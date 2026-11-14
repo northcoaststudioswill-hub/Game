@@ -20,14 +20,15 @@ Under the cartridges is the **Lantern menu** (press down, or tap it): one capsul
 
 ## Rootdeep in one minute
 
-- Start a **New Game**. Erin will tell you what's going on. The Root Door at the bottom of the Hearth takes you down.
+- Start a **New Game**. Erin will walk over and tell you what's going on. **The Burrow** at the bottom of the Hearth takes you down.
 - **A** attacks (it aims for you), **B** casts, **X** and **Y** are your keeper's special moves, **double-tap a direction** to dash.
   When the SUPER bar is full, **B** fires your super.
 - Sprouts you find down there fight for you. Walk over them to pick them up; press **A** next to a buried one to pluck it.
 - Pots, berry bushes, chests and boom bulbs: smash them, eat them, open them, or set them off near enemies.
-- When you fall, the Moondew you found comes home with you. Spend it in the **Burrow Beneath** (the hatch by the Hearth's back wall), where your sprouts dig you permanent upgrades. Your sprouts come home too.
+- When you fall, the Moondew you found comes home with you. Spend it at the **Sprout Digs** (by the Hearth's back wall), where your sprouts dig you permanent upgrades. Your sprouts come home too.
 - When your sprout string is full, extra sprouts you find head up to the surface between chambers and wait for you in the Ledger.
-- **Start** pauses. **Save & Quit** keeps your run; **Continue** on the title menu picks it back up.
+- **Start** pauses, in a run or in the Hearth (save, settings, capsules, new game, quit). **Save & Quit** keeps your run; **Continue** on the title menu picks it back up.
+- When someone has something to tell you, they'll walk over. Between chambers you'll see your keeper drop to the next one, and any rescued sprouts climbing home.
 - Unlock more keepers (Erin, Louie, Marcus, the Sprout King) by playing, or from **Capsules** (the same machine from any menu).
 
 ## Controls on a computer

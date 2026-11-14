@@ -38,7 +38,7 @@ On the cartridge shelf: one capsule machine for every cartridge, stats from all 
 ## Rootdeep (slot 3): what's in
 
 **Structure**
-- **The Hearth:** a hub with five stations as furniture (Mirror, Armory, Keepsake Shelf, Codex, Pact gate) and the cast in their corners.
+- **The Hearth:** a hub with five stations as furniture (Sprout Digs, Armory, Keepsake Shelf, Codex, Pact gate) and the cast in their corners.
 - **Runs:** 12 chambers across 3 areas (the Burrows, the Flooded Vault, the Ember Core).
 - **Bosses:** the Grub Mother, the Drowned King and the Hollow Keeper.
 - **Rewards:** two reward doors per chamber, plus boons from 6 sprout gods, a shop, fountains, Sunfruit and honey.
@@ -57,20 +57,23 @@ On the cartridge shelf: one capsule machine for every cartridge, stats from all 
 **In the rooms:** pots, berry bushes, root chests and boom bulbs.
 
 **Progression and saving**
-- **The Burrow Beneath** (was the Mirror): 8 permanent upgrades, dug by your sprouts with Moondew.
-- **Sprouts to the surface:** a full string sends extra sprouts up between chambers, in a keeper-specific scene.
+- **The Sprout Digs** (was the Mirror): 8 permanent upgrades, dug by your sprouts with Moondew.
+- **The Burrow** (the bottom door): every descent plays a keeper-specific drop scene.
+- **Between chambers:** a short scene every time: chamber cleared, rescued overflow sprouts climbing home, the drop, the next chamber's card.
+- **Hearth menu** on Start: save, settings, capsules, new game, quit to title, swap cartridge. A SAVED mark shows when it saves.
 - **Keepsakes and weapons:** 5 keepsakes and 3 weapons.
 - **The Pact of Roots:** heat levels, unlocked after your first escape.
 - **Saving:** a run checkpoints every chamber, with Continue and New Game on the title menu and Save & Quit on pause.
 
 **Story and feel**
 - **Cinematics** in Sprouts' cutscene style: the intro, each boss's first appearance, the first escape, the Sprout King's arrival, and a rope-rescue death scene.
-- **A smooth start:** Erin's welcome, an objective bar with an arrow, and one-at-a-time tips in chamber 1.
+- **A smooth start:** Erin walks over with the welcome, an objective bar with an arrow, and one-at-a-time tips in chamber 1.
+- **Walk-ups:** characters cross the Hearth to explain things when they matter (the Digs, the Ledger, unlocks, the Pact, capsule tickets).
 - **Growing dialogue:** 38 topics that unlock with milestones and keeper logs. Marcus's voice is locked to Sprouts', with Waterworks lines only once it's built and the occasional "J".
 - **Art:** pixels drawn true to size in Sprouts' style, lantern lighting with wall lanterns that relight when a room is cleared, animated attacks, foe warnings and hit-stop.
 
 **Checks**
-- **Automated:** a text audit (177 screens at iPhone 16 Pro Max size), keeper moves, the full roguelite loop, capsules and reset, cinematics, saves and onboarding. All pass.
+- **Automated:** a text audit (257 screens at iPhone 16 Pro Max size), keeper moves, the full roguelite loop, capsules and reset, cinematics, saves and onboarding. All pass.
 - **Playtest:** see `PLAYTEST_REPORT.md`.
 
 ## Known issues and open questions

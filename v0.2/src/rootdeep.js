@@ -283,7 +283,7 @@ function rdDrawKeeper(id,x,y,dirX){x=Math.round(x);y=Math.round(y);
 const RDCAP=[
  {n:'MOONLIGHT LANTERN',d:'YOUR LIGHT IN THE DEEP: MOON-WHITE',r:0,lan:'#d8e8ff'},
  {n:'SPROUT LANTERN',d:'YOUR LIGHT IN THE DEEP: SPROUT-GREEN',r:0,lan:'#b8f890'},
- {n:'MOONDEW JAR',d:'+40 MOONDEW FOR THE BURROW',r:0,dew:40},
+ {n:'MOONDEW JAR',d:'+40 MOONDEW FOR THE DIGS',r:0,dew:40},
  {n:'ROSE LANTERN',d:'YOUR LIGHT IN THE DEEP: ROSE',r:1,lan:'#f8a8d0'},
  {n:'EMBER LANTERN',d:'YOUR LIGHT IN THE DEEP: EMBER',r:1,lan:'#f89848'},
  {n:"ERIN'S INVITE",d:'ERIN CAN DIVE WITH YOU',r:1,ch:'ERIN'},
@@ -372,6 +372,7 @@ function applyFruit(){const owned=[RUN.boons.atk,RUN.boons.cast,RUN.boons.dash,.
  if(owned.length){const b=owned[(Math.random()*owned.length)|0];b.level++;say2('SUNFRUIT: '+boonName(b)+' Lv'+b.level,3);return true}
  RUN.petals+=60;say2('NO BOON TO FEED. +60 PETALS',2);return false;}
 /* ---------------- runs & chambers ---------------- */
+function rdGoDown(){rdStartRun();rdDescPick();(RUN.cineQ=RUN.cineQ||[]).unshift('descend');state='g3run'}
 function rdStartRun(resume){const s=rdStats();
  RUN={hp:s.maxHp,petals:20+mir('gold')*20,dew:0,keys:0,honey:0,chamber:0,char:RD.char||'WILL',wave2:null,sigShown:0,heat:heatTotal(),
   boons:{atk:null,cast:null,dash:null,pass:[]},enemies:[],projs:[],eprojs:[],pickups:[],parts:[],texts:[],doors:[],zones:[],hazards:[],buds:[],pods:[],dewT:0,podDropped:false,
@@ -393,7 +394,7 @@ function rdCkpt(){if(!RUN)return;RD.ckpt={hp:RUN.hp,petals:RUN.petals,dew:RUN.de
 function rdResume(){const c=RD.ckpt;if(!c)return false;RD.char=c.char;rdStartRun(true);
  Object.assign(RUN,{hp:c.hp,petals:c.petals,dew:c.dew,keys:c.keys,honey:c.honey,char:c.char,heat:c.heat,boons:c.boons,revives:c.revives,phoenixUsed:c.phoenixUsed,
   collarUsed:c.collarUsed,kills:c.kills,bonusMax:c.bonusMax,sup:c.sup,found:c.found||0});
- RUN.buds=c.buds.map(t=>({type:t,x:P3.x,y:P3.y,a:Math.random()*6,cd:0,z:0}));RUN.chamber=c.chamber-1;rdNextChamber();state='g3run';say2('BACK IN CHAMBER '+RUN.chamber,2);return true}
+ RUN.buds=c.buds.map(t=>({type:t,x:P3.x,y:P3.y,a:Math.random()*6,cd:0,z:0}));RUN.chamber=c.chamber-1;RUN.noDrop=1;rdNextChamber();RUN.noDrop=0;state='g3run';say2('BACK IN CHAMBER '+RUN.chamber,2);return true}
 function rdArena(biome){RUN.obst=[];const A=rdArt(),kinds=A.B[biome].props,rows=Math.floor((H-RDA.top-RDA.bot)/16),n=3+((Math.random()*3)|0),used=new Set();
  let guard=0;while(RUN.obst.length<n&&guard++<60){const gx=(Math.random()*14)|0,gy=1+((Math.random()*(rows-2))|0),x=RDA.side+gx*16,y=RDA.top+gy*16,key=gx+','+gy;
   if(used.has(key)||Math.abs(x+8-W/2)<30&&Math.abs(y+8-H/2)<34||Math.abs(x+8-W/2)<28&&y>H-60||gy<2&&(Math.abs(x+8-(W/2-40))<20||Math.abs(x+8-(W/2+40))<20))continue;
@@ -412,9 +413,9 @@ function spawnBoss(ix){const d=BOSSES[ix],sc=foeScale();
  RUN.enemies.push(e);RUN.boss=e;RD.seen[d.id]=1;snd(110,.6,55,'sawtooth',.09);return e;}
 let say2T=0,say2Txt='';
 function say2(s,t=3){say2Txt=s;say2T=t;}
-function rdNextChamber(){if(RUN.chamber>0)rdSurfaceQueue();RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=[];RUN.eprojs=[];RUN.pickups=[];RUN.pods=[];RUN.podDropped=false;
+function rdNextChamber(){if(RUN.chamber>0&&!RUN.noDrop){RUN.surfN=0;rdSurfaceQueue();rdQueueDrop()}RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=[];RUN.eprojs=[];RUN.pickups=[];RUN.pods=[];RUN.podDropped=false;
  const ch=RUN.chamber,biome=ch<=4?0:ch<=8?1:2;RUN.biome=biome;rdArena(biome);rdInts(ch,biome,RUN.usedCells);
- if(ch===4||ch===8||ch===12){spawnBoss(ch/4-1);RUN.zoneT=2.4;if(!RD.flags['cine_boss'+(ch/4-1)])RUN.pendingCine='boss'+(ch/4-1);rdCkpt();return}
+ if(ch===4||ch===8||ch===12){spawnBoss(ch/4-1);RUN.zoneT=2.4;if(!RD.flags['cine_boss'+(ch/4-1)])RUN.pendingCine='boss'+(ch/4-1);rdCkpt();rdSavedMark();return}
  const pool=BIOMES[biome].pool,budget=4+ch+((RD.pact.swarm||0)*2),eliteCh=ch===3||ch===7||ch===10;
  let spent=0,guard=0;const wlist=[];
  while(spent<budget&&guard++<40){const k=pool[(Math.random()*pool.length)|0],cost=k==='grub'?1:k==='wisp'||k==='shade'?2:3;
@@ -422,7 +423,7 @@ function rdNextChamber(){if(RUN.chamber>0)rdSurfaceQueue();RUN.chamber++;RUN.pha
  const cut=Math.max(1,Math.ceil(wlist.length*.55));
  wlist.slice(0,cut).forEach(s2=>spawnFoe(s2.k,26+Math.random()*(W-52),RDA.top+10+Math.random()*(H*.42),s2.elite));
  RUN.wave2=wlist.length>cut?wlist.slice(cut):null;
- RUN.elite=eliteCh;RUN.zoneT=2;if(eliteCh)say2('AN ELITE GUARDS THIS CHAMBER',2);rdCkpt();}
+ RUN.elite=eliteCh;RUN.zoneT=2;if(eliteCh)say2('AN ELITE GUARDS THIS CHAMBER',2);rdCkpt();rdSavedMark()}
 function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;
  if(!RUN.podDropped){RUN.pods.push({type:PODW[RUN.biome][(Math.random()*6)|0],x:W/2+R(-16,16),y:H/2});RUN.podDropped=true;ftext(W/2,H/2-16,'A SPROUT WAS HIDING HERE!','#a8f080')}
  if(RD.keepEq){const who=(KEEPS.find(k=>k.id===RD.keepEq)||{}).who;if(who)RD.keepXp[who]=(RD.keepXp[who]||0)+1}
@@ -468,7 +469,7 @@ function rdEscape(){RD.ckpt=null;RD.stats.escapes++;try{meta.tix++;persist(true)
 function rdAbandon(){RD.ckpt=null;if(RUN){bankBuds();RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey}RUN=null;rdSave();state='g3hub';}
 
 /* ---------------- the Hearth (hub) ---------------- */
-const STATIONS=[{id:'mirror',n:'THE BURROW BENEATH',l:'BURROW',x:28},{id:'arm',n:'ARMORY',l:'ARMORY',x:71},{id:'keep',n:'KEEPSAKE SHELF',l:'SHELF',x:114},{id:'codex',n:'CODEX',l:'CODEX',x:157},{id:'heat',n:'HEAT GATE',l:'HEAT',x:200}];
+const STATIONS=[{id:'mirror',n:'THE SPROUT DIGS',l:'DIGS',x:28},{id:'arm',n:'ARMORY',l:'ARMORY',x:71},{id:'keep',n:'KEEPSAKE SHELF',l:'SHELF',x:114},{id:'codex',n:'CODEX',l:'CODEX',x:157},{id:'heat',n:'HEAT GATE',l:'HEAT',x:200}];
 /* the Hearth's layout is in fractions of the screen height, so a tall phone gets a roomy hall
    with everyone in their own corner, not a pile at the bottom */
 function hubL(){return{bedY:Math.round(H*.31),gloomY:Math.round(H*.30),rugY:Math.round(H*.46),deskY:Math.round(H*.62),campY:Math.round(H*.62)}}
@@ -500,7 +501,7 @@ function charLockTxt(id){if(id==='ERIN')return 'GIVE ERIN 3 HONEY: '+(RD.gift.ER
  if(id==='MARCUS')return 'TAKES OVER AFTER 8 DEATHS: '+(RD.stats.deaths||0)+'/8';
  if(id==='KING')return 'CARRY 6 BUDS IN ONE RUN';return ''}
 function charsUpdate(){uiSel=nav(uiSel,CHARS.length);
- if(pressed('a')){const c=CHARS[uiSel];if(charUnlocked(c.id)){RD.char=c.id;rdSave();snd(784,.1);later(()=>snd(1175,.2),90);rdStartRun();state='g3run'}else snd(140,.09);return}
+ if(pressed('a')){const c=CHARS[uiSel];if(charUnlocked(c.id)){RD.char=c.id;rdSave();snd(784,.1);later(()=>snd(1175,.2),90);rdGoDown()}else snd(140,.09);return}
  if(pressed('b')||pressed('start'))state='g3hub';}
 /* draws one keeper's little sprite with its feet at (x,y) */
 function rdKeeperSpr(id,x,y,sc){if(sc>=2){g.save();g.translate(Math.round(x),Math.round(y));g.scale(2,2);rdDrawKeeper(id,0,0,1);g.restore()}else rdDrawKeeper(id,x,y,1)}
@@ -535,7 +536,7 @@ const NPCROUTE={
 function hubNpcReset(){for(const who of NPCS){const hx=NPCPOS[who][0],hy=hubY(NPCPOS[who][1]);
  const route=NPCROUTE[who].map(pt=>pt==='P3'?'P3':{x:pt[0],y:hubY(pt[1]),act:!!pt[2]});
  HUBNPC[who]={x:hx,y:hy,hx,hy,route,ri:0,jx:0,jy:0,act:0,wait:.3+Math.random()*.8}}}
-function hubEnter(){rdTalkL=null;hubBark=null;hubBarkT=3;P3.x=W/2;P3.y=hubY(.36);P3.vx=P3.vy=0;hubNpcReset();state='g3hub';
+function hubEnter(){rdTalkL=null;hubBark=null;hubBarkT=3;rdApprWait=.9;rdApprTalk=false;rdSavedMark();P3.x=W/2;P3.y=hubY(.36);P3.vx=P3.vy=0;hubNpcReset();state='g3hub';
  if(charUnlocked('KING')&&!RD.flags.cine_king&&(RD.stats.fullString||0)>=1)startCine('hub','king');}
 function movePlayer(dt,spd){const mx=keys.right-keys.left,my=keys.down-keys.up;const l=Math.hypot(mx,my)||1;
  const sp=spd*(rdStats().speedMul);
@@ -549,22 +550,49 @@ function movePlayer(dt,spd){const mx=keys.right-keys.left,my=keys.down-keys.up;c
 /* what to do next, at the top of the Hearth like Sprouts' objective bar (with an arrow over the target) */
 function rdObjective(){const S=RD.stats;
  if(!RD.flags.met_ERIN)return{t:'TALK TO ERIN',who:'ERIN'};
- if(!S.runs)return{t:'GO DOWN THE ROOT DOOR',door:1};
- if(!Object.keys(RD.mirror||{}).length&&RD.dew>=Math.min(...MIRROR.map(m=>m.cost[0])))return{t:'SPEND MOONDEW IN THE BURROW',st:'mirror'};
+ if(!S.runs)return{t:'GO DOWN THE BURROW',door:1};
+ if(!Object.keys(RD.mirror||{}).length&&RD.dew>=Math.min(...MIRROR.map(m=>m.cost[0])))return{t:'SPEND MOONDEW AT THE DIGS',st:'mirror'};
  if(!S.bosses)return{t:'BEAT THE GRUB MOTHER: CHAMBER 4',door:1};
  if(!S.escapes)return{t:'ESCAPE THE DEEP: CHAMBER 12',door:1};
  if(!heatTotal())return{t:'TRY THE PACT OF ROOTS',st:'heat'};
  return null}
 /* Erin's welcome, the first time you talk to her: how the whole thing works */
-const RDINTRO=["Will! You came. The Lantern's light is draining down through the roots.","Something under the Hearth is eating it. The Root Door, bottom of this room, goes down there.","You'll fall down there. Everyone does. You wake up here and keep the Moondew you found.","Spend it in the Burrow Beneath, the hatch by the back wall. Then go again. Go on, keeper."];
+const RDINTRO=["Will! You came. The Lantern's light is draining down through the roots.","Something under the Hearth is eating it. See the Burrow, bottom of the room? It goes all the way down.",
+ "Down there, find sprouts. Pluck them with A. They follow you and fight for you.","You'll fall. Everyone does. You wake up right here and keep the Moondew you found.",
+ "Spend it at the Sprout Digs, by the back wall. The sprouts dig you upgrades that last. Then go again.","Go on, keeper. I'll keep the light on."];
+/* who walks over, when, and what they say. Each plays once; it marks the matching talk topic as heard. */
+const RDAPPR=[
+ {id:'met_ERIN',flag:1,who:'ERIN',when:()=>!RD.flags.met_ERIN,lines:RDINTRO},
+ {id:'e_fall',who:'ERIN',when:()=>RD.stats.deaths>=1,lines:["You came back up! Covered in dirt, but up.","That's how the deep works. You fall, you wake up here. The Moondew you found comes with you.",
+  "Take it to the Sprout Digs by the back wall. The sprouts dig you upgrades, and those stay forever.","Then go again. A little deeper every time."]},
+ {id:'l_unlock',who:'LOUIE',when:()=>charUnlocked('LOUIE'),lines:["WOOF WOOF! (Louie has dropped his stick at your feet. He's coming down with you now.)","ARF! (Pick him when you go down the Burrow. He is very fast. He wants you to know.)"]},
+ {id:'e_unlock',who:'ERIN',when:()=>charUnlocked('ERIN'),lines:["You kept bringing me honey, so... I'm coming down with you. If you want.","Pick me when you go down the Burrow. My buds fight harder for me."]},
+ {id:'m_unlock',who:'MARCUS',when:()=>charUnlocked('MARCUS'),lines:["Eight falls, bro. EIGHT. I'm going down there myself.","Pick me at the Burrow. I'll show you how it's done. Hydro Jet, baby."]},
+ {id:'e_ledger',who:'ERIN',when:()=>RD.stats.runs>=1&&Object.values(RD.bank||{}).some(v=>v>0),lines:["Will! The sprouts you saved are in the Ledger. That's the bed by the wall, look.",
+  "Before you go down, pick up to three of them at the bed. They start the run with you and fight for you.","Find more down there and your string grows. When it's full, the extras climb up here to the bed.",
+  "Spare sprouts trade at the bed too. That's the Exchange. Up here, sprouts buy almost everything."]},
+ {id:'r_escape',who:'RANGER',when:()=>RD.stats.escapes>=1,lines:["You came out the bottom and back up. Not many have.","The gate by the wall is open now. The Pact of Roots.","Sign it and the deep gets meaner. Meaner deep, better rewards. Your call, keeper."]},
+ {id:'m_caps',who:'MARCUS',when:()=>RD.stats.runs>=1&&(typeof meta!=='undefined')&&meta.tix>0,lines:["Bro. BRO. You've got capsule tickets and you're just... holding them?",
+  "Press START, hit CAPSULES. One ticket, one capsule. Keepers, lanterns, Sprouts styles. One machine for everything.","Bosses down here pay tickets. Sprouts pays them. Even the Lantern achievements on the shelf pay them, J.","Don't thank me. Actually, thank me."]}];
+let rdAppr=null,rdApprWait=0,rdApprTalk=false;
+function rdApprCheck(){RD.heard=RD.heard||{};for(const a of RDAPPR){const done=a.flag?RD.flags[a.id]:RD.heard[a.id];if(done)continue;let ok=false;try{ok=a.when()}catch(e){}if(ok&&HUBNPC[a.who]){rdApproach(a);return true}}return false}
+function rdApproach(a){if(a.flag)RD.flags[a.id]=1;else RD.heard[a.id]=1;if(a.who==='ERIN')RD.flags.met_ERIN=1;rdSave();
+ const n=HUBNPC[a.who];n.wait=0;rdAppr={a,t:0};hubMsg='';hubBark=null;P3.vx=P3.vy=0;state='g3appr';snd(392,.2,523,'triangle',.04)}
+function apprUpdate(dt){const A=rdAppr,n=HUBNPC[A.a.who];A.t+=dt;const side=n.x<P3.x?-1:1,tx=P3.x+side*16,ty=P3.y-2,dx=tx-n.x,dy=ty-n.y,d=Math.hypot(dx,dy);
+ if(A.t>.45){if(d>2&&A.t<4&&!pressed('a')){const sp=(NPCSPD[A.a.who]||32)*2;n.x+=dx/d*Math.min(d,sp*dt);n.y+=dy/d*Math.min(d,sp*dt)}
+  else{n.x=tx;n.y=ty;n.wait=4;P3.fx=side;P3.ax=side;P3.ay=0;rdTalkL=A.a.lines;talkNPC=A.a.who;uiSel=0;talkStart=0;talkLine=0;talkTxt=rdLn(A.a.lines[0]);rdApprTalk=true;state='g3talk';snd(520,.04)}}
+ if(A.t>.45&&P3)P3.fx=side;}
+function rdDrawLetterbox(k,top){const h=Math.round(16*k);r('#000000',0,0,W,h);if(!top)r('#000000',0,H-h,W,h)}
 let rdTalkL=null;
 function hubTarget(){let best=null,bd=17*17;
  for(const s of STATIONS){const d=(P3.x-s.x)**2+(P3.y-70)**2;if(d<bd*1.3){bd=d;best={kind:'station',id:s.id,n:s.n,x:s.x,y:70}}}
  for(const who of NPCS){const n2=HUBNPC[who],x=n2?n2.x:NPCPOS[who][0],y=n2?n2.y:hubY(NPCPOS[who][1]);const d=(P3.x-x)**2+(P3.y-y)**2;if(d<bd){bd=d;best={kind:'npc',who,n:who,x,y}}}
  const bY=hubL().bedY+16,db2=(P3.x-41)**2+(P3.y-bY)**2;if(db2<bd*1.6){bd=db2;best={kind:'sprouts',n:'SPROUT LEDGER',x:41,y:bY}}
- const d=(P3.x-W/2)**2+(P3.y-(H-13))**2;if(d<bd)best={kind:'descend',n:'THE ROOT DOOR — DESCEND',x:W/2,y:H-13};
+ const d=(P3.x-W/2)**2+(P3.y-(H-13))**2;if(d<bd)best={kind:'descend',n:'THE BURROW — GO DOWN',x:W/2,y:H-13};
  return best;}
 function hubUpdate(dt){if(pressed('sel')){rdSave();eject();return}
+ if(pressed('start')){hpSel=0;hpArm=0;state='g3hpause';snd(660,.06,880);return}
+ if(rdApprWait>0)rdApprWait-=dt;else if(rdApprCheck())return;
  movePlayer(dt,84);
  for(const who of NPCS){const n=HUBNPC[who];if(!n)continue;
   if(n.act>0)n.act-=dt;
@@ -584,7 +612,7 @@ function hubUpdate(dt){if(pressed('sel')){rdSave();eject();return}
  const t=hubTarget();
  hubMsg=t?('A: '+t.n):'';if(hubMsgT>0)hubMsgT-=dt;
  if(t&&pressed('a')){snd(520,.05);
-  if(t.kind==='descend'){if(CHARS.filter(c=>charUnlocked(c.id)).length<=1){RD.char='WILL';rdStartRun();state='g3run';return}uiSel=Math.max(0,CHARS.findIndex(c=>c.id===(RD.char||'WILL')));state='g3chars';return}
+  if(t.kind==='descend'){if(CHARS.filter(c=>charUnlocked(c.id)).length<=1){RD.char='WILL';rdGoDown();return}uiSel=Math.max(0,CHARS.findIndex(c=>c.id===(RD.char||'WILL')));state='g3chars';return}
   if(t.kind==='sprouts'){sprPage=0;uiSel=0;state='g3sprouts';return}
   if(t.kind==='npc'&&t.who==='ERIN'&&!RD.flags.met_ERIN){rdTalkL=RDINTRO;talkNPC='ERIN';uiSel=0;talkStart=0;talkLine=0;talkTxt=RDINTRO[0];RD.flags.met_ERIN=1;rdSave();state='g3talk';return}
   if(t.kind==='npc'){const tp=rdTopic(t.who);if(tp){rdTalkL=tp.lines;RD.heard[tp.id]=1;talkNPC=t.who;uiSel=0;talkStart=0;talkLine=0;talkTxt=rdLn(tp.lines[0]);rdSave();state='g3talk';return}}
@@ -594,12 +622,12 @@ function hubUpdate(dt){if(pressed('sel')){rdSave();eject();return}
    state='g3talk';return}
   if(t.id==='mirror'&&!RD.flags.cine_burrow){startCine('mirror','burrow');return}
   uiSel=0;codexPage=0;heatSel=0;state='g3'+t.id;return}}
-function talkUpdate(){if(pressed('b')){state='g3hub';snd(330,.05);return}
+function talkUpdate(){if(pressed('b')){state='g3hub';if(rdApprTalk){rdApprTalk=false;rdApprWait=1.4}snd(330,.05);return}
  if(pressed('start')&&RD.honey>0&&talkNPC){const who=talkNPC,k=KEEPS.find(k=>k.who===who);
   RD.honey--;RD.gift[who]=(RD.gift[who]||0)+1;if(k&&!RD.keeps[k.id]){RD.keeps[k.id]=1;RD.keepXp[who]=RD.keepXp[who]||0;talkTxt=who+' gave you a keepsake: '+k.n+'! Equip it at the shelf.';snd(784,.12);later(()=>snd(1175,.25),110)}
   else{RD.dew+=5;talkTxt=who+' presses 5 Moondew into your hand. "For the road down."'}rdSave();return}
  if(pressed('a')){const L=rdTalkL||LINES[talkNPC];talkLine++;
-  if(talkStart+talkLine>=L.length){state='g3hub';if(L===RDINTRO){hubBark={who:'MARCUS',txt:"door's RIGHT there, bro",t:3.5};hubBarkT=6}}else{talkTxt=rdLn(L[talkStart+talkLine]);snd(520,.04)}return}}
+  if(talkStart+talkLine>=L.length){state='g3hub';if(rdApprTalk){rdApprTalk=false;rdApprWait=1.4}if(L===RDINTRO){hubBark={who:'MARCUS',txt:"door's RIGHT there, bro",t:3.5};hubBarkT=6}}else{talkTxt=rdLn(L[talkStart+talkLine]);snd(520,.04)}return}}
 function mirrorUpdate(){uiSel=nav(uiSel,MIRROR.length);
  if(pressed('a')){const m=MIRROR[uiSel],rank=mir(m.id);
   if(rank>=m.max){snd(140,.08)}else{const c=m.cost[rank];if(RD.dew>=c){RD.dew-=c;RD.mirror[m.id]=rank+1;rdSave();snd(784,.1);later(()=>snd(1175,.2),100)}else snd(140,.08)}}
@@ -627,6 +655,27 @@ function shopUpdate(){uiSel=nav(uiSel,shopItems.length+1);
   const it=shopItems[uiSel];
   if(it.sold){snd(140,.08)}else if(RUN.petals>=it.p){RUN.petals-=it.p;it.sold=true;snd(700,.08,1100);it.act()}else snd(140,.08)}
  if(pressed('b')){rdNextChamber();state='g3run'}}
+let hpSel=0,hpArm=0,rdSavedT=0;
+const HPITEMS=['RESUME','SAVE GAME','SETTINGS','CAPSULES','NEW GAME','QUIT TO TITLE','SWAP CARTRIDGE'];
+const HPDESC=['BACK TO THE HEARTH','SAVES EVERYTHING. IT ALSO SAVES ON ITS OWN','MUSIC, SOUND, SHAKE, LANTERN','ONE MACHINE FOR EVERY CARTRIDGE','WIPE ROOTDEEP AND START OVER','THE ROOTDEEP TITLE MENU','BACK TO THE CARTRIDGE SHELF'];
+function rdSavedMark(){rdSavedT=1.8}
+function hpauseUpdate(){const was=hpSel;hpSel=nav(hpSel,HPITEMS.length);if(hpSel!==was)hpArm=0;
+ if(pressed('b')||pressed('start')){state='g3hub';snd(440,.05);return}
+ if(pressed('a')){const k=HPITEMS[hpSel];snd(660,.06,990);
+  if(k==='RESUME')state='g3hub';
+  else if(k==='SAVE GAME'){rdSave();rdSavedMark()}
+  else if(k==='SETTINGS'){setReturn='g3hpause';uiSel=0;state='g3set'}
+  else if(k==='CAPSULES')lanOpen('g3hpause','caps');
+  else if(k==='NEW GAME'){if(hpArm<2){hpArm++;snd(330,.1)}else{hpArm=0;rdNewGame()}}
+  else if(k==='QUIT TO TITLE'){rdSave();menuSel=0;newArm=0;state='g3menu'}
+  else{rdSave();eject()}}}
+function drawHPause(){hubMsg='';drawHub();r('rgba(8,5,14,.86)',0,0,W,H);const st=19,n=HPITEMS.length,ph=n*st+40,y0=Math.round((H-ph)/2);
+ r('#181020',W/2-82,y0-2,164,ph+4);r('#241a38',W/2-80,y0,160,ph);r('#ffd94d',W/2-80,y0,160,1);ctext('THE HEARTH',y0+6,2,'#ffd94d','#403010');
+ drawList(HPITEMS,hpSel,y0+34,st);
+ const dsc=HPITEMS[hpSel]==='NEW GAME'&&hpArm?(hpArm===1?'A AGAIN: ARE YOU SURE?':'ONCE MORE: ALL ROOTDEEP PROGRESS GOES'):HPDESC[hpSel];
+ ctext(dsc,y0+ph+12,1,hpArm?'#ff9a8a':'#a89ec2',null);ctext('B: BACK',H-13,1,'#8d84a8',null)}
+function rdDrawSaved(){if(rdSavedT<=0)return;const a=Math.min(1,rdSavedT*2),x=W-46,y=17;g.save();g.globalAlpha=a;r('#181020',x-1,y-1,44,13);r('#2a4a2a',x,y,42,11);
+ r('#a8f080',x+3,y+5,2,2);r('#a8f080',x+5,y+7,2,2);r('#a8f080',x+7,y+5,2,2);r('#a8f080',x+9,y+3,2,2);text('SAVED',x+14,y+2,1,'#e8ffd8',null);g.restore()}
 function pauseUpdate(){if(pressed('b')){if(pausePage===1){pausePage=0}else state='g3run';return}
  if(pausePage===1){if(pressed('a')||pressed('start'))pausePage=0;return}
  pauseSel=nav(pauseSel,6);
@@ -655,20 +704,40 @@ const RDCINES={
  escape:[{d:4.5,bg:'escape',lines:[[null,'The keeper climbed out of the deep.'],['ERIN','You brought some light back up with you.']]},
   {d:4.5,bg:'escape',lines:[['MARCUS','Cool, bro. Now do it again with heat. Unless you\'re scared. You\'re scared.'],[null,'The Pact of Roots is open at the Hearth.']]}],
  burrow:[{d:5,bg:'burrow',lines:()=>RDBURROWL[RD.char||'WILL']||RDBURROWL.WILL},{d:4,bg:'burrow',lines:[[null,'Give them Moondew and they dig you something stronger. It lasts forever.']]}],
+ descend:[{d:3.6,bg:'descend',lines:()=>(RUN&&RUN.descL)||[]}],
+ drop:[{d:2.6,bg:'drop',lines:[]}],
  surface:[{d:3.6,bg:'surface',lines:()=>[[null,(RUN&&RUN.surfN||0)+((RUN&&RUN.surfN)===1?' sprout heads':' sprouts head')+' up to the surface.'],RDSURFL[(RUN&&RUN.char)||'WILL']||RDSURFL.WILL]}],
  king:[{d:4.5,bg:'king',lines:[[null,'Six buds in a row. Something in the dark noticed.'],['SPROUT KING','You carried my court all the way down.']]},
   {d:4.5,bg:'king',lines:[['SPROUT KING','The buds have chosen. I walk with you, keeper.'],['MARCUS','Bro. The salad has a crown now. Never been this jealous of a salad.']]}]};
 const RDCINE=RDCINES.intro;
+/* going down: a line for whoever's diving (picked once, so it doesn't flicker), and Erin's push on the very first one */
+const RDDESCL={WILL:[['WILL','Lantern lit. Down we go.'],['WILL','Okay, deep. Round two.'],['WILL',"Stay close, buds. It's dark down there."]],
+ ERIN:[['ERIN','Hold on, buds. Mind the roots.'],['ERIN',"Back soon. Don't let Marcus touch my seeds."],['ERIN','Okay. Okay. In we go.']],
+ LOUIE:[['LOUIE','WOOF! (Head first. Always head first.)'],['LOUIE','ARF ARF! (He has smelled something down there.)']],
+ MARCUS:[['MARCUS','Bro. Watch this. Actually nobody watch this.'],['MARCUS','Marcus, going in. Tell the people I was brave.'],['MARCUS',"If I'm not back in ten, I'm busy winning."]],
+ KING:[['SPROUT KING','Court. We descend.'],['SPROUT KING','The roots remember their king. Onward.']]};
+function rdDescPick(){const k=RUN.char||'WILL',L=RDDESCL[k]||RDDESCL.WILL;
+ if(RD.stats.runs<=1){RUN.descL=[[null,'The Burrow under the Hearth goes all the way down.'],['ERIN','Find sprouts down there, Will. Pluck them with A. They fight for you.'],['ERIN','When you fall, you come back here. Nobody stays down. Go on.']];RDCINES.descend[0].d=9}
+ else{RUN.descL=[L[(Math.random()*L.length)|0]];RDCINES.descend[0].d=3.6}}
+/* between chambers: the room you just cleared, any rescued sprouts climbing up to the surface, then the drop */
+function rdQueueDrop(){const n=RUN.surfN||0,k=RUN.char||'WILL';let L=[];
+ if(n){L=!RD.flags.surf_told?[[null,'Your string is full, so '+n+(n===1?' rescued sprout climbs':' rescued sprouts climb')+' up to the surface.'],[null,'They go home to the Ledger. Spend them up there.'],RDSURFL[k]||RDSURFL.WILL]
+  :[[null,n+(n===1?' rescued sprout climbs':' rescued sprouts climb')+' up to the surface.'],RDSURFL[k]||RDSURFL.WILL];RD.flags.surf_told=1}
+ RDCINES.drop[0].d=n?2.6+L.length*1.9:2.6;RDCINES.drop[0].lines=L;RUN.dropFrom=RUN.chamber;(RUN.cineQ=RUN.cineQ||[]).push('drop')}
+/* the chamber card both scenes end on: CHAMBER 5 / THE FLOODED VAULT */
+function rdDrawChamberCard(sc,y){const t=rdCineT,k=Math.max(0,Math.min(1,(t-(sc.d-1.3))/.35));if(!RUN||k<=0)return;
+ const ch=RUN.chamber,b=ch<=4?0:ch<=8?1:2;g.save();g.globalAlpha=k;
+ ctext((ch%4===0?'BOSS · ':'')+'CHAMBER '+ch,y,2,'#ffffff','#181020');ctext(BIOMES[b].n,y+20,1,['#c8a0e8','#7fd0e8','#f8a060'][b],null);g.restore()}
 const RDCPLATE={WILL:'#2a6a88',ERIN:'#b8304a',MARCUS:'#3a3a44',SCOUT:'#1f6a72',LOUIE:'#7a4a28',RANGER:'#38603a','GRUB MOTHER':'#7a3a9a','DROWNED KING':'#2a6a88','HOLLOW KEEPER':'#3a3050','SPROUT KING':'#3c8a30'};
 let rdCineT=0,rdCineIx=0,rdCineDest='hub',rdCineKey='intro',rdCineSeq=RDCINES.intro;
 const rdLines=sc=>typeof sc.lines==='function'?sc.lines():sc.lines;
 function startCine(dest,key){rdCineKey=key||'intro';rdCineSeq=RDCINES[rdCineKey];rdCineIx=0;rdCineT=0;rdCineDest=dest;state='g3cine';snd(392,.3,196,'triangle',.05)}
 function endCine(){if(rdCineKey==='intro')RD.flags.cineSeen=1;else RD.flags['cine_'+rdCineKey]=1;rdSave();
- if(rdCineDest==='mirror'){uiSel=0;state='g3mirror'}else if(rdCineDest==='hub'){hubEnter();if(rdCineKey==='intro'&&!RD.flags.met_ERIN){const n=HUBNPC.ERIN;P3.x=n.x+16;P3.y=n.y+4;P3.ax=-1;P3.ay=0;rdTalkL=RDINTRO;talkNPC='ERIN';talkStart=0;talkLine=0;talkTxt=RDINTRO[0];RD.flags.met_ERIN=1;rdSave();state='g3talk'}}else if(rdCineDest==='run')state='g3run';else if(rdCineDest==='win')state='g3win';else{menuSel=0;state='g3menu'}}
-function cineUpdate(dt){rdCineT+=dt;const sc=rdCineSeq[rdCineIx],LN=rdLines(sc);
+ if(rdCineDest==='mirror'){uiSel=0;state='g3mirror'}else if(rdCineDest==='hub'){hubEnter();if(rdCineKey==='intro')rdApprWait=.6}else if(rdCineDest==='run')state='g3run';else if(rdCineDest==='win')state='g3win';else{menuSel=0;state='g3menu'}}
+function cineUpdate(dt){rdCineT+=dt;const sc=rdCineSeq[rdCineIx],LN=rdLines(sc),NL=Math.max(1,LN.length);
  if(pressed('start')||pressed('sel')){endCine();return}
- if(pressed('a')){const seg=sc.d/LN.length,cur=Math.min(LN.length-1,Math.floor(rdCineT/seg));
-  if(cur<LN.length-1)rdCineT=(cur+1)*seg+.01;
+ if(pressed('a')){const seg=sc.d/NL,cur=Math.min(NL-1,Math.floor(rdCineT/seg));
+  if(cur<NL-1)rdCineT=(cur+1)*seg+.01;
   else{rdCineIx++;rdCineT=0;if(rdCineIx>=rdCineSeq.length){endCine();return}}}
  if(rdCineT>=sc.d){rdCineIx++;rdCineT=0;if(rdCineIx>=rdCineSeq.length)endCine()}}
 function cineActor(x,y,fx){const sax=P3.ax,say=P3.ay;P3.ax=fx||1;P3.ay=0;drawPlayerSpr(x,y,1);P3.ax=sax;P3.ay=say}
@@ -697,7 +766,7 @@ const RSTG={HH:0,GY:0,
  sprout(x,type,s){g.save();g.translate(Math.round(x),this.GY);g.scale(s,s);drawSprout({x:ox,y:oy+2,type,age:30});g.restore()}};
 
 /* the cutscenes. The current speaker is drawn at 3x, everyone else at 2x */
-function rdDrawCine(){const sc=rdCineSeq[rdCineIx],tt=rdCineT,LN=rdLines(sc),seg=sc.d/LN.length,li=Math.min(LN.length-1,Math.floor(tt/seg)),ln=LN[li],spk=ln[0],S=RSTG.base(H-74),gy=S.GY,hh=S.HH,
+function rdDrawCine(){const sc=rdCineSeq[rdCineIx],tt=rdCineT,LN=rdLines(sc),seg=sc.d/Math.max(1,LN.length),li=Math.min(Math.max(0,LN.length-1),Math.floor(tt/seg)),ln=LN[li]||[null,''],spk=ln[0],S=RSTG.base(H-74),gy=S.GY,hh=S.HH,
   kp=(RUN&&RUN.char)||RD.char||'WILL',who=(id,x,fx)=>S.keeper(id,x,spk===id?3:2,fx);
  if(sc.bg==='garden'){S.sky('dusk');S.hills('dusk');
   r('#8a5a3a',8,gy-5,46,9);r('#6e4428',8,gy-5,46,2);for(let k=0;k<3;k++)S.sprout(18+k*14,k,1);
@@ -751,6 +820,29 @@ function rdDrawCine(){const sc=rdCineSeq[rdCineIx],tt=rdCineT,LN=rdLines(sc),seg
    else{const px=sx+22+i*14-((i%2)?6:0);g.save();g.translate(px,top-4-Math.round(Math.abs(Math.sin(time*6+i))*3));g.scale(2,2);drawBud({x:ox,y:oy,type:ty,stage:2,z:0,a:i,mv:true,st:'follow',fx:1});g.restore()}});
   S.keeper(kp2,sx-48,2,1);
   rdLight([{x:sx,y:top,r:70,c:'#fff3b0'},{x:sx-48,y:gy-14,r:40,c:rdLanternC()}],'rgba(14,6,22,.3)');}
+ else if(sc.bg==='descend'||sc.bg==='drop'){const d=sc.d,fall=Math.max(0,tt-(d-1.3)),go=d-2.1,hx=W/2,hy=gy-2;
+  if(fall<=0){
+   if(sc.bg==='descend'){const A=rdArt();for(let y=15;y<hh;y+=16)for(let x=0;x<W;x+=16)g.drawImage(A.hubWood,x,y);r('#3b2620',0,15,W,22);for(let x=0;x<W;x+=16)g.drawImage(A.B[0].wall,x,20);
+    r('#3a2c1c',hx,15,1,16);r('#3a2c1c',hx-4,31,9,8);r('#ffd94d',hx-2,33,5,5)}
+   else{const pb=RUN.dropFrom<=4?0:RUN.dropFrom<=8?1:2,AB=rdArt().B[pb];for(let y=31;y<hh;y+=16)for(let x=0;x<W;x+=16)g.drawImage(AB.floor[((x*7+y*13)>>4)%9<7?0:1],x,y);for(let x=0;x<W;x+=16)g.drawImage(AB.wall,x,15)}
+   /* the hole in the floor, with the deep breathing up out of it */
+   g.save();g.globalAlpha=.25+.1*Math.sin(time*4);g.fillStyle='#58f0c0';g.beginPath();g.ellipse(hx,hy,24,8,0,0,7);g.fill();g.restore();
+   g.fillStyle='#2a1a14';g.beginPath();g.ellipse(hx,hy,18,6,0,0,7);g.fill();g.fillStyle='#04060a';g.beginPath();g.ellipse(hx,hy+1,15,4,0,0,7);g.fill();
+   for(let i=0;i<10;i++){const a=i/10*6.283;r('#6e4a2a',Math.round(hx+Math.cos(a)*19)-1,Math.round(hy+Math.sin(a)*6)-1,3,2)}
+   /* rescued sprouts climb a root up out of the room */
+   if(sc.bg==='drop'&&RUN.surfN){const rx=34;r('#6e4a2a',rx,15,2,gy-15);for(let y=20;y<gy;y+=9)r('#8a5e36',rx-2,y,6,1);
+    (RUN.surfT||[]).forEach((ty,i)=>{const p=Math.max(0,Math.min(1,(tt-.3-i*.35)/1.8)),y=Math.round(gy-4-(gy-10)*p);if(p<1){g.save();g.translate(rx+1,y);g.scale(2,2);drawBud({x:ox,y:oy,type:ty,stage:2,z:0,a:time*8+i,mv:true,st:'follow',fx:1});g.restore()}});
+    const left=(RUN.surfT||[]).filter((ty,i)=>tt-.3-i*.35<1.8).length;if(left)text(left+' GOING UP',rx+8,gy-40,1,'#a8f080','#181020')}
+   /* the keeper walks to the hole and drops in */
+   const wk=Math.min(1,tt/Math.max(.4,Math.min(1.4,go))),kx=Math.round((sc.bg==='drop'?W/2+60:W/2-70)+(hx-(sc.bg==='drop'?W/2+60:W/2-70))*wk),sink=Math.max(0,(tt-go)/.8);
+   g.save();g.beginPath();g.rect(0,0,W,hy);g.clip();g.translate(0,Math.round(sink*sink*44));S.keeper(kp,kx,2,sc.bg==='drop'?-1:1);g.restore();
+   if(sc.bg==='drop'){const a=Math.min(1,tt*3);g.save();g.globalAlpha=a;r('rgba(8,5,14,.8)',0,40,W,20);r('#a8f080',0,40,W,1);r('#a8f080',0,59,W,1);ctext('CHAMBER '+RUN.dropFrom+' CLEARED',45,1,'#a8f080',null);g.restore()}
+   rdLight([{x:hx,y:hy,r:44,c:'#58f0c0'},{x:kx,y:gy-14,r:46,c:rdLanternC()}],sc.bg==='drop'?'rgba(10,4,16,.3)':'rgba(14,6,22,.3)')}
+  else{/* falling down the shaft: roots stream past, the keeper's lantern the only light */
+   r('#08060c',0,15,W,hh-15);for(let i=0;i<16;i++){const x=i<8?6+i*5:W-46+(i-8)*5,y=Math.round(((i*37+fall*260)%(hh+20))-10);r(i%3?'#2a1a14':'#3a2414',x,y,3,22);r('#4e3530',x+1,y+4,1,10)}
+   for(let i=0;i<9;i++){const x=40+((i*53)%160),y=Math.round(((i*71+fall*420)%(hh))+10);r('rgba(255,243,176,.35)',x,y,1,8)}
+   const ky=Math.round(Math.min(hh*.62,80+fall*70));S.base(ky+14).keeper(kp,W/2+Math.round(Math.sin(fall*9)*2),2,1);S.base(H-74);
+   rdLight([{x:W/2,y:ky-6,r:50,c:rdLanternC()}],'rgba(4,2,8,.5)');rdDrawChamberCard(sc,28)}}
  else if(sc.bg==='burrow'){S.cave();const kp2=RD.char||'WILL';
   /* the burrow under the Hearth: tunnels, a hanging lamp, and sprouts digging with tiny shovels */
   for(const[ax,ay,rr]of[[60,hh-60,24],[150,hh-70,30],[210,hh-50,18]]){g.fillStyle='#0b0812';g.beginPath();g.arc(ax,ay,rr,Math.PI,0);g.fill();r('#0b0812',ax-rr,ay,rr*2,8)}
@@ -775,9 +867,9 @@ function rdDrawCine(){const sc=rdCineSeq[rdCineIx],tt=rdCineT,LN=rdLines(sc),seg
   if(tt>1.1){const a=Math.min(1,(tt-1.1)*3);g.save();g.globalAlpha=a;r('rgba(8,5,14,.8)',0,30,W,24);r(col,0,30,W,1);r(col,0,53,W,1);ctext(BOSSES[bi].n,34,3,'#ffffff','#181020');g.restore()}}
  if(sc.bg!=='boss')r('#000000',0,hh,W,H-hh);
  r('#000000',0,0,W,15);r('#000000',0,H-15,W,15);
- r('#f4ead2',4,H-50,W-8,32);r('#281c30',4,H-50,W-8,1);
+ if(LN.length){r('#f4ead2',4,H-50,W-8,32);r('#281c30',4,H-50,W-8,1);
  if(ln[0]){const pc=RDCPLATE[ln[0]]||'#181020';r('#181020',8,H-58,tw(ln[0],2)+10,14);r(pc,9,H-57,tw(ln[0],2)+8,12);text(ln[0],13,H-55,2,'#ffffff',null)}
- wrapPx(ln[1],222,1).slice(0,2).forEach((l,i)=>text(l,10,H-41+i*10,1,'#281c30',null));
+ wrapPx(ln[1],222,1).slice(0,2).forEach((l,i)=>text(l,10,H-41+i*10,1,'#281c30',null))}
  text('START: SKIP',W-tw('START: SKIP',1)-6,H-12,1,'#8d84a8',null);}
 /* ---------------- sprouts: the shared currency ---------------- */
 const SPFX=['EMBER buds lob fire at your foes.','PEB buds block a hit meant for you.','DEW buds slowly mend you.','ZIP buds: +speed, and pickups drift to you.','LEAF buds: foes drop more petals.','LUCKY buds: +crit. The deep approves.'];
@@ -825,7 +917,7 @@ function drawSprouts(){const M=RD;
  screenShell('SPROUT EXCHANGE','◀ ▶ LEDGER · SPROUTS ARE MONEY HERE');
  const rows=TRADES.map(tr=>({a:'3 '+TYPES[tr.g[0]].n+' → 1 '+TYPES[tr.t[0]].n,b:(M.bank[tr.g[0]]||0)>=3?'READY':'NEED 3'}))
   .concat(SELLS.map(s=>({a:'SELL 1 '+TYPES[s.ty].n,b:'+'+s.dew+' MOONDEW'})));
- rowsDraw2(rows,uiSel,uiSel<TRADES.length?'Trading up the chain: EMBER→ZIP→LUCKY, PEB→DEW→LEAF.':'Moondew buys Burrow digs. Sprouts buy everything else.');
+ rowsDraw2(rows,uiSel,uiSel<TRADES.length?'Trading up the chain: EMBER→ZIP→LUCKY, PEB→DEW→LEAF.':'Moondew buys upgrades at the Digs. Sprouts buy everything else.');
  ctext('A: TRADE / SELL    B: BACK',H-11,1,'#8d84a8',null);}
 
 /* ---------------- combat ---------------- */
@@ -1260,7 +1352,7 @@ const RDHUB={
  globe:SPRG(['...ww','..wbbw','.wbgbbw','.wbbgbw','..wbbw','...dd','..dddd'],{w:'#5a3a20',b:'#4878c8',g:'#58a858',d:'#6a4428'}),
  bedroll:SPRG(['..gggggggggg','.gGGGGGGGGGgg','gGGggggggggGGg','gggggggggggggg','.rrrrrrrrrrrr'],{g:'#4a7a3a',G:'#6a9a58',r:'#8a5a30'})};
 function rdDrawStation(s){const x=s.x,base=54,lk=s.id==='heat'&&RD.stats.escapes<1;r('rgba(0,0,0,.3)',x-11,base-1,22,3);
- if(s.id==='mirror')rdDrawBurrowHatch(x,base);
+ if(s.id==='mirror')rdDrawDigs(x,base);
  else if(s.id==='arm'){r('#3a2414',x-12,base-24,24,20);r('#7a4a28',x-11,base-23,22,18);r('#5a3a20',x-11,base-16,22,1);r('#c8a04a',x-8,base-21,2,2);r('#c8a04a',x,base-21,2,2);r('#c8a04a',x+7,base-21,2,2);
   const own=id=>rdOwnsWeapon(id);g.save();g.translate(x-6,base-6);g.rotate(-Math.PI/2);g.drawImage(RDWPN.blade.ol,0,-3);g.restore();
   g.save();if(!own('maul'))g.globalAlpha=.3;g.translate(x+1,base-5);g.rotate(-Math.PI/2);g.drawImage(RDWPN.maul.ol,0,-4,15,7);g.restore();
@@ -1299,17 +1391,17 @@ const RDTALK=(()=>{const S=()=>RD.stats,F=()=>RD.flags,K=ksR,U=id=>charUnlocked(
  {id:'e_ch4',who:'ERIN',when:()=>best()>=4,lines:["You reached the Grub Mother's nest. I could hear her from up here.","She guards the way down. Take sprouts with you. They hate her too."]},
  {id:'e_mother',who:'ERIN',when:()=>F().kill_mother,lines:["The Grub Mother's gone quiet. The bed's been sprouting all morning.","I think the garden knows."]},
  {id:'e_vault',who:'ERIN',when:()=>best()>=5,lines:["Water down there? Under the garden? That explains the soggy carrots."]},
- {id:'e_unlock',who:'ERIN',when:()=>U('ERIN'),lines:["You kept bringing me honey, so... I'm coming down with you. If you want.","Pick me at the Root Door. My buds fight harder for me."]},
+ {id:'e_unlock',who:'ERIN',when:()=>U('ERIN'),lines:["You kept bringing me honey, so... I'm coming down with you. If you want.","Pick me when you go down the Burrow. My buds fight harder for me."]},
  {id:'e_dived',who:'ERIN',when:()=>K('ERIN').runs>=1,lines:["I went down there! It's so loud. Everything wants to eat you.","My buds were amazing, though. Did you see them? You saw them."]},
  {id:'e_core',who:'ERIN',when:()=>best()>=9,lines:["Scout says it gets hot near the bottom. Ember-hot. Take a DEW bud with you. Trust me."]},
  {id:'e_escape',who:'ERIN',when:()=>S().escapes>=1,lines:["You did it. The Lantern's brighter. I can see it from the bed.","Don't stop now, though. Whatever's down there will grow back."]},
  {id:'e_king',who:'ERIN',when:()=>U('KING'),lines:["A sprout with a crown, Will. In my bed. He's very polite.","He calls the others 'my court'. They love it."]},
  {id:'e_heat',who:'ERIN',when:()=>heat()>=1,lines:["Marcus talked you into the Pact, didn't he. Be careful. Heat makes the deep meaner."]},
  /* Marcus */
- {id:'m_fall',who:'MARCUS',when:()=>S().deaths>=1,lines:["Bro. BRO. You died in like a minute. I timed it.","The Burrow's right there, J. Buy something. Make it make sense."]},
+ {id:'m_fall',who:'MARCUS',when:()=>S().deaths>=1,lines:["Bro. BRO. You died in like a minute. I timed it.","The Digs are right there, J. Buy something. Make it make sense."]},
  {id:'m_ch4',who:'MARCUS',when:()=>best()>=4,lines:["Heard you met the Grub Mother, bro. She's a worm. With a crown. I'd have won."]},
  {id:'m_mother',who:'MARCUS',when:()=>F().kill_mother,lines:["You beat the worm queen? Okay. Okay, bro. That's fine. I could've. But fine."]},
- {id:'m_unlock',who:'MARCUS',when:()=>U('MARCUS'),lines:["Eight falls, bro. EIGHT. I'm going down there myself.","Pick me at the door. I'll show you how it's done. Hydro Jet, baby."]},
+ {id:'m_unlock',who:'MARCUS',when:()=>U('MARCUS'),lines:["Eight falls, bro. EIGHT. I'm going down there myself.","Pick me at the Burrow. I'll show you how it's done. Hydro Jet, baby."]},
  {id:'m_dived',who:'MARCUS',when:()=>K('MARCUS').runs>=1,lines:["Went down. It was fine. I let it win, bro. Strategy.","Don't look at the Codex. The Codex lies."]},
  {id:'m_louie',who:'MARCUS',when:()=>K('LOUIE').kills>=50,lines:["The dog has more kills than you now, bro. Think about that. The DOG."]},
  {id:'m_deaths10',who:'MARCUS',when:()=>S().deaths>=10,lines:["Ten falls, J. I made a chart. It only goes down."]},
@@ -1421,12 +1513,9 @@ function drawHub(){rdTiles();const A=rdArt();r('#1d141f',0,0,W,H);
   r('#181020',bx-1,by-1,bw+2,13);r('#f8f0d8',bx,by,bw,11);r('#f8f0d8',Math.round(n.x)-1,by+11,3,2);r('#181020',Math.round(n.x)-2,by+11,1,2);r('#181020',Math.round(n.x)+2,by+11,1,2);r('#f8f0d8',Math.round(n.x),by+13,1,1);
   text(hubBark.txt,bx+4,by+1,1,'#281c30',null)}}
  /* root door */
- g.save();g.globalAlpha=.16+.05*Math.sin(time*3);g.fillStyle='#58f0c0';g.beginPath();g.arc(W/2,H-17,16,0,7);g.fill();g.restore();
- r('#0a1a20',W/2-10,H-24,20,15);g.fillStyle='#0a1a20';g.beginPath();g.arc(W/2,H-24,10,Math.PI,0);g.fill();
- g.save();g.globalAlpha=.3+.15*Math.sin(time*3);r('#58f0c0',W/2-7,H-26,14,16);g.restore();
- for(let k=0;k<9;k++){const a=Math.PI+k/8*Math.PI,x=Math.round(W/2+Math.cos(a)*12),y=Math.round(H-24+Math.sin(a)*12);r('#6e4a2a',x-2,y-1,3,3);r('#8a5e36',x-1,y-1,1,1)}
- r('#6e4a2a',W/2-13,H-24,3,15);r('#6e4a2a',W/2+10,H-24,3,15);
- if(state!=='g3talk')text('DESCEND',Math.round(W/2-tw('DESCEND',1)/2),H-9,1,'#f8c070',null);
+ g.save();g.globalAlpha=.16+.05*Math.sin(time*3);g.fillStyle='#58f0c0';g.beginPath();g.arc(W/2,H-20,18,0,7);g.fill();g.restore();
+ rdDrawBurrowHatch(W/2,H-10);
+ if(state!=='g3talk'&&state!=='g3hpause')text('THE BURROW',Math.round(W/2-tw('THE BURROW',1)/2),H-9,1,'#f8c070',null);
  r('rgba(0,0,0,.25)',Math.round(P3.x)-5,Math.round(P3.y)+1,10,2);drawPlayerSpr(P3.x,P3.y+2,1);
  /* warm, cozy light: the hearth lantern, the torches, the root door, and you */
  rdLight([{x:W/2,y:12,r:70,c:'#ffd27a'},{x:8,y:24,r:34,c:'#f8a040'},{x:230,y:24,r:34,c:'#f8a040'},{x:W/2,y:H-17,r:30,c:'#58f0c0'},{x:P3.x,y:P3.y-6,r:56,c:'#ffd27a'},{x:W/2,y:HL.rugY+16,r:46,c:'#f8a040'},{x:41,y:HL.bedY+14,r:30,c:'#a8f080'},{x:30,y:HL.deskY,r:26,c:'#f8a040'},{x:16,y:hubY(.47)+6,r:48,c:'#f8a040'},{x:W-17,y:hubY(.47),r:30,c:'#a8f080'}],'rgba(14,6,22,.34)');
@@ -1461,7 +1550,7 @@ function g3DrawUI(){const M=RD;
   rowsDraw2([{a:'MUSIC VOL  '+pips(M.set.mus),b:M.set.mus+' / 10'},{a:'SFX VOL  '+pips(M.set.sfx),b:M.set.sfx+' / 10'},{a:'SCREEN SHAKE',b:M.set.shake?'ON':'OFF'},{a:'LANTERN COLOUR',b:lan[0]}],uiSel,['The lantern hum, low under everything.','Every slash, beep and bloom.','The screen kicks when you take a hit.',nl>1?'The colour of your light down there.':'More lantern colours come from Sprouts capsules.'][uiSel]);
   ctext('◀ ▶ ADJUST · A: CYCLE    B: BACK',H-13,1,'#8d84a8',null);return}
  if(state==='g3sprouts'){drawSprouts();return}
- if(state==='g3mirror'){screenShell('THE BURROW BENEATH','MOONDEW: '+M.dew);
+ if(state==='g3mirror'){screenShell('THE SPROUT DIGS','MOONDEW: '+M.dew);
   rowsDraw2(MIRROR.map(m=>{const rank=mir(m.id);return{a:m.n+'  '+'●'.repeat(rank)+'○'.repeat(m.max-rank),b:rank>=m.max?'MAX':m.cost[rank]+' DEW'}}),uiSel,MIRROR[uiSel].d.replace(/\.?\s*$/,'.')+' Dug with Moondew, kept forever.');
   ctext('A: DIG DEEPER    B: BACK',H-11,1,'#8d84a8',null);return}
  if(state==='g3arm'){screenShell('THE ARMORY','KEYS: '+M.keys);
@@ -1716,13 +1805,19 @@ function drawOver(win){r(win?'#141a10':'#180a10',0,0,W,H);const L=RD.lastRun||{c
  ctext('MOONDEW BANKED  +'+L.dew,st+sp2*2,2,'#7fd0e8');
  const ms=[L.spr?L.spr+(L.spr===1?' SPROUT':' SPROUTS')+' SAVED TO THE LEDGER':''].concat((L.msgs||[]).map(m=>'★ '+m)).concat(L.heat?['HEAT '+L.heat]:[]).filter(Boolean);
  ms.slice(0,4).forEach((m,i)=>ctext(m,st+sp2*3+i*12,1,m[0]==='★'?'#ffd94d':'#a8f080',null));
- ctext('SPEND IT IN THE BURROW. GO AGAIN.',H-30,1,'#a8f080',null);
+ ctext('SPEND IT AT THE DIGS. GO AGAIN.',H-30,1,'#a8f080',null);
  if(overT>.8&&((time*2)|0)%2)ctext('A: THE HEARTH',H-16,2,'#ffffff');}
 /* ---------------- the capsule machine, from Rootdeep's own menu ----------------
    The same machine as Sprouts' CAPSULES: one shared pool (Sprouts styles + Rootdeep unlocks), the same
    tickets and petals (Sprouts' wallet), the same odds, no duplicates. */
 let capR={ph:'idle',t:0,it:null,msg:'',msgT:0};
+const CAPTUT=()=>["This is the capsule machine. It's the same machine in every cartridge.","One ticket opens one capsule. No ticket? It takes "+PULL+" petals from Sprouts instead. Never the same thing twice.","LEFT and RIGHT show what's inside for each game, and how to earn tickets."];
+const CAPPG=['SPROUTS','ROOTDEEP','KNOCKOUT','TICKETS'];
 function capsUpdate(dt){const c=capR;c.t+=dt;if(c.msgT>0)c.msgT-=dt;
+ if(c.pg===undefined)c.pg=String(lanFrom).slice(0,2)==='g3'?1:0;
+ if(c.tut===undefined)c.tut=LAN.capTut?-1:0;
+ if(c.tut>=0){if(pressed('a')||pressed('b')||pressed('start')){c.tut++;snd(520,.04);if(c.tut>=CAPTUT().length){c.tut=-1;LAN.capTut=1;lanSave()}}return}
+ if(c.ph==='idle'&&(pressed('left')||pressed('right'))){c.pg=(c.pg+(pressed('right')?1:3))%4;snd(520,.04)}
  if(c.ph==='idle'){if(pressed('b')||pressed('start')){lanBack();return}
   if(pressed('a')){if(!pool().length){c.msg='YOU HAVE EVERYTHING!';c.msgT=2.5;snd(140,.1)}
    else if(meta.tix>0||meta.petals>=PULL){if(meta.tix>0)meta.tix--;else meta.petals-=PULL;c.it=pullOne();c.ph='shake';c.t=0;meta.life.pulls++;snd(200,.5,500)}
@@ -1741,9 +1836,21 @@ function drawCaps(){const c=capR;screenShell('CAPSULES','ONE MACHINE FOR EVERY C
   if(c.t<.4){g.save();g.globalAlpha=1-c.t/.4;r('#ffffff',0,0,W,H);g.restore()}
   if(isRd&&RDCAP[it.i].ch)rdKeeperSpr(RDCAP[it.i].ch,W/2,my+44,2);else{r('#181020',W/2-11,my+16,22,22);r(isRd?(RDCAP[it.i].lan||'#a8f080'):STY[it.k][it.i][1]||'#c8c0d8',W/2-9,my+18,18,18)}
   ctext((isRd?'ROOTDEEP · ':'SPROUTS STYLE · ')+ra[0],my+50,1,ra[1],null);ctext(nm,my+62,2,'#ffffff');}
- const owned=rdCapOwned(),n=RDCAP.length,top=my+82,st=Math.max(10,Math.min(13,Math.floor((H-top-34)/(n+1))));
- text('ROOTDEEP UNLOCKS',10,top,1,'#ffd94d',null);rtext(owned.length+' / '+n,W-10,top,1,'#ffd94d',null);
- RDCAP.forEach((it,i)=>{const y=top+st*(i+1),has=owned.includes(i);text(it.n,14,y,1,has?'#e8e4f5':'#6a6284',null);rtext(has?'OWNED':RAR[it.r][0],W-14,y,1,has?'#a8f080':RAR[it.r][1],null)});
+ const pg=c.pg||0,top=my+80;r('#241a38',6,top-3,W-12,13);r('#ffd94d',6,top-3,W-12,1);
+ const head=['SPROUTS STYLES '+ROWS.reduce((a,q)=>a+((meta.own[q[1]]||[]).length),0)+' / '+ROWS.reduce((a,q)=>a+((STY[q[1]]||[]).length),0),'ROOTDEEP '+rdCapOwned().length+' / '+RDCAP.length,'KNOCKOUT','HOW TO GET TICKETS'][pg];
+ ctext('◀ '+head+' ▶',top,1,'#ffd94d',null);
+ let rows=[];
+ if(pg===0)rows=ROWS.map(q=>[({CAP:'CAPS',COAT:'COATS',FLOWER:'FLOWERS',LOUIE:"LOUIE'S BANDANAS",TRAIL:'TRAILS'})[q[0]]||q[0],((meta.own[q[1]]||[]).length)+' / '+((STY[q[1]]||[]).length),'#e8e4f5','#ffd94d']).concat([['WEAR THEM IN SPROUTS: STYLE MENU','','#8d84a8','']]);
+ else if(pg===1){const owned=rdCapOwned();rows=RDCAP.map((it,i)=>{const has=owned.includes(i);return[it.n,has?'OWNED':RAR[it.r][0],has?'#e8e4f5':'#6a6284',has?'#a8f080':RAR[it.r][1]]})}
+ else if(pg===2)rows=[['NOTHING IN THE MACHINE YET','','#c8c0d8',''],['KNOCKOUT STILL PAYS TICKETS:','','#8d84a8',''],['  EACH NEW ARCADE CLEAR','+1','#e8e4f5','#f8e060'],['  EVERY 10 WINS','+1','#e8e4f5','#f8e060']];
+ else rows=[['SPROUTS','','#a8f080',''],['  KEEPER RANK UP','+1','#e8e4f5','#f8e060'],['  VISIT EACH DAY','+1','#e8e4f5','#f8e060'],['  ALL 3 DAILY ASKS','+1','#e8e4f5','#f8e060'],["  EVERY 3 OF ERIN'S ORDERS",'+1','#e8e4f5','#f8e060'],
+  ['ROOTDEEP','','#a8f080',''],['  FIRST WIN OVER EACH BOSS','+1','#e8e4f5','#f8e060'],['  EVERY ESCAPE','+1','#e8e4f5','#f8e060'],
+  ['KNOCKOUT · THE LANTERN','','#a8f080',''],['  ARCADE CLEARS, EVERY 10 WINS','+1','#e8e4f5','#f8e060'],['  LANTERN ACHIEVEMENTS','+2-5','#e8e4f5','#f8e060']];
+ const st=Math.max(9,Math.min(13,Math.floor((H-top-28)/rows.length)));
+ if(!(c.tut>=0))rows.slice(0,Math.floor((H-top-28)/st)).forEach(([a,b,ca,cb],i)=>{const y=top+14+st*i;text(a,12,y,1,ca,null);if(b)rtext(b,W-12,y,1,cb,null)});
+ if(c.tut>=0){const L=CAPTUT(),ls=wrapPx(L[c.tut],222,1),bh=Math.max(2,ls.length)*11+26,by=H-4-bh;r('rgba(8,5,14,.6)',0,0,W,H);r('#181020',4,by,W-8,bh);r('#f8f0d8',5,by+1,W-10,bh-2);
+  const nw=tw('ERIN',2)+10;r('#181020',8,by-7,nw+2,14);r(RDCPLATE.ERIN,9,by-6,nw,12);text('ERIN',14,by-4,2,'#ffffff',null);
+  ls.slice(0,4).forEach((l,i)=>text(l,10,by+10+i*11,1,'#281c30',null));text(c.tut<L.length-1?'A: MORE ▼':'A: GOT IT',10,H-16,1,'#7a6a8a',null);return}
  ctext(c.msgT>0?c.msg:c.ph==='show'?'A: NICE!':pool().length?(meta.tix>0?'A: OPEN ONE (1 TICKET)    B: BACK':'A: OPEN ONE ('+PULL+' PETALS)    B: BACK'):'YOU HAVE EVERYTHING    B: BACK',H-13,1,c.msgT>0?'#f8a060':'#8d84a8',null);}
 
 /* ---------------- the Burrow Beneath, and sprouts going up to the surface ----------------
@@ -1760,8 +1867,14 @@ const RDBURROWL={WILL:[[null,'Under the Hearth, the sprouts have been digging.']
  MARCUS:[[null,'Under the Hearth, the sprouts have been digging.'],['MARCUS','Bro. They built a whole basement. No permits. Respect.']],
  KING:[[null,'Under the Hearth, the sprouts have been digging.'],['SPROUT KING','My court has been busy. Good.']]};
 function rdSurfaceQueue(){const w=RUN.waiting||[];if(!w.length)return;for(const t of w)RD.bank[t]=(RD.bank[t]||0)+1;
- RD.stats.budsBanked=(RD.stats.budsBanked||0)+w.length;RUN.surfN=w.length;RUN.surfT=w.slice(0,8);RUN.waiting=[];(RUN.cineQ=RUN.cineQ||[]).push('surface');rdSave()}
+ RD.stats.budsBanked=(RD.stats.budsBanked||0)+w.length;RUN.surfN=w.length;RUN.surfT=w.slice(0,8);RUN.waiting=[];rdSave()}
 function rdWait(type,x,y){(RUN.waiting=RUN.waiting||[]).push(type);rdFound();ftext(x,y-14,"FULL: IT'LL GO UP TOP",'#a8f080');snd(880,.06,1320)}
+/* the Sprout Digs: a dig site against the back wall, a sign, a shovel, and whoever's on shift */
+function rdDrawDigs(x,base){r('#4e3020',x-13,base-8,26,8);r('#6e4a2a',x-11,base-11,22,4);r('#8a5e36',x-8,base-13,16,3);r('#2a1a14',x-6,base-6,12,4);
+ r('#5a3a20',x-12,base-24,2,14);r('#c89860',x-15,base-27,14,7);r('#8a5e36',x-15,base-21,14,1);r('#3a2414',x-13,base-25,2,1);r('#3a2414',x-10,base-25,2,1);r('#3a2414',x-7,base-25,3,1);
+ r('#98a0b0',x+7,base-24,3,5);r('#7a4a28',x+8,base-19,1,8);
+ const up=Math.sin(time*3)>0;if(up){r('#58c048',x-1,base-17,1,2);r('#58c048',x+1,base-17,1,2)}r('#c8e8a0',x-2,base-15+(up?0:2),5,3);r('#241a30',x-1,base-14+(up?0:2),1,1);r('#241a30',x+1,base-14+(up?0:2),1,1);
+ for(let k=0;k<3;k++)if(((time*2+k*.3)%1)<.5)r('#7a5a44',x+3+k*3,base-12-((time*12+k*4)%6),2,2)}
 /* the hatch itself, in the Hearth */
 function rdDrawBurrowHatch(x,base){r('#3a2414',x-13,base-22,26,20);r('#5a3a20',x-13,base-22,26,2);
  g.fillStyle='#0b0812';g.beginPath();g.arc(x,base-9,10,Math.PI,0);g.fill();r('#0b0812',x-10,base-9,20,7);
@@ -1908,7 +2021,7 @@ function setUpdate(){uiSel=nav(uiSel,4);const lr=(pressed('right')?1:0)-(pressed
   if(touched){applyVolumes();rdSave();snd(660,.05,880)}}
  if(pressed('b')||pressed('start')){snd(440,.05);state=setReturn}}
 function g3Update(dt){
- if(say2T>0)say2T-=dt;
+ if(say2T>0)say2T-=dt;if(rdSavedT>0&&state!=='g3cine')rdSavedT-=dt;
  switch(state){
  case 'g3menu':menuUpdate();return;
  case 'g3set':setUpdate();return;
@@ -1918,6 +2031,8 @@ function g3Update(dt){
   else if(pressed('b')||pressed('sel'))eject();return;
  case 'g3hub':hubUpdate(dt);return;
  case 'g3talk':talkUpdate();return;
+ case 'g3appr':apprUpdate(dt);return;
+ case 'g3hpause':hpauseUpdate();return;
  case 'g3chars':charsUpdate();return;
  case 'g3mirror':mirrorUpdate();return;
  case 'g3arm':armUpdate();return;
@@ -1936,13 +2051,16 @@ function g3Draw(){
  case 'g3title':drawTitle();return;
  case 'g3menu':drawMenu();return;
  case 'g3cine':rdDrawCine();return;
- case 'g3hub':case 'g3talk':drawHub();return;
+ case 'g3hub':drawHub();rdDrawSaved();return;
+ case 'g3talk':drawHub();if(rdApprTalk)rdDrawLetterbox(1,true);return;
+ case 'g3appr':drawHub();rdDrawLetterbox(Math.min(1,rdAppr.t/.4));return;
+ case 'g3hpause':drawHPause();return;
  case 'g3chars':drawChars();return;
  case 'g3mirror':case 'g3arm':case 'g3keep':case 'g3codex':case 'g3heat':case 'g3boon':case 'g3shop':case 'g3pause':case 'g3set':case 'g3sprouts':
   if(state==='g3boon'||state==='g3pause'){if(RUN&&state==='g3pause'){drawRun(true)}g3DrawUI();return}
   if(state==='g3shop'&&RUN){g3DrawUI();return}
   g3DrawUI();return;
- case 'g3run':if(RUN)drawRun();return;
+ case 'g3run':if(RUN){drawRun();rdDrawSaved()}return;
  case 'g3dying':if(RUN){drawRun(true);rdDrawDying()}return;
  case 'g3over':drawOver(false);return;
  case 'g3win':drawOver(true);return;
