@@ -2373,7 +2373,9 @@ function rdArt(){if(RDART)return RDART;const T=tile;
   {floor:[0,1,2].map(stoneF),wall:stoneW,side:'#1d3140',sideHi:'#36566a',props:['boulderS','crystal','crystal','mush'],dark:'rgba(6,10,24,.5)'},
   {floor:[0,1,2].map(ashF),wall:ashW,side:'#1a0e10',sideHi:'#3e2428',props:['boulderA','boulderA','crystalA'],dark:'rgba(18,6,10,.46)'}];
  const GLOW={mush:['#8ae0d0',22],crystal:['#90f0f8',22],crystalA:['#f88088',20],boulderA:['#f07830',14]};
- RDART={B,P,GLOW};return RDART;}
+ /* the Hearth's floor: Sprouts' plank layout in a deeper, warmer wood so the room reads as underground */
+ const hubWood=T(p=>{p('#7a5236',0,0,16,16);p('#5e3c26',0,7,16,1);p('#5e3c26',0,15,16,1);p('#5e3c26',5,0,1,7);p('#5e3c26',12,8,1,7);p('#946644',1,1,3,1);p('#946644',7,9,3,1);p('#6a4630',9,3,2,1);p('#6a4630',2,11,2,1)});
+ RDART={B,P,GLOW,hubWood};return RDART;}
 
 /* ---- foes and bosses, redrawn at 1x in the valley's style (facing right) ---- */
 const RDFOE={
@@ -2767,56 +2769,92 @@ function cineUpdate(dt){rdCineT+=dt;const sc=rdCineSeq[rdCineIx],LN=rdLines(sc);
   else{rdCineIx++;rdCineT=0;if(rdCineIx>=rdCineSeq.length){endCine();return}}}
  if(rdCineT>=sc.d){rdCineIx++;rdCineT=0;if(rdCineIx>=rdCineSeq.length)endCine()}}
 function cineActor(x,y,fx){const sax=P3.ax,say=P3.ay;P3.ax=fx||1;P3.ay=0;drawPlayerSpr(x,y,1);P3.ax=sax;P3.ay=say}
-function rdDrawCine(){const sc=rdCineSeq[rdCineIx],tt=rdCineT,LN=rdLines(sc);
- if(sc.bg==='garden'||sc.bg==='crack'){for(let y=0;y<H;y+=16)for(let x=0;x<W;x+=16)g.drawImage(TL.grass[((x*7+y*13)>>4)%TL.grass.length],x,y);
-  r('#e8e4f5',W-36,8,11,11);r('#c8c0d8',W-33,11,3,3);r('#c8c0d8',W-29,15,2,2);
-  g.save();g.globalAlpha=.16+.03*Math.sin(time*2);g.fillStyle='#f8c050';g.beginPath();g.arc(W/2,56,30,0,7);g.fill();g.restore();
-  r('#6e4a20',W/2-10,42,20,27);r('#8a5f28',W/2-10,42,20,3);r('#f8c050',W/2-7,46,14,15);r('#fff2b0',W/2-3,49+Math.round(Math.sin(time*7)),6,8);
-  r('#4a3010',W/2-13,38,26,4);
-  if(sc.bg==='crack'){const n=Math.min(11,2+Math.floor(tt*3));
-   for(let k=0;k<n;k++)r('#04060a',W/2-3+((k*7)%5)-2,94+k*8,6,7);
-   if(tt>1){g.save();g.globalAlpha=.3+.1*Math.sin(time*5);g.fillStyle='#ffd94d';g.fillRect(W/2-1,66,2,26);g.restore()}}
-  cineActor(W/2-36,124,1);rdDrawNPC('ERIN',W/2+30,126);rdDrawNPC('LOUIE',W/2-6,130);}
- else if(sc.bg==='hearth'){for(let y=0;y<H;y+=16)for(let x=0;x<W;x+=16)g.drawImage(TL.wood,x,y);
-  r('#2c1a10',W/2-17,H-34,34,22);r('#0a0610',W/2-14,H-31,28,19);
-  g.save();g.globalAlpha=.25+.08*Math.sin(time*3);g.fillStyle='#a8f080';g.beginPath();g.arc(W/2,H-20,17,0,7);g.fill();g.restore();
-  rdDrawNPC('ERIN',36,H-84);rdDrawNPC('LOUIE',80,H-80);rdDrawNPC('MARCUS',124,H-84);rdDrawNPC('SCOUT',168,H-84);rdDrawNPC('RANGER',206,H-84);
-  cineActor(W/2,H-66,0);}
+/* ================= STAGES =================
+   Rootdeep's cinematics use Sprouts' own cutscene language (see drawCine in Sprouts):
+   a side-view stage, sky bands or a cave, hills, a ground strip, the speaker drawn large,
+   everyone else at 2x, the Great Lantern from Sprouts' drawHearth and Louie from drawDog.
+   base(hh) sets the stage height; the ground line is hh-14. */
+const RSTG={HH:0,GY:0,
+ base(hh){this.HH=hh;this.GY=hh-14;return this},
+ sky(k){const hh=this.HH;
+  if(k==='night'){r('#101838',0,0,W,hh);for(let i=0;i<30;i++)r(i%5?'#8090c8':'#ffffff',(i*53+17)%240,(i*29+7)%Math.max(20,hh-50),1,1)}
+  else(k==='dawn'?[['#9ab8e8',0],['#e8b8c0',.26],['#f8d8b0',.46]]:[['#f8b878',0],['#f8c890',.2],['#f8dca8',.42]]).forEach(([c,q])=>r(c,0,Math.round(hh*q),W,hh-Math.round(hh*q)))},
+ hills(k){const hh=this.HH,n=k==='night';g.fillStyle=n?'#182848':k==='dawn'?'#8cbc80':'#78c078';g.beginPath();g.arc(50,hh+14,72,0,7);g.arc(190,hh+30,92,0,7);g.fill();
+  r(n?'#1c3828':'#58b858',0,hh-26,W,26);r(n?'#142c20':'#3c9848',0,hh-26,W,2);for(let i=0;i<16;i++)r(n?'#24482f':'#84d870',(i*37+5)%W,hh-20+((i*7)%14),2,1)},
+ cave(){const hh=this.HH;r('#181428',0,0,W,hh);g.fillStyle='#241c38';g.beginPath();g.arc(120,hh+40,170,0,7);g.fill();
+  for(let k=0;k<11;k++){const x=(k*23+8)%236,len=10+(k*7)%26;r('#3a2620',x,0,3,len);r('#6e4a2a',x+1,0,1,len-2);r('#3a2620',x+(k%2?2:-1),len-2,2,4)}
+  r('#3b2620',0,hh-26,W,26);r('#24150f',0,hh-26,W,2);for(let i=0;i<12;i++)r('#4e3530',(i*41+9)%W,hh-20+((i*5)%14),3,1)},
+ /* a sprite with its feet on the ground line, at an exact integer scale */
+ put(spr,x,s,fx,dy){const w=spr.width*s,h=spr.height*s,gy=this.GY+(dy||0);r('rgba(0,0,0,.28)',Math.round(x-w*.33),gy+1,Math.round(w*.66),s+1);
+  g.save();g.translate(Math.round(x),gy-h+s);if(fx<0)g.scale(-1,1);g.translate(-(w>>1),0);g.drawImage(spr,0,0,w,h);g.restore()},
+ lantern(x,sc,n){const so=ox,sy=oy,sh=shards;shards=n;g.save();g.translate(x,this.GY);g.scale(sc,sc);ox=HX;oy=HY;drawHearth();g.restore();ox=so;oy=sy;shards=sh},
+ dog(x,sc,sit,fx,alert){const so=ox,sy=oy;g.save();g.translate(Math.round(x),this.GY);g.scale(sc,sc);ox=oy=0;drawDog({x:0,y:0,fx:fx||-1,mv:false,st:sit?'sit':'follow',alert:alert?1:0,say:null});g.restore();ox=so;oy=sy},
+ keeper(id,x,s,fx,dy){if(id==='LOUIE')return this.dog(x,s,false,fx);const spr=id==='KING'?RDKING.ol:id==='WILL'?SP.pd:CH[id];if(spr)this.put(spr,x,s,fx,dy)},
+ bud(x,type,s,hop){const z=Math.round(Math.abs(Math.sin(time*5+type*1.7))*(hop||0));g.save();g.translate(Math.round(x),this.GY-z*s);g.scale(s,s);drawBud({x:ox,y:oy,type,stage:2,z:0,a:type,mv:true,st:'follow',fx:1});g.restore()},
+ sprout(x,type,s){g.save();g.translate(Math.round(x),this.GY);g.scale(s,s);drawSprout({x:ox,y:oy+2,type,age:30});g.restore()}};
+
+/* the cutscenes. The current speaker is drawn at 3x, everyone else at 2x */
+function rdDrawCine(){const sc=rdCineSeq[rdCineIx],tt=rdCineT,LN=rdLines(sc),seg=sc.d/LN.length,li=Math.min(LN.length-1,Math.floor(tt/seg)),ln=LN[li],spk=ln[0],S=RSTG.base(H-74),gy=S.GY,hh=S.HH,
+  kp=(RUN&&RUN.char)||RD.char||'WILL',who=(id,x,fx)=>S.keeper(id,x,spk===id?3:2,fx);
+ if(sc.bg==='garden'){S.sky('dusk');S.hills('dusk');
+  r('#8a5a3a',8,gy-5,46,9);r('#6e4428',8,gy-5,46,2);for(let k=0;k<3;k++)S.sprout(18+k*14,k,1);
+  S.lantern(120,2,4);S.keeper('WILL',74,2,1);S.dog(160,2,true,-1);who('ERIN',200,-1);}
+ else if(sc.bg==='crack'){const sh=tt<1.2?1:0;g.save();if(sh)g.translate(Math.round(R(-1.2,1.2)),0);
+  S.sky('night');S.hills('night');S.lantern(120,2,Math.max(0,4-Math.floor(tt*1.1)));
+  /* the ground splits open under the Lantern and its light drains down into it */
+  const w=Math.min(78,tt*52);for(let x=-w;x<=w;x+=2){const k=1-Math.abs(x)/Math.max(1,w),d=Math.round((6+((x*7+40)&7))*k*2.2);if(d<1)continue;
+   r('#04060a',120+x,hh-26,2,Math.min(26,d));if(k>.55&&((x/2)|0)%3===0)r('rgba(88,240,192,.55)',120+x,hh-26+Math.min(24,d)-1,2,1)}
+  for(let i=0;i<10;i++){const p=((tt*.8+i*.1)%1);r(i%2?'#ffd94d':'#fff3b0',Math.round(120+Math.sin(i*2.3)*10*(1-p)),Math.round(gy-44+p*(hh-gy+58)),2,2)}
+  S.keeper('WILL',62,2,1);S.dog(92,2,false,1,true);who('ERIN',196,-1);g.restore();}
+ else if(sc.bg==='hearth'){const A=rdArt();r('#3b2620',0,0,W,hh-26);for(let i=0;i<5;i++)r('#34211c',0,Math.round((hh-26)*(i+1)/6),W,1);for(let i=0;i<18;i++)r(i%3?'#4b3228':'#6e4a2a',(i*53+11)%W,(i*37+9)%Math.max(10,hh-34),i%3?3:1,i%3?1:5);
+  for(let x=0;x<W;x+=16)g.drawImage(A.hubWood||TL.wood,x,hh-26);r('#3a2414',0,hh-10,W,10);
+  /* the fire, and a lamp on a chain */
+  r('#4a4048',8,gy-40,36,40);r('#2a2028',12,gy-34,28,34);r('#5a5058',6,gy-44,40,5);
+  const fl=((time*10)|0)%2;r('#f07830',16,gy-12-fl,20,12+fl);r('#f8d030',20,gy-9,12,9);r('#fff3b0',24,gy-6+fl,4,5);
+  r('#3a2c1c',W/2,0,1,24);r('#3a2c1c',W/2-5,24,11,12);r('#ffd94d',W/2-3,26,7,8);r('#fff3b0',W/2-1,28,3,4);
+  who('ERIN',66,1);S.dog(96,2,true,1);who('MARCUS',128,1);who('SCOUT',160,-1);who('RANGER',192,-1);S.put(SP.pu,224,2,1);
+  rdLight([{x:W/2,y:30,r:70,c:'#ffd27a'},{x:26,y:gy-8,r:50,c:'#f8a040'}],'rgba(20,8,16,.32)');}
+ else if(sc.bg==='door'){S.cave();
+  /* the root door: an arch in the rock with the deep's green light breathing out of it */
+  const dx=W/2,top=gy-70,pul=.35+.15*Math.sin(time*3);g.save();g.globalAlpha=pul;g.fillStyle='#58f0c0';g.beginPath();g.arc(dx,gy-30,46,0,7);g.fill();g.restore();
+  r('#0b0812',dx-20,top+14,40,56);g.fillStyle='#0b0812';g.beginPath();g.arc(dx,top+16,20,Math.PI,0);g.fill();
+  g.save();g.globalAlpha=.35+.2*Math.sin(time*4);r('#58f0c0',dx-14,top+22,28,48);g.restore();
+  for(let k=0;k<14;k++){const a=Math.PI+k/13*Math.PI,x=Math.round(dx+Math.cos(a)*24),y=Math.round(top+16+Math.sin(a)*24);r('#6e4a2a',x-2,y-2,4,4);r('#8a5e36',x-1,y-2,2,1)}
+  r('#6e4a2a',dx-24,top+16,4,54);r('#6e4a2a',dx+20,top+16,4,54);
+  const wx=Math.min(dx-6,24+tt*34),fade=Math.max(0,Math.min(1,(dx-14-wx)/20+.15));g.save();g.globalAlpha=fade;S.keeper(kp,wx,2,1);g.restore();
+  if(tt>2.1){ctext('ROOTDEEP',29,5,'#181020',null);ctext('ROOTDEEP',26,5,'#ffd94d','#403010')}}
+ else if(sc.bg==='escape'){S.sky('dawn');S.hills('dawn');
+  /* the Lantern blazes; the keeper is out of the hole, and the buds pop out after */
+  for(let i=0;i<10;i++){const a=i/10*6.283+time*.3;g.save();g.globalAlpha=.18;g.strokeStyle='#fff3b0';g.lineWidth=3;g.beginPath();g.moveTo(132,gy-40);g.lineTo(132+Math.cos(a)*90,gy-40+Math.sin(a)*70);g.stroke();g.restore()}
+  S.lantern(132,2,4);r('#24150f',38,hh-24,40,8);r('#0b0812',42,hh-22,32,5);
+  for(let i=0;i<4;i++){const a=tt-.5-i*.35;if(a>0){const k=Math.min(1,a/.45),x=52+i*8+k*(i*10-6),y=Math.round(-Math.sin(k*Math.PI)*16);g.save();g.translate(0,y);S.bud(x,i+1,2,a>.45?3:0);g.restore()}}
+  S.keeper(kp,96,2,1);
+  if(rdCineIx===0)who('ERIN',206,-1);else who('MARCUS',214,-1);
+  S.dog(170,2,true,-1);}
+ else if(sc.bg==='king'){S.cave();
+  g.save();g.globalAlpha=.25+.08*Math.sin(time*3);g.fillStyle='#b8f890';g.beginPath();g.arc(W/2,gy-30,52,0,7);g.fill();g.restore();
+  [[52,0],[78,1],[162,2],[188,3],[30,4],[210,5]].forEach(([x,t2])=>S.bud(x,t2,2,4));
+  S.put(RDKING.ol,W/2,spk==='SPROUT KING'||rdCineIx===0?4:3,1);if(((time*3)|0)%2)r('#ffffff',W/2+6,gy-60,2,2);
+  if(rdCineIx===1)S.keeper('MARCUS',226,spk==='MARCUS'?3:2,-1);}
  else if(sc.bg==='boss'){const bi=sc.boss,AB=rdArt().B[bi],rise=Math.min(1,tt/1.4),fy=Math.round(H*.36+(1-rise)*26),col=BOSSES[bi].c;
+  g.save();if(tt<1.4)g.translate(Math.round(R(-1,1)),0);
   for(let ty=20;ty<H;ty+=16)for(let tx=0;tx<W;tx+=16)g.drawImage(AB.floor[((tx*7+ty*13)>>4)%9<7?0:1],tx,ty);
   for(let tx=0;tx<W;tx+=16)g.drawImage(AB.wall,tx,15);
-  g.save();g.globalAlpha=rise;
-  if(bi<2){const sp=RDFOE[bi?'king':'mother'];g.translate(W/2-sp.ow,fy-sp.oh*2);g.scale(2,2);g.drawImage(sp.ol,0,0)}
-  else{const im=SP.pd;g.translate(W/2-im.width,fy-im.height*2);g.scale(2,2);g.drawImage(rdShadowOf(im),0,0)}
+  /* silhouette first, then the reveal with a white flash */
+  const sp=bi<2?RDFOE[bi?'king':'mother'].ol:SP.pd,lit=bi<2&&tt>1.4;g.save();g.globalAlpha=Math.min(1,.25+rise);g.translate(W/2-sp.width,fy-sp.height*2);g.scale(2,2);
+  g.drawImage(lit?sp:rdShadowOf(sp),0,0);g.restore();
+  for(let i=0;i<14;i++){const p=(tt*.9+i*.071)%1;r('rgba(200,180,160,'+(.5*(1-p)).toFixed(2)+')',Math.round(W/2+((i*37)%90)-45),Math.round(fy-p*40),2,2)}
+  S.base(H-50).keeper(kp,W/2,2,1);S.base(H-74);
+  rdLight([{x:W/2,y:H-76,r:64,c:rdLanternC()},{x:W/2,y:fy-20,r:30+rise*24,a:rise,c:col}],AB.dark);
+  if(tt>1.4&&tt<1.6){g.save();g.globalAlpha=(1.6-tt)/.2*.7;r('#ffffff',0,0,W,H);g.restore()}
   g.restore();
-  rdKeeperSpr(RUN?RUN.char:'WILL',W/2,H-64,2);
-  rdLight([{x:W/2,y:H-78,r:64,c:rdLanternC()},{x:W/2,y:fy-20,r:30+rise*24,a:rise,c:col}],AB.dark);
   if(tt>1.1){const a=Math.min(1,(tt-1.1)*3);g.save();g.globalAlpha=a;r('rgba(8,5,14,.8)',0,30,W,24);r(col,0,30,W,1);r(col,0,53,W,1);ctext(BOSSES[bi].n,34,3,'#ffffff','#181020');g.restore()}}
- else if(sc.bg==='escape'){for(let y=0;y<H;y+=16)for(let x=0;x<W;x+=16)g.drawImage(x>=W/2-16&&x<W/2+16?TL.dirt:TL.grass[((x*7+y*13)>>4)%TL.grass.length],x,y);
-  const glow=.25+.08*Math.sin(time*3)+Math.min(.3,tt*.1);g.save();g.globalAlpha=glow;g.fillStyle='#fff3b0';g.beginPath();g.arc(W/2,40,30+tt*6,0,7);g.fill();g.restore();
-  r('#3a2c1c',W/2-1,0,2,26);r('#6e4a20',W/2-9,24,18,24);r('#8a5f28',W/2-9,24,18,3);r('#ffd94d',W/2-6,28,12,16);r('#fff3b0',W/2-3,31,6,10);
-  for(let i=0;i<8;i++){const a=i/8*6.283+time*.4;r('rgba(255,243,176,.5)',Math.round(W/2+Math.cos(a)*(36+tt*4)),Math.round(36+Math.sin(a)*(24+tt*3)),2,2)}
-  rdKeeperSpr(RD.char||'WILL',W/2,H-62,2);
-  for(let i=0;i<4;i++)drawBud({x:W/2-40+i*26+ox,y:H-60+(i%2)*4+oy,type:i+1,stage:2,z:0,a:time*3+i,mv:true,st:'follow',fx:1});
-  rdDrawNPC('ERIN',W/2+60,H-66);rdDrawNPC('LOUIE',W/2-62,H-62);}
- else if(sc.bg==='king'){const AB=rdArt().B[0];for(let ty=0;ty<H;ty+=16)for(let tx=0;tx<W;tx+=16)g.drawImage(AB.floor[((tx*7+ty*13)>>4)%9<7?0:2],tx,ty);
-  const cy=Math.round(H*.44);for(let i=0;i<6;i++){const a=i/6*6.283+time*.9;drawBud({x:Math.round(W/2+Math.cos(a)*40)+ox,y:Math.round(cy+Math.sin(a)*22)+oy,type:i,stage:2,z:0,a:time*4+i,mv:true,st:'follow',fx:Math.cos(a)>0?-1:1})}
-  rdKeeperSpr('KING',W/2,cy+6,2);if(((time*3)|0)%2)r('#ffffff',W/2+5,cy-24,1,1);
-  rdLight([{x:W/2,y:cy-8,r:70,c:'#b8f890'}],'rgba(14,6,22,.6)');}
- else{r('#0a0612',0,0,W,H);
-  for(let i=0;i<24;i++)g.drawImage(RDDEB.rock.ol,(i*53)%W,20+((i*37)%(H-50)));
-  r('#241226',W/2-24,44,48,66);r('#180a1c',W/2-19,49,38,61);
-  g.save();g.globalAlpha=.3+.12*Math.sin(time*3);g.fillStyle='#a8f080';g.beginPath();g.arc(W/2,80,26,0,7);g.fill();g.restore();
-  r('#3d2b12',W/2-3,68,6,16);r('#ffd94d',W/2-1,72,2,3);
-  const wx=Math.min(W/2-34,26+tt*22);cineActor(wx,128,1);
-  if(tt>2.1)ctext('ROOTDEEP',26,5,'#ffd94d');}
+ if(sc.bg!=='boss')r('#000000',0,hh,W,H-hh);
  r('#000000',0,0,W,15);r('#000000',0,H-15,W,15);
- const seg=sc.d/LN.length,li=Math.min(LN.length-1,Math.floor(rdCineT/seg)),ln=LN[li];
  r('#f4ead2',4,H-50,W-8,32);r('#281c30',4,H-50,W-8,1);
  if(ln[0]){const pc=RDCPLATE[ln[0]]||'#181020';r('#181020',8,H-58,tw(ln[0],2)+10,14);r(pc,9,H-57,tw(ln[0],2)+8,12);text(ln[0],13,H-55,2,'#ffffff',null)}
  wrapPx(ln[1],222,1).slice(0,2).forEach((l,i)=>text(l,10,H-41+i*10,1,'#281c30',null));
  text('START: SKIP',W-tw('START: SKIP',1)-6,H-12,1,'#8d84a8',null);}
-
 /* ---------------- sprouts: the shared currency ---------------- */
 const SPFX=['EMBER buds lob fire at your foes.','PEB buds block a hit meant for you.','DEW buds slowly mend you.','ZIP buds: +speed, and pickups drift to you.','LEAF buds: foes drop more petals.','LUCKY buds: +crit. The deep approves.'];
 const TRADES=[{g:[0,3],t:[3,1]},{g:[1,3],t:[2,1]},{g:[2,3],t:[4,1]},{g:[3,3],t:[5,1]},{g:[4,3],t:[5,1]}];
@@ -3173,10 +3211,13 @@ function rdVig(){for(let i=0;i<3;i++){const a='rgba(4,2,8,'+(0.10-i*0.03)+')',o=
  r(a,0,o,W,5);r(a,0,H-o-5,W,5);r(a,o,0,5,H);r(a,W-o-5,0,5,H)}}
 function drawHub(){rdTiles();const A=rdArt();r('#1d141f',0,0,W,H);
  /* the Hearth is a valley house dug into the earth: Sprouts' own wood floor, an earth wall behind the stations */
- for(let ty=30;ty<H;ty+=16)for(let tx=0;tx<W;tx+=16)g.drawImage(TL.wood,tx,ty);
+ for(let ty=30;ty<H;ty+=16)for(let tx=0;tx<W;tx+=16)g.drawImage(A.hubWood,tx,ty);
  for(let tx=0;tx<W;tx+=16)g.drawImage(A.B[0].wall,tx,14);r('rgba(0,0,0,.3)',0,30,W,2);
  r('#2e1c16',0,14,6,H);r('#2e1c16',W-6,14,6,H);r('#4b3228',5,30,1,H-30);r('#4b3228',W-6,30,1,H-30);
- r('#46222f',W/2-56,H-58,112,32);r('#552a3a',W/2-53,H-55,106,26);r('#c8a04a',W/2-53,H-55,106,1);
+ /* the hearth rug: a border, a field, a row of diamonds and fringe at the ends */
+ {const rx=W/2-56,ry=H-58;r('#3a1622',rx,ry,112,32);r('#7a2e40',rx+1,ry+1,110,30);r('#c8a04a',rx+3,ry+3,106,1);r('#c8a04a',rx+3,ry+28,106,1);r('#c8a04a',rx+3,ry+3,1,26);r('#c8a04a',rx+108,ry+3,1,26);
+  r('#8e3a4e',rx+5,ry+5,102,22);for(let i=0;i<8;i++){const cx=rx+12+i*13,cy=ry+16;r('#c8a04a',cx,cy-3,1,1);r('#c8a04a',cx-1,cy-2,3,1);r('#e8c868',cx-2,cy-1,5,1);r('#c8a04a',cx-1,cy,3,1);r('#c8a04a',cx,cy+1,1,1)}
+  for(let i=0;i<7;i++){r('#d8c8a8',rx-3,ry+3+i*4,3,1);r('#d8c8a8',rx+112,ry+3+i*4,3,1)}}
  /* the Great Lantern, hanging over the hearth */
  g.save();g.globalAlpha=.10+.02*Math.sin(time*2);g.fillStyle='#ffd94d';g.beginPath();g.arc(W/2,10,14,0,7);g.fill();g.restore();
  r('#3a2c1c',W/2-5,1,10,11);r('#ffd94d',W/2-3,3,6,6);r('#fff3b0',W/2-1,4,2,3);
@@ -3190,7 +3231,8 @@ function drawHub(){rdTiles();const A=rdArt();r('#1d141f',0,0,W,H);
   if(locked)g.restore();
   }
  for(const pr of [['plant',22,-82],['table',64,-96],['crate',216,-84],['plant',196,-128]]){const sp=RDPROPS[pr[0]];r('rgba(0,0,0,.3)',pr[1]-8,H+pr[2]+sp.h-2,16,2);g.drawImage(sp.ol,pr[1]-Math.round(sp.ow/2),H+pr[2]-1)}
- r('#3a2415',14,H-98,54,28);r('#5a3a20',14,H-98,54,2);r('#2c1a0e',16,H-94,50,22);
+ r('#3a2415',14,H-98,54,28);for(let i=0;i<4;i++)for(let j=0;j<2;j++)g.drawImage(TL.soil,0,0,i<3?16:2,j?6:16,16+i*16,H-94+j*16,i<3?16:2,j?6:16);
+ r('#7a4a28',14,H-98,54,3);r('#5a3a20',14,H-73,54,3);r('#7a4a28',14,H-98,2,28);r('#7a4a28',66,H-98,2,28);r('#a06a38',14,H-98,54,1);
  {const flat=[];for(let ty=0;ty<6;ty++)for(let i=0;i<(RD.bank[ty]||0);i++)flat.push(ty);
   flat.slice(0,10).forEach((ty,i)=>drawBud({x:21+(i%5)*10+ox,y:H-76+((i/5)|0)*11+oy,type:ty,stage:2,z:0,a:i*1.3+ty,mv:false,st:'idle',fx:1}));}
  g.drawImage(RDPROPS.plant.ol,70,H-124);g.drawImage(RDPROPS.plant.ol,102,H-126);
@@ -3201,8 +3243,10 @@ function drawHub(){rdTiles();const A=rdArt();r('#1d141f',0,0,W,H);
   if(n&&n.act>0){r('#fff3b0',Math.round(n.x)-1,Math.round(n.y)-25,2,2);if(((time*6)|0)%2)r('#ffd94d',Math.round(n.x)+3,Math.round(n.y)-22,1,1)}}
  /* root door */
  g.save();g.globalAlpha=.16+.05*Math.sin(time*3);g.fillStyle='#58f0c0';g.beginPath();g.arc(W/2,H-17,16,0,7);g.fill();g.restore();
- r('#241408',W/2-13,H-24,26,15);r('#0a1a20',W/2-10,H-21,20,12);
- r('#5a3a20',W/2-13,H-24,3,15);r('#5a3a20',W/2+10,H-24,3,15);r('#5a3a20',W/2-13,H-24,26,3);
+ r('#0a1a20',W/2-10,H-24,20,15);g.fillStyle='#0a1a20';g.beginPath();g.arc(W/2,H-24,10,Math.PI,0);g.fill();
+ g.save();g.globalAlpha=.3+.15*Math.sin(time*3);r('#58f0c0',W/2-7,H-26,14,16);g.restore();
+ for(let k=0;k<9;k++){const a=Math.PI+k/8*Math.PI,x=Math.round(W/2+Math.cos(a)*12),y=Math.round(H-24+Math.sin(a)*12);r('#6e4a2a',x-2,y-1,3,3);r('#8a5e36',x-1,y-1,1,1)}
+ r('#6e4a2a',W/2-13,H-24,3,15);r('#6e4a2a',W/2+10,H-24,3,15);
  if(state!=='g3talk')text('DESCEND',Math.round(W/2-tw('DESCEND',1)/2),H-9,1,'#f8c070',null);
  r('rgba(0,0,0,.25)',Math.round(P3.x)-5,Math.round(P3.y)+1,10,2);drawPlayerSpr(P3.x,P3.y+2,1);
  /* warm, cozy light: the hearth lantern, the torches, the root door, and you */
@@ -3391,6 +3435,10 @@ function drawRun(bg){const B=BIOMES[RUN.biome],A=rdArt(),AB=A.B[RUN.biome],shx=R
    else if(f.k==='pillar'&&!(f.tick>0&&f.hits===4))L.push({x:f.x,y:f.y,r:30,a:k,c:'#fff3b0'});else if(f.k==='geyser')L.push({x:f.x,y:f.y-10,r:24,a:k,c:'#bdeffb'})}
   if(RUN.bloomT>0)for(const b of RUN.buds)L.push({x:b.x,y:b.y-6,r:16,c:'#a8f080'});
   rdLight(L,RUN.phase==='doors'?'rgba(14,6,22,'+Math.max(.2,.46-RUN.litT*.35)+')':AB.dark);}
+ {const top=RDA.top,span=H-top-RDA.bot;for(let i=0;i<16;i++){
+  if(RUN.biome===0){const y=top+((((i*37-time*7)%span)+span)%span),x=Math.round((i*53+Math.sin(time*.7+i)*8+W)%W);r('rgba(232,208,176,.32)',x,Math.round(y),1,1)}
+  else if(RUN.biome===1){const y=top+((time*55+i*29)%span),x=(i*61+7)%W;r('rgba(160,215,245,.45)',x,Math.round(y),1,3)}
+  else{const y=H-RDA.bot-((time*18+i*31)%span),x=Math.round((i*47+Math.sin(time+i)*6+W)%W);r(i%3?'rgba(248,160,64,.75)':'rgba(248,216,96,.8)',x,Math.round(y),1,1)}}}
  for(const q of RUN.parts)r(q.c,Math.round(q.x),Math.round(q.y),2,2);
  for(const f of RUN.fx)if(f.k==='coin'){const k=f.t/f.max,w=Math.max(1,Math.round(Math.abs(Math.cos(time*28))*4)),cy=Math.round(f.y-10*(1-k));
   r('#181020',Math.round(f.x)-w-1,cy-1,2*w+3,8);r(k<.4?(f.win?'#f8d030':'#8d84a8'):'#f8d030',Math.round(f.x)-w,cy,2*w+1,6)}
@@ -3429,29 +3477,48 @@ function drawRun(bg){const B=BIOMES[RUN.biome],A=rdArt(),AB=A.B[RUN.biome],shx=R
 /* ---------------- title / death / escape ---------------- */
 function drawMenu(){drawTitle();r('rgba(8,5,14,.78)',W/2-64,H-100,128,84);r('#ffd94d',W/2-64,H-100,128,1);
  drawList(['TO THE HEARTH','INTRO','SETTINGS','SWAP CARTRIDGE'],menuSel,H-90,20);}
-function drawTitle(){r('#0a0714',0,0,W,H);
- for(let i=0;i<40;i++)r(i%5?'#3a3350':'#8d84a8',(i*47+13)%236,8+((i*29)%(H-70)),1,1);
- for(let i=0;i<7;i++){const x=14+i*34;r('#4a3040',x,0,3,10+((i*13)%16));r('#4a3040',x-2,8+((i*13)%16),7,2)}
- g.save();g.globalAlpha=.13+.03*Math.sin(time*2);g.fillStyle='#ffd94d';g.beginPath();g.arc(W/2,24,14,0,7);g.fill();g.restore();
- r('#4a3040',W/2-1,0,2,13);
- r('#3a2c1c',W/2-6,13,12,13);r('#ffd94d',W/2-3,16,6,7);r('#fff3b0',W/2-1,17,2,4);
- ctext('ROOTDEEP',49,5,'#181020',null);ctext('ROOTDEEP',46,5,'#ffd94d','#403010');
+function drawTitle(){const gl=Math.round(H*.13);
+ /* above: the valley at night with the Great Lantern; below: the earth, roots and sprouts, down to the root door */
+ r('#101838',0,0,W,gl);for(let i=0;i<22;i++)r(i%5?'#8090c8':'#ffffff',(i*53+17)%240,(i*29+5)%Math.max(8,gl-10),1,1);
+ g.fillStyle='#182848';g.beginPath();g.arc(40,gl+10,40,0,7);g.arc(200,gl+16,56,0,7);g.fill();
+ const band=[['#3b2620',0],['#34211f',.18],['#2b1b20',.38],['#21141f',.6],['#170e18',.82]];band.forEach(([c,q])=>r(c,0,gl+Math.round((H-gl)*q),W,H));
+ r('#58b858',0,gl-4,W,6);r('#3c9848',0,gl+1,W,2);for(let i=0;i<20;i++)r('#84d870',(i*29+3)%W,gl-3+(i%3),2,1);
+ {const so=ox,sy=oy,sh=shards;shards=4;g.save();g.translate(W/2,gl-1);ox=HX;oy=HY;drawHearth();g.restore();ox=so;oy=sy;shards=sh}
+ g.save();g.globalAlpha=.14+.04*Math.sin(time*2);g.fillStyle='#ffd94d';g.beginPath();g.arc(W/2,gl-10,26,0,7);g.fill();g.restore();
+ /* roots wandering down from the grass */
+ for(let k=0;k<9;k++){const x0=12+k*27,len=Math.round((H-gl)*(.25+((k*37)%60)/100));for(let y=0;y<len;y+=2){const x=Math.round(x0+Math.sin(y*.07+k)*5+Math.sin(y*.021+k*2)*8);r(y<len*.6?'#6e4a2a':'#5a3a24',x,gl+3+y,y<len*.5?2:1,2)}}
+ for(let i=0;i<16;i++)r('#4e3530',(i*61+11)%W,gl+12+((i*47)%(H-gl-30)),3,2);
+ /* sprouts sleeping in the dark, each with a little glow */
+ [[34,.52,0],[206,.46,2],[64,.74,3],[180,.7,5],[120,.86,1]].forEach(([x,q,t2],i)=>{const y=Math.round(gl+(H-gl)*q*.8);g.save();g.globalAlpha=.25+.1*Math.sin(time*2+i);g.fillStyle='#a8f080';g.beginPath();g.arc(x,y-4,9,0,7);g.fill();g.restore();
+  drawBud({x:x+ox,y:y+oy,type:t2,stage:2,z:0,a:time*1.5+i,mv:false,st:'idle',fx:1})});
+ for(let i=0;i<10;i++){const p=(time*.06+i*.1)%1;r('rgba(232,208,176,'+(.4*(1-p)).toFixed(2)+')',Math.round((i*47+Math.sin(time+i)*6)%W),Math.round(H-20-p*(H-gl-30)),1,1)}
+ const ly=Math.round(H*.34);ctext('ROOTDEEP',ly+3,5,'#181020',null);ctext('ROOTDEEP',ly,5,'#ffd94d','#403010');
  for(let x=0;x<W;x+=8){const hh=6+((x*13)%7);r('#080510',x,H-14-hh,8,14+hh)}
  r('#080510',0,H-16,W,16);
- g.save();g.globalAlpha=.3+.1*Math.sin(time*3);g.fillStyle='#58f0c0';g.beginPath();g.arc(W/2,H-17,6,0,7);g.fill();g.restore();
- r('#0a1a20',W/2-4,H-23,8,12);r('#241408',W/2-5,H-24,10,2);
+ g.save();g.globalAlpha=.3+.1*Math.sin(time*3);g.fillStyle='#58f0c0';g.beginPath();g.arc(W/2,H-17,7,0,7);g.fill();g.restore();
+ r('#0a1a20',W/2-4,H-23,8,12);g.fillStyle='#0a1a20';g.beginPath();g.arc(W/2,H-23,4,Math.PI,0);g.fill();r('#6e4a2a',W/2-6,H-24,2,13);r('#6e4a2a',W/2+4,H-24,2,13);
  if(RD.stats.runs)ctext('RUNS '+RD.stats.runs+' · ESCAPES '+RD.stats.escapes,H-40,1,'#6a6284',null);
  if(state!=='g3menu'&&((time*2)|0)%2)ctext('PRESS A',H-31,2,'#ffffff');
  if(state!=='g3menu')ctext('B OR SELECT: SWAP CARTRIDGE',H-11,1,'#565064',null);}
 
-function drawOver(win){r(win?'#141a10':'#180a10',0,0,W,H);const L=RD.lastRun||{chamber:0,kills:0,dew:0,petals:0,heat:0};
- ctext(win?'YOU ESCAPED THE DEEP':'THE DEEP KEEPS YOU',40,3,win?'#ffd94d':'#ff9a8a','#181020');
- ctext(win?'DAWN, AND YOUR FACE IS STILL YOURS':'ERIN WILL COME DIGGING. SHE ALWAYS DOES',70,1,'#c8c0d8',null);
- ctext('CHAMBERS REACHED  '+(win?12:L.chamber),96,2,'#ffffff');
- ctext('FOES FELLED  '+L.kills,114,2,'#ffffff');
- ctext('MOONDEW BANKED  +'+L.dew,132,2,'#7fd0e8');
- if(L.heat)ctext('HEAT '+L.heat,148,1,'#f8a060',null);
- if(L.spr)ctext('SPROUTS BANKED  +'+L.spr,160,1,'#a8f080',null);
+function drawOver(win){r(win?'#141a10':'#180a10',0,0,W,H);const L=RD.lastRun||{chamber:0,kills:0,dew:0,petals:0,heat:0},kp=RD.char||'WILL';
+ /* a small stage on tall screens: the keeper down in the dark with Erin's rope coming, or dawn over the valley */
+ const S0=H>=250?Math.min(120,H-160):0;
+ if(S0){const S=RSTG.base(S0);
+  if(win){S.sky('dawn');S.hills('dawn');S.lantern(150,1,4);S.keeper(kp,96,2,1);[70,118].forEach((x,i)=>S.bud(x,i+2,1,3));S.dog(178,1,true,-1)}
+  else{S.cave();const lx=W/2+26,rope=Math.round((S.GY-30)*Math.min(1,overT/2.5));
+   g.save();g.translate(W/2-4,S.GY-2);g.rotate(-Math.PI/2);const sp=kp==='KING'?RDKING.ol:kp==='WILL'||!CH[kp]?SP.pd:CH[kp];g.drawImage(sp,-sp.width,-sp.height,sp.width*2,sp.height*2);g.restore();
+   const fl=.35+.15*Math.sin(time*7);g.save();g.globalAlpha=fl;g.fillStyle='#ffd94d';g.beginPath();g.arc(W/2-34,S.GY-6,10,0,7);g.fill();g.restore();r('#3a2c1c',W/2-37,S.GY-10,7,9);r('#806030',W/2-35,S.GY-8,3,5);
+   r('#c8a878',lx,0,1,rope);if(rope>4){g.save();g.globalAlpha=.4;g.fillStyle='#ffd27a';g.beginPath();g.arc(lx,rope,9,0,7);g.fill();g.restore();r('#ffd94d',lx-2,rope-2,5,5)}}
+  r(win?'#141a10':'#180a10',0,S0,W,H-S0);r(win?'#a8f080':'#ff9a8a',0,S0,W,1)}
+ const o=S0?S0-8:0;
+ ctext(win?'YOU ESCAPED THE DEEP':'THE DEEP KEEPS YOU',o+(S0?22:40),3,win?'#ffd94d':'#ff9a8a','#181020');
+ ctext(win?'DAWN, AND YOUR FACE IS STILL YOURS':'ERIN WILL COME DIGGING. SHE ALWAYS DOES',o+(S0?46:70),1,'#c8c0d8',null);
+ const st=S0?o+64:96,sp2=S0?16:18;
+ ctext('CHAMBERS REACHED  '+(win?12:L.chamber),st,2,'#ffffff');
+ ctext('FOES FELLED  '+L.kills,st+sp2,2,'#ffffff');
+ ctext('MOONDEW BANKED  +'+L.dew,st+sp2*2,2,'#7fd0e8');
+ const ex=[L.heat?'HEAT '+L.heat:'',L.spr?'SPROUTS BANKED +'+L.spr:''].filter(Boolean).join('   ');if(ex)ctext(ex,st+sp2*3,1,'#a8f080',null);
  ctext('SPEND IT AT THE MIRROR. GO AGAIN.',H-30,1,'#a8f080',null);
  if(overT>.8&&((time*2)|0)%2)ctext('A: THE HEARTH',H-16,2,'#ffffff');}
 /* ---------------- dispatch ---------------- */
