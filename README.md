@@ -18,14 +18,15 @@ python3 build.py
 
 ## North Coast Knockout
 
-Controls: d-pad to walk / jump / crouch, hold back to block, **A** punch (A,A,A combo), **B** kick,
-down+A uppercut, down+B sweep, forward+A up close to throw, **Select** special,
-**A+B** (or down+Select) for the super when the meter is full. Win two rounds, then press Select to finish.
+Controls (direction + button, no motion inputs): d-pad to walk / jump / crouch, double-tap to dash,
+hold back to block, **A** punch (A,A,A combo), **B** kick, down+A uppercut, down+B sweep,
+forward+A up close to throw, **Select** special 1, forward+Select special 2,
+down+Select (or A+B) for the super when the meter is full. Win two rounds, then press Select to finish.
 
 Everything is drawn in code, so it is all editable in `src/knockout.js`:
 
 - `CH` – the roster: names, colours, stats, special / super / finisher names, win quotes
 - `HD` – the pixel-art heads
 - `ST` – the stages
-- `MV`, `SPC`, `SUP` – normal moves, specials and supers
+- `MV`, `S1`, `S2`, `SUP` – normal moves, the two specials per fighter, and supers
 - `SONG` – the chiptune. Any track in `src/tracks.js` tagged `"use":["ko-menu"]` or `["ko-fight"]` plays instead.
