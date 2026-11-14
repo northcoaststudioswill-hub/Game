@@ -3604,7 +3604,7 @@ function g3DrawUI(){const M=RD;
  if(state==='g3boon'){r('#0d0a18',0,0,W,H);const god=boonOffer[0]?boonOffer[0].god:'EMBER';
   ctext(GODS[god].n+' SPEAKS',6,3,GODS[god].l,'#181020');ctext('"'+GODS[god].t+' OFFERS:"',26,1,'#a89ec2',null);
   /* cards size to the screen; descriptions only print as many lines as fit inside the card */
-  const n=boonOffer.length||1,need=Math.max(1,Math.min(3,...boonOffer.map(b=>wrapPx(boonDesc(b),208,1).length))),ch2=Math.max(32,Math.min(Math.floor((H-62)/n)-4,31+need*10)),nl=Math.max(1,Math.floor((ch2-30)/10));
+  const n=boonOffer.length||1,need=Math.max(1,Math.min(3,Math.max(...boonOffer.map(b=>wrapPx(boonDesc(b),208,1).length)))),ch2=Math.max(32,Math.min(Math.floor((H-62)/n)-4,31+need*10)),nl=Math.max(1,Math.floor((ch2-30)/10));
   boonOffer.forEach((b,i)=>{const y=40+i*(ch2+4),on=i===uiSel,gc=GODS[b.god]||GODS.EMBER;
    r(on?'#f8e060':'#241c38',8,y,W-16,ch2);r(on?'#fff3b0':'#2e2450',9,y+1,W-18,ch2-2);r(gc.c,9,y+1,4,ch2-2);
    text(boonName(b),17,y+3,2,on?'#281c30':'#e8e4f5',null);
