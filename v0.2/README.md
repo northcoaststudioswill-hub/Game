@@ -11,5 +11,14 @@ v0.1 plus **Rootdeep** in cartridge slot 3, overhauled. v0.1 is untouched and is
 | `handoffs/` | Notes for the next session: the v0.2 handoff, the Rootdeep design doc, the art manifesto. |
 | `playtest/` | The v0.2 playtest report, the development snapshot, and screenshots from the playtest. |
 
-Backup SHA-256: `9c44454c3cc5a3c2e7096d2a418b1138dd537960ef013307813dc569b32fe1ab`
-Playable test page (private claude.ai artifact): https://claude.ai/artifact/TtWoCTcCU9ZZfkrWkyUZtQ
+v0.2 backup SHA-256: `9c44454c3cc5a3c2e7096d2a418b1138dd537960ef013307813dc569b32fe1ab`
+Playable test page (claude.ai artifact): https://claude.ai/artifact/TtWoCTcCU9ZZfkrWkyUZtQ
+
+## v0.2.1 (Nov 14 2026)
+
+Rootdeep: the Burrow descent and a scene between every chamber (rescued sprouts climbing home), characters who walk over to explain
+things, capsule pages per cartridge with how to get tickets, and a Hearth menu on Start (save, settings, capsules, new game, quit).
+
+- Send this: `share/pocket-lantern-v0.2.1-share.zip` (the game plus HOW-TO-PLAY).
+- Frozen copy: `backups/pocket-lantern_2026-11-14_v0.2.1_BACKUP.html`, SHA-256 `c28ea95bcaf4045d89351a982eb91e4fd5a0fc9c18fa46d1bf642a4769335591`
+- The v0.2 backup, share folder and zip are kept as they were.
