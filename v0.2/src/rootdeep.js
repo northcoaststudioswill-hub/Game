@@ -108,7 +108,7 @@ const LINES={
  RANGER:["Paths below shift like paths above. Mark your turns or don't come back.","Thornback was the garden's problem. His mother's the garden's history.","Bramble taught me: the way through is usually on fire. Ember agrees.","Take the elite doors. Cowards get common boons and common graves.","Marcus complains about the dark. Then he sleeps in it like a baby.","Patrolled the door twice today. It only whispered once. Improvement.","A string of buds at your back is a squad. Treat them like one.","Ember Core runs hot. If your boots smoke, you're close to the Keeper."],
  /* Marcus: Sprouts' Marcus (cocky "bro" hype man, Marcus Waterworks, "I've got a guy. The guy is me.")
     who also roasts everyone and everything down here. Keep both halves in every line. */
- MARCUS:["Bro. BRO. The keeper's here. Everybody act natural. Nobody here is good at it, but try.","I've watched every keeper go down that door, bro. Read my reviews. All terrible. Except mine. Mine are great.","The Drowned King. Drowned. King. Two red flags, bro. And you still wanna swim down there?","Erin says there's good in everyone. I checked, personally. There's less than she thinks, bro.","Scout wrote forty pages on the grubs. I read every one. I hate the pages AND the grubs.","If you don't come back, I'm telling everyone you owed me money. Big money. Waterworks money.","Louie's the only one here I respect, bro. He bites his problems. You've got a sword. I guess.","The deep's been talking trash about you, bro. And honestly? Team deep.","Down there needs a lazy river. I've got a guy. The guy is me. You clear the bugs first, bro.","I watered that sprout bed once. ONCE. Now it's in Erin's speech forever. Legacy, bro.","My honest review of the deep: one star. The star is a warning label.","See one, smack one. That's the whole philosophy down there, bro. Write it down."],
+ MARCUS:["Bro. BRO. The keeper's here. Everybody act natural. Nobody here is good at it, but try.","I've watched every keeper go down that door, bro. Read my reviews. All terrible. Except mine. Mine are great.","The Drowned King. Drowned. King. Two red flags, bro. And you still wanna swim down there?","Erin says there's good in everyone. I checked, personally. There's less than she thinks, bro.","Scout wrote forty pages on the grubs. I read every one. I hate the pages AND the grubs.","If you don't come back, I'm telling everyone you owed me money. Big money. Waterworks money.","Louie's the only one here I respect, bro. He bites his problems. You've got a sword. I guess.","The deep's been talking trash about you, bro. And honestly? Team deep.","Down there needs a lazy river. I've got a guy. The guy is me. You clear the bugs first, bro.","I watered that sprout bed once. ONCE. Now it's in Erin's speech forever. Legacy, bro.","My honest review of the deep: one star. The star is a warning label.","See one, smack one. That's the whole philosophy down there, bro. Write it down.","You're such a J, Will. Love you, bro. Still a J.","Bro, stop J-lighting me. I never said I'd go down there. I said I'd THINK about it.","Will, you absolute J. You walked right past the Mirror. Again."],
  SCOUT:["I catalogued 40 species below! 39 want to eat you. The crab is undecided.","Mothshades blink behind you. If one winks, dash. Trust me.","Every chamber you clear, I update the Codex. Science marches on!","The Hollow Keeper collects faces. Yours is just on loan, apparently.","Marcus reviewed my Codex. One star. He said the star was generous.","Field note: LUCKY buds hum near treasure. Or near Marcus. Data's noisy.","I timed Louie's naps. He's awake for your returns. Every single one.","New Codex page: 'Pods, and why the deep keeps coughing them up.'"]};
 /* ---------------- data: enemies & bosses ---------------- */
 const FOES={
@@ -376,7 +376,7 @@ function rdStartRun(){const s=rdStats();
   boons:{atk:null,cast:null,dash:null,pass:[]},enemies:[],projs:[],eprojs:[],pickups:[],parts:[],texts:[],doors:[],zones:[],hazards:[],buds:[],pods:[],dewT:0,podDropped:false,
   obst:[],phase:'fight',atkCd:0,combo:0,dtap:{},castAmmo:1+(hasKeep('stone')?1:0),castCd:0,dashCd:0,dashT:0,dashCharges:rdStats().dashCharges,
   inv:0,shake:0,boss:null,elite:false,revives:mir('defy'),collarUsed:false,phoenixUsed:false,regen:0,fountain:0,time:0,zoneT:0,kills:0,
-  xCd:0,yCd:0,sup:0,rush:null,zoomQ:0,fx:[],cutT:0,cutN:''};
+  xCd:0,yCd:0,sup:0,rush:null,zoomQ:0,fx:[],cutT:0,cutN:'',hs:0,hurtT:0,atkA:null};
  for(const ty of RD.party){if((RD.bank[ty]||0)>0){RD.bank[ty]--;RUN.buds.push({type:ty,x:P3.x,y:P3.y,a:Math.random()*6,cd:0,z:0})}}
  if(RUN.char==='KING')for(let i=0;i<2;i++)RUN.buds.push({type:(Math.random()*5)|0,x:P3.x,y:P3.y,a:Math.random()*6,cd:0,z:0});
  RD.party=[];RD.stats.runs++;rdSave();rdNextChamber();}
@@ -522,7 +522,7 @@ const NPCROUTE={
 function hubNpcReset(){for(const who of NPCS){const hx=NPCPOS[who][0],hy=hubY(NPCPOS[who][1]);
  const route=NPCROUTE[who].map(pt=>pt==='P3'?'P3':{x:pt[0],y:hubY(pt[1]),act:!!pt[2]});
  HUBNPC[who]={x:hx,y:hy,hx,hy,route,ri:0,jx:0,jy:0,act:0,wait:.3+Math.random()*.8}}}
-function hubEnter(){P3.x=W/2;P3.y=hubY(.36);P3.vx=P3.vy=0;hubNpcReset();state='g3hub';
+function hubEnter(){hubBark=null;hubBarkT=3;P3.x=W/2;P3.y=hubY(.36);P3.vx=P3.vy=0;hubNpcReset();state='g3hub';
  if(charUnlocked('KING')&&!RD.flags.cine_king&&(RD.stats.fullString||0)>=1)startCine('hub','king');}
 function movePlayer(dt,spd){const mx=keys.right-keys.left,my=keys.down-keys.up;const l=Math.hypot(mx,my)||1;
  const sp=spd*(rdStats().speedMul);
@@ -530,7 +530,7 @@ function movePlayer(dt,spd){const mx=keys.right-keys.left,my=keys.down-keys.up;c
  else{P3.vx*=Math.max(0,1-dt*10);P3.vy*=Math.max(0,1-dt*10)}
  P3.x+=P3.vx*dt;P3.y+=P3.vy*dt;
  if(RUN&&state==='g3run'){P3.x=Math.max(RDA.side+6,Math.min(W-RDA.side-6,P3.x));P3.y=Math.max(RDA.top+6,Math.min(H-RDA.bot-4,P3.y))}
- else{P3.x=Math.max(13,Math.min(W-13,P3.x));P3.y=Math.max(32,Math.min(H-11,P3.y))}
+ else{P3.x=Math.max(13,Math.min(W-13,P3.x));P3.y=Math.max(48,Math.min(H-11,P3.y))}
  if(RUN)for(const o of RUN.obst){const nx=Math.max(o.x,Math.min(P3.x,o.x+o.w)),ny=Math.max(o.y,Math.min(P3.y,o.y+o.h));
   const dx=P3.x-nx,dy=P3.y-ny,d=Math.hypot(dx,dy);if(d<7&&d>0){P3.x=nx+dx/d*7;P3.y=ny+dy/d*7}else if(d===0){P3.y=o.y-7}}}
 function hubTarget(){let best=null,bd=17*17;
@@ -553,6 +553,9 @@ function hubUpdate(dt){if(pressed('sel')){rdSave();eject();return}
  for(let i=0;i<NPCS.length;i++)for(let j=i+1;j<NPCS.length;j++){const a=HUBNPC[NPCS[i]],c=HUBNPC[NPCS[j]];if(!a||!c)continue;
   const dx=c.x-a.x,dy=c.y-a.y,d=Math.hypot(dx,dy);if(d>0&&d<22){const push=(22-d)/2,ux=dx/d,uy=dy/d;a.x-=ux*push;a.y-=uy*push;c.x+=ux*push;c.y+=uy*push}}
  for(const who of NPCS){const n=HUBNPC[who];if(n){n.y=Math.max(52,Math.min(H-40,n.y));n.x=Math.max(12,Math.min(W-12,n.x))}}
+ hubBarkT-=dt;if(hubBark){hubBark.t-=dt;if(hubBark.t<=0)hubBark=null}
+ if(hubBarkT<=0){hubBarkT=5+Math.random()*4;const pool=NPCS.filter(w=>HUBNPC[w]&&HUBNPC[w].y>96&&Math.hypot(HUBNPC[w].x-P3.x,HUBNPC[w].y-P3.y)<150);
+  if(pool.length){const w=pool[(Math.random()*pool.length)|0],L2=RDBARK[w]||['...'];hubBark={who:w,txt:L2[(Math.random()*L2.length)|0],t:2.6}}}
  const t=hubTarget();
  hubMsg=t?('A: '+t.n):'';if(hubMsgT>0)hubMsgT-=dt;
  if(t&&pressed('a')){snd(520,.05);
@@ -784,6 +787,7 @@ function hitEnemy(e,dmg,src,kx,ky){if(e.hp<=0)return;const s=rdStats();let crit=
  if(src==='atk'&&e.kind==='boss'&&RUN.boons.pass.find(p=>p.id==='heavy'))dmg*=1+rdBoonVal(RUN.boons.pass.find(p=>p.id==='heavy'))/100;
  if(hasDuo('mudslide')&&e.chill>0)dmg*=1.3;
  dmg*=crit?2:1;e.hp-=dmg;e.flash=.12;
+ if(src==='atk'||src==='sp')RUN.hs=Math.max(RUN.hs||0,crit?.06:.035);
  /* the super meter fills from your own hits (not supers, burns, buds or reflects) */
  if(src!=='su'&&src!=='burn'&&src!=='bud'&&src!=='reflect'&&(RUN.sup||0)<100){RUN.sup=Math.min(100,(RUN.sup||0)+dmg*.5);
   if(RUN.sup>=100){ftext(P3.x,P3.y-22,'SUPER READY - B','#ffd94d');snd(1568,.08,2093)}}
@@ -815,7 +819,7 @@ function damagePlayer(n){if(!RUN||RUN.inv>0||RUN.dashT>0)return;const s=rdStats(
  const peb=RUN.buds&&RUN.buds.find(b=>b.type===1&&b.cd<=0);
  if(peb){peb.cd=15;RUN.inv=.55;ftext(P3.x,P3.y-16,'PEB BLOCKED!','#dce2ea');burst(P3.x,P3.y,'#dce2ea',6,30);snd(520,.08,760);return}
  let d=n*(1-s.armor)*(RUN.armT>0?.5:1);
- RUN.hp-=d;RUN.inv=.55;RUN.shake=Math.min(5,2.5);RUN.sup=Math.min(100,(RUN.sup||0)+5);burst(P3.x,P3.y,'#ff7a6b',7,36);snd(170,.15,70,'sawtooth',.07);
+ RUN.hp-=d;RUN.inv=.55;RUN.shake=Math.min(5,2.5);RUN.hs=.08;RUN.hurtT=.28;RUN.sup=Math.min(100,(RUN.sup||0)+5);burst(P3.x,P3.y,'#ff7a6b',7,36);snd(170,.15,70,'sawtooth',.07);
  if(RUN.buds&&RUN.buds.length&&Math.random()<.3){const lb=RUN.buds.pop();ftext(P3.x,P3.y-20,TYPES[lb.type].n+' SCATTERED!','#f8a0c8');snd(340,.1,180)}
  if(hasKeep('charm')){for(const e of RUN.enemies)if(Math.hypot(e.x-P3.x,e.y-P3.y)<e.r+9)hitEnemy(e,9,'reflect')}
  if(RUN.hp<=0){if(RUN.revives>0){RUN.revives--;RUN.hp=s.maxHp*.5;RUN.inv=2;say2('DEATH DEFIED!',3);burst(P3.x,P3.y,'#ffd94d',16,50);snd(784,.2);later(()=>snd(1175,.4),140)}
@@ -825,13 +829,15 @@ function damagePlayer(n){if(!RUN||RUN.inv>0||RUN.dashT>0)return;const s=rdStats(
 function doAttack(){const w=WEAPONS[RD.weapon],s=rdStats(),[ax,ay]=aimVec(),isLou=RUN.char==='LOUIE';RUN.atkCd=w.rate*(isLou?.72:1);
  noise(.045,.14,2400);RUN.combo=(RUN.combo+1)%(w.dmg.length);
  const base=w.dmg[RUN.combo]*s.dmgMul*s.atkMul*(isLou?.85:1);
+ rdAtkStart(isLou?'bite':w.proj?'bow':RD.weapon==='maul'?'maul':'blade',Math.atan2(ay,ax),RUN.combo);
  if(w.proj){RUN.projs.push({x:P3.x+ax*8,y:P3.y+ay*8,vx:ax*w.proj,vy:ay*w.proj,dmg:base,kind:'arrow',r:2,life:1.1});snd(740,.05,1200);return}
  let hit=false;for(const e of RUN.enemies.slice()){const dx=e.x-P3.x,dy=e.y-P3.y,d=Math.hypot(dx,dy);
   if(d<(isLou?Math.max(18,w.range-6):w.range)+e.r){const dot=(dx/(d||1))*ax+(dy/(d||1))*ay;if(dot>Math.cos(w.arc/2)||d<12){hitEnemy(e,base,'atk',(dx/(d||1))*(w.kb||40)*.06,(dy/(d||1))*(w.kb||40)*.06);hit=true}}}
  rdHitInts(P3.x+ax*w.range*.5,P3.y+ay*w.range*.5,w.range*.6+4);
  if(hit)snd(300,.05,180);
  if(hit&&w.dmg.length>1&&RUN.combo===w.dmg.length-1)ftext(P3.x,P3.y-24,RDMOVES[RUN.char||'WILL'].fin+'!','#fff3b0');
- RUN.slashT=.12;RUN.slashAng=Math.atan2(ay,ax);}
+ RUN.slashT=.12;RUN.slashAng=Math.atan2(ay,ax);
+ if(RD.weapon==='maul'&&!isLou)later(()=>{if(!RUN)return;RUN.fx.push({k:'whistle',x:P3.x+ax*16,y:P3.y+ay*16-2,t:.25,max:.25,dust:1});RUN.shake=Math.max(RUN.shake,2.5);burst(P3.x+ax*16,P3.y+ay*16,'#c8a878',8,40)},110);}
 function doDash(){const s=rdStats();if(RUN.dashCharges<=0||RUN.dashT>0)return;const[ax,ay]=aimVec();
  RUN.dashCharges--;RUN.dashT=.15;RUN.dashRegen=.95;RUN.inv=Math.max(RUN.inv,.24);
  P3.vx=ax*310;P3.vy=ay*310;noise(.1,.16,1600);burst(P3.x,P3.y,'#a8d8ff',5,20);
@@ -925,6 +931,30 @@ function rdDrawInts(){const pots=['potE','potS','potA'];for(const it of RUN.ints
   g.drawImage(fl?sp.hol:sp.ol,x-(sp.ow>>1),y-sp.oh+1+(it.fuse>0?Math.round(R(-1,1)):0))}}
  /* the prompt for the one you're next to (only when no foe is close) */
  const it=rdNearInt();if(it&&!RUN.enemies.some(e=>Math.hypot(e.x-P3.x,e.y-P3.y)<34)){const s2='A: '+RDUSE[it.k];text(s2,Math.round(it.x-tw(s2,1)/2),Math.round(it.y)-26,1,'#fff3b0','#181020')}}
+
+/* ---------------- the basic attack, animated ----------------
+   The keeper lunges into the swing and the weapon itself sweeps through the arc with a smear behind it.
+   Petal Blade: 3-hit combo, the third hit spins. Root Maul: a slow heavy slam with a dust ring. Thornbow: draw and loose.
+   Louie bites (jaws snap shut in front of him). */
+const RDWPN={
+ blade:SPRG(['...g','...g.wwwwwwwwp','hhhgwbbbbbbbbPp','...g.wwwwwwwwp','...g'],{h:'#7a4a28',g:'#f8d030',w:'#ffffff',b:'#c8d0dc',p:'#f8a0c8',P:'#f85888'}),
+ maul:SPRG(['............dddddd','............dHHhhd','llllllllllllldHhhhd','llllllllllllldhhhhd','............dhhhhd','............dddddd'],{l:'#6e4a2a',d:'#3a2414',H:'#c89860',h:'#8a5e36'})};
+function rdAtkStart(kind,ang,combo){RUN.atkA={t:0,max:kind==='maul'?.3:kind==='bow'?.18:kind==='bite'?.16:combo===2?.24:.17,kind,ang,combo,dir:combo%2?-1:1};}
+function rdAtkLunge(){const A=RUN.atkA;if(!A)return[0,0];const k=A.t/A.max,m=(A.kind==='maul'?(k<.35?-1.5:4):A.kind==='bow'?-1:3)*Math.sin(Math.PI*Math.min(1,k));return[Math.cos(A.ang)*m,Math.sin(A.ang)*m]}
+function rdDrawAtk(front){const A=RUN.atkA;if(!A)return;const k=Math.min(1,A.t/A.max),px=P3.x,py=P3.y-6;
+ if(A.kind==='bite'){if(!front)return;const cx=px+Math.cos(A.ang)*13,cy=py+3+Math.sin(A.ang)*10,gp=Math.round(5*(1-k));
+  g.save();g.translate(Math.round(cx),Math.round(cy));g.rotate(A.ang);for(const s2 of[-1,1]){const y=s2*(gp+1);r('#ffffff',-3,y-(s2<0?2:0),6,2);r('#ffffff',-2,y+(s2<0?0:-1),1,1);r('#ffffff',1,y+(s2<0?0:-1),1,1)}g.restore();
+  if(k>.6){g.save();g.globalAlpha=1-k;r('#ffffff',Math.round(cx)-1,Math.round(cy)-6,2,2);r('#ffffff',Math.round(cx)+4,Math.round(cy)-3,2,2);g.restore()}return}
+ if(A.kind==='bow'){if(!front)return;g.save();g.translate(Math.round(px),Math.round(py+2));g.rotate(A.ang);const pull=k<.5?k*2:0;
+  g.strokeStyle='#8a5e36';g.lineWidth=2;g.beginPath();g.arc(4,0,7,-1.2,1.2);g.stroke();g.strokeStyle='#e8e4f5';g.lineWidth=1;g.beginPath();g.moveTo(4+Math.cos(-1.2)*7,Math.sin(-1.2)*7);g.lineTo(4-pull*5,0);g.lineTo(4+Math.cos(1.2)*7,Math.sin(1.2)*7);g.stroke();
+  if(k<.5)r('#b0f090',Math.round(4-pull*5),-1,12,1);g.restore();return}
+ const spin=A.kind==='blade'&&A.combo===2,sw=A.kind==='maul'?2.6:2.1,e=1-Math.pow(1-k,3),a0=A.ang-A.dir*sw/2,a1=spin?a0+A.dir*Math.PI*2:A.ang+A.dir*sw/2,a=a0+(a1-a0)*e,R2=A.kind==='maul'?18:15;
+ /* the weapon is behind the keeper while it's above them, in front while it's below */
+ if((Math.sin(a)<0)===front)return;
+ g.save();g.globalAlpha=.6*(1-k*.7);g.lineCap='round';g.strokeStyle=spin?'#ffd94d':A.kind==='maul'?'#d8c0a0':'#f8f0ff';g.lineWidth=A.kind==='maul'?7:5;g.beginPath();
+ const lo=Math.min(a0,a),hi=Math.max(a0,a);g.arc(px,py,R2-3,lo,hi);g.stroke();g.globalAlpha=.5*(1-k);g.strokeStyle=A.kind==='maul'?'#8a5e36':'#f8a0c8';g.lineWidth=1;g.beginPath();g.arc(px,py,R2+1,lo,hi);g.stroke();g.restore();
+ const sp=RDWPN[A.kind]||RDWPN.blade;g.save();g.translate(Math.round(px),Math.round(py));g.rotate(a);g.drawImage(sp.ol,2,-(sp.oh>>1));g.restore();
+ if(spin&&((A.t*40)|0)%2)RUN.parts.push({x:px+Math.cos(a)*R2,y:py+Math.sin(a)*R2,vx:R(-20,20),vy:R(-20,20),life:.3,c:'#f8a0c8'});}
 
 /* ---------------- keeper specials (X, Y) and supers ---------------- */
 function rdNear(rad,skip){let best=null,bd=rad*rad;for(const e of RUN.enemies){if(e.hp<=0||(skip&&skip.has(e)))continue;const d=(e.x-P3.x)**2+(e.y-P3.y)**2;if(d<bd){bd=d;best=e}}return best}
@@ -1033,6 +1063,9 @@ function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.bt-
 function runUpdate(dt){if(RUN.pendingCine){const k=RUN.pendingCine;RUN.pendingCine=null;startCine('run',k);return}
  RUN.time+=dt;if(say2T>0)say2T-=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
  if(RUN.cutT>0){RUN.cutT-=dt;if(RUN.cutT<=0){RUN.cutT=0;rdSuperGo()}return}
+ /* hit-stop: a few frames of freeze when a blow lands (longer when you're the one hit) */
+ if(RUN.hs>0){RUN.hs-=dt;return}
+ if(RUN.atkA){RUN.atkA.t+=dt;if(RUN.atkA.t>=RUN.atkA.max)RUN.atkA=null}if(RUN.hurtT>0)RUN.hurtT-=dt;
  if(pressed('start')){pauseSel=0;pausePage=0;state='g3pause';rdSave();return}
  /* player */
  if(RUN.atkCd>0)RUN.atkCd-=dt;if(RUN.castCd>0)RUN.castCd-=dt;if(RUN.inv>0)RUN.inv-=dt;
@@ -1148,17 +1181,38 @@ function runUpdate(dt){if(RUN.pendingCine){const k=RUN.pendingCine;RUN.pendingCi
 
 /* ---------------- drawing: hub & screens ---------------- */
 function drawPlayerSpr(x,y,scale){scale=scale||1;const spr=P3.ay<-.4?SP.pu:P3.ax<-.4?SP.pl:P3.ax>.4?SP.pr:SP.pd;
- const hop=P3.anim&&((P3.anim)|0)%2?0:0;g.save();g.translate(Math.round(x)-6*scale,Math.round(y)-11*scale+hop);g.scale(scale,scale);g.drawImage(spr,0,0);g.restore();
+ const hop=Math.hypot(P3.vx||0,P3.vy||0)>12&&((P3.anim|0)%2)?-1:0;g.save();g.translate(Math.round(x)-6*scale,Math.round(y)-11*scale+hop);g.scale(scale,scale);g.drawImage(spr,0,0);g.restore();
  r('rgba(0,0,0,.25)',Math.round(x)-5,Math.round(y)+1,10,2);}
-function rdDrawNPC(who,x,y){r('rgba(0,0,0,.25)',Math.round(x)-5,Math.round(y)+1,10,2);rdDrawKeeper(who,x,y+2,1);
+/* what each of them is doing at their station */
+function rdNpcJob(who,x,y){if(who==='ERIN'){r('#98a0b0',x+5,y-9,5,4);r('#98a0b0',x+10,y-10,2,1);for(let i=0;i<3;i++){const p=(time*2+i*.33)%1;r('#7fd0e8',x+12+i,Math.round(y-9+p*10),1,2)}}
+ else if(who==='SCOUT'){r('#f8f0d8',x+5,y-8,6,5);r('#281c30',x+6,y-7,4,1);if(((time*6)|0)%2)r('#281c30',x+6,y-5,3,1);r('#c8a04a',x+10,y-10,1,4)}
+ else if(who==='RANGER'){r('#d8c8a0',x-11,y-9,7,5);r('#8a6a40',x-10,y-7,5,1);r('#e84a5f',x-7,y-8,1,1)}
+ else{r('#fff3b0',x-1,y-25,2,2);if(((time*6)|0)%2)r('#ffd94d',x+3,y-22,1,1)}}
+/* little things they say to themselves in the Hearth */
+const RDBARK={MARCUS:['bro.',"you're a J.",'stop J-lighting me','waterworks 2.0','team deep.'],ERIN:['hi, keeper!','water, water...',"they're growing!"],
+ SCOUT:['fascinating.','page 41...','noted. noted.'],RANGER:['paths shift.','stay sharp.','hm.'],LOUIE:['WOOF','*snore*','arf!']};
+let hubBark=null,hubBarkT=3;
+function rdDrawNPC(who,x,y,bob){r('rgba(0,0,0,.25)',Math.round(x)-5,Math.round(y)+1,10,2);rdDrawKeeper(who,x,y+2+(bob||0),1);
  if(who!=='LOUIE'&&state!=='g3cine'&&!(state==='g3talk'&&y>H-84))text(who,Math.round(x)-tw(who,1)/2,Math.round(y)+4,1,'#e8e4f5','#181020');}
 function rdVig(){for(let i=0;i<3;i++){const a='rgba(4,2,8,'+(0.10-i*0.03)+')',o=i*5;
  r(a,0,o,W,5);r(a,0,H-o-5,W,5);r(a,o,0,5,H);r(a,W-o-5,0,5,H)}}
 function drawHub(){rdTiles();const A=rdArt();r('#1d141f',0,0,W,H);
  /* the Hearth is a valley house dug into the earth: Sprouts' own wood floor, an earth wall behind the stations */
  for(let ty=30;ty<H;ty+=16)for(let tx=0;tx<W;tx+=16)g.drawImage(A.hubWood,tx,ty);
- for(let tx=0;tx<W;tx+=16)g.drawImage(A.B[0].wall,tx,14);r('rgba(0,0,0,.3)',0,30,W,2);
- r('#2e1c16',0,14,6,H);r('#2e1c16',W-6,14,6,H);r('#4b3228',5,30,1,H-30);r('#4b3228',W-6,30,1,H-30);
+ for(let tx=0;tx<W;tx+=16){g.drawImage(A.B[0].wall,tx,14);g.drawImage(A.B[0].wall,tx,30)}r('rgba(0,0,0,.35)',0,46,W,2);
+ /* shelves between the stations: jars of dew, seed packets, Scout's books */
+ for(const sx of[50,93,136,179]){r('#5a3a20',sx-9,24,18,2);r('#3a2414',sx-9,26,18,1);r('#7fd0e8',sx-7,19,3,5);r('#e6f7ff',sx-7,19,1,1);r('#a8f080',sx-2,20,4,4);r('#c84858',sx+3,18,2,6);r('#e8c868',sx+5,19,2,5);
+  r('#5a3a20',sx-9,38,18,2);r('#f8a0c8',sx-6,34,3,4);r('#c8a04a',sx-1,33,3,5);r('#7a4a28',sx+4,35,4,3)}
+ r('#2e1c16',0,14,6,H);r('#2e1c16',W-6,14,6,H);r('#4b3228',5,46,1,H-46);r('#4b3228',W-6,46,1,H-46);
+ for(let y=60;y<H-20;y+=37){r('#6e4a2a',1,y,2,9);r('#6e4a2a',W-3,y+14,2,9)}
+ {const fy=hubY(.47),fl=((time*10)|0)%2;
+  /* the fireplace on the left wall */
+  r('#3a3238',2,fy-14,26,30);r('#5a5058',2,fy-16,28,4);r('#4a4048',4,fy-12,22,26);r('#1a1218',8,fy-6,14,20);
+  for(let i=0;i<4;i++){r('#6a6068',4+i*6,fy-16,4,2)}r('#f07830',10,fy+4-fl,10,10+fl);r('#f8d030',12,fy+7,6,7);r('#fff3b0',14,fy+9+fl,2,4);
+  /* the window on the right wall: the sprout garden, glowing, with little heads bobbing past */
+  r('#5a3a20',W-30,fy-14,26,26);r('#1c3828',W-27,fy-11,20,20);g.save();g.globalAlpha=.55+.15*Math.sin(time*2);r('#58b858',W-27,fy+1,20,8);g.restore();
+  for(let i=0;i<3;i++){const bx=W-25+((time*6+i*7)%18);r(['#f07830','#48a0f0','#f0d020'][i],Math.round(bx),fy+1-((((time*4)|0)+i)%2),3,3)}
+  r('#5a3a20',W-18,fy-11,2,20);r('#5a3a20',W-27,fy-2,20,2);}
  const HL=hubL();
  /* the hearth rug in the middle of the hall: a border, a field, a row of diamonds, fringe */
  {const rx=W/2-56,ry=HL.rugY;r('#3a1622',rx,ry,112,32);r('#7a2e40',rx+1,ry+1,110,30);r('#c8a04a',rx+3,ry+3,106,1);r('#c8a04a',rx+3,ry+28,106,1);r('#c8a04a',rx+3,ry+3,1,26);r('#c8a04a',rx+108,ry+3,1,26);
@@ -1189,8 +1243,12 @@ function drawHub(){rdTiles();const A=rdArt();r('#1d141f',0,0,W,H);
  pr('table',28,HL.deskY);pr('plant',16,HL.deskY+26);
  pr('crate',204,HL.campY);pr('crate',220,HL.campY+12);pr('plant',226,HL.campY-18);
  pr('plant',16,H-42);pr('plant',224,H-42);
- for(const who of NPCS){const n=HUBNPC[who];rdDrawNPC(who,n?n.x:NPCPOS[who][0],n?n.y:hubY(NPCPOS[who][1]));
-  if(n&&n.act>0){r('#fff3b0',Math.round(n.x)-1,Math.round(n.y)-25,2,2);if(((time*6)|0)%2)r('#ffd94d',Math.round(n.x)+3,Math.round(n.y)-22,1,1)}}
+ for(const who of NPCS){const n=HUBNPC[who],x=n?n.x:NPCPOS[who][0],y=n?n.y:hubY(NPCPOS[who][1]),mv=n&&n.wait<=0;
+  rdDrawNPC(who,x,y,mv?-(((time*8)|0)%2):-(((time*1.3+x*.1)|0)%2));
+  if(n&&n.act>0)rdNpcJob(who,Math.round(x),Math.round(y));}
+ if(hubBark&&state==='g3hub'){const n=HUBNPC[hubBark.who];if(n){const bw=tw(hubBark.txt,1)+8,bx=Math.max(4,Math.min(W-4-bw,Math.round(n.x-bw/2))),by=Math.round(n.y)-38;
+  r('#181020',bx-1,by-1,bw+2,13);r('#f8f0d8',bx,by,bw,11);r('#f8f0d8',Math.round(n.x)-1,by+11,3,2);r('#181020',Math.round(n.x)-2,by+11,1,2);r('#181020',Math.round(n.x)+2,by+11,1,2);r('#f8f0d8',Math.round(n.x),by+13,1,1);
+  text(hubBark.txt,bx+4,by+1,1,'#281c30',null)}}
  /* root door */
  g.save();g.globalAlpha=.16+.05*Math.sin(time*3);g.fillStyle='#58f0c0';g.beginPath();g.arc(W/2,H-17,16,0,7);g.fill();g.restore();
  r('#0a1a20',W/2-10,H-24,20,15);g.fillStyle='#0a1a20';g.beginPath();g.arc(W/2,H-24,10,Math.PI,0);g.fill();
@@ -1200,7 +1258,7 @@ function drawHub(){rdTiles();const A=rdArt();r('#1d141f',0,0,W,H);
  if(state!=='g3talk')text('DESCEND',Math.round(W/2-tw('DESCEND',1)/2),H-9,1,'#f8c070',null);
  r('rgba(0,0,0,.25)',Math.round(P3.x)-5,Math.round(P3.y)+1,10,2);drawPlayerSpr(P3.x,P3.y+2,1);
  /* warm, cozy light: the hearth lantern, the torches, the root door, and you */
- rdLight([{x:W/2,y:12,r:70,c:'#ffd27a'},{x:8,y:24,r:34,c:'#f8a040'},{x:230,y:24,r:34,c:'#f8a040'},{x:W/2,y:H-17,r:30,c:'#58f0c0'},{x:P3.x,y:P3.y-6,r:56,c:'#ffd27a'},{x:W/2,y:HL.rugY+16,r:46,c:'#f8a040'},{x:41,y:HL.bedY+14,r:30,c:'#a8f080'},{x:30,y:HL.deskY,r:26,c:'#f8a040'}],'rgba(14,6,22,.34)');
+ rdLight([{x:W/2,y:12,r:70,c:'#ffd27a'},{x:8,y:24,r:34,c:'#f8a040'},{x:230,y:24,r:34,c:'#f8a040'},{x:W/2,y:H-17,r:30,c:'#58f0c0'},{x:P3.x,y:P3.y-6,r:56,c:'#ffd27a'},{x:W/2,y:HL.rugY+16,r:46,c:'#f8a040'},{x:41,y:HL.bedY+14,r:30,c:'#a8f080'},{x:30,y:HL.deskY,r:26,c:'#f8a040'},{x:16,y:hubY(.47)+6,r:48,c:'#f8a040'},{x:W-17,y:hubY(.47),r:30,c:'#a8f080'}],'rgba(14,6,22,.34)');
  for(const st2 of STATIONS){const lk=st2.id==='heat'&&RD.stats.escapes<1;text(st2.l,Math.round(st2.x-tw(st2.l,1)/2),43,1,lk?'#6a6284':'#f8f0d8','#181020')}
  /* top bar */
  r('rgba(10,6,16,.9)',0,0,W,15);text('DEW '+RD.dew,4,2,1,'#7fd0e8',null);
@@ -1296,6 +1354,12 @@ function rdDrawFoe(e){const x=Math.round(e.x),y=Math.round(e.y),k=e.kind;
  if(k==='crab'&&e.state===1){g.save();g.globalAlpha=.35;g.fillStyle='#bdeffb';g.beginPath();g.arc(x,y-2,e.r+6,0,7);g.fill();g.restore()}
  if(e.chill>0){g.save();g.globalAlpha=.3;g.fillStyle='#a8d8ff';g.beginPath();g.arc(x,y-3,e.r+2,0,7);g.fill();g.restore()}
  if(e.root>0&&k!=='boss'&&((time*6)|0)%2)r('#fff3b0',x-1,dy-4,2,2);
+ /* telegraphs: a foe about to attack says so */
+ const d2=Math.hypot(P3.x-e.x,P3.y-e.y);
+ if((k==='spitter'||k==='wisp')&&e.cd<.35&&e.cd>0&&(k==='wisp'||d2<125)){g.save();g.globalAlpha=.5+.4*Math.sin(time*40);g.strokeStyle='#ff7a6b';g.lineWidth=1;g.beginPath();g.arc(x,y-4,e.r+3+(.35-e.cd)*10,0,7);g.stroke();g.restore()}
+ if((k==='beetle'||k==='boss'&&e.bossIx===0)&&e.state===1){const an=Math.atan2(P3.y-e.y,P3.x-e.x);g.save();g.globalAlpha=.6;for(let i=1;i<7;i++)if(((time*20+i)|0)%2)r('#ff7a6b',Math.round(e.x+Math.cos(an)*i*9)-1,Math.round(e.y+Math.sin(an)*i*9)-1,3,3);g.restore()}
+ if(k==='shade'&&e.cd<.3&&e.cd>0&&d2>26){const a=Math.atan2(e.y-P3.y,e.x-P3.x),bx=P3.x+Math.cos(a)*20,by=P3.y+Math.sin(a)*20;for(let i=0;i<4;i++)r('#a898d8',Math.round(bx+Math.cos(time*9+i*1.6)*5),Math.round(by-4+Math.sin(time*9+i*1.6)*4),1,1)}
+ if(k==='boss'&&e.bossIx===1&&e.state===1){g.save();g.globalAlpha=.4+.3*Math.sin(time*30);g.strokeStyle='#ff7a6b';g.lineWidth=2;g.beginPath();g.arc(e.tx,e.ty,26,0,7);g.stroke();g.restore()}
  if(e.burn>0&&((time*8)|0)%2)r('#f07830',x-2,dy-3,3,3);
  if(e.hp<e.max&&k!=='boss'){r('#181020',x-9,dy-5,18,3);r('#e84a5f',x-8,dy-4,Math.round(16*Math.max(0,e.hp/e.max)),1)}}
 /* bg=true draws only the room (under the pause menu): no labels, numbers or HUD */
@@ -1342,7 +1406,7 @@ function drawRun(bg){const B=BIOMES[RUN.biome],A=rdArt(),AB=A.B[RUN.biome],shx=R
    g.globalAlpha=.35+.4*k;g.strokeStyle='#ffd94d';g.lineWidth=10*k+4;g.beginPath();g.moveTo(f.x,f.y);g.lineTo(ex,ey);g.stroke();
    g.globalAlpha=.5+.5*k;g.strokeStyle='#ffffff';g.lineWidth=3;g.beginPath();g.moveTo(f.x,f.y);g.lineTo(ex,ey);g.stroke();
    if(((time*20)|0)%2){g.fillStyle='#f8a0c8';for(let i=1;i<6;i++)g.fillRect(Math.round(f.x+f.ax*f.len*i/6+R(-5,5)),Math.round(f.y+f.ay*f.len*i/6+R(-5,5)),2,2)}}
-  else if(f.k==='whistle'){g.globalAlpha=k;g.strokeStyle='#a8f080';g.lineWidth=2;g.beginPath();g.arc(f.x,f.y,8+70*(1-k),0,7);g.stroke();g.globalAlpha=k*.6;g.beginPath();g.arc(f.x,f.y,4+40*(1-k),0,7);g.stroke()}
+  else if(f.k==='whistle'){g.globalAlpha=k;g.strokeStyle=f.dust?'#d8c0a0':'#a8f080';g.lineWidth=2;g.beginPath();g.arc(f.x,f.y,8+70*(1-k),0,7);g.stroke();g.globalAlpha=k*.6;g.beginPath();g.arc(f.x,f.y,4+40*(1-k),0,7);g.stroke()}
   else if(f.k==='leash'){g.globalAlpha=Math.min(1,k*1.6);g.strokeStyle='#8a5a2c';g.lineWidth=2;g.beginPath();g.moveTo(P3.x,P3.y-6);g.lineTo(f.x,f.y-4);g.stroke();r('#c8a04a',Math.round(f.x)-2,Math.round(f.y)-6,4,4)}
   else if(f.k==='pillar'){const arm=f.tick>0&&f.hits===4;
    if(arm){g.globalAlpha=.5+.4*Math.sin(time*30);g.strokeStyle='#fff3b0';g.lineWidth=1;g.beginPath();g.arc(f.x,f.y,9,0,7);g.stroke()}
@@ -1366,12 +1430,13 @@ function drawRun(bg){const B=BIOMES[RUN.biome],A=rdArt(),AB=A.B[RUN.biome],shx=R
   g.save();g.strokeStyle='#181020';g.lineWidth=2;for(const s2 of[-1,1]){g.beginPath();g.arc(cx+bx*7*s2,cy+by*4*s2,4,0,7);g.stroke()}
   g.strokeStyle='#d83030';g.beginPath();g.moveTo(cx-bx*7,cy-by*4);g.lineTo(cx,cy-3);g.lineTo(cx+bx*7,cy+by*4);g.stroke();g.restore()}
  r('rgba(0,0,0,.28)',Math.round(P3.x)-5,Math.round(P3.y)+1,10,2);
- if(!(RUN.inv>0&&RUN.dashT<=0&&!RUN.rush&&((time*12)|0)%2))rdDrawKeeper(RUN.char||'WILL',P3.x,P3.y+2,P3.ax);
+ rdDrawAtk(false);
+ {const[lx,ly]=rdAtkLunge();if(!(RUN.inv>0&&RUN.dashT<=0&&!RUN.rush&&RUN.hurtT<=0&&((time*12)|0)%2))rdDrawKeeper(RUN.char||'WILL',P3.x+lx,P3.y+2+ly,P3.ax)}
+ rdDrawAtk(true);
  /* the bud string; thrown buds arc through the air; in BLOOM OF KINGS every bud is an exact 2x */
  for(const b of RUN.buds||[]){const big=RUN.bloomT>0;if(big){g.save();g.translate(b.x,b.y);g.scale(2,2);g.translate(-b.x,-b.y)}
   drawBud({x:b.x+ox,y:b.y+oy,type:b.type,stage:2,z:b.z||0,a:b.a,mv:true,st:'follow',fx:b.fx||1});
   if(big)g.restore();if(b.temp&&((time*6)|0)%2)r('#ffd94d',Math.round(b.x),Math.round(b.y)-12-(big?10:0),1,1)}
- if(RUN.slashT>0){g.save();g.translate(P3.x,P3.y);g.rotate(RUN.slashAng);g.strokeStyle='#eaffea';g.lineWidth=2;g.beginPath();g.arc(0,0,17,-.9,.9);g.stroke();g.restore()}
  /* the Lantern's light. Darker while you fight; the relit wall lanterns open the room up */
  {const L=[{x:P3.x,y:P3.y-6,r:86,c:rdLanternC()}],GL=A.GLOW;
   RUN.lamps.forEach((l,i)=>{if(RUN.phase==='doors'&&RUN.litT>i*.22)L.push({x:l.x,y:l.y+8,r:Math.min(64,(RUN.litT-i*.22)*180),c:'#ffd27a'})});
@@ -1397,6 +1462,7 @@ function drawRun(bg){const B=BIOMES[RUN.biome],A=rdArt(),AB=A.B[RUN.biome],shx=R
  if(!bg)for(const t of RUN.texts)text(t.txt,Math.round(t.x-tw(t.txt,1)/2),Math.round(t.y),1,t.c,null);
  g.restore();if(bg)return;
  /* HUD */
+ if(RUN.hurtT>0){const a=(RUN.hurtT/.28)*.45;g.save();g.globalAlpha=a;r('#e84a5f',0,0,W,4);r('#e84a5f',0,H-4,W,4);r('#e84a5f',0,0,4,H);r('#e84a5f',W-4,0,4,H);g.restore()}
  const s=rdStats();r('rgba(8,5,14,.88)',0,0,W,20);r('#c22e4a',0,20,W,1);
  r('#3a1420',4,6,58,7);r(RUN.hp/s.maxHp<.3?'#e84a5f':'#58c048',4,6,Math.round(58*Math.max(0,RUN.hp/s.maxHp)),7);
  text(Math.ceil(RUN.hp)+'/'+s.maxHp,5,2,1,'#ffffff','#181020');
