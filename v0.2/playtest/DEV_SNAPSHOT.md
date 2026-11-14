@@ -31,6 +31,10 @@ A/B (plus X/Y for the cartridges that use them), Select and Start. Saves stay in
 - **Modes and controls:** arcade and versus, four face buttons, and its battle theme built in.
 - **Canon for Rootdeep:** the keepers' Rootdeep moves are taken from here.
 
+## The Lantern menu (console level, new after this snapshot was first written)
+
+On the cartridge shelf: one capsule machine for every cartridge, stats from all three games, and 14 Lantern achievements that span the games and pay capsule tickets. Every cartridge earns tickets.
+
 ## Rootdeep (slot 3): what's in
 
 **Structure**
@@ -53,7 +57,8 @@ A/B (plus X/Y for the cartridges that use them), Select and Start. Saves stay in
 **In the rooms:** pots, berry bushes, root chests and boom bulbs.
 
 **Progression and saving**
-- **The Mirror:** 8 permanent upgrades.
+- **The Burrow Beneath** (was the Mirror): 8 permanent upgrades, dug by your sprouts with Moondew.
+- **Sprouts to the surface:** a full string sends extra sprouts up between chambers, in a keeper-specific scene.
 - **Keepsakes and weapons:** 5 keepsakes and 3 weapons.
 - **The Pact of Roots:** heat levels, unlocked after your first escape.
 - **Saving:** a run checkpoints every chamber, with Continue and New Game on the title menu and Save & Quit on pause.
