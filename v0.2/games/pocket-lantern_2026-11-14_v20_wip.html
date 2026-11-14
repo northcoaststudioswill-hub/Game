@@ -1007,7 +1007,14 @@ function setF(sc){g.font='700 '+FS[sc]+'px ui-monospace,"SF Mono",Menlo,Consolas
 function tw(s,sc=2){setF(sc);const m=g.measureText(String(s));return Math.ceil((m&&m.width)||String(s).length*FS[sc]*.6);}
 /* test hook: when TBX is an array, every text box drawn is recorded (in logical pixels) so a test can check for overlaps */
 let TBON=false,TBX=null,TBL=[];
-function text(s,x,y,sc=2,c='#fff',sh='#181020'){s=String(s);setF(sc);if(TBX){const m=g.getTransform(),w=g.measureText(s).width;TBX.push({s,x:(m.a*x+m.e)/2,y:(m.d*y+m.f)/2,w:w*m.a/2,h:FS[sc]*.8*m.d/2,sq:Math.abs(m.a-2)>.01&&Math.abs(m.a-4)>.01})}if(sh){g.lineJoin='round';g.lineWidth=2;g.strokeStyle=sh;g.strokeText(s,x,y);g.fillStyle=sh;g.fillText(s,x+1,y+1)}g.fillStyle=c;g.fillText(s,x,y);}
+/* Rootdeep (cartridge 3) places text by the real cap height, so the letters' tops land exactly at y on every font.
+   With a 'top' baseline, iPhone's SF Mono draws a few pixels lower than desktop fonts, which pushed text onto the
+   bottom edge of tags and boxes. Sprouts keeps its own tuned placement. */
+const CAPH={};
+function capOf(sc){if(CAPH[sc]===undefined){setF(sc);g.textBaseline='alphabetic';const m=g.measureText('H');CAPH[sc]=(m&&m.actualBoundingBoxAscent)||FS[sc]*.72;g.textBaseline='top'}return CAPH[sc]}
+function text(s,x,y,sc=2,c='#fff',sh='#181020'){s=String(s);const capN=cart===2,cy=capN?capOf(sc):0;setF(sc);if(TBX){const m=g.getTransform(),w=g.measureText(s).width;TBX.push({s,x:(m.a*x+m.e)/2,y:(m.d*y+m.f)/2,w:w*m.a/2,h:FS[sc]*.8*m.d/2,sq:Math.abs(m.a-2)>.01&&Math.abs(m.a-4)>.01})}
+ if(capN){g.textBaseline='alphabetic';y+=cy}
+ if(sh){g.lineJoin='round';g.lineWidth=2;g.strokeStyle=sh;g.strokeText(s,x,y);g.fillStyle=sh;g.fillText(s,x+1,y+1)}g.fillStyle=c;g.fillText(s,x,y);if(capN)g.textBaseline='top';}
 function ctext(s,y,sc=2,c,sh){const w=tw(s,sc);if(w>W-6){g.save();g.translate(3,0);g.scale((W-6)/w,1);text(s,0,y,sc,c,sh);g.restore()}else text(s,Math.round((W-w)/2),y,sc,c,sh);}
 function rtext(s,xr,y,sc=2,c,sh){text(s,xr-tw(s,sc),y,sc,c,sh);}
 function wrapPx(s,maxW,sc=2){const out=[];let l='';for(const w of String(s).split(' ')){const t=l?l+' '+w:w;if(l&&tw(t,sc)>maxW){out.push(l);l=w}else l=t}if(l)out.push(l);return out;}
@@ -2649,8 +2656,8 @@ function drawChars(){r('#14101c',0,0,W,H);r('#1d1530',0,0,W,20);ctext('CHOOSE YO
  CHARS.forEach((c,i)=>{const y=24+i*(rowH+3),on=i===uiSel,un=charUnlocked(c.id);
   r(on?'#f8e060':'#241c38',6,y,W-12,rowH);r(on?'#fff3b0':'#2e2450',7,y+1,W-14,rowH-2);
   if(!un){g.save();g.globalAlpha=.45}rdKeeperSpr(c.id,22,y+rowH-3,1);if(!un)g.restore();
-  text(c.n||c.id,40,y+(rowH-14)/2|0,2,on?'#281c30':un?'#e8e4f5':'#8d84a8',null);
-  rtext(un?c.tag:'LOCKED',W-12,y+(rowH-8)/2|0,1,on?'#5a4a28':'#a89ec2',null);});
+  text(c.n||c.id,40,y+Math.round((rowH-9)/2),2,on?'#281c30':un?'#e8e4f5':'#8d84a8',null);
+  rtext(un?c.tag:'LOCKED',W-12,y+Math.round((rowH-8)/2),1,on?'#5a4a28':'#a89ec2',null);});
  const c=CHARS[uiSel],un=charUnlocked(c.id),mv=RDMOVES[c.id],py=24+NC*(rowH+3)+2,pb=H-18;
  r('#0d0a18',6,py,W-12,pb-py);r('#2e2450',6,py,W-12,1);
  let ly=py+5;const line=(s,col)=>{if(ly+8>pb)return;text(s,12,ly,1,col,null);ly+=10};
@@ -3411,7 +3418,7 @@ const RDBARK={MARCUS:['bro.',"you're a J.",'stop J-lighting me',['big ideas, bro
  SCOUT:['fascinating.','page 41...','noted. noted.'],RANGER:['paths shift.','stay sharp.','hm.'],LOUIE:['WOOF','*snore*','arf!']};
 let hubBark=null,hubBarkT=3;
 function rdDrawNPC(who,x,y,bob){r('rgba(0,0,0,.25)',Math.round(x)-5,Math.round(y)+1,10,2);rdDrawKeeper(who,x,y+2+(bob||0),1);
- if(who!=='LOUIE'&&state!=='g3cine'&&!(state==='g3talk'&&y>H-84)){const w2=tw(who,1)+6,tx=Math.round(x-w2/2),ty=Math.round(y)+4;r('#181020',tx-1,ty-1,w2+2,11);r(RDCPLATE[who]||'#3a3050',tx,ty,w2,9);text(who,tx+3,ty,1,'#ffffff',null)}}
+ if(who!=='LOUIE'&&state!=='g3cine'&&state!=='g3talk'){const w2=tw(who,1)+6,tx=Math.round(x-w2/2),ty=Math.round(y)+4;r('#181020',tx-1,ty-1,w2+2,11);r(RDCPLATE[who]||'#3a3050',tx,ty,w2,9);text(who,tx+3,ty,1,'#ffffff',null)}}
 function rdVig(){for(let i=0;i<3;i++){const a='rgba(4,2,8,'+(0.10-i*0.03)+')',o=i*5;
  r(a,0,o,W,5);r(a,0,H-o-5,W,5);r(a,o,0,5,H);r(a,W-o-5,0,5,H)}}
 function drawHub(){rdTiles();const A=rdArt();r('#1d141f',0,0,W,H);
@@ -3482,16 +3489,18 @@ function drawHub(){rdTiles();const A=rdArt();r('#1d141f',0,0,W,H);
  {const ob=rdObjective();if(ob&&state==='g3hub'){const tw2=tw(ob.t,1)+14;r('#181020',4,16,tw2+2,13);r('#2e2450',5,17,tw2,11);r('#a070e8',5,17,3,11);text(ob.t,11,18,1,'#fff3b0',null);
   let mx=null,my=null;if(ob.who&&HUBNPC[ob.who]){mx=HUBNPC[ob.who].x;my=HUBNPC[ob.who].y-28}else if(ob.door){mx=W/2;my=H-40}else if(ob.st){const st3=STATIONS.find(q=>q.id===ob.st);if(st3){mx=st3.x;my=72}}
   if(mx!==null){const b=Math.round(Math.abs(Math.sin(time*4))*3);r('#181020',Math.round(mx)-4,my-b-1,9,4);r('#ffd94d',Math.round(mx)-3,my-b,7,2);r('#ffd94d',Math.round(mx)-2,my-b+2,5,1);r('#ffd94d',Math.round(mx)-1,my-b+3,3,1);r('#ffd94d',Math.round(mx),my-b+4,1,1)}}}
- if(state==='g3talk'&&talkNPC){r('#181020',4,H-68,W-8,64);r('#f8f0d8',5,H-67,W-10,62);
-  r('#181020',8,H-73,tw(talkNPC,2)+10,14);r('#b8304a',9,H-72,tw(talkNPC,2)+8,12);text(talkNPC,13,H-70,2,'#ffffff',null);const ls=wrapPx(talkTxt,222,1);ls.slice(0,3).forEach((l,i)=>text(l,10,H-51+i*11,1,'#281c30',null));
+ if(state==='g3talk'&&talkNPC){
+  const ls=wrapPx(talkTxt,222,1),nl=Math.max(2,Math.min(4,ls.length)),bh=nl*11+26,by=H-4-bh;r('#181020',4,by,W-8,bh);r('#f8f0d8',5,by+1,W-10,bh-2);
+  const nw=tw(talkNPC,2)+10;r('#181020',8,by-7,nw+2,14);r(RDCPLATE[talkNPC]||'#b8304a',9,by-6,nw,12);text(talkNPC,14,by-4,2,'#ffffff',null);
+  ls.slice(0,4).forEach((l,i)=>text(l,10,by+10+i*11,1,'#281c30',null));r('#e0d4b8',10,H-20,W-20,1);
   const more=talkNPC&&talkStart+talkLine<(rdTalkL||LINES[talkNPC]).length-1;
-  text((more?'A: MORE ▼':'A: BYE')+' · B: BYE'+(RD.honey>0?' · START: GIFT ('+RD.honey+')':''),10,H-14,1,'#7a6a8a',null);}}
+  text((more?'A: MORE ▼':'A: BYE')+' · B: BYE'+(RD.honey>0?' · START: GIFT ('+RD.honey+')':''),10,H-16,1,'#7a6a8a',null);}}
 function rowsPlain(items,y,step){items.forEach((s,i)=>text(s,10,y+i*step,1,'#c8c0d8',null));}
 function rowsDraw2(items,sel,desc){const step=items.length>6?15:17,y0=items.length>6?40:44;
  items.forEach((it,i)=>{const yy=y0+i*step,on=i===sel;
  if(on){r('#f8e060',6,yy-2,W-12,step-2);r('#281c30',7,yy-1,W-14,step-4)}
- text(it.a,10,yy,1,on?'#ffffff':'#c8c0d8',on?null:'#181020');
- if(it.b)rtext(it.b,W-10,yy,1,on?'#ffd94d':'#8d84a8',on?null:'#181020');});
+ text(it.a,10,yy+(step>15?2:1),1,on?'#ffffff':'#c8c0d8',on?null:'#181020');
+ if(it.b)rtext(it.b,W-10,yy+(step>15?2:1),1,on?'#ffd94d':'#8d84a8',on?null:'#181020');});
  if(desc)wrapPx(desc,222,1).slice(0,2).forEach((l,i)=>ctext(l,H-44+i*11,1,'#a89ec2',null));}
 function screenShell(title,sub){r('#120c1c',0,0,W,H);ctext(title,8,3,'#ffd94d','#403010');
  if(sub)ctext(sub,26,1,'#a89ec2',null);}
@@ -3503,7 +3512,7 @@ function g3DrawUI(){const M=RD;
   ctext('◀ ▶ ADJUST · A: CYCLE    B: BACK',H-13,1,'#8d84a8',null);return}
  if(state==='g3sprouts'){drawSprouts();return}
  if(state==='g3mirror'){screenShell('MIRROR OF DEW','MOONDEW: '+M.dew);
-  rowsDraw2(MIRROR.map(m=>{const rank=mir(m.id);return{a:m.n+'  '+'●'.repeat(rank)+'○'.repeat(m.max-rank),b:rank>=m.max?'MAX':m.cost[rank]+' DEW'}}),uiSel,MIRROR[uiSel].d+' Bought with Moondew, kept forever.');
+  rowsDraw2(MIRROR.map(m=>{const rank=mir(m.id);return{a:m.n+'  '+'●'.repeat(rank)+'○'.repeat(m.max-rank),b:rank>=m.max?'MAX':m.cost[rank]+' DEW'}}),uiSel,MIRROR[uiSel].d.replace(/\.?\s*$/,'.')+' Bought with Moondew, kept forever.');
   ctext('A: BUY RANK    B: BACK',H-11,1,'#8d84a8',null);return}
  if(state==='g3arm'){screenShell('THE ARMORY','KEYS: '+M.keys);
   rowsDraw2(Object.keys(WEAPONS).map(id=>{const w=WEAPONS[id],own=rdOwnsWeapon(id);
@@ -3525,7 +3534,7 @@ function g3DrawUI(){const M=RD;
  if(state==='g3boon'){r('#0d0a18',0,0,W,H);const god=boonOffer[0]?boonOffer[0].god:'EMBER';
   ctext(GODS[god].n+' SPEAKS',6,3,GODS[god].l,'#181020');ctext('"'+GODS[god].t+' OFFERS:"',26,1,'#a89ec2',null);
   /* cards size to the screen; descriptions only print as many lines as fit inside the card */
-  const n=boonOffer.length||1,ch2=Math.max(32,Math.min(64,Math.floor((H-62)/n)-4)),nl=Math.max(1,Math.floor((ch2-30)/10));
+  const n=boonOffer.length||1,need=Math.max(1,Math.min(3,...boonOffer.map(b=>wrapPx(boonDesc(b),208,1).length))),ch2=Math.max(32,Math.min(Math.floor((H-62)/n)-4,31+need*10)),nl=Math.max(1,Math.floor((ch2-30)/10));
   boonOffer.forEach((b,i)=>{const y=40+i*(ch2+4),on=i===uiSel,gc=GODS[b.god]||GODS.EMBER;
    r(on?'#f8e060':'#241c38',8,y,W-16,ch2);r(on?'#fff3b0':'#2e2450',9,y+1,W-18,ch2-2);r(gc.c,9,y+1,4,ch2-2);
    text(boonName(b),17,y+3,2,on?'#281c30':'#e8e4f5',null);
@@ -3682,9 +3691,8 @@ function drawRun(bg){const B=BIOMES[RUN.biome],A=rdArt(),AB=A.B[RUN.biome],shx=R
  /* HUD */
  if(RUN.hurtT>0){const a=(RUN.hurtT/.28)*.45;g.save();g.globalAlpha=a;r('#e84a5f',0,0,W,4);r('#e84a5f',0,H-4,W,4);r('#e84a5f',0,0,4,H);r('#e84a5f',W-4,0,4,H);g.restore()}
  const s=rdStats();r('rgba(8,5,14,.88)',0,0,W,20);r('#c22e4a',0,20,W,1);
- r('#3a1420',4,6,58,7);r(RUN.hp/s.maxHp<.3?'#e84a5f':'#58c048',4,6,Math.round(58*Math.max(0,RUN.hp/s.maxHp)),7);
- text(Math.ceil(RUN.hp)+'/'+s.maxHp,5,2,1,'#ffffff','#181020');
- for(let i=1;i<8;i++)r('rgba(10,6,16,.5)',4+Math.round(i*7.25),6,1,7);
+ r('#0d0a14',3,3,60,14);r('#3a1420',4,4,58,12);r(RUN.hp/s.maxHp<.3?'#e84a5f':'#58c048',4,4,Math.round(58*Math.max(0,RUN.hp/s.maxHp)),12);r('rgba(255,255,255,.18)',4,4,Math.round(58*Math.max(0,RUN.hp/s.maxHp)),2);
+ {const hs=Math.ceil(RUN.hp)+'/'+s.maxHp;text(hs,Math.round(33-tw(hs,1)/2),6,1,'#ffffff','#181020')}
  /* X and Y: the keeper's specials, same colours as the console buttons; they fill back up as they cool down */
  const mvs=RDMOVES[RUN.char||'WILL'],sbtn=(x,l,cd,mx)=>{const rd=cd<=0,f=rd?1:Math.max(0,1-cd/mx),c=RDBTN[l];
   r('#0d0a14',x,3,13,15);r('#2a2440',x+1,4,11,13);const fh=Math.round(13*f);r(c,x+1,17-fh,11,fh);
@@ -3734,7 +3742,7 @@ function drawTitle(){const gl=Math.round(H*.13);
  r('#080510',0,H-16,W,16);
  g.save();g.globalAlpha=.3+.1*Math.sin(time*3);g.fillStyle='#58f0c0';g.beginPath();g.arc(W/2,H-17,7,0,7);g.fill();g.restore();
  r('#0a1a20',W/2-4,H-23,8,12);g.fillStyle='#0a1a20';g.beginPath();g.arc(W/2,H-23,4,Math.PI,0);g.fill();r('#6e4a2a',W/2-6,H-24,2,13);r('#6e4a2a',W/2+4,H-24,2,13);
- if(RD.stats.runs)ctext('RUNS '+RD.stats.runs+' · ESCAPES '+RD.stats.escapes,H-40,1,'#6a6284',null);
+ if(RD.stats.runs&&state!=='g3menu')ctext('RUNS '+RD.stats.runs+' · ESCAPES '+RD.stats.escapes,H-40,1,'#6a6284',null);
  if(state!=='g3menu'&&((time*2)|0)%2)ctext('PRESS A',H-31,2,'#ffffff');
  if(state!=='g3menu')ctext('B OR SELECT: SWAP CARTRIDGE',H-11,1,'#565064',null);}
 
