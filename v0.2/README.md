@@ -22,3 +22,9 @@ things, capsule pages per cartridge with how to get tickets, and a Hearth menu o
 - Send this: `share/pocket-lantern-v0.2.1-share.zip` (the game plus HOW-TO-PLAY).
 - Frozen copy: `backups/pocket-lantern_2026-11-14_v0.2.1_BACKUP.html`, SHA-256 `c28ea95bcaf4045d89351a982eb91e4fd5a0fc9c18fa46d1bf642a4769335591`
 - The v0.2 backup, share folder and zip are kept as they were.
+
+## Audit note (after v0.2.1)
+
+- The v0.2 share folder and zip had been overwritten with later builds. They're restored to v0.2 and match the v0.2 backup above.
+- `v0.1/music/` (the songs as .mp3 files) is now on this branch too. The two William Cohen songs are not embedded in the game file;
+  they stream only on claude.ai, so these files are their only full copies.
