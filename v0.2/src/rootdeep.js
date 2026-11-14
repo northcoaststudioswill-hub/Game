@@ -271,6 +271,29 @@ function rdDrawKeeper(id,x,y,dirX){x=Math.round(x);y=Math.round(y);
  if(id==='WILL'||!CH[id]){drawPlayerSpr(x,y,1);return}
  const im=CH[id];g.drawImage(im,x-(im.width>>1),y-im.height+1);}
 
+/* ---------------- capsule unlocks ----------------
+   Pulled from the CAPSULES machine on Sprouts' main menu, in the same pool as the styles
+   (60/30/10, no duplicates). Ownership lives in Sprouts' save as meta.own.rd, so it syncs like
+   every other style and Sprouts' RESET PULLS (in Settings) can hand them back. */
+const RDCAP=[
+ {n:'MOONLIGHT LANTERN',d:'YOUR LIGHT IN THE DEEP: MOON-WHITE',r:0,lan:'#d8e8ff'},
+ {n:'SPROUT LANTERN',d:'YOUR LIGHT IN THE DEEP: SPROUT-GREEN',r:0,lan:'#b8f890'},
+ {n:'MOONDEW JAR',d:'+40 MOONDEW FOR THE MIRROR',r:0,dew:40},
+ {n:'ROSE LANTERN',d:'YOUR LIGHT IN THE DEEP: ROSE',r:1,lan:'#f8a8d0'},
+ {n:'EMBER LANTERN',d:'YOUR LIGHT IN THE DEEP: EMBER',r:1,lan:'#f89848'},
+ {n:"ERIN'S INVITE",d:'ERIN CAN DIVE WITH YOU',r:1,ch:'ERIN'},
+ {n:"LOUIE'S LEASH",d:'LOUIE CAN DIVE WITH YOU',r:1,ch:'LOUIE'},
+ {n:'ROOT MAUL',d:'THE HEAVY WEAPON, IN THE ARMORY',r:1,wp:'maul'},
+ {n:"MARCUS'S RSVP",d:'MARCUS CAN DIVE. HE IS NOT HAPPY',r:2,ch:'MARCUS'},
+ {n:'ROOT CROWN',d:'THE SPROUT KING CAN DIVE WITH YOU',r:2,ch:'KING'},
+ {n:'THORNBOW',d:'THE BOW, IN THE ARMORY',r:2,wp:'bow'}];
+function rdCapOwned(){try{return(meta&&meta.own&&meta.own.rd)||[]}catch(e){return[]}}
+function rdCapHas(f){return rdCapOwned().some(i=>RDCAP[i]&&f(RDCAP[i]))}
+function rdCapGot(i){const c=RDCAP[i];if(!c)return;if(c.dew)RD.dew+=c.dew;if(c.lan)RD.set.lantern=c.lan;rdSave();}
+const RDLANTERNS=[['AMBER','#ffd27a']].concat(RDCAP.filter(c=>c.lan).map(c=>[c.n.replace(' LANTERN',''),c.lan]));
+function rdLanternC(){const L=RD.set&&RD.set.lantern;return L&&rdCapHas(c=>c.lan===L)?L:'#ffd27a'}
+function rdOwnsWeapon(id){return RD.weapons.includes(id)||rdCapHas(c=>c.wp===id)}
+
 /* ---------------- save / state ---------------- */
 const RDDEF=()=>({dew:30,keys:1,honey:1,mirror:{},weapons:['blade'],weapon:'blade',keeps:{},keepXp:{},keepEq:'',
  pact:{},bounty:{},gift:{},seen:{},boonSeen:{},stats:{runs:0,deaths:0,escapes:0,kills:0,bosses:0,chambers:0},
@@ -375,7 +398,7 @@ let say2T=0,say2Txt='';
 function say2(s,t=3){say2Txt=s;say2T=t;}
 function rdNextChamber(){RUN.chamber++;RUN.phase='fight';RUN.doors=[];RUN.projs=[];RUN.eprojs=[];RUN.pickups=[];RUN.pods=[];RUN.podDropped=false;
  const ch=RUN.chamber,biome=ch<=4?0:ch<=8?1:2;RUN.biome=biome;rdArena(biome);
- if(ch===4||ch===8||ch===12){spawnBoss(ch/4-1);RUN.zoneT=2.4;return}
+ if(ch===4||ch===8||ch===12){spawnBoss(ch/4-1);RUN.zoneT=2.4;if(!RD.flags['cine_boss'+(ch/4-1)])RUN.pendingCine='boss'+(ch/4-1);return}
  const pool=BIOMES[biome].pool,budget=4+ch+((RD.pact.swarm||0)*2),eliteCh=ch===3||ch===7||ch===10;
  let spent=0,guard=0;const wlist=[];
  while(spent<budget&&guard++<40){const k=pool[(Math.random()*pool.length)|0],cost=k==='grub'?1:k==='wisp'||k==='shade'?2:3;
@@ -424,7 +447,7 @@ function genShop(){const all=[
 function rdDie(){RD.stats.deaths++;RD.lastRun={chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='g3over';snd(196,.5,49,'sawtooth',.08);}
 function rdEscape(){RD.stats.escapes++;RD.lastRun={chamber:12,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;
  if(RD.stats.escapes===1)say2('FIRST ESCAPE!',5);
- RUN=null;rdSave();overT=0;state='g3win';snd(523,.15);later(()=>snd(659,.15),140);later(()=>snd(784,.15),280);later(()=>snd(1046,.5),420);}
+ RUN=null;rdSave();overT=0;if(!RD.flags.cine_escape)startCine('win','escape');else state='g3win';snd(523,.15);later(()=>snd(659,.15),140);later(()=>snd(784,.15),280);later(()=>snd(1046,.5),420);}
 function rdAbandon(){if(RUN){bankBuds();RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey}RUN=null;rdSave();state='g3hub';}
 
 /* ---------------- the Hearth (hub) ---------------- */
@@ -449,7 +472,7 @@ const RDMOVES={
  LOUIE:{x:{n:'ZOOM ZOOM ZOOM',d:'Three blurs, three bites, three foes.',cd:4.5},y:{n:'TURBO ZOOM',d:'One long, fearless charge.',cd:5},su:{n:'JUDGEMENT',d:'He stares. Light falls on every foe.'},fin:'CHOMP'},
  KING:{x:{n:'SPROUT TOSS',d:'Throw your front bud. It latches on and chews.',cd:1.6},y:{n:'ROYAL WHISTLE',d:'Call the buds home. They rally, heal you, frenzy.',cd:7},su:{n:'BLOOM OF KINGS',d:'Every bud blooms huge. Three golden buds join.'},fin:'SCEPTER SWAT'},
  MARCUS:{x:{n:'DAB CLOUD',d:'A slow cloud of attitude. Dazes what it rolls over.',cd:4.5},y:{n:'DOUBLE OR NOTHING',d:'Coin-flip punch: huge hit or a sad poke.',cd:4},su:{n:'HYDRO JET',d:'Six geysers burst in a line.'},fin:'PIPE WRENCH'}};
-function charUnlocked(id){if(id==='WILL')return true;if(id==='ERIN')return(RD.gift.ERIN||0)>=3;
+function charUnlocked(id){if(id==='WILL')return true;if(rdCapHas(c=>c.ch===id))return true;if(id==='ERIN')return(RD.gift.ERIN||0)>=3;
  if(id==='LOUIE')return(RD.stats.budsBanked||0)>=20;if(id==='MARCUS')return(RD.stats.deaths||0)>=8;if(id==='KING')return(RD.stats.fullString||0)>=1;return false}
 function charLockTxt(id){if(id==='ERIN')return 'GIVE ERIN 3 HONEY: '+(RD.gift.ERIN||0)+'/3';
  if(id==='LOUIE')return 'BANK 20 SPROUTS: '+(RD.stats.budsBanked||0)+'/20';
@@ -491,7 +514,8 @@ const NPCROUTE={
 function hubNpcReset(){for(const who of NPCS){const hx=NPCPOS[who][0],hy=H+NPCPOS[who][1];
  const route=NPCROUTE[who].map(pt=>pt==='P3'?'P3':{x:pt[0],y:H+pt[1],act:!!pt[2]});
  HUBNPC[who]={x:hx,y:hy,hx,hy,route,ri:0,jx:0,jy:0,act:0,wait:.3+Math.random()*.8}}}
-function hubEnter(){P3.x=W/2;P3.y=H/2+16;P3.vx=P3.vy=0;hubNpcReset();state='g3hub';}
+function hubEnter(){P3.x=W/2;P3.y=H/2+16;P3.vx=P3.vy=0;hubNpcReset();state='g3hub';
+ if(charUnlocked('KING')&&!RD.flags.cine_king&&(RD.stats.fullString||0)>=1)startCine('hub','king');}
 function movePlayer(dt,spd){const mx=keys.right-keys.left,my=keys.down-keys.up;const l=Math.hypot(mx,my)||1;
  const sp=spd*(rdStats().speedMul);
  if(keys.right||keys.left||keys.up||keys.down){P3.vx=mx/l*sp;P3.vy=my/l*sp;P3.fx=mx!==0?mx:(P3.fx);P3.fy=my;P3.anim+=dt*8}
@@ -543,7 +567,7 @@ function mirrorUpdate(){uiSel=nav(uiSel,MIRROR.length);
  if(pressed('b')||pressed('start'))state='g3hub';}
 function armUpdate(){const ids=Object.keys(WEAPONS);uiSel=nav(uiSel,ids.length);
  if(pressed('a')){const id=ids[uiSel],w=WEAPONS[id];
-  if(RD.weapons.includes(id)){RD.weapon=id;rdSave();snd(660,.08,990)}
+  if(rdOwnsWeapon(id)){RD.weapon=id;rdSave();snd(660,.08,990)}
   else if(RD.keys>=w.cost){RD.keys-=w.cost;RD.weapons.push(id);RD.weapon=id;rdSave();snd(784,.12);later(()=>snd(1175,.25),110)}else snd(140,.08)}
  if(pressed('b')||pressed('start'))state='g3hub';}
 function keepUpdate(){uiSel=nav(uiSel,KEEPS.length);
@@ -573,25 +597,41 @@ function pauseUpdate(){if(pressed('b')){if(pausePage===1){pausePage=0}else state
   else if(pauseSel===3){rdAbandon();hubEnter()}else{if(RUN){bankBuds();RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey}RUN=null;rdSave();eject()}}}
 
 /* ---------------- intro cinematic ---------------- */
-const RDCINE=[
+/* cinematics: the intro, each boss the first time you meet it, the first escape, the Sprout King.
+   lines can be a function so the radio voice fits whoever is diving. */
+const rdRadio=(marcus,scout)=>()=>[RUN&&RUN.char==='MARCUS'?['SCOUT',scout]:['MARCUS',marcus]];
+const RDCINES={
+ intro:[
  {d:5.5,bg:'garden',lines:[[null,'The Great Lantern kept the garden lit.'],['ERIN','Under it, everything grew. Every bit of it.']]},
  {d:6,bg:'crack',lines:[['LOUIE','WOOF. (The ground just growled.)'],['ERIN','The light is going DOWN, Will. Something under us is hungry.']]},
  {d:7.5,bg:'hearth',lines:[['SCOUT','Statistically, one of us should supervise from up here.'],['MARCUS','Great. A haunted basement. Put it on the list of things I hate.'],['ERIN','Bring me back a story, keeper.']]},
- {d:4,bg:'door',lines:[[null,'So the keeper went down.']]}];
-const RDCPLATE={ERIN:'#b8304a',MARCUS:'#3a3a44',SCOUT:'#1f6a72',LOUIE:'#7a4a28',RANGER:'#38603a'};
-let rdCineT=0,rdCineIx=0,rdCineDest='hub';
-function startCine(dest){rdCineIx=0;rdCineT=0;rdCineDest=dest;state='g3cine';snd(392,.3,196,'triangle',.05)}
-function endCine(){RD.flags.cineSeen=1;rdSave();if(rdCineDest==='hub')hubEnter();else{menuSel=0;state='g3menu'}}
-function cineUpdate(dt){rdCineT+=dt;const sc=RDCINE[rdCineIx];
+ {d:4,bg:'door',lines:[[null,'So the keeper went down.']]}],
+ boss0:[{d:4.5,bg:'boss',boss:0,lines:[[null,'Something huge is chewing on the roots.'],['GRUB MOTHER','MORE. LIGHT. MORE.']]},
+  {d:3.6,bg:'boss',boss:0,lines:rdRadio('Bro. That is a worm with a crown. End it. I want to go to bed.','A grub with a crown. Fascinating. Hit it.')}],
+ boss1:[{d:4.5,bg:'boss',boss:1,lines:[[null,'The water in here stands up.'],['DROWNED KING','I DRANK YOUR LANTERN, LITTLE LIGHT.']]},
+  {d:3.6,bg:'boss',boss:1,lines:rdRadio('Okay, that one talks. I hate when they talk.','It talks. Noting that. Please do not die.')}],
+ boss2:[{d:4.5,bg:'boss',boss:2,lines:[[null,'At the very bottom, someone is waiting.'],['HOLLOW KEEPER','You left the light on for nobody.']]},
+  {d:3.8,bg:'boss',boss:2,lines:()=>[RUN&&RUN.char==='ERIN'?['LOUIE','WOOF. (That is not Will. Bite it.)']:['ERIN',"Whatever that is, it isn't you. Come home."]]}],
+ escape:[{d:4.5,bg:'escape',lines:[[null,'The keeper climbed out of the deep.'],['ERIN','You brought some light back up with you.']]},
+  {d:4.5,bg:'escape',lines:[['MARCUS','Cool. Now do it again, with heat. Coward.'],[null,'The Pact of Roots is open at the Hearth.']]}],
+ king:[{d:4.5,bg:'king',lines:[[null,'Six buds in a row. Something in the dark noticed.'],['SPROUT KING','You carried my court all the way down.']]},
+  {d:4.5,bg:'king',lines:[['SPROUT KING','The buds have chosen. I walk with you, keeper.'],['MARCUS','Great. The salad has a crown now.']]}]};
+const RDCINE=RDCINES.intro;
+const RDCPLATE={ERIN:'#b8304a',MARCUS:'#3a3a44',SCOUT:'#1f6a72',LOUIE:'#7a4a28',RANGER:'#38603a','GRUB MOTHER':'#7a3a9a','DROWNED KING':'#2a6a88','HOLLOW KEEPER':'#3a3050','SPROUT KING':'#3c8a30'};
+let rdCineT=0,rdCineIx=0,rdCineDest='hub',rdCineKey='intro',rdCineSeq=RDCINES.intro;
+const rdLines=sc=>typeof sc.lines==='function'?sc.lines():sc.lines;
+function startCine(dest,key){rdCineKey=key||'intro';rdCineSeq=RDCINES[rdCineKey];rdCineIx=0;rdCineT=0;rdCineDest=dest;state='g3cine';snd(392,.3,196,'triangle',.05)}
+function endCine(){if(rdCineKey==='intro')RD.flags.cineSeen=1;else RD.flags['cine_'+rdCineKey]=1;rdSave();
+ if(rdCineDest==='hub')hubEnter();else if(rdCineDest==='run')state='g3run';else if(rdCineDest==='win')state='g3win';else{menuSel=0;state='g3menu'}}
+function cineUpdate(dt){rdCineT+=dt;const sc=rdCineSeq[rdCineIx],LN=rdLines(sc);
  if(pressed('start')||pressed('sel')){endCine();return}
- if(pressed('a')){const seg=sc.d/sc.lines.length,cur=Math.min(sc.lines.length-1,Math.floor(rdCineT/seg));
-  if(cur<sc.lines.length-1)rdCineT=(cur+1)*seg+.01;
-  else{rdCineIx++;rdCineT=0;if(rdCineIx>=RDCINE.length){endCine();return}}}
- if(rdCineT>=sc.d){rdCineIx++;rdCineT=0;if(rdCineIx>=RDCINE.length)endCine()}}
-function cineActor(x,y,fx){const sax=P3.ax,say=P3.ay;P3.ax=fx||1;P3.ay=0;drawPlayerSpr(x,y,1.5);P3.ax=sax;P3.ay=say}
-function rdDrawCine(){const sc=RDCINE[rdCineIx],tt=rdCineT;
- if(sc.bg==='garden'||sc.bg==='crack'){r('#14230f',0,0,W,H);
-  for(let i=0;i<36;i++)g.drawImage(RDDEB.tuft.ol,(i*47)%W,26+((i*31)%(H-70)));
+ if(pressed('a')){const seg=sc.d/LN.length,cur=Math.min(LN.length-1,Math.floor(rdCineT/seg));
+  if(cur<LN.length-1)rdCineT=(cur+1)*seg+.01;
+  else{rdCineIx++;rdCineT=0;if(rdCineIx>=rdCineSeq.length){endCine();return}}}
+ if(rdCineT>=sc.d){rdCineIx++;rdCineT=0;if(rdCineIx>=rdCineSeq.length)endCine()}}
+function cineActor(x,y,fx){const sax=P3.ax,say=P3.ay;P3.ax=fx||1;P3.ay=0;drawPlayerSpr(x,y,1);P3.ax=sax;P3.ay=say}
+function rdDrawCine(){const sc=rdCineSeq[rdCineIx],tt=rdCineT,LN=rdLines(sc);
+ if(sc.bg==='garden'||sc.bg==='crack'){for(let y=0;y<H;y+=16)for(let x=0;x<W;x+=16)g.drawImage(TL.grass[((x*7+y*13)>>4)%TL.grass.length],x,y);
   r('#e8e4f5',W-36,8,11,11);r('#c8c0d8',W-33,11,3,3);r('#c8c0d8',W-29,15,2,2);
   g.save();g.globalAlpha=.16+.03*Math.sin(time*2);g.fillStyle='#f8c050';g.beginPath();g.arc(W/2,56,30,0,7);g.fill();g.restore();
   r('#6e4a20',W/2-10,42,20,27);r('#8a5f28',W/2-10,42,20,3);r('#f8c050',W/2-7,46,14,15);r('#fff2b0',W/2-3,49+Math.round(Math.sin(time*7)),6,8);
@@ -600,12 +640,32 @@ function rdDrawCine(){const sc=RDCINE[rdCineIx],tt=rdCineT;
    for(let k=0;k<n;k++)r('#04060a',W/2-3+((k*7)%5)-2,94+k*8,6,7);
    if(tt>1){g.save();g.globalAlpha=.3+.1*Math.sin(time*5);g.fillStyle='#ffd94d';g.fillRect(W/2-1,66,2,26);g.restore()}}
   cineActor(W/2-36,124,1);rdDrawNPC('ERIN',W/2+30,126);rdDrawNPC('LOUIE',W/2-6,130);}
- else if(sc.bg==='hearth'){const tv=RDTILE.hub;
-  for(let y=0;y<H;y+=16)for(let x=0;x<W;x+=16)g.drawImage(tv[(x/16*7+y/16*13)%3],x,y);
+ else if(sc.bg==='hearth'){for(let y=0;y<H;y+=16)for(let x=0;x<W;x+=16)g.drawImage(TL.wood,x,y);
   r('#2c1a10',W/2-17,H-34,34,22);r('#0a0610',W/2-14,H-31,28,19);
   g.save();g.globalAlpha=.25+.08*Math.sin(time*3);g.fillStyle='#a8f080';g.beginPath();g.arc(W/2,H-20,17,0,7);g.fill();g.restore();
-  rdDrawNPC('ERIN',36,H-58);rdDrawNPC('LOUIE',80,H-54);rdDrawNPC('MARCUS',124,H-58);rdDrawNPC('SCOUT',168,H-58);rdDrawNPC('RANGER',206,H-58);
-  cineActor(W/2,H-44,0);}
+  rdDrawNPC('ERIN',36,H-84);rdDrawNPC('LOUIE',80,H-80);rdDrawNPC('MARCUS',124,H-84);rdDrawNPC('SCOUT',168,H-84);rdDrawNPC('RANGER',206,H-84);
+  cineActor(W/2,H-66,0);}
+ else if(sc.bg==='boss'){const bi=sc.boss,AB=rdArt().B[bi],rise=Math.min(1,tt/1.4),fy=Math.round(H*.36+(1-rise)*26),col=BOSSES[bi].c;
+  for(let ty=20;ty<H;ty+=16)for(let tx=0;tx<W;tx+=16)g.drawImage(AB.floor[((tx*7+ty*13)>>4)%9<7?0:1],tx,ty);
+  for(let tx=0;tx<W;tx+=16)g.drawImage(AB.wall,tx,15);
+  g.save();g.globalAlpha=rise;
+  if(bi<2){const sp=RDFOE[bi?'king':'mother'];g.translate(W/2-sp.ow,fy-sp.oh*2);g.scale(2,2);g.drawImage(sp.ol,0,0)}
+  else{const im=SP.pd;g.translate(W/2-im.width,fy-im.height*2);g.scale(2,2);g.drawImage(rdShadowOf(im),0,0)}
+  g.restore();
+  rdKeeperSpr(RUN?RUN.char:'WILL',W/2,H-64,2);
+  rdLight([{x:W/2,y:H-78,r:64,c:rdLanternC()},{x:W/2,y:fy-20,r:30+rise*24,a:rise,c:col}],AB.dark);
+  if(tt>1.1){const a=Math.min(1,(tt-1.1)*3);g.save();g.globalAlpha=a;r('rgba(8,5,14,.8)',0,30,W,24);r(col,0,30,W,1);r(col,0,53,W,1);ctext(BOSSES[bi].n,34,3,'#ffffff','#181020');g.restore()}}
+ else if(sc.bg==='escape'){for(let y=0;y<H;y+=16)for(let x=0;x<W;x+=16)g.drawImage(x>=W/2-16&&x<W/2+16?TL.dirt:TL.grass[((x*7+y*13)>>4)%TL.grass.length],x,y);
+  const glow=.25+.08*Math.sin(time*3)+Math.min(.3,tt*.1);g.save();g.globalAlpha=glow;g.fillStyle='#fff3b0';g.beginPath();g.arc(W/2,40,30+tt*6,0,7);g.fill();g.restore();
+  r('#3a2c1c',W/2-1,0,2,26);r('#6e4a20',W/2-9,24,18,24);r('#8a5f28',W/2-9,24,18,3);r('#ffd94d',W/2-6,28,12,16);r('#fff3b0',W/2-3,31,6,10);
+  for(let i=0;i<8;i++){const a=i/8*6.283+time*.4;r('rgba(255,243,176,.5)',Math.round(W/2+Math.cos(a)*(36+tt*4)),Math.round(36+Math.sin(a)*(24+tt*3)),2,2)}
+  rdKeeperSpr(RD.char||'WILL',W/2,H-62,2);
+  for(let i=0;i<4;i++)drawBud({x:W/2-40+i*26+ox,y:H-60+(i%2)*4+oy,type:i+1,stage:2,z:0,a:time*3+i,mv:true,st:'follow',fx:1});
+  rdDrawNPC('ERIN',W/2+60,H-66);rdDrawNPC('LOUIE',W/2-62,H-62);}
+ else if(sc.bg==='king'){const AB=rdArt().B[0];for(let ty=0;ty<H;ty+=16)for(let tx=0;tx<W;tx+=16)g.drawImage(AB.floor[((tx*7+ty*13)>>4)%9<7?0:2],tx,ty);
+  const cy=Math.round(H*.44);for(let i=0;i<6;i++){const a=i/6*6.283+time*.9;drawBud({x:Math.round(W/2+Math.cos(a)*40)+ox,y:Math.round(cy+Math.sin(a)*22)+oy,type:i,stage:2,z:0,a:time*4+i,mv:true,st:'follow',fx:Math.cos(a)>0?-1:1})}
+  rdKeeperSpr('KING',W/2,cy+6,2);if(((time*3)|0)%2)r('#ffffff',W/2+5,cy-24,1,1);
+  rdLight([{x:W/2,y:cy-8,r:70,c:'#b8f890'}],'rgba(14,6,22,.6)');}
  else{r('#0a0612',0,0,W,H);
   for(let i=0;i<24;i++)g.drawImage(RDDEB.rock.ol,(i*53)%W,20+((i*37)%(H-50)));
   r('#241226',W/2-24,44,48,66);r('#180a1c',W/2-19,49,38,61);
@@ -614,7 +674,7 @@ function rdDrawCine(){const sc=RDCINE[rdCineIx],tt=rdCineT;
   const wx=Math.min(W/2-34,26+tt*22);cineActor(wx,128,1);
   if(tt>2.1)ctext('ROOTDEEP',26,5,'#ffd94d');}
  r('#000000',0,0,W,15);r('#000000',0,H-15,W,15);
- const seg=sc.d/sc.lines.length,li=Math.min(sc.lines.length-1,Math.floor(rdCineT/seg)),ln=sc.lines[li];
+ const seg=sc.d/LN.length,li=Math.min(LN.length-1,Math.floor(rdCineT/seg)),ln=LN[li];
  r('#f4ead2',4,H-50,W-8,32);r('#281c30',4,H-50,W-8,1);
  if(ln[0]){const pc=RDCPLATE[ln[0]]||'#181020';r('#181020',8,H-58,tw(ln[0],2)+10,14);r(pc,9,H-57,tw(ln[0],2)+8,12);text(ln[0],13,H-55,2,'#ffffff',null)}
  wrapPx(ln[1],222,1).slice(0,2).forEach((l,i)=>text(l,10,H-41+i*10,1,'#281c30',null));
@@ -862,7 +922,8 @@ function updBoss(e,dt){e.flash=Math.max(0,e.flash-dt);e.hitCd-=dt;e.cd-=dt;e.bt-
     else if(e.phase>=2&&RUN.enemies.length<3){spawnFoe('shade',e.x+R(-16,16),e.y+R(-12,12),false)}
     else radial(9)}}}
  if(RUN&&d<e.r+7&&e.hitCd<=0&&RUN.inv<=0&&RUN.dashT<=0){e.hitCd=.85;damagePlayer(e.dmg);}}
-function runUpdate(dt){RUN.time+=dt;if(say2T>0)say2T-=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
+function runUpdate(dt){if(RUN.pendingCine){const k=RUN.pendingCine;RUN.pendingCine=null;startCine('run',k);return}
+ RUN.time+=dt;if(say2T>0)say2T-=dt;if(RUN.zoneT>0)RUN.zoneT-=dt;
  if(RUN.cutT>0){RUN.cutT-=dt;if(RUN.cutT<=0){RUN.cutT=0;rdSuperGo()}return}
  if(pressed('start')){pauseSel=0;pausePage=0;state='g3pause';rdSave();return}
  /* player */
@@ -970,7 +1031,7 @@ function drawPlayerSpr(x,y,scale){scale=scale||1;const spr=P3.ay<-.4?SP.pu:P3.ax
  const hop=P3.anim&&((P3.anim)|0)%2?0:0;g.save();g.translate(Math.round(x)-6*scale,Math.round(y)-11*scale+hop);g.scale(scale,scale);g.drawImage(spr,0,0);g.restore();
  r('rgba(0,0,0,.25)',Math.round(x)-5,Math.round(y)+1,10,2);}
 function rdDrawNPC(who,x,y){r('rgba(0,0,0,.25)',Math.round(x)-5,Math.round(y)+1,10,2);rdDrawKeeper(who,x,y+2,1);
- if(who!=='LOUIE')text(who,Math.round(x)-tw(who,1)/2,Math.round(y)+4,1,'#e8e4f5','#181020');}
+ if(who!=='LOUIE'&&state!=='g3cine'&&!(state==='g3talk'&&y>H-84))text(who,Math.round(x)-tw(who,1)/2,Math.round(y)+4,1,'#e8e4f5','#181020');}
 function rdVig(){for(let i=0;i<3;i++){const a='rgba(4,2,8,'+(0.10-i*0.03)+')',o=i*5;
  r(a,0,o,W,5);r(a,0,H-o-5,W,5);r(a,o,0,5,H);r(a,W-o-5,0,5,H)}}
 function drawHub(){rdTiles();const A=rdArt();r('#1d141f',0,0,W,H);
@@ -1005,7 +1066,7 @@ function drawHub(){rdTiles();const A=rdArt();r('#1d141f',0,0,W,H);
  g.save();g.globalAlpha=.16+.05*Math.sin(time*3);g.fillStyle='#58f0c0';g.beginPath();g.arc(W/2,H-17,16,0,7);g.fill();g.restore();
  r('#241408',W/2-13,H-24,26,15);r('#0a1a20',W/2-10,H-21,20,12);
  r('#5a3a20',W/2-13,H-24,3,15);r('#5a3a20',W/2+10,H-24,3,15);r('#5a3a20',W/2-13,H-24,26,3);
- text('DESCEND',Math.round(W/2-tw('DESCEND',1)/2),H-9,1,'#f8c070',null);
+ if(state!=='g3talk')text('DESCEND',Math.round(W/2-tw('DESCEND',1)/2),H-9,1,'#f8c070',null);
  r('rgba(0,0,0,.25)',Math.round(P3.x)-5,Math.round(P3.y)+1,10,2);drawPlayerSpr(P3.x,P3.y+2,1);
  /* warm, cozy light: the hearth lantern, the torches, the root door, and you */
  rdLight([{x:W/2,y:12,r:70,c:'#ffd27a'},{x:8,y:24,r:34,c:'#f8a040'},{x:230,y:24,r:34,c:'#f8a040'},{x:W/2,y:H-17,r:30,c:'#58f0c0'},{x:P3.x,y:P3.y-6,r:56,c:'#ffd27a'},{x:W/2,y:H-42,r:40,c:'#f8a040'}],'rgba(14,6,22,.34)');
@@ -1031,14 +1092,15 @@ function screenShell(title,sub){r('#120c1c',0,0,W,H);ctext(title,8,3,'#ffd94d','
 function g3DrawUI(){const M=RD;
  if(state==='g3set'){screenShell('SETTINGS','SHARED WITH THE CONSOLE');
   const pips=v=>'●'.repeat(v)+'○'.repeat(10-v);
-  rowsDraw2([{a:'MUSIC VOL  '+pips(M.set.mus),b:M.set.mus+' / 10'},{a:'SFX VOL  '+pips(M.set.sfx),b:M.set.sfx+' / 10'},{a:'SCREEN SHAKE',b:M.set.shake?'ON':'OFF'}],uiSel,['The lantern hum, low under everything.','Every slash, beep and bloom.','The screen kicks when you take a hit.'][uiSel]);
+  const lan=RDLANTERNS.find(l=>l[1]===rdLanternC())||RDLANTERNS[0],nl=RDLANTERNS.filter((l,i)=>i===0||rdCapHas(c=>c.lan===l[1])).length;
+  rowsDraw2([{a:'MUSIC VOL  '+pips(M.set.mus),b:M.set.mus+' / 10'},{a:'SFX VOL  '+pips(M.set.sfx),b:M.set.sfx+' / 10'},{a:'SCREEN SHAKE',b:M.set.shake?'ON':'OFF'},{a:'LANTERN COLOUR',b:lan[0]}],uiSel,['The lantern hum, low under everything.','Every slash, beep and bloom.','The screen kicks when you take a hit.',nl>1?'The colour of your light down there.':'More lantern colours come from Sprouts capsules.'][uiSel]);
   ctext('◀ ▶ ADJUST · A: CYCLE    B: BACK',H-13,1,'#8d84a8',null);return}
  if(state==='g3sprouts'){drawSprouts();return}
  if(state==='g3mirror'){screenShell('MIRROR OF DEW','MOONDEW: '+M.dew);
   rowsDraw2(MIRROR.map(m=>{const rank=mir(m.id);return{a:m.n+'  '+'●'.repeat(rank)+'○'.repeat(m.max-rank),b:rank>=m.max?'MAX':m.cost[rank]+' DEW'}}),uiSel,MIRROR[uiSel].d+' Bought with Moondew, kept forever.');
   ctext('A: BUY RANK    B: BACK',H-11,1,'#8d84a8',null);return}
  if(state==='g3arm'){screenShell('THE ARMORY','KEYS: '+M.keys);
-  rowsDraw2(Object.keys(WEAPONS).map(id=>{const w=WEAPONS[id],own=M.weapons.includes(id);
+  rowsDraw2(Object.keys(WEAPONS).map(id=>{const w=WEAPONS[id],own=rdOwnsWeapon(id);
    return{a:(M.weapon===id?'* ':'')+w.n,b:own?'OWNED':w.cost+' KEYS'}}),uiSel,WEAPONS[Object.keys(WEAPONS)[uiSel]].d);
   ctext('A: EQUIP / UNLOCK    B: BACK',H-13,1,'#8d84a8',null);return}
  if(state==='g3keep'){screenShell('KEEPSAKE SHELF','ONE AT A TIME · LEVELS BY USE');
@@ -1105,7 +1167,8 @@ function rdDrawFoe(e){const x=Math.round(e.x),y=Math.round(e.y),k=e.kind;
  if(e.root>0&&k!=='boss'&&((time*6)|0)%2)r('#fff3b0',x-1,dy-4,2,2);
  if(e.burn>0&&((time*8)|0)%2)r('#f07830',x-2,dy-3,3,3);
  if(e.hp<e.max&&k!=='boss'){r('#181020',x-9,dy-5,18,3);r('#e84a5f',x-8,dy-4,Math.round(16*Math.max(0,e.hp/e.max)),1)}}
-function drawRun(){const B=BIOMES[RUN.biome],A=rdArt(),AB=A.B[RUN.biome],shx=RD.set.shake&&RUN.shake?R(-RUN.shake,RUN.shake)*.5:0,shy=RD.set.shake&&RUN.shake?R(-RUN.shake,RUN.shake)*.5:0;
+/* bg=true draws only the room (under the pause menu): no labels, numbers or HUD */
+function drawRun(bg){const B=BIOMES[RUN.biome],A=rdArt(),AB=A.B[RUN.biome],shx=RD.set.shake&&RUN.shake?R(-RUN.shake,RUN.shake)*.5:0,shy=RD.set.shake&&RUN.shake?R(-RUN.shake,RUN.shake)*.5:0;
  g.save();g.translate(Math.round(shx),Math.round(shy));
  /* floor: 16px tiles, variant picked by a stable hash so a chamber never flickers */
  for(let ty=RDA.top-16;ty<H;ty+=16)for(let tx=0;tx<W;tx+=16){const hsh=((tx*7+ty*13+RUN.chamber*31)>>4)%9;g.drawImage(AB.floor[hsh<6?0:hsh<8?1:2],tx,ty)}
@@ -1122,8 +1185,8 @@ function drawRun(){const B=BIOMES[RUN.biome],A=rdArt(),AB=A.B[RUN.biome],shx=RD.
   r('#0b0812',x-11,top+2,22,15);r('#0b0812',x-9,top,18,2);
   r(gc,x-12,top+3,2,13);r(gc,x+10,top+3,2,13);r(gc,x-10,top+1,2,2);r(gc,x+8,top+1,2,2);r(gc,x-8,top-1,16,2);
   g.save();g.globalAlpha=.25+.15*Math.sin(time*4+x);r(gc,x-9,top+3,18,13);g.restore();
-  text(DOORICON[d.kind]||'?',x-3,top+4,2,'#ffd94d',null);
-  const lbl=d.kind==='boon'?GODS[d.god].n:d.kind.toUpperCase();text(lbl,Math.round(x-tw(lbl,1)/2),RDA.top+2,1,'#e8e4f5','#181020');}
+  if(!bg)text(DOORICON[d.kind]||'?',x-3,top+4,2,'#ffd94d',null);
+  if(!bg){const lbl=d.kind==='boon'?GODS[d.god].n:d.kind.toUpperCase();text(lbl,Math.round(x-tw(lbl,1)/2),RDA.top+2,1,'#e8e4f5','#181020')}}
  /* a little scattered debris, then the props (drawn back to front) */
  for(let i=0;i<7;i++){const dx2=RDA.side+8+(i*97+RUN.chamber*31)%(W-RDA.side*2-16),dy2=RDA.top+8+((i*57+RUN.chamber*19)%(H-RDA.top-RDA.bot-20)),db=DEBBY[RUN.biome][i%DEBBY[RUN.biome].length];
   g.drawImage(db.ol,dx2-(db.ow>>1),dy2)}
@@ -1178,7 +1241,7 @@ function drawRun(){const B=BIOMES[RUN.biome],A=rdArt(),AB=A.B[RUN.biome],shx=RD.
   if(big)g.restore();if(b.temp&&((time*6)|0)%2)r('#ffd94d',Math.round(b.x),Math.round(b.y)-12-(big?10:0),1,1)}
  if(RUN.slashT>0){g.save();g.translate(P3.x,P3.y);g.rotate(RUN.slashAng);g.strokeStyle='#eaffea';g.lineWidth=2;g.beginPath();g.arc(0,0,17,-.9,.9);g.stroke();g.restore()}
  /* the Lantern's light. Darker while you fight; the relit wall lanterns open the room up */
- {const L=[{x:P3.x,y:P3.y-6,r:86,c:'#ffd27a'}],GL=A.GLOW;
+ {const L=[{x:P3.x,y:P3.y-6,r:86,c:rdLanternC()}],GL=A.GLOW;
   RUN.lamps.forEach((l,i)=>{if(RUN.phase==='doors'&&RUN.litT>i*.22)L.push({x:l.x,y:l.y+8,r:Math.min(64,(RUN.litT-i*.22)*180),c:'#ffd27a'})});
   for(const o of RUN.obst){const gw=GL[o.kind];if(gw)L.push({x:o.gx+8,y:o.gy+8,r:gw[1]+Math.sin(time*2+o.gx)*1.5,c:gw[0]})}
   for(const e of RUN.enemies){if(e.kind==='wisp'||e.burn>0)L.push({x:e.x,y:e.y-4,r:18,c:'#f8a040'});else if(e.kind==='boss')L.push({x:e.x,y:e.y-10,r:e.bossIx===2?44:40,a:.75,c:e.bossIx===2?'#b8a8e8':null})}
@@ -1194,8 +1257,8 @@ function drawRun(){const B=BIOMES[RUN.biome],A=rdArt(),AB=A.B[RUN.biome],shx=RD.
  for(const q of RUN.parts)r(q.c,Math.round(q.x),Math.round(q.y),2,2);
  for(const f of RUN.fx)if(f.k==='coin'){const k=f.t/f.max,w=Math.max(1,Math.round(Math.abs(Math.cos(time*28))*4)),cy=Math.round(f.y-10*(1-k));
   r('#181020',Math.round(f.x)-w-1,cy-1,2*w+3,8);r(k<.4?(f.win?'#f8d030':'#8d84a8'):'#f8d030',Math.round(f.x)-w,cy,2*w+1,6)}
- for(const t of RUN.texts)text(t.txt,Math.round(t.x-tw(t.txt,1)/2),Math.round(t.y),1,t.c,null);
- g.restore();
+ if(!bg)for(const t of RUN.texts)text(t.txt,Math.round(t.x-tw(t.txt,1)/2),Math.round(t.y),1,t.c,null);
+ g.restore();if(bg)return;
  /* HUD */
  const s=rdStats();r('rgba(8,5,14,.88)',0,0,W,20);r('#c22e4a',0,20,W,1);
  r('#3a1420',4,6,58,7);r(RUN.hp/s.maxHp<.3?'#e84a5f':'#58c048',4,6,Math.round(58*Math.max(0,RUN.hp/s.maxHp)),7);
@@ -1271,11 +1334,13 @@ function menuUpdate(){menuSel=nav(menuSel,4);
   else if(menuSel===2){setReturn='g3menu';uiSel=0;state='g3set'}
   else eject()}
  if(pressed('b')||pressed('sel'))eject()}
-function setUpdate(){uiSel=nav(uiSel,3);const lr=(pressed('right')?1:0)-(pressed('left')?1:0);
+function setUpdate(){uiSel=nav(uiSel,4);const lr=(pressed('right')?1:0)-(pressed('left')?1:0);
  if(lr||pressed('a')){let touched=true;
   if(uiSel===0)RD.set.mus=lr?Math.max(0,Math.min(10,RD.set.mus+lr)):(RD.set.mus>=10?0:RD.set.mus+1);
   else if(uiSel===1)RD.set.sfx=lr?Math.max(0,Math.min(10,RD.set.sfx+lr)):(RD.set.sfx>=10?0:RD.set.sfx+1);
-  else if(pressed('a'))RD.set.shake=!RD.set.shake;else touched=false;
+  else if(uiSel===2){if(pressed('a'))RD.set.shake=!RD.set.shake;else touched=false}
+  else{const own=RDLANTERNS.filter((l,i)=>i===0||rdCapHas(c=>c.lan===l[1])),ix=Math.max(0,own.findIndex(l=>l[1]===rdLanternC()));
+   RD.set.lantern=own[(ix+(lr||1)+own.length)%own.length][1];}
   if(touched){applyVolumes();rdSave();snd(660,.05,880)}}
  if(pressed('b')||pressed('start')){snd(440,.05);state=setReturn}}
 function g3Update(dt){
@@ -1309,8 +1374,8 @@ function g3Draw(){
  case 'g3hub':case 'g3talk':drawHub();return;
  case 'g3chars':drawChars();return;
  case 'g3mirror':case 'g3arm':case 'g3keep':case 'g3codex':case 'g3heat':case 'g3boon':case 'g3shop':case 'g3pause':case 'g3set':case 'g3sprouts':
-  if(state==='g3boon'||state==='g3pause'){if(RUN&&state==='g3pause'){drawRun()}g3DrawUI();return}
-  if(state==='g3shop'&&RUN){drawRun();g3DrawUI();return}
+  if(state==='g3boon'||state==='g3pause'){if(RUN&&state==='g3pause'){drawRun(true)}g3DrawUI();return}
+  if(state==='g3shop'&&RUN){g3DrawUI();return}
   g3DrawUI();return;
  case 'g3run':if(RUN)drawRun();return;
  case 'g3over':drawOver(false);return;
@@ -1320,6 +1385,7 @@ function g3Draw(){
 const RDF={start:()=>{hubEnter()},depart:()=>{rdStartRun();state='g3run'},
  special:k=>rdSpecial(k),superFill:()=>{if(RUN)RUN.sup=100},run:()=>RUN,
  goto:n=>{if(RUN){RUN.chamber=n-1;rdNextChamber();state='g3run'}},
+ cine:(k,d)=>startCine(d||'hub',k),
  talk:who=>{talkNPC=who;talkStart=0;talkLine=0;talkTxt=LINES[who]?LINES[who][0]:'';state='g3talk'},open:id=>{state='g3'+id},
  clearRoom:()=>{if(RUN){RUN.wave2=null;for(const e of RUN.enemies.slice())killEnemy(e)}},
  hurt:n=>{if(RUN){RUN.inv=0;RUN.dashT=0;damagePlayer(n)}},
