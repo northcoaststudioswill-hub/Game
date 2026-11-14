@@ -70,6 +70,18 @@ canvas#screen{ position:absolute; inset:0; width:100%; height:100%; object-fit:c
 .pill.on{ transform:translateY(2px); box-shadow:0 1px 0 var(--btn-lo); }
 .pill small{ font-size:10px; opacity:.7; margin-left:4px }
 button:focus-visible{ outline:3px solid #fff; outline-offset:2px }
+/* four face buttons, only while the Knockout cartridge is in (Sprouts keeps A and B) */
+#bX,#bY{ display:none }
+.console.ko .ab{ height:var(--s) }
+.console.ko #bX,.console.ko #bY{ display:block }
+.console.ko .rnd{ width:37%; font-size:20px }
+.console.ko #bA{ right:0; top:31.5% }
+.console.ko #bB{ left:31.5%; bottom:0 }
+#bX{ left:31.5%; top:0; background:#2f7fd0; color:#fff; box-shadow:0 5px 0 #1b4f88 }
+#bY{ left:0; top:31.5%; background:#2f9e63; color:#fff; box-shadow:0 5px 0 #1b6640 }
+.pill.ready{ background:var(--berry); color:#fff; box-shadow:0 3px 0 var(--berry-lo),0 0 14px #ff6b8a; animation:glow .5s steps(2) infinite }
+@keyframes glow{ 50%{ filter:brightness(1.35) } }
+@media (prefers-reduced-motion:reduce){ .pill.ready{ animation:none } }
 @media (max-width:440px){ .console{ border-radius:0 0 36px 36px; max-height:none } }
 </style>
 </head>
@@ -93,6 +105,8 @@ button:focus-visible{ outline:3px solid #fff; outline-offset:2px }
   <div class="controls">
     <div class="dpad" id="dpad" aria-label="Direction pad"><i></i><i></i><b></b></div>
     <div class="ab">
+      <button class="rnd" id="bX" aria-label="X: special 1">X<span>spec 1</span></button>
+      <button class="rnd" id="bY" aria-label="Y: special 2">Y<span>spec 2</span></button>
       <button class="rnd" id="bA" aria-label="A: confirm, throw, pluck, talk">A<span>act</span></button>
       <button class="rnd" id="bB" aria-label="B: back, call sprouts">B<span>call</span></button>
     </div>

@@ -73,7 +73,7 @@ function pullOne(){const p=pool();if(!p.length)return null;const have=[0,1,2].fi
  for(const q of have){x-=w[q];if(x<0){rr=q;break}}const c=p.filter(x=>x.r===rr);return c[(Math.random()*c.length)|0];}
 
 /* ---------- input ---------- */
-const keys={up:0,down:0,left:0,right:0,a:0,b:0,sel:0,start:0},prev={};
+const keys={up:0,down:0,left:0,right:0,a:0,b:0,x:0,y:0,sel:0,start:0},prev={};
 const pressed=k=>keys[k]&&!prev[k];
 let ac=null;
 function unlock(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();}catch(e){}
@@ -89,7 +89,7 @@ TRACKS.forEach(t=>{try{const im=new Image();im.src=t.art;t.img=im}catch(e){}});
 const MUS={pending:-1,from:'',list:'',src:null,gain:null,buf:null,bi:-1,cur:-1,last:-1,loading:false,tok:0,gap:0,fade:1,np:0,shown:-1};
 const MENU_ST={intro:1,menu:1,rewards:1,caps:1,style:1,bugs:1};
 function musWant(){if(state==='off')return'';if(state==='ko')return KO.mus();if(state==='boot')return cart?'':bootT>.35?'menu':'';if(state==='settings')return setFrom==='pause'?'game':'menu';return MENU_ST[state]?'menu':'game';}
-const musLevel=()=>Math.pow(meta.mus/10,2)*.85*(state==='pause'||(state==='settings'&&setFrom==='pause')?.55:1);
+const musLevel=()=>Math.pow(meta.mus/10,2)*.85*(state==='pause'||(state==='ko'&&KO&&KO.paused())||(state==='settings'&&setFrom==='pause')?.55:1);
 function musGain(){if(!MUS.gain&&ac){MUS.gain=ac.createGain();MUS.gain.gain.value=0;MUS.gain.connect(ac.destination)}return MUS.gain;}
 function getBuf(i){if(MUS.bi===i&&MUS.buf)return Promise.resolve(MUS.buf);
  return new Promise((res,rej)=>{try{const t=TRACKS[i];if(!t.bytes){const bin=atob(t.data),u=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)u[k]=bin.charCodeAt(k);t.bytes=u;t.data=null}
@@ -123,7 +123,7 @@ function musTick(dt){if(MUS.np>0)MUS.np-=dt;if(!ac||!TRACKS.length)return;const 
 function bindBtn(id,key){const el=$(id);
  el.addEventListener('pointerdown',e=>{e.preventDefault();unlock();keys[key]=1;el.classList.add('on');try{el.setPointerCapture(e.pointerId)}catch(_){}} );
  ['pointerup','pointercancel','lostpointercapture'].forEach(n=>el.addEventListener(n,()=>{keys[key]=0;el.classList.remove('on')}));}
-bindBtn('bA','a');bindBtn('bB','b');bindBtn('bSel','sel');bindBtn('bSta','start');
+bindBtn('bA','a');bindBtn('bB','b');bindBtn('bX','x');bindBtn('bY','y');bindBtn('bSel','sel');bindBtn('bSta','start');
 const dp=$('dpad');
 const DIRS={'0':[1,0],'1':[1,1],'2':[0,1],'3':[-1,1],'4':[-1,0],'-4':[-1,0],'-3':[-1,-1],'-2':[0,-1],'-1':[1,-1]};
 function dpSet(e){const b=dp.getBoundingClientRect(),x=e.clientX-(b.left+b.width/2),y=e.clientY-(b.top+b.height/2);let v=[0,0];
@@ -134,7 +134,7 @@ let dpDown=false;
 dp.addEventListener('pointerdown',e=>{e.preventDefault();unlock();dpDown=true;try{dp.setPointerCapture(e.pointerId)}catch(_){ }dpSet(e)});
 dp.addEventListener('pointermove',e=>{if(dpDown)dpSet(e)});
 ['pointerup','pointercancel','lostpointercapture'].forEach(n=>dp.addEventListener(n,()=>{dpDown=false;dpClr()}));
-const KM={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',z:'a',j:'a',' ':'a',x:'b',k:'b',q:'sel',e:'sel',Shift:'sel',Enter:'start',p:'start'};
+const KM={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',z:'a',j:'a',' ':'a',x:'b',k:'b',c:'x',l:'x',v:'y',i:'y',q:'sel',e:'sel',Shift:'sel',Enter:'start',p:'start'};
 addEventListener('keydown',e=>{const k=KM[e.key]||KM[e.key.toLowerCase()];if(k){keys[k]=1;unlock();e.preventDefault()}});
 addEventListener('keyup',e=>{const k=KM[e.key]||KM[e.key.toLowerCase()];if(k)keys[k]=0});
 document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
@@ -215,8 +215,8 @@ const say=(s,t=4)=>{msg=s;msgT=t};
 /* ---------- cartridge 2: North Coast Knockout (src/knockout.js) ---------- */
 let cart=0;
 const KO=window.KO_CART?window.KO_CART({g,W,H:()=>H,r,text,ctext,tw,snd,noise,keys,pressed,mk,flip,ac:()=>ac,meta:()=>meta,eject:()=>eject(),hasTracks:n=>TRACKS.some(t=>t.use.includes(n))}):null;
-const PAD=[['act','call','swap','pause'],['punch','kick','special','pause']];
-function setPad(i){try{const q=(s,t)=>{const e=document.querySelector(s);if(e)e.textContent=t},L=PAD[i]||PAD[0];q('#bA span',L[0]);q('#bB span',L[1]);q('#bSel small',L[2]);q('#bSta small',L[3])}catch(e){}}
+const PAD=[['act','call','swap','pause'],['light','heavy','super','pause']];
+function setPad(i){try{const q=(s,t)=>{const e=document.querySelector(s);if(e)e.textContent=t},L=PAD[i]||PAD[0];q('#bA span',L[0]);q('#bB span',L[1]);q('#bSel small',L[2]);q('#bSta small',L[3]);const cs=$('console');if(cs)cs.classList.toggle('ko',i===1);const sl=$('bSel');if(sl)sl.classList.remove('ready')}catch(e){}}
 const toast=s=>toasts.push({s,t:3.2});
 function carve(x,y,w,h,t=G){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)map[j*MW+i]=t;}
 function tileAt(px,py){const tx=px>>4,ty=py>>4;if(tx<0||ty<0||tx>=MW||ty>=MH)return TR;return map[ty*MW+tx];}

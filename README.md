@@ -18,15 +18,20 @@ python3 build.py
 
 ## North Coast Knockout
 
-Controls (direction + button, no motion inputs): d-pad to walk / jump / crouch, double-tap to dash,
-hold back to block, **A** punch (A,A,A combo), **B** kick, down+A uppercut, down+B sweep,
-forward+A up close to throw, **Select** special 1, forward+Select special 2,
-down+Select (or A+B) for the super when the meter is full. Win two rounds, then press Select to finish.
+Controls (no two-button presses). Knockout shows four face buttons (A, B, X, Y); Sprouts keeps its two.
+D-pad to walk / jump / crouch, double-tap to dash, hold back to block, **A** light (A,A,A combo), **B** heavy,
+down+A launcher, down+B low, forward+A up close to throw, **X** special 1, **Y** special 2,
+**Select** super when the meter is full (it glows). Win two rounds, then press X, Y or Select to finish.
+Keyboard: arrows/WASD, Z/J = A, X/K = B, C/L = X, V/I = Y, Q = Select, Enter = Start.
+
+Music: the cartridge plays only tracks tagged `"use":["ko"]` in `src/tracks.js` (currently Retro Battle Theme);
+with none tagged it falls back to its built-in chiptune.
 
 Everything is drawn in code, so it is all editable in `src/knockout.js`:
 
 - `CH` – the roster: names, colours, stats, special / super / finisher names, win quotes
 - `HD` – the pixel-art heads
 - `ST` – the stages
-- `MV`, `S1`, `S2`, `SUP` – normal moves, the two specials per fighter, and supers
+- `MV`, `MVO`, `MN` – shared normal moves, each fighter's tweaks to them, and their move names
+- `S1`, `S2`, `SUP` – the two specials per fighter (X, Y) and supers
 - `SONG` – the chiptune. Any track in `src/tracks.js` tagged `"use":["ko-menu"]` or `["ko-fight"]` plays instead.
