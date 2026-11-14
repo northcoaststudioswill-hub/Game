@@ -106,9 +106,10 @@ const LINES={
  ERIN:["The lantern's warm up here, Will. Down there it's all roots and old dark.","Bring me back a story, not just dew. Though dew spends better.","Louie dug up the floor again. He's looking for the way down, I think.","Every keeper before you came back up changed. Mostly taller. Don't ask.","If the Hollow Keeper wears your face — be kind to it. Then hit it. Hard.","One day the roots will bloom instead of bite. You'll be why.","Marcus has hated everything since 2019. It's his cardio.","The bed's sprouting faster since you started diving. Coincidence, I'm sure.","Take a PEB down with you. I worry less. Slightly less. Barely less.","If a bud scatters, plant its story here. The bed remembers them all."],
  LOUIE:["WOOF. (Translation: the floor smells like adventure and old socks.)","ARF ARF. (He has packed you a stick. It is a good stick.)","WHINE... (He dreams of chasing the Grub Mother. He always wins.)","RUFF! (Translation: bring back snacks from the deep. Any snacks.)","BOOF. (He believes in you. Unconditionally. Loudly.)","GROWL. (That one was at Marcus. Marcus deserved it.)","WHINE? (He would simply like to go down too. He is told no. Daily.)","BOOF. (Translation: the grubs fear you now. He taught them to.)","SNIFF SNIFF. (You smell like deep water and courage. Mostly deep water.)"],
  RANGER:["Paths below shift like paths above. Mark your turns or don't come back.","Thornback was the garden's problem. His mother's the garden's history.","Bramble taught me: the way through is usually on fire. Ember agrees.","Take the elite doors. Cowards get common boons and common graves.","Marcus complains about the dark. Then he sleeps in it like a baby.","Patrolled the door twice today. It only whispered once. Improvement.","A string of buds at your back is a squad. Treat them like one.","Ember Core runs hot. If your boots smoke, you're close to the Keeper."],
- /* Marcus: Sprouts' Marcus (cocky "bro" hype man, Marcus Waterworks, "I've got a guy. The guy is me.")
+ /* Marcus: Sprouts' Marcus (cocky "bro" hype man, "I've got a guy. The guy is me.") who also roasts everyone.
+    Anything about Waterworks is a [before, after] pair: it only comes up once Waterworks is open in Sprouts (rdWaterworks).
     who also roasts everyone and everything down here. Keep both halves in every line. */
- MARCUS:["Bro. BRO. The keeper's here. Everybody act natural. Nobody here is good at it, but try.","I've watched every keeper go down that door, bro. Read my reviews. All terrible. Except mine. Mine are great.","The Drowned King. Drowned. King. Two red flags, bro. And you still wanna swim down there?","Erin says there's good in everyone. I checked, personally. There's less than she thinks, bro.","Scout wrote forty pages on the grubs. I read every one. I hate the pages AND the grubs.","If you don't come back, I'm telling everyone you owed me money. Big money. Waterworks money.","Louie's the only one here I respect, bro. He bites his problems. You've got a sword. I guess.","The deep's been talking trash about you, bro. And honestly? Team deep.","Down there needs a lazy river. I've got a guy. The guy is me. You clear the bugs first, bro.","I watered that sprout bed once. ONCE. Now it's in Erin's speech forever. Legacy, bro.","My honest review of the deep: one star. The star is a warning label.","See one, smack one. That's the whole philosophy down there, bro. Write it down.","You're such a J, Will. Love you, bro. Still a J.","Bro, stop J-lighting me. I never said I'd go down there. I said I'd THINK about it.","Will, you absolute J. You walked right past the Mirror. Again."],
+ MARCUS:["Bro. BRO. The keeper's here. Everybody act natural. Nobody here is good at it, but try.","I've watched every keeper go down that door, bro. Read my reviews. All terrible. Except mine. Mine are great.","The Drowned King. Drowned. King. Two red flags, bro. And you still wanna swim down there?","Erin says there's good in everyone. I checked, personally. There's less than she thinks, bro.","Scout wrote forty pages on the grubs. I read every one. I hate the pages AND the grubs.",["If you don't come back, I'm telling everyone you owed me money. Big money. Business money.","If you don't come back, I'm telling everyone you owed me money. Big money. Waterworks money."],"Louie's the only one here I respect, bro. He bites his problems. You've got a sword. I guess.","The deep's been talking trash about you, bro. And honestly? Team deep.",["I've got a big idea for up top, bro. Huge. Can't say yet. I've got a guy. The guy is me.","Down there needs a lazy river. Waterworks Two. I've got a guy. The guy is me. You clear the bugs first, bro."],"I watered that sprout bed once. ONCE. Now it's in Erin's speech forever. Legacy, bro.","My honest review of the deep: one star. The star is a warning label.","See one, smack one. That's the whole philosophy down there, bro. Write it down.","You're such a J, Will. Love you, bro. Still a J.","Bro, stop J-lighting me. I never said I'd go down there. I said I'd THINK about it.","Will, you absolute J. You walked right past the Mirror. Again."],
  SCOUT:["I catalogued 40 species below! 39 want to eat you. The crab is undecided.","Mothshades blink behind you. If one winks, dash. Trust me.","Every chamber you clear, I update the Codex. Science marches on!","The Hollow Keeper collects faces. Yours is just on loan, apparently.","Marcus reviewed my Codex. One star. He said the star was generous.","Field note: LUCKY buds hum near treasure. Or near Marcus. Data's noisy.","I timed Louie's naps. He's awake for your returns. Every single one.","New Codex page: 'Pods, and why the deep keeps coughing them up.'"]};
 /* ---------------- data: enemies & bosses ---------------- */
 const FOES={
@@ -555,7 +556,7 @@ function hubUpdate(dt){if(pressed('sel')){rdSave();eject();return}
  for(const who of NPCS){const n=HUBNPC[who];if(n){n.y=Math.max(52,Math.min(H-40,n.y));n.x=Math.max(12,Math.min(W-12,n.x))}}
  hubBarkT-=dt;if(hubBark){hubBark.t-=dt;if(hubBark.t<=0)hubBark=null}
  if(hubBarkT<=0){hubBarkT=5+Math.random()*4;const pool=NPCS.filter(w=>HUBNPC[w]&&HUBNPC[w].y>96&&Math.hypot(HUBNPC[w].x-P3.x,HUBNPC[w].y-P3.y)<150);
-  if(pool.length){const w=pool[(Math.random()*pool.length)|0],L2=RDBARK[w]||['...'];hubBark={who:w,txt:L2[(Math.random()*L2.length)|0],t:2.6}}}
+  if(pool.length){const w=pool[(Math.random()*pool.length)|0],L2=RDBARK[w]||['...'];hubBark={who:w,txt:rdLn(L2[(Math.random()*L2.length)|0]),t:2.6}}}
  const t=hubTarget();
  hubMsg=t?('A: '+t.n):'';if(hubMsgT>0)hubMsgT-=dt;
  if(t&&pressed('a')){snd(520,.05);
@@ -563,7 +564,7 @@ function hubUpdate(dt){if(pressed('sel')){rdSave();eject();return}
   if(t.kind==='sprouts'){sprPage=0;uiSel=0;state='g3sprouts';return}
   if(t.kind==='npc'){talkNPC=t.who;uiSel=0;
    talkStart=RD.flags['met_'+t.who]?(RD.lineIx[t.who]||1)%LINES[t.who].length:0;
-   RD.flags['met_'+t.who]=1;talkLine=0;talkTxt=LINES[t.who][talkStart];RD.lineIx[t.who]=talkStart+1;rdSave()
+   RD.flags['met_'+t.who]=1;talkLine=0;talkTxt=rdLn(LINES[t.who][talkStart]);RD.lineIx[t.who]=talkStart+1;rdSave()
    state='g3talk';return}
   uiSel=0;codexPage=0;heatSel=0;state='g3'+t.id;return}}
 function talkUpdate(){if(pressed('b')){state='g3hub';snd(330,.05);return}
@@ -571,7 +572,7 @@ function talkUpdate(){if(pressed('b')){state='g3hub';snd(330,.05);return}
   RD.honey--;RD.gift[who]=(RD.gift[who]||0)+1;if(k&&!RD.keeps[k.id]){RD.keeps[k.id]=1;RD.keepXp[who]=RD.keepXp[who]||0;talkTxt=who+' gave you a keepsake: '+k.n+'! Equip it at the shelf.';snd(784,.12);later(()=>snd(1175,.25),110)}
   else{RD.dew+=5;talkTxt=who+' presses 5 Moondew into your hand. "For the road down."'}rdSave();return}
  if(pressed('a')){const L=LINES[talkNPC];talkLine++;
-  if(talkStart+talkLine>=L.length){state='g3hub'}else{talkTxt=L[talkStart+talkLine];snd(520,.04)}return}}
+  if(talkStart+talkLine>=L.length){state='g3hub'}else{talkTxt=rdLn(L[talkStart+talkLine]);snd(520,.04)}return}}
 function mirrorUpdate(){uiSel=nav(uiSel,MIRROR.length);
  if(pressed('a')){const m=MIRROR[uiSel],rank=mir(m.id);
   if(rank>=m.max){snd(140,.08)}else{const c=m.cost[rank];if(RD.dew>=c){RD.dew-=c;RD.mirror[m.id]=rank+1;rdSave();snd(784,.1);later(()=>snd(1175,.2),100)}else snd(140,.08)}}
@@ -1188,8 +1189,12 @@ function rdNpcJob(who,x,y){if(who==='ERIN'){r('#98a0b0',x+5,y-9,5,4);r('#98a0b0'
  else if(who==='SCOUT'){r('#f8f0d8',x+5,y-8,6,5);r('#281c30',x+6,y-7,4,1);if(((time*6)|0)%2)r('#281c30',x+6,y-5,3,1);r('#c8a04a',x+10,y-10,1,4)}
  else if(who==='RANGER'){r('#d8c8a0',x-11,y-9,7,5);r('#8a6a40',x-10,y-7,5,1);r('#e84a5f',x-7,y-8,1,1)}
  else{r('#fff3b0',x-1,y-25,2,2);if(((time*6)|0)%2)r('#ffd94d',x+3,y-22,1,1)}}
+/* Marcus only mentions Waterworks once it exists in Sprouts: the MAKING WAVES achievement (saved for good),
+   or the project finished in the valley you're playing now. A line can be a [before, after] pair. */
+function rdWaterworks(){try{const i=ACH.findIndex(a=>a[0]==='MAKING WAVES');if(i>=0&&meta&&meta.ach&&meta.ach[i])return true;return !!(run&&pjDone(PJ[0]))}catch(e){return false}}
+const rdLn=e=>Array.isArray(e)?e[rdWaterworks()?1:0]:e;
 /* little things they say to themselves in the Hearth */
-const RDBARK={MARCUS:['bro.',"you're a J.",'stop J-lighting me','waterworks 2.0','team deep.'],ERIN:['hi, keeper!','water, water...',"they're growing!"],
+const RDBARK={MARCUS:['bro.',"you're a J.",'stop J-lighting me',['big ideas, bro','waterworks 2.0'],'team deep.'],ERIN:['hi, keeper!','water, water...',"they're growing!"],
  SCOUT:['fascinating.','page 41...','noted. noted.'],RANGER:['paths shift.','stay sharp.','hm.'],LOUIE:['WOOF','*snore*','arf!']};
 let hubBark=null,hubBarkT=3;
 function rdDrawNPC(who,x,y,bob){r('rgba(0,0,0,.25)',Math.round(x)-5,Math.round(y)+1,10,2);rdDrawKeeper(who,x,y+2+(bob||0),1);
@@ -1609,7 +1614,7 @@ const RDF={start:()=>{hubEnter()},depart:()=>{rdStartRun();state='g3run'},
  ints:()=>RUN?RUN.ints.map(i=>({k:i.k,x:i.x,y:i.y,done:i.done})):[],near:()=>{const i=rdNearInt();return i?i.k:null},
  goto:n=>{if(RUN){RUN.chamber=n-1;rdNextChamber();state='g3run'}},
  cine:(k,d)=>startCine(d||'hub',k),
- talk:who=>{talkNPC=who;talkStart=0;talkLine=0;talkTxt=LINES[who]?LINES[who][0]:'';state='g3talk'},open:id=>{state='g3'+id},
+ talk:who=>{talkNPC=who;talkStart=0;talkLine=0;talkTxt=LINES[who]?rdLn(LINES[who][0]):'';state='g3talk'},open:id=>{state='g3'+id},
  clearRoom:()=>{if(RUN){RUN.wave2=null;for(const e of RUN.enemies.slice())killEnemy(e)}},
  hurt:n=>{if(RUN){RUN.inv=0;RUN.dashT=0;damagePlayer(n)}},
  door:i=>{if(RUN&&RUN.doors[i])doorReward(RUN.doors[i])},
