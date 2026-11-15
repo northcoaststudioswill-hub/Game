@@ -342,6 +342,21 @@ async function main() {
     console.log('erin', JSON.stringify(r));
   }
 
+  if (want('closeup')) {
+    /* real fight frames, cropped tight on the fighters and blown up, to judge the sprites like a player sees them */
+    const url = await E(() => {
+      const fr = [];
+      const crop = (a) => { const z = cv.width / 240, c = document.createElement('canvas'); c.width = 130 * z; c.height = 110 * z; const x0 = Math.round(((a.x + a.o.x) / 2 - KO.cam - 65) * z * (KO.G.Z || 1)); c.getContext('2d').drawImage(cv, Math.max(0, Math.min(cv.width - c.width, x0)), Math.round(cv.height * .48), c.width, c.height, 0, 0, c.width, c.height); return c; };
+      for (const [p1, p2, keys] of [[0, 6, ['a', 'b', 'a']], [1, 3, ['b', 'a', 'x']], [2, 4, ['a', 'b', 'down']]]) {
+        const [a, b] = fight(p1, p2, 0); a.x = 140; b.x = 178;
+        for (let s = 0; s < keys.length; s++) { K[keys[s]] = 1; __step(1 / 60); if (keys[s] !== 'down') K[keys[s]] = 0; for (let i = 0; i < 14; i++) { __step(1 / 60); if (i === 6) fr.push(crop(a)); } K.down = 0; }
+        for (let i = 0; i < 8; i++) __step(1 / 60); fr.push(crop(a));
+      }
+      return sheet(fr, 4, 1, 'close-up of real fight frames');
+    });
+    await save('closeup.png', url);
+  }
+
   if (want('fight')) {
     const url = await E(() => {
       fight(6, 0, 0, true); const frames = [];

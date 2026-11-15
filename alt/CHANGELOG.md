@@ -219,6 +219,23 @@ Normals, timing and hitboxes for everyone are unchanged (the pass-2 trace still 
   hit the opponent on the stage: 5+5+20 = 30 (`DELETED.`).
 - All full supers (HASBARA, RUBY TEMPER TANTRUM, LOUIE AIRLINES, NUKE THE DATA CENTER) now share one cut-in and hit system (`CN`).
 
+## Rig v3: GBA-style sprite renderer (Will: the models look goofy and clippy next to real GBA fighters)
+
+What was wrong, seen in close-ups of real fights next to Supersonic Warriors / Tekken Advance: limbs were one-width "pipes"
+with stair-step edges and kinked elbows and knees; every stroke had its own black outline, so arms crossing bodies stacked
+outlines into blocks (the clipping look); hands and feet were tiny squares and bricks; shading was flat bands.
+
+Now (`rig` in `knockout.js`, "rig v3"):
+- Every part is a shaped piece: tapered limbs with rounded joints (thick at the shoulder and thigh), a torso with chest and
+  shoulders, round fists, shaped shoes, three tones lit from the front and above.
+- Each figure is drawn at 1x into three layers (back arm and leg / body / front arm), snapped to whole pixels, and each layer
+  gets one outline around its silhouette, the way a sprite artist draws it. Overlaps read as one limb in front of another.
+- Outfits per fighter on the same figure (Will's tee and shorts, Erin's top, jeans and hair, Marcus's hoodie and boots, Louie's
+  fur, belly, paws and tail, Bottie's puffer, robot joints and dreads, King Bibi's suit and tie, Corbin's cape, Mama's hair).
+- The guard is up at the chin in idle and walk (visual only).
+- Finished sprites are cached by pose: frame cost stays about 2.1 ms (of 16).
+- Same skeleton, poses and timing: the pass-2 trace still matches on all 1,088 frames. Heads are unchanged.
+
 ## Not changed
 
 - Patch & Plate (`src/patchplate.js` is v0.3's file as built). Its 76 checks pass on the ALT build.

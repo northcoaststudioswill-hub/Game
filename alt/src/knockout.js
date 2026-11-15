@@ -127,8 +127,8 @@ function bubble(lines,x,y,right,col){const w=Math.max(...lines.map(l=>tw(l,1)))+
 const p=(hx,hy,ln,bfx,bfy,ffx,ffy,bhx,bhy,fhx,fhy,hdx=0,hdy=0)=>[hx,hy,ln,bfx,bfy,ffx,ffy,bhx,bhy,fhx,fhy,hdx,hdy];
 const mix=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*t);
 const PS={
- st:p(0,19,.12,-7,0,7,0,5,-4,10,-1),st2:p(0,18,.15,-7,0,7,0,5,-5,10,-2),
- w1:p(0,19,.12,-4,2,7,0,5,-4,10,-1),w2:p(1,19,.14,-5,0,10,2,6,-4,9,-2),
+ st:p(0,19,.1,-7,0,7,0,6,1,10,4),st2:p(0,18.4,.12,-7,0,7,0,6,0,10,3),
+ w1:p(0,19,.12,-4,2,7,0,6,1,10,4),w2:p(1,19,.14,-5,0,10,2,6,0,9,3),
  cr:p(0,11,.3,-8,0,8,0,6,-3,10,0),jr:p(0,20,.05,-3,1,3,2,3,-8,7,-6),jt:p(0,19,.25,-5,7,6,9,4,-6,9,-3),
  p1w:p(0,19,.1,-7,0,7,0,5,-4,3,-2),p1:p(3,19,.25,-7,0,8,0,4,-4,16,0),
  p2w:p(1,19,.15,-7,0,7,0,1,-3,8,-2),p2:p(4,19,.35,-7,0,8,0,16,-1,6,-3),
@@ -202,101 +202,117 @@ function limb(a,b,c,w,c1,c2){seg(a[0],a[1],b[0],b[1],w+2,K);seg(b[0],b[1],c[0],c
 function ik(a,t,l1,l2,bend){let dx=t[0]-a[0],dy=t[1]-a[1],d=Math.hypot(dx,dy)||.001;const m=l1+l2-.01;if(d>m){dx*=m/d;dy*=m/d;d=m}
  const a0=Math.atan2(dy,dx),a1=Math.acos(cl((l1*l1+d*d-l2*l2)/(2*l1*d),-1,1)),an=a0+bend*a1;return[[a[0]+Math.cos(an)*l1,a[1]+Math.sin(an)*l1],[a[0]+dx,a[1]+dy]];}
 const B=(c,x,y,w,h)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(-y-h),w,h)}; // rect with y-up coords, (x,y)=bottom-left
-/* ALT: character models. One skeleton (same poses, timing and hitboxes for everyone); each of Will, Erin, Marcus,
-   Louie and Lil Bottie has their own body art on it. The torso is a shape that ends at the shoulders and the head sits on
-   a neck above it, so heads never sink into bodies. */
-const MODEL={
- will:{ws:[5,5.7,5.4,5.2],neck:2,cols:['#141218','#24222c','#3a3844']},
- erin:{ws:[5.2,3.9,4.6,4.4],neck:3,aw:3.5,lw:4.6,cols:['#1c6a40','#2e8a58','#46a870']},
- marcus:{ws:[6.2,6.6,7,6.8],neck:1.5,aw:5.2,lw:6,cols:['#b45a10','#e07a20','#f8a050']},
- louie:{ws:[5.6,6,6.4,5.6],neck:1,aw:4.4,lw:6,cols:['#b86428','#e89040','#f8b070']},
- chrome:{ws:[6.2,6.8,7.2,6.8],neck:2,aw:5.4,lw:5.4,cols:['#8a92a0','#c8d0dc','#eef2f8']}};
-function rig(c,P,o){o=o||{};const M=MODEL[c.id];
+/* ---------- ALT rig v3: GBA-style sprite renderer ----------
+   Same skeleton and poses as before (so timing, reach and hitboxes don't change). What changed is how a body is drawn:
+   - every part is a shaped, tapered piece (capsules with rounded joints, a torso with chest and shoulders, real fists and shoes)
+     with three tones lit from the front and above;
+   - the figure is drawn at 1x into small layers (back limbs / body / front arm), snapped to whole pixels, and each layer gets
+     ONE outline around its silhouette, like a sprite artist would draw it, instead of an outline on every stroke;
+   - finished sprites are cached by pose, so most frames are a single drawImage. */
+const SPW=128,SPH=124,SPX=64,SPY=112,SPO='#141018';
+const spMk=()=>{const c=document.createElement('canvas');c.width=SPW;c.height=SPH;return c};
+const SPL=[spMk(),spMk(),spMk()],SPLX=SPL.map(c=>c.getContext('2d',{willReadFrequently:true}));
+const SPCACHE=new Map();
+let VX=null;
+const vcol=c=>{VX.fillStyle=c};
+function vcirc(x,y,r,col){if(r<=0)return;vcol(col);VX.beginPath();VX.arc(x,y,r,0,7);VX.fill()}
+function vcap(a,b,r0,r1,col){const dx=b[0]-a[0],dy=b[1]-a[1],d=Math.hypot(dx,dy)||1e-3,nx=-dy/d,ny=dx/d;vcol(col);VX.beginPath();
+ VX.moveTo(a[0]+nx*r0,a[1]+ny*r0);VX.lineTo(b[0]+nx*r1,b[1]+ny*r1);VX.lineTo(b[0]-nx*r1,b[1]-ny*r1);VX.lineTo(a[0]-nx*r0,a[1]-ny*r0);VX.closePath();VX.fill();vcirc(a[0],a[1],r0,col);vcirc(b[0],b[1],r1,col)}
+function vpoly(pts,col){vcol(col);VX.beginPath();VX.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)VX.lineTo(pts[i][0],pts[i][1]);VX.closePath();VX.fill()}
+/* a lit limb: dark base, mid tone nudged toward the light (front, up), a thin highlight */
+function vlimb(a,b,r0,r1,col,hl){vcap(a,b,r0,r1,dk(col));const o=.75;vcap([a[0]+o,a[1]+o],[b[0]+o,b[1]+o],Math.max(.6,r0-.85),Math.max(.6,r1-.85),col);
+ if(hl!==0){const o2=Math.min(r0,r1)*.55;vcap([a[0]+o2,a[1]+o2],[b[0]+o2,b[1]+o2],Math.max(.5,r0*.28),Math.max(.5,r1*.24),lt(col))}}
+const lerp2=(a,b,k)=>[a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k];
+/* snap a layer to whole pixels and give it one outline around its silhouette */
+function spBake(i){const x=SPLX[i],d=x.getImageData(0,0,SPW,SPH),p=d.data,n=SPW*SPH,on=new Uint8Array(n);
+ for(let k=0;k<n;k++){if(p[k*4+3]>=110){on[k]=1;p[k*4+3]=255}else p[k*4+3]=0}
+ const ol=[17,16,24];for(let k=0;k<n;k++){if(on[k])continue;const xx=k%SPW;if((xx>0&&on[k-1])||(xx<SPW-1&&on[k+1])||(k>=SPW&&on[k-SPW])||(k<n-SPW&&on[k+SPW])){p[k*4]=ol[0];p[k*4+1]=ol[1];p[k*4+2]=ol[2];p[k*4+3]=255}}
+ x.putImageData(d,0,0)}
+/* per-character outfits: colours and extras on the shared figure */
+const OUT={
+ will:{torso:[5.2,5.6,5.6,5.4],sleeve:.5,shorts:1,socks:'#f4f4f4'},
+ erin:{torso:[5,3.9,4.6,4.3],hair:'#74482c',hairEnd:'#c89a62',hairLen:13,thin:.85},
+ marcus:{torso:[6.2,6.6,7,7],hood:1,cuffs:1,bulk:1.2,boots:1},
+ louie:{torso:[5.6,6,6.4,5.8],dog:1,bulk:1.1},
+ chrome:{torso:[6.4,7,7.4,7.2],puffer:1,mech:1,bulk:1.15},
+ bibi:{torso:[5.4,5.6,6,6.2],suit:1},
+ kiss:{torso:[5,4.8,5.4,5.4],cape:1},
+ mama:{torso:[5.2,4.4,5,4.8],hair:'#2e1e1a',hairLen:10,thin:.9}};
+function rig(c,P,o){o=o||{};const U=OUT[c.id]||{torso:[5,5,5.4,5.2]},bulk=U.bulk||1,thin=U.thin||1;
  const ls=c.ls||1,hip=[P[0]*BS,P[1]*ls*BS],tl=(c.tl||13)*BS,sh=[hip[0]+Math.sin(P[2])*tl,hip[1]+Math.cos(P[2])*tl];
- const th=(c.th||11)*BS,sn=(c.sn||10)*BS,ua=8*BS,fa=8*BS,aw=(M&&M.aw)||c.aw||4,lw=(M&&M.lw)||c.lw||5,tw_=c.tw||11,hw=tw_/2,sway=o.sway||0;
+ const th=(c.th||11)*BS,sn=(c.sn||10)*BS,ua=8*BS,fa=8*BS,sway=o.sway||0;
  const bl=ik([hip[0]-1.5,hip[1]],[P[3]*BS,P[4]*BS+2],th,sn,1),fl=ik([hip[0]+1.5,hip[1]],[P[5]*BS,P[6]*BS+2],th,sn,1);
- const ba=ik([sh[0]-1,sh[1]-2],[sh[0]+P[7]*BS,sh[1]+P[8]*BS],ua,fa,-1),fr=ik([sh[0]+1,sh[1]-2],[sh[0]+P[9]*BS,sh[1]+P[10]*BS],ua,fa,-1);
- // the head on its neck: bottom row of the head image sits just above the shoulders
- const hI=o.head||c.head,hw2=hI.width,hh2=hI.height,nl=M?M.neck:2,nk=[sh[0]+1+P[11]*BS,sh[1]+nl+P[12]*BS];
+ const BRT=[sh[0]-1,sh[1]-2],FRT=[sh[0]+1,sh[1]-2];
+ const ba=ik(BRT,[sh[0]+P[7]*BS,sh[1]+P[8]*BS],ua,fa,-1),fr=ik(FRT,[sh[0]+P[9]*BS,sh[1]+P[10]*BS],ua,fa,-1);
+ const hI=o.head||c.head,hw2=hI.width,hh2=hI.height,nk=[sh[0]+1+P[11]*BS,sh[1]+2+P[12]*BS];
  const hx0=Math.round(nk[0]-hw2/2),hy0=Math.round(-nk[1]-hh2+1),htop=-hy0,hd=[nk[0],nk[1]+hh2/2-1];
- const ax=Math.cos(P[2]),ay=-Math.sin(P[2]),tp=k=>[hip[0]+(sh[0]-hip[0])*k,hip[1]+(sh[1]-hip[1])*k],at=(k,d)=>{const q=tp(k);return[q[0]+ax*d,q[1]+ay*d]};
- const lerpP=(a_,b_,k)=>[a_[0]+(b_[0]-a_[0])*k,a_[1]+(b_[1]-a_[1])*k];
- const shoe=(e,col)=>{B(K,e[0]-4,e[1]-3,10,6);B(dk(col),e[0]-3,e[1]-2,8,4);B(col,e[0]-3,e[1]-1,8,3);B(lt(col),e[0]+2,e[1]+1,3,1)};
- const paw=(e,col)=>{B(K,e[0]-4,e[1]-3,9,6);B(col,e[0]-3,e[1]-2,7,4);B('#fff0d8',e[0]+1,e[1]-2,3,3);B('#b86428',e[0]-1,e[1]-2,1,2);B(K,e[0]+2,e[1]-2,1,1);B(K,e[0]+4,e[1]-2,1,1)};
- const hand=(e,col)=>{if(c.id==='chrome'){B(K,e[0]-3,e[1]-3,10,7);B('#3a4050',e[0]-2,e[1]-2,8,5);B('#5a6272',e[0]-2,e[1]+1,8,1);B('#101018',e[0]+5,e[1]-1,2,3);B('#f8d030',e[0]-2,e[1]-2,1,5);return}
-  if(c.id==='louie'){B(K,e[0]-3,e[1]-3,7,6);B('#fff0d8',e[0]-2,e[1]-2,5,4);B('#e0c8a8',e[0]-2,e[1]-2,5,1);return}
-  B(K,e[0]-3,e[1]-3,6,6);B(dk(col),e[0]-2,e[1]-2,4,4);B(col,e[0]-2,e[1]-1,3,3)};
- const foot=(e,col)=>c.id==='louie'?paw(e,col):shoe(e,col);
- // torso shape: half-widths at hip, waist, chest, shoulder; rounded shoulders; outlined; shaded on the back side
- const torso=(ws,cols)=>{const n=Math.max(10,Math.ceil(tl)),Wd=t=>{t=cl(t,0,1);let w=t<.35?ws[0]+(ws[1]-ws[0])*t/.35:t<.7?ws[1]+(ws[2]-ws[1])*(t-.35)/.35:ws[2]+(ws[3]-ws[2])*(t-.7)/.3;return t>.88?w*(1-(t-.88)*2.2):w};
-  const row=(t,e,c1,c2)=>{const q=tp(t),w=Wd(t)+e,l=[q[0]-ax*w,q[1]-ay*w],r_=[q[0]+ax*w,q[1]+ay*w];if(c2){const m=lerpP(l,r_,.38);seg(l[0],l[1],m[0],m[1],2,c1);seg(m[0],m[1],r_[0],r_[1],2,c2)}else seg(l[0],l[1],r_[0],r_[1],2,c1)};
-  for(let i=-1;i<=n+1;i++)row(i/n,1.3,K);for(let i=0;i<=n;i++)row(i/n,0,cols[0],cols[1]);
-  for(let i=1;i<n;i++){const t=i/n,q=at(t,Wd(t)-1.4);B(cols[2],q[0],q[1],1,1)}};
- const sleeve=(root,el,len,w,col,cuff)=>{const e=lerpP(root,el,len);seg(root[0],root[1],e[0],e[1],w+2,K);seg(root[0],root[1],e[0],e[1],w,col);if(cuff)seg(e[0],e[1],lerpP(root,el,len-.12)[0],lerpP(root,el,len-.12)[1],w+1,cuff)};
- const band=(a_,b_,k,w,col)=>{const q=lerpP(a_,b_,k);B(K,q[0]-w/2-1,q[1]-1,w+2,3);B(col,q[0]-w/2,q[1],w,2)};
- // ---- behind the body
- if(c.id==='kiss'){const cx=hip[0]-10-sway*6,cy=hip[1]-7+Math.sin(G.t*9)*1.5;seg(sh[0]-2,sh[1]-1,cx,cy,8,K);seg(sh[0]-2,sh[1]-1,cx,cy,6,'#d02030');seg(sh[0]-3,sh[1]-3,cx-1,cy+2,3,'#f04050')}
- if(c.id==='louie'){const wg=Math.sin(G.t*10)*1.6,tx=hip[0]-8,ty=hip[1]+2+wg;disc(Math.round(tx),Math.round(-ty),6,K);disc(Math.round(tx),Math.round(-ty),5,'#e89040');disc(Math.round(tx+1),Math.round(-ty),3,'#fff0d8');disc(Math.round(tx+1),Math.round(-ty),1,'#e89040');B(K,tx+4,ty-6,2,4);B('#e89040',tx+3,ty-5,2,3)}
- if(c.id==='erin'){const sw_=-sway*3-Math.sin(G.t*3)*.7,y0=htop-7,x0=hx0+3,x1=sh[0]-5+sw_,y1=sh[1]-11,col=(k,i)=>k>.72?'#c89a62':i%3?'#74482c':'#5e3a22';
-  for(const pass of[0,1])for(let i=0;i<=10;i++){const k=i/10,x=x0+(x1-x0)*k+Math.sin(k*6+G.t*3)*.8,y=y0+(y1-y0)*k,w=7.5-k*3;seg(x,y,x,y,pass?w:w+2,pass?col(k,i):K)}}
- if(c.id==='mama'){seg(hx0+3,htop-5,sh[0]-6-sway*3,sh[1]-8,7,K);seg(hx0+3,htop-5,sh[0]-6-sway*3,sh[1]-8,5,'#2e1e1a')}
- if(c.id==='chrome'){for(let i=0;i<6;i++){const sx=hx0+2+i*1.8,ex=sh[0]-9+i*2-sway*4,ey=sh[1]-12-(i%3)*3;seg(sx,htop-6,ex,ey,3,K);seg(sx,htop-6,ex,ey,2,i%2?'#1e1618':'#2a1e20');B('#4a3a3a',ex-1,ey+3,1,1)}
-  disc(Math.round(sh[0]-ax*4),Math.round(-sh[1]-1),4,K);disc(Math.round(sh[0]-ax*4),Math.round(-sh[1]-1),3,'#1c1c24')}
- if(c.id==='marcus'){const q=at(.98,-3.5);disc(Math.round(q[0]),Math.round(-q[1]-1),5,K);disc(Math.round(q[0]),Math.round(-q[1]-1),4,'#b45a10');disc(Math.round(q[0]+1),Math.round(-q[1]-2),2,'#c86818')}
- // ---- back arm and back leg
- const BRT=[sh[0]-1,sh[1]-2];
- limb(BRT,ba[0],ba[1],aw,c.armD,c.foreD);
- if(c.id==='will')sleeve(BRT,ba[0],.55,aw,dk('#24222c'));
- if(c.id==='chrome'){B(K,ba[0][0]-3,ba[0][1]-3,6,6);B('#5a6272',ba[0][0]-2,ba[0][1]-2,4,4)}
- if(c.id==='marcus')band(ba[0],ba[1],.9,aw+1,'#a04c0c');
- hand(ba[1],c.id==='louie'?c.skinD:c.id==='chrome'?c.foreD:c.skinD);
- limb([hip[0]-1.5,hip[1]],bl[0],bl[1],lw,c.pantD,c.shinD);foot(bl[1],c.shoeD);
- // ---- torso
- if(M){torso(M.ws,M.cols);
-  switch(c.id){
-   case'will':{const q=at(.97,.5);B(c.skin,q[0]-1,q[1]-2,3,2);B(K,q[0]-2,q[1]-3,1,1);B(K,q[0]+2,q[1]-3,1,1);const g_=at(.62,1.5);B('#f8d030',g_[0],g_[1],3,1);B('#f8d030',g_[0]+1,g_[1]+1,1,1);
-    const bly=at(.38,2.5);B('#141218',bly[0]-1,bly[1],4,1);const w1=at(.05,0);B('#d83030',w1[0]-5,w1[1]-2,10,3);break}
-   case'erin':{const h1=at(.08,0);B(K,h1[0]-5,h1[1]-1,10,3);B('#1c6a40',h1[0]-4,h1[1],8,1);const q=at(.97,.8);B('#f6d2b4',q[0]-1,q[1]-2,3,2);
-break}
-   case'marcus':{for(const d_ of[1.2,3]){const a_=at(.95,d_),b_=at(.7,d_);seg(a_[0],a_[1],b_[0],b_[1],1,'#f4f4f4');B('#f4f4f4',b_[0],b_[1]-1,1,1)}
-    const p1=at(.35,-1.5),p2=at(.12,5.5);B(K,p1[0],p2[1],p2[0]-p1[0]+1,p1[1]-p2[1]+1);B('#c86818',p1[0]+1,p2[1]+1,p2[0]-p1[0]-1,p1[1]-p2[1]-1);
-    const h1=at(.02,0);B(K,h1[0]-6,h1[1]-1,12,3);B('#a04c0c',h1[0]-5,h1[1],10,1);break}
-   case'louie':{for(let i=0;i<9;i++){const t=.08+i*.1,q=at(t,M.ws[1]*.35);seg(q[0],q[1],at(t,M.ws[1]-1)[0],at(t,M.ws[1]-1)[1],2,'#fff0d8')}
-    for(let i=0;i<3;i++){const q=at(.3+i*.22,M.ws[2]+.6);B('#e89040',q[0],q[1],2,2);B(K,q[0]+2,q[1],1,1)}break}
-   case'chrome':{for(const t of[.16,.32,.48,.64,.8]){const l=at(t,-M.ws[1]+.5),r_=at(t,M.ws[1]-.5);seg(l[0],l[1],r_[0],r_[1],1,'#8a92a0');seg(l[0],l[1]+1,r_[0],r_[1]+1,1,'#f8faff')}
-    {const a_=at(.98,.5),b_=at(.04,.5);seg(a_[0],a_[1],b_[0],b_[1],1,'#3a4050')}
-    {const q=at(.99,.5);B('#1c1c24',q[0]-3,q[1]-2,7,3)}
-    const a2=at(.86,0);for(let i=0;i<5;i++)B('#e8ecf4',a2[0]-3+i*2,a2[1]+1-Math.abs(i-2)*1.6,2,2);const p_=at(.58,0);B(K,p_[0]-2,p_[1]-5,8,6);B('#dcdce8',p_[0]-1,p_[1]-4,6,4);B('#dcdce8',p_[0],p_[1],2,1);B('#dcdce8',p_[0]+3,p_[1],2,1);B('#ffffff',p_[0],p_[1]-3,1,1);break}}}
- else{seg(hip[0],hip[1],sh[0],sh[1],tw_+2,K);seg(hip[0],hip[1],sh[0],sh[1],tw_,dk(c.top));seg(hip[0]+1,hip[1]+.5,sh[0]+1,sh[1]+.5,tw_-2,c.top);seg(hip[0]+tw_/2-1.5,hip[1]+2,sh[0]+tw_/2-1.5,sh[1]-1,1,lt(c.top));
-  if(c.id!=='kiss')B(c.pant,hip[0]-hw,hip[1]-hw,tw_,3);
-  switch(c.id){
-  case'bibi':{const a=tp(.98),b=tp(.86),c2=tp(.42);seg(a[0]+1,a[1],b[0]+1,b[1],4,'#f4f4f0');seg(b[0]+1,b[1],c2[0]+1,c2[1],2,'#3a6ad0');B('#2a50a8',b[0],b[1]-1,3,2);seg(a[0]-3,a[1]-1,c2[0]-3,c2[1],1,'#1a2238');break}
-  case'kiss':{const a=tp(.62);g.save();g.translate(Math.round(a[0]+1),Math.round(-a[1]));heart(0,0,'#ffe0ec');g.restore();B('#f8d030',hip[0]-hw,hip[1]-hw+2,tw_,2);B('#c02030',hip[0]-hw,hip[1]-hw,tw_,2);break}
-  case'mama':{seg(hip[0]+2,hip[1],sh[0]+2,sh[1],3,'#eadcc8');const a=tp(.35),b=tp(.65);B('#f8d030',a[0]+4,a[1],1,1);B('#f8d030',b[0]+4,b[1],1,1);break}}}
- // ---- front leg (shorts flare, cuffs, knee plates)
- limb([hip[0]+1.5,hip[1]],fl[0],fl[1],lw,c.pant,c.shin);
- if(c.id==='will'){const h_=[hip[0]+1.5,hip[1]];for(const[k0,col]of[[bl,dk('#d83030')],[fl,'#d83030']]){const q=lerpP(k0===bl?[hip[0]-1.5,hip[1]]:h_,k0[0],.85);B(K,q[0]-4,q[1]-2,9,4);B(col,q[0]-3,q[1]-1,7,2);B('#f4f4f4',q[0]+2,q[1]-1,1,2)}
-  for(const k0 of[bl,fl]){const e=k0[1];B(K,e[0]-3,e[1]+2,7,3);B('#f4f4f4',e[0]-2,e[1]+3,5,1)}}
- if(c.id==='marcus')for(const k0 of[bl,fl]){const e=k0[1];B(K,e[0]-4,e[1]+2,9,3);B('#2a2a34',e[0]-3,e[1]+3,7,1)}
- if(c.id==='chrome')for(const k0 of[bl,fl]){const k_=k0[0];B(K,k_[0]-3,k_[1]-3,7,7);B('#5a6272',k_[0]-2,k_[1]-2,5,5);B('#c8d0dc',k_[0]-1,k_[1]+1,2,1)}
- if(c.id==='louie')for(const k0 of[bl,fl]){const k_=k0[0];B('#e89040',k_[0]-4,k_[1]-1,2,2);B(K,k_[0]-5,k_[1]-1,1,1)}
- foot(fl[1],c.shoe);
- // ---- neck and head
- seg(sh[0]+1,sh[1]-1,nk[0],nk[1]+1,5,K);seg(sh[0]+1,sh[1]-1,nk[0],nk[1]+1,3,c.id==='chrome'?'#5a6272':c.id==='louie'?'#e89040':c.skin);
- if(c.id==='marcus'){const q=at(.98,0);B(K,q[0]-4,q[1]-1,9,3);B('#c86818',q[0]-3,q[1],7,1)}
+ const ax=Math.cos(P[2]),ay=-Math.sin(P[2]),tp=k=>lerp2(hip,sh,k),at=(k,d)=>{const q=tp(k);return[q[0]+ax*d,q[1]+ay*d]};
+ const ph=((G.t*6)|0)%4,key=c.id+'|'+P.map(v=>Math.round(v*4)).join(',')+'|'+(o.head?1:0)+'|'+Math.round(sway*3)+'|'+ph;
+ let spr=SPCACHE.get(key);
+ if(!spr){
+  const sk=c.skin,arm=c.arm,fore=c.fore,top=c.top,pant=c.pant,shin=c.shin,shoe=c.shoe;
+  const ar=2.2*bulk*thin,lr=2.8*bulk*thin;
+  const fist=(e,dir,col)=>{if(U.mech){vpoly([[e[0]-2.5,e[1]-2.5],[e[0]+3.5,e[1]-2.5],[e[0]+3.5,e[1]+2.5],[e[0]-2.5,e[1]+2.5]],'#3a4050');vcirc(e[0]+.5,e[1]+.5,1.6,'#5a6272');return}
+   if(U.dog){vcirc(e[0]+.5,e[1],2.6,'#e0c8a8');vcirc(e[0]+1,e[1]+.5,2,'#fff0d8');return}
+   vcirc(e[0]+.5,e[1],2.7,dk(col));vcirc(e[0]+.9,e[1]+.5,2.1,col);vcirc(e[0]+1.4,e[1]+1.2,.9,lt(col))};
+  const footF=(k0,col)=>{const e=k0[1];if(U.dog){vcap([e[0]-2,e[1]-1],[e[0]+3.5,e[1]-1.2],2.4,2,'#c87830');vcap([e[0]-1.5,e[1]-.5],[e[0]+3.5,e[1]-.7],1.7,1.4,'#fff0d8');return}
+   const h_=U.boots?2.8:2.3;vpoly([[e[0]-3.5,e[1]-3],[e[0]+5.5,e[1]-3],[e[0]+6,e[1]-1.2],[e[0]+3,e[1]+h_],[e[0]-3,e[1]+h_]],dk(col));
+   vpoly([[e[0]-2.8,e[1]-2.2],[e[0]+5,e[1]-2.2],[e[0]+5.2,e[1]-1],[e[0]+2.6,e[1]+h_-.8],[e[0]-2.6,e[1]+h_-.8]],col);
+   vpoly([[e[0]-3.5,e[1]-3],[e[0]+5.5,e[1]-3],[e[0]+5.5,e[1]-2.2],[e[0]-3.5,e[1]-2.2]],U.boots?'#2a1a10':'#c8c8d0')};
+  const armDraw=(rt,el,wr,c1,c2,back)=>{const d_=back?dk:x=>x;
+   if(U.puffer){vlimb(rt,el,ar*1.5,ar*1.25,d_('#c8d0dc'));vlimb(el,wr,ar*.8,ar*.7,d_('#5a6272'));vcirc(el[0],el[1],ar*.9,d_('#3a4050'));vcirc(el[0]+.4,el[1]+.4,ar*.5,d_('#8a92a0'))}
+   else if(U.dog){vlimb(rt,el,ar*1.2,ar,d_('#e89040'));vlimb(el,wr,ar*.95,ar*.8,d_('#e89040'));vcap(lerp2(el,wr,.2),lerp2(el,wr,.95),ar*.4,ar*.35,d_('#fff0d8'))}
+   else{vlimb(rt,el,ar*1.1,ar*.95,d_(c1));vlimb(el,wr,ar*.9,ar*.7,d_(c2));
+    if(U.sleeve){vlimb(rt,lerp2(rt,el,U.sleeve+.1),ar*1.25,ar*1.1,d_(top),0)}
+    if(U.cuffs)vcap(lerp2(el,wr,.78),lerp2(el,wr,.9),ar*.95,ar*.95,d_(dk(c2)))}
+   fist(wr,1,d_(U.puffer?'#d0d8e4':sk))};
+  const legDraw=(k0,root,back)=>{const d_=back?dk:x=>x,kn=k0[0],an=k0[1];
+   if(U.dog){vlimb(root,kn,lr*1.25,lr*.95,d_('#e89040'));vlimb(kn,an,lr*.85,lr*.6,d_('#e89040'));vcirc(kn[0]-1,kn[1],1.2,d_('#f8b070'))}
+   else{vlimb(root,kn,lr*1.05,lr*.85,d_(pant));vlimb(kn,an,lr*.8,lr*.62,d_(shin));
+    if(U.shorts){vlimb(root,lerp2(root,kn,.82),lr*1.14,lr*1.04,d_(pant));vcap(lerp2(root,kn,.15),lerp2(root,kn,.8),.55,.55,d_('#f4f4f4'))}
+    if(U.socks)vcap(lerp2(kn,an,.82),lerp2(kn,an,.98),lr*.68,lr*.62,d_(U.socks));
+    if(U.mech){vcirc(kn[0]+.5,kn[1],2.4,d_('#3a4050'));vcirc(kn[0]+.8,kn[1]+.3,1.4,d_('#8a92a0'))}
+    if(U.boots)vcap(lerp2(kn,an,.82),lerp2(kn,an,.95),lr*.72,lr*.72,d_('#2a2a34'))}
+   footF(k0,d_(shoe))};
+  // ---- layer 0: behind the body (hair, cape, tail, back arm, back leg)
+  SPLX.forEach(x=>{x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,SPW,SPH);x.setTransform(1,0,0,-1,SPX,SPY)});
+  VX=SPLX[0];
+  if(U.cape){const cx=hip[0]-10-sway*6,cy=hip[1]-8+Math.sin(ph)*1;vpoly([[sh[0]-3,sh[1]],[sh[0]+1,sh[1]-1],[cx+2,cy],[cx-4,cy-2]],'#a01828');vpoly([[sh[0]-2,sh[1]-1],[sh[0],sh[1]-2],[cx+1,cy+1],[cx-3,cy]],'#d02030')}
+  if(U.dog){const wg=[0,1,0,-1][ph],tx=hip[0]-8,ty=hip[1]+3+wg;vcirc(tx,ty,5,'#c87830');vcirc(tx+.6,ty+.6,4,'#e89040');vcirc(tx+1,ty+.4,2.2,'#fff0d8');vcirc(tx+1.4,ty+.6,1,'#e89040')}
+  if(U.hair){const top_=htop-7,len=U.hairLen,sw_=-sway*3+[0,.6,0,-.6][ph],x0=hx0+5,x1=sh[0]-4+sw_,y1=sh[1]-len,L=[],R=[];
+   for(let i=0;i<=8;i++){const k=i/8,cx=x0+(x1-x0)*k+Math.sin(k*4.5+ph*.5)*1.1,cy=top_+(y1-top_)*k,w=4.6*(1-k*.55);L.push([cx-w,cy]);R.push([cx+w*.7,cy])}
+   const pts=L.concat(R.reverse());vpoly(pts,dk(U.hair));vpoly(pts.map(([x,y])=>[x+.7,y+.3]),U.hair);vcap([x0+1,top_-1],[x1+.5,y1+2],.6,.5,lt(U.hair));
+   if(U.hairEnd){const e=L[8],f_=L[6];vpoly([[e[0],e[1]],[e[0]+4,e[1]],[f_[0]+5,f_[1]],[f_[0]+1,f_[1]]],U.hairEnd)}}
+  if(U.mech){for(let i=0;i<6;i++){const sx=hx0+3+i*1.7,ex=sh[0]-9+i*2-sway*4,ey=sh[1]-12-(i%3)*3;vcap([sx,htop-6],[ex,ey],1,.9,i%2?'#1e1618':'#2e2224')}}
+  armDraw(BRT,ba[0],ba[1],c.arm,c.fore,1);legDraw(bl,[hip[0]-1.5,hip[1]],1);
+  // ---- layer 1: body (front leg, torso, neck, collar bits)
+  VX=SPLX[1];
+  legDraw(fl,[hip[0]+1.5,hip[1]],0);
+  if(U.hood){const q=at(.96,-3.6);vcirc(q[0],q[1]+1,4.6,dk(top));vcirc(q[0]+.6,q[1]+1.4,3.4,top)}
+  {const w=U.torso,pts=(e,cut)=>{const W_=t=>t<.35?w[0]+(w[1]-w[0])*t/.35:t<.7?w[1]+(w[2]-w[1])*(t-.35)/.35:w[2]+(w[3]-w[2])*(t-.7)/.3,L=[],R=[];
+    for(let i=0;i<=8;i++){const t=i/8,ww=(W_(t)+e)*(t>.86?1-(t-.86)*1.6:1);L.push(at(t,-ww));R.push(at(t,ww*(cut||1)))}return L.concat(R.reverse())};
+   vpoly(pts(.3),dk(top));vpoly(pts(0).map(([x,y])=>[x+.8,y+.3]),top);vpoly(pts(-2.4,.95).map(([x,y])=>[x+2.2,y+.6]),lt(top));vpoly(pts(-2.4,.95).map(([x,y])=>[x+1.6,y+.3]),top);
+   vcap(at(.02,-w[0]+.5),at(.02,w[0]-.5),1.6,1.6,U.dog?'#e89040':pant)}
+  if(U.dog){vpoly([at(.08,1),at(.08,U.torso[0]-.5),at(.8,U.torso[2]-.5),at(.95,1.5),at(.6,.8)],'#fff0d8')}
+  if(U.puffer){for(const t of[.18,.36,.54,.72]){vcap(at(t,-U.torso[1]+.8),at(t,U.torso[1]-.8),.55,.55,'#8a92a0')}vcap(at(.04,.6),at(.97,.6),.5,.5,'#3a4050');vcirc(at(.99,.2)[0],at(.99,.2)[1],2.6,'#1c1c24')}
+  if(U.suit){vpoly([at(1,-1.5),at(1,2.5),at(.62,.8)],'#f4f4f0');vpoly([at(.95,.4),at(.95,1.4),at(.45,1.2),at(.4,.6)],'#3a6ad0')}
+  if(c.id==='marcus'){for(const d_ of[1.2,3]){vcap(at(.95,d_),at(.72,d_),.45,.45,'#f4f4f4')}vpoly([at(.35,-1),at(.35,5),at(.12,5.6),at(.12,-1.4)],dk(top))}
+  if(c.id==='will'){vcap(at(.96,-1),at(.96,2.5),1,1,sk);const g_=at(.62,1.8);vcirc(g_[0],g_[1],1,'#f8d030')}
+  if(c.id==='erin')vcap(at(.06,-U.torso[0]+.4),at(.06,U.torso[0]-.4),1.1,1.1,dk(top));
+  vcap([sh[0]+1,sh[1]-1],[nk[0],nk[1]+1],1.7,1.5,U.mech?'#5a6272':U.dog?'#e89040':sk);
+  if(U.dog){vcap([sh[0]-3.5,sh[1]+1],[sh[0]+4.5,sh[1]+1.3],1.3,1.3,'#c02028');vcirc(sh[0]+2.5,sh[1]-.8,1,'#d8b040')}
+  if(U.puffer){const a2=at(.86,0);for(let i=0;i<5;i++)vcirc(a2[0]-3+i*1.6,a2[1]+1-Math.abs(i-2)*1.4,.8,'#e8ecf4');const p_=at(.58,.5);vcirc(p_[0],p_[1],2.2,'#dcdce8');vcirc(p_[0]+1.6,p_[1]+.4,1.6,'#dcdce8')}
+  // ---- layer 2: the front arm
+  VX=SPLX[2];armDraw(FRT,fr[0],fr[1],c.arm,c.fore,0);
+  [0,1,2].forEach(spBake);
+  spr=spMk();const sx=spr.getContext('2d');SPL.forEach(L=>sx.drawImage(L,0,0));
+  if(SPCACHE.size>400)SPCACHE.delete(SPCACHE.keys().next().value);SPCACHE.set(key,spr)}
+ // the finished sprite, then the head on its neck, then props
+ g.drawImage(spr,-SPX,-SPY);
  g.drawImage(hI,hx0,hy0);
  if(c.id==='chrome'){B(K,hx0-2,hd[1]-3,4,7);B('#3a4050',hx0-1,hd[1]-2,2,5);B(K,hx0+hw2-2,hd[1]-3,4,7);B('#3a4050',hx0+hw2-1,hd[1]-2,2,5)}
- if(c.id==='louie'){B('#c02028',sh[0]-4,sh[1]+1,9,2);for(let i=0;i<9;i+=2)B('#2a1418',sh[0]-4+i,sh[1]+1+(i%4?1:0),1,1);B('#e04040',sh[0]-4,sh[1]+2,9,1);B('#d8b040',sh[0]+2,sh[1]-2,2,3)}
  if(o.daze){for(let i=0;i<3;i++){const a=G.t*6+i*2.1;B('#f8e060',hd[0]+Math.cos(a)*8,htop+2+Math.sin(a)*2,2,2)}}
  if(o.zz){text('Z',Math.round(hd[0]+6),Math.round(-htop-12-((G.t*8)%8)),1,'#b0d0ff')}
- // ---- front arm
- const FRT=[sh[0]+1,sh[1]-2];
- limb(FRT,fr[0],fr[1],aw,c.arm,c.fore);
- if(c.id==='will')sleeve(FRT,fr[0],.55,aw,'#24222c');
- if(c.id==='marcus')band(fr[0],fr[1],.9,aw+1,'#c86818');
- if(c.id==='chrome'){sleeve(FRT,fr[0],.95,aw+1,'#c8d0dc');B(K,fr[0][0]-3,fr[0][1]-3,6,6);B('#5a6272',fr[0][0]-2,fr[0][1]-2,4,4);B('#c8d0dc',fr[0][0]-1,fr[0][1],1,1)}
- if(c.id==='louie'){const q=lerpP(fr[0],fr[1],.4);B('#fff0d8',q[0],q[1],2,3)}
- hand(fr[1],c.id==='chrome'?'#d0d8e4':c.skin);
  const hx=fr[1][0],hy=fr[1][1];
  if(o.prop==='phone'){B(K,hx+1,hy-2,5,8);B('#30303c',hx+2,hy-1,3,6);B('#80d0ff',hx+2,hy+1,3,3)}
  if(o.prop==='cup'){B(K,hx,hy,7,9);B('#f4f4f4',hx+1,hy+1,5,7);B('#8a5a34',hx+1,hy+2,5,3);B('#e0e0e0',hx+1,hy+7,5,1)}
