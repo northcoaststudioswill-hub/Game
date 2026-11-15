@@ -21,6 +21,34 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v6.0 — one button, like Sprouts; who chops what; quieter people (Fable)
+
+From Will's notes and a real-time playtest of my own.
+
+**Controls now match the original Sprouts.**
+- A does everything. Face something sprouts can work and the ring locks on to it; A throws, and holding A keeps throwing. B only calls them back (which is what the handheld's B button says).
+- The ring locks on in a wide cone in front of you and to anything right beside you, so you do not have to line up.
+- The right kind of sprout steps up by itself: PEB for heavy loads, DEW for berries, the matching kind for a gate, the buddy's own kind for a wild. SELECT overrides for a few seconds. If the squad lacks the kind a gate needs, the ring turns red and says which.
+- Holding A spreads the squad: a load that already has enough carriers is passed over for the next one.
+- With nothing locked on, A throws nothing. Idle sprouts walk back by themselves after a few seconds.
+
+**Who does what.**
+- Sprouts pick berries and carry. They no longer chop trees or crack rocks.
+- Trees are felled by a buddy with LUMBER (leaf kinds), rocks by a buddy with MINE (rock kinds): stand next to one and press A. Or do it yourself by hand, slowly.
+- What a buddy fells drops as a log or stone for the sprouts to carry home.
+
+**People talk less.** One speech bubble at a time with a pause between them, each a single short line. Idle chatter starts only after the opening and comes every half-minute or so, when you are nearby.
+
+**Found in my playtest.**
+- The opening stalled: all three sprouts piled onto one berry. Fixed by the spreading above; the Lantern now wakes about 12 seconds after the first throw.
+- Louie stood where you greet your first buddy, so A petted him instead. Louie and people are now the last thing A considers.
+- A stray press of A threw sprouts at empty ground and left them behind. Fixed by throwing nothing without a target.
+- The three dim buddies now walk in toward the light instead of appearing.
+- KISS ambushed you three steps into the Meadow, before your first wild fight. He now waits near the north gate.
+- The ring's label read "1 · 1" for berries. It names the load and its weight now.
+
+Tests: `field-lab.js` 76/76.
+
 ## v5.9 — its own letters, and people who talk (Fable)
 
 From Will's iPhone screenshots.

@@ -18,7 +18,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
   for(let i=0;i<60;i++)step(1,['down']);ok('the south road is closed before the Lantern wakes',!F.fld());
   for(let n=0;n<3;n++){const b=bf.buds[0];F.setPos(b.x,b.y+13);step(2,['up']);tap('a');step(4)}
   ok('plucking them gives a squad of three',bf.sq.length===3&&F.op()===1,bf.sq.length);
-  for(let n=0;n<3;n++){const it=bf.items.find(i=>i.op&&!i.car.length);if(!it)break;F.setPos(it.x+40,it.y+2);step(2,['left']);for(const q of bf.sq)if(q.st==='follow'){q.x=F.pos().x+8;q.y=F.pos().y}step(4);tap('b');step(20)}
+  for(let n=0;n<3;n++){const it=bf.items.find(i=>i.op&&!i.car.length);if(!it)break;F.setPos(it.x+40,it.y+2);step(2,['left']);for(const q of bf.sq)if(q.st==='follow'){q.x=F.pos().x+8;q.y=F.pos().y}step(4);tap('a');step(20)}
   step(500);ok('thrown sprouts carry the berries home and the Lantern stirs',!!S.lit&&F.op()===2,S.fedN);
   F.setPos(240,170);step(2,['up']);step(2);ok('dim buddies come to the light',F.near()&&F.near().k==='choice',F.near()&&F.near().k);
   tap('a');step(4);tap('a');step(10);tap('a');step(10);ok('greeting one makes it your first buddy',S.party.length===1&&S.quest===2,S.quest);
@@ -30,35 +30,39 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
  step(3);ok('the pouch walks with you as a squad',f.sq.length===10,f.sq.length);
  f.npcs.forEach(n=>{if(n.team)S.fl[n.fk]=1});
  /* throw + whistle */
- at(17,20,[0,-1]);step(20);tap('b');step(4);ok('B throws a sprout',f.sq.some(s=>s.st==='fly'||s.st==='idle'),f.sq.map(s=>s.st).join(','));
- step(30);ok('a thrown sprout waits where it lands',f.sq.filter(s=>s.st==='idle'||s.st==='ret').length>=1);
+ at(17,20,[0,-1]);step(20);tap('a');step(4);ok('with nothing locked on, A throws nothing',f.sq.every(s=>s.st==='follow'),f.sq.map(s=>s.st).join(','));
+ {const bs=F.nodes().find(n=>n.k==='bush');F.setPos(bs.x,bs.y+34);f.dir=[0,-1];for(const q of f.sq){q.x=F.pos().x;q.y=F.pos().y+8}step(4);tap('a');step(4);ok('A throws a sprout at what the ring locked on',f.sq.some(s=>s.st==='fly'||s.st==='work'),f.sq.map(s=>s.st).join(','));ok('the right kind steps up by itself (DEW for berries)',S.selType===2,S.selType)}
  at(17,14,[0,-1]);step(2);const before=f.sq.filter(s=>s.st==='follow').length;
- at(17,19,[0,-1]);step(40,['b']);step(40);ok('holding B whistles them back',f.sq.every(s=>s.st==='follow'),f.sq.map(s=>s.st).join(','));
+ at(17,19,[0,-1]);for(const it of f.items)it.car=[];for(const q of f.sq){q.tg=null;q.st='idle';q.t=0;q.x=F.pos().x+30;q.y=F.pos().y+4}step(40,['b']);step(40);ok('holding B whistles them back',f.sq.every(s=>s.st==='follow'),f.sq.map(s=>s.st).join(','));
  /* bridge */
- at(15,12,[-1,0]);step(15);for(let i=0;i<6;i++){tap('b');step(5)}
+ at(15,12,[-1,0]);step(15);for(let i=0;i<6;i++){tap('a');step(5)}
  ok('sprouts take the bridge job',f.sq.filter(s=>s.st==='work').length>=4,f.sq.filter(s=>s.st==='work').length);
  step(600);const site=f.sites[0];ok('the bridge gets built',site.done&&f.t[12][10]==='=',site.hp);
  /* carry the island treasure home (weight 3) */
  step(40,['b']);step(20);at(10,12,[-1,0]);step(15);
- const tre=f.items.find(i=>i.n==='ACORN CROWN');tap('b');step(20);
+ const tre=f.items.find(i=>i.n==='ACORN CROWN');tap('a');step(20);
  ok('one sprout cannot lift weight 3',tre&&tre.car.length===1&&Math.abs(tre.x-(7*T+8))<1,tre&&tre.car.length);
- tap('b');step(6);tap('b');step(900);
+ tap('a');step(6);tap('a');step(900);
  ok('three sprouts carry it to the beacon',S.fl[tre.fk]===1&&S.res.petal>=40,S.res.petal);
  ok('carriers come back after delivery',f.sq.every(s=>s.st!=='carry'));
  /* type gate */
- step(40,['b']);step(30);at(22,9,[0,-1]);step(15);tap('b');step(30);const gate=f.gates[0];
+ step(40,['b']);step(30);at(22,9,[0,-1]);step(15);tap('a');step(30);const gate=f.gates[0];
  ok('wrong kind bounces off the boulder wall',!gate.open&&gate.hp===gate.max,gate.hp);
  at(5,4,[0,-1]);step(4);const bud=f.buds.find(q=>q.type===1);F.setPos(bud.x,bud.y+12);f.dir=[0,-1];step(3);tap('a');step(3);
  ok('plucking a buried PEB sprout adds it to the squad',S.buds.PEB===1&&f.sq.some(s=>s.type===1),S.buds.PEB);
- at(22,9,[0,-1]);step(40,['b']);step(30);at(22,9,[0,-1]);step(10);tap('b');step(500);
+ at(22,9,[0,-1]);step(40,['b']);step(30);at(22,9,[0,-1]);step(10);tap('a');step(500);
  ok('a PEB sprout cracks the boulder wall',gate.open,gate.hp);
  at(22,9,[0,-1]);step(60,['up']);ok('the keeper can walk through the opened gate',F.pos().y<8*T+6,Math.round(F.pos().y));
  /* ledge */
  at(28,7,[0,1]);step(30,['down']);ok('ledges hop down',F.pos().y>9*T,Math.round(F.pos().y));
  at(28,9,[0,-1]);step(30,['up']);ok('ledges do not climb',F.pos().y>8*T+8,Math.round(F.pos().y));
  /* node -> pellet -> home */
- step(40,['b']);step(40);const w0=S.res.wood;const nd=F.nodes().find(n=>n.k==='tree'&&!n.got);F.setPos(nd.x+2,nd.y+22);f.dir=[0,-1];step(15);for(let i=0;i<5;i++){tap('b');step(5)}step(1500);
- ok('sprouts fell a tree and haul the log home',nd.got&&S.res.wood>w0,S.res.wood);
+ step(40,['b']);step(40);const w0=S.res.wood;const nd=F.nodes().find(n=>n.k==='tree'&&!n.got);F.setPos(nd.x+2,nd.y+16);f.dir=[0,-1];for(const q of f.sq){q.x=F.pos().x;q.y=F.pos().y+8}step(6);
+ ok('sprouts do not target trees',!f.sq.some(q=>q.st==='work')&&F.near()&&F.near().txt==='CHOP BY HAND',F.near()&&F.near().txt);
+ F.giveMon('FERNFANG',8);S.party.unshift(S.party.pop());step(3);ok('a LUMBER buddy offers to chop',F.near()&&F.near().txt==='SEND FERNFANG TO CHOP',F.near()&&F.near().txt);
+ tap('a');step(200);ok('the buddy fells the tree and it drops a log',nd.got&&f.items.some(i=>i.res==='wood'),nd.hp);
+ {const lg=f.items.find(i=>i.res==='wood');F.setPos(lg.x,lg.y+30);f.dir=[0,-1];for(const q of f.sq){q.x=F.pos().x;q.y=F.pos().y+8;q.st='follow'}step(6);for(let i=0;i<3;i++){tap('a');step(6)}step(1500)}
+ ok('sprouts carry the log home',S.res.wood>w0,S.res.wood);S.party.push(S.party.shift());
  /* alpha guards its treasure */
  const al=f.alphas[0],gt=f.items.find(i=>i.guard);ok('an alpha guards the plateau treasure',!!al&&!!gt);
  /* walking off the edge travels; arriving puts you by the matching exit */
@@ -104,9 +108,9 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
  ok('all six sectors build, update and draw',true);
  /* Sunkeep: same squad, same orders, loot goes to the Lantern */
  S.bottieSeen=1;S.bottieBeat=1;F.enter('BASE');step(5);G.draw();const bf=F.bf();ok('sunkeep has the squad too',!F.fld()&&!!bf&&bf.sq.length>0,bf&&bf.sq.length);
- {const nd=F.nodes().find(n=>n.k==='tree'),w1=S.res.wood;F.setPos(nd.x,nd.y+26);step(2,['up']);for(const q of bf.sq){q.x=F.pos().x;q.y=F.pos().y+8;q.st='follow'}step(10);
-  for(let i=0;i<5;i++){tap('b');step(5)}ok('B throws at home',bf.sq.filter(q=>q.st==='work'||q.st==='fly').length>=3,bf.sq.map(q=>q.st).join(','));
-  step(1800);G.draw();ok('sprouts fell a Sunkeep tree and carry the log to the Lantern',nd.got&&S.res.wood>w1,S.res.wood-w1);
+ {const nd=F.nodes().find(n=>n.k==='bush'),w1=S.res.berry;F.setPos(nd.x,nd.y+30);step(2,['up']);for(const q of bf.sq){q.x=F.pos().x;q.y=F.pos().y+8;q.st='follow'}step(10);
+  for(let i=0;i<4;i++){tap('a');step(5)}ok('sprouts are thrown at home too',bf.sq.filter(q=>q.st==='work'||q.st==='fly').length>=3,bf.sq.map(q=>q.st).join(','));
+  step(1800);G.draw();ok('sprouts pick a Sunkeep berry bush and carry the berries to the Lantern',nd.got&&S.res.berry>w1,S.res.berry-w1);
   step(40,['b']);step(60);ok('whistle works at home',bf.sq.every(q=>q.st==='follow'),bf.sq.map(q=>q.st).join(','))}
  /* Palworld-style work: buddies at home pick jobs by skill, goods are carried to the Lantern */
  {S.box=[];S.party=S.party.slice(0,1);S.craftQ=[];S.buildings=[];S.crew=[];F.build('kiln',4,8);F.build('bench',8,8);F.build('quarry',14,8);

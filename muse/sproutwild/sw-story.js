@@ -27,18 +27,18 @@ const wLit=()=>!!SW.lit||SW.quest>=2;
 const wOp=()=>SW.quest>=2?3:SW.lit?2:(SW.seeds&&SW.seeds.length)?0:1;
 function wQuestText(){const op=wOp();
  if(op===0)return'Pluck the glowing seeds';
- if(op===1)return'B: throw sprouts at the berries';
+ if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
  if(SW.quest===2)return'South road: tire a wild, then SWARM';
  return WQUEST[SW.quest]}
 function wNextGoal(){const op=wOp(),F=W4.bf;
- if(op===0){const p=WSEEDPOS[SW.seeds[0]];return{x:p[0]-14,y:p[1]+4,label:'Woof! Something glows in the roots. Pluck it! (A)'}}
- if(op===1){const it=F&&F.items.find(i=>i.op);return it?{x:it.x-14,y:it.y+8,label:'Berries! Face them and press B. The sprouts know the way home.'}:{x:226,y:108,label:'They are carrying it to the Lantern. Good sprouts.'}}
- if(op===2)return{x:226,y:176,label:'They are dim, not mean. Walk up and say hello. (A)'};
- if(SW.quest===2)return{x:228,y:(W4.wh||520)-40,label:'The south road goes to the Meadow. Tire a wild buddy out, then let the sprouts SWARM it.'};
- if(!SW.buildings.some(b=>b.k==='cottage'))return{x:150,y:230,label:'Open ground. START, then BUILD: a COTTAGE first. Meadow trees have the wood.'};
- if(!SW.buildings.some(b=>b.k==='bed'))return{x:330,y:230,label:'Now a GARDEN BED. Buddies who stay home will work it.'};
- if(wBaseReady())return{x:226,y:104,label:'The missions are done! Ask the Lantern to grow.'};
+ if(op===0){const p=WSEEDPOS[SW.seeds[0]];return{x:p[0]-14,y:p[1]+4,label:'Woof! It glows. Pluck it!'}}
+ if(op===1){const it=F&&F.items.find(i=>i.op);return it?{x:it.x-14,y:it.y+8,label:'Berries! Face them. Press A.'}:{x:226,y:108,label:'Good sprouts.'}}
+ if(op===2)return{x:206,y:204,label:'Dim, not mean. Say hello.'};
+ if(SW.quest===2)return{x:228,y:(W4.wh||520)-40,label:'This way! The south road.'};
+ if(!SW.buildings.some(b=>b.k==='cottage'))return{x:150,y:230,label:'Good spot for a cottage. START, BUILD.'};
+ if(!SW.buildings.some(b=>b.k==='bed'))return{x:330,y:230,label:'A garden bed could go here.'};
+ if(wBaseReady())return{x:226,y:104,label:'The Lantern is ready to grow!'};
  return null}
 function wLouieTip(){const tips=[
  'Four things carried home and the Lantern grows a new sprout. That is how you get more of us. Them. Woof.',
@@ -52,7 +52,7 @@ function wLouieTip(){const tips=[
  'King Bibi says the dome is temporary. I am a dog and even I do not believe him.'];
  SW.talkN.LOUIE=(SW.talkN.LOUIE||0)+1;return tips[(SW.talkN.LOUIE-1)%tips.length]}
 function wLouTalk(){if(!(W4.petCd>0)){W4.petCd=18;if(Math.random()<.5){SW.hearts++;SW.heartsTotal++;W4.floats.push({x:lou.x,y:lou.y-16,txt:'+1 ♥',t:1.2,c:'#f078c0'})}}
- swSnd(988,.06,1318);const g2=wNextGoal();wQuip('LOUIE',g2?g2.label:wLouieTip());swSave()}
+ swSnd(988,.06,1318);const g2=wNextGoal();wQuip('LOUIE',g2?g2.label:wLouieTip(),true);swSave()}
 /* Louie runs ahead to whatever is next and waits for you; with nothing to show he just keeps you company */
 function wLouTick(dt){if(W4.petCd>0)W4.petCd-=dt;const g2=wNextGoal();let tx=lou.x,ty=lou.y;const dp=Math.hypot(P3.x-lou.x,P3.y-lou.y);
  if(g2){const dg=Math.hypot(g2.x-lou.x,g2.y-lou.y);W4.louLead=dg>8?1:2;if(dg>8&&dp<96){tx=g2.x;ty=g2.y}else if(dp>150){tx=P3.x;ty=P3.y}}
@@ -62,7 +62,8 @@ function wPluckSeed(b){const F=W4.bf,tn=TYPES[b.type].n;F.buds.splice(F.buds.ind
  W4.floats.push({x:b.x,y:b.y-16,txt:'A '+tn+' SPROUT!',t:1.6,c:TYPES[b.type].l});swSnd(880,.07,1320);
  if(!SW.seeds.length)SW.quest=Math.max(SW.quest,1);
  swSave()}
-function wLanternWake(){SW.lit=1;SW.tendDone=true;SW.tendStage=4;SW.plucked=2;SW.trioPlucked=[];SW.quest=Math.max(SW.quest,1);wInitPatch();W4.wake=3;
+function wLanternWake(){SW.lit=1;Object.assign(SW.lessons,{seed:1,folbase:1,folhaul:1,fol:1,cmd:1}); /* the old one-line lessons are covered by Erin and Marcus now */
+ SW.tendDone=true;SW.tendStage=4;SW.plucked=2;SW.trioPlucked=[];SW.quest=Math.max(SW.quest,1);wInitPatch();W4.wake=3;
  W4.banner={txt:'THE LANTERN STIRS',sub:'Its light reaches the garden — and the wilds',t:4.5};swSnd(523,.35,1046);
  swSave()}
 /* every delivery feeds the Lantern: four make a sprout. The opening's berries wake it. */
@@ -135,14 +136,6 @@ function fSpotDraw(sp){const x=Math.round(sp.x+(sp.shake>0?Math.sin(time*60)*1.5
  if(!sp.got&&((time*2)|0)%2){r('#fff3b0',x+9,y-15,1,3);r('#fff3b0',x+8,y-14,3,1)}}
 function fFetch(F,sp){const lead=SW.party.find(m=>m.hp>0);if(!lead){swSay('That is a job for a buddy, and yours needs rest.',2.4);return}
  W4.fetch={sp,ph:0,t:0};swSnd(520,.07,880);if(!SW.lessons.fetch){SW.lessons.fetch=1;swSay('Buddies fetch what sprouts cannot: ORE and FIBER. The bench turns them into gear.',4)}}
-function fFetchTick(F,dt,lead){const fe=W4.fetch;if(!fe)return false;const pt=W4.part=W4.part||{x:P3.x,y:P3.y},sp=fe.sp;
- const go=(x,y,arr)=>{const dx=x-pt.x,dy=y-pt.y,d=Math.hypot(dx,dy);if(d<arr)return true;pt.x+=dx/d*120*dt;pt.y+=dy/d*120*dt;pt.mv=true;pt.fx=dx<0?-1:1;return false};
- if(fe.ph===0){if(go(sp.x,sp.y+8,7))fe.ph=1}
- else if(fe.ph===1){fe.t+=dt;pt.mv=((time*8)|0)%2===0;sp.shake=.1;if(((fe.t*4)|0)!==(((fe.t-dt)*4)|0)){fSpark(sp.x+(Math.random()*14-7),sp.y-8-Math.random()*8,'#fff3b0');swSnd(sp.k==='ore'?180:300,.03,120)}
-  if(fe.t>=2.2){sp.got=true;fe.ph=2}}
- else if(go(P3.x,P3.y+6,16)){const wk=wSp(lead.sp).work||{},good=sp.k==='ore'?(wk.QUARRY||wk.KINDLING):(wk.PLANTING||wk.WATERING),n=2+(good?1:0);
-  SW.res[sp.k]=(SW.res[sp.k]||0)+n;W4.floats.push({x:P3.x,y:P3.y-22,txt:'+'+n+' '+sp.k.toUpperCase()+' — '+lead.sp+' fetched it!'+(good?' (good at this)':''),t:2.2,c:'#ffd94d'});swSnd(784,.08,1175);W4.fetch=null;swSave()}
- return true}
 /* Louie in the field: keeps up, and herds stray sprouts back like he does in the garden */
 function fLouTick(F,dt){const stray=F.sq.find(s=>s.st==='idle'&&s.t>2.5&&Math.hypot(s.x-P3.x,s.y-P3.y)>44);let tx=P3.x-F.dir[0]*22+F.dir[1]*14,ty=P3.y+6-F.dir[1]*22;
  if(stray){tx=stray.x;ty=stray.y;if(Math.hypot(tx-lou.x,ty-lou.y)<10){stray.st='ret';W4.floats.push({x:lou.x,y:lou.y-12,txt:'WOOF!',t:.8,c:'#ffe8b0'});swSnd(700,.05,500)}}
@@ -165,7 +158,7 @@ function wMissionDone(key){const [k,v]=key.split(':');
 /* past the opening the strip shows the next thing the base needs, so there is always a direction */
 function wQuestText(){const op=wOp();
  if(op===0)return'Pluck the glowing seeds';
- if(op===1)return'B: throw sprouts at the berries';
+ if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
  if(SW.quest===2)return'South road: tire a wild, then SWARM';
  if(SW.quest<5)return WQUEST[SW.quest];
@@ -197,7 +190,8 @@ function drawNur(){const b=SW.buildings[W4.nurB];if(!b)return;swShell('LANTERN N
   'Dim buddies follow berries and light. It takes about a minute; a tender (WATER or PLANT) halves it.')}
 /* the keeper's guide, rewritten for how the game works now */
 WGUIDE.length=0;WGUIDE.push(
- ['SPROUTS','Sprouts are Lantern light with','legs. They walk with you.','B throws one at the ring.','Hold B and they all come back.','SELECT picks which kind goes','next. They carry, chop, break','and build, all on their own.'],
+ ['SPROUTS','Sprouts are Lantern light with','legs. They walk with you.','A throws one at whatever the','ring has locked on to. The','right kind steps up by itself.','Hold B to call them back.','They pick, carry and build.'],
+ ['TREES AND ROCKS','Sprouts do not chop. A buddy','with LUMBER (leaf kinds) fells','trees; one with MINE (rock','kinds) cracks rock. Press A','next to one. You can do it by','hand, slowly. Sprouts carry','what falls.'],
  ['THE LANTERN','Everything carried to a Lantern','feeds it: wood, stone, berries,','treasure. Four deliveries and','it grows a new sprout. The','Great Lantern at home also','heals you, sells plans and','sends you to posts you lit.'],
  ['BUDDIES','Wild buddies went dim when','the Lantern cracked. Walk up','and press A to battle, or','throw a sprout at one. Tire','it out, then SWARM: kin','sprouts bloom best. No sprout','is ever used up.'],
  ['ORE AND FIBER','Sprouts cannot get these.','Find a vein or a thicket and','press A: your lead buddy','fetches it. Beaten wilds drop','them too. The bench turns','them into a SEED POUCH, a','CLIMBING ROPE, better tools.'],
@@ -207,3 +201,27 @@ WGUIDE.length=0;WGUIDE.push(
 /* gear: ore finally matters */
 WRECIPES.splice(2,0,{id:'rope',n:'CLIMBING ROPE',cost:{fiber:6,ore:2},need:20,d:'Climb ledges from below. Opens shortcuts and high ground in every sector.'});
 {const kd=wBuildDef('kiln');kd.d='Smelts ORE into ingots. Needs a KINDLE worker, and ore: buddies fetch it from veins.'}
+/* ================================================================
+   v6.0 — who does what, from Will's notes
+   Sprouts pick berries and carry. Trees and rocks are felled by a
+   buddy with the skill (LUMBER for trees: leaf kinds; MINE for
+   rocks: rock kinds), or by you, slowly, by hand. What a buddy
+   fells drops as a log or stone for the sprouts to carry home.
+   ================================================================ */
+function wLeadSkill(kind){const lead=SW.party.find(m=>m.hp>0);if(!lead)return 0;const sk=wkSkills({kind:'b',ref:lead});return(kind==='tree'?sk.LUMBERING:sk.QUARRY)||0}
+function wNodeLabel(nd){const lead=SW.party.find(m=>m.hp>0),v=nd.k==='tree'?'CHOP':'MINE';return wLeadSkill(nd.k)?'SEND '+lead.sp+' TO '+v:v+' BY HAND'}
+function wNodeDrop(nd){nd.got=true;const F=W4.fld||W4.bf,y2=WNODEY[nd.k];if(!F)return;F.items.push({k:'pel',res:y2[0],n:y2[1]+1,w:nd.k==='tree'?2:3,x:nd.x,y:nd.y,car:[]});if(F.base)fFlow(F);
+ W4.floats.push({x:nd.x,y:nd.y-18,txt:nd.k==='tree'?'TIMBER! Sprouts can carry it.':'CRACKED! Sprouts can carry it.',t:1.8,c:'#ffd94d'});swSnd(220,.1,120)}
+function wNodeAct(nd){const lv=wLeadSkill(nd.k);
+ if(lv){if(W4.fld)W4.fetch={nd,ph:0,t:0,lv};else W4.cmdT={nd};swSnd(520,.07,880);return}
+ wSwing(nd);if(!SW.lessons['hand'+nd.k]){SW.lessons['hand'+nd.k]=1;swSay(nd.k==='tree'?'By hand it is slow. A buddy with LUMBER (leaf kinds) fells a tree in moments.':'By hand it is slow. A buddy with MINE (rock kinds) cracks rock in moments.',4)}}
+function fFetchTick(F,dt,lead){const fe=W4.fetch;if(!fe)return false;const pt=W4.part=W4.part||{x:P3.x,y:P3.y},sp=fe.sp||fe.nd;
+ const go=(x,y,arr)=>{const dx=x-pt.x,dy=y-pt.y,d=Math.hypot(dx,dy);if(d<arr)return true;pt.x+=dx/d*120*dt;pt.y+=dy/d*120*dt;pt.mv=true;pt.fx=dx<0?-1:1;return false};
+ if(fe.ph===0){if(go(sp.x,sp.y+9,8))fe.ph=1}
+ else if(fe.ph===1){fe.t+=dt;pt.mv=((time*8)|0)%2===0;sp.shake=.1;if(((fe.t*4)|0)!==(((fe.t-dt)*4)|0)){fSpark(sp.x+(Math.random()*14-7),sp.y-8-Math.random()*8,'#fff3b0');swSnd(fe.nd?(sp.k==='rock'?180:260):(sp.k==='ore'?180:300),.03,120)}
+  if(fe.nd){sp.hp-=(5+fe.lv*4)*dt;if(sp.hp<=0||sp.got){if(!sp.got)wNodeDrop(sp);fe.ph=2}}
+  else if(fe.t>=2.2){sp.got=true;fe.ph=2}}
+ else if(go(P3.x,P3.y+6,16)){if(!fe.nd){const wk=wSp(lead.sp).work||{},good=sp.k==='ore'?(wk.QUARRY||wk.KINDLING):(wk.PLANTING||wk.WATERING),n=2+(good?1:0);
+   SW.res[sp.k]=(SW.res[sp.k]||0)+n;W4.floats.push({x:P3.x,y:P3.y-22,txt:'+'+n+' '+sp.k.toUpperCase()+' — '+lead.sp+' fetched it!'+(good?' (good at this)':''),t:2.2,c:'#ffd94d'});swSnd(784,.08,1175);swSave()}
+  W4.fetch=null}
+ return true}

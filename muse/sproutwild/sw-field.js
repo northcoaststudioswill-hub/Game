@@ -37,11 +37,11 @@ const FMEADOW=[
  ['....""""""..,..','.::.','###############'],['..""""""""""...','.::.','#.....R....A..#'],
  ['.""""p"""""""..','.::.','#..R.......2..#'],['.""""""""""""..','.::.','#.............#'],
  ['..""""""""""...','.::.','#...,....R....#'],['...""""""""..,.','.::.','#.............#'],
- ['.,...."""".....','.::.','#..P..........#'],['...............','.::.','##x####---#####'],
+ ['.,...."""".....','.::.','#..P..........#'],['..............M','.::.','##x####---#####'],
  ['..~~~~~~~~~~...','.:::',':::............'],['.~~~~~~~~~~~~..','.::.','..""""""""""...'],
  ['.~~~~....~~~~..','.::.','.""""""""""""..'],['.~~~~.1..bbbb::',':::.','.""""""",""""..'],
  ['.~~~~....~~~~..','.::.','..""""""""""...'],['.~~~~~~~~~~~~..','.::.','...............'],
- ['..~~~~~~~~~~...','.::.','...T.......T...'],['...............','.::.','.M.............'],
+ ['..~~~~~~~~~~...','.::.','...T.......T...'],['...............','.::.','...............'],
  ['.T..W....T...,.','.::.','.R....""""""...'],['....T..B...W...','.::.','.....""""""""..'],
  ['.W.....T.......','.::.','..B..""""""""..'],['...T.....B..T..','.::.','......""""""...'],
  ['.......,.......','.::.','...T...........'],['..T..W.....T...','.::.','..........W....'],
@@ -51,7 +51,7 @@ const FMAPS={
   key:{e:{k:'exit',to:'TOWN'},h:{k:'exit',to:'BASE'},p:{k:'bud',type:1},P:{k:'bud',type:3},
    1:{k:'tre',n:'ACORN CROWN',w:3,petal:40},2:{k:'tre',n:'RUSTY FLOW PROS WRENCH',w:5,petal:60,res:['ingot',2]},
    A:{k:'alpha',sp:'BLOOMBOAR',lv:8,guards:'2'},
-   M:{k:'npc',who:'KISS',dir:[-1,0],team:[['ZIPWIG',4],['PEBBLIT',4]],prize:30,
+   M:{k:'npc',who:'KISS',dir:[1,0],team:[['ZIPWIG',4],['PEBBLIT',4]],prize:30,
     pre:['KISS: Hey. Keeper. One question.','Do your buddies even battle? Every single time, I ask. Let us find out.'],
     win:'KISS: ...Okay. One MORE question. Later.',lose:'KISS: That answers that.',after:'One question: did you try throwing sprouts at that boulder wall? PEB kinds crack rock.'}}},
  TOWN:{rows:[
@@ -266,29 +266,35 @@ const cap=Math.min(24,SW.pouch||8);
   for(let i=have.length;i<want[ty];i++)F.sq.push({type:ty,x:P3.x+(Math.random()*20-10),y:P3.y+6+Math.random()*10,z:fresh?0:8,st:'follow',a:Math.random()*9,t:0,stuck:0})}}
 function fDrop(F,s){if(s.st==='carry'&&s.tg&&s.tg.car){const i=s.tg.car.indexOf(s);if(i>=0)s.tg.car.splice(i,1)}s.tg=null}
 const fStr=it=>it.car.reduce((a,s)=>a+(s.type===1?2:1),0);
-function fAim(F){ /* the throw cursor: ahead of you, locking on to the nearest thing in front that a sprout can work */
+function fAim(F){ /* the cursor sits ahead of you and locks on to the nearest thing sprouts can work: a wide cone in front, plus anything right beside you */
  let x=P3.x+F.dir[0]*52,y=P3.y+F.dir[1]*52,best=1e9,tg=null,kind=null;
- const tryT=(o,k)=>{const vx=o.x-P3.x,vy=o.y-P3.y,al=vx*F.dir[0]+vy*F.dir[1],off=Math.abs(vx*F.dir[1]-vy*F.dir[0]);
-  if(al>2&&al<86&&off<24){const sc=al+off*1.6;if(sc<best){best=sc;tg=o;kind=k}}};
+ const tryT=(o,k)=>{const vx=o.x-P3.x,vy=o.y-P3.y,al=vx*F.dir[0]+vy*F.dir[1],off=Math.abs(vx*F.dir[1]-vy*F.dir[0]),d=Math.hypot(vx,vy);
+  let sc=1e9;if(al>-2&&al<92&&off<16+al*.42)sc=al+off*1.3;if(d<26)sc=Math.min(sc,d*.8);if(sc<best){best=sc;tg=o;kind=k}};
  for(const g2 of F.gates)if(!g2.open)tryT(g2,'gate');
  for(const s of F.sites)if(!s.done)tryT(s,'site');
- for(const it of F.items)if(!it.done)tryT(it,'item');
- for(const nd of W4.nodes)if(!nd.got)tryT(nd,'node');
+ {const b0=best;let full=null;for(const it of F.items)if(!it.done&&!(it.guard&&F.alphas.includes(it.guard))){if(fStr(it)+F.sq.filter(q=>q.st==='fly'&&q.aim&&q.aim.tg===it).reduce((a,q)=>a+(q.type===1?2:1),0)>=it.w){full=full||it;continue}tryT(it,'item')}
+  if(!tg&&full&&best===b0){const sv=best;tryT(full,'item');if(tg===full){tg=null;kind=null;best=sv;F.aimFull=full}}else F.aimFull=null}
+ for(const nd of W4.nodes)if(!nd.got&&nd.k==='bush')tryT(nd,'node'); /* sprouts pick berries; trees and rocks are buddy work */
  for(const wd of W4.wilds)tryT(wd,'wild');
  if(tg){x=tg.x;y=tg.y}
  else{let n=0;while(n++<10&&!fWalkTile(F,Math.floor(x/FT),Math.floor(y/FT))){x-=F.dir[0]*5;y-=F.dir[1]*5}}
- return{x,y,tg,kind}}
-function fThrow(F){const aim=fAim(F),cand=F.sq.filter(s=>s.st==='follow'&&Math.hypot(s.x-P3.x,s.y-P3.y)<70);
- if(!cand.length){swSnd(240,.05);W4.floats.push({x:P3.x,y:P3.y-18,txt:F.sq.length?'WHISTLE THEM BACK (HOLD B)':'NO SPROUTS — PLUCK SOME',t:1.2,c:'#e88'});return}
- const want=aim.kind==='gate'?aim.tg.type:SW.selType;
- cand.sort((a,b)=>((a.type===want?0:1)-(b.type===want?0:1))||(Math.hypot(a.x-P3.x,a.y-P3.y)-Math.hypot(b.x-P3.x,b.y-P3.y)));
- const s=cand[0];s.st='fly';s.sx=P3.x;s.sy=P3.y-6;s.tx=aim.x+(Math.random()*6-3);s.ty=aim.y+(Math.random()*6-3);s.t=0;s.aim=aim;
- swSnd(520,.07,940)}
+ /* which kind goes: what the target needs, else what suits it; SELECT overrides for a few seconds */
+ let pref=null,need=-1;
+ if(kind==='gate')pref=[tg.type];else if(kind==='item')pref=tg.w>=3?[1,0,5,3,4,2]:[3,5,0,4,2,1];else if(kind==='node')pref=[2,4,5,0,3,1];else if(kind==='site')pref=[1,0,4,3,5,2];
+ else if(kind==='wild'){const t0=wSp(tg.sp).t[0];pref=[t0].concat([0,1,2,3,4,5].filter(t=>t!==t0))}
+ if(pref){const sq=F.sq.filter(s=>s.st==='follow'),have=pref.find(t=>sq.some(s=>s.type===t));if(have===undefined){if(pref.length===1)need=pref[0]}else if(!(F.manT>0)||pref.length===1)SW.selType=have}
+ return{x,y,tg,kind,need}}
+function fThrow(F,quiet){const aim=fAim(F),cand=F.sq.filter(s=>s.st==='follow'&&Math.hypot(s.x-P3.x,s.y-P3.y)<70);
+ if(aim.need>=0){if(!quiet){swSnd(200,.06);W4.floats.push({x:aim.tg.x,y:aim.tg.y-22,txt:'NEEDS '+TYPES[aim.need].n+' SPROUTS',t:1.4,c:'#ffd94d'})}return false}
+ if(!aim.tg)return false;
+ if(!cand.length){if(!quiet){swSnd(240,.05);W4.floats.push({x:P3.x,y:P3.y-18,txt:F.sq.length?'B CALLS THEM BACK':'NO SPROUTS WITH YOU',t:1.2,c:'#e88'})}return false}
+ const want=SW.selType;cand.sort((a,b)=>((a.type===want?0:1)-(b.type===want?0:1))||(Math.hypot(a.x-P3.x,a.y-P3.y)-Math.hypot(b.x-P3.x,b.y-P3.y)));
+ const s=cand[0];s.st='fly';s.sx=P3.x;s.sy=P3.y-6;s.tx=aim.x+(Math.random()*6-3);s.ty=aim.y+(Math.random()*6-3);s.t=0;s.aim=aim;swSnd(520,.07,940);return true}
 function fLand(F,s){const a=s.aim||{};s.z=0;s.aim=null;
  const near=(o,r2)=>o&&Math.hypot(o.x-s.x,o.y-s.y)<(r2||24);
  let tg=a.tg,kind=a.kind;
  if(!tg){for(const it of F.items)if(!it.done&&near(it,18)){tg=it;kind='item'}
-  if(!tg)for(const nd of W4.nodes)if(!nd.got&&near(nd,18)){tg=nd;kind='node'}}
+  if(!tg)for(const nd of W4.nodes)if(!nd.got&&nd.k==='bush'&&near(nd,18)){tg=nd;kind='node'}}
  if(kind==='wild'&&W4.wilds.includes(tg)){W4.wilds.splice(W4.wilds.indexOf(tg),1);W4.wildCd=14;s.st='ret';
   wEngage('WILD '+tg.sp+'!',()=>wStartWildAt(tg.sp,tg.lv));return}
  if(kind==='gate'){if(tg.open){s.st='idle';s.t=0;return}
@@ -327,7 +333,7 @@ function fSquad(F,dt){const flw=F.sq.filter(s=>s.st==='follow');let fi=0;
    /* an idle sprout picks up nearby work by itself, like the garden sprouts do */
    if(s.t>.5){const it=F.items.find(i2=>!i2.done&&!(i2.guard&&F.alphas.includes(i2.guard))&&Math.hypot(i2.x-s.x,i2.y-s.y)<30);
     if(it){s.st='carry';s.tg=it;s.kind='item';it.car.push(s);continue}
-    if(Math.hypot(P3.x-s.x,P3.y-s.y)<34)s.st='ret'}
+    if(Math.hypot(P3.x-s.x,P3.y-s.y)<34||s.t>3.5)s.st='ret'}
    continue}
   if(s.st==='work'){const tg=s.tg,k=s.kind;
    const gone=!tg||(k==='node'&&tg.got)||(k==='gate'&&tg.open)||(k==='site'&&tg.done);
@@ -367,11 +373,8 @@ function fNear(F){const px=P3.x+F.dir[0]*11,py=P3.y+F.dir[1]*11,in2=(o,r2)=>Math
  if(F.gym&&in2(F.gym,18))return{k:'gym',txt:'GYM'};
  for(const dr of F.doors)if(in2(dr,14))return{k:'door',txt:'KNOCK'};
  if(in2(F.start,18))return{k:'sign',txt:'LANTERN POST · TRAVEL'};
- for(const nd of W4.nodes)if(!nd.got&&in2(nd))return{k:'node',nd,txt:nd.k==='tree'?'CHOP':nd.k==='rock'?'MINE':'PICK'};
- for(const it of F.items)if(!it.done&&in2(it))return{k:'info',txt:'LOOK',msg:(it.n||it.res.toUpperCase())+' · needs '+it.w+' sprout strength · B throws sprouts'};
- for(const g2 of F.gates)if(!g2.open&&in2(g2,20))return{k:'info',txt:'LOOK',msg:g2.n+' · only '+TYPES[g2.type].n+' sprouts can clear it'};
+ for(const nd of W4.nodes)if(!nd.got&&nd.k!=='bush'&&in2(nd))return{k:'node',nd,txt:wNodeLabel(nd)};
  for(const dm of F.domes)if(!SW.fl[dm.flag]&&in2(dm,22))return{k:'info',txt:'LOOK',msg:"IRON DOME · by order of KING BIBI. 'Temporary.' It has been temporary for years."};
- for(const s of F.sites)if(!s.done&&Math.hypot(px-s.x,py-s.y)<s.tiles.length*8+16)return{k:'info',txt:'LOOK',msg:'A BRIDGE could go here · throw sprouts at it to build'};
  return null}
 function fTalk(F,who,lines,after){F.dlg={who,lines,i:0,after}}
 function fTrainer(F,np){const q=np.team.map(([sp,lv])=>wMakeMon(sp,lv));
@@ -436,7 +439,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
   if(n.k==='bud'){F.buds.splice(F.buds.indexOf(n.b),1);const tn=TYPES[n.b.type].n;SW.buds[tn]=(SW.buds[tn]||0)+1;
    W4.floats.push({x:n.b.x,y:n.b.y-16,txt:tn+' SPROUT JOINS THE SQUAD!',t:1.6,c:'#7ee787'});swSnd(880,.06,1175);swSave()}
   else if(n.k==='spot')fFetch(F,n.sp);
-  else if(n.k==='node')wSwing(n.nd);
+  else if(n.k==='node')wNodeAct(n.nd);
   else if(n.k==='wild'){const wd=n.wd;W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv))}
   else if(n.k==='alpha'){const al=n.al;if(!SW.party.some(m=>m.hp>0)){swSay('No buddy fit to battle.',1.6);return}
    wEngage('ALPHA '+al.sp+'!',()=>{wStartWildAt(al.sp,al.lv);BT.log.unshift({txt:'The ALPHA '+al.sp+' rears up — it is huge!'});
@@ -454,13 +457,12 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
  fCommand(F,dt);
  if(pressed('start')){swSel=0;state='g4pause'}}
 /* squad orders, shared by the field and Sunkeep: SELECT picks the kind, B throws, hold B whistles */
-function fCommand(F,dt){
+function fCommand(F,dt){if(F.manT>0)F.manT-=dt;
  if(pressed('sel')){let i=SW.selType;for(let n=0;n<TYPES.length;n++){i=(i+1)%TYPES.length;if(F.sq.some(s=>s.type===i))break}
-  SW.selType=i;swSnd(660,.06,990);W4.floats.push({x:P3.x,y:P3.y-20,txt:TYPES[i].n+' SPROUTS UP NEXT',t:1.2,c:TYPES[i].l})}
- if(pressed('b')){fThrow(F);if(F.sq.length&&!SW.lessons.fthrow&&!F.base){SW.lessons.fthrow=1;swSay('B throws a sprout where the ring is. HOLD B to whistle them back. SELECT picks the kind.',4.2)}}
- if(keys.b){F.bHold=(F.bHold||0)+dt;
-  if(F.bHold>.38){const wr=Math.min(78,16+(F.bHold-.38)*150);F.whistle=wr;if(((F.bHold*10)|0)%3===0)swSnd(1320+wr*6,.03);
-   for(const s of F.sq)if(s.st!=='follow'&&s.st!=='fly'&&s.st!=='ret'&&Math.hypot(s.x-P3.x,s.y-P3.y)<wr){fDrop(F,s);s.st='ret'}}}
+  SW.selType=i;F.manT=4;swSnd(660,.06,990);W4.floats.push({x:P3.x,y:P3.y-20,txt:TYPES[i].n+' SPROUTS UP NEXT',t:1.2,c:TYPES[i].l})}
+ if(keys.a&&!W4.near){if(pressed('a')){fThrow(F);F.aT=.26}else{F.aT=(F.aT||0)-dt;if(F.aT<=0){fThrow(F,true);F.aT=.2}}}
+ if(keys.b){F.bHold=(F.bHold||0)+dt;const wr=Math.min(84,14+F.bHold*150);F.whistle=wr;if(((F.bHold*10)|0)%3===0)swSnd(900+wr*9,.03);
+  for(const s of F.sq)if(s.st!=='follow'&&s.st!=='fly'&&s.st!=='ret'&&Math.hypot(s.x-P3.x,s.y-P3.y)<wr){fDrop(F,s);s.st='ret'}}
  else{F.bHold=0;F.whistle=0}}
 /* Sunkeep keeps its own walker and layout, but the squad, throwing, carrying and the way home all run on the field engine */
 function fBaseBuild(){const w=Math.ceil(WW/FT),h=Math.ceil((W4.wh||520)/FT),F={id:'BASE',base:1,w,h,t:[],items:[],gates:[],sites:[],buds:[],npcs:[],exits:[],sq:[],alphas:[],domes:[],doors:[],grass:[],gym:null,start:{x:240,y:100},bl:{},t0:0,dir:[0,1],bio:FBIO.MEADOW,cv:null,dist:null};
@@ -472,9 +474,13 @@ function fBaseTick(dt){const F=W4.bf;if(!F)return;if(P3.ax||P3.ay)F.dir=[P3.ax,P
 function fSqDraw(F,front){for(const o of F.sq){if((o.y>P3.y)!==front)continue;drawBud({x:Math.round(o.x),y:Math.round(o.y)+2,type:o.type,stage:2,z:o.z||0,a:o.a,mv:!!o.mv,st:o.st==='idle'?'idle':'follow',fx:1});
   if(o.st==='work'&&o.mv)r('#ffffff',Math.round(o.x)+4,Math.round(o.y)-9,2,2)}
  if(!front){for(const it of F.items)fItemDraw(it);for(const b of F.buds)fBudDraw(b)}}
-function fRing(F){if(F.sq.some(s=>s.st==='follow')){const a=fAim(F),T=TYPES[a.kind==='gate'?a.tg.type:SW.selType],ph=((time*6)|0)%2,ax=Math.round(a.x),ay=Math.round(a.y);
-  for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.55)',Math.round(px),Math.round(py),1,1)}
-  r(T.l,ax-6-ph,ay-1,3,1);r(T.l,ax+4+ph,ay-1,3,1);r(T.l,ax-1,ay-6-ph,1,3);r(T.l,ax-1,ay+3+ph,1,3);if(a.tg)r('#ffffff',ax-1,ay-1,1,1)}
+function fRing(F){if(F.sq.length){const a=fAim(F),T=TYPES[a.need>=0?a.need:SW.selType],ph=((time*6)|0)%2,ax=Math.round(a.x),ay=Math.round(a.y);
+  if(a.tg){const c=a.need>=0?'#e04838':T.l,rr=a.kind==='site'?14:11;
+   for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){r('#14101e',ax+sx*(rr+ph)-2,ay-6+sy*(rr-2+ph)-2,5,5);r(c,ax+sx*(rr+ph)-1,ay-6+sy*(rr-2+ph)-1,3,1);r(c,ax+sx*(rr+ph)-(sx<0?1:-1),ay-6+sy*(rr-2+ph)-1,1,3)}
+   for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.6)',Math.round(px),Math.round(py),1,1)}
+   const lab=a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?'THROW TO BATTLE':a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
+   F.aimLab=lab;F.aimNeed=a.need>=0}
+  else{F.aimLab=null;r('rgba(255,255,255,.35)',ax-1,ay-1,2,2)}}else F.aimLab=null;
  if(F.whistle){g.strokeStyle='rgba(255,244,180,.8)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-2,F.whistle,0,7);g.stroke();
   g.strokeStyle='rgba(255,244,180,.35)';g.beginPath();g.arc(P3.x,P3.y-2,F.whistle*.7,0,7);g.stroke()}}
 if(SW.followers&&SW.followers.length){for(const ty of SW.followers)SW.buds[TYPES[ty].n]=(SW.buds[TYPES[ty].n]||0)+1;SW.followers=[];swSave()} /* old follower trains join the pouch */
@@ -674,12 +680,7 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
   else if(k===15)fFort(o.x,o.y);
   else if(k===14){const hz=F.hopZ||0;wHero(P3.x,P3.y-hz);if(!hz)feet(P3.x,P3.y+2)}}
  for(const nd of W4.nodes)if(!nd.got&&nd.hp<nd.max){r('#00000088',nd.x-11,nd.y-30,22,4);r('#7ee787',nd.x-10,nd.y-29,Math.round(20*Math.max(0,nd.hp)/nd.max),2)}
- /* the throw ring */
- if(!F.dlg&&!F.spot&&F.sq.some(s=>s.st==='follow')){const a=fAim(F),T=TYPES[a.kind==='gate'?a.tg.type:SW.selType],ph=((time*6)|0)%2,ax=Math.round(a.x),ay=Math.round(a.y);
-  for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.55)',Math.round(px),Math.round(py),1,1)}
-  r(T.l,ax-6-ph,ay-1,3,1);r(T.l,ax+4+ph,ay-1,3,1);r(T.l,ax-1,ay-6-ph,1,3);r(T.l,ax-1,ay+3+ph,1,3);if(a.tg)r('#ffffff',ax-1,ay-1,1,1)}
- if(F.whistle){g.strokeStyle='rgba(255,244,180,.8)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-2,F.whistle,0,7);g.stroke();
-  g.strokeStyle='rgba(255,244,180,.35)';g.beginPath();g.arc(P3.x,P3.y-2,F.whistle*.7,0,7);g.stroke()}
+ if(!F.dlg&&!F.spot)fRing(F);
  for(const f of W4.floats){const ft=wFit(f.txt,200),fx2=Math.max(cx+tw(ft,1)/2+3,Math.min(cx+W-tw(ft,1)/2-3,f.x));
   text(ft,Math.round(fx2-tw(ft,1)/2),Math.round(f.y-(1.4-Math.min(1.4,f.t))*8),1,f.c,'#14101e')}
  /* weather motes */

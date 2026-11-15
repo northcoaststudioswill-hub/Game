@@ -513,22 +513,24 @@ function wSproutInfo(px,py){ /* the catch-all: any sprout can be asked what it i
  return null}
 function wNear(){const sec=wSector(W4.sector),px=P3.x+P3.ax*13,py=P3.y+P3.ay*13;
  {const ex=wNearExtra(px,py);if(ex)return ex}
+ const aimT=!!(W4.bf&&W4.bf.sq.length&&fAim(W4.bf).tg);
  if(W4.loose)for(const lb of W4.loose)if(Math.hypot(px-lb.x,py-lb.y)<17)return{k:'wildpluck',lb,txt:'PLUCK '+TYPES[lb.type].n+' SPROUT'};
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)
   if(pb.type>=0&&pb.stage>=2&&Math.hypot(px-pb.x,py-pb.y)<17)return{k:'pluck',pb,txt:'PLUCK '+TYPES[pb.type].n+' SPROUT'};
- for(const nd of W4.nodes)if(!nd.got&&Math.hypot(px-nd.x,py-nd.y)<17)
-  return{k:'node',nd,txt:nd.k==='tree'?'CHOP':nd.k==='rock'?'MINE':'PICK'};
+ for(const nd of W4.nodes)if(!nd.got&&nd.k!=='bush'&&Math.hypot(px-nd.x,py-nd.y)<17)
+  return{k:'node',nd,txt:wNodeLabel(nd)};
  if(W4.sector==='BASE'&&SW.tendStage>=3&&W4.tend&&W4.tend.buds)for(const tb of W4.tend.buds)
   if(tb.st==='grown'&&Math.hypot(px-tb.x,py-tb.y)<18)return{k:'tendpluck',b:tb,txt:'PLUCK '+TYPES[tb.type].n+' SPROUT'};
  if(false&&W4.sector==='BASE'&&SW.quest<=1&&!SW.tendDone&&Math.hypot(px-240,py-352)<26)return{k:'patch',txt:SW.tendStage===0?'WATER THE SEEDS':SW.tendStage>=3?'PLUCK THE GROWN ONES':'THE SPROUT PATCH'};
  if(W4.sector==='BASE'&&SW.quest===1&&SW.tendDone&&!SW.party.length)for(const c of WCHOICE)
-   if(Math.hypot(px-c.x,py-c.y)<17)return{k:'choice',sp:c.sp,txt:'BEFRIEND '+c.sp};
+   if(Math.hypot(px-c.x,py-c.y)<24)return{k:'choice',sp:c.sp,txt:'GREET '+c.sp};
  if(sec.gym>=0&&Math.hypot(px-WW/2,py-66)<20)return{k:'gym',txt:'GYM'};
  if(W4.sector!=='BASE'&&Math.hypot(px-WW/2,py-(W4.wh-22))<17)return{k:'sign',txt:'LANTERN GATE'};
  if(W4.sector==='BASE'){for(const b of SW.buildings){const bx=wCellX(b.gx)+10,by=wCellY(b.gy)+12;
    if(Math.hypot(px-bx,py-by)<18)return{k:'bld',b,txt:wBuildDef(b.k).n}}
-  if(Math.hypot(px-lou.x,py-lou.y)<17)return{k:'louie',txt:'PET LOUIE'};
   if(Math.hypot(px-WW/2,py-74)<24)return{k:'lantern',txt:'THE GREAT LANTERN'}}
+ if(aimT)return null;
+ if(W4.sector==='BASE'&&Math.hypot(px-lou.x,py-lou.y)<17)return{k:'louie',txt:'PET LOUIE'}; /* Louie and people come last: they follow you about and must never take the button from what you are facing */
  for(const np of wNpcList())if(Math.hypot(px-np.x,py-np.y)<16)return{k:'npc',who:np.who,txt:'TALK TO '+np.who}; /* people last: they wander, and must never steal the button from what you are facing */
  const si=wSproutInfo(px,py);if(si)return si; return null}
 const WTOOLCOST=[{w:6,s:3,i:0},{w:14,s:8,i:2},{w:24,s:14,i:5}];
@@ -545,10 +547,6 @@ function wGather(nd){nd.got=true;
  if(nd.k==='tree'){SW.res.wood+=2+(SW.tools.axe>=3?1:0);swSay('+2 WOOD',1.2);swSnd(220,.07,140)}
  if(nd.k==='rock'){SW.res.stone+=2+(SW.tools.pick>=3?1:0);swSay('+2 STONE',1.2);swSnd(160,.07,110)}
  if(nd.k==='bush'){SW.res.berry+=1;if(Math.random()<.3)SW.res.petal+=3;swSay('+1 BERRY',1.2);swSnd(520,.06,760)}
- if(Math.random()<.25){const es=(wSector(W4.sector).table||[])[0];
-  const bt2=nd.k==='tree'?4:nd.k==='rock'?1:(es?wSp(es[0]).t[0]:4);
-  SW.buds[TYPES[bt2].n]=(SW.buds[TYPES[bt2].n]||0)+1;
-  W4.floats.push({x:nd.x,y:nd.y-12,txt:'+1 '+TYPES[bt2].n+' SPROUT',t:1.6,c:'#7ee787'})}
  swSave()}
 let lou={x:60,y:120};
 function worldUpdate(dt){if(W4.fld){fUpdate(dt);return}const sec=wSector(W4.sector);
@@ -610,7 +608,7 @@ function worldUpdate(dt){if(W4.fld){fUpdate(dt);return}const sec=wSector(W4.sect
     if(nd.got)W4.cmdWork=null;
     else{W4.part.x=nd.x;W4.part.y=nd.y+9;cw.t-=dt;
      if(cw.t<=0){cw.t=.34;nd.hp-=2;nd.shake=.25;W4.floats.push({x:nd.x,y:nd.y-14,txt:'-2',t:.7,c:'#ffe8b0'});swSnd(240,.04,140);
-      if(nd.hp<=0){wGather(nd);W4.cmdWork=null}}}}
+      if(nd.hp<=0){wNodeDrop(nd);W4.cmdWork=null}}}}
    else{const dx=P3.x-W4.part.x,dy=(P3.y+8)-W4.part.y,d=Math.hypot(dx,dy);
     if(d>17){W4.part.x+=dx/d*68*dt;W4.part.y+=dy/d*68*dt}}}}
  if(W4.sector==='BASE'){if(W4.petCd>0)W4.petCd-=dt;
@@ -633,7 +631,7 @@ function worldUpdate(dt){if(W4.fld){fUpdate(dt);return}const sec=wSector(W4.sect
  W4.near=wNear();
  if(pressed('a')&&W4.near){const n=W4.near;
   if(n.k==='fbud')wPluckSeed(n.b);
-  else if(n.k==='node')wSwing(n.nd);
+  else if(n.k==='node')wNodeAct(n.nd);
   else if(n.k==='sign'){if(W4.sector==='BASE'&&SW.quest===2&&!SW.gateSeen){SW.gateSeen=1;W4.gatePage=0;state='g4gate';swSave()}
    else{swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}}
   else if(n.k==='gym'){if(SW.quest<5)swSay(WGYMS[sec.gym].leader+': "Easy, keeper. Set up camp and catch a buddy first — then we battle."',3.4);
