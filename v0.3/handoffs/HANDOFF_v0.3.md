@@ -77,3 +77,22 @@ The only console errors are the Sprouts songs that stream only on claude.ai. **N
 3. Patch & Plate has no capsule items of its own yet (styles for Erin, a stand awning colour...).
 4. Music: its own William Cohen track would be nicer than sharing Sprouts'.
 5. No frozen backup or share package for v0.3 yet; make them once it's been played (README rule 3 layout).
+
+## The sprout crew (second pass, Nov 15)
+
+Will's idea: sprouts that help around the kitchen, and a way to grow them. Uses Sprouts' six canon types and colours;
+their kitchen jobs are new (flag to Will).
+
+- **Earning a seed:** the first star on days 1, 2, 4, 5, 7 and 9 pays DEW, PEB, EMBER, ZIP, LEAF and LUCKY seeds (`SEEDDAY`).
+  Saves from before this pass get the seeds their stars already earned.
+- **Growing one:** the seed waits in the **sprout pot** (tile `N`, end of the garden row). Take it, plant it in any plot (16 s,
+  watering helps), and **pluck** the sprout when it peeks out. It joins the crew for good (`SV.crew`). The helper arrow points
+  at the pot and the ripe sprout on any day, so it teaches itself. A tossed seed goes back in the pot.
+- **The jobs (automatic, nothing to manage):** DEW waters growing plots; PEB chops whatever is on the board; EMBER sits on
+  whatever is cooking (1.5x faster); ZIP carries finished food from a station to the plate that needs it; LEAF replants a
+  picked plot, but only with a crop the next orders need; LUCKY stands by a waiting customer: bigger tips, 10 s more patience.
+- **Growing them:** every job is work (`SV.cxp`); level 2 at 20, level 3 at 60, each level 30% faster. A level-up pops a label.
+- **SPROUTS page** at the stand: the crew, their jobs, level stars and progress, seeds waiting, and which day earns the rest.
+- Once a sprout is on the crew, the helper arrow leaves its job to it (Erin isn't sent to chop when PEB will).
+- Tests: 46 checks pass. Every working sprout does its job; with all six the bot gets 3 stars on days 8, 11 and 12, where it
+  gets 0 to 3 without them.

@@ -879,7 +879,7 @@ const R=(a,b)=>a+Math.random()*(b-a),pick=a=>a[(Math.random()*a.length)|0];
 /* ---------- the stand (15 x 11 tiles) ----------
    X outside path (customers)   C counter   W serving window (one customer each)
    . grass   , path   _ kitchen floor   # hedge (garden) / counter (kitchen)
-   P garden plot   S seed crate   c chop board   g grill   o oven   f fryer   j juicer
+   P garden plot   S seed crate   N sprout pot   c chop board   g grill   o oven   f fryer   j juicer
    L plate spot   K pantry (patties) */
 const MAP=[
  'XXXXXXXXXXXXXXX',
@@ -892,7 +892,7 @@ const MAP=[
  '.P.P.P.,__L___f',
  '.......,______#',
  '.......,______j',
- '#SSSSS#,#cc#K##'];
+ '#SSSSSN,#cc#K##'];
 const WIN=[2,7,12];                                   /* the three serving windows (columns of row 1) */
 const BIN={1:'let',2:'tom',3:'whe',4:'ber',5:'pot'};  /* seed crates along the bottom, by column */
 const PLOTS=[[1,3],[3,3],[1,5],[3,5],[5,3],[5,5],[1,7],[3,7],[5,7]]; /* unlock order */
@@ -900,7 +900,7 @@ const PLATES=[[10,5],[10,6],[10,7]];
 const SCH={c:'chop',g:'grill',o:'oven',f:'fryer',j:'juicer'};
 
 /* ---------- food ---------- */
-const CROP={let:{n:'LETTUCE',t:7,col:'#58b848'},tom:{n:'TOMATO',t:9,col:'#e04030'},whe:{n:'WHEAT',t:8,col:'#e8c050'},
+const CROP={spr:{n:'SPROUT',t:16,col:'#f8a0c8'},let:{n:'LETTUCE',t:7,col:'#58b848'},tom:{n:'TOMATO',t:9,col:'#e04030'},whe:{n:'WHEAT',t:8,col:'#e8c050'},
  ber:{n:'BERRIES',t:9,col:'#7050d0'},pot:{n:'POTATO',t:10,col:'#c89058'}};
 const NM={let:'LETTUCE',tom:'TOMATO',whe:'WHEAT',ber:'BERRIES',pot:'POTATO',pat:'PATTY',
  let_c:'LETTUCE',tom_c:'TOMATO',bun:'BUN',pat_c:'PATTY',fry:'FRIES',smo:'SMOOTHIE'};
@@ -965,14 +965,35 @@ const UPS=[
 
 /* ---------- save ---------- */
 const KEY='patchplate-v1';
-const DEF=()=>({v:1,day:0,stars:{},best:{},coins:0,earned:0,served:0,up:{},tix:{},plays:0,run:null});
+const DEF=()=>({v:1,day:0,stars:{},best:{},coins:0,earned:0,served:0,up:{},tix:{},plays:0,run:null,seeds:[],crew:[],cxp:{}});
 let SV=DEF();
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&typeof s==='object'){SV=Object.assign(DEF(),s);
- for(const k of ['stars','best','up','tix'])SV[k]=Object.assign({},s[k]||{})}}catch(e){}
+ for(const k of ['stars','best','up','tix','cxp'])SV[k]=Object.assign({},s[k]||{});
+ for(const k of ['seeds','crew'])SV[k]=Array.isArray(s[k])?s[k].slice():[]}}catch(e){}
 function store(){try{localStorage.setItem(KEY,JSON.stringify(SV))}catch(e){}}
 const up=k=>SV.up[k]|0;
 const bagN=()=>up('seeds')?5:3,taps=()=>up('knife')?2:4,nPlots=()=>Math.min(9,4+2*up('plots')),nPlates=()=>2+up('plate');
 const stepT=()=>up('boots')?.1:.13;
+
+/* ---------- the sprout crew (Sprouts' six canon types; their kitchen jobs are new) ----------
+   A sprout seed is earned the first time a day gets a star (SEEDDAY). It waits in the sprout pot (N) at the end
+   of the garden: take it, plant it in a plot, water it if you like, and pluck the sprout when it peeks out.
+   It joins the crew for good and works on its own every day after. Sprouts level up by working (cxp). */
+const SPT={EMBER:{c:'#f07830',d:'#983818',l:'#f8c070',job:'SPEEDS UP THE STOVE'},
+ PEB:{c:'#98a0b0',d:'#4c5466',l:'#dce2ea',job:'CHOPS ON THE BOARD'},
+ DEW:{c:'#48a0f0',d:'#2050a8',l:'#b0e0f8',job:'WATERS THE GARDEN'},
+ ZIP:{c:'#f0d020',d:'#806008',l:'#fff8a0',job:'CARRIES FOOD TO PLATES'},
+ LEAF:{c:'#58c048',d:'#286028',l:'#b0f090',job:'REPLANTS PICKED PLOTS'},
+ LUCKY:{c:'#f078c0',d:'#902868',l:'#ffc8e8',job:'BIGGER TIPS, MORE PATIENCE'}};
+const SPORDER=['DEW','PEB','EMBER','ZIP','LEAF','LUCKY'];
+const SEEDDAY={0:'DEW',1:'PEB',3:'EMBER',4:'ZIP',6:'LEAF',8:'LUCKY'};
+const SPHOME={DEW:[4,8],PEB:[11,9],EMBER:[13,4],ZIP:[12,8],LEAF:[2,8],LUCKY:[5,2]};
+const hasSp=T=>SV.seeds.includes(T)||SV.crew.includes(T);
+/* saves from before the crew existed get the seeds their stars already earned */
+for(const d in SEEDDAY)if((SV.stars[d]|0)>=1&&!hasSp(SEEDDAY[d]))SV.seeds.push(SEEDDAY[d]);
+const spLv=T=>{const x=SV.cxp[T]|0;return x>=60?3:x>=20?2:1},spNext=T=>{const x=SV.cxp[T]|0;return x>=60?null:x>=20?[x-20,40]:[x,20]};
+const spSpd=T=>1+.3*(spLv(T)-1);
+const crewHas=T=>SV.crew.includes(T);
 
 /* ---------- sprites ---------- */
 const EP={k:K,h:'#b84828',H:'#e87848',f:'#f8dcb0',d:'#9070d0',D:'#c0a8f0',b:'#583828',a:'#f8f0e0',A:'#e0d0c0'};
@@ -1007,7 +1028,8 @@ const G={s:'title',t:0,mi:0,si:0,ui:0,bi:0,bp:0,pi:0,ri:0,arm:0,L:null,fx:[],res
 
 /* ---------- days ---------- */
 function newDay(d){const D=DAYS[d],L={d,t:0,P:{x:7,y:6,fx:0,fy:-1,mv:0,ox:7,oy:6,step:0},held:null,plots:[],st:{},pl:{},
-  cu:[null,null,null],q:[],qi:0,spawnT:2.5,coins:0,tips:0,served:0,missed:0,endT:0,saveT:0};
+  cu:[null,null,null],q:[],qi:0,spawnT:2.5,coins:0,tips:0,served:0,missed:0,endT:0,saveT:0,sown:[],help:[],jobs:{}};
+ SV.crew.forEach(T=>L.help.push(newHelper(T)));
  L.plots=PLOTS.slice(0,nPlots()).map(([x,y])=>({x,y,c:null,g:0,w:0}));
  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const ch=MAP[y][x];if(SCH[ch])L.st[x+','+y]={k:SCH[ch],it:null,p:0,out:null}}
  PLATES.slice(0,nPlates()).forEach(([x,y])=>{L.pl[x+','+y]=[]});
@@ -1038,11 +1060,15 @@ function act(dry){const L=G.L,P=L.P,tx=P.x+P.fx,ty=P.y+P.fy,k=kind(tx,ty),h=L.he
   if(!h||(h.k==='bag'&&h.id===c&&h.n<bagN()))return go('TAKE '+CROP[c].n+' SEEDS',()=>{L.held={k:'bag',id:c,n:bagN()};SFX.pick()});
   return no('HANDS FULL');}
  if(k==='P'){const p=plotAt(tx,ty);
+  if(!p.c&&h&&h.k==='sseed')return go('PLANT THE '+h.id+' SEED',()=>{p.c='spr';p.sp=h.id;p.g=0;p.w=0;p.ding=0;L.held=null;SFX.plant()});
+  if(p.c==='spr'&&p.g>=1){if(!h)return go('PLUCK THE '+p.sp+' SPROUT!',()=>pluck(p));return no('HANDS FULL');}
   if(!p.c){if(h&&h.k==='bag')return go('PLANT '+CROP[h.id].n,()=>{p.c=h.id;p.g=0;p.w=up('grow')>=2?1:0;p.ding=0;h.n--;if(h.n<=0)L.held=null;SFX.plant()});
    return no(h?'HANDS FULL':'EMPTY: GET SEEDS');}
   if(p.g<1){if(!h&&!p.w)return go('WATER IT',()=>{p.w=1;SFX.water()});return no(CROP[p.c].n+': GROWING');}
-  if(!h)return go('PICK '+CROP[p.c].n,()=>{L.held={k:'it',id:p.c};p.c=null;p.g=0;p.w=0;p.ding=0;SFX.pick()});
+  if(!h)return go('PICK '+CROP[p.c].n,()=>{L.held={k:'it',id:p.c};p.last=p.c;p.c=null;p.g=0;p.w=0;p.ding=0;SFX.pick()});
   return no('HANDS FULL');}
+ if(k==='N'){const T=potNext();if(!T)return no(SV.crew.length>=6?'SPROUT POT: ALL GROWN UP':'SPROUT POT: EARN SEEDS ON NEW DAYS');
+  if(!h)return go('TAKE THE '+T+' SPROUT SEED',()=>{L.held={k:'sseed',id:T};L.sown.push(T);SFX.pick()});return no('HANDS FULL');}
  if(k==='K'){if(!dayHas('st','pantry'))return no('PANTRY: NOT TODAY');if(!h)return go('TAKE A PATTY',()=>{L.held={k:'it',id:'pat'};SFX.pick()});return no('HANDS FULL');}
  if(SCH[k]){const s=L.st[key],S=STN[s.k];if(!dayHas('st',s.k))return no(S.n+': NOT TODAY');
   if(s.out){if(!h)return go('TAKE '+NM[s.out],()=>{L.held={k:'it',id:s.out};s.out=null;SFX.pick()});
@@ -1062,21 +1088,63 @@ function act(dry){const L=G.L,P=L.P,tx=P.x+P.fx,ty=P.y+P.fy,k=kind(tx,ty),h=L.he
  if(k==='W'){const i=WIN.indexOf(tx),cu=L.cu[i];if(!cu||cu.st!=='wait')return no(cu?'':'NOBODY HERE YET');const rc=RC[cu.rc],hc=contsOf(h);
   if(hc&&same(hc,rc.c))return go('SERVE '+rc.n,()=>serve(i));return no(cu.who+' WANTS '+rc.n);}
  return no('');}
-function toss(){const L=G.L;if(!L.held)return;L.held=null;SFX.toss();const P=L.P;G.fx.push({k:'poof',x:P.x*TS+8,y:P.y*TS,t:0});}
-function serve(i){const L=G.L,cu=L.cu[i],rc=RC[cu.rc],tip=Math.round(rc.v*.5*Math.max(0,cu.pat/cu.pmax)),c=rc.v+tip;
+function toss(){const L=G.L;if(!L.held)return;if(L.held.k==='sseed')L.sown.splice(L.sown.indexOf(L.held.id),1);L.held=null;SFX.toss();const P=L.P;G.fx.push({k:'poof',x:P.x*TS+8,y:P.y*TS,t:0});}
+function serve(i){const L=G.L,cu=L.cu[i],rc=RC[cu.rc],tip=Math.round(rc.v*(crewHas('LUCKY')?.5+.1*spLv('LUCKY'):.5)*Math.max(0,cu.pat/cu.pmax)),c=rc.v+tip;
  L.coins+=c;L.tips+=tip;L.served++;L.held=null;cu.st='happy';cu.t=0;cu.say=pick(WHO[cu.who].yum);cu.gain=c;SFX.serve();
  G.fx.push({k:'txt',s:'+'+c,x:WIN[i]*TS+8,y:TS+4,t:0,c:'#f8d040'});}
+
+/* ---------- the crew at work ---------- */
+function potNext(){const L=G.L,left=SV.seeds.slice();L.sown.forEach(T=>{const i=left.indexOf(T);if(i>=0)left.splice(i,1)});return left[0]||null;}
+function newHelper(T,x,y){const[hx,hy]=SPHOME[T];return{t:T,x:x!==undefined?x:hx*TS+8,y:y!==undefined?y:hy*TS+12,goal:null,cd:0,carry:null,wait:0,at:null,mv:0,lv:spLv(T)};}
+function pluck(p){const L=G.L,T=p.sp;p.c=null;p.sp=null;p.g=0;p.w=0;p.ding=0;
+ const i=SV.seeds.indexOf(T);if(i>=0)SV.seeds.splice(i,1);const j=L.sown.indexOf(T);if(j>=0)L.sown.splice(j,1);
+ if(!SV.crew.includes(T))SV.crew.push(T);store();L.help.push(newHelper(T,p.x*TS+8,p.y*TS+12));
+ G.fx.push({k:'txt',s:T+' JOINED!',x:p.x*TS+8,y:p.y*TS,t:0,c:SPT[T].l});
+ snd(900,.06,1800,'sine',.06);later(()=>snd(1400,.08,2200,'sine',.05),90);}
+const keyXY=k=>k.split(',').map(Number);
+function openRecs(){const L=G.L,o=[];L.cu.forEach(c=>{if(c&&(c.st==='wait'||c.st==='in'))o.push(RC[c.rc].c)});if(!o.length&&L.qi<L.q.length)o.push(RC[L.q[L.qi]].c);return o;}
+function plateFor(id){const L=G.L,recs=openRecs(),fits=c=>recs.some(R=>c.every(x=>R.includes(x)));let best=null;
+ for(const k in L.pl){const c=L.pl[k];if(canAdd(c,id)&&fits(c.concat(id))&&(!best||c.length>L.pl[best].length))best=k}return best;}
+function spWork(h){SV.cxp[h.t]=(SV.cxp[h.t]|0)+1;G.L.jobs[h.t]=(G.L.jobs[h.t]|0)+1;const lv=spLv(h.t);if(lv>h.lv){SFX.star();G.fx.push({k:'txt',s:h.t+' LEVEL '+lv+'!',x:h.x,y:h.y-10,t:0,c:SPT[h.t].l})}h.lv=lv;}
+function spGoal(h){const L=G.L;
+ switch(h.t){
+ case 'DEW':{const p=L.plots.find(p=>p.c&&p.g<1&&!p.w);return p?{x:p.x,y:p.y}:null;}
+ case 'LEAF':{const nd=need(true,2),p=L.plots.find(p=>!p.c&&p.last&&dayHas('cr',p.last)&&nd[PROC[p.last]]>0);return p?{x:p.x,y:p.y}:null;}
+ case 'PEB':{for(const k in L.st){const s=L.st[k];if(s.k==='chop'&&s.it&&!s.out){const[x,y]=keyXY(k);return{x,y,k}}}return null;}
+ case 'EMBER':{for(const k in L.st){const s=L.st[k];if(s.it&&STN[s.k].t){const[x,y]=keyXY(k);return{x,y,k}}}return null;}
+ case 'ZIP':{if(h.carry){const k=plateFor(h.carry);if(!k)return null;const[x,y]=keyXY(k);return{x,y,k,plate:1}}
+  for(const k in L.st){const s=L.st[k];if(s.out&&plateFor(s.out)){const[x,y]=keyXY(k);return{x,y,k}}}return null;}
+ case 'LUCKY':{const i=L.cu.findIndex(c=>c&&c.st==='wait');return i>=0?{x:WIN[i],y:2,stand:1}:null;}}
+ return null;}
+function spJob(h){const L=G.L,g2=h.goal,m=spSpd(h.t);
+ switch(h.t){
+ case 'DEW':{const p=plotAt(g2.x,g2.y);if(p&&p.c&&p.g<1&&!p.w){p.w=1;spWork(h);noise(.08,.06,3600)}h.goal=null;h.cd=.5/m;return;}
+ case 'LEAF':{const p=plotAt(g2.x,g2.y);if(p&&!p.c&&p.last&&need(true,2)[PROC[p.last]]>0){p.c=p.last;p.g=0;p.w=up('grow')>=2?1:0;p.ding=0;spWork(h);snd(560,.04,0,'square',.025)}h.goal=null;h.cd=.8/m;return;}
+ case 'PEB':{const s=L.st[g2.k];if(s&&s.it&&!s.out){s.p++;noise(.02,.2,2600);if(s.p>=taps()){s.out=STN.chop.in[s.it];s.it=null;s.p=0;spWork(h);SFX.done();h.goal=null}}else h.goal=null;h.cd=.55/m;return;}
+ case 'EMBER':{const s=L.st[g2.k];if(!s||!s.it)h.goal=null;else h.at=g2.k;return;}
+ case 'ZIP':{if(g2.plate){const c=L.pl[g2.k];if(c&&h.carry&&canAdd(c,h.carry)&&plateFor(h.carry)===g2.k){c.push(h.carry);h.carry=null;spWork(h);snd(784,.04,0,'square',.025)}h.goal=null;h.cd=.3/m;return;}
+  const s=L.st[g2.k];if(s&&s.out&&!h.carry&&plateFor(s.out)){h.carry=s.out;s.out=null;snd(660,.03,0,'square',.025)}h.goal=null;h.cd=.2/m;return;}
+ case 'LUCKY':{h.goal=null;h.cd=2.5;return;}}}
+function helpUpd(dt){const L=G.L;
+ for(const h of L.help){const m=spSpd(h.t);if(h.cd>0)h.cd-=dt;h.at=null;
+  if(h.carry){if(!plateFor(h.carry)){h.wait+=dt;if(h.wait>6){G.fx.push({k:'poof',x:h.x,y:h.y-6,t:0});h.carry=null;h.wait=0}}else h.wait=0}
+  if(!h.goal&&h.cd<=0)h.goal=spGoal(h);
+  const go=h.goal||{x:SPHOME[h.t][0],y:SPHOME[h.t][1]},tx=go.x*TS+8,ty=go.y*TS+(h.goal&&!go.stand?9:12),dx=tx-h.x,dy=ty-h.y,d=Math.hypot(dx,dy),v=44*m*dt;
+  if(d>v){h.x+=dx/d*v;h.y+=dy/d*v;h.mv=1}else{h.x=tx;h.y=ty;h.mv=0;if(h.goal&&h.cd<=0)spJob(h)}}}
+const emberOn=k=>G.L.help.some(h=>h.t==='EMBER'&&h.at===k);
 
 /* ---------- what to do next: drives the helper arrow on the first days (and the test bot) ---------- */
 function plan(){const L=G.L,h=L.held,open=[];L.cu.forEach((c,i)=>{if(c&&(c.st==='wait'||c.st==='in'))open.push({i,c:RC[c.rc].c,wait:c.st==='wait'})});
  const recs=open.map(o=>o.c);if(!recs.length&&L.qi<L.q.length)recs.push(RC[L.q[L.qi]].c);
  const fits=c=>recs.some(R=>c.every(x=>R.includes(x)));
  const spots=Object.keys(L.pl).map(k=>{const[x,y]=k.split(',').map(Number);return{x,y,c:L.pl[k]}});
+ if(h&&h.k==='sseed'){const p=L.plots.find(p=>!p.c);return p?{x:p.x,y:p.y,spr:1}:null;}
+ const ripeSp=L.plots.find(p=>p.c==='spr'&&p.g>=1);if(ripeSp&&!h)return{x:ripeSp.x,y:ripeSp.y,spr:1};
  const hc=contsOf(h);
  if(hc){const o=open.find(o=>o.wait&&same(hc,o.c));if(o)return{x:WIN[o.i],y:1};}
  if(h&&h.k==='plate'){if(!fits(h.c))return{toss:1};const s=spots.find(s=>!s.c.length);return s?{x:s.x,y:s.y}:null;}
  if(h&&h.k==='it'){const id=h.id;
-  if(RAWHINT[id]){const s=stationFor(id,true);if(s)return s;
+  if(RAWHINT[id]){if(need(true,2)[PROC[id]]<0)return{toss:1};const s=stationFor(id,true);if(s)return s;
    /* every station that takes it is holding finished food: nowhere to put it */
    return Object.values(L.st).some(t=>t.k===STOF[id]&&t.it)?null:{toss:1};}
   const best=spots.filter(s=>canAdd(s.c,id)&&fits(s.c.concat(id))).sort((a,b)=>b.c.length-a.c.length)[0];
@@ -1084,18 +1152,20 @@ function plan(){const L=G.L,h=L.held,open=[];L.cu.forEach((c,i)=>{if(c&&(c.st===
  if(h&&h.k==='bag'){const p=L.plots.find(p=>!p.c);return p?{x:p.x,y:p.y}:{toss:1};}
  for(const s of spots)if(s.c.length&&open.some(o=>o.wait&&same(s.c,o.c)))return{x:s.x,y:s.y};
  for(const s of spots)if(s.c.length&&!fits(s.c))return{x:s.x,y:s.y};
+ if(!h&&potNext()&&L.plots.some(p=>!p.c)&&!L.plots.some(p=>p.c==='spr'))return{x:6,y:10,spr:1};
  const nd=need(false,0),ahead=need(true,2);
- for(const k in L.st){const s=L.st[k];if(s.out&&(nd[s.out]>-1||recs.some(R=>R.includes(s.out)))){const[x,y]=k.split(',').map(Number);return{x,y}}}
- for(const k in L.st){const s=L.st[k];if(s.it&&STN[s.k].taps){const[x,y]=k.split(',').map(Number);return{x,y}}}
+ for(const k in L.st){const s=L.st[k];if(s.out&&crewHas('ZIP')&&plateFor(s.out))continue;if(s.out&&(nd[s.out]>-1||recs.some(R=>R.includes(s.out)))){const[x,y]=k.split(',').map(Number);return{x,y}}}
+ if(!crewHas('PEB'))for(const k in L.st){const s=L.st[k];if(s.it&&STN[s.k].taps){const[x,y]=k.split(',').map(Number);return{x,y}}}
  const order=[];recs.forEach(R=>R.forEach(id=>{if(!order.includes(id))order.push(id)}));
  /* 1) things you can make now, 2) water what's growing for them, 3) plant for what's coming */
  for(const id of order){if(!(nd[id]>0))continue;const raw=RAWOF[id];
   if(raw==='pat'){if(stationFor('pat',true))return{x:12,y:10};continue;}
   const ripe=L.plots.find(p=>p.c===raw&&p.g>=1);if(ripe)return{x:ripe.x,y:ripe.y};}
- for(const id of order){if(!(nd[id]>0))continue;const raw=RAWOF[id],dry=L.plots.find(p=>p.c===raw&&p.g<1&&!p.w);if(dry)return{x:dry.x,y:dry.y};}
+ if(!crewHas('DEW'))for(const id of order){if(!(nd[id]>0))continue;const raw=RAWOF[id],dry=L.plots.find(p=>p.c===raw&&p.g<1&&!p.w);if(dry)return{x:dry.x,y:dry.y};}
  const soon=order.slice();L.q.slice(L.qi,L.qi+2).forEach(k=>RC[k].c.forEach(id=>{if(!soon.includes(id))soon.push(id)}));
  for(const id of soon){const raw=RAWOF[id];if(raw==='pat'||!(ahead[id]>0))continue;
-  if(L.plots.some(p=>!p.c)){const bx=+Object.keys(BIN).find(c=>BIN[c]===raw);return{x:bx,y:10};}}
+  if(L.plots.some(p=>!p.c)){const bx=+Object.keys(BIN).find(c=>BIN[c]===raw);return{x:bx,y:10};}
+  const spare=L.plots.find(p=>p.c&&p.c!=='spr'&&p.g>=1&&need(true,2)[PROC[p.c]]<0);if(spare)return{x:spare.x,y:spare.y};}
  return null;}
 /* what's still missing for the orders in view (processed ingredient -> count) */
 function need(plots=true,ahead=0){const L=G.L,n={},add=(id,v)=>{n[id]=(n[id]||0)+v};
@@ -1105,7 +1175,8 @@ function need(plots=true,ahead=0){const L=G.L,n={},add=(id,v)=>{n[id]=(n[id]||0)
  Object.values(L.pl).forEach(c=>c.forEach(id=>add(id,-1)));
  const hc=contsOf(L.held);if(hc)hc.forEach(have);
  for(const k in L.st){const s=L.st[k];if(s.out)add(s.out,-1);if(s.it)have(s.it);}
- if(plots)L.plots.forEach(p=>{if(p.c)have(p.c)});return n;}
+ L.help.forEach(x=>{if(x.carry)add(x.carry,-1)});
+ if(plots)L.plots.forEach(p=>{if(p.c&&p.c!=='spr')have(p.c)});return n;}
 function stationFor(raw,free){const L=G.L,want=STOF[raw];for(const k in L.st){const s=L.st[k];if(s.k===want&&(!free||(!s.it&&!s.out))){const[x,y]=k.split(',').map(Number);return{x,y}}}return null;}
 
 /* ---------- updating a day ---------- */
@@ -1113,7 +1184,9 @@ function playUpd(dt){const L=G.L;L.t+=dt;
  if(pressed('start')){G.s='pause';G.pi=0;snap();SFX.nav();return}
  if(pressed('sel')){G.bookFrom='play';G.s='book';G.bp=0;return}
  for(const p of L.plots)if(p.c&&p.g<1){p.g=Math.min(1,p.g+dt/(CROP[p.c].t*(1-.2*up('grow')))*(p.w?1.8:1));if(p.g>=1&&!p.ding){p.ding=1;SFX.ripe()}}
- for(const k in L.st){const s=L.st[k],S=STN[s.k];if(S.t&&s.it){s.p+=dt/(S.t*(1-.18*up('heat')));if(s.p>=1){s.out=S.in[s.it];s.it=null;s.p=0;SFX.done()}}}
+ for(const k in L.st){const s=L.st[k],S=STN[s.k];if(S.t&&s.it){const em=emberOn(k);s.p+=dt/(S.t*(1-.18*up('heat')))*(em?1.5+.25*(spLv('EMBER')-1):1);
+  if(s.p>=1){s.out=S.in[s.it];s.it=null;s.p=0;SFX.done();if(em){const h=L.help.find(h=>h.t==='EMBER');if(h)spWork(h)}}}}
+ helpUpd(dt);
  custUpd(dt);
  const P=L.P;if(P.mv>0){P.mv=Math.max(0,P.mv-dt/stepT())}
  if(P.mv===0){const hz=keys.right-keys.left,vt=keys.down-keys.up;let dx=0,dy=0;
@@ -1133,15 +1206,16 @@ function custUpd(dt){const L=G.L;
  if(L.qi<L.q.length){L.spawnT-=dt;const free=[0,1,2].filter(i=>!L.cu[i]);
   if(free.length===3&&L.spawnT>2)L.spawnT=2;
   if(L.spawnT<=0&&free.length){const i=pick(free),rc=L.q[L.qi++],D=DAYS[L.d],who=RC[rc].dog?'LOUIE':pick(PEOPLE),side=i===0?-1:i===2?1:pick([-1,1]);
-   const pmax=65+15*up('bench')+(RC[rc].x||0);
+   const pmax=65+15*up('bench')+(RC[rc].x||0)+(crewHas('LUCKY')?10:0);
    L.cu[i]={who,rc,pat:pmax,pmax,st:'in',x:side<0?-14:W+14,side,t:0,say:'',gain:0};L.spawnT=R(D.gap[0],D.gap[1]);}}}
 function finish(){const L=G.L,d=L.d,st=starsFor(L),prevDay=SV.day;
  SV.coins+=L.coins;SV.earned+=L.coins;SV.served+=L.served;SV.plays++;
  const prevSt=SV.stars[d]|0;if(st>prevSt)SV.stars[d]=st;const best=L.coins>(SV.best[d]|0);if(best)SV.best[d]=L.coins;
  if(st>=1&&SV.day<d+1)SV.day=Math.min(DAYS.length,d+1);
+ let seed=null;if(st>=1&&SEEDDAY[d]&&!hasSp(SEEDDAY[d])){seed=SEEDDAY[d];SV.seeds.push(seed)}
  let tix=0;if(st===3&&!SV.tix[d]){SV.tix[d]=1;tix=1;try{const m=A.meta();m.tix++;A.persist()}catch(e){}}
  SV.run=null;store();
- G.res={d,st,coins:L.coins,tips:L.tips,served:L.served,n:L.q.length,missed:L.missed,tix,best:best&&prevSt>0,
+ G.res={d,st,coins:L.coins,tips:L.tips,served:L.served,n:L.q.length,missed:L.missed,tix,seed,jobs:Object.assign({},L.jobs),best:best&&prevSt>0,
   unl:st>=1&&prevDay<d+1&&d+1<DAYS.length,last:st>=1&&d+1>=DAYS.length&&prevDay<DAYS.length};
  G.s='done';G.ri=0;G.t=0;}
 function snap(){if(G.L&&(G.s==='play'||G.s==='pause'||(G.s==='book'&&G.bookFrom!=='stand'))){SV.run={L:G.L};store()}}
@@ -1150,7 +1224,7 @@ function snap(){if(G.L&&(G.s==='play'||G.s==='pause'||(G.s==='book'&&G.bookFrom!
 function nav(i,n){if(pressed('down')){SFX.nav();return(i+1)%n}if(pressed('up')){SFX.nav();return(i+n-1)%n}return i;}
 const titleItems=()=>(SV.run?['CONTINUE DAY '+(SV.run.L.d+1)]:[]).concat(['PLAY','SWAP CARTRIDGE']);
 function standItems(){const o=[];for(let d=0;d<=Math.min(SV.day,DAYS.length-1);d++)o.push({d});if(SV.day<DAYS.length-1)o.push({d:SV.day+1,lock:1});
- return o.concat([{k:'UPGRADES'},{k:'RECIPES'},{k:'TITLE'}]);}
+ return o.concat([{k:'UPGRADES'},{k:'SPROUTS'},{k:'RECIPES'},{k:'TITLE'}]);}
 const pauseItems=()=>['RESUME','RECIPES','RESTART DAY','QUIT DAY','SWAP CARTRIDGE'];
 const doneItems=()=>G.res.st>=1?(G.res.d+1<DAYS.length?['NEXT DAY','PLAY AGAIN','THE STAND']:['PLAY AGAIN','THE STAND']):['TRY AGAIN','THE STAND'];
 function startDay(d){newDay(d);G.s='intro';G.t=0;SFX.ok();}
@@ -1167,7 +1241,7 @@ function update(dt){H=A.H();G.t+=dt;
   if(pressed('a')||pressed('start')){const x=it[G.si];
    if(x.lock){SFX.no();G.nope=1.2;G.nopeS='EARN A STAR ON DAY '+x.d+' FIRST';return}
    if(x.d!==undefined){if(SV.run&&SV.run.L.d!==x.d){SV.run=null;store()}startDay(x.d);return}
-   if(x.k==='UPGRADES'){G.s='shop';G.ui=0;SFX.ok()}else if(x.k==='RECIPES'){G.s='book';G.bookFrom='stand';G.bp=0;SFX.ok()}else{G.s='title';G.mi=0;SFX.nav()}}
+   if(x.k==='UPGRADES'){G.s='shop';G.ui=0;SFX.ok()}else if(x.k==='SPROUTS'){G.s='crew';SFX.ok()}else if(x.k==='RECIPES'){G.s='book';G.bookFrom='stand';G.bp=0;SFX.ok()}else{G.s='title';G.mi=0;SFX.nav()}}
   if(G.nope>0)G.nope-=dt;return;}
  case 'shop':{G.ui=nav(G.ui,UPS.length+1);if(G.nope>0)G.nope-=dt;
   if(pressed('b')||((pressed('a')||pressed('start'))&&G.ui===UPS.length)){G.s='stand';SFX.nav();return}
@@ -1176,6 +1250,7 @@ function update(dt){H=A.H();G.t+=dt;
    SV.coins-=c;SV.up[u[0]]=lv+1;store();SFX.ok();G.nope=1;G.nopeS=u[1]+' BOUGHT!';}return;}
  case 'book':{if(pressed('left')||pressed('right')){G.bp=1-G.bp;SFX.nav()}
   if(pressed('b')||pressed('a')||pressed('sel')||pressed('start')){G.s=G.bookFrom==='play'?'play':G.bookFrom==='pause'?'pause':'stand';SFX.nav()}return;}
+ case 'crew':{if(pressed('a')||pressed('b')||pressed('start')){G.s='stand';SFX.nav()}return;}
  case 'intro':{if(pressed('a')||pressed('start')){G.s='play';G.fx=[];SFX.ok();snap()}else if(pressed('b')){G.L=null;G.s='stand';SFX.nav()}return;}
  case 'play':playUpd(dt);return;
  case 'pause':{const it=pauseItems();G.pi=nav(G.pi,it.length);if(pressed('b')){G.s='play';return}
@@ -1212,7 +1287,17 @@ function drawFood(c,cx,by){
  if(has('let_c')||has('tom_c')){r(K,x0-7,y-4,14,4);r('#e8e0f0',x0-6,y-3,12,3);r('#58b848',x0-6,y-6,12,3);r('#a0e070',x0-4,y-7,4,1);r('#a0e070',x0+1,y-6,3,1);
   if(has('tom_c')){r('#e04030',x0-4,y-5,2,2);r('#e04030',x0+2,y-6,2,2)}if(has('pat_c'))r('#8a5030',x0-1,y-6,3,2);return}
  if(has('pat_c')){if(c.length===1){r(K,x0-7,y-4,14,4);r('#c83838',x0-6,y-3,12,3);r('#f07070',x0-6,y-3,12,1)}g.drawImage(IC.pat_c,x0-5,by-12);}}
-function drawHeld(h,cx,by){if(!h)return;if(h.k==='plate'){drawFood(h.c,cx,by);return}if(h.k==='bag'){drawBag(cx-5,by-10,h.id,h.n);return}g.drawImage(IC[h.id],cx-5,by-10);}
+function drawHeld(h,cx,by){if(!h)return;if(h.k==='sseed'){drawSeed(cx-5,by-10,h.id);return}if(h.k==='plate'){drawFood(h.c,cx,by);return}if(h.k==='bag'){drawBag(cx-5,by-10,h.id,h.n);return}g.drawImage(IC[h.id],cx-5,by-10);}
+
+/* a sprout: cx = centre, by = feet. Same colours as Sprouts' buds */
+function drawSp(T,cx,by,bob=0,carry=null){const C=SPT[T],x=Math.round(cx),y=Math.round(by)+bob;
+ r('rgba(0,0,0,.22)',x-3,Math.round(by),7,2);
+ r(C.d,x-3,y-8,7,8);r(C.d,x-4,y-7,9,6);r(C.c,x-3,y-7,7,6);r(C.l,x-2,y-7,3,1);
+ const bl=((G.t*1.3+cx)%4)<.12;r(K,x-2,y-5,1,bl?1:2);r(K,x+2,y-5,1,bl?1:2);
+ r('#3c9848',x,y-11,1,3);r('#84d870',x+1,y-11,2,1);r('#f8a0c8',x-1,y-13,3,2);r('#ffffff',x,y-13,1,1);
+ if(carry)g.drawImage(IC[carry],x-5,y-23);}
+function drawSeed(x,y,T){const C=SPT[T];r(K,x+2,y+2,6,7);r(C.c,x+3,y+3,4,5);r(C.l,x+3,y+3,2,1);r('#3c9848',x+4,y,1,2);r('#84d870',x+5,y,2,1);
+ if(((G.t*3)|0)%2)r('#ffffff',x+8,y+1,1,1);}
 
 /* ---------- drawing the stand ---------- */
 function counter(x,y){r('#6a4830',x,y,16,16);r('#e8d0a0',x,y,16,11);r('#f8e8c0',x,y,16,2);r('#c8a878',x,y+10,16,1);r('#4a3020',x,y+15,16,1);}
@@ -1233,6 +1318,12 @@ function drawTile(x,y,ch,px,py){const TL=A.TL;
 function drawThing(x,y,ch,px,py){const L=G.L,key=x+','+y;
  if(ch==='P'){const p=plotAt(x,y);if(!p)return;if(p.w&&p.c)r('rgba(30,16,40,.3)',px,py,16,16);if(!p.c)return;
   const st=p.g>=1?3:p.g>.6?2:p.g>.25?1:0,cc=CROP[p.c].col;
+  if(p.c==='spr'){const C=SPT[p.sp]||SPT.DEW;
+   if(st===0){r(C.c,px+7,py+8,3,3);if(((G.t*3)|0)%2)r('#ffffff',px+8,py+8,1,1)}
+   else if(st===1){r('#3c9848',px+8,py+5,1,6);r('#84d870',px+9,py+5,2,1);r(C.c,px+6,py+10,5,2)}
+   else if(st===2){r('#3c9848',px+8,py+2,1,5);r('#84d870',px+9,py+2,2,1);r('#f8a0c8',px+7,py+1,3,2);r(C.d,px+4,py+8,9,4);r(C.c,px+5,py+8,7,3)}
+   else{const w=((G.t*5)|0)%2;drawSp(p.sp,px+8+w,py+13);r('#5a3a20',px+3,py+12,11,2);if(((G.t*4)|0)%2){r('#ffffff',px+1,py+3,1,1);r('#ffffff',px+14,py+6,1,1)}}
+   if(st<3)bar(px+2,py+13,12,p.g,'#f8a0c8');return;}
   if(st===0){r('#4a2a18',px+5,py+8,2,2);r('#4a2a18',px+9,py+7,2,2)}
   else if(st===1){r('#3c9848',px+7,py+7,2,5);r('#84d870',px+5,py+6,3,2);r('#84d870',px+9,py+6,3,2)}
   else if(st===2){r('#3c9848',px+7,py+4,2,8);r('#84d870',px+3,py+5,4,3);r('#84d870',px+9,py+4,4,3);r(cc,px+6,py+3,4,3)}
@@ -1240,6 +1331,8 @@ function drawThing(x,y,ch,px,py){const L=G.L,key=x+','+y;
   if(st<3)bar(px+2,py+13,12,p.g);return;}
  if(ch==='S'){const c=BIN[x],on=dayHas('cr',c);r(K,px+1,py+3,14,13);r(on?'#a06838':'#6a5048',px+2,py+4,12,11);r(on?'#c88850':'#806458',px+2,py+4,12,2);r('#704020',px+2,py+9,12,1);
   if(on)g.drawImage(IC[c],px+3,py-1);else{r('#c8c0d0',px+5,py+7,6,1)}return;}
+ if(ch==='N'){r(K,px+3,py+5,10,10);r('#c86838',px+4,py+6,8,8);r('#e88858',px+4,py+6,8,2);r('#5a3a20',px+4,py+8,8,1);const T=potNext();
+  if(T){drawSeed(px+3,py-4,T)}else{r('#3c9848',px+7,py+3,1,3);r('#84d870',px+8,py+3,2,1)}return;}
  if(ch==='K'){const on=dayHas('st','pantry');counter(px,py);r(K,px+2,py+1,12,9);r(on?'#c8e0f0':'#7a7088',px+3,py+2,10,7);if(on){g.drawImage(IC.pat,px+3,py+1)}return;}
  if(ch==='L'){if(!L.pl[key])return;counter(px,py);r('#d8c090',px+2,py+2,12,7);const c=L.pl[key];if(c.length)drawFood(c,px+8,py+10);else{r('#ffffff',px+4,py+4,8,3);r('#c8c8d8',px+5,py+7,6,1)}return;}
  if(SCH[ch]){const s=L.st[key],on=dayHas('st',s.k);
@@ -1265,10 +1358,11 @@ function drawField(ox,oy){const L=G.L;
   if(!s)continue;const x=Math.round(cu.x-s.width/2)+ox;
   if(cu.who==='LOUIE'){const sp=walk&&cu.side>0?A.LOU.l[((G.t*8)|0)%2]:walk?A.LOU.r[((G.t*8)|0)%2]:s;g.drawImage(sp,x,oy+4+b)}else g.drawImage(s,x,oy+3+b);}
  for(let x=0;x<COLS;x++)drawTile(x,1,MAP[1][x],ox+x*TS,oy+TS);
+ for(const h of L.help)drawSp(h.t,ox+h.x,oy+h.y,h.mv&&((G.t*8+h.x)|0)%2?-1:0,h.carry);
  drawErin(ox,oy);
  const P=L.P,tx=P.x+P.fx,ty=P.y+P.fy,a=act(true);
  if(a.ok&&((G.t*3)|0)%3!==2){const x=ox+tx*TS,y=oy+ty*TS,c='#f8e060';[[0,0,1,1],[1,0,-1,1],[0,1,1,-1],[1,1,-1,-1]].forEach(([u,v,su,sv])=>{const X=x+u*15,Y=y+v*15;r(c,X+(su<0?-3:0),Y,4,1);r(c,X,Y+(sv<0?-3:0),1,4)})}
- if(L.d<3&&G.s==='play'){const t=plan();if(t&&t.x!==undefined&&!(t.x===tx&&t.y===ty)){const b=((G.t*4)|0)%2,x=ox+t.x*TS+8,y=oy+t.y*TS-8+b;
+ if(G.s==='play'){const t=plan();if(t&&t.x!==undefined&&(L.d<3||t.spr)&&!(t.x===tx&&t.y===ty)){const b=((G.t*4)|0)%2,x=ox+t.x*TS+8,y=oy+t.y*TS-8+b;
   r(K,x-4,y-1,9,3);r(K,x-3,y+2,7,2);r(K,x-2,y+4,5,1);r(K,x-1,y+5,3,1);r('#f8e060',x-3,y,7,1);r('#f8e060',x-2,y+2,5,1);r('#f8e060',x-1,y+3,3,1);r('#f8e060',x,y+4,1,1)}}
  for(const f of G.fx){if(f.k==='txt')text(f.s,ox+f.x-tw(f.s,2)/2,oy+f.y-Math.round(f.t*14),2,f.c);
   else if(f.k==='poof'){const k=Math.round(f.t*8);r('#e8e0f0',ox+f.x-k,oy+f.y-k,2,2);r('#e8e0f0',ox+f.x+k,oy+f.y-k,2,2);r('#e8e0f0',ox+f.x-k,oy+f.y+k-4,2,2);r('#e8e0f0',ox+f.x+k,oy+f.y+k-4,2,2)}}}
@@ -1346,9 +1440,19 @@ function drawBook(){const{VH}=begin();r('#f0e4c8',0,0,W,VH);r('#c8b088',0,0,W,22
    rc.c.forEach((id,j)=>g.drawImage(IC[id],W-58+j*12,y+3));});}
  else{const rows=[['let','CHOP BOARD','let_c'],['tom','CHOP BOARD','tom_c'],['whe','OVEN','bun'],['pat','GRILL','pat_c'],['pot','FRYER','fry'],['ber','JUICER','smo']];
   rows.forEach(([a,s,b],i)=>{const y=30+i*24;g.drawImage(IC[a],10,y);text('→ '+s+' →',26,y+1,2,'#3a2618',null);g.drawImage(IC[b],W-24,y)});
-  const yy=30+6*24+2,tips=['SEEDS: CRATES BY THE GARDEN.','PATTIES: THE PANTRY CRATE.','A ON A GROWING PLOT WATERS IT.','B TOSSES WHAT YOU HOLD.'];
+  const yy=30+6*24+2,tips=['SEEDS: CRATES BY THE GARDEN.','PATTIES: THE PANTRY CRATE.','A ON A GROWING PLOT WATERS IT.','B TOSSES WHAT YOU HOLD.','SPROUT SEEDS: THE POT. PLANT, PLUCK!'];
   tips.forEach((t,i)=>ftext(t,W/2,yy+i*13,W-12,1,'#5a3c2a',null));}
  ftext(G.bookFrom==='stand'?'B: BACK':'B: BACK TO THE DAY',W/2,VH-13,W-12,1,'#7a5a40',null);g.restore();}
+function drawCrew(){const{VH}=begin();r('#26402c',0,0,W,VH);for(let y=0;y<VH;y+=8)r('#223a28',0,y,W,1);
+ text('SPROUTS',6,6,3,'#f8e060');rtextR(SV.crew.length+' / 6',W-6,9,2,'#c8c0d8');
+ const st=Math.min(36,Math.floor((VH-50)/6));
+ SPORDER.forEach((T,i)=>{const y=28+i*st,C=SPT[T],on=crewHas(T),seed=SV.seeds.includes(T);
+  r('#1a2c1e',4,y,W-8,st-3);
+  if(on){drawSp(T,20,y+st-8,((G.t*2+i)|0)%2?-1:0);text(T,36,y+3,2,C.l);text(C.job,36,y+15,1,'#c8d8c0');
+   const lv=spLv(T),nx=spNext(T);stars(lv,W-38,y+3);if(nx)bar(W-38,y+14,26,nx[0]/nx[1],C.c);else rtextR('MAX',W-12,y+14,1,'#84d870');}
+  else if(seed){drawSeed(15,y+st/2-7,T);text(T+' SEED',36,y+3,2,'#a8c8a0');text('IN THE POT: PLANT IT, PLUCK IT',36,y+15,1,'#84d870');}
+  else{r('#3a4a3c',16,y+st/2-5,8,8);text('???',36,y+3,2,'#68786a');const d=+Object.keys(SEEDDAY).find(k=>SEEDDAY[k]===T);text('A STAR ON DAY '+(d+1)+' EARNS IT',36,y+15,1,'#68786a');}});
+ ftext('THEY LEVEL UP BY WORKING.   B: BACK',W/2,VH-13,W-12,1,'#a8c8a0',null);g.restore();}
 function drawIntro(){drawPlay();const{VH}=begin(),L=G.L,D=DAYS[L.d];r('rgba(20,12,30,.72)',0,0,W,VH);
  const ph=200,py=Math.round((VH-ph)/2);panel(8,py,W-16,ph);
  ftext('DAY '+(L.d+1),W/2,py+8,W-30,4,'#f8e060',null);ftext(D.n,W/2,py+32,W-30,3,'#ffffff',null);
@@ -1357,6 +1461,7 @@ function drawIntro(){drawPlay();const{VH}=begin(),L=G.L,D=DAYS[L.d];r('rgba(20,1
  wrap(D.s,W-84,2).slice(0,6).forEach((l,i)=>text(l,62,by+i*12,2,'#e8e0f0',null));
  const gy=py+ph-58;text('GOAL',18,gy,2,'#c8c0d8',null);[0,1,2].forEach(i=>{const x=58+i*54;stars(i+1,x,gy+1);coinTxt(L.goal[i],x+(i+1)*8+4,gy)});
  text('CUSTOMERS: '+L.q.length,18,gy+16,2,'#c8c0d8',null);
+ if(potNext()){const s2='SPROUT SEED!';rtextR(s2,W-18,gy+16,2,'#84d870');drawSeed(W-30-tw(s2),gy+12,potNext())}
  const blink=((G.t*2)|0)%2;ftext('A: OPEN THE STAND   B: BACK',W/2,py+ph-18,W-30,2,blink?'#ffffff':'#f8e060',null);g.restore();}
 function drawPause(){drawPlay();const{VH}=begin();r('rgba(20,12,30,.78)',0,0,W,VH);const it=pauseItems(),ph=34+it.length*16,py=Math.round((VH-ph)/2);
  panel(30,py,W-60,ph);ftext('PAUSED',W/2,py+7,W-70,3,'#f8e060',null);cList(it,G.pi,py+28,16);
@@ -1368,10 +1473,10 @@ function drawDone(){const{VH}=begin(),R2=G.res;scene(VH);r('rgba(20,12,30,.7)',0
  const rows=[['SERVED',R2.served+' / '+R2.n],['COINS','+'+R2.coins],['TIPS','+'+R2.tips]];
  rows.forEach(([a,b],i)=>{text(a,26,py+58+i*14,2,'#c8c0d8',null);rtextR(b,W-26,py+58+i*14,2,i===1?'#f8d040':'#ffffff')});
  let y=py+102;const note=s=>{ftext(s,W/2,y,W-34,2,'#84d870',null);y+=13};
- if(R2.unl)note('DAY '+(R2.d+2)+' IS OPEN!');if(R2.last)note('EVERY DAY DONE. WOW!');if(R2.tix)note('+1 CAPSULE TICKET');if(R2.best)note('NEW BEST!');if(!R2.st)note('NEED '+(G.L?G.L.goal[0]:'')+' COINS FOR A STAR');
+ if(R2.unl)note('DAY '+(R2.d+2)+' IS OPEN!');if(R2.last)note('EVERY DAY DONE. WOW!');if(R2.seed)note('+ '+R2.seed+' SPROUT SEED!');if(R2.tix)note('+1 CAPSULE TICKET');if(R2.best)note('NEW BEST!');if(!R2.st)note('NEED '+(G.L?G.L.goal[0]:'')+' COINS FOR A STAR');
  cList(doneItems(),G.ri,py+ph-52,16);g.restore();}
 function draw(){H=A.H();
- switch(G.s){case 'title':drawTitle();break;case 'stand':drawStand();break;case 'shop':drawShop();break;case 'book':drawBook();break;
+ switch(G.s){case 'title':drawTitle();break;case 'stand':drawStand();break;case 'shop':drawShop();break;case 'crew':drawCrew();break;case 'book':drawBook();break;
   case 'intro':drawIntro();break;case 'play':drawPlay();break;case 'pause':drawPause();break;case 'done':drawDone();break;}}
 
 /* put the phone down: the day pauses and saves */

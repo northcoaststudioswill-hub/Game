@@ -138,6 +138,7 @@ async function main() {
   const f1 = await pp('__playDay()');
   const r1 = await pp('__g.PP._.G.res');
   check(r1 && r1.st >= 1, `day 1 finished by the bot in ${(f1 / 60).toFixed(0)}s of game time: ${r1 && r1.st} stars, ${r1 && r1.coins} coins, served ${r1 && r1.served}/${r1 && r1.n}`);
+  check((await pp('__g.PP._.SV.seeds')).includes('DEW'), 'day 1 pays the DEW sprout seed');
   await pp('for(let i=0;i<60*2;i++)__upd(1/60)');
   await shot('pp_16_day1_done.png'); await audit('results');
 
@@ -147,6 +148,7 @@ async function main() {
   for (const d of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]) {
     const r = await page.evaluate(d => { const PP = __g.PP._; PP.startDay(d); PP.G.s = 'play'; const f = __playDay(); const R = PP.G.res; return { d: d + 1, sec: Math.round(f / 60), st: R && R.st, coins: R && R.coins, goal: PP.G.L.goal, served: R && R.served, n: R && R.n, s: PP.G.s }; }, d);
     results.push(r);
+    if (d === 1) check((await pp('__g.PP._.SV.crew')).includes('DEW'), 'day 2: the bot plants the DEW seed, plucks it, and DEW joins the crew');
     check(r.s === 'done', `day ${r.d}: bot finished in ${r.sec}s, ${r.st} stars, ${r.coins} coins (goals ${r.goal.join('/')}), served ${r.served}/${r.n}`);
     if (d === 3 || d === 7 || d === 11) {
       await page.evaluate(d => { const PP = __g.PP._; PP.startDay(d); PP.G.s = 'play'; for (let i = 0; i < 60 * 40; i++) { __botTick(); __upd(1 / 60); } }, d);
@@ -154,6 +156,26 @@ async function main() {
       await pp('__playDay()');
     }
   }
+
+  /* the sprout crew: every one does its job, and the hard days with and without them */
+  await pp("__g.PP._.SV.crew=[];__g.PP._.SV.seeds=[]");
+  const solo = await page.evaluate(() => { const PP = __g.PP._, o = {}; for (const d of [7, 10, 11]) { PP.startDay(d); PP.G.s = 'play'; __playDay(); o[d + 1] = PP.G.res.st + '★ ' + PP.G.res.coins; } return o; });
+  await pp("__g.PP._.SV.crew=['DEW','PEB','EMBER','ZIP','LEAF','LUCKY'];__g.PP._.SV.cxp={}");
+  const crew = await page.evaluate(() => { const PP = __g.PP._, o = {}, jobs = {}; for (const d of [7, 10, 11]) { PP.startDay(d); PP.G.s = 'play'; __playDay(); o[d + 1] = PP.G.res.st + '★ ' + PP.G.res.coins; for (const k in PP.G.res.jobs) jobs[k] = (jobs[k] | 0) + PP.G.res.jobs[k]; } return { o, jobs, cxp: PP.SV.cxp }; });
+  notes.push('note days 8/11/12 without the crew: ' + JSON.stringify(solo) + '   with all six: ' + JSON.stringify(crew.o));
+  const idle = ['DEW', 'PEB', 'EMBER', 'ZIP', 'LEAF'].filter(t => !(crew.jobs[t] > 0));
+  check(!idle.length, 'every working sprout did its job: ' + JSON.stringify(crew.jobs) + (idle.length ? ' idle: ' + idle : ''));
+  check(Object.values(crew.cxp).some(x => x >= 20), 'sprouts level up by working: ' + JSON.stringify(crew.cxp));
+  await page.evaluate(() => { const PP = __g.PP._; PP.startDay(9); PP.G.s = 'play'; for (let i = 0; i < 60 * 35; i++) { __botTick(); __upd(1 / 60); } });
+  await shot('pp_36_crew_at_work.png'); await audit('day 10 with the crew');
+  await pp('__playDay()');
+  await pp("__g.PP._.SV.crew=['DEW','PEB','EMBER'];__g.PP._.SV.seeds=['ZIP'];__g.PP._.G.s='crew'");
+  await shot('pp_37_sprouts_page.png'); await audit('sprouts page');
+  await page.evaluate(() => { const PP = __g.PP._; PP.startDay(4); PP.G.s = 'play'; for (let i = 0; i < 60 * 6; i++) { __botTick(); __upd(1 / 60); } });
+  await shot('pp_38_sprout_seed_planting.png');
+  await page.evaluate(() => { for (let i = 0; i < 60 * 20; i++) { __botTick(); __upd(1 / 60); } });
+  check((await pp('__g.PP._.SV.crew')).includes('ZIP'), 'a seed planted mid-day grows and ZIP joins');
+  await pp('__playDay()');
 
   /* the other screens */
   await pp("__g.PP._.G.s='stand';__g.PP._.G.si=0");
