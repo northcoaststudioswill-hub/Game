@@ -102,7 +102,7 @@ const FMAPS={
    1:{k:'tre',n:"DEREK'S COOLER",w:4,petal:70,res:['berry',6]},2:{k:'tre',n:'MOLTEN GEODE',w:6,petal:90,res:['ingot',3]},3:{k:'tre',n:'MYSTERY GLASSWARE',w:3,petal:55},
    M:{k:'npc',who:'DOME GUARD',dir:[1,0],team:[['MAGMOSS',9],['BOULDERHOUND',9]],prize:60,
     pre:['DOME GUARD: Halt. This road belongs to KING BIBI now.','Papers. Sprouts. Snacks. All of it, on the ground.'],
-    win:'DOME GUARD: The dome stays up. Only the King lowers it — and he sits in the Gloom.',lose:'DOME GUARD: Move along. Nothing to see behind the dome.',after:'The IRON DOME only drops for the King. Find him in GLOOM HOLLOW.'},
+    win:'DOME GUARD: The dome stays up. The King says it is temporary. He sits in the Gloom.',lose:'DOME GUARD: Move along. Nothing to see behind the dome.',after:'The IRON DOME only drops for the King. Find him in GLOOM HOLLOW.'},
    Q:{k:'npc',who:'DEREK',dir:[-1,0],prop:'truck',team:[['CINDERCAP',8],['DRIZZLET',8]],prize:50,
     pre:['DEREK: Yo! The Flow Pros truck died. Again.','Battle me while I wait on Marcus? Loser buys the beer.'],
     win:'DEREK: Ha! Okay, okay. Beer is on me. Do not tell Marcus about the truck.',lose:'DEREK: You owe me a cold one, keeper.',after:'Marcus runs the gym up the road. Tell him the truck is, uh, fine.'}}},
@@ -163,8 +163,12 @@ const FMAPS={
     pre:['DOME GUARD: The King is not receiving visitors.','Or criticism. Or keepers. Turn around.'],
     win:'DOME GUARD: ...He is going to be so mad at me.',lose:'DOME GUARD: The Gloom keeps what the King takes.',after:'He is right up the road. Do not say I let you through.'},
    K:{k:'npc',who:'KING BIBI',dir:[0,1],boss:1,flag:'bibi',team:[['BOULDERHOUND',18],['MAGMOSS',18],['AURICORN',19]],prize:300,
-    pre:['KING BIBI: Ah. The little keeper.','This valley was promised to me. By me.','The Lantern light is a security risk. I am keeping the shards. Indefinitely.'],
-    win:'KING BIBI: ...I will be back. I am always back. Again. And again.',lose:'KING BIBI: The dome protects. The dome provides. Mostly for me.',after:'KING BIBI: Enjoy the road. I am already drafting my return.'}}},
+    pre:['Ah. The little keeper. Sit. I have brought a chart.',
+     'This is a lantern. This is a red line. I drew the line myself. With a marker.',
+     'For thirty years I have warned: the light is weeks away. I am never wrong. I am only early.',
+     'So the shards stay with me. It is self-defense. With me, everything is self-defense.'],
+    win:'KING BIBI: This changes nothing! It is a witch hunt! I will have a new coalition by morning.',lose:'KING BIBI: Total victory. The most moral dome in the valley. Again.',
+    after:'I did not lose. I am restructuring my coalition. And my trial? Postponed. Indefinitely.'}}},
  PEAK:{rows:[
   'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
   'T.....HHHH.....................T',
@@ -240,8 +244,8 @@ function fBuild(id,from){const M=FMAPS[id],rows=M.rows,h=rows.length,w=rows[0].l
 function fSpawnWild(F,sec){const [gx,gy]=F.grass[(Math.random()*F.grass.length)|0];
  return{sp:wPickFromTable(sec),lv:sec.lv[0]+((Math.random()*(sec.lv[1]-sec.lv[0]+1))|0),x:gx*FT+8,y:gy*FT+10,tx:gx*FT+8,ty:gy*FT+10,t:Math.random()*2}}
 function fBlocked(F,tx,ty){const o=F.bl[tx+','+ty];return!!o&&(o.dome?!SW.fl[o.flag]:!o.open)}
-function fWalkTile(F,tx,ty){const c=fTile(F,tx,ty);return'.,:"='.includes(c)&&!fBlocked(F,tx,ty)}
-function fSolid(F,x,y){const tx=Math.floor(x/FT),ty=Math.floor(y/FT);
+function fWalkTile(F,tx,ty){if(F.base)return tx>=0&&ty>=0&&tx<F.w&&ty<F.h&&!wSolidAt(tx*FT+8,ty*FT+8);const c=fTile(F,tx,ty);return'.,:"='.includes(c)&&!fBlocked(F,tx,ty)}
+function fSolid(F,x,y){if(F.base)return wSolidAt(x,y);const tx=Math.floor(x/FT),ty=Math.floor(y/FT);
  if(!fWalkTile(F,tx,ty))return true;
  for(const nd of W4.nodes)if(!nd.got&&Math.abs(x-nd.x)<7&&Math.abs(y-nd.y)<6)return true;
  return false}
@@ -333,7 +337,7 @@ function fSquad(F,dt){const flw=F.sq.filter(s=>s.st==='follow');let fi=0;
    if(s.wt>=.5){s.wt=0;const pw=(k==='node'&&((tg.k==='rock'&&s.type===1)||(tg.k==='tree'&&s.type===4)||(tg.k==='bush'&&s.type===2)))?2:1;
     tg.hp-=pw;tg.shake=.2;fSpark(tg.x+(Math.random()*12-6),tg.y-10-(Math.random()*8),T.l);if(Math.random()<.3)swSnd(k==='node'&&tg.k==='rock'?180:260,.03,120);
     if(tg.hp<=0){
-     if(k==='node'){tg.got=true;const y2=WNODEY[tg.k];F.items.push({k:'pel',res:y2[0],n:y2[1]+1,w:tg.k==='bush'?1:tg.k==='tree'?2:3,x:tg.x,y:tg.y,car:[]});swSnd(220,.08,140)}
+     if(k==='node'){tg.got=true;const y2=WNODEY[tg.k];F.items.push({k:'pel',res:y2[0],n:y2[1]+1,w:tg.k==='bush'?1:tg.k==='tree'?2:3,x:tg.x,y:tg.y,car:[]});if(F.base)fFlow(F);swSnd(220,.08,140)}
      else if(k==='gate'){tg.open=true;SW.fl[tg.fk]=1;fFlow(F);F.cv=null;W4.floats.push({x:tg.x,y:tg.y-18,txt:tg.n+' CLEARED!',t:1.8,c:'#7ee787'});swSnd(660,.12,1320);swSave()}
      else{tg.done=true;SW.fl[tg.fk]=1;for(const [x,y] of tg.tiles)F.t[y][x]='=';fFlow(F);F.cv=null;W4.floats.push({x:tg.x,y:tg.y-14,txt:'BRIDGE BUILT!',t:1.8,c:'#7ee787'});swSnd(660,.12,1320);swSave()}}}
    continue}
@@ -360,7 +364,7 @@ function fNear(F){const px=P3.x+F.dir[0]*11,py=P3.y+F.dir[1]*11,in2=(o,r2)=>Math
  for(const nd of W4.nodes)if(!nd.got&&in2(nd))return{k:'node',nd,txt:nd.k==='tree'?'CHOP':nd.k==='rock'?'MINE':'PICK'};
  for(const it of F.items)if(!it.done&&in2(it))return{k:'info',txt:'LOOK',msg:(it.n||it.res.toUpperCase())+' · needs '+it.w+' sprout strength · B throws sprouts'};
  for(const g2 of F.gates)if(!g2.open&&in2(g2,20))return{k:'info',txt:'LOOK',msg:g2.n+' · only '+TYPES[g2.type].n+' sprouts can clear it'};
- for(const dm of F.domes)if(!SW.fl[dm.flag]&&in2(dm,22))return{k:'info',txt:'LOOK',msg:"IRON DOME · by order of KING BIBI. It only drops when he does."};
+ for(const dm of F.domes)if(!SW.fl[dm.flag]&&in2(dm,22))return{k:'info',txt:'LOOK',msg:"IRON DOME · by order of KING BIBI. 'Temporary.' It has been temporary for years."};
  for(const s of F.sites)if(!s.done&&Math.hypot(px-s.x,py-s.y)<s.tiles.length*8+16)return{k:'info',txt:'LOOK',msg:'A BRIDGE could go here · throw sprouts at it to build'};
  return null}
 function fTalk(F,who,lines,after){F.dlg={who,lines,i:0,after}}
@@ -437,14 +441,34 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
   else if(n.k==='sign'){swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(n.k==='info'){swSay(n.msg,2.6);swSnd(660,.05,880)}
   return}
+ fCommand(F,dt);
+ if(pressed('start')){swSel=0;state='g4pause'}}
+/* squad orders, shared by the field and Sunkeep: SELECT picks the kind, B throws, hold B whistles */
+function fCommand(F,dt){
  if(pressed('sel')){let i=SW.selType;for(let n=0;n<TYPES.length;n++){i=(i+1)%TYPES.length;if(F.sq.some(s=>s.type===i))break}
   SW.selType=i;swSnd(660,.06,990);W4.floats.push({x:P3.x,y:P3.y-20,txt:TYPES[i].n+' SPROUTS UP NEXT',t:1.2,c:TYPES[i].l})}
- if(pressed('b')){fThrow(F);if(!SW.lessons.fthrow){SW.lessons.fthrow=1;swSay('B throws a sprout where the ring is. HOLD B to whistle them back. SELECT picks the kind.',4.2)}}
+ if(pressed('b')){fThrow(F);if(F.sq.length&&!SW.lessons.fthrow){SW.lessons.fthrow=1;swSay('B throws a sprout where the ring is. HOLD B to whistle them back. SELECT picks the kind.',4.2)}}
  if(keys.b){F.bHold=(F.bHold||0)+dt;
   if(F.bHold>.38){const wr=Math.min(78,16+(F.bHold-.38)*150);F.whistle=wr;if(((F.bHold*10)|0)%3===0)swSnd(1320+wr*6,.03);
    for(const s of F.sq)if(s.st!=='follow'&&s.st!=='fly'&&s.st!=='ret'&&Math.hypot(s.x-P3.x,s.y-P3.y)<wr){fDrop(F,s);s.st='ret'}}}
- else{F.bHold=0;F.whistle=0}
- if(pressed('start')){swSel=0;state='g4pause'}}
+ else{F.bHold=0;F.whistle=0}}
+/* Sunkeep keeps its own walker and layout, but the squad, throwing, carrying and the way home all run on the field engine */
+function fBaseBuild(){const w=Math.ceil(WW/FT),h=Math.ceil((W4.wh||520)/FT),F={id:'BASE',base:1,w,h,t:[],items:[],gates:[],sites:[],buds:[],npcs:[],exits:[],sq:[],alphas:[],domes:[],doors:[],grass:[],gym:null,start:{x:240,y:100},bl:{},t0:0,dir:[0,1],bio:FBIO.MEADOW,cv:null,dist:null};
+ for(let y=0;y<h;y++)F.t.push(new Array(w).fill('.'));fFlow(F);fSync(F,true);return F}
+function fBaseTick(dt){const F=W4.bf;if(!F)return;if(P3.ax||P3.ay)F.dir=[P3.ax,P3.ay];
+ F.ft=(F.ft||0)-dt;if(F.ft<=0){F.ft=2;fFlow(F)}
+ if(F.got){F.got.t-=dt;if(F.got.t<=0)F.got=null}
+ fSync(F);fSquad(F,dt);fItems(F,dt);fCommand(F,dt)}
+function fSqDraw(F,front){for(const o of F.sq){if((o.y>P3.y)!==front)continue;drawBud({x:Math.round(o.x),y:Math.round(o.y)+2,type:o.type,stage:2,z:o.z||0,a:o.a,mv:!!o.mv,st:o.st==='idle'?'idle':'follow',fx:1});
+  if(o.st==='work'&&o.mv)r('#ffffff',Math.round(o.x)+4,Math.round(o.y)-9,2,2)}
+ if(!front)for(const it of F.items)fItemDraw(it)}
+function fRing(F){if(F.sq.some(s=>s.st==='follow')){const a=fAim(F),T=TYPES[a.kind==='gate'?a.tg.type:SW.selType],ph=((time*6)|0)%2,ax=Math.round(a.x),ay=Math.round(a.y);
+  for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.55)',Math.round(px),Math.round(py),1,1)}
+  r(T.l,ax-6-ph,ay-1,3,1);r(T.l,ax+4+ph,ay-1,3,1);r(T.l,ax-1,ay-6-ph,1,3);r(T.l,ax-1,ay+3+ph,1,3);if(a.tg)r('#ffffff',ax-1,ay-1,1,1)}
+ if(F.whistle){g.strokeStyle='rgba(255,244,180,.8)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-2,F.whistle,0,7);g.stroke();
+  g.strokeStyle='rgba(255,244,180,.35)';g.beginPath();g.arc(P3.x,P3.y-2,F.whistle*.7,0,7);g.stroke()}}
+if(SW.followers&&SW.followers.length){for(const ty of SW.followers)SW.buds[TYPES[ty].n]=(SW.buds[TYPES[ty].n]||0)+1;SW.followers=[];swSave()} /* old follower trains join the pouch */
+
 /* ---------------- drawing ---------------- */
 function fBake(F){const B=F.bio,cv=document.createElement('canvas');cv.width=F.w*FT;cv.height=F.h*FT;const b=cv.getContext('2d');if(!b||!b.fillRect){F.cv=cv;return}
  const R=(c,x,y,w,h)=>{b.fillStyle=c;b.fillRect(x,y,w,h)},rnd=wSeedRand(wSectorSeed(F.id)+3);

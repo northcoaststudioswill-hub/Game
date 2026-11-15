@@ -457,7 +457,7 @@ function wEnterSector(id){W4.sector=id;SW.sector=id;const sec=wSector(id);W4.ww=
  P3.x=id==='BASE'?WW/2-20:WW/2-30;P3.y=id==='BASE'?292:W4.wh-30;P3.ax=0;P3.ay=-1;W4.grassT=0;W4.grace=1.2;
  W4.part={x:P3.x-14,y:P3.y+6};W4.cam=null;wCamUpdate(P3.x,P3.y);
  if(id==='BASE'){lou.x=WW/2-56;lou.y=290}
- W4.fld=FMAPS[id]?fBuild(id,W4.from):null;W4.from=null;if(W4.fld)wCamUpdate(P3.x,P3.y);
+ W4.fld=FMAPS[id]?fBuild(id,W4.from):null;W4.from=null;W4.bf=W4.fld?null:fBaseBuild();if(W4.fld)wCamUpdate(P3.x,P3.y);
  if(!SW.visited[sec.id]){SW.visited[sec.id]=1;W4.banner={txt:sec.n,sub:WSECSUB[sec.id]||'',t:3}}
  else swSay(sec.n,2.2);swSave()}
 /* ---------- base production: workers turn time into resources ---------- */
@@ -675,26 +675,7 @@ function worldUpdate(dt){if(W4.fld){fUpdate(dt);return}const sec=wSector(W4.sect
    else if(wBuildDef(b.k).yields){W4.assignB=SW.buildings.indexOf(b);swSel=0;state='g4assign'}
    else swSay(wBuildDef(b.k).n+' — '+wBuildDef(b.k).d,3)}
   return}
- if(pressed('sel')){SW.cmdMode=SW.cmdMode==='sprout'?'buddy':'sprout';swSnd(660,.06,990);swSave();
-  W4.floats.push({x:P3.x,y:P3.y-18,txt:SW.cmdMode==='sprout'?'COMMAND: SPROUTS':'COMMAND: BUDDY',t:1.6,c:'#ffd94d'});
-  if(!SW.lessons.cmd){SW.lessons.cmd=1;swSay(SW.cmdMode==='sprout'?'B throws a sprout — it brings things to you. Hold B to whistle.':'B sends your buddy to work a node. SELECT swaps command.',3.4)}}
- if(SW.cmdMode==='sprout'){
-  if(pressed('b')){wThrowSprout();W4.bThrowT=.26}
-  if(keys.b){W4.bHold=(W4.bHold||0)+dt;
-   if(W4.bHold>.5){const wr2=Math.min(54,14+W4.bHold*80);W4.whistle={r:wr2};
-    for(const f of W4.fol||[])if(['work','seek','bring','haul'].includes(f.mode)&&Math.hypot(f.x-P3.x,f.y-P3.y)<wr2){f.mode='return';f.item=null;f.tgtKind=null;f.tgtNode=null}}
-   else if(W4.bHold>.26){W4.bThrowT-=dt;if(W4.bThrowT<=0){wThrowSprout();W4.bThrowT=.26}}}
-  else{W4.bHold=0;W4.whistle=null}}
- else{
-  if(pressed('b')){const fx=P3.ax||0,fy=P3.ay||1,lx=P3.x+fx*46,ly=P3.y+fy*46;
-   W4.tossFx={x:lx,y:ly,t:.45};
-   const nd=(W4.nodes||[]).filter(n2=>!n2.got).sort((a,b)=>Math.hypot(a.x-lx,a.y-ly)-Math.hypot(b.x-lx,b.y-ly))[0];
-   if(nd&&Math.hypot(nd.x-lx,nd.y-ly)<30&&SW.party.some(m=>m.hp>0)){W4.cmdT={nd};swSnd(520,.06,760)}
-   else swSnd(240,.05)}
-  if(keys.b){W4.bHold=(W4.bHold||0)+dt;
-   if(W4.bHold>.5){const wr2=Math.min(54,14+W4.bHold*80);W4.whistle={r:wr2};
-    for(const f of W4.fol||[])if(['work','seek','bring','haul'].includes(f.mode)&&Math.hypot(f.x-P3.x,f.y-P3.y)<wr2){f.mode='return';f.item=null;f.tgtKind=null;f.tgtNode=null}}}
-  else{W4.bHold=0;W4.whistle=null}}
+ fBaseTick(dt);
  if(pressed('start')){swSel=0;state='g4pause'}}
 function wDrawTree(x,y,s){
  r('#3c2a16',x-6*s,y-1*s,12*s,3*s);
@@ -899,7 +880,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
  if(W4.tossFx){const tf=W4.tossFx,ld=SW.party.find(m=>m.hp>0);
   r('#ffd23f',tf.x-5,tf.y-1,10,2);r('#ffd23f',tf.x-1,tf.y-5,2,10);
   if(ld){const ls=wSp(ld.sp)._spr;g.drawImage(ls.ol,Math.round(tf.x)-7,Math.round(tf.y)-17,14,Math.round(14*ls.oh/ls.ow))}}
- for(const f of (W4.fol||[])){if(f.mode==='away'||f.y>P3.y)continue;wDrawFol(f)}
+ if(W4.bf)fSqDraw(W4.bf,false);
  r('rgba(0,0,0,.25)',P3.x-8,P3.y+1,16,3);
  if(SW.keeper==='WILL')drawPlayerSpr(P3.x,P3.y,1.4);
  else{if(SWCHR[SW.keeper]){const kmv=(keys.left||keys.right||keys.up||keys.down)?Math.abs(Math.sin(time*9))*2:Math.sin(time*2)*0.6;wChar(SW.keeper,P3.x,P3.y-kmv,20)}
@@ -908,11 +889,10 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
  if(W4.tend&&W4.tend.active)for(const b2 of W4.tend.buds){if(b2.y<=P3.y)continue;
   drawBud({x:Math.round(b2.x),y:Math.round(b2.y)+2,type:b2.type,stage:b2.stage||0,z:0,a:b2.type*1.3,mv:b2.st==='go'||b2.st==='carry',st:'idle',fx:1});
   if(b2.item){r('#c93a2e',Math.round(b2.x)-2,Math.round(b2.y)-12,5,5);r('#7ec850',Math.round(b2.x),Math.round(b2.y)-14,2,2)}}
- for(const f of (W4.fol||[])){if(f.mode==='away'||f.y<=P3.y)continue;wDrawFol(f)}
+ if(W4.bf){fSqDraw(W4.bf,true);fRing(W4.bf)}
  for(const f of W4.floats){const ft=wFit(f.txt,190),cx0=W4.cam?W4.cam.x:0;
   const fx2=Math.max(cx0+tw(ft,1)/2+3,Math.min(cx0+W-tw(ft,1)/2-3,f.x));
   text(ft,Math.round(fx2-tw(ft,1)/2),Math.round(f.y-(1.4-f.t)*8),1,f.c,null)}
- if(W4.whistle){g.strokeStyle='rgba(255,244,180,.75)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-4,W4.whistle.r,0,7);g.stroke()}
  for(const [fk,fo] of (W4.front||[])){if(fk==='n')wDrawNode(fo);else wDrawDecor(fo)}
  if(W4.sector==='PEAK'&&SW.bottieSeen&&!SW.bottieBeat){wChar('BOTTIE',300,124+Math.round(Math.sin(time*1.7)*2),22);
   if(Math.hypot(P3.x-300,P3.y-120)>34){r('rgba(10,14,8,.55)',300-tw('BOTTIE',1)/2-2,126,tw('BOTTIE',1)+4,9);text('BOTTIE',300-tw('BOTTIE',1)/2,127,1,'#7ee7ff',null)}}
@@ -2026,7 +2006,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},

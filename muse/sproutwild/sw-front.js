@@ -38,7 +38,7 @@ function uiMon(sp,x,y,w2,flip){const spr=wSp(sp)._spr,h2=Math.round(w2*spr.oh/sp
 function uiWill(x,y,sc,ax,ay){const sx=P3.x,sy=P3.y,sax=P3.ax,say=P3.ay,san=P3.anim;P3.ax=ax||0;P3.ay=ay==null?1:ay;P3.anim=0;drawPlayerSpr(x,y,sc);P3.x=sx;P3.y=sy;P3.ax=sax;P3.ay=say;P3.anim=san}
 
 /* ---------------- the one HUD ---------------- */
-function wHud(){const sec=wSector(W4.sector),F=W4.fld,atBase=!F;
+function wHud(){const sec=wSector(W4.sector),F=W4.fld||W4.bf,atBase=!W4.fld;
  r('rgba(10,14,8,.8)',0,0,W,15);r(UI.gold,0,15,W,1);text(sec.n,5,4,1,'#ffd94d',null);
  {const rs='♣'+SW.res.wood+' ◆'+SW.res.stone+' ✿'+SW.res.petal+(atBase?' ♥'+SW.hearts:'');text(rs,W-5-tw(rs,1),4,1,'#d8e8c8',null)}
  if(SW.stam<99){r('#00000088',0,16,W,2);r(SW.stam>40?UI.leaf:SW.stam>18?'#ffd94d':'#e04838',0,16,Math.round(W*SW.stam/100),2)}
@@ -53,7 +53,7 @@ function wHud(){const sec=wSector(W4.sector),F=W4.fld,atBase=!F;
    const lab=fl===all.length?''+fl:fl+'/'+all.length,w2=13+tw(lab,1);
    if(on){r(UI.gold,x-2,y-2,w2+3,13);r('#2a2416',x-1,y-1,w2+1,11)}
    r(T.d,x,y+1,7,7);r(T.c,x+1,y+2,5,5);r(T.l,x+1,y+2,2,1);r('#2c6030',x+3,y-1,1,2);text(lab,x+10,y+1,1,fl?'#ffffff':'#98988a',null);x+=w2+6}
-  if(!F.sq.length)text('NO SPROUTS — PLUCK THE LEAFY ONES',4,H-12,1,UI.dim,null)}
+  if(!F.sq.length)text(atBase?'SIGILS '+SW.badges.length+'/4':'NO SPROUTS — PLUCK THE LEAFY ONES',4,H-12,1,UI.dim,null)}
  else{for(let ty=0;ty<TYPES.length;ty++){const n=SW.buds[TYPES[ty].n]||0;if(!n)continue;const T=TYPES[ty],lab=''+n;
    r(T.d,x,y+1,7,7);r(T.c,x+1,y+2,5,5);r(T.l,x+1,y+2,2,1);r('#2c6030',x+3,y-1,1,2);text(lab,x+10,y+1,1,'#ffffff',null);x+=19+tw(lab,1)}
   if(x===4)text('SIGILS '+SW.badges.length+'/4',4,H-12,1,SW.badges.length>=4?'#ffd94d':UI.dim,null)}
@@ -100,7 +100,7 @@ const WSTORY=[
  {who:'ERIN',t:"A year of dark, keeper. Sunkeep has one good patch of soil left. Grow them."},
  {who:'',t:'Sprouts carry, build and break. Toss one at a wild BUDDY and it is yours.'},
  {who:'MARCUS',t:"Four gyms, four Sigils. I'll be at mine either way. Unimpressed, as ever."},
- {who:'KING BIBI',t:'A dark valley needs a king. My IRON DOME covers the roads now. For your safety. ...bzzt?',acc:'#1e2c5a'}];
+ {who:'KING BIBI',t:'Citizens. For thirty years I have warned you: the light is weeks away. Hence, my IRON DOME.',acc:'#1e2c5a'}];
 /* six beats, one press each (the old rhythm); B or START skips */
 function introUpdate(){W4.introT=(W4.introT||0)+1/60;
  if(pressed('b')){wIntroDone();return}
@@ -144,7 +144,7 @@ function swDrawIntro(){const p=Math.min(W4.introPage||0,WSTORY.length-1),tt=W4.i
   if(g.beginPath&&rad>4){g.save();g.beginPath();g.rect(0,0,W,gy);g.clip();g.globalAlpha=.18+.06*Math.sin(time*4);g.fillStyle='#58a0f0';g.beginPath();g.arc(W/2,gy,rad,0,6.3);g.fill();
    g.globalAlpha=.8;g.strokeStyle='#b0e0f8';g.lineWidth=1;g.beginPath();g.arc(W/2,gy,rad,0,6.3);g.stroke();g.globalAlpha=.35;g.beginPath();g.arc(W/2,gy,rad*.7,0,6.3);g.stroke();g.restore();g.globalAlpha=1}
   fFort(W/2,gy+8);fChibi(W/2,gy+18,FLOOK['KING BIBI'],[0,1],false);fChibi(W/2-40,gy+16,FLOOK['DOME GUARD'],[0,1],false);fChibi(W/2+40,gy+16,FLOOK['DOME GUARD'],[0,1],false);
-  if(tt>2.4){const by=Math.round(gy*.30+Math.sin(time*1.4)*2);g.globalAlpha=.14+.06*Math.sin(time*5);r('#7ee7ff',W-66,by-30,40,34);g.globalAlpha=1;wChar('BOTTIE',W-46,by,30);if(((time*3)|0)%2)text('bzzt',W-80,by-30,1,'#7ee7ff',null)}}
+  if(tt>2.4){const by=Math.round(gy*.30+Math.sin(time*1.4)*2);g.globalAlpha=.14+.06*Math.sin(time*5);r('#7ee7ff',W-66,by-30,40,34);g.globalAlpha=1;wChar('BOTTIE',W-46,by,30)}}
  if(fade<1){g.globalAlpha=1-fade;r('#000000',0,0,W,H);g.globalAlpha=1}
  /* letterbox + progress */
  r('#000000',0,0,W,9);for(let i=0;i<WSTORY.length;i++)r(i===p?UI.gold:i<p?'#7a6a30':'#3a3a48',W/2-WSTORY.length*5+i*10,3,7,3);

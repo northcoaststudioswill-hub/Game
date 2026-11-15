@@ -69,7 +69,12 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
  /* every sector builds and draws */
  for(const id of ['MEADOW','TOWN','WASTES','SHORE','GLOOM','PEAK']){F.enter(id);step(5);G.draw()}
  ok('all six sectors build, update and draw',true);
- F.enter('BASE');step(5);G.draw();ok('sunkeep still runs on the old walker',!F.fld());
+ /* Sunkeep: same squad, same orders, loot goes to the Lantern */
+ S.bottieSeen=1;S.bottieBeat=1;F.enter('BASE');step(5);G.draw();const bf=F.bf();ok('sunkeep has the squad too',!F.fld()&&!!bf&&bf.sq.length>0,bf&&bf.sq.length);
+ {const nd=F.nodes().find(n=>n.k==='tree'),w1=S.res.wood;F.setPos(nd.x,nd.y+26);step(2,['up']);for(const q of bf.sq){q.x=F.pos().x;q.y=F.pos().y+8;q.st='follow'}step(10);
+  for(let i=0;i<5;i++){tap('b');step(5)}ok('B throws at home',bf.sq.filter(q=>q.st==='work'||q.st==='fly').length>=3,bf.sq.map(q=>q.st).join(','));
+  step(1800);G.draw();ok('sprouts fell a Sunkeep tree and carry the log to the Lantern',nd.got&&S.res.wood>w1,S.res.wood-w1);
+  step(40,['b']);step(60);ok('whistle works at home',bf.sq.every(q=>q.st==='follow'),bf.sq.map(q=>q.st).join(','))}
  }catch(e){out.push('FAIL crashed: '+e.message)}
  return out});
 console.log(res.join('\n'));const fails=res.filter(l=>l.startsWith('FAIL')).length;

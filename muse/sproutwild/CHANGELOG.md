@@ -21,6 +21,14 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v5.3 — Sunkeep joins the new engine; King Bibi's voice (Fable)
+
+- **The squad works at home.** Your sprouts follow you around Sunkeep, B throws, hold B whistles, SELECT picks the kind. Thrown sprouts fell Sunkeep's trees and rocks and carry the pellets to the Lantern. Sunkeep keeps its own layout, buildings, garden and tutorial; the squad, throwing, carrying and path-home all run on the field engine.
+- Replaced at Sunkeep: the SPROUT/BUDDY command toggle and "B sends your buddy to a node". Old follower trains are folded into the pouch on load.
+- **King Bibi** no longer says "bzzt" (that is Bottie's). His lines are rewritten as satire of the man: the chart and the red line drawn in marker, thirty years of "weeks away", "everything is self-defense", the witch hunt, the new coalition by morning, the postponed trial.
+
+Tests: `field-lab.js` 34/34. Older suites: 11 pass; sw12 and sw20 join the failing list because they test the two commands this version replaces.
+
 ## v5.2 — the first hour (Fable)
 
 What you see before you ever leave Sunkeep was still the old game. This pass rebuilds it (`sw-front.js`).
