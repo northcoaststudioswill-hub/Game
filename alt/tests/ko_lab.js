@@ -230,7 +230,7 @@ async function main() {
       out.hasbara = shoot(() => { const [a, b] = fight(0, 4, 0); a.x = 140; b.x = 190; hp0 = b.hp; a.meter = 100; K.sel = 1; __step(1 / 60); K.sel = 0; }, 260, 8, 'HASBARA: every 8th frame', 6, .55);
       out.hasbaraDmg = Math.round(hp0 - G.f[1].hp);
       { const keys = [20, 60, 104, 124, 160, 196], fr = []; const [a, b] = fight(0, 4, 0); a.x = 140; b.x = 190; a.meter = 100; K.sel = 1; __step(1 / 60); K.sel = 0;
-        for (let i = 0; i <= 200; i++) { __step(1 / 60); if (keys.includes(i)) fr.push(grab()); } out.hasbaraKeys = sheet(fr, 3, 1, 'HASBARA key frames: cut-in | desk | sent | mind | self-hit | final'); } out.cineDone = !G.cine; out.vSt = G.f[1].st; out.willMeter = G.f[0].meter;
+        for (let i = 0; i <= 240; i++) { __step(1 / 60); if (keys.includes(i)) fr.push(grab()); } out.hasbaraKeys = sheet(fr, 3, 1, 'HASBARA key frames: cut-in | desk | sent | mind | self-hit | final'); } out.cineDone = !G.cine; out.vSt = G.f[1].st; out.willMeter = G.f[0].meter;
       /* Bike Lane at half meter */
       out.bike = shoot(() => { const [a, b] = fight(0, 6, 0); a.x = 110; b.x = 200; hp0 = b.hp; a.meter = 60; K.sel = 1; __step(1 / 60); K.sel = 0; }, 90, 6, 'BIKE LANE (half meter): every 6th frame', 5, .6);
       out.bikeDmg = Math.round(hp0 - G.f[1].hp); out.bikeMeterLeft = Math.round(G.f[0].meter); out.willBack = !G.f[0].hide && G.f[0].st;
@@ -272,6 +272,40 @@ async function main() {
       out.sheet = sheet(fr, 6, 1, 'FWD+B for Will, Erin, Louie, Bottie, Marcus (3 frames each)'); return out;
     });
     await save('fk.png', r.sheet); delete r.sheet; console.log('fk', JSON.stringify(r));
+  }
+
+  if (want('mama')) {
+    const r = await E(() => {
+      const G = KO.G, out = {}; const mi = KO.CH.findIndex(c => c.id === 'mama');
+      let fr = [], hp0; { const [a, b] = fight(mi, 0, 2); a.x = 150; b.x = 200; hp0 = b.hp; a.meter = 100; K.sel = 1; __step(1 / 60); K.sel = 0;
+        const keys = [20, 50, 75, 100, 140, 165, 195, 225, 252, 266];
+        for (let i = 0; i <= 270; i++) { __step(1 / 60); if (keys.includes(i)) fr.push(grab()); } }
+      out.tantrumDmg = Math.round(hp0 - G.f[1].hp); out.cineDone = !G.cine; out.tantrum = sheet(fr, 5, .6, 'RUBY TEMPER TANTRUM key frames');
+      fr = []; { const [a, b] = fight(mi, 0, 2); a.x = 110; b.x = 190; hp0 = b.hp; a.meter = 60; K.sel = 1; __step(1 / 60); K.sel = 0;
+        for (let i = 0; i < 100; i++) { __step(1 / 60); if (i % 10 === 0) fr.push(grab()); } }
+      out.yukonDmg = Math.round(hp0 - G.f[1].hp); out.yukon = sheet(fr, 5, .6, 'YUKON (half meter)');
+      return out;
+    });
+    await save('super_tantrum.png', r.tantrum); await save('super_yukon.png', r.yukon); delete r.tantrum; delete r.yukon; console.log('mama', JSON.stringify(r));
+  }
+
+  if (want('arcade')) {
+    const r = await E(() => {
+      const G = KO.G, fr = [], out = {};
+      for (const opp of ['chrome', 'mama', 'marcus']) {
+        G.mode = 'arc'; G.p1 = 0; G.ladder = [1, 2, 6, KO.CH.findIndex(c => c.id === opp), 4, 5, 3]; G.li = 3; G.p2 = G.ladder[3]; G.stage = KO.CH[G.p2].stage; G.scr = 'tower'; G.scrT = 0;
+        for (let i = 0; i < 60 * 3.5; i++) { __step(1 / 60); if (i === 30 || i === 150) fr.push(grab()); }
+        out['after tower (' + opp + ')'] = G.scr;
+        for (let i = 0; i < 60 * 2.6; i++) { __step(1 / 60); if (i === 150) fr.push(grab()); }
+      }
+      G.mode = 'vs'; G.p1 = 0; G.p2 = 6; G.scr = 'stage'; G.stage = 4; for (let i = 0; i < 4; i++) __step(1 / 60); fr.push(grab());
+      /* music: a stand-in Bottie track makes his fights ask for 'ko-bottie' */
+      __g.ev("TRACKS.push({title:'test',artist:'',use:['ko-bottie'],data:''})");
+      G.p1 = 0; G.p2 = 3; G.scr = 'vs'; out.musVsBottie = __g.KO.mus(); G.p2 = 6; out.musVsMarcus = __g.KO.mus(); G.scr = 'title'; out.musMenu = __g.KO.mus();
+      __g.ev("TRACKS.pop()");
+      out.sheet = sheet(fr, 4, .6, 'tower+scene, VS banter (x3 opponents) | level select'); return out;
+    });
+    await save('arcade.png', r.sheet); delete r.sheet; console.log('arcade', JSON.stringify(r));
   }
 
   if (want('fight')) {

@@ -14,7 +14,7 @@ two music <script> blocks from the shipped v0.3 build, read-only.
 
 Run:  python3 alt/build.py      -> alt/games/pocket-lantern-alt.html
 """
-import pathlib, re, sys
+import base64, json, pathlib, re, sys
 
 here = pathlib.Path(__file__).resolve().parent
 SRC = here / 'src'
@@ -45,6 +45,24 @@ def music_blocks():
     return found
 
 
+def alt_music():
+    """ALT's own songs: alt/music/tracks.json lists them, e.g.
+    [{"file": "bottie-1.mp3", "title": "Song", "artist": "lil Bottie", "use": ["ko-bottie"]}]
+    'ko-bottie' plays in Knockout fights against Lil Bottie; 'ko-<fighter id>' or 'ko-stage-<n>' work the same way."""
+    lst = here / 'music' / 'tracks.json'
+    if not lst.exists():
+        return '/* no ALT songs yet: see alt/music/README.md */'
+    out = []
+    for t in json.loads(lst.read_text(encoding='utf8')):
+        f = here / 'music' / t['file']
+        if not f.exists():
+            die('music: ' + t['file'] + ' is listed in tracks.json but missing')
+        tr = {'title': t.get('title', f.stem), 'artist': t.get('artist', ''), 'use': t['use'],
+              'data': base64.b64encode(f.read_bytes()).decode()}
+        out.append('window.SPROUT_TRACKS.push(' + json.dumps(tr, separators=(',', ':')) + ');')
+    return '\n'.join(out)
+
+
 def code(name):
     js = (SRC / name).read_text(encoding='utf8')
     if '</script' in js.lower():
@@ -61,6 +79,7 @@ console = console.replace('/*@include rootdeep.js*/', code('rootdeep.js'))
 parts = {
     '@MUSIC tracks': music['tracks'],
     '@MUSIC pp': music['pp'],
+    '@MUSIC alt': alt_music(),
     'knockout.js': code('knockout.js'),
     'patchplate.js': code('patchplate.js'),
     'console.js': console,
@@ -74,4 +93,7 @@ for slot, body in parts.items():
 
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(html, encoding='utf8')
-print(OUT.relative_to(here.parent), len(html.encode('utf8')), 'bytes')
+size = len(html.encode('utf8'))
+print(OUT.relative_to(here.parent), size, 'bytes')
+if size > 16_000_000:
+    print('build: WARNING over 16 MB, too big to publish as a claude.ai page (songs are the heavy part)')

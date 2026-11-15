@@ -115,6 +115,56 @@ All names, lines and move names below are **invented this pass** unless Will gav
 - **Erin:** blue-grey eyes (hair and outfit unchanged).
 - Waiting on more photos of Will, Erin, Bottie and Louie for the next pass.
 
+## Pass 3: character rigs, Mama's supers, dialogue, arcade tower, level select, music slot
+
+Invented this pass unless Will gave it: move names, lines, scenes. Flag anything to change.
+
+### Character rigs (rig v2)
+- **Heads redrawn in 3/4 view** (18x18, turned toward the opponent, shaded) for all eight fighters, and each head now sits on a
+  **neck** at its jaw (an anchor point per head) instead of floating on the shoulder by its centre.
+- **Bodies have builds** (`RG` in `knockout.js`): a tapered torso with real shoulders, shaded on the back side, and per-fighter
+  proportions. Will is tall with a slouch; Marcus is broad and stocky; Erin is slighter with hair that sways in locks; Louie is low
+  and long with a wagging tail; Lil Bottie is a blocky robot with joint plates at elbows and knees. Others share a default build.
+- **Own stances and walks** (`PSO`): Will's loose guard, Marcus's wide chest-out swagger, Erin's boxer guard, Louie's crouch,
+  Bottie's stiff right-angle arms. Their jabs and specials keep the same names and effects.
+- **Own frame data and a forward+B for each of the five** (`MVO`): Erin is quickest, Marcus slow and heavy, Louie short and fast,
+  Bottie slow with long reach.
+  - Will: **FORCE PUSH** (`GIT PUSH --FORCE`), a lunging shoulder charge. 10.
+  - Erin: **TRELLIS SPIN**, a high spinning kick. 9.
+  - Louie: **ZOOMIE TACKLE**, a low diving tackle that knocks down. 9.
+  - Lil Bottie: **ROCKET FIST** (`ROCKET_FIST.EXE`), the fist flies out on a chain. 12.
+  - Marcus: **DAP UP**, a step-in handshake that can't be blocked. 12.
+- Specials, supers and finishers are unchanged.
+
+### Mama: two supers
+- **Half meter: YUKON.** A big white Yukon reverses in, reverse beeper going, Mama at the wheel yelling (I DID NOT SEE YOU!!,
+  WHO PARKS LIKE THAT?!, MOVE!!! MOVE!!!...) and MOTHERFUCKER!!! on impact. 15.
+- **Full meter: RUBY TEMPER TANTRUM** (Will's idea), a cinematic like HASBARA: S-rank cut-in with Ruby; Ruby says NO. and grows
+  into a giant, flickering Hulk-green (`RUBY SMASH!!`); on the stage she stomps twice (NO NAP!, MINE!), throws a red toy car,
+  and lets out a WAAAAAAH! shockwave: 5 + 5 + 6 + 14 = 30, can't be blocked. Then she shrinks back: `hehe.`
+  Ruby is drawn from Will's photos: curls, pigtails with green bows, pink hoodie, black leggings, white sneakers.
+
+### Dialogue
+- **VS screen banter:** each fighter gets a bubble before the fight. Set exchanges for Marcus/Will (he calls Will a J), Will/Bottie
+  (the handoff), Marcus/Bottie, Marcus/Louie, Will/Louie, Will/King Bibi, Bottie/King Bibi, Marcus/King Bibi, Will/Mama. Otherwise
+  each fighter's intro lines (Will, Marcus, Bottie, Mama have their own; others use their win quotes).
+- **More win quotes** for Will, Marcus and Bottie; the results screen now cycles through all of them.
+- **Barks:** Will, Marcus and Bottie call out on a 4-hit combo, and once when they drop low.
+- Marcus's lines follow his canon voice from Sprouts and Rootdeep (bro, see one send one, dap me up, I've got a guy).
+
+### Arcade tower and level select
+- **Arcade tower** (Mortal Kombat style) before every arcade fight: a brick tower of the ladder with the boss on top, beaten
+  opponents crossed out, torches, and your portrait climbing to the next fight. Then a short scene for the opponent
+  (Louie's ball, Marcus's spinning wrench, Erin's flowers, Bottie's loading bar, King Bibi's podium with camera flashes, Corbin's
+  hearts, Mama's Yukon driving past, Will's commit log) with a line. A skips.
+- **Level select:** Quick Fight's stage screen is now a 3x3 grid of stage thumbnails over the live preview (left/right, up/down).
+
+### Music slot for Bottie's songs
+- Songs in `alt/music/` listed in `alt/music/tracks.json` are embedded by `build.py` (see `alt/music/README.md`).
+- Tag a song `ko-bottie` and it plays in fights with Lil Bottie (and on his VS screen and tower). `ko-<fighter>` and
+  `ko-stage-<n>` work the same way; `ko` replaces the default chiptune everywhere. Opponent first, then you, then the stage.
+- The build warns past 16 MB (the claude.ai page limit). There's about 2 MB of room now: roughly one song.
+
 ## Not changed
 
 - Patch & Plate (`src/patchplate.js` is v0.3's file as built). Its 76 checks pass on the ALT build.
