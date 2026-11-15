@@ -1110,9 +1110,9 @@ function drawLou(){swShell('LOUIE','BASE GUIDE · GOOD BOY');
 function wFit(s,n){if(tw(s,1)<=n)return s;let o=s;while(o.length&&tw(o+'…',1)>n)o=o.slice(0,-1);return o+'…'}
 const WQUEST=['Talk to Louie','Choose your first buddy','Catch a wild buddy','Build a COTTAGE — START, BUILD','Build a GARDEN BED'];
 function wQuestTick(){
- if(SW.quest===3&&SW.buildings.some(b=>b.k==='cottage')){SW.quest=4;
+ if(SW.quest===3&&SW.buildings.some(b=>b.k==='cottage'&&!b.con)){SW.quest=4;
   swSay('A roof over Sunkeep! Now a GARDEN BED for berries.',3.4);swSnd(784,.09,1175);swSave()}
- else if(SW.quest===4&&SW.buildings.some(b=>b.k==='bed')){SW.quest=5;
+ else if(SW.quest===4&&SW.buildings.some(b=>b.k==='bed'&&!b.con)){SW.quest=5;
   swSay('Sunkeep stands! The valley is yours, keeper — the gyms await.',3.8);swSnd(784,.09,1175);swSave()}}
 let BT=null;
 function wAliveParty(){return SW.party.filter(m=>m.hp>0)}
@@ -1841,9 +1841,8 @@ function placeUpdate(){const c=W4.cursor;
  if(pressed('a')){if(!wCellFree(c.x,c.y)){swSnd(140,.08);swSay('No room there \u2014 the Lantern, sign and sprouts need their space.',1.8);return}
   const def=wBuildDef(W4.placeK);wPay(def.cost);
   const firstOfKind=!SW.buildings.some(b=>b.k===def.k);
-  SW.buildings.push({k:def.k,gx:c.x,gy:c.y,workers:[]});
-  if(firstOfKind){SW.hearts+=3;SW.heartsTotal+=3;swSay(def.n+' built! First of its kind: +3 gratitude',2.4)}
-  else swSay(def.n+' built!',1.8);swSnd(784,.09,1175);swSave();state='g4world'}}
+  const nb={k:def.k,gx:c.x,gy:c.y,workers:[]};SW.buildings.push(nb);scConStart(nb,def,firstOfKind);
+  swSnd(523,.08,784);swSave();state='g4world'}}
 function drawPlace(){wDrawWorld();const cam=W4.cam||{x:0,y:0};
  g.save();g.translate(-cam.x,-cam.y);
  g.globalAlpha=.10;for(let gx=0;gx<=22;gx++)for(let gy=0;gy<=23;gy++){const ox=wCellX(gx),oy=wCellY(gy);r('#ffffff',ox,oy,20,1);r('#ffffff',ox,oy,1,20)}g.globalAlpha=1;

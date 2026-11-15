@@ -234,7 +234,7 @@ function fBuild(id,from){const M=FMAPS[id],rows=M.rows,h=rows.length,w=rows[0].l
  for(const it of F.items){const al=F.alphas.find(a=>a.guards===it.ch);if(al)it.guard=al}
  if(M.fort)F.fort={x:M.fort[0]*FT,y:M.fort[1]*FT};
  const sec=wSector(id);
- if(sec.table&&F.grass.length)for(let i=0;i<5;i++)W4.wilds.push(fSpawnWild(F,sec));
+ if(sec.table&&F.grass.length)for(let i=0;i<4;i++)W4.wilds.push(fSpawnWild(F,sec));
  /* where you arrive: the exit that leads back where you came from, else the beacon */
  const ex=from&&F.exits.find(e=>e.to===from);
  if(ex){const ix=ex.tx<=0?1:ex.tx>=w-1?-1:0,iy=ex.ty<=0?1:ex.ty>=h-1?-1:0;P3.x=ex.x+ix*FT*1.5;P3.y=ex.y+iy*FT*1.5;F.dir=[ix,iy||(ix?0:-1)]}
@@ -269,7 +269,7 @@ const fStr=it=>it.car.reduce((a,s)=>a+(s.type===1?2:1),0);
 function fAim(F){ /* the cursor sits ahead of you and locks on to the nearest thing sprouts can work: a wide cone in front, plus anything right beside you */
  let x=P3.x+F.dir[0]*52,y=P3.y+F.dir[1]*52,best=1e9,tg=null,kind=null;
  const tryT=(o,k)=>{const vx=o.x-P3.x,vy=o.y-P3.y,al=vx*F.dir[0]+vy*F.dir[1],off=Math.abs(vx*F.dir[1]-vy*F.dir[0]),d=Math.hypot(vx,vy);
-  let sc=1e9;if(al>-2&&al<92&&off<16+al*.42)sc=al+off*1.3;if(d<26)sc=Math.min(sc,d*.8);if(sc<best){best=sc;tg=o;kind=k}};
+  let sc=1e9;if(al>-2&&al<92&&off<16+al*.42)sc=al+off*1.3;if(d<26)sc=Math.min(sc,d*.8);if(sc<1e9){if(k==='wild')sc*=.75;else if(k==='bwork')sc*=1.1}if(sc<best){best=sc;tg=o;kind=k}};
  for(const g2 of F.gates)if(!g2.open)tryT(g2,'gate');
  for(const s of F.sites)if(!s.done)tryT(s,'site');
  {const b0=best;let full=null;for(const it of F.items)if(!it.done&&!(it.guard&&F.alphas.includes(it.guard))){if(fStr(it)+F.sq.filter(q=>q.st==='fly'&&q.aim&&q.aim.tg===it).reduce((a,q)=>a+(q.type===1?2:1),0)>=it.w){full=full||it;continue}tryT(it,'item')}
@@ -433,7 +433,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    if(wd.t<=0){const gt=F.grass.filter(g2=>Math.abs(g2[0]*FT-wd.x)<70&&Math.abs(g2[1]*FT-wd.y)<70),pk=gt[(Math.random()*gt.length)|0];
     if(pk){wd.tx=pk[0]*FT+8;wd.ty=pk[1]*FT+10}wd.t=1.5+Math.random()*3}
    const dx=wd.tx-wd.x,dy=wd.ty-wd.y,d=Math.hypot(dx,dy);wd.mv=d>2;if(d>2){wd.x+=dx/d*16*dt;wd.y+=dy/d*16*dt;wd.fx=dx<0?-1:1}}
-  if(W4.wildCd>0){W4.wildCd-=dt;if(W4.wildCd<=0&&W4.wilds.length<5&&F.grass.length)W4.wilds.push(fSpawnWild(F,sec))}}
+  if(W4.wildCd>0){W4.wildCd-=dt;if(W4.wildCd<=0&&W4.wilds.length<3&&F.grass.length)W4.wilds.push(fSpawnWild(F,sec))}}
  /* your lead buddy walks at your side */
  pfTick(F,dt);pfWildTick(F,dt);
  fSquad(F,dt);fItems(F,dt);fLouTick(F,dt);
@@ -474,7 +474,7 @@ function fBaseBuild(){const w=Math.ceil(WW/FT),h=Math.ceil((W4.wh||520)/FT),F={i
 function fBaseTick(dt){const F=W4.bf;if(!F)return;if(P3.ax||P3.ay)F.dir=[P3.ax,P3.ay];
  F.ft=(F.ft||0)-dt;if(F.ft<=0){F.ft=2;fFlow(F)}
  if(F.got){F.got.t-=dt;if(F.got.t<=0)F.got=null}
- fSync(F);pfTick(F,dt);fSquad(F,dt);fItems(F,dt);wkTick(dt);wCastTick(dt);fCommand(F,dt);wBaseEdge()}
+ fSync(F);pfTick(F,dt);fSquad(F,dt);fItems(F,dt);wkTick(dt);scConTick(dt);wCastTick(dt);fCommand(F,dt);wBaseEdge()}
 function fSqDraw(F,front){for(const o of F.sq){if((o.y>P3.y)!==front)continue;drawBud({x:Math.round(o.x),y:Math.round(o.y)+2,type:o.type,stage:2,z:o.z||0,a:o.a,mv:!!o.mv,st:o.st==='idle'?'idle':'follow',fx:1});
   if(o.st==='work'&&o.mv)r('#ffffff',Math.round(o.x)+4,Math.round(o.y)-9,2,2)}
  if(!front){for(const it of F.items)fItemDraw(it);for(const b of F.buds)fBudDraw(b)}}

@@ -7158,9 +7158,9 @@ function drawLou(){swShell('LOUIE','BASE GUIDE · GOOD BOY');
 function wFit(s,n){if(tw(s,1)<=n)return s;let o=s;while(o.length&&tw(o+'…',1)>n)o=o.slice(0,-1);return o+'…'}
 const WQUEST=['Talk to Louie','Choose your first buddy','Catch a wild buddy','Build a COTTAGE — START, BUILD','Build a GARDEN BED'];
 function wQuestTick(){
- if(SW.quest===3&&SW.buildings.some(b=>b.k==='cottage')){SW.quest=4;
+ if(SW.quest===3&&SW.buildings.some(b=>b.k==='cottage'&&!b.con)){SW.quest=4;
   swSay('A roof over Sunkeep! Now a GARDEN BED for berries.',3.4);swSnd(784,.09,1175);swSave()}
- else if(SW.quest===4&&SW.buildings.some(b=>b.k==='bed')){SW.quest=5;
+ else if(SW.quest===4&&SW.buildings.some(b=>b.k==='bed'&&!b.con)){SW.quest=5;
   swSay('Sunkeep stands! The valley is yours, keeper — the gyms await.',3.8);swSnd(784,.09,1175);swSave()}}
 let BT=null;
 function wAliveParty(){return SW.party.filter(m=>m.hp>0)}
@@ -7889,9 +7889,8 @@ function placeUpdate(){const c=W4.cursor;
  if(pressed('a')){if(!wCellFree(c.x,c.y)){swSnd(140,.08);swSay('No room there \u2014 the Lantern, sign and sprouts need their space.',1.8);return}
   const def=wBuildDef(W4.placeK);wPay(def.cost);
   const firstOfKind=!SW.buildings.some(b=>b.k===def.k);
-  SW.buildings.push({k:def.k,gx:c.x,gy:c.y,workers:[]});
-  if(firstOfKind){SW.hearts+=3;SW.heartsTotal+=3;swSay(def.n+' built! First of its kind: +3 gratitude',2.4)}
-  else swSay(def.n+' built!',1.8);swSnd(784,.09,1175);swSave();state='g4world'}}
+  const nb={k:def.k,gx:c.x,gy:c.y,workers:[]};SW.buildings.push(nb);scConStart(nb,def,firstOfKind);
+  swSnd(523,.08,784);swSave();state='g4world'}}
 function drawPlace(){wDrawWorld();const cam=W4.cam||{x:0,y:0};
  g.save();g.translate(-cam.x,-cam.y);
  g.globalAlpha=.10;for(let gx=0;gx<=22;gx++)for(let gy=0;gy<=23;gy++){const ox=wCellX(gx),oy=wCellY(gy);r('#ffffff',ox,oy,20,1);r('#ffffff',ox,oy,1,20)}g.globalAlpha=1;
@@ -8202,7 +8201,7 @@ function fBuild(id,from){const M=FMAPS[id],rows=M.rows,h=rows.length,w=rows[0].l
  for(const it of F.items){const al=F.alphas.find(a=>a.guards===it.ch);if(al)it.guard=al}
  if(M.fort)F.fort={x:M.fort[0]*FT,y:M.fort[1]*FT};
  const sec=wSector(id);
- if(sec.table&&F.grass.length)for(let i=0;i<5;i++)W4.wilds.push(fSpawnWild(F,sec));
+ if(sec.table&&F.grass.length)for(let i=0;i<4;i++)W4.wilds.push(fSpawnWild(F,sec));
  /* where you arrive: the exit that leads back where you came from, else the beacon */
  const ex=from&&F.exits.find(e=>e.to===from);
  if(ex){const ix=ex.tx<=0?1:ex.tx>=w-1?-1:0,iy=ex.ty<=0?1:ex.ty>=h-1?-1:0;P3.x=ex.x+ix*FT*1.5;P3.y=ex.y+iy*FT*1.5;F.dir=[ix,iy||(ix?0:-1)]}
@@ -8237,7 +8236,7 @@ const fStr=it=>it.car.reduce((a,s)=>a+(s.type===1?2:1),0);
 function fAim(F){ /* the cursor sits ahead of you and locks on to the nearest thing sprouts can work: a wide cone in front, plus anything right beside you */
  let x=P3.x+F.dir[0]*52,y=P3.y+F.dir[1]*52,best=1e9,tg=null,kind=null;
  const tryT=(o,k)=>{const vx=o.x-P3.x,vy=o.y-P3.y,al=vx*F.dir[0]+vy*F.dir[1],off=Math.abs(vx*F.dir[1]-vy*F.dir[0]),d=Math.hypot(vx,vy);
-  let sc=1e9;if(al>-2&&al<92&&off<16+al*.42)sc=al+off*1.3;if(d<26)sc=Math.min(sc,d*.8);if(sc<best){best=sc;tg=o;kind=k}};
+  let sc=1e9;if(al>-2&&al<92&&off<16+al*.42)sc=al+off*1.3;if(d<26)sc=Math.min(sc,d*.8);if(sc<1e9){if(k==='wild')sc*=.75;else if(k==='bwork')sc*=1.1}if(sc<best){best=sc;tg=o;kind=k}};
  for(const g2 of F.gates)if(!g2.open)tryT(g2,'gate');
  for(const s of F.sites)if(!s.done)tryT(s,'site');
  {const b0=best;let full=null;for(const it of F.items)if(!it.done&&!(it.guard&&F.alphas.includes(it.guard))){if(fStr(it)+F.sq.filter(q=>q.st==='fly'&&q.aim&&q.aim.tg===it).reduce((a,q)=>a+(q.type===1?2:1),0)>=it.w){full=full||it;continue}tryT(it,'item')}
@@ -8401,7 +8400,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    if(wd.t<=0){const gt=F.grass.filter(g2=>Math.abs(g2[0]*FT-wd.x)<70&&Math.abs(g2[1]*FT-wd.y)<70),pk=gt[(Math.random()*gt.length)|0];
     if(pk){wd.tx=pk[0]*FT+8;wd.ty=pk[1]*FT+10}wd.t=1.5+Math.random()*3}
    const dx=wd.tx-wd.x,dy=wd.ty-wd.y,d=Math.hypot(dx,dy);wd.mv=d>2;if(d>2){wd.x+=dx/d*16*dt;wd.y+=dy/d*16*dt;wd.fx=dx<0?-1:1}}
-  if(W4.wildCd>0){W4.wildCd-=dt;if(W4.wildCd<=0&&W4.wilds.length<5&&F.grass.length)W4.wilds.push(fSpawnWild(F,sec))}}
+  if(W4.wildCd>0){W4.wildCd-=dt;if(W4.wildCd<=0&&W4.wilds.length<3&&F.grass.length)W4.wilds.push(fSpawnWild(F,sec))}}
  /* your lead buddy walks at your side */
  pfTick(F,dt);pfWildTick(F,dt);
  fSquad(F,dt);fItems(F,dt);fLouTick(F,dt);
@@ -8442,7 +8441,7 @@ function fBaseBuild(){const w=Math.ceil(WW/FT),h=Math.ceil((W4.wh||520)/FT),F={i
 function fBaseTick(dt){const F=W4.bf;if(!F)return;if(P3.ax||P3.ay)F.dir=[P3.ax,P3.ay];
  F.ft=(F.ft||0)-dt;if(F.ft<=0){F.ft=2;fFlow(F)}
  if(F.got){F.got.t-=dt;if(F.got.t<=0)F.got=null}
- fSync(F);pfTick(F,dt);fSquad(F,dt);fItems(F,dt);wkTick(dt);wCastTick(dt);fCommand(F,dt);wBaseEdge()}
+ fSync(F);pfTick(F,dt);fSquad(F,dt);fItems(F,dt);wkTick(dt);scConTick(dt);wCastTick(dt);fCommand(F,dt);wBaseEdge()}
 function fSqDraw(F,front){for(const o of F.sq){if((o.y>P3.y)!==front)continue;drawBud({x:Math.round(o.x),y:Math.round(o.y)+2,type:o.type,stage:2,z:o.z||0,a:o.a,mv:!!o.mv,st:o.st==='idle'?'idle':'follow',fx:1});
   if(o.st==='work'&&o.mv)r('#ffffff',Math.round(o.x)+4,Math.round(o.y)-9,2,2)}
  if(!front){for(const it of F.items)fItemDraw(it);for(const b of F.buds)fBudDraw(b)}}
@@ -8987,7 +8986,8 @@ function wkDraw(front){for(const w of W4.wk||[]){if((w.y>P3.y)!==front)continue;
   else if(w.at&&tk&&tk.b){const key=tk.k==='craft'?'HANDIWORK':tk.k==='tend'?'WATERING':(wBuildDef(tk.b.k).skill||['PLANTING'])[0],c=WKC[tk.b.k==='sawmill'?'LUMBERING':key];
    r('#14101e',X-4,top-7,8,8);r(c,X-3,top-6,6,6);r('#ffffff',X-2,top-5,2,1);if(hop)r('#ffffff',X+5,top+2,2,2)}}}
 /* ---------------- buildings: bigger, outlined, alive ---------------- */
-function wDrawBuilding(b){const x=wCellX(b.gx),y=wCellY(b.gy),K='#14101e',on=b.busy>0,def=wBuildDef(b.k),t=time;
+function wDrawBuilding(b){if(b.con>0){scConDraw(b);return}wDrawBuilding0(b)}
+function wDrawBuilding0(b){const x=wCellX(b.gx),y=wCellY(b.gy),K='#14101e',on=b.busy>0,def=wBuildDef(b.k),t=time;
  r('rgba(0,0,0,.24)',x-4,y+17,30,5);
  if(b.k==='cottage'){r(K,x-4,y-1,28,22);r('#9a9aa2',x+15,y-13,6,9);r(K,x+14,y-14,8,2);r('#c8c8d0',x+15,y-13,2,9);
   r('#e8dcc0',x-3,y+6,26,14);r('#c9b890',x-3,y+16,26,4);r('#8a6a48',x-3,y+6,2,14);r('#8a6a48',x+21,y+6,2,14);r('#8a6a48',x+9,y+6,2,6);
@@ -9654,8 +9654,8 @@ const WCBEATS=[
  ['three',()=>wOp()===1,[['MARCUS','Berries. Face them and press A. The sprouts do the rest.']]],
  ['carry',()=>wOp()===1&&W4.bf&&W4.bf.items.some(i=>i.op&&i.car.length),[['ERIN','B calls them back. Everything goes to the Lantern.']]],
  ['lit',()=>wOp()===2,[['ERIN',"It's awake! Go and greet one of the dim ones."]]],
- ['buddy',()=>SW.quest>=2&&SW.party.length>0&&SW.quest<5,[['MARCUS','South road. Throw sprouts at a wild one. Enough and it blooms.']]],
- ['caught',()=>SW.quest>=3,[['ERIN','Leave a buddy at home and it finds work.'],['MARCUS','START, then BUILD. Cottage first.']]],
+ ['buddy',()=>SW.quest===2&&SW.party.length>0,[['MARCUS','South road. Throw sprouts at a wild one. Enough and it blooms.']]],
+ ['caught',()=>SW.quest===3,[['ERIN','Leave a buddy at home and it finds work.'],['MARCUS','START, then BUILD. Cottage first.']]],
  ['cottage',()=>SW.buildings.some(b=>b.k==='cottage'),[['ERIN','A roof! Now a garden bed.']]],
  ['worker',()=>(W4.wk||[]).some(w=>w.at),[['MARCUS','Free labour. I respect it.']]],
  ['ore',()=>(SW.res.ore||0)>0,[['MARCUS','Ore! Build a kiln for ingots.']]],
@@ -9732,10 +9732,11 @@ function pfDraw(b,feet){const spr=wSp(b.m.sp)._spr,w=Math.round(spr.ow*PSC),h=Ma
  if(b.st==='work'){const T=TYPES[wSp(b.m.sp).t[0]];r('#14101e',X-3,Y-h-6,7,7);r(T.c,X-2,Y-h-5,5,5)}
  if(feet)feet(b.x,b.y)}
 /* ---------------- open-field capture ---------------- */
-function pfNeed(wd){return 2+wd.lv}
-function pfStr(wd){const ty=wSp(wd.sp).t;return(wd.lat||[]).reduce((a,s)=>a+(ty.includes(s.type)?2:1),0)}
+function pfNeed(wd){return 1+wd.lv}
+function pfPin(wd){const F=W4.fld;return F&&F.pf&&F.pf.some(b=>b.st==='follow'&&Math.hypot(b.x-wd.x,b.y-wd.y)<70)?1:0}
+function pfStr(wd){const ty=wSp(wd.sp).t;return(wd.lat||[]).reduce((a,s)=>a+(ty.includes(s.type)?2:1),0)+((wd.lat||[]).length?pfPin(wd):0)}
 function pfLatch(F,s,wd){wd.lat=wd.lat||[];if(!wd.lat.includes(s))wd.lat.push(s);s.st='latch';s.tg=wd;s.lt=0;wd.lt=0;wd.mv=false;
- if(wd.lat.length===1){swSnd(660,.06,990);if(!SW.lessons.fswarm){SW.lessons.fswarm=1;swSay('They latched on! Enough sprouts (kin count double) and it blooms right here. Too few and it fights.',4.4)}}}
+ if(wd.lat.length===1){swSnd(660,.06,990);if(!SW.lessons.fswarm){SW.lessons.fswarm=1;swSay('They latched on! The bar fills with each sprout (kin count double; a buddy nearby helps). Full bar and it blooms. Too few and it fights.',4.4)}}}
 function pfWildTick(F,dt){for(const wd of W4.wilds.slice()){
  if(wd.cap){wd.cap.t+=dt;const t=wd.cap.t;
   if(t>=2.3){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;for(const s of wd.lat||[]){s.st='ret';s.tg=null}
@@ -9746,7 +9747,7 @@ function pfWildTick(F,dt){for(const wd of W4.wilds.slice()){
  if(!wd.lat||!wd.lat.length)continue;
  wd.lat=wd.lat.filter(s=>s.st==='latch'&&s.tg===wd);if(!wd.lat.length){wd.lt=0;continue}
  wd.lt=(wd.lt||0)+dt;const str=pfStr(wd),need=pfNeed(wd);
- if(str>=need&&wd.lt>1){const sp=wSp(wd.sp),p=Math.max(.2,Math.min(.92,.4+.12*(str-need)+(sp.catch||.4)*.4));
+ if(str>=need&&wd.lt>1){const sp=wSp(wd.sp),p=Math.max(.2,Math.min(.9,.3+.12*(str-need)+(sp.catch||.4)*.4));
   wd.cap={t:0,ok:Math.random()<p};swSnd(523,.12,784)}
  else if(wd.lt>3.6){ /* it shakes them off and turns on you */
   for(const s of wd.lat){s.st='ret';s.tg=null;s.z=10}wd.lat=[];W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;
@@ -9824,6 +9825,33 @@ function scWorldFx(){if(!W4.seedFx)return;for(const fx of W4.seedFx){fx.t+=1/60;
   for(let i=1;i<5;i++){const k2=Math.max(0,k-i*.035),x2=240+(P3.x-240)*k2,y2=40+(P3.y-8-40)*k2-Math.sin(k2*3.1416)*46;g.globalAlpha=.6-i*.12;r(T.l,Math.round(x2),Math.round(y2),2,2)}
   g.globalAlpha=1;r('#ffffff',Math.round(x)-2,Math.round(y)-2,5,5);r(T.c,Math.round(x)-1,Math.round(y)-1,3,3)}
  W4.seedFx=W4.seedFx.filter(fx=>fx.t<1.1)}
+/* ---------------- raising a building (v6.4) ----------------
+   Placing a building no longer pops it into being: a scaffold goes up,
+   your sprouts hop on it with hammers, base buddies walk over to help,
+   and it rises over a few seconds. More helpers, faster build. */
+function scConStart(b,def,first){W4.cons=W4.cons||[];W4.cons.push({b,def,first,t:0,need:4.2});b.con=1;
+ for(const w of W4.wk||[]){w.task={k:'idle',x:wCellX(b.gx)+10+(Math.random()*40-20),y:wCellY(b.gy)+28+Math.random()*6,t:4.5}}}
+function scConTick(dt){if(!W4.cons||!W4.cons.length)return;const F=W4.bf;
+ for(const c of W4.cons){const x=wCellX(c.b.gx)+10,y=wCellY(c.b.gy)+10,help=(W4.wk||[]).filter(w=>Math.hypot(w.x-x,w.y-y-18)<40).length;
+  c.t+=dt*(1+help*.35);c.b.con=Math.max(0,1-c.t/c.need);
+  if(((c.t*5)|0)!==(((c.t-dt)*5)|0)){fSpark(x+(Math.random()*28-14),y-4-Math.random()*16,'#ffe8b0');swSnd(220+Math.random()*80,.03,140)}
+  if(c.t>=c.need){c.b.con=0;delete c.b.con;
+   for(let i=0;i<14;i++)W4.floats.push({x:x+(Math.random()*36-18),y:y-Math.random()*24,txt:'*',t:.4+Math.random()*.6,c:i%2?'#fff3b0':'#7ee787'});
+   if(c.first){SW.hearts+=3;SW.heartsTotal+=3}W4.floats.push({x,y:y-26,txt:c.def.n+' BUILT!'+(c.first?' +3 ♥':''),t:2.2,c:'#ffd94d'});
+   swSnd(784,.09,1175);swSave()}}
+ W4.cons=W4.cons.filter(c=>c.t<c.need)}
+function scConDraw(b){if(!(W4.cons||[]).some(c=>c.b===b)){delete b.con;wDrawBuilding0(b);return}const x=wCellX(b.gx),y=wCellY(b.gy),k=1-b.con,K='#14101e',hh=Math.round(30*k);
+ r('rgba(0,0,0,.24)',x-4,y+17,30,5);
+ /* the building rises out of the ground */
+ if(hh>0){const sv=g.save.bind(g);sv();g.beginPath();g.rect(x-12,y+20-hh,46,hh+2);g.clip();wDrawBuilding0(b);g.restore()}
+ /* scaffold poles and planks */
+ r('#8a6a48',x-6,y-12,2,32);r('#8a6a48',x+24,y-12,2,32);r('#a8865c',x-7,y+18-hh,34,2);r('#a8865c',x-7,y-2,34,1);
+ /* three sprouts on the job */
+ const F=W4.bf,ts=F?F.sq.slice(0,3).map(s=>s.type):[0,2,4];
+ ts.forEach((ty,i)=>{const T=TYPES[ty],sx=x-4+i*13,hop=((time*6+i*2)|0)%2,sy=y+18-hh-6-hop*2;
+  r(K,sx-1,sy-1,6,7);r(T.c,sx,sy,4,5);r(T.l,sx+1,sy,2,1);
+  const sw2=((time*8+i)|0)%2;r('#8a6a48',sx+4,sy-3+sw2,1,4);r('#c8ccd4',sx+3,sy-4+sw2,3,2)});
+ const pct=Math.round(k*100)+'%';r('rgba(10,14,8,.75)',x+10-tw(pct,1)/2-2,y-24,tw(pct,1)+4,9);text(pct,x+10-tw(pct,1)/2,y-23,1,'#ffd94d',null)}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */

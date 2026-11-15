@@ -21,6 +21,19 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v6.4 · 2026-11-15 · catching works early, buildings rise
+
+Playtest past the opening (real keys, phone screen): Meadow catches, buddy and sprout gathering, home, cottage and bed.
+
+Found and fixed:
+- **First catches were impossible.** A Lv2 wild needed 4 sprout points and you start with 3, so every throw ended in a fight and the base quests never unlocked. Now a wild needs level + 1, and a buddy standing near the wild adds 1 ("pins it"). Base catch odds dropped a little so it is not automatic.
+- **Aim grabbed a rock instead of the wild you faced.** Wilds in the cone are now preferred over buddy jobs beside them. (A bug in the first try made A lock on to far-off wilds; caught by the lab and fixed.)
+- **Meadow was crowded with wilds** (5 plus respawns, chained fights until the buddy fainted). Now 4 at arrival and at most 3 after.
+- **Buildings now get built.** Placing one raises a scaffold: three of your sprouts hop on it with hammers, base buddies walk over to help (more helpers, faster), a percent shows above it, and it finishes in a burst after about 4 seconds. The quest step only counts it when it is done.
+- **Text pile-up at base.** Marcus kept saying "South road" and "Cottage first" after those were done; the built message stacked a second box. Tips now stop once done, and "BUILT!" floats over the building instead.
+
+Verified: 82 lab checks; real-time runs of the Meadow (3 catches, fiber and wood gathered) and the base build flow (cottage, bed).
+
 ## v6.3 · 2026-11-15 · buddies go where you aim, and the game explains itself
 
 Will's notes: still could not throw buddies with the auto target; the opening is overlapped and confusing; the garden is never explained; wants in-game cutscenes and animations.

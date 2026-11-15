@@ -41,10 +41,11 @@ function pfDraw(b,feet){const spr=wSp(b.m.sp)._spr,w=Math.round(spr.ow*PSC),h=Ma
  if(b.st==='work'){const T=TYPES[wSp(b.m.sp).t[0]];r('#14101e',X-3,Y-h-6,7,7);r(T.c,X-2,Y-h-5,5,5)}
  if(feet)feet(b.x,b.y)}
 /* ---------------- open-field capture ---------------- */
-function pfNeed(wd){return 2+wd.lv}
-function pfStr(wd){const ty=wSp(wd.sp).t;return(wd.lat||[]).reduce((a,s)=>a+(ty.includes(s.type)?2:1),0)}
+function pfNeed(wd){return 1+wd.lv}
+function pfPin(wd){const F=W4.fld;return F&&F.pf&&F.pf.some(b=>b.st==='follow'&&Math.hypot(b.x-wd.x,b.y-wd.y)<70)?1:0}
+function pfStr(wd){const ty=wSp(wd.sp).t;return(wd.lat||[]).reduce((a,s)=>a+(ty.includes(s.type)?2:1),0)+((wd.lat||[]).length?pfPin(wd):0)}
 function pfLatch(F,s,wd){wd.lat=wd.lat||[];if(!wd.lat.includes(s))wd.lat.push(s);s.st='latch';s.tg=wd;s.lt=0;wd.lt=0;wd.mv=false;
- if(wd.lat.length===1){swSnd(660,.06,990);if(!SW.lessons.fswarm){SW.lessons.fswarm=1;swSay('They latched on! Enough sprouts (kin count double) and it blooms right here. Too few and it fights.',4.4)}}}
+ if(wd.lat.length===1){swSnd(660,.06,990);if(!SW.lessons.fswarm){SW.lessons.fswarm=1;swSay('They latched on! The bar fills with each sprout (kin count double; a buddy nearby helps). Full bar and it blooms. Too few and it fights.',4.4)}}}
 function pfWildTick(F,dt){for(const wd of W4.wilds.slice()){
  if(wd.cap){wd.cap.t+=dt;const t=wd.cap.t;
   if(t>=2.3){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;for(const s of wd.lat||[]){s.st='ret';s.tg=null}
@@ -55,7 +56,7 @@ function pfWildTick(F,dt){for(const wd of W4.wilds.slice()){
  if(!wd.lat||!wd.lat.length)continue;
  wd.lat=wd.lat.filter(s=>s.st==='latch'&&s.tg===wd);if(!wd.lat.length){wd.lt=0;continue}
  wd.lt=(wd.lt||0)+dt;const str=pfStr(wd),need=pfNeed(wd);
- if(str>=need&&wd.lt>1){const sp=wSp(wd.sp),p=Math.max(.2,Math.min(.92,.4+.12*(str-need)+(sp.catch||.4)*.4));
+ if(str>=need&&wd.lt>1){const sp=wSp(wd.sp),p=Math.max(.2,Math.min(.9,.3+.12*(str-need)+(sp.catch||.4)*.4));
   wd.cap={t:0,ok:Math.random()<p};swSnd(523,.12,784)}
  else if(wd.lt>3.6){ /* it shakes them off and turns on you */
   for(const s of wd.lat){s.st='ret';s.tg=null;s.z=10}wd.lat=[];W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;

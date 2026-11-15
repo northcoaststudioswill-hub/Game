@@ -58,3 +58,30 @@ function scWorldFx(){if(!W4.seedFx)return;for(const fx of W4.seedFx){fx.t+=1/60;
   for(let i=1;i<5;i++){const k2=Math.max(0,k-i*.035),x2=240+(P3.x-240)*k2,y2=40+(P3.y-8-40)*k2-Math.sin(k2*3.1416)*46;g.globalAlpha=.6-i*.12;r(T.l,Math.round(x2),Math.round(y2),2,2)}
   g.globalAlpha=1;r('#ffffff',Math.round(x)-2,Math.round(y)-2,5,5);r(T.c,Math.round(x)-1,Math.round(y)-1,3,3)}
  W4.seedFx=W4.seedFx.filter(fx=>fx.t<1.1)}
+/* ---------------- raising a building (v6.4) ----------------
+   Placing a building no longer pops it into being: a scaffold goes up,
+   your sprouts hop on it with hammers, base buddies walk over to help,
+   and it rises over a few seconds. More helpers, faster build. */
+function scConStart(b,def,first){W4.cons=W4.cons||[];W4.cons.push({b,def,first,t:0,need:4.2});b.con=1;
+ for(const w of W4.wk||[]){w.task={k:'idle',x:wCellX(b.gx)+10+(Math.random()*40-20),y:wCellY(b.gy)+28+Math.random()*6,t:4.5}}}
+function scConTick(dt){if(!W4.cons||!W4.cons.length)return;const F=W4.bf;
+ for(const c of W4.cons){const x=wCellX(c.b.gx)+10,y=wCellY(c.b.gy)+10,help=(W4.wk||[]).filter(w=>Math.hypot(w.x-x,w.y-y-18)<40).length;
+  c.t+=dt*(1+help*.35);c.b.con=Math.max(0,1-c.t/c.need);
+  if(((c.t*5)|0)!==(((c.t-dt)*5)|0)){fSpark(x+(Math.random()*28-14),y-4-Math.random()*16,'#ffe8b0');swSnd(220+Math.random()*80,.03,140)}
+  if(c.t>=c.need){c.b.con=0;delete c.b.con;
+   for(let i=0;i<14;i++)W4.floats.push({x:x+(Math.random()*36-18),y:y-Math.random()*24,txt:'*',t:.4+Math.random()*.6,c:i%2?'#fff3b0':'#7ee787'});
+   if(c.first){SW.hearts+=3;SW.heartsTotal+=3}W4.floats.push({x,y:y-26,txt:c.def.n+' BUILT!'+(c.first?' +3 ♥':''),t:2.2,c:'#ffd94d'});
+   swSnd(784,.09,1175);swSave()}}
+ W4.cons=W4.cons.filter(c=>c.t<c.need)}
+function scConDraw(b){if(!(W4.cons||[]).some(c=>c.b===b)){delete b.con;wDrawBuilding0(b);return}const x=wCellX(b.gx),y=wCellY(b.gy),k=1-b.con,K='#14101e',hh=Math.round(30*k);
+ r('rgba(0,0,0,.24)',x-4,y+17,30,5);
+ /* the building rises out of the ground */
+ if(hh>0){const sv=g.save.bind(g);sv();g.beginPath();g.rect(x-12,y+20-hh,46,hh+2);g.clip();wDrawBuilding0(b);g.restore()}
+ /* scaffold poles and planks */
+ r('#8a6a48',x-6,y-12,2,32);r('#8a6a48',x+24,y-12,2,32);r('#a8865c',x-7,y+18-hh,34,2);r('#a8865c',x-7,y-2,34,1);
+ /* three sprouts on the job */
+ const F=W4.bf,ts=F?F.sq.slice(0,3).map(s=>s.type):[0,2,4];
+ ts.forEach((ty,i)=>{const T=TYPES[ty],sx=x-4+i*13,hop=((time*6+i*2)|0)%2,sy=y+18-hh-6-hop*2;
+  r(K,sx-1,sy-1,6,7);r(T.c,sx,sy,4,5);r(T.l,sx+1,sy,2,1);
+  const sw2=((time*8+i)|0)%2;r('#8a6a48',sx+4,sy-3+sw2,1,4);r('#c8ccd4',sx+3,sy-4+sw2,3,2)});
+ const pct=Math.round(k*100)+'%';r('rgba(10,14,8,.75)',x+10-tw(pct,1)/2-2,y-24,tw(pct,1)+4,9);text(pct,x+10-tw(pct,1)/2,y-23,1,'#ffd94d',null)}
