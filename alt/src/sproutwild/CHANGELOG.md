@@ -21,6 +21,15 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v6.10 · 2026-11-15 · first ten minutes, played as a Pikmin / Pokemon / Palworld fan
+
+- **A trainer ambushed new players.** KISS stood exactly where the new path from the gate meets the main road, so the first walk into the Meadow could be a two-buddy trainer battle before the first catch. She now stands up the road by the town gate, and trainers leave you alone until you have caught your first buddy.
+- **A throws, even beside a wild.** Pressing A next to a wild used to start a battle instead of a throw. Now A throws whenever your sprouts can catch it. The battle prompt only shows for wilds too strong to catch (or when no sprouts are with you), and the ring label says so: "Lv5 · needs 6 sprouts · walk up to battle".
+- **Wild buddies wear a level tag** when you are close, so a wild Drizzlet never looks like your own.
+- The first-latch tip is one short line instead of a four-line box over the catch.
+- Checked and left as is: the starter card (type, stats, moves, work skill, evolution), the join card, the bloom sequence and the NEW BUDDY card.
+- Verified: 84 lab checks; real-time replays of the starter pick and several catches.
+
 ## v6.9 · 2026-11-15 · opening pass for first-time players
 
 Will's note: keep playing the beginning; onboarding for new players and quality.

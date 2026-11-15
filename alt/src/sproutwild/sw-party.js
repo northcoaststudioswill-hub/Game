@@ -43,9 +43,10 @@ function pfDraw(b,feet){const spr=wSp(b.m.sp)._spr,w=Math.round(spr.ow*PSC),h=Ma
 /* ---------------- open-field capture ---------------- */
 function pfNeed(wd){return 1+wd.lv}
 function pfPin(wd){const F=W4.fld;return F&&F.pf&&F.pf.some(b=>b.st==='follow'&&Math.hypot(b.x-wd.x,b.y-wd.y)<70)?1:0}
+function pfCan(F,wd){const ty=wSp(wd.sp).t;return F.sq.filter(s=>s.st==='follow'||s.st==='latch').reduce((a,s)=>a+(ty.includes(s.type)?2:1),0)+pfPin(wd)>=pfNeed(wd)}
 function pfStr(wd){const ty=wSp(wd.sp).t;return(wd.lat||[]).reduce((a,s)=>a+(ty.includes(s.type)?2:1),0)+((wd.lat||[]).length?pfPin(wd):0)}
 function pfLatch(F,s,wd){wd.lat=wd.lat||[];if(!wd.lat.includes(s))wd.lat.push(s);s.st='latch';s.tg=wd;s.lt=0;wd.lt=0;wd.mv=false;
- if(wd.lat.length===1){swSnd(660,.06,990);if(!SW.lessons.fswarm){SW.lessons.fswarm=1;swSay('They latched on! The bar fills with each sprout (kin count double; a buddy nearby helps). Full bar and it blooms. Too few and it fights.',4.4)}}}
+ if(wd.lat.length===1){swSnd(660,.06,990);if(!SW.lessons.fswarm){SW.lessons.fswarm=1;swSay('Latched on! Fill the bar and it blooms.',2.4)}}}
 function pfWildTick(F,dt){for(const wd of W4.wilds.slice()){
  if(wd.cap){wd.cap.t+=dt;const t=wd.cap.t;
   if(t>=2.3){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;for(const s of wd.lat||[]){s.st='ret';s.tg=null}
@@ -73,4 +74,5 @@ function pfWildDraw(o,feet){const spr=wSp(o.sp)._spr,w=Math.round(spr.ow*PSC),h=
  if(sc<=0)return;const ww=Math.max(1,Math.round(w*sc)),hh=Math.max(1,Math.round(h*sc));
  r('rgba(0,0,0,.22)',X-6,Y-1,12,3);const img=white&&spr.hol?spr.hol:spr.ol;
  if(o.fx>0&&spr.fable){g.save();g.translate(X+Math.round(ww/2),Y-hh+2-bob);g.scale(-1,1);g.drawImage(img,0,0,ww,hh);g.restore()}else g.drawImage(img,X-Math.round(ww/2),Y-hh+2-bob,ww,hh);
+ if(!c&&Math.hypot(o.x-P3.x,o.y-P3.y)<90){const lt='Lv'+o.lv,lw=tw(lt,1);r('rgba(10,14,8,.7)',X-lw/2-2,Y+3,lw+4,9);text(lt,X-lw/2,Y+4,1,'#ffe8b0',null)}
  if(!c&&feet)feet(o.x,o.y)}

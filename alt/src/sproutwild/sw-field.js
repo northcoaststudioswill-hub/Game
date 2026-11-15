@@ -34,10 +34,10 @@ const FLOOK={
  'DOME GUARD':{skin:'#d8a070',hair:'#3a3a30',top:'#5a6a3a',legs:'#3e4a2c',helm:'#4a5a34'},
  'KING BIBI':{skin:'#e0aa84',hair:'#c8c8ce',top:'#1e2c5a',legs:'#17203e',crown:1,tie:'#58a0f0',sc:1.25}};
 const FMEADOW=[
- ['.::S""""""..,..','.::.','###############'],['.::.""""""""...','.::.','#.....R....A..#'],
+ ['.::S""""""..,..','.::.','###############'],['.::.""""""""..M','.::.','#.....R....A..#'],
  ['.::."p"""""""..','.::.','#..R.......2..#'],['.::."""""""""..','.::.','#.............#'],
  ['.::.""""""""...','.::.','#...,....R....#'],['.::."""""""..,.','.::.','#.............#'],
- ['.::::::::::::::','.::.','#..P..........#'],['..............M','.::.','##x####---#####'],
+ ['.::::::::::::::','.::.','#..P..........#'],['...............','.::.','##x####---#####'],
  ['..~~~~~~~~~~...','.:::',':::............'],['.~~~~~~~~~~~~..','.::.','..""""""""""...'],
  ['.~~~~....~~~~..','.::.','.""""""""""""..'],['.~~~~.1..bbbb::',':::.','.""""""",""""..'],
  ['.~~~~....~~~~..','.::.','..""""""""""...'],['.~~~~~~~~~~~~..','.::.','...............'],
@@ -372,7 +372,7 @@ function fNear(F){const px=P3.x+F.dir[0]*11,py=P3.y+F.dir[1]*11,in2=(o,r2)=>Math
  for(const b of F.buds)if(in2(b))return{k:'bud',b,txt:'PLUCK '+TYPES[b.type].n+' SPROUT'};
  for(const np of F.npcs)if(in2(np,18))return{k:'npc',np,txt:np.team&&!SW.fl[np.fk]?'BATTLE '+np.who:'TALK'};
  for(const al of F.alphas)if(in2(al,22))return{k:'alpha',al,txt:'CHALLENGE ALPHA '+al.sp};
- for(const wd of W4.wilds)if(in2(wd))return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv};
+ for(const wd of W4.wilds)if(in2(wd)&&!wd.cap&&!pfCan(F,wd))return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv+(F.sq.length?' · too strong to catch':'')};
  if(F.gym&&in2(F.gym,18))return{k:'gym',txt:'GYM'};
  for(const dr of F.doors)if(in2(dr,14))return{k:'door',txt:'KNOCK'};
  if(in2(F.start,18))return{k:'sign',txt:'LANTERN POST · REST, TRAVEL'};
@@ -429,7 +429,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
  if(!F.arrive){const tx=Math.floor(P3.x/FT),ty=Math.floor(P3.y/FT),ex=F.exits.find(e=>e.tx===tx&&e.ty===ty);if(ex){fTravel(ex.to,F.id);return}}
  /* trainers who have not battled you yet watch the road */
  if(W4.grace<=0)for(const np of F.npcs)if(np.team&&!SW.fl[np.fk]&&!np.boss){const dx=P3.x-np.x,dy=P3.y-np.y,al=dx*np.dir[0]+dy*np.dir[1],off=Math.abs(dx*np.dir[1]-dy*np.dir[0]);
-  if(al>6&&al<FT*5.5&&off<11&&SW.party.some(m=>m.hp>0)){F.spot={np,t:0};swSnd(880,.1,1320);return}}
+  if(al>6&&al<FT*5.5&&off<11&&SW.quest>=3&&SW.party.some(m=>m.hp>0)){F.spot={np,t:0};swSnd(880,.1,1320);return}}
  /* wild buddies wander their grass */
  if(sec.table){for(const wd of W4.wilds){if((wd.lat&&wd.lat.length)||wd.cap){wd.mv=false;continue}wd.t-=dt;
    if(wd.t<=0){const gt=F.grass.filter(g2=>Math.abs(g2[0]*FT-wd.x)<70&&Math.abs(g2[1]*FT-wd.y)<70),pk=gt[(Math.random()*gt.length)|0];
@@ -484,7 +484,7 @@ function fRing(F){if(F.sq.length||(F.pf&&F.pf.length)){const a=fAim(F),T=a.kind=
   if(a.tg){const c=a.need>=0?'#e04838':T.l,rr=a.kind==='site'?14:11;
    for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){r('#14101e',ax+sx*(rr+ph)-2,ay-6+sy*(rr-2+ph)-2,5,5);r(c,ax+sx*(rr+ph)-1,ay-6+sy*(rr-2+ph)-1,3,1);r(c,ax+sx*(rr+ph)-(sx<0?1:-1),ay-6+sy*(rr-2+ph)-1,1,3)}
    for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.6)',Math.round(px),Math.round(py),1,1)}
-   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?'CATCH Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts':a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
+   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?(pfCan(F,a.tg)?'CATCH Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts':'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
    F.aimLab=lab;F.aimNeed=a.need>=0}
   else{F.aimLab=null;r('rgba(255,255,255,.35)',ax-1,ay-1,2,2)}}else F.aimLab=null;
  if(F.whistle){g.strokeStyle='rgba(255,244,180,.8)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-2,F.whistle,0,7);g.stroke();

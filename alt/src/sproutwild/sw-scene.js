@@ -39,7 +39,7 @@ function scMeadow(F){SW.lessons.scMeadow=1;const sec=wSector(W4.sector);
   tr=W4.nodes.filter(n=>!n.got&&n.k==='tree').sort((a,b)=>far(a)-far(b))[0],st=[];
  if(wd){st.push({x:wd.x,y:wd.y,hold:1.3},{x:wd.x,y:wd.y,who:'LOUIE',txt:'Woof! A wild buddy. They live in the tall grass.'},
   {x:wd.x,y:wd.y,who:'LOUIE',txt:'Face it and press A to throw sprouts. Enough of them and it blooms and joins you.'},
-  {x:wd.x,y:wd.y,who:'LOUIE',txt:'Too few and it fights. Or walk right up and press A to battle it yourself.'})}
+  {x:wd.x,y:wd.y,who:'LOUIE',txt:'Too strong to catch? Walk right up and press A to battle it instead.'})}
  if(tr&&SW.party.length&&!SW.lessons.scSend){SW.lessons.scSend=1;st.push({x:tr.x,y:tr.y,hold:1.1},{x:tr.x,y:tr.y,who:'LOUIE',txt:'Trees and rocks are buddy work. Face one and press A: your buddy goes.'},
   {x:tr.x,y:tr.y,who:'LOUIE',txt:'The ring shows who is going. B calls everyone back.'})}
  if(st.length){st.push({hold:.5});scStart(st,()=>swSave())}}
