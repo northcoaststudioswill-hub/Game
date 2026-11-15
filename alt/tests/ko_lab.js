@@ -246,6 +246,34 @@ async function main() {
     console.log('supers', JSON.stringify(r));
   }
 
+  if (want('lineup')) {
+    /* every fighter standing, at 2x, in idle / walk / jab / heavy / fwd+B poses */
+    const url = await E(() => {
+      const g = cv.getContext('2d'), n = KO.CH.length, rows = ['st', 'w2', 'p1', 'k', 'fk'], out = [];
+      for (const pose of rows) {
+        g.setTransform(2, 0, 0, 2, 0, 0); g.imageSmoothingEnabled = false; g.fillStyle = '#cfc8b8'; g.fillRect(0, 0, 240, 400); g.fillStyle = '#a89c84'; g.fillRect(0, 150, 240, 4);
+        g.fillRect(0, 290, 240, 4); KO.CH.forEach((c, i) => { const P = (c.ps && c.ps[pose]) || KO.PS[pose] || KO.PS.st; KO.poser(i, 30 + (i % 4) * 58, i < 4 ? 150 : 290, 1, P, 2); });
+        g.setTransform(1, 0, 0, 1, 0, 0); const c2 = document.createElement('canvas'); c2.width = cv.width; c2.height = 300 * 2; c2.getContext('2d').drawImage(cv, 0, 0); out.push(c2);
+      }
+      return sheet(out, 5, .9, 'lineup at 2x: idle | walk | jab | heavy | fwd+B');
+    });
+    await save('lineup.png', url);
+  }
+
+  if (want('fk')) {
+    const r = await E(() => {
+      const out = {}, fr = [];
+      for (const ci of [0, 1, 2, 3, 6]) {
+        const [a, b] = fight(ci, 4, 0); a.x = 140; b.x = 186; const hp = b.hp;
+        K.right = 1; __step(1 / 60); K.b = 1; __step(1 / 60); K.b = 0;
+        for (let i = 0; i < 30; i++) { __step(1 / 60); if (i === 6 || i === 12 || i === 20) fr.push(grabCrop(.45)); }
+        K.right = 0; out[KO.CH[ci].n] = { move: a.c.mn.fk, dmg: Math.round(hp - b.hp), victim: b.st };
+      }
+      out.sheet = sheet(fr, 6, 1, 'FWD+B for Will, Erin, Louie, Bottie, Marcus (3 frames each)'); return out;
+    });
+    await save('fk.png', r.sheet); delete r.sheet; console.log('fk', JSON.stringify(r));
+  }
+
   if (want('fight')) {
     const url = await E(() => {
       fight(6, 0, 0, true); const frames = [];
