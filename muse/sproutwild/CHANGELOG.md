@@ -21,6 +21,18 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v5.6 — the battle screen (Fable)
+
+Same rules, new stage (`sw-battle.js`). Nothing here changes an outcome.
+- A backdrop for each sector; buddies drawn on the pixel grid.
+- Each "X used Y!" line plays: a lunge, a bolt in the move's colour, a white flash and shake on the target. That HP bar drains only after its own hit lands.
+- Your keeper stands behind your buddy and your sprouts wait in a row. SWARM sends them hopping across to latch on; a bloom glows gold, a failed swarm gets thrown clear and those sprouts lie dazed.
+- Wild buddies show TIRING and WORN OUT tags so you know when to swarm. Trainers show how many buddies they have left.
+- Fainting sinks and fades; new buddies slide in.
+- One panel style for text, commands, moves (with type and power), the swarm picker (KIN / GOOD / WEAK) and the party list (with HP bars).
+
+Tests: `field-lab.js` 56/56, soak run OK.
+
 ## v5.5 — the loop makes sense (Fable)
 
 Written after playing the opening from a fresh save. What was wrong: you spawned in an empty field, the first interaction was a five-row dog menu, then three pages of text and 15 seconds of watching sprouts carry apples, three starter buddies appeared for no reason, and a sprout was thrown like a ball. (`sw-story.js`)

@@ -16,7 +16,7 @@ OUT = here.parent / 'games/Sprouts+Rootdeep+Sproutwild-v5.html'
 MARK = '/* ================================================================\n   DISPATCH + TEST HOOKS'
 mod = (here / 'sw-module.js').read_text()
 assert mod.count(MARK) == 1
-mod = mod.replace(MARK, (here / 'sw-field.js').read_text().rstrip() + '\n' + (here / 'sw-front.js').read_text().rstrip() + '\n' + (here / 'sw-base.js').read_text().rstrip() + '\n' + (here / 'sw-art.js').read_text().rstrip() + '\n' + (here / 'sw-story.js').read_text().rstrip() + '\n' + MARK)
+mod = mod.replace(MARK, (here / 'sw-field.js').read_text().rstrip() + '\n' + (here / 'sw-front.js').read_text().rstrip() + '\n' + (here / 'sw-base.js').read_text().rstrip() + '\n' + (here / 'sw-art.js').read_text().rstrip() + '\n' + (here / 'sw-story.js').read_text().rstrip() + '\n' + (here / 'sw-battle.js').read_text().rstrip() + '\n' + MARK)
 code = code.replace('module = (w/"sw-module.js").read_text().rstrip()', 'module = MODULE.rstrip()')
 assert 'MODULE' in code
 exec(compile(code, 'build.py', 'exec'), {'SRC': src, 'HERE': here, 'OUT': OUT, 'MODULE': mod})
