@@ -16,3 +16,9 @@ fonts need the internet, and it falls back to system fonts without it.
 Make a new dated folder (`dev-board/YYYY-MM-DD_frozen/`) from the living board. Don't overwrite an older snapshot.
 
 For the repo organizer, see [`NOTE_FOR_REPO_ORGANIZER.md`](NOTE_FOR_REPO_ORGANIZER.md).
+
+## Updates waiting to go on the board
+
+`updates/` holds source material for passes made after the last snapshot: a table of passes with times, commits and photos.
+
+- [`updates/2026-11-15_sproutwild-rebuild-and-fusion/`](updates/2026-11-15_sproutwild-rebuild-and-fusion/README.md): Sproutwild v5.0 to v6.0, and its fusion into the console as cartridge 5.

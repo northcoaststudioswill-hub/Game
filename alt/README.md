@@ -1,4 +1,8 @@
-# Pocket Lantern ALT (experimental fork of v0.3)
+# Pocket Lantern ALT — the main line (five cartridges)
+
+> **As of Nov 15 2026 this folder is the main version of the game to build on.** It started as an experimental fork of
+> v0.3, became where Knockout was reworked, and now also holds Sproutwild as cartridge 5. Shelf: Sprouts, Knockout,
+> Rootdeep, Patch & Plate, Sproutwild. The paragraphs below about being a fork are still true of how it is built and saved.
 
 An alternate version of the whole console for trying bigger changes **without touching anything outside `alt/`**.
 v0.1, v0.2 and v0.3 are not edited, rebuilt, or overwritten by anything in here. Keep what works, throw away what doesn't,
@@ -23,6 +27,9 @@ real game can't read or overwrite Erin's Patch & Plate days, Rootdeep runs, or a
 | `src/knockout.js` | North Coast Knockout (cartridge 2). Most of the ALT work is here. |
 | `src/rootdeep.js` | Rootdeep (cartridge 3), plus the Lantern menu (stats, achievements). |
 | `src/patchplate.js` | Patch & Plate (cartridge 4). Unchanged from v0.3 on purpose. |
+| `src/sproutwild/` | Sproutwild (cartridge 5): eleven files, see its own `README.md` and `CHANGELOG.md`. |
+| `backups/` | Frozen builds. Never edit. |
+| `tests/sproutwild/` | Sproutwild's checks and playtest scripts. |
 | `build.py` | `python3 alt/build.py` assembles `games/pocket-lantern-alt.html`. The 13 MB of embedded music is read from the v0.3 build (read-only), not copied. |
 | `tests/ko_lab.js` | Knockout lab: feel metrics (jump arc, pose snap, hit slide, juggles), frame sheets, the new modes, a text audit of every menu. |
 | `tests/fable_lab.js` | Fable pass 1: parry, wall bounce, K.O. frame, stances, rules and Trials (20 pass/fail checks, sheets in `playtest/fable/`). |

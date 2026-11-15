@@ -8,6 +8,7 @@ Nothing outside alt/ is ever written. The code lives here as plain files:
   alt/src/rootdeep.js    Rootdeep (cartridge 3), spliced into console.js
   alt/src/knockout.js    the fighter (cartridge 2)
   alt/src/patchplate.js  the farm stand (cartridge 4)
+  alt/src/sproutwild/    Sproutwild (cartridge 5), eleven files spliced into console.js
 
 The music is big (13 MB of embedded mp3), so it is not copied: the build reads the
 two music <script> blocks from the shipped v0.3 build, read-only.
@@ -75,6 +76,17 @@ console = code('console.js')
 if console.count('/*@include rootdeep.js*/') != 1:
     die('console.js needs exactly one /*@include rootdeep.js*/')
 console = console.replace('/*@include rootdeep.js*/', code('rootdeep.js'))
+# cartridge 5, Sproutwild: its files share the console's scope, in this order
+SPROUTWILD = ['sw-cartart', 'sw-module', 'sw-field', 'sw-front', 'sw-base', 'sw-art', 'sw-story', 'sw-battle', 'sw-save', 'sw-text', 'sw-cast']
+if console.count('/*@include sproutwild*/') != 1:
+    die('console.js needs exactly one /*@include sproutwild*/')
+swmod = code('sproutwild/sw-module.js')
+SWMARK = '/* ================================================================\n   DISPATCH + TEST HOOKS'
+if swmod.count(SWMARK) != 1:
+    die('sproutwild/sw-module.js: dispatch marker not found')
+# the later files replace functions the module's dispatch block calls, so they go in just ahead of it
+swmod = swmod.replace(SWMARK, '\n'.join(code('sproutwild/' + f + '.js').rstrip() for f in SPROUTWILD[2:]) + '\n' + SWMARK)
+console = console.replace('/*@include sproutwild*/', code('sproutwild/sw-cartart.js').rstrip() + '\n' + swmod.rstrip() + '\n')
 
 parts = {
     '@MUSIC tracks': music['tracks'],

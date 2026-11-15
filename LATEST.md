@@ -1,4 +1,18 @@
-# Latest: Pocket Lantern v0.35 (Nov 15 2026)
+# Main line: `alt/` — five cartridges (Nov 15 2026)
+
+**Build on this:** [`alt/`](alt/README.md). Sprouts, North Coast Knockout (with the later Fable passes), Rootdeep,
+Patch & Plate and **Sproutwild** in one console. Play `alt/games/pocket-lantern-alt.html`; rebuild with `python3 alt/build.py`.
+
+- **What changed:** [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (console and Knockout), [`alt/src/sproutwild/CHANGELOG.md`](alt/src/sproutwild/CHANGELOG.md) (Sproutwild)
+- **Saved before Sproutwild went in:** `alt/backups/pocket-lantern-alt_2026-11-15_4-carts_pre-sproutwild_BACKUP.html`
+- **Saved standalone Sproutwild v6.0:** `muse/games/Sprouts+Rootdeep+Sproutwild-v6.0_2026-11-15_BACKUP.html`
+- **For the dev board team:** [`dev-board/updates/2026-11-15_sproutwild-rebuild-and-fusion/`](dev-board/updates/2026-11-15_sproutwild-rebuild-and-fusion/README.md)
+
+![Five cartridges](alt/playtest/five-cartridges-fused.png)
+
+It has not been cut as a numbered release yet (no `share/` zip). The last numbered release is still v0.35, below.
+
+# Last release: Pocket Lantern v0.35 (Nov 15 2026)
 
 Four cartridges: Sprouts, **North Coast Knockout (reworked)**, Rootdeep, Patch & Plate.
 v0.35 is v0.3 with a new Knockout: snappier feel, GBA-style sprite bodies, King Bibi, two-stage supers with full-meter
@@ -17,7 +31,8 @@ level select and banter. Everything else is exactly v0.3.
 | v0.3 | `v0.3/` | The previous main version: Patch & Plate in slot 4. Kept as is. Changelog: [`v0.3/CHANGELOG.md`](v0.3/CHANGELOG.md), send: [`v0.3/share/pocket-lantern-v0.3-share.zip`](v0.3/share/pocket-lantern-v0.3-share.zip) |
 | v0.2.1 | `v0.2/` | Rootdeep in slot 3; still where Rootdeep work happens. Changelog: [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md) |
 | v0.1 | `v0.1/` | Sprouts + Knockout; the rollback. Never edit. |
-| ALT | `alt/` | The experimental fork where v0.35's Knockout was made (separate saves). Not a release. |
+| ALT | `alt/` | **The main line.** Began as the experimental fork where v0.35's Knockout was made; now five cartridges with Sproutwild. Separate saves. Not yet a numbered release. |
+| Sproutwild (standalone) | `muse/` | lil Bottie's Muse files and the standalone Sproutwild through v6.0. Archive; live source moved to `alt/src/sproutwild/`. |
 
 The files at the repo root (`README.md`, `build.py`, `index.html`, `src/`) are the old pre-v0.2 setup.
 

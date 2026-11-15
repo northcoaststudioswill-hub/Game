@@ -80,7 +80,7 @@ async function main() {
   const H = await ev('H'); notes.push('note screen height (logical): ' + H);
   await page.screenshot({ path: path.join(SHOTS, 'pp_00_shelf.png') });
   const carts = await page.$$eval('.cart', b => b.map(x => { const r = x.getBoundingClientRect(); return { t: x.textContent.trim(), w: r.width, h: r.height, right: r.right }; }));
-  check(carts.length === 4 && carts.every(c => c.right <= 440), 'shelf shows 4 cartridges inside the screen: ' + carts.map(c => c.t + ' ' + Math.round(c.w) + 'x' + Math.round(c.h)).join(', '));
+  check(carts.length === 5 && carts.every(c => c.right <= 440), 'shelf shows 5 cartridges inside the screen: ' + carts.map(c => c.t + ' ' + Math.round(c.w) + 'x' + Math.round(c.h)).join(', '));
   const want = ['intro', 'ko', 'g3', 'pp'];
   for (let i = 0; i < 4; i++) {
     const before = errs.length;

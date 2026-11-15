@@ -3,6 +3,35 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Cartridge 5: Sproutwild fused in (Nov 15 2026)
+
+ALT is now the main line of the game, with five cartridges: Sprouts, Knockout, Rootdeep, Patch & Plate, **Sproutwild**.
+
+- **What was added.** `src/sproutwild/` (eleven files, about 330 KB) holds Sproutwild v6.0, moved in from `muse/sproutwild/`.
+  `build.py` splices it into `console.js` after Rootdeep. Its own history is in `src/sproutwild/CHANGELOG.md`.
+- **What changed in the console to make room** (`src/console.js`, `src/shell.html`):
+  - a fifth shelf slot; shelf labels are a point smaller so five fit
+  - boot, update and draw hand `g4...` states to Sproutwild, the same way `g3...` goes to Rootdeep
+  - button labels for slot 5: act / call / kind / menu
+  - the console's `tw`, `text` and `ctext` keep their bodies under the names `tw0`, `text0`, `ctext0`. Sproutwild's
+    `sw-text.js` owns the public names and passes straight through to them unless a Sproutwild screen is showing, where it
+    draws its own pixel font. The other four cartridges draw exactly as before.
+  - the console's screen-width variable `SW` is renamed `SCW` (seven uses), because Sproutwild's save object is `SW`
+  - `window.__g` gains `SW` and `SWF` for tests
+- **Nothing was removed.** Knockout, Rootdeep, Patch & Plate and Sprouts source files are otherwise untouched.
+- **Frozen before the fusion:** `backups/pocket-lantern-alt_2026-11-15_4-carts_pre-sproutwild_BACKUP.html` (the four-cartridge
+  build exactly as it was) and `muse/games/Sprouts+Rootdeep+Sproutwild-v6.0_2026-11-15_BACKUP.html` (standalone Sproutwild).
+- **Tests on the fused build:** Sproutwild `tests/sproutwild/field-lab.js` 76/76; Knockout `tests/fable_lab.js` all pass;
+  Patch & Plate `tests/pp_test.js` 76/76 on the final build, three runs in a row (its shelf check now expects five
+  cartridges). Two earlier runs during the work each failed one check with a random outcome (a text-squeeze audit on day 12,
+  and Louie changing his craving "within a few days"). The one run on the build from before the fusion was clean, so whether
+  those two are flaky from before is not established. Console and Rootdeep `tests/v02/` suites report no errors.
+- **Size:** 14.4 MB. The claude.ai page limit is 16 MB, so there is room for about 1.5 MB more before songs have to move out.
+- **Not done:** `docs/index.html` (the public GitHub Pages copy) still holds the four-cartridge build. It was not updated
+  because that publishes Sproutwild publicly; that is Will's call.
+
+![Five cartridges](playtest/five-cartridges-fused.png)
+
 ## Safety
 
 - **Separate saves.** Every `localStorage` key is stored as `pl-alt:<key>` (`src/shell.html`, top script). ALT can't

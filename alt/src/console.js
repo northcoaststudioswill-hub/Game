@@ -153,7 +153,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){persist(tr
 /* ---------- text (drawn at double resolution so it stays sharp) ---------- */
 const FS={1:10,2:11,3:15,4:19,5:25};
 function setF(sc){g.font='700 '+FS[sc]+'px ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace';g.textBaseline='top';}
-function tw(s,sc=2){setF(sc);const m=g.measureText(String(s));return Math.ceil((m&&m.width)||String(s).length*FS[sc]*.6);}
+function tw0(s,sc=2){setF(sc);const m=g.measureText(String(s));return Math.ceil((m&&m.width)||String(s).length*FS[sc]*.6);}
 /* test hook: when TBX is an array, every text box drawn is recorded (in logical pixels) so a test can check for overlaps */
 let TBON=false,TBX=null,TBL=[];
 /* Rootdeep (cartridge 3) places text by the real cap height, so the letters' tops land exactly at y on every font.
@@ -161,10 +161,10 @@ let TBON=false,TBX=null,TBL=[];
    bottom edge of tags and boxes. Sprouts keeps its own tuned placement. */
 const CAPH={};
 function capOf(sc){if(CAPH[sc]===undefined){setF(sc);g.textBaseline='alphabetic';const m=g.measureText('H');CAPH[sc]=(m&&m.actualBoundingBoxAscent)||FS[sc]*.72;g.textBaseline='top'}return CAPH[sc]}
-function text(s,x,y,sc=2,c='#fff',sh='#181020'){s=String(s);const capN=cart===2||cart===3||(typeof state==='string'&&state.slice(0,3)==='lan'),cy=capN?capOf(sc):0;setF(sc);if(TBX){const m=g.getTransform(),w=g.measureText(s).width;TBX.push({s,x:(m.a*x+m.e)/2,y:(m.d*y+m.f)/2,w:w*m.a/2,h:FS[sc]*.8*m.d/2,sq:Math.abs(m.a-2)>.01&&Math.abs(m.a-4)>.01})}
+function text0(s,x,y,sc=2,c='#fff',sh='#181020'){s=String(s);const capN=cart===2||cart===3||(typeof state==='string'&&state.slice(0,3)==='lan'),cy=capN?capOf(sc):0;setF(sc);if(TBX){const m=g.getTransform(),w=g.measureText(s).width;TBX.push({s,x:(m.a*x+m.e)/2,y:(m.d*y+m.f)/2,w:w*m.a/2,h:FS[sc]*.8*m.d/2,sq:Math.abs(m.a-2)>.01&&Math.abs(m.a-4)>.01})}
  if(capN){g.textBaseline='alphabetic';y+=cy}
  if(sh){g.lineJoin='round';g.lineWidth=2;g.strokeStyle=sh;g.strokeText(s,x,y);g.fillStyle=sh;g.fillText(s,x+1,y+1)}g.fillStyle=c;g.fillText(s,x,y);if(capN)g.textBaseline='top';}
-function ctext(s,y,sc=2,c,sh){const w=tw(s,sc);if(w>W-6){g.save();g.translate(3,0);g.scale((W-6)/w,1);text(s,0,y,sc,c,sh);g.restore()}else text(s,Math.round((W-w)/2),y,sc,c,sh);}
+function ctext0(s,y,sc=2,c,sh){const w=tw(s,sc);if(w>W-6){g.save();g.translate(3,0);g.scale((W-6)/w,1);text(s,0,y,sc,c,sh);g.restore()}else text(s,Math.round((W-w)/2),y,sc,c,sh);}
 function rtext(s,xr,y,sc=2,c,sh){text(s,xr-tw(s,sc),y,sc,c,sh);}
 function wrapPx(s,maxW,sc=2){const out=[];let l='';for(const w of String(s).split(' ')){const t=l?l+' '+w:w;if(l&&tw(t,sc)>maxW){out.push(l);l=w}else l=t}if(l)out.push(l);return out;}
 function petalIcon(x,y){r('#f8a0c8',x+1,y,3,5);r('#f8a0c8',x,y+1,5,3);r('#f8d040',x+2,y+2,1,1);}
@@ -215,7 +215,7 @@ const TL={
 TL.wood=tile(p=>{p('#c89860',0,0,16,16);p('#a87848',0,7,16,1);p('#a87848',0,15,16,1);p('#a87848',5,0,1,7);p('#a87848',12,8,1,7);p('#e0b880',1,1,3,1);p('#e0b880',7,9,3,1)});
 /* ---------- state ---------- */
 let map,fieldL,fieldW,P,LO,buds,sprouts,items,foes,gates,bugs,npcs,plots,parts,spawns,trail,squad,sel,day,dayT,shards,run,tod,gard,won,time=0,msg='',msgT=0,cam,cur,wr,aT,found,winT,sndT=0,duskSaid,achT=0,saveT=0,petOK=false;
-const Z=1.5,VW=160;let VH=134,SW=240,TRN=null,hop=null,pan=null,card=null,scn=null,scnDone=null,sceneQ=[];
+const Z=1.5,VW=160;let VH=134,SCW=240,TRN=null,hop=null,pan=null,card=null,scn=null,scnDone=null,sceneQ=[];
 let manT=0,needT=-1,inHome=false,parked=[],resid=[],cineI=0,cineT=0,cpage=0;
 let introT=0,home={res:Array(NT).fill(0),jobs:[0,0,0],up:0},hi=0;
 const DOOR={x:33*16+8,y:17*16+2};
@@ -231,7 +231,7 @@ const say=(s,t=4)=>{msg=s;msgT=t};
 let cart=0;
 const KO=window.KO_CART?window.KO_CART({g,W,H:()=>H,r,text,ctext,tw,snd,noise,keys,pressed,mk,flip,ac:()=>ac,meta:()=>meta,eject:()=>eject(),hasTracks:n=>TRACKS.some(t=>t.use.includes(n))}):null;
 const PP=window.PP_CART?window.PP_CART({g,W,H:()=>H,r,text,tw,snd,noise,keys,pressed,mk,flip,CH,LOU,TL,will:()=>SP,meta:()=>meta,persist:()=>persist(true),eject:()=>eject(),active:()=>state==='pp',hasTracks:n=>TRACKS.some(t=>t.use.includes(n))}):null;
-const PAD=[['act','call','swap','pause'],['light','heavy','super','pause'],['attack','cast','swap','pause'],['use','toss','recipes','pause']];
+const PAD=[['act','call','swap','pause'],['light','heavy','super','pause'],['attack','cast','swap','pause'],['use','toss','recipes','pause'],['act','call','kind','menu']];
 function setPad(i){try{const q=(s,t)=>{const e=document.querySelector(s);if(e)e.textContent=t},L=PAD[i]||PAD[0];q('#bA span',L[0]);q('#bB span',L[1]);q('#bSel small',L[2]);q('#bSta small',L[3]);const cs=$('console');if(cs)cs.classList.toggle('ko',i===1||i===2);const sl=$('bSel');if(sl)sl.classList.remove('ready')}catch(e){}}
 const toast=s=>toasts.push({s,t:3.2});
 function carve(x,y,w,h,t=G){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)map[j*MW+i]=t;}
@@ -471,7 +471,7 @@ const shelf=$('shelf'),carts=[...shelf.querySelectorAll('.cart')];let cartAnim=n
 function cartHi(i){cartSel=i;carts.forEach((c,n)=>c.classList.toggle('sel',n===i));}
 function cartPick(i){if(inserting)return;cartHi(i);const c=carts[i];
  try{lanPlayed(i)}catch(e){}
- if(i>3||(i===1&&!KO)||(i===3&&!PP)){$('shelfMsg').textContent='That one is not out yet';c.classList.remove('nope');void c.offsetWidth;c.classList.add('nope');snd(140,.1);return;}
+ if(i>4||(i===1&&!KO)||(i===3&&!PP)){$('shelfMsg').textContent='That one is not out yet';c.classList.remove('nope');void c.offsetWidth;c.classList.add('nope');snd(140,.1);return;}
  inserting=true;const a=c.getBoundingClientRect(),s=$('slot').getBoundingClientRect(),d=a.top-s.bottom,dx=(s.left+s.width/2)-(a.left+a.width/2);
  const done=()=>{inserting=false;shelf.hidden=true;$('slot').classList.add('in');$('led').classList.add('on');cart=i;setPad(i);bootT=0;bootDing=false;state='boot';};
  if(c.animate){cartAnim=c.animate([{transform:'translate(0,-4px)',clipPath:'inset(0 0 0 0)'},{transform:`translate(${dx}px,${-d}px)`,clipPath:'inset(0 0 0 0)',offset:.55},{transform:`translate(${dx}px,${-d-a.height}px)`,clipPath:'inset(100% 0 0 0)'}],{duration:950,easing:'ease-in-out',fill:'forwards'});
@@ -491,11 +491,12 @@ function update(dt){
  if(toasts.length){toasts[0].t-=dt;if(toasts[0].t<=0)toasts.shift()}
  if(TRN){TRN.t+=dt;if(!TRN.done&&TRN.t>=.3){TRN.done=true;TRN.fn()}if(TRN.t>=.68)TRN=null;return}
  if(state.slice(0,2)==='g3'){g3Update(dt);return}
+ if(state.slice(0,2)==='g4'){g4Update(dt);return} /* cartridge 5: Sproutwild */
  if(state.slice(0,3)==='lan'){lanUpdate(dt);return}
  switch(state){
  case 'off':{const lb=$('lanBtn');if(pressed('down')){lanHi=1;if(lb)lb.classList.add('sel');carts.forEach(c=>c.classList.remove('sel'))}if(pressed('up')&&lanHi){lanHi=0;if(lb)lb.classList.remove('sel');cartHi(cartSel)}
   if(!lanHi){if(pressed('right'))cartHi((cartSel+1)%4);if(pressed('left'))cartHi((cartSel+3)%4)}if(pressed('a')||pressed('start')){if(lanHi){lanHi=0;if(lb)lb.classList.remove('sel');cartHi(cartSel);lanOpen('off')}else cartPick(cartSel)}return;}
- case 'boot':bootT+=dt;if(bootT>1.15&&!bootDing){bootDing=true;snd(988,.1);later(()=>snd(1319,.4),100)}if(bootT>2.7||(bootT>.6&&pressed('a'))){if(cart===1){state='ko';KO.start()}else if(cart===2){g3StartTitle()}else if(cart===3){state='pp';PP.start()}else{state='intro';introT=0}}return;
+ case 'boot':bootT+=dt;if(bootT>1.15&&!bootDing){bootDing=true;snd(988,.1);later(()=>snd(1319,.4),100)}if(bootT>2.7||(bootT>.6&&pressed('a'))){if(cart===1){state='ko';KO.start()}else if(cart===2){g3StartTitle()}else if(cart===3){state='pp';PP.start()}else if(cart===4){g4StartTitle()}else{state='intro';introT=0}}return;
  case 'ko':KO.update(dt);return;
  case 'pp':PP.update(dt);return;
  case 'cine':{cineT+=dt;const end=()=>{state='play';const f=scnDone;scnDone=null;if(f)f();persist()};if(pressed('start')){end();return}
@@ -852,7 +853,7 @@ function drawDog(d){const x=Math.round(d.x-ox),y=Math.round(d.y-oy),left=d.fx<0,
  if(((time*(d.st==='sit'?12:5))|0)%2)r('#fff0d8',left?X+16:X+3,Y,1,1);
  if(d.st==='sit'){r('#f85888',left?X+4:X+14,Y+8,2,2)}
  if(d.st==='dig')r('#a87850',left?X-2:X+20,Y+10+hop,2,2);
- if(d.say&&d.say.t>0){const s=d.say.s,fz=SW<W?1:2,w2=tw(s,fz)+8,bx=Math.max(2,Math.min(SW-w2-2,Math.round(x-w2/2)));r('#181020',bx-1,Y-19,w2+2,16);r('#ffffff',bx,Y-18,w2,14);r('#181020',x-1,Y-3,3,2);r('#ffffff',x,Y-4,1,2);text(s,bx+4,Y-(fz===1?16:17),fz,'#281c30',null)}
+ if(d.say&&d.say.t>0){const s=d.say.s,fz=SCW<W?1:2,w2=tw(s,fz)+8,bx=Math.max(2,Math.min(SCW-w2-2,Math.round(x-w2/2)));r('#181020',bx-1,Y-19,w2+2,16);r('#ffffff',bx,Y-18,w2,14);r('#181020',x-1,Y-3,3,2);r('#ffffff',x,Y-4,1,2);text(s,bx+4,Y-(fz===1?16:17),fz,'#281c30',null)}
  else if(d.alert>0)text('!',x-2,Y-15,3,'#f8e060');
  else if(d.pet){const by=Y-14+(((time*3)|0)%2);r('#181020',x-6,by-1,13,11);r('#ffffff',x-5,by,11,9);r('#f85888',x-3,by+2,2,2);r('#f85888',x+1,by+2,2,2);r('#f85888',x-3,by+3,6,2);r('#f85888',x-2,by+5,4,1);r('#f85888',x-1,by+6,2,1)}}
 function drawNPC(n){const x=Math.round(n.x-ox),y=Math.round(n.y-oy);r('rgba(0,0,0,.28)',x-4,y+3,8,2);g.drawImage(n.spr,x-6,y-10-(((time*1.5+n.x)|0)%2));
@@ -903,7 +904,7 @@ function drawHearth(){const x=Math.round(HX-ox),y=Math.round(HY-oy),lit=shards/4
  r('#282038',x-7,y-32,14,14);r(shards?'#f8e060':'#705838',x-5,y-30,10,10);r(shards?'#fff8c0':'#907048',x-2+fl,y-27,3,5);r('#f08030',x-1,y-23,2,2);
  r('#782828',x-9,y-35,18,3);r('#c04848',x-9,y-35,18,2);r('#c04848',x-5,y-38,10,3);r('#f07070',x-4,y-38,3,1);}
 function drawWorld(){
- ox=Math.round(cam.x);oy=Math.round(cam.y);if(inHome){drawHome();return}g.save();g.scale(Z,Z);SW=VW;const wf=((time*2)|0)%2,x0=ox>>4,y0=oy>>4;
+ ox=Math.round(cam.x);oy=Math.round(cam.y);if(inHome){drawHome();return}g.save();g.scale(Z,Z);SCW=VW;const wf=((time*2)|0)%2,x0=ox>>4,y0=oy>>4;
  for(let ty=y0;ty<=y0+((H/16)|0)+1;ty++)for(let tx=x0;tx<=x0+15;tx++){
   const t=(tx<0||ty<0||tx>=MW||ty>=MH)?TR:map[ty*MW+tx],px=tx*16-ox,py=ty*16-oy;let im;
   if(t===G||t===GT||t===6)im=TL.grass[(tx*7+ty*13)%11%3];else if(t===D)im=TL.dirt;else if(t===S)im=TL.soil;else if(t===WA)im=TL.water[(wf+tx+ty)%2];else im=TL.tree;
@@ -928,7 +929,7 @@ function drawWorld(){
   [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b])=>{r('#181020',x+a*q-1,y+b*q-1,3,3);r(c,x+a*q,y+b*q,1,1);r(c,x+a*q-a,y+b*q,1,1);r(c,x+a*q,y+b*q-b,1,1)});
   if(wr>0)for(let i=0;i<16;i++){const a=i/16*6.283+time*5;r(i%2?'#ffffff':'#f8e060',Math.round(x+Math.cos(a)*wr),Math.round(y+Math.sin(a)*wr),2,2)}}
  const f=dayT/DAYLEN;if(f>.6){const a=Math.min(1,(f-.6)/.4);r('rgba(240,120,40,'+(a*.14)+')',0,0,W,H);r('rgba(30,20,90,'+(a*a*.36)+')',0,0,W,H)}
- g.restore();SW=W;
+ g.restore();SCW=W;
 }
 function box(x,y,w,h,c='rgba(24,16,32,.82)'){r(c,x,y,w,h);}
 function drawHUD(){
@@ -1201,6 +1202,7 @@ function drawIntro(){const t=introT,gy=Math.round(H*.6),sx=ox,sy=oy;ox=oy=0;
  ox=sx;oy=sy;}
 function draw(){
  if(state.slice(0,2)==='g3'){g3Draw();return;}
+ if(state.slice(0,2)==='g4'){g4Draw();return;}
  if(state.slice(0,3)==='lan'){lanDraw();return;}
  if(state==='off'){r('#0c0a12',0,0,W,H);return;}
  const OY=(H-160)/2;
@@ -1306,7 +1308,7 @@ function draw(){
  g.restore();
  if(TRN){const k=TRN.t<.3?1-TRN.t/.3:Math.max(0,(TRN.t-.36)/.32);g.fillStyle='#0c0a12';g.beginPath();g.rect(0,0,W,H);g.arc(W/2,H/2,k*Math.hypot(W,H)/2,0,7,true);g.fill()}
 }
-/*@include rootdeep.js*//* ---------- loop ---------- */
+/*@include rootdeep.js*//*@include sproutwild*//* ---------- loop ---------- */
 function fit(){const p=cv.parentNode||{};let nh=Math.round(240*p.clientHeight/p.clientWidth/2)*2;nh=Math.max(160,Math.min(304,nh||200));if(nh!==H||cv.height!==nh*2||cv.width!==480){H=nh;cv.width=480;cv.height=H*2}VH=Math.ceil(H/Z);}
 fit();addEventListener('resize',fit);try{new ResizeObserver(fit).observe(cv.parentNode)}catch(e){}
 loadWorld();cloudInit();
@@ -1316,6 +1318,6 @@ function frame(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;
  for(const k in keys)prev[k]=keys[k];
  requestAnimationFrame(frame);}
 if(typeof requestAnimationFrame!=='undefined')requestAnimationFrame(frame);
-window.__g={KO,PP,RD:()=>RD,RDF:()=>RDF,tb:{on:v=>{TBON=!!v},last:()=>TBL},
+window.__g={KO,PP,RD:()=>RD,RDF:()=>RDF,SW:()=>SW,SWF:()=>SWF,tb:{on:v=>{TBON=!!v},last:()=>TBL},
  ev:/[?&]dev\b/.test(location.search)?(s=>eval(s)):undefined,unlock,MUS,update,draw,keys,prev,snap,restore,persist,get s(){return{state,P,LO,buds,sprouts,items,foes,gates,bugs,npcs,plots,gard,shards,day,run,meta,live,SAVE}}};
 })();
