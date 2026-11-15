@@ -131,3 +131,13 @@ a GBA colour treatment on every stage (`stageLayer`), a new HUD (`hud2`, `bar2`)
 Still to do, in the order I'd take them: repaint the stage drawings one at a time (start with THE LIVING ROOM), heads that
 face the opponent (one fighter first, from his photos), menus and select screen, sparks and projectiles.
 Will has not yet said what he thinks of this slice; get that before building further on it.
+
+## Fable pass 2, in `alt/` only (Nov 15)
+
+Will's notes after graphics pass 1, all done (see `alt/CHANGELOG.md`): Erin's hair clipping fixed; Marcus's full-meter
+super THE FINAL BET (`CN.bet`; TIME TO REMOVE THE J only against Will, canon from Will); King Bibi's head redrawn; IRON DOME
+is a counter; King Bibi's full-meter super WAR CRIMINAL (`CN.war`). Roster table above is out of date for these two:
+Marcus is HYDRO JET (half) / THE FINAL BET (full), King Bibi is COALITION (half) / WAR CRIMINAL (full).
+Will also asked for "more cinematic in general": only the letterbox during full supers is done. Ideas not built yet:
+walk-on intros per fighter, win poses with a camera push, a slow-motion replay of the last hit.
+He has not reacted to graphics pass 1 as a whole beyond these notes, so the stage repaints are still waiting on his word.

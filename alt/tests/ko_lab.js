@@ -238,7 +238,7 @@ async function main() {
       out.bibiX = shoot(() => { const [a, b] = fight(4, 0, 8); a.x = 120; b.x = 190; hp0 = b.hp; K.x = 1; __step(1 / 60); K.x = 0; }, 48, 6, 'KING BIBI X: RED LINE', 4, .6);
       out.redLineDmg = Math.round(hp0 - G.f[1].hp);
       out.bibiY = shoot(() => { const [a, b] = fight(4, 2, 8); a.x = 150; b.x = 220; b.dummy = 0; b.cpu = true; KO.startSpecial(b, 1); b.dummy = 1; for (let i = 0; i < 6; i++) __step(1 / 60); K.y = 1; __step(1 / 60); K.y = 0; }, 48, 6, 'KING BIBI Y: IRON DOME vs ZOOM', 4, .6);
-      out.bibiSuper = shoot(() => { const [a, b] = fight(4, 0, 8); a.x = 90; b.x = 190; hp0 = b.hp; a.meter = 100; K.sel = 1; __step(1 / 60); K.sel = 0; }, 150, 10, 'KING BIBI SUPER: COALITION', 5, .6);
+      out.bibiSuper = shoot(() => { const [a, b] = fight(4, 0, 8); a.x = 90; b.x = 190; hp0 = b.hp; a.meter = 60; K.sel = 1; __step(1 / 60); K.sel = 0; }, 150, 10, 'KING BIBI HALF-METER SUPER: COALITION', 5, .6);
       out.coalitionDmg = Math.round(hp0 - G.f[1].hp);
       return out;
     });

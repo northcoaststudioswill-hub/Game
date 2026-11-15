@@ -193,6 +193,32 @@ async function main() {
     check('4 cpu-vs-cpu fights finish (hard; normal, turbo, moon, chaos)', r.fights === 4, r);
   }
 
+  /* ---- 9. pass 2: THE FINAL BET, WAR CRIMINAL, IRON DOME as a counter ---- */
+  {
+    const r = await E(() => {
+      const G = KO.G, out = {}, ix = id => KO.CH.findIndex(c => c.id === id);
+      const full = (p1, p2, times) => { KO.SV.rule = 0; const [a, v] = fight(ix(p1), ix(p2), 0); a.x = 140; v.x = 200; a.meter = 100; const hp = v.hp; KO.startSuper(a); const kind = G.cine && G.cine.kind, say = G.cine && G.cine.say, fr = []; let t = 0, i = 0;
+        while (G.cine && t < 7) { __step(1 / 60); t += 1 / 60; if (i < times.length && t >= times[i]) { fr.push(grab()); i++; } } for (let k = 0; k < 50; k++) __step(1 / 60); return { kind, say, dmg: hp - v.hp, st: a.st, fr }; };
+      const half = (p1) => { const [a, v] = fight(ix(p1), ix('will'), 0); a.x = 120; v.x = 190; a.meter = 60; const hp = v.hp; KO.startSuper(a); const cine = !!G.cine; for (let k = 0; k < 240; k++) __step(1 / 60); return { cine, dmg: +(hp - v.hp).toFixed(1), meter: Math.round(a.meter) }; };
+      const b1 = full('marcus', 'will', [.3, 1.2, 2.0, 2.3, 2.9, 4.1]), b2 = full('marcus', 'erin', []), w1 = full('bibi', 'will', [.3, 1.4, 2.2, 3.0, 3.3, 4.3]);
+      out.bet = { kind: b1.kind, say: b1.say, dmg: b1.dmg, st: b1.st }; out.betOther = b2.say; out.war = { kind: w1.kind, dmg: w1.dmg, st: w1.st };
+      out.halfMarcus = half('marcus'); out.halfBibi = half('bibi');
+      { const [a, v] = fight(ix('will'), ix('bibi'), 0); a.x = 150; v.x = 178; KO.startSpecial(v, 2); for (let i = 0; i < 10; i++) __step(1 / 60); const h0 = v.hp, a0 = a.hp; K.a = 1; __step(1 / 60); K.a = 0; for (let i = 0; i < 24; i++) __step(1 / 60); out.dome = { bibiLost: h0 - v.hp, willLost: +(a0 - a.hp).toFixed(1), willSt: a.st }; }
+      { const [a, v] = fight(ix('will'), ix('bibi'), 0); a.x = 150; v.x = 178; KO.startSpecial(v, 2); for (let i = 0; i < 38; i++) __step(1 / 60); const h1 = v.hp; K.a = 1; __step(1 / 60); K.a = 0; for (let i = 0; i < 14; i++) __step(1 / 60); out.whiff = +(h1 - v.hp).toFixed(1); }
+      out.heads = { erin: KO.CH[ix('erin')].head.height, bibi: KO.CH[ix('bibi')].head.width };
+      out.sheet = sheet(b1.fr.concat(w1.fr), 6, .5, 'THE FINAL BET (vs Will) | WAR CRIMINAL');
+      return out;
+    });
+    save('supers2.png', r.sheet); delete r.sheet;
+    check('THE FINAL BET: full meter, 30 damage, Marcus back to idle', r.bet.kind === 'bet' && r.bet.dmg === 30 && r.bet.st === 'idle', r.bet);
+    check('against Will he says TIME TO REMOVE THE J; against others something else', r.bet.say === 'TIME TO REMOVE THE J.' && !!r.betOther && r.betOther !== r.bet.say, [r.bet.say, r.betOther]);
+    check('WAR CRIMINAL: full meter, 30 damage, Bibi back to idle', r.war.kind === 'war' && r.war.dmg === 30 && r.war.st === 'idle', r.war);
+    check('half meter still plays HYDRO JET and COALITION (no cinematic, 50 meter spent)', !r.halfMarcus.cine && !r.halfBibi.cine && r.halfMarcus.meter === 10 && r.halfBibi.meter === 10 && r.halfMarcus.dmg > 0 && r.halfBibi.dmg > 0, [r.halfMarcus, r.halfBibi]);
+    check('IRON DOME counters a jab: Bibi takes nothing, the attacker is hit and launched', r.dome.bibiLost === 0 && r.dome.willLost > 7 && r.dome.willSt === 'knock', r.dome);
+    check('IRON DOME whiffed: he can be hit afterwards', r.whiff > 0, r.whiff);
+    check('new heads are in (Erin 13 rows, Bibi 16 wide)', r.heads.erin === 13 && r.heads.bibi === 16, r.heads);
+  }
+
   check('no page errors', errs.length === 0, errs);
   await browser.close();
   console.log(fails ? fails + ' FAILED' : 'all passed');

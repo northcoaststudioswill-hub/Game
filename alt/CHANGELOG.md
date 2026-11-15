@@ -340,6 +340,40 @@ is the extra; it has not been timed on a phone.
 **Not done yet (the rest of the overhaul):** repainting the nine stage drawings (they are the same sparse compositions,
 now graded), heads that face the opponent, the menus and select screen, hit sparks and projectiles.
 
+## Fable pass 2: Erin's hair, THE FINAL BET, King Bibi's face, IRON DOME as a counter, WAR CRIMINAL (Nov 15)
+
+From Will's notes after the graphics pass. The ideas are his; the staging and every line except TIME TO REMOVE THE J are
+invented and flagged for him. Nothing is phone-confirmed.
+
+- **Erin's hair no longer clips.** Her head sprite carried long hair that hung below her chin and was drawn on top of her
+  shoulders, arms and back in every pose. The head's hair now stops at the jaw (13 rows, was 16), and the long hair is the
+  mass behind her body, moved back so it falls down behind her shoulder blades where it can be seen and never crosses her
+  arms or torso. Mama's hair moves with it (same code).
+- **Marcus is two-stage now.** Half meter: **HYDRO JET** (the old super). Full meter: **THE FINAL BET**, a cinematic.
+  S-rank cut-in; Marcus on his phone with a 12-leg UFC parlay, stake THE RENT, pays $4,800,000, the legs ticking over to HIT
+  one at a time; leg 12 in the octagon, COME ON. COME ON., then a one-punch KNOCKOUT!!; PARLAY HITS! with the number
+  rolling up and cash raining, CASHED OUT, BRO.; then the winnings land on the opponent: CHA- / CHING! / PAID., 5 + 5 + 20 = 30,
+  can't be blocked. **Against Will he says TIME TO REMOVE THE J.** Against anyone else, one of: I DON'T GAMBLE, BRO. I INVEST. /
+  TWELVE LEGS. I'VE GOT A GUY FOR EACH. / THE HOUSE ALWAYS WINS. I'M THE HOUSE. / BRO. YOUR WHOLE CAREER IS THE UNDER. (`BETQ`).
+- **King Bibi looks more like him.** New 16x16 head: swept silver hair, a high forehead, heavy dark brows, a long nose with
+  the lines beside it, jowls, a flat wide mouth. It is still drawn from memory, not from a photo; send one if it's off.
+- **IRON DOME (Y) is a counter.** It used to make him briefly untouchable and shove. Now, while the dome is up (0.1 to 0.56 s
+  of the cast), any blockable hit that touches him is INTERCEPTED!: no damage, +10 meter, and an attacker within reach is hit
+  back for 8 and launched. It still eats projectiles. Whiff it and he is open for the rest of the move. Unblockables go through.
+  It counts as a parry in Trials.
+- **King Bibi is two-stage now.** Half meter: **COALITION** (the old super). Full meter: **WAR CRIMINAL**, a cinematic.
+  S-rank cut-in; THE SECRET DATA CENTER, where his SUPER SOLDIER LIL BOTTIE stands in a tube, the racks go red and it comes
+  ONLINE.; HE BECOMES FENTANYAHU, growing; THE WHOLE ENTIRE CITY: a skyline at dusk coming down building by building while
+  Bottie flies over it firing and Fentanyahu walks through it (buildings only, no people); then the blast and a red beam
+  reach the stage: NO COMMENT., 5 + 5 + 20 = 30, can't be blocked. I read "Fentanyahu" as the name of his powered-up form;
+  say if it should be a separate character.
+- **More cinematic:** while a full super plays over the stage, the health bars give way to letterbox bars. New cinematics get
+  an optional `init(C)` (used to pick Marcus's line).
+- Move lists, the select screen and the half-way tick on the meter pick up both new two-stage supers on their own. The CPU
+  uses them the same way it uses the others.
+
+Still single-stage: Louie (Judgement) and Corbin (007).
+
 ## Not changed
 
 - Patch & Plate (`src/patchplate.js` is v0.3's file as built). Its 76 checks pass on the ALT build.

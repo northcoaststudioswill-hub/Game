@@ -93,3 +93,13 @@ stage is drawn in its own layer). `fable_lab.js` 20 of 20. `pp_test.js` 76 of 76
 roguelite_loop and lantern_menu pass (the others were not re-run; the pass touches only `src/knockout.js`).
 Frame cost, 600 frames of a CPU fight on three stages: 3.1 to 3.5 ms a frame in headless Chromium on a desktop.
 The sheets in `ko/` were regenerated with the new look. **Nothing is phone-confirmed.**
+
+## Fable pass 2 (Nov 15 2026)
+
+`fable_lab.js` now has 27 checks, all pass, no page errors. New ones: THE FINAL BET does 30 at full meter and Marcus returns to
+idle; he says TIME TO REMOVE THE J. against Will and something else against Erin; WAR CRIMINAL does 30 and Bibi returns to
+idle; at half meter Marcus and Bibi still play HYDRO JET (15.6) and COALITION (20.4) with no cinematic and 50 meter spent;
+IRON DOME counters a jab (Bibi loses nothing, the attacker loses 8.6 and is launched) and can be hit after a whiff; the new
+heads are in. Sheet: `fable/supers2.png`. `ko_lab.js`: metrics unchanged, no errors (its Coalition check now uses half
+meter). `pp_test.js` 76 of 76. Not re-run: `tests/v02/` (this pass only touches `src/knockout.js`).
+**Nothing is phone-confirmed.**
