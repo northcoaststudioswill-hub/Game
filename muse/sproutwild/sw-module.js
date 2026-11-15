@@ -368,7 +368,8 @@ function wPlot(){return{c0:0,c1:22,r0:0,r1:23}}
 function wCellFree(gx,gy){const x=wCellX(gx),y=wCellY(gy),cx=x+10,cy=y+10;
  if(gx<0||gx>22||gy<0||gy>23)return false;
  if(x>172&&x<290&&y<112)return false;
- if(Math.hypot(cx-WW/2,cy-(W4.wh-22))<30)return false;
+ if(cx>218&&cx<262&&cy>100)return false; /* the lane from the Lantern to the south road stays clear */
+ if(cx>284&&cx<340&&cy>150&&cy<204)return false; /* the camp fire */
  if(cx>158&&cx<322&&cy>324&&cy<392)return false; /* the garden: nothing builds on the plots */
  for(const b of W4.bushes||[])if(Math.hypot(cx-b.x,cy-b.y)<18)return false;
  if(SW.quest<2&&Math.hypot(cx-240,cy-296)<52)return false;
@@ -459,7 +460,7 @@ function wEnterSector(id){W4.sector=id;SW.sector=id;const sec=wSector(id);W4.ww=
  if(id==='BASE'){lou.x=WW/2-56;lou.y=290}
  {const fr0=W4.from;W4.fld=FMAPS[id]?fBuild(id,fr0):null;W4.from=null;W4.bf=W4.fld?null:fBaseBuild();if(W4.fld)wCamUpdate(P3.x,P3.y);else wBaseArrive(fr0)}
  if(!SW.visited[sec.id]){SW.visited[sec.id]=1;W4.banner={txt:sec.n,sub:WSECSUB[sec.id]||'',t:3}}
- else swSay(sec.n,2.2);swSave()}
+ swSave()}
 /* ---------- base production: workers turn time into resources ---------- */
 function wProdTick(){SW.buildings.forEach((b,bi)=>{const def=wBuildDef(b.k);if(!def.yields)return;
   const crew=wCrewAt(bi);if(!crew.length)return;
@@ -1053,7 +1054,7 @@ function wNextGoal(){
   if(q===3)return{x:240,y:300,label:'Build the COTTAGE anywhere open — START, then BUILD, then place it.'};
   return{x:240,y:300,label:'Build a GARDEN BED on any open ground. Meadow trees have the wood.'}}
  if(!SW.buildings.some(b=>b.k==='cottage'))return{x:240,y:300,label:'Build a COTTAGE first — START menu, then BUILD. Any open ground works. Woof.'}
- if(wBaseReady())return{x:WW/2,y:70,label:'The missions are done! Ring the Base Lantern — the plot grows!'};
+ if(wBaseReady())return{x:WW/2,y:70,label:'The missions are done! Ring the Great Lantern — the plot grows!'};
  if(SW.crew.length&&!wAssignedCount()&&SW.buildings.length)return{x:wCellX(SW.buildings[0].gx)+10,y:wCellY(SW.buildings[0].gy)+30,label:'Give a sprout a job — walk to a building and press A. Sprouts work; buddies fight.'};
  if(SW.badges.length<4)return{x:WW/2,y:(W4.wh||360)-40,label:'Adventure! The Lantern Gate leads to sectors and gyms.'};
  return{x:WW/2,y:70,label:'Home sweet home. Everything is built, boss.'}}
@@ -1081,10 +1082,11 @@ function wLampRows(){const rows=[];
 function lampUpdate(){const rows=wLampRows();swNav(rows.length);
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){const rw=rows[swSel];
-  if(rw.act==='ring'){wConfirm('Ring the Base Lantern? Sunkeep grows to LV'+(SW.baseLv+1)+' — more crew room, new plans.',()=>{SW.baseLv++;swSnd(880,.14,1318);
-   swSay('The Base Lantern blazes brighter — BASE LEVEL '+SW.baseLv+'!',3);swSave();state='g4world'});return}
+  if(rw.act==='ring'){wConfirm('Ring the Great Lantern? Sunkeep grows to LV'+(SW.baseLv+1)+' — more crew room, new plans.',()=>{SW.baseLv++;swSnd(880,.14,1318);
+   swSay('The Great Lantern blazes brighter — BASE LEVEL '+SW.baseLv+'!',3);swSave();state='g4world'});return}
   else if(rw.act==='board')state='g4base';
-  else if(rw.act==='travel'){swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
+  else if(rw.act==='rest'){for(const m of SW.party)m.hp=wStats(m).max;SW.stam=100;swSnd(880,.1,1175);swSay('The light mends everyone. Buddies fully rested.',2.6);swSave();state='g4world'}
+  else if(rw.act==='travel'){W4.mapRO=0;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(rw.act==='leave')state='g4world';
   else{if(SW.hearts>=rw.price){SW.hearts-=rw.price;SW.unlocked[rw.act]=1;swSnd(784,.1,1175);
     swSay('Plans pinned up! '+(rw.act==='sawmill'?'SAWMILL':'LANTERN STATUE')+' is in the BUILD menu now.',3);swSave();swSel=0}
@@ -1148,6 +1150,7 @@ function wDamage(att,def,move,aSt,dSt){const A=wStats(att).atk*(1+.25*(aSt.atk||
  const crit=Math.random()<(move.crit?.22:.06)?1.5:1;
  let dmg=Math.max(1,Math.round(move.p*(A/D)*(0.32+att.lv*0.05)*stab*mult*crit*(0.85+Math.random()*0.3)/1.4));
  if(SW.keeper==='MARCUS'&&SW.party.includes(att))dmg=Math.max(1,Math.round(dmg*1.12));
+ if(!SW.badges.length&&SW.party.includes(def))dmg=Math.min(dmg,Math.ceil(wStats(def).max*.45)); /* before the first Sigil nothing takes more than 45% in one hit */
  return{dmg,mult,crit:crit>1}}
 function wDoMove(att,def,move,aSt,dSt,who){ /* returns log lines, applies damage */
  if(move.p===0){if(move.eff==='atkup'){aSt.atk=Math.min(3,(aSt.atk||0)+1);return[att.sp+"'s ATTACK rose!"]}
@@ -1767,10 +1770,12 @@ function mapUpdate(){swNav(WSECTORS.length);
  if(pressed('a')){const s=WSECTORS[swSel];
   if(s.id!=='BASE'&&SW.quest<2){swSnd(140,.09);swSay('Wake the Lantern and greet a buddy first.',2.4);return}
   if(SW.badges.length<s.req){swSnd(140,.09);swSay('Locked — needs '+s.req+' Sigils.',1.6);return}
+  if(W4.mapRO){swSnd(140,.09);swSay('This is only the map. Travel from a Lantern post, or the Great Lantern at home.',2.8);return}
+  if(s.id!=='BASE'&&!SW.visited[s.id]){swSnd(140,.09);swSay('You have not lit a post there yet. Walk the road first.',2.6);return}
   wEnterSector(s.id);state='g4world'}}
 function drawMap(){swShell('SECTORS','SIGILS '+SW.badges.length+'/4');
  swRows(WSECTORS.map(s=>({a:s.n+(W4.sector===s.id?' · HERE':''),
-  b:SW.badges.length<s.req?'NEEDS '+s.req+' SIGILS':s.gym>=0?(SW.gymDone[s.gym]?'SIGIL ✓':'GYM'):''})),
+  b:SW.badges.length<s.req?'NEEDS '+s.req+' SIGIL'+(s.req>1?'S':''):(s.id!=='BASE'&&!SW.visited[s.id])?'no post lit yet':s.gym>=0?(SW.gymDone[s.gym]?'SIGIL ✓':'GYM'):'lit'})),
   swSel,WSECTORS[swSel].sub+' Wilds Lv '+(WSECTORS[swSel].lv?WSECTORS[swSel].lv.join('-'):'—')+'.')}
 function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','BASE','KEEPER','GUIDE','RESUME'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}
@@ -1778,15 +1783,15 @@ function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','
   if(r2==='BUDDIES'){swSel=0;state='g4party'}
   else if(r2==='BUDDY GUIDE'){swSel=0;state='g4dex'}
   else if(r2==='BUILD'){if(W4.sector!=='BASE'){swSay('Building happens at Sunkeep Base.',1.8);state='g4world'}else{swSel=0;state='g4build'}}
-  else if(r2==='SECTORS'){swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
+  else if(r2==='SECTORS'){W4.mapRO=1;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(r2==='BASE'){state='g4base'}
   else if(r2==='KEEPER'){swSel=['WILL','ERIN','MARCUS'].indexOf(SW.keeper);state='g4keeper'}
   else if(r2==='GUIDE'){W4.guidePage=0;state='g4guide'}
   else state='g4world'}}
 function drawPause(){swShell('KEEPER MENU','');
  swRows([{a:'BUDDIES',b:SW.party.length+(SW.party.length===1?' buddy':' buddies')},{a:'BUDDY GUIDE',b:Object.keys(SW.caught).length+'/'+WSPECIES.length+' caught'},
-  {a:'BUILD',b:W4.sector==='BASE'?'at base':'go to base'},{a:'SECTORS',b:WSECTORS.length+' pockets'},
-  {a:'BASE',b:'Level '+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how everything works'},{a:'RESUME',b:''}],swSel,'Sprouts '+wBudTotal()+' (pouch '+(SW.pouch||8)+') · Tonics '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0))}
+  {a:'BUILD',b:W4.sector==='BASE'?'at base':'go to base'},{a:'MAP',b:'travel is by Lantern'},
+  {a:'WORK BOARD',b:'Sunkeep Lv'+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how everything works'},{a:'RESUME',b:''}],swSel,'Sprouts '+wBudTotal()+' (pouch '+(SW.pouch||8)+') · Tonics '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0))}
 function partyUpdate(){swNav(Math.max(1,SW.party.length+1));
  if(pressed('b')){state='g4pause';swSel=0;return}
  if(pressed('a')){if(swSel===SW.party.length){swSel=0;state='g4box';return}
@@ -1816,13 +1821,13 @@ function drawDex(){swShell('BUDDY GUIDE','');
 function buildUpdate(){swNav(WBUILD.length);
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){const def=WBUILD[swSel];
-  if(def.lock&&!SW.unlocked[def.k]){swSnd(140,.08);swSay('Plans for sale at the Base Lantern — gratitude hearts only.',2.2);return}
+  if(def.lock&&!SW.unlocked[def.k]){swSnd(140,.08);swSay('Plans for sale at the Great Lantern — gratitude hearts only.',2.2);return}
   const owned=SW.buildings.filter(b=>b.k===def.k).length;
   if(def.max&&owned>=def.max){swSnd(140,.08);swSay('Already standing.',1.4);return}
   if(!wCanPay(def.cost)){swSnd(140,.08);swSay('Not enough: '+wCostStr(def.cost),1.6);return}
-  W4.placeK=def.k;W4.cursor={x:5,y:2};state='g4place'}}
-function drawBuild(){swShell('BUILD AT SUNKEEP','WOOD '+SW.res.wood+' STONE '+SW.res.stone+' INGOT '+SW.res.ingot);
- swRows(WBUILD.map(d2=>{if(d2.lock&&!SW.unlocked[d2.k])return{a:'???',b:'♥ '+d2.price+' · Base Lantern'};
+  W4.placeK=def.k;W4.cursor={x:Math.max(0,Math.min(22,Math.round((P3.x-20)/20))),y:Math.max(0,Math.min(23,Math.round((P3.y-38)/20)+2))};state='g4place'}}
+function drawBuild(){swShell('BUILD','♣'+SW.res.wood+' ◆'+SW.res.stone+' ingot '+SW.res.ingot);
+ swRows(WBUILD.map(d2=>{if(d2.lock&&!SW.unlocked[d2.k])return{a:'???',b:'♥ '+d2.price+' · Great Lantern'};
    const owned=SW.buildings.filter(b=>b.k===d2.k).length;
    return{a:d2.n+(owned?' x'+owned:''),b:wCanPay(d2.cost)?wCostStr(d2.cost):wCostStr(d2.cost)+' ✗'}}),
   swSel,(WBUILD[swSel].lock&&!SW.unlocked[WBUILD[swSel].k])
@@ -1846,7 +1851,7 @@ function drawPlace(){wDrawWorld();const cam=W4.cam||{x:0,y:0};
  r(ok?'rgba(126,231,135,.25)':'rgba(240,120,120,.25)',x,y,20,20);
  r(cc,x,y,20,1);r(cc,x,y+19,20,1);r(cc,x,y,1,20);r(cc,x+19,y,1,20);
  g.restore();
- ctext('PLACE: '+wBuildDef(W4.placeK).n+' — A: BUILD · B: BACK',30,1,'#ffd94d',null)}
+ uiPill('PLACE '+wBuildDef(W4.placeK).n+'  ·  B  BACK',H-30,'A')}
 function cotUpdate(){const hasBench=SW.buildings.some(b=>b.k==='bench');
  const rows=['REST','BREW TONIC','BUY SPROUT · 12p','BUY TONIC · 25p','LEAVE'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}
@@ -1873,14 +1878,14 @@ function nurUpdate(){const b=SW.buildings[W4.nurB];if(!b){state='g4world';return
   else if(r2==='WORKERS'){W4.assignB=W4.nurB;swSel=0;state='g4assign'}
   else if(r2.startsWith('PLANT')){const e=WNURPLANT.find(x2=>r2.includes(x2[0]));
    const cost=e[0]==='LUCKY'?{berry:5,ingot:1}:{berry:e[2]};
-   if(wCanPay(cost)){wPay(cost);b.crop={kind:e[0],sp:e[1],t:0,stage:1};swSay('Planted a '+e[0]+' sprout. A tender speeds it up.',2);swSnd(784,.07);swSave()}
+   if(wCanPay(cost)){wPay(cost);b.crop={kind:e[0],sp:e[1],t:0,stage:1};swSay('Berries set out for a '+e[0]+' kind. A tender brings it sooner.',2.4);swSnd(784,.07);swSave()}
    else{swSnd(140,.08);swSay('Needs '+e[2]+' BERRY'+(e[0]==='LUCKY'?' + 1 INGOT':'')+'.',1.8)}}
-  else if(r2.startsWith('GROWING')){swSnd(660,.05);swSay(b.crop.kind+' sprout — stage '+b.crop.stage+'/3. '+((b.workers&&b.workers.length)?'Your tender is on it.':'Assign a tender to grow it faster.'),2)}
-  else if(r2==='HARVEST'){if(!b.crop||b.crop.stage<3){swSnd(140,.08);swSay('Not ready yet — sprouts take time.',1.6)}
+  else if(r2.startsWith('GROWING')){swSnd(660,.05);swSay('A dim '+b.crop.kind+' buddy is on its way: '+b.crop.stage+'/3.',2)}
+  else if(r2==='HARVEST'){if(!b.crop||b.crop.stage<3){swSnd(140,.08);swSay('Nobody at the door yet.',1.6)}
    else{const m=wMakeMon(b.crop.sp,1);SW.seen[m.sp]=1;SW.caught[m.sp]=1;
     if(SW.party.length<3)SW.party.push(m);else SW.box.push(m);
-    const bt2=TYPES[wSp(m.sp).t[0]].n;SW.buds[bt2]=(SW.buds[bt2]||0)+2;
-    swSay(m.sp+' sprouted and joined you! +2 '+bt2+' buds',2.2);swSnd(784,.09,1175);b.crop=null;swSave()}}
+    
+    swSay(m.sp+' followed the light in. It is with you now.',2.4);swSnd(784,.09,1175);b.crop=null;swSave()}}
   else if(r2==='CLEAR BED'){b.crop=null;swSay('Bed cleared.',1.2);swSave()}}}
 function drawNur(){const b=SW.buildings[W4.nurB];if(!b)return;
  swShell('SPROUT NURSERY','BERRY '+SW.res.berry+' · INGOT '+SW.res.ingot);

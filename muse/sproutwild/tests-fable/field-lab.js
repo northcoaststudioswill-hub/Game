@@ -93,6 +93,11 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
  /* the south road joins Sunkeep and the Meadow */
  {S.bottieSeen=1;F.enter('MEADOW');at(17,23,[0,1]);for(let i=0;i<60&&F.fld();i++)step(1,['down']);ok('the meadow south road leads home',!F.fld()&&F.pos().y>440,Math.round(F.pos().y));
   for(let i=0;i<90&&!F.fld();i++)step(1,['down']);ok('...and Sunkeep south road leads back out',F.fld()&&F.fld().id==='MEADOW')}
+ /* gear and services found by playing on */
+ {S.gear={};F.enter('MEADOW');at(28,9,[0,-1]);step(30,['up']);ok('no rope: ledges still do not climb',F.pos().y>8*T+8);
+  S.gear={rope:1};at(28,9,[0,-1]);step(40,['up']);ok('with a CLIMBING ROPE you climb the ledge',F.pos().y<8*T,Math.round(F.pos().y));
+  S.party[0].hp=1;F.enter('BASE');F.setPos(240,92);step(3,['up']);step(2);tap('a');step(3);
+  ok('the Great Lantern opens as the hub',F.state()==='g4lamp',F.state());tap('a');step(3);ok('resting in the light heals the party',S.party[0].hp>1,S.party[0].hp)}
  /* every sector builds and draws */
  for(const id of ['MEADOW','TOWN','WASTES','SHORE','GLOOM','PEAK']){F.enter(id);step(5);G.draw()}
  ok('all six sectors build, update and draw',true);
@@ -107,10 +112,10 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
   const fire=F.giveMon('CINDERCAP',5,true),rock=F.giveMon('PEBBLIT',5,true),zip=F.giveMon('ZIPWIG',5,true);step(3);const wk=F.wk();
   ok('box buddies become base workers',wk.length===3,wk.length);
   ok('species bring their own work skills',F.wkSkills(wk[0]).KINDLING>=1&&F.wkSkills(wk[1]).QUARRY>=1&&F.wkSkills(wk[2]).HANDIWORK>=1,JSON.stringify(wk.map(w=>F.wkSkills(w))));
-  F.dayT(20);F.setPos(60,460);const i0=S.res.ingot,s0=S.res.stone;step(240);
+  F.dayT(20);F.setPos(60,460);S.res.ore=0;step(300);ok('the kiln sits idle without ore',!(S.buildings[0].prog>0),S.buildings[0].prog);S.res.ore=6;const i0=S.res.ingot,s0=S.res.stone;step(240);
   const kiln=S.buildings[0],quarry=S.buildings[2];
   ok('the fire buddy picks the kiln, the rock buddy the quarry',wk[0].task&&wk[0].task.b===kiln&&wk[1].task&&wk[1].task.b===quarry,(wk[0].task&&wk[0].task.k)+','+(wk[1].task&&wk[1].task.k));
-  step(2400);G.draw();ok('buildings make goods and workers haul them to the Lantern',S.res.ingot>i0&&S.res.stone>s0,(S.res.ingot-i0)+' ingot, '+(S.res.stone-s0)+' stone');
+  step(2400);G.draw();ok('smelting uses up ore',S.res.ore<6,S.res.ore);ok('buildings make goods and workers haul them to the Lantern',S.res.ingot>i0&&S.res.stone>s0,(S.res.ingot-i0)+' ingot, '+(S.res.stone-s0)+' stone');
   S.res.berry=9;const t0=S.tonics;S.craftQ.push({id:'tonic',need:12,done:0});step(1500);
   ok('the CRAFT buddy builds the bench queue',S.tonics===t0+1&&S.craftQ.length===0,S.tonics-t0);
   S.box=[];step(3);S.craftQ.push({id:'tonic',need:12,done:0});F.setPos(10+8*20+10,38+8*20+24);step(500);

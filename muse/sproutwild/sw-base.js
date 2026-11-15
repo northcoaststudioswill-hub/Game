@@ -37,7 +37,7 @@ function wkPick(w){const sk=wkSkills(w),bench=SW.buildings.find(b=>b.k==='bench'
   return{k:b.k==='bench'?'craft':b.k==='nursery'?'tend':'bld',b}}
  if(wDark()>.7)return{k:'sleep',t:6};
  if(bench&&(SW.craftQ||[]).length&&sk.HANDIWORK&&wkAt(bench).length<2)return{k:'craft',b:bench};
- let best=null,bl=0;for(const b of SW.buildings){const def=wBuildDef(b.k);if(!def.yields||(b.out||0)>=3)continue;const lv=wkBldLv(def,sk),n=wkAt(b).length;if(lv>0&&n<2&&lv-n*.5>bl){bl=lv-n*.5;best=b}}
+ let best=null,bl=0;for(const b of SW.buildings){const def=wBuildDef(b.k);if(!def.yields||(b.out||0)>=3||(b.k==='kiln'&&!(SW.res.ore>0)))continue;const lv=wkBldLv(def,sk),n=wkAt(b).length;if(lv>0&&n<2&&lv-n*.5>bl){bl=lv-n*.5;best=b}}
  if(best)return{k:'bld',b:best};
  for(const b of SW.buildings)if(b.k==='nursery'&&b.crop&&b.crop.stage<3&&(sk.WATERING||sk.PLANTING)&&!wkAt(b).length)return{k:'tend',b};
  const it=(W4.bf.items||[]).find(i2=>!i2.by&&!i2.car.length&&!i2.done);if(it){it.by=w;return{k:'haul',it}}
@@ -47,6 +47,7 @@ function wkCraftDone(q,bench){const x=wCellX(bench.gx)+10,y=wCellY(bench.gy);let
  else if(q.id==='axe'||q.id==='pick'){SW.tools[q.id]=Math.min(3,SW.tools[q.id]+1);txt=(q.id==='axe'?'AXE':'PICKAXE')+' Lv'+SW.tools[q.id]+'!'}
  else if(q.id==='oil'){SW.hearts+=3;SW.heartsTotal+=3;txt='LANTERN OIL: +3 ♥'}
  else if(q.id==='pouch'){SW.pouch=Math.min(24,(SW.pouch||8)+4);txt='SEED POUCH: '+SW.pouch+' SPROUTS WALK WITH YOU'}
+ else if(q.id==='rope'){SW.gear=SW.gear||{};SW.gear.rope=1;txt='CLIMBING ROPE! Ledges can be climbed now.'}
  else if(q.id==='charm'){SW.buds.LUCKY=(SW.buds.LUCKY||0)+1;txt='A LUCKY SPROUT JOINS YOU!'}
  W4.floats.push({x,y:y-10,txt,t:2.2,c:'#ffd94d'});swSnd(784,.1,1318);swSave()}
 function wkTick(dt){if(!W4.bf)return;wkSync();const bench=SW.buildings.find(b=>b.k==='bench');if(!SW.craftQ)SW.craftQ=[];
@@ -72,8 +73,9 @@ function wkTick(dt){if(!W4.bf)return;wkSync();const bench=SW.buildings.find(b=>b
   else if(tk.k==='tend'){if(!b.crop||b.crop.stage>=3){if(w.kind!=='s')w.task=null;continue}b.crop.t+=dt*Math.max(sk.WATERING||0,sk.PLANTING||0,.5)}
   else{const def=wBuildDef(b.k),lv=wkBldLv(def,sk)||.4;
    if((b.out||0)>=3){if(w.kind!=='s')w.task=null;else w.task=wkPick(w);continue}
+   if(b.k==='kiln'&&!(SW.res.ore>0)){b.busy=0;if(((time*.5)|0)%4===0&&!b.noOre){b.noOre=1;W4.floats.push({x:wCellX(b.gx)+10,y:wCellY(b.gy)-6,txt:'THE KILN NEEDS ORE',t:1.6,c:'#e88'})}else if(((time*.5)|0)%4!==0)b.noOre=0;if(w.kind!=='s'){w.task={k:'idle',x:w.hx,y:w.hy,t:4}}continue}
    b.prog=(b.prog||0)+lv*dt;
-   if(b.prog>=16){b.prog=0;const luck=wkAt(b).some(w2=>wkSkills(w2).FORTUNE),n=2+(lv>=2?1:0)+(luck?1:0)+(SW.keeper==='ERIN'?1:0);
+   if(b.prog>=16){b.prog=0;if(b.k==='kiln')SW.res.ore--;const luck=wkAt(b).some(w2=>wkSkills(w2).FORTUNE),n=2+(lv>=2?1:0)+(luck?1:0)+(SW.keeper==='ERIN'?1:0);
     W4.bf.items.push({k:'pel',res:def.yields,n,w:1,x:wCellX(b.gx)+10+(Math.random()*8-4),y:wCellY(b.gy)+33+(b.out||0)*3,car:[],from:b});
     W4.floats.push({x:wCellX(b.gx)+10,y:wCellY(b.gy)-6,txt:def.yields.toUpperCase()+' READY',t:1.2,c:'#ffd94d'});swSnd(880,.05,1175);
     if(Math.random()<(SW.buildings.some(bb=>bb.k==='statue')?.7:.35)&&(W4.groundHearts||[]).length<8){W4.groundHearts=W4.groundHearts||[];W4.groundHearts.push({x:wCellX(b.gx)+4+Math.random()*12,y:wCellY(b.gy)+38})}
@@ -125,7 +127,7 @@ function wDrawBuilding(b){const x=wCellX(b.gx),y=wCellY(b.gy),K='#14101e',on=b.b
 /* ---------------- the Tinker Bench: a crafting queue ---------------- */
 const WRECIPES=[{id:'tonic',n:'TONIC',cost:{berry:3},need:12,d:'Heals a buddy 25 HP.'},{id:'axe',n:'AXE',need:24,d:'Each level: +1 damage to trees. Lv3 also yields +1.'},{id:'pick',n:'PICKAXE',need:24,d:'Each level: +1 damage to rocks. Lv3 also yields +1.'},
  {id:'oil',n:'LANTERN OIL',cost:{wood:2,berry:2},need:10,d:'Burns bright: +3 gratitude hearts.'},{id:'charm',n:'LUCKY CHARM',cost:{ingot:1,berry:5},need:20,d:'A LUCKY sprout hatches from it and joins your pouch.'}];
-function wRecipeCost(rc){if(rc.id==='pouch'&&(SW.pouch||8)+4*(SW.craftQ||[]).filter(q=>q.id==='pouch').length>=24)return null;if(rc.cost)return rc.cost;const lv=SW.tools[rc.id]+(SW.craftQ||[]).filter(q=>q.id===rc.id).length;if(lv>=3)return null;const c=wToolCost(rc.id,lv),o={wood:c.w,stone:c.s};if(c.i)o.ingot=c.i;return o}
+function wRecipeCost(rc){if(rc.id==='rope'&&((SW.gear&&SW.gear.rope)||(SW.craftQ||[]).some(q=>q.id==='rope')))return null;if(rc.id==='pouch'&&(SW.pouch||8)+4*(SW.craftQ||[]).filter(q=>q.id==='pouch').length>=24)return null;if(rc.cost)return rc.cost;const lv=SW.tools[rc.id]+(SW.craftQ||[]).filter(q=>q.id===rc.id).length;if(lv>=3)return null;const c=wToolCost(rc.id,lv),o={wood:c.w,stone:c.s};if(c.i)o.ore=c.i;return o}
 function toolsUpdate(){const n=WRECIPES.length+3;swNav(n);if(!SW.craftQ)SW.craftQ=[];
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){if(swSel===n-1){state='g4world';return}

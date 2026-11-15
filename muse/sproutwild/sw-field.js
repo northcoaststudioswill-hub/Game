@@ -410,6 +410,9 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
  if(mx||my){if(!((F.dir[0]&&F.dir[0]===mx)||(F.dir[1]&&F.dir[1]===my)))F.dir=mx?[mx,0]:[0,my];
   P3.ax=F.dir[0];P3.ay=F.dir[1];P3.anim=(P3.anim||0)+dt*8;
   const l=Math.hypot(mx,my),sp=84,nx=P3.x+mx/l*sp*dt,ny=P3.y+my/l*sp*dt;
+  if(my<0&&fTile(F,Math.floor(P3.x/FT),Math.floor((P3.y-9)/FT))==='-'){const ty=Math.floor((P3.y-9)/FT)-1;
+   if(SW.gear&&SW.gear.rope&&fWalkTile(F,Math.floor(P3.x/FT),ty)){F.hop={t:0,sy:P3.y,ty:ty*FT+10};swSnd(520,.07,780);return}
+   if(!(SW.gear&&SW.gear.rope)&&!(W4.msgT>0)){swSay('A ledge. With a CLIMBING ROPE from the bench you could get up here.',2.6)}}
   if(my>0&&fTile(F,Math.floor(P3.x/FT),Math.floor((P3.y+7)/FT))==='-'){const ty=Math.floor((P3.y+7)/FT)+1;
    if(fWalkTile(F,Math.floor(P3.x/FT),ty)){F.hop={t:0,sy:P3.y,ty:ty*FT+8};swSnd(440,.06,660);return}}
   if(!fBox(F,nx,P3.y))P3.x=nx;if(!fBox(F,P3.x,ny))P3.y=ny}
@@ -445,7 +448,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
   else if(n.k==='gym'){if(SW.quest<5)swSay(WGYMS[sec.gym].leader+': "Easy, keeper. Set up camp and catch a buddy first — then we battle."',3.4);
    else{W4.gymIx=wGymIx(sec);W4.gymPage=0;swSel=0;state='g4gym'}}
   else if(n.k==='door')swSay(['Nobody home. A sprout waves from the window.','Locked. It smells like berry pie in there.','A note: GONE TO THE GYM. BACK NEVER.'][(F.t0*7|0)%3],2.2);
-  else if(n.k==='sign'){swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
+  else if(n.k==='sign'){W4.mapRO=0;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(n.k==='info'){swSay(n.msg,2.6);swSnd(660,.05,880)}
   return}
  fCommand(F,dt);

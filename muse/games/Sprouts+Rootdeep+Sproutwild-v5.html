@@ -2614,7 +2614,8 @@ function wPlot(){return{c0:0,c1:22,r0:0,r1:23}}
 function wCellFree(gx,gy){const x=wCellX(gx),y=wCellY(gy),cx=x+10,cy=y+10;
  if(gx<0||gx>22||gy<0||gy>23)return false;
  if(x>172&&x<290&&y<112)return false;
- if(Math.hypot(cx-WW/2,cy-(W4.wh-22))<30)return false;
+ if(cx>218&&cx<262&&cy>100)return false; /* the lane from the Lantern to the south road stays clear */
+ if(cx>284&&cx<340&&cy>150&&cy<204)return false; /* the camp fire */
  if(cx>158&&cx<322&&cy>324&&cy<392)return false; /* the garden: nothing builds on the plots */
  for(const b of W4.bushes||[])if(Math.hypot(cx-b.x,cy-b.y)<18)return false;
  if(SW.quest<2&&Math.hypot(cx-240,cy-296)<52)return false;
@@ -2705,7 +2706,7 @@ function wEnterSector(id){W4.sector=id;SW.sector=id;const sec=wSector(id);W4.ww=
  if(id==='BASE'){lou.x=WW/2-56;lou.y=290}
  {const fr0=W4.from;W4.fld=FMAPS[id]?fBuild(id,fr0):null;W4.from=null;W4.bf=W4.fld?null:fBaseBuild();if(W4.fld)wCamUpdate(P3.x,P3.y);else wBaseArrive(fr0)}
  if(!SW.visited[sec.id]){SW.visited[sec.id]=1;W4.banner={txt:sec.n,sub:WSECSUB[sec.id]||'',t:3}}
- else swSay(sec.n,2.2);swSave()}
+ swSave()}
 /* ---------- base production: workers turn time into resources ---------- */
 function wProdTick(){SW.buildings.forEach((b,bi)=>{const def=wBuildDef(b.k);if(!def.yields)return;
   const crew=wCrewAt(bi);if(!crew.length)return;
@@ -3299,7 +3300,7 @@ function wNextGoal(){
   if(q===3)return{x:240,y:300,label:'Build the COTTAGE anywhere open — START, then BUILD, then place it.'};
   return{x:240,y:300,label:'Build a GARDEN BED on any open ground. Meadow trees have the wood.'}}
  if(!SW.buildings.some(b=>b.k==='cottage'))return{x:240,y:300,label:'Build a COTTAGE first — START menu, then BUILD. Any open ground works. Woof.'}
- if(wBaseReady())return{x:WW/2,y:70,label:'The missions are done! Ring the Base Lantern — the plot grows!'};
+ if(wBaseReady())return{x:WW/2,y:70,label:'The missions are done! Ring the Great Lantern — the plot grows!'};
  if(SW.crew.length&&!wAssignedCount()&&SW.buildings.length)return{x:wCellX(SW.buildings[0].gx)+10,y:wCellY(SW.buildings[0].gy)+30,label:'Give a sprout a job — walk to a building and press A. Sprouts work; buddies fight.'};
  if(SW.badges.length<4)return{x:WW/2,y:(W4.wh||360)-40,label:'Adventure! The Lantern Gate leads to sectors and gyms.'};
  return{x:WW/2,y:70,label:'Home sweet home. Everything is built, boss.'}}
@@ -3327,10 +3328,11 @@ function wLampRows(){const rows=[];
 function lampUpdate(){const rows=wLampRows();swNav(rows.length);
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){const rw=rows[swSel];
-  if(rw.act==='ring'){wConfirm('Ring the Base Lantern? Sunkeep grows to LV'+(SW.baseLv+1)+' — more crew room, new plans.',()=>{SW.baseLv++;swSnd(880,.14,1318);
-   swSay('The Base Lantern blazes brighter — BASE LEVEL '+SW.baseLv+'!',3);swSave();state='g4world'});return}
+  if(rw.act==='ring'){wConfirm('Ring the Great Lantern? Sunkeep grows to LV'+(SW.baseLv+1)+' — more crew room, new plans.',()=>{SW.baseLv++;swSnd(880,.14,1318);
+   swSay('The Great Lantern blazes brighter — BASE LEVEL '+SW.baseLv+'!',3);swSave();state='g4world'});return}
   else if(rw.act==='board')state='g4base';
-  else if(rw.act==='travel'){swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
+  else if(rw.act==='rest'){for(const m of SW.party)m.hp=wStats(m).max;SW.stam=100;swSnd(880,.1,1175);swSay('The light mends everyone. Buddies fully rested.',2.6);swSave();state='g4world'}
+  else if(rw.act==='travel'){W4.mapRO=0;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(rw.act==='leave')state='g4world';
   else{if(SW.hearts>=rw.price){SW.hearts-=rw.price;SW.unlocked[rw.act]=1;swSnd(784,.1,1175);
     swSay('Plans pinned up! '+(rw.act==='sawmill'?'SAWMILL':'LANTERN STATUE')+' is in the BUILD menu now.',3);swSave();swSel=0}
@@ -3394,6 +3396,7 @@ function wDamage(att,def,move,aSt,dSt){const A=wStats(att).atk*(1+.25*(aSt.atk||
  const crit=Math.random()<(move.crit?.22:.06)?1.5:1;
  let dmg=Math.max(1,Math.round(move.p*(A/D)*(0.32+att.lv*0.05)*stab*mult*crit*(0.85+Math.random()*0.3)/1.4));
  if(SW.keeper==='MARCUS'&&SW.party.includes(att))dmg=Math.max(1,Math.round(dmg*1.12));
+ if(!SW.badges.length&&SW.party.includes(def))dmg=Math.min(dmg,Math.ceil(wStats(def).max*.45)); /* before the first Sigil nothing takes more than 45% in one hit */
  return{dmg,mult,crit:crit>1}}
 function wDoMove(att,def,move,aSt,dSt,who){ /* returns log lines, applies damage */
  if(move.p===0){if(move.eff==='atkup'){aSt.atk=Math.min(3,(aSt.atk||0)+1);return[att.sp+"'s ATTACK rose!"]}
@@ -4013,10 +4016,12 @@ function mapUpdate(){swNav(WSECTORS.length);
  if(pressed('a')){const s=WSECTORS[swSel];
   if(s.id!=='BASE'&&SW.quest<2){swSnd(140,.09);swSay('Wake the Lantern and greet a buddy first.',2.4);return}
   if(SW.badges.length<s.req){swSnd(140,.09);swSay('Locked — needs '+s.req+' Sigils.',1.6);return}
+  if(W4.mapRO){swSnd(140,.09);swSay('This is only the map. Travel from a Lantern post, or the Great Lantern at home.',2.8);return}
+  if(s.id!=='BASE'&&!SW.visited[s.id]){swSnd(140,.09);swSay('You have not lit a post there yet. Walk the road first.',2.6);return}
   wEnterSector(s.id);state='g4world'}}
 function drawMap(){swShell('SECTORS','SIGILS '+SW.badges.length+'/4');
  swRows(WSECTORS.map(s=>({a:s.n+(W4.sector===s.id?' · HERE':''),
-  b:SW.badges.length<s.req?'NEEDS '+s.req+' SIGILS':s.gym>=0?(SW.gymDone[s.gym]?'SIGIL ✓':'GYM'):''})),
+  b:SW.badges.length<s.req?'NEEDS '+s.req+' SIGIL'+(s.req>1?'S':''):(s.id!=='BASE'&&!SW.visited[s.id])?'no post lit yet':s.gym>=0?(SW.gymDone[s.gym]?'SIGIL ✓':'GYM'):'lit'})),
   swSel,WSECTORS[swSel].sub+' Wilds Lv '+(WSECTORS[swSel].lv?WSECTORS[swSel].lv.join('-'):'—')+'.')}
 function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','BASE','KEEPER','GUIDE','RESUME'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}
@@ -4024,15 +4029,15 @@ function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','
   if(r2==='BUDDIES'){swSel=0;state='g4party'}
   else if(r2==='BUDDY GUIDE'){swSel=0;state='g4dex'}
   else if(r2==='BUILD'){if(W4.sector!=='BASE'){swSay('Building happens at Sunkeep Base.',1.8);state='g4world'}else{swSel=0;state='g4build'}}
-  else if(r2==='SECTORS'){swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
+  else if(r2==='SECTORS'){W4.mapRO=1;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(r2==='BASE'){state='g4base'}
   else if(r2==='KEEPER'){swSel=['WILL','ERIN','MARCUS'].indexOf(SW.keeper);state='g4keeper'}
   else if(r2==='GUIDE'){W4.guidePage=0;state='g4guide'}
   else state='g4world'}}
 function drawPause(){swShell('KEEPER MENU','');
  swRows([{a:'BUDDIES',b:SW.party.length+(SW.party.length===1?' buddy':' buddies')},{a:'BUDDY GUIDE',b:Object.keys(SW.caught).length+'/'+WSPECIES.length+' caught'},
-  {a:'BUILD',b:W4.sector==='BASE'?'at base':'go to base'},{a:'SECTORS',b:WSECTORS.length+' pockets'},
-  {a:'BASE',b:'Level '+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how everything works'},{a:'RESUME',b:''}],swSel,'Sprouts '+wBudTotal()+' (pouch '+(SW.pouch||8)+') · Tonics '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0))}
+  {a:'BUILD',b:W4.sector==='BASE'?'at base':'go to base'},{a:'MAP',b:'travel is by Lantern'},
+  {a:'WORK BOARD',b:'Sunkeep Lv'+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how everything works'},{a:'RESUME',b:''}],swSel,'Sprouts '+wBudTotal()+' (pouch '+(SW.pouch||8)+') · Tonics '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0))}
 function partyUpdate(){swNav(Math.max(1,SW.party.length+1));
  if(pressed('b')){state='g4pause';swSel=0;return}
  if(pressed('a')){if(swSel===SW.party.length){swSel=0;state='g4box';return}
@@ -4062,13 +4067,13 @@ function drawDex(){swShell('BUDDY GUIDE','');
 function buildUpdate(){swNav(WBUILD.length);
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){const def=WBUILD[swSel];
-  if(def.lock&&!SW.unlocked[def.k]){swSnd(140,.08);swSay('Plans for sale at the Base Lantern — gratitude hearts only.',2.2);return}
+  if(def.lock&&!SW.unlocked[def.k]){swSnd(140,.08);swSay('Plans for sale at the Great Lantern — gratitude hearts only.',2.2);return}
   const owned=SW.buildings.filter(b=>b.k===def.k).length;
   if(def.max&&owned>=def.max){swSnd(140,.08);swSay('Already standing.',1.4);return}
   if(!wCanPay(def.cost)){swSnd(140,.08);swSay('Not enough: '+wCostStr(def.cost),1.6);return}
-  W4.placeK=def.k;W4.cursor={x:5,y:2};state='g4place'}}
-function drawBuild(){swShell('BUILD AT SUNKEEP','WOOD '+SW.res.wood+' STONE '+SW.res.stone+' INGOT '+SW.res.ingot);
- swRows(WBUILD.map(d2=>{if(d2.lock&&!SW.unlocked[d2.k])return{a:'???',b:'♥ '+d2.price+' · Base Lantern'};
+  W4.placeK=def.k;W4.cursor={x:Math.max(0,Math.min(22,Math.round((P3.x-20)/20))),y:Math.max(0,Math.min(23,Math.round((P3.y-38)/20)+2))};state='g4place'}}
+function drawBuild(){swShell('BUILD','♣'+SW.res.wood+' ◆'+SW.res.stone+' ingot '+SW.res.ingot);
+ swRows(WBUILD.map(d2=>{if(d2.lock&&!SW.unlocked[d2.k])return{a:'???',b:'♥ '+d2.price+' · Great Lantern'};
    const owned=SW.buildings.filter(b=>b.k===d2.k).length;
    return{a:d2.n+(owned?' x'+owned:''),b:wCanPay(d2.cost)?wCostStr(d2.cost):wCostStr(d2.cost)+' ✗'}}),
   swSel,(WBUILD[swSel].lock&&!SW.unlocked[WBUILD[swSel].k])
@@ -4092,7 +4097,7 @@ function drawPlace(){wDrawWorld();const cam=W4.cam||{x:0,y:0};
  r(ok?'rgba(126,231,135,.25)':'rgba(240,120,120,.25)',x,y,20,20);
  r(cc,x,y,20,1);r(cc,x,y+19,20,1);r(cc,x,y,1,20);r(cc,x+19,y,1,20);
  g.restore();
- ctext('PLACE: '+wBuildDef(W4.placeK).n+' — A: BUILD · B: BACK',30,1,'#ffd94d',null)}
+ uiPill('PLACE '+wBuildDef(W4.placeK).n+'  ·  B  BACK',H-30,'A')}
 function cotUpdate(){const hasBench=SW.buildings.some(b=>b.k==='bench');
  const rows=['REST','BREW TONIC','BUY SPROUT · 12p','BUY TONIC · 25p','LEAVE'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}
@@ -4119,14 +4124,14 @@ function nurUpdate(){const b=SW.buildings[W4.nurB];if(!b){state='g4world';return
   else if(r2==='WORKERS'){W4.assignB=W4.nurB;swSel=0;state='g4assign'}
   else if(r2.startsWith('PLANT')){const e=WNURPLANT.find(x2=>r2.includes(x2[0]));
    const cost=e[0]==='LUCKY'?{berry:5,ingot:1}:{berry:e[2]};
-   if(wCanPay(cost)){wPay(cost);b.crop={kind:e[0],sp:e[1],t:0,stage:1};swSay('Planted a '+e[0]+' sprout. A tender speeds it up.',2);swSnd(784,.07);swSave()}
+   if(wCanPay(cost)){wPay(cost);b.crop={kind:e[0],sp:e[1],t:0,stage:1};swSay('Berries set out for a '+e[0]+' kind. A tender brings it sooner.',2.4);swSnd(784,.07);swSave()}
    else{swSnd(140,.08);swSay('Needs '+e[2]+' BERRY'+(e[0]==='LUCKY'?' + 1 INGOT':'')+'.',1.8)}}
-  else if(r2.startsWith('GROWING')){swSnd(660,.05);swSay(b.crop.kind+' sprout — stage '+b.crop.stage+'/3. '+((b.workers&&b.workers.length)?'Your tender is on it.':'Assign a tender to grow it faster.'),2)}
-  else if(r2==='HARVEST'){if(!b.crop||b.crop.stage<3){swSnd(140,.08);swSay('Not ready yet — sprouts take time.',1.6)}
+  else if(r2.startsWith('GROWING')){swSnd(660,.05);swSay('A dim '+b.crop.kind+' buddy is on its way: '+b.crop.stage+'/3.',2)}
+  else if(r2==='HARVEST'){if(!b.crop||b.crop.stage<3){swSnd(140,.08);swSay('Nobody at the door yet.',1.6)}
    else{const m=wMakeMon(b.crop.sp,1);SW.seen[m.sp]=1;SW.caught[m.sp]=1;
     if(SW.party.length<3)SW.party.push(m);else SW.box.push(m);
-    const bt2=TYPES[wSp(m.sp).t[0]].n;SW.buds[bt2]=(SW.buds[bt2]||0)+2;
-    swSay(m.sp+' sprouted and joined you! +2 '+bt2+' buds',2.2);swSnd(784,.09,1175);b.crop=null;swSave()}}
+    
+    swSay(m.sp+' followed the light in. It is with you now.',2.4);swSnd(784,.09,1175);b.crop=null;swSave()}}
   else if(r2==='CLEAR BED'){b.crop=null;swSay('Bed cleared.',1.2);swSave()}}}
 function drawNur(){const b=SW.buildings[W4.nurB];if(!b)return;
  swShell('SPROUT NURSERY','BERRY '+SW.res.berry+' · INGOT '+SW.res.ingot);
@@ -4571,6 +4576,9 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
  if(mx||my){if(!((F.dir[0]&&F.dir[0]===mx)||(F.dir[1]&&F.dir[1]===my)))F.dir=mx?[mx,0]:[0,my];
   P3.ax=F.dir[0];P3.ay=F.dir[1];P3.anim=(P3.anim||0)+dt*8;
   const l=Math.hypot(mx,my),sp=84,nx=P3.x+mx/l*sp*dt,ny=P3.y+my/l*sp*dt;
+  if(my<0&&fTile(F,Math.floor(P3.x/FT),Math.floor((P3.y-9)/FT))==='-'){const ty=Math.floor((P3.y-9)/FT)-1;
+   if(SW.gear&&SW.gear.rope&&fWalkTile(F,Math.floor(P3.x/FT),ty)){F.hop={t:0,sy:P3.y,ty:ty*FT+10};swSnd(520,.07,780);return}
+   if(!(SW.gear&&SW.gear.rope)&&!(W4.msgT>0)){swSay('A ledge. With a CLIMBING ROPE from the bench you could get up here.',2.6)}}
   if(my>0&&fTile(F,Math.floor(P3.x/FT),Math.floor((P3.y+7)/FT))==='-'){const ty=Math.floor((P3.y+7)/FT)+1;
    if(fWalkTile(F,Math.floor(P3.x/FT),ty)){F.hop={t:0,sy:P3.y,ty:ty*FT+8};swSnd(440,.06,660);return}}
   if(!fBox(F,nx,P3.y))P3.x=nx;if(!fBox(F,P3.x,ny))P3.y=ny}
@@ -4606,7 +4614,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
   else if(n.k==='gym'){if(SW.quest<5)swSay(WGYMS[sec.gym].leader+': "Easy, keeper. Set up camp and catch a buddy first — then we battle."',3.4);
    else{W4.gymIx=wGymIx(sec);W4.gymPage=0;swSel=0;state='g4gym'}}
   else if(n.k==='door')swSay(['Nobody home. A sprout waves from the window.','Locked. It smells like berry pie in there.','A note: GONE TO THE GYM. BACK NEVER.'][(F.t0*7|0)%3],2.2);
-  else if(n.k==='sign'){swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
+  else if(n.k==='sign'){W4.mapRO=0;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(n.k==='info'){swSay(n.msg,2.6);swSnd(660,.05,880)}
   return}
  fCommand(F,dt);
@@ -4900,8 +4908,8 @@ function wHud(){const sec=wSector(W4.sector),F=W4.fld||W4.bf,atBase=!W4.fld;
  {const rs='♣'+SW.res.wood+' ◆'+SW.res.stone+' ✿'+SW.res.petal+(atBase?' ♥'+SW.hearts:'');text(rs,W-5-tw(rs,1),4,1,'#d8e8c8',null)}
  if(SW.stam<99){r('#00000088',0,16,W,2);r(SW.stam>40?UI.leaf:SW.stam>18?'#ffd94d':'#e04838',0,16,Math.round(W*SW.stam/100),2)}
  const ban=W4.banner&&W4.banner.t>0;
- if(SW.quest<5&&!ban){const q=wQuestText();
-  r('rgba(10,14,8,.62)',0,18,W,11);r(UI.gold,0,18,2,11);text(wFit(q,226),6,20,1,'#ffe8b0',null)}
+ {const q=wQuestText();if(q&&!ban&&state!=='g4place'){
+  r('rgba(10,14,8,.62)',0,18,W,11);r(UI.gold,0,18,2,11);text(wFit(q,226),6,20,1,'#ffe8b0',null)}}
  if(ban){g.globalAlpha=Math.min(1,W4.banner.t);r('#0e1a0a',8,30,224,34);r(UI.gold,8,30,224,2);r(UI.gold,8,62,224,1);
   text(W4.banner.txt,Math.round(W/2-tw(W4.banner.txt,2)/2),35,2,'#ffffff',null);const sb=wFit(W4.banner.sub,216);text(sb,Math.round(W/2-tw(sb,1)/2),53,1,'#cfe0b8',null);g.globalAlpha=1}
  /* bottom row: squad on the field, crew and sigils at home */
@@ -4915,7 +4923,7 @@ function wHud(){const sec=wSector(W4.sector),F=W4.fld||W4.bf,atBase=!W4.fld;
    r(T.d,x,y+1,7,7);r(T.c,x+1,y+2,5,5);r(T.l,x+1,y+2,2,1);r('#2c6030',x+3,y-1,1,2);text(lab,x+10,y+1,1,'#ffffff',null);x+=19+tw(lab,1)}
   if(x===4)text('SIGILS '+SW.badges.length+'/4',4,H-12,1,SW.badges.length>=4?'#ffd94d':UI.dim,null)}
  {const dph=wDark()<=0?'DAY':wDark()<.6?'DUSK':'NIGHT',dl=dph+' '+(SW.day||1);text(dl,W-5-tw(dl,1),H-12,1,UI.dim,null)}
- const busy=(F&&F.dlg)||W4.talk;
+ const busy=(F&&F.dlg)||W4.talk||state==='g4place';
  if(W4.near&&!busy)uiPill(W4.near.txt,H-30,'A');
  if(W4.msgT>0&&W4.msg&&!busy){const ml=swWrap(W4.msg,W-30).slice(0,3),ex=(ml.length-1)*10,by=H-46-ex-(W4.near?0:0);
   r('rgba(10,10,16,.9)',8,by,W-16,13+ex);r(UI.gold,8,by,W-16,1);ml.forEach((l,j)=>text(l,Math.round(W/2-tw(l,1)/2),by+3+j*10,1,'#ffe8b0',null))}}
@@ -5126,7 +5134,7 @@ function wkPick(w){const sk=wkSkills(w),bench=SW.buildings.find(b=>b.k==='bench'
   return{k:b.k==='bench'?'craft':b.k==='nursery'?'tend':'bld',b}}
  if(wDark()>.7)return{k:'sleep',t:6};
  if(bench&&(SW.craftQ||[]).length&&sk.HANDIWORK&&wkAt(bench).length<2)return{k:'craft',b:bench};
- let best=null,bl=0;for(const b of SW.buildings){const def=wBuildDef(b.k);if(!def.yields||(b.out||0)>=3)continue;const lv=wkBldLv(def,sk),n=wkAt(b).length;if(lv>0&&n<2&&lv-n*.5>bl){bl=lv-n*.5;best=b}}
+ let best=null,bl=0;for(const b of SW.buildings){const def=wBuildDef(b.k);if(!def.yields||(b.out||0)>=3||(b.k==='kiln'&&!(SW.res.ore>0)))continue;const lv=wkBldLv(def,sk),n=wkAt(b).length;if(lv>0&&n<2&&lv-n*.5>bl){bl=lv-n*.5;best=b}}
  if(best)return{k:'bld',b:best};
  for(const b of SW.buildings)if(b.k==='nursery'&&b.crop&&b.crop.stage<3&&(sk.WATERING||sk.PLANTING)&&!wkAt(b).length)return{k:'tend',b};
  const it=(W4.bf.items||[]).find(i2=>!i2.by&&!i2.car.length&&!i2.done);if(it){it.by=w;return{k:'haul',it}}
@@ -5136,6 +5144,7 @@ function wkCraftDone(q,bench){const x=wCellX(bench.gx)+10,y=wCellY(bench.gy);let
  else if(q.id==='axe'||q.id==='pick'){SW.tools[q.id]=Math.min(3,SW.tools[q.id]+1);txt=(q.id==='axe'?'AXE':'PICKAXE')+' Lv'+SW.tools[q.id]+'!'}
  else if(q.id==='oil'){SW.hearts+=3;SW.heartsTotal+=3;txt='LANTERN OIL: +3 ♥'}
  else if(q.id==='pouch'){SW.pouch=Math.min(24,(SW.pouch||8)+4);txt='SEED POUCH: '+SW.pouch+' SPROUTS WALK WITH YOU'}
+ else if(q.id==='rope'){SW.gear=SW.gear||{};SW.gear.rope=1;txt='CLIMBING ROPE! Ledges can be climbed now.'}
  else if(q.id==='charm'){SW.buds.LUCKY=(SW.buds.LUCKY||0)+1;txt='A LUCKY SPROUT JOINS YOU!'}
  W4.floats.push({x,y:y-10,txt,t:2.2,c:'#ffd94d'});swSnd(784,.1,1318);swSave()}
 function wkTick(dt){if(!W4.bf)return;wkSync();const bench=SW.buildings.find(b=>b.k==='bench');if(!SW.craftQ)SW.craftQ=[];
@@ -5161,8 +5170,9 @@ function wkTick(dt){if(!W4.bf)return;wkSync();const bench=SW.buildings.find(b=>b
   else if(tk.k==='tend'){if(!b.crop||b.crop.stage>=3){if(w.kind!=='s')w.task=null;continue}b.crop.t+=dt*Math.max(sk.WATERING||0,sk.PLANTING||0,.5)}
   else{const def=wBuildDef(b.k),lv=wkBldLv(def,sk)||.4;
    if((b.out||0)>=3){if(w.kind!=='s')w.task=null;else w.task=wkPick(w);continue}
+   if(b.k==='kiln'&&!(SW.res.ore>0)){b.busy=0;if(((time*.5)|0)%4===0&&!b.noOre){b.noOre=1;W4.floats.push({x:wCellX(b.gx)+10,y:wCellY(b.gy)-6,txt:'THE KILN NEEDS ORE',t:1.6,c:'#e88'})}else if(((time*.5)|0)%4!==0)b.noOre=0;if(w.kind!=='s'){w.task={k:'idle',x:w.hx,y:w.hy,t:4}}continue}
    b.prog=(b.prog||0)+lv*dt;
-   if(b.prog>=16){b.prog=0;const luck=wkAt(b).some(w2=>wkSkills(w2).FORTUNE),n=2+(lv>=2?1:0)+(luck?1:0)+(SW.keeper==='ERIN'?1:0);
+   if(b.prog>=16){b.prog=0;if(b.k==='kiln')SW.res.ore--;const luck=wkAt(b).some(w2=>wkSkills(w2).FORTUNE),n=2+(lv>=2?1:0)+(luck?1:0)+(SW.keeper==='ERIN'?1:0);
     W4.bf.items.push({k:'pel',res:def.yields,n,w:1,x:wCellX(b.gx)+10+(Math.random()*8-4),y:wCellY(b.gy)+33+(b.out||0)*3,car:[],from:b});
     W4.floats.push({x:wCellX(b.gx)+10,y:wCellY(b.gy)-6,txt:def.yields.toUpperCase()+' READY',t:1.2,c:'#ffd94d'});swSnd(880,.05,1175);
     if(Math.random()<(SW.buildings.some(bb=>bb.k==='statue')?.7:.35)&&(W4.groundHearts||[]).length<8){W4.groundHearts=W4.groundHearts||[];W4.groundHearts.push({x:wCellX(b.gx)+4+Math.random()*12,y:wCellY(b.gy)+38})}
@@ -5214,7 +5224,7 @@ function wDrawBuilding(b){const x=wCellX(b.gx),y=wCellY(b.gy),K='#14101e',on=b.b
 /* ---------------- the Tinker Bench: a crafting queue ---------------- */
 const WRECIPES=[{id:'tonic',n:'TONIC',cost:{berry:3},need:12,d:'Heals a buddy 25 HP.'},{id:'axe',n:'AXE',need:24,d:'Each level: +1 damage to trees. Lv3 also yields +1.'},{id:'pick',n:'PICKAXE',need:24,d:'Each level: +1 damage to rocks. Lv3 also yields +1.'},
  {id:'oil',n:'LANTERN OIL',cost:{wood:2,berry:2},need:10,d:'Burns bright: +3 gratitude hearts.'},{id:'charm',n:'LUCKY CHARM',cost:{ingot:1,berry:5},need:20,d:'A LUCKY sprout hatches from it and joins your pouch.'}];
-function wRecipeCost(rc){if(rc.id==='pouch'&&(SW.pouch||8)+4*(SW.craftQ||[]).filter(q=>q.id==='pouch').length>=24)return null;if(rc.cost)return rc.cost;const lv=SW.tools[rc.id]+(SW.craftQ||[]).filter(q=>q.id===rc.id).length;if(lv>=3)return null;const c=wToolCost(rc.id,lv),o={wood:c.w,stone:c.s};if(c.i)o.ingot=c.i;return o}
+function wRecipeCost(rc){if(rc.id==='rope'&&((SW.gear&&SW.gear.rope)||(SW.craftQ||[]).some(q=>q.id==='rope')))return null;if(rc.id==='pouch'&&(SW.pouch||8)+4*(SW.craftQ||[]).filter(q=>q.id==='pouch').length>=24)return null;if(rc.cost)return rc.cost;const lv=SW.tools[rc.id]+(SW.craftQ||[]).filter(q=>q.id===rc.id).length;if(lv>=3)return null;const c=wToolCost(rc.id,lv),o={wood:c.w,stone:c.s};if(c.i)o.ore=c.i;return o}
 function toolsUpdate(){const n=WRECIPES.length+3;swNav(n);if(!SW.craftQ)SW.craftQ=[];
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){if(swSel===n-1){state='g4world';return}
@@ -5515,6 +5525,63 @@ function fLouTick(F,dt){const stray=F.sq.find(s=>s.st==='idle'&&s.t>2.5&&Math.hy
 function fLouDraw(){const x=Math.round(lou.x),y=Math.round(lou.y),f=W4.louMv?((time*8)|0)%2:((time*2)|0)%2;r('rgba(0,0,0,.22)',x-9,y+4,18,3);g.drawImage(f?LOU.l[0]:LOU.l[1],x-12,y-6,24,12)}
 /* ---------------- gear ---------------- */
 WRECIPES.splice(1,0,{id:'pouch',n:'SEED POUCH',cost:{fiber:4,wood:4},need:18,d:'+4 sprouts can walk with you (to 24). FIBER comes from thickets and beaten wilds: buddy work.'});
+/* ================================================================
+   v5.7 — after the first catch (found by playing on)
+   ================================================================ */
+if(!SW.gear)SW.gear={};
+WBASEMS[1][2][1]='Put 1 worker to work';WBASEMS[2][2][1]='Put 3 workers to work';
+function wWorkerCount(){return SW.crew.filter(c=>c.job!==-1).length+SW.party.slice(1).length+SW.box.length}
+function wMissionDone(key){const [k,v]=key.split(':');
+ if(k==='build')return SW.buildings.some(b=>b.k===v);
+ if(k==='workers')return wWorkerCount()>=+v;
+ if(k==='species')return Object.keys(SW.caught).length>=+v;
+ if(k==='sigils')return SW.badges.length>=+v;
+ if(k==='hearts')return SW.heartsTotal>=+v;return false}
+/* past the opening the strip shows the next thing the base needs, so there is always a direction */
+function wQuestText(){const op=wOp();
+ if(op===0)return'Pluck the glowing seeds';
+ if(op===1)return'B: throw sprouts at the berries';
+ if(op===2)return'Greet one of the dim buddies';
+ if(SW.quest===2)return'South road: tire a wild, then SWARM';
+ if(SW.quest<5)return WQUEST[SW.quest];
+ const ms=WBASEMS[SW.baseLv];if(!ms)return SW.badges.length<4?'Earn the Sigils. Free the roads.':'';
+ const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?'Sunkeep Lv'+SW.baseLv+': '+nx[1]:'Ask the Great Lantern to grow'}
+function wLampRows(){const rows=[];
+ if(wBaseReady())rows.push({act:'ring',label:'GROW THE LANTERN'});
+ rows.push({act:'rest',label:'REST IN THE LIGHT'},{act:'travel',label:'TRAVEL BY LANTERN LIGHT'},{act:'board',label:'WORK BOARD'});
+ if(!SW.unlocked.sawmill)rows.push({act:'sawmill',label:'SAWMILL PLANS',price:15});
+ if(!SW.unlocked.statue)rows.push({act:'statue',label:'STATUE PLANS',price:25});
+ rows.push({act:'leave',label:'LEAVE'});return rows}
+function lampDraw(){const rows=wLampRows();swShell('THE GREAT LANTERN','♥ '+SW.hearts+' · light '+(SW.light||0)+'/4');
+ swRows(rows.map(rw=>({a:rw.label,b:rw.price?'♥ '+rw.price:rw.act==='travel'?'posts you have lit':rw.act==='rest'?'heals everyone':''})),swSel,
+  wBaseReady()?'The missions are done. Let it grow!':'Everything carried home feeds it. Four deliveries grow a sprout. Hearts buy plans.')}
+/* the cottage: a bed and a tonic shelf (sprouts are grown by the Lantern, never bought) */
+function cotUpdate(){const rows=['REST','BUY TONIC','LEAVE'];swNav(rows.length);
+ if(pressed('b')){state='g4world';return}
+ if(pressed('a')){const r2=rows[swSel];
+  if(r2==='REST'){for(const m of SW.party)m.hp=wStats(m).max;SW.stam=100;swSay('Everyone slept well. Buddies fully rested.',1.8);swSnd(880,.1,1175);swSave()}
+  else if(r2==='LEAVE')state='g4world';
+  else if(SW.res.petal>=25){SW.res.petal-=25;SW.tonics++;swSay('Bought a Tonic. Tonics: '+SW.tonics,1.4);swSave()}else{swSnd(140,.08);swSay('Needs 25 petals. The bench can make them from berries.',2)}}}
+function drawCot(){swShell('COTTAGE','✿ '+SW.res.petal);
+ swRows([{a:'REST',b:'full heal'},{a:'BUY TONIC',b:'25 petals'},{a:'LEAVE',b:''}],swSel,'Tonics x'+SW.tonics+'. Rest is always free. The Tinker Bench makes tonics from berries.')}
+/* the nook (was "nursery"): dim buddies follow berries and light in; nothing is grown from a sprout */
+{const nd=wBuildDef('nursery');nd.n='LANTERN NOOK';nd.d='Leave berries in the light and a dim buddy of the kind you choose follows them in. Tenders bring it sooner.'}
+function drawNur(){const b=SW.buildings[W4.nurB];if(!b)return;swShell('LANTERN NOOK','BERRY '+SW.res.berry+' · INGOT '+SW.res.ingot);
+ const lab=r2=>r2.replace('PLANT','LURE').replace('GROWING','COMING').replace('HARVEST','WELCOME IT IN').replace('CLEAR BED','PUT THE BERRIES AWAY').replace('WORKERS','TENDERS').replace(/stage (\d)\/3/,'$1/3 of the way');
+ swRows(wNurRows(b).map(r2=>({a:lab(r2),b:r2.startsWith('PLANT')?'a dim buddy':r2==='HARVEST'?(b.crop&&b.crop.stage>=3?'it is at the door':'not here yet'):''})),swSel,
+  'Dim buddies follow berries and light. It takes about a minute; a tender (WATER or PLANT) halves it.')}
+/* the keeper's guide, rewritten for how the game works now */
+WGUIDE.length=0;WGUIDE.push(
+ ['SPROUTS','Sprouts are Lantern light with','legs. They walk with you.','B throws one at the ring.','Hold B and they all come back.','SELECT picks which kind goes','next. They carry, chop, break','and build, all on their own.'],
+ ['THE LANTERN','Everything carried to a Lantern','feeds it: wood, stone, berries,','treasure. Four deliveries and','it grows a new sprout. The','Great Lantern at home also','heals you, sells plans and','sends you to posts you lit.'],
+ ['BUDDIES','Wild buddies went dim when','the Lantern cracked. Walk up','and press A to battle, or','throw a sprout at one. Tire','it out, then SWARM: kin','sprouts bloom best. No sprout','is ever used up.'],
+ ['ORE AND FIBER','Sprouts cannot get these.','Find a vein or a thicket and','press A: your lead buddy','fetches it. Beaten wilds drop','them too. The bench turns','them into a SEED POUCH, a','CLIMBING ROPE, better tools.'],
+ ['SUNKEEP AT WORK','Buddies you leave at home','work the buildings by skill:','KINDLE, WATER, PLANT, MINE,','LUMBER, CRAFT, HAUL, LUCK.','What they make must be','carried to the Lantern. The','work board shows who is who.'],
+ ['GATES AND GEAR','Boulders want PEB sprouts,','fire EMBER, vines LEAF, sparks','ZIP, dry blooms DEW. Ledges','hop down only, until you own','a CLIMBING ROPE. Heavy loot','needs more sprouts: PEB','counts double.'],
+ ['THE VALLEY','Four gyms hold four Sigils.','Roads past the Town need','them. KING BIBI holds the','Peak road behind an IRON','DOME he calls temporary. He','sits in Gloom Hollow. Above','them all, something chrome.']);
+/* gear: ore finally matters */
+WRECIPES.splice(2,0,{id:'rope',n:'CLIMBING ROPE',cost:{fiber:6,ore:2},need:20,d:'Climb ledges from below. Opens shortcuts and high ground in every sector.'});
+{const kd=wBuildDef('kiln');kd.d='Smelts ORE into ingots. Needs a KINDLE worker, and ore: buddies fetch it from veins.'}
 /* ================================================================
    BATTLE SCREEN (Fable, v5.6) — same rules, new stage.
    The turn logic above is untouched; this replaces how it is shown:

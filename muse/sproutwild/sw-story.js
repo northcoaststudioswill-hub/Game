@@ -150,3 +150,60 @@ function fLouTick(F,dt){const stray=F.sq.find(s=>s.st==='idle'&&s.t>2.5&&Math.hy
 function fLouDraw(){const x=Math.round(lou.x),y=Math.round(lou.y),f=W4.louMv?((time*8)|0)%2:((time*2)|0)%2;r('rgba(0,0,0,.22)',x-9,y+4,18,3);g.drawImage(f?LOU.l[0]:LOU.l[1],x-12,y-6,24,12)}
 /* ---------------- gear ---------------- */
 WRECIPES.splice(1,0,{id:'pouch',n:'SEED POUCH',cost:{fiber:4,wood:4},need:18,d:'+4 sprouts can walk with you (to 24). FIBER comes from thickets and beaten wilds: buddy work.'});
+/* ================================================================
+   v5.7 — after the first catch (found by playing on)
+   ================================================================ */
+if(!SW.gear)SW.gear={};
+WBASEMS[1][2][1]='Put 1 worker to work';WBASEMS[2][2][1]='Put 3 workers to work';
+function wWorkerCount(){return SW.crew.filter(c=>c.job!==-1).length+SW.party.slice(1).length+SW.box.length}
+function wMissionDone(key){const [k,v]=key.split(':');
+ if(k==='build')return SW.buildings.some(b=>b.k===v);
+ if(k==='workers')return wWorkerCount()>=+v;
+ if(k==='species')return Object.keys(SW.caught).length>=+v;
+ if(k==='sigils')return SW.badges.length>=+v;
+ if(k==='hearts')return SW.heartsTotal>=+v;return false}
+/* past the opening the strip shows the next thing the base needs, so there is always a direction */
+function wQuestText(){const op=wOp();
+ if(op===0)return'Pluck the glowing seeds';
+ if(op===1)return'B: throw sprouts at the berries';
+ if(op===2)return'Greet one of the dim buddies';
+ if(SW.quest===2)return'South road: tire a wild, then SWARM';
+ if(SW.quest<5)return WQUEST[SW.quest];
+ const ms=WBASEMS[SW.baseLv];if(!ms)return SW.badges.length<4?'Earn the Sigils. Free the roads.':'';
+ const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?'Sunkeep Lv'+SW.baseLv+': '+nx[1]:'Ask the Great Lantern to grow'}
+function wLampRows(){const rows=[];
+ if(wBaseReady())rows.push({act:'ring',label:'GROW THE LANTERN'});
+ rows.push({act:'rest',label:'REST IN THE LIGHT'},{act:'travel',label:'TRAVEL BY LANTERN LIGHT'},{act:'board',label:'WORK BOARD'});
+ if(!SW.unlocked.sawmill)rows.push({act:'sawmill',label:'SAWMILL PLANS',price:15});
+ if(!SW.unlocked.statue)rows.push({act:'statue',label:'STATUE PLANS',price:25});
+ rows.push({act:'leave',label:'LEAVE'});return rows}
+function lampDraw(){const rows=wLampRows();swShell('THE GREAT LANTERN','♥ '+SW.hearts+' · light '+(SW.light||0)+'/4');
+ swRows(rows.map(rw=>({a:rw.label,b:rw.price?'♥ '+rw.price:rw.act==='travel'?'posts you have lit':rw.act==='rest'?'heals everyone':''})),swSel,
+  wBaseReady()?'The missions are done. Let it grow!':'Everything carried home feeds it. Four deliveries grow a sprout. Hearts buy plans.')}
+/* the cottage: a bed and a tonic shelf (sprouts are grown by the Lantern, never bought) */
+function cotUpdate(){const rows=['REST','BUY TONIC','LEAVE'];swNav(rows.length);
+ if(pressed('b')){state='g4world';return}
+ if(pressed('a')){const r2=rows[swSel];
+  if(r2==='REST'){for(const m of SW.party)m.hp=wStats(m).max;SW.stam=100;swSay('Everyone slept well. Buddies fully rested.',1.8);swSnd(880,.1,1175);swSave()}
+  else if(r2==='LEAVE')state='g4world';
+  else if(SW.res.petal>=25){SW.res.petal-=25;SW.tonics++;swSay('Bought a Tonic. Tonics: '+SW.tonics,1.4);swSave()}else{swSnd(140,.08);swSay('Needs 25 petals. The bench can make them from berries.',2)}}}
+function drawCot(){swShell('COTTAGE','✿ '+SW.res.petal);
+ swRows([{a:'REST',b:'full heal'},{a:'BUY TONIC',b:'25 petals'},{a:'LEAVE',b:''}],swSel,'Tonics x'+SW.tonics+'. Rest is always free. The Tinker Bench makes tonics from berries.')}
+/* the nook (was "nursery"): dim buddies follow berries and light in; nothing is grown from a sprout */
+{const nd=wBuildDef('nursery');nd.n='LANTERN NOOK';nd.d='Leave berries in the light and a dim buddy of the kind you choose follows them in. Tenders bring it sooner.'}
+function drawNur(){const b=SW.buildings[W4.nurB];if(!b)return;swShell('LANTERN NOOK','BERRY '+SW.res.berry+' · INGOT '+SW.res.ingot);
+ const lab=r2=>r2.replace('PLANT','LURE').replace('GROWING','COMING').replace('HARVEST','WELCOME IT IN').replace('CLEAR BED','PUT THE BERRIES AWAY').replace('WORKERS','TENDERS').replace(/stage (\d)\/3/,'$1/3 of the way');
+ swRows(wNurRows(b).map(r2=>({a:lab(r2),b:r2.startsWith('PLANT')?'a dim buddy':r2==='HARVEST'?(b.crop&&b.crop.stage>=3?'it is at the door':'not here yet'):''})),swSel,
+  'Dim buddies follow berries and light. It takes about a minute; a tender (WATER or PLANT) halves it.')}
+/* the keeper's guide, rewritten for how the game works now */
+WGUIDE.length=0;WGUIDE.push(
+ ['SPROUTS','Sprouts are Lantern light with','legs. They walk with you.','B throws one at the ring.','Hold B and they all come back.','SELECT picks which kind goes','next. They carry, chop, break','and build, all on their own.'],
+ ['THE LANTERN','Everything carried to a Lantern','feeds it: wood, stone, berries,','treasure. Four deliveries and','it grows a new sprout. The','Great Lantern at home also','heals you, sells plans and','sends you to posts you lit.'],
+ ['BUDDIES','Wild buddies went dim when','the Lantern cracked. Walk up','and press A to battle, or','throw a sprout at one. Tire','it out, then SWARM: kin','sprouts bloom best. No sprout','is ever used up.'],
+ ['ORE AND FIBER','Sprouts cannot get these.','Find a vein or a thicket and','press A: your lead buddy','fetches it. Beaten wilds drop','them too. The bench turns','them into a SEED POUCH, a','CLIMBING ROPE, better tools.'],
+ ['SUNKEEP AT WORK','Buddies you leave at home','work the buildings by skill:','KINDLE, WATER, PLANT, MINE,','LUMBER, CRAFT, HAUL, LUCK.','What they make must be','carried to the Lantern. The','work board shows who is who.'],
+ ['GATES AND GEAR','Boulders want PEB sprouts,','fire EMBER, vines LEAF, sparks','ZIP, dry blooms DEW. Ledges','hop down only, until you own','a CLIMBING ROPE. Heavy loot','needs more sprouts: PEB','counts double.'],
+ ['THE VALLEY','Four gyms hold four Sigils.','Roads past the Town need','them. KING BIBI holds the','Peak road behind an IRON','DOME he calls temporary. He','sits in Gloom Hollow. Above','them all, something chrome.']);
+/* gear: ore finally matters */
+WRECIPES.splice(2,0,{id:'rope',n:'CLIMBING ROPE',cost:{fiber:6,ore:2},need:20,d:'Climb ledges from below. Opens shortcuts and high ground in every sector.'});
+{const kd=wBuildDef('kiln');kd.d='Smelts ORE into ingots. Needs a KINDLE worker, and ore: buddies fetch it from veins.'}

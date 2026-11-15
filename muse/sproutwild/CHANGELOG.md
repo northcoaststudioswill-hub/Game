@@ -21,6 +21,20 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v5.7 — after the first catch (Fable)
+
+Found by playing on past the opening and looking at every screen.
+- **Healing had no home early on.** Before you could afford a cottage there was nowhere to heal. The Great Lantern now has REST IN THE LIGHT.
+- **First fights could one-shot your starter.** Before your first Sigil nothing takes more than 45% of its HP in one hit.
+- **Ore did nothing.** The kiln now smelts ORE into ingots and sits idle without it. Axe and pickaxe upgrades cost ore. New CLIMBING ROPE (fiber + ore): climb ledges from below, which opens shortcuts and high ground in every sector.
+- **You could teleport anywhere from the pause menu.** The pause map is now read-only. Travel is from a Lantern post or the Great Lantern, and only to sectors whose post you have walked to.
+- **No direction after the tutorial.** The strip under the top bar now shows the next thing Sunkeep needs.
+- **"Deploy 1 sprout worker" ignored buddies.** Missions count everyone working at home.
+- **Lore leftovers.** The cottage no longer sells sprouts. The "Buddy Nursery" grew buddies from sprouts; it is now the Lantern Nook, where a dim buddy follows berries and light in. The keeper's guide is rewritten for how the game works now.
+- **Small things.** The build cursor starts next to you. Buildings cannot block the lane to the south road or the camp fire. The placing prompt no longer sits on other text. Pause rows renamed MAP and WORK BOARD.
+
+Tests: `field-lab.js` 62/62.
+
 ## v5.6 — the battle screen (Fable)
 
 Same rules, new stage (`sw-battle.js`). Nothing here changes an outcome.
