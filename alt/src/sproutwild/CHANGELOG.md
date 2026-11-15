@@ -21,6 +21,21 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v6.3 · 2026-11-15 · buddies go where you aim, and the game explains itself
+
+Will's notes: still could not throw buddies with the auto target; the opening is overlapped and confusing; the garden is never explained; wants in-game cutscenes and animations.
+
+- **Buddy sending fixed.** The ring only offered a buddy when it had the matching skill (LUMBER for trees, MINE for rocks), so a Drizzlet or Cindercap starter never got an offer. Now any buddy can be sent at a tree or rock; skilled ones are faster and are picked first.
+- **Works at Sunkeep too.** The lead buddy follows you at base on the same party code as the field, and A sends it at base trees and rocks. (Other party members stay base workers.)
+- **In-game scenes** (new `sw-scene.js`): camera pans with a caption, A next, START skips.
+  - The Lantern wakes: look up at it, pan down to the garden as sprouts pop out of the soil, Erin explains the garden and plucking, Marcus explains that four deliveries grow a sprout. The three buddies walk in only after it ends.
+  - First buddy: Marcus pans to a tree and explains face it, press A, the buddy goes.
+  - First Meadow visit: Louie pans to a wild buddy in the grass and explains throwing sprouts to catch it or walking up to battle.
+- **Seed of light**: when the Lantern grows a sprout at base, a seed arcs from the Lantern to you.
+- **Opening spacing**: Erin and Marcus stand further from the seeds, you start lower, name tags hide until the opening is done, and nobody stands on top of you.
+- Goal text now says to throw sprouts at a wild buddy (it still said tire and SWARM).
+- Tests: scene switch for the lab (`SWF().noScenes`), 82 checks pass. Real-time replay of the whole opening on a phone-shaped screen passes.
+
 ## v6.2 — the party walks with you; capture in the open (Opus)
 
 From Will's notes: the A button only ever chose between sprouts; buddies should be targets too, the whole party should follow, things looked big and cramped, and the capture should be better and work out in the field.

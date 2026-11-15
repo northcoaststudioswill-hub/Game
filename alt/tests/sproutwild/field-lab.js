@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:440,height:956}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
 await p.goto('file://'+process.argv[2]);await p.waitForTimeout(700);
 await p.evaluate(()=>{const e=document.querySelector('.cart[data-i="4"]');e.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}))});await p.waitForTimeout(900);
-const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
+const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F.noScenes(true);
  const ok=(n,c,x)=>out.push((c?'PASS ':'FAIL ')+n+(x!==undefined?'  ['+x+']':''));
  const step=(n,keys)=>{for(let i=0;i<n;i++){for(const k in G.keys)G.keys[k]=0;if(keys)for(const k of keys)G.keys[k]=1;G.update(1/30);for(const k in G.keys)G.prev[k]=G.keys[k]}for(const k in G.keys)G.keys[k]=0;G.update(1/30);for(const k in G.keys)G.prev[k]=0};
  const tap=k=>{step(1,[k]);step(1)};
@@ -58,7 +58,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
  at(28,9,[0,-1]);step(30,['up']);ok('ledges do not climb',F.pos().y>8*T+8,Math.round(F.pos().y));
  /* node -> pellet -> home */
  step(40,['b']);step(40);const w0=S.res.wood;const nd=F.nodes().find(n=>n.k==='tree'&&!n.got);F.setPos(nd.x+2,nd.y+16);f.dir=[0,-1];for(const q of f.sq){q.x=F.pos().x;q.y=F.pos().y+8}step(6);
- ok('sprouts do not target trees',!f.sq.some(q=>q.st==='work')&&F.near()&&F.near().txt==='CHOP BY HAND',F.near()&&F.near().txt);
+ ok('sprouts do not target trees; the ring offers a buddy instead',!f.sq.some(q=>q.st==='work')&&!F.near(),F.near()&&F.near().txt);
  F.giveMon('FERNFANG',8);S.party.unshift(S.party.pop());step(3);step(30);G.draw();ok('the ring locks on and offers the LUMBER buddy',f.aimLab==='SEND FERNFANG · CHOP',f.aimLab);
  tap('a');step(200);ok('the buddy fells the tree and it drops a log',nd.got&&f.items.some(i=>i.res==='wood'),nd.hp);
  {const lg=f.items.find(i=>i.res==='wood');F.setPos(lg.x,lg.y+30);f.dir=[0,-1];for(const q of f.sq){q.x=F.pos().x;q.y=F.pos().y+8;q.st='follow'}step(6);for(let i=0;i<3;i++){tap('a');step(6)}step(1500)}

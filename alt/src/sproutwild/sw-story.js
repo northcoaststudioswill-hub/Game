@@ -29,7 +29,7 @@ function wQuestText(){const op=wOp();
  if(op===0)return'Pluck the glowing seeds';
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
- if(SW.quest===2)return'South road: tire a wild, then SWARM';
+ if(SW.quest===2)return'South road: throw sprouts at a wild buddy';
  return WQUEST[SW.quest]}
 function wNextGoal(){const op=wOp(),F=W4.bf;
  if(op===0){const p=WSEEDPOS[SW.seeds[0]];return{x:p[0]-14,y:p[1]+4,label:'Woof! It glows. Pluck it!'}}
@@ -63,17 +63,16 @@ function wPluckSeed(b){const F=W4.bf,tn=TYPES[b.type].n;F.buds.splice(F.buds.ind
  if(!SW.seeds.length)SW.quest=Math.max(SW.quest,1);
  swSave()}
 function wLanternWake(){SW.lit=1;Object.assign(SW.lessons,{seed:1,folbase:1,folhaul:1,fol:1,cmd:1}); /* the old one-line lessons are covered by Erin and Marcus now */
- SW.tendDone=true;SW.tendStage=4;SW.plucked=2;SW.trioPlucked=[];SW.quest=Math.max(SW.quest,1);wInitPatch();W4.wake=3;
- W4.banner={txt:'THE LANTERN STIRS',sub:'Its light reaches the garden — and the wilds',t:4.5};swSnd(523,.35,1046);
+ SW.tendDone=true;SW.tendStage=4;SW.plucked=2;SW.trioPlucked=[];SW.quest=Math.max(SW.quest,1);scWake();
  swSave()}
 /* every delivery feeds the Lantern: four make a sprout. The opening's berries wake it. */
 function wOnDeliver(F,it){SW.light=(SW.light||0)+(it.k==='tre'?3:1);
  if(SW.light>=4&&wBudTotal()<40&&wLit()){SW.light-=4;const c=it.car&&it.car[0],ty=c?c.type:(Math.random()*5)|0,tn=TYPES[ty].n;SW.buds[tn]=(SW.buds[tn]||0)+1;
-  W4.floats.push({x:F.start.x,y:F.start.y-44,txt:'THE LANTERN GROWS A '+tn+' SPROUT!',t:2.4,c:TYPES[ty].l});swSnd(988,.1,1480)}
+  if(F.base)scSeed(ty);W4.floats.push({x:F.start.x,y:F.start.y-44,txt:'THE LANTERN GROWS A '+tn+' SPROUT!',t:2.4,c:TYPES[ty].l});swSnd(988,.1,1480)}
  if(F.base&&it.op){SW.fedN=(SW.fedN||0)+1;if(SW.fedN>=2&&!SW.lit)wLanternWake()}}
 function wBefriend(sp){SW.party=[wMakeMon(sp,5)];SW.seen[sp]=1;SW.caught[sp]=1;SW.quest=2;swSave();
  wCineMon(sp,'Your sprouts bloomed on it. It remembers the light.')}
-function wBaseArrive(from){const F=W4.bf;P3.x=240;P3.ax=0;P3.ay=-1;P3.y=from==='MEADOW'?(W4.wh||520)-38:152;
+function wBaseArrive(from){const F=W4.bf;P3.x=240;P3.ax=0;P3.ay=-1;P3.y=from==='MEADOW'?(W4.wh||520)-38:SW.lit?152:170;
  lou.x=P3.x-24;lou.y=P3.y+8;W4.part={x:P3.x+16,y:P3.y+6};for(const s of F.sq){s.x=P3.x+(Math.random()*24-12);s.y=P3.y+10+Math.random()*10}
  if(SW.quest<2&&!SW.lit){if(!SW.seeds)SW.seeds=[0,2,4];
   F.buds=SW.seeds.map(ty=>({type:ty,x:WSEEDPOS[ty][0],y:WSEEDPOS[ty][1],glow:1}));
@@ -162,7 +161,7 @@ function wQuestText(){const op=wOp();
  if(op===0)return'Pluck the glowing seeds';
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
- if(SW.quest===2)return'South road: tire a wild, then SWARM';
+ if(SW.quest===2)return'South road: throw sprouts at a wild buddy';
  if(SW.quest<5)return WQUEST[SW.quest];
  const ms=WBASEMS[SW.baseLv];if(!ms)return SW.badges.length<4?'Earn the Sigils. Free the roads.':'';
  const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?'Sunkeep Lv'+SW.baseLv+': '+nx[1]:'Ask the Great Lantern to grow'}

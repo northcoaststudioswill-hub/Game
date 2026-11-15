@@ -514,11 +514,11 @@ function wSproutInfo(px,py){ /* the catch-all: any sprout can be asked what it i
  return null}
 function wNear(){const sec=wSector(W4.sector),px=P3.x+P3.ax*13,py=P3.y+P3.ay*13;
  {const ex=wNearExtra(px,py);if(ex)return ex}
- const aimT=!!(W4.bf&&W4.bf.sq.length&&fAim(W4.bf).tg);
+ const aimT=!!(W4.bf&&(W4.bf.sq.length||(W4.bf.pf&&W4.bf.pf.length))&&fAim(W4.bf).tg);
  if(W4.loose)for(const lb of W4.loose)if(Math.hypot(px-lb.x,py-lb.y)<17)return{k:'wildpluck',lb,txt:'PLUCK '+TYPES[lb.type].n+' SPROUT'};
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)
   if(pb.type>=0&&pb.stage>=2&&Math.hypot(px-pb.x,py-pb.y)<17)return{k:'pluck',pb,txt:'PLUCK '+TYPES[pb.type].n+' SPROUT'};
- for(const nd of W4.nodes)if(!nd.got&&nd.k!=='bush'&&Math.hypot(px-nd.x,py-nd.y)<17)
+ for(const nd of W4.nodes)if(!nd.got&&nd.k!=='bush'&&!(W4.bf&&pfBest(W4.bf,nd))&&Math.hypot(px-nd.x,py-nd.y)<17)
   return{k:'node',nd,txt:wNodeLabel(nd)};
  if(W4.sector==='BASE'&&SW.tendStage>=3&&W4.tend&&W4.tend.buds)for(const tb of W4.tend.buds)
   if(tb.st==='grown'&&Math.hypot(px-tb.x,py-tb.y)<18)return{k:'tendpluck',b:tb,txt:'PLUCK '+TYPES[tb.type].n+' SPROUT'};
@@ -550,7 +550,7 @@ function wGather(nd){nd.got=true;
  if(nd.k==='bush'){SW.res.berry+=1;if(Math.random()<.3)SW.res.petal+=3;swSay('+1 BERRY',1.2);swSnd(520,.06,760)}
  swSave()}
 let lou={x:60,y:120};
-function worldUpdate(dt){if(W4.fld){fUpdate(dt);return}const sec=wSector(W4.sector);
+function worldUpdate(dt){if(W4.scene){scTick(dt);return}scAuto();if(W4.fld){fUpdate(dt);return}const sec=wSector(W4.sector);
  SW.playT+=dt;
  if(W4.grace>0)W4.grace-=dt;
  W4.swingCd=Math.max(0,(W4.swingCd||0)-dt);W4.stamT=(W4.stamT||0)+dt;
@@ -828,11 +828,11 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
     else{const px2=((sd*9+time*11)%(WW+14))-7,py2=((sd*4+time*6)%(W4.wh-50))+24;r(i2%2?'rgba(240,184,216,.75)':'rgba(255,255,255,.7)',Math.round(px2+Math.sin(time*1.4+i2*2)*3),Math.round(py2),2,1)}}}
   for(const np of wNpcList()){r('rgba(0,0,0,.25)',np.x-7,np.y-1,14,3);
    fChibi(Math.round(np.x),Math.round(np.y)+3,FLOOK[np.who]||FLOOK.WILL,np.dir||[0,1],!!np.mv);
-   if(Math.hypot(P3.x-np.x,P3.y-np.y)<70&&!(W4.quips||[]).some(q=>q.who===np.who)){r('rgba(10,14,8,.55)',np.x-tw(np.who,1)/2-2,np.y+2,tw(np.who,1)+4,9);
+   if(Math.hypot(P3.x-np.x,P3.y-np.y)<70&&wOp()>=3&&!(W4.quips||[]).some(q=>q.who===np.who)){r('rgba(10,14,8,.55)',np.x-tw(np.who,1)/2-2,np.y+2,tw(np.who,1)+4,9);
    text(np.who,np.x-tw(np.who,1)/2,np.y+3,1,'#ffe8b0',null)}}
   r('rgba(0,0,0,.22)',Math.round(lou.x)-9,Math.round(lou.y)+4,18,3);
   const lf=((time*2)|0)%2;g.drawImage(lf?LOU.l[0]:LOU.l[1],Math.round(lou.x)-12,Math.round(lou.y)-6,24,12);
-  if(Math.hypot(P3.x-lou.x,P3.y-lou.y)<70&&!(W4.quips||[]).some(q=>q.who==='LOUIE')){r('rgba(10,14,8,.55)',Math.round(lou.x)-tw('LOUIE',1)/2-2,Math.round(lou.y)+6,tw('LOUIE',1)+4,9);
+  if(Math.hypot(P3.x-lou.x,P3.y-lou.y)<70&&wOp()>=3&&!(W4.quips||[]).some(q=>q.who==='LOUIE')){r('rgba(10,14,8,.55)',Math.round(lou.x)-tw('LOUIE',1)/2-2,Math.round(lou.y)+6,tw('LOUIE',1)+4,9);
   text('LOUIE',Math.round(lou.x)-tw('LOUIE',1)/2,Math.round(lou.y)+7,1,'#ffe8b0',null)}
   if(W4.louLead)text('!',Math.round(lou.x)-1,Math.round(lou.y)-17,2,'#ffd94d',null)
   if(SW.quest===1&&SW.tendDone&&!SW.party.length)for(const c of WCHOICE){const spr=wSp(c.sp)._spr,bob=Math.sin(time*3+c.x)*1;
@@ -846,7 +846,8 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
   if(c.job===-2){r('#8a6a48',Math.round(jp.x)+3,Math.round(jp.y)-10+(sw2?0:1),1,5);r('#c8ccd4',Math.round(jp.x)+1,Math.round(jp.y)-12+(sw2?0:1),4,2)}
   else{r('#8a6a48',Math.round(jp.x)+3,Math.round(jp.y)-10+(sw2?0:1),1,5);r('#c8ccd4',Math.round(jp.x),Math.round(jp.y)-12+(sw2?0:1),6,1)}});
  {const lead=SW.party.find(m=>m.hp>0);
-  if(lead&&W4.part){const spr=wSp(lead.sp)._spr,bob=Math.sin(time*5)*1;
+  scWorldFx();if(W4.bf&&W4.bf.pf){for(const b of W4.bf.pf)pfDraw(b)}
+  else if(lead&&W4.part){const spr=wSp(lead.sp)._spr,bob=Math.sin(time*5)*1;
    r('rgba(0,0,0,.22)',W4.part.x-8,W4.part.y-1,16,3);
    g.drawImage(spr.ol,Math.round(W4.part.x)-13,Math.round(W4.part.y)-spr.oh+4+Math.round(bob),spr.ow,spr.oh)}}
  if(W4.tossFx){const tf=W4.tossFx,ld=SW.party.find(m=>m.hp>0);
@@ -1982,7 +1983,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={noScenes:v=>{SCOFF=v},scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},

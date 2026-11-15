@@ -276,7 +276,7 @@ function fAim(F){ /* the cursor sits ahead of you and locks on to the nearest th
   if(!tg&&full&&best===b0){const sv=best;tryT(full,'item');if(tg===full){tg=null;kind=null;best=sv;F.aimFull=full}}else F.aimFull=null}
  for(const nd of W4.nodes)if(!nd.got&&nd.k==='bush')tryT(nd,'node'); /* sprouts pick berries; trees and rocks are buddy work */
  for(const wd of W4.wilds)if(!wd.cap)tryT(wd,'wild');
- if(W4.fld){for(const nd of W4.nodes)if(!nd.got&&nd.k!=='bush'&&pfBest(F,nd))tryT(nd,'bwork');for(const sp of F.spots||[])if(!sp.got&&pfBest(F,sp))tryT(sp,'bwork')}
+ if(F.pf){for(const nd of W4.nodes)if(!nd.got&&nd.k!=='bush'&&pfBest(F,nd))tryT(nd,'bwork');for(const sp of F.spots||[])if(!sp.got&&pfBest(F,sp))tryT(sp,'bwork')}
  if(tg){x=tg.x;y=tg.y}
  else{let n=0;while(n++<10&&!fWalkTile(F,Math.floor(x/FT),Math.floor(y/FT))){x-=F.dir[0]*5;y-=F.dir[1]*5}}
  /* which kind goes: what the target needs, else what suits it; SELECT overrides for a few seconds */
@@ -474,7 +474,7 @@ function fBaseBuild(){const w=Math.ceil(WW/FT),h=Math.ceil((W4.wh||520)/FT),F={i
 function fBaseTick(dt){const F=W4.bf;if(!F)return;if(P3.ax||P3.ay)F.dir=[P3.ax,P3.ay];
  F.ft=(F.ft||0)-dt;if(F.ft<=0){F.ft=2;fFlow(F)}
  if(F.got){F.got.t-=dt;if(F.got.t<=0)F.got=null}
- fSync(F);fSquad(F,dt);fItems(F,dt);wkTick(dt);wCastTick(dt);fCommand(F,dt);wBaseEdge()}
+ fSync(F);pfTick(F,dt);fSquad(F,dt);fItems(F,dt);wkTick(dt);wCastTick(dt);fCommand(F,dt);wBaseEdge()}
 function fSqDraw(F,front){for(const o of F.sq){if((o.y>P3.y)!==front)continue;drawBud({x:Math.round(o.x),y:Math.round(o.y)+2,type:o.type,stage:2,z:o.z||0,a:o.a,mv:!!o.mv,st:o.st==='idle'?'idle':'follow',fx:1});
   if(o.st==='work'&&o.mv)r('#ffffff',Math.round(o.x)+4,Math.round(o.y)-9,2,2)}
  if(!front){for(const it of F.items)fItemDraw(it);for(const b of F.buds)fBudDraw(b)}}
@@ -608,7 +608,7 @@ function fItemDraw(it){const x=Math.round(it.x),y=Math.round(it.y)-(it.car.lengt
  if(it.car.length||it.guard){const st=fStr(it),ok=st>=it.w,lab=it.block?'NO WAY HOME':st+'/'+it.w;
   const lw=tw(lab,1)+4;r(ok&&!it.block?'#1d5a2a':'#5a1d1d',x-lw/2,y-23,lw,9);text(lab,x-lw/2+2,y-22,1,'#ffffff',null)}}
 function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*FT;
- const cx=mw<=W?(mw-W)/2:Math.max(0,Math.min(mw-W,P3.x-W/2)),cy=mh<=H?(mh-H)/2:Math.max(0,Math.min(mh-H,P3.y-H/2-4));
+ const cx=mw<=W?(mw-W)/2:Math.max(0,Math.min(mw-W,(W4.scene||P3).x-W/2)),cy=mh<=H?(mh-H)/2:Math.max(0,Math.min(mh-H,(W4.scene||P3).y-H/2-4));
  W4.cam={x:cx,y:cy};
  r(B.t1,0,0,W,H);g.save();g.translate(-Math.round(cx),-Math.round(cy));
  if(!F.cv)fBake(F);if(F.cv&&F.cv.width)g.drawImage(F.cv,0,0);

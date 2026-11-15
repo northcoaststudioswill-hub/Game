@@ -14,7 +14,7 @@ WSTORY.length=0;WSTORY.push(
  {sc:1,who:'',t:'Its light fell as seeds, and the seeds grew legs. The buddies of the valley went dim.'},
  {sc:5,who:'KING BIBI',t:'Citizens. For thirty years I have warned you: the light is weeks away. Hence, my IRON DOME.',acc:'#1e2c5a'});
 const WCANCH={ /* where each of them hangs about, by how far along you are */
- ERIN:[[290,148,14],[214,206,16],[150,196,20],[336,300,56]],MARCUS:[[190,154,14],[272,176,16],[334,200,20],[300,214,40]],WILL:[[150,250,30],[150,250,30],[150,250,30],[130,260,50]]};
+ ERIN:[[322,172,12],[214,206,16],[150,196,20],[336,300,56]],MARCUS:[[156,178,12],[272,176,16],[334,200,20],[300,214,40]],WILL:[[150,250,30],[150,250,30],[150,250,30],[130,260,50]]};
 function wCastInit(){W4.cast=['ERIN','MARCUS','WILL'].map(w=>{const a=WCANCH[w][Math.min(3,wOp())];return{who:w,x:a[0],y:a[1],tx:a[0],ty:a[1],t:1+Math.random()*2,dir:[0,1],mv:false}});
  if(wOp()===0&&!(SW.beats&&SW.beats.wake)){W4.cast[0].x=330;W4.cast[0].y=214;W4.cast[1].x=150;W4.cast[1].y=220} /* they walk up as you wake */
  W4.quips=[];W4.quipQ=[];W4.idleT=9}
@@ -27,7 +27,7 @@ const WCBEATS=[
  ['three',()=>wOp()===1,[['MARCUS','Berries. Face them and press A. The sprouts do the rest.']]],
  ['carry',()=>wOp()===1&&W4.bf&&W4.bf.items.some(i=>i.op&&i.car.length),[['ERIN','B calls them back. Everything goes to the Lantern.']]],
  ['lit',()=>wOp()===2,[['ERIN',"It's awake! Go and greet one of the dim ones."]]],
- ['buddy',()=>SW.quest>=2&&SW.party.length>0&&SW.quest<5,[['MARCUS','South road. Tire a wild one out, then SWARM it.']]],
+ ['buddy',()=>SW.quest>=2&&SW.party.length>0&&SW.quest<5,[['MARCUS','South road. Throw sprouts at a wild one. Enough and it blooms.']]],
  ['caught',()=>SW.quest>=3,[['ERIN','Leave a buddy at home and it finds work.'],['MARCUS','START, then BUILD. Cottage first.']]],
  ['cottage',()=>SW.buildings.some(b=>b.k==='cottage'),[['ERIN','A roof! Now a garden bed.']]],
  ['worker',()=>(W4.wk||[]).some(w=>w.at),[['MARCUS','Free labour. I respect it.']]],

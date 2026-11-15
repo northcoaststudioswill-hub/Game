@@ -11,11 +11,11 @@
    Field buddies are drawn at three quarters size so the screen breathes.
    ================================================================ */
 const PSC=.75;
-function pfSync(F){const alive=SW.party.filter(m=>m.hp>0);F.pf=(F.pf||[]).filter(b=>alive.includes(b.m));
+function pfSync(F){const alive=(F.base?SW.party.slice(0,1):SW.party).filter(m=>m.hp>0);F.pf=(F.pf||[]).filter(b=>alive.includes(b.m));
  for(const m of alive)if(!F.pf.some(b=>b.m===m))F.pf.push({m,x:P3.x+(Math.random()*16-8),y:P3.y+12,st:'follow',fx:1,mv:false,t:0})}
 function pfJob(o){return o.k==='tree'||o.k==='rock'||o.k==='ore'||o.k==='fiber'?o.k:null}
 function pfSkill(m,job){const sk=wkSkills({kind:'b',ref:m});
- if(job==='tree')return sk.LUMBERING||0;if(job==='rock')return sk.QUARRY||0;
+ if(job==='tree')return sk.LUMBERING||.5;if(job==='rock')return sk.QUARRY||.5;
  if(job==='ore')return(sk.QUARRY||sk.KINDLING)?2:1;if(job==='fiber')return(sk.PLANTING||sk.WATERING)?2:1;return 0}
 function pfBest(F,o){const job=pfJob(o);if(!job||!F.pf)return null;let best=null,bl=0;
  for(const b of F.pf)if(b.st==='follow'){const l=pfSkill(b.m,job);if(l>bl){bl=l;best=b}}return best}
