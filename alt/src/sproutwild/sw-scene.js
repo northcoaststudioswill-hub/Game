@@ -63,9 +63,9 @@ function scArrow(){if(W4.scene||!W4.bf||wOp()>=3)return;const op=wOp();let t=nul
  r(K,x-5,y-1,11,4);r(K,x-3,y+3,7,2);r(K,x-1,y+5,3,2);r('#ffd94d',x-4,y,9,2);r('#ffd94d',x-2,y+2,5,2);r('#ffd94d',x,y+4,1,2)}
 function scBuild(){SW.lessons.scBuild=1;SW.beats.caught=1;const nm=(SW.party[SW.party.length-1]||{}).sp||'It';
  scStart([{hold:.6},{who:'MARCUS',txt:'AYYY! You caught one! Never doubted you once. Dap me up.'},
-  {x:150,y:236,hold:1.1},{x:150,y:236,who:'MARCUS',txt:'Now a roof, bro. Press START, pick BUILD, then COTTAGE. Costs 8 wood. This spot is nice.'},
+  {x:150,y:236,hold:1.1},{x:150,y:236,who:'MARCUS',txt:'Buddies need a roof, bro. Press START, pick BUILD, then COTTAGE. Costs 8 wood. This spot is nice.'},
   {x:150,y:236,who:'MARCUS',txt:'Short on wood? Send a buddy at trees. Sprouts carry the logs home. Teamwork. I supervise.'},
-  {who:'ERIN',txt:'Only your lead buddy walks with you here. The others stay home and find work on their own.'},{hold:.4}],()=>swSave())}
+  {who:'ERIN',txt:'Only your lead buddy walks with you here. The others wait at home. Give them a roof and they get to work.'},{hold:.4}],()=>swSave())}
 function scAuto(){if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
   if(SW.quest===3&&!SW.lessons.scBuild&&W4.sector==='BASE'&&SW.lessons.scSend){SW.beats.caught=1;W4.buildT=(W4.buildT||0)+1;if(W4.buildT>40){scBuild();return}}
   if(wOp()===0&&!SW.beats.wake){SW.beats.wake=1;SW.beats.first=1;scIntro();return}

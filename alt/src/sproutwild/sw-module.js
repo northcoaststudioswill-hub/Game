@@ -344,7 +344,7 @@ const WGYMS=[
 function wGymIx(sec){if(sec.id==='PEAK'&&SW.gymDone[4]&&SW.bottieSeen)return 5;
  return(sec.id==='PEAK'&&SW.badges.length>=4&&SW.gymDone[3])?4:sec.gym}
 const WBUILD=[
- {k:'cottage',n:'COTTAGE',cost:{wood:8},max:1,d:'Rest here for a full party heal. Home sweet home.'},
+ {k:'cottage',n:'COTTAGE',cost:{wood:8},max:1,d:'A roof for your buddies. With it, buddies left at home work the base. Sleep here to skip the night.'},
  {k:'bed',n:'GARDEN BED',cost:{wood:6,stone:2},skill:['PLANTING','WATERING'],yields:'berry',d:'A DEW or LEAF sprout grows berries over time.'},
  {k:'nursery',n:'BUDDY NURSERY',cost:{wood:6,stone:2},skill:['PLANTING','WATERING'],max:2,d:'Plant a sprout (3 BERRY). Tend it, watch it grow, harvest a buddy.'},
  {k:'kiln',n:'KILN',cost:{stone:8,wood:4},skill:['KINDLING','CHARGE'],yields:'ingot',d:'An EMBER or ZIP sprout smelts ingots over time.'},
@@ -1852,10 +1852,10 @@ function drawPlace(){wDrawWorld();const cam=W4.cam||{x:0,y:0};
  g.restore();
  uiPill('PLACE '+wBuildDef(W4.placeK).n+'  ·  B  BACK',H-30,'A')}
 function cotUpdate(){const hasBench=SW.buildings.some(b=>b.k==='bench');
- const rows=['REST','BREW TONIC','BUY SPROUT · 12p','BUY TONIC · 25p','LEAVE'];swNav(rows.length);
+ const rows=['SLEEP','BUY SPROUT · 12p','BUY TONIC · 25p','LEAVE'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){const r2=rows[swSel];
-  if(r2==='REST'){for(const m of SW.party)m.hp=wStats(m).max;SW.stam=100;swSay('Buddies fully rested.',1.8);swSnd(880,.1,1175);swSave()}
+  if(r2==='SLEEP'){for(const m of SW.party.concat(SW.box))m.hp=wStats(m).max;SW.stam=100;const night=(W4.dayT||0)>150;if(night){W4.dayT=0;SW.day=(SW.day||1)+1}W4.sleepFx=1.6;swSay(night?'You slept until morning. Day '+SW.day+'. Everyone is rested and back at work.':'A quick nap. Everyone is rested.',2.6);swSnd(523,.3,262);swSave();state='g4world'}
   else if(r2==='LEAVE'){state='g4world'}
   else if(!hasBench&&r2.startsWith('BREW')){swSnd(140,.08);swSay('Needs a TINKER BENCH built first.',1.8)}
   else if(r2.startsWith('BUY SPROUT')){if(SW.res.petal>=12){SW.res.petal-=12;const bn=TYPES[(Math.random()*5)|0].n;SW.buds[bn]++;swSay('A '+bn+' sprout joins your pouch! Sprouts: '+wBudTotal(),1.6);swSave()}else{swSnd(140,.08);swSay('Needs 12 petals.',1.4)}}
@@ -1863,9 +1863,9 @@ function cotUpdate(){const hasBench=SW.buildings.some(b=>b.k==='bench');
   else if(r2.startsWith('BUY TONIC')){if(SW.res.petal>=25){SW.res.petal-=25;SW.tonics++;swSay('Bought a Tonic. Tonics: '+SW.tonics,1.4);swSave()}else{swSnd(140,.08);swSay('Needs 25 petals.',1.4)}}}}
 function drawCot(){swShell('COTTAGE','PETALS '+SW.res.petal);
  const hasBench=SW.buildings.some(b=>b.k==='bench');
- swRows([{a:'REST',b:'full heal'},
-  {a:'BREW TONIC',b:hasBench?'3 BERRY':'needs bench'},{a:'BUY SPROUT',b:'12 petals · a random sprout joins'},
-  {a:'BUY TONIC',b:'25 petals'},{a:'LEAVE',b:''}],swSel,'Buds x'+wBudTotal()+' · Tonics x'+SW.tonics+'. Rest is always free, keeper.')}
+ swRows([{a:'SLEEP',b:(W4.dayT||0)>150?'until morning':'a quick nap'},
+  {a:'BUY SPROUT',b:'12 petals · a random sprout joins'},
+  {a:'BUY TONIC',b:'25 petals'},{a:'LEAVE',b:''}],swSel,'Home buddies live here: '+Math.max(0,SW.party.length-1+SW.box.length)+'. Sleeping skips the night, when nobody works. Sprouts x'+wBudTotal()+' · Tonics x'+SW.tonics+'.')}
 const WNURPLANT=[['EMBER','CINDERCAP',3],['PEB','PEBBLIT',3],['DEW','DRIZZLET',3],['ZIP','ZIPWIG',3],['LEAF','FERNFANG',3],['LUCKY','CLOVERIMP',5]];
 function wNurRows(b){if(!b.crop)return WNURPLANT.map(e=>'PLANT '+e[0]+' · '+e[2]+' BERRY').concat(['WORKERS','LEAVE']);
  return['GROWING: '+b.crop.kind+' — '+(b.crop.stage>=3?'READY!':'stage '+b.crop.stage+'/3'),'HARVEST','CLEAR BED','WORKERS','LEAVE']}

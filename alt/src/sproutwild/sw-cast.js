@@ -29,7 +29,7 @@ const WCBEATS=[
  ['lit',()=>wOp()===2,[['ERIN',"It's awake! Go and greet one of the dim ones."]]],
  ['buddy',()=>SW.quest===2&&SW.party.length>0,[['MARCUS','South road, bro. Throw sprouts at a wild one. Enough and it blooms.']]],
  ['caught',()=>SW.quest===3,[['ERIN','Leave a buddy at home and it finds work.'],['MARCUS','START, then BUILD. Cottage first, bro. Waterpark later.']]],
- ['cottage',()=>SW.buildings.some(b=>b.k==='cottage'),[['ERIN','A roof! Now a garden bed.']]],
+ ['cottage',()=>SW.buildings.some(b=>b.k==='cottage'&&!b.con),[['ERIN','A roof! Buddies you leave home will work now.'],['MARCUS','Beds for the buddies. Nothing for me. Classic, bro.']]],
  ['worker',()=>(W4.wk||[]).some(w=>w.at),[['MARCUS','Free labour. I respect it.']]],
  ['ore',()=>(SW.res.ore||0)>0,[['MARCUS','ORE! Build a kiln, bro. Ingots. We are basically rich.']]],
  ['fiber',()=>(SW.res.fiber||0)>=4,[['ERIN','Enough fiber for a seed pouch. Try the bench.']]],

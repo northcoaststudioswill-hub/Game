@@ -31,16 +31,20 @@ function wkSync(){const want=[];
  const old=W4.wk||[];W4.wk=want.map(([kind,ref],i)=>old.find(w=>w.ref===ref)||{kind,ref,x:284+(i%4)*20,y:158+((i/4)|0)*40,hx:284+(i%4)*20,hy:158+((i/4)|0)*40,task:null,t:Math.random()*1.5,mv:false,fx:1,xpT:0});
  for(const w of old)if(!W4.wk.includes(w)&&w.task&&w.task.it)w.task.it.by=null}
 function wkAt(b,k){return(W4.wk||[]).filter(w=>w.task&&w.task.b===b&&(!k||w.task.k===k))}
+function wHasRoof(){return SW.buildings.some(b=>b.k==='cottage'&&!b.con)}
 function wkPick(w){const sk=wkSkills(w),bench=SW.buildings.find(b=>b.k==='bench');
  if(w.kind==='s'){const b=SW.buildings[w.ref.job];if(!b)return null;
   const mine=(W4.bf.items||[]).find(it=>it.from===b&&!it.by&&!it.car.length);if(mine&&(b.out||0)>=2){mine.by=w;return{k:'haul',it:mine}}
   return{k:b.k==='bench'?'craft':b.k==='nursery'?'tend':'bld',b}}
+ if(!wHasRoof())return{k:'idle',x:w.hx+(Math.random()*30-15),y:w.hy+(Math.random()*16-8),t:4,noroof:1}; /* no cottage, no workforce */
  if(wDark()>.7)return{k:'sleep',t:6};
  if(bench&&!bench.con&&(SW.craftQ||[]).length&&wkAt(bench).length<2)return{k:'craft',b:bench}; /* anyone can lend a hand; the handy ones are much faster */
  let best=null,bl=0;for(const b of SW.buildings){const def=wBuildDef(b.k);if(!def.yields||(b.out||0)>=3||(b.k==='kiln'&&!(SW.res.ore>0)))continue;const lv=wkBldLv(def,sk)||.4,n=wkAt(b).length;if(!b.con&&n<2&&lv-n*.5>bl){bl=lv-n*.5;best=b}}
  if(best)return{k:'bld',b:best};
  for(const b of SW.buildings)if(b.k==='nursery'&&b.crop&&b.crop.stage<3&&(sk.WATERING||sk.PLANTING)&&!wkAt(b).length)return{k:'tend',b};
  const it=(W4.bf.items||[]).find(i2=>!i2.by&&!i2.car.length&&!i2.done);if(it){it.by=w;return{k:'haul',it}}
+ /* nothing else to do: gather. Home buddies fell base trees and crack base rocks on their own */
+ {const nd=(W4.nodes||[]).filter(n=>!n.got&&n.k!=='bush'&&!n.wkBy).sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y))[0];if(nd&&(W4.bf.items||[]).length<6){nd.wkBy=w;return{k:'chop',nd}}}
  return{k:'idle',x:w.hx+(Math.random()*70-35),y:w.hy+(Math.random()*40-10),t:2+Math.random()*3}}
 function wkCraftDone(q,bench){const x=wCellX(bench.gx)+10,y=wCellY(bench.gy);let txt='';
  if(q.id==='tonic'){SW.tonics++;txt='TONIC READY!'}
@@ -67,6 +71,11 @@ function wkTick(dt){if(!W4.bf)return;wkSync();const bench=SW.buildings.find(b=>b
    if(!tk.got){if(go(it.x,it.y+4,6))tk.got=1}
    else{if(go(240,106,7)){it.by=null;fDeliver(W4.bf,it);w.task=null;w.ref.wxp=(w.ref.wxp||0)+1}else{it.x=w.x;it.y=w.y-3-(w.kind==='b'?8:4)}}
    continue}
+  if(tk.k==='chop'){const nd=tk.nd;if(!nd||nd.got||wDark()>.7){if(nd)nd.wkBy=null;w.task=null;continue}
+   if(!go(nd.x+(w.x<nd.x?-11:11),nd.y+8,4))continue;w.at=true;w.fx=w.x<nd.x?1:-1;nd.shake=.12;
+   const lv=nd.k==='tree'?(sk.LUMBERING||.5):(sk.QUARRY||.5);nd.hp-=(.5+lv*.7)*dt;
+   if(((time*3)|0)!==(((time-dt)*3)|0)){fSpark(nd.x+(Math.random()*14-7),nd.y-8-Math.random()*8,'#fff3b0')}
+   if(nd.hp<=0){nd.wkBy=null;wNodeDrop(nd);w.task=null;w.ref.wxp=(w.ref.wxp||0)+1}continue}
   const slot=wkAt(b).indexOf(w),bx=wCellX(b.gx)+(slot%2?19:1),by=wCellY(b.gy)+25;
   if(!go(bx,by,3))continue;
   w.at=true;w.fx=slot%2?-1:1;b.busy=(b.busy||0)+1;w.xpT+=dt;if(w.xpT>=8){w.xpT=0;w.ref.wxp=(w.ref.wxp||0)+1}
@@ -151,7 +160,7 @@ function drawTools(){swShell('TINKER BENCH','B  DONE');if(!SW.craftQ)SW.craftQ=[
 function baseUpdate(){const n=(W4.wk||[]).length+1;swNav(n);if(pressed('a')||pressed('b'))state='g4world'}
 function drawBase(){swShell('SUNKEEP WORK BOARD','BASE LV '+SW.baseLv);wkSync();
  const ms=WBASEMS[SW.baseLv],done=ms?ms.filter(([k])=>wMissionDone(k)).length:0,rows=[{a:ms?'MISSIONS '+done+'/'+ms.length:'BASE FULLY GROWN',b:'♥ '+SW.hearts+' · AXE '+SW.tools.axe+' PICK '+SW.tools.pick}];
- const job=w=>{const tk=w.task;return!tk?'thinking':tk.k==='sleep'?'asleep':tk.k==='idle'?'resting':tk.k==='haul'?'hauling':tk.k==='craft'?'crafting':tk.k==='tend'?'tending':wBuildDef(tk.b.k).n.toLowerCase()};
+ const job=w=>{const tk=w.task;return!tk?'thinking':tk.k==='sleep'?'asleep':tk.k==='idle'?(tk.noroof?'needs a cottage':'resting'):tk.k==='haul'?'hauling':tk.k==='chop'?(tk.nd.k==='tree'?'chopping':'mining'):tk.k==='craft'?'crafting':tk.k==='tend'?'tending':wBuildDef(tk.b.k).n.toLowerCase()};
  for(const w of W4.wk)rows.push({a:wkName(w)+(w.kind==='b'?' Lv'+w.ref.lv:''),b:job(w)});
  const sel=Math.min(swSel,rows.length-1),w=W4.wk[sel-1];
  swRows(rows,sel,sel===0?(ms?ms.map(([k,l])=>(wMissionDone(k)?'✓ ':'· ')+l).join('  '):'Everything is built. For now.'):

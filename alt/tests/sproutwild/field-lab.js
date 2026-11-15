@@ -134,6 +134,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  {S.box=[];S.party=S.party.slice(0,1);S.craftQ=[];S.buildings=[];S.crew=[];F.build('kiln',4,8);F.build('bench',8,8);F.build('quarry',14,8);
   const fire=F.giveMon('CINDERCAP',5,true),rock=F.giveMon('PEBBLIT',5,true),zip=F.giveMon('ZIPWIG',5,true);step(3);const wk=F.wk();
   ok('box buddies become base workers',wk.length===3,wk.length);
+  S.res.ore=6;step(120);ok('without a cottage, home buddies only wait',wk.every(w=>!w.task||w.task.k==='idle'),wk.map(w=>w.task&&w.task.k).join());F.build('cottage',18,12);step(60);ok('with a roof they find work',wk.some(w=>w.task&&w.task.k!=='idle'),wk.map(w=>w.task&&w.task.k).join());
   ok('species bring their own work skills',F.wkSkills(wk[0]).KINDLING>=1&&F.wkSkills(wk[1]).QUARRY>=1&&F.wkSkills(wk[2]).HANDIWORK>=1,JSON.stringify(wk.map(w=>F.wkSkills(w))));
   F.dayT(20);F.setPos(60,460);S.res.ore=0;step(300);ok('the kiln sits idle without ore',!(S.buildings[0].prog>0),S.buildings[0].prog);S.res.ore=6;const i0=S.res.ingot,s0=S.res.stone;step(240);
   const kiln=S.buildings[0],quarry=S.buildings[2];

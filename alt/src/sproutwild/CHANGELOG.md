@@ -21,6 +21,18 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v6.8 · 2026-11-15 · the cottage is the buddies' home
+
+Will's note: the cottage does not provide anything useful the way the game works.
+
+It only offered a heal (already free at the Great Lantern) and a tonic shop. Now it is what turns the base on:
+
+- **No roof, no workforce.** Buddies left at home just wait until a cottage stands. The work board says "needs a cottage". Once it is built they get to work.
+- **Home buddies gather on their own.** With nothing else to do they fell base trees and crack base rocks, then carry the logs and stone to the Lantern, so the cottage pays off the moment it is finished. Skilled buddies are faster. They still prefer production buildings and the bench when those have work.
+- **Sleep.** The cottage menu's first row is SLEEP: at night it skips to morning (next day) with a fade, heals everyone including buddies at home, and the workers start again. By day it is a quick nap that heals.
+- Marcus and Erin's lines and the build menu text explain the roof rule.
+- Verified: 84 lab checks (two new: no work without a cottage, work with one); real-time run: buddies idle, cottage built, both start chopping and hauling, sleep at night wakes on day 2.
+
 ## v6.7 · 2026-11-15 · Marcus sounds like Marcus, and the first catch is fair
 
 Will's notes: keep working on onboarding; Marcus should talk to the keeper the way he does in the other games.

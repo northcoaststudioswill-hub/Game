@@ -175,14 +175,14 @@ function lampDraw(){const rows=wLampRows();swShell('THE GREAT LANTERN','♥ '+SW
  swRows(rows.map(rw=>({a:rw.label,b:rw.price?'♥ '+rw.price:rw.act==='travel'?'posts you have lit':rw.act==='rest'?'heals everyone':''})),swSel,
   wBaseReady()?'The missions are done. Let it grow!':'Everything carried home feeds it. Four deliveries grow a sprout. Hearts buy plans.')}
 /* the cottage: a bed and a tonic shelf (sprouts are grown by the Lantern, never bought) */
-function cotUpdate(){const rows=['REST','BUY TONIC','LEAVE'];swNav(rows.length);
+function cotUpdate(){const rows=['SLEEP','BUY TONIC','LEAVE'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){const r2=rows[swSel];
-  if(r2==='REST'){for(const m of SW.party)m.hp=wStats(m).max;SW.stam=100;swSay('Everyone slept well. Buddies fully rested.',1.8);swSnd(880,.1,1175);swSave()}
+  if(r2==='SLEEP'){for(const m of SW.party.concat(SW.box))m.hp=wStats(m).max;SW.stam=100;const night=(W4.dayT||0)>150;if(night){W4.dayT=0;SW.day=(SW.day||1)+1}W4.sleepFx=1.6;swSay(night?'You slept until morning. Day '+SW.day+'. Everyone is rested and back at work.':'A quick nap. Everyone is rested.',2.6);swSnd(523,.3,262);swSave();state='g4world'}
   else if(r2==='LEAVE')state='g4world';
   else if(SW.res.petal>=25){SW.res.petal-=25;SW.tonics++;swSay('Bought a Tonic. Tonics: '+SW.tonics,1.4);swSave()}else{swSnd(140,.08);swSay('Needs 25 petals. The bench can make them from berries.',2)}}}
 function drawCot(){swShell('COTTAGE','✿ '+SW.res.petal);
- swRows([{a:'REST',b:'full heal'},{a:'BUY TONIC',b:'25 petals'},{a:'LEAVE',b:''}],swSel,'Tonics x'+SW.tonics+'. Rest is always free. The Tinker Bench makes tonics from berries.')}
+ swRows([{a:'SLEEP',b:(W4.dayT||0)>150?'until morning':'a quick nap'},{a:'BUY TONIC',b:'25 petals'},{a:'LEAVE',b:''}],swSel,'Home buddies living here: '+Math.max(0,SW.party.length-1+SW.box.length)+'. Sleeping skips the night, when nobody works. Tonics x'+SW.tonics+'.')}
 /* the nook (was "nursery"): dim buddies follow berries and light in; nothing is grown from a sprout */
 {const nd=wBuildDef('nursery');nd.n='LANTERN NOOK';nd.d='Leave berries in the light and a dim buddy of the kind you choose follows them in. Tenders bring it sooner.'}
 function drawNur(){const b=SW.buildings[W4.nurB];if(!b)return;swShell('LANTERN NOOK','BERRY '+SW.res.berry+' · INGOT '+SW.res.ingot);

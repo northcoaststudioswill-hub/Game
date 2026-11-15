@@ -38,7 +38,7 @@ function uiMon(sp,x,y,w2,flip){const spr=wSp(sp)._spr,h2=Math.round(w2*spr.oh/sp
 function uiWill(x,y,sc,ax,ay){const sx=P3.x,sy=P3.y,sax=P3.ax,say=P3.ay,san=P3.anim;P3.ax=ax||0;P3.ay=ay==null?1:ay;P3.anim=0;drawPlayerSpr(x,y,sc);P3.x=sx;P3.y=sy;P3.ax=sax;P3.ay=say;P3.anim=san}
 
 /* ---------------- the one HUD ---------------- */
-function wHud(){if(W4.scene){scDraw();return}const sec=wSector(W4.sector),F=W4.fld||W4.bf,atBase=!W4.fld;
+function wHud(){if(W4.scene){scDraw();return}if(W4.sleepFx>0){W4.sleepFx-=1/60;g.globalAlpha=Math.min(1,W4.sleepFx*1.2);r('#0a0e08',0,0,W,H);g.globalAlpha=1;ctext('z z z',H/2-4,1,'#ffd94d')}const sec=wSector(W4.sector),F=W4.fld||W4.bf,atBase=!W4.fld;
  r('rgba(10,14,8,.8)',0,0,W,15);r(UI.gold,0,15,W,1);
  {const rs='♣'+SW.res.wood+' ◆'+SW.res.stone+' ✿'+SW.res.petal+(atBase?' ♥'+SW.hearts:'');text(rs,W-5-tw(rs,1),4,1,'#d8e8c8',null);text(wFit(sec.n,W-16-tw(rs,1)),5,4,1,'#ffd94d',null)}
  if(SW.stam<99){r('#00000088',0,16,W,2);r(SW.stam>40?UI.leaf:SW.stam>18?'#ffd94d':'#e04838',0,16,Math.round(W*SW.stam/100),2)}
