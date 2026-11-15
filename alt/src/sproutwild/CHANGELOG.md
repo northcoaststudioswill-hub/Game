@@ -21,6 +21,19 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v6.9 · 2026-11-15 · opening pass for first-time players
+
+Will's note: keep playing the beginning; onboarding for new players and quality.
+
+Replayed from the title screen as someone who has never seen the game and fixed what would trip them:
+
+- **Which one is me?** A "YOU" tag sits over your keeper until you pluck the first seed.
+- **How do I move?** Marcus's first line now says to use the D-pad to walk, then press A.
+- **Where do I look?** The guide arrow is twice the size with a dark outline, and the seed or berry it marks has a pulsing ring. If the target is off screen, the arrow sits on the screen edge and points the way (used for the south road after your first buddy).
+- **Berries were at the far left edge** with Marcus cut off by the screen. Berries now sit just below the path in the middle; Marcus and Erin stand fully in view at the sides.
+- **Goal line was cut off** ("South road: throw sprouts at a wild ..."). It now reads "Take the south road to the Meadow" at base and "A: throw sprouts at a wild buddy" in the Meadow.
+- Verified: 84 lab checks; real-time replay from title to the Meadow on a phone-shaped screen.
+
 ## v6.8 · 2026-11-15 · the cottage is the buddies' home
 
 Will's note: the cottage does not provide anything useful the way the game works.

@@ -53,14 +53,24 @@ function scSend(){SW.lessons.scSend=1;const far=(o)=>Math.hypot(o.x-P3.x,o.y-P3.
 function scSpread(){for(const c of W4.cast||[]){const dx=c.x-P3.x,dy=c.y-P3.y,d=Math.hypot(dx,dy);if(d<24){const ux=d>.5?dx/d:1,uy=d>.5?dy/d:0;c.x+=ux*(24-d)*.5;c.y+=uy*(24-d)*.5}}}
 /* the opening is told in captions, one at a time, with the field left clear */
 function scIntro(){scStart([{hold:.9},{who:'ERIN',txt:"You're up! Look: the roots under the Great Lantern are glowing."},
-  {x:240,y:128,hold:1.1},{x:240,y:128,who:'MARCUS',txt:'Bro. Seeds. Walk up to one and press A. See one, pluck one.'},{hold:.4}])}
-function scBerries(){const it=W4.bf.items.find(i=>i.op)||{x:165,y:192};scStart([{hold:.5},{who:'ERIN',txt:'They follow you! Those are sprouts.'},
+  {x:240,y:128,hold:1.1},{x:240,y:128,who:'MARCUS',txt:'Bro. Seeds. Use the D-pad to walk up to one, then press A. See one, pluck one.'},{hold:.4}])}
+function scBerries(){const it=W4.bf.items.find(i=>i.op)||{x:212,y:208};scStart([{hold:.5},{who:'ERIN',txt:'They follow you! Those are sprouts.'},
   {x:it.x+14,y:it.y,hold:1.1},{x:it.x+14,y:it.y,who:'MARCUS',txt:'Berries, bro. Face them and press A. Your sprouts haul them to the Lantern. I supervise.'},
   {x:it.x+14,y:it.y,who:'ERIN',txt:'Hold B and they all come back to you.'},{hold:.4}])}
-function scArrow(){if(W4.scene||!W4.bf||wOp()>=3)return;const op=wOp();let t=null;
- if(op===0)t=W4.bf.buds[0];else if(op===1)t=W4.bf.items.find(i=>i.op&&!i.car.length&&!i.done);else if(WCHOICE[1].y>0&&WCHOICE[1].y<190)t=WCHOICE[1];
- if(!t)return;const x=Math.round(t.x),y=Math.round(t.y-(op===2?34:20)+Math.sin(time*6)*2),K='#14101e';
- r(K,x-5,y-1,11,4);r(K,x-3,y+3,7,2);r(K,x-1,y+5,3,2);r('#ffd94d',x-4,y,9,2);r('#ffd94d',x-2,y+2,5,2);r('#ffd94d',x,y+4,1,2)}
+/* one bouncing arrow on the thing to do next. If it is off screen, the arrow sits on the screen edge and points the way. */
+function scTri(x,y,d){const K='#14101e',C='#ffd94d';x=Math.round(x);y=Math.round(y);
+ if(d==='d'){r(K,x-7,y-1,15,5);r(K,x-5,y+4,11,4);r(K,x-3,y+8,7,3);r(K,x-1,y+11,3,2);r(C,x-6,y,13,3);r(C,x-4,y+3,9,3);r(C,x-2,y+6,5,3);r(C,x,y+9,1,2)}
+ else if(d==='u'){r(K,x-7,y+7,15,5);r(K,x-5,y+3,11,4);r(K,x-3,y,7,3);r(K,x-1,y-2,3,2);r(C,x-6,y+8,13,3);r(C,x-4,y+5,9,3);r(C,x-2,y+2,5,3);r(C,x,y-1,1,3)}
+ else{const s2=d==='l'?-1:1;for(let n=0;n<4;n++){const h=13-n*4,xx=x+s2*n*3-(s2<0?2:0);r(K,xx-1,y-(h>>1)-1,5,h+2)}for(let n=0;n<4;n++){const h=13-n*4,xx=x+s2*n*3-(s2<0?2:0);r(C,xx,y-(h>>1),3,h)}}}
+function scArrow(){if(W4.scene||!W4.bf||W4.fld)return;const op=wOp(),cam=W4.cam||{x:0,y:0};let t=null,off=22;
+ if(op===0)t=W4.bf.buds[0];else if(op===1)t=W4.bf.items.find(i=>i.op&&!i.car.length&&!i.done);
+ else if(op===2){if(WCHOICE[1].y>0&&WCHOICE[1].y<190){t=WCHOICE[1];off=40}}
+ else if(SW.quest===2)t={x:240,y:(W4.wh||520)-14,gate:1};
+ if(op===0&&wBudTotal()===0){const lw=tw('YOU',1);r('#14101e',P3.x-lw/2-3,P3.y-34,lw+6,10);text('YOU',P3.x-lw/2,P3.y-33,1,'#ffd94d',null)}
+ if(!t)return;const sx=t.x-cam.x,sy=t.y-off-cam.y,cx=Math.max(14,Math.min(W-14,sx)),cy=Math.max(46,Math.min(H-40,sy)),edge=cx!==sx||cy!==sy,b=Math.sin(time*6)*2;
+ if(!edge){if(op<2){const p=1+((time*2)%1)*6,a=1-((time*2)%1);g.globalAlpha=.7*a;r('#fff3b0',t.x-6-p,t.y+3,12+p*2,1);r('#fff3b0',t.x-6-p,t.y-9-p,12+p*2,1);r('#fff3b0',t.x-6-p,t.y-9-p,1,12+p);r('#fff3b0',t.x+5+p,t.y-9-p,1,12+p);g.globalAlpha=1}
+  if(!t.gate)scTri(t.x,t.y-off+b,'d');return}
+ const d=sy>H-40?'d':sx<14?'l':sx>W-14?'r':'u';scTri(cx+cam.x+(d==='l'?-b:d==='r'?b:0),cy+cam.y+(d==='d'?b:d==='u'?-b:0),d)}
 function scBuild(){SW.lessons.scBuild=1;SW.beats.caught=1;const nm=(SW.party[SW.party.length-1]||{}).sp||'It';
  scStart([{hold:.6},{who:'MARCUS',txt:'AYYY! You caught one! Never doubted you once. Dap me up.'},
   {x:150,y:236,hold:1.1},{x:150,y:236,who:'MARCUS',txt:'Buddies need a roof, bro. Press START, pick BUILD, then COTTAGE. Costs 8 wood. This spot is nice.'},

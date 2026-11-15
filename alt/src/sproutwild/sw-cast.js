@@ -14,9 +14,9 @@ WSTORY.length=0;WSTORY.push(
  {sc:1,who:'',t:'Its light fell as seeds, and the seeds grew legs. The buddies of the valley went dim.'},
  {sc:5,who:'KING BIBI',t:'Citizens. For thirty years I have warned you: the light is weeks away. Hence, my IRON DOME.',acc:'#1e2c5a'});
 const WCANCH={ /* where each of them hangs about, by how far along you are */
- ERIN:[[344,206,8],[340,204,10],[118,216,8],[336,300,56]],MARCUS:[[116,208,6],[112,216,6],[356,214,8],[300,214,40]],WILL:[[150,250,30],[150,250,30],[150,250,30],[130,260,50]]};
+ ERIN:[[330,206,6],[330,204,8],[118,216,8],[336,300,56]],MARCUS:[[152,216,5],[152,220,5],[356,214,8],[300,214,40]],WILL:[[150,250,30],[150,250,30],[150,250,30],[130,260,50]]};
 function wCastInit(){W4.cast=['ERIN','MARCUS','WILL'].map(w=>{const a=WCANCH[w][Math.min(3,wOp())];return{who:w,x:a[0],y:a[1],tx:a[0],ty:a[1],t:1+Math.random()*2,dir:[0,1],mv:false}});
- if(wOp()===0&&!(SW.beats&&SW.beats.wake)){W4.cast[0].x=344;W4.cast[0].y=206;W4.cast[1].x=116;W4.cast[1].y=208} /* they walk up as you wake */
+ if(wOp()===0&&!(SW.beats&&SW.beats.wake)){W4.cast[0].x=330;W4.cast[0].y=206;W4.cast[1].x=152;W4.cast[1].y=216} /* they walk up as you wake */
  W4.quips=[];W4.quipQ=[];W4.idleT=9}
 function wNpcList(){if(W4.sector!=='BASE')return[];if(!W4.cast)wCastInit();return W4.cast.filter(c=>c.who!==SW.keeper)}
 function wSpeaker(who){if(who==='LOUIE')return{x:lou.x,y:lou.y+10,h:14};const c=(W4.cast||[]).find(q=>q.who===who);return c?{x:c.x,y:c.y,h:30}:null}

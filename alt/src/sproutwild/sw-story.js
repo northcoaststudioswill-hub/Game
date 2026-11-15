@@ -29,7 +29,7 @@ function wQuestText(){const op=wOp();
  if(op===0)return'Pluck the glowing seeds';
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
- if(SW.quest===2)return'South road: throw sprouts at a wild buddy';
+ if(SW.quest===2)return W4.fld?'A: throw sprouts at a wild buddy':'Take the south road to the Meadow';
  return WQUEST[SW.quest]}
 function wNextGoal(){const op=wOp(),F=W4.bf;
  if(op===0){const p=WSEEDPOS[SW.seeds[0]];return{x:p[0]-14,y:p[1]+4,label:'Woof! It glows. Pluck it!'}}
@@ -76,7 +76,7 @@ function wBaseArrive(from){const F=W4.bf;P3.x=240;P3.ax=0;P3.ay=-1;P3.y=from==='
  lou.x=P3.x-24;lou.y=P3.y+8;W4.part={x:P3.x+16,y:P3.y+6};for(const s of F.sq){s.x=P3.x+(Math.random()*24-12);s.y=P3.y+10+Math.random()*10}
  if(SW.quest<2&&!SW.lit){if(!SW.seeds)SW.seeds=[0,2,4];
   F.buds=SW.seeds.map(ty=>({type:ty,x:WSEEDPOS[ty][0],y:WSEEDPOS[ty][1],glow:1}));
-  for(let i=(SW.fedN||0);i<3;i++)F.items.push({k:'pel',res:'berry',n:1,w:1,x:150+i*15,y:190+(i%2)*7,car:[],op:1})}
+  for(let i=(SW.fedN||0);i<3;i++)F.items.push({k:'pel',res:'berry',n:1,w:1,x:196+i*16,y:208+(i%2)*6,car:[],op:1})}
  if(SW.quest<2){W4.banner=null;SW.visited.BASE=1}
  wCastInit();W4.talk=null;
  W4.baseArrive=from?{x:P3.x,y:P3.y}:null;
@@ -161,7 +161,7 @@ function wQuestText(){const op=wOp();
  if(op===0)return'Pluck the glowing seeds';
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
- if(SW.quest===2)return'South road: throw sprouts at a wild buddy';
+ if(SW.quest===2)return W4.fld?'A: throw sprouts at a wild buddy':'Take the south road to the Meadow';
  if(SW.quest<5)return WQUEST[SW.quest];
  const ms=WBASEMS[SW.baseLv];if(!ms)return SW.badges.length<4?'Earn the Sigils. Free the roads.':'';
  const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?'Sunkeep Lv'+SW.baseLv+': '+nx[1]:'Ask the Great Lantern to grow'}
