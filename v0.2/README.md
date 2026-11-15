@@ -1,5 +1,9 @@
 # Pocket Lantern v0.2 (pre-alpha)
 
+**What's new:** `CHANGELOG.md`.
+
+![v0.2.1](playtest/UPDATE_GALLERY_v0.2.1.png)
+
 v0.1 plus **Rootdeep** in cartridge slot 3, overhauled. v0.1 is untouched and is still the rollback.
 
 | Folder | What it is |
@@ -9,7 +13,10 @@ v0.1 plus **Rootdeep** in cartridge slot 3, overhauled. v0.1 is untouched and is
 | `backups/` | Frozen snapshot of this version. Never edit; add new dated copies instead. |
 | `share/` | What you send to other people: the game and its how-to. The zip is ready to send. |
 | `handoffs/` | Notes for the next session: the v0.2 handoff, the Rootdeep design doc, the art manifesto. |
-| `playtest/` | The v0.2 playtest report, the development snapshot, and screenshots from the playtest. |
+| `playtest/` | The playtest report, the development snapshot, `TEST_REPORT.md`, the update galleries, and screenshots. |
+| `playtest/dev-photos/` | Screenshots from every development pass, one folder per pass (see its README). |
+| `tests/` | The 11 test scripts. Run from the repo root: `node v0.2/tests/<name>.js`. Screenshots go to `tests/out/` (not saved in git). |
+| `CHANGELOG.md` | What changed in v0.2 and v0.2.1, pass by pass, with commits and pictures. |
 
 v0.2 backup SHA-256: `9c44454c3cc5a3c2e7096d2a418b1138dd537960ef013307813dc569b32fe1ab`
 Playable test page (claude.ai artifact): https://claude.ai/artifact/TtWoCTcCU9ZZfkrWkyUZtQ
