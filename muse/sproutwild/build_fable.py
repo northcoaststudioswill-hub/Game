@@ -12,4 +12,11 @@ code = code.replace('w = pathlib.Path.home()/"workspace/sproutwild"', 'w = HERE'
 code = code.replace('out = w/"out/Sprouts+Rootdeep+Sproutwild.html"', 'out = OUT')
 assert 'workspace' not in code, 'build.py changed: a path was not redirected'
 OUT = here.parent / 'games/Sprouts+Rootdeep+Sproutwild-v5.html'
-exec(compile(code, 'build.py', 'exec'), {'SRC': src, 'HERE': here, 'OUT': OUT})
+# the field engine lives in its own file and is spliced in ahead of the dispatch block
+MARK = '/* ================================================================\n   DISPATCH + TEST HOOKS'
+mod = (here / 'sw-module.js').read_text()
+assert mod.count(MARK) == 1
+mod = mod.replace(MARK, (here / 'sw-field.js').read_text().rstrip() + '\n' + MARK)
+code = code.replace('module = (w/"sw-module.js").read_text().rstrip()', 'module = MODULE.rstrip()')
+assert 'MODULE' in code
+exec(compile(code, 'build.py', 'exec'), {'SRC': src, 'HERE': here, 'OUT': OUT, 'MODULE': mod})

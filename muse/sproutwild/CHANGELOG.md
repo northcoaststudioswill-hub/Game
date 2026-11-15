@@ -21,6 +21,35 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v5.1 — the field engine (Fable)
+
+Everything outside Sunkeep Base was rebuilt. The old sectors were one flat 480x360 screen with randomly scattered props; they are now hand-drawn scrolling tile maps with their own engine (`sw-field.js`, spliced in by `build_fable.py`).
+
+**Sprouts work like the latest Sprouts**
+- Your pouch sprouts walk with you as a squad (up to 24 on the field). The pouch and the squad are the same thing.
+- B throws one at the ring in front of you; the ring locks on to the nearest thing a sprout can work. Hold B to whistle them back. SELECT picks which kind goes next.
+- Thrown sprouts break trees, rocks and bushes into pellets, then carry the pellets home to the Lantern beacon. Carrying uses weight against strength, and PEB counts double.
+- Idle sprouts pick up nearby loot by themselves and rejoin you when you walk past.
+
+**Level design**
+- Six maps: Verdant Meadow, Lantern Town, Ember Wastes, Dewmist Shore, Gloom Hollow, Zephyr Peak. Each has its own tiles, trees and weather.
+- Treasures with names and weights (13 in all), some on islands that need a bridge built, some behind type gates: boulders need PEB, fire needs EMBER, vines need LEAF, spark gates need ZIP, thirsty blooms need DEW.
+- Buried wild sprouts to pluck, placed so the kind you need for a gate is nearby.
+- Wild buddies are visible and live in the tall grass. A sleeping ALPHA guards the best treasure in the Meadow and the Gloom.
+- Ledges hop one way. Sectors join edge to edge (Meadow - Town - Wastes/Shore - Peak/Gloom); the Lantern Gate map is still fast travel. Roads still need Sigils.
+
+**Trainers and the villain**
+- Trainers watch the road and challenge you on sight: KISS, DEREK (with the broken-down Flow Pros truck), MAMA (with the Yukon), and DOME GUARDS.
+- KING BIBI is the villain. His IRON DOME blocks the road to the Peak; he waits outside his fortress in Gloom Hollow with a three-buddy team. Beating him drops the dome.
+
+**Not done yet**
+- Sunkeep Base still runs on the old walker and old art. The squad does not follow you there yet.
+- Battles, menus and the title screen are unchanged apart from the v5.0 buddy sprites.
+
+**Tests**
+- New: `tests-fable/field-lab.js` (31 checks, headless Chromium) and `tests-fable/render-field.js` (screenshots).
+- Of the 23 older suites, 13 still pass. The 10 that fail (sw2, 4, 6, 8, 10, 13, 14, 18, 19, 23) check the old sector layout: fixed gym and NPC coordinates, the old grass rectangles, the follower train and the SPROUT/BUDDY command toggle, all of which this version replaces.
+
 ## v5.0 — "New buddies" (2026-11-15, Fable)
 
 Will, handing Sproutwild to Fable: total overhaul, everything is a

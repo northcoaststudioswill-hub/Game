@@ -457,6 +457,7 @@ function wEnterSector(id){W4.sector=id;SW.sector=id;const sec=wSector(id);W4.ww=
  P3.x=id==='BASE'?WW/2-20:WW/2-30;P3.y=id==='BASE'?292:W4.wh-30;P3.ax=0;P3.ay=-1;W4.grassT=0;W4.grace=1.2;
  W4.part={x:P3.x-14,y:P3.y+6};W4.cam=null;wCamUpdate(P3.x,P3.y);
  if(id==='BASE'){lou.x=WW/2-56;lou.y=290}
+ W4.fld=FMAPS[id]?fBuild(id,W4.from):null;W4.from=null;if(W4.fld)wCamUpdate(P3.x,P3.y);
  if(!SW.visited[sec.id]){SW.visited[sec.id]=1;W4.banner={txt:sec.n,sub:WSECSUB[sec.id]||'',t:3}}
  else swSay(sec.n,2.2);swSave()}
 /* ---------- base production: workers turn time into resources ---------- */
@@ -548,7 +549,7 @@ function wGather(nd){nd.got=true;
   W4.floats.push({x:nd.x,y:nd.y-12,txt:'+1 '+TYPES[bt2].n+' SPROUT',t:1.6,c:'#7ee787'})}
  swSave()}
 let lou={x:60,y:120};
-function worldUpdate(dt){const sec=wSector(W4.sector);
+function worldUpdate(dt){if(W4.fld){fUpdate(dt);return}const sec=wSector(W4.sector);
  SW.playT+=dt;W4.prodT+=dt;if(W4.prodT>=25){W4.prodT=0;wProdTick()}
  if(W4.grace>0)W4.grace-=dt;
  W4.swingCd=Math.max(0,(W4.swingCd||0)-dt);W4.stamT=(W4.stamT||0)+dt;
@@ -771,7 +772,7 @@ function wBakeGround(){const sec=wSector(W4.sector),pal=sec.pal,wh=W4.wh||360;
   for(let px2=176;px2<304;px2+=16)for(let py2=10;py2<86;py2+=12)R((px2+py2)%32?'#9a8f7a':'#8a7f6a',px2,py2,15,11);
   R('#6e6350',174,7,132,3);R('#6e6350',174,85,132,3)}
  W4.groundCv=cv;W4.groundFor=sec.id+'x'+wh}
-function wDrawWorld(){const sec=wSector(W4.sector),pal=sec.pal;
+function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal=sec.pal;
  const cam=W4.cam||{x:0,y:0};
  r('#0c120a',0,0,W,H);
  g.save();g.translate(-cam.x,-cam.y);
@@ -1246,7 +1247,7 @@ function wResolveTurn(myMove){const me=btCur(),foe=BT.foe;
 function wFoeDown(){const me=btCur(),foe=BT.foe;BT.log.push({txt:foe.sp+' fainted!'});
  if(BT.mode==='wild'){const bt2=TYPES[wSp(foe.sp).t[0]].n;SW.buds[bt2]=(SW.buds[bt2]||0)+1;
   BT.log.push({txt:'Its '+bt2+' bud hops over to your crew! (+1 bud)'})}
- const gain=Math.round((5+foe.lv*3)*(BT.mode==='gym'||BT.mode==='raid'?1.5:1));
+ const gain=Math.round((5+foe.lv*3)*(BT.mode==='gym'||BT.mode==='raid'||BT.mode==='trainer'?1.5:1));
  me.xp+=gain;BT.log.push({txt:me.sp+' gained '+gain+' XP!'});
  let need=wXpNext(me.lv);
  while(me.xp>=need&&me.lv<40){me.xp-=need;me.lv++;const ns=wStats(me);me.hp=Math.min(ns.max,me.hp+4);
@@ -1259,14 +1260,17 @@ function wFoeDown(){const me=btCur(),foe=BT.foe;BT.log.push({txt:foe.sp+' fainte
   me.hp=Math.min(newMax,me.hp+newMax-oldMax);me.moves=wMovesAt(wSp(me.sp),me.lv);
   SW.seen[evoTo]=1;SW.caught[evoTo]=1;
   BT.log.push({txt:'What? Your buddy is evolving!'},{txt:'It evolved into '+evoTo+'!'});swSnd(523,.12,1046)}
- if((BT.mode==='gym'||BT.mode==='raid')&&BT.queue.length){const nw=!SW.seen[BT.queue[0].sp];BT.foe=BT.queue.shift();SW.seen[BT.foe.sp]=1;
-  BT.foeStage={atk:0,def:0};BT.log.push({txt:(BT.mode==='raid'?'BOTTIE':WGYMS[BT.gym].leader)+' sent out '+BT.foe.sp+'!'});if(nw)BT.log.push({txt:'NEW! '+BT.foe.sp+' was added to the Field Guide.'});
+ if((BT.mode==='gym'||BT.mode==='raid'||BT.mode==='trainer')&&BT.queue.length){const nw=!SW.seen[BT.queue[0].sp];BT.foe=BT.queue.shift();SW.seen[BT.foe.sp]=1;
+  BT.foeStage={atk:0,def:0};BT.log.push({txt:(BT.mode==='raid'?'BOTTIE':BT.mode==='trainer'?BT.tn.who:WGYMS[BT.gym].leader)+' sent out '+BT.foe.sp+'!'});if(nw)BT.log.push({txt:'NEW! '+BT.foe.sp+' was added to the Field Guide.'});
   BT.after='menu';BT.phase='msg';return}
  if(BT.mode==='gym'){const g=WGYMS[BT.gym];
   if(g.crown){SW.gymDone[BT.gym]=1;if(BT.gym===5)SW.bottieBeat=1;if(!BT.rematch)SW.champion=1}
   else if(!BT.rematch){SW.badges.push(g.sig);SW.gymDone[BT.gym]=1}
   SW.res.petal+=g.prize;
   BT.log.push({txt:g.win},{txt:BT.rematch?'Rematch won! +'+g.prize+' petals.':(g.crown?'The crown of light is yours! +'+g.prize+' petals.':'You earned the '+g.sig+'! +'+g.prize+' petals.')});
+  BT.won=true;BT.after='endwin';BT.phase='msg';return}
+ if(BT.mode==='trainer'){const np=BT.tn;SW.fl[np.fk]=1;SW.res.petal+=np.prize;BT.log.push({txt:np.win},{txt:'You won! +'+np.prize+' petals.'});
+  if(np.boss)BT.log.push({txt:'The IRON DOME flickers out across the valley. The roads are open!'});
   BT.won=true;BT.after='endwin';BT.phase='msg';return}
  if(BT.mode==='raid'){SW.res.petal+=50;BT.log.push({txt:'RAID REPELLED! Bottie clanks off, dropping petals. (+50)'});
   BT.won=true;BT.after='endwin';BT.phase='msg';return}
@@ -1282,14 +1286,15 @@ function wMineDown(){BT.log.push({txt:btCur().sp+' fainted!'});
  if(wAliveParty().length){BT.after='forceswitch';BT.forced=true;BT.phase='msg'}
  else{BT.log.push({txt:'You have no buddies left...'});
   if(BT.mode==='gym')BT.log.push({txt:WGYMS[BT.gym].lose});
+  if(BT.mode==='trainer')BT.log.push({txt:BT.tn.lose});
   if(BT.mode==='raid')BT.log.push({txt:'BOTTIE: bzzt. The feed always collects. (He trashed the place.)'});
   BT.after='blackout';BT.phase='msg'}}
 function wBlackout(){const lost=Math.floor(SW.res.petal*.1);SW.res.petal-=lost;
  for(const m of SW.party)m.hp=wStats(m).max;
  BT=null;wEnterSector('BASE');state='g4world';swSay('You rushed back to Sunkeep Base. (-'+lost+' petals)',3.5);swSave()}
-function wBattleEnd(){const won=BT&&BT.won;BT=null;W4.grassT=0;W4.grace=2.5;
+function wBattleEnd(){const won=BT&&BT.won,cb=BT&&BT.onEnd,bt0=BT;BT=null;W4.grassT=0;W4.grace=2.5;
  if(won&&SW.keeper==='ERIN')for(const m of SW.party)if(m.hp>0)m.hp=Math.min(wStats(m).max,m.hp+Math.ceil(wStats(m).max*.15));
- state='g4world';swSave()}
+ state='g4world';if(cb)cb(!!won,bt0);swSave()}
 function wKeeperMove(){if(BT.keeperUsed){swSnd(140,.08);return}
  BT.keeperUsed=true;const foe=BT.foe;BT.log=[];BT.t=0;BT.phase='msg';BT.shake=2;
  if(SW.keeper==='WILL'){BT.foeStage.atk=Math.max(-3,BT.foeStage.atk-1);BT.dazzle=true;
@@ -2041,7 +2046,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},
