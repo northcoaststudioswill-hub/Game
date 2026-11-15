@@ -21,6 +21,56 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v5.0 — "New buddies" (2026-11-15, Fable)
+
+Will, handing Sproutwild to Fable: total overhaul, everything is a
+placeholder. The buddies need a lot of work; the sprouts should work
+the way they do in the latest Sprouts; the level design needs a major
+rework drawing on Pikmin, Palworld and Pokemon; the fighting game's
+cast can appear and King Bibi is a villain too; it stays its own file
+for now and merges into Pocket Lantern later. This version is the
+first slice of that: **the buddies.** Nothing else changed.
+
+- **All 15 buddies are redrawn** by a new renderer (`swbMake`,
+  `SWBUD` in sw-module.js). Each one is built from shapes at twice the
+  old detail, then finished like a sprite: hard pixels, a lit top
+  edge, a shaded underside, one dark outline. They have big eyes and
+  readable silhouettes, and they all face left.
+  Cindercap is a mushroom imp with a flame on its cap; Magmoss a
+  cracked, glowing boulder under a moss cap; Pebblit a rock-eared pup;
+  Boulderhound a hound with stone plates down its back; Drizzlet a
+  teardrop with antennae; Tidebud a bulb on a lily pad; Zipwig a
+  beetle with a bolt on its shell; Volthare a hare with lightning
+  ears; Fernfang a small fern-crested raptor with fangs; Bloomboar a
+  boar carrying a flower bed; Cloverimp a pink imp under a clover;
+  Auricorn a golden foal; Embercap a volcano-capped mushroom;
+  Tidestag a stag with coral antlers; Fernhowl a fern-maned wolf.
+- Names, types, stats, moves and catch rates are unchanged, and the
+  species IDs are the same, so saves load as before. The old
+  letter-grid art is kept as a fallback (`s._old`).
+- **Your buddy faces the wild one in battle** (yours is flipped to
+  face right).
+- **The game builds from this repo now.** `build_fable.py` runs the
+  original build.py with its paths pointed here and writes
+  `muse/games/Sprouts+Rootdeep+Sproutwild-v5.html`. The v4.7 file is
+  untouched. Before any change, this build reproduced v4.7 byte for
+  byte. `sw-cartart.js` (the cartridge label, which build.py needs)
+  was missing from the repo and was recovered from the built file.
+- Test hook: `SWF.species()`.
+
+**Verification:** all 23 `test-harness-sw*.js` suites green on the v5
+file, 0 console errors. Renders looked at: every buddy next to its old
+sprite (`shots/v5.0-buddy-lineup.png`), a wild battle and the Meadow
+in a real browser (`shots/v5.0-battle-and-meadow.png`; scripts in
+`tests-fable/`). Not run: the soak and Rootdeep's own harness.
+**Phone status: unconfirmed, awaiting Will's verdict.**
+
+**Next, in the order I'd take them:** (1) sprouts that behave like
+the latest Sprouts (read its code first); (2) level design, one
+sector at a time; (3) King Bibi as a villain and cameos from the
+fighting game's cast; (4) the HUD and text overlaps seen in the
+first look (cryptic "W0 S0 P30" line, labels colliding).
+
 ## v4.7 — "Your move" (2026-11-14)
 
 Will: keep playing, play the original Sprouts, look up
