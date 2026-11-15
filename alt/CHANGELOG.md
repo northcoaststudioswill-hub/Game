@@ -165,6 +165,21 @@ Invented this pass unless Will gave it: move names, lines, scenes. Flag anything
   `ko-stage-<n>` work the same way; `ko` replaces the default chiptune everywhere. Opponent first, then you, then the stage.
 - The build warns past 16 MB (the claude.ai page limit). There's about 2 MB of room now: roughly one song.
 
+## Pass 3 rollback (Will: the new heads were ugly and the fighting lost its snap)
+
+Rolled back to pass 2: the 3/4 heads, the rig v2 bodies and builds, the per-fighter stances, the frame-data changes and the
+forward+B moves. Knockout's fighting now matches pass 2 exactly: the same scripted inputs (walk, jab chain, forward+B, jump,
+launcher combo; Will, Erin, Marcus, Bottie) give identical positions, states and damage on all 1,088 frames compared, and the
+rig, move and physics code is the same as pass 2.
+
+Kept from pass 3 (none of it touches how fights play): Mama's YUKON and RUBY TEMPER TANTRUM supers, the VS banter, win quotes and
+barks, the arcade tower, the level select, and the music slot. The VS screen is longer to fit the banter (A skips after half a
+second), and arcade fights now start with the tower (A skips).
+
+What the measurements said about "slower": not the frame rate (2.1 vs 2.3 ms a frame, either way far under the 16 ms budget).
+It was the moves: holding forward and pressing B fired the new forward+B moves (slower to come out than the heavy kick), Marcus and
+Bottie's jabs got slower, and the bodies got bigger.
+
 ## Not changed
 
 - Patch & Plate (`src/patchplate.js` is v0.3's file as built). Its 76 checks pass on the ALT build.
