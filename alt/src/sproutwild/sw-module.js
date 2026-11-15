@@ -355,10 +355,11 @@ const WBUILD=[
  {k:'statue',n:'LANTERN STATUE',cost:{stone:8,ingot:2},d:'Gratitude hearts drop far more often.',max:1,lock:1,price:25}];
 function wBuildDef(k){return WBUILD.find(b=>b.k===k)}
 function wWorkerCap(){return 2+(SW.baseLv-1)*2+SW.buildings.filter(b=>b.k==='pen').length*2}
-const WBASEMS={1:[['build:cottage','Build a Cottage'],['build:bed','Build a Garden Bed'],['workers:1','Deploy 1 sprout worker'],['species:3','Catch 3 species']],
+const WBASEMS={1:[['build:cottage','Build a Cottage'],['crop:1','Grow a crop on a garden plot'],['workers:1','Deploy 1 sprout worker'],['species:3','Catch 3 species']],
  2:[['build:kiln','Build a Kiln'],['build:bench','Build a Tinker Bench'],['workers:3','Deploy 3 sprout workers'],['sigils:1','Earn 1 Sigil'],['hearts:10','Collect 10 gratitude hearts']]};
 function wMissionDone(key){const [k,v]=key.split(':');
  if(k==='build')return SW.buildings.some(b=>b.k===v);
+ if(k==='crop')return plCrops()>=+v||SW.buildings.some(b=>b.k==='bed');
  if(k==='workers')return wAssignedCount()>=+v;
  if(k==='species')return Object.keys(SW.caught).length>=+v;
  if(k==='sigils')return SW.badges.length>=+v;
@@ -383,7 +384,7 @@ function wCrewAt(bi){return SW.crew.filter(c=>c.job===bi)}
 function wCrewSetJob(c,job){c.job=job;const ci=SW.crew.indexOf(c);
  if(c.atPatch&&job!==-1){c.atPatch=false;if(W4.patchBuds)for(const pb of W4.patchBuds)
   if(pb.crew&&pb.crewIx===ci){pb.crew=false;pb.type=-1;pb.age=-8;pb.dlv=0;pb.mode='soil';pb.item=false;pb.pend=null;pb.seedTy=null;pb.by=null;pb.x=pb.sx;pb.y=pb.sy}}
- else if(!c.atPatch&&job===-1&&W4.patchBuds){const spot=W4.patchBuds.find(pb=>pb.type<0);
+ else if(!c.atPatch&&job===-1&&W4.patchBuds){const spot=W4.patchBuds.find(pb=>pb.type<0&&!pb.crop);
   if(spot){c.atPatch=true;spot.type=c.type;spot.age=31;spot.stage=2;spot.dlv=3;spot.crew=true;spot.crewIx=ci;spot.mode='soil';spot.x=spot.sx;spot.y=spot.sy}}
  swSave()}
 function wAssignedCount(){return SW.crew.filter(c=>c.job!==-1).length}
@@ -409,7 +410,7 @@ function wCamUpdate(tx,ty){W4.cam=W4.cam||{x:0,y:0};if(!W4.fld&&ty<240)ty-=Math.
 function wGrassPatches(){return[{x:36,y:70,w:76,h:44},{x:368,y:64,w:78,h:46},{x:60,y:200,w:84,h:48},{x:330,y:210,w:88,h:50},{x:196,y:140,w:80,h:44},{x:392,y:140,w:64,h:40},{x:150,y:262,w:90,h:46}]}
 function wInitPatch(){if(W4.patchBuds&&W4.patchBuds.length)return; /* the patch is alive — never reseed it */
  W4.patchBuds=WPLOTS.slice(0,wPlotCount()).map(([x,y])=>({sx:x,sy:y,x,y,type:-1,age:-4,stage:0,mode:'soil',item:false,tx:0,ty:0,dlv:0,seedTy:null,by:null,forPlot:null,bush:null,itemTy:0,t:0}));
- for(let ci=0;ci<SW.crew.length;ci++){const c=SW.crew[ci];if(c.job===-1&&c.atPatch!==false){const spot=W4.patchBuds.find(pb=>pb.type<0);
+ for(let ci=0;ci<SW.crew.length;ci++){const c=SW.crew[ci];if(c.job===-1&&c.atPatch!==false){const spot=W4.patchBuds.find(pb=>pb.type<0&&!pb.crop);
    if(spot){c.atPatch=true;spot.type=c.type;spot.age=31;spot.stage=2;spot.dlv=3;spot.crew=true;spot.crewIx=ci;spot.mode='soil'}else c.atPatch=false}}
  if(!SW.trioSeeded){SW.trioSeeded=1;[0,2,4].filter(ty=>!(SW.trioPlucked||[]).includes(ty)).forEach((ty,i)=>{const pb=W4.patchBuds[i];if(pb){pb.type=ty;pb.age=31;pb.stage=2;pb.dlv=1}});swSave()}}
 function wEnterSector(id){W4.sector=id;SW.sector=id;const sec=wSector(id);W4.ww=WW;W4.wh=id==='BASE'?520:360;
@@ -500,8 +501,7 @@ function wSproutInfo(px,py){ /* the catch-all: any sprout can be asked what it i
  {const wd=(W4.wilds||[]).find(w2=>Math.hypot(px-w2.x,py-w2.y)<17);
   if(wd)return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv,x:wd.x,y:wd.y}}
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)if(pb.type<0&&Math.hypot(px-pb.x,py-pb.y)<15)
-  return pb.seedTy!=null?{k:'sproutinfo',txt:'ASK',x:pb.x,y:pb.y,msg:TYPES[pb.seedTy].n+' SEED · planted from fruit'}
-   :{k:'sproutinfo',txt:'ASK',x:pb.x,y:pb.y,msg:'EMPTY PLOT · fruit seeds go here'};
+  return{k:'plot',pb,txt:pb.crop?(pb.ripe?'HARVEST '+WCROPS[pb.crop].n:WCROPS[pb.crop].n+' · growing · A changes it'):pb.seedTy!=null?TYPES[pb.seedTy].n+' SEED · A changes this plot':'EMPTY PLOT · choose what grows'};
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)if(pb.type>=0&&pb.stage<2&&Math.hypot(px-pb.x,py-pb.y)<15)
   return{k:'sproutinfo',txt:'ASK',x:pb.x,y:pb.y,msg:TYPES[pb.type].n+' SPROUT · still growing — grown sprouts work'};
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)if(pb.type>=0&&pb.stage>=2&&Math.hypot(px-pb.x,py-pb.y)<15)
@@ -640,6 +640,7 @@ function worldUpdate(dt){if(W4.scene){scTick(dt);return}scAuto();if(W4.fld){fUpd
   else if(n.k==='choice'){W4.choiceSp=n.sp;state='g4choice'}
   else if(n.k==='wild'){const wd=n.wd;W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=18;
    wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv))}
+ else if(n.k==='plot'){if(n.pb.crop&&n.pb.ripe)plHarvest(n.pb);else{W4.plotPb=n.pb;swSel=n.pb.crop==='berry'?1:n.pb.crop==='fiber'?2:0;state='g4plot'}}
  else if(n.k==='sproutinfo'){W4.floats.push({x:n.x,y:n.y-16,txt:n.msg,t:2.2,c:'#cfe0b8'});swSnd(660,.05,880)}
   else if(n.k==='wildpluck'){const lb=n.lb;W4.loose.splice(W4.loose.indexOf(lb),1);
    if(SW.followers.length<4){SW.followers.push(lb.type);wFolSync();
@@ -812,7 +813,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
    if(!it2.taken){r('#c93a2e',it2.x-2,it2.y-2,5,5);r('#7ec850',it2.x,it2.y-4,2,2)}
    else if(it2.regrow>0&&it2.regrow<5)r('#7ec850',it2.x-1,it2.y-1,2,2)}
   if(W4.patchBuds)for(const pb of W4.patchBuds){
-   if(pb.type<0){r('#5a3d24',pb.sx-5,pb.sy,11,4);r('#8a6a42',pb.sx-3,pb.sy-1,7,2);r('#3d2c1a',pb.sx-1,pb.sy-2,2,2);if(pb.seedTy!=null)r(TYPES[pb.seedTy].d,pb.sx-1,pb.sy-4,3,3);continue}
+   if(pb.type<0){r('#5a3d24',pb.sx-5,pb.sy,11,4);r('#8a6a42',pb.sx-3,pb.sy-1,7,2);r('#3d2c1a',pb.sx-1,pb.sy-2,2,2);if(pb.crop)plDraw(pb);else if(pb.seedTy!=null)r(TYPES[pb.seedTy].d,pb.sx-1,pb.sy-4,3,3);continue}
    if(pb.y<=P3.y)wDrawPatchBud(pb)}} /* front-layer buds draw after the player, below */
   r('#a87948',30,W4.wh-58,138,3);r('#a87948',312,W4.wh-58,138,3);
   for(let fx2=30;fx2<=168;fx2+=23)r('#8a6a48',fx2,W4.wh-62,3,11);
@@ -1109,11 +1110,11 @@ function drawLou(){swShell('LOUIE','BASE GUIDE · GOOD BOY');
  swRows([{a:'SHOW ME THE WAY',b:'he leads, you follow'},{a:'ANY TIPS, LOUIE?',b:'wisdom, barked'},
   {a:'PET LOUIE',b:'+1 gratitude (sometimes)'},{a:'ANY ASKS?',b:'the valley needs things'},{a:'BYE',b:''}],swSel,W4.louTip||'He knows every corner of Sunkeep. Ask him anything.')}
 function wFit(s,n){if(tw(s,1)<=n)return s;let o=s;while(o.length&&tw(o+'…',1)>n)o=o.slice(0,-1);return o+'…'}
-const WQUEST=['Talk to Louie','Choose your first buddy','Catch a wild buddy','Build a COTTAGE — START, BUILD','Build a GARDEN BED'];
+const WQUEST=['Talk to Louie','Choose your first buddy','Catch a wild buddy','Build a COTTAGE — START, BUILD','Garden: press A on a plot, grow BERRIES'];
 function wQuestTick(){
  if(SW.quest===3&&SW.buildings.some(b=>b.k==='cottage'&&!b.con)){SW.quest=4;
-  swSay('A roof over Sunkeep! Now a GARDEN BED for berries.',3.4);swSnd(784,.09,1175);swSave()}
- else if(SW.quest===4&&SW.buildings.some(b=>b.k==='bed'&&!b.con)){SW.quest=5;
+  swSay('A roof over Sunkeep! Now grow BERRIES on a garden plot.',3.4);swSnd(784,.09,1175);swSave()}
+ else if(SW.quest===4&&(plCrops()>0||SW.buildings.some(b=>b.k==='bed'))){SW.quest=5;
   swSay('Sunkeep stands! The valley is yours, keeper — the gyms await.',3.8);swSnd(784,.09,1175);swSave()}}
 let BT=null;
 function wAliveParty(){return SW.party.filter(m=>m.hp>0)}
@@ -1508,7 +1509,7 @@ function wFolUpdate(dt){if(!W4.fol||!W4.fol.length)return;
     if(!b){f.mode='b_rest';f.t=1}
     else if(wMoveTo(f,b.x,b.y,46,dt,7)){
      if(b.fruit>0){b.fruit--;f.item=['',0,'','#c93a2e'];f.itemTy=b.type;f.bush=null;
-      const plot=(W4.patchBuds||[]).find(q=>q.type<0&&q.seedTy==null&&!q.by);
+      const plot=(W4.patchBuds||[]).find(q=>q.type<0&&q.seedTy==null&&!q.by&&!q.crop);
       if(plot){plot.by=f;f.forPlot=plot;f.mode='b_plant'}else f.mode='b_carry'}
      else{f.bush=null;f.mode='b_rest';f.t=1}}}
    else if(f.mode==='b_plant'){f.mv=true;const pl=f.forPlot;
@@ -1536,7 +1537,7 @@ function wPatchUpdate(dt){let workers=0;
   const spd=pb.type===3?54:36;
   if(pb.mode==='soil'){pb.t=(pb.t||0)-dt;
    if(workers<2&&pb.t<=0){pb.t=.5;const bush=wPickBush();
-    if(bush){const plot=W4.patchBuds.find(q=>q.type<0&&q.seedTy==null&&!q.by);
+    if(bush){const plot=W4.patchBuds.find(q=>q.type<0&&q.seedTy==null&&!q.by&&!q.crop);
      if(plot){plot.by=pb;pb.forPlot=plot}else pb.forPlot=null;
      pb.bush=bush;pb.mode='fetch';workers++}}}
   else if(pb.mode==='fetch'){const b=pb.bush;
@@ -1939,6 +1940,7 @@ function g4Update(dt){switch(state){
  case 'g4dex':dexUpdate();return;
  case 'g4build':buildUpdate();return;
  case 'g4place':placeUpdate();return;
+ case 'g4plot':plotUpdate();return;
  case 'g4cot':cotUpdate();return;
  case 'g4nur':nurUpdate();return;
  case 'g4tools':toolsUpdate();return;
@@ -1969,6 +1971,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4box':drawBox();return;
  case 'g4dex':drawDex();return;
  case 'g4build':drawBuild();return;
+ case 'g4plot':drawPlot();return;
  case 'g4cot':drawCot();return;
  case 'g4nur':drawNur();return;
  case 'g4tools':drawTools();return;
@@ -1983,7 +1986,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={noScenes:v=>{SCOFF=v},noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},

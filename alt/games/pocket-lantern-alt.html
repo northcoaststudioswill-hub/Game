@@ -6403,10 +6403,11 @@ const WBUILD=[
  {k:'statue',n:'LANTERN STATUE',cost:{stone:8,ingot:2},d:'Gratitude hearts drop far more often.',max:1,lock:1,price:25}];
 function wBuildDef(k){return WBUILD.find(b=>b.k===k)}
 function wWorkerCap(){return 2+(SW.baseLv-1)*2+SW.buildings.filter(b=>b.k==='pen').length*2}
-const WBASEMS={1:[['build:cottage','Build a Cottage'],['build:bed','Build a Garden Bed'],['workers:1','Deploy 1 sprout worker'],['species:3','Catch 3 species']],
+const WBASEMS={1:[['build:cottage','Build a Cottage'],['crop:1','Grow a crop on a garden plot'],['workers:1','Deploy 1 sprout worker'],['species:3','Catch 3 species']],
  2:[['build:kiln','Build a Kiln'],['build:bench','Build a Tinker Bench'],['workers:3','Deploy 3 sprout workers'],['sigils:1','Earn 1 Sigil'],['hearts:10','Collect 10 gratitude hearts']]};
 function wMissionDone(key){const [k,v]=key.split(':');
  if(k==='build')return SW.buildings.some(b=>b.k===v);
+ if(k==='crop')return plCrops()>=+v||SW.buildings.some(b=>b.k==='bed');
  if(k==='workers')return wAssignedCount()>=+v;
  if(k==='species')return Object.keys(SW.caught).length>=+v;
  if(k==='sigils')return SW.badges.length>=+v;
@@ -6431,7 +6432,7 @@ function wCrewAt(bi){return SW.crew.filter(c=>c.job===bi)}
 function wCrewSetJob(c,job){c.job=job;const ci=SW.crew.indexOf(c);
  if(c.atPatch&&job!==-1){c.atPatch=false;if(W4.patchBuds)for(const pb of W4.patchBuds)
   if(pb.crew&&pb.crewIx===ci){pb.crew=false;pb.type=-1;pb.age=-8;pb.dlv=0;pb.mode='soil';pb.item=false;pb.pend=null;pb.seedTy=null;pb.by=null;pb.x=pb.sx;pb.y=pb.sy}}
- else if(!c.atPatch&&job===-1&&W4.patchBuds){const spot=W4.patchBuds.find(pb=>pb.type<0);
+ else if(!c.atPatch&&job===-1&&W4.patchBuds){const spot=W4.patchBuds.find(pb=>pb.type<0&&!pb.crop);
   if(spot){c.atPatch=true;spot.type=c.type;spot.age=31;spot.stage=2;spot.dlv=3;spot.crew=true;spot.crewIx=ci;spot.mode='soil';spot.x=spot.sx;spot.y=spot.sy}}
  swSave()}
 function wAssignedCount(){return SW.crew.filter(c=>c.job!==-1).length}
@@ -6457,7 +6458,7 @@ function wCamUpdate(tx,ty){W4.cam=W4.cam||{x:0,y:0};if(!W4.fld&&ty<240)ty-=Math.
 function wGrassPatches(){return[{x:36,y:70,w:76,h:44},{x:368,y:64,w:78,h:46},{x:60,y:200,w:84,h:48},{x:330,y:210,w:88,h:50},{x:196,y:140,w:80,h:44},{x:392,y:140,w:64,h:40},{x:150,y:262,w:90,h:46}]}
 function wInitPatch(){if(W4.patchBuds&&W4.patchBuds.length)return; /* the patch is alive — never reseed it */
  W4.patchBuds=WPLOTS.slice(0,wPlotCount()).map(([x,y])=>({sx:x,sy:y,x,y,type:-1,age:-4,stage:0,mode:'soil',item:false,tx:0,ty:0,dlv:0,seedTy:null,by:null,forPlot:null,bush:null,itemTy:0,t:0}));
- for(let ci=0;ci<SW.crew.length;ci++){const c=SW.crew[ci];if(c.job===-1&&c.atPatch!==false){const spot=W4.patchBuds.find(pb=>pb.type<0);
+ for(let ci=0;ci<SW.crew.length;ci++){const c=SW.crew[ci];if(c.job===-1&&c.atPatch!==false){const spot=W4.patchBuds.find(pb=>pb.type<0&&!pb.crop);
    if(spot){c.atPatch=true;spot.type=c.type;spot.age=31;spot.stage=2;spot.dlv=3;spot.crew=true;spot.crewIx=ci;spot.mode='soil'}else c.atPatch=false}}
  if(!SW.trioSeeded){SW.trioSeeded=1;[0,2,4].filter(ty=>!(SW.trioPlucked||[]).includes(ty)).forEach((ty,i)=>{const pb=W4.patchBuds[i];if(pb){pb.type=ty;pb.age=31;pb.stage=2;pb.dlv=1}});swSave()}}
 function wEnterSector(id){W4.sector=id;SW.sector=id;const sec=wSector(id);W4.ww=WW;W4.wh=id==='BASE'?520:360;
@@ -6548,8 +6549,7 @@ function wSproutInfo(px,py){ /* the catch-all: any sprout can be asked what it i
  {const wd=(W4.wilds||[]).find(w2=>Math.hypot(px-w2.x,py-w2.y)<17);
   if(wd)return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv,x:wd.x,y:wd.y}}
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)if(pb.type<0&&Math.hypot(px-pb.x,py-pb.y)<15)
-  return pb.seedTy!=null?{k:'sproutinfo',txt:'ASK',x:pb.x,y:pb.y,msg:TYPES[pb.seedTy].n+' SEED · planted from fruit'}
-   :{k:'sproutinfo',txt:'ASK',x:pb.x,y:pb.y,msg:'EMPTY PLOT · fruit seeds go here'};
+  return{k:'plot',pb,txt:pb.crop?(pb.ripe?'HARVEST '+WCROPS[pb.crop].n:WCROPS[pb.crop].n+' · growing · A changes it'):pb.seedTy!=null?TYPES[pb.seedTy].n+' SEED · A changes this plot':'EMPTY PLOT · choose what grows'};
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)if(pb.type>=0&&pb.stage<2&&Math.hypot(px-pb.x,py-pb.y)<15)
   return{k:'sproutinfo',txt:'ASK',x:pb.x,y:pb.y,msg:TYPES[pb.type].n+' SPROUT · still growing — grown sprouts work'};
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)if(pb.type>=0&&pb.stage>=2&&Math.hypot(px-pb.x,py-pb.y)<15)
@@ -6688,6 +6688,7 @@ function worldUpdate(dt){if(W4.scene){scTick(dt);return}scAuto();if(W4.fld){fUpd
   else if(n.k==='choice'){W4.choiceSp=n.sp;state='g4choice'}
   else if(n.k==='wild'){const wd=n.wd;W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=18;
    wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv))}
+ else if(n.k==='plot'){if(n.pb.crop&&n.pb.ripe)plHarvest(n.pb);else{W4.plotPb=n.pb;swSel=n.pb.crop==='berry'?1:n.pb.crop==='fiber'?2:0;state='g4plot'}}
  else if(n.k==='sproutinfo'){W4.floats.push({x:n.x,y:n.y-16,txt:n.msg,t:2.2,c:'#cfe0b8'});swSnd(660,.05,880)}
   else if(n.k==='wildpluck'){const lb=n.lb;W4.loose.splice(W4.loose.indexOf(lb),1);
    if(SW.followers.length<4){SW.followers.push(lb.type);wFolSync();
@@ -6860,7 +6861,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
    if(!it2.taken){r('#c93a2e',it2.x-2,it2.y-2,5,5);r('#7ec850',it2.x,it2.y-4,2,2)}
    else if(it2.regrow>0&&it2.regrow<5)r('#7ec850',it2.x-1,it2.y-1,2,2)}
   if(W4.patchBuds)for(const pb of W4.patchBuds){
-   if(pb.type<0){r('#5a3d24',pb.sx-5,pb.sy,11,4);r('#8a6a42',pb.sx-3,pb.sy-1,7,2);r('#3d2c1a',pb.sx-1,pb.sy-2,2,2);if(pb.seedTy!=null)r(TYPES[pb.seedTy].d,pb.sx-1,pb.sy-4,3,3);continue}
+   if(pb.type<0){r('#5a3d24',pb.sx-5,pb.sy,11,4);r('#8a6a42',pb.sx-3,pb.sy-1,7,2);r('#3d2c1a',pb.sx-1,pb.sy-2,2,2);if(pb.crop)plDraw(pb);else if(pb.seedTy!=null)r(TYPES[pb.seedTy].d,pb.sx-1,pb.sy-4,3,3);continue}
    if(pb.y<=P3.y)wDrawPatchBud(pb)}} /* front-layer buds draw after the player, below */
   r('#a87948',30,W4.wh-58,138,3);r('#a87948',312,W4.wh-58,138,3);
   for(let fx2=30;fx2<=168;fx2+=23)r('#8a6a48',fx2,W4.wh-62,3,11);
@@ -7157,11 +7158,11 @@ function drawLou(){swShell('LOUIE','BASE GUIDE · GOOD BOY');
  swRows([{a:'SHOW ME THE WAY',b:'he leads, you follow'},{a:'ANY TIPS, LOUIE?',b:'wisdom, barked'},
   {a:'PET LOUIE',b:'+1 gratitude (sometimes)'},{a:'ANY ASKS?',b:'the valley needs things'},{a:'BYE',b:''}],swSel,W4.louTip||'He knows every corner of Sunkeep. Ask him anything.')}
 function wFit(s,n){if(tw(s,1)<=n)return s;let o=s;while(o.length&&tw(o+'…',1)>n)o=o.slice(0,-1);return o+'…'}
-const WQUEST=['Talk to Louie','Choose your first buddy','Catch a wild buddy','Build a COTTAGE — START, BUILD','Build a GARDEN BED'];
+const WQUEST=['Talk to Louie','Choose your first buddy','Catch a wild buddy','Build a COTTAGE — START, BUILD','Garden: press A on a plot, grow BERRIES'];
 function wQuestTick(){
  if(SW.quest===3&&SW.buildings.some(b=>b.k==='cottage'&&!b.con)){SW.quest=4;
-  swSay('A roof over Sunkeep! Now a GARDEN BED for berries.',3.4);swSnd(784,.09,1175);swSave()}
- else if(SW.quest===4&&SW.buildings.some(b=>b.k==='bed'&&!b.con)){SW.quest=5;
+  swSay('A roof over Sunkeep! Now grow BERRIES on a garden plot.',3.4);swSnd(784,.09,1175);swSave()}
+ else if(SW.quest===4&&(plCrops()>0||SW.buildings.some(b=>b.k==='bed'))){SW.quest=5;
   swSay('Sunkeep stands! The valley is yours, keeper — the gyms await.',3.8);swSnd(784,.09,1175);swSave()}}
 let BT=null;
 function wAliveParty(){return SW.party.filter(m=>m.hp>0)}
@@ -7556,7 +7557,7 @@ function wFolUpdate(dt){if(!W4.fol||!W4.fol.length)return;
     if(!b){f.mode='b_rest';f.t=1}
     else if(wMoveTo(f,b.x,b.y,46,dt,7)){
      if(b.fruit>0){b.fruit--;f.item=['',0,'','#c93a2e'];f.itemTy=b.type;f.bush=null;
-      const plot=(W4.patchBuds||[]).find(q=>q.type<0&&q.seedTy==null&&!q.by);
+      const plot=(W4.patchBuds||[]).find(q=>q.type<0&&q.seedTy==null&&!q.by&&!q.crop);
       if(plot){plot.by=f;f.forPlot=plot;f.mode='b_plant'}else f.mode='b_carry'}
      else{f.bush=null;f.mode='b_rest';f.t=1}}}
    else if(f.mode==='b_plant'){f.mv=true;const pl=f.forPlot;
@@ -7584,7 +7585,7 @@ function wPatchUpdate(dt){let workers=0;
   const spd=pb.type===3?54:36;
   if(pb.mode==='soil'){pb.t=(pb.t||0)-dt;
    if(workers<2&&pb.t<=0){pb.t=.5;const bush=wPickBush();
-    if(bush){const plot=W4.patchBuds.find(q=>q.type<0&&q.seedTy==null&&!q.by);
+    if(bush){const plot=W4.patchBuds.find(q=>q.type<0&&q.seedTy==null&&!q.by&&!q.crop);
      if(plot){plot.by=pb;pb.forPlot=plot}else pb.forPlot=null;
      pb.bush=bush;pb.mode='fetch';workers++}}}
   else if(pb.mode==='fetch'){const b=pb.bush;
@@ -8444,7 +8445,7 @@ function fBaseBuild(){const w=Math.ceil(WW/FT),h=Math.ceil((W4.wh||520)/FT),F={i
 function fBaseTick(dt){const F=W4.bf;if(!F)return;if(P3.ax||P3.ay)F.dir=[P3.ax,P3.ay];
  F.ft=(F.ft||0)-dt;if(F.ft<=0){F.ft=2;fFlow(F)}
  if(F.got){F.got.t-=dt;if(F.got.t<=0)F.got=null}
- fSync(F);pfTick(F,dt);fSquad(F,dt);fItems(F,dt);wkTick(dt);scConTick(dt);wCastTick(dt);fCommand(F,dt);wBaseEdge()}
+ fSync(F);pfTick(F,dt);fSquad(F,dt);fItems(F,dt);wkTick(dt);scConTick(dt);plTick(dt);wCastTick(dt);fCommand(F,dt);wBaseEdge()}
 function fSqDraw(F,front){for(const o of F.sq){if((o.y>P3.y)!==front)continue;drawBud({x:Math.round(o.x),y:Math.round(o.y)+2,type:o.type,stage:2,z:o.z||0,a:o.a,mv:!!o.mv,st:o.st==='idle'?'idle':'follow',fx:1});
   if(o.st==='work'&&o.mv)r('#ffffff',Math.round(o.x)+4,Math.round(o.y)-9,2,2)}
  if(!front){for(const it of F.items)fItemDraw(it);for(const b of F.buds)fBudDraw(b)}}
@@ -8943,6 +8944,7 @@ function wkPick(w){const sk=wkSkills(w),bench=SW.buildings.find(b=>b.k==='bench'
  if(best)return{k:'bld',b:best};
  for(const b of SW.buildings)if(b.k==='nursery'&&b.crop&&b.crop.stage<3&&(sk.WATERING||sk.PLANTING)&&!wkAt(b).length)return{k:'tend',b};
  const it=(W4.bf.items||[]).find(i2=>!i2.by&&!i2.car.length&&!i2.done);if(it){it.by=w;return{k:'haul',it}}
+ {const rp=(W4.patchBuds||[]).find(q=>q.crop&&q.ripe&&q.type<0&&!q.hBy);if(rp){rp.hBy=w;return{k:'crop',pb:rp}}}
  /* nothing else to do: gather. Home buddies fell base trees and crack base rocks on their own */
  {const nd=(W4.nodes||[]).filter(n=>!n.got&&n.k!=='bush'&&!n.wkBy).sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y))[0];if(nd&&(W4.bf.items||[]).length<6){nd.wkBy=w;return{k:'chop',nd}}}
  return{k:'idle',x:w.hx+(Math.random()*70-35),y:w.hy+(Math.random()*40-10),t:2+Math.random()*3}}
@@ -8971,6 +8973,8 @@ function wkTick(dt){if(!W4.bf)return;wkSync();const bench=SW.buildings.find(b=>b
    if(!tk.got){if(go(it.x,it.y+4,6))tk.got=1}
    else{if(go(240,106,7)){it.by=null;fDeliver(W4.bf,it);w.task=null;w.ref.wxp=(w.ref.wxp||0)+1}else{it.x=w.x;it.y=w.y-3-(w.kind==='b'?8:4)}}
    continue}
+  if(tk.k==='crop'){const pb=tk.pb;if(!pb||!pb.ripe||!pb.crop){if(pb)pb.hBy=null;w.task=null;continue}
+   if(!go(pb.sx+(w.x<pb.sx?-9:9),pb.sy+5,4))continue;w.at=true;w.fx=w.x<pb.sx?1:-1;tk.t=(tk.t||0)+dt;if(tk.t>=1.4){plHarvest(pb);w.task=null;w.ref.wxp=(w.ref.wxp||0)+1}continue}
   if(tk.k==='chop'){const nd=tk.nd;if(!nd||nd.got||wDark()>.7){if(nd)nd.wkBy=null;w.task=null;continue}
    if(!go(nd.x+(w.x<nd.x?-11:11),nd.y+8,4))continue;w.at=true;w.fx=w.x<nd.x?1:-1;nd.shake=.12;
    const lv=nd.k==='tree'?(sk.LUMBERING||.5):(sk.QUARRY||.5);nd.hp-=(.5+lv*.7)*dt;
@@ -9059,7 +9063,7 @@ function drawTools(){swShell('TINKER BENCH','B  DONE');if(!SW.craftQ)SW.craftQ=[
 function baseUpdate(){const n=(W4.wk||[]).length+1;swNav(n);if(pressed('a')||pressed('b'))state='g4world'}
 function drawBase(){swShell('SUNKEEP WORK BOARD','BASE LV '+SW.baseLv);wkSync();
  const ms=WBASEMS[SW.baseLv],done=ms?ms.filter(([k])=>wMissionDone(k)).length:0,rows=[{a:ms?'MISSIONS '+done+'/'+ms.length:'BASE FULLY GROWN',b:'♥ '+SW.hearts+' · AXE '+SW.tools.axe+' PICK '+SW.tools.pick}];
- const job=w=>{const tk=w.task;return!tk?'thinking':tk.k==='sleep'?'asleep':tk.k==='idle'?(tk.noroof?'needs a cottage':'resting'):tk.k==='haul'?'hauling':tk.k==='chop'?(tk.nd.k==='tree'?'chopping':'mining'):tk.k==='craft'?'crafting':tk.k==='tend'?'tending':wBuildDef(tk.b.k).n.toLowerCase()};
+ const job=w=>{const tk=w.task;return!tk?'thinking':tk.k==='sleep'?'asleep':tk.k==='idle'?(tk.noroof?'needs a cottage':'resting'):tk.k==='haul'?'hauling':tk.k==='chop'?(tk.nd.k==='tree'?'chopping':'mining'):tk.k==='crop'?'harvesting':tk.k==='craft'?'crafting':tk.k==='tend'?'tending':wBuildDef(tk.b.k).n.toLowerCase()};
  for(const w of W4.wk)rows.push({a:wkName(w)+(w.kind==='b'?' Lv'+w.ref.lv:''),b:job(w)});
  const sel=Math.min(swSel,rows.length-1),w=W4.wk[sel-1];
  swRows(rows,sel,sel===0?(ms?ms.map(([k,l])=>(wMissionDone(k)?'✓ ':'· ')+l).join('  '):'Everything is built. For now.'):
@@ -9226,7 +9230,7 @@ function wNextGoal(){const op=wOp(),F=W4.bf;
  if(op===2)return{x:206,y:204,label:'Dim, not mean. Say hello.'};
  if(SW.quest===2)return{x:228,y:(W4.wh||520)-40,label:'This way! The south road.'};
  if(!SW.buildings.some(b=>b.k==='cottage'))return{x:150,y:230,label:'Good spot for a cottage. START, BUILD.'};
- if(!SW.buildings.some(b=>b.k==='bed'))return{x:330,y:230,label:'A garden bed could go here.'};
+ if(!plCrops()&&!SW.buildings.some(b=>b.k==='bed'))return{x:226,y:340,label:'Empty plot! Press A on it. Grow berries.'};
  if(wBaseReady())return{x:226,y:104,label:'The Lantern is ready to grow!'};
  return null}
 function wLouieTip(){const tips=[
@@ -9862,6 +9866,7 @@ function scBuild(){SW.lessons.scBuild=1;SW.beats.caught=1;const nm=(SW.party[SW.
   {x:150,y:236,who:'MARCUS',txt:'Short on wood? Send a buddy at trees. Sprouts carry the logs home. Teamwork. I supervise.'},
   {who:'ERIN',txt:'Only your lead buddy walks with you here. The others wait at home. Give them a roof and they get to work.'},{hold:.4}],()=>swSave())}
 function scAuto(){if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
+  if(SW.quest===4&&!SW.lessons.scPlot&&W4.sector==='BASE'&&!(W4.cons&&W4.cons.length)){W4.plotT=(W4.plotT||0)+1;if(W4.plotT>60){scPlots();return}}
   if(SW.quest===3&&!SW.lessons.scBuild&&W4.sector==='BASE'&&SW.lessons.scSend){SW.beats.caught=1;W4.buildT=(W4.buildT||0)+1;if(W4.buildT>40){scBuild();return}}
   if(wOp()===0&&!SW.beats.wake){SW.beats.wake=1;SW.beats.first=1;scIntro();return}
   if(wOp()===1&&!SW.beats.three){SW.beats.three=1;SW.beats.carry=1;SW.beats.first=1;scBerries();return}
@@ -9982,7 +9987,7 @@ function drawChoice(){const sp=W4.choiceSp,s2=wSp(sp),spr=s2._spr,T=TYPES[s2.t[0
  if(t>3.6){r('#14121e',0,H-18,W,18);const a='A  BEFRIEND',b='B  SEE THE OTHERS';text(a,8,H-13,1,'#7ee787',null);text(b,W-8-tw(b,1),H-13,1,'#a89ec2',null)}
  else{const s='A  SKIP';text(s,W-8-tw(s,1),H-13,1,'#5a5870',null)}}
 /* ---------------- the Data Center: where buddies beyond three are kept ---------------- */
-WBUILD.push({k:'datacenter',n:'DATA CENTER',cost:{wood:10,stone:6,ingot:2},max:1,d:'A humming box of Lantern light. Keeps up to 12 more buddies. Without one you can only have three.'});
+WBUILD.push({k:'datacenter',n:'DATA CENTER',cost:{stone:8,ingot:2},max:1,d:'Stores 12 more buddies. Without it you can keep only three.'});
 function wHasDC(){return SW.buildings.some(b=>b.k==='datacenter'&&!b.con)}
 function wBuddyCap(){return wHasDC()?15:3}
 let WNOCAP=false;
@@ -9994,6 +9999,50 @@ function dcDraw(b){const x=wCellX(b.gx),y=wCellY(b.gy),K='#14101e',t=time;
   r(((t*3+i*1.7)|0)%3?'#7ee787':'#1d5a2a',x+4,yy+2,2,1);r(((t*5+i)|0)%4?'#ffd94d':'#6a5a1a',x+8,yy+2,2,1);r(((t*2+i*2.3)|0)%2?'#58a0f0':'#1e3a66',x+12,yy+2,3,1)}
  r(K,x+9,y-12,2,7);r('#c8ccd4',x+9,y-11,1,5);g.globalAlpha=.5+.5*Math.sin(t*4);r('#fff3b0',x+8,y-14,3,3);g.globalAlpha=1;
  const n=SW.box.length;if(n){const s=''+n,lw=tw(s,1);r(K,x+10-lw/2-2,y+20,lw+4,9);text(s,x+10-lw/2,y+21,1,'#7ee787',null)}}
+/* ================================================================
+   GARDEN PLOTS (v7.0)
+   The garden is the base's one field. Each plot grows ONE thing and
+   you choose which: SPROUTS (the default), BERRIES or FIBER REEDS.
+   More crops means fewer sprouts, so the plots are the management
+   decision. Home buddies speed growth (WATERING / PLANTING) and
+   harvest ripe crops; what they pick is carried to the Lantern like
+   everything else. The old GARDEN BED building is retired.
+   ================================================================ */
+const WCROPS={berry:{n:'BERRIES',res:'berry',need:60,yield:2,d:'Fruit for tonics, town requests and the Lantern.'},
+ fiber:{n:'FIBER REEDS',res:'fiber',need:90,yield:1,d:'Reeds for rope and seed pouches.'}};
+const WBUILD_OLD=WBUILD.splice(WBUILD.findIndex(b=>b.k==='bed'),1);
+function wBuildDef(k){return WBUILD.find(b=>b.k===k)||WBUILD_OLD.find(b=>b.k===k)}
+function wPlotCount(){return 6+(wHasRoof()?1:0)+(SW.baseLv>=2?1:0)}
+function plCrops(){return Object.keys(SW.plotCrop||{}).length}
+function plApply(){SW.plotCrop=SW.plotCrop||{};(W4.patchBuds||[]).forEach((pb,i)=>{const c=SW.plotCrop[i];pb.crop=c&&WCROPS[c]&&pb.type<0?c:null;if(pb.crop&&pb.cg==null)pb.cg=0})}
+function plSet(pb,crop){SW.plotCrop=SW.plotCrop||{};const i=W4.patchBuds.indexOf(pb);
+ if(crop){SW.plotCrop[i]=crop;pb.crop=crop;pb.cg=0;pb.ripe=false;pb.seedTy=null;if(pb.by){pb.by.forPlot=null;pb.by=null}}else{delete SW.plotCrop[i];pb.crop=null;pb.ripe=false}swSave()}
+function plRate(){let b=0;if(wHasRoof())for(const w of W4.wk||[])if(w.kind==='b'){const sk=wkSkills(w);b=Math.max(b,sk.WATERING||0,sk.PLANTING||0)}return 1+b*.5}
+function plTick(dt){if(!W4.patchBuds)return;if(W4.plotsFor!==W4.patchBuds){plApply();W4.plotsFor=W4.patchBuds}
+ const rate=plRate();for(const pb of W4.patchBuds){if(pb.crop&&pb.type<0&&pb.seedTy!=null)pb.seedTy=null; /* a crop plot never takes a seed */
+  if(!pb.crop||pb.type>=0||pb.ripe)continue;const C=WCROPS[pb.crop];pb.cg=(pb.cg||0)+dt*rate;
+  if(pb.cg>=C.need){pb.ripe=true;W4.floats.push({x:pb.sx,y:pb.sy-16,txt:C.n+' READY',t:1.4,c:'#ffd94d'});swSnd(880,.05,1175)}}}
+function plHarvest(pb){const C=WCROPS[pb.crop];if(!C||!pb.ripe)return;pb.ripe=false;pb.cg=0;pb.hBy=null;
+ W4.bf.items.push({k:'pel',res:C.res,n:C.yield,w:1,x:pb.sx+(Math.random()*8-4),y:pb.sy+11,car:[]});swSnd(660,.06,990);
+ W4.floats.push({x:pb.sx,y:pb.sy-14,txt:'PICKED',t:1,c:'#a0e888'})}
+function plDraw(pb){const C=WCROPS[pb.crop];if(!C)return;const x=Math.round(pb.sx),y=Math.round(pb.sy),k=pb.ripe?1:Math.min(1,(pb.cg||0)/C.need),K='#14101e';
+ if(pb.crop==='berry'){const h=3+Math.round(k*7),w=5+Math.round(k*7);r(K,x-(w>>1)-1,y-h-1,w+2,h+2);r('#3a7d2e',x-(w>>1),y-h,w,h);r('#58b848',x-(w>>1),y-h,w,2);
+  if(k>.5)r('#e04838',x-3,y-h+3,2,2);if(k>.8)r('#e04838',x+1,y-h+5,2,2);if(pb.ripe){r('#ff6858',x-1,y-h+1,2,2);r('#e04838',x+3,y-h+2,2,2)}}
+ else{const h=4+Math.round(k*10);for(let i=-1;i<=1;i++){const hh=h-(i?2:0);r(K,x+i*3-1,y-hh-1,3,hh+2);r(pb.ripe?'#d8c878':'#8ab858',x+i*3,y-hh,1,hh);if(k>.7)r('#b08848',x+i*3-0,y-hh-0,1,3)}}
+ if(pb.ripe&&((time*3)|0)%2)r('#fff3b0',x+5,y-14,2,2)}
+function plotUpdate(){const pb=W4.plotPb,rows=['SPROUTS','BERRIES','FIBER REEDS','LEAVE'];swNav(rows.length);
+ if(pressed('b')||!pb){state='g4world';return}
+ if(pressed('a')){const r2=rows[swSel];if(r2==='LEAVE'){state='g4world';return}
+  const crop=r2==='BERRIES'?'berry':r2==='FIBER REEDS'?'fiber':null;plSet(pb,crop);
+  swSay(crop?WCROPS[crop].n+' planted. Buddies at home water and pick them.':'This plot grows sprouts again.',2.6);swSnd(660,.08,990);state='g4world'}}
+function drawPlot(){const pb=W4.plotPb,cur=pb&&pb.crop,n=(W4.patchBuds||[]).length,cr=plCrops();swShell('GARDEN PLOT',cr+' of '+n+' plots grow crops');
+ swRows([{a:'SPROUTS',b:!cur?'growing here':'sprouts grow here'},{a:'BERRIES',b:cur==='berry'?'growing here':'2 every '+WCROPS.berry.need+'s'},
+  {a:'FIBER REEDS',b:cur==='fiber'?'growing here':'1 every '+WCROPS.fiber.need+'s'},{a:'LEAVE',b:''}],swSel,
+  swSel===0?'Garden sprouts plant seeds here and new sprouts grow. Pluck them when grown.':swSel===1?WCROPS.berry.d+' Takes the plot from sprouts.':swSel===2?WCROPS.fiber.d+' Takes the plot from sprouts.':'Each plot grows one thing. Home buddies with WATERING or PLANTING make crops grow faster.')}
+function scPlots(){SW.lessons.scPlot=1;scStart([{hold:.5},{x:240,y:352,hold:1.1},
+  {x:240,y:352,who:'ERIN',txt:'Now the garden. Each plot grows one thing: sprouts, berries or fiber reeds.'},
+  {x:240,y:352,who:'ERIN',txt:'Stand at an empty plot and press A to choose. More crops means fewer sprouts. Your call.'},
+  {x:240,y:352,who:'MARCUS',txt:'Buddies at home water it and pick it. Sprouts carry it. I supervise, bro.'},{hold:.4}],()=>swSave())}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */
@@ -10015,6 +10064,7 @@ function g4Update(dt){switch(state){
  case 'g4dex':dexUpdate();return;
  case 'g4build':buildUpdate();return;
  case 'g4place':placeUpdate();return;
+ case 'g4plot':plotUpdate();return;
  case 'g4cot':cotUpdate();return;
  case 'g4nur':nurUpdate();return;
  case 'g4tools':toolsUpdate();return;
@@ -10045,6 +10095,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4box':drawBox();return;
  case 'g4dex':drawDex();return;
  case 'g4build':drawBuild();return;
+ case 'g4plot':drawPlot();return;
  case 'g4cot':drawCot();return;
  case 'g4nur':drawNur();return;
  case 'g4tools':drawTools();return;
@@ -10059,7 +10110,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={noScenes:v=>{SCOFF=v},noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},

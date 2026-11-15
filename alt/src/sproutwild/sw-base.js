@@ -43,6 +43,7 @@ function wkPick(w){const sk=wkSkills(w),bench=SW.buildings.find(b=>b.k==='bench'
  if(best)return{k:'bld',b:best};
  for(const b of SW.buildings)if(b.k==='nursery'&&b.crop&&b.crop.stage<3&&(sk.WATERING||sk.PLANTING)&&!wkAt(b).length)return{k:'tend',b};
  const it=(W4.bf.items||[]).find(i2=>!i2.by&&!i2.car.length&&!i2.done);if(it){it.by=w;return{k:'haul',it}}
+ {const rp=(W4.patchBuds||[]).find(q=>q.crop&&q.ripe&&q.type<0&&!q.hBy);if(rp){rp.hBy=w;return{k:'crop',pb:rp}}}
  /* nothing else to do: gather. Home buddies fell base trees and crack base rocks on their own */
  {const nd=(W4.nodes||[]).filter(n=>!n.got&&n.k!=='bush'&&!n.wkBy).sort((a,b)=>Math.hypot(a.x-w.x,a.y-w.y)-Math.hypot(b.x-w.x,b.y-w.y))[0];if(nd&&(W4.bf.items||[]).length<6){nd.wkBy=w;return{k:'chop',nd}}}
  return{k:'idle',x:w.hx+(Math.random()*70-35),y:w.hy+(Math.random()*40-10),t:2+Math.random()*3}}
@@ -71,6 +72,8 @@ function wkTick(dt){if(!W4.bf)return;wkSync();const bench=SW.buildings.find(b=>b
    if(!tk.got){if(go(it.x,it.y+4,6))tk.got=1}
    else{if(go(240,106,7)){it.by=null;fDeliver(W4.bf,it);w.task=null;w.ref.wxp=(w.ref.wxp||0)+1}else{it.x=w.x;it.y=w.y-3-(w.kind==='b'?8:4)}}
    continue}
+  if(tk.k==='crop'){const pb=tk.pb;if(!pb||!pb.ripe||!pb.crop){if(pb)pb.hBy=null;w.task=null;continue}
+   if(!go(pb.sx+(w.x<pb.sx?-9:9),pb.sy+5,4))continue;w.at=true;w.fx=w.x<pb.sx?1:-1;tk.t=(tk.t||0)+dt;if(tk.t>=1.4){plHarvest(pb);w.task=null;w.ref.wxp=(w.ref.wxp||0)+1}continue}
   if(tk.k==='chop'){const nd=tk.nd;if(!nd||nd.got||wDark()>.7){if(nd)nd.wkBy=null;w.task=null;continue}
    if(!go(nd.x+(w.x<nd.x?-11:11),nd.y+8,4))continue;w.at=true;w.fx=w.x<nd.x?1:-1;nd.shake=.12;
    const lv=nd.k==='tree'?(sk.LUMBERING||.5):(sk.QUARRY||.5);nd.hp-=(.5+lv*.7)*dt;
@@ -159,7 +162,7 @@ function drawTools(){swShell('TINKER BENCH','B  DONE');if(!SW.craftQ)SW.craftQ=[
 function baseUpdate(){const n=(W4.wk||[]).length+1;swNav(n);if(pressed('a')||pressed('b'))state='g4world'}
 function drawBase(){swShell('SUNKEEP WORK BOARD','BASE LV '+SW.baseLv);wkSync();
  const ms=WBASEMS[SW.baseLv],done=ms?ms.filter(([k])=>wMissionDone(k)).length:0,rows=[{a:ms?'MISSIONS '+done+'/'+ms.length:'BASE FULLY GROWN',b:'♥ '+SW.hearts+' · AXE '+SW.tools.axe+' PICK '+SW.tools.pick}];
- const job=w=>{const tk=w.task;return!tk?'thinking':tk.k==='sleep'?'asleep':tk.k==='idle'?(tk.noroof?'needs a cottage':'resting'):tk.k==='haul'?'hauling':tk.k==='chop'?(tk.nd.k==='tree'?'chopping':'mining'):tk.k==='craft'?'crafting':tk.k==='tend'?'tending':wBuildDef(tk.b.k).n.toLowerCase()};
+ const job=w=>{const tk=w.task;return!tk?'thinking':tk.k==='sleep'?'asleep':tk.k==='idle'?(tk.noroof?'needs a cottage':'resting'):tk.k==='haul'?'hauling':tk.k==='chop'?(tk.nd.k==='tree'?'chopping':'mining'):tk.k==='crop'?'harvesting':tk.k==='craft'?'crafting':tk.k==='tend'?'tending':wBuildDef(tk.b.k).n.toLowerCase()};
  for(const w of W4.wk)rows.push({a:wkName(w)+(w.kind==='b'?' Lv'+w.ref.lv:''),b:job(w)});
  const sel=Math.min(swSel,rows.length-1),w=W4.wk[sel-1];
  swRows(rows,sel,sel===0?(ms?ms.map(([k,l])=>(wMissionDone(k)?'✓ ':'· ')+l).join('  '):'Everything is built. For now.'):

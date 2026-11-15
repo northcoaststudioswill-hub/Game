@@ -166,6 +166,15 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   F.noCap(false);S.buildings=[];S.box=[];S.party=S.party.slice(0,1);ok('one buddy: room for more',!F.buddyFull());
   while(S.party.length+S.box.length<3)F.giveMon('PEBBLIT',3);ok('three buddies and no Data Center: full',F.buddyFull(),S.party.length+S.box.length);
   F.build('datacenter',6,12);ok('a Data Center makes room',!F.buddyFull());F.noCap(true)}
+ /* v7.0: garden plots grow what you choose */
+ {S.buildings=[];S.box=[];S.plotCrop={};F.build('cottage',18,12);F.enter('BASE');step(5);const pl=F.plots();
+  ok('the garden bed building is retired',!F.builds().includes('bed')&&F.builds().includes('datacenter'),F.builds().join());
+  const ix=pl.findIndex(q=>q.type<0);ok('there is an empty plot to plan',ix>=0,pl.map(q=>q.type).join());
+  F.plotSet(ix,'berry');const b0=S.res.berry;ok('a plot can be set to berries',pl[ix].crop==='berry'&&S.plotCrop[ix]==='berry');
+  F.dayT(20);F.setPos(60,460);for(let i=0;i<1500&&!pl[ix].ripe;i++)step(1);ok('berries ripen on the plot',pl[ix].ripe===true,Math.round(pl[ix].cg||0)+' type'+pl[ix].type+' seed'+pl[ix].seedTy+' crop'+pl[ix].crop+' same'+(F.plots()===pl)+' crew'+pl[ix].crew+' mode'+pl[ix].mode+' st'+F.state()+' q'+S.quest);
+  F.giveMon('PEBBLIT',4,true);for(let i=0;i<1500&&S.res.berry<=b0;i++)step(1);ok('a home buddy harvests and the berries reach the Lantern',S.res.berry>b0,S.res.berry+' vs '+b0);
+  ok('no sprout seed takes a crop plot',pl[ix].type<0&&pl[ix].seedTy==null);
+  F.plotSet(ix,null);ok('the plot can go back to sprouts',!pl[ix].crop&&S.plotCrop[ix]===undefined)}
  }catch(e){out.push('FAIL crashed: '+e.message)}
  return out});
 console.log(res.join('\n'));const fails=res.filter(l=>l.startsWith('FAIL')).length;

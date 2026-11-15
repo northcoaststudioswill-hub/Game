@@ -37,7 +37,7 @@ function wNextGoal(){const op=wOp(),F=W4.bf;
  if(op===2)return{x:206,y:204,label:'Dim, not mean. Say hello.'};
  if(SW.quest===2)return{x:228,y:(W4.wh||520)-40,label:'This way! The south road.'};
  if(!SW.buildings.some(b=>b.k==='cottage'))return{x:150,y:230,label:'Good spot for a cottage. START, BUILD.'};
- if(!SW.buildings.some(b=>b.k==='bed'))return{x:330,y:230,label:'A garden bed could go here.'};
+ if(!plCrops()&&!SW.buildings.some(b=>b.k==='bed'))return{x:226,y:340,label:'Empty plot! Press A on it. Grow berries.'};
  if(wBaseReady())return{x:226,y:104,label:'The Lantern is ready to grow!'};
  return null}
 function wLouieTip(){const tips=[
