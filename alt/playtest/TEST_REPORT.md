@@ -84,3 +84,12 @@ Re-run on the same build, unchanged from before this pass:
   growing_dialogue, walkups_burrow_menus, waterworks_rule: all pass, no errors. (growing_dialogue threw once and passed
   on the re-run.) `text_audit.js` reports the same 7 overlaps as the build before this pass, compared side by side.
 - `lantern_shots.js`: same figures as before.
+
+## Fable graphics pass 1 (Nov 15 2026)
+
+Visual only. On the new build: `ko_lab.js` metrics and damage figures identical to before, no errors; its text audit now
+lists only the title logo's shadow and the banner under the pause menu (the stage signs are no longer audited, because the
+stage is drawn in its own layer). `fable_lab.js` 20 of 20. `pp_test.js` 76 of 76. `tests/v02/` console_carts,
+roguelite_loop and lantern_menu pass (the others were not re-run; the pass touches only `src/knockout.js`).
+Frame cost, 600 frames of a CPU fight on three stages: 3.1 to 3.5 ms a frame in headless Chromium on a desktop.
+The sheets in `ko/` were regenerated with the new look. **Nothing is phone-confirmed.**

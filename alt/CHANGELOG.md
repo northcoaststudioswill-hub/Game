@@ -312,6 +312,34 @@ between the two fighters, with STREAK and STARS under it.
 ### Saves
 `ncko-v1` gains `rule` (number) and `tr` (stars per trial). Old saves load unchanged; both default when missing.
 
+## Fable graphics pass 1: new sprite renderer, stage colour treatment, new HUD, closer camera (Nov 15)
+
+Will: a total graphics overhaul of the fighter, still GBA style, keeping the cutscenes. This is the first slice of that: the
+parts that change every fight at once. **Visual only**: `ko_lab.js` metrics and every damage figure are unchanged, and the
+cinematics, tower, VS screen and finishers are the same scenes. One switch, `GFX` at the top of `src/knockout.js`: `GFX=0`
+draws everything the way it was. Nothing is phone-confirmed.
+
+- **Sprites (all eight fighters, through the shared `rig`):** chunkier builds (thicker arms and legs, a broader torso, bigger
+  fists, bigger shoes with a highlight), hard cel shading in place of the soft rim, cool-tinted shadows and warm highlights
+  (`dk` / `lt` now shift hue, they don't just darken), and a rim light: the top edge of every sprite layer is lit and the
+  underside is darkened when the sprite is baked (`spBake`). Heads are unchanged (still Will's approved ones, still facing
+  the camera). Same skeleton, poses and hitboxes.
+- **Stages (all nine, through `stageLayer`):** each stage is drawn into its own layer and given a GBA colour treatment: more
+  contrast and saturation, a 15-bit palette with a 4x4 ordered dither, and depth shading (the wall or sky darkens and cools
+  the higher it is above the fighters' heads, and the floor strip is dimmed) so the fighters stand out. The stage select
+  thumbnails and preview use it too. The stage drawings themselves are not repainted yet.
+- **HUD:** slanted health bars with a gradient, quarter marks and a red damage trail; framed portraits; a gold timer plate;
+  diamond round marks; a segmented super meter; a framed special-cooldown light. Same positions, so no text moved.
+- **Camera:** zooms in to 2.05x when the fighters are close (was 1.75x).
+- **Shadows under fighters** are a rounded, darker shape.
+- **Fix:** floating callouts (LAST LANTERN!, PARRY!, WALL!) no longer show through the K.O. impact frame.
+
+Cost: about 3.1 to 3.5 ms a frame in headless Chromium on a desktop (was about 2.1), of a 16 ms budget. The stage treatment
+is the extra; it has not been timed on a phone.
+
+**Not done yet (the rest of the overhaul):** repainting the nine stage drawings (they are the same sparse compositions,
+now graded), heads that face the opponent, the menus and select screen, hit sparks and projectiles.
+
 ## Not changed
 
 - Patch & Plate (`src/patchplate.js` is v0.3's file as built). Its 76 checks pass on the ALT build.

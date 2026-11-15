@@ -121,3 +121,13 @@ may be edited. Full list in `alt/CHANGELOG.md` ("Fable pass 1"); checks in `alt/
      Lantern hooks would mean touching Rootdeep's block).
   3. Knockout still has nothing in the capsule machine. Trial stars pay tickets now; prizes (colours, a stage) are the next step.
   4. Everything in the Open list above still stands (heads facing the opponent, more two-stage supers, the songs).
+
+## Fable graphics pass 1, in `alt/` only (Nov 15)
+
+Will asked for a total graphics overhaul of the fighter: still GBA, keep the cutscenes, "not these graphics". He also said
+Sprouts is the heart of the game and he wants Fable's touches on all four games after this; the fighter is just what is
+being worked on now. First slice done (details in `alt/CHANGELOG.md`): a cel-shaded sprite renderer for all eight fighters,
+a GBA colour treatment on every stage (`stageLayer`), a new HUD (`hud2`, `bar2`), a closer camera. `GFX=0` restores the old look.
+Still to do, in the order I'd take them: repaint the stage drawings one at a time (start with THE LIVING ROOM), heads that
+face the opponent (one fighter first, from his photos), menus and select screen, sparks and projectiles.
+Will has not yet said what he thinks of this slice; get that before building further on it.
