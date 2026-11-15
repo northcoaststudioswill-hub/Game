@@ -236,6 +236,82 @@ Now (`rig` in `knockout.js`, "rig v3"):
 - Finished sprites are cached by pose: frame cost stays about 2.1 ms (of 16).
 - Same skeleton, poses and timing: the pass-2 trace still matches on all 1,088 frames. Heads are unchanged.
 
+## Fable pass 1: parry, wall bounce, Last Lantern, K.O. impact frame, stances, house rules, Trials (Nov 15)
+
+Knockout only, plus three small Lantern-menu hooks. **All names here are invented this pass and nothing is phone-confirmed.**
+Unlike the earlier passes, this one changes how fights play on purpose (Will: put your own touches on it). The basic numbers
+did not move: `ko_lab.js` metrics are identical to before (jump 26 frames / 49 px, jab 4-frame startup / 22 stun / 8 px slide,
+launcher, juggle at every delay, walk 87, every special and super damage figure). What is new sits on top of them.
+Each new system has one switch or constant in `src/knockout.js`, named below, so any of them can be turned off alone.
+
+### New in a fight
+- **PARRY.** Tap back just before a hit lands (inside 0.13 s) and any blockable hit is turned away: no damage, no chip, no
+  pushback, +12 meter, a blue burst and `PARRY!`. An attacker who is up close is left stunned for 0.44 s (a free punish);
+  projectiles are just swatted. Holding back early is still an ordinary block; unblockables (throws, Hide and Seek, Judgement,
+  the full-meter cinematics) can't be parried. The CPU parries now and then: never on Easy, 10% of its blocks on Normal,
+  25% on Hard. HOW TO PLAY has a line for it. (In `tryHit`; delete the `FABLE: PARRY` block to remove.)
+- **WALL BOUNCE.** A hard launch (throws, the big specials, supers) that carries someone into the edge of the stage bounces
+  them back off it, once per combo, still juggle-able under the same 3-hit juggle limit. `WALL!`. (In `sim`.)
+- **LAST LANTERN.** Under 25 health a fighter's lantern flares: embers rise off them, their hits do 15% more, and their meter
+  creeps up (6 a second). Announced once a round. Off in Training and Sudden Death. (`LAST=0` switches it off.)
+- **K.O. impact frame.** On the final hit the stage is replaced for half a second by speed lines in the winner's colour,
+  bursting from the loser, with a longer freeze and `K.O.` slamming in. (`koLines`, `G.koF`.)
+- **Combo callouts:** NICE! at 3 hits, SWEET! at 5, SAVAGE! at 7, UNREAL!! at 9, under the hit counter (`RK`).
+- **Afterimages** trail behind dashes and every dashing special (Louie's zooms, Corbin's Sneaky Kiss, Double or Nothing).
+
+### Each fighter stands their own way (visual only)
+Idle and walk only; attacks, timing, reach and hitboxes are shared and unchanged (`STN` table; `STANCES=0` puts everyone
+back in the shared stance). Will is loose with his hands low; Erin is an upright boxer, light on her feet; Louie is low and
+coiled; Lil Bottie is stiff with level forearms and barely moves; King Bibi keeps one hand behind his back; Corbin leans in
+with an arm reaching; Marcus is chest-out on a wide base with his fists low; Mama has a hand on her hip.
+Note for Will: per-fighter stances were part of the pass he rolled back. That rollback was about the heads and the slower
+moves; these touch neither. Sheet: `playtest/fable/stances.png`.
+
+### RULES (title menu; applies to Quick Fight and Training only)
+NORMAL, TURBO (1.3x speed), MOON GRAVITY, BIG HEADS, GLASS CANNON (double damage), METER MADNESS (meter fills by itself),
+SUDDEN DEATH (everyone on 1 health), CHAOS (turbo + moon + big heads + meter). Saved as `SV.rule`. Arcade and Survival always
+play NORMAL, so clears and streaks stay comparable.
+
+### TRIALS (new mode on the title menu)
+Sixteen one-round fights with a goal, each with a set fighter, opponent, difficulty and sometimes a rule. Winning with the
+goal met earns a star; GOLD (a second star) is finishing on 70+ health, or the trial's own rule. The goal and a live tally
+show under the health bars; pause has RESTART TRIAL. Stars save in `SV.tr`.
+
+| # | Trial | You vs | Goal |
+| --- | --- | --- | --- |
+| 1 | FIRST COMMIT | Will vs Louie, Easy | win the round |
+| 2 | COMBO CLASS | Erin vs Corbin, Easy | land a 4-hit combo |
+| 3 | PARRY SCHOOL | Will vs Lil Bottie, Easy | parry 2 hits |
+| 4 | ALL BITE | Louie vs Marcus, Easy | win using only B attacks |
+| 5 | WALL STREET | Marcus vs King Bibi, Easy | bounce them off the wall |
+| 6 | HUG IT OUT | Erin vs Mama, Normal | land 3 throws |
+| 7 | SPEED RUN | Louie vs Corbin, Normal | win with 40 on the clock |
+| 8 | UNTOUCHABLE | Lil Bottie vs Will, Normal | win on 80+ health |
+| 9 | FULL SEND | Mama vs Marcus, Normal, meter madness | land a full-meter super |
+| 10 | MOON LANDING | Will vs Lil Bottie, Normal, moon gravity | land 3 air attacks |
+| 11 | HEAD GAMES | King Bibi vs Corbin, Normal, big heads + turbo | win |
+| 12 | JUGGLER | Marcus vs Louie, Normal | land a 6-hit combo |
+| 13 | GLASS JAW | Corbin vs King Bibi, Hard, glass cannon | win |
+| 14 | SUDDEN DEATH | Mama vs Marcus, Hard, sudden death | first hit wins (gold: 52 on the clock) |
+| 15 | PARRY MASTER | Erin vs Lil Bottie, Hard | parry 5 hits |
+| 16 | FINAL EXAM | Will vs Louie, Hard, turbo | win |
+
+Not checked: whether each trial is the right difficulty for a person. The tests prove each one can be started, cleared,
+failed and saved; none has been played by hand.
+
+### The Lantern menu (`src/rootdeep.js`)
+- **Tickets:** Knockout Trials pay 1 capsule ticket for every 4 stars (up to 8), counted when you're back at the shelf.
+- **STATS**, Knockout page: adds TRIAL STARS n / 32.
+- **HOW TO GET TICKETS** lists it (the Knockout capsule page, and the all-games page as `SURVIVAL x5, TRIAL STARS x4`).
+- No new Lantern achievement: a seventeenth row runs into the footer on the achievements page.
+
+### Title screen
+Nine items now (TRIALS and RULES are new), so the list is one pixel tighter per row and the win/loss line moved down
+between the two fighters, with STREAK and STARS under it.
+
+### Saves
+`ncko-v1` gains `rule` (number) and `tr` (stars per trial). Old saves load unchanged; both default when missing.
+
 ## Not changed
 
 - Patch & Plate (`src/patchplate.js` is v0.3's file as built). Its 76 checks pass on the ALT build.

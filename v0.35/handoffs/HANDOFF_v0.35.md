@@ -99,3 +99,25 @@ ALT session) matched Will's approved version on all 1,088 frames. **Nothing is p
 5. The Lantern menu is v0.3's: no Survival streak, no Patch & Plate stats page. The ALT fork has both in `alt/src/rootdeep.js`
    if Will wants them in the main line (that would touch Rootdeep's block, so coordinate with whoever is on Rootdeep).
 6. Rootdeep still uses BIKE LANE as Will's super and LEASH LASSO for Erin (separate game; decide whether to sync).
+
+## Fable pass 1, in `alt/` only (Nov 15, after v0.35 shipped)
+
+v0.35 itself is untouched: this pass lives in the ALT fork (`alt/src/knockout.js`, three small hooks in `alt/src/rootdeep.js`).
+Will's brief changed for this pass: put your own touches on it, reimagine it, frame data is no longer off limits, any game
+may be edited. Full list in `alt/CHANGELOG.md` ("Fable pass 1"); checks in `alt/playtest/TEST_REPORT.md`.
+
+- **What it adds:** parry (tap back late), wall bounce, Last Lantern (a comeback under 25 health), a K.O. impact frame, combo
+  callouts, dash afterimages, a stance per fighter, RULES for Quick Fight and Training (turbo, moon gravity, big heads,
+  glass cannon, meter madness, sudden death, chaos), and TRIALS: 16 goal fights with stars that pay capsule tickets.
+- **What it did not move:** every `ko_lab.js` number is the same as v0.35's. The new systems sit on top.
+- **Switches:** `STANCES`, `LAST`, the `FABLE: PARRY` block in `tryHit`, the `FABLE: WALL BOUNCE` block in `sim`.
+- **Code map additions:** `STN` (stances), `RULES` / `MU()` / `grv()` (house rules), `TRIALS` / `trStart` / `G.tq` (the tally) /
+  screens `trials` and `tres`, `RK` (callouts), `lastL`, `koLines`. Test handle `KO._` also exposes `TRIALS, RULES, trStart, endMatch`.
+- **Invented, for Will to rename or cut:** every trial name, the rule names, LAST LANTERN, the callout words.
+- **Open after this pass:**
+  1. Will plays ALT on his phone. The things only a hand can judge: whether the 0.13 s parry window feels fair, whether Last
+     Lantern is too strong or too weak, whether the stances read, and how hard each trial is (none was played by hand).
+  2. If he likes it, bring it into the main line as the next version the way v0.35 was made (copy `alt/src/knockout.js`; the
+     Lantern hooks would mean touching Rootdeep's block).
+  3. Knockout still has nothing in the capsule machine. Trial stars pay tickets now; prizes (colours, a stage) are the next step.
+  4. Everything in the Open list above still stands (heads facing the opponent, more two-stage supers, the songs).

@@ -59,3 +59,28 @@ the same as v0.3.
 With sample saves (Patch & Plate file at day 7, Knockout with a survival streak of 6): the PATCH & PLATE stats page reads
 7/12 days, 19/36 stars, 84 dishes, 1320 coins, crew 3/6, hearts 9/20; STILL STANDING is awarded and 1 survival-streak ticket
 paid. The HOW TO GET TICKETS page fits on screen. Shots in `lantern/`.
+
+## Fable pass 1 (Nov 15 2026): `node alt/tests/fable_lab.js`
+
+20 checks, all pass, no page errors. Sheets in `fable/`. **Nothing is phone-confirmed, and no trial has been played by hand.**
+
+| Check | Result |
+| --- | --- |
+| Stances | all eight idle stances differ (`fable/stances.png`) |
+| Parry | back tapped 3 frames before a hit: no damage, +12 meter, attacker stunned 0.44 s. Back held for half a second first: an ordinary block. Not holding back: hit for 8.6. An unblockable: still lands |
+| Wall bounce | a 230-speed launch 39 px from the wall bounces back once (17 frames later, heading away at 108) and ends in a normal knockdown |
+| K.O. impact frame | starts on the killing frame and the round carries on (`fable/ko.png`) |
+| Rules | moon gravity jump 57 frames (normal 26); sudden death starts on 1 health; a glass-cannon jab does 8 (normal 4); meter madness adds 22 a second; Arcade ignores the rule |
+| Trials | trial 1 won on full health = GOLD, saved as 2 stars; trial 2 won without its 4-hit combo = not cleared; a later loss keeps the stars; stars are in the save |
+| Text audit of the new screens | title, all 16 trial rows, trial VS, trial HUD, both result screens, trial pause, HOW TO PLAY: nothing off-screen or overlapping (the title logo's shadow and the banner under the pause menu are the known intended ones) |
+| CPU vs CPU soak | 4 full fights on Hard (normal, turbo, moon, chaos rules) finish with no errors; in the last run the CPUs parried 12 times and wall-bounced 7 (it varies run to run) |
+
+Re-run on the same build, unchanged from before this pass:
+- `ko_lab.js`: metrics identical (jump 26 frames / 48.8 px, jab 4 / 22 / 7.8, launch 35 / 35 / 22, juggle HIT at 0, 2, 4, 6,
+  walk 87); supers, Mama, Erin, arcade and forward+B figures identical; the same known text notes; no errors.
+- `pp_test.js`: 76 passed. (One earlier run failed "Louie changes his mind mid-craving", a chance-based check; it passed on
+  the re-run and Patch & Plate's code is untouched.)
+- `tests/v02/`: console_carts, roguelite_loop, keeper_moves, saves_onboarding, lantern_menu, capsules_reset,
+  growing_dialogue, walkups_burrow_menus, waterworks_rule: all pass, no errors. (growing_dialogue threw once and passed
+  on the re-run.) `text_audit.js` reports the same 7 overlaps as the build before this pass, compared side by side.
+- `lantern_shots.js`: same figures as before.

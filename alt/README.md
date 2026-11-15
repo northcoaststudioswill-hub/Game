@@ -25,6 +25,7 @@ real game can't read or overwrite Erin's Patch & Plate days, Rootdeep runs, or a
 | `src/patchplate.js` | Patch & Plate (cartridge 4). Unchanged from v0.3 on purpose. |
 | `build.py` | `python3 alt/build.py` assembles `games/pocket-lantern-alt.html`. The 13 MB of embedded music is read from the v0.3 build (read-only), not copied. |
 | `tests/ko_lab.js` | Knockout lab: feel metrics (jump arc, pose snap, hit slide, juggles), frame sheets, the new modes, a text audit of every menu. |
+| `tests/fable_lab.js` | Fable pass 1: parry, wall bounce, K.O. frame, stances, rules and Trials (20 pass/fail checks, sheets in `playtest/fable/`). |
 | `tests/sprouts_tour.js` | Plays Sprouts in real time from a fresh save by following the objective marker. |
 | `tests/lantern_shots.js` | The Lantern menu's stats, achievements and ticket pages with sample saves. |
 | `tests/pp_test.js` | v0.3's Patch & Plate test (76 checks), pointed at the ALT build. |
@@ -35,6 +36,7 @@ Run tests from the repo root, after `python3 alt/build.py`:
 
 ```
 node alt/tests/ko_lab.js                                   # all Knockout sections; ONLY=metrics,modes,text to pick
+node alt/tests/fable_lab.js                                # the Fable-pass checks
 node alt/tests/pp_test.js
 node alt/tests/v02/roguelite_loop.js alt/games/pocket-lantern-alt.html
 ```

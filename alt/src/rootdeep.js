@@ -1842,11 +1842,11 @@ function drawCaps(){const c=capR;screenShell('CAPSULES','ONE MACHINE FOR EVERY C
  let rows=[];
  if(pg===0)rows=ROWS.map(q=>[({CAP:'CAPS',COAT:'COATS',FLOWER:'FLOWERS',LOUIE:"LOUIE'S BANDANAS",TRAIL:'TRAILS'})[q[0]]||q[0],((meta.own[q[1]]||[]).length)+' / '+((STY[q[1]]||[]).length),'#e8e4f5','#ffd94d']).concat([['WEAR THEM IN SPROUTS: STYLE MENU','','#8d84a8','']]);
  else if(pg===1){const owned=rdCapOwned();rows=RDCAP.map((it,i)=>{const has=owned.includes(i);return[it.n,has?'OWNED':RAR[it.r][0],has?'#e8e4f5':'#6a6284',has?'#a8f080':RAR[it.r][1]]})}
- else if(pg===2)rows=[['NOTHING IN THE MACHINE YET','','#c8c0d8',''],['KNOCKOUT STILL PAYS TICKETS:','','#8d84a8',''],['  EACH NEW ARCADE CLEAR','+1','#e8e4f5','#f8e060'],['  EVERY 10 WINS','+1','#e8e4f5','#f8e060'],['  SURVIVAL: EVERY 5 IN A ROW','+1','#e8e4f5','#f8e060']];
+ else if(pg===2)rows=[['NOTHING IN THE MACHINE YET','','#c8c0d8',''],['KNOCKOUT STILL PAYS TICKETS:','','#8d84a8',''],['  EACH NEW ARCADE CLEAR','+1','#e8e4f5','#f8e060'],['  EVERY 10 WINS','+1','#e8e4f5','#f8e060'],['  SURVIVAL: EVERY 5 IN A ROW','+1','#e8e4f5','#f8e060'],['  TRIALS: EVERY 4 STARS','+1','#e8e4f5','#f8e060']];
  else rows=[['SPROUTS','','#a8f080',''],['  KEEPER RANK UP','+1','#e8e4f5','#f8e060'],['  VISIT EACH DAY','+1','#e8e4f5','#f8e060'],['  ALL 3 DAILY ASKS','+1','#e8e4f5','#f8e060'],["  EVERY 3 OF ERIN'S ORDERS",'+1','#e8e4f5','#f8e060'],
   ['ROOTDEEP','','#a8f080',''],['  FIRST WIN OVER EACH BOSS','+1','#e8e4f5','#f8e060'],['  EVERY ESCAPE','+1','#e8e4f5','#f8e060'],
   ['PATCH & PLATE','','#a8f080',''],['  FIRST 3 STARS ON A DAY','+1','#e8e4f5','#f8e060'],
-  ['KNOCKOUT · THE LANTERN','','#a8f080',''],['  ARCADE CLEARS, EVERY 10 WINS','+1','#e8e4f5','#f8e060'],['  SURVIVAL: EVERY 5 IN A ROW','+1','#e8e4f5','#f8e060'],['  LANTERN ACHIEVEMENTS','+2-5','#e8e4f5','#f8e060']];
+  ['KNOCKOUT · THE LANTERN','','#a8f080',''],['  ARCADE CLEARS, EVERY 10 WINS','+1','#e8e4f5','#f8e060'],['  SURVIVAL x5, TRIAL STARS x4','+1','#e8e4f5','#f8e060'],['  LANTERN ACHIEVEMENTS','+2-5','#e8e4f5','#f8e060']];
  const st=Math.max(9,Math.min(13,Math.floor((H-top-28)/rows.length)));
  if(!(c.tut>=0))rows.slice(0,Math.floor((H-top-28)/st)).forEach(([a,b,ca,cb],i)=>{const y=top+14+st*i;text(a,12,y,1,ca,null);if(b)rtext(b,W-12,y,1,cb,null)});
  if(c.tut>=0){const L=CAPTUT(),ls=wrapPx(L[c.tut],222,1),bh=Math.max(2,ls.length)*11+26,by=H-4-bh;r('rgba(8,5,14,.6)',0,0,W,H);r('#181020',4,by,W-8,bh);r('#f8f0d8',5,by+1,W-10,bh-2);
@@ -1926,6 +1926,7 @@ function rdDrawDying(){const t=RUN.dieT,k=Math.min(1,t/1.6),x=Math.round(P3.x),y
 let LAN={ach:{},played:{},ko:{w:0,cl:0},tixEarned:0};
 try{const s=JSON.parse(localStorage.getItem('lantern-v1')||'null');if(s)LAN=Object.assign(LAN,s)}catch(e){}
 const lanSave=()=>{try{localStorage.setItem('lantern-v1',JSON.stringify(LAN))}catch(e){}};
+function koStars(){const t=koSV().tr||{};let n=0;for(const k in t)n+=t[k]||0;return n}
 function koSV(){try{return Object.assign({diff:0,clear:{},w:0,l:0,surv:0},JSON.parse(localStorage.getItem('ncko-v1')||'{}'))}catch(e){return{diff:0,clear:{},w:0,l:0,surv:0}}}
 /* ALT: Patch & Plate's saves, read only (the best of its three files) */
 function ppSV(){const out={day:0,stars:0,served:0,earned:0,crew:0,friends:0};
@@ -1959,6 +1960,7 @@ function lanCheck(onShelf){const got=[];let tix=0;
  const ko=koSV(),cl=Object.keys(ko.clear).length;if(cl>LAN.ko.cl){tix+=cl-LAN.ko.cl;got.push('KNOCKOUT ARCADE CLEAR');LAN.ko.cl=cl}
  const w10=Math.floor(ko.w/10);if(w10>Math.floor(LAN.ko.w/10)){tix+=w10-Math.floor(LAN.ko.w/10);got.push('KNOCKOUT WINS')}LAN.ko.w=ko.w;
  const s5=Math.floor((ko.surv||0)/5);if(s5>(LAN.ko.s5||0)){tix+=s5-(LAN.ko.s5||0);got.push('SURVIVAL STREAK');LAN.ko.s5=s5}
+ const t4=Math.floor(koStars()/4);if(t4>(LAN.ko.t4||0)){tix+=t4-(LAN.ko.t4||0);got.push('TRIAL STARS');LAN.ko.t4=t4}
  if(tix){meta.tix+=tix;LAN.tixEarned+=tix;try{persist(true)}catch(e){}}
  lanSave();
  if(onShelf&&got.length){const m=$('shelfMsg');if(m){m.textContent='✦ '+got[0]+(got.length>1?' +'+(got.length-1)+' MORE':'')+'  +'+tix+' TICKETS';setTimeout(()=>{if(state==='off')m.textContent='Pick a cartridge'},4500)}}
@@ -1991,7 +1993,7 @@ function lanDraw(){r('#0c0a12',0,0,W,H);
  if(state==='lanstats'){const P=['ALL GAMES','SPROUTS','KNOCKOUT','ROOTDEEP','PATCH & PLATE'][lanPage];screenShell('STATS','◀ '+P+' ▶');let rows=[];
   if(lanPage===0){const done=LACH.filter(a=>LAN.ach[a[0]]).length;rows=[['CARTRIDGES PLAYED',lanPlayedN()+' / 4'],['LANTERN ACHIEVEMENTS',done+' / '+LACH.length],['CAPSULES OPENED',meta.life.pulls],['CAPSULE ITEMS OWNED',pulledCount()],['TICKETS ON HAND',meta.tix],['TICKETS FROM THE LANTERN',LAN.tixEarned]]}
   else if(lanPage===1){const L=meta.life;rows=[['KEEPER RANK',rankOf(meta.xp)[0]],['PETALS EARNED',meta.xp],['ACHIEVEMENTS',Object.keys(meta.ach).length+' / '+ACH.length],['MISSIONS',L.missions],['BERRIES BROUGHT HOME',L.berries],['BUGS CAUGHT',L.bugs],['FLOWERS HARVESTED',L.flowers],['LOUIE PETS',L.pets]]}
-  else if(lanPage===2){const k=koSV(),c=Object.keys(k.clear);rows=[['WINS',k.w],['LOSSES',k.l],['ARCADE CLEARS',c.length+' / 8'],['CLEARED WITH',c.length?c.map(x=>x.toUpperCase()).slice(0,3).join(', ')+(c.length>3?'...':''):'NOBODY YET'],['BEST SURVIVAL STREAK',k.surv||0]]}
+  else if(lanPage===2){const k=koSV(),c=Object.keys(k.clear);rows=[['WINS',k.w],['LOSSES',k.l],['ARCADE CLEARS',c.length+' / 8'],['CLEARED WITH',c.length?c.map(x=>x.toUpperCase()).slice(0,3).join(', ')+(c.length>3?'...':''):'NOBODY YET'],['BEST SURVIVAL STREAK',k.surv||0],['TRIAL STARS',koStars()+' / 32']]}
   else if(lanPage===4){const q=ppSV();rows=[['DAYS OPEN',Math.min(12,q.day+1)+' / 12'],['STARS',q.stars+' / 36'],['DISHES SERVED',q.served],['COINS EARNED',q.earned],['SPROUT CREW',q.crew+' / 6'],['FRIEND HEARTS',q.friends+' / 20']]}
   else if(lanPage===3){const S=RD.stats;rows=[['RUNS',S.runs],['ESCAPES',S.escapes],['DEEPEST CHAMBER',(S.best||0)+' / 12'],['FOES FELLED',S.kills],['BOSSES FELLED',S.bosses],['SPROUTS FOUND',S.sproutsFound||0],['FALLS',S.deaths],['KEEPERS UNLOCKED',CHARS.filter(c=>charUnlocked(c.id)).length+' / '+CHARS.length]]}
   rows.forEach(([a,b],i)=>{const y=48+i*17;r(i%2?'#181024':'#1d1530',8,y-3,W-16,15);text(a,14,y+1,1,'#c8c0d8',null);rtext(String(b),W-14,y+1,1,'#ffd94d',null)});
