@@ -89,7 +89,7 @@ function swDrawTitle(){const hz=Math.round(H*.60);ox=0;oy=0;
   /* a sprout growing out of the logo */
   r('#2c6030',bx+bw+2,ly+2,1,10);r('#58c048',bx+bw-2,ly-1,4,3);r('#58c048',bx+bw+3,ly-3,4,3);r('#b0f090',bx+bw-1,ly-1,1,1);
   const sub='A LANTERN VALLEY TALE';text(sub,Math.round(W/2-tw(sub,1)/2),ly+bh+7,1,'#ffe8b0',null)}
- if(!(W4.tm|0)&&((time*1.6)|0)%2)uiPill('PRESS A',Math.round(hz+34),'A');
+ if(!(W4.tm|0)){if(((time*1.6)|0)%2)uiPill('PRESS A',Math.round(hz+34),'A');if(typeof eject==='function')uiPill('EJECT',Math.round(hz+50),'B')}
  r('rgba(10,14,8,.8)',0,H-12,W,12);ctext(W4.tsaved>0?'SAVED TO FILE '+(wSlot+1):'GROW · THROW · CATCH · BUILD',H-10,1,W4.tsaved>0?'#7ee787':'#7a9a68',null);
  if(W4.tm|0)wTitleFiles()}
 

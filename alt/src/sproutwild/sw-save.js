@@ -37,7 +37,7 @@ function wLoadSlot(i){wSlot=i;let j=null;try{j=JSON.parse(localStorage.getItem(W
 SW=wNormalize(SW);
 /* ---------------- title: splash, then the file list ---------------- */
 function titleUpdate(){const tm=W4.tm|0;if(W4.tsaved>0)W4.tsaved-=1/60;
- if(tm===0){if(pressed('a')||pressed('start')){swSnd(784,.09);W4.tm=1;swSel=wSlot}return}
+ if(tm===0){if(pressed('a')||pressed('start')){swSnd(784,.09);W4.tm=1;swSel=wSlot}else if(pressed('b')&&typeof eject==='function'){swSave();eject()}return} /* B on the title: back to the cartridge shelf */
  if(tm===2){if(pressed('a')){try{localStorage.removeItem(WSLOTS[swSel])}catch(e){}swSnd(200,.2,90);W4.tm=1}else if(pressed('b'))W4.tm=1;return}
  swNav(3);if(pressed('b')){W4.tm=0;return}
  if(pressed('sel')&&wSlotInfo(swSel)){W4.tm=2;swSnd(300,.08);return}
