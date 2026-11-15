@@ -140,11 +140,10 @@ const WRECIPES=[{id:'tonic',n:'TONIC',cost:{berry:3},need:12,d:'Heals a buddy 25
  {id:'oil',n:'LANTERN OIL',cost:{wood:2,berry:2},need:10,d:'Burns bright: +3 gratitude hearts.'},{id:'charm',n:'LUCKY CHARM',cost:{ingot:1,berry:5},need:20,d:'A LUCKY sprout hatches from it and joins your pouch.'}];
 WRECIPES.splice(0,WRECIPES.length,...WRECIPES.filter(rc=>rc.id!=='axe'&&rc.id!=='pick')); /* v6.6: tools are gone; buddies are the tools */
 function wRecipeCost(rc){if(rc.id==='rope'&&((SW.gear&&SW.gear.rope)||(SW.craftQ||[]).some(q=>q.id==='rope')))return null;if(rc.id==='pouch'&&(SW.pouch||8)+4*(SW.craftQ||[]).filter(q=>q.id==='pouch').length>=24)return null;if(rc.cost)return rc.cost;const lv=SW.tools[rc.id]+(SW.craftQ||[]).filter(q=>q.id===rc.id).length;if(lv>=3)return null;const c=wToolCost(rc.id,lv),o={wood:c.w,stone:c.s};if(c.i)o.ore=c.i;return o}
-function toolsUpdate(){const n=WRECIPES.length+3;swNav(n);if(!SW.craftQ)SW.craftQ=[];
+function toolsUpdate(){const n=WRECIPES.length+2;swNav(n);if(!SW.craftQ)SW.craftQ=[];
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){if(swSel===n-1){state='g4world';return}
-  if(swSel===n-3){W4.assignB=SW.buildings.findIndex(b=>b.k==='bench');swSel=0;state='g4assign';return}
-  if(swSel===n-2){swSel=0;state='g4jobs';return}
+  if(swSel===n-2){W4.assignB=SW.buildings.findIndex(b=>b.k==='bench');swSel=0;state='g4assign';return}
   const rc=WRECIPES[swSel],c=wRecipeCost(rc);
   if(!c){swSnd(140,.08);swSay('That is as good as it gets already.',1.6);return}
   if(SW.craftQ.length>=4){swSnd(140,.08);swSay('The bench queue is full (4).',1.6);return}
@@ -152,7 +151,7 @@ function toolsUpdate(){const n=WRECIPES.length+3;swNav(n);if(!SW.craftQ)SW.craft
   wPay(c);SW.craftQ.push({id:rc.id,need:rc.need,done:0});swSnd(660,.08,990);swSay(rc.n+' queued. Workers with CRAFT build it — or stand at the bench and do it yourself.',3);swSave()}}
 function drawTools(){swShell('TINKER BENCH','B  DONE');if(!SW.craftQ)SW.craftQ=[];
  const rows=WRECIPES.map(rc=>{const c=wRecipeCost(rc),tl=rc.id==='axe'||rc.id==='pick';return{a:rc.n+(tl?' Lv'+SW.tools[rc.id]:''),b:c?wCostStr(c)+(wCanPay(c)?'':' ✗'):'MASTERWORK'}});
- rows.push({a:'ASSIGN SPROUTS',b:'pin a sprout here'},{a:'SPROUT JOBS',b:'axe & pick crews'},{a:'LEAVE',b:''});
+ rows.push({a:'ASSIGN SPROUTS',b:'pin a sprout here'},{a:'LEAVE',b:''});
  const q=SW.craftQ,hand=(W4.wk||[]).filter(w=>wkSkills(w).HANDIWORK).length;
  const qs=q.length?'QUEUE: '+q.map((x,i)=>WRECIPES.find(rc=>rc.id===x.id).n+(i===0?' '+Math.floor(100*x.done/x.need)+'%':'')).join(' · '):'Queue empty.';
  swRows(rows,swSel,(swSel<WRECIPES.length?WRECIPES[swSel].d+' ':'')+qs+' · Buddies at home build it. Stand at the bench and you and your sprouts help.')}

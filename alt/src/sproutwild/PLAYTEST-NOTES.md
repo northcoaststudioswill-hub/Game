@@ -1,7 +1,7 @@
 # Sproutwild playtest notes (v6.10)
 
 Notes from playing the build after v6.10, kept for the next work session.
-Nothing here has been changed in the game yet. Played with real key presses on a
+**Update, v6.11:** items 1-7, 9-11, 13, 14 and 17 are fixed (see CHANGELOG v6.11). Item 8 needed no change, and item 15 was a misread: the intro has six slides and Erin's does address the keeper. Still open: 12, 16, 18, 19, 20, 21, 22. Played with real key presses on a
 phone-shaped screen (430x932). Screenshots are in `shots/v6.10-notes-*.png`.
 
 Run covered: Meadow from the north-west gate, the road north, KISS (first trainer),

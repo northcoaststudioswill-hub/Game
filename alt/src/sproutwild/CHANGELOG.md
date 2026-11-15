@@ -21,6 +21,29 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v6.11 · 2026-11-15 · fixes from the v6.10 playtest notes
+
+Worked through `PLAYTEST-NOTES.md` (item numbers in brackets).
+
+- [1] After a faint, "SEND WHO?" starts on a healthy buddy; fainted ones read FAINTED, the one in play reads OUT NOW.
+- [2] BUDDY is greyed out when nobody else can fight, and says so instead of opening a dead list.
+- [3] Gym door prompt fits: "A: BATTLE (team Lv7+) · B: LEAVE", which also gives the recommended level.
+- [4] The gym sign hangs on the building front, clear of the top bar.
+- [5] Town requests explain how to get each resource (berries from bushes, buddies chop trees, and so on).
+- [6] Town banner fits on one line.
+- [7] First gym opens with Lv7 and Lv8 (was Lv9 and Lv10).
+- [9] The first time your move is "not very effective" and you have someone to swap to, a tip explains BUDDY.
+- [10] Move list marks strong moves in green with "+", weak ones in red with "-", and the description line says "STRONG vs" or "WEAK vs" the foe.
+- [11] Away from Sunkeep the goal line is local: the gym in this area, or "At Sunkeep: ..." for home goals.
+- [13] With your lead buddy under a quarter health in the field, the goal line says to rest at a Lantern post.
+- [14] On the starter pick, the arrow follows the buddy you are nearest, matching the A prompt.
+- [17] The bench's "SPROUT JOBS: axe & pick crews" row is gone.
+- Marcus's story slide is in his voice.
+
+Not done: [12] crowding on narrow paths, [16] choosing to battle a weak wild, [18]-[21], [22] needs Will's go-ahead.
+
+Verified: 84 lab checks; real-time gym run (door prompt, move tags, forced switch, loss sends you home).
+
 ## v6.10 · 2026-11-15 · first ten minutes, played as a Pikmin / Pokemon / Palworld fan
 
 - **A trainer ambushed new players.** KISS stood exactly where the new path from the gate meets the main road, so the first walk into the Meadow could be a two-buddy trainer battle before the first catch. She now stands up the road by the town gate, and trainers leave you alone until you have caught your first buddy.

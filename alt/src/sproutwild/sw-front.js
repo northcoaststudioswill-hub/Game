@@ -99,7 +99,7 @@ const WSTORY=[
  {who:'',t:'Its light fell as seeds, and the seeds grew legs: SPROUTS, the little plant folk.'},
  {who:'ERIN',t:"A year of dark, keeper. Sunkeep has one good patch of soil left. Grow them."},
  {who:'',t:'Wild BUDDIES went dim without the light. Sprouts can carry it back to them.'},
- {who:'MARCUS',t:"Four gyms, four Sigils. I'll be at mine either way. Unimpressed, as ever."},
+ {who:'MARCUS',t:"Four gyms, four Sigils, bro. You got this. I'll supervise."},
  {who:'KING BIBI',t:'Citizens. For thirty years I have warned you: the light is weeks away. Hence, my IRON DOME.',acc:'#1e2c5a'}];
 /* six beats, one press each (the old rhythm); B or START skips */
 function introUpdate(){W4.introT=(W4.introT||0)+1/60;

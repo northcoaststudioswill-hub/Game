@@ -96,16 +96,16 @@ function wDrawBattle(){const B=FBIO[W4.sector]||FBIO.MEADOW,foe=BT.foe,me=btCur(
   swWrap(tx,W-24).slice(0,3).forEach((l,j)=>text(l,10,top+9+j*12,1,ink,null));if(BT.phase==='msg'&&((time*2.4)|0)%2)text('▼',W-16,top+PH-14,1,'#a33b2e',null)}
  else if(BT.phase==='party'){text('SEND WHO?'+(BT.forced?'':'   B  BACK'),10,top+7,1,'#6a6258',null);
   SW.party.forEach((m,i)=>{const y=top+18+i*12,on=i===swSel,st=wStats(m);if(on)sel(6,y-2,W-12,12);
-   text(m.sp+' Lv'+m.lv,14,y,1,m.hp<=0?'#a03828':ink,null);wbBar(W-92,y+2,50,m.hp/st.max,4);const hs=m.hp+'/'+st.max;text(hs,W-10-tw(hs,1),y,1,'#585868',null)})}
+   text(m.sp+' Lv'+m.lv,14,y,1,m.hp<=0?'#a03828':ink,null);if(m.hp>0&&i!==BT.aiIx)wbBar(W-92,y+2,50,m.hp/st.max,4);const hs=m.hp<=0?'FAINTED':i===BT.aiIx?'OUT NOW':m.hp+'/'+st.max;text(hs,W-10-tw(hs,1),y,1,m.hp<=0?'#a03828':'#585868',null)})}
  else if(BT.phase==='moves'){const mv=me.moves;
   mv.forEach((mid,i)=>{const m=WMOVES[mid],x=6+(i%2)*116,y=top+7+((i/2)|0)*17,on=i===swSel,T=TYPES[m.t];if(on)sel(x,y-2,112,16);
-   r(T?T.d:'#585868',x+6,y+1,4,9);r(T?T.c:'#98988a',x+7,y+2,2,7);text(wFit(m.n,72),x+13,y+2,1,ink,null);const pw=m.p?''+m.p:'—';text(pw,x+106-tw(pw,1),y+2,1,'#585868',null)});
-  const cm=WMOVES[mv[Math.min(swSel,mv.length-1)]];text(wFit((cm.t>=0?WT[cm.t]+' · ':'')+cm.d,W-20),10,top+PH-13,1,'#6a6258',null)}
+   r(T?T.d:'#585868',x+6,y+1,4,9);r(T?T.c:'#98988a',x+7,y+2,2,7);text(wFit(m.n,72),x+13,y+2,1,ink,null);const ef=m.p&&m.t>=0?wMult(m.t,wSp(foe.sp).t):1,pw=m.p?(ef>1?'+':ef<1?'-':'')+m.p:'—';text(pw,x+106-tw(pw,1),y+2,1,ef>1?'#1d7a2a':ef<1?'#a03828':'#585868',null)});
+  const cm=WMOVES[mv[Math.min(swSel,mv.length-1)]];{const ef2=cm.p&&cm.t>=0?wMult(cm.t,wSp(foe.sp).t):1;text(wFit((ef2>1?'STRONG vs '+foe.sp+' · ':ef2<1?'WEAK vs '+foe.sp+' · ':cm.t>=0?WT[cm.t]+' · ':'')+cm.d,W-20),10,top+PH-13,1,ef2>1?'#1d7a2a':ef2<1?'#a03828':'#6a6258',null)}}
  else if(BT.phase==='budpick'){text('SWARM WITH WHICH?   B  BACK',10,top+7,1,'#6a6258',null);
   TYPES.map((t2,i)=>i).filter(i=>(SW.buds[TYPES[i].n]||0)>0&&!(BT.dz&&BT.dz[i])).forEach((ix,j)=>{const kin=wKinship(ix,foe.sp),tag=kin===1.5?'KIN!':kin===1.25?'GOOD':kin===.75?'WEAK':'',T=TYPES[ix],x=6+(j%2)*116,y=top+18+((j/2)|0)*13,on=j===swSel;
    if(on)sel(x,y-2,112,13);r(T.d,x+6,y+1,7,7);r(T.c,x+7,y+2,5,5);text(T.n+' x'+Math.min(5,SW.buds[T.n]),x+17,y+1,1,ink,null);if(tag)text(tag,x+108-tw(tag,1),y+1,1,kin>1?'#1d7a2a':'#a03828',null)})}
  else{const opts=BT.mode==='wild'?['FIGHT','SPROUT','KEEPER','BUDDY','RUN']:BT.mode==='raid'?['FIGHT','KEEPER','BUDDY','RUN']:['FIGHT','KEEPER','BUDDY'];
-  swWrap('What will '+me.sp+' do?',92).slice(0,3).forEach((l,j)=>text(l,10,top+9+j*12,1,ink,null));
-  opts.forEach((o,i)=>{const x=106+(i%2)*66,y=top+7+((i/2)|0)*15,on=i===swSel,used=o==='KEEPER'&&BT.keeperUsed,lab=o==='SPROUT'?'SWARM':o;
+  if(BT.noSwap>0)BT.noSwap-=1/60;swWrap(BT.noSwap>0?'Nobody else can fight!':'What will '+me.sp+' do?',92).slice(0,3).forEach((l,j)=>text(l,10,top+9+j*12,1,BT.noSwap>0?'#a03828':ink,null));
+  opts.forEach((o,i)=>{const x=106+(i%2)*66,y=top+7+((i/2)|0)*15,on=i===swSel,used=(o==='KEEPER'&&BT.keeperUsed)||(o==='BUDDY'&&!SW.party.some((m,i2)=>i2!==BT.aiIx&&m.hp>0)),lab=o==='SPROUT'?'SWARM':o;
    if(on)sel(x,y-2,64,14);const ic=o==='FIGHT'?'#e04838':o==='SPROUT'?'#58c048':o==='KEEPER'?'#ffd23f':o==='BUDDY'?'#48a0f0':'#98988a';r(K,x+5,y,7,9);r(used?'#c8c0b0':ic,x+6,y+1,5,7);
    text(lab,x+15,y+1,1,used?'#98988a':ink,null)})}}

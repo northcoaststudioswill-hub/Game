@@ -322,9 +322,9 @@ MARCUS:["I'm not an NPC. I'm between protagonists.","Your form is terrible. The 
 function wNpcList(){if(W4.sector==='TOWN')return[{who:'PIP',x:168,y:214},{who:'ELDER',x:312,y:214}];
  const spots={ERIN:{x:90,y:120},MARCUS:{x:390,y:120},WILL:{x:84,y:428}};
  return Object.keys(spots).filter(w2=>w2!==SW.keeper).map(w2=>({who:w2,x:spots[w2].x,y:spots[w2].y}))}
-const WSECSUB={BASE:'Your home — build it anywhere',TOWN:'Lanterns lit, doors open — welcome in',MEADOW:'Wildsprouts live in the tall grass',WASTES:'Hot winds. EMBER kinds thrive here',SHORE:'Mist, shells and DEW kinds',HOLLOW:'Dark, quiet, and LUCKY',PEAK:'High winds. ZIP kinds race here'};
+const WSECSUB={BASE:'Your home — build it anywhere',TOWN:'Lanterns lit. Doors open.',MEADOW:'Wildsprouts live in the tall grass',WASTES:'Hot winds. EMBER kinds thrive here',SHORE:'Mist, shells and DEW kinds',HOLLOW:'Dark, quiet, and LUCKY',PEAK:'High winds. ZIP kinds race here'};
 const WGYMS=[
- {sec:'TOWN',leader:'RANGER',sig:'VERDANT SIGIL',prize:80,team:[['FERNFANG',9],['BLOOMBOAR',10]],
+ {sec:'TOWN',leader:'RANGER',sig:'VERDANT SIGIL',prize:80,team:[['FERNFANG',7],['BLOOMBOAR',8]],
   pre:["RANGER: So you want the Verdant Sigil.","My buddies grew up in this meadow. Show me yours can keep up."],
   win:"RANGER: Ha! Grown strong. The Verdant Sigil is yours.",lose:"RANGER: The meadow is patient. Come back stronger."},
  {sec:'WASTES',leader:'MARCUS',sig:'EMBER SIGIL',prize:120,team:[['CINDERCAP',16],['MAGMOSS',17]],
@@ -1161,7 +1161,7 @@ function wDoMove(att,def,move,aSt,dSt,who){ /* returns log lines, applies damage
  const lines=[att.sp+' used '+move.n+'!'];
  if(r.crit)lines.push('A critical hit!');
  if(r.mult>1)lines.push("It's super effective!");
- if(r.mult<1)lines.push("It's not very effective...");
+ if(r.mult<1){lines.push("It's not very effective...");if(att===SW.party[BT.aiIx]&&!SW.lessons.swap&&SW.party.some((m,i)=>i!==BT.aiIx&&m.hp>0)){SW.lessons.swap=1;lines.push('Tip: BUDDY swaps in someone whose moves hit harder.')}}
  if(move.eff==='atkdn'&&def.hp>0){dSt.atk=Math.max(-3,(dSt.atk||0)-1);lines.push(def.sp+"'s ATTACK fell!")}
  return lines}
 function wFoeMove(){const mv=WMOVES[BT.foe.moves[(Math.random()*BT.foe.moves.length)|0]];return mv}
@@ -1252,7 +1252,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.shake>0)
      else if(BT.dazzle){BT.dazzle=false;BT.log=[{txt:foe2.sp+' is too dazzled to aim!'}];BT.after='menu';BT.phase='msg';BT.t=0}
      else{const lines=wDoMove(foe2,btCur(),wFoeMove(),BT.foeStage,BT.myStage);BT.log=lines.map(x=>({txt:x}));BT.phase='msg';BT.t=0;
       if(btCur().hp<=0)wMineDown();else BT.after='menu'}}
-    else if(a==='forceswitch'){BT.phase='party';swSel=0}
+    else if(a==='forceswitch'){BT.phase='party';swSel=Math.max(0,SW.party.findIndex(m=>m.hp>0))}
     else if(a==='endwin')wBattleEnd();
     else if(a==='blackout')wBlackout();
     else BT.phase='menu'}}
@@ -1264,7 +1264,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.shake>0)
    else if(o==='KEEPER')wKeeperMove();
    else if(o==='SPROUT'){if(wBudTotal()<=0){BT.log=[{txt:'No sprouts with you. Pluck some, or carry things home so the Lantern grows more.'}];BT.after='menu';BT.phase='msg';BT.t=0}
     else{BT.phase='budpick';swSel=0}}
-   else if(o==='BUDDY'){BT.phase='party';swSel=0;BT.partyFrom='menu'}
+   else if(o==='BUDDY'){const ok=SW.party.findIndex((m,i)=>i!==BT.aiIx&&m.hp>0);if(ok<0){swSnd(140,.08);BT.noSwap=1.6}else{BT.phase='party';swSel=ok;BT.partyFrom='menu'}}
    else if(o==='RUN'){if(Math.random()<.7){if(BT.mode==='raid'){const lost=Math.min(15,SW.res.petal);SW.res.petal-=lost;BT.log=[{txt:'You fled — Bottie trashed the place on his way out. (-'+lost+' petals)'}]}else BT.log=[{txt:'Got away safely!'}];BT.after='endwin';BT.phase='msg';BT.t=0}
     else{BT.log=[{txt:"Couldn't escape!"}];BT.after=null;BT.phase='msg';BT.t=0;
      const lines=wDoMove(BT.foe,btCur(),wFoeMove(),BT.foeStage,BT.myStage);
@@ -1561,7 +1561,7 @@ function wGenAsk(who){const r2=Math.random();
  if(r2<.7){const rs=['wood','stone','berry'][(Math.random()*3)|0],n=4+((Math.random()*5)|0);return{kind:'res',res:rs,n,rw:8+n*3,bonus:Math.random()<.25}}
  const sp=WASKSP[(Math.random()*WASKSP.length)|0];return{kind:'catch',sp,base:SW.caught[sp]||0,rw:26,bonus:Math.random()<.3}}
 function wAskText(a){return a.kind==='buds'?'Bring '+a.n+' '+TYPES[a.type].n+' sprouts. Pluck them from the patch, or win them in the wild.':
- a.kind==='res'?'Bring '+a.n+' '+a.res.toUpperCase()+'. Gather it, chop it, mine it — Sunkeep provides.':
+ a.kind==='res'?'Bring '+a.n+' '+a.res.toUpperCase()+'. '+({berry:'Sprouts pick berries from bushes.',wood:'Buddies chop trees; sprouts carry the logs.',stone:'Buddies crack rocks; sprouts carry the stone.',ore:'Buddies dig ore from veins.',fiber:'Buddies pull fiber from thickets.',ingot:'A kiln smelts ore into ingots.'}[a.res]||'Sunkeep provides.'):
  'Catch a '+a.sp+'. Weaken it in the grass, then command it with a sprout.'}
 function wAskHave(a){return a.kind==='buds'?(SW.buds[TYPES[a.type].n]||0):a.kind==='res'?SW.res[a.res]:((SW.caught[a.sp]||0)>a.base?'CAUGHT!':'not yet')}
 function wAskReady(a){return a.kind==='catch'?(SW.caught[a.sp]||0)>a.base:(wAskHave(a)>=a.n)}
@@ -1916,7 +1916,7 @@ function drawGym(){const g=WGYMS[W4.gymIx],done=SW.gymDone[W4.gymIx];
  r('#f8f4e0',8,H-58,W-16,50);r('#282838',8,H-58,W-16,3);
  const line=W4.gymPage===0?g.pre[0]:g.pre[1];
  swWrap(line,218).slice(0,2).forEach((l,j)=>text(l,14,H-48+j*11,1,'#282838',null));
- text(done?'A: REMATCH (+4 Lv) · B: LEAVE':'A: BATTLE FOR THE '+g.sig+' · B: LEAVE',14,H-20,1,'#a33b2e',null)}
+ text(done?'A: REMATCH (+4 Lv) · B: LEAVE':'A: BATTLE (team Lv'+g.team[0][1]+'+) · B: LEAVE',14,H-20,1,'#a33b2e',null)}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */

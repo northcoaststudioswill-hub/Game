@@ -64,7 +64,7 @@ function scTri(x,y,d){const K='#14101e',C='#ffd94d';x=Math.round(x);y=Math.round
  else{const s2=d==='l'?-1:1;for(let n=0;n<4;n++){const h=13-n*4,xx=x+s2*n*3-(s2<0?2:0);r(K,xx-1,y-(h>>1)-1,5,h+2)}for(let n=0;n<4;n++){const h=13-n*4,xx=x+s2*n*3-(s2<0?2:0);r(C,xx,y-(h>>1),3,h)}}}
 function scArrow(){if(W4.scene||!W4.bf||W4.fld)return;const op=wOp(),cam=W4.cam||{x:0,y:0};let t=null,off=22;
  if(op===0)t=W4.bf.buds[0];else if(op===1)t=W4.bf.items.find(i=>i.op&&!i.car.length&&!i.done);
- else if(op===2){if(WCHOICE[1].y>0&&WCHOICE[1].y<190){t=WCHOICE[1];off=40}}
+ else if(op===2){if(WCHOICE[1].y>0&&WCHOICE[1].y<190){t=WCHOICE.slice().sort((a,b)=>Math.hypot(a.x-P3.x,a.y-P3.y)-Math.hypot(b.x-P3.x,b.y-P3.y))[0];off=40}}
  else if(SW.quest===2)t={x:240,y:(W4.wh||520)-14,gate:1};
  if(op===0&&wBudTotal()===0){const lw=tw('YOU',1);r('#14101e',P3.x-lw/2-3,P3.y-34,lw+6,10);text('YOU',P3.x-lw/2,P3.y-33,1,'#ffd94d',null)}
  if(!t)return;const sx=t.x-cam.x,sy=t.y-off-cam.y,cx=Math.max(14,Math.min(W-14,sx)),cy=Math.max(46,Math.min(H-40,sy)),edge=cx!==sx||cy!==sy,b=Math.sin(time*6)*2;

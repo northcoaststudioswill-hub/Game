@@ -568,7 +568,7 @@ function fHouse(x,y,gymSec){ /* x,y = door centre */
   r('#7a2e22',gx+12,gy-4,40,6);r('#8a3a2a',gx+4,gy+2,56,6);r('#9a4634',gx-4,gy+8,72,5);r('#5a241c',gx-4,gy+13,72,2);
   r(gc,gx+12,gy+16,4,16);r(gc,gx+48,gy+16,4,16);r('#ffffff',gx+12,gy+18,4,2);r('#ffffff',gx+48,gy+18,4,2);
   r('#ffd23f',gx+24,gy+22,16,20);r('#3a2a1c',gx+26,gy+24,12,18);r('#ffd94d',gx+35,gy+33,2,2);
-  const lab=gl.leader+"'S GYM",lw=tw(lab,1)+8;r('#14101e',x-lw/2-1,gy-17,lw+2,12);r('#f8f4e0',x-lw/2,gy-16,lw,10);text(lab,x-lw/2+4,gy-15,1,'#7a2e22',null);return}
+  const lab=gl.leader+"'S GYM",lw=tw(lab,1)+8;r('#14101e',x-lw/2-1,gy+1,lw+2,12);r('#f8f4e0',x-lw/2,gy+2,lw,10);text(lab,x-lw/2+4,gy+3,1,'#7a2e22',null);return}
  const hx=x-24,hy=y-38;r('rgba(0,0,0,.22)',hx-2,hy+35,52,5);r('#14101e',hx-3,hy-3,54,40);
  r('#e8dcc0',hx,hy+12,48,24);r('#d0c0a0',hx,hy+31,48,5);
  r('#4a6ab0',hx+6,hy-2,36,6);r('#5a7ac0',hx+2,hy+3,44,5);r('#6a8ad0',hx-2,hy+8,52,5);r('#34508c',hx-2,hy+12,52,2);
