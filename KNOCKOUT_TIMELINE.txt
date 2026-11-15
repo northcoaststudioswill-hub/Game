@@ -1,0 +1,129 @@
+NORTH COAST KNOCKOUT - DEV TIMELINE
+Cartridge 2 for the Pocket Lantern console
+Compiled 2026-11-15. All times UTC.
+
+Sources: git history on branch claude/2d-fighter-game-characters-r9oir7 (repo northcoaststudioswill-hub/Game) and the publish log of the Pocket Lantern artifact (https://claude.ai/artifact/KnV5bSXjfQpZzststEonke).
+Artifact version ids are Unix timestamps, so each version's time is exact. Commit and publish times match to the minute.
+
+Version labels: "Artifact vNN" is the live page's own version counter.
+Pocket Lantern v0.1 (pre-alpha) is Artifact v19, the pause point frozen in the repo's v0.1/ folder.
+The Knockout builds before it are labelled KO-1 to KO-3. They are dev builds inside the run-up to v0.1, not separate releases.
+
+
+SUMMARY
+-------
+Label        | Artifact | Published (UTC)     | Commit            | What changed
+-------------+----------+---------------------+-------------------+-----------------------------------------------
+(base)       | v13?     | 2026-11-13 23:56    | -                 | Sprouts only. Knockout work started from this page.
+KO-1         | v14      | 2026-11-14 01:38    | e2344a7           | Knockout lands as cartridge 2
+KO-2         | v15      | 2026-11-14 04:40    | c22a279           | GBA-style look, second specials, controls rework
+-            | v16, v17 | by 2026-11-14 11:56 | -                 | Sprouts-only updates from another session
+KO-3         | v18      | 2026-11-14 15:51    | b1e05bd + 30fd20e | 4 buttons, impact, Marcus, per-fighter moves, battle theme
+v0.1 (pre-alpha) | v19  | 2026-11-14 16:02    | 2ce413d + 7d75a9e | Pause point: KO-3's Knockout unchanged, more Sprouts work, frozen in v0.1/
+
+
+DETAIL
+------
+
+BASE (before the record): Artifact version 1794614200, 2026-11-13 23:56 UTC
+- This is the live Sprouts page the work started from. It was byte-identical to the Sprouts.html upload.
+- The shelf showed Sprouts plus two locked "Coming soon" slots.
+- Its artifact number was not recorded. It is probably v13, since the next publish was v14.
+- Everything earlier (the original Sprouts build, the Opus audit, the Fable plan) is not in this repo or this log.
+
+KO-1: Artifact v14, 2026-11-14 01:38 UTC, commit e2344a7
+"Add North Coast Knockout, a 2D fighter, as cartridge 2"
+- Repo set up: the single-file console split into src/shell.html, src/tracks.js and src/sprouts.js, plus build.py to produce index.html.
+- Second cartridge slot unlocked: "Knockout", with its own label art.
+- One-on-one fighter, best of 3 rounds, 60-second timer, then a finisher.
+- 8 fighters: Will, Erin, Louie (standing Shiba), Chrome, Gas Guy, Kiss Man, Points, Mama.
+- 8 stages from the user's photos: Living Room, Backyard, Front Lawn, The Trail, The Overpass, Gas Station, Fitting Rooms, Rooftop.
+- Moves: punch combo, kick, uppercut, sweep, throw, block, jump attacks, one special per fighter, a super, and a finisher ("-ality").
+- Modes: Arcade (7 fights, Louie as final boss) and Quick Fight. Easy, Normal and Hard CPU difficulty.
+- Built-in chiptune music.
+- Tested with a CPU-vs-CPU soak: 439 rounds, no crashes or stuck matches.
+
+KO-2: Artifact v15, 2026-11-14 04:40 UTC, commit c22a279
+"GBA-style sprites, second specials, direction+button controls"
+- User feedback: the graphics were too playful and the move sets needed signature moves.
+- Look: taller GBA-fighter proportions with smaller heads, shaded limbs, darker outlines, dithered skies, and hit sparks instead of comic words.
+- Renames: Chrome became LIL BOTTIE and Kiss Man became CORBIN ("Can I Get A Kiss Man", from Love Island USA season 8).
+- A second special for every fighter:
+  Will - Mazel Tov Laser
+  Erin - Towel Whip (Leash Lasso moved to her second special)
+  Louie - Shiba Plane (airplane ears)
+  Lil Bottie - Clanker Guns, Chain Stun
+  Gas Guy - Tire Pressure
+  Corbin - Sneaky Kiss
+  Points - Point Blank
+  Mama - Mom Voice
+- Controls: researched two-button fighters. Moved to direction + button inputs with no motion inputs, and added a double-tap dash.
+- Soak test: 427 rounds, no errors.
+
+v16 and v17: Sprouts updates from another session, published by 2026-11-14 11:56 UTC
+- One of these is version id 1794657381 (11:56 UTC). The other was not seen from this session.
+- Changes were to Sprouts only:
+  - Marcus's Waterworks dialogue and dap
+  - Thornback becomes a friend (renamed achievement and mission)
+  - story scenes, zone pans, travel hop
+  - camera and viewport changes
+- The Knockout code was unchanged in these versions.
+
+KO-3: Artifact v18, 2026-11-14 15:51 UTC, commits b1e05bd (15:44) and 30fd20e (15:51)
+"Four-button layout, heavier hits, Marcus, per-fighter moves, battle theme"
+- User feedback: no two-button presses on a phone, fights felt floaty, Erin's head looked off, attacks should be character-specific, add Marcus and the battle song.
+- Music: "Retro Battle Theme" (dreamliketextures752) is the only track in Knockout, re-encoded at 128 kbps.
+- Controls: X and Y face buttons appear only while Knockout is inserted, so Sprouts keeps its two-button layout.
+  A = light (A,A,A combo), B = heavy, X = special 1, Y = special 2, Select = super (it glows when ready).
+  Finisher: X, Y or Select.
+- Impact: higher gravity and a faster fall, longer hitstop, a white hit flash, victim shake, stronger screen shake, a zoom punch on big hits, more knockback, and landing dust.
+- Erin: head redrawn, and her down + A is the "Bean Dip".
+- Louie: Paw Paw Paw, Chomp (bite), Need More Loaf (loaf slide), Zoom Zoom Zoom (X), Turbo Zoom (Y), and a new super, Judgement (giant Shiba side-eye).
+- MARCUS replaces Points. His moves:
+  - normals: Bro Jab, Pipe Wrench, Plunger Pop, Snake the Drain
+  - Dab Cloud (X)
+  - Double or Nothing (Y, a coin flip)
+  - Hydro Jet super
+  - Flush-ality finisher
+- Every fighter has named basic attacks. Corbin's are all "Can I Get A Kiss".
+- A move list screen opens from the pause menu, or with X or Y on character select.
+- Merge: the v16/v17 Sprouts changes were kept, and the Knockout hooks were reapplied on top (commit 30fd20e).
+- Soak test: 449 rounds, no errors. Sprouts was checked to still boot into its new opening scene.
+
+POCKET LANTERN v0.1 (pre-alpha): Artifact v19 (id 1794672147-9b23), 2026-11-14 16:02 UTC
+Commits 2ce413d (16:56 UTC) and 7d75a9e (17:16 UTC), from another session
+- Pause point before importing new cartridges. Frozen copy and backup in v0.1/games and v0.1/backups.
+- Standalone music files are in v0.1/music, and a shareable zip is in v0.1/share.
+- Knockout code is byte-identical to KO-3.
+- Adds Sprouts work: story chapters, valley projects, and a second Sprouts song, "Autumn Study" (William Cohen).
+- The handoff note says to start any next work from the live page, not from an old copy.
+
+
+CURRENT ROSTER (as of v0.1 / KO-3)
+---------------------------
+Fighter    | X special       | Y special          | Super            | Finisher
+-----------+-----------------+--------------------+------------------+---------------
+Will       | Selfie Flash    | Mazel Tov Laser    | Bike Lane        | Selfie-ality
+Erin       | Towel Whip      | Leash Lasso        | Sprout Stampede  | Garden-ality
+Louie      | Zoom Zoom Zoom  | Turbo Zoom         | Judgement        | Bork-ality
+Lil Bottie | Clanker Guns    | Chain Stun         | Air Support      | Latte-ality
+Gas Guy    | Thumbs Down     | Tire Pressure      | Free Air         | Dislike-ality
+Corbin     | Can I Get A Kiss| Sneaky Kiss        | 007              | Smooch-ality
+Marcus     | Dab Cloud       | Double or Nothing  | Hydro Jet        | Flush-ality
+Mama       | Bottle Toss     | Mom Voice          | Bean on the Move | Naptime-ality
+
+
+OPEN ITEMS (not done yet)
+-------------------------
+- Not yet played on a real phone. Touch feel and CPU difficulty are unverified there.
+- Marcus won the fewest CPU-vs-CPU matches in the last soak (small sample). Balance needs a real play check.
+- "Mama" and her baby "Bean" are placeholder names for a friend from the group photo.
+- Corbin uses a generic caped-hero sprite, not the meme photo.
+
+
+GAPS FOR THE BOARD
+------------------
+- The repo has no history before the Knockout work (commit e2344a7). Sprouts appears there only as it was on 2026-11-13 23:56 UTC.
+- src/ in this repo still holds Sprouts as of KO-3. The v0.1 Sprouts changes live only in v0.1/games, so new work should start from that file or the live page.
+- Artifact v16 and v17 came from another session. Their exact contents and times are only partly known (see above). That session's own notes would fill this in.
+- From now on, adding an entry to a CHANGELOG file with each publish would give the board dated, numbered versions without reconstruction.
