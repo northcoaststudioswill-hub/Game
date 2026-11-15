@@ -31,7 +31,7 @@ function wNormalize(j){const D=SWDEF(),S=Object.assign(SWDEF(),(j&&typeof j==='o
  if(S.selType==null||!TYPES[S.selType])S.selType=0;if(!S.cmdMode)S.cmdMode='sprout';
  return S}
 function wResetWorld(){Object.assign(W4,{sector:'BASE',fld:null,bf:null,wk:[],patchBuds:null,tend:null,groundHearts:[],amb:null,jobPos:null,banner:null,talk:null,cine:null,fetch:null,confirm:null,engage:null,
-  msg:'',msgT:0,dayT:40,wildCd:0,near:null,wake:0,nodes:[],wilds:[],loose:[],treasure:null,from:null,bushes:null,groundFor:null,prodT:0});W4.floats=[];BT=null}
+  cast:null,quips:[],quipQ:[],msg:'',msgT:0,dayT:40,wildCd:0,near:null,wake:0,nodes:[],wilds:[],loose:[],treasure:null,from:null,bushes:null,groundFor:null,prodT:0});W4.floats=[];BT=null}
 function wSlotInfo(i){try{const j=JSON.parse(localStorage.getItem(WSLOTS[i])||'null');return j&&j.intro?j:null}catch(e){return null}}
 function wLoadSlot(i){wSlot=i;let j=null;try{j=JSON.parse(localStorage.getItem(WSLOTS[i])||'null')}catch(e){}const N=wNormalize(j);for(const k in SW)delete SW[k];Object.assign(SW,N);wResetWorld();return!!(j&&j.intro)} /* same object, new contents: nothing holds a stale save */
 SW=wNormalize(SW);

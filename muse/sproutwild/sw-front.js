@@ -89,7 +89,7 @@ function swDrawTitle(){const hz=Math.round(H*.60);ox=0;oy=0;
   /* a sprout growing out of the logo */
   r('#2c6030',bx+bw+2,ly+2,1,10);r('#58c048',bx+bw-2,ly-1,4,3);r('#58c048',bx+bw+3,ly-3,4,3);r('#b0f090',bx+bw-1,ly-1,1,1);
   const sub='A LANTERN VALLEY TALE';text(sub,Math.round(W/2-tw(sub,1)/2),ly+bh+7,1,'#ffe8b0',null)}
- if(!(W4.tm|0)&&((time*1.6)|0)%2)uiPill('PRESS A',H-56,'A');
+ if(!(W4.tm|0)&&((time*1.6)|0)%2)uiPill('PRESS A',Math.round(hz+34),'A');
  r('rgba(10,14,8,.8)',0,H-12,W,12);ctext(W4.tsaved>0?'SAVED TO FILE '+(wSlot+1):'GROW · THROW · CATCH · BUILD',H-10,1,W4.tsaved>0?'#7ee787':'#7a9a68',null);
  if(W4.tm|0)wTitleFiles()}
 
@@ -105,9 +105,9 @@ const WSTORY=[
 function introUpdate(){W4.introT=(W4.introT||0)+1/60;
  if(pressed('b')){wIntroDone();return}
  if(pressed('a')||pressed('start')){W4.introPage=(W4.introPage||0)+1;W4.introT=0;swSnd(660,.05);if(W4.introPage>=WSTORY.length)wIntroDone()}}
-function swDrawIntro(){const p=Math.min(W4.introPage||0,WSTORY.length-1),tt=W4.introT||0,S=WSTORY[p],gy=H-78;ox=0;oy=0;
+function swDrawIntro(){const p=Math.min(W4.introPage||0,WSTORY.length-1),tt=W4.introT||0,S=WSTORY[p],sn=S.sc==null?p:S.sc,gy=H-78;ox=0;oy=0;
  const fade=Math.min(1,tt*2.5);
- if(p===0){ /* the lantern in the sky, then the crack */
+ if(sn===0){ /* the lantern in the sky, then the crack */
   const crack=tt>1.5,sh=crack&&tt<2.0?Math.round(Math.sin(time*70)*2):0;
   uiSky(['#070a20','#141a48','#2a2a6a','#3a3a7a'],gy);uiStars(50,gy-20,1);uiHills(gy,22,'#12203a',1.1,1.2);uiHills(gy+10,14,'#0c2a1c',3.3,2);r('#0a2014',0,gy+10,W,H);
   const lx=W/2+sh,ly=Math.round(gy*.42);if(!crack)uiRays(lx,ly,130,10,'#ffd94d',.10);
@@ -115,17 +115,17 @@ function swDrawIntro(){const p=Math.min(W4.introPage||0,WSTORY.length-1),tt=W4.i
   r(UI.ink,lx-17,ly-21,34,42);r('#7a2e22',lx-17,ly-23,34,5);r('#3c2a16',lx-15,ly-18,30,36);r(crack?'#5a4a30':'#ffd94d',lx-12,ly-15,24,30);r(crack?'#6a5a3a':'#fff3b0',lx-8,ly-11,16,22);if(!crack)r('#ffffff',lx-4,ly-6,8,12);
   if(crack){r(UI.ink,lx-2,ly-15,2,9);r(UI.ink,lx,ly-7,5,2);r(UI.ink,lx+4,ly-6,2,10);r(UI.ink,lx-5,ly+3,10,2);r(UI.ink,lx-6,ly+4,2,10);
    if(tt<1.8){g.globalAlpha=1-(tt-1.5)/.3;r('#ffffff',0,0,W,H);g.globalAlpha=1}}}
- else if(p===1){ /* seeds fall, sprouts pop */
+ else if(sn===1){ /* seeds fall, sprouts pop */
   uiSky(['#070a20','#141a48','#2a2a6a'],gy);uiStars(40,gy-20,2);uiHills(gy,20,'#12203a',1.1,1.2);r('#143a1e',0,gy,W,H);r('#2c6a34',0,gy,W,2);
   for(let i=0;i<9;i++){const k=((tt*.55+i*.137)%1),sx=30+i*24+k*26,sy=k*(gy-6);r('#fff3b0',Math.round(sx),Math.round(sy),2,2);g.globalAlpha=.5;r('#ffd94d',Math.round(sx-3),Math.round(sy-5),1,4);r('#ffd94d',Math.round(sx-6),Math.round(sy-10),1,4);g.globalAlpha=1}
   for(let i=0;i<6;i++){const born=.8+i*.45;if(tt<born)continue;const age=tt-born,px=28+i*37,z=age<.3?Math.sin(age/.3*Math.PI)*10:0;
    if(age<.25){r('#fff3b0',px-4,gy-2,10,2);r('#fff3b0',px,gy-6,2,6)}
    drawBud({x:px,y:gy+8,type:i,stage:age<1?0:age<2?1:2,z,a:i*1.9,mv:age>2,st:'idle',fx:1})}}
- else if(p===2){ /* Sunkeep, dark lantern, Erin */
+ else if(sn===2){ /* Sunkeep, dark lantern, Erin */
   uiSky(['#1a2048','#4a3a70','#c06a6a','#f0b070'],gy);uiHills(gy,18,'#3a3a5a',2.2,1.4);r('#3f7a34',0,gy,W,H);r('#58a044',0,gy,W,2);
   r('#6a4a2c',W/2-50,gy+14,100,22);r('#7d5a36',W/2-50,gy+14,100,3);for(let i=0;i<3;i++){r('#5a3d24',W/2-36+i*30,gy+22,16,3);if(tt>.6+i*.4)drawBud({x:W/2-28+i*30,y:gy+24,type:[0,2,4][i],stage:Math.min(2,Math.floor((tt-.6-i*.4))),z:0,a:i,mv:false,st:'idle',fx:1})}
   uiLantern(W/2,gy+6,false,1.3);fChibi(W/2+56,gy+8,Object.assign({},FLOOK.ERIN,{sc:2}),[-1,0],false);g.drawImage(LOU.l[((time*2)|0)%2],W/2-88,gy-4,26,13);uiWill(W/2-50,gy+4,1.5,1,0)}
- else if(p===3){ /* a sprout takes command of a buddy */
+ else if(sn===3){ /* a sprout takes command of a buddy */
   uiSky(['#6ab8e8','#a8dcf4','#e0f4fc'],gy);uiHills(gy,14,'#3f8a4a',1.7,1.8);r('#5fa544',0,gy,W,H);r('#86d86c',0,gy,W,2);
   for(let i=0;i<40;i++)r(i%2?'#2f6a2c':'#4fb04a',(i*17+3)%W,gy+4+(i*7)%16,1,5);
   const k=(tt%2.6)/2.6,bx=60+(W-110-60)*Math.min(1,k*1.8),by=gy-8-Math.sin(Math.min(1,k*1.8)*Math.PI)*46,hit=k*1.8>=1;
@@ -133,12 +133,12 @@ function swDrawIntro(){const p=Math.min(W4.introPage||0,WSTORY.length-1),tt=W4.i
   if(!hit)drawBud({x:Math.round(bx),y:Math.round(by)+8,type:4,stage:2,z:0,a:1,mv:false,st:'idle',fx:1});
   else{drawBud({x:W-58,y:gy-30,type:4,stage:2,z:0,a:1,mv:true,st:'idle',fx:1});for(let i=0;i<6;i++){const a=i*1.05+time*3;r('#fff3b0',Math.round(W-56+Math.cos(a)*24),Math.round(gy-14+Math.sin(a)*16),2,2)}}
   uiMon('CINDERCAP',84,gy+12,26,true)}
- else if(p===4){ /* Marcus and the four sigils */
+ else if(sn===4){ /* Marcus and the four sigils */
   uiSky(['#e09a50','#f0c080','#f8e0b0'],gy);uiHills(gy,22,'#94603e',2.9,1.3);r('#bd8850',0,gy,W,H);r('#e6ba78',0,gy,W,2);
   fHouse(W/2,gy+12,wSector('WASTES'));fChibi(W/2+52,gy+16,Object.assign({},FLOOK.MARCUS,{sc:2}),[0,1],false);
   ['#58c048','#f07830','#48a0f0','#f0d020'].forEach((c,i)=>{if(tt<.4+i*.3)return;const a=time*1.2+i*1.571,sx=Math.round(W/2+Math.cos(a)*74),sy=Math.round(gy*.34+Math.sin(a)*12);
    r(UI.ink,sx-5,sy-6,10,12);r(c,sx-3,sy-5,6,3);r(c,sx-4,sy-2,8,4);r(c,sx-3,sy+2,6,3);r('#ffffff',sx-1,sy-2,2,2)})}
- else if(p===5){ /* King Bibi raises the dome */
+ else if(sn===5){ /* King Bibi raises the dome */
   uiSky(['#0c0a20','#241f44','#3d3760','#5a4a80'],gy);uiStars(30,gy-30,5);uiHills(gy,20,'#241f36',1.9,1.5);r('#262244',0,gy,W,H);r('#3d3760',0,gy,W,2);
   const rise=Math.min(1,tt/1.6),rad=Math.round(70*rise);
   if(g.beginPath&&rad>4){g.save();g.beginPath();g.rect(0,0,W,gy);g.clip();g.globalAlpha=.18+.06*Math.sin(time*4);g.fillStyle='#58a0f0';g.beginPath();g.arc(W/2,gy,rad,0,6.3);g.fill();

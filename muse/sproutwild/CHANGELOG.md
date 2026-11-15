@@ -21,6 +21,21 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v5.9 — its own letters, and people who talk (Fable)
+
+From Will's iPhone screenshots.
+
+**Text.** On the iPhone every label sat a few pixels low and spilled out of its box: menu rows, name tabs, signs, the bottom bar. The game was using the device's monospace font, which is placed differently on iOS than on the machine the layouts were made on. Sproutwild now carries its own pixel font (`sw-text.js`), so every device draws the same pixels in the same place. Sprouts and Rootdeep keep the system font.
+
+**The start is taught by people, in the world** (`sw-cast.js`).
+- The story before the game is three scenes instead of six.
+- You load in at the Lantern with control straight away. Erin and Marcus walk up and talk in speech bubbles over their heads; Louie barks. They react to what you do: the first pluck, the berries, the Lantern waking, your first buddy, your first catch.
+- After the opening they keep wandering the base, turn to look at you, and quip about what is going on: a new building, workers, ore, fiber, a Sigil, night.
+- Louie answers in a bubble too. Bubbles never overlap; one that has to move away from its speaker gets a name tag instead of a tail.
+- People are now the lowest priority for the A button, so someone walking past cannot steal it from what you are facing.
+
+Tests: `field-lab.js` 72/72. `tests-fable/render-phone.js` shoots the opening at an iPhone-shaped screen.
+
 ## v5.8 — save files, and text that cannot clip (Fable)
 
 Will hit an error and clipped text before the game even started. I could not reproduce an error with saves made by five older builds, an empty save or a deliberately damaged one, but three real weaknesses turned up and are fixed.

@@ -525,11 +525,11 @@ function wNear(){const sec=wSector(W4.sector),px=P3.x+P3.ax*13,py=P3.y+P3.ay*13;
    if(Math.hypot(px-c.x,py-c.y)<17)return{k:'choice',sp:c.sp,txt:'BEFRIEND '+c.sp};
  if(sec.gym>=0&&Math.hypot(px-WW/2,py-66)<20)return{k:'gym',txt:'GYM'};
  if(W4.sector!=='BASE'&&Math.hypot(px-WW/2,py-(W4.wh-22))<17)return{k:'sign',txt:'LANTERN GATE'};
- for(const np of wNpcList())if(Math.hypot(px-np.x,py-np.y)<16)return{k:'npc',who:np.who,txt:'TALK'};
  if(W4.sector==='BASE'){for(const b of SW.buildings){const bx=wCellX(b.gx)+10,by=wCellY(b.gy)+12;
    if(Math.hypot(px-bx,py-by)<18)return{k:'bld',b,txt:wBuildDef(b.k).n}}
   if(Math.hypot(px-lou.x,py-lou.y)<17)return{k:'louie',txt:'PET LOUIE'};
   if(Math.hypot(px-WW/2,py-74)<24)return{k:'lantern',txt:'THE GREAT LANTERN'}}
+ for(const np of wNpcList())if(Math.hypot(px-np.x,py-np.y)<16)return{k:'npc',who:np.who,txt:'TALK TO '+np.who}; /* people last: they wander, and must never steal the button from what you are facing */
  const si=wSproutInfo(px,py);if(si)return si; return null}
 const WTOOLCOST=[{w:6,s:3,i:0},{w:14,s:8,i:2},{w:24,s:14,i:5}];
 function wToolCost(tool,lv){const c=WTOOLCOST[lv];return tool==='axe'?c:{w:c.s,s:c.w,i:c.i}}
@@ -828,12 +828,12 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
     else if(sid==='WASTES'){const px2=((sd*11+time*46)%(WW+30))-15,py2=(sd*5)%(W4.wh-40)+30;r('rgba(232,200,150,.5)',Math.round(px2),Math.round(py2),3,1)}
     else{const px2=((sd*9+time*11)%(WW+14))-7,py2=((sd*4+time*6)%(W4.wh-50))+24;r(i2%2?'rgba(240,184,216,.75)':'rgba(255,255,255,.7)',Math.round(px2+Math.sin(time*1.4+i2*2)*3),Math.round(py2),2,1)}}}
   for(const np of wNpcList()){r('rgba(0,0,0,.25)',np.x-7,np.y-1,14,3);
-   fChibi(np.x,np.y+3,FLOOK[np.who]||FLOOK.WILL,[0,1],false);
-   if(Math.hypot(P3.x-np.x,P3.y-np.y)>34){r('rgba(10,14,8,.55)',np.x-tw(np.who,1)/2-2,np.y+2,tw(np.who,1)+4,9);
+   fChibi(Math.round(np.x),Math.round(np.y)+3,FLOOK[np.who]||FLOOK.WILL,np.dir||[0,1],!!np.mv);
+   if(Math.hypot(P3.x-np.x,P3.y-np.y)<70&&!(W4.quips||[]).some(q=>q.who===np.who)){r('rgba(10,14,8,.55)',np.x-tw(np.who,1)/2-2,np.y+2,tw(np.who,1)+4,9);
    text(np.who,np.x-tw(np.who,1)/2,np.y+3,1,'#ffe8b0',null)}}
   r('rgba(0,0,0,.22)',Math.round(lou.x)-9,Math.round(lou.y)+4,18,3);
   const lf=((time*2)|0)%2;g.drawImage(lf?LOU.l[0]:LOU.l[1],Math.round(lou.x)-12,Math.round(lou.y)-6,24,12);
-  if(Math.hypot(P3.x-lou.x,P3.y-lou.y)>34){r('rgba(10,14,8,.55)',Math.round(lou.x)-tw('LOUIE',1)/2-2,Math.round(lou.y)+6,tw('LOUIE',1)+4,9);
+  if(Math.hypot(P3.x-lou.x,P3.y-lou.y)<70&&!(W4.quips||[]).some(q=>q.who==='LOUIE')){r('rgba(10,14,8,.55)',Math.round(lou.x)-tw('LOUIE',1)/2-2,Math.round(lou.y)+6,tw('LOUIE',1)+4,9);
   text('LOUIE',Math.round(lou.x)-tw('LOUIE',1)/2,Math.round(lou.y)+7,1,'#ffe8b0',null)}
   if(W4.louLead)text('!',Math.round(lou.x)-1,Math.round(lou.y)-17,2,'#ffd94d',null)
   if(SW.quest===1&&SW.tendDone&&!SW.party.length)for(const c of WCHOICE){const spr=wSp(c.sp)._spr,bob=Math.sin(time*3+c.x)*1;
@@ -879,7 +879,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
   if(dk>.15&&W4.sector==='BASE'){r('rgba(255,190,80,'+(dk*.05).toFixed(3)+')',196,40,88,88);
    r('rgba(255,190,80,'+(dk*.10).toFixed(3)+')',214,58,52,52);
    r('rgba(255,200,100,'+(dk*.24).toFixed(3)+')',227,71,26,26)}}
- g.restore();
+ wQuipDraw();g.restore();
  fxAtmos();wHud();
  if(W4.talk){const tk=W4.talk,line=tk.page===0?WTALK[tk.who][(SW.talkN[tk.who]-1)%3]:'Hand over the lantern?';
   uiSay(tk.who,line,null,tk.page===0?'A  MORE · B  BYE':'A  BECOME '+tk.who+' · B  NO')}}
@@ -1719,7 +1719,7 @@ function swDrawTitle(){r('#101408',0,0,W,H);
  if(((time*1.4)|0)%2)ctext('PRESS A',H-30,2,'#ffd94d',null);
  ctext('CATCH · BUILD · BATTLE',H-14,1,'#7a9a68',null)}
 function wIntroDone(){SW.intro=1;wEnterSector('BASE');state='g4world';
- swSay('The Great Lantern is dark. Something glows at its roots...',4);swSave();
+ swSave();
  SW.lessons.start=1}
 function introUpdate(){W4.introT=(W4.introT||0)+1/60;
  if(pressed('b')){wIntroDone();return}

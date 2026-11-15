@@ -52,7 +52,7 @@ function wLouieTip(){const tips=[
  'King Bibi says the dome is temporary. I am a dog and even I do not believe him.'];
  SW.talkN.LOUIE=(SW.talkN.LOUIE||0)+1;return tips[(SW.talkN.LOUIE-1)%tips.length]}
 function wLouTalk(){if(!(W4.petCd>0)){W4.petCd=18;if(Math.random()<.5){SW.hearts++;SW.heartsTotal++;W4.floats.push({x:lou.x,y:lou.y-16,txt:'+1 ♥',t:1.2,c:'#f078c0'})}}
- swSnd(988,.06,1318);const g2=wNextGoal();swSay('LOUIE: '+(g2?g2.label:wLouieTip()),4);swSave()}
+ swSnd(988,.06,1318);const g2=wNextGoal();wQuip('LOUIE',g2?g2.label:wLouieTip());swSave()}
 /* Louie runs ahead to whatever is next and waits for you; with nothing to show he just keeps you company */
 function wLouTick(dt){if(W4.petCd>0)W4.petCd-=dt;const g2=wNextGoal();let tx=lou.x,ty=lou.y;const dp=Math.hypot(P3.x-lou.x,P3.y-lou.y);
  if(g2){const dg=Math.hypot(g2.x-lou.x,g2.y-lou.y);W4.louLead=dg>8?1:2;if(dg>8&&dp<96){tx=g2.x;ty=g2.y}else if(dp>150){tx=P3.x;ty=P3.y}}
@@ -60,25 +60,25 @@ function wLouTick(dt){if(W4.petCd>0)W4.petCd-=dt;const g2=wNextGoal();let tx=lou
  const dx=tx-lou.x,dy=ty-lou.y,d=Math.hypot(dx,dy);W4.louMv=d>2;if(d>2){const v=Math.min(d*6,g2?92:70);lou.x+=dx/d*v*dt;lou.y+=dy/d*v*dt}}
 function wPluckSeed(b){const F=W4.bf,tn=TYPES[b.type].n;F.buds.splice(F.buds.indexOf(b),1);SW.seeds=SW.seeds.filter(t=>t!==b.type);SW.buds[tn]=(SW.buds[tn]||0)+1;
  W4.floats.push({x:b.x,y:b.y-16,txt:'A '+tn+' SPROUT!',t:1.6,c:TYPES[b.type].l});swSnd(880,.07,1320);
- if(!SW.seeds.length){SW.quest=Math.max(SW.quest,1);swSay('Three sprouts: Lantern light with legs. Face the berries and press B to throw one.',4.5)}
- else swSay('It follows you. Sprouts are what is left of the Lantern light.',3.2);
+ if(!SW.seeds.length)SW.quest=Math.max(SW.quest,1);
  swSave()}
 function wLanternWake(){SW.lit=1;SW.tendDone=true;SW.tendStage=4;SW.plucked=2;SW.trioPlucked=[];SW.quest=Math.max(SW.quest,1);wInitPatch();W4.wake=3;
  W4.banner={txt:'THE LANTERN STIRS',sub:'Its light reaches the garden — and the wilds',t:4.5};swSnd(523,.35,1046);
- later(()=>swSay('Dim buddies are creeping toward the light. Go and greet one.',4),4600);swSave()}
+ swSave()}
 /* every delivery feeds the Lantern: four make a sprout. The opening's berries wake it. */
 function wOnDeliver(F,it){SW.light=(SW.light||0)+(it.k==='tre'?3:1);
  if(SW.light>=4&&wBudTotal()<40&&wLit()){SW.light-=4;const c=it.car&&it.car[0],ty=c?c.type:(Math.random()*5)|0,tn=TYPES[ty].n;SW.buds[tn]=(SW.buds[tn]||0)+1;
   W4.floats.push({x:F.start.x,y:F.start.y-44,txt:'THE LANTERN GROWS A '+tn+' SPROUT!',t:2.4,c:TYPES[ty].l});swSnd(988,.1,1480)}
  if(F.base&&it.op){SW.fedN=(SW.fedN||0)+1;if(SW.fedN>=2&&!SW.lit)wLanternWake()}}
 function wBefriend(sp){SW.party=[wMakeMon(sp,5)];SW.seen[sp]=1;SW.caught[sp]=1;SW.quest=2;swSave();
- wCineMon(sp,'Your sprouts bloomed on it. It remembers the light.');later(()=>swSay('Take the south road. Louie knows the way.',3.6),700)}
+ wCineMon(sp,'Your sprouts bloomed on it. It remembers the light.')}
 function wBaseArrive(from){const F=W4.bf;P3.x=240;P3.ax=0;P3.ay=-1;P3.y=from==='MEADOW'?(W4.wh||520)-38:152;
  lou.x=P3.x-24;lou.y=P3.y+8;W4.part={x:P3.x+16,y:P3.y+6};for(const s of F.sq){s.x=P3.x+(Math.random()*24-12);s.y=P3.y+10+Math.random()*10}
  if(SW.quest<2&&!SW.lit){if(!SW.seeds)SW.seeds=[0,2,4];
   F.buds=SW.seeds.map(ty=>({type:ty,x:WSEEDPOS[ty][0],y:WSEEDPOS[ty][1],glow:1}));
   for(let i=(SW.fedN||0);i<3;i++)F.items.push({k:'pel',res:'berry',n:1,w:1,x:150+i*15,y:190+(i%2)*7,car:[],op:1})}
  if(SW.quest<2){W4.banner=null;SW.visited.BASE=1}
+ wCastInit();W4.talk=null;
  W4.cam=null;wCamUpdate(P3.x,P3.y)}
 function wNearExtra(px,py){const F=W4.bf;if(!F)return null;for(const b of F.buds)if(Math.hypot(px-b.x,py-b.y)<18)return{k:'fbud',b,txt:'PLUCK'};return null}
 /* leaving Sunkeep on foot */
@@ -95,7 +95,7 @@ function lampDraw(){const rows=wLampRows();swShell('THE GREAT LANTERN','♥ '+SW
  swRows(rows.map(rw=>({a:rw.label,b:rw.price?'♥ '+rw.price:rw.act==='travel'?'any lit post':''})),swSel,
   wBaseReady()?'The missions are done. Let it grow!':'Everything carried home feeds it. Four deliveries grow a sprout. Hearts buy plans.')}
 function wTrailhead(){const x=268,y=(W4.wh||520)-30,K='#14101e';r('rgba(0,0,0,.25)',x-3,y+1,10,3);r(K,x,y-18,4,20);r('#8a6238',x+1,y-17,2,18);r(K,x-12,y-22,28,11);r('#b0834e',x-11,y-21,26,9);r('#d0a468',x-11,y-21,26,2);
- text('MEADOW',x-9,y-19,1,K,null);r(K,x-2,y-9,8,5);r('#b0834e',x-1,y-8,6,3);r(K,x+1,y-4,2,3)}
+ text('SOUTH',x-9,y-20,1,K,null);r(K,x-2,y-9,8,5);r('#b0834e',x-1,y-8,6,3);r(K,x+1,y-4,2,3)}
 /* ---------------- the Great Lantern: an old tree cradling a cracked lantern ---------------- */
 function wShrine(){const lx=240,K='#14101e',lit=wLit(),fl=.5+.5*Math.sin(time*2.2),dk=wDark(),B=FBIO.MEADOW;
  r('#1c4426',0,-50,WW,52);for(let x=4;x<WW;x+=22)if(Math.abs(x-lx)>58)fTree(B,x+((x*7)%9),2+((x*5)%7),x);

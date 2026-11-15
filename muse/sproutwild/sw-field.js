@@ -457,7 +457,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
 function fCommand(F,dt){
  if(pressed('sel')){let i=SW.selType;for(let n=0;n<TYPES.length;n++){i=(i+1)%TYPES.length;if(F.sq.some(s=>s.type===i))break}
   SW.selType=i;swSnd(660,.06,990);W4.floats.push({x:P3.x,y:P3.y-20,txt:TYPES[i].n+' SPROUTS UP NEXT',t:1.2,c:TYPES[i].l})}
- if(pressed('b')){fThrow(F);if(F.sq.length&&!SW.lessons.fthrow){SW.lessons.fthrow=1;swSay('B throws a sprout where the ring is. HOLD B to whistle them back. SELECT picks the kind.',4.2)}}
+ if(pressed('b')){fThrow(F);if(F.sq.length&&!SW.lessons.fthrow&&!F.base){SW.lessons.fthrow=1;swSay('B throws a sprout where the ring is. HOLD B to whistle them back. SELECT picks the kind.',4.2)}}
  if(keys.b){F.bHold=(F.bHold||0)+dt;
   if(F.bHold>.38){const wr=Math.min(78,16+(F.bHold-.38)*150);F.whistle=wr;if(((F.bHold*10)|0)%3===0)swSnd(1320+wr*6,.03);
    for(const s of F.sq)if(s.st!=='follow'&&s.st!=='fly'&&s.st!=='ret'&&Math.hypot(s.x-P3.x,s.y-P3.y)<wr){fDrop(F,s);s.st='ret'}}}
@@ -468,7 +468,7 @@ function fBaseBuild(){const w=Math.ceil(WW/FT),h=Math.ceil((W4.wh||520)/FT),F={i
 function fBaseTick(dt){const F=W4.bf;if(!F)return;if(P3.ax||P3.ay)F.dir=[P3.ax,P3.ay];
  F.ft=(F.ft||0)-dt;if(F.ft<=0){F.ft=2;fFlow(F)}
  if(F.got){F.got.t-=dt;if(F.got.t<=0)F.got=null}
- fSync(F);fSquad(F,dt);fItems(F,dt);wkTick(dt);fCommand(F,dt);wBaseEdge()}
+ fSync(F);fSquad(F,dt);fItems(F,dt);wkTick(dt);wCastTick(dt);fCommand(F,dt);wBaseEdge()}
 function fSqDraw(F,front){for(const o of F.sq){if((o.y>P3.y)!==front)continue;drawBud({x:Math.round(o.x),y:Math.round(o.y)+2,type:o.type,stage:2,z:o.z||0,a:o.a,mv:!!o.mv,st:o.st==='idle'?'idle':'follow',fx:1});
   if(o.st==='work'&&o.mv)r('#ffffff',Math.round(o.x)+4,Math.round(o.y)-9,2,2)}
  if(!front){for(const it of F.items)fItemDraw(it);for(const b of F.buds)fBudDraw(b)}}

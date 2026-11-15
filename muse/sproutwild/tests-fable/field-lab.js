@@ -14,6 +14,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
  /* the opening, played: seeds, berries, the Lantern stirs, a buddy joins, the road opens */
  {S.intro=1;F.enter('BASE');step(3);const bf=F.bf();
   ok('a new game wakes at the dark Lantern with three glowing seeds',F.op()===0&&bf.buds.length===3&&!S.lit,F.op());
+  step(200);ok('Erin and Marcus are there and talk you through it',F.npcs().length===2&&S.beats&&S.beats.wake===1,JSON.stringify(S.beats));
   for(let i=0;i<60;i++)step(1,['down']);ok('the south road is closed before the Lantern wakes',!F.fld());
   for(let n=0;n<3;n++){const b=bf.buds[0];F.setPos(b.x,b.y+13);step(2,['up']);tap('a');step(4)}
   ok('plucking them gives a squad of three',bf.sq.length===3&&F.op()===1,bf.sq.length);
@@ -22,7 +23,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
   F.setPos(240,170);step(2,['up']);step(2);ok('dim buddies come to the light',F.near()&&F.near().k==='choice',F.near()&&F.near().k);
   tap('a');step(4);tap('a');step(10);tap('a');step(10);ok('greeting one makes it your first buddy',S.party.length===1&&S.quest===2,S.quest);
   F.setPos(F.louie().x+13,F.louie().y);step(2,['left']);const st0=F.state();tap('a');step(3);ok('Louie is a dog, not a menu',F.state()==='g4world',F.state());
-  F.setPos(240,470);for(let i=0;i<60&&!F.fld();i++)step(1,['down']);ok('now the south road leads to the Meadow',F.fld()&&F.fld().id==='MEADOW')}
+  F.setPos(240,470);for(let i=0;i<60&&!F.fld();i++)step(1,['down']);ok('now the south road leads to the Meadow',F.fld()&&F.fld().id==='MEADOW',F.state()+' pos='+JSON.stringify(F.pos())+' q='+S.quest+' sec='+S.sector)}
  S.intro=1;S.quest=5;S.lit=1;S.pouch=24;S.tendDone=true;S.tendStage=4;S.fl={};S.badges=[];S.buds={EMBER:4,PEB:0,DEW:3,ZIP:0,LEAF:3,LUCKY:0};S.res={wood:0,stone:0,petal:0,berry:0,ingot:0};
  F.giveMon('CINDERCAP',30);F.enter('MEADOW');let f=F.fld();
  ok('meadow is a field map',!!f&&f.w===36&&f.h===25,f&&f.w+'x'+f.h);
@@ -97,7 +98,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
  {S.gear={};F.enter('MEADOW');at(28,9,[0,-1]);step(30,['up']);ok('no rope: ledges still do not climb',F.pos().y>8*T+8);
   S.gear={rope:1};at(28,9,[0,-1]);step(40,['up']);ok('with a CLIMBING ROPE you climb the ledge',F.pos().y<8*T,Math.round(F.pos().y));
   S.party[0].hp=1;F.enter('BASE');F.setPos(240,92);step(3,['up']);step(2);tap('a');step(3);
-  ok('the Great Lantern opens as the hub',F.state()==='g4lamp',F.state());tap('a');step(3);ok('resting in the light heals the party',S.party[0].hp>1,S.party[0].hp)}
+  ok('the Great Lantern opens as the hub',F.state()==='g4lamp',F.state()+' near='+JSON.stringify(F.near()&&F.near().txt)+' pos='+JSON.stringify(F.pos())+' talk='+JSON.stringify(F.talk())+' q='+S.quest+' lit='+S.lit);tap('a');step(3);ok('resting in the light heals the party',S.party[0].hp>1,S.party[0].hp)}
  /* every sector builds and draws */
  for(const id of ['MEADOW','TOWN','WASTES','SHORE','GLOOM','PEAK']){F.enter(id);step(5);G.draw()}
  ok('all six sectors build, update and draw',true);
