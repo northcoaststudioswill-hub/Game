@@ -196,6 +196,29 @@ still matches on all 1,088 frames, and frame cost is unchanged (about 2.5 ms of 
   - **Lil Bottie:** quilted silver puffer with a zip and the black hoodie under it, chain and cloud pendant, robot elbow and knee plates, dreads, headphones.
 - King Bibi, Corbin and Mama keep their pass-2 bodies, with the head fix.
 
+## Erin pass (and Bottie's full super)
+
+Normals, timing and hitboxes for everyone are unchanged (the pass-2 trace still matches on all 1,088 frames). Names marked
+(invented) are placeholders for Will to rename.
+
+- **Erin's hair** no longer clips: one hair mass falls from the back of her head to her shoulder blades, behind her body, with
+  a little sway and lighter ends (the separate locks and the lock over her shoulder are gone).
+- **X: TOWEL WHIP** is a four-hit string now, moving in and out: step in with a horizontal lash, step back and raise the towel,
+  crack it overhead (an overhead: block standing), step in with a low snap along the floor (a low: block crouching), then a final
+  big crack that launches (`SNAP!`). 5 + 6 + 5 + 10, about 19 after combo scaling (was a single 8). The towel is drawn per pattern.
+- **Y: HIDE AND SEEK** replaces Leash Lasso. Erin ducks into a bush and vanishes (can't be hit), `1... 2... 3...` counts over the
+  opponent, then she pops out behind them (`FOUND YOU!`) with a tag that can't be blocked: 11 and a launch.
+- **Erin's supers:** half meter **SPROUT STAMPEDE** (the old super); full meter **LOUIE AIRLINES** (invented name), a cinematic:
+  S-rank cut-in; `PREPARE FOR TAKEOFF`, Louie folded into a paper airplane with his ears as the wings; Erin throws him
+  (`WHEEEEE!`); he loops the opponent trailing hearts, three passes and a dive (`ZOOM!`, `ZOOM ZOOM!`, `BORK!!`): 5+5+5+15 = 30;
+  then he sits by them: `GOOD BOY.`
+- **Lil Bottie's supers:** half meter **AIR SUPPORT** (the old super); full meter **NUKE THE DATA CENTER**, staged from Will's
+  three images: the bodega with his cup and the TV reading `I MIGHT JUST HIT MY RATE LIMIT`, then `RATE LIMIT REACHED`, his face
+  goes red and angry (`...OKAY.`); the data center on fire at night, him waving on the roof in a spotlight, fire truck below
+  (`DELETING...`, `rm -rf /data`); him walking away from the exploding tower without looking back; then the blast wave and debris
+  hit the opponent on the stage: 5+5+20 = 30 (`DELETED.`).
+- All full supers (HASBARA, RUBY TEMPER TANTRUM, LOUIE AIRLINES, NUKE THE DATA CENTER) now share one cut-in and hit system (`CN`).
+
 ## Not changed
 
 - Patch & Plate (`src/patchplate.js` is v0.3's file as built). Its 76 checks pass on the ALT build.

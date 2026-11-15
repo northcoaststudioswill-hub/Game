@@ -322,6 +322,26 @@ async function main() {
     await save('models.png', url);
   }
 
+  if (want('erin')) {
+    const r = await E(() => {
+      const G = KO.G, out = {}, ei = KO.CH.findIndex(c => c.id === 'erin'), bi = KO.CH.findIndex(c => c.id === 'chrome');
+      const film = (setup, n, every, cols, label, sc = .6) => { const fr = []; setup(); for (let i = 0; i < n; i++) { __step(1 / 60); if (i % every === 0) fr.push(grab()); } return sheet(fr, cols, sc, label); };
+      let hp0;
+      out.whip = film(() => { const [a, b] = fight(ei, 6, 2); a.x = 140; b.x = 180; hp0 = b.hp; K.x = 1; __step(1 / 60); K.x = 0; }, 66, 4, 6, 'TOWEL WHIP: every 4th frame');
+      out.whipDmg = Math.round(hp0 - G.f[1].hp); out.whipHits = G.f[0].combo;
+      out.hide = film(() => { const [a, b] = fight(ei, 6, 2); a.x = 100; b.x = 190; hp0 = b.hp; K.y = 1; __step(1 / 60); K.y = 0; }, 72, 6, 6, 'HIDE AND SEEK: every 6th frame');
+      out.hideDmg = Math.round(hp0 - G.f[1].hp); out.erinBehind = G.f[0].x > G.f[1].x ? 'right of opponent' : 'left of opponent';
+      { const fr = [], keys = [20, 55, 75, 95, 125, 140, 155, 170, 185, 205]; const [a, b] = fight(ei, 4, 2); a.x = 120; b.x = 190; hp0 = b.hp; a.meter = 100; K.sel = 1; __step(1 / 60); K.sel = 0;
+        for (let i = 0; i <= 230; i++) { __step(1 / 60); if (keys.includes(i)) fr.push(grab()); } out.lou = sheet(fr, 5, .6, 'LOUIE AIRLINES key frames'); out.louDmg = Math.round(hp0 - G.f[1].hp); out.louDone = !G.cine; }
+      { const fr = [], keys = [20, 50, 80, 105, 125, 145, 170, 190, 215, 245]; const [a, b] = fight(bi, 0, 7); a.x = 120; b.x = 190; hp0 = b.hp; a.meter = 100; K.sel = 1; __step(1 / 60); K.sel = 0;
+        for (let i = 0; i <= 275; i++) { __step(1 / 60); if (keys.includes(i)) fr.push(grab()); } out.nuk = sheet(fr, 5, .6, 'NUKE THE DATA CENTER key frames'); out.nukDmg = Math.round(hp0 - G.f[1].hp); out.nukDone = !G.cine; }
+      { const [a, b] = fight(ei, 6, 2); a.x = 120; b.x = 200; hp0 = b.hp; a.meter = 60; K.sel = 1; __step(1 / 60); K.sel = 0; for (let i = 0; i < 160; i++) __step(1 / 60); out.stampedeDmg = Math.round(hp0 - b.hp); out.meterLeft = Math.round(a.meter); }
+      return out;
+    });
+    for (const k of ['whip', 'hide', 'lou', 'nuk']) { await save('erin_' + k + '.png', r[k]); delete r[k]; }
+    console.log('erin', JSON.stringify(r));
+  }
+
   if (want('fight')) {
     const url = await E(() => {
       fight(6, 0, 0, true); const frames = [];
