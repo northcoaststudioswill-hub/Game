@@ -3119,7 +3119,7 @@ function update(dt){
  if(state.slice(0,3)==='lan'){lanUpdate(dt);return}
  switch(state){
  case 'off':{const lb=$('lanBtn');if(pressed('down')){lanHi=1;if(lb)lb.classList.add('sel');carts.forEach(c=>c.classList.remove('sel'))}if(pressed('up')&&lanHi){lanHi=0;if(lb)lb.classList.remove('sel');cartHi(cartSel)}
-  if(!lanHi){if(pressed('right'))cartHi((cartSel+1)%4);if(pressed('left'))cartHi((cartSel+3)%4)}if(pressed('a')||pressed('start')){if(lanHi){lanHi=0;if(lb)lb.classList.remove('sel');cartHi(cartSel);lanOpen('off')}else cartPick(cartSel)}return;}
+  if(!lanHi){if(pressed('right'))cartHi((cartSel+1)%5);if(pressed('left'))cartHi((cartSel+4)%5)}if(pressed('a')||pressed('start')){if(lanHi){lanHi=0;if(lb)lb.classList.remove('sel');cartHi(cartSel);lanOpen('off')}else cartPick(cartSel)}return;}
  case 'boot':bootT+=dt;if(bootT>1.15&&!bootDing){bootDing=true;snd(988,.1);later(()=>snd(1319,.4),100)}if(bootT>2.7||(bootT>.6&&pressed('a'))){if(cart===1){state='ko';KO.start()}else if(cart===2){g3StartTitle()}else if(cart===3){state='pp';PP.start()}else if(cart===4){g4StartTitle()}else{state='intro';introT=0}}return;
  case 'ko':KO.update(dt);return;
  case 'pp':PP.update(dt);return;
