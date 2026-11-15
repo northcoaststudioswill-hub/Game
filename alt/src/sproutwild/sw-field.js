@@ -240,7 +240,7 @@ function fBuild(id,from){const M=FMAPS[id],rows=M.rows,h=rows.length,w=rows[0].l
  if(ex){const ix=ex.tx<=0?1:ex.tx>=w-1?-1:0,iy=ex.ty<=0?1:ex.ty>=h-1?-1:0;P3.x=ex.x+ix*FT*1.5;P3.y=ex.y+iy*FT*1.5;F.dir=[ix,iy||(ix?0:-1)]}
  else{P3.x=F.start.x+FT;P3.y=F.start.y}
  P3.ax=F.dir[0];P3.ay=F.dir[1];W4.part={x:P3.x-12,y:P3.y+4};
- F.t0=0;fSpotsBuild(F);lou.x=P3.x-16;lou.y=P3.y+8;W4.fetch=null;fFlow(F);fSync(F,true);return F}
+ F.arrive=ex?{x:P3.x,y:P3.y}:null;F.t0=0;fSpotsBuild(F);lou.x=P3.x-16;lou.y=P3.y+8;W4.fetch=null;fFlow(F);fSync(F,true);return F}
 function fSpawnWild(F,sec){const [gx,gy]=F.grass[(Math.random()*F.grass.length)|0];
  return{sp:wPickFromTable(sec),lv:sec.lv[0]+((Math.random()*(sec.lv[1]-sec.lv[0]+1))|0),x:gx*FT+8,y:gy*FT+10,tx:gx*FT+8,ty:gy*FT+10,t:Math.random()*2}}
 function fBlocked(F,tx,ty){const o=F.bl[tx+','+ty];return!!o&&(o.dome?!SW.fl[o.flag]:!o.open)}
@@ -372,7 +372,7 @@ function fNear(F){const px=P3.x+F.dir[0]*11,py=P3.y+F.dir[1]*11,in2=(o,r2)=>Math
  for(const sp of F.spots)if(!sp.got&&in2(sp,20)){const ld=SW.party.find(m=>m.hp>0);return{k:'spot',sp,txt:'SEND '+(ld?ld.sp:'A BUDDY')+' FOR '+sp.k.toUpperCase()}}
  if(F.gym&&in2(F.gym,18))return{k:'gym',txt:'GYM'};
  for(const dr of F.doors)if(in2(dr,14))return{k:'door',txt:'KNOCK'};
- if(in2(F.start,18))return{k:'sign',txt:'LANTERN POST · TRAVEL'};
+ if(in2(F.start,18))return{k:'sign',txt:'LANTERN POST · REST, TRAVEL'};
  for(const nd of W4.nodes)if(!nd.got&&nd.k!=='bush'&&in2(nd))return{k:'node',nd,txt:wNodeLabel(nd)};
  for(const dm of F.domes)if(!SW.fl[dm.flag]&&in2(dm,22))return{k:'info',txt:'LOOK',msg:"IRON DOME · by order of KING BIBI. 'Temporary.' It has been temporary for years."};
  return null}
@@ -418,9 +418,12 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    if(!(SW.gear&&SW.gear.rope)&&!(W4.msgT>0)){swSay('A ledge. With a CLIMBING ROPE from the bench you could get up here.',2.6)}}
   if(my>0&&fTile(F,Math.floor(P3.x/FT),Math.floor((P3.y+7)/FT))==='-'){const ty=Math.floor((P3.y+7)/FT)+1;
    if(fWalkTile(F,Math.floor(P3.x/FT),ty)){F.hop={t:0,sy:P3.y,ty:ty*FT+8};swSnd(440,.06,660);return}}
-  if(!fBox(F,nx,P3.y))P3.x=nx;if(!fBox(F,P3.x,ny))P3.y=ny}
+  const exAt=(x,y)=>F.arrive&&F.exits.some(e=>e.tx===Math.floor(x/FT)&&e.ty===Math.floor(y/FT)); /* just arrived: the way back is shut until you let go once */
+  if(!fBox(F,nx,P3.y)&&!exAt(nx,P3.y))P3.x=nx;if(!fBox(F,P3.x,ny)&&!exAt(P3.x,ny))P3.y=ny}
  /* leaving by the edge of the map */
- {const tx=Math.floor(P3.x/FT),ty=Math.floor(P3.y/FT),ex=F.exits.find(e=>e.tx===tx&&e.ty===ty);if(ex){fTravel(ex.to,F.id);return}}
+ /* an exit only fires once you have stepped away from where you came in: holding the stick across a border must not bounce you back */
+ if(F.arrive&&(!(keys.up||keys.down||keys.left||keys.right)||Math.hypot(P3.x-F.arrive.x,P3.y-F.arrive.y)>48))F.arrive=null;
+ if(!F.arrive){const tx=Math.floor(P3.x/FT),ty=Math.floor(P3.y/FT),ex=F.exits.find(e=>e.tx===tx&&e.ty===ty);if(ex){fTravel(ex.to,F.id);return}}
  /* trainers who have not battled you yet watch the road */
  if(W4.grace<=0)for(const np of F.npcs)if(np.team&&!SW.fl[np.fk]&&!np.boss){const dx=P3.x-np.x,dy=P3.y-np.y,al=dx*np.dir[0]+dy*np.dir[1],off=Math.abs(dx*np.dir[1]-dy*np.dir[0]);
   if(al>6&&al<FT*5.5&&off<11&&SW.party.some(m=>m.hp>0)){F.spot={np,t:0};swSnd(880,.1,1320);return}}
@@ -451,7 +454,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
   else if(n.k==='gym'){if(SW.quest<5)swSay(WGYMS[sec.gym].leader+': "Easy, keeper. Set up camp and catch a buddy first — then we battle."',3.4);
    else{W4.gymIx=wGymIx(sec);W4.gymPage=0;swSel=0;state='g4gym'}}
   else if(n.k==='door')swSay(['Nobody home. A sprout waves from the window.','Locked. It smells like berry pie in there.','A note: GONE TO THE GYM. BACK NEVER.'][(F.t0*7|0)%3],2.2);
-  else if(n.k==='sign'){W4.mapRO=0;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
+  else if(n.k==='sign'){const hurt=SW.party.some(m=>m.hp<wStats(m).max);for(const m of SW.party)m.hp=wStats(m).max;if(hurt){swSnd(880,.1,1175);swSay('The Lantern light mends your buddies.',2.2);swSave()}W4.mapRO=0;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(n.k==='info'){swSay(n.msg,2.6);swSnd(660,.05,880)}
   return}
  fCommand(F,dt);

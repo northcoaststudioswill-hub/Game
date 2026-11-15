@@ -21,6 +21,17 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v6.1 — playtest fixes after the fusion (Opus)
+
+Played the Meadow stretch in the five-cartridge console.
+- **Crossing between Sunkeep and the Meadow bounced you back.** Holding the D-pad across the border landed you on the far side right next to the exit, still walking into it, so you were sent straight home. Now the way back is shut until you let go of the D-pad once (or walk well away).
+- **B on Sproutwild's title ejects to the cartridge shelf** (it saves first). From inside a game: START, SAVE AND QUIT, then B.
+- **Lantern posts in every sector heal your buddies** when you use them, like a Pokémon Center. Measured first fights: a Lv5 starter loses 5 to 23 HP of about 55 per Meadow fight, so two or three fights before needing one.
+- **Chopping by hand is less of a grind:** 5 swings a tree instead of 15. A buddy with LUMBER or MINE is still far quicker.
+- The shelf D-pad reaches the fifth cartridge.
+
+Tests: `alt/tests/sproutwild/field-lab.js` 76/76.
+
 ## v6.0 — one button, like Sprouts; who chops what; quieter people (Fable)
 
 From Will's notes and a real-time playtest of my own.

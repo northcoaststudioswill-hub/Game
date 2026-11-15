@@ -80,10 +80,12 @@ function wBaseArrive(from){const F=W4.bf;P3.x=240;P3.ax=0;P3.ay=-1;P3.y=from==='
   for(let i=(SW.fedN||0);i<3;i++)F.items.push({k:'pel',res:'berry',n:1,w:1,x:150+i*15,y:190+(i%2)*7,car:[],op:1})}
  if(SW.quest<2){W4.banner=null;SW.visited.BASE=1}
  wCastInit();W4.talk=null;
+ W4.baseArrive=from?{x:P3.x,y:P3.y}:null;
  W4.cam=null;wCamUpdate(P3.x,P3.y)}
 function wNearExtra(px,py){const F=W4.bf;if(!F)return null;for(const b of F.buds)if(Math.hypot(px-b.x,py-b.y)<18)return{k:'fbud',b,txt:'PLUCK'};return null}
 /* leaving Sunkeep on foot */
-function wBaseEdge(){if(P3.y>(W4.wh||520)-17&&Math.abs(P3.x-240)<34){
+function wBaseEdge(){const A=W4.baseArrive;if(A&&(!(keys.up||keys.down||keys.left||keys.right)||Math.hypot(P3.x-A.x,P3.y-A.y)>48))W4.baseArrive=null;
+ if(!W4.baseArrive&&P3.y>(W4.wh||520)-17&&Math.abs(P3.x-240)<34){
   if(SW.quest<2){P3.y-=10;swSay(SW.lit?'Greet a buddy first. The wilds are no place to walk alone.':'It is dark out there. Wake the Lantern first.',2.8);swSnd(140,.08)}
   else fTravel('MEADOW','BASE')}}
 function wLampRows(){const rows=[];

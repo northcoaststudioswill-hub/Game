@@ -483,6 +483,7 @@ W4.floats=[];
    WORLD (sectors + base share one walker)
    ================================================================ */
 function wSolidAt(x,y){const sec=wSector(W4.sector);
+ if(W4.sector==='BASE'&&W4.baseArrive&&y>(W4.wh||520)-17&&Math.abs(x-240)<34)return true; /* just arrived from the road: let go once before it takes you back */
  if(W4.sector==='BASE'&&x>196&&x<284&&y<86)return true; /* the Great Lantern's trunk */
  if(x<10||x>WW-10||y<28||y>(W4.wh||360)-10)return true;
  if(W4.sector==='TOWN'&&((x>58&&x<136&&y>88&&y<134)||(x>346&&x<424&&y>88&&y<134)))return true;
@@ -538,7 +539,7 @@ function wToolCost(tool,lv){const c=WTOOLCOST[lv];return tool==='axe'?c:{w:c.s,s
 function wSwing(nd){if(W4.swingCd>0)return;W4.swingCd=.22;
  if(SW.stam<5){if(W4.msgT<=0)swSay('Winded! Catch your breath a moment.',1.6);swSnd(140,.07);return}
  SW.stam-=5;W4.stamT=0;
- const dmg=nd.k==='tree'?1+SW.tools.axe:nd.k==='rock'?1+SW.tools.pick:1;
+ const dmg=nd.k==='tree'?3+SW.tools.axe*2:nd.k==='rock'?3+SW.tools.pick*2:1; /* by hand a tree takes 5 swings; a buddy with the skill is still far quicker */
  nd.hp-=dmg;nd.shake=.25;
  W4.floats.push({x:nd.x,y:nd.y-14,txt:'-'+dmg,t:.7,c:'#ffe8b0'});
  swSnd(nd.k==='rock'?180:nd.k==='tree'?240:520,.05,nd.k==='bush'?760:120);
