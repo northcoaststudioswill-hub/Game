@@ -124,7 +124,7 @@ function swDrawIntro(){const p=Math.min(W4.introPage||0,WSTORY.length-1),tt=W4.i
  else if(p===2){ /* Sunkeep, dark lantern, Erin */
   uiSky(['#1a2048','#4a3a70','#c06a6a','#f0b070'],gy);uiHills(gy,18,'#3a3a5a',2.2,1.4);r('#3f7a34',0,gy,W,H);r('#58a044',0,gy,W,2);
   r('#6a4a2c',W/2-50,gy+14,100,22);r('#7d5a36',W/2-50,gy+14,100,3);for(let i=0;i<3;i++){r('#5a3d24',W/2-36+i*30,gy+22,16,3);if(tt>.6+i*.4)drawBud({x:W/2-28+i*30,y:gy+24,type:[0,2,4][i],stage:Math.min(2,Math.floor((tt-.6-i*.4))),z:0,a:i,mv:false,st:'idle',fx:1})}
-  uiLantern(W/2,gy+6,false,1.3);wChar('ERIN',W/2+56,gy+8,26);g.drawImage(LOU.l[((time*2)|0)%2],W/2-88,gy-4,26,13);uiWill(W/2-50,gy+4,1.5,1,0)}
+  uiLantern(W/2,gy+6,false,1.3);fChibi(W/2+56,gy+8,Object.assign({},FLOOK.ERIN,{sc:2}),[-1,0],false);g.drawImage(LOU.l[((time*2)|0)%2],W/2-88,gy-4,26,13);uiWill(W/2-50,gy+4,1.5,1,0)}
  else if(p===3){ /* a sprout takes command of a buddy */
   uiSky(['#6ab8e8','#a8dcf4','#e0f4fc'],gy);uiHills(gy,14,'#3f8a4a',1.7,1.8);r('#5fa544',0,gy,W,H);r('#86d86c',0,gy,W,2);
   for(let i=0;i<40;i++)r(i%2?'#2f6a2c':'#4fb04a',(i*17+3)%W,gy+4+(i*7)%16,1,5);
@@ -135,7 +135,7 @@ function swDrawIntro(){const p=Math.min(W4.introPage||0,WSTORY.length-1),tt=W4.i
   uiMon('CINDERCAP',84,gy+12,26,true)}
  else if(p===4){ /* Marcus and the four sigils */
   uiSky(['#e09a50','#f0c080','#f8e0b0'],gy);uiHills(gy,22,'#94603e',2.9,1.3);r('#bd8850',0,gy,W,H);r('#e6ba78',0,gy,W,2);
-  fHouse(W/2,gy+12,wSector('WASTES'));wChar('MARCUS',W/2+50,gy+14,26);
+  fHouse(W/2,gy+12,wSector('WASTES'));fChibi(W/2+52,gy+16,Object.assign({},FLOOK.MARCUS,{sc:2}),[0,1],false);
   ['#58c048','#f07830','#48a0f0','#f0d020'].forEach((c,i)=>{if(tt<.4+i*.3)return;const a=time*1.2+i*1.571,sx=Math.round(W/2+Math.cos(a)*74),sy=Math.round(gy*.34+Math.sin(a)*12);
    r(UI.ink,sx-5,sy-6,10,12);r(c,sx-3,sy-5,6,3);r(c,sx-4,sy-2,8,4);r(c,sx-3,sy+2,6,3);r('#ffffff',sx-1,sy-2,2,2)})}
  else if(p===5){ /* King Bibi raises the dome */
@@ -160,7 +160,7 @@ function swDrawCine(){const cn=W4.cine;if(!cn)return;const t=cn.t,cy=Math.round(
  for(let i=0;i<16;i++){const k=((t*.5+i*.0625)%1),a=i*2.4,x=W/2+Math.cos(a)*k*130,y=cy+Math.sin(a)*k*100;r(i%2?'#fff3b0':(mon?T.l:'#ffd94d'),Math.round(x),Math.round(y),2,2)}
  r('rgba(0,0,0,.3)',W/2-30,cy+30,60,6);
  if(mon)uiMon(cn.id,W/2,cy+34+Math.round(Math.sin(time*3)*1.5),Math.round(84*pop));
- else if(cn.id==='WILL')uiWill(W/2,cy+26,3.2*pop,0,1);else wChar(cn.id,W/2,cy+34,Math.round(60*pop));
+ else fChibi(W/2,cy+34,Object.assign({},FLOOK[cn.id]||FLOOK.WILL,{sc:3}),[0,1],false);
  /* name banner sweeps in */
  {const k=Math.min(1,Math.max(0,(t-.25)/.25)),by=Math.max(14,cy-78),bw=Math.round(W*k);r(UI.ink,W/2-bw/2,by,bw,26);r(UI.gold,W/2-bw/2,by,bw,2);r(UI.gold,W/2-bw/2,by+24,bw,2);
   if(k>=1){text(cn.id,Math.round(W/2-tw(cn.id,2)/2),by+6,2,'#ffffff',null)}}
@@ -205,8 +205,7 @@ function wBakeGround(){const sec=wSector(W4.sector),wh=W4.wh||360,B=FBIO.MEADOW;
  const R=(c,x,y,w,h)=>{b.fillStyle=c;b.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))},rnd=wSeedRand(wSectorSeed(sec.id)+5);
  R(B.g,0,0,WW,wh);
  for(let i=0;i<90;i++)R(B.g2,rnd()*WW,rnd()*wh,10+rnd()*22,5+rnd()*10);
- for(let i=0;i<700;i++)R(B.g3,rnd()*WW,rnd()*wh,1,2);
- for(let i=0;i<260;i++)R(B.a,rnd()*WW,rnd()*wh,1,2);
+ for(let i=0;i<520;i++){const ux=rnd()*WW,uy=rnd()*wh;R(B.g3,ux,uy+1,1,2);R(B.g3,ux+2,uy+1,1,2);R(B.a,ux+1,uy,1,2)}
  const path=(x,y,w,h)=>{R(B.p,x,y,w,h);for(let i=0;i<w*h/40;i++)R(B.p2,x+rnd()*(w-2),y+rnd()*(h-1),2,1);
   for(let i=0;i<w;i+=2){R(B.g2,x+i,y-1,2,1+((rnd()*2)|0));R(B.g2,x+i,y+h-((rnd()*2)|0),2,2)}
   for(let i=0;i<h;i+=2){R(B.g2,x-1,y+i,1+((rnd()*2)|0),2);R(B.g2,x+w-((rnd()*2)|0),y+i,2,2)}};
@@ -226,10 +225,9 @@ function wBakeGround(){const sec=wSector(W4.sector),wh=W4.wh||360,B=FBIO.MEADOW;
   /* flower beds along the lanes */
   for(let i=0;i<46;i++){const fx=20+rnd()*(WW-40),fy=100+rnd()*(wh-150);if(fx>150&&fx<330&&fy>316&&fy<400)continue;const c=B.fl[i%3];R(c,fx,fy,2,2);R('#ffffff',fx,fy,1,1);R(B.g3,fx,fy+2,1,2)}}
  /* the forest edge */
- const tree=(x,y)=>{R('rgba(0,0,0,.2)',x-9,y-2,18,4);R(UI.ink,x-3,y-9,7,10);R(B.tk,x-2,y-8,5,8);R(UI.ink,x-12,y-23,25,13);R(UI.ink,x-9,y-29,19,8);
-  R(B.t1,x-11,y-22,23,11);R(B.t2,x-11,y-22,19,8);R(B.t2,x-8,y-28,17,7);R(B.t3,x-7,y-27,8,3);R(B.t3,x-9,y-21,5,2)};
+ const tree=(x,y)=>{R('rgba(0,0,0,.24)',x-12,y-3,28,6);artTree((c,a,b2,w,h)=>R(c,x-22+a,y-44+b2,w,h),B,0)};
  R('#2c5a2e',0,0,WW,10);R('#2c5a2e',0,0,6,wh);R('#2c5a2e',WW-6,0,6,wh);R('#2c5a2e',0,wh-8,WW,8);
- for(let x=8;x<WW;x+=20){if(sec.id==='BASE'&&x>160&&x<320)continue;tree(x+((rnd()*6)|0),20+((rnd()*6)|0))}
- for(let y=44;y<wh-10;y+=22){tree(2+((rnd()*4)|0),y);tree(WW-3-((rnd()*4)|0),y+8)}
+ for(let x=6;x<WW;x+=26){if(sec.id==='BASE'&&x>150&&x<330)continue;tree(x+((rnd()*6)|0),26+((rnd()*5)|0))}
+ for(let y=52;y<wh-10;y+=26){tree(1+((rnd()*3)|0),y);tree(WW-2-((rnd()*3)|0),y+12)}
  for(let x=6;x<WW;x+=14){if(Math.abs(x-WW/2)<34)continue;R(UI.ink,x-1,wh-13,15,13);R(B.t1,x,wh-12,13,12);R(B.t2,x,wh-12,13,4);R(B.t3,x+2,wh-11,4,1)}
  W4.groundCv=cv;W4.groundFor=sec.id+'x'+wh}

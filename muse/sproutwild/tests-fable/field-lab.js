@@ -75,6 +75,20 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
   for(let i=0;i<5;i++){tap('b');step(5)}ok('B throws at home',bf.sq.filter(q=>q.st==='work'||q.st==='fly').length>=3,bf.sq.map(q=>q.st).join(','));
   step(1800);G.draw();ok('sprouts fell a Sunkeep tree and carry the log to the Lantern',nd.got&&S.res.wood>w1,S.res.wood-w1);
   step(40,['b']);step(60);ok('whistle works at home',bf.sq.every(q=>q.st==='follow'),bf.sq.map(q=>q.st).join(','))}
+ /* Palworld-style work: buddies at home pick jobs by skill, goods are carried to the Lantern */
+ {S.box=[];S.party=S.party.slice(0,1);S.craftQ=[];S.buildings=[];S.crew=[];F.build('kiln',4,8);F.build('bench',8,8);F.build('quarry',14,8);
+  const fire=F.giveMon('CINDERCAP',5,true),rock=F.giveMon('PEBBLIT',5,true),zip=F.giveMon('ZIPWIG',5,true);step(3);const wk=F.wk();
+  ok('box buddies become base workers',wk.length===3,wk.length);
+  ok('species bring their own work skills',F.wkSkills(wk[0]).KINDLING>=1&&F.wkSkills(wk[1]).QUARRY>=1&&F.wkSkills(wk[2]).HANDIWORK>=1,JSON.stringify(wk.map(w=>F.wkSkills(w))));
+  F.dayT(20);F.setPos(60,460);const i0=S.res.ingot,s0=S.res.stone;step(240);
+  const kiln=S.buildings[0],quarry=S.buildings[2];
+  ok('the fire buddy picks the kiln, the rock buddy the quarry',wk[0].task&&wk[0].task.b===kiln&&wk[1].task&&wk[1].task.b===quarry,(wk[0].task&&wk[0].task.k)+','+(wk[1].task&&wk[1].task.k));
+  step(2400);G.draw();ok('buildings make goods and workers haul them to the Lantern',S.res.ingot>i0&&S.res.stone>s0,(S.res.ingot-i0)+' ingot, '+(S.res.stone-s0)+' stone');
+  S.res.berry=9;const t0=S.tonics;S.craftQ.push({id:'tonic',need:12,done:0});step(1500);
+  ok('the CRAFT buddy builds the bench queue',S.tonics===t0+1&&S.craftQ.length===0,S.tonics-t0);
+  S.box=[];step(3);S.craftQ.push({id:'tonic',need:12,done:0});F.setPos(10+8*20+10,38+8*20+24);step(500);
+  ok('with no crafter you can build it by hand at the bench',S.craftQ.length===0,S.craftQ.length&&S.craftQ[0].done);
+  S.box=[fire];step(3);F.dayT(250);step(200);ok('workers sleep at night',F.wk()[0].task&&F.wk()[0].task.k==='sleep',F.wk()[0].task&&F.wk()[0].task.k);F.dayT(20)}
  }catch(e){out.push('FAIL crashed: '+e.message)}
  return out});
 console.log(res.join('\n'));const fails=res.filter(l=>l.startsWith('FAIL')).length;

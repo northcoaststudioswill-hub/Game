@@ -21,6 +21,29 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v5.4 — Sunkeep at work, and one art style (Fable)
+
+**Sunkeep runs like a Palworld camp** (`sw-base.js`)
+- Buddies you are not adventuring with work at home, on screen: everyone in the box, plus party buddies behind your leader. They pick their own jobs.
+- Every worker has work skills with levels 1 to 3: KINDLE (kiln), WATER and PLANT (garden bed, nursery), MINE (quarry), LUMBER (sawmill), CRAFT (Tinker Bench), HAUL, LUCK (extra yield). Species bring their own; Lv16 and 40 work XP each add a level.
+- Sprouts you pin to a building work it and haul what it makes.
+- Buildings now make real pellets that someone has to carry to the Lantern: a worker, or your own thrown squad.
+- The Tinker Bench is a crafting queue: Tonic, Axe, Pickaxe, Lantern Oil, Lucky Charm. CRAFT workers build it; with none, stand at the bench and build by hand.
+- Workers sleep at night around the camp fire. START > BASE is now the work board (who is doing what, and their skills).
+- While you are away the old timed production tick still pays out for pinned sprouts.
+
+**Art pass** (`sw-art.js`), aimed at the first areas you see
+- One sprite builder for every human (keeper, Erin, Marcus, townsfolk, trainers, King Bibi), with four facings and a walk cycle.
+- Nothing is drawn at a fractional scale any more; buddies sit on the pixel grid.
+- Trees are outlined, cel-shaded in three tones with a hard cast shadow, and sway. Trees with fruit are the ones you can chop.
+- Ground: grass in two-tone drifts with tufts, paths with a dark rim and pebbles, water with an outline and a shallow band.
+- Buildings redrawn larger with outlines, smoke, fire, a spinning saw, progress bars. They sort in front of and behind you.
+- Sunkeep: new Lantern shrine with banners, new Lantern Gate, a camp fire.
+- Light and air: drifting cloud shadows, sun shafts, a warm grade by day, fire and lantern glow at night, butterflies and fireflies, a soft vignette.
+
+Tests: `field-lab.js` 41/41 (7 new work-system checks). `tests-fable/render-base.js` for screenshots.
+Older suites: 10 pass. sw17 joins the failing list because the bench menu it drives is now the crafting queue.
+
 ## v5.3 — Sunkeep joins the new engine; King Bibi's voice (Fable)
 
 - **The squad works at home.** Your sprouts follow you around Sunkeep, B throws, hold B whistles, SELECT picks the kind. Thrown sprouts fell Sunkeep's trees and rocks and carry the pellets to the Lantern. Sunkeep keeps its own layout, buildings, garden and tutorial; the squad, throwing, carrying and path-home all run on the field engine.
