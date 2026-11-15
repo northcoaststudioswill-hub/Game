@@ -374,6 +374,26 @@ invented and flagged for him. Nothing is phone-confirmed.
 
 Still single-stage: Louie (Judgement) and Corbin (007).
 
+### Pass 2 follow-up: Fentanyahu is his own character, Ben Gvir celebrates (Nov 15)
+
+- **FENTANYAHU** is now a separate character in WAR CRIMINAL, not Bibi's powered-up form (Will's correction). After the data
+  center, Bibi points and he pops up from below: green, eyes shut, folded over at the waist with his arms hanging, swaying,
+  snoring Zs (`FENTY`, `foldP`). In the city scene he is the giant shuffling through the skyline.
+  What I could find about the name: almost nothing. One user-made character page spells it "Fentenyahu" and describes a
+  parody name joining fentanyl and Netanyahu; there is no Know Your Meme entry or news coverage. So his look is built from
+  the pun (the bent-over "fold"), not from a reference. If Will has an image in mind, send it.
+- **BEN GVIR and DONALD TRUMP** celebrate in the city scene, in the foreground next to Bibi under confetti: Ben Gvir jumping
+  with his arms up (`GVIR`: white kippah, glasses, short beard, white shirt), Trump beside him pumping a fist (`TRUMP`: blond
+  swoop, navy suit, long red tie). No name tags (Will's note). Each has a speech bubble, one after the other.
+  Ben Gvir says things he has really said, in English as reported (`GVIRQ`, one picked each time): "WE'RE THE LANDLORDS
+  HERE. REMEMBER THAT." (Sheikh Jarrah, October 2022) or "WE ARE IN CHARGE HERE." (a Temple Mount visit). English wordings of
+  the first vary a little between reports. Trump says "BEAUTIFUL. WE'LL BUILD A RESORT." (invented; Will likes it).
+  Both are drawn from memory, not from photos.
+- The city scene is 0.8 s longer so the lines can be read; the whole super is now 5.5 s (was 4.7). Damage is still 30.
+- All three are scene extras drawn with the shared rig (`mkX`, `drawX`), not fighters.
+- **Open:** Will says Fentanyahu is "still super off" and I don't know in what way. Needs his description or a picture.
+
+
 ## Not changed
 
 - Patch & Plate (`src/patchplate.js` is v0.3's file as built). Its 76 checks pass on the ALT build.
