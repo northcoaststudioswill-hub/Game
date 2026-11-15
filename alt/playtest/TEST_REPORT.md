@@ -49,7 +49,10 @@ the same as v0.3.
 
 - v0.3, for comparison: run 1 reached chamber 6 (spored out), run 2 with every Mirror upgrade reached chamber 7 (grublets).
   Chambers take 4 to 9 s each until the bosses (19 to 21 s).
-- ALT: see below.
+- ALT, run alone: 6 runs. Depth grows with the Mirror upgrades: chamber 8, 7, then chamber 11 to 12 on runs 5 and 6 (best 12,
+  7 bosses felled, 19 sprouts found, 155 kills). Frames: median, p95 and worst all 16.7 to 16.8 ms (steady 60 fps). No page errors.
+  One run of the six (run 3) never started a dive. The bot does this now and then; an earlier ALT run and the v0.3 comparison
+  each had or avoided it at random. It isn't something a player meets: the run after it played normally.
 
 ## Lantern menu (`node alt/tests/lantern_shots.js`)
 
