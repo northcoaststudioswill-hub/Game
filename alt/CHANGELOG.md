@@ -180,6 +180,22 @@ What the measurements said about "slower": not the frame rate (2.1 vs 2.3 ms a f
 It was the moves: holding forward and pressing B fired the new forward+B moves (slower to come out than the heavy kick), Marcus and
 Bottie's jabs got slower, and the bodies got bigger.
 
+## Character models and head fix (Will: heads clip into bodies; the five need their own rigs)
+
+Visual only: same skeleton, poses, timing and hitboxes. The pass-2 trace (scripted inputs for Will, Erin, Marcus, Bottie)
+still matches on all 1,088 frames, and frame cost is unchanged (about 2.5 ms of a 16 ms frame).
+
+- **Heads no longer clip.** Torsos were a thick line whose square ends poked about 6 px above the shoulders, while heads were
+  pinned at a fixed height (Will's taller head sank the most). Now a torso is a shape that ends at the shoulders and every head
+  sits on a short neck, placed by its real height. All eight fighters. Heads are the pass-2 ones.
+- **Own models** (`MODEL` in `knockout.js`) on the shared skeleton:
+  - **Will:** black tee with a little belly, collar and logo, short sleeves, red basketball shorts with a white stripe, socks, sneakers.
+  - **Erin:** fitted green top with a waist and hem, jeans, long wavy hair down her back (three locks that sway, lighter ends) and a lock over her shoulder.
+  - **Marcus:** bulky orange hoodie (hood bunched behind his neck, drawstrings, kangaroo pocket, ribbed hem and cuffs), dark joggers with cuffs, boots.
+  - **Louie:** a dog body: furry barrel chest with a cream belly, fur tufts, thick legs, paws instead of shoes and hands, a big curled tail that wags, the plaid collar.
+  - **Lil Bottie:** quilted silver puffer with a zip and the black hoodie under it, chain and cloud pendant, robot elbow and knee plates, dreads, headphones.
+- King Bibi, Corbin and Mama keep their pass-2 bodies, with the head fix.
+
 ## Not changed
 
 - Patch & Plate (`src/patchplate.js` is v0.3's file as built). Its 76 checks pass on the ALT build.

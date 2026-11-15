@@ -308,6 +308,20 @@ async function main() {
     await save('arcade.png', r.sheet); delete r.sheet; console.log('arcade', JSON.stringify(r));
   }
 
+  if (want('models')) {
+    const url = await E(() => {
+      const g = cv.getContext('2d'), out = [];
+      for (const pose of ['st', 'p3', 'k']) {
+        g.setTransform(2, 0, 0, 2, 0, 0); g.imageSmoothingEnabled = false; g.fillStyle = '#cfc8b8'; g.fillRect(0, 0, 240, 400);
+        ['will', 'erin', 'marcus'].forEach((id, i) => KO.poser(KO.CH.findIndex(c => c.id === id), 30 + i * 78, 150, 1, KO.PS[pose], 2.2));
+        ['louie', 'chrome'].forEach((id, i) => KO.poser(KO.CH.findIndex(c => c.id === id), 60 + i * 100, 300, 1, KO.PS[pose], 2.2));
+        g.setTransform(1, 0, 0, 1, 0, 0); const c2 = document.createElement('canvas'); c2.width = cv.width; c2.height = 305 * 2; c2.getContext('2d').drawImage(cv, 0, 0); out.push(c2);
+      }
+      return sheet(out, 3, 1, 'models at 2.2x: idle | big punch | heavy kick');
+    });
+    await save('models.png', url);
+  }
+
   if (want('fight')) {
     const url = await E(() => {
       fight(6, 0, 0, true); const frames = [];
