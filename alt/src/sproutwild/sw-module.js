@@ -1309,7 +1309,7 @@ function wLerpC(a,b,k){const pa=[1,3,5].map(i=>parseInt(a.substr(i,2),16)),pb=[1
 function wThrowBud(ix){const bn=TYPES[ix].n,nS=Math.max(1,Math.min(5,SW.buds[bn]||1));BT.tossN=nS;const foe=BT.foe,frac=foe.hp/wStats(foe).max;
  const p=Math.min(.96,Math.max(.05,wSp(foe.sp).catch*(1.55-frac*.95)*wKinship(ix,foe.sp)*(SW.keeper==='WILL'?1.15:1)));
  BT.tossIx=ix;BT.orbOk=SW.quest===2?true:Math.random()<1-Math.pow(1-p*.6,nS); /* the intro catch cannot fail */
- BT.orbT=1.5;BT.phase='orb';swSnd(880,.08,1320);swSave()}
+ BT.orbT=2.9;BT.phase='orb';swSnd(880,.08,1320);swSave()}
 function wDrawBattle(){const sec=wSector(W4.sector),pal=sec?sec.pal:{g:'#5da244',g2:'#4c8a38',a:'#c4ec8a'};
  const HY=H*0.40,sky=sec&&sec.id==='WASTES'?['#f2b95e','#f9deb0']:sec&&sec.id==='GLOOM'?['#17122a','#241b40']:sec&&sec.id==='PEAK'?['#cfe4f2','#eef6fb']:['#8fd0f0','#d8f2fc'];
  for(let i=0;i<5;i++)r(wLerpC(sky[0],sky[1],i/4),0,Math.floor(HY*i/5),W,Math.ceil(HY/5)+1);

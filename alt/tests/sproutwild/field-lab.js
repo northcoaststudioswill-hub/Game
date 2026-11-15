@@ -59,7 +59,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
  /* node -> pellet -> home */
  step(40,['b']);step(40);const w0=S.res.wood;const nd=F.nodes().find(n=>n.k==='tree'&&!n.got);F.setPos(nd.x+2,nd.y+16);f.dir=[0,-1];for(const q of f.sq){q.x=F.pos().x;q.y=F.pos().y+8}step(6);
  ok('sprouts do not target trees',!f.sq.some(q=>q.st==='work')&&F.near()&&F.near().txt==='CHOP BY HAND',F.near()&&F.near().txt);
- F.giveMon('FERNFANG',8);S.party.unshift(S.party.pop());step(3);ok('a LUMBER buddy offers to chop',F.near()&&F.near().txt==='SEND FERNFANG TO CHOP',F.near()&&F.near().txt);
+ F.giveMon('FERNFANG',8);S.party.unshift(S.party.pop());step(3);step(30);G.draw();ok('the ring locks on and offers the LUMBER buddy',f.aimLab==='SEND FERNFANG · CHOP',f.aimLab);
  tap('a');step(200);ok('the buddy fells the tree and it drops a log',nd.got&&f.items.some(i=>i.res==='wood'),nd.hp);
  {const lg=f.items.find(i=>i.res==='wood');F.setPos(lg.x,lg.y+30);f.dir=[0,-1];for(const q of f.sq){q.x=F.pos().x;q.y=F.pos().y+8;q.st='follow'}step(6);for(let i=0;i<3;i++){tap('a');step(6)}step(1500)}
  ok('sprouts carry the log home',S.res.wood>w0,S.res.wood);S.party.push(S.party.shift());
@@ -103,6 +103,24 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
   S.gear={rope:1};at(28,9,[0,-1]);step(40,['up']);ok('with a CLIMBING ROPE you climb the ledge',F.pos().y<8*T,Math.round(F.pos().y));
   S.party[0].hp=1;F.enter('BASE');F.setPos(240,92);step(3,['up']);step(2);tap('a');step(3);
   ok('the Great Lantern opens as the hub',F.state()==='g4lamp',F.state()+' near='+JSON.stringify(F.near()&&F.near().txt)+' pos='+JSON.stringify(F.pos())+' talk='+JSON.stringify(F.talk())+' q='+S.quest+' lit='+S.lit);tap('a');step(3);ok('resting in the light heals the party',S.party[0].hp>1,S.party[0].hp)}
+ /* the party in the field, and open-field capture */
+ {S.party=[];F.giveMon('FERNFANG',8);F.giveMon('PEBBLIT',8);F.giveMon('DRIZZLET',8);F.enter('MEADOW');step(40);const f2=F.fld();
+  ok('three party buddies walk with you',f2.pf.length===3&&f2.pf.every(b=>b.st==='follow'),f2.pf.length);
+  const tr=F.nodes().find(n=>n.k==='tree'&&!n.got),rk=F.nodes().find(n=>n.k==='rock'&&!n.got);
+  F.setPos(tr.x,tr.y+20);f2.dir=[0,-1];step(20);tap('a');step(4);const fb=f2.pf.find(b=>b.m.sp==='FERNFANG');
+  ok('A sends the LUMBER buddy to the tree',fb.st==='go'||fb.st==='work',fb.st);
+  F.setPos(rk.x,rk.y+20);f2.dir=[0,-1];step(20);tap('a');step(4);const pbb=f2.pf.find(b=>b.m.sp==='PEBBLIT');
+  const pj=pbb.tg;ok('...and the MINE buddy to the nearest rock work, at the same time',(pbb.st==='go'||pbb.st==='work')&&(pj.k==='rock'||pj.k==='ore')&&(fb.st==='go'||fb.st==='work'),pbb.st+' '+fb.st+' '+(pj&&pj.k));
+  step(400);ok('both jobs finish',tr.got&&pj.got,tr.hp+' '+pj.got);
+  /* capture: enough kin sprouts latch on and it blooms */
+  S.buds={EMBER:0,PEB:0,DEW:0,ZIP:0,LEAF:8,LUCKY:0};S.pouch=24;step(5);W4wilds=F.wilds();const before=S.party.length+S.box.length;
+  const wd=W4wilds[0];W4wilds.splice(1);wd.sp='FERNFANG';wd.lv=3;wd.t=99;wd.tx=wd.x;wd.ty=wd.y;F.setPos(wd.x,wd.y+30);f2.dir=[0,-1];for(const q of f2.sq){q.x=F.pos().x;q.y=F.pos().y+6;q.st='follow'}step(4);
+  for(const sp of f2.spots)sp.got=true;for(const n of F.nodes())n.got=true;step(2);for(let i=0;i<5;i++){tap('a');step(6)}step(60);G.draw();
+  ok('thrown sprouts latch on to the wild',(wd.lat||[]).length>=3||!!wd.cap,(wd.lat||[]).length+' st='+F.state()+' spot='+!!f2.spot+' dlg='+!!f2.dlg+' inW='+F.wilds().includes(wd)+' d='+Math.round(Math.hypot(wd.x-F.pos().x,wd.y-F.pos().y))+' aim='+f2.aimLab+' sq='+f2.sq.map(q=>q.st).join(','));
+  for(let i=0;i<200&&F.state()==='g4world';i++)step(1);for(let i=0;i<8&&F.state()!=='g4world';i++){tap('a');step(4)}
+  ok('it is caught in the open field, or turns to fight',S.party.length+S.box.length===before+1||F.state()==='g4battle'||(F.bt&&F.bt()),S.party.length+S.box.length-before);
+  if(F.state()==='g4battle'){for(let n=0;n<300&&F.state()==='g4battle';n++){const bt=F.bt();if(bt.foe)bt.foe.hp=Math.min(bt.foe.hp,1);S.party[0].hp=200;tap('a');step(3)}}
+  S.party=S.party.slice(0,1)}
  /* every sector builds and draws */
  for(const id of ['MEADOW','TOWN','WASTES','SHORE','GLOOM','PEAK']){F.enter(id);step(5);G.draw()}
  ok('all six sectors build, update and draw',true);

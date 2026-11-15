@@ -51,7 +51,9 @@ function wDrawBattle(){const B=FBIO[W4.sector]||FBIO.MEADOW,foe=BT.foe,me=btCur(
  let fx=FGx+(1-ease(time-d.fin))*130,fy=FGy+Math.round(Math.sin(time*2.2)*1.5),mx=MGx-(1-ease(time-d.min))*150,my=MGy+Math.round(Math.sin(time*2.2+1.3)*1.5);
  if(an&&at<.34){const k=Math.sin(Math.min(1,at/.34)*Math.PI);if(an.who==='me'){mx+=k*16;my-=k*8}else if(an.who==='foe'){fx-=k*16;fy+=k*8}}
  if(hit){const s2=Math.round(Math.sin(time*70)*3);if(an.who==='foe')mx+=s2;else fx+=s2}
- const swT=BT.phase==='orb'?1.5-BT.orbT:-1;if(swT>.9&&swT<1.45)fx+=Math.round(Math.sin(time*50)*2);
+ const swT=BT.phase==='orb'?2.9-BT.orbT:-1,wob=swT>.9&&swT<2.2?Math.max(0,Math.sin((swT-.9)/1.3*3*Math.PI)):0;
+ if(swT>.9&&swT<2.2){fx+=Math.round(Math.sin(time*36)*4*wob);if(BT.wobN!==((swT-.9)/1.3*3|0)){BT.wobN=((swT-.9)/1.3*3|0);swSnd(330+BT.wobN*110,.08,220)}}
+ if(swT>=2.2&&!BT.wobEnd){BT.wobEnd=1;if(BT.orbOk){swSnd(784,.12,1568)}else swSnd(160,.14,90)}if(swT<0){BT.wobN=-1;BT.wobEnd=0}
  /* keeper and waiting sprouts, behind your buddy */
  fChibi(Math.round(MGx-52),MGy+4,Object.assign({},FLOOK[SW.keeper]||FLOOK.WILL,{sc:sc>2?2:1}),[0,-1],false);
  {let n=0;for(let ty=0;ty<TYPES.length&&n<8;ty++){const c=Math.min(SW.buds[TYPES[ty].n]||0,ty===(BT.tossIx||0)&&swT>=0?0:3),dz=BT.dz&&BT.dz[ty];
@@ -59,8 +61,10 @@ function wDrawBattle(){const B=FBIO[W4.sector]||FBIO.MEADOW,foe=BT.foe,me=btCur(
  /* foe */
  const drawMon=(spr,x,y,w,h,flip,white,alpha)=>{const img=white&&spr.hol?spr.hol:spr.ol;if(alpha<1)g.globalAlpha=Math.max(0,alpha);
   if(flip){g.save();g.translate(Math.round(x+w/2),Math.round(y-h));g.scale(-1,1);g.drawImage(img,0,0,w,h);g.restore()}else g.drawImage(img,Math.round(x-w/2),Math.round(y-h),w,h);g.globalAlpha=1};
- {let a=1,yo=0;if(d.faint==='foe'){const k=(time-d.ft)/.6;a=1-k;yo=k*24}if(d.bloom||(swT>1.1&&BT.orbOk)){const fl=.5+.5*Math.sin(time*8);g.globalAlpha=.25+.2*fl;r('#fff3b0',FGx-fw/2-6,FGy-fh-6,fw+12,fh+10);g.globalAlpha=1;uiRays(FGx,FGy-fh/2,70,8,'#fff3b0',.16)}
-  if(a>0)drawMon(fs,fx,fy+2+yo,fw,fh,false,hit&&an.who!=='foe',a)}
+ {let a=1,yo=0;if(d.faint==='foe'){const k=(time-d.ft)/.6;a=1-k;yo=k*24}if(d.bloom||(swT>2.2&&BT.orbOk)){const fl=.5+.5*Math.sin(time*8);g.globalAlpha=.25+.2*fl;r('#fff3b0',FGx-fw/2-6,FGy-fh-6,fw+12,fh+10);g.globalAlpha=1;uiRays(FGx,FGy-fh/2,70,8,'#fff3b0',.16)}
+  {let sc=1;if(swT>2.2&&BT.orbOk)sc=Math.max(0,1-(swT-2.2)/.5);const fl=swT>.9&&swT<2.2&&wob>.85;
+   if(d.bloom){for(let i=0;i<Math.min(5,BT.tossN||3);i++)drawBud({x:Math.round(FGx-18+i*9),y:FGy+1-(((time*6+i)|0)%2)*2,type:BT.tossIx||0,stage:2,z:0,a:i,mv:true,st:'idle',fx:1});for(let i=0;i<6;i++){const ag=i*1.05+time*2;r('#fff3b0',Math.round(FGx+Math.cos(ag)*22),Math.round(FGy-14+Math.sin(ag)*10),2,2)}} /* caught: it has gone into the light; the sprouts dance where it stood */
+   else if(a>0&&sc>0)drawMon(fs,fx,fy+2+yo,Math.max(1,Math.round(fw*sc)),Math.max(1,Math.round(fh*sc)),false,(hit&&an.who!=='foe')||fl,a)}}
  {let a=1,yo=0;if(d.faint==='me'){const k=(time-d.ft)/.6;a=1-k;yo=k*24}if(a>0)drawMon(ms,mx,my+2+yo,mw,mh,!!ms.fable,hit&&an.who==='foe',a)}
  /* the bolt */
  if(an&&at>.08&&at<.34&&an.pw>0){const k=(at-.08)/.26,fromMe=an.who!=='foe',x0=fromMe?MGx+20:FGx-20,y0=fromMe?MGy-mh*.5:FGy-fh*.5,x1=fromMe?FGx:MGx,y1=fromMe?FGy-fh*.5:MGy-mh*.5,c=an.ty>=0?TYPES[an.ty]:{c:'#ffffff',l:'#ffffff',d:'#c8c0d8'};
@@ -72,10 +76,10 @@ function wDrawBattle(){const B=FBIO[W4.sector]||FBIO.MEADOW,foe=BT.foe,me=btCur(
  if(swT>=0){const n=BT.tossN||1,T=TYPES[BT.tossIx||0];
   for(let i=0;i<n;i++){const t0=i*.09,k=Math.max(0,Math.min(1,(swT-t0)/.8)),ang=i*1.26+1,cxp=FGx+Math.cos(ang)*fw*.28,cyp=FGy-fh*.45+Math.sin(ang)*fh*.28;let px,py,z=0;
    if(k<1){px=6+i*9+(cxp-(6+i*9))*k;py=top-4+(cyp-(top-4))*k-Math.sin(k*Math.PI)*34}
-   else if(BT.orbOk||swT<1.3){px=cxp+Math.sin(time*30+i)*1;py=cyp;z=((time*12+i)|0)%2}
-   else{const k2=(swT-1.3)/.2;px=cxp+Math.cos(ang)*k2*60;py=cyp-k2*30+k2*k2*70}
+   else if(BT.orbOk||swT<2.2){px=cxp+Math.sin(time*30+i)*1+(swT<2.2?Math.round(Math.sin(time*36)*4*wob):0);py=cyp;z=((time*12+i)|0)%2;if(BT.orbOk&&swT>2.2){const k3=Math.min(1,(swT-2.2)/.5);px=px+(FGx-px)*k3;py=py+(FGy-fh*.5-py)*k3}}
+   else{const k2=Math.min(1.4,(swT-2.2)/.25);px=cxp+Math.cos(ang)*k2*60;py=cyp-k2*30+k2*k2*70}
    drawBud({x:Math.round(px),y:Math.round(py)+4,type:BT.tossIx||0,stage:2,z,a:i+1,mv:k<1,st:'idle',fx:1})}
-  if(swT>1.0&&BT.orbOk)for(let i=0;i<10;i++){const a=i*.63+time*3,rad=10+(swT-1)*46;r(i%2?'#fff3b0':T.l,Math.round(FGx+Math.cos(a)*rad),Math.round(FGy-fh*.5+Math.sin(a)*rad*.7),3,3);r(T.c,Math.round(FGx+Math.cos(a+.3)*rad*.6),Math.round(FGy-fh*.5+Math.sin(a+.3)*rad*.4),2,2)}}
+  if(swT>2.2&&BT.orbOk)for(let i=0;i<14;i++){const a=i*.45+time*3,rad=8+(swT-2.2)*90;r(i%2?'#fff3b0':T.l,Math.round(FGx+Math.cos(a)*rad),Math.round(FGy-fh*.5+Math.sin(a)*rad*.7),3,3);r(T.c,Math.round(FGx+Math.cos(a+.3)*rad*.6),Math.round(FGy-fh*.5+Math.sin(a+.3)*rad*.4),2,2)}}
  if(dk>0)r('rgba(10,12,48,'+dk.toFixed(3)+')',0,0,W,top);
  /* ---- status cards ---- */
  const card=(x,y,m,hp,mine)=>{const st=wStats(m),T=TYPES[wSp(m.sp).t[0]],w=116,h=mine?34:26;r(K,x,y,w,h);r('#f8f4e0',x+2,y+2,w-4,h-4);r(T.c,x+2,y+2,4,h-4);r(T.d,x+2,y+2,1,h-4);
@@ -88,7 +92,7 @@ function wDrawBattle(){const B=FBIO[W4.sector]||FBIO.MEADOW,foe=BT.foe,me=btCur(
  /* ---- the panel ---- */
  r(K,0,top,W,PH);r('#f8f4e0',2,top+2,W-4,PH-4);r('#ffd23f',2,top+2,W-4,2);
  const ink='#282838',sel=(x,y,w,h)=>{r(K,x,y,w,h);r('#fff3b0',x+1,y+1,w-2,h-2);r('#ffd23f',x+1,y+1,3,h-2)};
- if(BT.phase==='msg'||BT.phase==='intro'||BT.phase==='orb'){const tx=BT.phase==='orb'?(swT<.9?'Your '+TYPES[BT.tossIx||0].n+' sprouts swarm in...':'They latch on!'):cur?cur.txt:'';
+ if(BT.phase==='msg'||BT.phase==='intro'||BT.phase==='orb'){const tx=BT.phase==='orb'?(swT<.9?'Your '+TYPES[BT.tossIx||0].n+' sprouts swarm in...':swT<2.2?'They latch on'+'...'.slice(0,1+((swT-.9)/1.3*3|0)):BT.orbOk?'It blooms!':'It broke free!'):cur?cur.txt:'';
   swWrap(tx,W-24).slice(0,3).forEach((l,j)=>text(l,10,top+9+j*12,1,ink,null));if(BT.phase==='msg'&&((time*2.4)|0)%2)text('▼',W-16,top+PH-14,1,'#a33b2e',null)}
  else if(BT.phase==='party'){text('SEND WHO?'+(BT.forced?'':'   B  BACK'),10,top+7,1,'#6a6258',null);
   SW.party.forEach((m,i)=>{const y=top+18+i*12,on=i===swSel,st=wStats(m);if(on)sel(6,y-2,W-12,12);

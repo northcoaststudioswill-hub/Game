@@ -21,6 +21,17 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v6.2 — the party walks with you; capture in the open (Opus)
+
+From Will's notes: the A button only ever chose between sprouts; buddies should be targets too, the whole party should follow, things looked big and cramped, and the capture should be better and work out in the field.
+- **Your whole party (up to three buddies) walks with you** outside Sunkeep (`sw-party.js`). At home the ones behind your leader still work the stations.
+- **A sends buddies the same way it throws sprouts.** The ring locks on to trees, rocks, ore veins and fiber thickets too, and sends the buddy best at that job: LUMBER for trees, MINE for rocks, anyone for ore and fiber (the right kinds bring more). Several work at once. B calls them back with the sprouts. You only chop by hand when no buddy in the party can.
+- **Capture in the open field.** Throw sprouts at a wild buddy and they latch on and glow, with a bar showing how close you are. Enough of them (2 + its level; kin count double) and it blooms and joins you right there. Too few for too long, or a bad roll, and it breaks free and the fight starts.
+- **The capture in battle has suspense:** the sprouts hop on, it wobbles three times with a flash and a rising note each time, then it shrinks into the light and the sprouts dance where it stood. Or it breaks free and throws them clear.
+- **More room on screen.** Buddies in the field are drawn at three quarters size (alphas at 1.5x instead of 2x). The party walks in a line behind you; the sprouts trail further back.
+
+Tests: `alt/tests/sproutwild/field-lab.js` 82/82, three runs in a row (6 new: three buddies follow, the right buddy is sent to a tree and a rock at the same time, both finish, sprouts latch on to a wild, it is caught or turns to fight).
+
 ## v6.1 — playtest fixes after the fusion (Opus)
 
 Played the Meadow stretch in the five-cartridge console.
