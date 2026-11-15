@@ -21,6 +21,17 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v6.5 · 2026-11-15 · the base actually works when you leave buddies home
+
+Playtest of the crafting chain (kiln, bench, tonic) with real keys.
+
+- **Home buddies stood idle.** A buddy only worked a building if it had the matching skill, so a Pebblit and a Fernfang left a kiln full of ore untouched and nothing was ever crafted. Now any buddy takes any job at a slow rate; skilled ones are much faster and still get first pick. Same for the bench queue.
+- **Sprouts help at the bench.** Stand at the bench with your squad and each sprout with you speeds the craft (sparks show it). The bench text now says so instead of "CRAFT workers at home: 0".
+- **Kiln yield** is 1 ingot per ore (2 with a skilled worker) instead of 2 to 3, since anyone can run it now.
+- Buddies put down tools at night and sleep (they kept working once any job was allowed; caught by the lab).
+
+Verified: 82 lab checks; real-time run where two unskilled buddies smelted ore and built a tonic.
+
 ## v6.4 · 2026-11-15 · catching works early, buildings rise
 
 Playtest past the opening (real keys, phone screen): Meadow catches, buddy and sprout gathering, home, cottage and bed.

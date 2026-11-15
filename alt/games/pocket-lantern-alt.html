@@ -8933,8 +8933,8 @@ function wkPick(w){const sk=wkSkills(w),bench=SW.buildings.find(b=>b.k==='bench'
   const mine=(W4.bf.items||[]).find(it=>it.from===b&&!it.by&&!it.car.length);if(mine&&(b.out||0)>=2){mine.by=w;return{k:'haul',it:mine}}
   return{k:b.k==='bench'?'craft':b.k==='nursery'?'tend':'bld',b}}
  if(wDark()>.7)return{k:'sleep',t:6};
- if(bench&&(SW.craftQ||[]).length&&sk.HANDIWORK&&wkAt(bench).length<2)return{k:'craft',b:bench};
- let best=null,bl=0;for(const b of SW.buildings){const def=wBuildDef(b.k);if(!def.yields||(b.out||0)>=3||(b.k==='kiln'&&!(SW.res.ore>0)))continue;const lv=wkBldLv(def,sk),n=wkAt(b).length;if(lv>0&&n<2&&lv-n*.5>bl){bl=lv-n*.5;best=b}}
+ if(bench&&!bench.con&&(SW.craftQ||[]).length&&wkAt(bench).length<2)return{k:'craft',b:bench}; /* anyone can lend a hand; the handy ones are much faster */
+ let best=null,bl=0;for(const b of SW.buildings){const def=wBuildDef(b.k);if(!def.yields||(b.out||0)>=3||(b.k==='kiln'&&!(SW.res.ore>0)))continue;const lv=wkBldLv(def,sk)||.4,n=wkAt(b).length;if(!b.con&&n<2&&lv-n*.5>bl){bl=lv-n*.5;best=b}}
  if(best)return{k:'bld',b:best};
  for(const b of SW.buildings)if(b.k==='nursery'&&b.crop&&b.crop.stage<3&&(sk.WATERING||sk.PLANTING)&&!wkAt(b).length)return{k:'tend',b};
  const it=(W4.bf.items||[]).find(i2=>!i2.by&&!i2.car.length&&!i2.done);if(it){it.by=w;return{k:'haul',it}}
@@ -8951,10 +8951,11 @@ function wkTick(dt){if(!W4.bf)return;wkSync();const bench=SW.buildings.find(b=>b
  for(const b of SW.buildings){b.busy=0;b.out=0}
  for(const it of W4.bf.items)if(it.from)it.from.out=(it.from.out||0)+1;
  /* you can always work the bench yourself by standing at it */
- if(bench&&SW.craftQ.length&&!wkAt(bench,'craft').some(w=>w.at)&&Math.hypot(P3.x-(wCellX(bench.gx)+10),P3.y-(wCellY(bench.gy)+22))<30){const q=SW.craftQ[0];q.done+=1.2*dt;bench.busy=1;W4.byHand=.3;if(q.done>=q.need){SW.craftQ.shift();wkCraftDone(q,bench)}}
+ if(bench&&SW.craftQ.length&&!wkAt(bench,'craft').some(w=>w.at)&&Math.hypot(P3.x-(wCellX(bench.gx)+10),P3.y-(wCellY(bench.gy)+22))<30){const q=SW.craftQ[0],ns=W4.bf.sq.filter(s=>s.st==='follow').length;q.done+=(1.2+.15*Math.min(8,ns))*dt;bench.busy=1;W4.byHand=.3;if(ns&&((time*4)|0)!==(((time-dt)*4)|0))fSpark(wCellX(bench.gx)+10+(Math.random()*20-10),wCellY(bench.gy)+4-Math.random()*8,'#fff3b0');if(q.done>=q.need){SW.craftQ.shift();wkCraftDone(q,bench)}}
  if(W4.byHand>0)W4.byHand-=dt;
  for(const w of W4.wk){const sk=wkSkills(w),spd=w.kind==='s'?44:56;w.mv=false;w.at=false;
   const go=(x,y,arr)=>{const dx=x-w.x,dy=y-w.y,d=Math.hypot(dx,dy);if(d<=(arr||3))return true;w.x+=dx/d*spd*dt;w.y+=dy/d*spd*dt;w.mv=true;if(Math.abs(dx)>1)w.fx=dx<0?-1:1;return false};
+  if(w.kind==='b'&&w.task&&(w.task.k==='bld'||w.task.k==='craft')&&wDark()>.7)w.task=null; /* buddies down tools at night */
   if(!w.task){w.t-=dt;if(w.t<=0){w.task=wkPick(w);w.t=.6}continue}
   const tk=w.task,b=tk.b;
   if(b&&!SW.buildings.includes(b)){w.task=null;continue}
@@ -8972,7 +8973,7 @@ function wkTick(dt){if(!W4.bf)return;wkSync();const bench=SW.buildings.find(b=>b
    if((b.out||0)>=3){if(w.kind!=='s')w.task=null;else w.task=wkPick(w);continue}
    if(b.k==='kiln'&&!(SW.res.ore>0)){b.busy=0;if(((time*.5)|0)%4===0&&!b.noOre){b.noOre=1;W4.floats.push({x:wCellX(b.gx)+10,y:wCellY(b.gy)-6,txt:'THE KILN NEEDS ORE',t:1.6,c:'#e88'})}else if(((time*.5)|0)%4!==0)b.noOre=0;if(w.kind!=='s'){w.task={k:'idle',x:w.hx,y:w.hy,t:4}}continue}
    b.prog=(b.prog||0)+lv*dt;
-   if(b.prog>=16){b.prog=0;if(b.k==='kiln')SW.res.ore--;const luck=wkAt(b).some(w2=>wkSkills(w2).FORTUNE),n=2+(lv>=2?1:0)+(luck?1:0)+(SW.keeper==='ERIN'?1:0);
+   if(b.prog>=16){b.prog=0;if(b.k==='kiln')SW.res.ore--;const luck=wkAt(b).some(w2=>wkSkills(w2).FORTUNE),n=(b.k==='kiln'?1:2)+(lv>=2?1:0)+(luck?1:0)+(SW.keeper==='ERIN'?1:0);
     W4.bf.items.push({k:'pel',res:def.yields,n,w:1,x:wCellX(b.gx)+10+(Math.random()*8-4),y:wCellY(b.gy)+33+(b.out||0)*3,car:[],from:b});
     W4.floats.push({x:wCellX(b.gx)+10,y:wCellY(b.gy)-6,txt:def.yields.toUpperCase()+' READY',t:1.2,c:'#ffd94d'});swSnd(880,.05,1175);
     if(Math.random()<(SW.buildings.some(bb=>bb.k==='statue')?.7:.35)&&(W4.groundHearts||[]).length<8){W4.groundHearts=W4.groundHearts||[];W4.groundHearts.push({x:wCellX(b.gx)+4+Math.random()*12,y:wCellY(b.gy)+38})}
@@ -9041,7 +9042,7 @@ function drawTools(){swShell('TINKER BENCH','B  DONE');if(!SW.craftQ)SW.craftQ=[
  rows.push({a:'ASSIGN SPROUTS',b:'pin a sprout here'},{a:'SPROUT JOBS',b:'axe & pick crews'},{a:'LEAVE',b:''});
  const q=SW.craftQ,hand=(W4.wk||[]).filter(w=>wkSkills(w).HANDIWORK).length;
  const qs=q.length?'QUEUE: '+q.map((x,i)=>WRECIPES.find(rc=>rc.id===x.id).n+(i===0?' '+Math.floor(100*x.done/x.need)+'%':'')).join(' · '):'Queue empty.';
- swRows(rows,swSel,(swSel<WRECIPES.length?WRECIPES[swSel].d+' ':'')+qs+' · CRAFT workers at home: '+hand+(hand?'':' (stand at the bench to build by hand)'))}
+ swRows(rows,swSel,(swSel<WRECIPES.length?WRECIPES[swSel].d+' ':'')+qs+' · Buddies at home build it. Stand at the bench and you and your sprouts help.')}
 /* ---------------- the work board ---------------- */
 function baseUpdate(){const n=(W4.wk||[]).length+1;swNav(n);if(pressed('a')||pressed('b'))state='g4world'}
 function drawBase(){swShell('SUNKEEP WORK BOARD','BASE LV '+SW.baseLv);wkSync();
