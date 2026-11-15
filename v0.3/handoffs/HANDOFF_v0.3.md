@@ -157,3 +157,14 @@ lost streaks for skipping days, which undercuts the cozy feel. All five shaped t
   mentions Waterworks. Everything else is new: flag to Will.
 - Tests: 76 checks pass, including save files (fresh file 2, file 1 untouched, three-press erase), Louie fed and
   changing his mind, hearts and the heart scene, asks paying out, the wardrobe, and text audits of every new screen.
+
+## Release: v0.3 frozen and pushed (Nov 15)
+
+- Frozen copy `backups/pocket-lantern_2026-11-15_v0.3_BACKUP.html`, share folder `share/pocket-lantern-v0.3/` with a
+  four-cartridge HOW-TO-PLAY, and `share/pocket-lantern-v0.3-share.zip`. SHA-256s in `v0.3/README.md`.
+- `CHANGELOG.md` (patch log by commit), `VERSION.md`, `playtest/TEST_REPORT.md` (76/76), `playtest/UPDATE_GALLERY_v0.3.png`.
+- `LATEST.md` at the repo root points here (a new file; the old root setup is untouched).
+- Pushed to `claude/optimistic-brown-0pt8kf`. The Rootdeep line is still `claude/adoring-shannon-825i25`; nothing on it changed.
+  When Will wants one line again: merge this branch into it (or open a PR). It only adds `v0.3/`, `LATEST.md`, the v0.1
+  music backup, the v0.2 share repair and appended notes, so it should merge cleanly.
+- Next version: new files only (`backups/..._v0.3.X_BACKUP.html`, `share/pocket-lantern-v0.3.X/` + zip), hashes in the README.
