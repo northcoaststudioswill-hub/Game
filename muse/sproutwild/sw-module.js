@@ -31,7 +31,7 @@ if(SW.intro){const hasCot=SW.buildings.some(b=>b.k==='cottage'),hasBed=SW.buildi
  wildCaught=Object.keys(SW.caught||{}).length>1,talked=(SW.talkN&&SW.talkN.LOUIE)>0||SW.quest>0;
  SW.quest=(SW.badges.length||SW.champion||(hasCot&&hasBed&&wildCaught))?5:
   !talked?0:!SW.party.length?1:!wildCaught?2:!hasCot?3:!hasBed?4:5}
-function swSave(){try{localStorage.setItem('sproutwild-v1',JSON.stringify(SW))}catch(e){}}
+function swSave(){try{localStorage.setItem((WSLOTS&&WSLOTS[wSlot])||'sproutwild-v1',JSON.stringify(SW))}catch(e){}}
 let W4={sector:'BASE',nodes:[],prodT:0,msg:'',msgT:0,stepAcc:0,grassT:0,grace:0,placeK:null,cursor:{x:5,y:3},assignB:-1,partyMode:'view',gymQueue:null,dayT:40,askWho:null,treasure:null};
 function swSay(s,t){W4.msg=s;W4.msgT=t||2.2}
 function swSnd(f,d,f2){snd(f||660,d||.06,f2)}

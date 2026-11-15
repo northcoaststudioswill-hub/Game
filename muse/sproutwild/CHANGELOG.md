@@ -21,6 +21,17 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v5.8 — save files, and text that cannot clip (Fable)
+
+Will hit an error and clipped text before the game even started. I could not reproduce an error with saves made by five older builds, an empty save or a deliberately damaged one, but three real weaknesses turned up and are fixed.
+
+- **Save files.** Press A on the title for a file list. Three files: pick one to CONTINUE, pick an empty one for a NEW GAME, SELECT erases after asking. START > SAVE AND QUIT returns to the title. File 1 is the save older builds used.
+- **Saves are cleaned on load.** Unknown buddies, buildings and sectors are dropped and missing fields filled in, so an old or damaged save cannot crash the game. (A damaged save did crash it before: a buddy the game did not know broke drawing.)
+- **Clipped text.** Speech boxes were fixed at three lines. With a slightly wider font, which is likely what an iPhone uses, the opening story ran to a fourth line that was cut off. Speech boxes, message bars and area banners now grow with their text. Found by forcing a 12% wider font in the test browser.
+- **Cloud save switched off in the page build.** The trilogy's cloud save asked the claude.ai page for storage it was never given; that may have been the error. Local saves are unaffected.
+
+Tests: `field-lab.js` 71/71 (9 new for the save flow).
+
 ## v5.7 — after the first catch (Fable)
 
 Found by playing on past the opening and looking at every screen.

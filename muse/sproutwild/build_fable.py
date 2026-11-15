@@ -16,7 +16,15 @@ OUT = here.parent / 'games/Sprouts+Rootdeep+Sproutwild-v5.html'
 MARK = '/* ================================================================\n   DISPATCH + TEST HOOKS'
 mod = (here / 'sw-module.js').read_text()
 assert mod.count(MARK) == 1
-mod = mod.replace(MARK, (here / 'sw-field.js').read_text().rstrip() + '\n' + (here / 'sw-front.js').read_text().rstrip() + '\n' + (here / 'sw-base.js').read_text().rstrip() + '\n' + (here / 'sw-art.js').read_text().rstrip() + '\n' + (here / 'sw-story.js').read_text().rstrip() + '\n' + (here / 'sw-battle.js').read_text().rstrip() + '\n' + MARK)
+mod = mod.replace(MARK, (here / 'sw-field.js').read_text().rstrip() + '\n' + (here / 'sw-front.js').read_text().rstrip() + '\n' + (here / 'sw-base.js').read_text().rstrip() + '\n' + (here / 'sw-art.js').read_text().rstrip() + '\n' + (here / 'sw-story.js').read_text().rstrip() + '\n' + (here / 'sw-battle.js').read_text().rstrip() + '\n' + (here / 'sw-save.js').read_text().rstrip() + '\n' + MARK)
 code = code.replace('module = (w/"sw-module.js").read_text().rstrip()', 'module = MODULE.rstrip()')
 assert 'MODULE' in code
 exec(compile(code, 'build.py', 'exec'), {'SRC': src, 'HERE': here, 'OUT': OUT, 'MODULE': mod})
+
+# This test build is published as a claude.ai page, where the trilogy's cloud save has no storage to talk to.
+# Switch it off here (the local saves are untouched) so the page asks for nothing it cannot have.
+html = OUT.read_text()
+assert html.count('loadWorld();cloudInit();') == 1
+html = html.replace('loadWorld();cloudInit();', 'loadWorld();cloudDone=true;').replace('claude.use', 'claude.__off')
+OUT.write_text(html)
+print('cloud save switched off for the page build:', len(html))

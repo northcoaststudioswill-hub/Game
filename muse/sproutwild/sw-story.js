@@ -78,7 +78,7 @@ function wBaseArrive(from){const F=W4.bf;P3.x=240;P3.ax=0;P3.ay=-1;P3.y=from==='
  if(SW.quest<2&&!SW.lit){if(!SW.seeds)SW.seeds=[0,2,4];
   F.buds=SW.seeds.map(ty=>({type:ty,x:WSEEDPOS[ty][0],y:WSEEDPOS[ty][1],glow:1}));
   for(let i=(SW.fedN||0);i<3;i++)F.items.push({k:'pel',res:'berry',n:1,w:1,x:150+i*15,y:190+(i%2)*7,car:[],op:1})}
- if(SW.quest<2)W4.banner=null;
+ if(SW.quest<2){W4.banner=null;SW.visited.BASE=1}
  W4.cam=null;wCamUpdate(P3.x,P3.y)}
 function wNearExtra(px,py){const F=W4.bf;if(!F)return null;for(const b of F.buds)if(Math.hypot(px-b.x,py-b.y)<18)return{k:'fbud',b,txt:'PLUCK'};return null}
 /* leaving Sunkeep on foot */

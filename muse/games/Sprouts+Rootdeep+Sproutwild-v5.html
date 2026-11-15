@@ -163,7 +163,7 @@ function persist(force){try{SAVE.meta=meta;if(live)SAVE.run=snap();SAVE.t=Date.n
  try{localStorage.setItem('sprouts-v2',JSON.stringify(SAVE))}catch(e){}
  if(cloud&&!cloudBusy&&(force||Date.now()-cloudAt>25000)){cloudBusy=true;cloudAt=Date.now();try{cloud.set({t:SAVE.t,json:JSON.stringify(SAVE)}).catch(()=>{}).then(()=>{cloudBusy=false})}catch(e){cloudBusy=false}}}
 const save=()=>persist(false);
-async function cloudInit(){try{if(typeof claude==='undefined'||!claude.use){cloudDone=true;return}const db=await claude.use('db'),user=await claude.use('user');if(!db||!user)return;const id=await user.id();if(!id)return;
+async function cloudInit(){try{if(typeof claude==='undefined'||!claude.__off){cloudDone=true;return}const db=await claude.__off('db'),user=await claude.__off('user');if(!db||!user)return;const id=await user.id();if(!id)return;
  const ref=db.collection('data/users/'+id).doc('sprouts'),sn=await ref.get();cloud=ref;
  if(sn&&sn.exists){const d=sn.data();if(d&&d.json&&(d.t||0)>(SAVE.t||0)&&(state==='off'||state==='boot'||state==='menu')){const o=JSON.parse(d.json);if(o&&o.meta){SAVE=o;meta=fixMeta(o.meta);applyLook(meta.eq);loadWorld();try{localStorage.setItem('sprouts-v2',JSON.stringify(SAVE))}catch(e){}}}}
  else if(SAVE.t)persist(true);}catch(e){}cloudDone=true;}
@@ -2277,7 +2277,7 @@ if(SW.intro){const hasCot=SW.buildings.some(b=>b.k==='cottage'),hasBed=SW.buildi
  wildCaught=Object.keys(SW.caught||{}).length>1,talked=(SW.talkN&&SW.talkN.LOUIE)>0||SW.quest>0;
  SW.quest=(SW.badges.length||SW.champion||(hasCot&&hasBed&&wildCaught))?5:
   !talked?0:!SW.party.length?1:!wildCaught?2:!hasCot?3:!hasBed?4:5}
-function swSave(){try{localStorage.setItem('sproutwild-v1',JSON.stringify(SW))}catch(e){}}
+function swSave(){try{localStorage.setItem((WSLOTS&&WSLOTS[wSlot])||'sproutwild-v1',JSON.stringify(SW))}catch(e){}}
 let W4={sector:'BASE',nodes:[],prodT:0,msg:'',msgT:0,stepAcc:0,grassT:0,grace:0,placeK:null,cursor:{x:5,y:3},assignB:-1,partyMode:'view',gymQueue:null,dayT:40,askWho:null,treasure:null};
 function swSay(s,t){W4.msg=s;W4.msgT=t||2.2}
 function swSnd(f,d,f2){snd(f||660,d||.06,f2)}
@@ -4876,7 +4876,7 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
    ================================================================ */
 const UI={ink:'#14101e',paper:'#f8f4e0',paper2:'#e4dcc0',gold:'#ffd23f',leaf:'#7ee787',dim:'#a8c898',red:'#a33b2e'};
 /* a speech box: name tab, three lines, the prompt on its own row */
-function uiSay(who,txt,shown,hint,acc){const bh=58,y=H-bh-4,lines=swWrap(txt,W-36).slice(0,3);
+function uiSay(who,txt,shown,hint,acc){const lines=swWrap(txt,W-36).slice(0,6),bh=25+Math.max(3,lines.length)*11,y=H-bh-4;
  r(UI.ink,4,y,W-8,bh);r(UI.paper,6,y+2,W-12,bh-4);r(acc||UI.gold,6,y+2,W-12,2);r(UI.paper2,6,y+bh-14,W-12,12);
  if(who){const nw=tw(who,1)+10;r(UI.ink,10,y-9,nw+2,12);r(acc||UI.red,11,y-8,nw,10);text(who,16,y-7,1,'#ffffff',null)}
  let left=shown==null?1e9:Math.floor(shown);
@@ -4904,14 +4904,14 @@ function uiWill(x,y,sc,ax,ay){const sx=P3.x,sy=P3.y,sax=P3.ax,say=P3.ay,san=P3.a
 
 /* ---------------- the one HUD ---------------- */
 function wHud(){const sec=wSector(W4.sector),F=W4.fld||W4.bf,atBase=!W4.fld;
- r('rgba(10,14,8,.8)',0,0,W,15);r(UI.gold,0,15,W,1);text(sec.n,5,4,1,'#ffd94d',null);
- {const rs='♣'+SW.res.wood+' ◆'+SW.res.stone+' ✿'+SW.res.petal+(atBase?' ♥'+SW.hearts:'');text(rs,W-5-tw(rs,1),4,1,'#d8e8c8',null)}
+ r('rgba(10,14,8,.8)',0,0,W,15);r(UI.gold,0,15,W,1);
+ {const rs='♣'+SW.res.wood+' ◆'+SW.res.stone+' ✿'+SW.res.petal+(atBase?' ♥'+SW.hearts:'');text(rs,W-5-tw(rs,1),4,1,'#d8e8c8',null);text(wFit(sec.n,W-16-tw(rs,1)),5,4,1,'#ffd94d',null)}
  if(SW.stam<99){r('#00000088',0,16,W,2);r(SW.stam>40?UI.leaf:SW.stam>18?'#ffd94d':'#e04838',0,16,Math.round(W*SW.stam/100),2)}
  const ban=W4.banner&&W4.banner.t>0;
  {const q=wQuestText();if(q&&!ban&&state!=='g4place'){
   r('rgba(10,14,8,.62)',0,18,W,11);r(UI.gold,0,18,2,11);text(wFit(q,226),6,20,1,'#ffe8b0',null)}}
- if(ban){g.globalAlpha=Math.min(1,W4.banner.t);r('#0e1a0a',8,30,224,34);r(UI.gold,8,30,224,2);r(UI.gold,8,62,224,1);
-  text(W4.banner.txt,Math.round(W/2-tw(W4.banner.txt,2)/2),35,2,'#ffffff',null);const sb=wFit(W4.banner.sub,216);text(sb,Math.round(W/2-tw(sb,1)/2),53,1,'#cfe0b8',null);g.globalAlpha=1}
+ if(ban){const sl=swWrap(W4.banner.sub||'',212).slice(0,3),bh2=24+sl.length*11;g.globalAlpha=Math.min(1,W4.banner.t);r('#0e1a0a',8,30,224,bh2);r(UI.gold,8,30,224,2);r(UI.gold,8,30+bh2-2,224,1);
+  {const bt=W4.banner.txt,big=tw(bt,2)<=216;text(big?bt:wFit(bt,216),Math.round(W/2-tw(big?bt:wFit(bt,216),big?2:1)/2),35,big?2:1,'#ffffff',null)}sl.forEach((l,j)=>text(l,Math.round(W/2-tw(l,1)/2),53+j*11,1,'#cfe0b8',null));g.globalAlpha=1}
  /* bottom row: squad on the field, crew and sigils at home */
  r('rgba(10,14,8,.8)',0,H-16,W,16);let x=4;const y=H-13;
  if(F){for(let ty=0;ty<TYPES.length;ty++){const all=F.sq.filter(s=>s.type===ty);if(!all.length)continue;const fl=all.filter(s=>s.st==='follow').length,T=TYPES[ty],on=ty===SW.selType;
@@ -4925,7 +4925,7 @@ function wHud(){const sec=wSector(W4.sector),F=W4.fld||W4.bf,atBase=!W4.fld;
  {const dph=wDark()<=0?'DAY':wDark()<.6?'DUSK':'NIGHT',dl=dph+' '+(SW.day||1);text(dl,W-5-tw(dl,1),H-12,1,UI.dim,null)}
  const busy=(F&&F.dlg)||W4.talk||state==='g4place';
  if(W4.near&&!busy)uiPill(W4.near.txt,H-30,'A');
- if(W4.msgT>0&&W4.msg&&!busy){const ml=swWrap(W4.msg,W-30).slice(0,3),ex=(ml.length-1)*10,by=H-46-ex-(W4.near?0:0);
+ if(W4.msgT>0&&W4.msg&&!busy){const ml=swWrap(W4.msg,W-30).slice(0,5),ex=(ml.length-1)*10,by=H-46-ex-(W4.near?0:0);
   r('rgba(10,10,16,.9)',8,by,W-16,13+ex);r(UI.gold,8,by,W-16,1);ml.forEach((l,j)=>text(l,Math.round(W/2-tw(l,1)/2),by+3+j*10,1,'#ffe8b0',null))}}
 
 /* ---------------- title ---------------- */
@@ -4954,9 +4954,9 @@ function swDrawTitle(){const hz=Math.round(H*.60);ox=0;oy=0;
   /* a sprout growing out of the logo */
   r('#2c6030',bx+bw+2,ly+2,1,10);r('#58c048',bx+bw-2,ly-1,4,3);r('#58c048',bx+bw+3,ly-3,4,3);r('#b0f090',bx+bw-1,ly-1,1,1);
   const sub='A LANTERN VALLEY TALE';text(sub,Math.round(W/2-tw(sub,1)/2),ly+bh+7,1,'#ffe8b0',null)}
- if(SW.intro){const st='SIGILS '+SW.badges.length+'/4 · BUDDIES '+(SW.party.length+SW.box.length)+' · DAY '+(SW.day||1);r('rgba(10,14,8,.6)',0,H-40,W,11);text(st,Math.round(W/2-tw(st,1)/2),H-38,1,UI.dim,null)}
- if(((time*1.6)|0)%2)uiPill(SW.intro?'CONTINUE':'NEW GAME',H-56,'A');
- r('rgba(10,14,8,.8)',0,H-12,W,12);ctext('GROW · THROW · CATCH · BUILD',H-10,1,'#7a9a68',null)}
+ if(!(W4.tm|0)&&((time*1.6)|0)%2)uiPill('PRESS A',H-56,'A');
+ r('rgba(10,14,8,.8)',0,H-12,W,12);ctext(W4.tsaved>0?'SAVED TO FILE '+(wSlot+1):'GROW · THROW · CATCH · BUILD',H-10,1,W4.tsaved>0?'#7ee787':'#7a9a68',null);
+ if(W4.tm|0)wTitleFiles()}
 
 /* ---------------- the opening story ---------------- */
 const WSTORY=[
@@ -5453,7 +5453,7 @@ function wBaseArrive(from){const F=W4.bf;P3.x=240;P3.ax=0;P3.ay=-1;P3.y=from==='
  if(SW.quest<2&&!SW.lit){if(!SW.seeds)SW.seeds=[0,2,4];
   F.buds=SW.seeds.map(ty=>({type:ty,x:WSEEDPOS[ty][0],y:WSEEDPOS[ty][1],glow:1}));
   for(let i=(SW.fedN||0);i<3;i++)F.items.push({k:'pel',res:'berry',n:1,w:1,x:150+i*15,y:190+(i%2)*7,car:[],op:1})}
- if(SW.quest<2)W4.banner=null;
+ if(SW.quest<2){W4.banner=null;SW.visited.BASE=1}
  W4.cam=null;wCamUpdate(P3.x,P3.y)}
 function wNearExtra(px,py){const F=W4.bf;if(!F)return null;for(const b of F.buds)if(Math.hypot(px-b.x,py-b.y)<18)return{k:'fbud',b,txt:'PLUCK'};return null}
 /* leaving Sunkeep on foot */
@@ -5690,6 +5690,82 @@ function wDrawBattle(){const B=FBIO[W4.sector]||FBIO.MEADOW,foe=BT.foe,me=btCur(
    if(on)sel(x,y-2,64,14);const ic=o==='FIGHT'?'#e04838':o==='SPROUT'?'#58c048':o==='KEEPER'?'#ffd23f':o==='BUDDY'?'#48a0f0':'#98988a';r(K,x+5,y,7,9);r(used?'#c8c0b0':ic,x+6,y+1,5,7);
    text(lab,x+15,y+1,1,used?'#98988a':ink,null)})}}
 /* ================================================================
+   SAVE FILES (Fable, v5.8)
+   Three files. The title screen opens a file list: pick one to
+   CONTINUE, pick an empty one for a NEW GAME, SELECT erases (asks
+   first). START > SAVE AND QUIT returns to the title. Every save
+   is cleaned on load, so a save from an older build, or a damaged
+   one, can never crash the game: unknown buddies, buildings and
+   sectors are dropped and missing fields are filled in.
+   File 1 is the save older builds used ('sproutwild-v1').
+   ================================================================ */
+var WSLOTS=['sproutwild-v1','sproutwild-s2','sproutwild-s3'],wSlot=0;
+function wNormalize(j){const D=SWDEF(),S=Object.assign(SWDEF(),(j&&typeof j==='object')?j:{});
+ for(const k of ['res','buds','tools'])S[k]=Object.assign({},D[k],(S[k]&&typeof S[k]==='object')?S[k]:{});
+ for(const k in S.res)if(!(S.res[k]>=0))S.res[k]=0;for(const k in S.buds)if(!(S.buds[k]>=0))S.buds[k]=0;
+ S.res.fiber=S.res.fiber||0;S.res.ore=S.res.ore||0;
+ for(const k of ['seen','caught','gymDone','visited','talkN','unlocked','asks','lessons','fl','gear'])if(!S[k]||typeof S[k]!=='object'||Array.isArray(S[k]))S[k]={};
+ for(const k of ['party','box','badges','buildings','crew','trioPlucked','followers'])if(!Array.isArray(S[k]))S[k]=[];
+ const okMon=m=>m&&typeof m==='object'&&wSp(m.sp)&&m.lv>0;S.box=S.box.filter(okMon);S.party=S.party.filter(okMon);while(S.party.length>3)S.box.push(S.party.pop());
+ for(const m of S.party.concat(S.box)){m.lv=Math.min(40,m.lv|0);const st=wStats(m);if(!(m.hp>=0))m.hp=st.max;m.hp=Math.min(m.hp,st.max);if(!(m.xp>=0))m.xp=0;
+  if(!Array.isArray(m.moves)||!m.moves.length||m.moves.some(id=>!WMOVES[id]))m.moves=wMovesAt(wSp(m.sp),m.lv)}
+ S.buildings=S.buildings.filter(b=>b&&wBuildDef(b.k)&&b.gx>=0&&b.gy>=0);for(const b of S.buildings){b.workers=[];if(b.crop&&!wSp(b.crop.sp))b.crop=null}
+ S.crew=S.crew.filter(c=>c&&c.type>=0&&c.type<TYPES.length);for(const c of S.crew)if(c.job>=S.buildings.length)c.job=-1;
+ for(const ty of S.followers)if(TYPES[ty])S.buds[TYPES[ty].n]++;S.followers=[];
+ if(!wSector(S.sector))S.sector='BASE';if(!WKEEPERS[S.keeper])S.keeper='WILL';
+ S.quest=Math.max(0,Math.min(5,S.quest|0));S.baseLv=Math.max(1,S.baseLv|0);S.day=Math.max(1,S.day|0);if(!(S.stam>=0))S.stam=100;if(!(S.tonics>=0))S.tonics=0;
+ if(!(S.hearts>=0))S.hearts=0;if(!(S.heartsTotal>=0))S.heartsTotal=S.hearts;if(!(S.playT>=0))S.playT=0;S.pouch=Math.max(8,Math.min(24,S.pouch|0||8));if(!Array.isArray(S.craftQ))S.craftQ=[];
+ S.craftQ=S.craftQ.filter(q=>q&&WRECIPES.some(rc=>rc.id===q.id));
+ if(S.quest>=2||S.tendDone)S.lit=1;
+ if(!S.party.length&&S.quest>=2){S.quest=1;S.lit=1;S.tendDone=true} /* a save with no buddy goes back to greeting one */
+ if(S.lit){S.tendDone=true;S.tendStage=4}
+ if(S.selType==null||!TYPES[S.selType])S.selType=0;if(!S.cmdMode)S.cmdMode='sprout';
+ return S}
+function wResetWorld(){Object.assign(W4,{sector:'BASE',fld:null,bf:null,wk:[],patchBuds:null,tend:null,groundHearts:[],amb:null,jobPos:null,banner:null,talk:null,cine:null,fetch:null,confirm:null,engage:null,
+  msg:'',msgT:0,dayT:40,wildCd:0,near:null,wake:0,nodes:[],wilds:[],loose:[],treasure:null,from:null,bushes:null,groundFor:null,prodT:0});W4.floats=[];BT=null}
+function wSlotInfo(i){try{const j=JSON.parse(localStorage.getItem(WSLOTS[i])||'null');return j&&j.intro?j:null}catch(e){return null}}
+function wLoadSlot(i){wSlot=i;let j=null;try{j=JSON.parse(localStorage.getItem(WSLOTS[i])||'null')}catch(e){}const N=wNormalize(j);for(const k in SW)delete SW[k];Object.assign(SW,N);wResetWorld();return!!(j&&j.intro)} /* same object, new contents: nothing holds a stale save */
+SW=wNormalize(SW);
+/* ---------------- title: splash, then the file list ---------------- */
+function titleUpdate(){const tm=W4.tm|0;if(W4.tsaved>0)W4.tsaved-=1/60;
+ if(tm===0){if(pressed('a')||pressed('start')){swSnd(784,.09);W4.tm=1;swSel=wSlot}return}
+ if(tm===2){if(pressed('a')){try{localStorage.removeItem(WSLOTS[swSel])}catch(e){}swSnd(200,.2,90);W4.tm=1}else if(pressed('b'))W4.tm=1;return}
+ swNav(3);if(pressed('b')){W4.tm=0;return}
+ if(pressed('sel')&&wSlotInfo(swSel)){W4.tm=2;swSnd(300,.08);return}
+ if(pressed('a')||pressed('start')){const had=wLoadSlot(swSel);swSnd(784,.09,1175);W4.tm=0;
+  if(!had){W4.introPage=0;W4.introT=0;state='g4intro'}else{wEnterSector(SW.sector||'BASE');state='g4world'}}}
+function wTitleFiles(){const K='#14101e',tm=W4.tm|0,pw=W-20,rh=34,ph=3*rh+40,py=Math.max(18,Math.min(Math.round(H*.30),H-ph-6));
+ r('rgba(6,8,20,.6)',0,0,W,H);r(K,8,py,pw+4,ph);r('#f8f4e0',10,py+2,pw,ph-4);r('#ffd23f',10,py+2,pw,2);
+ text('CHOOSE A FILE',16,py+7,1,'#6a6258',null);
+ for(let i=0;i<3;i++){const j=wSlotInfo(i),y=py+20+i*rh,on=i===swSel,lab='FILE '+(i+1),nx=22+tw(lab,1)+8;
+  r(on?K:'#d8d0b8',14,y,pw-8,rh-3);r(on?'#fff3b0':'#efe8d0',15,y+1,pw-10,rh-5);if(on)r('#ffd23f',15,y+1,3,rh-5);
+  text(lab,22,y+4,1,'#a33b2e',null);
+  if(j){const pt=Math.floor((j.playT||0)/60),bud=((j.party||[]).length+(j.box||[]).length),sec=wSector(j.sector)?wSector(j.sector).n:'SUNKEEP BASE';
+   text(wFit((j.keeper||'WILL')+' · '+sec,pw+10-nx-14),nx,y+4,1,'#282838',null);
+   text(wFit('DAY '+(j.day||1)+' · '+((j.badges||[]).length)+' SIGILS · '+(pt>=60?Math.floor(pt/60)+'h ':'')+(pt%60)+'m',pw-18),22,y+17,1,'#585868',null)}
+  else{text('NEW GAME',nx,y+4,1,'#1d7a2a',null);text('an empty file',22,y+17,1,'#98907c',null)}}
+ {const cur=wSlotInfo(swSel),hint=wFit(cur?'A PLAY · SELECT ERASE · B BACK':'A NEW GAME · B BACK',pw-10);text(hint,Math.round(W/2-tw(hint,1)/2),py+ph-16,1,'#6a6258',null)}
+ if(tm===2){const y=Math.round(H/2-36),t1='ERASE FILE '+(swSel+1)+'?';r('rgba(6,8,6,.7)',0,0,W,H);r(K,16,y,W-32,72);r('#f8f4e0',18,y+2,W-36,68);r('#e04838',18,y+2,W-36,3);
+  text(t1,Math.round(W/2-tw(t1,2)/2),y+11,2,'#a33b2e',null);ctext('This cannot be undone.',y+31,1,'#282838',null);text('A  ERASE',30,y+52,1,'#a33b2e',null);text('B  KEEP IT',W-30-tw('B  KEEP IT',1),y+52,1,'#1d5a2a',null)}}
+/* ---------------- pause: save and quit ---------------- */
+function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','BASE','KEEPER','GUIDE','SAVE AND QUIT','RESUME'];swNav(rows.length);
+ if(pressed('b')){state='g4world';return}
+ if(pressed('a')){const r2=rows[swSel];
+  if(r2==='BUDDIES'){swSel=0;state='g4party'}
+  else if(r2==='BUDDY GUIDE'){swSel=0;state='g4dex'}
+  else if(r2==='BUILD'){if(W4.sector!=='BASE'){swSay('Building happens at Sunkeep Base.',1.8);state='g4world'}else{swSel=0;state='g4build'}}
+  else if(r2==='SECTORS'){W4.mapRO=1;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
+  else if(r2==='BASE'){swSel=0;state='g4base'}
+  else if(r2==='KEEPER'){swSel=['WILL','ERIN','MARCUS'].indexOf(SW.keeper);state='g4keeper'}
+  else if(r2==='GUIDE'){W4.guidePage=0;state='g4guide'}
+  else if(r2==='SAVE AND QUIT'){swSave();swSnd(784,.1,1175);W4.tm=0;W4.tsaved=3;state='g4title'}
+  else state='g4world'}}
+function drawPause(){swShell('KEEPER MENU','FILE '+(wSlot+1));
+ swRows([{a:'BUDDIES',b:SW.party.length+(SW.party.length===1?' buddy':' buddies')},{a:'BUDDY GUIDE',b:Object.keys(SW.caught).length+'/'+WSPECIES.length+' met'},
+  {a:'BUILD',b:W4.sector==='BASE'?'at home':'only at home'},{a:'MAP',b:'look only'},{a:'WORK BOARD',b:'Sunkeep Lv'+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how it works'},
+  {a:'SAVE AND QUIT',b:'to the title'},{a:'RESUME',b:''}],swSel,
+  'Sprouts '+wBudTotal()+'/'+(SW.pouch||8)+' · Tonic '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0)+'. Saves by itself.')}
+/* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */
 function g4Update(dt){switch(state){
@@ -5778,7 +5854,7 @@ const SWF={op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W
 /* ---------- loop ---------- */
 function fit(){const p=cv.parentNode||{};let nh=Math.round(240*p.clientHeight/p.clientWidth/2)*2;nh=Math.max(160,Math.min(304,nh||200));if(nh!==H||cv.height!==nh*2||cv.width!==480){H=nh;cv.width=480;cv.height=H*2}}
 fit();addEventListener('resize',fit);try{new ResizeObserver(fit).observe(cv.parentNode)}catch(e){}
-loadWorld();cloudInit();
+loadWorld();cloudDone=true;
 let last=0;
 function frame(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;
  try{update(dt);g.setTransform(2,0,0,2,0,0);g.imageSmoothingEnabled=false;draw();}catch(err){console.error(err)}

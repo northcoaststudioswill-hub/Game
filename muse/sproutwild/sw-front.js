@@ -11,7 +11,7 @@
    ================================================================ */
 const UI={ink:'#14101e',paper:'#f8f4e0',paper2:'#e4dcc0',gold:'#ffd23f',leaf:'#7ee787',dim:'#a8c898',red:'#a33b2e'};
 /* a speech box: name tab, three lines, the prompt on its own row */
-function uiSay(who,txt,shown,hint,acc){const bh=58,y=H-bh-4,lines=swWrap(txt,W-36).slice(0,3);
+function uiSay(who,txt,shown,hint,acc){const lines=swWrap(txt,W-36).slice(0,6),bh=25+Math.max(3,lines.length)*11,y=H-bh-4;
  r(UI.ink,4,y,W-8,bh);r(UI.paper,6,y+2,W-12,bh-4);r(acc||UI.gold,6,y+2,W-12,2);r(UI.paper2,6,y+bh-14,W-12,12);
  if(who){const nw=tw(who,1)+10;r(UI.ink,10,y-9,nw+2,12);r(acc||UI.red,11,y-8,nw,10);text(who,16,y-7,1,'#ffffff',null)}
  let left=shown==null?1e9:Math.floor(shown);
@@ -39,14 +39,14 @@ function uiWill(x,y,sc,ax,ay){const sx=P3.x,sy=P3.y,sax=P3.ax,say=P3.ay,san=P3.a
 
 /* ---------------- the one HUD ---------------- */
 function wHud(){const sec=wSector(W4.sector),F=W4.fld||W4.bf,atBase=!W4.fld;
- r('rgba(10,14,8,.8)',0,0,W,15);r(UI.gold,0,15,W,1);text(sec.n,5,4,1,'#ffd94d',null);
- {const rs='♣'+SW.res.wood+' ◆'+SW.res.stone+' ✿'+SW.res.petal+(atBase?' ♥'+SW.hearts:'');text(rs,W-5-tw(rs,1),4,1,'#d8e8c8',null)}
+ r('rgba(10,14,8,.8)',0,0,W,15);r(UI.gold,0,15,W,1);
+ {const rs='♣'+SW.res.wood+' ◆'+SW.res.stone+' ✿'+SW.res.petal+(atBase?' ♥'+SW.hearts:'');text(rs,W-5-tw(rs,1),4,1,'#d8e8c8',null);text(wFit(sec.n,W-16-tw(rs,1)),5,4,1,'#ffd94d',null)}
  if(SW.stam<99){r('#00000088',0,16,W,2);r(SW.stam>40?UI.leaf:SW.stam>18?'#ffd94d':'#e04838',0,16,Math.round(W*SW.stam/100),2)}
  const ban=W4.banner&&W4.banner.t>0;
  {const q=wQuestText();if(q&&!ban&&state!=='g4place'){
   r('rgba(10,14,8,.62)',0,18,W,11);r(UI.gold,0,18,2,11);text(wFit(q,226),6,20,1,'#ffe8b0',null)}}
- if(ban){g.globalAlpha=Math.min(1,W4.banner.t);r('#0e1a0a',8,30,224,34);r(UI.gold,8,30,224,2);r(UI.gold,8,62,224,1);
-  text(W4.banner.txt,Math.round(W/2-tw(W4.banner.txt,2)/2),35,2,'#ffffff',null);const sb=wFit(W4.banner.sub,216);text(sb,Math.round(W/2-tw(sb,1)/2),53,1,'#cfe0b8',null);g.globalAlpha=1}
+ if(ban){const sl=swWrap(W4.banner.sub||'',212).slice(0,3),bh2=24+sl.length*11;g.globalAlpha=Math.min(1,W4.banner.t);r('#0e1a0a',8,30,224,bh2);r(UI.gold,8,30,224,2);r(UI.gold,8,30+bh2-2,224,1);
+  {const bt=W4.banner.txt,big=tw(bt,2)<=216;text(big?bt:wFit(bt,216),Math.round(W/2-tw(big?bt:wFit(bt,216),big?2:1)/2),35,big?2:1,'#ffffff',null)}sl.forEach((l,j)=>text(l,Math.round(W/2-tw(l,1)/2),53+j*11,1,'#cfe0b8',null));g.globalAlpha=1}
  /* bottom row: squad on the field, crew and sigils at home */
  r('rgba(10,14,8,.8)',0,H-16,W,16);let x=4;const y=H-13;
  if(F){for(let ty=0;ty<TYPES.length;ty++){const all=F.sq.filter(s=>s.type===ty);if(!all.length)continue;const fl=all.filter(s=>s.st==='follow').length,T=TYPES[ty],on=ty===SW.selType;
@@ -60,7 +60,7 @@ function wHud(){const sec=wSector(W4.sector),F=W4.fld||W4.bf,atBase=!W4.fld;
  {const dph=wDark()<=0?'DAY':wDark()<.6?'DUSK':'NIGHT',dl=dph+' '+(SW.day||1);text(dl,W-5-tw(dl,1),H-12,1,UI.dim,null)}
  const busy=(F&&F.dlg)||W4.talk||state==='g4place';
  if(W4.near&&!busy)uiPill(W4.near.txt,H-30,'A');
- if(W4.msgT>0&&W4.msg&&!busy){const ml=swWrap(W4.msg,W-30).slice(0,3),ex=(ml.length-1)*10,by=H-46-ex-(W4.near?0:0);
+ if(W4.msgT>0&&W4.msg&&!busy){const ml=swWrap(W4.msg,W-30).slice(0,5),ex=(ml.length-1)*10,by=H-46-ex-(W4.near?0:0);
   r('rgba(10,10,16,.9)',8,by,W-16,13+ex);r(UI.gold,8,by,W-16,1);ml.forEach((l,j)=>text(l,Math.round(W/2-tw(l,1)/2),by+3+j*10,1,'#ffe8b0',null))}}
 
 /* ---------------- title ---------------- */
@@ -89,9 +89,9 @@ function swDrawTitle(){const hz=Math.round(H*.60);ox=0;oy=0;
   /* a sprout growing out of the logo */
   r('#2c6030',bx+bw+2,ly+2,1,10);r('#58c048',bx+bw-2,ly-1,4,3);r('#58c048',bx+bw+3,ly-3,4,3);r('#b0f090',bx+bw-1,ly-1,1,1);
   const sub='A LANTERN VALLEY TALE';text(sub,Math.round(W/2-tw(sub,1)/2),ly+bh+7,1,'#ffe8b0',null)}
- if(SW.intro){const st='SIGILS '+SW.badges.length+'/4 · BUDDIES '+(SW.party.length+SW.box.length)+' · DAY '+(SW.day||1);r('rgba(10,14,8,.6)',0,H-40,W,11);text(st,Math.round(W/2-tw(st,1)/2),H-38,1,UI.dim,null)}
- if(((time*1.6)|0)%2)uiPill(SW.intro?'CONTINUE':'NEW GAME',H-56,'A');
- r('rgba(10,14,8,.8)',0,H-12,W,12);ctext('GROW · THROW · CATCH · BUILD',H-10,1,'#7a9a68',null)}
+ if(!(W4.tm|0)&&((time*1.6)|0)%2)uiPill('PRESS A',H-56,'A');
+ r('rgba(10,14,8,.8)',0,H-12,W,12);ctext(W4.tsaved>0?'SAVED TO FILE '+(wSlot+1):'GROW · THROW · CATCH · BUILD',H-10,1,W4.tsaved>0?'#7ee787':'#7a9a68',null);
+ if(W4.tm|0)wTitleFiles()}
 
 /* ---------------- the opening story ---------------- */
 const WSTORY=[

@@ -114,13 +114,28 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];
   ok('species bring their own work skills',F.wkSkills(wk[0]).KINDLING>=1&&F.wkSkills(wk[1]).QUARRY>=1&&F.wkSkills(wk[2]).HANDIWORK>=1,JSON.stringify(wk.map(w=>F.wkSkills(w))));
   F.dayT(20);F.setPos(60,460);S.res.ore=0;step(300);ok('the kiln sits idle without ore',!(S.buildings[0].prog>0),S.buildings[0].prog);S.res.ore=6;const i0=S.res.ingot,s0=S.res.stone;step(240);
   const kiln=S.buildings[0],quarry=S.buildings[2];
-  ok('the fire buddy picks the kiln, the rock buddy the quarry',wk[0].task&&wk[0].task.b===kiln&&wk[1].task&&wk[1].task.b===quarry,(wk[0].task&&wk[0].task.k)+','+(wk[1].task&&wk[1].task.k));
+  let seenK=false,seenQ=false;for(let i=0;i<300;i++){step(1);if(wk[0].task&&wk[0].task.b===kiln)seenK=true;if(wk[1].task&&wk[1].task.b===quarry)seenQ=true}
+  ok('the fire buddy picks the kiln, the rock buddy the quarry',seenK&&seenQ,(wk[0].task&&wk[0].task.k)+','+(wk[1].task&&wk[1].task.k));
   step(2400);G.draw();ok('smelting uses up ore',S.res.ore<6,S.res.ore);ok('buildings make goods and workers haul them to the Lantern',S.res.ingot>i0&&S.res.stone>s0,(S.res.ingot-i0)+' ingot, '+(S.res.stone-s0)+' stone');
   S.res.berry=9;const t0=S.tonics;S.craftQ.push({id:'tonic',need:12,done:0});step(1500);
   ok('the CRAFT buddy builds the bench queue',S.tonics===t0+1&&S.craftQ.length===0,S.tonics-t0);
   S.box=[];step(3);S.craftQ.push({id:'tonic',need:12,done:0});F.setPos(10+8*20+10,38+8*20+24);step(500);
   ok('with no crafter you can build it by hand at the bench',S.craftQ.length===0,S.craftQ.length&&S.craftQ[0].done);
   S.box=[fire];step(3);F.dayT(250);step(200);ok('workers sleep at night',F.wk()[0].task&&F.wk()[0].task.k==='sleep',F.wk()[0].task&&F.wk()[0].task.k);F.dayT(20)}
+ /* save files: new, continue, erase, and nothing touches the other files */
+ {S.quest=5;S.day=9;F.setRes('wood',77);F.start();ok('START > title',F.state()==='g4title');
+  tap('a');step(2);tap('down');tap('a');step(3);
+  ok('an empty file starts a NEW GAME',F.state()==='g4intro'&&F.meta().quest===0&&!F.meta().party.length&&F.meta().res.wood===0,F.state());
+  tap('b');step(5);ok('...which begins at the Lantern',F.state()==='g4world'&&F.op()===0,F.op());
+  F.meta().day=4;tap('start');for(let i=0;i<7;i++)tap('down');tap('a');step(3);ok('SAVE AND QUIT returns to the title',F.state()==='g4title',F.state());
+  tap('a');step(2);tap('a');step(4);ok('CONTINUE loads that file back',F.state()==='g4world'&&F.meta().day===4&&F.op()===0,F.meta().day);
+  const f1=JSON.parse(localStorage.getItem('sproutwild-v1'));ok('file 1 is untouched by playing file 2',f1.quest===5&&f1.day===9&&f1.res.wood===77,f1.day);
+  tap('start');for(let i=0;i<7;i++)tap('down');tap('a');step(3);tap('a');step(2);tap('sel');step(2);tap('a');step(2);
+  ok('SELECT erases a file after asking',localStorage.getItem('sproutwild-s2')===null);
+  tap('up');tap('a');step(5);ok('file 1 continues where it was',F.state()==='g4world'&&F.meta().day===9&&F.meta().res.wood===77,F.meta().day);
+  localStorage.setItem('sproutwild-s3','{"intro":1,"party":[{"sp":"NOPE","lv":3}],"box":"x","sector":"NOWHERE","quest":9,"buildings":[{"k":"castle"}],"res":null}');
+  tap('start');for(let i=0;i<7;i++)tap('down');tap('a');step(3);tap('a');step(2);tap('down');tap('down');tap('a');step(8);G.draw();
+  ok('a damaged save loads safely',F.state()==='g4world'&&F.meta().sector==='BASE'&&F.meta().party.length===0&&F.meta().buildings.length===0,F.state()+' '+F.meta().quest)}
  }catch(e){out.push('FAIL crashed: '+e.message)}
  return out});
 console.log(res.join('\n'));const fails=res.filter(l=>l.startsWith('FAIL')).length;
