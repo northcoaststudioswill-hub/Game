@@ -15,7 +15,7 @@ is ever written to.
 
 Run:  python3 v0.3/build.py
 """
-import pathlib, sys
+import base64, json, pathlib, sys
 
 here = pathlib.Path(__file__).resolve().parent
 v02 = here.parent / 'v0.2'
@@ -23,12 +23,14 @@ BASE = v02 / 'games/pocket-lantern_2026-11-14_v20_wip.html'
 RD_SRC = v02 / 'src/rootdeep.js'
 PP_SRC = here / 'src/patchplate.js'
 OUT = here / 'games/pocket-lantern_2026-11-14_v21_wip.html'
+MUSIC = here / 'music/cook-e.mp3'
+MUSIC_ART = here / 'music/cook-e-art.png'
 
 RD_START = '/* ---------- cartridge 3: ROOTDEEP'
 RD_END = '/* ---------- loop ---------- */'
 
 PP_NEW = ("const PP=window.PP_CART?window.PP_CART({g,W,H:()=>H,r,text,tw,snd,noise,keys,pressed,mk,flip,CH,LOU,TL,"
-          "will:()=>SP,meta:()=>meta,persist:()=>persist(true),eject:()=>eject(),active:()=>state==='pp'}):null;\n")
+          "will:()=>SP,meta:()=>meta,persist:()=>persist(true),eject:()=>eject(),active:()=>state==='pp',hasTracks:n=>TRACKS.some(t=>t.use.includes(n))}):null;\n")
 
 # (what's in the v0.2 console, what it becomes). Each 'old' must occur exactly once.
 HOOKS = [
@@ -47,7 +49,7 @@ HOOKS = [
     ("else if(cart===2){g3StartTitle()}", "else if(cart===2){g3StartTitle()}else if(cart===3){state='pp';PP.start()}"),
     ("case 'ko':KO.update(dt);return;", "case 'ko':KO.update(dt);return;\n case 'pp':PP.update(dt);return;"),
     ("if(state==='ko'){KO.draw();return}", "if(state==='ko'){KO.draw();return}\n if(state==='pp'){PP.draw();return}"),
-    # music: Sprouts' William Cohen songs (the 'game' list), quieter while paused
+    # music: Patch & Plate's own song (tagged 'pp', embedded below), quieter while paused
     ("if(state==='ko')return KO.mus();", "if(state==='ko')return KO.mus();if(state==='pp')return PP.mus();"),
     ("(state==='ko'&&KO&&KO.paused())", "(state==='ko'&&KO&&KO.paused())||(state==='pp'&&PP&&PP.paused())"),
     # the iPhone text placement (cap height), as Rootdeep has it
@@ -56,6 +58,7 @@ HOOKS = [
     ("window.__g={KO,", "window.__g={KO,PP,"),
 ]
 SCRIPT_AT = "<script>\n(()=>{\nconst $=id=>document.getElementById(id);"
+TRACKS_AT = '<script>\n/* ============================================================\n   NORTH COAST KNOCKOUT'
 
 
 def die(msg):
@@ -87,6 +90,14 @@ if '</script' in pp.lower():
 if html.count(SCRIPT_AT) != 1:
     die('console script start not found exactly once')
 html = html.replace(SCRIPT_AT, '<script>\n' + pp + '</script>\n' + SCRIPT_AT)
+
+# 5. Patch & Plate's song, embedded like Knockout's (plays without the claude.ai host)
+track = {'title': 'Cook E', 'artist': 'dreamliketextures752', 'use': ['pp'],
+         'art': 'data:image/png;base64,' + base64.b64encode(MUSIC_ART.read_bytes()).decode(),
+         'data': base64.b64encode(MUSIC.read_bytes()).decode()}
+if html.count(TRACKS_AT) != 1:
+    die('Knockout script start not found exactly once (the song goes just before it)')
+html = html.replace(TRACKS_AT, '<script>\n/* Patch & Plate plays only tracks tagged "pp" */\nwindow.SPROUT_TRACKS.push(' + json.dumps(track, separators=(',', ':')) + ');\n</script>\n' + TRACKS_AT)
 
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(html, encoding='utf8')

@@ -96,3 +96,27 @@ their kitchen jobs are new (flag to Will).
 - Once a sprout is on the crew, the helper arrow leaves its job to it (Erin isn't sent to chop when PEB will).
 - Tests: 46 checks pass. Every working sprout does its job; with all six the bot gets 3 stars on days 8, 11 and 12, where it
   gets 0 to 3 without them.
+
+## Scenes, quips and its own music (third pass, Nov 15)
+
+Will asked for cinematics between levels, after orders and at good moments, with good quips, and sent a song for the game.
+
+- **Music:** "Cook E" by dreamliketextures752 (the file's tags; made with Suno), in `v0.3/music/` with checksums and its
+  24px cover art. `build.py` embeds it tagged `pp`, so it plays in a downloaded copy too. The game file is now ~14 MB
+  (the claude.ai page limit is 16 MB). The console passes `hasTracks`; without the song it falls back to Sprouts' songs.
+- **Scenes** (`cine()`, Sprouts' cutscene look: sky bands, hills, ground strip, the speaker drawn big, a typed text box):
+  - *Opening* (first day 1 only, `SV.opened`): Will hands Erin the stand; Erin and Louie answer.
+  - *Night* (NEXT DAY on the results): dusk with a quip about how the day went (by stars), night with Louie and the crew
+    asleep, dawn with the sign flipping to OPEN and "DAY N", then the next day's card.
+  - *Taste* (`SV.tasted`): the first time each dish is ever served, the customer holds it up with a line for that dish;
+    Marcus has his own. *New helper*: a sprout pops out of the soil when plucked.
+  - Short (1.6 to 4.6 s), auto-advancing; A skips a line, Start skips the scene. During a day the day waits. Putting the
+    phone down mid-scene drops the scene and pauses the day as usual.
+- **Quips** (`quip()`): a portrait line under the hint bar that doesn't stop play. First plate (sometimes), a clutch serve
+  (under 20% patience), a streak of 4 and 8, a rush (three waiting at once, day 4 on), the first customer who leaves, the
+  last plate, a sprout levelling up. At most one every 10 s unless it's one of those moments.
+- **Results:** confetti on a 3-star day.
+- All lines are new (flag to Will). Marcus: bro, brags, roasts, no Waterworks.
+- **Fix found by the bot:** holding food that fits no plate while both plates were finished orders stalled the helper arrow
+  (and a day). The planner now tosses it. 40 runs of the hardest days: no stalls, every run at least 1 star.
+- Tests: 57 checks pass (scenes, skipping, the night leading into the next day, quips, the song, text audits of each scene).

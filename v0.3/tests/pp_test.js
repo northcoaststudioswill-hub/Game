@@ -58,7 +58,7 @@ const PAGE_KIT = () => {
   /* play the current day to the results screen; returns frames used */
   window.__playDay = (maxSec = 400) => {
     let f = 0;
-    while (PP.G.s === 'play' && f < maxSec * 60) { __botTick(); (f % 15 === 0 ? __step : __upd)(1 / 60); f++; }
+    while ((PP.G.s === 'play' || (PP.G.s === 'cine' && PP.G.cine.from === 'play')) && f < maxSec * 60) { __botTick(); (f % 15 === 0 ? __step : __upd)(1 / 60); f++; }
     clear(); K.a = K.b = 0;
     return f;
   };
@@ -117,7 +117,11 @@ async function main() {
   check(await pp('__g.PP._.G.s') === 'stand', 'title PLAY opens the stand');
   await shot('pp_11_stand.png'); await audit('stand (new save)');
   await pp("__tap('a')");
-  check(await pp('__g.PP._.G.s') === 'intro', 'day 1 opens its intro card');
+  check(await pp('__g.PP._.G.s') === 'cine' && await pp('__g.PP._.G.cine.k') === 'open', 'the first day starts with the opening scene');
+  await pp('for(let i=0;i<60*1.2;i++)__upd(1/60)');
+  await shot('pp_12a_opening_scene.png'); await audit('opening scene');
+  await pp('for(let i=0;i<60*12&&__g.PP._.G.s===\'cine\';i++)__upd(1/60)');
+  check(await pp('__g.PP._.G.s') === 'intro', 'the opening scene plays itself out, then day 1 opens its intro card');
   await shot('pp_12_intro_day1.png'); await audit('intro day 1');
   await pp("__tap('a')");
   check(await pp('__g.PP._.G.s') === 'play', 'A opens the stand for the day');
@@ -176,6 +180,25 @@ async function main() {
   await page.evaluate(() => { for (let i = 0; i < 60 * 20; i++) { __botTick(); __upd(1 / 60); } });
   check((await pp('__g.PP._.SV.crew')).includes('ZIP'), 'a seed planted mid-day grows and ZIP joins');
   await pp('__playDay()');
+
+  /* scenes and quips */
+  const sc = async (code, name, label, t) => { await page.evaluate(code); await pp(`for(let i=0;i<60*${t};i++)__upd(1/60)`); await shot(name); await audit(label); };
+  await sc(() => { const PP = __g.PP._; PP.startDay(4); PP.G.s = 'play'; PP.cine('taste', { who: 'MARCUS', rc: 'deluxe' }, [['MARCUS', "BRO, I'D PUT MY NAME ON THIS."]]); }, 'pp_40_scene_taste.png', 'taste scene', 1);
+  await pp("__tap('start')"); check(await pp('__g.PP._.G.s') === 'play', 'Start skips a scene and the day carries on');
+  await sc(() => { const PP = __g.PP._; PP.cine('sprout', { T: 'ZIP' }, [['NEW HELPER', 'ZIP JOINED THE CREW! IT RUNS FINISHED FOOD TO THE PLATES.']]); }, 'pp_41_scene_sprout.png', 'sprout scene', 1.4);
+  await pp("__tap('start')");
+  await page.evaluate(() => { const PP = __g.PP._; PP.G.res = { d: 4, st: 3, coins: 120, tips: 30, served: 6, n: 6, missed: 0 }; PP.G.s = 'done'; PP.G.t = 1; PP.G.ri = 0; });
+  await pp("__tap('a')");
+  check(await pp('__g.PP._.G.s') === 'cine' && await pp('__g.PP._.G.cine.k') === 'night', 'NEXT DAY plays the night scene');
+  await pp('for(let i=0;i<60;i++)__upd(1/60)'); await shot('pp_42_scene_dusk.png'); await audit('night scene (dusk)');
+  await pp('for(let i=0;i<60*1.4;i++)__upd(1/60)'); await shot('pp_43_scene_night.png');
+  await pp('for(let i=0;i<60*1.6;i++)__upd(1/60)'); await shot('pp_44_scene_dawn.png'); await audit('night scene (dawn)');
+  await pp('for(let i=0;i<60*8&&__g.PP._.G.s===\'cine\';i++)__upd(1/60)');
+  check(await pp('__g.PP._.G.s') === 'intro' && await pp('__g.PP._.G.L.d') === 5, 'the night scene leads into the next day');
+  await page.evaluate(() => { const PP = __g.PP._; PP.G.s = 'play'; PP.G.L.qcd = 0; PP.quip('streak', 1); });
+  await pp('for(let i=0;i<20;i++)__upd(1/60)'); await shot('pp_45_quip.png'); await audit('a quip during the day');
+  const mus = await pp("__g.ev('musWant()')");
+  check(mus === 'pp', 'Patch & Plate asks for its own song (music list: ' + mus + ')');
 
   /* the other screens */
   await pp("__g.PP._.G.s='stand';__g.PP._.G.si=0");

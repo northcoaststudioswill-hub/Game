@@ -109,10 +109,10 @@ const UPS=[
 
 /* ---------- save ---------- */
 const KEY='patchplate-v1';
-const DEF=()=>({v:1,day:0,stars:{},best:{},coins:0,earned:0,served:0,up:{},tix:{},plays:0,run:null,seeds:[],crew:[],cxp:{}});
+const DEF=()=>({v:1,day:0,stars:{},best:{},coins:0,earned:0,served:0,up:{},tix:{},plays:0,run:null,seeds:[],crew:[],cxp:{},tasted:{},opened:0});
 let SV=DEF();
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&typeof s==='object'){SV=Object.assign(DEF(),s);
- for(const k of ['stars','best','up','tix','cxp'])SV[k]=Object.assign({},s[k]||{});
+ for(const k of ['stars','best','up','tix','cxp','tasted'])SV[k]=Object.assign({},s[k]||{});
  for(const k of ['seeds','crew'])SV[k]=Array.isArray(s[k])?s[k].slice():[]}}catch(e){}
 function store(){try{localStorage.setItem(KEY,JSON.stringify(SV))}catch(e){}}
 const up=k=>SV.up[k]|0;
@@ -130,6 +130,9 @@ const SPT={EMBER:{c:'#f07830',d:'#983818',l:'#f8c070',job:'SPEEDS UP THE STOVE'}
  LEAF:{c:'#58c048',d:'#286028',l:'#b0f090',job:'REPLANTS PICKED PLOTS'},
  LUCKY:{c:'#f078c0',d:'#902868',l:'#ffc8e8',job:'BIGGER TIPS, MORE PATIENCE'}};
 const SPORDER=['DEW','PEB','EMBER','ZIP','LEAF','LUCKY'];
+const SPJOIN={DEW:'DEW JOINED THE CREW! IT WILL WATER THE GARDEN FOR YOU.',PEB:'PEB JOINED THE CREW! IT WILL CHOP ANYTHING ON THE BOARD.',
+ EMBER:'EMBER JOINED THE CREW! IT KEEPS THE STOVE EXTRA HOT.',ZIP:'ZIP JOINED THE CREW! IT RUNS FINISHED FOOD TO THE PLATES.',
+ LEAF:'LEAF JOINED THE CREW! IT REPLANTS WHAT THE ORDERS NEED.',LUCKY:'LUCKY JOINED THE CREW! CUSTOMERS TIP MORE AND WAIT LONGER.'};
 const SEEDDAY={0:'DEW',1:'PEB',3:'EMBER',4:'ZIP',6:'LEAF',8:'LUCKY'};
 const SPHOME={DEW:[4,8],PEB:[11,9],EMBER:[13,4],ZIP:[12,8],LEAF:[2,8],LUCKY:[5,2]};
 const hasSp=T=>SV.seeds.includes(T)||SV.crew.includes(T);
@@ -235,6 +238,9 @@ function act(dry){const L=G.L,P=L.P,tx=P.x+P.fx,ty=P.y+P.fy,k=kind(tx,ty),h=L.he
 function toss(){const L=G.L;if(!L.held)return;if(L.held.k==='sseed')L.sown.splice(L.sown.indexOf(L.held.id),1);L.held=null;SFX.toss();const P=L.P;G.fx.push({k:'poof',x:P.x*TS+8,y:P.y*TS,t:0});}
 function serve(i){const L=G.L,cu=L.cu[i],rc=RC[cu.rc],tip=Math.round(rc.v*(crewHas('LUCKY')?.5+.1*spLv('LUCKY'):.5)*Math.max(0,cu.pat/cu.pmax)),c=rc.v+tip;
  L.coins+=c;L.tips+=tip;L.served++;L.held=null;cu.st='happy';cu.t=0;cu.say=pick(WHO[cu.who].yum);cu.gain=c;SFX.serve();
+ L.streak=(L.streak|0)+1;const left=L.q.length-L.served-L.missed;
+ if(!SV.tasted[cu.rc]){SV.tasted[cu.rc]=1;store();const w=cu.who;cine('taste',{who:w,rc:cu.rc},[[w,w==='MARCUS'&&TASTE_M[cu.rc]?TASTE_M[cu.rc]:TASTE[cu.rc]]])}
+ else if(cu.pat/cu.pmax<.2)quip('clutch',1);else if(left===0&&L.q.length>3)quip('last',1);else if(L.streak===4||L.streak===8)quip('streak',1);else if(L.served===1&&Math.random()<.5)quip('first');
  G.fx.push({k:'txt',s:'+'+c,x:WIN[i]*TS+8,y:TS+4,t:0,c:'#f8d040'});}
 
 /* ---------- the crew at work ---------- */
@@ -243,13 +249,13 @@ function newHelper(T,x,y){const[hx,hy]=SPHOME[T];return{t:T,x:x!==undefined?x:hx
 function pluck(p){const L=G.L,T=p.sp;p.c=null;p.sp=null;p.g=0;p.w=0;p.ding=0;
  const i=SV.seeds.indexOf(T);if(i>=0)SV.seeds.splice(i,1);const j=L.sown.indexOf(T);if(j>=0)L.sown.splice(j,1);
  if(!SV.crew.includes(T))SV.crew.push(T);store();L.help.push(newHelper(T,p.x*TS+8,p.y*TS+12));
- G.fx.push({k:'txt',s:T+' JOINED!',x:p.x*TS+8,y:p.y*TS,t:0,c:SPT[T].l});
+ cine('sprout',{T},[['NEW HELPER',SPJOIN[T]]]);
  snd(900,.06,1800,'sine',.06);later(()=>snd(1400,.08,2200,'sine',.05),90);}
 const keyXY=k=>k.split(',').map(Number);
 function openRecs(){const L=G.L,o=[];L.cu.forEach(c=>{if(c&&(c.st==='wait'||c.st==='in'))o.push(RC[c.rc].c)});if(!o.length&&L.qi<L.q.length)o.push(RC[L.q[L.qi]].c);return o;}
 function plateFor(id){const L=G.L,recs=openRecs(),fits=c=>recs.some(R=>c.every(x=>R.includes(x)));let best=null;
  for(const k in L.pl){const c=L.pl[k];if(canAdd(c,id)&&fits(c.concat(id))&&(!best||c.length>L.pl[best].length))best=k}return best;}
-function spWork(h){SV.cxp[h.t]=(SV.cxp[h.t]|0)+1;G.L.jobs[h.t]=(G.L.jobs[h.t]|0)+1;const lv=spLv(h.t);if(lv>h.lv){SFX.star();G.fx.push({k:'txt',s:h.t+' LEVEL '+lv+'!',x:h.x,y:h.y-10,t:0,c:SPT[h.t].l})}h.lv=lv;}
+function spWork(h){SV.cxp[h.t]=(SV.cxp[h.t]|0)+1;G.L.jobs[h.t]=(G.L.jobs[h.t]|0)+1;const lv=spLv(h.t);if(lv>h.lv){SFX.star();quipSp(h.t,h.t+' GREW TO LEVEL '+lv+'! IT WORKS FASTER NOW.');G.fx.push({k:'txt',s:h.t+' LEVEL '+lv+'!',x:h.x,y:h.y-10,t:0,c:SPT[h.t].l})}h.lv=lv;}
 function spGoal(h){const L=G.L;
  switch(h.t){
  case 'DEW':{const p=L.plots.find(p=>p.c&&p.g<1&&!p.w);return p?{x:p.x,y:p.y}:null;}
@@ -292,7 +298,9 @@ function plan(){const L=G.L,h=L.held,open=[];L.cu.forEach((c,i)=>{if(c&&(c.st===
    /* every station that takes it is holding finished food: nowhere to put it */
    return Object.values(L.st).some(t=>t.k===STOF[id]&&t.it)?null:{toss:1};}
   const best=spots.filter(s=>canAdd(s.c,id)&&fits(s.c.concat(id))).sort((a,b)=>b.c.length-a.c.length)[0];
-  if(best)return{x:best.x,y:best.y};return recs.some(R=>R.includes(id))?null:{toss:1};}
+  if(best)return{x:best.x,y:best.y};
+  /* nowhere to put it: toss it so the hands are free to serve (food is free) */
+  return{toss:1};}
  if(h&&h.k==='bag'){const p=L.plots.find(p=>!p.c);return p?{x:p.x,y:p.y}:{toss:1};}
  for(const s of spots)if(s.c.length&&open.some(o=>o.wait&&same(s.c,o.c)))return{x:s.x,y:s.y};
  for(const s of spots)if(s.c.length&&!fits(s.c))return{x:s.x,y:s.y};
@@ -339,14 +347,15 @@ function playUpd(dt){const L=G.L;L.t+=dt;
  if(pressed('a')){const r2=act(false);if(!r2.ok){G.nope=.9;G.nopeS=r2.s;if(r2.s)SFX.no()}else G.nope=0}
  if(pressed('b'))toss();
  for(const f of G.fx)f.t+=dt;G.fx=G.fx.filter(f=>f.t<1);if(G.nope>0)G.nope-=dt;
- L.saveT+=dt;if(L.saveT>4){L.saveT=0;snap()}
+ L.saveT+=dt;if(L.saveT>4){L.saveT=0;snap()}if(L.qcd>0)L.qcd-=dt;if(G.quip)G.quip.t+=dt;
  if(L.qi>=L.q.length&&L.cu.every(c=>!c)){L.endT+=dt;if(L.endT>.8)finish()}}
 function custUpd(dt){const L=G.L;
  for(let i=0;i<3;i++){const cu=L.cu[i];if(!cu)continue;const tx=WIN[i]*TS+8;cu.t+=dt;
   if(cu.st==='in'){const d=tx-cu.x;cu.x+=Math.sign(d)*Math.min(Math.abs(d),64*dt);if(Math.abs(d)<.5){cu.x=tx;cu.st='wait';SFX.bell()}}
-  else if(cu.st==='wait'){cu.pat-=dt;if(cu.pat<=0){cu.pat=0;cu.st='sad';cu.t=0;cu.say=pick(WHO[cu.who].bye);L.missed++}}
+  else if(cu.st==='wait'){cu.pat-=dt;if(cu.pat<=0){cu.pat=0;cu.st='sad';cu.t=0;cu.say=pick(WHO[cu.who].bye);L.missed++;L.streak=0;if(!L.qmiss){L.qmiss=1;quip('miss',1)}}}
   else if(cu.st==='happy'||cu.st==='sad'){if(cu.t>1.7){cu.st='out'}}
   else if(cu.st==='out'){const ex=cu.side<0?-14:W+14;cu.x+=Math.sign(ex-cu.x)*72*dt;if(Math.abs(ex-cu.x)<3)L.cu[i]=null}}
+ if(!L.qrush&&L.d>=3&&L.cu.every(c=>c&&c.st==='wait')){L.qrush=1;quip('rush',1)}
  if(L.qi<L.q.length){L.spawnT-=dt;const free=[0,1,2].filter(i=>!L.cu[i]);
   if(free.length===3&&L.spawnT>2)L.spawnT=2;
   if(L.spawnT<=0&&free.length){const i=pick(free),rc=L.q[L.qi++],D=DAYS[L.d],who=RC[rc].dog?'LOUIE':pick(PEOPLE),side=i===0?-1:i===2?1:pick([-1,1]);
@@ -364,6 +373,82 @@ function finish(){const L=G.L,d=L.d,st=starsFor(L),prevDay=SV.day;
  G.s='done';G.ri=0;G.t=0;}
 function snap(){if(G.L&&(G.s==='play'||G.s==='pause'||(G.s==='book'&&G.bookFrom!=='stand'))){SV.run={L:G.L};store()}}
 
+/* ---------- scenes and quips (all lines are new: flag to Will) ----------
+   Scenes are short, auto-advance, and skip: A skips a line, Start skips the scene. During a day they pause it.
+   Quips are a little portrait line at the bottom that doesn't stop anything. */
+const QP={
+ first:[['WILL','FIRST PLATE OF THE DAY!'],['LOUIE','ARF! (THAT SMELLED GREAT.)'],['SCOUT','AND WE\'RE OPEN.']],
+ clutch:[['MARCUS','CLUTCH, BRO. I TAUGHT YOU THAT.'],['WILL','THAT WAS CLOSE!'],['SCOUT','NEW RECORD FOR CLOSE CALLS.']],
+ streak:[['WILL','YOU\'RE ON FIRE, ERIN!'],['MARCUS','BRO, SHE\'S COOKING. LITERALLY.'],['LOUIE','ARF ARF ARF!'],['RANGER','STEADY HANDS. NICE WORK.']],
+ rush:[['MARCUS','THREE AT ONCE? YOU GOT THIS. PROBABLY.'],['SCOUT','STATISTICALLY, THIS IS A RUSH.'],['WILL','DEEP BREATH. ONE PLATE AT A TIME.']],
+ miss:[['LOUIE','*SAD LITTLE WHINE*'],['WILL','THEY\'LL BE BACK. NO WORRIES.'],['RANGER','CAN\'T FEED EVERYONE. YOU\'RE DOING FINE.']],
+ last:[['WILL','LAST ONE! BRING IT HOME.'],['MARCUS','FINAL BOSS: ONE MORE PLATE, BRO.']]};
+const TASTE={salad:'CRUNCHY. FRESH. PERFECT.',gsalad:'THE TOMATOES MAKE IT.',bread:'STILL WARM!',burger:'NOW THAT\'S A BURGER.',
+ louie:'*CHOMP CHOMP CHOMP*',gburger:'LEAFY. HAPPY. YUM.',smoothie:'BERRY BRAIN FREEZE!',fries:'CRISPY! SALTY! MORE!',
+ deluxe:'EVERYTHING ON IT. LEGEND.',combo:'BURGER AND FRIES. LIFE IS GOOD.'};
+const TASTE_M={burger:'BRO. THIS BURGER HAS AURA.',deluxe:'BRO, I\'D PUT MY NAME ON THIS.',fries:'FRIES SO GOOD I\'M NOT SHARING. WITH WILL.',
+ gburger:'LETTUCE? ON MY BURGER? BRO... IT WORKS.',smoothie:'BRO. BRAIN FREEZE. WORTH IT.'};
+const NIGHT={3:[['WILL','BEST DAY YET. THE WHOLE VALLEY IS TALKING.'],['MARCUS','THREE STARS? BRO, I\'M TELLING EVERYONE.'],['SCOUT','THREE STARS. I\'M WRITING THAT DOWN.']],
+ 2:[['RANGER','GOOD HONEST DAY. REST UP.'],['SCOUT','SOLID NUMBERS TODAY.'],['WILL','THAT WAS A GOOD ONE, ERIN.']],
+ 1:[['WILL','WE GOT THROUGH IT. TOMORROW\'S NEW.'],['LOUIE','*BIG YAWN* (GOOD DAY.)'],['MARCUS','ONE STAR IS STILL A STAR, BRO. ASK ME.']]};
+function quip(k,force){const L=G.L;if(!L)return;if(!force&&(L.qcd||0)>0)return;const q=pick(QP[k]);G.quip={who:q[0],s:q[1],t:0};L.qcd=10;}
+function quipSp(T,s){G.quip={sp:T,who:T,s,t:0};if(G.L)G.L.qcd=6;}
+function cine(k,d,lines,after){G.cine={k,d:d||{},ln:lines||[],li:0,lt:0,t:0,from:G.s,after,dur:{open:3.2,night:4.6,taste:1.6,sprout:2.2}[k]||2};G.s='cine';}
+function cineEnd(){const c=G.cine;G.cine=null;G.s=c.from==='cine'?'stand':c.from;if(c.after)c.after();}
+function cineUpd(dt){const c=G.cine;c.t+=dt;c.lt+=dt;
+ if(pressed('start')){cineEnd();return}
+ const ln=c.ln[c.li],need=ln?Math.max(1.7,ln[1].length*.055):0,shown=ln?Math.min(ln[1].length,Math.floor(c.lt*38)):0;
+ if(pressed('a')){if(ln&&shown<ln[1].length)c.lt=99;else if(ln){c.li++;c.lt=0}else{cineEnd();return}}
+ else if(ln&&c.lt>need+.6){c.li++;c.lt=0}
+ if(c.li>=c.ln.length&&c.t>=c.dur&&c.lt>.3)cineEnd();}
+
+/* the stage: Sprouts' cutscene look (sky bands, hills, a ground strip), the speaker big */
+const SKY={day:['#a8e0f8','#bce8f8','#d0f0f8','#e0f4f0'],dusk:['#f8b070','#f09080','#c87898','#806090'],
+ night:['#181838','#1c1c44','#22224e','#282858'],dawn:['#f8d8a8','#f8c0a8','#c8b8d8','#a8c8e8']};
+function stageBG(tod,VH,sunY){const sk=SKY[tod],bh=Math.ceil(VH*.16);sk.forEach((c,i)=>r(c,0,i*bh,W,bh+1));r(sk[3],0,4*bh,W,VH);
+ if(tod==='night'){for(let i=0;i<26;i++){const x=(i*53)%W,y=(i*37)%Math.round(VH*.5);if(((G.t*2+i)|0)%5)r('#f8f0d0',x,y,1,1)}for(let j=-6;j<=6;j++){const w=Math.round(Math.sqrt(36-j*j)),w2=Math.round(Math.sqrt(Math.max(0,30-(j+1)*(j+1))));r('#f8f0d0',196-w,26+j,2*w+1,1);if(w2)r(sk[0],199-w2,25+j,2*w2+1,1)}}
+ else if(sunY!==undefined){r('#fff0b0',178,sunY,14,14);r('#fff8d8',180,sunY+2,10,10)}
+ const gy=Math.round(VH*.64);const hill=tod==='night'?'#1c3828':tod==='dusk'?'#4c7048':'#3c9848';
+ for(let x=0;x<W;x+=2){const h=Math.round(10+6*Math.sin(x/23)+4*Math.sin(x/9));r(hill,x,gy-h,2,h)}
+ r(tod==='night'?'#24402c':'#58b858',0,gy,W,VH-gy);r(tod==='night'?'#1c3424':'#3c9848',0,gy,W,2);return gy;}
+function stageStand(cx,gy,sign){const sx=cx-50,sy=gy-46;r('#6a4830',sx+2,sy+16,4,30);r('#6a4830',sx+94,sy+16,4,30);
+ for(let i=0;i<11;i++){r(i%2?'#ffffff':'#e85878',sx+i*9,sy,9,14);r(i%2?'#e0d0e0':'#b83858',sx+i*9,sy+14,9,3)}r(K,sx-1,sy-1,101,1);
+ r('#e8d0a0',sx,sy+32,100,8);r('#f8e8c0',sx,sy+32,100,2);r('#6a4830',sx,sy+40,100,6);
+ if(sign){const sw=tw(sign,1)+8,sx2=sx+100-sw-4;r('#6a4830',sx2+sw/2,sy+14,1,5);r(K,sx2-1,sy+18,sw+2,12);r(sign==='OPEN'?'#58c048':'#c84848',sx2,sy+19,sw,10);ftext(sign,sx2+sw/2,sy+20,sw,1,'#ffffff',null)}}
+function actor(s,cx,by,sc,bob=0){if(!s)return;g.drawImage(s,Math.round(cx-s.width*sc/2),Math.round(by-s.height*sc)+bob,s.width*sc,s.height*sc);}
+function sprOf(w){return w==='ERIN'?ES.d[0]:whoSpr(w);}
+const WHOC=w=>w==='ERIN'?'#e87848':WHO[w]?WHO[w].c:SPT[w]?SPT[w].c:'#f8e060';
+function cineBox(c,VH){const ln=c.ln[c.li];r('#0c0a12',0,0,W,14);if(!ln)return;
+ const by=VH-62;r('#0c0a12',0,by-4,W,VH-by+4);r(K,6,by,W-12,54);r('#fff4dc',7,by+1,W-14,52);
+ const nm=ln[0],col=WHOC(nm),nw=tw(nm,2)+10;r(col,12,by-7,nw,13);text(nm,17,by-5,2,'#181020',null);
+ const shown=ln[1].slice(0,Math.floor(c.lt*38));wrap(shown,W-30,2).slice(0,3).forEach((l,i)=>text(l,14,by+10+i*13,2,'#281c30',null));
+ if(shown.length>=ln[1].length&&((G.t*3)|0)%2){r('#c02848',W-20,by+44,5,3);r('#c02848',W-19,by+47,3,1)}}
+function drawCine(){const c=G.cine;if(!c)return;const{VH}=begin(),t=c.t,bob=((G.t*4)|0)%2?-1:0;
+ const talking=w=>c.ln[c.li]&&c.ln[c.li][0]===w;
+ if(c.k==='open'){const gy=stageBG('day',VH,26);stageStand(W/2,gy,'OPEN');actor(ES.d[0],W/2-8,gy-14,talking('ERIN')?3:2,talking('ERIN')?bob:0);
+  actor(sprOf('WILL'),48,gy+30,talking('WILL')?3:2,talking('WILL')?bob:0);try{g.drawImage(A.LOU.r[((G.t*3)|0)%2],170,gy+18,40,26)}catch(e){}}
+ else if(c.k==='night'){const f=Math.min(1,t/c.dur),tod=f<.36?'dusk':f<.68?'night':'dawn',gy=stageBG(tod,VH,tod==='dawn'?Math.round(VH*.6-(f-.68)*120):tod==='dusk'?Math.round(VH*.45+f*40):undefined);
+  stageStand(W/2,gy,tod==='dawn'?'OPEN':'CLOSED');
+  if(tod==='night'){try{g.drawImage(A.LOU.l[0],W/2-20,gy+10,40,26)}catch(e){}const z=((G.t*2)|0)%3;text('Z'.repeat(z+1),W/2+14,gy-2-z*3,2,'#c8c8f0',null);
+   (SV.crew||[]).forEach((T,i)=>drawSp(T,40+i*14,gy+42));if(SV.crew.length)text('Z',40+SV.crew.length*14,gy+24,1,'#c8c8f0',null);}
+  else{const sp=sprOf(c.d.who||'WILL');actor(ES.d[0],W/2-8,gy-14,2);if(tod==='dusk')actor(sp,52,gy+32,3,talking(c.d.who)?bob:0);}
+  if(tod==='night')r('rgba(10,8,30,.25)',0,0,W,VH);
+  if(tod==='dawn'){const a=Math.min(1,(f-.68)*5);ftext('DAY '+(c.d.day+1),W/2,30,W-20,5,'rgba(255,248,224,'+a+')','#783048')}}
+ else if(c.k==='taste'){const gy=stageBG('day',VH);r('#e85878',0,0,W,18);for(let i=0;i<W;i+=16)r('#ffffff',i+8,0,8,18);r('#b83858',0,18,W,2);
+  const w=c.d.who,ch=((G.t*5)|0)%2&&c.t>.5?2:0;actor(sprOf(w),W/2-24,gy+28+ch,w==='LOUIE'?3:4);
+  r('#e8d0a0',0,gy+22,W,14);r('#f8e8c0',0,gy+22,W,2);r('#6a4830',0,gy+36,W,VH);
+  g.save();g.translate(W/2+44,gy+30);g.scale(3,3);drawFood(RC[c.d.rc].c,0,0);g.restore();if(((G.t*3)|0)%2){r('#ffffff',W/2+60,gy-4,2,2);r('#ffffff',W/2+26,gy+2,2,2)}
+  if(c.t>.4){const k=Math.min(1,(c.t-.4)*4);ftext('NEW DISH: '+RC[c.d.rc].n,W/2,30,W-20,3,'rgba(255,248,224,'+k+')','#783048')}}
+ else if(c.k==='sprout'){const gy=stageBG('day',VH,22),T=c.d.T,up2=Math.min(1,c.t*2.2),y=gy+30-Math.round(up2*30)+(c.t>.45?bob:0);
+  r('#8a5a3a',W/2-30,gy+24,60,10);r('#6e4428',W/2-30,gy+30,60,4);g.save();g.translate(W/2,y);g.scale(4,4);drawSp(T,0,0);g.restore();
+  for(let i=0;i<8;i++){const a=i/8*Math.PI*2+G.t,rr=26+6*Math.sin(G.t*4+i);if(((G.t*6+i)|0)%2)r(SPT[T].l,Math.round(W/2+Math.cos(a)*rr),Math.round(y-20+Math.sin(a)*rr*.6),2,2)}
+  actor(ES.d[0],W/2-56,gy+34,2);}
+ cineBox(c,VH);if(c.t<.25)r('rgba(0,0,0,'+(1-c.t*4)+')',0,0,W,VH);g.restore();}
+function drawQuip(VH,hy){const q=G.quip;if(!q||q.t>3.2)return;const a=Math.min(1,q.t*6,(3.2-q.t)*4),y=VH-hy>=26?hy+14:hy-26+Math.round((1-a)*10);
+ r(K,2,y,W-4,24);r('#281c30',3,y+1,W-6,22);const col=WHOC(q.who);r(col,4,y+2,20,20);r('#181020',5,y+3,18,18);
+ if(q.sp)drawSp(q.sp,14,y+20);else{const s=sprOf(q.who);if(s){const sc=q.who==='LOUIE'?.8:1;g.drawImage(s,Math.round(14-s.width*sc/2),y+4,Math.round(s.width*sc),Math.min(18,Math.round(s.height*sc)))}}
+ text(q.who,28,y+3,1,col,null);ftext(q.s,28+(W-34)/2,y+13,W-34,1,'#ffffff',null);}
+
 /* ---------- menus ---------- */
 function nav(i,n){if(pressed('down')){SFX.nav();return(i+1)%n}if(pressed('up')){SFX.nav();return(i+n-1)%n}return i;}
 const titleItems=()=>(SV.run?['CONTINUE DAY '+(SV.run.L.d+1)]:[]).concat(['PLAY','SWAP CARTRIDGE']);
@@ -371,7 +456,7 @@ function standItems(){const o=[];for(let d=0;d<=Math.min(SV.day,DAYS.length-1);d
  return o.concat([{k:'UPGRADES'},{k:'SPROUTS'},{k:'RECIPES'},{k:'TITLE'}]);}
 const pauseItems=()=>['RESUME','RECIPES','RESTART DAY','QUIT DAY','SWAP CARTRIDGE'];
 const doneItems=()=>G.res.st>=1?(G.res.d+1<DAYS.length?['NEXT DAY','PLAY AGAIN','THE STAND']:['PLAY AGAIN','THE STAND']):['TRY AGAIN','THE STAND'];
-function startDay(d){newDay(d);G.s='intro';G.t=0;SFX.ok();}
+function startDay(d){newDay(d);G.s='intro';G.t=0;G.quip=null;SFX.ok();}
 function update(dt){H=A.H();G.t+=dt;
  switch(G.s){
  case 'title':{const it=titleItems();G.mi=nav(Math.min(G.mi,it.length-1),it.length);
@@ -384,7 +469,9 @@ function update(dt){H=A.H();G.t+=dt;
   if(pressed('b')){G.s='title';G.mi=0;SFX.nav();return}
   if(pressed('a')||pressed('start')){const x=it[G.si];
    if(x.lock){SFX.no();G.nope=1.2;G.nopeS='EARN A STAR ON DAY '+x.d+' FIRST';return}
-   if(x.d!==undefined){if(SV.run&&SV.run.L.d!==x.d){SV.run=null;store()}startDay(x.d);return}
+   if(x.d!==undefined){if(SV.run&&SV.run.L.d!==x.d){SV.run=null;store()}
+    if(!SV.opened){SV.opened=1;store();G.s='stand';cine('open',{},[['WILL','THE STAND IS ALL YOURS, ERIN. THE WHOLE VALLEY IS HUNGRY.'],['ERIN','THEN LET\'S FEED IT.'],['LOUIE','ARF! (FEED ME FIRST.)']],()=>startDay(x.d));return}
+    startDay(x.d);return}
    if(x.k==='UPGRADES'){G.s='shop';G.ui=0;SFX.ok()}else if(x.k==='SPROUTS'){G.s='crew';SFX.ok()}else if(x.k==='RECIPES'){G.s='book';G.bookFrom='stand';G.bp=0;SFX.ok()}else{G.s='title';G.mi=0;SFX.nav()}}
   if(G.nope>0)G.nope-=dt;return;}
  case 'shop':{G.ui=nav(G.ui,UPS.length+1);if(G.nope>0)G.nope-=dt;
@@ -395,6 +482,7 @@ function update(dt){H=A.H();G.t+=dt;
  case 'book':{if(pressed('left')||pressed('right')){G.bp=1-G.bp;SFX.nav()}
   if(pressed('b')||pressed('a')||pressed('sel')||pressed('start')){G.s=G.bookFrom==='play'?'play':G.bookFrom==='pause'?'pause':'stand';SFX.nav()}return;}
  case 'crew':{if(pressed('a')||pressed('b')||pressed('start')){G.s='stand';SFX.nav()}return;}
+ case 'cine':cineUpd(dt);return;
  case 'intro':{if(pressed('a')||pressed('start')){G.s='play';G.fx=[];SFX.ok();snap()}else if(pressed('b')){G.L=null;G.s='stand';SFX.nav()}return;}
  case 'play':playUpd(dt);return;
  case 'pause':{const it=pauseItems();G.pi=nav(G.pi,it.length);if(pressed('b')){G.s='play';return}
@@ -404,7 +492,7 @@ function update(dt){H=A.H();G.t+=dt;
    else{snap();A.eject()}}return;}
  case 'done':{const it=doneItems();G.ri=nav(G.ri,it.length);
   if(G.t>.5&&(pressed('a')||pressed('start'))){const k=it[G.ri],d=G.res.d;
-   if(k==='NEXT DAY')startDay(d+1);else if(k==='PLAY AGAIN'||k==='TRY AGAIN')startDay(d);
+   if(k==='NEXT DAY'){const q=pick(NIGHT[Math.max(1,G.res.st)]);cine('night',{who:q[0],day:d+1},[q],()=>startDay(d+1))}else if(k==='PLAY AGAIN'||k==='TRY AGAIN')startDay(d);
    else{G.s='stand';const L2=standItems();G.si=Math.max(0,L2.findIndex(x=>x.d===Math.min(SV.day,DAYS.length-1)));SFX.nav()}}return;}}}
 
 /* ---------- drawing helpers ---------- */
@@ -533,6 +621,7 @@ function drawPlay(){const{VH,top}=begin(),L=G.L,fy=top+58;
  if(!hs&&!L.held&&L.P.mv===0)ftext('WALK UP TO SOMETHING, PRESS A',W/2,hy+2,232,2,'#686078',null);
  if(hs)ftext((a.ok&&!(G.nope>0)?'A: ':'')+hs,L.held?96:W/2,hy+2,L.held?186:232,2,G.nope>0?'#f89060':a.ok?'#ffffff':'#a8a0b8',null);
  if(L.held)text('B: TOSS',W-tw('B: TOSS')-3,hy+2,2,'#a8a0b8',null);
+ if(G.s==='play')drawQuip(VH,hy);
  g.restore();}
 function rtextR(s,xr,y,sc,c){text(s,xr-tw(s,sc),y,sc,c);}
 
@@ -611,6 +700,7 @@ function drawPause(){drawPlay();const{VH}=begin();r('rgba(20,12,30,.78)',0,0,W,V
  panel(30,py,W-60,ph);ftext('PAUSED',W/2,py+7,W-70,3,'#f8e060',null);cList(it,G.pi,py+28,16);
  ftext('SAVED. PICK IT UP ANY TIME.',W/2,py+ph+8,W-12,1,'#84d870',null);g.restore();}
 function drawDone(){const{VH}=begin(),R2=G.res;scene(VH);r('rgba(20,12,30,.7)',0,0,W,VH);
+ if(R2.st===3)for(let i=0;i<40;i++){const x=(i*47+Math.sin(G.t+i)*8)%W,y=((G.t*40+i*31)%VH);r(['#f8d040','#e85878','#58c048','#48a0f0','#ffffff'][i%5],Math.round(x),Math.round(y),2,3)}
  const ph=208,py=Math.round((VH-ph)/2);panel(10,py,W-20,ph);
  ftext(R2.st?'DAY '+(R2.d+1)+' DONE!':'SO CLOSE!',W/2,py+8,W-30,4,'#f8e060',null);
  const shown=Math.min(R2.st,Math.floor(G.t/.45));stars(shown,W/2-24,py+34,true);
@@ -620,11 +710,11 @@ function drawDone(){const{VH}=begin(),R2=G.res;scene(VH);r('rgba(20,12,30,.7)',0
  if(R2.unl)note('DAY '+(R2.d+2)+' IS OPEN!');if(R2.last)note('EVERY DAY DONE. WOW!');if(R2.seed)note('+ '+R2.seed+' SPROUT SEED!');if(R2.tix)note('+1 CAPSULE TICKET');if(R2.best)note('NEW BEST!');if(!R2.st)note('NEED '+(G.L?G.L.goal[0]:'')+' COINS FOR A STAR');
  cList(doneItems(),G.ri,py+ph-52,16);g.restore();}
 function draw(){H=A.H();
- switch(G.s){case 'title':drawTitle();break;case 'stand':drawStand();break;case 'shop':drawShop();break;case 'crew':drawCrew();break;case 'book':drawBook();break;
+ switch(G.s){case 'title':drawTitle();break;case 'stand':drawStand();break;case 'shop':drawShop();break;case 'crew':drawCrew();break;case 'cine':drawCine();break;case 'book':drawBook();break;
   case 'intro':drawIntro();break;case 'play':drawPlay();break;case 'pause':drawPause();break;case 'done':drawDone();break;}}
 
 /* put the phone down: the day pauses and saves */
-try{document.addEventListener('visibilitychange',()=>{if(!A.active())return;if(document.hidden){if(G.s==='play'){G.s='pause';G.pi=0}snap()}});
+try{document.addEventListener('visibilitychange',()=>{if(!A.active())return;if(document.hidden){if(G.s==='cine'&&G.cine&&G.cine.from==='play'){G.cine=null;G.s='play'}if(G.s==='play'){G.s='pause';G.pi=0}snap()}});
  addEventListener('pagehide',()=>{if(A.active())snap()});}catch(e){}
 
 /* ---------- cartridge label ---------- */
@@ -638,9 +728,9 @@ try{document.addEventListener('visibilitychange',()=>{if(!A.active())return;if(d
 
 return{
  start(){G.s='title';G.mi=0;G.t=0;G.fx=[];G.nope=0},
- mus:()=>'game',
- paused:()=>G.s==='pause'||G.s==='intro'||G.s==='book'&&G.bookFrom!=='stand',
+ mus:()=>A.hasTracks&&A.hasTracks('pp')?'pp':'game',
+ paused:()=>G.s==='pause'||G.s==='cine'&&G.cine&&G.cine.from==='play'||G.s==='intro'||G.s==='book'&&G.bookFrom!=='stand',
  update,draw,
- _:{G,get SV(){return SV},set SV(v){SV=v},DAYS,RC,UPS,MAP,WIN,plan,need,act,walkable,kind,newDay,startDay,finish,snap,store,KEY,
+ _:{G,cine,quip,get SV(){return SV},set SV(v){SV=v},DAYS,RC,UPS,MAP,WIN,plan,need,act,walkable,kind,newDay,startDay,finish,snap,store,KEY,
   setDay(d){SV.day=d;store()}}};
 };
