@@ -21,6 +21,21 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v7.0 · 2026-11-15 · Ohio starters, the reveal, Data Center, garden plots, Crooked Hollow
+
+Will's brief and the research behind these choices are in `DESIGN-v7.md`.
+
+- **Three new starters** from north-east Ohio lore: CUYAPUP (EMBER, the burning Cuyahoga), BESSLING (DEW, the Lake Erie monster), GRASSKIN (LEAF, the Grassman). Higher stats than common buddies, two job skills each, a move only they learn at Lv8, and they never appear in the wild. The old trio are ordinary wild buddies now.
+- **Starter reveal.** Greeting one plays a short sequence: shadow slides in, flash, name, then legend, jobs, moves, its own move and stat bars, one line at a time. A skips, B looks at the others.
+- **Data Center** building (8 stone, 2 ingots) stores 12 more buddies. Without it you can keep three in total: the catch prompt, a thrown sprout and SWARM in battle all say so.
+- **Garden plots.** Stand at a plot and press A to choose what it grows: sprouts, berries or fiber reeds. Home buddies with WATERING or PLANTING speed growth and harvest; the pick is carried to the Lantern. The fourth quest step is now "grow berries on a plot", with a short lesson from Erin and Marcus. The Garden Bed building is retired (old ones keep working).
+- **Building is slower**: about 9 seconds plus a little per unit of cost, faster with helpers.
+- **Crooked Hollow**, a new area east of the Meadow: Lv4 to 7 wilds, ore and fiber, a Lantern post, MELONKIN (the Melon Heads) in the grass, and PYTHORN (the Peninsula Python) asleep on a circus trunk as the alpha.
+- Battle menu always opens on FIGHT.
+- Tests: 101 checks (12 new for starters, the buddy limit, plots and the Hollow). Real-time runs: the starter pick, plots and Data Center at base, the walk into the Hollow and back, and the whole first loop from the title to the cottage.
+
+Shots: `shots/v7.0-starter-reveal.png`, `shots/v7.0-plots-and-datacenter.png`, `shots/v7.0-crooked-hollow.png`.
+
 ## v6.11 · 2026-11-15 · fixes from the v6.10 playtest notes
 
 Worked through `PLAYTEST-NOTES.md` (item numbers in brackets).

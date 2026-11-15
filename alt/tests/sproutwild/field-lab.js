@@ -175,6 +175,14 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   F.giveMon('PEBBLIT',4,true);for(let i=0;i<1500&&S.res.berry<=b0;i++)step(1);ok('a home buddy harvests and the berries reach the Lantern',S.res.berry>b0,S.res.berry+' vs '+b0);
   ok('no sprout seed takes a crop plot',pl[ix].type<0&&pl[ix].seedTy==null);
   F.plotSet(ix,null);ok('the plot can go back to sprouts',!pl[ix].crop&&S.plotCrop[ix]===undefined)}
+ /* v7.0: Crooked Hollow, east of the Meadow */
+ {F.travel('MEADOW','BASE');step(3);let f2=F.fld();F.setPos(34*16+2,9*16+10);f2.dir=[1,0];f2.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='MEADOW';i++)step(1,['right']);f2=F.fld();
+  ok('the Meadow east road leads to Crooked Hollow',f2&&f2.id==='HOLLOW',f2&&f2.id);
+  ok('you arrive on its west side, heading east',F.pos().x<60&&f2.dir[0]===1,Math.round(F.pos().x));
+  ok('the Peninsula Python guards the trunk',f2.alphas.some(a=>a.sp==='PYTHORN')&&f2.items.some(i=>i.n==='CIRCUS TRUNK'));
+  ok('Hollow wilds are Lv4 or more once you have caught a buddy',S.quest<3||F.wilds().every(w=>w.lv>=4),F.wilds().map(w=>w.lv).join());
+  step(10);F.setPos(20,9*16+10);f2.dir=[-1,0];f2.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='HOLLOW';i++)step(1,['left']);
+  ok('and the west road leads back to the Meadow',F.fld()&&F.fld().id==='MEADOW',F.fld()&&F.fld().id)}
  }catch(e){out.push('FAIL crashed: '+e.message)}
  return out});
 console.log(res.join('\n'));const fails=res.filter(l=>l.startsWith('FAIL')).length;
