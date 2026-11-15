@@ -28,7 +28,7 @@ function wkName(w){return w.kind==='s'?TYPES[w.ref.type].n+' SPROUT':w.ref.sp}
 function wkSync(){const want=[];
  for(const m of SW.party.slice(1).concat(SW.box).slice(0,8))want.push(['b',m]);
  for(const c of SW.crew)if(c.job>=0)want.push(['s',c]);
- const old=W4.wk||[];W4.wk=want.map(([kind,ref],i)=>old.find(w=>w.ref===ref)||{kind,ref,x:176+(i%6)*26,y:150+((i/6)|0)*18,hx:176+(i%6)*26,hy:150+((i/6)|0)*18,task:null,t:Math.random()*1.5,mv:false,fx:1,xpT:0});
+ const old=W4.wk||[];W4.wk=want.map(([kind,ref],i)=>old.find(w=>w.ref===ref)||{kind,ref,x:284+(i%4)*20,y:158+((i/4)|0)*40,hx:284+(i%4)*20,hy:158+((i/4)|0)*40,task:null,t:Math.random()*1.5,mv:false,fx:1,xpT:0});
  for(const w of old)if(!W4.wk.includes(w)&&w.task&&w.task.it)w.task.it.by=null}
 function wkAt(b,k){return(W4.wk||[]).filter(w=>w.task&&w.task.b===b&&(!k||w.task.k===k))}
 function wkPick(w){const sk=wkSkills(w),bench=SW.buildings.find(b=>b.k==='bench');
@@ -46,6 +46,7 @@ function wkCraftDone(q,bench){const x=wCellX(bench.gx)+10,y=wCellY(bench.gy);let
  if(q.id==='tonic'){SW.tonics++;txt='TONIC READY!'}
  else if(q.id==='axe'||q.id==='pick'){SW.tools[q.id]=Math.min(3,SW.tools[q.id]+1);txt=(q.id==='axe'?'AXE':'PICKAXE')+' Lv'+SW.tools[q.id]+'!'}
  else if(q.id==='oil'){SW.hearts+=3;SW.heartsTotal+=3;txt='LANTERN OIL: +3 ♥'}
+ else if(q.id==='pouch'){SW.pouch=Math.min(24,(SW.pouch||8)+4);txt='SEED POUCH: '+SW.pouch+' SPROUTS WALK WITH YOU'}
  else if(q.id==='charm'){SW.buds.LUCKY=(SW.buds.LUCKY||0)+1;txt='A LUCKY SPROUT JOINS YOU!'}
  W4.floats.push({x,y:y-10,txt,t:2.2,c:'#ffd94d'});swSnd(784,.1,1318);swSave()}
 function wkTick(dt){if(!W4.bf)return;wkSync();const bench=SW.buildings.find(b=>b.k==='bench');if(!SW.craftQ)SW.craftQ=[];
@@ -124,14 +125,14 @@ function wDrawBuilding(b){const x=wCellX(b.gx),y=wCellY(b.gy),K='#14101e',on=b.b
 /* ---------------- the Tinker Bench: a crafting queue ---------------- */
 const WRECIPES=[{id:'tonic',n:'TONIC',cost:{berry:3},need:12,d:'Heals a buddy 25 HP.'},{id:'axe',n:'AXE',need:24,d:'Each level: +1 damage to trees. Lv3 also yields +1.'},{id:'pick',n:'PICKAXE',need:24,d:'Each level: +1 damage to rocks. Lv3 also yields +1.'},
  {id:'oil',n:'LANTERN OIL',cost:{wood:2,berry:2},need:10,d:'Burns bright: +3 gratitude hearts.'},{id:'charm',n:'LUCKY CHARM',cost:{ingot:1,berry:5},need:20,d:'A LUCKY sprout hatches from it and joins your pouch.'}];
-function wRecipeCost(rc){if(rc.cost)return rc.cost;const lv=SW.tools[rc.id]+(SW.craftQ||[]).filter(q=>q.id===rc.id).length;if(lv>=3)return null;const c=wToolCost(rc.id,lv),o={wood:c.w,stone:c.s};if(c.i)o.ingot=c.i;return o}
+function wRecipeCost(rc){if(rc.id==='pouch'&&(SW.pouch||8)+4*(SW.craftQ||[]).filter(q=>q.id==='pouch').length>=24)return null;if(rc.cost)return rc.cost;const lv=SW.tools[rc.id]+(SW.craftQ||[]).filter(q=>q.id===rc.id).length;if(lv>=3)return null;const c=wToolCost(rc.id,lv),o={wood:c.w,stone:c.s};if(c.i)o.ingot=c.i;return o}
 function toolsUpdate(){const n=WRECIPES.length+3;swNav(n);if(!SW.craftQ)SW.craftQ=[];
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){if(swSel===n-1){state='g4world';return}
   if(swSel===n-3){W4.assignB=SW.buildings.findIndex(b=>b.k==='bench');swSel=0;state='g4assign';return}
   if(swSel===n-2){swSel=0;state='g4jobs';return}
   const rc=WRECIPES[swSel],c=wRecipeCost(rc);
-  if(!c){swSnd(140,.08);swSay('That tool is masterwork already.',1.6);return}
+  if(!c){swSnd(140,.08);swSay('That is as good as it gets already.',1.6);return}
   if(SW.craftQ.length>=4){swSnd(140,.08);swSay('The bench queue is full (4).',1.6);return}
   if(!wCanPay(c)){swSnd(140,.08);swSay('Not enough: needs '+wCostStr(c)+'.',2.2);return}
   wPay(c);SW.craftQ.push({id:rc.id,need:rc.need,done:0});swSnd(660,.08,990);swSay(rc.n+' queued. Workers with CRAFT build it — or stand at the bench and do it yourself.',3);swSave()}}

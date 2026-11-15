@@ -47,8 +47,8 @@ const FMEADOW=[
  ['.......,.......','.::.','...T...........'],['..T..W.....T...','.::.','..........W....'],
  ['...............','.S:.','...............']];
 const FMAPS={
- MEADOW:{rows:['TTTTTTTTTTTTTTTTTeeTTTTTTTTTTTTTTTTT'].concat(FMEADOW.map(p=>'T'+p[0]+p[1]+p[2]+'T'),['TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT']),
-  key:{e:{k:'exit',to:'TOWN'},p:{k:'bud',type:1},P:{k:'bud',type:3},
+ MEADOW:{rows:['TTTTTTTTTTTTTTTTTeeTTTTTTTTTTTTTTTTT'].concat(FMEADOW.map(p=>'T'+p[0]+p[1]+p[2]+'T'),['TTTTTTTTTTTTTTTTThhTTTTTTTTTTTTTTTTT']),
+  key:{e:{k:'exit',to:'TOWN'},h:{k:'exit',to:'BASE'},p:{k:'bud',type:1},P:{k:'bud',type:3},
    1:{k:'tre',n:'ACORN CROWN',w:3,petal:40},2:{k:'tre',n:'RUSTY FLOW PROS WRENCH',w:5,petal:60,res:['ingot',2]},
    A:{k:'alpha',sp:'BLOOMBOAR',lv:8,guards:'2'},
    M:{k:'npc',who:'KISS',dir:[-1,0],team:[['ZIPWIG',4],['PEBBLIT',4]],prize:30,
@@ -240,7 +240,7 @@ function fBuild(id,from){const M=FMAPS[id],rows=M.rows,h=rows.length,w=rows[0].l
  if(ex){const ix=ex.tx<=0?1:ex.tx>=w-1?-1:0,iy=ex.ty<=0?1:ex.ty>=h-1?-1:0;P3.x=ex.x+ix*FT*1.5;P3.y=ex.y+iy*FT*1.5;F.dir=[ix,iy||(ix?0:-1)]}
  else{P3.x=F.start.x+FT;P3.y=F.start.y}
  P3.ax=F.dir[0];P3.ay=F.dir[1];W4.part={x:P3.x-12,y:P3.y+4};
- F.t0=0;fFlow(F);fSync(F,true);return F}
+ F.t0=0;fSpotsBuild(F);lou.x=P3.x-16;lou.y=P3.y+8;W4.fetch=null;fFlow(F);fSync(F,true);return F}
 function fSpawnWild(F,sec){const [gx,gy]=F.grass[(Math.random()*F.grass.length)|0];
  return{sp:wPickFromTable(sec),lv:sec.lv[0]+((Math.random()*(sec.lv[1]-sec.lv[0]+1))|0),x:gx*FT+8,y:gy*FT+10,tx:gx*FT+8,ty:gy*FT+10,t:Math.random()*2}}
 function fBlocked(F,tx,ty){const o=F.bl[tx+','+ty];return!!o&&(o.dome?!SW.fl[o.flag]:!o.open)}
@@ -259,7 +259,8 @@ function fFlow(F){const d=new Array(F.w*F.h).fill(-1),sx=Math.floor(F.start.x/FT
 const fDist=(F,x,y)=>{const tx=Math.floor(x/FT),ty=Math.floor(y/FT);return(tx<0||ty<0||tx>=F.w||ty>=F.h)?-1:F.dist[ty*F.w+tx]};
 /* the squad IS the pouch: every sprout you own walks with you (up to 24 on the field) */
 function fSync(F,fresh){const want=TYPES.map(t=>SW.buds[t.n]||0);let tot=want.reduce((a,b)=>a+b,0);
- while(tot>24){const i=want.indexOf(Math.max(...want));want[i]--;tot--}
+const cap=Math.min(24,SW.pouch||8);
+ while(tot>cap){const i=want.indexOf(Math.max(...want));want[i]--;tot--}
  for(let ty=0;ty<TYPES.length;ty++){let have=F.sq.filter(s=>s.type===ty);
   while(have.length>want[ty]){const s=have.find(s2=>s2.st==='follow')||have[0];fDrop(F,s);F.sq.splice(F.sq.indexOf(s),1);have=F.sq.filter(s2=>s2.type===ty)}
   for(let i=have.length;i<want[ty];i++)F.sq.push({type:ty,x:P3.x+(Math.random()*20-10),y:P3.y+6+Math.random()*10,z:fresh?0:8,st:'follow',a:Math.random()*9,t:0,stuck:0})}}
@@ -298,7 +299,11 @@ function fLand(F,s){const a=s.aim||{};s.z=0;s.aim=null;
  if(fSolid(F,s.x,s.y)){s.st='ret';return}
  s.st='idle';s.t=0}
 function fSpark(x,y,c){W4.floats.push({x,y,txt:'*',t:.35,c:c||'#ffffff'})}
-function fDeliver(F,it){it.done=true;
+function fBudDraw(o){const x=Math.round(o.x),y=Math.round(o.y),T=TYPES[o.type],sw=Math.round(Math.sin(time*3+o.x)*1);
+ if(o.glow){const fl=.5+.5*Math.sin(time*4+o.x);g.globalAlpha=.18+.14*fl;r(T.l,x-9,y-14,19,18);g.globalAlpha=.3+.2*fl;r('#fff3b0',x-5,y-11,11,12);g.globalAlpha=1}
+ r('#5a3820',x-4,y,9,3);r('#3d2c1a',x-3,y+1,7,1);r('#2c6030',x,y-6,1,6);r(T.c,x-3+sw,y-9,3,3);r(T.c,x+1+sw,y-10,3,3);r(T.l,x-2+sw,y-9,1,1);
+ if(((time*2+o.x)|0)%2)r('#fff3b0',x+5,y-12,1,1)}
+function fDeliver(F,it){wOnDeliver(F,it);it.done=true;
  if(it.k==='tre'){SW.fl[it.fk]=1;SW.treasures=(SW.treasures||0)+1;SW.res.petal+=it.petal;if(it.res)SW.res[it.res[0]]=(SW.res[it.res[0]]||0)+it.res[1];
   F.got={n:it.n,t:3.2,txt:'+'+it.petal+' PETALS'+(it.res?' · +'+it.res[1]+' '+it.res[0].toUpperCase():'')};swSnd(784,.14,1568)}
  else{SW.res[it.res]=(SW.res[it.res]||0)+it.n;W4.floats.push({x:F.start.x,y:F.start.y-26,txt:'+'+it.n+' '+it.res.toUpperCase(),t:1.6,c:'#ffd94d'});swSnd(1175,.06,1568)}
@@ -358,9 +363,10 @@ function fNear(F){const px=P3.x+F.dir[0]*11,py=P3.y+F.dir[1]*11,in2=(o,r2)=>Math
  for(const np of F.npcs)if(in2(np,18))return{k:'npc',np,txt:np.team&&!SW.fl[np.fk]?'BATTLE '+np.who:'TALK'};
  for(const al of F.alphas)if(in2(al,22))return{k:'alpha',al,txt:'CHALLENGE ALPHA '+al.sp};
  for(const wd of W4.wilds)if(in2(wd))return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv};
+ for(const sp of F.spots)if(!sp.got&&in2(sp,20)){const ld=SW.party.find(m=>m.hp>0);return{k:'spot',sp,txt:'SEND '+(ld?ld.sp:'A BUDDY')+' FOR '+sp.k.toUpperCase()}}
  if(F.gym&&in2(F.gym,18))return{k:'gym',txt:'GYM'};
  for(const dr of F.doors)if(in2(dr,14))return{k:'door',txt:'KNOCK'};
- if(in2(F.start,18))return{k:'sign',txt:'LANTERN GATE'};
+ if(in2(F.start,18))return{k:'sign',txt:'LANTERN POST · TRAVEL'};
  for(const nd of W4.nodes)if(!nd.got&&in2(nd))return{k:'node',nd,txt:nd.k==='tree'?'CHOP':nd.k==='rock'?'MINE':'PICK'};
  for(const it of F.items)if(!it.done&&in2(it))return{k:'info',txt:'LOOK',msg:(it.n||it.res.toUpperCase())+' · needs '+it.w+' sprout strength · B throws sprouts'};
  for(const g2 of F.gates)if(!g2.open&&in2(g2,20))return{k:'info',txt:'LOOK',msg:g2.n+' · only '+TYPES[g2.type].n+' sprouts can clear it'};
@@ -419,13 +425,14 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    const dx=wd.tx-wd.x,dy=wd.ty-wd.y,d=Math.hypot(dx,dy);wd.mv=d>2;if(d>2){wd.x+=dx/d*16*dt;wd.y+=dy/d*16*dt;wd.fx=dx<0?-1:1}}
   if(W4.wildCd>0){W4.wildCd-=dt;if(W4.wildCd<=0&&W4.wilds.length<5&&F.grass.length)W4.wilds.push(fSpawnWild(F,sec))}}
  /* your lead buddy walks at your side */
- {const lead=SW.party.find(m=>m.hp>0);if(lead){W4.part=W4.part||{x:P3.x,y:P3.y};const tx=P3.x-F.dir[1]*14-F.dir[0]*4,ty=P3.y+4+F.dir[0]*10-F.dir[1]*2,dx=tx-W4.part.x,dy=ty-W4.part.y,d=Math.hypot(dx,dy);
+ {const lead=SW.party.find(m=>m.hp>0);if(lead&&!fFetchTick(F,dt,lead)){W4.part=W4.part||{x:P3.x,y:P3.y};const tx=P3.x-F.dir[1]*14-F.dir[0]*4,ty=P3.y+4+F.dir[0]*10-F.dir[1]*2,dx=tx-W4.part.x,dy=ty-W4.part.y,d=Math.hypot(dx,dy);
    W4.part.mv=d>4;if(d>4){const v=Math.min(d*5,96);W4.part.x+=dx/d*v*dt;W4.part.y+=dy/d*v*dt;if(Math.abs(dx)>1)W4.part.fx=dx<0?-1:1}}}
- fSquad(F,dt);fItems(F,dt);
+ fSquad(F,dt);fItems(F,dt);fLouTick(F,dt);
  W4.near=fNear(F);
  if(pressed('a')&&W4.near){const n=W4.near;
   if(n.k==='bud'){F.buds.splice(F.buds.indexOf(n.b),1);const tn=TYPES[n.b.type].n;SW.buds[tn]=(SW.buds[tn]||0)+1;
    W4.floats.push({x:n.b.x,y:n.b.y-16,txt:tn+' SPROUT JOINS THE SQUAD!',t:1.6,c:'#7ee787'});swSnd(880,.06,1175);swSave()}
+  else if(n.k==='spot')fFetch(F,n.sp);
   else if(n.k==='node')wSwing(n.nd);
   else if(n.k==='wild'){const wd=n.wd;W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv))}
   else if(n.k==='alpha'){const al=n.al;if(!SW.party.some(m=>m.hp>0)){swSay('No buddy fit to battle.',1.6);return}
@@ -458,10 +465,10 @@ function fBaseBuild(){const w=Math.ceil(WW/FT),h=Math.ceil((W4.wh||520)/FT),F={i
 function fBaseTick(dt){const F=W4.bf;if(!F)return;if(P3.ax||P3.ay)F.dir=[P3.ax,P3.ay];
  F.ft=(F.ft||0)-dt;if(F.ft<=0){F.ft=2;fFlow(F)}
  if(F.got){F.got.t-=dt;if(F.got.t<=0)F.got=null}
- fSync(F);fSquad(F,dt);fItems(F,dt);wkTick(dt);fCommand(F,dt)}
+ fSync(F);fSquad(F,dt);fItems(F,dt);wkTick(dt);fCommand(F,dt);wBaseEdge()}
 function fSqDraw(F,front){for(const o of F.sq){if((o.y>P3.y)!==front)continue;drawBud({x:Math.round(o.x),y:Math.round(o.y)+2,type:o.type,stage:2,z:o.z||0,a:o.a,mv:!!o.mv,st:o.st==='idle'?'idle':'follow',fx:1});
   if(o.st==='work'&&o.mv)r('#ffffff',Math.round(o.x)+4,Math.round(o.y)-9,2,2)}
- if(!front)for(const it of F.items)fItemDraw(it)}
+ if(!front){for(const it of F.items)fItemDraw(it);for(const b of F.buds)fBudDraw(b)}}
 function fRing(F){if(F.sq.some(s=>s.st==='follow')){const a=fAim(F),T=TYPES[a.kind==='gate'?a.tg.type:SW.selType],ph=((time*6)|0)%2,ax=Math.round(a.x),ay=Math.round(a.y);
   for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.55)',Math.round(px),Math.round(py),1,1)}
   r(T.l,ax-6-ph,ay-1,3,1);r(T.l,ax+4+ph,ay-1,3,1);r(T.l,ax-1,ay-6-ph,1,3);r(T.l,ax-1,ay+3+ph,1,3);if(a.tg)r('#ffffff',ax-1,ay-1,1,1)}
@@ -620,7 +627,7 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
  D.push([F.start.y-2,12]);
  if(F.fort)D.push([F.fort.y-4,15,F.fort]);
  const lead=SW.party.find(m=>m.hp>0);if(lead&&W4.part)D.push([W4.part.y,13,lead]);
- D.push([P3.y+1,14]);
+ D.push([P3.y+1,14]);for(const sp of F.spots)D.push([sp.y+3,17,sp]);D.push([lou.y+5,16]);
  D.sort((a,b)=>a[0]-b[0]);
  const feet=(x,y)=>{if(fTile(F,Math.floor(x/FT),Math.floor(y/FT))==='"'){const sx=Math.round(x);r(B.tg[1],sx-5,y-3,1,5);r(B.tg[2],sx-5,y-3,1,1);r(B.tg[1],sx-1,y-2,1,4);r(B.tg[1],sx+3,y-4,1,6);r(B.tg[2],sx+3,y-4,1,1);r(B.tg[0],sx-6,y+1,13,2)}};
  for(const d of D){const k=d[1],o=d[2];
@@ -631,9 +638,7 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
    r('#14101e',x-8,y-22,16,26);g.globalAlpha=.35+.25*fl;r('#58a0f0',x-8,y-20,16,22);g.globalAlpha=1;r('#b0e0f8',x-8,y-20+((time*20)|0)%20,16,1);
    r('#5c6675',x-8,y-22,3,26);r('#5c6675',x+5,y-22,3,26);r('#c8ccd4',x-8,y-22,3,3);r('#c8ccd4',x+5,y-22,3,3);r('#ffd94d',x-1,y-12,2,2);r('#ffd94d',x-2,y-11,4,1)}
   else if(k===4)fItemDraw(o);
-  else if(k===5){const x=Math.round(o.x),y=Math.round(o.y),T=TYPES[o.type],sw=Math.round(Math.sin(time*3+o.x)*1);
-   r('#5a3820',x-4,y,9,3);r('#3d2c1a',x-3,y+1,7,1);r('#2c6030',x,y-6,1,6);r(T.c,x-3+sw,y-9,3,3);r(T.c,x+1+sw,y-10,3,3);r(T.l,x-2+sw,y-9,1,1);
-   if(((time*2+o.x)|0)%2)r('#fff3b0',x+5,y-12,1,1)}
+  else if(k===5)fBudDraw(o);
   else if(k===6){const spr=wSp(o.sp)._spr,bob=o.mv?((time*8)|0)%2:0,w2=spr.ow,h2=spr.oh,X=Math.round(o.x),Y=Math.round(o.y);
    r('rgba(0,0,0,.22)',X-7,Y-1,14,3);
    if(o.fx>0&&spr.fable){g.save();g.translate(X+w2/2,Y-h2+2-bob);g.scale(-1,1);g.drawImage(spr.ol,0,0,w2,h2);g.restore()}else g.drawImage(spr.ol,X-w2/2,Y-h2+2-bob,w2,h2);
@@ -661,6 +666,8 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
    r('rgba(0,0,0,.22)',X-8,Y-1,16,3);
    if(W4.part.fx>0&&spr.fable){g.save();g.translate(X+w2/2,Y-h2+2-bob);g.scale(-1,1);g.drawImage(spr.ol,0,0,w2,h2);g.restore()}else g.drawImage(spr.ol,X-w2/2,Y-h2+2-bob,w2,h2);
    feet(W4.part.x,W4.part.y)}
+  else if(k===16)fLouDraw();
+  else if(k===17)fSpotDraw(o);
   else if(k===15)fFort(o.x,o.y);
   else if(k===14){const hz=F.hopZ||0;wHero(P3.x,P3.y-hz);if(!hz)feet(P3.x,P3.y+2)}}
  for(const nd of W4.nodes)if(!nd.got&&nd.hp<nd.max){r('#00000088',nd.x-11,nd.y-30,22,4);r('#7ee787',nd.x-10,nd.y-29,Math.round(20*Math.max(0,nd.hp)/nd.max),2)}

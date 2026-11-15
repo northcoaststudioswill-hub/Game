@@ -43,7 +43,7 @@ function wHud(){const sec=wSector(W4.sector),F=W4.fld||W4.bf,atBase=!W4.fld;
  {const rs='♣'+SW.res.wood+' ◆'+SW.res.stone+' ✿'+SW.res.petal+(atBase?' ♥'+SW.hearts:'');text(rs,W-5-tw(rs,1),4,1,'#d8e8c8',null)}
  if(SW.stam<99){r('#00000088',0,16,W,2);r(SW.stam>40?UI.leaf:SW.stam>18?'#ffd94d':'#e04838',0,16,Math.round(W*SW.stam/100),2)}
  const ban=W4.banner&&W4.banner.t>0;
- if(SW.quest<5&&!ban){const q=SW.quest===1&&!SW.tendDone?(SW.tendStage>=3?'Pluck 2 grown sprouts at the patch':SW.tendStage>=1?'Watch them grow as they carry':'Water the seeds at the SPROUT PATCH'):WQUEST[SW.quest];
+ if(SW.quest<5&&!ban){const q=wQuestText();
   r('rgba(10,14,8,.62)',0,18,W,11);r(UI.gold,0,18,2,11);text(wFit(q,226),6,20,1,'#ffe8b0',null)}
  if(ban){g.globalAlpha=Math.min(1,W4.banner.t);r('#0e1a0a',8,30,224,34);r(UI.gold,8,30,224,2);r(UI.gold,8,62,224,1);
   text(W4.banner.txt,Math.round(W/2-tw(W4.banner.txt,2)/2),35,2,'#ffffff',null);const sb=wFit(W4.banner.sub,216);text(sb,Math.round(W/2-tw(sb,1)/2),53,1,'#cfe0b8',null);g.globalAlpha=1}
@@ -98,7 +98,7 @@ const WSTORY=[
  {who:'',t:'The Great Lantern hung over the valley and everything grew. Then, one night, it cracked.'},
  {who:'',t:'Its light fell as seeds, and the seeds grew legs: SPROUTS, the little plant folk.'},
  {who:'ERIN',t:"A year of dark, keeper. Sunkeep has one good patch of soil left. Grow them."},
- {who:'',t:'Sprouts carry, build and break. Toss one at a wild BUDDY and it is yours.'},
+ {who:'',t:'Wild BUDDIES went dim without the light. Sprouts can carry it back to them.'},
  {who:'MARCUS',t:"Four gyms, four Sigils. I'll be at mine either way. Unimpressed, as ever."},
  {who:'KING BIBI',t:'Citizens. For thirty years I have warned you: the light is weeks away. Hence, my IRON DOME.',acc:'#1e2c5a'}];
 /* six beats, one press each (the old rhythm); B or START skips */
@@ -210,12 +210,11 @@ function wBakeGround(){const sec=wSector(W4.sector),wh=W4.wh||360,B=FBIO.MEADOW;
   for(let i=0;i<w;i+=2){R(B.g2,x+i,y-1,2,1+((rnd()*2)|0));R(B.g2,x+i,y+h-((rnd()*2)|0),2,2)}
   for(let i=0;i<h;i+=2){R(B.g2,x-1,y+i,1+((rnd()*2)|0),2);R(B.g2,x+w-((rnd()*2)|0),y+i,2,2)}};
  if(sec.id==='BASE'){
-  path(WW/2-9,88,18,236);path(WW/2-9,392,18,wh-392-30);     /* lantern to garden, garden to gate */
+  path(WW/2-9,88,18,236);path(WW/2-9,392,18,wh-392);     /* lantern to garden, garden to gate */
   path(84,120,312,14);path(84,134,14,292);path(98,412,134,14); /* the keepers' lanes */
   path(322,198,14,214);path(248,412,88,14);
   /* plaza */
-  R('#6e6350',170,4,140,86);for(let px=172;px<308;px+=16)for(let py=6;py<88;py+=12){R(((px+py)/4|0)%2?'#a39a86':'#948a76',px,py,15,11);R('#b8b09c',px,py,15,1)}
-  R('#ffd94d',238,60,4,4);
+  for(let px=196;px<284;px+=11)for(let py=92;py<116;py+=8){R('#6e6350',px+((py/8|0)%2)*5,py,11,8);R(((px+py)/4|0)%2?'#a39a86':'#948a76',px+((py/8|0)%2)*5,py,10,7);R('#b8b09c',px+((py/8|0)%2)*5,py,10,1)}
   /* the garden: fenced, tilled */
   const pc=6+Math.min(2,SW.buildings.filter(b2=>b2.k==='bed').length);
   R('#5a8a3a',158,326,164,66);R('#8a6a48',162,330,156,3);R('#8a6a48',162,384,156,3);R('#8a6a48',162,330,3,57);R('#8a6a48',315,330,3,57);

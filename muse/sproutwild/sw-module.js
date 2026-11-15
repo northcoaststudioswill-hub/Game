@@ -367,7 +367,7 @@ function wBaseReady(){const ms=WBASEMS[SW.baseLv];return!!ms&&ms.every(([key])=>
 function wPlot(){return{c0:0,c1:22,r0:0,r1:23}}
 function wCellFree(gx,gy){const x=wCellX(gx),y=wCellY(gy),cx=x+10,cy=y+10;
  if(gx<0||gx>22||gy<0||gy>23)return false;
- if(x>206&&x<254&&y>8&&y<66)return false;
+ if(x>172&&x<290&&y<112)return false;
  if(Math.hypot(cx-WW/2,cy-(W4.wh-22))<30)return false;
  if(cx>158&&cx<322&&cy>324&&cy<392)return false; /* the garden: nothing builds on the plots */
  for(const b of W4.bushes||[])if(Math.hypot(cx-b.x,cy-b.y)<18)return false;
@@ -403,8 +403,8 @@ const WW=480,WH=360;
 const wCellX=gx=>10+gx*20, wCellY=gy=>38+gy*20;
 const WCHOICE=[{sp:'CINDERCAP',x:184,y:302},{sp:'DRIZZLET',x:240,y:286},{sp:'FERNFANG',x:296,y:302}];
 
-function wCamUpdate(tx,ty){W4.cam=W4.cam||{x:0,y:0};
- W4.cam.x=Math.max(0,Math.min(WW-W,tx-W/2));W4.cam.y=Math.max(0,Math.min((W4.wh||360)-H,ty-H/2))}
+function wCamUpdate(tx,ty){W4.cam=W4.cam||{x:0,y:0};if(!W4.fld&&ty<240)ty-=Math.min(60,(240-ty)*.7); /* near the Great Lantern the view leans up to take it in */
+ W4.cam.x=Math.max(0,Math.min(WW-W,tx-W/2));W4.cam.y=Math.max(W4.fld?0:-44,Math.min((W4.wh||360)-H,ty-H/2))}
 function wGrassPatches(){return[{x:36,y:70,w:76,h:44},{x:368,y:64,w:78,h:46},{x:60,y:200,w:84,h:48},{x:330,y:210,w:88,h:50},{x:196,y:140,w:80,h:44},{x:392,y:140,w:64,h:40},{x:150,y:262,w:90,h:46}]}
 function wInitPatch(){if(W4.patchBuds&&W4.patchBuds.length)return; /* the patch is alive — never reseed it */
  W4.patchBuds=WPLOTS.slice(0,wPlotCount()).map(([x,y])=>({sx:x,sy:y,x,y,type:-1,age:-4,stage:0,mode:'soil',item:false,tx:0,ty:0,dlv:0,seedTy:null,by:null,forPlot:null,bush:null,itemTy:0,t:0}));
@@ -457,7 +457,7 @@ function wEnterSector(id){W4.sector=id;SW.sector=id;const sec=wSector(id);W4.ww=
  P3.x=id==='BASE'?WW/2-20:WW/2-30;P3.y=id==='BASE'?292:W4.wh-30;P3.ax=0;P3.ay=-1;W4.grassT=0;W4.grace=1.2;
  W4.part={x:P3.x-14,y:P3.y+6};W4.cam=null;wCamUpdate(P3.x,P3.y);
  if(id==='BASE'){lou.x=WW/2-56;lou.y=290}
- W4.fld=FMAPS[id]?fBuild(id,W4.from):null;W4.from=null;W4.bf=W4.fld?null:fBaseBuild();if(W4.fld)wCamUpdate(P3.x,P3.y);
+ {const fr0=W4.from;W4.fld=FMAPS[id]?fBuild(id,fr0):null;W4.from=null;W4.bf=W4.fld?null:fBaseBuild();if(W4.fld)wCamUpdate(P3.x,P3.y);else wBaseArrive(fr0)}
  if(!SW.visited[sec.id]){SW.visited[sec.id]=1;W4.banner={txt:sec.n,sub:WSECSUB[sec.id]||'',t:3}}
  else swSay(sec.n,2.2);swSave()}
 /* ---------- base production: workers turn time into resources ---------- */
@@ -482,6 +482,7 @@ W4.floats=[];
    WORLD (sectors + base share one walker)
    ================================================================ */
 function wSolidAt(x,y){const sec=wSector(W4.sector);
+ if(W4.sector==='BASE'&&x>196&&x<284&&y<86)return true; /* the Great Lantern's trunk */
  if(x<10||x>WW-10||y<28||y>(W4.wh||360)-10)return true;
  if(W4.sector==='TOWN'&&((x>58&&x<136&&y>88&&y<134)||(x>346&&x<424&&y>88&&y<134)))return true;
  for(const nd of W4.nodes)if(!nd.got&&Math.abs(x-nd.x)<10&&Math.abs(y-nd.y)<8)return true;
@@ -510,6 +511,7 @@ function wSproutInfo(px,py){ /* the catch-all: any sprout can be asked what it i
     return{k:'sproutinfo',txt:'ASK',x:bx+6+wi*10,y:by+22,msg:TYPES[here[wi].type].n+' SPROUT · working the '+wBuildDef(b.k).n+' · skill '+(here[wi].wxp||0)}}}
  return null}
 function wNear(){const sec=wSector(W4.sector),px=P3.x+P3.ax*13,py=P3.y+P3.ay*13;
+ {const ex=wNearExtra(px,py);if(ex)return ex}
  if(W4.loose)for(const lb of W4.loose)if(Math.hypot(px-lb.x,py-lb.y)<17)return{k:'wildpluck',lb,txt:'PLUCK '+TYPES[lb.type].n+' SPROUT'};
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)
   if(pb.type>=0&&pb.stage>=2&&Math.hypot(px-pb.x,py-pb.y)<17)return{k:'pluck',pb,txt:'PLUCK '+TYPES[pb.type].n+' SPROUT'};
@@ -517,7 +519,7 @@ function wNear(){const sec=wSector(W4.sector),px=P3.x+P3.ax*13,py=P3.y+P3.ay*13;
   return{k:'node',nd,txt:nd.k==='tree'?'CHOP':nd.k==='rock'?'MINE':'PICK'};
  if(W4.sector==='BASE'&&SW.tendStage>=3&&W4.tend&&W4.tend.buds)for(const tb of W4.tend.buds)
   if(tb.st==='grown'&&Math.hypot(px-tb.x,py-tb.y)<18)return{k:'tendpluck',b:tb,txt:'PLUCK '+TYPES[tb.type].n+' SPROUT'};
- if(W4.sector==='BASE'&&SW.quest<=1&&!SW.tendDone&&Math.hypot(px-240,py-352)<26)return{k:'patch',txt:SW.tendStage===0?'WATER THE SEEDS':SW.tendStage>=3?'PLUCK THE GROWN ONES':'THE SPROUT PATCH'};
+ if(false&&W4.sector==='BASE'&&SW.quest<=1&&!SW.tendDone&&Math.hypot(px-240,py-352)<26)return{k:'patch',txt:SW.tendStage===0?'WATER THE SEEDS':SW.tendStage>=3?'PLUCK THE GROWN ONES':'THE SPROUT PATCH'};
  if(W4.sector==='BASE'&&SW.quest===1&&SW.tendDone&&!SW.party.length)for(const c of WCHOICE)
    if(Math.hypot(px-c.x,py-c.y)<17)return{k:'choice',sp:c.sp,txt:'BEFRIEND '+c.sp};
  if(sec.gym>=0&&Math.hypot(px-WW/2,py-66)<20)return{k:'gym',txt:'GYM'};
@@ -525,9 +527,8 @@ function wNear(){const sec=wSector(W4.sector),px=P3.x+P3.ax*13,py=P3.y+P3.ay*13;
  for(const np of wNpcList())if(Math.hypot(px-np.x,py-np.y)<16)return{k:'npc',who:np.who,txt:'TALK'};
  if(W4.sector==='BASE'){for(const b of SW.buildings){const bx=wCellX(b.gx)+10,by=wCellY(b.gy)+12;
    if(Math.hypot(px-bx,py-by)<18)return{k:'bld',b,txt:wBuildDef(b.k).n}}
-  if(Math.hypot(px-lou.x,py-lou.y)<17)return{k:'louie',txt:'LOUIE'};
-  if(Math.hypot(px-WW/2,py-46)<18)return{k:'lantern',txt:'BASE LANTERN'};
-  if(Math.hypot(px-WW/2,py-(W4.wh-22))<17)return{k:'sign',txt:'LANTERN GATE'}}
+  if(Math.hypot(px-lou.x,py-lou.y)<17)return{k:'louie',txt:'PET LOUIE'};
+  if(Math.hypot(px-WW/2,py-74)<24)return{k:'lantern',txt:'THE GREAT LANTERN'}}
  const si=wSproutInfo(px,py);if(si)return si; return null}
 const WTOOLCOST=[{w:6,s:3,i:0},{w:14,s:8,i:2},{w:24,s:14,i:5}];
 function wToolCost(tool,lv){const c=WTOOLCOST[lv];return tool==='axe'?c:{w:c.s,s:c.w,i:c.i}}
@@ -612,12 +613,7 @@ function worldUpdate(dt){if(W4.fld){fUpdate(dt);return}const sec=wSector(W4.sect
    else{const dx=P3.x-W4.part.x,dy=(P3.y+8)-W4.part.y,d=Math.hypot(dx,dy);
     if(d>17){W4.part.x+=dx/d*68*dt;W4.part.y+=dy/d*68*dt}}}}
  if(W4.sector==='BASE'){if(W4.petCd>0)W4.petCd-=dt;
-  const lm=W4.louMode||'follow';
-  if(lm==='guide'&&W4.louTarget){const dx=W4.louTarget.x-lou.x,dy=W4.louTarget.y-lou.y,d=Math.hypot(dx,dy);
-   if(d<5)W4.louMode='wait';else{lou.x+=dx/d*62*dt;lou.y+=dy/d*62*dt}}
-  else if(lm==='wait'&&W4.louTarget){if(Math.hypot(P3.x-lou.x,P3.y-lou.y)<24){swSay('Louie: '+W4.louTarget.label,3.4);W4.louMode='follow';W4.louTarget=null}}
-  else{const dx=P3.x-lou.x,dy=P3.y-lou.y,d=Math.hypot(dx,dy);
-   if(d>26){lou.x+=dx/d*40*dt;lou.y+=dy/d*40*dt}}
+  wLouTick(dt);
   if(!W4.amb)W4.amb=[0,1,3,4].map(i=>({type:i,x:60+i*100,y:150+((i*67)%220),tx:0,ty:0,t:i}));
   for(const a of W4.amb){a.t-=dt;
    if(a.t<0){a.tx=26+Math.random()*(WW-52);a.ty=70+Math.random()*((W4.wh||360)-110);a.t=2+Math.random()*3}
@@ -635,7 +631,8 @@ function worldUpdate(dt){if(W4.fld){fUpdate(dt);return}const sec=wSector(W4.sect
  if(W4.treasure&&Math.hypot(P3.x-W4.treasure.x,P3.y-W4.treasure.y)<11){const tx2=W4.treasure.x,ty2=W4.treasure.y;W4.treasure=null;SW.treasures=(SW.treasures||0)+1;wTreasureReward(tx2,ty2)}
  W4.near=wNear();
  if(pressed('a')&&W4.near){const n=W4.near;
-  if(n.k==='node')wSwing(n.nd);
+  if(n.k==='fbud')wPluckSeed(n.b);
+  else if(n.k==='node')wSwing(n.nd);
   else if(n.k==='sign'){if(W4.sector==='BASE'&&SW.quest===2&&!SW.gateSeen){SW.gateSeen=1;W4.gatePage=0;state='g4gate';swSave()}
    else{swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}}
   else if(n.k==='gym'){if(SW.quest<5)swSay(WGYMS[sec.gym].leader+': "Easy, keeper. Set up camp and catch a buddy first — then we battle."',3.4);
@@ -664,10 +661,8 @@ function worldUpdate(dt){if(W4.fld){fUpdate(dt);return}const sec=wSector(W4.sect
   swSave()}
  else if(n.k==='patch'){if(SW.quest===0){swSay('Louie first — he is waiting by the path, and he watches this patch.',2.2);return}wStartTend()}
   else if(n.k==='npc'){if(n.who==='PIP'||n.who==='ELDER')wOpenAsk(n.who);else{W4.talk={who:n.who,page:0};SW.talkN[n.who]=(SW.talkN[n.who]||0)+1}}
-  else if(n.k==='louie'){swSel=0;W4.louTip='';
-   if(SW.quest===0){SW.quest=1;swSay('Louie wags approval. He will show you the patch — follow him!',2.6);swSnd(784,.09,1175);swSave();W4.louTarget={x:198,y:330};W4.louMode='guide'}
-   state='g4lou'}
-  else if(n.k==='lantern'){swSel=0;state='g4lamp'}
+  else if(n.k==='louie')wLouTalk();
+  else if(n.k==='lantern'){if(!wLit())swSay('The Great Lantern is dark and cracked. It is hungry for anything that grows.',3.2);else{swSel=0;state='g4lamp'}}
   else if(n.k==='bld'){const b=n.b;
    if(b.k==='cottage'){swSel=0;state='g4cot'}
    else if(b.k==='nursery'){W4.nurB=SW.buildings.indexOf(b);swSel=0;state='g4nur'}
@@ -839,13 +834,12 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
   const lf=((time*2)|0)%2;g.drawImage(lf?LOU.l[0]:LOU.l[1],Math.round(lou.x)-12,Math.round(lou.y)-6,24,12);
   if(Math.hypot(P3.x-lou.x,P3.y-lou.y)>34){r('rgba(10,14,8,.55)',Math.round(lou.x)-tw('LOUIE',1)/2-2,Math.round(lou.y)+6,tw('LOUIE',1)+4,9);
   text('LOUIE',Math.round(lou.x)-tw('LOUIE',1)/2,Math.round(lou.y)+7,1,'#ffe8b0',null)}
-  if(W4.louMode==='wait'||SW.quest===0)text('!',Math.round(lou.x)-1,Math.round(lou.y)-17,2,'#ffd94d',null)
+  if(W4.louLead)text('!',Math.round(lou.x)-1,Math.round(lou.y)-17,2,'#ffd94d',null)
   if(SW.quest===1&&SW.tendDone&&!SW.party.length)for(const c of WCHOICE){const spr=wSp(c.sp)._spr,bob=Math.sin(time*3+c.x)*1;
    r('rgba(0,0,0,.22)',c.x-8,c.y-1,16,3);
    g.drawImage(spr.ol,Math.round(c.x)-13,Math.round(c.y)-spr.oh+4+Math.round(bob),spr.ow,spr.oh);
    if(Math.hypot(P3.x-c.x,P3.y-c.y)>34){r('rgba(10,14,8,.55)',c.x-tw(c.sp,1)/2-2,c.y+3,tw(c.sp,1)+4,9);
    text(c.sp,c.x-tw(c.sp,1)/2,c.y+4,1,'#ffe8b0',null)}}}
- wGateArt(WW/2,W4.wh-6);
  if(W4.sector==='BASE'&&W4.jobPos)SW.crew.forEach((c,ci)=>{if(c.job!==-2&&c.job!==-3)return;const jp=W4.jobPos[ci];if(!jp)return;
   drawBud({x:Math.round(jp.x),y:Math.round(jp.y)+2,type:c.type,stage:2,z:0,a:ci*1.71,mv:!!(jp.nd&&Math.hypot(jp.x-jp.nd.x,jp.y-jp.nd.y)>7),st:'idle',fx:1});
   const sw2=Math.sin(time*7+ci)>0;
@@ -1090,6 +1084,7 @@ function lampUpdate(){const rows=wLampRows();swNav(rows.length);
   if(rw.act==='ring'){wConfirm('Ring the Base Lantern? Sunkeep grows to LV'+(SW.baseLv+1)+' — more crew room, new plans.',()=>{SW.baseLv++;swSnd(880,.14,1318);
    swSay('The Base Lantern blazes brighter — BASE LEVEL '+SW.baseLv+'!',3);swSave();state='g4world'});return}
   else if(rw.act==='board')state='g4base';
+  else if(rw.act==='travel'){swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(rw.act==='leave')state='g4world';
   else{if(SW.hearts>=rw.price){SW.hearts-=rw.price;SW.unlocked[rw.act]=1;swSnd(784,.1,1175);
     swSay('Plans pinned up! '+(rw.act==='sawmill'?'SAWMILL':'LANTERN STATUE')+' is in the BUILD menu now.',3);swSave();swSel=0}
@@ -1138,7 +1133,7 @@ function wStartWildAt(pick,lv){
  if(BT.aiIx<0)BT.aiIx=0;
  const isNew=!SW.seen[pick];SW.seen[pick]=1;wSetupBattle();BT.log=[{txt:'A wild '+pick+' appeared!'}];
  if(isNew)BT.log.push({txt:'NEW! '+pick+' was added to the Field Guide.'});
- if(!SW.tutSeen){SW.tutSeen=1;BT.log.push({txt:'Weaken it, then SPROUT: toss a sprout to take command!'},{txt:'A sprout of the same type commands best. Your KEEPER move fires once!'})}
+ if(!SW.tutSeen){SW.tutSeen=1;BT.log.push({txt:'Wild buddies went dim when the Lantern cracked. Tire it out, then SWARM: your sprouts carry the light back to it.'},{txt:'Kin sprouts bloom best. No sprout is used up — shaken ones just sit out the fight.'})}
  BT.after='menu';swSnd(392,.12,262)}
 function wStartGym(gi,rematch){const g=WGYMS[gi];
  BT={mode:'gym',gym:gi,rematch:!!rematch,queue:g.team.map(([sp,lv])=>wMakeMon(sp,lv+(rematch?4:0))),aiIx:SW.party.findIndex(m=>m.hp>0)};
@@ -1181,8 +1176,8 @@ function wResolveTurn(myMove){const me=btCur(),foe=BT.foe;
  if(BT.log.length===0)BT.log.push({txt:'...'});
  if(!BT.after)BT.after='menu';BT.phase='msg'}
 function wFoeDown(){const me=btCur(),foe=BT.foe;BT.log.push({txt:foe.sp+' fainted!'});
- if(BT.mode==='wild'){const bt2=TYPES[wSp(foe.sp).t[0]].n;SW.buds[bt2]=(SW.buds[bt2]||0)+1;
-  BT.log.push({txt:'Its '+bt2+' bud hops over to your crew! (+1 bud)'})}
+ if(BT.mode==='wild'){const dk=[0,1].includes(wSp(foe.sp).t[0])?'ore':'fiber';SW.res[dk]=(SW.res[dk]||0)+1;
+  BT.log.push({txt:'It dropped '+dk.toUpperCase()+'. (+1)'})}
  const gain=Math.round((5+foe.lv*3)*(BT.mode==='gym'||BT.mode==='raid'||BT.mode==='trainer'?1.5:1));
  me.xp+=gain;BT.log.push({txt:me.sp+' gained '+gain+' XP!'});
  let need=wXpNext(me.lv);
@@ -1264,7 +1259,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.shake>0)
   if(pressed('a')){const o=opts[swSel];
    if(o==='FIGHT'){BT.phase='moves';swSel=0}
    else if(o==='KEEPER')wKeeperMove();
-   else if(o==='SPROUT'){if(wBudTotal()<=0){BT.log=[{txt:'No sprouts to toss! Win a battle — defeated wilds leave a sprout behind.'}];BT.after='menu';BT.phase='msg';BT.t=0}
+   else if(o==='SPROUT'){if(wBudTotal()<=0){BT.log=[{txt:'No sprouts with you. Pluck some, or carry things home so the Lantern grows more.'}];BT.after='menu';BT.phase='msg';BT.t=0}
     else{BT.phase='budpick';swSel=0}}
    else if(o==='BUDDY'){BT.phase='party';swSel=0;BT.partyFrom='menu'}
    else if(o==='RUN'){if(Math.random()<.7){if(BT.mode==='raid'){const lost=Math.min(15,SW.res.petal);SW.res.petal-=lost;BT.log=[{txt:'You fled — Bottie trashed the place on his way out. (-'+lost+' petals)'}]}else BT.log=[{txt:'Got away safely!'}];BT.after='endwin';BT.phase='msg';BT.t=0}
@@ -1274,7 +1269,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.shake>0)
      if(btCur().hp<=0)wMineDown();else BT.after='menu'}}
    return}
   return}
- if(BT.phase==='budpick'){const list=TYPES.map((t2,i)=>i).filter(i=>(SW.buds[TYPES[i].n]||0)>0);
+ if(BT.phase==='budpick'){const list=TYPES.map((t2,i)=>i).filter(i=>(SW.buds[TYPES[i].n]||0)>0&&!(BT.dz&&BT.dz[i]));
   if(!list.length){BT.phase='menu'}
   else{wGridNav(2,list.length);
    if(pressed('b')){BT.phase='menu';swSel=0;return}
@@ -1300,18 +1295,18 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.shake>0)
   if(BT.orbT<=0){if(BT.orbOk){const foe=BT.foe;SW.caught[foe.sp]=1;
      if(SW.quest===2){SW.quest=3;swSave();later(()=>swSay('First catch! Now build your buddy a home — a COTTAGE (START · BUILD).',3.6),1600)}
      if(SW.party.length<3)SW.party.push(foe);else SW.box.push(foe);
-     BT.log=[{txt:'The '+TYPES[BT.tossIx||0].n+' sprout took command of '+foe.sp+'!'},{txt:SW.party.includes(foe)?foe.sp+' joined your buddies.':foe.sp+' now works for you — sent to your base box.'}];
+     BT.log=[{txt:'The '+TYPES[BT.tossIx||0].n+' sprouts bloom on '+foe.sp+'. It remembers the Lantern light!'},{txt:SW.party.includes(foe)?foe.sp+' joined your buddies.':foe.sp+' now works for you — sent to your base box.'}];
      BT.after='endwin';BT.phase='msg';BT.t=0}
-    else{BT.log=[{txt:'Oh no! '+BT.foe.sp+' shook the sprout off!'}];BT.phase='msg';BT.t=0;
+    else{BT.dz=BT.dz||{};BT.dz[BT.tossIx||0]=1;BT.log=[{txt:BT.foe.sp+' shook the sprouts off! They sit out the rest of this fight.'}];BT.phase='msg';BT.t=0;
      const lines=wDoMove(BT.foe,btCur(),wFoeMove(),BT.foeStage,BT.myStage);
      BT.log=BT.log.concat(lines.map(t=>({txt:t})));
      if(btCur().hp<=0)wMineDown();else BT.after='menu'}}
   return}}
 function wLerpC(a,b,k){const pa=[1,3,5].map(i=>parseInt(a.substr(i,2),16)),pb=[1,3,5].map(i=>parseInt(b.substr(i,2),16));
  return'rgb('+pa.map((v,i)=>Math.round(v+(pb[i]-v)*k)).join(',')+')'}
-function wThrowBud(ix){const bn=TYPES[ix].n;SW.buds[bn]--;const foe=BT.foe,frac=foe.hp/wStats(foe).max;
+function wThrowBud(ix){const bn=TYPES[ix].n,nS=Math.max(1,Math.min(5,SW.buds[bn]||1));BT.tossN=nS;const foe=BT.foe,frac=foe.hp/wStats(foe).max;
  const p=Math.min(.96,Math.max(.05,wSp(foe.sp).catch*(1.55-frac*.95)*wKinship(ix,foe.sp)*(SW.keeper==='WILL'?1.15:1)));
- BT.tossIx=ix;BT.orbOk=SW.quest===2?true:Math.random()<p; /* the intro catch cannot fail */
+ BT.tossIx=ix;BT.orbOk=SW.quest===2?true:Math.random()<1-Math.pow(1-p*.6,nS); /* the intro catch cannot fail */
  BT.orbT=1.5;BT.phase='orb';swSnd(880,.08,1320);swSave()}
 function wDrawBattle(){const sec=wSector(W4.sector),pal=sec?sec.pal:{g:'#5da244',g2:'#4c8a38',a:'#c4ec8a'};
  const HY=H*0.40,sky=sec&&sec.id==='WASTES'?['#f2b95e','#f9deb0']:sec&&sec.id==='GLOOM'?['#17122a','#241b40']:sec&&sec.id==='PEAK'?['#cfe4f2','#eef6fb']:['#8fd0f0','#d8f2fc'];
@@ -1340,11 +1335,12 @@ function wDrawBattle(){const sec=wSector(W4.sector),pal=sec?sec.pal:{g:'#5da244'
  r('#8a7a52',FGx-46,FGy-3,92,7);r(pal.g2,FGx-42,FGy-6,84,6);r(pal.g,FGx-36,FGy-7,72,3);
  r('#8a7a52',MGx-46,MGy-3,92,7);r(pal.g2,MGx-42,MGy-6,84,6);r(pal.g,MGx-36,MGy-7,72,3);
  for(let i=0;i<7;i++){r(pal.a,FGx-38+i*12,FGy-9,1,3);r(pal.a,MGx-34+i*11,MGy-9,1,3)}
- if(BT.phase!=='orb'||BT.orbT>.5)g.drawImage(fspr.ol,FGx-fw/2+fsh,FGy-fh+Math.round(Math.sin(time*2.2)*1.5),fw,fh);
+ g.drawImage(fspr.ol,FGx-fw/2+fsh,FGy-fh+Math.round(Math.sin(time*2.2)*1.5),fw,fh);
  {const mx_=Math.round(MGx-mw2/2+msh),my_=Math.round(MGy-mh2+Math.round(Math.sin(time*2.2+1.3)*1.5));if(mspr.fable){g.save();g.translate(mx_+mw2,my_);g.scale(-1,1);g.drawImage(mspr.ol,0,0,mw2,mh2);g.restore()}else g.drawImage(mspr.ol,mx_,my_,mw2,mh2)};
  if(BT.phase==='orb'){const t=1.5-BT.orbT,k=Math.min(1,t/1.1),
    ox=(MGx+12)+(FGx-(MGx+12))*k,oy=(MGy-30)+((FGy-12)-(MGy-30))*k-Math.sin(k*Math.PI)*H*0.16;
-drawBud({x:Math.round(ox),y:Math.round(oy)+4,type:BT.tossIx||0,stage:2,z:7,a:1,mv:false,st:'idle',fx:1})}
+for(let i=0;i<(BT.tossN||1);i++)drawBud({x:Math.round(k>=1?FGx+(i-((BT.tossN||1)-1)/2)*11:ox-i*12*(1-k)),y:Math.round(k>=1?FGy-18-(i%2)*14:oy+(i%2)*5)+4,type:BT.tossIx||0,stage:2,z:k>=1?((time*10+i)|0)%2*2:7,a:i+1,mv:k>=1,st:'idle',fx:1});
+  if(k>=1&&BT.orbOk)for(let i=0;i<8;i++){const a=i*.785+time*4;r(i%2?'#fff3b0':TYPES[BT.tossIx||0].l,Math.round(FGx+Math.cos(a)*(20+t*8)),Math.round(FGy-24+Math.sin(a)*(14+t*6)),2,2)}}
  /* info boxes */
  const fmax=wStats(foe).max;
  r('#282838',4,4,108,30);r('#f8f4e0',6,6,104,26);r(TYPES[wSp(foe.sp).t[0]].d,6,6,4,26);
@@ -1371,8 +1367,8 @@ drawBud({x:Math.round(ox),y:Math.round(oy)+4,type:BT.tossIx||0,stage:2,z:7,a:1,m
    text(m.t>=0?WT[m.t]:'—',x+62,y,1,TYPES[m.t]?TYPES[m.t].d:'#585868',null);
    text('PW '+m.p,x+88,y,1,'#585868',null)});
   const cur=WMOVES[mv[swSel]];text(cur.d,10,H-11,1,'#585868',null)}
- else if(BT.phase==='budpick'){text('TOSS WHICH SPROUT?  (kinship matters!)',10,H-50,1,'#282838',null);
-  TYPES.map((t2,i)=>i).filter(i=>(SW.buds[TYPES[i].n]||0)>0).forEach((ix,j)=>{const kin=wKinship(ix,BT.foe.sp);
+ else if(BT.phase==='budpick'){text('SWARM WITH WHICH?  (kin blooms best)',10,H-50,1,'#282838',null);
+  TYPES.map((t2,i)=>i).filter(i=>(SW.buds[TYPES[i].n]||0)>0&&!(BT.dz&&BT.dz[i])).forEach((ix,j)=>{const kin=wKinship(ix,BT.foe.sp);
    const tag=kin===1.5?'KIN!':kin===1.25?'STRONG':kin===.75?'WEAK':'';
    const col=j%2,row=(j/2)|0,x=8+col*116,y=H-36+row*13,on=j===swSel;
    if(on)r('#f8e060',x-3,y-2,112,12);
@@ -1382,7 +1378,7 @@ drawBud({x:Math.round(ox),y:Math.round(oy)+4,type:BT.tossIx||0,stage:2,z:7,a:1,m
   opts.forEach((o,i)=>{const col=i%2,row=(i/2)|0,x=122+col*58,y=H-50+row*14,on=i===swSel;
    if(on)r('#f8e060',x-3,y-2,56,12);
    const used=o==='KEEPER'&&BT.keeperUsed;
-   text(used?'KEEPER·':o.split(' ')[0],x,y,1,used?'#98988a':'#282838',null);
+   text(used?'KEEPER·':o.startsWith('SPROUT')?'SWARM':o.split(' ')[0],x,y,1,used?'#98988a':'#282838',null);
    if(o.startsWith('SPROUT '))text('x'+wBudTotal(),x+40,y,1,'#585868',null)})}}
 
 /* ================================================================
@@ -1720,7 +1716,7 @@ function swDrawTitle(){r('#101408',0,0,W,H);
  if(((time*1.4)|0)%2)ctext('PRESS A',H-30,2,'#ffd94d',null);
  ctext('CATCH · BUILD · BATTLE',H-14,1,'#7a9a68',null)}
 function wIntroDone(){SW.intro=1;wEnterSector('BASE');state='g4world';
- swSay('Louie is waiting by the path — go say hi!',3.4);swSave();
+ swSay('The Great Lantern is dark. Something glows at its roots...',4);swSave();
  SW.lessons.start=1}
 function introUpdate(){W4.introT=(W4.introT||0)+1/60;
  if(pressed('b')){wIntroDone();return}
@@ -1769,7 +1765,7 @@ function drawStarter(){swShell('CHOOSE YOUR FIRST PARTNER','');
 function mapUpdate(){swNav(WSECTORS.length);
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){const s=WSECTORS[swSel];
-  if(s.id!=='BASE'&&SW.quest<2){swSnd(140,.09);swSay(SW.quest===0?'Louie first — he is waiting by the path.':'Grow your sprouts first — tend the patch by the clearing.',2);return}
+  if(s.id!=='BASE'&&SW.quest<2){swSnd(140,.09);swSay('Wake the Lantern and greet a buddy first.',2.4);return}
   if(SW.badges.length<s.req){swSnd(140,.09);swSay('Locked — needs '+s.req+' Sigils.',1.6);return}
   wEnterSector(s.id);state='g4world'}}
 function drawMap(){swShell('SECTORS','SIGILS '+SW.badges.length+'/4');
@@ -1790,7 +1786,7 @@ function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','
 function drawPause(){swShell('KEEPER MENU','');
  swRows([{a:'BUDDIES',b:SW.party.length+(SW.party.length===1?' buddy':' buddies')},{a:'BUDDY GUIDE',b:Object.keys(SW.caught).length+'/'+WSPECIES.length+' caught'},
   {a:'BUILD',b:W4.sector==='BASE'?'at base':'go to base'},{a:'SECTORS',b:WSECTORS.length+' pockets'},
-  {a:'BASE',b:'Level '+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how everything works'},{a:'RESUME',b:''}],swSel,'Buds x'+wBudTotal()+' · Tonics x'+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot)}
+  {a:'BASE',b:'Level '+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how everything works'},{a:'RESUME',b:''}],swSel,'Sprouts '+wBudTotal()+' (pouch '+(SW.pouch||8)+') · Tonics '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0))}
 function partyUpdate(){swNav(Math.max(1,SW.party.length+1));
  if(pressed('b')){state='g4pause';swSel=0;return}
  if(pressed('a')){if(swSel===SW.party.length){swSel=0;state='g4box';return}
@@ -1982,7 +1978,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},

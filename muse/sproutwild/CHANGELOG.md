@@ -21,6 +21,32 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v5.5 — the loop makes sense (Fable)
+
+Written after playing the opening from a fresh save. What was wrong: you spawned in an empty field, the first interaction was a five-row dog menu, then three pages of text and 15 seconds of watching sprouts carry apples, three starter buddies appeared for no reason, and a sprout was thrown like a ball. (`sw-story.js`)
+
+**Why sprouts can take buddies.** Sprouts are Lantern light with legs. Wild buddies went dim when the Lantern cracked. Tire one out and your sprouts SWARM it: they latch on and bloom, it remembers the light, it joins you. Up to five of one kind go at once; kin blooms best. No sprout is used up; a swarm that gets shaken off sits out the rest of that fight.
+
+**The opening is played, not read** (about a minute):
+1. Wake at the foot of the dark Great Lantern. Three seeds glow in its roots. Pluck them: a squad of three.
+2. Louie runs to a pile of berries. B throws the sprouts; they carry the berries to the Lantern.
+3. The Lantern stirs. The garden wakes, the camp fire lights, three dim buddies creep toward the light.
+4. Walk up and greet one. It is your first buddy.
+5. The south road opens. Walk out to the Meadow.
+
+**Who gathers what**
+- Sprouts carry wood, stone, berries and treasure. Every four deliveries, at home or at a Lantern post, the Lantern grows a new sprout.
+- Buddies fetch what sprouts cannot: ORE veins and FIBER thickets in every sector (A next to one sends your lead buddy; the right species brings back more). Wilds you beat drop ore or fiber instead of a free sprout.
+- At home both work the stations, and the bench turns fiber into a SEED POUCH: the squad starts at 8 and grows by 4 per pouch, to 24.
+
+**Sunkeep**
+- You start at the Great Lantern and leave on foot by the south road, which joins the Meadow both ways. The blue gate arch is gone.
+- The Great Lantern is reimagined: an old tree cradling a cracked lantern, dark until you feed it. It is the hub: grow the base, buy plans, see the work board, travel to any Lantern post.
+- Louie is a dog again, not a menu. He runs ahead to whatever is next and waits for you. A pets him and he says one thing: the next step, or a tip. In the sectors he follows you and herds stray sprouts back.
+
+Tests: `field-lab.js` 56/56 (15 new: the whole opening, swarming, fetching, the pouch, the south road).
+Older suites: 4 of 23 pass (including the soak run). The rest script the old opening, Louie menu and gate, which no longer exist; they need rewriting or retiring, not fixing.
+
 ## v5.4 — Sunkeep at work, and one art style (Fable)
 
 **Sunkeep runs like a Palworld camp** (`sw-base.js`)
