@@ -14,9 +14,9 @@ WSTORY.length=0;WSTORY.push(
  {sc:1,who:'',t:'Its light fell as seeds, and the seeds grew legs. The buddies of the valley went dim.'},
  {sc:5,who:'KING BIBI',t:'Citizens. For thirty years I have warned you: the light is weeks away. Hence, my IRON DOME.',acc:'#1e2c5a'});
 const WCANCH={ /* where each of them hangs about, by how far along you are */
- ERIN:[[322,172,12],[214,206,16],[150,196,20],[336,300,56]],MARCUS:[[156,178,12],[272,176,16],[334,200,20],[300,214,40]],WILL:[[150,250,30],[150,250,30],[150,250,30],[130,260,50]]};
+ ERIN:[[344,206,8],[340,204,10],[118,216,8],[336,300,56]],MARCUS:[[116,208,6],[112,216,6],[356,214,8],[300,214,40]],WILL:[[150,250,30],[150,250,30],[150,250,30],[130,260,50]]};
 function wCastInit(){W4.cast=['ERIN','MARCUS','WILL'].map(w=>{const a=WCANCH[w][Math.min(3,wOp())];return{who:w,x:a[0],y:a[1],tx:a[0],ty:a[1],t:1+Math.random()*2,dir:[0,1],mv:false}});
- if(wOp()===0&&!(SW.beats&&SW.beats.wake)){W4.cast[0].x=330;W4.cast[0].y=214;W4.cast[1].x=150;W4.cast[1].y=220} /* they walk up as you wake */
+ if(wOp()===0&&!(SW.beats&&SW.beats.wake)){W4.cast[0].x=344;W4.cast[0].y=206;W4.cast[1].x=116;W4.cast[1].y=208} /* they walk up as you wake */
  W4.quips=[];W4.quipQ=[];W4.idleT=9}
 function wNpcList(){if(W4.sector!=='BASE')return[];if(!W4.cast)wCastInit();return W4.cast.filter(c=>c.who!==SW.keeper)}
 function wSpeaker(who){if(who==='LOUIE')return{x:lou.x,y:lou.y+10,h:14};const c=(W4.cast||[]).find(q=>q.who===who);return c?{x:c.x,y:c.y,h:30}:null}
@@ -35,7 +35,7 @@ const WCBEATS=[
  ['fiber',()=>(SW.res.fiber||0)>=4,[['ERIN','Enough fiber for a seed pouch. Try the bench.']]],
  ['sigil',()=>SW.badges.length>=1,[['MARCUS','One Sigil. Out of four. Calm down.']]]];
 const WCIDLE={ERIN:['The beds grow better when someone sings. So I sing.','Louie has a route. Always trust the route.','A tidy base is a happy base. Mostly.','Everything you carry home feeds the Lantern.','Kin sprouts bloom best. Leaf on leaf, dew on dew.','If a buddy is good at a job, it will find that job.'],
- MARCUS:["I'm not an NPC. I'm between protagonists.",'Your form is terrible. The sprouts respect it anyway.','Hydro jet solves most problems. The rest are personal.','King Bibi called that dome temporary. In writing.','You know what this place needs? A van.','Ore. Kiln. Ingots. Tools. It is not complicated.'],
+ MARCUS:["I'm not an NPC. I'm between protagonists.",'Your form is terrible. The sprouts respect it anyway.','Hydro jet solves most problems. The rest are personal.','King Bibi called that dome temporary. In writing.','You know what this place needs? A van.','Ore. Kiln. Ingots. It is not complicated.'],
  WILL:['I catalog every sprout in this valley. Twice.','The Lantern chose us. No pressure or anything.','If Marcus asks, I was absolutely working.'],
  LOUIE:['*sniff sniff*','WOOF.','(tail wag)','(found a stick)','ARF! ARF!']};
 function wCastTick(dt){if(!W4.cast)wCastInit();if(!SW.beats)SW.beats={};const op=Math.min(3,wOp());

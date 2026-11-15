@@ -96,7 +96,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  /* the pouch limits the squad; four deliveries grow a sprout */
  {S.pouch=8;S.buds={EMBER:6,PEB:0,DEW:6,ZIP:0,LEAF:0,LUCKY:0};step(3);ok('the seed pouch caps the squad',F.fld().sq.length===8,F.fld().sq.length);S.pouch=24;step(3)}
  /* the south road joins Sunkeep and the Meadow */
- {S.bottieSeen=1;F.enter('MEADOW');at(17,23,[0,1]);for(let i=0;i<60&&F.fld();i++)step(1,['down']);ok('the meadow south road leads home',!F.fld()&&F.pos().y>440,Math.round(F.pos().y));
+ {S.bottieSeen=1;F.enter('MEADOW');at(2,2,[0,-1]);for(let i=0;i<60&&F.fld();i++)step(1,['up']);ok('the meadow north-west gate leads home to the south gate of Sunkeep',!F.fld()&&F.pos().y>440,Math.round(F.pos().y));
   for(let i=0;i<90&&!F.fld();i++)step(1,['down']);ok('...and Sunkeep south road leads back out',F.fld()&&F.fld().id==='MEADOW')}
  /* gear and services found by playing on */
  {S.gear={};F.enter('MEADOW');at(28,9,[0,-1]);step(30,['up']);ok('no rope: ledges still do not climb',F.pos().y>8*T+8);
@@ -137,7 +137,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   ok('species bring their own work skills',F.wkSkills(wk[0]).KINDLING>=1&&F.wkSkills(wk[1]).QUARRY>=1&&F.wkSkills(wk[2]).HANDIWORK>=1,JSON.stringify(wk.map(w=>F.wkSkills(w))));
   F.dayT(20);F.setPos(60,460);S.res.ore=0;step(300);ok('the kiln sits idle without ore',!(S.buildings[0].prog>0),S.buildings[0].prog);S.res.ore=6;const i0=S.res.ingot,s0=S.res.stone;step(240);
   const kiln=S.buildings[0],quarry=S.buildings[2];
-  let seenK=false,seenQ=false;for(let i=0;i<300;i++){step(1);if(wk[0].task&&wk[0].task.b===kiln)seenK=true;if(wk[1].task&&wk[1].task.b===quarry)seenQ=true}
+  let seenK=false,seenQ=false;for(let i=0;i<700;i++){step(1);if(wk[0].task&&wk[0].task.b===kiln)seenK=true;if(wk[1].task&&wk[1].task.b===quarry)seenQ=true}
   ok('the fire buddy picks the kiln, the rock buddy the quarry',seenK&&seenQ,(wk[0].task&&wk[0].task.k)+','+(wk[1].task&&wk[1].task.k));
   step(2400);G.draw();ok('smelting uses up ore',S.res.ore<6,S.res.ore);ok('buildings make goods and workers haul them to the Lantern',S.res.ingot>i0&&S.res.stone>s0,(S.res.ingot-i0)+' ingot, '+(S.res.stone-s0)+' stone');
   S.res.berry=9;const t0=S.tonics;S.craftQ.push({id:'tonic',need:12,done:0});step(1500);

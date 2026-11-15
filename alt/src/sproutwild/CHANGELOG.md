@@ -21,6 +21,15 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v6.6 · 2026-11-15 · clear opening, Meadow faces the right way, no tools
+
+Will's notes: tools are not needed now the game is in action; leaving the base and arriving in the first area do not line up; the beginning is still cluttered and important things are covered.
+
+- **Opening told in captions, field left clear.** The floating speech bubbles in the opening are gone. Erin and Marcus speak one line at a time in the bottom caption box while the camera shows the thing they mean (the seeds, then the berries). A small yellow arrow bobs over what to do next (seed, berries, buddies). Erin and Marcus stand out at the sides, away from the seeds, berries and buddies.
+- **Meadow orientation.** You leave Sunkeep by the south road and now arrive at the Meadow's north-west gate, still heading south, with the Lantern post beside you and a path down to the main road. Walking north out of that gate brings you in at Sunkeep's south gate. The old gate at the bottom of the Meadow is closed off.
+- **Tools removed.** AXE and PICKAXE are gone from the bench. Buddies do the chopping and mining; the bench keeps tonic, seed pouch, climbing rope, lantern oil and lucky charm.
+- Verified: 82 lab checks (one updated for the new gate, one given more time since any buddy can now take a job); real-time run of the whole opening, the trip to the Meadow and the walk back.
+
 ## v6.5 · 2026-11-15 · the base actually works when you leave buddies home
 
 Playtest of the crafting chain (kiln, bench, tonic) with real keys.

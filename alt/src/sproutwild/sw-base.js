@@ -129,6 +129,7 @@ function wDrawBuilding0(b){const x=wCellX(b.gx),y=wCellY(b.gy),K='#14101e',on=b.
 /* ---------------- the Tinker Bench: a crafting queue ---------------- */
 const WRECIPES=[{id:'tonic',n:'TONIC',cost:{berry:3},need:12,d:'Heals a buddy 25 HP.'},{id:'axe',n:'AXE',need:24,d:'Each level: +1 damage to trees. Lv3 also yields +1.'},{id:'pick',n:'PICKAXE',need:24,d:'Each level: +1 damage to rocks. Lv3 also yields +1.'},
  {id:'oil',n:'LANTERN OIL',cost:{wood:2,berry:2},need:10,d:'Burns bright: +3 gratitude hearts.'},{id:'charm',n:'LUCKY CHARM',cost:{ingot:1,berry:5},need:20,d:'A LUCKY sprout hatches from it and joins your pouch.'}];
+WRECIPES.splice(0,WRECIPES.length,...WRECIPES.filter(rc=>rc.id!=='axe'&&rc.id!=='pick')); /* v6.6: tools are gone; buddies are the tools */
 function wRecipeCost(rc){if(rc.id==='rope'&&((SW.gear&&SW.gear.rope)||(SW.craftQ||[]).some(q=>q.id==='rope')))return null;if(rc.id==='pouch'&&(SW.pouch||8)+4*(SW.craftQ||[]).filter(q=>q.id==='pouch').length>=24)return null;if(rc.cost)return rc.cost;const lv=SW.tools[rc.id]+(SW.craftQ||[]).filter(q=>q.id===rc.id).length;if(lv>=3)return null;const c=wToolCost(rc.id,lv),o={wood:c.w,stone:c.s};if(c.i)o.ore=c.i;return o}
 function toolsUpdate(){const n=WRECIPES.length+3;swNav(n);if(!SW.craftQ)SW.craftQ=[];
  if(pressed('b')){state='g4world';return}

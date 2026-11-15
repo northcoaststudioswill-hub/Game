@@ -19,7 +19,7 @@ function scDraw(){const sc=W4.scene,st=sc.steps[sc.i];if(!st)return;
  r('#0a0e08',0,0,W,12);r('#0a0e08',0,H-12,W,12);
  if(st.txt)uiSay(st.who,st.txt,sc.t*55,'A  NEXT · START  SKIP',st.acc);}
 /* the Lantern wakes: look up at it, then down to the garden as the soil stirs */
-function scWake(){const pop=()=>{wInitPatch();for(const pb of W4.patchBuds||[])if(pb.type>=0){for(let i=0;i<5;i++)W4.floats.push({x:pb.x+(Math.random()*14-7),y:pb.y-4-Math.random()*12,txt:'*',t:.5+Math.random()*.6,c:TYPES[pb.type].l})}swSnd(784,.12,1568)};
+function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch();for(const pb of W4.patchBuds||[])if(pb.type>=0){for(let i=0;i<5;i++)W4.floats.push({x:pb.x+(Math.random()*14-7),y:pb.y-4-Math.random()*12,txt:'*',t:.5+Math.random()*.6,c:TYPES[pb.type].l})}swSnd(784,.12,1568)};
  scStart([
   {x:240,y:70,hold:1.9,fn:()=>{for(const c of WCHOICE){c.x=-200;c.y=-200}W4.wake=3;W4.banner=null;swSnd(523,.35,1046)}},
   {x:240,y:70,who:'ERIN',txt:'The Great Lantern is awake. Your berries did that.'},
@@ -50,11 +50,24 @@ function scSend(){SW.lessons.scSend=1;const far=(o)=>Math.hypot(o.x-P3.x,o.y-P3.
   {x:tr.x,y:tr.y,who:'MARCUS',txt:'Then throw sprouts at what it drops. They carry it home to the Lantern.'},{hold:.5}],()=>swSave())}
 /* nobody stands on top of you */
 function scSpread(){for(const c of W4.cast||[]){const dx=c.x-P3.x,dy=c.y-P3.y,d=Math.hypot(dx,dy);if(d<24){const ux=d>.5?dx/d:1,uy=d>.5?dy/d:0;c.x+=ux*(24-d)*.5;c.y+=uy*(24-d)*.5}}}
-function scAuto(){if(!W4.fld&&W4.bf){scSpread();if(SW.party.length&&!SW.lessons.scSend&&wOp()>=3&&W4.sector==='BASE'){W4.sendT=(W4.sendT||0)+1;if(W4.sendT>45)scSend()}}
+/* the opening is told in captions, one at a time, with the field left clear */
+function scIntro(){scStart([{hold:.9},{who:'ERIN',txt:"You're up! Look: the roots under the Great Lantern are glowing."},
+  {x:240,y:128,hold:1.1},{x:240,y:128,who:'MARCUS',txt:'Seeds. Walk up to one and press A to pluck it.'},{hold:.4}])}
+function scBerries(){const it=W4.bf.items.find(i=>i.op)||{x:165,y:192};scStart([{hold:.5},{who:'ERIN',txt:'They follow you! Those are sprouts.'},
+  {x:it.x+14,y:it.y,hold:1.1},{x:it.x+14,y:it.y,who:'MARCUS',txt:'Berries. Face them and press A. Your sprouts carry them to the Lantern.'},
+  {x:it.x+14,y:it.y,who:'ERIN',txt:'Hold B and they all come back to you.'},{hold:.4}])}
+function scArrow(){if(W4.scene||!W4.bf||wOp()>=3)return;const op=wOp();let t=null;
+ if(op===0)t=W4.bf.buds[0];else if(op===1)t=W4.bf.items.find(i=>i.op&&!i.car.length&&!i.done);else if(WCHOICE[1].y>0&&WCHOICE[1].y<190)t=WCHOICE[1];
+ if(!t)return;const x=Math.round(t.x),y=Math.round(t.y-(op===2?34:20)+Math.sin(time*6)*2),K='#14101e';
+ r(K,x-5,y-1,11,4);r(K,x-3,y+3,7,2);r(K,x-1,y+5,3,2);r('#ffd94d',x-4,y,9,2);r('#ffd94d',x-2,y+2,5,2);r('#ffd94d',x,y+4,1,2)}
+function scAuto(){if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
+  if(wOp()===0&&!SW.beats.wake){SW.beats.wake=1;SW.beats.first=1;scIntro();return}
+  if(wOp()===1&&!SW.beats.three){SW.beats.three=1;SW.beats.carry=1;SW.beats.first=1;scBerries();return}
+  if(wOp()===2)SW.beats.lit=1;if(SW.party.length&&!SW.lessons.scSend&&wOp()>=3&&W4.sector==='BASE'){W4.sendT=(W4.sendT||0)+1;if(W4.sendT>45)scSend()}}
  const F=W4.fld;if(F&&F.id==='MEADOW'&&!SW.lessons.scMeadow&&SW.quest>=2){F.scT=(F.scT||0)+1;if(F.scT>20)scMeadow(F)}}
 /* a seed of light arcs from the Lantern to you when it grows a sprout */
 function scSeed(ty){(W4.seedFx=W4.seedFx||[]).push({t:0,ty})}
-function scWorldFx(){if(!W4.seedFx)return;for(const fx of W4.seedFx){fx.t+=1/60;const k=Math.min(1,fx.t/1.1),x=240+(P3.x-240)*k,y=40+(P3.y-8-40)*k-Math.sin(k*3.1416)*46,T=TYPES[fx.ty];
+function scWorldFx(){scArrow();if(!W4.seedFx)return;for(const fx of W4.seedFx){fx.t+=1/60;const k=Math.min(1,fx.t/1.1),x=240+(P3.x-240)*k,y=40+(P3.y-8-40)*k-Math.sin(k*3.1416)*46,T=TYPES[fx.ty];
   for(let i=1;i<5;i++){const k2=Math.max(0,k-i*.035),x2=240+(P3.x-240)*k2,y2=40+(P3.y-8-40)*k2-Math.sin(k2*3.1416)*46;g.globalAlpha=.6-i*.12;r(T.l,Math.round(x2),Math.round(y2),2,2)}
   g.globalAlpha=1;r('#ffffff',Math.round(x)-2,Math.round(y)-2,5,5);r(T.c,Math.round(x)-1,Math.round(y)-1,3,3)}
  W4.seedFx=W4.seedFx.filter(fx=>fx.t<1.1)}
