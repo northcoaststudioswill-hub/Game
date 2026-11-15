@@ -92,7 +92,7 @@ function scWorldFx(){scArrow();if(!W4.seedFx)return;for(const fx of W4.seedFx){f
    Placing a building no longer pops it into being: a scaffold goes up,
    your sprouts hop on it with hammers, base buddies walk over to help,
    and it rises over a few seconds. More helpers, faster build. */
-function scConStart(b,def,first){W4.cons=W4.cons||[];W4.cons.push({b,def,first,t:0,need:4.2});b.con=1;
+function scConStart(b,def,first){W4.cons=W4.cons||[];W4.cons.push({b,def,first,t:0,need:9+Object.values(def.cost||{}).reduce((a,v)=>a+v,0)*.45});b.con=1;
  for(const w of W4.wk||[]){w.task={k:'idle',x:wCellX(b.gx)+10+(Math.random()*40-20),y:wCellY(b.gy)+28+Math.random()*6,t:4.5}}}
 function scConTick(dt){if(!W4.cons||!W4.cons.length)return;const F=W4.bf;
  for(const c of W4.cons){const x=wCellX(c.b.gx)+10,y=wCellY(c.b.gy)+10,help=(W4.wk||[]).filter(w=>Math.hypot(w.x-x,w.y-y-18)<40).length;
@@ -106,7 +106,7 @@ function scConTick(dt){if(!W4.cons||!W4.cons.length)return;const F=W4.bf;
 function scConDraw(b){if(!(W4.cons||[]).some(c=>c.b===b)){delete b.con;wDrawBuilding0(b);return}const x=wCellX(b.gx),y=wCellY(b.gy),k=1-b.con,K='#14101e',hh=Math.round(30*k);
  r('rgba(0,0,0,.24)',x-4,y+17,30,5);
  /* the building rises out of the ground */
- if(hh>0){const sv=g.save.bind(g);sv();g.beginPath();g.rect(x-12,y+20-hh,46,hh+2);g.clip();wDrawBuilding0(b);g.restore()}
+ if(hh>0){const sv=g.save.bind(g);sv();g.beginPath();g.rect(x-12,y+20-hh,46,hh+2);g.clip();if(b.k==='datacenter')dcDraw(b);else wDrawBuilding0(b);g.restore()}
  /* scaffold poles and planks */
  r('#8a6a48',x-6,y-12,2,32);r('#8a6a48',x+24,y-12,2,32);r('#a8865c',x-7,y+18-hh,34,2);r('#a8865c',x-7,y-2,34,1);
  /* three sprouts on the job */

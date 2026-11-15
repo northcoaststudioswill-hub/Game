@@ -299,7 +299,7 @@ function fLand(F,s){const a=s.aim||{};s.z=0;s.aim=null;
  let tg=a.tg,kind=a.kind;
  if(!tg){for(const it of F.items)if(!it.done&&near(it,18)){tg=it;kind='item'}
   if(!tg)for(const nd of W4.nodes)if(!nd.got&&nd.k==='bush'&&near(nd,18)){tg=nd;kind='node'}}
- if(kind==='wild'&&W4.wilds.includes(tg)){pfLatch(F,s,tg);return}
+ if(kind==='wild'&&W4.wilds.includes(tg)){if(wBuddyFull()){wFullSay();s.st='ret';return}pfLatch(F,s,tg);return}
  if(kind==='gate'){if(tg.open){s.st='idle';s.t=0;return}
   if(tg.type!==s.type){s.st='ret';W4.floats.push({x:tg.x,y:tg.y-20,txt:tg.n+' — NEEDS '+TYPES[tg.type].n+' SPROUTS',t:1.6,c:'#ffd94d'});swSnd(200,.06);return}}
  if(kind==='item'&&tg.guard&&F.alphas.includes(tg.guard)){s.st='ret';W4.floats.push({x:tg.x,y:tg.y-20,txt:'THE ALPHA GUARDS IT!',t:1.4,c:'#e88'});return}
@@ -484,7 +484,7 @@ function fRing(F){if(F.sq.length||(F.pf&&F.pf.length)){const a=fAim(F),T=a.kind=
   if(a.tg){const c=a.need>=0?'#e04838':T.l,rr=a.kind==='site'?14:11;
    for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){r('#14101e',ax+sx*(rr+ph)-2,ay-6+sy*(rr-2+ph)-2,5,5);r(c,ax+sx*(rr+ph)-1,ay-6+sy*(rr-2+ph)-1,3,1);r(c,ax+sx*(rr+ph)-(sx<0?1:-1),ay-6+sy*(rr-2+ph)-1,1,3)}
    for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.6)',Math.round(px),Math.round(py),1,1)}
-   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?(pfCan(F,a.tg)?'CATCH Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts':'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
+   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?(wBuddyFull()?'No room for more buddies · build a DATA CENTER':pfCan(F,a.tg)?'CATCH Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts':'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
    F.aimLab=lab;F.aimNeed=a.need>=0}
   else{F.aimLab=null;r('rgba(255,255,255,.35)',ax-1,ay-1,2,2)}}else F.aimLab=null;
  if(F.whistle){g.strokeStyle='rgba(255,244,180,.8)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-2,F.whistle,0,7);g.stroke();

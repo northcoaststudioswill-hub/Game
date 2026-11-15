@@ -6715,6 +6715,7 @@ function worldUpdate(dt){if(W4.scene){scTick(dt);return}scAuto();if(W4.fld){fUpd
    if(b.k==='cottage'){swSel=0;state='g4cot'}
    else if(b.k==='nursery'){W4.nurB=SW.buildings.indexOf(b);swSel=0;state='g4nur'}
    else if(b.k==='bench'){swSel=0;state='g4tools'}
+   else if(b.k==='datacenter'){swSel=0;state='g4party'}
    else if(wBuildDef(b.k).yields){W4.assignB=SW.buildings.indexOf(b);swSel=0;state='g4assign'}
    else swSay(wBuildDef(b.k).n+' — '+wBuildDef(b.k).d,3)}
   return}
@@ -7289,7 +7290,7 @@ function wKeeperMove(){if(BT.keeperUsed){swSnd(140,.08);return}
   foe.hp=Math.max(0,foe.hp-r2.dmg);
   BT.log.push({txt:'MARCUS used HYDRO JET! ('+r2.dmg+')'});
   if(foe.hp<=0)wFoeDown();else BT.after='keeperfoe'}}
-function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.shake>0)BT.shake=Math.max(0,BT.shake-dt*6);
+function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.phase==='menu'&&BT._lp!=='menu')swSel=0;BT._lp=BT.phase; /* the battle menu always opens on FIGHT */if(BT.shake>0)BT.shake=Math.max(0,BT.shake-dt*6);
  if(BT.phase==='intro'){if(BT.t>.7){BT.phase='msg'}return}
  if(BT.phase==='msg'){
   if((pressed('a')&&BT.t>.25)||BT.t>2.6){BT.t=0;BT.log.shift();
@@ -7310,7 +7311,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.shake>0)
   if(pressed('a')){const o=opts[swSel];
    if(o==='FIGHT'){BT.phase='moves';swSel=0}
    else if(o==='KEEPER')wKeeperMove();
-   else if(o==='SPROUT'){if(wBudTotal()<=0){BT.log=[{txt:'No sprouts with you. Pluck some, or carry things home so the Lantern grows more.'}];BT.after='menu';BT.phase='msg';BT.t=0}
+   else if(o==='SPROUT'){if(wBuddyFull()){BT.log=[{txt:wHasDC()?'The Data Center is full.':'No room for another buddy. Build a DATA CENTER at Sunkeep first.'}];BT.after='menu';BT.phase='msg';BT.t=0}else if(wBudTotal()<=0){BT.log=[{txt:'No sprouts with you. Pluck some, or carry things home so the Lantern grows more.'}];BT.after='menu';BT.phase='msg';BT.t=0}
     else{BT.phase='budpick';swSel=0}}
    else if(o==='BUDDY'){const ok=SW.party.findIndex((m,i)=>i!==BT.aiIx&&m.hp>0);if(ok<0){swSnd(140,.08);BT.noSwap=1.6}else{BT.phase='party';swSel=ok;BT.partyFrom='menu'}}
    else if(o==='RUN'){if(Math.random()<.7){if(BT.mode==='raid'){const lost=Math.min(15,SW.res.petal);SW.res.petal-=lost;BT.log=[{txt:'You fled — Bottie trashed the place on his way out. (-'+lost+' petals)'}]}else BT.log=[{txt:'Got away safely!'}];BT.after='endwin';BT.phase='msg';BT.t=0}
@@ -7334,7 +7335,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.shake>0)
   swNav(list.length);
   if(pressed('b')&&!BT.forced&&BT.partyFrom==='menu'){BT.phase='menu';return}
   if(pressed('a')){const ix=swSel,m=list[ix];
-   if(ix===BT.aiIx||m.hp<=0){swSnd(140,.08);return}
+   if((ix===BT.aiIx&&!BT.forced)||m.hp<=0){swSnd(140,.08);return}
    BT.aiIx=ix;BT.myStage={atk:0,def:0};
    if(BT.forced){BT.forced=false;BT.phase='menu';BT.log=[];return}
    BT.log=[{txt:'Go, '+m.sp+'!'}];BT.phase='msg';BT.t=0;
@@ -8266,7 +8267,7 @@ function fLand(F,s){const a=s.aim||{};s.z=0;s.aim=null;
  let tg=a.tg,kind=a.kind;
  if(!tg){for(const it of F.items)if(!it.done&&near(it,18)){tg=it;kind='item'}
   if(!tg)for(const nd of W4.nodes)if(!nd.got&&nd.k==='bush'&&near(nd,18)){tg=nd;kind='node'}}
- if(kind==='wild'&&W4.wilds.includes(tg)){pfLatch(F,s,tg);return}
+ if(kind==='wild'&&W4.wilds.includes(tg)){if(wBuddyFull()){wFullSay();s.st='ret';return}pfLatch(F,s,tg);return}
  if(kind==='gate'){if(tg.open){s.st='idle';s.t=0;return}
   if(tg.type!==s.type){s.st='ret';W4.floats.push({x:tg.x,y:tg.y-20,txt:tg.n+' — NEEDS '+TYPES[tg.type].n+' SPROUTS',t:1.6,c:'#ffd94d'});swSnd(200,.06);return}}
  if(kind==='item'&&tg.guard&&F.alphas.includes(tg.guard)){s.st='ret';W4.floats.push({x:tg.x,y:tg.y-20,txt:'THE ALPHA GUARDS IT!',t:1.4,c:'#e88'});return}
@@ -8451,7 +8452,7 @@ function fRing(F){if(F.sq.length||(F.pf&&F.pf.length)){const a=fAim(F),T=a.kind=
   if(a.tg){const c=a.need>=0?'#e04838':T.l,rr=a.kind==='site'?14:11;
    for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){r('#14101e',ax+sx*(rr+ph)-2,ay-6+sy*(rr-2+ph)-2,5,5);r(c,ax+sx*(rr+ph)-1,ay-6+sy*(rr-2+ph)-1,3,1);r(c,ax+sx*(rr+ph)-(sx<0?1:-1),ay-6+sy*(rr-2+ph)-1,1,3)}
    for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.6)',Math.round(px),Math.round(py),1,1)}
-   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?(pfCan(F,a.tg)?'CATCH Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts':'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
+   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?(wBuddyFull()?'No room for more buddies · build a DATA CENTER':pfCan(F,a.tg)?'CATCH Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts':'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
    F.aimLab=lab;F.aimNeed=a.need>=0}
   else{F.aimLab=null;r('rgba(255,255,255,.35)',ax-1,ay-1,2,2)}}else F.aimLab=null;
  if(F.whistle){g.strokeStyle='rgba(255,244,180,.8)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-2,F.whistle,0,7);g.stroke();
@@ -8998,7 +8999,7 @@ function wkDraw(front){for(const w of W4.wk||[]){if((w.y>P3.y)!==front)continue;
   else if(w.at&&tk&&tk.b){const key=tk.k==='craft'?'HANDIWORK':tk.k==='tend'?'WATERING':(wBuildDef(tk.b.k).skill||['PLANTING'])[0],c=WKC[tk.b.k==='sawmill'?'LUMBERING':key];
    r('#14101e',X-4,top-7,8,8);r(c,X-3,top-6,6,6);r('#ffffff',X-2,top-5,2,1);if(hop)r('#ffffff',X+5,top+2,2,2)}}}
 /* ---------------- buildings: bigger, outlined, alive ---------------- */
-function wDrawBuilding(b){if(b.con>0){scConDraw(b);return}wDrawBuilding0(b)}
+function wDrawBuilding(b){if(b.con>0){scConDraw(b);return}if(b.k==='datacenter'){dcDraw(b);return}wDrawBuilding0(b)}
 function wDrawBuilding0(b){const x=wCellX(b.gx),y=wCellY(b.gy),K='#14101e',on=b.busy>0,def=wBuildDef(b.k),t=time;
  r('rgba(0,0,0,.24)',x-4,y+17,30,5);
  if(b.k==='cottage'){r(K,x-4,y-1,28,22);r('#9a9aa2',x+15,y-13,6,9);r(K,x+14,y-14,8,2);r('#c8c8d0',x+15,y-13,2,9);
@@ -9749,7 +9750,7 @@ function pfDraw(b,feet){const spr=wSp(b.m.sp)._spr,w=Math.round(spr.ow*PSC),h=Ma
 /* ---------------- open-field capture ---------------- */
 function pfNeed(wd){return 1+wd.lv}
 function pfPin(wd){const F=W4.fld;return F&&F.pf&&F.pf.some(b=>b.st==='follow'&&Math.hypot(b.x-wd.x,b.y-wd.y)<70)?1:0}
-function pfCan(F,wd){const ty=wSp(wd.sp).t;return F.sq.filter(s=>s.st==='follow'||s.st==='latch').reduce((a,s)=>a+(ty.includes(s.type)?2:1),0)+pfPin(wd)>=pfNeed(wd)}
+function pfCan(F,wd){if(wBuddyFull())return false;const ty=wSp(wd.sp).t;return F.sq.filter(s=>s.st==='follow'||s.st==='latch').reduce((a,s)=>a+(ty.includes(s.type)?2:1),0)+pfPin(wd)>=pfNeed(wd)}
 function pfStr(wd){const ty=wSp(wd.sp).t;return(wd.lat||[]).reduce((a,s)=>a+(ty.includes(s.type)?2:1),0)+((wd.lat||[]).length?pfPin(wd):0)}
 function pfLatch(F,s,wd){wd.lat=wd.lat||[];if(!wd.lat.includes(s))wd.lat.push(s);s.st='latch';s.tg=wd;s.lt=0;wd.lt=0;wd.mv=false;
  if(wd.lat.length===1){swSnd(660,.06,990);if(!SW.lessons.fswarm){SW.lessons.fswarm=1;swSay('Latched on! Fill the bar and it blooms.',2.4)}}}
@@ -9876,7 +9877,7 @@ function scWorldFx(){scArrow();if(!W4.seedFx)return;for(const fx of W4.seedFx){f
    Placing a building no longer pops it into being: a scaffold goes up,
    your sprouts hop on it with hammers, base buddies walk over to help,
    and it rises over a few seconds. More helpers, faster build. */
-function scConStart(b,def,first){W4.cons=W4.cons||[];W4.cons.push({b,def,first,t:0,need:4.2});b.con=1;
+function scConStart(b,def,first){W4.cons=W4.cons||[];W4.cons.push({b,def,first,t:0,need:9+Object.values(def.cost||{}).reduce((a,v)=>a+v,0)*.45});b.con=1;
  for(const w of W4.wk||[]){w.task={k:'idle',x:wCellX(b.gx)+10+(Math.random()*40-20),y:wCellY(b.gy)+28+Math.random()*6,t:4.5}}}
 function scConTick(dt){if(!W4.cons||!W4.cons.length)return;const F=W4.bf;
  for(const c of W4.cons){const x=wCellX(c.b.gx)+10,y=wCellY(c.b.gy)+10,help=(W4.wk||[]).filter(w=>Math.hypot(w.x-x,w.y-y-18)<40).length;
@@ -9890,7 +9891,7 @@ function scConTick(dt){if(!W4.cons||!W4.cons.length)return;const F=W4.bf;
 function scConDraw(b){if(!(W4.cons||[]).some(c=>c.b===b)){delete b.con;wDrawBuilding0(b);return}const x=wCellX(b.gx),y=wCellY(b.gy),k=1-b.con,K='#14101e',hh=Math.round(30*k);
  r('rgba(0,0,0,.24)',x-4,y+17,30,5);
  /* the building rises out of the ground */
- if(hh>0){const sv=g.save.bind(g);sv();g.beginPath();g.rect(x-12,y+20-hh,46,hh+2);g.clip();wDrawBuilding0(b);g.restore()}
+ if(hh>0){const sv=g.save.bind(g);sv();g.beginPath();g.rect(x-12,y+20-hh,46,hh+2);g.clip();if(b.k==='datacenter')dcDraw(b);else wDrawBuilding0(b);g.restore()}
  /* scaffold poles and planks */
  r('#8a6a48',x-6,y-12,2,32);r('#8a6a48',x+24,y-12,2,32);r('#a8865c',x-7,y+18-hh,34,2);r('#a8865c',x-7,y-2,34,1);
  /* three sprouts on the job */
@@ -9899,6 +9900,100 @@ function scConDraw(b){if(!(W4.cons||[]).some(c=>c.b===b)){delete b.con;wDrawBuil
   r(K,sx-1,sy-1,6,7);r(T.c,sx,sy,4,5);r(T.l,sx+1,sy,2,1);
   const sw2=((time*8+i)|0)%2;r('#8a6a48',sx+4,sy-3+sw2,1,4);r('#c8ccd4',sx+3,sy-4+sw2,3,2)});
  const pct=Math.round(k*100)+'%';r('rgba(10,14,8,.75)',x+10-tw(pct,1)/2-2,y-24,tw(pct,1)+4,9);text(pct,x+10-tw(pct,1)/2,y-23,1,'#ffd94d',null)}
+/* ================================================================
+   STARTERS, THE REVEAL, AND THE DATA CENTER (v7.0)
+   The three first partners are creatures out of north-east Ohio lore.
+   They are stronger than common buddies, good at two jobs each, learn
+   a move nobody else gets, and never appear in the wild.
+     CUYAPUP   EMBER  the Cuyahoga, "crooked river", which caught fire
+     BESSLING  DEW    South Bay Bessie, the Lake Erie monster
+     GRASSKIN  LEAF   the Grassman, Ohio's woods-walker
+   Greeting one plays a short reveal: silhouette, flash, name, then
+   its legend, type, jobs, moves and stats, one line at a time.
+   The DATA CENTER is a building that stores buddies beyond three.
+   ================================================================ */
+Object.assign(WMOVES,{
+ riverfire:{n:'RIVER FIRE',t:0,p:55,acc:100,d:'The river is on fire. Again.'},
+ lakewake:{n:'LAKE WAKE',t:2,p:55,acc:100,d:'Something big just moved under the water.'},
+ bigstomp:{n:'BIG STOMP',t:4,p:55,acc:100,d:'A footprint people will argue about.'}});
+const WSTARTERS={
+ CUYAPUP:{tag:'THE BURNING RIVER PUP',lore:'Born the night the crooked river caught fire.',sig:'riverfire'},
+ BESSLING:{tag:"THE LAKE MONSTER'S PUP",lore:'Pup of the great lake serpent. Reward still out.',sig:'lakewake'},
+ GRASSKIN:{tag:'THE LITTLE GRASSMAN',lore:'A shaggy woods-walker of the eastern hills.',sig:'bigstomp'}};
+const WSTARTART={
+CUYAPUP(D){const fur='#5c4238',cr='#f0d8b0',og='#f8902c';
+ D.l(17.5,18.5,21.5,13.5,2.4,fur);D.p([[21.4,14],[19.6,10],[21.6,11.4],[22.6,8.6],[23.4,13.4]],og);D.p([[21.6,13.2],[21.2,11.2],[22.6,12]],'#ffe070');
+ D.l(9,20.5,9,22.6,2.4,'#40302a');D.l(15,20.5,15,22.6,2.4,'#40302a');D.b(12.5,16.6,6.2,4.6,fur);D.e(11.4,18.2,3.6,2.3,cr);D.e(15,14.6,1.6,.8,'#8a6aa8');
+ D.p([[8.6,5.6],[7.2,1.4],[9.8,3.2],[10.8,.6],[12.2,5.2]],og);D.p([[9.6,5.4],[9.4,3],[11,4.4]],'#ffe070');
+ D.e(5,5.8,1.4,1.3,fur);D.e(12.8,5.4,1.4,1.3,fur);D.b(9,9.6,5.6,4.8,fur);D.e(7,11.3,3.1,2.1,cr);D.e(5.5,10.5,.9,.7,'#2a1a1a');
+ D.eye(7.1,8.8,1.5);D.eye(11.4,8.8,1.5);D.r(6.2,12.4,1.8,.6,'#8a4a40')},
+BESSLING(D){const tl='#3aa0a8',dk='#287880',cr='#c8f0e8';
+ D.p([[20,17],[23.6,13.2],[22.6,18.6]],tl);D.p([[9,20],[5.4,22.8],[10.6,22]],dk);D.p([[17,20.6],[20,23],[21,20.4]],dk);
+ D.b(14,18,7,4.2,tl);D.e(13,19.8,5,1.9,cr);
+ D.p([[11.6,14],[13,11.4],[14.4,14]],'#ffe070');D.p([[15.2,14.4],[16.4,12.4],[17.6,14.6]],'#ffe070');
+ D.l(9.6,16.4,7.6,8,3.6,tl);D.l(9.2,16,7.6,9.4,1.4,cr);D.b(6.6,6.2,3.9,3.2,tl);D.e(4.1,7.3,2,1.4,cr);
+ D.p([[6.8,3.4],[8,.8],[9.4,3.4]],'#ffe070');D.eye(5.8,5.6,1.5);D.eye(8.8,5.5,1.2);D.r(3.4,8,1.6,.6,dk)},
+GRASSKIN(D){const fur='#6a8c3a',dk='#4a6a2a',fc='#e0c090';
+ D.e(8.4,22.6,2.8,1.2,'#4a3a22');D.e(15.6,22.6,2.8,1.2,'#4a3a22');
+ D.l(6,14,4.4,19.6,2.6,fur);D.l(18,14,19.8,19.6,2.6,fur);D.b(12,15.6,7,6.6,fur);
+ D.p([[6.4,17.6],[5,21],[7.8,20]],dk);D.p([[17.6,17.6],[19,21],[16.2,20]],dk);D.p([[10,20],[12,22.6],[14,20]],dk);
+ D.b(12,8.2,5.8,5,fur);D.e(11,9.5,3.8,3,fc);D.r(7.8,7,6.4,1,'#3a5220');
+ D.eye(9.3,8.9,1.4);D.eye(12.8,8.9,1.4);D.r(10,11.3,2.4,.7,'#6a3a30');
+ D.l(12,3.6,12,1.4,.9,'#3a7d2e');D.e(10.2,1.6,2,1.1,'#8fd45e');D.e(13.8,1.4,2,1.1,'#8fd45e')}};
+{const fb=["..ss..",".sggs.","sggggs",".sggs."],mk=(id,t,hp,atk,def,spd,work,learn,d,c)=>{const s={id,t:[t],hp,atk,def,spd,catch:.3,work,learn,d,spr:fb.slice(),pal:{s:'#14101e',g:c},starter:1};
+  s._old=SWSPR(s.spr,s.pal);s._spr=swbMake(WSTARTART[id]);WSPECIES.push(s)};
+ mk('CUYAPUP',0,34,14,10,12,{KINDLING:2,WATERING:1},[[1,'tackle'],[1,'embershot'],[5,'quicknip'],[8,'riverfire'],[12,'flameburst'],[16,'magmaburst']],'A river pup with a tail that never goes out. Leaves a rainbow sheen on puddles.','#f8902c');
+ mk('BESSLING',2,38,12,12,10,{WATERING:2,FORTUNE:1},[[1,'tackle'],[1,'bubblesnap'],[5,'shellup'],[8,'lakewake'],[12,'tideslam'],[16,'tidalsurge']],'A lake serpent pup. Fishermen swear they saw it. Nobody believes them.','#3aa0a8');
+ mk('GRASSKIN',4,40,14,12,8,{PLANTING:2,QUARRY:1},[[1,'tackle'],[1,'vinelash'],[5,'warcry'],[8,'bigstomp'],[12,'headbutt'],[16,'thornstorm']],'A knee-high Grassman. Hides behind trees it is wider than.','#6a8c3a');
+ WCHOICE[0].sp='CUYAPUP';WCHOICE[1].sp='BESSLING';WCHOICE[2].sp='GRASSKIN';
+ Object.assign(WBLURB,{CUYAPUP:'Fast and fierce. Runs the kiln and waters the garden.',BESSLING:'Tough and lucky. The best waterer there is.',GRASSKIN:'The strongest of the three. Plants, chops and hauls stone.'})}
+/* ---------------- the reveal ---------------- */
+function choiceUpdate(){const full=(W4.revT||0)>3.6;
+ if(pressed('b')){W4.revT=null;state='g4world';return}
+ if(pressed('a')){if(!full){W4.revT=4;return}const sp=W4.choiceSp;W4.revT=null;state='g4world';wBefriend(sp)}}
+function drawChoice(){const sp=W4.choiceSp,s2=wSp(sp),spr=s2._spr,T=TYPES[s2.t[0]],L=WSTARTERS[sp]||{tag:'FIRST PARTNER',lore:s2.d},K='#07060c';
+ if(W4.revT==null||W4.revSp!==sp){W4.revT=0;W4.revSp=sp;swSnd(110,.5,55)}const t0=W4.revT;W4.revT+=1/60;const t=W4.revT,tick=(at)=>t0<at&&t>=at;
+ r(K,0,0,W,H);
+ /* light behind it */
+ const k0=Math.min(1,t/.6),cx=W/2,cy=76;g.globalAlpha=.5*k0;r(T.d,0,22,W,108);g.globalAlpha=1;
+ if(t>.6)uiRays(cx,cy,150,12,T.l,.16+.05*Math.sin(time*3));
+ /* it slides in as a shadow, then the flash shows its colours */
+ const sc=4,w=spr.ow*sc,h=spr.oh*sc,slide=t<.6?(1-k0)*(1-k0)*150:0,bob=t>.6?Math.round(Math.sin(time*2.4)*2):0,x=Math.round(cx-w/2+slide),y=Math.round(cy-h/2+bob);
+ r('rgba(0,0,0,.35)',cx-34,cy+h/2-8,68,7);
+ if(t<.6){g.drawImage(spr.hol,x,y,w,h);g.globalCompositeOperation='source-atop';g.globalCompositeOperation='source-over';g.globalAlpha=.86;r(K,x,y,w,h);g.globalAlpha=1;g.drawImage(spr.hol,x,y,w,h);g.globalAlpha=.9;g.fillStyle=K;g.globalAlpha=1}
+ else g.drawImage(spr.ol,x,y,w,h);
+ if(t<.6){g.globalAlpha=.93;r(K,0,22,W,108);g.globalAlpha=1;g.globalAlpha=.25;g.drawImage(spr.hol,x,y,w,h);g.globalAlpha=1}
+ if(tick(.6)){swSnd(880,.25,1760);swSnd(220,.3,110)}
+ if(t>=.6&&t<.9){g.globalAlpha=1-(t-.6)/.3;r('#ffffff',0,0,W,H);g.globalAlpha=1}
+ /* letterbox and name */
+ r(K,0,0,W,22);r(K,0,130,W,H-130);r(T.c,0,22,W,1);r(T.c,0,130,W,1);
+ if(t>=.75){const sh=t<1.05?Math.round((1.05-t)*14*Math.sin(t*90)):0;g.save();g.translate(W/2,136+sh);g.scale(2,2);text(sp,-tw(sp,1)/2,0,1,'#ffffff',null);g.restore();ctext(L.tag,158,1,T.l)}
+ if(tick(.75))swSnd(330,.2,165);
+ text('FIRST PARTNER',6,7,1,'#8a86a0',null);const tn=WT[s2.t[0]];text(tn,W-6-tw(tn,1),7,1,T.l,null);
+ /* the facts, one line at a time */
+ const rows=[['LEGEND',L.lore],['JOBS',Object.entries(s2.work).map(([k2,v])=>k2+' '+v).join(' · ')],
+  ['MOVES',s2.learn.filter(([lv])=>lv<=5).map(([,m])=>WMOVES[m].n).join(' · ')],['LEARNS',L.sig?WMOVES[L.sig].n+' · Lv8 · only it':'']];
+ let yy=174;rows.forEach(([lab,val],i)=>{const at=1.3+i*.45,lines=swWrap(val,W-62).slice(0,2);if(tick(at))swSnd(660+i*90,.04,880+i*90);
+  if(t>=at){const a=Math.min(1,(t-at)/.2);g.globalAlpha=a;text(lab,8,yy,1,T.l,null);lines.forEach((l,j)=>text(l,56,yy+j*10,1,'#e8e4f4',null));g.globalAlpha=1}yy+=lines.length*10+4});
+ const st=[['HP',s2.hp,44],['ATK',s2.atk,16],['DEF',s2.def,16],['SPD',s2.spd,14]];
+ st.forEach(([lab,v,mx],i)=>{const at=3.1+i*.08;if(t<at)return;const k=Math.min(1,(t-at)/.35),bx=8+(i%2)*116,by=H-42+((i/2)|0)*11;
+  text(lab,bx,by,1,'#a8a4c0',null);r('#2a2838',bx+26,by+1,60,5);r(T.c,bx+26,by+1,Math.round(60*Math.min(1,v/mx)*k),5);text(''+v,bx+90,by,1,'#ffffff',null)});
+ if(tick(3.1))swSnd(523,.12,784);
+ if(t>3.6){r('#14121e',0,H-18,W,18);const a='A  BEFRIEND',b='B  SEE THE OTHERS';text(a,8,H-13,1,'#7ee787',null);text(b,W-8-tw(b,1),H-13,1,'#a89ec2',null)}
+ else{const s='A  SKIP';text(s,W-8-tw(s,1),H-13,1,'#5a5870',null)}}
+/* ---------------- the Data Center: where buddies beyond three are kept ---------------- */
+WBUILD.push({k:'datacenter',n:'DATA CENTER',cost:{wood:10,stone:6,ingot:2},max:1,d:'A humming box of Lantern light. Keeps up to 12 more buddies. Without one you can only have three.'});
+function wHasDC(){return SW.buildings.some(b=>b.k==='datacenter'&&!b.con)}
+function wBuddyCap(){return wHasDC()?15:3}
+let WNOCAP=false;
+function wBuddyFull(){return!WNOCAP&&SW.party.length+SW.box.length>=wBuddyCap()}
+function wFullSay(){if(time>(W4.fullAt||0)){W4.fullAt=time+6;swSay(wHasDC()?'The Data Center is full.':'No room for another buddy. Build a DATA CENTER at Sunkeep to keep more than three.',3.4);swSnd(200,.08,140)}}
+function dcDraw(b){const x=wCellX(b.gx),y=wCellY(b.gy),K='#14101e',t=time;
+ r('rgba(0,0,0,.24)',x-4,y+17,30,5);r(K,x-2,y-6,24,27);r('#5a6478',x-1,y-5,22,25);r('#7c88a0',x-1,y-5,22,2);r('#3e4656',x-1,y+17,22,3);
+ for(let i=0;i<3;i++){const yy=y-1+i*6;r(K,x+2,yy,16,5);r('#20242e',x+3,yy+1,14,3);
+  r(((t*3+i*1.7)|0)%3?'#7ee787':'#1d5a2a',x+4,yy+2,2,1);r(((t*5+i)|0)%4?'#ffd94d':'#6a5a1a',x+8,yy+2,2,1);r(((t*2+i*2.3)|0)%2?'#58a0f0':'#1e3a66',x+12,yy+2,3,1)}
+ r(K,x+9,y-12,2,7);r('#c8ccd4',x+9,y-11,1,5);g.globalAlpha=.5+.5*Math.sin(t*4);r('#fff3b0',x+8,y-14,3,3);g.globalAlpha=1;
+ const n=SW.box.length;if(n){const s=''+n,lw=tw(s,1);r(K,x+10-lw/2-2,y+20,lw+4,9);text(s,x+10-lw/2,y+21,1,'#7ee787',null)}}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */
@@ -9964,7 +10059,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={noScenes:v=>{SCOFF=v},scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={noScenes:v=>{SCOFF=v},noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},

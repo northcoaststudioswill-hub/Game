@@ -43,7 +43,7 @@ function pfDraw(b,feet){const spr=wSp(b.m.sp)._spr,w=Math.round(spr.ow*PSC),h=Ma
 /* ---------------- open-field capture ---------------- */
 function pfNeed(wd){return 1+wd.lv}
 function pfPin(wd){const F=W4.fld;return F&&F.pf&&F.pf.some(b=>b.st==='follow'&&Math.hypot(b.x-wd.x,b.y-wd.y)<70)?1:0}
-function pfCan(F,wd){const ty=wSp(wd.sp).t;return F.sq.filter(s=>s.st==='follow'||s.st==='latch').reduce((a,s)=>a+(ty.includes(s.type)?2:1),0)+pfPin(wd)>=pfNeed(wd)}
+function pfCan(F,wd){if(wBuddyFull())return false;const ty=wSp(wd.sp).t;return F.sq.filter(s=>s.st==='follow'||s.st==='latch').reduce((a,s)=>a+(ty.includes(s.type)?2:1),0)+pfPin(wd)>=pfNeed(wd)}
 function pfStr(wd){const ty=wSp(wd.sp).t;return(wd.lat||[]).reduce((a,s)=>a+(ty.includes(s.type)?2:1),0)+((wd.lat||[]).length?pfPin(wd):0)}
 function pfLatch(F,s,wd){wd.lat=wd.lat||[];if(!wd.lat.includes(s))wd.lat.push(s);s.st='latch';s.tg=wd;s.lt=0;wd.lt=0;wd.mv=false;
  if(wd.lat.length===1){swSnd(660,.06,990);if(!SW.lessons.fswarm){SW.lessons.fswarm=1;swSay('Latched on! Fill the bar and it blooms.',2.4)}}}

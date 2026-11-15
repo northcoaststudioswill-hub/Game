@@ -4,12 +4,12 @@ const { chromium } = require('playwright');
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:440,height:956}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
 await p.goto('file://'+process.argv[2]);await p.waitForTimeout(700);
 await p.evaluate(()=>{const e=document.querySelector('.cart[data-i="4"]');e.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}))});await p.waitForTimeout(900);
-const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F.noScenes(true);
+const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F.noScenes(true);F.noCap(true);
  const ok=(n,c,x)=>out.push((c?'PASS ':'FAIL ')+n+(x!==undefined?'  ['+x+']':''));
  const step=(n,keys)=>{for(let i=0;i<n;i++){for(const k in G.keys)G.keys[k]=0;if(keys)for(const k of keys)G.keys[k]=1;G.update(1/30);for(const k in G.keys)G.prev[k]=G.keys[k]}for(const k in G.keys)G.keys[k]=0;G.update(1/30);for(const k in G.keys)G.prev[k]=0};
  const tap=k=>{step(1,[k]);step(1)};
  const T=16,at=(tx,ty,d)=>{F.setPos(tx*T+8,ty*T+10);const f2=F.fld();if(d)f2.dir=d;for(const s of f2.sq)if(s.st==='follow'){s.x=F.pos().x;s.y=F.pos().y+6}};
- const fight=()=>{for(let n=0;n<300&&F.state()==='g4battle';n++){const bt=F.bt();if(bt.foe)bt.foe.hp=Math.min(bt.foe.hp,1);S.party[0].hp=200;if(bt.phase==='moves')tap(['right','down','left','up'][n%4]);tap('a');step(3)}};
+ const fight=()=>{for(let n=0;n<600&&F.state()==='g4battle';n++){const bt=F.bt();if(bt.foe)bt.foe.hp=Math.min(bt.foe.hp,1);S.party[0].hp=200;if(bt.phase==='moves')tap(['right','down','left','up'][n%4]);tap('a');step(3)}};
  try{
  /* the opening, played: seeds, berries, the Lantern stirs, a buddy joins, the road opens */
  {S.intro=1;F.enter('BASE');step(3);const bf=F.bf();
@@ -81,7 +81,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  ok('king bibi talks before he fights',!!f.dlg&&f.dlg.who==='KING BIBI');
  for(let i=0;i<5;i++){tap('a');step(4)}step(40);
  fight();
- ok('beating king bibi sets the flag',S.fl.bibi===1,F.state());
+ ok('beating king bibi sets the flag',S.fl.bibi===1,F.state()+' '+(F.bt()?F.bt().phase+' ai'+F.bt().aiIx+' foe'+F.bt().foe.sp+':'+F.bt().foe.hp+' q'+(F.bt().queue||[]).length+' hp'+S.party.map(m=>m.hp).join('/')+' log:'+JSON.stringify((F.bt().log||[]).slice(-1)):''));
  F.enter('WASTES');at(20,3,[0,-1]);for(let i=0;i<80&&F.fld().id==='WASTES';i++)step(1,['up']);ok('the dome is down: the peak road is open',F.fld().id==='PEAK',F.fld().id);
  /* swarming: sprouts bloom on a tired buddy; none are used up */
  {F.enter('MEADOW');S.buds={EMBER:2,PEB:0,DEW:0,ZIP:0,LEAF:4,LUCKY:0};step(3);const b0=S.buds.LEAF,box0=S.box.length+S.party.length;S.quest=2;F.forceWild('FERNFANG',3);
@@ -160,6 +160,12 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   localStorage.setItem('sproutwild-s3','{"intro":1,"party":[{"sp":"NOPE","lv":3}],"box":"x","sector":"NOWHERE","quest":9,"buildings":[{"k":"castle"}],"res":null}');
   tap('start');for(let i=0;i<7;i++)tap('down');tap('a');step(3);tap('a');step(2);tap('down');tap('down');tap('a');step(8);G.draw();
   ok('a damaged save loads safely',F.state()==='g4world'&&F.meta().sector==='BASE'&&F.meta().party.length===0&&F.meta().buildings.length===0,F.state()+' '+F.meta().quest)}
+ /* v7.0: starters and the Data Center */
+ {const st=F.starters();ok('the three starters are the Ohio trio',st.join()==='CUYAPUP,BESSLING,GRASSKIN',st.join());
+  const sp=F.species(),tb=JSON.stringify(sp.map(x=>x.id));ok('starters exist as species with two jobs each',st.every(id=>{const x=sp.find(q=>q.id===id);return x&&Object.keys(x.work).length===2&&x.starter}),tb.slice(-60));
+  F.noCap(false);S.buildings=[];S.box=[];S.party=S.party.slice(0,1);ok('one buddy: room for more',!F.buddyFull());
+  while(S.party.length+S.box.length<3)F.giveMon('PEBBLIT',3);ok('three buddies and no Data Center: full',F.buddyFull(),S.party.length+S.box.length);
+  F.build('datacenter',6,12);ok('a Data Center makes room',!F.buddyFull());F.noCap(true)}
  }catch(e){out.push('FAIL crashed: '+e.message)}
  return out});
 console.log(res.join('\n'));const fails=res.filter(l=>l.startsWith('FAIL')).length;

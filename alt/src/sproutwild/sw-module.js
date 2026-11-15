@@ -667,6 +667,7 @@ function worldUpdate(dt){if(W4.scene){scTick(dt);return}scAuto();if(W4.fld){fUpd
    if(b.k==='cottage'){swSel=0;state='g4cot'}
    else if(b.k==='nursery'){W4.nurB=SW.buildings.indexOf(b);swSel=0;state='g4nur'}
    else if(b.k==='bench'){swSel=0;state='g4tools'}
+   else if(b.k==='datacenter'){swSel=0;state='g4party'}
    else if(wBuildDef(b.k).yields){W4.assignB=SW.buildings.indexOf(b);swSel=0;state='g4assign'}
    else swSay(wBuildDef(b.k).n+' — '+wBuildDef(b.k).d,3)}
   return}
@@ -1241,7 +1242,7 @@ function wKeeperMove(){if(BT.keeperUsed){swSnd(140,.08);return}
   foe.hp=Math.max(0,foe.hp-r2.dmg);
   BT.log.push({txt:'MARCUS used HYDRO JET! ('+r2.dmg+')'});
   if(foe.hp<=0)wFoeDown();else BT.after='keeperfoe'}}
-function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.shake>0)BT.shake=Math.max(0,BT.shake-dt*6);
+function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.phase==='menu'&&BT._lp!=='menu')swSel=0;BT._lp=BT.phase; /* the battle menu always opens on FIGHT */if(BT.shake>0)BT.shake=Math.max(0,BT.shake-dt*6);
  if(BT.phase==='intro'){if(BT.t>.7){BT.phase='msg'}return}
  if(BT.phase==='msg'){
   if((pressed('a')&&BT.t>.25)||BT.t>2.6){BT.t=0;BT.log.shift();
@@ -1262,7 +1263,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.shake>0)
   if(pressed('a')){const o=opts[swSel];
    if(o==='FIGHT'){BT.phase='moves';swSel=0}
    else if(o==='KEEPER')wKeeperMove();
-   else if(o==='SPROUT'){if(wBudTotal()<=0){BT.log=[{txt:'No sprouts with you. Pluck some, or carry things home so the Lantern grows more.'}];BT.after='menu';BT.phase='msg';BT.t=0}
+   else if(o==='SPROUT'){if(wBuddyFull()){BT.log=[{txt:wHasDC()?'The Data Center is full.':'No room for another buddy. Build a DATA CENTER at Sunkeep first.'}];BT.after='menu';BT.phase='msg';BT.t=0}else if(wBudTotal()<=0){BT.log=[{txt:'No sprouts with you. Pluck some, or carry things home so the Lantern grows more.'}];BT.after='menu';BT.phase='msg';BT.t=0}
     else{BT.phase='budpick';swSel=0}}
    else if(o==='BUDDY'){const ok=SW.party.findIndex((m,i)=>i!==BT.aiIx&&m.hp>0);if(ok<0){swSnd(140,.08);BT.noSwap=1.6}else{BT.phase='party';swSel=ok;BT.partyFrom='menu'}}
    else if(o==='RUN'){if(Math.random()<.7){if(BT.mode==='raid'){const lost=Math.min(15,SW.res.petal);SW.res.petal-=lost;BT.log=[{txt:'You fled — Bottie trashed the place on his way out. (-'+lost+' petals)'}]}else BT.log=[{txt:'Got away safely!'}];BT.after='endwin';BT.phase='msg';BT.t=0}
@@ -1286,7 +1287,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.shake>0)
   swNav(list.length);
   if(pressed('b')&&!BT.forced&&BT.partyFrom==='menu'){BT.phase='menu';return}
   if(pressed('a')){const ix=swSel,m=list[ix];
-   if(ix===BT.aiIx||m.hp<=0){swSnd(140,.08);return}
+   if((ix===BT.aiIx&&!BT.forced)||m.hp<=0){swSnd(140,.08);return}
    BT.aiIx=ix;BT.myStage={atk:0,def:0};
    if(BT.forced){BT.forced=false;BT.phase='menu';BT.log=[];return}
    BT.log=[{txt:'Go, '+m.sp+'!'}];BT.phase='msg';BT.t=0;
@@ -1982,7 +1983,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={noScenes:v=>{SCOFF=v},scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={noScenes:v=>{SCOFF=v},noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},

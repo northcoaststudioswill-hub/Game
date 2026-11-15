@@ -99,7 +99,7 @@ function wkDraw(front){for(const w of W4.wk||[]){if((w.y>P3.y)!==front)continue;
   else if(w.at&&tk&&tk.b){const key=tk.k==='craft'?'HANDIWORK':tk.k==='tend'?'WATERING':(wBuildDef(tk.b.k).skill||['PLANTING'])[0],c=WKC[tk.b.k==='sawmill'?'LUMBERING':key];
    r('#14101e',X-4,top-7,8,8);r(c,X-3,top-6,6,6);r('#ffffff',X-2,top-5,2,1);if(hop)r('#ffffff',X+5,top+2,2,2)}}}
 /* ---------------- buildings: bigger, outlined, alive ---------------- */
-function wDrawBuilding(b){if(b.con>0){scConDraw(b);return}wDrawBuilding0(b)}
+function wDrawBuilding(b){if(b.con>0){scConDraw(b);return}if(b.k==='datacenter'){dcDraw(b);return}wDrawBuilding0(b)}
 function wDrawBuilding0(b){const x=wCellX(b.gx),y=wCellY(b.gy),K='#14101e',on=b.busy>0,def=wBuildDef(b.k),t=time;
  r('rgba(0,0,0,.24)',x-4,y+17,30,5);
  if(b.k==='cottage'){r(K,x-4,y-1,28,22);r('#9a9aa2',x+15,y-13,6,9);r(K,x+14,y-14,8,2);r('#c8c8d0',x+15,y-13,2,9);
