@@ -429,6 +429,24 @@ Plays when the Knockout cartridge boots, to the menu song; A, B or Start skips i
    and cheering. Then the title menu.
 Nothing in it is saved or counted. (`opUpd`, `opDraw`, `OPC` is the clip list.)
 
+### Pass 3 follow-up: cyborg Fentanyahu, the longer opening movie (Nov 15)
+
+- **FENTANYAHU is a cyborg Bibi now** (Will: he's based on his own meme, in the same family as the android memes). Half his
+  face is a metal plate with a red eye and a grille, there is a green reactor in his chest, his hands and shins are metal, and
+  he stands bolt upright and marches. In WAR CRIMINAL he pops up, sweeps a red scan beam (FENT REACTOR: ONLINE), and in the
+  city he is the giant firing his eye at the skyline. The green, folded-over version is gone.
+  I still could not find a picture of the meme itself (searched four times; only a chatbot page with no image), so this is
+  the android family's look applied to Bibi. A screenshot from Will would let me match the real one.
+- **The opening movie is the whole roster now, about 41 seconds** (was 24):
+  - Roll-call cards are a little longer, each fighter throws a punch and a kick, and the list of specials is replaced by a
+    short **bio** (`OPBIO`, invented for Will to rewrite): Will BUILT THIS GAME. STILL LOSES AT IT. / Erin GROWS THE FOOD.
+    RUNS THE STAND. ENDS THE FIGHT. / Louie EVOLVED SHIBA, EST 2018. GOOD BOY. BAD NEWS. / Lil Bottie RAPPER. ROBOT. ONE BAD
+    DAY FROM A DATA CENTER. / Marcus OWNS FLOW PROS. HAS A GUY. THE GUY IS HIM. / King Bibi PRIME MINISTER. AGAIN. AND AGAIN. /
+    Corbin ONE QUESTION. EVERY SINGLE TIME. / Mama UP SINCE 4. DRIVES A YUKON. FEAR HER.
+  - After the four fight clips, **a cut from every fighter's ultimate**, with its name on a bar: HASBARA, LOUIE AIRLINES,
+    JUDGEMENT, NUKE THE DATA CENTER, THE FINAL BET, WAR CRIMINAL (the city, with the lines), 007, RUBY TEMPER TANTRUM.
+    They are the real supers started part-way in, not recordings.
+
 ## Not changed
 
 - Patch & Plate (`src/patchplate.js` is v0.3's file as built). Its 76 checks pass on the ALT build.
