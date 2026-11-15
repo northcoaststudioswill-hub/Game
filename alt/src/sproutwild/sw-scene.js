@@ -6,7 +6,7 @@
    while one plays.
    ================================================================ */
 let SCOFF=false;
-function scStart(steps,done){if(SCOFF){for(const s of steps)if(s.fn)s.fn();if(done)done();return}W4.scene={steps,i:-1,t:0,x:P3.x,y:P3.y,done};W4.talk=null;W4.quips=[];scNext()}
+function scStart(steps,done){if(SCOFF){for(const s of steps)if(s.fn)s.fn();if(done)done();return}W4.scene={steps,i:-1,t:0,x:P3.x,y:P3.y,done};W4.talk=null;W4.quips=[];W4.quipQ=[];scNext()}
 function scNext(){const sc=W4.scene;sc.i++;sc.t=0;const st=sc.steps[sc.i];
  if(!st){W4.scene=null;if(sc.done)sc.done();if(!W4.fld)wCamUpdate(P3.x,P3.y);return}if(st.fn)st.fn()}
 function scTick(dt){const sc=W4.scene,st=sc.steps[sc.i];sc.t+=dt;
@@ -17,7 +17,8 @@ function scTick(dt){const sc=W4.scene,st=sc.steps[sc.i];sc.t+=dt;
  if(st.txt){if(sc.t>.45&&pressed('a')){swSnd(660,.04,880);scNext()}}else if(sc.t>=(st.hold||1.2))scNext()}
 function scDraw(){const sc=W4.scene,st=sc.steps[sc.i];if(!st)return;
  r('#0a0e08',0,0,W,12);r('#0a0e08',0,H-12,W,12);
- if(st.txt)uiSay(st.who,st.txt,sc.t*55,'A  NEXT · START  SKIP',st.acc);}
+ const who=st.who&&st.who===SW.keeper?(SW.keeper==='WILL'?'ERIN':'WILL'):st.who; /* nobody narrates to themselves */
+ if(st.txt)uiSay(who,st.txt,sc.t*55,'A  NEXT · START  SKIP',st.acc);}
 /* the Lantern wakes: look up at it, then down to the garden as the soil stirs */
 function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch();for(const pb of W4.patchBuds||[])if(pb.type>=0){for(let i=0;i<5;i++)W4.floats.push({x:pb.x+(Math.random()*14-7),y:pb.y-4-Math.random()*12,txt:'*',t:.5+Math.random()*.6,c:TYPES[pb.type].l})}swSnd(784,.12,1568)};
  scStart([
@@ -28,8 +29,8 @@ function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch
   {x:240,y:352,who:'ERIN',txt:'This is the GARDEN. The Lantern\'s light wakes sprouts in the soil here.'},
   {x:240,y:352,who:'ERIN',txt:'Those first three were seeds it kept safe. From now on, new sprouts grow here.'},
   {x:240,y:352,who:'ERIN',txt:'Walk up to a grown one and press A to pluck it. It joins your squad.'},
-  {x:240,y:352,who:'MARCUS',txt:'Every four things your sprouts carry home, the Lantern grows one more.'},
-  {who:'MARCUS',txt:'The light reached the wilds too. Three buddies are on their way. Pick one.'}
+  {x:240,y:352,who:'MARCUS',txt:'Every four things they carry home, the Lantern grows one more. Free sprouts, bro.'},
+  {who:'MARCUS',txt:'Light reached the wilds too. Three buddies incoming. Pick one. I would pick the blue one. Hydro.'}
  ],()=>{W4.choiceT=0;W4.banner={txt:'THE LANTERN STIRS',sub:'Pluck sprouts in the garden to the south',t:3.5}})}
 /* first steps in the Meadow: where buddies live, and what A does out here */
 function scMeadow(F){SW.lessons.scMeadow=1;const sec=wSector(W4.sector);
@@ -45,22 +46,28 @@ function scMeadow(F){SW.lessons.scMeadow=1;const sec=wSector(W4.sector);
 /* right after your first buddy joins: what A does with a buddy at your side */
 function scSend(){SW.lessons.scSend=1;const far=(o)=>Math.hypot(o.x-P3.x,o.y-P3.y),tr=W4.nodes.filter(n=>!n.got&&n.k!=='bush').sort((a,b)=>far(a)-far(b))[0];if(!tr)return;
  const nm=SW.party[0].sp;scStart([{x:tr.x,y:tr.y,hold:1.2},
-  {x:tr.x,y:tr.y,who:'MARCUS',txt:nm+' walks with you now. Buddies do the heavy work sprouts cannot.'},
-  {x:tr.x,y:tr.y,who:'MARCUS',txt:'Face a tree or a rock and press A. The ring locks on and '+nm+' goes.'},
-  {x:tr.x,y:tr.y,who:'MARCUS',txt:'Then throw sprouts at what it drops. They carry it home to the Lantern.'},{hold:.5}],()=>swSave())}
+  {x:tr.x,y:tr.y,who:'MARCUS',txt:"That's my guy! "+nm+' rolls with you now. Buddies do the heavy lifting.'},
+  {x:tr.x,y:tr.y,who:'MARCUS',txt:'Face a tree or a rock, press A. Ring locks on, '+nm+' goes. See one, send one.'},
+  {x:tr.x,y:tr.y,who:'MARCUS',txt:'Then throw sprouts at what drops. They carry it home. You just point, bro.'},{hold:.5}],()=>swSave())}
 /* nobody stands on top of you */
 function scSpread(){for(const c of W4.cast||[]){const dx=c.x-P3.x,dy=c.y-P3.y,d=Math.hypot(dx,dy);if(d<24){const ux=d>.5?dx/d:1,uy=d>.5?dy/d:0;c.x+=ux*(24-d)*.5;c.y+=uy*(24-d)*.5}}}
 /* the opening is told in captions, one at a time, with the field left clear */
 function scIntro(){scStart([{hold:.9},{who:'ERIN',txt:"You're up! Look: the roots under the Great Lantern are glowing."},
-  {x:240,y:128,hold:1.1},{x:240,y:128,who:'MARCUS',txt:'Seeds. Walk up to one and press A to pluck it.'},{hold:.4}])}
+  {x:240,y:128,hold:1.1},{x:240,y:128,who:'MARCUS',txt:'Bro. Seeds. Walk up to one and press A. See one, pluck one.'},{hold:.4}])}
 function scBerries(){const it=W4.bf.items.find(i=>i.op)||{x:165,y:192};scStart([{hold:.5},{who:'ERIN',txt:'They follow you! Those are sprouts.'},
-  {x:it.x+14,y:it.y,hold:1.1},{x:it.x+14,y:it.y,who:'MARCUS',txt:'Berries. Face them and press A. Your sprouts carry them to the Lantern.'},
+  {x:it.x+14,y:it.y,hold:1.1},{x:it.x+14,y:it.y,who:'MARCUS',txt:'Berries, bro. Face them and press A. Your sprouts haul them to the Lantern. I supervise.'},
   {x:it.x+14,y:it.y,who:'ERIN',txt:'Hold B and they all come back to you.'},{hold:.4}])}
 function scArrow(){if(W4.scene||!W4.bf||wOp()>=3)return;const op=wOp();let t=null;
  if(op===0)t=W4.bf.buds[0];else if(op===1)t=W4.bf.items.find(i=>i.op&&!i.car.length&&!i.done);else if(WCHOICE[1].y>0&&WCHOICE[1].y<190)t=WCHOICE[1];
  if(!t)return;const x=Math.round(t.x),y=Math.round(t.y-(op===2?34:20)+Math.sin(time*6)*2),K='#14101e';
  r(K,x-5,y-1,11,4);r(K,x-3,y+3,7,2);r(K,x-1,y+5,3,2);r('#ffd94d',x-4,y,9,2);r('#ffd94d',x-2,y+2,5,2);r('#ffd94d',x,y+4,1,2)}
+function scBuild(){SW.lessons.scBuild=1;SW.beats.caught=1;const nm=(SW.party[SW.party.length-1]||{}).sp||'It';
+ scStart([{hold:.6},{who:'MARCUS',txt:'AYYY! You caught one! Never doubted you once. Dap me up.'},
+  {x:150,y:236,hold:1.1},{x:150,y:236,who:'MARCUS',txt:'Now a roof, bro. Press START, pick BUILD, then COTTAGE. Costs 8 wood. This spot is nice.'},
+  {x:150,y:236,who:'MARCUS',txt:'Short on wood? Send a buddy at trees. Sprouts carry the logs home. Teamwork. I supervise.'},
+  {who:'ERIN',txt:'Only your lead buddy walks with you here. The others stay home and find work on their own.'},{hold:.4}],()=>swSave())}
 function scAuto(){if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
+  if(SW.quest===3&&!SW.lessons.scBuild&&W4.sector==='BASE'&&SW.lessons.scSend){SW.beats.caught=1;W4.buildT=(W4.buildT||0)+1;if(W4.buildT>40){scBuild();return}}
   if(wOp()===0&&!SW.beats.wake){SW.beats.wake=1;SW.beats.first=1;scIntro();return}
   if(wOp()===1&&!SW.beats.three){SW.beats.three=1;SW.beats.carry=1;SW.beats.first=1;scBerries();return}
   if(wOp()===2)SW.beats.lit=1;if(SW.party.length&&!SW.lessons.scSend&&wOp()>=3&&W4.sector==='BASE'){W4.sendT=(W4.sendT||0)+1;if(W4.sendT>45)scSend()}}

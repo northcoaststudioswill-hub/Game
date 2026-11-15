@@ -8209,7 +8209,9 @@ function fBuild(id,from){const M=FMAPS[id],rows=M.rows,h=rows.length,w=rows[0].l
  P3.ax=F.dir[0];P3.ay=F.dir[1];W4.part={x:P3.x-12,y:P3.y+4};
  F.arrive=ex?{x:P3.x,y:P3.y}:null;F.t0=0;fSpotsBuild(F);lou.x=P3.x-16;lou.y=P3.y+8;W4.fetch=null;fFlow(F);fSync(F,true);return F}
 function fSpawnWild(F,sec){const [gx,gy]=F.grass[(Math.random()*F.grass.length)|0];
- return{sp:wPickFromTable(sec),lv:sec.lv[0]+((Math.random()*(sec.lv[1]-sec.lv[0]+1))|0),x:gx*FT+8,y:gy*FT+10,tx:gx*FT+8,ty:gy*FT+10,t:Math.random()*2}}
+ /* levels climb with distance from the Lantern post; until your first catch, wilds stay at the lowest level */
+ const d0=Math.hypot(gx*FT+8-F.start.x,gy*FT+10-F.start.y),fr=Math.min(1,d0/400),lvl=SW.quest<3?sec.lv[0]:sec.lv[0]+((Math.random()*(1+(sec.lv[1]-sec.lv[0])*fr))|0);
+ return{sp:wPickFromTable(sec),lv:Math.min(sec.lv[1],lvl),x:gx*FT+8,y:gy*FT+10,tx:gx*FT+8,ty:gy*FT+10,t:Math.random()*2}}
 function fBlocked(F,tx,ty){const o=F.bl[tx+','+ty];return!!o&&(o.dome?!SW.fl[o.flag]:!o.open)}
 function fWalkTile(F,tx,ty){if(F.base)return tx>=0&&ty>=0&&tx<F.w&&ty<F.h&&!wSolidAt(tx*FT+8,ty*FT+8);const c=fTile(F,tx,ty);return'.,:"='.includes(c)&&!fBlocked(F,tx,ty)}
 function fSolid(F,x,y){if(F.base)return wSolidAt(x,y);const tx=Math.floor(x/FT),ty=Math.floor(y/FT);
@@ -8449,7 +8451,7 @@ function fRing(F){if(F.sq.length||(F.pf&&F.pf.length)){const a=fAim(F),T=a.kind=
   if(a.tg){const c=a.need>=0?'#e04838':T.l,rr=a.kind==='site'?14:11;
    for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){r('#14101e',ax+sx*(rr+ph)-2,ay-6+sy*(rr-2+ph)-2,5,5);r(c,ax+sx*(rr+ph)-1,ay-6+sy*(rr-2+ph)-1,3,1);r(c,ax+sx*(rr+ph)-(sx<0?1:-1),ay-6+sy*(rr-2+ph)-1,1,3)}
    for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.6)',Math.round(px),Math.round(py),1,1)}
-   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?'THROW SPROUTS TO CATCH':a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
+   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?'CATCH Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts':a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
    F.aimLab=lab;F.aimNeed=a.need>=0}
   else{F.aimLab=null;r('rgba(255,255,255,.35)',ax-1,ay-1,2,2)}}else F.aimLab=null;
  if(F.whistle){g.strokeStyle='rgba(255,244,180,.8)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-2,F.whistle,0,7);g.stroke();
@@ -9656,15 +9658,15 @@ const WCBEATS=[
  ['three',()=>wOp()===1,[['MARCUS','Berries. Face them and press A. The sprouts do the rest.']]],
  ['carry',()=>wOp()===1&&W4.bf&&W4.bf.items.some(i=>i.op&&i.car.length),[['ERIN','B calls them back. Everything goes to the Lantern.']]],
  ['lit',()=>wOp()===2,[['ERIN',"It's awake! Go and greet one of the dim ones."]]],
- ['buddy',()=>SW.quest===2&&SW.party.length>0,[['MARCUS','South road. Throw sprouts at a wild one. Enough and it blooms.']]],
- ['caught',()=>SW.quest===3,[['ERIN','Leave a buddy at home and it finds work.'],['MARCUS','START, then BUILD. Cottage first.']]],
+ ['buddy',()=>SW.quest===2&&SW.party.length>0,[['MARCUS','South road, bro. Throw sprouts at a wild one. Enough and it blooms.']]],
+ ['caught',()=>SW.quest===3,[['ERIN','Leave a buddy at home and it finds work.'],['MARCUS','START, then BUILD. Cottage first, bro. Waterpark later.']]],
  ['cottage',()=>SW.buildings.some(b=>b.k==='cottage'),[['ERIN','A roof! Now a garden bed.']]],
  ['worker',()=>(W4.wk||[]).some(w=>w.at),[['MARCUS','Free labour. I respect it.']]],
- ['ore',()=>(SW.res.ore||0)>0,[['MARCUS','Ore! Build a kiln for ingots.']]],
+ ['ore',()=>(SW.res.ore||0)>0,[['MARCUS','ORE! Build a kiln, bro. Ingots. We are basically rich.']]],
  ['fiber',()=>(SW.res.fiber||0)>=4,[['ERIN','Enough fiber for a seed pouch. Try the bench.']]],
- ['sigil',()=>SW.badges.length>=1,[['MARCUS','One Sigil. Out of four. Calm down.']]]];
+ ['sigil',()=>SW.badges.length>=1,[['MARCUS',"One Sigil! That's my guy. Three more. Dap me up."]]]];
 const WCIDLE={ERIN:['The beds grow better when someone sings. So I sing.','Louie has a route. Always trust the route.','A tidy base is a happy base. Mostly.','Everything you carry home feeds the Lantern.','Kin sprouts bloom best. Leaf on leaf, dew on dew.','If a buddy is good at a job, it will find that job.'],
- MARCUS:["I'm not an NPC. I'm between protagonists.",'Your form is terrible. The sprouts respect it anyway.','Hydro jet solves most problems. The rest are personal.','King Bibi called that dome temporary. In writing.','You know what this place needs? A van.','Ore. Kiln. Ingots. It is not complicated.'],
+ MARCUS:["I'm not an NPC, bro. I'm between protagonists.",'Your throwing form is terrible. The sprouts respect it anyway.','Hydro jet solves most problems. The rest are personal.','King Bibi called that dome temporary. In writing, bro.','You know what this place needs? A van. And a lazy river.','That pond out south? Future Marcus Waterworks.','See one, send one. Works for sprouts. Works for buddies.','I would have caught that one faster. Respectfully, bro.','You built this place. I helped. A little. A lot.'],
  WILL:['I catalog every sprout in this valley. Twice.','The Lantern chose us. No pressure or anything.','If Marcus asks, I was absolutely working.'],
  LOUIE:['*sniff sniff*','WOOF.','(tail wag)','(found a stick)','ARF! ARF!']};
 function wCastTick(dt){if(!W4.cast)wCastInit();if(!SW.beats)SW.beats={};const op=Math.min(3,wOp());
@@ -9750,7 +9752,7 @@ function pfWildTick(F,dt){for(const wd of W4.wilds.slice()){
  wd.lat=wd.lat.filter(s=>s.st==='latch'&&s.tg===wd);if(!wd.lat.length){wd.lt=0;continue}
  wd.lt=(wd.lt||0)+dt;const str=pfStr(wd),need=pfNeed(wd);
  if(str>=need&&wd.lt>1){const sp=wSp(wd.sp),p=Math.max(.2,Math.min(.9,.3+.12*(str-need)+(sp.catch||.4)*.4));
-  wd.cap={t:0,ok:Math.random()<p};swSnd(523,.12,784)}
+  wd.cap={t:0,ok:Math.random()<(SW.quest<3?Math.max(p,.8):p)}; /* the first catch is kind */swSnd(523,.12,784)}
  else if(wd.lt>3.6){ /* it shakes them off and turns on you */
   for(const s of wd.lat){s.st='ret';s.tg=null;s.z=10}wd.lat=[];W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;
   wEngage(wd.sp+' SHOOK THEM OFF!',()=>wStartWildAt(wd.sp,wd.lv))}}}
@@ -9775,7 +9777,7 @@ function pfWildDraw(o,feet){const spr=wSp(o.sp)._spr,w=Math.round(spr.ow*PSC),h=
    while one plays.
    ================================================================ */
 let SCOFF=false;
-function scStart(steps,done){if(SCOFF){for(const s of steps)if(s.fn)s.fn();if(done)done();return}W4.scene={steps,i:-1,t:0,x:P3.x,y:P3.y,done};W4.talk=null;W4.quips=[];scNext()}
+function scStart(steps,done){if(SCOFF){for(const s of steps)if(s.fn)s.fn();if(done)done();return}W4.scene={steps,i:-1,t:0,x:P3.x,y:P3.y,done};W4.talk=null;W4.quips=[];W4.quipQ=[];scNext()}
 function scNext(){const sc=W4.scene;sc.i++;sc.t=0;const st=sc.steps[sc.i];
  if(!st){W4.scene=null;if(sc.done)sc.done();if(!W4.fld)wCamUpdate(P3.x,P3.y);return}if(st.fn)st.fn()}
 function scTick(dt){const sc=W4.scene,st=sc.steps[sc.i];sc.t+=dt;
@@ -9786,7 +9788,8 @@ function scTick(dt){const sc=W4.scene,st=sc.steps[sc.i];sc.t+=dt;
  if(st.txt){if(sc.t>.45&&pressed('a')){swSnd(660,.04,880);scNext()}}else if(sc.t>=(st.hold||1.2))scNext()}
 function scDraw(){const sc=W4.scene,st=sc.steps[sc.i];if(!st)return;
  r('#0a0e08',0,0,W,12);r('#0a0e08',0,H-12,W,12);
- if(st.txt)uiSay(st.who,st.txt,sc.t*55,'A  NEXT · START  SKIP',st.acc);}
+ const who=st.who&&st.who===SW.keeper?(SW.keeper==='WILL'?'ERIN':'WILL'):st.who; /* nobody narrates to themselves */
+ if(st.txt)uiSay(who,st.txt,sc.t*55,'A  NEXT · START  SKIP',st.acc);}
 /* the Lantern wakes: look up at it, then down to the garden as the soil stirs */
 function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch();for(const pb of W4.patchBuds||[])if(pb.type>=0){for(let i=0;i<5;i++)W4.floats.push({x:pb.x+(Math.random()*14-7),y:pb.y-4-Math.random()*12,txt:'*',t:.5+Math.random()*.6,c:TYPES[pb.type].l})}swSnd(784,.12,1568)};
  scStart([
@@ -9797,8 +9800,8 @@ function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch
   {x:240,y:352,who:'ERIN',txt:'This is the GARDEN. The Lantern\'s light wakes sprouts in the soil here.'},
   {x:240,y:352,who:'ERIN',txt:'Those first three were seeds it kept safe. From now on, new sprouts grow here.'},
   {x:240,y:352,who:'ERIN',txt:'Walk up to a grown one and press A to pluck it. It joins your squad.'},
-  {x:240,y:352,who:'MARCUS',txt:'Every four things your sprouts carry home, the Lantern grows one more.'},
-  {who:'MARCUS',txt:'The light reached the wilds too. Three buddies are on their way. Pick one.'}
+  {x:240,y:352,who:'MARCUS',txt:'Every four things they carry home, the Lantern grows one more. Free sprouts, bro.'},
+  {who:'MARCUS',txt:'Light reached the wilds too. Three buddies incoming. Pick one. I would pick the blue one. Hydro.'}
  ],()=>{W4.choiceT=0;W4.banner={txt:'THE LANTERN STIRS',sub:'Pluck sprouts in the garden to the south',t:3.5}})}
 /* first steps in the Meadow: where buddies live, and what A does out here */
 function scMeadow(F){SW.lessons.scMeadow=1;const sec=wSector(W4.sector);
@@ -9814,22 +9817,28 @@ function scMeadow(F){SW.lessons.scMeadow=1;const sec=wSector(W4.sector);
 /* right after your first buddy joins: what A does with a buddy at your side */
 function scSend(){SW.lessons.scSend=1;const far=(o)=>Math.hypot(o.x-P3.x,o.y-P3.y),tr=W4.nodes.filter(n=>!n.got&&n.k!=='bush').sort((a,b)=>far(a)-far(b))[0];if(!tr)return;
  const nm=SW.party[0].sp;scStart([{x:tr.x,y:tr.y,hold:1.2},
-  {x:tr.x,y:tr.y,who:'MARCUS',txt:nm+' walks with you now. Buddies do the heavy work sprouts cannot.'},
-  {x:tr.x,y:tr.y,who:'MARCUS',txt:'Face a tree or a rock and press A. The ring locks on and '+nm+' goes.'},
-  {x:tr.x,y:tr.y,who:'MARCUS',txt:'Then throw sprouts at what it drops. They carry it home to the Lantern.'},{hold:.5}],()=>swSave())}
+  {x:tr.x,y:tr.y,who:'MARCUS',txt:"That's my guy! "+nm+' rolls with you now. Buddies do the heavy lifting.'},
+  {x:tr.x,y:tr.y,who:'MARCUS',txt:'Face a tree or a rock, press A. Ring locks on, '+nm+' goes. See one, send one.'},
+  {x:tr.x,y:tr.y,who:'MARCUS',txt:'Then throw sprouts at what drops. They carry it home. You just point, bro.'},{hold:.5}],()=>swSave())}
 /* nobody stands on top of you */
 function scSpread(){for(const c of W4.cast||[]){const dx=c.x-P3.x,dy=c.y-P3.y,d=Math.hypot(dx,dy);if(d<24){const ux=d>.5?dx/d:1,uy=d>.5?dy/d:0;c.x+=ux*(24-d)*.5;c.y+=uy*(24-d)*.5}}}
 /* the opening is told in captions, one at a time, with the field left clear */
 function scIntro(){scStart([{hold:.9},{who:'ERIN',txt:"You're up! Look: the roots under the Great Lantern are glowing."},
-  {x:240,y:128,hold:1.1},{x:240,y:128,who:'MARCUS',txt:'Seeds. Walk up to one and press A to pluck it.'},{hold:.4}])}
+  {x:240,y:128,hold:1.1},{x:240,y:128,who:'MARCUS',txt:'Bro. Seeds. Walk up to one and press A. See one, pluck one.'},{hold:.4}])}
 function scBerries(){const it=W4.bf.items.find(i=>i.op)||{x:165,y:192};scStart([{hold:.5},{who:'ERIN',txt:'They follow you! Those are sprouts.'},
-  {x:it.x+14,y:it.y,hold:1.1},{x:it.x+14,y:it.y,who:'MARCUS',txt:'Berries. Face them and press A. Your sprouts carry them to the Lantern.'},
+  {x:it.x+14,y:it.y,hold:1.1},{x:it.x+14,y:it.y,who:'MARCUS',txt:'Berries, bro. Face them and press A. Your sprouts haul them to the Lantern. I supervise.'},
   {x:it.x+14,y:it.y,who:'ERIN',txt:'Hold B and they all come back to you.'},{hold:.4}])}
 function scArrow(){if(W4.scene||!W4.bf||wOp()>=3)return;const op=wOp();let t=null;
  if(op===0)t=W4.bf.buds[0];else if(op===1)t=W4.bf.items.find(i=>i.op&&!i.car.length&&!i.done);else if(WCHOICE[1].y>0&&WCHOICE[1].y<190)t=WCHOICE[1];
  if(!t)return;const x=Math.round(t.x),y=Math.round(t.y-(op===2?34:20)+Math.sin(time*6)*2),K='#14101e';
  r(K,x-5,y-1,11,4);r(K,x-3,y+3,7,2);r(K,x-1,y+5,3,2);r('#ffd94d',x-4,y,9,2);r('#ffd94d',x-2,y+2,5,2);r('#ffd94d',x,y+4,1,2)}
+function scBuild(){SW.lessons.scBuild=1;SW.beats.caught=1;const nm=(SW.party[SW.party.length-1]||{}).sp||'It';
+ scStart([{hold:.6},{who:'MARCUS',txt:'AYYY! You caught one! Never doubted you once. Dap me up.'},
+  {x:150,y:236,hold:1.1},{x:150,y:236,who:'MARCUS',txt:'Now a roof, bro. Press START, pick BUILD, then COTTAGE. Costs 8 wood. This spot is nice.'},
+  {x:150,y:236,who:'MARCUS',txt:'Short on wood? Send a buddy at trees. Sprouts carry the logs home. Teamwork. I supervise.'},
+  {who:'ERIN',txt:'Only your lead buddy walks with you here. The others stay home and find work on their own.'},{hold:.4}],()=>swSave())}
 function scAuto(){if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
+  if(SW.quest===3&&!SW.lessons.scBuild&&W4.sector==='BASE'&&SW.lessons.scSend){SW.beats.caught=1;W4.buildT=(W4.buildT||0)+1;if(W4.buildT>40){scBuild();return}}
   if(wOp()===0&&!SW.beats.wake){SW.beats.wake=1;SW.beats.first=1;scIntro();return}
   if(wOp()===1&&!SW.beats.three){SW.beats.three=1;SW.beats.carry=1;SW.beats.first=1;scBerries();return}
   if(wOp()===2)SW.beats.lit=1;if(SW.party.length&&!SW.lessons.scSend&&wOp()>=3&&W4.sector==='BASE'){W4.sendT=(W4.sendT||0)+1;if(W4.sendT>45)scSend()}}

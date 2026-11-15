@@ -27,15 +27,15 @@ const WCBEATS=[
  ['three',()=>wOp()===1,[['MARCUS','Berries. Face them and press A. The sprouts do the rest.']]],
  ['carry',()=>wOp()===1&&W4.bf&&W4.bf.items.some(i=>i.op&&i.car.length),[['ERIN','B calls them back. Everything goes to the Lantern.']]],
  ['lit',()=>wOp()===2,[['ERIN',"It's awake! Go and greet one of the dim ones."]]],
- ['buddy',()=>SW.quest===2&&SW.party.length>0,[['MARCUS','South road. Throw sprouts at a wild one. Enough and it blooms.']]],
- ['caught',()=>SW.quest===3,[['ERIN','Leave a buddy at home and it finds work.'],['MARCUS','START, then BUILD. Cottage first.']]],
+ ['buddy',()=>SW.quest===2&&SW.party.length>0,[['MARCUS','South road, bro. Throw sprouts at a wild one. Enough and it blooms.']]],
+ ['caught',()=>SW.quest===3,[['ERIN','Leave a buddy at home and it finds work.'],['MARCUS','START, then BUILD. Cottage first, bro. Waterpark later.']]],
  ['cottage',()=>SW.buildings.some(b=>b.k==='cottage'),[['ERIN','A roof! Now a garden bed.']]],
  ['worker',()=>(W4.wk||[]).some(w=>w.at),[['MARCUS','Free labour. I respect it.']]],
- ['ore',()=>(SW.res.ore||0)>0,[['MARCUS','Ore! Build a kiln for ingots.']]],
+ ['ore',()=>(SW.res.ore||0)>0,[['MARCUS','ORE! Build a kiln, bro. Ingots. We are basically rich.']]],
  ['fiber',()=>(SW.res.fiber||0)>=4,[['ERIN','Enough fiber for a seed pouch. Try the bench.']]],
- ['sigil',()=>SW.badges.length>=1,[['MARCUS','One Sigil. Out of four. Calm down.']]]];
+ ['sigil',()=>SW.badges.length>=1,[['MARCUS',"One Sigil! That's my guy. Three more. Dap me up."]]]];
 const WCIDLE={ERIN:['The beds grow better when someone sings. So I sing.','Louie has a route. Always trust the route.','A tidy base is a happy base. Mostly.','Everything you carry home feeds the Lantern.','Kin sprouts bloom best. Leaf on leaf, dew on dew.','If a buddy is good at a job, it will find that job.'],
- MARCUS:["I'm not an NPC. I'm between protagonists.",'Your form is terrible. The sprouts respect it anyway.','Hydro jet solves most problems. The rest are personal.','King Bibi called that dome temporary. In writing.','You know what this place needs? A van.','Ore. Kiln. Ingots. It is not complicated.'],
+ MARCUS:["I'm not an NPC, bro. I'm between protagonists.",'Your throwing form is terrible. The sprouts respect it anyway.','Hydro jet solves most problems. The rest are personal.','King Bibi called that dome temporary. In writing, bro.','You know what this place needs? A van. And a lazy river.','That pond out south? Future Marcus Waterworks.','See one, send one. Works for sprouts. Works for buddies.','I would have caught that one faster. Respectfully, bro.','You built this place. I helped. A little. A lot.'],
  WILL:['I catalog every sprout in this valley. Twice.','The Lantern chose us. No pressure or anything.','If Marcus asks, I was absolutely working.'],
  LOUIE:['*sniff sniff*','WOOF.','(tail wag)','(found a stick)','ARF! ARF!']};
 function wCastTick(dt){if(!W4.cast)wCastInit();if(!SW.beats)SW.beats={};const op=Math.min(3,wOp());

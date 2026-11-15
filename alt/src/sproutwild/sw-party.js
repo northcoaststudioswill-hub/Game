@@ -57,7 +57,7 @@ function pfWildTick(F,dt){for(const wd of W4.wilds.slice()){
  wd.lat=wd.lat.filter(s=>s.st==='latch'&&s.tg===wd);if(!wd.lat.length){wd.lt=0;continue}
  wd.lt=(wd.lt||0)+dt;const str=pfStr(wd),need=pfNeed(wd);
  if(str>=need&&wd.lt>1){const sp=wSp(wd.sp),p=Math.max(.2,Math.min(.9,.3+.12*(str-need)+(sp.catch||.4)*.4));
-  wd.cap={t:0,ok:Math.random()<p};swSnd(523,.12,784)}
+  wd.cap={t:0,ok:Math.random()<(SW.quest<3?Math.max(p,.8):p)}; /* the first catch is kind */swSnd(523,.12,784)}
  else if(wd.lt>3.6){ /* it shakes them off and turns on you */
   for(const s of wd.lat){s.st='ret';s.tg=null;s.z=10}wd.lat=[];W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;
   wEngage(wd.sp+' SHOOK THEM OFF!',()=>wStartWildAt(wd.sp,wd.lv))}}}

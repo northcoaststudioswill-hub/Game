@@ -21,6 +21,17 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v6.7 · 2026-11-15 · Marcus sounds like Marcus, and the first catch is fair
+
+Will's notes: keep working on onboarding; Marcus should talk to the keeper the way he does in the other games.
+
+- **Marcus's voice.** Rewritten from his lines in Sprouts and Rootdeep: "bro", "See one, send one", "That's my guy", "Dap me up", Waterworks dreams, and taking credit ("I supervise", "You built this place. I helped. A little. A lot."). Covers his opening captions, tips and idle chatter.
+- **Build lesson.** Coming home after the first catch, Marcus celebrates, the camera shows a cottage spot, and he explains START, BUILD, COTTAGE, 8 wood, and how to get wood (buddy chops, sprouts carry). Erin explains that only the lead buddy walks with you at base and the rest find work.
+- **First catch is fair.** Playtest found Lv5 wilds in the grass right by the new gate: three sprouts cannot catch them and a Lv5 starter can lose and get sent home. Now wild levels climb with distance from the Lantern post, wilds stay at the lowest level until your first catch, and the first catch has at least 80% odds once the bar is full.
+- **Catch label** now reads "CATCH Lv2 · needs 3 sprouts" so you can tell what is out of reach.
+- If the keeper you picked is the one speaking in a scene, someone else says the line.
+- Verified: 82 lab checks; real-time run of the first loop (opening, catch on first try, home, build lesson, chop wood, cottage built) in about three minutes.
+
 ## v6.6 · 2026-11-15 · clear opening, Meadow faces the right way, no tools
 
 Will's notes: tools are not needed now the game is in action; leaving the base and arriving in the first area do not line up; the beginning is still cluttered and important things are covered.

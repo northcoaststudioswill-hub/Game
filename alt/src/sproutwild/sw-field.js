@@ -242,7 +242,9 @@ function fBuild(id,from){const M=FMAPS[id],rows=M.rows,h=rows.length,w=rows[0].l
  P3.ax=F.dir[0];P3.ay=F.dir[1];W4.part={x:P3.x-12,y:P3.y+4};
  F.arrive=ex?{x:P3.x,y:P3.y}:null;F.t0=0;fSpotsBuild(F);lou.x=P3.x-16;lou.y=P3.y+8;W4.fetch=null;fFlow(F);fSync(F,true);return F}
 function fSpawnWild(F,sec){const [gx,gy]=F.grass[(Math.random()*F.grass.length)|0];
- return{sp:wPickFromTable(sec),lv:sec.lv[0]+((Math.random()*(sec.lv[1]-sec.lv[0]+1))|0),x:gx*FT+8,y:gy*FT+10,tx:gx*FT+8,ty:gy*FT+10,t:Math.random()*2}}
+ /* levels climb with distance from the Lantern post; until your first catch, wilds stay at the lowest level */
+ const d0=Math.hypot(gx*FT+8-F.start.x,gy*FT+10-F.start.y),fr=Math.min(1,d0/400),lvl=SW.quest<3?sec.lv[0]:sec.lv[0]+((Math.random()*(1+(sec.lv[1]-sec.lv[0])*fr))|0);
+ return{sp:wPickFromTable(sec),lv:Math.min(sec.lv[1],lvl),x:gx*FT+8,y:gy*FT+10,tx:gx*FT+8,ty:gy*FT+10,t:Math.random()*2}}
 function fBlocked(F,tx,ty){const o=F.bl[tx+','+ty];return!!o&&(o.dome?!SW.fl[o.flag]:!o.open)}
 function fWalkTile(F,tx,ty){if(F.base)return tx>=0&&ty>=0&&tx<F.w&&ty<F.h&&!wSolidAt(tx*FT+8,ty*FT+8);const c=fTile(F,tx,ty);return'.,:"='.includes(c)&&!fBlocked(F,tx,ty)}
 function fSolid(F,x,y){if(F.base)return wSolidAt(x,y);const tx=Math.floor(x/FT),ty=Math.floor(y/FT);
@@ -482,7 +484,7 @@ function fRing(F){if(F.sq.length||(F.pf&&F.pf.length)){const a=fAim(F),T=a.kind=
   if(a.tg){const c=a.need>=0?'#e04838':T.l,rr=a.kind==='site'?14:11;
    for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){r('#14101e',ax+sx*(rr+ph)-2,ay-6+sy*(rr-2+ph)-2,5,5);r(c,ax+sx*(rr+ph)-1,ay-6+sy*(rr-2+ph)-1,3,1);r(c,ax+sx*(rr+ph)-(sx<0?1:-1),ay-6+sy*(rr-2+ph)-1,1,3)}
    for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.6)',Math.round(px),Math.round(py),1,1)}
-   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?'THROW SPROUTS TO CATCH':a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
+   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?'CATCH Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts':a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
    F.aimLab=lab;F.aimNeed=a.need>=0}
   else{F.aimLab=null;r('rgba(255,255,255,.35)',ax-1,ay-1,2,2)}}else F.aimLab=null;
  if(F.whistle){g.strokeStyle='rgba(255,244,180,.8)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-2,F.whistle,0,7);g.stroke();
