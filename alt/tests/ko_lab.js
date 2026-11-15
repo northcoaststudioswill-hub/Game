@@ -207,6 +207,45 @@ async function main() {
     await save('drama.png', url);
   }
 
+  if (want('heads')) {
+    /* every fighter's head at 8x, and the select screen, for likeness work */
+    const url = await E(() => {
+      const c = document.createElement('canvas'), S = 8, n = KO.CH.length; c.width = n * (18 * S) + 10; c.height = 22 * S; const x = c.getContext('2d'); x.imageSmoothingEnabled = false;
+      x.fillStyle = '#3a3a48'; x.fillRect(0, 0, c.width, c.height);
+      KO.CH.forEach((ch, i) => { x.fillStyle = ch.bg; x.fillRect(5 + i * 18 * S, 5, 17 * S, 17 * S); x.drawImage(ch.head, 5 + i * 18 * S + S, 5 + S, ch.head.width * S, ch.head.height * S); x.fillStyle = '#fff'; x.font = '20px monospace'; x.fillText(ch.n, 8 + i * 18 * S, 20 * S + 8); });
+      return c.toDataURL('image/png');
+    });
+    await save('heads.png', url);
+    const sel = await E(() => { KO.G.scr = 'sel'; KO.G.pick = 0; KO.G.cur = 0; KO.G.scrT = 2; for (let i = 0; i < 3; i++) __step(1 / 60); return sheet([grab()], 1, 1); });
+    await save('select.png', sel);
+  }
+
+  if (want('supers')) {
+    /* HASBARA cinematic, Bike Lane, King Bibi's specials and super: frame sheets + damage numbers */
+    const r = await E(() => {
+      const G = KO.G, out = {};
+      const shoot = (setup, frames, every, label, cols = 6, sc = .6) => { const fr = []; setup(); for (let i = 0; i < frames; i++) { __step(1 / 60); if (i % every === 0) fr.push(grab()); } return sheet(fr, cols, sc, label); };
+      /* HASBARA */
+      let hp0;
+      out.hasbara = shoot(() => { const [a, b] = fight(0, 4, 0); a.x = 140; b.x = 190; hp0 = b.hp; a.meter = 100; K.sel = 1; __step(1 / 60); K.sel = 0; }, 260, 8, 'HASBARA: every 8th frame', 6, .55);
+      out.hasbaraDmg = Math.round(hp0 - G.f[1].hp);
+      { const keys = [20, 60, 104, 124, 160, 196], fr = []; const [a, b] = fight(0, 4, 0); a.x = 140; b.x = 190; a.meter = 100; K.sel = 1; __step(1 / 60); K.sel = 0;
+        for (let i = 0; i <= 200; i++) { __step(1 / 60); if (keys.includes(i)) fr.push(grab()); } out.hasbaraKeys = sheet(fr, 3, 1, 'HASBARA key frames: cut-in | desk | sent | mind | self-hit | final'); } out.cineDone = !G.cine; out.vSt = G.f[1].st; out.willMeter = G.f[0].meter;
+      /* Bike Lane at half meter */
+      out.bike = shoot(() => { const [a, b] = fight(0, 6, 0); a.x = 110; b.x = 200; hp0 = b.hp; a.meter = 60; K.sel = 1; __step(1 / 60); K.sel = 0; }, 90, 6, 'BIKE LANE (half meter): every 6th frame', 5, .6);
+      out.bikeDmg = Math.round(hp0 - G.f[1].hp); out.bikeMeterLeft = Math.round(G.f[0].meter); out.willBack = !G.f[0].hide && G.f[0].st;
+      /* King Bibi: X red line (low), Y iron dome (eats a projectile), super coalition */
+      out.bibiX = shoot(() => { const [a, b] = fight(4, 0, 8); a.x = 120; b.x = 190; hp0 = b.hp; K.x = 1; __step(1 / 60); K.x = 0; }, 48, 6, 'KING BIBI X: RED LINE', 4, .6);
+      out.redLineDmg = Math.round(hp0 - G.f[1].hp);
+      out.bibiY = shoot(() => { const [a, b] = fight(4, 2, 8); a.x = 150; b.x = 220; b.dummy = 0; b.cpu = true; KO.startSpecial(b, 1); b.dummy = 1; for (let i = 0; i < 6; i++) __step(1 / 60); K.y = 1; __step(1 / 60); K.y = 0; }, 48, 6, 'KING BIBI Y: IRON DOME vs ZOOM', 4, .6);
+      out.bibiSuper = shoot(() => { const [a, b] = fight(4, 0, 8); a.x = 90; b.x = 190; hp0 = b.hp; a.meter = 100; K.sel = 1; __step(1 / 60); K.sel = 0; }, 150, 10, 'KING BIBI SUPER: COALITION', 5, .6);
+      out.coalitionDmg = Math.round(hp0 - G.f[1].hp);
+      return out;
+    });
+    for (const k of ['hasbara', 'hasbaraKeys', 'bike', 'bibiX', 'bibiY', 'bibiSuper']) { await save('super_' + k + '.png', r[k]); delete r[k]; }
+    console.log('supers', JSON.stringify(r));
+  }
+
   if (want('fight')) {
     const url = await E(() => {
       fight(6, 0, 0, true); const frames = [];

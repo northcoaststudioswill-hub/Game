@@ -77,6 +77,44 @@ Open item 2 of the v0.3 handoff ("the Lantern menu still counts 3 cartridges"), 
   dishes served, coins earned, sprout crew /6, friend hearts /20. The Knockout page adds BEST SURVIVAL STREAK.
 - **HOW TO GET TICKETS** (capsule machine) lists Patch & Plate's "first 3 stars on a day" and Survival streaks.
 
+## Pass 2: HASBARA, King Bibi, likenesses (from Will's photos and notes)
+
+All names, lines and move names below are **invented this pass** unless Will gave them; flag anything to change.
+
+### Will's supers are two-tier
+- **Half meter: BIKE LANE** (Select at 50+). A green bike lane paints itself along the floor and Will rides through it,
+  pedals turning, Louie in a front basket. 14 damage, costs 50. (It used to be a riderless bike with Louie on the back.)
+  The meter has a half-way tick for Will and shows `BIKE LANE (SELECT)` at half.
+- **Full meter: HASBARA** (Will's idea; the cinematic is my staging of it). A ZZZ-style super, about 3.8 s, clock stopped:
+  1. **Cut-in:** S-rank badge, Will's portrait on yellow and blue diagonal bands, halftone dots, light sweep, `HASBARA` slams in.
+  2. **The desk:** Will in a headset at the keyboard; monitors read `IDF / HASBARA / DESK`, the opponent's face under a target
+     ring, and a feed that fills (`THREAD`, `TALKING PTS`, `POSTING...`, `SHIFTING`) until `SENT!`.
+  3. **The mind flip:** the opponent's face fills the screen, eyes turn to spirals: `WAIT...`, `WHO IS THE BAD GUY?`,
+     `MIND: RECALIBRATED`.
+  4. **Self-hits:** back on the stage, the opponent punches themselves four times (4.5 each) and once more for 12, launching
+     themselves away: `SELF OWN!`. 30 total, can't be blocked. Will tweets through it on his phone.
+- The move list shows `SEL 1/2  BIKE LANE` and `SEL FULL  HASBARA`; the select screen shows both.
+- The CPU Will uses Bike Lane at half meter now and then, and HASBARA at full.
+
+### King Bibi replaces Gas Guy (slot 5)
+- Caricature: silver hair, navy suit, white shirt, blue tie. Tag `PRIME MINISTER. AGAIN.` Slower and hits a bit harder.
+- **X: RED LINE** holds up the diagram, then a red line sweeps along the floor (a low: block crouching).
+- **Y: IRON DOME** brief invulnerability, a dome that destroys incoming projectiles, and a shove.
+- **Super: COALITION** five suited partners run across the stage (5 each).
+- **Finisher: FILIBUSTER-ALITY** the speech runs so long the opponent falls asleep.
+- Normals: TALKING POINTS, PODIUM KICK, POLL BUMP, SWEEPING REFORM, COALITION DEAL, COMEBACK TOUR.
+- Win quotes: I ALWAYS COME BACK. / NEXT QUESTION. / THE COALITION HOLDS.
+- **New stage, THE PODIUM:** a green-and-gold assembly hall, a rostrum with a lectern and mic, spotlights, delegate desks.
+- Gas Guy's code (thumbs, wind) is gone from the roster.
+
+### Likenesses (from the photos)
+- **Will:** new 16x16 head: wild curls with lighter tips, round dark glasses with blue eyes, ginger-brown beard.
+- **Louie:** red buffalo-check collar with a gold tag.
+- **Lil Bottie:** chrome helmet with a dot texture, LED face with `^ ^` eyes and a smile, headphones, longer dreads,
+  quilted silver puffer, silver chain with a cloud pendant.
+- **Erin:** blue-grey eyes (hair and outfit unchanged).
+- Waiting on more photos of Will, Erin, Bottie and Louie for the next pass.
+
 ## Not changed
 
 - Patch & Plate (`src/patchplate.js` is v0.3's file as built). Its 76 checks pass on the ALT build.
