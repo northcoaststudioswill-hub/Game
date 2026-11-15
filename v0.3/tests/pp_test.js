@@ -20,7 +20,7 @@ const PAGE_KIT = () => {
   __g.ev("window.__upd=(dt)=>{update(dt);for(const k in keys)prev[k]=keys[k]}");
   const K = __g.keys, PP = __g.PP._;
   const clear = () => { K.up = K.down = K.left = K.right = 0; };
-  window.__tap = (k, n = 1) => { for (let i = 0; i < n; i++) { K[k] = 1; __step(1 / 60); K[k] = 0; __step(1 / 60); } };
+  window.__tap = (k, n = 1) => { for (let i = 0; i < n; i++) { K[k] = 0; __step(1 / 60); K[k] = 1; __step(1 / 60); K[k] = 0; __step(1 / 60); } };
   const DIRS = [[1, 0, 'right'], [-1, 0, 'left'], [0, 1, 'down'], [0, -1, 'up']];
   function firstStep(L, goals) {
     const P = L.P, key = (x, y) => x + ',' + y, seen = new Map([[key(P.x, P.y), null]]), q = [[P.x, P.y]];
@@ -97,7 +97,7 @@ async function main() {
   await page.waitForTimeout(100);
   await page.evaluate(PAGE_KIT);
   const pp = s => page.evaluate(s => eval(s), s);
-  const shot = async (name) => { await pp('__step(1/60)'); await page.screenshot({ path: path.join(SHOTS, name) }); };
+  const shot = async (name) => { await pp('for(let i=0;i<12;i++)__step(1/60)'); await page.screenshot({ path: path.join(SHOTS, name) }); };
   /* text audit: every text box drawn this frame must sit inside the screen, not overlap another, not be squeezed */
   const audit = async (label) => {
     const r = await page.evaluate(() => { __g.tb.on(true); __step(1 / 60); const b = __g.tb.last(); __g.tb.on(false); return { b, H: __g.ev('H') }; });
@@ -187,7 +187,7 @@ async function main() {
   await pp("__tap('start')"); check(await pp('__g.PP._.G.s') === 'play', 'Start skips a scene and the day carries on');
   await sc(() => { const PP = __g.PP._; PP.cine('sprout', { T: 'ZIP' }, [['NEW HELPER', 'ZIP JOINED THE CREW! IT RUNS FINISHED FOOD TO THE PLATES.']]); }, 'pp_41_scene_sprout.png', 'sprout scene', 1.4);
   await pp("__tap('start')");
-  await page.evaluate(() => { const PP = __g.PP._; PP.G.res = { d: 4, st: 3, coins: 120, tips: 30, served: 6, n: 6, missed: 0 }; PP.G.s = 'done'; PP.G.t = 1; PP.G.ri = 0; });
+  await page.evaluate(() => { const PP = __g.PP._; PP.SV.hpend = []; PP.G.res = { d: 4, st: 3, coins: 120, tips: 30, served: 6, n: 6, missed: 0 }; PP.G.s = 'done'; PP.G.t = 1; PP.G.ri = 0; });
   await pp("__tap('a')");
   check(await pp('__g.PP._.G.s') === 'cine' && await pp('__g.PP._.G.cine.k') === 'night', 'NEXT DAY plays the night scene');
   await pp('for(let i=0;i<60;i++)__upd(1/60)'); await shot('pp_42_scene_dusk.png'); await audit('night scene (dusk)');
@@ -199,6 +199,49 @@ async function main() {
   await pp('for(let i=0;i<20;i++)__upd(1/60)'); await shot('pp_45_quip.png'); await audit('a quip during the day');
   const mus = await pp("__g.ev('musWant()')");
   check(mus === 'pp', 'Patch & Plate asks for its own song (music list: ' + mus + ')');
+
+  /* Louie, hearts, asks (from the days the bot just played) */
+  const soc = await pp("({fed:__g.PP._.SV.lou.fed,hearts:{WILL:__g.PP._.heartsOf('WILL'),MARCUS:__g.PP._.heartsOf('MARCUS'),LOUIE:__g.PP._.heartsOf('LOUIE')},pend:__g.PP._.SV.hpend.slice()})");
+  check(soc.fed > 0, 'the bot fed Louie ' + soc.fed + ' times across the days');
+  check(soc.hearts.MARCUS > 0 && soc.hearts.WILL > 0 && soc.hearts.LOUIE > 0, 'hearts grow for Will, Marcus and Louie: ' + JSON.stringify(soc));
+  const mind = await page.evaluate(() => { const PP = __g.PP._; let changed = 0; for (let k = 0; k < 6 && !changed; k++) { PP.startDay(6); PP.G.s = 'play'; for (let i = 0; i < 60 * 90 && PP.G.s !== 'done'; i++) { __botTick(); __upd(1 / 60); if (PP.G.L.lou && PP.G.L.lou.changed) changed = 1; } } return changed; });
+  check(mind === 1, 'Louie changes his mind mid-craving (seen within a few days)');
+  await page.evaluate(() => { const PP = __g.PP._; PP.startDay(5); PP.G.s = 'play'; const L = PP.G.L; for (let i = 0; i < 60 * 6; i++) { __upd(1 / 60) } L.lou.st = 'want'; L.lou.t = 3; L.lou.want = ['kib', 'let_c']; L.lou.bowl = ['kib']; L.P.x = 9; L.P.y = 3; L.P.fx = -1; L.P.fy = 0; });
+  await shot('pp_50_louie_wants.png'); await audit('Louie wants a mix');
+  await page.evaluate(() => { const PP = __g.PP._; PP.G.s = 'done'; PP.G.res = { d: 5, st: 2, coins: 90, tips: 20, served: 6, n: 6, missed: 0 }; PP.G.t = 1; PP.G.ri = 0; PP.SV.hpend = ['MARCUS:3']; });
+  await pp("__tap('a')");
+  check(await pp('__g.PP._.G.s') === 'cine' && await pp('__g.PP._.G.cine.k') === 'heart', 'a waiting heart scene plays after the day, before the night');
+  await pp('for(let i=0;i<60*1.2;i++)__upd(1/60)'); await shot('pp_51_heart_scene.png'); await audit('heart scene');
+  await pp('for(let i=0;i<60*20&&__g.PP._.G.s===\'cine\'&&__g.PP._.G.cine.k===\'heart\';i++)__upd(1/60)');
+  check(await pp('__g.PP._.G.cine&&__g.PP._.G.cine.k') === 'night', 'then the night scene carries on as usual');
+  await pp("__tap('start')");
+  const ask = await page.evaluate(() => { const PP = __g.PP._; PP.SV.daily = null; const D = PP.asks(), a = D.a[0], c0 = PP.SV.coins; PP.bumpAsk(a.id, a.n, a.id === 'streak'); return { n: D.a.length, done: a.done, gain: PP.SV.coins - c0 }; });
+  check(ask.n === 3 && ask.done && ask.gain === 15, "today's asks: three of them, and finishing one pays 15 coins " + JSON.stringify(ask));
+
+  /* the stand hub and the new pages */
+  await pp("__g.PP._.G.s='stand';__g.PP._.G.si=0");
+  await shot('pp_52_stand_hub.png'); await audit('stand hub');
+  await pp("__g.PP._.G.s='days';__g.PP._.G.di=0"); await shot('pp_53_all_days.png'); await audit('all days');
+  await pp("__g.PP._.SV.coins=500;__g.PP._.G.s='ward';__g.PP._.G.wi=0;__g.PP._.G.wv=Object.assign({},__g.PP._.SV.look)");
+  await pp("__tap('right');__tap('a')");
+  check(await pp('__g.PP._.SV.look.dress') === 1, 'wardrobe: buying the SAGE dress puts it on Erin');
+  await pp("__tap('down');__tap('down');__tap('right');__tap('right')"); await shot('pp_54_wardrobe.png'); await audit('wardrobe');
+  await pp("__g.PP._.G.s='friends'"); await shot('pp_55_friends.png'); await audit('friends');
+  await pp("__g.PP._.G.s='book';__g.PP._.G.bookFrom='stand';__g.PP._.G.bp=2"); await shot('pp_56_book_louie.png'); await audit('recipe book: Louie page');
+
+  /* save files: a fresh file 2, file 1 untouched, then erase file 2 */
+  const file1 = await pp('({day:__g.PP._.SV.day,coins:__g.PP._.SV.coins})');
+  await pp("__g.PP._.G.s='files';__g.PP._.G.fi=0;__g.PP._.G.fa=0;__tap('down');__tap('a')");
+  const f2 = await pp('({slot:__g.PP._.SLOT,day:__g.PP._.SV.day,coins:__g.PP._.SV.coins,s:__g.PP._.G.s})');
+  check(f2.slot === 1 && f2.day === 0 && f2.coins === 0 && f2.s === 'stand', 'SAVE FILES: file 2 starts a fresh game ' + JSON.stringify(f2));
+  await pp("__g.PP._.G.s='files';__g.PP._.G.fi=1;__g.PP._.G.fa=0"); await shot('pp_57_save_files.png'); await audit('save files');
+  await pp("__g.PP._.G.fi=0;__tap('a')");
+  const back1 = await pp('({slot:__g.PP._.SLOT,day:__g.PP._.SV.day,coins:__g.PP._.SV.coins})');
+  check(back1.slot === 0 && back1.day === file1.day && back1.coins === file1.coins, 'file 1 is just as it was ' + JSON.stringify(back1));
+  await pp("__g.PP._.G.s='files';__g.PP._.G.fi=1;__g.PP._.G.fa=0;__tap('right');__tap('a')");
+  check(await pp('__g.PP._.slotUsed(1)') === true, 'erasing needs more than one press');
+  await pp("__tap('a');__tap('a')");
+  check(await pp('__g.PP._.slotUsed(1)') === false && await pp('__g.PP._.slotUsed(0)') === true, 'three presses erase file 2, file 1 stays');
 
   /* the other screens */
   await pp("__g.PP._.G.s='stand';__g.PP._.G.si=0");

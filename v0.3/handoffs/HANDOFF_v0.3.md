@@ -120,3 +120,40 @@ Will asked for cinematics between levels, after orders and at good moments, with
 - **Fix found by the bot:** holding food that fits no plate while both plates were finished orders stalled the helper arrow
   (and a day). The planner now tosses it. 40 runs of the hardest days: no stalls, every run at least 1 star.
 - Tests: 57 checks pass (scenes, skipping, the night leading into the next day, quips, the song, text audits of each scene).
+
+## Engagement pass: save files, Louie, friends, asks, wardrobe, more lines (Nov 15)
+
+Will asked for more dialogue (Will, Erin, Louie, Marcus), to look at how games like this keep people coming back, a save
+system with NEW GAME, nicer menus, more Erin customization, and feeding Louie: loaf, dry kibble and fresh lettuce,
+sometimes a mix, and sometimes he changes his mind mid-order. ("Fresh let" read as fresh lettuce; check with Will.)
+
+**What the research says** (short web search; sources are mostly blog-level, so treat as direction, not proof):
+small goals you can finish keep people longest; short daily visits suit this genre; friendship that grows through
+repeated small interactions (Stardew's hearts); a daily care chore such as feeding an animal; and no guilt or
+lost streaks for skipping days, which undercuts the cozy feel. All five shaped this pass.
+
+- **Save files** (`SLOTKEY`): three files. File 1 keeps the original key `patchplate-v1`, so older saves carry on;
+  files 2 and 3 are `patchplate-v1-s2` / `-s3`; `patchplate-meta` remembers the last one. Title: CONTINUE / NEW GAME,
+  SAVE FILES, SWAP CARTRIDGE. The files page shows each file's day, stars, coins, crew and hearts, with PLAY and ERASE
+  (ERASE needs three presses). Everything still autosaves.
+- **The stand is a hub now:** PLAY DAY N (or CONTINUE DAY N) on top, so one press starts the next day; ALL DAYS,
+  UPGRADES, WARDROBE, SPROUTS, FRIENDS, RECIPES, SAVE FILES. Lists have a bouncing cursor; screens fade into each other.
+- **Today's asks:** three small goals a day from a pool (serve, feed Louie, pet Louie, a streak, stars, plant,
+  burgers, finish days). 15 coins each; all three pay a capsule ticket. Skipping a day costs nothing.
+- **Louie lives at the stand** (from day 2): a bed and bowl at the kitchen's top-left, a kibble bag and a loaf tin on
+  the bottom counter. He naps, then wants kibble, a loaf or fresh (chopped) lettuce; from day 3 sometimes two of them.
+  About a third of the time he changes his mind while he waits ("?!", and Erin: "LOUIE. YOU SAID KIBBLE.").
+  Wrong food gets a "*SNIFF* NOPE"; A on the bowl takes the last thing back. Feeding fills his mood; a happy Louie
+  (60+) adds 10% to tips. A on Louie pets him. He no longer orders at a window (the PUP PATTY recipe is retired).
+- **Friends and hearts:** serving someone grows their hearts (more for fast service); feeding and petting grow
+  Louie's. Four hearts each (4/12/24/40 points). Each new heart with Will, Marcus or Louie plays a short scene after the
+  day (before the night scene). Gifts: Will's 2nd heart unlocks the FLOWER CROWN, Marcus's 3rd the BRO CAP. FRIENDS page
+  shows everyone's hearts and what's next.
+- **Wardrobe:** dress (6), apron (4, including none), hat (6), and the stand's awning colour (4), which repaints the
+  counter, title and scenes. Bought with coins, or unlocked by hearts or total stars (CHEF HAT: 18 stars). Live preview.
+- **More lines:** customers' thank-yous (Will and Marcus have many more), arrival lines and impatience lines, Erin
+  answering in quips, two-line night conversations, Louie's cravings and mind changes, heart scenes. Marcus keeps his
+  voice ("I've got a guy. The guy is me." and "See one, send one" are reused from Sprouts), calls Will a J, and never
+  mentions Waterworks. Everything else is new: flag to Will.
+- Tests: 76 checks pass, including save files (fresh file 2, file 1 untouched, three-press erase), Louie fed and
+  changing his mind, hearts and the heart scene, asks paying out, the wardrobe, and text audits of every new screen.
