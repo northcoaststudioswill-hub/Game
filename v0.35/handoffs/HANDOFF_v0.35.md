@@ -141,3 +141,11 @@ Marcus is HYDRO JET (half) / THE FINAL BET (full), King Bibi is COALITION (half)
 Will also asked for "more cinematic in general": only the letterbox during full supers is done. Ideas not built yet:
 walk-on intros per fighter, win poses with a camera push, a slow-motion replay of the last hit.
 He has not reacted to graphics pass 1 as a whole beyond these notes, so the stage repaints are still waiting on his word.
+
+## Fable pass 3, in `alt/` only (Nov 15)
+
+Marcus wears Flow Pros (his company, Cleveland; colours in `FP` are a placeholder, the real logo and truck were not found
+online), is thinner, and his half-meter super is DEREK PULLS UP (the Flow Pros truck). WAR CRIMINAL has Fentanyahu as his
+own character plus Ben Gvir and Trump with lines. Knockout now boots into an opening movie (`opUpd` / `opDraw`).
+Waiting on Will: what is off about Fentanyahu; a photo of the Flow Pros truck and of Derek; his verdict on the graphics pass.
+After the fighter, he wants the same attention on Sprouts ("the heart of the game"), Rootdeep and Patch & Plate.

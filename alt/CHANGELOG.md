@@ -394,6 +394,41 @@ Still single-stage: Louie (Judgement) and Corbin (007).
 - **Open:** Will says Fentanyahu is "still super off" and I don't know in what way. Needs his description or a picture.
 
 
+## Fable pass 3: Marcus in Flow Pros, DEREK PULLS UP, the opening movie (Nov 15)
+
+From Will's notes. Invented unless he gave it; nothing is phone-confirmed.
+
+### Marcus
+- **All Flow Pros, and thinner.** His hoodie and cap are Flow Pros blue with a white drop logo on the chest, over navy work
+  pants; his build is slimmer (no extra bulk, a narrower torso). **The colours and logo are a placeholder**: I searched for
+  Flow Pros in Cleveland and could not find the company's site, logo or truck (the Ohio results were other businesses in
+  Canton). One table, `FP` in `src/knockout.js`, sets the colours for his clothes and the truck; a photo from Will fixes it.
+- **Half meter is now DEREK PULLS UP** (replaces Hydro Jet in that slot). Marcus says DEREK. PULL UP., a horn sounds, and
+  Derek drives the Flow Pros truck through whoever is in front of him: 15, launches, ON TIME. EVERY TIME. Beer cans, a
+  lighter, a dab pen, a glass piece spill out of the back the whole way across. Derek is a driver in a cap and shades; I
+  don't know what he looks like. Hydro Jet's code is still there (`SUP.marcus`) but nothing fires it; it is still his super
+  in Rootdeep.
+- **His kit as it stands:** A, A, A Bro Jab; B Pipe Wrench; down+A Plunger Pop; down+B Snake the Drain; X Dab Cloud (rips
+  the pen, the cloud dazes); Y Double or Nothing; half meter Derek Pulls Up; full meter The Final Bet.
+- **The J line.** It did fire in every test (as the player and as the CPU), so my best explanation for Will not seeing it is
+  that the super went off at half meter, which was Hydro Jet, or that the CPU spent its meter early. Changed so it is hard
+  to miss: the line is in the bubble on the parlay screen, again in big text when the parlay hits, and Marcus says it once
+  more in a bubble on the stage while the cash lands. And the CPU now saves for the full-meter super far more often
+  (it fired the half-meter one 20% of the times it could; now 7%), so every fighter's cinematic shows up more.
+
+### The opening movie
+Plays when the Knockout cartridge boots, to the menu song; A, B or Start skips it. About 24 seconds:
+1. **NORTH COAST STUDIOS PRESENTS**, with a lantern.
+2. **Roll call:** each of the eight fighters gets a card in their colour: their face slides in, they throw a punch, and their
+   name, tag line and two specials are shown.
+3. **Four clips of real fights**, played by the engine itself (two CPUs on Hard) with moves fired on cue: Will's Mazel Tov
+   Laser and Louie's Zoom Zoom Zoom; Erin's Towel Whip and Bottie's Clanker Guns; Bibi's Red Line and Marcus's Derek Pulls Up;
+   Corbin's kiss and Mama's Yukon. Letterboxed, no health bars. Because they are real fights, they play out a little
+   differently each time.
+4. **The finale:** the eight faces rush together, a flash, and NORTH COAST KNOCKOUT slams in over the whole cast lined up
+   and cheering. Then the title menu.
+Nothing in it is saved or counted. (`opUpd`, `opDraw`, `OPC` is the clip list.)
+
 ## Not changed
 
 - Patch & Plate (`src/patchplate.js` is v0.3's file as built). Its 76 checks pass on the ALT build.
