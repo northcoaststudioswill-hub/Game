@@ -661,29 +661,7 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
   const lg=(x,y,rr,a)=>{g.globalAlpha=a;r('#ffd98a',x-rr,y-rr*.6,rr*2,rr*1.2);r('#ffd98a',x-rr*.6,y-rr,rr*1.2,rr*2);g.globalAlpha=1};
   lg(Math.round(F.start.x),Math.round(F.start.y)-30,20,dk*.22);lg(Math.round(P3.x),Math.round(P3.y)-6,22,dk*.14)}
  g.restore();
- /* ---- HUD ---- */
- r('rgba(10,14,8,.78)',0,0,W,15);r('#ffd23f',0,15,W,1);
- text(sec.n,5,4,1,'#ffd94d',null);
- {const rs='♣'+SW.res.wood+' ◆'+SW.res.stone+' ✿'+SW.res.petal;text(rs,W-5-tw(rs,1),4,1,'#d8e8c8',null)}
- if(SW.stam<99){r('#00000088',0,16,W,2);r(SW.stam>40?'#7ee787':SW.stam>18?'#ffd94d':'#e04838',0,16,Math.round(W*SW.stam/100),2)}
- if(SW.quest<5&&!(W4.banner&&W4.banner.t>0)){r('rgba(10,14,8,.6)',0,18,W,11);text(wFit('» '+WQUEST[SW.quest],232),5,20,1,'#ffd94d',null)}
- if(W4.banner&&W4.banner.t>0){const a=Math.min(1,W4.banner.t);g.globalAlpha=a;r('#0e1a0a',8,28,224,34);r('#ffd23f',8,28,224,2);r('#ffd23f',8,60,224,1);
-  text(W4.banner.txt,W/2-tw(W4.banner.txt,2)/2,33,2,'#ffffff',null);text(wFit(W4.banner.sub,216),W/2-tw(wFit(W4.banner.sub,216),1)/2,51,1,'#cfe0b8',null);g.globalAlpha=1}
- /* the squad, by kind: following / on the field */
- {let x=4;const y=H-13;r('rgba(10,14,8,.78)',0,H-16,W,16);
-  for(let ty=0;ty<TYPES.length;ty++){const all=F.sq.filter(s=>s.type===ty);if(!all.length)continue;const fl=all.filter(s=>s.st==='follow').length,T=TYPES[ty],on=ty===SW.selType;
-   const lab=fl===all.length?''+fl:fl+'/'+all.length,w2=13+tw(lab,1);
-   if(on){r('#ffd23f',x-2,y-2,w2+3,13);r('#2a2416',x-1,y-1,w2+1,11)}
-   r(T.d,x,y+1,7,7);r(T.c,x+1,y+2,5,5);r(T.l,x+1,y+2,2,1);r('#2c6030',x+3,y-1,1,2);
-   text(lab,x+10,y+1,1,fl?'#ffffff':'#98988a',null);x+=w2+6}
-  if(!F.sq.length)text('NO SPROUTS — PLUCK THE LEAFY ONES',4,H-12,1,'#a8c898',null);
-  const dph=wDark()<=0?'DAY':wDark()<.6?'DUSK':'NIGHT',dl=dph+' '+(SW.day||1);text(dl,W-5-tw(dl,1),H-12,1,'#a8c898',null)}
- if(W4.near&&!F.dlg){const lab='A  '+W4.near.txt,lw=tw(lab,1)+10;r('rgba(10,14,8,.82)',W/2-lw/2,H-30,lw,11);r('#ffd23f',W/2-lw/2,H-30,9,11);text('A',W/2-lw/2+2,H-28,1,'#14101e',null);text(W4.near.txt,W/2-lw/2+13,H-28,1,'#ffffff',null)}
- if(W4.msgT>0&&W4.msg&&!F.dlg){const ml=swWrap(W4.msg,W-30).slice(0,3),ex2=(ml.length-1)*10;
-  r('rgba(10,10,16,.88)',8,H-46-ex2,W-16,13+ex2);r('#ffd23f',8,H-46-ex2,W-16,1);ml.forEach((l,j)=>text(l,Math.round(W/2-tw(l,1)/2),H-43-ex2+j*10,1,'#ffe8b0',null))}
+ wHud();
  if(F.got){const a=Math.min(1,F.got.t*2);g.globalAlpha=a;r('#14101e',20,H/2-26,200,44);r('#ffd23f',20,H/2-26,200,2);r('#ffd23f',20,H/2+16,200,2);
   ctext('TREASURE HOME!',H/2-21,1,'#ffd94d',null);ctext(wFit(F.got.n,190),H/2-9,2,'#ffffff',null);ctext(F.got.txt,H/2+6,1,'#7ee787',null);g.globalAlpha=1}
- if(F.dlg){const dl=F.dlg,L=FLOOK[dl.who];r('#14101e',6,H-62,W-12,56);r('#f8f4e0',8,H-60,W-16,52);r('#282838',8,H-60,W-16,3);
-  r(L&&L.crown?'#1e2c5a':'#a33b2e',8,H-57,tw(dl.who,1)+10,11);text(dl.who,13,H-55,1,'#ffffff',null);
-  swWrap(dl.lines[dl.i],W-32).slice(0,3).forEach((l,j)=>text(l,14,H-41+j*11,1,'#282838',null));
-  if(((time*2)|0)%2)text('▼',W-20,H-18,1,'#a33b2e',null)}}
+ if(F.dlg){const dl=F.dlg,L=FLOOK[dl.who];uiSay(dl.who,dl.lines[dl.i].replace(dl.who+': ',''),null,'A  NEXT',L&&L.crown?'#1e2c5a':null)}}

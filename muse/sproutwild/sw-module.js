@@ -913,7 +913,6 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
   const fx2=Math.max(cx0+tw(ft,1)/2+3,Math.min(cx0+W-tw(ft,1)/2-3,f.x));
   text(ft,Math.round(fx2-tw(ft,1)/2),Math.round(f.y-(1.4-f.t)*8),1,f.c,null)}
  if(W4.whistle){g.strokeStyle='rgba(255,244,180,.75)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-4,W4.whistle.r,0,7);g.stroke()}
- text('SEL: '+(SW.cmdMode==='sprout'?'SPROUT':'BUDDY'),(W4.cam?W4.cam.x:0)+8,(W4.cam?W4.cam.y:0)+H-40,1,SW.cmdMode==='sprout'?'#7ee787':'#a8c898',null)
  for(const [fk,fo] of (W4.front||[])){if(fk==='n')wDrawNode(fo);else wDrawDecor(fo)}
  if(W4.sector==='PEAK'&&SW.bottieSeen&&!SW.bottieBeat){wChar('BOTTIE',300,124+Math.round(Math.sin(time*1.7)*2),22);
   if(Math.hypot(P3.x-300,P3.y-120)>34){r('rgba(10,14,8,.55)',300-tw('BOTTIE',1)/2-2,126,tw('BOTTIE',1)+4,9);text('BOTTIE',300-tw('BOTTIE',1)/2,127,1,'#7ee7ff',null)}}
@@ -930,28 +929,9 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
    r('rgba(255,190,80,'+(dk*.10).toFixed(3)+')',214,58,52,52);
    r('rgba(255,200,100,'+(dk*.24).toFixed(3)+')',227,71,26,26)}}
  g.restore();
- if(W4.banner&&W4.banner.t>0){r('#0e1a0a',35,30,170,34);r('#ffd23f',35,30,170,2);
-  text(W4.banner.txt,W/2-tw(W4.banner.txt,2)/2,35,2,'#ffffff',null);
-  text(W4.banner.sub,W/2-tw(W4.banner.sub,1)/2,53,1,'#cfe0b8',null)}
- if(SW.quest<5&&!(W4.banner&&W4.banner.t>0)){r('rgba(10,14,8,.72)',0,18,W,12);
-  text(wFit('» '+(SW.quest===1&&!SW.tendDone?(SW.tendStage>=3?'Pluck 2 grown sprouts at the patch':SW.tendStage>=1?'Watch them grow as they carry':'Water the seeds at the SPROUT PATCH'):WQUEST[SW.quest]),232),6,20,1,'#ffd94d',null)}
- r('rgba(10,14,8,.72)',0,0,W,18);
- text(sec.n,6,5,1,'#ffd94d',null);
- if(SW.stam<99){r('#00000088',0,18,W,3);r(SW.stam>40?'#7ee787':SW.stam>18?'#ffd94d':'#e04838',0,18,Math.round(W*SW.stam/100),3)}
- const rs='W'+SW.res.wood+' S'+SW.res.stone+' P'+SW.res.petal+' SP'+wBudTotal()+(W4.sector==='BASE'?' ♥'+SW.hearts:'');
- text(rs,W-6-tw(rs,1),5,1,'#d8e8c8',null);
- const sig=SW.badges.length;text('SIGILS '+sig+'/4',6,H-12,1,sig>=4?'#ffd94d':'#a8c898',null);
- const dph=wDark()<=0?'DAY':wDark()<.6?'DUSK':'NIGHT',dl='DAY '+(SW.day||1)+' · '+dph;
- text(dl,W-6-tw(dl,1),H-12,1,'#a8c898',null);
- if(W4.near)ctext('A: '+W4.near.txt,H-24,1,'#ffffff',null);
- if(W4.msgT>0&&W4.msg){const mlines=swWrap(W4.msg,W-30).slice(0,2),extra=(mlines.length-1)*11;
-  r('rgba(10,10,16,.85)',10,H-40-extra,W-20,14+extra);
-  mlines.forEach((l,j)=>text(l,Math.round(W/2-tw(l,1)/2),H-37-extra+j*11,1,'#ffe8b0',null))}
+ wHud();
  if(W4.talk){const tk=W4.talk,line=tk.page===0?WTALK[tk.who][(SW.talkN[tk.who]-1)%3]:'Hand over the lantern?';
-  r('#f8f4e0',8,H-58,W-16,50);r('#282838',8,H-58,W-16,3);
-  text(tk.who,14,H-50,1,'#a33b2e',null);
-  swWrap(line,218).slice(0,2).forEach((l,j)=>text(l,14,H-40+j*11,1,'#282838',null));
-  text(tk.page===0?'A: MORE · B: BYE':'A: BECOME '+tk.who+' · B: BYE',14,H-18,1,'#585868',null)}}
+  uiSay(tk.who,line,null,tk.page===0?'A  MORE · B  BYE':'A  BECOME '+tk.who+' · B  NO')}}
 
 function wDrawBuilding(b){const x=wCellX(b.gx),y=wCellY(b.gy);
  if(b.k==='cottage'){r('rgba(0,0,0,.18)',x-2,y+18,24,3);

@@ -21,6 +21,21 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v5.2 — the first hour (Fable)
+
+What you see before you ever leave Sunkeep was still the old game. This pass rebuilds it (`sw-front.js`).
+
+- **Text no longer overlaps.** One HUD for Sunkeep and the field, laid out in fixed rows from the bottom of the screen: status row, then the A prompt, then messages. The stray "SEL: BUDDY" and "SIGILS" labels that sat on top of messages are gone. All dialogue uses one speech box with a name tab and its prompt on a separate row.
+- **Title screen** redrawn: sunrise behind the Lantern, the logo, a parade of buddies and sprouts.
+- **Opening story** redone as six animated scenes: the Lantern cracks, seeds fall and sprout, Erin at the dark lantern, a sprout taking command of a buddy, Marcus and the Sigils, King Bibi raising the Iron Dome with Bottie glinting overhead.
+- **Cut-ins** ("joined you", keeper swap, Bottie's arrival) redrawn with rays, a name banner and the speech box.
+- **Menus** restyled; long lists scroll instead of shrinking, and the description box holds three lines.
+- **Sunkeep's ground** repainted: dirt lanes, a stone plaza under the Lantern, a fenced garden, flower beds, a forest edge.
+
+Not done yet: Sunkeep still uses the old walker, so the sprout squad does not follow you at home, and buildings and battle screens keep their old art.
+
+Tests: `tests-fable/render-front.js` (screenshots). `field-lab.js` 31/31. The older suites are unchanged from v5.1: 13 pass, the same 10 fail on the old sector layout.
+
 ## v5.1 — the field engine (Fable)
 
 Everything outside Sunkeep Base was rebuilt. The old sectors were one flat 480x360 screen with randomly scattered props; they are now hand-drawn scrolling tile maps with their own engine (`sw-field.js`, spliced in by `build_fable.py`).
