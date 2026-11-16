@@ -1,4 +1,6 @@
-# Main line: `alt/` — five cartridges (Nov 15 2026)
+# Main line: `alt/` — five cartridges (updated Nov 16 2026)
+
+**Newest:** Sproutwild v8.0. Front page with every game, its changelog and status: [`README.md`](README.md). Known bugs: [`KNOWN-ISSUES.md`](KNOWN-ISSUES.md).
 
 **Build on this:** [`alt/`](alt/README.md). Sprouts, North Coast Knockout (with the later Fable passes), Rootdeep,
 Patch & Plate and **Sproutwild** in one console. Play `alt/games/pocket-lantern-alt.html`; rebuild with `python3 alt/build.py`.
