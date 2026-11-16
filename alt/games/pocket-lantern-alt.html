@@ -9900,7 +9900,7 @@ function scBuild(){SW.lessons.scBuild=1;SW.beats.caught=1;const nm=(SW.party[SW.
   {x:150,y:236,hold:1.1},{x:150,y:236,who:'MARCUS',txt:'Buddies need a roof, bro. Press START, pick BUILD, then COTTAGE. Costs 8 wood. This spot is nice.'},
   {x:150,y:236,who:'MARCUS',txt:'Short on wood? Send a buddy at trees. Sprouts carry the logs home. Teamwork. I supervise.'},
   {who:'ERIN',txt:'Only your lead buddy walks with you here. The others wait at home. Give them a roof and they get to work.'},{hold:.4}],()=>swSave())}
-function scAuto(){swMsgPump();scGymCheck();sigilCheck();if(!SCOFF&&!swBusy()&&!(W4.scPend&&W4.scPend.length)&&kindCheck())return;
+function scAuto(){swMsgPump();scGymCheck();sigilCheck();loreTown();loreBibi();if(!SCOFF&&!swBusy()&&!(W4.scPend&&W4.scPend.length)&&kindCheck())return;
  if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
   if(wOp()>=3&&!SW.lessons.loop&&SW.quest<=2&&(SCOFF||!swBusy())){if(SCOFF)SW.lessons.loop=1;else{W4.loopT=0;state='g4loop';return}}
   if(wHasRoof()&&!SW.lessons.scDab&&W4.sector==='BASE'&&wOp()>=3&&!(W4.cons&&W4.cons.length)){W4.dabT=(W4.dabT||0)+1;if(W4.dabT>50){if(SCOFF)SW.lessons.scDab=1;else dabStart();return}}
@@ -10581,6 +10581,7 @@ function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch
  scStart([
   {x:240,y:70,hold:1.9,fn:()=>{for(const c of WCHOICE){c.x=-200;c.y=-200}W4.wake=3;W4.banner=null;swSnd(523,.35,1046)}},
   {x:240,y:70,who:'ERIN',txt:'It is awake! Your sprouts did that, with the berries they carried.'},
+  {x:240,y:70,who:'MARCUS',txt:'Bet King Bibi saw that from behind his dome. Good. Let him squint, bro.'},
   {x:240,y:352,hold:1.5},
   {x:240,y:352,hold:1.1,fn:pop},
   {x:240,y:352,who:'ERIN',txt:'Now it is lit, the garden grows sprouts on its own. Pluck them when they are grown.'},
@@ -10790,6 +10791,39 @@ function drawSigil(){const KC=KO._,C=KC.CH,M=C[C.findIndex(c=>c.id==='marcus')],
    text0('SOUTH',W/2-30,ay+20,1,'#ffffff',K);text0("SQUIRE'S WOODS",W/2-30,ay+32,1,'#f8e060',K)}
   if(u>1.2)ctext0('A  CONTINUE',H-14,1,'#8a86a0',null);
   if(u<.1)r('rgba(255,255,255,'+(1-u/.1).toFixed(2)+')',0,0,W,H)}}
+/* ================================================================
+   THE STORY, TOLD A LITTLE MORE (v8.9): Will asked for more explaining
+   in the intro and more scenes with the cast about the villain.
+   - The intro is 8 short slides (one voice each, A to go on): the
+     Lantern, the sprouts, the dim buddies, KING BIBI and his IRON DOME,
+     why a dark valley suits him, Erin's hope and Marcus's plan.
+   - Marcus mentions Bibi when the Lantern wakes.
+   - The Elder tells you about the domes on your first visit to
+     Lantern Town.
+   - After Bottie shows up, Erin and Marcus talk about King Bibi.
+   ================================================================ */
+WSTORY.length=0;WSTORY.push(
+ {sc:0,who:'',t:'The Great Lantern hung over the valley and everything grew. Then, one night, it cracked.'},
+ {sc:1,who:'',t:'Its light fell as seeds, and the seeds grew legs: SPROUTS, the little plant folk.'},
+ {sc:3,who:'',t:"Without the light the valley's wild BUDDIES went dim. Sprouts can carry the light back to them."},
+ {sc:5,who:'KING BIBI',t:'Citizens. For thirty years I have warned you: the light is weeks away. Hence, my IRON DOME.',acc:'#1e2c5a'},
+ {sc:5,who:'',t:"King Bibi walled the valley's roads with IRON DOME posts. 'Temporary,' he said. They never came down."},
+ {sc:5,who:'KING BIBI',t:'A dark valley needs a strong king. Stay home. Stay dim. Trust the dome.',acc:'#1e2c5a'},
+ {sc:2,who:'ERIN',t:'One patch of soil at Sunkeep still grows, keeper. Light the Lantern and his domes lose their grip.'},
+ {sc:4,who:'MARCUS',t:"Four gyms, four Sigils, bro. Each one opens a road. Then we knock on the King's dome. I supervise."});
+/* first visit to Lantern Town: the Elder explains what the domes did */
+function loreTown(){const F=W4.fld;if(!F||F.id!=='TOWN'||SW.lessons.scTown||W4.scene||state!=='g4world'||(W4.banner&&W4.banner.t>0))return;
+ SW.lessons.scTown=1;scStart([
+  {who:'ELDER',txt:'Welcome to Lantern Town, keeper. We were the brightest street in the valley once.'},
+  {who:'ELDER',txt:'Then King Bibi put up his IRON DOMES. Roads shut. Trade stopped. The light stopped.'},
+  {who:'ELDER',txt:"The Ranger kept our one road open, the one you walked in on. Win her Sigil and she'll open more."}],()=>swSave())}
+/* after Bottie's visit: Erin and Marcus on the King */
+function loreBibi(){if(W4.fld||W4.sector!=='BASE'||!SW.bottieSeen||SW.lessons.scBibi||W4.scene||state!=='g4world')return;
+ W4.bibiT=(W4.bibiT||0)+1;if(W4.bibiT<90)return;SW.lessons.scBibi=1;scStart([
+  {who:'ERIN',txt:"That robot gives me the creeps. And it isn't even the worst thing out there."},
+  {who:'MARCUS',txt:"King Bibi, bro. Thirty years of 'the light is weeks away.' Weeks."},
+  {who:'ERIN',txt:"Every road he domes off is a road the light can't reach. A dark valley keeps him king."},
+  {who:'MARCUS',txt:'Four Sigils and we walk right up to his dome. I do the talking, you do the battling. Dap me up.'}],()=>swSave())}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */

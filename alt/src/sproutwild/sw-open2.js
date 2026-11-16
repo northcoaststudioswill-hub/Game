@@ -71,6 +71,7 @@ function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch
  scStart([
   {x:240,y:70,hold:1.9,fn:()=>{for(const c of WCHOICE){c.x=-200;c.y=-200}W4.wake=3;W4.banner=null;swSnd(523,.35,1046)}},
   {x:240,y:70,who:'ERIN',txt:'It is awake! Your sprouts did that, with the berries they carried.'},
+  {x:240,y:70,who:'MARCUS',txt:'Bet King Bibi saw that from behind his dome. Good. Let him squint, bro.'},
   {x:240,y:352,hold:1.5},
   {x:240,y:352,hold:1.1,fn:pop},
   {x:240,y:352,who:'ERIN',txt:'Now it is lit, the garden grows sprouts on its own. Pluck them when they are grown.'},
