@@ -67,3 +67,73 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
   simple mobile base management (short timers, real choices like plot space).
 - Prefers working builds he can play at the artifact link after each round, plus a changelog entry
   and screenshots for the dev board team.
+
+## Architecture details (for whoever edits the code next)
+
+### How the code fits together
+- Everything runs in ONE scope: `console.js` (the Pocket Lantern shell) with all `sw-*.js` files spliced
+  in by `alt/build.py` ahead of the module's `DISPATCH + TEST HOOKS` marker. A function declared in a
+  later file replaces the earlier one everywhere (function declarations hoist; last one wins). `const`
+  and `let` names must be unique across all files, or the page fails to load.
+- Build order (see `SPROUTWILD=[...]` in `alt/build.py`): sw-cartart, sw-module, sw-field, sw-front,
+  sw-base, sw-art, sw-story, sw-battle, sw-save, sw-text, sw-cast, sw-party, sw-scene, sw-starters,
+  sw-plots, sw-hollow, sw-louie, sw-bugs, sw-walk, sw-open2.
+- Several functions exist in more than one file on purpose (the later one is live). Known pairs:
+  `swPauseUpdate/drawPause` (live: sw-save.js), `cotUpdate/drawCot` (live: sw-story.js),
+  `wQuestText` (two copies in sw-story.js; the second is live), `wBaseArrive`, `scIntro`, `scWake`,
+  `ewTick/ewTarget/ewDraw`, `fBudDraw`, `wNearExtra`, `swSay` (live: sw-open2.js), `wLouTick/fLouTick/
+  fLouDraw` (live: sw-louie.js), `choiceUpdate/drawChoice` (live: sw-starters.js), `wBuildDef/wPlotCount`
+  (live: sw-plots.js). When an edit "does nothing", grep for a second definition first.
+- Patching style used so far: small Python scripts doing exact string replacement with an assert
+  that the old text occurs exactly once, then rebuild and run the lab. Do not use sed for multi-part
+  edits. Careful when replacing the `const SWF={` hook line: keep every existing hook.
+
+### Key state
+- `state` strings: `g4title g4intro g4world g4battle g4engage g4cine g4pause g4party g4dex g4build g4place
+  g4map g4base g4keeper g4guide g4cot g4nur g4tools g4assign g4jobs g4lamp g4gym g4confirm g4ask g4plot
+  g4dab g4loop g4jar g4kind g4choice g4bottie`.
+- `SW` is the save (localStorage key `sproutwild-v1`, `-s2`, `-s3` for files 2 and 3). Notable fields:
+  quest (0..5; 2 = has first buddy, 3 = first catch done, 5 = cottage+crop done), seeds, louFed, lit,
+  buds{EMBER,PEB,DEW,ZIP,LEAF,LUCKY}, party[], box[], buildings[], res{wood,stone,petal,berry,ingot,
+  fiber,ore}, hearts, light, plotCrop{plotIndex:'berry'|'fiber'}, bugs{}, bugSeen{}, kinds{}, lessons{},
+  beats{}, walk2 (Meadow walk stage 0..10), bwalk (base escort 0..2), keeper, day, baseLv.
+- `W4` is runtime only (not saved): fld (field area), bf (base field), scene, cast, wk (home workers),
+  patchBuds (garden), wilds, bugs, ew (Erin in the Meadow), lst (Louie state), cons (buildings going up).
+- Opening stage `wOp()`: 0 seeds left to pluck, 1 berries to deliver, 2 Lantern lit/choose a starter,
+  3 done. Goal line text comes from `wQuestText()`, Louie's hint target from `wNextGoal()`.
+
+### Systems and their numbers (so balance changes start from facts)
+- Catch: wild needs `level + 1` sprout points (kin sprouts count 2, a buddy next to it adds 1).
+  First catch always blooms. Wild level grows with distance from the area's Lantern post.
+- Buddy cap: 3 total (party + box) until a Data Center (8 stone, 2 ingots) raises it to 15.
+- Building time: about 9 s + 0.45 s per unit of cost, faster with helpers nearby.
+- Base trees regrow after 75 s, rocks after 90 s. Kiln: 1 ore -> 1 ingot (2 with a skilled worker).
+- Plots: berries ripen in 60 s, fiber in 90 s (faster with WATERING or PLANTING buddies at home).
+- Lantern: every 4 deliveries grows a sprout. Lightning bugs add light.
+- Starters: CUYAPUP 34hp/14atk, BESSLING 38/12, GRASSKIN 40/14; evolve at Lv16 (CUYAFLARE, BESSIE,
+  GRASSMAN). First gym (Ranger, Lantern Town) opens with Lv7 and Lv8. Python alpha Lv11.
+
+### Tests and playtests
+- `alt/tests/sproutwild/field-lab.js` steps the real game with `G.update(1/30)` in headless Chromium.
+  At the top it calls `noScenes(true)`, `noCap(true)`, `noBugs(true)` and sets Louie's dig timer huge,
+  because scenes, the buddy cap, bugs and Louie's dug berries all change what A aims at. Individual
+  checks switch them back on when they test them.
+- If a menu row is added to the pause menu, the save/quit tests count rows with `tap('down')` and must
+  be updated (they use 8 downs as of v7.9).
+- Flaky failures so far always came from something random taking the aim (a bug, a dug berry, an
+  island treasure) or from a fight helper picking a non-damaging move. Run the lab 2 to 4 times.
+- Real-time playtest pattern (scripts lived in the session scratchpad and are gone; rebuild as needed):
+  open the built file in Playwright at 430x932, `dispatchEvent(new PointerEvent('pointerdown'))` on
+  `.cart[data-i="4"]`, wait about 4.4 s, then press keys by setting `window.__g.keys[k]=1` for ~70 ms.
+  Screenshot `#screen`. Use `window.__g.SWF()` hooks to read state, find targets and setPos.
+- Publishing: the Artifact tool, file `/home/user/Game/alt/games/pocket-lantern-alt.html`, url
+  https://claude.ai/artifact/KqmxEmur2YMFoFLYjp7MNx. The build is about 14.5 MB of the 16 MB limit.
+
+### Timeline (short)
+- v5.x to v6.x (2026-11-14/15): Sproutwild rebuilt as a fifth cartridge in the fighter console (`alt/`),
+  field engine, base, party, open-field capture, then many onboarding passes.
+- v6.6: tools removed, Meadow home gate moved north. v6.8: cottage gives buddies a roof.
+- v7.0: Ohio starters, reveal, Data Center, garden plot crops, Crooked Hollow. v7.1: cottage cinematic.
+- v7.2 to v7.7: evolutions, how-it-works card, base goals, regrowth, SELECT battles, goal hints.
+- v7.8: Louie like Sprouts. v7.9: bugs and jar, Erin's Meadow walk, kind cards.
+- v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
