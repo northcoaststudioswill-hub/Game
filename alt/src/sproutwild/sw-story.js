@@ -152,6 +152,8 @@ if(!SW.gear)SW.gear={};
 function wWorkerCount(){return SW.crew.filter(c=>c.job!==-1).length+SW.party.slice(1).length+SW.box.length}
 function wMissionDone(key){const [k,v]=key.split(':');
  if(k==='build')return SW.buildings.some(b=>b.k===v);
+ if(k==='crop')return plCrops()>=+v||SW.buildings.some(b=>b.k==='bed'); /* v8.7: these two were missing here, so Sunkeep Lv1 could never finish */
+ if(k==='buddies')return SW.party.length+(SW.box||[]).length>=+v;
  if(k==='workers')return wWorkerCount()>=+v;
  if(k==='species')return Object.keys(SW.caught).length>=+v;
  if(k==='sigils')return SW.badges.length>=+v;

@@ -109,8 +109,8 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - Base trees regrow after 75 s, rocks after 90 s. Kiln: 1 ore -> 1 ingot (2 with a skilled worker).
 - Plots: berries ripen in 60 s, fiber in 90 s (faster with WATERING or PLANTING buddies at home).
 - Lantern: every 4 deliveries grows a sprout. Lightning bugs add light.
-- Starters: CUYAPUP 34hp/14atk, BESSLING 38/12, GRASSKIN 40/14; evolve at Lv16 (CUYAFLARE, BESSIE,
-  GRASSMAN). First gym (Ranger, Lantern Town) opens with Lv7 and Lv8. Python alpha Lv11.
+- Starters: CUYAPUP 34hp/14atk, BESSLING 38/14 (was 12), GRASSKIN 40/14; evolve at Lv16. First gym (Ranger, Lantern
+  Town) is MELONKIN Lv5 + FERNFANG Lv5 since v8.7 (was Lv7/8); the team shares 60% XP. Python alpha Lv11.
 
 ### Tests and playtests
 - `alt/tests/sproutwild/field-lab.js` steps the real game with `G.update(1/30)` in headless Chromium.
@@ -138,6 +138,8 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
 - v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
   "FOUND ONE!" bubble stays on screen.
+- v8.7: gym guidance (scGymCheck, wGymGoal), first gym rebalanced, XP share, crop/buddies missions fixed,
+  pluck grown garden sprouts. Autopilot `fromCottage` start.
 - v8.6: Erin's hands-on beats after the Meadow tour (SW.walk3: chop, carry, ladybug), tile pathing (ewGo).
 - v8.5: sw-pace.js (message queue; scenes, cards, dialogue and bubbles wait their turn), Ranger's barrier until the
   first Sigil, Lower Meadow (sw-meadow2.js), one garden from the start. Autopilot playtest: `alt/tests/sproutwild/autopilot.js`.

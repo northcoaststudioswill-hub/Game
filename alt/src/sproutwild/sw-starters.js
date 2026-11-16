@@ -41,7 +41,7 @@ GRASSKIN(D){const fur='#6a8c3a',dk='#4a6a2a',fc='#e0c090';
 {const fb=["..ss..",".sggs.","sggggs",".sggs."],mk=(id,t,hp,atk,def,spd,work,learn,d,c)=>{const s={id,t:[t],hp,atk,def,spd,catch:.3,work,learn,d,spr:fb.slice(),pal:{s:'#14101e',g:c},starter:1};
   s._old=SWSPR(s.spr,s.pal);s._spr=swbMake(WSTARTART[id]);WSPECIES.push(s)};
  mk('CUYAPUP',0,34,14,10,12,{KINDLING:2,WATERING:1},[[1,'tackle'],[1,'embershot'],[5,'quicknip'],[8,'riverfire'],[12,'flameburst'],[16,'magmaburst']],'A river pup with a tail that never goes out. Leaves a rainbow sheen on puddles.','#f8902c');
- mk('BESSLING',2,38,12,12,10,{WATERING:2,FORTUNE:1},[[1,'tackle'],[1,'bubblesnap'],[5,'shellup'],[8,'lakewake'],[12,'tideslam'],[16,'tidalsurge']],'A lake serpent pup. Fishermen swear they saw it. Nobody believes them.','#3aa0a8');
+ mk('BESSLING',2,38,14,12,10,{WATERING:2,FORTUNE:1},[[1,'tackle'],[1,'bubblesnap'],[5,'shellup'],[8,'lakewake'],[12,'tideslam'],[16,'tidalsurge']],'A lake serpent pup. Fishermen swear they saw it. Nobody believes them.','#3aa0a8');
  mk('GRASSKIN',4,40,14,12,8,{PLANTING:2,QUARRY:1},[[1,'tackle'],[1,'vinelash'],[5,'warcry'],[8,'bigstomp'],[12,'headbutt'],[16,'thornstorm']],'A knee-high Grassman. Hides behind trees it is wider than.','#6a8c3a');
  WCHOICE[0].sp='CUYAPUP';WCHOICE[1].sp='BESSLING';WCHOICE[2].sp='GRASSKIN';
  Object.assign(WBLURB,{CUYAPUP:'Fast and fierce. Runs the kiln and waters the garden.',BESSLING:'Tough and lucky. The best waterer there is.',GRASSKIN:'The strongest of the three. Plants, chops and hauls stone.'})}

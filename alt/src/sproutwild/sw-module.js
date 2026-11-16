@@ -324,7 +324,7 @@ function wNpcList(){if(W4.sector==='TOWN')return[{who:'PIP',x:168,y:214},{who:'E
  return Object.keys(spots).filter(w2=>w2!==SW.keeper).map(w2=>({who:w2,x:spots[w2].x,y:spots[w2].y}))}
 const WSECSUB={BASE:'Your home — build it anywhere',TOWN:'Lanterns lit. Doors open.',MEADOW:'Wildsprouts live in the tall grass',WASTES:'Hot winds. EMBER kinds thrive here',SHORE:'Mist, shells and DEW kinds',HOLLOW:'Dark, quiet, and LUCKY',PEAK:'High winds. ZIP kinds race here'};
 const WGYMS=[
- {sec:'TOWN',leader:'RANGER',sig:'VERDANT SIGIL',prize:80,team:[['FERNFANG',7],['BLOOMBOAR',8]],
+ {sec:'TOWN',leader:'RANGER',sig:'VERDANT SIGIL',prize:80,team:[['MELONKIN',5],['FERNFANG',5]], /* v8.7: first gym, on the main path now */
   pre:["RANGER: So you want the Verdant Sigil.","My buddies grew up in this meadow. Show me yours can keep up."],
   win:"RANGER: Ha! Grown strong. The Verdant Sigil is yours.",lose:"RANGER: The meadow is patient. Come back stronger."},
  {sec:'WASTES',leader:'MARCUS',sig:'EMBER SIGIL',prize:120,team:[['CINDERCAP',16],['MAGMOSS',17]],
@@ -1196,6 +1196,8 @@ function wFoeDown(){const me=btCur(),foe=BT.foe;BT.log.push({txt:foe.sp+' fainte
   const now=wMovesAt(wSp(me.sp),me.lv);
   for(const mid of now)if(!me.moves.includes(mid))BT.log.push({txt:me.sp+' learned '+WMOVES[mid].n+'!'});
   me.moves=now;need=wXpNext(me.lv)}
+ for(const m of SW.party){if(m===me||m.hp<=0||m.lv>=40)continue;m.xp=(m.xp||0)+Math.round(gain*.6);let nd=wXpNext(m.lv); /* v8.7: the team shares XP */
+  while(m.xp>=nd&&m.lv<40){m.xp-=nd;m.lv++;m.moves=wMovesAt(wSp(m.sp),m.lv);BT.log.push({txt:m.sp+' grew to Lv '+m.lv+' too!'});nd=wXpNext(m.lv)}}
  const evoTo=WEVO[me.sp];
  if(evoTo&&me.lv>=16){const oldMax=wStats(me).max;me.sp=evoTo;const newMax=wStats(me).max;
   me.hp=Math.min(newMax,me.hp+newMax-oldMax);me.moves=wMovesAt(wSp(me.sp),me.lv);

@@ -21,6 +21,23 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v8.7 · 2026-11-16 · past the cottage: the road to the first gym
+
+Played past the cottage with the autopilot (it now plants a crop, walks north to Lantern Town and fights the Ranger) and with battle simulations.
+
+- **Fixed: Sunkeep Lv1 could never be finished.** The live mission check had lost two rules, so "Grow a crop on a garden plot" and "Have 3 buddies" never counted, even with berries planted.
+- **The game now points you at the gym.** Nothing did after the cottage and the crop. Now a short scene (queued right after the crop): Erin and Marcus send you up the north road to Lantern Town, say the VERDANT SIGIL opens the roads east and south, and explain the matchup: "The Ranger's buddies are LEAF kinds, Lv5. EMBER hits leaf hard. DEW and PEB get hit hard." In the field the goal line reads "Ranger gym, north road: train to Lv6 (SELECT)" until your best buddy gets there, then "win the Ranger's Sigil". At home the base missions still show.
+- **The first gym is fair now that it is on the main path.** Battle simulations (the real battle code, wild Meadow fights then the gym):
+  - Old Ranger (Lv7 FERNFANG, Lv8 BLOOMBOAR): with BESSLING it took 14 battles to reach Lv7 and still lost every time; 25 battles to Lv8 won 1 of 2.
+  - New Ranger (Lv5 MELONKIN, Lv5 FERNFANG): CUYAPUP and GRASSKIN win at Lv6 first try (7 to 9 wild battles); BESSLING, weak to leaf, wins first try at Lv7 (13 to 14 battles).
+- **The whole team shares XP**: teammates still standing get 60% of the winner's XP ("PEBBLIT grew to Lv 4 too!"). Before, your second buddy stayed at Lv2.
+- **BESSLING attack 12 -> 14.** It was strictly weaker than GRASSKIN.
+- **Pluck grown garden sprouts.** A grown sprout resting in its plot can be plucked into your squad, freeing the plot, like Sprouts. (Erin already told you to pluck them.)
+- Autopilot: can start right after the cottage (`fromCottage`), plants a crop, travels north, fights the gym, logs every goal-line change.
+- Tests: 119 checks; one run in four had "the lead buddy fetches FIBER from a thicket" fail (a single A press, a wild can take the aim); the other three clean.
+
+**Not checked:** a real player training by hand to the Sigil (the autopilot does not train); the gym scene plays at the next calm moment, which can be after you leave home if you leave within a few seconds of planting; iPhone.
+
 ## v8.6 · 2026-11-16 · learn by doing before the cottage; Erin walks round the lake
 
 Will: keep play-testing and keep building learning into the onboarding.

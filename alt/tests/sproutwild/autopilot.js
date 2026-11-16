@@ -9,6 +9,10 @@ const errs=[];p.on('pageerror',e=>errs.push(e.message));
 await p.goto('file://'+FILE+'?dev');await sleep(800);
 await p.evaluate(()=>{document.querySelector('.cart[data-i="4"]').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}))});await sleep(4400);
 const ev=s=>p.evaluate(s=>window.__g.ev(s),s);
+if(process.argv[5]==='fromCottage'){await p.evaluate(()=>{const F=window.__g.SWF(),S=F.meta();
+ S.intro=1;S.quest=4;S.lit=1;S.tendDone=true;S.louFed=1;S.walk2=10;S.walk3=7;S.bwalk=2;S.trioSeeded=1;
+ Object.assign(S.lessons,{scSend:1,loop:1,scMeadow:1,scBuild:1,scDab:1,scPlot:1,squire:1});S.beats=Object.assign(S.beats||{},{wake:1,three:1,lit:1,first:1,caught:1});
+ S.buildings.push({k:'cottage',gx:3,gy:9,workers:[]});S.res.wood=0;F.giveMon('BESSLING',5);F.giveMon('PEBBLIT',2);F.enter('BASE')});await sleep(1500)}
 const key=async(k,ms=70)=>{await p.evaluate(k=>{window.__g.keys[k]=1},k);await sleep(ms);await p.evaluate(k=>{window.__g.keys[k]=0},k);await sleep(40)};
 let shotN=0;const shot=async n=>{const u=await p.evaluate(()=>document.querySelector('#screen').toDataURL());fs.writeFileSync(D+'/'+String(shotN++).padStart(3,'0')+'-'+n+'.png',Buffer.from(u.split(',')[1],'base64'))};
 const SNAP=`JSON.stringify((()=>{const F=W4.fld,bf=W4.bf,sc=W4.scene,st=sc&&sc.steps[sc.i],dl=F&&F.dlg;
@@ -48,13 +52,14 @@ while(T()<CAP){
  const ph=s.state+'/'+s.sec+'/op'+s.op+'/q'+s.q+'/w'+s.w2+'/bw'+s.bw;if(ph!==phase){log.push(T().toFixed(1)+'s == '+ph);phase=ph}
  if(Date.now()-lastShot>6000){await shot(s.state);lastShot=Date.now()}
  if(s.state==='g4dab'){globalThis.__sawDab=1;if(Date.now()-lastShot>2500){await shot('dab');lastShot=Date.now()}}
+ if(!globalThis.__dbgT||Date.now()-globalThis.__dbgT>20000){globalThis.__dbgT=Date.now();log.push(T().toFixed(1)+'s DBG cot='+s.cot+' crop='+s.crop+' plot='+JSON.stringify(s.plot)+' q='+s.q+' P='+s.P.map(Math.round)+' sec='+s.sec+' fid='+s.fid+' state='+s.state)}
  if(s.goal!==globalThis.__goal){globalThis.__goal=s.goal;log.push(T().toFixed(1)+'s GOAL '+s.goal+'   [team '+s.lv+']')}
  if(s.badges>=1){log.push(T().toFixed(1)+'s FIRST SIGIL [team '+s.lv+']');await sleep(3000);await shot('sigil');break}
  const txt=s.scene||s.dlg||(s.state!=='g4world'?s.state:'');if(txt!==lastTxt){lastTxt=txt;txtAt=Date.now()}
  // 1. anything that waits for A: read it first
  if(s.scene&&Date.now()-txtAt>20000&&!globalThis.__dumped){globalThis.__dumped=1;log.push('STUCK DUMP '+await ev("JSON.stringify({i:W4.scene.i,n:W4.scene.steps.length,t:W4.scene.t,step:W4.scene.steps[W4.scene.i],pend:(W4.scPend||[]).length,msgT:W4.msgT,state,keysA:keys.a,prevA:prev.a})"));console.log(log[log.length-1])}
  if(s.scene||s.dlg||s.talk){const need=Math.max(1.6,readT(s.scene||s.dlg||'x'))*1000;if(Date.now()-txtAt>need){await key('a');if(!globalThis.__dumped)txtAt=Date.now()}await sleep(150);continue}
- if(['g4title','g4intro','g4loop','g4kind','g4cine','g4choice','g4file','g4slot','g4save'].includes(s.state)||(s.state!=='g4world'&&!['g4build','g4place','g4pause','g4battle'].includes(s.state))){if(Date.now()-txtAt>2200){await key('a');txtAt=Date.now()}await sleep(150);continue}
+ if(['g4title','g4intro','g4loop','g4kind','g4cine','g4choice','g4file','g4slot','g4save'].includes(s.state)||(s.state!=='g4world'&&!['g4build','g4place','g4pause','g4battle','g4plot'].includes(s.state))){if(Date.now()-txtAt>2200){await key('a');txtAt=Date.now()}await sleep(150);continue}
  if(s.state==='g4battle'){await aPress(500);await sleep(150);continue}
  if(s.state==='g4plot'){const sel=+(await ev('swSel'));if(sel<1)await key('down');else if(sel>1)await key('up');else await key('a');await sleep(250);continue}
  if(s.state==='g4pause'){const sel=+(await ev('swSel'));if(sel<3)await key('down');else if(sel>3)await key('up');else await key('a');await sleep(200);continue}

@@ -6372,7 +6372,7 @@ function wNpcList(){if(W4.sector==='TOWN')return[{who:'PIP',x:168,y:214},{who:'E
  return Object.keys(spots).filter(w2=>w2!==SW.keeper).map(w2=>({who:w2,x:spots[w2].x,y:spots[w2].y}))}
 const WSECSUB={BASE:'Your home — build it anywhere',TOWN:'Lanterns lit. Doors open.',MEADOW:'Wildsprouts live in the tall grass',WASTES:'Hot winds. EMBER kinds thrive here',SHORE:'Mist, shells and DEW kinds',HOLLOW:'Dark, quiet, and LUCKY',PEAK:'High winds. ZIP kinds race here'};
 const WGYMS=[
- {sec:'TOWN',leader:'RANGER',sig:'VERDANT SIGIL',prize:80,team:[['FERNFANG',7],['BLOOMBOAR',8]],
+ {sec:'TOWN',leader:'RANGER',sig:'VERDANT SIGIL',prize:80,team:[['MELONKIN',5],['FERNFANG',5]], /* v8.7: first gym, on the main path now */
   pre:["RANGER: So you want the Verdant Sigil.","My buddies grew up in this meadow. Show me yours can keep up."],
   win:"RANGER: Ha! Grown strong. The Verdant Sigil is yours.",lose:"RANGER: The meadow is patient. Come back stronger."},
  {sec:'WASTES',leader:'MARCUS',sig:'EMBER SIGIL',prize:120,team:[['CINDERCAP',16],['MAGMOSS',17]],
@@ -7244,6 +7244,8 @@ function wFoeDown(){const me=btCur(),foe=BT.foe;BT.log.push({txt:foe.sp+' fainte
   const now=wMovesAt(wSp(me.sp),me.lv);
   for(const mid of now)if(!me.moves.includes(mid))BT.log.push({txt:me.sp+' learned '+WMOVES[mid].n+'!'});
   me.moves=now;need=wXpNext(me.lv)}
+ for(const m of SW.party){if(m===me||m.hp<=0||m.lv>=40)continue;m.xp=(m.xp||0)+Math.round(gain*.6);let nd=wXpNext(m.lv); /* v8.7: the team shares XP */
+  while(m.xp>=nd&&m.lv<40){m.xp-=nd;m.lv++;m.moves=wMovesAt(wSp(m.sp),m.lv);BT.log.push({txt:m.sp+' grew to Lv '+m.lv+' too!'});nd=wXpNext(m.lv)}}
  const evoTo=WEVO[me.sp];
  if(evoTo&&me.lv>=16){const oldMax=wStats(me).max;me.sp=evoTo;const newMax=wStats(me).max;
   me.hp=Math.min(newMax,me.hp+newMax-oldMax);me.moves=wMovesAt(wSp(me.sp),me.lv);
@@ -9361,6 +9363,8 @@ if(!SW.gear)SW.gear={};
 function wWorkerCount(){return SW.crew.filter(c=>c.job!==-1).length+SW.party.slice(1).length+SW.box.length}
 function wMissionDone(key){const [k,v]=key.split(':');
  if(k==='build')return SW.buildings.some(b=>b.k===v);
+ if(k==='crop')return plCrops()>=+v||SW.buildings.some(b=>b.k==='bed'); /* v8.7: these two were missing here, so Sunkeep Lv1 could never finish */
+ if(k==='buddies')return SW.party.length+(SW.box||[]).length>=+v;
  if(k==='workers')return wWorkerCount()>=+v;
  if(k==='species')return Object.keys(SW.caught).length>=+v;
  if(k==='sigils')return SW.badges.length>=+v;
@@ -10077,7 +10081,7 @@ GRASSKIN(D){const fur='#6a8c3a',dk='#4a6a2a',fc='#e0c090';
 {const fb=["..ss..",".sggs.","sggggs",".sggs."],mk=(id,t,hp,atk,def,spd,work,learn,d,c)=>{const s={id,t:[t],hp,atk,def,spd,catch:.3,work,learn,d,spr:fb.slice(),pal:{s:'#14101e',g:c},starter:1};
   s._old=SWSPR(s.spr,s.pal);s._spr=swbMake(WSTARTART[id]);WSPECIES.push(s)};
  mk('CUYAPUP',0,34,14,10,12,{KINDLING:2,WATERING:1},[[1,'tackle'],[1,'embershot'],[5,'quicknip'],[8,'riverfire'],[12,'flameburst'],[16,'magmaburst']],'A river pup with a tail that never goes out. Leaves a rainbow sheen on puddles.','#f8902c');
- mk('BESSLING',2,38,12,12,10,{WATERING:2,FORTUNE:1},[[1,'tackle'],[1,'bubblesnap'],[5,'shellup'],[8,'lakewake'],[12,'tideslam'],[16,'tidalsurge']],'A lake serpent pup. Fishermen swear they saw it. Nobody believes them.','#3aa0a8');
+ mk('BESSLING',2,38,14,12,10,{WATERING:2,FORTUNE:1},[[1,'tackle'],[1,'bubblesnap'],[5,'shellup'],[8,'lakewake'],[12,'tideslam'],[16,'tidalsurge']],'A lake serpent pup. Fishermen swear they saw it. Nobody believes them.','#3aa0a8');
  mk('GRASSKIN',4,40,14,12,8,{PLANTING:2,QUARRY:1},[[1,'tackle'],[1,'vinelash'],[5,'warcry'],[8,'bigstomp'],[12,'headbutt'],[16,'thornstorm']],'A knee-high Grassman. Hides behind trees it is wider than.','#6a8c3a');
  WCHOICE[0].sp='CUYAPUP';WCHOICE[1].sp='BESSLING';WCHOICE[2].sp='GRASSKIN';
  Object.assign(WBLURB,{CUYAPUP:'Fast and fierce. Runs the kiln and waters the garden.',BESSLING:'Tough and lucky. The best waterer there is.',GRASSKIN:'The strongest of the three. Plants, chops and hauls stone.'})}
@@ -10731,14 +10735,14 @@ function fBarrierDraw(F){if(SW.badges.length>=1)return;for(const e of F.exits){i
 /* field dialogue (Erin, trainers) waits for the message on screen too */
 function fTalk(F,who,lines,after){const d={who,lines,i:0,after};if(!SCOFF&&swBusy()&&!F.dlg){F.dlgPend=d;return}F.dlgPend=null;F.dlg=d}
 /* v8.7: after the cottage and the first crop, the game points you at the Ranger's gym */
-function scGymCheck(){if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||W4.scene||state!=='g4world'||!SW.lessons.scPlot)return;
- W4.gymT=(W4.gymT||0)+1;if(W4.gymT<150)return;SW.lessons.scGym=1;
+function scGymCheck(){if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.lessons.scPlot)return; /* queued right away: it plays as soon as the crop line has been read */SW.lessons.scGym=1;
  scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Time to make a name for yourself.'},
   {who:'MARCUS',txt:'Lantern Town, bro. Top of the Meadow, the north road. The Ranger runs the gym there.'},
   {who:'ERIN',txt:'Win the VERDANT SIGIL and the Ranger opens the roads east and south.'},
-  {who:'MARCUS',txt:"The Ranger's buddies are Lv7 and Lv8. Battle wilds with SELECT till yours catch up. See one, beat one."}],()=>swSave())}
+  {who:'MARCUS',txt:"The Ranger's buddies are LEAF kinds, Lv"+WGYMS[0].team[1][1]+". EMBER hits leaf hard. DEW and PEB get hit hard."},
+  {who:'MARCUS',txt:'Battle wilds with SELECT till your lead is Lv'+(WGYMS[0].team[1][1]+1)+'. Lost? Train a bit more. See one, beat one.'}],()=>swSave())}
 function wGymGoal(){if(SW.quest<5||SW.badges.length)return null;const L=Math.max(0,...SW.party.map(m=>m.lv));
- return L<7?'Ranger gym, north road: train to Lv7 (SELECT)':"Lantern Town (north road): win the Ranger's Sigil"}
+ const T=Math.max(...WGYMS[0].team.map(t=>t[1]))+1;return L<T?'Ranger gym, north road: train to Lv'+T+' (SELECT)':"Lantern Town (north road): win the Ranger's Sigil"}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */
