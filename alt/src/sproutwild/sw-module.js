@@ -794,7 +794,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
   else if(gl.crown){r('#ffd94d',WW/2-4,58,8,10);r('#fff2b0',WW/2-3,59,6,5);r('#8a5a28',WW/2-1,68,2,5)}
   r('rgba(10,14,8,.55)',WW/2-tw(gl.leader,1)/2-2,79,tw(gl.leader,1)+4,9);
   text(gl.leader,WW/2-tw(gl.leader,1)/2,80,1,'#fff',null)}
- if(W4.sector==='BASE'&&SW.quest<=1&&!SW.tendDone){
+ if(W4.sector==='BASE'&&SW.quest<=1&&!SW.tendDone&&W4.tend&&W4.tend.active){ /* v8.5: only the old tending opening drew its own bed; the garden is the same fenced plots from the start */
   r('#6a4a2c',196,336,88,30);r('#7d5a36',196,336,88,4);
   r('#5a3d24',204,346,72,3);r('#5a3d24',204,356,72,3);
   for(const it2 of ((W4.tend&&W4.tend.active)?W4.tend.items:(W4.items||WTENDITEMS.map(([x,y])=>({x,y,taken:false,regrow:0}))))){

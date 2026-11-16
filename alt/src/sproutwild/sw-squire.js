@@ -28,7 +28,7 @@ STONESQUIRE(D){const st='#8c909c',lt='#a8acb6',dk='#5e626e';
   d:'A pale light that walks the old gatehouse at night. Some say she is still waiting for the castle to be finished.'},'#e6e0f6');
  mk({id:'STONESQUIRE',t:[1],hp:54,atk:15,def:17,spd:6,catch:.22,work:{QUARRY:2},learn:[[1,'tackle'],[1,'rocktoss'],[1,'headbutt'],[12,'boulderbash']],
   d:'The gatehouse of a castle that was never built. It got tired of waiting and stood up.'},'#8c909c')}
-WSECTORS.splice(3,0,{id:'SQUIRE',n:"SQUIRE'S WOODS",sub:'An old stone gatehouse. A light moves in it at night.',req:0,lv:[6,9],gym:-1,pal:{g:'#5a8a4a',g2:'#4c7a40',a:'#e8d890'},
+WSECTORS.splice(3,0,{id:'SQUIRE',n:"SQUIRE'S WOODS",sub:'An old stone gatehouse. A light moves in it at night.',req:1,lv:[6,9],gym:-1,pal:{g:'#5a8a4a',g2:'#4c7a40',a:'#e8d890'},
  table:[['LANTERNWISP',5],['PEBBLIT',3],['DRIZZLET',2],['FERNFANG',2],['MELONKIN',1]]});
 WSECSUB.SQUIRE='Old stones in the woods. Wilds Lv6 to 9.';
 FBIO.SQUIRE=Object.assign({},FBIO.MEADOW,{g:'#5a8a4a',g2:'#4c7a40',g3:'#365e34',a:'#e8d890',p:'#c4ae84',p2:'#a8926a',t1:'#24502e',t2:'#357a40',t3:'#68b05a'});
@@ -66,5 +66,5 @@ function sqArrive(F){if(!F||F.id!=='SQUIRE'||SW.lessons.squire)return;
  if(!F.sqLou){F.sqLou=1;F.sqT=0;louSay('SNIFF... OLD STONES.',2.2);return}
  if(F.sqT>2.4){SW.lessons.squire=1;swSay("A gatehouse for a castle nobody finished. THORN VINES: LEAF sprouts clear them.",3.6)}}
 /* v8.4: near the Meadow's south road (after the first catch, before your first visit) Louie points the way */
-function sqHint(F){if(!F||F.id!=='MEADOW'||SW.quest<3||(SW.visited&&SW.visited.SQUIRE)||SW.lessons.sqHint||W4.scene||(W4.banner&&W4.banner.t>0))return;
+function sqHint(F){if(!F||F.id!=='MEADOW'||SW.badges.length<1||(SW.visited&&SW.visited.SQUIRE)||SW.lessons.sqHint||W4.scene||(W4.banner&&W4.banner.t>0))return;
  if(P3.y>17*16&&Math.abs(P3.x-(17*16+16))<70){SW.lessons.sqHint=1;louSay('SNIFF! OLD STONES, SOUTH!',2.8);swSnd(600,.05,420)}}

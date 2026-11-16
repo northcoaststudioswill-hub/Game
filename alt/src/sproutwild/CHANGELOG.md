@@ -21,6 +21,25 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v8.5 · 2026-11-16 · pacing: nothing you are told disappears; a bigger Meadow; the gym first
+
+Will played to the cottage: the side areas open too soon (the gym is north), the Meadow is tiny, Erin offers a buddy when you just got one, the PEB, the sprouts and the wild all happen at once, text pops up and is covered by a scene (right after the cottage, and early on), and the garden switches from one big bed to small plots.
+
+- **Nothing you are told disappears before you can read it** (new `sw-pace.js`). A message stays up for at least its reading time; anything said meanwhile waits its turn. Scenes, the cottage party, the how-it-works card, the sprout-kind cards, Erin's dialogue and the cast's chat bubbles all wait for the message on screen, and messages wait for them. One voice at a time. The cottage moment now runs: Marcus's line, then the hearts line, then "A roof over Sunkeep!", then the party.
+- **A bug this round's first version caused and the playthrough caught:** a held-back scene could be queued dozens of times (Erin's "Ready for the wilds?" repeated forever). Held scenes are now kept once each and play in the order they were asked for.
+- **The gym comes first.** The roads to Crooked Hollow and Squire's Woods have a RANGER'S BARRIER until you win the VERDANT SIGIL in Lantern Town (north). Walking into it says so. Louie's "OLD STONES, SOUTH!" waits for the Sigil too.
+- **The Meadow is bigger.** A Lower Meadow, 14 rows further south: a big field, a pond for water bugs, and a rocky corner. The south road now leaves from its bottom edge.
+- **Erin's walk is spread out.** Your first catch waits in the big lower field, a real walk from the start; the buried PEB is out among the rocks in the south-east; the boulder wall and the bridge are back north. She takes a short breath between lessons.
+- **Erin knows you have a buddy:** "BESSLING could use a friend. Wild ones live down in the tall grass. Follow me." (was "let's get you a buddy").
+- **One garden from the start.** The opening drew its own big bed with three mounds over the garden, then it vanished. Now the garden is the same fenced plots all along: the first seeds land in the top row and grow there, like plots in Sprouts.
+- **Bubbles stay clear of the top bars**, name tag included.
+- **A new playtest tool** (`alt/tests/sproutwild/autopilot.js`): an autopilot plays from the title to the cottage party in real time, reading every caption before pressing A, and logs every text with how long it stayed up. It flags any message cut short, any message covered by a card or cinematic, and any two voices at once. Last run: title to the cottage party in 393 s, 0 flags, no page errors. (Before these fixes it caught the WOOD line covered by the card, Louie's berry line over Erin, and Marcus's bubbles over the hearts line.)
+- Tests: 119 checks, twice clean (Meadow size, Sigil gates and the south road's new place updated).
+
+Screens: `shots/v8.5-playthrough.png` (the opening garden, the walk south, the first catch in the lower field, Erin between lessons, the PEB among the rocks, after the cottage), `shots/v8.5-rangers-barrier.png`.
+
+**Not checked:** the autopilot moves with position hooks, so real walking routes (around the lake) are not tested; iPhone.
+
 ## v8.4 · 2026-11-16 · a Lanternwisp caught by hand; name tags; Louie points south
 
 Kept playing the new area and the last untried jar action.

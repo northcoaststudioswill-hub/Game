@@ -2,11 +2,17 @@
 
 Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v8.4)
+## Sproutwild (cartridge 5, v8.5)
 
 ### Known bugs
 - One real-time bug catch missed during testing in v7.9 (a step-by-step run caught 4 of 4). Not seen since; a wild
   buddy next to a bug takes the aim, which may be what happened.
+
+### Fixed in v8.5
+- Text covered by scenes, cards or other voices (message queue; one voice at a time). Checked by a real-time autopilot run to the cottage: 0 flags.
+- Side areas opened before the gym: now behind a Ranger's barrier until the first Sigil.
+- The Meadow was small and Erin's lessons were bunched up: Lower Meadow added, lessons spread out.
+- The opening garden bed that vanished: one garden from the start.
 
 ### Fixed in v8.4
 - Wild name tags overlapped when two wilds were close; only the nearest shows its full name now.
@@ -33,7 +39,7 @@ Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to eve
 
 ### Balance to check in a long session
 - Crop timers (berries 60 s, fiber 90 s), building times, catch odds after the first catch, starter strength.
-- About 40% of the first three minutes is watching scenes rather than playing.
+- About 40% of the first three minutes is watching scenes rather than playing. Title to cottage takes about 6.5 minutes at a slow reading pace (v8.5 autopilot).
 
 ### Not built yet
 - More Ohio-lore creatures (ideas: the Haserot Angel, Franklin Castle, Helltown, the Guardians of Traffic).

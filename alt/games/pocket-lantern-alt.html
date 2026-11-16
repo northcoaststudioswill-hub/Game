@@ -6842,7 +6842,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
   else if(gl.crown){r('#ffd94d',WW/2-4,58,8,10);r('#fff2b0',WW/2-3,59,6,5);r('#8a5a28',WW/2-1,68,2,5)}
   r('rgba(10,14,8,.55)',WW/2-tw(gl.leader,1)/2-2,79,tw(gl.leader,1)+4,9);
   text(gl.leader,WW/2-tw(gl.leader,1)/2,80,1,'#fff',null)}
- if(W4.sector==='BASE'&&SW.quest<=1&&!SW.tendDone){
+ if(W4.sector==='BASE'&&SW.quest<=1&&!SW.tendDone&&W4.tend&&W4.tend.active){ /* v8.5: only the old tending opening drew its own bed; the garden is the same fenced plots from the start */
   r('#6a4a2c',196,336,88,30);r('#7d5a36',196,336,88,4);
   r('#5a3d24',204,346,72,3);r('#5a3d24',204,356,72,3);
   for(const it2 of ((W4.tend&&W4.tend.active)?W4.tend.items:(W4.items||WTENDITEMS.map(([x,y])=>({x,y,taken:false,regrow:0}))))){
@@ -8397,7 +8397,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    if(!(SW.gear&&SW.gear.rope)&&!(W4.msgT>0)){swSay('A ledge. With a CLIMBING ROPE from the bench you could get up here.',2.6)}}
   if(my>0&&fTile(F,Math.floor(P3.x/FT),Math.floor((P3.y+7)/FT))==='-'){const ty=Math.floor((P3.y+7)/FT)+1;
    if(fWalkTile(F,Math.floor(P3.x/FT),ty)){F.hop={t:0,sy:P3.y,ty:ty*FT+8};swSnd(440,.06,660);return}}
-  const exAt=(x,y)=>{const e=F.exits.find(e2=>e2.tx===Math.floor(x/FT)&&e2.ty===Math.floor(y/FT));if(e&&(e.to==='HOLLOW'||e.to==='SQUIRE')&&SW.quest<3){if(!(W4.msgT>0))swSay('LOUIE: Woof. Too wild in there. Catch a buddy in the Meadow first.',2.8);return true}return!!(F.arrive&&e)}; /* just arrived: the way back is shut until you let go once */
+  const exAt=(x,y)=>{const e=F.exits.find(e2=>e2.tx===Math.floor(x/FT)&&e2.ty===Math.floor(y/FT));if(e&&(e.to==='HOLLOW'||e.to==='SQUIRE')&&SW.badges.length<1){if(!(W4.msgT>0))swSay("RANGER'S BARRIER: closed until you win the VERDANT SIGIL from the Ranger in Lantern Town (the north road).",3.4);return true}return!!(F.arrive&&e)}; /* just arrived: the way back is shut until you let go once */
   if(!fBox(F,nx,P3.y)&&!exAt(nx,P3.y))P3.x=nx;if(!fBox(F,P3.x,ny)&&!exAt(P3.x,ny))P3.y=ny}
  /* leaving by the edge of the map */
  /* an exit only fires once you have stepped away from where you came in: holding the stick across a border must not bounce you back */
@@ -8674,7 +8674,7 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
  if(dk>0){r('rgba(10,12,48,'+dk.toFixed(3)+')',cx,cy,W,H);
   const lg=(x,y,rr,a)=>{g.globalAlpha=a;r('#ffd98a',x-rr,y-rr*.6,rr*2,rr*1.2);r('#ffd98a',x-rr*.6,y-rr,rr*1.2,rr*2);g.globalAlpha=1};
   lg(Math.round(F.start.x),Math.round(F.start.y)-30,20,dk*.22);lg(Math.round(P3.x),Math.round(P3.y)-6,22,dk*.14)}
- louBubDraw();g.restore();
+ fBarrierDraw(F);louBubDraw();g.restore();
  fxAtmos();wHud();
  if(F.got){const a=Math.min(1,F.got.t*2);g.globalAlpha=a;r('#14101e',20,H/2-26,200,44);r('#ffd23f',20,H/2-26,200,2);r('#ffd23f',20,H/2+16,200,2);
   ctext('TREASURE HOME!',H/2-21,1,'#ffd94d',null);ctext(wFit(F.got.n,190),H/2-9,2,'#ffffff',null);ctext(F.got.txt,H/2+6,1,'#7ee787',null);g.globalAlpha=1}
@@ -9718,13 +9718,13 @@ function wCastTick(dt){if(!W4.cast)wCastInit();if(!SW.beats)SW.beats={};const op
   if(sp&&Math.hypot(P3.x-sp.x,P3.y-sp.y)<110){const pool=WCIDLE[who];wQuip(who,wDark()>.7&&who==='ERIN'?'Night already. The fire is lit if you want company.':pool[(Math.random()*pool.length)|0])}}
  /* one bubble at a time, with a breath between them */
  for(const q of W4.quips)q.t-=dt;if(W4.quips.length&&W4.quips[0].t<=0){W4.quips=[];W4.quipGap=.7}
- if(!W4.quips.length){W4.quipGap=(W4.quipGap||0)-dt;if(W4.quipGap<=0&&W4.quipQ.length){const q=W4.quipQ.shift();W4.quips=[q];swSnd(q.who==='LOUIE'?700:q.who==='MARCUS'?300:520,.04,q.who==='LOUIE'?500:q.who==='MARCUS'?260:640)}}
+ if(!W4.quips.length){W4.quipGap=(W4.quipGap||0)-dt;if(W4.quipGap<=0&&W4.quipQ.length&&!(typeof swBusy==='function'&&swBusy())){ /* one voice at a time: chatter waits for the message */const q=W4.quipQ.shift();W4.quips=[q];swSnd(q.who==='LOUIE'?700:q.who==='MARCUS'?300:520,.04,q.who==='LOUIE'?500:q.who==='MARCUS'?260:640)}}
  /* the dim buddies walk in to the light rather than appearing */
  if(wOp()===2){if(!W4.choiceT)W4.choiceT=time;const k=Math.min(1,(time-W4.choiceT)/2.6);[[188,166],[240,152],[292,166]].forEach((q,i)=>{WCHOICE[i].x=q[0]+(i-1)*30*(1-k);WCHOICE[i].y=q[1]+(1-k)*(130+i*14)})}}
 function wQuipDraw(){const K='#14101e',cx=W4.cam?W4.cam.x:0,cy=W4.cam?W4.cam.y:0,placed=[];
  for(const q of W4.quips||[]){const sp=wSpeaker(q.who);if(!sp)continue;const lines=swWrap(q.txt,124).slice(0,5),w=Math.max(...lines.map(l=>tw(l,1)))+10,h=lines.length*10+6;
-  let x=Math.round(sp.x-w/2),y=Math.round(sp.y-sp.h-h-4);x=Math.max(cx+3,Math.min(cx+W-w-3,x));y=Math.max(cy+31,y);
-  for(let n=0;n<4;n++){const hit=placed.find(b=>x<b.x+b.w+2&&x+w+2>b.x&&y<b.y+b.h+4&&y+h+4>b.y);if(!hit)break;y=Math.max(cy+31,hit.y-h-5);if(y===cy+31&&hit.y<cy+40+h)x=hit.x>cx+W/2?Math.max(cx+3,hit.x-w-4):Math.min(cx+W-w-3,hit.x+hit.w+4)} /* bubbles never sit on each other */
+  let x=Math.round(sp.x-w/2),y=Math.round(sp.y-sp.h-h-4);x=Math.max(cx+3,Math.min(cx+W-w-3,x));y=Math.max(cy+41,y);
+  for(let n=0;n<4;n++){const hit=placed.find(b=>x<b.x+b.w+2&&x+w+2>b.x&&y<b.y+b.h+4&&y+h+4>b.y);if(!hit)break;y=Math.max(cy+41,hit.y-h-5);if(y===cy+41&&hit.y<cy+50+h)x=hit.x>cx+W/2?Math.max(cx+3,hit.x-w-4):Math.min(cx+W-w-3,hit.x+hit.w+4)} /* bubbles never sit on each other */
   placed.push({x,y,w,h});const tx=Math.max(x+6,Math.min(x+w-8,Math.round(sp.x)-1)),a=Math.min(1,q.t*3);
   g.globalAlpha=a;r(K,x-1,y,w+2,h);r(K,x,y-1,w,h+2);r('#fffdf2',x,y,w,h);r('#e8e0c8',x,y+h-2,w,2);
   if(Math.abs((y+h)-(sp.y-sp.h))<14){r(K,tx-1,y+h,5,2);r(K,tx,y+h+2,3,2);r('#fffdf2',tx,y+h-1,3,2);r('#fffdf2',tx+1,y+h+1,1,2)}
@@ -9890,9 +9890,9 @@ function scBuild(){SW.lessons.scBuild=1;SW.beats.caught=1;const nm=(SW.party[SW.
   {x:150,y:236,hold:1.1},{x:150,y:236,who:'MARCUS',txt:'Buddies need a roof, bro. Press START, pick BUILD, then COTTAGE. Costs 8 wood. This spot is nice.'},
   {x:150,y:236,who:'MARCUS',txt:'Short on wood? Send a buddy at trees. Sprouts carry the logs home. Teamwork. I supervise.'},
   {who:'ERIN',txt:'Only your lead buddy walks with you here. The others wait at home. Give them a roof and they get to work.'},{hold:.4}],()=>swSave())}
-function scAuto(){if(!SCOFF&&kindCheck())return;
+function scAuto(){swMsgPump();if(!SCOFF&&!swBusy()&&!(W4.scPend&&W4.scPend.length)&&kindCheck())return;
  if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
-  if(wOp()>=3&&!SW.lessons.loop&&SW.quest<=2){if(SCOFF)SW.lessons.loop=1;else{W4.loopT=0;state='g4loop';return}}
+  if(wOp()>=3&&!SW.lessons.loop&&SW.quest<=2&&(SCOFF||!swBusy())){if(SCOFF)SW.lessons.loop=1;else{W4.loopT=0;state='g4loop';return}}
   if(wHasRoof()&&!SW.lessons.scDab&&W4.sector==='BASE'&&wOp()>=3&&!(W4.cons&&W4.cons.length)){W4.dabT=(W4.dabT||0)+1;if(W4.dabT>50){if(SCOFF)SW.lessons.scDab=1;else dabStart();return}}
   if(SW.quest===4&&SW.lessons.scDab&&!SW.lessons.scPlot&&W4.sector==='BASE'&&!(W4.cons&&W4.cons.length)){W4.plotT=(W4.plotT||0)+1;if(W4.plotT>60){scPlots();return}}
   if(SW.quest===3&&!SW.lessons.scBuild&&W4.sector==='BASE'&&SW.lessons.scSend){SW.beats.caught=1;W4.buildT=(W4.buildT||0)+1;if(W4.buildT>40){scBuild();return}}
@@ -10237,7 +10237,7 @@ PYTHORN(D){const gn='#5a8a3a',lt='#7aaa50',yl='#e8d878';
   d:'A melon-headed sprite of the old woods. Shy. Nobody goes looking for it twice.'},'#58b848');
  mk({id:'PYTHORN',t:[4],hp:46,atk:15,def:12,spd:9,catch:.25,work:{PLANTING:2},learn:[[1,'headbutt'],[1,'vinelash'],[1,'rocktoss'],[10,'sporepuff'],[14,'thornstorm']],
   d:'It slipped off a circus train in 1944 and never stopped growing.'},'#5a8a3a')}
-WSECTORS.splice(2,0,{id:'HOLLOW',n:'CROOKED HOLLOW',sub:'Old woods east of the Meadow. Something is watching.',req:0,lv:[4,7],gym:-1,pal:{g:'#4a8a48',g2:'#3e7a40',a:'#8cc86a'},
+WSECTORS.splice(2,0,{id:'HOLLOW',n:'CROOKED HOLLOW',sub:'Old woods east of the Meadow. Something is watching.',req:1,lv:[4,7],gym:-1,pal:{g:'#4a8a48',g2:'#3e7a40',a:'#8cc86a'},
  table:[['MELONKIN',5],['FERNFANG',2],['ZIPWIG',2],['PEBBLIT',2],['DRIZZLET',1]]});
 WSECSUB.HOLLOW='Old woods. Wilds Lv4 to 7.';
 FBIO.HOLLOW=Object.assign({},FBIO.MEADOW,{g:'#4a8a48',g2:'#3e7a40',g3:'#2e5e34',a:'#8cc86a',p:'#bfa67a',p2:'#a48a62',t1:'#1f5230',t2:'#2f7a3c',t3:'#62b858'});
@@ -10278,7 +10278,7 @@ STONESQUIRE(D){const st='#8c909c',lt='#a8acb6',dk='#5e626e';
   d:'A pale light that walks the old gatehouse at night. Some say she is still waiting for the castle to be finished.'},'#e6e0f6');
  mk({id:'STONESQUIRE',t:[1],hp:54,atk:15,def:17,spd:6,catch:.22,work:{QUARRY:2},learn:[[1,'tackle'],[1,'rocktoss'],[1,'headbutt'],[12,'boulderbash']],
   d:'The gatehouse of a castle that was never built. It got tired of waiting and stood up.'},'#8c909c')}
-WSECTORS.splice(3,0,{id:'SQUIRE',n:"SQUIRE'S WOODS",sub:'An old stone gatehouse. A light moves in it at night.',req:0,lv:[6,9],gym:-1,pal:{g:'#5a8a4a',g2:'#4c7a40',a:'#e8d890'},
+WSECTORS.splice(3,0,{id:'SQUIRE',n:"SQUIRE'S WOODS",sub:'An old stone gatehouse. A light moves in it at night.',req:1,lv:[6,9],gym:-1,pal:{g:'#5a8a4a',g2:'#4c7a40',a:'#e8d890'},
  table:[['LANTERNWISP',5],['PEBBLIT',3],['DRIZZLET',2],['FERNFANG',2],['MELONKIN',1]]});
 WSECSUB.SQUIRE='Old stones in the woods. Wilds Lv6 to 9.';
 FBIO.SQUIRE=Object.assign({},FBIO.MEADOW,{g:'#5a8a4a',g2:'#4c7a40',g3:'#365e34',a:'#e8d890',p:'#c4ae84',p2:'#a8926a',t1:'#24502e',t2:'#357a40',t3:'#68b05a'});
@@ -10316,7 +10316,7 @@ function sqArrive(F){if(!F||F.id!=='SQUIRE'||SW.lessons.squire)return;
  if(!F.sqLou){F.sqLou=1;F.sqT=0;louSay('SNIFF... OLD STONES.',2.2);return}
  if(F.sqT>2.4){SW.lessons.squire=1;swSay("A gatehouse for a castle nobody finished. THORN VINES: LEAF sprouts clear them.",3.6)}}
 /* v8.4: near the Meadow's south road (after the first catch, before your first visit) Louie points the way */
-function sqHint(F){if(!F||F.id!=='MEADOW'||SW.quest<3||(SW.visited&&SW.visited.SQUIRE)||SW.lessons.sqHint||W4.scene||(W4.banner&&W4.banner.t>0))return;
+function sqHint(F){if(!F||F.id!=='MEADOW'||SW.badges.length<1||(SW.visited&&SW.visited.SQUIRE)||SW.lessons.sqHint||W4.scene||(W4.banner&&W4.banner.t>0))return;
  if(P3.y>17*16&&Math.abs(P3.x-(17*16+16))<70){SW.lessons.sqHint=1;louSay('SNIFF! OLD STONES, SOUTH!',2.8);swSnd(600,.05,420)}}
 /* ================================================================
    LOUIE, THE WAY HE IS IN SPROUTS (v7.8)
@@ -10512,7 +10512,7 @@ function ewDraw(){const E=W4.ew;if(!E)return;fChibi(Math.round(E.x),Math.round(E
       the Meadow she walks you to a calm wild buddy for your first
       catch. No battle can start before that first catch.
    ================================================================ */
-WSEEDPOS[0]=[208,348];WSEEDPOS[2]=[240,348];WSEEDPOS[4]=[272,348];
+WSEEDPOS[0]=[208,351];WSEEDPOS[2]=[240,351];WSEEDPOS[4]=[272,351]; /* on the top row of garden plots, where garden sprouts stand */
 /* messages stay up long enough to read */
 function swSay(s,t){W4.msg=s;W4.msgT=Math.max(t||2.2,1.4+String(s).length*.055)}
 /* ---- 1. Louie's berry ---- */
@@ -10608,16 +10608,88 @@ function ewTick(F,dt){if(SCOFF||F.id!=='MEADOW'||wOp()<3||W4.scene||F.dlg||F.spo
  const E=W4.ew,go=(x,y,v)=>{const dx=x-E.x,dy=y-E.y,d=Math.hypot(dx,dy);E.mv=d>2;if(d>2){const s=Math.min(d*5,v);E.x+=dx/d*s*dt;E.y+=dy/d*s*dt;E.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}return d};
  if(E.leave){if(go(F.start.x,F.start.y-10,70)<4)W4.ew=null;return}
  const dp=Math.hypot(P3.x-E.x,P3.y-E.y);if(dp>230){const p=ewNear(F,P3.x-30,P3.y);E.x=p.x;E.y=p.y}
- if(st===0){if(SW.quest>=3){SW.walk2=3;return}fTalk(F,'ERIN',["ERIN: You made it! Welcome to the Meadow.","ERIN: First things first: let's get you a buddy. Follow me."],()=>{SW.walk2=1;swSave()});return}
+ if(st===0){if(SW.quest>=3){SW.walk2=3;return}fTalk(F,'ERIN',["ERIN: You made it! Welcome to the Meadow.","ERIN: "+((SW.party[0]&&SW.party[0].sp)||"Your buddy")+" could use a friend. Wild ones live down in the tall grass. Follow me."],()=>{SW.walk2=1;swSave()});return}
+ if(st%2===1&&E.rest>0){E.rest-=dt;E.mv=false;E.dir=[P3.x>E.x?1:-1,0];return} /* a breath between lessons (v8.5) */
  if(st%2===1){const tg=ewTarget(F,st);if(!tg){SW.walk2=st===9?10:st+2;return}
   if(dp>80&&Math.hypot(P3.x-tg.x,P3.y-tg.y)>Math.hypot(E.x-tg.x,E.y-tg.y)+20){E.mv=false;E.wait=1;E.dir=[P3.x>E.x?1:-1,0];return}E.wait=0;
   if(go(tg.x,tg.y,62)<4){E.mv=false;E.dir=[P3.x>E.x?1:-1,0];if(dp<70)fTalk(F,'ERIN',EW2[st],()=>{SW.walk2=st+1;if(st===9){SW.walk2=10;E.leave=1}swSave()})}return}
  E.mv=false;E.t+=dt;E.dir=[P3.x>E.x?1:-1,0];
  const done=st===2?SW.quest>=3:st===4?!F.buds.some(b=>b.type===1):st===6?!F.gates.some(g2=>g2.type===1&&!g2.open):st===8?!F.sites.some(s=>!s.done):true;
- if(done){if(st===2)for(const w of W4.wilds)w.tame=0;fTalk(F,'ERIN',EWDONE[st],()=>{SW.walk2=st+1;swSave()});E.t=0;return}
+ if(done){if(st===2)for(const w of W4.wilds)w.tame=0;fTalk(F,'ERIN',EWDONE[st],()=>{SW.walk2=st+1;E.rest=3;swSave()});E.t=0;return}
  if(E.t>75&&st!==2){E.t=0;fTalk(F,'ERIN',["ERIN: No rush. I'll wait right here."],()=>{})}}
 function ewDraw(){const E=W4.ew;if(!E)return;fChibi(Math.round(E.x),Math.round(E.y)+3,FLOOK.ERIN,E.dir,E.mv);
  const st=SW.walk2||0;if(E.wait||(!E.mv&&!E.leave&&st%2===0&&st<10))if(((time*2)|0)%2)text('!',Math.round(E.x)-1,Math.round(E.y)-30,2,'#ffd94d',null)}
+/* ================================================================
+   THE LOWER MEADOW (v8.5): the Meadow was too small and everything in
+   Erin's walk happened in one corner. The Meadow now runs 14 rows
+   further south: a big field where your first catch waits, a pond
+   for water bugs, and a rocky corner where the buried PEB sprout is.
+   The lessons are a walk apart, and Erin takes a breath between them.
+   ================================================================ */
+{const R=FMAPS.MEADOW.rows,W=R[0].length;
+ /* the old buried PEB by the start goes; it lives in the rocks now */
+ R[3]=R[3].replace('p','"');
+ const g=[];for(let y=0;y<15;y++){const row=[];for(let x=0;x<W;x++)row.push(x===0||x===W-1?'T':'.');g.push(row)}
+ const put=(x,y,c)=>{if(y>=0&&y<15&&x>0&&x<W-1)g[y][x]=c},box=(x0,y0,x1,y1,c)=>{for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)put(x,y,c)};
+ box(17,0,18,13,':');                                   /* the road keeps going south */
+ box(4,2,12,7,'"');box(5,1,10,1,'"');                    /* the big field: your first catch */
+ box(3,9,8,12,'~');box(4,8,7,8,'~');                     /* the pond */
+ box(23,3,31,7,'"');                                     /* the east field */
+ for(const [x,y] of [[25,1],[28,9],[31,10],[34,11],[33,8],[26,12]])put(x,y,'R');
+ put(30,10,'p');                                         /* the buried PEB, among the rocks */
+ for(const [x,y] of [[3,1],[14,3],[21,2],[33,3],[12,10],[22,12],[14,13],[2,6]])put(x,y,'W');
+ for(const [x,y] of [[10,0],[15,9],[25,9],[20,6]])put(x,y,'B');
+ for(const [x,y] of [[6,0],[13,6],[20,10],[29,2],[10,13],[31,13]])put(x,y,',');
+ const rows=g.map(r=>r.join(''));
+ const wall='T'.repeat(17)+'kk'+'T'.repeat(W-19);
+ FMAPS.MEADOW.rows=R.slice(0,R.length-1).concat(rows.slice(0,14),[wall])}
+FSPOTS.MEADOW=(FSPOTS.MEADOW||[]).concat([[33,36,'ore'],[11,36,'fiber']]);
+/* the lesson buddy waits in the big field, a walk from the start */
+function ewTame(F){let wd=W4.wilds.find(w=>w.tame);if(wd)return wd;const sec=wSector(F.id),tx=8*FT,ty=29*FT,
+  gr=F.grass.slice().sort((a,b)=>Math.hypot(a[0]*FT-tx,a[1]*FT-ty)-Math.hypot(b[0]*FT-tx,b[1]*FT-ty))[0]||F.grass[0];
+ if(!gr)return null;wd=fSpawnWild(F,sec);wd.x=wd.tx=gr[0]*FT+8;wd.y=wd.ty=gr[1]*FT+10;wd.lv=sec.lv[0];wd.tame=1;W4.wilds.push(wd);return wd}
+/* ================================================================
+   PACING (v8.5): nothing you are told disappears before you can read it
+   - A message stays up for at least its reading time. Anything said
+     while it is up waits its turn (a queue), and anything said during
+     a scene waits until the scene is over.
+   - Scenes and the cottage cinematic wait until the message on screen
+     (and any waiting behind it) has been read, then start.
+   - The catch cinematic is the reward for the catch, so it does not
+     wait; it only clears a stale "Latched on" line.
+   ================================================================ */
+function swReadT(s){return 1.4+String(s).length*.055}
+function swSay(s,t){s=String(s);const need=Math.max(t||2.2,swReadT(s));W4.msgQ=W4.msgQ||[];
+ if(W4.msgT>0&&W4.msg===s){W4.msgT=Math.max(W4.msgT,need*.6);return}            /* already on screen */
+ if(W4.msgQ.some(q=>q.s===s))return;                                           /* already waiting */
+ if(W4.scene||(W4.fld&&W4.fld.dlg)||W4.talk||(W4.quips&&W4.quips.length)||W4.scPend&&W4.scPend.length||(W4.msgT>0&&time-(W4.msgAt||0)<(W4.msgMin||0))){if(W4.msgQ.length<5)W4.msgQ.push({s,t:need});return}
+ W4.msg=s;W4.msgT=need;W4.msgAt=time;W4.msgMin=Math.min(need,1.2+s.length*.045)}
+function swBusy(){return W4.msgT>0||(W4.msgQ&&W4.msgQ.length)}
+/* called every world frame (scAuto): next message, then a waiting scene */
+function swMsgPump(){{const F=W4.fld;if(F&&F.dlgPend&&!F.dlg&&!W4.scene&&!swBusy()){F.dlg=F.dlgPend;F.dlgPend=null;return}}
+ if(W4.scene||(W4.fld&&W4.fld.dlg)||W4.talk||(W4.quips&&W4.quips.length))return;W4.msgQ=W4.msgQ||[];
+ if(!(W4.msgT>0)&&W4.msgQ.length){const q=W4.msgQ.shift();W4.msg=q.s;W4.msgT=q.t;W4.msgAt=time;W4.msgMin=Math.min(q.t,1.2+q.s.length*.045);return}
+ if(swBusy())return;
+ if(W4.scPend&&W4.scPend.length){const p=W4.scPend.shift();if(p.dab)dabGo();else scGo(p.steps,p.done)}}
+function scStart(steps,done){if(SCOFF){for(const s of steps)if(s.fn)s.fn();if(done)done();return}
+ W4.scPend=W4.scPend||[];const sig=scSig(steps);
+ if((W4.scene&&W4.scene.sig===sig)||W4.scPend.some(p=>p.sig===sig))return;       /* the same scene is already playing or waiting */
+ if(W4.scene||swBusy()||W4.scPend.length){W4.scPend.push({steps,done,sig});return} /* waits its turn, in order */
+ scGo(steps,done)}
+function scSig(steps){return steps.map(s=>(s.who||'')+(s.txt||'')).join('|')}
+function scGo(steps,done){W4.scene={steps,i:-1,t:0,x:P3.x,y:P3.y,done,sig:scSig(steps)};W4.talk=null;W4.quips=[];W4.quipQ=[];scNext()}
+function dabStart(){SW.lessons.scDab=1;if(!(typeof KO!=='undefined'&&KO&&KO._)){scDab();return}
+ W4.scPend=W4.scPend||[];if(W4.scPend.some(p=>p.dab))return;
+ if(W4.scene||swBusy()||W4.scPend.length){W4.scPend.push({dab:1,sig:'dab'});return}dabGo()}
+function dabGo(){W4.dabC=0;W4.talk=null;W4.quips=[];W4.quipQ=[];state='g4dab';swSave()}
+function wCineMon(sp,sub){if(W4.msg&&/Latched|SHOOK|Fill the bar/i.test(W4.msg))W4.msgT=0;W4.cine={kind:'mon',id:sp,sub:sub||'',t:0};state='g4cine';swSnd(523,.1,784)}
+/* the Ranger's barrier on the roads to the Hollow and Squire's Woods, until the first Sigil (v8.5) */
+function fBarrierDraw(F){if(SW.badges.length>=1)return;for(const e of F.exits){if(e.to!=='HOLLOW'&&e.to!=='SQUIRE')continue;const x=e.tx*FT,y=e.ty*FT;
+ r('#5a3a1e',x+1,y+2,3,13);r('#5a3a1e',x+12,y+2,3,13);
+ for(let i=0;i<2;i++){const by=y+4+i*6;r('#f4ecd8',x-1,by,18,3);for(let k=0;k<18;k+=6)r('#c84030',x-1+k,by,3,3)}
+ r('#14101e',x+5,y-6,6,6);r('#ffd94d',x+6,y-5,4,4)}}
+/* field dialogue (Erin, trainers) waits for the message on screen too */
+function fTalk(F,who,lines,after){const d={who,lines,i:0,after};if(!SCOFF&&swBusy()&&!F.dlg){F.dlgPend=d;return}F.dlg=d}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */

@@ -26,7 +26,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   F.setPos(240,470);for(let i=0;i<60&&!F.fld();i++)step(1,['down']);ok('now the south road leads to the Meadow',F.fld()&&F.fld().id==='MEADOW',F.state()+' pos='+JSON.stringify(F.pos())+' q='+S.quest+' sec='+S.sector)}
  S.intro=1;S.quest=5;S.lit=1;S.pouch=24;S.tendDone=true;S.tendStage=4;S.fl={};S.badges=[];S.buds={EMBER:4,PEB:0,DEW:3,ZIP:0,LEAF:3,LUCKY:0};S.res={wood:0,stone:0,petal:0,berry:0,ingot:0};
  F.giveMon('CINDERCAP',30);F.enter('MEADOW');let f=F.fld();
- ok('meadow is a field map',!!f&&f.w===36&&f.h===25,f&&f.w+'x'+f.h);
+ ok('meadow is a field map (with the v8.5 Lower Meadow)',!!f&&f.w===36&&f.h===39,f&&f.w+'x'+f.h);
  step(3);ok('the pouch walks with you as a squad',f.sq.length===10,f.sq.length);
  f.npcs.forEach(n=>{if(n.team)S.fl[n.fk]=1});
  /* throw + whistle */
@@ -196,7 +196,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   ok('no sprout seed takes a crop plot',pl[ix].type<0&&pl[ix].seedTy==null);
   F.plotSet(ix,null);ok('the plot can go back to sprouts',!pl[ix].crop&&S.plotCrop[ix]===undefined)}
  /* v7.0: Crooked Hollow, east of the Meadow */
- {F.travel('MEADOW','BASE');step(3);let f2=F.fld();const q0=S.quest;S.quest=2;F.setPos(34*16+2,9*16+10);f2.dir=[1,0];f2.arrive=null;for(let i=0;i<40;i++)step(1,['right']);ok('the Hollow is shut until your first catch',F.fld().id==='MEADOW');S.quest=Math.max(5,q0);
+ {F.travel('MEADOW','BASE');step(3);let f2=F.fld();const q0=S.quest,b0=S.badges;S.badges=[];F.setPos(34*16+2,9*16+10);f2.dir=[1,0];f2.arrive=null;for(let i=0;i<40;i++)step(1,['right']);ok('the Hollow is barred until your first Sigil',F.fld().id==='MEADOW');S.quest=Math.max(5,q0);S.badges=['VERDANT SIGIL'];
   F.setPos(34*16+2,9*16+10);f2.dir=[1,0];f2.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='MEADOW';i++)step(1,['right']);f2=F.fld();
   ok('the Meadow east road leads to Crooked Hollow',f2&&f2.id==='HOLLOW',f2&&f2.id);
   ok('you arrive on its west side, heading east',F.pos().x<60&&f2.dir[0]===1,Math.round(F.pos().x));
@@ -205,8 +205,8 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   step(10);F.setPos(20,9*16+10);f2.dir=[-1,0];f2.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='HOLLOW';i++)step(1,['left']);
   ok('and the west road leads back to the Meadow',F.fld()&&F.fld().id==='MEADOW',F.fld()&&F.fld().id)}
  /* v8.3: Squire's Woods, south of the Meadow */
- {F.travel('MEADOW','BASE');step(3);let f3=F.fld();const q1=S.quest;S.quest=2;F.setPos(17*16+8,23*16+10);f3.dir=[0,1];f3.arrive=null;for(let i=0;i<40;i++)step(1,['down']);ok('the south road is shut until your first catch',F.fld().id==='MEADOW');S.quest=Math.max(5,q1);
-  F.setPos(17*16+8,23*16+10);f3.dir=[0,1];f3.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='MEADOW';i++)step(1,['down']);f3=F.fld();
+ {F.travel('MEADOW','BASE');step(3);let f3=F.fld();const q1=S.quest;S.badges=[];F.setPos(17*16+8,37*16+10);f3.dir=[0,1];f3.arrive=null;for(let i=0;i<40;i++)step(1,['down']);ok('the south road is barred until your first Sigil',F.fld().id==='MEADOW');S.quest=Math.max(5,q1);S.badges=['VERDANT SIGIL'];
+  F.setPos(17*16+8,37*16+10);f3.dir=[0,1];f3.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='MEADOW';i++)step(1,['down']);f3=F.fld();
   ok("the Meadow south road leads to Squire's Woods",f3&&f3.id==='SQUIRE',f3&&f3.id);
   ok('you arrive at its north edge, heading south',F.pos().y<60&&f3.dir[1]===1,Math.round(F.pos().y));
   ok("the stone gatehouse guards the Squire's Lantern",f3.alphas.some(a=>a.sp==='STONESQUIRE')&&f3.items.some(i=>i.n==="SQUIRE'S LANTERN"));
