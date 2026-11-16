@@ -21,6 +21,18 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v8.4 · 2026-11-16 · a Lanternwisp caught by hand; name tags; Louie points south
+
+Kept playing the new area and the last untried jar action.
+
+- **Caught a Lanternwisp in real time.** In Squire's Woods the ring read "CATCH · needs 7", sprouts latched on ("Latched on! Fill the bar and it blooms."), and it bloomed into a new buddy with its cinematic ("LANTERNWISP joined you!") (`shots/v8.4-wisp-caught-jar.png`).
+- **Used a bug from the jar with A.** A Ladybug became +2 berries, and the jar's footer said "+2 BERRY." Every bug action is now played: catch, night catch, use, sell.
+- **Wild name tags no longer print over each other.** Two wilds close together printed "PEBBLIT Lv" over "LANTERNWISP Lv6", and the tag sat on the player when you stood just below a wild. Now only the nearest wild shows its full name (the others show "Lv7"), and the tag moves above the wild when you stand right under it.
+- **Louie points the way south.** After your first catch, the first time you walk near the Meadow's south road (and have not been to Squire's Woods), he barks "SNIFF! OLD STONES, SOUTH!"
+- Tests: 119 checks, run 3 times clean, no page errors.
+
+**Not checked:** Louie's south hint in a real-time walk (checked by stepping the game), iPhone.
+
 ## v8.3 · 2026-11-16 · Squire's Woods: the south road goes somewhere
 
 From Will's list: add a second new area, since the Meadow's south end was a dead end. New `sw-squire.js`.

@@ -2,14 +2,17 @@
 
 Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v8.3)
+## Sproutwild (cartridge 5, v8.4)
 
 ### Known bugs
 - One real-time bug catch missed during testing in v7.9 (a step-by-step run caught 4 of 4). Not seen since; a wild
   buddy next to a bug takes the aim, which may be what happened.
 
+### Fixed in v8.4
+- Wild name tags overlapped when two wilds were close; only the nearest shows its full name now.
+
 ### Added in v8.3
-- Squire's Woods south of the Meadow (Lv6-9, LANTERNWISP, STONESQUIRE alpha). Not played by hand past the arrival.
+- Squire's Woods south of the Meadow (Lv6-9, LANTERNWISP, STONESQUIRE alpha). Caught a LANTERNWISP by hand in v8.4; the alpha fight checked stepped only.
 - Louie's bubble now stays below the top bars and draws over the people.
 
 ### Fixed in v8.2
@@ -25,7 +28,6 @@ Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to eve
 - Garden sprouts and the opening seeds had two growing looks; now one (confirmed on screen in v8.2).
 
 ### Not tested in play yet
-- Turning a bug into a resource with A (night bugs and selling to Pip were played in v8.2).
 - Watching a starter evolve at Lv16 in a battle.
 - Petting Louie at Sunkeep in real time (checked by the automated test only).
 

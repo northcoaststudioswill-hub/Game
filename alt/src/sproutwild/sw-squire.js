@@ -65,3 +65,6 @@ function sqArrive(F){if(!F||F.id!=='SQUIRE'||SW.lessons.squire)return;
  if((W4.banner&&W4.banner.t>0)||W4.scene)return;F.sqT=(F.sqT||0)+1/60;
  if(!F.sqLou){F.sqLou=1;F.sqT=0;louSay('SNIFF... OLD STONES.',2.2);return}
  if(F.sqT>2.4){SW.lessons.squire=1;swSay("A gatehouse for a castle nobody finished. THORN VINES: LEAF sprouts clear them.",3.6)}}
+/* v8.4: near the Meadow's south road (after the first catch, before your first visit) Louie points the way */
+function sqHint(F){if(!F||F.id!=='MEADOW'||SW.quest<3||(SW.visited&&SW.visited.SQUIRE)||SW.lessons.sqHint||W4.scene||(W4.banner&&W4.banner.t>0))return;
+ if(P3.y>17*16&&Math.abs(P3.x-(17*16+16))<70){SW.lessons.sqHint=1;louSay('SNIFF! OLD STONES, SOUTH!',2.8);swSnd(600,.05,420)}}

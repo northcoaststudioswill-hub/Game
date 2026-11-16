@@ -47,7 +47,6 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 ## Open items / ideas not done
 - v8.2 confirmed the garden look in play, played night bugs and selling to Pip, and fixed the lab flake.
 - Real-time bug catch had one miss in v7.9; a nearby wild buddy takes the aim (ring shows it).
-- Turning bugs into resources (A in the jar) not tried in play.
 - Balance needing a long session: crop timing, build time, catch odds after the first, starters.
 - More areas and Ohio lore (Haserot Angel, Franklin Castle...).
 - Narrow-path crowding mostly addressed (buddies trail in a line), not confirmed on phone.
@@ -139,6 +138,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
 - v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
   "FOUND ONE!" bubble stays on screen.
+- v8.4: Lanternwisp caught by hand, jar use played, one wild name tag at a time, Louie points south.
 - v8.3: Squire's Woods south of the Meadow (`sw-squire.js`), LANTERNWISP and STONESQUIRE.
 - v8.2: garden look confirmed, visible seed, night bugs and Pip played, jar shows results, lab flake fixed.
 - Playtest tip: build with `?dev` in the URL and `window.__g.ev(code)` runs code inside the game scope

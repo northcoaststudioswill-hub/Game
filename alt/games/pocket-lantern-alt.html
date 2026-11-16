@@ -9807,8 +9807,11 @@ function pfWildDraw(o,feet){const spr=wSp(o.sp)._spr,w=Math.round(spr.ow*PSC),h=
  if(sc<=0)return;const ww=Math.max(1,Math.round(w*sc)),hh=Math.max(1,Math.round(h*sc));
  r('rgba(0,0,0,.22)',X-6,Y-1,12,3);const img=white&&spr.hol?spr.hol:spr.ol;
  if(o.fx>0&&spr.fable){g.save();g.translate(X+Math.round(ww/2),Y-hh+2-bob);g.scale(-1,1);g.drawImage(img,0,0,ww,hh);g.restore()}else g.drawImage(img,X-Math.round(ww/2),Y-hh+2-bob,ww,hh);
- if(!c&&Math.hypot(o.x-P3.x,o.y-P3.y)<90){const lt=(Math.hypot(o.x-P3.x,o.y-P3.y)<56?o.sp+' ':'')+'Lv'+o.lv,lw=tw(lt,1);r('rgba(10,14,8,.7)',X-lw/2-2,Y+3,lw+4,9);text(lt,X-lw/2,Y+4,1,'#ffe8b0',null)}
+ if(!c&&Math.hypot(o.x-P3.x,o.y-P3.y)<90){const lt=(o===wTagWild()?o.sp+' ':'')+'Lv'+o.lv,lw=tw(lt,1),ty=(P3.y>o.y&&P3.y-o.y<34&&Math.abs(P3.x-o.x)<30)?Y-hh-11:Y+3;r('rgba(10,14,8,.7)',X-lw/2-2,ty,lw+4,9);text(lt,X-lw/2,ty+1,1,'#ffe8b0',null)}
  if(!c&&feet)feet(o.x,o.y)}
+
+/* v8.4: only the nearest wild shows its full name, so two close tags never print over each other */
+function wTagWild(){if(W4.tagT===time)return W4.tagW;W4.tagT=time;let b=null,bd=56;for(const w of W4.wilds||[]){if(w.cap)continue;const d=Math.hypot(w.x-P3.x,w.y-P3.y);if(d<bd){bd=d;b=w}}W4.tagW=b;return b}
 /* ================================================================
    IN-GAME SCENES (v6.3)
    Short camera moves with a caption, played in the world itself:
@@ -9897,7 +9900,7 @@ function scAuto(){if(!SCOFF&&kindCheck())return;
   if(wOp()===1&&!SW.beats.three){SW.beats.three=1;SW.beats.carry=1;SW.beats.first=1;scBerries();return}
   if(wOp()===2)SW.beats.lit=1;if(SW.party.length&&!SW.lessons.scSend&&wOp()>=3&&W4.sector==='BASE'){W4.sendT=(W4.sendT||0)+1;if(W4.sendT>45)scSend()}}
  const F=W4.fld;if(F&&F.id==='HOLLOW'&&!F.melon){F.melon=1;if(W4.wilds.length&&!W4.wilds.some(w=>w.sp==='MELONKIN'))W4.wilds[0].sp='MELONKIN'} /* its own creature is always home */
- if(F&&F.id==='SQUIRE'&&!F.wisp){F.wisp=1;if(W4.wilds.length&&!W4.wilds.some(w=>w.sp==='LANTERNWISP'))W4.wilds[0].sp='LANTERNWISP'}sqArrive(F);
+ if(F&&F.id==='SQUIRE'&&!F.wisp){F.wisp=1;if(W4.wilds.length&&!W4.wilds.some(w=>w.sp==='LANTERNWISP'))W4.wilds[0].sp='LANTERNWISP'}sqArrive(F);sqHint(F);
  if(F&&F.id==='MEADOW'&&!SW.lessons.scMeadow&&SW.quest>=2){F.scT=(F.scT||0)+1;if(F.scT>20)scMeadow(F)}}
 /* a seed of light arcs from the Lantern to you when it grows a sprout */
 function scSeed(ty){(W4.seedFx=W4.seedFx||[]).push({t:0,ty})}
@@ -10312,6 +10315,9 @@ function sqArrive(F){if(!F||F.id!=='SQUIRE'||SW.lessons.squire)return;
  if((W4.banner&&W4.banner.t>0)||W4.scene)return;F.sqT=(F.sqT||0)+1/60;
  if(!F.sqLou){F.sqLou=1;F.sqT=0;louSay('SNIFF... OLD STONES.',2.2);return}
  if(F.sqT>2.4){SW.lessons.squire=1;swSay("A gatehouse for a castle nobody finished. THORN VINES: LEAF sprouts clear them.",3.6)}}
+/* v8.4: near the Meadow's south road (after the first catch, before your first visit) Louie points the way */
+function sqHint(F){if(!F||F.id!=='MEADOW'||SW.quest<3||(SW.visited&&SW.visited.SQUIRE)||SW.lessons.sqHint||W4.scene||(W4.banner&&W4.banner.t>0))return;
+ if(P3.y>17*16&&Math.abs(P3.x-(17*16+16))<70){SW.lessons.sqHint=1;louSay('SNIFF! OLD STONES, SOUTH!',2.8);swSnd(600,.05,420)}}
 /* ================================================================
    LOUIE, THE WAY HE IS IN SPROUTS (v7.8)
    Same dog as cartridge 1: walks at your side and holds still when you
