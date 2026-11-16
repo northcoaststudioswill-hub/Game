@@ -204,6 +204,20 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   ok('Hollow wilds are Lv4 or more once you have caught a buddy',S.quest<3||F.wilds().every(w=>w.lv>=4),F.wilds().map(w=>w.lv).join());
   step(10);F.setPos(20,9*16+10);f2.dir=[-1,0];f2.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='HOLLOW';i++)step(1,['left']);
   ok('and the west road leads back to the Meadow',F.fld()&&F.fld().id==='MEADOW',F.fld()&&F.fld().id)}
+ /* v8.3: Squire's Woods, south of the Meadow */
+ {F.travel('MEADOW','BASE');step(3);let f3=F.fld();const q1=S.quest;S.quest=2;F.setPos(17*16+8,23*16+10);f3.dir=[0,1];f3.arrive=null;for(let i=0;i<40;i++)step(1,['down']);ok('the south road is shut until your first catch',F.fld().id==='MEADOW');S.quest=Math.max(5,q1);
+  F.setPos(17*16+8,23*16+10);f3.dir=[0,1];f3.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='MEADOW';i++)step(1,['down']);f3=F.fld();
+  ok("the Meadow south road leads to Squire's Woods",f3&&f3.id==='SQUIRE',f3&&f3.id);
+  ok('you arrive at its north edge, heading south',F.pos().y<60&&f3.dir[1]===1,Math.round(F.pos().y));
+  ok("the stone gatehouse guards the Squire's Lantern",f3.alphas.some(a=>a.sp==='STONESQUIRE')&&f3.items.some(i=>i.n==="SQUIRE'S LANTERN"));
+  ok("Squire's wilds are Lv6 or more and a Lanternwisp is home",F.wilds().every(w=>w.lv>=6)&&(step(2),F.wilds().some(w=>w.sp==='LANTERNWISP')),F.wilds().map(w=>w.sp+w.lv).join());
+  F.wilds().length=0;S.buds.LEAF=3;S.buds.PEB=3;
+  at(7,13,[1,0]);step(10);for(let i=0;i<6;i++){tap('a');step(5)}step(700);const site=f3.sites[0];
+  ok('sprouts build the river bridge to the south-west meadow',site.done,site.hp);
+  step(40,['b']);step(30);const vg=f3.gates[0];at(23,9,[0,-1]);step(10);tap('a');step(500);
+  ok('LEAF sprouts clear the thorn vines into the ruin',vg.open,vg.hp);
+  step(40,['b']);step(20);F.setPos(14*16+8,1*16+10);f3.dir=[0,-1];f3.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='SQUIRE';i++)step(1,['up']);
+  ok('and the north road leads back to the Meadow',F.fld()&&F.fld().id==='MEADOW',F.fld()&&F.fld().id)}
  }catch(e){out.push('FAIL crashed: '+e.message)}
  return out});
 console.log(res.join('\n'));const fails=res.filter(l=>l.startsWith('FAIL')).length;

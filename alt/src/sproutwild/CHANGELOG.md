@@ -21,6 +21,22 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v8.3 · 2026-11-16 · Squire's Woods: the south road goes somewhere
+
+From Will's list: add a second new area, since the Meadow's south end was a dead end. New `sw-squire.js`.
+
+- **Squire's Woods**, through the Meadow's south road (opens after your first catch, like the Hollow; Louie turns you back before that). After Squire's Castle in the Chagrin valley: a stone gatehouse Feargus Squire built in the 1890s for a castle he never finished, where people say his wife still walks at night with a lantern.
+- **Two new creatures from that lore.** LANTERNWISP (EMBER/LUCKY), the lady with the lantern as a shy light sprite, always living here. STONESQUIRE (PEB), the gatehouse that got tired of waiting and stood up; it sleeps on the ruin's treasure as the alpha (Lv12).
+- **The area** (30 x 20): wilds Lv6-9, a river that cuts off the south-west meadow until your sprouts build the bridge, and the ruin behind THORN VINES that only LEAF sprouts clear. Inside: SQUIRE'S LANTERN (80 petals and 3 ingots) and a buried DEW sprout. Two ore and two fiber spots for buddies.
+- **First visit, one voice at a time:** the area banner, then Louie ("SNIFF... OLD STONES."), then one line about the gatehouse and the vines.
+- **Louie's bubble is always readable.** Arriving at a top edge put it under the goal line, and the player could walk over it. It now stays below the top bars and is drawn after the people, at home and in the field.
+- **Balance:** the alpha, fought 3 times per team: Lv9/8/8 won 2 of 3 with the last buddy on 6 HP; Lv11/10/10 won all 3; Lv13/12/12 won easily. Same shape as the Python. Kept.
+- Tests: 119 checks (8 new: south road shut before the first catch, road leads there, arrive heading south, alpha guards the treasure, wilds Lv6+ with a Lanternwisp, sprouts build the bridge, LEAF sprouts clear the vines, the way back). Real time: walking the Meadow's south road reaches the woods in 1.7 s, and the first-visit lines come one after another.
+
+Screens: `shots/v8.3-squires-woods.png` (the ruin's vine gate, STONESQUIRE and LANTERNWISP in battle), `shots/v8.3-arrival.png` (Louie speaks once the banner has gone).
+
+**Not checked:** catching a Lanternwisp by hand in real time, the treasure carried home in real time, iPhone.
+
 ## v8.2 · 2026-11-16 · night bugs and Pip, played; garden confirmed
 
 Will: "Keep playtesting and improving." Played the open v8.1 items.

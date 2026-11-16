@@ -882,7 +882,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
   if(dk>.15&&W4.sector==='BASE'){r('rgba(255,190,80,'+(dk*.05).toFixed(3)+')',196,40,88,88);
    r('rgba(255,190,80,'+(dk*.10).toFixed(3)+')',214,58,52,52);
    r('rgba(255,200,100,'+(dk*.24).toFixed(3)+')',227,71,26,26)}}
- wQuipDraw();g.restore();
+ louBubDraw();wQuipDraw();g.restore();
  fxAtmos();wHud();
  if(W4.talk){const tk=W4.talk,line=tk.page===0?WTALK[tk.who][(SW.talkN[tk.who]-1)%3]:'Hand over the lantern?';
   uiSay(tk.who,line,null,tk.page===0?'A  MORE · B  BYE':'A  BECOME '+tk.who+' · B  NO')}}

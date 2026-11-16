@@ -2,11 +2,15 @@
 
 Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v8.2)
+## Sproutwild (cartridge 5, v8.3)
 
 ### Known bugs
 - One real-time bug catch missed during testing in v7.9 (a step-by-step run caught 4 of 4). Not seen since; a wild
   buddy next to a bug takes the aim, which may be what happened.
+
+### Added in v8.3
+- Squire's Woods south of the Meadow (Lv6-9, LANTERNWISP, STONESQUIRE alpha). Not played by hand past the arrival.
+- Louie's bubble now stays below the top bars and draws over the people.
 
 ### Fixed in v8.2
 - Garden plots: confirmed growing on screen (seed, shoot, head, bud). The seed is now visible on the brown plot.
@@ -30,7 +34,6 @@ Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to eve
 - About 40% of the first three minutes is watching scenes rather than playing.
 
 ### Not built yet
-- A second new area (the Meadow's south end is a dead end).
 - More Ohio-lore creatures (ideas: the Haserot Angel, Franklin Castle, Helltown, the Guardians of Traffic).
 - Sorting or searching the Data Center's buddy box.
 

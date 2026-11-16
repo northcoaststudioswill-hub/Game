@@ -6930,7 +6930,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
   if(dk>.15&&W4.sector==='BASE'){r('rgba(255,190,80,'+(dk*.05).toFixed(3)+')',196,40,88,88);
    r('rgba(255,190,80,'+(dk*.10).toFixed(3)+')',214,58,52,52);
    r('rgba(255,200,100,'+(dk*.24).toFixed(3)+')',227,71,26,26)}}
- wQuipDraw();g.restore();
+ louBubDraw();wQuipDraw();g.restore();
  fxAtmos();wHud();
  if(W4.talk){const tk=W4.talk,line=tk.page===0?WTALK[tk.who][(SW.talkN[tk.who]-1)%3]:'Hand over the lantern?';
   uiSay(tk.who,line,null,tk.page===0?'A  MORE · B  BYE':'A  BECOME '+tk.who+' · B  NO')}}
@@ -8397,7 +8397,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    if(!(SW.gear&&SW.gear.rope)&&!(W4.msgT>0)){swSay('A ledge. With a CLIMBING ROPE from the bench you could get up here.',2.6)}}
   if(my>0&&fTile(F,Math.floor(P3.x/FT),Math.floor((P3.y+7)/FT))==='-'){const ty=Math.floor((P3.y+7)/FT)+1;
    if(fWalkTile(F,Math.floor(P3.x/FT),ty)){F.hop={t:0,sy:P3.y,ty:ty*FT+8};swSnd(440,.06,660);return}}
-  const exAt=(x,y)=>{const e=F.exits.find(e2=>e2.tx===Math.floor(x/FT)&&e2.ty===Math.floor(y/FT));if(e&&e.to==='HOLLOW'&&SW.quest<3){if(!(W4.msgT>0))swSay('LOUIE: Woof. Too wild in there. Catch a buddy in the Meadow first.',2.8);return true}return!!(F.arrive&&e)}; /* just arrived: the way back is shut until you let go once */
+  const exAt=(x,y)=>{const e=F.exits.find(e2=>e2.tx===Math.floor(x/FT)&&e2.ty===Math.floor(y/FT));if(e&&(e.to==='HOLLOW'||e.to==='SQUIRE')&&SW.quest<3){if(!(W4.msgT>0))swSay('LOUIE: Woof. Too wild in there. Catch a buddy in the Meadow first.',2.8);return true}return!!(F.arrive&&e)}; /* just arrived: the way back is shut until you let go once */
   if(!fBox(F,nx,P3.y)&&!exAt(nx,P3.y))P3.x=nx;if(!fBox(F,P3.x,ny)&&!exAt(P3.x,ny))P3.y=ny}
  /* leaving by the edge of the map */
  /* an exit only fires once you have stepped away from where you came in: holding the stick across a border must not bounce you back */
@@ -8674,7 +8674,7 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
  if(dk>0){r('rgba(10,12,48,'+dk.toFixed(3)+')',cx,cy,W,H);
   const lg=(x,y,rr,a)=>{g.globalAlpha=a;r('#ffd98a',x-rr,y-rr*.6,rr*2,rr*1.2);r('#ffd98a',x-rr*.6,y-rr,rr*1.2,rr*2);g.globalAlpha=1};
   lg(Math.round(F.start.x),Math.round(F.start.y)-30,20,dk*.22);lg(Math.round(P3.x),Math.round(P3.y)-6,22,dk*.14)}
- g.restore();
+ louBubDraw();g.restore();
  fxAtmos();wHud();
  if(F.got){const a=Math.min(1,F.got.t*2);g.globalAlpha=a;r('#14101e',20,H/2-26,200,44);r('#ffd23f',20,H/2-26,200,2);r('#ffd23f',20,H/2+16,200,2);
   ctext('TREASURE HOME!',H/2-21,1,'#ffd94d',null);ctext(wFit(F.got.n,190),H/2-9,2,'#ffffff',null);ctext(F.got.txt,H/2+6,1,'#7ee787',null);g.globalAlpha=1}
@@ -9897,6 +9897,7 @@ function scAuto(){if(!SCOFF&&kindCheck())return;
   if(wOp()===1&&!SW.beats.three){SW.beats.three=1;SW.beats.carry=1;SW.beats.first=1;scBerries();return}
   if(wOp()===2)SW.beats.lit=1;if(SW.party.length&&!SW.lessons.scSend&&wOp()>=3&&W4.sector==='BASE'){W4.sendT=(W4.sendT||0)+1;if(W4.sendT>45)scSend()}}
  const F=W4.fld;if(F&&F.id==='HOLLOW'&&!F.melon){F.melon=1;if(W4.wilds.length&&!W4.wilds.some(w=>w.sp==='MELONKIN'))W4.wilds[0].sp='MELONKIN'} /* its own creature is always home */
+ if(F&&F.id==='SQUIRE'&&!F.wisp){F.wisp=1;if(W4.wilds.length&&!W4.wilds.some(w=>w.sp==='LANTERNWISP'))W4.wilds[0].sp='LANTERNWISP'}sqArrive(F);
  if(F&&F.id==='MEADOW'&&!SW.lessons.scMeadow&&SW.quest>=2){F.scT=(F.scT||0)+1;if(F.scT>20)scMeadow(F)}}
 /* a seed of light arcs from the Lantern to you when it grows a sprout */
 function scSeed(ty){(W4.seedFx=W4.seedFx||[]).push({t:0,ty})}
@@ -10245,6 +10246,73 @@ FMAPS.HOLLOW={rows:["TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT", "T..W....\"\"\"\"\"\"\"\".
 FMAPS.MEADOW.key.j={k:'exit',to:'HOLLOW'};
 {const R=FMAPS.MEADOW.rows;for(const y of [9,10]){R[y]=R[y].slice(0,R[y].length-1)+'j'}R[9]=R[9].slice(0,20)+':'.repeat(R[9].length-21)+'j'}
 /* ================================================================
+   SQUIRE'S WOODS (v8.3): the Meadow's south road no longer dead-ends
+   Old woods south of the Meadow, after the Chagrin valley's Squire's
+   Castle: a stone gatehouse Feargus Squire built in the 1890s for a
+   castle he never finished. People say his wife still walks the
+   ruin at night with a lantern. Wilds Lv6-9, a river to bridge, and
+   the ruin behind thorn vines only LEAF sprouts can clear.
+     LANTERNWISP  the lady with the lantern, a shy light sprite
+     STONESQUIRE  the gatehouse itself, awake; it sleeps on the ruin's
+                  treasure as the area's alpha
+   ================================================================ */
+const WSQUIREART={
+LANTERNWISP(D){const bd='#e6e0f6',sh='#c8bfe6';
+ D.p([[7.5,13],[9,21.5],[11,18.5],[12.5,22],[14,18.5],[16,21],[16.5,13]],sh);
+ D.b(12,11.5,6.2,6.6,bd);D.e(12,15.2,4.6,2.2,sh);
+ D.eye(10.2,10.6,1.35);D.eye(13.8,10.6,1.35);D.e(12,13.4,1,.55,'#9a7ab8');
+ D.l(16.5,13.5,19.4,10.2,.9,'#6a4a2a');D.e(20.4,12.2,3.2,3.2,'rgba(255,224,110,.35)');
+ D.r(19.1,10.4,2.6,3.6,'#3a3040');D.r(19.6,11,1.6,2.4,'#ffd94d');D.r(19.3,9.6,2.2,.9,'#3a3040')},
+STONESQUIRE(D){const st='#8c909c',lt='#a8acb6',dk='#5e626e';
+ D.r(6.5,19.5,3.4,3.5,dk);D.r(14.1,19.5,3.4,3.5,dk);
+ D.r(5.5,9,13,11.5,st);D.r(5.5,9,13,1.2,lt);D.r(8,12.5,3,2,dk);D.r(13,15,3,2,dk);
+ D.r(6.5,2.6,11,7,lt);D.r(6.5,1,2.4,2,lt);D.r(10.8,1,2.4,2,lt);D.r(15.1,1,2.4,2,lt);
+ D.r(7.5,5,9,1.8,'#2a2a34');D.r(9,5.3,1.6,1.1,'#ffd94d');D.r(13.4,5.3,1.6,1.1,'#ffd94d');
+ D.e(9,20.2,3.2,1.1,'#58b848');D.e(15.5,9.3,2.4,.9,'#58b848');
+ D.r(16.5,11,4.6,6.4,'#c0a050');D.r(17.4,12,2.8,4.4,'#8a6a2a')}};
+{const fb=["..ss..",".sggs.","sggggs",".sggs."],mk=(o,c)=>{o.spr=fb.slice();o.pal={s:'#14101e',g:c};o._old=SWSPR(o.spr,o.pal);o._spr=swbMake(WSQUIREART[o.id]);WSPECIES.push(o)};
+ mk({id:'LANTERNWISP',t:[0,5],hp:32,atk:12,def:9,spd:15,catch:.4,work:{KINDLING:1,FORTUNE:1},learn:[[1,'tackle'],[1,'embershot'],[6,'quicknip'],[9,'fortunefang'],[14,'flameburst']],
+  d:'A pale light that walks the old gatehouse at night. Some say she is still waiting for the castle to be finished.'},'#e6e0f6');
+ mk({id:'STONESQUIRE',t:[1],hp:54,atk:15,def:17,spd:6,catch:.22,work:{QUARRY:2},learn:[[1,'tackle'],[1,'rocktoss'],[1,'headbutt'],[12,'boulderbash']],
+  d:'The gatehouse of a castle that was never built. It got tired of waiting and stood up.'},'#8c909c')}
+WSECTORS.splice(3,0,{id:'SQUIRE',n:"SQUIRE'S WOODS",sub:'An old stone gatehouse. A light moves in it at night.',req:0,lv:[6,9],gym:-1,pal:{g:'#5a8a4a',g2:'#4c7a40',a:'#e8d890'},
+ table:[['LANTERNWISP',5],['PEBBLIT',3],['DRIZZLET',2],['FERNFANG',2],['MELONKIN',1]]});
+WSECSUB.SQUIRE='Old stones in the woods. Wilds Lv6 to 9.';
+FBIO.SQUIRE=Object.assign({},FBIO.MEADOW,{g:'#5a8a4a',g2:'#4c7a40',g3:'#365e34',a:'#e8d890',p:'#c4ae84',p2:'#a8926a',t1:'#24502e',t2:'#357a40',t3:'#68b05a'});
+FSPOTS.SQUIRE=[[21,11,'ore'],[3,4,'fiber'],[27,14,'ore'],[4,16,'fiber']];
+/* 30 x 20. k: back to the Meadow. #: the ruin's walls; v: thorn vines (LEAF sprouts); b: river to bridge */
+FMAPS.SQUIRE={rows:[
+"TTTTTTTTTTTTTTkkTTTTTTTTTTTTTT",
+"T..W..........::...#########.T",
+"T.\"\"\"\"\"\"\".....::...#.A.1..R#.T",
+"T.\"\"\"\"\"\"\"\"....::...#.......#WT",
+"T.\"\"\"\"\"\"\"\"..W.::...#..,..q.#.T",
+"T..\"\"\"\"\"\".....::...#R......#.T",
+"T....,......S.::...#.......#.T",
+"T..W..........::...#.......#.T",
+"T....B........::...####v####.T",
+"T~~~~~~~~~::::::::::::::::...T",
+"T.......~~....::........,..W.T",
+"T..W....~~....::.............T",
+"T.......~~....::....\"\"\"\"\"\"\"..T",
+"T.::::::bb::::::...\"\"\"\"\"\"\"\"..T",
+"T.\"\"\"\"..~~....::...\"\"\"\"\"\"\"\"..T",
+"T\"\"\"\"\"..~~..W.::....\"\"\"\"\"\"...T",
+"T\"\"\"\"\"..~~....::..........R..T",
+"T.\"\"\"...~~..B.::...W....B....T",
+"T....W..~~....::........,....T",
+"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"],
+ key:{k:{k:'exit',to:'MEADOW'},q:{k:'bud',type:2},
+  1:{k:'tre',n:"SQUIRE'S LANTERN",w:4,petal:80,res:['ingot',3]},A:{k:'alpha',sp:'STONESQUIRE',lv:12,guards:'1'}}};
+/* the Meadow's south road now leads here */
+FMAPS.MEADOW.key.k={k:'exit',to:'SQUIRE'};
+{const R=FMAPS.MEADOW.rows,y=R.length-1;R[y]=R[y].slice(0,17)+'kk'+R[y].slice(19)}
+/* the first visit, one voice at a time: the area banner, then Louie, then the note */
+function sqArrive(F){if(!F||F.id!=='SQUIRE'||SW.lessons.squire)return;
+ if((W4.banner&&W4.banner.t>0)||W4.scene)return;F.sqT=(F.sqT||0)+1/60;
+ if(!F.sqLou){F.sqLou=1;F.sqT=0;louSay('SNIFF... OLD STONES.',2.2);return}
+ if(F.sqT>2.4){SW.lessons.squire=1;swSay("A gatehouse for a castle nobody finished. THORN VINES: LEAF sprouts clear them.",3.6)}}
+/* ================================================================
    LOUIE, THE WAY HE IS IN SPROUTS (v7.8)
    Same dog as cartridge 1: walks at your side and holds still when you
    do, sits for pets (hearts and a short bark in caps), digs up berries
@@ -10296,7 +10364,10 @@ function wLouTalk(){louPet();if(!W4.fld){const g2=wNextGoal();if(g2&&wOp()>=3)wQ
 function louDraw(){const L=louSt(),x=Math.round(lou.x),y=Math.round(lou.y),sit=L.st==='sit',left=L.fx<0,f=W4.louMv?((time*8)|0)%2:((time*2)|0)%2,hop=W4.louMv&&f?1:0;
  r('rgba(0,0,0,.22)',x-9,y+4,18,3);const img=sit?(left?LOU.e:LOU.er):(left?LOU.l:LOU.r)[f];g.drawImage(img,x-12,y-6-hop+(sit?1:0),24,12);
  if(L.st==='dig')r('#a87850',left?x-13:x+11,y+3+hop,2,2);
- const s=W4.lsay;if(s){const w=tw(s.s,1)+8,cx0=W4.cam?W4.cam.x:0,bx=Math.min(Math.max(cx0+2,Math.round(x-w/2)),cx0+W-w-2),by=y-24; /* the bubble stays on screen at both edges (v8.1; W is the 240px view) */r('#14101e',bx-1,by-1,w+2,12);r('#ffffff',bx,by,w,10);r('#ffffff',x-1,by+10,3,2);text(s.s,bx+4,by+1,1,'#282838',null)}}
+ W4.louBubP={x,y}} /* the bubble is drawn later, over everyone (louBubDraw) */
+/* v8.3: Louie's bubble draws after the people, so nobody walks over his words */
+function louBubDraw(){const b=W4.louBubP;W4.louBubP=null;if(!b)return;const x=b.x,y=b.y;
+ const s=W4.lsay;if(s){const w=tw(s.s,1)+8,cx0=W4.cam?W4.cam.x:0,bx=Math.min(Math.max(cx0+2,Math.round(x-w/2)),cx0+W-w-2),by=Math.max((W4.cam?W4.cam.y:0)+31,y-24); /* the bubble stays on screen at both edges (v8.1; W is the 240px view) */r('#14101e',bx-1,by-1,w+2,12);r('#ffffff',bx,by,w,10);r('#ffffff',x-1,by+10,3,2);text(s.s,bx+4,by+1,1,'#282838',null)}}
 function fLouDraw(){louDraw()}
 /* ================================================================
    BUGS (v7.9)

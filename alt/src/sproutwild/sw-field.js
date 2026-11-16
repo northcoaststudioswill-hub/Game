@@ -425,7 +425,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    if(!(SW.gear&&SW.gear.rope)&&!(W4.msgT>0)){swSay('A ledge. With a CLIMBING ROPE from the bench you could get up here.',2.6)}}
   if(my>0&&fTile(F,Math.floor(P3.x/FT),Math.floor((P3.y+7)/FT))==='-'){const ty=Math.floor((P3.y+7)/FT)+1;
    if(fWalkTile(F,Math.floor(P3.x/FT),ty)){F.hop={t:0,sy:P3.y,ty:ty*FT+8};swSnd(440,.06,660);return}}
-  const exAt=(x,y)=>{const e=F.exits.find(e2=>e2.tx===Math.floor(x/FT)&&e2.ty===Math.floor(y/FT));if(e&&e.to==='HOLLOW'&&SW.quest<3){if(!(W4.msgT>0))swSay('LOUIE: Woof. Too wild in there. Catch a buddy in the Meadow first.',2.8);return true}return!!(F.arrive&&e)}; /* just arrived: the way back is shut until you let go once */
+  const exAt=(x,y)=>{const e=F.exits.find(e2=>e2.tx===Math.floor(x/FT)&&e2.ty===Math.floor(y/FT));if(e&&(e.to==='HOLLOW'||e.to==='SQUIRE')&&SW.quest<3){if(!(W4.msgT>0))swSay('LOUIE: Woof. Too wild in there. Catch a buddy in the Meadow first.',2.8);return true}return!!(F.arrive&&e)}; /* just arrived: the way back is shut until you let go once */
   if(!fBox(F,nx,P3.y)&&!exAt(nx,P3.y))P3.x=nx;if(!fBox(F,P3.x,ny)&&!exAt(P3.x,ny))P3.y=ny}
  /* leaving by the edge of the map */
  /* an exit only fires once you have stepped away from where you came in: holding the stick across a border must not bounce you back */
@@ -702,7 +702,7 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
  if(dk>0){r('rgba(10,12,48,'+dk.toFixed(3)+')',cx,cy,W,H);
   const lg=(x,y,rr,a)=>{g.globalAlpha=a;r('#ffd98a',x-rr,y-rr*.6,rr*2,rr*1.2);r('#ffd98a',x-rr*.6,y-rr,rr*1.2,rr*2);g.globalAlpha=1};
   lg(Math.round(F.start.x),Math.round(F.start.y)-30,20,dk*.22);lg(Math.round(P3.x),Math.round(P3.y)-6,22,dk*.14)}
- g.restore();
+ louBubDraw();g.restore();
  fxAtmos();wHud();
  if(F.got){const a=Math.min(1,F.got.t*2);g.globalAlpha=a;r('#14101e',20,H/2-26,200,44);r('#ffd23f',20,H/2-26,200,2);r('#ffd23f',20,H/2+16,200,2);
   ctext('TREASURE HOME!',H/2-21,1,'#ffd94d',null);ctext(wFit(F.got.n,190),H/2-9,2,'#ffffff',null);ctext(F.got.txt,H/2+6,1,'#7ee787',null);g.globalAlpha=1}

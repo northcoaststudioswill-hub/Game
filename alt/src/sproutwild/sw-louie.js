@@ -50,5 +50,8 @@ function wLouTalk(){louPet();if(!W4.fld){const g2=wNextGoal();if(g2&&wOp()>=3)wQ
 function louDraw(){const L=louSt(),x=Math.round(lou.x),y=Math.round(lou.y),sit=L.st==='sit',left=L.fx<0,f=W4.louMv?((time*8)|0)%2:((time*2)|0)%2,hop=W4.louMv&&f?1:0;
  r('rgba(0,0,0,.22)',x-9,y+4,18,3);const img=sit?(left?LOU.e:LOU.er):(left?LOU.l:LOU.r)[f];g.drawImage(img,x-12,y-6-hop+(sit?1:0),24,12);
  if(L.st==='dig')r('#a87850',left?x-13:x+11,y+3+hop,2,2);
- const s=W4.lsay;if(s){const w=tw(s.s,1)+8,cx0=W4.cam?W4.cam.x:0,bx=Math.min(Math.max(cx0+2,Math.round(x-w/2)),cx0+W-w-2),by=y-24; /* the bubble stays on screen at both edges (v8.1; W is the 240px view) */r('#14101e',bx-1,by-1,w+2,12);r('#ffffff',bx,by,w,10);r('#ffffff',x-1,by+10,3,2);text(s.s,bx+4,by+1,1,'#282838',null)}}
+ W4.louBubP={x,y}} /* the bubble is drawn later, over everyone (louBubDraw) */
+/* v8.3: Louie's bubble draws after the people, so nobody walks over his words */
+function louBubDraw(){const b=W4.louBubP;W4.louBubP=null;if(!b)return;const x=b.x,y=b.y;
+ const s=W4.lsay;if(s){const w=tw(s.s,1)+8,cx0=W4.cam?W4.cam.x:0,bx=Math.min(Math.max(cx0+2,Math.round(x-w/2)),cx0+W-w-2),by=Math.max((W4.cam?W4.cam.y:0)+31,y-24); /* the bubble stays on screen at both edges (v8.1; W is the 240px view) */r('#14101e',bx-1,by-1,w+2,12);r('#ffffff',bx,by,w,10);r('#ffffff',x-1,by+10,3,2);text(s.s,bx+4,by+1,1,'#282838',null)}}
 function fLouDraw(){louDraw()}

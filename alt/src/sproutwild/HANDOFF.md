@@ -17,7 +17,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
   (order listed in `SPROUTWILD=[...]`; later files override earlier functions by redeclaring them;
   `const` names must be unique). Output: `alt/games/pocket-lantern-alt.html` (~14.5 MB, limit 16).
 - `python3 alt/build.py` then `node alt/tests/sproutwild/field-lab.js alt/games/pocket-lantern-alt.html`
-  (111 checks; lab turns off scenes, the buddy cap, bugs and Louie's digging so results are steady).
+  (119 checks; lab turns off scenes, the buddy cap, bugs and Louie's digging so results are steady).
 - Test hooks: `window.__g.SWF()` (state, meta, enter, travel, setPos, pos, near, fld, bf, wilds,
   bugs, plots, cast, walk, lst, scene, noScenes, noCap, noBugs, ...).
 - Real-time playtests: Playwright scripts in the session scratchpad (`play31.js` = title to first
@@ -49,7 +49,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - Real-time bug catch had one miss in v7.9; a nearby wild buddy takes the aim (ring shows it).
 - Turning bugs into resources (A in the jar) not tried in play.
 - Balance needing a long session: crop timing, build time, catch odds after the first, starters.
-- A second new area (Meadow's south end is a dead end); more Ohio lore (Haserot Angel, Franklin Castle...).
+- More areas and Ohio lore (Haserot Angel, Franklin Castle...).
 - Narrow-path crowding mostly addressed (buddies trail in a line), not confirmed on phone.
 
 ## Will's taste (learned over the sessions; keep doing this)
@@ -77,7 +77,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
   and `let` names must be unique across all files, or the page fails to load.
 - Build order (see `SPROUTWILD=[...]` in `alt/build.py`): sw-cartart, sw-module, sw-field, sw-front,
   sw-base, sw-art, sw-story, sw-battle, sw-save, sw-text, sw-cast, sw-party, sw-scene, sw-starters,
-  sw-plots, sw-hollow, sw-louie, sw-bugs, sw-walk, sw-open2.
+  sw-plots, sw-hollow, sw-squire, sw-louie, sw-bugs, sw-walk, sw-open2.
 - Several functions exist in more than one file on purpose (the later one is live). Known pairs:
   `swPauseUpdate/drawPause` (live: sw-save.js), `cotUpdate/drawCot` (live: sw-story.js),
   `wQuestText` (two copies in sw-story.js; the second is live), `wBaseArrive`, `scIntro`, `scWake`,
@@ -139,6 +139,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
 - v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
   "FOUND ONE!" bubble stays on screen.
+- v8.3: Squire's Woods south of the Meadow (`sw-squire.js`), LANTERNWISP and STONESQUIRE.
 - v8.2: garden look confirmed, visible seed, night bugs and Pip played, jar shows results, lab flake fixed.
 - Playtest tip: build with `?dev` in the URL and `window.__g.ev(code)` runs code inside the game scope
   (read W4, wrap functions, set dayT for night). Wait 4.4 s after picking the cart before driving it.
