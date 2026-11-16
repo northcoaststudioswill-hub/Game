@@ -27,3 +27,37 @@ FSPOTS.MEADOW=(FSPOTS.MEADOW||[]).concat([[33,36,'ore'],[11,36,'fiber']]);
 function ewTame(F){let wd=W4.wilds.find(w=>w.tame);if(wd)return wd;const sec=wSector(F.id),tx=8*FT,ty=29*FT,
   gr=F.grass.slice().sort((a,b)=>Math.hypot(a[0]*FT-tx,a[1]*FT-ty)-Math.hypot(b[0]*FT-tx,b[1]*FT-ty))[0]||F.grass[0];
  if(!gr)return null;wd=fSpawnWild(F,sec);wd.x=wd.tx=gr[0]*FT+8;wd.y=wd.ty=gr[1]*FT+10;wd.lv=sec.lv[0];wd.tame=1;W4.wilds.push(wd);return wd}
+/* ---- Erin walks around water and walls (v8.6): a tile path, recomputed every second ---- */
+function ewBFS(F,s,g){const W=F.w,H=F.h,prev=new Int32Array(W*H).fill(-2),q=[s[1]*W+s[0]];if(s[0]<0||s[1]<0||s[0]>=W||s[1]>=H)return null;prev[q[0]]=-1;
+ for(let qi=0;qi<q.length;qi++){const c=q[qi],x=c%W,y=(c/W)|0;if(x===g[0]&&y===g[1]){const path=[];let k=c;while(prev[k]!==-1){path.unshift([(k%W)*FT+8,((k/W)|0)*FT+10]);k=prev[k]}return path}
+  for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+a,ny=y+b;if(nx<0||ny<0||nx>=W||ny>=H)continue;const n=ny*W+nx;if(prev[n]!==-2||!fWalkTile(F,nx,ny))continue;prev[n]=c;q.push(n)}}
+ return null}
+function ewGo(F,E,tx,ty,v,go){const key=Math.round(tx/8)+','+Math.round(ty/8);
+ if(E.pk!==key||!E.path||(E.pt=(E.pt||0)+1)>60){E.pk=key;E.pt=0;E.path=ewBFS(F,[Math.floor(E.x/FT),Math.floor(E.y/FT)],[Math.floor(tx/FT),Math.floor(ty/FT)])}
+ while(E.path&&E.path.length>1&&Math.hypot(E.path[0][0]-E.x,E.path[0][1]-E.y)<5)E.path.shift();
+ if(!E.path||E.path.length<=1)return go(tx,ty,v);
+ go(E.path[0][0],E.path[0][1],v);return Math.max(5,Math.hypot(tx-E.x,ty-E.y))}
+/* ---- after the tour, three things you do yourself (v8.6): chop, carry, catch a bug ---- */
+function ew3Tick(F,dt,E,dp,go){const w3=SW.walk3;E.t=(E.t||0)+dt;
+ if(E.rest>0){E.rest-=dt;E.mv=false;E.dir=[P3.x>E.x?1:-1,0];return}
+ const talk=(lines,next,rest)=>{E.t=0;fTalk(F,'ERIN',lines,()=>{SW.walk3=next;if(rest)E.rest=rest;if(next>=7)E.leave=1;swSave()})};
+ const lead=(x,y,lines,next)=>{if(dp>80&&Math.hypot(P3.x-x,P3.y-y)>Math.hypot(E.x-x,E.y-y)+20){E.mv=false;E.wait=1;E.dir=[P3.x>E.x?1:-1,0];return}E.wait=0;
+  if(ewGo(F,E,x,y,62,go)<4){E.mv=false;E.dir=[P3.x>E.x?1:-1,0];if(dp<70)talk(lines,next)}};
+ const nm=(SW.party[0]&&SW.party[0].sp)||'Your buddy';
+ if(w3===1){if(!E.tree||E.tree.got){E.tree=W4.nodes.filter(n=>n.k==='tree'&&!n.got).sort((a,b)=>Math.hypot(a.x-P3.x,a.y-P3.y)-Math.hypot(b.x-P3.x,b.y-P3.y))[0]||null}
+  if(!E.tree){SW.walk3=4;return}const p=ewNear(F,E.tree.x+22,E.tree.y+10);
+  lead(p.x,p.y,["ERIN: One more thing before you build a home. Homes need wood, and buddies get it.","ERIN: Face this tree and press A. "+nm+" goes and chops it."],2);return}
+ E.mv=false;E.dir=[P3.x>E.x?1:-1,0];
+ if(w3===2){if(!E.tree||E.tree.got){talk(["ERIN: Timber! See the logs? Throw sprouts at them. They carry them home to Sunkeep."],3);return}
+  if(E.t>45)talk(["ERIN: Stand facing the tree and press A. The ring shows SEND "+nm+"."],2);return}
+ if(w3===3){const left=F.items.some(i=>!i.done&&i.res==='wood'&&!(i.car&&i.car.length));if(!left||E.t>60) /* every log has sprouts on it */{talk(["ERIN: That's how Sunkeep grows. Buddies chop and mine. Sprouts carry it all home."],4,3)}return}
+ if(w3===4){if(typeof WNOBUG!=='undefined'&&WNOBUG){SW.walk3=6;return}
+  let bg=E.bug&&(W4.bugs||[]).includes(E.bug)?E.bug:null;
+  if(!bg){const sp=bgSpots(F,'grass').map(([x,y])=>[x,y,Math.hypot(x-P3.x,y-P3.y)]).filter(q=>q[2]>40&&q[2]<200).sort((a,b)=>a[2]-b[2]);if(!sp.length){SW.walk3=6;return}
+   const [hx,hy]=sp[Math.min(sp.length-1,(Math.random()*4)|0)];bg={sp:'LADYBUG',x:hx,y:hy,hx,hy,wx:hx,wy:hy,t:0,ph:0};W4.bugs=W4.bugs||[];W4.bugs.push(bg);E.bug=bg}
+  E.bugs0=Object.values(SW.bugs||{}).reduce((a,v)=>a+v,0);
+  const p=ewNear(F,bg.x+24,bg.y+2);lead(p.x,p.y,["ERIN: Look, a ladybug! Ohio's own state bug.","ERIN: Face it and press A. A sprout catches it for your jar."],5);return}
+ if(w3===5){const n=Object.values(SW.bugs||{}).reduce((a,v)=>a+v,0);
+  if(n>(E.bugs0||0)){talk(["ERIN: Into your jar! Bugs turn into berries, fiber, even light for the Lantern.","ERIN: The jar is in the START menu, under BUG JAR."],6,2);return}
+  if(!E.bug||!(W4.bugs||[]).includes(E.bug)){SW.walk3=4;return}if(E.t>50)talk(["ERIN: Face the ladybug and press A. Quick, before it flies!"],5);return}
+ if(w3===6){talk(["ERIN: You're getting the hang of this. Head home when you're ready.","ERIN: Marcus wants to build you a cottage. Don't let him pick the paint."],7);return}}

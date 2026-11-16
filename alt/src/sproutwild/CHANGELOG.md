@@ -21,6 +21,23 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v8.6 · 2026-11-16 · learn by doing before the cottage; Erin walks round the lake
+
+Will: keep play-testing and keep building learning into the onboarding.
+
+- **Three things you do yourself, after Erin's Meadow tour** (before, she listed bugs and left):
+  1. She walks you to a tree: "Homes need wood, and buddies get it. Face this tree and press A. BESSLING goes and chops it." She waits until it falls.
+  2. "Timber! See the logs? Throw sprouts at them." She waits until every log has sprouts on it. That wood goes toward the cottage.
+  3. She finds you a ladybug: "Ohio's own state bug. Face it and press A." Once it is in your jar she tells you where the jar is.
+  Then: "You're getting the hang of this. Head home when you're ready. Marcus wants to build you a cottage. Don't let him pick the paint." (Saves already past the tour are not sent back through it.)
+- **Erin walks round water and walls.** She used to walk straight across the lake to the lower field. She now follows a tile path: start to the lower field in 11 seconds, never off the ground.
+- **Fixed: a line could play twice** when Erin's dialogue was held back for a message and then overtaken.
+- Autopilot, title to the cottage party in real time: 501 s, 0 flags (nothing cut short, covered or talking over anything), no page errors; every Erin line appears exactly once. Lab: 119 checks clean.
+
+Screens: `shots/v8.6-meadow-beats.png` (the tree, the logs being carried, the ladybug, the jar).
+
+**Not checked:** iPhone. The autopilot still moves by position hooks.
+
 ## v8.5 · 2026-11-16 · pacing: nothing you are told disappears; a bigger Meadow; the gym first
 
 Will played to the cottage: the side areas open too soon (the gym is north), the Meadow is tiny, Erin offers a buddy when you just got one, the PEB, the sprouts and the wild all happen at once, text pops up and is covered by a scene (right after the cottage, and early on), and the garden switches from one big bed to small plots.

@@ -138,6 +138,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
 - v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
   "FOUND ONE!" bubble stays on screen.
+- v8.6: Erin's hands-on beats after the Meadow tour (SW.walk3: chop, carry, ladybug), tile pathing (ewGo).
 - v8.5: sw-pace.js (message queue; scenes, cards, dialogue and bubbles wait their turn), Ranger's barrier until the
   first Sigil, Lower Meadow (sw-meadow2.js), one garden from the start. Autopilot playtest: `alt/tests/sproutwild/autopilot.js`.
 - v8.4: Lanternwisp caught by hand, jar use played, one wild name tag at a time, Louie points south.

@@ -24,7 +24,7 @@ const SNAP=`JSON.stringify((()=>{const F=W4.fld,bf=W4.bf,sc=W4.scene,st=sc&&sc.s
   erin:F?(W4.ew&&!W4.ew.leave?[W4.ew.x,W4.ew.y]:null):(cast?[cast.x,cast.y]:null),
   tame:(W4.wilds||[]).filter(w=>w.tame).map(w=>[w.x,w.y])[0]||null,
   peb:F?(F.buds.find(b=>b.type===1)||null):null,gate:F?(F.gates.find(g=>g.type===1&&!g.open)||null):null,site:F?(F.sites.find(s=>!s.done)||null):null,
-  sq:((F||bf)&&(F||bf).sq||[]).filter(s=>s.st==='follow').length,wh:W4.wh||520}})())`;
+  sq:((F||bf)&&(F||bf).sq||[]).filter(s=>s.st==='follow').length,w3:SW.walk3||0,etree:W4.ew&&W4.ew.tree&&!W4.ew.tree.got?[W4.ew.tree.x,W4.ew.tree.y]:null,ebug:W4.ew&&W4.ew.bug&&(W4.bugs||[]).includes(W4.ew.bug)?[W4.ew.bug.x,W4.ew.bug.y]:null,wh:W4.wh||520}})())`;
 const log=[];const open={};const flags=[];const t0=Date.now();const T=()=>(Date.now()-t0)/1000;
 const readT=s=>1.2+String(s).length*.045;
 function track(k,v,s){const now=T();const cur=open[k];
@@ -76,7 +76,10 @@ while(T()<CAP){
   if(s.w2===4&&s.peb){if(await moveTo(s,s.peb.x,s.peb.y+12)){await face(0,-1);await aPress()}await sleep(150);continue}
   if(s.w2===6&&s.gate){if(await moveTo(s,s.gate.x,s.gate.y+22)){await face(0,-1);await aPress(1000)}await sleep(150);continue}
   if(s.w2===8&&s.site){if(await moveTo(s,s.site.x,s.site.y-26)){await face(0,1);await aPress(800)}await sleep(150);continue}
-  if(s.erin&&s.w2<10){const dx=s.P[0]-s.erin[0],dy=s.P[1]-s.erin[1],d=Math.hypot(dx,dy)||1;if(d>34)await moveTo(s,s.erin[0]+dx/d*26,s.erin[1]+dy/d*26,10);await sleep(150);continue}
+  if(s.w2>=10&&s.w3===2&&s.etree){if(await moveTo(s,s.etree[0],s.etree[1]+22)){await face(0,-1);await aPress(2500)}await sleep(150);continue}
+  if(s.w2>=10&&s.w3===3){const it=s.items.find(i=>i[3]==='wood');if(it){if(await moveTo(s,it[0]+28,it[1]+2)){await face(-1,0);await aPress(900)}await sleep(150);continue}}
+  if(s.w2>=10&&s.w3===5&&s.ebug){if(await moveTo(s,s.ebug[0],s.ebug[1]+20)){await face(0,-1);await aPress(800)}await sleep(150);continue}
+  if(s.erin&&(s.w2<10||(s.w3>0&&s.w3<7))){const dx=s.P[0]-s.erin[0],dy=s.P[1]-s.erin[1],d=Math.hypot(dx,dy)||1;if(d>34)await moveTo(s,s.erin[0]+dx/d*26,s.erin[1]+dy/d*26,10);await sleep(150);continue}
   if(s.w2>=10||s.q>=3){// home: up the west lane to the north gate
    if(s.P[1]>40){await moveTo(s,s.P[0]>60?s.P[0]-11:40,s.P[1]-11)}else{await key('up',150)}
    stuck=(lastP===s.P.join())?stuck+1:0;lastP=s.P.join();if(stuck>40){await p.evaluate(()=>window.__g.SWF().travel('BASE','MEADOW'));log.push(T().toFixed(1)+'s (autopilot: travel hook home after being stuck)')}

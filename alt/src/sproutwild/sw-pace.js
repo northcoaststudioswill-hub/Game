@@ -39,4 +39,4 @@ function fBarrierDraw(F){if(SW.badges.length>=1)return;for(const e of F.exits){i
  for(let i=0;i<2;i++){const by=y+4+i*6;r('#f4ecd8',x-1,by,18,3);for(let k=0;k<18;k+=6)r('#c84030',x-1+k,by,3,3)}
  r('#14101e',x+5,y-6,6,6);r('#ffd94d',x+6,y-5,4,4)}}
 /* field dialogue (Erin, trainers) waits for the message on screen too */
-function fTalk(F,who,lines,after){const d={who,lines,i:0,after};if(!SCOFF&&swBusy()&&!F.dlg){F.dlgPend=d;return}F.dlg=d}
+function fTalk(F,who,lines,after){const d={who,lines,i:0,after};if(!SCOFF&&swBusy()&&!F.dlg){F.dlgPend=d;return}F.dlgPend=null;F.dlg=d}
