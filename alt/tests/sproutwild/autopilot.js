@@ -24,7 +24,7 @@ const SNAP=`JSON.stringify((()=>{const F=W4.fld,bf=W4.bf,sc=W4.scene,st=sc&&sc.s
   erin:F?(W4.ew&&!W4.ew.leave?[W4.ew.x,W4.ew.y]:null):(cast?[cast.x,cast.y]:null),
   tame:(W4.wilds||[]).filter(w=>w.tame).map(w=>[w.x,w.y])[0]||null,
   peb:F?(F.buds.find(b=>b.type===1)||null):null,gate:F?(F.gates.find(g=>g.type===1&&!g.open)||null):null,site:F?(F.sites.find(s=>!s.done)||null):null,
-  sq:((F||bf)&&(F||bf).sq||[]).filter(s=>s.st==='follow').length,w3:SW.walk3||0,goal:(()=>{try{return wQuestText()}catch(e){return ''}})(),badges:SW.badges.length,crop:Object.keys(SW.plotCrop||{}).length,plot:(W4.patchBuds||[]).filter(q=>q.type<0&&!q.crop&&q.seedTy==null).map(q=>[q.sx,q.sy])[0]||null,gym:F&&F.gym?[F.gym.x,F.gym.y]:null,lv:SW.party.map(m=>m.sp+m.lv).join(' '),etree:W4.ew&&W4.ew.tree&&!W4.ew.tree.got?[W4.ew.tree.x,W4.ew.tree.y]:null,ebug:W4.ew&&W4.ew.bug&&(W4.bugs||[]).includes(W4.ew.bug)?[W4.ew.bug.x,W4.ew.bug.y]:null,wh:W4.wh||520}})())`;
+  sq:((F||bf)&&(F||bf).sq||[]).filter(s=>s.st==='follow').length,w3:SW.walk3||0,goal:(()=>{try{return wQuestText()}catch(e){return ''}})(),badges:SW.badges.length,crop:Object.keys(SW.plotCrop||{}).length,plot:(W4.patchBuds||[]).filter(q=>q.type<0&&!q.crop).map(q=>[q.sx,q.sy])[0]||null,gym:F&&F.gym?[F.gym.x,F.gym.y]:null,lv:SW.party.map(m=>m.sp+m.lv).join(' '),etree:W4.ew&&W4.ew.tree&&!W4.ew.tree.got?[W4.ew.tree.x,W4.ew.tree.y]:null,ebug:W4.ew&&W4.ew.bug&&(W4.bugs||[]).includes(W4.ew.bug)?[W4.ew.bug.x,W4.ew.bug.y]:null,wh:W4.wh||520}})())`;
 const log=[];const open={};const flags=[];const t0=Date.now();const T=()=>(Date.now()-t0)/1000;
 const readT=s=>1.2+String(s).length*.045;
 function track(k,v,s){const now=T();const cur=open[k];

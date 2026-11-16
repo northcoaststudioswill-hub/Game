@@ -505,6 +505,8 @@ function wSproutInfo(px,py){ /* the catch-all: any sprout can be asked what it i
   return{k:'plot',pb,txt:pb.crop?(pb.ripe?'HARVEST '+WCROPS[pb.crop].n:WCROPS[pb.crop].n+' · growing · A changes it'):pb.seedTy!=null?TYPES[pb.seedTy].n+' SEED · A changes this plot':'EMPTY PLOT · choose what grows'};
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)if(pb.type>=0&&pb.stage<2&&Math.hypot(px-pb.x,py-pb.y)<15)
   return{k:'sproutinfo',txt:'ASK',x:pb.x,y:pb.y,msg:TYPES[pb.type].n+' SPROUT · still growing — grown sprouts work'};
+ if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)if(pb.type>=0&&pb.stage>=2&&pb.mode==='soil'&&Math.hypot(px-pb.x,py-pb.y)<15)
+  return{k:'gpluck',pb,txt:'PLUCK '+TYPES[pb.type].n+' SPROUT'}; /* v8.7: grown garden sprouts pluck into your squad, like Sprouts */
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)if(pb.type>=0&&pb.stage>=2&&Math.hypot(px-pb.x,py-pb.y)<15)
   return{k:'sproutinfo',txt:'ASK',x:pb.x,y:pb.y,msg:TYPES[pb.type].n+' SPROUT · '+(pb.mode==='fetch'?'off to pick fruit':pb.mode==='plant'?'carrying a berry to plant':pb.mode==='carry'?'hauling fruit to the Lantern':pb.mode==='back'?'heading back to its plot':'works the garden from this plot')};
  if(W4.sector==='BASE'){let pi=0;for(let ci=0;ci<SW.crew.length;ci++){const c=SW.crew[ci];if(c.job===-1&&!c.atPatch&&pi<6){
@@ -643,6 +645,8 @@ function worldUpdate(dt){if(W4.scene){scTick(dt);return}scAuto();if(W4.fld){fUpd
   else if(n.k==='wild'){const wd=n.wd;W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=18;
    wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv))}
  else if(n.k==='plot'){if(n.pb.crop&&n.pb.ripe)plHarvest(n.pb);else{W4.plotPb=n.pb;swSel=n.pb.crop==='berry'?1:n.pb.crop==='fiber'?2:0;state='g4plot'}}
+ else if(n.k==='gpluck'){const pb=n.pb,tn=TYPES[pb.type].n;SW.buds[tn]=(SW.buds[tn]||0)+1;W4.floats.push({x:pb.x,y:pb.y-16,txt:'A '+tn+' SPROUT!',t:1.6,c:TYPES[pb.type].l});
+  Object.assign(pb,{type:-1,stage:0,age:-4,mode:'soil',seedTy:null,item:false,forPlot:null,bush:null});swSnd(880,.07,1320);if(!SW.lessons.gpluck){SW.lessons.gpluck=1;swSay('Plucked! The plot is free again. Garden sprouts plant new seeds in empty plots.',3)}swSave()}
  else if(n.k==='sproutinfo'){W4.floats.push({x:n.x,y:n.y-16,txt:n.msg,t:2.2,c:'#cfe0b8'});swSnd(660,.05,880)}
   else if(n.k==='wildpluck'){const lb=n.lb;W4.loose.splice(W4.loose.indexOf(lb),1);
    if(SW.followers.length<4){SW.followers.push(lb.type);wFolSync();
