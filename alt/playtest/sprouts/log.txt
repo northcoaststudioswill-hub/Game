@@ -1,0 +1,12 @@
+0s state cine
+3s state talk
+4s state card
+5s state play
+5s obj: PLUCK 6 SPROUTS:  1 / 6 (buds 1, day 1)
+6s obj: PLUCK 6 SPROUTS:  2 / 6 (buds 2, day 1)
+7s obj: PLUCK 6 SPROUTS:  3 / 6 (buds 3, day 1)
+8s obj: PLUCK 6 SPROUTS:  4 / 6 (buds 4, day 1)
+8s obj: PLUCK 6 SPROUTS:  5 / 6 (buds 5, day 1)
+9s obj: DONE! GO SEE ERIN (buds 6, day 1)
+11s obj: BRING HOME 3 BERRIES:  0 / 3 (buds 6, day 1)
+page errors: none

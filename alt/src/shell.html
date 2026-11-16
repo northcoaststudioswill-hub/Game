@@ -1,0 +1,141 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Pocket Lantern ALT</title>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page:#e7e2d6; --shell:#f2b632; --shell-lo:#d99a1c; --shell-hi:#ffd166;
+  --bezel:#2a2238; --btn:#3a3050; --btn-lo:#231c33; --berry:#e23b5e; --berry-lo:#9c1f3c;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){ --page:#15121d; color-scheme:dark; } }
+:root[data-theme="dark"]{ --page:#15121d; color-scheme:dark; }
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none !important}
+html,body{height:100%;margin:0}
+body{
+  background:var(--page); display:flex; justify-content:center; align-items:center; overflow:hidden;
+  font-family:"Pixelify Sans",ui-monospace,Menlo,Consolas,monospace;
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; touch-action:none; overscroll-behavior:none;
+}
+.console{
+  width:100%; max-width:440px; height:100%; max-height:900px; display:flex; flex-direction:column;
+  background:linear-gradient(180deg,var(--shell-hi) 0,var(--shell) 5%,var(--shell) 84%,var(--shell-lo) 100%);
+  border-radius:20px 20px 48px 48px; box-shadow:inset 0 -5px 0 rgba(0,0,0,.14), inset 0 3px 0 rgba(255,255,255,.35);
+  touch-action:none;
+}
+.slot{ flex:none; align-self:center; width:44%; height:8px; margin-top:6px; border-radius:0 0 5px 5px; background:#1b1626; box-shadow:inset 0 3px 3px rgba(0,0,0,.7); position:relative; z-index:3; }
+.slot.in{ background:linear-gradient(#8fd06a 0 45%,#1b1626 45%); }
+.bezel{ flex:1; min-height:0; display:flex; flex-direction:column; margin:5px 8px 0; padding:8px 8px 3px; background:var(--bezel); border-radius:10px 10px 24px 24px; box-shadow:inset 0 2px 6px rgba(0,0,0,.6); }
+.scr{ flex:1; min-height:0; position:relative; }
+canvas#screen{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#0c0a12; border-radius:3px; image-rendering:pixelated; }
+.shelf{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; background:#0c0a12; border-radius:3px; color:#cfc8e2; }
+.shelf p{ margin:0; font-size:16px; }
+.carts{ display:flex; gap:6px; width:100%; justify-content:center; padding:0 6px; }
+.cart{ width:18.6%; max-width:100px; aspect-ratio:5/6; border:0; padding:9px 4px 6px; border-radius:7px 7px 3px 3px; background:linear-gradient(#cdc8d8,#a9a3ba); box-shadow:inset 0 3px 0 rgba(255,255,255,.5), inset 0 -4px 0 rgba(0,0,0,.2); display:flex; flex-direction:column; gap:4px; align-items:stretch; font:700 11px/1.1 "Pixelify Sans",monospace; color:#2a2238; position:relative; z-index:5; touch-action:none; } /* five on the shelf: slightly narrower label */
+.cart::before{ content:""; position:absolute; left:18%; right:18%; top:3px; height:3px; border-radius:2px; background:rgba(0,0,0,.22); }
+.cart .art{ flex:1; min-height:0; width:100%; border-radius:3px; background:#6f6884; image-rendering:pixelated; display:flex; align-items:center; justify-content:center; color:#a9a3ba; font-size:20px; }
+.cart.sel{ outline:3px solid #ffd166; outline-offset:2px; transform:translateY(-4px); }
+.cart.lock{ background:linear-gradient(#8e889f,#777089); color:#3f3852; }
+.cart.nope{ animation:nope .3s; }
+.lbtn{ border:0; border-radius:6px; padding:8px 16px; background:#2e2450; color:#ffd94d; font:700 13px ui-monospace,"SF Mono",Menlo,monospace; letter-spacing:.05em; box-shadow:inset 0 2px 0 rgba(255,255,255,.12); }
+.lbtn.sel{ outline:3px solid #ffd166; outline-offset:2px; }
+@keyframes nope{ 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+.brand{ flex:none; display:flex; align-items:center; justify-content:space-between; color:#8f86a8; font-size:10px; letter-spacing:.06em; padding:3px 6px 1px; }
+.led{ display:inline-block; width:6px; height:6px; border-radius:50%; background:#5a2420; margin-right:5px; vertical-align:1px; }
+.led.on{ background:#ff5a4d; box-shadow:0 0 6px #ff5a4d; }
+.brand>span{ flex:none; }
+.brand>.np{ flex:1; min-width:0; display:flex; align-items:center; gap:5px; margin:0 8px; color:#d8d0ec; font-size:11px; letter-spacing:.02em; }
+.np img{ width:14px; height:14px; flex:none; border-radius:2px; image-rendering:pixelated; }
+.npt{ flex:1; min-width:0; overflow:hidden; white-space:nowrap; -webkit-mask-image:linear-gradient(90deg,transparent,#000 6px,#000 calc(100% - 10px),transparent); mask-image:linear-gradient(90deg,transparent,#000 6px,#000 calc(100% - 10px),transparent); }
+.npt span{ display:inline-block; padding-left:4px; }
+.npt.roll span{ animation:roll var(--d,14s) linear infinite; }
+@keyframes roll{ to{ transform:translateX(-50%); } }
+.controls{ --s:min(45vw,188px,25vh); flex:none; display:grid; grid-template-columns:1fr 1fr; align-items:center; justify-items:center; row-gap:10px; padding:12px 10px 30px; }
+.dpad{ width:var(--s); height:var(--s); position:relative; border-radius:50%; background:rgba(0,0,0,.08); touch-action:none; }
+.dpad i{ position:absolute; background:var(--btn); border-radius:8px; box-shadow:0 4px 0 var(--btn-lo); transform:translate(calc(var(--tx,0)*2px),calc(var(--ty,0)*2px)); }
+.dpad i:nth-child(1){ left:5%; right:5%; top:33.5%; height:33%; }
+.dpad i:nth-child(2){ top:5%; bottom:5%; left:33.5%; width:33%; }
+.dpad b{ position:absolute; left:42%; top:42%; width:16%; height:16%; border-radius:50%; background:var(--btn-lo); transform:translate(calc(var(--tx,0)*2px),calc(var(--ty,0)*2px)); }
+.ab{ width:var(--s); height:calc(var(--s)*.8); position:relative; }
+.rnd{ position:absolute; width:47%; aspect-ratio:1; border-radius:50%; border:0; padding:0; font:700 24px/1 "Pixelify Sans",monospace; touch-action:none; }
+.rnd span{ display:block; font-size:11px; font-weight:500; margin-top:2px; opacity:.9 }
+#bA{ right:0; top:0; background:var(--berry); color:#fff; box-shadow:0 5px 0 var(--berry-lo); }
+#bB{ left:0; bottom:0; background:var(--btn); color:#f6e9c9; box-shadow:0 5px 0 var(--btn-lo); }
+.rnd.on{ transform:translateY(4px); box-shadow:0 1px 0 var(--btn-lo) !important; }
+.meta{ grid-column:1/3; display:flex; justify-content:center; gap:22px; }
+.pill{ border:0; background:var(--btn); color:#f6e9c9; border-radius:99px; padding:9px 16px; font:500 13px/1 "Pixelify Sans",monospace; box-shadow:0 3px 0 var(--btn-lo); touch-action:none; min-width:104px; }
+.pill.on{ transform:translateY(2px); box-shadow:0 1px 0 var(--btn-lo); }
+.pill small{ font-size:10px; opacity:.7; margin-left:4px }
+button:focus-visible{ outline:3px solid #fff; outline-offset:2px }
+/* four face buttons, only while the Knockout cartridge is in (Sprouts keeps A and B) */
+#bX,#bY{ display:none }
+.console.ko .ab{ height:var(--s) }
+.console.ko #bX,.console.ko #bY{ display:block }
+.console.ko .rnd{ width:37%; font-size:20px }
+.console.ko #bA{ right:0; top:31.5% }
+.console.ko #bB{ left:31.5%; bottom:0 }
+#bX{ left:31.5%; top:0; background:#2f7fd0; color:#fff; box-shadow:0 5px 0 #1b4f88 }
+#bY{ left:0; top:31.5%; background:#2f9e63; color:#fff; box-shadow:0 5px 0 #1b6640 }
+.pill.ready{ background:var(--berry); color:#fff; box-shadow:0 3px 0 var(--berry-lo),0 0 14px #ff6b8a; animation:glow .5s steps(2) infinite }
+@keyframes glow{ 50%{ filter:brightness(1.35) } }
+@media (prefers-reduced-motion:reduce){ .pill.ready{ animation:none } }
+@media (max-width:440px){ .console{ border-radius:0 0 36px 36px; max-height:none } }
+</style>
+</head>
+<body>
+<div class="console" id="console">
+  <div class="slot" id="slot"></div>
+  <div class="bezel">
+    <div class="scr">
+      <canvas id="screen" width="480" height="400" aria-label="Game screen"></canvas>
+      <div class="shelf" id="shelf">
+        <p id="shelfMsg">Pick a cartridge</p>
+        <div class="carts">
+          <button class="cart sel" data-i="0"><canvas class="art" id="cartArt" width="40" height="26"></canvas>Sprouts</button>
+          <button class="cart" data-i="1"><canvas class="art" id="cartArt2" width="40" height="26"></canvas>Knockout</button>
+          <button class="cart" data-i="2"><canvas class="art" id="cartArt3" width="40" height="26"></canvas>Rootdeep</button>
+          <button class="cart" data-i="3"><canvas class="art" id="cartArt4" width="40" height="26"></canvas>Patch &amp; Plate</button>
+          <button class="cart" data-i="4"><canvas class="art" id="cartArt5" width="40" height="26"></canvas>Sproutwild</button>
+        </div>
+        <button class="lbtn" id="lanBtn">✦ Lantern menu</button>
+      </div>
+    </div>
+    <div class="brand"><span><span class="led" id="led"></span>Power</span><span class="np" id="np" hidden aria-live="polite"><img id="npArt" alt=""><span class="npt" id="npBox"><span id="npText"></span></span></span><span>Pocket Lantern</span></div>
+  </div>
+  <div class="controls">
+    <div class="dpad" id="dpad" aria-label="Direction pad"><i></i><i></i><b></b></div>
+    <div class="ab">
+      <button class="rnd" id="bX" aria-label="X: special 1">X<span>spec 1</span></button>
+      <button class="rnd" id="bY" aria-label="Y: special 2">Y<span>spec 2</span></button>
+      <button class="rnd" id="bA" aria-label="A: confirm, throw, pluck, talk">A<span>act</span></button>
+      <button class="rnd" id="bB" aria-label="B: back, call sprouts">B<span>call</span></button>
+    </div>
+    <div class="meta">
+      <button class="pill" id="bSel">Select<small>swap</small></button>
+      <button class="pill" id="bSta">Start<small>pause</small></button>
+    </div>
+  </div>
+</div>
+<script>
+/* ALT build: every save key gets the "pl-alt:" prefix, so this fork never reads or
+   overwrites the original Pocket Lantern's saves, even from the same browser. */
+(()=>{try{const P='pl-alt:',S=Storage.prototype,g=S.getItem,st=S.setItem,rm=S.removeItem;
+S.getItem=function(k){return g.call(this,P+k)};S.setItem=function(k,v){return st.call(this,P+k,v)};
+S.removeItem=function(k){return rm.call(this,P+k)}}catch(e){}})();
+</script>
+<script>/*@MUSIC tracks*/</script>
+<script>/*@MUSIC pp*/</script>
+<script>/*@MUSIC alt*/</script>
+<script>/*knockout.js*/</script>
+<script>/*patchplate.js*/</script>
+<script>/*console.js*/</script>
+</body>
+</html>
+
+</body></html>

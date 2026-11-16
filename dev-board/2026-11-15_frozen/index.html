@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pocket Lantern Dev Board</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a console "screen" page. Sticky nav (sections + lane filter + play), releases, swimlane map, chaptered log, open threads.
+   Any pass opens in the Lantern viewer: a console shell you step through with the D-pad. Single dark look by choice. */
+:root{
+  color-scheme: dark;
+  --shell:#f2b730; --shell-deep:#c98d12; --shell-ink:#2a2233;
+  --screen:#16131f; --panel:#211c2e; --panel-2:#2b2540; --line:#3a3352;
+  --ink:#efe8f6; --ink-dim:#a69cbb; --ink-faint:#776d8c;
+  --cream:#f7eedb; --cream-ink:#2a2233; --plate:#c8384a; --btn:#3a3354;
+  --l-console:#f2b730; --l-sprouts:#6cc96a; --l-knockout:#ef6b5b; --l-rootdeep:#b98cff; --l-patch:#ff9ec4; --muse:#7fd6e8;
+  --font-pixel:"Pixelify Sans","Silkscreen",ui-monospace,monospace;
+  --font-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --navh:58px;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:calc(var(--navh) + 70px + env(safe-area-inset-top,0px))}
+html,body{background:var(--screen);color:var(--ink)}
+body{font-family:var(--font-body);font-size:15px;line-height:1.5}
+body.lock{overflow:hidden}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+a{color:var(--shell)}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--shell);outline-offset:2px}
+[hidden]{display:none!important}
+
+/* ---------- header ---------- */
+.bezel{background:linear-gradient(180deg,var(--shell) 0%,var(--shell-deep) 100%);color:var(--shell-ink)}
+.bezel .wrap{padding-block:26px 24px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px 28px;align-items:end}
+@media (max-width:760px){.bezel .wrap{grid-template-columns:1fr}}
+.hero-text{display:grid;gap:12px;min-width:0}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+h1{font-family:var(--font-pixel);font-weight:700;font-size:clamp(36px,7vw,66px);line-height:.98;margin:0;text-wrap:balance}
+.lede{max-width:60ch;margin:0;font-size:16px}
+.counts{display:flex;flex-wrap:wrap;gap:8px 22px;font-family:var(--font-mono);font-size:12.5px}
+.counts b{font-family:var(--font-pixel);font-size:22px;font-weight:700;display:block;line-height:1.1}
+.hero-cta{display:grid;gap:10px;justify-items:start}
+.play{display:inline-flex;align-items:center;gap:12px;background:var(--shell-ink);color:var(--cream);border:0;border-radius:14px;padding:12px 18px 12px 12px;cursor:pointer;font:700 16px var(--font-body);box-shadow:0 4px 0 #120f19;text-align:left}
+.play:active{transform:translateY(2px);box-shadow:0 2px 0 #120f19}
+.play .a{width:40px;height:40px;border-radius:50%;background:var(--plate);display:grid;place-items:center;font:700 18px var(--font-pixel);color:#fff;flex:none;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
+.play small{display:block;font-weight:500;font-size:12px;opacity:.7}
+.hero-cta .hint{font-size:12.5px;opacity:.75;max-width:30ch}
+
+/* ---------- sticky nav ---------- */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--screen)}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:color-mix(in srgb,var(--screen) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:10px;min-height:var(--navh);padding-block:8px}
+.nav .brand{font:700 15px var(--font-pixel);color:var(--shell);white-space:nowrap;text-decoration:none}
+.sections{display:flex;gap:2px;margin-right:auto}
+.sections a{color:var(--ink-dim);text-decoration:none;font-weight:600;font-size:13.5px;padding:7px 9px;border-radius:8px;white-space:nowrap}
+.sections a.on{color:var(--ink);background:var(--panel-2)}
+.nav .mini-play{border:0;background:var(--plate);color:#fff;font-weight:700;font-size:13px;border-radius:999px;padding:8px 13px;cursor:pointer;white-space:nowrap}
+.lanes-row{border-top:1px solid var(--line)}
+.lanes-row .wrap{min-height:0;padding-block:8px;overflow-x:auto;scrollbar-width:none}
+.lanes-row .wrap::-webkit-scrollbar{display:none}
+@media (max-width:640px){.nav .brand{display:none}.sections a{padding:7px 7px;font-size:13px}}
+
+.chip{font:600 13px/1 var(--font-body);display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;white-space:nowrap;flex:none}
+.chip i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.chip[aria-pressed="false"]{opacity:.4}
+.chip .n{font:600 11px var(--font-mono);color:var(--ink-faint)}
+.chip.ghost{background:transparent;border-style:dashed;color:var(--ink-dim)}
+.chip.muse-toggle i{background:transparent;border:2px solid var(--muse)}
+
+section{padding-block:30px 6px}
+h2{font-family:var(--font-pixel);font-weight:700;font-size:26px;margin:0 0 4px;letter-spacing:.02em}
+.sub{color:var(--ink-dim);margin:0 0 16px;max-width:70ch}
+
+/* ---------- releases ---------- */
+.releases{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.releases{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:440px){.releases{grid-template-columns:1fr}}
+.rel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:8px;align-content:start;text-align:left;color:inherit;cursor:pointer;font:inherit}
+.rel:hover{border-color:var(--shell)}
+.rel h3{margin:0;font-family:var(--font-pixel);font-size:22px;color:var(--shell)}
+.rel .when{font-family:var(--font-mono);font-size:12px;color:var(--ink-dim)}
+.rel p{margin:0;font-size:14px;color:var(--ink-dim)}
+.shelf{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.cart{border-radius:4px 4px 2px 2px;height:30px;display:flex;align-items:flex-end;justify-content:center;font:600 10px/1.1 var(--font-body);padding:3px 2px;text-align:center;color:#1a1522;background:var(--c)}
+.cart.empty{background:transparent;border:1px dashed var(--line);color:var(--ink-faint)}
+
+/* ---------- map ---------- */
+.mapbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}
+.mapscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.map{position:relative}
+.lanehead{z-index:3;background:var(--panel);border-right:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:0 10px;font:600 13px/1.15 var(--font-body)}
+.lanehead i{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
+.lanehead small{display:block;font-weight:400;color:var(--ink-faint);font-size:11px}
+.dot{position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:var(--c);border:2px solid var(--panel);cursor:pointer;padding:0;z-index:2;transition:transform .12s}
+.dot.muse{background:var(--panel);border:3px solid var(--c);box-shadow:0 0 0 2px var(--muse)}
+.dot.release{width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:4px;transform:rotate(45deg)}
+.dot.rejected{background:var(--panel);border:2px dashed var(--ink-faint)}
+.dot:hover,.dot:focus-visible,.dot.hot{transform:scale(1.35)}
+.dot.release:hover,.dot.release:focus-visible,.dot.release.hot{transform:rotate(45deg) scale(1.3)}
+.dot.dim{opacity:.14;pointer-events:none}
+.peek{position:absolute;z-index:5;pointer-events:none;background:var(--cream);color:var(--cream-ink);border-radius:8px;padding:8px 10px;width:220px;font-size:13px;line-height:1.3;box-shadow:0 8px 24px rgba(0,0,0,.45);display:grid;grid-template-columns:52px 1fr;gap:8px;align-items:start}
+.peek img{width:52px;aspect-ratio:2/3;object-fit:cover;border-radius:3px;image-rendering:pixelated;background:#0d0b13}
+.peek .pt{font-weight:700}
+.peek .pw{font:600 10.5px var(--font-mono);color:#6d6077;margin-bottom:2px}
+.peek.noimg{grid-template-columns:1fr}
+.maphint{display:flex;flex-wrap:wrap;gap:6px 16px;padding:10px 12px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-dim)}
+.maphint span{display:inline-flex;align-items:center;gap:6px}
+.k{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ink-dim)}
+.k.m{background:transparent;border:2px solid var(--ink-dim);box-shadow:0 0 0 2px var(--muse)}
+.k.r{border-radius:2px;transform:rotate(45deg)}
+.k.l{width:22px;height:0;border-radius:0;background:none;border-top:2px dashed var(--ink-dim)}
+.k.s{width:22px;height:7px;border-radius:4px;opacity:.5}
+.k.x{background:transparent;border:2px dashed var(--ink-faint)}
+
+.span{position:absolute;height:8px;border-radius:4px;background:var(--c);opacity:.3;z-index:1}
+.span-l{position:absolute;z-index:1;font:600 10px var(--font-mono);color:var(--c);white-space:nowrap;opacity:.9}
+.links{position:absolute;left:0;top:0;pointer-events:none;z-index:1;overflow:visible}
+.links .hit{fill:none;stroke:transparent;stroke-width:12px;pointer-events:stroke;cursor:help}
+.lnk{opacity:.85}
+.span.dim,.span-l.dim,.lnk.dim{opacity:.06}
+.viewtog{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px;margin:12px 0}
+.viewtog button{border:0;background:transparent;color:var(--ink-dim);font:600 13px var(--font-body);padding:7px 14px;border-radius:999px;cursor:pointer}
+.viewtog button[aria-pressed="true"]{background:var(--shell);color:#1a1522}
+.bygame{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.gl{min-width:0;background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--c);border-radius:12px;padding:12px 0}
+.gl-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:0 14px 10px}
+.gl-h h3{margin:0;font:700 20px var(--font-pixel);color:var(--c)}
+.gl-h span{font:500 12px var(--font-mono);color:var(--ink-dim)}
+.gl-h button{margin-left:auto;border:1px solid var(--line);background:transparent;color:var(--shell);font:600 12.5px var(--font-body);border-radius:999px;padding:5px 11px;cursor:pointer}
+.track{display:flex;gap:10px;overflow-x:auto;padding:0 14px 6px;scroll-snap-type:x proximity;scroll-padding-inline:14px}
+.tk{flex:none;width:112px;padding:0;border:0;background:transparent;color:var(--ink);text-align:left;cursor:pointer;scroll-snap-align:start;font:inherit}
+.tk .im{position:relative;display:flex;align-items:center;justify-content:center;width:112px;aspect-ratio:2/3;border-radius:6px;overflow:hidden;background:#0d0b13;border:1px solid var(--line)}
+.tk.muse .im{border:2px solid var(--muse)}
+.tk img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
+.tk .im.none{background:repeating-linear-gradient(135deg,var(--panel-2) 0 6px,var(--panel) 6px 12px)}
+.tk .im i{font:700 15px/1.05 var(--font-pixel);font-style:normal;color:var(--c);text-align:center;padding:6px}
+.tk em{position:absolute;left:5px;top:5px;font:700 9.5px var(--font-body);font-style:normal;letter-spacing:.06em;text-transform:uppercase;background:var(--shell);color:#1a1522;border-radius:3px;padding:3px 5px}
+.tk b{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;line-height:1.25;margin-top:6px;font-weight:600}
+.tk small{display:block;font:500 10.5px var(--font-mono);color:var(--ink-faint);margin-top:3px}
+.tk:hover .im,.tk:focus-visible .im{border-color:var(--c)}
+/* ---------- log ---------- */
+.chapters{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.chap{flex:none;display:grid;gap:2px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--ink);cursor:pointer;font:inherit;min-width:150px}
+.chap b{font:700 14px var(--font-pixel);letter-spacing:.02em}
+.chap span{font:500 11px var(--font-mono);color:var(--ink-dim)}
+.chap .bar{display:flex;gap:2px;margin-top:4px}
+.chap .bar i{height:5px;flex:1;border-radius:2px;background:var(--c);min-width:4px}
+.chap.on{border-color:var(--shell)}
+.phase{margin-top:28px}
+.phase-h{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}
+.phase-h h3{margin:0;font-family:var(--font-pixel);font-size:21px}
+.phase-h .rng{font-family:var(--font-mono);font-size:12px;color:var(--ink-dim)}
+.phase-h p{flex-basis:100%;margin:2px 0 0;color:var(--ink-dim);font-size:14px;max-width:72ch}
+.phase-h .pp{margin-left:auto;border:1px solid var(--line);background:transparent;color:var(--shell);font-weight:600;font-size:12.5px;border-radius:999px;padding:5px 10px;cursor:pointer}
+.feed{display:grid;gap:10px}
+.card{display:grid;grid-template-columns:120px minmax(0,1fr);background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:8px;overflow:hidden;cursor:pointer;transition:border-color .12s,transform .12s}
+.card:hover{border-color:color-mix(in srgb,var(--c) 60%,var(--line));border-left-color:var(--c)}
+.card.muse-src{border-left-style:double;border-left-width:6px}
+.card.rejected .ttl{text-decoration:line-through;text-decoration-color:var(--plate);text-decoration-thickness:2px}
+.card.flash{box-shadow:0 0 0 2px var(--shell)}
+.thumb{background:#0d0b13;position:relative;display:flex;align-items:center;justify-content:center;min-height:100%}
+.thumb img{display:block;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;aspect-ratio:2/3}
+.thumb .count{position:absolute;right:5px;bottom:5px;background:rgba(10,8,14,.8);color:var(--ink);font:600 11px var(--font-mono);border-radius:4px;padding:2px 5px}
+.thumb.none{background:repeating-linear-gradient(135deg,var(--panel-2) 0 6px,var(--panel) 6px 12px);flex-direction:column;gap:6px;padding:10px;text-align:center}
+.thumb.none b{font:700 15px/1.05 var(--font-pixel);color:var(--c)}
+.thumb.none span{font:600 10px var(--font-mono);color:var(--ink-faint);letter-spacing:.06em;text-transform:uppercase}
+.body{padding:11px 13px;min-width:0;display:grid;gap:6px;align-content:start}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-dim)}
+.tag{font:700 10.5px/1 var(--font-body);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:4px;background:var(--panel-2);color:var(--ink)}
+.tag.lane{background:var(--c);color:#1a1522}
+.tag.src-muse{background:transparent;border:1px solid var(--muse);color:var(--muse)}
+.tag.src-claude{background:transparent;border:1px solid var(--ink-faint);color:var(--ink-dim)}
+.tag.rel{background:var(--shell);color:#1a1522}
+.tag.rej{background:var(--plate);color:#fff}
+.ttl{margin:0;font-size:17px;font-weight:700;line-height:1.25;text-wrap:balance}
+.sum{margin:0;color:var(--ink-dim);font-size:14.5px}
+.quote{margin:2px 0 0;background:var(--cream);color:var(--cream-ink);border-radius:6px;padding:8px 10px;font-size:14px}
+.quote b,.vq b{display:inline-block;background:var(--plate);color:#fff;font:700 10.5px/1 var(--font-body);letter-spacing:.08em;padding:4px 6px;border-radius:3px;margin-right:6px;vertical-align:1px}
+.strip{display:flex;gap:6px;overflow-x:auto;padding:4px 0 2px;scrollbar-width:thin}
+.strip button{flex:none;padding:0;border:1px solid var(--line);border-radius:4px;background:#0d0b13;cursor:zoom-in;overflow:hidden}
+.strip img{display:block;width:62px;aspect-ratio:2/3;object-fit:cover;image-rendering:pixelated}
+.open-l{font-weight:600;font-size:13px;color:var(--shell)}
+code,.mono{font-family:var(--font-mono);font-size:.9em}
+@media (max-width:520px){.card{grid-template-columns:92px minmax(0,1fr)}.ttl{font-size:16px}.strip img{width:52px}}
+
+/* ---------- roster ---------- */
+.tbl-wrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.ros{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+.ros th,.ros td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.ros th{font:600 11.5px var(--font-mono);color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em}
+.ros td:first-child{font-weight:700;color:var(--l-knockout);white-space:nowrap}
+.ros tr:last-child td{border-bottom:0}
+.evo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.evo button{padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel);color:var(--ink);cursor:zoom-in;text-align:left;font:inherit}
+.evo img{display:block;width:100%;aspect-ratio:408/300;object-fit:cover;object-position:50% 20%;image-rendering:pixelated}
+.evo span{display:block;padding:8px 10px;font-size:13px;color:var(--ink-dim)}
+.evo b{font:700 14px var(--font-pixel);color:var(--l-knockout);margin-right:4px}
+@media (max-width:520px){.evo span{font-size:11.5px;padding:6px 7px}}
+/* ---------- open threads ---------- */
+.threads{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.threads{grid-template-columns:1fr}}
+.th{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.th h3{margin:0 0 8px;font-size:15px;font-family:var(--font-pixel);letter-spacing:.03em;color:var(--shell)}
+.th ul{margin:0;padding-left:18px;font-size:14px;display:grid;gap:6px}
+.th li{color:var(--ink-dim)}
+.th li b{color:var(--ink);font-weight:600}
+footer{padding-block:34px 40px;color:var(--ink-faint);font-size:13px}
+.totop{position:fixed;right:max(16px,calc(env(safe-area-inset-right,0px) + 12px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:8;border:0;border-radius:50%;width:44px;height:44px;background:var(--panel-2);color:var(--ink);font:700 18px var(--font-pixel);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+
+/* ---------- Lantern viewer ---------- */
+.viewer{position:fixed;inset:0;z-index:30;background:rgba(9,7,13,.94);display:flex;align-items:center;justify-content:center;padding:calc(10px + env(safe-area-inset-top,0px)) max(10px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
+.console{width:min(460px,100%);height:min(900px,100%);display:flex;flex-direction:column;background:linear-gradient(180deg,var(--shell),var(--shell-deep));border-radius:22px 22px 44px 22px;padding:10px 12px 14px;box-shadow:0 20px 60px rgba(0,0,0,.6);color:var(--shell-ink)}
+.c-top{display:flex;align-items:center;gap:8px;padding:0 4px 8px;font:600 12px var(--font-mono)}
+.c-top .ctr{margin-left:auto}
+.c-x{border:0;background:rgba(42,34,51,.15);color:var(--shell-ink);border-radius:999px;font:700 12px var(--font-body);padding:5px 10px;cursor:pointer}
+.c-screen{background:#0d0b13;border-radius:10px;padding:6px;display:flex;flex-direction:column;min-height:0;flex:1 1 auto;box-shadow:inset 0 0 0 3px #2a2233}
+.c-prog{display:flex;gap:2px;padding:2px 2px 6px}
+.c-prog i{flex:1;height:4px;border-radius:2px;background:#2b2540}
+.c-prog i.done{background:var(--c,var(--ink-faint));opacity:.55}
+.c-prog i.now{background:var(--c,var(--shell));opacity:1}
+.c-img{position:relative;flex:1 1 auto;min-height:120px;display:flex;align-items:center;justify-content:center;background:#0d0b13;border-radius:6px;overflow:hidden;touch-action:pan-y}
+.c-img img{max-width:100%;max-height:100%;height:auto;object-fit:contain;image-rendering:pixelated;display:block}
+.c-card{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;text-align:center;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--c) 22%,#0d0b13),#0d0b13 70%)}
+.c-card b{font:700 30px/1 var(--font-pixel);color:var(--c)}
+.c-card span{font:600 12px var(--font-mono);color:var(--ink-dim);letter-spacing:.08em;text-transform:uppercase}
+.c-dots{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;gap:5px}
+.c-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3)}
+.c-dots i.on{background:#fff}
+.c-cap{position:absolute;left:8px;top:8px;background:rgba(10,8,14,.75);color:var(--ink);font:600 11px var(--font-mono);padding:3px 6px;border-radius:4px}
+.c-text{background:var(--cream);color:var(--cream-ink);border-radius:6px;margin-top:6px;padding:10px 12px;overflow-y:auto;max-height:30vh;flex:none}
+.c-text .meta{color:#6d6077;margin-bottom:4px}
+.c-text .tag.src-claude{color:#6d6077;border-color:#b9adc2}
+.c-text .tag.src-muse{color:#1d7f92;border-color:#1d7f92}
+.c-text .tag{background:#e6dcc6;color:var(--cream-ink)}
+.c-text .tag.lane{background:var(--c);color:#1a1522}
+.c-text .tag.rel{background:var(--shell)}
+.c-text .tag.rej{background:var(--plate);color:#fff}
+.c-text h4{margin:0 0 4px;font-size:17px;line-height:1.25}
+.c-text p{margin:0 0 6px;font-size:14px}
+.c-text ul{margin:4px 0 0;padding-left:18px;font-size:13.5px}
+.vq{background:#efe2c6;border-radius:5px;padding:6px 8px}
+.c-pads{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:14px 6px 2px}
+.dpad{display:grid;grid-template-columns:repeat(3,38px);grid-template-rows:repeat(3,38px)}
+.dpad button{border:0;background:var(--btn);color:#cfc6e0;font:700 13px var(--font-body);cursor:pointer;padding:0}
+.dpad button:active,.ab button:active{filter:brightness(1.3)}
+.dpad .u{grid-area:1/2;border-radius:6px 6px 0 0}
+.dpad .l{grid-area:2/1;border-radius:6px 0 0 6px}
+.dpad .r{grid-area:2/3;border-radius:0 6px 6px 0}
+.dpad .d{grid-area:3/2;border-radius:0 0 6px 6px}
+.dpad .m{grid-area:2/2;background:var(--btn);border-radius:0}
+.legendpad{font:600 10.5px/1.5 var(--font-mono);text-align:center;opacity:.8}
+.ab{display:flex;gap:10px;align-items:flex-end}
+.ab button{width:54px;height:54px;border-radius:50%;border:0;cursor:pointer;color:#fff;font:700 17px var(--font-pixel);display:grid;place-items:center;line-height:1;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
+.ab button small{display:block;font:600 9px var(--font-body);opacity:.85}
+.ab .b{background:var(--btn)}
+.ab .a{background:var(--plate);margin-bottom:16px}
+@media (max-height:720px){.c-text{max-height:26vh}.dpad{grid-template-columns:repeat(3,32px);grid-template-rows:repeat(3,32px)}.ab button{width:46px;height:46px}.c-pads{padding-top:8px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div style="background:#c8384a;color:#fff;font:600 13px/1.4 Figtree,system-ui,sans-serif;text-align:center;padding:8px max(16px,env(safe-area-inset-left,0px))">
+  Frozen time capsule · saved Nov 15, 2026 (board version 7). Don't edit this copy. The living board is at
+  <a href="https://claude.ai/artifact/HyDXhUmTsQfA6SY4RhPvvJ" style="color:#fff">claude.ai/artifact/HyDXhUmTsQfA6SY4RhPvvJ</a>.
+</div>
+
+<header class="bezel" id="top">
+  <div class="wrap">
+    <div class="hero-text">
+      <div class="eyebrow">North Coast Studios · build history · updated Nov 15, 2026</div>
+      <h1>Pocket Lantern<br>Dev Board</h1>
+      <p class="lede">Every pass on the console and its cartridges, from Sprouts to Patch &amp; Plate. Sprouts came first. Rootdeep was built on Muse with lil Bottie, then imported into Claude for refinement.</p>
+      <div class="counts" id="counts"></div>
+    </div>
+    <div class="hero-cta">
+      <button class="play" type="button" data-play="start"><span class="a">A</span><span>Play the story<small>Step through every pass on the Lantern</small></span></button>
+      <div class="hint">Or tap any dot, card or screenshot to open it there. Use the D-pad or arrow keys to move.</div>
+    </div>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Board">
+  <div class="wrap">
+    <a class="brand" href="#top">Pocket Lantern</a>
+    <div class="sections" id="sections">
+      <a href="#releases">Releases</a><a href="#map-sec">Map</a><a href="#log-sec">Log</a><a href="#roster">Roster</a><a href="#open">Open</a>
+    </div>
+    <button class="mini-play" type="button" data-play="start">▶ Play</button>
+  </div>
+  <div class="lanes-row"><div class="wrap" id="legend" role="group" aria-label="Show or hide lanes"></div></div>
+</nav>
+
+<main class="wrap">
+  <section id="releases" aria-labelledby="rel-h">
+    <h2 id="rel-h">Releases</h2>
+    <p class="sub">What was on the shelf at each pause point. Tap one to open it.</p>
+    <div class="releases" id="rels"></div>
+  </section>
+
+  <section id="map-sec" aria-labelledby="map-h">
+    <h2 id="map-h">The map</h2>
+    <p class="sub">Bars show how long each game was in development, and dashed lines show where one game fed into another. Switch to <b>By game</b> to give every game its own equal row. One lane per cartridge, plus the console, in Eastern time. Muse times are approximate. Hover or tap a dot. On a phone, scroll the map sideways.</p>
+    <div class="viewtog" role="group" aria-label="Map view">
+      <button type="button" data-view="time" aria-pressed="true">Timeline</button>
+      <button type="button" data-view="game" aria-pressed="false">By game</button>
+    </div>
+    <div class="bygame" id="bygame" hidden></div>
+    <div class="mapbox" id="mapbox">
+      <div class="mapscroll"><div class="map" id="map"></div></div>
+      <div class="peek" id="peek" hidden></div>
+      <div class="maphint">
+        <span><i class="k"></i> built in Claude</span>
+        <span><i class="k m"></i> built on Muse</span>
+        <span><i class="k r"></i> release</span>
+        <span><i class="k x"></i> rejected</span>
+        <span><i class="k l"></i> one game fed into another (hover for what)</span>
+        <span><i class="k s"></i> time in development</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="log-sec" aria-labelledby="log-h">
+    <h2 id="log-h">The log</h2>
+    <p class="sub">Five chapters. Jump to one, or play a chapter on its own. Cream boxes are Will's direction that drove the pass.</p>
+    <div class="chapters" id="chapters"></div>
+    <div id="log"></div>
+  </section>
+
+  <section id="roster" aria-labelledby="ros-h">
+    <h2 id="ros-h">Knockout roster</h2>
+    <p class="sub">How the cast changed across the three passes, then all eight fighters as of Artifact v18 (Nov 14, 10:51 AM ET). Marcus replaced Points. Mama and Bean are placeholder names, and Corbin uses a stand-in sprite.</p>
+    <div class="evo">
+      <button type="button" data-open="ko-1" data-img="1"><img src="shots/ko14_select.webp" alt="Character select in Artifact v14" loading="lazy"><span><b>v14</b> Chrome, Kiss Man, Points</span></button>
+      <button type="button" data-open="knockout-2" data-img="0"><img src="shots/ko15_select.webp" alt="Character select in Artifact v15" loading="lazy"><span><b>v15</b> Lil Bottie, Corbin</span></button>
+      <button type="button" data-open="knockout-3" data-img="1"><img src="shots/ko18_select.webp" alt="Character select in Artifact v18" loading="lazy"><span><b>v18</b> Marcus replaces Points</span></button>
+    </div>
+    <div class="tbl-wrap"><table class="ros">
+      <thead><tr><th>Fighter</th><th>X special</th><th>Y special</th><th>Super</th><th>Finisher</th></tr></thead>
+      <tbody>
+        <tr><td>Will</td><td>Selfie Flash</td><td>Mazel Tov Laser</td><td>Bike Lane</td><td>Selfie-ality</td></tr>
+        <tr><td>Erin</td><td>Towel Whip</td><td>Leash Lasso</td><td>Sprout Stampede</td><td>Garden-ality</td></tr>
+        <tr><td>Louie</td><td>Zoom Zoom Zoom</td><td>Turbo Zoom</td><td>Judgement</td><td>Bork-ality</td></tr>
+        <tr><td>Lil Bottie</td><td>Clanker Guns</td><td>Chain Stun</td><td>Air Support</td><td>Latte-ality</td></tr>
+        <tr><td>Gas Guy</td><td>Thumbs Down</td><td>Tire Pressure</td><td>Free Air</td><td>Dislike-ality</td></tr>
+        <tr><td>Corbin</td><td>Can I Get A Kiss</td><td>Sneaky Kiss</td><td>007</td><td>Smooch-ality</td></tr>
+        <tr><td>Marcus</td><td>Dab Cloud</td><td>Double or Nothing</td><td>Hydro Jet</td><td>Flush-ality</td></tr>
+        <tr><td>Mama</td><td>Bottle Toss</td><td>Mom Voice</td><td>Bean on the Move</td><td>Naptime-ality</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="open" aria-labelledby="open-h">
+    <h2 id="open-h">Open threads</h2>
+    <p class="sub">Gaps in the record, and what's waiting on Will.</p>
+    <div class="threads">
+      <div class="th"><h3>Import next</h3><ul>
+        <li><b>Sprouts before Version 16.</b> Versions 16 to 19 are now exact. The original build, the Opus audit and Fable's plan still have no dates.</li>
+        <li><b>Knockout before commit e2344a7.</b> The repo has no history before this commit. Its first build came from another session.</li>
+        <li><b>Knockout's origin.</b> It came from another session on Nov 13. Anything before the first commit is missing.</li>
+      </ul></div>
+      <div class="th"><h3>Waiting on Will</h3><ul>
+        <li><b>Phone verdicts.</b> No version has been confirmed on the iPhone: text placement, touch feel, dash, frame rate.</li>
+        <li><b>Erin's verdict</b> on Patch &amp; Plate's pace, difficulty and hints.</li>
+        <li><b>Canon calls:</b> the Sprout King and everything in Patch &amp; Plate are invented, so they need your OK. Ranger and Scout are still placeholder names.</li>
+        <li><b>Knockout balance and names:</b> Marcus won the fewest CPU matches in the last soak. Mama and Bean are placeholders, and Corbin has a stand-in sprite.</li>
+        <li><b>"Three little auto balls"</b> you dislike in Rootdeep: still unidentified.</li>
+      </ul></div>
+      <div class="th"><h3>Known soft spots</h3><ul>
+        <li>Sprouts' valley projects haven't been tested in a long play-through.</li>
+        <li>The Mothshade caused every death in the bot playtest.</li>
+        <li>Rootdeep rooms clear in 4 to 10 seconds, and difficulty is untouched until you've played more.</li>
+        <li>Rootdeep's music is a placeholder loop and needs a William Cohen track.</li>
+        <li>The Lantern menu still counts three cartridges, not four.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <footer>Sources: the <span class="mono">northcoaststudioswill-hub/Game</span> repo (commits, changelogs, handoffs, dev photos), lil Bottie's Rootdeep timeline, the Pocket Lantern backup and handoff guide, and Will's phone capture from Nov 14.</footer>
+</main>
+
+<button class="totop" id="totop" type="button" aria-label="Back to top" hidden>↑</button>
+
+<div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="Lantern viewer">
+  <div class="console">
+    <div class="c-top"><span id="v-phase"></span><span class="ctr" id="v-ctr"></span><button class="c-x" id="v-close" type="button">Close ✕</button></div>
+    <div class="c-screen">
+      <div class="c-prog" id="v-prog"></div>
+      <div class="c-img" id="v-img"></div>
+      <div class="c-text" id="v-text"></div>
+    </div>
+    <div class="c-pads">
+      <div class="dpad" aria-label="D-pad">
+        <button class="u" type="button" data-k="up" aria-label="Previous screenshot">▲</button>
+        <button class="l" type="button" data-k="left" aria-label="Previous pass">◀</button>
+        <span class="m"></span>
+        <button class="r" type="button" data-k="right" aria-label="Next pass">▶</button>
+        <button class="d" type="button" data-k="down" aria-label="Next screenshot">▼</button>
+      </div>
+      <div class="legendpad">◀ ▶ pass<br>▲ ▼ screen<br>swipe works too</div>
+      <div class="ab">
+        <button class="b" type="button" data-k="b" aria-label="Close">B<small>close</small></button>
+        <button class="a" type="button" data-k="a" aria-label="Next">A<small>next</small></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const LANES=[
+  {id:"console", name:"Console", note:"shelf, menus, music", c:"var(--l-console)"},
+  {id:"sprouts", name:"Sprouts", note:"cart 1", c:"var(--l-sprouts)"},
+  {id:"knockout",name:"Knockout",note:"cart 2", c:"var(--l-knockout)"},
+  {id:"rootdeep",name:"Rootdeep",note:"cart 3", c:"var(--l-rootdeep)"},
+  {id:"patch",   name:"Patch & Plate",note:"cart 4", c:"var(--l-patch)"}
+];
+const S=n=>"shots/"+n+".webp";
+
+/* t: Eastern time "MM-DD HH:MM". approx:true = Muse timing is a guess within the night it names. t:null = before the record. */
+const EV=[
+ {id:"sprouts-v19",lane:"sprouts",src:"claude",t:null,when:"Before Nov 13 (dates not recorded)",title:"Sprouts: the cozy keeper game",
+  sum:"The first game and the canon of the universe. A Pikmin-like squad game built as one HTML file: you're Will, keeper of the Great Lantern. Pluck sprouts, throw them, whistle them home. Opus audited it, and Fable wrote a six-step action plan.",
+  pts:["Six sprout types: Ember, Peb, Dew, Zip, Leaf, Lucky","Erin's opening, four sun shards, Old Thornback woken rather than beaten","Home, Erin's garden, 10 bugs, 12 treasures, daily asks, 36 achievements, capsule gacha","Music: William Cohen's Beautiful Sprouts and Autumn Study","Opus wrote an audit and handoff; Fable wrote the action plan (steps 1 to 6)","The live page reached Version 15 before the record starts"],
+  imgs:[["sp_play","Lantern Field, day 1"],["sp_talk","Dialogue"],["sp_menu","Title menu"],["sp_cine","Cutscene"]]},
+ {id:"ko-base",lane:"console",src:"claude",t:"11-13 18:56",title:"The starting point: Sprouts alone on the shelf",live:"Artifact v13 (probably) · id 1794614200",sum:"The live page both the Knockout and Sprouts sessions started from. It matched the Sprouts.html upload byte for byte. The shelf showed Sprouts and two locked Coming Soon slots."},
+ {id:"ko-1",lane:"knockout",src:"claude",t:"11-13 20:38",title:"North Coast Knockout added as cartridge 2",commit:"e2344a7",
+  sum:"A one-on-one 2D fighter: 8 fighters, 8 stages, specials, supers, finishers, arcade and quick fight, chiptune. The console was split into sources with a build script.",
+  live:"Artifact v14",pts:["Repo split into src/ with a build script (shell, tracks, sprouts)","One-on-one, best of 3 rounds, 60-second timer, then a finisher","8 fighters at launch: Will, Erin, Louie, Chrome, Gas Guy, Kiss Man, Points, Mama","8 stages from your photos: Living Room, Backyard, Front Lawn, The Trail, The Overpass, Gas Station, Fitting Rooms, Rooftop","Arcade (7 fights, Louie final boss) and Quick Fight, Easy / Normal / Hard","Soak test: 439 rounds, no crashes or stuck matches"],imgs:[["ko14_title","Title, Artifact v14"],["ko14_select","Original eight: Chrome, Kiss Man, Points"],["ko14_fight_will_louie","Will vs Louie, The Living Room"],["ko14_special_will","Will's Selfie Flash, The Overpass"],["ko14_special_erin","Erin vs Kiss Man, The Backyard"],["ko14_special_3","Chrome vs Gas Guy, Fitting Rooms"],["ko14_super_louie","Louie's super, The Trail"],["ko14_super_6","Points' Photobomb super"]]},
+ {id:"muse-brief",lane:"rootdeep",src:"muse",t:"11-13 22:12",title:"The brief: a new game on a blank cartridge",
+  sum:"Will hands lil Bottie the Sprouts file and asks for a new game it can hand back to Claude. Bottie maps the console: 3 slots, one shared JS scope, 240-wide screen.",quote:"Analyze the game, build on a blank cartridge, make it hand-back-able to Claude."},
+ {id:"muse-mothlight",lane:"rootdeep",src:"muse",t:"11-13 22:50",approx:1,rejected:1,title:"v1 Mothlight",
+  sum:"A 90-second moth arcade game. Fully tested, then killed the same night and deleted. The lesson: Will wants systems depth, not arcade loops.",quote:"That game is too basic. I want it matching in depth — think like Hades."},
+ {id:"muse-v20",lane:"rootdeep",src:"muse",t:"11-13 23:30",approx:1,title:"v2.0 Rootdeep: a Hades-style roguelite",
+  sum:"The Hearth hub, 12-chamber runs across 3 biomes, 3 bosses, boons from 6 sprout gods, Mirror of Dew, Armory, Keepsakes, Pact of Roots, Codex.",
+  pts:["Biomes: The Burrows, The Flooded Vault, The Ember Core","Bosses: Grub Mother, Drowned King, The Hollow Keeper (a shadow Will)","Death banks Moondew, Keys and Honey; burns petals and boons"]},
+ {id:"knockout-2",lane:"knockout",src:"claude",t:"11-13 23:40",title:"Knockout: GBA-style sprites, second specials",commit:"c22a279",live:"Artifact v15",
+  sum:"Taller shaded fighters with dithered skies, a second special for everyone (Mazel Tov Laser, Towel Whip, Shiba Plane, Clanker Guns, Chain Stun), double-tap dash.",pts:["Feedback: graphics too playful, moves needed signature moves","Taller GBA-style fighters, smaller heads, shaded limbs, dithered skies, hit sparks instead of comic words","Renames: Chrome becomes Lil Bottie, Kiss Man becomes Corbin","Direction + button controls with no motion inputs; double-tap dash","Soak test: 427 rounds, no errors"],imgs:[["ko15_select","Renamed: Lil Bottie and Corbin"],["ko15_special_3","Lil Bottie's Chain Stun"],["ko15_special_erin","Erin vs Corbin: Can I Get A Kiss?"],["ko15_special_will","Will vs Lil Bottie, The Overpass"],["ko15_fight_will_louie","Taller GBA-style fighters"]]},
+ {id:"muse-v21",lane:"rootdeep",src:"muse",t:"11-14 00:10",approx:1,title:"v2.1 text fit and sprites",quote:"A lot of the text doesn't fit.",
+  sum:"Two-part list rows, short labels, sprite foes and bosses with hit-flash, per-biome floors, glowing doors, dash ghosts."},
+ {id:"muse-v22",lane:"rootdeep",src:"muse",t:"11-14 00:45",approx:1,title:"v2.2 presentation pass",
+  sum:"The HOW TO DELVE explainer and title bullets deleted at Will's word. A render rig built so the team could actually look at frames, not just pass tests."},
+ {id:"muse-v23",lane:"rootdeep",src:"muse",t:"11-14 01:20",approx:1,title:"v2.3 Legacy of Goku style pass",quote:"Look at games like Legacy of Goku as inspo for graphics — I literally can't play the game till it looks right.",
+  sum:"1px outlines on every sprite, chunkier actors, 3-variant stone floors, segmented HP bars, the red name-plate dialogue box."},
+ {id:"muse-v24",lane:"rootdeep",src:"muse",t:"11-14 01:55",approx:1,title:"v2.4 character pass",quote:"A smart ass with borderline over the edge humor, a hater of all.",
+  sum:"Marcus rewritten to roast everyone. Will set the order: characters first, cinematic after."},
+ {id:"muse-v25",lane:"rootdeep",src:"muse",t:"11-14 02:40",approx:1,title:"v2.5 the Sprouts connection",
+  sum:"Sprouts become the currency: buds follow you and work by type, bank at run's end, trade at the Sprout Ledger. Intro cinematic, main menu, shared settings."},
+ {id:"muse-v251",lane:"rootdeep",src:"muse",t:"11-14 03:15",approx:1,title:"v2.5.1 the green-screen fix",
+  sum:"The intro froze on Will's phone. The cinematic was handing sprite records to drawImage. The rule since then: drawImage takes canvases only, and every test fails hard otherwise."},
+ {id:"muse-v26",lane:"rootdeep",src:"muse",t:"11-14 04:00",approx:1,title:"v2.6 living Hearth, guaranteed sprouts",
+  sum:"NPCs wander and page through all their lines. Sprout drops guaranteed: 25% regular, elites always, bosses two."},
+ {id:"muse-v27",lane:"rootdeep",src:"muse",t:"11-14 05:30",approx:1,title:"v2.7 stations and routes",
+  sum:"Each NPC gets a station and a waypoint route at their own speed (Louie fastest, Marcus sulks slowest). 3 to 4 lines each."},
+ {id:"muse-v28",lane:"rootdeep",src:"muse",t:"11-14 08:30",approx:1,title:"v2.8 battler buds, controls remap",
+  sum:"Buds auto-battle. NPCs keep personal space. Controls remapped at Will's word: A attack, B cast, double-tap to dash. Honey gifting moved to START."},
+ {id:"muse-v281",lane:"rootdeep",src:"muse",t:"11-14 09:30",approx:1,title:"v2.8.1 tester pass",
+  sum:"A real-input bot played the whole game. Dash charges 1 to 2, more foes per chamber, bud damage confirmed as micro-buffs only."},
+ {id:"phone-1057",lane:"rootdeep",src:"muse",t:"11-14 10:57",title:"Will's phone capture: the Hearth",
+  sum:"Sprouts+Rootdeep.html on the iPhone, Ranger talking. It still shows \"B: GIFT HONEY\" and the Mirror station, so it's the Muse build. Either a pre-v2.8 copy or a prompt v2.8 missed.",
+  pts:["The dialogue box clips its own bottom line, and \"DESCEND\" shows through","Autumn Study by William Cohen playing"],
+  imgs:[["phone_hearth","Nov 14, 10:57 AM, iPhone"]]},
+ {id:"knockout-3",lane:"knockout",src:"claude",t:"11-14 10:44",title:"Knockout: four buttons, heavier hits, Marcus",commit:"b1e05bd",live:"Artifact v18",
+  sum:"X and Y buttons appear only for this cartridge. Bigger impact (hitstop, flash, shake, zoom punch). Marcus replaces Points. Every fighter gets named moves. Retro Battle Theme.",
+  pts:["Controls: A light (A,A,A combo), B heavy, X and Y specials, Select super; X and Y show only in Knockout","Impact: higher gravity, longer hitstop, white hit flash, victim shake, zoom punch, landing dust","Erin: head redrawn; down + A is Bean Dip","Louie: Paw Paw Paw, Chomp, Need More Loaf, Zoom Zoom Zoom, Turbo Zoom, and the Judgement super","Marcus replaces Points: Bro Jab, Pipe Wrench, Plunger Pop, Snake the Drain, Dab Cloud, Double or Nothing, Hydro Jet, Flush-ality","Every fighter has named basics; a move list opens from pause","Retro Battle Theme is the only Knockout track. Soak test: 449 rounds, no errors"],
+  imgs:[["ko18_super_6","Marcus' Hydro Jet super"],["ko18_select","Marcus joins; X or Y opens the move list"],["ko18_moves","Will's move list"],["ko18_special_erin","Erin vs Corbin"],["ko18_special_3","Lil Bottie vs Gas Guy"],["ko18_fight_will_louie","Will vs Louie, heavier hits"]]},
+ {id:"ko-v18-tour",lane:"knockout",src:"claude",t:"11-14 10:46",approx:1,title:"Knockout v18 in action: dev photos",live:"Artifact v18",sum:"The devs' captures of the v18 build: Marcus's full kit from Dab Cloud to the Flush-ality finisher, Louie's Judgement, Erin's Bean Dip, and the four-button pad that appears only for Knockout. Capture time wasn't recorded.",pts:["The console swaps to A / B / X / Y with Select as super when Knockout is in; Sprouts keeps two buttons","Marcus: Pipe Wrench, Snake the Drain, Dab Cloud (\"BRO.\"), Double or Nothing, Hydro Jet (\"Bro, I got an idea\"), Flush-ality","Louie: Need More Loaf, the Judgement super, and his full move list","Erin: Bean Dip launcher on down + A","Sprite frames show the taller shaded GBA-style bodies for Erin and Marcus"],imgs:[["kd_pads","Sprouts pad vs Knockout's four buttons"],["kd_select_marcus","Marcus: plumbing boss, all gas, bro"],["kd_louie_moves","Louie's move list"],["kd_louie_erin","Louie vs Erin, The Backyard"],["kd_need_more_loaf","Need More Loaf"],["kd_judgement","Judgement super"],["kd_bean_dip","Erin's Bean Dip"],["kd_pipe_wrench","Marcus: Pipe Wrench"],["kd_snake_drain","Marcus: Snake the Drain"],["kd_dab_cloud","Marcus: Dab Cloud"],["kd_double_nothing","Marcus: Double or Nothing"],["kd_hydro_jet","Marcus: Hydro Jet super"],["kd_flushality","Marcus: Flush-ality finisher"],["kd_will_mama","Will vs Mama, Fitting Rooms"],["kd_dash_ghost","Double-tap dash afterimage"],["kd_sprites","Sprite frames: Erin and Marcus"]]},
+ {id:"sp-v16",lane:"sprouts",src:"claude",t:"11-13 23:51",title:"Sprouts v16: Fable's plan steps 1 to 4",live:"Artifact v16",sum:"Bug fixes, camera zoom, story chapters and transitions, all from Fable's action plan. Knockout from the other session merged in as cartridge 2.",pts:["Fixes: berries add sprouts again, the garden fence, the indoor map","Camera zoom, and one banner at a time","Story chapters","Transitions: doors, the travel hop, a first-visit area sweep, discovery cards"]},
+ {id:"sp-v17",lane:"sprouts",src:"claude",t:"11-14 06:56",title:"Sprouts v17: Marcus the bro",live:"Artifact v17",sum:"Marcus rewritten as a cocky \"bro\" with a big scheme, Marcus Waterworks, plus a dap with a DAPPED UP! banner. You asked for his bro voice at 11:58 PM the night before.",pts:["Catchphrase: \"See one, send one.\"","Waterworks is his outlandish scheme; a hot tub heated by Embers is next","Afterward you played the new dialogue and asked for something to stop the game from maxing out"]},
+ {id:"sp-v19",lane:"sprouts",src:"claude",t:"11-14 11:02",title:"Sprouts v19: valley projects",live:"Artifact v19",sum:"Five building projects that take sprouts for good, so the crew stops maxing out. Five new hats and higher house upgrade costs. Merged on top of the other session's Knockout update.",pts:["Marcus Waterworks (about 90 sprouts): swim spot to grand opening","Erin's Greenhouse (about 50), Thornback's Den (about 45)","Ranger's Lookout (about 35), Scout's Bug Hotel (about 35)","Sprouts sent to a project move there and visibly work","Each project pays a ticket, a hat only projects give, and a lasting bonus"]},
+ {id:"backup-v19",lane:"console",src:"claude",t:"11-14 11:04",title:"Frozen backup of Version 19",sum:"A frozen backup page with its own link, plus a backup file sent to you. This is the rollback point that v0.1 in the repo copies."},
+ {id:"sprouts-merge",lane:"sprouts",src:"claude",t:"11-14 10:51",title:"Repo catches up with Sprouts v16 and v17",commit:"30fd20e",
+  sum:"Another session's Sprouts update (the five valley projects, Marcus's Waterworks lines and dap, camera and scene work) merged under the Knockout hooks."},
+ {id:"muse-v29",lane:"rootdeep",src:"muse",t:"11-14 11:15",approx:1,title:"v2.9 the cast update (final Muse build)",
+  sum:"Character select: Will, Erin, Louie, Marcus, each with a signature cast (Mazel Tov Laser, Towel Whip, The Boof, Hydro Jet). Chambers spawn in two waves."},
+ {id:"v01",lane:"console",src:"claude",t:"11-14 11:56",release:1,title:"v0.1 pre-alpha: the rollback point",commit:"2ce413d",
+  sum:"Sprouts plus Knockout, frozen as Version 19. Music backed up separately at 12:16 PM (7d75a9e). Never edited after this.",imgs:[["boot1","Sprouts boot"],["boot2","Knockout boot"]]},
+ {id:"muse-handoff",lane:"rootdeep",src:"muse",t:"11-14 12:05",approx:1,title:"Muse handoff: Rootdeep goes to Claude",
+  sum:"Bottie writes a clean FOR-CLAUDE.md and the timeline. The project is closed on Muse.",quote:"Rootdeep is handed off completely now and you won't be working on it anymore."},
+ {id:"rd-import",lane:"rootdeep",src:"claude",t:"11-14 12:20",title:"Rootdeep imported into slot 3",commit:"1d0447e",
+  sum:"Only the Rootdeep block and its cart art came over from the Muse file, merged onto the newest Sprouts. Eight hooks connect it to the console.",
+  imgs:[["rd_import_title","Title on arrival"],["rd_import_hub","Hearth on arrival"],["rd_import_ch1","Chamber 1"],["rd_import_chars","Keeper select"],["rd_import_boss","Grub Mother"]]},
+ {id:"rd-moves",lane:"rootdeep",src:"claude",t:"11-14 12:48",title:"Keepers get their Knockout moves",commit:"48ae8f8",
+  sum:"Each keeper's X, Y and super taken straight from Knockout, on the same buttons. Piercing-shot fix, text fixes.",imgs:[["ko_will_x","Will's X special in Rootdeep"],["ko_marcus_super","Marcus' super in Rootdeep"],["ko_erin_cutin","Erin's super cut-in in Rootdeep"]]},
+ {id:"rd-gfx",lane:"rootdeep",src:"claude",t:"11-14 13:08",title:"Graphics overhaul and the Sprout King",commit:"c03950d",
+  sum:"Everything redrawn at true size in Sprouts' style: 16px biome floors, real walls, lantern lighting that relights when a room clears. A new keeper, the Sprout King, tosses and blooms buds.",
+  imgs:[["rd_gfx_hub","New Hearth"],["rd_gfx_vault","Flooded Vault"],["rd_king_toss","Sprout King toss"],["rd_boss_king","Drowned King"]]},
+ {id:"rd-textaudit",lane:"rootdeep",src:"claude",t:"11-14 13:28",title:"Text audit, first cinematics, capsules",commit:"0788155",
+  sum:"Text checked at iPhone 16 Pro Max size. Rootdeep unlocks added to the capsule machine. RESET PULLS added to Sprouts."},
+ {id:"rd-cine",lane:"rootdeep",src:"claude",t:"11-14 13:55",title:"Cinematics in Sprouts' cutscene style",commit:"dfb7da0",
+  sum:"Title scene, a cinematic for each boss, the escape, end screens.",imgs:[["rd_cine_title","Title scene"],["rd_cine_boss","Boss cinematic"]]},
+ {id:"rd-playtest",lane:"rootdeep",src:"claude",t:"11-14 14:19",title:"After Will's playtest: swarms and room objects",commit:"c73533e",
+  sum:"A roomier Hearth. Sprouts swarm foes and latch on. Pots, berries, chests, boom bulbs. Marcus's voice brought in line with Sprouts.",imgs:[["rd_swarm","Buds swarming"]]},
+ {id:"rd-anim",lane:"rootdeep",src:"claude",t:"11-14 14:42",title:"Animated attacks, living Hearth, telegraphs",commit:"bd6b086",
+  sum:"Attack frames for every weapon and keeper, foe warnings, hit-stop. Two minutes later: Marcus only mentions Waterworks once it's built in Sprouts (70337dc).",imgs:[["rd_telegraphs","Foe telegraphs"]]},
+ {id:"rd-saves",lane:"rootdeep",src:"claude",t:"11-14 15:06",title:"Saves, onboarding, death cinematic",commit:"396ba0c",
+  sum:"A checkpoint every chamber, Continue and New Game, Erin's welcome with an objective arrow, a rope-rescue death scene with milestones.",imgs:[["rd_erin_intro","Erin's welcome"],["rd_dying","Death cinematic"]]},
+ {id:"rd-textbox",lane:"rootdeep",src:"claude",t:"11-14 15:18",title:"Text sits right in its boxes",commit:"5483596",
+  sum:"Every text box placed by cap height so nothing clips on iPhone. This is the clipping visible in the 10:57 phone capture.",imgs:[["rd_textfix_talk","Dialogue after the fix"]]},
+ {id:"rd-dialogue",lane:"rootdeep",src:"claude",t:"11-14 15:37",title:"Dialogue that grows with you",commit:"be5cb62",
+  sum:"38 topics that unlock with milestones, keeper logs, a smoother first run."},
+ {id:"v02",lane:"console",src:"claude",t:"11-14 15:41",release:1,title:"v0.2 pre-alpha: Rootdeep on the shelf",commit:"c9a9bdc",
+  sum:"Three cartridges. Share package, frozen backup, README. The playtest report and dev snapshot followed at 4:33 PM (61e9314).",imgs:[["boot3","Rootdeep boot"],["rd_escape","Playtest: escape"]]},
+ {id:"lantern-menu",lane:"console",src:"claude",t:"11-14 16:44",title:"The Lantern menu",commit:"2358c50",
+  sum:"On the cartridge shelf: one capsule machine for every game, cross-game stats, 14 Lantern achievements that pay tickets. Rootdeep's bottom door becomes the Burrow.",imgs:[["lantern_shelf","Shelf"],["lantern_stats","Cross-game stats"],["rd_burrow_cine","Burrow scene"]]},
+ {id:"rd-burrow",lane:"rootdeep",src:"claude",t:"11-14 17:48",title:"Burrow descent, walk-ups, Hearth menu",commit:"68de12b",
+  sum:"A keeper-specific drop scene every run, a short scene between chambers, characters who walk over to explain things, a Start menu in the Hearth."},
+ {id:"v021",lane:"console",src:"claude",t:"11-14 17:52",release:1,title:"v0.2.1 pre-alpha",commit:"b98014c",
+  sum:"Frozen backup and share package. Then an audit (6:07 to 6:08 PM) found the v0.2 share zip had been overwritten and the music backup missing from this line. Both fixed."},
+ {id:"pp-1",lane:"patch",src:"claude",t:"11-14 18:28",title:"Patch & Plate: Erin's farm stand",commit:"c465f7e",
+  sum:"Built from Erin's own wish list: a couple of minutes at a time, levels she can finish and put down, no story to remember, saving without thinking. Plant, cook, plate, serve.",
+  imgs:[["boot4","Cartridge 4 boot"],["pp_day1","Day 1"]]},
+ {id:"pp-crew",lane:"patch",src:"claude",t:"11-14 19:32",title:"The sprout crew",commit:"6f1405f",
+  sum:"Sprouts join the kitchen: Dew waters, Peb chops, Ember speeds the stove, Zip carries plates, Leaf replants, Lucky charms customers.",imgs:[["pp_crew","Crew at work"]]},
+ {id:"pp-scenes",lane:"patch",src:"claude",t:"11-14 19:47",title:"Scenes, quips and its own song",commit:"d980fe6",
+  sum:"Skippable scenes between days, portrait quips that never stop play, \"Cook E\" as its music.",imgs:[["pp_taste","First taste"]]},
+ {id:"pp-engage",lane:"patch",src:"claude",t:"11-14 20:17",title:"Save files, Louie, friends, wardrobe",commit:"0cc5ab1",
+  sum:"Three save files. The stand becomes a hub. Louie lives there with his cravings. Friendship hearts and scenes, Erin's wardrobe and awning colours.",
+  imgs:[["pp_hub","Stand hub"],["pp_louie","Louie wants"],["pp_wardrobe","Wardrobe"]]},
+ {id:"v03",lane:"console",src:"claude",t:"11-14 20:32",release:1,title:"v0.3 pre-alpha: four cartridges",commit:"15500f9",
+  sum:"Patch & Plate in slot 4. Frozen backup, share package, 76 automated checks passing. Dev records and a screenshot refresh pushed by 9:02 PM.",imgs:[["shelf4","Four-slot shelf"],["pp_title","Patch & Plate title"]]}
+];
+
+const RELEASES=[
+ {v:"v0.1",when:"Nov 14 · 11:56 AM",id:"v01",carts:["sprouts","knockout",null,null],txt:"Sprouts and Knockout. The rollback point."},
+ {v:"v0.2",when:"Nov 14 · 3:41 PM",id:"v02",carts:["sprouts","knockout","rootdeep",null],txt:"Rootdeep imported and overhauled."},
+ {v:"v0.2.1",when:"Nov 14 · 5:52 PM",id:"v021",carts:["sprouts","knockout","rootdeep",null],txt:"Burrow scenes, walk-ups, Hearth menu, Lantern menu."},
+ {v:"v0.3",when:"Nov 14 · 8:32 PM",id:"v03",carts:["sprouts","knockout","rootdeep","patch"],txt:"Patch & Plate, Erin's farm stand."}
+];
+
+
+const PHASES=[
+ {name:"Before the record",range:"to Nov 13",test:e=>!e.t,p:"Sprouts is built and grows to Version 19 on the live page."},
+ {name:"Friday night",range:"Nov 13 · 7 PM to midnight",test:e=>e.t&&e.t<"11-14 00:00",p:"Knockout lands in slot 2. Over on Muse, Rootdeep starts, and Mothlight gets cut."},
+ {name:"Overnight and morning",range:"Nov 14 · midnight to noon",test:e=>e.t&&e.t>="11-14 00:00"&&e.t<"11-14 12:10",p:"Rootdeep goes from v2.1 to v2.9 on Muse in one long run of feedback passes. Knockout and Sprouts get updates, and v0.1 is frozen."},
+ {name:"Rootdeep in Claude",range:"Nov 14 · noon to 6 PM",test:e=>e.t&&e.t>="11-14 12:10"&&e.t<"11-14 18:15",p:"Rootdeep is imported and refined: graphics, cinematics, saves, text, dialogue. v0.2 and v0.2.1 ship, and the console gets the Lantern menu."},
+ {name:"Patch & Plate",range:"Nov 14 · 6 PM to 9 PM",test:e=>e.t&&e.t>="11-14 18:15",p:"A fourth cartridge, built for Erin. v0.3 ships."}
+];
+
+
+const lane=id=>LANES.find(l=>l.id===id);
+const on=new Set(LANES.map(l=>l.id));
+let museOnly=false;
+const fmt=t=>{if(!t)return"";const[d,hm]=t.split(" ");let[h,m]=hm.split(":").map(Number);const ap=h>=12?"PM":"AM";h=h%12||12;return `Nov ${+d.split("-")[1]} · ${h}:${String(m).padStart(2,"0")} ${ap}`};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const SORTED=[...EV].sort((a,b)=>(a.t||"")<(b.t||"")?-1:1);
+const phaseOf=e=>PHASES.findIndex(p=>p.test(e));
+const when=e=>e.t?fmt(e.t)+(e.approx?" (approx.)":""):e.when;
+const visible=e=>on.has(e.lane)&&(!museOnly||e.src==="muse");
+const tagsOf=e=>{const l=lane(e.lane);return [`<span class="tag lane" style="--c:${l.c}">${esc(l.name)}</span>`,
+  e.src==="muse"?`<span class="tag src-muse">Muse</span>`:`<span class="tag src-claude">Claude</span>`,
+  e.release?`<span class="tag rel">Release</span>`:"",e.rejected?`<span class="tag rej">Rejected</span>`:""].join("")};
+
+/* counts */
+document.getElementById("counts").innerHTML=[[4,"cartridges"],[4,"releases"],[EV.length,"passes"],[EV.reduce((n,e)=>n+(e.imgs?e.imgs.length:0),0),"screens"],["~26 h","of building"]]
+  .map(([b,s])=>`<span><b>${b}</b>${s}</span>`).join("");
+
+/* releases */
+const rels=document.getElementById("rels");
+rels.innerHTML=RELEASES.map(r=>`<button class="rel" type="button" data-open="${r.id}">
+    <h3>${r.v}</h3><div class="when">${r.when}</div>
+    <div class="shelf">${r.carts.map(c=>c?`<div class="cart" style="--c:${lane(c).c}">${esc(lane(c).name)}</div>`:`<div class="cart empty">empty</div>`).join("")}</div>
+    <p>${esc(r.txt)}</p></button>`).join("");
+
+/* legend */
+const legend=document.getElementById("legend");
+legend.innerHTML=LANES.map(l=>`<button class="chip" type="button" aria-pressed="true" data-lane="${l.id}" style="--c:${l.c}"><i></i>${esc(l.name)}<span class="n">${EV.filter(e=>e.lane===l.id).length}</span></button>`).join("")+
+  `<button class="chip muse-toggle" type="button" aria-pressed="false" data-muse><i></i>Muse only</button><button class="chip ghost" type="button" data-all hidden>Show all</button>`;
+legend.addEventListener("click",ev=>{
+  const b=ev.target.closest("button");if(!b)return;
+  if(b.dataset.all!=null){LANES.forEach(l=>on.add(l.id));museOnly=false}
+  else if(b.dataset.muse!=null){museOnly=!museOnly}
+  else{const id=b.dataset.lane;
+    if(on.has(id)&&on.size===LANES.length){on.clear();on.add(id)}
+    else if(on.has(id)){on.delete(id);if(!on.size)LANES.forEach(l=>on.add(l.id))}
+    else on.add(id);}
+  applyFilter();
+});
+
+/* map */
+const HEAD=124, PRE=96, PX_H=46, ROW=58, TOP=34;
+const t0=Date.UTC(2026,10,13,18,0), t1=Date.UTC(2026,10,14,21,30);
+const xOf=t=>{if(!t)return HEAD+PRE/2;const[d,hm]=t.split(" ");const[h,m]=hm.split(":").map(Number);return HEAD+PRE+(Date.UTC(2026,10,+d.split("-")[1],h,m)-t0)/36e5*PX_H};
+const map=document.getElementById("map"),ms=document.querySelector(".mapscroll"),peek=document.getElementById("peek"),mapbox=document.getElementById("mapbox");
+(function buildMap(){
+  const W=HEAD+PRE+(t1-t0)/36e5*PX_H+24, H=TOP+LANES.length*ROW+8;
+  map.style.width=W+"px";map.style.height=H+"px";
+  let h="";
+  for(let t=t0;t<=t1;t+=36e5){
+    const hr=new Date(t).getUTCHours(),x=HEAD+PRE+(t-t0)/36e5*PX_H,major=hr%3===0;
+    h+=`<div style="position:absolute;left:${x}px;top:${TOP-6}px;bottom:0;border-left:1px solid ${hr===0?"var(--ink-faint)":"var(--line)"};opacity:${major?1:.45}"></div>`;
+    if(major){const lab=hr===0?"Nov 14":(hr%12||12)+(hr<12?" AM":" PM");h+=`<div style="position:absolute;left:${x+4}px;top:8px;font:${hr===0?600:400} 11px var(--font-mono);color:${hr===0?"var(--shell)":"var(--ink-faint)"};white-space:nowrap">${lab}</div>`}
+  }
+  h+=`<div style="position:absolute;left:${HEAD+4}px;top:8px;font:600 11px var(--font-mono);color:var(--ink-faint)">BEFORE</div><div style="position:absolute;left:${HEAD+PRE}px;top:${TOP-6}px;bottom:0;border-left:2px dotted var(--ink-faint)"></div>`;
+  // chapter bands
+  PHASES.forEach((p,i)=>{const evs=SORTED.filter(p.test).filter(e=>e.t);if(!evs.length)return;
+    const x=xOf(evs[0].t)-10;h+=`<div style="position:absolute;left:${x}px;top:${TOP+LANES.length*ROW-16}px;font:600 10px var(--font-mono);color:var(--ink-faint);white-space:nowrap;letter-spacing:.04em">CH ${i+1}</div>`});
+  const hx=xOf("11-14 12:05");
+  h+=`<div style="position:absolute;left:${hx}px;top:${TOP+3*ROW}px;height:${ROW}px;border-left:2px solid var(--muse)"></div><div style="position:absolute;left:${hx+5}px;top:${TOP+3*ROW+3}px;font:600 10px var(--font-mono);color:var(--muse);white-space:nowrap">handoff → Claude</div>`;
+  LANES.forEach((l,i)=>{const y=TOP+i*ROW;
+    h+=`<div style="position:absolute;left:0;right:0;top:${y}px;height:${ROW}px;border-top:1px solid var(--line)"></div>`;
+    h+=`<div class="lanehead" style="position:absolute;left:0;top:${y}px;height:${ROW}px;width:${HEAD}px;--c:${l.c}"><i></i><span>${esc(l.name)}<small>${esc(l.note)}</small></span></div>`;});
+  const POS={};
+  LANES.forEach((l,i)=>{const ts=SORTED.filter(e=>e.lane===l.id&&e.t);if(ts.length<2)return;
+    const x1=xOf(ts[0].t),x2=xOf(ts[ts.length-1].t),y=TOP+i*ROW+ROW/2;
+    const hrs=(Date.UTC(2026,10,+ts[ts.length-1].t.slice(3,5),+ts[ts.length-1].t.slice(6,8),+ts[ts.length-1].t.slice(9))-Date.UTC(2026,10,+ts[0].t.slice(3,5),+ts[0].t.slice(6,8),+ts[0].t.slice(9)))/36e5;
+    h+=`<div class="span" data-span="${l.id}" style="left:${x1}px;width:${x2-x1}px;top:${y-4}px;--c:${l.c}"></div>`;
+    h+=`<div class="span-l" data-span="${l.id}" style="left:${x1+12}px;top:${y+9}px;--c:${l.c}">${hrs<1?"<1":"~"+Math.round(hrs)} h in development</div>`;});
+  const last={};
+  SORTED.forEach(e=>{
+    const li=LANES.findIndex(l=>l.id===e.lane),x=xOf(e.t),p=last[e.lane];let off=0;
+    if(p&&x-p.x<22)off=p.off<=0?-13:13;last[e.lane]={x,off};POS[e.id]={x,y:TOP+li*ROW+ROW/2+off};
+    const cls=["dot",e.src==="muse"?"muse":"",e.release?"release":"",e.rejected?"rejected":""].join(" ");
+    h+=`<button class="${cls}" type="button" data-open="${e.id}" data-ev="${e.id}" style="left:${x}px;top:${TOP+li*ROW+ROW/2+off}px;--c:${lane(e.lane).c}" aria-label="${esc((e.t?when(e)+": ":"")+e.title)}"></button>`;});
+  const LINKS=[
+    ["knockout-2","muse-v29","signature moves → Rootdeep cast"],
+    ["knockout-3","rd-moves","Knockout moves on X / Y / super"],
+    ["ko-1","sp-v16","Knockout merged into the Sprouts page"],
+    ["sp-v19","rd-import","Rootdeep built on Version 19"],
+    ["sp-v19","pp-crew","Sprouts' six types join the kitchen"]];
+  let sv=`<svg class="links" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">`;
+  LINKS.forEach(([a,b,t])=>{const A=POS[a],B=POS[b];if(!A||!B)return;const ea=EV.find(e=>e.id===a),eb=EV.find(e=>e.id===b);
+    const dx=Math.max(40,(B.x-A.x)/2);
+    sv+=`<g class="lnk" data-la="${ea.lane}" data-lb="${eb.lane}"><path d="M${A.x} ${A.y} C${A.x+dx} ${A.y} ${B.x-dx} ${B.y} ${B.x} ${B.y}" fill="none" stroke="${lane(ea.lane).c}" stroke-width="2" stroke-dasharray="5 4"/>`+
+      `<path class="hit" d="M${A.x} ${A.y} C${A.x+dx} ${A.y} ${B.x-dx} ${B.y} ${B.x} ${B.y}"><title>${esc(lane(ea.lane).name+" → "+lane(eb.lane).name+": "+t)}</title></path></g>`;});
+  h+=sv+`</svg>`;
+  map.innerHTML=h;
+})();
+const heads=[...map.querySelectorAll(".lanehead")];
+ms.addEventListener("scroll",()=>{const v=ms.scrollLeft;heads.forEach(h=>h.style.transform=`translateX(${v}px)`);peek.hidden=true},{passive:true});
+function showPeek(dot){
+  const e=EV.find(x=>x.id===dot.dataset.ev);if(!e)return;
+  const im=e.imgs&&e.imgs[0];
+  peek.className="peek"+(im?"":" noimg");
+  peek.innerHTML=(im?`<img src="${S(im[0])}" alt="">`:"")+`<div><div class="pw">${esc(when(e))}</div><div class="pt">${esc(e.title)}</div></div>`;
+  peek.hidden=false;
+  const br=mapbox.getBoundingClientRect(),dr=dot.getBoundingClientRect();
+  let x=dr.left-br.left+dr.width/2-110;x=Math.max(8,Math.min(x,br.width-228));
+  let y=dr.top-br.top-peek.offsetHeight-10;if(y<4)y=dr.bottom-br.top+10;
+  peek.style.left=x+"px";peek.style.top=y+"px";
+}
+map.addEventListener("pointerover",ev=>{const d=ev.target.closest(".dot");if(d&&ev.pointerType==="mouse")showPeek(d)});
+map.addEventListener("pointerout",ev=>{if(ev.target.closest(".dot"))peek.hidden=true});
+map.addEventListener("focusin",ev=>{const d=ev.target.closest(".dot");if(d)showPeek(d)});
+map.addEventListener("focusout",()=>peek.hidden=true);
+
+/* chapters + log */
+const chapters=document.getElementById("chapters");
+chapters.innerHTML=PHASES.map((p,i)=>{const evs=SORTED.filter(p.test);
+  return `<button class="chap" type="button" data-chap="${i}"><span>Chapter ${i+1}</span><b>${esc(p.name)}</b><span>${esc(p.range)} · ${evs.length} passes</span><div class="bar">${evs.map(e=>`<i style="--c:${lane(e.lane).c}"></i>`).join("")}</div></button>`}).join("");
+chapters.addEventListener("click",ev=>{const b=ev.target.closest("[data-chap]");if(b)document.getElementById("ch-"+b.dataset.chap).scrollIntoView({behavior:"smooth",block:"start"})});
+
+function card(e){
+  const l=lane(e.lane),n=e.imgs?e.imgs.length:0;
+  const th=n?`<div class="thumb"><img src="${S(e.imgs[0][0])}" alt="${esc(e.imgs[0][1])}" loading="lazy">${n>1?`<span class="count">${n} shots</span>`:""}</div>`
+    :`<div class="thumb none" style="--c:${l.c}"><b>${esc((e.title.match(/^v[\d.]+/)||[l.name])[0])}</b><span>${e.src==="muse"?"Muse · no shots":"no shots"}</span></div>`;
+  return `<article class="card${e.src==="muse"?" muse-src":""}${e.rejected?" rejected":""}" id="${e.id}" data-open="${e.id}" data-lane="${e.lane}" data-src="${e.src}" style="--c:${l.c}" tabindex="0" aria-label="${esc(e.title)}">
+    ${th}
+    <div class="body">
+      <div class="meta">${tagsOf(e)}<span>${esc(when(e))}</span>${e.commit?`<span class="mono">${e.commit}</span>`:""}${e.live?`<span class="mono">${e.live}</span>`:""}</div>
+      <h4 class="ttl">${esc(e.title)}</h4>
+      <p class="sum">${esc(e.sum)}</p>
+      ${e.quote?`<p class="quote"><b>WILL</b>${esc(e.quote)}</p>`:""}
+      ${n>1?`<div class="strip">${e.imgs.map(([s,c],k)=>`<button type="button" data-open="${e.id}" data-img="${k}" aria-label="${esc(c)}"><img src="${S(s)}" alt="" loading="lazy"></button>`).join("")}</div>`:""}
+      <span class="open-l">${e.pts?"Open for details ▸":"Open on the Lantern ▸"}</span>
+    </div></article>`;
+}
+document.getElementById("log").innerHTML=PHASES.map((p,i)=>{
+  const evs=SORTED.filter(p.test);
+  return `<div class="phase" id="ch-${i}" data-phase="${i}"><div class="phase-h"><h3>${i+1}. ${esc(p.name)}</h3><span class="rng">${esc(p.range)}</span><button class="pp" type="button" data-play="${i}">▶ Play chapter</button><p>${esc(p.p)}</p></div><div class="feed">${evs.map(card).join("")}</div></div>`;
+}).join("");
+
+function applyFilter(){
+  legend.querySelectorAll("button[data-lane]").forEach(b=>b.setAttribute("aria-pressed",on.has(b.dataset.lane)));
+  legend.querySelector("[data-muse]").setAttribute("aria-pressed",museOnly);
+  legend.querySelector("[data-all]").hidden=on.size===LANES.length&&!museOnly;
+  document.querySelectorAll("[data-span]").forEach(x=>x.classList.toggle("dim",!on.has(x.dataset.span)));
+  document.querySelectorAll(".lnk").forEach(x=>x.classList.toggle("dim",!(on.has(x.dataset.la)&&on.has(x.dataset.lb))));
+  document.querySelectorAll(".gl").forEach(x=>x.hidden=!on.has(x.dataset.gl));
+  document.querySelectorAll(".dot").forEach(d=>{const e=EV.find(x=>x.id===d.dataset.ev);d.classList.toggle("dim",!visible(e))});
+  document.querySelectorAll(".card").forEach(c=>c.hidden=!visible(EV.find(x=>x.id===c.id)));
+  document.querySelectorAll("[data-phase]").forEach(p=>p.hidden=!p.querySelector(".card:not([hidden])"));
+}
+
+/* ---------- viewer ---------- */
+const V={list:[],i:0,img:0,el:document.getElementById("viewer"),last:null};
+const vImg=document.getElementById("v-img"),vText=document.getElementById("v-text"),vProg=document.getElementById("v-prog");
+function openViewer(id,img=0,list){
+  V.list=list||SORTED.filter(visible);
+  if(!V.list.some(e=>e.id===id)) V.list=SORTED;
+  V.i=Math.max(0,V.list.findIndex(e=>e.id===id));V.img=img;V.last=document.activeElement;
+  V.el.hidden=false;document.body.classList.add("lock");render();document.getElementById("v-close").focus();
+}
+function closeViewer(){
+  const e=V.list[V.i];V.el.hidden=true;document.body.classList.remove("lock");
+  try{history.replaceState(null,"",location.pathname+location.search)}catch(_){}
+  const c=e&&document.getElementById(e.id);
+  if(c&&!c.hidden){c.scrollIntoView({block:"center"});c.classList.add("flash");setTimeout(()=>c.classList.remove("flash"),1400);c.focus({preventScroll:true})}
+  else if(V.last)V.last.focus({preventScroll:true});
+  map.querySelectorAll(".dot.hot").forEach(d=>d.classList.remove("hot"));
+}
+function render(){
+  const e=V.list[V.i],l=lane(e.lane),imgs=e.imgs||[];
+  V.img=Math.max(0,Math.min(V.img,imgs.length-1));
+  document.getElementById("v-ctr").textContent=`${V.i+1} / ${V.list.length}`;
+  const pi=phaseOf(e);document.getElementById("v-phase").textContent=`CH ${pi+1} · ${PHASES[pi].name}`;
+  vProg.innerHTML=V.list.map((x,k)=>`<i class="${k<V.i?"done":k===V.i?"now":""}" style="--c:${lane(x.lane).c}"></i>`).join("");
+  vImg.style.setProperty("--c",l.c);
+  vImg.innerHTML=imgs.length
+    ?`<img src="${S(imgs[V.img][0])}" alt="${esc(imgs[V.img][1])}"><span class="c-cap">${esc(imgs[V.img][1])}</span>${imgs.length>1?`<div class="c-dots">${imgs.map((_,k)=>`<i class="${k===V.img?"on":""}"></i>`).join("")}</div>`:""}`
+    :`<div class="c-card" style="--c:${l.c}"><span>${esc(l.name)} · ${e.src==="muse"?"built on Muse":"built in Claude"}</span><b>${esc((e.title.match(/^v[\d.]+/)||[""])[0]||e.title.split(":")[0])}</b><span>${esc(when(e))}</span></div>`;
+  vText.style.setProperty("--c",l.c);
+  vText.innerHTML=`<div class="meta">${tagsOf(e)}<span>${esc(when(e))}</span>${e.commit?`<span class="mono">${e.commit}</span>`:""}${e.live?`<span class="mono">${e.live}</span>`:""}</div>
+    <h4>${esc(e.title)}</h4><p>${esc(e.sum)}</p>${e.quote?`<p class="vq"><b>WILL</b>${esc(e.quote)}</p>`:""}${e.pts?`<ul>${e.pts.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:""}`;
+  vText.scrollTop=0;
+  map.querySelectorAll(".dot.hot").forEach(d=>d.classList.remove("hot"));
+  const d=map.querySelector(`.dot[data-ev="${e.id}"]`);if(d)d.classList.add("hot");
+  try{history.replaceState(null,"","#"+e.id)}catch(_){}
+  const n=V.list[V.i+1];if(n&&n.imgs){const p=new Image();p.src=S(n.imgs[0][0])}
+}
+function step(k){
+  const e=V.list[V.i],n=(e.imgs||[]).length;
+  if(k==="right"){if(V.i<V.list.length-1){V.i++;V.img=0;render()}}
+  else if(k==="left"){if(V.i>0){V.i--;V.img=0;render()}}
+  else if(k==="down"){if(V.img<n-1){V.img++;render()}}
+  else if(k==="up"){if(V.img>0){V.img--;render()}}
+  else if(k==="a"){if(V.img<n-1){V.img++;render()}else if(V.i<V.list.length-1){V.i++;V.img=0;render()}else closeViewer()}
+  else if(k==="b")closeViewer();
+}
+V.el.addEventListener("click",ev=>{const b=ev.target.closest("[data-k]");if(b){step(b.dataset.k);return}if(ev.target===V.el)closeViewer()});
+document.getElementById("v-close").addEventListener("click",closeViewer);
+document.addEventListener("keydown",ev=>{
+  if(V.el.hidden)return;
+  const m={ArrowRight:"right",ArrowLeft:"left",ArrowDown:"down",ArrowUp:"up",Enter:"a"," ":"a",Escape:"b",z:"a",x:"b"}[ev.key];
+  if(m){ev.preventDefault();step(m)}
+  if(ev.key==="Tab"){const f=[...V.el.querySelectorAll("button")];const i=f.indexOf(document.activeElement);if(ev.shiftKey&&i<=0){ev.preventDefault();f[f.length-1].focus()}else if(!ev.shiftKey&&i===f.length-1){ev.preventDefault();f[0].focus()}}
+});
+let sx=null,sy=null;
+vImg.addEventListener("touchstart",ev=>{sx=ev.touches[0].clientX;sy=ev.touches[0].clientY},{passive:true});
+vImg.addEventListener("touchend",ev=>{if(sx==null)return;const dx=ev.changedTouches[0].clientX-sx,dy=ev.changedTouches[0].clientY-sy;sx=null;
+  if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){const n=(V.list[V.i].imgs||[]).length;
+    if(dx<0){V.img<n-1?step("down"):step("right")}else{V.img>0?step("up"):step("left")}}});
+
+/* open triggers */
+document.addEventListener("click",ev=>{
+  if(!V.el.hidden)return;
+  const pg=ev.target.closest("[data-playlane]");
+  if(pg){const list=SORTED.filter(e=>e.lane===pg.dataset.playlane&&visible(e));if(list.length)openViewer(list[0].id,0,list);return}
+  const vt=ev.target.closest("[data-view]");if(vt){setView(vt.dataset.view);return}
+  const pl=ev.target.closest("[data-play]");
+  if(pl){const v=pl.dataset.play;
+    if(v==="start"){const list=SORTED.filter(visible);if(list.length)openViewer(list[0].id,0,list)}
+    else{const list=SORTED.filter(PHASES[+v].test).filter(visible);if(list.length)openViewer(list[0].id,0,list)}
+    return}
+  const o=ev.target.closest("[data-open]");
+  if(o){ev.preventDefault();const tl=o.dataset.track;openViewer(o.dataset.open,+(o.dataset.img||0),tl?SORTED.filter(e=>e.lane===tl&&visible(e)):undefined)}
+});
+document.addEventListener("keydown",ev=>{if(V.el.hidden&&(ev.key==="Enter"||ev.key===" ")&&ev.target.classList&&ev.target.classList.contains("card")){ev.preventDefault();openViewer(ev.target.id)}});
+
+/* nav: section highlight, back to top */
+const secLinks=[...document.querySelectorAll("#sections a")],secs=secLinks.map(a=>document.querySelector(a.getAttribute("href")));
+const totop=document.getElementById("totop");
+function onScroll(){
+  const y=scrollY+innerHeight*.3;let cur=-1;secs.forEach((s,i)=>{if(s.offsetTop<=y)cur=i});
+  secLinks.forEach((a,i)=>a.classList.toggle("on",i===cur));
+  let ch=-1;document.querySelectorAll("[data-phase]").forEach(p=>{if(!p.hidden&&p.offsetTop<=y)ch=+p.dataset.phase});
+  document.querySelectorAll(".chap").forEach(c=>c.classList.toggle("on",+c.dataset.chap===ch));
+  totop.hidden=scrollY<900;
+}
+addEventListener("scroll",onScroll,{passive:true});
+totop.addEventListener("click",()=>scrollTo({top:0,behavior:"smooth"}));
+
+(function buildByGame(){
+  const hrsBetween=(a,b)=>{const p=t=>Date.UTC(2026,10,+t.slice(3,5),+t.slice(6,8),+t.slice(9));return (p(b)-p(a))/36e5};
+  document.getElementById("bygame").innerHTML=LANES.map(l=>{
+    const evs=SORTED.filter(e=>e.lane===l.id),ts=evs.filter(e=>e.t);
+    const shots=evs.reduce((n,e)=>n+(e.imgs?e.imgs.length:0),0);
+    const span=ts.length>1?`~${Math.max(1,Math.round(hrsBetween(ts[0].t,ts[ts.length-1].t)))} h in development`:"";
+    const muse=evs.filter(e=>e.src==="muse").length;
+    return `<div class="gl" data-gl="${l.id}" style="--c:${l.c}">
+      <div class="gl-h"><h3>${esc(l.name)}</h3><span>${evs.length} passes · ${shots} screens${span?" · "+span:""}${muse?" · "+muse+" on Muse":""}</span>
+        <button type="button" data-playlane="${l.id}">▶ Play ${esc(l.name)}</button></div>
+      <div class="track">${evs.map(e=>{const im=e.imgs&&e.imgs[0];
+        return `<button class="tk${e.src==="muse"?" muse":""}" type="button" data-open="${e.id}" data-track="${l.id}">
+          <span class="im${im?"":" none"}">${im?`<img src="${S(im[0])}" alt="" loading="lazy">`:`<i>${esc((e.title.match(/^v[\d.]+/)||[l.name])[0])}</i>`}${e.release?`<em>release</em>`:""}</span>
+          <b>${esc(e.title)}</b><small>${esc(e.t?fmt(e.t):"before the record")}</small></button>`}).join("")}</div></div>`}).join("");
+})();
+function setView(v){
+  document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.view===v));
+  document.getElementById("bygame").hidden=v!=="game";document.getElementById("mapbox").hidden=v==="game";
+  try{localStorage.setItem("plv",v)}catch(_){}
+}
+try{const v=localStorage.getItem("plv");if(v==="game")setView("game")}catch(_){}
+applyFilter();onScroll();
+if(ms.clientWidth<900)ms.scrollLeft=xOf("11-14 08:00")-HEAD-20;
+const h=location.hash.slice(1);if(h&&EV.some(e=>e.id===h))openViewer(h);
+</script>
+
+</body>
+</html>

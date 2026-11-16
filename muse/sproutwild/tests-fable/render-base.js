@@ -1,0 +1,21 @@
+// screenshots of Sunkeep at work and the restyled first areas: node render-base.js <built html> <out dir>
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:440,height:956}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+const out=process.argv[3];await p.goto('file://'+process.argv[2]);await p.waitForTimeout(800);
+await p.evaluate(()=>{const e=document.querySelector('.cart[data-i="2"]');e.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}))});await p.waitForTimeout(1200);
+const key=async(k,ms)=>{await p.evaluate(k=>{window.__g.keys[k]=1},k);await p.waitForTimeout(ms||70);await p.evaluate(k=>{window.__g.keys[k]=0},k);await p.waitForTimeout(80)};
+const shot=n=>p.locator('#screen').screenshot({path:out+'/'+n+'.png'});
+await p.evaluate(()=>{const F=window.__g.SWF(),S=F.meta();S.intro=1;S.quest=5;S.tendDone=true;S.tendStage=4;S.bottieSeen=1;S.visited={BASE:1,MEADOW:1,TOWN:1};
+ F.giveMon('DRIZZLET',6);for(const sp of ['CINDERCAP','PEBBLIT','ZIPWIG','FERNFANG','BLOOMBOAR'])F.giveMon(sp,7,true);
+ F.build('cottage',3,7);F.build('kiln',6,9);F.build('bench',9,7);F.build('quarry',14,9);F.build('bed',17,7);F.build('sawmill',19,10);F.build('pen',3,11);F.build('statue',20,5);
+ for(const [t,n] of [['EMBER',3],['DEW',2],['LEAF',3],['PEB',2]])F.giveBud(t,n);S.res.berry=12;S.craftQ=[{id:'tonic',need:12,done:0}];F.dayT(20);F.enter('BASE');F.setPos(240,250)});
+await p.waitForTimeout(9000);await shot('w1_base_work');
+await p.evaluate(()=>window.__g.SWF().setPos(150,236));await key('up',200);await p.waitForTimeout(6000);await shot('w2_base_left');
+await p.evaluate(()=>window.__g.SWF().setPos(360,250));await key('up',200);await p.waitForTimeout(6000);await shot('w3_base_right');
+await p.evaluate(()=>window.__g.SWF().setPos(240,130));await key('up',300);await p.waitForTimeout(500);await shot('w4_shrine');
+await key('start');await key('down');await key('down');await key('down');await key('down');await key('a');await p.waitForTimeout(250);await shot('w5_board');await key('b');
+await p.evaluate(()=>{const F=window.__g.SWF();F.dayT(262);F.setPos(240,220)});await p.waitForTimeout(1500);await shot('w6_night');
+await p.evaluate(()=>{const F=window.__g.SWF();F.dayT(20);F.enter('MEADOW');F.fld().npcs.forEach(n=>{if(n.team)F.meta().fl[n.fk]=1})});await key('up',1400);await p.waitForTimeout(300);await shot('w7_meadow');
+await p.evaluate(()=>{const F=window.__g.SWF();F.setPos(8*16,4*16)});await key('left',300);await p.waitForTimeout(300);await shot('w8_meadow_grass');
+await p.evaluate(()=>window.__g.SWF().enter('TOWN'));await key('up',2500);await p.waitForTimeout(300);await shot('w9_town');
+console.log(errs.length?errs.slice(0,5):'no page errors');await b.close()})();
