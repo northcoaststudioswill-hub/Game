@@ -1,5 +1,89 @@
 # THORNWATCH — Changelog
 
+## v3.5 — Nov 16, 2026 — Flesh it out (width before length)
+
+Will played v3.4: **"It's getting better"** — then three
+directives: the circle around the aimer has to go; some text was
+made black and is really hard to read; and the game still feels
+like a mini game — flesh it out. Minutes later he sharpened the
+third one: money becoming useless needs a real fix with more
+systems, and *"if it's 20 nights on the same level... I don't
+think the scope is wide enough before we make it longer"* —
+**width before length**, with Bloons TD6 as the reference. So
+the 20-nights-one-board plan was scrapped the same morning it
+was drafted. Research round 3 (BTD6-first) is in
+`RESEARCH-v3.5.md`; the full playtest + audit is
+`PLAYTEST-v3.5.md`, both in the workdir.
+
+- **FIX 1 — the aimer circle is dead.** The aiming cursor is the
+  clean square bracket alone, no ring, ever. A placed tower's
+  range shows only while the cursor rests on that tower, as a
+  thin dashed outline. The guide's ghost marker lost its ring
+  too (sprite + corner brackets now).
+- **FIX 2 — the black-text audit.** Every screen re-captured and
+  swept. The worst offenders were secondary lines drawn in
+  `#6a6480`/`#8f86c8` on near-black panels (fork panel effects,
+  locked-keeper lore, settings and menu footers, cut-in skip
+  prompts) — all lifted to readable light tones; floats got dark
+  shadow passes; the boss HUD label got a dark plate; dark text
+  now lives only on light plates. Full string-by-string table in
+  the playtest report. The audit also caught two layout defects:
+  map-select cards clipping their own names, and a self-
+  colliding map-screen footer — both fixed.
+- **THREE GARDENS, not one board × 20.** Erin's Garden (10
+  nights, Thornback) is now Map 1 of 3. **The Long Beds** (new
+  624px three-row snake, deep-dusk grade, 8 nights, BRAMBLE MAW
+  finale) and **The Crossroads** (two entrances converging on
+  one Heart leg, deepest grade, 8 nights, THORNBACK PRIME —
+  1,600 HP, enrage + mite-shedding) unlock in sequence. 26
+  nights, but length through width: every map changes which
+  towers and spots are good. Chapter title cards at each map's
+  first night.
+- **Two new creeps.** BUBBLEBRAM — a shield bubble eats a pool
+  of damage before the creep can be hurt; pops with a burst
+  (Rootdeep's crab is the ancestor). BURROWER — travels the
+  first 40% of the track underground and untargetable, dust
+  trail showing; DEW mist or Ranger's flare digs it up early.
+  Louie has counter-barks for both; both are in the field guide.
+- **The money fix — four new systems.** **SUNFARM**: LEAF's
+  fork is a true farm now — no attack, banks petals in visible
+  bursts all night; greedy farming provably dies (Night 3 in
+  sims), and SUNLEAF's old Heart mend is gone with it.
+  **GRAND upgrades**: every fork grows once more into a Grand
+  form (340–480 petals, damage ×2.6 and a per-type spike) — there
+  is always something worth saving for. **POWERS**: SELECT
+  mid-round buys one-shots — SUNBURST, RAIN OF DEW, LOUIE'S
+  HOWL — money gets an emergency job every night. **HERO
+  TRAINING**: level placed heroes Lv1→3 for petals, gold pips
+  under the sprite.
+- **Modes + stars.** Each map: STANDARD, then HARD (+HP, 40
+  starting petals, double drops) and ALT NIGHTS (remixed
+  compositions) unlock on a clear. Stars per map×mode×night
+  (clear 1★ · Heart ≥10 2★ · zero leaks 3★). NIGHTS is now a
+  MAP SELECT screen; PLAY still jumps straight to the frontier.
+- **SUN DROPS + LANTERN UPGRADES.** First-time stars pay drops;
+  8 permanent perks (3–6 drops, 37 total — a full clear affords
+  most, not all): DEEP PURSE, SECOND HEART, KEEPER'S DISCOUNT,
+  RICH SOIL, DOUBLE BOOF, GARDENER'S EYE, FORKED PATHS, WARM
+  LANTERN.
+- **THE LONG NIGHT (endless).** Unlocks when the Crossroads
+  falls: fresh garden, compounding scaling, a MAW every 10th
+  night, score = nights survived (expert sims die at 9–15),
+  +1 drop per 5 nights survived (max +4 a run).
+- **The O1 verdict** (winning runs used to end ~2,000 petals
+  rich): with the sinks in play, the expert line ends Map 1 at
+  **695 petals vs 1,976** with Grands off — the flood is
+  converted, not deleted; a no-spend line still ends rich, and
+  a Grand alone still loses. Details in the playtest report.
+- **Playtest-caught balance fixes, logged:** an early draft
+  scaled Maps 2–3 as if they were campaign nights 8–22 (3.17×
+  HP openers — unwinnable) and opened them with mid-game waves;
+  both maps now ramp from their own Night 1, BTD6-style.
+- **Save migration is honest:** v3.4 saves backfill Map 1 stars
+  at 1★ per cleared night (no gifted 2★/3★) with drops granted
+  once; Maps 2–3 follow the unlock rule; a v3.4 win does NOT
+  unlock endless — that takes the new Map 3 finale.
+
 ## v3.4 — Nov 16, 2026 — A proper front door
 
 Will played v3.3: **"keep play testing and researching these
