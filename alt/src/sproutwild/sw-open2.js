@@ -39,12 +39,14 @@ function scIntro(){W4.louBerry={x:316,y:214,held:0};W4.louFetch=0;
   {x:240,y:352,who:'MARCUS',txt:'Give them a sec. When one is grown, walk up and press A to pluck it.'},
   {hold:.4}])}
 /* seeds draw as they grow: seed, shoot, sprout */
-function fBudDraw(o){if(o.g!=null&&o.g<1){const x=Math.round(o.x),y=Math.round(o.y),T=TYPES[o.type],gg=o.dl>0?0:o.g;
+function fBudDraw(o){if(o.g!=null&&o.g<1){budGrow(o,o.dl>0?0:o.g);return}
+ fBudDraw0(o)}
+/* ONE growing look for the field and the garden (v8.1): gg 0..1 = seed, shoot, leafy head; the finished bud is drawn by drawBud */
+function budGrow(o,gg){const x=Math.round(o.x),y=Math.round(o.y),T=TYPES[o.type];
   r('#5a3820',x-4,y,9,3);r('#3d2c1a',x-3,y+1,7,1);
   if(gg<.34){r('#7a5230',x-1,y-2,3,2);if(((time*3)|0)%2)r('#fff3b0',x+1,y-3,1,1)}
   else if(gg<.67){const h=2+Math.round((gg-.34)*12);r('#2c6030',x,y-h,1,h);r('#58b848',x-2,y-h,2,1);r('#58b848',x+1,y-h-1,2,1)}
-  else{r('#2c6030',x,y-6,1,6);r(T.d,x-2,y-9,5,4);r(T.c,x-1,y-9,3,3)}return}
- fBudDraw0(o)}
+  else{r('#2c6030',x,y-6,1,6);r(T.d,x-2,y-9,5,4);r(T.c,x-1,y-9,3,3)}}
 function fBudDraw0(o){const x=Math.round(o.x),y=Math.round(o.y),T=TYPES[o.type],sw=Math.round(Math.sin(time*3+o.x)*1);
  if(o.glow){const fl=.5+.5*Math.sin(time*4+o.x);g.globalAlpha=.18+.14*fl;r(T.l,x-9,y-14,19,18);g.globalAlpha=.3+.2*fl;r('#fff3b0',x-5,y-11,11,12);g.globalAlpha=1}
  r('#5a3820',x-4,y,9,3);r('#3d2c1a',x-3,y+1,7,1);r('#2c6030',x,y-6,1,6);r(T.c,x-3+sw,y-9,3,3);r(T.c,x+1+sw,y-10,3,3);r(T.l,x-2+sw,y-9,1,1);

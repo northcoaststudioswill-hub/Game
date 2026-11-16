@@ -328,8 +328,9 @@ function fSquad(F,dt){const flw=F.sq.filter(s=>s.st==='follow');let fi=0;
     tx=P3.x+bx*back+lx*lat;ty=P3.y+2+by*back+ly*lat}
    const dx=tx-s.x,dy=ty-s.y,d=Math.hypot(dx,dy);
    if(s.st==='ret'&&d<26){s.st='follow';continue}
-   if(d>3){const v=Math.min(d*6,d>50?sp*1.6:sp),nx=s.x+dx/d*v*dt,ny=s.y+dy/d*v*dt;let moved=false;
-    if(!fSolid(F,nx,s.y)){s.x=nx;moved=true}if(!fSolid(F,s.x,ny)){s.y=ny;moved=true}
+   if(d>3){const v=Math.min(d*6,d>50?sp*1.6:sp),nx=s.x+dx/d*v*dt,ny=s.y+dy/d*v*dt,x0=s.x,y0=s.y;
+    if(!fSolid(F,nx,s.y))s.x=nx;if(!fSolid(F,s.x,ny))s.y=ny;
+    const moved=Math.abs(s.x-x0)+Math.abs(s.y-y0)>.01; /* a blocked axis is not movement: a sprout pinned on a wall gives up and flies home */
     s.mv=d>5;s.stuck=moved&&d<110?0:s.stuck+dt;
     if(s.stuck>.8){s.stuck=0;s.st='fly';s.sx=s.x;s.sy=s.y;s.tx=P3.x-F.dir[0]*10;s.ty=P3.y+2-F.dir[1]*10;s.t=0;s.aim={home:1}}}
    continue}

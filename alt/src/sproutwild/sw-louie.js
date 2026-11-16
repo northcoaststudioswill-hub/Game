@@ -34,8 +34,9 @@ function wLouTick(dt){if(W4.petCd>0)W4.petCd-=dt;louIdleTick(dt);const L=louSt()
 /* the field: fetch strays first, sniff out wilds, dig, stay at your side */
 function fLouTick(F,dt){louIdleTick(dt);const L=louSt();
  if(L.st==='sit'||L.st==='dig'){louCommon(L,dt,F.items,F.dir);return}
- const stray=F.sq.find(s=>s.st==='idle'&&s.t>2.5&&Math.hypot(s.x-P3.x,s.y-P3.y)>44);
- if(stray){const d=louGo(L,stray.x,stray.y,130,dt);if(d<10){stray.st='ret';louSay('FOUND ONE!',1.4);swSnd(700,.05,500)}return}
+ const stray=F.sq.find(s=>s.st==='idle'&&s.t>.6&&Math.hypot(s.x-P3.x,s.y-P3.y)>44);
+ /* a lost sprout gives itself up after 3.5 s; while Louie is on his way it waits for him */
+ if(stray){stray.t=Math.min(stray.t,2);const d=louGo(L,stray.x,stray.y,130,dt);if(d<10){stray.st='ret';louSay('FOUND ONE!',1.4);swSnd(700,.05,500)}return}
  L.bark-=dt;if(L.bark<=0){const wd=W4.wilds.find(w=>!w.cap&&Math.hypot(w.x-P3.x,w.y-P3.y)<90);if(wd){L.bark=22;L.fx=wd.x>lou.x?1:-1;louSay(wd.lv>(SW.party[0]?SW.party[0].lv:5)+2?'GRR! BIG ONE!':'SNIFF! A BUDDY!',1.8);swSnd(600,.05,420)}else L.bark=4}
  if(louCommon(L,dt,F.items,F.dir))return;
  const dp=Math.hypot(P3.x-lou.x,P3.y-lou.y);if(dp>260){lou.x=P3.x;lou.y=P3.y+8}louSide(L,F.dir);louGo(L,L.sx,L.sy,dp>50?118:84,dt)}
@@ -49,5 +50,5 @@ function wLouTalk(){louPet();if(!W4.fld){const g2=wNextGoal();if(g2&&wOp()>=3)wQ
 function louDraw(){const L=louSt(),x=Math.round(lou.x),y=Math.round(lou.y),sit=L.st==='sit',left=L.fx<0,f=W4.louMv?((time*8)|0)%2:((time*2)|0)%2,hop=W4.louMv&&f?1:0;
  r('rgba(0,0,0,.22)',x-9,y+4,18,3);const img=sit?(left?LOU.e:LOU.er):(left?LOU.l:LOU.r)[f];g.drawImage(img,x-12,y-6-hop+(sit?1:0),24,12);
  if(L.st==='dig')r('#a87850',left?x-13:x+11,y+3+hop,2,2);
- const s=W4.lsay;if(s){const w=tw(s.s,1)+8,bx=Math.max((W4.cam?W4.cam.x:0)+2,Math.round(x-w/2)),by=y-24;r('#14101e',bx-1,by-1,w+2,12);r('#ffffff',bx,by,w,10);r('#ffffff',x-1,by+10,3,2);text(s.s,bx+4,by+1,1,'#282838',null)}}
+ const s=W4.lsay;if(s){const w=tw(s.s,1)+8,cx0=W4.cam?W4.cam.x:0,bx=Math.min(Math.max(cx0+2,Math.round(x-w/2)),cx0+W-w-2),by=y-24; /* the bubble stays on screen at both edges (v8.1; W is the 240px view) */r('#14101e',bx-1,by-1,w+2,12);r('#ffffff',bx,by,w,10);r('#ffffff',x-1,by+10,3,2);text(s.s,bx+4,by+1,1,'#282838',null)}}
 function fLouDraw(){louDraw()}

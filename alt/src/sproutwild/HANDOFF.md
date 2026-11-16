@@ -4,8 +4,8 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 `DESIGN-v7.md` (research and system decisions) and `PLAYTEST-NOTES*.md`.
 
 ## Ground rules from Will
-- Branch `claude/festive-knuth-f30w4u`. Commit locally; **push only when Will says "push"**
-  (plain push, never force). 16 commits are unpushed as of v8.0.
+- Branch for v8.1: `claude/sproutwild-v8.1`, made from `main` (earlier rounds used `claude/festive-knuth-f30w4u`).
+  Commit locally; **push only when Will says "push"** (plain push, never force). Merge to main only when asked.
 - No PRs unless asked. Never delete or overwrite `backups/` or older version folders.
 - Do not touch `docs/index.html` (public Pages, still the 4-cart build) without his go-ahead.
 - The playable build is published at https://claude.ai/artifact/KqmxEmur2YMFoFLYjp7MNx
@@ -45,8 +45,10 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - Live pause menu is in `sw-save.js` (not sw-module.js).
 
 ## Open items / ideas not done
-- Louie's stray-fetch not re-checked after v7.8; real-time bug catch had one miss (stepped run 4/4).
-- Garden has two growth looks (first seeds vs later patch sprouts); unify if Will notices.
+- v8.1 fixed Louie's stray fetch (timing and returning sprouts stuck on walls) and gave garden sprouts the
+  opening's growing look. Still to confirm: a planted garden plot's stalk and head on screen (see KNOWN-ISSUES).
+- Lab check "a sprout thrown at a bug catches it" fails intermittently (2 of 7 on v8.1). Unexplained.
+- Real-time bug catch had one miss (stepped run 4/4).
 - Night-only bugs, bug selling, and turning bugs into resources not tried in play.
 - Balance needing a long session: crop timing, build time, catch odds after the first, starters.
 - A second new area (Meadow's south end is a dead end); more Ohio lore (Haserot Angel, Franklin Castle...).
@@ -137,3 +139,5 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v7.2 to v7.7: evolutions, how-it-works card, base goals, regrowth, SELECT battles, goal hints.
 - v7.8: Louie like Sprouts. v7.9: bugs and jar, Erin's Meadow walk, kind cards.
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
+- v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
+  "FOUND ONE!" bubble stays on screen.

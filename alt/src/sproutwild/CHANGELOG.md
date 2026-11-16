@@ -21,6 +21,22 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v8.1 · 2026-11-16 · Louie finds lost sprouts; one growing look
+
+From Will's next-up list: recheck Louie fetching lost sprouts, and unify the two looks for growing sprouts in the garden.
+
+- **Louie fetches lost sprouts.** Louie only went for a lost sprout after 2.5 seconds, but the sprout gave up and flew home at 3.5, so he almost never got there. Now he starts at 0.6 seconds, and a sprout he is running to waits for him instead of giving up. Real-time run: he reaches a sprout about 2 seconds after it lands, says "FOUND ONE!", and the sprout flies home to the squad (`shots/v8.1-louie-chases.png`, `shots/v8.1-louie-found.png`).
+- **Sprouts no longer get stuck on walls.** A returning sprout pinned against a solid tile never came home: the sideways move was blocked, but the up-down move (zero distance) still counted as moving, so the "stuck" timer never ran. Now a blocked sprout flies home after 0.8 seconds.
+- **Garden sprouts grow like the opening's seeds.** Opening seeds show a seed mound, a shoot, then a leafy head. Garden sprouts used to pop in as a tiny stem, then a yellow bud, and a planted seed showed as one coloured dot. They now share the same drawing (one function), so a planted plot shows a mound, then a shoot, then a head, then the full bud at 30 seconds (`shots/v8.1-seeds-grow.png` is the opening's real-time frames, same drawing).
+- **Louie's "FOUND ONE!" bubble stays on screen.** It only clamped at the left edge, so it ran off the right when Louie fetched something near the edge.
+- Tests: 111 checks. Headless stepped check of Louie's fetch at 70, 110, 160 and 240 px: every sprout comes home (160 px was stuck before the wall fix). Real-time from the title through the opening: intro, Louie's berry, the three seeds growing, plucking them, the Lantern moving on. No page errors.
+
+**Not verified:**
+- Garden plots in real time. In my frames a planted plot showed its soil mound and a glint, but I could not confirm the stalk and head on that tray, and main behaved the same in my harness. Check on the phone before trusting it.
+- The lab check "a sprout thrown at a bug catches it" failed in 2 of 7 runs on this branch (intermittent, random bug positions; the `main` build passed 4 of 4 later, and its first baseline run also had one unnamed failure). Not explained yet; see KNOWN-ISSUES.
+- Night-only bugs and selling bugs to Pip: not played this round. Balance, and the second new area: not started.
+- Nothing has been checked on an iPhone.
+
 ## v8.0 · 2026-11-16 · an opening you earn
 
 Will's notes: the first sprouts popped up by the Lantern and then came from a garden nobody explained; things were explained too fast and one message vanished almost at once; in the Meadow Louie talked about catching and then Erin arrived, which was confusing; Erin should lead you out after the base basics and hold your hand; the first battle could start by accident; some menus were cut off; growing sprouts should look like they grow.

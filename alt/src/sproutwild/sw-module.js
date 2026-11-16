@@ -815,7 +815,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
    if(!it2.taken){r('#c93a2e',it2.x-2,it2.y-2,5,5);r('#7ec850',it2.x,it2.y-4,2,2)}
    else if(it2.regrow>0&&it2.regrow<5)r('#7ec850',it2.x-1,it2.y-1,2,2)}
   if(W4.patchBuds)for(const pb of W4.patchBuds){
-   if(pb.type<0){r('#5a3d24',pb.sx-5,pb.sy,11,4);r('#8a6a42',pb.sx-3,pb.sy-1,7,2);r('#3d2c1a',pb.sx-1,pb.sy-2,2,2);if(pb.crop)plDraw(pb);else if(pb.seedTy!=null)r(TYPES[pb.seedTy].d,pb.sx-1,pb.sy-4,3,3);continue}
+   if(pb.type<0){r('#5a3d24',pb.sx-5,pb.sy,11,4);r('#8a6a42',pb.sx-3,pb.sy-1,7,2);r('#3d2c1a',pb.sx-1,pb.sy-2,2,2);if(pb.crop)plDraw(pb);else if(pb.seedTy!=null)budGrow({x:pb.sx,y:pb.sy+3,type:pb.seedTy},0);continue} /* a planted seed shows as the first stage of the same growing look */
    if(pb.y<=P3.y)wDrawPatchBud(pb)}} /* front-layer buds draw after the player, below */
   r('#a87948',30,W4.wh-58,138,3);r('#a87948',312,W4.wh-58,138,3);
   for(let fx2=30;fx2<=168;fx2+=23)r('#8a6a48',fx2,W4.wh-62,3,11);
@@ -1459,7 +1459,8 @@ function wThrowSprout(){const cand=(W4.fol||[]).filter(f=>['follow','b_rest','re
  const f=cand[0],tg=wThrowTarget();
  f.mode='fly';f.sx=f.x;f.sy=f.y;f.tx=tg.x;f.ty=tg.y;f.tgtKind=tg.kind;f.tgtNode=tg.nd;f.t=0;f.item=null;f.z=0;
  W4.tossFx={x:tg.x,y:tg.y,t:.45};swSnd(500,.1,900)}
-function wDrawPatchBud(pb){drawBud({x:Math.round(pb.x),y:Math.round(pb.y)+3,type:pb.type,stage:pb.stage,z:0,a:pb.sx*.37+pb.sy,mv:pb.mode==='fetch'||pb.mode==='carry',st:'idle',fx:1});
+function wDrawPatchBud(pb){if(pb.type>=0&&pb.stage<2&&pb.age>=0)budGrow({x:Math.round(pb.x),y:Math.round(pb.y)+3,type:pb.type},Math.min(.99,pb.age/30)); /* grows like the opening's seeds: seed, shoot, head (v8.1) */
+ else drawBud({x:Math.round(pb.x),y:Math.round(pb.y)+3,type:pb.type,stage:pb.stage,z:0,a:pb.sx*.37+pb.sy,mv:pb.mode==='fetch'||pb.mode==='carry',st:'idle',fx:1});
  if(pb.item){r('#c93a2e',Math.round(pb.x)-2,Math.round(pb.y)-13,5,5);r('#7ec850',Math.round(pb.x),Math.round(pb.y)-15,2,2)}
  if(pb.stage===2&&pb.mode==='soil'&&((time*2)|0)%2)r('#fff3b0',Math.round(pb.x)+5,Math.round(pb.y)-10,2,2)}
 function wDrawFol(f){drawBud({x:Math.round(f.x),y:Math.round(f.y)+2,type:f.type,stage:2,z:f.z||0,a:f.type*1.7,mv:!!f.mv||f.mode==='haul',st:'follow',fx:1});
