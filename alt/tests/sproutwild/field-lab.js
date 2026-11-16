@@ -91,7 +91,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   ok('the swarm blooms and the buddy joins',S.party.length+S.box.length===box0+1,S.party.length+S.box.length-box0);
   ok('no sprout is used up',S.buds.LEAF===b0&&S.buds.EMBER===2,JSON.stringify(S.buds));S.quest=5}
  /* buddies fetch ore and fiber */
- {F.enter('MEADOW');const sp=F.spots().find(q=>q.k==='fiber'),f0=S.res.fiber||0;F.setPos(sp.x,sp.y+24);F.fld().dir=[0,-1];step(3);tap('a');step(260);
+ {F.enter('MEADOW');F.wilds().length=0; /* v8.8: a wild beside the thicket can take the aim */const sp=F.spots().find(q=>q.k==='fiber'),f0=S.res.fiber||0;F.setPos(sp.x,sp.y+24);F.fld().dir=[0,-1];step(3);tap('a');step(260);
   ok('the lead buddy fetches FIBER from a thicket',(S.res.fiber||0)>=f0+2&&sp.got,(S.res.fiber||0)-f0)}
  /* the pouch limits the squad; four deliveries grow a sprout */
  {S.pouch=8;S.buds={EMBER:6,PEB:0,DEW:6,ZIP:0,LEAF:0,LUCKY:0};step(3);ok('the seed pouch caps the squad',F.fld().sq.length===8,F.fld().sq.length);S.pouch=24;step(3)}

@@ -1208,9 +1208,10 @@ function wFoeDown(){const me=btCur(),foe=BT.foe;BT.log.push({txt:foe.sp+' fainte
   BT.after='menu';BT.phase='msg';return}
  if(BT.mode==='gym'){const g=WGYMS[BT.gym];
   if(g.crown){SW.gymDone[BT.gym]=1;if(BT.gym===5)SW.bottieBeat=1;if(!BT.rematch)SW.champion=1}
-  else if(!BT.rematch){SW.badges.push(g.sig);SW.gymDone[BT.gym]=1}
+  else if(!BT.rematch){SW.badges.push(g.sig);SW.gymDone[BT.gym]=1;if(SW.badges.length===1){W4.sigilQ=1;BT.sigLine=1}} /* v8.8: the first Sigil opens the roads */
   SW.res.petal+=g.prize;
   BT.log.push({txt:g.win},{txt:BT.rematch?'Rematch won! +'+g.prize+' petals.':(g.crown?'The crown of light is yours! +'+g.prize+' petals.':'You earned the '+g.sig+'! +'+g.prize+' petals.')});
+  if(BT.sigLine)BT.log.push({txt:"RANGER: My barriers on the Meadow roads are down. The Hollow is east, Squire's Woods south."});
   BT.won=true;BT.after='endwin';BT.phase='msg';return}
  if(BT.mode==='trainer'){const np=BT.tn;SW.fl[np.fk]=1;SW.res.petal+=np.prize;BT.log.push({txt:np.win},{txt:'You won! +'+np.prize+' petals.'});
   if(np.boss)BT.log.push({txt:'The IRON DOME flickers out across the valley. The roads are open!'});
@@ -1951,6 +1952,7 @@ function g4Update(dt){switch(state){
  case 'g4place':placeUpdate();return;
  case 'g4plot':plotUpdate();return;
  case 'g4dab':dabUpdate(dt);return;
+ case 'g4sigil':sigilUpdate(dt);return;
  case 'g4loop':loopUpdate();return;
  case 'g4jar':jarUpdate();return;
  case 'g4kind':kindUpdate();return;
@@ -1986,6 +1988,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4build':drawBuild();return;
  case 'g4plot':drawPlot();return;
  case 'g4dab':drawDab();return;
+ case 'g4sigil':drawSigil();return;
  case 'g4loop':drawLoop();return;
  case 'g4jar':drawJar();return;
  case 'g4kind':drawKind();return;
