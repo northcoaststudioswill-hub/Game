@@ -168,7 +168,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   F.build('datacenter',6,12);ok('a Data Center makes room',!F.buddyFull());F.noCap(true)}
  /* v7.9: bugs */
  {F.noBugs(false);S.buds.ZIP=3;S.buds.DEW=3;F.travel('MEADOW','BASE');S.bugs={};S.bugSeen={};for(let i=0;i<40*30&&F.bugs().length<2;i++)step(1);const bs=F.bugs();ok('bugs live in the Meadow',bs.length>=1,bs.length);
-  if(bs.length){const bg=bs[0],f4=F.fld();bg.hx=bg.x;bg.hy=bg.y;F.setPos(bg.x,bg.y+20);f4.dir=[0,-1];f4.arrive=null;for(const s of f4.sq){s.st='follow';s.x=F.pos().x;s.y=F.pos().y+6}step(4);
+  if(bs.length){const bg=bs[0],f4=F.fld();F.wilds().length=0; /* v8.1: a wild buddy beside the bug can take the aim; this check is about bugs */bg.hx=bg.x;bg.hy=bg.y;F.setPos(bg.x,bg.y+20);f4.dir=[0,-1];f4.arrive=null;for(const s of f4.sq){s.st='follow';s.x=F.pos().x;s.y=F.pos().y+6}step(4);
    const nr=JSON.stringify(F.near()),b0=JSON.stringify({x:Math.round(bg.x),y:Math.round(bg.y),sp:bg.sp}),me=JSON.stringify(F.pos());tap('a');step(3);const lab=nr+' '+b0+' me'+me+' sq:'+f4.sq.map(s=>s.st+(s.aim?s.aim.kind:'')).join(',');step(57);ok('a sprout thrown at a bug catches it',Object.values(S.bugs).reduce((a,v)=>a+v,0)>=1,lab+' / '+JSON.stringify(S.bugs))}
   F.noBugs(true)}
  /* v7.8: Louie, the Sprouts way */

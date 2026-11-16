@@ -21,6 +21,20 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v8.2 · 2026-11-16 · night bugs and Pip, played; garden confirmed
+
+Will: "Keep playtesting and improving." Played the open v8.1 items.
+
+- **Garden plots confirmed.** A planted plot grows on screen like the opening's seeds: planted, shoot at about 10 s, head at about 20 s, full bud at 30 s (`shots/v8.2-garden-grows.png`). The v8.1 doubt came from my test scripts, not the game.
+- **The seed is easier to see.** It was brown on a brown plot. Now it is a pale seed with a dark rim.
+- **Night bugs and selling, played.** At night in the Meadow a Luna Moth showed up and one A press caught it (its lore card shows). In Lantern Town: START, BUG JAR, SELECT, and Pip paid 25 petals. A second run did the same with a Lightning Bug for 8 (`shots/v8.2-night-moth-to-jar.png`).
+- **The jar now says what happened.** Selling, using a bug, or trying to sell outside town only showed a message in the world behind the menu, so nothing visible happened. The jar's footer now says it for 3 seconds: "PIP paid 25 petals for a LUNA MOTH. You have 25." (`shots/v8.2-jar-sold.png`).
+- **"LIGHTNING BUG" fits its jar row** (the yield reads "+1 LIGHT"; it was cut to "LIGHTNING ...").
+- **The intermittent lab failure is explained.** Repeated 30 times, the bug-catch check failed only when a wild buddy stood next to the bug and took the aim (the ring shows which one A will hit, so the game is behaving as designed). The check now clears wilds first: lab 111 of 111 in 6 runs.
+- Real-time playtest from the title: opening, berries, Lantern waking, starter pick (BESSLING), Marcus's buddy lines, Erin's walk to the south road, arrival in the Meadow. Captions logged with times: one voice at a time, each waits for A, nothing stacked. No page errors.
+
+**Not checked:** the first catch and Erin's Meadow walk this round (verified in v8.0); turning a bug into a resource with A; balance; the second new area; iPhone.
+
 ## v8.1 · 2026-11-16 · Louie finds lost sprouts; one growing look
 
 From Will's next-up list: recheck Louie fetching lost sprouts, and unify the two looks for growing sprouts in the garden.

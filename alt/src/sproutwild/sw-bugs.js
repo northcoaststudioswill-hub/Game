@@ -54,11 +54,14 @@ function jarUpdate(){const rows=jarRows();swNav(rows.length+1);
  if(pressed('b')){state='g4pause';swSel=2;return}
  const row=rows[swSel];if(swSel===rows.length){if(pressed('a')){state='g4pause';swSel=2}return}
  if(pressed('a')){if(!row.n){swSnd(140,.08);return}row.n--;SW.bugs[row.b.id]--;const [k,q]=row.b.yield;
-  if(k==='light'){SW.light=(SW.light||0)+q*2;if(SW.light>=4&&wLit()&&W4.bf){SW.light-=4;const tn=TYPES[(Math.random()*5)|0].n;SW.buds[tn]=(SW.buds[tn]||0)+1;swSay('The Lantern drank the light and grew a '+tn+' sprout!',2.6)}else swSay('The Lantern glows a little brighter.',1.8)}
-  else if(k==='heart'){SW.hearts++;SW.heartsTotal++;swSay('+1 gratitude heart.',1.6)}
-  else{SW.res[k]=(SW.res[k]||0)+q;swSay('+'+q+' '+WBUGRES[k]+'.',1.6)}swSnd(784,.08,1175);swSave()}
- if(pressed('sel')){if(!row.n){swSnd(140,.08);return}if(W4.sector!=='TOWN'){swSnd(140,.08);swSay('PIP buys bugs in Lantern Town.',2);return}
-  row.n--;SW.bugs[row.b.id]--;SW.res.petal+=row.b.val;swSay('PIP paid '+row.b.val+' petals for a '+row.b.id+'.',1.8);swSnd(988,.08,1319);swSave()}}
+  if(k==='light'){SW.light=(SW.light||0)+q*2;if(SW.light>=4&&wLit()&&W4.bf){SW.light-=4;const tn=TYPES[(Math.random()*5)|0].n;SW.buds[tn]=(SW.buds[tn]||0)+1;jarSay('The Lantern drank the light and grew a '+tn+' sprout!',2.6)}else jarSay('The Lantern glows a little brighter.',1.8)}
+  else if(k==='heart'){SW.hearts++;SW.heartsTotal++;jarSay('+1 gratitude heart.',1.6)}
+  else{SW.res[k]=(SW.res[k]||0)+q;jarSay('+'+q+' '+WBUGRES[k]+'.',1.6)}swSnd(784,.08,1175);swSave()}
+ if(pressed('sel')){if(!row.n){swSnd(140,.08);return}if(W4.sector!=='TOWN'){swSnd(140,.08);jarSay('PIP buys bugs in Lantern Town.',2);return}
+  row.n--;SW.bugs[row.b.id]--;SW.res.petal+=row.b.val;jarSay('PIP paid '+row.b.val+' petals for a '+row.b.id+'. You have '+SW.res.petal+'.',1.8);swSnd(988,.08,1319);swSave()}}
 function drawJar(){const rows=jarRows(),tot=rows.reduce((a,r2)=>a+r2.n,0),seen=rows.filter(r2=>r2.seen).length;swShell('BUG JAR',seen+' of '+WBUGS.length+' found');
- swRows(rows.map(r2=>({a:r2.seen?r2.b.id+(r2.n?' x'+r2.n:''):'???',b:r2.seen?'+'+r2.b.yield[1]+' '+WBUGRES[r2.b.yield[0]]+' · '+r2.b.val+'✿':(r2.b.night?'at night · ':'')+(r2.b.hab==='water'?'by water':r2.b.hab==='tree'?'in trees':'in grass')})).concat([{a:'BACK',b:''}]),swSel,
-  swSel<rows.length?(rows[swSel].seen?rows[swSel].b.lore+' A: use one'+(W4.sector==='TOWN'?' · SELECT: sell to PIP':' · sell to PIP in town'):'Not found yet. Throw a sprout at a bug to catch it.'):(tot+' bugs in the jar.'))}
+ swRows(rows.map(r2=>({a:r2.seen?r2.b.id+(r2.n?' x'+r2.n:''):'???',b:r2.seen?'+'+r2.b.yield[1]+' '+(r2.b.yield[0]==='light'?'LIGHT':WBUGRES[r2.b.yield[0]])+' · '+r2.b.val+'✿':(r2.b.night?'at night · ':'')+(r2.b.hab==='water'?'by water':r2.b.hab==='tree'?'in trees':'in grass')})).concat([{a:'BACK',b:''}]),swSel,
+  W4.jarMsg&&time-W4.jarMsgAt<3?W4.jarMsg:swSel<rows.length?(rows[swSel].seen?rows[swSel].b.lore+' A: use one'+(W4.sector==='TOWN'?' · SELECT: sell to PIP':' · sell to PIP in town'):'Not found yet. Throw a sprout at a bug to catch it.'):(tot+' bugs in the jar.'))}
+
+/* v8.1: what A and SELECT did shows in the jar's footer (swSay only shows in the world, behind this menu) */
+function jarSay(s,t){swSay(s,t);W4.jarMsg=s;W4.jarMsgAt=time}

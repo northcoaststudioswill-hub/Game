@@ -2,25 +2,26 @@
 
 Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v8.1)
+## Sproutwild (cartridge 5, v8.2)
 
 ### Known bugs
-- Garden plots (v8.1): the growing sprouts now share the opening's look in code, but in real-time frames I could not
-  confirm the stalk and head on a planted plot (only the soil mound). Check on the phone.
-- The lab check "a sprout thrown at a bug catches it" fails now and then (2 of 7 runs on v8.1; 0 of 4 on main after
-  its first run). Its bug position is random. Not explained yet; rerun the lab 3 to 4 times before trusting a single run.
-- One real-time bug catch missed during testing (a step-by-step run caught 4 of 4). Watch for throws at bugs that
-  miss.
+- One real-time bug catch missed during testing in v7.9 (a step-by-step run caught 4 of 4). Not seen since; a wild
+  buddy next to a bug takes the aim, which may be what happened.
+
+### Fixed in v8.2
+- Garden plots: confirmed growing on screen (seed, shoot, head, bud). The seed is now visible on the brown plot.
+- Bug Jar: selling or using a bug now shows the result in the jar itself.
+- The lab's intermittent bug-catch failure (a wild buddy beside the bug took the aim in the test).
 
 ### Fixed in v8.1
 - Louie fetching lost sprouts: he started too late for the sprout's 3.5 s return. Re-checked stepped (70 to 240 px) and
   in real time.
 - Returning sprouts pinned against a wall never came home. Now they fly home after 0.8 s.
 - Louie's "FOUND ONE!" bubble ran off the right edge; now it stays on screen.
-- Garden sprouts and the opening seeds had two growing looks; now one (see the garden item above for what is unconfirmed).
+- Garden sprouts and the opening seeds had two growing looks; now one (confirmed on screen in v8.2).
 
 ### Not tested in play yet
-- Night-only bugs (lightning bug, luna moth), selling bugs to Pip, turning bugs into resources.
+- Turning a bug into a resource with A (night bugs and selling to Pip were played in v8.2).
 - Watching a starter evolve at Lv16 in a battle.
 - Petting Louie at Sunkeep in real time (checked by the automated test only).
 

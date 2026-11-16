@@ -45,11 +45,9 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - Live pause menu is in `sw-save.js` (not sw-module.js).
 
 ## Open items / ideas not done
-- v8.1 fixed Louie's stray fetch (timing and returning sprouts stuck on walls) and gave garden sprouts the
-  opening's growing look. Still to confirm: a planted garden plot's stalk and head on screen (see KNOWN-ISSUES).
-- Lab check "a sprout thrown at a bug catches it" fails intermittently (2 of 7 on v8.1). Unexplained.
-- Real-time bug catch had one miss (stepped run 4/4).
-- Night-only bugs, bug selling, and turning bugs into resources not tried in play.
+- v8.2 confirmed the garden look in play, played night bugs and selling to Pip, and fixed the lab flake.
+- Real-time bug catch had one miss in v7.9; a nearby wild buddy takes the aim (ring shows it).
+- Turning bugs into resources (A in the jar) not tried in play.
 - Balance needing a long session: crop timing, build time, catch odds after the first, starters.
 - A second new area (Meadow's south end is a dead end); more Ohio lore (Haserot Angel, Franklin Castle...).
 - Narrow-path crowding mostly addressed (buddies trail in a line), not confirmed on phone.
@@ -141,3 +139,6 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
 - v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
   "FOUND ONE!" bubble stays on screen.
+- v8.2: garden look confirmed, visible seed, night bugs and Pip played, jar shows results, lab flake fixed.
+- Playtest tip: build with `?dev` in the URL and `window.__g.ev(code)` runs code inside the game scope
+  (read W4, wrap functions, set dayT for night). Wait 4.4 s after picking the cart before driving it.
