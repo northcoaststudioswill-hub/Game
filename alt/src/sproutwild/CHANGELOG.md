@@ -21,6 +21,18 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v7.8 · 2026-11-16 · Louie behaves like he does in Sprouts
+
+Will's ask: make Louie's behaviour more like the Sprouts cartridge. Read cartridge 1's dog (`updLouie` in `console.js`) and brought its habits over (new `sw-louie.js`):
+
+- **Walks at your side, not behind**, and holds still when you stop. When you walk toward him he stays put so you can reach him. A lone buddy now walks right behind you so it never covers him.
+- **Pets.** Face him while standing still and press A, at Sunkeep or in the field: he sits with his ears up, hearts float off, and he says one of his Sprouts lines ("WOOF!", "MORE SCRATCHES.", "SQUIRREL?!", "IS IT PATE TIME?"). It is always the last prompt in the field, so it never takes A from a throw.
+- **Digs up berries.** Every 40 to 60 seconds he digs near you and a berry pops out ("BERRY!") for the sprouts to carry home. The first time, a line explains it.
+- **Fetches lost sprouts** ("FOUND ONE!") and **sniffs out wild buddies** near you ("SNIFF! A BUDDY!", or "GRR! BIG ONE!" when it is well above your level).
+- **Speaks in short bubbles** over his head, like in Sprouts, and faces the way he walks.
+- At Sunkeep he still runs ahead to point at the next goal during the opening.
+- Tests: 109 checks (3 new: pet offered, pet makes him sit, he digs a berry), run three times clean.
+
 ## v7.7 · 2026-11-16 · goals say where things come from
 
 Playtested the road to the Data Center past the base: ore veins in the Meadow work (the ring offers "SEND CUYAPUP · GET ORE"; a fetch gives 2 to 3 ore, enough for the Data Center's 2 ingots), and veins refill each time you enter an area.

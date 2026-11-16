@@ -166,11 +166,16 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   F.noCap(false);S.buildings=[];S.box=[];S.party=S.party.slice(0,1);ok('one buddy: room for more',!F.buddyFull());
   while(S.party.length+S.box.length<3)F.giveMon('PEBBLIT',3);ok('three buddies and no Data Center: full',F.buddyFull(),S.party.length+S.box.length);
   F.build('datacenter',6,12);ok('a Data Center makes room',!F.buddyFull());F.noCap(true)}
+ /* v7.8: Louie, the Sprouts way */
+ {S.seeds=[];S.lit=1;S.tendDone=true;S.tendStage=4;S.quest=Math.max(S.quest,5);if(!S.party.length)F.giveMon('GRASSKIN',7);F.travel('BASE','MEADOW');step(10);const L=F.lst();L.st='follow';L.dig=999;const lo=F.louie();F.setPos(lo.x,lo.y+14);step(1,['up']);step(20);
+  ok('facing Louie while standing still offers a pet',F.near()&&F.near().k==='louie',JSON.stringify(F.near())+' op'+F.op()+' st'+F.state()+' lou'+JSON.stringify(F.louie())+' me'+JSON.stringify(F.pos()));tap('a');step(2);ok('petting makes him sit',F.lst().st==='sit');
+  step(60);S.lessons.louDig=0;let dug=false;for(let k=0;k<4&&!dug;k++){F.lst().dig=0;for(let i=0;i<300&&!S.lessons.louDig;i++)step(1);dug=!!S.lessons.louDig}
+  ok('Louie digs up a berry for the sprouts',dug,F.lst().st)}
  /* v7.6: Sunkeep's trees and rocks grow back */
  {F.travel('BASE','MEADOW');step(5);const nd=F.nodes().find(n=>n.k==='tree');nd.got=true;nd.rg=0;F.setPos(60,460);for(let i=0;i<62*30&&nd.got;i++)step(1);ok('a felled tree at Sunkeep grows back',!nd.got&&nd.hp===nd.max,nd.got)}
  /* v7.5: SELECT picks a fight with a wild you could catch */
  {F.travel('MEADOW','BASE');step(5);const f3=F.fld();if(!F.wilds().length)F.forceWild&&F.forceWild();const wd=F.wilds()[0];
-  if(wd){wd.lv=2;wd.tx=wd.x;wd.ty=wd.y;F.setPos(wd.x,wd.y+30);f3.dir=[0,-1];f3.arrive=null;step(2);tap('sel');step(40);ok('SELECT next to a wild starts a battle',F.state()==='g4battle'||F.state()==='g4engage',F.state());
+  if(wd){wd.lv=2;wd.tx=wd.x;wd.ty=wd.y;wd.t=99;F.setPos(wd.x,wd.y+20);f3.dir=[0,-1];f3.arrive=null;step(2);tap('sel');step(40);ok('SELECT next to a wild starts a battle',F.state()==='g4battle'||F.state()==='g4engage',F.state());
    for(let i=0;i<300&&F.state()!=='g4world';i++){tap('b');tap('a');step(2)}}else ok('SELECT next to a wild starts a battle',false,'no wild')}
  /* v7.2: starters grow up */
  {const sp=F.species(),has=id=>sp.some(x=>x.id===id&&x.starter&&x._spr);ok('each starter has an evolved form',has('CUYAFLARE')&&has('BESSIE')&&has('GRASSMAN'));

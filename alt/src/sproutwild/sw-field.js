@@ -378,6 +378,7 @@ function fNear(F){const px=P3.x+F.dir[0]*11,py=P3.y+F.dir[1]*11,in2=(o,r2)=>Math
  if(in2(F.start,18))return{k:'sign',txt:'LANTERN POST · REST, TRAVEL'};
  for(const nd of W4.nodes)if(!nd.got&&nd.k!=='bush'&&in2(nd)&&!pfBest(F,nd)&&!(F.pf||[]).some(b=>b.tg===nd))return{k:'node',nd,txt:'CHOP BY HAND'.replace('CHOP',nd.k==='rock'?'MINE':'CHOP')};
  for(const dm of F.domes)if(!SW.fl[dm.flag]&&in2(dm,22))return{k:'info',txt:'LOOK',msg:"IRON DOME · by order of KING BIBI. 'Temporary.' It has been temporary for years."};
+ if(louPetOK()&&!fAim(F).tg)return{k:'louie',txt:'PET LOUIE'}; /* last: he must never take A from a throw */
  return null}
 function fTalk(F,who,lines,after){F.dlg={who,lines,i:0,after}}
 function fTrainer(F,np){const q=np.team.map(([sp,lv])=>wMakeMon(sp,lv));
@@ -455,6 +456,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    else fTalk(F,np.who,[np.after||'...'])}
   else if(n.k==='gym'){if(SW.quest<5)swSay(WGYMS[sec.gym].leader+': "Easy, keeper. Set up camp and catch a buddy first — then we battle."',3.4);
    else{W4.gymIx=wGymIx(sec);W4.gymPage=0;swSel=0;state='g4gym'}}
+  else if(n.k==='louie')wLouTalk();
   else if(n.k==='door')swSay(['Nobody home. A sprout waves from the window.','Locked. It smells like berry pie in there.','A note: GONE TO THE GYM. BACK NEVER.'][(F.t0*7|0)%3],2.2);
   else if(n.k==='sign'){const hurt=SW.party.some(m=>m.hp<wStats(m).max);for(const m of SW.party)m.hp=wStats(m).max;if(hurt){swSnd(880,.1,1175);swSay('The Lantern light mends your buddies.',2.2);swSave()}W4.mapRO=0;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(n.k==='info'){swSay(n.msg,2.6);swSnd(660,.05,880)}

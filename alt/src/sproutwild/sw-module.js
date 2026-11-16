@@ -515,6 +515,7 @@ function wSproutInfo(px,py){ /* the catch-all: any sprout can be asked what it i
  return null}
 function wNear(){const sec=wSector(W4.sector),px=P3.x+P3.ax*13,py=P3.y+P3.ay*13;
  {const ex=wNearExtra(px,py);if(ex)return ex}
+ if(W4.sector==='BASE'&&louPetOK()&&Math.hypot(P3.x+(P3.ax||0)*12-lou.x,P3.y+(P3.ay||0)*12-lou.y)<14)return{k:'louie',txt:'PET LOUIE'}; /* facing him, standing still: that is a pet */
  const aimT=!!(W4.bf&&(W4.bf.sq.length||(W4.bf.pf&&W4.bf.pf.length))&&fAim(W4.bf).tg);
  if(W4.loose)for(const lb of W4.loose)if(Math.hypot(px-lb.x,py-lb.y)<17)return{k:'wildpluck',lb,txt:'PLUCK '+TYPES[lb.type].n+' SPROUT'};
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)
@@ -532,7 +533,7 @@ function wNear(){const sec=wSector(W4.sector),px=P3.x+P3.ax*13,py=P3.y+P3.ay*13;
    if(Math.hypot(px-bx,py-by)<18)return{k:'bld',b,txt:wBuildDef(b.k).n}}
   if(Math.hypot(px-WW/2,py-74)<24)return{k:'lantern',txt:'THE GREAT LANTERN'}}
  if(aimT)return null;
- if(W4.sector==='BASE'&&Math.hypot(px-lou.x,py-lou.y)<17)return{k:'louie',txt:'PET LOUIE'}; /* Louie and people come last: they follow you about and must never take the button from what you are facing */
+ if(W4.sector==='BASE'&&(Math.hypot(px-lou.x,py-lou.y)<17||louPetOK()))return{k:'louie',txt:'PET LOUIE'}; /* Louie and people come last: they follow you about and must never take the button from what you are facing */
  for(const np of wNpcList())if(Math.hypot(px-np.x,py-np.y)<16)return{k:'npc',who:np.who,txt:'TALK TO '+np.who}; /* people last: they wander, and must never steal the button from what you are facing */
  const si=wSproutInfo(px,py);if(si)return si; return null}
 const WTOOLCOST=[{w:6,s:3,i:0},{w:14,s:8,i:2},{w:24,s:14,i:5}];
@@ -833,8 +834,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
    fChibi(Math.round(np.x),Math.round(np.y)+3,FLOOK[np.who]||FLOOK.WILL,np.dir||[0,1],!!np.mv);
    if(Math.hypot(P3.x-np.x,P3.y-np.y)<70&&wOp()>=3&&!(W4.quips||[]).some(q=>q.who===np.who)){r('rgba(10,14,8,.55)',np.x-tw(np.who,1)/2-2,np.y+2,tw(np.who,1)+4,9);
    text(np.who,np.x-tw(np.who,1)/2,np.y+3,1,'#ffe8b0',null)}}
-  r('rgba(0,0,0,.22)',Math.round(lou.x)-9,Math.round(lou.y)+4,18,3);
-  const lf=((time*2)|0)%2;g.drawImage(lf?LOU.l[0]:LOU.l[1],Math.round(lou.x)-12,Math.round(lou.y)-6,24,12);
+  louDraw();
   if(Math.hypot(P3.x-lou.x,P3.y-lou.y)<70&&wOp()>=3&&!(W4.quips||[]).some(q=>q.who==='LOUIE')){r('rgba(10,14,8,.55)',Math.round(lou.x)-tw('LOUIE',1)/2-2,Math.round(lou.y)+6,tw('LOUIE',1)+4,9);
   text('LOUIE',Math.round(lou.x)-tw('LOUIE',1)/2,Math.round(lou.y)+7,1,'#ffe8b0',null)}
   if(W4.louLead)text('!',Math.round(lou.x)-1,Math.round(lou.y)-17,2,'#ffd94d',null)
@@ -1991,7 +1991,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={lst:()=>louSt(),louPet:()=>louPetOK(),noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},
