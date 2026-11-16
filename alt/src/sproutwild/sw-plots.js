@@ -40,5 +40,5 @@ function drawPlot(){const pb=W4.plotPb,cur=pb&&pb.crop,n=(W4.patchBuds||[]).leng
   swSel===0?'Garden sprouts plant seeds here and new sprouts grow. Pluck them when grown.':swSel===1?WCROPS.berry.d+' Takes the plot from sprouts.':swSel===2?WCROPS.fiber.d+' Takes the plot from sprouts.':'Each plot grows one thing. Home buddies with WATERING or PLANTING make crops grow faster.')}
 function scPlots(){SW.lessons.scPlot=1;scStart([{hold:.5},{x:240,y:352,hold:1.1},
   {x:240,y:352,who:'ERIN',txt:'Now the garden. Each plot grows one thing: sprouts, berries or fiber reeds.'},
-  {x:240,y:352,who:'ERIN',txt:'Stand at an empty plot and press A to choose. More crops means fewer sprouts. Your call.'},
+  {x:240,y:352,who:'ERIN',txt:'Stand at an empty plot and press A to choose. All full? Pluck a sprout to free one. More crops means fewer sprouts.'},
   {x:240,y:352,who:'MARCUS',txt:'Buddies at home water it and pick it. Sprouts carry it. I supervise, bro.'},{hold:.4}],()=>swSave())}

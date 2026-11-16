@@ -72,6 +72,7 @@ while(T()<CAP){
   if(s.op===1){const it=s.items[0];if(it){if(await moveTo(s,it[0]+30,it[1]+2)){await face(-1,0);await aPress(900)}}await sleep(150);continue}
   if(s.op===2){if(await moveTo(s,240,170)){await face(0,-1);await aPress(1200)}await sleep(150);continue}
   if(s.q<=2){if(s.erin&&s.bw<2){const dx=s.P[0]-s.erin[0],dy=s.P[1]-s.erin[1],d=Math.hypot(dx,dy)||1;if(d>30)await moveTo(s,s.erin[0]+dx/d*26,s.erin[1]+dy/d*26-(dy>0?40:0),9);}else{await moveTo(s,240,s.wh-8,11);await key('down',120)}await sleep(150);continue}
+  if(s.cot&&!s.crop&&!s.plot){const gs=JSON.parse(await ev("JSON.stringify((W4.patchBuds||[]).filter(q=>q.type>=0&&q.stage>=2&&q.mode==='soil').map(q=>[q.sx,q.sy]))"))[0];if(gs){if(await moveTo(s,gs[0],gs[1]+14)){await face(0,-1);await aPress(1200)}}await sleep(150);continue}
   if(s.cot&&!s.crop&&s.plot){if(await moveTo(s,s.plot[0],s.plot[1]+14)){await face(0,-1);await aPress(1500)}await sleep(150);continue}
   if(s.cot&&s.q>=5){await moveTo(s,240,s.wh-8,11);await key('down',120);await sleep(150);continue}
   if(!s.cot){if(s.wood>=8){await key('start');await sleep(300);continue}

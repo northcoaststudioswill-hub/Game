@@ -165,6 +165,7 @@ function wQuestText(){const op=wOp();
  if(op===2)return'Greet one of the dim buddies';
  if(SW.quest===2)return W4.fld?'A: throw sprouts at a wild buddy':'Take the south road to the Meadow';
  if(!W4.fld&&wHasRoof()&&wDark()>.7)return'Night: sleep in the cottage to skip it';
+ if(SW.quest===4&&!W4.fld&&W4.patchBuds&&!W4.patchBuds.some(q=>q.type<0&&!q.crop))return'Garden full: pluck a sprout, then grow BERRIES'; /* v8.9 */
  if(SW.quest<5)return(W4.fld&&SW.quest>=3?'At Sunkeep: ':'')+WQUEST[SW.quest];
  if(W4.fld){const ld=SW.party.find(m=>m.hp>0),sec=wSector(W4.sector);
   if(!ld||ld.hp<wStats(ld).max*.25)return'Your buddy is hurt: rest at a Lantern post';
@@ -239,4 +240,5 @@ function wMissionHint(nx){const [key,lab]=nx,[k,v]=key.split(':');
  if(k==='build'&&v==='kiln'&&!wCanPay(wBuildDef('kiln').cost))return'Kiln: 8 stone, 4 wood (rocks, trees)';
  if(k==='build'&&v==='datacenter'&&(SW.res.ingot||0)<2)return(SW.buildings.some(b=>b.k==='kiln')?'Data Center: 2 ingots. Ore veins, then kiln':'Data Center: needs a kiln for ingots');
  if(k==='buddies'&&wBuddyFull())return'Buddies: build a Data Center for room';
+ if(k==='crop'&&W4.patchBuds&&!W4.patchBuds.some(q=>q.type<0&&!q.crop))return'Garden full: pluck a sprout, then grow BERRIES'; /* v8.9 */
  return lab}
