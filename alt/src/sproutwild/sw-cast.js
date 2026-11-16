@@ -39,7 +39,7 @@ const WCIDLE={ERIN:['The beds grow better when someone sings. So I sing.','Louie
  WILL:['I catalog every sprout in this valley. Twice.','The Lantern chose us. No pressure or anything.','If Marcus asks, I was absolutely working.'],
  LOUIE:['*sniff sniff*','WOOF.','(tail wag)','(found a stick)','ARF! ARF!']};
 function wCastTick(dt){if(!W4.cast)wCastInit();if(!SW.beats)SW.beats={};const op=Math.min(3,wOp());
- for(const c of W4.cast){if(c.who===SW.keeper)continue;const a=WCANCH[c.who][op],dp=Math.hypot(P3.x-c.x,P3.y-c.y);c.t-=dt;
+ for(const c of W4.cast){if(c.who===SW.keeper)continue;if(c.who==='ERIN'&&SW.quest===2&&(SW.bwalk||0)>=1&&W4.sector==='BASE')continue; /* she is walking you out */const a=WCANCH[c.who][op],dp=Math.hypot(P3.x-c.x,P3.y-c.y);c.t-=dt;
   if(Math.hypot(c.tx-a[0],c.ty-a[1])>a[2]+4||c.t<=0){for(let n=0;n<6;n++){const tx=a[0]+(Math.random()*2-1)*a[2],ty=a[1]+(Math.random()*2-1)*a[2];if(!wSolidAt(tx,ty)){c.tx=tx;c.ty=ty;break}}c.t=2.5+Math.random()*4}
   const dx=c.tx-c.x,dy=c.ty-c.y,d=Math.hypot(dx,dy),far=Math.hypot(c.x-a[0],c.y-a[1])>a[2]+30;c.mv=d>2&&(far||dp>22);
   if(c.mv){const v=far?64:26;c.x+=dx/d*v*dt;c.y+=dy/d*v*dt;c.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}

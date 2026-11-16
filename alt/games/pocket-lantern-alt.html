@@ -6361,7 +6361,7 @@ const WSECTORS=[
 function wSector(id){return WSECTORS.find(s=>s.id===id)}
 const WKEEPERS={
  WILL:{pas:'Lantern Charm: catch +15%',act:'SELFIE FLASH',actD:'Dazzled foe: ATK down, loses a turn.'},
- ERIN:{pas:'Green Hands: +1 yield, heal wins',act:'TOWEL WHIP',actD:'Damage + the foe loses its turn.'},
+ ERIN:{pas:'Green Hands: +1 yield',act:'TOWEL WHIP',actD:'Damage + the foe loses its turn.'},
  MARCUS:{pas:'Drill Sergeant: hits +12%',act:'HYDRO JET',actD:'A pressurized DEW blast.'}};
 const WTALK={PIP:['A wild ZIPWIG chased me home once. It just wanted my sandwich, I think.','When I grow up I want a whole FORTUNE sprout. They bring luck AND snacks.','The gym leader? That is Ranger. He is tough but he shares his berries.'],
  ELDER:['Lantern Town was three tents and a dream when I was your size, keeper.','A good base is a garden and a workshop at once. Tend both.','The Sigils are old promises. Ranger keeps the first, down at the gym.'],WILL:["I catalog every sprout in this valley. Twice.","The Lantern chose us. No pressure or anything.","If Marcus asks, I was absolutely working."],
@@ -7466,7 +7466,7 @@ function wMoveTo(o,tx,ty,sp,dt,arr){const dx=tx-o.x,dy=ty-o.y,d=Math.hypot(dx,dy
 function wPatchYield(pb){pb.dlv=(pb.dlv||0)+1;
  if(pb.dlv>=3&&!pb.crew&&SW.crew.length<wCrewCap()){const ty=pb.type;SW.crew.push({type:ty,dlv:3,wxp:0,job:-1,atPatch:true});
   pb.crew=true;pb.crewIx=SW.crew.length-1;pb.pend={txt:TYPES[ty].n+' SPROUT GREW UP — CREW!',c:'#7ee787'};
-  swSay('A '+TYPES[ty].n+' sprout joined your crew!',2.6);swSnd(784,.12,1175);swSave();return}
+  swSay(('AEIOU'.includes(TYPES[ty].n[0])?'An ':'A ')+TYPES[ty].n+' sprout joined your crew!',2.6);swSnd(784,.12,1175);swSave();return}
  const r2=Math.random(),F=(txt,c)=>{pb.pend={txt,c}};
  const bud=()=>{const bt2=(Math.random()*5)|0;SW.buds[TYPES[bt2].n]=(SW.buds[TYPES[bt2].n]||0)+1;F('sprout brought a '+TYPES[bt2].n+' SPROUT!','#7ee787')};
  if(pb.type===0){if(r2<.3){SW.res.ingot++;F('EMBER sprout smelted an INGOT!','#ffd23f')}else if(r2<.6){SW.res.wood++;F('+1 WOOD','#e8d8a8')}else{SW.res.berry++;F('+1 BERRY','#f0b8d8')}}
@@ -8345,7 +8345,7 @@ function fNear(F){const px=P3.x+F.dir[0]*11,py=P3.y+F.dir[1]*11,in2=(o,r2)=>Math
  for(const b of F.buds)if(in2(b))return{k:'bud',b,txt:'PLUCK '+TYPES[b.type].n+' SPROUT'};
  for(const np of F.npcs)if(in2(np,18))return{k:'npc',np,txt:np.team&&!SW.fl[np.fk]?'BATTLE '+np.who:'TALK'};
  for(const al of F.alphas)if(in2(al,22))return{k:'alpha',al,txt:'CHALLENGE ALPHA '+al.sp};
- for(const wd of W4.wilds)if(in2(wd)&&!wd.cap&&!pfCan(F,wd))return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv+(F.sq.length?' · too strong to catch':'')};
+ for(const wd of W4.wilds)if(SW.quest>=3&&in2(wd)&&!wd.cap&&!pfCan(F,wd))return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv+(F.sq.length?' · too strong to catch':'')};
  if(F.gym&&in2(F.gym,18))return{k:'gym',txt:'GYM'};
  for(const dr of F.doors)if(in2(dr,14))return{k:'door',txt:'KNOCK'};
  if(in2(F.start,18))return{k:'sign',txt:'LANTERN POST · REST, TRAVEL'};
@@ -8405,7 +8405,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
  if(W4.grace<=0)for(const np of F.npcs)if(np.team&&!SW.fl[np.fk]&&!np.boss){const dx=P3.x-np.x,dy=P3.y-np.y,al=dx*np.dir[0]+dy*np.dir[1],off=Math.abs(dx*np.dir[1]-dy*np.dir[0]);
   if(al>6&&al<FT*5.5&&off<11&&SW.quest>=3&&SW.party.some(m=>m.hp>0)){F.spot={np,t:0};swSnd(880,.1,1320);return}}
  /* wild buddies wander their grass */
- if(sec.table){for(const wd of W4.wilds){if((wd.lat&&wd.lat.length)||wd.cap){wd.mv=false;continue}wd.t-=dt;
+ if(sec.table){for(const wd of W4.wilds){if((wd.lat&&wd.lat.length)||wd.cap||wd.tame){wd.mv=false;continue}wd.t-=dt;
    if(wd.t<=0){const gt=F.grass.filter(g2=>Math.abs(g2[0]*FT-wd.x)<70&&Math.abs(g2[1]*FT-wd.y)<70),pk=gt[(Math.random()*gt.length)|0];
     if(pk){wd.tx=pk[0]*FT+8;wd.ty=pk[1]*FT+10}wd.t=1.5+Math.random()*3}
    const dx=wd.tx-wd.x,dy=wd.ty-wd.y,d=Math.hypot(dx,dy);wd.mv=d>2;if(d>2){wd.x+=dx/d*16*dt;wd.y+=dy/d*16*dt;wd.fx=dx<0?-1:1}}
@@ -8438,7 +8438,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
  if(pressed('start')){swSel=0;state='g4pause'}}
 /* squad orders, shared by the field and Sunkeep: SELECT picks the kind, B throws, hold B whistles */
 function fCommand(F,dt){if(F.manT>0)F.manT-=dt;
- if(pressed('sel')&&W4.fld){const a=fAim(F),wd=a.kind==='wild'&&a.tg;if(wd&&!wd.cap&&!(wd.lat&&wd.lat.length)&&Math.hypot(wd.x-P3.x,wd.y-P3.y)<64&&SW.party.some(m=>m.hp>0)){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv));return}}
+ if(pressed('sel')&&W4.fld){const a=fAim(F),wd=a.kind==='wild'&&a.tg;if(wd&&SW.quest>=3&&!wd.cap&&!(wd.lat&&wd.lat.length)&&Math.hypot(wd.x-P3.x,wd.y-P3.y)<64&&SW.party.some(m=>m.hp>0)){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv));return}}
  if(pressed('sel')){let i=SW.selType;for(let n=0;n<TYPES.length;n++){i=(i+1)%TYPES.length;if(F.sq.some(s=>s.type===i))break}
   SW.selType=i;F.manT=4;swSnd(660,.06,990);W4.floats.push({x:P3.x,y:P3.y-20,txt:TYPES[i].n+' SPROUTS UP NEXT',t:1.2,c:TYPES[i].l})}
  if(keys.a&&!W4.near){if(pressed('a')){fThrow(F);F.aT=.26}else{F.aT=(F.aT||0)-dt;if(F.aT<=0){fThrow(F,true);F.aT=.2}}}
@@ -8453,7 +8453,7 @@ function fBaseTick(dt){const F=W4.bf;if(!F)return;if(P3.ax||P3.ay)F.dir=[P3.ax,P
  F.ft=(F.ft||0)-dt;if(F.ft<=0){F.ft=2;fFlow(F)}
  if(F.got){F.got.t-=dt;if(F.got.t<=0)F.got=null}
  fSync(F);pfTick(F,dt);fSquad(F,dt);fItems(F,dt);wkTick(dt);scConTick(dt);plTick(dt);
- for(const nd of W4.nodes)if(nd.got&&nd.k!=='bush'){nd.rg=(nd.rg||0)+dt;if(nd.rg>=(nd.k==='tree'?75:90)){nd.got=false;nd.hp=nd.max;nd.rg=0;nd.wkBy=null;for(let i=0;i<8;i++)W4.floats.push({x:nd.x+(Math.random()*16-8),y:nd.y-4-Math.random()*16,txt:'*',t:.5+Math.random()*.5,c:'#a0e888'});if(!SW.lessons.regrow){SW.lessons.regrow=1;swSay('Trees and rocks at Sunkeep grow back. Your buddies will keep at it.',3)}}} /* Sunkeep's grove and stones come back */wCastTick(dt);fCommand(F,dt);wBaseEdge()}
+ for(const nd of W4.nodes)if(nd.got&&nd.k!=='bush'){nd.rg=(nd.rg||0)+dt;if(nd.rg>=(nd.k==='tree'?75:90)){nd.got=false;nd.hp=nd.max;nd.rg=0;nd.wkBy=null;for(let i=0;i<8;i++)W4.floats.push({x:nd.x+(Math.random()*16-8),y:nd.y-4-Math.random()*16,txt:'*',t:.5+Math.random()*.5,c:'#a0e888'});if(!SW.lessons.regrow){SW.lessons.regrow=1;swSay('Trees and rocks at Sunkeep grow back. Your buddies will keep at it.',3)}}} /* Sunkeep's grove and stones come back */wCastTick(dt);bwTick(dt);seedGrow(dt);fCommand(F,dt);wBaseEdge()}
 function fSqDraw(F,front){for(const o of F.sq){if((o.y>P3.y)!==front)continue;drawBud({x:Math.round(o.x),y:Math.round(o.y)+2,type:o.type,stage:2,z:o.z||0,a:o.a,mv:!!o.mv,st:o.st==='idle'?'idle':'follow',fx:1});
   if(o.st==='work'&&o.mv)r('#ffffff',Math.round(o.x)+4,Math.round(o.y)-9,2,2)}
  if(!front){for(const it of F.items)fItemDraw(it);for(const b of F.buds)fBudDraw(b)}}
@@ -8461,7 +8461,7 @@ function fRing(F){if(F.sq.length||(F.pf&&F.pf.length)){const a=fAim(F),T=a.kind=
   if(a.tg){const c=a.need>=0?'#e04838':T.l,rr=a.kind==='site'?14:11;
    for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){r('#14101e',ax+sx*(rr+ph)-2,ay-6+sy*(rr-2+ph)-2,5,5);r(c,ax+sx*(rr+ph)-1,ay-6+sy*(rr-2+ph)-1,3,1);r(c,ax+sx*(rr+ph)-(sx<0?1:-1),ay-6+sy*(rr-2+ph)-1,1,3)}
    for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.6)',Math.round(px),Math.round(py),1,1)}
-   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='bug'?'CATCH '+a.tg.sp:a.kind==='wild'?(wBuddyFull()?'No room for more buddies · build a DATA CENTER':pfCan(F,a.tg)?'CATCH · needs '+pfNeed(a.tg)+(Math.hypot(a.tg.x-P3.x,a.tg.y-P3.y)<64?' · SELECT: fight':' sprouts'):'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
+   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='bug'?'CATCH '+a.tg.sp:a.kind==='wild'?(wBuddyFull()?'No room for more buddies · build a DATA CENTER':pfCan(F,a.tg)?'CATCH · needs '+pfNeed(a.tg)+(Math.hypot(a.tg.x-P3.x,a.tg.y-P3.y)<64?(SW.quest>=3?' · SELECT: fight':''):' sprouts'):'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
    F.aimLab=lab;F.aimNeed=a.need>=0}
   else{F.aimLab=null;r('rgba(255,255,255,.35)',ax-1,ay-1,2,2)}}else F.aimLab=null;
  if(F.whistle){g.strokeStyle='rgba(255,244,180,.8)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-2,F.whistle,0,7);g.stroke();
@@ -9070,13 +9070,13 @@ function drawTools(){swShell('TINKER BENCH','B  DONE');if(!SW.craftQ)SW.craftQ=[
  const qs=q.length?'QUEUE: '+q.map((x,i)=>WRECIPES.find(rc=>rc.id===x.id).n+(i===0?' '+Math.floor(100*x.done/x.need)+'%':'')).join(' · '):'Queue empty.';
  swRows(rows,swSel,(swSel<WRECIPES.length?WRECIPES[swSel].d+' ':'')+qs+' · Buddies at home build it. Stand at the bench and you and your sprouts help.')}
 /* ---------------- the work board ---------------- */
-function baseUpdate(){const n=(W4.wk||[]).length+1;swNav(n);if(pressed('a')||pressed('b'))state='g4world'}
+function baseUpdate(){const ms=WBASEMS[SW.baseLv],n=(W4.wk||[]).length+1+(ms?ms.length:0);swNav(n);if(pressed('a')||pressed('b'))state='g4world'}
 function drawBase(){swShell('SUNKEEP WORK BOARD','BASE LV '+SW.baseLv);wkSync();
- const ms=WBASEMS[SW.baseLv],done=ms?ms.filter(([k])=>wMissionDone(k)).length:0,rows=[{a:ms?'MISSIONS '+done+'/'+ms.length:'BASE FULLY GROWN',b:'♥ '+SW.hearts+' · AXE '+SW.tools.axe+' PICK '+SW.tools.pick}];
+ const ms=WBASEMS[SW.baseLv],done=ms?ms.filter(([k])=>wMissionDone(k)).length:0,rows=[{a:ms?'MISSIONS '+done+'/'+ms.length:'BASE FULLY GROWN',b:'♥ '+SW.hearts}];if(ms)for(const [k,l] of ms)rows.push({a:(wMissionDone(k)?'✓ ':'· ')+l,b:wMissionDone(k)?'done':''});const nm=rows.length;
  const job=w=>{const tk=w.task;return!tk?'thinking':tk.k==='sleep'?'asleep':tk.k==='idle'?(tk.noroof?'needs a cottage':'resting'):tk.k==='haul'?'hauling':tk.k==='chop'?(tk.nd.k==='tree'?'chopping':'mining'):tk.k==='crop'?'harvesting':tk.k==='craft'?'crafting':tk.k==='tend'?'tending':wBuildDef(tk.b.k).n.toLowerCase()};
  for(const w of W4.wk)rows.push({a:wkName(w)+(w.kind==='b'?' Lv'+w.ref.lv:''),b:job(w)});
- const sel=Math.min(swSel,rows.length-1),w=W4.wk[sel-1];
- swRows(rows,sel,sel===0?(ms?ms.map(([k,l])=>(wMissionDone(k)?'✓ ':'· ')+l).join('  '):'Everything is built. For now.'):
+ const sel=Math.min(swSel,rows.length-1),w=W4.wk[sel-nm];
+ swRows(rows,sel,sel<nm?(ms?'Finish every mission, then ask the Great Lantern to grow. Home buddies are listed below.':'Everything is built. For now.'):
   'SKILLS: '+wkSkillStr(w)+'. Work XP '+(w.ref.wxp||0)+'/40'+((w.ref.wxp||0)>=40?' (skills +1)':'')+'. '+(w.kind==='b'?'Buddies at home pick their own jobs by skill.':'Pinned to its building; it also hauls what it makes.')+(W4.wk.length?'':''))}
 /* ================================================================
    ART PASS (Fable, v5.4) — one look for the whole overworld.
@@ -9229,7 +9229,7 @@ const WSEEDPOS={0:[206,126],2:[240,134],4:[274,126]};
 const wLit=()=>!!SW.lit||SW.quest>=2;
 const wOp=()=>SW.quest>=2?3:SW.lit?2:(SW.seeds&&SW.seeds.length)?0:1;
 function wQuestText(){const op=wOp();
- if(op===0)return'Pluck the glowing seeds';
+ if(op===0)return opGoal0();
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
  if(SW.quest===2)return W4.fld?'A: throw sprouts at a wild buddy':'Take the south road to the Meadow';
@@ -9351,7 +9351,7 @@ WRECIPES.splice(1,0,{id:'pouch',n:'SEED POUCH',cost:{fiber:4,wood:4},need:18,d:'
    v5.7 — after the first catch (found by playing on)
    ================================================================ */
 if(!SW.gear)SW.gear={};
-WBASEMS[1][2][1]='Put 1 worker to work';WBASEMS[2][2][1]='Put 3 workers to work';
+/* v8.0: the mission names are set in sw-module.js; the old worker missions are gone */
 function wWorkerCount(){return SW.crew.filter(c=>c.job!==-1).length+SW.party.slice(1).length+SW.box.length}
 function wMissionDone(key){const [k,v]=key.split(':');
  if(k==='build')return SW.buildings.some(b=>b.k===v);
@@ -9361,7 +9361,7 @@ function wMissionDone(key){const [k,v]=key.split(':');
  if(k==='hearts')return SW.heartsTotal>=+v;return false}
 /* past the opening the strip shows the next thing the base needs, so there is always a direction */
 function wQuestText(){const op=wOp();
- if(op===0)return'Pluck the glowing seeds';
+ if(op===0)return opGoal0();
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
  if(SW.quest===2)return W4.fld?'A: throw sprouts at a wild buddy':'Take the south road to the Meadow';
@@ -9705,7 +9705,7 @@ const WCIDLE={ERIN:['The beds grow better when someone sings. So I sing.','Louie
  WILL:['I catalog every sprout in this valley. Twice.','The Lantern chose us. No pressure or anything.','If Marcus asks, I was absolutely working.'],
  LOUIE:['*sniff sniff*','WOOF.','(tail wag)','(found a stick)','ARF! ARF!']};
 function wCastTick(dt){if(!W4.cast)wCastInit();if(!SW.beats)SW.beats={};const op=Math.min(3,wOp());
- for(const c of W4.cast){if(c.who===SW.keeper)continue;const a=WCANCH[c.who][op],dp=Math.hypot(P3.x-c.x,P3.y-c.y);c.t-=dt;
+ for(const c of W4.cast){if(c.who===SW.keeper)continue;if(c.who==='ERIN'&&SW.quest===2&&(SW.bwalk||0)>=1&&W4.sector==='BASE')continue; /* she is walking you out */const a=WCANCH[c.who][op],dp=Math.hypot(P3.x-c.x,P3.y-c.y);c.t-=dt;
   if(Math.hypot(c.tx-a[0],c.ty-a[1])>a[2]+4||c.t<=0){for(let n=0;n<6;n++){const tx=a[0]+(Math.random()*2-1)*a[2],ty=a[1]+(Math.random()*2-1)*a[2];if(!wSolidAt(tx,ty)){c.tx=tx;c.ty=ty;break}}c.t=2.5+Math.random()*4}
   const dx=c.tx-c.x,dy=c.ty-c.y,d=Math.hypot(dx,dy),far=Math.hypot(c.x-a[0],c.y-a[1])>a[2]+30;c.mv=d>2&&(far||dp>22);
   if(c.mv){const v=far?64:26;c.x+=dx/d*v*dt;c.y+=dy/d*v*dt;c.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}
@@ -9788,7 +9788,8 @@ function pfWildTick(F,dt){for(const wd of W4.wilds.slice()){
  wd.lat=wd.lat.filter(s=>s.st==='latch'&&s.tg===wd);if(!wd.lat.length){wd.lt=0;continue}
  wd.lt=(wd.lt||0)+dt;const str=pfStr(wd),need=pfNeed(wd);
  if(str>=need&&wd.lt>1){const sp=wSp(wd.sp),p=Math.max(.2,Math.min(.9,.3+.12*(str-need)+(sp.catch||.4)*.4));
-  wd.cap={t:0,ok:Math.random()<(SW.quest<3?Math.max(p,.8):p)}; /* the first catch is kind */swSnd(523,.12,784)}
+  wd.cap={t:0,ok:SW.quest<3||Math.random()<p}; /* the first catch always blooms */ /* the first catch is kind */swSnd(523,.12,784)}
+ else if(wd.lt>3.6&&SW.quest<3){for(const s of wd.lat){s.st='ret';s.tg=null;s.z=10}wd.lat=[];wd.lt=0;W4.floats.push({x:wd.x,y:wd.y-24,txt:'IT SHOOK THEM OFF! THROW MORE.',t:1.8,c:'#ffd94d'});swSnd(300,.08,200)}
  else if(wd.lt>3.6){ /* it shakes them off and turns on you */
   for(const s of wd.lat){s.st='ret';s.tg=null;s.z=10}wd.lat=[];W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;
   wEngage(wd.sp+' SHOOK THEM OFF!',()=>wStartWildAt(wd.sp,wd.lv))}}}
@@ -9818,10 +9819,12 @@ function scStart(steps,done){if(SCOFF){for(const s of steps)if(s.fn)s.fn();if(do
 function scNext(){const sc=W4.scene;sc.i++;sc.t=0;const st=sc.steps[sc.i];
  if(!st){W4.scene=null;if(sc.done)sc.done();if(!W4.fld)wCamUpdate(P3.x,P3.y);return}if(st.fn)st.fn()}
 function scTick(dt){const sc=W4.scene,st=sc.steps[sc.i];sc.t+=dt;
- const tx=st.x==null?P3.x:st.x,ty=st.y==null?P3.y:st.y,k=Math.min(1,dt*3.4);sc.x+=(tx-sc.x)*k;sc.y+=(ty-sc.y)*k;
+ if(st.tick)st.tick(dt);
+ const tx=st.x==='lou'?lou.x:st.x==null?P3.x:st.x,ty=st.x==='lou'?lou.y:st.y==null?P3.y:st.y,k=Math.min(1,dt*3.4);sc.x+=(tx-sc.x)*k;sc.y+=(ty-sc.y)*k;
  for(const f of W4.floats)f.t-=dt;W4.floats=W4.floats.filter(f=>f.t>0);
- if(!W4.fld){if(wOp()===2)for(const c of WCHOICE){c.x=-200;c.y=-200}wCamUpdate(sc.x,sc.y);if(W4.patchBuds&&SW.tendDone)wPatchUpdate(dt)}
+ if(!W4.fld){if(wOp()===2)for(const c of WCHOICE){c.x=-200;c.y=-200}wCamUpdate(sc.x,sc.y);seedGrow(dt);if(W4.patchBuds&&SW.tendDone)wPatchUpdate(dt)}
  if(pressed('start')){for(let j=sc.i+1;j<sc.steps.length;j++)if(sc.steps[j].fn)sc.steps[j].fn();sc.i=sc.steps.length;scNext();return}
+ if(st.until){if(st.until()||sc.t>(st.max||15))scNext();return}
  if(st.txt){if(sc.t>.45&&pressed('a')){swSnd(660,.04,880);scNext()}}else if(sc.t>=(st.hold||1.2))scNext()}
 function scDraw(){const sc=W4.scene,st=sc.steps[sc.i];if(!st)return;
  r('#0a0e08',0,0,W,12);r('#0a0e08',0,H-12,W,12);
@@ -9895,7 +9898,7 @@ function scAuto(){if(!SCOFF&&kindCheck())return;
  if(F&&F.id==='MEADOW'&&!SW.lessons.scMeadow&&SW.quest>=2){F.scT=(F.scT||0)+1;if(F.scT>20)scMeadow(F)}}
 /* a seed of light arcs from the Lantern to you when it grows a sprout */
 function scSeed(ty){(W4.seedFx=W4.seedFx||[]).push({t:0,ty})}
-function scWorldFx(){scArrow();scDabFx();if(!W4.seedFx)return;for(const fx of W4.seedFx){fx.t+=1/60;const k=Math.min(1,fx.t/1.1),x=240+(P3.x-240)*k,y=40+(P3.y-8-40)*k-Math.sin(k*3.1416)*46,T=TYPES[fx.ty];
+function scWorldFx(){opFx();scArrow();scDabFx();if(!W4.seedFx)return;for(const fx of W4.seedFx){fx.t+=1/60;const k=Math.min(1,fx.t/1.1),x=240+(P3.x-240)*k,y=40+(P3.y-8-40)*k-Math.sin(k*3.1416)*46,T=TYPES[fx.ty];
   for(let i=1;i<5;i++){const k2=Math.max(0,k-i*.035),x2=240+(P3.x-240)*k2,y2=40+(P3.y-8-40)*k2-Math.sin(k2*3.1416)*46;g.globalAlpha=.6-i*.12;r(T.l,Math.round(x2),Math.round(y2),2,2)}
   g.globalAlpha=1;r('#ffffff',Math.round(x)-2,Math.round(y)-2,5,5);r(T.c,Math.round(x)-1,Math.round(y)-1,3,3)}
  W4.seedFx=W4.seedFx.filter(fx=>fx.t<1.1)}
@@ -10413,6 +10416,124 @@ function ewTick(F,dt){if(SCOFF||F.id!=='MEADOW'||!SW.lessons.scMeadow||wOp()<3||
 function ewDraw(){const E=W4.ew;if(!E)return;fChibi(Math.round(E.x),Math.round(E.y)+3,FLOOK.ERIN,E.dir,E.mv);
  if(E.wait||(!E.mv&&!E.leave&&(SW.walk===2||SW.walk===4||SW.walk===6)))if(((time*2)|0)%2)text('!',Math.round(E.x)-1,Math.round(E.y)-30,2,'#ffd94d',null)}
 /* ================================================================
+   THE OPENING, EARNED (v8.0)
+   Will's notes: the first sprouts popped up by the Lantern and then
+   came from a garden nobody explained; things were explained too fast;
+   Louie and Erin talked over each other in the Meadow; the first fight
+   could start by accident. Now:
+   1. Sunkeep is dark. Louie finds a berry and carries it to the Great
+      Lantern. It flickers and drops three seeds into the garden.
+   2. You watch them grow there (seed, shoot, sprout) and pluck them.
+   3. Your sprouts carry berries to the Lantern and wake it (as before).
+   4. After your buddy joins, Erin walks you to the south road, and in
+      the Meadow she walks you to a calm wild buddy for your first
+      catch. No battle can start before that first catch.
+   ================================================================ */
+WSEEDPOS[0]=[208,348];WSEEDPOS[2]=[240,348];WSEEDPOS[4]=[272,348];
+/* messages stay up long enough to read */
+function swSay(s,t){W4.msg=s;W4.msgT=Math.max(t||2.2,1.4+String(s).length*.055)}
+/* ---- 1. Louie's berry ---- */
+function louFetchTick(dt){const L=louSt(),B=W4.louBerry;if(W4.lsay){W4.lsay.t-=dt;if(W4.lsay.t<=0)W4.lsay=null}
+ if(!B){W4.louFetch=3;return}
+ if(W4.louFetch===1){if(louGo(L,B.x+(lou.x<B.x?-9:9),B.y,78,dt)<4){B.held=1;W4.louFetch=2;louSay('!',1);swSnd(880,.05,1320)}}
+ else if(W4.louFetch===2){if(louGo(L,240,114,78,dt)<5){W4.louBerry=null;W4.louFetch=3;L.fx=-1;louSay('WOOF!',1.6);swSnd(700,.06,500)}}}
+function plantFirst(){SW.louFed=1;const F=W4.bf;if(!F)return;SW.seeds=SW.seeds&&SW.seeds.length?SW.seeds:[0,2,4];
+ F.buds=SW.seeds.map((ty,i)=>({type:ty,x:WSEEDPOS[ty][0],y:WSEEDPOS[ty][1],g:SCOFF?1:0,dl:1.1+i*.5}));
+ W4.arcs=SW.seeds.map((ty,i)=>({t:-i*.25,ty,tx:WSEEDPOS[ty][0],tyy:WSEEDPOS[ty][1]}));swSnd(784,.12,1175);swSave()}
+function seedGrow(dt){const F=W4.bf;if(!F)return;for(const b of F.buds)if(b.g!=null&&b.g<1){b.dl=(b.dl||0)-dt;if(b.dl>0)continue;
+ const g0=b.g;b.g=Math.min(1,b.g+dt/5.5);if(g0<1&&b.g>=1){b.glow=1;for(let i=0;i<6;i++)W4.floats.push({x:b.x+(Math.random()*12-6),y:b.y-6-Math.random()*10,txt:'*',t:.6,c:TYPES[b.type].l});swSnd(988,.05,1319)}}}
+function scIntro(){W4.louBerry={x:316,y:214,held:0};W4.louFetch=0;
+ scStart([{hold:.9},
+  {who:'ERIN',txt:"You're up! The Great Lantern went out last night. All of Sunkeep is dark."},
+  {who:'MARCUS',txt:"It runs on anything that grows, bro. Fruit, wood, stone. It just needs a first bite."},
+  {who:'ERIN',txt:'Louie found a berry. Watch him.',fn:()=>{W4.louFetch=1}},
+  {x:'lou',until:()=>W4.louFetch===3,tick:louFetchTick,max:14},
+  {x:240,y:96,hold:1.6,fn:()=>{W4.wake=1.2;swSnd(523,.3,1046)}},
+  {x:240,y:96,who:'ERIN',txt:'It flickered! Look, it is letting go of something.'},
+  {x:240,y:300,hold:1.8,fn:plantFirst},
+  {x:240,y:352,hold:2.4},
+  {x:240,y:352,who:'ERIN',txt:'Seeds. They fell in the garden. This is where sprouts grow.'},
+  {x:240,y:352,who:'MARCUS',txt:'Give them a sec. When one is grown, walk up and press A to pluck it.'},
+  {hold:.4}])}
+/* seeds draw as they grow: seed, shoot, sprout */
+function fBudDraw(o){if(o.g!=null&&o.g<1){const x=Math.round(o.x),y=Math.round(o.y),T=TYPES[o.type],gg=o.dl>0?0:o.g;
+  r('#5a3820',x-4,y,9,3);r('#3d2c1a',x-3,y+1,7,1);
+  if(gg<.34){r('#7a5230',x-1,y-2,3,2);if(((time*3)|0)%2)r('#fff3b0',x+1,y-3,1,1)}
+  else if(gg<.67){const h=2+Math.round((gg-.34)*12);r('#2c6030',x,y-h,1,h);r('#58b848',x-2,y-h,2,1);r('#58b848',x+1,y-h-1,2,1)}
+  else{r('#2c6030',x,y-6,1,6);r(T.d,x-2,y-9,5,4);r(T.c,x-1,y-9,3,3)}return}
+ fBudDraw0(o)}
+function fBudDraw0(o){const x=Math.round(o.x),y=Math.round(o.y),T=TYPES[o.type],sw=Math.round(Math.sin(time*3+o.x)*1);
+ if(o.glow){const fl=.5+.5*Math.sin(time*4+o.x);g.globalAlpha=.18+.14*fl;r(T.l,x-9,y-14,19,18);g.globalAlpha=.3+.2*fl;r('#fff3b0',x-5,y-11,11,12);g.globalAlpha=1}
+ r('#5a3820',x-4,y,9,3);r('#3d2c1a',x-3,y+1,7,1);r('#2c6030',x,y-6,1,6);r(T.c,x-3+sw,y-9,3,3);r(T.c,x+1+sw,y-10,3,3);r(T.l,x-2+sw,y-9,1,1);
+ if(((time*2+o.x)|0)%2)r('#fff3b0',x+5,y-12,1,1)}
+function wNearExtra(px,py){const F=W4.bf;if(!F)return null;for(const b of F.buds)if(Math.hypot(px-b.x,py-b.y)<18)
+  return b.g==null||b.g>=1?{k:'fbud',b,txt:'PLUCK'}:{k:'sproutinfo',txt:'GROWING',x:b.x,y:b.y,msg:'Still growing. Give it a moment.'};return null}
+function opGoal0(){const F=W4.bf;if(!SW.louFed)return'Watch Louie';if(F&&F.buds.length&&F.buds.every(b=>b.g!=null&&b.g<1))return'The sprouts are growing in the garden';return'Pluck the sprouts in the garden'}
+function wBaseArrive(from){const F=W4.bf;P3.x=240;P3.ax=0;P3.ay=-1;P3.y=from==='MEADOW'?(W4.wh||520)-38:SW.lit?152:170;
+ lou.x=P3.x-24;lou.y=P3.y+8;W4.part={x:P3.x+16,y:P3.y+6};for(const s of F.sq){s.x=P3.x+(Math.random()*24-12);s.y=P3.y+10+Math.random()*10}
+ if(SW.quest<2&&!SW.lit){if(!SW.seeds)SW.seeds=[0,2,4];
+  F.buds=SW.louFed?SW.seeds.map(ty=>({type:ty,x:WSEEDPOS[ty][0],y:WSEEDPOS[ty][1],glow:1,g:1})):[];
+  for(let i=(SW.fedN||0);i<3;i++)F.items.push({k:'pel',res:'berry',n:1,w:1,x:196+i*16,y:208+(i%2)*6,car:[],op:1})}
+ if(SW.quest<2){W4.banner=null;SW.visited.BASE=1}
+ wCastInit();W4.talk=null;W4.baseArrive=from?{x:P3.x,y:P3.y}:null;W4.cam=null;wCamUpdate(P3.x,P3.y)}
+function opFx(){const B=W4.louBerry;if(B&&!B.held){r('#14101e',B.x-3,B.y-3,7,6);r('#e04838',B.x-2,B.y-2,5,4);r('#ff8070',B.x-1,B.y-2,1,1);r('#3a7d2e',B.x,B.y-4,2,2)}
+ else if(B&&B.held){const L=louSt(),x=Math.round(lou.x)+(L.fx<0?-14:11),y=Math.round(lou.y)-2;r('#14101e',x-1,y-1,5,5);r('#e04838',x,y,3,3)}
+ if(W4.arcs){for(const a of W4.arcs){a.t+=1/60;if(a.t<0)continue;const k=Math.min(1,a.t/1.1),x=240+(a.tx-240)*k,y=70+(a.tyy-70)*k-Math.sin(k*3.1416)*60,T=TYPES[a.ty];
+   for(let i=1;i<5;i++){const k2=Math.max(0,k-i*.04),x2=240+(a.tx-240)*k2,y2=70+(a.tyy-70)*k2-Math.sin(k2*3.1416)*60;g.globalAlpha=.6-i*.12;r(T.l,Math.round(x2),Math.round(y2),2,2)}
+   g.globalAlpha=1;if(k<1){r('#ffffff',Math.round(x)-2,Math.round(y)-2,5,5);r(T.c,Math.round(x)-1,Math.round(y)-1,3,3)}}W4.arcs=W4.arcs.filter(a=>a.t<1.3)}}
+/* ---- the wake scene now that the garden is known ---- */
+function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch();for(const pb of W4.patchBuds||[])if(pb.type>=0){for(let i=0;i<5;i++)W4.floats.push({x:pb.x+(Math.random()*14-7),y:pb.y-4-Math.random()*12,txt:'*',t:.5+Math.random()*.6,c:TYPES[pb.type].l})}swSnd(784,.12,1568)};
+ scStart([
+  {x:240,y:70,hold:1.9,fn:()=>{for(const c of WCHOICE){c.x=-200;c.y=-200}W4.wake=3;W4.banner=null;swSnd(523,.35,1046)}},
+  {x:240,y:70,who:'ERIN',txt:'It is awake! Your sprouts did that, with the berries they carried.'},
+  {x:240,y:352,hold:1.5},
+  {x:240,y:352,hold:1.1,fn:pop},
+  {x:240,y:352,who:'ERIN',txt:'Now it is lit, the garden grows sprouts on its own. Pluck them when they are grown.'},
+  {x:240,y:352,who:'MARCUS',txt:'Every four things you carry home, the Lantern grows one more. Free sprouts, bro.'},
+  {who:'MARCUS',txt:'The light reached the wilds too. Three buddies are on their way. Pick one.'}
+ ],()=>{W4.choiceT=0;W4.banner={txt:'THE LANTERN STIRS',sub:'Three dim buddies are coming',t:3.5}})}
+/* ---- 4a. Erin walks you to the south road ---- */
+function bwTick(dt){if(SCOFF||W4.sector!=='BASE'||SW.quest!==2||!SW.lessons.scSend||!SW.lessons.loop||W4.scene||state!=='g4world')return;const st=SW.bwalk||0;if(st>=2&&!W4.bwHold)return;
+ const c=(W4.cast||[]).find(q=>q.who==='ERIN');if(!c)return;const gy=(W4.wh||520)-60,dp=Math.hypot(P3.x-c.x,P3.y-c.y);
+ if(st===0){W4.bwT=(W4.bwT||0)+dt;if(W4.bwT<1.2)return;W4.bwHold=1;scStart([{who:'ERIN',txt:"Ready for the wilds? I'll walk you to the Meadow. Stay close!"}],()=>{SW.bwalk=1;swSave()});return}
+ const go=(x,y,v)=>{const dx=x-c.x,dy=y-c.y,d=Math.hypot(dx,dy);c.mv=d>2;if(d>2){const s=Math.min(d*5,v);c.x+=dx/d*s*dt;c.y+=dy/d*s*dt;c.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}c.tx=c.x;c.ty=c.y;c.t=5;return d};
+ if(st===1){const behind=Math.hypot(P3.x-240,P3.y-gy)>Math.hypot(c.x-240,c.y-gy)+20;if(dp>80&&behind){c.mv=false;c.tx=c.x;c.ty=c.y;c.t=5;c.dir=[P3.x>c.x?1:-1,0];return} /* waits only when you fall behind */
+  if(go(240,gy,dp<40?80:62)<4&&dp<70){scStart([{who:'ERIN',txt:'The south road. The Meadow is just through here. Walk on down, I will meet you on the other side!'}],()=>{SW.bwalk=2;swSave()})}return}
+ if(st===2){go(240,gy+40,50);c.tx=c.x;c.ty=c.y}}
+/* ---- 4b. the Meadow walk, with your first catch first ---- */
+function scMeadow(F){SW.lessons.scMeadow=1} /* Erin covers the Meadow now; Louie keeps quiet */
+function ewTame(F){let wd=W4.wilds.find(w=>w.tame);if(wd)return wd;const sec=wSector(F.id),gr=F.grass.slice().sort((a,b)=>Math.hypot(a[0]*FT-F.start.x,a[1]*FT-F.start.y)-Math.hypot(b[0]*FT-F.start.x,b[1]*FT-F.start.y))[3]||F.grass[0];
+ if(!gr)return null;wd=fSpawnWild(F,sec);wd.x=wd.tx=gr[0]*FT+8;wd.y=wd.ty=gr[1]*FT+10;wd.lv=sec.lv[0];wd.tame=1;W4.wilds.push(wd);return wd}
+function ewTarget(F,st){if(st===1){const wd=ewTame(F);return wd?ewNear(F,wd.x+30,wd.y+6):null}
+ if(st===3){const b=F.buds.find(b2=>b2.type===1);return b?ewNear(F,b.x+16,b.y+4):null}
+ if(st===5){const gt=F.gates.find(g2=>g2.type===1&&!g2.open);return gt?ewNear(F,gt.x+18,gt.y+22):null}
+ if(st===7){const s=F.sites.find(s2=>!s2.done);return s?ewNear(F,s.x,s.y-30):null}
+ if(st===9)return ewNear(F,P3.x+20,P3.y);return null}
+const EW2={
+ 1:["ERIN: There. A wild buddy, out in the grass. See its tag? Level 2.","ERIN: Face it and press A. Each sprout you throw fills its bar.","ERIN: Fill the bar and it blooms and joins you. Take your time. It won't run."],
+ 3:["ERIN: Now, sprouts. They are not all the same. See that one poking out? That's a PEB.","ERIN: Walk up to it and press A to pluck it."],
+ 5:["ERIN: A boulder wall. Only PEB sprouts can crack rock.","ERIN: Face it and press A. Throw a few if it's tough."],
+ 7:["ERIN: Sprouts build, too. See the planks out in the water?","ERIN: Face them and press A. A few sprouts make a bridge."],
+ 9:["ERIN: That's the Meadow. Every kind of sprout has its own job.","ERIN: Bugs live out here too. Throw a sprout at one and it goes in your jar. It's in the START menu.","ERIN: I'll be at Sunkeep. Explore! Carry things home!"]};
+const EWDONE={2:["ERIN: Your first catch! It walks with you now.","ERIN: Buddies can fight, too. Stand next to a wild one and press SELECT to battle it. Battles make them stronger.","ERIN: Not now, though. Come on, there's more to see."],
+ 4:["ERIN: There. A PEB walks with you now. Over this way!"],6:["ERIN: Ha! The rock never stood a chance. One more thing."],8:["ERIN: A bridge! Whatever's on that island is yours."]};
+function ewTick(F,dt){if(SCOFF||F.id!=='MEADOW'||wOp()<3||W4.scene||F.dlg||F.spot)return;SW.lessons.scMeadow=1;const st=SW.walk2||0;
+ if(SW.quest<3&&st>=1){const tm=W4.wilds.find(w=>w.tame);if(tm)for(const w of W4.wilds)if(w!==tm&&!(w.lat&&w.lat.length)&&Math.hypot(w.x-tm.x,w.y-tm.y)<110)w.gone=1;W4.wilds=W4.wilds.filter(w=>!w.gone)} /* the lesson buddy has the grass to itself */if(st>=10&&!(W4.ew&&W4.ew.leave))return;
+ if(!W4.ew||W4.ewFor!==F){W4.ewFor=F;const p=ewNear(F,P3.x-24,P3.y+10);W4.ew={x:p.x,y:p.y,dir:[0,1],mv:false,t:0}}
+ const E=W4.ew,go=(x,y,v)=>{const dx=x-E.x,dy=y-E.y,d=Math.hypot(dx,dy);E.mv=d>2;if(d>2){const s=Math.min(d*5,v);E.x+=dx/d*s*dt;E.y+=dy/d*s*dt;E.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}return d};
+ if(E.leave){if(go(F.start.x,F.start.y-10,70)<4)W4.ew=null;return}
+ const dp=Math.hypot(P3.x-E.x,P3.y-E.y);if(dp>230){const p=ewNear(F,P3.x-30,P3.y);E.x=p.x;E.y=p.y}
+ if(st===0){if(SW.quest>=3){SW.walk2=3;return}fTalk(F,'ERIN',["ERIN: You made it! Welcome to the Meadow.","ERIN: First things first: let's get you a buddy. Follow me."],()=>{SW.walk2=1;swSave()});return}
+ if(st%2===1){const tg=ewTarget(F,st);if(!tg){SW.walk2=st===9?10:st+2;return}
+  if(dp>80&&Math.hypot(P3.x-tg.x,P3.y-tg.y)>Math.hypot(E.x-tg.x,E.y-tg.y)+20){E.mv=false;E.wait=1;E.dir=[P3.x>E.x?1:-1,0];return}E.wait=0;
+  if(go(tg.x,tg.y,62)<4){E.mv=false;E.dir=[P3.x>E.x?1:-1,0];if(dp<70)fTalk(F,'ERIN',EW2[st],()=>{SW.walk2=st+1;if(st===9){SW.walk2=10;E.leave=1}swSave()})}return}
+ E.mv=false;E.t+=dt;E.dir=[P3.x>E.x?1:-1,0];
+ const done=st===2?SW.quest>=3:st===4?!F.buds.some(b=>b.type===1):st===6?!F.gates.some(g2=>g2.type===1&&!g2.open):st===8?!F.sites.some(s=>!s.done):true;
+ if(done){if(st===2)for(const w of W4.wilds)w.tame=0;fTalk(F,'ERIN',EWDONE[st],()=>{SW.walk2=st+1;swSave()});E.t=0;return}
+ if(E.t>75&&st!==2){E.t=0;fTalk(F,'ERIN',["ERIN: No rush. I'll wait right here."],()=>{})}}
+function ewDraw(){const E=W4.ew;if(!E)return;fChibi(Math.round(E.x),Math.round(E.y)+3,FLOOK.ERIN,E.dir,E.mv);
+ const st=SW.walk2||0;if(E.wait||(!E.mv&&!E.leave&&st%2===0&&st<10))if(((time*2)|0)%2)text('!',Math.round(E.x)-1,Math.round(E.y)-30,2,'#ffd94d',null)}
+/* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */
 function g4Update(dt){switch(state){
@@ -10487,7 +10608,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={noBugs:v=>{WNOBUG=v},walk:()=>({st:SW.walk||0,ew:W4.ew}),bugs:()=>W4.bugs||[],bugCatch:b=>bgCatch(b),bugCatch:b=>bgCatch(b),lst:()=>louSt(),louPet:()=>louPetOK(),noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={cast:()=>W4.cast,noBugs:v=>{WNOBUG=v},walk:()=>({st:SW.walk||0,ew:W4.ew}),bugs:()=>W4.bugs||[],bugCatch:b=>bgCatch(b),bugCatch:b=>bgCatch(b),lst:()=>louSt(),louPet:()=>louPetOK(),noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},

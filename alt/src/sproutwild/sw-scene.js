@@ -10,10 +10,12 @@ function scStart(steps,done){if(SCOFF){for(const s of steps)if(s.fn)s.fn();if(do
 function scNext(){const sc=W4.scene;sc.i++;sc.t=0;const st=sc.steps[sc.i];
  if(!st){W4.scene=null;if(sc.done)sc.done();if(!W4.fld)wCamUpdate(P3.x,P3.y);return}if(st.fn)st.fn()}
 function scTick(dt){const sc=W4.scene,st=sc.steps[sc.i];sc.t+=dt;
- const tx=st.x==null?P3.x:st.x,ty=st.y==null?P3.y:st.y,k=Math.min(1,dt*3.4);sc.x+=(tx-sc.x)*k;sc.y+=(ty-sc.y)*k;
+ if(st.tick)st.tick(dt);
+ const tx=st.x==='lou'?lou.x:st.x==null?P3.x:st.x,ty=st.x==='lou'?lou.y:st.y==null?P3.y:st.y,k=Math.min(1,dt*3.4);sc.x+=(tx-sc.x)*k;sc.y+=(ty-sc.y)*k;
  for(const f of W4.floats)f.t-=dt;W4.floats=W4.floats.filter(f=>f.t>0);
- if(!W4.fld){if(wOp()===2)for(const c of WCHOICE){c.x=-200;c.y=-200}wCamUpdate(sc.x,sc.y);if(W4.patchBuds&&SW.tendDone)wPatchUpdate(dt)}
+ if(!W4.fld){if(wOp()===2)for(const c of WCHOICE){c.x=-200;c.y=-200}wCamUpdate(sc.x,sc.y);seedGrow(dt);if(W4.patchBuds&&SW.tendDone)wPatchUpdate(dt)}
  if(pressed('start')){for(let j=sc.i+1;j<sc.steps.length;j++)if(sc.steps[j].fn)sc.steps[j].fn();sc.i=sc.steps.length;scNext();return}
+ if(st.until){if(st.until()||sc.t>(st.max||15))scNext();return}
  if(st.txt){if(sc.t>.45&&pressed('a')){swSnd(660,.04,880);scNext()}}else if(sc.t>=(st.hold||1.2))scNext()}
 function scDraw(){const sc=W4.scene,st=sc.steps[sc.i];if(!st)return;
  r('#0a0e08',0,0,W,12);r('#0a0e08',0,H-12,W,12);
@@ -87,7 +89,7 @@ function scAuto(){if(!SCOFF&&kindCheck())return;
  if(F&&F.id==='MEADOW'&&!SW.lessons.scMeadow&&SW.quest>=2){F.scT=(F.scT||0)+1;if(F.scT>20)scMeadow(F)}}
 /* a seed of light arcs from the Lantern to you when it grows a sprout */
 function scSeed(ty){(W4.seedFx=W4.seedFx||[]).push({t:0,ty})}
-function scWorldFx(){scArrow();scDabFx();if(!W4.seedFx)return;for(const fx of W4.seedFx){fx.t+=1/60;const k=Math.min(1,fx.t/1.1),x=240+(P3.x-240)*k,y=40+(P3.y-8-40)*k-Math.sin(k*3.1416)*46,T=TYPES[fx.ty];
+function scWorldFx(){opFx();scArrow();scDabFx();if(!W4.seedFx)return;for(const fx of W4.seedFx){fx.t+=1/60;const k=Math.min(1,fx.t/1.1),x=240+(P3.x-240)*k,y=40+(P3.y-8-40)*k-Math.sin(k*3.1416)*46,T=TYPES[fx.ty];
   for(let i=1;i<5;i++){const k2=Math.max(0,k-i*.035),x2=240+(P3.x-240)*k2,y2=40+(P3.y-8-40)*k2-Math.sin(k2*3.1416)*46;g.globalAlpha=.6-i*.12;r(T.l,Math.round(x2),Math.round(y2),2,2)}
   g.globalAlpha=1;r('#ffffff',Math.round(x)-2,Math.round(y)-2,5,5);r(T.c,Math.round(x)-1,Math.round(y)-1,3,3)}
  W4.seedFx=W4.seedFx.filter(fx=>fx.t<1.1)}

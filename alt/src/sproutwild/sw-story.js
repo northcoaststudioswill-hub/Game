@@ -26,7 +26,7 @@ const WSEEDPOS={0:[206,126],2:[240,134],4:[274,126]};
 const wLit=()=>!!SW.lit||SW.quest>=2;
 const wOp=()=>SW.quest>=2?3:SW.lit?2:(SW.seeds&&SW.seeds.length)?0:1;
 function wQuestText(){const op=wOp();
- if(op===0)return'Pluck the glowing seeds';
+ if(op===0)return opGoal0();
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
  if(SW.quest===2)return W4.fld?'A: throw sprouts at a wild buddy':'Take the south road to the Meadow';
@@ -148,7 +148,7 @@ WRECIPES.splice(1,0,{id:'pouch',n:'SEED POUCH',cost:{fiber:4,wood:4},need:18,d:'
    v5.7 — after the first catch (found by playing on)
    ================================================================ */
 if(!SW.gear)SW.gear={};
-WBASEMS[1][2][1]='Put 1 worker to work';WBASEMS[2][2][1]='Put 3 workers to work';
+/* v8.0: the mission names are set in sw-module.js; the old worker missions are gone */
 function wWorkerCount(){return SW.crew.filter(c=>c.job!==-1).length+SW.party.slice(1).length+SW.box.length}
 function wMissionDone(key){const [k,v]=key.split(':');
  if(k==='build')return SW.buildings.some(b=>b.k===v);
@@ -158,7 +158,7 @@ function wMissionDone(key){const [k,v]=key.split(':');
  if(k==='hearts')return SW.heartsTotal>=+v;return false}
 /* past the opening the strip shows the next thing the base needs, so there is always a direction */
 function wQuestText(){const op=wOp();
- if(op===0)return'Pluck the glowing seeds';
+ if(op===0)return opGoal0();
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
  if(SW.quest===2)return W4.fld?'A: throw sprouts at a wild buddy':'Take the south road to the Meadow';

@@ -21,6 +21,19 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v8.0 · 2026-11-16 · an opening you earn
+
+Will's notes: the first sprouts popped up by the Lantern and then came from a garden nobody explained; things were explained too fast and one message vanished almost at once; in the Meadow Louie talked about catching and then Erin arrived, which was confusing; Erin should lead you out after the base basics and hold your hand; the first battle could start by accident; some menus were cut off; growing sprouts should look like they grow.
+
+New `sw-open2.js`:
+- **Earn the first sprouts.** Sunkeep starts dark. Erin and Marcus explain the Lantern runs on what grows; Louie finds a berry, carries it to the Great Lantern, and it flickers. Three seeds arc from it into the garden.
+- **Sprouts grow where they will keep growing.** The first seeds land in the garden plots and visibly grow: seed, shoot, then sprout, before you can pluck them ("GROWING" if you try early). The goal line follows along (Watch Louie, The sprouts are growing, Pluck the sprouts in the garden). The wake scene now says the lit Lantern lets the garden grow on its own.
+- **Erin walks you out.** After the base lessons she says "Ready for the wilds? Stay close!" and walks you down to the south road, waiting if you fall behind, then sends you through.
+- **One voice in the Meadow.** Louie's Meadow scene is gone; Erin meets you instead and walks you to a calm Lv2 wild buddy that stays put and has the grass to itself. She explains the bar, you fill it, and the first catch always blooms. Before that first catch no battle can start: no battle prompt, no SELECT fight, and a wild that shakes off your sprouts just waits for more instead of fighting. After it, Erin explains SELECT battles, then carries on with the PEB, the boulder wall, the bridge and bugs.
+- **Messages stay up long enough to read**: every message's time now scales with its length.
+- **Menus**: the work board lists missions as rows instead of a cramped footer, the stale AXE/PICK counts are gone, the missions show the current names, and Erin's keeper line fits. "An EMBER sprout" reads properly.
+- Tests: 111 checks pass. Real-time run from the title through Louie's berry, the seeds growing, plucking, berries, the wake, the starter, the cards, Erin's escort to the south road and the guided first catch.
+
 ## v7.9 · 2026-11-16 · bugs, Erin's Meadow walk, sprout kinds one at a time
 
 Will's ask: a bug collecting system whose bugs make resources or trade for currency; more hand-holding through the first area (the bridge, PEB as a special sprout); sprout kinds introduced slower; more lore; characters walking you places.

@@ -159,11 +159,11 @@ function drawTools(){swShell('TINKER BENCH','B  DONE');if(!SW.craftQ)SW.craftQ=[
  const qs=q.length?'QUEUE: '+q.map((x,i)=>WRECIPES.find(rc=>rc.id===x.id).n+(i===0?' '+Math.floor(100*x.done/x.need)+'%':'')).join(' · '):'Queue empty.';
  swRows(rows,swSel,(swSel<WRECIPES.length?WRECIPES[swSel].d+' ':'')+qs+' · Buddies at home build it. Stand at the bench and you and your sprouts help.')}
 /* ---------------- the work board ---------------- */
-function baseUpdate(){const n=(W4.wk||[]).length+1;swNav(n);if(pressed('a')||pressed('b'))state='g4world'}
+function baseUpdate(){const ms=WBASEMS[SW.baseLv],n=(W4.wk||[]).length+1+(ms?ms.length:0);swNav(n);if(pressed('a')||pressed('b'))state='g4world'}
 function drawBase(){swShell('SUNKEEP WORK BOARD','BASE LV '+SW.baseLv);wkSync();
- const ms=WBASEMS[SW.baseLv],done=ms?ms.filter(([k])=>wMissionDone(k)).length:0,rows=[{a:ms?'MISSIONS '+done+'/'+ms.length:'BASE FULLY GROWN',b:'♥ '+SW.hearts+' · AXE '+SW.tools.axe+' PICK '+SW.tools.pick}];
+ const ms=WBASEMS[SW.baseLv],done=ms?ms.filter(([k])=>wMissionDone(k)).length:0,rows=[{a:ms?'MISSIONS '+done+'/'+ms.length:'BASE FULLY GROWN',b:'♥ '+SW.hearts}];if(ms)for(const [k,l] of ms)rows.push({a:(wMissionDone(k)?'✓ ':'· ')+l,b:wMissionDone(k)?'done':''});const nm=rows.length;
  const job=w=>{const tk=w.task;return!tk?'thinking':tk.k==='sleep'?'asleep':tk.k==='idle'?(tk.noroof?'needs a cottage':'resting'):tk.k==='haul'?'hauling':tk.k==='chop'?(tk.nd.k==='tree'?'chopping':'mining'):tk.k==='crop'?'harvesting':tk.k==='craft'?'crafting':tk.k==='tend'?'tending':wBuildDef(tk.b.k).n.toLowerCase()};
  for(const w of W4.wk)rows.push({a:wkName(w)+(w.kind==='b'?' Lv'+w.ref.lv:''),b:job(w)});
- const sel=Math.min(swSel,rows.length-1),w=W4.wk[sel-1];
- swRows(rows,sel,sel===0?(ms?ms.map(([k,l])=>(wMissionDone(k)?'✓ ':'· ')+l).join('  '):'Everything is built. For now.'):
+ const sel=Math.min(swSel,rows.length-1),w=W4.wk[sel-nm];
+ swRows(rows,sel,sel<nm?(ms?'Finish every mission, then ask the Great Lantern to grow. Home buddies are listed below.':'Everything is built. For now.'):
   'SKILLS: '+wkSkillStr(w)+'. Work XP '+(w.ref.wxp||0)+'/40'+((w.ref.wxp||0)>=40?' (skills +1)':'')+'. '+(w.kind==='b'?'Buddies at home pick their own jobs by skill.':'Pinned to its building; it also hauls what it makes.')+(W4.wk.length?'':''))}

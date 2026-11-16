@@ -313,7 +313,7 @@ const WSECTORS=[
 function wSector(id){return WSECTORS.find(s=>s.id===id)}
 const WKEEPERS={
  WILL:{pas:'Lantern Charm: catch +15%',act:'SELFIE FLASH',actD:'Dazzled foe: ATK down, loses a turn.'},
- ERIN:{pas:'Green Hands: +1 yield, heal wins',act:'TOWEL WHIP',actD:'Damage + the foe loses its turn.'},
+ ERIN:{pas:'Green Hands: +1 yield',act:'TOWEL WHIP',actD:'Damage + the foe loses its turn.'},
  MARCUS:{pas:'Drill Sergeant: hits +12%',act:'HYDRO JET',actD:'A pressurized DEW blast.'}};
 const WTALK={PIP:['A wild ZIPWIG chased me home once. It just wanted my sandwich, I think.','When I grow up I want a whole FORTUNE sprout. They bring luck AND snacks.','The gym leader? That is Ranger. He is tough but he shares his berries.'],
  ELDER:['Lantern Town was three tents and a dream when I was your size, keeper.','A good base is a garden and a workshop at once. Tend both.','The Sigils are old promises. Ranger keeps the first, down at the gym.'],WILL:["I catalog every sprout in this valley. Twice.","The Lantern chose us. No pressure or anything.","If Marcus asks, I was absolutely working."],
@@ -1418,7 +1418,7 @@ function wMoveTo(o,tx,ty,sp,dt,arr){const dx=tx-o.x,dy=ty-o.y,d=Math.hypot(dx,dy
 function wPatchYield(pb){pb.dlv=(pb.dlv||0)+1;
  if(pb.dlv>=3&&!pb.crew&&SW.crew.length<wCrewCap()){const ty=pb.type;SW.crew.push({type:ty,dlv:3,wxp:0,job:-1,atPatch:true});
   pb.crew=true;pb.crewIx=SW.crew.length-1;pb.pend={txt:TYPES[ty].n+' SPROUT GREW UP — CREW!',c:'#7ee787'};
-  swSay('A '+TYPES[ty].n+' sprout joined your crew!',2.6);swSnd(784,.12,1175);swSave();return}
+  swSay(('AEIOU'.includes(TYPES[ty].n[0])?'An ':'A ')+TYPES[ty].n+' sprout joined your crew!',2.6);swSnd(784,.12,1175);swSave();return}
  const r2=Math.random(),F=(txt,c)=>{pb.pend={txt,c}};
  const bud=()=>{const bt2=(Math.random()*5)|0;SW.buds[TYPES[bt2].n]=(SW.buds[TYPES[bt2].n]||0)+1;F('sprout brought a '+TYPES[bt2].n+' SPROUT!','#7ee787')};
  if(pb.type===0){if(r2<.3){SW.res.ingot++;F('EMBER sprout smelted an INGOT!','#ffd23f')}else if(r2<.6){SW.res.wood++;F('+1 WOOD','#e8d8a8')}else{SW.res.berry++;F('+1 BERRY','#f0b8d8')}}
@@ -1996,7 +1996,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={noBugs:v=>{WNOBUG=v},walk:()=>({st:SW.walk||0,ew:W4.ew}),bugs:()=>W4.bugs||[],bugCatch:b=>bgCatch(b),bugCatch:b=>bgCatch(b),lst:()=>louSt(),louPet:()=>louPetOK(),noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={cast:()=>W4.cast,noBugs:v=>{WNOBUG=v},walk:()=>({st:SW.walk||0,ew:W4.ew}),bugs:()=>W4.bugs||[],bugCatch:b=>bgCatch(b),bugCatch:b=>bgCatch(b),lst:()=>louSt(),louPet:()=>louPetOK(),noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},
