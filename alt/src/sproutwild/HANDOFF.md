@@ -51,3 +51,19 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - Balance needing a long session: crop timing, build time, catch odds after the first, starters.
 - A second new area (Meadow's south end is a dead end); more Ohio lore (Haserot Angel, Franklin Castle...).
 - Narrow-path crowding mostly addressed (buddies trail in a line), not confirmed on phone.
+
+## Will's taste (learned over the sessions; keep doing this)
+- Playtest like a first-time player, from the title, phone-shaped screen, before calling anything done.
+  Look at the screenshots; say plainly what was and was not checked.
+- One voice at a time. Never stack messages; never a wall of text. Hand-holding beats explaining:
+  characters walk you to things and let you do them.
+- Explain slowly; nothing should flash by. Captions advance on A.
+- Marcus: "bro", "See one, send one", "That's my guy", "Dap me up", Waterworks dreams, takes credit
+  ("I supervise"). Erin: warm guide. Louie: a dog, short caps barks, like the Sprouts cartridge.
+- Big moments get cinematics in the fighter's style (cut-in on a slanted band, speed lines, slammed text).
+- Creatures and bugs come from north-east Ohio lore (Cuyahoga fire, South Bay Bessie, Grassman,
+  Melon Heads, Peninsula Python, Woollybear, Lake Erie mayflies...).
+- Inspirations: Pikmin (sprouts carry), Palworld (buddies work the base), Pokemon (catch, battle),
+  simple mobile base management (short timers, real choices like plot space).
+- Prefers working builds he can play at the artifact link after each round, plus a changelog entry
+  and screenshots for the dev board team.
