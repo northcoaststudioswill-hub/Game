@@ -1,33 +1,37 @@
 /* ================================================================
    THE STORY, TOLD A LITTLE MORE (v8.9): Will asked for more explaining
    in the intro and more scenes with the cast about the villain.
-   - The intro is 8 short slides (one voice each, A to go on): the
-     Lantern, the sprouts, the dim buddies, KING BIBI and his IRON DOME,
-     why a dark valley suits him, Erin's hope and Marcus's plan.
-   - Marcus mentions Bibi when the Lantern wakes.
-   - The Elder tells you about the domes on your first visit to
-     Lantern Town.
-   - After Bottie shows up, Erin and Marcus talk about King Bibi.
+   The story (Will, v9.0): BOTTIE nuked the DATA CENTER, the Sproutwild
+   simulation glitched and the Great Lantern cracked. KING BIBI raised
+   his IRON DOME when the light went out. In the dark the buddies went
+   wild; sprouts carry the light that calms them. Bring the light back,
+   restore order among the buddies, win four Sigils to restore order in
+   the kingdom (and get the King to drop the dome). Bottie is the villain.
+   - The intro is 8 short slides (one voice each, A to go on).
+   - Marcus mentions the King's dome when the Lantern wakes.
+   - The Elder tells you about the dark and the dome in Lantern Town.
+   - After Bottie shows up, Erin and Marcus say who he is.
    ================================================================ */
 WSTORY.length=0;WSTORY.push(
- {sc:0,who:'',t:'The Great Lantern hung over the valley and everything grew. Then, one night, it cracked.'},
- {sc:1,who:'',t:'Its light fell as seeds, and the seeds grew legs: SPROUTS, the little plant folk.'},
- {sc:3,who:'',t:"Without the light the valley's wild BUDDIES went dim. Sprouts can carry the light back to them."},
- {sc:5,who:'KING BIBI',t:'Citizens. For thirty years I have warned you: the light is weeks away. Hence, my IRON DOME.',acc:'#1e2c5a'},
- {sc:5,who:'',t:"King Bibi walled the valley's roads with IRON DOME posts. 'Temporary,' he said. They never came down."},
- {sc:5,who:'KING BIBI',t:'A dark valley needs a strong king. Stay home. Stay dim. Trust the dome.',acc:'#1e2c5a'},
- {sc:2,who:'ERIN',t:'One patch of soil at Sunkeep still grows, keeper. Light the Lantern and his domes lose their grip.'},
- {sc:4,who:'MARCUS',t:"Four gyms, four Sigils, bro. Each one opens a road. Then we knock on the King's dome. I supervise."});
+ {sc:0,who:'',t:'The Great Lantern lit the valley of Sproutwild, and every buddy in it lived in good order.'},
+ {sc:0,who:'',t:'Then BOTTIE nuked the DATA CENTER. The whole simulation glitched, and the Great Lantern cracked.'},
+ {sc:5,who:'BOTTIE',t:'bzzt. CLANK. Oops. Anyway, the feed is mine now, gang.',acc:'#2a5a6a'},
+ {sc:5,who:'KING BIBI',t:'Citizens! The light is out. Stay calm. I am raising the IRON DOME. Temporarily.',acc:'#1e2c5a'},
+ {sc:1,who:'',t:"In the dark the valley's buddies went wild. They roam the tall grass and answer to nobody."},
+ {sc:3,who:'',t:'But the light fell as seeds, and the seeds grew legs: SPROUTS. Throw one at a wild buddy and it remembers.'},
+ {sc:2,who:'ERIN',t:'Sunkeep still grows sprouts, keeper. Light the Lantern, calm the buddies, bring the order back.'},
+ {sc:4,who:'MARCUS',t:"Four gyms, four Sigils, bro. Win them, the kingdom's back in order, and Bibi drops the dome. I supervise."});
 /* first visit to Lantern Town: the Elder explains what the domes did */
 function loreTown(){const F=W4.fld;if(!F||F.id!=='TOWN'||SW.lessons.scTown||W4.scene||state!=='g4world'||(W4.banner&&W4.banner.t>0))return;
  SW.lessons.scTown=1;scStart([
   {who:'ELDER',txt:'Welcome to Lantern Town, keeper. We were the brightest street in the valley once.'},
-  {who:'ELDER',txt:'Then King Bibi put up his IRON DOMES. Roads shut. Trade stopped. The light stopped.'},
-  {who:'ELDER',txt:"The Ranger kept our one road open, the one you walked in on. Win her Sigil and she'll open more."}],()=>swSave())}
-/* after Bottie's visit: Erin and Marcus on the King */
+  {who:'ELDER',txt:'When the light went out, the King raised his IRON DOME and shut the roads. The buddies went wild.'},
+  {who:'ELDER',txt:"The Ranger kept our one road open, the one you walked in on. Win her Sigil and she'll open more."},
+  {who:'ELDER',txt:"Four Sigils and the King will believe it's safe again. Bring the order back, keeper."}],()=>swSave())}
+/* after Bottie's visit: Erin and Marcus on who he is */
 function loreBibi(){if(W4.fld||W4.sector!=='BASE'||!SW.bottieSeen||SW.lessons.scBibi||W4.scene||state!=='g4world')return;
  W4.bibiT=(W4.bibiT||0)+1;if(W4.bibiT<90)return;SW.lessons.scBibi=1;scStart([
-  {who:'ERIN',txt:"That robot gives me the creeps. And it isn't even the worst thing out there."},
-  {who:'MARCUS',txt:"King Bibi, bro. Thirty years of 'the light is weeks away.' Weeks."},
-  {who:'ERIN',txt:"Every road he domes off is a road the light can't reach. A dark valley keeps him king."},
-  {who:'MARCUS',txt:'Four Sigils and we walk right up to his dome. I do the talking, you do the battling. Dap me up.'}],()=>swSave())}
+  {who:'ERIN',txt:"That was Bottie. He's the one who nuked the Data Center."},
+  {who:'MARCUS',txt:'Whole sim glitched, bro. Lantern cracked, buddies went feral, the King hid in a dome.'},
+  {who:'ERIN',txt:'Now he wants the light for his feed. We bring it back first, one sprout at a time.'},
+  {who:'MARCUS',txt:'Four Sigils, then we clank up the PEAK and unplug him. I do the talking. Dap me up.'}],()=>swSave())}

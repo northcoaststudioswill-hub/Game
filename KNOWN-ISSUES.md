@@ -2,7 +2,7 @@
 
 Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v8.9)
+## Sproutwild (cartridge 5, v9.0)
 
 ### Known bugs
 - "BERRIES planted" stayed up 16 s in one run (too long, not too short). Not looked into yet.

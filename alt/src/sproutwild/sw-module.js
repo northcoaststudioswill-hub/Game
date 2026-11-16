@@ -1006,6 +1006,7 @@ function confirmUpdate(){if(pressed('a')){const cf=W4.confirm;W4.confirm=null;if
  else if(pressed('b')){const b2=W4.confirm?W4.confirm.back:'g4world';W4.confirm=null;state=b2}}
 const WBOTTPAGES=['BOTTIE: bzzt. CLANK. Look at this little light show, gang.',
  'BOTTIE: I run the feed up there. Every spark of this valley’s light trends through ME.',
+ 'BOTTIE: The Data Center? Upgrade, gang. Your little sim runs on MY rules now. Clank.',
  'BOTTIE: You relight that Lantern, keeper, and the whole sky watches. I intend to collect.',
  'BOTTIE: Grow strong. Clank up to the PEAK when you’re ready. I’ll be smiling.',
  'LOUIE: ...woof. (He does NOT like him. At all.)'];

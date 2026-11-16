@@ -3,6 +3,13 @@
 Read this first in a new session. Details live in `CHANGELOG.md` (newest at top),
 `DESIGN-v7.md` (research and system decisions) and `PLAYTEST-NOTES*.md`.
 
+## The story (Will, v9.0)
+- BOTTIE is the villain: he nuked the DATA CENTER, the Sproutwild simulation glitched and the Great Lantern cracked.
+- KING BIBI is the king: when the light went out he raised the IRON DOME ("temporarily") and shut the roads.
+- In the dark the buddies went wild. Sprouts carry the light that calms them and restores order.
+- Goal: bring the light back, restore order among the buddies, win four Sigils to restore order in the kingdom;
+  then the King drops the dome and the Peak road opens to Bottie. Tone: warm Erin, Marcus "bro", Bottie "bzzt, clank, gang".
+
 ## Ground rules from Will
 - Branch for v8.1: `claude/sproutwild-v8.1`, made from `main` (earlier rounds used `claude/festive-knuth-f30w4u`).
   Commit locally; **push only when Will says "push"** (plain push, never force). Merge to main only when asked.
@@ -138,6 +145,8 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
 - v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
   "FOUND ONE!" bubble stays on screen.
+- v9.0: the story reworked to Will's lore (Bottie the villain, Bibi the king behind his dome) across the intro,
+  scenes, Bottie, the King's fight, his guards and the guide.
 - v8.9: sw-lore.js (8-slide intro, Elder and Erin/Marcus scenes about KING BIBI), full-garden hint, scenes no
   longer wait behind chatter, gym scene anywhere after the crop.
 - v8.8: first Sigil cinematic (sw-sigil.js, state g4sigil), Ranger's roads-open line, rest/travel split at posts,

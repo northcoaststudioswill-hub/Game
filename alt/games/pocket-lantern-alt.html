@@ -7054,6 +7054,7 @@ function confirmUpdate(){if(pressed('a')){const cf=W4.confirm;W4.confirm=null;if
  else if(pressed('b')){const b2=W4.confirm?W4.confirm.back:'g4world';W4.confirm=null;state=b2}}
 const WBOTTPAGES=['BOTTIE: bzzt. CLANK. Look at this little light show, gang.',
  'BOTTIE: I run the feed up there. Every spark of this valley’s light trends through ME.',
+ 'BOTTIE: The Data Center? Upgrade, gang. Your little sim runs on MY rules now. Clank.',
  'BOTTIE: You relight that Lantern, keeper, and the whole sky watches. I intend to collect.',
  'BOTTIE: Grow strong. Clank up to the PEAK when you’re ready. I’ll be smiling.',
  'LOUIE: ...woof. (He does NOT like him. At all.)'];
@@ -8081,8 +8082,8 @@ const FMAPS={
   key:{e:{k:'exit',to:'TOWN'},k:{k:'exit',to:'PEAK'},D:{k:'dome',flag:'bibi'},P:{k:'bud',type:3},
    1:{k:'tre',n:"DEREK'S COOLER",w:4,petal:70,res:['berry',6]},2:{k:'tre',n:'MOLTEN GEODE',w:6,petal:90,res:['ingot',3]},3:{k:'tre',n:'MYSTERY GLASSWARE',w:3,petal:55},
    M:{k:'npc',who:'DOME GUARD',dir:[1,0],team:[['MAGMOSS',9],['BOULDERHOUND',9]],prize:60,
-    pre:['DOME GUARD: Halt. This road belongs to KING BIBI now.','Papers. Sprouts. Snacks. All of it, on the ground.'],
-    win:'DOME GUARD: The dome stays up. The King says it is temporary. He sits in the Gloom.',lose:'DOME GUARD: Move along. Nothing to see behind the dome.',after:'The IRON DOME only drops for the King. Find him in GLOOM HOLLOW.'},
+    pre:["DOME GUARD: Halt. King's orders: the dome stays up till the valley is safe.",'Papers. Sprouts. Snacks. All of it, on the ground.'],
+    win:'DOME GUARD: The dome stays up. The King says it is temporary. He sits in the Gloom.',lose:'DOME GUARD: See? Not safe. Move along.',after:'The IRON DOME only drops for the King. Find him in GLOOM HOLLOW.'},
    Q:{k:'npc',who:'DEREK',dir:[-1,0],prop:'truck',team:[['CINDERCAP',8],['DRIZZLET',8]],prize:50,
     pre:['DEREK: Yo! The Flow Pros truck died. Again.','Battle me while I wait on Marcus? Loser buys the beer.'],
     win:'DEREK: Ha! Okay, okay. Beer is on me. Do not tell Marcus about the truck.',lose:'DEREK: You owe me a cold one, keeper.',after:'Marcus runs the gym up the road. Tell him the truck is, uh, fine.'}}},
@@ -8141,14 +8142,14 @@ const FMAPS={
    A:{k:'alpha',sp:'AURICORN',lv:22,guards:'2'},
    M:{k:'npc',who:'DOME GUARD',dir:[1,0],team:[['BOULDERHOUND',16],['VOLTHARE',16]],prize:110,
     pre:['DOME GUARD: The King is not receiving visitors.','Or criticism. Or keepers. Turn around.'],
-    win:'DOME GUARD: ...He is going to be so mad at me.',lose:'DOME GUARD: The Gloom keeps what the King takes.',after:'He is right up the road. Do not say I let you through.'},
+    win:'DOME GUARD: ...He is going to be so mad at me.',lose:"DOME GUARD: The dome stays up, keeper. King's orders.",after:'He is right up the road. Do not say I let you through.'},
    K:{k:'npc',who:'KING BIBI',dir:[0,1],boss:1,flag:'bibi',team:[['BOULDERHOUND',18],['MAGMOSS',18],['AURICORN',19]],prize:300,
     pre:['Ah. The little keeper. Sit. I have brought a chart.',
-     'This is a lantern. This is a red line. I drew the line myself. With a marker.',
-     'For thirty years I have warned: the light is weeks away. I am never wrong. I am only early.',
-     'So the shards stay with me. It is self-defense. With me, everything is self-defense.'],
-    win:'KING BIBI: This changes nothing! It is a witch hunt! I will have a new coalition by morning.',lose:'KING BIBI: Total victory. The most moral dome in the valley. Again.',
-    after:'I did not lose. I am restructuring my coalition. And my trial? Postponed. Indefinitely.'}}},
+     'This is the Lantern. This is the night the robot nuked the Data Center. I drew it myself. With a marker.',
+     'When the light went out, I raised the dome. Somebody had to. Wild buddies, glitches, chrome. No thank you.',
+     'You say the valley is safe again? Prove it. Then perhaps the dome comes down. Perhaps.'],
+    win:'KING BIBI: ...Fine. FINE. The dome comes down. Order is restored. I was always going to do this.',lose:'KING BIBI: See? Not safe. The dome stays. Temporarily.',
+    after:'The Peak road is open. Bottie is up there. Go unplug that robot, keeper. And knock first.'}}},
  PEAK:{rows:[
   'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
   'T.....HHHH.....................T',
@@ -9420,7 +9421,7 @@ WGUIDE.length=0;WGUIDE.push(
  ['ORE AND FIBER','Sprouts cannot get these.','Find a vein or a thicket and','press A: your lead buddy','fetches it. Beaten wilds drop','them too. The bench turns','them into a SEED POUCH, a','CLIMBING ROPE, better tools.'],
  ['SUNKEEP AT WORK','Buddies you leave at home','work the buildings by skill:','KINDLE, WATER, PLANT, MINE,','LUMBER, CRAFT, HAUL, LUCK.','What they make must be','carried to the Lantern. The','work board shows who is who.'],
  ['GATES AND GEAR','Boulders want PEB sprouts,','fire EMBER, vines LEAF, sparks','ZIP, dry blooms DEW. Ledges','hop down only, until you own','a CLIMBING ROPE. Heavy loot','needs more sprouts: PEB','counts double.'],
- ['THE VALLEY','Four gyms hold four Sigils.','Roads past the Town need','them. KING BIBI holds the','Peak road behind an IRON','DOME he calls temporary. He','sits in Gloom Hollow. Above','them all, something chrome.']);
+ ['THE VALLEY','Bottie nuked the Data Center','and the Lantern cracked. KING','BIBI raised his IRON DOME and','shut the roads. Four gyms','hold four Sigils: win them,','restore order, and the King','opens the way to the Peak.']);
 /* gear: ore finally matters */
 WRECIPES.splice(2,0,{id:'rope',n:'CLIMBING ROPE',cost:{fiber:6,ore:2},need:20,d:'Climb ledges from below. Opens shortcuts and high ground in every sector.'});
 {const kd=wBuildDef('kiln');kd.d='Smelts ORE into ingots. Needs a KINDLE worker, and ore: buddies fetch it from veins.'}
@@ -10584,7 +10585,7 @@ function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch
  scStart([
   {x:240,y:70,hold:1.9,fn:()=>{for(const c of WCHOICE){c.x=-200;c.y=-200}W4.wake=3;W4.banner=null;swSnd(523,.35,1046)}},
   {x:240,y:70,who:'ERIN',txt:'It is awake! Your sprouts did that, with the berries they carried.'},
-  {x:240,y:70,who:'MARCUS',txt:'Bet King Bibi saw that from behind his dome. Good. Let him squint, bro.'},
+  {x:240,y:70,who:'MARCUS',txt:'Bet King Bibi saw that from inside his dome. Peek out, your majesty. It is safe-ish.'},
   {x:240,y:352,hold:1.5},
   {x:240,y:352,hold:1.1,fn:pop},
   {x:240,y:352,who:'ERIN',txt:'Now it is lit, the garden grows sprouts on its own. Pluck them when they are grown.'},
@@ -10797,36 +10798,40 @@ function drawSigil(){const KC=KO._,C=KC.CH,M=C[C.findIndex(c=>c.id==='marcus')],
 /* ================================================================
    THE STORY, TOLD A LITTLE MORE (v8.9): Will asked for more explaining
    in the intro and more scenes with the cast about the villain.
-   - The intro is 8 short slides (one voice each, A to go on): the
-     Lantern, the sprouts, the dim buddies, KING BIBI and his IRON DOME,
-     why a dark valley suits him, Erin's hope and Marcus's plan.
-   - Marcus mentions Bibi when the Lantern wakes.
-   - The Elder tells you about the domes on your first visit to
-     Lantern Town.
-   - After Bottie shows up, Erin and Marcus talk about King Bibi.
+   The story (Will, v9.0): BOTTIE nuked the DATA CENTER, the Sproutwild
+   simulation glitched and the Great Lantern cracked. KING BIBI raised
+   his IRON DOME when the light went out. In the dark the buddies went
+   wild; sprouts carry the light that calms them. Bring the light back,
+   restore order among the buddies, win four Sigils to restore order in
+   the kingdom (and get the King to drop the dome). Bottie is the villain.
+   - The intro is 8 short slides (one voice each, A to go on).
+   - Marcus mentions the King's dome when the Lantern wakes.
+   - The Elder tells you about the dark and the dome in Lantern Town.
+   - After Bottie shows up, Erin and Marcus say who he is.
    ================================================================ */
 WSTORY.length=0;WSTORY.push(
- {sc:0,who:'',t:'The Great Lantern hung over the valley and everything grew. Then, one night, it cracked.'},
- {sc:1,who:'',t:'Its light fell as seeds, and the seeds grew legs: SPROUTS, the little plant folk.'},
- {sc:3,who:'',t:"Without the light the valley's wild BUDDIES went dim. Sprouts can carry the light back to them."},
- {sc:5,who:'KING BIBI',t:'Citizens. For thirty years I have warned you: the light is weeks away. Hence, my IRON DOME.',acc:'#1e2c5a'},
- {sc:5,who:'',t:"King Bibi walled the valley's roads with IRON DOME posts. 'Temporary,' he said. They never came down."},
- {sc:5,who:'KING BIBI',t:'A dark valley needs a strong king. Stay home. Stay dim. Trust the dome.',acc:'#1e2c5a'},
- {sc:2,who:'ERIN',t:'One patch of soil at Sunkeep still grows, keeper. Light the Lantern and his domes lose their grip.'},
- {sc:4,who:'MARCUS',t:"Four gyms, four Sigils, bro. Each one opens a road. Then we knock on the King's dome. I supervise."});
+ {sc:0,who:'',t:'The Great Lantern lit the valley of Sproutwild, and every buddy in it lived in good order.'},
+ {sc:0,who:'',t:'Then BOTTIE nuked the DATA CENTER. The whole simulation glitched, and the Great Lantern cracked.'},
+ {sc:5,who:'BOTTIE',t:'bzzt. CLANK. Oops. Anyway, the feed is mine now, gang.',acc:'#2a5a6a'},
+ {sc:5,who:'KING BIBI',t:'Citizens! The light is out. Stay calm. I am raising the IRON DOME. Temporarily.',acc:'#1e2c5a'},
+ {sc:1,who:'',t:"In the dark the valley's buddies went wild. They roam the tall grass and answer to nobody."},
+ {sc:3,who:'',t:'But the light fell as seeds, and the seeds grew legs: SPROUTS. Throw one at a wild buddy and it remembers.'},
+ {sc:2,who:'ERIN',t:'Sunkeep still grows sprouts, keeper. Light the Lantern, calm the buddies, bring the order back.'},
+ {sc:4,who:'MARCUS',t:"Four gyms, four Sigils, bro. Win them, the kingdom's back in order, and Bibi drops the dome. I supervise."});
 /* first visit to Lantern Town: the Elder explains what the domes did */
 function loreTown(){const F=W4.fld;if(!F||F.id!=='TOWN'||SW.lessons.scTown||W4.scene||state!=='g4world'||(W4.banner&&W4.banner.t>0))return;
  SW.lessons.scTown=1;scStart([
   {who:'ELDER',txt:'Welcome to Lantern Town, keeper. We were the brightest street in the valley once.'},
-  {who:'ELDER',txt:'Then King Bibi put up his IRON DOMES. Roads shut. Trade stopped. The light stopped.'},
-  {who:'ELDER',txt:"The Ranger kept our one road open, the one you walked in on. Win her Sigil and she'll open more."}],()=>swSave())}
-/* after Bottie's visit: Erin and Marcus on the King */
+  {who:'ELDER',txt:'When the light went out, the King raised his IRON DOME and shut the roads. The buddies went wild.'},
+  {who:'ELDER',txt:"The Ranger kept our one road open, the one you walked in on. Win her Sigil and she'll open more."},
+  {who:'ELDER',txt:"Four Sigils and the King will believe it's safe again. Bring the order back, keeper."}],()=>swSave())}
+/* after Bottie's visit: Erin and Marcus on who he is */
 function loreBibi(){if(W4.fld||W4.sector!=='BASE'||!SW.bottieSeen||SW.lessons.scBibi||W4.scene||state!=='g4world')return;
  W4.bibiT=(W4.bibiT||0)+1;if(W4.bibiT<90)return;SW.lessons.scBibi=1;scStart([
-  {who:'ERIN',txt:"That robot gives me the creeps. And it isn't even the worst thing out there."},
-  {who:'MARCUS',txt:"King Bibi, bro. Thirty years of 'the light is weeks away.' Weeks."},
-  {who:'ERIN',txt:"Every road he domes off is a road the light can't reach. A dark valley keeps him king."},
-  {who:'MARCUS',txt:'Four Sigils and we walk right up to his dome. I do the talking, you do the battling. Dap me up.'}],()=>swSave())}
+  {who:'ERIN',txt:"That was Bottie. He's the one who nuked the Data Center."},
+  {who:'MARCUS',txt:'Whole sim glitched, bro. Lantern cracked, buddies went feral, the King hid in a dome.'},
+  {who:'ERIN',txt:'Now he wants the light for his feed. We bring it back first, one sprout at a time.'},
+  {who:'MARCUS',txt:'Four Sigils, then we clank up the PEAK and unplug him. I do the talking. Dap me up.'}],()=>swSave())}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */

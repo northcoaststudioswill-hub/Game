@@ -21,6 +21,20 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v9.0 · 2026-11-16 · the story as it stands: Bottie is the villain
+
+Will set the lore: King Bibi is the king, and he raised the IRON DOME when the light went out. When the light went out the buddies began to roam wild, and someone found that sprouts bring the light back to them and restore order. The villain is BOTTIE: he nuked the DATA CENTER, which glitched the Sproutwild simulation. We use sprouts to bring the light back, restore order among the buddies, and collect the four Sigils to restore order in the kingdom.
+
+Every line that told the story was reworked to match, in the same voice (`shots/v9.0-intro.png`, `shots/v9.0-story-scenes.png`):
+- **The intro, 8 slides:** the Lantern lit the valley and every buddy lived in good order; "Then BOTTIE nuked the DATA CENTER. The whole simulation glitched, and the Great Lantern cracked."; BOTTIE: "bzzt. CLANK. Oops. Anyway, the feed is mine now, gang."; KING BIBI: "Citizens! The light is out. Stay calm. I am raising the IRON DOME. Temporarily."; in the dark the buddies went wild; the light fell as seeds that grew legs, SPROUTS, and a sprout thrown at a wild buddy makes it remember; Erin: light the Lantern, calm the buddies, bring the order back; Marcus: four gyms, four Sigils, the kingdom back in order, and Bibi drops the dome.
+- **The Lantern waking**, Marcus: "Bet King Bibi saw that from inside his dome. Peek out, your majesty. It is safe-ish."
+- **Lantern Town**, the Elder: when the light went out the King raised his dome and shut the roads, and the buddies went wild; the Ranger kept one road open; four Sigils and the King will believe it is safe again.
+- **After Bottie's visit**, Erin and Marcus: "That was Bottie. He's the one who nuked the Data Center." / the sim glitched, the Lantern cracked, the buddies went feral, the King hid in a dome / he wants the light for his feed, so we bring it back first / four Sigils, then up the PEAK to unplug him.
+- **Bottie's arrival** now owns it: "The Data Center? Upgrade, gang. Your little sim runs on MY rules now. Clank."
+- **King Bibi in Gloom Hollow** is the cautious King, not a villain: he raised the dome because somebody had to, asks you to prove the valley is safe, and when you win: "Fine. FINE. The dome comes down. Order is restored." Then: "Bottie is up there. Go unplug that robot, keeper. And knock first." His DOME GUARDS keep the roads shut "till the valley is safe".
+- **The guide's VALLEY page** tells the same story.
+- Checked: all 8 slides fit on a phone-shaped screen; the Elder, Erin/Marcus and the King's lines played and fit their boxes. Lab: 119 checks clean.
+
 ## v8.9 · 2026-11-16 · more story: the intro, the King, the cast; a full garden no longer blocks you
 
 Will: keep improving what is there (no new places); a little more explaining in the intro; more scenes with the cast; explain the villain.

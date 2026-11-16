@@ -207,7 +207,7 @@ WGUIDE.length=0;WGUIDE.push(
  ['ORE AND FIBER','Sprouts cannot get these.','Find a vein or a thicket and','press A: your lead buddy','fetches it. Beaten wilds drop','them too. The bench turns','them into a SEED POUCH, a','CLIMBING ROPE, better tools.'],
  ['SUNKEEP AT WORK','Buddies you leave at home','work the buildings by skill:','KINDLE, WATER, PLANT, MINE,','LUMBER, CRAFT, HAUL, LUCK.','What they make must be','carried to the Lantern. The','work board shows who is who.'],
  ['GATES AND GEAR','Boulders want PEB sprouts,','fire EMBER, vines LEAF, sparks','ZIP, dry blooms DEW. Ledges','hop down only, until you own','a CLIMBING ROPE. Heavy loot','needs more sprouts: PEB','counts double.'],
- ['THE VALLEY','Four gyms hold four Sigils.','Roads past the Town need','them. KING BIBI holds the','Peak road behind an IRON','DOME he calls temporary. He','sits in Gloom Hollow. Above','them all, something chrome.']);
+ ['THE VALLEY','Bottie nuked the Data Center','and the Lantern cracked. KING','BIBI raised his IRON DOME and','shut the roads. Four gyms','hold four Sigils: win them,','restore order, and the King','opens the way to the Peak.']);
 /* gear: ore finally matters */
 WRECIPES.splice(2,0,{id:'rope',n:'CLIMBING ROPE',cost:{fiber:6,ore:2},need:20,d:'Climb ledges from below. Opens shortcuts and high ground in every sector.'});
 {const kd=wBuildDef('kiln');kd.d='Smelts ORE into ingots. Needs a KINDLE worker, and ore: buddies fetch it from veins.'}
