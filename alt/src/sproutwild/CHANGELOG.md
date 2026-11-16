@@ -21,6 +21,14 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v7.4 · 2026-11-16 · base goals match the new systems; Crooked Hollow played through
+
+- **Base goals rewritten.** They still asked for "deploy a sprout worker" and a tinker bench first. Sunkeep Lv1 is now: cottage, a crop on a plot, three buddies, a kiln. Lv2: Data Center, five buddies, one Sigil, a bench. "Have N buddies" replaces "catch N species", which could not be met with duplicates under the three-buddy limit.
+- **A Melonkin is always in the Hollow when you arrive**, and it is the most common wild there. (In a first run none appeared among the four starting wilds.)
+- **The python is a real fight.** Lv11 (was 9), with a rock move in place of a defence buff, after a Lv7 fire starter beat it without taking a hit.
+- **Goal line in the field**: names the area's sleeping ALPHA when there is one, otherwise shows the home goal as "Home: ..." so it fits.
+- Verified: 104 lab checks; real-time Hollow run (Melonkin caught with six sprouts, join card, alpha prompt). The tougher python has not been fought again since the change.
+
 ## v7.3 · 2026-11-16 · the opening, timed end to end
 
 Ran the whole chain in one go, title to the garden lesson, with real key presses: every scene hands off to the next (intro, berries, Lantern waking, starter reveal, how-it-works card, buddy lesson, Meadow, first catch, build lesson, cottage, party, garden lesson). About 200 seconds in total, 77 of them watching.

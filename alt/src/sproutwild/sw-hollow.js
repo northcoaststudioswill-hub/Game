@@ -20,16 +20,16 @@ PYTHORN(D){const gn='#5a8a3a',lt='#7aaa50',yl='#e8d878';
 {const fb=["..ss..",".sggs.","sggggs",".sggs."],mk=(o,c)=>{o.spr=fb.slice();o.pal={s:'#14101e',g:c};o._old=SWSPR(o.spr,o.pal);o._spr=swbMake(WHOLLOWART[o.id]);WSPECIES.push(o)};
  mk({id:'MELONKIN',t:[4,5],hp:30,atk:10,def:9,spd:13,catch:.45,work:{PLANTING:1,FORTUNE:1},learn:[[1,'tackle'],[1,'vinelash'],[5,'sporepuff'],[8,'fortunefang'],[13,'headbutt']],
   d:'A melon-headed sprite of the old woods. Shy. Nobody goes looking for it twice.'},'#58b848');
- mk({id:'PYTHORN',t:[4],hp:46,atk:15,def:12,spd:9,catch:.25,work:{PLANTING:2},learn:[[1,'vinelash'],[1,'headbutt'],[6,'shellup'],[10,'sporepuff'],[14,'thornstorm']],
+ mk({id:'PYTHORN',t:[4],hp:46,atk:15,def:12,spd:9,catch:.25,work:{PLANTING:2},learn:[[1,'headbutt'],[1,'vinelash'],[1,'rocktoss'],[10,'sporepuff'],[14,'thornstorm']],
   d:'It slipped off a circus train in 1944 and never stopped growing.'},'#5a8a3a')}
 WSECTORS.splice(2,0,{id:'HOLLOW',n:'CROOKED HOLLOW',sub:'Old woods east of the Meadow. Something is watching.',req:0,lv:[4,7],gym:-1,pal:{g:'#4a8a48',g2:'#3e7a40',a:'#8cc86a'},
- table:[['MELONKIN',3],['FERNFANG',2],['ZIPWIG',2],['PEBBLIT',2],['DRIZZLET',1]]});
+ table:[['MELONKIN',5],['FERNFANG',2],['ZIPWIG',2],['PEBBLIT',2],['DRIZZLET',1]]});
 WSECSUB.HOLLOW='Old woods. Wilds Lv4 to 7.';
 FBIO.HOLLOW=Object.assign({},FBIO.MEADOW,{g:'#4a8a48',g2:'#3e7a40',g3:'#2e5e34',a:'#8cc86a',p:'#bfa67a',p2:'#a48a62',t1:'#1f5230',t2:'#2f7a3c',t3:'#62b858'});
 FSPOTS.HOLLOW=[[26,12,'ore'],[11,16,'fiber'],[12,12,'fiber'],[20,7,'ore']];
 FMAPS.HOLLOW={rows:["TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT", "T..W....\"\"\"\"\"\"\"\"....W.....R..T", "T......\"\"\"\"\"\"\"\"\"\"......R.....T", "T..W...\"\"\"\"\"\"\"\"\"\"..W.....1.A.T", "T.......\"\"\"\"\"\"\"\"........,....T", "T...,.........::.............T", "T.W...........::....W...W....T", "T.............::.............T", "T....B........::......\"\"\"\"\"\".T", "m:::::::::::::S:::::::\"\"\"\"\"\"pT", "m:::::::::::::::..B...\"\"\"\"\"\"\"T", "T.....W.......::......\"\"\"\"\"\".T", "T.............::.....,.......T", "T..~~~~~~.....::........R....T", "T.~~~~~~~~....:::::::::::::..T", "T.~~~~~~~~..............W.:..T", "T..~~~~~~....W....\"\"\"\"\"...:..T", "T.........,......\"\"\"\"\"\"\"..q..T", "T...W.....B......\"\"\"\"\"\"\"...R.T", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"],
  key:{m:{k:'exit',to:'MEADOW'},p:{k:'bud',type:5},q:{k:'bud',type:2},
-  1:{k:'tre',n:'CIRCUS TRUNK',w:4,petal:60,res:['ingot',2]},A:{k:'alpha',sp:'PYTHORN',lv:9,guards:'1'}}};
+  1:{k:'tre',n:'CIRCUS TRUNK',w:4,petal:60,res:['ingot',2]},A:{k:'alpha',sp:'PYTHORN',lv:11,guards:'1'}}};
 /* the Meadow's east road now leads here */
 FMAPS.MEADOW.key.j={k:'exit',to:'HOLLOW'};
 {const R=FMAPS.MEADOW.rows;for(const y of [9,10]){R[y]=R[y].slice(0,R[y].length-1)+'j'}R[9]=R[9].slice(0,20)+':'.repeat(R[9].length-21)+'j'}

@@ -355,11 +355,12 @@ const WBUILD=[
  {k:'statue',n:'LANTERN STATUE',cost:{stone:8,ingot:2},d:'Gratitude hearts drop far more often.',max:1,lock:1,price:25}];
 function wBuildDef(k){return WBUILD.find(b=>b.k===k)}
 function wWorkerCap(){return 2+(SW.baseLv-1)*2+SW.buildings.filter(b=>b.k==='pen').length*2}
-const WBASEMS={1:[['build:cottage','Build a Cottage'],['crop:1','Grow a crop on a garden plot'],['workers:1','Deploy 1 sprout worker'],['species:3','Catch 3 species']],
- 2:[['build:kiln','Build a Kiln'],['build:bench','Build a Tinker Bench'],['workers:3','Deploy 3 sprout workers'],['sigils:1','Earn 1 Sigil'],['hearts:10','Collect 10 gratitude hearts']]};
+const WBASEMS={1:[['build:cottage','Build a Cottage'],['crop:1','Grow a crop on a garden plot'],['buddies:3','Have 3 buddies'],['build:kiln','Build a Kiln (ore makes ingots)']],
+ 2:[['build:datacenter','Build a Data Center'],['buddies:5','Have 5 buddies'],['sigils:1','Earn 1 Sigil'],['build:bench','Build a Tinker Bench']]};
 function wMissionDone(key){const [k,v]=key.split(':');
  if(k==='build')return SW.buildings.some(b=>b.k===v);
  if(k==='crop')return plCrops()>=+v||SW.buildings.some(b=>b.k==='bed');
+ if(k==='buddies')return SW.party.length+SW.box.length>=+v;
  if(k==='workers')return wAssignedCount()>=+v;
  if(k==='species')return Object.keys(SW.caught).length>=+v;
  if(k==='sigils')return SW.badges.length>=+v;

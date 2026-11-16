@@ -166,9 +166,10 @@ function wQuestText(){const op=wOp();
  if(SW.quest<5)return(W4.fld&&SW.quest>=3?'At Sunkeep: ':'')+WQUEST[SW.quest];
  if(W4.fld){const ld=SW.party.find(m=>m.hp>0),sec=wSector(W4.sector);
   if(!ld||ld.hp<wStats(ld).max*.25)return'Your buddy is hurt: rest at a Lantern post';
-  if(sec.gym>=0&&!SW.gymDone[sec.gym])return'The '+WGYMS[sec.gym].leader+' gym is here: win the '+WGYMS[sec.gym].sig}
+  if(sec.gym>=0&&!SW.gymDone[sec.gym])return'The '+WGYMS[sec.gym].leader+' gym is here: win the '+WGYMS[sec.gym].sig;
+  if(SW.quest>=5&&W4.fld.alphas&&W4.fld.alphas.length)return'An ALPHA sleeps here, guarding treasure'}
  const ms=WBASEMS[SW.baseLv];if(!ms)return SW.badges.length<4?'Earn the Sigils. Free the roads.':'';
- const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?'Sunkeep Lv'+SW.baseLv+': '+nx[1]:(W4.fld?'At Sunkeep: ask':'Ask')+' the Great Lantern to grow'}
+ const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?(W4.fld?'Home: ':'Sunkeep Lv'+SW.baseLv+': ')+nx[1]:(W4.fld?'At Sunkeep: ask':'Ask')+' the Great Lantern to grow'}
 function wLampRows(){const rows=[];
  if(wBaseReady())rows.push({act:'ring',label:'GROW THE LANTERN'});
  rows.push({act:'rest',label:'REST IN THE LIGHT'},{act:'travel',label:'TRAVEL BY LANTERN LIGHT'},{act:'board',label:'WORK BOARD'});

@@ -82,7 +82,8 @@ function scAuto(){if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
   if(wOp()===0&&!SW.beats.wake){SW.beats.wake=1;SW.beats.first=1;scIntro();return}
   if(wOp()===1&&!SW.beats.three){SW.beats.three=1;SW.beats.carry=1;SW.beats.first=1;scBerries();return}
   if(wOp()===2)SW.beats.lit=1;if(SW.party.length&&!SW.lessons.scSend&&wOp()>=3&&W4.sector==='BASE'){W4.sendT=(W4.sendT||0)+1;if(W4.sendT>45)scSend()}}
- const F=W4.fld;if(F&&F.id==='MEADOW'&&!SW.lessons.scMeadow&&SW.quest>=2){F.scT=(F.scT||0)+1;if(F.scT>20)scMeadow(F)}}
+ const F=W4.fld;if(F&&F.id==='HOLLOW'&&!F.melon){F.melon=1;if(W4.wilds.length&&!W4.wilds.some(w=>w.sp==='MELONKIN'))W4.wilds[0].sp='MELONKIN'} /* its own creature is always home */
+ if(F&&F.id==='MEADOW'&&!SW.lessons.scMeadow&&SW.quest>=2){F.scT=(F.scT||0)+1;if(F.scT>20)scMeadow(F)}}
 /* a seed of light arcs from the Lantern to you when it grows a sprout */
 function scSeed(ty){(W4.seedFx=W4.seedFx||[]).push({t:0,ty})}
 function scWorldFx(){scArrow();scDabFx();if(!W4.seedFx)return;for(const fx of W4.seedFx){fx.t+=1/60;const k=Math.min(1,fx.t/1.1),x=240+(P3.x-240)*k,y=40+(P3.y-8-40)*k-Math.sin(k*3.1416)*46,T=TYPES[fx.ty];

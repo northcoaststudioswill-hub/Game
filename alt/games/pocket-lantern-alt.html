@@ -6403,11 +6403,12 @@ const WBUILD=[
  {k:'statue',n:'LANTERN STATUE',cost:{stone:8,ingot:2},d:'Gratitude hearts drop far more often.',max:1,lock:1,price:25}];
 function wBuildDef(k){return WBUILD.find(b=>b.k===k)}
 function wWorkerCap(){return 2+(SW.baseLv-1)*2+SW.buildings.filter(b=>b.k==='pen').length*2}
-const WBASEMS={1:[['build:cottage','Build a Cottage'],['crop:1','Grow a crop on a garden plot'],['workers:1','Deploy 1 sprout worker'],['species:3','Catch 3 species']],
- 2:[['build:kiln','Build a Kiln'],['build:bench','Build a Tinker Bench'],['workers:3','Deploy 3 sprout workers'],['sigils:1','Earn 1 Sigil'],['hearts:10','Collect 10 gratitude hearts']]};
+const WBASEMS={1:[['build:cottage','Build a Cottage'],['crop:1','Grow a crop on a garden plot'],['buddies:3','Have 3 buddies'],['build:kiln','Build a Kiln (ore makes ingots)']],
+ 2:[['build:datacenter','Build a Data Center'],['buddies:5','Have 5 buddies'],['sigils:1','Earn 1 Sigil'],['build:bench','Build a Tinker Bench']]};
 function wMissionDone(key){const [k,v]=key.split(':');
  if(k==='build')return SW.buildings.some(b=>b.k===v);
  if(k==='crop')return plCrops()>=+v||SW.buildings.some(b=>b.k==='bed');
+ if(k==='buddies')return SW.party.length+SW.box.length>=+v;
  if(k==='workers')return wAssignedCount()>=+v;
  if(k==='species')return Object.keys(SW.caught).length>=+v;
  if(k==='sigils')return SW.badges.length>=+v;
@@ -9359,9 +9360,10 @@ function wQuestText(){const op=wOp();
  if(SW.quest<5)return(W4.fld&&SW.quest>=3?'At Sunkeep: ':'')+WQUEST[SW.quest];
  if(W4.fld){const ld=SW.party.find(m=>m.hp>0),sec=wSector(W4.sector);
   if(!ld||ld.hp<wStats(ld).max*.25)return'Your buddy is hurt: rest at a Lantern post';
-  if(sec.gym>=0&&!SW.gymDone[sec.gym])return'The '+WGYMS[sec.gym].leader+' gym is here: win the '+WGYMS[sec.gym].sig}
+  if(sec.gym>=0&&!SW.gymDone[sec.gym])return'The '+WGYMS[sec.gym].leader+' gym is here: win the '+WGYMS[sec.gym].sig;
+  if(SW.quest>=5&&W4.fld.alphas&&W4.fld.alphas.length)return'An ALPHA sleeps here, guarding treasure'}
  const ms=WBASEMS[SW.baseLv];if(!ms)return SW.badges.length<4?'Earn the Sigils. Free the roads.':'';
- const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?'Sunkeep Lv'+SW.baseLv+': '+nx[1]:(W4.fld?'At Sunkeep: ask':'Ask')+' the Great Lantern to grow'}
+ const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?(W4.fld?'Home: ':'Sunkeep Lv'+SW.baseLv+': ')+nx[1]:(W4.fld?'At Sunkeep: ask':'Ask')+' the Great Lantern to grow'}
 function wLampRows(){const rows=[];
  if(wBaseReady())rows.push({act:'ring',label:'GROW THE LANTERN'});
  rows.push({act:'rest',label:'REST IN THE LIGHT'},{act:'travel',label:'TRAVEL BY LANTERN LIGHT'},{act:'board',label:'WORK BOARD'});
@@ -9872,7 +9874,8 @@ function scAuto(){if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
   if(wOp()===0&&!SW.beats.wake){SW.beats.wake=1;SW.beats.first=1;scIntro();return}
   if(wOp()===1&&!SW.beats.three){SW.beats.three=1;SW.beats.carry=1;SW.beats.first=1;scBerries();return}
   if(wOp()===2)SW.beats.lit=1;if(SW.party.length&&!SW.lessons.scSend&&wOp()>=3&&W4.sector==='BASE'){W4.sendT=(W4.sendT||0)+1;if(W4.sendT>45)scSend()}}
- const F=W4.fld;if(F&&F.id==='MEADOW'&&!SW.lessons.scMeadow&&SW.quest>=2){F.scT=(F.scT||0)+1;if(F.scT>20)scMeadow(F)}}
+ const F=W4.fld;if(F&&F.id==='HOLLOW'&&!F.melon){F.melon=1;if(W4.wilds.length&&!W4.wilds.some(w=>w.sp==='MELONKIN'))W4.wilds[0].sp='MELONKIN'} /* its own creature is always home */
+ if(F&&F.id==='MEADOW'&&!SW.lessons.scMeadow&&SW.quest>=2){F.scT=(F.scT||0)+1;if(F.scT>20)scMeadow(F)}}
 /* a seed of light arcs from the Lantern to you when it grows a sprout */
 function scSeed(ty){(W4.seedFx=W4.seedFx||[]).push({t:0,ty})}
 function scWorldFx(){scArrow();scDabFx();if(!W4.seedFx)return;for(const fx of W4.seedFx){fx.t+=1/60;const k=Math.min(1,fx.t/1.1),x=240+(P3.x-240)*k,y=40+(P3.y-8-40)*k-Math.sin(k*3.1416)*46,T=TYPES[fx.ty];
@@ -10201,16 +10204,16 @@ PYTHORN(D){const gn='#5a8a3a',lt='#7aaa50',yl='#e8d878';
 {const fb=["..ss..",".sggs.","sggggs",".sggs."],mk=(o,c)=>{o.spr=fb.slice();o.pal={s:'#14101e',g:c};o._old=SWSPR(o.spr,o.pal);o._spr=swbMake(WHOLLOWART[o.id]);WSPECIES.push(o)};
  mk({id:'MELONKIN',t:[4,5],hp:30,atk:10,def:9,spd:13,catch:.45,work:{PLANTING:1,FORTUNE:1},learn:[[1,'tackle'],[1,'vinelash'],[5,'sporepuff'],[8,'fortunefang'],[13,'headbutt']],
   d:'A melon-headed sprite of the old woods. Shy. Nobody goes looking for it twice.'},'#58b848');
- mk({id:'PYTHORN',t:[4],hp:46,atk:15,def:12,spd:9,catch:.25,work:{PLANTING:2},learn:[[1,'vinelash'],[1,'headbutt'],[6,'shellup'],[10,'sporepuff'],[14,'thornstorm']],
+ mk({id:'PYTHORN',t:[4],hp:46,atk:15,def:12,spd:9,catch:.25,work:{PLANTING:2},learn:[[1,'headbutt'],[1,'vinelash'],[1,'rocktoss'],[10,'sporepuff'],[14,'thornstorm']],
   d:'It slipped off a circus train in 1944 and never stopped growing.'},'#5a8a3a')}
 WSECTORS.splice(2,0,{id:'HOLLOW',n:'CROOKED HOLLOW',sub:'Old woods east of the Meadow. Something is watching.',req:0,lv:[4,7],gym:-1,pal:{g:'#4a8a48',g2:'#3e7a40',a:'#8cc86a'},
- table:[['MELONKIN',3],['FERNFANG',2],['ZIPWIG',2],['PEBBLIT',2],['DRIZZLET',1]]});
+ table:[['MELONKIN',5],['FERNFANG',2],['ZIPWIG',2],['PEBBLIT',2],['DRIZZLET',1]]});
 WSECSUB.HOLLOW='Old woods. Wilds Lv4 to 7.';
 FBIO.HOLLOW=Object.assign({},FBIO.MEADOW,{g:'#4a8a48',g2:'#3e7a40',g3:'#2e5e34',a:'#8cc86a',p:'#bfa67a',p2:'#a48a62',t1:'#1f5230',t2:'#2f7a3c',t3:'#62b858'});
 FSPOTS.HOLLOW=[[26,12,'ore'],[11,16,'fiber'],[12,12,'fiber'],[20,7,'ore']];
 FMAPS.HOLLOW={rows:["TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT", "T..W....\"\"\"\"\"\"\"\"....W.....R..T", "T......\"\"\"\"\"\"\"\"\"\"......R.....T", "T..W...\"\"\"\"\"\"\"\"\"\"..W.....1.A.T", "T.......\"\"\"\"\"\"\"\"........,....T", "T...,.........::.............T", "T.W...........::....W...W....T", "T.............::.............T", "T....B........::......\"\"\"\"\"\".T", "m:::::::::::::S:::::::\"\"\"\"\"\"pT", "m:::::::::::::::..B...\"\"\"\"\"\"\"T", "T.....W.......::......\"\"\"\"\"\".T", "T.............::.....,.......T", "T..~~~~~~.....::........R....T", "T.~~~~~~~~....:::::::::::::..T", "T.~~~~~~~~..............W.:..T", "T..~~~~~~....W....\"\"\"\"\"...:..T", "T.........,......\"\"\"\"\"\"\"..q..T", "T...W.....B......\"\"\"\"\"\"\"...R.T", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"],
  key:{m:{k:'exit',to:'MEADOW'},p:{k:'bud',type:5},q:{k:'bud',type:2},
-  1:{k:'tre',n:'CIRCUS TRUNK',w:4,petal:60,res:['ingot',2]},A:{k:'alpha',sp:'PYTHORN',lv:9,guards:'1'}}};
+  1:{k:'tre',n:'CIRCUS TRUNK',w:4,petal:60,res:['ingot',2]},A:{k:'alpha',sp:'PYTHORN',lv:11,guards:'1'}}};
 /* the Meadow's east road now leads here */
 FMAPS.MEADOW.key.j={k:'exit',to:'HOLLOW'};
 {const R=FMAPS.MEADOW.rows;for(const y of [9,10]){R[y]=R[y].slice(0,R[y].length-1)+'j'}R[9]=R[9].slice(0,20)+':'.repeat(R[9].length-21)+'j'}
