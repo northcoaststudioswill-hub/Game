@@ -21,6 +21,14 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v7.7 · 2026-11-16 · goals say where things come from
+
+Playtested the road to the Data Center past the base: ore veins in the Meadow work (the ring offers "SEND CUYAPUP · GET ORE"; a fetch gives 2 to 3 ore, enough for the Data Center's 2 ingots), and veins refill each time you enter an area.
+
+- **The field goal line was stuck on the alpha.** Anywhere in the Meadow it read "An ALPHA sleeps here, guarding treas..." (cut off), hiding the home goal. Now it shows "ALPHA nearby: it guards treasure" only within a short distance of one; otherwise the home goal.
+- **Base goals name their materials when you are short:** "Kiln: 8 stone, 4 wood (rocks, trees)", "Data Center: needs a kiln for ingots", then "Data Center: 2 ingots. Ore veins, then kiln", and "Buddies: build a Data Center for room" when the three-buddy limit is hit.
+- Tests: 106 checks pass.
+
 ## v7.6 · 2026-11-16 · Sunkeep's grove grows back
 
 Simulated ten minutes of home-buddy work after the cottage (stepped, three buddies, nobody leaving base).

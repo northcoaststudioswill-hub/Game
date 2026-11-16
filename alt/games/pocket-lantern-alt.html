@@ -9363,9 +9363,9 @@ function wQuestText(){const op=wOp();
  if(W4.fld){const ld=SW.party.find(m=>m.hp>0),sec=wSector(W4.sector);
   if(!ld||ld.hp<wStats(ld).max*.25)return'Your buddy is hurt: rest at a Lantern post';
   if(sec.gym>=0&&!SW.gymDone[sec.gym])return'The '+WGYMS[sec.gym].leader+' gym is here: win the '+WGYMS[sec.gym].sig;
-  if(SW.quest>=5&&W4.fld.alphas&&W4.fld.alphas.length)return'An ALPHA sleeps here, guarding treasure'}
+  if(SW.quest>=5&&(W4.fld.alphas||[]).some(a=>Math.hypot(a.x-P3.x,a.y-P3.y)<130))return'ALPHA nearby: it guards treasure'}
  const ms=WBASEMS[SW.baseLv];if(!ms)return SW.badges.length<4?'Earn the Sigils. Free the roads.':'';
- const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?(W4.fld?'Home: ':'Sunkeep Lv'+SW.baseLv+': ')+nx[1]:(W4.fld?'At Sunkeep: ask':'Ask')+' the Great Lantern to grow'}
+ const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?(W4.fld?'Home: ':'Sunkeep Lv'+SW.baseLv+': ')+wMissionHint(nx):(W4.fld?'At Sunkeep: ask':'Ask')+' the Great Lantern to grow'}
 function wLampRows(){const rows=[];
  if(wBaseReady())rows.push({act:'ring',label:'GROW THE LANTERN'});
  rows.push({act:'rest',label:'REST IN THE LIGHT'},{act:'travel',label:'TRAVEL BY LANTERN LIGHT'},{act:'board',label:'WORK BOARD'});
@@ -9427,6 +9427,12 @@ function fFetchTick(F,dt,lead){const fe=W4.fetch;if(!fe)return false;const pt=W4
    SW.res[sp.k]=(SW.res[sp.k]||0)+n;W4.floats.push({x:P3.x,y:P3.y-22,txt:'+'+n+' '+sp.k.toUpperCase()+' — '+lead.sp+' fetched it!'+(good?' (good at this)':''),t:2.2,c:'#ffd94d'});swSnd(784,.08,1175);swSave()}
   W4.fetch=null}
  return true}
+/* mission lines say where the materials come from when you are short (v7.7) */
+function wMissionHint(nx){const [key,lab]=nx,[k,v]=key.split(':');
+ if(k==='build'&&v==='kiln'&&!wCanPay(wBuildDef('kiln').cost))return'Kiln: 8 stone, 4 wood (rocks, trees)';
+ if(k==='build'&&v==='datacenter'&&(SW.res.ingot||0)<2)return(SW.buildings.some(b=>b.k==='kiln')?'Data Center: 2 ingots. Ore veins, then kiln':'Data Center: needs a kiln for ingots');
+ if(k==='buddies'&&wBuddyFull())return'Buddies: build a Data Center for room';
+ return lab}
 /* ================================================================
    BATTLE SCREEN (Fable, v5.6) — same rules, new stage.
    The turn logic above is untouched; this replaces how it is shown:
