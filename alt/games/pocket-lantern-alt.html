@@ -10713,9 +10713,10 @@ function swBusy(){return W4.msgT>0||(W4.msgQ&&W4.msgQ.length)}
 /* called every world frame (scAuto): next message, then a waiting scene */
 function swMsgPump(){{const F=W4.fld;if(F&&F.dlgPend&&!F.dlg&&!W4.scene&&!swBusy()){F.dlg=F.dlgPend;F.dlgPend=null;return}}
  if(W4.scene||(W4.fld&&W4.fld.dlg)||W4.talk||(W4.quips&&W4.quips.length))return;W4.msgQ=W4.msgQ||[];
- if(!(W4.msgT>0)&&W4.msgQ.length){const q=W4.msgQ.shift();W4.msg=q.s;W4.msgT=q.t;W4.msgAt=time;W4.msgMin=Math.min(q.t,1.2+q.s.length*.045);return}
- if(swBusy())return;
- if(W4.scPend&&W4.scPend.length){const p=W4.scPend.shift();if(p.dab)dabGo();else scGo(p.steps,p.done)}}
+ if(W4.msgT>0)return;
+ if(W4.scPend&&W4.scPend.length){const p=W4.scPend.shift();if(p.dab)dabGo();else scGo(p.steps,p.done);return} /* v8.9: a waiting scene goes before messages not yet shown */
+ if(W4.msgQ.length){const q=W4.msgQ.shift();W4.msg=q.s;W4.msgT=q.t;W4.msgAt=time;W4.msgMin=Math.min(q.t,1.2+q.s.length*.045);return}
+ if(false){const p=W4.scPend.shift();if(p.dab)dabGo();else scGo(p.steps,p.done)}}
 function scStart(steps,done){if(SCOFF){for(const s of steps)if(s.fn)s.fn();if(done)done();return}
  W4.scPend=W4.scPend||[];const sig=scSig(steps);
  if((W4.scene&&W4.scene.sig===sig)||W4.scPend.some(p=>p.sig===sig))return;       /* the same scene is already playing or waiting */
