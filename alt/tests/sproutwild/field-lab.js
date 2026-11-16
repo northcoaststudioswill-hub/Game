@@ -166,6 +166,10 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   F.noCap(false);S.buildings=[];S.box=[];S.party=S.party.slice(0,1);ok('one buddy: room for more',!F.buddyFull());
   while(S.party.length+S.box.length<3)F.giveMon('PEBBLIT',3);ok('three buddies and no Data Center: full',F.buddyFull(),S.party.length+S.box.length);
   F.build('datacenter',6,12);ok('a Data Center makes room',!F.buddyFull());F.noCap(true)}
+ /* v7.5: SELECT picks a fight with a wild you could catch */
+ {F.travel('MEADOW','BASE');step(5);const f3=F.fld();if(!F.wilds().length)F.forceWild&&F.forceWild();const wd=F.wilds()[0];
+  if(wd){wd.lv=2;wd.tx=wd.x;wd.ty=wd.y;F.setPos(wd.x,wd.y+30);f3.dir=[0,-1];f3.arrive=null;step(2);tap('sel');step(40);ok('SELECT next to a wild starts a battle',F.state()==='g4battle'||F.state()==='g4engage',F.state());
+   for(let i=0;i<300&&F.state()!=='g4world';i++){tap('b');tap('a');step(2)}}else ok('SELECT next to a wild starts a battle',false,'no wild')}
  /* v7.2: starters grow up */
  {const sp=F.species(),has=id=>sp.some(x=>x.id===id&&x.starter&&x._spr);ok('each starter has an evolved form',has('CUYAFLARE')&&has('BESSIE')&&has('GRASSMAN'));
   const a=sp.find(x=>x.id==='GRASSKIN'),b2=sp.find(x=>x.id==='GRASSMAN');ok('the evolved form is stronger and better at its jobs',b2.hp>a.hp&&b2.atk>a.atk&&b2.work.PLANTING>a.work.PLANTING,b2.hp+'/'+a.hp)}

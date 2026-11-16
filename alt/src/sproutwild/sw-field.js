@@ -463,6 +463,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
  if(pressed('start')){swSel=0;state='g4pause'}}
 /* squad orders, shared by the field and Sunkeep: SELECT picks the kind, B throws, hold B whistles */
 function fCommand(F,dt){if(F.manT>0)F.manT-=dt;
+ if(pressed('sel')&&W4.fld){const a=fAim(F),wd=a.kind==='wild'&&a.tg;if(wd&&!wd.cap&&!(wd.lat&&wd.lat.length)&&Math.hypot(wd.x-P3.x,wd.y-P3.y)<64&&SW.party.some(m=>m.hp>0)){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv));return}}
  if(pressed('sel')){let i=SW.selType;for(let n=0;n<TYPES.length;n++){i=(i+1)%TYPES.length;if(F.sq.some(s=>s.type===i))break}
   SW.selType=i;F.manT=4;swSnd(660,.06,990);W4.floats.push({x:P3.x,y:P3.y-20,txt:TYPES[i].n+' SPROUTS UP NEXT',t:1.2,c:TYPES[i].l})}
  if(keys.a&&!W4.near){if(pressed('a')){fThrow(F);F.aT=.26}else{F.aT=(F.aT||0)-dt;if(F.aT<=0){fThrow(F,true);F.aT=.2}}}
@@ -484,7 +485,7 @@ function fRing(F){if(F.sq.length||(F.pf&&F.pf.length)){const a=fAim(F),T=a.kind=
   if(a.tg){const c=a.need>=0?'#e04838':T.l,rr=a.kind==='site'?14:11;
    for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){r('#14101e',ax+sx*(rr+ph)-2,ay-6+sy*(rr-2+ph)-2,5,5);r(c,ax+sx*(rr+ph)-1,ay-6+sy*(rr-2+ph)-1,3,1);r(c,ax+sx*(rr+ph)-(sx<0?1:-1),ay-6+sy*(rr-2+ph)-1,1,3)}
    for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.6)',Math.round(px),Math.round(py),1,1)}
-   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?(wBuddyFull()?'No room for more buddies · build a DATA CENTER':pfCan(F,a.tg)?'CATCH Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts':'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
+   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?(wBuddyFull()?'No room for more buddies · build a DATA CENTER':pfCan(F,a.tg)?'CATCH · needs '+pfNeed(a.tg)+(Math.hypot(a.tg.x-P3.x,a.tg.y-P3.y)<64?' · SELECT: fight':' sprouts'):'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
    F.aimLab=lab;F.aimNeed=a.need>=0}
   else{F.aimLab=null;r('rgba(255,255,255,.35)',ax-1,ay-1,2,2)}}else F.aimLab=null;
  if(F.whistle){g.strokeStyle='rgba(255,244,180,.8)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-2,F.whistle,0,7);g.stroke();

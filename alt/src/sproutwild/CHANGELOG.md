@@ -21,6 +21,12 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v7.5 · 2026-11-16 · pick a fight; python checked
+
+- **SELECT picks a fight.** A always throws at a wild you can catch, which left no way to battle a weak one for experience (notes item 16 and v7 item 18). Now, with a wild targeted close by, SELECT starts the battle. The ring label says so: "CATCH · needs 3 · SELECT: fight". Away from wilds SELECT still cycles the sprout kind. The console button label for Sproutwild reads "select" (was "kind").
+- **Python balance checked** after the v7.4 change: a Lv7/5/5 team beats it narrowly (starter fainted, one buddy half health); a Lv9/7/7 team beats it comfortably. Kept as is.
+- Tests: 105 checks (1 new), run twice clean.
+
 ## v7.4 · 2026-11-16 · base goals match the new systems; Crooked Hollow played through
 
 - **Base goals rewritten.** They still asked for "deploy a sprout worker" and a tinker bench first. Sunkeep Lv1 is now: cottage, a crop on a plot, three buddies, a kiln. Lv2: Data Center, five buddies, one Sigil, a bench. "Have N buddies" replaces "catch N species", which could not be met with duplicates under the three-buddy limit.
