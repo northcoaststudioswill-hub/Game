@@ -166,6 +166,9 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   F.noCap(false);S.buildings=[];S.box=[];S.party=S.party.slice(0,1);ok('one buddy: room for more',!F.buddyFull());
   while(S.party.length+S.box.length<3)F.giveMon('PEBBLIT',3);ok('three buddies and no Data Center: full',F.buddyFull(),S.party.length+S.box.length);
   F.build('datacenter',6,12);ok('a Data Center makes room',!F.buddyFull());F.noCap(true)}
+ /* v7.2: starters grow up */
+ {const sp=F.species(),has=id=>sp.some(x=>x.id===id&&x.starter&&x._spr);ok('each starter has an evolved form',has('CUYAFLARE')&&has('BESSIE')&&has('GRASSMAN'));
+  const a=sp.find(x=>x.id==='GRASSKIN'),b2=sp.find(x=>x.id==='GRASSMAN');ok('the evolved form is stronger and better at its jobs',b2.hp>a.hp&&b2.atk>a.atk&&b2.work.PLANTING>a.work.PLANTING,b2.hp+'/'+a.hp)}
  /* v7.0: garden plots grow what you choose */
  {S.buildings=[];S.box=[];S.plotCrop={};F.build('cottage',18,12);F.enter('BASE');step(5);const pl=F.plots();
   ok('the garden bed building is retired',!F.builds().includes('bed')&&F.builds().includes('datacenter'),F.builds().join());

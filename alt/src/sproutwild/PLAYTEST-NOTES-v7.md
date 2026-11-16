@@ -1,5 +1,7 @@
 # Sproutwild playtest notes: v7.0, first-time player and systems reader
 
+**Update, v7.2:** items 9, 10, 11, 13, 14, 16 and 34 are fixed (see CHANGELOG v7.2). Item 17 already worked as asked (first A skips to the end, second A befriends).
+
 Two passes, kept separate on purpose:
 - **Part A** is what a new player sees and feels, from the title screen on.
 - **Part B** is what someone reading the systems would notice.

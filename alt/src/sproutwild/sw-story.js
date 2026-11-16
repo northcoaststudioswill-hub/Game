@@ -162,6 +162,7 @@ function wQuestText(){const op=wOp();
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
  if(SW.quest===2)return W4.fld?'A: throw sprouts at a wild buddy':'Take the south road to the Meadow';
+ if(!W4.fld&&wHasRoof()&&wDark()>.7)return'Night: sleep in the cottage to skip it';
  if(SW.quest<5)return(W4.fld&&SW.quest>=3?'At Sunkeep: ':'')+WQUEST[SW.quest];
  if(W4.fld){const ld=SW.party.find(m=>m.hp>0),sec=wSector(W4.sector);
   if(!ld||ld.hp<wStats(ld).max*.25)return'Your buddy is hurt: rest at a Lantern post';

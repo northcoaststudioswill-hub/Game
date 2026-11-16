@@ -74,5 +74,5 @@ function pfWildDraw(o,feet){const spr=wSp(o.sp)._spr,w=Math.round(spr.ow*PSC),h=
  if(sc<=0)return;const ww=Math.max(1,Math.round(w*sc)),hh=Math.max(1,Math.round(h*sc));
  r('rgba(0,0,0,.22)',X-6,Y-1,12,3);const img=white&&spr.hol?spr.hol:spr.ol;
  if(o.fx>0&&spr.fable){g.save();g.translate(X+Math.round(ww/2),Y-hh+2-bob);g.scale(-1,1);g.drawImage(img,0,0,ww,hh);g.restore()}else g.drawImage(img,X-Math.round(ww/2),Y-hh+2-bob,ww,hh);
- if(!c&&Math.hypot(o.x-P3.x,o.y-P3.y)<90){const lt='Lv'+o.lv,lw=tw(lt,1);r('rgba(10,14,8,.7)',X-lw/2-2,Y+3,lw+4,9);text(lt,X-lw/2,Y+4,1,'#ffe8b0',null)}
+ if(!c&&Math.hypot(o.x-P3.x,o.y-P3.y)<90){const lt=(Math.hypot(o.x-P3.x,o.y-P3.y)<56?o.sp+' ':'')+'Lv'+o.lv,lw=tw(lt,1);r('rgba(10,14,8,.7)',X-lw/2-2,Y+3,lw+4,9);text(lt,X-lw/2,Y+4,1,'#ffe8b0',null)}
  if(!c&&feet)feet(o.x,o.y)}

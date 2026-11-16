@@ -840,7 +840,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
   if(SW.quest===1&&SW.tendDone&&!SW.party.length)for(const c of WCHOICE){const spr=wSp(c.sp)._spr,bob=Math.sin(time*3+c.x)*1;
    r('rgba(0,0,0,.22)',c.x-8,c.y-1,16,3);
    g.drawImage(spr.ol,Math.round(c.x)-13,Math.round(c.y)-spr.oh+4+Math.round(bob),spr.ow,spr.oh);
-   if(Math.hypot(P3.x-c.x,P3.y-c.y)>34){r('rgba(10,14,8,.55)',c.x-tw(c.sp,1)/2-2,c.y+3,tw(c.sp,1)+4,9);
+   if(c===WCHOICE.slice().sort((a,b)=>Math.hypot(a.x-P3.x,a.y-P3.y)-Math.hypot(b.x-P3.x,b.y-P3.y))[0]){r('rgba(10,14,8,.55)',c.x-tw(c.sp,1)/2-2,c.y+3,tw(c.sp,1)+4,9);
    text(c.sp,c.x-tw(c.sp,1)/2,c.y+4,1,'#ffe8b0',null)}}}
  if(W4.sector==='BASE'&&W4.jobPos)SW.crew.forEach((c,ci)=>{if(c.job!==-2&&c.job!==-3)return;const jp=W4.jobPos[ci];if(!jp)return;
   drawBud({x:Math.round(jp.x),y:Math.round(jp.y)+2,type:c.type,stage:2,z:0,a:ci*1.71,mv:!!(jp.nd&&Math.hypot(jp.x-jp.nd.x,jp.y-jp.nd.y)>7),st:'idle',fx:1});
@@ -1110,7 +1110,7 @@ function drawLou(){swShell('LOUIE','BASE GUIDE · GOOD BOY');
  swRows([{a:'SHOW ME THE WAY',b:'he leads, you follow'},{a:'ANY TIPS, LOUIE?',b:'wisdom, barked'},
   {a:'PET LOUIE',b:'+1 gratitude (sometimes)'},{a:'ANY ASKS?',b:'the valley needs things'},{a:'BYE',b:''}],swSel,W4.louTip||'He knows every corner of Sunkeep. Ask him anything.')}
 function wFit(s,n){if(tw(s,1)<=n)return s;let o=s;while(o.length&&tw(o+'…',1)>n)o=o.slice(0,-1);return o+'…'}
-const WQUEST=['Talk to Louie','Choose your first buddy','Catch a wild buddy','Build a COTTAGE — START, BUILD','Garden: press A on a plot, grow BERRIES'];
+const WQUEST=['Talk to Louie','Choose your first buddy','Catch a wild buddy','COTTAGE (START, BUILD): a roof for buddies','Garden: press A on a plot, grow BERRIES'];
 function wQuestTick(){
  if(SW.quest===3&&SW.buildings.some(b=>b.k==='cottage'&&!b.con)){SW.quest=4;
   swSay('A roof over Sunkeep! Now grow BERRIES on a garden plot.',3.4);swSnd(784,.09,1175);swSave()}
@@ -1942,6 +1942,7 @@ function g4Update(dt){switch(state){
  case 'g4place':placeUpdate();return;
  case 'g4plot':plotUpdate();return;
  case 'g4dab':dabUpdate(dt);return;
+ case 'g4loop':loopUpdate();return;
  case 'g4cot':cotUpdate();return;
  case 'g4nur':nurUpdate();return;
  case 'g4tools':toolsUpdate();return;
@@ -1974,6 +1975,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4build':drawBuild();return;
  case 'g4plot':drawPlot();return;
  case 'g4dab':drawDab();return;
+ case 'g4loop':drawLoop();return;
  case 'g4cot':drawCot();return;
  case 'g4nur':drawNur();return;
  case 'g4tools':drawTools();return;

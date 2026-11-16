@@ -21,6 +21,22 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v7.2 · 2026-11-16 · explaining the game, and starters that grow up
+
+From `PLAYTEST-NOTES-v7.md` (item numbers in brackets).
+
+- **"How Sunkeep works" card.** One screen, once, right after your first buddy joins: THROW, CARRY, CATCH, BUILD, SIGILS, one line each. A closes it.
+- **Starter evolutions** [34]. At Lv16: CUYAPUP becomes CUYAFLARE, BESSLING becomes BESSIE (the lake monster herself), GRASSKIN becomes GRASSMAN. Higher stats and both job skills go up a level. New art for all three.
+- **Reveal tells you why to pick** [13]. Rows are now LEGEND, PICK IF, JOBS, OWN MOVE, GROWS TO.
+- **Top-bar counters** [9] are hidden during the opening, when there is nothing to count. Each one is explained in a line the first time it matters (wood, stone, petals in town, hearts).
+- **One name tag at a time** on the starter pick [10]: only the buddy you are nearest shows its name.
+- **Wild buddies show their name** with the level when you are close [11].
+- **Cottage goal says why** [14]: "COTTAGE (START, BUILD): a roof for buddies".
+- **Night goal** [16]: with a cottage, the goal line at night says to sleep there to skip it.
+- Tests: 103 checks (2 new). Real-time capture of the starter pick, the reveal, the card and the three evolved sprites.
+
+Still open from the notes: 12, 15, 18 to 21 (old list), 26 to 33 and 35 (v7 list).
+
 ## v7.1 · 2026-11-16 · the cottage party cinematic
 
 Will's ask: after the cottage is built, a cutscene of Will and Marcus celebrating with the rig, Marcus yelling "see one, send one, my J", done like the fighter's finishers and intro.

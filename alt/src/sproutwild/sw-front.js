@@ -40,7 +40,7 @@ function uiWill(x,y,sc,ax,ay){const sx=P3.x,sy=P3.y,sax=P3.ax,say=P3.ay,san=P3.a
 /* ---------------- the one HUD ---------------- */
 function wHud(){if(W4.scene){scDraw();return}if(W4.sleepFx>0){W4.sleepFx-=1/60;g.globalAlpha=Math.min(1,W4.sleepFx*1.2);r('#0a0e08',0,0,W,H);g.globalAlpha=1;ctext('z z z',H/2-4,1,'#ffd94d')}const sec=wSector(W4.sector),F=W4.fld||W4.bf,atBase=!W4.fld;
  r('rgba(10,14,8,.8)',0,0,W,15);r(UI.gold,0,15,W,1);
- {const rs='♣'+SW.res.wood+' ◆'+SW.res.stone+' ✿'+SW.res.petal+(atBase?' ♥'+SW.hearts:'');text(rs,W-5-tw(rs,1),4,1,'#d8e8c8',null);text(wFit(sec.n,W-16-tw(rs,1)),5,4,1,'#ffd94d',null)}
+ hudTips();{const rs=wOp()<3?'':'♣'+SW.res.wood+' ◆'+SW.res.stone+' ✿'+SW.res.petal+(atBase?' ♥'+SW.hearts:'');text(rs,W-5-tw(rs,1),4,1,'#d8e8c8',null);text(wFit(sec.n,W-16-tw(rs,1)),5,4,1,'#ffd94d',null)}
  if(SW.stam<99){r('#00000088',0,16,W,2);r(SW.stam>40?UI.leaf:SW.stam>18?'#ffd94d':'#e04838',0,16,Math.round(W*SW.stam/100),2)}
  const ban=W4.banner&&W4.banner.t>0;
  {const q=wQuestText();if(q&&!ban&&state!=='g4place'){

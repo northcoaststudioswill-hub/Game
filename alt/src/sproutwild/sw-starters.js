@@ -69,10 +69,10 @@ function drawChoice(){const sp=W4.choiceSp,s2=wSp(sp),spr=s2._spr,T=TYPES[s2.t[0
  if(tick(.75))swSnd(330,.2,165);
  text('FIRST PARTNER',6,7,1,'#8a86a0',null);const tn=WT[s2.t[0]];text(tn,W-6-tw(tn,1),7,1,T.l,null);
  /* the facts, one line at a time */
- const rows=[['LEGEND',L.lore],['JOBS',Object.entries(s2.work).map(([k2,v])=>k2+' '+v).join(' · ')],
-  ['MOVES',s2.learn.filter(([lv])=>lv<=5).map(([,m])=>WMOVES[m].n).join(' · ')],['LEARNS',L.sig?WMOVES[L.sig].n+' · Lv8 · only it':'']];
- let yy=174;rows.forEach(([lab,val],i)=>{const at=1.3+i*.45,lines=swWrap(val,W-62).slice(0,2);if(tick(at))swSnd(660+i*90,.04,880+i*90);
-  if(t>=at){const a=Math.min(1,(t-at)/.2);g.globalAlpha=a;text(lab,8,yy,1,T.l,null);lines.forEach((l,j)=>text(l,56,yy+j*10,1,'#e8e4f4',null));g.globalAlpha=1}yy+=lines.length*10+4});
+ const rows=[['LEGEND',L.lore],['PICK IF',WBLURB[sp]||''],['JOBS',Object.entries(s2.work).map(([k2,v])=>k2+' '+v).join(' · ')],
+  ['OWN MOVE',L.sig?WMOVES[L.sig].n+' at Lv8':''],['GROWS TO',WEVO[sp]?WEVO[sp]+' at Lv16':'']];
+ let yy=172;rows.forEach(([lab,val],i)=>{const at=1.3+i*.36,lines=swWrap(val,W-70).slice(0,2);if(tick(at))swSnd(660+i*90,.04,880+i*90);
+  if(t>=at){const a=Math.min(1,(t-at)/.2);g.globalAlpha=a;text(lab,8,yy,1,T.l,null);lines.forEach((l,j)=>text(l,64,yy+j*10,1,'#e8e4f4',null));g.globalAlpha=1}yy+=lines.length*10+4});
  const st=[['HP',s2.hp,44],['ATK',s2.atk,16],['DEF',s2.def,16],['SPD',s2.spd,14]];
  st.forEach(([lab,v,mx],i)=>{const at=3.1+i*.08;if(t<at)return;const k=Math.min(1,(t-at)/.35),bx=8+(i%2)*116,by=H-42+((i/2)|0)*11;
   text(lab,bx,by,1,'#a8a4c0',null);r('#2a2838',bx+26,by+1,60,5);r(T.c,bx+26,by+1,Math.round(60*Math.min(1,v/mx)*k),5);text(''+v,bx+90,by,1,'#ffffff',null)});
@@ -92,3 +92,44 @@ function dcDraw(b){const x=wCellX(b.gx),y=wCellY(b.gy),K='#14101e',t=time;
   r(((t*3+i*1.7)|0)%3?'#7ee787':'#1d5a2a',x+4,yy+2,2,1);r(((t*5+i)|0)%4?'#ffd94d':'#6a5a1a',x+8,yy+2,2,1);r(((t*2+i*2.3)|0)%2?'#58a0f0':'#1e3a66',x+12,yy+2,3,1)}
  r(K,x+9,y-12,2,7);r('#c8ccd4',x+9,y-11,1,5);g.globalAlpha=.5+.5*Math.sin(t*4);r('#fff3b0',x+8,y-14,3,3);g.globalAlpha=1;
  const n=SW.box.length;if(n){const s=''+n,lw=tw(s,1);r(K,x+10-lw/2-2,y+20,lw+4,9);text(s,x+10-lw/2,y+21,1,'#7ee787',null)}}
+/* ---------------- starter evolutions at Lv16 (v7.2) ---------------- */
+const WSTARTEVO={
+CUYAFLARE(D){const fur='#4e362e',cr='#f0d8b0',og='#f8902c',yl='#ffe070',dk='#34241e';
+ D.l(17,17,22,10,2.8,fur);D.p([[22,10.6],[19.4,5],[21.8,7],[23.2,3],[23.8,10]],og);D.p([[22,9.6],[21.4,7.2],[23,8]],yl);
+ D.l(9,19.5,8.6,22.6,2.8,dk);D.l(15.5,19.5,16,22.6,2.8,dk);D.p([[15,9.6],[16.6,6],[17.6,10]],og);D.p([[17,11.4],[19.2,8.4],[19.2,12.6]],og);
+ D.b(12.5,15,6.6,6,fur);D.e(11.4,16.6,3.8,3.6,cr);D.l(7,13.5,4.6,16.6,2,fur);D.l(17.6,13.5,19.2,16.6,2,fur);D.e(15.4,12.4,1.8,.8,'#8a6aa8');
+ D.p([[8.2,3.8],[6.8,.4],[9.4,2],[10.6,0],[11.4,2],[12.8,.6],[12.8,4]],og);D.p([[9.6,3.8],[9.4,1.8],[10.8,3],[11.6,1.8],[11.8,3.8]],yl);
+ D.e(5.2,4.4,1.4,1.3,fur);D.e(13.4,4.2,1.4,1.3,fur);D.b(9.4,7.6,5.4,4.6,fur);D.e(7.4,9.2,3,2,cr);D.e(5.8,8.4,.9,.7,'#1a1010');
+ D.eye(7.6,6.9,1.4);D.eye(11.6,6.9,1.4);D.l(6.2,5.2,8.8,5.9,.7,'#1a1010');D.l(13,5.2,10.6,5.9,.7,'#1a1010');D.r(6.4,10.2,2,.6,'#8a4a40')},
+BESSIE(D){const tl='#2e8c98',dk='#1f6670',cr='#c8f0e8',yl='#ffe070';
+ D.p([[19,17],[23.8,11],[22.4,18.4]],tl);D.b(19.6,16.8,3,2.4,tl);D.p([[8.6,20],[4.4,23],[10.6,22.4]],dk);D.p([[17,21],[20.4,23.4],[21,20.6]],dk);
+ D.b(15,18.6,7.6,3.8,tl);D.e(14,20.7,5.6,1.5,cr);
+ D.p([[12,15.2],[13.4,11.8],[14.8,15.2]],yl);D.p([[15.6,15.2],[17,12.4],[18.4,15.6]],yl);D.p([[19,14.8],[20.2,12.8],[21.2,15.2]],yl);
+ D.l(9.4,17,6.6,6,4,tl);D.l(9,16.4,6.6,7.6,1.5,cr);D.b(5.8,4.6,4.4,3.2,tl);D.e(3,5.6,2.4,1.5,cr);
+ D.p([[6.2,2],[7.6,.2],[9,2.2]],yl);D.p([[8.6,2.6],[10.2,.9],[10.6,3.4]],yl);D.eye(5,4,1.4);D.eye(8,3.9,1.1);D.r(2,6.7,2.4,.6,dk)},
+GRASSMAN(D){const fur='#5a7a30',dk='#3e5a22',fc='#e0c090';
+ D.e(7.6,22.8,3.2,1.2,'#4a3a22');D.e(16.4,22.8,3.2,1.2,'#4a3a22');D.l(9,18,8.4,22,3.4,fur);D.l(15,18,15.6,22,3.4,fur);
+ D.l(5.4,10,3,18.4,3,fur);D.l(18.6,10,21,18.4,3,fur);D.e(3,19,1.6,1.4,dk);D.e(21,19,1.6,1.4,dk);D.b(12,13,7.6,7.4,fur);
+ D.p([[6.6,16],[5.4,20],[8.2,18.6]],dk);D.p([[17.4,16],[18.6,20],[15.8,18.6]],dk);D.p([[10,18.4],[12,21.4],[14,18.4]],dk);D.p([[8,9.6],[10,12.4],[12,9.8]],dk);
+ D.b(12,5.6,5,4.4,fur);D.e(11.4,6.7,3.4,2.6,fc);D.r(8.4,4.6,6,1,'#2a4218');D.eye(9.8,6.3,1.2);D.eye(13,6.3,1.2);D.r(10.2,8.4,2.4,.7,'#6a3a30');
+ D.l(12,2.6,12,1,.9,'#3a7d2e');D.e(9.6,1.6,2.2,1.1,'#8fd45e');D.e(14,1.4,2.2,1.1,'#8fd45e')}};
+{const fb=["..ss..",".sggs.","sggggs",".sggs."],ev=(from,id,hp,atk,def,spd,work,d,c)=>{const b=wSp(from),s={id,t:b.t.slice(),hp,atk,def,spd,catch:.1,work,learn:b.learn.slice(),d,spr:fb.slice(),pal:{s:'#14101e',g:c},starter:1};
+  s._old=SWSPR(s.spr,s.pal);s._spr=swbMake(WSTARTEVO[id]);WSPECIES.push(s);WEVO[from]=id};
+ ev('CUYAPUP','CUYAFLARE',54,21,14,16,{KINDLING:3,WATERING:2},'The river burns wherever it swims. It thinks this is normal.','#f8902c');
+ ev('BESSLING','BESSIE',60,18,18,13,{WATERING:3,FORTUNE:2},'The lake monster herself. The reward was never claimed.','#2e8c98');
+ ev('GRASSKIN','GRASSMAN',64,21,17,10,{PLANTING:3,QUARRY:2},'Seven feet of moss and manners. Leaves very large footprints.','#5a7a30');
+ Object.assign(WBLURB,{CUYAPUP:'Fast hitter. Runs the kiln.',BESSLING:'Tough and lucky. Waters.',GRASSKIN:'Strongest. Plants, chops.'})}
+/* ---------------- "how Sunkeep works": one card, once, right after your first buddy ---------------- */
+function loopUpdate(){W4.loopT=(W4.loopT||0)+1/30;if((pressed('a')||pressed('start'))&&W4.loopT>.8){SW.lessons.loop=1;W4.loopT=0;swSnd(660,.06,990);state='g4world';swSave()}}
+function drawLoop(){const K='#0c1410',t=W4.loopT||0,rows=[['1','THROW','A throws sprouts at berries, logs and wild buddies.','#f8902c'],['2','CARRY','They carry it all home. The Lantern grows more sprouts.','#58a0f0'],
+  ['3','CATCH','Enough sprouts on a wild buddy and it joins you.','#7ee787'],['4','BUILD','Buddies you leave home do the work. Build Sunkeep up.','#ffd94d'],['5','SIGILS','Win the four gyms to open the roads.','#f078c0']];
+ ox=0;oy=0;r(K,0,0,W,H);r('#ffd94d',0,22,W,1);ctext('HOW SUNKEEP WORKS',8,1,'#ffd94d');
+ rows.forEach(([n,h,d,c],i)=>{const at=.15+i*.18;if(t<at)return;const y=34+i*46,k=Math.min(1,(t-at)/.2),xo=Math.round((1-k)*40);g.globalAlpha=k;
+  r('#14101e',8+xo,y,22,22);r(c,10+xo,y+2,18,18);text(n,16+xo,y+7,1,'#14101e',null);text(h,38+xo,y+2,1,c,null);swWrap(d,W-50).slice(0,3).forEach((l,j)=>text(l,38+xo,y+14+j*10,1,'#e8f4d8',null));g.globalAlpha=1});
+ if(t>1.2){r('#14121e',0,H-18,W,18);const s='A  GOT IT';text(s,W-8-tw(s,1),H-13,1,'#7ee787',null)}}
+/* the top-bar counters explain themselves the first time each one matters */
+function hudTips(){const L=SW.lessons;if(W4.scene||state!=='g4world'||W4.msgT>0||wOp()<3)return;
+ if(SW.res.wood>0&&!L.hW){L.hW=1;swSay('♣ at the top is WOOD. Buildings cost wood.',3.2)}
+ else if(SW.res.stone>0&&!L.hS){L.hS=1;swSay('◆ at the top is STONE. Bigger buildings need it.',3.2)}
+ else if(W4.sector==='TOWN'&&!L.hP){L.hP=1;swSay('✿ at the top is PETALS: money for town and the cottage.',3.4)}
+ else if(SW.hearts>0&&!L.hH&&!W4.fld){L.hH=1;swSay('♥ are gratitude hearts. The Great Lantern trades plans for them.',3.4)}}
