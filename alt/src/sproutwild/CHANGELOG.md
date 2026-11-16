@@ -21,6 +21,22 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v8.9 · 2026-11-16 · more story: the intro, the King, the cast; a full garden no longer blocks you
+
+Will: keep improving what is there (no new places); a little more explaining in the intro; more scenes with the cast; explain the villain.
+
+- **The intro is 8 slides** (was 3), one short line each, A to go on (`shots/v8.9-intro.png`): the Lantern cracks; its light becomes SPROUTS; the wild buddies go dim and sprouts can carry the light back; KING BIBI ("the light is weeks away. Hence, my IRON DOME"); the narrator on the IRON DOME posts walling the roads ("'Temporary,' he said. They never came down."); Bibi's motive ("A dark valley needs a strong king. Stay home. Stay dim. Trust the dome."); Erin's hope (Sunkeep's soil still grows; light the Lantern and his domes lose their grip); Marcus's plan (four gyms, four Sigils, each opens a road, then the King's dome).
+- **Villain scenes with the cast** (`shots/v8.9-villain-scenes.png`):
+  - When the Lantern wakes, Marcus: "Bet King Bibi saw that from behind his dome. Good. Let him squint, bro."
+  - First visit to Lantern Town, the Elder: the town was the brightest street in the valley until Bibi's domes shut the roads, trade and the light; the Ranger kept its one road open.
+  - Back at Sunkeep after Bottie's visit, Erin and Marcus on the King: thirty years of "weeks away"; "Every road he domes off is a road the light can't reach. A dark valley keeps him king."; four Sigils and they walk up to his dome.
+- **Fixed: a full garden blocked the crop step.** In a real playthrough every plot ended up holding a grown sprout, so there was nowhere to plant the berries the goal asked for. The goal now says "Garden full: pluck a sprout, then grow BERRIES", and Erin's garden lesson says so too.
+- **Fixed: scenes waited minutes behind chatter.** The cottage party waited about four minutes because the cast's chat bubbles and messages kept coming. Chat now holds back for a waiting scene, and a waiting scene goes before messages not yet shown. The gym scene needs only the cottage and a crop and can play wherever you are (it plays about 16 s after planting).
+- **The placement screen says why a spot was refused** ("No room there... Try another spot."); it was hidden behind the screen.
+- Full real-time playthrough, title to the first Sigil: about 13 minutes at a slow reading pace, 0 flags, no page errors; the Elder's and Marcus's Bibi lines play. Lab: 119 checks clean.
+
+**Not checked:** iPhone. After planting, "BERRIES planted" stayed up 16 seconds in one run (longer than needed, not cut short).
+
 ## v8.8 · 2026-11-16 · training, the first Sigil, and the roads opening
 
 Played from the cottage to the first Sigil in real time: the autopilot now trains like a player (SELECT battles on the nearest wild, rests at the Lantern post when its lead is hurt), then walks north and fights the Ranger.

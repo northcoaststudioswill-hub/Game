@@ -42,7 +42,7 @@ function fBarrierDraw(F){if(SW.badges.length>=1)return;for(const e of F.exits){i
 /* field dialogue (Erin, trainers) waits for the message on screen too */
 function fTalk(F,who,lines,after){const d={who,lines,i:0,after};if(!SCOFF&&swBusy()&&!F.dlg){F.dlgPend=d;return}F.dlgPend=null;F.dlg=d}
 /* v8.7: after the cottage and the first crop, the game points you at the Ranger's gym */
-function scGymCheck(){if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return; /* v8.9: cottage and a crop are enough (the garden lesson can come after) */ /* queued right away: it plays as soon as the crop line has been read */SW.lessons.scGym=1;
+function scGymCheck(){if(SCOFF||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return; /* v8.9: cottage and a crop are enough (the garden lesson can come after) */ /* queued right away: it plays as soon as the crop line has been read */SW.lessons.scGym=1;
  scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Time to make a name for yourself.'},
   {who:'MARCUS',txt:'Lantern Town, bro. Top of the Meadow, the north road. The Ranger runs the gym there.'},
   {who:'ERIN',txt:'Win the VERDANT SIGIL and the Ranger opens the roads east and south.'},

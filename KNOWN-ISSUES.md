@@ -2,12 +2,17 @@
 
 Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v8.8)
+## Sproutwild (cartridge 5, v8.9)
 
 ### Known bugs
-- The gym scene is queued after the crop line; leave home within a few seconds and it plays at the next calm moment elsewhere.
+- "BERRIES planted" stayed up 16 s in one run (too long, not too short). Not looked into yet.
 - One real-time bug catch missed during testing in v7.9 (a step-by-step run caught 4 of 4). Not seen since; a wild
   buddy next to a bug takes the aim, which may be what happened.
+
+### Fixed in v8.9
+- A full garden blocked the crop step (no empty plot, no hint).
+- Scenes (the cottage party) waited minutes behind chat bubbles and messages.
+- The placement screen hid why a spot was refused.
 
 ### Fixed in v8.8
 - Resting at a Lantern post: the heal message was hidden behind the travel map.

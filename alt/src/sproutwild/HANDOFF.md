@@ -76,7 +76,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
   and `let` names must be unique across all files, or the page fails to load.
 - Build order (see `SPROUTWILD=[...]` in `alt/build.py`): sw-cartart, sw-module, sw-field, sw-front,
   sw-base, sw-art, sw-story, sw-battle, sw-save, sw-text, sw-cast, sw-party, sw-scene, sw-starters,
-  sw-plots, sw-hollow, sw-squire, sw-louie, sw-bugs, sw-walk, sw-open2, sw-meadow2, sw-pace, sw-sigil.
+  sw-plots, sw-hollow, sw-squire, sw-louie, sw-bugs, sw-walk, sw-open2, sw-meadow2, sw-pace, sw-sigil, sw-lore.
 - Several functions exist in more than one file on purpose (the later one is live). Known pairs:
   `swPauseUpdate/drawPause` (live: sw-save.js), `cotUpdate/drawCot` (live: sw-story.js),
   `wQuestText` (two copies in sw-story.js; the second is live), `wBaseArrive`, `scIntro`, `scWake`,
@@ -138,6 +138,8 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
 - v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
   "FOUND ONE!" bubble stays on screen.
+- v8.9: sw-lore.js (8-slide intro, Elder and Erin/Marcus scenes about KING BIBI), full-garden hint, scenes no
+  longer wait behind chatter, gym scene anywhere after the crop.
 - v8.8: first Sigil cinematic (sw-sigil.js, state g4sigil), Ranger's roads-open line, rest/travel split at posts,
   autopilot trains (SELECT + rest) and plays cottage -> Sigil in ~4 min.
 - v8.7: gym guidance (scGymCheck, wGymGoal), first gym rebalanced, XP share, crop/buddies missions fixed,
