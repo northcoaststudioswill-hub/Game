@@ -168,6 +168,7 @@ function wQuestText(){const op=wOp();
   if(!ld||ld.hp<wStats(ld).max*.25)return'Your buddy is hurt: rest at a Lantern post';
   if(sec.gym>=0&&!SW.gymDone[sec.gym])return'The '+WGYMS[sec.gym].leader+' gym is here: win the '+WGYMS[sec.gym].sig;
   if(SW.quest>=5&&(W4.fld.alphas||[]).some(a=>Math.hypot(a.x-P3.x,a.y-P3.y)<130))return'ALPHA nearby: it guards treasure'}
+ if(W4.fld){const gg=wGymGoal();if(gg)return gg} /* v8.7: in the field the next big goal is the gym */
  const ms=WBASEMS[SW.baseLv];if(!ms)return SW.badges.length<4?'Earn the Sigils. Free the roads.':'';
  const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?(W4.fld?'Home: ':'Sunkeep Lv'+SW.baseLv+': ')+wMissionHint(nx):(W4.fld?'At Sunkeep: ask':'Ask')+' the Great Lantern to grow'}
 function wLampRows(){const rows=[];

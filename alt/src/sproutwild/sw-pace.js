@@ -40,3 +40,12 @@ function fBarrierDraw(F){if(SW.badges.length>=1)return;for(const e of F.exits){i
  r('#14101e',x+5,y-6,6,6);r('#ffd94d',x+6,y-5,4,4)}}
 /* field dialogue (Erin, trainers) waits for the message on screen too */
 function fTalk(F,who,lines,after){const d={who,lines,i:0,after};if(!SCOFF&&swBusy()&&!F.dlg){F.dlgPend=d;return}F.dlgPend=null;F.dlg=d}
+/* v8.7: after the cottage and the first crop, the game points you at the Ranger's gym */
+function scGymCheck(){if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||W4.scene||state!=='g4world'||!SW.lessons.scPlot)return;
+ W4.gymT=(W4.gymT||0)+1;if(W4.gymT<150)return;SW.lessons.scGym=1;
+ scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Time to make a name for yourself.'},
+  {who:'MARCUS',txt:'Lantern Town, bro. Top of the Meadow, the north road. The Ranger runs the gym there.'},
+  {who:'ERIN',txt:'Win the VERDANT SIGIL and the Ranger opens the roads east and south.'},
+  {who:'MARCUS',txt:"The Ranger's buddies are Lv7 and Lv8. Battle wilds with SELECT till yours catch up. See one, beat one."}],()=>swSave())}
+function wGymGoal(){if(SW.quest<5||SW.badges.length)return null;const L=Math.max(0,...SW.party.map(m=>m.lv));
+ return L<7?'Ranger gym, north road: train to Lv7 (SELECT)':"Lantern Town (north road): win the Ranger's Sigil"}

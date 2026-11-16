@@ -24,7 +24,7 @@ const SNAP=`JSON.stringify((()=>{const F=W4.fld,bf=W4.bf,sc=W4.scene,st=sc&&sc.s
   erin:F?(W4.ew&&!W4.ew.leave?[W4.ew.x,W4.ew.y]:null):(cast?[cast.x,cast.y]:null),
   tame:(W4.wilds||[]).filter(w=>w.tame).map(w=>[w.x,w.y])[0]||null,
   peb:F?(F.buds.find(b=>b.type===1)||null):null,gate:F?(F.gates.find(g=>g.type===1&&!g.open)||null):null,site:F?(F.sites.find(s=>!s.done)||null):null,
-  sq:((F||bf)&&(F||bf).sq||[]).filter(s=>s.st==='follow').length,w3:SW.walk3||0,etree:W4.ew&&W4.ew.tree&&!W4.ew.tree.got?[W4.ew.tree.x,W4.ew.tree.y]:null,ebug:W4.ew&&W4.ew.bug&&(W4.bugs||[]).includes(W4.ew.bug)?[W4.ew.bug.x,W4.ew.bug.y]:null,wh:W4.wh||520}})())`;
+  sq:((F||bf)&&(F||bf).sq||[]).filter(s=>s.st==='follow').length,w3:SW.walk3||0,goal:(()=>{try{return wQuestText()}catch(e){return ''}})(),badges:SW.badges.length,crop:Object.keys(SW.plotCrop||{}).length,plot:(W4.patchBuds||[]).filter(q=>q.type<0&&!q.crop&&q.seedTy==null).map(q=>[q.sx,q.sy])[0]||null,gym:F&&F.gym?[F.gym.x,F.gym.y]:null,lv:SW.party.map(m=>m.sp+m.lv).join(' '),etree:W4.ew&&W4.ew.tree&&!W4.ew.tree.got?[W4.ew.tree.x,W4.ew.tree.y]:null,ebug:W4.ew&&W4.ew.bug&&(W4.bugs||[]).includes(W4.ew.bug)?[W4.ew.bug.x,W4.ew.bug.y]:null,wh:W4.wh||520}})())`;
 const log=[];const open={};const flags=[];const t0=Date.now();const T=()=>(Date.now()-t0)/1000;
 const readT=s=>1.2+String(s).length*.045;
 function track(k,v,s){const now=T();const cur=open[k];
@@ -48,13 +48,15 @@ while(T()<CAP){
  const ph=s.state+'/'+s.sec+'/op'+s.op+'/q'+s.q+'/w'+s.w2+'/bw'+s.bw;if(ph!==phase){log.push(T().toFixed(1)+'s == '+ph);phase=ph}
  if(Date.now()-lastShot>6000){await shot(s.state);lastShot=Date.now()}
  if(s.state==='g4dab'){globalThis.__sawDab=1;if(Date.now()-lastShot>2500){await shot('dab');lastShot=Date.now()}}
- if(globalThis.__sawDab&&s.state==='g4world'){await sleep(3000);break}
+ if(s.goal!==globalThis.__goal){globalThis.__goal=s.goal;log.push(T().toFixed(1)+'s GOAL '+s.goal+'   [team '+s.lv+']')}
+ if(s.badges>=1){log.push(T().toFixed(1)+'s FIRST SIGIL [team '+s.lv+']');await sleep(3000);await shot('sigil');break}
  const txt=s.scene||s.dlg||(s.state!=='g4world'?s.state:'');if(txt!==lastTxt){lastTxt=txt;txtAt=Date.now()}
  // 1. anything that waits for A: read it first
  if(s.scene&&Date.now()-txtAt>20000&&!globalThis.__dumped){globalThis.__dumped=1;log.push('STUCK DUMP '+await ev("JSON.stringify({i:W4.scene.i,n:W4.scene.steps.length,t:W4.scene.t,step:W4.scene.steps[W4.scene.i],pend:(W4.scPend||[]).length,msgT:W4.msgT,state,keysA:keys.a,prevA:prev.a})"));console.log(log[log.length-1])}
  if(s.scene||s.dlg||s.talk){const need=Math.max(1.6,readT(s.scene||s.dlg||'x'))*1000;if(Date.now()-txtAt>need){await key('a');if(!globalThis.__dumped)txtAt=Date.now()}await sleep(150);continue}
  if(['g4title','g4intro','g4loop','g4kind','g4cine','g4choice','g4file','g4slot','g4save'].includes(s.state)||(s.state!=='g4world'&&!['g4build','g4place','g4pause','g4battle'].includes(s.state))){if(Date.now()-txtAt>2200){await key('a');txtAt=Date.now()}await sleep(150);continue}
  if(s.state==='g4battle'){await aPress(500);await sleep(150);continue}
+ if(s.state==='g4plot'){const sel=+(await ev('swSel'));if(sel<1)await key('down');else if(sel>1)await key('up');else await key('a');await sleep(250);continue}
  if(s.state==='g4pause'){const sel=+(await ev('swSel'));if(sel<3)await key('down');else if(sel>3)await key('up');else await key('a');await sleep(200);continue}
  if(s.state==='g4build'){const want=+(await ev("WBUILD.findIndex(d=>d.k==='cottage')")),sel=+(await ev('swSel'));if(sel<want)await key('down');else if(sel>want)await key('up');else await key('a');await sleep(200);continue}
  if(s.state==='g4place'){placeTries++;if(placeTries%3===0)await key(placeTries%6===0?'down':'right');await key('a');await sleep(300);continue}
@@ -65,6 +67,8 @@ while(T()<CAP){
   if(s.op===1){const it=s.items[0];if(it){if(await moveTo(s,it[0]+30,it[1]+2)){await face(-1,0);await aPress(900)}}await sleep(150);continue}
   if(s.op===2){if(await moveTo(s,240,170)){await face(0,-1);await aPress(1200)}await sleep(150);continue}
   if(s.q<=2){if(s.erin&&s.bw<2){const dx=s.P[0]-s.erin[0],dy=s.P[1]-s.erin[1],d=Math.hypot(dx,dy)||1;if(d>30)await moveTo(s,s.erin[0]+dx/d*26,s.erin[1]+dy/d*26-(dy>0?40:0),9);}else{await moveTo(s,240,s.wh-8,11);await key('down',120)}await sleep(150);continue}
+  if(s.cot&&!s.crop&&s.plot){if(await moveTo(s,s.plot[0],s.plot[1]+14)){await face(0,-1);await aPress(1500)}await sleep(150);continue}
+  if(s.cot&&s.q>=5){await moveTo(s,240,s.wh-8,11);await key('down',120);await sleep(150);continue}
   if(!s.cot){if(s.wood>=8){await key('start');await sleep(300);continue}
    const it=s.items.find(i=>i[3]==='wood'||i[2]==='log'||i[2]==='pel')||s.items[0];
    if(it&&s.sq){if(await moveTo(s,it[0]+28,it[1]+2)){await face(-1,0);await aPress(900)}await sleep(150);continue}
@@ -80,11 +84,13 @@ while(T()<CAP){
   if(s.w2>=10&&s.w3===3){const it=s.items.find(i=>i[3]==='wood');if(it){if(await moveTo(s,it[0]+28,it[1]+2)){await face(-1,0);await aPress(900)}await sleep(150);continue}}
   if(s.w2>=10&&s.w3===5&&s.ebug){if(await moveTo(s,s.ebug[0],s.ebug[1]+20)){await face(0,-1);await aPress(800)}await sleep(150);continue}
   if(s.erin&&(s.w2<10||(s.w3>0&&s.w3<7))){const dx=s.P[0]-s.erin[0],dy=s.P[1]-s.erin[1],d=Math.hypot(dx,dy)||1;if(d>34)await moveTo(s,s.erin[0]+dx/d*26,s.erin[1]+dy/d*26,10);await sleep(150);continue}
+  if(s.q>=5){if(s.P[1]>24||Math.abs(s.P[0]-(17*16+16))>6){await moveTo(s,17*16+16,s.P[1]>24?Math.max(20,s.P[1]-11):20)}else{await key('up',150)}await sleep(150);continue}
   if(s.w2>=10||s.q>=3){// home: up the west lane to the north gate
    if(s.P[1]>40){await moveTo(s,s.P[0]>60?s.P[0]-11:40,s.P[1]-11)}else{await key('up',150)}
    stuck=(lastP===s.P.join())?stuck+1:0;lastP=s.P.join();if(stuck>40){await p.evaluate(()=>window.__g.SWF().travel('BASE','MEADOW'));log.push(T().toFixed(1)+'s (autopilot: travel hook home after being stuck)')}
    await sleep(150);continue}
   await sleep(150);continue}
+ if(s.fid==='TOWN'&&s.gym){if(await moveTo(s,s.gym[0],s.gym[1]+18)){await face(0,-1);await aPress(1500)}await sleep(150);continue}
  await sleep(150)}
 for(const k in open)log.push(open[k].t.toFixed(1)+'s (still up) ['+k+'] '+open[k].v);
 await shot('end');

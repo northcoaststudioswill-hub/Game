@@ -76,7 +76,7 @@ function scBuild(){SW.lessons.scBuild=1;SW.beats.caught=1;const nm=(SW.party[SW.
   {x:150,y:236,hold:1.1},{x:150,y:236,who:'MARCUS',txt:'Buddies need a roof, bro. Press START, pick BUILD, then COTTAGE. Costs 8 wood. This spot is nice.'},
   {x:150,y:236,who:'MARCUS',txt:'Short on wood? Send a buddy at trees. Sprouts carry the logs home. Teamwork. I supervise.'},
   {who:'ERIN',txt:'Only your lead buddy walks with you here. The others wait at home. Give them a roof and they get to work.'},{hold:.4}],()=>swSave())}
-function scAuto(){swMsgPump();if(!SCOFF&&!swBusy()&&!(W4.scPend&&W4.scPend.length)&&kindCheck())return;
+function scAuto(){swMsgPump();scGymCheck();if(!SCOFF&&!swBusy()&&!(W4.scPend&&W4.scPend.length)&&kindCheck())return;
  if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
   if(wOp()>=3&&!SW.lessons.loop&&SW.quest<=2&&(SCOFF||!swBusy())){if(SCOFF)SW.lessons.loop=1;else{W4.loopT=0;state='g4loop';return}}
   if(wHasRoof()&&!SW.lessons.scDab&&W4.sector==='BASE'&&wOp()>=3&&!(W4.cons&&W4.cons.length)){W4.dabT=(W4.dabT||0)+1;if(W4.dabT>50){if(SCOFF)SW.lessons.scDab=1;else dabStart();return}}
