@@ -21,6 +21,17 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v8.8 · 2026-11-16 · training, the first Sigil, and the roads opening
+
+Played from the cottage to the first Sigil in real time: the autopilot now trains like a player (SELECT battles on the nearest wild, rests at the Lantern post when its lead is hurt), then walks north and fights the Ranger.
+
+- **Real-time result:** cottage to the first Sigil in about 4 minutes. BESSLING went from Lv5 to Lv6 in about 2 minutes of SELECT battles (two rests), lost the first try at the gym, trained a little more by fighting its way back, and won the second with BESSLING Lv6 + PEBBLIT Lv5 (the shared XP from v8.7 brought PEBBLIT from Lv2).
+- **The first Sigil is a big moment now:** a cinematic in the fighter's style. Marcus cuts in ("FIRST SIGIL! That is my guy"), the Verdant Sigil slams down, then ROADS OPEN with arrows east to Crooked Hollow and south to Squire's Woods (`shots/v8.8-first-sigil.png`). In battle the Ranger adds "My barriers on the Meadow roads are down", and back in the world one line names both roads. The barriers on the map are gone.
+- **Resting at a Lantern post shows that it worked.** The rest and the travel map opened together, so "The Lantern light mends your buddies" was hidden behind the map. Now, when anyone is hurt, A heals with a sparkle and the message ("Press A again to travel"); when nobody is hurt, A opens the map.
+- **Lab:** the fiber fetch check clears nearby wilds first (the same fix as the bug check). 119 checks, twice clean.
+
+**Not checked:** a person training by hand; the gym scene can still play after you leave home if you leave within seconds of planting; iPhone.
+
 ## v8.7 · 2026-11-16 · past the cottage: the road to the first gym
 
 Played past the cottage with the autopilot (it now plants a crop, walks north to Lantern Town and fights the Ranger) and with battle simulations.

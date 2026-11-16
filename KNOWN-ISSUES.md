@@ -2,13 +2,16 @@
 
 Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v8.7)
+## Sproutwild (cartridge 5, v8.8)
 
 ### Known bugs
-- Lab: "the lead buddy fetches FIBER from a thicket" failed 1 run in 4 (a single A press; a wild can take the aim).
 - The gym scene is queued after the crop line; leave home within a few seconds and it plays at the next calm moment elsewhere.
 - One real-time bug catch missed during testing in v7.9 (a step-by-step run caught 4 of 4). Not seen since; a wild
   buddy next to a bug takes the aim, which may be what happened.
+
+### Fixed in v8.8
+- Resting at a Lantern post: the heal message was hidden behind the travel map.
+- Lab: the fiber fetch check was flaky (a wild could take the aim).
 
 ### Fixed in v8.7
 - Sunkeep Lv1 could never finish (crop and buddies missions never counted).
