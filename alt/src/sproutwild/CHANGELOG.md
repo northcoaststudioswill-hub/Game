@@ -21,6 +21,15 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v7.6 · 2026-11-16 · Sunkeep's grove grows back
+
+Simulated ten minutes of home-buddy work after the cottage (stepped, three buddies, nobody leaving base).
+
+- **The base economy stalled.** Sunkeep has 4 trees and 2 rocks. Home buddies cleared them in about two minutes and then stood idle for good; stone stopped at 6, while the kiln and the Data Center need 16 between them. Felled trees only came back if you left Sunkeep and returned, and home buddies only work while you are there.
+- **Trees grow back after 75 seconds, rocks after 90**, with a sparkle and a one-time line explaining it. Same ten-minute run now: 18 stone, plenty of wood, buddies busy the whole time.
+- The plot test now clears a plot itself instead of relying on one being empty (the garden can fill every plot given time).
+- Tests: 106 checks (1 new), run twice clean.
+
 ## v7.5 · 2026-11-16 · pick a fight; python checked
 
 - **SELECT picks a fight.** A always throws at a wild you can catch, which left no way to battle a weak one for experience (notes item 16 and v7 item 18). Now, with a wild targeted close by, SELECT starts the battle. The ring label says so: "CATCH · needs 3 · SELECT: fight". Away from wilds SELECT still cycles the sprout kind. The console button label for Sproutwild reads "select" (was "kind").

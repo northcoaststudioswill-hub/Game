@@ -166,6 +166,8 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   F.noCap(false);S.buildings=[];S.box=[];S.party=S.party.slice(0,1);ok('one buddy: room for more',!F.buddyFull());
   while(S.party.length+S.box.length<3)F.giveMon('PEBBLIT',3);ok('three buddies and no Data Center: full',F.buddyFull(),S.party.length+S.box.length);
   F.build('datacenter',6,12);ok('a Data Center makes room',!F.buddyFull());F.noCap(true)}
+ /* v7.6: Sunkeep's trees and rocks grow back */
+ {F.travel('BASE','MEADOW');step(5);const nd=F.nodes().find(n=>n.k==='tree');nd.got=true;nd.rg=0;F.setPos(60,460);for(let i=0;i<62*30&&nd.got;i++)step(1);ok('a felled tree at Sunkeep grows back',!nd.got&&nd.hp===nd.max,nd.got)}
  /* v7.5: SELECT picks a fight with a wild you could catch */
  {F.travel('MEADOW','BASE');step(5);const f3=F.fld();if(!F.wilds().length)F.forceWild&&F.forceWild();const wd=F.wilds()[0];
   if(wd){wd.lv=2;wd.tx=wd.x;wd.ty=wd.y;F.setPos(wd.x,wd.y+30);f3.dir=[0,-1];f3.arrive=null;step(2);tap('sel');step(40);ok('SELECT next to a wild starts a battle',F.state()==='g4battle'||F.state()==='g4engage',F.state());
@@ -176,7 +178,8 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  /* v7.0: garden plots grow what you choose */
  {S.buildings=[];S.box=[];S.plotCrop={};F.build('cottage',18,12);F.enter('BASE');step(5);const pl=F.plots();
   ok('the garden bed building is retired',!F.builds().includes('bed')&&F.builds().includes('datacenter'),F.builds().join());
-  const ix=pl.findIndex(q=>q.type<0);ok('there is an empty plot to plan',ix>=0,pl.map(q=>q.type).join());
+  if(!pl.some(q=>q.type<0&&!q.crew)){const q=pl[pl.length-1];Object.assign(q,{type:-1,seedTy:null,crew:false,mode:'soil',age:-4,stage:0,by:null})}
+  const ix=pl.findIndex(q=>q.type<0&&!q.crew);ok('there is an empty plot to plan',ix>=0,pl.map(q=>q.type).join());
   F.plotSet(ix,'berry');const b0=S.res.berry;ok('a plot can be set to berries',pl[ix].crop==='berry'&&S.plotCrop[ix]==='berry');
   F.dayT(20);F.setPos(60,460);for(let i=0;i<1500&&!pl[ix].ripe;i++)step(1);ok('berries ripen on the plot',pl[ix].ripe===true,Math.round(pl[ix].cg||0)+' type'+pl[ix].type+' seed'+pl[ix].seedTy+' crop'+pl[ix].crop+' same'+(F.plots()===pl)+' crew'+pl[ix].crew+' mode'+pl[ix].mode+' st'+F.state()+' q'+S.quest);
   F.giveMon('PEBBLIT',4,true);for(let i=0;i<1500&&S.res.berry<=b0;i++)step(1);ok('a home buddy harvests and the berries reach the Lantern',S.res.berry>b0,S.res.berry+' vs '+b0);
