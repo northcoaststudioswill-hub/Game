@@ -7898,7 +7898,7 @@ function placeUpdate(){const c=W4.cursor;
  if(pressed('up'))c.y=Math.max(0,c.y-1);if(pressed('down'))c.y=Math.min(23,c.y+1);
  wCamUpdate(wCellX(c.x)+10,wCellY(c.y)+10);
  if(pressed('b')){state='g4build';return}
- if(pressed('a')){if(!wCellFree(c.x,c.y)){swSnd(140,.08);swSay('No room there \u2014 the Lantern, sign and sprouts need their space.',1.8);return}
+ if(pressed('a')){if(!wCellFree(c.x,c.y)){swSnd(140,.08);W4.msgQ=[];W4.msg='No room there \u2014 the Lantern, sign and sprouts need their space. Try another spot.';W4.msgT=2.6;W4.msgAt=time;return}
   const def=wBuildDef(W4.placeK);wPay(def.cost);
   const firstOfKind=!SW.buildings.some(b=>b.k===def.k);
   const nb={k:def.k,gx:c.x,gy:c.y,workers:[]};SW.buildings.push(nb);scConStart(nb,def,firstOfKind);
@@ -7910,7 +7910,8 @@ function drawPlace(){wDrawWorld();const cam=W4.cam||{x:0,y:0};
  r(ok?'rgba(126,231,135,.25)':'rgba(240,120,120,.25)',x,y,20,20);
  r(cc,x,y,20,1);r(cc,x,y+19,20,1);r(cc,x,y,1,20);r(cc,x+19,y,1,20);
  g.restore();
- uiPill('PLACE '+wBuildDef(W4.placeK).n+'  ·  B  BACK',H-30,'A')}
+ uiPill('PLACE '+wBuildDef(W4.placeK).n+'  ·  B  BACK',H-30,'A');
+ if(W4.msgT>0&&W4.msg){const ls=swWrap(W4.msg,W-24).slice(0,2);r('#14101e',6,H-62-ls.length*10,W-12,ls.length*10+8);ls.forEach((l,j)=>text(l,12,H-58-ls.length*10+j*10,1,'#ffe8b0',null))}} /* v8.9: why A did not place shows here, not behind the screen */
 function cotUpdate(){const hasBench=SW.buildings.some(b=>b.k==='bench');
  const rows=['SLEEP','BUY SPROUT · 12p','BUY TONIC · 25p','LEAVE'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}
@@ -9730,7 +9731,7 @@ function wCastTick(dt){if(!W4.cast)wCastInit();if(!SW.beats)SW.beats={};const op
   if(sp&&Math.hypot(P3.x-sp.x,P3.y-sp.y)<110){const pool=WCIDLE[who];wQuip(who,wDark()>.7&&who==='ERIN'?'Night already. The fire is lit if you want company.':pool[(Math.random()*pool.length)|0])}}
  /* one bubble at a time, with a breath between them */
  for(const q of W4.quips)q.t-=dt;if(W4.quips.length&&W4.quips[0].t<=0){W4.quips=[];W4.quipGap=.7}
- if(!W4.quips.length){W4.quipGap=(W4.quipGap||0)-dt;if(W4.quipGap<=0&&W4.quipQ.length&&!(typeof swBusy==='function'&&swBusy())){ /* one voice at a time: chatter waits for the message */const q=W4.quipQ.shift();W4.quips=[q];swSnd(q.who==='LOUIE'?700:q.who==='MARCUS'?300:520,.04,q.who==='LOUIE'?500:q.who==='MARCUS'?260:640)}}
+ if(!W4.quips.length){W4.quipGap=(W4.quipGap||0)-dt;if(W4.quipGap<=0&&W4.quipQ.length&&!(typeof swBusy==='function'&&swBusy())&&!(W4.scPend&&W4.scPend.length)){ /* and waits for a scene that is waiting */ /* one voice at a time: chatter waits for the message */const q=W4.quipQ.shift();W4.quips=[q];swSnd(q.who==='LOUIE'?700:q.who==='MARCUS'?300:520,.04,q.who==='LOUIE'?500:q.who==='MARCUS'?260:640)}}
  /* the dim buddies walk in to the light rather than appearing */
  if(wOp()===2){if(!W4.choiceT)W4.choiceT=time;const k=Math.min(1,(time-W4.choiceT)/2.6);[[188,166],[240,152],[292,166]].forEach((q,i)=>{WCHOICE[i].x=q[0]+(i-1)*30*(1-k);WCHOICE[i].y=q[1]+(1-k)*(130+i*14)})}}
 function wQuipDraw(){const K='#14101e',cx=W4.cam?W4.cam.x:0,cy=W4.cam?W4.cam.y:0,placed=[];
@@ -10740,7 +10741,7 @@ function fBarrierDraw(F){if(SW.badges.length>=1)return;for(const e of F.exits){i
 /* field dialogue (Erin, trainers) waits for the message on screen too */
 function fTalk(F,who,lines,after){const d={who,lines,i:0,after};if(!SCOFF&&swBusy()&&!F.dlg){F.dlgPend=d;return}F.dlgPend=null;F.dlg=d}
 /* v8.7: after the cottage and the first crop, the game points you at the Ranger's gym */
-function scGymCheck(){if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.lessons.scPlot)return; /* queued right away: it plays as soon as the crop line has been read */SW.lessons.scGym=1;
+function scGymCheck(){if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return; /* v8.9: cottage and a crop are enough (the garden lesson can come after) */ /* queued right away: it plays as soon as the crop line has been read */SW.lessons.scGym=1;
  scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Time to make a name for yourself.'},
   {who:'MARCUS',txt:'Lantern Town, bro. Top of the Meadow, the north road. The Ranger runs the gym there.'},
   {who:'ERIN',txt:'Win the VERDANT SIGIL and the Ranger opens the roads east and south.'},

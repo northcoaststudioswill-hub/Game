@@ -1850,7 +1850,7 @@ function placeUpdate(){const c=W4.cursor;
  if(pressed('up'))c.y=Math.max(0,c.y-1);if(pressed('down'))c.y=Math.min(23,c.y+1);
  wCamUpdate(wCellX(c.x)+10,wCellY(c.y)+10);
  if(pressed('b')){state='g4build';return}
- if(pressed('a')){if(!wCellFree(c.x,c.y)){swSnd(140,.08);swSay('No room there \u2014 the Lantern, sign and sprouts need their space.',1.8);return}
+ if(pressed('a')){if(!wCellFree(c.x,c.y)){swSnd(140,.08);W4.msgQ=[];W4.msg='No room there \u2014 the Lantern, sign and sprouts need their space. Try another spot.';W4.msgT=2.6;W4.msgAt=time;return}
   const def=wBuildDef(W4.placeK);wPay(def.cost);
   const firstOfKind=!SW.buildings.some(b=>b.k===def.k);
   const nb={k:def.k,gx:c.x,gy:c.y,workers:[]};SW.buildings.push(nb);scConStart(nb,def,firstOfKind);
@@ -1862,7 +1862,8 @@ function drawPlace(){wDrawWorld();const cam=W4.cam||{x:0,y:0};
  r(ok?'rgba(126,231,135,.25)':'rgba(240,120,120,.25)',x,y,20,20);
  r(cc,x,y,20,1);r(cc,x,y+19,20,1);r(cc,x,y,1,20);r(cc,x+19,y,1,20);
  g.restore();
- uiPill('PLACE '+wBuildDef(W4.placeK).n+'  ·  B  BACK',H-30,'A')}
+ uiPill('PLACE '+wBuildDef(W4.placeK).n+'  ·  B  BACK',H-30,'A');
+ if(W4.msgT>0&&W4.msg){const ls=swWrap(W4.msg,W-24).slice(0,2);r('#14101e',6,H-62-ls.length*10,W-12,ls.length*10+8);ls.forEach((l,j)=>text(l,12,H-58-ls.length*10+j*10,1,'#ffe8b0',null))}} /* v8.9: why A did not place shows here, not behind the screen */
 function cotUpdate(){const hasBench=SW.buildings.some(b=>b.k==='bench');
  const rows=['SLEEP','BUY SPROUT · 12p','BUY TONIC · 25p','LEAVE'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}

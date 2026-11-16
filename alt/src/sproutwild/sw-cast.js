@@ -50,7 +50,7 @@ function wCastTick(dt){if(!W4.cast)wCastInit();if(!SW.beats)SW.beats={};const op
   if(sp&&Math.hypot(P3.x-sp.x,P3.y-sp.y)<110){const pool=WCIDLE[who];wQuip(who,wDark()>.7&&who==='ERIN'?'Night already. The fire is lit if you want company.':pool[(Math.random()*pool.length)|0])}}
  /* one bubble at a time, with a breath between them */
  for(const q of W4.quips)q.t-=dt;if(W4.quips.length&&W4.quips[0].t<=0){W4.quips=[];W4.quipGap=.7}
- if(!W4.quips.length){W4.quipGap=(W4.quipGap||0)-dt;if(W4.quipGap<=0&&W4.quipQ.length&&!(typeof swBusy==='function'&&swBusy())){ /* one voice at a time: chatter waits for the message */const q=W4.quipQ.shift();W4.quips=[q];swSnd(q.who==='LOUIE'?700:q.who==='MARCUS'?300:520,.04,q.who==='LOUIE'?500:q.who==='MARCUS'?260:640)}}
+ if(!W4.quips.length){W4.quipGap=(W4.quipGap||0)-dt;if(W4.quipGap<=0&&W4.quipQ.length&&!(typeof swBusy==='function'&&swBusy())&&!(W4.scPend&&W4.scPend.length)){ /* and waits for a scene that is waiting */ /* one voice at a time: chatter waits for the message */const q=W4.quipQ.shift();W4.quips=[q];swSnd(q.who==='LOUIE'?700:q.who==='MARCUS'?300:520,.04,q.who==='LOUIE'?500:q.who==='MARCUS'?260:640)}}
  /* the dim buddies walk in to the light rather than appearing */
  if(wOp()===2){if(!W4.choiceT)W4.choiceT=time;const k=Math.min(1,(time-W4.choiceT)/2.6);[[188,166],[240,152],[292,166]].forEach((q,i)=>{WCHOICE[i].x=q[0]+(i-1)*30*(1-k);WCHOICE[i].y=q[1]+(1-k)*(130+i*14)})}}
 function wQuipDraw(){const K='#14101e',cx=W4.cam?W4.cam.x:0,cy=W4.cam?W4.cam.y:0,placed=[];
