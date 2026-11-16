@@ -9,7 +9,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  const step=(n,keys)=>{for(let i=0;i<n;i++){for(const k in G.keys)G.keys[k]=0;if(keys)for(const k of keys)G.keys[k]=1;G.update(1/30);for(const k in G.keys)G.prev[k]=G.keys[k]}for(const k in G.keys)G.keys[k]=0;G.update(1/30);for(const k in G.keys)G.prev[k]=0};
  const tap=k=>{step(1,[k]);step(1)};
  const T=16,at=(tx,ty,d)=>{F.setPos(tx*T+8,ty*T+10);const f2=F.fld();if(d)f2.dir=d;for(const s of f2.sq)if(s.st==='follow'){s.x=F.pos().x;s.y=F.pos().y+6}};
- const fight=()=>{for(let n=0;n<600&&F.state()==='g4battle';n++){const bt=F.bt();if(bt.foe)bt.foe.hp=Math.min(bt.foe.hp,1);S.party[0].hp=200;if(bt.phase==='moves')tap(['right','down','left','up'][n%4]);tap('a');step(3)}};
+ const fight=()=>{for(let n=0;n<600&&F.state()==='g4battle';n++){const bt=F.bt();if(bt.foe)bt.foe.hp=Math.min(bt.foe.hp,1);S.party[0].hp=200;tap('a');step(3)}};
  try{
  /* the opening, played: seeds, berries, the Lantern stirs, a buddy joins, the road opens */
  {S.intro=1;F.enter('BASE');step(3);const bf=F.bf();
@@ -179,7 +179,8 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   ok('no sprout seed takes a crop plot',pl[ix].type<0&&pl[ix].seedTy==null);
   F.plotSet(ix,null);ok('the plot can go back to sprouts',!pl[ix].crop&&S.plotCrop[ix]===undefined)}
  /* v7.0: Crooked Hollow, east of the Meadow */
- {F.travel('MEADOW','BASE');step(3);let f2=F.fld();F.setPos(34*16+2,9*16+10);f2.dir=[1,0];f2.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='MEADOW';i++)step(1,['right']);f2=F.fld();
+ {F.travel('MEADOW','BASE');step(3);let f2=F.fld();const q0=S.quest;S.quest=2;F.setPos(34*16+2,9*16+10);f2.dir=[1,0];f2.arrive=null;for(let i=0;i<40;i++)step(1,['right']);ok('the Hollow is shut until your first catch',F.fld().id==='MEADOW');S.quest=Math.max(5,q0);
+  F.setPos(34*16+2,9*16+10);f2.dir=[1,0];f2.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='MEADOW';i++)step(1,['right']);f2=F.fld();
   ok('the Meadow east road leads to Crooked Hollow',f2&&f2.id==='HOLLOW',f2&&f2.id);
   ok('you arrive on its west side, heading east',F.pos().x<60&&f2.dir[0]===1,Math.round(F.pos().x));
   ok('the Peninsula Python guards the trunk',f2.alphas.some(a=>a.sp==='PYTHORN')&&f2.items.some(i=>i.n==='CIRCUS TRUNK'));

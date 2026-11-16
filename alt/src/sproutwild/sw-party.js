@@ -24,8 +24,8 @@ function pfSend(F,b,o){b.st='go';b.tg=o;b.job=pfJob(o);b.t=0;swSnd(520,.07,880);
 function pfTick(F,dt){pfSync(F);const n=F.pf.filter(b=>b.st==='follow').length;let i=0;
  for(const b of F.pf){b.mv=false;
   const go=(x,y,v,arr)=>{const dx=x-b.x,dy=y-b.y,d=Math.hypot(dx,dy);if(d<=arr)return true;const s=Math.min(d*5,v);b.x+=dx/d*s*dt;b.y+=dy/d*s*dt;b.mv=d>3;if(Math.abs(dx)>1)b.fx=dx<0?-1:1;return false};
-  if(b.st==='follow'){const k=i++,bx=-F.dir[0],by=-F.dir[1],lx=-by,ly=bx,lat=(k-(n-1)/2)*22;
-   const tx=P3.x+bx*16+lx*lat+(n===1?lx*16:0),ty=P3.y+4+by*16+ly*lat+(n===1?ly*16:0);go(tx,ty,110,3);continue}
+  if(b.st==='follow'){const k=i++,bx=-F.dir[0],by=-F.dir[1],lx=-by,ly=bx,lat=n===1?16:(k%2?7:-7);
+   const back=n===1?16:18+k*15,tx=P3.x+bx*back+lx*lat,ty=P3.y+4+by*back+ly*lat;go(tx,ty,110,3);continue}
   if(b.st==='ret'){if(go(P3.x,P3.y+8,130,22))b.st='follow';continue}
   const o=b.tg;if(!o||o.got){b.st='ret';continue}
   if(b.st==='go'){if(go(o.x+(b.x<o.x?-10:10),o.y+8,120,4)){b.st='work';b.t=0}continue}

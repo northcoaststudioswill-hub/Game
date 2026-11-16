@@ -21,6 +21,16 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v7.3 · 2026-11-16 · the opening, timed end to end
+
+Ran the whole chain in one go, title to the garden lesson, with real key presses: every scene hands off to the next (intro, berries, Lantern waking, starter reveal, how-it-works card, buddy lesson, Meadow, first catch, build lesson, cottage, party, garden lesson). About 200 seconds in total, 77 of them watching.
+
+- **Lantern-waking scene is shorter.** It was the longest stretch at 16 seconds. Two captions cut (the how-it-works card now covers "four deliveries grow a sprout").
+- **Crooked Hollow is shut until your first catch.** Its wilds start at Lv4, which three starter sprouts cannot catch. Louie turns you back at the east road and says why.
+- **Buddies trail behind you** in a staggered line instead of three abreast, so narrow paths are less crowded (notes item 12).
+- Test helper no longer picks random moves, which made one long battle test flaky once starters had a non-damaging move.
+- Tests: 104 checks, run four times in a row clean.
+
 ## v7.2 · 2026-11-16 · explaining the game, and starters that grow up
 
 From `PLAYTEST-NOTES-v7.md` (item numbers in brackets).
