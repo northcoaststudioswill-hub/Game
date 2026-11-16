@@ -21,6 +21,22 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v7.1 · 2026-11-16 · the cottage party cinematic
+
+Will's ask: after the cottage is built, a cutscene of Will and Marcus celebrating with the rig, Marcus yelling "see one, send one, my J", done like the fighter's finishers and intro.
+
+- Full-screen cinematic (`g4dab`) that plays once, the first time a cottage stands at Sunkeep, before the garden lesson. About 8 seconds; A skips after the first beat.
+- Built in the fighter's super cut-in style and with the fighter's own Will and Marcus art (portraits and full-body poses from `knockout.js`):
+  1. Marcus portrait cut-in on a slanted gold band: ROOF RAISED.
+  2. The two of them either side of the rig, torch on the banger, a HEATING bar that fills to READY.
+  3. Marcus's rip on speed lines, smoke across the screen, and the line slammed on in three hits: SEE ONE, / SEND ONE, / MY J!!!
+  4. Will's cut-in from the other side (YOUR TURN), a bigger cloud, three *COUGH* tags.
+  5. The dap with an impact burst, an S "SESH RANK" splash, and Louie sneezing.
+- If the fighter module is ever missing, a simpler in-world version of the scene plays instead.
+- Verified: 101 lab checks; real-time capture of every beat on a phone-shaped screen.
+
+Shot: `shots/v7.1-cottage-party.png`.
+
 ## v7.0 · 2026-11-15 · Ohio starters, the reveal, Data Center, garden plots, Crooked Hollow
 
 Will's brief and the research behind these choices are in `DESIGN-v7.md`.

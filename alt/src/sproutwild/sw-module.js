@@ -1941,6 +1941,7 @@ function g4Update(dt){switch(state){
  case 'g4build':buildUpdate();return;
  case 'g4place':placeUpdate();return;
  case 'g4plot':plotUpdate();return;
+ case 'g4dab':dabUpdate(dt);return;
  case 'g4cot':cotUpdate();return;
  case 'g4nur':nurUpdate();return;
  case 'g4tools':toolsUpdate();return;
@@ -1972,6 +1973,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4dex':drawDex();return;
  case 'g4build':drawBuild();return;
  case 'g4plot':drawPlot();return;
+ case 'g4dab':drawDab();return;
  case 'g4cot':drawCot();return;
  case 'g4nur':drawNur();return;
  case 'g4tools':drawTools();return;
