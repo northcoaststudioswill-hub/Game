@@ -1618,7 +1618,7 @@ const WGUIDE=[
  ['GATHERING & TOOLS','Trees and rocks take 15 hits;','bushes take 6. Every swing','costs stamina — rest at the','Cottage. The Tinker Bench','crafts the AXE and PICKAXE.','Level them up to Lv3.'],
  ['GYMS & SIGILS','Four gyms, four Sigils:','Ranger, Marcus, Erin, Scout.','Then the First Keeper waits','at the Peak — and past him,','something chrome. Gym buddies','cannot be caught.'],
  ['THE VALLEY','Pip, the Elder, and Louie hold','ASKS — small jobs that pay.','A gold sparkle is a buried','TREASURE: walk into it. Days','turn to night, and wild','buddies grow bolder.']];
-function guideUpdate(){if(pressed('b')){state='g4pause';swSel=6;return}
+function guideUpdate(){if(pressed('b')){state='g4pause';swSel=7;return}
  if(pressed('right')||pressed('a')){if(W4.guidePage<WGUIDE.length-1){W4.guidePage++;swSnd(660,.04)}else swSnd(140,.06)}
  if(pressed('left')){if(W4.guidePage>0){W4.guidePage--;swSnd(660,.04)}else swSnd(140,.06)}}
 function drawGuide(){const pg=WGUIDE[W4.guidePage||0];swShell("KEEPER'S GUIDE",'PAGE '+(W4.guidePage+1)+'/'+WGUIDE.length);
@@ -1780,7 +1780,7 @@ function drawMap(){swShell('SECTORS','SIGILS '+SW.badges.length+'/4');
  swRows(WSECTORS.map(s=>({a:s.n+(W4.sector===s.id?' · HERE':''),
   b:SW.badges.length<s.req?'NEEDS '+s.req+' SIGIL'+(s.req>1?'S':''):(s.id!=='BASE'&&!SW.visited[s.id])?'no post lit yet':s.gym>=0?(SW.gymDone[s.gym]?'SIGIL ✓':'GYM'):'lit'})),
   swSel,WSECTORS[swSel].sub+' Wilds Lv '+(WSECTORS[swSel].lv?WSECTORS[swSel].lv.join('-'):'—')+'.')}
-function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','BASE','KEEPER','GUIDE','RESUME'];swNav(rows.length);
+function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','BASE','KEEPER','GUIDE','BUG JAR','RESUME'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){const r2=rows[swSel];
   if(r2==='BUDDIES'){swSel=0;state='g4party'}
@@ -1790,11 +1790,12 @@ function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','
   else if(r2==='BASE'){state='g4base'}
   else if(r2==='KEEPER'){swSel=['WILL','ERIN','MARCUS'].indexOf(SW.keeper);state='g4keeper'}
   else if(r2==='GUIDE'){W4.guidePage=0;state='g4guide'}
+  else if(r2==='BUG JAR'){swSel=0;state='g4jar'}
   else state='g4world'}}
 function drawPause(){swShell('KEEPER MENU','');
  swRows([{a:'BUDDIES',b:SW.party.length+(SW.party.length===1?' buddy':' buddies')},{a:'BUDDY GUIDE',b:Object.keys(SW.caught).length+'/'+WSPECIES.length+' caught'},
   {a:'BUILD',b:W4.sector==='BASE'?'at base':'go to base'},{a:'MAP',b:'travel is by Lantern'},
-  {a:'WORK BOARD',b:'Sunkeep Lv'+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how everything works'},{a:'RESUME',b:''}],swSel,'Sprouts '+wBudTotal()+' (pouch '+(SW.pouch||8)+') · Tonics '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0))}
+  {a:'WORK BOARD',b:'Sunkeep Lv'+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how everything works'},{a:'BUG JAR',b:Object.values(SW.bugs||{}).reduce((a,v)=>a+v,0)+' bugs'},{a:'RESUME',b:''}],swSel,'Sprouts '+wBudTotal()+' (pouch '+(SW.pouch||8)+') · Tonics '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0))}
 function partyUpdate(){swNav(Math.max(1,SW.party.length+1));
  if(pressed('b')){state='g4pause';swSel=0;return}
  if(pressed('a')){if(swSel===SW.party.length){swSel=0;state='g4box';return}
@@ -1944,6 +1945,8 @@ function g4Update(dt){switch(state){
  case 'g4plot':plotUpdate();return;
  case 'g4dab':dabUpdate(dt);return;
  case 'g4loop':loopUpdate();return;
+ case 'g4jar':jarUpdate();return;
+ case 'g4kind':kindUpdate();return;
  case 'g4cot':cotUpdate();return;
  case 'g4nur':nurUpdate();return;
  case 'g4tools':toolsUpdate();return;
@@ -1977,6 +1980,8 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4plot':drawPlot();return;
  case 'g4dab':drawDab();return;
  case 'g4loop':drawLoop();return;
+ case 'g4jar':drawJar();return;
+ case 'g4kind':drawKind();return;
  case 'g4cot':drawCot();return;
  case 'g4nur':drawNur();return;
  case 'g4tools':drawTools();return;
@@ -1991,7 +1996,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={lst:()=>louSt(),louPet:()=>louPetOK(),noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={noBugs:v=>{WNOBUG=v},walk:()=>({st:SW.walk||0,ew:W4.ew}),bugs:()=>W4.bugs||[],bugCatch:b=>bgCatch(b),bugCatch:b=>bgCatch(b),lst:()=>louSt(),louPet:()=>louPetOK(),noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},

@@ -57,11 +57,12 @@ function wTitleFiles(){const K='#14101e',tm=W4.tm|0,pw=W-20,rh=34,ph=3*rh+40,py=
  if(tm===2){const y=Math.round(H/2-36),t1='ERASE FILE '+(swSel+1)+'?';r('rgba(6,8,6,.7)',0,0,W,H);r(K,16,y,W-32,72);r('#f8f4e0',18,y+2,W-36,68);r('#e04838',18,y+2,W-36,3);
   text(t1,Math.round(W/2-tw(t1,2)/2),y+11,2,'#a33b2e',null);ctext('This cannot be undone.',y+31,1,'#282838',null);text('A  ERASE',30,y+52,1,'#a33b2e',null);text('B  KEEP IT',W-30-tw('B  KEEP IT',1),y+52,1,'#1d5a2a',null)}}
 /* ---------------- pause: save and quit ---------------- */
-function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','BASE','KEEPER','GUIDE','SAVE AND QUIT','RESUME'];swNav(rows.length);
+function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUG JAR','BUILD','SECTORS','BASE','KEEPER','GUIDE','SAVE AND QUIT','RESUME'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){const r2=rows[swSel];
   if(r2==='BUDDIES'){swSel=0;state='g4party'}
   else if(r2==='BUDDY GUIDE'){swSel=0;state='g4dex'}
+  else if(r2==='BUG JAR'){swSel=0;state='g4jar'}
   else if(r2==='BUILD'){if(W4.sector!=='BASE'){swSay('Building happens at Sunkeep Base.',1.8);state='g4world'}else{swSel=0;state='g4build'}}
   else if(r2==='SECTORS'){W4.mapRO=1;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(r2==='BASE'){swSel=0;state='g4base'}
@@ -70,7 +71,7 @@ function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','
   else if(r2==='SAVE AND QUIT'){swSave();swSnd(784,.1,1175);W4.tm=0;W4.tsaved=3;state='g4title'}
   else state='g4world'}}
 function drawPause(){swShell('KEEPER MENU','FILE '+(wSlot+1));
- swRows([{a:'BUDDIES',b:SW.party.length+(SW.party.length===1?' buddy':' buddies')},{a:'BUDDY GUIDE',b:Object.keys(SW.caught).length+'/'+WSPECIES.length+' met'},
+ swRows([{a:'BUDDIES',b:SW.party.length+(SW.party.length===1?' buddy':' buddies')},{a:'BUDDY GUIDE',b:Object.keys(SW.caught).length+'/'+WSPECIES.length+' met'},{a:'BUG JAR',b:Object.values(SW.bugs||{}).reduce((a,v)=>a+v,0)+' bugs'},
   {a:'BUILD',b:W4.sector==='BASE'?'at home':'only at home'},{a:'MAP',b:'look only'},{a:'WORK BOARD',b:'Sunkeep Lv'+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how it works'},
   {a:'SAVE AND QUIT',b:'to the title'},{a:'RESUME',b:''}],swSel,
   'Sprouts '+wBudTotal()+'/'+(SW.pouch||8)+' · Tonic '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0)+'. Saves by itself.')}

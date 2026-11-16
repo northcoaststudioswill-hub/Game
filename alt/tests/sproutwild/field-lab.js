@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:440,height:956}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
 await p.goto('file://'+process.argv[2]);await p.waitForTimeout(700);
 await p.evaluate(()=>{const e=document.querySelector('.cart[data-i="4"]');e.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}))});await p.waitForTimeout(900);
-const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F.noScenes(true);F.noCap(true);
+const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F.noScenes(true);F.noCap(true);F.noBugs(true);F.lst().dig=1e9;
  const ok=(n,c,x)=>out.push((c?'PASS ':'FAIL ')+n+(x!==undefined?'  ['+x+']':''));
  const step=(n,keys)=>{for(let i=0;i<n;i++){for(const k in G.keys)G.keys[k]=0;if(keys)for(const k of keys)G.keys[k]=1;G.update(1/30);for(const k in G.keys)G.prev[k]=G.keys[k]}for(const k in G.keys)G.keys[k]=0;G.update(1/30);for(const k in G.keys)G.prev[k]=0};
  const tap=k=>{step(1,[k]);step(1)};
@@ -151,14 +151,14 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   tap('a');step(2);tap('down');tap('a');step(3);
   ok('an empty file starts a NEW GAME',F.state()==='g4intro'&&F.meta().quest===0&&!F.meta().party.length&&F.meta().res.wood===0,F.state());
   tap('b');step(5);ok('...which begins at the Lantern',F.state()==='g4world'&&F.op()===0,F.op());
-  F.meta().day=4;tap('start');for(let i=0;i<7;i++)tap('down');tap('a');step(3);ok('SAVE AND QUIT returns to the title',F.state()==='g4title',F.state());
+  F.meta().day=4;tap('start');for(let i=0;i<8;i++)tap('down');tap('a');step(3);ok('SAVE AND QUIT returns to the title',F.state()==='g4title',F.state());
   tap('a');step(2);tap('a');step(4);ok('CONTINUE loads that file back',F.state()==='g4world'&&F.meta().day===4&&F.op()===0,F.meta().day);
   const f1=JSON.parse(localStorage.getItem('sproutwild-v1'));ok('file 1 is untouched by playing file 2',f1.quest===5&&f1.day===9&&f1.res.wood===77,f1.day);
-  tap('start');for(let i=0;i<7;i++)tap('down');tap('a');step(3);tap('a');step(2);tap('sel');step(2);tap('a');step(2);
+  tap('start');for(let i=0;i<8;i++)tap('down');tap('a');step(3);tap('a');step(2);tap('sel');step(2);tap('a');step(2);
   ok('SELECT erases a file after asking',localStorage.getItem('sproutwild-s2')===null);
   tap('up');tap('a');step(5);ok('file 1 continues where it was',F.state()==='g4world'&&F.meta().day===9&&F.meta().res.wood===77,F.meta().day);
   localStorage.setItem('sproutwild-s3','{"intro":1,"party":[{"sp":"NOPE","lv":3}],"box":"x","sector":"NOWHERE","quest":9,"buildings":[{"k":"castle"}],"res":null}');
-  tap('start');for(let i=0;i<7;i++)tap('down');tap('a');step(3);tap('a');step(2);tap('down');tap('down');tap('a');step(8);G.draw();
+  tap('start');for(let i=0;i<8;i++)tap('down');tap('a');step(3);tap('a');step(2);tap('down');tap('down');tap('a');step(8);G.draw();
   ok('a damaged save loads safely',F.state()==='g4world'&&F.meta().sector==='BASE'&&F.meta().party.length===0&&F.meta().buildings.length===0,F.state()+' '+F.meta().quest)}
  /* v7.0: starters and the Data Center */
  {const st=F.starters();ok('the three starters are the Ohio trio',st.join()==='CUYAPUP,BESSLING,GRASSKIN',st.join());
@@ -166,6 +166,11 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   F.noCap(false);S.buildings=[];S.box=[];S.party=S.party.slice(0,1);ok('one buddy: room for more',!F.buddyFull());
   while(S.party.length+S.box.length<3)F.giveMon('PEBBLIT',3);ok('three buddies and no Data Center: full',F.buddyFull(),S.party.length+S.box.length);
   F.build('datacenter',6,12);ok('a Data Center makes room',!F.buddyFull());F.noCap(true)}
+ /* v7.9: bugs */
+ {F.noBugs(false);S.buds.ZIP=3;S.buds.DEW=3;F.travel('MEADOW','BASE');S.bugs={};S.bugSeen={};for(let i=0;i<40*30&&F.bugs().length<2;i++)step(1);const bs=F.bugs();ok('bugs live in the Meadow',bs.length>=1,bs.length);
+  if(bs.length){const bg=bs[0],f4=F.fld();bg.hx=bg.x;bg.hy=bg.y;F.setPos(bg.x,bg.y+20);f4.dir=[0,-1];f4.arrive=null;for(const s of f4.sq){s.st='follow';s.x=F.pos().x;s.y=F.pos().y+6}step(4);
+   const nr=JSON.stringify(F.near()),b0=JSON.stringify({x:Math.round(bg.x),y:Math.round(bg.y),sp:bg.sp}),me=JSON.stringify(F.pos());tap('a');step(3);const lab=nr+' '+b0+' me'+me+' sq:'+f4.sq.map(s=>s.st+(s.aim?s.aim.kind:'')).join(',');step(57);ok('a sprout thrown at a bug catches it',Object.values(S.bugs).reduce((a,v)=>a+v,0)>=1,lab+' / '+JSON.stringify(S.bugs))}
+  F.noBugs(true)}
  /* v7.8: Louie, the Sprouts way */
  {S.seeds=[];S.lit=1;S.tendDone=true;S.tendStage=4;S.quest=Math.max(S.quest,5);if(!S.party.length)F.giveMon('GRASSKIN',7);F.travel('BASE','MEADOW');step(10);const L=F.lst();L.st='follow';L.dig=999;const lo=F.louie();F.setPos(lo.x,lo.y+14);step(1,['up']);step(20);
   ok('facing Louie while standing still offers a pet',F.near()&&F.near().k==='louie',JSON.stringify(F.near())+' op'+F.op()+' st'+F.state()+' lou'+JSON.stringify(F.louie())+' me'+JSON.stringify(F.pos()));tap('a');step(2);ok('petting makes him sit',F.lst().st==='sit');

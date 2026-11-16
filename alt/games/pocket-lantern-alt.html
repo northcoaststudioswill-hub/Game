@@ -7666,7 +7666,7 @@ const WGUIDE=[
  ['GATHERING & TOOLS','Trees and rocks take 15 hits;','bushes take 6. Every swing','costs stamina — rest at the','Cottage. The Tinker Bench','crafts the AXE and PICKAXE.','Level them up to Lv3.'],
  ['GYMS & SIGILS','Four gyms, four Sigils:','Ranger, Marcus, Erin, Scout.','Then the First Keeper waits','at the Peak — and past him,','something chrome. Gym buddies','cannot be caught.'],
  ['THE VALLEY','Pip, the Elder, and Louie hold','ASKS — small jobs that pay.','A gold sparkle is a buried','TREASURE: walk into it. Days','turn to night, and wild','buddies grow bolder.']];
-function guideUpdate(){if(pressed('b')){state='g4pause';swSel=6;return}
+function guideUpdate(){if(pressed('b')){state='g4pause';swSel=7;return}
  if(pressed('right')||pressed('a')){if(W4.guidePage<WGUIDE.length-1){W4.guidePage++;swSnd(660,.04)}else swSnd(140,.06)}
  if(pressed('left')){if(W4.guidePage>0){W4.guidePage--;swSnd(660,.04)}else swSnd(140,.06)}}
 function drawGuide(){const pg=WGUIDE[W4.guidePage||0];swShell("KEEPER'S GUIDE",'PAGE '+(W4.guidePage+1)+'/'+WGUIDE.length);
@@ -7828,7 +7828,7 @@ function drawMap(){swShell('SECTORS','SIGILS '+SW.badges.length+'/4');
  swRows(WSECTORS.map(s=>({a:s.n+(W4.sector===s.id?' · HERE':''),
   b:SW.badges.length<s.req?'NEEDS '+s.req+' SIGIL'+(s.req>1?'S':''):(s.id!=='BASE'&&!SW.visited[s.id])?'no post lit yet':s.gym>=0?(SW.gymDone[s.gym]?'SIGIL ✓':'GYM'):'lit'})),
   swSel,WSECTORS[swSel].sub+' Wilds Lv '+(WSECTORS[swSel].lv?WSECTORS[swSel].lv.join('-'):'—')+'.')}
-function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','BASE','KEEPER','GUIDE','RESUME'];swNav(rows.length);
+function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','BASE','KEEPER','GUIDE','BUG JAR','RESUME'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){const r2=rows[swSel];
   if(r2==='BUDDIES'){swSel=0;state='g4party'}
@@ -7838,11 +7838,12 @@ function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','
   else if(r2==='BASE'){state='g4base'}
   else if(r2==='KEEPER'){swSel=['WILL','ERIN','MARCUS'].indexOf(SW.keeper);state='g4keeper'}
   else if(r2==='GUIDE'){W4.guidePage=0;state='g4guide'}
+  else if(r2==='BUG JAR'){swSel=0;state='g4jar'}
   else state='g4world'}}
 function drawPause(){swShell('KEEPER MENU','');
  swRows([{a:'BUDDIES',b:SW.party.length+(SW.party.length===1?' buddy':' buddies')},{a:'BUDDY GUIDE',b:Object.keys(SW.caught).length+'/'+WSPECIES.length+' caught'},
   {a:'BUILD',b:W4.sector==='BASE'?'at base':'go to base'},{a:'MAP',b:'travel is by Lantern'},
-  {a:'WORK BOARD',b:'Sunkeep Lv'+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how everything works'},{a:'RESUME',b:''}],swSel,'Sprouts '+wBudTotal()+' (pouch '+(SW.pouch||8)+') · Tonics '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0))}
+  {a:'WORK BOARD',b:'Sunkeep Lv'+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how everything works'},{a:'BUG JAR',b:Object.values(SW.bugs||{}).reduce((a,v)=>a+v,0)+' bugs'},{a:'RESUME',b:''}],swSel,'Sprouts '+wBudTotal()+' (pouch '+(SW.pouch||8)+') · Tonics '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0))}
 function partyUpdate(){swNav(Math.max(1,SW.party.length+1));
  if(pressed('b')){state='g4pause';swSel=0;return}
  if(pressed('a')){if(swSel===SW.party.length){swSel=0;state='g4box';return}
@@ -8241,19 +8242,20 @@ const fStr=it=>it.car.reduce((a,s)=>a+(s.type===1?2:1),0);
 function fAim(F){ /* the cursor sits ahead of you and locks on to the nearest thing sprouts can work: a wide cone in front, plus anything right beside you */
  let x=P3.x+F.dir[0]*52,y=P3.y+F.dir[1]*52,best=1e9,tg=null,kind=null;
  const tryT=(o,k)=>{const vx=o.x-P3.x,vy=o.y-P3.y,al=vx*F.dir[0]+vy*F.dir[1],off=Math.abs(vx*F.dir[1]-vy*F.dir[0]),d=Math.hypot(vx,vy);
-  let sc=1e9;if(al>-2&&al<92&&off<16+al*.42)sc=al+off*1.3;if(d<26)sc=Math.min(sc,d*.8);if(sc<1e9){if(k==='wild')sc*=.75;else if(k==='bwork')sc*=1.1}if(sc<best){best=sc;tg=o;kind=k}};
+  let sc=1e9;if(al>-2&&al<92&&off<16+al*.42)sc=al+off*1.3;if(d<26)sc=Math.min(sc,d*.8);if(sc<1e9){if(k==='bug')sc*=.6;else if(k==='wild')sc*=.75;else if(k==='bwork')sc*=1.1}if(sc<best){best=sc;tg=o;kind=k}};
  for(const g2 of F.gates)if(!g2.open)tryT(g2,'gate');
  for(const s of F.sites)if(!s.done)tryT(s,'site');
  {const b0=best;let full=null;for(const it of F.items)if(!it.done&&!(it.guard&&F.alphas.includes(it.guard))){if(fStr(it)+F.sq.filter(q=>q.st==='fly'&&q.aim&&q.aim.tg===it).reduce((a,q)=>a+(q.type===1?2:1),0)>=it.w){full=full||it;continue}tryT(it,'item')}
   if(!tg&&full&&best===b0){const sv=best;tryT(full,'item');if(tg===full){tg=null;kind=null;best=sv;F.aimFull=full}}else F.aimFull=null}
  for(const nd of W4.nodes)if(!nd.got&&nd.k==='bush')tryT(nd,'node'); /* sprouts pick berries; trees and rocks are buddy work */
  for(const wd of W4.wilds)if(!wd.cap)tryT(wd,'wild');
+ if(W4.fld)for(const bg of W4.bugs||[])tryT(bg,'bug');
  if(F.pf){for(const nd of W4.nodes)if(!nd.got&&nd.k!=='bush'&&pfBest(F,nd))tryT(nd,'bwork');for(const sp of F.spots||[])if(!sp.got&&pfBest(F,sp))tryT(sp,'bwork')}
  if(tg){x=tg.x;y=tg.y}
  else{let n=0;while(n++<10&&!fWalkTile(F,Math.floor(x/FT),Math.floor(y/FT))){x-=F.dir[0]*5;y-=F.dir[1]*5}}
  /* which kind goes: what the target needs, else what suits it; SELECT overrides for a few seconds */
  let pref=null,need=-1;
- if(kind==='gate')pref=[tg.type];else if(kind==='item')pref=tg.w>=3?[1,0,5,3,4,2]:[3,5,0,4,2,1];else if(kind==='node')pref=[2,4,5,0,3,1];else if(kind==='site')pref=[1,0,4,3,5,2];
+ if(kind==='gate')pref=[tg.type];else if(kind==='item')pref=tg.w>=3?[1,0,5,3,4,2]:[3,5,0,4,2,1];else if(kind==='node')pref=[2,4,5,0,3,1];else if(kind==='site')pref=[1,0,4,3,5,2];else if(kind==='bug')pref=[3,2,4,0,5,1];
  else if(kind==='wild'){const t0=wSp(tg.sp).t[0];pref=[t0].concat([0,1,2,3,4,5].filter(t=>t!==t0))}
  if(pref){const sq=F.sq.filter(s=>s.st==='follow'),have=pref.find(t=>sq.some(s=>s.type===t));if(have===undefined){if(pref.length===1)need=pref[0]}else if(!(F.manT>0)||pref.length===1)SW.selType=have}
  return{x,y,tg,kind,need,buddy:kind==='bwork'?pfBest(F,tg):null}}
@@ -8269,6 +8271,7 @@ function fLand(F,s){const a=s.aim||{};s.z=0;s.aim=null;
  let tg=a.tg,kind=a.kind;
  if(!tg){for(const it of F.items)if(!it.done&&near(it,18)){tg=it;kind='item'}
   if(!tg)for(const nd of W4.nodes)if(!nd.got&&nd.k==='bush'&&near(nd,18)){tg=nd;kind='node'}}
+ if(kind==='bug'){s.st='ret';if((W4.bugs||[]).includes(tg)&&Math.hypot(tg.x-s.x,tg.y-s.y)<26)bgCatch(tg);else W4.floats.push({x:s.x,y:s.y-14,txt:'IT FLEW OFF!',t:1,c:'#e88'});return}
  if(kind==='wild'&&W4.wilds.includes(tg)){if(wBuddyFull()){wFullSay();s.st='ret';return}pfLatch(F,s,tg);return}
  if(kind==='gate'){if(tg.open){s.st='idle';s.t=0;return}
   if(tg.type!==s.type){s.st='ret';W4.floats.push({x:tg.x,y:tg.y-20,txt:tg.n+' — NEEDS '+TYPES[tg.type].n+' SPROUTS',t:1.6,c:'#ffd94d'});swSnd(200,.06);return}}
@@ -8408,7 +8411,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    const dx=wd.tx-wd.x,dy=wd.ty-wd.y,d=Math.hypot(dx,dy);wd.mv=d>2;if(d>2){wd.x+=dx/d*16*dt;wd.y+=dy/d*16*dt;wd.fx=dx<0?-1:1}}
   if(W4.wildCd>0){W4.wildCd-=dt;if(W4.wildCd<=0&&W4.wilds.length<3&&F.grass.length)W4.wilds.push(fSpawnWild(F,sec))}}
  /* your lead buddy walks at your side */
- pfTick(F,dt);pfWildTick(F,dt);
+ pfTick(F,dt);pfWildTick(F,dt);bgTick(F,dt);ewTick(F,dt);
  fSquad(F,dt);fItems(F,dt);fLouTick(F,dt);
  W4.near=fNear(F);
  if(pressed('a')&&W4.near){const n=W4.near;
@@ -8458,7 +8461,7 @@ function fRing(F){if(F.sq.length||(F.pf&&F.pf.length)){const a=fAim(F),T=a.kind=
   if(a.tg){const c=a.need>=0?'#e04838':T.l,rr=a.kind==='site'?14:11;
    for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){r('#14101e',ax+sx*(rr+ph)-2,ay-6+sy*(rr-2+ph)-2,5,5);r(c,ax+sx*(rr+ph)-1,ay-6+sy*(rr-2+ph)-1,3,1);r(c,ax+sx*(rr+ph)-(sx<0?1:-1),ay-6+sy*(rr-2+ph)-1,1,3)}
    for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.6)',Math.round(px),Math.round(py),1,1)}
-   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='wild'?(wBuddyFull()?'No room for more buddies · build a DATA CENTER':pfCan(F,a.tg)?'CATCH · needs '+pfNeed(a.tg)+(Math.hypot(a.tg.x-P3.x,a.tg.y-P3.y)<64?' · SELECT: fight':' sprouts'):'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
+   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='bug'?'CATCH '+a.tg.sp:a.kind==='wild'?(wBuddyFull()?'No room for more buddies · build a DATA CENTER':pfCan(F,a.tg)?'CATCH · needs '+pfNeed(a.tg)+(Math.hypot(a.tg.x-P3.x,a.tg.y-P3.y)<64?' · SELECT: fight':' sprouts'):'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
    F.aimLab=lab;F.aimNeed=a.need>=0}
   else{F.aimLab=null;r('rgba(255,255,255,.35)',ax-1,ay-1,2,2)}}else F.aimLab=null;
  if(F.whistle){g.strokeStyle='rgba(255,244,180,.8)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-2,F.whistle,0,7);g.stroke();
@@ -8616,7 +8619,7 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
  D.push([F.start.y-2,12]);
  if(F.fort)D.push([F.fort.y-4,15,F.fort]);
  for(const pb of F.pf||[])D.push([pb.y,13,pb]);
- D.push([P3.y+1,14]);for(const sp of F.spots)D.push([sp.y+3,17,sp]);D.push([lou.y+5,16]);
+ D.push([P3.y+1,14]);for(const sp of F.spots)D.push([sp.y+3,17,sp]);D.push([lou.y+5,16]);for(const bg of W4.bugs||[])D.push([bg.y+1,18,bg]);if(W4.ew&&W4.ewFor===F)D.push([W4.ew.y,19]);
  D.sort((a,b)=>a[0]-b[0]);
  const feet=(x,y)=>{if(fTile(F,Math.floor(x/FT),Math.floor(y/FT))==='"'){const sx=Math.round(x);r(B.tg[1],sx-5,y-3,1,5);r(B.tg[2],sx-5,y-3,1,1);r(B.tg[1],sx-1,y-2,1,4);r(B.tg[1],sx+3,y-4,1,6);r(B.tg[2],sx+3,y-4,1,1);r(B.tg[0],sx-6,y+1,13,2)}};
  for(const d of D){const k=d[1],o=d[2];
@@ -8651,6 +8654,8 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
   else if(k===13)pfDraw(o,feet);
   else if(k===16)fLouDraw();
   else if(k===17)fSpotDraw(o);
+  else if(k===18)bgDraw(o);
+  else if(k===19)ewDraw();
   else if(k===15)fFort(o.x,o.y);
   else if(k===14){const hz=F.hopZ||0;wHero(P3.x,P3.y-hz);if(!hz)feet(P3.x,P3.y+2)}}
  for(const nd of W4.nodes)if(!nd.got&&nd.hp<nd.max){r('#00000088',nd.x-11,nd.y-30,22,4);r('#7ee787',nd.x-10,nd.y-29,Math.round(20*Math.max(0,nd.hp)/nd.max),2)}
@@ -9605,11 +9610,12 @@ function wTitleFiles(){const K='#14101e',tm=W4.tm|0,pw=W-20,rh=34,ph=3*rh+40,py=
  if(tm===2){const y=Math.round(H/2-36),t1='ERASE FILE '+(swSel+1)+'?';r('rgba(6,8,6,.7)',0,0,W,H);r(K,16,y,W-32,72);r('#f8f4e0',18,y+2,W-36,68);r('#e04838',18,y+2,W-36,3);
   text(t1,Math.round(W/2-tw(t1,2)/2),y+11,2,'#a33b2e',null);ctext('This cannot be undone.',y+31,1,'#282838',null);text('A  ERASE',30,y+52,1,'#a33b2e',null);text('B  KEEP IT',W-30-tw('B  KEEP IT',1),y+52,1,'#1d5a2a',null)}}
 /* ---------------- pause: save and quit ---------------- */
-function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','BASE','KEEPER','GUIDE','SAVE AND QUIT','RESUME'];swNav(rows.length);
+function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUG JAR','BUILD','SECTORS','BASE','KEEPER','GUIDE','SAVE AND QUIT','RESUME'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){const r2=rows[swSel];
   if(r2==='BUDDIES'){swSel=0;state='g4party'}
   else if(r2==='BUDDY GUIDE'){swSel=0;state='g4dex'}
+  else if(r2==='BUG JAR'){swSel=0;state='g4jar'}
   else if(r2==='BUILD'){if(W4.sector!=='BASE'){swSay('Building happens at Sunkeep Base.',1.8);state='g4world'}else{swSel=0;state='g4build'}}
   else if(r2==='SECTORS'){W4.mapRO=1;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(r2==='BASE'){swSel=0;state='g4base'}
@@ -9618,7 +9624,7 @@ function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUILD','SECTORS','
   else if(r2==='SAVE AND QUIT'){swSave();swSnd(784,.1,1175);W4.tm=0;W4.tsaved=3;state='g4title'}
   else state='g4world'}}
 function drawPause(){swShell('KEEPER MENU','FILE '+(wSlot+1));
- swRows([{a:'BUDDIES',b:SW.party.length+(SW.party.length===1?' buddy':' buddies')},{a:'BUDDY GUIDE',b:Object.keys(SW.caught).length+'/'+WSPECIES.length+' met'},
+ swRows([{a:'BUDDIES',b:SW.party.length+(SW.party.length===1?' buddy':' buddies')},{a:'BUDDY GUIDE',b:Object.keys(SW.caught).length+'/'+WSPECIES.length+' met'},{a:'BUG JAR',b:Object.values(SW.bugs||{}).reduce((a,v)=>a+v,0)+' bugs'},
   {a:'BUILD',b:W4.sector==='BASE'?'at home':'only at home'},{a:'MAP',b:'look only'},{a:'WORK BOARD',b:'Sunkeep Lv'+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how it works'},
   {a:'SAVE AND QUIT',b:'to the title'},{a:'RESUME',b:''}],swSel,
   'Sprouts '+wBudTotal()+'/'+(SW.pouch||8)+' · Tonic '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0)+'. Saves by itself.')}
@@ -9876,7 +9882,8 @@ function scBuild(){SW.lessons.scBuild=1;SW.beats.caught=1;const nm=(SW.party[SW.
   {x:150,y:236,hold:1.1},{x:150,y:236,who:'MARCUS',txt:'Buddies need a roof, bro. Press START, pick BUILD, then COTTAGE. Costs 8 wood. This spot is nice.'},
   {x:150,y:236,who:'MARCUS',txt:'Short on wood? Send a buddy at trees. Sprouts carry the logs home. Teamwork. I supervise.'},
   {who:'ERIN',txt:'Only your lead buddy walks with you here. The others wait at home. Give them a roof and they get to work.'},{hold:.4}],()=>swSave())}
-function scAuto(){if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
+function scAuto(){if(!SCOFF&&kindCheck())return;
+ if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
   if(wOp()>=3&&!SW.lessons.loop&&SW.quest<=2){if(SCOFF)SW.lessons.loop=1;else{W4.loopT=0;state='g4loop';return}}
   if(wHasRoof()&&!SW.lessons.scDab&&W4.sector==='BASE'&&wOp()>=3&&!(W4.cons&&W4.cons.length)){W4.dabT=(W4.dabT||0)+1;if(W4.dabT>50){if(SCOFF)SW.lessons.scDab=1;else dabStart();return}}
   if(SW.quest===4&&SW.lessons.scDab&&!SW.lessons.scPlot&&W4.sector==='BASE'&&!(W4.cons&&W4.cons.length)){W4.plotT=(W4.plotT||0)+1;if(W4.plotT>60){scPlots();return}}
@@ -10135,8 +10142,8 @@ GRASSMAN(D){const fur='#5a7a30',dk='#3e5a22',fc='#e0c090';
  ev('GRASSKIN','GRASSMAN',64,21,17,10,{PLANTING:3,QUARRY:2},'Seven feet of moss and manners. Leaves very large footprints.','#5a7a30');
  Object.assign(WBLURB,{CUYAPUP:'Fast hitter. Runs the kiln.',BESSLING:'Tough and lucky. Waters.',GRASSKIN:'Strongest. Plants, chops.'})}
 /* ---------------- "how Sunkeep works": one card, once, right after your first buddy ---------------- */
-function loopUpdate(){W4.loopT=(W4.loopT||0)+1/30;if((pressed('a')||pressed('start'))&&W4.loopT>.8){SW.lessons.loop=1;W4.loopT=0;swSnd(660,.06,990);state='g4world';swSave()}}
-function drawLoop(){const K='#0c1410',t=W4.loopT||0,rows=[['1','THROW','A throws sprouts at berries, logs and wild buddies.','#f8902c'],['2','CARRY','They carry it all home. The Lantern grows more sprouts.','#58a0f0'],
+function loopUpdate(){W4.loopT=(W4.loopT||0)+1/30;if((pressed('a')||pressed('start'))&&W4.loopT>.8){swSnd(660,.06,990);W4.loopT=0;if(!W4.loopP){W4.loopP=1;return}W4.loopP=0;SW.lessons.loop=1;state='g4world';swSave()}}
+function drawLoop(){if(W4.loopP){drawLoop2();return}const K='#0c1410',t=W4.loopT||0,rows=[['1','THROW','A throws sprouts at berries, logs and wild buddies.','#f8902c'],['2','CARRY','They carry it all home. The Lantern grows more sprouts.','#58a0f0'],
   ['3','CATCH','Enough sprouts on a wild buddy and it joins you.','#7ee787'],['4','BUILD','Buddies you leave home do the work. Build Sunkeep up.','#ffd94d'],['5','SIGILS','Win the four gyms to open the roads.','#f078c0']];
  ox=0;oy=0;r(K,0,0,W,H);r('#ffd94d',0,22,W,1);ctext('HOW SUNKEEP WORKS',8,1,'#ffd94d');
  rows.forEach(([n,h,d,c],i)=>{const at=.15+i*.18;if(t<at)return;const y=34+i*46,k=Math.min(1,(t-at)/.2),xo=Math.round((1-k)*40);g.globalAlpha=k;
@@ -10148,6 +10155,11 @@ function hudTips(){const L=SW.lessons;if(W4.scene||state!=='g4world'||W4.msgT>0|
  else if(SW.res.stone>0&&!L.hS){L.hS=1;swSay('◆ at the top is STONE. Bigger buildings need it.',3.2)}
  else if(W4.sector==='TOWN'&&!L.hP){L.hP=1;swSay('✿ at the top is PETALS: money for town and the cottage.',3.4)}
  else if(SW.hearts>0&&!L.hH&&!W4.fld){L.hH=1;swSay('♥ are gratitude hearts. The Great Lantern trades plans for them.',3.4)}}
+function drawLoop2(){const t=W4.loopT||0;ox=0;oy=0;r('#0c1410',0,0,W,H);r('#ffd94d',0,22,W,1);ctext('YOUR FIRST THREE SPROUTS',8,1,'#ffd94d');
+ [0,2,4].forEach((ty,i)=>{const at=.1+i*.2;if(t<at)return;const T=TYPES[ty],y=40+i*62,k=Math.min(1,(t-at)/.2);g.globalAlpha=k;
+  g.save();g.translate(26,y+30);g.scale(2,2);drawBud({x:0,y:0,type:ty,stage:2,z:0,a:ty,mv:false,st:'follow',fx:1});g.restore();
+  text(T.n,52,y+4,1,T.l,null);swWrap(WKINDS[ty].good,W-62).slice(0,2).forEach((l,j)=>text(l,52,y+16+j*10,1,'#e8f4d8',null));g.globalAlpha=1});
+ if(t>.7){ctext('More kinds are out in the wild. Each has its own job.',H-36,1,'#a8c898');r('#14121e',0,H-18,W,18);const s='A  GOT IT';text(s,W-8-tw(s,1),H-13,1,'#7ee787',null)}}
 /* ================================================================
    GARDEN PLOTS (v7.0)
    The garden is the base's one field. Each plot grows ONE thing and
@@ -10281,6 +10293,126 @@ function louDraw(){const L=louSt(),x=Math.round(lou.x),y=Math.round(lou.y),sit=L
  const s=W4.lsay;if(s){const w=tw(s.s,1)+8,bx=Math.max((W4.cam?W4.cam.x:0)+2,Math.round(x-w/2)),by=y-24;r('#14101e',bx-1,by-1,w+2,12);r('#ffffff',bx,by,w,10);r('#ffffff',x-1,by+10,3,2);text(s.s,bx+4,by+1,1,'#282838',null)}}
 function fLouDraw(){louDraw()}
 /* ================================================================
+   BUGS (v7.9)
+   Bugs live out in the field areas: some in the grass, some by the
+   water, some in the trees, some only at night. Face one and press A:
+   a sprout catches it. Caught bugs go in the BUG JAR (START menu),
+   where each can be turned into a resource, or sold to PIP in Lantern
+   Town for petals. All eight come from Ohio summers.
+   ================================================================ */
+const WBUGS=[
+ {id:'LADYBUG',hab:'grass',c:'#e04838',c2:'#14101e',yield:['berry',2],val:4,w:5,lore:"Ohio's state insect. Gardens love it."},
+ {id:'WOOLLY BEAR',hab:'grass',c:'#3a2414',c2:'#d8902c',yield:['fiber',2],val:6,w:4,lore:'Vermilion throws it a festival. Its stripes forecast winter.'},
+ {id:'LIGHTNING BUG',hab:'grass',night:1,fly:1,c:'#3a3a28',c2:'#fff3b0',yield:['light',1],val:8,w:5,lore:'Summer nights in the valley. Feeds a spark to the Lantern.'},
+ {id:'MAYFLY',hab:'water',fly:1,c:'#b8a868',c2:'#f0e8c8',yield:['fiber',1],val:3,w:5,lore:'Lake Erie swarms of them every June. Lives a single day.'},
+ {id:'CICADA',hab:'tree',fly:1,c:'#4a6a3a',c2:'#d8e8f0',yield:['wood',3],val:10,w:3,lore:'Sleeps underground seventeen years, then sings all summer.'},
+ {id:'HELLGRAMMITE',hab:'water',c:'#3a2c22',c2:'#8a6a48',yield:['ore',1],val:14,w:2,lore:'A river monster in miniature. Lives under Cuyahoga stones.'},
+ {id:'LUNA MOTH',hab:'tree',night:1,fly:1,c:'#a8e8b8',c2:'#e8fff0',yield:['fiber',4],val:25,w:1,lore:'Pale green, out only at night. Its silk is like moonlight.'},
+ {id:'MANTIS',hab:'grass',c:'#7ec850',c2:'#3a7d2e',yield:['heart',1],val:18,w:1,lore:'Bows to everyone. The Lantern likes its manners.'}];
+const WBUGRES={berry:'BERRY',fiber:'FIBER',wood:'WOOD',ore:'ORE',light:'LANTERN LIGHT',heart:'HEART'};
+function bgSp(id){return WBUGS.find(b=>b.id===id)}
+/* where each habitat is on this map */
+function bgSpots(F,hab){F.bgH=F.bgH||{};if(F.bgH[hab])return F.bgH[hab];let L=[];
+ if(hab==='grass')L=F.grass.map(([x,y])=>[x*FT+8,y*FT+8]);
+ else if(hab==='water'){for(let y=1;y<F.h-1;y++)for(let x=1;x<F.w-1;x++)if(fWalkTile(F,x,y)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([a,b])=>fTile(F,x+a,y+b)==='~'))L.push([x*FT+8,y*FT+8])}
+ else L=W4.nodes.filter(n=>n.k==='tree').map(n=>[n.x+(Math.random()<.5?-14:14),n.y-6]);
+ return F.bgH[hab]=L}
+let WNOBUG=false;
+function bgTick(F,dt){if(WNOBUG){W4.bugs=[];return}W4.bugs=W4.bugs||[];if(W4.bugsFor!==F){W4.bugs=[];W4.bugsFor=F;W4.bugCd=.5}
+ const night=wDark()>.4,cap=F.id==='HOLLOW'?4:3;
+ W4.bugCd=(W4.bugCd||0)-dt;if(W4.bugCd<=0&&W4.bugs.length<cap){W4.bugCd=14+Math.random()*10;
+  const pool=WBUGS.filter(b=>(!b.night||night)&&bgSpots(F,b.hab).length);let tot=pool.reduce((a,b)=>a+b.w,0),roll=Math.random()*tot,pick=null;for(const b of pool){roll-=b.w;if(roll<=0){pick=b;break}}
+  if(pick){const S=bgSpots(F,pick.hab),[hx,hy]=S[(Math.random()*S.length)|0];if(Math.hypot(hx-P3.x,hy-P3.y)>60)W4.bugs.push({sp:pick.id,x:hx,y:hy,hx,hy,wx:hx,wy:hy,t:0,ph:Math.random()*6})}}
+ for(const bg of W4.bugs){const s=bgSp(bg.sp);if(s.night&&!night){bg.gone=1;continue}bg.t-=dt;
+  if(bg.t<=0){bg.t=s.fly?.6+Math.random():1.5+Math.random()*2;const rr=s.fly?22:10;bg.wx=bg.hx+(Math.random()*2-1)*rr;bg.wy=bg.hy+(Math.random()*2-1)*rr*.7}
+  const dx=bg.wx-bg.x,dy=bg.wy-bg.y,d=Math.hypot(dx,dy),v=s.fly?26:7;if(d>1){bg.x+=dx/d*Math.min(d,v*dt);bg.y+=dy/d*Math.min(d,v*dt);bg.fx=dx<0?-1:1}}
+ W4.bugs=W4.bugs.filter(b=>!b.gone)}
+function bgCatch(bg){const s=bgSp(bg.sp);W4.bugs.splice(W4.bugs.indexOf(bg),1);SW.bugs=SW.bugs||{};const first=!SW.bugs[bg.sp]&&!(SW.bugSeen&&SW.bugSeen[bg.sp]);
+ SW.bugs[bg.sp]=(SW.bugs[bg.sp]||0)+1;SW.bugSeen=SW.bugSeen||{};SW.bugSeen[bg.sp]=1;
+ for(let i=0;i<6;i++)W4.floats.push({x:bg.x+(Math.random()*10-5),y:bg.y-6-Math.random()*8,txt:'*',t:.5,c:s.c2});
+ W4.floats.push({x:bg.x,y:bg.y-18,txt:(first?'NEW BUG: ':'')+bg.sp+'!',t:1.8,c:'#fff3b0'});swSnd(900,.06,1400);swSnd(1400,.1,1400);
+ if(first)swSay(bg.sp+': '+s.lore,3.6);
+ if(!SW.lessons.bugJar){SW.lessons.bugJar=1;W4.bugTip=1}swSave()}
+function bgDraw(bg){const s=bgSp(bg.sp),x=Math.round(bg.x),fl=((time*14+bg.ph)|0)%2,y=Math.round(bg.y-(s.fly?5+Math.sin(time*5+bg.ph)*2:0)),K='#14101e';
+ if(s.fly){r('rgba(0,0,0,.18)',x-2,Math.round(bg.y)+1,5,1)}
+ if(bg.sp==='LIGHTNING BUG'){const gl=.5+.5*Math.sin(time*4+bg.ph);g.globalAlpha=.25+.4*gl;r('#fff3b0',x-3,y-2,7,6);g.globalAlpha=1}
+ if(bg.sp==='WOOLLY BEAR'||bg.sp==='HELLGRAMMITE'){const w=bg.sp==='HELLGRAMMITE'?6:7;r(K,x-4,y-2,w+2,4);r(s.c,x-3,y-1,w,2);r(s.c2,x-1,y-1,3,2);if(fl)r(s.c,x-4,y+1,1,1);return}
+ if(bg.sp==='MANTIS'){r(K,x-1,y-6,3,8);r(s.c,x,y-5,1,6);r(s.c,x+1,y-6,2,1);r(s.c2,x-2,y-3,2,1);r(s.c2,x+1,y-3,2,1);return}
+ r(K,x-2,y-2,5,4);r(s.c,x-1,y-1,3,2);
+ if(bg.sp==='LADYBUG'){r(s.c2,x,y-1,1,1);r(s.c2,x-1,y,1,1)}
+ if(s.fly){const wc=bg.sp==='LUNA MOTH'?s.c:s.c2,a=fl?1:2;r(wc,x-1-a-1,y-2-(fl?1:0),2,2);r(wc,x+2+a-1,y-2-(fl?1:0),2,2)}
+ if(((time*1.2+bg.ph)%3)<.12)r('#ffffff',x+2,y-3,1,1)}
+/* the jar */
+function jarRows(){return WBUGS.map(b=>({b,n:(SW.bugs||{})[b.id]||0,seen:(SW.bugSeen||{})[b.id]}))}
+function jarUpdate(){const rows=jarRows();swNav(rows.length+1);
+ if(pressed('b')){state='g4pause';swSel=2;return}
+ const row=rows[swSel];if(swSel===rows.length){if(pressed('a')){state='g4pause';swSel=2}return}
+ if(pressed('a')){if(!row.n){swSnd(140,.08);return}row.n--;SW.bugs[row.b.id]--;const [k,q]=row.b.yield;
+  if(k==='light'){SW.light=(SW.light||0)+q*2;if(SW.light>=4&&wLit()&&W4.bf){SW.light-=4;const tn=TYPES[(Math.random()*5)|0].n;SW.buds[tn]=(SW.buds[tn]||0)+1;swSay('The Lantern drank the light and grew a '+tn+' sprout!',2.6)}else swSay('The Lantern glows a little brighter.',1.8)}
+  else if(k==='heart'){SW.hearts++;SW.heartsTotal++;swSay('+1 gratitude heart.',1.6)}
+  else{SW.res[k]=(SW.res[k]||0)+q;swSay('+'+q+' '+WBUGRES[k]+'.',1.6)}swSnd(784,.08,1175);swSave()}
+ if(pressed('sel')){if(!row.n){swSnd(140,.08);return}if(W4.sector!=='TOWN'){swSnd(140,.08);swSay('PIP buys bugs in Lantern Town.',2);return}
+  row.n--;SW.bugs[row.b.id]--;SW.res.petal+=row.b.val;swSay('PIP paid '+row.b.val+' petals for a '+row.b.id+'.',1.8);swSnd(988,.08,1319);swSave()}}
+function drawJar(){const rows=jarRows(),tot=rows.reduce((a,r2)=>a+r2.n,0),seen=rows.filter(r2=>r2.seen).length;swShell('BUG JAR',seen+' of '+WBUGS.length+' found');
+ swRows(rows.map(r2=>({a:r2.seen?r2.b.id+(r2.n?' x'+r2.n:''):'???',b:r2.seen?'+'+r2.b.yield[1]+' '+WBUGRES[r2.b.yield[0]]+' · '+r2.b.val+'✿':(r2.b.night?'at night · ':'')+(r2.b.hab==='water'?'by water':r2.b.hab==='tree'?'in trees':'in grass')})).concat([{a:'BACK',b:''}]),swSel,
+  swSel<rows.length?(rows[swSel].seen?rows[swSel].b.lore+' A: use one'+(W4.sector==='TOWN'?' · SELECT: sell to PIP':' · sell to PIP in town'):'Not found yet. Throw a sprout at a bug to catch it.'):(tot+' bugs in the jar.'))}
+/* ================================================================
+   ERIN'S MEADOW WALK, AND THE SPROUT KINDS (v7.9)
+   The first time out in the Meadow, Erin walks you round it: the
+   buried PEB sprout, the boulder wall only a PEB can crack, and the
+   bridge sprouts can build. She walks ahead and waits for you, then
+   waits again while you try it. Each sprout kind gets its own card
+   the first time you have one, so they arrive one at a time.
+   ================================================================ */
+const WKINDS=[
+ {good:'Burns through FIRE WALLS. Keeps the kiln warm.',lore:'Sparks that fell the night the Lantern cracked. Warm to hold.'},
+ {good:'Cracks BOULDER WALLS. Counts double when it carries.',lore:'Pebble-hearted and stubborn. Heavy for its size.'},
+ {good:'Waters THIRSTY BLOOMS. Happy by the water.',lore:'Lake mist that grew legs. Never quite dry.'},
+ {good:'Opens SPARK GATES. The fastest sprout there is.',lore:'Charged by summer storms. Always in a hurry.'},
+ {good:'Cuts THORN VINES. Good in the garden.',lore:'Grown from the old woods. Smells like rain.'},
+ {good:'Rare. Keep it close.',lore:'Nobody has ever grown one on purpose.'}];
+/* a card the first time you have each kind; the opening's three share one page on the how-it-works card */
+function kindCheck(){if(state!=='g4world'||W4.scene||(W4.fld&&(W4.fld.dlg||W4.fld.spot)))return false;SW.kinds=SW.kinds||{};
+ if(wOp()<3||!SW.lessons.loop){for(const t of [0,2,4])SW.kinds[t]=1;return false}
+ for(let t=0;t<TYPES.length;t++)if(!SW.kinds[t]&&(SW.buds[TYPES[t].n]||0)>0){SW.kinds[t]=1;W4.kindT=t;W4.kindC=0;state='g4kind';swSnd(523,.12,784);swSave();return true}
+ return false}
+function kindUpdate(){W4.kindC=(W4.kindC||0)+1/30;if(W4.kindC>.8&&(pressed('a')||pressed('start'))){swSnd(660,.06,990);state='g4world'}}
+function drawKind(){const t=W4.kindT,T=TYPES[t],K=WKINDS[t],c=W4.kindC||0,cy=74;ox=0;oy=0;
+ r('#0a0e14',0,0,W,H);g.globalAlpha=.55;r(T.d,0,22,W,104);g.globalAlpha=1;uiRays(W/2,cy,130,12,T.l,.14);
+ r('#0a0e14',0,0,W,22);r(T.c,0,22,W,1);r(T.c,0,126,W,1);text('NEW SPROUT KIND',6,7,1,'#8a86a0',null);
+ g.save();g.translate(W/2,cy+26);g.scale(4,4);drawBud({x:0,y:0,type:t,stage:2,z:Math.round(Math.abs(Math.sin(time*4))*2),a:t,mv:false,st:'follow',fx:1});g.restore();
+ if(c>.25){g.save();g.translate(W/2,134);g.scale(2,2);text(T.n,-tw(T.n,1)/2,0,1,'#ffffff',null);g.restore();ctext(T.n+' SPROUT',158,1,T.l)}
+ if(c>.6){text('GOOD FOR',8,178,1,T.l,null);swWrap(K.good,W-70).slice(0,2).forEach((l,j)=>text(l,64,178+j*10,1,'#e8e4f4',null))}
+ if(c>.9){text('LORE',8,204,1,T.l,null);swWrap(K.lore,W-70).slice(0,2).forEach((l,j)=>text(l,64,204+j*10,1,'#e8e4f4',null))}
+ if(c>1.1){const n=SW.buds[T.n]||0;text('YOU HAVE '+n,8,232,1,'#a8a4c0',null)}
+ if(c>.8){r('#14121e',0,H-18,W,18);const s='A  GOT IT';text(s,W-8-tw(s,1),H-13,1,'#7ee787',null)}}
+/* ---------------- the walk ---------------- */
+function ewNear(F,x,y){for(let rr=0;rr<5;rr++)for(let dy=-rr;dy<=rr;dy++)for(let dx=-rr;dx<=rr;dx++){const tx=Math.floor(x/FT)+dx,ty=Math.floor(y/FT)+dy;if(fWalkTile(F,tx,ty)&&!fBox(F,tx*FT+8,ty*FT+10))return{x:tx*FT+8,y:ty*FT+10}}return{x,y}}
+function ewTarget(F,st){if(st===1){const b=F.buds.find(b2=>b2.type===1);return b?ewNear(F,b.x+16,b.y+4):null}
+ if(st===3){const gt=F.gates.find(g2=>g2.type===1&&!g2.open);return gt?ewNear(F,gt.x+18,gt.y+22):null}
+ if(st===5){const s=F.sites.find(s2=>!s2.done);return s?ewNear(F,s.x,s.y-30):null}
+ if(st===7)return ewNear(F,P3.x+20,P3.y);return null}
+const EWSAY={
+ 1:["ERIN: See the sprout poking out of the grass? That's a PEB.","ERIN: Walk up to it and press A to pluck it."],
+ 3:["ERIN: A boulder wall. Only PEB sprouts can crack rock.","ERIN: Face it and press A. Throw a few if it's tough."],
+ 5:["ERIN: Sprouts build, too. See the planks out in the water?","ERIN: Face them and press A. A few sprouts make a bridge."],
+ 7:["ERIN: That's the Meadow. Every kind of sprout has its own job.","ERIN: Bugs live out here too. Throw a sprout at one and it goes in your jar. Check it from START.","ERIN: I'll be at Sunkeep. Go catch yourself a buddy!"]};
+function ewTick(F,dt){if(SCOFF||F.id!=='MEADOW'||!SW.lessons.scMeadow||wOp()<3||W4.scene||F.dlg||F.spot)return;const st=SW.walk||0;if(st>=8&&!(W4.ew&&W4.ew.leave))return;
+ if(!W4.ew||W4.ewFor!==F){W4.ewFor=F;const p=ewNear(F,P3.x-24,P3.y+10);W4.ew={x:p.x,y:p.y,dir:[0,1],mv:false,t:0}}
+ const E=W4.ew,go=(x,y,v)=>{const dx=x-E.x,dy=y-E.y,d=Math.hypot(dx,dy);E.mv=d>2;if(d>2){const s=Math.min(d*5,v);E.x+=dx/d*s*dt;E.y+=dy/d*s*dt;E.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}return d};
+ if(E.leave){if(go(F.start.x,F.start.y-10,70)<4)W4.ew=null;return}
+ const dp=Math.hypot(P3.x-E.x,P3.y-E.y);if(dp>230){const p=ewNear(F,P3.x-30,P3.y);E.x=p.x;E.y=p.y}
+ if(st===0){fTalk(F,'ERIN',["ERIN: Hey, wait up! First time out here? I'll show you around.","ERIN: Follow me."],()=>{SW.walk=1;swSave()});return}
+ if(st===1||st===3||st===5||st===7){const tg=ewTarget(F,st);if(!tg){SW.walk=st+2>7?7:st+2;if(st===7)SW.walk=8;return}
+  if(dp>80){E.mv=false;E.wait=1;E.dir=[P3.x>E.x?1:-1,0];return}E.wait=0;   /* she waits for you to catch up */
+  if(go(tg.x,tg.y,62)<4){E.mv=false;E.dir=[P3.x>E.x?1:-1,0];if(dp<56)fTalk(F,'ERIN',EWSAY[st],()=>{SW.walk=st+1;if(st===7){SW.walk=8;E.leave=1}swSave()})}return}
+ E.mv=false;E.t+=dt;E.dir=[P3.x>E.x?1:-1,0];
+ const done=st===2?!F.buds.some(b=>b.type===1):st===4?!F.gates.some(g2=>g2.type===1&&!g2.open):st===6?!F.sites.some(s=>!s.done):true;
+ if(done){const L={2:["ERIN: There. A PEB walks with you now. Over this way!"],4:["ERIN: Ha! The rock never stood a chance. One more thing."],6:["ERIN: A bridge! Whatever's on that island is yours."]}[st];fTalk(F,'ERIN',L,()=>{SW.walk=st+1;swSave()});return}
+ if(E.t>75){E.t=0;fTalk(F,'ERIN',["ERIN: No rush. I'll wait. Or we can skip it and I'll catch you later."],()=>{})}}
+function ewDraw(){const E=W4.ew;if(!E)return;fChibi(Math.round(E.x),Math.round(E.y)+3,FLOOK.ERIN,E.dir,E.mv);
+ if(E.wait||(!E.mv&&!E.leave&&(SW.walk===2||SW.walk===4||SW.walk===6)))if(((time*2)|0)%2)text('!',Math.round(E.x)-1,Math.round(E.y)-30,2,'#ffd94d',null)}
+/* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */
 function g4Update(dt){switch(state){
@@ -10304,6 +10436,8 @@ function g4Update(dt){switch(state){
  case 'g4plot':plotUpdate();return;
  case 'g4dab':dabUpdate(dt);return;
  case 'g4loop':loopUpdate();return;
+ case 'g4jar':jarUpdate();return;
+ case 'g4kind':kindUpdate();return;
  case 'g4cot':cotUpdate();return;
  case 'g4nur':nurUpdate();return;
  case 'g4tools':toolsUpdate();return;
@@ -10337,6 +10471,8 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4plot':drawPlot();return;
  case 'g4dab':drawDab();return;
  case 'g4loop':drawLoop();return;
+ case 'g4jar':drawJar();return;
+ case 'g4kind':drawKind();return;
  case 'g4cot':drawCot();return;
  case 'g4nur':drawNur();return;
  case 'g4tools':drawTools();return;
@@ -10351,7 +10487,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4engage':engageDraw();return;
   case 'g4battle':wDrawBattle();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
-const SWF={lst:()=>louSt(),louPet:()=>louPetOK(),noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
+const SWF={noBugs:v=>{WNOBUG=v},walk:()=>({st:SW.walk||0,ew:W4.ew}),bugs:()=>W4.bugs||[],bugCatch:b=>bgCatch(b),bugCatch:b=>bgCatch(b),lst:()=>louSt(),louPet:()=>louPetOK(),noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,
  starter:(i)=>wPickStarter(i),
  enter:(id)=>{wEnterSector(id);state='g4world'},

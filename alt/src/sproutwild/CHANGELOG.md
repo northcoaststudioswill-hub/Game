@@ -21,6 +21,19 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v7.9 · 2026-11-16 · bugs, Erin's Meadow walk, sprout kinds one at a time
+
+Will's ask: a bug collecting system whose bugs make resources or trade for currency; more hand-holding through the first area (the bridge, PEB as a special sprout); sprout kinds introduced slower; more lore; characters walking you places.
+
+- **Bugs** (new `sw-bugs.js`). Eight bugs from Ohio summers live in the field areas, each in its own habitat (grass, water, trees), some only at night: LADYBUG (the state insect), WOOLLY BEAR (Vermilion's festival), LIGHTNING BUG, MAYFLY (Lake Erie swarms), CICADA (the 17-year brood), HELLGRAMMITE (under Cuyahoga stones), LUNA MOTH, MANTIS. Face one and press A: a sprout catches it ("CATCH LADYBUG"). The first of each shows its lore.
+- **Bug Jar** in the START menu: shows what you have found and where the rest live. A turns a bug into its resource (berries, fiber, wood, ore, a heart, or light for the Lantern); SELECT sells it to PIP for petals, in Lantern Town only.
+- **Erin's Meadow walk** (new `sw-walk.js`). The first time out, Erin walks you round the Meadow, waiting for you when you fall behind: the buried PEB sprout (pluck it), the boulder wall only a PEB can crack (do it), and the planks sprouts can build into a bridge (build it). Then she tells you about bugs and heads home. If you wander off she catches up; if you stall she offers to skip.
+- **Sprout kinds, one at a time.** A card the first time you have each kind: its colour, what it is good for and a line of lore. The opening's three share one page added to the how-it-works card; PEB, ZIP and LUCKY each get their own when you first find them.
+- Bugs close in front of you win the aim over things further off, like wild buddies do.
+- Tests: 111 checks (2 new for bugs). Bugs, the walk and Louie's digging are switched off in the lab where they could take the aim at random; run four times clean.
+
+Verified in real time: Erin's whole walk (PEB pluck, kind card, wall cracked, bridge built), the jar from START. Bug catching verified stepped (4 of 4).
+
 ## v7.8 · 2026-11-16 · Louie behaves like he does in Sprouts
 
 Will's ask: make Louie's behaviour more like the Sprouts cartridge. Read cartridge 1's dog (`updLouie` in `console.js`) and brought its habits over (new `sw-louie.js`):
