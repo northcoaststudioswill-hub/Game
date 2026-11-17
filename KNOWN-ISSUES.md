@@ -113,6 +113,11 @@ From [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), still open:
 - Everything in the valley update on a phone: night darkness, the bridge, nectar, digging, how fast held-A throwing feels.
 - A whole day played by hand. The checks are stepped, plus one short real-time run of pluck, throw and deliver.
 
+### Canon to confirm with Will (the prequel pass)
+- The Lantern Field becoming "Sunkeep" from a carving; Thornback as guardian of the light; the coin with a crowned face
+  "nobody here knows"; the red button and the fallen chip as hints of what is coming.
+- Which buddies live here. The seven were picked as one relative per sprout kind plus the Lanternwisp.
+
 ### Balance to check
 - The bridge takes 80 sprout-seconds (12 sprouts: about 7 s). Nectar blooms up to 12 sprouts, six blossoms a day.
 - `tests/sprouts_tour.js` still wanders into the house on the berry step and stays there (the bot, not the game).

@@ -3,6 +3,42 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: the prequel pass (Nov 17 2026)
+
+Will: Sprouts can be a prequel to Sproutwild. Bottie blows up the Data Center later; everyone is called to the Lantern and
+forgets what came before. In Sprouts we can find what Sunkeep was before it was Sunkeep. Buddies exist here but are not a
+focus. Maybe this place has a guardian of the light. Nobody yet understands why the light matters. Keep Corbin and Pip out.
+
+![The prequel pass](playtest/sprouts-prequel-pass.png)
+
+**The canon this assumes (new, flag to Will):**
+- Sprouts happens before the Night of the Clank. The crack in this game is a small, earlier one (Thornback's squeeze).
+  Nothing here mentions Bottie, the King, the dome, alphas or Sigils.
+- The Lantern Field is the place that Sproutwild calls Sunkeep. The name comes from an old carving, "SUN KEEP", which
+  Erin starts using. Who carved it is not said (the first keeper stays unknown).
+- Old Thornback is this valley's guardian of the light. He has forgotten who set him to it, and why.
+- The river north of the orchard is the Crooked River (Sproutwild's name for it).
+
+**What is in the game:**
+- **Seven wild buddies** (Cindercap, Pebblit, Drizzlet, Zipwig, Fernfang, Cloverimp, and a Lanternwisp at Willow Falls
+  after dusk), in Sproutwild's art. They wander, back away from Will and the crew, and cannot be thrown at, caught or
+  fought. From dusk, the ones who can reach it walk to the Great Lantern and sit at the edge of its light.
+- **The old arch** at Willow Falls (top right, behind the willows). Press A at it for a seven-line scene: a carving of a
+  lantern, sprouts and buddies, the worn words "...promised to sprouts and buddies. Keep the...", and SUN KEEP.
+  Afterwards the Lantern Field shows as SUNKEEP on its banner and at the trail posts.
+- **Thornback** has two new lines when he wakes (guardian, forgotten), Ranger calls him the guardian of the light, and the
+  ending says nobody remembers who lit the Lantern first.
+- **Each of the 12 treasures has a memory line** on its card: a key stamped with a sun, a coin with a crowned face nobody
+  knows, a marble with a tiny valley inside, a big red DO NOT PRESS button, a shiny chip that fell from the sky.
+- **The Lantern skips once a night** from day 2 (a half-second picture jump, Louie growls). Nobody explains it.
+- Erin has a new line about the buddies watching the Lantern.
+
+**Fixed on the way:** the last line of Thornback's den scene was five rows in a four-row box and lost its ending. A check
+now measures every scene line.
+
+**Tested:** `tests/sprouts_valley.js`, now 25 checks, three runs in a row; Sproutwild lab 124 of 124. Stepped, not played
+by hand; not on the phone.
+
 ## Sprouts: the valley update (Nov 17 2026)
 
 Cartridge 1, `src/console.js`. Checked in headless Chromium only; not played on the phone yet.

@@ -27,8 +27,8 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   await tp(66, 8); await step(4); await throwFor(120); const d0 = await E('run.delivered'); let t = 0; for (; t < 90; t++) { await step(30); if (await E('run.delivered') > d0) break; }
   ok('the golden pear is carried home over the bridge', t < 90, t + ' s'); ok('the lantern throws its seeds', (await E('seeds.length')) > 0, await E('seeds.length'));
   const n0 = await E('sprouts.length'); await step(45); ok('the seeds land and sprout', await E(`seeds.length===0&&sprouts.length>${n0}`));
-  await E(`run.spark={x:24*16+8,y:19*16+8,i:3,hp:8};digSync();void 0`); await tp(24, 21); await step(4); await throwFor(40);
-  ok('sprouts dig at the buried spot', (await E('DIG.on.length')) > 0, await E('DIG.on.length'));
+  await E(`run.spark={x:23*16+8,y:21*16+8,i:3,hp:8};digSync();void 0`); await tp(23, 23); await step(4); await throwFor(40);
+  ok('sprouts dig at the buried spot', await E('DIG.on.length>0||!DIG.alive'), await E('DIG.on.length'));
   for (t = 0; t < 40; t++) { await step(30); if ((await E('state')) === 'card') break; }
   ok('the treasure is dug up, carried home and filed', await E(`state==='card'&&meta.trs.includes(3)`), await E('card&&card.title')); await E(`state='play';void 0`);
   await E(`run.spark={x:24*16+8,y:19*16+8,i:5,hp:.01};digSync();buds[0].tgt=DIG;buds[0].st='work';DIG.on.push(buds[0]);seeds.push({type:2,tx:420,ty:370,t:0});void 0`); await step(2);
@@ -36,7 +36,18 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   const a = await E(sig); await E(`restore(JSON.parse(JSON.stringify(snap())));void 0`); ok('save and load keep the bridge, a treasure in transit and seeds in the air', a === await E(sig));
   ok('a save from before this update still loads', await E(`(()=>{init();const o=JSON.parse(JSON.stringify(snap()));delete o.gates.orchardBridge;o.items=o.items.filter(q=>q[0]==='berry'||q[0]==='big'||q[0]==='shard').map(q=>q.slice(0,6));o.run.spark={x:400,y:300,i:1};restore(o);return gates[5].alive&&run.spark.hp===8&&DIG.alive})()`));
   await E(`newDay();void 0`); ok('nectar blossoms open again in the morning', (await E(`items.filter(i=>i.alive&&i.sub==='nectar').length`)) === 6);
-  await E(`dayT=DAYLEN*.95;void 0`); await E(`__g.draw();void 0`); ok('night draws', true);
+  /* the prequel pass */
+  ok('seven wild buddies live in the valley, with Sproutwild art', await E(`wbuds.length===7&&wbuds.every(q=>!!wbSprite(q))`));
+  ok('nothing targets a buddy', await E(`(()=>{const q=wbuds[0];return findTarget({x:q.x,y:q.y,type:0},20)===null||findTarget({x:q.x,y:q.y,type:0},20).kind!==undefined})()`));
+  await E(`P.x=wbuds[0].x+12;P.y=wbuds[0].y;void 0`); const bx = await E('wbuds[0].x'); await step(30); ok('a buddy backs away from Will', (await E('wbuds[0].x')) < bx - 8, await E('msg'));
+  await E(`P.x=HX;P.y=HY+30;dayT=DAYLEN*.76;duskSaid=true;void 0`); await step(30 * 25); ok('at night buddies sit by the lantern', (await E(`wbuds.filter(q=>q.night&&q.path&&!q.path.length&&d2(q,HX,HY)<80*80).length`)) >= 1, await E(`wbuds.map(q=>[q.id,Math.round(Math.sqrt(d2(q,HX,HY)))])`));
+  await E(`dayT=1;gates.forEach(q=>q.alive&&openGate(q));ZONES.forEach(z=>run.seen[z[0]]=1);run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1};state='play';P.x=KEEP.x;P.y=KEEP.y+14;P.dx=0;P.dy=-1;keys.a=0;void 0`); await step(3); await E(`keys.a=1;void 0`); await step(1); await E(`keys.a=0;void 0`);
+  ok('the old arch plays its scene', (await E('state')) === 'cine' && (await E('scn.length')) === 7); await E(`__g.draw();void 0`);
+  await E(`keys.start=1;void 0`); await step(1); await E(`keys.start=0;void 0`); await step(2);
+  ok('afterwards the Lantern Field is called Sunkeep', await E(`run.keep===1&&zName('LANTERN FIELD')==='SUNKEEP'`));
+  ok('every treasure has a memory that fits its card', await E(`TRL.length===TRS.length&&TRL.every((l,i)=>wrapPx(l,168,2).length<=3)`));
+  ok('every scene line fits its four rows', await E(`Object.keys(SCN).every(k=>{const q=typeof SCN[k]==='function'?SCN[k]():SCN[k];return q.every(e=>wrapPx(e[0],214).length<=4)})`));
+  await E(`dayT=DAYLEN*.95;flickT=.3;void 0`); await E(`__g.draw();void 0`); ok('night draws, with the lantern skipping', true);
   ok('no page errors', !errs.length, errs);
   console.log(fail ? fail + ' FAILED' : 'ALL PASS'); await browser.close(); process.exit(fail ? 1 : 0);
 })();

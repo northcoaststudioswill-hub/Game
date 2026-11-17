@@ -21,6 +21,9 @@ A pocket game console in one HTML file, by North Coast Studios. Five game cartri
 
 ## Latest updates
 
+- **Sprouts, the prequel pass (Nov 17 2026):** Sprouts is now set before Sproutwild. Wild buddies keep their distance and
+  sit by the Lantern at night, an old arch names the place Sunkeep, Thornback is the guardian of the light, and each
+  treasure carries a memory. Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
 - **Sprouts, the valley update (Nov 17 2026):** the valley repainted with real nights, a bridge the sprouts build to a new
   place (Willow Falls), nectar, treasure that is dug up and carried home, and three fixes for things Sproutwild had broken
   in Sprouts (garden beds, Louie's bubbles, the project screen). Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
