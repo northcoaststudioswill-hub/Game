@@ -43,14 +43,14 @@ console.log('heist?', await ev(() => [BTS.G.heist, BTS.G.mode, BTS.World.npcs.ma
 await wait(1500); await shot('h1-heist');
 // stand right in front of the proctor -> must be caught
 await ev(() => { const n = BTS.World.npcs.find(n => n.patrol); BTS.P.x = n.x + [0,0,-1,1][n.dir] * 30; BTS.P.y = n.y + [1,-1,0,0][n.dir] * 30; });
-await wait(300); await shot('h2-caught'); console.log('caught count', await ev(() => BTS.G.flags.caught)); await talkThrough(); await wait(900);
+await wait(1100); await shot('h2-caught'); console.log('caught count', await ev(() => BTS.G.flags.caught)); await talkThrough(); await wait(900);
 console.log('reset pos', await ev(() => [BTS.P.x|0, BTS.P.y|0]));
 // sneak: wait until the proctor is far right, then go to the bank
 // bolt distraction test
 await ev(() => { BTS.P.x = 6*16+8; BTS.P.y = 12*16+4; BTS.P.dir = 3; BTS.World.caughtT = 0; });
 await key('KeyX', 1, 900); console.log('watchman investigating', await ev(() => !!BTS.World.npcs.find(n => n.id === 'watchman').inv)); await shot('h2b-bolt');
 await ev(() => { BTS.World.npcs.forEach(n => { if (n.patrol) { n.x = 4*16; n.y = 12*16+12; n.inv = null; n.dir = 0; } }); BTS.P.x = 21*16+8; BTS.P.y = 8*16+10; BTS.P.dir = 1; });
-await key('KeyE', 1, 400); await talkThrough(); console.log('relay cut', await ev(() => BTS.G.flags.relayCut));
+await page.keyboard.down('KeyE'); await wait(2300); await page.keyboard.up('KeyE'); await wait(200); await talkThrough(); console.log('relay cut', await ev(() => BTS.G.flags.relayCut));
 await ev(() => { BTS.World.npcs.forEach(n => { if (n.patrol) { n.x = 4*16; n.y = 12*16+12; n.dir = 0; n.wait = 99; } }); BTS.P.x = 10*16+8; BTS.P.y = 2*16+12; BTS.P.dir = 1; }); await key('KeyE', 1, 500);
 console.log('heist puzzle open', await ev(() => BTS.Puzzle.active)); await shot('h3-bleed-puzzle');
 const hr = await ev(() => { const Pz = BTS.Puzzle; for (let y = 0; y < Pz.rows; y++) for (let x = 0; x < Pz.cols; x++) { const c = Pz.grid[y][x]; if (c.kind !== 'pipe') continue; let k = 0; while (c.m !== c.sol && k < 4) { Pz.rotate(x, y); k++; } } return Pz.flowR.ok; });

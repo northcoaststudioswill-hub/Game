@@ -1,0 +1,167 @@
+// ============================================================
+// systems/panels — illustrated story panels for cutscenes.
+// A cutscene can CUT to one of these full-screen drawings ({panel:'id', stage}) and back,
+// so the story is told with close-ups and tableaux, not only with pans and zooms.
+// Each panel draws on a 320x180 canvas: fn(g, t, stage, st)  (t = time on panel, st = time in stage)
+// ============================================================
+const Panels = {
+  c: null, g: null, sil: {},
+  draw(g, p) {
+    if (!this.c) [this.c, this.g] = mk(320, 180);
+    const pg = this.g; pg.globalAlpha = 1; pg.globalCompositeOperation = 'source-over'; pg.fillStyle = '#07050a'; pg.fillRect(0, 0, 320, 180);
+    const fn = PANELS[p.id]; if (fn) fn(pg, p.t, p.stage, p.st);
+    g.fillStyle = '#07050a'; g.fillRect(0, 0, W, H); g.drawImage(this.c, Math.round((W - 320) / 2), Math.round((H - 180) / 2));
+  },
+  // a character sprite as a flat dark shape, for figures against a light
+  shape(id, dir, col) { const k = id + dir + col; if (!this.sil[k]) { const s = World.sheetFor(id), fh = s.fh || 16, [c, g] = mk(16, fh); g.drawImage(s, 0, dir * fh, 16, fh, 0, 0, 16, fh); g.globalCompositeOperation = 'source-in'; g.fillStyle = col; g.fillRect(0, 0, 16, fh); c.fh = fh; this.sil[k] = c; } return this.sil[k]; }
+};
+const PX = {
+  R(g, x, y, w, h, c) { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); },
+  glow(g, x, y, r, rgb, a) { g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); g.globalCompositeOperation = 'source-over'; },
+  plate(g, t, cx, y, dim) { const w = ptextW(t) + 6, x = Math.round(cx - w / 2); PX.R(g, x - 1, y - 1, w + 2, 11, '#0c0808'); PX.R(g, x, y, w, 9, dim ? '#5a4a30' : '#c8a050'); PX.R(g, x + 1, y + 1, w - 2, 7, '#1e1512'); ptext(g, t, x + 3, y + 2, dim ? '#8a7a60' : '#f3e3c3'); },
+  rock(g, y0, y1) { for (let y = y0; y < y1; y += 2) for (let x = 0; x < 320; x += 2) { const r = hash(x, y); PX.R(g, x, y, 2, 2, r < .33 ? '#1a1114' : r < .66 ? '#20151a' : '#150e11'); } },
+  plates(g, c) { PX.R(g, 0, 0, 320, 180, c); for (let y = 0; y < 180; y += 30) for (let x = (y / 30 % 2) * 20; x < 320; x += 40) { PX.R(g, x, y, 1, 30, shade(c, .6)); PX.R(g, x + 1, y, 1, 30, shade(c, 1.2)); PX.R(g, x + 4, y + 4, 1, 1, shade(c, 1.6)); PX.R(g, x + 36, y + 25, 1, 1, shade(c, 1.6)); } for (let y = 0; y < 180; y += 30) { PX.R(g, 0, y, 320, 1, shade(c, .6)); PX.R(g, 0, y + 1, 320, 1, shade(c, 1.15)); } },
+  spr(g, s, dir, x, y, sc) { const fh = s.fh || 16; g.drawImage(s, 0, dir * fh, 16, fh, Math.round(x - 8 * sc), Math.round(y - fh * sc), 16 * sc, fh * sc); },
+  fade(g, a) { if (a > 0) { g.fillStyle = `rgba(7,5,10,${Math.min(1, a)})`; g.fillRect(0, 0, 320, 180); } }
+};
+const PANELS = {
+  // ---- the world as Cinderwell is told it: a burning sky, six tiers, one machine, one lift
+  world(g, t, st, s) {
+    const { R, glow, plate } = PX, k = a => Math.max(0, Math.min(1, a));
+    PX.rock(g, 0, 180);
+    for (let y = 0; y < 30; y++) R(g, 0, y, 320, 1, `rgb(${70 + y * 3 + Math.sin(t * 2 + y) * 8 | 0},${14 + y | 0},${8})`);
+    for (let i = 0; i < 26; i++) { const x = (hash(i, 1) * 320 + t * (6 + i % 5)) % 320, y = 28 - ((t * (5 + i % 4) + hash(i, 2) * 30) % 30); R(g, x, y, 1, 1, i % 3 ? '#ffb040' : '#ffe08a'); }
+    glow(g, 160, 0, 150, '255,90,30', .35 + Math.sin(t * 1.7) * .06);
+    for (let x = 0; x < 320; x += 3) R(g, x, 30 + (hash(x, 3) * 3 | 0), 3, 9, '#2a1c1e');
+    plate(g, 'THE SURFACE  -  BURNS', 232, 17);
+    if (st >= 1) { const a = k(s / 1.2 + (st > 1 ? 1 : 0));
+      // the Deep Array: one machine through every tier
+      g.globalAlpha = a; R(g, 150, 42, 20, 104, '#0c1416'); R(g, 152, 42, 16, 104, '#1e3438'); R(g, 152, 42, 2, 104, '#3a6468'); for (let y = 46; y < 144; y += 10) { const p = (Math.sin(t * 3 - y * .12) + 1) / 2; R(g, 150, y, 20, 3, `rgb(${40 + p * 40 | 0},${150 + p * 90 | 0},${150 + p * 80 | 0})`); } g.globalAlpha = 1;
+      glow(g, 160, 94, 64, '79,214,208', .18 * a);
+      for (let tier = 0; tier < 6; tier++) { const y = 50 + tier * 17, on = k((s - tier * .35) / .5 + (st > 1 ? 1 : 0)); if (on <= 0) continue; g.globalAlpha = on;
+        for (const side of [-1, 1]) for (let j = 0; j < 2; j++) { const cx = 160 + side * (52 + j * 62), rx = 24 - j * 3; g.fillStyle = '#0a0608'; g.beginPath(); g.ellipse(cx, y, rx + 2, 7.5, 0, 0, 6.3); g.fill(); g.fillStyle = tier === 2 ? '#4a3428' : '#33262a'; g.beginPath(); g.ellipse(cx, y, rx, 6, 0, 0, 6.3); g.fill(); R(g, cx - rx + 4, y + 2, rx * 2 - 8, 2, '#221a1c'); for (let q = 0; q < 5; q++) R(g, cx - rx + 6 + hash(cx + q, tier) * (rx * 2 - 12), y - 3 + hash(q, cx) * 5, 1, 1, Math.sin(t * 3 + q + cx) > -.6 ? '#ffd890' : '#6a4a30');
+          R(g, Math.min(cx, 160) + (side > 0 ? 10 : rx), y, Math.abs(cx - 160) - rx - 10, 1, '#2e6a68'); if (st >= 2) { const d = Math.abs(cx - 160) - rx - 10, o = (t * 26 + j * 9 + tier * 5) % d; R(g, side > 0 ? 170 + o : 150 - o, y - 1, 2, 3, '#9ff2ea'); } }
+        ptext(g, 'TIER ' + (tier + 4), 6, y - 2, tier === 2 ? '#ffb35a' : '#6a5a50'); g.globalAlpha = 1; }
+      if (a >= 1) plate(g, 'THE DEEP ARRAY', 160, 34);
+    }
+    if (st >= 2) { plate(g, 'TIER 6 - ASHGATE - HOME', 250, 74); for (let tier = 0; tier < 6; tier++) { const y = 50 + tier * 17, f = .35 + hash(tier, 9) * .3; R(g, 292, y - 4, 22, 5, '#0c0808'); R(g, 293, y - 3, 20, 3, '#3a2a24'); R(g, 293, y - 3, 20 * f, 3, f < .45 ? '#c8452e' : '#e8b23a'); } ptext(g, 'RATION', 291, 40, '#8a7a60'); }
+    if (st >= 3) { R(g, 108, 28, 5, 58, '#0a0608'); R(g, 109, 28, 3, 58, '#e8e4dc'); const y = 30 + (Math.sin(s * .9 - 1.2) * .5 + .5) * 50; R(g, 107, y, 7, 5, '#ffffff'); glow(g, 110, y + 2, 26, '255,246,214', .7);
+      R(g, 96, 12, 28, 18, '#e8e4dc'); R(g, 100, 6, 20, 6, '#f4f2ec'); R(g, 107, 1, 6, 5, '#f4f2ec'); R(g, 96, 28, 28, 2, '#e8c25a'); glow(g, 110, 14, 40, '255,246,214', .35); plate(g, 'LIFT 0', 84, 40); }
+  },
+  // ---- the washer: three weeks of lunch breaks
+  hands(g, t, st, s) {
+    const { R, glow } = PX;
+    for (let y = 0; y < 180; y++) R(g, 0, y, 320, 1, `rgb(${18 + y / 9 | 0},${12 + y / 14 | 0},${30 - y / 12 | 0})`);
+    for (let i = 0; i < 16; i++) { const x = (hash(i, 4) * 360 + t * (2 + i % 3)) % 360 - 20, y = 14 + hash(i, 5) * 110 + Math.sin(t * .6 + i) * 3, r = 7 + hash(i, 6) * 10; glow(g, x, y, r * 2.2, i % 3 ? '255,170,70' : '255,220,130', .22); g.fillStyle = `rgba(255,${190 + i * 3},110,.16)`; g.beginPath(); g.arc(x, y, r, 0, 6.3); g.fill(); }
+    // his palm, soot in the creases
+    const sk = '#c48a64', sd = '#9a6a4a', sl = '#dca27c', px = 96, py = 58 + Math.sin(t * 1.3) * 1.5;
+    R(g, px - 80, py + 22, 120, 110, sd); R(g, px - 80, py + 20, 118, 4, sk); R(g, px, py, 92, 62, sk); R(g, px, py, 92, 3, sl); R(g, px + 88, py + 3, 4, 59, sd);
+    for (let f = 0; f < 4; f++) { R(g, px + 92, py + 2 + f * 15, 46 - (f === 3 ? 12 : f === 0 ? 6 : 0), 13, sk); R(g, px + 92, py + 2 + f * 15, 46 - (f === 3 ? 12 : f === 0 ? 6 : 0), 2, sl); R(g, px + 92, py + 13 + f * 15, 46 - (f === 3 ? 12 : f === 0 ? 6 : 0), 2, sd); R(g, px + 112, py + 4 + f * 15, 1, 9, sd); }
+    R(g, px + 14, py - 16, 40, 18, sk); R(g, px + 14, py - 16, 40, 3, sl); R(g, px + 20, py + 18, 30, 1, sd); R(g, px + 30, py + 34, 36, 1, sd); R(g, px + 12, py + 44, 2, 2, '#4a3028'); R(g, px + 60, py + 50, 3, 1, '#4a3028');
+    // her fingers, reaching in
+    if (st >= 1) { const hx = 320 - Math.min(1, s / .8) * 96, hk = '#9a6448', hd = '#74483a'; R(g, hx, py + 6, 110, 40, hk); R(g, hx, py + 6, 110, 3, '#b47a5c'); for (let f = 0; f < 3; f++) { R(g, hx - 34, py + 8 + f * 12, 36, 10, hk); R(g, hx - 34, py + 8 + f * 12, 36, 2, '#b47a5c'); R(g, hx - 34, py + 16 + f * 12, 36, 2, hd); } }
+    // the ring
+    const rx = st >= 1 ? 320 - Math.min(1, s / .8) * 96 - 14 : px + 46, ry = st >= 1 ? py + 22 : py + 26;
+    glow(g, rx, ry, 34, '255,214,120', .5 + Math.sin(t * 4) * .1);
+    g.strokeStyle = '#3a2408'; g.lineWidth = 9; g.beginPath(); g.ellipse(rx, ry, 11, st >= 1 ? 11 : 8, 0, 0, 6.3); g.stroke(); g.strokeStyle = '#d8a040'; g.lineWidth = 6; g.stroke(); g.strokeStyle = '#ffe9a8'; g.lineWidth = 2; g.beginPath(); g.ellipse(rx, ry - 1, 12, st >= 1 ? 12 : 9, 0, 3.5, 5.6); g.stroke();
+    const tw = (Math.sin(t * 5) + 1) / 2; R(g, rx - 9, ry - 12, 1, 5 * tw, '#fff'); R(g, rx - 11, ry - 10, 5 * tw, 1, '#fff');
+  },
+  // ---- the fever ward: forty children on ration air (stage 1: the fans come up)
+  ward(g, t, st, s) {
+    const { R, glow } = PX, on = st >= 1 ? Math.min(1, s / 1.5) : 0;
+    for (let y = 0; y < 180; y++) R(g, 0, y, 320, 1, `rgb(${14 + on * 22 | 0},${22 + y / 12 + on * 18 | 0},${26 + y / 10 + on * 10 | 0})`);
+    R(g, 0, 118, 320, 62, '#182020'); R(g, 0, 118, 320, 2, '#34423e'); for (let x = 0; x < 320; x += 20) R(g, x, 120, 1, 60, '#101616');
+    for (let x = 10; x < 320; x += 44) { R(g, x, 34, 2, 84, '#101818'); }
+    // the fan
+    R(g, 138, 18, 44, 44, '#0c1212'); R(g, 140, 20, 40, 40, '#27332f'); const a = st >= 1 ? s * (1 + on * 13) : 0.4;
+    g.save(); g.translate(160, 40); g.rotate(a); for (let i = 0; i < 4; i++) { g.rotate(Math.PI / 2); R(g, -3, -17, 6, 15, '#8a9a94'); R(g, -3, -17, 2, 15, '#b8c8c0'); } g.restore(); R(g, 157, 37, 6, 6, '#3a4440');
+    if (st >= 1) { glow(g, 160, 40, 90, '200,236,255', .25 * on); for (let i = 0; i < 14; i++) { const y = 62 + ((s * 60 + i * 23) % 60), x = 130 + hash(i, 3) * 60 + Math.sin(s * 3 + i) * 6; R(g, x, y, 1, 4, 'rgba(210,240,255,.5)'); } }
+    // cots in a row, small chests rising
+    for (let i = 0; i < 6; i++) { const x = 8 + i * 53, y = 104, b = Math.sin(t * (st >= 1 ? 1.5 : 2.6) + i * 1.3) * (st >= 1 ? 2.2 : 0.9);
+      R(g, x, y + 8, 46, 4, '#3a4246'); R(g, x + 2, y + 12, 3, 10, '#2a3034'); R(g, x + 41, y + 12, 3, 10, '#2a3034'); R(g, x + 2, y, 42, 9, '#c8ccc4'); R(g, x + 2, y, 12, 6, '#eef2ea');
+      R(g, x + 5, y - 5, 7, 6, ['#c08a6a', '#5e3a2a', '#e0b090', '#9a6448', '#c48a64', '#7a4e36'][i]); R(g, x + 5, y - 6, 7, 2, ['#6a3a1a', '#1a1014', '#c8a040', '#1e1416', '#6a2e18', '#1a1014'][i]);
+      R(g, x + 13, y - 2 - b, 30, 8 + b, '#4e7284'); R(g, x + 13, y - 2 - b, 30, 2, '#7aa2b6');
+      if (st < 1 && Math.sin(t * 2.6 + i * 1.3) > .8) R(g, x + 3, y - 9, 2, 1, 'rgba(220,230,230,.5)'); }
+    if (st < 1) { PX.plate(g, 'RATION PRESSURE', 60, 24, true); R(g, 22, 40, 76, 8, '#0c0808'); R(g, 23, 41, 74, 6, '#3a2a24'); R(g, 23, 41, 16 + Math.sin(t * 3) * 2, 6, '#c8452e'); }
+    else { PX.plate(g, 'BREATHING ON THEIR OWN', 80, 24); R(g, 22, 40, 76, 8, '#0c0808'); R(g, 23, 41, 74, 6, '#3a2a24'); R(g, 23, 41, 16 + 54 * on, 6, '#7cf27c'); }
+  },
+  // ---- the crime, drawn plainly: one fat sealed line, one starving one, and a bleed between them
+  pipe(g, t, st, s) {
+    const { R, glow, plate } = PX; PX.plates(g, '#3a3038');
+    const big = (y, h, c) => { R(g, 0, y - 2, 320, h + 4, '#120a0c'); R(g, 0, y, 320, h, c); R(g, 0, y, 320, 3, shade(c, 1.4)); R(g, 0, y + 3, 320, 3, shade(c, 1.18)); R(g, 0, y + h - 5, 320, 5, shade(c, .6)); for (let x = 28; x < 320; x += 96) { R(g, x, y - 5, 10, h + 10, shade(c, .7)); R(g, x, y - 5, 3, h + 10, shade(c, 1.1)); for (let q = 0; q < 3; q++) R(g, x + 4, y - 2 + q * (h / 2), 2, 2, '#e8c890'); } };
+    big(38, 40, '#9a6238'); big(126, 14, '#4a6464');
+    for (let i = 0; i < 12; i++) R(g, (t * 90 + i * 30) % 340 - 10, 50 + (i % 3) * 6, 8, 2, 'rgba(255,230,190,.35)');
+    for (let i = 0; i < 3; i++) R(g, (t * (st >= 1 ? 50 : 8) + i * 110) % 340 - 10, 132, 5, 2, st >= 1 ? 'rgba(160,250,240,.8)' : 'rgba(160,220,220,.25)');
+    // the seal
+    R(g, 150, 34, 5, 48, '#e8c25a'); R(g, 150, 34, 2, 48, '#fff0b0'); g.fillStyle = '#7a1e14'; g.beginPath(); g.arc(152, 58, 13, 0, 6.3); g.fill(); g.fillStyle = '#c8452e'; g.beginPath(); g.arc(152, 57, 11, 0, 6.3); g.fill(); R(g, 148, 53, 8, 8, '#e8c25a'); R(g, 150, 50, 4, 14, '#e8c25a'); R(g, 145, 55, 14, 4, '#e8c25a'); R(g, 150, 55, 4, 4, '#7a1e14');
+    plate(g, 'ARRAY AUTHORITY  -  SEALED LINE', 160, 18); plate(g, 'CLINIC BRANCH  -  TIER 6', 160, 108);
+    const gauge = (cx, cy, v, lab) => { g.fillStyle = '#120a0c'; g.beginPath(); g.arc(cx, cy, 19, 0, 6.3); g.fill(); g.fillStyle = '#c8a050'; g.beginPath(); g.arc(cx, cy, 17, 0, 6.3); g.fill(); g.fillStyle = '#f0e8d0'; g.beginPath(); g.arc(cx, cy, 14, 0, 6.3); g.fill(); for (let i = 0; i <= 6; i++) { const a = Math.PI * (1 + i / 6); R(g, cx + Math.cos(a) * 11 - 1, cy + Math.sin(a) * 11 - 1, 2, 2, i < 2 ? '#c8452e' : '#3a2a20'); }
+      const a = Math.PI * (1 + v) + Math.sin(t * 11) * .03; g.strokeStyle = '#c8452e'; g.lineWidth = 2; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + Math.cos(a) * 12, cy + Math.sin(a) * 12); g.stroke(); R(g, cx - 2, cy - 2, 4, 4, '#2a1a14'); ptext(g, lab, cx - ptextW(lab) / 2, cy + 5, '#3a2a20'); };
+    gauge(262, 58, st >= 1 ? .96 - Math.min(.11, s * .06) : .96, st >= 1 ? '-11' : 'FULL'); gauge(262, 132, st >= 1 ? .08 + Math.min(.62, s * .3) : .08 + Math.sin(t * 5) * .02, st >= 1 ? 'AIR' : 'LOW');
+    if (st >= 1) { const h = Math.min(52, s * 60); R(g, 62, 74, 12, h + 2, '#120a0c'); R(g, 64, 74, 8, h, '#2a8a86'); R(g, 64, 74, 2, h, '#9ff2ea'); for (let i = 0; i < 4; i++) { const y = 76 + ((s * 50 + i * 14) % 50); if (y < 74 + h) R(g, 67, y, 2, 4, '#e8fffd'); } R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); if (h >= 52) { glow(g, 68, 132, 30, '79,214,208', .5); plate(g, 'A SLIVER. BALANCED BY DAWN.', 230, 100); } }
+    else { R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); R(g, 64, 78, 8, 10, '#2a2a32'); }
+  },
+  // ---- Lift Zero opens: light, and three shapes in it, and a tier on its knees
+  lift(g, t, st, s) {
+    const { R, glow } = PX, op = Math.min(1, t / 2.2), w = 6 + op * 54;
+    PX.plates(g, '#241c22');
+    R(g, 84, 0, 152, 150, '#e4e2dc'); R(g, 84, 0, 4, 150, '#ffffff'); R(g, 232, 0, 4, 150, '#aaa8a4'); R(g, 84, 148, 152, 3, '#e8c25a'); R(g, 92, 0, 136, 148, '#101014');
+    R(g, 160 - w, 0, w * 2, 148, '#fff6dc'); glow(g, 160, 60, 150 * op + 20, '255,244,206', .8);
+    g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 9; i++) { const a = Math.PI / 2 + (i - 4) * .2 + Math.sin(t * .4 + i) * .02; g.fillStyle = `rgba(255,236,180,${.07 * op})`; g.beginPath(); g.moveTo(160, 40); g.lineTo(160 + Math.cos(a - .05) * 300, 40 + Math.sin(a - .05) * 300); g.lineTo(160 + Math.cos(a + .05) * 300, 40 + Math.sin(a + .05) * 300); g.fill(); } g.globalCompositeOperation = 'source-over';
+    // door leaves sliding apart, gold trim
+    R(g, 92, 0, 68 - w, 148, '#b8bcc8'); R(g, 160 + w, 0, 68 - w, 148, '#b8bcc8'); for (let x = 96; x < 160 - w; x += 8) R(g, x, 0, 2, 148, '#7a7e8a'); for (let x = 224; x > 160 + w; x -= 8) R(g, x, 0, 2, 148, '#7a7e8a'); R(g, 160 - w - 3, 0, 3, 148, '#e8c25a'); R(g, 160 + w, 0, 3, 148, '#e8c25a');
+    // three figures, taller than anyone you know
+    if (op > .35) { const a = Math.min(1, (op - .35) * 2.2), sc = 3; g.globalAlpha = a; const cs = World.sheetFor('celestine'), ws = World.sheetFor('warden'); PX.spr(g, ws, 0, 122, 150, sc); PX.spr(g, ws, 0, 198, 150, sc); PX.spr(g, cs, 0, 160, 150, sc + 1); g.globalAlpha = 1; glow(g, 160, 60, 50, '255,236,180', .35 * a); }
+    for (let i = 0; i < 30; i++) { const x = 100 + hash(i, 7) * 120, y = 148 - ((t * (8 + i % 7) + hash(i, 8) * 150) % 150); R(g, x, y, 1, 1, 'rgba(255,246,214,.9)'); }
+    // the tier, kneeling, backs to us
+    R(g, 0, 150, 320, 30, '#0a0608'); for (let i = 0; i < 17; i++) { const x = 4 + i * 19 + (i % 2) * 4, y = 150 + (i % 3) * 3; g.fillStyle = '#0a0608'; g.beginPath(); g.arc(x + 8, y, 7, 0, 6.3); g.fill(); R(g, x - 2, y + 2, 20, 30, '#0a0608'); R(g, x + 4, y - 6, 8, 1, 'rgba(255,236,180,.35)'); }
+  },
+  // ---- the heart-furnace (0: she stands before it · 1: she walks · 2: the doors close)
+  furnace(g, t, st, s) {
+    const { R, glow } = PX; PX.plates(g, '#3a1c18');
+    const close = st >= 2 ? Math.min(1, s / 1.3) : 0, mx = 160, mw = 76 * (1 - close);
+    // the mouth
+    R(g, 70, 8, 180, 150, '#120808'); R(g, 76, 14, 168, 144, '#2a1410'); for (let i = 0; i < 9; i++) { R(g, 78 + i * 19, 10, 2, 2, '#b08a64'); }
+    R(g, 84, 22, 152, 136, '#0c0404');
+    if (mw > 0.5) { g.save(); g.beginPath(); g.rect(mx - mw, 22, mw * 2, 136); g.clip();
+      for (let y = 22; y < 158; y++) R(g, 84, y, 152, 1, `rgb(255,${60 + (y - 22) * 1.3 | 0},${10 + (y - 22) * .5 | 0})`);
+      for (let x = 84; x < 236; x += 4) { const h = 40 + Math.sin(t * 7 + x * .4) * 18 + Math.sin(t * 13 + x) * 10 + hash(x, (t * 9) | 0) * 14; R(g, x, 158 - h, 4, h, '#ffb030'); R(g, x, 158 - h * .62, 4, h * .62, '#ffe070'); R(g, x + 1, 158 - h * .3, 2, h * .3, '#fff8d8'); }
+      g.restore(); glow(g, 160, 100, 170 * (1 - close * .8), '255,110,30', .55 * (1 - close)); }
+    // Seren, small against it
+    const walk = st >= 1 ? Math.min(1, (st >= 2 ? 1 : s / 2.6)) : 0, sy = 140 - walk * 14, sc = 4 - walk * 1.4;
+    if (close < .9) { const ss = Panels.shape('seren', 1, '#140806'); PX.spr(g, ss, 0, 160, sy, sc); if (st === 0) { const hx = 160 + 7 * sc, hy = sy - 13 * sc; R(g, hx - 2, hy, 4, 3 * sc, '#140806'); const tw = (Math.sin(t * 6) + 1) / 2; R(g, hx - 1, hy - 3, 3, 3, '#ffe9a8'); R(g, hx, hy - 3 - 5 * tw, 1, 5 * tw + 8, '#fff'); R(g, hx - 4 * tw, hy - 2, 8 * tw + 1, 1, '#fff'); glow(g, hx, hy - 2, 14, '255,236,170', .7); } }
+    const ws = Panels.shape('warden', 1, '#1a0e0c'); PX.spr(g, ws, 0, 104, 146, 4); PX.spr(g, ws, 0, 216, 146, 4); R(g, 0, 140, 320, 40, '#0c0606'); R(g, 0, 140, 320, 1, '#3a1c18');
+    // doors
+    if (st >= 2) { const dw = 76 * close; R(g, 84, 22, dw, 136, '#3a2a2e'); R(g, 236 - dw, 22, dw, 136, '#3a2a2e'); R(g, 84 + dw - 4, 22, 4, 136, '#6a5a62'); R(g, 236 - dw, 22, 4, 136, '#1a1014'); for (let y = 30; y < 158; y += 22) { R(g, 84, y, dw, 2, '#22181c'); R(g, 236 - dw, y, dw, 2, '#22181c'); }
+      if (close >= 1) { const a = Math.max(0, 1 - (s - 1.3) / 1.6); R(g, 159, 22, 2, 136, `rgba(255,170,60,${a})`); glow(g, 160, 90, 40, '255,120,40', .4 * a); PX.fade(g, (s - 1.6) / 2.2); } }
+    for (let i = 0; i < 24; i++) { const x = 60 + hash(i, 2) * 200 + Math.sin(t + i) * 6, y = 170 - ((t * (10 + i % 9) + hash(i, 3) * 170) % 170); R(g, x, y, 1, 1, close >= 1 ? '#5a4a48' : '#ffb060'); }
+  },
+  // ---- Kael, after. Ash in his hair.
+  kael(g, t, st, s) {
+    const { R, glow } = PX; R(g, 0, 0, 320, 180, '#0c0708');
+    glow(g, 40, 120, 200, '255,90,30', .22 + Math.sin(t * 6) * .03 + Math.sin(t * 17) * .015);
+    const b = makeBustCached('kael'); g.drawImage(b, 0, 0, 32, 32, 80, 12, 160, 160);
+    g.globalCompositeOperation = 'multiply'; const gr = g.createLinearGradient(80, 0, 240, 0); gr.addColorStop(0, '#ffb070'); gr.addColorStop(.55, '#8a5a5a'); gr.addColorStop(1, '#2a2030'); g.fillStyle = gr; g.fillRect(80, 12, 160, 160); g.globalCompositeOperation = 'source-over';
+    R(g, 0, 0, 80, 180, '#0c0708'); R(g, 240, 0, 80, 180, '#0c0708'); glow(g, 60, 130, 120, '255,90,30', .18);
+    for (let i = 0; i < 40; i++) { const x = hash(i, 1) * 320 + Math.sin(t * .7 + i) * 8, y = (t * (9 + i % 6) + hash(i, 2) * 180) % 180; R(g, x, y, i % 4 ? 1 : 2, 1, i % 3 ? '#8a8080' : '#c8c0c0'); }
+    for (const [x, y] of [[118, 34], [150, 28], [176, 36], [200, 44], [132, 42]]) R(g, x, y, 3, 2, '#c8c0c0');
+    if (st >= 1) { const a = Math.min(1, s / 1.2); R(g, 132, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); R(g, 172, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); glow(g, 142, 84, 14, '255,140,50', .5 * a); glow(g, 182, 84, 14, '255,140,50', .5 * a); }
+  },
+  // ---- what they send back
+  tin(g, t, st, s) {
+    const { R, glow } = PX; for (let i = 0; i < 9; i++) { R(g, 0, i * 20, 320, 19, i % 2 ? '#3a2a20' : '#40301f'); R(g, 0, i * 20, 320, 1, '#54402a'); R(g, (hash(i, 1) * 300) | 0, i * 20, 1, 19, '#241a12'); }
+    glow(g, 150, 80, 150, '255,180,90', .22); g.save(); g.translate(0, -26);
+    // the tin
+    R(g, 96, 62, 112, 70, '#141418'); R(g, 98, 64, 108, 66, '#6e727c'); R(g, 98, 64, 108, 3, '#a2a6b0'); R(g, 202, 67, 4, 63, '#44474e'); R(g, 104, 70, 96, 54, '#1c1c20');
+    for (let i = 0; i < 60; i++) { const x = 106 + hash(i, 5) * 90, y = 96 + hash(i, 6) * 24 - Math.sin((x - 106) / 90 * Math.PI) * 10; R(g, x, y, 3, 2, ['#8a8684', '#6a6664', '#a8a4a0'][i % 3]); } R(g, 106, 112, 92, 10, '#7a7674');
+    // lid, with their little stamped sun
+    R(g, 216, 78, 74, 56, '#141418'); R(g, 218, 80, 70, 52, '#7a7e88'); R(g, 218, 80, 70, 3, '#aeb2bc'); R(g, 244, 98, 18, 18, '#5e626c'); R(g, 250, 92, 6, 30, '#5e626c'); R(g, 238, 104, 30, 6, '#5e626c'); R(g, 250, 104, 6, 6, '#3a3d44');
+    // the washer, blackened, still round
+    const rx = 152, ry = 100; g.strokeStyle = '#0c0808'; g.lineWidth = 8; g.beginPath(); g.ellipse(rx, ry, 10, 7, 0, 0, 6.3); g.stroke(); g.strokeStyle = '#3a2e22'; g.lineWidth = 5; g.stroke(); g.strokeStyle = '#8a6a34'; g.lineWidth = 1; g.beginPath(); g.ellipse(rx, ry - 1, 11, 8, 0, 3.6, 5.2); g.stroke();
+    if (Math.sin(t * 1.4) > .93) { R(g, rx - 8, ry - 9, 1, 5, '#ffe9a8'); R(g, rx - 10, ry - 7, 5, 1, '#ffe9a8'); }
+    // the invoice
+    if (st >= 1) { const a = Math.min(1, s / .6), ox = 20 - (1 - a) * 60; g.save(); g.translate(ox + 36, 120); g.rotate(-.12); R(g, -34, -52, 70, 96, '#141010'); R(g, -32, -50, 66, 92, '#e8e0cc'); R(g, -32, -20, 66, 1, '#b8b09c'); R(g, -32, 10, 66, 1, '#b8b09c'); ptext(g, 'COMMITMENT', -27, -44, '#2a2018'); ptext(g, 'FUEL', -27, -36, '#2a2018'); ptext(g, '14 SCRIP', -27, -14, '#c8452e'); ptext(g, 'DEDUCTED', -27, -4, '#2a2018'); ptext(g, 'FROM WAGES', -27, 2, '#2a2018'); ptext(g, 'GRATITUDE', -27, 18, '#7a6a50'); ptext(g, 'IS BREATH', -27, 26, '#7a6a50'); R(g, 6, -42, 20, 20, 'rgba(200,69,46,.25)'); R(g, 12, -36, 8, 8, 'rgba(200,69,46,.5)'); g.restore(); }
+    g.restore();
+  }
+};
+let _kb = null; function makeBustCached(id) { if (!_kb) _kb = makeBust(Object.assign(playerLook(), { mouth: 'frown' })); return _kb; }

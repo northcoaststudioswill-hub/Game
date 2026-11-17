@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Book One. Current build: v0.8 (art pass over v0.7 "First Fire") (see CHANGELOG.md).
+Book One. Current build: v0.9 (story panels and stealth rework over the v0.8 art pass) (see CHANGELOG.md).
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -62,7 +62,9 @@ SOOTBORN ("soot" is the Authority's slur; the title reclaims it). A card game ca
   - The Night Proctor walks a lantern loop and looks around at each corner.
   - The Night Watchman stands in place and sweeps his lantern.
   - Their vision cones are drawn on screen; crates and walls block line of sight.
-- B throws a bolt: guards within earshot walk over to investigate (shown with "?!"), then return to their routes. Getting seen sends you back to the checkpoint. Seren's distraction helps after three catches.
+- Lamps sweep smoothly. A detection meter fills while a lamp is on Kael and drains when he breaks line of sight; a full meter sends him back to the checkpoint.
+- Cutting the relay is hold-to-work (about two seconds, standing still).
+- B throws a bolt: guards within earshot walk over, look all the way around (shown with "?!"), then return to their routes. Seren's distraction helps after three catches.
 
 ## Slice flow (~40–50 min)
 1. Prologue A: festival proposal → fever, Nell, the plan, Kael's drive.
@@ -125,6 +127,8 @@ Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at F
 - Saves are schema v2; v1 saves migrate. No saving during the prologue, the heist or the festival stealth.
 - Day 2 lives in `src/day2.js`: `D2T` (talk) and `D2H` (hotspots) wrap the day-1 tables once `day1Done` is set; `D3` holds epilogue lines.
 - `phase()` picks the Pillar color from day flags. Exits take `when` and `deny`.
+- Story panels live in `src/panels.js`. A cutscene step `{panel:'id', stage}` cuts to one, `{pstage:n}` advances it, `{panel:null}` cuts back. Keep each panel's focus in the top two thirds: the caption strip covers the bottom.
+- Stealth: guards have a facing angle `n.ang` that eases toward their direction; `World.alert` is the detection meter; `World.work` is hold-to-work progress (`WORK_T` seconds).
 
 ## Not yet tested
 Real devices, sound by ear, and how the heist, the festival stealth and the fights feel with a human player (fight balance so far comes from two bots: one mashes, one dodges).

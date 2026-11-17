@@ -20,7 +20,7 @@ const HUD = {
   hint() {
     const d = Input.device;
     if (G.mode !== 'world' || Dialogue.active || Puzzle.active || Brawl.active || UI.stack.length) return '';
-    if (G.heist) return d === 'touch' ? 'B: throw a bolt · stay out of the light' : d === 'pad' ? 'Ⓑ throw a bolt · stay out of the light' : 'Esc/X: throw a bolt · stay out of the light';
+    if (G.heist) { const b = d === 'touch' ? 'B' : d === 'pad' ? 'Ⓑ' : 'X', a = d === 'kb' ? 'E' : d === 'pad' ? 'Ⓐ' : 'A'; return `${b}: throw a bolt · hold ${a} to work · watch the lamps turn`; }
     if (P.moved < 40 && !F('talkedTavi')) return d === 'touch' ? 'Drag the pad to move' : d === 'pad' ? 'Left stick or D-pad to move' : 'WASD or arrow keys to move';
     if (World.target && !F('interacted')) return d === 'touch' ? 'Tap A to interact' : d === 'pad' ? 'Press Ⓐ to interact' : 'Press E or Enter to interact';
     return '';
@@ -37,6 +37,7 @@ const HUD = {
     document.body.classList.toggle('ctlfade', Dialogue.active || Puzzle.active);
     document.body.classList.toggle('ingame', world);
     document.body.classList.toggle('inpuzzle', Puzzle.active);
+    document.body.classList.toggle('inpanel', Cutscene.active && !!Cutscene.panel);
     if (this.tt > 0) { this.tt -= dt; if (this.tt <= 0) $('#toast').classList.remove('on'); }
   },
   toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('on'); this.tt = 2.4; }

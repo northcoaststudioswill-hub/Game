@@ -8,7 +8,7 @@ const Cutscene = {
   active: false, steps: [], i: 0, actors: [], cam: { x: 0, y: 0 }, block: null, letter: 0, beam: 0, beamT: 0, flash: 0, flashC: '#fff', shake: 0, dark: null, onEnd: null, pillarRed: false, motes: [],
   actor(id) { return this.actors.find(a => a.id === id); },
   play(steps, onEnd) {
-    Object.assign(this, { steps, i: 0, onEnd, active: true, actors: [], letter: 1, beam: 0, flash: 0, shake: 0, dark: null, pillarRed: false, motes: [], furnace: 0, zoom: 1, zoomT: 1, heart: 0, heartT: 0, vignette: 0, lift: 0, hung: 0, glowK: 0, sun: 0, sunT: 0 });
+    Object.assign(this, { steps, i: 0, onEnd, active: true, actors: [], letter: 1, beam: 0, flash: 0, shake: 0, dark: null, pillarRed: false, motes: [], furnace: 0, zoom: 1, zoomT: 1, heart: 0, heartT: 0, vignette: 0, lift: 0, hung: 0, glowK: 0, sun: 0, sunT: 0, panel: null });
     G.mode = 'cine'; $('#cskip').classList.remove('hidden'); this.next();
   },
   next() {
@@ -25,7 +25,7 @@ const Cutscene = {
   run(s) {
     const T = (x, y) => ({ x: x * 16 + 8, y: y * 16 + 12 });
     if (s.card !== undefined) { this.card(s.card, s.sub, s.big); if (s.sfx) Sound.play(s.sfx); this.block = { type: 'card', t: 0, min: s.min || 1.4, max: s.max || 7 }; return true; }
-    if (s.scene) { this.hideCard(); World.load(s.scene, null, true); this.actors = []; this.dark = s.dark || null; this.cam = { x: s.cam[0] * 16 + 8, y: s.cam[1] * 16 }; this.pillarRed = false; this.beam = 0; this.furnace = 0; this.motes = []; this.zoomT = s.zoom || 1; this.zoom = this.zoomT; return false; }
+    if (s.scene) { this.hideCard(); this.panel = null; World.load(s.scene, null, true); this.actors = []; this.dark = s.dark || null; this.cam = { x: s.cam[0] * 16 + 8, y: s.cam[1] * 16 }; this.pillarRed = false; this.beam = 0; this.furnace = 0; this.motes = []; this.zoomT = s.zoom || 1; this.zoom = this.zoomT; return false; }
     if (s.add) { for (const [id, x, y, dir, who] of s.add) { const p = T(x, y); this.actors.push({ id, who: who || id, x: p.x, y: p.y, dir: dir || 0, sheet: id === 'kael' ? P.sheet : World.sheetFor(who || id), anim: 0, moving: false }); } return false; }
     if (s.remove) { this.actors = this.actors.filter(a => a.id !== s.remove); return false; }
     if (s.face) { const a = this.actor(s.face); if (a) a.dir = s.dir; return false; }
@@ -38,6 +38,8 @@ const Cutscene = {
     if (s.pan) { this.pan = { from: { ...this.cam }, to: { x: s.pan[0] * 16 + 8, y: s.pan[1] * 16 }, t: 0, d: s.dur || 2 }; if (s.hold !== false) { this.block = { type: 'pan' }; return true; } return false; }
     if (s.fade === 'out') { this.block = { type: 'fade' }; Fade.go(() => { if (this.active) this.next(); }, s.spd || 1.4, true); return true; }
     if (s.fade === 'in') { this.hideCard(); Fade.a = 1; Fade.dir = -1; Fade.sp = s.spd || 1; Fade.busy = true; }
+    if (s.panel !== undefined) { this.hideCard(); this.panel = s.panel ? { id: s.panel, t: 0, stage: s.stage || 0, st: 0 } : null; }
+    if (s.pstage !== undefined && this.panel) { this.panel.stage = s.pstage; this.panel.st = 0; }
     if (s.music !== undefined) Sound.music(s.music);
     if (s.sfx) Sound.play(s.sfx);
     if (s.flash) { this.flash = 1; this.flashC = s.flash; }
@@ -61,6 +63,7 @@ const Cutscene = {
     }
     if (this.pan) { const p = this.pan; p.t += dt; const k = Math.min(1, p.t / p.d), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
       this.cam = { x: p.from.x + (p.to.x - p.from.x) * e, y: p.from.y + (p.to.y - p.from.y) * e }; if (k >= 1) { this.pan = null; if (this.block && this.block.type === 'pan') this.next(); } }
+    if (this.panel) { this.panel.t += dt; this.panel.st += dt; }
     this.zoom += (this.zoomT - this.zoom) * Math.min(1, dt * 2.5); this.sun += ((this.sunT || 0) - (this.sun || 0)) * Math.min(1, dt * 0.9);
     if (this.heart) { this.heartT -= dt; if (this.heartT <= 0) { Sound.play('heart'); this.heartT = 0.85; } }
     this.flash = Math.max(0, this.flash - dt * 0.8); this.shake = Math.max(0, this.shake - dt); this.beamT += dt;
@@ -78,7 +81,7 @@ const Cutscene = {
   },
   end() {
     this.active = false; this.hideCard(); $('#cskip').classList.add('hidden');
-    this.beam = 0; this.letter = 0; this.dark = null; this.actors = []; this.block = null; this.furnace = 0; this.zoom = this.zoomT = 1; this.heart = 0; this.vignette = 0; this.lift = 0; this.hung = 0; this.glowK = 0; this.sun = this.sunT = 0;
+    this.beam = 0; this.letter = 0; this.dark = null; this.actors = []; this.block = null; this.furnace = 0; this.zoom = this.zoomT = 1; this.heart = 0; this.vignette = 0; this.lift = 0; this.hung = 0; this.glowK = 0; this.sun = this.sunT = 0; this.panel = null;
     const cb = this.onEnd; this.onEnd = null; Input.consume(); cb && cb();
   },
   // drawn after World lighting: the Accredited are never in shadow
@@ -121,7 +124,19 @@ const Cutscene = {
 
 // ================= PROLOGUE A: the love, the fever, the plan =================
 const PROLOGUE_A = [
-  { music: 'home' },
+  { music: 'mystery' }, { letter: 1 },
+  { panel: 'world' }, { fade: 'in', spd: 0.7 }, { wait: 1.2 },
+  { narr: 'They say the surface burned two hundred years ago. That the sky is poison now, and the sun is a furnace that eats lungs.' },
+  { pstage: 1 }, { wait: 2.4 },
+  { narr: 'So we live below. Cinderwell. Six tiers of rock wrapped around a machine called the Deep Array, which makes the only air there is.' },
+  { pstage: 2 }, { wait: 0.8 },
+  { narr: 'We keep the Array running. The Array Authority keeps the count. Every breath down here is rationed, logged, and owed.' },
+  { narr: 'They have a word for us. Soot. The thing that is left over when something useful burns.' },
+  { pstage: 3 }, { wait: 1.6 },
+  { narr: 'Once in a decade they come down Lift Zero, in white, in light. We kneel. They go back up.' },
+  { narr: 'Nobody from Cinderwell has ever gone with them.' },
+  { narr: 'My name is Kael Brennick. I fix valves on Tier 6. And one year ago tonight, I thought the worst thing that could happen to me was a girl saying no.' },
+  { fade: 'out' }, { panel: null }, { music: 'home' },
   { card: 'ONE YEAR AGO', sub: 'The Festival of the First Fire · Ashgate Square', min: 1.2, max: 4 },
   { scene: 'square', cam: [11, 9], dark: 'rgba(8,5,16,.32)', zoom: 2.2 },
   { add: [['seren', 12, 9, 1], ['kael', 7, 9, 3], ['c1', 6, 5, 0, 'c1'], ['c2', 18, 6, 2, 'c2'], ['ivo', 16, 11, 2], ['juno', 9, 12, 1]] },
@@ -136,10 +151,13 @@ const PROLOGUE_A = [
     { t: "Paint me one I can carry, then.", fx: () => setF('ambitiousYouth'), then: [say('seren', 'Greedy. You always want the one you can hold.')] },
     { t: "One day I'll show you the real one.", fx: () => setF('promisedSky'), then: [say('seren', "Don't promise me the sky, Kael Brennick. Promise me tomorrow. Tomorrow I can use.")] }
   ] },
+  { panel: 'hands' }, { sfx: 'clue' },
   { narr: 'You have been carrying it in your pocket for three weeks. A brass washer from Bank Seven, filed smooth on your lunch breaks until it shines like something that matters.' },
   { say: 'kael', t: "Seren Holloway. I can't give you the sky. But I can give you a perfectly balanced pressure seal." },
   { say: 'seren', t: "...That is the worst proposal in the history of Cinderwell." },
+  { pstage: 1 }, { sfx: 'coin' },
   { say: 'seren', t: 'Yes. Obviously yes. Put it on me before I come to my senses.' },
+  { wait: 0.9 }, { panel: null },
   { narr: 'Mara binds you at the Pillar, in front of the whole crew, with chalk on your hands and Ivo crying louder than anyone.' },
   { say: 'ivo', t: "I'm not crying. The square is dusty. The square is VERY dusty." },
   { narr: 'Seren draws the last ray of her sun on your wrist with her finger. "There," she says. "Now you\'ve seen it."' },
@@ -155,13 +173,20 @@ const PROLOGUE_A = [
   { say: 'seren', t: 'Smart kid.' },
   { face: 'kael', dir: 3 },
   { say: 'nell', t: "I'll be honest, because you'd know if I wasn't. The fever isn't what kills them. It's the air." },
+  { panel: 'ward' },
   { say: 'nell', t: 'The Authority cut the clinic to ration pressure two weeks ago. Forty kids, breathing each other\'s breath. Tavi\'s lungs are filling.' },
+  { narr: 'You have seen the ward. Six cots to a row. You can hear a room full of children working for every breath, and once you have heard it you cannot stop.' },
+  { panel: null },
   { say: 'kael', t: "Then we get the clinic more air." },
   { say: 'nell', t: "From where? Every cubic meter in Cinderwell is counted. Tier 6 doesn't get one breath more than its ration." },
+  { panel: 'pipe' },
   { say: 'kael', t: "Not every meter. Bank Seven has a line nobody's allowed to touch. Authority seal. Fat as my arm." },
   { say: 'kael', t: "I read its gauge once. That one pipe carries more air than all of Tier 6 put together. Every night. Going somewhere." },
   { say: 'seren', t: "It's Authority, Kael. If they so much as see a needle twitch—" },
+  { pstage: 1 }, { sfx: 'rotate' },
   { say: 'kael', t: "So we bleed it slow. A sliver, into the clinic line. And we balance the bank again before the morning audit. Nobody sees a thing." },
+  { narr: 'Stealing air is the one crime the Authority never forgives. They do not fine you for it. They do not jail you. They commit you to the Array, and the Array runs on fire.' },
+  { panel: null },
   { say: 'nell', t: "...I didn't hear any of this. I'll have the ward vents open at second bell." },
   { move: 'nell', to: [6, 8], spd: 30 },
   { say: 'seren', t: 'Why you? Why does it always have to be you?' },
@@ -174,7 +199,7 @@ const PROLOGUE_A = [
   { say: 'kael', t: "And if he sees both of us?" },
   { say: 'seren', t: "Then we're newlyweds looking for somewhere private. Try to look embarrassed. Shouldn't be hard." },
   { fade: 'out' },
-  { card: 'Bay Three · Second bell', sub: 'Cut the audit relay. Then reach Valve Bank Seven. Stay out of the lantern light. Throw bolts to pull the guards away.', min: 1, max: 4 }
+  { card: 'Bay Three · Second bell', sub: 'Hold A at the audit relay to cut it. Then reach Valve Bank Seven. The lamps sweep: move when they turn away. Throw bolts to pull a guard off his post.', min: 1, max: 4 }
 ];
 
 // ================= PROLOGUE B: the audit, the sentence, the furnace =================
@@ -186,7 +211,9 @@ const PROLOGUE_B = [
   { face: 'kael', dir: 2 },
   { say: 'seren', t: 'Kael. Did it work?' },
   { say: 'kael', t: 'Listen.' },
+  { panel: 'ward', stage: 1 }, { sfx: 'solved' },
   { narr: 'Far off, through the vents: the clinic fans spinning up. Then a cheer, thin and tired, from a ward full of children who can suddenly breathe.' },
+  { wait: 0.8 }, { panel: null },
   { say: 'seren', t: "You're insufferable when you're right." },
   { say: 'kael', t: 'Then I plan to be insufferable for a very long time.' },
   { say: 'seren', t: "Balance it back before the audit. Promise me. Every night until the fever breaks, and then never again." },
@@ -201,8 +228,10 @@ const PROLOGUE_B = [
   { fade: 'in' }, { wait: 0.8 },
   { narr: 'The whole tier was summoned to Ashgate. Nobody was told why. Nobody needed to be.' },
   { sfx: 'rumble' }, { shake: 0.9 }, { wait: 1 },
+  { flash: '#fff6dc' }, { music: 'surface' }, { sfx: 'choir' }, { panel: 'lift' },
   { narr: 'Lift 0 opened for the first time in eleven years.' },
-  { flash: '#fff6dc' }, { beam: 1 }, { music: 'surface' }, { sfx: 'choir' },
+  { narr: 'Light came out of it like water out of a broken main. Real light. Not Pillar light. It had a color none of you had a word for.' },
+  { wait: 0.6 }, { panel: null }, { beam: 1 },
   { add: [['celestine', 13, 1, 0], ['wl', 12, 1, 0, 'warden'], ['wr', 14, 1, 0, 'warden']] },
   { move: 'wl', to: [12, 4], spd: 14 }, { move: 'wr', to: [14, 4], spd: 14 }, { move: 'celestine', to: [13, 4], spd: 14, wait: true },
   { narr: 'They came down in light. Tall and unhurried, robed in white that had never known a smudge. Their skin had never known soot. Their voices had never needed to be raised.' },
@@ -254,22 +283,24 @@ const PROLOGUE_B = [
   { move: 'seren', to: [15, 3], spd: 9 }, { move: 'wr', to: [16, 3], spd: 9 }, { move: 'wl', to: [14, 3], spd: 9, wait: true },
   { sfx: 'roar' }, { flash: '#ff7a30' }, { shake: 1.2 }, { fx: () => { Cutscene.furnace = 1; } }, { vignette: 1 },
   { narr: 'The Wardens haul the furnace doors open. The heat hits the back row like a slap. The whole bay turns the color of a wound.' },
+  { panel: 'furnace' },
   { narr: 'Her boots scrape on the grating. She is not crying. You will hate yourself, later, for being proud of that.' },
-  { face: 'seren', dir: 0 }, { zoom: 3 }, { pan: [15, 4], dur: 1.2 },
+  { face: 'seren', dir: 0 }, { zoom: 3 }, { fx: () => { Cutscene.cam = { x: 15 * 16 + 8, y: 4 * 16 }; } },
   { say: 'seren', t: 'Hey. Hey, Kael. Look at me. Not at them. At me.' },
   { say: 'seren', t: 'You were always too much for this place. Too loud, too proud, too much. Good.' },
   { say: 'seren', t: 'Be too much for THEM.' },
   { narr: 'She lifts her hand so you can see the brass washer on her finger, catching the fire.' },
   { say: 'seren', t: 'Balance the bank. And don\'t you DARE stop breathing.' },
-  { pan: [12, 6], dur: 0.8 }, { zoom: 2.6 },
+  { panel: null }, { fx: () => { Cutscene.cam = { x: 12 * 16 + 8, y: 6 * 16 }; } }, { zoom: 2.6 },
   { choice: [
     { t: 'SCREAM HER NAME.', fx: () => { fury(1); setF('screamed'); }, then: [narr("You scream her name until something in your throat tears and the sound turns to nothing. Mara's forearm locks across your chest. She is crying too. You will never forgive her for that. You will never forgive anyone for anything.")] },
     { t: 'BREAK FREE. RUN FOR HER.', fx: () => { fury(2); setF('ranForHer'); }, then: [{ fx: () => { Cutscene.shake = 1; Cutscene.flash = 1; Cutscene.flashC = '#ff2010'; Sound.play('hit'); } }, narr("Three steps. You make it three steps. A Warden's halberd takes you across the ribs and the grating comes up to meet your face. You taste iron. You crawl. Ivo lands on your back, sobbing, holding you down, saying sorry, sorry, sorry.")] },
     { t: "HOLD HER EYES. DON'T LET HER BE ALONE.", fx: () => setF('heldEyes'), then: [narr('You hold her eyes. You do not look away. Not for one second of what comes next. Whatever it costs. You owe her that. You owe her everything.')] }
   ] },
-  { move: 'seren', to: [15, 2], spd: 7, wait: true }, { remove: 'seren' },
-  { sfx: 'roar' }, { flash: '#fff2d0' }, { shake: 2 }, { heart: 0 },
-  { narr: 'The doors close.' },
+  { remove: 'seren' }, { panel: 'furnace', stage: 1 }, { wait: 2.8 },
+  { narr: 'She walks the last of it herself. They do not have to push her. She would not give them that.' },
+  { pstage: 2 }, { sfx: 'roar' }, { shake: 2 }, { heart: 0 }, { wait: 1.5 }, { sfx: 'hit' },
+  { narr: 'The doors close.' }, { wait: 1.6 },
   { fade: 'out', spd: 3 }, { vignette: 0 },
   { card: 'ONE.', sub: 'She steals your bread on the first day of school and denies it with her mouth full.', min: 0.8, max: 2.6, sfx: 'heart' },
   { card: 'TWO.', sub: 'Fifteen. Behind the noodle stall. She kisses you first, then tells the whole tier you started it.', min: 0.8, max: 2.6, sfx: 'heart' },
@@ -298,14 +329,21 @@ const PROLOGUE_B = [
   { move: 'celestine', to: [19, 3], spd: 14 }, { move: 'wl', to: [19, 2], spd: 14 }, { move: 'wr', to: [20, 3], spd: 14 }, { move: 'vale', to: [21, 4], spd: 14 },
   { wait: 1.5 }, { zoom: 2.4 },
   { say: 'mara', t: "Kael. Kael, son. Get up. She'd want you up." },
+  { panel: 'kael' },
   { say: 'kael', t: 'She told me to breathe.' },
   { say: 'kael', t: 'So every breath I take now is hers.' },
+  { pstage: 1 },
   { say: 'kael', t: 'And every breath THEY take is mine.' },
   { narr: 'Something in you goes quiet, and stays quiet.' },
   { narr: 'Something else wakes up, and does not go back to sleep.' },
   { fade: 'out' },
-  { card: 'Two days later, a tin arrives at your door.', sub: 'Inside: a cup of ash. A blackened brass washer. And an invoice: COMMITMENT FUEL — 14 SCRIP, deducted from future wages. GRATITUDE IS BREATH.', min: 3, max: 10 },
-  { card: 'They returned the ring.', sub: 'They kept the girl.', min: 2, max: 6 },
+  { panel: 'tin' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'Two days later, a tin arrives at your door. Authority grey, with a little sun stamped on the lid.' },
+  { narr: 'Inside: a cup of ash. Less than you would think. And a brass washer, blackened, still round.' },
+  { pstage: 1 }, { sfx: 'page' }, { wait: 0.8 },
+  { narr: 'And an invoice. COMMITMENT FUEL — 14 SCRIP, deducted from future wages. GRATITUDE IS BREATH.' },
+  { narr: 'They returned the ring. They kept the girl. And they sent you the bill for the fire.' },
+  { fade: 'out' }, { panel: null },
   { card: 'SOOTBORN', sub: 'What they call us. What they will remember.', big: 1, sfx: 'splash', min: 2.2, max: 6 },
   { card: 'FORTY-ONE DAYS LATER', min: 1, max: 3 }
 ];

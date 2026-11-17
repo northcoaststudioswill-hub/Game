@@ -1,5 +1,21 @@
 # SOOTBORN — changelog
 
+## v0.9 · 2026-11-17 — cinematics and stealth (from playtest notes on the prologue)
+- **Story panels**: cutscenes can now cut to full-screen illustrated panels and back, so the story is not told only with pans and zooms. Eight panels so far, all animated:
+  - the world as Cinderwell is told it (burning surface, six tiers, the Deep Array, rations, Lift Zero)
+  - the washer on Kael's palm, and on her finger
+  - the fever ward on ration air, and later with the fans up
+  - the crime drawn plainly: the sealed Authority line, the starving clinic branch, the bleed between them
+  - Lift Zero opening on a kneeling tier
+  - the heart-furnace: Seren before it, walking in, the doors closing
+  - Kael's face afterwards, ash in his hair
+  - the tin, the washer and the invoice
+- **More exposition**: the game now opens on the world panel with Kael narrating what Cinderwell is, who the Authority are, and what the punishment for stealing air is. The tin is now a scene, not a text card.
+- **Guards sweep**: every lamp turns smoothly through its arc instead of snapping between four directions. A guard who hears a bolt does a full, slow look around.
+- **Detection meter**: being caught is no longer instant. An eye meter fills while a lamp is on you (faster up close), the cone turns red, a heartbeat plays, and it drains when you break line of sight. Surviving a near miss gets a line from Seren (or Ivo and Tavi at the festival).
+- **Hold to work**: cutting the audit relay and hanging the lantern now take about two seconds of holding A while standing still, with a progress bar. You can let go, hide, and come back.
+- Dialogue shrinks to a slim caption strip over story panels.
+
 ## v0.8 · 2026-11-17 — art pass (no new content)
 - Tiles redrawn: hand-laid flagstones in the square, riveted deck plates in the bays, floorboards with grain at home, packed dirt in the tunnel, steel grating with frames. Every surface has a lit top-left edge and a dark bottom-right edge.
 - Walls: dressed stone courses with timber props, iron panels with girders and rust in the bays, lumped cave rock with ore glints around every room. Walls now cast contact shadows on the floor.

@@ -36,6 +36,7 @@ node build.mjs
 | `src/story.js` | Cast, journal, dialogue, hotspots, puzzles, ambient barks |
 | `src/systems.js` | State, saves, dialogue runner, pipe puzzle, world, heist stealth, lighting, fades |
 | `src/cinema.js` | Cutscene engine and the prologue scripts |
+| `src/panels.js` | Illustrated story panels that cutscenes cut to |
 | `src/brawl.js` | Real-time melee: the base for every fight |
 | `src/day2.js` | Day 2 "First Fire": dialogue, hotspots, the Ember Ring, festival cutscenes |
 | `src/ui.js` | HUD, menus, cutaway map, splash, title, day-end |

@@ -16,7 +16,7 @@ const Game = {
     G.heist = 1; World.load('bay', { x: 24, y: 7 * 16 + 4, dir: 3 }, true); World.darkOverride = 'rgba(3,2,9,.8)';
     G.mode = 'world'; Game.resetHeist(); Sound.music('mystery');
     Fade.a = 1; Fade.dir = -1; Fade.sp = 1; Fade.busy = true;
-    setTimeout(() => HUD.toast('B: throw a bolt to pull a guard away'), 900);
+    setTimeout(() => HUD.toast('Hold A at the relay · B throws a bolt'), 900);
   },
   resetHeist() {
     if (G.heist === 2) return Game.resetFest();
@@ -25,7 +25,7 @@ const Game = {
       { id: 'proctor', patrol: 1, x: 5 * 16 + 8, y: 4 * 16 + 12, dir: 3, home: 3, wander: [[17, 4, 1, 2.2], [17, 8, 2, 1.2], [5, 8, 1, 2], [5, 4, 3, 1.4]], wi: 0, wait: 1.5, anim: 0, moving: false, face: 0, barkCd: 99 },
       { id: 'watchman', patrol: 1, x: 14 * 16 + 8, y: 10 * 16 + 12, dir: 2, home: 2, wander: [[14, 10, 2, 1.9], [14, 10, 1, 1.4], [14, 10, 3, 1.9], [14, 10, 0, 1.4]], wi: 0, wait: 1.9, anim: 0, moving: false, face: 0, barkCd: 99 }
     ];
-    World.caughtT = 0;
+    World.caughtT = 0; World.alert = 0; World.alertPeak = 0; World.work = 0; World.seenBy = null;
   },
   onHeistDone() {
     G.heist = 0; G.flags.relayCut = 0; World.darkOverride = null; World.bolt = null; World.ripple = null; World.dynLights = []; World.npcs = [];
@@ -131,7 +131,7 @@ const Game = {
       s('tavi', 6, 13, 3), s('ivo', 8, 14, 1), s('mara', 3, 6, 3), s('hollis', 2, 8, 3), s('marrow', 3, 10, 3), s('pell', 2, 12, 3), s('bao', 5, 11, 3), s('juno', 10, 14, 1), s('orin', 12, 14, 1), s('nell', 17, 14, 1), s('fen', 20, 14, 1), s('kit', 24, 10, 2)
     ];
     if (F('sullWar') && !F('beatSull')) World.npcs.push(g('watchman', 20, 8, 2, [[20, 8, 2, 2], [20, 8, 1, 1.5], [20, 8, 2, 2], [20, 8, 0, 1.5]]));
-    World.caughtT = 0;
+    World.caughtT = 0; World.alert = 0; World.alertPeak = 0; World.work = 0; World.seenBy = null;
     if ((G.flags.caught2 | 0) >= 2) { // Ivo gets clumsy with his cart: every lamp turns east
       setTimeout(() => { if (G.heist !== 2) return; Sound.play('rumble'); Sound.play('clink'); for (const n of World.npcs) if (n.patrol) { n.inv = { x: 23 * 16 + 8, y: 13 * 16 }; n.invT = 0; n.invGive = 0; n.bark = { t: '?!', life: 1.4 }; } const iv = World.npcs.find(n => n.id === 'ivo'); if (iv) iv.bark = { t: 'OH NO. MY CART.', life: 2.4 }; }, 1400);
     }
@@ -214,6 +214,7 @@ function render() {
   if (G.mode === 'boot' || G.mode === 'splash' || !World.map || (Cutscene.active && !$('#card').classList.contains('hidden') && Fade.a >= 1)) { g.fillStyle = '#07090d'; g.fillRect(0, 0, W, H); return; }
   if (Brawl.active && !Puzzle.active) Brawl.render(g);
   else if (Puzzle.active) Puzzle.render(g);
+  else if (Cutscene.active && Cutscene.panel) Panels.draw(g, Cutscene.panel);
   else if (Cutscene.active && Cutscene.zoom > 1.02) { // cinematic zoom: render a smaller window, scale it up
     const z = Cutscene.zoom, ow = W, oh = H, zw = Math.round(W / z), zh = Math.round(H / z);
     if (!ZC.c || ZC.c.width !== zw || ZC.c.height !== zh) [ZC.c, ZC.g] = mk(zw, zh);

@@ -19,6 +19,6 @@ await walk('ArrowRight', s => s.p[0] > 11 * 16 + 6);
 // wait until the north sentry is not looking down
 for (let i = 0; i < 200; i++) { const s = await st(), n = s.g[2]; if (n.dir !== 0 && n.wait > 1.2) break; await wait(40); }
 await walk('ArrowRight', s => s.p[0] > 13 * 16 + 4, 1500);
-await page.keyboard.down('ArrowDown'); await wait(90); await page.keyboard.up('ArrowDown'); await page.keyboard.press('KeyE'); await wait(500);
+await page.keyboard.down('ArrowDown'); await wait(90); await page.keyboard.up('ArrowDown'); await page.keyboard.down('KeyE'); await wait(2300); await page.keyboard.up('KeyE'); await wait(500);
 const s = await st(); console.log('took', ((Date.now() - t0) / 1000).toFixed(1) + 's', 'caught', s.caught, 'finale', s.cine, 'pos', s.p.map(v => (v / 16).toFixed(1)));
 await page.screenshot({ path: 'shots/sneak.png' }); console.log(errors); await browser.close();

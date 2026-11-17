@@ -275,7 +275,10 @@ const World = {
       if (!this.boxHits(nx, P.y)) P.x = nx; if (!this.boxHits(P.x, ny)) P.y = ny;
       P.anim += dt; P.moved += sp; P.stepT = (P.stepT || 0) + dt; if (P.stepT > 0.3) { P.stepT = 0; Sound.play(this.tileAt(P.x, P.y - 2) === ',' ? 'stepg' : 'step'); }
     } else P.anim = 0;
-    if (G.heist) { this.heistCheck(dt); if (this.caughtT > 0) return; this.boltCd = (this.boltCd || 0) - dt; if (Input.p('B') && this.boltCd <= 0) this.throwBolt(); this.target = this.findTarget(); if (Input.p('A') && this.target) { Sound.play('blip'); this.interact(this.target); } this.updateNPCs(dt); return; }
+    if (G.heist) { this.heistCheck(dt); if (this.caughtT > 0) return; this.boltCd = (this.boltCd || 0) - dt; if (Input.p('B') && this.boltCd <= 0) this.throwBolt(); const t = this.target = this.findTarget(), hold = t && ((G.heist === 1 && t.id === 'relay' && !G.flags.relayCut) || (G.heist === 2 && t.id === 'pillarFest'));
+      if (hold) { if (Input.h('A') && !P.moving) { const w0 = this.work || 0; this.work = w0 + dt; if (Math.floor(this.work * 5) !== Math.floor(w0 * 5)) Sound.play('rotate'); if (this.work >= WORK_T) { this.work = 0; this.interact(t); } } else this.work = Math.max(0, (this.work || 0) - dt * 0.6); }
+      else { this.work = 0; if (Input.p('A') && t) { Sound.play('blip'); this.interact(t); } }
+      this.updateNPCs(dt); return; }
     const ex = this.exitAt(P.x, P.y);
     if (!ex) this.exitArmed = true; else if (this.exitArmed && ex.when && !ex.when()) { this.exitArmed = false; Sound.play('deny'); Dialogue.start(ex.deny()); return; } else if (this.exitArmed) { this.exitArmed = false; Sound.play('door'); Fade.go(() => { this.load(ex.to, ex.spawn); Game.autosave(); }); return; }
     this.target = this.findTarget();
@@ -284,12 +287,17 @@ const World = {
   },
   updateNPCs(dt) {
     for (const n of this.npcs) {
+      if (n.patrol) { // lamps sweep: turn toward the wanted facing instead of snapping
+        if (n.ang === undefined) n.ang = DIRA[n.dir];
+        if (!(n.inv && n.invT > 0)) { let d = DIRA[n.dir] - n.ang; d = Math.atan2(Math.sin(d), Math.cos(d)); const sp = (n.moving ? 6 : 1.5) * dt; n.ang += Math.abs(d) < sp ? d : Math.sign(d) * sp; }
+        n.vdir = [3, 0, 2, 1][Math.round(n.ang / (Math.PI / 2)) & 3];
+      }
       n.barkCd = (n.barkCd === undefined ? 1 + Math.random() * 3 : n.barkCd) - dt;
       if (n.bark) { n.bark.life -= dt; if (n.bark.life <= 0) n.bark = null; }
       if (!n.bark && n.barkCd <= 0 && !Dialogue.active && G.mode === 'world' && Math.hypot(P.x - n.x, P.y - n.y) < 48) { const l = barks(n.id); if (l.length) { n.bark = { t: l[Math.floor(Math.random() * l.length)], life: 2.6 }; } n.barkCd = 14 + Math.random() * 10; }
       if (n.face > 0) { n.face -= dt; if (n.face <= 0 && !n.wander) n.dir = n.home; n.moving = false; continue; }
       if (n.inv) { // heard a noise: walk over, look around, go back to the route
-        if (n.invT > 0) { n.invT -= dt; n.moving = false; const k = Math.floor(n.invT / 0.6); if (k !== n.invK) { n.invK = k; n.dir = (n.dir + 1) % 4; } if (n.invT <= 0) { n.inv = null; n.wait = 0.3; } continue; }
+        if (n.invT > 0) { n.invT -= dt; n.moving = false; n.ang += 2.7 * dt; if (n.invT <= 0) { n.inv = null; n.wait = 0.3; n.dir = [3, 0, 2, 1][Math.round(n.ang / (Math.PI / 2)) & 3]; } continue; } // a full, slow look around
         const dx = n.inv.x - n.x, dy = n.inv.y - n.y, sp = 40 * dt;
         if (Math.abs(dx) < 2 && Math.abs(dy) < 6 || n.invGive > 4) { n.invT = 2.4; n.invK = -1; continue; }
         n.invGive = (n.invGive || 0) + dt;
@@ -314,10 +322,9 @@ const World = {
   fxFlash(c, s) { this.flash = 1; this.flashC = c; this.shakeT = s || 0; },
   // ---- heist: lantern vision cones with line of sight; caught = back to the door
   seesPlayer(n) {
-    const FX = [0, 0, -1, 1][n.dir], FY = [1, -1, 0, 0][n.dir];
     const ox = n.x, oy = n.y - 6, dx = P.x - ox, dy = (P.y - 4) - oy, d = Math.hypot(dx, dy);
     if (d < 12) return true; if (d > 72) return false;
-    if ((dx * FX + dy * FY) / d < Math.cos(0.55)) return false;
+    let df = Math.atan2(dy, dx) - (n.ang === undefined ? DIRA[n.dir] : n.ang); df = Math.atan2(Math.sin(df), Math.cos(df)); if (Math.abs(df) > 0.55) return false;
     for (let s = 6; s < d; s += 4) if (this.solidAt(ox + dx * s / d, oy + dy * s / d)) return false;
     return true;
   },
@@ -334,8 +341,13 @@ const World = {
     if (this.bolt) { this.bolt.t += dt / 0.45; if (this.bolt.t >= 1) { const b = this.bolt; this.bolt = null; this.boltLand(b); } }
     if (this.ripple) { this.ripple.t += dt; if (this.ripple.t > 0.7) this.ripple = null; }
     if (this.caughtT > 0) { if (Dialogue.active) return; this.caughtT -= dt; if (this.caughtT <= 0) { if (G.heist === 2) { P.x = 7 * 16 + 8; P.y = 13 * 16 + 4; P.dir = 1; } else if (G.flags.relayCut) { P.x = 20 * 16 + 8; P.y = 9 * 16 + 4; P.dir = 1; } else { P.x = 24; P.y = 7 * 16 + 4; P.dir = 3; } Game.resetHeist(); } return; }
-    this.dynLights = this.npcs.filter(n => n.patrol).map(n => ({ x: n.x + [0, 0, -1, 1][n.dir] * 10, y: n.y - 6 + [1, -1, 0, 0][n.dir] * 10, r: 46, c: '#ffd070' }));
-    for (const n of this.npcs) if (n.patrol && this.seesPlayer(n)) {
+    this.dynLights = this.npcs.filter(n => n.patrol).map(n => { const a = n.ang === undefined ? DIRA[n.dir] : n.ang; return { x: n.x + Math.cos(a) * 14, y: n.y - 6 + Math.sin(a) * 14, r: 46, c: '#ffd070' }; });
+    let seen = 0, by = null;
+    for (const n of this.npcs) if (n.patrol && this.seesPlayer(n)) { const d = Math.hypot(P.x - n.x, P.y - 4 - (n.y - 6)), k = d < 14 ? 99 : 1.5 + (72 - d) / 72 * 2.8; if (k > seen) { seen = k; by = n; } }
+    if (seen) { this.alert = Math.min(1, (this.alert || 0) + seen * (G.flags.heistEase ? .6 : 1) * dt); this.alertPeak = Math.max(this.alertPeak || 0, this.alert); this.seenBy = by; this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = 0.32; } }
+    else if (this.alert > 0) { this.alert = Math.max(0, this.alert - dt * 0.9); if (this.alert === 0) { if (this.alertPeak > 0.4) { G.flags.closeCalls = (G.flags.closeCalls | 0) + 1; HUD.toast(G.heist === 1 ? ['Seren: "Close. Too close."', 'Seren: "Breathe. He didn\'t see."', 'Seren: "Stop showing off."'][G.flags.closeCalls % 3] : ['Ivo: "I felt that from here."', 'Tavi: "...Kael!"', 'Close call'][G.flags.closeCalls % 3]); Sound.play('back'); } this.alertPeak = 0; this.seenBy = null; } }
+    for (const n of this.npcs) if (n === by && this.alert >= 1) {
+      this.alert = 0; this.alertPeak = 0; this.work = 0;
       if (G.heist === 2) { this.caughtT = 0.6; const k = G.flags.caught2 = (G.flags.caught2 || 0) + 1; Sound.play('alarm'); this.fxFlash('#ff3020', 0.4); if (k >= 2) G.flags.heistEase = 1; Dialogue.start(FEST_CAUGHT(k, n.id)); return; }
       this.caughtT = 0.6; G.flags.caught = (G.flags.caught || 0) + 1; Sound.play('alarm'); this.fxFlash('#ff3020', 0.4);
       const n2 = G.flags.caught; if (n2 >= 3) G.flags.heistEase = 1;
@@ -347,10 +359,16 @@ const World = {
     if (this.bolt) { const b = this.bolt, k = b.t, x = b.x0 + (b.x1 - b.x0) * k, y = b.y0 + (b.y1 - b.y0) * k - Math.sin(k * Math.PI) * 18; g.fillStyle = '#c8ccd4'; g.fillRect(Math.round(x - cx) - 1, Math.round(y - cy) - 1, 2, 2); }
     if (this.ripple) { const r = this.ripple; g.strokeStyle = `rgba(255,255,255,${0.6 - r.t * 0.8})`; g.lineWidth = 1; g.beginPath(); g.arc(r.x - cx, r.y - cy, 4 + r.t * 40, 0, Math.PI * 2); g.stroke(); }
     for (const n of this.npcs) if (n.patrol) {
-      const a0 = [Math.PI / 2, -Math.PI / 2, Math.PI, 0][n.dir], ox = n.x - cx, oy = n.y - 6 - cy, R = 72;
-      g.fillStyle = this.caughtT > 0 ? 'rgba(255,60,40,.25)' : 'rgba(255,214,120,.14)';
+      const a0 = n.ang === undefined ? DIRA[n.dir] : n.ang, ox = n.x - cx, oy = n.y - 6 - cy, R = 72, hot = this.seenBy === n ? (this.alert || 0) : 0;
+      g.fillStyle = this.caughtT > 0 ? 'rgba(255,60,40,.25)' : hot ? `rgba(255,${214 - hot * 150 | 0},${120 - hot * 80 | 0},${.16 + hot * .14})` : 'rgba(255,214,120,.15)';
       g.beginPath(); g.moveTo(ox, oy); for (let a = -0.55; a <= 0.551; a += 0.11) { let r = 0; while (r < R && !this.solidAt(n.x + Math.cos(a0 + a) * r, n.y - 6 + Math.sin(a0 + a) * r)) r += 3; g.lineTo(ox + Math.cos(a0 + a) * r, oy + Math.sin(a0 + a) * r); } g.closePath(); g.fill();
+      g.strokeStyle = hot ? 'rgba(255,120,80,.5)' : 'rgba(255,230,160,.22)'; g.lineWidth = 1; g.stroke();
+      if (hot > 0.15) ptext(g, hot > 0.6 ? '!' : '?', Math.round(n.x - cx) - 1, Math.round(n.y - cy) - 32, hot > 0.6 ? '#ff5a4a' : '#ffe08a', 2);
     }
+    // the eye over Kael's head: how close he is to being made
+    if (this.alert > 0.02) { const x = Math.round(P.x - cx), y = Math.round(P.y - cy) - 27, a = this.alert; g.fillStyle = '#120a0e'; g.fillRect(x - 9, y - 1, 18, 5); g.fillStyle = '#3a2a24'; g.fillRect(x - 8, y, 16, 3); g.fillStyle = a > 0.6 ? '#ff5a4a' : '#ffb35a'; g.fillRect(x - 8, y, Math.round(16 * a), 3); if (!Settings.d.reduce) { g.fillStyle = `rgba(160,10,10,${a * 0.22})`; g.fillRect(0, 0, W, H); } }
+    // hold-to-work progress
+    if (this.work > 0 && this.target) { const x = Math.round(this.target.x - cx), y = Math.round(this.target.y - cy) - 8, k = Math.min(1, this.work / WORK_T); g.fillStyle = '#120a0e'; g.fillRect(x - 13, y - 1, 26, 6); g.fillStyle = '#3a2a24'; g.fillRect(x - 12, y, 24, 4); g.fillStyle = '#7cf27c'; g.fillRect(x - 12, y, Math.round(24 * k), 4); }
   },
   snapCam(hard) { const m = this.map; if (Cutscene.active) { const mw = m.w * 16, mh = m.h * 16, c = Cutscene.cam; this.cam.x = mw <= W ? (mw - W) / 2 : clamp(c.x - W / 2, 0, mw - W); this.cam.y = mh <= H ? (mh - H) / 2 : clamp(c.y - H / 2, 0, mh - H); if (Cutscene.shake && !Settings.d.reduce) { this.cam.x += (Math.random() - .5) * 4 * Cutscene.shake; this.cam.y += (Math.random() - .5) * 4 * Cutscene.shake; } return; } const mw = m.w * 16, mh = m.h * 16, tx = mw <= W ? (mw - W) / 2 : clamp(P.x - W / 2, 0, mw - W), ty = mh <= H ? (mh - H) / 2 : clamp(P.y - 8 - H / 2, 0, mh - H); if (hard || this.camHard || Math.abs(tx - this.cam.x) > 90 || Math.abs(ty - this.cam.y) > 90 || Settings.d.reduce) { this.cam.x = tx; this.cam.y = ty; this.camHard = false; } else { this.cam.x += (tx - this.cam.x) * 0.16; this.cam.y += (ty - this.cam.y) * 0.16; if (Math.abs(tx - this.cam.x) < 0.5) this.cam.x = tx; if (Math.abs(ty - this.cam.y) < 0.5) this.cam.y = ty; } },
   render(g, t) {
@@ -382,7 +400,7 @@ const World = {
     // entities sorted by y
     let ents;
     if (Cutscene.active) ents = Cutscene.actors.map(a => ({ x: a.x, y: a.y, dir: a.dir, f: a.moving ? 1 + (Math.floor(a.anim * 6) % 2) : 0, sheet: a.sheet }));
-    else { ents = this.npcs.map(n => ({ x: n.x, y: n.y, dir: n.dir, f: n.moving ? 1 + (Math.floor(n.anim * 6) % 2) : 0, sheet: this.sheetFor(n.id) }));
+    else { ents = this.npcs.map(n => ({ x: n.x, y: n.y, dir: n.vdir === undefined ? n.dir : n.vdir, f: n.moving ? 1 + (Math.floor(n.anim * 6) % 2) : 0, sheet: this.sheetFor(n.id) }));
       ents.push({ x: P.x, y: P.y, dir: P.dir, f: P.moving ? 1 + (Math.floor(P.anim * 8) % 2) : 0, sheet: P.sheet, me: 1 }); }
     ents.sort((a, b) => a.y - b.y);
     for (const e of ents) { const fh = e.sheet.fh || 16, sx = Math.round(e.x - 8 - cx), sy = Math.round(e.y - fh + 1 - cy); g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(sx + 2, sy + fh - 2, 12, 2); g.fillRect(sx + 4, sy + fh - 3, 8, 4); g.fillRect(sx + 3, sy + fh, 10, 1); const br = !e.f && !rm && ((t * 0.9 + e.x * 0.07) % 2.4) < 0.35 ? 1 : 0; g.drawImage(e.sheet, e.f * 16, e.dir * fh, 16, fh - br, sx, sy + br - (e.f === 1 && !rm ? 1 : 0), 16, fh - br); }
@@ -421,7 +439,7 @@ const World = {
     // interaction prompt
     if (Cutscene.active) { Cutscene.renderFX(g, cx, cy, t); return; }
     const show = (this.target && !Dialogue.active && !UI.stack.length);
-    if (show) { const bx = Math.round(this.target.x - cx), by = Math.round(this.target.y - cy) + (rm ? 0 : Math.round(Math.sin(t * 5))); g.fillStyle = '#120a0e'; g.fillRect(bx - 5, by - 6, 11, 10); g.fillStyle = PAL.amber; g.fillRect(bx - 4, by - 5, 9, 8); g.fillStyle = '#120a0e'; g.fillRect(bx, by + 3, 1, 2); ptext(g, Input.device === 'kb' ? 'E' : 'A', bx - 1, by - 4, '#2a1408'); }
+    if (show) { const bx = Math.round(this.target.x - cx), by = Math.round(this.target.y - cy) + (rm ? 0 : Math.round(Math.sin(t * 5))); g.fillStyle = '#120a0e'; g.fillRect(bx - 5, by - 6, 11, 10); g.fillStyle = PAL.amber; g.fillRect(bx - 4, by - 5, 9, 8); g.fillStyle = '#120a0e'; g.fillRect(bx, by + 3, 1, 2); ptext(g, Input.device === 'kb' ? 'E' : 'A', bx - 1, by - 4, '#2a1408'); if (G.heist && (this.target.id === 'pillarFest' || (this.target.id === 'relay' && !G.flags.relayCut)) && !this.work) { g.fillStyle = '#120a0e'; g.fillRect(bx - 10, by + 6, 21, 9); ptext(g, 'HOLD', bx - 7, by + 8, PAL.amber); } }
     if (Settings.d.highlight && !Dialogue.active) { const a = Math.floor(t * 2) % 2 ? PAL.cyan : PAL.amber; g.fillStyle = a;
       for (const h of m.hot) { const [hx, hy] = h.tiles[0]; g.fillRect(hx * 16 + 7 - cx, hy * 16 - cy + (isWall(m.grid[hy][hx]) ? 13 : 1), 2, 2); }
       for (const n of this.npcs) g.fillRect(Math.round(n.x - 1 - cx), Math.round(n.y - 24 - cy), 2, 2); }
@@ -449,6 +467,7 @@ const Light = {
   }
 };
 
+const DIRA = [Math.PI / 2, -Math.PI / 2, Math.PI, 0], WORK_T = 1.7; // facing angle per dir (down, up, left, right)
 const Fade = {
   a: 0, dir: 0, cb: null, busy: false,
   go(cb, speed, hold) { this.busy = true; this.dir = 1; this.cb = cb; this.sp = speed || 4; this.hold = !!hold; },

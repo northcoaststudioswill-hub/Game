@@ -135,6 +135,11 @@ body.portrait #hint{bottom:auto;top:calc(var(--cy) + var(--ch) + 64px)}
 .tabs button.on{border-color:var(--gold);color:var(--goldL);background:#33201a}
 #hint span{border:1px solid var(--goldD)}
 .modal.clear .panel{box-shadow:0 0 0 1px #0c0808,0 0 0 3px var(--goldD),0 0 0 4px #0c0808,0 8px 22px rgba(0,0,0,.6)}
+
+/* story panels: a slim caption strip so the picture stays visible */
+body.inpanel:not(.portrait) #dlg{padding:6px 10px;background:linear-gradient(rgba(20,13,15,.84),rgba(12,8,10,.9));bottom:calc(var(--by) + 6px)}
+body.inpanel:not(.portrait) #dlg canvas{width:44px;height:44px}
+body.inpanel:not(.portrait) #dlg .tx{min-height:0;line-height:1.4}
 </style>
 </head>
 <body>
@@ -1629,7 +1634,10 @@ const World = {
       if (!this.boxHits(nx, P.y)) P.x = nx; if (!this.boxHits(P.x, ny)) P.y = ny;
       P.anim += dt; P.moved += sp; P.stepT = (P.stepT || 0) + dt; if (P.stepT > 0.3) { P.stepT = 0; Sound.play(this.tileAt(P.x, P.y - 2) === ',' ? 'stepg' : 'step'); }
     } else P.anim = 0;
-    if (G.heist) { this.heistCheck(dt); if (this.caughtT > 0) return; this.boltCd = (this.boltCd || 0) - dt; if (Input.p('B') && this.boltCd <= 0) this.throwBolt(); this.target = this.findTarget(); if (Input.p('A') && this.target) { Sound.play('blip'); this.interact(this.target); } this.updateNPCs(dt); return; }
+    if (G.heist) { this.heistCheck(dt); if (this.caughtT > 0) return; this.boltCd = (this.boltCd || 0) - dt; if (Input.p('B') && this.boltCd <= 0) this.throwBolt(); const t = this.target = this.findTarget(), hold = t && ((G.heist === 1 && t.id === 'relay' && !G.flags.relayCut) || (G.heist === 2 && t.id === 'pillarFest'));
+      if (hold) { if (Input.h('A') && !P.moving) { const w0 = this.work || 0; this.work = w0 + dt; if (Math.floor(this.work * 5) !== Math.floor(w0 * 5)) Sound.play('rotate'); if (this.work >= WORK_T) { this.work = 0; this.interact(t); } } else this.work = Math.max(0, (this.work || 0) - dt * 0.6); }
+      else { this.work = 0; if (Input.p('A') && t) { Sound.play('blip'); this.interact(t); } }
+      this.updateNPCs(dt); return; }
     const ex = this.exitAt(P.x, P.y);
     if (!ex) this.exitArmed = true; else if (this.exitArmed && ex.when && !ex.when()) { this.exitArmed = false; Sound.play('deny'); Dialogue.start(ex.deny()); return; } else if (this.exitArmed) { this.exitArmed = false; Sound.play('door'); Fade.go(() => { this.load(ex.to, ex.spawn); Game.autosave(); }); return; }
     this.target = this.findTarget();
@@ -1638,12 +1646,17 @@ const World = {
   },
   updateNPCs(dt) {
     for (const n of this.npcs) {
+      if (n.patrol) { // lamps sweep: turn toward the wanted facing instead of snapping
+        if (n.ang === undefined) n.ang = DIRA[n.dir];
+        if (!(n.inv && n.invT > 0)) { let d = DIRA[n.dir] - n.ang; d = Math.atan2(Math.sin(d), Math.cos(d)); const sp = (n.moving ? 6 : 1.5) * dt; n.ang += Math.abs(d) < sp ? d : Math.sign(d) * sp; }
+        n.vdir = [3, 0, 2, 1][Math.round(n.ang / (Math.PI / 2)) & 3];
+      }
       n.barkCd = (n.barkCd === undefined ? 1 + Math.random() * 3 : n.barkCd) - dt;
       if (n.bark) { n.bark.life -= dt; if (n.bark.life <= 0) n.bark = null; }
       if (!n.bark && n.barkCd <= 0 && !Dialogue.active && G.mode === 'world' && Math.hypot(P.x - n.x, P.y - n.y) < 48) { const l = barks(n.id); if (l.length) { n.bark = { t: l[Math.floor(Math.random() * l.length)], life: 2.6 }; } n.barkCd = 14 + Math.random() * 10; }
       if (n.face > 0) { n.face -= dt; if (n.face <= 0 && !n.wander) n.dir = n.home; n.moving = false; continue; }
       if (n.inv) { // heard a noise: walk over, look around, go back to the route
-        if (n.invT > 0) { n.invT -= dt; n.moving = false; const k = Math.floor(n.invT / 0.6); if (k !== n.invK) { n.invK = k; n.dir = (n.dir + 1) % 4; } if (n.invT <= 0) { n.inv = null; n.wait = 0.3; } continue; }
+        if (n.invT > 0) { n.invT -= dt; n.moving = false; n.ang += 2.7 * dt; if (n.invT <= 0) { n.inv = null; n.wait = 0.3; n.dir = [3, 0, 2, 1][Math.round(n.ang / (Math.PI / 2)) & 3]; } continue; } // a full, slow look around
         const dx = n.inv.x - n.x, dy = n.inv.y - n.y, sp = 40 * dt;
         if (Math.abs(dx) < 2 && Math.abs(dy) < 6 || n.invGive > 4) { n.invT = 2.4; n.invK = -1; continue; }
         n.invGive = (n.invGive || 0) + dt;
@@ -1668,10 +1681,9 @@ const World = {
   fxFlash(c, s) { this.flash = 1; this.flashC = c; this.shakeT = s || 0; },
   // ---- heist: lantern vision cones with line of sight; caught = back to the door
   seesPlayer(n) {
-    const FX = [0, 0, -1, 1][n.dir], FY = [1, -1, 0, 0][n.dir];
     const ox = n.x, oy = n.y - 6, dx = P.x - ox, dy = (P.y - 4) - oy, d = Math.hypot(dx, dy);
     if (d < 12) return true; if (d > 72) return false;
-    if ((dx * FX + dy * FY) / d < Math.cos(0.55)) return false;
+    let df = Math.atan2(dy, dx) - (n.ang === undefined ? DIRA[n.dir] : n.ang); df = Math.atan2(Math.sin(df), Math.cos(df)); if (Math.abs(df) > 0.55) return false;
     for (let s = 6; s < d; s += 4) if (this.solidAt(ox + dx * s / d, oy + dy * s / d)) return false;
     return true;
   },
@@ -1688,8 +1700,13 @@ const World = {
     if (this.bolt) { this.bolt.t += dt / 0.45; if (this.bolt.t >= 1) { const b = this.bolt; this.bolt = null; this.boltLand(b); } }
     if (this.ripple) { this.ripple.t += dt; if (this.ripple.t > 0.7) this.ripple = null; }
     if (this.caughtT > 0) { if (Dialogue.active) return; this.caughtT -= dt; if (this.caughtT <= 0) { if (G.heist === 2) { P.x = 7 * 16 + 8; P.y = 13 * 16 + 4; P.dir = 1; } else if (G.flags.relayCut) { P.x = 20 * 16 + 8; P.y = 9 * 16 + 4; P.dir = 1; } else { P.x = 24; P.y = 7 * 16 + 4; P.dir = 3; } Game.resetHeist(); } return; }
-    this.dynLights = this.npcs.filter(n => n.patrol).map(n => ({ x: n.x + [0, 0, -1, 1][n.dir] * 10, y: n.y - 6 + [1, -1, 0, 0][n.dir] * 10, r: 46, c: '#ffd070' }));
-    for (const n of this.npcs) if (n.patrol && this.seesPlayer(n)) {
+    this.dynLights = this.npcs.filter(n => n.patrol).map(n => { const a = n.ang === undefined ? DIRA[n.dir] : n.ang; return { x: n.x + Math.cos(a) * 14, y: n.y - 6 + Math.sin(a) * 14, r: 46, c: '#ffd070' }; });
+    let seen = 0, by = null;
+    for (const n of this.npcs) if (n.patrol && this.seesPlayer(n)) { const d = Math.hypot(P.x - n.x, P.y - 4 - (n.y - 6)), k = d < 14 ? 99 : 1.5 + (72 - d) / 72 * 2.8; if (k > seen) { seen = k; by = n; } }
+    if (seen) { this.alert = Math.min(1, (this.alert || 0) + seen * (G.flags.heistEase ? .6 : 1) * dt); this.alertPeak = Math.max(this.alertPeak || 0, this.alert); this.seenBy = by; this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = 0.32; } }
+    else if (this.alert > 0) { this.alert = Math.max(0, this.alert - dt * 0.9); if (this.alert === 0) { if (this.alertPeak > 0.4) { G.flags.closeCalls = (G.flags.closeCalls | 0) + 1; HUD.toast(G.heist === 1 ? ['Seren: "Close. Too close."', 'Seren: "Breathe. He didn\'t see."', 'Seren: "Stop showing off."'][G.flags.closeCalls % 3] : ['Ivo: "I felt that from here."', 'Tavi: "...Kael!"', 'Close call'][G.flags.closeCalls % 3]); Sound.play('back'); } this.alertPeak = 0; this.seenBy = null; } }
+    for (const n of this.npcs) if (n === by && this.alert >= 1) {
+      this.alert = 0; this.alertPeak = 0; this.work = 0;
       if (G.heist === 2) { this.caughtT = 0.6; const k = G.flags.caught2 = (G.flags.caught2 || 0) + 1; Sound.play('alarm'); this.fxFlash('#ff3020', 0.4); if (k >= 2) G.flags.heistEase = 1; Dialogue.start(FEST_CAUGHT(k, n.id)); return; }
       this.caughtT = 0.6; G.flags.caught = (G.flags.caught || 0) + 1; Sound.play('alarm'); this.fxFlash('#ff3020', 0.4);
       const n2 = G.flags.caught; if (n2 >= 3) G.flags.heistEase = 1;
@@ -1701,10 +1718,16 @@ const World = {
     if (this.bolt) { const b = this.bolt, k = b.t, x = b.x0 + (b.x1 - b.x0) * k, y = b.y0 + (b.y1 - b.y0) * k - Math.sin(k * Math.PI) * 18; g.fillStyle = '#c8ccd4'; g.fillRect(Math.round(x - cx) - 1, Math.round(y - cy) - 1, 2, 2); }
     if (this.ripple) { const r = this.ripple; g.strokeStyle = `rgba(255,255,255,${0.6 - r.t * 0.8})`; g.lineWidth = 1; g.beginPath(); g.arc(r.x - cx, r.y - cy, 4 + r.t * 40, 0, Math.PI * 2); g.stroke(); }
     for (const n of this.npcs) if (n.patrol) {
-      const a0 = [Math.PI / 2, -Math.PI / 2, Math.PI, 0][n.dir], ox = n.x - cx, oy = n.y - 6 - cy, R = 72;
-      g.fillStyle = this.caughtT > 0 ? 'rgba(255,60,40,.25)' : 'rgba(255,214,120,.14)';
+      const a0 = n.ang === undefined ? DIRA[n.dir] : n.ang, ox = n.x - cx, oy = n.y - 6 - cy, R = 72, hot = this.seenBy === n ? (this.alert || 0) : 0;
+      g.fillStyle = this.caughtT > 0 ? 'rgba(255,60,40,.25)' : hot ? `rgba(255,${214 - hot * 150 | 0},${120 - hot * 80 | 0},${.16 + hot * .14})` : 'rgba(255,214,120,.15)';
       g.beginPath(); g.moveTo(ox, oy); for (let a = -0.55; a <= 0.551; a += 0.11) { let r = 0; while (r < R && !this.solidAt(n.x + Math.cos(a0 + a) * r, n.y - 6 + Math.sin(a0 + a) * r)) r += 3; g.lineTo(ox + Math.cos(a0 + a) * r, oy + Math.sin(a0 + a) * r); } g.closePath(); g.fill();
+      g.strokeStyle = hot ? 'rgba(255,120,80,.5)' : 'rgba(255,230,160,.22)'; g.lineWidth = 1; g.stroke();
+      if (hot > 0.15) ptext(g, hot > 0.6 ? '!' : '?', Math.round(n.x - cx) - 1, Math.round(n.y - cy) - 32, hot > 0.6 ? '#ff5a4a' : '#ffe08a', 2);
     }
+    // the eye over Kael's head: how close he is to being made
+    if (this.alert > 0.02) { const x = Math.round(P.x - cx), y = Math.round(P.y - cy) - 27, a = this.alert; g.fillStyle = '#120a0e'; g.fillRect(x - 9, y - 1, 18, 5); g.fillStyle = '#3a2a24'; g.fillRect(x - 8, y, 16, 3); g.fillStyle = a > 0.6 ? '#ff5a4a' : '#ffb35a'; g.fillRect(x - 8, y, Math.round(16 * a), 3); if (!Settings.d.reduce) { g.fillStyle = `rgba(160,10,10,${a * 0.22})`; g.fillRect(0, 0, W, H); } }
+    // hold-to-work progress
+    if (this.work > 0 && this.target) { const x = Math.round(this.target.x - cx), y = Math.round(this.target.y - cy) - 8, k = Math.min(1, this.work / WORK_T); g.fillStyle = '#120a0e'; g.fillRect(x - 13, y - 1, 26, 6); g.fillStyle = '#3a2a24'; g.fillRect(x - 12, y, 24, 4); g.fillStyle = '#7cf27c'; g.fillRect(x - 12, y, Math.round(24 * k), 4); }
   },
   snapCam(hard) { const m = this.map; if (Cutscene.active) { const mw = m.w * 16, mh = m.h * 16, c = Cutscene.cam; this.cam.x = mw <= W ? (mw - W) / 2 : clamp(c.x - W / 2, 0, mw - W); this.cam.y = mh <= H ? (mh - H) / 2 : clamp(c.y - H / 2, 0, mh - H); if (Cutscene.shake && !Settings.d.reduce) { this.cam.x += (Math.random() - .5) * 4 * Cutscene.shake; this.cam.y += (Math.random() - .5) * 4 * Cutscene.shake; } return; } const mw = m.w * 16, mh = m.h * 16, tx = mw <= W ? (mw - W) / 2 : clamp(P.x - W / 2, 0, mw - W), ty = mh <= H ? (mh - H) / 2 : clamp(P.y - 8 - H / 2, 0, mh - H); if (hard || this.camHard || Math.abs(tx - this.cam.x) > 90 || Math.abs(ty - this.cam.y) > 90 || Settings.d.reduce) { this.cam.x = tx; this.cam.y = ty; this.camHard = false; } else { this.cam.x += (tx - this.cam.x) * 0.16; this.cam.y += (ty - this.cam.y) * 0.16; if (Math.abs(tx - this.cam.x) < 0.5) this.cam.x = tx; if (Math.abs(ty - this.cam.y) < 0.5) this.cam.y = ty; } },
   render(g, t) {
@@ -1736,7 +1759,7 @@ const World = {
     // entities sorted by y
     let ents;
     if (Cutscene.active) ents = Cutscene.actors.map(a => ({ x: a.x, y: a.y, dir: a.dir, f: a.moving ? 1 + (Math.floor(a.anim * 6) % 2) : 0, sheet: a.sheet }));
-    else { ents = this.npcs.map(n => ({ x: n.x, y: n.y, dir: n.dir, f: n.moving ? 1 + (Math.floor(n.anim * 6) % 2) : 0, sheet: this.sheetFor(n.id) }));
+    else { ents = this.npcs.map(n => ({ x: n.x, y: n.y, dir: n.vdir === undefined ? n.dir : n.vdir, f: n.moving ? 1 + (Math.floor(n.anim * 6) % 2) : 0, sheet: this.sheetFor(n.id) }));
       ents.push({ x: P.x, y: P.y, dir: P.dir, f: P.moving ? 1 + (Math.floor(P.anim * 8) % 2) : 0, sheet: P.sheet, me: 1 }); }
     ents.sort((a, b) => a.y - b.y);
     for (const e of ents) { const fh = e.sheet.fh || 16, sx = Math.round(e.x - 8 - cx), sy = Math.round(e.y - fh + 1 - cy); g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(sx + 2, sy + fh - 2, 12, 2); g.fillRect(sx + 4, sy + fh - 3, 8, 4); g.fillRect(sx + 3, sy + fh, 10, 1); const br = !e.f && !rm && ((t * 0.9 + e.x * 0.07) % 2.4) < 0.35 ? 1 : 0; g.drawImage(e.sheet, e.f * 16, e.dir * fh, 16, fh - br, sx, sy + br - (e.f === 1 && !rm ? 1 : 0), 16, fh - br); }
@@ -1775,7 +1798,7 @@ const World = {
     // interaction prompt
     if (Cutscene.active) { Cutscene.renderFX(g, cx, cy, t); return; }
     const show = (this.target && !Dialogue.active && !UI.stack.length);
-    if (show) { const bx = Math.round(this.target.x - cx), by = Math.round(this.target.y - cy) + (rm ? 0 : Math.round(Math.sin(t * 5))); g.fillStyle = '#120a0e'; g.fillRect(bx - 5, by - 6, 11, 10); g.fillStyle = PAL.amber; g.fillRect(bx - 4, by - 5, 9, 8); g.fillStyle = '#120a0e'; g.fillRect(bx, by + 3, 1, 2); ptext(g, Input.device === 'kb' ? 'E' : 'A', bx - 1, by - 4, '#2a1408'); }
+    if (show) { const bx = Math.round(this.target.x - cx), by = Math.round(this.target.y - cy) + (rm ? 0 : Math.round(Math.sin(t * 5))); g.fillStyle = '#120a0e'; g.fillRect(bx - 5, by - 6, 11, 10); g.fillStyle = PAL.amber; g.fillRect(bx - 4, by - 5, 9, 8); g.fillStyle = '#120a0e'; g.fillRect(bx, by + 3, 1, 2); ptext(g, Input.device === 'kb' ? 'E' : 'A', bx - 1, by - 4, '#2a1408'); if (G.heist && (this.target.id === 'pillarFest' || (this.target.id === 'relay' && !G.flags.relayCut)) && !this.work) { g.fillStyle = '#120a0e'; g.fillRect(bx - 10, by + 6, 21, 9); ptext(g, 'HOLD', bx - 7, by + 8, PAL.amber); } }
     if (Settings.d.highlight && !Dialogue.active) { const a = Math.floor(t * 2) % 2 ? PAL.cyan : PAL.amber; g.fillStyle = a;
       for (const h of m.hot) { const [hx, hy] = h.tiles[0]; g.fillRect(hx * 16 + 7 - cx, hy * 16 - cy + (isWall(m.grid[hy][hx]) ? 13 : 1), 2, 2); }
       for (const n of this.npcs) g.fillRect(Math.round(n.x - 1 - cx), Math.round(n.y - 24 - cy), 2, 2); }
@@ -1803,6 +1826,7 @@ const Light = {
   }
 };
 
+const DIRA = [Math.PI / 2, -Math.PI / 2, Math.PI, 0], WORK_T = 1.7; // facing angle per dir (down, up, left, right)
 const Fade = {
   a: 0, dir: 0, cb: null, busy: false,
   go(cb, speed, hold) { this.busy = true; this.dir = 1; this.cb = cb; this.sp = speed || 4; this.hold = !!hold; },
@@ -1826,7 +1850,7 @@ const Cutscene = {
   active: false, steps: [], i: 0, actors: [], cam: { x: 0, y: 0 }, block: null, letter: 0, beam: 0, beamT: 0, flash: 0, flashC: '#fff', shake: 0, dark: null, onEnd: null, pillarRed: false, motes: [],
   actor(id) { return this.actors.find(a => a.id === id); },
   play(steps, onEnd) {
-    Object.assign(this, { steps, i: 0, onEnd, active: true, actors: [], letter: 1, beam: 0, flash: 0, shake: 0, dark: null, pillarRed: false, motes: [], furnace: 0, zoom: 1, zoomT: 1, heart: 0, heartT: 0, vignette: 0, lift: 0, hung: 0, glowK: 0, sun: 0, sunT: 0 });
+    Object.assign(this, { steps, i: 0, onEnd, active: true, actors: [], letter: 1, beam: 0, flash: 0, shake: 0, dark: null, pillarRed: false, motes: [], furnace: 0, zoom: 1, zoomT: 1, heart: 0, heartT: 0, vignette: 0, lift: 0, hung: 0, glowK: 0, sun: 0, sunT: 0, panel: null });
     G.mode = 'cine'; $('#cskip').classList.remove('hidden'); this.next();
   },
   next() {
@@ -1843,7 +1867,7 @@ const Cutscene = {
   run(s) {
     const T = (x, y) => ({ x: x * 16 + 8, y: y * 16 + 12 });
     if (s.card !== undefined) { this.card(s.card, s.sub, s.big); if (s.sfx) Sound.play(s.sfx); this.block = { type: 'card', t: 0, min: s.min || 1.4, max: s.max || 7 }; return true; }
-    if (s.scene) { this.hideCard(); World.load(s.scene, null, true); this.actors = []; this.dark = s.dark || null; this.cam = { x: s.cam[0] * 16 + 8, y: s.cam[1] * 16 }; this.pillarRed = false; this.beam = 0; this.furnace = 0; this.motes = []; this.zoomT = s.zoom || 1; this.zoom = this.zoomT; return false; }
+    if (s.scene) { this.hideCard(); this.panel = null; World.load(s.scene, null, true); this.actors = []; this.dark = s.dark || null; this.cam = { x: s.cam[0] * 16 + 8, y: s.cam[1] * 16 }; this.pillarRed = false; this.beam = 0; this.furnace = 0; this.motes = []; this.zoomT = s.zoom || 1; this.zoom = this.zoomT; return false; }
     if (s.add) { for (const [id, x, y, dir, who] of s.add) { const p = T(x, y); this.actors.push({ id, who: who || id, x: p.x, y: p.y, dir: dir || 0, sheet: id === 'kael' ? P.sheet : World.sheetFor(who || id), anim: 0, moving: false }); } return false; }
     if (s.remove) { this.actors = this.actors.filter(a => a.id !== s.remove); return false; }
     if (s.face) { const a = this.actor(s.face); if (a) a.dir = s.dir; return false; }
@@ -1856,6 +1880,8 @@ const Cutscene = {
     if (s.pan) { this.pan = { from: { ...this.cam }, to: { x: s.pan[0] * 16 + 8, y: s.pan[1] * 16 }, t: 0, d: s.dur || 2 }; if (s.hold !== false) { this.block = { type: 'pan' }; return true; } return false; }
     if (s.fade === 'out') { this.block = { type: 'fade' }; Fade.go(() => { if (this.active) this.next(); }, s.spd || 1.4, true); return true; }
     if (s.fade === 'in') { this.hideCard(); Fade.a = 1; Fade.dir = -1; Fade.sp = s.spd || 1; Fade.busy = true; }
+    if (s.panel !== undefined) { this.hideCard(); this.panel = s.panel ? { id: s.panel, t: 0, stage: s.stage || 0, st: 0 } : null; }
+    if (s.pstage !== undefined && this.panel) { this.panel.stage = s.pstage; this.panel.st = 0; }
     if (s.music !== undefined) Sound.music(s.music);
     if (s.sfx) Sound.play(s.sfx);
     if (s.flash) { this.flash = 1; this.flashC = s.flash; }
@@ -1879,6 +1905,7 @@ const Cutscene = {
     }
     if (this.pan) { const p = this.pan; p.t += dt; const k = Math.min(1, p.t / p.d), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
       this.cam = { x: p.from.x + (p.to.x - p.from.x) * e, y: p.from.y + (p.to.y - p.from.y) * e }; if (k >= 1) { this.pan = null; if (this.block && this.block.type === 'pan') this.next(); } }
+    if (this.panel) { this.panel.t += dt; this.panel.st += dt; }
     this.zoom += (this.zoomT - this.zoom) * Math.min(1, dt * 2.5); this.sun += ((this.sunT || 0) - (this.sun || 0)) * Math.min(1, dt * 0.9);
     if (this.heart) { this.heartT -= dt; if (this.heartT <= 0) { Sound.play('heart'); this.heartT = 0.85; } }
     this.flash = Math.max(0, this.flash - dt * 0.8); this.shake = Math.max(0, this.shake - dt); this.beamT += dt;
@@ -1896,7 +1923,7 @@ const Cutscene = {
   },
   end() {
     this.active = false; this.hideCard(); $('#cskip').classList.add('hidden');
-    this.beam = 0; this.letter = 0; this.dark = null; this.actors = []; this.block = null; this.furnace = 0; this.zoom = this.zoomT = 1; this.heart = 0; this.vignette = 0; this.lift = 0; this.hung = 0; this.glowK = 0; this.sun = this.sunT = 0;
+    this.beam = 0; this.letter = 0; this.dark = null; this.actors = []; this.block = null; this.furnace = 0; this.zoom = this.zoomT = 1; this.heart = 0; this.vignette = 0; this.lift = 0; this.hung = 0; this.glowK = 0; this.sun = this.sunT = 0; this.panel = null;
     const cb = this.onEnd; this.onEnd = null; Input.consume(); cb && cb();
   },
   // drawn after World lighting: the Accredited are never in shadow
@@ -1939,7 +1966,19 @@ const Cutscene = {
 
 // ================= PROLOGUE A: the love, the fever, the plan =================
 const PROLOGUE_A = [
-  { music: 'home' },
+  { music: 'mystery' }, { letter: 1 },
+  { panel: 'world' }, { fade: 'in', spd: 0.7 }, { wait: 1.2 },
+  { narr: 'They say the surface burned two hundred years ago. That the sky is poison now, and the sun is a furnace that eats lungs.' },
+  { pstage: 1 }, { wait: 2.4 },
+  { narr: 'So we live below. Cinderwell. Six tiers of rock wrapped around a machine called the Deep Array, which makes the only air there is.' },
+  { pstage: 2 }, { wait: 0.8 },
+  { narr: 'We keep the Array running. The Array Authority keeps the count. Every breath down here is rationed, logged, and owed.' },
+  { narr: 'They have a word for us. Soot. The thing that is left over when something useful burns.' },
+  { pstage: 3 }, { wait: 1.6 },
+  { narr: 'Once in a decade they come down Lift Zero, in white, in light. We kneel. They go back up.' },
+  { narr: 'Nobody from Cinderwell has ever gone with them.' },
+  { narr: 'My name is Kael Brennick. I fix valves on Tier 6. And one year ago tonight, I thought the worst thing that could happen to me was a girl saying no.' },
+  { fade: 'out' }, { panel: null }, { music: 'home' },
   { card: 'ONE YEAR AGO', sub: 'The Festival of the First Fire · Ashgate Square', min: 1.2, max: 4 },
   { scene: 'square', cam: [11, 9], dark: 'rgba(8,5,16,.32)', zoom: 2.2 },
   { add: [['seren', 12, 9, 1], ['kael', 7, 9, 3], ['c1', 6, 5, 0, 'c1'], ['c2', 18, 6, 2, 'c2'], ['ivo', 16, 11, 2], ['juno', 9, 12, 1]] },
@@ -1954,10 +1993,13 @@ const PROLOGUE_A = [
     { t: "Paint me one I can carry, then.", fx: () => setF('ambitiousYouth'), then: [say('seren', 'Greedy. You always want the one you can hold.')] },
     { t: "One day I'll show you the real one.", fx: () => setF('promisedSky'), then: [say('seren', "Don't promise me the sky, Kael Brennick. Promise me tomorrow. Tomorrow I can use.")] }
   ] },
+  { panel: 'hands' }, { sfx: 'clue' },
   { narr: 'You have been carrying it in your pocket for three weeks. A brass washer from Bank Seven, filed smooth on your lunch breaks until it shines like something that matters.' },
   { say: 'kael', t: "Seren Holloway. I can't give you the sky. But I can give you a perfectly balanced pressure seal." },
   { say: 'seren', t: "...That is the worst proposal in the history of Cinderwell." },
+  { pstage: 1 }, { sfx: 'coin' },
   { say: 'seren', t: 'Yes. Obviously yes. Put it on me before I come to my senses.' },
+  { wait: 0.9 }, { panel: null },
   { narr: 'Mara binds you at the Pillar, in front of the whole crew, with chalk on your hands and Ivo crying louder than anyone.' },
   { say: 'ivo', t: "I'm not crying. The square is dusty. The square is VERY dusty." },
   { narr: 'Seren draws the last ray of her sun on your wrist with her finger. "There," she says. "Now you\'ve seen it."' },
@@ -1973,13 +2015,20 @@ const PROLOGUE_A = [
   { say: 'seren', t: 'Smart kid.' },
   { face: 'kael', dir: 3 },
   { say: 'nell', t: "I'll be honest, because you'd know if I wasn't. The fever isn't what kills them. It's the air." },
+  { panel: 'ward' },
   { say: 'nell', t: 'The Authority cut the clinic to ration pressure two weeks ago. Forty kids, breathing each other\'s breath. Tavi\'s lungs are filling.' },
+  { narr: 'You have seen the ward. Six cots to a row. You can hear a room full of children working for every breath, and once you have heard it you cannot stop.' },
+  { panel: null },
   { say: 'kael', t: "Then we get the clinic more air." },
   { say: 'nell', t: "From where? Every cubic meter in Cinderwell is counted. Tier 6 doesn't get one breath more than its ration." },
+  { panel: 'pipe' },
   { say: 'kael', t: "Not every meter. Bank Seven has a line nobody's allowed to touch. Authority seal. Fat as my arm." },
   { say: 'kael', t: "I read its gauge once. That one pipe carries more air than all of Tier 6 put together. Every night. Going somewhere." },
   { say: 'seren', t: "It's Authority, Kael. If they so much as see a needle twitch—" },
+  { pstage: 1 }, { sfx: 'rotate' },
   { say: 'kael', t: "So we bleed it slow. A sliver, into the clinic line. And we balance the bank again before the morning audit. Nobody sees a thing." },
+  { narr: 'Stealing air is the one crime the Authority never forgives. They do not fine you for it. They do not jail you. They commit you to the Array, and the Array runs on fire.' },
+  { panel: null },
   { say: 'nell', t: "...I didn't hear any of this. I'll have the ward vents open at second bell." },
   { move: 'nell', to: [6, 8], spd: 30 },
   { say: 'seren', t: 'Why you? Why does it always have to be you?' },
@@ -1992,7 +2041,7 @@ const PROLOGUE_A = [
   { say: 'kael', t: "And if he sees both of us?" },
   { say: 'seren', t: "Then we're newlyweds looking for somewhere private. Try to look embarrassed. Shouldn't be hard." },
   { fade: 'out' },
-  { card: 'Bay Three · Second bell', sub: 'Cut the audit relay. Then reach Valve Bank Seven. Stay out of the lantern light. Throw bolts to pull the guards away.', min: 1, max: 4 }
+  { card: 'Bay Three · Second bell', sub: 'Hold A at the audit relay to cut it. Then reach Valve Bank Seven. The lamps sweep: move when they turn away. Throw bolts to pull a guard off his post.', min: 1, max: 4 }
 ];
 
 // ================= PROLOGUE B: the audit, the sentence, the furnace =================
@@ -2004,7 +2053,9 @@ const PROLOGUE_B = [
   { face: 'kael', dir: 2 },
   { say: 'seren', t: 'Kael. Did it work?' },
   { say: 'kael', t: 'Listen.' },
+  { panel: 'ward', stage: 1 }, { sfx: 'solved' },
   { narr: 'Far off, through the vents: the clinic fans spinning up. Then a cheer, thin and tired, from a ward full of children who can suddenly breathe.' },
+  { wait: 0.8 }, { panel: null },
   { say: 'seren', t: "You're insufferable when you're right." },
   { say: 'kael', t: 'Then I plan to be insufferable for a very long time.' },
   { say: 'seren', t: "Balance it back before the audit. Promise me. Every night until the fever breaks, and then never again." },
@@ -2019,8 +2070,10 @@ const PROLOGUE_B = [
   { fade: 'in' }, { wait: 0.8 },
   { narr: 'The whole tier was summoned to Ashgate. Nobody was told why. Nobody needed to be.' },
   { sfx: 'rumble' }, { shake: 0.9 }, { wait: 1 },
+  { flash: '#fff6dc' }, { music: 'surface' }, { sfx: 'choir' }, { panel: 'lift' },
   { narr: 'Lift 0 opened for the first time in eleven years.' },
-  { flash: '#fff6dc' }, { beam: 1 }, { music: 'surface' }, { sfx: 'choir' },
+  { narr: 'Light came out of it like water out of a broken main. Real light. Not Pillar light. It had a color none of you had a word for.' },
+  { wait: 0.6 }, { panel: null }, { beam: 1 },
   { add: [['celestine', 13, 1, 0], ['wl', 12, 1, 0, 'warden'], ['wr', 14, 1, 0, 'warden']] },
   { move: 'wl', to: [12, 4], spd: 14 }, { move: 'wr', to: [14, 4], spd: 14 }, { move: 'celestine', to: [13, 4], spd: 14, wait: true },
   { narr: 'They came down in light. Tall and unhurried, robed in white that had never known a smudge. Their skin had never known soot. Their voices had never needed to be raised.' },
@@ -2072,22 +2125,24 @@ const PROLOGUE_B = [
   { move: 'seren', to: [15, 3], spd: 9 }, { move: 'wr', to: [16, 3], spd: 9 }, { move: 'wl', to: [14, 3], spd: 9, wait: true },
   { sfx: 'roar' }, { flash: '#ff7a30' }, { shake: 1.2 }, { fx: () => { Cutscene.furnace = 1; } }, { vignette: 1 },
   { narr: 'The Wardens haul the furnace doors open. The heat hits the back row like a slap. The whole bay turns the color of a wound.' },
+  { panel: 'furnace' },
   { narr: 'Her boots scrape on the grating. She is not crying. You will hate yourself, later, for being proud of that.' },
-  { face: 'seren', dir: 0 }, { zoom: 3 }, { pan: [15, 4], dur: 1.2 },
+  { face: 'seren', dir: 0 }, { zoom: 3 }, { fx: () => { Cutscene.cam = { x: 15 * 16 + 8, y: 4 * 16 }; } },
   { say: 'seren', t: 'Hey. Hey, Kael. Look at me. Not at them. At me.' },
   { say: 'seren', t: 'You were always too much for this place. Too loud, too proud, too much. Good.' },
   { say: 'seren', t: 'Be too much for THEM.' },
   { narr: 'She lifts her hand so you can see the brass washer on her finger, catching the fire.' },
   { say: 'seren', t: 'Balance the bank. And don\'t you DARE stop breathing.' },
-  { pan: [12, 6], dur: 0.8 }, { zoom: 2.6 },
+  { panel: null }, { fx: () => { Cutscene.cam = { x: 12 * 16 + 8, y: 6 * 16 }; } }, { zoom: 2.6 },
   { choice: [
     { t: 'SCREAM HER NAME.', fx: () => { fury(1); setF('screamed'); }, then: [narr("You scream her name until something in your throat tears and the sound turns to nothing. Mara's forearm locks across your chest. She is crying too. You will never forgive her for that. You will never forgive anyone for anything.")] },
     { t: 'BREAK FREE. RUN FOR HER.', fx: () => { fury(2); setF('ranForHer'); }, then: [{ fx: () => { Cutscene.shake = 1; Cutscene.flash = 1; Cutscene.flashC = '#ff2010'; Sound.play('hit'); } }, narr("Three steps. You make it three steps. A Warden's halberd takes you across the ribs and the grating comes up to meet your face. You taste iron. You crawl. Ivo lands on your back, sobbing, holding you down, saying sorry, sorry, sorry.")] },
     { t: "HOLD HER EYES. DON'T LET HER BE ALONE.", fx: () => setF('heldEyes'), then: [narr('You hold her eyes. You do not look away. Not for one second of what comes next. Whatever it costs. You owe her that. You owe her everything.')] }
   ] },
-  { move: 'seren', to: [15, 2], spd: 7, wait: true }, { remove: 'seren' },
-  { sfx: 'roar' }, { flash: '#fff2d0' }, { shake: 2 }, { heart: 0 },
-  { narr: 'The doors close.' },
+  { remove: 'seren' }, { panel: 'furnace', stage: 1 }, { wait: 2.8 },
+  { narr: 'She walks the last of it herself. They do not have to push her. She would not give them that.' },
+  { pstage: 2 }, { sfx: 'roar' }, { shake: 2 }, { heart: 0 }, { wait: 1.5 }, { sfx: 'hit' },
+  { narr: 'The doors close.' }, { wait: 1.6 },
   { fade: 'out', spd: 3 }, { vignette: 0 },
   { card: 'ONE.', sub: 'She steals your bread on the first day of school and denies it with her mouth full.', min: 0.8, max: 2.6, sfx: 'heart' },
   { card: 'TWO.', sub: 'Fifteen. Behind the noodle stall. She kisses you first, then tells the whole tier you started it.', min: 0.8, max: 2.6, sfx: 'heart' },
@@ -2116,14 +2171,21 @@ const PROLOGUE_B = [
   { move: 'celestine', to: [19, 3], spd: 14 }, { move: 'wl', to: [19, 2], spd: 14 }, { move: 'wr', to: [20, 3], spd: 14 }, { move: 'vale', to: [21, 4], spd: 14 },
   { wait: 1.5 }, { zoom: 2.4 },
   { say: 'mara', t: "Kael. Kael, son. Get up. She'd want you up." },
+  { panel: 'kael' },
   { say: 'kael', t: 'She told me to breathe.' },
   { say: 'kael', t: 'So every breath I take now is hers.' },
+  { pstage: 1 },
   { say: 'kael', t: 'And every breath THEY take is mine.' },
   { narr: 'Something in you goes quiet, and stays quiet.' },
   { narr: 'Something else wakes up, and does not go back to sleep.' },
   { fade: 'out' },
-  { card: 'Two days later, a tin arrives at your door.', sub: 'Inside: a cup of ash. A blackened brass washer. And an invoice: COMMITMENT FUEL — 14 SCRIP, deducted from future wages. GRATITUDE IS BREATH.', min: 3, max: 10 },
-  { card: 'They returned the ring.', sub: 'They kept the girl.', min: 2, max: 6 },
+  { panel: 'tin' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'Two days later, a tin arrives at your door. Authority grey, with a little sun stamped on the lid.' },
+  { narr: 'Inside: a cup of ash. Less than you would think. And a brass washer, blackened, still round.' },
+  { pstage: 1 }, { sfx: 'page' }, { wait: 0.8 },
+  { narr: 'And an invoice. COMMITMENT FUEL — 14 SCRIP, deducted from future wages. GRATITUDE IS BREATH.' },
+  { narr: 'They returned the ring. They kept the girl. And they sent you the bill for the fire.' },
+  { fade: 'out' }, { panel: null },
   { card: 'SOOTBORN', sub: 'What they call us. What they will remember.', big: 1, sfx: 'splash', min: 2.2, max: 6 },
   { card: 'FORTY-ONE DAYS LATER', min: 1, max: 3 }
 ];
@@ -2134,6 +2196,175 @@ const HEIST_PUZZLE = { name: 'BANK 7 · BLEED', tip: 'Bleed the Authority line i
   ['', 'ES', 'EW', 'SW', ''],
   ['SRC:E:AUTH', 'NW', 'E', 'NSW', ''],
   ['', '', '', 'NE', 'OUT:W:CLINIC']] };
+
+// ---- src/panels.js
+// ============================================================
+// systems/panels — illustrated story panels for cutscenes.
+// A cutscene can CUT to one of these full-screen drawings ({panel:'id', stage}) and back,
+// so the story is told with close-ups and tableaux, not only with pans and zooms.
+// Each panel draws on a 320x180 canvas: fn(g, t, stage, st)  (t = time on panel, st = time in stage)
+// ============================================================
+const Panels = {
+  c: null, g: null, sil: {},
+  draw(g, p) {
+    if (!this.c) [this.c, this.g] = mk(320, 180);
+    const pg = this.g; pg.globalAlpha = 1; pg.globalCompositeOperation = 'source-over'; pg.fillStyle = '#07050a'; pg.fillRect(0, 0, 320, 180);
+    const fn = PANELS[p.id]; if (fn) fn(pg, p.t, p.stage, p.st);
+    g.fillStyle = '#07050a'; g.fillRect(0, 0, W, H); g.drawImage(this.c, Math.round((W - 320) / 2), Math.round((H - 180) / 2));
+  },
+  // a character sprite as a flat dark shape, for figures against a light
+  shape(id, dir, col) { const k = id + dir + col; if (!this.sil[k]) { const s = World.sheetFor(id), fh = s.fh || 16, [c, g] = mk(16, fh); g.drawImage(s, 0, dir * fh, 16, fh, 0, 0, 16, fh); g.globalCompositeOperation = 'source-in'; g.fillStyle = col; g.fillRect(0, 0, 16, fh); c.fh = fh; this.sil[k] = c; } return this.sil[k]; }
+};
+const PX = {
+  R(g, x, y, w, h, c) { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); },
+  glow(g, x, y, r, rgb, a) { g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); g.globalCompositeOperation = 'source-over'; },
+  plate(g, t, cx, y, dim) { const w = ptextW(t) + 6, x = Math.round(cx - w / 2); PX.R(g, x - 1, y - 1, w + 2, 11, '#0c0808'); PX.R(g, x, y, w, 9, dim ? '#5a4a30' : '#c8a050'); PX.R(g, x + 1, y + 1, w - 2, 7, '#1e1512'); ptext(g, t, x + 3, y + 2, dim ? '#8a7a60' : '#f3e3c3'); },
+  rock(g, y0, y1) { for (let y = y0; y < y1; y += 2) for (let x = 0; x < 320; x += 2) { const r = hash(x, y); PX.R(g, x, y, 2, 2, r < .33 ? '#1a1114' : r < .66 ? '#20151a' : '#150e11'); } },
+  plates(g, c) { PX.R(g, 0, 0, 320, 180, c); for (let y = 0; y < 180; y += 30) for (let x = (y / 30 % 2) * 20; x < 320; x += 40) { PX.R(g, x, y, 1, 30, shade(c, .6)); PX.R(g, x + 1, y, 1, 30, shade(c, 1.2)); PX.R(g, x + 4, y + 4, 1, 1, shade(c, 1.6)); PX.R(g, x + 36, y + 25, 1, 1, shade(c, 1.6)); } for (let y = 0; y < 180; y += 30) { PX.R(g, 0, y, 320, 1, shade(c, .6)); PX.R(g, 0, y + 1, 320, 1, shade(c, 1.15)); } },
+  spr(g, s, dir, x, y, sc) { const fh = s.fh || 16; g.drawImage(s, 0, dir * fh, 16, fh, Math.round(x - 8 * sc), Math.round(y - fh * sc), 16 * sc, fh * sc); },
+  fade(g, a) { if (a > 0) { g.fillStyle = `rgba(7,5,10,${Math.min(1, a)})`; g.fillRect(0, 0, 320, 180); } }
+};
+const PANELS = {
+  // ---- the world as Cinderwell is told it: a burning sky, six tiers, one machine, one lift
+  world(g, t, st, s) {
+    const { R, glow, plate } = PX, k = a => Math.max(0, Math.min(1, a));
+    PX.rock(g, 0, 180);
+    for (let y = 0; y < 30; y++) R(g, 0, y, 320, 1, `rgb(${70 + y * 3 + Math.sin(t * 2 + y) * 8 | 0},${14 + y | 0},${8})`);
+    for (let i = 0; i < 26; i++) { const x = (hash(i, 1) * 320 + t * (6 + i % 5)) % 320, y = 28 - ((t * (5 + i % 4) + hash(i, 2) * 30) % 30); R(g, x, y, 1, 1, i % 3 ? '#ffb040' : '#ffe08a'); }
+    glow(g, 160, 0, 150, '255,90,30', .35 + Math.sin(t * 1.7) * .06);
+    for (let x = 0; x < 320; x += 3) R(g, x, 30 + (hash(x, 3) * 3 | 0), 3, 9, '#2a1c1e');
+    plate(g, 'THE SURFACE  -  BURNS', 232, 17);
+    if (st >= 1) { const a = k(s / 1.2 + (st > 1 ? 1 : 0));
+      // the Deep Array: one machine through every tier
+      g.globalAlpha = a; R(g, 150, 42, 20, 104, '#0c1416'); R(g, 152, 42, 16, 104, '#1e3438'); R(g, 152, 42, 2, 104, '#3a6468'); for (let y = 46; y < 144; y += 10) { const p = (Math.sin(t * 3 - y * .12) + 1) / 2; R(g, 150, y, 20, 3, `rgb(${40 + p * 40 | 0},${150 + p * 90 | 0},${150 + p * 80 | 0})`); } g.globalAlpha = 1;
+      glow(g, 160, 94, 64, '79,214,208', .18 * a);
+      for (let tier = 0; tier < 6; tier++) { const y = 50 + tier * 17, on = k((s - tier * .35) / .5 + (st > 1 ? 1 : 0)); if (on <= 0) continue; g.globalAlpha = on;
+        for (const side of [-1, 1]) for (let j = 0; j < 2; j++) { const cx = 160 + side * (52 + j * 62), rx = 24 - j * 3; g.fillStyle = '#0a0608'; g.beginPath(); g.ellipse(cx, y, rx + 2, 7.5, 0, 0, 6.3); g.fill(); g.fillStyle = tier === 2 ? '#4a3428' : '#33262a'; g.beginPath(); g.ellipse(cx, y, rx, 6, 0, 0, 6.3); g.fill(); R(g, cx - rx + 4, y + 2, rx * 2 - 8, 2, '#221a1c'); for (let q = 0; q < 5; q++) R(g, cx - rx + 6 + hash(cx + q, tier) * (rx * 2 - 12), y - 3 + hash(q, cx) * 5, 1, 1, Math.sin(t * 3 + q + cx) > -.6 ? '#ffd890' : '#6a4a30');
+          R(g, Math.min(cx, 160) + (side > 0 ? 10 : rx), y, Math.abs(cx - 160) - rx - 10, 1, '#2e6a68'); if (st >= 2) { const d = Math.abs(cx - 160) - rx - 10, o = (t * 26 + j * 9 + tier * 5) % d; R(g, side > 0 ? 170 + o : 150 - o, y - 1, 2, 3, '#9ff2ea'); } }
+        ptext(g, 'TIER ' + (tier + 4), 6, y - 2, tier === 2 ? '#ffb35a' : '#6a5a50'); g.globalAlpha = 1; }
+      if (a >= 1) plate(g, 'THE DEEP ARRAY', 160, 34);
+    }
+    if (st >= 2) { plate(g, 'TIER 6 - ASHGATE - HOME', 250, 74); for (let tier = 0; tier < 6; tier++) { const y = 50 + tier * 17, f = .35 + hash(tier, 9) * .3; R(g, 292, y - 4, 22, 5, '#0c0808'); R(g, 293, y - 3, 20, 3, '#3a2a24'); R(g, 293, y - 3, 20 * f, 3, f < .45 ? '#c8452e' : '#e8b23a'); } ptext(g, 'RATION', 291, 40, '#8a7a60'); }
+    if (st >= 3) { R(g, 108, 28, 5, 58, '#0a0608'); R(g, 109, 28, 3, 58, '#e8e4dc'); const y = 30 + (Math.sin(s * .9 - 1.2) * .5 + .5) * 50; R(g, 107, y, 7, 5, '#ffffff'); glow(g, 110, y + 2, 26, '255,246,214', .7);
+      R(g, 96, 12, 28, 18, '#e8e4dc'); R(g, 100, 6, 20, 6, '#f4f2ec'); R(g, 107, 1, 6, 5, '#f4f2ec'); R(g, 96, 28, 28, 2, '#e8c25a'); glow(g, 110, 14, 40, '255,246,214', .35); plate(g, 'LIFT 0', 84, 40); }
+  },
+  // ---- the washer: three weeks of lunch breaks
+  hands(g, t, st, s) {
+    const { R, glow } = PX;
+    for (let y = 0; y < 180; y++) R(g, 0, y, 320, 1, `rgb(${18 + y / 9 | 0},${12 + y / 14 | 0},${30 - y / 12 | 0})`);
+    for (let i = 0; i < 16; i++) { const x = (hash(i, 4) * 360 + t * (2 + i % 3)) % 360 - 20, y = 14 + hash(i, 5) * 110 + Math.sin(t * .6 + i) * 3, r = 7 + hash(i, 6) * 10; glow(g, x, y, r * 2.2, i % 3 ? '255,170,70' : '255,220,130', .22); g.fillStyle = `rgba(255,${190 + i * 3},110,.16)`; g.beginPath(); g.arc(x, y, r, 0, 6.3); g.fill(); }
+    // his palm, soot in the creases
+    const sk = '#c48a64', sd = '#9a6a4a', sl = '#dca27c', px = 96, py = 58 + Math.sin(t * 1.3) * 1.5;
+    R(g, px - 80, py + 22, 120, 110, sd); R(g, px - 80, py + 20, 118, 4, sk); R(g, px, py, 92, 62, sk); R(g, px, py, 92, 3, sl); R(g, px + 88, py + 3, 4, 59, sd);
+    for (let f = 0; f < 4; f++) { R(g, px + 92, py + 2 + f * 15, 46 - (f === 3 ? 12 : f === 0 ? 6 : 0), 13, sk); R(g, px + 92, py + 2 + f * 15, 46 - (f === 3 ? 12 : f === 0 ? 6 : 0), 2, sl); R(g, px + 92, py + 13 + f * 15, 46 - (f === 3 ? 12 : f === 0 ? 6 : 0), 2, sd); R(g, px + 112, py + 4 + f * 15, 1, 9, sd); }
+    R(g, px + 14, py - 16, 40, 18, sk); R(g, px + 14, py - 16, 40, 3, sl); R(g, px + 20, py + 18, 30, 1, sd); R(g, px + 30, py + 34, 36, 1, sd); R(g, px + 12, py + 44, 2, 2, '#4a3028'); R(g, px + 60, py + 50, 3, 1, '#4a3028');
+    // her fingers, reaching in
+    if (st >= 1) { const hx = 320 - Math.min(1, s / .8) * 96, hk = '#9a6448', hd = '#74483a'; R(g, hx, py + 6, 110, 40, hk); R(g, hx, py + 6, 110, 3, '#b47a5c'); for (let f = 0; f < 3; f++) { R(g, hx - 34, py + 8 + f * 12, 36, 10, hk); R(g, hx - 34, py + 8 + f * 12, 36, 2, '#b47a5c'); R(g, hx - 34, py + 16 + f * 12, 36, 2, hd); } }
+    // the ring
+    const rx = st >= 1 ? 320 - Math.min(1, s / .8) * 96 - 14 : px + 46, ry = st >= 1 ? py + 22 : py + 26;
+    glow(g, rx, ry, 34, '255,214,120', .5 + Math.sin(t * 4) * .1);
+    g.strokeStyle = '#3a2408'; g.lineWidth = 9; g.beginPath(); g.ellipse(rx, ry, 11, st >= 1 ? 11 : 8, 0, 0, 6.3); g.stroke(); g.strokeStyle = '#d8a040'; g.lineWidth = 6; g.stroke(); g.strokeStyle = '#ffe9a8'; g.lineWidth = 2; g.beginPath(); g.ellipse(rx, ry - 1, 12, st >= 1 ? 12 : 9, 0, 3.5, 5.6); g.stroke();
+    const tw = (Math.sin(t * 5) + 1) / 2; R(g, rx - 9, ry - 12, 1, 5 * tw, '#fff'); R(g, rx - 11, ry - 10, 5 * tw, 1, '#fff');
+  },
+  // ---- the fever ward: forty children on ration air (stage 1: the fans come up)
+  ward(g, t, st, s) {
+    const { R, glow } = PX, on = st >= 1 ? Math.min(1, s / 1.5) : 0;
+    for (let y = 0; y < 180; y++) R(g, 0, y, 320, 1, `rgb(${14 + on * 22 | 0},${22 + y / 12 + on * 18 | 0},${26 + y / 10 + on * 10 | 0})`);
+    R(g, 0, 118, 320, 62, '#182020'); R(g, 0, 118, 320, 2, '#34423e'); for (let x = 0; x < 320; x += 20) R(g, x, 120, 1, 60, '#101616');
+    for (let x = 10; x < 320; x += 44) { R(g, x, 34, 2, 84, '#101818'); }
+    // the fan
+    R(g, 138, 18, 44, 44, '#0c1212'); R(g, 140, 20, 40, 40, '#27332f'); const a = st >= 1 ? s * (1 + on * 13) : 0.4;
+    g.save(); g.translate(160, 40); g.rotate(a); for (let i = 0; i < 4; i++) { g.rotate(Math.PI / 2); R(g, -3, -17, 6, 15, '#8a9a94'); R(g, -3, -17, 2, 15, '#b8c8c0'); } g.restore(); R(g, 157, 37, 6, 6, '#3a4440');
+    if (st >= 1) { glow(g, 160, 40, 90, '200,236,255', .25 * on); for (let i = 0; i < 14; i++) { const y = 62 + ((s * 60 + i * 23) % 60), x = 130 + hash(i, 3) * 60 + Math.sin(s * 3 + i) * 6; R(g, x, y, 1, 4, 'rgba(210,240,255,.5)'); } }
+    // cots in a row, small chests rising
+    for (let i = 0; i < 6; i++) { const x = 8 + i * 53, y = 104, b = Math.sin(t * (st >= 1 ? 1.5 : 2.6) + i * 1.3) * (st >= 1 ? 2.2 : 0.9);
+      R(g, x, y + 8, 46, 4, '#3a4246'); R(g, x + 2, y + 12, 3, 10, '#2a3034'); R(g, x + 41, y + 12, 3, 10, '#2a3034'); R(g, x + 2, y, 42, 9, '#c8ccc4'); R(g, x + 2, y, 12, 6, '#eef2ea');
+      R(g, x + 5, y - 5, 7, 6, ['#c08a6a', '#5e3a2a', '#e0b090', '#9a6448', '#c48a64', '#7a4e36'][i]); R(g, x + 5, y - 6, 7, 2, ['#6a3a1a', '#1a1014', '#c8a040', '#1e1416', '#6a2e18', '#1a1014'][i]);
+      R(g, x + 13, y - 2 - b, 30, 8 + b, '#4e7284'); R(g, x + 13, y - 2 - b, 30, 2, '#7aa2b6');
+      if (st < 1 && Math.sin(t * 2.6 + i * 1.3) > .8) R(g, x + 3, y - 9, 2, 1, 'rgba(220,230,230,.5)'); }
+    if (st < 1) { PX.plate(g, 'RATION PRESSURE', 60, 24, true); R(g, 22, 40, 76, 8, '#0c0808'); R(g, 23, 41, 74, 6, '#3a2a24'); R(g, 23, 41, 16 + Math.sin(t * 3) * 2, 6, '#c8452e'); }
+    else { PX.plate(g, 'BREATHING ON THEIR OWN', 80, 24); R(g, 22, 40, 76, 8, '#0c0808'); R(g, 23, 41, 74, 6, '#3a2a24'); R(g, 23, 41, 16 + 54 * on, 6, '#7cf27c'); }
+  },
+  // ---- the crime, drawn plainly: one fat sealed line, one starving one, and a bleed between them
+  pipe(g, t, st, s) {
+    const { R, glow, plate } = PX; PX.plates(g, '#3a3038');
+    const big = (y, h, c) => { R(g, 0, y - 2, 320, h + 4, '#120a0c'); R(g, 0, y, 320, h, c); R(g, 0, y, 320, 3, shade(c, 1.4)); R(g, 0, y + 3, 320, 3, shade(c, 1.18)); R(g, 0, y + h - 5, 320, 5, shade(c, .6)); for (let x = 28; x < 320; x += 96) { R(g, x, y - 5, 10, h + 10, shade(c, .7)); R(g, x, y - 5, 3, h + 10, shade(c, 1.1)); for (let q = 0; q < 3; q++) R(g, x + 4, y - 2 + q * (h / 2), 2, 2, '#e8c890'); } };
+    big(38, 40, '#9a6238'); big(126, 14, '#4a6464');
+    for (let i = 0; i < 12; i++) R(g, (t * 90 + i * 30) % 340 - 10, 50 + (i % 3) * 6, 8, 2, 'rgba(255,230,190,.35)');
+    for (let i = 0; i < 3; i++) R(g, (t * (st >= 1 ? 50 : 8) + i * 110) % 340 - 10, 132, 5, 2, st >= 1 ? 'rgba(160,250,240,.8)' : 'rgba(160,220,220,.25)');
+    // the seal
+    R(g, 150, 34, 5, 48, '#e8c25a'); R(g, 150, 34, 2, 48, '#fff0b0'); g.fillStyle = '#7a1e14'; g.beginPath(); g.arc(152, 58, 13, 0, 6.3); g.fill(); g.fillStyle = '#c8452e'; g.beginPath(); g.arc(152, 57, 11, 0, 6.3); g.fill(); R(g, 148, 53, 8, 8, '#e8c25a'); R(g, 150, 50, 4, 14, '#e8c25a'); R(g, 145, 55, 14, 4, '#e8c25a'); R(g, 150, 55, 4, 4, '#7a1e14');
+    plate(g, 'ARRAY AUTHORITY  -  SEALED LINE', 160, 18); plate(g, 'CLINIC BRANCH  -  TIER 6', 160, 108);
+    const gauge = (cx, cy, v, lab) => { g.fillStyle = '#120a0c'; g.beginPath(); g.arc(cx, cy, 19, 0, 6.3); g.fill(); g.fillStyle = '#c8a050'; g.beginPath(); g.arc(cx, cy, 17, 0, 6.3); g.fill(); g.fillStyle = '#f0e8d0'; g.beginPath(); g.arc(cx, cy, 14, 0, 6.3); g.fill(); for (let i = 0; i <= 6; i++) { const a = Math.PI * (1 + i / 6); R(g, cx + Math.cos(a) * 11 - 1, cy + Math.sin(a) * 11 - 1, 2, 2, i < 2 ? '#c8452e' : '#3a2a20'); }
+      const a = Math.PI * (1 + v) + Math.sin(t * 11) * .03; g.strokeStyle = '#c8452e'; g.lineWidth = 2; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + Math.cos(a) * 12, cy + Math.sin(a) * 12); g.stroke(); R(g, cx - 2, cy - 2, 4, 4, '#2a1a14'); ptext(g, lab, cx - ptextW(lab) / 2, cy + 5, '#3a2a20'); };
+    gauge(262, 58, st >= 1 ? .96 - Math.min(.11, s * .06) : .96, st >= 1 ? '-11' : 'FULL'); gauge(262, 132, st >= 1 ? .08 + Math.min(.62, s * .3) : .08 + Math.sin(t * 5) * .02, st >= 1 ? 'AIR' : 'LOW');
+    if (st >= 1) { const h = Math.min(52, s * 60); R(g, 62, 74, 12, h + 2, '#120a0c'); R(g, 64, 74, 8, h, '#2a8a86'); R(g, 64, 74, 2, h, '#9ff2ea'); for (let i = 0; i < 4; i++) { const y = 76 + ((s * 50 + i * 14) % 50); if (y < 74 + h) R(g, 67, y, 2, 4, '#e8fffd'); } R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); if (h >= 52) { glow(g, 68, 132, 30, '79,214,208', .5); plate(g, 'A SLIVER. BALANCED BY DAWN.', 230, 100); } }
+    else { R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); R(g, 64, 78, 8, 10, '#2a2a32'); }
+  },
+  // ---- Lift Zero opens: light, and three shapes in it, and a tier on its knees
+  lift(g, t, st, s) {
+    const { R, glow } = PX, op = Math.min(1, t / 2.2), w = 6 + op * 54;
+    PX.plates(g, '#241c22');
+    R(g, 84, 0, 152, 150, '#e4e2dc'); R(g, 84, 0, 4, 150, '#ffffff'); R(g, 232, 0, 4, 150, '#aaa8a4'); R(g, 84, 148, 152, 3, '#e8c25a'); R(g, 92, 0, 136, 148, '#101014');
+    R(g, 160 - w, 0, w * 2, 148, '#fff6dc'); glow(g, 160, 60, 150 * op + 20, '255,244,206', .8);
+    g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 9; i++) { const a = Math.PI / 2 + (i - 4) * .2 + Math.sin(t * .4 + i) * .02; g.fillStyle = `rgba(255,236,180,${.07 * op})`; g.beginPath(); g.moveTo(160, 40); g.lineTo(160 + Math.cos(a - .05) * 300, 40 + Math.sin(a - .05) * 300); g.lineTo(160 + Math.cos(a + .05) * 300, 40 + Math.sin(a + .05) * 300); g.fill(); } g.globalCompositeOperation = 'source-over';
+    // door leaves sliding apart, gold trim
+    R(g, 92, 0, 68 - w, 148, '#b8bcc8'); R(g, 160 + w, 0, 68 - w, 148, '#b8bcc8'); for (let x = 96; x < 160 - w; x += 8) R(g, x, 0, 2, 148, '#7a7e8a'); for (let x = 224; x > 160 + w; x -= 8) R(g, x, 0, 2, 148, '#7a7e8a'); R(g, 160 - w - 3, 0, 3, 148, '#e8c25a'); R(g, 160 + w, 0, 3, 148, '#e8c25a');
+    // three figures, taller than anyone you know
+    if (op > .35) { const a = Math.min(1, (op - .35) * 2.2), sc = 3; g.globalAlpha = a; const cs = World.sheetFor('celestine'), ws = World.sheetFor('warden'); PX.spr(g, ws, 0, 122, 150, sc); PX.spr(g, ws, 0, 198, 150, sc); PX.spr(g, cs, 0, 160, 150, sc + 1); g.globalAlpha = 1; glow(g, 160, 60, 50, '255,236,180', .35 * a); }
+    for (let i = 0; i < 30; i++) { const x = 100 + hash(i, 7) * 120, y = 148 - ((t * (8 + i % 7) + hash(i, 8) * 150) % 150); R(g, x, y, 1, 1, 'rgba(255,246,214,.9)'); }
+    // the tier, kneeling, backs to us
+    R(g, 0, 150, 320, 30, '#0a0608'); for (let i = 0; i < 17; i++) { const x = 4 + i * 19 + (i % 2) * 4, y = 150 + (i % 3) * 3; g.fillStyle = '#0a0608'; g.beginPath(); g.arc(x + 8, y, 7, 0, 6.3); g.fill(); R(g, x - 2, y + 2, 20, 30, '#0a0608'); R(g, x + 4, y - 6, 8, 1, 'rgba(255,236,180,.35)'); }
+  },
+  // ---- the heart-furnace (0: she stands before it · 1: she walks · 2: the doors close)
+  furnace(g, t, st, s) {
+    const { R, glow } = PX; PX.plates(g, '#3a1c18');
+    const close = st >= 2 ? Math.min(1, s / 1.3) : 0, mx = 160, mw = 76 * (1 - close);
+    // the mouth
+    R(g, 70, 8, 180, 150, '#120808'); R(g, 76, 14, 168, 144, '#2a1410'); for (let i = 0; i < 9; i++) { R(g, 78 + i * 19, 10, 2, 2, '#b08a64'); }
+    R(g, 84, 22, 152, 136, '#0c0404');
+    if (mw > 0.5) { g.save(); g.beginPath(); g.rect(mx - mw, 22, mw * 2, 136); g.clip();
+      for (let y = 22; y < 158; y++) R(g, 84, y, 152, 1, `rgb(255,${60 + (y - 22) * 1.3 | 0},${10 + (y - 22) * .5 | 0})`);
+      for (let x = 84; x < 236; x += 4) { const h = 40 + Math.sin(t * 7 + x * .4) * 18 + Math.sin(t * 13 + x) * 10 + hash(x, (t * 9) | 0) * 14; R(g, x, 158 - h, 4, h, '#ffb030'); R(g, x, 158 - h * .62, 4, h * .62, '#ffe070'); R(g, x + 1, 158 - h * .3, 2, h * .3, '#fff8d8'); }
+      g.restore(); glow(g, 160, 100, 170 * (1 - close * .8), '255,110,30', .55 * (1 - close)); }
+    // Seren, small against it
+    const walk = st >= 1 ? Math.min(1, (st >= 2 ? 1 : s / 2.6)) : 0, sy = 140 - walk * 14, sc = 4 - walk * 1.4;
+    if (close < .9) { const ss = Panels.shape('seren', 1, '#140806'); PX.spr(g, ss, 0, 160, sy, sc); if (st === 0) { const hx = 160 + 7 * sc, hy = sy - 13 * sc; R(g, hx - 2, hy, 4, 3 * sc, '#140806'); const tw = (Math.sin(t * 6) + 1) / 2; R(g, hx - 1, hy - 3, 3, 3, '#ffe9a8'); R(g, hx, hy - 3 - 5 * tw, 1, 5 * tw + 8, '#fff'); R(g, hx - 4 * tw, hy - 2, 8 * tw + 1, 1, '#fff'); glow(g, hx, hy - 2, 14, '255,236,170', .7); } }
+    const ws = Panels.shape('warden', 1, '#1a0e0c'); PX.spr(g, ws, 0, 104, 146, 4); PX.spr(g, ws, 0, 216, 146, 4); R(g, 0, 140, 320, 40, '#0c0606'); R(g, 0, 140, 320, 1, '#3a1c18');
+    // doors
+    if (st >= 2) { const dw = 76 * close; R(g, 84, 22, dw, 136, '#3a2a2e'); R(g, 236 - dw, 22, dw, 136, '#3a2a2e'); R(g, 84 + dw - 4, 22, 4, 136, '#6a5a62'); R(g, 236 - dw, 22, 4, 136, '#1a1014'); for (let y = 30; y < 158; y += 22) { R(g, 84, y, dw, 2, '#22181c'); R(g, 236 - dw, y, dw, 2, '#22181c'); }
+      if (close >= 1) { const a = Math.max(0, 1 - (s - 1.3) / 1.6); R(g, 159, 22, 2, 136, `rgba(255,170,60,${a})`); glow(g, 160, 90, 40, '255,120,40', .4 * a); PX.fade(g, (s - 1.6) / 2.2); } }
+    for (let i = 0; i < 24; i++) { const x = 60 + hash(i, 2) * 200 + Math.sin(t + i) * 6, y = 170 - ((t * (10 + i % 9) + hash(i, 3) * 170) % 170); R(g, x, y, 1, 1, close >= 1 ? '#5a4a48' : '#ffb060'); }
+  },
+  // ---- Kael, after. Ash in his hair.
+  kael(g, t, st, s) {
+    const { R, glow } = PX; R(g, 0, 0, 320, 180, '#0c0708');
+    glow(g, 40, 120, 200, '255,90,30', .22 + Math.sin(t * 6) * .03 + Math.sin(t * 17) * .015);
+    const b = makeBustCached('kael'); g.drawImage(b, 0, 0, 32, 32, 80, 12, 160, 160);
+    g.globalCompositeOperation = 'multiply'; const gr = g.createLinearGradient(80, 0, 240, 0); gr.addColorStop(0, '#ffb070'); gr.addColorStop(.55, '#8a5a5a'); gr.addColorStop(1, '#2a2030'); g.fillStyle = gr; g.fillRect(80, 12, 160, 160); g.globalCompositeOperation = 'source-over';
+    R(g, 0, 0, 80, 180, '#0c0708'); R(g, 240, 0, 80, 180, '#0c0708'); glow(g, 60, 130, 120, '255,90,30', .18);
+    for (let i = 0; i < 40; i++) { const x = hash(i, 1) * 320 + Math.sin(t * .7 + i) * 8, y = (t * (9 + i % 6) + hash(i, 2) * 180) % 180; R(g, x, y, i % 4 ? 1 : 2, 1, i % 3 ? '#8a8080' : '#c8c0c0'); }
+    for (const [x, y] of [[118, 34], [150, 28], [176, 36], [200, 44], [132, 42]]) R(g, x, y, 3, 2, '#c8c0c0');
+    if (st >= 1) { const a = Math.min(1, s / 1.2); R(g, 132, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); R(g, 172, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); glow(g, 142, 84, 14, '255,140,50', .5 * a); glow(g, 182, 84, 14, '255,140,50', .5 * a); }
+  },
+  // ---- what they send back
+  tin(g, t, st, s) {
+    const { R, glow } = PX; for (let i = 0; i < 9; i++) { R(g, 0, i * 20, 320, 19, i % 2 ? '#3a2a20' : '#40301f'); R(g, 0, i * 20, 320, 1, '#54402a'); R(g, (hash(i, 1) * 300) | 0, i * 20, 1, 19, '#241a12'); }
+    glow(g, 150, 80, 150, '255,180,90', .22); g.save(); g.translate(0, -26);
+    // the tin
+    R(g, 96, 62, 112, 70, '#141418'); R(g, 98, 64, 108, 66, '#6e727c'); R(g, 98, 64, 108, 3, '#a2a6b0'); R(g, 202, 67, 4, 63, '#44474e'); R(g, 104, 70, 96, 54, '#1c1c20');
+    for (let i = 0; i < 60; i++) { const x = 106 + hash(i, 5) * 90, y = 96 + hash(i, 6) * 24 - Math.sin((x - 106) / 90 * Math.PI) * 10; R(g, x, y, 3, 2, ['#8a8684', '#6a6664', '#a8a4a0'][i % 3]); } R(g, 106, 112, 92, 10, '#7a7674');
+    // lid, with their little stamped sun
+    R(g, 216, 78, 74, 56, '#141418'); R(g, 218, 80, 70, 52, '#7a7e88'); R(g, 218, 80, 70, 3, '#aeb2bc'); R(g, 244, 98, 18, 18, '#5e626c'); R(g, 250, 92, 6, 30, '#5e626c'); R(g, 238, 104, 30, 6, '#5e626c'); R(g, 250, 104, 6, 6, '#3a3d44');
+    // the washer, blackened, still round
+    const rx = 152, ry = 100; g.strokeStyle = '#0c0808'; g.lineWidth = 8; g.beginPath(); g.ellipse(rx, ry, 10, 7, 0, 0, 6.3); g.stroke(); g.strokeStyle = '#3a2e22'; g.lineWidth = 5; g.stroke(); g.strokeStyle = '#8a6a34'; g.lineWidth = 1; g.beginPath(); g.ellipse(rx, ry - 1, 11, 8, 0, 3.6, 5.2); g.stroke();
+    if (Math.sin(t * 1.4) > .93) { R(g, rx - 8, ry - 9, 1, 5, '#ffe9a8'); R(g, rx - 10, ry - 7, 5, 1, '#ffe9a8'); }
+    // the invoice
+    if (st >= 1) { const a = Math.min(1, s / .6), ox = 20 - (1 - a) * 60; g.save(); g.translate(ox + 36, 120); g.rotate(-.12); R(g, -34, -52, 70, 96, '#141010'); R(g, -32, -50, 66, 92, '#e8e0cc'); R(g, -32, -20, 66, 1, '#b8b09c'); R(g, -32, 10, 66, 1, '#b8b09c'); ptext(g, 'COMMITMENT', -27, -44, '#2a2018'); ptext(g, 'FUEL', -27, -36, '#2a2018'); ptext(g, '14 SCRIP', -27, -14, '#c8452e'); ptext(g, 'DEDUCTED', -27, -4, '#2a2018'); ptext(g, 'FROM WAGES', -27, 2, '#2a2018'); ptext(g, 'GRATITUDE', -27, 18, '#7a6a50'); ptext(g, 'IS BREATH', -27, 26, '#7a6a50'); R(g, 6, -42, 20, 20, 'rgba(200,69,46,.25)'); R(g, 12, -36, 8, 8, 'rgba(200,69,46,.5)'); g.restore(); }
+    g.restore();
+  }
+};
+let _kb = null; function makeBustCached(id) { if (!_kb) _kb = makeBust(Object.assign(playerLook(), { mouth: 'frown' })); return _kb; }
 
 // ---- src/brawl.js
 // ============================================================
@@ -2855,7 +3086,7 @@ const HUD = {
   hint() {
     const d = Input.device;
     if (G.mode !== 'world' || Dialogue.active || Puzzle.active || Brawl.active || UI.stack.length) return '';
-    if (G.heist) return d === 'touch' ? 'B: throw a bolt · stay out of the light' : d === 'pad' ? 'Ⓑ throw a bolt · stay out of the light' : 'Esc/X: throw a bolt · stay out of the light';
+    if (G.heist) { const b = d === 'touch' ? 'B' : d === 'pad' ? 'Ⓑ' : 'X', a = d === 'kb' ? 'E' : d === 'pad' ? 'Ⓐ' : 'A'; return `${b}: throw a bolt · hold ${a} to work · watch the lamps turn`; }
     if (P.moved < 40 && !F('talkedTavi')) return d === 'touch' ? 'Drag the pad to move' : d === 'pad' ? 'Left stick or D-pad to move' : 'WASD or arrow keys to move';
     if (World.target && !F('interacted')) return d === 'touch' ? 'Tap A to interact' : d === 'pad' ? 'Press Ⓐ to interact' : 'Press E or Enter to interact';
     return '';
@@ -2872,6 +3103,7 @@ const HUD = {
     document.body.classList.toggle('ctlfade', Dialogue.active || Puzzle.active);
     document.body.classList.toggle('ingame', world);
     document.body.classList.toggle('inpuzzle', Puzzle.active);
+    document.body.classList.toggle('inpanel', Cutscene.active && !!Cutscene.panel);
     if (this.tt > 0) { this.tt -= dt; if (this.tt <= 0) $('#toast').classList.remove('on'); }
   },
   toast(t) { const e = $('#toast'); e.textContent = t; e.classList.add('on'); this.tt = 2.4; }
@@ -3215,7 +3447,7 @@ const Game = {
     G.heist = 1; World.load('bay', { x: 24, y: 7 * 16 + 4, dir: 3 }, true); World.darkOverride = 'rgba(3,2,9,.8)';
     G.mode = 'world'; Game.resetHeist(); Sound.music('mystery');
     Fade.a = 1; Fade.dir = -1; Fade.sp = 1; Fade.busy = true;
-    setTimeout(() => HUD.toast('B: throw a bolt to pull a guard away'), 900);
+    setTimeout(() => HUD.toast('Hold A at the relay · B throws a bolt'), 900);
   },
   resetHeist() {
     if (G.heist === 2) return Game.resetFest();
@@ -3224,7 +3456,7 @@ const Game = {
       { id: 'proctor', patrol: 1, x: 5 * 16 + 8, y: 4 * 16 + 12, dir: 3, home: 3, wander: [[17, 4, 1, 2.2], [17, 8, 2, 1.2], [5, 8, 1, 2], [5, 4, 3, 1.4]], wi: 0, wait: 1.5, anim: 0, moving: false, face: 0, barkCd: 99 },
       { id: 'watchman', patrol: 1, x: 14 * 16 + 8, y: 10 * 16 + 12, dir: 2, home: 2, wander: [[14, 10, 2, 1.9], [14, 10, 1, 1.4], [14, 10, 3, 1.9], [14, 10, 0, 1.4]], wi: 0, wait: 1.9, anim: 0, moving: false, face: 0, barkCd: 99 }
     ];
-    World.caughtT = 0;
+    World.caughtT = 0; World.alert = 0; World.alertPeak = 0; World.work = 0; World.seenBy = null;
   },
   onHeistDone() {
     G.heist = 0; G.flags.relayCut = 0; World.darkOverride = null; World.bolt = null; World.ripple = null; World.dynLights = []; World.npcs = [];
@@ -3330,7 +3562,7 @@ const Game = {
       s('tavi', 6, 13, 3), s('ivo', 8, 14, 1), s('mara', 3, 6, 3), s('hollis', 2, 8, 3), s('marrow', 3, 10, 3), s('pell', 2, 12, 3), s('bao', 5, 11, 3), s('juno', 10, 14, 1), s('orin', 12, 14, 1), s('nell', 17, 14, 1), s('fen', 20, 14, 1), s('kit', 24, 10, 2)
     ];
     if (F('sullWar') && !F('beatSull')) World.npcs.push(g('watchman', 20, 8, 2, [[20, 8, 2, 2], [20, 8, 1, 1.5], [20, 8, 2, 2], [20, 8, 0, 1.5]]));
-    World.caughtT = 0;
+    World.caughtT = 0; World.alert = 0; World.alertPeak = 0; World.work = 0; World.seenBy = null;
     if ((G.flags.caught2 | 0) >= 2) { // Ivo gets clumsy with his cart: every lamp turns east
       setTimeout(() => { if (G.heist !== 2) return; Sound.play('rumble'); Sound.play('clink'); for (const n of World.npcs) if (n.patrol) { n.inv = { x: 23 * 16 + 8, y: 13 * 16 }; n.invT = 0; n.invGive = 0; n.bark = { t: '?!', life: 1.4 }; } const iv = World.npcs.find(n => n.id === 'ivo'); if (iv) iv.bark = { t: 'OH NO. MY CART.', life: 2.4 }; }, 1400);
     }
@@ -3413,6 +3645,7 @@ function render() {
   if (G.mode === 'boot' || G.mode === 'splash' || !World.map || (Cutscene.active && !$('#card').classList.contains('hidden') && Fade.a >= 1)) { g.fillStyle = '#07090d'; g.fillRect(0, 0, W, H); return; }
   if (Brawl.active && !Puzzle.active) Brawl.render(g);
   else if (Puzzle.active) Puzzle.render(g);
+  else if (Cutscene.active && Cutscene.panel) Panels.draw(g, Cutscene.panel);
   else if (Cutscene.active && Cutscene.zoom > 1.02) { // cinematic zoom: render a smaller window, scale it up
     const z = Cutscene.zoom, ow = W, oh = H, zw = Math.round(W / z), zh = Math.round(H / z);
     if (!ZC.c || ZC.c.width !== zw || ZC.c.height !== zh) [ZC.c, ZC.g] = mk(zw, zh);
