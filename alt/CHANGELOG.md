@@ -3,6 +3,25 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Patch & Plate v0.7: played in real time, scenes spaced out (Nov 17 2026)
+
+Will: one more pass, then I'll try it. Cooking game only (`src/patchplate.js`, `tests/`).
+
+- **Played in real time from a new save** (`tests/pp_realtime.js`, new): the real game loop at real speed, a bot on the
+  buttons, every scene watched to the end, four days, about 7 minutes. No page errors. Seen firing by themselves in play:
+  the opening, taste scenes, sprout scenes, PERFECT DAY!, THE YEAR OF DARK, FIVE IN A ROW! (day 2), CUYAPUP MOVES IN!
+  (6 stars, after day 2), DEREK PULLS UP! (day 4), heart scenes for Marcus and Will, the nights. The bot went 3 stars with
+  no misses on all four days, so nothing about a bad day was seen.
+- **What that run showed, and the fixes:**
+  - PERFECT DAY! played on three of the four days. It now plays for the first perfect day ever, then only on days 7 and
+    later (once each).
+  - A day that already had a streak cut-in does not also get PERFECT DAY!.
+  - After a story chapter, a waiting heart scene keeps for the next day instead of playing straight after it.
+- **Tested:** `tests/pp_test.js` 119/119 on the final build. The real-time run was on the build just before the PERFECT
+  DAY! change; that change was checked by the stepped test only. Screenshots from the real-time run: `playtest/pp-v0.7/`.
+- **Not tested:** days 5 to 13 in real time; BOTTIE IS IN LINE!, EIGHT IN A ROW! and THE VALLEY IS FED! firing in real
+  play; a phone; a person's hands.
+
 ## Patch & Plate v0.6: the story so far, a favourite each, heart scenes for everyone (Nov 17 2026)
 
 Will: only the cooking game from here; leave the other games alone. More lore, the characters, their personalities and

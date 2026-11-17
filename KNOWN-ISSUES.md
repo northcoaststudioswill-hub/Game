@@ -103,10 +103,11 @@ From [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), still open:
 - Rooms are short (4 to 10 seconds); difficulty untouched until Will has played more.
 - The music is a placeholder synth loop; it needs a William Cohen track.
 
-## Patch & Plate (cartridge 4, v0.6)
+## Patch & Plate (cartridge 4, v0.7)
 
+- v0.7 real-time run: days 1 to 4 only, by a bot that never missed. Days 5 to 13, Bottie's first visit and a bad day have not been seen in real time.
 - Since v0.6: the 24 new heart scenes were measured for fit but not each watched; how fast hearts grow for the rarer customers (three times the usual) is a guess.
-- Since v0.6: after a first clear you can get a big moment, then a story chapter, then a heart scene, then the night. All skippable, but it may be a lot in a row.
+- After a first clear you can still get a cut-in before the results and a story chapter plus the night after them (fixed in v0.7: no heart scene on top, and PERFECT DAY! is rarer).
 - Since v0.5: no big-moment scene has been watched firing in real time from real play; the streak scenes pause the day, which may or may not feel right in a rush.
 - Since v0.5: kitchen buddy numbers (6, 15, 27 stars; 15% faster; +8 patience) are untuned.
 - Bottie is not on the FRIENDS page (on purpose; his hearts are hidden).

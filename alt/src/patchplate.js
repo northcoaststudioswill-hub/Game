@@ -308,8 +308,8 @@ function serve(i){const L=G.L,cu=L.cu[i],rc=RC[cu.rc],tip=Math.round(rc.v*(crewH
  if(!SV.tasted[cu.rc]){SV.tasted[cu.rc]=1;store();const w=cu.who;cine('taste',{who:w,rc:cu.rc},[[w,w==='MARCUS'&&TASTE_M[cu.rc]?TASTE_M[cu.rc]:TASTE[cu.rc]]])}
  else if(cu.pat/cu.pmax<.2)quip('clutch',1);else if(left===0&&L.q.length>3)quip('last',1);else if(L.streak===4||L.streak===8)quip('streak',1);else if(L.served===1&&Math.random()<.5)quip('first');
  G.fx.push({k:'txt',s:'+'+c,x:WIN[i]*TS+8,y:TS+4,t:0,c:'#f8d040'});
- if(G.s==='play'&&L.streak===5&&bigOnce('s5'))big('MARCUS','FIVE IN|A ROW!',[['MARCUS','FIVE STRAIGHT, BRO! SEE ONE, SERVE ONE!']]);
- else if(G.s==='play'&&L.streak===8&&bigOnce('s8'))big('WILL','EIGHT IN|A ROW!',[['WILL','EIGHT! ERIN, YOU ARE ON FIRE. NOT THE GRILL KIND.']]);}
+ if(G.s==='play'&&L.streak===5&&bigOnce('s5')){L.bigDone=1;big('MARCUS','FIVE IN|A ROW!',[['MARCUS','FIVE STRAIGHT, BRO! SEE ONE, SERVE ONE!']])}
+ else if(G.s==='play'&&L.streak===8&&bigOnce('s8')){L.bigDone=1;big('WILL','EIGHT IN|A ROW!',[['WILL','EIGHT! ERIN, YOU ARE ON FIRE. NOT THE GRILL KIND.']])}}
 
 /* ---------- the crew at work ---------- */
 function potNext(){const L=G.L,left=SV.seeds.slice();L.sown.forEach(T=>{const i=left.indexOf(T);if(i>=0)left.splice(i,1)});return left[0]||null;}
@@ -532,7 +532,7 @@ const bigOnce=k=>{if(SV.big[k])return false;SV.big[k]=1;store();return true};
 /* what the day just earned, played one after another before the results */
 function playBigs(){const b=G.bigQ&&G.bigQ.shift();if(!b)return;big(b[0],b[1],b[2],playBigs)}
 function dayBigs(L,st,d){const q=G.bigQ=[];
- if(st===3&&!L.missed&&bigOnce('perfect:'+d)){const w=pick(['WILL','MARCUS']);q.push([w,'PERFECT|DAY!',w==='WILL'?[['WILL','NOBODY WENT HUNGRY. NOT ONE. THAT\'S MY GIRL.']]:[['MARCUS','ZERO MISSES, BRO. I TAUGHT HER EVERYTHING.'],['ERIN','YOU TAUGHT ME NOTHING.']]])}
+ if(st===3&&!L.missed&&!L.bigDone&&(d>=6||!SV.big.perfect)&&bigOnce('perfect:'+d)&&(SV.big.perfect=1)){const w=pick(['WILL','MARCUS']);q.push([w,'PERFECT|DAY!',w==='WILL'?[['WILL','NOBODY WENT HUNGRY. NOT ONE. THAT\'S MY GIRL.']]:[['MARCUS','ZERO MISSES, BRO. I TAUGHT HER EVERYTHING.'],['ERIN','YOU TAUGHT ME NOTHING.']]])}
  const stars=totalStars();for(const b of BUDS)if(stars>=b[1]&&!budHas(b[0])){SV.buds.push(b[0]);q.push([b[0],b[0]+'|MOVES IN!',BUDLINE[b[0]].concat([['ERIN',b[0]+': '+b[2]+'.']])])}
  if(d===12&&st>=1&&bigOnce('fed'))q.push(['ELDER','THE VALLEY|IS FED!',[['ELDER','EVERY TABLE FULL, UNDER THE LIGHT. LIKE THE PROMISE SAID.'],['MARCUS','AND I SUPERVISED ALL OF IT. DAP ME UP, CHEF.']]]);
  store();}
@@ -792,7 +792,7 @@ function update(dt){H=A.H();G.t+=dt;if(G.nope>0&&G.s!=='play')G.nope-=dt;
    const go2=()=>{if(k==='NEXT DAY'){const ex=nightPick(G.res.st,d);cine('night',{who:ex[0][0],day:d+1},ex,()=>startDay(d+1))}
     else if(k==='PLAY AGAIN'||k==='TRY AGAIN')startDay(d);else{G.s='stand';G.si=0;asks();SFX.nav()}};
    const go1=()=>{if(SV.hpend.length)playHeart(go2);else go2()};
-   if(k!=='PLAY AGAIN'&&k!=='TRY AGAIN'&&G.res.st>=1&&STORY[d]&&!SV.story[d])playStory(d,go1);else go1();}
+   if(k!=='PLAY AGAIN'&&k!=='TRY AGAIN'&&G.res.st>=1&&STORY[d]&&!SV.story[d])playStory(d,go2);else go1();} /* v0.7: after a chapter, a waiting heart scene keeps for the next day */
   return;}}}
 
 /* ---------- drawing helpers ---------- */
