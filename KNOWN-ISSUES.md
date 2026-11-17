@@ -147,6 +147,18 @@ From [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), still open:
   garden; past that it is the bot that stalls (it cannot use the house desk). The mid-game is covered by its chaos runs.
 - All 13 sprouts thrown into the garden become gardeners and stay there. That is how the garden has always worked, but
   it empties the crew quickly; worth a look on the phone.
+## Patch & Plate (cartridge 4, v0.7)
+
+- v0.7 real-time run: days 1 to 4 only, by a bot that never missed. Days 5 to 13, Bottie's first visit and a bad day have not been seen in real time.
+- Since v0.6: the 24 new heart scenes were measured for fit but not each watched; how fast hearts grow for the rarer customers (three times the usual) is a guess.
+- After a first clear you can still get a cut-in before the results and a story chapter plus the night after them (fixed in v0.7: no heart scene on top, and PERFECT DAY! is rarer).
+- Since v0.5: no big-moment scene has been watched firing in real time from real play; the streak scenes pause the day, which may or may not feel right in a rush.
+- Since v0.5: kitchen buddy numbers (6, 15, 27 stars; 15% faster; +8 patience) are untuned.
+- Bottie is not on the FRIENDS page (on purpose; his hearts are hidden).
+- Not played on a phone or by a person in real time since v0.4; the test bot played every day, day 13 included.
+- The lore placement is new (the stand is at Sunkeep, during Sproutwild's story). Will has not confirmed it as canon.
+- LANTERN NIGHT's difficulty (11 customers, every recipe) is a guess; the bot's result is in the test output.
+- The Elder and Pip have hearts on the FRIENDS page but no heart scenes yet.
 
 ## Sprouts and Patch & Plate (cartridges 1 and 4)
 

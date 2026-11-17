@@ -1,6 +1,6 @@
 # Pocket Lantern ALT changelog
 
-ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
+ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
 ## Sprouts: the story run (Nov 17 2026)
@@ -372,6 +372,130 @@ Not checked: a full fresh-save playthrough by hand; old-save test could not run 
 - Pressing A on the castle alpha with no Buddy Barn and no sigil now stops the fight. Marcus says: "Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do." He then names the cost: 8 stone, 2 ingots, at Sunkeep.
 - The goal line says to build the Buddy Barn first until it's built. After that it's back to "Light the castle ALPHA".
 - Checked in the lab at 430x932: the gate stops the fight without a barn and the battle starts with one, with no page errors. Not yet played by hand from a fresh save.
+## Patch & Plate v0.7: played in real time, scenes spaced out (Nov 17 2026)
+
+Will: one more pass, then I'll try it. Cooking game only (`src/patchplate.js`, `tests/`).
+
+- **Played in real time from a new save** (`tests/pp_realtime.js`, new): the real game loop at real speed, a bot on the
+  buttons, every scene watched to the end, four days, about 7 minutes. No page errors. Seen firing by themselves in play:
+  the opening, taste scenes, sprout scenes, PERFECT DAY!, THE YEAR OF DARK, FIVE IN A ROW! (day 2), CUYAPUP MOVES IN!
+  (6 stars, after day 2), DEREK PULLS UP! (day 4), heart scenes for Marcus and Will, the nights. The bot went 3 stars with
+  no misses on all four days, so nothing about a bad day was seen.
+- **What that run showed, and the fixes:**
+  - PERFECT DAY! played on three of the four days. It now plays for the first perfect day ever, then only on days 7 and
+    later (once each).
+  - A day that already had a streak cut-in does not also get PERFECT DAY!.
+  - After a story chapter, a waiting heart scene keeps for the next day instead of playing straight after it.
+- **Tested:** `tests/pp_test.js` 119/119 on the final build. The real-time run was on the build just before the PERFECT
+  DAY! change; that change was checked by the stepped test only. Screenshots from the real-time run: `playtest/pp-v0.7/`.
+- **Not tested:** days 5 to 13 in real time; BOTTIE IS IN LINE!, EIGHT IN A ROW! and THE VALLEY IS FED! firing in real
+  play; a phone; a person's hands.
+
+## Patch & Plate v0.6: the story so far, a favourite each, heart scenes for everyone (Nov 17 2026)
+
+Will: only the cooking game from here; leave the other games alone. More lore, the characters, their personalities and
+stories. **Only `src/patchplate.js` and `tests/pp_test.js` changed this round** (no other game's file, not `console.js`).
+
+- **The story so far: six short chapters.** The first time a chapter's day is cleared, it plays on the way out of the
+  results screen, with a title card. Start skips it. Each plays once per file.
+  1. THE YEAR OF DARK (after day 1): why lettuce goes first
+  2. MARCUS WATERWORKS (day 4): Marcus's lazy river, Derek's van
+  3. THE ROBOT (day 7): Bottie offers one follow for the Great Lantern
+  4. THE KING'S ORDER (day 10): King Bibi wants a combo meal, to go
+  5. THE FIRST HARVEST (day 12): the Elder, Will, "same job, different apron"
+  6. ONE TABLE (day 13): sprouts, buddies and people eating together
+- **Heart scenes for everyone.** Scout, Ranger, the Elder, Pip, Derek and Bottie each get four (24 new scenes), so all
+  nine characters have a full set. Scout takes field notes; the Ranger still walks the shut roads; the Elder kept one
+  lamp lit through the dark; Pip wants a bug stand next door; Derek's truck needs a part that needs a truck.
+- **Bottie's arc.** His hearts are kept off the FRIENDS page. He admits it was "a very red button", then that nobody feeds
+  him up on the Peak. At four hearts he leaves his first tip, and tips from then on.
+- **A favourite each.** Will: big salad. Marcus: burger. Scout: salad. Ranger: combo. Elder: bread. Pip: smoothie. Derek
+  and Bottie: fries. Serve someone their favourite and they say so on the card, FAVORITE! pops up, and the friendship
+  grows faster (+2). Once found, the FRIENDS page shows "LOVES FRIES".
+- **The rarer faces grow hearts three times as fast** (Elder, Pip, Derek, Bottie), since they come by less often.
+- New save fields `story` and `fav`, with defaults.
+
+**Tested:** `tests/pp_test.js` 119/119, two runs in a row (12 new checks: every new line measured against its box, a text
+audit of all six chapters, a chapter plays once and only once, Derek's favourite, Bottie's tip at four hearts, the friends
+page). Screenshots looked at: `playtest/pp-v0.6/` (four).
+**Not tested:** other games' suites were not run this round (none of their files changed). The 24 new heart scenes were
+checked for fit, not each put on screen. Nothing played by a person in real time or on a phone.
+**All new, flag to Will:** every line and every favourite. King Bibi is mentioned by name once (chapter 4).
+
+## Patch & Plate v0.5: big moments, kitchen buddies, Bottie and Derek (Nov 17 2026)
+
+Will: make sure Will, Marcus, Bottie and Derek all make more appearances; if something really cool happens, trigger scenes
+like in Sproutwild and the fighter; as you level up, up to 3 buddies in your kitchen over time.
+
+- **Big moments.** A cut-in in the fighter's style (slanted band in the speaker's colour, speed lines, the face sliding in,
+  the words slammed on with a flash), then a line or two. A skips a line, Start skips it all. Each plays once per file:
+  - FIVE IN A ROW! (Marcus) and EIGHT IN A ROW! (Will), during the day, the first time you get that streak
+  - PERFECT DAY! (Will or Marcus), after a 3-star day with nobody missed, once per day number
+  - BOTTIE IS IN LINE! and DEREK PULLS UP!, the first time each walks up
+  - <BUDDY> MOVES IN!, when a kitchen buddy arrives
+  - THE VALLEY IS FED! (the Elder, Marcus), the first time LANTERN NIGHT is cleared
+  Scenes earned by a day play before the results screen, one after another.
+- **Kitchen buddies.** The stand's level is its total stars. CUYAPUP moves in at 6 stars (stoves 15% faster), BESSLING at
+  15 (crops grow 15% faster), GRASSKIN at 27 (customers wait 8 longer). Three at most. They are Sproutwild's three
+  starters, drawn with Sproutwild's art, sitting on the counters between the stoves. The stand hub says when the next
+  one comes ("KITCHEN BUDDY 2 OF 3: 15 STARS"). A file that already has the stars gets them after its next finished day.
+- **Bottie and Derek are customers.** DEREK (Flow Pros truck) from BURGER TIME on, BOTTIE from FRY DAY on. Bottie eats and
+  never tips. Derek is on the FRIENDS page. Derek's sprite is new (Marcus's build, Sproutwild's Derek colours).
+- **Will and Marcus come by most**: three in thirteen customers each on a late day (Scout and Ranger two each).
+  More of their lines in the quips, plus four new night scenes with Bottie, Derek, Marcus and Will.
+- New save fields `buds` and `big`, both with defaults; old saves load as before.
+
+**Files:** `src/patchplate.js`, `src/console.js` (Patch & Plate is also handed Sproutwild's buddy sprites, read-only),
+`tests/pp_test.js`.
+**Tested:** `tests/pp_test.js` 107/107 (14 new checks: who joins the line and when, buddy thresholds on a wiped file, a
+text audit of all eight big moments, three buddies in the kitchen with Bottie and Derek at the windows, Bottie's tip is 0,
+the friends page with Derek). Sproutwild lab 124/124. Screenshots looked at: `playtest/pp-v0.5/` (seven).
+**Not tested:** the big moments were put on screen by the test, and the bot's days ran through them, but nobody has watched
+one fire in real time from a real streak. Whether a scene in the middle of a rush feels good or gets in the way is for a
+person to say. Buddy numbers (6/15/27 stars, 15%, +8) are guesses. Not played on a phone.
+**All new, flag to Will:** every line, the buddy perks, and Bottie being allowed to queue for lunch.
+
+## Patch & Plate v0.4: the Sunkeep update (Nov 17 2026)
+
+Will: the cooking game needs an update and testing; bring in the lore from the newest Sproutwild so the games connect.
+Will, during the work: no save link between them. They are separate games in the same universe.
+
+**The canon this assumes (new, flag to Will):** Erin's stand is at Sunkeep, beside the Great Lantern, in Sproutwild's valley.
+Her garden is the "one good patch of soil left" that Sproutwild's opening mentions. The stand feeds the valley while the
+keeper is out bringing the light back ("a fed valley is a calm valley"). It is flavour in the lines only; there is still no
+story to remember, and **neither game reads or writes the other's save.**
+
+- **The Great Lantern is on screen.** On the title (with "AT SUNKEEP, UNDER THE GREAT LANTERN") and behind the stand in every
+  scene, drawn the way Sproutwild draws it.
+- **Two customers from Lantern Town.** The ELDER walks down from BREAD DAY on, PIP (the bug buyer) from BERRY GOOD on, about
+  one customer in ten each. They use their Sproutwild sprites, have their own hellos, thanks and hurry-ups, and sit on the
+  FRIENDS page.
+- **Day 13, LANTERN NIGHT.** A feast under the Lantern at dusk: every recipe, 11 customers, the Elder gives the briefing.
+  A save that had finished all 12 days finds day 13 open.
+- **Valley talk.** New lines in the hellos, thanks, quips and day cards about the Lantern, the Iron Dome, Bottie, the Sigils
+  and calm buddies. Eight new night scenes about the valley; about 4 nights in 10 play one instead of a star night.
+  The opening scene says where you are. MARKET DAY and HARVEST FEST name Lantern Town and "the first since the dark".
+- **A LANTERN awning** in the wardrobe (90 coins).
+- **Sproutwild's side** (`src/sproutwild/`): the Sunkeep notice board has a note for Erin's farm stand, and Erin, Marcus and
+  Will each have a new idle line about it. See v9.10 in `src/sproutwild/CHANGELOG.md`.
+
+**Fixed while testing (both were in v0.3 too):**
+- Long quips were squeezed narrow to fit one row ("I'VE GOT A GUY. THE GUY IS ME. THE GUY IS HUNGRY.", Louie's "wants"
+  lines). A long quip now takes a second row. This is what made the text audit fail at random in earlier runs.
+- Two thank-yous on the order card lost their last words ("TEN OUT OF TEN. LIKE ME." showed two of three rows; "FOR SCIENCE.
+  YUM." the same). Reworded to fit: "TEN OF TEN. LIKE ME.", "YUM. FOR SCIENCE."
+
+**Files:** `src/patchplate.js`; `src/console.js` (one word: Patch & Plate is handed Sproutwild's character sprites);
+`tests/pp_test.js` (17 new checks).
+
+**Tested:** `tests/pp_test.js` 93/93, two runs in a row, at 440x956 in headless Chromium. New checks: every hello, hurry,
+quip, order-card, scene and day-card line is measured against the box it is drawn in; the Elder and Pip only appear once
+their day is open; the bot plays day 13 to the results screen through the real controls; text audits on the day 13 card,
+day 13 with the Elder and Pip at the windows, all eight valley nights, the title, the friends page and a two-row quip.
+Sproutwild `tests/sproutwild/field-lab.js` 124/124, no page errors. Screenshots looked at: `playtest/pp-v0.4/` (six).
+**Not tested:** Knockout and Rootdeep suites were not re-run (their code is untouched). Not played on a phone. The days
+were played by the test bot with the clock stepped by hand, not by a person in real time.
+**Size:** 14.6 MB of the 16 MB limit.
 
 ## Cartridge 5: Sproutwild fused in (Nov 15 2026)
 

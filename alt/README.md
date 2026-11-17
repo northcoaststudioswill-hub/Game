@@ -26,7 +26,7 @@ real game can't read or overwrite Erin's Patch & Plate days, Rootdeep runs, or a
 | `src/console.js` | The console and Sprouts (cartridge 1). |
 | `src/knockout.js` | North Coast Knockout (cartridge 2). Most of the ALT work is here. |
 | `src/rootdeep.js` | Rootdeep (cartridge 3), plus the Lantern menu (stats, achievements). |
-| `src/patchplate.js` | Patch & Plate (cartridge 4). Unchanged from v0.3 on purpose. |
+| `src/patchplate.js` | Patch & Plate (cartridge 4). v0.5 since Nov 17 2026 (v0.4 the Sunkeep update, v0.5 big moments and kitchen buddies); v0.3's copy is untouched. |
 | `src/sproutwild/` | Sproutwild (cartridge 5): eleven files, see its own `README.md` and `CHANGELOG.md`. |
 | `backups/` | Frozen builds. Never edit. |
 | `STORY-NOTES.md` | Will's story decisions for Pocket Lantern, and what is still open. |
@@ -39,7 +39,7 @@ real game can't read or overwrite Erin's Patch & Plate days, Rootdeep runs, or a
 | `tests/sprouts_soak.js` | Sprouts autopilots: Erin's first day by the objective marker, and seeded chaos runs of the mid-game, with invariant checks. |
 | `tests/sprouts_tour.js` | Plays Sprouts in real time from a fresh save by following the objective marker. |
 | `tests/lantern_shots.js` | The Lantern menu's stats, achievements and ticket pages with sample saves. |
-| `tests/pp_test.js` | v0.3's Patch & Plate test (76 checks), pointed at the ALT build. |
+| `tests/pp_test.js` | Patch & Plate test (119 checks): v0.3's 76 plus the v0.4 to v0.6 checks. |
 | `tests/v02/` | v0.2's Rootdeep/console tests, copied so their screenshots land here instead of in `v0.2/`. |
 | `playtest/` | Screenshots and frame sheets from the runs above. |
 
