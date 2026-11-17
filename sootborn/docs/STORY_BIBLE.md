@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Book One · The First Shift. Current build: v0.6 (see CHANGELOG.md).
+Book One. Current build: v0.7 "First Fire" (see CHANGELOG.md).
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
