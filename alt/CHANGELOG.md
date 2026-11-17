@@ -3,6 +3,13 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v10.2: fixes from the first fresh-save run
+- Bug from v10.1: Erin's battle lesson only counted a battle you started with SELECT. A wild that broke free and attacked did not count, so she kept asking. Any wild battle counts now.
+- The Meadow's west lane (the "weird path on the left"): it was two tiles wide going down, one wide going east, and stopped one tile short of the main road. It is two wide all the way and joins the road.
+- Test scripts: the autopilot knows the battle lesson and walks home by the north road (it still used a pre-v9.8 route).
+
+Checked: field lab passes, no page errors. A real-time fresh-save autopilot run plays the whole of Erin's walk, the new battle step included.
+
 ## v10.1: the slice refinements (Will's list, Nov 17)
 Tutorial
 - Erin's walk now has a real battle step. After your first catch she points at a second wild one and waits until you press SELECT on it. Before, she told you about SELECT and the game blocked it.

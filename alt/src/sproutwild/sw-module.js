@@ -1141,7 +1141,7 @@ function wStartWild(){const sec=wSector(W4.sector);let tot=0;for(const [id,w] of
  let roll=Math.random()*tot,pick=sec.table[0][0];for(const [id,w] of sec.table){roll-=w;if(roll<=0){pick=id;break}}
  const lv=sec.lv[0]+((Math.random()*(sec.lv[1]-sec.lv[0]+1))|0);
  wStartWildAt(pick,lv)}
-function wStartWildAt(pick,lv){
+function wStartWildAt(pick,lv){if(SW.lessons.tutFight===1)SW.lessons.tutFight=2; /* v10.2: any wild battle counts for Erin's battle lesson */
  BT={mode:'wild',foe:wMakeMon(pick,lv),aiIx:SW.party.findIndex(m=>m.hp>0)};
  if(BT.aiIx<0)BT.aiIx=0;
  const isNew=!SW.seen[pick];SW.seen[pick]=1;wSetupBattle();BT.log=[{txt:'A wild '+pick+' appeared!'}];

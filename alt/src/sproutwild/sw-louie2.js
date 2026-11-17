@@ -82,3 +82,7 @@ const _wGG10=wGymGoal;wGymGoal=function(){if(SW.quest>=5&&!SW.badges.length&&!wH
  put(4,25,'.');put(5,20,'###x###');put(6,25,'q');put(7,21,'u');
  put(9,18,'::~~~b~~~~');put(9,28,'.');put(10,16,'::::::::');
  FMAPS.SQUIRE.key.u={k:'bud',type:1}}
+
+/* v10.2: the Meadow's west lane was two tiles wide going down, one wide going east, and stopped a tile short
+   of the main road. Now it is two wide all the way and joins the road. */
+{const R=FMAPS.MEADOW.rows,put=(y,x,s)=>{R[y]=R[y].slice(0,x)+s+R[y].slice(x+s.length)};put(7,2,':::::::::::::::');put(8,2,':::::::::::::::')}

@@ -27,6 +27,7 @@ const SNAP=`JSON.stringify((()=>{const F=W4.fld,bf=W4.bf,sc=W4.scene,st=sc&&sc.s
   trees:(!F?W4.nodes:[]).filter(n=>n.k==='tree'&&!n.got).map(n=>[n.x,n.y]),
   erin:F?(W4.ew&&!W4.ew.leave?[W4.ew.x,W4.ew.y]:null):(cast?[cast.x,cast.y]:null),
   tame:(W4.wilds||[]).filter(w=>w.tame).map(w=>[w.x,w.y])[0]||null,
+  fight:(SW.lessons.tutFight===1&&(W4.wilds||[]).filter(w=>w.fightMe).map(w=>[w.x,w.y])[0])||null,
   peb:F?(F.buds.find(b=>b.type===1)||null):null,gate:F?(F.gates.find(g=>g.type===1&&!g.open)||null):null,sqgate:F&&F.id==='SQUIRE'?(F.gates.find(g=>!g.open)||null):null,site:F?(F.sites.find(s=>!s.done)||null):null,
   sq:((F||bf)&&(F||bf).sq||[]).filter(s=>s.st==='follow').length,w3:SW.walk3||0,goal:(()=>{try{return wQuestText()}catch(e){return ''}})(),badges:SW.badges.length,crop:Object.keys(SW.plotCrop||{}).length,plot:(W4.patchBuds||[]).filter(q=>q.type<0&&!q.crop).map(q=>[q.sx,q.sy])[0]||null,gym:F&&F.gym?[F.gym.x,F.gym.y]:null,lv:SW.party.map(m=>m.sp+m.lv).join(' '),lead:SW.party[0]?[SW.party[0].lv,SW.party[0].hp/wStats(SW.party[0]).max]:[0,0],target:FMAPS.SQUIRE.key.A.lv-1,alpha:F&&F.alphas&&F.alphas[0]?[F.alphas[0].x,F.alphas[0].y]:null,wilds:(W4.wilds||[]).filter(w=>!w.cap).map(w=>[w.x,w.y,w.lv]),start:F&&F.start?[F.start.x,F.start.y]:null,etree:W4.ew&&W4.ew.tree&&!W4.ew.tree.got?[W4.ew.tree.x,W4.ew.tree.y]:null,ebug:W4.ew&&W4.ew.bug&&(W4.bugs||[]).includes(W4.ew.bug)?[W4.ew.bug.x,W4.ew.bug.y]:null,wh:W4.wh||520}})())`;
 const log=[];const open={};const flags=[];const t0=Date.now();const T=()=>(Date.now()-t0)/1000;
@@ -82,6 +83,7 @@ while(T()<CAP){
    if(tr){if(await moveTo(s,tr[0],tr[1]+24)){await face(0,-1);await aPress(2500)}}await sleep(150);continue}
   await sleep(200);continue}
  if(s.fid==='MEADOW'){
+  if(s.w2===2&&s.fight){if(await moveTo(s,s.fight[0],s.fight[1]+20)){await face(0,-1);await p.evaluate(()=>{window.__g.keys.sel=1});await sleep(90);await p.evaluate(()=>{window.__g.keys.sel=0})}await sleep(300);continue}
   if(s.w2===2&&s.tame){if(await moveTo(s,s.tame[0],s.tame[1]+24)){await face(0,-1);await aPress(700)}await sleep(150);continue}
   if(s.w2===4&&s.peb){if(await moveTo(s,s.peb.x,s.peb.y+12)){await face(0,-1);await aPress()}await sleep(150);continue}
   if(s.w2===6&&s.gate){if(await moveTo(s,s.gate.x,s.gate.y+22)){await face(0,-1);await aPress(1000)}await sleep(150);continue}
@@ -104,8 +106,8 @@ while(T()<CAP){
    if(s.P[1]>8*16+4){if(Math.abs(s.P[0]-GX)>4){await moveTo(s,GX,RY);await sleep(150);continue}await moveTo(s,GX,7*16+6,6);await sleep(150);continue}}
   if(s.q>=5&&s.badges<1&&s.alpha){if(await moveTo(s,s.alpha[0],s.alpha[1]+22,8)){await face(0,-1);await aPress(1500)}await sleep(150);continue} /* v9.1: the first Sigil is the Meadow alpha */
   if(s.q>=5){if(s.P[1]>24||Math.abs(s.P[0]-(17*16+16))>6){await moveTo(s,17*16+16,s.P[1]>24?Math.max(20,s.P[1]-11):20)}else{await key('up',150)}await sleep(150);continue}
-  if(s.w2>=10||s.q>=3){// home: up the west lane to the north gate
-   if(s.P[1]>40){await moveTo(s,s.P[0]>60?s.P[0]-11:40,s.P[1]-11)}else{await key('up',150)}
+  if(s.w2>=10||s.q>=3){// home: the main road north
+   {const HX=17*16+16;if(Math.abs(s.P[0]-HX)>6&&s.P[1]>30)await moveTo(s,HX,s.P[1]);else if(s.P[1]>24)await moveTo(s,HX,Math.max(20,s.P[1]-11));else await key('up',150)} /* v10.2: home is the north road */
    stuck=(lastP===s.P.join())?stuck+1:0;lastP=s.P.join();if(stuck>40){await p.evaluate(()=>window.__g.SWF().travel('BASE','MEADOW'));log.push(T().toFixed(1)+'s (autopilot: travel hook home after being stuck)')}
    await sleep(150);continue}
   await sleep(150);continue}
