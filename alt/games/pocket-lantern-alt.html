@@ -8399,7 +8399,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
  if(F.dlg){if(pressed('a')||pressed('b')){F.dlg.i++;swSnd(660,.04);if(F.dlg.i>=F.dlg.lines.length){const fn=F.dlg.after;F.dlg=null;if(fn)fn()}}return}
  if(F.spot){const sp2=F.spot,np=sp2.np;sp2.t+=dt;
   if(sp2.t>.6){const dx=P3.x-np.x,dy=P3.y-np.y,d=Math.hypot(dx,dy);
-   if(d>20){np.x+=dx/d*70*dt;np.y+=dy/d*70*dt;np.mv=true}else{np.mv=false;F.spot=null;fChallenge(F,np)}}
+   if(d>20){np.x+=dx/d*70*dt;np.y+=dy/d*70*dt;np.mv=true}else{np.mv=false;F.spot=null;W4.msgT=0;W4.msgQ=[];F.dlgPend=null;fChallenge(F,np);if(!F.dlg&&F.dlgPend){F.dlg=F.dlgPend;F.dlgPend=null}}} /* v10.3: a message on screen used to swallow the challenge, and the trainer spotted you forever */
   return}
  if(F.hop){const hp=F.hop;hp.t+=dt;const k=Math.min(1,hp.t/.28);P3.y=hp.sy+(hp.ty-hp.sy)*k;F.hopZ=Math.sin(k*Math.PI)*9;if(k>=1){F.hop=null;F.hopZ=0}
   fSquad(F,dt);return}
