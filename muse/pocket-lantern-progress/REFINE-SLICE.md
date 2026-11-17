@@ -13,6 +13,12 @@ Will, Nov 17. The Sigil 2 to 4 playthrough waits. This is the work on the slice 
 - Erin's walk: the order of lessons and the "Hang on!" gating (v9.8, v9.9). Check `sw-open2.js` (her lessons) and `sw-louie2.js` (the gating).
 - The start: how much to walk before she starts (v9.8 made her wait down the road). Check the first-visit wait in `sw-open2.js`.
 
+## Battles: defeat vs. calm, and the tutorial fight (Will, Nov 17)
+
+- **Bug (found in the code):** Erin says "Stand next to a wild one and press SELECT to battle it." But the v9.8 tutorial gating blocks SELECT battles for the whole of her walk (`sw-field.js`, the `sel` handler checks `wTutStage()`). So the lesson tells you to do something the game won't let you do. Fix first: let SELECT battle the lesson's wild during its step.
+- **The fight is skipped in the tutorial.** Every other lesson makes you do the thing before she moves on. The battle lesson doesn't. Make it a required step in her walk, like the catch, the PEB and the bridge, with the gating open for that one wild.
+- **Defeat has a story reason, and Erin explains it.** Will's point: if you can't show a darkened buddy the light, it stays dark, and a dark buddy keeps the valley dark. So defeating one is sometimes the only way to clear it. After the first defeat, Erin says why, in one or two lines. Right now `wFoeDown` says "The dark breaks... settles down, calm", which is the cleanse wording (v9.1 chose "we cleanse, we do not knock out"). **Decision for Will:** does a defeat remove the buddy (killed), or leave it dark and in the grass? Does it count toward LIGHT SHOWN?
+
 ## Battles
 
 - **Keep the tap.** The timed strike (v9.5) is well liked. Make it better: a clearer ring, a clear miss state, and a way to read the window on a phone. Check `aimUpdate` and `aimDraw` in `sw-dark.js`.
