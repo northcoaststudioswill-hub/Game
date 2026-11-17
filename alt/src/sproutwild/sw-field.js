@@ -733,10 +733,11 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
 
 /* v10.1: followers keep off the water. Blocked for a moment and far from you, they hop to your side. */
 function fWet(x,y){const F=W4.fld;if(!F||F.base)return false;return fTile(F,Math.floor(x/FT),Math.floor(y/FT))==='~'}
-function fDryStep(o,nx,ny,dt,dest){if(!W4.fld||W4.fld.base||fWet(o.x,o.y)){o.x=nx;o.y=ny;return}
- let blk=0;if(!fWet(nx,o.y+2))o.x=nx;else blk=1;if(!fWet(o.x,ny+2))o.y=ny;else blk=1;
- if(blk&&dest){o.wetT=(o.wetT||0)+dt;if(o.wetT>.7){o.wetT=0;if(fWet(dest.x,dest.y)){o.x=nx;o.y=ny}else{o.x=dest.x;o.y=dest.y}}return} /* off to a job across the pond: a quick hop to it */
- if(blk&&Math.hypot(P3.x-o.x,P3.y-o.y)>46){o.wetT=(o.wetT||0)+dt;if(o.wetT>1.1&&!fWet(P3.x,P3.y)){o.wetT=0;const F=W4.fld;o.x=P3.x-F.dir[0]*12;o.y=P3.y+5-F.dir[1]*8;if(fWet(o.x,o.y)){o.x=P3.x;o.y=P3.y+4}}}else o.wetT=0}
+function fDryStep(o,nx,ny,dt,dest){const F=W4.fld,blk=(x,y)=>fSolid(F,x,y); /* v12.6: trees, rocks, walls and shut gates stop followers too, not only water */
+ if(!F||F.base||blk(o.x,o.y+2)){o.x=nx;o.y=ny;return}
+ let hit=0;if(!blk(nx,o.y+2))o.x=nx;else hit=1;if(!blk(o.x,ny+2))o.y=ny;else hit=1;
+ if(hit&&dest){o.wetT=(o.wetT||0)+dt;if(o.wetT>.7){o.wetT=0;if(blk(dest.x,dest.y+2)){o.x=nx;o.y=ny}else{o.x=dest.x;o.y=dest.y}}return} /* off to a job past an obstacle: a quick hop to it */
+ if(hit&&Math.hypot(P3.x-o.x,P3.y-o.y)>46){o.wetT=(o.wetT||0)+dt;if(o.wetT>1.1&&!blk(P3.x,P3.y+2)){o.wetT=0;o.x=P3.x-F.dir[0]*12;o.y=P3.y+5-F.dir[1]*8;if(blk(o.x,o.y+2)){o.x=P3.x;o.y=P3.y+4}}}else o.wetT=0}
 
 /* v10.1: calmer pop-ups. Same pickups merge into one count, they fade out, and no more than four float at once. */
 function wFloatCalm(){const fl=W4.floats;for(let i=0;i<fl.length;i++){const f=fl[i];if(f.seen)continue;f.seen=1;f.t=Math.min(f.t,1.5);const m=/^\+(\d+) (.+)$/.exec(f.txt||'');if(!m)continue;

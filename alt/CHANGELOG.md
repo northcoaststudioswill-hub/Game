@@ -3,6 +3,12 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v12.6: followers stop walking through things
+- Louie and your buddies used to walk straight through trees, rocks, walls and shut gates (only water stopped them, since v10.1). They now go round, and hop to your side if they are stuck and left behind. Sent to a job past an obstacle, they hop to the job.
+- Measured in the Meadow, walking a loop through the trees for 15 seconds: nobody was inside anything solid in 73 of 73 samples. In 7 of the 73 one of them was more than 90 pixels behind, catching up.
+
+Checked: field lab; the loop above; Sunkeep at night with the lamps lit.
+
 ## v12.5: a free first crop plot, and a tidier build list
 - Your first CROP PLOT is free (the next ones cost 2 wood). The cottage takes 8 wood and the game asks for a plot straight after; a fresh-save run stalled there, one log short. A real player could too.
 - The build list starts with the three things you build first: COTTAGE, CROP PLOT, BUDDY BARN.
