@@ -8,8 +8,8 @@
    - The catch cinematic is the reward for the catch, so it does not
      wait; it only clears a stale "Latched on" line.
    ================================================================ */
-function swReadT(s){return 1.4+String(s).length*.055}
-function swSay(s,t){s=String(s);const need=Math.max(t||2.2,swReadT(s));W4.msgQ=W4.msgQ||[];
+function swReadT(s){return 1.1+String(s).length*.042} /* v12.2: messages stayed up too long */
+function swSay(s,t){s=String(s);const rd=swReadT(s),need=Math.min(5.5,Math.max(rd,Math.min(t||0,rd+.8)));W4.msgQ=W4.msgQ||[];
  if(W4.msgT>0&&W4.msg===s){W4.msgT=Math.max(W4.msgT,need*.6);return}            /* already on screen */
  if(W4.msgQ.some(q=>q.s===s))return;                                           /* already waiting */
  if(W4.scene||(W4.fld&&W4.fld.dlg)||W4.talk||(W4.quips&&W4.quips.length)||W4.scPend&&W4.scPend.length||(W4.msgT>0&&time-(W4.msgAt||0)<(W4.msgMin||0))){if(W4.msgQ.length<5)W4.msgQ.push({s,t:need});return}

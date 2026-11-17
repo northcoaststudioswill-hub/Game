@@ -7612,7 +7612,7 @@ function wPatchUpdate(dt){let workers=0;
    if(!pl){pb.item=false;pb.mode='carry'}
    else if(wMoveTo(pb,pl.sx,pl.sy,spd,dt,6)){pl.seedTy=pb.itemTy;pl.age=-7;pl.by=null;pb.forPlot=null;pb.item=false;
     W4.floats.push({x:pl.sx,y:pl.sy-14,txt:'PLANTED!',t:1.4,c:'#a0e888'});swSnd(660,.06,990);
-    if(SW.lessons&&!SW.lessons.seed){SW.lessons.seed=1;swSay('Planted! A fruit seed grows a new sprout in the garden.',2.8)}
+    if(SW.lessons&&!SW.lessons.seed){SW.lessons.seed=1;swSay('Planted! A fruit seed grows a new sprout in the soil.',2.8)}
     pb.mode='back'}}
   else if(pb.mode==='carry'){if(wMoveTo(pb,240,100,spd,dt,9)){pb.item=false;pb.mode='back';wPatchYield(pb)}}
   else if(pb.mode==='back'){if(wMoveTo(pb,pb.sx,pb.sy,spd,dt,4)){pb.mode='soil';pb.t=.3+Math.random()*.6;
@@ -9321,7 +9321,7 @@ function wQuestText(){const op=wOp();
  if(op===0)return opGoal0();
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
- if(SW.quest===2)return W4.fld?((SW.walk2||0)<1?'Meet Erin down the road':'Follow Erin: a wild buddy'):'Take the south road to the Meadow';
+ if(SW.quest===2)return W4.fld?((SW.walk2||0)<1?'Meet Erin down the road':(SW.walk2===1||SW.walk2===2)?'Follow Erin: a wild buddy':'Follow Erin'):'Take the south road to the Meadow';
  return WQUEST[SW.quest]}
 function wNextGoal(){const op=wOp(),F=W4.bf;
  if(op===0){const p=WSEEDPOS[SW.seeds[0]];return{x:p[0]-14,y:p[1]+4,label:'Woof! It glows. Pluck it!'}}
@@ -9455,9 +9455,10 @@ function wQuestText(){const op=wOp();
  if(op===0)return opGoal0();
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
- if(SW.quest===2)return W4.fld?((SW.walk2||0)<1?'Meet Erin down the road':'Follow Erin: a wild buddy'):'Take the south road to the Meadow';
+ if(SW.quest===2)return W4.fld?((SW.walk2||0)<1?'Meet Erin down the road':(SW.walk2===1||SW.walk2===2)?'Follow Erin: a wild buddy':'Follow Erin'):'Take the south road to the Meadow';
  if(!W4.fld&&wHasRoof()&&wDark()>.7)return'Night: sleep in the cottage to skip it';
  if(SW.quest===4&&!W4.fld&&W4.patchBuds&&!W4.patchBuds.some(q=>q.type<0&&!q.crop))return'Garden full: pluck a sprout, then grow BERRIES'; /* v8.9 */
+ if(SW.quest===3&&W4.fld&&typeof wTutDone==='function'&&!wTutDone()&&W4.fld.id==='MEADOW')return'Follow Erin: your first battle';
  if(SW.quest<5)return(W4.fld&&SW.quest>=3?'Home: ':'')+WQUEST[SW.quest];
  if(W4.fld){const ld=SW.party.find(m=>m.hp>0),sec=wSector(W4.sector);
   if(!ld||ld.hp<wStats(ld).max*.25)return'Your buddy is hurt: rest at a Lantern post';
@@ -10641,7 +10642,7 @@ function scIntro(){W4.louBerry={x:316,y:214,held:0};W4.louFetch=0;
   {x:240,y:96,who:'ERIN',txt:'It flickered! Look, it is letting go of something.'},
   {x:240,y:300,hold:1.8,fn:plantFirst},
   {x:240,y:352,hold:2.4},
-  {x:240,y:352,who:'ERIN',txt:'Seeds. They fell in the garden. This is where sprouts grow.'},
+  {x:240,y:352,who:'ERIN',txt:"Seeds. They fell in the Lantern's soil. This is where sprouts grow."},
   {x:240,y:352,who:'MARCUS',txt:'Give them a sec. When one is grown, walk up and press A to pluck it.'},
   {hold:.4}])}
 /* seeds draw as they grow: seed, shoot, sprout */
@@ -10659,7 +10660,7 @@ function fBudDraw0(o){const x=Math.round(o.x),y=Math.round(o.y),T=TYPES[o.type],
  if(((time*2+o.x)|0)%2)r('#fff3b0',x+5,y-12,1,1)}
 function wNearExtra(px,py){const F=W4.bf;if(!F)return null;for(const b of F.buds)if(Math.hypot(px-b.x,py-b.y)<18)
   return b.g==null||b.g>=1?{k:'fbud',b,txt:'PLUCK'}:{k:'sproutinfo',txt:'GROWING',x:b.x,y:b.y,msg:'Still growing. Give it a moment.'};return null}
-function opGoal0(){const F=W4.bf;if(!SW.louFed)return'Watch Louie';if(F&&F.buds.length&&F.buds.every(b=>b.g!=null&&b.g<1))return'The sprouts are growing in the garden';return'Pluck the sprouts in the garden'}
+function opGoal0(){const F=W4.bf;if(!SW.louFed)return'Watch Louie';if(F&&F.buds.length&&F.buds.every(b=>b.g!=null&&b.g<1))return'The sprouts are growing in the soil';return"Pluck the sprouts in the Lantern's soil"}
 function wBaseArrive(from){const F=W4.bf;P3.x=240;P3.ax=0;P3.ay=-1;P3.y=from==='MEADOW'?(W4.wh||520)-38:SW.lit?152:170;
  lou.x=P3.x-24;lou.y=P3.y+8;W4.part={x:P3.x+16,y:P3.y+6};for(const s of F.sq){s.x=P3.x+(Math.random()*24-12);s.y=P3.y+10+Math.random()*10}
  if(SW.quest<2&&!SW.lit){if(!SW.seeds)SW.seeds=[0,2,4];
@@ -10680,7 +10681,7 @@ function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch
   {x:240,y:70,who:'MARCUS',txt:'Bet King Bibi saw that from inside his dome. Peek out, your majesty. It is safe-ish.'},
   {x:240,y:352,hold:1.5},
   {x:240,y:352,hold:1.1,fn:pop},
-  {x:240,y:352,who:'ERIN',txt:'Now it is lit, the garden grows sprouts on its own. Pluck them when they are grown.'},
+  {x:240,y:352,who:'ERIN',txt:'Now it is lit, the soil grows sprouts on its own. Pluck them when they are grown.'},
   {who:'MARCUS',txt:'The light reached the wilds too. Three buddies are on their way. Pick one.'}
  ],()=>{W4.choiceT=0;W4.banner={txt:'THE LANTERN STIRS',sub:'Three dim buddies are coming',t:3.5}})}
 /* ---- 4a. Erin walks you to the south road ---- */
@@ -10705,27 +10706,27 @@ const EW2={
  3:["ERIN: Now, sprouts. They are not all the same. See that one poking out? That's a PEB.","ERIN: Walk up to it and press A to pluck it."],
  5:["ERIN: A boulder wall. Only PEB sprouts can crack rock.","ERIN: Face it and press A. Throw a few if it's tough."],
  7:["ERIN: Sprouts build, too. See the planks out in the water?","ERIN: Face them and press A. A few sprouts make a bridge."],
- 9:["ERIN: That's the Meadow. Every kind of sprout has its own job."]};
-const EWDONE={2:["ERIN: That's a battle. Tap right as the ring closes and the hit lands harder.","ERIN: Battles make your buddies stronger. Come on, there's more to see."],
+ 9:["ERIN: That's the Meadow, keeper. You're getting the hang of this.","ERIN: Head home when you're ready. Marcus wants to build you a cottage. Don't let him pick the paint."]};
+const EWDONE={2:["ERIN: That's a battle. Tap right as the ring closes and the hit lands harder.","ERIN: Battles make your buddies stronger. That is the last of the lessons."],
  4:["ERIN: There. A PEB walks with you now. Over this way!"],6:["ERIN: Ha! The rock never stood a chance. One more thing."],8:["ERIN: A bridge! Whatever's on that island is yours."]};
 function ewTick(F,dt){if(SCOFF||F.id!=='MEADOW'||wOp()<3||W4.scene||F.dlg||F.spot)return;SW.lessons.scMeadow=1;const st=SW.walk2||0;
- if(SW.quest<3&&st<1)W4.wilds=W4.wilds.filter(w=>w.lat&&w.lat.length); /* v9.8: no wild buddies before Erin starts */
- if(SW.quest<3&&st>=1){const tm=W4.wilds.find(w=>w.tame);if(tm)for(const w of W4.wilds)if(w!==tm&&!(w.lat&&w.lat.length)&&Math.hypot(w.x-tm.x,w.y-tm.y)<110)w.gone=1;W4.wilds=W4.wilds.filter(w=>!w.gone)} /* the lesson buddy has the grass to itself */if(st>=10&&!(W4.ew&&W4.ew.leave)&&!(SW.walk3>0&&SW.walk3<7))return;
+ if(SW.quest<3&&st!==1&&st!==2)W4.wilds=W4.wilds.filter(w=>w.lat&&w.lat.length); /* v12.2: no wild buddies until the catch lesson, which is the last one */
+ if(SW.quest<3&&(st===1||st===2)){const tm=W4.wilds.find(w=>w.tame);if(tm)for(const w of W4.wilds)if(w!==tm&&!(w.lat&&w.lat.length)&&Math.hypot(w.x-tm.x,w.y-tm.y)<110)w.gone=1;W4.wilds=W4.wilds.filter(w=>!w.gone)} /* the lesson buddy has the grass to itself */if(st>=10&&!(W4.ew&&W4.ew.leave)&&!(SW.walk3>0&&SW.walk3<7))return;
  if(!W4.ew||W4.ewFor!==F){W4.ewFor=F;const p=st===0?{x:19*FT+8,y:21*FT+10}:ewNear(F,P3.x-24,P3.y+10);W4.ew={x:p.x,y:p.y,dir:[-1,0],mv:false,t:0}} /* v9.8: on your first visit she waits at the crossroads */
  const E=W4.ew,go=(x,y,v)=>{const dx=x-E.x,dy=y-E.y,d=Math.hypot(dx,dy);E.mv=d>2;if(d>2){const s=Math.min(d*5,v);E.x+=dx/d*s*dt;E.y+=dy/d*s*dt;E.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}return d};
  if(E.leave){if(E.fade!=null){E.fade-=dt*1.6;E.mv=false;if(E.fade<=0)W4.ew=null;return}if(ewGo(F,E,F.start.x,F.start.y-14,70,go)<4)E.fade=1;return} /* v9.2: she walks up the road and fades out at the gate, not pops */
  const dp=Math.hypot(P3.x-E.x,P3.y-E.y);if(dp>230&&st>0){const p=ewNear(F,P3.x-30,P3.y);E.x=p.x;E.y=p.y}
  if(st>=10){ew3Tick(F,dt,E,dp,go);return}
- if(st===0){if(SW.quest>=3){SW.walk2=3;return}E.dir=[P3.x>E.x?1:-1,0];if(dp>44)return; /* she waits; you walk to her */fTalk(F,'ERIN',["ERIN: You made it! Welcome to the Meadow.","ERIN: "+((SW.party[0]&&SW.party[0].sp)||"Your buddy")+" could use a friend. There is a wild one in the grass, just over here. Follow me."],()=>{SW.walk2=1;swSave()});return}
+ if(st===0){if(SW.quest>=3){SW.walk2=3;return}E.dir=[P3.x>E.x?1:-1,0];if(dp>44)return; /* she waits; you walk to her */fTalk(F,'ERIN',["ERIN: You made it! Welcome to the Meadow.","ERIN: Walk with me. I'll show you how things work out here. We'll find "+((SW.party[0]&&SW.party[0].sp)||"your buddy")+" a friend at the end."],()=>{SW.walk2=3;swSave()});return}
  if(st%2===1&&E.rest>0){E.rest-=dt;E.mv=false;E.dir=[P3.x>E.x?1:-1,0];return} /* a breath between lessons (v8.5) */
- if(st%2===1){const tg=ewTarget(F,st);if(!tg){SW.walk2=st===9?10:st+2;return}
+ if(st%2===1){const tg=ewTarget(F,st);if(!tg){ewAfter(st===9?9:st+1,E,1);return}
   if(dp>80&&Math.hypot(P3.x-tg.x,P3.y-tg.y)>Math.hypot(E.x-tg.x,E.y-tg.y)+20){E.mv=false;E.wait=1;E.dir=[P3.x>E.x?1:-1,0];return}E.wait=0;
-  if(ewGo(F,E,tg.x,tg.y,62,go)<4){E.mv=false;E.dir=[P3.x>E.x?1:-1,0];if(dp<70)fTalk(F,'ERIN',EW2[st],()=>{SW.walk2=st+1;if(st===9){SW.walk2=10;if(SW.walk3)E.leave=1;else{SW.walk3=1;E.rest=2}}swSave()})}return}
+  if(ewGo(F,E,tg.x,tg.y,62,go)<4){E.mv=false;E.dir=[P3.x>E.x?1:-1,0];if(dp<70)fTalk(F,'ERIN',EW2[st],()=>{SW.walk2=st+1;if(st===9){SW.walk2=10;SW.walk3=7;E.leave=1}swSave()})}return}
  E.mv=false;E.t+=dt;E.dir=[P3.x>E.x?1:-1,0];
  const done=st===2?SW.quest>=3:st===4?!F.buds.some(b=>b.type===1):st===6?!F.gates.some(g2=>g2.type===1&&!g2.open):st===8?!F.sites.some(s=>!s.done):true;
  if(done&&st===2&&!SW.lessons.tutFight){for(const w of W4.wilds)w.tame=0;ewFightSetup(F);fTalk(F,'ERIN',["ERIN: Your first catch! See how the dark broke right off it? That is the whole job, keeper.","ERIN: Buddies can fight, too. Look, another wild one. Stand next to it and press SELECT to battle it.","ERIN: Go on. I'll watch."],()=>{SW.lessons.tutFight=1;swSave()});E.t=0;return}
  if(st===2&&SW.lessons.tutFight===1){if(!W4.wilds.some(w=>w.fightMe))ewFightSetup(F);if(E.t>40){E.t=0;fTalk(F,'ERIN',["ERIN: Stand next to the wild one and press SELECT. That starts a battle."],()=>{})}return}
- if(done){if(st===2)for(const w of W4.wilds)w.tame=0;fTalk(F,'ERIN',EWDONE[st],()=>{SW.walk2=st+1;E.rest=3;swSave()});E.t=0;return}
+ if(done){if(st===2)for(const w of W4.wilds)w.tame=0;fTalk(F,'ERIN',EWDONE[st],()=>{ewAfter(st,E);swSave()});E.t=0;return}
  if(E.t>75&&st!==2){E.t=0;fTalk(F,'ERIN',["ERIN: No rush. I'll wait right here."],()=>{})}}
 function ewDraw(){const E=W4.ew;if(!E)return;if(E.fade!=null)g.globalAlpha=Math.max(0,E.fade);fChibi(Math.round(E.x),Math.round(E.y)+3,FLOOK.ERIN,E.dir,E.mv);g.globalAlpha=1;if(E.fade!=null)return;
  const st=SW.walk2||0;if(E.wait||(!E.mv&&!E.leave&&st%2===0&&st<10))if(((time*2)|0)%2)text('!',Math.round(E.x)-1,Math.round(E.y)-30,2,'#ffd94d',null)}
@@ -10733,6 +10734,16 @@ function ewDraw(){const E=W4.ew;if(!E)return;if(E.fade!=null)g.globalAlpha=Math.
 /* v10.1: the battle lesson gets its own wild, close by */
 function ewFightSetup(F){const sec=wSector(F.id);if(!F.grass.length)return;const gr=F.grass.slice().sort((a,b)=>Math.hypot(a[0]*FT+8-P3.x,a[1]*FT+10-P3.y)-Math.hypot(b[0]*FT+8-P3.x,b[1]*FT+10-P3.y)).find(t=>Math.hypot(t[0]*FT+8-P3.x,t[1]*FT+10-P3.y)>30)||F.grass[0];
  const wd=fSpawnWild(F,sec);wd.x=wd.tx=gr[0]*FT+8;wd.y=wd.ty=gr[1]*FT+10;wd.lv=sec.lv[0];wd.fightMe=1;W4.wilds.push(wd)}
+
+/* v12.2 (Will): the order of Erin's walk. Sprout kinds, the wall, the bridge, wood, a bug... and the catch and
+   the battle LAST. If that first battle ends with the buddy gone, Erin says why right there, and King Bibi's
+   beam follows at once. Then she sends you home. */
+const WWHY=[{who:'ERIN',txt:"That one's gone, keeper. The dark had it too deep."},{who:'ERIN',txt:"A buddy you can't show the light stays dark, and a dark buddy keeps the valley dark. Sometimes a battle is the only way to clear it."},{who:'ERIN',txt:"Nobody blames you for it. But catch them when you can. Showing the light is the real job."}];
+function ewAfter(st,E,skip){const L=SW.lessons;
+ if(st===2){SW.walk2=9;E.rest=1.5;if(L.defeat1===1){L.defeat1=2;scStart(WWHY,()=>{swSave();beamStart()})}return}
+ if(st>=8&&st<9){if((SW.walk3||0)<7){SW.walk2=10;SW.walk3=Math.max(1,SW.walk3||0);E.rest=2}else SW.walk2=(SW.quest>=3&&L.tutFight)?9:1;return}
+ if(st>=9){SW.walk2=10;SW.walk3=7;E.leave=1;return}
+ SW.walk2=st+1;E.rest=skip?0:3}
 /* ================================================================
    THE LOWER MEADOW (v8.5): the Meadow was too small and everything in
    Erin's walk happened in one corner. The Meadow now runs 14 rows
@@ -10782,13 +10793,13 @@ function ewGo(F,E,tx,ty,v,go){const key=Math.round(tx/8)+','+Math.round(ty/8);
 /* ---- after the tour, three things you do yourself (v8.6): chop, carry, catch a bug ---- */
 function ew3Tick(F,dt,E,dp,go){const w3=SW.walk3;E.t=(E.t||0)+dt;
  if(E.rest>0){E.rest-=dt;E.mv=false;E.dir=[P3.x>E.x?1:-1,0];return}
- const talk=(lines,next,rest)=>{E.t=0;fTalk(F,'ERIN',lines,()=>{SW.walk3=next;if(rest)E.rest=rest;if(next>=7)E.leave=1;swSave()})};
+ const talk=(lines,next,rest)=>{E.t=0;fTalk(F,'ERIN',lines,()=>{SW.walk3=next;if(rest)E.rest=rest;if(next>=7){SW.walk2=(SW.quest>=3&&SW.lessons.tutFight)?9:1;E.rest=1}swSave()})};
  const lead=(x,y,lines,next)=>{if(dp>80&&Math.hypot(P3.x-x,P3.y-y)>Math.hypot(E.x-x,E.y-y)+20){E.mv=false;E.wait=1;E.dir=[P3.x>E.x?1:-1,0];return}E.wait=0;
   if(ewGo(F,E,x,y,62,go)<4){E.mv=false;E.dir=[P3.x>E.x?1:-1,0];if(dp<70)talk(lines,next)}};
  const nm=(SW.party[0]&&SW.party[0].sp)||'Your buddy';
  if(w3===1){if(!E.tree||E.tree.got){E.tree=W4.nodes.filter(n=>n.k==='tree'&&!n.got).sort((a,b)=>Math.hypot(a.x-P3.x,a.y-P3.y)-Math.hypot(b.x-P3.x,b.y-P3.y))[0]||null}
   if(!E.tree){SW.walk3=4;return}const p=ewNear(F,E.tree.x+22,E.tree.y+10);
-  lead(p.x,p.y,["ERIN: One more thing before you build a home. Homes need wood, and buddies get it.","ERIN: Face this tree and press A. "+nm+" goes and chops it."],2);return}
+  lead(p.x,p.y,["ERIN: Now, wood. Homes need it, and buddies get it.","ERIN: Face this tree and press A. "+nm+" goes and chops it."],2);return}
  E.mv=false;E.dir=[P3.x>E.x?1:-1,0];
  if(w3===2){if(!E.tree||E.tree.got){talk(["ERIN: Timber! See the logs? Throw sprouts at them. They carry them home to Sunkeep."],3);return}
   if(E.t>45)talk(["ERIN: Stand facing the tree and press A. The ring shows SEND "+nm+"."],2);return}
@@ -10802,7 +10813,7 @@ function ew3Tick(F,dt,E,dp,go){const w3=SW.walk3;E.t=(E.t||0)+dt;
  if(w3===5){const n=Object.values(SW.bugs||{}).reduce((a,v)=>a+v,0);
   if(n>(E.bugs0||0)){talk(["ERIN: Into your jar! Bugs turn into berries, fiber, even light for the Lantern.","ERIN: The jar is in the START menu, under BUG JAR."],6,2);return}
   if(!E.bug||!(W4.bugs||[]).includes(E.bug)){SW.walk3=4;return}if(E.t>50)talk(["ERIN: Face the ladybug and press A. Quick, before it flies!"],5);return}
- if(w3===6){talk(["ERIN: You're getting the hang of this. Head home when you're ready.","ERIN: Marcus wants to build you a cottage. Don't let him pick the paint."],7);return}}
+ if(w3===6){talk(["ERIN: One last thing, and it's the big one.","ERIN: "+nm+" could use a friend. There is a wild buddy in the grass, just over here. Follow me."],7);return}}
 /* ================================================================
    PACING (v8.5): nothing you are told disappears before you can read it
    - A message stays up for at least its reading time. Anything said
@@ -10813,8 +10824,8 @@ function ew3Tick(F,dt,E,dp,go){const w3=SW.walk3;E.t=(E.t||0)+dt;
    - The catch cinematic is the reward for the catch, so it does not
      wait; it only clears a stale "Latched on" line.
    ================================================================ */
-function swReadT(s){return 1.4+String(s).length*.055}
-function swSay(s,t){s=String(s);const need=Math.max(t||2.2,swReadT(s));W4.msgQ=W4.msgQ||[];
+function swReadT(s){return 1.1+String(s).length*.042} /* v12.2: messages stayed up too long */
+function swSay(s,t){s=String(s);const rd=swReadT(s),need=Math.min(5.5,Math.max(rd,Math.min(t||0,rd+.8)));W4.msgQ=W4.msgQ||[];
  if(W4.msgT>0&&W4.msg===s){W4.msgT=Math.max(W4.msgT,need*.6);return}            /* already on screen */
  if(W4.msgQ.some(q=>q.s===s))return;                                           /* already waiting */
  if(W4.scene||(W4.fld&&W4.fld.dlg)||W4.talk||(W4.quips&&W4.quips.length)||W4.scPend&&W4.scPend.length||(W4.msgT>0&&time-(W4.msgAt||0)<(W4.msgMin||0))){if(W4.msgQ.length<5)W4.msgQ.push({s,t:need});return}
@@ -11546,7 +11557,7 @@ function wQuietTick(){const calm=state==='g4world'&&!W4.scene&&!swBusy()&&!(W4.f
  if(L.defeat1===1&&wTutDone()&&W4.fld)W4.whyW=(W4.whyW||0)+1/60; /* v12: out in the field only, never on top of the cottage */
  if(L.defeat1===2&&!L.soul1&&W4.fld)W4.beamW=(W4.beamW||0)+1/60;
  const F=W4.fld;if(F&&F.id==='MEADOW')for(const np of F.npcs)if(np.who==='KISS'){if(!wTutDone()){if(np.x>-900){np.kx=np.x;np.ky=np.y}np.x=-999;np.y=-999}else if(np.x<-900){np.x=np.kx==null?np.hx:np.kx;np.y=np.ky==null?np.hy:np.ky}}}
-function wBeamReady(){return!!W4.fld&&(W4.beamW||0)>=60}
+function wBeamReady(){return!!W4.fld&&(W4.beamW||0)>=15}
 /* ---- 3. the travel scene ---- */
 const WTRAV_T=2.9;
 function wTravLook(to){const B=(typeof FBIO!=='undefined'&&(FBIO[to]||FBIO.MEADOW))||{};return{g:B.g||'#58a848',g2:B.g2||'#4a9840',p:B.p||'#d8c08a',t:B.t2||'#2f7a3c',t1:B.t1||'#1f5230'}}
@@ -11625,7 +11636,7 @@ function roomDraw(){const R=W4.room;if(!R)return;const D=WROOMS[R.i],K='#14101e'
      straight through all of them.
    - The road from the Lantern to the south gate is wider, with a paved middle, lamp posts that light at dusk,
      and two stone gate posts where the road leaves for the Meadow. */
-WPROPS.push({k:'lamp',x:220,y:176,tall:1},{k:'lamp',x:260,y:250,tall:1},{k:'lamp',x:220,y:300,tall:1},{k:'lamp',x:260,y:436,tall:1},{k:'gatepost',x:208,y:506,tall:1},{k:'gatepost',x:272,y:506,tall:1});
+WPROPS.push({k:'lamp',x:222,y:142,tall:1},{k:'lamp',x:258,y:142,tall:1},{k:'lamp',x:222,y:286,tall:1},{k:'lamp',x:258,y:286,tall:1},{k:'lamp',x:222,y:452,tall:1},{k:'lamp',x:258,y:452,tall:1},{k:'gatepost',x:208,y:506,tall:1},{k:'gatepost',x:272,y:506,tall:1});
 {const _pd=wPropDraw;wPropDraw=function(d){if(!d.prop||(d.k!=='lamp'&&d.k!=='gatepost'))return _pd(d);const x=Math.round(d.x),y=Math.round(d.y),K='#14101e',dk=wDark();
   if(d.k==='lamp'){r('rgba(0,0,0,.22)',x-4,y+1,9,3);r(K,x-1,y-22,3,24);r('#5a5a66',x,y-21,1,22);r(K,x-4,y-30,9,9);r(dk>.3?'#ffd94d':'#c8ccd4',x-3,y-29,7,7);r(dk>.3?'#fff8c0':'#e8ecf0',x-2,y-28,3,3);r(K,x-3,y-32,7,2);
    if(dk>.3&&g.save){g.globalAlpha=.10+.05*Math.sin(time*3+x);r('#ffd94d',x-16,y-40,33,36);r('#ffd94d',x-10,y-46,21,48);g.globalAlpha=1}}
@@ -11728,9 +11739,9 @@ wGardenBake=function(R,B,path){const K='#14101e',x0=164,y0=326,w=152,h=80;
  for(let j=0;j<9;j++){const yy=y0+6+j*8;R('#4a3120',x0+3,yy,w-6,2);R('#7a5434',x0+3,yy+2,w-6,1);for(let i=0;i<14;i++)R('#8a6238',x0+6+((i*37+j*19)%(w-14)),yy+4,2,1)}
  for(let i=0;i<10;i++){const sx=x0+8+((i*61)%(w-20)),sy=y0+8+((i*29)%(h-18));R('#a8865c',sx,sy,2,2)}
  for(let yy=y0-2;yy<y0+h+2;yy+=10){R(K,WW/2-8,yy,16,8);R('#a39a86',WW/2-7,yy+1,14,6);R('#b8b09c',WW/2-7,yy+1,14,1)} /* stepping stones: the avenue crosses the soil */
- R(K,x0-2,y0-18,2,16);R(K,x0-12,y0-22,22,11);R('#c49a62',x0-11,y0-21,20,9);R('#5a3d24',x0-9,y0-18,16,1);R('#5a3d24',x0-9,y0-15,12,1)};
+};
 /* ---- lore to read ---- */
-WPROPS.push({k:'plaque',x:206,y:126,act:'READ THE PLAQUE',r:14},{k:'fstone',x:120,y:160,act:'THE OLD STONE',tall:1,r:16},{k:'soilsign',x:158,y:318,act:'READ THE SIGN',r:14},{k:'waystone',x:296,y:476,act:'THE WAYSTONE',tall:1,r:16});
+WPROPS.push({k:'plaque',x:204,y:112,act:'READ THE PLAQUE',r:14},{k:'fstone',x:376,y:176,act:'THE OLD STONE',tall:1,r:16},{k:'soilsign',x:216,y:322,act:'READ THE SIGN',r:14},{k:'waystone',x:160,y:492,act:'THE WAYSTONE',tall:1,r:16});
 const WLORE={plaque:['THE GREAT LANTERN. Lit by the first keepers. "While it burns, nothing in this valley grows alone."','Under it, scratched in later with a nail: It cracked the night the Data Center burned. We are still here.'],
  fstone:['SUNKEEP. The first keepers camped here because the soil glowed at night. Three tents and a dream, the Elder says.','Most of the names are worn smooth. One mark is still clear: a pawprint.'],
  soilsign:["THE LANTERN'S SOIL. The light fell here as seeds. Whatever lands in this soil grows legs, sooner or later.",'Underneath, in marker: DO NOT PLANT YOUR BOOTS. I TRIED. -- Marcus'],

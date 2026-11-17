@@ -22,7 +22,7 @@ function wQuietTick(){const calm=state==='g4world'&&!W4.scene&&!swBusy()&&!(W4.f
  if(L.defeat1===1&&wTutDone()&&W4.fld)W4.whyW=(W4.whyW||0)+1/60; /* v12: out in the field only, never on top of the cottage */
  if(L.defeat1===2&&!L.soul1&&W4.fld)W4.beamW=(W4.beamW||0)+1/60;
  const F=W4.fld;if(F&&F.id==='MEADOW')for(const np of F.npcs)if(np.who==='KISS'){if(!wTutDone()){if(np.x>-900){np.kx=np.x;np.ky=np.y}np.x=-999;np.y=-999}else if(np.x<-900){np.x=np.kx==null?np.hx:np.kx;np.y=np.ky==null?np.hy:np.ky}}}
-function wBeamReady(){return!!W4.fld&&(W4.beamW||0)>=60}
+function wBeamReady(){return!!W4.fld&&(W4.beamW||0)>=15}
 /* ---- 3. the travel scene ---- */
 const WTRAV_T=2.9;
 function wTravLook(to){const B=(typeof FBIO!=='undefined'&&(FBIO[to]||FBIO.MEADOW))||{};return{g:B.g||'#58a848',g2:B.g2||'#4a9840',p:B.p||'#d8c08a',t:B.t2||'#2f7a3c',t1:B.t1||'#1f5230'}}
@@ -101,7 +101,7 @@ function roomDraw(){const R=W4.room;if(!R)return;const D=WROOMS[R.i],K='#14101e'
      straight through all of them.
    - The road from the Lantern to the south gate is wider, with a paved middle, lamp posts that light at dusk,
      and two stone gate posts where the road leaves for the Meadow. */
-WPROPS.push({k:'lamp',x:220,y:176,tall:1},{k:'lamp',x:260,y:250,tall:1},{k:'lamp',x:220,y:300,tall:1},{k:'lamp',x:260,y:436,tall:1},{k:'gatepost',x:208,y:506,tall:1},{k:'gatepost',x:272,y:506,tall:1});
+WPROPS.push({k:'lamp',x:222,y:142,tall:1},{k:'lamp',x:258,y:142,tall:1},{k:'lamp',x:222,y:286,tall:1},{k:'lamp',x:258,y:286,tall:1},{k:'lamp',x:222,y:452,tall:1},{k:'lamp',x:258,y:452,tall:1},{k:'gatepost',x:208,y:506,tall:1},{k:'gatepost',x:272,y:506,tall:1});
 {const _pd=wPropDraw;wPropDraw=function(d){if(!d.prop||(d.k!=='lamp'&&d.k!=='gatepost'))return _pd(d);const x=Math.round(d.x),y=Math.round(d.y),K='#14101e',dk=wDark();
   if(d.k==='lamp'){r('rgba(0,0,0,.22)',x-4,y+1,9,3);r(K,x-1,y-22,3,24);r('#5a5a66',x,y-21,1,22);r(K,x-4,y-30,9,9);r(dk>.3?'#ffd94d':'#c8ccd4',x-3,y-29,7,7);r(dk>.3?'#fff8c0':'#e8ecf0',x-2,y-28,3,3);r(K,x-3,y-32,7,2);
    if(dk>.3&&g.save){g.globalAlpha=.10+.05*Math.sin(time*3+x);r('#ffd94d',x-16,y-40,33,36);r('#ffd94d',x-10,y-46,21,48);g.globalAlpha=1}}

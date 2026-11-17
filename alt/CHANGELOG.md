@@ -3,6 +3,28 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v12.2: the walkthrough ends on the catch and the battle (Will, Nov 17)
+Will: the Bibi scene never came after the first SELECT battle, Erin's lines about it came far too late, some text stayed up too long, and the new Sunkeep items were in the wrong places.
+
+Erin's walk, new order
+1. Sprout kinds (pluck a PEB), the boulder wall, the bridge.
+2. Wood (send a buddy at a tree, sprouts carry the logs), then the ladybug.
+3. LAST: your first catch, then your first battle.
+- Right after that battle Erin says why the buddy is gone, King Bibi's beam plays, and Will says his lines. Then Erin sends you home for the cottage.
+- No wild buddies show in the Meadow until the catch lesson.
+- From a fresh save, real time: battle at 6:15, Erin's talk at 6:41, the beam at 6:59, "head home" at 7:21, home at 7:41.
+- If that first battle does not end with the buddy gone, the talk and the beam still come later, on their own, out in the field (the beam 15 seconds after the talk, not 60).
+
+Text
+- On-screen messages are shorter-lived: reading time is cut by about a quarter and nothing stays past 5.5 seconds.
+- "The garden" is "the Lantern's soil" in the opening lines and goals.
+
+Sunkeep items
+- Lamp posts stand in matched pairs at the three street corners, not staggered along the avenue.
+- The plaque sits on the plaza by the Lantern's steps. The founders' stone is by the fire and benches. The soil sign is at the stepping stones. The waystone is inside the south gate, to the west. Nothing stands in a street.
+
+Checked: field lab; a real-time fresh-save run through the whole new order to the crop plot, no errors; Sunkeep seen top to bottom.
+
 ## v12.1: Guardians of the Light, and why they are at Sunkeep (Will, Nov 17)
 - Every "alpha" the player can read is now a GUARDIAN. In story terms they are the Guardians of the Light: every place has one, they went dim when the Lantern did, and a dim Guardian spells peril for the kingdom. (The code still calls them `alpha` inside.)
 - When you bring one the light, its Sigil stone goes home to the Lantern. The Sigil scene, the Elder, Marcus, the guide page and the opening story all say so.

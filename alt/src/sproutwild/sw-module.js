@@ -1564,7 +1564,7 @@ function wPatchUpdate(dt){let workers=0;
    if(!pl){pb.item=false;pb.mode='carry'}
    else if(wMoveTo(pb,pl.sx,pl.sy,spd,dt,6)){pl.seedTy=pb.itemTy;pl.age=-7;pl.by=null;pb.forPlot=null;pb.item=false;
     W4.floats.push({x:pl.sx,y:pl.sy-14,txt:'PLANTED!',t:1.4,c:'#a0e888'});swSnd(660,.06,990);
-    if(SW.lessons&&!SW.lessons.seed){SW.lessons.seed=1;swSay('Planted! A fruit seed grows a new sprout in the garden.',2.8)}
+    if(SW.lessons&&!SW.lessons.seed){SW.lessons.seed=1;swSay('Planted! A fruit seed grows a new sprout in the soil.',2.8)}
     pb.mode='back'}}
   else if(pb.mode==='carry'){if(wMoveTo(pb,240,100,spd,dt,9)){pb.item=false;pb.mode='back';wPatchYield(pb)}}
   else if(pb.mode==='back'){if(wMoveTo(pb,pb.sx,pb.sy,spd,dt,4)){pb.mode='soil';pb.t=.3+Math.random()*.6;

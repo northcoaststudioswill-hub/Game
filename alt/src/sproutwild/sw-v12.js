@@ -89,9 +89,9 @@ wGardenBake=function(R,B,path){const K='#14101e',x0=164,y0=326,w=152,h=80;
  for(let j=0;j<9;j++){const yy=y0+6+j*8;R('#4a3120',x0+3,yy,w-6,2);R('#7a5434',x0+3,yy+2,w-6,1);for(let i=0;i<14;i++)R('#8a6238',x0+6+((i*37+j*19)%(w-14)),yy+4,2,1)}
  for(let i=0;i<10;i++){const sx=x0+8+((i*61)%(w-20)),sy=y0+8+((i*29)%(h-18));R('#a8865c',sx,sy,2,2)}
  for(let yy=y0-2;yy<y0+h+2;yy+=10){R(K,WW/2-8,yy,16,8);R('#a39a86',WW/2-7,yy+1,14,6);R('#b8b09c',WW/2-7,yy+1,14,1)} /* stepping stones: the avenue crosses the soil */
- R(K,x0-2,y0-18,2,16);R(K,x0-12,y0-22,22,11);R('#c49a62',x0-11,y0-21,20,9);R('#5a3d24',x0-9,y0-18,16,1);R('#5a3d24',x0-9,y0-15,12,1)};
+};
 /* ---- lore to read ---- */
-WPROPS.push({k:'plaque',x:206,y:126,act:'READ THE PLAQUE',r:14},{k:'fstone',x:120,y:160,act:'THE OLD STONE',tall:1,r:16},{k:'soilsign',x:158,y:318,act:'READ THE SIGN',r:14},{k:'waystone',x:296,y:476,act:'THE WAYSTONE',tall:1,r:16});
+WPROPS.push({k:'plaque',x:204,y:112,act:'READ THE PLAQUE',r:14},{k:'fstone',x:376,y:176,act:'THE OLD STONE',tall:1,r:16},{k:'soilsign',x:216,y:322,act:'READ THE SIGN',r:14},{k:'waystone',x:160,y:492,act:'THE WAYSTONE',tall:1,r:16});
 const WLORE={plaque:['THE GREAT LANTERN. Lit by the first keepers. "While it burns, nothing in this valley grows alone."','Under it, scratched in later with a nail: It cracked the night the Data Center burned. We are still here.'],
  fstone:['SUNKEEP. The first keepers camped here because the soil glowed at night. Three tents and a dream, the Elder says.','Most of the names are worn smooth. One mark is still clear: a pawprint.'],
  soilsign:["THE LANTERN'S SOIL. The light fell here as seeds. Whatever lands in this soil grows legs, sooner or later.",'Underneath, in marker: DO NOT PLANT YOUR BOOTS. I TRIED. -- Marcus'],
