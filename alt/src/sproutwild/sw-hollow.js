@@ -2,8 +2,8 @@
    CROOKED HOLLOW (v7.0): a second wild area before the gym
    Old woods east of the Meadow, reached by the east road. Wilds are
    Lv4-7, so it is where a team grows up before facing the Ranger.
-   Two creatures from north-east Ohio lore live only here:
-     MELONKIN  the Melon Heads of the Kirtland woods
+   Two creatures from valley lore live only here:
+     MELONKIN  the melon-headed folk of the Hollow woods
      PYTHORN   the Peninsula Python, loose since a 1944 circus wreck;
                it sleeps on the Hollow's treasure as the area's alpha.
    ================================================================ */
@@ -22,7 +22,7 @@ PYTHORN(D){const gn='#5a8a3a',lt='#7aaa50',yl='#e8d878';
   d:'A melon-headed sprite of the old woods. Shy. Nobody goes looking for it twice.'},'#58b848');
  mk({id:'PYTHORN',t:[4],hp:46,atk:15,def:12,spd:9,catch:.25,work:{PLANTING:2},learn:[[1,'headbutt'],[1,'vinelash'],[1,'rocktoss'],[10,'sporepuff'],[14,'thornstorm']],
   d:'It slipped off a circus train in 1944 and never stopped growing.'},'#5a8a3a')}
-WSECTORS.splice(2,0,{id:'HOLLOW',n:'CROOKED HOLLOW',sub:'Old woods east of the Meadow. Something is watching.',req:0,lv:[4,7],gym:-1,pal:{g:'#4a8a48',g2:'#3e7a40',a:'#8cc86a'},
+WSECTORS.splice(2,0,{id:'HOLLOW',n:'CROOKED HOLLOW',sub:'Old woods east of the Meadow. Something is watching.',req:1,lv:[4,7],gym:-1,pal:{g:'#4a8a48',g2:'#3e7a40',a:'#8cc86a'},
  table:[['MELONKIN',5],['FERNFANG',2],['ZIPWIG',2],['PEBBLIT',2],['DRIZZLET',1]]});
 WSECSUB.HOLLOW='Old woods. Wilds Lv4 to 7.';
 FBIO.HOLLOW=Object.assign({},FBIO.MEADOW,{g:'#4a8a48',g2:'#3e7a40',g3:'#2e5e34',a:'#8cc86a',p:'#bfa67a',p2:'#a48a62',t1:'#1f5230',t2:'#2f7a3c',t3:'#62b858'});

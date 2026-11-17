@@ -21,7 +21,7 @@
    ================================================================ */
 if(SW.res.fiber==null)SW.res.fiber=0;if(SW.res.ore==null)SW.res.ore=0;if(!SW.pouch)SW.pouch=8;
 if(SW.quest>=2||SW.tendDone)SW.lit=1;
-WCHOICE[0].x=188;WCHOICE[0].y=166;WCHOICE[1].x=240;WCHOICE[1].y=152;WCHOICE[2].x=292;WCHOICE[2].y=166;
+WCHOICE[0].x=166;WCHOICE[0].y=232;WCHOICE[1].x=240;WCHOICE[1].y=212;WCHOICE[2].x=310;WCHOICE[2].y=236; /* v9.2: well apart, below the road, clear of the Lantern steps */
 const WSEEDPOS={0:[206,126],2:[240,134],4:[274,126]};
 const wLit=()=>!!SW.lit||SW.quest>=2;
 const wOp=()=>SW.quest>=2?3:SW.lit?2:(SW.seeds&&SW.seeds.length)?0:1;
@@ -29,7 +29,7 @@ function wQuestText(){const op=wOp();
  if(op===0)return opGoal0();
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
- if(SW.quest===2)return W4.fld?'A: throw sprouts at a wild buddy':'Take the south road to the Meadow';
+ if(SW.quest===2)return W4.fld?((SW.walk2||0)<1?'Meet Erin down the road':'Follow Erin: a wild buddy'):'Take the south road to the Meadow';
  return WQUEST[SW.quest]}
 function wNextGoal(){const op=wOp(),F=W4.bf;
  if(op===0){const p=WSEEDPOS[SW.seeds[0]];return{x:p[0]-14,y:p[1]+4,label:'Woof! It glows. Pluck it!'}}
@@ -152,6 +152,8 @@ if(!SW.gear)SW.gear={};
 function wWorkerCount(){return SW.crew.filter(c=>c.job!==-1).length+SW.party.slice(1).length+SW.box.length}
 function wMissionDone(key){const [k,v]=key.split(':');
  if(k==='build')return SW.buildings.some(b=>b.k===v);
+ if(k==='crop')return plCrops()>=+v||SW.buildings.some(b=>b.k==='bed'); /* v8.7: these two were missing here, so Sunkeep Lv1 could never finish */
+ if(k==='buddies')return SW.party.length+(SW.box||[]).length>=+v;
  if(k==='workers')return wWorkerCount()>=+v;
  if(k==='species')return Object.keys(SW.caught).length>=+v;
  if(k==='sigils')return SW.badges.length>=+v;
@@ -161,15 +163,17 @@ function wQuestText(){const op=wOp();
  if(op===0)return opGoal0();
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
- if(SW.quest===2)return W4.fld?'A: throw sprouts at a wild buddy':'Take the south road to the Meadow';
+ if(SW.quest===2)return W4.fld?((SW.walk2||0)<1?'Meet Erin down the road':'Follow Erin: a wild buddy'):'Take the south road to the Meadow';
  if(!W4.fld&&wHasRoof()&&wDark()>.7)return'Night: sleep in the cottage to skip it';
- if(SW.quest<5)return(W4.fld&&SW.quest>=3?'At Sunkeep: ':'')+WQUEST[SW.quest];
+ if(SW.quest===4&&!W4.fld&&W4.patchBuds&&!W4.patchBuds.some(q=>q.type<0&&!q.crop))return'Garden full: pluck a sprout, then grow BERRIES'; /* v8.9 */
+ if(SW.quest<5)return(W4.fld&&SW.quest>=3?'Home: ':'')+WQUEST[SW.quest];
  if(W4.fld){const ld=SW.party.find(m=>m.hp>0),sec=wSector(W4.sector);
   if(!ld||ld.hp<wStats(ld).max*.25)return'Your buddy is hurt: rest at a Lantern post';
   if(sec.gym>=0&&!SW.gymDone[sec.gym])return'The '+WGYMS[sec.gym].leader+' gym is here: win the '+WGYMS[sec.gym].sig;
   if(SW.quest>=5&&(W4.fld.alphas||[]).some(a=>Math.hypot(a.x-P3.x,a.y-P3.y)<130))return'ALPHA nearby: it guards treasure'}
+ if(W4.fld){const gg=wGymGoal();if(gg)return gg} /* v8.7: in the field the next big goal is the gym */
  const ms=WBASEMS[SW.baseLv];if(!ms)return SW.badges.length<4?'Earn the Sigils. Free the roads.':'';
- const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?(W4.fld?'Home: ':'Sunkeep Lv'+SW.baseLv+': ')+wMissionHint(nx):(W4.fld?'At Sunkeep: ask':'Ask')+' the Great Lantern to grow'}
+ const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?(W4.fld?'Home: ':'Sunkeep Lv'+SW.baseLv+': ')+wMissionHint(nx):(W4.fld?'Home: ask':'Ask')+' the Lantern to grow'}
 function wLampRows(){const rows=[];
  if(wBaseReady())rows.push({act:'ring',label:'GROW THE LANTERN'});
  rows.push({act:'rest',label:'REST IN THE LIGHT'},{act:'travel',label:'TRAVEL BY LANTERN LIGHT'},{act:'board',label:'WORK BOARD'});
@@ -203,7 +207,8 @@ WGUIDE.length=0;WGUIDE.push(
  ['ORE AND FIBER','Sprouts cannot get these.','Find a vein or a thicket and','press A: your lead buddy','fetches it. Beaten wilds drop','them too. The bench turns','them into a SEED POUCH, a','CLIMBING ROPE, better tools.'],
  ['SUNKEEP AT WORK','Buddies you leave at home','work the buildings by skill:','KINDLE, WATER, PLANT, MINE,','LUMBER, CRAFT, HAUL, LUCK.','What they make must be','carried to the Lantern. The','work board shows who is who.'],
  ['GATES AND GEAR','Boulders want PEB sprouts,','fire EMBER, vines LEAF, sparks','ZIP, dry blooms DEW. Ledges','hop down only, until you own','a CLIMBING ROPE. Heavy loot','needs more sprouts: PEB','counts double.'],
- ['THE VALLEY','Four gyms hold four Sigils.','Roads past the Town need','them. KING BIBI holds the','Peak road behind an IRON','DOME he calls temporary. He','sits in Gloom Hollow. Above','them all, something chrome.']);
+ ['THE VALLEY','Bottie nuked the Data Center','and the Lantern cracked. KING','BIBI raised his IRON DOME and','the buddies went wild. Four','ALPHAS hold four Sigils:','bring each one the light and','it gives its Sigil up.'],
+ ['LIGHT SHOWN','Every wild buddy you calm,','by battle or by bloom, is','LIGHT SHOWN. Every 10 the','Lantern grows a ring and','gives you a gift. Four Sigils','and 20 calmed buddies, and','the King drops the dome.']);
 /* gear: ore finally matters */
 WRECIPES.splice(2,0,{id:'rope',n:'CLIMBING ROPE',cost:{fiber:6,ore:2},need:20,d:'Climb ledges from below. Opens shortcuts and high ground in every sector.'});
 {const kd=wBuildDef('kiln');kd.d='Smelts ORE into ingots. Needs a KINDLE worker, and ore: buddies fetch it from veins.'}
@@ -234,6 +239,7 @@ function fFetchTick(F,dt,lead){const fe=W4.fetch;if(!fe)return false;const pt=W4
 /* mission lines say where the materials come from when you are short (v7.7) */
 function wMissionHint(nx){const [key,lab]=nx,[k,v]=key.split(':');
  if(k==='build'&&v==='kiln'&&!wCanPay(wBuildDef('kiln').cost))return'Kiln: 8 stone, 4 wood (rocks, trees)';
- if(k==='build'&&v==='datacenter'&&(SW.res.ingot||0)<2)return(SW.buildings.some(b=>b.k==='kiln')?'Data Center: 2 ingots. Ore veins, then kiln':'Data Center: needs a kiln for ingots');
- if(k==='buddies'&&wBuddyFull())return'Buddies: build a Data Center for room';
+ if(k==='build'&&v==='datacenter'&&(SW.res.ingot||0)<2)return(SW.buildings.some(b=>b.k==='kiln')?'Buddy Barn: 2 ingots. Ore veins, then kiln':'Buddy Barn: needs a kiln for ingots');
+ if(k==='buddies'&&wBuddyFull())return'Buddies: build a Buddy Barn for room';
+ if(k==='crop'&&W4.patchBuds&&!W4.patchBuds.some(q=>q.type<0&&!q.crop))return'Garden full: pluck a sprout, then grow BERRIES'; /* v8.9 */
  return lab}

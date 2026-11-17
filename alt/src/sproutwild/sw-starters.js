@@ -1,11 +1,11 @@
 /* ================================================================
    STARTERS, THE REVEAL, AND THE DATA CENTER (v7.0)
-   The three first partners are creatures out of north-east Ohio lore.
+   The three first partners are creatures out of valley lore.
    They are stronger than common buddies, good at two jobs each, learn
    a move nobody else gets, and never appear in the wild.
-     CUYAPUP   EMBER  the Cuyahoga, "crooked river", which caught fire
-     BESSLING  DEW    South Bay Bessie, the Lake Erie monster
-     GRASSKIN  LEAF   the Grassman, Ohio's woods-walker
+     CUYAPUP   EMBER  the Crooked River, which caught fire
+     BESSLING  DEW    the Wending Lake monster
+     GRASSKIN  LEAF   a shaggy woods-walker of the eastern hills
    Greeting one plays a short reveal: silhouette, flash, name, then
    its legend, type, jobs, moves and stats, one line at a time.
    The DATA CENTER is a building that stores buddies beyond three.
@@ -17,7 +17,7 @@ Object.assign(WMOVES,{
 const WSTARTERS={
  CUYAPUP:{tag:'THE BURNING RIVER PUP',lore:'Born the night the crooked river caught fire.',sig:'riverfire'},
  BESSLING:{tag:"THE LAKE MONSTER'S PUP",lore:'Pup of the great lake serpent. Reward still out.',sig:'lakewake'},
- GRASSKIN:{tag:'THE LITTLE GRASSMAN',lore:'A shaggy woods-walker of the eastern hills.',sig:'bigstomp'}};
+ GRASSKIN:{tag:'THE LITTLE MOSSMAN',lore:'A shaggy woods-walker of the eastern hills.',sig:'bigstomp'}};
 const WSTARTART={
 CUYAPUP(D){const fur='#5c4238',cr='#f0d8b0',og='#f8902c';
  D.l(17.5,18.5,21.5,13.5,2.4,fur);D.p([[21.4,14],[19.6,10],[21.6,11.4],[22.6,8.6],[23.4,13.4]],og);D.p([[21.6,13.2],[21.2,11.2],[22.6,12]],'#ffe070');
@@ -41,8 +41,8 @@ GRASSKIN(D){const fur='#6a8c3a',dk='#4a6a2a',fc='#e0c090';
 {const fb=["..ss..",".sggs.","sggggs",".sggs."],mk=(id,t,hp,atk,def,spd,work,learn,d,c)=>{const s={id,t:[t],hp,atk,def,spd,catch:.3,work,learn,d,spr:fb.slice(),pal:{s:'#14101e',g:c},starter:1};
   s._old=SWSPR(s.spr,s.pal);s._spr=swbMake(WSTARTART[id]);WSPECIES.push(s)};
  mk('CUYAPUP',0,34,14,10,12,{KINDLING:2,WATERING:1},[[1,'tackle'],[1,'embershot'],[5,'quicknip'],[8,'riverfire'],[12,'flameburst'],[16,'magmaburst']],'A river pup with a tail that never goes out. Leaves a rainbow sheen on puddles.','#f8902c');
- mk('BESSLING',2,38,12,12,10,{WATERING:2,FORTUNE:1},[[1,'tackle'],[1,'bubblesnap'],[5,'shellup'],[8,'lakewake'],[12,'tideslam'],[16,'tidalsurge']],'A lake serpent pup. Fishermen swear they saw it. Nobody believes them.','#3aa0a8');
- mk('GRASSKIN',4,40,14,12,8,{PLANTING:2,QUARRY:1},[[1,'tackle'],[1,'vinelash'],[5,'warcry'],[8,'bigstomp'],[12,'headbutt'],[16,'thornstorm']],'A knee-high Grassman. Hides behind trees it is wider than.','#6a8c3a');
+ mk('BESSLING',2,38,14,12,10,{WATERING:2,FORTUNE:1},[[1,'tackle'],[1,'bubblesnap'],[5,'shellup'],[8,'lakewake'],[12,'tideslam'],[16,'tidalsurge']],'A lake serpent pup. Fishermen swear they saw it. Nobody believes them.','#3aa0a8');
+ mk('GRASSKIN',4,40,14,12,8,{PLANTING:2,QUARRY:1},[[1,'tackle'],[1,'vinelash'],[5,'warcry'],[8,'bigstomp'],[12,'headbutt'],[16,'thornstorm']],'A knee-high Mossman. Hides behind trees it is wider than.','#6a8c3a');
  WCHOICE[0].sp='CUYAPUP';WCHOICE[1].sp='BESSLING';WCHOICE[2].sp='GRASSKIN';
  Object.assign(WBLURB,{CUYAPUP:'Fast and fierce. Runs the kiln and waters the garden.',BESSLING:'Tough and lucky. The best waterer there is.',GRASSKIN:'The strongest of the three. Plants, chops and hauls stone.'})}
 /* ---------------- the reveal ---------------- */
@@ -80,12 +80,12 @@ function drawChoice(){const sp=W4.choiceSp,s2=wSp(sp),spr=s2._spr,T=TYPES[s2.t[0
  if(t>3.6){r('#14121e',0,H-18,W,18);const a='A  BEFRIEND',b='B  SEE THE OTHERS';text(a,8,H-13,1,'#7ee787',null);text(b,W-8-tw(b,1),H-13,1,'#a89ec2',null)}
  else{const s='A  SKIP';text(s,W-8-tw(s,1),H-13,1,'#5a5870',null)}}
 /* ---------------- the Data Center: where buddies beyond three are kept ---------------- */
-WBUILD.push({k:'datacenter',n:'DATA CENTER',cost:{stone:8,ingot:2},max:1,d:'Stores 12 more buddies. Without it you can keep only three.'});
+WBUILD.push({k:'datacenter',n:'BUDDY BARN',cost:{stone:8,ingot:2},max:1,d:'Stores 12 more buddies. Without it you can keep only three.'});
 function wHasDC(){return SW.buildings.some(b=>b.k==='datacenter'&&!b.con)}
 function wBuddyCap(){return wHasDC()?15:3}
 let WNOCAP=false;
 function wBuddyFull(){return!WNOCAP&&SW.party.length+SW.box.length>=wBuddyCap()}
-function wFullSay(){if(time>(W4.fullAt||0)){W4.fullAt=time+6;swSay(wHasDC()?'The Data Center is full.':'No room for another buddy. Build a DATA CENTER at Sunkeep to keep more than three.',3.4);swSnd(200,.08,140)}}
+function wFullSay(){if(time>(W4.fullAt||0)){W4.fullAt=time+6;swSay(wHasDC()?'The Buddy Barn is full.':'No room for another buddy. Build a BUDDY BARN at Sunkeep to keep more than three.',3.4);swSnd(200,.08,140)}}
 function dcDraw(b){const x=wCellX(b.gx),y=wCellY(b.gy),K='#14101e',t=time;
  r('rgba(0,0,0,.24)',x-4,y+17,30,5);r(K,x-2,y-6,24,27);r('#5a6478',x-1,y-5,22,25);r('#7c88a0',x-1,y-5,22,2);r('#3e4656',x-1,y+17,22,3);
  for(let i=0;i<3;i++){const yy=y-1+i*6;r(K,x+2,yy,16,5);r('#20242e',x+3,yy+1,14,3);
@@ -107,7 +107,7 @@ BESSIE(D){const tl='#2e8c98',dk='#1f6670',cr='#c8f0e8',yl='#ffe070';
  D.p([[12,15.2],[13.4,11.8],[14.8,15.2]],yl);D.p([[15.6,15.2],[17,12.4],[18.4,15.6]],yl);D.p([[19,14.8],[20.2,12.8],[21.2,15.2]],yl);
  D.l(9.4,17,6.6,6,4,tl);D.l(9,16.4,6.6,7.6,1.5,cr);D.b(5.8,4.6,4.4,3.2,tl);D.e(3,5.6,2.4,1.5,cr);
  D.p([[6.2,2],[7.6,.2],[9,2.2]],yl);D.p([[8.6,2.6],[10.2,.9],[10.6,3.4]],yl);D.eye(5,4,1.4);D.eye(8,3.9,1.1);D.r(2,6.7,2.4,.6,dk)},
-GRASSMAN(D){const fur='#5a7a30',dk='#3e5a22',fc='#e0c090';
+MOSSMAN(D){const fur='#5a7a30',dk='#3e5a22',fc='#e0c090';
  D.e(7.6,22.8,3.2,1.2,'#4a3a22');D.e(16.4,22.8,3.2,1.2,'#4a3a22');D.l(9,18,8.4,22,3.4,fur);D.l(15,18,15.6,22,3.4,fur);
  D.l(5.4,10,3,18.4,3,fur);D.l(18.6,10,21,18.4,3,fur);D.e(3,19,1.6,1.4,dk);D.e(21,19,1.6,1.4,dk);D.b(12,13,7.6,7.4,fur);
  D.p([[6.6,16],[5.4,20],[8.2,18.6]],dk);D.p([[17.4,16],[18.6,20],[15.8,18.6]],dk);D.p([[10,18.4],[12,21.4],[14,18.4]],dk);D.p([[8,9.6],[10,12.4],[12,9.8]],dk);
@@ -117,12 +117,12 @@ GRASSMAN(D){const fur='#5a7a30',dk='#3e5a22',fc='#e0c090';
   s._old=SWSPR(s.spr,s.pal);s._spr=swbMake(WSTARTEVO[id]);WSPECIES.push(s);WEVO[from]=id};
  ev('CUYAPUP','CUYAFLARE',54,21,14,16,{KINDLING:3,WATERING:2},'The river burns wherever it swims. It thinks this is normal.','#f8902c');
  ev('BESSLING','BESSIE',60,18,18,13,{WATERING:3,FORTUNE:2},'The lake monster herself. The reward was never claimed.','#2e8c98');
- ev('GRASSKIN','GRASSMAN',64,21,17,10,{PLANTING:3,QUARRY:2},'Seven feet of moss and manners. Leaves very large footprints.','#5a7a30');
+ ev('GRASSKIN','MOSSMAN',64,21,17,10,{PLANTING:3,QUARRY:2},'Seven feet of moss and manners. Leaves very large footprints.','#5a7a30');
  Object.assign(WBLURB,{CUYAPUP:'Fast hitter. Runs the kiln.',BESSLING:'Tough and lucky. Waters.',GRASSKIN:'Strongest. Plants, chops.'})}
 /* ---------------- "how Sunkeep works": one card, once, right after your first buddy ---------------- */
 function loopUpdate(){W4.loopT=(W4.loopT||0)+1/30;if((pressed('a')||pressed('start'))&&W4.loopT>.8){swSnd(660,.06,990);W4.loopT=0;if(!W4.loopP){W4.loopP=1;return}W4.loopP=0;SW.lessons.loop=1;state='g4world';swSave()}}
 function drawLoop(){if(W4.loopP){drawLoop2();return}const K='#0c1410',t=W4.loopT||0,rows=[['1','THROW','A throws sprouts at berries, logs and wild buddies.','#f8902c'],['2','CARRY','They carry it all home. The Lantern grows more sprouts.','#58a0f0'],
-  ['3','CATCH','Enough sprouts on a wild buddy and it joins you.','#7ee787'],['4','BUILD','Buddies you leave home do the work. Build Sunkeep up.','#ffd94d'],['5','SIGILS','Win the four gyms to open the roads.','#f078c0']];
+  ['3','CATCH','Enough sprouts on a wild buddy and it joins you.','#7ee787'],['4','BUILD','Buddies you leave home do the work. Build Sunkeep up.','#ffd94d'],['5','SIGILS','Light the four alphas. Each gives a Sigil.','#f078c0']];
  ox=0;oy=0;r(K,0,0,W,H);r('#ffd94d',0,22,W,1);ctext('HOW SUNKEEP WORKS',8,1,'#ffd94d');
  rows.forEach(([n,h,d,c],i)=>{const at=.15+i*.18;if(t<at)return;const y=34+i*46,k=Math.min(1,(t-at)/.2),xo=Math.round((1-k)*40);g.globalAlpha=k;
   r('#14101e',8+xo,y,22,22);r(c,10+xo,y+2,18,18);text(n,16+xo,y+7,1,'#14101e',null);text(h,38+xo,y+2,1,c,null);swWrap(d,W-50).slice(0,3).forEach((l,j)=>text(l,38+xo,y+14+j*10,1,'#e8f4d8',null));g.globalAlpha=1});

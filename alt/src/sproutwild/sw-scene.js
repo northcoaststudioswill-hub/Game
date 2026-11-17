@@ -8,7 +8,7 @@
 let SCOFF=false;
 function scStart(steps,done){if(SCOFF){for(const s of steps)if(s.fn)s.fn();if(done)done();return}W4.scene={steps,i:-1,t:0,x:P3.x,y:P3.y,done};W4.talk=null;W4.quips=[];W4.quipQ=[];scNext()}
 function scNext(){const sc=W4.scene;sc.i++;sc.t=0;const st=sc.steps[sc.i];
- if(!st){W4.scene=null;if(sc.done)sc.done();if(!W4.fld)wCamUpdate(P3.x,P3.y);return}if(st.fn)st.fn()}
+ if(!st){W4.scene=null;W4.scEndT=time;if(sc.done)sc.done();if(!W4.fld)wCamUpdate(P3.x,P3.y);return}if(st.fn)st.fn()}
 function scTick(dt){const sc=W4.scene,st=sc.steps[sc.i];sc.t+=dt;
  if(st.tick)st.tick(dt);
  const tx=st.x==='lou'?lou.x:st.x==null?P3.x:st.x,ty=st.x==='lou'?lou.y:st.y==null?P3.y:st.y,k=Math.min(1,dt*3.4);sc.x+=(tx-sc.x)*k;sc.y+=(ty-sc.y)*k;
@@ -64,7 +64,7 @@ function scTri(x,y,d){const K='#14101e',C='#ffd94d';x=Math.round(x);y=Math.round
  else{const s2=d==='l'?-1:1;for(let n=0;n<4;n++){const h=13-n*4,xx=x+s2*n*3-(s2<0?2:0);r(K,xx-1,y-(h>>1)-1,5,h+2)}for(let n=0;n<4;n++){const h=13-n*4,xx=x+s2*n*3-(s2<0?2:0);r(C,xx,y-(h>>1),3,h)}}}
 function scArrow(){if(W4.scene||!W4.bf||W4.fld)return;const op=wOp(),cam=W4.cam||{x:0,y:0};let t=null,off=22;
  if(op===0)t=W4.bf.buds[0];else if(op===1)t=W4.bf.items.find(i=>i.op&&!i.car.length&&!i.done);
- else if(op===2){if(WCHOICE[1].y>0&&WCHOICE[1].y<190){t=WCHOICE.slice().sort((a,b)=>Math.hypot(a.x-P3.x,a.y-P3.y)-Math.hypot(b.x-P3.x,b.y-P3.y))[0];off=40}}
+ else if(op===2){if(WCHOICE[1].y>0&&WCHOICE[1].y<260){t=WCHOICE.slice().sort((a,b)=>Math.hypot(a.x-P3.x,a.y-P3.y)-Math.hypot(b.x-P3.x,b.y-P3.y))[0];off=40}}
  else if(SW.quest===2)t={x:240,y:(W4.wh||520)-14,gate:1};
  if(op===0&&wBudTotal()===0){const lw=tw('YOU',1);r('#14101e',P3.x-lw/2-3,P3.y-34,lw+6,10);text('YOU',P3.x-lw/2,P3.y-33,1,'#ffd94d',null)}
  if(!t)return;const sx=t.x-cam.x,sy=t.y-off-cam.y,cx=Math.max(14,Math.min(W-14,sx)),cy=Math.max(46,Math.min(H-40,sy)),edge=cx!==sx||cy!==sy,b=Math.sin(time*6)*2;
@@ -72,20 +72,21 @@ function scArrow(){if(W4.scene||!W4.bf||W4.fld)return;const op=wOp(),cam=W4.cam|
   if(!t.gate)scTri(t.x,t.y-off+b,'d');return}
  const d=sy>H-40?'d':sx<14?'l':sx>W-14?'r':'u';scTri(cx+cam.x+(d==='l'?-b:d==='r'?b:0),cy+cam.y+(d==='d'?b:d==='u'?-b:0),d)}
 function scBuild(){SW.lessons.scBuild=1;SW.beats.caught=1;const nm=(SW.party[SW.party.length-1]||{}).sp||'It';
- scStart([{hold:.6},{who:'MARCUS',txt:'AYYY! You caught one! Never doubted you once. Dap me up.'},
+ scStart([{hold:.6},{who:'MARCUS',txt:'AYYY! Erin told me. Your first catch! Never doubted you once. Dap me up.'},
   {x:150,y:236,hold:1.1},{x:150,y:236,who:'MARCUS',txt:'Buddies need a roof, bro. Press START, pick BUILD, then COTTAGE. Costs 8 wood. This spot is nice.'},
   {x:150,y:236,who:'MARCUS',txt:'Short on wood? Send a buddy at trees. Sprouts carry the logs home. Teamwork. I supervise.'},
   {who:'ERIN',txt:'Only your lead buddy walks with you here. The others wait at home. Give them a roof and they get to work.'},{hold:.4}],()=>swSave())}
-function scAuto(){if(!SCOFF&&kindCheck())return;
+function scAuto(){swMsgPump();scGymCheck();sigilCheck();loreTown();loreBibi();if(!SCOFF&&!swBusy()&&!(W4.scPend&&W4.scPend.length)&&kindCheck())return;
  if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
-  if(wOp()>=3&&!SW.lessons.loop&&SW.quest<=2){if(SCOFF)SW.lessons.loop=1;else{W4.loopT=0;state='g4loop';return}}
-  if(wHasRoof()&&!SW.lessons.scDab&&W4.sector==='BASE'&&wOp()>=3&&!(W4.cons&&W4.cons.length)){W4.dabT=(W4.dabT||0)+1;if(W4.dabT>50){if(SCOFF)SW.lessons.scDab=1;else dabStart();return}}
-  if(SW.quest===4&&SW.lessons.scDab&&!SW.lessons.scPlot&&W4.sector==='BASE'&&!(W4.cons&&W4.cons.length)){W4.plotT=(W4.plotT||0)+1;if(W4.plotT>60){scPlots();return}}
+  if(wOp()>=3&&!SW.lessons.loop&&SW.quest<=2&&(SCOFF||!swBusy())){if(SCOFF)SW.lessons.loop=1;else{W4.loopT=0;state='g4loop';return}}
+  if(wHasRoof()&&!SW.lessons.scDab&&W4.sector==='BASE'&&wOp()>=3&&!(W4.cons&&W4.cons.length)&&(SCOFF||wNearCot(200)||(W4.dabW=(W4.dabW||0)+1)>900)){ /* the party waits till you are near the cottage, or 15 s at home (v9.7: it must not be missed) */W4.dabT=(W4.dabT||0)+1;if(W4.dabT>50){if(SCOFF)SW.lessons.scDab=1;else dabStart();return}}
+  if(SW.quest===4&&SW.lessons.scDab&&!SW.lessons.scPlot&&W4.sector==='BASE'&&!(W4.cons&&W4.cons.length)&&(SCOFF||P3.y>250)){ /* v9.2: the garden lesson plays when you walk to the garden */W4.plotT=(W4.plotT||0)+1;if(W4.plotT>60){scPlots();return}}
   if(SW.quest===3&&!SW.lessons.scBuild&&W4.sector==='BASE'&&SW.lessons.scSend){SW.beats.caught=1;W4.buildT=(W4.buildT||0)+1;if(W4.buildT>40){scBuild();return}}
   if(wOp()===0&&!SW.beats.wake){SW.beats.wake=1;SW.beats.first=1;scIntro();return}
   if(wOp()===1&&!SW.beats.three){SW.beats.three=1;SW.beats.carry=1;SW.beats.first=1;scBerries();return}
   if(wOp()===2)SW.beats.lit=1;if(SW.party.length&&!SW.lessons.scSend&&wOp()>=3&&W4.sector==='BASE'){W4.sendT=(W4.sendT||0)+1;if(W4.sendT>45)scSend()}}
  const F=W4.fld;if(F&&F.id==='HOLLOW'&&!F.melon){F.melon=1;if(W4.wilds.length&&!W4.wilds.some(w=>w.sp==='MELONKIN'))W4.wilds[0].sp='MELONKIN'} /* its own creature is always home */
+ if(F&&F.id==='SQUIRE'&&!F.wisp){F.wisp=1;if(W4.wilds.length&&!W4.wilds.some(w=>w.sp==='LANTERNWISP'))W4.wilds[0].sp='LANTERNWISP'}sqArrive(F);sqHint(F);
  if(F&&F.id==='MEADOW'&&!SW.lessons.scMeadow&&SW.quest>=2){F.scT=(F.scT||0)+1;if(F.scT>20)scMeadow(F)}}
 /* a seed of light arcs from the Lantern to you when it grows a sprout */
 function scSeed(ty){(W4.seedFx=W4.seedFx||[]).push({t:0,ty})}
@@ -100,8 +101,11 @@ function scWorldFx(){opFx();scArrow();scDabFx();if(!W4.seedFx)return;for(const f
 function scConStart(b,def,first){W4.cons=W4.cons||[];W4.cons.push({b,def,first,t:0,need:9+Object.values(def.cost||{}).reduce((a,v)=>a+v,0)*.45});b.con=1;
  for(const w of W4.wk||[]){w.task={k:'idle',x:wCellX(b.gx)+10+(Math.random()*40-20),y:wCellY(b.gy)+28+Math.random()*6,t:4.5}}}
 function scConTick(dt){if(!W4.cons||!W4.cons.length)return;const F=W4.bf;
- for(const c of W4.cons){const x=wCellX(c.b.gx)+10,y=wCellY(c.b.gy)+10,help=(W4.wk||[]).filter(w=>Math.hypot(w.x-x,w.y-y-18)<40).length;
-  c.t+=dt*(1+help*.35);c.b.con=Math.max(0,1-c.t/c.need);
+ for(const c of W4.cons){const x=wCellX(c.b.gx)+10,y=wCellY(c.b.gy)+10,near=w=>Math.hypot(w.x-x,w.y-y-18)<40;
+  /* v9.7: nothing builds itself. Home buddies keep coming back to the scaffold; your lead buddy helps when it stands there with you */
+  for(const w of W4.wk||[])if(!near(w)&&(!w.task||w.task.k==='idle'))w.task={k:'idle',x:x+(Math.random()*40-20),y:y+26+Math.random()*6,t:3};
+  const help=(W4.wk||[]).filter(near).length+(W4.part&&SW.party.length&&near(W4.part)?1:0);c.help=help;
+  c.t+=dt*(help?.6+help*.4:0);c.b.con=Math.max(0,1-c.t/c.need);
   if(((c.t*5)|0)!==(((c.t-dt)*5)|0)){fSpark(x+(Math.random()*28-14),y-4-Math.random()*16,'#ffe8b0');swSnd(220+Math.random()*80,.03,140)}
   if(c.t>=c.need){c.b.con=0;delete c.b.con;
    for(let i=0;i<14;i++)W4.floats.push({x:x+(Math.random()*36-18),y:y-Math.random()*24,txt:'*',t:.4+Math.random()*.6,c:i%2?'#fff3b0':'#7ee787'});
@@ -119,7 +123,7 @@ function scConDraw(b){if(!(W4.cons||[]).some(c=>c.b===b)){delete b.con;wDrawBuil
  ts.forEach((ty,i)=>{const T=TYPES[ty],sx=x-4+i*13,hop=((time*6+i*2)|0)%2,sy=y+18-hh-6-hop*2;
   r(K,sx-1,sy-1,6,7);r(T.c,sx,sy,4,5);r(T.l,sx+1,sy,2,1);
   const sw2=((time*8+i)|0)%2;r('#8a6a48',sx+4,sy-3+sw2,1,4);r('#c8ccd4',sx+3,sy-4+sw2,3,2)});
- const pct=Math.round(k*100)+'%';r('rgba(10,14,8,.75)',x+10-tw(pct,1)/2-2,y-24,tw(pct,1)+4,9);text(pct,x+10-tw(pct,1)/2,y-23,1,'#ffd94d',null)}
+ const cn=(W4.cons||[]).find(c=>c.b===b),pct=cn&&!cn.help?'NEEDS A BUDDY':Math.round(k*100)+'%';r('rgba(10,14,8,.75)',x+10-tw(pct,1)/2-2,y-24,tw(pct,1)+4,9);text(pct,x+10-tw(pct,1)/2,y-23,1,'#ffd94d',null)}
 /* ---------------- the cottage party (v7.1) ----------------
    The first roof at Sunkeep gets celebrated properly: Marcus brings
    out the rig, heats it, rips it, yells his line, and hands it over. */
@@ -214,3 +218,6 @@ function drawDab(){const KC=KO._,C=KC.CH,mi=C.findIndex(c=>c.id==='marcus'),wi=C
   for(let i=0;i<10;i++)puff(((i*61+time*14)%(W+60))-30,30+((i*37)%(H-80)),10+(i*7)%14,.16);
   if(u<.1)r('rgba(255,255,255,'+(1-u/.1).toFixed(2)+')',0,0,W,H)}
  r('#000000',0,0,W,8);r('#000000',0,H-8,W,8);if(t>1.2&&t<7.6){const s='A  SKIP';text0(s,W-6-tw0(s,1),H-7,1,'#6a6880',null)}}
+
+/* v9.2: is the keeper near the cottage? */
+function wNearCot(d){const c=SW.buildings.find(b=>b.k==='cottage');if(!c)return false;return Math.hypot(P3.x-(wCellX(c.gx)+10),P3.y-(wCellY(c.gy)+10))<d}

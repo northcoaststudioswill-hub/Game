@@ -27,6 +27,7 @@ function wDrawBattle(){const B=FBIO[W4.sector]||FBIO.MEADOW,foe=BT.foe,me=btCur(
    if(i>0){const nm=tx.slice(0,i),who=nm===me.sp&&nm===foe.sp?(d.last==='me'?'foe':'me'):nm===me.sp?'me':nm===foe.sp?'foe':'keeper';
     const mv=wbMove(tx.slice(i+6).replace(/\s*[!(—].*$/,'').trim());d.an={who,t:time,ty:mv?mv.t:-1,miss:tx.includes('missed'),pw:mv?mv.p:1};d.last=who;if(who==='foe')d.relM=0;else d.relF=0}
    else if(tx.includes(' fainted')){d.faint=tx.startsWith(foe.sp)&&foe.hp<=0?'foe':'me';d.ft=time}
+   else if(tx.startsWith('The dark breaks')){d.faint='foe';d.ft=time;swSnd(523,.12,1046)} /* v9.4: the light-up */
    else if(tx.includes('bloom on'))d.bloom=true}}
  const an=d.an,at=an?time-an.t:9,hit=an&&!an.miss&&an.pw>0&&at>.3&&at<.62;
  /* a bar only drains once its own hit has landed: hold it while that attack is still to come in the log */
@@ -46,7 +47,7 @@ function wDrawBattle(){const B=FBIO[W4.sector]||FBIO.MEADOW,foe=BT.foe,me=btCur(
  {const rr=wSeedRand(wSectorSeed(W4.sector)+7);for(let i=0;i<34;i++){const gx=rr()*W,gy=HY+10+rr()*(top-HY-14);r(i%7===0?B.fl[i%B.fl.length]:B.g3,Math.round(gx),Math.round(gy),i%7===0?2:1,i%7===0?2:3)}}
  /* ---- positions ---- */
  const FGx=Math.round(W*.71),FGy=Math.round(top*.50),MGx=Math.round(W*.30),MGy=top-12;
- wbPlat(FGx,FGy,96,B);wbPlat(MGx,MGy,112,B);
+ wbPlat(FGx,FGy,96,B);wbPlat(MGx,MGy,112,B);BT._fg=[FGx,FGy];
  const fw=fs.ow*sc,fh=fs.oh*sc,mw=ms.ow*sc,mh=ms.oh*sc,ease=t=>{const k=Math.min(1,Math.max(0,t/.35));return 1-(1-k)*(1-k)};
  let fx=FGx+(1-ease(time-d.fin))*130,fy=FGy+Math.round(Math.sin(time*2.2)*1.5),mx=MGx-(1-ease(time-d.min))*150,my=MGy+Math.round(Math.sin(time*2.2+1.3)*1.5);
  if(an&&at<.34){const k=Math.sin(Math.min(1,at/.34)*Math.PI);if(an.who==='me'){mx+=k*16;my-=k*8}else if(an.who==='foe'){fx-=k*16;fy+=k*8}}
@@ -59,12 +60,15 @@ function wDrawBattle(){const B=FBIO[W4.sector]||FBIO.MEADOW,foe=BT.foe,me=btCur(
  {let n=0;for(let ty=0;ty<TYPES.length&&n<8;ty++){const c=Math.min(SW.buds[TYPES[ty].n]||0,ty===(BT.tossIx||0)&&swT>=0?0:3),dz=BT.dz&&BT.dz[ty];
    for(let i=0;i<c&&n<8;i++,n++)drawBud({x:Math.round(6+n*9),y:top-2-(n%2)*3,type:ty,stage:2,z:dz?0:((time*3+n)|0)%4===0?2:0,a:n*1.7,mv:false,st:dz?'stun':'idle',fx:1})}}
  /* foe */
- const drawMon=(spr,x,y,w,h,flip,white,alpha)=>{const img=white&&spr.hol?spr.hol:spr.ol;if(alpha<1)g.globalAlpha=Math.max(0,alpha);
+ const drawMon=(spr,x,y,w,h,flip,white,alpha,dark)=>{const img=white&&spr.hol?spr.hol:dark?(wDarkImg(spr)||spr.ol):spr.ol;if(alpha<1)g.globalAlpha=Math.max(0,alpha);
   if(flip){g.save();g.translate(Math.round(x+w/2),Math.round(y-h));g.scale(-1,1);g.drawImage(img,0,0,w,h);g.restore()}else g.drawImage(img,Math.round(x-w/2),Math.round(y-h),w,h);g.globalAlpha=1};
- {let a=1,yo=0;if(d.faint==='foe'){const k=(time-d.ft)/.6;a=1-k;yo=k*24}if(d.bloom||(swT>2.2&&BT.orbOk)){const fl=.5+.5*Math.sin(time*8);g.globalAlpha=.25+.2*fl;r('#fff3b0',FGx-fw/2-6,FGy-fh-6,fw+12,fh+10);g.globalAlpha=1;uiRays(FGx,FGy-fh/2,70,8,'#fff3b0',.16)}
+ {let a=1,yo=0,lit=0;if(d.faint==='foe'){const k=(time-d.ft)/.6;if(wFoeDark()){lit=Math.min(1,Math.max(0,k*.5))}else{a=1-k;yo=k*24}} /* v9.4: a dark foe is not knocked out; the dark drains off it */if(d.bloom||(swT>2.2&&BT.orbOk)){const fl=.5+.5*Math.sin(time*8);g.globalAlpha=.25+.2*fl;r('#fff3b0',FGx-fw/2-6,FGy-fh-6,fw+12,fh+10);g.globalAlpha=1;uiRays(FGx,FGy-fh/2,70,8,'#fff3b0',.16)}
   {let sc=1;if(swT>2.2&&BT.orbOk)sc=Math.max(0,1-(swT-2.2)/.5);const fl=swT>.9&&swT<2.2&&wob>.85;
    if(d.bloom){for(let i=0;i<Math.min(5,BT.tossN||3);i++)drawBud({x:Math.round(FGx-18+i*9),y:FGy+1-(((time*6+i)|0)%2)*2,type:BT.tossIx||0,stage:2,z:0,a:i,mv:true,st:'idle',fx:1});for(let i=0;i<6;i++){const ag=i*1.05+time*2;r('#fff3b0',Math.round(FGx+Math.cos(ag)*22),Math.round(FGy-14+Math.sin(ag)*10),2,2)}} /* caught: it has gone into the light; the sprouts dance where it stood */
-   else if(a>0&&sc>0)drawMon(fs,fx,fy+2+yo,Math.max(1,Math.round(fw*sc)),Math.max(1,Math.round(fh*sc)),false,(hit&&an.who!=='foe')||fl,a)}}
+   else if(a>0&&sc>0){const dw=Math.max(1,Math.round(fw*sc)),dh=Math.max(1,Math.round(fh*sc)),dark=wFoeDark()&&!d.bloom&&!(swT>2.2&&BT.orbOk);
+    if(lit>0){drawMon(fs,fx,fy+2,dw,dh,false,false,1,false);if(lit<1)drawMon(fs,fx,fy+2,dw,dh,false,false,1-lit,true);
+     uiRays(fx,fy-dh/2,40+lit*60,10,'#fff3b0',.22*(1-lit*.5));for(let i=0;i<10;i++){const ag=i*.63+lit*5,rd=8+lit*44;r(i%2?'#fff3b0':'#ffd94d',Math.round(fx+Math.cos(ag)*rd),Math.round(fy-dh/2+Math.sin(ag)*rd*.6),2,2)}}
+    else{drawMon(fs,fx,fy+2+yo,dw,dh,false,(hit&&an.who!=='foe')||fl,a,dark);if(dark&&a>=1)wDarkHaze(fx,fy+2,dh,3)}}}}
  {let a=1,yo=0;if(d.faint==='me'){const k=(time-d.ft)/.6;a=1-k;yo=k*24}if(a>0)drawMon(ms,mx,my+2+yo,mw,mh,!!ms.fable,hit&&an.who==='foe',a)}
  /* the bolt */
  if(an&&at>.08&&at<.34&&an.pw>0){const k=(at-.08)/.26,fromMe=an.who!=='foe',x0=fromMe?MGx+20:FGx-20,y0=fromMe?MGy-mh*.5:FGy-fh*.5,x1=fromMe?FGx:MGx,y1=fromMe?FGy-fh*.5:MGy-mh*.5,c=an.ty>=0?TYPES[an.ty]:{c:'#ffffff',l:'#ffffff',d:'#c8c0d8'};

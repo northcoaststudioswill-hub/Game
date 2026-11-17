@@ -44,7 +44,9 @@ function wHud(){if(W4.scene){scDraw();return}if(W4.sleepFx>0){W4.sleepFx-=1/60;g
  if(SW.stam<99){r('#00000088',0,16,W,2);r(SW.stam>40?UI.leaf:SW.stam>18?'#ffd94d':'#e04838',0,16,Math.round(W*SW.stam/100),2)}
  const ban=W4.banner&&W4.banner.t>0;
  {const q=wQuestText();if(q&&!ban&&state!=='g4place'){
-  r('rgba(10,14,8,.62)',0,18,W,11);r(UI.gold,0,18,2,11);text(wFit(q,226),6,20,1,'#ffe8b0',null)}}
+  r('rgba(10,14,8,.62)',0,18,W,11);r(UI.gold,0,18,2,11);const qw=tw(q,1);
+  if(qw<=226||!g.save)text(wFit(q,226),6,20,1,'#ffe8b0',null);else{const per=qw+48,k=Math.max(0,((time-(W4.qT0||0))*16)%(per+40)-40),x0=6-Math.round(k); /* v9.2: a long goal scrolls instead of being cut off */
+   g.save();g.beginPath();g.rect(4,18,W-6,11);g.clip();text(q,x0,20,1,'#ffe8b0',null);text(q,x0+per,20,1,'#ffe8b0',null);g.restore()}}}
  if(ban){const sl=swWrap(W4.banner.sub||'',212).slice(0,3),bh2=24+sl.length*11;g.globalAlpha=Math.min(1,W4.banner.t);r('#0e1a0a',8,30,224,bh2);r(UI.gold,8,30,224,2);r(UI.gold,8,30+bh2-2,224,1);
   {const bt=W4.banner.txt,big=tw(bt,2)<=216;text(big?bt:wFit(bt,216),Math.round(W/2-tw(big?bt:wFit(bt,216),big?2:1)/2),35,big?2:1,'#ffffff',null)}sl.forEach((l,j)=>text(l,Math.round(W/2-tw(l,1)/2),53+j*11,1,'#cfe0b8',null));g.globalAlpha=1}
  /* bottom row: squad on the field, crew and sigils at home */
@@ -145,6 +147,32 @@ function swDrawIntro(){const p=Math.min(W4.introPage||0,WSTORY.length-1),tt=W4.i
    g.globalAlpha=.8;g.strokeStyle='#b0e0f8';g.lineWidth=1;g.beginPath();g.arc(W/2,gy,rad,0,6.3);g.stroke();g.globalAlpha=.35;g.beginPath();g.arc(W/2,gy,rad*.7,0,6.3);g.stroke();g.restore();g.globalAlpha=1}
   fFort(W/2,gy+8);fChibi(W/2,gy+18,FLOOK['KING BIBI'],[0,1],false);fChibi(W/2-40,gy+16,FLOOK['DOME GUARD'],[0,1],false);fChibi(W/2+40,gy+16,FLOOK['DOME GUARD'],[0,1],false);
   if(tt>2.4){const by=Math.round(gy*.30+Math.sin(time*1.4)*2);g.globalAlpha=.14+.06*Math.sin(time*5);r('#7ee7ff',W-66,by-30,40,34);g.globalAlpha=1;wChar('BOTTIE',W-46,by,30)}}
+ else if(sn===6){ /* v9.2: the promise. Daylight, the Lantern burning, sprouts and buddies together */
+  uiSky(['#5aa8e0','#9cd4f0','#d8f0fa'],gy);uiHills(gy,26,'#5f9a58',1.3,1.1);uiHills(gy+6,16,'#4f8a44',3.1,1.7);r('#5fa544',0,gy,W,H);r('#86d86c',0,gy,W,2);
+  for(let i=0;i<5;i++){const cx=((i*61+time*6)%(W+40))-20;r('#ffffff',Math.round(cx),18+i*9,18,4);r('#ffffff',Math.round(cx)+4,15+i*9,10,3)}
+  uiRays(W/2,gy-58,110,12,'#ffd94d',.10);uiLantern(W/2,gy+4,true,1.6);
+  for(let i=0;i<40;i++)r(i%2?'#4fb04a':'#76c85c',(i*29+7)%W,gy+6+(i*11)%22,1,3);
+  [['DRIZZLET',34,-1],['FERNFANG',W-36,1],['PEBBLIT',W/2+46,0],['CINDERCAP',W/2-48,0]].forEach(([sp,x,fl],i)=>{if(tt<.3+i*.25)return;uiMon(sp,x,gy+4+Math.round(Math.sin(time*3+i)*1),i<2?34:26,fl>0)});
+  for(let i=0;i<5;i++){if(tt<1.2+i*.2)continue;const px=40+i*40+Math.round(Math.sin(time*1.6+i)*6);drawBud({x:px,y:gy+4,type:i,stage:2,z:Math.abs(Math.sin(time*5+i))*3,a:i*1.3,mv:true,st:'idle',fx:i%2?1:-1})}}
+ else if(sn===7||sn===8){ /* v9.2: the Data Center under the Peak, and Bottie's button; 8 is the glitch */
+  uiSky(['#05060f','#0d1230','#1a1f48'],gy);uiStars(40,gy-40,7);
+  for(let x=0;x<W;x+=2){const h=Math.max(0,90-Math.abs(x-W/2)*.55+Math.sin(x*.07)*6);r('#151a30',x,Math.round(gy-h),2,Math.ceil(h)+2)}
+  r('#0e1222',0,gy,W,H);const dx=W/2-44,dy=gy-46;
+  r(UI.ink,dx-2,dy-2,92,50);r('#2a3046',dx,dy,88,46);r('#3a425e',dx,dy,88,3);
+  for(let row=0;row<4;row++)for(let c=0;c<10;c++){const on=((time*3+row*7+c*13)|0)%5!==0;r(on?(c%3?'#58e0a0':'#58a0f0'):'#1a2030',dx+6+c*8,dy+8+row*9,4,3)}
+  r('#14101e',dx+36,dy+30,16,16);r('#58a0f0',dx+38,dy+32,12,2);
+  g.globalAlpha=.12+.05*Math.sin(time*4);r('#58e0a0',dx-14,dy-14,116,74);g.globalAlpha=1;
+  if(S.k){const bx=Math.round(W-30-Math.min(1,tt/1.4)*(W/2-60)),by=gy+2;wChar('BOTTIE',bx,by,30);
+   if(tt>1.4){r(UI.ink,bx-26,by-20,14,12);r('#7a7a88',bx-25,by-19,12,10);const pr=tt>2.6&&((time*4)|0)%2;r(pr?'#ff4040':'#c02020',bx-22,by-17-(pr?0:1),6,4)}}
+  if(sn===8){const k=Math.min(1,tt/.25);if(tt<.6){g.globalAlpha=1-tt/.6;r('#ffffff',0,0,W,H);g.globalAlpha=1}
+   for(let i=0;i<14;i++){const yy=((i*37+((time*20)|0)*13)%gy),hh=3+(i*7)%9,sh=((i*53+((time*30)|0)*17)%40)-20;g.globalAlpha=.55*k;r(i%3?'#58e0a0':i%2?'#ff40a0':'#58a0f0',0,yy,W,1);r('#000000',Math.max(0,sh),yy+1,W,hh);g.globalAlpha=1}
+   for(let i=0;i<20;i++){const x=(i*41+((time*12)|0)*29)%W,y=(i*23+((time*12)|0)*31)%(H-90);r(['#ff40a0','#58e0a0','#ffd94d','#58a0f0'][i%4],x,y,4+(i%3)*4,4)}
+   if(((time*3)|0)%2){const t2='SIMULATION ERROR';r('#000000',W/2-tw(t2,1)/2-4,34,tw(t2,1)+8,11);text(t2,W/2-tw(t2,1)/2,36,1,'#ff4040',null)}}}
+ else if(sn===9){ /* v9.2: the buddies went wild. Red eyes in the tall grass */
+  uiSky(['#03040c','#0a0e22','#141a36'],gy);uiStars(30,gy-30,9);uiHills(gy,18,'#0c1424',2.4,1.3);r('#0a1a10',0,gy-44,W,H);
+  const eyes=[[40,gy-34],[96,gy-40],[150,gy-30],[200,gy-42],[70,gy-16],[178,gy-14],[124,gy-8]];
+  eyes.forEach(([x,y],i)=>{if(tt<.4+i*.3)return;const bl=((time*1.3+i*.7)%3)<.12;if(!bl){r('#ff3030',x,y,3,2);r('#ff3030',x+7,y,3,2);g.globalAlpha=.25;r('#ff3030',x-2,y-2,14,6);g.globalAlpha=1}});
+  for(let i=0;i<70;i++){const x=(i*13+3)%W,h=10+(i*7)%14,sw=Math.round(Math.sin(time*1.5+i)*1);r(i%2?'#0e2a16':'#14361c',x+sw,gy-2-h+(i%3)*12,2,h)}}
  if(fade<1){g.globalAlpha=1-fade;r('#000000',0,0,W,H);g.globalAlpha=1}
  /* letterbox + progress */
  r('#000000',0,0,W,9);for(let i=0;i<WSTORY.length;i++)r(i===p?UI.gold:i<p?'#7a6a30':'#3a3a48',W/2-WSTORY.length*5+i*10,3,7,3);
@@ -215,18 +243,14 @@ function wBakeGround(){const sec=wSector(W4.sector),wh=W4.wh||360,B=FBIO.MEADOW;
   path(322,198,14,214);path(248,412,88,14);
   /* plaza */
   for(let px=196;px<284;px+=11)for(let py=92;py<116;py+=8){R('#6e6350',px+((py/8|0)%2)*5,py,11,8);R(((px+py)/4|0)%2?'#a39a86':'#948a76',px+((py/8|0)%2)*5,py,10,7);R('#b8b09c',px+((py/8|0)%2)*5,py,10,1)}
-  /* the garden: fenced, tilled */
-  const pc=6+Math.min(2,SW.buildings.filter(b2=>b2.k==='bed').length);
-  R('#5a8a3a',158,326,164,66);R('#8a6a48',162,330,156,3);R('#8a6a48',162,384,156,3);R('#8a6a48',162,330,3,57);R('#8a6a48',315,330,3,57);
-  R('#b89468',162,330,156,1);for(let fx=162;fx<=315;fx+=22){R(UI.ink,fx-1,326,6,9);R('#6e5233',fx,327,4,7);R(UI.ink,fx-1,380,6,9);R('#6e5233',fx,381,4,7)}
-  const PL=[[208,348],[240,348],[272,348],[208,374],[240,374],[272,374],[176,361],[304,361]];
-  for(let i=0;i<pc;i++){const [px,py]=PL[i];R('#4a3520',px-12,py-7,24,15);R('#6a4a2c',px-11,py-6,22,13);R('#8a6238',px-11,py-6,22,2);R('#5a3d24',px-8,py-1,16,2);R('#5a3d24',px-8,py+3,16,2)}
+  /* the garden: fenced, tilled, with room to grow (v9.7) */
+  wGardenBake(R,B,path);
   /* flower beds along the lanes */
-  for(let i=0;i<46;i++){const fx=20+rnd()*(WW-40),fy=100+rnd()*(wh-150);if(fx>150&&fx<330&&fy>316&&fy<400)continue;const c=B.fl[i%3];R(c,fx,fy,2,2);R('#ffffff',fx,fy,1,1);R(B.g3,fx,fy+2,1,2)}}
+  for(let i=0;i<46;i++){const fx=20+rnd()*(WW-40),fy=100+rnd()*(wh-150);if(fx>160&&fx<320&&fy>320&&fy<408)continue;const c=B.fl[i%3];R(c,fx,fy,2,2);R('#ffffff',fx,fy,1,1);R(B.g3,fx,fy+2,1,2)}}
  /* the forest edge */
  const tree=(x,y)=>{R('rgba(0,0,0,.24)',x-12,y-3,28,6);artTree((c,a,b2,w,h)=>R(c,x-22+a,y-44+b2,w,h),B,0)};
  R('#2c5a2e',0,0,WW,10);R('#2c5a2e',0,0,6,wh);R('#2c5a2e',WW-6,0,6,wh);R('#2c5a2e',0,wh-8,WW,8);
  for(let x=6;x<WW;x+=26){if(sec.id==='BASE'&&x>150&&x<330)continue;tree(x+((rnd()*6)|0),26+((rnd()*5)|0))}
  for(let y=52;y<wh-10;y+=26){tree(1+((rnd()*3)|0),y);tree(WW-2-((rnd()*3)|0),y+12)}
  for(let x=6;x<WW;x+=14){if(Math.abs(x-WW/2)<34)continue;R(UI.ink,x-1,wh-13,15,13);R(B.t1,x,wh-12,13,12);R(B.t2,x,wh-12,13,4);R(B.t3,x+2,wh-11,4,1)}
- W4.groundCv=cv;W4.groundFor=sec.id+'x'+wh}
+ W4.groundCv=cv;W4.groundFor=sec.id+'x'+wh+'p'+wPlotCount()}

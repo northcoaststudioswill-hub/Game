@@ -50,7 +50,7 @@ function pfLatch(F,s,wd){wd.lat=wd.lat||[];if(!wd.lat.includes(s))wd.lat.push(s)
 function pfWildTick(F,dt){for(const wd of W4.wilds.slice()){
  if(wd.cap){wd.cap.t+=dt;const t=wd.cap.t;
   if(t>=2.3){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;for(const s of wd.lat||[]){s.st='ret';s.tg=null}
-   if(wd.cap.ok){const m=wMakeMon(wd.sp,wd.lv);SW.seen[wd.sp]=1;SW.caught[wd.sp]=1;if(SW.party.length<3)SW.party.push(m);else SW.box.push(m);
+   if(wd.cap.ok){wShowLight();const m=wMakeMon(wd.sp,wd.lv);SW.seen[wd.sp]=1;SW.caught[wd.sp]=1;if(SW.party.length<3)SW.party.push(m);else SW.box.push(m);
     if(SW.quest===2){SW.quest=3}swSave();wCineMon(wd.sp,SW.party.includes(m)?'It bloomed right there in the grass and walks with you now.':'It bloomed in the grass. It is waiting at Sunkeep.')}
    else{for(const s of wd.lat||[])s.z=10;swSnd(200,.12,120);wEngage(wd.sp+' BROKE FREE!',()=>wStartWildAt(wd.sp,wd.lv))}}
   continue}
@@ -73,7 +73,11 @@ function pfWildDraw(o,feet){const spr=wSp(o.sp)._spr,w=Math.round(spr.ow*PSC),h=
  if(c||(o.lat&&o.lat.length)){const fl=.5+.5*Math.sin(time*8);g.globalAlpha=.18+.15*fl;r('#fff3b0',X-w/2-4,Y-h-2,w+8,h+6);g.globalAlpha=1;if(c)uiRays(X,Y-h/2,30+c.t*30,8,'#fff3b0',.18)}
  if(c&&c.t>=1.8&&c.ok){for(let i=0;i<12;i++){const a=i*.52+c.t*4,rad=6+(c.t-1.8)*80;r(i%2?'#fff3b0':'#7ee787',Math.round(X+Math.cos(a)*rad),Math.round(Y-h/2+Math.sin(a)*rad*.7),2,2)}}
  if(sc<=0)return;const ww=Math.max(1,Math.round(w*sc)),hh=Math.max(1,Math.round(h*sc));
- r('rgba(0,0,0,.22)',X-6,Y-1,12,3);const img=white&&spr.hol?spr.hol:spr.ol;
+ r('rgba(0,0,0,.22)',X-6,Y-1,12,3);const dk=!c&&!white&&wDarkImg(spr),img=white&&spr.hol?spr.hol:dk||spr.ol; /* v9.4: wild buddies are dark until you bring them the light */
+ if(dk)wDarkHaze(X,Y,hh,o.x);
  if(o.fx>0&&spr.fable){g.save();g.translate(X+Math.round(ww/2),Y-hh+2-bob);g.scale(-1,1);g.drawImage(img,0,0,ww,hh);g.restore()}else g.drawImage(img,X-Math.round(ww/2),Y-hh+2-bob,ww,hh);
- if(!c&&Math.hypot(o.x-P3.x,o.y-P3.y)<90){const lt=(Math.hypot(o.x-P3.x,o.y-P3.y)<56?o.sp+' ':'')+'Lv'+o.lv,lw=tw(lt,1);r('rgba(10,14,8,.7)',X-lw/2-2,Y+3,lw+4,9);text(lt,X-lw/2,Y+4,1,'#ffe8b0',null)}
+ if(!c&&Math.hypot(o.x-P3.x,o.y-P3.y)<90){const lt=(o===wTagWild()?o.sp+' ':'')+'Lv'+o.lv,lw=tw(lt,1),ty=(P3.y>o.y&&P3.y-o.y<34&&Math.abs(P3.x-o.x)<30)?Y-hh-11:Y+3;r('rgba(10,14,8,.7)',X-lw/2-2,ty,lw+4,9);text(lt,X-lw/2,ty+1,1,'#ffe8b0',null)}
  if(!c&&feet)feet(o.x,o.y)}
+
+/* v8.4: only the nearest wild shows its full name, so two close tags never print over each other */
+function wTagWild(){if(W4.tagT===time)return W4.tagW;W4.tagT=time;let b=null,bd=56;for(const w of W4.wilds||[]){if(w.cap)continue;const d=Math.hypot(w.x-P3.x,w.y-P3.y);if(d<bd){bd=d;b=w}}W4.tagW=b;return b}

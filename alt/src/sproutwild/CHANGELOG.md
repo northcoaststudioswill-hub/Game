@@ -21,6 +21,329 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v9.9 · 2026-11-17 · loose ends
+
+Will: keep working on the game.
+
+- **Erin's gating says so.** Pressing A at something she hasn't shown you yet (the boulder wall during the PEB lesson, say) did nothing at all; now she says "Hang on! I'll show you that. Stick with me." Checked with a real press from the spot.
+- **A prop you face wins over Louie.** At the notice board, the prompt was PET LOUIE whenever he stood beside you; it's READ THE BOARD now.
+- **The castle path, walked by script** (the autopilot never managed it in real time): LEAF sprouts at the thorn gate open it; walking in plays the courtyard scene ("Shh. It's waking up..."); CHALLENGE ALPHA STONESQUIRE starts the fight; bringing it the light gives the STONE SIGIL and counts as LIGHT SHOWN; the Sigil cinematic plays and ends "One Sigil. Crooked Hollow is open, east of the Meadow, and so is the road past Lantern Town."; the Hollow's barrier is gone. No page errors.
+- Lab: 124 checks.
+
+## v9.8 · 2026-11-17 · Erin's Meadow walk, straightened out
+
+Will: during the tutorial you shouldn't be able to do things until Erin shows you; when you first enter you should walk more before she starts, it's awkward; the whole pathing in that first part is weird.
+
+`shots/v9.8-meadow-arrival.png`: arriving at the top of the Meadow road (the Lantern post and the HOME sign right there), and Erin waiting down the road.
+
+- **The road from Sunkeep comes in at the top of the Meadow's main road.** It used to come in at the top-left corner, then down a narrow lane, along a thin path and round the pond (walking it at player speed, it was easy to end up in the pond). The Lantern Town road takes that corner now. The Lantern post moved to the new entrance, and the road signs say which way is which.
+- **You walk to Erin.** On your first visit she waits beside the road, about 4 seconds' walk down it, and only talks once you reach her. The goal line says "Meet Erin down the road". No wild buddies appear before she starts, so there's nothing in the grass you're not allowed to touch yet.
+- **Her lessons follow one loop off the road:**
+  1. the wild buddy, in the field just east of where she waits
+  2. the buried PEB, moved up beside that field
+  3. back north to the boulder wall on the east road
+  4. west to the bridge
+  5. then the tree, the logs and the ladybug
+- **You can only do what Erin has shown you.** During her walk, the aim ring only locks on to the thing she's teaching right now (the wild buddy, then the PEB, the boulder wall, the bridge, the tree, the logs, the ladybug), and SELECT battles wait. A on anything else gets "ERIN: Hang on! I'll show you that. Stick with me." Talking, petting Louie, the Lantern post and the signs always work.
+- The Meadow's banner said "Wildsprouts live in the tall grass"; it's "Wild buddies" now.
+- Louie doesn't dig up berries during Erin's walk any more: "Throw sprouts at it" came up while the gating wouldn't let you.
+- Played in real time from the title (autopilot, 430x932) through all of Erin's walk to "Head home when you're ready": every lesson in order, 0 timing flags, no page errors. Walking from the entrance to Erin at player speed with real key presses takes 3.4 s, straight down the road.
+- Lab: 124 checks; the two that walked out of the Meadow's top edge now use the new exits.
+
+## v9.7 · 2026-11-17 · Louie, the garden, and slowing the start down
+
+Will: play the start to the cottage and refine it. Things happen a little too fast; some new graphics are clunky; the base plots are not all working and have no room to grow; nothing should build until base buddies are touching it; the first night comes too soon; someone saying something important should walk up to you. Louie's model is bad, and he works well in the original Sprouts game. He's a Shiba Inu.
+
+- **Louie, the Sprouts way.** He was the right Shiba sprite drawn wrong: squashed from 20 x 13 to 24 x 12, with no outline. He's drawn the way Sprouts draws him now: true size, his white outline, a two-frame trot with a little hop, his curled tail flicking, and ears up with a pink tongue when he sits for a pet. His fetch works like Sprouts too: a stray sprout hops on his back (up to three, if they're close together), he trots it to your side, and they hop off. "FOUND 2!"
+- **The garden grows with Sunkeep.** It drew 8 plots but only 6 worked, and its plots were only ever made once, so the plot the cottage was meant to open never appeared. Now:
+  - up to 12 plots, four columns in three rows, with the lane running straight through the middle and a gateway in the fence where it passes
+  - 6 plots to start, 8 with the cottage, 12 at Sunkeep Lv2, and a new plot pops in with "NEW PLOT" when it opens
+  - plots that aren't open yet are staked out with string, with a little sign, so you can see where the garden is going
+  - nothing can be built where the garden will grow
+- **Nothing builds itself.** A scaffold only rises while buddies are at it: home buddies keep walking back to it until it's done, and your lead buddy helps when it stands there with you. With nobody at it, the scaffold says NEEDS A BUDDY. More helpers, faster.
+- **The first day lasts until you have a roof.** A day is 5 minutes and dusk came at minute 3, in the middle of the tutorial. Day 1 now stays in daylight until the cottage is built; then evening comes, the fire scene plays, and sleeping in your new cottage makes sense.
+- **Erin and Marcus walk up to you before they say something.** A scene at Sunkeep where they speak now starts with them walking over to stand beside you (Erin on your left, Marcus on your right), instead of talking from across the map.
+- **A breath between scenes.** One scene ending no longer starts the next one on the same frame: 1.5 seconds of plain play first.
+- **The start breathes.** Playing from the title in real time showed some crowding, now fixed:
+  - The Lantern-wakes section was 5 lines of talk in a row; it's 4.
+  - Right after you chose your first buddy came its cinematic, a Marcus bubble, a 3-line "send your buddy at a tree" lesson, and then Erin's walk. That lesson repeated one Erin gives you in the Meadow, so the one at home is gone.
+  - Back home, Marcus no longer opens with "AYYY! You caught one!" as if it just happened. Now it's "AYYY! Erin told me. Your first catch!"
+  - On day 1, finishing the cottage resets the clock to mid-afternoon, so the party, the garden lesson and the castle briefing aren't squeezed by nightfall.
+  - The first evening is Erin and Marcus walking up to you: "The sun's going down..."
+  - The cottage party can't be missed. It waited until you stood by the cottage, and a real-time run walked off to the garden and never saw it. Now it plays when you're anywhere near, or after 15 seconds at Sunkeep. The castle briefing waits until after it.
+- **Cleaner props.** The garden fence is lighter (rails, and posts at the corners and gateways); the four lone fence posts by the gate lane are gone; the pond moved up off the base's bottom rail.
+
+`shots/v9.7-louie-garden-walkup.png`: Louie carrying a stray home and sitting; the garden at 6 and 8 plots; Erin and Marcus walking up before the first evening.
+
+- Played in real time from the title (autopilot, 430x932) to the cottage and the castle briefing: 0 timing flags, no page errors. Erin's walk begins 9 s after the first buddy's cinematic, with nothing doubled.
+- Checked by scripts from their own spots: the cottage built with two buddies at it (11 s), the party, then the garden lesson with Erin and Marcus walking up; the first-evening walk-up; Louie's ride-home fetch. Lab: 124 checks.
+
+## v9.6 · 2026-11-17 · Sunkeep, lived in
+
+Will: keep improving the visuals, item placement and design; more story triggers; more content inside the slice we have.
+
+`shots/v9.6-sunkeep-props-and-courtyard.png`
+
+- **Sunkeep's empty fields have things in them now:**
+  - a stone well with a red roof by the plaza
+  - a notice board across the lane
+  - two benches by the campfire
+  - flower beds either side of the Lantern steps
+  - a lily pond with reeds and a frog's ripple
+  - a fenced lane down to the gate
+  - a mushroom ring
+
+  Buildings can't be placed on top of any of them.
+- **Four of them do something:**
+  - **The notice board** reads you today's goal, a note that changes with your progress (Marcus wanting a cottage; Erin on the dark castle; then "THE CASTLE IS CALM!"; a warning about robots once Bottie has visited), your LIGHT SHOWN count, and an old note from the first keeper about the promise. A gold dot on the board means there's something new.
+  - **The well** gives one heart a day.
+  - **The benches** rest your buddies.
+  - **The pond** has three things to notice.
+- **New story beats, each on something you do:**
+  - The first night at Sunkeep, the camera goes to the fire. Erin and Marcus on the dark, the Lantern, and sleeping in the cottage.
+  - The moment your lead reaches the level the castle needs, Marcus: "BESSLING is Lv6! Look at you. Castle time, bro." Then Erin on the thorn gate.
+  - Stepping into the castle courtyard, the camera goes to the alpha. Louie: "Shh. It's waking up..." Then the narrator: "Dark pours off it like smoke off a candle."
+  - The first buddy you calm, Erin: "The dark broke right off it. That is the whole job, keeper." Marcus calls the rest of the valley a backlog. During Erin's Meadow walk she says it herself in her first-catch line, so the two never stack (a real-time run caught them back to back).
+- Lab: 124 checks, unchanged.
+- Played in real time from the title (autopilot, 430x932) through the opening and Erin's Meadow walk to the bridge: 0 timing flags, no page errors. The board, the well and the courtyard beat were checked by a script from their own spots.
+
+**Not checked:** the first night at the fire in real time; iPhone.
+
+## v9.5 · 2026-11-17 · the first alpha lives in the castle
+
+Will: refine what we have, no new content; clean up, make things work better, fill tutorial and onboarding gaps, flesh out the first area. The flow to the first alpha is bad: it should be in Squire's Woods, which should have a castle. And look hard at the battles: is this style right, or should it pivot to Mario RPG style or multi-battlers?
+
+`shots/v9.5-castle-strike-signs.png`: the castle, the timed strike, a road sign.
+
+- **The first alpha is in Squire's castle.** Squire's Woods opens once Sunkeep has a cottage and a crop (the Ranger's barrier says so until then). Its old walls are drawn as a castle now: grey brick with battlements, round corner towers with arrow slits and red pennants, a gatehouse over the thorn gate, and a flagstone courtyard where STONESQUIRE, the castle's own gatehouse come alive, waits dark. It is Lv7 and gives the first Sigil (STONE). The woods' wilds are Lv3 to 6.
+- **The Meadow is the training ground.** No alpha behind its boulder wall; the wall, the ore and the buried PEB stay for Erin's lessons. Crooked Hollow (Lv6 to 9) opens with the first Sigil. BLOOMBOAR moved to the Ember Wastes (Lv12, guarding the glassware), so there are still four alphas.
+- **Balance, by simulation** (one starter at Lv6 or 7 plus a Lv4 PEBBLIT, 6 fights each): BESSLING and GRASSKIN win 6/6 against the Lv7 alpha, even at Lv8. CUYAPUP (fire, weak to stone) loses most, but with a Lv5 DRIZZLET it wins 6/6. So the game teaches it: Erin says "it is made of stone. Water and leaves wear stone down. A DEW or LEAF buddy from the woods will help", and Louie says it again at the castle. The training goal is Lv6 ("Stone ALPHA Lv7: train to Lv6"); at Lv7 it took over 6 minutes of grinding in a real-time run.
+- **Arriving at the castle** is a short scene now: the camera pans to the gatehouse, the narrator on the castle nobody finished, then to the dark alpha and Louie on stone, then back to the gate and how to clear the thorns.
+- **The Lantern post gets a lesson.** The first time your lead buddy drops below half in the wild, Louie walks the camera to the area's Lantern post: A heals, A again travels.
+- **Road signs in the Meadow** at the four ways out (home, Lantern Town, Crooked Hollow, Squire's Woods). Walk up and press A to read. (The first version put the HOME sign on the Lantern post and hid the post's prompt; a real-time run caught it, the sign moved, and the post always wins now. New lab check.)
+- **The Squire's Woods Lantern post** was hidden under a tree's canopy; the tree is gone.
+- **A timed strike (prototype, for the battle question).** After you pick a damaging move, a gold ring closes on the foe; press A as it meets the white ring for GREAT (+30%, about a fifth of a second) or GOOD (+12%, about half a second). A miss, or no press, is a normal hit. The first three times, a line under it explains. The story bible has a new section, "Battles: keep, change or pivot?", with the recommendation: keep 1 vs 1, add timing (strike now, guard next), and make sprouts the team that breaks an alpha's dark shield. A full multi-battler would cost the most and fit a 240 px screen worst.
+- Lab: 124 checks, updated: the Meadow has no alpha, the castle alpha gives the STONE SIGIL, Squire's Woods is barred until the cottage and a crop, the Hollow until the first Sigil, and the level ranges. The bug-catch check uses a grass bug in open ground (a water bug at the edge failed once).
+
+## v9.4 · 2026-11-17 · dark and lit
+
+Will: keep working. Round 3 of the story bible starts with the core reward: seeing a buddy go from dark to lit.
+
+- **Every wild buddy is dark** (`shots/v9.4-dark-and-lit.png`): a purple-black tint over its own colours and a faint haze rising off it, in the grass and in battle. That covers every foe in the story: wild buddies, alphas and Bottie's glitched team.
+- **Alphas are darkest of all**: a dark sprite, a slow purple aura and two trails of haze, until you have their Sigil. Then they stand in the field in their own colours.
+- **Calming a buddy is a light-up, not a knock-out.** When "The dark breaks!" comes up, the foe stays where it stands while the dark drains off it over about a second in a burst of rays and sparks, with a chime, and it ends in its true colours. (The battle used to watch only for "fainted", so since v9.1 wild foes just stood there; fixed.)
+- **The right sprouts say so.** When a sprout throw doesn't bloom but the kind was right for that buddy (its own kind, or one that beats it), the burn already counted double; now the battle says it: "EMBER sprouts burn bright on FERNFANG! The dark burns double. (-24)".
+- **The dome comes down as a cinematic** (`shots/v9.4-the-dome-comes-down.png`): when King Bibi agrees, the IRON DOME shrinks away over the castle in a spray of sparks while the night sky turns to dawn. Then four voices, one at a time: Bibi ("...Lower it. All of it. Yes, the whole thing. I am sure. Mostly."), the narrator, Bottie from far off ("bzzt. ...The dome is down? Uh oh. I mean: COME AT ME, GANG.") and Erin pointing you up the Peak road. A pages through, B skips.
+- **The first ring waits for you.** In a real-time run the "10 buddies shown the light" message came up during a battle, under the battle screen. A ring reached in battle is now said when you're back out.
+- Done in one new file, `sw-dark.js`: the dark version of each sprite is made once and kept.
+- Lab: 123 checks, unchanged.
+- Played in real time from the cottage (autopilot, 430x932): trained, beat the dark Meadow alpha, VERDANT SIGIL at 216 s, the first ring message shown after the battle, 0 timing flags, no page errors. One earlier run stalled at the alpha after a loss; that was the autopilot standing 3 px off its spot and never pressing A, not the game (a probe from the same spot gets CHALLENGE ALPHA). The autopilot now accepts 8 px.
+
+**Not checked:** the dome cinematic in a real run to four Sigils (checked by screenshot from its own screen); Bottie's team in its dark form in real time; iPhone.
+
+## v9.3 · 2026-11-17 · round 2: the intro, LIGHT SHOWN, a softer Meadow
+
+Will: keep working on the game. Round 2 of the story bible's fix list.
+
+- **The intro is 12 scenes** (`shots/v9.3-intro-twelve-scenes.png`), each with one voice: the promised valley in daylight (the Lantern burning, buddies and sprouts together); "Buddies did the heavy work. Sprouts carried the light."; the DATA CENTER humming under the Peak; Bottie walking in with a big red button ("Do not press. ...Oops in advance."); the glitch (a white flash, torn scanlines, SIMULATION ERROR); the Lantern cracking; King Bibi raising the dome; red eyes in the tall grass (the buddies went wild, the biggest became ALPHAS); seeds falling and growing legs; a sprout bringing the light to a buddy; Erin; Marcus. Four of the pictures are new.
+- **LIGHT SHOWN.** Every wild buddy you calm counts: a battle won, a bloom in battle, or a bloom in the grass. It shows in the pause menu header, and each new one floats "LIGHT SHOWN n" over you.
+- **The Lantern grows a ring every 10.** Each ring gives the keeper a gift, which is where Erin's and Marcus's old keeper perks went: 10 is GREEN HANDS (+1 from every harvest), 20 is WARM LIGHT (buddies heal a little after each win), 30 is BIG HEART (buddies hit 12% harder). Each ring also gives 3 hearts.
+- **The King wants a calm valley.** Four Sigils are not enough on their own: King Bibi lowers the dome when you also have 20 buddies shown the light ("The buddies out there are still wild, keeper. 3 calmed. I need 20."). The goal line counts them for you.
+- **The Meadow looks softer** (`shots/v9.3-meadow-soft-edges.png`): tall grass ends in ragged tufts instead of square blocks, pond corners are rounded with reeds at the water's edge, and flowers grow along the roads. This applies to every wild area.
+- **The GUIDE caught up with the story.** The Valley page talked about four gyms; it now explains the alphas and their Sigils, and a new LIGHT SHOWN page explains the counter, the rings and the King's condition. A few leftover lines ("the gyms await", "sectors and gyms") now point at the alphas.
+- **Every menu matches the new pause menu.** Buddies, Build, the Guide, the Bug Jar and the work board use the same dark blue panels, gold selection and header as the pause menu (one shared change to the menu frame and rows).
+- **Goal lines fit the bar.** The early goals and the alpha goals are shorter, and a goal that is still too long now scrolls slowly across the bar instead of being cut off.
+- Lab: 123 checks (new: a bloom in battle and a catch in the open grass both count as LIGHT SHOWN; four Sigils with a wild valley keeps the dome up). Two checks were flaky because something else near the target could take the aim ring: the bug catch (a loose item beside the bug) and SELECT-to-battle (a tree or item beside the wild). Both tests now clear the area first. Six clean runs in a row afterwards.
+- Played in real time from the title (autopilot, 430x932): all 12 intro scenes, the opening, the starters, Erin's walk and the first catch, 0 timing flags, no page errors.
+
+**Not checked:** the Lantern ring gifts at 10, 20 and 30 in a real session; the King's 20-buddy condition in real time; the restyled menus opened by hand one by one (checked by screenshot); iPhone.
+
+## v9.2 · 2026-11-17 · first fixes from the story bible
+
+Will: make a doc of story events, triggers and ideas; the top of the map is covered; text covers too much; the tutorial pathing takes you to the old area by the trees with no path and Erin disappears; the first area is ugly; base building has to feed the goal; buddy text overlaps at the start; things trigger at odd times; more intro scenes; no more playable Marcus or Erin; the pause menus are ugly; real-world names go; aim for a four-hour game with post-game later.
+
+- **The story bible** is a doc now (Sproutwild: Story and Systems Bible): the lore, the goal loop and how every system should feed it, all 20 story beats with their triggers and problems, the opening reworked, the cast, a five-act four-hour arc with post-game ideas, and the fix list in rounds. This version is round 1.
+- **Erin keeps to the paths.** New dirt paths run off the south road to the big field and to the rocks where the PEB is buried. Erin's route finder now prefers dirt (a road tile costs 1, grass 4), so she walks you down the road and along the path instead of cutting through the trees. When she leaves she walks up the road and fades out at the gate instead of popping out of sight.
+- **The three starters stand apart**, below the road and clear of the Lantern steps, the banner and the campfire. One name tag at a time, never on top of another.
+- **The top of the map scrolls clear of the HUD.** In the wild areas the view can now go 30 px above the map's top row and 16 px past its bottom, so the top row and its exits are no longer stuck under the bars.
+- **A new pause menu**: a header with where you are, the day and your four Sigils (lit in their own colours, with how many alphas are left), eight big tiles with icons in a 2 x 4 grid, and your supplies along the bottom with colour keys. B or START goes back to play.
+- **Only the keeper is played.** The KEEPER row is gone from the menu, talking to Erin or Marcus no longer offers to hand them the lantern, and old saves load as the keeper.
+- **Real-world names are gone:** Ohio becomes the valley, Lake Erie the Wending Lake, the Cuyahoga the Crooked River, and Grasskin evolves into MOSSMAN (old saves are moved over).
+- **No more gym talk:** "How Sunkeep works" says "Light the four alphas. Each gives a Sigil."; Lantern Town, Pip and the Elder talk about alphas. The base's DATA CENTER building is now the BUDDY BARN (the Data Center is what Bottie nuked).
+- **Scenes wait for the right place:** the cottage party waits till you are by the cottage, the garden lesson till you walk to the garden, and the alpha scene till you are home.
+- Lab: 120 checks, updated for the new starter spots and the grid menu.
+- Played in real time from the title (autopilot, 430x932): the starters, Erin's walk to the south road and her Meadow walk on the dirt paths to the first catch, 0 timing flags, no page errors (`shots/v9.2-menu-and-starters.png`).
+
+**Not checked:** the rest of the Meadow walk after the PEB, Erin's fade at the gate in real time, the pause-menu tiles opening each screen by hand, iPhone. Not done yet from round 1: the keeper picking up Erin's and Marcus's perks; three beats (the send lesson, the build lesson, "That was Bottie") still start on short timers.
+
+## v9.1 · 2026-11-17 · bring the light: alphas, not gyms
+
+Will: the valley was promised to sprouts and buddies 3000 years ago. After the Data Center was nuked the light was lost; sprouts bring it back to the buddies. The goal is cleansing the dark from the buddies and showing them the light so Bibi can lower the dome and we face Bottie once and for all. No gyms or trainer battles: just buddies and alphas to bring the light to. Sprouts should matter in battles. Light enough buddies and find the Sigils, and you face Bottie. Also: Erin's first pathing looked weird.
+
+New `sw-light.js`:
+- **The four alphas hold the four Sigils.** Bring an alpha the light (wear it down, or bloom it with sprouts) and it gives up its Sigil: BLOOMBOAR in the Meadow, the VERDANT SIGIL (opens the Hollow, Squire's Woods and the Wastes); PYTHORN in Crooked Hollow, the ROOT SIGIL; STONESQUIRE in Squire's Woods, the STONE SIGIL (two Sigils open the Shore, three Gloom Hollow); AURICORN in Gloom Hollow, the GOLD SIGIL. Each one gets the cinematic, in its own colours, ending on what it opens (`shots/v9.1-bring-the-light.png`).
+- **No gyms, no trainer battles.** Trainers walk up and talk (new lines: KISS asks who keeps a promise for 3000 years; DEREK got chased off the road by wild buddies; MAMA's beach buddies hiss now; the DOME GUARDS say four Sigils and the King might listen). The gym buildings are lodges where the Ranger, Marcus and Erin point you at the alphas; the Peak's is BOTTIE'S TOWER, the one battle left, open once the dome is down.
+- **King Bibi lowers the dome for four Sigils**, no fight: "Four Sigils. Four alphas, lit. ...The buddies are calm again? Fine. FINE. The dome comes down." Before that he tells you how many you have.
+- **Sprouts matter in battle.** A sprout throw that does not bloom still burns away some of the dark ("Their light burned away some of the dark. (-24)" on the Meadow alpha). Wild fights end "The dark breaks! BLOOMBOAR settles down, calm."
+- **Story text:** the intro opens on the 3000-year promise; Erin: "Cleanse the dark from the buddies. Show them the light."; Marcus: "Four alphas hold four Sigils, bro. Light them all, Bibi drops the dome, and we face Bottie." The Elder and the scene after your first crop point you at the alphas. Goal lines lead alpha to alpha, then to the King, then to Bottie's tower.
+- **The Meadow alpha is Lv6**, from simulations: every starter at Lv6 with a Lv4 buddy wins 3 of 3 against it (at Lv7, two starters lost every time). Real time with the autopilot: cottage to the first Sigil in about 6.5 minutes (train to Lv6, lose once, rest, win), 0 flags, no page errors.
+- **Erin's first walk** (Sunkeep to the south road) walked straight across the garden plots. She now follows a path, down the east lane and round the garden to the gate.
+- Lab: 120 checks (new: trainers only talk; the Meadow alpha gives the VERDANT SIGIL; the King keeps the dome up without four Sigils and lowers it with them), twice clean.
+
+**Not checked:** Sigils 2 to 4 played by hand (the Hollow, Squire's and Gloom alphas, the King's talk in real time); Bottie's tower as the final battle in real time; iPhone.
+
+## v9.0 · 2026-11-16 · the story as it stands: Bottie is the villain
+
+Will set the lore: King Bibi is the king, and he raised the IRON DOME when the light went out. When the light went out the buddies began to roam wild, and someone found that sprouts bring the light back to them and restore order. The villain is BOTTIE: he nuked the DATA CENTER, which glitched the Sproutwild simulation. We use sprouts to bring the light back, restore order among the buddies, and collect the four Sigils to restore order in the kingdom.
+
+Every line that told the story was reworked to match, in the same voice (`shots/v9.0-intro.png`, `shots/v9.0-story-scenes.png`):
+- **The intro, 8 slides:** the Lantern lit the valley and every buddy lived in good order; "Then BOTTIE nuked the DATA CENTER. The whole simulation glitched, and the Great Lantern cracked."; BOTTIE: "bzzt. CLANK. Oops. Anyway, the feed is mine now, gang."; KING BIBI: "Citizens! The light is out. Stay calm. I am raising the IRON DOME. Temporarily."; in the dark the buddies went wild; the light fell as seeds that grew legs, SPROUTS, and a sprout thrown at a wild buddy makes it remember; Erin: light the Lantern, calm the buddies, bring the order back; Marcus: four gyms, four Sigils, the kingdom back in order, and Bibi drops the dome.
+- **The Lantern waking**, Marcus: "Bet King Bibi saw that from inside his dome. Peek out, your majesty. It is safe-ish."
+- **Lantern Town**, the Elder: when the light went out the King raised his dome and shut the roads, and the buddies went wild; the Ranger kept one road open; four Sigils and the King will believe it is safe again.
+- **After Bottie's visit**, Erin and Marcus: "That was Bottie. He's the one who nuked the Data Center." / the sim glitched, the Lantern cracked, the buddies went feral, the King hid in a dome / he wants the light for his feed, so we bring it back first / four Sigils, then up the PEAK to unplug him.
+- **Bottie's arrival** now owns it: "The Data Center? Upgrade, gang. Your little sim runs on MY rules now. Clank."
+- **King Bibi in Gloom Hollow** is the cautious King, not a villain: he raised the dome because somebody had to, asks you to prove the valley is safe, and when you win: "Fine. FINE. The dome comes down. Order is restored." Then: "Bottie is up there. Go unplug that robot, keeper. And knock first." His DOME GUARDS keep the roads shut "till the valley is safe".
+- **The guide's VALLEY page** tells the same story.
+- Checked: all 8 slides fit on a phone-shaped screen; the Elder, Erin/Marcus and the King's lines played and fit their boxes. Lab: 119 checks clean.
+
+## v8.9 · 2026-11-16 · more story: the intro, the King, the cast; a full garden no longer blocks you
+
+Will: keep improving what is there (no new places); a little more explaining in the intro; more scenes with the cast; explain the villain.
+
+- **The intro is 8 slides** (was 3), one short line each, A to go on (`shots/v8.9-intro.png`): the Lantern cracks; its light becomes SPROUTS; the wild buddies go dim and sprouts can carry the light back; KING BIBI ("the light is weeks away. Hence, my IRON DOME"); the narrator on the IRON DOME posts walling the roads ("'Temporary,' he said. They never came down."); Bibi's motive ("A dark valley needs a strong king. Stay home. Stay dim. Trust the dome."); Erin's hope (Sunkeep's soil still grows; light the Lantern and his domes lose their grip); Marcus's plan (four gyms, four Sigils, each opens a road, then the King's dome).
+- **Villain scenes with the cast** (`shots/v8.9-villain-scenes.png`):
+  - When the Lantern wakes, Marcus: "Bet King Bibi saw that from behind his dome. Good. Let him squint, bro."
+  - First visit to Lantern Town, the Elder: the town was the brightest street in the valley until Bibi's domes shut the roads, trade and the light; the Ranger kept its one road open.
+  - Back at Sunkeep after Bottie's visit, Erin and Marcus on the King: thirty years of "weeks away"; "Every road he domes off is a road the light can't reach. A dark valley keeps him king."; four Sigils and they walk up to his dome.
+- **Fixed: a full garden blocked the crop step.** In a real playthrough every plot ended up holding a grown sprout, so there was nowhere to plant the berries the goal asked for. The goal now says "Garden full: pluck a sprout, then grow BERRIES", and Erin's garden lesson says so too.
+- **Fixed: scenes waited minutes behind chatter.** The cottage party waited about four minutes because the cast's chat bubbles and messages kept coming. Chat now holds back for a waiting scene, and a waiting scene goes before messages not yet shown. The gym scene needs only the cottage and a crop and can play wherever you are (it plays about 16 s after planting).
+- **The placement screen says why a spot was refused** ("No room there... Try another spot."); it was hidden behind the screen.
+- Full real-time playthrough, title to the first Sigil: about 13 minutes at a slow reading pace, 0 flags, no page errors; the Elder's and Marcus's Bibi lines play. Lab: 119 checks clean.
+
+**Not checked:** iPhone. After planting, "BERRIES planted" stayed up 16 seconds in one run (longer than needed, not cut short).
+
+## v8.8 · 2026-11-16 · training, the first Sigil, and the roads opening
+
+Played from the cottage to the first Sigil in real time: the autopilot now trains like a player (SELECT battles on the nearest wild, rests at the Lantern post when its lead is hurt), then walks north and fights the Ranger.
+
+- **Real-time result:** cottage to the first Sigil in about 4 minutes. BESSLING went from Lv5 to Lv6 in about 2 minutes of SELECT battles (two rests), lost the first try at the gym, trained a little more by fighting its way back, and won the second with BESSLING Lv6 + PEBBLIT Lv5 (the shared XP from v8.7 brought PEBBLIT from Lv2).
+- **The first Sigil is a big moment now:** a cinematic in the fighter's style. Marcus cuts in ("FIRST SIGIL! That is my guy"), the Verdant Sigil slams down, then ROADS OPEN with arrows east to Crooked Hollow and south to Squire's Woods (`shots/v8.8-first-sigil.png`). In battle the Ranger adds "My barriers on the Meadow roads are down", and back in the world one line names both roads. The barriers on the map are gone.
+- **Resting at a Lantern post shows that it worked.** The rest and the travel map opened together, so "The Lantern light mends your buddies" was hidden behind the map. Now, when anyone is hurt, A heals with a sparkle and the message ("Press A again to travel"); when nobody is hurt, A opens the map.
+- **Lab:** the fiber fetch check clears nearby wilds first (the same fix as the bug check). 119 checks, twice clean.
+
+**Not checked:** a person training by hand; the gym scene can still play after you leave home if you leave within seconds of planting; iPhone.
+
+## v8.7 · 2026-11-16 · past the cottage: the road to the first gym
+
+Played past the cottage with the autopilot (it now plants a crop, walks north to Lantern Town and fights the Ranger) and with battle simulations.
+
+- **Fixed: Sunkeep Lv1 could never be finished.** The live mission check had lost two rules, so "Grow a crop on a garden plot" and "Have 3 buddies" never counted, even with berries planted.
+- **The game now points you at the gym.** Nothing did after the cottage and the crop. Now a short scene (queued right after the crop): Erin and Marcus send you up the north road to Lantern Town, say the VERDANT SIGIL opens the roads east and south, and explain the matchup: "The Ranger's buddies are LEAF kinds, Lv5. EMBER hits leaf hard. DEW and PEB get hit hard." In the field the goal line reads "Ranger gym, north road: train to Lv6 (SELECT)" until your best buddy gets there, then "win the Ranger's Sigil". At home the base missions still show.
+- **The first gym is fair now that it is on the main path.** Battle simulations (the real battle code, wild Meadow fights then the gym):
+  - Old Ranger (Lv7 FERNFANG, Lv8 BLOOMBOAR): with BESSLING it took 14 battles to reach Lv7 and still lost every time; 25 battles to Lv8 won 1 of 2.
+  - New Ranger (Lv5 MELONKIN, Lv5 FERNFANG): CUYAPUP and GRASSKIN win at Lv6 first try (7 to 9 wild battles); BESSLING, weak to leaf, wins first try at Lv7 (13 to 14 battles).
+- **The whole team shares XP**: teammates still standing get 60% of the winner's XP ("PEBBLIT grew to Lv 4 too!"). Before, your second buddy stayed at Lv2.
+- **BESSLING attack 12 -> 14.** It was strictly weaker than GRASSKIN.
+- **Pluck grown garden sprouts.** A grown sprout resting in its plot can be plucked into your squad, freeing the plot, like Sprouts. (Erin already told you to pluck them.)
+- Autopilot: can start right after the cottage (`fromCottage`), plants a crop, travels north, fights the gym, logs every goal-line change.
+- Tests: 119 checks; one run in four had "the lead buddy fetches FIBER from a thicket" fail (a single A press, a wild can take the aim); the other three clean.
+
+**Not checked:** a real player training by hand to the Sigil (the autopilot does not train); the gym scene plays at the next calm moment, which can be after you leave home if you leave within a few seconds of planting; iPhone.
+
+## v8.6 · 2026-11-16 · learn by doing before the cottage; Erin walks round the lake
+
+Will: keep play-testing and keep building learning into the onboarding.
+
+- **Three things you do yourself, after Erin's Meadow tour** (before, she listed bugs and left):
+  1. She walks you to a tree: "Homes need wood, and buddies get it. Face this tree and press A. BESSLING goes and chops it." She waits until it falls.
+  2. "Timber! See the logs? Throw sprouts at them." She waits until every log has sprouts on it. That wood goes toward the cottage.
+  3. She finds you a ladybug: "Ohio's own state bug. Face it and press A." Once it is in your jar she tells you where the jar is.
+  Then: "You're getting the hang of this. Head home when you're ready. Marcus wants to build you a cottage. Don't let him pick the paint." (Saves already past the tour are not sent back through it.)
+- **Erin walks round water and walls.** She used to walk straight across the lake to the lower field. She now follows a tile path: start to the lower field in 11 seconds, never off the ground.
+- **Fixed: a line could play twice** when Erin's dialogue was held back for a message and then overtaken.
+- Autopilot, title to the cottage party in real time: 501 s, 0 flags (nothing cut short, covered or talking over anything), no page errors; every Erin line appears exactly once. Lab: 119 checks clean.
+
+Screens: `shots/v8.6-meadow-beats.png` (the tree, the logs being carried, the ladybug, the jar).
+
+**Not checked:** iPhone. The autopilot still moves by position hooks.
+
+## v8.5 · 2026-11-16 · pacing: nothing you are told disappears; a bigger Meadow; the gym first
+
+Will played to the cottage: the side areas open too soon (the gym is north), the Meadow is tiny, Erin offers a buddy when you just got one, the PEB, the sprouts and the wild all happen at once, text pops up and is covered by a scene (right after the cottage, and early on), and the garden switches from one big bed to small plots.
+
+- **Nothing you are told disappears before you can read it** (new `sw-pace.js`). A message stays up for at least its reading time; anything said meanwhile waits its turn. Scenes, the cottage party, the how-it-works card, the sprout-kind cards, Erin's dialogue and the cast's chat bubbles all wait for the message on screen, and messages wait for them. One voice at a time. The cottage moment now runs: Marcus's line, then the hearts line, then "A roof over Sunkeep!", then the party.
+- **A bug this round's first version caused and the playthrough caught:** a held-back scene could be queued dozens of times (Erin's "Ready for the wilds?" repeated forever). Held scenes are now kept once each and play in the order they were asked for.
+- **The gym comes first.** The roads to Crooked Hollow and Squire's Woods have a RANGER'S BARRIER until you win the VERDANT SIGIL in Lantern Town (north). Walking into it says so. Louie's "OLD STONES, SOUTH!" waits for the Sigil too.
+- **The Meadow is bigger.** A Lower Meadow, 14 rows further south: a big field, a pond for water bugs, and a rocky corner. The south road now leaves from its bottom edge.
+- **Erin's walk is spread out.** Your first catch waits in the big lower field, a real walk from the start; the buried PEB is out among the rocks in the south-east; the boulder wall and the bridge are back north. She takes a short breath between lessons.
+- **Erin knows you have a buddy:** "BESSLING could use a friend. Wild ones live down in the tall grass. Follow me." (was "let's get you a buddy").
+- **One garden from the start.** The opening drew its own big bed with three mounds over the garden, then it vanished. Now the garden is the same fenced plots all along: the first seeds land in the top row and grow there, like plots in Sprouts.
+- **Bubbles stay clear of the top bars**, name tag included.
+- **A new playtest tool** (`alt/tests/sproutwild/autopilot.js`): an autopilot plays from the title to the cottage party in real time, reading every caption before pressing A, and logs every text with how long it stayed up. It flags any message cut short, any message covered by a card or cinematic, and any two voices at once. Last run: title to the cottage party in 393 s, 0 flags, no page errors. (Before these fixes it caught the WOOD line covered by the card, Louie's berry line over Erin, and Marcus's bubbles over the hearts line.)
+- Tests: 119 checks, twice clean (Meadow size, Sigil gates and the south road's new place updated).
+
+Screens: `shots/v8.5-playthrough.png` (the opening garden, the walk south, the first catch in the lower field, Erin between lessons, the PEB among the rocks, after the cottage), `shots/v8.5-rangers-barrier.png`.
+
+**Not checked:** the autopilot moves with position hooks, so real walking routes (around the lake) are not tested; iPhone.
+
+## v8.4 · 2026-11-16 · a Lanternwisp caught by hand; name tags; Louie points south
+
+Kept playing the new area and the last untried jar action.
+
+- **Caught a Lanternwisp in real time.** In Squire's Woods the ring read "CATCH · needs 7", sprouts latched on ("Latched on! Fill the bar and it blooms."), and it bloomed into a new buddy with its cinematic ("LANTERNWISP joined you!") (`shots/v8.4-wisp-caught-jar.png`).
+- **Used a bug from the jar with A.** A Ladybug became +2 berries, and the jar's footer said "+2 BERRY." Every bug action is now played: catch, night catch, use, sell.
+- **Wild name tags no longer print over each other.** Two wilds close together printed "PEBBLIT Lv" over "LANTERNWISP Lv6", and the tag sat on the player when you stood just below a wild. Now only the nearest wild shows its full name (the others show "Lv7"), and the tag moves above the wild when you stand right under it.
+- **Louie points the way south.** After your first catch, the first time you walk near the Meadow's south road (and have not been to Squire's Woods), he barks "SNIFF! OLD STONES, SOUTH!"
+- Tests: 119 checks, run 3 times clean, no page errors.
+
+**Not checked:** Louie's south hint in a real-time walk (checked by stepping the game), iPhone.
+
+## v8.3 · 2026-11-16 · Squire's Woods: the south road goes somewhere
+
+From Will's list: add a second new area, since the Meadow's south end was a dead end. New `sw-squire.js`.
+
+- **Squire's Woods**, through the Meadow's south road (opens after your first catch, like the Hollow; Louie turns you back before that). After Squire's Castle in the Chagrin valley: a stone gatehouse Feargus Squire built in the 1890s for a castle he never finished, where people say his wife still walks at night with a lantern.
+- **Two new creatures from that lore.** LANTERNWISP (EMBER/LUCKY), the lady with the lantern as a shy light sprite, always living here. STONESQUIRE (PEB), the gatehouse that got tired of waiting and stood up; it sleeps on the ruin's treasure as the alpha (Lv12).
+- **The area** (30 x 20): wilds Lv6-9, a river that cuts off the south-west meadow until your sprouts build the bridge, and the ruin behind THORN VINES that only LEAF sprouts clear. Inside: SQUIRE'S LANTERN (80 petals and 3 ingots) and a buried DEW sprout. Two ore and two fiber spots for buddies.
+- **First visit, one voice at a time:** the area banner, then Louie ("SNIFF... OLD STONES."), then one line about the gatehouse and the vines.
+- **Louie's bubble is always readable.** Arriving at a top edge put it under the goal line, and the player could walk over it. It now stays below the top bars and is drawn after the people, at home and in the field.
+- **Balance:** the alpha, fought 3 times per team: Lv9/8/8 won 2 of 3 with the last buddy on 6 HP; Lv11/10/10 won all 3; Lv13/12/12 won easily. Same shape as the Python. Kept.
+- Tests: 119 checks (8 new: south road shut before the first catch, road leads there, arrive heading south, alpha guards the treasure, wilds Lv6+ with a Lanternwisp, sprouts build the bridge, LEAF sprouts clear the vines, the way back). Real time: walking the Meadow's south road reaches the woods in 1.7 s, and the first-visit lines come one after another.
+
+Screens: `shots/v8.3-squires-woods.png` (the ruin's vine gate, STONESQUIRE and LANTERNWISP in battle), `shots/v8.3-arrival.png` (Louie speaks once the banner has gone).
+
+**Not checked:** catching a Lanternwisp by hand in real time, the treasure carried home in real time, iPhone.
+
+## v8.2 · 2026-11-16 · night bugs and Pip, played; garden confirmed
+
+Will: "Keep playtesting and improving." Played the open v8.1 items.
+
+- **Garden plots confirmed.** A planted plot grows on screen like the opening's seeds: planted, shoot at about 10 s, head at about 20 s, full bud at 30 s (`shots/v8.2-garden-grows.png`). The v8.1 doubt came from my test scripts, not the game.
+- **The seed is easier to see.** It was brown on a brown plot. Now it is a pale seed with a dark rim.
+- **Night bugs and selling, played.** At night in the Meadow a Luna Moth showed up and one A press caught it (its lore card shows). In Lantern Town: START, BUG JAR, SELECT, and Pip paid 25 petals. A second run did the same with a Lightning Bug for 8 (`shots/v8.2-night-moth-to-jar.png`).
+- **The jar now says what happened.** Selling, using a bug, or trying to sell outside town only showed a message in the world behind the menu, so nothing visible happened. The jar's footer now says it for 3 seconds: "PIP paid 25 petals for a LUNA MOTH. You have 25." (`shots/v8.2-jar-sold.png`).
+- **"LIGHTNING BUG" fits its jar row** (the yield reads "+1 LIGHT"; it was cut to "LIGHTNING ...").
+- **The intermittent lab failure is explained.** Repeated 30 times, the bug-catch check failed only when a wild buddy stood next to the bug and took the aim (the ring shows which one A will hit, so the game is behaving as designed). The check now clears wilds first: lab 111 of 111 in 6 runs.
+- Real-time playtest from the title: opening, berries, Lantern waking, starter pick (BESSLING), Marcus's buddy lines, Erin's walk to the south road, arrival in the Meadow. Captions logged with times: one voice at a time, each waits for A, nothing stacked. No page errors.
+
+**Not checked:** the first catch and Erin's Meadow walk this round (verified in v8.0); turning a bug into a resource with A; balance; the second new area; iPhone.
+
+## v8.1 · 2026-11-16 · Louie finds lost sprouts; one growing look
+
+From Will's next-up list: recheck Louie fetching lost sprouts, and unify the two looks for growing sprouts in the garden.
+
+- **Louie fetches lost sprouts.** Louie only went for a lost sprout after 2.5 seconds, but the sprout gave up and flew home at 3.5, so he almost never got there. Now he starts at 0.6 seconds, and a sprout he is running to waits for him instead of giving up. Real-time run: he reaches a sprout about 2 seconds after it lands, says "FOUND ONE!", and the sprout flies home to the squad (`shots/v8.1-louie-chases.png`, `shots/v8.1-louie-found.png`).
+- **Sprouts no longer get stuck on walls.** A returning sprout pinned against a solid tile never came home: the sideways move was blocked, but the up-down move (zero distance) still counted as moving, so the "stuck" timer never ran. Now a blocked sprout flies home after 0.8 seconds.
+- **Garden sprouts grow like the opening's seeds.** Opening seeds show a seed mound, a shoot, then a leafy head. Garden sprouts used to pop in as a tiny stem, then a yellow bud, and a planted seed showed as one coloured dot. They now share the same drawing (one function), so a planted plot shows a mound, then a shoot, then a head, then the full bud at 30 seconds (`shots/v8.1-seeds-grow.png` is the opening's real-time frames, same drawing).
+- **Louie's "FOUND ONE!" bubble stays on screen.** It only clamped at the left edge, so it ran off the right when Louie fetched something near the edge.
+- Tests: 111 checks. Headless stepped check of Louie's fetch at 70, 110, 160 and 240 px: every sprout comes home (160 px was stuck before the wall fix). Real-time from the title through the opening: intro, Louie's berry, the three seeds growing, plucking them, the Lantern moving on. No page errors.
+
+**Not verified:**
+- Garden plots in real time. In my frames a planted plot showed its soil mound and a glint, but I could not confirm the stalk and head on that tray, and main behaved the same in my harness. Check on the phone before trusting it.
+- The lab check "a sprout thrown at a bug catches it" failed in 2 of 7 runs on this branch (intermittent, random bug positions; the `main` build passed 4 of 4 later, and its first baseline run also had one unnamed failure). Not explained yet; see KNOWN-ISSUES.
+- Night-only bugs and selling bugs to Pip: not played this round. Balance, and the second new area: not started.
+- Nothing has been checked on an iPhone.
+
 ## v8.0 · 2026-11-16 · an opening you earn
 
 Will's notes: the first sprouts popped up by the Lantern and then came from a garden nobody explained; things were explained too fast and one message vanished almost at once; in the Meadow Louie talked about catching and then Erin arrived, which was confusing; Erin should lead you out after the base basics and hold your hand; the first battle could start by accident; some menus were cut off; growing sprouts should look like they grow.

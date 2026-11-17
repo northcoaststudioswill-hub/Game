@@ -3,9 +3,17 @@
 Read this first in a new session. Details live in `CHANGELOG.md` (newest at top),
 `DESIGN-v7.md` (research and system decisions) and `PLAYTEST-NOTES*.md`.
 
+## The story (Will, v9.0)
+- BOTTIE is the villain: he nuked the DATA CENTER, the Sproutwild simulation glitched and the Great Lantern cracked.
+- KING BIBI is the king: when the light went out he raised the IRON DOME ("temporarily") and shut the roads.
+- In the dark the buddies went wild. Sprouts carry the light that calms them and restores order.
+- The valley was promised to sprouts and buddies 3000 years ago. Goal: cleanse the dark from the buddies, show them
+  the light. No gyms, no trainer battles (v9.1): the four ALPHAS give the four Sigils (sw-light.js); four Sigils and
+  the King lowers the dome; Bottie's tower on the Peak is the final battle. Sprouts matter in battle. Tone: warm Erin, Marcus "bro", Bottie "bzzt, clank, gang".
+
 ## Ground rules from Will
-- Branch `claude/festive-knuth-f30w4u`. Commit locally; **push only when Will says "push"**
-  (plain push, never force). 16 commits are unpushed as of v8.0.
+- Branch for v8.1: `claude/sproutwild-v8.1`, made from `main` (earlier rounds used `claude/festive-knuth-f30w4u`).
+  Commit locally; **push only when Will says "push"** (plain push, never force). Merge to main only when asked.
 - No PRs unless asked. Never delete or overwrite `backups/` or older version folders.
 - Do not touch `docs/index.html` (public Pages, still the 4-cart build) without his go-ahead.
 - The playable build is published at https://claude.ai/artifact/KqmxEmur2YMFoFLYjp7MNx
@@ -17,7 +25,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
   (order listed in `SPROUTWILD=[...]`; later files override earlier functions by redeclaring them;
   `const` names must be unique). Output: `alt/games/pocket-lantern-alt.html` (~14.5 MB, limit 16).
 - `python3 alt/build.py` then `node alt/tests/sproutwild/field-lab.js alt/games/pocket-lantern-alt.html`
-  (111 checks; lab turns off scenes, the buddy cap, bugs and Louie's digging so results are steady).
+  (124 checks; lab turns off scenes, the buddy cap, bugs and Louie's digging so results are steady).
 - Test hooks: `window.__g.SWF()` (state, meta, enter, travel, setPos, pos, near, fld, bf, wilds,
   bugs, plots, cast, walk, lst, scene, noScenes, noCap, noBugs, ...).
 - Real-time playtests: Playwright scripts in the session scratchpad (`play31.js` = title to first
@@ -45,11 +53,10 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - Live pause menu is in `sw-save.js` (not sw-module.js).
 
 ## Open items / ideas not done
-- Louie's stray-fetch not re-checked after v7.8; real-time bug catch had one miss (stepped run 4/4).
-- Garden has two growth looks (first seeds vs later patch sprouts); unify if Will notices.
-- Night-only bugs, bug selling, and turning bugs into resources not tried in play.
+- v8.2 confirmed the garden look in play, played night bugs and selling to Pip, and fixed the lab flake.
+- Real-time bug catch had one miss in v7.9; a nearby wild buddy takes the aim (ring shows it).
 - Balance needing a long session: crop timing, build time, catch odds after the first, starters.
-- A second new area (Meadow's south end is a dead end); more Ohio lore (Haserot Angel, Franklin Castle...).
+- More areas and Ohio lore (Haserot Angel, Franklin Castle...).
 - Narrow-path crowding mostly addressed (buddies trail in a line), not confirmed on phone.
 
 ## Will's taste (learned over the sessions; keep doing this)
@@ -77,7 +84,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
   and `let` names must be unique across all files, or the page fails to load.
 - Build order (see `SPROUTWILD=[...]` in `alt/build.py`): sw-cartart, sw-module, sw-field, sw-front,
   sw-base, sw-art, sw-story, sw-battle, sw-save, sw-text, sw-cast, sw-party, sw-scene, sw-starters,
-  sw-plots, sw-hollow, sw-louie, sw-bugs, sw-walk, sw-open2.
+  sw-plots, sw-hollow, sw-squire, sw-louie, sw-bugs, sw-walk, sw-open2, sw-meadow2, sw-pace, sw-sigil, sw-lore, sw-light, sw-menu, sw-dark, sw-castle, sw-sunkeep, sw-louie2.
 - Several functions exist in more than one file on purpose (the later one is live). Known pairs:
   `swPauseUpdate/drawPause` (live: sw-save.js), `cotUpdate/drawCot` (live: sw-story.js),
   `wQuestText` (two copies in sw-story.js; the second is live), `wBaseArrive`, `scIntro`, `scWake`,
@@ -110,8 +117,8 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - Base trees regrow after 75 s, rocks after 90 s. Kiln: 1 ore -> 1 ingot (2 with a skilled worker).
 - Plots: berries ripen in 60 s, fiber in 90 s (faster with WATERING or PLANTING buddies at home).
 - Lantern: every 4 deliveries grows a sprout. Lightning bugs add light.
-- Starters: CUYAPUP 34hp/14atk, BESSLING 38/12, GRASSKIN 40/14; evolve at Lv16 (CUYAFLARE, BESSIE,
-  GRASSMAN). First gym (Ranger, Lantern Town) opens with Lv7 and Lv8. Python alpha Lv11.
+- Starters: CUYAPUP 34hp/14atk, BESSLING 38/14 (was 12), GRASSKIN 40/14; evolve at Lv16. First gym (Ranger, Lantern
+  Town) is MELONKIN Lv5 + FERNFANG Lv5 since v8.7 (was Lv7/8); the team shares 60% XP. Python alpha Lv11.
 
 ### Tests and playtests
 - `alt/tests/sproutwild/field-lab.js` steps the real game with `G.update(1/30)` in headless Chromium.
@@ -137,3 +144,43 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v7.2 to v7.7: evolutions, how-it-works card, base goals, regrowth, SELECT battles, goal hints.
 - v7.8: Louie like Sprouts. v7.9: bugs and jar, Erin's Meadow walk, kind cards.
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
+- v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
+  "FOUND ONE!" bubble stays on screen.
+- v9.8: Meadow entrances swapped (BASE at the top of the main road, TOWN in the corner; sw-castle.js); Erin waits at
+  (19,21) on first visit; lesson loop east field, PEB (27,15), wall, bridge; tutorial gating wTutStage/wTutAim/wTutNear
+  in sw-louie2.js (off in SCOFF, so the lab never sees it).
+- v9.7: Louie drawn the Sprouts way and rides strays home (sw-louie2.js: louDraw, louFetch, fLouTick); scWalkUp
+  (Erin/Marcus walk up before speaking, injected in scStart); garden of 12 plots that grows (WPLOTS, wPlotCount,
+  wPlotSync, wGardenBake in sw-sunkeep.js); scaffolds need buddies (scConTick); day 1 held until the cottage; 1.5 s
+  between scenes (W4.scEndT).
+- v9.6: Sunkeep props (WPROPS in sw-sunkeep.js; drawn via wDrawDecor, used via 'prop' near, kept off build cells by
+  wPropBlocks) and wStoryBeats (night fire, ready for the castle, courtyard, first light), called from scGymCheck.
+- v9.5: first alpha is STONESQUIRE in Squire's castle (sw-castle.js: map moves, wBarred/wBarredSay, castleBake in
+  fBake, castle reveal sqArrive, Lantern post lesson, FSIGNS road signs); timed strike prototype (aimUpdate/aimDraw in
+  sw-dark.js, BT.phase 'aim', BT.aimX in wDamage). Meadow has no alpha; BLOOMBOAR alpha is in the Wastes.
+- v9.4: dark and lit forms (sw-dark.js: wDarkImg tints a sprite once, wDarkHaze; field wilds, alphas until their
+  Sigil, battle foes; "The dark breaks!" now drives a light-up in sw-battle.js instead of a faint).
+- v9.3: 12-scene intro (scenes 6-9 new in swDrawIntro), LIGHT SHOWN counter (SW.shown, wShowLight in sw-light.js;
+  the King needs WSHOWN=20 plus 4 Sigils; rings at 10/20/30 carry the old Erin/Marcus perks), soft field edges in fBake,
+  scrolling goal bar.
+- v9.2: story bible doc (https://claude.ai/artifact/A3MMHmbJHANhn1Z9WmbFq6) and round 1 of its fix list: Erin keeps to
+  dirt paths (cost-based route), starters spread out, map edges scroll clear of the HUD, grid pause menu (sw-menu.js),
+  keeper only (no Erin/Marcus switching), real-world names out (GRASSMAN is MOSSMAN), Data Center building is the Buddy Barn.
+- v9.1: bring the light - alphas give Sigils, no gyms or trainer battles, sprout light burn, Meadow alpha Lv6,
+  Erin's Sunkeep escort pathed round the garden.
+- v9.0: the story reworked to Will's lore (Bottie the villain, Bibi the king behind his dome) across the intro,
+  scenes, Bottie, the King's fight, his guards and the guide.
+- v8.9: sw-lore.js (8-slide intro, Elder and Erin/Marcus scenes about KING BIBI), full-garden hint, scenes no
+  longer wait behind chatter, gym scene anywhere after the crop.
+- v8.8: first Sigil cinematic (sw-sigil.js, state g4sigil), Ranger's roads-open line, rest/travel split at posts,
+  autopilot trains (SELECT + rest) and plays cottage -> Sigil in ~4 min.
+- v8.7: gym guidance (scGymCheck, wGymGoal), first gym rebalanced, XP share, crop/buddies missions fixed,
+  pluck grown garden sprouts. Autopilot `fromCottage` start.
+- v8.6: Erin's hands-on beats after the Meadow tour (SW.walk3: chop, carry, ladybug), tile pathing (ewGo).
+- v8.5: sw-pace.js (message queue; scenes, cards, dialogue and bubbles wait their turn), Ranger's barrier until the
+  first Sigil, Lower Meadow (sw-meadow2.js), one garden from the start. Autopilot playtest: `alt/tests/sproutwild/autopilot.js`.
+- v8.4: Lanternwisp caught by hand, jar use played, one wild name tag at a time, Louie points south.
+- v8.3: Squire's Woods south of the Meadow (`sw-squire.js`), LANTERNWISP and STONESQUIRE.
+- v8.2: garden look confirmed, visible seed, night bugs and Pip played, jar shows results, lab flake fixed.
+- Playtest tip: build with `?dev` in the URL and `window.__g.ev(code)` runs code inside the game scope
+  (read W4, wrap functions, set dayT for night). Wait 4.4 s after picking the cart before driving it.

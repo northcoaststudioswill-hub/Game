@@ -88,7 +88,7 @@ function wkTick(dt){if(!W4.bf)return;wkSync();const bench=SW.buildings.find(b=>b
    if((b.out||0)>=3){if(w.kind!=='s')w.task=null;else w.task=wkPick(w);continue}
    if(b.k==='kiln'&&!(SW.res.ore>0)){b.busy=0;if(((time*.5)|0)%4===0&&!b.noOre){b.noOre=1;W4.floats.push({x:wCellX(b.gx)+10,y:wCellY(b.gy)-6,txt:'THE KILN NEEDS ORE',t:1.6,c:'#e88'})}else if(((time*.5)|0)%4!==0)b.noOre=0;if(w.kind!=='s'){w.task={k:'idle',x:w.hx,y:w.hy,t:4}}continue}
    b.prog=(b.prog||0)+lv*dt;
-   if(b.prog>=16){b.prog=0;if(b.k==='kiln')SW.res.ore--;const luck=wkAt(b).some(w2=>wkSkills(w2).FORTUNE),n=(b.k==='kiln'?1:2)+(lv>=2?1:0)+(luck?1:0)+(SW.keeper==='ERIN'?1:0);
+   if(b.prog>=16){b.prog=0;if(b.k==='kiln')SW.res.ore--;const luck=wkAt(b).some(w2=>wkSkills(w2).FORTUNE),n=(b.k==='kiln'?1:2)+(lv>=2?1:0)+(luck?1:0)+((SW.shown||0)>=10?1:0);
     W4.bf.items.push({k:'pel',res:def.yields,n,w:1,x:wCellX(b.gx)+10+(Math.random()*8-4),y:wCellY(b.gy)+33+(b.out||0)*3,car:[],from:b});
     W4.floats.push({x:wCellX(b.gx)+10,y:wCellY(b.gy)-6,txt:def.yields.toUpperCase()+' READY',t:1.2,c:'#ffd94d'});swSnd(880,.05,1175);
     if(Math.random()<(SW.buildings.some(bb=>bb.k==='statue')?.7:.35)&&(W4.groundHearts||[]).length<8){W4.groundHearts=W4.groundHearts||[];W4.groundHearts.push({x:wCellX(b.gx)+4+Math.random()*12,y:wCellY(b.gy)+38})}
