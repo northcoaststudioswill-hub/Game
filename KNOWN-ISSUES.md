@@ -2,9 +2,13 @@
 
 Updated Nov 17 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v10.1)
+## Sproutwild (cartridge 5, v12.0)
 
 ### Known bugs
+- v12.0: you can't pick which buddy tends which crop plot; the best waterer or planter tends all of them.
+- v12.0: old saves lose any crop that was set on a soil plot (crops live on built CROP PLOTs now). Buildings an old save put where a street now runs stay there.
+- v12.0: a crop plot can't be removed or moved once placed.
+- v11.0: the three town houses are rooms to look at only.
 - v10.1: nobody has played the new castle puzzle or the tutorial fight from a fresh save by hand yet.
 - v10.1: a buddy sent to a job across a pond hops straight to it (no walk-around path).
 - v10.1: the old-saves test can't run here (old builds missing), so old saves are untested against the new castle map.

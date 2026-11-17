@@ -195,13 +195,13 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  /* v7.0: garden plots grow what you choose */
  {S.buildings=[];S.box=[];S.plotCrop={};F.build('cottage',18,12);F.enter('BASE');step(5);const pl=F.plots();
   ok('the garden bed building is retired',!F.builds().includes('bed')&&F.builds().includes('datacenter'),F.builds().join());
-  if(!pl.some(q=>q.type<0&&!q.crew)){const q=pl[pl.length-1];Object.assign(q,{type:-1,seedTy:null,crew:false,mode:'soil',age:-4,stage:0,by:null})}
-  const ix=pl.findIndex(q=>q.type<0&&!q.crew);ok('there is an empty plot to plan',ix>=0,pl.map(q=>q.type).join());
-  F.plotSet(ix,'berry');const b0=S.res.berry;ok('a plot can be set to berries',pl[ix].crop==='berry'&&S.plotCrop[ix]==='berry');
-  F.dayT(20);F.setPos(60,460);for(let i=0;i<1500&&!pl[ix].ripe;i++)step(1);ok('berries ripen on the plot',pl[ix].ripe===true,Math.round(pl[ix].cg||0)+' type'+pl[ix].type+' seed'+pl[ix].seedTy+' crop'+pl[ix].crop+' same'+(F.plots()===pl)+' crew'+pl[ix].crew+' mode'+pl[ix].mode+' st'+F.state()+' q'+S.quest);
+  /* v12: the soil grows sprouts only; crops grow on a CROP PLOT you build */
+  ok("the Lantern's soil takes no crops",pl.every(q=>!q.crop),pl.map(q=>q.crop||'-').join());
+  F.build('plot',3,14);step(5);const cp=F.plots().find(q=>q.plotB),b0=S.res.berry;ok('a built crop plot starts with berries',!!cp&&cp.crop==='berry'&&cp.type<0,cp&&cp.crop);
+  F.dayT(20);F.setPos(60,460);for(let i=0;i<1500&&!cp.ripe;i++)step(1);ok('berries ripen on the plot',cp.ripe===true,Math.round(cp.cg||0)+' st'+F.state()+' q'+S.quest);
   F.giveMon('PEBBLIT',4,true);for(let i=0;i<1500&&S.res.berry<=b0;i++)step(1);ok('a home buddy harvests and the berries reach the Lantern',S.res.berry>b0,S.res.berry+' vs '+b0);
-  ok('no sprout seed takes a crop plot',pl[ix].type<0&&pl[ix].seedTy==null);
-  F.plotSet(ix,null);ok('the plot can go back to sprouts',!pl[ix].crop&&S.plotCrop[ix]===undefined)}
+  ok('no sprout seed takes a crop plot',cp.type<0&&cp.seedTy==null);
+  S.buildings=S.buildings.filter(q=>q.k!=='plot');step(3);ok('a removed crop plot leaves the patch',!F.plots().some(q=>q.plotB))}
  /* v7.0: Crooked Hollow, east of the Meadow */
  {F.travel('MEADOW','BASE');step(3);let f2=F.fld();const q0=S.quest,b0=S.badges;S.badges=[];F.setPos(34*16+2,9*16+10);f2.dir=[1,0];f2.arrive=null;for(let i=0;i<40;i++)step(1,['right']);ok('the Hollow is barred until your first Sigil',F.fld().id==='MEADOW');S.quest=Math.max(5,q0);S.badges=['VERDANT SIGIL'];
   F.setPos(34*16+2,9*16+10);f2.dir=[1,0];f2.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='MEADOW';i++)step(1,['right']);f2=F.fld();

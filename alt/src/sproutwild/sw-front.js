@@ -250,8 +250,7 @@ function wBakeGround(){const sec=wSector(W4.sector),wh=W4.wh||360,B=FBIO.MEADOW;
  if(sec.id==='BASE'){
   path(WW/2-13,88,26,236);path(WW/2-13,392,26,wh-392);     /* lantern to garden, garden to gate (v11: wider) */
   for(let py=118;py<wh-10;py+=9){if(py>322&&py<408)continue;R('#b8a880',WW/2-5+((py/9|0)%2)*2,py,8,6);R('#c8b890',WW/2-5+((py/9|0)%2)*2,py,8,1)} /* a paved middle */
-  path(84,120,312,14);path(84,134,14,292);path(98,412,134,14); /* the keepers' lanes */
-  path(322,198,14,214);path(248,412,88,14);
+  for(const S of WSTREETS)path(S.x0,S.y-7,S.x1-S.x0,14); /* v12: three streets off the avenue; the old web of lanes is gone */
   /* plaza */
   for(let px=196;px<284;px+=11)for(let py=92;py<116;py+=8){R('#6e6350',px+((py/8|0)%2)*5,py,11,8);R(((px+py)/4|0)%2?'#a39a86':'#948a76',px+((py/8|0)%2)*5,py,10,7);R('#b8b09c',px+((py/8|0)%2)*5,py,10,1)}
   /* the garden: fenced, tilled, with room to grow (v9.7) */

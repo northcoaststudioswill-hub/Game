@@ -503,7 +503,7 @@ function wSproutInfo(px,py){ /* the catch-all: any sprout can be asked what it i
   msg:TYPES[f.type].n+' SPROUT · '+(f.mode==='haul'?'hauling a find home!':f.mode&&f.mode[0]==='b'?'working the patch — it hauls finds home on the road':'following you — it hauls finds home')};
  {const wd=(W4.wilds||[]).find(w2=>Math.hypot(px-w2.x,py-w2.y)<17);
   if(wd)return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv,x:wd.x,y:wd.y}}
- if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)if(pb.type<0&&Math.hypot(px-pb.x,py-pb.y)<15)
+ if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)if(pb.plotB&&pb.type<0&&Math.hypot(px-pb.x,py-pb.y)<19)
   return{k:'plot',pb,txt:pb.crop?(pb.ripe?'HARVEST '+WCROPS[pb.crop].n:WCROPS[pb.crop].n+' · growing · A changes it'):pb.seedTy!=null?TYPES[pb.seedTy].n+' SEED · A changes this plot':'EMPTY PLOT · choose what grows'};
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)if(pb.type>=0&&pb.stage<2&&Math.hypot(px-pb.x,py-pb.y)<15)
   return{k:'sproutinfo',txt:'ASK',x:pb.x,y:pb.y,msg:TYPES[pb.type].n+' SPROUT · still growing — grown sprouts work'};
@@ -535,7 +535,7 @@ function wNear(){const sec=wSector(W4.sector),px=P3.x+P3.ax*13,py=P3.y+P3.ay*13;
  if(sec.gym>=0&&Math.hypot(px-WW/2,py-66)<20)return{k:'gym',txt:'GYM'};
  if(W4.sector!=='BASE'&&Math.hypot(px-WW/2,py-(W4.wh-22))<17)return{k:'sign',txt:'LANTERN GATE'};
  if(W4.sector==='BASE'){for(const b of SW.buildings){const bx=wCellX(b.gx)+10,by=wCellY(b.gy)+12;
-   if(Math.hypot(px-bx,py-by)<18)return{k:'bld',b,txt:wBuildDef(b.k).n}}
+   if(Math.hypot(px-bx,py-by)<18)return{k:'bld',b,txt:b.k==='plot'?wPlotLabel(b):wBuildDef(b.k).n}}
   if(Math.hypot(px-WW/2,py-74)<24)return{k:'lantern',txt:'THE GREAT LANTERN'}}
  if(aimT)return null;
  if(W4.sector==='BASE'&&(Math.hypot(px-lou.x,py-lou.y)<17||louPetOK()))return{k:'louie',txt:'PET LOUIE'}; /* Louie and people come last: they follow you about and must never take the button from what you are facing */
@@ -647,7 +647,7 @@ function worldUpdate(dt){if(W4.scene){scTick(dt);return}scAuto();if(W4.fld){fUpd
   else if(n.k==='choice'){W4.choiceSp=n.sp;state='g4choice'}
   else if(n.k==='wild'){const wd=n.wd;W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=18;
    wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv))}
- else if(n.k==='plot'){if(n.pb.crop&&n.pb.ripe)plHarvest(n.pb);else{W4.plotPb=n.pb;swSel=n.pb.crop==='berry'?1:n.pb.crop==='fiber'?2:0;state='g4plot'}}
+ else if(n.k==='plot'){if(n.pb.crop&&n.pb.ripe)plHarvest(n.pb);else{W4.plotPb=n.pb;swSel=n.pb.crop==='fiber'?1:0;state='g4plot'}}
  else if(n.k==='gpluck'){const pb=n.pb,tn=TYPES[pb.type].n;SW.buds[tn]=(SW.buds[tn]||0)+1;W4.floats.push({x:pb.x,y:pb.y-16,txt:'A '+tn+' SPROUT!',t:1.6,c:TYPES[pb.type].l});
   Object.assign(pb,{type:-1,stage:0,age:-4,mode:'soil',seedTy:null,item:false,forPlot:null,bush:null});swSnd(880,.07,1320);if(!SW.lessons.gpluck){SW.lessons.gpluck=1;swSay('Plucked! The plot is free again. Garden sprouts plant new seeds in empty plots.',3)}swSave()}
  else if(n.k==='sproutinfo'){W4.floats.push({x:n.x,y:n.y-16,txt:n.msg,t:2.2,c:'#cfe0b8'});swSnd(660,.05,880)}
@@ -674,7 +674,8 @@ function worldUpdate(dt){if(W4.scene){scTick(dt);return}scAuto();if(W4.fld){fUpd
   else if(n.k==='louie')wLouTalk();
   else if(n.k==='lantern'){if(!wLit())swSay('The Great Lantern is dark and cracked. It is hungry for anything that grows.',3.2);else{swSel=0;state='g4lamp'}}
   else if(n.k==='bld'){const b=n.b;
-   if(b.k==='cottage'){swSel=0;state='g4cot'}
+   if(b.k==='plot'){const pb=(W4.patchBuds||[]).find(q=>q.plotB===b);if(pb){if(pb.ripe)plHarvest(pb);else{W4.plotPb=pb;W4.plotMsg=null;swSel=pb.crop==='fiber'?1:0;state='g4plot'}}}
+   else if(b.k==='cottage'){swSel=0;state='g4cot'}
    else if(b.k==='nursery'){W4.nurB=SW.buildings.indexOf(b);swSel=0;state='g4nur'}
    else if(b.k==='bench'){swSel=0;state='g4tools'}
    else if(b.k==='datacenter'){swSel=0;state='g4party'}
@@ -1122,7 +1123,7 @@ function wFit(s,n){if(tw(s,1)<=n)return s;let o=s;while(o.length&&tw(o+'…',1)>
 const WQUEST=['Talk to Louie','Choose your first buddy','Catch a wild buddy','Build a COTTAGE (START, BUILD)','Grow BERRIES: A on a garden plot'];
 function wQuestTick(){
  if(SW.quest===3&&SW.buildings.some(b=>b.k==='cottage'&&!b.con)){SW.quest=4;
-  swSay('A roof over Sunkeep! Now grow BERRIES on a garden plot.',3.4);swSnd(784,.09,1175);swSave()}
+  swSay('A roof over Sunkeep! Now build a CROP PLOT: START, then BUILD.',3.4);swSnd(784,.09,1175);swSave()}
  else if(SW.quest===4&&(plCrops()>0||SW.buildings.some(b=>b.k==='bed'))){SW.quest=5;
   swSay('Sunkeep stands! The valley is yours, keeper. The alphas await.',3.8);swSnd(784,.09,1175);swSave()}}
 let BT=null;

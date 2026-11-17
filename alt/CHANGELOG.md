@@ -3,6 +3,41 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v12.0: Sunkeep, redesigned (Will, Nov 17)
+Will: cluttered, hard to build at, characters ignore the paths, weird plots; grow sprouts in one big bed like Sprouts, then placeable plots, buddies working them, level-gated recipes; keep the furniture; more lore; clean it up.
+
+Layout
+- One avenue from the Lantern to the south gate, and three streets off it: Lantern Row, Field Lane, Gate Lane. The old web of lanes is gone.
+- The land between the streets is open for building.
+
+Building
+- The build screen tints every free spot green, and the cursor starts on the nearest free spot to you.
+- Streets and furniture can't be built on.
+
+People
+- Erin, Marcus and the home workers walk along the avenue and the streets and step off only at the end. Measured: Erin was on a road in 36 of 38 samples while crossing the whole base.
+
+The Lantern's soil
+- One big bed with a stone edge and stepping stones where the avenue crosses it. Sprouts come up in it as before (6 spots, 8 with the cottage, 12 at Sunkeep Lv2). No stakes or little frames.
+- It grows sprouts only now. Old saves: any crop set on a soil plot is cleared.
+
+Crop plots
+- CROP PLOT is a new thing to build (2 wood, needs the cottage). You place it where you like. It starts with BERRIES; A on it changes the crop or harvests.
+- FIBER REEDS need Sunkeep Lv2.
+- 2 plots at Sunkeep Lv1, 4 at Lv2, 6 at Lv3.
+- The best home waterer or planter tends them, and the plot's label names who ("BERRIES · 40% · DRIZZLET tends it"). Picking a buddy per plot by hand is not built yet.
+- The tutorial step "grow berries on a garden plot" is now "build a CROP PLOT". Erin's garden talk and the hints say so.
+
+Recipes
+- Gated by Sunkeep's level: TONIC and ROPE at Lv1, SEED POUCH and LANTERN OIL at Lv2, LUCKY CHARM at Lv3. First guesses.
+
+Lore to read (A)
+- The Lantern plaque, the founders' stone, the sign at the soil, the waystone at the gate. Two lines each.
+
+Pacing (found by the v11 fresh-save run): Erin's "why" talk fired at home while the cottage was going up. It now only plays out in the field.
+
+Checked: field lab (plot checks rewritten for the new rules); real-time at 430x932: the whole base, placing a plot through the menus, growth, a buddy's harvest, the fiber gate, a plaque.
+
 ## v11.0: Will's notes after playing to the Bibi scene (Nov 17)
 Pacing
 - Erin's "why" talk now waits until her tutorial is over. It used to land in the middle of it, right after the battle lesson.

@@ -17,9 +17,9 @@
  const K_=FMAPS.MEADOW.key.M;if(K_)K_.after='One question: did you bring LEAF sprouts? The castle gate down this road is all thorns.'}
 function wTutDone(){return SW.quest>=5||((SW.walk2||0)>=10&&(SW.walk3||0)>=7)}
 /* ---- 2. pacing ---- */
-function wWhyReady(){return wTutDone()&&(W4.whyW||0)>=10}
+function wWhyReady(){return wTutDone()&&!!W4.fld&&(W4.whyW||0)>=6}
 function wQuietTick(){const calm=state==='g4world'&&!W4.scene&&!swBusy()&&!(W4.fld&&W4.fld.dlg);if(!calm)return;const L=SW.lessons;
- if(L.defeat1===1&&wTutDone())W4.whyW=(W4.whyW||0)+1/60;
+ if(L.defeat1===1&&wTutDone()&&W4.fld)W4.whyW=(W4.whyW||0)+1/60; /* v12: out in the field only, never on top of the cottage */
  if(L.defeat1===2&&!L.soul1&&W4.fld)W4.beamW=(W4.beamW||0)+1/60;
  const F=W4.fld;if(F&&F.id==='MEADOW')for(const np of F.npcs)if(np.who==='KISS'){if(!wTutDone()){if(np.x>-900){np.kx=np.x;np.ky=np.y}np.x=-999;np.y=-999}else if(np.x<-900){np.x=np.kx==null?np.hx:np.kx;np.y=np.ky==null?np.hy:np.ky}}}
 function wBeamReady(){return!!W4.fld&&(W4.beamW||0)>=60}
