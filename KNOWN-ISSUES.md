@@ -106,6 +106,7 @@ From [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), still open:
 ## Sprouts (cartridge 1, the valley update)
 
 ### Fixed Nov 17 2026
+- Sprouts that cannot swim were left standing in the pond when Louie brought them home across water.
 - Erin's garden beds drew a Sproutwild menu, Louie's speech bubbles never showed, and the valley project screen was
   Sproutwild's (shared function names). All three were broken in every build since Sproutwild joined.
 
@@ -120,7 +121,10 @@ From [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), still open:
 
 ### Balance to check
 - The bridge takes 80 sprout-seconds (12 sprouts: about 7 s). Nectar blooms up to 12 sprouts, six blossoms a day.
-- `tests/sprouts_tour.js` still wanders into the house on the berry step and stays there (the bot, not the game).
+- The objective autopilot in `tests/sprouts_soak.js` reliably clears Erin's first three asks and sometimes reaches the
+  garden; past that it is the bot that stalls (it cannot use the house desk). The mid-game is covered by its chaos runs.
+- All 13 sprouts thrown into the garden become gardeners and stay there. That is how the garden has always worked, but
+  it empties the crew quickly; worth a look on the phone.
 
 ## Sprouts and Patch & Plate (cartridges 1 and 4)
 

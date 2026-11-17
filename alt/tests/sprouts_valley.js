@@ -24,17 +24,17 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   await step(30 * 14); ok('the bridge gets built and can be walked', await E('!gates[5].alive&&map[11*MW+60]===D&&fieldL[8*MW+61]>0'), await E('msg'));
   await tp(63, 5); await E(`buds.forEach(b=>b.stage=0);void 0`); await step(4); await throwFor(2); await step(60);
   ok('nectar blooms the crew', (await E('buds.filter(b=>b.stage===2).length')) === 12, await E('msg'));
-  await tp(66, 8); await step(4); await throwFor(120); const d0 = await E('run.delivered'); let t = 0; for (; t < 90; t++) { await step(30); if (await E('run.delivered') > d0) break; }
-  ok('the golden pear is carried home over the bridge', t < 90, t + ' s'); ok('the lantern throws its seeds', (await E('seeds.length')) > 0, await E('seeds.length'));
+  await tp(66, 8); await step(4); await throwFor(120); const d0 = await E('run.delivered'); let t = 0; for (; t < 450; t++) { await step(6); if (await E('run.delivered') > d0) break; }
+  ok('the golden pear is carried home over the bridge', t < 450, Math.round(t / 5) + ' s'); ok('the lantern throws its seeds', (await E('seeds.length')) > 0, await E('seeds.length'));
   const n0 = await E('sprouts.length'); await step(45); ok('the seeds land and sprout', await E(`seeds.length===0&&sprouts.length>${n0}`));
-  await E(`run.spark={x:23*16+8,y:21*16+8,i:3,hp:8};digSync();void 0`); await tp(23, 23); await step(4); await throwFor(40);
+  await E(`run.spark={x:23*16+8,y:21*16+8,i:3,hp:DIGHP};digSync();void 0`); await tp(23, 23); await step(4); await throwFor(40);
   ok('sprouts dig at the buried spot', await E('DIG.on.length>0||!DIG.alive'), await E('DIG.on.length'));
   for (t = 0; t < 40; t++) { await step(30); if ((await E('state')) === 'card') break; }
   ok('the treasure is dug up, carried home and filed', await E(`state==='card'&&meta.trs.includes(3)`), await E('card&&card.title')); await E(`state='play';void 0`);
   await E(`run.spark={x:24*16+8,y:19*16+8,i:5,hp:.01};digSync();buds[0].tgt=DIG;buds[0].st='work';DIG.on.push(buds[0]);seeds.push({type:2,tx:420,ty:370,t:0});void 0`); await step(2);
   const sig = `JSON.stringify([sprouts.length+seeds.length,buds.length,items.filter(i=>i.alive).map(i=>i.sub+(i.tri===undefined?'':i.tri)).sort(),gates.map(g=>g.alive)])`;
   const a = await E(sig); await E(`restore(JSON.parse(JSON.stringify(snap())));void 0`); ok('save and load keep the bridge, a treasure in transit and seeds in the air', a === await E(sig));
-  ok('a save from before this update still loads', await E(`(()=>{init();const o=JSON.parse(JSON.stringify(snap()));delete o.gates.orchardBridge;o.items=o.items.filter(q=>q[0]==='berry'||q[0]==='big'||q[0]==='shard').map(q=>q.slice(0,6));o.run.spark={x:400,y:300,i:1};restore(o);return gates[5].alive&&run.spark.hp===8&&DIG.alive})()`));
+  ok('a save from before this update still loads', await E(`(()=>{init();const o=JSON.parse(JSON.stringify(snap()));delete o.gates.orchardBridge;o.items=o.items.filter(q=>q[0]==='berry'||q[0]==='big'||q[0]==='shard').map(q=>q.slice(0,6));o.run.spark={x:400,y:300,i:1};restore(o);return gates[5].alive&&run.spark.hp===DIGHP&&DIG.alive})()`));
   await E(`newDay();void 0`); ok('nectar blossoms open again in the morning', (await E(`items.filter(i=>i.alive&&i.sub==='nectar').length`)) === 6);
   /* the prequel pass */
   ok('seven wild buddies live in the valley, with Sproutwild art', await E(`wbuds.length===7&&wbuds.every(q=>!!wbSprite(q))`));

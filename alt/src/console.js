@@ -426,13 +426,13 @@ function updRes(dt){for(const q of resid){q.t-=dt;if(q.t<=0){const z=RZ[q.job];q
 function enterHome(){buds.forEach(b=>{if(b.st==='ride'){b.st='follow';b.z=0}});LO.riders=[];parked=buds.filter(b=>b.st==='follow');parked.forEach((b,k)=>{b.st='park';b.x=DOOR.x-18+(k%7)*6;b.y=DOOR.y+8+((k/7)|0)*5});
  inHome=true;P.x=RX+88;P.y=RY+94;P.dx=0;P.dy=-1;LO.st='follow';LO.x=LO.sx=P.x+20;LO.y=LO.sy=P.y-6;trail=[];mkRes();cam.x=RX+88-W/2;cam.y=RY+42-H/2;noise(.06,.3,500,'lowpass');snd(330,.08,440,'triangle',.06);}
 function exitHome(){inHome=false;P.x=DOOR.x;P.y=DOOR.y+12;P.dx=0;P.dy=1;parked.forEach(b=>{if(b.st==='park')b.st='follow'});parked=[];LO.st='follow';LO.x=LO.sx=P.x-20;LO.y=LO.sy=P.y+4;trail=[];cam.x=P.x-VW/2;cam.y=P.y-VH/2;noise(.06,.3,500,'lowpass');}
-const DIG={kind:'dig',x:0,y:0,r:5,alive:false,on:[]};
-function digSync(){DIG.on.length=0;const q=run.spark;if(q){DIG.x=q.x;DIG.y=q.y;DIG.alive=true;if(q.hp===undefined)q.hp=8}else DIG.alive=false}
+const DIGHP=14,DIG={kind:'dig',x:0,y:0,r:5,alive:false,on:[]};
+function digSync(){DIG.on.length=0;const q=run.spark;if(q){DIG.x=q.x;DIG.y=q.y;DIG.alive=true;if(q.hp===undefined)q.hp=DIGHP}else DIG.alive=false}
 function updDig(dt){const n=DIG.on.length,q=run.spark;if(!n||!q)return;q.hp-=n*dt;DIG.on.forEach(b=>{b.fx=DIG.x>b.x?1:-1});if(Math.random()<dt*9)puff(DIG.x+R(-5,5),DIG.y,'#a87850',1,28);if(sndT<=0){snd(150+Math.random()*60,.03,90);sndT=.14}
  if(q.hp<=0){const it=mkItem('trs',q.x,q.y);it.tri=q.i;it.w=2+q.i%3;run.spark=null;DIG.alive=false;DIG.on.slice().forEach(b=>{b.z=0;b.tgt=it;b.st='seek';b.t=0});DIG.on.length=0;
   puff(q.x,q.y,'#f8e060',10,45);snd(784,.1);later(()=>snd(1175,.15),100);say('DUG UP: '+TRS[q.i][0]+'!  CARRY IT HOME TO THE LANTERN',5);spSay('DUG IT UP!',3);persist()}}
 function newSpark(){run.spark=null;digSync();sniffT=20;const un=TRS.map((q,i)=>i).filter(i=>!meta.trs.includes(i)&&!items.some(k=>k.alive&&k.sub==='trs'&&k.tri===i));if(!un.length)return;const zs=ZONES.filter(z=>(run.seen&&run.seen[z[0]])||z[0]==='LANTERN FIELD');
- for(let k=0;k<40;k++){const z=zs[(Math.random()*zs.length)|0],tx=z[1]+((Math.random()*z[3])|0),ty=z[2]+((Math.random()*z[4])|0);if(map[ty*MW+tx]===G&&fieldL[ty*MW+tx]>=0&&d2({x:tx*16+8,y:ty*16+8},HX,HY)>60*60){run.spark={x:tx*16+8,y:ty*16+8,i:un[(Math.random()*un.length)|0],hp:8};digSync();return}}}
+ for(let k=0;k<40;k++){const z=zs[(Math.random()*zs.length)|0],tx=z[1]+((Math.random()*z[3])|0),ty=z[2]+((Math.random()*z[4])|0);if(map[ty*MW+tx]===G&&fieldL[ty*MW+tx]>=0&&d2({x:tx*16+8,y:ty*16+8},HX,HY)>60*60){run.spark={x:tx*16+8,y:ty*16+8,i:un[(Math.random()*un.length)|0],hp:DIGHP};digSync();return}}}
 let sniffT=0;
 
 /* ---------- objectives ---------- */
@@ -448,7 +448,7 @@ const isBerry=i=>i.alive&&(i.sub==='berry'||i.sub==='big');
 const nearBerry=()=>near(items,i=>isBerry(i)&&reachable(i))||near(items,isBerry)||SOIL;
 const nearShard=()=>near(items,i=>i.alive&&i.sub==='shard')||near(foes,e=>e.alive&&e.boss)||{x:HX,y:HY};
 const nearBug=()=>near(bugs,q=>q.alive&&!q.hid)||{x:42*16,y:18*16};
-const AT={e1:()=>near(sprouts,()=>true)||SOIL,e2:nearBerry,e3:()=>LO,e4:()=>SOIL,e5:()=>GARD,e6:()=>GARD,e7:nearBerry,e8:nearShard,e9:()=>GARD,e10:()=>GARD,e11:()=>DOOR,
+const AT={e1:()=>near(sprouts,()=>true)||SOIL,e2:nearBerry,e3:()=>LO,e4:()=>near(sprouts,q=>inSoil(q)&&stageOf(q)===2)||SOIL,e5:()=>GARD,e6:()=>GARD,e7:nearBerry,e8:nearShard,e9:()=>GARD,e10:()=>GARD,e11:()=>DOOR,
  r1:()=>gates[0],r2:()=>({x:23*16+8,y:4*16+8}),r3:()=>gates[1],r5:()=>gates[5],r4:()=>near(foes,e=>e.alive&&e.boss)||nearShard(),
  s1:()=>({x:51*16+8,y:24*16+8}),s2:nearBug,s3:()=>near(foes,e=>e.alive&&!e.boss)||{x:44*16,y:16*16},s4:nearBug,
  m1:()=>({x:10*16,y:12*16+10}),m2:()=>near(items,i=>i.alive&&i.isle)||{x:HX,y:HY},m3:()=>({x:7*16+8,y:16*16+8})};
@@ -644,7 +644,7 @@ function cycleSel(){for(let n=1;n<=NT;n++){const t=(sel+n)%NT;if(squad.some(b=>b
 function call(x,y,rad){for(const b of buds){if(b.st==='follow'||b.st==='fly')continue;if(d2(b,x,y)<rad*rad){release(b);b.gard=false;b.st='follow';}}}
 function doA(fresh){
  if(P.pluck>0||P.stun>0)return;
- let s=null,bd=17*17;for(const q of sprouts){const d=d2(q,P.x,P.y);if(d<bd&&q.age>.5){bd=d;s=q}}
+ let s=null,bd=1e9;for(const q of sprouts){const d=d2(q,P.x,P.y);if(d<17*17&&q.age>.5){const k=d-stageOf(q)*400;if(k<bd){bd=k;s=q}}} /* the most grown sprout in reach, then the nearest */
  if(s){P.pluck=.2;P.pl=s;return;}
  if(fresh&&!P.mv){for(const n of npcs)if(facing(n,24)){talk(n);return}
   if(run.boss&&!inHome&&facing(THORN,28)){say(['THORNBACK: SO WARM. THANK YOU, KEEPER.',"THORNBACK: I'LL KEEP WATCH TONIGHT.",'THORNBACK: THE SMALL ONES TICKLE.'][(day+run.pets)%3],4);snd(110,.25,80,'sine',.3);return}
@@ -669,6 +669,7 @@ function avoid(b){for(const n of npcs){const dx=b.x-n.x,dy=b.y-n.y,d=Math.hypot(
 function updBud(b,dt){
  const T=TYPES[b.type],sp=T.sp*(b.stage===2?1.25:1),swim=b.type===2;b.mv=false;if(b.cheer>0)b.cheer-=dt;
  if(b.st==='carry'||b.st==='fight'||b.st==='work'){b.xp+=dt;if(!b.star&&b.xp>=40){b.star=true;puff(b.x,b.y-8,'#f8e060',6,30);snd(1175,.08,1568);if(!run.starSaid){run.starSaid=1;say('A SPROUT EARNED A GOLD STAR! STARS CAN MOVE INTO YOUR HOUSE',7)}}}
+ if(!swim&&(b.st==='follow'||b.st==='idle')&&tileAt(b.x,b.y)===WA){puff(b.x,b.y,'#a8d8ff',5,30);b.st='fly';b.ret=true;b.sx=b.x;b.sy=b.y;b.tx=P.x;b.ty=P.y;b.t=0;snd(240,.08,160)}
  switch(b.st){
  case 'follow':{const i=b.si||0,p=trail[Math.min(trail.length-1,2+((i/3)|0)*2)]||P;
    const tx=p.x+((i%3)-1)*6,ty=p.y+(((i*7)%5)-2)*2,d=Math.hypot(tx-b.x,ty-b.y);go(b,tx,ty,Math.min(sp,80)*(d>40?1.5:1),dt,swim,3);
@@ -724,7 +725,7 @@ function updLouie(dt){const l=LO,lv=louLv();if(l.say)l.say.t-=dt;l.mv=false;l.cd
   if(walk(118+lv*8)||d2(l,b.x,b.y)<14*14){const got=[b];if(lv>=3)for(const q of buds)if(q!==b&&q.st==='idle'&&!q.gard&&got.length<8&&d2(q,b.x,b.y)<70*70&&(lv>=4||tileAt(q.x,q.y)!==WA))got.push(q);
    got.forEach(q=>{q.st='ride';q.tgt=null;l.riders.push(q)});bark();louXP(3*got.length);l.st='bring';l.rt=0;l.path=null}return}
  if(l.st==='bring'){if(!l.riders.length){l.st='follow';l.sx=l.x;l.sy=l.y;return}l.rt-=dt;if(l.rt<=0||!l.path||!l.path.length){l.rt=.8;l.path=pathTo(l.x,l.y,P.x,P.y,true)||[{x:P.x,y:P.y}]}
-  walk(118+lv*8);if(d2(l,P.x,P.y)<30*30){l.riders.forEach((b,i)=>{b.st='follow';b.z=0;b.x=l.x+((i%3)-1)*5;b.y=l.y+4});const n=l.riders.length;l.riders=[];l.st='follow';l.sx=l.x;l.sy=l.y;bark();spSay(n>1?'FOUND '+n+'!':'FOUND ONE!')}return}
+  walk(118+lv*8);if(d2(l,P.x,P.y)<30*30&&free(l.x,l.y,false)){l.riders.forEach((b,i)=>{b.st='follow';b.z=0;b.x=l.x+((i%3)-1)*5;b.y=l.y+4;if(!free(b.x,b.y,false)){b.x=l.x;b.y=l.y}});const n=l.riders.length;l.riders=[];l.st='follow';l.sx=l.x;l.sy=l.y;bark();spSay(n>1?'FOUND '+n+'!':'FOUND ONE!')}return}
  if(d2(l,P.x,P.y)>230*230){l.x=P.x+(free(P.x+20,P.y,false)?20:free(P.x-20,P.y,false)?-20:0);l.y=P.y+(l.x===P.x?10:2);l.sx=l.x;l.sy=l.y;l.st='follow'}
  if(l.st==='sit'){l.t-=dt;if(l.t<=0)l.st='follow';return}
  if(l.st==='dig'){if(l.t>0){const d=go(l,l.tx,l.ty,95,dt,false,3);l.tt+=dt;if(d<5||l.tt>3){l.t=0;l.dt=1.4}}
@@ -1080,7 +1081,7 @@ function trArt(i,x,y){const c=TRS[i][1],k='#181020',m=i%4;
  else if(m===2){r(k,x-4,y-3,9,6);r(k,x-3,y-4,7,8);r(c,x-3,y-2,7,4);r(c,x-2,y-3,5,6)}else{r(k,x-1,y-5,3,10);r(k,x-4,y-2,9,4);r(c,x,y-4,1,8);r(c,x-3,y-1,7,2);r(c,x-1,y-2,3,4)}
  r('#ffffff',x-1,y-2,1,1);}
 function drawSpark(){const q=run.spark,x=q.x-ox,y=q.y-oy,p=((time*5)|0)%4;r('#6e4428',x-4,y,8,2);r('#a87850',x-2,y-1,4,1);const yy=y-7-(p===1?1:0);g.fillStyle='rgba(248,224,96,'+(.18+.14*Math.sin(time*5)).toFixed(2)+')';g.beginPath();g.arc(x+.5,yy+.5,9,0,7);g.fill();r('#f8e060',x-1,yy-4,3,9);r('#f8e060',x-4,yy-1,9,3);if(p<2){r('#ffffff',x-1,yy-1,3,3)}else r('#ffffff',x,yy,1,1);r('#fff8a0',x+5,yy-5+(p%2),1,1);r('#fff8a0',x-6,yy+2-(p%2),1,1);
- if(q.hp<8){r('#181020',x-7,y+4,14,4);r('#f8d030',x-6,y+5,Math.round(12*Math.max(0,1-q.hp/8)),2)}}
+ if(q.hp<DIGHP){r('#181020',x-7,y+4,14,4);r('#f8d030',x-6,y+5,Math.round(12*Math.max(0,1-q.hp/DIGHP)),2)}}
 function drawSeed(q){if(q.t<0)return;const t=Math.min(1,q.t),x=Math.round(HX+(q.tx-HX)*t-ox),gy=HY-8+(q.ty-HY+8)*t,y=Math.round(gy-Math.sin(Math.PI*t)*26-(1-t)*22-oy),T=TYPES[q.type];r('rgba(0,0,0,.22)',x-1,Math.round(gy-oy),3,1);r('#181020',x-2,y-2,5,5);r(T.c,x-1,y-1,3,3);r(T.l,x-1,y-1,1,1)}
 function drawHome(){r('#0c0a12',0,0,W,H);const X=RX-ox,Y=RY-oy,k='#383048',J=home.jobs,zk=Math.min(1.3,(W-4)/182,(H-74)/150);g.save();g.translate(W/2,H/2-6);g.scale(zk,zk);g.translate(-W/2,-H/2);
  r(k,X-3,Y-33,182,36);r('#e8d8b8',X,Y-30,176,30);for(let i=0;i<11;i++)r('#dcc8a0',X+i*16+7,Y-30,2,26);r('#a87048',X,Y-4,176,4);
@@ -1509,7 +1510,7 @@ function draw(){
   if(!hp&&OBJ&&((time*3)|0)%2){const X=Math.round(mx+OBJ.x*3/16),Y=Math.round(my+OBJ.y*3/16);r('#f8e060',X-5,Y-5,10,1);r('#f8e060',X-5,Y+4,10,1);r('#f8e060',X-5,Y-5,1,10);r('#f8e060',X+4,Y-5,1,10)}
   if(!hp){const wx=inHome?DOOR.x:P.x,wy=inHome?DOOR.y+10:P.y;if(!inHome)dot(LO.x,LO.y,'#e89040',3);dot(wx,wy,((time*4)|0)%2?'#ffffff':'#f85888',5)}
   else{const a=postXY(hop.z),k=Math.min(1,hop.t/1.2),e2=k*k*(3-2*k),at=q=>[hop.fx+(a.x-hop.fx)*q,hop.fy+(a.y-hop.fy)*q-Math.sin(Math.PI*q)*90];for(let q=0;q<=14;q++)if(q/14<=e2){const p=at(q/14);dot(p[0],p[1],'#fff8e0',1)}const p=at(e2);dot(p[0],p[1],'#f85888',5);dot(a.x,a.y,((time*5)|0)%2?'#f8e060':'#ffffff',4)}
-  for(const z of ZONES)if(!run.seen||run.seen[z[0]]||z[0]==='LANTERN FIELD'){const n=z[0].replace("THORNBACK'S ",'').replace("ERIN'S ",'').replace('SUNNY ','').replace('PEBBLE ','').replace(' FIELD','').replace('NORTH ','').replace('DEW ',''),w=tw(n,1);text(n,Math.max(2,Math.min(W-w-2,Math.round(mx+(z[1]+z[3]/2)*3-w/2))),my+(z[2]+z[4])*3-1,1,'#fff8e0')}
+  for(const z of ZONES)if(!run.seen||run.seen[z[0]]||z[0]==='LANTERN FIELD'){const n=zName(z[0]).replace('WILLOW ','').replace("THORNBACK'S ",'').replace("ERIN'S ",'').replace('SUNNY ','').replace('PEBBLE ','').replace(' FIELD','').replace('NORTH ','').replace('DEW ',''),w=tw(n,1);text(n,Math.max(2,Math.min(W-w-2,Math.round(mx+(z[1]+z[3]/2)*3-w/2))),my+(z[2]+z[4])*3-1,1,'#fff8e0')}
   if(hp){ctext('TO '+zName(hop.z[0]),1,3,'#f8e060')}else{text('MAP',5,1,3,'#f8e060');let lx=64;[['WILL','#ffffff'],['LOUIE','#e89040'],['SHARD','#f8d030'],['HOME','#c04848']].forEach(([n,c])=>{r('#181020',lx,5,6,6);r(c,lx+1,6,4,4);text(n,lx+9,3,1,'#c8c0d8');lx+=tw(n,1)+17});
   box(170,146,70,14,'rgba(24,16,32,.9)');text('B: BACK',180,147,2,'#a098b0')}}
  else if(state==='house'){text('HOME',5,1,3,'#f8e060');walletBox(3);const sq=inHome?parked:buds.filter(b=>b.st==='follow'),ns=sq.filter(b=>b.star).length,J=home.jobs,rest=homeTotal()-J[0]-J[1]-J[2],uc=UPCOST[home.up];

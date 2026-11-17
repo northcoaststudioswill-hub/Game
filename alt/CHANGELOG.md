@@ -3,6 +3,35 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: the checking pass (Nov 17 2026)
+
+Will: another pass refining the new Pikmin mechanics and making sure the game does what it means to.
+
+How it was checked: two autopilots that play through the real controls (`tests/sprouts_soak.js`). One follows the
+objective marker from a fresh save. The other wanders a mid-game valley throwing at everything, whistling, travelling and
+opening menus. Every second they check that no sprout is in a wall or in water, every worker is on the thing it thinks it
+is working on, nothing carried takes 90 s to arrive, and nothing throws an error.
+
+**Bugs they found, now fixed:**
+- **Sprouts left standing in the pond.** Louie swims home with strays on his back and set them down as soon as he was near
+  Will, even mid-pond. Sprouts that cannot swim then stood in the water, and with Louie under level 4 nothing could fetch
+  them. This was in the game before the valley update. Louie now only sets riders down on dry land, and any non-swimmer
+  that ends up in water hops back to Will.
+- **"PLUCK 3 BLOOMED" pointed at the middle of the soil**, not at a bloomed sprout. It now points at a bloomed sprout in
+  the lantern soil when there is one.
+- **A in a crowded soil patch took the nearest sprout** even with a bloomed one beside it. It now takes the most grown
+  sprout in reach, then the nearest.
+- **On the map, WILLOW FALLS was written over GARDEN.** It is FALLS now. The map also says SUNKEEP once the arch is read.
+
+**Tuned:** digging a treasure takes 14 sprout-seconds (was 8; a full crew finished before you saw it).
+
+**Looked at and found right:** Erin's garden beds through a real harvest (the autopilot filled her first flower ask),
+the valley project screen, Ranger's bridge ask and its text, the trail post list with nine places.
+
+**Tested:** `tests/sprouts_soak.js`: Erin's day plus three chaos seeds of two days each, all clean.
+`tests/sprouts_valley.js` 25 checks, 10 runs in a row (two of its checks had timing flakes in the test itself; fixed).
+Sproutwild lab 124 of 124. **Not tested:** by hand, or on a phone. `tests/sprouts_tour.js` is superseded by the soak test.
+
 ## Sprouts: the prequel pass (Nov 17 2026)
 
 Will: Sprouts can be a prequel to Sproutwild. Bottie blows up the Data Center later; everyone is called to the Lantern and
