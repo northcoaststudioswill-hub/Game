@@ -2,18 +2,34 @@
 
 Updated Nov 17 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v12.0)
+## Sproutwild (cartridge 5, v12.10)
 
-### Known bugs
-- v12.4: the buddy you set to tend a plot does not walk over and stand at it; the bonus applies wherever it is.
-- v12.0: old saves lose any crop that was set on a soil plot (crops live on built CROP PLOTs now). Buildings an old save put where a street now runs stay there.
-- v12.0: a crop plot can't be removed or moved once placed.
-- v11.0: the three town houses are rooms to look at only.
-- v10.1: nobody has played the new castle puzzle or the tutorial fight from a fresh save by hand yet.
-- v10.1: a buddy sent to a job across a pond hops straight to it (no walk-around path).
-- "BERRIES planted" stayed up 16 s in one run (too long, not too short). Not looked into yet.
-- One real-time bug catch missed during testing in v7.9 (a step-by-step run caught 4 of 4). Not seen since; a wild
-  buddy next to a bug takes the aim, which may be what happened.
+### Not confirmed
+- Nobody has played v10 to v12 by hand on a phone yet. Everything was checked by scripts on a 430 x 932 screen.
+- The first Guardian fight was tested with real turns for three starter teams, but only once each.
+- Sigils 2 to 4, Bottie's tower and the post-game are untouched by this work and still unplayed.
+
+### Waiting on Will
+- The fire starter (CUYAPUP) loses to the stone Guardian at the level the game asks for. The game now warns the player. Should the numbers change too?
+- "SOUL LAMP" and "release" are placeholder words.
+- Is the keeper locked to Will? The menu still lets a player pick Erin or Marcus.
+- Why Sunkeep exists and who called the three of them there (see `alt/STORY-NOTES.md`).
+- Expedition numbers, recipe levels and the Buddy Barn's price (8 stone, 6 wood) are first guesses.
+
+### Known gaps
+- The buddy you set to tend a plot does not walk over and stand at it; the bonus applies wherever it is.
+- A crop plot can't be removed or moved once placed.
+- Old saves lose any crop that was set on a soil plot (crops live on built crop plots now). A building an old save put where a street now runs stays there.
+- The three town houses are rooms to look at only.
+- A buddy sent to a job past a pond or a wall hops straight to it (no walk-around path).
+- The travel scene has its own landmark for five areas; the rest show plain trees.
+- One real-time bug catch missed during testing in v7.9 (a step-by-step run caught 4 of 4). Not seen since.
+
+### Fixed in v10 to v12 (the big ones)
+- v12.10: reopening the game with a file-1 save that held a Buddy Barn or a crop plot crashed before the title.
+- v12.3: text hung on screen for up to 41 seconds through scenes and menus; dozens of wild buddies could pile up after the first catch.
+- v12.1: home workers never reached a building site away from the avenue, so the cottage was never built.
+- v10.3: a trainer walking up while a message showed froze everything near you, the Lantern post included.
 
 ### Fixed in v9.7
 - Garden plots 7 and 8 never worked (plots were only made once; the ground drew 6). The garden now grows to 12, and opens plots as it goes.

@@ -1,5 +1,9 @@
 const { chromium } = require('playwright');const sl=ms=>new Promise(r=>setTimeout(r,ms));const fs=require('fs');
-const OLD='/tmp/claude-0/-home-user-Game/4295d2ac-667f-508f-a732-c766830c9e74/scratchpad/old-v99.html',NEW='/home/user/Game/alt/games/pocket-lantern-alt.html';
+// Usage: node alt/tests/sproutwild/old-saves-from-main.js   (run from the repo root; needs the `main` branch locally)
+// Builds three saves with main's copy of the game, then continues each one in the working build and reports errors.
+const path=require('path'),os=require('os'),cp=require('child_process');
+const OLD=path.join(os.tmpdir(),'pocket-lantern-main.html');fs.writeFileSync(OLD,cp.execSync('git show main:alt/games/pocket-lantern-alt.html',{maxBuffer:1<<28}));
+const NEW=process.argv[2]||path.resolve(__dirname,'../../games/pocket-lantern-alt.html');
 const boot=async(p,f)=>{await p.goto('file://'+f+'?dev');await sl(700);await p.evaluate(()=>{document.querySelector('.cart[data-i="4"]').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}))});await sl(3200)};
 const key=async(p,k)=>{await p.evaluate(k=>{window.__g.keys[k]=1},k);await sl(70);await p.evaluate(k=>{window.__g.keys[k]=0},k);await sl(150)};
 const SETS={
@@ -17,6 +21,5 @@ for(const [name,set] of Object.entries(SETS)){
  await sl(2500);for(let i=0;i<10;i++){if(!(await p2.evaluate(()=>window.__g.ev('!!W4.scene||!!(W4.fld&&W4.fld.dlg)'))))break;await key(p2,'a');await sl(500)}
  for(const k of ['up','left','down','right']){await p2.evaluate(k=>{window.__g.keys[k]=1},k);await sl(500);await p2.evaluate(k=>{window.__g.keys[k]=0},k)}
  const info=await p2.evaluate(()=>window.__g.ev("JSON.stringify({state,sec:W4.sector,q:SW.quest,w2:SW.walk2,party:SW.party.map(m=>m.sp+m.lv),goal:wQuestText(),plots:(W4.patchBuds||[]).length,crops:plCrops(),plotCropLeft:Object.keys(SW.plotCrop||{}).length,bld:SW.buildings.map(b=>b.k),sigHome:SW.sigHome,keys:Object.keys(localStorage).length})"));
- await p2.screenshot({path:'/tmp/claude-0/-home-user-Game/4295d2ac-667f-508f-a732-c766830c9e74/scratchpad/v10/old_'+name+'.png'});
  console.log((errs.length?'FAIL ':'PASS ')+name+'  '+info+(errs.length?'  ERR '+JSON.stringify(errs.slice(0,2)):''));bad+=errs.length?1:0;await c2.close()}
 console.log(bad?bad+' saves broke':'all old saves load');await b.close()})();

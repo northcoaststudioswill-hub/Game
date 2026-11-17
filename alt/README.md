@@ -29,7 +29,8 @@ real game can't read or overwrite Erin's Patch & Plate days, Rootdeep runs, or a
 | `src/patchplate.js` | Patch & Plate (cartridge 4). Unchanged from v0.3 on purpose. |
 | `src/sproutwild/` | Sproutwild (cartridge 5): eleven files, see its own `README.md` and `CHANGELOG.md`. |
 | `backups/` | Frozen builds. Never edit. |
-| `tests/sproutwild/` | Sproutwild's checks and playtest scripts. |
+| `STORY-NOTES.md` | Will's story decisions for Pocket Lantern, and what is still open. |
+| `tests/sproutwild/` | Sproutwild's checks. `field-lab.js` (step-by-step rules, about 90 s). `checkpoint.js <html> <out> <point>` plays one stretch in real time from a saved point: `walkend`, `plot`, `barn`, `castle`, `reload` (30 to 100 s each). `old-saves-from-main.js` makes saves with main's build and continues them here. `autopilot.js` is a full fresh-save run (slow; use the checkpoints first). |
 | `build.py` | `python3 alt/build.py` assembles `games/pocket-lantern-alt.html`. The 13 MB of embedded music is read from the v0.3 build (read-only), not copied. |
 | `tests/ko_lab.js` | Knockout lab: feel metrics (jump arc, pose snap, hit slide, juggles), frame sheets, the new modes, a text audit of every menu. |
 | `tests/fable_lab.js` | Fable pass 1: parry, wall bounce, K.O. frame, stances, rules and Trials (20 pass/fail checks, sheets in `playtest/fable/`). |
