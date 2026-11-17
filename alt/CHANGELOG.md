@@ -3,6 +3,18 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v12.9: a fair warning before the first Guardian
+- Fought the stone Guardian for real, every turn, with each starter at the level the game asks for (Lv6) and a Lv3-4 second buddy:
+  - BESSLING (water): wins with 28 of 68 health left. With timed taps: wins.
+  - GRASSKIN (leaf): wins with 29 of 70 left.
+  - CUYAPUP (fire): loses. Both buddies down, the Guardian still at 28 of 88. Fire does 0.625x to stone, water and leaf do 1.6x.
+- The game never told a fire-starter player any of that. Now:
+  - The goal line says "Stone GUARDIAN: lead with DRIZZLET (START, BUDDIES). CUYAPUP is weak to stone", or to catch a DEW or LEAF buddy if you have none.
+  - At the Guardian, the first A press with a weak lead gets Louie: "CUYAPUP barely scratches this one. DEW or LEAF kinds wear it down." and who to lead with. The second press fights anyway.
+- The numbers themselves are unchanged. Whether the fire starter should be able to win at Lv6 is Will's call.
+
+Checked: field lab; the castle checkpoint (18 of 18); the warning and the second press with a fire lead.
+
 ## v12.8: the Sigil stones come home
 Will: "when we bring them light the sigil stones go to the lantern".
 - Four sockets are set in the Lantern's steps, two each side of its level plate. Each Sigil you win sits in one, lit in its own colour.

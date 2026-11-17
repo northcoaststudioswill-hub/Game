@@ -182,3 +182,17 @@ WLORE.sigils=['x'];
 {const _sb3=wStoryBeats;wStoryBeats=function(){_sb3();if(SCOFF||state!=='g4world'||W4.scene||swBusy()||W4.fld||W4.sector!=='BASE')return;const n=SW.badges.length;
   if(n>(SW.sigHome||0)){SW.sigHome=n;const S=Object.values(WASIG).find(q=>q.n===SW.badges[n-1])||{};
    scStart([{hold:.4},{x:240,y:110,hold:1.0},{x:240,y:110,who:'',txt:'You set the '+(SW.badges[n-1]||'Sigil')+' into the Lantern\'s steps. It fits. The Lantern burns a shade brighter.'},{x:240,y:110,who:'ERIN',txt:n>=4?'All four home. Look at it.':n===1?'One Guardian of the Light, home. Three to go.':n+' home. '+(4-n)+' to go.'},{hold:.3}],()=>swSave())}}}
+
+/* ---- v12.9: a fair warning before a bad matchup ----
+   Tested with real turns: at the level the game asks for (Lv6), the water and leaf starters beat the stone
+   Guardian with a third of their health left. The fire starter loses with the Guardian still at a third.
+   Fire does 0.625x to stone. The game never said so. Now the goal line says who to lead with, and Louie
+   stops you once at the Guardian. The second press fights anyway. */
+function wLeadMult(m,foeSp){const ft=wSp(foeSp).t;return Math.max(...wSp(m.sp).t.map(t=>wMult(t,ft)))}
+function wWeakLead(foeSp){const lead=SW.party.find(m=>m.hp>0);if(!lead||wLeadMult(lead,foeSp)>=1)return null;
+ const better=SW.party.concat(SW.box).filter(m=>m!==lead&&m.hp>0&&wLeadMult(m,foeSp)>1).sort((a,b)=>b.lv-a.lv)[0]||null;return{lead,better}}
+function wWeakWarn(al){const w=wWeakLead(al.sp);if(!w||W4.weakTold===al.sp)return false;W4.weakTold=al.sp;const kinds=[0,1,2,3,4].filter(t=>wMult(t,wSp(al.sp).t)>1).map(t=>WT[t]).join(' or ');
+ scStart([{who:'LOUIE',txt:'Grr. '+w.lead.sp+' barely scratches this one. '+kinds+' kinds wear it down. Woof.'},
+  {who:'LOUIE',txt:w.better?'Lead with '+w.better.sp+': START, BUDDIES, then A on it. Or press A here again to fight anyway.':'Catch a '+kinds+' buddy first. Or press A here again to fight anyway. Woof.'}]);return true}
+{const _gg=wGymGoal;wGymGoal=function(){const base=_gg();if(SW.quest>=5&&!SW.badges.length&&wHasDC()&&base&&/GUARDIAN/.test(base)){const w=wWeakLead('STONESQUIRE');
+  if(w)return w.better?'Stone GUARDIAN: lead with '+w.better.sp+' (START, BUDDIES). '+w.lead.sp+' is weak to stone':'Stone GUARDIAN: catch a DEW or LEAF buddy. '+w.lead.sp+' is weak to stone'}return base}}
