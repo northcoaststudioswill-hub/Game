@@ -1,5 +1,116 @@
 # THORNWATCH — Changelog
 
+## v3.7 — Nov 16, 2026 — The NOOB round (Will: "play as a noob, make it more fun")
+
+Played v3.6 as four first-time players who don't know tower
+defense (a text-skipper, a petal-hoarder, a chaos-planter, a
+returning casual), logged where each got bored, confused, or
+cheated, then made fun-first edits — every one cited to a
+persona moment. Full record: `PLAYTEST-v3.7.md`; fun
+research: `RESEARCH-v3.7.md`. Headless verification only —
+not yet phone-verified.
+
+- **Kills pay visibly now.** Bounties used to tick into the
+  counter silently. A petal sprite flies from every corpse
+  to the HUD petal counter (pulse + coin tick on arrival);
+  bounties of 10+ float their amount at the kill.
+- **Crits feel lucky.** A crit that lands the kill bursts
+  gold, floats 'CRIT!' and pops higher — LUCKY's card
+  promised "huge crit hits" and the game never showed one.
+- **Nights end with a reward, not a log line.** A dawn card:
+  'NIGHT N CLEAR!', the stars filling in, petals and pops
+  for the night, 'NO LEAKS! THE HEART IS WHOLE' or the leak
+  count. Skippable; START dismisses it and starts the next
+  night in a single press.
+- **Dying teaches.** The defeat screen names the night's
+  biggest leaker with its field-guide counter:
+  'x6 DART · DEW SLOWS IT DOWN'.
+- **Danger announces itself.** A creep past 78% of the path
+  earns a 'WOOF! TOO CLOSE!' bark and a flashing red Heart
+  in the HUD — noobs were watching the number drop without
+  ever seeing why.
+- **Louie speaks up for defenseless gardens.** A round that
+  starts with no real shooter: 'WOOF! TOO WEAK! PLANT
+  SHOOTERS!'. First dawn holding 90+ petals with no keeper:
+  'WOOF! A KEEPER COSTS 90P!' (3 of 4 personas never found
+  heroes at all).
+- **Mashing no longer spends your petals.** Fork and train
+  panels ignore A presses in the first 0.13s after opening
+  — in v3.6, 3 of 4 personas mash-bought upgrades they never
+  chose, one a 480-petal GRAND. Deliberate presses land
+  untouched; the window was measured against both the mash
+  rate and a deliberate double-tap.
+- **The noob floor held.** No difficulty was touched: every
+  persona still wins nights 1–2; the tapper's now-honest
+  no-upgrade line dies on night 6, threatened from night 4 —
+  and the expert ceiling is unchanged (all maps/seeds clear,
+  endless 13–15, failure set byte-identical to v3.6's).
+
+## v3.6 — Nov 16, 2026 — Playtest round (Will: "Play test and work on it")
+
+No new headline features — a full playtest of v3.5 (naive
+journey, returning saves, expert matrices, soak, defeat paths,
+and a size-aware text-fit audit over every rendered string),
+then fixes for everything provable. Full record:
+`PLAYTEST-v3.6.md`. Headless verification only — not yet
+phone-verified.
+
+- **THE BIG ONE — standalone night starts were death
+  sentences.** MAP SELECT and PLAY-to-frontier invite starting
+  any unlocked night fresh, but nights are tuned for an
+  accumulated garden: expert lines starting fresh at 8
+  different map/night points died 8/8. A run starting at
+  night N now also gets the purse a fought-through garden
+  would hold at that dawn (measured curve). **8/8 deaths →
+  8/8 wins.** Night-1 and endless starts unchanged.
+- **Info bar rebuilt to fit the screen.** The dawn hero line
+  was 54 characters on a 39-character screen — the B action
+  was literally off-canvas. Heroes now show short ability
+  names (LASER/WHIP/JET/FLARE/FIND/YUKON; canon names intact
+  everywhere else), tower lines stand alone, and a fit ladder
+  guarantees every inspect line fits. The new render audit
+  asserts **zero** overflowing strings on any screen.
+- **YUKON respects paths.** Mama's Yukon on The Crossroads
+  was damaging creeps on BOTH paths (the fx carried no path).
+  It now drives the path nearest Mama and hits only that
+  path — probe-verified both directions.
+- **RAIN OF DEW is weather.** It only slowed creeps already
+  on screen, so the slowed front shielded the unslowed tail
+  and the power could *cause* leaks on small waves. Spawns
+  during the 10s window now inherit the slow; the backfire
+  is gone and the big-wave case stays decisive.
+- **LOUIE'S HOWL retuned** (numbers only): stun 2s→3s,
+  reveal 8s→14s. Still the situational one — a panic button
+  for camo about to leak, not a staple.
+- **HARD softened one knob:** creep HP ×1.35 → ×1.28. The
+  strongest script line still dies on one seed at N4 — but a
+  line that answers Louie's own "PEB cracks armor" warning
+  wins that seed at ♥10, so the wall is play, not tuning.
+- **SUNFARM shows its work:** lifetime petals tracked per
+  farm and shown on inspect ('MADE 1234P') and in its GRAND
+  panel.
+- **Defeat screen tells the truth and offers a retry:**
+  'YOU HELD 2 NIGHTS · FELL ON NIGHT 3' (it used to credit
+  the night you died on), A retries the same map/mode,
+  B goes to title.
+- **The Crossroads glows at the gate that feeds next** —
+  a small ember marker on the entrance the queue head will
+  use, so two-gate nights are readable before the wave lands.
+- **Powers discoverability:** Louie barks 'WOOF! SELECT =
+  POWERS!' the first time a run can afford one; the panel
+  title now honestly says 'PAY TO FIRE'.
+- **Fit-audit sweep:** 'GRAND GRAND SUNFARM/JACKPOT' doubling
+  fixed at five sites; THORNBACK PRIME's boss label no longer
+  runs off the right edge; train panel footer de-collided;
+  victory headlines, upgrades header, six Louie warning barks
+  and the WARM LANTERN desc all fit; locked map pips lifted
+  off the banned `#6a6480`; cursor labels clamp on-screen;
+  the intro's closing line no longer says 'ten nights' in a
+  26-night game.
+- Suites: core (17 new checks) + front + migration ×7 +
+  soak + naive + render (28 shots) all green, zero console
+  errors, zero duplicate function names.
+
 ## v3.5 — Nov 16, 2026 — Flesh it out (width before length)
 
 Will played v3.4: **"It's getting better"** — then three
