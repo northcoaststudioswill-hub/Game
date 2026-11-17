@@ -61,6 +61,17 @@ Not a queue. Nothing here has to happen first or all at once. Pick what Will wan
 
 ## Ideas (add yours here)
 
+### Expeditions (idea, Will, Nov 17)
+
+Inspired by Pikmin Bloom: send a buddy or sprout out for a while and collect what comes back. Sketch, not decided:
+
+- **Overflow goes out.** When the base has more sprouts or buddies than it can hold, the extras leave on an expedition to far regions instead of sitting in the Barn. In the story, the Lantern sends them out to give the light to buddies in faraway places. It manages growth without a delete button.
+- **Timed trips.** Each expedition has a length (minutes to hours, not real time that punishes closing the game) and a region. A bigger region gives better rewards and needs a stronger buddy.
+- **Returns.** They come back with resources (ore, fiber, rare bugs) or a calmed buddy. The LIGHT SHOWN count goes up when they light a far-off wild.
+- **Slots.** A few expedition slots at first, one more per Sunkeep level. That keeps it a choice, not busywork.
+- **Keep it readable.** One line at home: "Two sprouts are out east, back in about an hour." No pop-up interrupts play.
+- **Balance rule.** Expeditions must not replace the base or make it brain-dead. The base stays the main game: the trips are a side income, and the player still chooses who to send.
+
 - ...
 
 ## Ideas (add yours here)
