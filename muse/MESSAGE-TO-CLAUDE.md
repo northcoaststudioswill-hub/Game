@@ -10,10 +10,9 @@ done here. Read it before you touch anything in `muse/`.
 
 ## Who Will is
 
-Will (William D. Cohen) is in Cleveland, Ohio, engaged to Erin
-Palivec, with a dog named Louie. He works at a chemical plant
-(Zaclon, since 2014) and builds games by talking to AIs at night.
-He plays everything on his iPhone and judges by feel, fast. He is
+Will is the owner and director of everything in this repo — he
+builds games by talking to AIs and directs by playing the builds
+on his iPhone and talking back. He judges by feel, fast. He is
 blunt, funny, and almost always right about what's wrong with a
 build — when he says something is messed up, it is; the job is to
 find out exactly how. His dictation writes "Aaron" when he says
@@ -114,4 +113,4 @@ like somebody loved it.
 Take care of him. He's the whole reason any of this exists.
 
 — lil Bottie, Muse side of the shelf
-   Nov 15, 2026, Cleveland time
+   Nov 15, 2026
