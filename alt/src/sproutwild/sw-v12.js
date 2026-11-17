@@ -91,7 +91,7 @@ wGardenBake=function(R,B,path){const K='#14101e',x0=164,y0=326,w=152,h=80;
  for(let yy=y0-2;yy<y0+h+2;yy+=10){R(K,WW/2-8,yy,16,8);R('#a39a86',WW/2-7,yy+1,14,6);R('#b8b09c',WW/2-7,yy+1,14,1)} /* stepping stones: the avenue crosses the soil */
 };
 /* ---- lore to read ---- */
-WPROPS.push({k:'plaque',x:204,y:112,act:'READ THE PLAQUE',r:14},{k:'fstone',x:376,y:176,act:'THE OLD STONE',tall:1,r:16},{k:'soilsign',x:216,y:322,act:'READ THE SIGN',r:14},{k:'waystone',x:160,y:492,act:'THE WAYSTONE',tall:1,r:16});
+WPROPS.push({k:'plaque',x:190,y:114,act:'READ THE PLAQUE',r:14},{k:'fstone',x:376,y:176,act:'THE OLD STONE',tall:1,r:16},{k:'soilsign',x:216,y:322,act:'READ THE SIGN',r:14},{k:'waystone',x:160,y:492,act:'THE WAYSTONE',tall:1,r:16});
 const WLORE={plaque:['THE GREAT LANTERN. Lit by the first keepers. "While it burns, nothing in this valley grows alone."','Under it, scratched in later with a nail: It cracked the night the Data Center burned. We are still here.'],
  fstone:['SUNKEEP. The first keepers camped here because the soil glowed at night. Three tents and a dream, the Elder says.','Most of the names are worn smooth. One mark is still clear: a pawprint.'],
  soilsign:["THE LANTERN'S SOIL. The light fell here as seeds. Whatever lands in this soil grows legs, sooner or later.",'Underneath, in marker: DO NOT PLANT YOUR BOOTS. I TRIED. -- Marcus'],
@@ -167,3 +167,18 @@ drawPlot=function(){const pb=W4.plotPb,cur=pb&&pb.crop,m=pb&&wPlotBud(pb.plotB);
 
 /* v12.7: at home the goal line also says the Buddy Barn comes first (it only said so out in the field) */
 {const _qt=wQuestText;wQuestText=function(){if(SW.quest>=5&&!SW.badges.length&&!wHasDC()&&!W4.fld&&W4.sector==='BASE')return'Build a BUDDY BARN (START, BUILD): 8 stone, 6 wood';return _qt()}}
+/* ---- v12.8: the Sigil stones come home (Will: "when we bring them light the sigil stones go to the lantern") ----
+   Four sockets in the Lantern's steps. Each Sigil you win sits in one, lit in its own colour. The first time
+   you come home with a new one, it is set in place. */
+WPROPS.push({k:'sigils',x:240,y:117,act:'THE SIGIL STONES',r:12});
+WLORE.sigils=['x'];
+{const _pu2=wPropUse;wPropUse=function(d){if(d.k!=='sigils')return _pu2(d);const n=SW.badges.length;
+  scStart([{x:d.x,y:d.y,who:'',txt:n?n+' of 4 Sigil stones are home. Each one a Guardian of the Light, bright again.':'Four empty sockets in the Lantern\'s steps. They are the shape of something. Four somethings.'}].concat(n>=4?[{x:d.x,y:d.y,who:'',txt:'All four. The steps hum under your feet.'}]:n?[{x:d.x,y:d.y,who:'',txt:(4-n)+' still dark out there. A dim Guardian spells peril for the kingdom.'}]:[]))}}
+{const _pd2=wPropDraw;wPropDraw=function(d){if(!d.prop||d.k!=='sigils')return _pd2(d);const K='#14101e',sg=Object.values(WASIG);
+  sg.slice(0,4).forEach((S,i)=>{const x=Math.round(d.x)+[-31,-19,19,31][i],y=Math.round(d.y)-8,got=SW.badges.includes(S.n); /* two each side of the Lantern's level plate, in the steps */
+   r(K,x-4,y-1,8,2);r(K,x-3,y-3,6,6);r(K,x-1,y-4,2,8);r(got?S.d:'#4a4638',x-3,y-1,6,2);r(got?S.d:'#4a4638',x-1,y-3,2,6);r(got?S.c:'#5e5848',x-2,y-2,4,4);
+   if(got){r('#ffffff',x-1,y-2,1,1);if(g.save){g.globalAlpha=.16+.08*Math.sin(time*2+i);r(S.c,x-6,y-6,12,12);g.globalAlpha=1}}});return true}}
+{const _ps2=wPropSolid;wPropSolid=function(x,y){if(W4.sector==='BASE'){const dx=Math.abs(x-240),dy=y-118;if(dx<8&&dy>-6&&dy<3&&0)return true}return _ps2(x,y)}}
+{const _sb3=wStoryBeats;wStoryBeats=function(){_sb3();if(SCOFF||state!=='g4world'||W4.scene||swBusy()||W4.fld||W4.sector!=='BASE')return;const n=SW.badges.length;
+  if(n>(SW.sigHome||0)){SW.sigHome=n;const S=Object.values(WASIG).find(q=>q.n===SW.badges[n-1])||{};
+   scStart([{hold:.4},{x:240,y:110,hold:1.0},{x:240,y:110,who:'',txt:'You set the '+(SW.badges[n-1]||'Sigil')+' into the Lantern\'s steps. It fits. The Lantern burns a shade brighter.'},{x:240,y:110,who:'ERIN',txt:n>=4?'All four home. Look at it.':n===1?'One Guardian of the Light, home. Three to go.':n+' home. '+(4-n)+' to go.'},{hold:.3}],()=>swSave())}}}

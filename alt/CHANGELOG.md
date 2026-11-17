@@ -3,6 +3,15 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v12.8: the Sigil stones come home
+Will: "when we bring them light the sigil stones go to the lantern".
+- Four sockets are set in the Lantern's steps, two each side of its level plate. Each Sigil you win sits in one, lit in its own colour.
+- The first time you come home with a new Sigil, a short scene sets it in place: "You set the STONE SIGIL into the Lantern's steps. It fits. The Lantern burns a shade brighter." Erin counts what is left.
+- A on the steps reads them: how many are home, how many Guardians are still dark.
+- The plaque moved a little left to make room.
+
+Checked: field lab; the scene and the sockets on screen with one Sigil.
+
 ## v12.7: checks from saved points, and the stretch to the first Sigil confirmed
 Will: stop the 20-minute runs; make saves at certain points.
 - New test, `alt/tests/sproutwild/checkpoint.js`. It starts from a saved point and plays one stretch in real time, in under two minutes:
