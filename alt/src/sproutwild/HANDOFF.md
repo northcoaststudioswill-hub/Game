@@ -146,6 +146,9 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
 - v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
   "FOUND ONE!" bubble stays on screen.
+- v9.8: Meadow entrances swapped (BASE at the top of the main road, TOWN in the corner; sw-castle.js); Erin waits at
+  (19,21) on first visit; lesson loop east field, PEB (27,15), wall, bridge; tutorial gating wTutStage/wTutAim/wTutNear
+  in sw-louie2.js (off in SCOFF, so the lab never sees it).
 - v9.7: Louie drawn the Sprouts way and rides strays home (sw-louie2.js: louDraw, louFetch, fLouTick); scWalkUp
   (Erin/Marcus walk up before speaking, injected in scStart); garden of 12 plots that grows (WPLOTS, wPlotCount,
   wPlotSync, wGardenBake in sw-sunkeep.js); scaffolds need buddies (scConTick); day 1 held until the cottage; 1.5 s

@@ -15,17 +15,18 @@
  box(3,9,8,12,'~');box(4,8,7,8,'~');                     /* the pond */
  box(23,3,31,7,'"');                                     /* the east field */
  for(const [x,y] of [[25,1],[28,9],[31,10],[34,11],[33,8],[26,12]])put(x,y,'R');
- put(30,10,'p');                                         /* the buried PEB, among the rocks */
+ /* v9.8: the buried PEB moved up beside the east field, on Erin's route */
  for(const [x,y] of [[3,1],[14,3],[21,2],[33,3],[12,10],[22,12],[14,13],[2,6]])put(x,y,'W');
  for(const [x,y] of [[10,0],[15,9],[25,9],[20,6]])put(x,y,'B');
  for(const [x,y] of [[6,0],[13,6],[20,10],[29,2],[10,13],[31,13]])put(x,y,',');
  box(8,0,16,0,':');box(19,8,29,8,':');                  /* v9.2: dirt paths off the road to the big field and to the rocks, so Erin walks you on a path */
  const rows=g.map(r=>r.join(''));
  const wall='T'.repeat(17)+'kk'+'T'.repeat(W-19);
- FMAPS.MEADOW.rows=R.slice(0,R.length-1).concat(rows.slice(0,14),[wall])}
+ FMAPS.MEADOW.rows=R.slice(0,R.length-1).concat(rows.slice(0,14),[wall]);
+ {const M=FMAPS.MEADOW.rows,set=(x,y,c)=>{M[y]=M[y].slice(0,x)+c+M[y].slice(x+1)};set(27,15,'p');set(29,15,'R');set(26,16,'R');set(30,14,'R')}}
 FSPOTS.MEADOW=(FSPOTS.MEADOW||[]).concat([[33,36,'ore'],[11,36,'fiber']]);
 /* the lesson buddy waits in the big field, a walk from the start */
-function ewTame(F){let wd=W4.wilds.find(w=>w.tame);if(wd)return wd;const sec=wSector(F.id),tx=8*FT,ty=29*FT,
+function ewTame(F){let wd=W4.wilds.find(w=>w.tame);if(wd)return wd;const sec=wSector(F.id),tx=28*FT,ty=19*FT, /* v9.8: the field east of the road, beside the buried PEB */
   gr=F.grass.slice().sort((a,b)=>Math.hypot(a[0]*FT-tx,a[1]*FT-ty)-Math.hypot(b[0]*FT-tx,b[1]*FT-ty))[0]||F.grass[0];
  if(!gr)return null;wd=fSpawnWild(F,sec);wd.x=wd.tx=gr[0]*FT+8;wd.y=wd.ty=gr[1]*FT+10;wd.lv=sec.lv[0];wd.tame=1;W4.wilds.push(wd);return wd}
 /* ---- Erin walks around water and walls (v8.6): a tile path, recomputed every second ---- */

@@ -8255,7 +8255,7 @@ function fDrop(F,s){if(s.st==='carry'&&s.tg&&s.tg.car){const i=s.tg.car.indexOf(
 const fStr=it=>it.car.reduce((a,s)=>a+(s.type===1?2:1),0);
 function fAim(F){ /* the cursor sits ahead of you and locks on to the nearest thing sprouts can work: a wide cone in front, plus anything right beside you */
  let x=P3.x+F.dir[0]*52,y=P3.y+F.dir[1]*52,best=1e9,tg=null,kind=null;
- const tryT=(o,k)=>{const vx=o.x-P3.x,vy=o.y-P3.y,al=vx*F.dir[0]+vy*F.dir[1],off=Math.abs(vx*F.dir[1]-vy*F.dir[0]),d=Math.hypot(vx,vy);
+ const tryT=(o,k)=>{if(!wTutAim(o,k))return; /* v9.8: in Erin's lessons only the thing she is showing you */const vx=o.x-P3.x,vy=o.y-P3.y,al=vx*F.dir[0]+vy*F.dir[1],off=Math.abs(vx*F.dir[1]-vy*F.dir[0]),d=Math.hypot(vx,vy);
   let sc=1e9;if(al>-2&&al<92&&off<16+al*.42)sc=al+off*1.3;if(d<26)sc=Math.min(sc,d*.8);if(sc<1e9){if(k==='bug')sc*=.6;else if(k==='wild')sc*=.75;else if(k==='bwork')sc*=1.1}if(sc<best){best=sc;tg=o;kind=k}};
  for(const g2 of F.gates)if(!g2.open)tryT(g2,'gate');
  for(const s of F.sites)if(!s.done)tryT(s,'site');
@@ -8430,6 +8430,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
  pfTick(F,dt);pfWildTick(F,dt);bgTick(F,dt);ewTick(F,dt);
  fSquad(F,dt);fItems(F,dt);fLouTick(F,dt);
  W4.near=fNear(F);
+ if(pressed('a')&&W4.near&&!wTutNear(W4.near)){wTutHint();W4.near=null}
  if(pressed('a')&&W4.near){const n=W4.near;
   if(n.k==='bud'){F.buds.splice(F.buds.indexOf(n.b),1);const tn=TYPES[n.b.type].n;SW.buds[tn]=(SW.buds[tn]||0)+1;
    W4.floats.push({x:n.b.x,y:n.b.y-16,txt:tn+' SPROUT JOINS THE SQUAD!',t:1.6,c:'#7ee787'});swSnd(880,.06,1175);swSave()}
@@ -8454,7 +8455,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
  if(pressed('start')){swSel=0;state='g4pause'}}
 /* squad orders, shared by the field and Sunkeep: SELECT picks the kind, B throws, hold B whistles */
 function fCommand(F,dt){if(F.manT>0)F.manT-=dt;
- if(pressed('sel')&&W4.fld){const a=fAim(F),wd=a.kind==='wild'&&a.tg;if(wd&&SW.quest>=3&&!wd.cap&&!(wd.lat&&wd.lat.length)&&Math.hypot(wd.x-P3.x,wd.y-P3.y)<64&&SW.party.some(m=>m.hp>0)){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv));return}}
+ if(pressed('sel')&&W4.fld){const a=fAim(F),wd=a.kind==='wild'&&a.tg;if(wd&&wTutStage()&&!SCOFF){wTutHint()}else if(wd&&SW.quest>=3&&!wd.cap&&!(wd.lat&&wd.lat.length)&&Math.hypot(wd.x-P3.x,wd.y-P3.y)<64&&SW.party.some(m=>m.hp>0)){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv));return}}
  if(pressed('sel')){let i=SW.selType;for(let n=0;n<TYPES.length;n++){i=(i+1)%TYPES.length;if(F.sq.some(s=>s.type===i))break}
   SW.selType=i;F.manT=4;swSnd(660,.06,990);W4.floats.push({x:P3.x,y:P3.y-20,txt:TYPES[i].n+' SPROUTS UP NEXT',t:1.2,c:TYPES[i].l})}
  if(keys.a&&!W4.near){if(pressed('a')){fThrow(F);F.aT=.26}else{F.aT=(F.aT||0)-dt;if(F.aT<=0){fThrow(F,true);F.aT=.2}}}
@@ -9290,7 +9291,7 @@ function wQuestText(){const op=wOp();
  if(op===0)return opGoal0();
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
- if(SW.quest===2)return W4.fld?'A: throw sprouts at a wild buddy':'Take the south road to the Meadow';
+ if(SW.quest===2)return W4.fld?((SW.walk2||0)<1?'Meet Erin down the road':'Follow Erin: a wild buddy'):'Take the south road to the Meadow';
  return WQUEST[SW.quest]}
 function wNextGoal(){const op=wOp(),F=W4.bf;
  if(op===0){const p=WSEEDPOS[SW.seeds[0]];return{x:p[0]-14,y:p[1]+4,label:'Woof! It glows. Pluck it!'}}
@@ -9424,7 +9425,7 @@ function wQuestText(){const op=wOp();
  if(op===0)return opGoal0();
  if(op===1)return'A: throw sprouts at the berries';
  if(op===2)return'Greet one of the dim buddies';
- if(SW.quest===2)return W4.fld?'A: throw sprouts at a wild buddy':'Take the south road to the Meadow';
+ if(SW.quest===2)return W4.fld?((SW.walk2||0)<1?'Meet Erin down the road':'Follow Erin: a wild buddy'):'Take the south road to the Meadow';
  if(!W4.fld&&wHasRoof()&&wDark()>.7)return'Night: sleep in the cottage to skip it';
  if(SW.quest===4&&!W4.fld&&W4.patchBuds&&!W4.patchBuds.some(q=>q.type<0&&!q.crop))return'Garden full: pluck a sprout, then grow BERRIES'; /* v8.9 */
  if(SW.quest<5)return(W4.fld&&SW.quest>=3?'Home: ':'')+WQUEST[SW.quest];
@@ -10416,7 +10417,8 @@ function louCommon(L,dt,items,dir){
  if(L.st==='dig'){const d=louGo(L,L.tx,L.ty,95,dt);if(d<5){W4.louMv=true;L.t-=dt;if(Math.random()<dt*12)W4.floats.push({x:lou.x+(Math.random()*10-5),y:lou.y+2,txt:'.',t:.4,c:'#a87850'});
    if(L.t<=0){L.items.push({k:'pel',res:'berry',n:1,w:1,x:lou.x,y:lou.y+4,car:[]});louSay('BERRY!',1.6);swSnd(880,.06,1320);L.st='follow';L.dig=R2(40,60);
     if(!SW.lessons.louDig){SW.lessons.louDig=1;swSay('Louie dug up a berry. Throw sprouts at it and they carry it home.',3)}}}return true}
- L.dig-=dt;if(L.dig<=0){const a=Math.random()*6.28,rr=R2(30,46),x=P3.x+Math.cos(a)*rr,y=P3.y+Math.sin(a)*rr,blk=W4.fld?fBox(W4.fld,x,y):wSolidAt(x,y);
+ L.dig-=dt;if(L.dig<=0&&wTutStage())L.dig=5; /* v9.8: no digging during Erin's lessons */
+ if(L.dig<=0){const a=Math.random()*6.28,rr=R2(30,46),x=P3.x+Math.cos(a)*rr,y=P3.y+Math.sin(a)*rr,blk=W4.fld?fBox(W4.fld,x,y):wSolidAt(x,y);
   if(!blk&&items.filter(i=>!i.done&&i.res==='berry').length<6){louDigAt(L,items,x,y);return true}L.dig=3}
  return false}
 /* the base: lead to the goal while there is one, otherwise be a dog */
@@ -10665,7 +10667,7 @@ function ewTame(F){let wd=W4.wilds.find(w=>w.tame);if(wd)return wd;const sec=wSe
 function ewTarget(F,st){if(st===1){const wd=ewTame(F);return wd?ewNear(F,wd.x+30,wd.y+6):null}
  if(st===3){const b=F.buds.find(b2=>b2.type===1);return b?ewNear(F,b.x+16,b.y+4):null}
  if(st===5){const gt=F.gates.find(g2=>g2.type===1&&!g2.open);return gt?ewNear(F,gt.x+18,gt.y+22):null}
- if(st===7){const s=F.sites.find(s2=>!s2.done);return s?ewNear(F,s.x,s.y-30):null}
+ if(st===7){const s=F.sites.find(s2=>!s2.done);return s?ewNear(F,s.x+44,s.y):null}
  if(st===9)return ewNear(F,P3.x+20,P3.y);return null}
 const EW2={
  1:["ERIN: There. A wild buddy, out in the grass. See its tag? Level 2.","ERIN: Face it and press A. Each sprout you throw fills its bar.","ERIN: Fill the bar and it blooms and joins you. Take your time. It won't run."],
@@ -10676,13 +10678,14 @@ const EW2={
 const EWDONE={2:["ERIN: Your first catch! See how the dark broke right off it? That is the whole job, keeper.","ERIN: Buddies can fight, too. Stand next to a wild one and press SELECT to battle it. Battles make them stronger.","ERIN: Not now, though. Come on, there's more to see."],
  4:["ERIN: There. A PEB walks with you now. Over this way!"],6:["ERIN: Ha! The rock never stood a chance. One more thing."],8:["ERIN: A bridge! Whatever's on that island is yours."]};
 function ewTick(F,dt){if(SCOFF||F.id!=='MEADOW'||wOp()<3||W4.scene||F.dlg||F.spot)return;SW.lessons.scMeadow=1;const st=SW.walk2||0;
+ if(SW.quest<3&&st<1)W4.wilds=W4.wilds.filter(w=>w.lat&&w.lat.length); /* v9.8: no wild buddies before Erin starts */
  if(SW.quest<3&&st>=1){const tm=W4.wilds.find(w=>w.tame);if(tm)for(const w of W4.wilds)if(w!==tm&&!(w.lat&&w.lat.length)&&Math.hypot(w.x-tm.x,w.y-tm.y)<110)w.gone=1;W4.wilds=W4.wilds.filter(w=>!w.gone)} /* the lesson buddy has the grass to itself */if(st>=10&&!(W4.ew&&W4.ew.leave)&&!(SW.walk3>0&&SW.walk3<7))return;
- if(!W4.ew||W4.ewFor!==F){W4.ewFor=F;const p=ewNear(F,P3.x-24,P3.y+10);W4.ew={x:p.x,y:p.y,dir:[0,1],mv:false,t:0}}
+ if(!W4.ew||W4.ewFor!==F){W4.ewFor=F;const p=st===0?{x:19*FT+8,y:21*FT+10}:ewNear(F,P3.x-24,P3.y+10);W4.ew={x:p.x,y:p.y,dir:[-1,0],mv:false,t:0}} /* v9.8: on your first visit she waits at the crossroads */
  const E=W4.ew,go=(x,y,v)=>{const dx=x-E.x,dy=y-E.y,d=Math.hypot(dx,dy);E.mv=d>2;if(d>2){const s=Math.min(d*5,v);E.x+=dx/d*s*dt;E.y+=dy/d*s*dt;E.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}return d};
  if(E.leave){if(E.fade!=null){E.fade-=dt*1.6;E.mv=false;if(E.fade<=0)W4.ew=null;return}if(ewGo(F,E,F.start.x,F.start.y-14,70,go)<4)E.fade=1;return} /* v9.2: she walks up the road and fades out at the gate, not pops */
- const dp=Math.hypot(P3.x-E.x,P3.y-E.y);if(dp>230){const p=ewNear(F,P3.x-30,P3.y);E.x=p.x;E.y=p.y}
+ const dp=Math.hypot(P3.x-E.x,P3.y-E.y);if(dp>230&&st>0){const p=ewNear(F,P3.x-30,P3.y);E.x=p.x;E.y=p.y}
  if(st>=10){ew3Tick(F,dt,E,dp,go);return}
- if(st===0){if(SW.quest>=3){SW.walk2=3;return}fTalk(F,'ERIN',["ERIN: You made it! Welcome to the Meadow.","ERIN: "+((SW.party[0]&&SW.party[0].sp)||"Your buddy")+" could use a friend. Wild ones live down in the tall grass. Follow me."],()=>{SW.walk2=1;swSave()});return}
+ if(st===0){if(SW.quest>=3){SW.walk2=3;return}E.dir=[P3.x>E.x?1:-1,0];if(dp>44)return; /* she waits; you walk to her */fTalk(F,'ERIN',["ERIN: You made it! Welcome to the Meadow.","ERIN: "+((SW.party[0]&&SW.party[0].sp)||"Your buddy")+" could use a friend. There is a wild one in the grass, just over here. Follow me."],()=>{SW.walk2=1;swSave()});return}
  if(st%2===1&&E.rest>0){E.rest-=dt;E.mv=false;E.dir=[P3.x>E.x?1:-1,0];return} /* a breath between lessons (v8.5) */
  if(st%2===1){const tg=ewTarget(F,st);if(!tg){SW.walk2=st===9?10:st+2;return}
   if(dp>80&&Math.hypot(P3.x-tg.x,P3.y-tg.y)>Math.hypot(E.x-tg.x,E.y-tg.y)+20){E.mv=false;E.wait=1;E.dir=[P3.x>E.x?1:-1,0];return}E.wait=0;
@@ -10710,17 +10713,18 @@ function ewDraw(){const E=W4.ew;if(!E)return;if(E.fade!=null)g.globalAlpha=Math.
  box(3,9,8,12,'~');box(4,8,7,8,'~');                     /* the pond */
  box(23,3,31,7,'"');                                     /* the east field */
  for(const [x,y] of [[25,1],[28,9],[31,10],[34,11],[33,8],[26,12]])put(x,y,'R');
- put(30,10,'p');                                         /* the buried PEB, among the rocks */
+ /* v9.8: the buried PEB moved up beside the east field, on Erin's route */
  for(const [x,y] of [[3,1],[14,3],[21,2],[33,3],[12,10],[22,12],[14,13],[2,6]])put(x,y,'W');
  for(const [x,y] of [[10,0],[15,9],[25,9],[20,6]])put(x,y,'B');
  for(const [x,y] of [[6,0],[13,6],[20,10],[29,2],[10,13],[31,13]])put(x,y,',');
  box(8,0,16,0,':');box(19,8,29,8,':');                  /* v9.2: dirt paths off the road to the big field and to the rocks, so Erin walks you on a path */
  const rows=g.map(r=>r.join(''));
  const wall='T'.repeat(17)+'kk'+'T'.repeat(W-19);
- FMAPS.MEADOW.rows=R.slice(0,R.length-1).concat(rows.slice(0,14),[wall])}
+ FMAPS.MEADOW.rows=R.slice(0,R.length-1).concat(rows.slice(0,14),[wall]);
+ {const M=FMAPS.MEADOW.rows,set=(x,y,c)=>{M[y]=M[y].slice(0,x)+c+M[y].slice(x+1)};set(27,15,'p');set(29,15,'R');set(26,16,'R');set(30,14,'R')}}
 FSPOTS.MEADOW=(FSPOTS.MEADOW||[]).concat([[33,36,'ore'],[11,36,'fiber']]);
 /* the lesson buddy waits in the big field, a walk from the start */
-function ewTame(F){let wd=W4.wilds.find(w=>w.tame);if(wd)return wd;const sec=wSector(F.id),tx=8*FT,ty=29*FT,
+function ewTame(F){let wd=W4.wilds.find(w=>w.tame);if(wd)return wd;const sec=wSector(F.id),tx=28*FT,ty=19*FT, /* v9.8: the field east of the road, beside the buried PEB */
   gr=F.grass.slice().sort((a,b)=>Math.hypot(a[0]*FT-tx,a[1]*FT-ty)-Math.hypot(b[0]*FT-tx,b[1]*FT-ty))[0]||F.grass[0];
  if(!gr)return null;wd=fSpawnWild(F,sec);wd.x=wd.tx=gr[0]*FT+8;wd.y=wd.ty=gr[1]*FT+10;wd.lv=sec.lv[0];wd.tame=1;W4.wilds.push(wd);return wd}
 /* ---- Erin walks around water and walls (v8.6): a tile path, recomputed every second ---- */
@@ -11154,6 +11158,13 @@ const FSIGNS={MEADOW:[[4,6,'HOME: SUNKEEP. The garden, the cottage, the Great La
 function fSignsDraw(F){for(const [tx,ty] of FSIGNS[F.id]||[]){const x=tx*FT+8,y=ty*FT+12,K='#14101e';
  r('rgba(0,0,0,.22)',x-5,y+1,10,3);r(K,x-1,y-12,3,13);r('#8a6a48',x,y-11,1,12);
  r(K,x-8,y-17,17,8);r('#c49a62',x-7,y-16,15,6);r('#a87948',x-7,y-12,15,2);r('#5a3d22',x-5,y-14,11,1)}}
+/* v9.8: the road from Sunkeep comes in at the top of the Meadow's main road (it used to come in at the top-left corner,
+   down a narrow lane and round the pond); the Lantern Town road takes the corner. The Lantern post moves to the new entrance. */
+{const M=FMAPS.MEADOW.rows,set=(x,y,c)=>{M[y]=M[y].slice(0,x)+c+M[y].slice(x+1)};
+ set(2,0,'e');set(3,0,'e');set(17,0,'h');set(18,0,'h');set(4,1,'.');set(20,1,'S')}
+FSIGNS.MEADOW=[[19,3,'HOME: SUNKEEP, straight up the road. The garden, the cottage, the Great Lantern.'],[4,6,"LANTERN TOWN: up the west lane. The Elder, the Ranger's lodge, the road beyond."],
+ [33,11,'EAST: CROOKED HOLLOW. Darker woods. The Ranger lets you in once you hold a Sigil.'],[16,35,"SOUTH: SQUIRE'S WOODS. An old castle, and an alpha awake inside it."]];
+WSECSUB.MEADOW='Wild buddies live in the tall grass.'; /* v9.8: not "wildsprouts" */
 /* ================================================================
    SUNKEEP, LIVED IN (v9.6). Will: better visuals, item placement and
    design, more story triggers, more content inside the slice we have.
@@ -11303,6 +11314,27 @@ function scWalkUp(steps){if(W4.fld||!W4.cast||steps.some(s=>s.fn))return steps;
    if(d>2){const v=Math.min(d*6,92);c.x+=dx/d*v*dt;c.y+=dy/d*v*dt;c.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}else c.dir=[P3.x>c.x?1:-1,0];
    c.tx=c.x;c.ty=c.y;c.t=Math.max(c.t||0,12)}}};
  return[walk].concat(steps)}
+/* ================================================================
+   v9.8: during Erin's Meadow walk you can only do what she has shown
+   you. The aim ring only locks on to the thing she is teaching right
+   now; A on anything else gets "Hang on! I'll show you that."
+   Talking, petting Louie, the Lantern post and signs always work.
+   ================================================================ */
+function wTutStage(){if(SCOFF||!W4.fld||W4.fld.id!=='MEADOW')return null;const w2=SW.walk2||0,w3=SW.walk3||0;
+ if(w2<10)return'a'+w2;if(w3>=1&&w3<7)return'b'+w3;return null}
+function wTutAim(o,k){const st=wTutStage();if(!st)return true;
+ if(st==='a1'||st==='a2')return k==='wild'&&!!o.tame;
+ if(st==='a5'||st==='a6')return k==='gate';
+ if(st==='a7'||st==='a8')return k==='site';
+ if(st==='b1'||st==='b2')return k==='bwork'&&o.k==='tree';
+ if(st==='b3')return k==='item'&&o.res==='wood';
+ if(st==='b4'||st==='b5')return k==='bug';
+ return false}
+function wTutNear(n){const st=wTutStage();if(!st)return true;
+ if(['louie','sign','road','info','npc'].includes(n.k))return true;
+ if(n.k==='bud')return st==='a3'||st==='a4';
+ return false}
+function wTutHint(){if(time<(W4.tutHintT||0))return;W4.tutHintT=time+4;swSay("ERIN: Hang on! I'll show you that. Stick with me.",2.4)}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */

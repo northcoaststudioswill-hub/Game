@@ -67,7 +67,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  ok('the Meadow is the training ground: no alpha in it (v9.5)',!f.alphas.length,f.alphas.length);
  {const p0=F.pos();F.setPos(f.start.x,f.start.y+14);f.dir=[0,-1];step(2);ok('at the Lantern post the prompt is the post, not a road sign',F.near()&&F.near().k==='sign',F.near()&&F.near().txt);F.setPos(p0.x,p0.y);step(1)}
  /* walking off the edge travels; arriving puts you by the matching exit */
- at(17,1,[0,-1]);for(let i=0;i<40&&F.fld().id==='MEADOW';i++)step(1,['up']);f=F.fld();ok('north edge of the meadow leads to town',f.id==='TOWN',f.id);
+ at(2,1,[0,-1]);for(let i=0;i<40&&F.fld()&&F.fld().id==='MEADOW';i++)step(1,['up']);f=F.fld();ok('the west lane at the top of the meadow leads to town (v9.8)',f.id==='TOWN',f.id);
  ok('you arrive at the town south gate',F.pos().y>14*T,Math.round(F.pos().y));
  at(27,6,[1,0]);step(40,['right']);ok('roads need sigils',F.fld().id==='TOWN');
  S.badges=['A','B','C'];at(27,6,[1,0]);for(let i=0;i<40&&F.fld().id==='TOWN';i++)step(1,['right']);f=F.fld();ok('with sigils the east road opens',f.id==='WASTES',f.id);
@@ -101,7 +101,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  /* the pouch limits the squad; four deliveries grow a sprout */
  {S.pouch=8;S.buds={EMBER:6,PEB:0,DEW:6,ZIP:0,LEAF:0,LUCKY:0};step(3);ok('the seed pouch caps the squad',F.fld().sq.length===8,F.fld().sq.length);S.pouch=24;step(3)}
  /* the south road joins Sunkeep and the Meadow */
- {S.bottieSeen=1;F.enter('MEADOW');at(2,2,[0,-1]);for(let i=0;i<60&&F.fld();i++)step(1,['up']);ok('the meadow north-west gate leads home to the south gate of Sunkeep',!F.fld()&&F.pos().y>440,Math.round(F.pos().y));
+ {S.bottieSeen=1;F.enter('MEADOW');at(17,2,[0,-1]);for(let i=0;i<60&&F.fld();i++)step(1,['up']);ok('the top of the meadow road leads home to the south gate of Sunkeep (v9.8)',!F.fld()&&F.pos().y>440,Math.round(F.pos().y));
   for(let i=0;i<90&&!F.fld();i++)step(1,['down']);ok('...and Sunkeep south road leads back out',F.fld()&&F.fld().id==='MEADOW')}
  /* gear and services found by playing on */
  {S.gear={};F.enter('MEADOW');at(28,9,[0,-1]);step(30,['up']);ok('no rope: ledges still do not climb',F.pos().y>8*T+8);

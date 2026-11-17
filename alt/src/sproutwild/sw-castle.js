@@ -75,3 +75,10 @@ const FSIGNS={MEADOW:[[4,6,'HOME: SUNKEEP. The garden, the cottage, the Great La
 function fSignsDraw(F){for(const [tx,ty] of FSIGNS[F.id]||[]){const x=tx*FT+8,y=ty*FT+12,K='#14101e';
  r('rgba(0,0,0,.22)',x-5,y+1,10,3);r(K,x-1,y-12,3,13);r('#8a6a48',x,y-11,1,12);
  r(K,x-8,y-17,17,8);r('#c49a62',x-7,y-16,15,6);r('#a87948',x-7,y-12,15,2);r('#5a3d22',x-5,y-14,11,1)}}
+/* v9.8: the road from Sunkeep comes in at the top of the Meadow's main road (it used to come in at the top-left corner,
+   down a narrow lane and round the pond); the Lantern Town road takes the corner. The Lantern post moves to the new entrance. */
+{const M=FMAPS.MEADOW.rows,set=(x,y,c)=>{M[y]=M[y].slice(0,x)+c+M[y].slice(x+1)};
+ set(2,0,'e');set(3,0,'e');set(17,0,'h');set(18,0,'h');set(4,1,'.');set(20,1,'S')}
+FSIGNS.MEADOW=[[19,3,'HOME: SUNKEEP, straight up the road. The garden, the cottage, the Great Lantern.'],[4,6,"LANTERN TOWN: up the west lane. The Elder, the Ranger's lodge, the road beyond."],
+ [33,11,'EAST: CROOKED HOLLOW. Darker woods. The Ranger lets you in once you hold a Sigil.'],[16,35,"SOUTH: SQUIRE'S WOODS. An old castle, and an alpha awake inside it."]];
+WSECSUB.MEADOW='Wild buddies live in the tall grass.'; /* v9.8: not "wildsprouts" */

@@ -21,6 +21,26 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v9.8 · 2026-11-17 · Erin's Meadow walk, straightened out
+
+Will: during the tutorial you shouldn't be able to do things until Erin shows you; when you first enter you should walk more before she starts, it's awkward; the whole pathing in that first part is weird.
+
+`shots/v9.8-meadow-arrival.png`: arriving at the top of the Meadow road (the Lantern post and the HOME sign right there), and Erin waiting down the road.
+
+- **The road from Sunkeep comes in at the top of the Meadow's main road.** It used to come in at the top-left corner, then down a narrow lane, along a thin path and round the pond (walking it at player speed, it was easy to end up in the pond). The Lantern Town road takes that corner now. The Lantern post moved to the new entrance, and the road signs say which way is which.
+- **You walk to Erin.** On your first visit she waits beside the road, about 4 seconds' walk down it, and only talks once you reach her. The goal line says "Meet Erin down the road". No wild buddies appear before she starts, so there's nothing in the grass you're not allowed to touch yet.
+- **Her lessons follow one loop off the road:**
+  1. the wild buddy, in the field just east of where she waits
+  2. the buried PEB, moved up beside that field
+  3. back north to the boulder wall on the east road
+  4. west to the bridge
+  5. then the tree, the logs and the ladybug
+- **You can only do what Erin has shown you.** During her walk, the aim ring only locks on to the thing she's teaching right now (the wild buddy, then the PEB, the boulder wall, the bridge, the tree, the logs, the ladybug), and SELECT battles wait. A on anything else gets "ERIN: Hang on! I'll show you that. Stick with me." Talking, petting Louie, the Lantern post and the signs always work.
+- The Meadow's banner said "Wildsprouts live in the tall grass"; it's "Wild buddies" now.
+- Louie doesn't dig up berries during Erin's walk any more: "Throw sprouts at it" came up while the gating wouldn't let you.
+- Played in real time from the title (autopilot, 430x932) through all of Erin's walk to "Head home when you're ready": every lesson in order, 0 timing flags, no page errors. Walking from the entrance to Erin at player speed with real key presses takes 3.4 s, straight down the road.
+- Lab: 124 checks; the two that walked out of the Meadow's top edge now use the new exits.
+
 ## v9.7 · 2026-11-17 · Louie, the garden, and slowing the start down
 
 Will: play the start to the cottage and refine it. Things happen a little too fast; some new graphics are clunky; the base plots are not all working and have no room to grow; nothing should build until base buddies are touching it; the first night comes too soon; someone saying something important should walk up to you. Louie's model is bad, and he works well in the original Sprouts game. He's a Shiba Inu.

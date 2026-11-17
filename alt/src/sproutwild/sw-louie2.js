@@ -50,3 +50,24 @@ function scWalkUp(steps){if(W4.fld||!W4.cast||steps.some(s=>s.fn))return steps;
    if(d>2){const v=Math.min(d*6,92);c.x+=dx/d*v*dt;c.y+=dy/d*v*dt;c.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}else c.dir=[P3.x>c.x?1:-1,0];
    c.tx=c.x;c.ty=c.y;c.t=Math.max(c.t||0,12)}}};
  return[walk].concat(steps)}
+/* ================================================================
+   v9.8: during Erin's Meadow walk you can only do what she has shown
+   you. The aim ring only locks on to the thing she is teaching right
+   now; A on anything else gets "Hang on! I'll show you that."
+   Talking, petting Louie, the Lantern post and signs always work.
+   ================================================================ */
+function wTutStage(){if(SCOFF||!W4.fld||W4.fld.id!=='MEADOW')return null;const w2=SW.walk2||0,w3=SW.walk3||0;
+ if(w2<10)return'a'+w2;if(w3>=1&&w3<7)return'b'+w3;return null}
+function wTutAim(o,k){const st=wTutStage();if(!st)return true;
+ if(st==='a1'||st==='a2')return k==='wild'&&!!o.tame;
+ if(st==='a5'||st==='a6')return k==='gate';
+ if(st==='a7'||st==='a8')return k==='site';
+ if(st==='b1'||st==='b2')return k==='bwork'&&o.k==='tree';
+ if(st==='b3')return k==='item'&&o.res==='wood';
+ if(st==='b4'||st==='b5')return k==='bug';
+ return false}
+function wTutNear(n){const st=wTutStage();if(!st)return true;
+ if(['louie','sign','road','info','npc'].includes(n.k))return true;
+ if(n.k==='bud')return st==='a3'||st==='a4';
+ return false}
+function wTutHint(){if(time<(W4.tutHintT||0))return;W4.tutHintT=time+4;swSay("ERIN: Hang on! I'll show you that. Stick with me.",2.4)}

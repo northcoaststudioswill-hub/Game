@@ -23,7 +23,8 @@ function louCommon(L,dt,items,dir){
  if(L.st==='dig'){const d=louGo(L,L.tx,L.ty,95,dt);if(d<5){W4.louMv=true;L.t-=dt;if(Math.random()<dt*12)W4.floats.push({x:lou.x+(Math.random()*10-5),y:lou.y+2,txt:'.',t:.4,c:'#a87850'});
    if(L.t<=0){L.items.push({k:'pel',res:'berry',n:1,w:1,x:lou.x,y:lou.y+4,car:[]});louSay('BERRY!',1.6);swSnd(880,.06,1320);L.st='follow';L.dig=R2(40,60);
     if(!SW.lessons.louDig){SW.lessons.louDig=1;swSay('Louie dug up a berry. Throw sprouts at it and they carry it home.',3)}}}return true}
- L.dig-=dt;if(L.dig<=0){const a=Math.random()*6.28,rr=R2(30,46),x=P3.x+Math.cos(a)*rr,y=P3.y+Math.sin(a)*rr,blk=W4.fld?fBox(W4.fld,x,y):wSolidAt(x,y);
+ L.dig-=dt;if(L.dig<=0&&wTutStage())L.dig=5; /* v9.8: no digging during Erin's lessons */
+ if(L.dig<=0){const a=Math.random()*6.28,rr=R2(30,46),x=P3.x+Math.cos(a)*rr,y=P3.y+Math.sin(a)*rr,blk=W4.fld?fBox(W4.fld,x,y):wSolidAt(x,y);
   if(!blk&&items.filter(i=>!i.done&&i.res==='berry').length<6){louDigAt(L,items,x,y);return true}L.dig=3}
  return false}
 /* the base: lead to the goal while there is one, otherwise be a dog */
