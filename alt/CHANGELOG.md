@@ -3,6 +3,13 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v10.4: quieter screen, clearer battle menu
+- Battle menu: the left box now says what the highlighted choice does (FIGHT, SWARM, KEEPER, BUDDY, RUN), not "What will X do?".
+- A plain pickup like "+2 WOOD" is a small float over your head now, not a message box across the screen.
+- Louie barks "SNIFF! A BUDDY!" once per wild buddy, not every 22 seconds while one is near.
+
+Checked: field lab passes, no page errors; battle menu seen at 430x932.
+
 ## v10.3: a freeze at the Meadow's Lantern post
 - Old bug, found by the fresh-save run: if any message was on screen when a trainer (Kiss) walked up to you, his dialogue never opened and he spotted you again, forever. Nothing near you worked, the Lantern post included. It hit hardest when your buddy was hurt, because the "rest at a Lantern post" hint is exactly such a message. The challenge now clears the message and always opens.
 

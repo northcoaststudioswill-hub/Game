@@ -31,7 +31,7 @@ function louFetch(F,L,dt){
 function fLouTick(F,dt){louIdleTick(dt);const L=louSt();
  if(L.st==='sit'||L.st==='dig'){louCommon(L,dt,F.items,F.dir);return}
  if(louFetch(F,L,dt))return;
- L.bark-=dt;if(L.bark<=0){const wd=W4.wilds.find(w=>!w.cap&&Math.hypot(w.x-P3.x,w.y-P3.y)<90);if(wd){L.bark=22;L.fx=wd.x>lou.x?1:-1;louSay(wd.lv>(SW.party[0]?SW.party[0].lv:5)+2?'GRR! BIG ONE!':'SNIFF! A BUDDY!',1.8);swSnd(600,.05,420)}else L.bark=4}
+ L.bark-=dt;if(L.bark<=0){const wd=W4.wilds.find(w=>!w.cap&&!w.barked&&Math.hypot(w.x-P3.x,w.y-P3.y)<90);if(wd){wd.barked=1;L.bark=30; /* v10.4: one bark per wild buddy */L.fx=wd.x>lou.x?1:-1;louSay(wd.lv>(SW.party[0]?SW.party[0].lv:5)+2?'GRR! BIG ONE!':'SNIFF! A BUDDY!',1.8);swSnd(600,.05,420)}else L.bark=4}
  if(louCommon(L,dt,F.items,F.dir))return;
  const dp=Math.hypot(P3.x-lou.x,P3.y-lou.y);if(dp>260){lou.x=P3.x;lou.y=P3.y+8}louSide(L,F.dir);louGo(L,L.sx,L.sy,dp>50?118:84,dt)}
 /* ================================================================
@@ -86,3 +86,6 @@ const _wGG10=wGymGoal;wGymGoal=function(){if(SW.quest>=5&&!SW.badges.length&&!wH
 /* v10.2: the Meadow's west lane was two tiles wide going down, one wide going east, and stopped a tile short
    of the main road. Now it is two wide all the way and joins the road. */
 {const R=FMAPS.MEADOW.rows,put=(y,x,s)=>{R[y]=R[y].slice(0,x)+s+R[y].slice(x+s.length)};put(7,2,':::::::::::::::');put(8,2,':::::::::::::::')}
+
+/* v10.4: a plain pickup ("+2 WOOD") is a small float over your head, not a message box across the screen */
+{const _say10=swSay;swSay=function(s,t){if(/^\+\d+ [A-Z ]{2,14}$/.test(String(s))&&state==='g4world'&&W4.floats){W4.floats.push({x:P3.x,y:P3.y-26,txt:String(s),t:1.3,c:'#d8e8c8'});return}return _say10(s,t)}}
