@@ -33,6 +33,9 @@ gifts and bond hearts.
 
 ## Latest update (Nov 17, 2026)
 
+- **Fighting and light:** Wren redrawn with an outline and proper attack poses; three new moves (dash strike, rising
+  strike, charged flame wave); hit sparks; the **Old Wyrm** rebuilt as a three-phase boss (charge, leap slam, frost
+  breath, roar); lighting in every level; Starlight no longer cut off by scene endings; dialogue clear of the Skip button.
 - **Polish round:** every level dressed with props, Starlight motes to collect along the jump paths, chapter results
   (time, hits, Starlight), five music themes, a Skip button for scenes, a casting pose for Wren.
 - **Chapter 3, First Light:** Wren's first court gift, **Flame** (fireballs, moon pips that refill over time and from

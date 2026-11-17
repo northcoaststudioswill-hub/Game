@@ -58,7 +58,7 @@ body[data-state="talk"] #sign, body[data-state="talk"] #pause-btn { display: non
   display: none; gap: 14px; align-items: flex-start; background: var(--panel); border: 2px solid var(--panel-line); border-radius: 16px; padding: 12px 16px 12px 12px; cursor: pointer; }
 #dialog.show { display: flex; }
 #d-face { width: 96px; height: 96px; image-rendering: pixelated; border-radius: 10px; border: 2px solid rgba(255,255,255,.2); flex: none; }
-#d-body { min-width: 0; flex: 1; }
+#d-body { min-width: 0; flex: 1; padding-bottom: 12px; }
 #d-name { font-family: var(--display); font-weight: 800; font-size: 17px; letter-spacing: .06em; margin: 2px 0 4px; }
 #d-text { font-size: 19px; line-height: 1.4; font-weight: 600; }
 #dialog.narr #d-face, #dialog.narr #d-name { display: none; }
@@ -221,7 +221,7 @@ body[data-input="touch"] #touch { display: block; }
   background: var(--panel); border: 1px solid var(--panel-line); color: var(--gold); font-weight: 800; font-size: 13px; opacity: 0; transition: opacity .3s; pointer-events: none; }
 #saving.show { opacity: 1; }
 #dialog.typing #d-more { visibility: hidden; }
-#d-skip { position: absolute; right: 10px; top: 8px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--panel-line); background: rgba(255,255,255,.06); color: var(--ink-dim); font: 700 12px var(--body); cursor: pointer; }
+#d-skip { float: right; margin: 0 -4px 6px 14px; padding: 6px 12px; white-space: nowrap; border-radius: 999px; border: 1px solid var(--panel-line); background: rgba(255,255,255,.06); color: var(--ink-dim); font: 700 12px var(--body); cursor: pointer; }
 #dialog.choosing #d-skip { display: none; }
 .pause-wm { display: flex; justify-content: center; align-items: center; gap: 8px; font-family: var(--display); font-size: 10px; letter-spacing: .2em; color: var(--ink-dim); margin: -2px 0 6px; }
 .pause-wm svg { width: 26px; }
@@ -265,9 +265,8 @@ body[data-input="touch"] #touch { display: block; }
 
 <div id="dialog" role="dialog" aria-live="polite">
   <img id="d-face" alt="">
-  <div id="d-body"><div id="d-name"></div><div id="d-text"></div><div id="d-choices"></div></div>
+  <div id="d-body"><button id="d-skip" aria-label="Skip this scene">Skip &#9656;&#9656;</button><div id="d-name"></div><div id="d-text"></div><div id="d-choices"></div></div>
   <div id="d-more">tap anywhere &#9656;</div>
-  <button id="d-skip" aria-label="Skip this scene">Skip &#9656;&#9656;</button>
 </div>
 
 <div id="scene"><canvas id="scene-art" width="960" height="450"></canvas><div id="scene-title"></div></div>

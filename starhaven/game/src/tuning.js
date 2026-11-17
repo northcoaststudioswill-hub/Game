@@ -48,7 +48,9 @@
   // Court gifts (DESIGN.md "Court gifts" and "Combat system": 3 moon pips to start; a cast costs 1;
   // pips refill slowly over time and quickly from dagger hits, which rewards getting close).
   SH.GIFTS = {
-    flame: { cost: 1, speed: 5.6, life: 70, damage: 4, burn: 3, burnEvery: 40, cooldown: 22 },
+    flame: { cost: 1, speed: 5.6, life: 70, damage: 4, burn: 3, burnEvery: 40, cooldown: 22,
+      // hold the button to charge a flame wave: two moons, pierces everything in its path
+      chargeFrames: 32, waveCost: 2, waveDamage: 8, waveSpeed: 7.2 },
     pips: 3, regenFrames: 300, perHit: 0.34,
   };
 
@@ -74,6 +76,10 @@
       { frames: 14, active: [2, 7], next: 99, lunge: 0, kb: 4.5, stop: 4, reach: 38, arc: 'low', finisher: true },
     ],
     pogo: { frames: 16, active: [1, 11], next: 99, kb: 1.5, stop: 5, reach: 36, arc: 'down' },
+    // Dash strike: attack during a dash. A lunging thrust that hits harder than a normal cut.
+    thrust: { frames: 14, active: [0, 9], next: 99, kb: 5.5, stop: 5, reach: 52, arc: 'thrust', dmg: 3, finisher: true },
+    // Rising strike: hold up and attack on the ground. An uppercut that carries Wren into the air and launches light enemies.
+    up: { frames: 18, active: [1, 11], next: 99, kb: 1.5, stop: 4, reach: 36, arc: 'up', dmg: 2, launch: 7.5, hop: 2.7 },
     killStop: 6,
     recoil: 1.6,        // small push back on you when your blade connects
   };
@@ -90,8 +96,9 @@
     // Its head is armored while it winds up and charges: hit it from behind, or while it's dazed after a charge.
     wyrmling: { name: 'Mountain wyrmling', hp: 10, w: 46, h: 26, wander: 0.5, sight: 210, sightY: 70, windup: 34,
       chargeSpeed: 6.2, chargeFrames: 70, stun: 80, rest: 40, damage: 1, gravity: 0.5, scale: 1 },
-    // The Old Wyrm: the same creature, bigger (data, not new code). Charging into a wall brings rocks down.
-    oldWyrm: { name: 'The Old Wyrm', hp: 30, w: 80, h: 44, wander: 0.4, sight: 1200, sightY: 160, windup: 30,
+    // The Old Wyrm: the same creature, bigger, with three phases (see Wyrm in enemies.js): charge, leap slam, frost breath.
+    // Charging into a wall brings rocks down and dazes it; fire down its throat while it breathes in chokes it.
+    oldWyrm: { name: 'The Old Wyrm', hp: 46, breathReach: 170, w: 80, h: 44, wander: 0.4, sight: 1200, sightY: 160, windup: 30,
       chargeSpeed: 7.2, chargeFrames: 90, stun: 95, rest: 30, damage: 2, gravity: 0.5, scale: 1.7, rocks: 5, boss: true },
     bulb: { name: 'Thorn bud', r: 13, regrow: 40 },
   };

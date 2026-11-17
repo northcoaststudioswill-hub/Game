@@ -72,7 +72,50 @@
   D.resize = function (viewW) {
     layers.viewW = viewW;
     layers.vignette = makeVignette(viewW);
+    layers.dark = canvas(viewW, SH.VIEW_H);
+    if (!layers.hole) {   // a soft round light, stamped out of the darkness wherever something glows
+      const h = layers.hole = canvas(128, 128), g = h.getContext('2d');
+      const gr = g.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,0.7)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+      const wm = layers.warm = canvas(128, 128), g2 = wm.getContext('2d');
+      const g3 = g2.createRadialGradient(64, 64, 2, 64, 64, 64); g3.addColorStop(0, 'rgba(255,190,110,0.5)'); g3.addColorStop(1, 'rgba(255,150,60,0)');
+      g2.fillStyle = g3; g2.fillRect(0, 0, 128, 128);
+    }
   };
+  // How dark each place is away from a light: [colour, strength].
+  const DARK = { deep: ['#020806', 0.6], thornwood: ['#06030c', 0.5], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
+  function drawLight(ctx, w, cx, cy, vw, VH, t, themeA, themeB, k) {
+    const a = DARK[themeA] || DARK.dusk, b = DARK[themeB] || a, strength = a[1] + (b[1] - a[1]) * k;
+    const c = layers.dark, g = c.getContext('2d');
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; g.clearRect(0, 0, vw, VH);
+    g.fillStyle = k > 0.5 ? b[0] : a[0]; g.globalAlpha = strength; g.fillRect(0, 0, vw, VH);
+    g.globalCompositeOperation = 'destination-out';
+    const warm = [];
+    const hole = (x, y, r, al, glow) => { const X = x - cx, Y = y - cy; if (X < -r || X > vw + r) return; g.globalAlpha = al; g.drawImage(layers.hole, X - r, Y - r, r * 2, r * 2); if (glow) warm.push(X, Y, r * glow); };
+    const p = w.player, fl = Math.sin(t * 0.13) * 3;
+    hole(p.x, p.y - 22, 105, 0.85);
+    if (p.charging) hole(p.x + p.facing * 12, p.y - 24, 40 + Math.min(40, p.chargeT), 0.9, 0.7);
+    for (const l of w.lanterns) if (l.lit) hole(l.px, l.py - 40, 120 + fl, 1, 0.9);
+    for (const n of w.npcs) if (!n.hidden) hole(n.x, n.y - 24, 70, 0.6);
+    for (const m of w.motes || []) if (!m.got) hole(m.x, m.y, 20, 0.7);
+    for (const f of w.fireballs || []) hole(f.x, f.y, f.big ? 110 : 70, 1, 0.8);
+    for (const e of w.things) {
+      if (e.kind === 'brazier' && e.lit) hole(e.x, e.y - 34, 100 + fl, 1, 0.9);
+      else if (e.kind === 'stag' && e.state !== 'down') hole(e.x, e.y - 22, 80, 0.8);
+      else if (e.kind === 'wyrm' && !e.dead && e.boss) hole(e.x, e.y - e.h / 2, 120, 0.6);
+      else if (e.kind === 'bulb') hole(e.x, e.y, 34, 0.5);
+    }
+    const def = w.room.def, TS = SH.TILE;
+    if (def.exitLight != null) hole(def.exitLight * TS, 13 * TS, 190, 1);
+    if (def.cottage != null) hole((def.cottage + 3) * TS, 14 * TS, 120, 0.8, 0.6);
+    if (def.mural && SH.game.flags[def.mural.flag]) hole((def.mural.x + 2) * TS, 13 * TS, 110, 0.8);
+    for (const pt of SH.fx.parts) if (pt.glow && pt.life > 6) hole(pt.x, pt.y, 12, 0.35);
+    ctx.drawImage(c, 0, 0);
+    // a little warm bloom around flames, so fire feels like light and not just a shape
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < warm.length; i += 3) { const r = warm[i + 2]; ctx.globalAlpha = 0.5; ctx.drawImage(layers.warm, warm[i] - r, warm[i + 1] - r, r * 2, r * 2); }
+    ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+  }
 
   function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 
@@ -305,9 +348,31 @@
       else if (e.kind === 'wyrm') drawWyrm2(ctx, e, t);
     }
     for (const f of w.fireballs || []) {
-      const gl = ctx.createRadialGradient(f.x, f.y, 1, f.x, f.y, 16); gl.addColorStop(0, 'rgba(255,200,110,0.9)'); gl.addColorStop(1, 'rgba(255,120,40,0)');
-      ctx.fillStyle = gl; ctx.fillRect(f.x - 16, f.y - 16, 32, 32);
-      ctx.fillStyle = '#fff6d8'; ctx.beginPath(); ctx.arc(f.x, f.y, 4, 0, Math.PI * 2); ctx.fill();
+      const R = f.big ? 34 : 16;
+      const gl = ctx.createRadialGradient(f.x, f.y, 1, f.x, f.y, R); gl.addColorStop(0, 'rgba(255,200,110,0.9)'); gl.addColorStop(1, 'rgba(255,120,40,0)');
+      ctx.fillStyle = gl; ctx.fillRect(f.x - R, f.y - R, R * 2, R * 2);
+      if (f.big) {   // a flame wave: a tall burning crescent
+        ctx.save(); ctx.translate(f.x, f.y); ctx.scale(f.dir, 1);
+        const fl = Math.sin(t * 0.9) * 2;
+        ctx.fillStyle = '#ff8a3a'; ctx.beginPath(); ctx.moveTo(-10, -24 - fl); ctx.quadraticCurveTo(22, 0, -10, 24 + fl); ctx.quadraticCurveTo(4, 0, -10, -24 - fl); ctx.fill();
+        ctx.fillStyle = '#ffd27a'; ctx.beginPath(); ctx.moveTo(-6, -18); ctx.quadraticCurveTo(17, 0, -6, 18); ctx.quadraticCurveTo(6, 0, -6, -18); ctx.fill();
+        ctx.fillStyle = '#fff6d8'; ctx.beginPath(); ctx.moveTo(-1, -10); ctx.quadraticCurveTo(13, 0, -1, 10); ctx.quadraticCurveTo(7, 0, -1, -10); ctx.fill();
+        ctx.restore();
+      } else {
+        ctx.save(); ctx.translate(f.x, f.y); ctx.scale(f.dir, 1);
+        ctx.fillStyle = '#ff8a3a'; ctx.beginPath(); ctx.moveTo(6, 0); ctx.quadraticCurveTo(0, -7, -14 - Math.sin(t * 0.8) * 3, 0); ctx.quadraticCurveTo(0, 7, 6, 0); ctx.fill();
+        ctx.fillStyle = '#ffd27a'; ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fff6d8'; ctx.beginPath(); ctx.arc(1, 0, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+    }
+    for (const sw of w.waves || []) {
+      const k = Math.min(1, sw.life / 14), hgt = 20 + Math.sin(sw.t * 0.7) * 3;
+      ctx.save(); ctx.translate(sw.x, sw.y); ctx.scale(sw.dir, 1); ctx.globalAlpha = k;
+      ctx.fillStyle = '#0a0818'; ctx.beginPath(); ctx.moveTo(-17, 0); ctx.lineTo(-7, -hgt * 0.55 - 1); ctx.lineTo(-2, -5); ctx.lineTo(7, -hgt - 2); ctx.lineTo(13, 0); ctx.fill();
+      ctx.fillStyle = '#8a96b8'; ctx.beginPath(); ctx.moveTo(-15, 0); ctx.lineTo(-7, -hgt * 0.55); ctx.lineTo(-2, -4); ctx.lineTo(6, -hgt); ctx.lineTo(11, 0); ctx.fill();
+      ctx.fillStyle = '#e8eef8'; ctx.beginPath(); ctx.moveTo(2, 0); ctx.lineTo(6, -hgt); ctx.lineTo(11, 0); ctx.fill();
+      ctx.restore();
     }
     for (const r of w.rocks || []) {
       if (r.ground != null) { ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.beginPath(); ctx.ellipse(r.x, r.ground - 1, 12, 3, 0, 0, Math.PI * 2); ctx.fill(); }
@@ -318,12 +383,13 @@
       ctx.fillStyle = '#6a4a2a'; ctx.fillRect(-14, -1, 14, 2); ctx.fillStyle = '#c8d0e0'; ctx.fillRect(0, -2, 4, 4); ctx.fillStyle = '#e8e0c8'; ctx.fillRect(-16, -2, 3, 4);
       ctx.restore();
     }
-    for (const g of fx.ghosts) drawWren(ctx, w.player, { ghost: g });
-    drawWren(ctx, w.player, {});
+    for (const g of fx.ghosts) SH.wren.draw(ctx, w.player, { ghost: g });
+    SH.wren.draw(ctx, w.player, {});
     if (w.wyrm && w.wyrm.on) drawWyrm(ctx, w.wyrm, cy, t);
     drawParticles(ctx, fx);
     ctx.restore();
 
+    { const kk = zi > 0 ? Math.min(1, (mid - (zones[zi].x - 6)) / 12) : 0; drawLight(ctx, w, cx - sx, cy - sy, vw, VH, t, zones[Math.max(0, zi - 1)].theme, zones[zi].theme, kk); }
     ctx.drawImage(layers.vignette, 0, 0);
     if (fx.flash > 0) { ctx.fillStyle = fx.flashColor; ctx.globalAlpha = Math.min(1, fx.flash / 6); ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = 1; }
     if (fx.slowmo > 0) { ctx.fillStyle = 'rgba(120,190,255,0.10)'; ctx.fillRect(0, 0, vw, VH); }
@@ -495,6 +561,15 @@
       if (p.glow) { ctx.globalAlpha = a * 0.3; ctx.fillStyle = p.color; ctx.fillRect(p.x - p.size, p.y - p.size, p.size * 3, p.size * 3); }
       ctx.globalAlpha = a; ctx.fillStyle = p.color; ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
     }
+    ctx.lineCap = 'round';
+    for (const l of fx.lines) {
+      const k = l.life / l.max, c = Math.cos(l.ang), sn = Math.sin(l.ang);
+      ctx.globalAlpha = k; ctx.strokeStyle = l.slash ? '#ffffff' : '#ffe9a8'; ctx.lineWidth = l.slash ? 3 * k + 1 : 2;
+      ctx.beginPath();
+      if (l.slash) { ctx.moveTo(l.x - c * l.len * (1.2 - k * 0.4), l.y - sn * l.len * (1.2 - k * 0.4)); ctx.lineTo(l.x + c * l.len * (1.2 - k * 0.4), l.y + sn * l.len * (1.2 - k * 0.4)); }
+      else { ctx.moveTo(l.x + c * l.dist, l.y + sn * l.dist); ctx.lineTo(l.x + c * (l.dist + l.len * k), l.y + sn * (l.dist + l.len * k)); }
+      ctx.stroke();
+    }
     ctx.globalAlpha = 1;
     ctx.textAlign = 'center'; ctx.font = 'bold 13px system-ui, sans-serif';
     for (const wd of fx.words) {
@@ -595,25 +670,60 @@
     } else { ctx.fillStyle = '#1a1424'; ctx.fillRect(x - 8, y - 32, 16, 3); }
   }
   // Wyrms: a long, low, armored body; the head glows red while winding up; stars circle it when dazed.
+  // Drawn twice: once enlarged in the outline colour, then in colour, so it reads against any ground.
+  function wyrmBody(ctx, e, t, ol) {
+    const fl = e.flash > 0 && !ol;
+    const body = ol || (fl ? '#ffffff' : '#4a566e'), dark = ol || (fl ? '#ffffff' : '#343e54'), belly = ol || (fl ? '#ffffff' : '#7a86a0'), plate = ol || (fl ? '#ffffff' : '#c8d2e2');
+    const g = ol ? 1.6 : 0;   // outline growth
+    const wave = e.state === 'charge' ? Math.sin(e.t * 0.8) * 2 : Math.sin(t * 0.05) * 1;
+    const open = e.state === 'inhale' || e.state === 'breath' || e.state === 'roar';
+    const headUp = e.state === 'roar' ? -6 : e.state === 'inhale' ? -3 : e.state === 'stun' ? 4 : 0;
+    // tail
+    ctx.fillStyle = body; ctx.beginPath(); ctx.moveTo(-24, -15 - g); ctx.quadraticCurveTo(-36, -14 + wave, -44 - g, -4 + wave * 2); ctx.lineTo(-24, -5 + g); ctx.fill();
+    // legs
+    ctx.fillStyle = dark;
+    for (let i = 0; i < 4; i++) { const lift = (e.state === 'charge' || e.state === 'wander' || (e.state === 'rest' && e.vx)) && Math.floor(t / 4 + i) % 2 ? 2 : 0; ctx.fillRect(-19 + i * 10 - g, -6, 4 + g * 2, 6 - lift + (ol ? 1 : 0)); }
+    // body segments
+    ctx.fillStyle = body;
+    for (let i = 0; i < 5; i++) { const bx = -22 + i * 9, by = -12 + Math.sin(i * 0.9 + t * 0.08) * wave; ctx.beginPath(); ctx.ellipse(bx, by, 8 + g, 8 + g, 0, 0, Math.PI * 2); ctx.fill(); }
+    if (!ol) {
+      ctx.fillStyle = belly; ctx.fillRect(-26, -7, 40, 4);
+      // back plates
+      ctx.fillStyle = plate;
+      for (let i = 0; i < 5; i++) { const bx = -22 + i * 9, by = -19 + Math.sin(i * 0.9 + t * 0.08) * wave; ctx.beginPath(); ctx.moveTo(bx - 4, by + 2); ctx.lineTo(bx - 1, by - 5); ctx.lineTo(bx + 4, by + 2); ctx.fill(); }
+      ctx.fillStyle = dark; for (let i = 0; i < 4; i++) ctx.fillRect(-18 + i * 9, -13, 1, 6);
+    }
+    // head
+    ctx.save(); ctx.translate(14, -14 + headUp); ctx.rotate(headUp * -0.03);
+    ctx.fillStyle = body; ctx.fillRect(-g, -7 - g, 15 + g * 2, 8 + g * 2);                       // skull
+    ctx.fillRect(2 - g, 1 + (open ? 3 : 0) - g * 0.5, 12 + g * 2, 4 + g);                          // jaw
+    ctx.fillStyle = plate; ctx.fillRect(1 - g, -9 - g, 14 + g * 2, 5 + g); ctx.fillRect(12, -8 - g, 4 + g, 9 + g);   // brow plate
+    ctx.beginPath(); ctx.moveTo(1 - g, -9); ctx.lineTo(-4 - g, -18 - g); ctx.lineTo(6 + g, -9); ctx.fill();          // horn
+    if (!ol) {
+      const angry = e.state === 'windup' || e.state === 'charge' || e.state === 'crouch' || e.state === 'leap';
+      ctx.fillStyle = e.state === 'stun' ? '#6a7690' : angry ? '#ff4a4a' : (e.state === 'inhale' || e.state === 'breath') ? '#7ad8ff' : '#ffd27a'; ctx.fillRect(8, -3, 3, 2);
+      if (open) { ctx.fillStyle = e.state === 'roar' ? '#7a2a3a' : '#bfe8ff'; ctx.fillRect(4, 1, 9, 3); }
+      ctx.fillStyle = '#e8eef8'; ctx.fillRect(11, 1, 2, 2); ctx.fillRect(7, 1, 2, 2);                                 // teeth
+    }
+    ctx.restore();
+  }
   function drawWyrm2(ctx, e, t) {
     if (e.dead) return;
     const s = e.def.scale, x = e.x, y = e.y;
-    ctx.save(); ctx.translate(Math.round(x + (e.state === 'windup' ? Math.sin(e.t * 1.6) * 1.5 : 0)), Math.round(y)); ctx.scale(e.dir * s, s);
-    const body = e.flash > 0 ? '#ffffff' : '#4a566e', belly = e.flash > 0 ? '#ffffff' : '#7a86a0', plate = e.flash > 0 ? '#ffffff' : '#c8d2e2';
-    const wave = e.state === 'charge' ? Math.sin(e.t * 0.8) * 2 : Math.sin(t * 0.05) * 1;
-    ctx.fillStyle = body;
-    for (let i = 0; i < 5; i++) { const bx = -22 + i * 9, by = -12 + Math.sin(i * 0.9 + t * 0.08) * wave; ctx.beginPath(); ctx.ellipse(bx, by, 8, 8, 0, 0, Math.PI * 2); ctx.fill(); }
-    ctx.fillStyle = belly; ctx.fillRect(-26, -6, 40, 5);
-    ctx.fillStyle = body; ctx.beginPath(); ctx.moveTo(-26, -12); ctx.lineTo(-36, -8 + wave); ctx.lineTo(-26, -6); ctx.fill();   // tail
-    for (let i = 0; i < 4; i++) { ctx.fillRect(-18 + i * 10, -4, 3, 4 + (e.state === 'charge' && (t + i) % 4 < 2 ? 1 : 0)); }  // legs
-    // head with an armored brow plate
-    ctx.fillStyle = body; ctx.fillRect(14, -20, 14, 13);
-    ctx.fillStyle = plate; ctx.fillRect(16, -22, 13, 5); ctx.fillRect(26, -20, 4, 9);
-    ctx.fillStyle = '#e8eef8'; ctx.beginPath(); ctx.moveTo(16, -22); ctx.lineTo(12, -30); ctx.lineTo(20, -22); ctx.fill();
-    const angry = e.state === 'windup' || e.state === 'charge';
-    ctx.fillStyle = angry ? '#ff4a4a' : '#ffd27a'; ctx.fillRect(22, -16, 3, 2);
+    const shakeX = (e.state === 'windup' || e.state === 'roar') ? Math.sin(e.t * 1.6) * 1.5 : 0;
+    const sq = e.state === 'crouch' ? 1 - Math.min(0.22, e.t * 0.012) : e.state === 'slamrest' && e.t < 8 ? 0.8 + e.t * 0.025 : e.state === 'leap' ? 1.08 : 1;
+    if (e.state === 'leap') { const gy = e.shadowY || y; ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(x, e.home.y, 34, 5, 0, 0, Math.PI * 2); ctx.fill(); }
+    if (e.state === 'breath') {   // the frost cone
+      const hb = e.breathBox(), hx = x + e.dir * e.w / 2, k = Math.min(1, e.t / 8) * (0.5 + Math.sin(t * 0.6) * 0.08);
+      const g = ctx.createLinearGradient(hx, 0, hx + e.dir * e.def.breathReach, 0); g.addColorStop(0, 'rgba(200,236,255,' + k + ')'); g.addColorStop(1, 'rgba(200,236,255,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(hx, y - e.h * 0.5 - 4); ctx.lineTo(hx + e.dir * e.def.breathReach, hb.t - 6); ctx.lineTo(hx + e.dir * e.def.breathReach, y); ctx.lineTo(hx, y - e.h * 0.5 + 6); ctx.fill();
+    }
+    ctx.save(); ctx.translate(Math.round(x + shakeX), Math.round(y)); ctx.scale(e.dir * s * (2 - sq), s * sq);
+    wyrmBody(ctx, e, t, '#0a0818'); wyrmBody(ctx, e, t, null);
     ctx.restore();
-    if (angry) { const g = ctx.createRadialGradient(x + e.dir * 22 * s, y - 16 * s, 1, x + e.dir * 22 * s, y - 16 * s, 18 * s); g.addColorStop(0, 'rgba(255,70,70,0.45)'); g.addColorStop(1, 'rgba(255,70,70,0)'); ctx.fillStyle = g; ctx.fillRect(x + e.dir * 22 * s - 18 * s, y - 34 * s, 36 * s, 36 * s); }
+    const hx = x + e.dir * 22 * s, hy = y - 16 * s;
+    const glow = (e.state === 'windup' || e.state === 'charge' || e.state === 'crouch') ? '255,70,70' : (e.state === 'inhale' || e.state === 'breath') ? '120,210,255' : null;
+    if (glow) { const r = (e.state === 'inhale' ? 12 + e.t * 0.35 : 18) * s; const g = ctx.createRadialGradient(hx, hy, 1, hx, hy, r); g.addColorStop(0, 'rgba(' + glow + ',0.5)'); g.addColorStop(1, 'rgba(' + glow + ',0)'); ctx.fillStyle = g; ctx.fillRect(hx - r, hy - r, r * 2, r * 2); }
     if (e.state === 'stun') for (let i = 0; i < 3; i++) { const a = t * 0.12 + i * 2.1; ctx.fillStyle = '#ffe9a8'; ctx.fillRect(x + e.dir * 20 * s + Math.cos(a) * 10 * s, y - 34 * s + Math.sin(a) * 3, 3, 3); }
     if (!e.boss && e.hp < e.def.hp) { const n = 10; for (let i = 0; i < n; i++) { ctx.fillStyle = i < Math.ceil(e.hp / e.def.hp * n) ? '#c8d2e2' : '#2a2a3a'; ctx.fillRect(x - 25 + i * 5, y - e.h * s - 14, 4, 3); } }
   }
@@ -667,173 +777,6 @@
     ctx.beginPath();
     for (let i = 0; i < n * 2; i++) { const a = rot + i / (n * 2) * Math.PI * 2, rr = i % 2 ? r : R; i ? ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr) : ctx.moveTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
     ctx.closePath(); ctx.fill();
-  }
-
-  // ---------------------------------------------------------------- Wren
-  function poseOf(p) {
-    if (p.dashT > 0) return 'dash';
-    if (p.stun > 0) return 'hurt';
-    if (p.swing) return p.swing.kind === 'pogo' ? 'pogo' : 'attack';
-    if (!p.grounded) return p.vy < -1 ? 'rise' : p.vy > 1.5 ? 'fall' : 'apex';
-    if (Math.abs(p.vx) > 0.4) return 'run';
-    return 'idle';
-  }
-
-  function drawWren(ctx, p, opt) {
-    const g = opt.ghost;
-    const x = g ? g.x : p.x, y = g ? g.y : p.y, f = g ? g.facing : p.facing;
-    const pose = g ? g.pose : poseOf(p);
-    const a = p.anim;
-    const tint = g ? 'rgba(140,220,255,' + (0.35 * g.life / g.max).toFixed(3) + ')' : null;
-    if (!g && p.hidden) return;
-    const flicker = !g && p.invuln > 0 && Math.floor(p.invuln / 3) % 2 === 0 && p.stun <= 0;
-    if (flicker) return;
-
-    // scarf first (behind the body), in world space
-    if (!g) {
-      ctx.lineCap = 'round';
-      for (let i = 1; i < p.scarf.length; i++) {
-        const q0 = p.scarf[i - 1], q1 = p.scarf[i];
-        ctx.strokeStyle = i % 2 ? PAL.gold : PAL.goldDeep;
-        ctx.lineWidth = Math.max(1.5, 4.5 - i * 0.8);
-        ctx.beginPath(); ctx.moveTo(q0.x, q0.y); ctx.lineTo(q1.x, q1.y); ctx.stroke();
-      }
-      // soft starlight halo so Wren always reads against the dark
-      const h = ctx.createRadialGradient(x, y - 22, 4, x, y - 22, 34);
-      h.addColorStop(0, 'rgba(200,220,255,0.16)'); h.addColorStop(1, 'rgba(200,220,255,0)');
-      ctx.fillStyle = h; ctx.fillRect(x - 34, y - 56, 68, 68);
-    }
-
-    ctx.save();
-    ctx.translate(Math.round(x), Math.round(y));
-    // squash and stretch
-    let sxS = 1, syS = 1;
-    if (!g) {
-      if (a.land > 0) { const k = a.squash * (a.land / 8); sxS = 1 + k * 0.22; syS = 1 - k * 0.2; }
-      else if (pose === 'rise') { sxS = 0.92; syS = 1.08; }
-      if (pose === 'dash') { sxS = 1.12; syS = 0.9; }
-    } else if (pose === 'dash') { sxS = 1.12; syS = 0.9; }
-    ctx.scale(f * sxS, syS);
-
-    const C = c => tint || c;
-    const breathe = pose === 'idle' ? Math.round(Math.sin(a.t * 0.06) * 0.8) : 0;
-    const run = a.run * Math.PI;
-    const lean = pose === 'run' ? 0.12 : pose === 'dash' ? 0.25 : 0;
-
-    // legs
-    let legA = 0, legB = 0;
-    if (pose === 'run') { legA = Math.sin(run) * 0.9; legB = -legA; }
-    else if (pose === 'rise') { legA = -0.7; legB = 0.4; }
-    else if (pose === 'apex' || pose === 'pogo') { legA = -0.9; legB = 0.6; }
-    else if (pose === 'fall') { legA = 0.35; legB = -0.25; }
-    else if (pose === 'dash') { legA = 0.9; legB = -1.0; }
-    else if (pose === 'hurt') { legA = 0.6; legB = -0.5; }
-    else if (pose === 'attack') { legA = 0.55; legB = -0.45; }
-    const hipY = -16 + breathe;
-    limb(ctx, -1, hipY, legB, 16, 5, C(PAL.legs), C('#2a2238'));
-    limb(ctx, 1, hipY, legA, 16, 5, C(PAL.legs), C(PAL.boots));
-
-    ctx.save();
-    ctx.rotate(lean);
-    // cloak flows behind
-    const flow = Math.min(1, Math.abs(p.vx) / 4) * (g ? 1 : 1);
-    const lift = pose === 'fall' ? -6 : pose === 'rise' ? 4 : 0;
-    ctx.fillStyle = C(PAL.cloak);
-    ctx.beginPath();
-    ctx.moveTo(-2, -31 + breathe);
-    ctx.lineTo(-9 - flow * 8, -6 + lift - flow * 6 + Math.sin(a.t * 0.2) * flow * 2);
-    ctx.lineTo(-3, -10 + lift * 0.5);
-    ctx.lineTo(3, -30 + breathe);
-    ctx.closePath(); ctx.fill();
-
-    // torso
-    ctx.fillStyle = C(PAL.tunic); ctx.fillRect(-5, -31 + breathe, 11, 16);
-    ctx.fillStyle = C(PAL.tunicDark); ctx.fillRect(-5, -31 + breathe, 3, 16);
-    ctx.fillStyle = C('#6a4a2a'); ctx.fillRect(-5, -18 + breathe, 11, 2);
-
-    // head
-    const hy = -42 + breathe;
-    ctx.fillStyle = C(PAL.skin); ctx.fillRect(-3, hy, 10, 11);
-    ctx.fillStyle = C(PAL.hair); ctx.fillRect(-5, hy - 2, 11, 5); ctx.fillRect(-5, hy, 5, 9);
-    ctx.fillStyle = C(PAL.hairDark); ctx.fillRect(-5, hy + 6, 3, 4);
-    // ponytail swings opposite to motion
-    const tail = pose === 'run' ? Math.sin(run * 2) * 2 : pose === 'fall' ? -3 : 0;
-    ctx.fillStyle = C(PAL.hair); ctx.fillRect(-9, hy + 1 + Math.round(tail), 5, 4); ctx.fillRect(-11, hy + 3 + Math.round(tail * 1.4), 3, 5);
-    // ear: round while she's mortal, pointed once she's fae
-    ctx.fillStyle = C(PAL.skin); ctx.fillRect(0, hy + 3, 2, 3);
-    if (!SH.game.mortal) { ctx.fillRect(-1, hy + 1, 2, 2); ctx.fillRect(-2, hy - 1, 1, 2); }
-    if (!tint) {
-      if (pose === 'idle' && a.t % 230 < 7) { ctx.fillStyle = '#b08a72'; ctx.fillRect(4, hy + 5, 2, 1); }   // a blink now and then
-      else { ctx.fillStyle = '#1a1430'; ctx.fillRect(4, hy + 4, 2, 3); ctx.fillStyle = '#ffffff'; ctx.fillRect(5, hy + 4, 1, 1); }
-    }
-
-    // arm + dagger
-    const sw = p.swing;
-    // Arm angle: 0 = hanging down, -1.57 = straight forward, -3.14 = straight up, +1.57 = straight back.
-    let armAng = -0.25 + Math.sin(a.t * 0.06) * 0.05, showBlade = true;
-    if (pose === 'run') armAng = -0.3 - Math.sin(run) * 0.7;
-    if (pose === 'rise' || pose === 'apex') armAng = -1.2;
-    if (pose === 'fall') armAng = -2.2;
-    if (pose === 'dash') armAng = 1.3;
-    if (pose === 'hurt') armAng = 2.4;
-    if (!g && sw) {
-      const k = Math.min(1, sw.f / Math.max(1, sw.def.active[1]));
-      if (sw.def.arc === 'high') armAng = -3.0 + k * 2.5;
-      else if (sw.def.arc === 'low') armAng = -0.4 - k * 2.2;
-      else if (sw.def.arc === 'big') armAng = -3.4 + k * 3.4;
-    }
-    if (pose === 'pogo') armAng = 0;
-    const bow = !g && SH.game.can('bow') && !SH.game.can('daggers');
-    if (bow) { showBlade = false; if (p.bowT > 0) armAng = -1.57; }
-    const casting = !g && p.castT > 0;
-    if (casting) { armAng = -1.57; showBlade = false; }
-    ctx.save();
-    ctx.translate(2, -28 + breathe);
-    ctx.rotate(armAng);
-    ctx.fillStyle = C(PAL.tunic); ctx.fillRect(-2, 0, 4, 7);
-    ctx.fillStyle = C(PAL.skin); ctx.fillRect(-2, 7, 4, 4);
-    if (showBlade) { ctx.fillStyle = C(PAL.blade); ctx.fillRect(-1, 10, 2, 9); ctx.fillStyle = C(PAL.gold); ctx.fillRect(-2, 10, 4, 1); }
-    if (casting) { // an open palm with fire in it
-      ctx.fillStyle = 'rgba(255,150,60,0.5)'; ctx.fillRect(-5, 9, 10, 10); ctx.fillStyle = '#ff8a3a'; ctx.fillRect(-3, 11, 6, 6); ctx.fillStyle = '#ffe08a'; ctx.fillRect(-1, 12, 3, 4);
-    }
-    if (bow) { // a hunting bow in her hand, drawn back while she shoots
-      const pull = p.bowT > 8 ? 4 : 0;
-      ctx.strokeStyle = '#8a5a2a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 10, 9, -0.2 * Math.PI + Math.PI / 2 - 1.2, Math.PI / 2 + 1.2 - 0.2 * Math.PI); ctx.stroke();
-      ctx.strokeStyle = '#e8e0c8'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(-6, 4 + pull * 0); ctx.lineTo(-pull, 10); ctx.lineTo(-6, 17); ctx.stroke();
-    }
-    ctx.restore();
-    ctx.restore(); // lean
-
-    // slash arc
-    if (!g && sw && sw.f <= sw.def.active[1] + 3) drawSlash(ctx, sw);
-    ctx.restore();
-  }
-
-  function limb(ctx, x, y, ang, len, w, col, foot) {
-    ctx.save(); ctx.translate(x, y); ctx.rotate(ang * 0.6);
-    ctx.fillStyle = col; ctx.fillRect(-w / 2, 0, w, len - 3);
-    ctx.fillStyle = foot; ctx.fillRect(-w / 2, len - 4, w + 2, 4);
-    ctx.restore();
-  }
-
-  function drawSlash(ctx, sw) {
-    const d = sw.def, k = (sw.f - d.active[0] + 1) / (d.active[1] - d.active[0] + 4);
-    if (sw.f < d.active[0]) return;
-    const alpha = Math.max(0, 1 - k);
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    let cx = 6, cy = -21, R = d.reach - 4, a0, a1;
-    if (d.arc === 'high') { a0 = -1.9; a1 = 0.9; }
-    else if (d.arc === 'low') { a0 = 1.2; a1 = -1.3; }
-    else if (d.arc === 'big') { a0 = -2.4; a1 = 1.6; R += 4; }
-    else { cx = 0; cy = 2; a0 = 0.3; a1 = Math.PI - 0.3; R = d.reach - 6; }
-    const ccw = a1 < a0;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = 'rgba(150,220,255,0.7)'; ctx.lineWidth = 7;
-    ctx.beginPath(); ctx.arc(cx, cy, R - 3, a0, a1, ccw); ctx.stroke();
-    ctx.strokeStyle = '#fff6d8'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(cx, cy, R, a0, a1, ccw); ctx.stroke();
-    ctx.restore();
   }
 
   SH.draw = D;

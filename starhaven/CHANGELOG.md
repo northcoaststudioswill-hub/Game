@@ -1,5 +1,30 @@
 # Starhaven — Changelog
 
+## Rebuild 8 — Fighting, the Old Wyrm, light (Nov 17, 2026)
+Will: the slice needs polish before moving on. Better fighting animations, the boss is "super basic" (a hit move and a
+fire move), Starlight gets cut off when sections end too fast, dialogue runs over the Skip button, and it should look
+nicer overall.
+
+- **Wren is redrawn** (`src/wren.js`): a jointed figure with a dark outline so she reads on any background, two daggers,
+  and real key poses for every attack (wind-up then strike), with a crescent of light following each cut.
+- **Three new moves.** *Dash strike:* press STRIKE during a dash for a lunging thrust (3 damage). *Rising strike:* hold
+  up and STRIKE for an uppercut that carries Wren into the air and launches thorn sprites. *Flame wave:* hold FLAME and
+  let go: two moons, 8 damage, burns through everything in its path. A tap is still a fireball.
+- **Hits feel like hits:** sparks and a slash mark on every hit, bigger on finishers.
+- **The Old Wyrm is a real fight now.** 46 health, three phases (it roars and brings rocks down at each change, and
+  gets faster). Moves: the charge (still dazes itself on the cliff), a **leap slam** with shockwaves to jump, and
+  **frost breath** along the ground. Fire down its throat while it breathes in chokes it and leaves it wide open. Cuts
+  do extra damage while it's dazed. Phase 3 charges twice. Two ledges in the hollow give you somewhere to go, but camp
+  there and the roof comes down. Caelum explains the tells before the fight.
+- **Starlight is no longer cut off.** Chapter 2 doesn't end when the last sprite dies: Caelum arrives and waits until
+  you talk to him. The rooftop scene in Chapter 1 now starts past the roof's Starlight. Before the two points of no
+  return (the Wyrm chase, the Old Wyrm's hollow) a note says how much Starlight is still behind you.
+- **Dialogue no longer runs under Skip:** the text wraps around the button.
+- **Light.** Every place now has darkness and light: Wren, lanterns, braziers, fire, Starlight, the stag and the exit
+  all light up what's around them. Under the Mountain is properly dark. Fireballs have a flame shape and warm glow.
+  Wyrms are redrawn with an outline, back plates, a jaw, and a pose for each move.
+- Tests: 36 play checks (new: the boss's phases and moves, the three new moves, Chapter 2 waiting for you).
+
 ## Rebuild 7 — Polish round on what's there (Nov 17, 2026)
 Will asked for a round on the existing content. Started from an audit (close-ups of Wren's poses, every portrait, every
 level) and fixed what it showed.

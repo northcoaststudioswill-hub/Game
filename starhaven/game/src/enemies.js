@@ -88,7 +88,7 @@
     this.hp -= hit.dmg;
     this.flash = 8;
     const kb = hit.pogo ? 0 : hit.kb;
-    this.vx = hit.dir * kb; this.vy = hit.pogo ? 1 : -1.8;
+    this.vx = hit.dir * kb; this.vy = hit.pogo ? 1 : hit.launch ? -hit.launch : -1.8;
     fx.burst(this.x, this.y - this.h / 2, 7, { angle: hit.pogo ? Math.PI / 2 : (hit.dir > 0 ? 0 : Math.PI), spread: 1.4, speed: 2.4, life: 18, colors: ['#9be07a', '#d8ffb8', '#ffffff'] });
     if (this.hp <= 0) {
       this.dead = true; this.deadT = 0;
@@ -209,57 +209,140 @@
     this.reset();
   }
   Wyrm.prototype.reset = function () {
-    Object.assign(this, { x: this.home.x, y: this.home.y, vx: 0, vy: 0, hp: this.def.hp, dir: -1, state: this.boss ? 'sleep' : 'wander', t: 0, flash: 0, dead: false, burn: 0, burnT: 0, grounded: false, hitWall: false });
+    Object.assign(this, { x: this.home.x, y: this.home.y, vx: 0, vy: 0, hp: this.def.hp, dir: -1, state: this.boss ? 'sleep' : 'wander', t: 0, flash: 0, dead: false, burn: 0, burnT: 0, grounded: false, hitWall: false,
+      moveN: 0, lastPhase: 1, roarDue: false, again: 0, highT: 0 });
   };
   Wyrm.prototype.hittable = function () { return !this.dead && this.state !== 'sleep'; };
   Wyrm.prototype.hurtBox = function () { return { l: this.x - this.w / 2, r: this.x + this.w / 2, t: this.y - this.h, b: this.y }; };
   Wyrm.prototype.bodyBox = function () { return { l: this.x - this.w / 2 + 6, r: this.x + this.w / 2 - 6, t: this.y - this.h + 6, b: this.y }; };
   Wyrm.prototype.wake = function () { if (this.state === 'sleep') { this.state = 'rest'; this.t = 0; } };
+  // The Old Wyrm fights in three phases: it gets faster and gains moves as it weakens.
+  Wyrm.prototype.phase = function () { if (!this.boss) return 1; const k = this.hp / this.def.hp; return k > 0.66 ? 1 : k > 0.33 ? 2 : 3; };
+  Wyrm.prototype.breathBox = function () {
+    const head = this.x + this.dir * this.w / 2, far = head + this.dir * this.def.breathReach;
+    return { l: Math.min(head, far), r: Math.max(head, far), t: this.y - 46, b: this.y };
+  };
+  Wyrm.prototype.pickMove = function (world, dx) {
+    const d = this.def, p = world.player, ph = this.phase();
+    this.dir = dx > 0 ? 1 : -1; this.t = 0;
+    if (!this.boss) { this.state = 'windup'; return; }
+    const order = ph === 1 ? ['charge', 'slam'] : ph === 2 ? ['charge', 'breath', 'slam'] : ['charge', 'slam', 'breath', 'slam'];
+    let m = order[this.moveN++ % order.length];
+    if (m === 'breath' && p.y < this.y - 50) m = 'slam';              // she's up on a ledge: frost can't reach
+    if (m === 'breath' && Math.abs(dx) > d.breathReach + 60) m = 'charge';
+    if (m === 'charge') { this.state = 'windup'; this.again = ph === 3 ? 1 : 0; SH.sfx.play('rumble'); }
+    else if (m === 'slam') { this.state = 'crouch'; }
+    else { this.state = 'inhale'; SH.sfx.play('rumble'); }
+  };
   Wyrm.prototype.update = function (world) {
     const d = this.def, p = world.player, fx = SH.fx;
     if (this.dead || this.state === 'sleep') return;
     this.t++;
     if (this.flash > 0) this.flash--;
     if (this.burn > 0) { this.burn--; if (++this.burnT % SH.GIFTS.flame.burnEvery === 0) this.damage(1, world); if (this.t % 4 === 0) fx.burst(this.x, this.y - this.h * 0.7, 1, { speed: 0.6, life: 20, gravity: -0.06, colors: ['#ff8a3a', '#ffd27a'] }); }
+    if (this.dead) return;
+    const ph = this.phase(), quick = [1, 1, 0.85, 0.65][ph];
     const dx = p.x - this.x, sees = !p.dead && Math.abs(dx) < d.sight && Math.abs(p.y - this.y) < d.sightY;
+    // a new phase: it roars as soon as it has its feet under it
+    if (this.boss && this.roarDue && this.grounded && this.state !== 'charge' && this.state !== 'leap') {
+      this.roarDue = false; this.state = 'roar'; this.t = 0; this.vx = 0;
+      fx.kick(8); SH.sfx.play('rumble'); SH.sfx.play('thud');
+      fx.ring(this.x + this.dir * this.w / 2, this.y - this.h * 0.7, '#c8d2e2', 90, 30, 3);
+      fx.word(this.x, this.y - this.h - 34, ph === 3 ? 'It is furious!' : 'It is angry now!', '#ff8a8a', 80);
+      if (Math.abs(dx) < 150) { p.vx = (dx > 0 ? 1 : -1) * 6.5; p.vy = Math.min(p.vy, -3); }
+      world.dropRocks(2 + ph);
+    }
+    // camping up on a ledge brings the roof down on her
+    if (this.boss) { this.highT = p.y < this.y - 60 ? this.highT + 1 : 0; if (this.highT > 200) { this.highT = 0; world.dropRocks(3, p.x); } }
     switch (this.state) {
       case 'wander':
         this.vx = this.dir * d.wander;
         if (!SH.floorAhead(world.room, this.x + this.dir * (this.w / 2 + 2), this.y) || this.hitWall || Math.abs(this.x - this.home.x) > 5 * SH.TILE && (this.x - this.home.x) * this.dir > 0) this.dir *= -1;
-        if (sees && this.grounded) { this.state = 'windup'; this.t = 0; this.dir = dx > 0 ? 1 : -1; fx.word(this.x, this.y - this.h - 10, '!', '#ff5a5a', 30); SH.sfx.play('rumble'); }
+        if (sees && this.grounded) { this.pickMove(world, dx); if (!this.boss) { fx.word(this.x, this.y - this.h - 10, '!', '#ff5a5a', 30); SH.sfx.play('rumble'); } }
         break;
       case 'windup':
         this.vx = 0;
         if (this.t % 6 === 0) fx.dust(this.x - this.dir * this.w / 2, this.y, -this.dir, 2);
-        if (this.t >= d.windup) { this.state = 'charge'; this.t = 0; }
+        if (this.t >= d.windup * quick) { this.state = 'charge'; this.t = 0; }
         break;
       case 'charge': {
-        this.vx = this.dir * d.chargeSpeed;
+        this.vx = this.dir * d.chargeSpeed * (2 - quick > 1.2 ? 1.18 : 2 - quick > 1 ? 1.08 : 1);
         if (this.t % 3 === 0) fx.dust(this.x - this.dir * this.w / 2, this.y, -this.dir, 2);
         const edge = !SH.floorAhead(world.room, this.x + this.dir * (this.w / 2 + 4), this.y);
-        if (this.hitWall || edge || this.t > d.chargeFrames) {
+        const passed = this.boss && this.t > 24 && (p.x - this.x) * this.dir < -150;   // she's well behind it: stop short
+        if (this.hitWall || edge || passed || this.t > d.chargeFrames) {
           this.vx = 0;
           if (this.hitWall) {
             fx.kick(this.boss ? 9 : 5); SH.sfx.play('thud');
             if (d.rocks) world.dropRocks(d.rocks);
-            this.state = 'stun'; this.t = 0;
-          } else { this.state = edge ? 'stun' : 'rest'; this.t = edge ? Math.floor(d.stun / 2) : 0; }
+            this.state = 'stun'; this.t = 0; this.again = 0;
+          } else if (this.again > 0) { this.again--; this.state = 'windup'; this.t = Math.floor(d.windup * quick * 0.4); this.dir = p.x > this.x ? 1 : -1; SH.sfx.play('rumble'); }
+          else { this.state = edge ? 'stun' : 'rest'; this.t = edge ? Math.floor(d.stun / 2) : 0; }
         }
         break;
       }
+      // ---- leap slam: crouch, jump to where she is, land with a shockwave along the ground each way
+      case 'crouch':
+        this.vx = 0;
+        if (this.t % 5 === 0) fx.dust(this.x, this.y, 0, 2);
+        if (this.t >= 26 * quick) {
+          const air = 36, tx = Math.max(world.room.arena ? world.room.arena[0] : -1e9, Math.min(world.room.arena ? world.room.arena[1] : 1e9, p.x));
+          this.state = 'leap'; this.t = 0; this.vy = -9; this.grounded = false;
+          this.leapVx = Math.max(-7.5, Math.min(7.5, (tx - this.x) / air)); this.dir = this.leapVx >= 0 ? 1 : -1;
+          SH.sfx.play('dash'); fx.dust(this.x, this.y, 0, 8);
+        }
+        break;
+      case 'leap':
+        this.vx = this.leapVx;
+        if (this.grounded && this.t > 6) {
+          this.vx = 0; this.state = 'slamrest'; this.t = 0;
+          fx.kick(10); SH.sfx.play('thud');
+          fx.ring(this.x, this.y - 4, '#c8d2e2', 60, 18, 3);
+          fx.burst(this.x, this.y - 4, 24, { angle: -Math.PI / 2, spread: 2.6, speed: 3.6, life: 30, size: 3, colors: ['#5a6680', '#8a96b8', '#c8d2e2'] });
+          world.spawnWave(this.x - this.w / 2, this.y, -1); world.spawnWave(this.x + this.w / 2, this.y, 1);
+          if (ph === 3) world.dropRocks(2);
+        }
+        break;
+      case 'slamrest':
+        this.vx = 0;
+        if (this.t >= 58 * quick) { this.state = 'rest'; this.t = Math.floor(d.rest * quick * 0.5); }
+        break;
+      // ---- frost breath: a long breath in (fire down its throat chokes it), then a cone of frost along the ground
+      case 'inhale':
+        this.vx = 0;
+        if (this.t % 2 === 0) { const a = Math.random() * 1.4 - 0.7, r = 60 + Math.random() * 50, hx = this.x + this.dir * this.w / 2, hy = this.y - this.h * 0.55;
+          fx.parts.push({ x: hx + this.dir * Math.cos(a) * r, y: hy + Math.sin(a) * r, vx: -this.dir * Math.cos(a) * r / 16, vy: -Math.sin(a) * r / 16, g: 0, drag: 1, life: 15, max: 15, size: 2, color: '#bfe8ff', glow: true, shape: 'sq' }); }
+        if (this.t >= 52 * quick) { this.state = 'breath'; this.t = 0; SH.sfx.play('dash'); }
+        break;
+      case 'breath': {
+        this.vx = 0;
+        const hx = this.x + this.dir * this.w / 2, hy = this.y - this.h * 0.5;
+        fx.burst(hx, hy, 3, { angle: this.dir > 0 ? 0.12 : Math.PI - 0.12, spread: 0.5, speed: 7.5, life: 26, gravity: 0.03, drag: 0.95, size: 3, colors: ['#bfe8ff', '#ffffff', '#7ac8ff'], glow: true });
+        if (this.t % 4 === 0) fx.kick(1.2);
+        if (this.t > 5 && SH.overlap(this.breathBox(), p.box()) && !(p.dashT > 0 && p.iframes > 0)) p.hurt(this.x, 1, world);
+        if (this.t >= 66) { this.state = 'rest'; this.t = 0; }
+        break;
+      }
+      case 'roar':
+        this.vx = 0;
+        if (this.t % 6 === 0) fx.kick(3);
+        if (this.t >= 54) { this.state = 'rest'; this.t = Math.floor(d.rest * quick * 0.5); }
+        break;
       case 'stun':
         this.vx = 0;
         if (this.t >= d.stun) { this.state = 'rest'; this.t = 0; }
         break;
       case 'rest':
         this.vx = 0;
-        if (this.t >= d.rest) { this.state = 'wander'; this.t = 0; if (sees) { this.state = 'windup'; this.dir = dx > 0 ? 1 : -1; } }
+        if (this.boss && this.t > 4) { this.dir = dx > 0 ? 1 : -1; if (Math.abs(dx) > 120) this.vx = this.dir * d.wander * 1.6; }
+        if (this.t >= d.rest * quick) { if (this.boss) { if (!p.dead && this.grounded) this.pickMove(world, dx); } else { this.state = 'wander'; this.t = 0; if (sees) this.pickMove(world, dx); } }
         break;
     }
     this.vy = Math.min(this.vy + d.gravity, 9);
     const res = SH.moveBody(world.room, this);
     this.grounded = res.ground; this.hitWall = res.wall !== 0;
-    if (SH.overlap(this.bodyBox(), p.box()) && !(p.dashT > 0 && p.iframes > 0)) p.hurt(this.x, this.state === 'charge' ? d.damage : 1, world);
+    const hard = this.state === 'charge' || this.state === 'leap';
+    if (SH.overlap(this.bodyBox(), p.box()) && !(p.dashT > 0 && p.iframes > 0)) p.hurt(this.x, hard ? d.damage : 1, world);
   };
   Wyrm.prototype.damage = function (n, world) {
     this.hp -= n; this.flash = 8;
@@ -271,10 +354,12 @@
       if (this.boss && world.onBossDown) world.onBossDown();
       return true;
     }
+    if (this.boss) { const ph = this.phase(); if (ph > this.lastPhase) { this.lastPhase = ph; this.roarDue = true; } }
     return false;
   };
   Wyrm.prototype.takeHit = function (hit, world) {
     const facingHer = hit.dir === -this.dir;
+    if (this.state === 'roar') return null;
     if (!hit.fire && facingHer && (this.state === 'windup' || this.state === 'charge')) {
       // the armored head: sparks, no damage
       SH.fx.word(this.x + this.dir * this.w / 2, this.y - this.h - 6, 'CLANG', '#c8d2e2', 26);
@@ -283,9 +368,18 @@
       world.player.vx = hit.dir * -3;
       return { landed: true, deflect: true };
     }
-    if (hit.fire) this.burn = SH.GIFTS.flame.burn * SH.GIFTS.flame.burnEvery;
+    let dmg = hit.dmg;
+    if (hit.fire) {
+      this.burn = SH.GIFTS.flame.burn * SH.GIFTS.flame.burnEvery;
+      if (this.state === 'inhale' && facingHer) {
+        // fire down its throat while it breathes in: it chokes, and is wide open
+        this.state = 'stun'; this.t = -Math.floor(this.def.stun * 0.3); dmg += 2;
+        SH.fx.word(this.x, this.y - this.h - 22, 'CHOKED!', '#ffb057', 60); SH.fx.kick(6); SH.fx.stop(6); SH.sfx.play('thud');
+        SH.fx.burst(this.x + this.dir * this.w / 2, this.y - this.h * 0.5, 22, { speed: 3, life: 30, colors: ['#ff8a3a', '#ffd27a', '#bfe8ff'], glow: true });
+      }
+    } else if (this.boss && this.state === 'stun') dmg += 1;   // dazed: every cut bites deeper
     SH.fx.burst(this.x, this.y - this.h / 2, 7, { angle: hit.dir > 0 ? 0 : Math.PI, spread: 1.4, speed: 2.4, life: 18, colors: ['#c8d2e2', '#ffffff'] });
-    const killed = this.damage(hit.dmg, world);
+    const killed = this.damage(dmg, world);
     return { landed: true, killed };
   };
 

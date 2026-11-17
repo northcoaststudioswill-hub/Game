@@ -21,6 +21,7 @@ ORDER = [
     'enemies.js',    # thorn sprite, dummy, thorn buds
     'art.js',        # portraits, intro panels, people
     'cine.js',       # animated cinematics
+    'wren.js',       # Wren's jointed figure, poses and slash crescents
     'draw.js',       # world drawing
     'game.js',       # loop, camera, checkpoints
     'hud.js',        # HTML HUD and menus

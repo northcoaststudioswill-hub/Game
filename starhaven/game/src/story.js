@@ -80,6 +80,7 @@
         { id: 'combo', text: 'Show Bram your daggers on the training dummy' },
         { id: 'pit', text: 'Cross Bram\'s thorn pit by bouncing on the buds' },
         { id: 'sprites', text: 'Clear the thorn sprites past the north gate', count: 3 },
+        { id: 'report', text: 'Talk to Caelum when you are ready to leave' },
       ],
       summary: 'Wren trained with Bram and cleared the Iron King\'s thorn sprites. Iris saw a vision: the Iron King knows Wren\'s name, and his iron is reaching for her sisters.',
       done: 'The Iron King knows Wren\'s name. Across the water, Nessa and Lissa don\'t know they\'re in danger.',
@@ -610,7 +611,9 @@
     mtn_wyrm: [
       { do: 'close', id: 'arenagate' },
       ['narr', 'The hollow is full of bones and old wool. Something the size of a cottage uncoils from the rocks.'],
-      ['caelum', 'The Old Wyrm. When it hits the cliff, the mountain shakes. Watch for falling rocks.'],
+      { do: 'flag', name: 'bossmet' },
+      ['caelum', 'The Old Wyrm. Its head is armored: get it to charge into the cliff and it dazes itself. Watch for falling rocks.'],
+      ['caelum', 'When it leaps, jump the shockwave. And when it breathes in... put fire down its throat.'],
       ['wren', 'Stay back. I\'ve got this.'],
       ['caelum', 'I know. That\'s why I\'m staying back.'],
       { do: 'boss' },

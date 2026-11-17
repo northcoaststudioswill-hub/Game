@@ -58,7 +58,7 @@ body[data-state="talk"] #sign, body[data-state="talk"] #pause-btn { display: non
   display: none; gap: 14px; align-items: flex-start; background: var(--panel); border: 2px solid var(--panel-line); border-radius: 16px; padding: 12px 16px 12px 12px; cursor: pointer; }
 #dialog.show { display: flex; }
 #d-face { width: 96px; height: 96px; image-rendering: pixelated; border-radius: 10px; border: 2px solid rgba(255,255,255,.2); flex: none; }
-#d-body { min-width: 0; flex: 1; }
+#d-body { min-width: 0; flex: 1; padding-bottom: 12px; }
 #d-name { font-family: var(--display); font-weight: 800; font-size: 17px; letter-spacing: .06em; margin: 2px 0 4px; }
 #d-text { font-size: 19px; line-height: 1.4; font-weight: 600; }
 #dialog.narr #d-face, #dialog.narr #d-name { display: none; }
@@ -221,7 +221,7 @@ body[data-input="touch"] #touch { display: block; }
   background: var(--panel); border: 1px solid var(--panel-line); color: var(--gold); font-weight: 800; font-size: 13px; opacity: 0; transition: opacity .3s; pointer-events: none; }
 #saving.show { opacity: 1; }
 #dialog.typing #d-more { visibility: hidden; }
-#d-skip { position: absolute; right: 10px; top: 8px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--panel-line); background: rgba(255,255,255,.06); color: var(--ink-dim); font: 700 12px var(--body); cursor: pointer; }
+#d-skip { float: right; margin: 0 -4px 6px 14px; padding: 6px 12px; white-space: nowrap; border-radius: 999px; border: 1px solid var(--panel-line); background: rgba(255,255,255,.06); color: var(--ink-dim); font: 700 12px var(--body); cursor: pointer; }
 #dialog.choosing #d-skip { display: none; }
 .pause-wm { display: flex; justify-content: center; align-items: center; gap: 8px; font-family: var(--display); font-size: 10px; letter-spacing: .2em; color: var(--ink-dim); margin: -2px 0 6px; }
 .pause-wm svg { width: 26px; }
@@ -265,9 +265,8 @@ body[data-input="touch"] #touch { display: block; }
 
 <div id="dialog" role="dialog" aria-live="polite">
   <img id="d-face" alt="">
-  <div id="d-body"><div id="d-name"></div><div id="d-text"></div><div id="d-choices"></div></div>
+  <div id="d-body"><button id="d-skip" aria-label="Skip this scene">Skip &#9656;&#9656;</button><div id="d-name"></div><div id="d-text"></div><div id="d-choices"></div></div>
   <div id="d-more">tap anywhere &#9656;</div>
-  <button id="d-skip" aria-label="Skip this scene">Skip &#9656;&#9656;</button>
 </div>
 
 <div id="scene"><canvas id="scene-art" width="960" height="450"></canvas><div id="scene-title"></div></div>
@@ -409,7 +408,9 @@ body[data-input="touch"] #touch { display: block; }
   // Court gifts (DESIGN.md "Court gifts" and "Combat system": 3 moon pips to start; a cast costs 1;
   // pips refill slowly over time and quickly from dagger hits, which rewards getting close).
   SH.GIFTS = {
-    flame: { cost: 1, speed: 5.6, life: 70, damage: 4, burn: 3, burnEvery: 40, cooldown: 22 },
+    flame: { cost: 1, speed: 5.6, life: 70, damage: 4, burn: 3, burnEvery: 40, cooldown: 22,
+      // hold the button to charge a flame wave: two moons, pierces everything in its path
+      chargeFrames: 32, waveCost: 2, waveDamage: 8, waveSpeed: 7.2 },
     pips: 3, regenFrames: 300, perHit: 0.34,
   };
 
@@ -435,6 +436,10 @@ body[data-input="touch"] #touch { display: block; }
       { frames: 14, active: [2, 7], next: 99, lunge: 0, kb: 4.5, stop: 4, reach: 38, arc: 'low', finisher: true },
     ],
     pogo: { frames: 16, active: [1, 11], next: 99, kb: 1.5, stop: 5, reach: 36, arc: 'down' },
+    // Dash strike: attack during a dash. A lunging thrust that hits harder than a normal cut.
+    thrust: { frames: 14, active: [0, 9], next: 99, kb: 5.5, stop: 5, reach: 52, arc: 'thrust', dmg: 3, finisher: true },
+    // Rising strike: hold up and attack on the ground. An uppercut that carries Wren into the air and launches light enemies.
+    up: { frames: 18, active: [1, 11], next: 99, kb: 1.5, stop: 4, reach: 36, arc: 'up', dmg: 2, launch: 7.5, hop: 2.7 },
     killStop: 6,
     recoil: 1.6,        // small push back on you when your blade connects
   };
@@ -451,8 +456,9 @@ body[data-input="touch"] #touch { display: block; }
     // Its head is armored while it winds up and charges: hit it from behind, or while it's dazed after a charge.
     wyrmling: { name: 'Mountain wyrmling', hp: 10, w: 46, h: 26, wander: 0.5, sight: 210, sightY: 70, windup: 34,
       chargeSpeed: 6.2, chargeFrames: 70, stun: 80, rest: 40, damage: 1, gravity: 0.5, scale: 1 },
-    // The Old Wyrm: the same creature, bigger (data, not new code). Charging into a wall brings rocks down.
-    oldWyrm: { name: 'The Old Wyrm', hp: 30, w: 80, h: 44, wander: 0.4, sight: 1200, sightY: 160, windup: 30,
+    // The Old Wyrm: the same creature, bigger, with three phases (see Wyrm in enemies.js): charge, leap slam, frost breath.
+    // Charging into a wall brings rocks down and dazes it; fire down its throat while it breathes in chokes it.
+    oldWyrm: { name: 'The Old Wyrm', hp: 46, breathReach: 170, w: 80, h: 44, wander: 0.4, sight: 1200, sightY: 160, windup: 30,
       chargeSpeed: 7.2, chargeFrames: 90, stun: 95, rest: 30, damage: 2, gravity: 0.5, scale: 1.7, rocks: 5, boss: true },
     bulb: { name: 'Thorn bud', r: 13, regrow: 40 },
   };
@@ -543,6 +549,7 @@ body[data-input="touch"] #touch { display: block; }
         { id: 'combo', text: 'Show Bram your daggers on the training dummy' },
         { id: 'pit', text: 'Cross Bram\'s thorn pit by bouncing on the buds' },
         { id: 'sprites', text: 'Clear the thorn sprites past the north gate', count: 3 },
+        { id: 'report', text: 'Talk to Caelum when you are ready to leave' },
       ],
       summary: 'Wren trained with Bram and cleared the Iron King\'s thorn sprites. Iris saw a vision: the Iron King knows Wren\'s name, and his iron is reaching for her sisters.',
       done: 'The Iron King knows Wren\'s name. Across the water, Nessa and Lissa don\'t know they\'re in danger.',
@@ -1073,7 +1080,9 @@ body[data-input="touch"] #touch { display: block; }
     mtn_wyrm: [
       { do: 'close', id: 'arenagate' },
       ['narr', 'The hollow is full of bones and old wool. Something the size of a cottage uncoils from the rocks.'],
-      ['caelum', 'The Old Wyrm. When it hits the cliff, the mountain shakes. Watch for falling rocks.'],
+      { do: 'flag', name: 'bossmet' },
+      ['caelum', 'The Old Wyrm. Its head is armored: get it to charge into the cliff and it dazes itself. Watch for falling rocks.'],
+      ['caelum', 'When it leaps, jump the shockwave. And when it breathes in... put fire down its throat.'],
       ['wren', 'Stay back. I\'ve got this.'],
       ['caelum', 'I know. That\'s why I\'m staying back.'],
       { do: 'boss' },
@@ -1245,6 +1254,7 @@ body[data-input="touch"] #touch { display: block; }
       { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.' },
       { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.' },
       { x0: 80, x1: 85, text: 'Thorns hurt. Jump over them.' },
+      { x0: 88, x1: 94, text: 'The last trial is just ahead, and there is no way back. {LEFT} Starlight still behind you.', until: 'maze', motesLeft: true },
       { x0: 94, x1: 104, text: 'RUN. Keep moving right and jump the gaps.' },
     ],
     triggers: [
@@ -1294,13 +1304,13 @@ body[data-input="touch"] #touch { display: block; }
       { x: 4, script: 'ashes_start' },
       { x: 39, script: 'ashes_overlook' },
       { x: 55, script: 'ashes_gate' },
-      { x: 106, above: 10, script: 'ashes_roof', flag: 'painted' },
+      { x: 109.5, above: 10, script: 'ashes_roof', flag: 'painted' },
     ],
     props: [
       { t: 'bush', x: 6 }, { t: 'bush', x: 15 }, { t: 'bush', x: 27 }, { t: 'pine', x: 12 }, { t: 'pine', x: 20 }, { t: 'pine', x: 35 }, { t: 'pine', x: 44 },
       { t: 'banner', x: 56 }, { t: 'banner', x: 67, c: '#7a2a4a' }, { t: 'banner', x: 88 }, { t: 'crate', x: 60 }, { t: 'crate', x: 84.6 }, { t: 'barrel', x: 63 }, { t: 'barrel', x: 92 },
     ],
-    motes: [['line', 11, 20, 14.6], ['line', 23, 29, 13.6], ['line', 32, 38, 12.6], ['line', 58, 67, 14.6], ['line', 78, 96, 14.6], ['line', 100, 103, 11.6], ['line', 106, 109, 8.6]],
+    motes: [['line', 11, 20, 14.6], ['line', 23, 29, 13.6], ['line', 32, 38, 12.6], ['line', 58, 67, 14.6], ['line', 78, 96, 14.6], ['line', 100, 103, 11.6], ['line', 105, 108, 8.6]],
     mural: { x: 70, w: 5, needs: 'arrive', flag: 'painted', script: 'ashes_painted', frames: 80 },
     arch: 52,
     house: { x0: 104, x1: 118, top: 10 },
@@ -1328,6 +1338,7 @@ body[data-input="touch"] #touch { display: block; }
     hints: [
       { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
       { x0: 36, x1: 44, text: 'Jump toward a bud. When you are above it, {DOWNSTRIKE} to strike down and bounce.', flag: 'combo' },
+      { x0: 61, x1: 69, text: 'Two more cuts: {ATTACK} during a dash is a lunging dash strike. Hold up and {ATTACK} for a rising strike that carries you into the air.', flag: 'pit' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
     ],
     triggers: [
@@ -1360,6 +1371,7 @@ body[data-input="touch"] #touch { display: block; }
     zones: [{ x: 0, theme: 'city' }, { x: 40, theme: 'mountain' }],
     start: { x: 3, y: 16 },
     cityFrom: 3, cityTo: 30, cityLight: 0.8, cityGlowX: 20,
+    arena: [119 * 24 + 40, 161 * 24 - 40],   // where the Old Wyrm may land a leap
     shapes: [
       ['solid', 0, 2, 0, 20],
       ['ground', 2, 48, 16],            // the Library courtyard, then the foot of the mountain road
@@ -1370,6 +1382,8 @@ body[data-input="touch"] #touch { display: block; }
       ['ground', 90, 117, 14],
       ['oneway', 95, 100, 10],          // somewhere to hop up out of a charge
       ['ground', 117, 162, 14],         // the Old Wyrm's hollow
+      ['oneway', 126, 131, 10],         // two ledges in the hollow: out of reach of a charge and the frost,
+      ['oneway', 139, 144, 10],         // but stay too long and the roof comes down
       ['solid', 162, 164, 0, 20],
     ],
     props: [
@@ -1381,8 +1395,10 @@ body[data-input="touch"] #touch { display: block; }
     motes: [['line', 20, 24, 10.6], ['line', 37, 46, 14.6], ['line', 49, 55, 12.6], ['line', 57, 63, 10.6], ['arc', 63.5, 68.5, 10.4, 2.4], ['line', 70, 76, 10.6], ['line', 96, 99, 8.6], ['line', 108, 114, 12.6]],
     thornWalls: [{ id: 'road', x: 34, w: 2, top: 6 }],
     hints: [
-      { x0: 6, x1: 30, text: 'Call the flame with {GIFT}. Each flame costs one moon (beside your hearts); they refill over time, faster when your daggers land.', flag: 'giftgot' },
+      { x0: 6, x1: 30, text: 'Call the flame with {GIFT}. Each flame costs one moon (beside your hearts); they refill over time, faster when your daggers land.', flag: 'giftgot', until: 'flame' },
+      { x0: 6, x1: 27, text: 'Hold {GIFT} and let go for a flame wave: it costs two moons, hits twice as hard and burns through everything in its path.', flag: 'flame' },
       { x0: 27, x1: 34, text: 'Thorns: steel won\'t cut them. Burn them with {GIFT}.', flag: 'flame' },
+      { x0: 110, x1: 117, text: 'The Old Wyrm\'s hollow is ahead, and there is no way back out. {LEFT} Starlight still behind you.', flag: 'wall', until: 'bossmet', motesLeft: true },
       { x0: 66, x1: 82, text: 'Wyrmlings charge in a straight line, head armored. Jump over the charge, then strike from behind while it\'s dazed.', flag: 'wall' },
     ],
     triggers: [
@@ -1882,12 +1898,12 @@ body[data-input="touch"] #touch { display: block; }
 // Starhaven — game feel effects: particles, rings, hit-stop, shake, slow-motion, floating words.
 (function (SH) {
   const fx = {
-    parts: [], rings: [], words: [], ghosts: [],
+    parts: [], rings: [], words: [], ghosts: [], lines: [],
     hitstop: 0, shake: 0, flash: 0, flashColor: '#fff',
     slowmo: 0,
   };
 
-  fx.reset = function () { fx.parts.length = fx.rings.length = fx.words.length = fx.ghosts.length = 0; fx.hitstop = fx.shake = fx.flash = fx.slowmo = 0; };
+  fx.reset = function () { fx.parts.length = fx.rings.length = fx.words.length = fx.ghosts.length = fx.lines.length = 0; fx.hitstop = fx.shake = fx.flash = fx.slowmo = 0; };
 
   fx.stop = function (frames) { fx.hitstop = Math.max(fx.hitstop, frames); };
   fx.kick = function (amount) { if (SH.settings && SH.settings.shake === false) return; fx.shake = Math.max(fx.shake, amount); };
@@ -1913,6 +1929,13 @@ body[data-input="touch"] #touch { display: block; }
   fx.ring = function (x, y, color, r1, life, width) { fx.rings.push({ x, y, r: 2, r1: r1 || 26, life: life || 16, max: life || 16, color: color || '#fff', width: width || 2 }); };
   fx.word = function (x, y, text, color, life) { fx.words.push({ x, y, text, color: color || '#fff', life: life || 50, max: life || 50 }); };
   fx.ghost = function (snap) { fx.ghosts.push(snap); };
+  // Hit sparks: a slash mark across the hit and bright lines flying out of it.
+  fx.spark = function (x, y, ang, big) {
+    fx.lines.push({ x, y, ang: ang + 0.5, len: big ? 30 : 20, grow: 0, life: 7, max: 7, slash: true });
+    const n = big ? 9 : 5;
+    for (let i = 0; i < n; i++) { const a = ang + (Math.random() - 0.5) * 2.2; fx.lines.push({ x, y, ang: a, len: 5 + Math.random() * (big ? 12 : 7), grow: 2.5 + Math.random() * 3, dist: 4, life: 9, max: 9 }); }
+    fx.rings.push({ x, y, r: 2, r1: big ? 22 : 13, life: 8, max: 8, color: '#ffffff', width: 2 });
+  };
 
   fx.update = function () {
     for (const p of fx.parts) { p.vx *= p.drag; p.vy = p.vy * p.drag + p.g; p.x += p.vx; p.y += p.vy; p.life--; }
@@ -1921,6 +1944,8 @@ body[data-input="touch"] #touch { display: block; }
     fx.rings = fx.rings.filter(r => r.life > 0);
     for (const w of fx.words) { w.life--; w.y -= 0.35; }
     fx.words = fx.words.filter(w => w.life > 0);
+    for (const l of fx.lines) { l.life--; if (l.dist != null) l.dist += l.grow; }
+    fx.lines = fx.lines.filter(l => l.life > 0);
     for (const g of fx.ghosts) g.life--;
     fx.ghosts = fx.ghosts.filter(g => g.life > 0);
     if (fx.shake > 0) fx.shake = Math.max(0, fx.shake * 0.85 - 0.05);
@@ -1945,7 +1970,7 @@ body[data-input="touch"] #touch { display: block; }
       facing: 1, grounded: false, wasGrounded: false,
       coyote: 0, jumpBuf: 0, dashBuf: 0, atkBuf: 0,
       airJumps: 1, airDashes: 1, rising: false,
-      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, bowCd: 0, bowT: 0, pips: SH.GIFTS.pips, giftCd: 0, castT: 0,
+      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, bowCd: 0, bowT: 0, pips: SH.GIFTS.pips, giftCd: 0, castT: 0, giftBuf: 0, charging: false, chargeT: 0, hitFlash: 0,
       invuln: 0, stun: 0,
       swing: null, comboStep: 0, comboKind: null, comboGap: 0,
       hearts: P.hearts, maxHearts: P.hearts,
@@ -1985,14 +2010,27 @@ body[data-input="touch"] #touch { display: block; }
     if (SH.game.can('flame')) {
       const G = SH.GIFTS;
       this.pips = Math.min(G.pips, this.pips + 1 / G.regenFrames);
-      if (this.giftBuf > 0 && this.giftCd <= 0 && !this.dead && this.stun <= 0) {
-        this.giftBuf = 0;
-        if (this.pips >= G.flame.cost) {
-          this.pips -= G.flame.cost; this.giftCd = G.flame.cooldown; this.castT = 14;
+      // press to start, release to throw; hold long enough (and have two moons) and it becomes a flame wave
+      if (this.giftBuf > 0 && !this.charging && this.giftCd <= 0 && !this.dead && this.stun <= 0) { this.giftBuf = 0; this.charging = true; this.chargeT = 0; }
+      if (this.charging) {
+        this.chargeT++;
+        const ready = this.chargeT >= G.flame.chargeFrames && this.pips >= G.flame.waveCost;
+        if (this.chargeT === G.flame.chargeFrames && this.pips >= G.flame.waveCost) { SH.fx.ring(this.x + this.facing * 12, this.y - 24, '#ffb057', 26, 14, 2); SH.sfx.play('lantern'); }
+        if (this.chargeT > 6 && this.chargeT % 3 === 0) SH.fx.burst(this.x + this.facing * 12, this.y - 24, 1, { speed: 1.2, life: 14, gravity: -0.05, colors: ready ? ['#fff6d8', '#ffb057'] : ['#ff8a3a', '#ffd27a'], glow: true });
+        if (!inp.held.gift || this.stun > 0 || this.dead) {
           const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
-          world.spawnFireball(this.x + this.facing * 14, this.y - 22, this.facing);
-          SH.sfx.play('dash');
-        } else { SH.fx.word(this.x, this.y - 52, 'no moons left', '#b9b2dd', 34); this.giftCd = 20; }
+          if (this.stun > 0 || this.dead) { /* knocked out of it */ }
+          else if (ready) {
+            this.pips -= G.flame.waveCost; this.giftCd = G.flame.cooldown + 8; this.castT = 18;
+            world.spawnFireball(this.x + this.facing * 16, this.y - 22, this.facing, true);
+            this.vx -= this.facing * 2.4; SH.fx.kick(3); SH.sfx.play('kill');
+          } else if (this.pips >= G.flame.cost) {
+            this.pips -= G.flame.cost; this.giftCd = G.flame.cooldown; this.castT = 14;
+            world.spawnFireball(this.x + this.facing * 14, this.y - 22, this.facing, false);
+            SH.sfx.play('dash');
+          } else { SH.fx.word(this.x, this.y - 52, 'no moons left', '#b9b2dd', 34); this.giftCd = 20; }
+          this.charging = false; this.chargeT = 0;
+        }
       }
     }
     if (this.iframes > 0) this.iframes--;
@@ -2077,6 +2115,14 @@ body[data-input="touch"] #touch { display: block; }
     }
 
     // ---- attacks
+    if (this.hitFlash > 0) this.hitFlash--;
+    // Dash strike: attack during a dash
+    if (!stunned && this.dashT > 0 && this.atkBuf > 0 && !this.swing && SH.game.can('daggers')) {
+      this.atkBuf = 0; this.comboStep = 0; this.comboKind = 'thrust';
+      this.swing = { kind: 'thrust', step: 0, def: C.thrust, f: 0, hits: new Set() };
+      this.dashT = Math.max(this.dashT, 7); this.iframes = Math.max(this.iframes, 9);
+      SH.sfx.play('slash');
+    }
     if (!stunned && this.dashT <= 0) this.tryAttack(world, inp);
     if (this.swing) this.updateSwing(world);
 
@@ -2160,6 +2206,15 @@ body[data-input="touch"] #touch { display: block; }
       } else step = (this.comboKind === kind && this.comboGap > 0 && this.comboStep < list.length) ? this.comboStep : 0;
     }
     if (this.swing && kind === 'pogo') return;
+    // Rising strike: up + attack on the ground
+    if (kind === 'ground' && inp.held.up && !this.swing) {
+      this.atkBuf = 0; this.comboStep = 0; this.comboKind = 'up';
+      const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
+      this.swing = { kind: 'up', step: 0, def: C.up, f: 0, hits: new Set() };
+      this.vy = -this.jumpV(C.up.hop); this.grounded = false; this.coyote = 0; this.rising = false;
+      SH.sfx.play('slash'); SH.fx.dust(this.x, this.y, 0, 5);
+      return;
+    }
     const def = kind === 'pogo' ? C.pogo : C[kind][step];
     this.atkBuf = 0;
     this.comboKind = kind;
@@ -2190,6 +2245,7 @@ body[data-input="touch"] #touch { display: block; }
     const s = this.swing, d = s.def;
     if (s.kind === 'pogo') return { l: this.x - 22, r: this.x + 22, t: this.y - 8, b: this.y + d.reach };
     const f = this.facing, cy = this.y - 20;
+    if (s.kind === 'up') return { l: Math.min(this.x - f * 8, this.x + f * d.reach), r: Math.max(this.x - f * 8, this.x + f * d.reach), t: this.y - 78, b: this.y - 6 };
     const h = d.arc === 'big' ? 40 : 30;
     const near = this.x + f * 2, far = this.x + f * d.reach;
     return { l: Math.min(near, far), r: Math.max(near, far), t: cy - h / 2, b: cy + h / 2 };
@@ -2204,11 +2260,12 @@ body[data-input="touch"] #touch { display: block; }
         if (s.hits.has(tgt) || !tgt.hittable()) continue;
         if (!SH.overlap(hb, tgt.hurtBox())) continue;
         s.hits.add(tgt);
-        const r = tgt.takeHit({ dmg: C.damage, kb: d.kb, dir: this.facing, finisher: !!d.finisher, pogo: s.kind === 'pogo' }, world);
+        const r = tgt.takeHit({ dmg: d.dmg || C.damage, kb: d.kb, dir: this.facing, finisher: !!d.finisher, pogo: s.kind === 'pogo', launch: d.launch || 0 }, world);
         if (!r) continue;
         if (r.deflect) continue;
         if (SH.game.can('flame')) this.pips = Math.min(SH.GIFTS.pips, this.pips + SH.GIFTS.perHit); // close-up hits refill the moons
         this.stats.hits++;
+        { const hb2 = tgt.hurtBox(); fx.spark((Math.max(hb.l, hb2.l) + Math.min(hb.r, hb2.r)) / 2, (Math.max(hb.t, hb2.t) + Math.min(hb.b, hb2.b)) / 2, s.kind === 'pogo' ? Math.PI / 2 : s.kind === 'up' ? -Math.PI / 2 : (this.facing > 0 ? 0 : Math.PI), d.finisher || r.killed); }
         SH.sfx.play(r.killed ? 'kill' : 'hit');
         fx.stop(r.killed ? C.killStop : d.stop);
         fx.kick(r.killed ? 4 : d.finisher ? 3 : 1.6);
@@ -2244,7 +2301,7 @@ body[data-input="touch"] #touch { display: block; }
     if (this.iframes > 0) return false;
     const fx = SH.fx;
     this.hearts = Math.max(0, this.hearts - dmg);
-    this.stats.hurt++;
+    this.stats.hurt++; this.hitFlash = 6; this.charging = false; this.chargeT = 0;
     SH.sfx.play('hurt');
     this.invuln = SH.PLAYER.hurtInvuln;
     this.stun = SH.PLAYER.hurtStun;
@@ -2362,7 +2419,7 @@ body[data-input="touch"] #touch { display: block; }
     this.hp -= hit.dmg;
     this.flash = 8;
     const kb = hit.pogo ? 0 : hit.kb;
-    this.vx = hit.dir * kb; this.vy = hit.pogo ? 1 : -1.8;
+    this.vx = hit.dir * kb; this.vy = hit.pogo ? 1 : hit.launch ? -hit.launch : -1.8;
     fx.burst(this.x, this.y - this.h / 2, 7, { angle: hit.pogo ? Math.PI / 2 : (hit.dir > 0 ? 0 : Math.PI), spread: 1.4, speed: 2.4, life: 18, colors: ['#9be07a', '#d8ffb8', '#ffffff'] });
     if (this.hp <= 0) {
       this.dead = true; this.deadT = 0;
@@ -2483,57 +2540,140 @@ body[data-input="touch"] #touch { display: block; }
     this.reset();
   }
   Wyrm.prototype.reset = function () {
-    Object.assign(this, { x: this.home.x, y: this.home.y, vx: 0, vy: 0, hp: this.def.hp, dir: -1, state: this.boss ? 'sleep' : 'wander', t: 0, flash: 0, dead: false, burn: 0, burnT: 0, grounded: false, hitWall: false });
+    Object.assign(this, { x: this.home.x, y: this.home.y, vx: 0, vy: 0, hp: this.def.hp, dir: -1, state: this.boss ? 'sleep' : 'wander', t: 0, flash: 0, dead: false, burn: 0, burnT: 0, grounded: false, hitWall: false,
+      moveN: 0, lastPhase: 1, roarDue: false, again: 0, highT: 0 });
   };
   Wyrm.prototype.hittable = function () { return !this.dead && this.state !== 'sleep'; };
   Wyrm.prototype.hurtBox = function () { return { l: this.x - this.w / 2, r: this.x + this.w / 2, t: this.y - this.h, b: this.y }; };
   Wyrm.prototype.bodyBox = function () { return { l: this.x - this.w / 2 + 6, r: this.x + this.w / 2 - 6, t: this.y - this.h + 6, b: this.y }; };
   Wyrm.prototype.wake = function () { if (this.state === 'sleep') { this.state = 'rest'; this.t = 0; } };
+  // The Old Wyrm fights in three phases: it gets faster and gains moves as it weakens.
+  Wyrm.prototype.phase = function () { if (!this.boss) return 1; const k = this.hp / this.def.hp; return k > 0.66 ? 1 : k > 0.33 ? 2 : 3; };
+  Wyrm.prototype.breathBox = function () {
+    const head = this.x + this.dir * this.w / 2, far = head + this.dir * this.def.breathReach;
+    return { l: Math.min(head, far), r: Math.max(head, far), t: this.y - 46, b: this.y };
+  };
+  Wyrm.prototype.pickMove = function (world, dx) {
+    const d = this.def, p = world.player, ph = this.phase();
+    this.dir = dx > 0 ? 1 : -1; this.t = 0;
+    if (!this.boss) { this.state = 'windup'; return; }
+    const order = ph === 1 ? ['charge', 'slam'] : ph === 2 ? ['charge', 'breath', 'slam'] : ['charge', 'slam', 'breath', 'slam'];
+    let m = order[this.moveN++ % order.length];
+    if (m === 'breath' && p.y < this.y - 50) m = 'slam';              // she's up on a ledge: frost can't reach
+    if (m === 'breath' && Math.abs(dx) > d.breathReach + 60) m = 'charge';
+    if (m === 'charge') { this.state = 'windup'; this.again = ph === 3 ? 1 : 0; SH.sfx.play('rumble'); }
+    else if (m === 'slam') { this.state = 'crouch'; }
+    else { this.state = 'inhale'; SH.sfx.play('rumble'); }
+  };
   Wyrm.prototype.update = function (world) {
     const d = this.def, p = world.player, fx = SH.fx;
     if (this.dead || this.state === 'sleep') return;
     this.t++;
     if (this.flash > 0) this.flash--;
     if (this.burn > 0) { this.burn--; if (++this.burnT % SH.GIFTS.flame.burnEvery === 0) this.damage(1, world); if (this.t % 4 === 0) fx.burst(this.x, this.y - this.h * 0.7, 1, { speed: 0.6, life: 20, gravity: -0.06, colors: ['#ff8a3a', '#ffd27a'] }); }
+    if (this.dead) return;
+    const ph = this.phase(), quick = [1, 1, 0.85, 0.65][ph];
     const dx = p.x - this.x, sees = !p.dead && Math.abs(dx) < d.sight && Math.abs(p.y - this.y) < d.sightY;
+    // a new phase: it roars as soon as it has its feet under it
+    if (this.boss && this.roarDue && this.grounded && this.state !== 'charge' && this.state !== 'leap') {
+      this.roarDue = false; this.state = 'roar'; this.t = 0; this.vx = 0;
+      fx.kick(8); SH.sfx.play('rumble'); SH.sfx.play('thud');
+      fx.ring(this.x + this.dir * this.w / 2, this.y - this.h * 0.7, '#c8d2e2', 90, 30, 3);
+      fx.word(this.x, this.y - this.h - 34, ph === 3 ? 'It is furious!' : 'It is angry now!', '#ff8a8a', 80);
+      if (Math.abs(dx) < 150) { p.vx = (dx > 0 ? 1 : -1) * 6.5; p.vy = Math.min(p.vy, -3); }
+      world.dropRocks(2 + ph);
+    }
+    // camping up on a ledge brings the roof down on her
+    if (this.boss) { this.highT = p.y < this.y - 60 ? this.highT + 1 : 0; if (this.highT > 200) { this.highT = 0; world.dropRocks(3, p.x); } }
     switch (this.state) {
       case 'wander':
         this.vx = this.dir * d.wander;
         if (!SH.floorAhead(world.room, this.x + this.dir * (this.w / 2 + 2), this.y) || this.hitWall || Math.abs(this.x - this.home.x) > 5 * SH.TILE && (this.x - this.home.x) * this.dir > 0) this.dir *= -1;
-        if (sees && this.grounded) { this.state = 'windup'; this.t = 0; this.dir = dx > 0 ? 1 : -1; fx.word(this.x, this.y - this.h - 10, '!', '#ff5a5a', 30); SH.sfx.play('rumble'); }
+        if (sees && this.grounded) { this.pickMove(world, dx); if (!this.boss) { fx.word(this.x, this.y - this.h - 10, '!', '#ff5a5a', 30); SH.sfx.play('rumble'); } }
         break;
       case 'windup':
         this.vx = 0;
         if (this.t % 6 === 0) fx.dust(this.x - this.dir * this.w / 2, this.y, -this.dir, 2);
-        if (this.t >= d.windup) { this.state = 'charge'; this.t = 0; }
+        if (this.t >= d.windup * quick) { this.state = 'charge'; this.t = 0; }
         break;
       case 'charge': {
-        this.vx = this.dir * d.chargeSpeed;
+        this.vx = this.dir * d.chargeSpeed * (2 - quick > 1.2 ? 1.18 : 2 - quick > 1 ? 1.08 : 1);
         if (this.t % 3 === 0) fx.dust(this.x - this.dir * this.w / 2, this.y, -this.dir, 2);
         const edge = !SH.floorAhead(world.room, this.x + this.dir * (this.w / 2 + 4), this.y);
-        if (this.hitWall || edge || this.t > d.chargeFrames) {
+        const passed = this.boss && this.t > 24 && (p.x - this.x) * this.dir < -150;   // she's well behind it: stop short
+        if (this.hitWall || edge || passed || this.t > d.chargeFrames) {
           this.vx = 0;
           if (this.hitWall) {
             fx.kick(this.boss ? 9 : 5); SH.sfx.play('thud');
             if (d.rocks) world.dropRocks(d.rocks);
-            this.state = 'stun'; this.t = 0;
-          } else { this.state = edge ? 'stun' : 'rest'; this.t = edge ? Math.floor(d.stun / 2) : 0; }
+            this.state = 'stun'; this.t = 0; this.again = 0;
+          } else if (this.again > 0) { this.again--; this.state = 'windup'; this.t = Math.floor(d.windup * quick * 0.4); this.dir = p.x > this.x ? 1 : -1; SH.sfx.play('rumble'); }
+          else { this.state = edge ? 'stun' : 'rest'; this.t = edge ? Math.floor(d.stun / 2) : 0; }
         }
         break;
       }
+      // ---- leap slam: crouch, jump to where she is, land with a shockwave along the ground each way
+      case 'crouch':
+        this.vx = 0;
+        if (this.t % 5 === 0) fx.dust(this.x, this.y, 0, 2);
+        if (this.t >= 26 * quick) {
+          const air = 36, tx = Math.max(world.room.arena ? world.room.arena[0] : -1e9, Math.min(world.room.arena ? world.room.arena[1] : 1e9, p.x));
+          this.state = 'leap'; this.t = 0; this.vy = -9; this.grounded = false;
+          this.leapVx = Math.max(-7.5, Math.min(7.5, (tx - this.x) / air)); this.dir = this.leapVx >= 0 ? 1 : -1;
+          SH.sfx.play('dash'); fx.dust(this.x, this.y, 0, 8);
+        }
+        break;
+      case 'leap':
+        this.vx = this.leapVx;
+        if (this.grounded && this.t > 6) {
+          this.vx = 0; this.state = 'slamrest'; this.t = 0;
+          fx.kick(10); SH.sfx.play('thud');
+          fx.ring(this.x, this.y - 4, '#c8d2e2', 60, 18, 3);
+          fx.burst(this.x, this.y - 4, 24, { angle: -Math.PI / 2, spread: 2.6, speed: 3.6, life: 30, size: 3, colors: ['#5a6680', '#8a96b8', '#c8d2e2'] });
+          world.spawnWave(this.x - this.w / 2, this.y, -1); world.spawnWave(this.x + this.w / 2, this.y, 1);
+          if (ph === 3) world.dropRocks(2);
+        }
+        break;
+      case 'slamrest':
+        this.vx = 0;
+        if (this.t >= 58 * quick) { this.state = 'rest'; this.t = Math.floor(d.rest * quick * 0.5); }
+        break;
+      // ---- frost breath: a long breath in (fire down its throat chokes it), then a cone of frost along the ground
+      case 'inhale':
+        this.vx = 0;
+        if (this.t % 2 === 0) { const a = Math.random() * 1.4 - 0.7, r = 60 + Math.random() * 50, hx = this.x + this.dir * this.w / 2, hy = this.y - this.h * 0.55;
+          fx.parts.push({ x: hx + this.dir * Math.cos(a) * r, y: hy + Math.sin(a) * r, vx: -this.dir * Math.cos(a) * r / 16, vy: -Math.sin(a) * r / 16, g: 0, drag: 1, life: 15, max: 15, size: 2, color: '#bfe8ff', glow: true, shape: 'sq' }); }
+        if (this.t >= 52 * quick) { this.state = 'breath'; this.t = 0; SH.sfx.play('dash'); }
+        break;
+      case 'breath': {
+        this.vx = 0;
+        const hx = this.x + this.dir * this.w / 2, hy = this.y - this.h * 0.5;
+        fx.burst(hx, hy, 3, { angle: this.dir > 0 ? 0.12 : Math.PI - 0.12, spread: 0.5, speed: 7.5, life: 26, gravity: 0.03, drag: 0.95, size: 3, colors: ['#bfe8ff', '#ffffff', '#7ac8ff'], glow: true });
+        if (this.t % 4 === 0) fx.kick(1.2);
+        if (this.t > 5 && SH.overlap(this.breathBox(), p.box()) && !(p.dashT > 0 && p.iframes > 0)) p.hurt(this.x, 1, world);
+        if (this.t >= 66) { this.state = 'rest'; this.t = 0; }
+        break;
+      }
+      case 'roar':
+        this.vx = 0;
+        if (this.t % 6 === 0) fx.kick(3);
+        if (this.t >= 54) { this.state = 'rest'; this.t = Math.floor(d.rest * quick * 0.5); }
+        break;
       case 'stun':
         this.vx = 0;
         if (this.t >= d.stun) { this.state = 'rest'; this.t = 0; }
         break;
       case 'rest':
         this.vx = 0;
-        if (this.t >= d.rest) { this.state = 'wander'; this.t = 0; if (sees) { this.state = 'windup'; this.dir = dx > 0 ? 1 : -1; } }
+        if (this.boss && this.t > 4) { this.dir = dx > 0 ? 1 : -1; if (Math.abs(dx) > 120) this.vx = this.dir * d.wander * 1.6; }
+        if (this.t >= d.rest * quick) { if (this.boss) { if (!p.dead && this.grounded) this.pickMove(world, dx); } else { this.state = 'wander'; this.t = 0; if (sees) this.pickMove(world, dx); } }
         break;
     }
     this.vy = Math.min(this.vy + d.gravity, 9);
     const res = SH.moveBody(world.room, this);
     this.grounded = res.ground; this.hitWall = res.wall !== 0;
-    if (SH.overlap(this.bodyBox(), p.box()) && !(p.dashT > 0 && p.iframes > 0)) p.hurt(this.x, this.state === 'charge' ? d.damage : 1, world);
+    const hard = this.state === 'charge' || this.state === 'leap';
+    if (SH.overlap(this.bodyBox(), p.box()) && !(p.dashT > 0 && p.iframes > 0)) p.hurt(this.x, hard ? d.damage : 1, world);
   };
   Wyrm.prototype.damage = function (n, world) {
     this.hp -= n; this.flash = 8;
@@ -2545,10 +2685,12 @@ body[data-input="touch"] #touch { display: block; }
       if (this.boss && world.onBossDown) world.onBossDown();
       return true;
     }
+    if (this.boss) { const ph = this.phase(); if (ph > this.lastPhase) { this.lastPhase = ph; this.roarDue = true; } }
     return false;
   };
   Wyrm.prototype.takeHit = function (hit, world) {
     const facingHer = hit.dir === -this.dir;
+    if (this.state === 'roar') return null;
     if (!hit.fire && facingHer && (this.state === 'windup' || this.state === 'charge')) {
       // the armored head: sparks, no damage
       SH.fx.word(this.x + this.dir * this.w / 2, this.y - this.h - 6, 'CLANG', '#c8d2e2', 26);
@@ -2557,9 +2699,18 @@ body[data-input="touch"] #touch { display: block; }
       world.player.vx = hit.dir * -3;
       return { landed: true, deflect: true };
     }
-    if (hit.fire) this.burn = SH.GIFTS.flame.burn * SH.GIFTS.flame.burnEvery;
+    let dmg = hit.dmg;
+    if (hit.fire) {
+      this.burn = SH.GIFTS.flame.burn * SH.GIFTS.flame.burnEvery;
+      if (this.state === 'inhale' && facingHer) {
+        // fire down its throat while it breathes in: it chokes, and is wide open
+        this.state = 'stun'; this.t = -Math.floor(this.def.stun * 0.3); dmg += 2;
+        SH.fx.word(this.x, this.y - this.h - 22, 'CHOKED!', '#ffb057', 60); SH.fx.kick(6); SH.fx.stop(6); SH.sfx.play('thud');
+        SH.fx.burst(this.x + this.dir * this.w / 2, this.y - this.h * 0.5, 22, { speed: 3, life: 30, colors: ['#ff8a3a', '#ffd27a', '#bfe8ff'], glow: true });
+      }
+    } else if (this.boss && this.state === 'stun') dmg += 1;   // dazed: every cut bites deeper
     SH.fx.burst(this.x, this.y - this.h / 2, 7, { angle: hit.dir > 0 ? 0 : Math.PI, spread: 1.4, speed: 2.4, life: 18, colors: ['#c8d2e2', '#ffffff'] });
-    const killed = this.damage(hit.dmg, world);
+    const killed = this.damage(dmg, world);
     return { landed: true, killed };
   };
 
@@ -3145,6 +3296,241 @@ body[data-input="touch"] #touch { display: block; }
 
 </script>
 <script>
+// ---- src/wren.js
+// Starhaven — Wren's body: a small jointed figure (knees, elbows, two daggers) posed per move, drawn with a dark
+// outline so she reads on any background, plus the tapered slash crescents her blades leave.
+// Angles: 0 = pointing down, -1.57 = straight forward, -3.14 = straight up, +1.57 = straight back.
+(function (SH) {
+  const W = SH.wren = {};
+  const OX = 64, OY = 96;                       // where her feet sit on the sprite canvas
+  let cv = null, mask = null;
+  function ensure() {
+    if (cv) return;
+    cv = document.createElement('canvas'); cv.width = 128; cv.height = 116;
+    mask = document.createElement('canvas'); mask.width = 128; mask.height = 116;
+  }
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const easeOut = k => 1 - Math.pow(1 - Math.max(0, Math.min(1, k)), 3);
+  const mix = (A, B, k) => { const o = {}; for (const key in A) { const a = A[key], b = B[key] !== undefined ? B[key] : a; o[key] = Array.isArray(a) ? [lerp(a[0], b[0], k), lerp(a[1], b[1], k)] : typeof a === 'number' ? lerp(a, b, k) : (k < 0.5 ? a : b); } return o; };
+
+  // ---------------------------------------------------------------- poses
+  const BASE = { lean: 0, crouch: 0, ox: 0, legF: [0.06, 0], legB: [-0.08, 0.05], armF: [-0.2, -0.35], armB: [0.28, -0.2], cloak: 0, lift: 0, sx: 1, sy: 1 };
+  const P = (o) => Object.assign({}, BASE, o);
+  const POSES = {
+    rise: P({ legF: [-0.9, 1.1], legB: [0.35, 0.7], armF: [-2.3, -0.3], armB: [1.0, -0.4], lift: 4, sx: 0.93, sy: 1.08 }),
+    apex: P({ legF: [-1.0, 1.4], legB: [-0.3, 1.2], armF: [-1.6, -0.5], armB: [1.2, -0.5] }),
+    fall: P({ legF: [0.35, 0.25], legB: [-0.45, 0.6], armF: [-2.7, 0.1], armB: [2.5, -0.1], lift: -7 }),
+    dash: P({ lean: 0.62, legF: [1.0, 0.25], legB: [1.25, 0.35], armF: [1.45, 0.1], armB: [1.7, 0.1], cloak: 1, sx: 1.1, sy: 0.92 }),
+    hurt: P({ lean: -0.4, legF: [-0.6, 0.6], legB: [0.5, 0.4], armF: [-2.4, -0.5], armB: [2.2, 0.4] }),
+    cast: P({ lean: 0.08, legF: [-0.35, 0.1], legB: [0.4, 0.1], armF: [-1.5, 0], armB: [0.7, -0.3] }),
+    charge: P({ lean: -0.06, crouch: 2, legF: [-0.3, 0.3], legB: [0.45, 0.3], armF: [-1.15, -0.7], armB: [0.2, -1.0] }),
+    bow: P({ lean: -0.04, legF: [-0.3, 0.1], legB: [0.4, 0.1], armF: [-1.52, 0], armB: [-1.0, -1.3] }),
+  };
+  // attacks: a wind-up pose and a strike pose; the swing eases from one to the other
+  const SWINGS = {
+    high: [P({ lean: -0.12, legF: [-0.2, 0.2], legB: [0.3, 0.1], armF: [-3.3, -0.5], armB: [0.9, -0.5] }),
+           P({ lean: 0.32, ox: 3, legF: [-0.7, 0.35], legB: [0.6, 0.1], armF: [-0.75, 0.05], armB: [1.3, -0.3], cloak: 0.5 })],
+    low: [P({ lean: 0.25, ox: 3, legF: [-0.6, 0.3], legB: [0.55, 0.1], armF: [-0.6, 0], armB: [0.5, 0.2] }),
+          P({ lean: 0.05, ox: 4, legF: [-0.5, 0.2], legB: [0.6, 0.15], armF: [1.0, -0.8], armB: [-2.6, -0.2], cloak: 0.6 })],
+    big: [P({ lean: -0.2, crouch: 3, legF: [-0.3, 0.5], legB: [0.3, 0.5], armF: [-3.5, -0.2], armB: [1.4, -0.6] }),
+          P({ lean: 0.45, crouch: 2, ox: 7, legF: [-0.95, 0.5], legB: [0.85, 0.05], armF: [-0.35, 0.1], armB: [-2.7, -0.1], cloak: 1 })],
+    down: [P({ legF: [-1.0, 1.5], legB: [-0.4, 1.4], armF: [-0.5, -0.4], armB: [0.5, 0.4] }),
+           P({ legF: [-1.1, 1.6], legB: [-0.5, 1.5], armF: [0.12, 0], armB: [-0.12, 0], sx: 0.92, sy: 1.08 })],
+    thrust: [P({ lean: 0.5, legF: [0.8, 0.2], legB: [1.1, 0.3], armF: [-0.4, -1.2], armB: [1.4, 0] }),
+             P({ lean: 0.7, ox: 4, legF: [1.0, 0.2], legB: [1.3, 0.3], armF: [-1.52, 0], armB: [1.7, 0.1], cloak: 1, sx: 1.12, sy: 0.9 })],
+    up: [P({ lean: 0.2, crouch: 4, legF: [-0.4, 0.8], legB: [0.3, 0.8], armF: [-0.2, -0.2], armB: [0.6, -0.4] }),
+         P({ lean: -0.18, legF: [0.25, 0.1], legB: [-0.3, 0.7], armF: [-3.05, 0], armB: [1.1, -0.2], sx: 0.92, sy: 1.1, lift: 5 })],
+  };
+
+  W.poseOf = function (p) {
+    if (p.dashT > 0 && !(p.swing && p.swing.kind === 'thrust')) return 'dash';
+    if (p.stun > 0) return 'hurt';
+    if (p.swing) return 'swing';
+    if (p.bowT > 0) return 'bow';
+    if (p.castT > 0) return 'cast';
+    if (p.chargeT > 6) return 'charge';
+    if (!p.grounded) return p.vy < -1 ? 'rise' : p.vy > 1.5 ? 'fall' : 'apex';
+    if (Math.abs(p.vx) > 0.4) return 'run';
+    return 'idle';
+  };
+
+  function buildPose(p, name, ghost) {
+    const a = p.anim;
+    if (name === 'run') {
+      const ph = a.run * Math.PI, s = Math.sin(ph), c = Math.cos(ph);
+      return P({ lean: 0.16, crouch: Math.abs(c) * 1.2, legF: [s * 0.95, Math.max(0, -c) * 1.0 + 0.1], legB: [-s * 0.95, Math.max(0, c) * 1.0 + 0.1], armF: [-s * 0.9 - 0.2, -0.7], armB: [s * 0.9 + 0.2, -0.7], cloak: 0.7 });
+    }
+    if (name === 'idle') { const b = Math.sin(a.t * 0.06); return P({ crouch: b * 0.6 + 0.6, armF: [-0.2 + b * 0.03, -0.35], armB: [0.28 - b * 0.03, -0.2] }); }
+    if (name === 'swing' && !ghost) {
+      const s = p.swing, d = s.def, pair = SWINGS[d.arc] || SWINGS.high;
+      const k = easeOut((s.f - 0.5) / Math.max(1, d.active[0] + 2));
+      let pose = mix(pair[0], pair[1], k);
+      // in the air the legs stay tucked
+      if (!p.grounded && d.arc !== 'down' && d.arc !== 'thrust' && d.arc !== 'up') { pose.legF = [-0.9, 1.2]; pose.legB = [0.2, 0.9]; pose.crouch = 0; }
+      return pose;
+    }
+    return POSES[name] || BASE;
+  }
+
+  // ---------------------------------------------------------------- drawing the figure (facing right, feet at 0,0)
+  const COL = { skin: '#f6dcc6', hair: '#e0703f', hairD: '#a8452a', tunic: '#2f8f7a', tunicD: '#1f6656', tunicL: '#49b39a', cloak: '#2c3d74', cloakD: '#1c2850', cloakL: '#4a62a8', legs: '#3b3150', legsD: '#2a2238', boots: '#6a4430', belt: '#7a5632', blade: '#f2fbff', bladeD: '#9fc0d8', gold: '#ffd27a', goldD: '#d9973f' };
+
+  function seg(g, len, w, col, round) { g.fillStyle = col; g.fillRect(-w / 2, 0, w, len); if (round) g.fillRect(-w / 2 + 0.5, len - 1, w - 1, 1.5); }
+  function limb2(g, x, y, a1, a2, l1, l2, w, c1, c2, hand) {
+    g.save(); g.translate(x, y); g.rotate(a1); seg(g, l1, w, c1);
+    g.translate(0, l1 - 1); g.rotate(a2); seg(g, l2, w - 0.5, c2);
+    if (hand) { g.translate(0, l2); hand(g); }
+    g.restore();
+  }
+  function dagger(g) { g.fillStyle = COL.goldD; g.fillRect(-2.5, 1, 5, 1.5); g.fillStyle = COL.blade; g.fillRect(-1, 2, 2, 9); g.fillStyle = COL.bladeD; g.fillRect(0, 2, 1, 9); g.fillStyle = COL.blade; g.fillRect(-0.5, 11, 1, 1.5); }
+
+  function figure(g, p, S, o) {
+    const mortal = SH.game.mortal, t = p.anim.t;
+    const hip = -17 + S.crouch;
+    g.save();
+    g.translate(S.ox, 0);
+    // back arm and its dagger (behind everything)
+    g.save(); g.translate(0, hip); g.rotate(S.lean);
+    limb2(g, -1, -13, S.armB[0], S.armB[1], 6, 6, 3.5, COL.tunicD, COL.skin, o.blades ? dagger : null);
+    g.restore();
+    // back leg
+    limb2(g, -1.5, hip, S.legB[0], S.legB[1], 9, 9, 4.5, COL.legsD, COL.legsD, gg => { gg.fillStyle = '#3a2618'; gg.fillRect(-2.5, -3, 6.5, 3.5); });
+    // cloak
+    g.save(); g.translate(0, hip); g.rotate(S.lean);
+    const fl = S.cloak, lf = S.lift, wav = Math.sin(t * 0.25) * fl * 2;
+    g.fillStyle = COL.cloakD; g.beginPath(); g.moveTo(-3, -15); g.lineTo(-10 - fl * 9, 6 + lf - fl * 9 + wav); g.lineTo(-4 - fl * 4, 9 + lf * 0.6 - fl * 5); g.lineTo(2, -13); g.fill();
+    g.fillStyle = COL.cloak; g.beginPath(); g.moveTo(-3, -15); g.lineTo(-8 - fl * 8, 3 + lf - fl * 8 + wav); g.lineTo(-2, 2 + lf * 0.4); g.lineTo(3, -14); g.fill();
+    g.restore();
+    // front leg
+    limb2(g, 1.5, hip, S.legF[0], S.legF[1], 9, 9, 5, COL.legs, COL.legs, gg => { gg.fillStyle = COL.boots; gg.fillRect(-2.5, -3.5, 7, 4); gg.fillStyle = '#8a5a3c'; gg.fillRect(-2.5, -3.5, 7, 1); });
+    // torso and head lean together
+    g.save(); g.translate(0, hip); g.rotate(S.lean);
+    g.fillStyle = COL.tunic; g.fillRect(-5, -15, 10.5, 16);
+    g.fillStyle = COL.tunicD; g.fillRect(-5, -15, 3, 16);
+    g.fillStyle = COL.tunicL; g.fillRect(3.5, -14, 2, 9);
+    g.fillStyle = COL.belt; g.fillRect(-5, -2, 10.5, 2.5); g.fillStyle = COL.gold; g.fillRect(1, -2, 2.5, 2.5);
+    // scarf knot at the neck (the tail is drawn in the world so it can trail)
+    g.fillStyle = COL.gold; g.fillRect(-4, -17, 9, 3); g.fillStyle = COL.goldD; g.fillRect(-4, -15, 9, 1);
+    // head
+    const hy = -28;
+    g.fillStyle = COL.skin; g.fillRect(-3.5, hy, 10, 11);
+    g.fillStyle = '#e2b89c'; g.fillRect(-3.5, hy + 9, 10, 2);
+    g.fillStyle = COL.hair; g.fillRect(-5.5, hy - 2.5, 12, 5); g.fillRect(-5.5, hy, 5, 9); g.fillRect(4.5, hy - 1, 2.5, 3);
+    g.fillStyle = '#f39a6a'; g.fillRect(-2, hy - 2.5, 6, 1.5);
+    g.fillStyle = COL.hairD; g.fillRect(-5.5, hy + 6, 3, 4);
+    const tail = S.cloak * 3 + Math.sin(t * 0.2) * S.cloak;
+    g.fillStyle = COL.hair; g.fillRect(-9.5, hy + 1 + S.lift * 0.3 - tail * 0.4, 5, 4.5); g.fillRect(-12, hy + 3.5 + S.lift * 0.5 - tail * 0.7, 3.5, 5.5);
+    g.fillStyle = COL.skin; g.fillRect(-0.5, hy + 3, 2.5, 3.5);
+    if (!mortal) { g.fillRect(-1.5, hy + 1, 2, 2.5); g.fillRect(-2.5, hy - 1, 1.2, 2.2); }   // the pointed ear
+    if (o.face) {
+      if (o.blink) { g.fillStyle = '#b08a72'; g.fillRect(3.5, hy + 5, 2.5, 1); }
+      else { g.fillStyle = '#1a1430'; g.fillRect(3.5, hy + 4, 2.2, 3); g.fillStyle = '#ffffff'; g.fillRect(4.7, hy + 4, 1, 1); }
+      g.fillStyle = '#d8a890'; g.fillRect(4.5, hy + 8.5, 2, 0.8);
+    }
+    // front arm, its dagger, and anything in the hand
+    limb2(g, 1.5, -13, S.armF[0], S.armF[1], 6.5, 6.5, 4, COL.tunic, COL.skin, o.hand || (o.blades ? dagger : null));
+    g.restore();
+    g.restore();
+  }
+
+  function fireHand(size) { return g => { g.fillStyle = 'rgba(255,150,60,0.45)'; g.fillRect(-size, 0, size * 2, size * 2); g.fillStyle = '#ff8a3a'; g.fillRect(-size * 0.6, size * 0.3, size * 1.2, size * 1.2); g.fillStyle = '#ffe08a'; g.fillRect(-size * 0.25, size * 0.5, size * 0.6, size * 0.8); }; }
+  function bowHand(pull) { return g => {
+    const H = Math.PI / 2;
+    g.strokeStyle = '#8a5a2a'; g.lineWidth = 2; g.beginPath(); g.arc(0, -6, 10, H - 1.25, H + 1.25); g.stroke();
+    g.strokeStyle = '#e8e0c8'; g.lineWidth = 1; g.beginPath(); g.moveTo(9.5, -2.8); g.lineTo(0, pull ? -11 : -2.8); g.lineTo(-9.5, -2.8); g.stroke();
+  }; }
+
+  // ---------------------------------------------------------------- the public draw
+  W.draw = function (ctx, p, opt) {
+    ensure();
+    const gh = opt.ghost;
+    if (!gh && p.hidden) return;
+    if (!gh && p.invuln > 0 && Math.floor(p.invuln / 3) % 2 === 0 && p.stun <= 0) return;   // flicker after a hit
+    const x = gh ? gh.x : p.x, y = gh ? gh.y : p.y, f = gh ? gh.facing : p.facing;
+    const name = gh ? gh.pose : W.poseOf(p);
+    const S = buildPose(p, name, !!gh);
+    const a = p.anim;
+
+    if (!gh) {
+      // the scarf's tail trails in the world
+      ctx.lineCap = 'round';
+      for (let i = 1; i < p.scarf.length; i++) {
+        const q0 = p.scarf[i - 1], q1 = p.scarf[i];
+        ctx.strokeStyle = i % 2 ? COL.gold : COL.goldD; ctx.lineWidth = Math.max(1.5, 4.5 - i * 0.8);
+        ctx.beginPath(); ctx.moveTo(q0.x, q0.y); ctx.lineTo(q1.x, q1.y); ctx.stroke();
+      }
+    }
+
+    // draw the figure onto its own small canvas, then stamp a dark outline and the figure into the world
+    const g = cv.getContext('2d');
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+    let sx = S.sx, sy = S.sy;
+    if (!gh && a.land > 0) { const k = a.squash * (a.land / 8); sx = 1 + k * 0.22; sy = 1 - k * 0.2; }
+    g.translate(OX, OY); g.scale(sx, sy);
+    const bowMode = SH.game.can('bow') && !SH.game.can('daggers');
+    const o = { face: true, blink: name === 'idle' && a.t % 230 < 7, blades: !bowMode && name !== 'cast' && name !== 'charge' };
+    if (bowMode) o.hand = bowHand(p.bowT > 8);
+    if (name === 'cast') o.hand = fireHand(5);
+    if (name === 'charge') o.hand = fireHand(3 + Math.min(6, p.chargeT / 6));
+    figure(g, p, S, o);
+
+    const m = mask.getContext('2d');
+    m.globalCompositeOperation = 'source-over'; m.clearRect(0, 0, mask.width, mask.height); m.drawImage(cv, 0, 0);
+    m.globalCompositeOperation = 'source-in';
+    m.fillStyle = gh ? '#8cdcff' : p.hitFlash > 0 ? '#ffffff' : '#0a0818'; m.fillRect(0, 0, mask.width, mask.height);
+
+    ctx.save();
+    ctx.translate(Math.round(x), Math.round(y)); ctx.scale(f, 1);
+    if (gh) { ctx.globalAlpha = 0.4 * gh.life / gh.max; ctx.drawImage(mask, -OX, -OY); }
+    else {
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) ctx.drawImage(mask, -OX + dx, -OY + dy);
+      ctx.drawImage(cv, -OX, -OY);
+      if (p.swing && p.swing.f <= p.swing.def.frames) slash(ctx, p.swing);
+    }
+    ctx.restore();
+  };
+
+  // ---------------------------------------------------------------- slash crescents
+  // A crescent is a tapered arc: thick in the middle, pointed at both ends, swept from a0 to a1.
+  function crescent(ctx, cx, cy, R, a0, a1, u0, u1, thick, alpha, core) {
+    if (u1 - u0 < 0.02 || alpha <= 0) return;
+    const N = 12, pts = [];
+    for (let i = 0; i <= N; i++) { const u = u0 + (u1 - u0) * i / N, ang = a0 + (a1 - a0) * u; pts.push([cx + Math.cos(ang) * R, cy + Math.sin(ang) * R]); }
+    for (let i = N; i >= 0; i--) { const u = u0 + (u1 - u0) * i / N, ang = a0 + (a1 - a0) * u, r = R - thick * Math.sin(Math.PI * (i / N)); pts.push([cx + Math.cos(ang) * r, cy + Math.sin(ang) * r]); }
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = core; ctx.beginPath(); pts.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.closePath(); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  const ARCS = {
+    high: [{ cx: 3, cy: -26, R: 32, a0: -2.3, a1: 0.75, th: 11 }],
+    low: [{ cx: 3, cy: -22, R: 32, a0: 1.35, a1: -1.6, th: 11 }],
+    big: [{ cx: 4, cy: -24, R: 40, a0: -2.6, a1: 1.0, th: 14 }, { cx: 6, cy: -24, R: 36, a0: 1.5, a1: -2.0, th: 11 }],
+    down: [{ cx: 0, cy: -8, R: 30, a0: 0.15, a1: Math.PI - 0.15, th: 11 }, { cx: 0, cy: -8, R: 24, a0: Math.PI - 0.3, a1: 0.3, th: 7 }],
+    up: [{ cx: 4, cy: -28, R: 38, a0: 1.0, a1: -2.2, th: 13 }],
+  };
+  function slash(ctx, s) {
+    const d = s.def, st = d.active[0], en = d.active[1];
+    if (s.f < st) return;
+    const k = Math.min(1, (s.f - st + 1) / Math.max(2, (en - st) * 0.6));     // the head of the cut races ahead
+    const fade = s.f > en ? Math.max(0, 1 - (s.f - en) / 5) : 1;
+    const tail = s.f > en ? Math.min(1, (s.f - en) / 4) : Math.max(0, k - 0.8);
+    if (d.arc === 'thrust') {
+      // a lance of light straight ahead
+      const len = 26 + 34 * easeOut(k);
+      ctx.globalAlpha = fade * 0.5; ctx.fillStyle = '#9fe8ff'; ctx.beginPath(); ctx.moveTo(8, -30); ctx.lineTo(8 + len + 8, -24); ctx.lineTo(8, -18); ctx.fill();
+      ctx.globalAlpha = fade; ctx.fillStyle = '#fffbe8'; ctx.beginPath(); ctx.moveTo(10, -27); ctx.lineTo(10 + len, -24); ctx.lineTo(10, -21); ctx.fill();
+      ctx.globalAlpha = 1; return;
+    }
+    for (const A of ARCS[d.arc] || ARCS.high) {
+      crescent(ctx, A.cx, A.cy, A.R + 3, A.a0, A.a1, tail, k, A.th + 5, fade * 0.45, '#8fdcff');
+      crescent(ctx, A.cx, A.cy, A.R, A.a0, A.a1, tail, k, A.th, fade, '#fffbe8');
+      crescent(ctx, A.cx, A.cy, A.R - 1, A.a0, A.a1, Math.max(tail, k - 0.35), k, A.th * 0.45, fade, '#ffe9a8');
+    }
+  }
+})(window.SH = window.SH || {});
+
+</script>
+<script>
 // ---- src/draw.js
 // Starhaven — drawing. Placeholder art with a fixed direction: moody painted-style depth behind,
 // a near-black play layer with lit edges, and a bright, clearly outlined Wren in front.
@@ -3220,7 +3606,50 @@ body[data-input="touch"] #touch { display: block; }
   D.resize = function (viewW) {
     layers.viewW = viewW;
     layers.vignette = makeVignette(viewW);
+    layers.dark = canvas(viewW, SH.VIEW_H);
+    if (!layers.hole) {   // a soft round light, stamped out of the darkness wherever something glows
+      const h = layers.hole = canvas(128, 128), g = h.getContext('2d');
+      const gr = g.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,0.7)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+      const wm = layers.warm = canvas(128, 128), g2 = wm.getContext('2d');
+      const g3 = g2.createRadialGradient(64, 64, 2, 64, 64, 64); g3.addColorStop(0, 'rgba(255,190,110,0.5)'); g3.addColorStop(1, 'rgba(255,150,60,0)');
+      g2.fillStyle = g3; g2.fillRect(0, 0, 128, 128);
+    }
   };
+  // How dark each place is away from a light: [colour, strength].
+  const DARK = { deep: ['#020806', 0.6], thornwood: ['#06030c', 0.5], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
+  function drawLight(ctx, w, cx, cy, vw, VH, t, themeA, themeB, k) {
+    const a = DARK[themeA] || DARK.dusk, b = DARK[themeB] || a, strength = a[1] + (b[1] - a[1]) * k;
+    const c = layers.dark, g = c.getContext('2d');
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; g.clearRect(0, 0, vw, VH);
+    g.fillStyle = k > 0.5 ? b[0] : a[0]; g.globalAlpha = strength; g.fillRect(0, 0, vw, VH);
+    g.globalCompositeOperation = 'destination-out';
+    const warm = [];
+    const hole = (x, y, r, al, glow) => { const X = x - cx, Y = y - cy; if (X < -r || X > vw + r) return; g.globalAlpha = al; g.drawImage(layers.hole, X - r, Y - r, r * 2, r * 2); if (glow) warm.push(X, Y, r * glow); };
+    const p = w.player, fl = Math.sin(t * 0.13) * 3;
+    hole(p.x, p.y - 22, 105, 0.85);
+    if (p.charging) hole(p.x + p.facing * 12, p.y - 24, 40 + Math.min(40, p.chargeT), 0.9, 0.7);
+    for (const l of w.lanterns) if (l.lit) hole(l.px, l.py - 40, 120 + fl, 1, 0.9);
+    for (const n of w.npcs) if (!n.hidden) hole(n.x, n.y - 24, 70, 0.6);
+    for (const m of w.motes || []) if (!m.got) hole(m.x, m.y, 20, 0.7);
+    for (const f of w.fireballs || []) hole(f.x, f.y, f.big ? 110 : 70, 1, 0.8);
+    for (const e of w.things) {
+      if (e.kind === 'brazier' && e.lit) hole(e.x, e.y - 34, 100 + fl, 1, 0.9);
+      else if (e.kind === 'stag' && e.state !== 'down') hole(e.x, e.y - 22, 80, 0.8);
+      else if (e.kind === 'wyrm' && !e.dead && e.boss) hole(e.x, e.y - e.h / 2, 120, 0.6);
+      else if (e.kind === 'bulb') hole(e.x, e.y, 34, 0.5);
+    }
+    const def = w.room.def, TS = SH.TILE;
+    if (def.exitLight != null) hole(def.exitLight * TS, 13 * TS, 190, 1);
+    if (def.cottage != null) hole((def.cottage + 3) * TS, 14 * TS, 120, 0.8, 0.6);
+    if (def.mural && SH.game.flags[def.mural.flag]) hole((def.mural.x + 2) * TS, 13 * TS, 110, 0.8);
+    for (const pt of SH.fx.parts) if (pt.glow && pt.life > 6) hole(pt.x, pt.y, 12, 0.35);
+    ctx.drawImage(c, 0, 0);
+    // a little warm bloom around flames, so fire feels like light and not just a shape
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < warm.length; i += 3) { const r = warm[i + 2]; ctx.globalAlpha = 0.5; ctx.drawImage(layers.warm, warm[i] - r, warm[i + 1] - r, r * 2, r * 2); }
+    ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+  }
 
   function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 
@@ -3453,9 +3882,31 @@ body[data-input="touch"] #touch { display: block; }
       else if (e.kind === 'wyrm') drawWyrm2(ctx, e, t);
     }
     for (const f of w.fireballs || []) {
-      const gl = ctx.createRadialGradient(f.x, f.y, 1, f.x, f.y, 16); gl.addColorStop(0, 'rgba(255,200,110,0.9)'); gl.addColorStop(1, 'rgba(255,120,40,0)');
-      ctx.fillStyle = gl; ctx.fillRect(f.x - 16, f.y - 16, 32, 32);
-      ctx.fillStyle = '#fff6d8'; ctx.beginPath(); ctx.arc(f.x, f.y, 4, 0, Math.PI * 2); ctx.fill();
+      const R = f.big ? 34 : 16;
+      const gl = ctx.createRadialGradient(f.x, f.y, 1, f.x, f.y, R); gl.addColorStop(0, 'rgba(255,200,110,0.9)'); gl.addColorStop(1, 'rgba(255,120,40,0)');
+      ctx.fillStyle = gl; ctx.fillRect(f.x - R, f.y - R, R * 2, R * 2);
+      if (f.big) {   // a flame wave: a tall burning crescent
+        ctx.save(); ctx.translate(f.x, f.y); ctx.scale(f.dir, 1);
+        const fl = Math.sin(t * 0.9) * 2;
+        ctx.fillStyle = '#ff8a3a'; ctx.beginPath(); ctx.moveTo(-10, -24 - fl); ctx.quadraticCurveTo(22, 0, -10, 24 + fl); ctx.quadraticCurveTo(4, 0, -10, -24 - fl); ctx.fill();
+        ctx.fillStyle = '#ffd27a'; ctx.beginPath(); ctx.moveTo(-6, -18); ctx.quadraticCurveTo(17, 0, -6, 18); ctx.quadraticCurveTo(6, 0, -6, -18); ctx.fill();
+        ctx.fillStyle = '#fff6d8'; ctx.beginPath(); ctx.moveTo(-1, -10); ctx.quadraticCurveTo(13, 0, -1, 10); ctx.quadraticCurveTo(7, 0, -1, -10); ctx.fill();
+        ctx.restore();
+      } else {
+        ctx.save(); ctx.translate(f.x, f.y); ctx.scale(f.dir, 1);
+        ctx.fillStyle = '#ff8a3a'; ctx.beginPath(); ctx.moveTo(6, 0); ctx.quadraticCurveTo(0, -7, -14 - Math.sin(t * 0.8) * 3, 0); ctx.quadraticCurveTo(0, 7, 6, 0); ctx.fill();
+        ctx.fillStyle = '#ffd27a'; ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fff6d8'; ctx.beginPath(); ctx.arc(1, 0, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+    }
+    for (const sw of w.waves || []) {
+      const k = Math.min(1, sw.life / 14), hgt = 20 + Math.sin(sw.t * 0.7) * 3;
+      ctx.save(); ctx.translate(sw.x, sw.y); ctx.scale(sw.dir, 1); ctx.globalAlpha = k;
+      ctx.fillStyle = '#0a0818'; ctx.beginPath(); ctx.moveTo(-17, 0); ctx.lineTo(-7, -hgt * 0.55 - 1); ctx.lineTo(-2, -5); ctx.lineTo(7, -hgt - 2); ctx.lineTo(13, 0); ctx.fill();
+      ctx.fillStyle = '#8a96b8'; ctx.beginPath(); ctx.moveTo(-15, 0); ctx.lineTo(-7, -hgt * 0.55); ctx.lineTo(-2, -4); ctx.lineTo(6, -hgt); ctx.lineTo(11, 0); ctx.fill();
+      ctx.fillStyle = '#e8eef8'; ctx.beginPath(); ctx.moveTo(2, 0); ctx.lineTo(6, -hgt); ctx.lineTo(11, 0); ctx.fill();
+      ctx.restore();
     }
     for (const r of w.rocks || []) {
       if (r.ground != null) { ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.beginPath(); ctx.ellipse(r.x, r.ground - 1, 12, 3, 0, 0, Math.PI * 2); ctx.fill(); }
@@ -3466,12 +3917,13 @@ body[data-input="touch"] #touch { display: block; }
       ctx.fillStyle = '#6a4a2a'; ctx.fillRect(-14, -1, 14, 2); ctx.fillStyle = '#c8d0e0'; ctx.fillRect(0, -2, 4, 4); ctx.fillStyle = '#e8e0c8'; ctx.fillRect(-16, -2, 3, 4);
       ctx.restore();
     }
-    for (const g of fx.ghosts) drawWren(ctx, w.player, { ghost: g });
-    drawWren(ctx, w.player, {});
+    for (const g of fx.ghosts) SH.wren.draw(ctx, w.player, { ghost: g });
+    SH.wren.draw(ctx, w.player, {});
     if (w.wyrm && w.wyrm.on) drawWyrm(ctx, w.wyrm, cy, t);
     drawParticles(ctx, fx);
     ctx.restore();
 
+    { const kk = zi > 0 ? Math.min(1, (mid - (zones[zi].x - 6)) / 12) : 0; drawLight(ctx, w, cx - sx, cy - sy, vw, VH, t, zones[Math.max(0, zi - 1)].theme, zones[zi].theme, kk); }
     ctx.drawImage(layers.vignette, 0, 0);
     if (fx.flash > 0) { ctx.fillStyle = fx.flashColor; ctx.globalAlpha = Math.min(1, fx.flash / 6); ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = 1; }
     if (fx.slowmo > 0) { ctx.fillStyle = 'rgba(120,190,255,0.10)'; ctx.fillRect(0, 0, vw, VH); }
@@ -3643,6 +4095,15 @@ body[data-input="touch"] #touch { display: block; }
       if (p.glow) { ctx.globalAlpha = a * 0.3; ctx.fillStyle = p.color; ctx.fillRect(p.x - p.size, p.y - p.size, p.size * 3, p.size * 3); }
       ctx.globalAlpha = a; ctx.fillStyle = p.color; ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
     }
+    ctx.lineCap = 'round';
+    for (const l of fx.lines) {
+      const k = l.life / l.max, c = Math.cos(l.ang), sn = Math.sin(l.ang);
+      ctx.globalAlpha = k; ctx.strokeStyle = l.slash ? '#ffffff' : '#ffe9a8'; ctx.lineWidth = l.slash ? 3 * k + 1 : 2;
+      ctx.beginPath();
+      if (l.slash) { ctx.moveTo(l.x - c * l.len * (1.2 - k * 0.4), l.y - sn * l.len * (1.2 - k * 0.4)); ctx.lineTo(l.x + c * l.len * (1.2 - k * 0.4), l.y + sn * l.len * (1.2 - k * 0.4)); }
+      else { ctx.moveTo(l.x + c * l.dist, l.y + sn * l.dist); ctx.lineTo(l.x + c * (l.dist + l.len * k), l.y + sn * (l.dist + l.len * k)); }
+      ctx.stroke();
+    }
     ctx.globalAlpha = 1;
     ctx.textAlign = 'center'; ctx.font = 'bold 13px system-ui, sans-serif';
     for (const wd of fx.words) {
@@ -3743,25 +4204,60 @@ body[data-input="touch"] #touch { display: block; }
     } else { ctx.fillStyle = '#1a1424'; ctx.fillRect(x - 8, y - 32, 16, 3); }
   }
   // Wyrms: a long, low, armored body; the head glows red while winding up; stars circle it when dazed.
+  // Drawn twice: once enlarged in the outline colour, then in colour, so it reads against any ground.
+  function wyrmBody(ctx, e, t, ol) {
+    const fl = e.flash > 0 && !ol;
+    const body = ol || (fl ? '#ffffff' : '#4a566e'), dark = ol || (fl ? '#ffffff' : '#343e54'), belly = ol || (fl ? '#ffffff' : '#7a86a0'), plate = ol || (fl ? '#ffffff' : '#c8d2e2');
+    const g = ol ? 1.6 : 0;   // outline growth
+    const wave = e.state === 'charge' ? Math.sin(e.t * 0.8) * 2 : Math.sin(t * 0.05) * 1;
+    const open = e.state === 'inhale' || e.state === 'breath' || e.state === 'roar';
+    const headUp = e.state === 'roar' ? -6 : e.state === 'inhale' ? -3 : e.state === 'stun' ? 4 : 0;
+    // tail
+    ctx.fillStyle = body; ctx.beginPath(); ctx.moveTo(-24, -15 - g); ctx.quadraticCurveTo(-36, -14 + wave, -44 - g, -4 + wave * 2); ctx.lineTo(-24, -5 + g); ctx.fill();
+    // legs
+    ctx.fillStyle = dark;
+    for (let i = 0; i < 4; i++) { const lift = (e.state === 'charge' || e.state === 'wander' || (e.state === 'rest' && e.vx)) && Math.floor(t / 4 + i) % 2 ? 2 : 0; ctx.fillRect(-19 + i * 10 - g, -6, 4 + g * 2, 6 - lift + (ol ? 1 : 0)); }
+    // body segments
+    ctx.fillStyle = body;
+    for (let i = 0; i < 5; i++) { const bx = -22 + i * 9, by = -12 + Math.sin(i * 0.9 + t * 0.08) * wave; ctx.beginPath(); ctx.ellipse(bx, by, 8 + g, 8 + g, 0, 0, Math.PI * 2); ctx.fill(); }
+    if (!ol) {
+      ctx.fillStyle = belly; ctx.fillRect(-26, -7, 40, 4);
+      // back plates
+      ctx.fillStyle = plate;
+      for (let i = 0; i < 5; i++) { const bx = -22 + i * 9, by = -19 + Math.sin(i * 0.9 + t * 0.08) * wave; ctx.beginPath(); ctx.moveTo(bx - 4, by + 2); ctx.lineTo(bx - 1, by - 5); ctx.lineTo(bx + 4, by + 2); ctx.fill(); }
+      ctx.fillStyle = dark; for (let i = 0; i < 4; i++) ctx.fillRect(-18 + i * 9, -13, 1, 6);
+    }
+    // head
+    ctx.save(); ctx.translate(14, -14 + headUp); ctx.rotate(headUp * -0.03);
+    ctx.fillStyle = body; ctx.fillRect(-g, -7 - g, 15 + g * 2, 8 + g * 2);                       // skull
+    ctx.fillRect(2 - g, 1 + (open ? 3 : 0) - g * 0.5, 12 + g * 2, 4 + g);                          // jaw
+    ctx.fillStyle = plate; ctx.fillRect(1 - g, -9 - g, 14 + g * 2, 5 + g); ctx.fillRect(12, -8 - g, 4 + g, 9 + g);   // brow plate
+    ctx.beginPath(); ctx.moveTo(1 - g, -9); ctx.lineTo(-4 - g, -18 - g); ctx.lineTo(6 + g, -9); ctx.fill();          // horn
+    if (!ol) {
+      const angry = e.state === 'windup' || e.state === 'charge' || e.state === 'crouch' || e.state === 'leap';
+      ctx.fillStyle = e.state === 'stun' ? '#6a7690' : angry ? '#ff4a4a' : (e.state === 'inhale' || e.state === 'breath') ? '#7ad8ff' : '#ffd27a'; ctx.fillRect(8, -3, 3, 2);
+      if (open) { ctx.fillStyle = e.state === 'roar' ? '#7a2a3a' : '#bfe8ff'; ctx.fillRect(4, 1, 9, 3); }
+      ctx.fillStyle = '#e8eef8'; ctx.fillRect(11, 1, 2, 2); ctx.fillRect(7, 1, 2, 2);                                 // teeth
+    }
+    ctx.restore();
+  }
   function drawWyrm2(ctx, e, t) {
     if (e.dead) return;
     const s = e.def.scale, x = e.x, y = e.y;
-    ctx.save(); ctx.translate(Math.round(x + (e.state === 'windup' ? Math.sin(e.t * 1.6) * 1.5 : 0)), Math.round(y)); ctx.scale(e.dir * s, s);
-    const body = e.flash > 0 ? '#ffffff' : '#4a566e', belly = e.flash > 0 ? '#ffffff' : '#7a86a0', plate = e.flash > 0 ? '#ffffff' : '#c8d2e2';
-    const wave = e.state === 'charge' ? Math.sin(e.t * 0.8) * 2 : Math.sin(t * 0.05) * 1;
-    ctx.fillStyle = body;
-    for (let i = 0; i < 5; i++) { const bx = -22 + i * 9, by = -12 + Math.sin(i * 0.9 + t * 0.08) * wave; ctx.beginPath(); ctx.ellipse(bx, by, 8, 8, 0, 0, Math.PI * 2); ctx.fill(); }
-    ctx.fillStyle = belly; ctx.fillRect(-26, -6, 40, 5);
-    ctx.fillStyle = body; ctx.beginPath(); ctx.moveTo(-26, -12); ctx.lineTo(-36, -8 + wave); ctx.lineTo(-26, -6); ctx.fill();   // tail
-    for (let i = 0; i < 4; i++) { ctx.fillRect(-18 + i * 10, -4, 3, 4 + (e.state === 'charge' && (t + i) % 4 < 2 ? 1 : 0)); }  // legs
-    // head with an armored brow plate
-    ctx.fillStyle = body; ctx.fillRect(14, -20, 14, 13);
-    ctx.fillStyle = plate; ctx.fillRect(16, -22, 13, 5); ctx.fillRect(26, -20, 4, 9);
-    ctx.fillStyle = '#e8eef8'; ctx.beginPath(); ctx.moveTo(16, -22); ctx.lineTo(12, -30); ctx.lineTo(20, -22); ctx.fill();
-    const angry = e.state === 'windup' || e.state === 'charge';
-    ctx.fillStyle = angry ? '#ff4a4a' : '#ffd27a'; ctx.fillRect(22, -16, 3, 2);
+    const shakeX = (e.state === 'windup' || e.state === 'roar') ? Math.sin(e.t * 1.6) * 1.5 : 0;
+    const sq = e.state === 'crouch' ? 1 - Math.min(0.22, e.t * 0.012) : e.state === 'slamrest' && e.t < 8 ? 0.8 + e.t * 0.025 : e.state === 'leap' ? 1.08 : 1;
+    if (e.state === 'leap') { const gy = e.shadowY || y; ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(x, e.home.y, 34, 5, 0, 0, Math.PI * 2); ctx.fill(); }
+    if (e.state === 'breath') {   // the frost cone
+      const hb = e.breathBox(), hx = x + e.dir * e.w / 2, k = Math.min(1, e.t / 8) * (0.5 + Math.sin(t * 0.6) * 0.08);
+      const g = ctx.createLinearGradient(hx, 0, hx + e.dir * e.def.breathReach, 0); g.addColorStop(0, 'rgba(200,236,255,' + k + ')'); g.addColorStop(1, 'rgba(200,236,255,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(hx, y - e.h * 0.5 - 4); ctx.lineTo(hx + e.dir * e.def.breathReach, hb.t - 6); ctx.lineTo(hx + e.dir * e.def.breathReach, y); ctx.lineTo(hx, y - e.h * 0.5 + 6); ctx.fill();
+    }
+    ctx.save(); ctx.translate(Math.round(x + shakeX), Math.round(y)); ctx.scale(e.dir * s * (2 - sq), s * sq);
+    wyrmBody(ctx, e, t, '#0a0818'); wyrmBody(ctx, e, t, null);
     ctx.restore();
-    if (angry) { const g = ctx.createRadialGradient(x + e.dir * 22 * s, y - 16 * s, 1, x + e.dir * 22 * s, y - 16 * s, 18 * s); g.addColorStop(0, 'rgba(255,70,70,0.45)'); g.addColorStop(1, 'rgba(255,70,70,0)'); ctx.fillStyle = g; ctx.fillRect(x + e.dir * 22 * s - 18 * s, y - 34 * s, 36 * s, 36 * s); }
+    const hx = x + e.dir * 22 * s, hy = y - 16 * s;
+    const glow = (e.state === 'windup' || e.state === 'charge' || e.state === 'crouch') ? '255,70,70' : (e.state === 'inhale' || e.state === 'breath') ? '120,210,255' : null;
+    if (glow) { const r = (e.state === 'inhale' ? 12 + e.t * 0.35 : 18) * s; const g = ctx.createRadialGradient(hx, hy, 1, hx, hy, r); g.addColorStop(0, 'rgba(' + glow + ',0.5)'); g.addColorStop(1, 'rgba(' + glow + ',0)'); ctx.fillStyle = g; ctx.fillRect(hx - r, hy - r, r * 2, r * 2); }
     if (e.state === 'stun') for (let i = 0; i < 3; i++) { const a = t * 0.12 + i * 2.1; ctx.fillStyle = '#ffe9a8'; ctx.fillRect(x + e.dir * 20 * s + Math.cos(a) * 10 * s, y - 34 * s + Math.sin(a) * 3, 3, 3); }
     if (!e.boss && e.hp < e.def.hp) { const n = 10; for (let i = 0; i < n; i++) { ctx.fillStyle = i < Math.ceil(e.hp / e.def.hp * n) ? '#c8d2e2' : '#2a2a3a'; ctx.fillRect(x - 25 + i * 5, y - e.h * s - 14, 4, 3); } }
   }
@@ -3815,173 +4311,6 @@ body[data-input="touch"] #touch { display: block; }
     ctx.beginPath();
     for (let i = 0; i < n * 2; i++) { const a = rot + i / (n * 2) * Math.PI * 2, rr = i % 2 ? r : R; i ? ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr) : ctx.moveTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
     ctx.closePath(); ctx.fill();
-  }
-
-  // ---------------------------------------------------------------- Wren
-  function poseOf(p) {
-    if (p.dashT > 0) return 'dash';
-    if (p.stun > 0) return 'hurt';
-    if (p.swing) return p.swing.kind === 'pogo' ? 'pogo' : 'attack';
-    if (!p.grounded) return p.vy < -1 ? 'rise' : p.vy > 1.5 ? 'fall' : 'apex';
-    if (Math.abs(p.vx) > 0.4) return 'run';
-    return 'idle';
-  }
-
-  function drawWren(ctx, p, opt) {
-    const g = opt.ghost;
-    const x = g ? g.x : p.x, y = g ? g.y : p.y, f = g ? g.facing : p.facing;
-    const pose = g ? g.pose : poseOf(p);
-    const a = p.anim;
-    const tint = g ? 'rgba(140,220,255,' + (0.35 * g.life / g.max).toFixed(3) + ')' : null;
-    if (!g && p.hidden) return;
-    const flicker = !g && p.invuln > 0 && Math.floor(p.invuln / 3) % 2 === 0 && p.stun <= 0;
-    if (flicker) return;
-
-    // scarf first (behind the body), in world space
-    if (!g) {
-      ctx.lineCap = 'round';
-      for (let i = 1; i < p.scarf.length; i++) {
-        const q0 = p.scarf[i - 1], q1 = p.scarf[i];
-        ctx.strokeStyle = i % 2 ? PAL.gold : PAL.goldDeep;
-        ctx.lineWidth = Math.max(1.5, 4.5 - i * 0.8);
-        ctx.beginPath(); ctx.moveTo(q0.x, q0.y); ctx.lineTo(q1.x, q1.y); ctx.stroke();
-      }
-      // soft starlight halo so Wren always reads against the dark
-      const h = ctx.createRadialGradient(x, y - 22, 4, x, y - 22, 34);
-      h.addColorStop(0, 'rgba(200,220,255,0.16)'); h.addColorStop(1, 'rgba(200,220,255,0)');
-      ctx.fillStyle = h; ctx.fillRect(x - 34, y - 56, 68, 68);
-    }
-
-    ctx.save();
-    ctx.translate(Math.round(x), Math.round(y));
-    // squash and stretch
-    let sxS = 1, syS = 1;
-    if (!g) {
-      if (a.land > 0) { const k = a.squash * (a.land / 8); sxS = 1 + k * 0.22; syS = 1 - k * 0.2; }
-      else if (pose === 'rise') { sxS = 0.92; syS = 1.08; }
-      if (pose === 'dash') { sxS = 1.12; syS = 0.9; }
-    } else if (pose === 'dash') { sxS = 1.12; syS = 0.9; }
-    ctx.scale(f * sxS, syS);
-
-    const C = c => tint || c;
-    const breathe = pose === 'idle' ? Math.round(Math.sin(a.t * 0.06) * 0.8) : 0;
-    const run = a.run * Math.PI;
-    const lean = pose === 'run' ? 0.12 : pose === 'dash' ? 0.25 : 0;
-
-    // legs
-    let legA = 0, legB = 0;
-    if (pose === 'run') { legA = Math.sin(run) * 0.9; legB = -legA; }
-    else if (pose === 'rise') { legA = -0.7; legB = 0.4; }
-    else if (pose === 'apex' || pose === 'pogo') { legA = -0.9; legB = 0.6; }
-    else if (pose === 'fall') { legA = 0.35; legB = -0.25; }
-    else if (pose === 'dash') { legA = 0.9; legB = -1.0; }
-    else if (pose === 'hurt') { legA = 0.6; legB = -0.5; }
-    else if (pose === 'attack') { legA = 0.55; legB = -0.45; }
-    const hipY = -16 + breathe;
-    limb(ctx, -1, hipY, legB, 16, 5, C(PAL.legs), C('#2a2238'));
-    limb(ctx, 1, hipY, legA, 16, 5, C(PAL.legs), C(PAL.boots));
-
-    ctx.save();
-    ctx.rotate(lean);
-    // cloak flows behind
-    const flow = Math.min(1, Math.abs(p.vx) / 4) * (g ? 1 : 1);
-    const lift = pose === 'fall' ? -6 : pose === 'rise' ? 4 : 0;
-    ctx.fillStyle = C(PAL.cloak);
-    ctx.beginPath();
-    ctx.moveTo(-2, -31 + breathe);
-    ctx.lineTo(-9 - flow * 8, -6 + lift - flow * 6 + Math.sin(a.t * 0.2) * flow * 2);
-    ctx.lineTo(-3, -10 + lift * 0.5);
-    ctx.lineTo(3, -30 + breathe);
-    ctx.closePath(); ctx.fill();
-
-    // torso
-    ctx.fillStyle = C(PAL.tunic); ctx.fillRect(-5, -31 + breathe, 11, 16);
-    ctx.fillStyle = C(PAL.tunicDark); ctx.fillRect(-5, -31 + breathe, 3, 16);
-    ctx.fillStyle = C('#6a4a2a'); ctx.fillRect(-5, -18 + breathe, 11, 2);
-
-    // head
-    const hy = -42 + breathe;
-    ctx.fillStyle = C(PAL.skin); ctx.fillRect(-3, hy, 10, 11);
-    ctx.fillStyle = C(PAL.hair); ctx.fillRect(-5, hy - 2, 11, 5); ctx.fillRect(-5, hy, 5, 9);
-    ctx.fillStyle = C(PAL.hairDark); ctx.fillRect(-5, hy + 6, 3, 4);
-    // ponytail swings opposite to motion
-    const tail = pose === 'run' ? Math.sin(run * 2) * 2 : pose === 'fall' ? -3 : 0;
-    ctx.fillStyle = C(PAL.hair); ctx.fillRect(-9, hy + 1 + Math.round(tail), 5, 4); ctx.fillRect(-11, hy + 3 + Math.round(tail * 1.4), 3, 5);
-    // ear: round while she's mortal, pointed once she's fae
-    ctx.fillStyle = C(PAL.skin); ctx.fillRect(0, hy + 3, 2, 3);
-    if (!SH.game.mortal) { ctx.fillRect(-1, hy + 1, 2, 2); ctx.fillRect(-2, hy - 1, 1, 2); }
-    if (!tint) {
-      if (pose === 'idle' && a.t % 230 < 7) { ctx.fillStyle = '#b08a72'; ctx.fillRect(4, hy + 5, 2, 1); }   // a blink now and then
-      else { ctx.fillStyle = '#1a1430'; ctx.fillRect(4, hy + 4, 2, 3); ctx.fillStyle = '#ffffff'; ctx.fillRect(5, hy + 4, 1, 1); }
-    }
-
-    // arm + dagger
-    const sw = p.swing;
-    // Arm angle: 0 = hanging down, -1.57 = straight forward, -3.14 = straight up, +1.57 = straight back.
-    let armAng = -0.25 + Math.sin(a.t * 0.06) * 0.05, showBlade = true;
-    if (pose === 'run') armAng = -0.3 - Math.sin(run) * 0.7;
-    if (pose === 'rise' || pose === 'apex') armAng = -1.2;
-    if (pose === 'fall') armAng = -2.2;
-    if (pose === 'dash') armAng = 1.3;
-    if (pose === 'hurt') armAng = 2.4;
-    if (!g && sw) {
-      const k = Math.min(1, sw.f / Math.max(1, sw.def.active[1]));
-      if (sw.def.arc === 'high') armAng = -3.0 + k * 2.5;
-      else if (sw.def.arc === 'low') armAng = -0.4 - k * 2.2;
-      else if (sw.def.arc === 'big') armAng = -3.4 + k * 3.4;
-    }
-    if (pose === 'pogo') armAng = 0;
-    const bow = !g && SH.game.can('bow') && !SH.game.can('daggers');
-    if (bow) { showBlade = false; if (p.bowT > 0) armAng = -1.57; }
-    const casting = !g && p.castT > 0;
-    if (casting) { armAng = -1.57; showBlade = false; }
-    ctx.save();
-    ctx.translate(2, -28 + breathe);
-    ctx.rotate(armAng);
-    ctx.fillStyle = C(PAL.tunic); ctx.fillRect(-2, 0, 4, 7);
-    ctx.fillStyle = C(PAL.skin); ctx.fillRect(-2, 7, 4, 4);
-    if (showBlade) { ctx.fillStyle = C(PAL.blade); ctx.fillRect(-1, 10, 2, 9); ctx.fillStyle = C(PAL.gold); ctx.fillRect(-2, 10, 4, 1); }
-    if (casting) { // an open palm with fire in it
-      ctx.fillStyle = 'rgba(255,150,60,0.5)'; ctx.fillRect(-5, 9, 10, 10); ctx.fillStyle = '#ff8a3a'; ctx.fillRect(-3, 11, 6, 6); ctx.fillStyle = '#ffe08a'; ctx.fillRect(-1, 12, 3, 4);
-    }
-    if (bow) { // a hunting bow in her hand, drawn back while she shoots
-      const pull = p.bowT > 8 ? 4 : 0;
-      ctx.strokeStyle = '#8a5a2a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 10, 9, -0.2 * Math.PI + Math.PI / 2 - 1.2, Math.PI / 2 + 1.2 - 0.2 * Math.PI); ctx.stroke();
-      ctx.strokeStyle = '#e8e0c8'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(-6, 4 + pull * 0); ctx.lineTo(-pull, 10); ctx.lineTo(-6, 17); ctx.stroke();
-    }
-    ctx.restore();
-    ctx.restore(); // lean
-
-    // slash arc
-    if (!g && sw && sw.f <= sw.def.active[1] + 3) drawSlash(ctx, sw);
-    ctx.restore();
-  }
-
-  function limb(ctx, x, y, ang, len, w, col, foot) {
-    ctx.save(); ctx.translate(x, y); ctx.rotate(ang * 0.6);
-    ctx.fillStyle = col; ctx.fillRect(-w / 2, 0, w, len - 3);
-    ctx.fillStyle = foot; ctx.fillRect(-w / 2, len - 4, w + 2, 4);
-    ctx.restore();
-  }
-
-  function drawSlash(ctx, sw) {
-    const d = sw.def, k = (sw.f - d.active[0] + 1) / (d.active[1] - d.active[0] + 4);
-    if (sw.f < d.active[0]) return;
-    const alpha = Math.max(0, 1 - k);
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    let cx = 6, cy = -21, R = d.reach - 4, a0, a1;
-    if (d.arc === 'high') { a0 = -1.9; a1 = 0.9; }
-    else if (d.arc === 'low') { a0 = 1.2; a1 = -1.3; }
-    else if (d.arc === 'big') { a0 = -2.4; a1 = 1.6; R += 4; }
-    else { cx = 0; cy = 2; a0 = 0.3; a1 = Math.PI - 0.3; R = d.reach - 6; }
-    const ccw = a1 < a0;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = 'rgba(150,220,255,0.7)'; ctx.lineWidth = 7;
-    ctx.beginPath(); ctx.arc(cx, cy, R - 3, a0, a1, ccw); ctx.stroke();
-    ctx.strokeStyle = '#fff6d8'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(cx, cy, R, a0, a1, ccw); ctx.stroke();
-    ctx.restore();
   }
 
   SH.draw = D;
@@ -4081,11 +4410,12 @@ body[data-input="touch"] #touch { display: block; }
       onKnockout() { G.knockout(); },
       arrows: [],
       spawnArrow(x, y, dir) { this.arrows.push({ x, y, vx: dir * 8, vy: -0.5, life: 110, stuck: false }); },
-      fireballs: [], rocks: [],
-      spawnFireball(x, y, dir) { this.fireballs.push({ x, y, vx: dir * SH.GIFTS.flame.speed, life: SH.GIFTS.flame.life, dir }); },
+      fireballs: [], rocks: [], waves: [],
+      spawnFireball(x, y, dir, big) { const F = SH.GIFTS.flame; this.fireballs.push({ x, y, vx: dir * (big ? F.waveSpeed : F.speed), life: F.life, dir, big: !!big, hit: new Set() }); },
+      spawnWave(x, y, dir) { this.waves.push({ x, y, dir, life: 80, t: 0 }); },
       // The Old Wyrm hits the cliff: rocks fall near Wren, with a shadow first so you can dodge.
-      dropRocks(n) {
-        for (let i = 0; i < n; i++) this.rocks.push({ x: player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
+      dropRocks(n, at) {
+        for (let i = 0; i < n; i++) this.rocks.push({ x: at != null ? at + (i - (n - 1) / 2) * 30 : player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
       },
       onBossDown() { G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
@@ -4336,7 +4666,7 @@ body[data-input="touch"] #touch { display: block; }
       const tx = Math.floor(f.x / TS), ty = Math.floor(f.y / TS);
       const wall = w.thorns.find(t => t.solid && tx >= t.x && tx < t.x + t.w && ty >= t.top);
       if (wall) {
-        w.room.setThorns(wall, false); f.life = 0; SH.sfx.play('kill');
+        w.room.setThorns(wall, false); if (!f.big) f.life = 0; SH.sfx.play('kill');
         fx.burst((wall.x + wall.w / 2) * TS, 13 * TS, 50, { speed: 3, life: 50, gravity: -0.05, colors: ['#ff8a3a', '#ffd27a', '#5a1d3e', '#2a1024'], glow: true });
         fx.kick(4);
         if (wall.id === 'road') G.queueScript('lib_wall');
@@ -4346,7 +4676,15 @@ body[data-input="touch"] #touch { display: block; }
       for (const e of w.things) {
         if (e.arrowOnly || !e.hittable()) continue;
         const hb = e.hurtBox();
-        if (f.x > hb.l - 6 && f.x < hb.r + 6 && f.y > hb.t && f.y < hb.b) {
+        const pad = f.big ? 16 : 6;
+        if (f.x > hb.l - pad && f.x < hb.r + pad && f.y > hb.t - (f.big ? 14 : 0) && f.y < hb.b + (f.big ? 14 : 0)) {
+          if (f.big) {   // a flame wave burns through everything in its path, once each
+            if (f.hit.has(e)) continue;
+            f.hit.add(e);
+            e.takeHit({ fire: true, dmg: SH.GIFTS.flame.waveDamage, kb: 5, dir: f.dir, finisher: true }, w);
+            fx.burst(f.x, f.y, 22, { speed: 3.2, life: 28, colors: ['#ff8a3a', '#ffd27a', '#ffffff'], glow: true }); fx.stop(5); fx.kick(5);
+            continue;
+          }
           e.takeHit({ fire: true, dmg: SH.GIFTS.flame.damage, kb: 2, dir: f.dir, finisher: false }, w);
           f.life = 0; fx.burst(f.x, f.y, 14, { speed: 2.4, life: 24, colors: ['#ff8a3a', '#ffd27a', '#ffffff'], glow: true }); fx.stop(3);
           break;
@@ -4354,6 +4692,14 @@ body[data-input="touch"] #touch { display: block; }
       }
     }
     w.fireballs = w.fireballs.filter(f => f.life > 0);
+    // shockwaves from the Old Wyrm's slam: they run along the ground; jump them
+    for (const s of w.waves) {
+      s.t++; s.life--; s.x += s.dir * 4.4;
+      if (SH.isSolid(w.room.get(Math.floor((s.x + s.dir * 8) / TS), Math.floor((s.y - 4) / TS))) || !SH.floorAhead(w.room, s.x, s.y)) s.life = 0;
+      if (s.t % 2 === 0) fx.burst(s.x, s.y - 2, 1, { angle: -Math.PI / 2, spread: 1, speed: 2.2, life: 16, size: 3, colors: ['#8a96b8', '#c8d2e2', '#5a6680'] });
+      if (s.life > 0 && Math.abs(p.x - s.x) < 13 && p.y > s.y - 20 && p.y < s.y + 8 && !(p.dashT > 0 && p.iframes > 0)) p.hurt(s.x - s.dir * 10, 1, w);
+    }
+    w.waves = w.waves.filter(s => s.life > 0);
     // falling rocks
     for (const r of w.rocks) {
       if (r.ground == null) r.ground = (w.room.groundY(Math.floor(r.x / TS), 0) || w.room.pxH);
@@ -4413,14 +4759,19 @@ body[data-input="touch"] #touch { display: block; }
     // chapter 2: all sprites cleared -> Caelum arrives
     if (G.activeGoal === 'sprites' && !w.fired.spritesDone && w.things.filter(e => e.kind === 'thornSprite').every(e => e.dead)) {
       w.fired.spritesDone = true;
+      // Caelum arrives, but the level only ends when you talk to him: time to gather any Starlight you missed
       G.winnow('caelum', Math.min(def.width - 4, Math.floor(tx) + 3));
-      G.queueScript('ring_done');
+      const c = w.npcs.find(n => n.id === 'caelum'); c.optional = 'ring_done';
+      G.activeGoal = 'report'; G.hud.goal(true);
+      const left = w.motes.filter(m => !m.got).length;
+      G.hud.toast(left ? 'Caelum is here. ' + left + ' Starlight still out there: gather it, then talk to him.' : 'Caelum is here. Talk to him when you are ready.');
     }
 
     // control hints and the TALK / PAINT button
-    const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]));
+    const motesLeft = w.motes.filter(m => !m.got && (G.activeGoal === 'report' || m.x < p.x)).length;   // Starlight still behind her
+    const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
-    G.hud.prompt(hint ? input.fill(hint.text) : canPaint ? input.fill('Hold {PAINT} to paint the wall.') : null);
+    G.hud.prompt(hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Hold {PAINT} to paint the wall.') : null);
     G.hud.talkButton(talkable ? 'TALK' : canPaint ? 'PAINT' : null);
 
     for (const g of w.gates) if (!g.closed && (g.lift || 0) < 1) g.lift = (g.lift || 0) + 0.03;
@@ -4517,7 +4868,7 @@ body[data-input="touch"] #touch { display: block; }
       p.respawnAt(c.px + 14, c.py, 40);
       p.facing = 1;
       for (const e of w.things) if (e.reset && !(e.kind === 'wyrm' && e.dead && !e.boss)) e.reset();
-      w.rocks = []; w.fireballs = [];
+      w.rocks = []; w.fireballs = []; w.waves = [];
       if (G.boss) G.boss.wake();
       if (w.wyrm && w.wyrm.on) w.wyrm.x = p.x - 13 * TS;
       G.snapCamera();

@@ -89,11 +89,12 @@
       onKnockout() { G.knockout(); },
       arrows: [],
       spawnArrow(x, y, dir) { this.arrows.push({ x, y, vx: dir * 8, vy: -0.5, life: 110, stuck: false }); },
-      fireballs: [], rocks: [],
-      spawnFireball(x, y, dir) { this.fireballs.push({ x, y, vx: dir * SH.GIFTS.flame.speed, life: SH.GIFTS.flame.life, dir }); },
+      fireballs: [], rocks: [], waves: [],
+      spawnFireball(x, y, dir, big) { const F = SH.GIFTS.flame; this.fireballs.push({ x, y, vx: dir * (big ? F.waveSpeed : F.speed), life: F.life, dir, big: !!big, hit: new Set() }); },
+      spawnWave(x, y, dir) { this.waves.push({ x, y, dir, life: 80, t: 0 }); },
       // The Old Wyrm hits the cliff: rocks fall near Wren, with a shadow first so you can dodge.
-      dropRocks(n) {
-        for (let i = 0; i < n; i++) this.rocks.push({ x: player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
+      dropRocks(n, at) {
+        for (let i = 0; i < n; i++) this.rocks.push({ x: at != null ? at + (i - (n - 1) / 2) * 30 : player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
       },
       onBossDown() { G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
@@ -344,7 +345,7 @@
       const tx = Math.floor(f.x / TS), ty = Math.floor(f.y / TS);
       const wall = w.thorns.find(t => t.solid && tx >= t.x && tx < t.x + t.w && ty >= t.top);
       if (wall) {
-        w.room.setThorns(wall, false); f.life = 0; SH.sfx.play('kill');
+        w.room.setThorns(wall, false); if (!f.big) f.life = 0; SH.sfx.play('kill');
         fx.burst((wall.x + wall.w / 2) * TS, 13 * TS, 50, { speed: 3, life: 50, gravity: -0.05, colors: ['#ff8a3a', '#ffd27a', '#5a1d3e', '#2a1024'], glow: true });
         fx.kick(4);
         if (wall.id === 'road') G.queueScript('lib_wall');
@@ -354,7 +355,15 @@
       for (const e of w.things) {
         if (e.arrowOnly || !e.hittable()) continue;
         const hb = e.hurtBox();
-        if (f.x > hb.l - 6 && f.x < hb.r + 6 && f.y > hb.t && f.y < hb.b) {
+        const pad = f.big ? 16 : 6;
+        if (f.x > hb.l - pad && f.x < hb.r + pad && f.y > hb.t - (f.big ? 14 : 0) && f.y < hb.b + (f.big ? 14 : 0)) {
+          if (f.big) {   // a flame wave burns through everything in its path, once each
+            if (f.hit.has(e)) continue;
+            f.hit.add(e);
+            e.takeHit({ fire: true, dmg: SH.GIFTS.flame.waveDamage, kb: 5, dir: f.dir, finisher: true }, w);
+            fx.burst(f.x, f.y, 22, { speed: 3.2, life: 28, colors: ['#ff8a3a', '#ffd27a', '#ffffff'], glow: true }); fx.stop(5); fx.kick(5);
+            continue;
+          }
           e.takeHit({ fire: true, dmg: SH.GIFTS.flame.damage, kb: 2, dir: f.dir, finisher: false }, w);
           f.life = 0; fx.burst(f.x, f.y, 14, { speed: 2.4, life: 24, colors: ['#ff8a3a', '#ffd27a', '#ffffff'], glow: true }); fx.stop(3);
           break;
@@ -362,6 +371,14 @@
       }
     }
     w.fireballs = w.fireballs.filter(f => f.life > 0);
+    // shockwaves from the Old Wyrm's slam: they run along the ground; jump them
+    for (const s of w.waves) {
+      s.t++; s.life--; s.x += s.dir * 4.4;
+      if (SH.isSolid(w.room.get(Math.floor((s.x + s.dir * 8) / TS), Math.floor((s.y - 4) / TS))) || !SH.floorAhead(w.room, s.x, s.y)) s.life = 0;
+      if (s.t % 2 === 0) fx.burst(s.x, s.y - 2, 1, { angle: -Math.PI / 2, spread: 1, speed: 2.2, life: 16, size: 3, colors: ['#8a96b8', '#c8d2e2', '#5a6680'] });
+      if (s.life > 0 && Math.abs(p.x - s.x) < 13 && p.y > s.y - 20 && p.y < s.y + 8 && !(p.dashT > 0 && p.iframes > 0)) p.hurt(s.x - s.dir * 10, 1, w);
+    }
+    w.waves = w.waves.filter(s => s.life > 0);
     // falling rocks
     for (const r of w.rocks) {
       if (r.ground == null) r.ground = (w.room.groundY(Math.floor(r.x / TS), 0) || w.room.pxH);
@@ -421,14 +438,19 @@
     // chapter 2: all sprites cleared -> Caelum arrives
     if (G.activeGoal === 'sprites' && !w.fired.spritesDone && w.things.filter(e => e.kind === 'thornSprite').every(e => e.dead)) {
       w.fired.spritesDone = true;
+      // Caelum arrives, but the level only ends when you talk to him: time to gather any Starlight you missed
       G.winnow('caelum', Math.min(def.width - 4, Math.floor(tx) + 3));
-      G.queueScript('ring_done');
+      const c = w.npcs.find(n => n.id === 'caelum'); c.optional = 'ring_done';
+      G.activeGoal = 'report'; G.hud.goal(true);
+      const left = w.motes.filter(m => !m.got).length;
+      G.hud.toast(left ? 'Caelum is here. ' + left + ' Starlight still out there: gather it, then talk to him.' : 'Caelum is here. Talk to him when you are ready.');
     }
 
     // control hints and the TALK / PAINT button
-    const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]));
+    const motesLeft = w.motes.filter(m => !m.got && (G.activeGoal === 'report' || m.x < p.x)).length;   // Starlight still behind her
+    const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
-    G.hud.prompt(hint ? input.fill(hint.text) : canPaint ? input.fill('Hold {PAINT} to paint the wall.') : null);
+    G.hud.prompt(hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Hold {PAINT} to paint the wall.') : null);
     G.hud.talkButton(talkable ? 'TALK' : canPaint ? 'PAINT' : null);
 
     for (const g of w.gates) if (!g.closed && (g.lift || 0) < 1) g.lift = (g.lift || 0) + 0.03;
@@ -525,7 +547,7 @@
       p.respawnAt(c.px + 14, c.py, 40);
       p.facing = 1;
       for (const e of w.things) if (e.reset && !(e.kind === 'wyrm' && e.dead && !e.boss)) e.reset();
-      w.rocks = []; w.fireballs = [];
+      w.rocks = []; w.fireballs = []; w.waves = [];
       if (G.boss) G.boss.wake();
       if (w.wyrm && w.wyrm.on) w.wyrm.x = p.x - 13 * TS;
       G.snapCamera();

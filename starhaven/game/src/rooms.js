@@ -70,6 +70,7 @@
       { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.' },
       { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.' },
       { x0: 80, x1: 85, text: 'Thorns hurt. Jump over them.' },
+      { x0: 88, x1: 94, text: 'The last trial is just ahead, and there is no way back. {LEFT} Starlight still behind you.', until: 'maze', motesLeft: true },
       { x0: 94, x1: 104, text: 'RUN. Keep moving right and jump the gaps.' },
     ],
     triggers: [
@@ -119,13 +120,13 @@
       { x: 4, script: 'ashes_start' },
       { x: 39, script: 'ashes_overlook' },
       { x: 55, script: 'ashes_gate' },
-      { x: 106, above: 10, script: 'ashes_roof', flag: 'painted' },
+      { x: 109.5, above: 10, script: 'ashes_roof', flag: 'painted' },
     ],
     props: [
       { t: 'bush', x: 6 }, { t: 'bush', x: 15 }, { t: 'bush', x: 27 }, { t: 'pine', x: 12 }, { t: 'pine', x: 20 }, { t: 'pine', x: 35 }, { t: 'pine', x: 44 },
       { t: 'banner', x: 56 }, { t: 'banner', x: 67, c: '#7a2a4a' }, { t: 'banner', x: 88 }, { t: 'crate', x: 60 }, { t: 'crate', x: 84.6 }, { t: 'barrel', x: 63 }, { t: 'barrel', x: 92 },
     ],
-    motes: [['line', 11, 20, 14.6], ['line', 23, 29, 13.6], ['line', 32, 38, 12.6], ['line', 58, 67, 14.6], ['line', 78, 96, 14.6], ['line', 100, 103, 11.6], ['line', 106, 109, 8.6]],
+    motes: [['line', 11, 20, 14.6], ['line', 23, 29, 13.6], ['line', 32, 38, 12.6], ['line', 58, 67, 14.6], ['line', 78, 96, 14.6], ['line', 100, 103, 11.6], ['line', 105, 108, 8.6]],
     mural: { x: 70, w: 5, needs: 'arrive', flag: 'painted', script: 'ashes_painted', frames: 80 },
     arch: 52,
     house: { x0: 104, x1: 118, top: 10 },
@@ -153,6 +154,7 @@
     hints: [
       { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
       { x0: 36, x1: 44, text: 'Jump toward a bud. When you are above it, {DOWNSTRIKE} to strike down and bounce.', flag: 'combo' },
+      { x0: 61, x1: 69, text: 'Two more cuts: {ATTACK} during a dash is a lunging dash strike. Hold up and {ATTACK} for a rising strike that carries you into the air.', flag: 'pit' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
     ],
     triggers: [
@@ -185,6 +187,7 @@
     zones: [{ x: 0, theme: 'city' }, { x: 40, theme: 'mountain' }],
     start: { x: 3, y: 16 },
     cityFrom: 3, cityTo: 30, cityLight: 0.8, cityGlowX: 20,
+    arena: [119 * 24 + 40, 161 * 24 - 40],   // where the Old Wyrm may land a leap
     shapes: [
       ['solid', 0, 2, 0, 20],
       ['ground', 2, 48, 16],            // the Library courtyard, then the foot of the mountain road
@@ -195,6 +198,8 @@
       ['ground', 90, 117, 14],
       ['oneway', 95, 100, 10],          // somewhere to hop up out of a charge
       ['ground', 117, 162, 14],         // the Old Wyrm's hollow
+      ['oneway', 126, 131, 10],         // two ledges in the hollow: out of reach of a charge and the frost,
+      ['oneway', 139, 144, 10],         // but stay too long and the roof comes down
       ['solid', 162, 164, 0, 20],
     ],
     props: [
@@ -206,8 +211,10 @@
     motes: [['line', 20, 24, 10.6], ['line', 37, 46, 14.6], ['line', 49, 55, 12.6], ['line', 57, 63, 10.6], ['arc', 63.5, 68.5, 10.4, 2.4], ['line', 70, 76, 10.6], ['line', 96, 99, 8.6], ['line', 108, 114, 12.6]],
     thornWalls: [{ id: 'road', x: 34, w: 2, top: 6 }],
     hints: [
-      { x0: 6, x1: 30, text: 'Call the flame with {GIFT}. Each flame costs one moon (beside your hearts); they refill over time, faster when your daggers land.', flag: 'giftgot' },
+      { x0: 6, x1: 30, text: 'Call the flame with {GIFT}. Each flame costs one moon (beside your hearts); they refill over time, faster when your daggers land.', flag: 'giftgot', until: 'flame' },
+      { x0: 6, x1: 27, text: 'Hold {GIFT} and let go for a flame wave: it costs two moons, hits twice as hard and burns through everything in its path.', flag: 'flame' },
       { x0: 27, x1: 34, text: 'Thorns: steel won\'t cut them. Burn them with {GIFT}.', flag: 'flame' },
+      { x0: 110, x1: 117, text: 'The Old Wyrm\'s hollow is ahead, and there is no way back out. {LEFT} Starlight still behind you.', flag: 'wall', until: 'bossmet', motesLeft: true },
       { x0: 66, x1: 82, text: 'Wyrmlings charge in a straight line, head armored. Jump over the charge, then strike from behind while it\'s dazed.', flag: 'wall' },
     ],
     triggers: [

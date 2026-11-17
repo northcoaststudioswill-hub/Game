@@ -319,7 +319,7 @@ const path = require('path');
     (function () {
       SH.test.load(3); const p = P(), w = G.world;
       const buds = w.things.filter(t => t.kind === 'bulb');
-      let f = 0, swings = 0;
+      let f = 0, swings = 0, waited = 0;
       while (f++ < 60 * 150 && G.chapter === 3) {
         const tx = p.x / T; let press = null, held = { right: true, jump: true };
         if (G.state === 'play') {
@@ -332,7 +332,10 @@ const path = require('path');
             // hunt the nearest live sprite; jump up to it if it's on the ledge
             const alive = w.things.filter(e => e.kind === 'thornSprite' && !e.dead).sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x));
             const foe = alive[0];
-            if (foe && tx > 62) {
+            if (G.activeGoal === 'report') {   // the level waits for you: walk to Caelum and talk
+              const c = w.npcs.find(n => n.id === 'caelum'); waited++;
+              held = { right: c.x > p.x + 10, left: c.x < p.x - 10 }; if (Math.abs(c.x - p.x) < 40 && waited > 90) press = ['up'];
+            } else if (foe && tx > 62) {
               const dx = foe.x - p.x, dy = foe.y - p.y;
               held.right = dx > 0; held.left = dx < 0;
               if (Math.abs(dx) < 40 && Math.abs(dy) < 30) { held.right = held.left = false; p.facing = dx > 0 ? 1 : -1; if (!p.swing && f % 4 === 0) { press = ['attack']; swings++; } }
@@ -342,7 +345,7 @@ const path = require('path');
         }
         talk(held, press);
       }
-      check('Chapter 2 + vision + second evening: leads into Chapter 3', G.chapter === 4 && seen.has('ev2_caelum'),
+      check('Chapter 2 + vision + second evening: the level waits (1.5 s here) until you talk to Caelum, then leads into Chapter 3', G.chapter === 4 && seen.has('ev2_caelum') && waited > 90,
         { chapter: G.chapter, seconds: +(f / 60).toFixed(1), hurt: p.stats.hurt, swings });
     })();
 
@@ -390,18 +393,65 @@ const path = require('path');
       for (let i = 0; i < 600 && !G.boss; i++) talk({}, null);
       const boss = G.boss, gateClosed = w.gates[0].closed;
       let f = 0, rocksSeen = 0;
-      while (f++ < 60 * 120 && G.boss && !boss.dead) {
-        p.invuln = 5; p.hearts = 5;   // this test checks the fight can be won, not dodging
+      const moves = new Set(), phases = new Set(); let choked = false, wavesSeen = false, hp0 = boss.hp, waveHits = 0;
+      const behind = () => { const bx = boss.x - boss.dir * (boss.w / 2 + 14); if (Math.abs(p.x - bx) > 6 || Math.abs(p.y - boss.y) > 4) SH.test.place(bx / T, 14); p.facing = boss.dir; };
+      while (f++ < 60 * 150 && G.boss && !boss.dead) {
+        p.invuln = 5; p.hearts = 5;   // this test checks the fight can be won and every move happens, not dodging
         if (w.rocks.length) rocksSeen++;
-        let press = null;
-        if (boss.state === 'stun') { if (Math.abs(p.x - (boss.x - boss.dir * (boss.w / 2 + 14))) > 4) { SH.test.place((boss.x - boss.dir * (boss.w / 2 + 14)) / T, 14); p.facing = boss.dir; } if (!p.swing && f % 5 === 0) press = ['attack']; }
-        else { p.facing = boss.x > p.x ? 1 : -1; if (f % 30 === 0) press = ['gift']; }
-        step({}, press);
+        if (w.waves.length) wavesSeen = true;
+        moves.add(boss.state); phases.add(boss.phase());
+        let press = null, held = {};
+        const st = boss.state;
+        if (st === 'stun' || st === 'slamrest' || st === 'breath') { behind(); if (!p.swing && f % 5 === 0) press = ['attack']; }
+        else if (st === 'inhale') {   // stand in front and throw fire down its throat
+          const fx0 = boss.x + boss.dir * 110; if (Math.abs(p.x - fx0) > 8) SH.test.place(fx0 / T, 14);
+          p.facing = -boss.dir; if (f % 12 === 0) press = ['gift'];
+        }
+        else if (st === 'windup' || st === 'charge') {   // stay just behind its tail so it runs on into the cliff
+          behind();
+        }
+        else if (st === 'leap' || st === 'crouch') { if (p.y > 11 * T) SH.test.place(128.5, 10); }
+        else if (st === 'rest') {
+          if (p.pips >= 2 && Math.abs(p.x - boss.x) > 60) { p.facing = boss.x > p.x ? 1 : -1; held = { gift: f % 60 < 40 }; if (f % 60 === 0) press = ['gift']; }   // charge a flame wave
+          else { behind(); if (!p.swing && f % 5 === 0) press = ['attack']; }
+        }
+        const before = boss.hp, st0 = boss.state;
+        step(held, press);
+        if (st0 === 'inhale' && boss.state === 'stun') choked = true;
+        if (before - boss.hp >= 8) waveHits++;
       }
       const won = boss.dead;
       for (let i = 0; i < 4000 && G.state !== 'end'; i++) talk({}, null);
+      const allMoves = ['charge', 'leap', 'breath', 'roar', 'stun'].every(m => moves.has(m));
+      check('Old Wyrm: three phases; it charges, leaps (shockwaves), breathes frost and roars; fire chokes it mid-breath', hp0 === 46 && phases.size === 3 && allMoves && wavesSeen && choked,
+        { hp: hp0, phases: [...phases], moves: [...moves], wavesSeen, choked, flameWaveHits: waveHits });
       check('Old Wyrm: the hollow seals, rocks fall when it hits the cliff, it can be beaten; peak, evening and finale follow', gateClosed && won && rocksSeen > 0 && seen.has('mtn_peak') && seen.has('evening3') && seen.has('finale') && G.state === 'end',
         { gateClosed, won, rocksSeen: rocksSeen > 0, fightSeconds: +(f / 60).toFixed(1), peak: seen.has('mtn_peak'), evening: seen.has('evening3'), state: G.state });
+    })();
+
+    // New moves: dash strike, rising strike, flame wave
+    (function () {
+      SH.test.load('mountain', { story: false }); const p = P(), w = G.world;
+      const wy = w.things.find(e => e.kind === 'wyrm' && !e.boss);
+      const park = () => { wy.state = 'stun'; wy.t = 0; wy.dir = 1; wy.hp = 10; wy.burn = 0; wy.x = 100 * T; wy.y = 14 * T; wy.vx = 0; };
+      // dash strike: 3 damage
+      park(); SH.test.place(97, 14); p.facing = 1; step({}, null);
+      step({ right: true }, ['dash']); step({ right: true }, ['attack']); const kind1 = p.swing && p.swing.kind;
+      for (let i = 0; i < 20; i++) { wy.state = 'stun'; wy.t = 0; step({}, null); }
+      const thrustDmg = 10 - wy.hp;
+      // rising strike: lifts Wren off the ground and hits
+      park(); SH.test.place(97.9, 14); p.facing = 1; p.dashCd = 0; for (let i = 0; i < 30; i++) { wy.state = 'stun'; wy.t = 0; wy.x = 100 * T; step({}, null); }
+      park(); step({ up: true }, ['attack']); const kind2 = p.swing && p.swing.kind; let top = p.y;
+      for (let i = 0; i < 24; i++) { wy.state = 'stun'; wy.t = 0; step({}, null); top = Math.min(top, p.y); }
+      const upDmg = 10 - wy.hp, rose = 14 * T - top;
+      // flame wave: hold to charge, costs two moons, 8 damage, keeps going
+      park(); SH.test.place(95, 14); p.facing = 1; p.pips = 3; p.giftCd = 0; for (let i = 0; i < 30; i++) { wy.state = 'stun'; wy.t = 0; wy.x = 100 * T; step({}, null); }
+      park(); p.pips = 3; step({ gift: true }, ['gift']); for (let i = 0; i < 40; i++) { wy.state = 'stun'; wy.t = 0; step({ gift: true }, null); }
+      const charging = p.charging; step({}, null); const big = w.fireballs.some(f => f.big), pipsAfter = p.pips;
+      let alive = false; for (let i = 0; i < 30; i++) { wy.state = 'stun'; wy.t = 0; step({}, null); if (wy.hp < 10 && w.fireballs.some(f => f.big)) alive = true; }
+      const waveDmg = 10 - wy.hp;
+      check('New moves: dash strike (3), rising strike (lifts her, 2+), flame wave (hold: two moons, 8, pierces)', kind1 === 'thrust' && thrustDmg === 3 && kind2 === 'up' && upDmg >= 2 && rose > 30 && charging && big && pipsAfter < 1.2 && waveDmg >= 8 && alive,
+        { kind1, thrustDmg, kind2, upDmg, rose: Math.round(rose), charging, big, pipsAfter: +pipsAfter.toFixed(2), waveDmg, pierced: alive });
     })();
 
     // Evening 2 choices lead to the right person and add their bond points

@@ -1,12 +1,12 @@
 // Starhaven — game feel effects: particles, rings, hit-stop, shake, slow-motion, floating words.
 (function (SH) {
   const fx = {
-    parts: [], rings: [], words: [], ghosts: [],
+    parts: [], rings: [], words: [], ghosts: [], lines: [],
     hitstop: 0, shake: 0, flash: 0, flashColor: '#fff',
     slowmo: 0,
   };
 
-  fx.reset = function () { fx.parts.length = fx.rings.length = fx.words.length = fx.ghosts.length = 0; fx.hitstop = fx.shake = fx.flash = fx.slowmo = 0; };
+  fx.reset = function () { fx.parts.length = fx.rings.length = fx.words.length = fx.ghosts.length = fx.lines.length = 0; fx.hitstop = fx.shake = fx.flash = fx.slowmo = 0; };
 
   fx.stop = function (frames) { fx.hitstop = Math.max(fx.hitstop, frames); };
   fx.kick = function (amount) { if (SH.settings && SH.settings.shake === false) return; fx.shake = Math.max(fx.shake, amount); };
@@ -32,6 +32,13 @@
   fx.ring = function (x, y, color, r1, life, width) { fx.rings.push({ x, y, r: 2, r1: r1 || 26, life: life || 16, max: life || 16, color: color || '#fff', width: width || 2 }); };
   fx.word = function (x, y, text, color, life) { fx.words.push({ x, y, text, color: color || '#fff', life: life || 50, max: life || 50 }); };
   fx.ghost = function (snap) { fx.ghosts.push(snap); };
+  // Hit sparks: a slash mark across the hit and bright lines flying out of it.
+  fx.spark = function (x, y, ang, big) {
+    fx.lines.push({ x, y, ang: ang + 0.5, len: big ? 30 : 20, grow: 0, life: 7, max: 7, slash: true });
+    const n = big ? 9 : 5;
+    for (let i = 0; i < n; i++) { const a = ang + (Math.random() - 0.5) * 2.2; fx.lines.push({ x, y, ang: a, len: 5 + Math.random() * (big ? 12 : 7), grow: 2.5 + Math.random() * 3, dist: 4, life: 9, max: 9 }); }
+    fx.rings.push({ x, y, r: 2, r1: big ? 22 : 13, life: 8, max: 8, color: '#ffffff', width: 2 });
+  };
 
   fx.update = function () {
     for (const p of fx.parts) { p.vx *= p.drag; p.vy = p.vy * p.drag + p.g; p.x += p.vx; p.y += p.vy; p.life--; }
@@ -40,6 +47,8 @@
     fx.rings = fx.rings.filter(r => r.life > 0);
     for (const w of fx.words) { w.life--; w.y -= 0.35; }
     fx.words = fx.words.filter(w => w.life > 0);
+    for (const l of fx.lines) { l.life--; if (l.dist != null) l.dist += l.grow; }
+    fx.lines = fx.lines.filter(l => l.life > 0);
     for (const g of fx.ghosts) g.life--;
     fx.ghosts = fx.ghosts.filter(g => g.life > 0);
     if (fx.shake > 0) fx.shake = Math.max(0, fx.shake * 0.85 - 0.05);

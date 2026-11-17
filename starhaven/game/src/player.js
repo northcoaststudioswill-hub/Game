@@ -10,7 +10,7 @@
       facing: 1, grounded: false, wasGrounded: false,
       coyote: 0, jumpBuf: 0, dashBuf: 0, atkBuf: 0,
       airJumps: 1, airDashes: 1, rising: false,
-      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, bowCd: 0, bowT: 0, pips: SH.GIFTS.pips, giftCd: 0, castT: 0,
+      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, bowCd: 0, bowT: 0, pips: SH.GIFTS.pips, giftCd: 0, castT: 0, giftBuf: 0, charging: false, chargeT: 0, hitFlash: 0,
       invuln: 0, stun: 0,
       swing: null, comboStep: 0, comboKind: null, comboGap: 0,
       hearts: P.hearts, maxHearts: P.hearts,
@@ -50,14 +50,27 @@
     if (SH.game.can('flame')) {
       const G = SH.GIFTS;
       this.pips = Math.min(G.pips, this.pips + 1 / G.regenFrames);
-      if (this.giftBuf > 0 && this.giftCd <= 0 && !this.dead && this.stun <= 0) {
-        this.giftBuf = 0;
-        if (this.pips >= G.flame.cost) {
-          this.pips -= G.flame.cost; this.giftCd = G.flame.cooldown; this.castT = 14;
+      // press to start, release to throw; hold long enough (and have two moons) and it becomes a flame wave
+      if (this.giftBuf > 0 && !this.charging && this.giftCd <= 0 && !this.dead && this.stun <= 0) { this.giftBuf = 0; this.charging = true; this.chargeT = 0; }
+      if (this.charging) {
+        this.chargeT++;
+        const ready = this.chargeT >= G.flame.chargeFrames && this.pips >= G.flame.waveCost;
+        if (this.chargeT === G.flame.chargeFrames && this.pips >= G.flame.waveCost) { SH.fx.ring(this.x + this.facing * 12, this.y - 24, '#ffb057', 26, 14, 2); SH.sfx.play('lantern'); }
+        if (this.chargeT > 6 && this.chargeT % 3 === 0) SH.fx.burst(this.x + this.facing * 12, this.y - 24, 1, { speed: 1.2, life: 14, gravity: -0.05, colors: ready ? ['#fff6d8', '#ffb057'] : ['#ff8a3a', '#ffd27a'], glow: true });
+        if (!inp.held.gift || this.stun > 0 || this.dead) {
           const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
-          world.spawnFireball(this.x + this.facing * 14, this.y - 22, this.facing);
-          SH.sfx.play('dash');
-        } else { SH.fx.word(this.x, this.y - 52, 'no moons left', '#b9b2dd', 34); this.giftCd = 20; }
+          if (this.stun > 0 || this.dead) { /* knocked out of it */ }
+          else if (ready) {
+            this.pips -= G.flame.waveCost; this.giftCd = G.flame.cooldown + 8; this.castT = 18;
+            world.spawnFireball(this.x + this.facing * 16, this.y - 22, this.facing, true);
+            this.vx -= this.facing * 2.4; SH.fx.kick(3); SH.sfx.play('kill');
+          } else if (this.pips >= G.flame.cost) {
+            this.pips -= G.flame.cost; this.giftCd = G.flame.cooldown; this.castT = 14;
+            world.spawnFireball(this.x + this.facing * 14, this.y - 22, this.facing, false);
+            SH.sfx.play('dash');
+          } else { SH.fx.word(this.x, this.y - 52, 'no moons left', '#b9b2dd', 34); this.giftCd = 20; }
+          this.charging = false; this.chargeT = 0;
+        }
       }
     }
     if (this.iframes > 0) this.iframes--;
@@ -142,6 +155,14 @@
     }
 
     // ---- attacks
+    if (this.hitFlash > 0) this.hitFlash--;
+    // Dash strike: attack during a dash
+    if (!stunned && this.dashT > 0 && this.atkBuf > 0 && !this.swing && SH.game.can('daggers')) {
+      this.atkBuf = 0; this.comboStep = 0; this.comboKind = 'thrust';
+      this.swing = { kind: 'thrust', step: 0, def: C.thrust, f: 0, hits: new Set() };
+      this.dashT = Math.max(this.dashT, 7); this.iframes = Math.max(this.iframes, 9);
+      SH.sfx.play('slash');
+    }
     if (!stunned && this.dashT <= 0) this.tryAttack(world, inp);
     if (this.swing) this.updateSwing(world);
 
@@ -225,6 +246,15 @@
       } else step = (this.comboKind === kind && this.comboGap > 0 && this.comboStep < list.length) ? this.comboStep : 0;
     }
     if (this.swing && kind === 'pogo') return;
+    // Rising strike: up + attack on the ground
+    if (kind === 'ground' && inp.held.up && !this.swing) {
+      this.atkBuf = 0; this.comboStep = 0; this.comboKind = 'up';
+      const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
+      this.swing = { kind: 'up', step: 0, def: C.up, f: 0, hits: new Set() };
+      this.vy = -this.jumpV(C.up.hop); this.grounded = false; this.coyote = 0; this.rising = false;
+      SH.sfx.play('slash'); SH.fx.dust(this.x, this.y, 0, 5);
+      return;
+    }
     const def = kind === 'pogo' ? C.pogo : C[kind][step];
     this.atkBuf = 0;
     this.comboKind = kind;
@@ -255,6 +285,7 @@
     const s = this.swing, d = s.def;
     if (s.kind === 'pogo') return { l: this.x - 22, r: this.x + 22, t: this.y - 8, b: this.y + d.reach };
     const f = this.facing, cy = this.y - 20;
+    if (s.kind === 'up') return { l: Math.min(this.x - f * 8, this.x + f * d.reach), r: Math.max(this.x - f * 8, this.x + f * d.reach), t: this.y - 78, b: this.y - 6 };
     const h = d.arc === 'big' ? 40 : 30;
     const near = this.x + f * 2, far = this.x + f * d.reach;
     return { l: Math.min(near, far), r: Math.max(near, far), t: cy - h / 2, b: cy + h / 2 };
@@ -269,11 +300,12 @@
         if (s.hits.has(tgt) || !tgt.hittable()) continue;
         if (!SH.overlap(hb, tgt.hurtBox())) continue;
         s.hits.add(tgt);
-        const r = tgt.takeHit({ dmg: C.damage, kb: d.kb, dir: this.facing, finisher: !!d.finisher, pogo: s.kind === 'pogo' }, world);
+        const r = tgt.takeHit({ dmg: d.dmg || C.damage, kb: d.kb, dir: this.facing, finisher: !!d.finisher, pogo: s.kind === 'pogo', launch: d.launch || 0 }, world);
         if (!r) continue;
         if (r.deflect) continue;
         if (SH.game.can('flame')) this.pips = Math.min(SH.GIFTS.pips, this.pips + SH.GIFTS.perHit); // close-up hits refill the moons
         this.stats.hits++;
+        { const hb2 = tgt.hurtBox(); fx.spark((Math.max(hb.l, hb2.l) + Math.min(hb.r, hb2.r)) / 2, (Math.max(hb.t, hb2.t) + Math.min(hb.b, hb2.b)) / 2, s.kind === 'pogo' ? Math.PI / 2 : s.kind === 'up' ? -Math.PI / 2 : (this.facing > 0 ? 0 : Math.PI), d.finisher || r.killed); }
         SH.sfx.play(r.killed ? 'kill' : 'hit');
         fx.stop(r.killed ? C.killStop : d.stop);
         fx.kick(r.killed ? 4 : d.finisher ? 3 : 1.6);
@@ -309,7 +341,7 @@
     if (this.iframes > 0) return false;
     const fx = SH.fx;
     this.hearts = Math.max(0, this.hearts - dmg);
-    this.stats.hurt++;
+    this.stats.hurt++; this.hitFlash = 6; this.charging = false; this.chargeT = 0;
     SH.sfx.play('hurt');
     this.invuln = SH.PLAYER.hurtInvuln;
     this.stun = SH.PLAYER.hurtStun;
