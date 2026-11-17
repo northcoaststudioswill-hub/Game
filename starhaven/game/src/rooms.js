@@ -102,7 +102,7 @@
     ],
     hints: [
       { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
-      { x0: 36, x1: 44, text: 'Jump toward a bud. While you are above it, hold {DOWN} and press {ATTACK} to strike down and bounce.', flag: 'combo' },
+      { x0: 36, x1: 44, text: 'Jump toward a bud. When you are above it, {DOWNSTRIKE} to strike down and bounce.', flag: 'combo' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
     ],
     triggers: [

@@ -62,6 +62,8 @@
   window.addEventListener('keyup', e => { const a = KEYS[e.code]; if (a) { e.preventDefault(); up('kb', a); } });
   window.addEventListener('blur', () => input.clear());
 
+  // A Bluetooth or USB controller announces itself once any of its buttons is pressed.
+  window.addEventListener('gamepadconnected', e => { input.source = 'pad'; if (input.onSourceChange) input.onSourceChange('pad'); if (input.onPad) input.onPad(e.gamepad.id); });
   // ---- gamepad (standard mapping: A jump, X attack, B dash, Y talk, Start pause)
   const PAD_BTNS = { 0: 'jump', 2: 'attack', 1: 'dash', 3: 'up', 5: 'dash', 9: 'pause', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
   input.pollPad = function () {
@@ -87,11 +89,11 @@
   // ---- touch: floating stick on the left half, buttons on the right
   input.bindTouch = function (layer, stickBase, stickKnob) {
     let stickId = null, ox = 0, oy = 0;
-    const DEAD = 14, DOWN = 26, MAXR = 46;
+    const DEAD = 14, DOWN = 20, MAXR = 46;
     function stickSet(dx, dy) {
       const ang = Math.atan2(dy, dx), dist = Math.min(MAXR, Math.hypot(dx, dy));
       stickKnob.style.transform = `translate(${Math.cos(ang) * dist}px, ${Math.sin(ang) * dist}px)`;
-      const L = dx < -DEAD, R = dx > DEAD, D = dy > DOWN && dy > Math.abs(dx) * 0.6, U = dy < -DOWN && -dy > Math.abs(dx) * 0.6;
+      const L = dx < -DEAD, R = dx > DEAD, D = dy > DOWN && dy > Math.abs(dx) * 0.35, U = dy < -DOWN && -dy > Math.abs(dx) * 0.5;
       L ? down('touch', 'left') : up('touch', 'left');
       R ? down('touch', 'right') : up('touch', 'right');
       D ? down('touch', 'down') : up('touch', 'down');
@@ -140,9 +142,9 @@
 
   // Button names shown in signs, per input type.
   input.LABELS = {
-    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W' },
-    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button' },
-    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y' },
+    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J' },
+    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'press STRIKE (it aims down by itself)' },
+    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X' },
   };
   input.fill = function (text) {
     const L = input.LABELS[input.source] || input.LABELS.kb;

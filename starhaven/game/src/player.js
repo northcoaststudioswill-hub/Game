@@ -180,7 +180,9 @@
     if (this.atkBuf <= 0) return;
     const C = SH.COMBAT;
     let kind, step;
-    if (!this.grounded && inp.held.down) { kind = 'pogo'; step = 0; }
+    // On touch, a strike in the air aims down by itself when there's something to bounce on below (doc: auto-aim on phones).
+    const autoDown = !this.grounded && !inp.held.down && SH.input.source === 'touch' && SH.settings.autoDown && this.somethingBelow(world);
+    if (!this.grounded && (inp.held.down || autoDown)) { kind = 'pogo'; step = 0; }
     else {
       kind = this.grounded ? 'ground' : 'air';
       const list = C[kind];
@@ -197,6 +199,22 @@
     if (kind !== 'pogo') { const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d; }
     this.swing = { kind, step, def, f: 0, hits: new Set() };
     if (def.lunge && this.grounded) this.vx = this.facing * Math.max(Math.abs(this.vx) * 0.5, def.lunge * 1.6);
+  };
+
+  // A bud, enemy or thorns just below Wren's feet (what a down-strike could bounce on).
+  Player.prototype.somethingBelow = function (world) {
+    for (const t of world.targets) {
+      if (!t.hittable() || t.kind === 'dummy') continue;
+      const hb = t.hurtBox(), cx = (hb.l + hb.r) / 2, cy = (hb.t + hb.b) / 2;
+      if (Math.abs(cx - this.x) < 34 && cy > this.y - 6 && cy < this.y + 84) return true;
+    }
+    const TS = SH.TILE, tx = Math.floor(this.x / TS);
+    for (let d = 0; d < 4; d++) {
+      const tile = world.room.get(tx, Math.floor(this.y / TS) + d);
+      if (tile === SH.T_THORNS) return true;
+      if (tile === SH.T_SOLID || tile === SH.T_ONEWAY) break;
+    }
+    return false;
   };
 
   Player.prototype.swingBox = function () {

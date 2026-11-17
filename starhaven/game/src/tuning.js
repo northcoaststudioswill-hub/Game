@@ -42,6 +42,9 @@
     { key: 'pogoBounce', label: 'Pogo bounce', min: 6, max: 11, step: 0.1 },
   ];
 
+  // Player settings (menu). autoDown: on touch, a strike in the air aims down when something is below.
+  SH.settings = { autoDown: true };
+
   SH.PLAYER = {
     w: 14, h: 38,
     hearts: 5,

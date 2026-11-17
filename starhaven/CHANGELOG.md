@@ -1,5 +1,40 @@
 # Starhaven — Changelog
 
+## Rebuild 3 — Relationships, cutscenes, and an easier down-strike (Nov 17, 2026)
+Will's notes: the strike down is hard on mobile; can a Bluetooth controller be used; more relationship development,
+more story, more cutscenes.
+
+- **Down-strike on touch:** in the air, STRIKE now aims down by itself when a bud, an enemy or thorns are right below
+  Wren (the design doc's "auto-aim on phones"). Holding the stick down still works, and a down-diagonal now counts.
+  Bram's line and the hint are reworded for each input type.
+- **Bluetooth controllers:** already supported (standard mapping: A jump, X strike, B dash, Y talk/paint, Start menu).
+  New: a "Controller connected" message, the touch buttons hide while a controller is in use, and the Controls page
+  says how to pair one.
+- **Cutscenes:** full-screen illustrated scenes with portrait dialogue at the big beats: waking at the Spring Court,
+  Caelum at Wren's window at midnight, the rooftop, Iris's vision, evenings at the fire and the tower, and a Chapter 3
+  teaser (Wren's palm glowing with fire). Narrator lines for scene-setting.
+- **Bonds (design doc "Bonds" and "Bond pacing"):** 5 hearts each for Caelum, Bram and Iris. Heart 1 when you meet;
+  then hearts at 40 / 120 / 240 / 400 points. Points come from evenings (+20), gifts they love (+15), and choices.
+  Every heart has a scene: Caelum heart 2 (what he saw in the Deep), Caelum heart 3 (flying over the city), Bram heart 2,
+  Iris heart 2. Toasts say when someone loved what you did or will remember it.
+- **Dialogue choices** in 9 places. Each changes what the other person says and how much they warm to Wren.
+- **Evenings between chapters:** after Chapter 1, a night on the rooftop with Caelum (show him your sketchbook, toast,
+  or ask about his nightmares). After Chapter 2, choose who to spend the evening with: Caelum, Bram or Iris, each with
+  their own scene, gift and choices.
+- **More story:** the Spring Court (safe, smothered, a letter from her sisters she hasn't answered); Caelum's midnight
+  arrival; the bargain released ("I'm staying anyway"); Iris's vision that the Iron King knows Wren's name and his iron is
+  reaching for her sisters; Bram's brother lost on the north wall; Iris's secret about Caelum's thread.
+- **Journal:** a Bonds section with hearts, points to the next heart, and what each person loves.
+- New game resets bonds; the finale leads into the end screen.
+
+Verified (`game/tests/feel.js`, 23/23): everything from Rebuild 2, plus touch auto-aim crossing the thorn pit without
+holding down; Chapter 1 + first evening reaching Caelum heart 2 with its heart scene; Chapter 2 + vision + second evening
++ finale ending on the end screen; each evening choice going to the right person. A simulated Bluetooth controller
+started the game, went through the intro and dialogue, and moved Wren. Phone screenshots of every new scene checked.
+NOT tested: a real controller paired to a real phone (and whether the Claude app passes controllers through; Safari and
+Chrome do); human play.
+
+
 ## Rebuild 2 — Story-led concept: Prologue through Chapter 2 (Nov 17, 2026)
 Will's notes on Rebuild 1 and on Muse's slice: no outline of the story, no idea what to do or what was going on. This build
 is a phone-playable concept (no Godot for now) of the design doc's first playable: **the Prologue through Chapter 2**,

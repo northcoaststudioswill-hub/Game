@@ -17,11 +17,13 @@ back as fae → her bargain with Caelum, who has come to collect → the Iron Ki
 
 ## Prologue: The Deep (movement only, no enemies)
 A nightmare of the Deep. The Thorn Queen taunts Wren as she runs. Teaches move, jump, double jump and dash, then thorns.
-Ends with **the Deep Wyrm** waking and chasing her: run right, jump the gaps, reach the light. She wakes up.
+Ends with **the Deep Wyrm** waking and chasing her: run right, jump the gaps, reach the light. She wakes up at the
+**Spring Court**: safe, smothered, never allowed to leave, with a letter from her sisters she hasn't answered.
 - Goal: escape the Deep.
 
 ## Chapter 1: Ashes (walk, talk, paint, no enemies)
-Wren is living an empty life at another court. Caelum appears and calls in the bargain. He walks her up the road
+Midnight at the Spring Court: Caelum appears at Wren's window and calls in the bargain (your first choice of how to
+answer him). He winnows her away. He walks her up the road
 (winnowing ahead in starlight each time), shows her Starhaven glowing in the distance, and explains the city has gone
 dark from the war. At the gate he asks her to paint. She paints the first mural and the whole street lights up.
 On the roof of his house: banter, "try not to stab any of them", and Caelum's first bond heart.
@@ -30,11 +32,21 @@ On the roof of his house: banter, "try not to stab any of them", and Caelum's fi
 ## Chapter 2: The Five (daggers, pogo, first enemies)
 Bram tests Wren at the Training Ring: a 3-hit combo on the dummy, then his thorn pit (bounce on the buds with a
 downward strike). Iris says hello (optional). Bram sends her through the north gate to clear three thorn sprites,
-the Iron King's creatures. Caelum arrives: "Next time it won't be sprites."
+the Iron King's creatures. Caelum arrives, then **Iris's vision**: threads over the sea, an iron crown pulling on two
+mortal girls. The Iron King knows Wren's name, and he is reaching for her sisters.
 - Goals: show Bram your daggers; cross the thorn pit; clear the thorn sprites (count shown).
 
+## Evenings and bonds
+- **After Chapter 1:** a night on the rooftop with Caelum. Starlit wine. Show him your sketchbook (a gift he loves),
+  toast to the bargain, or ask about his nightmares.
+- **After Chapter 2:** choose who to spend the evening with. **Caelum** (the Iron King asked about Wren by name; he
+  releases her from the bargain and she stays anyway), **Bram** (spiced bread or sparring by the fire; his brother lost on
+  the north wall), or **Iris** (sugared plums in her tower; her secret about Caelum's thread).
+- **Hearts:** 5 each. Heart 1 when you meet; then 40, 120, 240, 400 points. Every new heart plays a short scene.
+
 ## Then
-An end screen says what comes next if this direction is right: the Starhaven hub, bond evenings, the bow, and Flame.
+A last scene: Wren dreams of fire instead of thorns and wakes with her palm glowing. Next: Chapter 3, First Light.
+The end screen says what comes next if this direction is right.
 
 ## How the player always knows what's going on
 - The **GOAL line** at the top always shows the chapter and the one thing to do now.

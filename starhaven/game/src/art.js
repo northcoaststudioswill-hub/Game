@@ -122,6 +122,93 @@
       }
       for (let i = 0; i < 5; i++) R(132 + i * 12, 14 + (i % 2 ? 4 : 0), 6, 14 - (i % 2 ? 4 : 0), '#6a6a74');
       R(130, 26, 62, 6, '#6a6a74');
+    } else if (id === 'spring') {
+      // a gilded bedroom at the Spring Court: too many flowers, a window Wren can't leave through
+      sky('#f4d6dc', '#d8a8b8');
+      R(0, 110, W, 40, '#b88a98'); R(0, 108, W, 3, '#f0c8d0');
+      R(210, 18, 70, 80, '#7ab0c8'); R(210, 18, 70, 4, '#e8c070'); R(243, 18, 4, 80, '#e8c070'); R(210, 56, 70, 3, '#e8c070');
+      for (let i = 0; i < 9; i++) R(212 + i * 7, 24 + (i % 3) * 3, 2, 70, 'rgba(255,255,255,0.15)');
+      R(40, 80, 120, 34, '#f8eef0'); R(40, 76, 120, 6, '#e8c070'); R(34, 60, 8, 54, '#c89a50'); R(158, 60, 8, 54, '#c89a50');
+      R(60, 82, 60, 14, '#f6dcc6'); R(112, 80, 14, 10, '#d8653a');
+      for (let i = 0; i < 26; i++) { const x = (i * 53) % W, y = 10 + (i * 37) % 90; R(x, y, 5, 5, i % 2 ? '#ff8fb0' : '#ffd0e0'); R(x + 1, y + 1, 2, 2, '#ffe9a8'); }
+      R(178, 92, 22, 18, '#c89a50'); R(182, 86, 14, 7, '#fff6e0');
+    } else if (id === 'window') {
+      // midnight: the window open, Caelum's silhouette in it, wings and stars behind
+      sky('#0a0820', '#2a1a48'); stars(70, 13);
+      R(0, 0, 90, H, '#140e24'); R(230, 0, 90, H, '#140e24'); R(0, 0, W, 16, '#140e24'); R(0, 130, W, 20, '#140e24');
+      R(88, 14, 4, 118, '#c89a50'); R(228, 14, 4, 118, '#c89a50'); R(88, 128, 144, 4, '#c89a50');
+      g.fillStyle = '#05040e';
+      g.beginPath(); g.moveTo(150, 60); g.quadraticCurveTo(100, 30, 96, 96); g.lineTo(130, 80); g.fill();
+      g.beginPath(); g.moveTo(170, 60); g.quadraticCurveTo(220, 30, 224, 96); g.lineTo(190, 80); g.fill();
+      g.beginPath(); g.arc(160, 52, 7, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.moveTo(150, 60); g.lineTo(170, 60); g.lineTo(176, 128); g.lineTo(144, 128); g.fill();
+      R(159, 40, 2, 4, '#ffffff'); R(157, 41, 6, 1, '#ffffff'); R(162, 50, 2, 2, '#a58bff');
+      for (let i = 0; i < 6; i++) R(20 + i * 10, 120 - (i % 2) * 6, 4, 4, '#ff8fb0');
+    } else if (id === 'rooftop') {
+      // two figures on a rooftop over Starhaven at night
+      sky('#070a22', '#2a2a60'); stars(110, 17);
+      const gr = g.createRadialGradient(250, 34, 2, 250, 34, 30); gr.addColorStop(0, '#fff6d8'); gr.addColorStop(0.3, 'rgba(255,246,216,0.4)'); gr.addColorStop(1, 'rgba(255,246,216,0)');
+      g.fillStyle = gr; g.fillRect(210, 0, 80, 70);
+      for (let i = 0; i < 26; i++) { const x = i * 13, h = 20 + ((i * 7) % 5) * 9; R(x, 118 - h, 11, h, '#16163e'); for (let k = 0; k < 3; k++) if ((i + k) % 3 === 0) R(x + 4, 122 - h + k * 7, 2, 2, '#ffd27a'); }
+      R(0, 116, W, 34, '#0c0a1e'); R(0, 116, W, 2, '#d6ccff'); for (let x = 0; x < W; x += 10) R(x, 106, 2, 10, '#2a2650'); R(0, 105, W, 2, '#2a2650');
+      g.fillStyle = '#05040e';
+      R(128, 84, 10, 32, '#05040e'); g.beginPath(); g.arc(133, 78, 6, 0, Math.PI * 2); g.fill(); R(126, 74, 6, 12, '#d8653a');
+      R(150, 80, 12, 36, '#05040e'); g.beginPath(); g.arc(156, 74, 6, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.moveTo(152, 82); g.quadraticCurveTo(180, 70, 186, 104); g.lineTo(164, 96); g.fill();
+      R(108, 108, 3, 8, '#5a3a5a'); R(107, 104, 5, 4, '#ffd27a');
+    } else if (id === 'city') {
+      // Starhaven at night from above: one bright street in a dark city
+      sky('#070a22', '#1e2050'); stars(80, 23);
+      for (let i = 0; i < 40; i++) { const x = (i * 29) % W, h = 30 + ((i * 11) % 6) * 12; R(x, 150 - h, 14, h, '#141438'); }
+      R(0, 108, W, 6, '#3a2a40'); for (let x = 6; x < W; x += 18) { R(x, 100, 3, 3, '#ffd98a'); R(x - 4, 96, 11, 11, 'rgba(255,214,130,0.15)'); }
+      R(150, 52, 3, 20, '#ffd27a'); R(140, 60, 23, 2, '#ffd27a');
+    } else if (id === 'vision') {
+      // threads of fate over the sea, an iron crown pulling two of them
+      sky('#0a0a24', '#1a1a3a'); stars(40, 29);
+      R(0, 110, W, 40, '#0c1424');
+      const cols = ['#ffe9a8', '#9fe0ff', '#ff8fb8', '#b9a8ff', '#9be07a'];
+      for (let i = 0; i < 9; i++) { g.strokeStyle = cols[i % cols.length]; g.globalAlpha = 0.55; g.beginPath(); g.moveTo(0, 30 + i * 10); g.bezierCurveTo(100, 10 + i * 14, 200, 90 - i * 6, W, 40 + i * 9); g.stroke(); }
+      g.globalAlpha = 1;
+      for (let i = 0; i < 5; i++) R(236 + i * 10, 38 + (i % 2 ? 4 : 0), 6, 16 - (i % 2 ? 4 : 0), '#7a7a88'); R(234, 52, 52, 6, '#7a7a88');
+      g.strokeStyle = '#c0c0d0'; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(260, 60); g.quadraticCurveTo(200, 90, 90, 96); g.stroke();
+      g.beginPath(); g.moveTo(260, 60); g.quadraticCurveTo(210, 104, 110, 112); g.stroke();
+      g.lineWidth = 1;
+      person(90, 118, 18, '#e8d0ff'); person(110, 126, 14, '#ffd0e0');
+    } else if (id === 'fire') {
+      // the Training Ring after dark: a fire pit and two figures
+      sky('#0a0818', '#2a1a28');
+      R(0, 112, W, 38, '#2a2018'); R(0, 112, W, 2, '#6a4a30');
+      for (let x = 20; x < W; x += 40) { R(x, 70, 4, 42, '#3a2a1e'); R(x - 2, 68, 8, 3, '#5a4430'); }
+      const gr = g.createRadialGradient(160, 104, 2, 160, 104, 90); gr.addColorStop(0, 'rgba(255,170,80,0.6)'); gr.addColorStop(1, 'rgba(255,170,80,0)');
+      g.fillStyle = gr; g.fillRect(60, 20, 200, 130);
+      R(146, 108, 28, 6, '#4a3020');
+      tri(150, 108, 160, 76, 170, 108, '#ff8a3a'); tri(154, 108, 160, 88, 166, 108, '#ffe08a');
+      person(120, 116, 24, '#1a1010'); R(108, 92, 24, 18, '#1a1010');
+      person(196, 116, 20, '#1a1010'); R(193, 92, 6, 4, '#d8653a');
+    } else if (id === 'observatory') {
+      // Iris's tower: round window, maps, candles, hanging threads of starlight
+      sky('#0c1428', '#1a2440');
+      g.fillStyle = '#0a1020'; g.beginPath(); g.arc(160, 60, 52, 0, Math.PI * 2); g.fill();
+      g.save(); g.beginPath(); g.arc(160, 60, 48, 0, Math.PI * 2); g.clip(); stars(60, 31); g.restore();
+      R(0, 114, W, 36, '#2a2238'); R(0, 114, W, 2, '#6a5a80');
+      R(30, 90, 70, 24, '#5a4430'); R(34, 86, 40, 6, '#e8d8b0'); R(220, 90, 70, 24, '#5a4430'); R(226, 84, 50, 8, '#e8d8b0');
+      for (let i = 0; i < 4; i++) { R(40 + i * 80, 78, 3, 10, '#f4f0e0'); R(40 + i * 80, 74, 3, 4, '#ffd27a'); }
+      g.strokeStyle = '#ffe9a8'; g.globalAlpha = 0.6;
+      for (let i = 0; i < 7; i++) { g.beginPath(); g.moveTo(20 + i * 45, 0); g.quadraticCurveTo(30 + i * 45, 40, 18 + i * 45, 70 + (i % 3) * 8); g.stroke(); }
+      g.globalAlpha = 1;
+      person(150, 116, 18, '#4f88c0'); R(147, 92, 6, 4, '#f4f0ff');
+      person(176, 116, 22, '#2a2238'); R(173, 92, 6, 4, '#d8653a');
+    } else if (id === 'spark') {
+      // Wren's open palm with a small flame waking in it
+      sky('#0a0610', '#2a0e10');
+      const gr = g.createRadialGradient(160, 70, 2, 160, 70, 80); gr.addColorStop(0, 'rgba(255,170,80,0.7)'); gr.addColorStop(1, 'rgba(255,120,60,0)');
+      g.fillStyle = gr; g.fillRect(60, 0, 200, 150);
+      g.fillStyle = '#f6dcc6';
+      g.beginPath(); g.ellipse(160, 108, 34, 18, 0, 0, Math.PI * 2); g.fill();
+      for (let i = 0; i < 4; i++) R(132 + i * 15, 76 + Math.abs(i - 1.5) * 4, 9, 30, '#f6dcc6');
+      R(186, 96, 18, 9, '#f6dcc6'); R(130, 120, 60, 30, '#2f8f7a');
+      tri(150, 92, 160, 50, 170, 92, '#ff8a3a'); tri(154, 92, 160, 64, 166, 92, '#ffe08a'); R(158, 82, 4, 8, '#ffffff');
     }
     return (cache['panel_' + id] = c);
   };

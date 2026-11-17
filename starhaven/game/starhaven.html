@@ -45,10 +45,10 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   opacity: 0; transition: opacity .18s, transform .18s; text-align: center; }
 #sign.show { opacity: 1; transform: translate(-50%, 0); }
 #sign b { color: var(--gold); }
-#toast { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
+#toast { position: fixed; z-index: 8; left: 50%; top: 30%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
   border-radius: 12px; padding: 10px 16px; font-size: 17px; font-weight: 700; opacity: 0; transition: opacity .25s; max-width: 70vw; text-align: center; }
 #toast.show { opacity: 1; }
-body[data-state="talk"] #toast { top: auto; bottom: 18%; }
+body[data-state="talk"] #toast { top: auto; bottom: max(10px, env(safe-area-inset-bottom)); }
 /* In-game controls only show while playing; story screens and conversations get the whole screen. */
 body:not([data-state="play"]) #touch, body:not([data-state="play"]):not([data-state="talk"]) #hud { display: none !important; }
 body[data-state="talk"] #sign, body[data-state="talk"] #pause-btn { display: none; }
@@ -61,6 +61,26 @@ body[data-state="talk"] #sign, body[data-state="talk"] #pause-btn { display: non
 #d-body { min-width: 0; flex: 1; }
 #d-name { font-family: var(--display); font-weight: 800; font-size: 17px; letter-spacing: .06em; margin: 2px 0 4px; }
 #d-text { font-size: 19px; line-height: 1.4; font-weight: 600; }
+#dialog.narr #d-face, #dialog.narr #d-name { display: none; }
+#dialog.narr #d-text { font-style: italic; color: #e6e0ff; }
+#dialog.choosing #d-more { display: none; }
+#dialog.choosing { cursor: default; }
+#d-choices { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+#d-choices:empty { display: none; }
+.choice { text-align: left; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--panel-line); background: rgba(255,210,122,.08);
+  color: var(--ink); font: 700 16px var(--body); cursor: pointer; }
+.choice.sel { border-color: var(--gold); background: rgba(255,210,122,.22); }
+.choice.sel::before { content: '\25B8  '; color: var(--gold); }
+#scene { position: fixed; inset: 0; z-index: 5; display: none; background: #05050e; }
+#scene.show { display: block; }
+#scene-art { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; display: block; }
+#scene-title { position: absolute; left: 50%; top: 18px; transform: translateX(-50%); font-family: var(--display);
+  color: var(--gold); letter-spacing: .14em; font-size: 15px; text-transform: uppercase; text-shadow: 0 2px 6px #000; white-space: nowrap; }
+.bond .hearts { color: #ff8fb8; letter-spacing: 2px; }
+.bond .hearts .dim { color: #5a4a70; }
+.bond .bar { height: 6px; background: #2a2650; border-radius: 3px; margin: 4px 0 2px; overflow: hidden; }
+.bond .bar span { display: block; height: 100%; background: linear-gradient(90deg, #ff8fb8, var(--gold)); }
+.bond small { color: var(--ink-dim); }
 #d-more { position: absolute; right: 14px; bottom: 8px; color: var(--gold); font-size: 13px; font-weight: 800; animation: pulse 1.2s infinite; }
 
 /* Touch controls (landscape phone) */
@@ -157,8 +177,8 @@ body[data-input="touch"] #touch { display: block; }
   <div id="goal"></div>
   <button id="pause-btn" aria-label="Menu">MENU</button>
   <div id="sign"></div>
-  <div id="toast"></div>
 </div>
+<div id="toast"></div>
 
 <div id="touch">
   <div id="stick"><div id="knob"></div></div>
@@ -171,9 +191,11 @@ body[data-input="touch"] #touch { display: block; }
 
 <div id="dialog" role="dialog" aria-live="polite">
   <img id="d-face" alt="">
-  <div id="d-body"><div id="d-name"></div><div id="d-text"></div></div>
+  <div id="d-body"><div id="d-name"></div><div id="d-text"></div><div id="d-choices"></div></div>
   <div id="d-more">tap anywhere &#9656;</div>
 </div>
+
+<div id="scene"><canvas id="scene-art" width="960" height="450"></canvas><div id="scene-title"></div></div>
 
 <div class="screen show" id="title">
   <h1>STARHAVEN</h1>
@@ -222,7 +244,8 @@ body[data-input="touch"] #touch { display: block; }
       <p><b>Gamepad:</b> stick or D-pad move, A jump, X strike, B dash, Y talk or paint, Start menu.</p>
       <p><b>Touch:</b> hold and slide on the left half to move (slide down to aim a downward strike). JUMP, STRIKE and DASH on the right.
          A TALK or PAINT button appears when there's someone to talk to or something to paint.</p>
-      <p>In conversations, tap the box or press any button to go on.</p>
+      <p>In conversations, tap anywhere or press any button to go on. For choices, tap one, or use up/down and A (Space on a keyboard).</p>
+      <p><b>Bluetooth controller on a phone:</b> pair it in your phone's Bluetooth settings, open the game, and press any button on it. The touch buttons hide while you use it.</p>
     </div>
   </div>
 </div>
@@ -306,6 +329,9 @@ body[data-input="touch"] #touch { display: block; }
     { key: 'pogoBounce', label: 'Pogo bounce', min: 6, max: 11, step: 0.1 },
   ];
 
+  // Player settings (menu). autoDown: on touch, a strike in the air aims down when something is below.
+  SH.settings = { autoDown: true };
+
   SH.PLAYER = {
     w: 14, h: 38,
     hearts: 5,
@@ -347,8 +373,16 @@ body[data-input="touch"] #touch { display: block; }
 </script>
 <script>
 // ---- src/story.js
-// Starhaven — the story: intro panels, chapters, goals, every line of dialogue, and the journal.
-// Data only. Follows DESIGN.md "Story outline" and "Chapter goals" (Prologue through Chapter 2 = the first playable).
+// Starhaven — the story: intro panels, chapters, goals, every line of dialogue, choices, bonds, evenings, the journal.
+// Data only. Follows DESIGN.md "Story outline", "Chapter goals", "Bonds" and "The cast" (Prologue through Chapter 2).
+//
+// A script is a list of steps:
+//   ['who', 'text']                       a line. who = 'narr' is the narrator (no portrait).
+//   { do: 'art', id, title }              show a full-screen illustrated scene behind the dialogue (id: null hides it)
+//   { choose: [{ text, bond: { who: pts }, liked: 'who', then: [steps] }] }   the player picks; `then` plays next
+//   { do: 'bond', who, pts }              bond points (hearts come at 40, 120, 240, 400 points)
+//   { do: 'meet', who }                   first meeting: heart 1
+//   { do: 'goal' | 'flag' | 'gate' | 'winnow' | 'wyrm' | 'complete' | 'end' ... }   game actions
 (function (SH) {
   const S = SH.STORY = {};
 
@@ -359,6 +393,15 @@ body[data-input="touch"] #touch { display: block; }
     queen: { name: 'The Thorn Queen', color: '#ff7a8a' },
     bram: { name: 'Bram', color: '#f0a860' },
     iris: { name: 'Iris', color: '#9fe0ff' },
+    narr: { name: '', color: '#b9b2dd' },
+  };
+
+  // Bonds (DESIGN.md "Bond pacing"): heart 1 when you meet; then hearts at these point totals.
+  S.HEARTS_AT = [40, 120, 240, 400];
+  S.BONDS = {
+    caelum: { loves: 'Wren\'s sketches, starlit wine', perk: 'In missions, enemies glow just before they attack (later chapters).' },
+    bram: { loves: 'Spiced bread, sparring', perk: 'Takes one hit for Wren per mission (later chapters).' },
+    iris: { loves: 'Sugared plums, old maps', perk: 'Shows hidden chests on the map (later chapters).' },
   };
 
   // The opening cutscene. Each panel: a painted scene (drawn in art.js) and one or two lines.
@@ -376,23 +419,24 @@ body[data-input="touch"] #touch { display: block; }
   S.CHAPTERS = [
     {
       id: 'prologue', label: 'Prologue', name: 'The Deep', room: 'deep',
-      card: 'Three months later, Wren still dreams of the Deep every night. Tonight, she runs.',
+      card: 'Three months after the Deep, Wren still dreams of it every night. Tonight, she runs.',
       goals: [
         { id: 'escape', text: 'Escape the Deep: run right, toward the light' },
       ],
-      summary: 'Wren relived the Deep in a nightmare, outran the Thorn Queen\'s Wyrm, and woke up.',
-      done: 'Wren wakes up gasping, in a silk bed, at a court that isn\'t hers.',
+      summary: 'Wren relived the Deep in a nightmare and woke up at the Spring Court, safe, smothered and unable to leave.',
+      done: 'Wren wakes up at the Spring Court, where everyone keeps her safe and nobody lets her go.',
     },
     {
       id: 'ch1', label: 'Chapter 1', name: 'Ashes', room: 'ashes',
-      card: 'Wren is living a gilded, empty life at another court. One evening, Lord Caelum appears to call in their bargain.',
+      card: 'Wren is living a gilded, empty life at the Spring Court. One night, Lord Caelum appears at her window to call in their bargain.',
       goals: [
         { id: 'arrive', text: 'Walk with Caelum to Starhaven' },
         { id: 'mural', text: 'Paint the first mural on the dark street' },
         { id: 'rooftop', text: 'Meet Caelum on his rooftop, at the end of the street' },
       ],
-      summary: 'Caelum brought Wren to Starhaven, a hidden city gone dark from the war. Her first mural woke up a street.',
-      done: 'Starhaven has one bright street again. Tomorrow, Wren meets the Five.',
+      summary: 'Caelum brought Wren to Starhaven, a hidden city gone dark from the war. Her first mural woke up a street. On his rooftop, she agreed to stay a while.',
+      done: 'Starhaven has one bright street again, and Wren has a room on a rooftop. Tomorrow, she meets the Five.',
+      after: 'evening1',
     },
     {
       id: 'ch2', label: 'Chapter 2', name: 'The Five', room: 'ring',
@@ -402,14 +446,14 @@ body[data-input="touch"] #touch { display: block; }
         { id: 'pit', text: 'Cross Bram\'s thorn pit by bouncing on the buds' },
         { id: 'sprites', text: 'Clear the thorn sprites past the north gate', count: 3 },
       ],
-      summary: 'Wren trained with Bram, met Iris, and cleared the Iron King\'s thorn sprites from the north wall.',
-      done: 'The Five are starting to trust her. The Iron King\'s creatures are getting closer.',
+      summary: 'Wren trained with Bram and cleared the Iron King\'s thorn sprites. Iris saw a vision: the Iron King knows Wren\'s name, and his iron is reaching for her sisters.',
+      done: 'The Iron King knows Wren\'s name. Across the water, Nessa and Lissa don\'t know they\'re in danger.',
+      after: 'evening2',
     },
   ];
 
-  // Dialogue scripts. A step is a line ['who', 'text'] or an action { do: ... }.
   S.SCRIPTS = {
-    // ---------------- Prologue: the Deep
+    // ======================================================== Prologue: the Deep
     deep_start: [
       ['queen', 'Back again, little huntress? You never really left my Deep.'],
       ['wren', 'It\'s a dream. Only a dream. Keep moving and it ends.'],
@@ -432,15 +476,37 @@ body[data-input="touch"] #touch { display: block; }
     ],
     deep_end: [
       ['wren', 'Light. It\'s light. I\'m waking up...'],
+      { do: 'art', id: 'spring', title: 'The Spring Court' },
+      ['narr', 'Wren wakes in a bed of silk at the Spring Court, where the flowers never die and the music never stops.'],
+      ['narr', 'Since the Deep she has lived here as a guest of honor. Everyone tells her she is safe. Nobody lets her leave.'],
+      ['wren', 'Another morning of smiling at people who look at me like I\'m made of glass.'],
+      ['narr', 'On her desk sits a letter from her sisters, three months old. She still hasn\'t answered it. She doesn\'t know what to say.'],
       { do: 'complete' },
     ],
 
-    // ---------------- Chapter 1: Ashes
+    // ======================================================== Chapter 1: Ashes
     ashes_start: [
+      { do: 'art', id: 'window', title: 'Midnight at the Spring Court' },
+      ['narr', 'Midnight. The Spring Court is asleep. Wren is not.'],
       ['caelum', 'Good evening, Wren. You look like you haven\'t slept in three months.'],
-      ['wren', 'Caelum. What do you want?'],
-      ['caelum', 'What I\'m owed. One week of every month, at my home. That was our bargain in the Deep.'],
-      ['caelum', 'Walk with me. I\'ll meet you up the road. I want to show you something.'],
+      ['wren', 'Caelum. You can\'t be here. If they find the High Lord of Dusk in the Spring Court...'],
+      ['caelum', 'They\'d be terribly rude about it. I\'m here for what I\'m owed: one week of every month, at my home. Our bargain from the Deep.'],
+      { do: 'meet', who: 'caelum' },
+      { choose: [
+        { text: '"Fine. Get me out of here."', bond: { caelum: 10 }, then: [
+          ['caelum', 'Gladly. You\'ve been holding your breath for three months. Let\'s find you somewhere you can breathe.'],
+        ] },
+        { text: '"I don\'t belong to you."', bond: { caelum: 5 }, then: [
+          ['caelum', 'No. You don\'t belong to anyone. That\'s rather the point. One week. Then you decide.'],
+        ] },
+        { text: '"Why now?"', bond: { caelum: 10 }, then: [
+          ['caelum', 'Because the Iron King is moving, and I need people I trust. You are one of very few.'],
+        ] },
+      ] },
+      ['caelum', 'Take my hand.'],
+      ['narr', 'The room folds into shadow and starlight, and then there is cold air, and a road, and the smell of pine.'],
+      { do: 'art', id: null },
+      ['caelum', 'Fae can winnow: step out of one place and into another. I\'ll meet you up the road. Walk with me.'],
       { do: 'goal', id: 'arrive' },
       { do: 'winnow', npc: 'caelum', to: 41 },
     ],
@@ -453,7 +519,7 @@ body[data-input="touch"] #touch { display: block; }
     ashes_gate: [
       ['caelum', 'The war took our painters and our lamplighters. Half of Starhaven sits in the dark now.'],
       ['caelum', 'You painted once, before the hunting. You told me, in the Deep.'],
-      ['wren', '...I remember.'],
+      ['wren', '...I remember. I haven\'t held a brush since.'],
       ['caelum', 'There\'s a bare wall halfway down this street. Paint something on it.'],
       { do: 'flag', name: 'arrive' },
       { do: 'goal', id: 'mural' },
@@ -467,26 +533,75 @@ body[data-input="touch"] #touch { display: block; }
       { do: 'winnow', npc: 'caelum', to: 110, y: 10 },
     ],
     ashes_roof: [
+      { do: 'art', id: 'rooftop', title: 'The Rooftop House' },
       ['caelum', 'This is the Rooftop House. It\'s yours too, if you want it.'],
       ['wren', 'And if I don\'t?'],
       ['caelum', 'Then you get a very nice room and a very annoying neighbor.'],
+      ['caelum', 'You painted my street awake in one night. Do you know how long it\'s been dark?'],
+      { choose: [
+        { text: '"How long?"', bond: { caelum: 5 }, then: [
+          ['caelum', 'Two years. Since the war took my painters. I\'d stopped looking at it.'],
+        ] },
+        { text: '"Is that why you really brought me here?"', bond: { caelum: 10 }, then: [
+          ['caelum', 'Partly. And partly because I remember a girl in the Deep who didn\'t break. I wanted to see her again.'],
+        ] },
+        { text: '"Don\'t get sentimental, High Lord."', bond: { caelum: 5 }, then: [
+          ['caelum', 'Too late. I\'m unbearable when I\'m sentimental. Ask anyone.'],
+        ] },
+      ] },
       ['caelum', 'Tomorrow you meet the Five, my inner circle. Try not to stab any of them.'],
       ['wren', 'No promises.'],
-      { do: 'heart', who: 'caelum' },
+      { do: 'bond', who: 'caelum', pts: 10 },
       { do: 'flag', name: 'rooftop' },
       { do: 'complete' },
     ],
 
-    // ---------------- Chapter 2: The Five
+    // ---------------- Evening 1: the first night in Starhaven (with Caelum)
+    evening1: [
+      { do: 'art', id: 'rooftop', title: 'Evening: the Rooftop House' },
+      ['narr', 'Wren\'s first night in Starhaven. Below her, one street glows. The rest of the city waits in the dark.'],
+      ['caelum', 'Can\'t sleep either?'],
+      ['wren', 'I don\'t sleep much. The Deep follows me.'],
+      ['caelum', 'Mine too. Here. Starlit wine. It tastes like the first warm night of summer.'],
+      { choose: [
+        { text: 'Show him your sketchbook', liked: 'caelum', bond: { caelum: 15 }, then: [
+          ['caelum', '...These are the Deep. You drew it from memory?'],
+          ['wren', 'So I could stop seeing it. It doesn\'t work.'],
+          ['caelum', 'It might, one day. Draw Starhaven next. Give the Deep some competition.'],
+        ] },
+        { text: 'Toast to the bargain', bond: { caelum: 5 }, then: [
+          ['caelum', 'To the bargain. The best one I ever made, and I\'ve made some very good ones.'],
+        ] },
+        { text: 'Ask what he sees in his nightmares', bond: { caelum: 10 }, then: [
+          ['caelum', 'The Thorn Queen\'s court. Smiling at her while she held my people hostage.'],
+          ['caelum', 'I\'d do it again to keep them safe. I hate that I\'d do it again.'],
+        ] },
+      ] },
+      ['caelum', 'The Five will test you tomorrow. Bram will try to break you. Iris will try to read you. Let them.'],
+      ['wren', 'And you?'],
+      ['caelum', 'I\'ll be watching from somewhere I can pretend I\'m not.'],
+      { do: 'bond', who: 'caelum', pts: 20 },
+    ],
+
+    // ======================================================== Chapter 2: The Five
     ring_start: [
       ['bram', 'So you\'re the huntress who walked out of the Deep. I\'m Bram. I run the Training Ring.'],
+      { do: 'meet', who: 'bram' },
       ['bram', 'Caelum says you can fight. I\'d like to see it before I believe it.'],
+      { choose: [
+        { text: '"Point me at something."', bond: { bram: 10 }, then: [
+          ['bram', 'Ha! I like you already. Don\'t tell Caelum.'],
+        ] },
+        { text: '"Caelum talks about me?"', bond: { bram: 5 }, then: [
+          ['bram', 'Constantly. It\'s unbearable. Please hit something so he\'ll stop.'],
+        ] },
+      ] },
       ['bram', 'Go hit the dummy. Three cuts in a row, and make the last one count.'],
       { do: 'goal', id: 'combo' },
     ],
     ring_combo: [
       ['bram', 'Not bad. Now my thorn pit.'],
-      ['bram', 'Jump over it, hold down, and strike the buds below you. Each bounce gives you your jumps back. Don\'t touch the floor.'],
+      ['bram', 'Jump toward the buds and strike down on them. Each bounce gives you your jumps back. Don\'t touch the floor.'],
       { do: 'flag', name: 'combo' },
       { do: 'goal', id: 'pit' },
       { do: 'gate', id: 'pitgate' },
@@ -495,31 +610,167 @@ body[data-input="touch"] #touch { display: block; }
       ['bram', 'Ha! Clean. Now some real work.'],
       ['bram', 'Thorn sprites, the Iron King\'s creatures, came over the north wall last night. Three of them. Clear them out.'],
       ['bram', 'They glow orange right before they lunge. Dash through the lunge, then cut them down.'],
+      { do: 'bond', who: 'bram', pts: 10 },
       { do: 'flag', name: 'pit' },
       { do: 'goal', id: 'sprites' },
       { do: 'gate', id: 'northgate' },
     ],
     iris: [
       ['iris', 'Oh! You\'re the new one. I\'m Iris. I see threads of fate.'],
-      ['iris', 'Yours is very tangled and very shiny. Anyway, hi! Go stab things. Bram likes that.'],
       { do: 'meet', who: 'iris' },
+      ['iris', 'Yours is very tangled and very shiny. Anyway, hi!'],
+      { choose: [
+        { text: '"What does tangled mean?"', bond: { iris: 10 }, then: [
+          ['iris', 'It means lots of people are tied to you. Some you know. Some you will. One you\'re pretending you don\'t.'],
+        ] },
+        { text: '"Shiny is good, right?"', bond: { iris: 5 }, then: [
+          ['iris', 'Shiny is very good! Mostly. Shiny things get noticed.'],
+        ] },
+      ] },
+      ['iris', 'Go stab things. Bram likes that.'],
     ],
     ring_done: [
       ['caelum', 'Three thorn sprites and not a scratch. Bram owes me a drink.'],
       ['bram', 'Bram owes nobody anything.'],
       ['caelum', 'The Iron King is testing our walls, Wren. Next time it won\'t be sprites.'],
+      { do: 'winnow', npc: 'iris', near: 2 },
+      ['iris', 'Wait! Before anyone goes anywhere. When the last sprite broke, I saw something.'],
+      { do: 'meet', who: 'iris' },
+      { do: 'art', id: 'vision', title: 'Iris\'s vision' },
+      ['narr', 'Threads of light, crossing the sea. An iron crown, pulling on two of them.'],
+      ['iris', 'Two mortal girls. Your thread is tied to theirs, Wren. And the iron is getting closer.'],
+      ['wren', 'My sisters.'],
+      ['caelum', 'Then the Iron King knows who you are. Those sprites weren\'t testing our walls. They were looking for you.'],
+      { choose: [
+        { text: '"If he touches them, I\'ll kill him."', bond: { bram: 10 }, then: [
+          ['bram', 'Get in line, huntress. But I\'ll hold your coat.'],
+        ] },
+        { text: '"How do we keep them safe?"', bond: { caelum: 10 }, then: [
+          ['caelum', 'Quietly, for now. I\'ll have eyes on their village by morning. You have my word.'],
+        ] },
+        { text: '"Iris, what else did you see?"', bond: { iris: 10 }, then: [
+          ['iris', 'Fire. In your hands. Which is new. I\'d keep an eye on that.'],
+        ] },
+      ] },
+      { do: 'art', id: null },
       { do: 'flag', name: 'sprites' },
       { do: 'complete' },
+    ],
+
+    // ---------------- Evening 2: choose who to spend it with
+    evening2: [
+      { do: 'art', id: 'city', title: 'Evening: Starhaven' },
+      ['narr', 'Night falls over Starhaven. Wren can\'t stop thinking about her sisters, and she doesn\'t want to be alone.'],
+      { choose: [
+        { text: 'Caelum, on the rooftop', then: [{ do: 'goto', id: 'ev2_caelum' }] },
+        { text: 'Bram, at the Training Ring', then: [{ do: 'goto', id: 'ev2_bram' }] },
+        { text: 'Iris, in her tower above the Library', then: [{ do: 'goto', id: 'ev2_iris' }] },
+      ] },
+    ],
+    ev2_caelum: [
+      { do: 'art', id: 'rooftop', title: 'Evening with Caelum' },
+      ['narr', 'The rooftop again. Caelum hasn\'t slept. Reports are stacked under a wine bottle.'],
+      ['caelum', 'My spies say the Iron King asked about you by name. My people are already watching your sisters\' village.'],
+      { choose: [
+        { text: '"Thank you."', bond: { caelum: 10 }, then: [
+          ['caelum', 'Don\'t. It isn\'t a favor. It\'s what you do for your own.'],
+        ] },
+        { text: '"I should go to them myself."', bond: { caelum: 5 }, then: [
+          ['caelum', 'You will. When it\'s time, I\'ll fly you there myself. Not before you\'re ready.'],
+        ] },
+        { text: 'Give him a sketch of Starhaven', liked: 'caelum', bond: { caelum: 15 }, then: [
+          ['caelum', 'You drew my city.'],
+          ['caelum', '...Our city. If you\'ll have it.'],
+        ] },
+      ] },
+      ['caelum', 'One more thing. The bargain. You don\'t owe me anything anymore. You can leave whenever you like.'],
+      ['wren', '...I know. I\'m staying anyway.'],
+      { do: 'bond', who: 'caelum', pts: 20 },
+    ],
+    ev2_bram: [
+      { do: 'art', id: 'fire', title: 'Evening with Bram' },
+      ['narr', 'The Training Ring after dark. Bram is burning old practice dummies in a fire pit.'],
+      ['bram', 'Come to gloat? You broke my best dummy.'],
+      { choose: [
+        { text: 'Bring him spiced bread from the market', liked: 'bram', bond: { bram: 15 }, then: [
+          ['bram', 'Is that from the Night Market? Sit down, huntress. You\'re officially my favorite. Don\'t tell Iris.'],
+        ] },
+        { text: '"Spar with me again."', bond: { bram: 10 }, then: [
+          ['bram', 'Now you\'re talking.'],
+          ['narr', 'You spar until neither of you can lift an arm, then lie in the sand laughing.'],
+        ] },
+        { text: 'Ask about the north wall', bond: { bram: 5 }, then: [
+          ['bram', 'Lost my brother on that wall, years back, to the Iron King\'s father. I don\'t lose people on it anymore.'],
+        ] },
+      ] },
+      ['bram', 'You fight like someone with people to protect.'],
+      ['wren', 'Two sisters. Mortal. Across the sea.'],
+      ['bram', 'Then we keep them safe. That\'s what the Five do.'],
+      { do: 'bond', who: 'bram', pts: 20 },
+    ],
+    ev2_iris: [
+      { do: 'art', id: 'observatory', title: 'Evening with Iris' },
+      ['narr', 'A round tower above the Library, full of maps, candles and threads of starlight hanging in the air.'],
+      ['iris', 'You came! Nobody visits the seer. They\'re afraid I\'ll tell them how they die.'],
+      { choose: [
+        { text: 'Bring her sugared plums', liked: 'iris', bond: { iris: 15 }, then: [
+          ['iris', 'Plums! Sugared! Oh, you\'re a good thread, Wren. A very good thread.'],
+        ] },
+        { text: 'Ask about your sisters\' threads', bond: { iris: 10 }, then: [
+          ['iris', 'Bright. Stubborn. One sharp, one soft. And iron getting closer. I\'m sorry. I can\'t see past it yet.'],
+        ] },
+        { text: '"So how do I die?"', bond: { iris: 5 }, then: [
+          ['iris', 'Ha! No. But not soon. You have far too much painting to do.'],
+        ] },
+      ] },
+      ['iris', 'Can I tell you a secret? Caelum\'s thread tangled with yours the day you walked into the Deep. He pretends it didn\'t.'],
+      ['wren', '...Does he.'],
+      { do: 'bond', who: 'iris', pts: 20 },
+    ],
+
+    // ---------------- Heart scenes: play when a bond reaches a new heart
+    heart_caelum_2: [
+      { do: 'art', id: 'rooftop', title: 'Caelum: heart 2' },
+      ['caelum', 'Wren. In the Deep, when the queen\'s last trial broke you, I couldn\'t help. I could only watch.'],
+      ['caelum', 'Five hundred years, and I\'ve never felt so useless. I didn\'t bring you here only because of a war.'],
+      ['wren', '...Then why?'],
+      ['caelum', 'Ask me again some other night.'],
+    ],
+    heart_caelum_3: [
+      { do: 'art', id: 'rooftop', title: 'Caelum: heart 3' },
+      ['narr', 'Caelum spreads his wings, and before Wren can argue, they are over the city, and Starhaven is a sea of small gold lights.'],
+      ['caelum', 'You did this. One street, and already my people are painting their doors again.'],
+      ['wren', 'Our people.'],
+      ['narr', 'Caelum doesn\'t say anything. He doesn\'t have to.'],
+    ],
+    heart_bram_2: [
+      { do: 'art', id: 'fire', title: 'Bram: heart 2' },
+      ['bram', 'I don\'t say this often. I don\'t say it at all, actually.'],
+      ['bram', 'Welcome to the Five, Wren. Properly.'],
+    ],
+    heart_iris_2: [
+      { do: 'art', id: 'observatory', title: 'Iris: heart 2' },
+      ['iris', 'Here. A thread of starlight. Tie it on your wrist.'],
+      ['iris', 'If you ever get lost, pull it, and I\'ll find you. I always find my friends.'],
+    ],
+
+    // ---------------- The end of the concept: a look at Chapter 3
+    finale: [
+      { do: 'art', id: 'spark', title: 'Next: Chapter 3, First Light' },
+      ['narr', 'That night, for the first time since the Deep, Wren dreams of fire instead of thorns.'],
+      ['narr', 'She wakes with her palm glowing, warm as an ember. A spark of a High Lord\'s power, waking up.'],
+      ['wren', '...What is this?'],
+      { do: 'end' },
     ],
   };
 
   // The journal's "People" page. Unlocked as Wren meets or hears of them.
   S.PEOPLE = [
     { id: 'wren', name: 'Wren', text: 'You. A mortal huntress who died in the Deep and woke up fae. Fights with daggers. Used to paint.' },
-    { id: 'sisters', name: 'Nessa and Lissa', text: 'Wren\'s sisters, still mortal. Nessa is sharp-tongued and protective. Lissa is gentle and loves her garden.' },
+    { id: 'sisters', name: 'Nessa and Lissa', text: 'Wren\'s sisters, still mortal, across the sea. Nessa is sharp-tongued and protective. Lissa is gentle and loves her garden.' },
     { id: 'queen', name: 'The Thorn Queen', text: 'The fae tyrant who held Wren in the Deep. Gone now, but not from Wren\'s dreams.' },
     { id: 'caelum', name: 'Lord Caelum', text: 'High Lord of the Court of Dusk and ruler of Starhaven. Charming in public, burdened in private. Wren owes him a bargain.' },
-    { id: 'ironking', name: 'The Iron King', text: 'A king across the sea, building an army. His spies and creatures are already in the woods.' },
+    { id: 'ironking', name: 'The Iron King', text: 'A king across the sea, building an army. His creatures are already in the woods, and he knows Wren\'s name.' },
     { id: 'bram', name: 'Bram', text: 'One of the Five. A general and brawler who runs the Training Ring. The big brother of the group.' },
     { id: 'iris', name: 'Iris', text: 'One of the Five. A seer who sees threads of fate. Oddly cheerful about it.' },
   ];
@@ -528,7 +779,7 @@ body[data-input="touch"] #touch { display: block; }
 
   S.END = {
     title: 'End of the concept',
-    text: 'That was the Prologue through Chapter 2, the first playable slice from the design doc, in miniature. If this direction feels right, next comes the Starhaven hub: districts to restore, bond evenings with Caelum and the Five, the bow, and Wren\'s first court gift, Flame.',
+    text: 'That was the Prologue through Chapter 2, the first playable slice of the design doc. If this direction feels right, next comes Chapter 3, First Light: Wren\'s first court gift, Flame, a monster hunt in the mountains, the Night Market, and more evenings with Caelum and the Five.',
   };
 })(window.SH = window.SH || {});
 
@@ -639,7 +890,7 @@ body[data-input="touch"] #touch { display: block; }
     ],
     hints: [
       { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
-      { x0: 36, x1: 44, text: 'Jump toward a bud. While you are above it, hold {DOWN} and press {ATTACK} to strike down and bounce.', flag: 'combo' },
+      { x0: 36, x1: 44, text: 'Jump toward a bud. When you are above it, {DOWNSTRIKE} to strike down and bounce.', flag: 'combo' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
     ],
     triggers: [
@@ -765,6 +1016,8 @@ body[data-input="touch"] #touch { display: block; }
   window.addEventListener('keyup', e => { const a = KEYS[e.code]; if (a) { e.preventDefault(); up('kb', a); } });
   window.addEventListener('blur', () => input.clear());
 
+  // A Bluetooth or USB controller announces itself once any of its buttons is pressed.
+  window.addEventListener('gamepadconnected', e => { input.source = 'pad'; if (input.onSourceChange) input.onSourceChange('pad'); if (input.onPad) input.onPad(e.gamepad.id); });
   // ---- gamepad (standard mapping: A jump, X attack, B dash, Y talk, Start pause)
   const PAD_BTNS = { 0: 'jump', 2: 'attack', 1: 'dash', 3: 'up', 5: 'dash', 9: 'pause', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
   input.pollPad = function () {
@@ -790,11 +1043,11 @@ body[data-input="touch"] #touch { display: block; }
   // ---- touch: floating stick on the left half, buttons on the right
   input.bindTouch = function (layer, stickBase, stickKnob) {
     let stickId = null, ox = 0, oy = 0;
-    const DEAD = 14, DOWN = 26, MAXR = 46;
+    const DEAD = 14, DOWN = 20, MAXR = 46;
     function stickSet(dx, dy) {
       const ang = Math.atan2(dy, dx), dist = Math.min(MAXR, Math.hypot(dx, dy));
       stickKnob.style.transform = `translate(${Math.cos(ang) * dist}px, ${Math.sin(ang) * dist}px)`;
-      const L = dx < -DEAD, R = dx > DEAD, D = dy > DOWN && dy > Math.abs(dx) * 0.6, U = dy < -DOWN && -dy > Math.abs(dx) * 0.6;
+      const L = dx < -DEAD, R = dx > DEAD, D = dy > DOWN && dy > Math.abs(dx) * 0.35, U = dy < -DOWN && -dy > Math.abs(dx) * 0.5;
       L ? down('touch', 'left') : up('touch', 'left');
       R ? down('touch', 'right') : up('touch', 'right');
       D ? down('touch', 'down') : up('touch', 'down');
@@ -843,9 +1096,9 @@ body[data-input="touch"] #touch { display: block; }
 
   // Button names shown in signs, per input type.
   input.LABELS = {
-    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W' },
-    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button' },
-    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y' },
+    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J' },
+    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'press STRIKE (it aims down by itself)' },
+    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X' },
   };
   input.fill = function (text) {
     const L = input.LABELS[input.source] || input.LABELS.kb;
@@ -1160,7 +1413,9 @@ body[data-input="touch"] #touch { display: block; }
     if (this.atkBuf <= 0) return;
     const C = SH.COMBAT;
     let kind, step;
-    if (!this.grounded && inp.held.down) { kind = 'pogo'; step = 0; }
+    // On touch, a strike in the air aims down by itself when there's something to bounce on below (doc: auto-aim on phones).
+    const autoDown = !this.grounded && !inp.held.down && SH.input.source === 'touch' && SH.settings.autoDown && this.somethingBelow(world);
+    if (!this.grounded && (inp.held.down || autoDown)) { kind = 'pogo'; step = 0; }
     else {
       kind = this.grounded ? 'ground' : 'air';
       const list = C[kind];
@@ -1177,6 +1432,22 @@ body[data-input="touch"] #touch { display: block; }
     if (kind !== 'pogo') { const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d; }
     this.swing = { kind, step, def, f: 0, hits: new Set() };
     if (def.lunge && this.grounded) this.vx = this.facing * Math.max(Math.abs(this.vx) * 0.5, def.lunge * 1.6);
+  };
+
+  // A bud, enemy or thorns just below Wren's feet (what a down-strike could bounce on).
+  Player.prototype.somethingBelow = function (world) {
+    for (const t of world.targets) {
+      if (!t.hittable() || t.kind === 'dummy') continue;
+      const hb = t.hurtBox(), cx = (hb.l + hb.r) / 2, cy = (hb.t + hb.b) / 2;
+      if (Math.abs(cx - this.x) < 34 && cy > this.y - 6 && cy < this.y + 84) return true;
+    }
+    const TS = SH.TILE, tx = Math.floor(this.x / TS);
+    for (let d = 0; d < 4; d++) {
+      const tile = world.room.get(tx, Math.floor(this.y / TS) + d);
+      if (tile === SH.T_THORNS) return true;
+      if (tile === SH.T_SOLID || tile === SH.T_ONEWAY) break;
+    }
+    return false;
   };
 
   Player.prototype.swingBox = function () {
@@ -1545,6 +1816,93 @@ body[data-input="touch"] #touch { display: block; }
       }
       for (let i = 0; i < 5; i++) R(132 + i * 12, 14 + (i % 2 ? 4 : 0), 6, 14 - (i % 2 ? 4 : 0), '#6a6a74');
       R(130, 26, 62, 6, '#6a6a74');
+    } else if (id === 'spring') {
+      // a gilded bedroom at the Spring Court: too many flowers, a window Wren can't leave through
+      sky('#f4d6dc', '#d8a8b8');
+      R(0, 110, W, 40, '#b88a98'); R(0, 108, W, 3, '#f0c8d0');
+      R(210, 18, 70, 80, '#7ab0c8'); R(210, 18, 70, 4, '#e8c070'); R(243, 18, 4, 80, '#e8c070'); R(210, 56, 70, 3, '#e8c070');
+      for (let i = 0; i < 9; i++) R(212 + i * 7, 24 + (i % 3) * 3, 2, 70, 'rgba(255,255,255,0.15)');
+      R(40, 80, 120, 34, '#f8eef0'); R(40, 76, 120, 6, '#e8c070'); R(34, 60, 8, 54, '#c89a50'); R(158, 60, 8, 54, '#c89a50');
+      R(60, 82, 60, 14, '#f6dcc6'); R(112, 80, 14, 10, '#d8653a');
+      for (let i = 0; i < 26; i++) { const x = (i * 53) % W, y = 10 + (i * 37) % 90; R(x, y, 5, 5, i % 2 ? '#ff8fb0' : '#ffd0e0'); R(x + 1, y + 1, 2, 2, '#ffe9a8'); }
+      R(178, 92, 22, 18, '#c89a50'); R(182, 86, 14, 7, '#fff6e0');
+    } else if (id === 'window') {
+      // midnight: the window open, Caelum's silhouette in it, wings and stars behind
+      sky('#0a0820', '#2a1a48'); stars(70, 13);
+      R(0, 0, 90, H, '#140e24'); R(230, 0, 90, H, '#140e24'); R(0, 0, W, 16, '#140e24'); R(0, 130, W, 20, '#140e24');
+      R(88, 14, 4, 118, '#c89a50'); R(228, 14, 4, 118, '#c89a50'); R(88, 128, 144, 4, '#c89a50');
+      g.fillStyle = '#05040e';
+      g.beginPath(); g.moveTo(150, 60); g.quadraticCurveTo(100, 30, 96, 96); g.lineTo(130, 80); g.fill();
+      g.beginPath(); g.moveTo(170, 60); g.quadraticCurveTo(220, 30, 224, 96); g.lineTo(190, 80); g.fill();
+      g.beginPath(); g.arc(160, 52, 7, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.moveTo(150, 60); g.lineTo(170, 60); g.lineTo(176, 128); g.lineTo(144, 128); g.fill();
+      R(159, 40, 2, 4, '#ffffff'); R(157, 41, 6, 1, '#ffffff'); R(162, 50, 2, 2, '#a58bff');
+      for (let i = 0; i < 6; i++) R(20 + i * 10, 120 - (i % 2) * 6, 4, 4, '#ff8fb0');
+    } else if (id === 'rooftop') {
+      // two figures on a rooftop over Starhaven at night
+      sky('#070a22', '#2a2a60'); stars(110, 17);
+      const gr = g.createRadialGradient(250, 34, 2, 250, 34, 30); gr.addColorStop(0, '#fff6d8'); gr.addColorStop(0.3, 'rgba(255,246,216,0.4)'); gr.addColorStop(1, 'rgba(255,246,216,0)');
+      g.fillStyle = gr; g.fillRect(210, 0, 80, 70);
+      for (let i = 0; i < 26; i++) { const x = i * 13, h = 20 + ((i * 7) % 5) * 9; R(x, 118 - h, 11, h, '#16163e'); for (let k = 0; k < 3; k++) if ((i + k) % 3 === 0) R(x + 4, 122 - h + k * 7, 2, 2, '#ffd27a'); }
+      R(0, 116, W, 34, '#0c0a1e'); R(0, 116, W, 2, '#d6ccff'); for (let x = 0; x < W; x += 10) R(x, 106, 2, 10, '#2a2650'); R(0, 105, W, 2, '#2a2650');
+      g.fillStyle = '#05040e';
+      R(128, 84, 10, 32, '#05040e'); g.beginPath(); g.arc(133, 78, 6, 0, Math.PI * 2); g.fill(); R(126, 74, 6, 12, '#d8653a');
+      R(150, 80, 12, 36, '#05040e'); g.beginPath(); g.arc(156, 74, 6, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.moveTo(152, 82); g.quadraticCurveTo(180, 70, 186, 104); g.lineTo(164, 96); g.fill();
+      R(108, 108, 3, 8, '#5a3a5a'); R(107, 104, 5, 4, '#ffd27a');
+    } else if (id === 'city') {
+      // Starhaven at night from above: one bright street in a dark city
+      sky('#070a22', '#1e2050'); stars(80, 23);
+      for (let i = 0; i < 40; i++) { const x = (i * 29) % W, h = 30 + ((i * 11) % 6) * 12; R(x, 150 - h, 14, h, '#141438'); }
+      R(0, 108, W, 6, '#3a2a40'); for (let x = 6; x < W; x += 18) { R(x, 100, 3, 3, '#ffd98a'); R(x - 4, 96, 11, 11, 'rgba(255,214,130,0.15)'); }
+      R(150, 52, 3, 20, '#ffd27a'); R(140, 60, 23, 2, '#ffd27a');
+    } else if (id === 'vision') {
+      // threads of fate over the sea, an iron crown pulling two of them
+      sky('#0a0a24', '#1a1a3a'); stars(40, 29);
+      R(0, 110, W, 40, '#0c1424');
+      const cols = ['#ffe9a8', '#9fe0ff', '#ff8fb8', '#b9a8ff', '#9be07a'];
+      for (let i = 0; i < 9; i++) { g.strokeStyle = cols[i % cols.length]; g.globalAlpha = 0.55; g.beginPath(); g.moveTo(0, 30 + i * 10); g.bezierCurveTo(100, 10 + i * 14, 200, 90 - i * 6, W, 40 + i * 9); g.stroke(); }
+      g.globalAlpha = 1;
+      for (let i = 0; i < 5; i++) R(236 + i * 10, 38 + (i % 2 ? 4 : 0), 6, 16 - (i % 2 ? 4 : 0), '#7a7a88'); R(234, 52, 52, 6, '#7a7a88');
+      g.strokeStyle = '#c0c0d0'; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(260, 60); g.quadraticCurveTo(200, 90, 90, 96); g.stroke();
+      g.beginPath(); g.moveTo(260, 60); g.quadraticCurveTo(210, 104, 110, 112); g.stroke();
+      g.lineWidth = 1;
+      person(90, 118, 18, '#e8d0ff'); person(110, 126, 14, '#ffd0e0');
+    } else if (id === 'fire') {
+      // the Training Ring after dark: a fire pit and two figures
+      sky('#0a0818', '#2a1a28');
+      R(0, 112, W, 38, '#2a2018'); R(0, 112, W, 2, '#6a4a30');
+      for (let x = 20; x < W; x += 40) { R(x, 70, 4, 42, '#3a2a1e'); R(x - 2, 68, 8, 3, '#5a4430'); }
+      const gr = g.createRadialGradient(160, 104, 2, 160, 104, 90); gr.addColorStop(0, 'rgba(255,170,80,0.6)'); gr.addColorStop(1, 'rgba(255,170,80,0)');
+      g.fillStyle = gr; g.fillRect(60, 20, 200, 130);
+      R(146, 108, 28, 6, '#4a3020');
+      tri(150, 108, 160, 76, 170, 108, '#ff8a3a'); tri(154, 108, 160, 88, 166, 108, '#ffe08a');
+      person(120, 116, 24, '#1a1010'); R(108, 92, 24, 18, '#1a1010');
+      person(196, 116, 20, '#1a1010'); R(193, 92, 6, 4, '#d8653a');
+    } else if (id === 'observatory') {
+      // Iris's tower: round window, maps, candles, hanging threads of starlight
+      sky('#0c1428', '#1a2440');
+      g.fillStyle = '#0a1020'; g.beginPath(); g.arc(160, 60, 52, 0, Math.PI * 2); g.fill();
+      g.save(); g.beginPath(); g.arc(160, 60, 48, 0, Math.PI * 2); g.clip(); stars(60, 31); g.restore();
+      R(0, 114, W, 36, '#2a2238'); R(0, 114, W, 2, '#6a5a80');
+      R(30, 90, 70, 24, '#5a4430'); R(34, 86, 40, 6, '#e8d8b0'); R(220, 90, 70, 24, '#5a4430'); R(226, 84, 50, 8, '#e8d8b0');
+      for (let i = 0; i < 4; i++) { R(40 + i * 80, 78, 3, 10, '#f4f0e0'); R(40 + i * 80, 74, 3, 4, '#ffd27a'); }
+      g.strokeStyle = '#ffe9a8'; g.globalAlpha = 0.6;
+      for (let i = 0; i < 7; i++) { g.beginPath(); g.moveTo(20 + i * 45, 0); g.quadraticCurveTo(30 + i * 45, 40, 18 + i * 45, 70 + (i % 3) * 8); g.stroke(); }
+      g.globalAlpha = 1;
+      person(150, 116, 18, '#4f88c0'); R(147, 92, 6, 4, '#f4f0ff');
+      person(176, 116, 22, '#2a2238'); R(173, 92, 6, 4, '#d8653a');
+    } else if (id === 'spark') {
+      // Wren's open palm with a small flame waking in it
+      sky('#0a0610', '#2a0e10');
+      const gr = g.createRadialGradient(160, 70, 2, 160, 70, 80); gr.addColorStop(0, 'rgba(255,170,80,0.7)'); gr.addColorStop(1, 'rgba(255,120,60,0)');
+      g.fillStyle = gr; g.fillRect(60, 0, 200, 150);
+      g.fillStyle = '#f6dcc6';
+      g.beginPath(); g.ellipse(160, 108, 34, 18, 0, 0, Math.PI * 2); g.fill();
+      for (let i = 0; i < 4; i++) R(132 + i * 15, 76 + Math.abs(i - 1.5) * 4, 9, 30, '#f6dcc6');
+      R(186, 96, 18, 9, '#f6dcc6'); R(130, 120, 60, 30, '#2f8f7a');
+      tri(150, 92, 160, 50, 170, 92, '#ff8a3a'); tri(154, 92, 160, 64, 166, 92, '#ffe08a'); R(158, 82, 4, 8, '#ffffff');
     }
     return (cache['panel_' + id] = c);
   };
@@ -2285,7 +2643,8 @@ body[data-input="touch"] #touch { display: block; }
   const G = SH.game = {
     state: 'title', world: null, frozen: false,
     chapter: 0, flags: {}, activeGoal: null, script: null,
-    progress: Object.assign({ reached: 0, hearts: {}, met: [] }, store.get('starhaven.save.v1', {})),
+    progress: Object.assign({ reached: 0, bonds: {}, met: [] }, store.get('starhaven.save.v1', {})),
+    heartQueue: [],
   };
   G.save = function () { store.set('starhaven.save.v1', G.progress); };
   G.chapterDef = () => ST.CHAPTERS[G.chapter];
@@ -2358,9 +2717,10 @@ body[data-input="touch"] #touch { display: block; }
     G.progress.reached = Math.max(G.progress.reached, next);
     G.save();
     G.state = 'card';
-    G.hud.card({ label: ch.label + ' complete', name: ch.name, text: ch.done, goals: null, button: next < ST.CHAPTERS.length ? 'Continue' : 'Finish' }, () => {
-      if (next < ST.CHAPTERS.length) G.startChapter(next);
-      else { G.state = 'end'; G.hud.end(true); }
+    // After the card: the chapter's evening (if it has one), then the next chapter, or the finale.
+    const cont = () => { if (next < ST.CHAPTERS.length) G.startChapter(next); else G.runScript('finale'); };
+    G.hud.card({ label: ch.label + ' complete', name: ch.name, text: ch.done, goals: null, button: 'Continue' }, () => {
+      if (ch.after) { G.afterScript = cont; G.runScript(ch.after); } else cont();
     });
   };
 
@@ -2398,7 +2758,7 @@ body[data-input="touch"] #touch { display: block; }
   };
   G.advance = function () {
     const sc = G.script;
-    if (!sc) return;
+    if (!sc || G.choosing) return;
     while (sc.i < sc.steps.length) {
       const st = sc.steps[sc.i++];
       if (Array.isArray(st)) {
@@ -2406,10 +2766,22 @@ body[data-input="touch"] #touch { display: block; }
         G.talkWait = 10; // a short pause so a held button doesn't skip the line
         return;
       }
+      if (st.choose) {
+        G.choosing = st.choose;
+        G.hud.choice(st.choose.map(o => o.text));
+        G.talkWait = 12;
+        return;
+      }
       G.act(st);
+    }
+    // A bond reached a new heart during this conversation: its heart scene plays next.
+    while (G.heartQueue.length) {
+      const id = G.heartQueue.shift();
+      if (ST.SCRIPTS[id]) { G.script = { id, steps: ST.SCRIPTS[id].slice(), i: 0 }; return G.advance(); }
     }
     G.script = null;
     G.hud.dialog(null);
+    G.hud.sceneArt(null);
     input.clear();
     if (G.afterScript) { const f = G.afterScript; G.afterScript = null; f(); }
     else if (G.state === 'talk') G.state = 'play';
@@ -2421,12 +2793,49 @@ body[data-input="touch"] #touch { display: block; }
       case 'flag': G.flags[st.name] = true; G.hud.goal(); break;
       case 'wyrm': w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
       case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
-      case 'heart': G.progress.hearts[st.who] = Math.max(1, G.progress.hearts[st.who] || 0); G.save(); G.hud.toast(`${ST.CAST[st.who].name}: bond heart 1 of 5`); break;
-      case 'meet': if (!G.progress.met.includes(st.who)) { G.progress.met.push(st.who); G.save(); } break;
-      case 'winnow': G.winnow(st.npc, st.to, st.y); break;
+      case 'meet': G.meet(st.who); break;
+      case 'bond': G.bond(st.who, st.pts); break;
+      case 'art': G.hud.sceneArt(st.id, st.title); break;
+      case 'goto': { const sc = G.script; sc.steps = sc.steps.slice(0, sc.i).concat(ST.SCRIPTS[st.id], sc.steps.slice(sc.i)); break; }
+      case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
+      case 'end': G.afterScript = () => { G.state = 'end'; G.hud.end(true); }; break;
     }
   };
+  // The player picked choice `idx`: apply its bond points, then play its reply.
+  G.pick = function (idx) {
+    const opts = G.choosing, sc = G.script;
+    if (!opts || !sc || !opts[idx]) return;
+    const o = opts[idx];
+    G.choosing = null;
+    G.hud.choice(null);
+    for (const who in (o.bond || {})) G.bond(who, o.bond[who], o.liked === who);
+    sc.steps = sc.steps.slice(0, sc.i).concat(o.then || [], sc.steps.slice(sc.i));
+    G.advance();
+  };
+
+  // ---------------------------------------------------------------- bonds (DESIGN.md: 5 hearts each)
+  G.heartsFor = pts => 1 + ST.HEARTS_AT.filter(t => pts >= t).length;
+  G.meet = function (who) {
+    if (!G.progress.met.includes(who)) G.progress.met.push(who);
+    if (!G.progress.bonds[who]) {
+      G.progress.bonds[who] = { pts: 0 };
+      G.hud.toast(`\u2665 ${ST.CAST[who].name}: heart 1 of 5`);
+    }
+    G.save();
+  };
+  G.bond = function (who, pts, liked) {
+    if (!G.progress.bonds[who]) G.progress.bonds[who] = { pts: 0 };
+    const b = G.progress.bonds[who], before = G.heartsFor(b.pts);
+    b.pts += pts;
+    const after = G.heartsFor(b.pts), name = ST.CAST[who].name;
+    if (after > before) {
+      G.hud.toast(`\u2665 ${name}: heart ${after} of 5`);
+      G.heartQueue.push(`heart_${who}_${after}`);
+    } else G.hud.toast(liked ? `${name} loved that.` : `${name} will remember that.`);
+    G.save();
+  };
+
   // Fae can "winnow": vanish in starlight and reappear somewhere else.
   G.winnow = function (id, toX, row) {
     const w = G.world;
@@ -2552,6 +2961,12 @@ body[data-input="touch"] #touch { display: block; }
 
   G.talkStep = function () {
     if (G.talkWait > 0) { G.talkWait--; return; }
+    if (G.choosing) {
+      if (input.pressed.up) G.hud.choiceMove(-1);
+      else if (input.pressed.down) G.hud.choiceMove(1);
+      else if (input.pressed.jump || input.pressed.attack) G.pick(G.hud.choiceIndex());
+      return;
+    }
     if (input.pressed.jump || input.pressed.attack || input.pressed.up || input.pressed.dash) G.advance();
   };
 
@@ -2641,6 +3056,7 @@ body[data-input="touch"] #touch { display: block; }
   };
 
   G.newGame = function () {
+    G.progress = { reached: 0, bonds: {}, met: [] }; G.save();
     G.hud.title(false);
     G.state = 'cutscene';
     G.hud.cutscene(ST.INTRO, () => G.startChapter(0));
@@ -2676,7 +3092,7 @@ body[data-input="touch"] #touch { display: block; }
         if (opts.story === false) (w.room.def.triggers || []).forEach((t, i) => (w.fired[i] = true));
         G.state = 'play';
       }
-      G.hud.dialog(null);
+      G.hud.dialog(null); G.hud.choice(null); G.hud.sceneArt(null); G.choosing = null; G.heartQueue = [];
       return SH.test.state();
     },
     // Step n frames holding `held` (e.g. {right:true}); `press` actions are pressed on the first frame.
@@ -2686,7 +3102,10 @@ body[data-input="touch"] #touch { display: block; }
         input.forced.held = held || {};
         input.forced.pressed = {};
         if (i === 0 && press) for (const a of press) input.forced.pressed[a] = true;
-        if (autoTalk && G.state === 'talk' && G.talkWait <= 0) input.forced.pressed.jump = true;
+        if (autoTalk && G.state === 'talk' && G.talkWait <= 0) {
+          if (G.choosing) { G.pick(Math.min(SH.test.choice || 0, G.choosing.length - 1)); continue; }
+          input.forced.pressed.jump = true;
+        }
         if (autoTalk && G.state === 'card') G.hud.cardGo();
         G.step();
       }
@@ -2758,11 +3177,41 @@ body[data-input="touch"] #touch { display: block; }
   H.dialog = function (who, text) {
     const el = $('dialog');
     if (!who) { el.classList.remove('show'); return; }
-    const c = ST.CAST[who];
-    $('d-face').src = SH.art.portraitURL(who);
+    const c = ST.CAST[who], narr = who === 'narr';
+    el.classList.toggle('narr', narr);
+    if (!narr) $('d-face').src = SH.art.portraitURL(who);
     $('d-name').textContent = c.name;
     $('d-name').style.color = c.color;
     $('d-text').textContent = text;
+    el.classList.add('show');
+  };
+
+  // ---------------- choices (under the last line of dialogue)
+  let choiceSel = 0;
+  H.choice = function (opts) {
+    const box = $('d-choices');
+    if (!opts) { box.innerHTML = ''; $('dialog').classList.remove('choosing'); return; }
+    if (!$('dialog').classList.contains('show')) H.dialog('narr', 'What does Wren do?');
+    choiceSel = 0;
+    box.innerHTML = opts.map((t, i) => `<button class="choice${i === 0 ? ' sel' : ''}" data-i="${i}">${esc(t)}</button>`).join('');
+    $('dialog').classList.add('choosing');
+  };
+  H.choiceMove = function (d) {
+    const btns = [...$('d-choices').children];
+    if (!btns.length) return;
+    choiceSel = (choiceSel + d + btns.length) % btns.length;
+    btns.forEach((b, i) => b.classList.toggle('sel', i === choiceSel));
+  };
+  H.choiceIndex = () => choiceSel;
+
+  // ---------------- full-screen illustrated scenes behind the dialogue
+  H.sceneArt = function (id, title) {
+    const el = $('scene');
+    if (!id) { el.classList.remove('show'); return; }
+    const cv = $('scene-art'), g = cv.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    g.drawImage(SH.art.panel(id), 0, 0, cv.width, cv.height);
+    $('scene-title').textContent = title || '';
     el.classList.add('show');
   };
 
@@ -2842,6 +3291,16 @@ body[data-input="touch"] #touch { display: block; }
     html += `<p>${esc(ST.RECAP)}</p>`;
     for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
     html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
+    html += '<h3>Bonds</h3>';
+    const bonds = G.progress.bonds, ids = Object.keys(ST.BONDS).filter(id => bonds[id]);
+    if (!ids.length) html += '<p>No bonds yet. Hearts grow from evenings together, gifts they love, and the choices you make when you talk.</p>';
+    for (const id of ids) {
+      const pts = bonds[id].pts, h = G.heartsFor(pts), next = ST.HEARTS_AT[h - 1];
+      const prev = h > 1 ? ST.HEARTS_AT[h - 2] : 0, k = next ? Math.min(1, (pts - prev) / (next - prev)) : 1;
+      html += `<div class="person bond"><img src="${SH.art.portraitURL(id)}" alt=""><div><b>${esc(ST.CAST[id].name)}</b> <span class="hearts">${'\u2665'.repeat(h)}<span class="dim">${'\u2661'.repeat(5 - h)}</span></span>
+        <div class="bar"><span style="width:${Math.round(k * 100)}%"></span></div>
+        <small>${next ? `${pts} / ${next} points to the next heart` : 'Every heart earned'} &middot; Loves: ${esc(ST.BONDS[id].loves)}</small></div></div>`;
+    }
     html += '<h3>People</h3>';
     for (const p of G.knownPeople()) html += `<div class="person"><img src="${SH.STORY.CAST[p.id] ? SH.art.portraitURL(p.id) : ''}" alt="" ${SH.STORY.CAST[p.id] ? '' : 'style="visibility:hidden"'}><div><b>${esc(p.name)}</b><br>${esc(p.text)}</div></div>`;
     $('j-body').innerHTML = html;
@@ -2921,6 +3380,8 @@ body[data-input="touch"] #touch { display: block; }
     on('e-again', () => { H.end(false); G.newGame(); });
     on('e-home', () => { H.end(false); G.state = 'title'; H.title(true); });
     SH.input.onSourceChange = src => { document.body.dataset.input = src; lastPrompt = null; };
+    SH.input.onPad = () => H.toast('Controller connected: A jump, X strike, B dash, Y talk. Hold down + X in the air to strike down.');
+    $('d-choices').addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (b) G.pick(+b.dataset.i); });
     document.body.dataset.input = SH.input.source;
     H.titleButtons();
   };

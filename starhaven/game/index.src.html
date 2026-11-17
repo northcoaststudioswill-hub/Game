@@ -45,10 +45,10 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   opacity: 0; transition: opacity .18s, transform .18s; text-align: center; }
 #sign.show { opacity: 1; transform: translate(-50%, 0); }
 #sign b { color: var(--gold); }
-#toast { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
+#toast { position: fixed; z-index: 8; left: 50%; top: 30%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
   border-radius: 12px; padding: 10px 16px; font-size: 17px; font-weight: 700; opacity: 0; transition: opacity .25s; max-width: 70vw; text-align: center; }
 #toast.show { opacity: 1; }
-body[data-state="talk"] #toast { top: auto; bottom: 18%; }
+body[data-state="talk"] #toast { top: auto; bottom: max(10px, env(safe-area-inset-bottom)); }
 /* In-game controls only show while playing; story screens and conversations get the whole screen. */
 body:not([data-state="play"]) #touch, body:not([data-state="play"]):not([data-state="talk"]) #hud { display: none !important; }
 body[data-state="talk"] #sign, body[data-state="talk"] #pause-btn { display: none; }
@@ -61,6 +61,26 @@ body[data-state="talk"] #sign, body[data-state="talk"] #pause-btn { display: non
 #d-body { min-width: 0; flex: 1; }
 #d-name { font-family: var(--display); font-weight: 800; font-size: 17px; letter-spacing: .06em; margin: 2px 0 4px; }
 #d-text { font-size: 19px; line-height: 1.4; font-weight: 600; }
+#dialog.narr #d-face, #dialog.narr #d-name { display: none; }
+#dialog.narr #d-text { font-style: italic; color: #e6e0ff; }
+#dialog.choosing #d-more { display: none; }
+#dialog.choosing { cursor: default; }
+#d-choices { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+#d-choices:empty { display: none; }
+.choice { text-align: left; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--panel-line); background: rgba(255,210,122,.08);
+  color: var(--ink); font: 700 16px var(--body); cursor: pointer; }
+.choice.sel { border-color: var(--gold); background: rgba(255,210,122,.22); }
+.choice.sel::before { content: '\25B8  '; color: var(--gold); }
+#scene { position: fixed; inset: 0; z-index: 5; display: none; background: #05050e; }
+#scene.show { display: block; }
+#scene-art { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; display: block; }
+#scene-title { position: absolute; left: 50%; top: 18px; transform: translateX(-50%); font-family: var(--display);
+  color: var(--gold); letter-spacing: .14em; font-size: 15px; text-transform: uppercase; text-shadow: 0 2px 6px #000; white-space: nowrap; }
+.bond .hearts { color: #ff8fb8; letter-spacing: 2px; }
+.bond .hearts .dim { color: #5a4a70; }
+.bond .bar { height: 6px; background: #2a2650; border-radius: 3px; margin: 4px 0 2px; overflow: hidden; }
+.bond .bar span { display: block; height: 100%; background: linear-gradient(90deg, #ff8fb8, var(--gold)); }
+.bond small { color: var(--ink-dim); }
 #d-more { position: absolute; right: 14px; bottom: 8px; color: var(--gold); font-size: 13px; font-weight: 800; animation: pulse 1.2s infinite; }
 
 /* Touch controls (landscape phone) */
@@ -157,8 +177,8 @@ body[data-input="touch"] #touch { display: block; }
   <div id="goal"></div>
   <button id="pause-btn" aria-label="Menu">MENU</button>
   <div id="sign"></div>
-  <div id="toast"></div>
 </div>
+<div id="toast"></div>
 
 <div id="touch">
   <div id="stick"><div id="knob"></div></div>
@@ -171,9 +191,11 @@ body[data-input="touch"] #touch { display: block; }
 
 <div id="dialog" role="dialog" aria-live="polite">
   <img id="d-face" alt="">
-  <div id="d-body"><div id="d-name"></div><div id="d-text"></div></div>
+  <div id="d-body"><div id="d-name"></div><div id="d-text"></div><div id="d-choices"></div></div>
   <div id="d-more">tap anywhere &#9656;</div>
 </div>
+
+<div id="scene"><canvas id="scene-art" width="960" height="450"></canvas><div id="scene-title"></div></div>
 
 <div class="screen show" id="title">
   <h1>STARHAVEN</h1>
@@ -222,7 +244,8 @@ body[data-input="touch"] #touch { display: block; }
       <p><b>Gamepad:</b> stick or D-pad move, A jump, X strike, B dash, Y talk or paint, Start menu.</p>
       <p><b>Touch:</b> hold and slide on the left half to move (slide down to aim a downward strike). JUMP, STRIKE and DASH on the right.
          A TALK or PAINT button appears when there's someone to talk to or something to paint.</p>
-      <p>In conversations, tap the box or press any button to go on.</p>
+      <p>In conversations, tap anywhere or press any button to go on. For choices, tap one, or use up/down and A (Space on a keyboard).</p>
+      <p><b>Bluetooth controller on a phone:</b> pair it in your phone's Bluetooth settings, open the game, and press any button on it. The touch buttons hide while you use it.</p>
     </div>
   </div>
 </div>

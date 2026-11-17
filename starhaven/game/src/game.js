@@ -12,7 +12,8 @@
   const G = SH.game = {
     state: 'title', world: null, frozen: false,
     chapter: 0, flags: {}, activeGoal: null, script: null,
-    progress: Object.assign({ reached: 0, hearts: {}, met: [] }, store.get('starhaven.save.v1', {})),
+    progress: Object.assign({ reached: 0, bonds: {}, met: [] }, store.get('starhaven.save.v1', {})),
+    heartQueue: [],
   };
   G.save = function () { store.set('starhaven.save.v1', G.progress); };
   G.chapterDef = () => ST.CHAPTERS[G.chapter];
@@ -85,9 +86,10 @@
     G.progress.reached = Math.max(G.progress.reached, next);
     G.save();
     G.state = 'card';
-    G.hud.card({ label: ch.label + ' complete', name: ch.name, text: ch.done, goals: null, button: next < ST.CHAPTERS.length ? 'Continue' : 'Finish' }, () => {
-      if (next < ST.CHAPTERS.length) G.startChapter(next);
-      else { G.state = 'end'; G.hud.end(true); }
+    // After the card: the chapter's evening (if it has one), then the next chapter, or the finale.
+    const cont = () => { if (next < ST.CHAPTERS.length) G.startChapter(next); else G.runScript('finale'); };
+    G.hud.card({ label: ch.label + ' complete', name: ch.name, text: ch.done, goals: null, button: 'Continue' }, () => {
+      if (ch.after) { G.afterScript = cont; G.runScript(ch.after); } else cont();
     });
   };
 
@@ -125,7 +127,7 @@
   };
   G.advance = function () {
     const sc = G.script;
-    if (!sc) return;
+    if (!sc || G.choosing) return;
     while (sc.i < sc.steps.length) {
       const st = sc.steps[sc.i++];
       if (Array.isArray(st)) {
@@ -133,10 +135,22 @@
         G.talkWait = 10; // a short pause so a held button doesn't skip the line
         return;
       }
+      if (st.choose) {
+        G.choosing = st.choose;
+        G.hud.choice(st.choose.map(o => o.text));
+        G.talkWait = 12;
+        return;
+      }
       G.act(st);
+    }
+    // A bond reached a new heart during this conversation: its heart scene plays next.
+    while (G.heartQueue.length) {
+      const id = G.heartQueue.shift();
+      if (ST.SCRIPTS[id]) { G.script = { id, steps: ST.SCRIPTS[id].slice(), i: 0 }; return G.advance(); }
     }
     G.script = null;
     G.hud.dialog(null);
+    G.hud.sceneArt(null);
     input.clear();
     if (G.afterScript) { const f = G.afterScript; G.afterScript = null; f(); }
     else if (G.state === 'talk') G.state = 'play';
@@ -148,12 +162,49 @@
       case 'flag': G.flags[st.name] = true; G.hud.goal(); break;
       case 'wyrm': w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
       case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
-      case 'heart': G.progress.hearts[st.who] = Math.max(1, G.progress.hearts[st.who] || 0); G.save(); G.hud.toast(`${ST.CAST[st.who].name}: bond heart 1 of 5`); break;
-      case 'meet': if (!G.progress.met.includes(st.who)) { G.progress.met.push(st.who); G.save(); } break;
-      case 'winnow': G.winnow(st.npc, st.to, st.y); break;
+      case 'meet': G.meet(st.who); break;
+      case 'bond': G.bond(st.who, st.pts); break;
+      case 'art': G.hud.sceneArt(st.id, st.title); break;
+      case 'goto': { const sc = G.script; sc.steps = sc.steps.slice(0, sc.i).concat(ST.SCRIPTS[st.id], sc.steps.slice(sc.i)); break; }
+      case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
+      case 'end': G.afterScript = () => { G.state = 'end'; G.hud.end(true); }; break;
     }
   };
+  // The player picked choice `idx`: apply its bond points, then play its reply.
+  G.pick = function (idx) {
+    const opts = G.choosing, sc = G.script;
+    if (!opts || !sc || !opts[idx]) return;
+    const o = opts[idx];
+    G.choosing = null;
+    G.hud.choice(null);
+    for (const who in (o.bond || {})) G.bond(who, o.bond[who], o.liked === who);
+    sc.steps = sc.steps.slice(0, sc.i).concat(o.then || [], sc.steps.slice(sc.i));
+    G.advance();
+  };
+
+  // ---------------------------------------------------------------- bonds (DESIGN.md: 5 hearts each)
+  G.heartsFor = pts => 1 + ST.HEARTS_AT.filter(t => pts >= t).length;
+  G.meet = function (who) {
+    if (!G.progress.met.includes(who)) G.progress.met.push(who);
+    if (!G.progress.bonds[who]) {
+      G.progress.bonds[who] = { pts: 0 };
+      G.hud.toast(`\u2665 ${ST.CAST[who].name}: heart 1 of 5`);
+    }
+    G.save();
+  };
+  G.bond = function (who, pts, liked) {
+    if (!G.progress.bonds[who]) G.progress.bonds[who] = { pts: 0 };
+    const b = G.progress.bonds[who], before = G.heartsFor(b.pts);
+    b.pts += pts;
+    const after = G.heartsFor(b.pts), name = ST.CAST[who].name;
+    if (after > before) {
+      G.hud.toast(`\u2665 ${name}: heart ${after} of 5`);
+      G.heartQueue.push(`heart_${who}_${after}`);
+    } else G.hud.toast(liked ? `${name} loved that.` : `${name} will remember that.`);
+    G.save();
+  };
+
   // Fae can "winnow": vanish in starlight and reappear somewhere else.
   G.winnow = function (id, toX, row) {
     const w = G.world;
@@ -279,6 +330,12 @@
 
   G.talkStep = function () {
     if (G.talkWait > 0) { G.talkWait--; return; }
+    if (G.choosing) {
+      if (input.pressed.up) G.hud.choiceMove(-1);
+      else if (input.pressed.down) G.hud.choiceMove(1);
+      else if (input.pressed.jump || input.pressed.attack) G.pick(G.hud.choiceIndex());
+      return;
+    }
     if (input.pressed.jump || input.pressed.attack || input.pressed.up || input.pressed.dash) G.advance();
   };
 
@@ -368,6 +425,7 @@
   };
 
   G.newGame = function () {
+    G.progress = { reached: 0, bonds: {}, met: [] }; G.save();
     G.hud.title(false);
     G.state = 'cutscene';
     G.hud.cutscene(ST.INTRO, () => G.startChapter(0));
@@ -403,7 +461,7 @@
         if (opts.story === false) (w.room.def.triggers || []).forEach((t, i) => (w.fired[i] = true));
         G.state = 'play';
       }
-      G.hud.dialog(null);
+      G.hud.dialog(null); G.hud.choice(null); G.hud.sceneArt(null); G.choosing = null; G.heartQueue = [];
       return SH.test.state();
     },
     // Step n frames holding `held` (e.g. {right:true}); `press` actions are pressed on the first frame.
@@ -413,7 +471,10 @@
         input.forced.held = held || {};
         input.forced.pressed = {};
         if (i === 0 && press) for (const a of press) input.forced.pressed[a] = true;
-        if (autoTalk && G.state === 'talk' && G.talkWait <= 0) input.forced.pressed.jump = true;
+        if (autoTalk && G.state === 'talk' && G.talkWait <= 0) {
+          if (G.choosing) { G.pick(Math.min(SH.test.choice || 0, G.choosing.length - 1)); continue; }
+          input.forced.pressed.jump = true;
+        }
         if (autoTalk && G.state === 'card') G.hud.cardGo();
         G.step();
       }

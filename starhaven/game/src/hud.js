@@ -52,11 +52,41 @@
   H.dialog = function (who, text) {
     const el = $('dialog');
     if (!who) { el.classList.remove('show'); return; }
-    const c = ST.CAST[who];
-    $('d-face').src = SH.art.portraitURL(who);
+    const c = ST.CAST[who], narr = who === 'narr';
+    el.classList.toggle('narr', narr);
+    if (!narr) $('d-face').src = SH.art.portraitURL(who);
     $('d-name').textContent = c.name;
     $('d-name').style.color = c.color;
     $('d-text').textContent = text;
+    el.classList.add('show');
+  };
+
+  // ---------------- choices (under the last line of dialogue)
+  let choiceSel = 0;
+  H.choice = function (opts) {
+    const box = $('d-choices');
+    if (!opts) { box.innerHTML = ''; $('dialog').classList.remove('choosing'); return; }
+    if (!$('dialog').classList.contains('show')) H.dialog('narr', 'What does Wren do?');
+    choiceSel = 0;
+    box.innerHTML = opts.map((t, i) => `<button class="choice${i === 0 ? ' sel' : ''}" data-i="${i}">${esc(t)}</button>`).join('');
+    $('dialog').classList.add('choosing');
+  };
+  H.choiceMove = function (d) {
+    const btns = [...$('d-choices').children];
+    if (!btns.length) return;
+    choiceSel = (choiceSel + d + btns.length) % btns.length;
+    btns.forEach((b, i) => b.classList.toggle('sel', i === choiceSel));
+  };
+  H.choiceIndex = () => choiceSel;
+
+  // ---------------- full-screen illustrated scenes behind the dialogue
+  H.sceneArt = function (id, title) {
+    const el = $('scene');
+    if (!id) { el.classList.remove('show'); return; }
+    const cv = $('scene-art'), g = cv.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    g.drawImage(SH.art.panel(id), 0, 0, cv.width, cv.height);
+    $('scene-title').textContent = title || '';
     el.classList.add('show');
   };
 
@@ -136,6 +166,16 @@
     html += `<p>${esc(ST.RECAP)}</p>`;
     for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
     html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
+    html += '<h3>Bonds</h3>';
+    const bonds = G.progress.bonds, ids = Object.keys(ST.BONDS).filter(id => bonds[id]);
+    if (!ids.length) html += '<p>No bonds yet. Hearts grow from evenings together, gifts they love, and the choices you make when you talk.</p>';
+    for (const id of ids) {
+      const pts = bonds[id].pts, h = G.heartsFor(pts), next = ST.HEARTS_AT[h - 1];
+      const prev = h > 1 ? ST.HEARTS_AT[h - 2] : 0, k = next ? Math.min(1, (pts - prev) / (next - prev)) : 1;
+      html += `<div class="person bond"><img src="${SH.art.portraitURL(id)}" alt=""><div><b>${esc(ST.CAST[id].name)}</b> <span class="hearts">${'\u2665'.repeat(h)}<span class="dim">${'\u2661'.repeat(5 - h)}</span></span>
+        <div class="bar"><span style="width:${Math.round(k * 100)}%"></span></div>
+        <small>${next ? `${pts} / ${next} points to the next heart` : 'Every heart earned'} &middot; Loves: ${esc(ST.BONDS[id].loves)}</small></div></div>`;
+    }
     html += '<h3>People</h3>';
     for (const p of G.knownPeople()) html += `<div class="person"><img src="${SH.STORY.CAST[p.id] ? SH.art.portraitURL(p.id) : ''}" alt="" ${SH.STORY.CAST[p.id] ? '' : 'style="visibility:hidden"'}><div><b>${esc(p.name)}</b><br>${esc(p.text)}</div></div>`;
     $('j-body').innerHTML = html;
@@ -215,6 +255,8 @@
     on('e-again', () => { H.end(false); G.newGame(); });
     on('e-home', () => { H.end(false); G.state = 'title'; H.title(true); });
     SH.input.onSourceChange = src => { document.body.dataset.input = src; lastPrompt = null; };
+    SH.input.onPad = () => H.toast('Controller connected: A jump, X strike, B dash, Y talk. Hold down + X in the air to strike down.');
+    $('d-choices').addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (b) G.pick(+b.dataset.i); });
     document.body.dataset.input = SH.input.source;
     H.titleButtons();
   };

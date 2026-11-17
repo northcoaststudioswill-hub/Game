@@ -98,6 +98,26 @@ const path = require('path');
       check('Pogo: crosses the thorn pit on the buds without a scratch', p.x >= 60 * T && p.stats.hurt === 0, { tx: +(p.x / T).toFixed(2), pogos: p.stats.pogos, hurt: p.stats.hurt });
     })();
 
+    // --- Touch: in the air, STRIKE aims down by itself over a bud (no holding down needed)
+    (function () {
+      fresh(); SH.test.place(37, 16); const p = P();
+      const buds = G.world.things.filter(t => t.kind === 'bulb');
+      SH.input.source = 'touch';
+      while (p.x < 40.7 * T) step({ right: true });
+      step({ right: true, jump: true }, ['jump']);
+      let i = 0;
+      while (i++ < 600 && p.x < 60.5 * T && p.stats.hurt === 0) {
+        let press = null;
+        const bud = buds.find(b => b.hittable() && Math.abs(b.x - p.x) < 26 && b.y - p.y > -4 && b.y - p.y < 46);
+        if (p.vy > 0 && bud && !p.swing) press = ['attack'];
+        const next = buds.find(b => b.x > p.x - 10);
+        const right = !next || p.x < next.x - 2 || p.vy < -4 || p.x > 57 * T;
+        step({ right, jump: true }, press);   // never holds down
+      }
+      SH.input.source = 'kb';
+      check('Touch auto-aim: STRIKE in the air bounces off the buds without holding down', p.x >= 60 * T && p.stats.hurt === 0, { tx: +(p.x / T).toFixed(2), pogos: p.stats.pogos });
+    })();
+
     // --- Thorns send you back to safe ground and cost one heart
     (function () {
       fresh(); SH.test.place(39, 16); const p = P();
@@ -204,8 +224,12 @@ const path = require('path');
         { chapter: G.chapter, sawWyrm, caught, seconds: +(f / 60).toFixed(1), hurt: p.stats.hurt });
     })();
 
-    // Chapter 1: Ashes. Walk with Caelum, paint the mural, climb to the roof
+    // Chapter 1: Ashes. Walk with Caelum, paint the mural, climb to the roof, then the first evening
+    const seen = new Set(); const origRun = G.runScript; G.runScript = function (id) { seen.add(id); return origRun.apply(this, arguments); };
+    const origAct = G.act; G.act = function (st) { if (st.do === 'goto') seen.add(st.id); return origAct.apply(this, arguments); };
+    const origAdv = G.advance; G.advance = function () { if (G.script) seen.add(G.script.id); const r = origAdv.apply(this, arguments); if (G.script) seen.add(G.script.id); return r; };
     (function () {
+      G.progress.bonds = {}; SH.test.choice = 0;
       SH.test.load(1); const p = P(), w = G.world;
       const jumps = [21.3, 29.3, 98.6, 102.4];
       let k = 0, f = 0, light0 = w.cityLight, painted = false;
@@ -216,8 +240,9 @@ const path = require('path');
         if (G.state === 'play' && k < jumps.length && tx >= jumps[k] && p.grounded && (k < 2 || G.flags.painted)) { press = ['jump']; k++; }
         talk(held, press);
       }
-      check('Chapter 1: walk, mural, rooftop all reachable; the street lights up', G.chapter === 2 && painted && G.progress.hearts.caelum >= 1,
-        { chapter: G.chapter, painted, cityLightBefore: +light0.toFixed(2), caelumHeart: G.progress.hearts.caelum, seconds: +(f / 60).toFixed(1) });
+      const cb = G.progress.bonds.caelum || { pts: 0 };
+      check('Chapter 1 + first evening: walk, mural, rooftop; Caelum reaches heart 2 with his heart scene', G.chapter === 2 && painted && G.heartsFor(cb.pts) >= 2 && seen.has('heart_caelum_2'),
+        { chapter: G.chapter, painted, caelumPoints: cb.pts, hearts: G.heartsFor(cb.pts), heartScene: seen.has('heart_caelum_2'), seconds: +(f / 60).toFixed(1) });
     })();
 
     // Chapter 2: The Five. Dummy combo, the thorn pit, three thorn sprites
@@ -247,9 +272,19 @@ const path = require('path');
         }
         talk(held, press);
       }
-      check('Chapter 2: dummy combo, thorn pit and all three thorn sprites; ends on the concept end screen', G.state === 'end' && G.progress.reached >= 3,
-        { state: G.state, reached: G.progress.reached, seconds: +(f / 60).toFixed(1), hurt: p.stats.hurt, swings });
+      check('Chapter 2 + vision + second evening + finale: ends on the concept end screen', G.state === 'end' && G.progress.reached >= 3 && seen.has('finale') && seen.has('ev2_caelum'),
+        { state: G.state, reached: G.progress.reached, seconds: +(f / 60).toFixed(1), hurt: p.stats.hurt, swings, finale: seen.has('finale') });
     })();
+
+    // Evening 2 choices lead to the right person and add their bond points
+    for (const [choice, who, script] of [[1, 'bram', 'ev2_bram'], [2, 'iris', 'ev2_iris']]) {
+      SH.test.load(2); G.progress.bonds = {}; SH.test.choice = choice;
+      G.runScript('evening2');
+      let f = 0; while (G.state === 'talk' && f++ < 2000) SH.test.step(1, {}, null, true);
+      const b = G.progress.bonds[who] || { pts: 0 };
+      check(`Evening 2, choice ${choice + 1}: spends the evening with ${who} (+points, back to play)`, seen.has(script) && b.pts > 0 && G.state === 'play', { pts: b.pts, state: G.state });
+    }
+    SH.test.choice = 0;
 
     return out;
   });
