@@ -22,7 +22,7 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   await tp(61, 14); await step(12); ok('a hint explains the bridge', /BRIDGE/.test(await E('msg')), await E('msg'));
   await throwFor(90); ok('any sprout works on the bridge', (await E('gates[5].on.length')) >= 10, await E('gates[5].on.length'));
   await step(30 * 14); ok('the bridge gets built and can be walked', await E('!gates[5].alive&&map[11*MW+60]===D&&fieldL[8*MW+61]>0'), await E('msg'));
-  await tp(63, 5); await E(`buds.forEach(b=>b.stage=0);void 0`); await step(4); await throwFor(2); await step(60);
+  await tp(63, 5); await E(`buds.forEach(b=>b.stage=0);bugs.forEach(q=>{q.alive=false});void 0`); await step(4); await throwFor(2); await step(60);
   ok('nectar blooms the crew', (await E('buds.filter(b=>b.stage===2).length')) === 12, await E('msg'));
   await tp(66, 8); await step(4); await throwFor(120); const d0 = await E('run.delivered'); let t = 0; for (; t < 450; t++) { await step(6); if (await E('run.delivered') > d0) break; }
   ok('the golden pear is carried home over the bridge', t < 450, Math.round(t / 5) + ' s'); ok('the lantern throws its seeds', (await E('seeds.length')) > 0, await E('seeds.length'));
