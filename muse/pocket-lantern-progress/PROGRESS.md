@@ -31,22 +31,24 @@ Estimates: Sproutwild is Claude's, Rootdeep and the note on the others are Will'
 7. **Starhaven.** Its outline draws on a published fantasy series. Confirm it will be an original world before it's sold or shared publicly?
 8. **Repo visibility.** Make the repo private now, or once Pocket Lantern is finished?
 
-## Resume when usage is back (in order)
+## Backlog: known things to address at some point
 
-1. **Push the pending commits** (only after Will says "push"): the Thornwatch handoff and research are already up; the progress doc, universe notes and cleanup report are local on `thornwatch-v4-work`.
-2. **Cleanup, one commit per game** (see `CLEANUP.md`):
+Not a queue. Nothing here has to happen first or all at once. Pick what Will wants when he wants it.
+
+- **Pending pushes** (only after Will says "push"): the progress doc, universe notes and cleanup report are local on `thornwatch-v4-work`.
+- **Cleanup, per game** (see `CLEANUP.md`):
    - Rootdeep: delete `cineActor`, `godCore`, `rdVig`.
    - Thornwatch: delete `twHeart`, `twRangeCirc` when next rebuilt.
    - Sproutwild: delete the 12 unused functions and the 2 dead branches. Ask Will before removing the 74 duplicate copies.
    - Verify each with its own check (Sproutwild: `field-lab.js`, 124 checks). No behaviour change expected.
-3. **Thornwatch v4.0 build**, after Will answers the open questions. Order: core loop and first garden, upgrade paths, cut-scenes, then the rest. Playtest after each step.
-4. **Sproutwild**: play Sigils 2 to 4 by hand, test Bottie's tower, check the Lantern rings in a long run.
-5. **Sprouts**: expand the original (Will: "definitely not done").
-6. **Rootdeep**: the open threads in its handoff (about 40% done).
-7. **Patch & Plate** (the cooking game): bug fixes and polish.
-8. **Knockout**: balance pass on a phone.
-9. **Sootborn**: read the code next, after the cleanup, if Will wants it.
-10. **Starhaven**: only if Will chooses it; its outline needs an original-world decision first.
+- **Thornwatch v4.0 build**, after Will answers the open questions. Order: core loop and first garden, upgrade paths, cut-scenes, then the rest. Playtest after each step.
+- **Sproutwild**: play Sigils 2 to 4 by hand, test Bottie's tower, check the Lantern rings in a long run.
+- **Sprouts**: expand the original (Will: "definitely not done").
+- **Rootdeep**: the open threads in its handoff (about 40% done).
+- **Patch & Plate** (the cooking game): bug fixes and polish.
+- **Knockout**: balance pass on a phone.
+- **Sootborn**: read the code next, after the cleanup, if Will wants it.
+- **Starhaven**: only if Will chooses it; its outline needs an original-world decision first.
 
 ## Ideas (add yours here)
 
