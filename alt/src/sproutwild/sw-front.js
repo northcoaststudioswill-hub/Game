@@ -44,7 +44,9 @@ function wHud(){if(W4.scene){scDraw();return}if(W4.sleepFx>0){W4.sleepFx-=1/60;g
  if(SW.stam<99){r('#00000088',0,16,W,2);r(SW.stam>40?UI.leaf:SW.stam>18?'#ffd94d':'#e04838',0,16,Math.round(W*SW.stam/100),2)}
  const ban=W4.banner&&W4.banner.t>0;
  {const q=wQuestText();if(q&&!ban&&state!=='g4place'){
-  r('rgba(10,14,8,.62)',0,18,W,11);r(UI.gold,0,18,2,11);text(wFit(q,226),6,20,1,'#ffe8b0',null)}}
+  r('rgba(10,14,8,.62)',0,18,W,11);r(UI.gold,0,18,2,11);const qw=tw(q,1);
+  if(qw<=226||!g.save)text(wFit(q,226),6,20,1,'#ffe8b0',null);else{const per=qw+48,k=Math.max(0,((time-(W4.qT0||0))*16)%(per+40)-40),x0=6-Math.round(k); /* v9.2: a long goal scrolls instead of being cut off */
+   g.save();g.beginPath();g.rect(4,18,W-6,11);g.clip();text(q,x0,20,1,'#ffe8b0',null);text(q,x0+per,20,1,'#ffe8b0',null);g.restore()}}}
  if(ban){const sl=swWrap(W4.banner.sub||'',212).slice(0,3),bh2=24+sl.length*11;g.globalAlpha=Math.min(1,W4.banner.t);r('#0e1a0a',8,30,224,bh2);r(UI.gold,8,30,224,2);r(UI.gold,8,30+bh2-2,224,1);
   {const bt=W4.banner.txt,big=tw(bt,2)<=216;text(big?bt:wFit(bt,216),Math.round(W/2-tw(big?bt:wFit(bt,216),big?2:1)/2),35,big?2:1,'#ffffff',null)}sl.forEach((l,j)=>text(l,Math.round(W/2-tw(l,1)/2),53+j*11,1,'#cfe0b8',null));g.globalAlpha=1}
  /* bottom row: squad on the field, crew and sigils at home */
@@ -145,6 +147,32 @@ function swDrawIntro(){const p=Math.min(W4.introPage||0,WSTORY.length-1),tt=W4.i
    g.globalAlpha=.8;g.strokeStyle='#b0e0f8';g.lineWidth=1;g.beginPath();g.arc(W/2,gy,rad,0,6.3);g.stroke();g.globalAlpha=.35;g.beginPath();g.arc(W/2,gy,rad*.7,0,6.3);g.stroke();g.restore();g.globalAlpha=1}
   fFort(W/2,gy+8);fChibi(W/2,gy+18,FLOOK['KING BIBI'],[0,1],false);fChibi(W/2-40,gy+16,FLOOK['DOME GUARD'],[0,1],false);fChibi(W/2+40,gy+16,FLOOK['DOME GUARD'],[0,1],false);
   if(tt>2.4){const by=Math.round(gy*.30+Math.sin(time*1.4)*2);g.globalAlpha=.14+.06*Math.sin(time*5);r('#7ee7ff',W-66,by-30,40,34);g.globalAlpha=1;wChar('BOTTIE',W-46,by,30)}}
+ else if(sn===6){ /* v9.2: the promise. Daylight, the Lantern burning, sprouts and buddies together */
+  uiSky(['#5aa8e0','#9cd4f0','#d8f0fa'],gy);uiHills(gy,26,'#5f9a58',1.3,1.1);uiHills(gy+6,16,'#4f8a44',3.1,1.7);r('#5fa544',0,gy,W,H);r('#86d86c',0,gy,W,2);
+  for(let i=0;i<5;i++){const cx=((i*61+time*6)%(W+40))-20;r('#ffffff',Math.round(cx),18+i*9,18,4);r('#ffffff',Math.round(cx)+4,15+i*9,10,3)}
+  uiRays(W/2,gy-58,110,12,'#ffd94d',.10);uiLantern(W/2,gy+4,true,1.6);
+  for(let i=0;i<40;i++)r(i%2?'#4fb04a':'#76c85c',(i*29+7)%W,gy+6+(i*11)%22,1,3);
+  [['DRIZZLET',34,-1],['FERNFANG',W-36,1],['PEBBLIT',W/2+46,0],['CINDERCAP',W/2-48,0]].forEach(([sp,x,fl],i)=>{if(tt<.3+i*.25)return;uiMon(sp,x,gy+4+Math.round(Math.sin(time*3+i)*1),i<2?34:26,fl>0)});
+  for(let i=0;i<5;i++){if(tt<1.2+i*.2)continue;const px=40+i*40+Math.round(Math.sin(time*1.6+i)*6);drawBud({x:px,y:gy+4,type:i,stage:2,z:Math.abs(Math.sin(time*5+i))*3,a:i*1.3,mv:true,st:'idle',fx:i%2?1:-1})}}
+ else if(sn===7||sn===8){ /* v9.2: the Data Center under the Peak, and Bottie's button; 8 is the glitch */
+  uiSky(['#05060f','#0d1230','#1a1f48'],gy);uiStars(40,gy-40,7);
+  for(let x=0;x<W;x+=2){const h=Math.max(0,90-Math.abs(x-W/2)*.55+Math.sin(x*.07)*6);r('#151a30',x,Math.round(gy-h),2,Math.ceil(h)+2)}
+  r('#0e1222',0,gy,W,H);const dx=W/2-44,dy=gy-46;
+  r(UI.ink,dx-2,dy-2,92,50);r('#2a3046',dx,dy,88,46);r('#3a425e',dx,dy,88,3);
+  for(let row=0;row<4;row++)for(let c=0;c<10;c++){const on=((time*3+row*7+c*13)|0)%5!==0;r(on?(c%3?'#58e0a0':'#58a0f0'):'#1a2030',dx+6+c*8,dy+8+row*9,4,3)}
+  r('#14101e',dx+36,dy+30,16,16);r('#58a0f0',dx+38,dy+32,12,2);
+  g.globalAlpha=.12+.05*Math.sin(time*4);r('#58e0a0',dx-14,dy-14,116,74);g.globalAlpha=1;
+  if(S.k){const bx=Math.round(W-30-Math.min(1,tt/1.4)*(W/2-60)),by=gy+2;wChar('BOTTIE',bx,by,30);
+   if(tt>1.4){r(UI.ink,bx-26,by-20,14,12);r('#7a7a88',bx-25,by-19,12,10);const pr=tt>2.6&&((time*4)|0)%2;r(pr?'#ff4040':'#c02020',bx-22,by-17-(pr?0:1),6,4)}}
+  if(sn===8){const k=Math.min(1,tt/.25);if(tt<.6){g.globalAlpha=1-tt/.6;r('#ffffff',0,0,W,H);g.globalAlpha=1}
+   for(let i=0;i<14;i++){const yy=((i*37+((time*20)|0)*13)%gy),hh=3+(i*7)%9,sh=((i*53+((time*30)|0)*17)%40)-20;g.globalAlpha=.55*k;r(i%3?'#58e0a0':i%2?'#ff40a0':'#58a0f0',0,yy,W,1);r('#000000',Math.max(0,sh),yy+1,W,hh);g.globalAlpha=1}
+   for(let i=0;i<20;i++){const x=(i*41+((time*12)|0)*29)%W,y=(i*23+((time*12)|0)*31)%(H-90);r(['#ff40a0','#58e0a0','#ffd94d','#58a0f0'][i%4],x,y,4+(i%3)*4,4)}
+   if(((time*3)|0)%2){const t2='SIMULATION ERROR';r('#000000',W/2-tw(t2,1)/2-4,34,tw(t2,1)+8,11);text(t2,W/2-tw(t2,1)/2,36,1,'#ff4040',null)}}}
+ else if(sn===9){ /* v9.2: the buddies went wild. Red eyes in the tall grass */
+  uiSky(['#03040c','#0a0e22','#141a36'],gy);uiStars(30,gy-30,9);uiHills(gy,18,'#0c1424',2.4,1.3);r('#0a1a10',0,gy-44,W,H);
+  const eyes=[[40,gy-34],[96,gy-40],[150,gy-30],[200,gy-42],[70,gy-16],[178,gy-14],[124,gy-8]];
+  eyes.forEach(([x,y],i)=>{if(tt<.4+i*.3)return;const bl=((time*1.3+i*.7)%3)<.12;if(!bl){r('#ff3030',x,y,3,2);r('#ff3030',x+7,y,3,2);g.globalAlpha=.25;r('#ff3030',x-2,y-2,14,6);g.globalAlpha=1}});
+  for(let i=0;i<70;i++){const x=(i*13+3)%W,h=10+(i*7)%14,sw=Math.round(Math.sin(time*1.5+i)*1);r(i%2?'#0e2a16':'#14361c',x+sw,gy-2-h+(i%3)*12,2,h)}}
  if(fade<1){g.globalAlpha=1-fade;r('#000000',0,0,W,H);g.globalAlpha=1}
  /* letterbox + progress */
  r('#000000',0,0,W,9);for(let i=0;i<WSTORY.length;i++)r(i===p?UI.gold:i<p?'#7a6a30':'#3a3a48',W/2-WSTORY.length*5+i*10,3,7,3);

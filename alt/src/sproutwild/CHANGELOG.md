@@ -21,6 +21,23 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v9.3 · 2026-11-17 · round 2: the intro, LIGHT SHOWN, a softer Meadow
+
+Will: keep working on the game. Round 2 of the story bible's fix list.
+
+- **The intro is 12 scenes** (`shots/v9.3-intro-twelve-scenes.png`), each with one voice: the promised valley in daylight (the Lantern burning, buddies and sprouts together); "Buddies did the heavy work. Sprouts carried the light."; the DATA CENTER humming under the Peak; Bottie walking in with a big red button ("Do not press. ...Oops in advance."); the glitch (a white flash, torn scanlines, SIMULATION ERROR); the Lantern cracking; King Bibi raising the dome; red eyes in the tall grass (the buddies went wild, the biggest became ALPHAS); seeds falling and growing legs; a sprout bringing the light to a buddy; Erin; Marcus. Four of the pictures are new.
+- **LIGHT SHOWN.** Every wild buddy you calm counts: a battle won, a bloom in battle, or a bloom in the grass. It shows in the pause menu header, and each new one floats "LIGHT SHOWN n" over you.
+- **The Lantern grows a ring every 10.** Each ring gives the keeper a gift, which is where Erin's and Marcus's old keeper perks went: 10 is GREEN HANDS (+1 from every harvest), 20 is WARM LIGHT (buddies heal a little after each win), 30 is BIG HEART (buddies hit 12% harder). Each ring also gives 3 hearts.
+- **The King wants a calm valley.** Four Sigils are not enough on their own: King Bibi lowers the dome when you also have 20 buddies shown the light ("The buddies out there are still wild, keeper. 3 calmed. I need 20."). The goal line counts them for you.
+- **The Meadow looks softer** (`shots/v9.3-meadow-soft-edges.png`): tall grass ends in ragged tufts instead of square blocks, pond corners are rounded with reeds at the water's edge, and flowers grow along the roads. This applies to every wild area.
+- **The GUIDE caught up with the story.** The Valley page talked about four gyms; it now explains the alphas and their Sigils, and a new LIGHT SHOWN page explains the counter, the rings and the King's condition. A few leftover lines ("the gyms await", "sectors and gyms") now point at the alphas.
+- **Every menu matches the new pause menu.** Buddies, Build, the Guide, the Bug Jar and the work board use the same dark blue panels, gold selection and header as the pause menu (one shared change to the menu frame and rows).
+- **Goal lines fit the bar.** The early goals and the alpha goals are shorter, and a goal that is still too long now scrolls slowly across the bar instead of being cut off.
+- Lab: 123 checks (new: a bloom in battle and a catch in the open grass both count as LIGHT SHOWN; four Sigils with a wild valley keeps the dome up). Two checks were flaky because something else near the target could take the aim ring: the bug catch (a loose item beside the bug) and SELECT-to-battle (a tree or item beside the wild). Both tests now clear the area first. Six clean runs in a row afterwards.
+- Played in real time from the title (autopilot, 430x932): all 12 intro scenes, the opening, the starters, Erin's walk and the first catch, 0 timing flags, no page errors.
+
+**Not checked:** the Lantern ring gifts at 10, 20 and 30 in a real session; the King's 20-buddy condition in real time; the restyled menus opened by hand one by one (checked by screenshot); iPhone.
+
 ## v9.2 · 2026-11-17 · first fixes from the story bible
 
 Will: make a doc of story events, triggers and ideas; the top of the map is covered; text covers too much; the tutorial pathing takes you to the old area by the trees with no path and Erin disappears; the first area is ugly; base building has to feed the goal; buddy text overlaps at the start; things trigger at odd times; more intro scenes; no more playable Marcus or Erin; the pause menus are ugly; real-world names go; aim for a four-hour game with post-game later.

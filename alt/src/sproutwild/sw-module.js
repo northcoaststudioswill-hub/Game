@@ -473,7 +473,7 @@ function wProdTick(){SW.buildings.forEach((b,bi)=>{const def=wBuildDef(b.k);if(!
   if(prod)amt=2+Math.min(2,((prod.wxp||0)/6)|0);
   else if(Math.random()<.5)amt=1;
   if(amt&&crew.some(c=>c.type===5))amt+=1;
-  if(amt&&SW.keeper==='ERIN')amt+=1;
+  if(amt&&(SW.shown||0)>=10)amt+=1; /* v9.2: Erin's Green Hands is the first Lantern ring */
   if(!amt)return;
   SW.res[def.yields]+=amt;
   if(Math.random()<(SW.buildings.some(bb=>bb.k==='statue')?.85:.5)&&(W4.groundHearts||[]).length<8){W4.groundHearts=W4.groundHearts||[];
@@ -1063,13 +1063,13 @@ function wNextGoal(){
  if(!SW.buildings.some(b=>b.k==='cottage'))return{x:240,y:300,label:'Build a COTTAGE first — START menu, then BUILD. Any open ground works. Woof.'}
  if(wBaseReady())return{x:WW/2,y:70,label:'The missions are done! Ring the Great Lantern — the plot grows!'};
  if(SW.crew.length&&!wAssignedCount()&&SW.buildings.length)return{x:wCellX(SW.buildings[0].gx)+10,y:wCellY(SW.buildings[0].gy)+30,label:'Give a sprout a job — walk to a building and press A. Sprouts work; buddies fight.'};
- if(SW.badges.length<4)return{x:WW/2,y:(W4.wh||360)-40,label:'Adventure! The Lantern Gate leads to sectors and gyms.'};
+ if(SW.badges.length<4)return{x:WW/2,y:(W4.wh||360)-40,label:'Adventure! The Lantern Gate leads to the wilds and the alphas.'};
  return{x:WW/2,y:70,label:'Home sweet home. Everything is built, boss.'}}
 function wLouieTip(){const tips=[
  'Weakened wilds are far easier to command. Soften first, bud second — and kin buds command best.',
  'Workers drop gratitude hearts while they produce. Walk over them!',
  'A SPROUT PEN raises how many buddies can hold jobs.',
- 'Erin keeps the garden singing. Marcus keeps the gyms humble.',
+ 'Erin keeps the garden singing. Marcus keeps everyone humble.',
  'Every keeper fights differently — try the KEEPER move in battle.',
  'First-of-a-kind buildings burst gratitude. Collect them all!',
  'The Lantern Gate at the south of home carries you anywhere the light reaches.','Bare hands take 15 hits a tree. A Tinker Bench crafts the AXE and PICKAXE — and levels them up.',
@@ -1115,12 +1115,12 @@ function drawLou(){swShell('LOUIE','BASE GUIDE · GOOD BOY');
  swRows([{a:'SHOW ME THE WAY',b:'he leads, you follow'},{a:'ANY TIPS, LOUIE?',b:'wisdom, barked'},
   {a:'PET LOUIE',b:'+1 gratitude (sometimes)'},{a:'ANY ASKS?',b:'the valley needs things'},{a:'BYE',b:''}],swSel,W4.louTip||'He knows every corner of Sunkeep. Ask him anything.')}
 function wFit(s,n){if(tw(s,1)<=n)return s;let o=s;while(o.length&&tw(o+'…',1)>n)o=o.slice(0,-1);return o+'…'}
-const WQUEST=['Talk to Louie','Choose your first buddy','Catch a wild buddy','COTTAGE (START, BUILD): a roof for buddies','Garden: press A on a plot, grow BERRIES'];
+const WQUEST=['Talk to Louie','Choose your first buddy','Catch a wild buddy','Build a COTTAGE (START, BUILD)','Grow BERRIES: A on a garden plot'];
 function wQuestTick(){
  if(SW.quest===3&&SW.buildings.some(b=>b.k==='cottage'&&!b.con)){SW.quest=4;
   swSay('A roof over Sunkeep! Now grow BERRIES on a garden plot.',3.4);swSnd(784,.09,1175);swSave()}
  else if(SW.quest===4&&(plCrops()>0||SW.buildings.some(b=>b.k==='bed'))){SW.quest=5;
-  swSay('Sunkeep stands! The valley is yours, keeper — the gyms await.',3.8);swSnd(784,.09,1175);swSave()}}
+  swSay('Sunkeep stands! The valley is yours, keeper. The alphas await.',3.8);swSnd(784,.09,1175);swSave()}}
 let BT=null;
 function wAliveParty(){return SW.party.filter(m=>m.hp>0)}
 function wSetupBattle(){BT.phase='intro';BT.t=0;BT.log=[];BT.after=null;BT.myStage={atk:0,def:0};BT.foeStage={atk:0,def:0};
@@ -1156,7 +1156,7 @@ function wDamage(att,def,move,aSt,dSt){const A=wStats(att).atk*(1+.25*(aSt.atk||
  let mult=1,stab=1;if(move.t>=0){mult=wMult(move.t,wSp(def.sp).t);if(wSp(att.sp).t.includes(move.t))stab=1.25}
  const crit=Math.random()<(move.crit?.22:.06)?1.5:1;
  let dmg=Math.max(1,Math.round(move.p*(A/D)*(0.32+att.lv*0.05)*stab*mult*crit*(0.85+Math.random()*0.3)/1.4));
- if(SW.keeper==='MARCUS'&&SW.party.includes(att))dmg=Math.max(1,Math.round(dmg*1.12));
+ if((SW.shown||0)>=30&&SW.party.includes(att))dmg=Math.max(1,Math.round(dmg*1.12));
  if(!SW.badges.length&&SW.party.includes(def))dmg=Math.min(dmg,Math.ceil(wStats(def).max*.45)); /* before the first Sigil nothing takes more than 45% in one hit */
  return{dmg,mult,crit:crit>1}}
 function wDoMove(att,def,move,aSt,dSt,who){ /* returns log lines, applies damage */
@@ -1185,7 +1185,7 @@ function wResolveTurn(myMove){const me=btCur(),foe=BT.foe;
    if(me.hp<=0){wMineDown();break}}}
  if(BT.log.length===0)BT.log.push({txt:'...'});
  if(!BT.after)BT.after='menu';BT.phase='msg'}
-function wFoeDown(){const me=btCur(),foe=BT.foe;BT.log.push({txt:BT.mode==='wild'?'The dark breaks! '+foe.sp+' settles down, calm.':foe.sp+' fainted!'}); /* v9.1: we cleanse, we do not knock out */
+function wFoeDown(){const me=btCur(),foe=BT.foe;if(BT.mode==='wild')wShowLight();BT.log.push({txt:BT.mode==='wild'?'The dark breaks! '+foe.sp+' settles down, calm.':foe.sp+' fainted!'}); /* v9.1: we cleanse, we do not knock out */
  if(BT.mode==='wild'){const dk=[0,1].includes(wSp(foe.sp).t[0])?'ore':'fiber';SW.res[dk]=(SW.res[dk]||0)+1;
   BT.log.push({txt:'It dropped '+dk.toUpperCase()+'. (+1)'})}
  const gain=Math.round((5+foe.lv*3)*(BT.mode==='gym'||BT.mode==='raid'||BT.mode==='trainer'?1.5:1));
@@ -1237,7 +1237,7 @@ function wBlackout(){const lost=Math.floor(SW.res.petal*.1);SW.res.petal-=lost;
  for(const m of SW.party)m.hp=wStats(m).max;
  BT=null;wEnterSector('BASE');state='g4world';swSay('You rushed back to Sunkeep Base. (-'+lost+' petals)',3.5);swSave()}
 function wBattleEnd(){const won=BT&&BT.won,cb=BT&&BT.onEnd,bt0=BT;BT=null;W4.grassT=0;W4.grace=2.5;
- if(won&&SW.keeper==='ERIN')for(const m of SW.party)if(m.hp>0)m.hp=Math.min(wStats(m).max,m.hp+Math.ceil(wStats(m).max*.15));
+ if(won&&(SW.shown||0)>=20)for(const m of SW.party)if(m.hp>0)m.hp=Math.min(wStats(m).max,m.hp+Math.ceil(wStats(m).max*.15));
  state='g4world';if(cb)cb(!!won,bt0);swSave()}
 function wKeeperMove(){if(BT.keeperUsed){swSnd(140,.08);return}
  BT.keeperUsed=true;const foe=BT.foe;BT.log=[];BT.t=0;BT.phase='msg';BT.shake=2;
@@ -1305,7 +1305,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.phase===
    if(m.hp<=0)wMineDown();else BT.after='menu'}
   return}
  if(BT.phase==='orb'){BT.orbT-=dt;
-  if(BT.orbT<=0){if(BT.orbOk){const foe=BT.foe;SW.caught[foe.sp]=1;
+  if(BT.orbT<=0){if(BT.orbOk){const foe=BT.foe;SW.caught[foe.sp]=1;wShowLight();
      if(SW.quest===2){SW.quest=3;swSave();later(()=>swSay('First catch! Now build your buddy a home — a COTTAGE (START · BUILD).',3.6),1600)}
      if(SW.party.length<3)SW.party.push(foe);else SW.box.push(foe);
      BT.log=[{txt:'The '+TYPES[BT.tossIx||0].n+' sprouts bloom on '+foe.sp+'. It remembers the Lantern light!'},{txt:SW.party.includes(foe)?foe.sp+' joined your buddies.':foe.sp+' now works for you — sent to your base box.'}];
@@ -1678,7 +1678,7 @@ const WBLURB={CINDERCAP:'Bold and warm-hearted. Your hardest hitter — and it c
 const WGATEPAGES=[
  'Woof! Stop a second, keeper — see this arch? This is the LANTERN GATE.',
  'Step in and the Lantern light carries you: the Meadow road, Lantern Town, and every corner of the valley.',
- 'Roads past town need Sigils — win them from the gyms and the whole valley opens. Now let us go catch you a buddy!'];
+ 'Roads past town need Sigils. Bring the alphas the light and the whole valley opens. Now let us go catch you a buddy!'];
 function gateUpdate(){if(pressed('b')){state='g4world';return}
  if(pressed('a')||pressed('start')){W4.gatePage=(W4.gatePage||0)+1;swSnd(660,.05);
   if(W4.gatePage>=WGATEPAGES.length){swSel=Math.max(0,WSECTORS.findIndex(s=>s.id==='MEADOW'));state='g4map'}}}

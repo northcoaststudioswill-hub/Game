@@ -81,15 +81,18 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  F.enter('GLOOM');f=F.fld();const kb=f.npcs.find(n=>n.boss);F.setPos(kb.x,kb.y+14);f.dir=[0,-1];step(3);tap('a');step(3);
  ok('king bibi talks',!!f.dlg&&f.dlg.who==='KING BIBI');
  for(let i=0;i<6;i++){tap('a');step(4)}step(20);ok('without four Sigils the King keeps the dome up',S.fl.bibi!==1&&F.state()==='g4world',F.state());
- S.badges=['VERDANT SIGIL','ROOT SIGIL','STONE SIGIL','GOLD SIGIL'];F.setPos(kb.x,kb.y+14);f.dir=[0,-1];step(3);tap('a');step(3);for(let i=0;i<10;i++){tap('a');step(10)}step(20);
+ S.badges=['VERDANT SIGIL','ROOT SIGIL','STONE SIGIL','GOLD SIGIL'];S.shown=3;F.setPos(kb.x,kb.y+14);f.dir=[0,-1];step(3);tap('a');step(3);for(let i=0;i<10;i++){tap('a');step(10)}step(20);
+ ok('four Sigils but a wild valley: the King wants more buddies shown the light',S.fl.bibi!==1,S.shown);
+ S.shown=20;F.setPos(kb.x,kb.y+14);f.dir=[0,-1];step(3);tap('a');step(3);for(let i=0;i<10;i++){tap('a');step(10)}step(20);
  ok('with four Sigils King Bibi lowers the dome',S.fl.bibi===1,'dlg='+JSON.stringify(f.dlg&&{who:f.dlg.who,i:f.dlg.i,n:f.dlg.lines.length})+' near='+JSON.stringify(F.near()&&F.near().k)+' ',F.state()+' '+(F.bt()?F.bt().phase+' ai'+F.bt().aiIx+' foe'+F.bt().foe.sp+':'+F.bt().foe.hp+' q'+(F.bt().queue||[]).length+' hp'+S.party.map(m=>m.hp).join('/')+' log:'+JSON.stringify((F.bt().log||[]).slice(-1)):''));
  F.enter('WASTES');at(20,3,[0,-1]);for(let i=0;i<80&&F.fld().id==='WASTES';i++)step(1,['up']);ok('the dome is down: the peak road is open',F.fld().id==='PEAK',F.fld().id);
  /* swarming: sprouts bloom on a tired buddy; none are used up */
- {F.enter('MEADOW');S.buds={EMBER:2,PEB:0,DEW:0,ZIP:0,LEAF:4,LUCKY:0};step(3);const b0=S.buds.LEAF,box0=S.box.length+S.party.length;S.quest=2;F.forceWild('FERNFANG',3);
+ {F.enter('MEADOW');S.buds={EMBER:2,PEB:0,DEW:0,ZIP:0,LEAF:4,LUCKY:0};step(3);const b0=S.buds.LEAF,box0=S.box.length+S.party.length,sh0=S.shown||0;S.quest=2;F.forceWild('FERNFANG',3);
   for(let i=0;i<30&&F.bt().phase!=='menu';i++){tap('a');step(4)}F.bt().foe.hp=1;tap('right');tap('a');step(3);
   ok('SWARM opens the sprout picker',F.bt().phase==='budpick',F.bt().phase);
   for(let i=0;i<6&&F.bt().phase==='budpick';i++){tap('a');step(3)}step(70);for(let i=0;i<20&&F.state()==='g4battle';i++){tap('a');step(6)}
   ok('the swarm blooms and the buddy joins',S.party.length+S.box.length===box0+1,S.party.length+S.box.length-box0);
+  ok('a buddy that blooms counts as LIGHT SHOWN',(S.shown||0)===sh0+1,(S.shown||0)-sh0);
   ok('no sprout is used up',S.buds.LEAF===b0&&S.buds.EMBER===2,JSON.stringify(S.buds));S.quest=5}
  /* buddies fetch ore and fiber */
  {F.enter('MEADOW');F.wilds().length=0; /* v8.8: a wild beside the thicket can take the aim */const sp=F.spots().find(q=>q.k==='fiber'),f0=S.res.fiber||0;F.setPos(sp.x,sp.y+24);F.fld().dir=[0,-1];step(3);tap('a');step(260);
@@ -114,12 +117,13 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   const pj=pbb.tg;ok('...and the MINE buddy to the nearest rock work, at the same time',(pbb.st==='go'||pbb.st==='work')&&(pj.k==='rock'||pj.k==='ore')&&(fb.st==='go'||fb.st==='work'),pbb.st+' '+fb.st+' '+(pj&&pj.k));
   step(400);ok('both jobs finish',tr.got&&pj.got,tr.hp+' '+pj.got);
   /* capture: enough kin sprouts latch on and it blooms */
-  S.buds={EMBER:0,PEB:0,DEW:0,ZIP:0,LEAF:8,LUCKY:0};S.pouch=24;step(5);W4wilds=F.wilds();const before=S.party.length+S.box.length;
+  S.buds={EMBER:0,PEB:0,DEW:0,ZIP:0,LEAF:8,LUCKY:0};S.pouch=24;step(5);W4wilds=F.wilds();const before=S.party.length+S.box.length,shB=S.shown||0;
   const wd=W4wilds[0];W4wilds.splice(1);wd.sp='FERNFANG';wd.lv=3;wd.t=99;wd.tx=wd.x;wd.ty=wd.y;F.setPos(wd.x,wd.y+30);f2.dir=[0,-1];for(const q of f2.sq){q.x=F.pos().x;q.y=F.pos().y+6;q.st='follow'}step(4);
   for(const sp of f2.spots)sp.got=true;for(const n of F.nodes())n.got=true;step(2);for(let i=0;i<5;i++){tap('a');step(6)}step(60);G.draw();
   ok('thrown sprouts latch on to the wild',(wd.lat||[]).length>=3||!!wd.cap,(wd.lat||[]).length+' st='+F.state()+' spot='+!!f2.spot+' dlg='+!!f2.dlg+' inW='+F.wilds().includes(wd)+' d='+Math.round(Math.hypot(wd.x-F.pos().x,wd.y-F.pos().y))+' aim='+f2.aimLab+' sq='+f2.sq.map(q=>q.st).join(','));
   for(let i=0;i<200&&F.state()==='g4world';i++)step(1);for(let i=0;i<8&&F.state()!=='g4world';i++){tap('a');step(4)}
   ok('it is caught in the open field, or turns to fight',S.party.length+S.box.length===before+1||F.state()==='g4battle'||(F.bt&&F.bt()),S.party.length+S.box.length-before);
+  ok('a catch in the open counts as LIGHT SHOWN',S.party.length+S.box.length===before||(S.shown||0)===shB+1,(S.shown||0)-shB);
   if(F.state()==='g4battle'){for(let n=0;n<300&&F.state()==='g4battle';n++){const bt=F.bt();if(bt.foe)bt.foe.hp=Math.min(bt.foe.hp,1);S.party[0].hp=200;tap('a');step(3)}}
   S.party=S.party.slice(0,1)}
  /* every sector builds and draws */
@@ -169,7 +173,8 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   F.build('datacenter',6,12);ok('a Data Center makes room',!F.buddyFull());F.noCap(true)}
  /* v7.9: bugs */
  {F.noBugs(false);S.buds.ZIP=3;S.buds.DEW=3;F.travel('MEADOW','BASE');S.bugs={};S.bugSeen={};for(let i=0;i<40*30&&F.bugs().length<2;i++)step(1);const bs=F.bugs();ok('bugs live in the Meadow',bs.length>=1,bs.length);
-  if(bs.length){const bg=bs[0],f4=F.fld();F.wilds().length=0; /* v8.1: a wild buddy beside the bug can take the aim; this check is about bugs */bg.hx=bg.x;bg.hy=bg.y;F.setPos(bg.x,bg.y+20);f4.dir=[0,-1];f4.arrive=null;for(const s of f4.sq){s.st='follow';s.x=F.pos().x;s.y=F.pos().y+6}step(4);
+  if(bs.length){const bg=bs[0],f4=F.fld();F.wilds().length=0;f4.items=f4.items.filter(it=>Math.hypot(it.x-bg.x,it.y-bg.y)>90); /* v9.3: a loose item by the bug takes the aim too */ /* v8.1: a wild buddy beside the bug can take the aim; this check is about bugs */bg.hx=bg.x;bg.hy=bg.y;F.setPos(bg.x,bg.y+20);f4.dir=[0,-1];f4.arrive=null;for(const s of f4.sq){s.st='follow';s.x=F.pos().x;s.y=F.pos().y+6}step(4);
+   for(let k=0;k<8&&!(F.near()&&F.near().k==='bug');k++){F.setPos(bg.x,bg.y+20);f4.dir=[0,-1];step(1)} /* v9.2: a flying bug drifts; re-aim before the throw */
    const nr=JSON.stringify(F.near()),b0=JSON.stringify({x:Math.round(bg.x),y:Math.round(bg.y),sp:bg.sp}),me=JSON.stringify(F.pos());tap('a');step(3);const lab=nr+' '+b0+' me'+me+' sq:'+f4.sq.map(s=>s.st+(s.aim?s.aim.kind:'')).join(',');step(57);ok('a sprout thrown at a bug catches it',Object.values(S.bugs).reduce((a,v)=>a+v,0)>=1,lab+' / '+JSON.stringify(S.bugs))}
   F.noBugs(true)}
  /* v7.8: Louie, the Sprouts way */
@@ -181,7 +186,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  {F.travel('BASE','MEADOW');step(5);const nd=F.nodes().find(n=>n.k==='tree');nd.got=true;nd.rg=0;F.setPos(60,460);for(let i=0;i<62*30&&nd.got;i++)step(1);ok('a felled tree at Sunkeep grows back',!nd.got&&nd.hp===nd.max,nd.got)}
  /* v7.5: SELECT picks a fight with a wild you could catch */
  {F.travel('MEADOW','BASE');step(5);const f3=F.fld();if(!F.wilds().length)F.forceWild&&F.forceWild();const wd=F.wilds()[0];
-  if(wd){wd.lv=2;wd.tx=wd.x;wd.ty=wd.y;wd.t=99;F.setPos(wd.x,wd.y+20);f3.dir=[0,-1];f3.arrive=null;step(2);tap('sel');step(40);ok('SELECT next to a wild starts a battle',F.state()==='g4battle'||F.state()==='g4engage',F.state());
+  if(wd){wd.lv=2;wd.tx=wd.x;wd.ty=wd.y;wd.t=99;f3.items=f3.items.filter(it=>Math.hypot(it.x-wd.x,it.y-wd.y)>90);for(const n of F.nodes())if(Math.hypot(n.x-wd.x,n.y-wd.y)<60)n.got=true;F.wilds().splice(0,F.wilds().length,wd); /* v9.3: nothing else near to take the aim */F.setPos(wd.x,wd.y+20);f3.dir=[0,-1];f3.arrive=null;step(2);tap('sel');step(40);ok('SELECT next to a wild starts a battle',F.state()==='g4battle'||F.state()==='g4engage',F.state());
    for(let i=0;i<300&&F.state()!=='g4world';i++){tap('b');tap('a');step(2)}}else ok('SELECT next to a wild starts a battle',false,'no wild')}
  /* v7.2: starters grow up */
  {const sp=F.species(),has=id=>sp.some(x=>x.id===id&&x.starter&&x._spr);ok('each starter has an evolved form',has('CUYAFLARE')&&has('BESSIE')&&has('MOSSMAN'));

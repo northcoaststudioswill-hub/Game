@@ -50,7 +50,7 @@ function pfLatch(F,s,wd){wd.lat=wd.lat||[];if(!wd.lat.includes(s))wd.lat.push(s)
 function pfWildTick(F,dt){for(const wd of W4.wilds.slice()){
  if(wd.cap){wd.cap.t+=dt;const t=wd.cap.t;
   if(t>=2.3){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;for(const s of wd.lat||[]){s.st='ret';s.tg=null}
-   if(wd.cap.ok){const m=wMakeMon(wd.sp,wd.lv);SW.seen[wd.sp]=1;SW.caught[wd.sp]=1;if(SW.party.length<3)SW.party.push(m);else SW.box.push(m);
+   if(wd.cap.ok){wShowLight();const m=wMakeMon(wd.sp,wd.lv);SW.seen[wd.sp]=1;SW.caught[wd.sp]=1;if(SW.party.length<3)SW.party.push(m);else SW.box.push(m);
     if(SW.quest===2){SW.quest=3}swSave();wCineMon(wd.sp,SW.party.includes(m)?'It bloomed right there in the grass and walks with you now.':'It bloomed in the grass. It is waiting at Sunkeep.')}
    else{for(const s of wd.lat||[])s.z=10;swSnd(200,.12,120);wEngage(wd.sp+' BROKE FREE!',()=>wStartWildAt(wd.sp,wd.lv))}}
   continue}

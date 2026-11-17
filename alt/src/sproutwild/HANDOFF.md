@@ -25,7 +25,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
   (order listed in `SPROUTWILD=[...]`; later files override earlier functions by redeclaring them;
   `const` names must be unique). Output: `alt/games/pocket-lantern-alt.html` (~14.5 MB, limit 16).
 - `python3 alt/build.py` then `node alt/tests/sproutwild/field-lab.js alt/games/pocket-lantern-alt.html`
-  (120 checks; lab turns off scenes, the buddy cap, bugs and Louie's digging so results are steady).
+  (123 checks; lab turns off scenes, the buddy cap, bugs and Louie's digging so results are steady).
 - Test hooks: `window.__g.SWF()` (state, meta, enter, travel, setPos, pos, near, fld, bf, wilds,
   bugs, plots, cast, walk, lst, scene, noScenes, noCap, noBugs, ...).
 - Real-time playtests: Playwright scripts in the session scratchpad (`play31.js` = title to first
@@ -146,6 +146,9 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
 - v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
   "FOUND ONE!" bubble stays on screen.
+- v9.3: 12-scene intro (scenes 6-9 new in swDrawIntro), LIGHT SHOWN counter (SW.shown, wShowLight in sw-light.js;
+  the King needs WSHOWN=20 plus 4 Sigils; rings at 10/20/30 carry the old Erin/Marcus perks), soft field edges in fBake,
+  scrolling goal bar.
 - v9.2: story bible doc (https://claude.ai/artifact/A3MMHmbJHANhn1Z9WmbFq6) and round 1 of its fix list: Erin keeps to
   dirt paths (cost-based route), starters spread out, map edges scroll clear of the HUD, grid pause menu (sw-menu.js),
   keeper only (no Erin/Marcus switching), real-world names out (GRASSMAN is MOSSMAN), Data Center building is the Buddy Barn.

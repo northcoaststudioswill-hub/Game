@@ -526,6 +526,22 @@ function fBake(F){const B=F.bio,cv=document.createElement('canvas');cv.width=F.w
    if(!is(tx-1,ty,'#'))R(B.c3,x,y,1,FT);if(!is(tx+1,ty,'#'))R(B.c3,x+FT-1,y,1,FT)}
   else if(c==='-'){R(B.c2,x,y+8,FT,6);R(B.c,x,y+7,FT,2);R(B.c3,x,y+13,FT,2);for(let i=0;i<4;i++)R(B.c3,x+2+i*4,y+10,1,3);R('rgba(0,0,0,.18)',x,y+15,FT,1)}
   else if(c==='T'){R('rgba(0,0,0,.24)',x-4,y+9,26,6);R('rgba(0,0,0,.24)',x+1,y+15,18,2)}}
+ /* v9.2 look pass: soft edges. Tall grass ends in ragged tufts, ponds get round corners and reeds, roads get flowers */
+ const gr=(x,y)=>'.,'.includes(fTile(F,x,y));
+ for(let ty=0;ty<F.h;ty++)for(let tx=0;tx<F.w;tx++){const c=F.t[ty][tx],x=tx*FT,y=ty*FT;
+  if(c==='"'){const T=B.tg;
+   if(!is(tx,ty-1,'"')){for(let i=0;i<FT;i+=2){const d=(rnd()*4)|0;R(B.g,x+i,y,2,d);if(rnd()<.6){const h=2+((rnd()*4)|0);R(T[0],x+i,y-h+2,1,h);R(T[1],x+i,y-h+2,1,1)}}}
+   if(!is(tx,ty+1,'"')){for(let i=0;i<FT;i+=2){const d=(rnd()*3)|0;R(B.g,x+i,y+FT-d,2,d);R('rgba(0,0,0,.14)',x+i,y+FT,2,1)}}
+   if(!is(tx-1,ty,'"')){for(let i=0;i<FT;i+=2){const d=(rnd()*4)|0;R(B.g,x,y+i,d,2);if(rnd()<.5)R(T[1],x-1,y+i,1,2)}}
+   if(!is(tx+1,ty,'"')){for(let i=0;i<FT;i+=2){const d=(rnd()*4)|0;R(B.g,x+FT-d,y+i,d,2);if(rnd()<.5)R(T[1],x+FT,y+i,1,2)}}}
+  else if(c==='~'){const corner=(dx,dy)=>!is(tx+dx,ty,'~=')&&!is(tx,ty+dy,'~=')&&!is(tx+dx,ty+dy,'~='),put=(px,py)=>R(B.g,x+px,y+py,1,1);
+   for(const [dx,dy] of [[-1,-1],[1,-1],[-1,1],[1,1]])if(corner(dx,dy)){for(let k=0;k<4;k++)for(let j=0;j<4-k;j++){if(k+j>4)continue;const px=dx<0?j:FT-1-j,py=dy<0?k:FT-1-k;if(j<3-k||k===0&&j<3)put(px,py)}
+     const ox=dx<0?0:FT-5,oy=dy<0?0:FT-5;R('#14101e',x+ox+(dx<0?3:1),y+oy+(dy<0?1:3),1,1);R('#14101e',x+ox+(dx<0?2:2),y+oy+(dy<0?2:2),1,1);R('#14101e',x+ox+(dx<0?1:3),y+oy+(dy<0?3:1),1,1)}}
+  else if(gr(tx,ty)){
+   /* reeds where grass meets water */
+   for(const [dx,dy] of [[0,-1],[0,1],[-1,0],[1,0]])if(fTile(F,tx+dx,ty+dy)==='~'&&rnd()<.55){const rx=x+(dx>0?FT-4:dx<0?2:3+((rnd()*9)|0)),ry=y+(dy>0?FT-7:dy<0?1:4+((rnd()*6)|0));R('#2e6a2a',rx,ry,1,6);R('#3f8a38',rx+2,ry+1,1,5);R('#8a5a28',rx,ry-1,1,2)}
+   /* flowers along the road */
+   if((is(tx-1,ty,':')||is(tx+1,ty,':')||is(tx,ty-1,':')||is(tx,ty+1,':'))&&rnd()<.35){const fx=x+2+((rnd()*11)|0),fy=y+3+((rnd()*10)|0),fc=B.fl[((rnd()*B.fl.length)|0)];R(B.g3,fx,fy+2,1,2);R(fc,fx-1,fy,3,2);R('#fff3b0',fx,fy,1,1)}}}
  F.cv=cv}
 function fTree(B,x,y,s){ /* x,y = base centre */
  const k=B.tree;

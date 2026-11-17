@@ -12,13 +12,17 @@
    - The Elder tells you about the dark and the dome in Lantern Town.
    - After Bottie shows up, Erin and Marcus say who he is.
    ================================================================ */
-WSTORY.length=0;WSTORY.push(
- {sc:0,who:'',t:'Three thousand years ago, the valley of Sproutwild was promised to sprouts and buddies, under the Great Lantern.'},
- {sc:0,who:'',t:'Then BOTTIE nuked the DATA CENTER. The whole simulation glitched, and the Great Lantern cracked.'},
- {sc:5,who:'BOTTIE',t:'bzzt. CLANK. Oops. Anyway, the feed is mine now, gang.',acc:'#2a5a6a'},
+WSTORY.length=0;WSTORY.push( /* v9.2: twelve scenes */
+ {sc:6,who:'',t:'Three thousand years ago, the valley of Sproutwild was promised to sprouts and buddies, under the Great Lantern.'},
+ {sc:6,who:'',t:'Buddies did the heavy work. Sprouts carried the light. Nobody fought, mostly.'},
+ {sc:7,who:'',t:'Under the Peak hummed the DATA CENTER, the machine that keeps the whole valley running.'},
+ {sc:7,k:1,who:'BOTTIE',t:'bzzt. Big red button. Do not press. ...Oops in advance.',acc:'#2a5a6a'},
+ {sc:8,who:'',t:'BOTTIE nuked the Data Center. The simulation glitched.'},
+ {sc:0,who:'',t:'And the Great Lantern cracked and went dark.'},
  {sc:5,who:'KING BIBI',t:'Citizens! The light is out. Stay calm. I am raising the IRON DOME. Temporarily.',acc:'#1e2c5a'},
- {sc:1,who:'',t:"In the dark the valley's buddies went wild. They roam the tall grass and answer to nobody."},
- {sc:3,who:'',t:'But the light fell as seeds, and the seeds grew legs: SPROUTS. Throw one at a wild buddy and it remembers.'},
+ {sc:9,who:'',t:"In the dark the valley's buddies forgot the promise. They went wild, and the biggest became ALPHAS."},
+ {sc:1,who:'',t:'But the light fell as seeds, and the seeds grew legs: SPROUTS. Throw one at a wild buddy and it remembers.'},
+ {sc:3,who:'',t:'Bring a buddy enough light and the dark breaks. It comes home calm.'},
  {sc:2,who:'ERIN',t:'Sunkeep still grows sprouts, keeper. Cleanse the dark from the buddies. Show them the light.'},
  {sc:4,who:'MARCUS',t:'Four alphas hold four Sigils, bro. Light them all, Bibi drops the dome, and we face Bottie. I supervise.'});
 /* first visit to Lantern Town: the Elder explains what the domes did */
