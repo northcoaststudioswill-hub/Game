@@ -13,6 +13,8 @@ ORDER = [
     'story.js',      # intro, chapters, goals, dialogue, journal
     'rooms.js',      # level data
     'input.js',      # keyboard, gamepad, touch
+    'sfx.js',        # synthesized sound effects
+    'save.js',       # 3 save slots
     'physics.js',    # tile collision
     'fx.js',         # particles, hit-stop, shake
     'player.js',     # Wren
@@ -22,6 +24,7 @@ ORDER = [
     'draw.js',       # world drawing
     'game.js',       # loop, camera, checkpoints
     'hud.js',        # HTML HUD and menus
+    'front.js',      # boot splashes, title, main menu, settings
 ]
 
 def main():

@@ -44,8 +44,13 @@
       queue[a] = 0;
     }
   };
-  input.clear = function () {
-    for (const a of ACTIONS) { queue[a] = 0; src.kb[a] = src.touch[a] = src.pad[a] = false; input.held[a] = input.pressed[a] = false; }
+  // Drop pending presses (e.g. when a menu opens). Buttons still physically held stay held, so holding a button
+  // doesn't count as a new press. `full` (window lost focus) also forgets held keys and touches.
+  input.clear = function (full) {
+    for (const a of ACTIONS) {
+      queue[a] = 0; input.pressed[a] = false;
+      if (full) { src.kb[a] = src.touch[a] = src.pad[a] = false; input.held[a] = false; }
+    }
   };
   // For menus: did this action get pressed (consumes it).
   input.take = function (a) { if (queue[a] > 0) { queue[a] = 0; return true; } return false; };
@@ -55,12 +60,13 @@
     const a = KEYS[e.code];
     if (!a) return;
     e.preventDefault();
+    if (SH.sfx) SH.sfx.unlock();
     setSource('kb');
     if (!e.repeat) down('kb', a);
     if (input.onAnyPress) input.onAnyPress(a);
   });
   window.addEventListener('keyup', e => { const a = KEYS[e.code]; if (a) { e.preventDefault(); up('kb', a); } });
-  window.addEventListener('blur', () => input.clear());
+  window.addEventListener('blur', () => input.clear(true));
 
   // A Bluetooth or USB controller announces itself once any of its buttons is pressed.
   window.addEventListener('gamepadconnected', e => { input.source = 'pad'; if (input.onSourceChange) input.onSourceChange('pad'); if (input.onPad) input.onPad(e.gamepad.id); });
@@ -83,7 +89,7 @@
       if (want[a] && !src.pad[a]) { down('pad', a); any = true; if (input.onAnyPress) input.onAnyPress(a); }
       else if (!want[a] && src.pad[a]) up('pad', a);
     }
-    if (any) setSource('pad');
+    if (any) { setSource('pad'); if (SH.sfx) SH.sfx.unlock(); }
   };
 
   // ---- touch: floating stick on the left half, buttons on the right
@@ -100,6 +106,7 @@
       U ? down('touch', 'up') : up('touch', 'up');
     }
     layer.addEventListener('pointerdown', e => {
+      if (SH.sfx) SH.sfx.unlock();
       if (e.pointerType === 'mouse') return;
       setSource('touch');
       const btn = e.target.closest('[data-act]');

@@ -8,14 +8,51 @@
   };
   SH.store = store;
   SH.tune = Object.assign({}, SH.TUNE_DEFAULTS, store.get('starhaven.tune.v1', {}));
+  SH.settings = Object.assign({ autoDown: true, sfx: 70, textSpeed: 'normal', shake: true }, store.get('starhaven.settings.v1', {}));
 
   const G = SH.game = {
-    state: 'title', world: null, frozen: false,
+    state: 'front', world: null, frozen: false, slot: null,
     chapter: 0, flags: {}, activeGoal: null, script: null,
-    progress: Object.assign({ reached: 0, bonds: {}, met: [] }, store.get('starhaven.save.v1', {})),
+    progress: { reached: 0, bonds: {}, met: [], playFrames: 0 },
     heartQueue: [],
   };
-  G.save = function () { store.set('starhaven.save.v1', G.progress); };
+  // Saves go to the current slot (none in chapter select). `where` overrides the resume point after a chapter ends.
+  G.save = function (show) {
+    if (G.slot == null) return;
+    const pr = G.progress;
+    SH.saves.write(G.slot, {
+      chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0,
+    });
+    if (show) G.hud.saved();
+  };
+  G.newGame = function (slot) {
+    G.slot = slot == null ? null : slot;
+    G.progress = { reached: 0, bonds: {}, met: [], playFrames: 0 };
+    G.startChapter(0);
+  };
+  G.playChapter = function (i) {   // chapter select: no saving
+    G.slot = null;
+    G.progress = { reached: i, bonds: {}, met: [], playFrames: 0 };
+    G.startChapter(i);
+  };
+  G.loadSlot = function (slot) {
+    const s = SH.saves.all()[slot];
+    if (!s) return G.newGame(slot);
+    G.slot = slot;
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0 };
+    const N = ST.CHAPTERS.length, target = s.chapter;
+    const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
+    if (s.pending) {           // quit during an evening: play it again, then go on
+      G.chapter = Math.max(0, Math.min(N - 1, target - 1));
+      G.flags = {}; G.activeGoal = null; G.script = null; G.pending = null; fx.reset();
+      G.build(ST.CHAPTERS[G.chapter].room);
+      G.resumeAt = target; G.pending2 = s.pending;
+      G.afterScript = () => { G.resumeAt = null; G.pending2 = null; goOn(); };
+      G.runScript(s.pending);
+    } else if (target >= N) { G.chapter = N - 1; G.build(ST.CHAPTERS[N - 1].room); G.state = 'end'; G.hud.end(true); }
+    else goOn();
+  };
 
   // What Wren can do in this chapter. Mortal in the Winter Woods: one jump, no dash, a bow instead of daggers.
   const ABILITIES = { double: true, dash: true, daggers: true, bow: false };
@@ -52,7 +89,7 @@
       onKnockout() { G.knockout(); },
       arrows: [],
       spawnArrow(x, y, dir) { this.arrows.push({ x, y, vx: dir * 8, vy: -0.5, life: 110, stuck: false }); },
-      onStagDown() { G.queueScript('woods_kill'); },
+      onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
@@ -79,6 +116,7 @@
   // ---------------------------------------------------------------- chapters
   G.startChapter = function (i) {
     G.chapter = i;
+    G.resumeAt = null; G.pending2 = null;
     G.flags = {}; G.activeGoal = null; G.script = null; G.pending = null;
     fx.reset();
     const ch = G.chapterDef();
@@ -88,15 +126,17 @@
       G.state = 'play'; input.clear(); G.hud.goal();
     });
     G.hud.goal();
+    G.save(true);
   };
 
   G.completeChapter = function () {
     const ch = G.chapterDef(), next = G.chapter + 1;
     G.progress.reached = Math.max(G.progress.reached, next);
-    G.save();
+    G.resumeAt = next; G.pending2 = ch.after || null;
+    G.save(true);
     G.state = 'card';
     // After the card: the chapter's evening (if it has one), then the next chapter, or the finale.
-    const cont = () => { if (next < ST.CHAPTERS.length) G.startChapter(next); else G.runScript('finale'); };
+    const cont = () => { G.pending2 = null; G.save(); if (next < ST.CHAPTERS.length) G.startChapter(next); else G.runScript('finale'); };
     G.hud.card({ label: ch.label + ' complete', name: ch.name, text: ch.done, goals: null, button: 'Continue' }, () => {
       if (ch.after) { G.afterScript = cont; G.runScript(ch.after); } else cont();
     });
@@ -169,12 +209,12 @@
     switch (st.do) {
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); break;
-      case 'wyrm': w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
+      case 'wyrm': SH.sfx.play('rumble'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
       case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
       case 'meet': G.meet(st.who); break;
       case 'bond': G.bond(st.who, st.pts); break;
       case 'art': G.hud.sceneArt(st.id, st.title); break;
-      case 'cue': G.hud.sceneCue(st.name); break;
+      case 'cue': G.hud.sceneCue(st.name); if (st.name === 'door' || st.name === 'end') SH.sfx.play('thud'); if (st.name === 'rise' || st.name === 'caelum') SH.sfx.play('chime'); break;
       case 'goto': { const sc = G.script; sc.steps = sc.steps.slice(0, sc.i).concat(ST.SCRIPTS[st.id], sc.steps.slice(sc.i)); break; }
       case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
@@ -211,6 +251,7 @@
     if (after > before) {
       G.hud.toast(`\u2665 ${name}: heart ${after} of 5`);
       G.heartQueue.push(`heart_${who}_${after}`);
+      SH.sfx.play('heart');
     } else G.hud.toast(liked ? `${name} loved that.` : `${name} will remember that.`);
     G.save();
   };
@@ -232,6 +273,7 @@
   G.step = function () {
     const w = G.world, p = w.player;
     input.step();
+    if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
     if (G.state === 'talk') { G.talkStep(); fx.update(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -282,7 +324,7 @@
     for (const l of w.lanterns) {
       const at = Math.abs(p.x - l.px) < 22 && Math.abs(p.y - l.py) < 30;
       if (at && !l.lit) {
-        l.lit = true; p.hearts = p.maxHearts;
+        l.lit = true; p.hearts = p.maxHearts; SH.sfx.play('lantern');
         fx.ring(l.px, l.py - 46, '#ffd27a', 50, 26, 2);
         fx.burst(l.px, l.py - 46, 16, { speed: 2, life: 30, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
         G.hud.toast('Lantern lit: hearts restored. You come back here if knocked out.');
@@ -339,11 +381,13 @@
     if (!w.muralNear || !input.held.up) return false;
     p.vx = 0; p.swing = null;
     w.muralProgress = Math.min(1, w.muralProgress + 1 / m.frames);
+    if (w.time % 6 === 0) SH.sfx.play('paint');
     if (w.time % 4 === 0) fx.burst(m.x * TS + m.w * TS * w.muralProgress, 16 * TS - 40 - Math.random() * 60, 2, { speed: 1, life: 20, colors: ['#ffd27a', '#ff9a7a', '#8a6aff', '#4ad8c8'], glow: true });
     if (w.muralProgress >= 1) {
       G.flags[m.flag] = true;
       G.flags.mural = true;
       w.cityLightTarget = 1;
+      SH.sfx.play('mural');
       fx.ring(cx, 16 * TS - 54, '#ffd27a', 90, 40, 3);
       fx.burst(cx, 16 * TS - 54, 40, { speed: 3, life: 50, gravity: -0.02, colors: ['#ffd27a', '#fff6d8', '#ff9a7a', '#8a6aff'], glow: true });
       G.hud.toast('The first mural is finished. The street wakes up.');
@@ -354,6 +398,7 @@
 
   G.talkStep = function () {
     if (G.talkWait > 0) { G.talkWait--; return; }
+    if (G.hud.typing()) { if (input.pressed.jump || input.pressed.attack || input.pressed.up || input.pressed.dash) G.hud.finishTyping(); return; }
     if (G.choosing) {
       if (input.pressed.up) G.hud.choiceMove(-1);
       else if (input.pressed.down) G.hud.choiceMove(1);
@@ -411,7 +456,7 @@
     if (w.koT > 72) { w.koT = 0; w.fade = 0; }
   };
 
-  G.pause = function () { if (G.state !== 'play') return; G.state = 'pause'; input.clear(); G.hud.menu(true); };
+  G.pause = function () { if (G.state !== 'play') return; G.state = 'pause'; input.clear(); G.hud.navReset(); G.hud.menu(true); G.hud.nav('menu', 0); };
   G.resume = function () { G.state = 'play'; input.clear(); G.hud.menu(false); G.hud.tune(false); G.hud.journal(false); };
 
   // ---------------------------------------------------------------- loop
@@ -442,15 +487,15 @@
   // Menus can be driven by keyboard and gamepad as well as taps.
   G.menuInput = function () {
     const go = () => input.take('jump') || input.take('attack');
-    if (G.state === 'title') { if (go()) G.hud.titlePrimary(); }
+    if (G.state === 'front') SH.front.menuInput(input);
     else if (G.state === 'card') { if (go()) G.hud.cardGo(); }
-    else if (G.state === 'pause') { if (input.take('pause')) G.resume(); }
-  };
-
-  G.newGame = function () {
-    G.progress = { reached: 0, bonds: {}, met: [] }; G.save();
-    G.hud.title(false);
-    G.startChapter(0);
+    else if (G.state === 'pause' || G.state === 'end') {
+      const id = G.state === 'end' ? 'end' : ['journal', 'tune'].find(x => document.getElementById(x).classList.contains('show')) || 'menu';
+      if (input.take('up')) G.hud.nav(id, -1);
+      else if (input.take('down')) G.hud.nav(id, 1);
+      else if (input.take('jump') || input.take('attack')) G.hud.nav(id, 0, true);
+      else if (G.state === 'pause' && (input.take('pause') || input.take('dash'))) { SH.sfx.play('back'); G.resume(); }
+    }
   };
 
   // ---------------------------------------------------------------- screen size
@@ -473,7 +518,7 @@
     load(chapterOrRoom, opts) {
       opts = opts || {};
       G.frozen = true; input.forced = { held: {}, pressed: {} };
-      G.hud.title(false);
+      document.getElementById('front').classList.remove('show'); G.slot = null;
       if (typeof chapterOrRoom === 'number') { G.startChapter(chapterOrRoom); G.hud.cardGo(); }
       else {
         const ci = ST.CHAPTERS.findIndex(c => c.room === chapterOrRoom);

@@ -24,8 +24,18 @@ const fs = require('fs');
 
   // A landscape phone (the main target), touch controls on.
   const phone = await open({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1 });
-  await snap(phone, '01-title.png');
-  await phone.click('#t-new'); await phone.waitForTimeout(300);
+  await snap(phone, '00a-splash-ncs.png');
+  await phone.waitForTimeout(2700);
+  await snap(phone, '00b-splash-econ.png');
+  await phone.tap('#front'); await phone.waitForTimeout(200);
+  await snap(phone, '01-press-start.png');
+  await phone.tap('#front'); await phone.waitForTimeout(200);
+  await snap(phone, '01b-main-menu.png');
+  await phone.evaluate(() => SH.front.slots('new')); await phone.waitForTimeout(100);
+  await snap(phone, '01c-slots.png');
+  await phone.evaluate(() => SH.front.settings(SH.front.main)); await phone.waitForTimeout(100);
+  await snap(phone, '01d-settings.png');
+  await phone.evaluate(() => SH.front.go(() => SH.game.newGame(0))); await phone.waitForTimeout(300);
   await snap(phone, '04-chapter-card.png');
   await phone.click('#c-go'); await phone.waitForTimeout(200);
   // first line of dialogue starts on the first frame of play

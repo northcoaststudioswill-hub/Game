@@ -54,11 +54,37 @@
     if (!who) { el.classList.remove('show'); return; }
     const c = ST.CAST[who], narr = who === 'narr';
     el.classList.toggle('narr', narr);
-    if (!narr) $('d-face').src = SH.art.portraitURL(who);
+    if (!narr) $('d-face').src = SH.art.portraitURL(who === 'wren' && SH.game.mortal ? 'wren_m' : who);
     $('d-name').textContent = c.name;
     $('d-name').style.color = c.color;
-    $('d-text').textContent = text;
     el.classList.add('show');
+    H.typeStart(text, narr);
+  };
+
+  // Lines type out letter by letter (Settings > Text speed). A tap or button press finishes the line first.
+  const SPEED = { slow: 0.6, normal: 1.4, fast: 3, instant: 1e9 };
+  let typed = 0, full = '', typingNarr = false, typeRAF = 0;
+  H.typeStart = function (text, narr) {
+    full = text; typed = 0; typingNarr = narr;
+    cancelAnimationFrame(typeRAF);
+    H.typeTick();
+  };
+  H.typeTick = function () {
+    const before = Math.floor(typed);
+    typed = Math.min(full.length, typed + (SPEED[SH.settings.textSpeed] || 1.4));
+    $('d-text').textContent = full.slice(0, Math.floor(typed));
+    if (!typingNarr && Math.floor(typed) > before && Math.floor(typed) % 3 === 0) SH.sfx.play('blip');
+    $('dialog').classList.toggle('typing', typed < full.length);
+    if (typed < full.length) typeRAF = requestAnimationFrame(H.typeTick);
+  };
+  H.typing = () => typed < full.length && $('dialog').classList.contains('show');
+  H.finishTyping = function () { typed = full.length; $('d-text').textContent = full; $('dialog').classList.remove('typing'); cancelAnimationFrame(typeRAF); SH.game.talkWait = 4; };
+
+  // A small "Saved" star in the corner when the game autosaves.
+  let savedT = 0;
+  H.saved = function () {
+    const el = $('saving'); el.classList.add('show'); SH.sfx.play('save');
+    clearTimeout(savedT); savedT = setTimeout(() => el.classList.remove('show'), 1600);
   };
 
   // ---------------- choices (under the last line of dialogue)
@@ -136,20 +162,19 @@
     $('b-attack').textContent = G.can('daggers') ? 'STRIKE' : 'SHOOT';
   };
 
-  // ---------------- title
-  H.title = function (show) { $('title').classList.toggle('show', show); if (show) H.titleButtons(); };
-  H.titleButtons = function () {
-    const G = SH.game, r = G.progress.reached, n = ST.CHAPTERS.length;
-    const cont = $('t-continue');
-    cont.style.display = r > 0 && r < n ? '' : 'none';
-    if (r > 0 && r < n) cont.textContent = `Continue: ${ST.CHAPTERS[r].label}, ${ST.CHAPTERS[r].name}`;
-    const list = $('t-chapters');
-    list.innerHTML = ST.CHAPTERS.map((c, i) => `<button class="btn small" data-ch="${i}">${esc(c.label)}: ${esc(c.name)}</button>`).join('');
+  // Controller navigation for the HTML screens (pause menu, journal, tune, end): D-pad to choose, A to press.
+  let navIdx = 0, navId = null;
+  H.navButtons = id => [...document.querySelectorAll('#' + id + ' button.btn')].filter(b => b.offsetParent !== null);
+  H.nav = function (id, d, press) {
+    const btns = H.navButtons(id);
+    if (!btns.length) return;
+    if (navId !== id) { navId = id; navIdx = 0; }
+    if (d) { navIdx = (navIdx + d + btns.length) % btns.length; SH.sfx.play('move'); }
+    btns.forEach((b, i) => b.classList.toggle('pad-sel', i === navIdx));
+    btns[navIdx].scrollIntoView({ block: 'nearest' });
+    if (press) { SH.sfx.play('select'); btns[navIdx].click(); navId = null; }
   };
-  H.titlePrimary = function () {
-    const G = SH.game, r = G.progress.reached;
-    if (r > 0 && r < ST.CHAPTERS.length) { H.title(false); G.startChapter(r); } else G.newGame();
-  };
+  H.navReset = () => { navId = null; document.querySelectorAll('.pad-sel').forEach(b => b.classList.remove('pad-sel')); };
 
   H.menu = function (show) { $('menu').classList.toggle('show', show); };
 
@@ -223,13 +248,10 @@
 
   H.bind = function () {
     const G = SH.game, on = (id, f) => $(id).addEventListener('click', f);
-    on('t-new', () => G.newGame());
-    on('t-continue', () => H.titlePrimary());
-    $('t-chapters').addEventListener('click', e => { const b = e.target.closest('[data-ch]'); if (b) { H.title(false); G.startChapter(+b.dataset.ch); } });
     on('c-go', () => H.cardGo());
     // In a conversation, a tap anywhere goes to the next line.
     document.addEventListener('pointerdown', e => {
-      if (G.state === 'talk' && G.talkWait <= 0 && !e.target.closest('button')) { e.preventDefault(); G.advance(); }
+      if (G.state === 'talk' && G.talkWait <= 0 && !e.target.closest('button')) { e.preventDefault(); if (H.typing()) H.finishTyping(); else G.advance(); }
     });
     on('pause-btn', () => G.state === 'pause' ? G.resume() : G.pause());
     on('m-resume', () => G.resume());
@@ -237,12 +259,12 @@
     on('m-tune', () => { H.menu(false); H.tune(true); });
     on('m-restart', () => { H.menu(false); G.startChapter(G.chapter); });
     on('m-controls', () => $('controls').classList.toggle('show'));
-    on('m-title', () => { H.menu(false); G.state = 'title'; H.title(true); });
+    on('m-title', () => { H.menu(false); SH.front.toTitle(); });
     const fs = $('m-fullscreen');
     if (document.documentElement.requestFullscreen) fs.addEventListener('click', () => { document.documentElement.requestFullscreen().catch(() => { }); G.resume(); });
     else fs.style.display = 'none';
     on('j-back', () => G.resume());
-    on('t-back', () => G.resume());
+    on('t-back', () => { if (H.tuneBack) { const f = H.tuneBack; H.tuneBack = null; H.tune(false); f(); } else G.resume(); });
     on('t-reset', () => { SH.tune = Object.assign({}, SH.TUNE_DEFAULTS); H.saveTune(); H.buildTune(); });
     on('t-copy', () => {
       const text = H.tuneText(), btn = $('t-copy');
@@ -251,13 +273,12 @@
         navigator.clipboard.writeText(text).then(() => { btn.textContent = 'Copied'; setTimeout(() => (btn.textContent = 'Copy numbers'), 1500); }, show);
       } catch (e) { show(); }
     });
-    on('e-again', () => { H.end(false); G.newGame(); });
-    on('e-home', () => { H.end(false); G.state = 'title'; H.title(true); });
+    on('e-again', () => { H.end(false); SH.front.toTitle(); SH.front.slots('new'); });
+    on('e-home', () => { H.end(false); SH.front.toTitle(); });
     SH.input.onSourceChange = src => { document.body.dataset.input = src; lastPrompt = null; };
     SH.input.onPad = () => H.toast('Controller connected: A jump, X strike, B dash, Y talk. Hold down + X in the air to strike down.');
     $('d-choices').addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (b) G.pick(+b.dataset.i); });
     document.body.dataset.input = SH.input.source;
-    H.titleButtons();
   };
 
   SH.game.hud = H;

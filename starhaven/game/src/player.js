@@ -63,6 +63,7 @@
       this.dashDir = dir !== 0 ? dir : this.facing;
       this.facing = this.dashDir;
       this.dashT = t.dashFrames;
+      SH.sfx.play('dash');
       this.iframes = t.dashIFrames;
       this.swing = null;
       this.vy = 0;
@@ -139,6 +140,7 @@
 
     if (this.grounded && !this.wasGrounded) {
       a.land = 8; a.squash = Math.min(1, fallSpeed / 9);
+      if (fallSpeed > 5) SH.sfx.play('land');
       if (fallSpeed > 3) fx.dust(this.x, this.y, 0, fallSpeed > 7 ? 8 : 4);
     }
     if (a.land > 0) a.land--;
@@ -174,6 +176,7 @@
     this.rising = true;
     this.coyote = 0; this.jumpBuf = 0; this.grounded = false;
     this.anim.squash = -0.6;
+    SH.sfx.play(isDouble ? 'djump' : 'jump');
     if (isDouble) {
       fx.ring(this.x, this.y - 4, '#bfe9ff', 20, 14, 2);
       fx.burst(this.x, this.y - 2, 8, { angle: Math.PI / 2, spread: 2.2, speed: 1.8, gravity: 0.02, life: 18, size: 2, colors: ['#e6f6ff', '#9fd8ff', '#ffe9a8'], glow: true });
@@ -187,6 +190,7 @@
         this.atkBuf = 0; this.bowCd = 30; this.bowT = 16; this.vx = 0;
         const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
         world.spawnArrow(this.x + this.facing * 12, this.y - 27, this.facing);
+        SH.sfx.play('bow');
       }
       return;
     }
@@ -210,6 +214,7 @@
     this.comboStep = step + 1;
     if (kind !== 'pogo') { const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d; }
     this.swing = { kind, step, def, f: 0, hits: new Set() };
+    SH.sfx.play('slash');
     if (def.lunge && this.grounded) this.vx = this.facing * Math.max(Math.abs(this.vx) * 0.5, def.lunge * 1.6);
   };
 
@@ -250,6 +255,7 @@
         const r = tgt.takeHit({ dmg: C.damage, kb: d.kb, dir: this.facing, finisher: !!d.finisher, pogo: s.kind === 'pogo' }, world);
         if (!r) continue;
         this.stats.hits++;
+        SH.sfx.play(r.killed ? 'kill' : 'hit');
         fx.stop(r.killed ? C.killStop : d.stop);
         fx.kick(r.killed ? 4 : d.finisher ? 3 : 1.6);
         if (s.kind === 'pogo') this.bounce();
@@ -273,6 +279,7 @@
     this.rising = false;
     this.airJumps = 1; this.airDashes = 1; this.dashCd = 0;
     this.stats.pogos++;
+    SH.sfx.play('pogo');
     SH.fx.ring(this.x, this.y + 12, '#ffe9a8', 26, 14, 2);
     if (this.swing) this.swing.bounced = true;
   };
@@ -284,6 +291,7 @@
     const fx = SH.fx;
     this.hearts = Math.max(0, this.hearts - dmg);
     this.stats.hurt++;
+    SH.sfx.play('hurt');
     this.invuln = SH.PLAYER.hurtInvuln;
     this.stun = SH.PLAYER.hurtStun;
     this.swing = null; this.dashT = 0;

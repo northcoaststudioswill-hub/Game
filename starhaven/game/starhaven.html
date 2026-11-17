@@ -114,14 +114,7 @@ body[data-input="touch"] #touch { display: block; }
 .btn.small { font-size: 15px; padding: 9px; margin-top: 6px; }
 @keyframes pulse { 50% { opacity: .45 } }
 
-#title { background: radial-gradient(ellipse at 50% 60%, rgba(40,30,70,.94), rgba(6,6,20,.98) 70%); flex-direction: column; text-align: center; gap: 0; padding: 12px; }
-#title h1 { font-family: var(--display); font-weight: 800; letter-spacing: .14em; font-size: clamp(36px, 10vh, 76px); margin: 0;
   color: #fff6d8; text-shadow: 0 0 24px rgba(255,210,122,.55); }
-#title .sub { font-family: var(--display); color: var(--gold); letter-spacing: .18em; font-size: 14px; margin: 2px 0 14px; }
-#title .menu { width: min(380px, 86vw); }
-#title details { margin-top: 8px; color: var(--ink-dim); font-size: 14px; }
-#title summary { cursor: pointer; padding: 6px; font-weight: 700; }
-#title .small { font-size: 12px; color: var(--ink-dim); margin-top: 10px; }
 
 
 #card .card { text-align: left; }
@@ -159,6 +152,69 @@ body[data-input="touch"] #touch { display: block; }
 #end p { font-size: 17px; line-height: 1.5; }
 #rotate { display: none; position: fixed; inset: 0; background: var(--night); align-items: center; justify-content: center; text-align: center; font-size: 22px; font-weight: 800; padding: 30px; z-index: 20; }
 @media (orientation: portrait) and (pointer: coarse) { #rotate { display: flex; } }
+
+/* Boot and menus */
+#front { position: fixed; inset: 0; z-index: 9; display: none; background: radial-gradient(ellipse at 50% 60%, rgba(40,30,70,.88), rgba(6,6,20,.97) 72%);
+  flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left)); }
+#front.show { display: flex; }
+#splash { display: none; position: absolute; inset: 0; z-index: 3; background: #04040a; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+#splash.show { display: flex; animation: splash 2.6s ease both; }
+#splash.econ.show { animation-duration: 2.2s; background: #050608; }
+@keyframes splash { 0% { opacity: 0 } 22% { opacity: 1 } 80% { opacity: 1 } 100% { opacity: 0 } }
+#splash .mark { width: min(150px, 26vh); }
+#splash .mark.e { width: min(110px, 22vh); }
+#splash .word { font-family: var(--display); font-weight: 800; letter-spacing: .3em; font-size: clamp(20px, 6vh, 34px); color: #fff6d8; margin-top: 6px; }
+#splash .word2 { font-family: var(--display); letter-spacing: .6em; font-size: clamp(12px, 3vh, 16px); color: #9fd0ff; }
+#splash.econ .word { background: linear-gradient(90deg, #4ad8c8, #9a6aff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+#f-logo { display: none; }
+#f-logo.show { display: block; }
+#f-logo h1 { font-family: var(--display); font-weight: 800; letter-spacing: .14em; font-size: clamp(34px, 11vh, 76px); margin: 0; color: #fff6d8; text-shadow: 0 0 24px rgba(255,210,122,.55); }
+#f-logo .sub { font-family: var(--display); color: var(--gold); letter-spacing: .18em; font-size: 14px; margin: 2px 0 10px; }
+#f-press { display: none; margin-top: 18px; font-weight: 800; color: var(--gold); font-size: 20px; letter-spacing: .06em; animation: pulse 1.6s infinite; }
+#f-press.show { display: flex; flex-direction: column; gap: 4px; }
+#f-press .pad-note { margin-top: 10px; font-size: 12px; opacity: .8; animation: none; }
+#f-press .small { font-size: 13px; color: var(--ink-dim); font-weight: 600; letter-spacing: 0; }
+#f-menu-wrap { display: none; width: min(460px, 92vw); max-height: calc(100vh - 150px); overflow: auto; }
+#f-menu-wrap.show { display: flex; flex-direction: column; }
+#f-menu-wrap.note-first #f-note { order: -1; margin: 0 0 10px; }
+#f-menu-wrap.note-first #f-title { order: -2; }
+#f-title { font-family: var(--display); color: var(--gold); letter-spacing: .1em; font-size: 20px; margin: 0 0 8px; }
+#f-title:empty { display: none; }
+#f-menu { display: flex; flex-direction: column; gap: 6px; }
+.fbtn { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 10px; text-align: left; padding: 9px 14px;
+  border-radius: 12px; border: 1px solid var(--panel-line); background: rgba(12,12,34,.82); color: var(--ink); font: 800 17px var(--body); cursor: pointer; }
+.fbtn .sub { flex-basis: 100%; font-weight: 600; font-size: 13px; color: var(--ink-dim); }
+.fbtn .val { color: var(--gold); font-size: 15px; }
+.fbtn.sel { border-color: var(--gold); background: rgba(255,210,122,.18); box-shadow: 0 0 16px rgba(255,210,122,.25); }
+.fbtn.sel .lbl::before { content: '\25B8  '; color: var(--gold); }
+.fbtn.off { opacity: .4; cursor: default; }
+.fbtn.danger .lbl { color: #ff9aa8; }
+#f-note { margin-top: 10px; font-size: 14px; color: var(--ink-dim); line-height: 1.45; }
+#f-note:empty { display: none; }
+.credits { color: var(--ink); font-size: 15px; }
+.credits .cmark { width: 70px; margin: 0 auto 4px; }
+.credits .dim { color: var(--ink-dim); }
+#f-help { position: absolute; bottom: max(8px, env(safe-area-inset-bottom)); right: max(14px, env(safe-area-inset-right)); display: flex; gap: 14px; font-size: 12px; color: var(--ink-dim); }
+#f-ver { position: absolute; top: 10px; right: max(14px, env(safe-area-inset-right)); font-size: 12px; color: var(--ink-dim); }
+.wm { position: absolute; left: max(14px, env(safe-area-inset-left)); bottom: max(8px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 8px;
+  font-family: var(--display); font-size: 11px; letter-spacing: .2em; color: rgba(255,246,216,.7); pointer-events: none; }
+.wm svg { width: 34px; }
+#saving { position: fixed; z-index: 10; right: max(14px, env(safe-area-inset-right)); bottom: max(10px, env(safe-area-inset-bottom)); padding: 6px 12px; border-radius: 999px;
+  background: var(--panel); border: 1px solid var(--panel-line); color: var(--gold); font-weight: 800; font-size: 13px; opacity: 0; transition: opacity .3s; pointer-events: none; }
+#saving.show { opacity: 1; }
+#dialog.typing #d-more { visibility: hidden; }
+.pause-wm { display: flex; justify-content: center; align-items: center; gap: 8px; font-family: var(--display); font-size: 10px; letter-spacing: .2em; color: var(--ink-dim); margin: -2px 0 6px; }
+.pause-wm svg { width: 26px; }
+.btn.pad-sel { outline: 2px solid var(--gold); outline-offset: 2px; box-shadow: 0 0 14px rgba(255,210,122,.35); }
+@media (max-height: 460px) {
+  #f-logo h1 { font-size: clamp(28px, 9vh, 40px); }
+  #f-logo .sub { font-size: 11px; margin-bottom: 6px; }
+  #f-menu { gap: 5px; }
+  .fbtn { padding: 6px 12px; font-size: 15px; }
+  .fbtn .sub { font-size: 12px; }
+  #f-title { font-size: 17px; margin-bottom: 6px; }
+  #f-menu-wrap { max-height: calc(100vh - 110px); }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -191,19 +247,23 @@ body[data-input="touch"] #touch { display: block; }
 
 <div id="scene"><canvas id="scene-art" width="960" height="450"></canvas><div id="scene-title"></div></div>
 
-<div class="screen show" id="title">
-  <h1>STARHAVEN</h1>
-  <div class="sub">A COURT OF DUSK AND STARLIGHT</div>
-  <div class="menu">
-    <button class="btn primary" id="t-continue" style="display:none">Continue</button>
-    <button class="btn" id="t-new">New game</button>
-    <details>
-      <summary>Chapters (all open in this concept build)</summary>
-      <div id="t-chapters"></div>
-    </details>
+<div id="front">
+  <div id="splash"></div>
+  <div id="f-logo">
+    <h1>STARHAVEN</h1>
+    <div class="sub">A COURT OF DUSK AND STARLIGHT</div>
   </div>
-  <div class="small">Concept build: the Prologue through Chapter 2. Placeholder art. Best on a phone held sideways.</div>
+  <div id="f-press">Press any button<span class="small">or tap the screen</span><span class="small pad-note">Controller not responding? Tap the screen once, or open the game in Safari or Chrome.</span></div>
+  <div id="f-menu-wrap">
+    <div id="f-title"></div>
+    <div id="f-menu" role="menu"></div>
+    <div id="f-note"></div>
+  </div>
+  <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
+  <div id="wm" class="wm"></div>
+  <div id="f-ver">Concept build &middot; Prologue to Chapter 2</div>
 </div>
+<div id="saving">&#10022; Saved</div>
 
 <div class="screen" id="card">
   <div class="card">
@@ -218,13 +278,14 @@ body[data-input="touch"] #touch { display: block; }
 <div class="screen" id="menu">
   <div class="card">
     <h2>Paused</h2>
+    <div class="pause-wm"></div>
     <button class="btn primary" id="m-resume">Resume</button>
     <button class="btn" id="m-journal">Story &amp; goals</button>
     <button class="btn" id="m-tune">Tune the feel</button>
     <button class="btn" id="m-restart">Restart this chapter</button>
     <button class="btn" id="m-controls">Controls</button>
     <button class="btn" id="m-fullscreen">Fullscreen</button>
-    <button class="btn" id="m-title">Title screen</button>
+    <button class="btn" id="m-title">Quit to title (restarts this chapter)</button>
     <div id="controls">
       <p><b>Keyboard:</b> A/D or arrows move, Space jump, J strike, Shift dash, W talk or paint, S + J in the air strikes down, Esc menu.
          (Z / X / C also jump / strike / dash.)</p>
@@ -1186,8 +1247,13 @@ body[data-input="touch"] #touch { display: block; }
       queue[a] = 0;
     }
   };
-  input.clear = function () {
-    for (const a of ACTIONS) { queue[a] = 0; src.kb[a] = src.touch[a] = src.pad[a] = false; input.held[a] = input.pressed[a] = false; }
+  // Drop pending presses (e.g. when a menu opens). Buttons still physically held stay held, so holding a button
+  // doesn't count as a new press. `full` (window lost focus) also forgets held keys and touches.
+  input.clear = function (full) {
+    for (const a of ACTIONS) {
+      queue[a] = 0; input.pressed[a] = false;
+      if (full) { src.kb[a] = src.touch[a] = src.pad[a] = false; input.held[a] = false; }
+    }
   };
   // For menus: did this action get pressed (consumes it).
   input.take = function (a) { if (queue[a] > 0) { queue[a] = 0; return true; } return false; };
@@ -1197,12 +1263,13 @@ body[data-input="touch"] #touch { display: block; }
     const a = KEYS[e.code];
     if (!a) return;
     e.preventDefault();
+    if (SH.sfx) SH.sfx.unlock();
     setSource('kb');
     if (!e.repeat) down('kb', a);
     if (input.onAnyPress) input.onAnyPress(a);
   });
   window.addEventListener('keyup', e => { const a = KEYS[e.code]; if (a) { e.preventDefault(); up('kb', a); } });
-  window.addEventListener('blur', () => input.clear());
+  window.addEventListener('blur', () => input.clear(true));
 
   // A Bluetooth or USB controller announces itself once any of its buttons is pressed.
   window.addEventListener('gamepadconnected', e => { input.source = 'pad'; if (input.onSourceChange) input.onSourceChange('pad'); if (input.onPad) input.onPad(e.gamepad.id); });
@@ -1225,7 +1292,7 @@ body[data-input="touch"] #touch { display: block; }
       if (want[a] && !src.pad[a]) { down('pad', a); any = true; if (input.onAnyPress) input.onAnyPress(a); }
       else if (!want[a] && src.pad[a]) up('pad', a);
     }
-    if (any) setSource('pad');
+    if (any) { setSource('pad'); if (SH.sfx) SH.sfx.unlock(); }
   };
 
   // ---- touch: floating stick on the left half, buttons on the right
@@ -1242,6 +1309,7 @@ body[data-input="touch"] #touch { display: block; }
       U ? down('touch', 'up') : up('touch', 'up');
     }
     layer.addEventListener('pointerdown', e => {
+      if (SH.sfx) SH.sfx.unlock();
       if (e.pointerType === 'mouse') return;
       setSource('touch');
       const btn = e.target.closest('[data-act]');
@@ -1294,6 +1362,123 @@ body[data-input="touch"] #touch { display: block; }
   };
 
   SH.input = input;
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/sfx.js
+// Starhaven — sound effects, synthesized with Web Audio (no files). Placeholder until real sounds and Will's music arrive.
+// Browsers only allow sound after the first tap, key or button press, so `unlock` is called on any input.
+(function (SH) {
+  const A = SH.sfx = {};
+  let ctx = null, master = null;
+
+  A.unlock = function () {
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      ctx = new AC(); master = ctx.createGain(); master.connect(ctx.destination);
+      A.volume();
+    } catch (e) { ctx = null; }
+  };
+  A.volume = function () { if (master) master.gain.value = (SH.settings.sfx != null ? SH.settings.sfx : 70) / 100 * 0.5; };
+
+  function tone(o) {
+    if (!ctx || !SH.settings.sfx) return;
+    const t = ctx.currentTime + (o.delay || 0);
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = o.type || 'square';
+    osc.frequency.setValueAtTime(o.f, t);
+    if (o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2, t + o.d);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(o.v || 0.3, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + o.d);
+    osc.connect(g); g.connect(master);
+    osc.start(t); osc.stop(t + o.d + 0.02);
+  }
+  function noise(o) {
+    if (!ctx || !SH.settings.sfx) return;
+    const t = ctx.currentTime + (o.delay || 0), len = Math.max(1, Math.floor(ctx.sampleRate * o.d));
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate), data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    src.buffer = buf; f.type = o.filter || 'lowpass'; f.frequency.value = o.freq || 2000;
+    g.gain.value = o.v || 0.3;
+    src.connect(f); f.connect(g); g.connect(master); src.start(t);
+  }
+
+  const S = {
+    jump: () => tone({ f: 300, f2: 520, d: 0.1, v: 0.12 }),
+    djump: () => { tone({ f: 500, f2: 900, d: 0.12, v: 0.12, type: 'triangle' }); tone({ f: 900, f2: 1300, d: 0.1, v: 0.06, type: 'sine', delay: 0.03 }); },
+    land: () => noise({ d: 0.05, freq: 600, v: 0.12 }),
+    dash: () => noise({ d: 0.16, freq: 3000, filter: 'bandpass', v: 0.25 }),
+    slash: () => noise({ d: 0.08, freq: 5000, filter: 'highpass', v: 0.18 }),
+    hit: () => { tone({ f: 220, f2: 90, d: 0.09, v: 0.22 }); noise({ d: 0.06, freq: 1500, v: 0.2 }); },
+    kill: () => { tone({ f: 330, f2: 60, d: 0.25, v: 0.22 }); noise({ d: 0.2, freq: 900, v: 0.2 }); },
+    hurt: () => { tone({ f: 180, f2: 70, d: 0.25, v: 0.25, type: 'sawtooth' }); },
+    pogo: () => { tone({ f: 420, f2: 840, d: 0.12, v: 0.16, type: 'triangle' }); },
+    bow: () => { noise({ d: 0.12, freq: 2500, filter: 'bandpass', v: 0.2 }); tone({ f: 160, f2: 120, d: 0.08, v: 0.1, type: 'triangle' }); },
+    lantern: () => { [523, 659, 784].forEach((f, i) => tone({ f, d: 0.35, v: 0.08, type: 'sine', delay: i * 0.07 })); },
+    heart: () => { [659, 784, 988, 1319].forEach((f, i) => tone({ f, d: 0.4, v: 0.09, type: 'sine', delay: i * 0.09 })); },
+    paint: () => tone({ f: 600 + Math.random() * 300, d: 0.05, v: 0.03, type: 'sine' }),
+    mural: () => { [392, 523, 659, 784, 1047].forEach((f, i) => tone({ f, d: 0.6, v: 0.08, type: 'sine', delay: i * 0.08 })); },
+    blip: () => tone({ f: 700 + Math.random() * 120, d: 0.025, v: 0.025, type: 'square' }),
+    move: () => tone({ f: 660, d: 0.04, v: 0.06, type: 'square' }),
+    select: () => { tone({ f: 660, d: 0.05, v: 0.08 }); tone({ f: 990, d: 0.08, v: 0.08, delay: 0.05 }); },
+    back: () => { tone({ f: 500, d: 0.05, v: 0.07 }); tone({ f: 330, d: 0.08, v: 0.07, delay: 0.05 }); },
+    save: () => { tone({ f: 880, d: 0.08, v: 0.05, type: 'sine' }); tone({ f: 1320, d: 0.12, v: 0.05, type: 'sine', delay: 0.07 }); },
+    thud: () => { tone({ f: 90, f2: 40, d: 0.4, v: 0.35, type: 'sine' }); noise({ d: 0.3, freq: 400, v: 0.25 }); },
+    rumble: () => { tone({ f: 55, f2: 35, d: 1.2, v: 0.3, type: 'sawtooth' }); noise({ d: 1, freq: 200, v: 0.2 }); },
+    chime: () => { [784, 1175].forEach((f, i) => tone({ f, d: 1.2, v: 0.06, type: 'sine', delay: i * 0.2 })); },
+  };
+  A.play = function (name) { if (S[name]) try { S[name](); } catch (e) { /* never break the game for a sound */ } };
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/save.js
+// Starhaven — save slots (DESIGN.md "Save data": 3 slots, saved after every chapter, evening and bond change).
+// A slot holds where you are and what you've built: chapter, bonds, people met, playtime.
+(function (SH) {
+  const KEY = 'starhaven.slots.v1', N = 3;
+  const S = SH.saves = { N };
+
+  S.blank = () => ({ v: 1, chapter: 0, reached: 0, bonds: {}, met: [], playFrames: 0, pending: null, savedAt: 0 });
+
+  S.all = function () {
+    const a = SH.store.get(KEY, null);
+    if (Array.isArray(a)) return a.concat([null, null, null]).slice(0, N);
+    // carry an older single save into slot 1
+    const arr = [null, null, null], old = SH.store.get('starhaven.save.v1', null);
+    if (old && (old.reached > 0 || (old.met && old.met.length))) {
+      const ch = Math.min(old.reached || 0, SH.STORY.CHAPTERS.length - 1);
+      arr[0] = Object.assign(S.blank(), { reached: old.reached || 0, bonds: old.bonds || {}, met: old.met || [], chapter: ch, savedAt: Date.now() });
+      SH.store.set(KEY, arr);
+    }
+    return arr;
+  };
+  S.write = function (i, data) {
+    const a = S.all();
+    a[i] = Object.assign(S.blank(), data, { savedAt: Date.now() });
+    SH.store.set(KEY, a);
+  };
+  S.erase = function (i) { const a = S.all(); a[i] = null; SH.store.set(KEY, a); };
+  S.latest = function () {
+    let best = -1, t = -1;
+    S.all().forEach((s, i) => { if (s && s.savedAt > t) { t = s.savedAt; best = i; } });
+    return best;
+  };
+  S.describe = function (s) {
+    if (!s) return null;
+    const ST = SH.STORY, ch = ST.CHAPTERS[Math.min(s.chapter, ST.CHAPTERS.length - 1)];
+    const mins = Math.floor(s.playFrames / 3600), time = `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`;
+    const done = s.chapter >= ST.CHAPTERS.length;
+    const c = s.bonds && s.bonds.caelum ? SH.game.heartsFor(s.bonds.caelum.pts) : 0;
+    let when = '';
+    try { when = new Date(s.savedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); } catch (e) { /* fine */ }
+    return { title: done ? 'Concept complete' : `${ch.label}: ${ch.name}`, time, caelum: c, when };
+  };
 })(window.SH = window.SH || {});
 
 </script>
@@ -1376,7 +1561,7 @@ body[data-input="touch"] #touch { display: block; }
   fx.reset = function () { fx.parts.length = fx.rings.length = fx.words.length = fx.ghosts.length = 0; fx.hitstop = fx.shake = fx.flash = fx.slowmo = 0; };
 
   fx.stop = function (frames) { fx.hitstop = Math.max(fx.hitstop, frames); };
-  fx.kick = function (amount) { fx.shake = Math.max(fx.shake, amount); };
+  fx.kick = function (amount) { if (SH.settings && SH.settings.shake === false) return; fx.shake = Math.max(fx.shake, amount); };
   fx.flashScreen = function (frames, color) { fx.flash = frames; fx.flashColor = color || '#fff'; };
 
   fx.burst = function (x, y, n, o) {
@@ -1484,6 +1669,7 @@ body[data-input="touch"] #touch { display: block; }
       this.dashDir = dir !== 0 ? dir : this.facing;
       this.facing = this.dashDir;
       this.dashT = t.dashFrames;
+      SH.sfx.play('dash');
       this.iframes = t.dashIFrames;
       this.swing = null;
       this.vy = 0;
@@ -1560,6 +1746,7 @@ body[data-input="touch"] #touch { display: block; }
 
     if (this.grounded && !this.wasGrounded) {
       a.land = 8; a.squash = Math.min(1, fallSpeed / 9);
+      if (fallSpeed > 5) SH.sfx.play('land');
       if (fallSpeed > 3) fx.dust(this.x, this.y, 0, fallSpeed > 7 ? 8 : 4);
     }
     if (a.land > 0) a.land--;
@@ -1595,6 +1782,7 @@ body[data-input="touch"] #touch { display: block; }
     this.rising = true;
     this.coyote = 0; this.jumpBuf = 0; this.grounded = false;
     this.anim.squash = -0.6;
+    SH.sfx.play(isDouble ? 'djump' : 'jump');
     if (isDouble) {
       fx.ring(this.x, this.y - 4, '#bfe9ff', 20, 14, 2);
       fx.burst(this.x, this.y - 2, 8, { angle: Math.PI / 2, spread: 2.2, speed: 1.8, gravity: 0.02, life: 18, size: 2, colors: ['#e6f6ff', '#9fd8ff', '#ffe9a8'], glow: true });
@@ -1608,6 +1796,7 @@ body[data-input="touch"] #touch { display: block; }
         this.atkBuf = 0; this.bowCd = 30; this.bowT = 16; this.vx = 0;
         const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
         world.spawnArrow(this.x + this.facing * 12, this.y - 27, this.facing);
+        SH.sfx.play('bow');
       }
       return;
     }
@@ -1631,6 +1820,7 @@ body[data-input="touch"] #touch { display: block; }
     this.comboStep = step + 1;
     if (kind !== 'pogo') { const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d; }
     this.swing = { kind, step, def, f: 0, hits: new Set() };
+    SH.sfx.play('slash');
     if (def.lunge && this.grounded) this.vx = this.facing * Math.max(Math.abs(this.vx) * 0.5, def.lunge * 1.6);
   };
 
@@ -1671,6 +1861,7 @@ body[data-input="touch"] #touch { display: block; }
         const r = tgt.takeHit({ dmg: C.damage, kb: d.kb, dir: this.facing, finisher: !!d.finisher, pogo: s.kind === 'pogo' }, world);
         if (!r) continue;
         this.stats.hits++;
+        SH.sfx.play(r.killed ? 'kill' : 'hit');
         fx.stop(r.killed ? C.killStop : d.stop);
         fx.kick(r.killed ? 4 : d.finisher ? 3 : 1.6);
         if (s.kind === 'pogo') this.bounce();
@@ -1694,6 +1885,7 @@ body[data-input="touch"] #touch { display: block; }
     this.rising = false;
     this.airJumps = 1; this.airDashes = 1; this.dashCd = 0;
     this.stats.pogos++;
+    SH.sfx.play('pogo');
     SH.fx.ring(this.x, this.y + 12, '#ffe9a8', 26, 14, 2);
     if (this.swing) this.swing.bounced = true;
   };
@@ -1705,6 +1897,7 @@ body[data-input="touch"] #touch { display: block; }
     const fx = SH.fx;
     this.hearts = Math.max(0, this.hearts - dmg);
     this.stats.hurt++;
+    SH.sfx.play('hurt');
     this.invuln = SH.PLAYER.hurtInvuln;
     this.stun = SH.PLAYER.hurtStun;
     this.swing = null; this.dashT = 0;
@@ -1946,6 +2139,7 @@ body[data-input="touch"] #touch { display: block; }
   // ---------------------------------------------------------------- portraits (48 x 48 pixels, shown big)
   const LOOKS = {
     wren: { bg: ['#2c3d74', '#11163a'], skin: '#f6dcc6', shade: '#e2b89c', hair: '#d8653a', hairD: '#9e3f22', eye: '#3f9c7a', style: 'pony', ears: true, cloth: '#2f8f7a', clothD: '#1f6656', scarf: '#ffd27a' },
+    wren_m: { bg: ['#3a4a6a', '#121a2a'], skin: '#f6dcc6', shade: '#e2b89c', hair: '#d8653a', hairD: '#9e3f22', eye: '#3f9c7a', style: 'pony', ears: false, cloth: '#2f8f7a', clothD: '#1f6656', scarf: '#c8a060' },
     caelum: { bg: ['#3a2a6a', '#120d2a'], skin: '#ecd5c8', shade: '#cfb0a4', hair: '#1a1530', hairD: '#0c0a1a', eye: '#a58bff', style: 'swept', ears: true, cloth: '#1c1838', clothD: '#0e0c20', trim: '#cfd6ff', circlet: true, wings: true },
     queen: { bg: ['#4a1426', '#14060c'], skin: '#efe4ea', shade: '#cdbac4', hair: '#2a0a16', hairD: '#14040a', eye: '#ff4a5a', style: 'long', ears: true, cloth: '#2a0a16', clothD: '#14040a', crown: true, lips: '#c0203a' },
     bram: { bg: ['#5a3a1c', '#1c1008'], skin: '#d9a77f', shade: '#b8865f', hair: '#3a2a20', hairD: '#2a1c14', eye: '#5a3a22', style: 'shaved', ears: true, cloth: '#a8743a', clothD: '#6e4a22', beard: '#8a4426', scar: true, broad: true },
@@ -3217,14 +3411,51 @@ body[data-input="touch"] #touch { display: block; }
   };
   SH.store = store;
   SH.tune = Object.assign({}, SH.TUNE_DEFAULTS, store.get('starhaven.tune.v1', {}));
+  SH.settings = Object.assign({ autoDown: true, sfx: 70, textSpeed: 'normal', shake: true }, store.get('starhaven.settings.v1', {}));
 
   const G = SH.game = {
-    state: 'title', world: null, frozen: false,
+    state: 'front', world: null, frozen: false, slot: null,
     chapter: 0, flags: {}, activeGoal: null, script: null,
-    progress: Object.assign({ reached: 0, bonds: {}, met: [] }, store.get('starhaven.save.v1', {})),
+    progress: { reached: 0, bonds: {}, met: [], playFrames: 0 },
     heartQueue: [],
   };
-  G.save = function () { store.set('starhaven.save.v1', G.progress); };
+  // Saves go to the current slot (none in chapter select). `where` overrides the resume point after a chapter ends.
+  G.save = function (show) {
+    if (G.slot == null) return;
+    const pr = G.progress;
+    SH.saves.write(G.slot, {
+      chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0,
+    });
+    if (show) G.hud.saved();
+  };
+  G.newGame = function (slot) {
+    G.slot = slot == null ? null : slot;
+    G.progress = { reached: 0, bonds: {}, met: [], playFrames: 0 };
+    G.startChapter(0);
+  };
+  G.playChapter = function (i) {   // chapter select: no saving
+    G.slot = null;
+    G.progress = { reached: i, bonds: {}, met: [], playFrames: 0 };
+    G.startChapter(i);
+  };
+  G.loadSlot = function (slot) {
+    const s = SH.saves.all()[slot];
+    if (!s) return G.newGame(slot);
+    G.slot = slot;
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0 };
+    const N = ST.CHAPTERS.length, target = s.chapter;
+    const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
+    if (s.pending) {           // quit during an evening: play it again, then go on
+      G.chapter = Math.max(0, Math.min(N - 1, target - 1));
+      G.flags = {}; G.activeGoal = null; G.script = null; G.pending = null; fx.reset();
+      G.build(ST.CHAPTERS[G.chapter].room);
+      G.resumeAt = target; G.pending2 = s.pending;
+      G.afterScript = () => { G.resumeAt = null; G.pending2 = null; goOn(); };
+      G.runScript(s.pending);
+    } else if (target >= N) { G.chapter = N - 1; G.build(ST.CHAPTERS[N - 1].room); G.state = 'end'; G.hud.end(true); }
+    else goOn();
+  };
 
   // What Wren can do in this chapter. Mortal in the Winter Woods: one jump, no dash, a bow instead of daggers.
   const ABILITIES = { double: true, dash: true, daggers: true, bow: false };
@@ -3261,7 +3492,7 @@ body[data-input="touch"] #touch { display: block; }
       onKnockout() { G.knockout(); },
       arrows: [],
       spawnArrow(x, y, dir) { this.arrows.push({ x, y, vx: dir * 8, vy: -0.5, life: 110, stuck: false }); },
-      onStagDown() { G.queueScript('woods_kill'); },
+      onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
@@ -3288,6 +3519,7 @@ body[data-input="touch"] #touch { display: block; }
   // ---------------------------------------------------------------- chapters
   G.startChapter = function (i) {
     G.chapter = i;
+    G.resumeAt = null; G.pending2 = null;
     G.flags = {}; G.activeGoal = null; G.script = null; G.pending = null;
     fx.reset();
     const ch = G.chapterDef();
@@ -3297,15 +3529,17 @@ body[data-input="touch"] #touch { display: block; }
       G.state = 'play'; input.clear(); G.hud.goal();
     });
     G.hud.goal();
+    G.save(true);
   };
 
   G.completeChapter = function () {
     const ch = G.chapterDef(), next = G.chapter + 1;
     G.progress.reached = Math.max(G.progress.reached, next);
-    G.save();
+    G.resumeAt = next; G.pending2 = ch.after || null;
+    G.save(true);
     G.state = 'card';
     // After the card: the chapter's evening (if it has one), then the next chapter, or the finale.
-    const cont = () => { if (next < ST.CHAPTERS.length) G.startChapter(next); else G.runScript('finale'); };
+    const cont = () => { G.pending2 = null; G.save(); if (next < ST.CHAPTERS.length) G.startChapter(next); else G.runScript('finale'); };
     G.hud.card({ label: ch.label + ' complete', name: ch.name, text: ch.done, goals: null, button: 'Continue' }, () => {
       if (ch.after) { G.afterScript = cont; G.runScript(ch.after); } else cont();
     });
@@ -3378,12 +3612,12 @@ body[data-input="touch"] #touch { display: block; }
     switch (st.do) {
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); break;
-      case 'wyrm': w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
+      case 'wyrm': SH.sfx.play('rumble'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
       case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
       case 'meet': G.meet(st.who); break;
       case 'bond': G.bond(st.who, st.pts); break;
       case 'art': G.hud.sceneArt(st.id, st.title); break;
-      case 'cue': G.hud.sceneCue(st.name); break;
+      case 'cue': G.hud.sceneCue(st.name); if (st.name === 'door' || st.name === 'end') SH.sfx.play('thud'); if (st.name === 'rise' || st.name === 'caelum') SH.sfx.play('chime'); break;
       case 'goto': { const sc = G.script; sc.steps = sc.steps.slice(0, sc.i).concat(ST.SCRIPTS[st.id], sc.steps.slice(sc.i)); break; }
       case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
@@ -3420,6 +3654,7 @@ body[data-input="touch"] #touch { display: block; }
     if (after > before) {
       G.hud.toast(`\u2665 ${name}: heart ${after} of 5`);
       G.heartQueue.push(`heart_${who}_${after}`);
+      SH.sfx.play('heart');
     } else G.hud.toast(liked ? `${name} loved that.` : `${name} will remember that.`);
     G.save();
   };
@@ -3441,6 +3676,7 @@ body[data-input="touch"] #touch { display: block; }
   G.step = function () {
     const w = G.world, p = w.player;
     input.step();
+    if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
     if (G.state === 'talk') { G.talkStep(); fx.update(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -3491,7 +3727,7 @@ body[data-input="touch"] #touch { display: block; }
     for (const l of w.lanterns) {
       const at = Math.abs(p.x - l.px) < 22 && Math.abs(p.y - l.py) < 30;
       if (at && !l.lit) {
-        l.lit = true; p.hearts = p.maxHearts;
+        l.lit = true; p.hearts = p.maxHearts; SH.sfx.play('lantern');
         fx.ring(l.px, l.py - 46, '#ffd27a', 50, 26, 2);
         fx.burst(l.px, l.py - 46, 16, { speed: 2, life: 30, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
         G.hud.toast('Lantern lit: hearts restored. You come back here if knocked out.');
@@ -3548,11 +3784,13 @@ body[data-input="touch"] #touch { display: block; }
     if (!w.muralNear || !input.held.up) return false;
     p.vx = 0; p.swing = null;
     w.muralProgress = Math.min(1, w.muralProgress + 1 / m.frames);
+    if (w.time % 6 === 0) SH.sfx.play('paint');
     if (w.time % 4 === 0) fx.burst(m.x * TS + m.w * TS * w.muralProgress, 16 * TS - 40 - Math.random() * 60, 2, { speed: 1, life: 20, colors: ['#ffd27a', '#ff9a7a', '#8a6aff', '#4ad8c8'], glow: true });
     if (w.muralProgress >= 1) {
       G.flags[m.flag] = true;
       G.flags.mural = true;
       w.cityLightTarget = 1;
+      SH.sfx.play('mural');
       fx.ring(cx, 16 * TS - 54, '#ffd27a', 90, 40, 3);
       fx.burst(cx, 16 * TS - 54, 40, { speed: 3, life: 50, gravity: -0.02, colors: ['#ffd27a', '#fff6d8', '#ff9a7a', '#8a6aff'], glow: true });
       G.hud.toast('The first mural is finished. The street wakes up.');
@@ -3563,6 +3801,7 @@ body[data-input="touch"] #touch { display: block; }
 
   G.talkStep = function () {
     if (G.talkWait > 0) { G.talkWait--; return; }
+    if (G.hud.typing()) { if (input.pressed.jump || input.pressed.attack || input.pressed.up || input.pressed.dash) G.hud.finishTyping(); return; }
     if (G.choosing) {
       if (input.pressed.up) G.hud.choiceMove(-1);
       else if (input.pressed.down) G.hud.choiceMove(1);
@@ -3620,7 +3859,7 @@ body[data-input="touch"] #touch { display: block; }
     if (w.koT > 72) { w.koT = 0; w.fade = 0; }
   };
 
-  G.pause = function () { if (G.state !== 'play') return; G.state = 'pause'; input.clear(); G.hud.menu(true); };
+  G.pause = function () { if (G.state !== 'play') return; G.state = 'pause'; input.clear(); G.hud.navReset(); G.hud.menu(true); G.hud.nav('menu', 0); };
   G.resume = function () { G.state = 'play'; input.clear(); G.hud.menu(false); G.hud.tune(false); G.hud.journal(false); };
 
   // ---------------------------------------------------------------- loop
@@ -3651,15 +3890,15 @@ body[data-input="touch"] #touch { display: block; }
   // Menus can be driven by keyboard and gamepad as well as taps.
   G.menuInput = function () {
     const go = () => input.take('jump') || input.take('attack');
-    if (G.state === 'title') { if (go()) G.hud.titlePrimary(); }
+    if (G.state === 'front') SH.front.menuInput(input);
     else if (G.state === 'card') { if (go()) G.hud.cardGo(); }
-    else if (G.state === 'pause') { if (input.take('pause')) G.resume(); }
-  };
-
-  G.newGame = function () {
-    G.progress = { reached: 0, bonds: {}, met: [] }; G.save();
-    G.hud.title(false);
-    G.startChapter(0);
+    else if (G.state === 'pause' || G.state === 'end') {
+      const id = G.state === 'end' ? 'end' : ['journal', 'tune'].find(x => document.getElementById(x).classList.contains('show')) || 'menu';
+      if (input.take('up')) G.hud.nav(id, -1);
+      else if (input.take('down')) G.hud.nav(id, 1);
+      else if (input.take('jump') || input.take('attack')) G.hud.nav(id, 0, true);
+      else if (G.state === 'pause' && (input.take('pause') || input.take('dash'))) { SH.sfx.play('back'); G.resume(); }
+    }
   };
 
   // ---------------------------------------------------------------- screen size
@@ -3682,7 +3921,7 @@ body[data-input="touch"] #touch { display: block; }
     load(chapterOrRoom, opts) {
       opts = opts || {};
       G.frozen = true; input.forced = { held: {}, pressed: {} };
-      G.hud.title(false);
+      document.getElementById('front').classList.remove('show'); G.slot = null;
       if (typeof chapterOrRoom === 'number') { G.startChapter(chapterOrRoom); G.hud.cardGo(); }
       else {
         const ci = ST.CHAPTERS.findIndex(c => c.room === chapterOrRoom);
@@ -3780,11 +4019,37 @@ body[data-input="touch"] #touch { display: block; }
     if (!who) { el.classList.remove('show'); return; }
     const c = ST.CAST[who], narr = who === 'narr';
     el.classList.toggle('narr', narr);
-    if (!narr) $('d-face').src = SH.art.portraitURL(who);
+    if (!narr) $('d-face').src = SH.art.portraitURL(who === 'wren' && SH.game.mortal ? 'wren_m' : who);
     $('d-name').textContent = c.name;
     $('d-name').style.color = c.color;
-    $('d-text').textContent = text;
     el.classList.add('show');
+    H.typeStart(text, narr);
+  };
+
+  // Lines type out letter by letter (Settings > Text speed). A tap or button press finishes the line first.
+  const SPEED = { slow: 0.6, normal: 1.4, fast: 3, instant: 1e9 };
+  let typed = 0, full = '', typingNarr = false, typeRAF = 0;
+  H.typeStart = function (text, narr) {
+    full = text; typed = 0; typingNarr = narr;
+    cancelAnimationFrame(typeRAF);
+    H.typeTick();
+  };
+  H.typeTick = function () {
+    const before = Math.floor(typed);
+    typed = Math.min(full.length, typed + (SPEED[SH.settings.textSpeed] || 1.4));
+    $('d-text').textContent = full.slice(0, Math.floor(typed));
+    if (!typingNarr && Math.floor(typed) > before && Math.floor(typed) % 3 === 0) SH.sfx.play('blip');
+    $('dialog').classList.toggle('typing', typed < full.length);
+    if (typed < full.length) typeRAF = requestAnimationFrame(H.typeTick);
+  };
+  H.typing = () => typed < full.length && $('dialog').classList.contains('show');
+  H.finishTyping = function () { typed = full.length; $('d-text').textContent = full; $('dialog').classList.remove('typing'); cancelAnimationFrame(typeRAF); SH.game.talkWait = 4; };
+
+  // A small "Saved" star in the corner when the game autosaves.
+  let savedT = 0;
+  H.saved = function () {
+    const el = $('saving'); el.classList.add('show'); SH.sfx.play('save');
+    clearTimeout(savedT); savedT = setTimeout(() => el.classList.remove('show'), 1600);
   };
 
   // ---------------- choices (under the last line of dialogue)
@@ -3862,20 +4127,19 @@ body[data-input="touch"] #touch { display: block; }
     $('b-attack').textContent = G.can('daggers') ? 'STRIKE' : 'SHOOT';
   };
 
-  // ---------------- title
-  H.title = function (show) { $('title').classList.toggle('show', show); if (show) H.titleButtons(); };
-  H.titleButtons = function () {
-    const G = SH.game, r = G.progress.reached, n = ST.CHAPTERS.length;
-    const cont = $('t-continue');
-    cont.style.display = r > 0 && r < n ? '' : 'none';
-    if (r > 0 && r < n) cont.textContent = `Continue: ${ST.CHAPTERS[r].label}, ${ST.CHAPTERS[r].name}`;
-    const list = $('t-chapters');
-    list.innerHTML = ST.CHAPTERS.map((c, i) => `<button class="btn small" data-ch="${i}">${esc(c.label)}: ${esc(c.name)}</button>`).join('');
+  // Controller navigation for the HTML screens (pause menu, journal, tune, end): D-pad to choose, A to press.
+  let navIdx = 0, navId = null;
+  H.navButtons = id => [...document.querySelectorAll('#' + id + ' button.btn')].filter(b => b.offsetParent !== null);
+  H.nav = function (id, d, press) {
+    const btns = H.navButtons(id);
+    if (!btns.length) return;
+    if (navId !== id) { navId = id; navIdx = 0; }
+    if (d) { navIdx = (navIdx + d + btns.length) % btns.length; SH.sfx.play('move'); }
+    btns.forEach((b, i) => b.classList.toggle('pad-sel', i === navIdx));
+    btns[navIdx].scrollIntoView({ block: 'nearest' });
+    if (press) { SH.sfx.play('select'); btns[navIdx].click(); navId = null; }
   };
-  H.titlePrimary = function () {
-    const G = SH.game, r = G.progress.reached;
-    if (r > 0 && r < ST.CHAPTERS.length) { H.title(false); G.startChapter(r); } else G.newGame();
-  };
+  H.navReset = () => { navId = null; document.querySelectorAll('.pad-sel').forEach(b => b.classList.remove('pad-sel')); };
 
   H.menu = function (show) { $('menu').classList.toggle('show', show); };
 
@@ -3949,13 +4213,10 @@ body[data-input="touch"] #touch { display: block; }
 
   H.bind = function () {
     const G = SH.game, on = (id, f) => $(id).addEventListener('click', f);
-    on('t-new', () => G.newGame());
-    on('t-continue', () => H.titlePrimary());
-    $('t-chapters').addEventListener('click', e => { const b = e.target.closest('[data-ch]'); if (b) { H.title(false); G.startChapter(+b.dataset.ch); } });
     on('c-go', () => H.cardGo());
     // In a conversation, a tap anywhere goes to the next line.
     document.addEventListener('pointerdown', e => {
-      if (G.state === 'talk' && G.talkWait <= 0 && !e.target.closest('button')) { e.preventDefault(); G.advance(); }
+      if (G.state === 'talk' && G.talkWait <= 0 && !e.target.closest('button')) { e.preventDefault(); if (H.typing()) H.finishTyping(); else G.advance(); }
     });
     on('pause-btn', () => G.state === 'pause' ? G.resume() : G.pause());
     on('m-resume', () => G.resume());
@@ -3963,12 +4224,12 @@ body[data-input="touch"] #touch { display: block; }
     on('m-tune', () => { H.menu(false); H.tune(true); });
     on('m-restart', () => { H.menu(false); G.startChapter(G.chapter); });
     on('m-controls', () => $('controls').classList.toggle('show'));
-    on('m-title', () => { H.menu(false); G.state = 'title'; H.title(true); });
+    on('m-title', () => { H.menu(false); SH.front.toTitle(); });
     const fs = $('m-fullscreen');
     if (document.documentElement.requestFullscreen) fs.addEventListener('click', () => { document.documentElement.requestFullscreen().catch(() => { }); G.resume(); });
     else fs.style.display = 'none';
     on('j-back', () => G.resume());
-    on('t-back', () => G.resume());
+    on('t-back', () => { if (H.tuneBack) { const f = H.tuneBack; H.tuneBack = null; H.tune(false); f(); } else G.resume(); });
     on('t-reset', () => { SH.tune = Object.assign({}, SH.TUNE_DEFAULTS); H.saveTune(); H.buildTune(); });
     on('t-copy', () => {
       const text = H.tuneText(), btn = $('t-copy');
@@ -3977,16 +4238,209 @@ body[data-input="touch"] #touch { display: block; }
         navigator.clipboard.writeText(text).then(() => { btn.textContent = 'Copied'; setTimeout(() => (btn.textContent = 'Copy numbers'), 1500); }, show);
       } catch (e) { show(); }
     });
-    on('e-again', () => { H.end(false); G.newGame(); });
-    on('e-home', () => { H.end(false); G.state = 'title'; H.title(true); });
+    on('e-again', () => { H.end(false); SH.front.toTitle(); SH.front.slots('new'); });
+    on('e-home', () => { H.end(false); SH.front.toTitle(); });
     SH.input.onSourceChange = src => { document.body.dataset.input = src; lastPrompt = null; };
     SH.input.onPad = () => H.toast('Controller connected: A jump, X strike, B dash, Y talk. Hold down + X in the air to strike down.');
     $('d-choices').addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (b) G.pick(+b.dataset.i); });
     document.body.dataset.input = SH.input.source;
-    H.titleButtons();
   };
 
   SH.game.hud = H;
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/front.js
+// Starhaven — boot and menus: studio splashes, "press any button", main menu, save slots, settings, credits.
+// Every menu works with a controller (D-pad/stick + A, B to go back), a keyboard, or touch.
+(function (SH) {
+  const $ = id => document.getElementById(id);
+  const F = SH.front = {};
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  let phase = null, menu = null, timer = 0;
+
+  // The studio marks, drawn inline (no files).
+  F.NCS_MARK = `<svg viewBox="0 0 120 80" aria-hidden="true"><defs><linearGradient id="ncsg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff6d8"/><stop offset="1" stop-color="#ffd27a"/></linearGradient></defs>
+    <path d="M60 4 L64 26 L84 30 L64 34 L60 56 L56 34 L36 30 L56 26 Z" fill="url(#ncsg)"/>
+    <path d="M8 62 Q24 52 40 62 T72 62 T104 62 T120 60" stroke="#9fd0ff" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M0 74 Q16 64 32 74 T64 74 T96 74 T120 72" stroke="#5a8ad8" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`;
+  F.E_MARK = `<svg viewBox="0 0 80 80" aria-hidden="true"><defs><linearGradient id="eg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#4ad8c8"/><stop offset="1" stop-color="#9a6aff"/></linearGradient></defs>
+    <rect x="4" y="4" width="72" height="72" rx="18" fill="none" stroke="url(#eg)" stroke-width="5"/>
+    <path d="M26 20 H56 M26 40 H50 M26 60 H56 M26 20 V60" stroke="url(#eg)" stroke-width="8" stroke-linecap="round" fill="none"/></svg>`;
+
+  // ---------------------------------------------------------------- boot
+  F.boot = function () {
+    SH.game.state = 'front';
+    $('front').classList.add('show');
+    try { window.focus(); } catch (e) { /* inside a frame: fine */ }
+    F.splash('ncs');
+  };
+  F.splash = function (which) {
+    phase = which;
+    const el = $('splash');
+    el.className = ''; void el.offsetWidth;   // restart the fade for each splash
+    el.className = 'show ' + which;
+    $('f-menu-wrap').classList.remove('show');
+    $('f-press').classList.remove('show');
+    el.innerHTML = which === 'ncs'
+      ? `<div class="mark ncs">${F.NCS_MARK}</div><div class="word">NORTH COAST</div><div class="word2">STUDIOS</div>`
+      : `<div class="mark e">${F.E_MARK}</div><div class="word">E CONCEPTS</div>`;
+    clearTimeout(timer);
+    timer = setTimeout(F.next, which === 'ncs' ? 2600 : 2200);
+  };
+  F.next = function () {
+    clearTimeout(timer);
+    if (phase === 'ncs') F.splash('econ');
+    else if (phase === 'econ') F.press();
+    else if (phase === 'press') { SH.sfx.play('select'); F.main(); }
+  };
+  F.press = function () {
+    phase = 'press';
+    $('splash').className = '';
+    $('f-logo').classList.add('show');
+    $('f-press').classList.add('show');
+  };
+
+  // ---------------------------------------------------------------- menus
+  F.show = function (title, items, back, note, noteFirst) {
+    $('f-menu-wrap').classList.toggle('note-first', !!noteFirst);
+    phase = 'menu';
+    $('f-logo').classList.toggle('show', !title);
+    $('f-press').classList.remove('show');
+    $('f-menu-wrap').classList.add('show');
+    $('f-title').textContent = title || '';
+    $('f-note').innerHTML = note || '';
+    menu = { items, back, sel: Math.max(0, items.findIndex(i => !i.disabled)) };
+    F.render();
+  };
+  F.render = function () {
+    $('f-menu').innerHTML = menu.items.map((it, i) => {
+      const v = it.value ? `<span class="val">&#9666; ${esc(it.value())} &#9656;</span>` : '';
+      const sub = it.sub ? `<span class="sub">${it.sub}</span>` : '';
+      return `<button class="fbtn${i === menu.sel ? ' sel' : ''}${it.disabled ? ' off' : ''}${it.danger ? ' danger' : ''}" data-i="${i}" ${it.disabled ? 'aria-disabled="true"' : ''}><span class="lbl">${esc(it.label)}</span>${v}${sub}</button>`;
+    }).join('');
+    const sel = $('f-menu').querySelector('.sel');
+    if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: 'nearest' });
+  };
+  F.move = function (d) {
+    if (!menu) return;
+    let i = menu.sel;
+    for (let k = 0; k < menu.items.length; k++) { i = (i + d + menu.items.length) % menu.items.length; if (!menu.items[i].disabled) break; }
+    if (i !== menu.sel) { menu.sel = i; SH.sfx.play('move'); F.render(); }
+  };
+  F.choose = function (i) {
+    const it = menu && menu.items[i == null ? menu.sel : i];
+    if (!it || it.disabled) return;
+    if (it.value && !it.action) { it.right(); SH.sfx.play('move'); F.render(); return; }
+    SH.sfx.play('select');
+    it.action();
+  };
+  F.adjust = function (d) {
+    const it = menu && menu.items[menu.sel];
+    if (it && it.value) { (d > 0 ? it.right : it.left)(); SH.sfx.play('move'); F.render(); }
+  };
+  F.back = function () { if (menu && menu.back) { SH.sfx.play('back'); menu.back(); } };
+
+  // Controller / keyboard, called every frame while the front end is up.
+  F.input = function (input) {
+    const any = ['jump', 'attack', 'dash', 'pause', 'up', 'down', 'left', 'right'].some(a => input.take(a));
+    if (phase === 'ncs' || phase === 'econ' || phase === 'press') { if (any) F.next(); return; }
+  };
+  F.menuInput = function (input) {
+    if (phase !== 'menu') return F.input(input);
+    if (input.take('up')) F.move(-1);
+    else if (input.take('down')) F.move(1);
+    else if (input.take('left')) F.adjust(-1);
+    else if (input.take('right')) F.adjust(1);
+    else if (input.take('jump') || input.take('attack')) F.choose();
+    else if (input.take('dash') || input.take('pause')) F.back();
+  };
+
+  // ---------------------------------------------------------------- the screens
+  F.main = function () {
+    const S = SH.saves, latest = S.latest(), slots = S.all(), any = slots.some(Boolean);
+    const items = [];
+    if (latest >= 0) { const d = S.describe(slots[latest]); items.push({ label: 'Continue', sub: `Slot ${latest + 1} &middot; ${esc(d.title)}`, action: () => F.go(() => SH.game.loadSlot(latest)) }); }
+    items.push({ label: 'New game', action: () => F.slots('new') });
+    items.push({ label: 'Load game', disabled: !any, action: () => F.slots('load') });
+    items.push({ label: 'Chapter select', sub: 'Any chapter, without saving (concept build)', action: F.chapters });
+    items.push({ label: 'Settings', action: () => F.settings(F.main) });
+    items.push({ label: 'Credits', action: F.credits });
+    F.show(null, items, null);
+  };
+  F.slots = function (mode) {
+    const S = SH.saves, slots = S.all();
+    const items = slots.map((s, i) => {
+      const d = S.describe(s);
+      const sub = d ? `${esc(d.title)} &middot; ${d.time} played${d.caelum ? ` &middot; Caelum ${'&#9829;'.repeat(d.caelum)}` : ''}${d.when ? ` &middot; ${esc(d.when)}` : ''}` : 'Empty';
+      return {
+        label: `Slot ${i + 1}`, sub, disabled: mode === 'load' && !s,
+        action: () => {
+          if (mode === 'load') return F.go(() => SH.game.loadSlot(i));
+          if (!s) return F.go(() => SH.game.newGame(i));
+          F.confirm(`Start a new game in slot ${i + 1}? The save there will be replaced.`, () => F.go(() => SH.game.newGame(i)), () => F.slots(mode));
+        },
+      };
+    });
+    if (mode === 'load') slots.forEach((s, i) => { if (s) items.push({ label: `Erase slot ${i + 1}`, danger: true, action: () => F.confirm(`Erase slot ${i + 1}? This can't be undone.`, () => { S.erase(i); F.slots('load'); }, () => F.slots('load')) }); });
+    items.push({ label: 'Back', action: F.main });
+    F.show(mode === 'new' ? 'New game: pick a slot' : 'Load game', items, F.main);
+  };
+  F.confirm = function (text, yes, no) {
+    F.show('Are you sure?', [{ label: 'Yes', danger: true, action: yes }, { label: 'No', action: no }], no, esc(text));
+    menu.sel = 1; F.render();
+  };
+  F.chapters = function () {
+    const items = SH.STORY.CHAPTERS.map((c, i) => ({ label: `${c.label}: ${c.name}`, action: () => F.go(() => SH.game.playChapter(i)) }));
+    items.push({ label: 'Back', action: F.main });
+    F.show('Chapter select', items, F.main, 'Plays any chapter on its own. Nothing is saved.');
+  };
+  F.settings = function (back) {
+    const s = SH.settings, save = () => { SH.store.set('starhaven.settings.v1', s); SH.sfx.volume(); };
+    const speeds = ['slow', 'normal', 'fast', 'instant'];
+    const cycle = (k, list, d) => { s[k] = list[(list.indexOf(s[k]) + d + list.length) % list.length]; save(); };
+    const flip = k => { s[k] = !s[k]; save(); };
+    const items = [
+      { label: 'Sound effects', value: () => s.sfx ? `${s.sfx}%` : 'Off', left: () => { s.sfx = Math.max(0, s.sfx - 10); save(); }, right: () => { s.sfx = Math.min(100, s.sfx + 10); save(); SH.sfx.play('select'); } },
+      { label: 'Text speed', value: () => s.textSpeed[0].toUpperCase() + s.textSpeed.slice(1), left: () => cycle('textSpeed', speeds, -1), right: () => cycle('textSpeed', speeds, 1) },
+      { label: 'Touch: strike down for me', value: () => s.autoDown ? 'On' : 'Off', left: () => flip('autoDown'), right: () => flip('autoDown') },
+      { label: 'Screen shake', value: () => s.shake ? 'On' : 'Off', left: () => flip('shake'), right: () => flip('shake') },
+      { label: 'Tune the movement feel', action: () => { $('front').classList.remove('show'); SH.game.hud.tune(true); SH.game.hud.tuneBack = () => { $('front').classList.add('show'); F.settings(back); }; } },
+      { label: 'Back', action: back },
+    ];
+    F.show('Settings', items, back, 'Left and right change a setting. Music is coming with Will\'s own tracks.');
+  };
+  F.credits = function () {
+    F.show('Credits', [{ label: 'Back', action: F.main }], F.main, `
+      <div class="credits">
+        <div class="cmark">${F.NCS_MARK}</div>
+        <p><b>STARHAVEN</b><br>A North Coast Studios game<br>with E Concepts</p>
+        <p><b>Created and directed by</b><br>Will, North Coast Studios</p>
+        <p><b>Design, story and code</b><br>Built with Claude from Will's design doc</p>
+        <p><b>Art and sound</b><br>Placeholder, made in code, until the real art and music arrive</p>
+        <p class="dim">Concept build. Prologue through Chapter 2.</p>
+      </div>`, true);
+  };
+
+  // Leave the menus and start playing.
+  F.go = function (start) {
+    phase = null; menu = null;
+    $('front').classList.remove('show');
+    start();
+  };
+  // Back to the title from the game.
+  F.toTitle = function () {
+    SH.game.state = 'front';
+    $('front').classList.add('show');
+    F.main();
+  };
+
+  F.bind = function () {
+    $('f-menu').addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (!b) return; const i = +b.dataset.i; if (menu) { menu.sel = i; F.choose(i); } });
+    $('f-menu').addEventListener('pointermove', e => { const b = e.target.closest('[data-i]'); if (b && menu && +b.dataset.i !== menu.sel && !menu.items[+b.dataset.i].disabled && e.pointerType === 'mouse') { menu.sel = +b.dataset.i; F.render(); } });
+    $('front').addEventListener('click', e => { if (phase !== 'menu') F.next(); });
+  };
 })(window.SH = window.SH || {});
 
 </script>
@@ -3998,8 +4452,12 @@ body[data-input="touch"] #touch { display: block; }
   G.hud.bind();
   SH.input.bindTouch(document.getElementById('touch'), document.getElementById('stick'), document.getElementById('knob'));
   G.fit();
-  G.build('ashes');          // the title screen sits over the road to Starhaven
+  G.build('ashes');          // the menus sit over the road to Starhaven
   G.world.player.hidden = true;
+  SH.front.bind();
+  document.getElementById('wm').innerHTML = SH.front.NCS_MARK + '<span>NORTH COAST STUDIOS</span>';
+  document.querySelector('.pause-wm').innerHTML = SH.front.NCS_MARK + '<span>NORTH COAST STUDIOS</span>';
+  SH.front.boot();
   window.addEventListener('resize', G.fit);
   document.addEventListener('visibilitychange', () => { if (document.hidden) G.pause(); });
   requestAnimationFrame(G.loop);

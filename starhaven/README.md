@@ -18,9 +18,10 @@ An original 2D side-scrolling action RPG. Fae-court romantasy, all original char
 - The design (source of truth): [`DESIGN.md`](DESIGN.md). Build plan and quality bar: [`BUILD-PLAN.md`](BUILD-PLAN.md).
 
 ## Play it
-Open `game/starhaven.html` in a browser. On a phone, hold it sideways. Keyboard: A/D move, Space jump, J strike, Shift dash,
-W talk/paint, S + J in the air strikes down, Esc menu. Gamepad: A jump, X strike, B dash, Y talk/paint.
-The menu has **Story & goals** (what to do, the story so far, who's who) and **Tune the feel** (live sliders).
+Open `game/starhaven.html` in a browser. On a phone, hold it sideways. It boots like a console game: studio splashes,
+"Press any button", then the main menu (Continue, New game, Load game, Chapter select, Settings, Credits). 3 save slots
+with autosave. Controller: D-pad/stick, A jump/select, X strike, B dash/back, Y talk, Start pause. Keyboard: A/D move,
+Space jump, J strike, Shift dash, W talk, Esc pause. Touch: stick on the left, buttons on the right.
 
 ## For developers
 - Source: `game/src/`, small files with one job each. Content is data: every line of story, the chapters and goals in
@@ -29,7 +30,8 @@ The menu has **Story & goals** (what to do, the story so far, who's who) and **T
   runner, loop), `hud.js` (dialogue, cards, journal, menus).
 - Build: `python3 starhaven/game/build.py` writes `game/starhaven.html` (one file, no dependencies).
 - Tests: `node starhaven/game/tests/feel.js` (gaps, combat numbers, checkpoints, and each chapter played start to finish
-  with its story) and `node starhaven/game/tests/smoke.js [outDir]` (every story screen on a landscape phone, screenshots).
+  with its story), `node starhaven/game/tests/front.js` (boot, menus and saves with a simulated controller) and
+  `node starhaven/game/tests/smoke.js [outDir]` (every screen on a landscape phone, screenshots).
 
 ## Engine note
 Godot 4 is still the long-term target in `DESIGN.md`, but for now Starhaven is a browser concept so Will can play it on

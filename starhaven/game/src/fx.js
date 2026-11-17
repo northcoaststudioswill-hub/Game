@@ -9,7 +9,7 @@
   fx.reset = function () { fx.parts.length = fx.rings.length = fx.words.length = fx.ghosts.length = 0; fx.hitstop = fx.shake = fx.flash = fx.slowmo = 0; };
 
   fx.stop = function (frames) { fx.hitstop = Math.max(fx.hitstop, frames); };
-  fx.kick = function (amount) { fx.shake = Math.max(fx.shake, amount); };
+  fx.kick = function (amount) { if (SH.settings && SH.settings.shake === false) return; fx.shake = Math.max(fx.shake, amount); };
   fx.flashScreen = function (frames, color) { fx.flash = frames; fx.flashColor = color || '#fff'; };
 
   fx.burst = function (x, y, n, o) {

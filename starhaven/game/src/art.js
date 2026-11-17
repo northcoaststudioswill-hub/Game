@@ -8,6 +8,7 @@
   // ---------------------------------------------------------------- portraits (48 x 48 pixels, shown big)
   const LOOKS = {
     wren: { bg: ['#2c3d74', '#11163a'], skin: '#f6dcc6', shade: '#e2b89c', hair: '#d8653a', hairD: '#9e3f22', eye: '#3f9c7a', style: 'pony', ears: true, cloth: '#2f8f7a', clothD: '#1f6656', scarf: '#ffd27a' },
+    wren_m: { bg: ['#3a4a6a', '#121a2a'], skin: '#f6dcc6', shade: '#e2b89c', hair: '#d8653a', hairD: '#9e3f22', eye: '#3f9c7a', style: 'pony', ears: false, cloth: '#2f8f7a', clothD: '#1f6656', scarf: '#c8a060' },
     caelum: { bg: ['#3a2a6a', '#120d2a'], skin: '#ecd5c8', shade: '#cfb0a4', hair: '#1a1530', hairD: '#0c0a1a', eye: '#a58bff', style: 'swept', ears: true, cloth: '#1c1838', clothD: '#0e0c20', trim: '#cfd6ff', circlet: true, wings: true },
     queen: { bg: ['#4a1426', '#14060c'], skin: '#efe4ea', shade: '#cdbac4', hair: '#2a0a16', hairD: '#14040a', eye: '#ff4a5a', style: 'long', ears: true, cloth: '#2a0a16', clothD: '#14040a', crown: true, lips: '#c0203a' },
     bram: { bg: ['#5a3a1c', '#1c1008'], skin: '#d9a77f', shade: '#b8865f', hair: '#3a2a20', hairD: '#2a1c14', eye: '#5a3a22', style: 'shaved', ears: true, cloth: '#a8743a', clothD: '#6e4a22', beard: '#8a4426', scar: true, broad: true },

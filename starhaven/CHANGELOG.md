@@ -1,5 +1,33 @@
 # Starhaven — Changelog
 
+## Rebuild 5 — Boots like a game: studio splashes, menus, save slots, sound (Nov 17, 2026)
+Will's notes: the controller connects but needs a touch first; it should boot like a game with a menu and a save system;
+North Coast Studios watermark; E Concepts as another screen; keep improving what's there.
+
+- **Boot sequence:** North Coast Studios splash (star over waves) → E Concepts splash → STARHAVEN "Press any button"
+  → main menu. Any button, key or tap skips a splash. The game tries to take focus on load so a controller works
+  straight away; if the phone's app still wants a tap first, the start screen says so (tap once, or open in Safari/Chrome).
+- **Main menu:** Continue (your latest save), New game, Load game, Chapter select (any chapter, no saving), Settings,
+  Credits. North Coast Studios watermark on the menus and the pause screen. Works with a controller (D-pad/stick, A,
+  B back), keyboard (arrows, Space, Esc) and touch.
+- **Save system (DESIGN.md: 3 slots):** each slot shows its chapter, playtime, Caelum's hearts and date. Autosaves when a
+  chapter starts and ends, and on every bond change ("Saved" star in the corner). Quitting during an evening replays
+  that evening on load. Overwrite and erase ask first. An older save carries over into slot 1.
+- **Settings (remembered):** sound effects volume, text speed (slow / normal / fast / instant), touch "strike down for
+  me", screen shake, and the movement Tune panel.
+- **Sound effects** (synthesized, placeholder): jumps, dash, dagger swings and hits, pogo, the bow, getting hurt,
+  landing, lanterns, hearts, painting and the finished mural, the Wyrm's rumble, the door slamming, menu sounds, text blips.
+- **Dialogue types out** letter by letter; a tap or button press finishes the line first.
+- **Controller in game:** the pause menu, Story & goals, Tune and the end screen can all be driven with the D-pad and A/B.
+- **Mortal Wren's portrait** has round ears in the prologue.
+- Fix: holding a button while a menu opened counted as a new press (holding Start flipped pause on and off).
+
+Verified: `game/tests/front.js` (new, 16/16) drives the boot and menus with only a simulated Bluetooth controller
+(splashes, press start, new game in a slot, chapter card, Continue, quitting mid-evening and resuming, settings remembered,
+erase with confirm, pause menu with Start / D-pad / A / B); `game/tests/feel.js` 27/27; `game/tests/smoke.js` screenshots
+with no errors. NOT tested: a real controller in the Claude app on a real phone.
+
+
 ## Rebuild 4 — The prologue: the stag, the Wall, the trials, the blood bond (Nov 17, 2026)
 Will's notes: the down-strike is still hard; build a real prologue (how Wren ends up in the fae world: the deer, the
 lord, the kidnapping), the three trials, dying on the last one, Caelum's blood, the mate bond, the war with Spring;
