@@ -165,7 +165,7 @@
         <p><b>Created and directed by</b><br>Will, North Coast Studios</p>
         <p><b>Design, story and code</b><br>Built with Claude from Will's design doc</p>
         <p><b>Art and sound</b><br>Placeholder, made in code, until the real art and music arrive</p>
-        <p class="dim">Concept build. Prologue through Chapter 2.</p>
+        <p class="dim">Concept build. Prologue through Chapter 3.</p>
       </div>`, true);
   };
 

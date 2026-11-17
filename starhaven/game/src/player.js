@@ -10,7 +10,7 @@
       facing: 1, grounded: false, wasGrounded: false,
       coyote: 0, jumpBuf: 0, dashBuf: 0, atkBuf: 0,
       airJumps: 1, airDashes: 1, rising: false,
-      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, bowCd: 0, bowT: 0,
+      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, bowCd: 0, bowT: 0, pips: SH.GIFTS.pips, giftCd: 0, castT: 0,
       invuln: 0, stun: 0,
       swing: null, comboStep: 0, comboKind: null, comboGap: 0,
       hearts: P.hearts, maxHearts: P.hearts,
@@ -43,6 +43,23 @@
     if (this.dashCd > 0) this.dashCd--;
     if (this.bowCd > 0) this.bowCd--;
     if (this.bowT > 0) this.bowT--;
+    if (this.giftCd > 0) this.giftCd--;
+    if (inp.pressed.gift) this.giftBuf = 8; else if (this.giftBuf > 0) this.giftBuf--;
+    if (this.castT > 0) this.castT--;
+    // Flame: cast a fireball for one moon pip; pips refill slowly over time
+    if (SH.game.can('flame')) {
+      const G = SH.GIFTS;
+      this.pips = Math.min(G.pips, this.pips + 1 / G.regenFrames);
+      if (this.giftBuf > 0 && this.giftCd <= 0 && !this.dead && this.stun <= 0) {
+        this.giftBuf = 0;
+        if (this.pips >= G.flame.cost) {
+          this.pips -= G.flame.cost; this.giftCd = G.flame.cooldown; this.castT = 14;
+          const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
+          world.spawnFireball(this.x + this.facing * 14, this.y - 22, this.facing);
+          SH.sfx.play('dash');
+        } else { SH.fx.word(this.x, this.y - 52, 'no moons left', '#b9b2dd', 34); this.giftCd = 20; }
+      }
+    }
     if (this.iframes > 0) this.iframes--;
     if (this.invuln > 0) this.invuln--;
     if (this.comboGap > 0) this.comboGap--; else if (!this.swing) this.comboStep = 0;
@@ -254,6 +271,8 @@
         s.hits.add(tgt);
         const r = tgt.takeHit({ dmg: C.damage, kb: d.kb, dir: this.facing, finisher: !!d.finisher, pogo: s.kind === 'pogo' }, world);
         if (!r) continue;
+        if (r.deflect) continue;
+        if (SH.game.can('flame')) this.pips = Math.min(SH.GIFTS.pips, this.pips + SH.GIFTS.perHit); // close-up hits refill the moons
         this.stats.hits++;
         SH.sfx.play(r.killed ? 'kill' : 'hit');
         fx.stop(r.killed ? C.killStop : d.stop);

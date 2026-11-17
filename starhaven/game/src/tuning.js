@@ -45,6 +45,13 @@
   // Player settings (menu). autoDown: on touch, a strike in the air aims down when something is below.
   SH.settings = { autoDown: true };
 
+  // Court gifts (DESIGN.md "Court gifts" and "Combat system": 3 moon pips to start; a cast costs 1;
+  // pips refill slowly over time and quickly from dagger hits, which rewards getting close).
+  SH.GIFTS = {
+    flame: { cost: 1, speed: 5.6, life: 70, damage: 4, burn: 3, burnEvery: 40, cooldown: 22 },
+    pips: 3, regenFrames: 300, perHit: 0.34,
+  };
+
   SH.PLAYER = {
     w: 14, h: 38,
     hearts: 5,
@@ -79,6 +86,13 @@
       respawn: 300, damage: 1, gravity: 0.5,
     },
     dummy: { name: 'Training dummy', w: 22, h: 40 },
+    // Mountain wyrmling (DESIGN.md: charges in a straight line; teaches "sidestep, then hit from behind"; HP 10).
+    // Its head is armored while it winds up and charges: hit it from behind, or while it's dazed after a charge.
+    wyrmling: { name: 'Mountain wyrmling', hp: 10, w: 46, h: 26, wander: 0.5, sight: 210, sightY: 70, windup: 34,
+      chargeSpeed: 6.2, chargeFrames: 70, stun: 80, rest: 40, damage: 1, gravity: 0.5, scale: 1 },
+    // The Old Wyrm: the same creature, bigger (data, not new code). Charging into a wall brings rocks down.
+    oldWyrm: { name: 'The Old Wyrm', hp: 30, w: 80, h: 44, wander: 0.4, sight: 1200, sightY: 160, windup: 30,
+      chargeSpeed: 7.2, chargeFrames: 90, stun: 95, rest: 30, damage: 2, gravity: 0.5, scale: 1.7, rocks: 5, boss: true },
     bulb: { name: 'Thorn bud', r: 13, regrow: 40 },
   };
 })(window.SH = window.SH || {});

@@ -10,7 +10,7 @@ the first playable is the Prologue through Chapter 2. Every line of dialogue liv
 - **The Thorn Queen:** the fae tyrant who seized the courts from Under the Mountain.
 - **Lord Caelum:** High Lord of the Court of Dusk, ruler of Starhaven. Wren's mate: he felt the bond from the first day.
 - **The Iron King:** across the sea, building an army, using the war between Spring and Dusk.
-- **Bram** and **Iris:** two of the Five, Caelum's inner circle.
+- **Bram**, **Iris** and **Thane:** three of the Five, Caelum's inner circle (general, seer, scholar).
 
 ## Prologue, part 1: The Winter Woods (playable; Wren is mortal: one jump, no dash, a bow)
 Starts at the sisters' cottage. Nessa and Lissa (both can be talked to) send Wren out hunting. Glittering tracks lead to a
@@ -54,6 +54,15 @@ the Iron King's creatures. Caelum arrives, then **Iris's vision**: threads over 
 mortal girls. The Iron King knows Wren's name, and he is reaching for her sisters.
 - Goals: show Bram your daggers; cross the thorn pit; clear the thorn sprites (count shown).
 
+## Chapter 3: First Light (Flame, wyrmlings, a boss)
+Wren dreams of fire and wakes with her palm glowing. **Thane**, keeper of the Library, explains: the Thorn Queen drained
+the power of all seven courts for fifty years; when she fell it broke loose, and some of it went into Wren's stopped
+heart. Flame woke first. Light three braziers; burn the queen's last thorns off the mountain road; hunt the **Old Wyrm**
+that is killing shepherds (two wyrmlings on the way: jump the charge, hit from behind). On the peak, **Rowan** comes for
+Wren and she refuses him (choose how). "Then I'll take you back. One way or another."
+- Goals: light the braziers; burn the thorns; hunt the beast.
+- Evening 3: Caelum on the rooftop ("you called it home") or Thane in the Library (forty-one questions).
+
 ## Evenings and bonds
 - **After Chapter 1:** a night on the rooftop with Caelum. Starlit wine. Show him your sketchbook (a gift he loves),
   toast to the bargain, or ask about his nightmares.
@@ -63,8 +72,7 @@ mortal girls. The Iron King knows Wren's name, and he is reaching for her sister
 - **Hearts:** 5 each. Heart 1 when you meet; then 40, 120, 240, 400 points. Every new heart plays a short scene.
 
 ## Then
-A last scene: Wren dreams of fire instead of thorns and wakes with her palm glowing. Next: Chapter 3, First Light.
-The end screen says what comes next if this direction is right.
+A last scene: three nights later, something with wings lands on the Library roof. Next: Chapter 4, The Spy in the Library.
 
 ## How the player always knows what's going on
 - The **GOAL line** at the top always shows the chapter and the one thing to do now.

@@ -154,6 +154,48 @@
     dummyCombo: 'ring_combo',          // landing a full 3-hit combo on the dummy runs this
   };
 
+  // ---------------------------------------------------------------- Chapter 3: First Light (Flame, wyrmlings, the Old Wyrm)
+  SH.ROOMS.mountain = {
+    id: 'mountain', width: 164, height: 20, theme: 'city',
+    zones: [{ x: 0, theme: 'city' }, { x: 40, theme: 'mountain' }],
+    start: { x: 3, y: 16 },
+    cityFrom: 3, cityTo: 30, cityLight: 0.8, cityGlowX: 20,
+    shapes: [
+      ['solid', 0, 2, 0, 20],
+      ['ground', 2, 48, 16],            // the Library courtyard, then the foot of the mountain road
+      ['oneway', 19, 25, 12],           // a ledge with the third brazier
+      ['ground', 48, 56, 14],
+      ['ground', 56, 64, 12],
+      ['ground', 68, 90, 12],           // gap 64..68; the first wyrmling's ledge
+      ['ground', 90, 117, 14],
+      ['oneway', 95, 100, 10],          // somewhere to hop up out of a charge
+      ['ground', 117, 162, 14],         // the Old Wyrm's hollow
+      ['solid', 162, 164, 0, 20],
+    ],
+    thornWalls: [{ id: 'road', x: 34, w: 2, top: 6 }],
+    hints: [
+      { x0: 6, x1: 30, text: 'Call the flame with {GIFT}. Each flame costs one moon (beside your hearts); they refill over time, faster when your daggers land.', flag: 'giftgot' },
+      { x0: 27, x1: 34, text: 'Thorns: steel won\'t cut them. Burn them with {GIFT}.', flag: 'flame' },
+      { x0: 66, x1: 82, text: 'Wyrmlings charge in a straight line, head armored. Jump over the charge, then strike from behind while it\'s dazed.', flag: 'wall' },
+    ],
+    triggers: [
+      { x: 4, script: 'lib_start' },
+      { x: 40, script: 'mtn_road', flag: 'wall' },
+      { x: 120, script: 'mtn_wyrm', flag: 'wall' },
+    ],
+    gates: [{ id: 'arenagate', x: 117, top: 6, open: true }],
+    lanterns: [{ x: 4, lit: true }, { x: 46 }, { x: 69 }, { x: 119 }],   // the last one is inside the hollow, so a knockout keeps you in the fight
+    npcs: [{ id: 'thane', x: 8 }, { id: 'caelum', x: 11 }],
+    spawns: [
+      { kind: 'brazier', x: 13 },
+      { kind: 'brazier', x: 17 },
+      { kind: 'brazier', x: 22, y: 12 },
+      { kind: 'wyrmling', x: 82, y: 12 },
+      { kind: 'wyrmling', x: 106 },
+      { kind: 'oldWyrm', x: 150 },
+    ],
+  };
+
   // Tile codes
   SH.T_EMPTY = 0; SH.T_SOLID = 1; SH.T_ONEWAY = 2; SH.T_THORNS = 3;
 
@@ -181,6 +223,11 @@
         return null;
       },
       // Gates are solid tiles that a script can remove.
+      // Thorn walls are solid until burned.
+      setThorns(t, solid) {
+        for (let x = t.x; x < t.x + t.w; x++) for (let y = t.top; y < 16; y++) set(x, y, solid ? SH.T_SOLID : SH.T_EMPTY);
+        t.solid = solid;
+      },
       setGate(g, closed) {
         if (g.bottom == null) g.bottom = this.groundY(g.x, g.top) / SH.TILE; // measured once, while the gate is open
         for (let y = g.top; y < g.bottom; y++) set(g.x, y, closed ? SH.T_SOLID : SH.T_EMPTY);

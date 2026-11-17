@@ -39,6 +39,12 @@
       ground: '#1a2236', speck: '#222c44', edgeLight: '#ffffff', edgeMid: '#c8d6f0', grass: '#ffffff', grassDark: '#dfe8f8', side: '#2a3450',
       motes: ['#ffffff', '#e8f0ff'],
     },
+    mountain: {
+      sky: ['#1c2433', '#3a4a62', '#7a8aa6', '#c8d2e2'], stars: false, far: 'mountains', mid: 'pines', snow: true,
+      farA: '#5a6a86', farB: '#44526e', midC: '#232c3c', mist: 'rgba(220,230,245,0.18)',
+      ground: '#141a24', speck: '#1c2432', edgeLight: '#ffffff', edgeMid: '#9aa6c0', grass: '#e8eef8', grassDark: '#b8c4d8', side: '#2a3446',
+      motes: ['#ffffff', '#dfe8f8'],
+    },
     thornwood: {
       sky: ['#090b20', '#191a45', '#33295c', '#4d3a72'], stars: true, far: 'mountains', mid: 'trees',
       farA: '#23275a', farB: '#181b42', midC: '#11132e', mist: 'rgba(110,100,190,0.18)',
@@ -244,6 +250,7 @@
     if (def.house) drawHouse(ctx, w, def.house);
     if (def.mural) drawMural(ctx, w, def.mural, t);
     for (const g of w.gates) drawGate(ctx, g);
+    for (const t of w.thorns || []) if (t.solid) drawThornWall(ctx, t, w.time);
     if (def.exitLight != null) drawExitLight(ctx, def.exitLight, t);
     for (const l of w.lanterns) drawLantern(ctx, l, t);
     for (const n of w.npcs) SH.art.npc(ctx, n, t);
@@ -253,6 +260,17 @@
       else if (e.kind === 'dummy') drawDummy(ctx, e);
       else if (e.kind === 'bulb') drawBulb(ctx, e, t);
       else if (e.kind === 'stag') drawStag(ctx, e, t);
+      else if (e.kind === 'brazier') drawBrazier(ctx, e, t);
+      else if (e.kind === 'wyrm') drawWyrm2(ctx, e, t);
+    }
+    for (const f of w.fireballs || []) {
+      const gl = ctx.createRadialGradient(f.x, f.y, 1, f.x, f.y, 16); gl.addColorStop(0, 'rgba(255,200,110,0.9)'); gl.addColorStop(1, 'rgba(255,120,40,0)');
+      ctx.fillStyle = gl; ctx.fillRect(f.x - 16, f.y - 16, 32, 32);
+      ctx.fillStyle = '#fff6d8'; ctx.beginPath(); ctx.arc(f.x, f.y, 4, 0, Math.PI * 2); ctx.fill();
+    }
+    for (const r of w.rocks || []) {
+      if (r.ground != null) { ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.beginPath(); ctx.ellipse(r.x, r.ground - 1, 12, 3, 0, 0, Math.PI * 2); ctx.fill(); }
+      if (r.warn <= 0) { ctx.fillStyle = '#5a6680'; ctx.fillRect(r.x - 9, r.y - 16, 18, 16); ctx.fillStyle = '#8a96b8'; ctx.fillRect(r.x - 9, r.y - 16, 18, 3); }
     }
     for (const a of w.arrows || []) {
       ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(Math.atan2(a.vy, a.vx)); ctx.globalAlpha = Math.min(1, a.life / 20);
@@ -511,6 +529,52 @@
     ctx.fillStyle = g; ctx.fillRect(x - 10, gy - 80, 80, 80);
     ctx.fillStyle = '#ffc070'; ctx.fillRect(x + 20, gy - 50, 20, 16); ctx.fillStyle = '#3a2a24'; ctx.fillRect(x + 29, gy - 50, 2, 16);
     ctx.fillStyle = '#5a3a24'; ctx.fillRect(x + 66, gy - 40, 18, 40);
+  }
+  function drawThornWall(ctx, tw, t) {
+    const TS = SH.TILE, x = tw.x * TS, top = tw.top * TS, bot = 16 * TS, wd = tw.w * TS;
+    ctx.fillStyle = '#2a1024'; ctx.fillRect(x + 4, top, wd - 8, bot - top);
+    for (let y = top; y < bot; y += 10) for (let k = 0; k < 3; k++) {
+      const sx = x + 4 + k * (wd - 8) / 3 + Math.sin(y * 0.3 + k) * 3;
+      ctx.fillStyle = '#5a1d3e'; ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx + (k % 2 ? 9 : -9), y + 4); ctx.lineTo(sx, y + 7); ctx.fill();
+      ctx.fillStyle = '#ff5a78'; ctx.fillRect(sx + (k % 2 ? 7 : -9), y + 3, 2, 2);
+    }
+    const g = ctx.createLinearGradient(x - 20, 0, x + wd + 20, 0); g.addColorStop(0, 'rgba(255,60,100,0)'); g.addColorStop(0.5, 'rgba(255,60,100,0.12)'); g.addColorStop(1, 'rgba(255,60,100,0)');
+    ctx.fillStyle = g; ctx.fillRect(x - 20, top, wd + 40, bot - top);
+  }
+  function drawBrazier(ctx, b, t) {
+    const x = b.x, y = b.y;
+    ctx.fillStyle = '#2a2236'; ctx.fillRect(x - 3, y - 22, 6, 22); ctx.fillRect(x - 9, y - 2, 18, 2);
+    ctx.fillStyle = '#4a3a5a'; ctx.fillRect(x - 11, y - 30, 22, 8); ctx.fillStyle = '#6a5a7a'; ctx.fillRect(x - 11, y - 30, 22, 2);
+    if (b.lit) {
+      const f = Math.sin(t * 0.3 + x) * 2;
+      const g = ctx.createRadialGradient(x, y - 36, 2, x, y - 36, 44); g.addColorStop(0, 'rgba(255,170,80,0.55)'); g.addColorStop(1, 'rgba(255,170,80,0)');
+      ctx.fillStyle = g; ctx.fillRect(x - 44, y - 80, 88, 88);
+      ctx.fillStyle = '#ff8a3a'; ctx.beginPath(); ctx.moveTo(x - 9, y - 30); ctx.lineTo(x, y - 48 + f); ctx.lineTo(x + 9, y - 30); ctx.fill();
+      ctx.fillStyle = '#ffe08a'; ctx.beginPath(); ctx.moveTo(x - 4, y - 30); ctx.lineTo(x, y - 40 - f); ctx.lineTo(x + 4, y - 30); ctx.fill();
+    } else { ctx.fillStyle = '#1a1424'; ctx.fillRect(x - 8, y - 32, 16, 3); }
+  }
+  // Wyrms: a long, low, armored body; the head glows red while winding up; stars circle it when dazed.
+  function drawWyrm2(ctx, e, t) {
+    if (e.dead) return;
+    const s = e.def.scale, x = e.x, y = e.y;
+    ctx.save(); ctx.translate(Math.round(x + (e.state === 'windup' ? Math.sin(e.t * 1.6) * 1.5 : 0)), Math.round(y)); ctx.scale(e.dir * s, s);
+    const body = e.flash > 0 ? '#ffffff' : '#4a566e', belly = e.flash > 0 ? '#ffffff' : '#7a86a0', plate = e.flash > 0 ? '#ffffff' : '#c8d2e2';
+    const wave = e.state === 'charge' ? Math.sin(e.t * 0.8) * 2 : Math.sin(t * 0.05) * 1;
+    ctx.fillStyle = body;
+    for (let i = 0; i < 5; i++) { const bx = -22 + i * 9, by = -12 + Math.sin(i * 0.9 + t * 0.08) * wave; ctx.beginPath(); ctx.ellipse(bx, by, 8, 8, 0, 0, Math.PI * 2); ctx.fill(); }
+    ctx.fillStyle = belly; ctx.fillRect(-26, -6, 40, 5);
+    ctx.fillStyle = body; ctx.beginPath(); ctx.moveTo(-26, -12); ctx.lineTo(-36, -8 + wave); ctx.lineTo(-26, -6); ctx.fill();   // tail
+    for (let i = 0; i < 4; i++) { ctx.fillRect(-18 + i * 10, -4, 3, 4 + (e.state === 'charge' && (t + i) % 4 < 2 ? 1 : 0)); }  // legs
+    // head with an armored brow plate
+    ctx.fillStyle = body; ctx.fillRect(14, -20, 14, 13);
+    ctx.fillStyle = plate; ctx.fillRect(16, -22, 13, 5); ctx.fillRect(26, -20, 4, 9);
+    ctx.fillStyle = '#e8eef8'; ctx.beginPath(); ctx.moveTo(16, -22); ctx.lineTo(12, -30); ctx.lineTo(20, -22); ctx.fill();
+    const angry = e.state === 'windup' || e.state === 'charge';
+    ctx.fillStyle = angry ? '#ff4a4a' : '#ffd27a'; ctx.fillRect(22, -16, 3, 2);
+    ctx.restore();
+    if (angry) { const g = ctx.createRadialGradient(x + e.dir * 22 * s, y - 16 * s, 1, x + e.dir * 22 * s, y - 16 * s, 18 * s); g.addColorStop(0, 'rgba(255,70,70,0.45)'); g.addColorStop(1, 'rgba(255,70,70,0)'); ctx.fillStyle = g; ctx.fillRect(x + e.dir * 22 * s - 18 * s, y - 34 * s, 36 * s, 36 * s); }
+    if (e.state === 'stun') for (let i = 0; i < 3; i++) { const a = t * 0.12 + i * 2.1; ctx.fillStyle = '#ffe9a8'; ctx.fillRect(x + e.dir * 20 * s + Math.cos(a) * 10 * s, y - 34 * s + Math.sin(a) * 3, 3, 3); }
+    if (!e.boss && e.hp < e.def.hp) { const n = 10; for (let i = 0; i < n; i++) { ctx.fillStyle = i < Math.ceil(e.hp / e.def.hp * n) ? '#c8d2e2' : '#2a2a3a'; ctx.fillRect(x - 25 + i * 5, y - e.h * s - 14, 4, 3); } }
   }
   function drawStag(ctx, e, t) {
     ctx.save(); ctx.translate(e.x, e.y);

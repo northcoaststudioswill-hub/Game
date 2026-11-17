@@ -301,7 +301,7 @@ const path = require('path');
       SH.test.load(3); const p = P(), w = G.world;
       const buds = w.things.filter(t => t.kind === 'bulb');
       let f = 0, swings = 0;
-      while (f++ < 60 * 150 && G.state !== 'end') {
+      while (f++ < 60 * 150 && G.chapter === 3) {
         const tx = p.x / T; let press = null, held = { right: true, jump: true };
         if (G.state === 'play') {
           if (!G.flags.combo) {
@@ -323,8 +323,66 @@ const path = require('path');
         }
         talk(held, press);
       }
-      check('Chapter 2 + vision + second evening + finale: ends on the concept end screen', G.state === 'end' && G.progress.reached >= 3 && seen.has('finale') && seen.has('ev2_caelum'),
-        { state: G.state, reached: G.progress.reached, seconds: +(f / 60).toFixed(1), hurt: p.stats.hurt, swings, finale: seen.has('finale') });
+      check('Chapter 2 + vision + second evening: leads into Chapter 3', G.chapter === 4 && seen.has('ev2_caelum'),
+        { chapter: G.chapter, seconds: +(f / 60).toFixed(1), hurt: p.stats.hurt, swings });
+    })();
+
+    // Chapter 3: Flame lights the braziers and burns the thorns
+    (function () {
+      SH.test.load(4); const p = P(), w = G.world;
+      SH.test.place(5, 16);
+      for (let i = 0; i < 2000 && !G.flags.giftgot; i++) talk({}, null);
+      for (let i = 0; i < 200 && G.state === 'talk'; i++) talk({}, null);
+      const pips0 = p.pips;
+      SH.test.place(9, 16); p.facing = 1;
+      const cast = () => { step({ right: false }, ['gift']); for (let i = 0; i < 40; i++) step({}); };
+      cast(); cast();
+      SH.test.place(20, 12); p.facing = 1; step({}); cast();
+      const lit = w.things.filter(e => e.kind === 'brazier' && e.lit).length;
+      for (let i = 0; i < 400 && (G.state === 'talk' || G.pending); i++) talk({}, null);
+      check('Flame: three casts cost three moons and light all three braziers', lit === 3 && pips0 >= 2.99 && G.activeGoal === 'wall', { lit, pips0: +pips0.toFixed(2), pipsLeft: +p.pips.toFixed(2), goal: G.activeGoal });
+      p.pips = 3; p.giftCd = 0; SH.fx.hitstop = 0; SH.test.place(30, 16); p.facing = 1; step({}); const before = [G.state, G.activeGoal, G.script && G.script.id, !!G.pending]; cast();
+      for (let i = 0; i < 400 && (G.state === 'talk' || G.pending); i++) talk({}, null);
+      check('Flame: the Thorn Queen\'s thorns burn away and the road opens', !w.thorns[0].solid && G.flags.wall && w.room.get(34, 14) === SH.T_EMPTY, { burned: !w.thorns[0].solid, wall: !!G.flags.wall, before });
+    })();
+
+    // Wyrmlings: armored head in front while charging, open from behind / when dazed
+    (function () {
+      SH.test.load('mountain', { story: false }); const p = P(), w = G.world;
+      const wy = w.things.find(e => e.kind === 'wyrm' && !e.boss);
+      SH.test.place(wy.x / T - 1.8, wy.y / T); p.facing = 1; wy.dir = -1; wy.state = 'charge'; wy.t = 0; p.invuln = 999;
+      const hp0 = wy.hp; step({}, ['attack']); for (let i = 0; i < 6; i++) { wy.state = 'charge'; wy.vx = 0; wy.x = wy.home.x; step({}); }
+      const afterFront = wy.hp;
+      wy.state = 'stun'; wy.t = 0; for (let i = 0; i < 20; i++) step({});
+      step({}, ['attack']); for (let i = 0; i < 8; i++) step({});
+      check('Wyrmling: a strike at its charging head clangs off; a strike while it\'s dazed lands', afterFront === hp0 && wy.hp === hp0 - 2, { hp0, afterFront, afterStun: wy.hp });
+    })();
+
+    // Chapter 3: the Old Wyrm, the peak, the evening, the finale
+    (function () {
+      SH.test.load(4); const p = P(), w = G.world;
+      SH.test.place(5, 16);
+      for (let i = 0; i < 2000 && !G.flags.giftgot; i++) talk({}, null);
+      for (let i = 0; i < 200 && G.state === 'talk'; i++) talk({}, null);
+      G.flags.flame = G.flags.wall = true; G.activeGoal = 'hunt';
+      for (const t of w.thorns) w.room.setThorns(t, false);
+      w.things.filter(e => e.kind === 'wyrm' && !e.boss).forEach(e => { e.dead = true; });
+      SH.test.place(121, 14);
+      for (let i = 0; i < 600 && !G.boss; i++) talk({}, null);
+      const boss = G.boss, gateClosed = w.gates[0].closed;
+      let f = 0, rocksSeen = 0;
+      while (f++ < 60 * 120 && G.boss && !boss.dead) {
+        p.invuln = 5; p.hearts = 5;   // this test checks the fight can be won, not dodging
+        if (w.rocks.length) rocksSeen++;
+        let press = null;
+        if (boss.state === 'stun') { if (Math.abs(p.x - (boss.x - boss.dir * (boss.w / 2 + 14))) > 4) { SH.test.place((boss.x - boss.dir * (boss.w / 2 + 14)) / T, 14); p.facing = boss.dir; } if (!p.swing && f % 5 === 0) press = ['attack']; }
+        else { p.facing = boss.x > p.x ? 1 : -1; if (f % 30 === 0) press = ['gift']; }
+        step({}, press);
+      }
+      const won = boss.dead;
+      for (let i = 0; i < 4000 && G.state !== 'end'; i++) talk({}, null);
+      check('Old Wyrm: the hollow seals, rocks fall when it hits the cliff, it can be beaten; peak, evening and finale follow', gateClosed && won && rocksSeen > 0 && seen.has('mtn_peak') && seen.has('evening3') && seen.has('finale') && G.state === 'end',
+        { gateClosed, won, rocksSeen: rocksSeen > 0, fightSeconds: +(f / 60).toFixed(1), peak: seen.has('mtn_peak'), evening: seen.has('evening3'), state: G.state });
     })();
 
     // Evening 2 choices lead to the right person and add their bond points

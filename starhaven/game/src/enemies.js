@@ -188,6 +188,107 @@
     return { landed: true, killed: true };
   };
 
+  // ---------------- Brazier: only fire lights it.
+  function Brazier(x, y) { Object.assign(this, { kind: 'brazier', x, y, w: 18, h: 30, lit: false, fireOnly: true }); }
+  Brazier.prototype.reset = function () { };
+  Brazier.prototype.hittable = function () { return !this.lit; };
+  Brazier.prototype.hurtBox = function () { return { l: this.x - 12, r: this.x + 12, t: this.y - 34, b: this.y }; };
+  Brazier.prototype.update = function () { };
+  Brazier.prototype.takeHit = function (hit) {
+    if (!hit.fire) { SH.fx.word(this.x, this.y - 44, 'needs fire', '#ffb057', 40); return { landed: true }; }
+    this.lit = true; SH.sfx.play('lantern');
+    SH.fx.burst(this.x, this.y - 32, 20, { speed: 2.4, life: 34, gravity: -0.05, colors: ['#ff8a3a', '#ffd27a', '#fff6d8'], glow: true });
+    return { landed: true };
+  };
+
+  // ---------------- Wyrms: the mountain wyrmling, and the Old Wyrm (same creature, bigger, from data).
+  // Wander -> wind up (armored head, eyes glow) -> charge in a straight line -> dazed (open to hits) -> rest.
+  function Wyrm(x, y, kind) {
+    const d = SH.ENEMY_DEFS[kind];
+    Object.assign(this, { kind: 'wyrm', defKind: kind, def: d, home: { x, y }, w: d.w, h: d.h, boss: !!d.boss, respawns: false });
+    this.reset();
+  }
+  Wyrm.prototype.reset = function () {
+    Object.assign(this, { x: this.home.x, y: this.home.y, vx: 0, vy: 0, hp: this.def.hp, dir: -1, state: this.boss ? 'sleep' : 'wander', t: 0, flash: 0, dead: false, burn: 0, burnT: 0, grounded: false, hitWall: false });
+  };
+  Wyrm.prototype.hittable = function () { return !this.dead && this.state !== 'sleep'; };
+  Wyrm.prototype.hurtBox = function () { return { l: this.x - this.w / 2, r: this.x + this.w / 2, t: this.y - this.h, b: this.y }; };
+  Wyrm.prototype.bodyBox = function () { return { l: this.x - this.w / 2 + 6, r: this.x + this.w / 2 - 6, t: this.y - this.h + 6, b: this.y }; };
+  Wyrm.prototype.wake = function () { if (this.state === 'sleep') { this.state = 'rest'; this.t = 0; } };
+  Wyrm.prototype.update = function (world) {
+    const d = this.def, p = world.player, fx = SH.fx;
+    if (this.dead || this.state === 'sleep') return;
+    this.t++;
+    if (this.flash > 0) this.flash--;
+    if (this.burn > 0) { this.burn--; if (++this.burnT % SH.GIFTS.flame.burnEvery === 0) this.damage(1, world); if (this.t % 4 === 0) fx.burst(this.x, this.y - this.h * 0.7, 1, { speed: 0.6, life: 20, gravity: -0.06, colors: ['#ff8a3a', '#ffd27a'] }); }
+    const dx = p.x - this.x, sees = !p.dead && Math.abs(dx) < d.sight && Math.abs(p.y - this.y) < d.sightY;
+    switch (this.state) {
+      case 'wander':
+        this.vx = this.dir * d.wander;
+        if (!SH.floorAhead(world.room, this.x + this.dir * (this.w / 2 + 2), this.y) || this.hitWall || Math.abs(this.x - this.home.x) > 5 * SH.TILE && (this.x - this.home.x) * this.dir > 0) this.dir *= -1;
+        if (sees && this.grounded) { this.state = 'windup'; this.t = 0; this.dir = dx > 0 ? 1 : -1; fx.word(this.x, this.y - this.h - 10, '!', '#ff5a5a', 30); SH.sfx.play('rumble'); }
+        break;
+      case 'windup':
+        this.vx = 0;
+        if (this.t % 6 === 0) fx.dust(this.x - this.dir * this.w / 2, this.y, -this.dir, 2);
+        if (this.t >= d.windup) { this.state = 'charge'; this.t = 0; }
+        break;
+      case 'charge': {
+        this.vx = this.dir * d.chargeSpeed;
+        if (this.t % 3 === 0) fx.dust(this.x - this.dir * this.w / 2, this.y, -this.dir, 2);
+        const edge = !SH.floorAhead(world.room, this.x + this.dir * (this.w / 2 + 4), this.y);
+        if (this.hitWall || edge || this.t > d.chargeFrames) {
+          this.vx = 0;
+          if (this.hitWall) {
+            fx.kick(this.boss ? 9 : 5); SH.sfx.play('thud');
+            if (d.rocks) world.dropRocks(d.rocks);
+            this.state = 'stun'; this.t = 0;
+          } else { this.state = edge ? 'stun' : 'rest'; this.t = edge ? Math.floor(d.stun / 2) : 0; }
+        }
+        break;
+      }
+      case 'stun':
+        this.vx = 0;
+        if (this.t >= d.stun) { this.state = 'rest'; this.t = 0; }
+        break;
+      case 'rest':
+        this.vx = 0;
+        if (this.t >= d.rest) { this.state = 'wander'; this.t = 0; if (sees) { this.state = 'windup'; this.dir = dx > 0 ? 1 : -1; } }
+        break;
+    }
+    this.vy = Math.min(this.vy + d.gravity, 9);
+    const res = SH.moveBody(world.room, this);
+    this.grounded = res.ground; this.hitWall = res.wall !== 0;
+    if (SH.overlap(this.bodyBox(), p.box()) && !(p.dashT > 0 && p.iframes > 0)) p.hurt(this.x, this.state === 'charge' ? d.damage : 1, world);
+  };
+  Wyrm.prototype.damage = function (n, world) {
+    this.hp -= n; this.flash = 8;
+    if (this.hp <= 0 && !this.dead) {
+      this.dead = true; this.vx = 0;
+      SH.fx.burst(this.x, this.y - this.h / 2, this.boss ? 60 : 26, { speed: 3.4, life: 46, size: 3, colors: ['#8a96b8', '#c8d2e2', '#5a6680', '#ffd27a'] });
+      SH.fx.kick(this.boss ? 10 : 4); SH.sfx.play('kill');
+      world.onKill(this);
+      if (this.boss && world.onBossDown) world.onBossDown();
+      return true;
+    }
+    return false;
+  };
+  Wyrm.prototype.takeHit = function (hit, world) {
+    const facingHer = hit.dir === -this.dir;
+    if (!hit.fire && facingHer && (this.state === 'windup' || this.state === 'charge')) {
+      // the armored head: sparks, no damage
+      SH.fx.word(this.x + this.dir * this.w / 2, this.y - this.h - 6, 'CLANG', '#c8d2e2', 26);
+      SH.fx.burst(this.x + this.dir * this.w / 2, this.y - this.h / 2, 8, { speed: 2.6, life: 14, colors: ['#ffffff', '#ffd27a'] });
+      SH.sfx.play('hit');
+      world.player.vx = hit.dir * -3;
+      return { landed: true, deflect: true };
+    }
+    if (hit.fire) this.burn = SH.GIFTS.flame.burn * SH.GIFTS.flame.burnEvery;
+    SH.fx.burst(this.x, this.y - this.h / 2, 7, { angle: hit.dir > 0 ? 0 : Math.PI, spread: 1.4, speed: 2.4, life: 18, colors: ['#c8d2e2', '#ffffff'] });
+    const killed = this.damage(hit.dmg, world);
+    return { landed: true, killed };
+  };
+
   SH.makeSpawn = function (s, room) {
     const T = TS();
     const x = s.x * T + T / 2;
@@ -196,6 +297,8 @@
     if (s.kind === 'thornSprite') { const e = new ThornSprite(x, y); e.respawns = s.respawn; return e; }
     if (s.kind === 'dummy') return new Dummy(x, y);
     if (s.kind === 'stag') return new Stag(x, y, s.spots || [s.x]);
+    if (s.kind === 'brazier') return new Brazier(x, y);
+    if (s.kind === 'wyrmling' || s.kind === 'oldWyrm') return new Wyrm(x, y, s.kind);
     throw new Error('unknown spawn ' + s.kind);
   };
 })(window.SH = window.SH || {});

@@ -1,5 +1,31 @@
 # Starhaven — Changelog
 
+## Rebuild 6 — Chapter 3, First Light (Nov 17, 2026)
+The next chapter in `DESIGN.md`: Wren's first court gift, a new enemy, a monster hunt, and Caelum's next heart.
+
+- **Where the gifts come from (Will's open question, answered in the story):** the Thorn Queen drained the power of all
+  seven courts for fifty years. When she fell it broke loose, and some of it went into the only heart that had just
+  stopped: Wren's. Caelum's blood made her fae; the queen's stolen power is the seven gifts. Flame wakes first.
+- **Thane** joins the cast (the Five's scholar): portrait, sprite, journal entry, bond, heart scene.
+- **Flame:** FLAME button / LB / F. Fireballs cost one moon pip; 3 pips beside the hearts, refilling over time and
+  faster from dagger hits (design doc). Fireballs burn wyrms over time, light braziers, and burn the Thorn Queen's
+  thorn walls (steel can't).
+- **The level (`mountain`):** the Library courtyard (light three braziers), the thorn-choked mountain road, two
+  **mountain wyrmlings** (armored heads: a strike at a charging head clangs off; jump the charge and hit from behind or
+  while dazed), and the Old Wyrm's hollow, which seals behind you.
+- **Boss: the Old Wyrm** (the same creature from data, bigger): 30 HP, a health bar, and when it charges into the cliff
+  the mountain shakes and rocks fall (with a shadow first).
+- **Story:** the fire dream; Thane's theory; the braziers; the thorns burning; the hunt; on the peak, Rowan comes for Wren
+  and she tells him no (choose how). Evening 3 with Caelum or Thane. A new finale teases Chapter 4 (a winged spy lands
+  on the Library roof).
+- Fixes: Flame presses during hit-stop were dropped; the Old Wyrm could stay asleep-eyed at the far end of its hollow.
+
+Verified (`game/tests/feel.js` 31/31, `front.js` 16/16, `smoke.js` no errors): three casts cost three moons and light all
+three braziers; the thorns burn and the road opens; a strike at a charging wyrmling's head clangs off and a strike while
+it's dazed lands; the hollow seals, rocks fall, the Old Wyrm can be beaten, and the peak, evening and finale follow.
+NOT tested: human play of Chapter 3, its difficulty, and Flame on a real controller.
+
+
 ## Rebuild 5 — Boots like a game: studio splashes, menus, save slots, sound (Nov 17, 2026)
 Will's notes: the controller connects but needs a touch first; it should boot like a game with a menu and a save system;
 North Coast Studios watermark; E Concepts as another screen; keep improving what's there.

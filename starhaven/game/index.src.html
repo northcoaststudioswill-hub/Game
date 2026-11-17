@@ -98,6 +98,16 @@ body[data-input="touch"] #touch { display: block; }
 #b-attack { width: 76px; height: 76px; right: calc(max(24px, env(safe-area-inset-right)) + 104px); bottom: 22px; }
 #b-dash { width: 70px; height: 70px; right: calc(max(24px, env(safe-area-inset-right)) + 40px); bottom: 132px; }
 #b-down { width: 64px; height: 64px; right: calc(max(24px, env(safe-area-inset-right)) + 192px); bottom: 30px; font-size: 22px; }
+#b-gift { width: 64px; height: 64px; right: calc(max(24px, env(safe-area-inset-right)) + 200px); bottom: 112px; display: none;
+  background: rgba(255,120,40,.25); border-color: #ff9a4a; color: #ffd27a; }
+#pips { position: absolute; left: max(14px, env(safe-area-inset-left)); top: 40px; display: flex; gap: 5px; }
+.pip { width: 15px; height: 15px; border-radius: 50%; border: 2px solid #c8c0ff; background: #14123a; position: relative; overflow: hidden; }
+.pip span { position: absolute; left: 0; bottom: 0; width: 100%; background: linear-gradient(#fff6d8, #b9a8ff); }
+#bossbar { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); width: min(420px, 60vw); display: none; text-align: center; }
+#bossbar.show { display: block; }
+#bossbar .bn { font-family: var(--display); color: #ffb0a0; letter-spacing: .12em; font-size: 13px; }
+#bossbar .bb { height: 8px; border-radius: 4px; background: #2a1a24; border: 1px solid #ff9a7a; overflow: hidden; margin-top: 3px; }
+#bossbar .bb span { display: block; height: 100%; background: linear-gradient(90deg, #ff5a5a, #ffb057); transition: width .2s; }
 #b-talk { width: 70px; height: 70px; right: calc(max(24px, env(safe-area-inset-right)) + 122px); bottom: 112px; display: none;
   background: rgba(255,210,122,.25); border-color: var(--gold); color: var(--gold); }
 #b-talk.show { display: flex; }
@@ -223,6 +233,8 @@ body[data-input="touch"] #touch { display: block; }
 
 <div id="hud">
   <div id="hearts"></div>
+  <div id="pips"></div>
+  <div id="bossbar"><span class="bn"></span><div class="bb"><span></span></div></div>
   <div id="goal"></div>
   <button id="pause-btn" aria-label="Menu">MENU</button>
   <div id="sign"></div>
@@ -233,6 +245,7 @@ body[data-input="touch"] #touch { display: block; }
   <div id="stick"><div id="knob"></div></div>
   <div id="touch-hint">Hold and slide anywhere on this side to move</div>
   <div class="tbtn" id="b-talk" data-act="up">TALK</div>
+  <div class="tbtn" id="b-gift" data-act="gift">FLAME</div>
   <div class="tbtn" id="b-down" data-act="downstrike" aria-label="Strike down">&#9660;</div>
   <div class="tbtn" id="b-dash" data-act="dash">DASH</div>
   <div class="tbtn" id="b-attack" data-act="attack">STRIKE</div>
@@ -261,7 +274,7 @@ body[data-input="touch"] #touch { display: block; }
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">Concept build &middot; Prologue to Chapter 2</div>
+  <div id="f-ver">Concept build &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 

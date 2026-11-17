@@ -17,6 +17,23 @@
   };
 
   // The GOAL line: chapter name + the one thing to do now. `fresh` makes it pulse (a new goal).
+  // Moon pips (gift power) and the boss's health bar.
+  let lastPips = '';
+  H.pips = function (v, max) {
+    const key = v.toFixed(2);
+    if (key === lastPips) return; lastPips = key;
+    let html = '';
+    for (let i = 0; i < max; i++) html += `<span class="pip"><span style="height:${Math.round(Math.max(0, Math.min(1, v - i)) * 100)}%"></span></span>`;
+    $('pips').innerHTML = html;
+  };
+  H.boss = function (b) {
+    const el = $('bossbar');
+    if (!b || b.dead) { el.classList.remove('show'); return; }
+    el.classList.add('show');
+    el.querySelector('.bn').textContent = b.def.name;
+    el.querySelector('.bb span').style.width = Math.max(0, b.hp / b.def.hp * 100) + '%';
+  };
+
   H.goal = function (fresh) {
     const G = SH.game, ch = G.chapterDef();
     const text = G.goalText();
@@ -160,6 +177,8 @@
     $('b-dash').style.display = G.can('dash') ? '' : 'none';
     $('b-down').style.display = G.can('daggers') ? '' : 'none';
     $('b-attack').textContent = G.can('daggers') ? 'STRIKE' : 'SHOOT';
+    $('b-gift').style.display = G.can('flame') ? 'flex' : 'none';
+    $('pips').style.display = G.can('flame') ? 'flex' : 'none';
   };
 
   // Controller navigation for the HTML screens (pause menu, journal, tune, end): D-pad to choose, A to press.

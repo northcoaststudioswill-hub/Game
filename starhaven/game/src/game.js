@@ -55,7 +55,7 @@
   };
 
   // What Wren can do in this chapter. Mortal in the Winter Woods: one jump, no dash, a bow instead of daggers.
-  const ABILITIES = { double: true, dash: true, daggers: true, bow: false };
+  const ABILITIES = { double: true, dash: true, daggers: true, bow: false, flame: false };
   G.can = name => { const ch = G.chapterDef(); const a = Object.assign({}, ABILITIES, ch && ch.abilities); return !!a[name]; };
   Object.defineProperty(G, 'mortal', { get: () => !!(G.chapterDef() && G.chapterDef().mortal) });
   G.chapterDef = () => ST.CHAPTERS[G.chapter];
@@ -67,7 +67,7 @@
     const things = def.spawns.map(s => SH.makeSpawn(s, room));
     const lanterns = def.lanterns.map(l => ({ ...l, px: l.x * TS + TS / 2, py: room.groundY(l.x, 0), lit: !!l.lit }));
     const npcs = def.npcs.map(n => ({ ...n, x: n.x * TS + TS / 2, y: room.groundY(Math.floor(n.x), 0), facing: -1, near: false }));
-    const gates = def.gates.map(g => ({ ...g }));
+    const gates = def.gates.map(g => ({ ...g, lift: g.open ? 1 : 0 }));
     const w = {
       room, player, things, lanterns, npcs, gates, input,
       targets: things,
@@ -89,16 +89,26 @@
       onKnockout() { G.knockout(); },
       arrows: [],
       spawnArrow(x, y, dir) { this.arrows.push({ x, y, vx: dir * 8, vy: -0.5, life: 110, stuck: false }); },
+      fireballs: [], rocks: [],
+      spawnFireball(x, y, dir) { this.fireballs.push({ x, y, vx: dir * SH.GIFTS.flame.speed, life: SH.GIFTS.flame.life, dir }); },
+      // The Old Wyrm hits the cliff: rocks fall near Wren, with a shadow first so you can dodge.
+      dropRocks(n) {
+        for (let i = 0; i < n; i++) this.rocks.push({ x: player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
+      },
+      onBossDown() { G.boss = null; G.queueScript('mtn_peak'); },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
     SH.draw.init(room, w.viewW);   // drawn with gates open, so gates draw on top as objects
-    for (const g of gates) room.setGate(g, true);
+    for (const g of gates) room.setGate(g, !g.open);
+    w.thorns = (def.thornWalls || []).map(t => ({ ...t }));
+    for (const t of w.thorns) room.setThorns(t, true);
+    G.boss = null;
     G.snapCamera();
     G.hud.hearts(player.hearts, player.maxHearts);
     G.hud.prompt(null); G.hud.talkButton(null);
-    G.hud.abilities();
+    G.hud.abilities(); G.hud.boss(null);
     return w;
   };
 
@@ -218,6 +228,8 @@
       case 'goto': { const sc = G.script; sc.steps = sc.steps.slice(0, sc.i).concat(ST.SCRIPTS[st.id], sc.steps.slice(sc.i)); break; }
       case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
+      case 'close': case 'open': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, st.do === 'close'); g.lift = st.do === 'open' ? 0 : 0; fx.kick(4); SH.sfx.play('thud'); } break; }
+      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; } break; }
       case 'end': G.afterScript = () => { G.state = 'end'; G.hud.end(true); }; break;
     }
   };
@@ -284,6 +296,7 @@
       if (input.pressed.attack) p.atkBuf = SH.COMBAT.attackBuffer + 1;
       if (input.pressed.jump) p.jumpBuf = SH.tune.jumpBufferFrames + 1;
       if (input.pressed.dash) p.dashBuf = 7;
+      if (input.pressed.gift) p.giftBuf = 9;
       return;
     }
     if (fx.slowmo > 0) fx.slowmo--;
@@ -307,6 +320,45 @@
       }
     }
     w.arrows = w.arrows.filter(a => a.life > 0);
+    // fireballs: burn thorn walls, light braziers, set wyrms burning
+    for (const f of w.fireballs) {
+      f.life--; f.x += f.vx;
+      if (w.time % 2 === 0) fx.burst(f.x, f.y, 1, { speed: 0.6, life: 16, gravity: -0.04, colors: ['#ff8a3a', '#ffd27a'], glow: true });
+      const tx = Math.floor(f.x / TS), ty = Math.floor(f.y / TS);
+      const wall = w.thorns.find(t => t.solid && tx >= t.x && tx < t.x + t.w && ty >= t.top);
+      if (wall) {
+        w.room.setThorns(wall, false); f.life = 0; SH.sfx.play('kill');
+        fx.burst((wall.x + wall.w / 2) * TS, 13 * TS, 50, { speed: 3, life: 50, gravity: -0.05, colors: ['#ff8a3a', '#ffd27a', '#5a1d3e', '#2a1024'], glow: true });
+        fx.kick(4);
+        if (wall.id === 'road') G.queueScript('lib_wall');
+        continue;
+      }
+      if (SH.isSolid(w.room.get(tx, ty))) { f.life = 0; fx.burst(f.x, f.y, 10, { speed: 2, life: 20, colors: ['#ff8a3a', '#ffd27a'], glow: true }); continue; }
+      for (const e of w.things) {
+        if (e.arrowOnly || !e.hittable()) continue;
+        const hb = e.hurtBox();
+        if (f.x > hb.l - 6 && f.x < hb.r + 6 && f.y > hb.t && f.y < hb.b) {
+          e.takeHit({ fire: true, dmg: SH.GIFTS.flame.damage, kb: 2, dir: f.dir, finisher: false }, w);
+          f.life = 0; fx.burst(f.x, f.y, 14, { speed: 2.4, life: 24, colors: ['#ff8a3a', '#ffd27a', '#ffffff'], glow: true }); fx.stop(3);
+          break;
+        }
+      }
+    }
+    w.fireballs = w.fireballs.filter(f => f.life > 0);
+    // falling rocks
+    for (const r of w.rocks) {
+      if (r.ground == null) r.ground = (w.room.groundY(Math.floor(r.x / TS), 0) || w.room.pxH);
+      if (r.warn > 0) { r.warn--; continue; }
+      r.vy = Math.min(r.vy + 0.5, 10); r.y += r.vy;
+      if (Math.abs(r.x - p.x) < 16 && r.y > p.y - p.h && r.y - 16 < p.y) p.hurt(r.x, 1, w);
+      if (r.y >= r.ground) { r.done = true; fx.burst(r.x, r.ground - 4, 8, { speed: 2, life: 18, colors: ['#5a6680', '#8a96b8'] }); }
+    }
+    w.rocks = w.rocks.filter(r => !r.done);
+    // chapter 3: all braziers lit
+    if (G.activeGoal === 'flame' && !w.fired.brz) {
+      const b = w.things.filter(e => e.kind === 'brazier');
+      if (b.length && b.every(e => e.lit)) { w.fired.brz = true; G.queueScript('lib_braziers'); }
+    }
 
     // thorns and pits
     const b = p.box();
@@ -365,6 +417,8 @@
     for (const g of w.gates) if (!g.closed && (g.lift || 0) < 1) g.lift = (g.lift || 0) + 0.03;
     w.cityLight += (w.cityLightTarget - w.cityLight) * 0.03;
     G.hud.hearts(p.hearts, p.maxHearts);
+    if (G.can('flame')) G.hud.pips(p.pips, SH.GIFTS.pips);
+    G.hud.boss(G.boss);
     G.cameraTarget();
     w.cam.x += (w.camT.x - w.cam.x) * 0.14;
     w.cam.y += (w.camT.y - w.cam.y) * 0.10;
@@ -447,7 +501,9 @@
       p.hearts = p.maxHearts;
       p.respawnAt(c.px + 14, c.py, 40);
       p.facing = 1;
-      for (const e of w.things) if (e.reset) e.reset();
+      for (const e of w.things) if (e.reset && !(e.kind === 'wyrm' && e.dead && !e.boss)) e.reset();
+      w.rocks = []; w.fireballs = [];
+      if (G.boss) G.boss.wake();
       if (w.wyrm && w.wyrm.on) w.wyrm.x = p.x - 13 * TS;
       G.snapCamera();
       G.hud.toast('Knocked out. Back at the last lantern, no harm done.');

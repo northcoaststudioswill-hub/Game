@@ -238,7 +238,7 @@
   };
 
   // Static panels get a slow push-in and drifting particles, so no scene is a still picture.
-  const DRIFT = { woods: 'snow', spring: 'petals', window: 'stars', rooftop: 'stars', city: 'stars', vision: 'threads', fire: 'embers', observatory: 'stars', spark: 'embers', mountain: 'embers', caelum: 'stars', ships: 'embers' };
+  const DRIFT = { woods: 'snow', spring: 'petals', window: 'stars', rooftop: 'stars', city: 'stars', vision: 'threads', fire: 'embers', observatory: 'stars', spark: 'embers', library: 'embers', peak: 'snow', mountain: 'embers', caelum: 'stars', ships: 'embers' };
   C.drawStatic = function (g, id, t) {
     const img = SH.art.panel(id), z = 1 + Math.min(0.08, t / 6000);
     g.save(); g.translate(W / 2, H / 2); g.scale(z, z); g.translate(-W / 2, -H / 2);

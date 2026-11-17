@@ -15,6 +15,7 @@
     nessa: { bg: ['#4a4a5a', '#16161e'], skin: '#f0d4c0', shade: '#d4b49e', hair: '#2a1a14', hairD: '#140c08', eye: '#5a6a7a', style: 'braid', ears: false, cloth: '#5a5a6a', clothD: '#3a3a48' },
     lissa: { bg: ['#4a6a3a', '#141e10'], skin: '#f6dcc6', shade: '#dcbca8', hair: '#b8864a', hairD: '#8a5a2a', eye: '#6a9a5a', style: 'long', ears: false, cloth: '#4a7a4a', clothD: '#2f5a2f', flower: true },
     rowan: { bg: ['#6a8a3a', '#1a2410'], skin: '#f2d8b8', shade: '#d4b490', hair: '#e8c070', hairD: '#b8903a', eye: '#4ac06a', style: 'swept', ears: true, cloth: '#3a5a2a', clothD: '#24381a', trim: '#e8c070', antlers: true },
+    thane: { bg: ['#5a2a3a', '#1a0c12'], skin: '#8a5a3c', shade: '#6e4630', hair: '#2a2a2a', hairD: '#9a9a9a', eye: '#3a2a1a', style: 'shaved', ears: true, cloth: '#6a2a3a', clothD: '#4a1a26', trim: '#e8c070', glasses: true },
     iris: { bg: ['#2a5a7a', '#0c1a2a'], skin: '#f2d9c8', shade: '#dcbca8', hair: '#f4f0ff', hairD: '#c8c0e8', eye: '#8fd8ff', style: 'bun', ears: true, cloth: '#4f88c0', clothD: '#2f5a88', thread: true },
   };
 
@@ -49,6 +50,7 @@
     if (L.flower) { R(30, 10, 4, 4, '#ff9ac0'); R(31, 11, 2, 2, '#ffe9a8'); }
     if (L.antlers) { R(14, 12, 20, 1, '#e8c070'); R(17, 10, 2, 3, '#7ac05a'); R(29, 10, 2, 3, '#7ac05a');
       g.strokeStyle = '#d8c8a0'; g.beginPath(); g.moveTo(15, 9); g.lineTo(10, 1); g.moveTo(12, 5); g.lineTo(7, 4); g.moveTo(33, 9); g.lineTo(38, 1); g.moveTo(36, 5); g.lineTo(41, 4); g.stroke(); }
+    if (L.glasses) { g.strokeStyle = '#e8c070'; g.strokeRect(17.5, 19.5, 6, 5); g.strokeRect(25.5, 19.5, 6, 5); g.beginPath(); g.moveTo(23.5, 21.5); g.lineTo(25.5, 21.5); g.stroke(); R(15, 10, 18, 2, L.hairD); }
     if (L.style === 'bun') { R(14, 9, 20, 5, L.hair); R(19, 3, 10, 7, L.hair); R(14, 12, 3, 7, L.hair); R(31, 12, 3, 7, L.hair); R(21, 4, 6, 1, L.hairD); }
     // eyes, brows, mouth
     R(18, 20, 4, 3, '#ffffff'); R(26, 20, 4, 3, '#ffffff');
@@ -130,6 +132,24 @@
       }
       for (let i = 0; i < 5; i++) R(132 + i * 12, 14 + (i % 2 ? 4 : 0), 6, 14 - (i % 2 ? 4 : 0), '#6a6a74');
       R(130, 26, 62, 6, '#6a6a74');
+    } else if (id === 'library') {
+      // the Library: tall shelves, a reading table, candlelight, Wren's palm aglow
+      sky('#1a1020', '#2a1a28');
+      for (let x = 0; x < W; x += 40) { R(x + 2, 10, 34, 110, '#3a2418'); for (let y = 16; y < 116; y += 14) for (let b = 0; b < 6; b++) R(x + 5 + b * 5, y, 4, 11, ['#6a2a3a', '#2a4a6a', '#5a6a2a', '#8a6a2a'][(b + y) % 4]); }
+      R(0, 118, W, 32, '#2a1a14'); R(90, 100, 140, 8, '#5a3a24'); R(100, 108, 6, 14, '#3a2418'); R(214, 108, 6, 14, '#3a2418');
+      for (let i = 0; i < 3; i++) { const cx = 110 + i * 50; const gr = g.createRadialGradient(cx, 92, 1, cx, 92, 30); gr.addColorStop(0, 'rgba(255,200,120,0.5)'); gr.addColorStop(1, 'rgba(255,200,120,0)'); g.fillStyle = gr; g.fillRect(cx - 30, 62, 60, 60); R(cx - 1, 90, 3, 10, '#f4f0e0'); R(cx - 1, 86, 3, 4, '#ffd27a'); }
+      person(130, 120, 22, '#2f8f7a'); R(127, 96, 6, 4, '#d8653a');
+      const gr2 = g.createRadialGradient(138, 104, 1, 138, 104, 14); gr2.addColorStop(0, 'rgba(255,160,70,0.9)'); gr2.addColorStop(1, 'rgba(255,120,40,0)'); g.fillStyle = gr2; g.fillRect(124, 90, 28, 28);
+      person(190, 120, 24, '#6a2a3a'); R(187, 94, 6, 3, '#9a9a9a');
+    } else if (id === 'peak') {
+      // the peak at dawn: snow, Starhaven far below, Rowan with spring flowers in the snow
+      sky('#3a3a6a', '#f0b8a0');
+      g.fillStyle = '#e8eef8'; g.beginPath(); g.moveTo(0, 150); g.lineTo(0, 110); g.lineTo(90, 96); g.lineTo(200, 104); g.lineTo(320, 92); g.lineTo(320, 150); g.fill();
+      for (let i = 0; i < 9; i++) { R(250 + i * 6, 120 + (i % 3) * 3, 2, 2, '#ffd27a'); }
+      person(110, 104, 24, '#2f8f7a'); R(107, 78, 6, 4, '#d8653a');
+      person(90, 102, 28, '#1c1838');
+      person(190, 106, 30, '#3a5a2a'); R(187, 72, 6, 3, '#e8c070');
+      for (let i = 0; i < 14; i++) R(170 + (i * 7) % 50, 104 + (i * 3) % 8, 3, 3, i % 2 ? '#ff9ac0' : '#9ad08a');
     } else if (id === 'spring') {
       // a gilded bedroom at the Spring Court: too many flowers, a window Wren can't leave through
       sky('#f4d6dc', '#d8a8b8');
@@ -254,6 +274,11 @@
       R(2, -36 + breathe, 2, 2, '#2a1a14');
       if (ness) { R(-12, -22, 3, 20, '#6a4a2a'); R(-14, -24, 7, 4, '#9aa0b0'); } // her axe
       else { R(4, -18, 8, 6, '#a8743a'); R(5, -20, 2, 2, '#ff9ac0'); R(9, -20, 2, 2, '#ffe9a8'); } // a basket
+    } else if (n.id === 'thane') {
+      R(-7, -32 + breathe, 14, 32, '#6a2a3a'); R(-7, -32 + breathe, 3, 32, '#4a1a26'); R(-1, -32 + breathe, 2, 32, '#e8c070');
+      R(-4, -42 + breathe, 9, 10, '#8a5a3c'); R(-5, -44 + breathe, 11, 3, '#2a2a2a'); R(-5, -44 + breathe, 4, 2, '#9a9a9a');
+      R(1, -38 + breathe, 4, 2, '#e8c070');
+      R(5, -24, 8, 10, '#3a2a5a'); R(6, -23, 6, 1, '#e8c070');   // a book under his arm
     } else if (n.id === 'iris') {
       R(-7, -30 + breathe, 14, 30, '#4f88c0'); R(-7, -30 + breathe, 3, 30, '#2f5a88');
       R(-4, -40 + breathe, 9, 10, '#f2d9c8'); R(-5, -42 + breathe, 11, 4, '#f4f0ff'); R(-3, -47 + breathe, 6, 5, '#f4f0ff');

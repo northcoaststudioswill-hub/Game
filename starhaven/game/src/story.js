@@ -21,6 +21,7 @@
     nessa: { name: 'Nessa', color: '#c8d0e0' },
     lissa: { name: 'Lissa', color: '#b8e8a0' },
     rowan: { name: 'Lord Rowan', color: '#e8c070' },
+    thane: { name: 'Thane', color: '#e0a0b0' },
     narr: { name: '', color: '#b9b2dd' },
   };
 
@@ -30,6 +31,7 @@
     caelum: { loves: 'Wren\'s sketches, starlit wine', perk: 'In missions, enemies glow just before they attack (later chapters).' },
     bram: { loves: 'Spiced bread, sparring', perk: 'Takes one hit for Wren per mission (later chapters).' },
     iris: { loves: 'Sugared plums, old maps', perk: 'Shows hidden chests on the map (later chapters).' },
+    thane: { loves: 'Rare books, good ink', perk: '+20% XP from missions (later chapters).' },
   };
 
   // Short version of the story so far, for the journal.
@@ -82,6 +84,19 @@
       summary: 'Wren trained with Bram and cleared the Iron King\'s thorn sprites. Iris saw a vision: the Iron King knows Wren\'s name, and his iron is reaching for her sisters.',
       done: 'The Iron King knows Wren\'s name. Across the water, Nessa and Lissa don\'t know they\'re in danger.',
       after: 'evening2',
+    },
+    {
+      id: 'ch3', label: 'Chapter 3', name: 'First Light', room: 'mountain',
+      abilities: { flame: true },
+      card: 'Wren wakes with fire in her hand. Starhaven\'s scholar, Thane, thinks he knows why. And in the mountains above the city, something big is killing shepherds.',
+      goals: [
+        { id: 'flame', text: 'Light the three braziers with Flame' },
+        { id: 'wall', text: 'Burn the thorns off the mountain road' },
+        { id: 'hunt', text: 'Hunt the beast killing shepherds' },
+      ],
+      summary: 'Wren learned she carries the stolen powers the Thorn Queen hoarded, and Flame woke first. She burned the queen\'s last thorns off the mountain road and killed the Old Wyrm. On the peak, Rowan came for her, and she told him no.',
+      done: 'Wren has her first court gift, and Rowan has his answer. Spring will not stop now. Neither will she.',
+      after: 'evening3',
     },
   ];
 
@@ -549,12 +564,124 @@
       ['iris', 'If you ever get lost, pull it, and I\'ll find you. I always find my friends.'],
     ],
 
-    // ---------------- The end of the concept: a look at Chapter 3
-    finale: [
-      { do: 'art', id: 'spark', title: 'Next: Chapter 3, First Light' },
+    // ======================================================== Chapter 3: First Light
+    lib_start: [
+      { do: 'art', id: 'spark', title: 'The morning after' },
       ['narr', 'That night, for the first time since the Deep, Wren dreams of fire instead of thorns.'],
-      ['narr', 'She wakes with her palm glowing, warm as an ember. Caelum\'s blood made her fae. Something else, something older, is waking up in her now.'],
-      ['wren', '...What is this?'],
+      ['narr', 'She wakes with her palm glowing, warm as an ember. It doesn\'t burn her. It feels like it has always been there.'],
+      { do: 'art', id: 'library', title: 'The Library of Starhaven' },
+      ['thane', 'Sit, sit. Don\'t touch the books with that hand. I\'m Thane. I keep the Library, and I have a theory about you.'],
+      { do: 'meet', who: 'thane' },
+      ['thane', 'For fifty years the Thorn Queen drained the power of all seven courts and hoarded it Under the Mountain. Flame, frost, shadow, light, tide, thorn and wind.'],
+      ['thane', 'When she fell, all of it broke loose. Most of it went home. Some of it went into the only heart that had just stopped beating.'],
+      ['wren', 'Mine.'],
+      ['caelum', 'Seven courts\' power, sleeping in one woman. Every High Lord alive will want it back. Or want her.'],
+      { choose: [
+        { text: '"They can try."', bond: { caelum: 5, thane: 5 }, then: [['caelum', 'That\'s my girl. Our girl. Starhaven\'s. I\'ll stop talking.']] },
+        { text: '"Can it be taken out of me?"', bond: { thane: 10 }, then: [['thane', 'Honestly? I don\'t know. Nobody has ever done this. I\'d rather learn what it does than what it costs to remove.']] },
+        { text: '"Does Rowan know?"', bond: { caelum: 10 }, then: [['caelum', 'If he doesn\'t yet, he will soon. It won\'t make him want you back any less.']] },
+      ] },
+      ['thane', 'Flame is the one that woke. Let\'s see what it does. There are three braziers in the courtyard. Light them.'],
+      { do: 'art', id: null },
+      { do: 'flag', name: 'giftgot' },
+      { do: 'goal', id: 'flame' },
+    ],
+    lib_braziers: [
+      ['thane', 'All three! Fire answers you. Wonderful. Terrifying, but wonderful.'],
+      ['caelum', 'Good, because I need it. Shepherds are dying on the mountain road. Something big has been taking their flocks, then them.'],
+      ['caelum', 'And the road is choked with the Thorn Queen\'s last thorns. Steel won\'t cut them. Fire might.'],
+      { do: 'flag', name: 'flame' },
+      { do: 'goal', id: 'wall' },
+      { do: 'winnow', npc: 'caelum', to: 44 },
+    ],
+    lib_wall: [
+      ['wren', 'They\'re burning. Fifty years of her thorns, burning.'],
+      ['narr', 'The smoke smells like the Deep. For a moment, Wren can\'t breathe. Then the wind takes it, and the road is open.'],
+      { do: 'flag', name: 'wall' },
+      { do: 'goal', id: 'hunt' },
+    ],
+    mtn_road: [
+      ['caelum', 'Tracks. Wyrmlings: young mountain wyrms. Their heads are armored like a battering ram.'],
+      ['caelum', 'They charge in a straight line and can\'t turn. Don\'t stand in front of one. Let it pass, then hit it from behind while it\'s dazed.'],
+      ['wren', 'And the thing killing shepherds?'],
+      ['caelum', 'That\'s their mother.'],
+      { do: 'winnow', npc: 'caelum', to: 114, y: 14 },
+    ],
+    mtn_wyrm: [
+      { do: 'close', id: 'arenagate' },
+      ['narr', 'The hollow is full of bones and old wool. Something the size of a cottage uncoils from the rocks.'],
+      ['caelum', 'The Old Wyrm. When it hits the cliff, the mountain shakes. Watch for falling rocks.'],
+      ['wren', 'Stay back. I\'ve got this.'],
+      ['caelum', 'I know. That\'s why I\'m staying back.'],
+      { do: 'boss' },
+    ],
+    mtn_peak: [
+      { do: 'open', id: 'arenagate' },
+      { do: 'art', id: 'peak', title: 'The peak' },
+      ['narr', 'The Old Wyrm falls. Below, the mountain road is clear for the first time in years, all the way down to the lights of Starhaven.'],
+      ['caelum', 'You hunted it down like you were born for it. You were, I suppose.'],
+      ['narr', 'Then the air turns warm and sweet, like spring, and there are flowers growing out of the snow.'],
+      ['rowan', 'Wren.'],
+      ['wren', 'Rowan.'],
+      ['rowan', 'I\'ve brought an army to his border because of you. I will burn his city to the river if I have to. Come home, and none of that happens.'],
+      { choose: [
+        { text: '"I\'m not going back, Rowan."', bond: { caelum: 10 }, then: [['rowan', 'You don\'t know what he is. What he wants with you.'], ['wren', 'I know exactly what he is. He let me choose. You never did.']] },
+        { text: '"Stop this war. Please."', then: [['rowan', 'He stole you from my bed in the middle of the night. There is no stopping this.'], ['wren', 'He didn\'t steal me. I left.']] },
+        { text: 'Show him the fire in your hand', bond: { caelum: 5 }, then: [['narr', 'The flame burns bright in Wren\'s palm. Rowan steps back for the first time.'], ['rowan', '...What did they do to you?'], ['wren', 'Nothing. This was always mine.']] },
+      ] },
+      ['rowan', 'Then I\'ll take you back. One way or another.'],
+      ['narr', 'The flowers wither. He is gone.'],
+      ['caelum', 'Are you all right?'],
+      ['wren', 'No. Take me home.'],
+      ['caelum', '...Home. Yes.'],
+      { do: 'bond', who: 'caelum', pts: 10 },
+      { do: 'flag', name: 'hunt' },
+      { do: 'complete' },
+    ],
+
+    // ---------------- Evening 3: Caelum or Thane
+    evening3: [
+      { do: 'art', id: 'city', title: 'Evening: Starhaven' },
+      ['narr', 'The whole city heard about the Old Wyrm by sundown. Wren can\'t walk ten steps without someone thanking her. She needs somewhere quiet.'],
+      { choose: [
+        { text: 'Caelum, on the rooftop', then: [{ do: 'goto', id: 'ev3_caelum' }] },
+        { text: 'Thane, in the Library', then: [{ do: 'goto', id: 'ev3_thane' }] },
+      ] },
+    ],
+    ev3_caelum: [
+      { do: 'art', id: 'rooftop', title: 'Evening with Caelum' },
+      ['caelum', 'You called it home. On the mountain. I\'ve been thinking about it all day.'],
+      ['wren', 'It slipped out.'],
+      ['caelum', 'Did it?'],
+      { choose: [
+        { text: '"No. I meant it."', bond: { caelum: 15 }, then: [['narr', 'Caelum is quiet for a long moment. When he finally smiles, it\'s the first time Wren has seen him look young.']] },
+        { text: 'Light a small flame between your hands', liked: 'caelum', bond: { caelum: 15 }, then: [['caelum', 'Show-off.'], ['narr', 'He holds his hands around hers, and the little flame burns gold and violet together.']] },
+        { text: '"Ask me again some other night."', bond: { caelum: 10 }, then: [['caelum', 'Using my own lines against me. That\'s cruel, Wren. I respect it.']] },
+      ] },
+      { do: 'bond', who: 'caelum', pts: 20 },
+    ],
+    ev3_thane: [
+      { do: 'art', id: 'library', title: 'Evening with Thane' },
+      ['thane', 'Oh, good. I have forty-one questions about your hand. Sit down. Tea?'],
+      { choose: [
+        { text: 'Bring him a rare book from the Night Market', liked: 'thane', bond: { thane: 15 }, then: [['thane', 'Is this... a first copy of the Tide Court star charts? Where did you... no, don\'t tell me. I\'ll cry on it.']] },
+        { text: '"Ask your forty-one questions."', bond: { thane: 10 }, then: [['narr', 'He asks all forty-one. Then he asks nine more. By the end, you both understand the fire a little better.']] },
+        { text: 'Ask about the other six powers', bond: { thane: 5 }, then: [['thane', 'Frost, shadow, light, tide, thorn and wind. Asleep, for now. Something will wake each of them. I\'d very much like to be there when it does.']] },
+      ] },
+      ['thane', 'You know, Caelum hasn\'t smiled like he does now in a long time. Whatever you\'re doing to him, keep doing it.'],
+      { do: 'bond', who: 'thane', pts: 20 },
+    ],
+    heart_thane_2: [
+      { do: 'art', id: 'library', title: 'Thane: heart 2' },
+      ['thane', 'I\'m giving you a key to the Library. The real Library, the rooms under this one. Very few people have it.'],
+      ['thane', 'Don\'t read anything that whispers back.'],
+    ],
+
+    // ---------------- The end of the concept: a look at Chapter 4
+    finale: [
+      { do: 'art', id: 'city', title: 'Next: Chapter 4, The Spy in the Library' },
+      ['narr', 'Three nights later, Starhaven sleeps under a sky full of stars.'],
+      ['narr', 'On the Library roof, something with wings lands without a sound, folds itself into the shadows, and waits.'],
       { do: 'end' },
     ],
   };
@@ -569,12 +696,13 @@
     { id: 'ironking', name: 'The Iron King', text: 'A king across the sea, building an army. His creatures are already in the woods, and he knows Wren\'s name.' },
     { id: 'bram', name: 'Bram', text: 'One of the Five. A general and brawler who runs the Training Ring. The big brother of the group.' },
     { id: 'iris', name: 'Iris', text: 'One of the Five. A seer who sees threads of fate. Oddly cheerful about it.' },
+    { id: 'thane', name: 'Thane', text: 'One of the Five. Scholar and keeper of the Library. Has a theory about everything, including Wren\'s fire.' },
   ];
   // Who you know about at the start of each chapter (the intro covers the first five).
-  S.KNOWN_FROM = { woods: ['wren', 'sisters'], prologue: ['rowan', 'queen', 'caelum'], ch1: ['ironking'], ch2: ['bram'] };
+  S.KNOWN_FROM = { woods: ['wren', 'sisters'], prologue: ['rowan', 'queen', 'caelum'], ch1: ['ironking'], ch2: ['bram'], ch3: ['thane'] };
 
   S.END = {
     title: 'End of the concept',
-    text: 'That was the Prologue through Chapter 2, the first playable slice of the design doc. If this direction feels right, next comes Chapter 3, First Light: Wren\'s first court gift, Flame, a monster hunt in the mountains, the Night Market, and more evenings with Caelum and the Five.',
+    text: 'That was the Prologue through Chapter 3. Next in the design doc: Chapter 4, The Spy in the Library. Winged spies attack, the city itself becomes the battlefield, and Wren learns the bow.',
   };
 })(window.SH = window.SH || {});
