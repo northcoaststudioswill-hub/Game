@@ -51,7 +51,7 @@ function wHud(){if(W4.scene){scDraw();return}if(W4.sleepFx>0){W4.sleepFx-=1/60;g
   {const bt=W4.banner.txt,big=tw(bt,2)<=216;text(big?bt:wFit(bt,216),Math.round(W/2-tw(big?bt:wFit(bt,216),big?2:1)/2),35,big?2:1,'#ffffff',null)}sl.forEach((l,j)=>text(l,Math.round(W/2-tw(l,1)/2),53+j*11,1,'#cfe0b8',null));g.globalAlpha=1}
  /* v10.1: at home, one calm line says what each worker is doing, one worker at a time */
  if(atBase&&!ban&&state==='g4world'&&W4.wk&&W4.wk.length&&!(F&&F.dlg)){const n=W4.wk.length,i=((time/2.6)|0)%n,w=W4.wk[i],tk=w.task,bn=tk&&tk.b?((WBUILD.find(d=>d.k===tk.b.k)||{}).n||tk.b.k.toUpperCase()):'',
-   what=!tk?'looks for work':tk.k==='idle'?'takes a break':tk.k==='sleep'?'sleeps':tk.k==='haul'?'carries a load to the Lantern':tk.k==='chop'?'chops a tree':tk.k==='crop'?'harvests a plot':tk.k==='tend'?'tends the garden':tk.k==='craft'?'crafts at the BENCH':tk.k==='bld'?(tk.b&&tk.b.con?'builds the '+bn:'works the '+bn):'works',
+   what=!tk?'looks for work':tk.k==='idle'?'takes a break':tk.k==='sleep'?'sleeps':tk.k==='haul'?'carries a load home':tk.k==='chop'?'chops a tree':tk.k==='crop'?'harvests a plot':tk.k==='tend'?'tends the garden':tk.k==='craft'?'crafts at the BENCH':tk.k==='bld'?(tk.b&&tk.b.con?'builds the '+bn:'works the '+bn):'works',
    ln=wFit('CREW '+(i+1)+'/'+n+' · '+wkName(w)+' '+what,W-12);r('rgba(10,14,8,.55)',0,30,W,10);text(ln,6,31,1,'#b8d0a0',null)}
  /* bottom row: squad on the field, crew and sigils at home */
  r('rgba(10,14,8,.8)',0,H-16,W,16);let x=4;const y=H-13;

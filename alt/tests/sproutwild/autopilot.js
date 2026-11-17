@@ -90,7 +90,7 @@ while(T()<CAP){
    const tr=s.trees.sort((a,b2)=>Math.hypot(a[0]-s.P[0],a[1]-s.P[1])-Math.hypot(b2[0]-s.P[0],b2[1]-s.P[1]))[0];
    if(tr){if(await moveTo(s,tr[0],tr[1]+24)){await face(0,-1);await aPress(2500)}}await sleep(150);continue}
   await sleep(200);continue}
- if(s.fid==='MEADOW'){
+ if(s.fid==='MEADOW'||s.fid==='SQUIRE'){ /* v12.6: the castle rules sat inside a Meadow-only block and never ran */
   if(s.w2===2&&s.fight){if(await moveTo(s,s.fight[0],s.fight[1]+20)){await face(0,-1);await p.evaluate(()=>{window.__g.keys.sel=1});await sleep(90);await p.evaluate(()=>{window.__g.keys.sel=0})}await sleep(300);continue}
   if(s.w2===2&&s.tame){if(await moveTo(s,s.tame[0],s.tame[1]+24)){await face(0,-1);await aPress(700)}await sleep(150);continue}
   if(s.w2===4&&s.peb){if(await moveTo(s,s.peb.x,s.peb.y+12)){await face(0,-1);await aPress()}await sleep(150);continue}

@@ -3,6 +3,19 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v12.7: checks from saved points, and the stretch to the first Sigil confirmed
+Will: stop the 20-minute runs; make saves at certain points.
+- New test, `alt/tests/sproutwild/checkpoint.js`. It starts from a saved point and plays one stretch in real time, in under two minutes:
+  - `castle`: Squire's entrance with a Buddy Barn. Travel scene, the reveal, bridge, thorns, pluck the PEB, boulder, the Guardian fight, the Sigil, the Hollow road opening. 18 checks, all pass. This stretch had never been confirmed before.
+  - `barn`: home with no Barn. The goal, the Barn's price, Marcus at the castle reveal, Marcus stopping the fight.
+  - `plot`: home with a cottage and no wood. The free first plot through the menus, then setting a buddy to tend it.
+- Found by `barn`: at home the goal line said "Have 3 buddies" and never mentioned the Buddy Barn. It now says "Build a BUDDY BARN (START, BUILD): 8 stone, 6 wood" until it is built.
+- The lamp pair by the notice board is gone: one lamp stood on top of the board. Pairs remain at Field Lane and Gate Lane.
+- The home status line "carries a load to the Lantern" is "carries a load home" (it was cut off).
+- The long-run autopilot had its castle steps filed under the Meadow, so they never ran. Fixed, though the checkpoint test replaces it for this stretch.
+
+Checked: field lab; all three checkpoints.
+
 ## v12.6: followers stop walking through things
 - Louie and your buddies used to walk straight through trees, rocks, walls and shut gates (only water stopped them, since v10.1). They now go round, and hop to your side if they are stuck and left behind. Sent to a job past an obstacle, they hop to the job.
 - Measured in the Meadow, walking a loop through the trees for 15 seconds: nobody was inside anything solid in 73 of 73 samples. In 7 of the 73 one of them was more than 90 pixels behind, catching up.

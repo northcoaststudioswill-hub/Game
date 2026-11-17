@@ -164,3 +164,6 @@ drawPlot=function(){const pb=W4.plotPb,cur=pb&&pb.crop,m=pb&&wPlotBud(pb.plotB);
   d.d='A tilled bed for BERRIES, or FIBER REEDS from Sunkeep Lv2. Your first one is free. Set a home buddy to tend it.'}
  const top=['cottage','plot','datacenter'],rest=WBUILD.filter(q=>!top.includes(q.k)),first=top.map(k=>WBUILD.find(q=>q.k===k)).filter(Boolean);WBUILD.splice(0,WBUILD.length,...first,...rest)}
 {const _cs=wCostStr;wCostStr=function(c){const s=_cs(c);return s||'FREE'}}
+
+/* v12.7: at home the goal line also says the Buddy Barn comes first (it only said so out in the field) */
+{const _qt=wQuestText;wQuestText=function(){if(SW.quest>=5&&!SW.badges.length&&!wHasDC()&&!W4.fld&&W4.sector==='BASE')return'Build a BUDDY BARN (START, BUILD): 8 stone, 6 wood';return _qt()}}
