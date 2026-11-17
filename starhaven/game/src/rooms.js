@@ -34,6 +34,13 @@
     lanterns: [{ x: 12, lit: true }, { x: 48 }],
     npcs: [{ id: 'lissa', x: 7, optional: 'woods_lissa' }, { id: 'nessa', x: 15.5, optional: 'woods_nessa' }],
     gates: [],
+    props: [
+      { t: 'log', x: 20, w: 2 }, { t: 'boulder', x: 55, w: 2, h: 2 },
+      { t: 'bush', x: 14.5 }, { t: 'bush', x: 27 }, { t: 'bush', x: 40.5 }, { t: 'bush', x: 50 }, { t: 'bush', x: 61 }, { t: 'bush', x: 71 },
+      { t: 'drift', x: 24.5 }, { t: 'drift', x: 34 }, { t: 'drift', x: 49 }, { t: 'drift', x: 66 }, { t: 'drift', x: 76 }, { t: 'drift', x: 91 },
+      { t: 'pine', x: 17.5 }, { t: 'pine', x: 42 }, { t: 'pine', x: 59 }, { t: 'pine', x: 86 }, { t: 'pine', x: 96.5 },
+    ],
+    motes: [['line', 13, 18, 14.6], ['arc', 18.5, 23.5, 14.4, 2.6], ['line', 31, 37, 13.6], ['arc', 42.5, 48.5, 14.4, 2.8], ['arc', 53, 59, 14.4, 3.6], ['line', 60, 64, 14.6]],
     spawns: [{ kind: 'stag', x: 80, spots: [80, 88, 94] }],
   };
 
@@ -74,6 +81,14 @@
       { x: 143, script: 'deep_end' },
     ],
     lanterns: [{ x: 4, lit: true }, { x: 47 }, { x: 79 }, { x: 93 }],
+    props: [
+      { t: 'bones', x: 10 }, { t: 'bones', x: 38 }, { t: 'bones', x: 58 }, { t: 'bones', x: 90 }, { t: 'bones', x: 112 }, { t: 'bones', x: 133 },
+      { t: 'shroom', x: 16 }, { t: 'shroom', x: 28 }, { t: 'shroom', x: 47.5 }, { t: 'shroom', x: 63 }, { t: 'shroom', x: 78 }, { t: 'shroom', x: 100 }, { t: 'shroom', x: 122 }, { t: 'shroom', x: 141 },
+      { t: 'chain', x: 12, len: 5 }, { t: 'chain', x: 36, len: 3 }, { t: 'chain', x: 70, len: 6 }, { t: 'chain', x: 96, len: 4 }, { t: 'chain', x: 128, len: 3 },
+      { t: 'stal', x: 20, len: 3 }, { t: 'stal', x: 44, len: 2 }, { t: 'stal', x: 72, len: 4 }, { t: 'stal', x: 86, len: 2 }, { t: 'stal', x: 110, len: 3 }, { t: 'stal', x: 140, len: 2 },
+    ],
+    motes: [['line', 9, 20, 14.6], ['arc', 30, 35, 12.4, 2.4], ['arc', 40, 46, 12.6, 2.4], ['col', 52.6, 14.4, 10.6], ['line', 55, 60, 9.6], ['line', 67, 75, 10.6],
+      ['arc', 84, 89, 14.4, 2.6], ['line', 97, 103, 14.6], ['arc', 103.5, 107.5, 14.4, 2.6], ['line', 109, 116, 14.6], ['arc', 125.5, 130.5, 12.6, 2.2], ['arc', 136, 141, 14.4, 2.6]],
     exitLight: 145,
     chase: { from: 94, wyrmX: 80, speed: 2.7 },
     npcs: [], gates: [], spawns: [],
@@ -81,7 +96,7 @@
 
   // ---------------------------------------------------------------- Chapter 1: Ashes (walk, talk, first mural, no enemies)
   SH.ROOMS.ashes = {
-    id: 'ashes', width: 122, height: 20, theme: 'dusk',
+    id: 'ashes', width: 122, height: 20, theme: 'dusk', music: 'city',
     start: { x: 4, y: 16 },
     cityFrom: 50,                       // Starhaven's houses begin here
     cityGlowX: 70,
@@ -106,6 +121,11 @@
       { x: 55, script: 'ashes_gate' },
       { x: 106, above: 10, script: 'ashes_roof', flag: 'painted' },
     ],
+    props: [
+      { t: 'bush', x: 6 }, { t: 'bush', x: 15 }, { t: 'bush', x: 27 }, { t: 'pine', x: 12 }, { t: 'pine', x: 20 }, { t: 'pine', x: 35 }, { t: 'pine', x: 44 },
+      { t: 'banner', x: 56 }, { t: 'banner', x: 67, c: '#7a2a4a' }, { t: 'banner', x: 88 }, { t: 'crate', x: 60 }, { t: 'crate', x: 84.6 }, { t: 'barrel', x: 63 }, { t: 'barrel', x: 92 },
+    ],
+    motes: [['line', 11, 20, 14.6], ['line', 23, 29, 13.6], ['line', 32, 38, 12.6], ['line', 58, 67, 14.6], ['line', 78, 96, 14.6], ['line', 100, 103, 11.6], ['line', 106, 109, 8.6]],
     mural: { x: 70, w: 5, needs: 'arrive', flag: 'painted', script: 'ashes_painted', frames: 80 },
     arch: 52,
     house: { x0: 104, x1: 118, top: 10 },
@@ -151,12 +171,17 @@
       { kind: 'thornSprite', x: 91, y: 12, respawn: false },
       { kind: 'thornSprite', x: 104, respawn: false },
     ],
+    props: [
+      { t: 'fence', x: 13, w: 18 }, { t: 'rack', x: 7 }, { t: 'rack', x: 33 }, { t: 'banner', x: 3.5 }, { t: 'banner', x: 36, c: '#7a2a4a' }, { t: 'crate', x: 9.5 }, { t: 'barrel', x: 30 },
+      { t: 'bush', x: 70 }, { t: 'bush', x: 85 }, { t: 'bush', x: 99 }, { t: 'bush', x: 113 }, { t: 'deadtree', x: 76 }, { t: 'deadtree', x: 109 }, { t: 'deadtree', x: 127 }, { t: 'cairn', x: 121 },
+    ],
+    motes: [['line', 14, 20, 14.6], ['pt', 45.5, 10.6], ['pt', 50.5, 10.4], ['pt', 55.5, 10.6], ['line', 70, 76, 14.6], ['line', 89, 93, 10.6], ['line', 96, 101, 14.6]],
     dummyCombo: 'ring_combo',          // landing a full 3-hit combo on the dummy runs this
   };
 
   // ---------------------------------------------------------------- Chapter 3: First Light (Flame, wyrmlings, the Old Wyrm)
   SH.ROOMS.mountain = {
-    id: 'mountain', width: 164, height: 20, theme: 'city',
+    id: 'mountain', width: 164, height: 20, theme: 'city', music: 'mountain',
     zones: [{ x: 0, theme: 'city' }, { x: 40, theme: 'mountain' }],
     start: { x: 3, y: 16 },
     cityFrom: 3, cityTo: 30, cityLight: 0.8, cityGlowX: 20,
@@ -172,6 +197,13 @@
       ['ground', 117, 162, 14],         // the Old Wyrm's hollow
       ['solid', 162, 164, 0, 20],
     ],
+    props: [
+      { t: 'banner', x: 5.5 }, { t: 'banner', x: 28, c: '#7a2a4a' }, { t: 'crate', x: 26 }, { t: 'barrel', x: 31 },
+      { t: 'deadtree', x: 42 }, { t: 'deadtree', x: 60 }, { t: 'deadtree', x: 94 }, { t: 'cairn', x: 51 }, { t: 'cairn', x: 73 }, { t: 'cairn', x: 101 },
+      { t: 'drift', x: 46 }, { t: 'drift', x: 58 }, { t: 'drift', x: 78 }, { t: 'drift', x: 104 }, { t: 'drift', x: 130 },
+      { t: 'bones', x: 87 }, { t: 'bones', x: 110 }, { t: 'bones', x: 124 }, { t: 'bones', x: 136 }, { t: 'bones', x: 146 }, { t: 'bones', x: 156 },
+    ],
+    motes: [['line', 20, 24, 10.6], ['line', 37, 46, 14.6], ['line', 49, 55, 12.6], ['line', 57, 63, 10.6], ['arc', 63.5, 68.5, 10.4, 2.4], ['line', 70, 76, 10.6], ['line', 96, 99, 8.6], ['line', 108, 114, 12.6]],
     thornWalls: [{ id: 'road', x: 34, w: 2, top: 6 }],
     hints: [
       { x0: 6, x1: 30, text: 'Call the flame with {GIFT}. Each flame costs one moon (beside your hearts); they refill over time, faster when your daggers land.', flag: 'giftgot' },
@@ -210,8 +242,16 @@
       else if (kind === 'oneway') { for (let x = x0; x < x1; x++) set(x, s[3], SH.T_ONEWAY); }
       else if (kind === 'thorns') { for (let x = x0; x < x1; x++) set(x, s[3], SH.T_THORNS); }
     }
+    // Starlight motes: ['line', x0, x1, row], ['arc', x0, x1, row, lift] (over a jump), ['col', x, row0, row1], ['pt', x, row]
+    const motes = [], TS = SH.TILE, mote = (x, y) => motes.push({ x: x * TS, y: y * TS, got: false });
+    for (const m of def.motes || []) {
+      if (m[0] === 'line') for (let x = m[1]; x <= m[2]; x += 1.5) mote(x, m[3]);
+      else if (m[0] === 'arc') { const n = Math.max(3, Math.round((m[2] - m[1]) / 1.2)); for (let i = 0; i <= n; i++) { const k = i / n; mote(m[1] + (m[2] - m[1]) * k, m[3] - Math.sin(k * Math.PI) * m[4]); } }
+      else if (m[0] === 'col') for (let y = m[2]; y >= m[3]; y -= 1.3) mote(m[1], y);
+      else if (m[0] === 'pt') mote(m[1], m[2]);
+    }
     const room = {
-      def, w, h, tiles,
+      def, w, h, tiles, motes,
       pxW: w * SH.TILE, pxH: h * SH.TILE,
       get(tx, ty) {
         if (tx < 0 || tx >= w) return SH.T_SOLID;

@@ -33,6 +33,8 @@ gifts and bond hearts.
 
 ## Latest update (Nov 17, 2026)
 
+- **Polish round:** every level dressed with props, Starlight motes to collect along the jump paths, chapter results
+  (time, hits, Starlight), five music themes, a Skip button for scenes, a casting pose for Wren.
 - **Chapter 3, First Light:** Wren's first court gift, **Flame** (fireballs, moon pips that refill over time and from
   dagger hits), braziers, the Thorn Queen's thorns burning off the mountain road, **mountain wyrmlings** (armored heads:
   jump the charge, hit them from behind), and a boss, **the Old Wyrm** (rocks fall when it hits the cliff). Thane joins

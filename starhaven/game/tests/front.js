@@ -103,8 +103,8 @@ const path = require('path');
   await page.locator('#f-menu .fbtn').nth(items.indexOf('Settings')).tap();
   await page.waitForTimeout(100);
   s = await st();
-  check('Settings (touch): sound, text speed, touch down-strike, screen shake, tune, back', s.menu.length === 6 && /Settings/.test(s.title), s.menu);
-  await page.locator('#f-menu .fbtn').nth(1).tap();     // text speed: normal -> fast
+  check('Settings (touch): sound, music, text speed, touch down-strike, screen shake, tune, back', s.menu.length === 7 && /Settings/.test(s.title), s.menu);
+  await page.locator('#f-menu .fbtn').nth(2).tap();     // text speed: normal -> fast
   const speed = await page.evaluate(() => [SH.settings.textSpeed, JSON.parse(localStorage.getItem('starhaven.settings.v1')).textSpeed]);
   check('Settings: a change applies and is remembered', speed[0] === 'fast' && speed[1] === 'fast', speed);
   await press(B);

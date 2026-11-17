@@ -33,7 +33,7 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .gem.full { background: linear-gradient(135deg, #fff6d8, var(--gold) 45%, var(--gold-deep)); box-shadow: 0 0 10px rgba(255, 210, 122, .6); }
 .gem.empty { background: rgba(20, 18, 48, .7); border-color: #4b4680; }
 #goal { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
-  padding: 6px 14px; border-radius: 999px; font-size: 15px; font-weight: 800; white-space: nowrap; max-width: calc(100vw - 260px); overflow: hidden; text-overflow: ellipsis; }
+  padding: 6px 14px; border-radius: 999px; font-size: 15px; font-weight: 800; white-space: nowrap; max-width: calc(100vw - 300px); overflow: hidden; text-overflow: ellipsis; }
 #goal .ch { color: var(--ink-dim); margin-right: 8px; font-weight: 600; }
 #goal .tag { color: var(--gold); margin-right: 6px; letter-spacing: .08em; }
 #goal.new { animation: glowpulse 1.4s 2; }
@@ -45,7 +45,7 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   opacity: 0; transition: opacity .18s, transform .18s; text-align: center; }
 #sign.show { opacity: 1; transform: translate(-50%, 0); }
 #sign b { color: var(--gold); }
-#toast { position: fixed; z-index: 8; left: 50%; top: 30%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
+#toast { position: fixed; z-index: 8; top: auto !important; bottom: 54px; left: 50%; top: 30%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
   border-radius: 12px; padding: 10px 16px; font-size: 17px; font-weight: 700; opacity: 0; transition: opacity .25s; max-width: 70vw; text-align: center; }
 #toast.show { opacity: 1; }
 body[data-state="talk"] #toast { top: auto; bottom: max(10px, env(safe-area-inset-bottom)); }
@@ -103,6 +103,14 @@ body[data-input="touch"] #touch { display: block; }
 #pips { position: absolute; left: max(14px, env(safe-area-inset-left)); top: 40px; display: flex; gap: 5px; }
 .pip { width: 15px; height: 15px; border-radius: 50%; border: 2px solid #c8c0ff; background: #14123a; position: relative; overflow: hidden; }
 .pip span { position: absolute; left: 0; bottom: 0; width: 100%; background: linear-gradient(#fff6d8, #b9a8ff); }
+#motes { position: absolute; left: max(88px, calc(env(safe-area-inset-left) + 88px)); top: 36px; font-weight: 800; font-size: 15px; color: var(--gold); background: var(--panel); border: 1px solid var(--panel-line); border-radius: 999px; padding: 2px 10px; }
+#motes small { color: var(--ink-dim); font-weight: 700; }
+#motes i { font-style: normal; }
+#motes.pop { animation: motepop .25s; }
+@keyframes motepop { 50% { transform: scale(1.25); } }
+#c-stats { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 2px 0 4px; }
+#c-stats:empty { display: none; }
+#c-stats span { font-size: 14px; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: rgba(255,210,122,.12); color: var(--gold); }
 #bossbar { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); width: min(420px, 60vw); display: none; text-align: center; }
 #bossbar.show { display: block; }
 #bossbar .bn { font-family: var(--display); color: #ffb0a0; letter-spacing: .12em; font-size: 13px; }
@@ -213,6 +221,8 @@ body[data-input="touch"] #touch { display: block; }
   background: var(--panel); border: 1px solid var(--panel-line); color: var(--gold); font-weight: 800; font-size: 13px; opacity: 0; transition: opacity .3s; pointer-events: none; }
 #saving.show { opacity: 1; }
 #dialog.typing #d-more { visibility: hidden; }
+#d-skip { position: absolute; right: 10px; top: 8px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--panel-line); background: rgba(255,255,255,.06); color: var(--ink-dim); font: 700 12px var(--body); cursor: pointer; }
+#dialog.choosing #d-skip { display: none; }
 .pause-wm { display: flex; justify-content: center; align-items: center; gap: 8px; font-family: var(--display); font-size: 10px; letter-spacing: .2em; color: var(--ink-dim); margin: -2px 0 6px; }
 .pause-wm svg { width: 26px; }
 .btn.pad-sel { outline: 2px solid var(--gold); outline-offset: 2px; box-shadow: 0 0 14px rgba(255,210,122,.35); }
@@ -234,6 +244,7 @@ body[data-input="touch"] #touch { display: block; }
 <div id="hud">
   <div id="hearts"></div>
   <div id="pips"></div>
+  <div id="motes"></div>
   <div id="bossbar"><span class="bn"></span><div class="bb"><span></span></div></div>
   <div id="goal"></div>
   <button id="pause-btn" aria-label="Menu">MENU</button>
@@ -256,6 +267,7 @@ body[data-input="touch"] #touch { display: block; }
   <img id="d-face" alt="">
   <div id="d-body"><div id="d-name"></div><div id="d-text"></div><div id="d-choices"></div></div>
   <div id="d-more">tap anywhere &#9656;</div>
+  <button id="d-skip" aria-label="Skip this scene">Skip &#9656;&#9656;</button>
 </div>
 
 <div id="scene"><canvas id="scene-art" width="960" height="450"></canvas><div id="scene-title"></div></div>
@@ -284,6 +296,7 @@ body[data-input="touch"] #touch { display: block; }
     <div id="c-name"></div>
     <p id="c-text"></p>
     <ul id="c-goals"></ul>
+    <div id="c-stats"></div>
     <button class="btn primary" id="c-go">Begin</button>
   </div>
 </div>
@@ -305,7 +318,7 @@ body[data-input="touch"] #touch { display: block; }
       <p><b>Gamepad:</b> stick or D-pad move, A jump, X strike, B dash, Y talk or paint, Start menu.</p>
       <p><b>Touch:</b> hold and slide on the left half to move (slide down to aim a downward strike). JUMP, STRIKE and DASH on the right.
          A TALK or PAINT button appears when there's someone to talk to or something to paint.</p>
-      <p>In conversations, tap anywhere or press any button to go on. For choices, tap one, or use up/down and A (Space on a keyboard).</p>
+      <p>In conversations, tap anywhere or press any button to go on. <b>Skip</b> (or Start / Esc) jumps to the end of the scene or the next choice. For choices, tap one, or use up/down and A (Space on a keyboard).</p>
       <p><b>Bluetooth controller on a phone:</b> pair it in your phone's Bluetooth settings, open the game, and press any button on it. The touch buttons hide while you use it.</p>
     </div>
   </div>
@@ -1196,6 +1209,13 @@ body[data-input="touch"] #touch { display: block; }
     lanterns: [{ x: 12, lit: true }, { x: 48 }],
     npcs: [{ id: 'lissa', x: 7, optional: 'woods_lissa' }, { id: 'nessa', x: 15.5, optional: 'woods_nessa' }],
     gates: [],
+    props: [
+      { t: 'log', x: 20, w: 2 }, { t: 'boulder', x: 55, w: 2, h: 2 },
+      { t: 'bush', x: 14.5 }, { t: 'bush', x: 27 }, { t: 'bush', x: 40.5 }, { t: 'bush', x: 50 }, { t: 'bush', x: 61 }, { t: 'bush', x: 71 },
+      { t: 'drift', x: 24.5 }, { t: 'drift', x: 34 }, { t: 'drift', x: 49 }, { t: 'drift', x: 66 }, { t: 'drift', x: 76 }, { t: 'drift', x: 91 },
+      { t: 'pine', x: 17.5 }, { t: 'pine', x: 42 }, { t: 'pine', x: 59 }, { t: 'pine', x: 86 }, { t: 'pine', x: 96.5 },
+    ],
+    motes: [['line', 13, 18, 14.6], ['arc', 18.5, 23.5, 14.4, 2.6], ['line', 31, 37, 13.6], ['arc', 42.5, 48.5, 14.4, 2.8], ['arc', 53, 59, 14.4, 3.6], ['line', 60, 64, 14.6]],
     spawns: [{ kind: 'stag', x: 80, spots: [80, 88, 94] }],
   };
 
@@ -1236,6 +1256,14 @@ body[data-input="touch"] #touch { display: block; }
       { x: 143, script: 'deep_end' },
     ],
     lanterns: [{ x: 4, lit: true }, { x: 47 }, { x: 79 }, { x: 93 }],
+    props: [
+      { t: 'bones', x: 10 }, { t: 'bones', x: 38 }, { t: 'bones', x: 58 }, { t: 'bones', x: 90 }, { t: 'bones', x: 112 }, { t: 'bones', x: 133 },
+      { t: 'shroom', x: 16 }, { t: 'shroom', x: 28 }, { t: 'shroom', x: 47.5 }, { t: 'shroom', x: 63 }, { t: 'shroom', x: 78 }, { t: 'shroom', x: 100 }, { t: 'shroom', x: 122 }, { t: 'shroom', x: 141 },
+      { t: 'chain', x: 12, len: 5 }, { t: 'chain', x: 36, len: 3 }, { t: 'chain', x: 70, len: 6 }, { t: 'chain', x: 96, len: 4 }, { t: 'chain', x: 128, len: 3 },
+      { t: 'stal', x: 20, len: 3 }, { t: 'stal', x: 44, len: 2 }, { t: 'stal', x: 72, len: 4 }, { t: 'stal', x: 86, len: 2 }, { t: 'stal', x: 110, len: 3 }, { t: 'stal', x: 140, len: 2 },
+    ],
+    motes: [['line', 9, 20, 14.6], ['arc', 30, 35, 12.4, 2.4], ['arc', 40, 46, 12.6, 2.4], ['col', 52.6, 14.4, 10.6], ['line', 55, 60, 9.6], ['line', 67, 75, 10.6],
+      ['arc', 84, 89, 14.4, 2.6], ['line', 97, 103, 14.6], ['arc', 103.5, 107.5, 14.4, 2.6], ['line', 109, 116, 14.6], ['arc', 125.5, 130.5, 12.6, 2.2], ['arc', 136, 141, 14.4, 2.6]],
     exitLight: 145,
     chase: { from: 94, wyrmX: 80, speed: 2.7 },
     npcs: [], gates: [], spawns: [],
@@ -1243,7 +1271,7 @@ body[data-input="touch"] #touch { display: block; }
 
   // ---------------------------------------------------------------- Chapter 1: Ashes (walk, talk, first mural, no enemies)
   SH.ROOMS.ashes = {
-    id: 'ashes', width: 122, height: 20, theme: 'dusk',
+    id: 'ashes', width: 122, height: 20, theme: 'dusk', music: 'city',
     start: { x: 4, y: 16 },
     cityFrom: 50,                       // Starhaven's houses begin here
     cityGlowX: 70,
@@ -1268,6 +1296,11 @@ body[data-input="touch"] #touch { display: block; }
       { x: 55, script: 'ashes_gate' },
       { x: 106, above: 10, script: 'ashes_roof', flag: 'painted' },
     ],
+    props: [
+      { t: 'bush', x: 6 }, { t: 'bush', x: 15 }, { t: 'bush', x: 27 }, { t: 'pine', x: 12 }, { t: 'pine', x: 20 }, { t: 'pine', x: 35 }, { t: 'pine', x: 44 },
+      { t: 'banner', x: 56 }, { t: 'banner', x: 67, c: '#7a2a4a' }, { t: 'banner', x: 88 }, { t: 'crate', x: 60 }, { t: 'crate', x: 84.6 }, { t: 'barrel', x: 63 }, { t: 'barrel', x: 92 },
+    ],
+    motes: [['line', 11, 20, 14.6], ['line', 23, 29, 13.6], ['line', 32, 38, 12.6], ['line', 58, 67, 14.6], ['line', 78, 96, 14.6], ['line', 100, 103, 11.6], ['line', 106, 109, 8.6]],
     mural: { x: 70, w: 5, needs: 'arrive', flag: 'painted', script: 'ashes_painted', frames: 80 },
     arch: 52,
     house: { x0: 104, x1: 118, top: 10 },
@@ -1313,12 +1346,17 @@ body[data-input="touch"] #touch { display: block; }
       { kind: 'thornSprite', x: 91, y: 12, respawn: false },
       { kind: 'thornSprite', x: 104, respawn: false },
     ],
+    props: [
+      { t: 'fence', x: 13, w: 18 }, { t: 'rack', x: 7 }, { t: 'rack', x: 33 }, { t: 'banner', x: 3.5 }, { t: 'banner', x: 36, c: '#7a2a4a' }, { t: 'crate', x: 9.5 }, { t: 'barrel', x: 30 },
+      { t: 'bush', x: 70 }, { t: 'bush', x: 85 }, { t: 'bush', x: 99 }, { t: 'bush', x: 113 }, { t: 'deadtree', x: 76 }, { t: 'deadtree', x: 109 }, { t: 'deadtree', x: 127 }, { t: 'cairn', x: 121 },
+    ],
+    motes: [['line', 14, 20, 14.6], ['pt', 45.5, 10.6], ['pt', 50.5, 10.4], ['pt', 55.5, 10.6], ['line', 70, 76, 14.6], ['line', 89, 93, 10.6], ['line', 96, 101, 14.6]],
     dummyCombo: 'ring_combo',          // landing a full 3-hit combo on the dummy runs this
   };
 
   // ---------------------------------------------------------------- Chapter 3: First Light (Flame, wyrmlings, the Old Wyrm)
   SH.ROOMS.mountain = {
-    id: 'mountain', width: 164, height: 20, theme: 'city',
+    id: 'mountain', width: 164, height: 20, theme: 'city', music: 'mountain',
     zones: [{ x: 0, theme: 'city' }, { x: 40, theme: 'mountain' }],
     start: { x: 3, y: 16 },
     cityFrom: 3, cityTo: 30, cityLight: 0.8, cityGlowX: 20,
@@ -1334,6 +1372,13 @@ body[data-input="touch"] #touch { display: block; }
       ['ground', 117, 162, 14],         // the Old Wyrm's hollow
       ['solid', 162, 164, 0, 20],
     ],
+    props: [
+      { t: 'banner', x: 5.5 }, { t: 'banner', x: 28, c: '#7a2a4a' }, { t: 'crate', x: 26 }, { t: 'barrel', x: 31 },
+      { t: 'deadtree', x: 42 }, { t: 'deadtree', x: 60 }, { t: 'deadtree', x: 94 }, { t: 'cairn', x: 51 }, { t: 'cairn', x: 73 }, { t: 'cairn', x: 101 },
+      { t: 'drift', x: 46 }, { t: 'drift', x: 58 }, { t: 'drift', x: 78 }, { t: 'drift', x: 104 }, { t: 'drift', x: 130 },
+      { t: 'bones', x: 87 }, { t: 'bones', x: 110 }, { t: 'bones', x: 124 }, { t: 'bones', x: 136 }, { t: 'bones', x: 146 }, { t: 'bones', x: 156 },
+    ],
+    motes: [['line', 20, 24, 10.6], ['line', 37, 46, 14.6], ['line', 49, 55, 12.6], ['line', 57, 63, 10.6], ['arc', 63.5, 68.5, 10.4, 2.4], ['line', 70, 76, 10.6], ['line', 96, 99, 8.6], ['line', 108, 114, 12.6]],
     thornWalls: [{ id: 'road', x: 34, w: 2, top: 6 }],
     hints: [
       { x0: 6, x1: 30, text: 'Call the flame with {GIFT}. Each flame costs one moon (beside your hearts); they refill over time, faster when your daggers land.', flag: 'giftgot' },
@@ -1372,8 +1417,16 @@ body[data-input="touch"] #touch { display: block; }
       else if (kind === 'oneway') { for (let x = x0; x < x1; x++) set(x, s[3], SH.T_ONEWAY); }
       else if (kind === 'thorns') { for (let x = x0; x < x1; x++) set(x, s[3], SH.T_THORNS); }
     }
+    // Starlight motes: ['line', x0, x1, row], ['arc', x0, x1, row, lift] (over a jump), ['col', x, row0, row1], ['pt', x, row]
+    const motes = [], TS = SH.TILE, mote = (x, y) => motes.push({ x: x * TS, y: y * TS, got: false });
+    for (const m of def.motes || []) {
+      if (m[0] === 'line') for (let x = m[1]; x <= m[2]; x += 1.5) mote(x, m[3]);
+      else if (m[0] === 'arc') { const n = Math.max(3, Math.round((m[2] - m[1]) / 1.2)); for (let i = 0; i <= n; i++) { const k = i / n; mote(m[1] + (m[2] - m[1]) * k, m[3] - Math.sin(k * Math.PI) * m[4]); } }
+      else if (m[0] === 'col') for (let y = m[2]; y >= m[3]; y -= 1.3) mote(m[1], y);
+      else if (m[0] === 'pt') mote(m[1], m[2]);
+    }
     const room = {
-      def, w, h, tiles,
+      def, w, h, tiles, motes,
       pxW: w * SH.TILE, pxH: h * SH.TILE,
       get(tx, ty) {
         if (tx < 0 || tx >= w) return SH.T_SOLID;
@@ -1574,7 +1627,7 @@ body[data-input="touch"] #touch { display: block; }
 // Browsers only allow sound after the first tap, key or button press, so `unlock` is called on any input.
 (function (SH) {
   const A = SH.sfx = {};
-  let ctx = null, master = null;
+  let ctx = null, master = null, mus = null;
 
   A.unlock = function () {
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
@@ -1582,10 +1635,15 @@ body[data-input="touch"] #touch { display: block; }
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
       ctx = new AC(); master = ctx.createGain(); master.connect(ctx.destination);
+      mus = ctx.createGain(); mus.connect(ctx.destination);
+      setInterval(A.tick, 60);
       A.volume();
     } catch (e) { ctx = null; }
   };
-  A.volume = function () { if (master) master.gain.value = (SH.settings.sfx != null ? SH.settings.sfx : 70) / 100 * 0.5; };
+  A.volume = function () {
+    if (master) master.gain.value = (SH.settings.sfx != null ? SH.settings.sfx : 70) / 100 * 0.5;
+    if (mus) mus.gain.value = (SH.settings.music != null ? SH.settings.music : 50) / 100 * 0.35;
+  };
 
   function tone(o) {
     if (!ctx || !SH.settings.sfx) return;
@@ -1626,6 +1684,7 @@ body[data-input="touch"] #touch { display: block; }
     heart: () => { [659, 784, 988, 1319].forEach((f, i) => tone({ f, d: 0.4, v: 0.09, type: 'sine', delay: i * 0.09 })); },
     paint: () => tone({ f: 600 + Math.random() * 300, d: 0.05, v: 0.03, type: 'sine' }),
     mural: () => { [392, 523, 659, 784, 1047].forEach((f, i) => tone({ f, d: 0.6, v: 0.08, type: 'sine', delay: i * 0.08 })); },
+    mote: () => { tone({ f: 1320, d: 0.07, v: 0.05, type: 'sine' }); tone({ f: 1760, d: 0.12, v: 0.04, type: 'sine', delay: 0.05 }); },
     blip: () => tone({ f: 700 + Math.random() * 120, d: 0.025, v: 0.025, type: 'square' }),
     move: () => tone({ f: 660, d: 0.04, v: 0.06, type: 'square' }),
     select: () => { tone({ f: 660, d: 0.05, v: 0.08 }); tone({ f: 990, d: 0.08, v: 0.08, delay: 0.05 }); },
@@ -1635,6 +1694,73 @@ body[data-input="touch"] #touch { display: block; }
     rumble: () => { tone({ f: 55, f2: 35, d: 1.2, v: 0.3, type: 'sawtooth' }); noise({ d: 1, freq: 200, v: 0.2 }); },
     chime: () => { [784, 1175].forEach((f, i) => tone({ f, d: 1.2, v: 0.06, type: 'sine', delay: i * 0.2 })); },
   };
+  // ---------------------------------------------------------------- music
+  // Placeholder themes, synthesized: a step sequencer per place. Will's own tracks replace these later.
+  const mtof = n => 440 * Math.pow(2, (n - 69) / 12);
+  function note(n, t, d, type, v) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(mtof(n), t);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + Math.min(0.05, d / 4)); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(mus); o.start(t); o.stop(t + d + 0.05);
+  }
+  function hiss(t, d, v, freq) {
+    const len = Math.floor(ctx.sampleRate * d), buf = ctx.createBuffer(1, len, ctx.sampleRate), data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / len);
+    const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; g.gain.value = v; src.connect(f); f.connect(g); g.connect(mus); src.start(t);
+  }
+  // The Starhaven motif (original): D F A G | F E D, heard in the city and echoed elsewhere.
+  const MOTIF = { 0: 62, 6: 65, 12: 69, 18: 67, 32: 65, 38: 64, 44: 62 };
+  const TRACKS = {
+    // the winter woods: cold, sparse, a lonely plucked line over a low drone
+    woods: { bpm: 60, len: 64, fn(s, t, sp) {
+      if (s % 32 === 0) { note(45, t, sp * 30, 'sine', 0.10); note(52, t, sp * 30, 'sine', 0.05); }
+      const m = { 0: 76, 6: 72, 10: 69, 20: 71, 26: 72, 36: 76, 40: 79, 46: 76, 54: 72, 58: 69 }[s];
+      if (m) note(m, t, sp * 5, 'triangle', 0.07);
+      if (s % 16 === 8) hiss(t, 2.4, 0.03, 900);
+    } },
+    // Under the Mountain: a drone, something dripping, something wrong
+    deep: { bpm: 50, len: 64, fn(s, t, sp) {
+      if (s % 32 === 0) { note(38, t, sp * 31, 'sine', 0.14); note(39, t + 1, sp * 20, 'sine', 0.04); }
+      if (s % 16 === 0) note(26, t, 0.7, 'sine', 0.2);
+      const b = { 5: 86, 21: 81, 30: 87, 43: 82, 57: 86 }[s]; if (b) note(b, t, 2.2, 'sine', 0.03);
+      if (s % 32 === 20) hiss(t, 3, 0.03, 300);
+    } },
+    // Starhaven: warm chords and the motif
+    city: { bpm: 72, len: 64, fn(s, t, sp) {
+      const bar = s >> 4, ch = [[50, 57, 65], [46, 53, 62], [41, 53, 60], [48, 55, 64]][bar];
+      if (s % 16 === 0) { for (const n of ch) note(n + 12, t, sp * 15, 'triangle', 0.045); note(ch[0] - 12, t, sp * 14, 'sine', 0.10); }
+      if (s % 4 === 2) note(ch[(s >> 2) % 3] + 24, t, sp * 2, 'sine', 0.03);
+      const m = MOTIF[s]; if (m) note(m + 12, t, sp * 5, 'sine', 0.07);
+    } },
+    // the mountain: open fifths and wind
+    mountain: { bpm: 66, len: 64, fn(s, t, sp) {
+      if (s % 32 === 0) { note(43, t, sp * 30, 'sine', 0.10); note(50, t, sp * 30, 'sine', 0.06); }
+      const m = { 0: 74, 8: 79, 14: 77, 24: 74, 32: 72, 40: 74, 48: 67, 56: 69 }[s]; if (m) note(m, t, sp * 7, 'triangle', 0.05);
+      if (s % 16 === 4) hiss(t, 3.2, 0.045, 600 + (s % 32) * 20);
+    } },
+    // the Wyrm: a pulse you can't outrun
+    tense: { bpm: 138, len: 32, fn(s, t, sp) {
+      const bass = [38, 38, 0, 38, 41, 0, 38, 0, 38, 38, 0, 38, 43, 0, 41, 0][s % 16];
+      if (bass) note(bass, t, sp * 0.9, 'sawtooth', 0.09);
+      if (s % 8 === 4) hiss(t, 0.12, 0.12, 2400);
+      if (s % 4 === 0) note(26, t, 0.12, 'sine', 0.22);
+      const m = { 0: 74, 6: 73, 12: 74, 16: 77, 22: 76, 28: 74 }[s]; if (m) note(m, t, sp * 3, 'square', 0.025);
+    } },
+  };
+  let track = null, trackName = null, step = 0, next = 0;
+  A.music = function (name) {
+    if (trackName === name) return;
+    trackName = name; track = TRACKS[name] || null; step = 0;
+    if (ctx) next = ctx.currentTime + 0.3;
+  };
+  A.tick = function () {
+    if (!ctx || !track || ctx.state !== 'running' || !SH.settings.music) return;
+    const sp = 60 / track.bpm / 4, now = ctx.currentTime;
+    if (next < now - 0.5) next = now + 0.05;
+    while (next < now + 0.25) { try { track.fn(step % track.len, next, sp); } catch (e) { /* never break the game for a note */ } step++; next += sp; }
+  };
+
   A.play = function (name) { if (S[name]) try { S[name](); } catch (e) { /* never break the game for a sound */ } };
 })(window.SH = window.SH || {});
 
@@ -3206,8 +3332,11 @@ body[data-input="touch"] #touch { display: block; }
     const TS = SH.TILE, c = canvas(r.pxW, r.pxH), g = c.getContext('2d'), rand = rng(21);
     const get = (x, y) => r.get(x, y);
     const solid = (x, y) => get(x, y) === SH.T_SOLID;
+    // a room that changes place (city -> mountain) changes its ground with it
+    const zones = r.def.zones, themeAt = tx => { if (!zones) return THEMES[r.def.theme]; let z = zones[0]; for (const q of zones) if (tx >= q.x) z = q; return THEMES[z.theme]; };
     for (let ty = 0; ty < r.h; ty++) for (let tx = 0; tx < r.w; tx++) {
       const t = get(tx, ty), x = tx * TS, y = ty * TS;
+      T = themeAt(tx);
       if (t === SH.T_SOLID) {
         g.fillStyle = T.ground; g.fillRect(x, y, TS, TS);
         for (let i = 0; i < 3; i++) { g.fillStyle = T.speck; g.fillRect(x + ((rand() * TS) | 0), y + ((rand() * TS) | 0), 2, 2); }
@@ -3245,8 +3374,39 @@ body[data-input="touch"] #touch { display: block; }
         }
       }
     }
+    // props: the things that make a place look lived in (data in rooms.js)
+    for (const p of r.def.props || []) {
+      const fn = PROPS[p.t]; if (!fn) continue;
+      const px = p.x * TS, top = p.t === 'chain' || p.t === 'stal' ? ceilY(r, Math.floor(p.x)) : r.groundY(Math.floor(p.x), p.from || 0);
+      if (top != null) fn(g, Math.round(px), top, p, themeAt(Math.floor(p.x)), rng(Math.floor(p.x * 31) + 5));
+    }
     return c;
   }
+  function ceilY(r, tx) { let ty = 0; while (ty < r.h && r.get(tx, ty) === SH.T_SOLID) ty++; return ty * SH.TILE; }
+
+  // Each prop draws at (x, y) where y is the ground (or the ceiling, for hanging things).
+  const PROPS = {
+    log(g, x, y, p) { const w = (p.w || 2) * SH.TILE, h = SH.TILE; g.fillStyle = '#4a3020'; g.fillRect(x, y, w, h); g.fillStyle = '#5e3e28'; for (let i = 3; i < h; i += 6) g.fillRect(x + 4, y + i, w - 8, 2);
+      g.fillStyle = '#7a5636'; g.beginPath(); g.ellipse(x + w - 3, y + h / 2, 5, h / 2, 0, 0, Math.PI * 2); g.fill(); g.strokeStyle = '#4a3020'; g.beginPath(); g.ellipse(x + w - 3, y + h / 2, 2.5, h / 4, 0, 0, Math.PI * 2); g.stroke();
+      g.fillStyle = '#ffffff'; g.fillRect(x, y, w - 4, 3); g.fillRect(x + 6, y + 3, 10, 2); },
+    boulder(g, x, y, p) { const w = (p.w || 2) * SH.TILE, h = (p.h || 2) * SH.TILE; g.fillStyle = '#3a4258'; g.beginPath(); g.moveTo(x, y + h); g.lineTo(x + 2, y + 8); g.lineTo(x + w * 0.3, y); g.lineTo(x + w * 0.8, y + 3); g.lineTo(x + w, y + h * 0.5); g.lineTo(x + w, y + h); g.fill();
+      g.fillStyle = '#4c566e'; g.beginPath(); g.moveTo(x + 4, y + 10); g.lineTo(x + w * 0.3, y + 2); g.lineTo(x + w * 0.6, y + 6); g.lineTo(x + w * 0.4, y + h * 0.5); g.fill(); g.fillStyle = '#ffffff'; g.fillRect(x + w * 0.25, y, w * 0.5, 3); },
+    bush(g, x, y, p, T) { g.fillStyle = T.midC; g.beginPath(); g.ellipse(x, y - 5, 13, 8, 0, 0, Math.PI * 2); g.ellipse(x + 9, y - 3, 9, 6, 0, 0, Math.PI * 2); g.fill(); g.fillStyle = T.grass; g.fillRect(x - 8, y - 12, 10, 2); g.fillRect(x + 6, y - 8, 7, 2); },
+    drift(g, x, y, p, T) { g.fillStyle = T.edgeLight; g.beginPath(); g.ellipse(x, y, 20, 6, 0, Math.PI, 0); g.fill(); g.fillStyle = T.edgeMid; g.fillRect(x - 12, y - 1, 24, 1); },
+    pine(g, x, y, p, T) { g.fillStyle = '#2a1c18'; g.fillRect(x - 1, y - 8, 3, 8); g.fillStyle = T.midC; for (let k = 0; k < 3; k++) { const yy = y - 8 - k * 9, w = 11 - k * 3; g.beginPath(); g.moveTo(x, yy - 12); g.lineTo(x - w, yy); g.lineTo(x + w + 1, yy); g.fill(); g.fillStyle = T.snow ? '#ffffff' : T.grass; g.fillRect(x - w + 3, yy - 2, w * 2 - 5, 1); g.fillStyle = T.midC; } },
+    deadtree(g, x, y, p, T) { g.strokeStyle = T.midC; g.lineWidth = 4; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 2, y - 30); g.stroke(); g.lineWidth = 2; g.beginPath(); g.moveTo(x + 1, y - 18); g.lineTo(x - 12, y - 32); g.moveTo(x + 2, y - 26); g.lineTo(x + 14, y - 40); g.moveTo(x + 2, y - 30); g.lineTo(x - 4, y - 46); g.moveTo(x + 9, y - 34); g.lineTo(x + 18, y - 32); g.stroke(); g.lineWidth = 1; },
+    bones(g, x, y) { g.fillStyle = '#c8ccd0'; g.fillRect(x - 10, y - 3, 20, 2); for (let i = 0; i < 4; i++) { g.fillRect(x - 8 + i * 5, y - 10 + (i % 2), 2, 8); } g.fillRect(x + 12, y - 7, 6, 6); g.fillStyle = '#1a1a20'; g.fillRect(x + 14, y - 5, 2, 2); },
+    shroom(g, x, y, p, T, r) { for (let i = 0; i < 3; i++) { const sx = x + i * 7 - 7, h = 5 + ((r() * 6) | 0), col = i % 2 ? '#ffb8c8' : '#bff0d0'; const gl = g.createRadialGradient(sx, y - h, 1, sx, y - h, 14); gl.addColorStop(0, i % 2 ? 'rgba(255,184,200,0.35)' : 'rgba(190,240,208,0.35)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gl; g.fillRect(sx - 14, y - h - 14, 28, 28); g.fillStyle = '#d8e8dc'; g.fillRect(sx, y - h, 1, h); g.fillStyle = col; g.fillRect(sx - 2, y - h - 2, 5, 3); } },
+    chain(g, x, y, p) { const n = (p.len || 4) * 4; g.fillStyle = '#3a4640'; for (let i = 0; i < n; i++) g.fillRect(x + (i % 2), y + i * 6, 3, 5); g.fillStyle = '#566a60'; g.fillRect(x - 2, y + n * 6, 7, 5); },
+    stal(g, x, y, p, T) { const h = (p.len || 2) * 12; g.fillStyle = T.ground; g.beginPath(); g.moveTo(x - 7, y); g.lineTo(x, y + h); g.lineTo(x + 7, y); g.fill(); g.fillStyle = T.side; g.fillRect(x - 6, y, 2, 4); },
+    banner(g, x, y, p) { g.fillStyle = '#16142c'; g.fillRect(x - 1, y - 70, 3, 70); g.fillRect(x - 1, y - 70, 18, 2); g.fillStyle = p.c || '#3a2a7a'; g.beginPath(); g.moveTo(x + 3, y - 68); g.lineTo(x + 17, y - 68); g.lineTo(x + 17, y - 38); g.lineTo(x + 10, y - 44); g.lineTo(x + 3, y - 38); g.fill();
+      g.fillStyle = '#ffd27a'; g.fillRect(x + 9, y - 60, 2, 8); g.fillRect(x + 6, y - 57, 8, 2); },
+    crate(g, x, y) { g.fillStyle = '#5a3e2a'; g.fillRect(x - 9, y - 18, 18, 18); g.fillStyle = '#7a5638'; g.fillRect(x - 9, y - 18, 18, 2); g.fillRect(x - 9, y - 10, 18, 2); g.fillStyle = '#3a2618'; g.fillRect(x - 9, y - 18, 2, 18); g.fillRect(x + 7, y - 18, 2, 18); },
+    barrel(g, x, y) { g.fillStyle = '#4a3424'; g.fillRect(x - 7, y - 20, 14, 20); g.fillStyle = '#8a8a96'; g.fillRect(x - 7, y - 16, 14, 2); g.fillRect(x - 7, y - 6, 14, 2); g.fillStyle = '#6a4c34'; g.fillRect(x - 5, y - 20, 10, 2); },
+    rack(g, x, y) { g.fillStyle = '#3a2a1e'; g.fillRect(x - 14, y - 26, 3, 26); g.fillRect(x + 11, y - 26, 3, 26); g.fillRect(x - 14, y - 22, 28, 3); g.fillStyle = '#c8d2e2'; for (let i = 0; i < 3; i++) { g.fillRect(x - 8 + i * 8, y - 44, 2, 40); g.fillRect(x - 9 + i * 8, y - 48, 4, 6); } },
+    fence(g, x, y, p) { const w = (p.w || 6) * SH.TILE; g.fillStyle = '#3a2a1e'; g.fillRect(x, y - 22, w, 3); g.fillRect(x, y - 12, w, 3); for (let i = 0; i <= w; i += 24) g.fillRect(x + i - 2, y - 28, 4, 28); },
+    cairn(g, x, y) { g.fillStyle = '#4c566e'; g.fillRect(x - 9, y - 6, 18, 6); g.fillRect(x - 6, y - 12, 13, 6); g.fillRect(x - 3, y - 17, 7, 5); g.fillStyle = '#ffffff'; g.fillRect(x - 3, y - 18, 7, 2); },
+  };
 
   // ---------------------------------------------------------------- per frame
   D.frame = function (ctx, w) {
@@ -3275,6 +3435,13 @@ body[data-input="touch"] #touch { display: block; }
     for (const t of w.thorns || []) if (t.solid) drawThornWall(ctx, t, w.time);
     if (def.exitLight != null) drawExitLight(ctx, def.exitLight, t);
     for (const l of w.lanterns) drawLantern(ctx, l, t);
+    for (const m of w.motes || []) {
+      if (m.got || m.x < cx - 20 || m.x > cx + vw + 20) continue;
+      const my = m.y + Math.sin(t * 0.08 + m.x * 0.05) * 2, tw = 0.6 + 0.4 * Math.sin(t * 0.15 + m.x);
+      ctx.globalAlpha = 0.25 * tw; ctx.fillStyle = '#ffd27a'; ctx.fillRect(m.x - 5, my - 5, 10, 10);
+      ctx.globalAlpha = 1; ctx.fillStyle = '#ffd27a'; ctx.fillRect(m.x - 1, my - 4, 3, 9); ctx.fillRect(m.x - 4, my - 1, 9, 3);
+      ctx.fillStyle = '#fff6d8'; ctx.fillRect(m.x - 1, my - 1, 3, 3);
+    }
     for (const n of w.npcs) SH.art.npc(ctx, n, t);
     for (const e of w.things) {
       if (e.x < cx - 80 || e.x > cx + vw + 80) continue;
@@ -3743,7 +3910,10 @@ body[data-input="touch"] #touch { display: block; }
     // ear: round while she's mortal, pointed once she's fae
     ctx.fillStyle = C(PAL.skin); ctx.fillRect(0, hy + 3, 2, 3);
     if (!SH.game.mortal) { ctx.fillRect(-1, hy + 1, 2, 2); ctx.fillRect(-2, hy - 1, 1, 2); }
-    if (!tint) { ctx.fillStyle = '#1a1430'; ctx.fillRect(4, hy + 4, 2, 3); ctx.fillStyle = '#ffffff'; ctx.fillRect(5, hy + 4, 1, 1); }
+    if (!tint) {
+      if (pose === 'idle' && a.t % 230 < 7) { ctx.fillStyle = '#b08a72'; ctx.fillRect(4, hy + 5, 2, 1); }   // a blink now and then
+      else { ctx.fillStyle = '#1a1430'; ctx.fillRect(4, hy + 4, 2, 3); ctx.fillStyle = '#ffffff'; ctx.fillRect(5, hy + 4, 1, 1); }
+    }
 
     // arm + dagger
     const sw = p.swing;
@@ -3763,12 +3933,17 @@ body[data-input="touch"] #touch { display: block; }
     if (pose === 'pogo') armAng = 0;
     const bow = !g && SH.game.can('bow') && !SH.game.can('daggers');
     if (bow) { showBlade = false; if (p.bowT > 0) armAng = -1.57; }
+    const casting = !g && p.castT > 0;
+    if (casting) { armAng = -1.57; showBlade = false; }
     ctx.save();
     ctx.translate(2, -28 + breathe);
     ctx.rotate(armAng);
     ctx.fillStyle = C(PAL.tunic); ctx.fillRect(-2, 0, 4, 7);
     ctx.fillStyle = C(PAL.skin); ctx.fillRect(-2, 7, 4, 4);
     if (showBlade) { ctx.fillStyle = C(PAL.blade); ctx.fillRect(-1, 10, 2, 9); ctx.fillStyle = C(PAL.gold); ctx.fillRect(-2, 10, 4, 1); }
+    if (casting) { // an open palm with fire in it
+      ctx.fillStyle = 'rgba(255,150,60,0.5)'; ctx.fillRect(-5, 9, 10, 10); ctx.fillStyle = '#ff8a3a'; ctx.fillRect(-3, 11, 6, 6); ctx.fillStyle = '#ffe08a'; ctx.fillRect(-1, 12, 3, 4);
+    }
     if (bow) { // a hunting bow in her hand, drawn back while she shoots
       const pull = p.bowT > 8 ? 4 : 0;
       ctx.strokeStyle = '#8a5a2a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 10, 9, -0.2 * Math.PI + Math.PI / 2 - 1.2, Math.PI / 2 + 1.2 - 0.2 * Math.PI); ctx.stroke();
@@ -3825,7 +4000,7 @@ body[data-input="touch"] #touch { display: block; }
   };
   SH.store = store;
   SH.tune = Object.assign({}, SH.TUNE_DEFAULTS, store.get('starhaven.tune.v1', {}));
-  SH.settings = Object.assign({ autoDown: true, sfx: 70, textSpeed: 'normal', shake: true }, store.get('starhaven.settings.v1', {}));
+  SH.settings = Object.assign({ autoDown: true, sfx: 70, music: 50, textSpeed: 'normal', shake: true }, store.get('starhaven.settings.v1', {}));
 
   const G = SH.game = {
     state: 'front', world: null, frozen: false, slot: null,
@@ -3839,25 +4014,25 @@ body[data-input="touch"] #touch { display: block; }
     const pr = G.progress;
     SH.saves.write(G.slot, {
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0,
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {},
     });
     if (show) G.hud.saved();
   };
   G.newGame = function (slot) {
     G.slot = slot == null ? null : slot;
-    G.progress = { reached: 0, bonds: {}, met: [], playFrames: 0 };
+    G.progress = { reached: 0, bonds: {}, met: [], playFrames: 0, motes: {} };
     G.startChapter(0);
   };
   G.playChapter = function (i) {   // chapter select: no saving
     G.slot = null;
-    G.progress = { reached: i, bonds: {}, met: [], playFrames: 0 };
+    G.progress = { reached: i, bonds: {}, met: [], playFrames: 0, motes: {} };
     G.startChapter(i);
   };
   G.loadSlot = function (slot) {
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
     G.slot = slot;
-    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0 };
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes) };
     const N = ST.CHAPTERS.length, target = s.chapter;
     const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
     if (s.pending) {           // quit during an evening: play it again, then go on
@@ -3886,7 +4061,7 @@ body[data-input="touch"] #touch { display: block; }
     const npcs = def.npcs.map(n => ({ ...n, x: n.x * TS + TS / 2, y: room.groundY(Math.floor(n.x), 0), facing: -1, near: false }));
     const gates = def.gates.map(g => ({ ...g, lift: g.open ? 1 : 0 }));
     const w = {
-      room, player, things, lanterns, npcs, gates, input,
+      room, player, things, lanterns, npcs, gates, input, motes: room.motes,
       targets: things,
       cam: { x: 0, y: 0 }, viewW: G.viewW || 640, time: 0, fade: 0,
       checkpoint: lanterns[0],
@@ -3912,7 +4087,7 @@ body[data-input="touch"] #touch { display: block; }
       dropRocks(n) {
         for (let i = 0; i < n; i++) this.rocks.push({ x: player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
       },
-      onBossDown() { G.boss = null; G.queueScript('mtn_peak'); },
+      onBossDown() { G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
@@ -3925,7 +4100,9 @@ body[data-input="touch"] #touch { display: block; }
     G.snapCamera();
     G.hud.hearts(player.hearts, player.maxHearts);
     G.hud.prompt(null); G.hud.talkButton(null);
-    G.hud.abilities(); G.hud.boss(null);
+    G.hud.abilities(); G.hud.boss(null); G.hud.motes(0, room.motes.length);
+    G.roomMusic = def.music || { winter: 'woods', deep: 'deep', mountain: 'mountain' }[def.theme] || 'city';
+    SH.sfx.music(G.roomMusic);
     return w;
   };
 
@@ -3964,7 +4141,15 @@ body[data-input="touch"] #touch { display: block; }
     G.state = 'card';
     // After the card: the chapter's evening (if it has one), then the next chapter, or the finale.
     const cont = () => { G.pending2 = null; G.save(); if (next < ST.CHAPTERS.length) G.startChapter(next); else G.runScript('finale'); };
-    G.hud.card({ label: ch.label + ' complete', name: ch.name, text: ch.done, goals: null, button: 'Continue' }, () => {
+    // how the chapter went: time, hearts lost, Starlight gathered (your best is kept)
+    const w = G.world, got = w.motes.filter(m => m.got).length, total = w.motes.length;
+    if (!G.progress.motes) G.progress.motes = {};
+    G.progress.motes[ch.id] = Math.max(G.progress.motes[ch.id] || 0, got);
+    const secs = Math.round((w.frames || 0) / 60);
+    const stats = [`Time ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`, `Hits taken ${w.player.stats.hurt}`];
+    if (total) stats.push(`Starlight ${got} / ${total}${got === total ? ' \u2726 all of it' : ''}`);
+    G.save();
+    G.hud.card({ label: ch.label + ' complete', name: ch.name, text: ch.done, goals: null, stats, button: 'Continue' }, () => {
       if (ch.after) { G.afterScript = cont; G.runScript(ch.after); } else cont();
     });
   };
@@ -4036,7 +4221,7 @@ body[data-input="touch"] #touch { display: block; }
     switch (st.do) {
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); break;
-      case 'wyrm': SH.sfx.play('rumble'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
+      case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
       case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
       case 'meet': G.meet(st.who); break;
       case 'bond': G.bond(st.who, st.pts); break;
@@ -4046,7 +4231,7 @@ body[data-input="touch"] #touch { display: block; }
       case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
       case 'close': case 'open': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, st.do === 'close'); g.lift = st.do === 'open' ? 0 : 0; fx.kick(4); SH.sfx.play('thud'); } break; }
-      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; } break; }
+      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; SH.sfx.music('tense'); } break; }
       case 'end': G.afterScript = () => { G.state = 'end'; G.hud.end(true); }; break;
     }
   };
@@ -4117,7 +4302,14 @@ body[data-input="touch"] #touch { display: block; }
       return;
     }
     if (fx.slowmo > 0) fx.slowmo--;
-    w.time++;
+    w.time++; w.frames = (w.frames || 0) + 1;
+    // Starlight motes
+    for (const m of w.motes) {
+      if (m.got || Math.abs(m.x - p.x) > 16 || Math.abs(m.y - (p.y - 20)) > 24) continue;
+      m.got = true; SH.sfx.play('mote');
+      fx.burst(m.x, m.y, 6, { speed: 1.6, life: 18, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
+      G.hud.motes(w.motes.filter(x => x.got).length, w.motes.length, true);
+    }
 
     const def = w.room.def;
     const painting = G.paintStep();
@@ -4267,7 +4459,13 @@ body[data-input="touch"] #touch { display: block; }
     return true;
   };
 
+  // Skip a scene: run it to its end (or to the next choice), still applying everything it does.
+  G.skipScene = function () {
+    let n = 0;
+    while (G.script && !G.choosing && G.state === 'talk' && n++ < 400) { G.hud.finishTyping(); G.talkWait = 0; G.advance(); }
+  };
   G.talkStep = function () {
+    if (input.pressed.pause && !G.choosing) { G.skipScene(); return; }
     if (G.talkWait > 0) { G.talkWait--; return; }
     if (G.hud.typing()) { if (input.pressed.jump || input.pressed.attack || input.pressed.up || input.pressed.dash) G.hud.finishTyping(); return; }
     if (G.choosing) {
@@ -4461,6 +4659,12 @@ body[data-input="touch"] #touch { display: block; }
     for (let i = 0; i < max; i++) html += `<span class="pip"><span style="height:${Math.round(Math.max(0, Math.min(1, v - i)) * 100)}%"></span></span>`;
     $('pips').innerHTML = html;
   };
+  H.motes = function (n, total, pop) {
+    const el = $('motes');
+    el.style.display = total ? '' : 'none';
+    el.innerHTML = `<i>&#10022;</i> ${n}<small> / ${total}</small>`;
+    if (pop) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+  };
   H.boss = function (b) {
     const el = $('bossbar');
     if (!b || b.dead) { el.classList.remove('show'); return; }
@@ -4595,6 +4799,7 @@ body[data-input="touch"] #touch { display: block; }
     $('c-name').textContent = o.name;
     $('c-text').textContent = o.text;
     $('c-goals').innerHTML = o.goals ? '<div class="gl">Goals</div>' + o.goals.map(g => `<li>${esc(g)}</li>`).join('') : '';
+    $('c-stats').innerHTML = o.stats ? o.stats.map(x => `<span>${esc(x)}</span>`).join('') : '';
     $('c-go').textContent = o.button;
     $('card').classList.add('show');
     cardDone = done;
@@ -4646,6 +4851,8 @@ body[data-input="touch"] #touch { display: block; }
     html += `<p>${esc(ST.RECAP)}</p>`;
     for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
     html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
+    const ms = G.progress.motes || {}, sum = Object.values(ms).reduce((a, b) => a + b, 0);
+    if (sum) html += `<p><b>Starlight gathered:</b> &#10022; ${sum} (kept for rebuilding Starhaven, later)</p>`;
     html += '<h3>Bonds</h3>';
     const bonds = G.progress.bonds, ids = Object.keys(ST.BONDS).filter(id => bonds[id]);
     if (!ids.length) html += '<p>No bonds yet. Hearts grow from evenings together, gifts they love, and the choices you make when you talk.</p>';
@@ -4703,6 +4910,7 @@ body[data-input="touch"] #touch { display: block; }
   H.bind = function () {
     const G = SH.game, on = (id, f) => $(id).addEventListener('click', f);
     on('c-go', () => H.cardGo());
+    on('d-skip', () => G.skipScene());
     // In a conversation, a tap anywhere goes to the next line.
     document.addEventListener('pointerdown', e => {
       if (G.state === 'talk' && G.talkWait <= 0 && !e.target.closest('button')) { e.preventDefault(); if (H.typing()) H.finishTyping(); else G.advance(); }
@@ -4892,13 +5100,14 @@ body[data-input="touch"] #touch { display: block; }
     const flip = k => { s[k] = !s[k]; save(); };
     const items = [
       { label: 'Sound effects', value: () => s.sfx ? `${s.sfx}%` : 'Off', left: () => { s.sfx = Math.max(0, s.sfx - 10); save(); }, right: () => { s.sfx = Math.min(100, s.sfx + 10); save(); SH.sfx.play('select'); } },
+      { label: 'Music', value: () => s.music ? `${s.music}%` : 'Off', left: () => { s.music = Math.max(0, s.music - 10); save(); }, right: () => { s.music = Math.min(100, s.music + 10); save(); } },
       { label: 'Text speed', value: () => s.textSpeed[0].toUpperCase() + s.textSpeed.slice(1), left: () => cycle('textSpeed', speeds, -1), right: () => cycle('textSpeed', speeds, 1) },
       { label: 'Touch: strike down for me', value: () => s.autoDown ? 'On' : 'Off', left: () => flip('autoDown'), right: () => flip('autoDown') },
       { label: 'Screen shake', value: () => s.shake ? 'On' : 'Off', left: () => flip('shake'), right: () => flip('shake') },
       { label: 'Tune the movement feel', action: () => { $('front').classList.remove('show'); SH.game.hud.tune(true); SH.game.hud.tuneBack = () => { $('front').classList.add('show'); F.settings(back); }; } },
       { label: 'Back', action: back },
     ];
-    F.show('Settings', items, back, 'Left and right change a setting. Music is coming with Will\'s own tracks.');
+    F.show('Settings', items, back, 'Left and right change a setting. The music is a placeholder until Will\'s own tracks go in.');
   };
   F.credits = function () {
     F.show('Credits', [{ label: 'Back', action: F.main }], F.main, `

@@ -33,7 +33,7 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .gem.full { background: linear-gradient(135deg, #fff6d8, var(--gold) 45%, var(--gold-deep)); box-shadow: 0 0 10px rgba(255, 210, 122, .6); }
 .gem.empty { background: rgba(20, 18, 48, .7); border-color: #4b4680; }
 #goal { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
-  padding: 6px 14px; border-radius: 999px; font-size: 15px; font-weight: 800; white-space: nowrap; max-width: calc(100vw - 260px); overflow: hidden; text-overflow: ellipsis; }
+  padding: 6px 14px; border-radius: 999px; font-size: 15px; font-weight: 800; white-space: nowrap; max-width: calc(100vw - 300px); overflow: hidden; text-overflow: ellipsis; }
 #goal .ch { color: var(--ink-dim); margin-right: 8px; font-weight: 600; }
 #goal .tag { color: var(--gold); margin-right: 6px; letter-spacing: .08em; }
 #goal.new { animation: glowpulse 1.4s 2; }
@@ -45,7 +45,7 @@ button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   opacity: 0; transition: opacity .18s, transform .18s; text-align: center; }
 #sign.show { opacity: 1; transform: translate(-50%, 0); }
 #sign b { color: var(--gold); }
-#toast { position: fixed; z-index: 8; left: 50%; top: 30%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
+#toast { position: fixed; z-index: 8; top: auto !important; bottom: 54px; left: 50%; top: 30%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
   border-radius: 12px; padding: 10px 16px; font-size: 17px; font-weight: 700; opacity: 0; transition: opacity .25s; max-width: 70vw; text-align: center; }
 #toast.show { opacity: 1; }
 body[data-state="talk"] #toast { top: auto; bottom: max(10px, env(safe-area-inset-bottom)); }
@@ -103,6 +103,14 @@ body[data-input="touch"] #touch { display: block; }
 #pips { position: absolute; left: max(14px, env(safe-area-inset-left)); top: 40px; display: flex; gap: 5px; }
 .pip { width: 15px; height: 15px; border-radius: 50%; border: 2px solid #c8c0ff; background: #14123a; position: relative; overflow: hidden; }
 .pip span { position: absolute; left: 0; bottom: 0; width: 100%; background: linear-gradient(#fff6d8, #b9a8ff); }
+#motes { position: absolute; left: max(88px, calc(env(safe-area-inset-left) + 88px)); top: 36px; font-weight: 800; font-size: 15px; color: var(--gold); background: var(--panel); border: 1px solid var(--panel-line); border-radius: 999px; padding: 2px 10px; }
+#motes small { color: var(--ink-dim); font-weight: 700; }
+#motes i { font-style: normal; }
+#motes.pop { animation: motepop .25s; }
+@keyframes motepop { 50% { transform: scale(1.25); } }
+#c-stats { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 2px 0 4px; }
+#c-stats:empty { display: none; }
+#c-stats span { font-size: 14px; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: rgba(255,210,122,.12); color: var(--gold); }
 #bossbar { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); width: min(420px, 60vw); display: none; text-align: center; }
 #bossbar.show { display: block; }
 #bossbar .bn { font-family: var(--display); color: #ffb0a0; letter-spacing: .12em; font-size: 13px; }
@@ -213,6 +221,8 @@ body[data-input="touch"] #touch { display: block; }
   background: var(--panel); border: 1px solid var(--panel-line); color: var(--gold); font-weight: 800; font-size: 13px; opacity: 0; transition: opacity .3s; pointer-events: none; }
 #saving.show { opacity: 1; }
 #dialog.typing #d-more { visibility: hidden; }
+#d-skip { position: absolute; right: 10px; top: 8px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--panel-line); background: rgba(255,255,255,.06); color: var(--ink-dim); font: 700 12px var(--body); cursor: pointer; }
+#dialog.choosing #d-skip { display: none; }
 .pause-wm { display: flex; justify-content: center; align-items: center; gap: 8px; font-family: var(--display); font-size: 10px; letter-spacing: .2em; color: var(--ink-dim); margin: -2px 0 6px; }
 .pause-wm svg { width: 26px; }
 .btn.pad-sel { outline: 2px solid var(--gold); outline-offset: 2px; box-shadow: 0 0 14px rgba(255,210,122,.35); }
@@ -234,6 +244,7 @@ body[data-input="touch"] #touch { display: block; }
 <div id="hud">
   <div id="hearts"></div>
   <div id="pips"></div>
+  <div id="motes"></div>
   <div id="bossbar"><span class="bn"></span><div class="bb"><span></span></div></div>
   <div id="goal"></div>
   <button id="pause-btn" aria-label="Menu">MENU</button>
@@ -256,6 +267,7 @@ body[data-input="touch"] #touch { display: block; }
   <img id="d-face" alt="">
   <div id="d-body"><div id="d-name"></div><div id="d-text"></div><div id="d-choices"></div></div>
   <div id="d-more">tap anywhere &#9656;</div>
+  <button id="d-skip" aria-label="Skip this scene">Skip &#9656;&#9656;</button>
 </div>
 
 <div id="scene"><canvas id="scene-art" width="960" height="450"></canvas><div id="scene-title"></div></div>
@@ -284,6 +296,7 @@ body[data-input="touch"] #touch { display: block; }
     <div id="c-name"></div>
     <p id="c-text"></p>
     <ul id="c-goals"></ul>
+    <div id="c-stats"></div>
     <button class="btn primary" id="c-go">Begin</button>
   </div>
 </div>
@@ -305,7 +318,7 @@ body[data-input="touch"] #touch { display: block; }
       <p><b>Gamepad:</b> stick or D-pad move, A jump, X strike, B dash, Y talk or paint, Start menu.</p>
       <p><b>Touch:</b> hold and slide on the left half to move (slide down to aim a downward strike). JUMP, STRIKE and DASH on the right.
          A TALK or PAINT button appears when there's someone to talk to or something to paint.</p>
-      <p>In conversations, tap anywhere or press any button to go on. For choices, tap one, or use up/down and A (Space on a keyboard).</p>
+      <p>In conversations, tap anywhere or press any button to go on. <b>Skip</b> (or Start / Esc) jumps to the end of the scene or the next choice. For choices, tap one, or use up/down and A (Space on a keyboard).</p>
       <p><b>Bluetooth controller on a phone:</b> pair it in your phone's Bluetooth settings, open the game, and press any button on it. The touch buttons hide while you use it.</p>
     </div>
   </div>

@@ -248,6 +248,25 @@ const path = require('path');
         { chapter: G.chapter, scripts: [...seenHere], seconds: +(f / 60).toFixed(1) });
     })();
 
+    // Skip: jumps to the end of a scene and still applies what the scene does
+    (function () {
+      SH.test.load(0); SH.test.step(3, {});
+      const was = G.state; G.skipScene();
+      check('Skip: ends the opening scene, sets the goal, returns to play', was === 'talk' && G.state === 'play' && G.activeGoal === 'hunt', { was, now: G.state, goal: G.activeGoal });
+      SH.test.load(2); SH.test.step(3, {}); G.skipScene();
+      check('Skip: stops at a choice instead of choosing for you', G.state === 'talk' && !!G.choosing, { state: G.state, choosing: !!G.choosing });
+      G.choosing = null; G.hud.choice(null);
+    })();
+
+    // Starlight motes: walking through them collects them; every level has some
+    (function () {
+      SH.test.load('woods', { story: false }); const p = P(), w = G.world;
+      SH.test.place(12, 16); for (let i = 0; i < 50; i++) step({ right: true });
+      const got = w.motes.filter(m => m.got).length;
+      const counts = ['woods', 'deep', 'ashes', 'ring', 'mountain'].map(r => SH.buildRoom(SH.ROOMS[r]).motes.length);
+      check('Starlight: motes are collected by touch, and all five levels have them', got >= 3 && counts.every(n => n >= 10), { collected: got, perLevel: counts });
+    })();
+
     // The riddle: a wrong answer makes the queen ask again; the right one starts the maze
     (function () {
       SH.test.load(1);

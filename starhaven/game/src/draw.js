@@ -184,8 +184,11 @@
     const TS = SH.TILE, c = canvas(r.pxW, r.pxH), g = c.getContext('2d'), rand = rng(21);
     const get = (x, y) => r.get(x, y);
     const solid = (x, y) => get(x, y) === SH.T_SOLID;
+    // a room that changes place (city -> mountain) changes its ground with it
+    const zones = r.def.zones, themeAt = tx => { if (!zones) return THEMES[r.def.theme]; let z = zones[0]; for (const q of zones) if (tx >= q.x) z = q; return THEMES[z.theme]; };
     for (let ty = 0; ty < r.h; ty++) for (let tx = 0; tx < r.w; tx++) {
       const t = get(tx, ty), x = tx * TS, y = ty * TS;
+      T = themeAt(tx);
       if (t === SH.T_SOLID) {
         g.fillStyle = T.ground; g.fillRect(x, y, TS, TS);
         for (let i = 0; i < 3; i++) { g.fillStyle = T.speck; g.fillRect(x + ((rand() * TS) | 0), y + ((rand() * TS) | 0), 2, 2); }
@@ -223,8 +226,39 @@
         }
       }
     }
+    // props: the things that make a place look lived in (data in rooms.js)
+    for (const p of r.def.props || []) {
+      const fn = PROPS[p.t]; if (!fn) continue;
+      const px = p.x * TS, top = p.t === 'chain' || p.t === 'stal' ? ceilY(r, Math.floor(p.x)) : r.groundY(Math.floor(p.x), p.from || 0);
+      if (top != null) fn(g, Math.round(px), top, p, themeAt(Math.floor(p.x)), rng(Math.floor(p.x * 31) + 5));
+    }
     return c;
   }
+  function ceilY(r, tx) { let ty = 0; while (ty < r.h && r.get(tx, ty) === SH.T_SOLID) ty++; return ty * SH.TILE; }
+
+  // Each prop draws at (x, y) where y is the ground (or the ceiling, for hanging things).
+  const PROPS = {
+    log(g, x, y, p) { const w = (p.w || 2) * SH.TILE, h = SH.TILE; g.fillStyle = '#4a3020'; g.fillRect(x, y, w, h); g.fillStyle = '#5e3e28'; for (let i = 3; i < h; i += 6) g.fillRect(x + 4, y + i, w - 8, 2);
+      g.fillStyle = '#7a5636'; g.beginPath(); g.ellipse(x + w - 3, y + h / 2, 5, h / 2, 0, 0, Math.PI * 2); g.fill(); g.strokeStyle = '#4a3020'; g.beginPath(); g.ellipse(x + w - 3, y + h / 2, 2.5, h / 4, 0, 0, Math.PI * 2); g.stroke();
+      g.fillStyle = '#ffffff'; g.fillRect(x, y, w - 4, 3); g.fillRect(x + 6, y + 3, 10, 2); },
+    boulder(g, x, y, p) { const w = (p.w || 2) * SH.TILE, h = (p.h || 2) * SH.TILE; g.fillStyle = '#3a4258'; g.beginPath(); g.moveTo(x, y + h); g.lineTo(x + 2, y + 8); g.lineTo(x + w * 0.3, y); g.lineTo(x + w * 0.8, y + 3); g.lineTo(x + w, y + h * 0.5); g.lineTo(x + w, y + h); g.fill();
+      g.fillStyle = '#4c566e'; g.beginPath(); g.moveTo(x + 4, y + 10); g.lineTo(x + w * 0.3, y + 2); g.lineTo(x + w * 0.6, y + 6); g.lineTo(x + w * 0.4, y + h * 0.5); g.fill(); g.fillStyle = '#ffffff'; g.fillRect(x + w * 0.25, y, w * 0.5, 3); },
+    bush(g, x, y, p, T) { g.fillStyle = T.midC; g.beginPath(); g.ellipse(x, y - 5, 13, 8, 0, 0, Math.PI * 2); g.ellipse(x + 9, y - 3, 9, 6, 0, 0, Math.PI * 2); g.fill(); g.fillStyle = T.grass; g.fillRect(x - 8, y - 12, 10, 2); g.fillRect(x + 6, y - 8, 7, 2); },
+    drift(g, x, y, p, T) { g.fillStyle = T.edgeLight; g.beginPath(); g.ellipse(x, y, 20, 6, 0, Math.PI, 0); g.fill(); g.fillStyle = T.edgeMid; g.fillRect(x - 12, y - 1, 24, 1); },
+    pine(g, x, y, p, T) { g.fillStyle = '#2a1c18'; g.fillRect(x - 1, y - 8, 3, 8); g.fillStyle = T.midC; for (let k = 0; k < 3; k++) { const yy = y - 8 - k * 9, w = 11 - k * 3; g.beginPath(); g.moveTo(x, yy - 12); g.lineTo(x - w, yy); g.lineTo(x + w + 1, yy); g.fill(); g.fillStyle = T.snow ? '#ffffff' : T.grass; g.fillRect(x - w + 3, yy - 2, w * 2 - 5, 1); g.fillStyle = T.midC; } },
+    deadtree(g, x, y, p, T) { g.strokeStyle = T.midC; g.lineWidth = 4; g.beginPath(); g.moveTo(x, y); g.lineTo(x + 2, y - 30); g.stroke(); g.lineWidth = 2; g.beginPath(); g.moveTo(x + 1, y - 18); g.lineTo(x - 12, y - 32); g.moveTo(x + 2, y - 26); g.lineTo(x + 14, y - 40); g.moveTo(x + 2, y - 30); g.lineTo(x - 4, y - 46); g.moveTo(x + 9, y - 34); g.lineTo(x + 18, y - 32); g.stroke(); g.lineWidth = 1; },
+    bones(g, x, y) { g.fillStyle = '#c8ccd0'; g.fillRect(x - 10, y - 3, 20, 2); for (let i = 0; i < 4; i++) { g.fillRect(x - 8 + i * 5, y - 10 + (i % 2), 2, 8); } g.fillRect(x + 12, y - 7, 6, 6); g.fillStyle = '#1a1a20'; g.fillRect(x + 14, y - 5, 2, 2); },
+    shroom(g, x, y, p, T, r) { for (let i = 0; i < 3; i++) { const sx = x + i * 7 - 7, h = 5 + ((r() * 6) | 0), col = i % 2 ? '#ffb8c8' : '#bff0d0'; const gl = g.createRadialGradient(sx, y - h, 1, sx, y - h, 14); gl.addColorStop(0, i % 2 ? 'rgba(255,184,200,0.35)' : 'rgba(190,240,208,0.35)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gl; g.fillRect(sx - 14, y - h - 14, 28, 28); g.fillStyle = '#d8e8dc'; g.fillRect(sx, y - h, 1, h); g.fillStyle = col; g.fillRect(sx - 2, y - h - 2, 5, 3); } },
+    chain(g, x, y, p) { const n = (p.len || 4) * 4; g.fillStyle = '#3a4640'; for (let i = 0; i < n; i++) g.fillRect(x + (i % 2), y + i * 6, 3, 5); g.fillStyle = '#566a60'; g.fillRect(x - 2, y + n * 6, 7, 5); },
+    stal(g, x, y, p, T) { const h = (p.len || 2) * 12; g.fillStyle = T.ground; g.beginPath(); g.moveTo(x - 7, y); g.lineTo(x, y + h); g.lineTo(x + 7, y); g.fill(); g.fillStyle = T.side; g.fillRect(x - 6, y, 2, 4); },
+    banner(g, x, y, p) { g.fillStyle = '#16142c'; g.fillRect(x - 1, y - 70, 3, 70); g.fillRect(x - 1, y - 70, 18, 2); g.fillStyle = p.c || '#3a2a7a'; g.beginPath(); g.moveTo(x + 3, y - 68); g.lineTo(x + 17, y - 68); g.lineTo(x + 17, y - 38); g.lineTo(x + 10, y - 44); g.lineTo(x + 3, y - 38); g.fill();
+      g.fillStyle = '#ffd27a'; g.fillRect(x + 9, y - 60, 2, 8); g.fillRect(x + 6, y - 57, 8, 2); },
+    crate(g, x, y) { g.fillStyle = '#5a3e2a'; g.fillRect(x - 9, y - 18, 18, 18); g.fillStyle = '#7a5638'; g.fillRect(x - 9, y - 18, 18, 2); g.fillRect(x - 9, y - 10, 18, 2); g.fillStyle = '#3a2618'; g.fillRect(x - 9, y - 18, 2, 18); g.fillRect(x + 7, y - 18, 2, 18); },
+    barrel(g, x, y) { g.fillStyle = '#4a3424'; g.fillRect(x - 7, y - 20, 14, 20); g.fillStyle = '#8a8a96'; g.fillRect(x - 7, y - 16, 14, 2); g.fillRect(x - 7, y - 6, 14, 2); g.fillStyle = '#6a4c34'; g.fillRect(x - 5, y - 20, 10, 2); },
+    rack(g, x, y) { g.fillStyle = '#3a2a1e'; g.fillRect(x - 14, y - 26, 3, 26); g.fillRect(x + 11, y - 26, 3, 26); g.fillRect(x - 14, y - 22, 28, 3); g.fillStyle = '#c8d2e2'; for (let i = 0; i < 3; i++) { g.fillRect(x - 8 + i * 8, y - 44, 2, 40); g.fillRect(x - 9 + i * 8, y - 48, 4, 6); } },
+    fence(g, x, y, p) { const w = (p.w || 6) * SH.TILE; g.fillStyle = '#3a2a1e'; g.fillRect(x, y - 22, w, 3); g.fillRect(x, y - 12, w, 3); for (let i = 0; i <= w; i += 24) g.fillRect(x + i - 2, y - 28, 4, 28); },
+    cairn(g, x, y) { g.fillStyle = '#4c566e'; g.fillRect(x - 9, y - 6, 18, 6); g.fillRect(x - 6, y - 12, 13, 6); g.fillRect(x - 3, y - 17, 7, 5); g.fillStyle = '#ffffff'; g.fillRect(x - 3, y - 18, 7, 2); },
+  };
 
   // ---------------------------------------------------------------- per frame
   D.frame = function (ctx, w) {
@@ -253,6 +287,13 @@
     for (const t of w.thorns || []) if (t.solid) drawThornWall(ctx, t, w.time);
     if (def.exitLight != null) drawExitLight(ctx, def.exitLight, t);
     for (const l of w.lanterns) drawLantern(ctx, l, t);
+    for (const m of w.motes || []) {
+      if (m.got || m.x < cx - 20 || m.x > cx + vw + 20) continue;
+      const my = m.y + Math.sin(t * 0.08 + m.x * 0.05) * 2, tw = 0.6 + 0.4 * Math.sin(t * 0.15 + m.x);
+      ctx.globalAlpha = 0.25 * tw; ctx.fillStyle = '#ffd27a'; ctx.fillRect(m.x - 5, my - 5, 10, 10);
+      ctx.globalAlpha = 1; ctx.fillStyle = '#ffd27a'; ctx.fillRect(m.x - 1, my - 4, 3, 9); ctx.fillRect(m.x - 4, my - 1, 9, 3);
+      ctx.fillStyle = '#fff6d8'; ctx.fillRect(m.x - 1, my - 1, 3, 3);
+    }
     for (const n of w.npcs) SH.art.npc(ctx, n, t);
     for (const e of w.things) {
       if (e.x < cx - 80 || e.x > cx + vw + 80) continue;
@@ -721,7 +762,10 @@
     // ear: round while she's mortal, pointed once she's fae
     ctx.fillStyle = C(PAL.skin); ctx.fillRect(0, hy + 3, 2, 3);
     if (!SH.game.mortal) { ctx.fillRect(-1, hy + 1, 2, 2); ctx.fillRect(-2, hy - 1, 1, 2); }
-    if (!tint) { ctx.fillStyle = '#1a1430'; ctx.fillRect(4, hy + 4, 2, 3); ctx.fillStyle = '#ffffff'; ctx.fillRect(5, hy + 4, 1, 1); }
+    if (!tint) {
+      if (pose === 'idle' && a.t % 230 < 7) { ctx.fillStyle = '#b08a72'; ctx.fillRect(4, hy + 5, 2, 1); }   // a blink now and then
+      else { ctx.fillStyle = '#1a1430'; ctx.fillRect(4, hy + 4, 2, 3); ctx.fillStyle = '#ffffff'; ctx.fillRect(5, hy + 4, 1, 1); }
+    }
 
     // arm + dagger
     const sw = p.swing;
@@ -741,12 +785,17 @@
     if (pose === 'pogo') armAng = 0;
     const bow = !g && SH.game.can('bow') && !SH.game.can('daggers');
     if (bow) { showBlade = false; if (p.bowT > 0) armAng = -1.57; }
+    const casting = !g && p.castT > 0;
+    if (casting) { armAng = -1.57; showBlade = false; }
     ctx.save();
     ctx.translate(2, -28 + breathe);
     ctx.rotate(armAng);
     ctx.fillStyle = C(PAL.tunic); ctx.fillRect(-2, 0, 4, 7);
     ctx.fillStyle = C(PAL.skin); ctx.fillRect(-2, 7, 4, 4);
     if (showBlade) { ctx.fillStyle = C(PAL.blade); ctx.fillRect(-1, 10, 2, 9); ctx.fillStyle = C(PAL.gold); ctx.fillRect(-2, 10, 4, 1); }
+    if (casting) { // an open palm with fire in it
+      ctx.fillStyle = 'rgba(255,150,60,0.5)'; ctx.fillRect(-5, 9, 10, 10); ctx.fillStyle = '#ff8a3a'; ctx.fillRect(-3, 11, 6, 6); ctx.fillStyle = '#ffe08a'; ctx.fillRect(-1, 12, 3, 4);
+    }
     if (bow) { // a hunting bow in her hand, drawn back while she shoots
       const pull = p.bowT > 8 ? 4 : 0;
       ctx.strokeStyle = '#8a5a2a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 10, 9, -0.2 * Math.PI + Math.PI / 2 - 1.2, Math.PI / 2 + 1.2 - 0.2 * Math.PI); ctx.stroke();

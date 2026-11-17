@@ -149,13 +149,14 @@
     const flip = k => { s[k] = !s[k]; save(); };
     const items = [
       { label: 'Sound effects', value: () => s.sfx ? `${s.sfx}%` : 'Off', left: () => { s.sfx = Math.max(0, s.sfx - 10); save(); }, right: () => { s.sfx = Math.min(100, s.sfx + 10); save(); SH.sfx.play('select'); } },
+      { label: 'Music', value: () => s.music ? `${s.music}%` : 'Off', left: () => { s.music = Math.max(0, s.music - 10); save(); }, right: () => { s.music = Math.min(100, s.music + 10); save(); } },
       { label: 'Text speed', value: () => s.textSpeed[0].toUpperCase() + s.textSpeed.slice(1), left: () => cycle('textSpeed', speeds, -1), right: () => cycle('textSpeed', speeds, 1) },
       { label: 'Touch: strike down for me', value: () => s.autoDown ? 'On' : 'Off', left: () => flip('autoDown'), right: () => flip('autoDown') },
       { label: 'Screen shake', value: () => s.shake ? 'On' : 'Off', left: () => flip('shake'), right: () => flip('shake') },
       { label: 'Tune the movement feel', action: () => { $('front').classList.remove('show'); SH.game.hud.tune(true); SH.game.hud.tuneBack = () => { $('front').classList.add('show'); F.settings(back); }; } },
       { label: 'Back', action: back },
     ];
-    F.show('Settings', items, back, 'Left and right change a setting. Music is coming with Will\'s own tracks.');
+    F.show('Settings', items, back, 'Left and right change a setting. The music is a placeholder until Will\'s own tracks go in.');
   };
   F.credits = function () {
     F.show('Credits', [{ label: 'Back', action: F.main }], F.main, `

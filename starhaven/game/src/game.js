@@ -8,7 +8,7 @@
   };
   SH.store = store;
   SH.tune = Object.assign({}, SH.TUNE_DEFAULTS, store.get('starhaven.tune.v1', {}));
-  SH.settings = Object.assign({ autoDown: true, sfx: 70, textSpeed: 'normal', shake: true }, store.get('starhaven.settings.v1', {}));
+  SH.settings = Object.assign({ autoDown: true, sfx: 70, music: 50, textSpeed: 'normal', shake: true }, store.get('starhaven.settings.v1', {}));
 
   const G = SH.game = {
     state: 'front', world: null, frozen: false, slot: null,
@@ -22,25 +22,25 @@
     const pr = G.progress;
     SH.saves.write(G.slot, {
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0,
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {},
     });
     if (show) G.hud.saved();
   };
   G.newGame = function (slot) {
     G.slot = slot == null ? null : slot;
-    G.progress = { reached: 0, bonds: {}, met: [], playFrames: 0 };
+    G.progress = { reached: 0, bonds: {}, met: [], playFrames: 0, motes: {} };
     G.startChapter(0);
   };
   G.playChapter = function (i) {   // chapter select: no saving
     G.slot = null;
-    G.progress = { reached: i, bonds: {}, met: [], playFrames: 0 };
+    G.progress = { reached: i, bonds: {}, met: [], playFrames: 0, motes: {} };
     G.startChapter(i);
   };
   G.loadSlot = function (slot) {
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
     G.slot = slot;
-    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0 };
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes) };
     const N = ST.CHAPTERS.length, target = s.chapter;
     const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
     if (s.pending) {           // quit during an evening: play it again, then go on
@@ -69,7 +69,7 @@
     const npcs = def.npcs.map(n => ({ ...n, x: n.x * TS + TS / 2, y: room.groundY(Math.floor(n.x), 0), facing: -1, near: false }));
     const gates = def.gates.map(g => ({ ...g, lift: g.open ? 1 : 0 }));
     const w = {
-      room, player, things, lanterns, npcs, gates, input,
+      room, player, things, lanterns, npcs, gates, input, motes: room.motes,
       targets: things,
       cam: { x: 0, y: 0 }, viewW: G.viewW || 640, time: 0, fade: 0,
       checkpoint: lanterns[0],
@@ -95,7 +95,7 @@
       dropRocks(n) {
         for (let i = 0; i < n; i++) this.rocks.push({ x: player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
       },
-      onBossDown() { G.boss = null; G.queueScript('mtn_peak'); },
+      onBossDown() { G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
@@ -108,7 +108,9 @@
     G.snapCamera();
     G.hud.hearts(player.hearts, player.maxHearts);
     G.hud.prompt(null); G.hud.talkButton(null);
-    G.hud.abilities(); G.hud.boss(null);
+    G.hud.abilities(); G.hud.boss(null); G.hud.motes(0, room.motes.length);
+    G.roomMusic = def.music || { winter: 'woods', deep: 'deep', mountain: 'mountain' }[def.theme] || 'city';
+    SH.sfx.music(G.roomMusic);
     return w;
   };
 
@@ -147,7 +149,15 @@
     G.state = 'card';
     // After the card: the chapter's evening (if it has one), then the next chapter, or the finale.
     const cont = () => { G.pending2 = null; G.save(); if (next < ST.CHAPTERS.length) G.startChapter(next); else G.runScript('finale'); };
-    G.hud.card({ label: ch.label + ' complete', name: ch.name, text: ch.done, goals: null, button: 'Continue' }, () => {
+    // how the chapter went: time, hearts lost, Starlight gathered (your best is kept)
+    const w = G.world, got = w.motes.filter(m => m.got).length, total = w.motes.length;
+    if (!G.progress.motes) G.progress.motes = {};
+    G.progress.motes[ch.id] = Math.max(G.progress.motes[ch.id] || 0, got);
+    const secs = Math.round((w.frames || 0) / 60);
+    const stats = [`Time ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`, `Hits taken ${w.player.stats.hurt}`];
+    if (total) stats.push(`Starlight ${got} / ${total}${got === total ? ' \u2726 all of it' : ''}`);
+    G.save();
+    G.hud.card({ label: ch.label + ' complete', name: ch.name, text: ch.done, goals: null, stats, button: 'Continue' }, () => {
       if (ch.after) { G.afterScript = cont; G.runScript(ch.after); } else cont();
     });
   };
@@ -219,7 +229,7 @@
     switch (st.do) {
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); break;
-      case 'wyrm': SH.sfx.play('rumble'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
+      case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
       case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
       case 'meet': G.meet(st.who); break;
       case 'bond': G.bond(st.who, st.pts); break;
@@ -229,7 +239,7 @@
       case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
       case 'close': case 'open': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, st.do === 'close'); g.lift = st.do === 'open' ? 0 : 0; fx.kick(4); SH.sfx.play('thud'); } break; }
-      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; } break; }
+      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; SH.sfx.music('tense'); } break; }
       case 'end': G.afterScript = () => { G.state = 'end'; G.hud.end(true); }; break;
     }
   };
@@ -300,7 +310,14 @@
       return;
     }
     if (fx.slowmo > 0) fx.slowmo--;
-    w.time++;
+    w.time++; w.frames = (w.frames || 0) + 1;
+    // Starlight motes
+    for (const m of w.motes) {
+      if (m.got || Math.abs(m.x - p.x) > 16 || Math.abs(m.y - (p.y - 20)) > 24) continue;
+      m.got = true; SH.sfx.play('mote');
+      fx.burst(m.x, m.y, 6, { speed: 1.6, life: 18, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
+      G.hud.motes(w.motes.filter(x => x.got).length, w.motes.length, true);
+    }
 
     const def = w.room.def;
     const painting = G.paintStep();
@@ -450,7 +467,13 @@
     return true;
   };
 
+  // Skip a scene: run it to its end (or to the next choice), still applying everything it does.
+  G.skipScene = function () {
+    let n = 0;
+    while (G.script && !G.choosing && G.state === 'talk' && n++ < 400) { G.hud.finishTyping(); G.talkWait = 0; G.advance(); }
+  };
   G.talkStep = function () {
+    if (input.pressed.pause && !G.choosing) { G.skipScene(); return; }
     if (G.talkWait > 0) { G.talkWait--; return; }
     if (G.hud.typing()) { if (input.pressed.jump || input.pressed.attack || input.pressed.up || input.pressed.dash) G.hud.finishTyping(); return; }
     if (G.choosing) {

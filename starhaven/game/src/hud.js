@@ -26,6 +26,12 @@
     for (let i = 0; i < max; i++) html += `<span class="pip"><span style="height:${Math.round(Math.max(0, Math.min(1, v - i)) * 100)}%"></span></span>`;
     $('pips').innerHTML = html;
   };
+  H.motes = function (n, total, pop) {
+    const el = $('motes');
+    el.style.display = total ? '' : 'none';
+    el.innerHTML = `<i>&#10022;</i> ${n}<small> / ${total}</small>`;
+    if (pop) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+  };
   H.boss = function (b) {
     const el = $('bossbar');
     if (!b || b.dead) { el.classList.remove('show'); return; }
@@ -160,6 +166,7 @@
     $('c-name').textContent = o.name;
     $('c-text').textContent = o.text;
     $('c-goals').innerHTML = o.goals ? '<div class="gl">Goals</div>' + o.goals.map(g => `<li>${esc(g)}</li>`).join('') : '';
+    $('c-stats').innerHTML = o.stats ? o.stats.map(x => `<span>${esc(x)}</span>`).join('') : '';
     $('c-go').textContent = o.button;
     $('card').classList.add('show');
     cardDone = done;
@@ -211,6 +218,8 @@
     html += `<p>${esc(ST.RECAP)}</p>`;
     for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
     html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
+    const ms = G.progress.motes || {}, sum = Object.values(ms).reduce((a, b) => a + b, 0);
+    if (sum) html += `<p><b>Starlight gathered:</b> &#10022; ${sum} (kept for rebuilding Starhaven, later)</p>`;
     html += '<h3>Bonds</h3>';
     const bonds = G.progress.bonds, ids = Object.keys(ST.BONDS).filter(id => bonds[id]);
     if (!ids.length) html += '<p>No bonds yet. Hearts grow from evenings together, gifts they love, and the choices you make when you talk.</p>';
@@ -268,6 +277,7 @@
   H.bind = function () {
     const G = SH.game, on = (id, f) => $(id).addEventListener('click', f);
     on('c-go', () => H.cardGo());
+    on('d-skip', () => G.skipScene());
     // In a conversation, a tap anywhere goes to the next line.
     document.addEventListener('pointerdown', e => {
       if (G.state === 'talk' && G.talkWait <= 0 && !e.target.closest('button')) { e.preventDefault(); if (H.typing()) H.finishTyping(); else G.advance(); }

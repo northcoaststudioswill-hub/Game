@@ -1,5 +1,33 @@
 # Starhaven — Changelog
 
+## Rebuild 7 — Polish round on what's there (Nov 17, 2026)
+Will asked for a round on the existing content. Started from an audit (close-ups of Wren's poses, every portrait, every
+level) and fixed what it showed.
+
+- **Levels are dressed.** Props in every level, placed from data: a real snow-capped fallen log, a boulder, bushes,
+  snowdrifts and saplings in the Winter Woods; bones, chains, stalactites and glowing mushrooms Under the Mountain;
+  banners, crates and barrels in Starhaven; weapon racks and a fence at the Training Ring; dead trees, cairns and the Old
+  Wyrm's bone pile on the mountain.
+- **The mountain has its own ground.** A level that changes place (city to mountain, city to Thornwood) now changes its
+  ground with it: snow on the mountain road instead of the city's purple.
+- **Starlight motes** (DESIGN.md: missions earn Starlight). Every level has them (29 / 61 / 43 / 20 / 38), laid along
+  the jump arcs so they also show the way: over the log, up the double-jump wall, across the dash gap, above each thorn
+  bud. A counter under the hearts; your best per chapter is saved; the total is in Story & goals.
+- **Chapter results.** The "chapter complete" card now shows time, hits taken and Starlight gathered.
+- **Music.** Five synthesized placeholder themes: the Winter Woods (cold and sparse), Under the Mountain (a drone and
+  things dripping), Starhaven (warm chords and a motif of its own), the mountain (open fifths and wind), and a tense
+  pulse for the Wyrm chase and the Old Wyrm. Settings has a Music volume. Will's own tracks replace these later.
+- **Skip.** A Skip button on every conversation and cinematic (Start or Esc on a controller or keyboard). It runs the
+  scene to its end, or to the next choice, and still applies everything the scene does.
+- **Wren:** a casting pose with fire in her open palm; she blinks when idle.
+- Toasts sit at the bottom so they never cover a control hint.
+
+Verified: `feel.js` 34/34 (new: Skip ends a scene and keeps its effects, and stops at choices; motes collect and every
+level has them), `front.js` 16/16 (settings list updated for Music), `smoke.js` no errors. Music checked by counting
+notes scheduled in a browser on the menu and after a chapter starts. NOT tested: how the music sounds on a phone speaker;
+human play.
+
+
 ## Rebuild 6 — Chapter 3, First Light (Nov 17, 2026)
 The next chapter in `DESIGN.md`: Wren's first court gift, a new enemy, a monster hunt, and Caelum's next heart.
 
