@@ -1,15 +1,15 @@
 # Pocket Lantern — where everything is (Nov 17, 2026)
 
-Estimates by Claude (Haiku 5.5) from the repo as it stands. They are judgment, not measurement: a rough sense of how far each game is from the version you'd call finished. Change any number freely.
+Estimates: Sproutwild is Claude's, Rootdeep and the note on the others are Will's. Sprouts, Knockout and Patch & Plate are Claude's guesses kept inside Will's "less than 40%" range. They measure how far each game is from the version you'd call finished. Change any number freely.
 
 ## Progress by game
 
 | Game | Where it lives | Version | Estimate | Basis |
 | --- | --- | --- | --- | --- |
-| Sprouts (cart 1) | `src/sprouts.js` (reference) | original | 100% | The finished original. Read-only reference. |
-| North Coast Knockout (cart 2) | `alt/src/knockout.js` | v0.35 reworked + Fable passes | 70% | Playable, roster and supers in. Balance and a phone check not done. |
-| Rootdeep | `v0.2/` and `alt/src/rootdeep.js` | v2.9 "Cast update" | 90% | Handed off and finished, but no phone verdict from Will yet. Open threads listed in its handoff. |
-| Patch & Plate (cart 4) | `alt/src/patchplate.js` | v0.3 | 60% | Untouched since v0.3. Works, not expanded. |
+| Sprouts (cart 1) | `src/sprouts.js` | original, to be expanded | 30% | Will: "definitely not done". Playable and a good base, but it gets more content next. |
+| North Coast Knockout (cart 2) | `alt/src/knockout.js` | v0.35 reworked + Fable passes | 25% | Will: less than 40%. Roster and supers in; balance and a phone check not done. |
+| Rootdeep | `v0.2/` and `alt/src/rootdeep.js` | v2.9 "Cast update" | 40% | Will's estimate. Its handoff lists the open threads. |
+| Patch & Plate (cart 4), the cooking game | `alt/src/patchplate.js` | v0.3 pre-alpha | 35% | Will: maybe further along than the others, but bug fixes and polish are needed. Erin's farm stand: plant, cook, serve. |
 | **Sproutwild / Pocket Lantern (cart 5)** | `alt/src/sproutwild/` | v9.9 | **35%** | The castle path works end to end, and the Meadow and Sunkeep are playable. Sigils 2 to 4, Bottie's final tower and the post-game are not played by hand. About 4 hours of content is the target. |
 | **Thornwatch** (slot 4 of the Thornwatch file) | `muse/games/thornwatch/` on `claude/2d-fighter-game-characters-r9oir7` | v3.7 (v4.0 not started) | **30%** | A working tower defense with three gardens, but it reads as a mini-game. v4 research is done; no v4 build yet. |
 | Starhaven (separate project) | `starhaven` branch | outline | 10% | Design outline only. Not part of Pocket Lantern. |
