@@ -243,18 +243,14 @@ function wBakeGround(){const sec=wSector(W4.sector),wh=W4.wh||360,B=FBIO.MEADOW;
   path(322,198,14,214);path(248,412,88,14);
   /* plaza */
   for(let px=196;px<284;px+=11)for(let py=92;py<116;py+=8){R('#6e6350',px+((py/8|0)%2)*5,py,11,8);R(((px+py)/4|0)%2?'#a39a86':'#948a76',px+((py/8|0)%2)*5,py,10,7);R('#b8b09c',px+((py/8|0)%2)*5,py,10,1)}
-  /* the garden: fenced, tilled */
-  const pc=6+Math.min(2,SW.buildings.filter(b2=>b2.k==='bed').length);
-  R('#5a8a3a',158,326,164,66);R('#8a6a48',162,330,156,3);R('#8a6a48',162,384,156,3);R('#8a6a48',162,330,3,57);R('#8a6a48',315,330,3,57);
-  R('#b89468',162,330,156,1);for(let fx=162;fx<=315;fx+=22){R(UI.ink,fx-1,326,6,9);R('#6e5233',fx,327,4,7);R(UI.ink,fx-1,380,6,9);R('#6e5233',fx,381,4,7)}
-  const PL=[[208,348],[240,348],[272,348],[208,374],[240,374],[272,374],[176,361],[304,361]];
-  for(let i=0;i<pc;i++){const [px,py]=PL[i];R('#4a3520',px-12,py-7,24,15);R('#6a4a2c',px-11,py-6,22,13);R('#8a6238',px-11,py-6,22,2);R('#5a3d24',px-8,py-1,16,2);R('#5a3d24',px-8,py+3,16,2)}
+  /* the garden: fenced, tilled, with room to grow (v9.7) */
+  wGardenBake(R,B,path);
   /* flower beds along the lanes */
-  for(let i=0;i<46;i++){const fx=20+rnd()*(WW-40),fy=100+rnd()*(wh-150);if(fx>150&&fx<330&&fy>316&&fy<400)continue;const c=B.fl[i%3];R(c,fx,fy,2,2);R('#ffffff',fx,fy,1,1);R(B.g3,fx,fy+2,1,2)}}
+  for(let i=0;i<46;i++){const fx=20+rnd()*(WW-40),fy=100+rnd()*(wh-150);if(fx>160&&fx<320&&fy>320&&fy<408)continue;const c=B.fl[i%3];R(c,fx,fy,2,2);R('#ffffff',fx,fy,1,1);R(B.g3,fx,fy+2,1,2)}}
  /* the forest edge */
  const tree=(x,y)=>{R('rgba(0,0,0,.24)',x-12,y-3,28,6);artTree((c,a,b2,w,h)=>R(c,x-22+a,y-44+b2,w,h),B,0)};
  R('#2c5a2e',0,0,WW,10);R('#2c5a2e',0,0,6,wh);R('#2c5a2e',WW-6,0,6,wh);R('#2c5a2e',0,wh-8,WW,8);
  for(let x=6;x<WW;x+=26){if(sec.id==='BASE'&&x>150&&x<330)continue;tree(x+((rnd()*6)|0),26+((rnd()*5)|0))}
  for(let y=52;y<wh-10;y+=26){tree(1+((rnd()*3)|0),y);tree(WW-2-((rnd()*3)|0),y+12)}
  for(let x=6;x<WW;x+=14){if(Math.abs(x-WW/2)<34)continue;R(UI.ink,x-1,wh-13,15,13);R(B.t1,x,wh-12,13,12);R(B.t2,x,wh-12,13,4);R(B.t3,x+2,wh-11,4,1)}
- W4.groundCv=cv;W4.groundFor=sec.id+'x'+wh}
+ W4.groundCv=cv;W4.groundFor=sec.id+'x'+wh+'p'+wPlotCount()}

@@ -6420,7 +6420,7 @@ function wCellFree(gx,gy){const x=wCellX(gx),y=wCellY(gy),cx=x+10,cy=y+10;
  if(x>172&&x<290&&y<112)return false;
  if(cx>218&&cx<262&&cy>100)return false; /* the lane from the Lantern to the south road stays clear */
  if(cx>284&&cx<340&&cy>150&&cy<204)return false; /* the camp fire */
- if(cx>158&&cx<322&&cy>324&&cy<392)return false; /* the garden: nothing builds on the plots */
+ if(cx>160&&cx<320&&cy>320&&cy<410)return false; /* the garden: nothing builds on the plots, or where it will grow */
  for(const b of W4.bushes||[])if(Math.hypot(cx-b.x,cy-b.y)<18)return false;
  if(wPropBlocks(cx,cy))return false; /* v9.6: props stay clear */
  if(SW.quest<2&&Math.hypot(cx-240,cy-296)<52)return false;
@@ -6811,7 +6811,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
  const cam=W4.cam||{x:0,y:0};
  r('#0c120a',0,0,W,H);
  g.save();g.translate(-cam.x,-cam.y);
- if(W4.groundFor!==sec.id+'x'+(W4.wh||360))wBakeGround();
+ if(W4.groundFor!==sec.id+'x'+(W4.wh||360)+'p'+wPlotCount())wBakeGround();
  g.drawImage(W4.groundCv,0,0);
  W4.front=[];for(const d of(W4.decor||[])){
   if(d.k==='tree'||d.k==='snowrock'||d.tall){if(d.y>P3.y)W4.front.push(['d',d]);else wDrawDecor(d)}
@@ -8956,21 +8956,17 @@ function wBakeGround(){const sec=wSector(W4.sector),wh=W4.wh||360,B=FBIO.MEADOW;
   path(322,198,14,214);path(248,412,88,14);
   /* plaza */
   for(let px=196;px<284;px+=11)for(let py=92;py<116;py+=8){R('#6e6350',px+((py/8|0)%2)*5,py,11,8);R(((px+py)/4|0)%2?'#a39a86':'#948a76',px+((py/8|0)%2)*5,py,10,7);R('#b8b09c',px+((py/8|0)%2)*5,py,10,1)}
-  /* the garden: fenced, tilled */
-  const pc=6+Math.min(2,SW.buildings.filter(b2=>b2.k==='bed').length);
-  R('#5a8a3a',158,326,164,66);R('#8a6a48',162,330,156,3);R('#8a6a48',162,384,156,3);R('#8a6a48',162,330,3,57);R('#8a6a48',315,330,3,57);
-  R('#b89468',162,330,156,1);for(let fx=162;fx<=315;fx+=22){R(UI.ink,fx-1,326,6,9);R('#6e5233',fx,327,4,7);R(UI.ink,fx-1,380,6,9);R('#6e5233',fx,381,4,7)}
-  const PL=[[208,348],[240,348],[272,348],[208,374],[240,374],[272,374],[176,361],[304,361]];
-  for(let i=0;i<pc;i++){const [px,py]=PL[i];R('#4a3520',px-12,py-7,24,15);R('#6a4a2c',px-11,py-6,22,13);R('#8a6238',px-11,py-6,22,2);R('#5a3d24',px-8,py-1,16,2);R('#5a3d24',px-8,py+3,16,2)}
+  /* the garden: fenced, tilled, with room to grow (v9.7) */
+  wGardenBake(R,B,path);
   /* flower beds along the lanes */
-  for(let i=0;i<46;i++){const fx=20+rnd()*(WW-40),fy=100+rnd()*(wh-150);if(fx>150&&fx<330&&fy>316&&fy<400)continue;const c=B.fl[i%3];R(c,fx,fy,2,2);R('#ffffff',fx,fy,1,1);R(B.g3,fx,fy+2,1,2)}}
+  for(let i=0;i<46;i++){const fx=20+rnd()*(WW-40),fy=100+rnd()*(wh-150);if(fx>160&&fx<320&&fy>320&&fy<408)continue;const c=B.fl[i%3];R(c,fx,fy,2,2);R('#ffffff',fx,fy,1,1);R(B.g3,fx,fy+2,1,2)}}
  /* the forest edge */
  const tree=(x,y)=>{R('rgba(0,0,0,.24)',x-12,y-3,28,6);artTree((c,a,b2,w,h)=>R(c,x-22+a,y-44+b2,w,h),B,0)};
  R('#2c5a2e',0,0,WW,10);R('#2c5a2e',0,0,6,wh);R('#2c5a2e',WW-6,0,6,wh);R('#2c5a2e',0,wh-8,WW,8);
  for(let x=6;x<WW;x+=26){if(sec.id==='BASE'&&x>150&&x<330)continue;tree(x+((rnd()*6)|0),26+((rnd()*5)|0))}
  for(let y=52;y<wh-10;y+=26){tree(1+((rnd()*3)|0),y);tree(WW-2-((rnd()*3)|0),y+12)}
  for(let x=6;x<WW;x+=14){if(Math.abs(x-WW/2)<34)continue;R(UI.ink,x-1,wh-13,15,13);R(B.t1,x,wh-12,13,12);R(B.t2,x,wh-12,13,4);R(B.t3,x+2,wh-11,4,1)}
- W4.groundCv=cv;W4.groundFor=sec.id+'x'+wh}
+ W4.groundCv=cv;W4.groundFor=sec.id+'x'+wh+'p'+wPlotCount()}
 /* ================================================================
    SUNKEEP AT WORK (Fable, v5.4) — the base runs like a Palworld camp.
    Everyone you are not adventuring with works at home, on screen:
@@ -9893,7 +9889,7 @@ function wTagWild(){if(W4.tagT===time)return W4.tagW;W4.tagT=time;let b=null,bd=
 let SCOFF=false;
 function scStart(steps,done){if(SCOFF){for(const s of steps)if(s.fn)s.fn();if(done)done();return}W4.scene={steps,i:-1,t:0,x:P3.x,y:P3.y,done};W4.talk=null;W4.quips=[];W4.quipQ=[];scNext()}
 function scNext(){const sc=W4.scene;sc.i++;sc.t=0;const st=sc.steps[sc.i];
- if(!st){W4.scene=null;if(sc.done)sc.done();if(!W4.fld)wCamUpdate(P3.x,P3.y);return}if(st.fn)st.fn()}
+ if(!st){W4.scene=null;W4.scEndT=time;if(sc.done)sc.done();if(!W4.fld)wCamUpdate(P3.x,P3.y);return}if(st.fn)st.fn()}
 function scTick(dt){const sc=W4.scene,st=sc.steps[sc.i];sc.t+=dt;
  if(st.tick)st.tick(dt);
  const tx=st.x==='lou'?lou.x:st.x==null?P3.x:st.x,ty=st.x==='lou'?lou.y:st.y==null?P3.y:st.y,k=Math.min(1,dt*3.4);sc.x+=(tx-sc.x)*k;sc.y+=(ty-sc.y)*k;
@@ -9957,14 +9953,14 @@ function scArrow(){if(W4.scene||!W4.bf||W4.fld)return;const op=wOp(),cam=W4.cam|
   if(!t.gate)scTri(t.x,t.y-off+b,'d');return}
  const d=sy>H-40?'d':sx<14?'l':sx>W-14?'r':'u';scTri(cx+cam.x+(d==='l'?-b:d==='r'?b:0),cy+cam.y+(d==='d'?b:d==='u'?-b:0),d)}
 function scBuild(){SW.lessons.scBuild=1;SW.beats.caught=1;const nm=(SW.party[SW.party.length-1]||{}).sp||'It';
- scStart([{hold:.6},{who:'MARCUS',txt:'AYYY! You caught one! Never doubted you once. Dap me up.'},
+ scStart([{hold:.6},{who:'MARCUS',txt:'AYYY! Erin told me. Your first catch! Never doubted you once. Dap me up.'},
   {x:150,y:236,hold:1.1},{x:150,y:236,who:'MARCUS',txt:'Buddies need a roof, bro. Press START, pick BUILD, then COTTAGE. Costs 8 wood. This spot is nice.'},
   {x:150,y:236,who:'MARCUS',txt:'Short on wood? Send a buddy at trees. Sprouts carry the logs home. Teamwork. I supervise.'},
   {who:'ERIN',txt:'Only your lead buddy walks with you here. The others wait at home. Give them a roof and they get to work.'},{hold:.4}],()=>swSave())}
 function scAuto(){swMsgPump();scGymCheck();sigilCheck();loreTown();loreBibi();if(!SCOFF&&!swBusy()&&!(W4.scPend&&W4.scPend.length)&&kindCheck())return;
  if(!W4.fld&&W4.bf){scSpread();SW.beats=SW.beats||{};
   if(wOp()>=3&&!SW.lessons.loop&&SW.quest<=2&&(SCOFF||!swBusy())){if(SCOFF)SW.lessons.loop=1;else{W4.loopT=0;state='g4loop';return}}
-  if(wHasRoof()&&!SW.lessons.scDab&&W4.sector==='BASE'&&wOp()>=3&&!(W4.cons&&W4.cons.length)&&(SCOFF||wNearCot(120))){ /* v9.2: the party waits till you are home at the cottage */W4.dabT=(W4.dabT||0)+1;if(W4.dabT>50){if(SCOFF)SW.lessons.scDab=1;else dabStart();return}}
+  if(wHasRoof()&&!SW.lessons.scDab&&W4.sector==='BASE'&&wOp()>=3&&!(W4.cons&&W4.cons.length)&&(SCOFF||wNearCot(200)||(W4.dabW=(W4.dabW||0)+1)>900)){ /* the party waits till you are near the cottage, or 15 s at home (v9.7: it must not be missed) */W4.dabT=(W4.dabT||0)+1;if(W4.dabT>50){if(SCOFF)SW.lessons.scDab=1;else dabStart();return}}
   if(SW.quest===4&&SW.lessons.scDab&&!SW.lessons.scPlot&&W4.sector==='BASE'&&!(W4.cons&&W4.cons.length)&&(SCOFF||P3.y>250)){ /* v9.2: the garden lesson plays when you walk to the garden */W4.plotT=(W4.plotT||0)+1;if(W4.plotT>60){scPlots();return}}
   if(SW.quest===3&&!SW.lessons.scBuild&&W4.sector==='BASE'&&SW.lessons.scSend){SW.beats.caught=1;W4.buildT=(W4.buildT||0)+1;if(W4.buildT>40){scBuild();return}}
   if(wOp()===0&&!SW.beats.wake){SW.beats.wake=1;SW.beats.first=1;scIntro();return}
@@ -9986,8 +9982,11 @@ function scWorldFx(){opFx();scArrow();scDabFx();if(!W4.seedFx)return;for(const f
 function scConStart(b,def,first){W4.cons=W4.cons||[];W4.cons.push({b,def,first,t:0,need:9+Object.values(def.cost||{}).reduce((a,v)=>a+v,0)*.45});b.con=1;
  for(const w of W4.wk||[]){w.task={k:'idle',x:wCellX(b.gx)+10+(Math.random()*40-20),y:wCellY(b.gy)+28+Math.random()*6,t:4.5}}}
 function scConTick(dt){if(!W4.cons||!W4.cons.length)return;const F=W4.bf;
- for(const c of W4.cons){const x=wCellX(c.b.gx)+10,y=wCellY(c.b.gy)+10,help=(W4.wk||[]).filter(w=>Math.hypot(w.x-x,w.y-y-18)<40).length;
-  c.t+=dt*(1+help*.35);c.b.con=Math.max(0,1-c.t/c.need);
+ for(const c of W4.cons){const x=wCellX(c.b.gx)+10,y=wCellY(c.b.gy)+10,near=w=>Math.hypot(w.x-x,w.y-y-18)<40;
+  /* v9.7: nothing builds itself. Home buddies keep coming back to the scaffold; your lead buddy helps when it stands there with you */
+  for(const w of W4.wk||[])if(!near(w)&&(!w.task||w.task.k==='idle'))w.task={k:'idle',x:x+(Math.random()*40-20),y:y+26+Math.random()*6,t:3};
+  const help=(W4.wk||[]).filter(near).length+(W4.part&&SW.party.length&&near(W4.part)?1:0);c.help=help;
+  c.t+=dt*(help?.6+help*.4:0);c.b.con=Math.max(0,1-c.t/c.need);
   if(((c.t*5)|0)!==(((c.t-dt)*5)|0)){fSpark(x+(Math.random()*28-14),y-4-Math.random()*16,'#ffe8b0');swSnd(220+Math.random()*80,.03,140)}
   if(c.t>=c.need){c.b.con=0;delete c.b.con;
    for(let i=0;i<14;i++)W4.floats.push({x:x+(Math.random()*36-18),y:y-Math.random()*24,txt:'*',t:.4+Math.random()*.6,c:i%2?'#fff3b0':'#7ee787'});
@@ -10005,7 +10004,7 @@ function scConDraw(b){if(!(W4.cons||[]).some(c=>c.b===b)){delete b.con;wDrawBuil
  ts.forEach((ty,i)=>{const T=TYPES[ty],sx=x-4+i*13,hop=((time*6+i*2)|0)%2,sy=y+18-hh-6-hop*2;
   r(K,sx-1,sy-1,6,7);r(T.c,sx,sy,4,5);r(T.l,sx+1,sy,2,1);
   const sw2=((time*8+i)|0)%2;r('#8a6a48',sx+4,sy-3+sw2,1,4);r('#c8ccd4',sx+3,sy-4+sw2,3,2)});
- const pct=Math.round(k*100)+'%';r('rgba(10,14,8,.75)',x+10-tw(pct,1)/2-2,y-24,tw(pct,1)+4,9);text(pct,x+10-tw(pct,1)/2,y-23,1,'#ffd94d',null)}
+ const cn=(W4.cons||[]).find(c=>c.b===b),pct=cn&&!cn.help?'NEEDS A BUDDY':Math.round(k*100)+'%';r('rgba(10,14,8,.75)',x+10-tw(pct,1)/2-2,y-24,tw(pct,1)+4,9);text(pct,x+10-tw(pct,1)/2,y-23,1,'#ffd94d',null)}
 /* ---------------- the cottage party (v7.1) ----------------
    The first roof at Sunkeep gets celebrated properly: Marcus brings
    out the rig, heats it, rips it, yells his line, and hands it over. */
@@ -10586,7 +10585,7 @@ function ewDraw(){const E=W4.ew;if(!E)return;fChibi(Math.round(E.x),Math.round(E
       the Meadow she walks you to a calm wild buddy for your first
       catch. No battle can start before that first catch.
    ================================================================ */
-WSEEDPOS[0]=[208,351];WSEEDPOS[2]=[240,351];WSEEDPOS[4]=[272,351]; /* on the top row of garden plots, where garden sprouts stand */
+WSEEDPOS[0]=[214,345];WSEEDPOS[2]=[266,345];WSEEDPOS[4]=[186,345]; /* on the top row of garden plots, where garden sprouts stand */
 /* messages stay up long enough to read */
 function swSay(s,t){W4.msg=s;W4.msgT=Math.max(t||2.2,1.4+String(s).length*.055)}
 /* ---- 1. Louie's berry ---- */
@@ -10649,7 +10648,6 @@ function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch
   {x:240,y:352,hold:1.5},
   {x:240,y:352,hold:1.1,fn:pop},
   {x:240,y:352,who:'ERIN',txt:'Now it is lit, the garden grows sprouts on its own. Pluck them when they are grown.'},
-  {x:240,y:352,who:'MARCUS',txt:'Every four things you carry home, the Lantern grows one more. Free sprouts, bro.'},
   {who:'MARCUS',txt:'The light reached the wilds too. Three buddies are on their way. Pick one.'}
  ],()=>{W4.choiceT=0;W4.banner={txt:'THE LANTERN STIRS',sub:'Three dim buddies are coming',t:3.5}})}
 /* ---- 4a. Erin walks you to the south road ---- */
@@ -10785,13 +10783,14 @@ function swBusy(){return W4.msgT>0||(W4.msgQ&&W4.msgQ.length)}
 function swMsgPump(){if(W4.ringPend&&state==='g4world'){const m=W4.ringPend;W4.ringPend=null;swSay(m,3.6);swSnd(784,.12,1568)}{const F=W4.fld;if(F&&F.dlgPend&&!F.dlg&&!W4.scene&&!swBusy()){F.dlg=F.dlgPend;F.dlgPend=null;return}}
  if(W4.scene||(W4.fld&&W4.fld.dlg)||W4.talk||(W4.quips&&W4.quips.length))return;W4.msgQ=W4.msgQ||[];
  if(W4.msgT>0)return;
+ if(W4.scPend&&W4.scPend.length&&time-(W4.scEndT||-9)<1.5)return; /* v9.7: a breath between scenes */
  if(W4.scPend&&W4.scPend.length){const p=W4.scPend.shift();if(p.dab)dabGo();else scGo(p.steps,p.done);return} /* v8.9: a waiting scene goes before messages not yet shown */
  if(W4.msgQ.length){const q=W4.msgQ.shift();W4.msg=q.s;W4.msgT=q.t;W4.msgAt=time;W4.msgMin=Math.min(q.t,1.2+q.s.length*.045);return}
  if(false){const p=W4.scPend.shift();if(p.dab)dabGo();else scGo(p.steps,p.done)}}
 function scStart(steps,done){if(SCOFF){for(const s of steps)if(s.fn)s.fn();if(done)done();return}
- W4.scPend=W4.scPend||[];const sig=scSig(steps);
+ W4.scPend=W4.scPend||[];const sig=scSig(steps);steps=scWalkUp(steps);
  if((W4.scene&&W4.scene.sig===sig)||W4.scPend.some(p=>p.sig===sig))return;       /* the same scene is already playing or waiting */
- if(W4.scene||swBusy()||W4.scPend.length){W4.scPend.push({steps,done,sig});return} /* waits its turn, in order */
+ if(W4.scene||swBusy()||W4.scPend.length||time-(W4.scEndT||-9)<1.5){W4.scPend.push({steps,done,sig});return} /* waits its turn, in order (and a breath after the last one) */
  scGo(steps,done)}
 function scSig(steps){return steps.map(s=>(s.who||'')+(s.txt||'')).join('|')}
 function scGo(steps,done){W4.scene={steps,i:-1,t:0,x:P3.x,y:P3.y,done,sig:scSig(steps)};W4.talk=null;W4.quips=[];W4.quipQ=[];scNext()}
@@ -11105,7 +11104,7 @@ WSECSUB.SQUIRE='The castle in the woods. Wilds Lv3 to 6.';
 function wBarred(to){return to==='SQUIRE'?SW.quest<5:to==='HOLLOW'?SW.badges.length<1:false}
 function wBarredSay(to){return to==='SQUIRE'?"RANGER'S BARRIER: Squire's Woods is wild. Build Sunkeep a cottage and grow a crop first.":"RANGER'S BARRIER: Crooked Hollow is darker still. Win a Sigil from the castle alpha in Squire's Woods first."}
 /* after the cottage and the first crop: the castle */
-function scGymCheck(){wStoryBeats();if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return;SW.lessons.scGym=1;
+function scGymCheck(){wStoryBeats();if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||!SW.lessons.scDab||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return;SW.lessons.scGym=1;
  const L=FMAPS.SQUIRE.key.A.lv;
  scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Now the real work: the dark out there.'},
   {who:'MARCUS',txt:"Every place has an ALPHA, bro. Biggest, darkest buddy around. Ours moved into the old castle in Squire's Woods."},
@@ -11169,8 +11168,7 @@ function fSignsDraw(F){for(const [tx,ty] of FSIGNS[F.id]||[]){const x=tx*FT+8,y=
 const WPROPS=[{k:'well',x:176,y:162,act:'THE WELL',tall:1,r:16},{k:'board',x:268,y:150,act:'READ THE BOARD',tall:1},
  {k:'bench',x:286,y:204,act:'SIT A WHILE'},{k:'bench',x:338,y:214,act:'SIT A WHILE'},
  {k:'fbed',x:176,y:104},{k:'fbed',x:304,y:104},
- {k:'pond',x:400,y:470,act:'THE POND',r:24},{k:'shrooms',x:70,y:470},
- {k:'fence',x:224,y:436},{k:'fence',x:256,y:436},{k:'fence',x:224,y:470},{k:'fence',x:256,y:470}];
+ {k:'pond',x:400,y:444,act:'THE POND',r:24},{k:'shrooms',x:70,y:446}];
 function wBaseProps(){for(const p of WPROPS)W4.decor.push(Object.assign({prop:1,s:1},p))}
 function wPropBlocks(cx,cy){if(W4.sector!=='BASE')return false;for(const p of WPROPS){const rad=p.k==='pond'?40:p.k==='fence'?14:22;if(Math.hypot(cx-p.x,cy-p.y)<rad)return true}return false}
 function wPropDraw(d){if(!d.prop)return false;const x=Math.round(d.x),y=Math.round(d.y),K='#14101e';
@@ -11209,12 +11207,15 @@ function wPropUse(d){if(d.k==='board'){SW.boardSeen=wBoardKey();scStart(wBoardNo
   swSay(wDark()>.5?'You sit by the fire. The Lantern hums. Your buddies doze off and wake up rested.':hurt?'You sit a while. Your buddies flop down in the grass and get their breath back.':'You sit a while. Louie puts his head on your knee.',3.2);if(hurt)swSnd(880,.08,1175);return}
  if(d.k==='pond'){const L=['Lily pads. A frog that is definitely not a buddy stares at you.','The water shows the Lantern upside down. It looks just as proud.','A ripple. Something small and orange darts under a lily pad.'];swSay(L[(SW.pondN=(SW.pondN||0)+1)%L.length],3);return}}
 /* ---- story beats on things you do ---- */
-function wStoryBeats(){if(SCOFF||state!=='g4world'||W4.scene||swBusy()||(W4.scPend&&W4.scPend.length)||(W4.banner&&W4.banner.t>0))return;const L=SW.lessons;
+function wStoryBeats(){wPlotSync();{const cot=SW.buildings.some(b=>b.k==='cottage'&&!b.con);if((SW.day||1)===1&&!cot)W4.dayT=Math.min(W4.dayT||0,170); /* v9.7: the first day lasts until there is a roof */
+  if(cot&&!SW.lessons.cotDay){SW.lessons.cotDay=1;if((SW.day||1)===1)W4.dayT=Math.min(W4.dayT||0,95)}} /* ...and then a good afternoon before the first evening */
+ if(SW.party.length&&!SW.lessons.scSend){SW.lessons.scSend=1} /* v9.7: Erin teaches sending a buddy at a tree in the Meadow; no second lesson at home */
+ if(SCOFF||state!=='g4world'||W4.scene||swBusy()||(W4.scPend&&W4.scPend.length)||(W4.banner&&W4.banner.t>0))return;const L=SW.lessons;
  /* the first night at home: the fire */
  if(!W4.fld&&W4.sector==='BASE'&&SW.quest>=3&&wDark()>.5&&!L.nightFire){L.nightFire=1;L.night=1;
-  scStart([{x:310,y:180,hold:1.2},{x:310,y:180,who:'ERIN',txt:'Night. Out there the dark is strongest, and the wilds get bolder.'},
-   {x:310,y:180,who:'MARCUS',txt:"In here the Lantern keeps it off. Fire's warm, bro. Bench is free."},
-   {x:310,y:180,who:'ERIN',txt:'Sleep in the cottage to skip to morning. Or sit with us a while.'},{hold:.3}],()=>swSave());return}
+  scStart([{who:'ERIN',txt:"The sun's going down. Out there the dark is strongest, and the wilds get bolder."},
+   {who:'MARCUS',txt:"In here the Lantern keeps it off. Fire's warm, bro. The benches are free."},
+   {who:'ERIN',txt:'Sleep in your new cottage to skip to morning. Or sit by the fire with us a while.'},{hold:.3}],()=>swSave());return}
  /* strong enough for the castle */
  const A=FMAPS.SQUIRE.key.A.lv,ld=SW.party[0];
  if(SW.quest>=5&&!SW.badges.length&&ld&&ld.lv>=A-1&&!L.readyCastle&&SW.lessons.scGym){L.readyCastle=1;
@@ -11227,6 +11228,81 @@ function wStoryBeats(){if(SCOFF||state!=='g4world'||W4.scene||swBusy()||(W4.scPe
  /* the first buddy you calm */
  if((SW.shown||0)>=1&&!L.firstLight){L.firstLight=1;if((SW.walk2||0)<10)return; /* Erin's Meadow walk says it herself */
   scStart([{who:'ERIN',txt:'Did you see that? The dark broke right off it. That is the whole job, keeper.'},{who:'MARCUS',txt:'One down. Whole valley to go. I believe they call that a backlog, bro.'}],()=>swSave());return}}
+/* ================================================================
+   THE GARDEN THAT GROWS (v9.7). Will: the plots are not all
+   functional and have no room to grow. Up to 12 plots, four columns
+   either side of the lane that now runs straight through the garden,
+   three rows. 6 to start, 8 with the cottage, 12 at Sunkeep Lv2.
+   Plots not open yet are staked out with string, so you can see
+   where the garden is going. New plots really appear when they open
+   (the old garden only ever made its plots once).
+   ================================================================ */
+WPLOTS.length=0;for(const y of [342,366,390])for(const x of [214,266,186,294])WPLOTS.push([x,y]);
+function wPlotCount(){return 6+(SW.buildings.some(b=>b.k==='cottage'&&!b.con)?2:0)+(SW.baseLv>=2?4:0)}
+function wPlotSync(){if(W4.fld||!W4.patchBuds||!W4.patchBuds.length)return;const n=wPlotCount();
+ while(W4.patchBuds.length<n){const [x,y]=WPLOTS[W4.patchBuds.length];W4.patchBuds.push({sx:x,sy:y,x,y,type:-1,age:-4,stage:0,mode:'soil',item:false,tx:0,ty:0,dlv:0,seedTy:null,by:null,forPlot:null,bush:null,itemTy:0,t:0});
+  if(!SCOFF){W4.floats.push({x,y:y-12,txt:'NEW PLOT',t:1.8,c:'#7ee787'});swSnd(784,.06,1175)}}}
+function wGardenBake(R,B,path){const n=wPlotCount(),K='#14101e';
+ R('#5a8a3a',166,328,148,76);path(WW/2-9,324,18,84);                       /* grass bed, and the lane runs through */
+ const post=(x,y)=>{R(K,x-1,y-1,5,10);R('#6e5233',x,y,3,8);R('#8a6a48',x,y,3,1)};
+ for(let x=168;x<310;x+=6){if(x>222&&x<254)continue;R('#8a6a48',x,331,6,2);R('#a87948',x,331,6,1);R('#8a6a48',x,397,6,2);R('#a87948',x,397,6,1)}  /* rails, with gaps for the lane */
+ R('#8a6a48',168,331,2,68);R('#8a6a48',310,331,2,68);
+ for(const x of [167,196,222,254,282,309]){post(x,326);post(x,392)}post(167,360);post(309,360);
+ WPLOTS.forEach(([px,py],i)=>{if(i<n){R('#4a3520',px-12,py-7,24,15);R('#6a4a2c',px-11,py-6,22,13);R('#8a6238',px-11,py-6,22,2);R('#5a3d24',px-8,py-1,16,2);R('#5a3d24',px-8,py+3,16,2)}
+  else{for(const [cx,cy] of [[-11,-6],[10,-6],[-11,6],[10,6]]){R(K,px+cx,py+cy-3,2,5);R('#c8b088',px+cx,py+cy-3,1,4)}R('#e8dcc0',px-10,py-6,20,1);R('#e8dcc0',px-10,py+6,20,1);R('#e8dcc0',px-11,py-5,1,11);R('#e8dcc0',px+10,py-5,1,11)}});
+ if(n<WPLOTS.length){const [lx,ly]=WPLOTS[Math.min(WPLOTS.length-1,n)];R(K,lx-9,ly-14,19,8);R('#c49a62',lx-8,ly-13,17,6);R('#5a3d24',lx-6,ly-11,13,1);R('#5a3d24',lx-6,ly-9,10,1)}}
+/* ================================================================
+   LOUIE, PROPERLY (v9.7). Will: Louie's model is bad; he works well in
+   the original Sprouts game. He's a Shiba Inu.
+   - Drawn the way Sprouts draws him: the same Shiba sprite at its true
+     size (20 x 13, it was being squashed to 24 x 12), with his white
+     outline, a two-frame trot with a hop, his tongue, and ears up and
+     a blush when he sits for a pet.
+   - Fetch, the Sprouts way: a stray sprout rides home on his back.
+     He trots over, it hops on, he brings it to your side and it hops
+     off. (It used to be told to walk back by itself.)
+   ================================================================ */
+function louDraw(){const L=louSt(),x=Math.round(lou.x),y=Math.round(lou.y),sit=L.st==='sit',left=L.fx<0,fr=W4.louMv?((time*9)|0)%2:0,hop=W4.louMv&&fr?1:0;
+ r('rgba(0,0,0,.3)',x-8,y+1,17,2);const X=x-10,Y=y-12-hop+(sit?1:0),wImg=sit?(left?LOU.ew:LOU.ewr):(left?LOU.w:LOU.wr),img=sit?(left?LOU.e:LOU.er):(left?LOU.l:LOU.r)[fr];
+ g.drawImage(wImg,X-1,Y);g.drawImage(wImg,X+1,Y);g.drawImage(wImg,X,Y-1);g.drawImage(wImg,X,Y+1);g.drawImage(img,X,Y);
+ if(((time*(sit?12:5))|0)%2)r('#fff0d8',left?X+16:X+3,Y,1,1);                 /* the tail wags */
+ if(sit)r('#f85888',left?X+4:X+14,Y+8,2,2);                                 /* the tongue / blush */
+ if(L.st==='dig')r('#a87850',left?X-2:X+20,Y+11,2,2);
+ W4.louBubP={x,y}}
+/* fetch: a stray sprout rides home on his back */
+function louFetch(F,L,dt){
+ if(L.st==='bring'){L.riders=(L.riders||[]).filter(s=>F.sq.includes(s));if(!L.riders.length){L.st='follow';return true}
+  L.riders.forEach((s,i)=>{s.st='ride';s.x=lou.x+((i%3)-1)*4;s.y=lou.y+1;s.z=9;s.mv=false});
+  const d=louGo(L,P3.x+(lou.x<P3.x?-14:14),P3.y+4,124,dt);
+  if(d<8){const n=L.riders.length;L.riders.forEach((s,i)=>{s.st='follow';s.z=0;s.x=lou.x+((i%3)-1)*5;s.y=lou.y+4});L.riders=[];L.st='sit';L.t=.6;louSay(n>1?'FOUND '+n+'!':'FOUND ONE!',1.4);swSnd(700,.05,500)}
+  return true}
+ const stray=F.sq.find(s=>s.st==='idle'&&s.t>.6&&Math.hypot(s.x-P3.x,s.y-P3.y)>44);if(!stray)return false;
+ stray.t=Math.min(stray.t,2);const d=louGo(L,stray.x,stray.y,130,dt);
+ if(d<10){L.riders=[stray];for(const q of F.sq)if(q!==stray&&q.st==='idle'&&L.riders.length<3&&Math.hypot(q.x-stray.x,q.y-stray.y)<40)L.riders.push(q);
+  L.st='bring';swSnd(880,.05,1175)}
+ return true}
+function fLouTick(F,dt){louIdleTick(dt);const L=louSt();
+ if(L.st==='sit'||L.st==='dig'){louCommon(L,dt,F.items,F.dir);return}
+ if(louFetch(F,L,dt))return;
+ L.bark-=dt;if(L.bark<=0){const wd=W4.wilds.find(w=>!w.cap&&Math.hypot(w.x-P3.x,w.y-P3.y)<90);if(wd){L.bark=22;L.fx=wd.x>lou.x?1:-1;louSay(wd.lv>(SW.party[0]?SW.party[0].lv:5)+2?'GRR! BIG ONE!':'SNIFF! A BUDDY!',1.8);swSnd(600,.05,420)}else L.bark=4}
+ if(louCommon(L,dt,F.items,F.dir))return;
+ const dp=Math.hypot(P3.x-lou.x,P3.y-lou.y);if(dp>260){lou.x=P3.x;lou.y=P3.y+8}louSide(L,F.dir);louGo(L,L.sx,L.sy,dp>50?118:84,dt)}
+/* ================================================================
+   v9.7: whoever says something important walks up to you first.
+   A scene at Sunkeep whose speakers include Erin or Marcus starts with
+   them walking over to stand beside you (Erin on your left, Marcus on
+   your right). Scenes with their own staging (fn steps) are left alone.
+   ================================================================ */
+function scWalkUp(steps){if(W4.fld||!W4.cast||steps.some(s=>s.fn))return steps;
+ const who=[...new Set(steps.map(s=>s.who).filter(w=>w==='ERIN'||w==='MARCUS'))],cs=who.map(w=>W4.cast.find(q=>q.who===w)).filter(Boolean);
+ if(!cs.length)return steps;
+ const spot=c=>({x:P3.x+(c.who==='ERIN'?-24:24),y:P3.y+2});
+ if(!cs.some(c=>Math.hypot(c.x-spot(c).x,c.y-spot(c).y)>14))return steps;
+ const walk={max:6,until:()=>cs.every(c=>Math.hypot(c.x-spot(c).x,c.y-spot(c).y)<3),
+  tick:dt=>{for(const c of cs){const sp=spot(c),dx=sp.x-c.x,dy=sp.y-c.y,d=Math.hypot(dx,dy);c.mv=d>2;
+   if(d>2){const v=Math.min(d*6,92);c.x+=dx/d*v*dt;c.y+=dy/d*v*dt;c.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}else c.dir=[P3.x>c.x?1:-1,0];
+   c.tx=c.x;c.ty=c.y;c.t=Math.max(c.t||0,12)}}};
+ return[walk].concat(steps)}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */

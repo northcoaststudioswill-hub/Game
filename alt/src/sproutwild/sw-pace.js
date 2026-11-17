@@ -19,13 +19,14 @@ function swBusy(){return W4.msgT>0||(W4.msgQ&&W4.msgQ.length)}
 function swMsgPump(){if(W4.ringPend&&state==='g4world'){const m=W4.ringPend;W4.ringPend=null;swSay(m,3.6);swSnd(784,.12,1568)}{const F=W4.fld;if(F&&F.dlgPend&&!F.dlg&&!W4.scene&&!swBusy()){F.dlg=F.dlgPend;F.dlgPend=null;return}}
  if(W4.scene||(W4.fld&&W4.fld.dlg)||W4.talk||(W4.quips&&W4.quips.length))return;W4.msgQ=W4.msgQ||[];
  if(W4.msgT>0)return;
+ if(W4.scPend&&W4.scPend.length&&time-(W4.scEndT||-9)<1.5)return; /* v9.7: a breath between scenes */
  if(W4.scPend&&W4.scPend.length){const p=W4.scPend.shift();if(p.dab)dabGo();else scGo(p.steps,p.done);return} /* v8.9: a waiting scene goes before messages not yet shown */
  if(W4.msgQ.length){const q=W4.msgQ.shift();W4.msg=q.s;W4.msgT=q.t;W4.msgAt=time;W4.msgMin=Math.min(q.t,1.2+q.s.length*.045);return}
  if(false){const p=W4.scPend.shift();if(p.dab)dabGo();else scGo(p.steps,p.done)}}
 function scStart(steps,done){if(SCOFF){for(const s of steps)if(s.fn)s.fn();if(done)done();return}
- W4.scPend=W4.scPend||[];const sig=scSig(steps);
+ W4.scPend=W4.scPend||[];const sig=scSig(steps);steps=scWalkUp(steps);
  if((W4.scene&&W4.scene.sig===sig)||W4.scPend.some(p=>p.sig===sig))return;       /* the same scene is already playing or waiting */
- if(W4.scene||swBusy()||W4.scPend.length){W4.scPend.push({steps,done,sig});return} /* waits its turn, in order */
+ if(W4.scene||swBusy()||W4.scPend.length||time-(W4.scEndT||-9)<1.5){W4.scPend.push({steps,done,sig});return} /* waits its turn, in order (and a breath after the last one) */
  scGo(steps,done)}
 function scSig(steps){return steps.map(s=>(s.who||'')+(s.txt||'')).join('|')}
 function scGo(steps,done){W4.scene={steps,i:-1,t:0,x:P3.x,y:P3.y,done,sig:scSig(steps)};W4.talk=null;W4.quips=[];W4.quipQ=[];scNext()}

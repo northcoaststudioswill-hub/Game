@@ -21,6 +21,34 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v9.7 · 2026-11-17 · Louie, the garden, and slowing the start down
+
+Will: play the start to the cottage and refine it. Things happen a little too fast; some new graphics are clunky; the base plots are not all working and have no room to grow; nothing should build until base buddies are touching it; the first night comes too soon; someone saying something important should walk up to you. Louie's model is bad, and he works well in the original Sprouts game. He's a Shiba Inu.
+
+- **Louie, the Sprouts way.** He was the right Shiba sprite drawn wrong: squashed from 20 x 13 to 24 x 12, with no outline. He's drawn the way Sprouts draws him now: true size, his white outline, a two-frame trot with a little hop, his curled tail flicking, and ears up with a pink tongue when he sits for a pet. His fetch works like Sprouts too: a stray sprout hops on his back (up to three, if they're close together), he trots it to your side, and they hop off. "FOUND 2!"
+- **The garden grows with Sunkeep.** It drew 8 plots but only 6 worked, and its plots were only ever made once, so the plot the cottage was meant to open never appeared. Now:
+  - up to 12 plots, four columns in three rows, with the lane running straight through the middle and a gateway in the fence where it passes
+  - 6 plots to start, 8 with the cottage, 12 at Sunkeep Lv2, and a new plot pops in with "NEW PLOT" when it opens
+  - plots that aren't open yet are staked out with string, with a little sign, so you can see where the garden is going
+  - nothing can be built where the garden will grow
+- **Nothing builds itself.** A scaffold only rises while buddies are at it: home buddies keep walking back to it until it's done, and your lead buddy helps when it stands there with you. With nobody at it, the scaffold says NEEDS A BUDDY. More helpers, faster.
+- **The first day lasts until you have a roof.** A day is 5 minutes and dusk came at minute 3, in the middle of the tutorial. Day 1 now stays in daylight until the cottage is built; then evening comes, the fire scene plays, and sleeping in your new cottage makes sense.
+- **Erin and Marcus walk up to you before they say something.** A scene at Sunkeep where they speak now starts with them walking over to stand beside you (Erin on your left, Marcus on your right), instead of talking from across the map.
+- **A breath between scenes.** One scene ending no longer starts the next one on the same frame: 1.5 seconds of plain play first.
+- **The start breathes.** Playing from the title in real time showed some crowding, now fixed:
+  - The Lantern-wakes section was 5 lines of talk in a row; it's 4.
+  - Right after you chose your first buddy came its cinematic, a Marcus bubble, a 3-line "send your buddy at a tree" lesson, and then Erin's walk. That lesson repeated one Erin gives you in the Meadow, so the one at home is gone.
+  - Back home, Marcus no longer opens with "AYYY! You caught one!" as if it just happened. Now it's "AYYY! Erin told me. Your first catch!"
+  - On day 1, finishing the cottage resets the clock to mid-afternoon, so the party, the garden lesson and the castle briefing aren't squeezed by nightfall.
+  - The first evening is Erin and Marcus walking up to you: "The sun's going down..."
+  - The cottage party can't be missed. It waited until you stood by the cottage, and a real-time run walked off to the garden and never saw it. Now it plays when you're anywhere near, or after 15 seconds at Sunkeep. The castle briefing waits until after it.
+- **Cleaner props.** The garden fence is lighter (rails, and posts at the corners and gateways); the four lone fence posts by the gate lane are gone; the pond moved up off the base's bottom rail.
+
+`shots/v9.7-louie-garden-walkup.png`: Louie carrying a stray home and sitting; the garden at 6 and 8 plots; Erin and Marcus walking up before the first evening.
+
+- Played in real time from the title (autopilot, 430x932) to the cottage and the castle briefing: 0 timing flags, no page errors. Erin's walk begins 9 s after the first buddy's cinematic, with nothing doubled.
+- Checked by scripts from their own spots: the cottage built with two buddies at it (11 s), the party, then the garden lesson with Erin and Marcus walking up; the first-evening walk-up; Louie's ride-home fetch. Lab: 124 checks.
+
 ## v9.6 · 2026-11-17 · Sunkeep, lived in
 
 Will: keep improving the visuals, item placement and design; more story triggers; more content inside the slice we have.

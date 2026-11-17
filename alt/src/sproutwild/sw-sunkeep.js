@@ -12,8 +12,7 @@
 const WPROPS=[{k:'well',x:176,y:162,act:'THE WELL',tall:1,r:16},{k:'board',x:268,y:150,act:'READ THE BOARD',tall:1},
  {k:'bench',x:286,y:204,act:'SIT A WHILE'},{k:'bench',x:338,y:214,act:'SIT A WHILE'},
  {k:'fbed',x:176,y:104},{k:'fbed',x:304,y:104},
- {k:'pond',x:400,y:470,act:'THE POND',r:24},{k:'shrooms',x:70,y:470},
- {k:'fence',x:224,y:436},{k:'fence',x:256,y:436},{k:'fence',x:224,y:470},{k:'fence',x:256,y:470}];
+ {k:'pond',x:400,y:444,act:'THE POND',r:24},{k:'shrooms',x:70,y:446}];
 function wBaseProps(){for(const p of WPROPS)W4.decor.push(Object.assign({prop:1,s:1},p))}
 function wPropBlocks(cx,cy){if(W4.sector!=='BASE')return false;for(const p of WPROPS){const rad=p.k==='pond'?40:p.k==='fence'?14:22;if(Math.hypot(cx-p.x,cy-p.y)<rad)return true}return false}
 function wPropDraw(d){if(!d.prop)return false;const x=Math.round(d.x),y=Math.round(d.y),K='#14101e';
@@ -52,12 +51,15 @@ function wPropUse(d){if(d.k==='board'){SW.boardSeen=wBoardKey();scStart(wBoardNo
   swSay(wDark()>.5?'You sit by the fire. The Lantern hums. Your buddies doze off and wake up rested.':hurt?'You sit a while. Your buddies flop down in the grass and get their breath back.':'You sit a while. Louie puts his head on your knee.',3.2);if(hurt)swSnd(880,.08,1175);return}
  if(d.k==='pond'){const L=['Lily pads. A frog that is definitely not a buddy stares at you.','The water shows the Lantern upside down. It looks just as proud.','A ripple. Something small and orange darts under a lily pad.'];swSay(L[(SW.pondN=(SW.pondN||0)+1)%L.length],3);return}}
 /* ---- story beats on things you do ---- */
-function wStoryBeats(){if(SCOFF||state!=='g4world'||W4.scene||swBusy()||(W4.scPend&&W4.scPend.length)||(W4.banner&&W4.banner.t>0))return;const L=SW.lessons;
+function wStoryBeats(){wPlotSync();{const cot=SW.buildings.some(b=>b.k==='cottage'&&!b.con);if((SW.day||1)===1&&!cot)W4.dayT=Math.min(W4.dayT||0,170); /* v9.7: the first day lasts until there is a roof */
+  if(cot&&!SW.lessons.cotDay){SW.lessons.cotDay=1;if((SW.day||1)===1)W4.dayT=Math.min(W4.dayT||0,95)}} /* ...and then a good afternoon before the first evening */
+ if(SW.party.length&&!SW.lessons.scSend){SW.lessons.scSend=1} /* v9.7: Erin teaches sending a buddy at a tree in the Meadow; no second lesson at home */
+ if(SCOFF||state!=='g4world'||W4.scene||swBusy()||(W4.scPend&&W4.scPend.length)||(W4.banner&&W4.banner.t>0))return;const L=SW.lessons;
  /* the first night at home: the fire */
  if(!W4.fld&&W4.sector==='BASE'&&SW.quest>=3&&wDark()>.5&&!L.nightFire){L.nightFire=1;L.night=1;
-  scStart([{x:310,y:180,hold:1.2},{x:310,y:180,who:'ERIN',txt:'Night. Out there the dark is strongest, and the wilds get bolder.'},
-   {x:310,y:180,who:'MARCUS',txt:"In here the Lantern keeps it off. Fire's warm, bro. Bench is free."},
-   {x:310,y:180,who:'ERIN',txt:'Sleep in the cottage to skip to morning. Or sit with us a while.'},{hold:.3}],()=>swSave());return}
+  scStart([{who:'ERIN',txt:"The sun's going down. Out there the dark is strongest, and the wilds get bolder."},
+   {who:'MARCUS',txt:"In here the Lantern keeps it off. Fire's warm, bro. The benches are free."},
+   {who:'ERIN',txt:'Sleep in your new cottage to skip to morning. Or sit by the fire with us a while.'},{hold:.3}],()=>swSave());return}
  /* strong enough for the castle */
  const A=FMAPS.SQUIRE.key.A.lv,ld=SW.party[0];
  if(SW.quest>=5&&!SW.badges.length&&ld&&ld.lv>=A-1&&!L.readyCastle&&SW.lessons.scGym){L.readyCastle=1;
@@ -70,3 +72,26 @@ function wStoryBeats(){if(SCOFF||state!=='g4world'||W4.scene||swBusy()||(W4.scPe
  /* the first buddy you calm */
  if((SW.shown||0)>=1&&!L.firstLight){L.firstLight=1;if((SW.walk2||0)<10)return; /* Erin's Meadow walk says it herself */
   scStart([{who:'ERIN',txt:'Did you see that? The dark broke right off it. That is the whole job, keeper.'},{who:'MARCUS',txt:'One down. Whole valley to go. I believe they call that a backlog, bro.'}],()=>swSave());return}}
+/* ================================================================
+   THE GARDEN THAT GROWS (v9.7). Will: the plots are not all
+   functional and have no room to grow. Up to 12 plots, four columns
+   either side of the lane that now runs straight through the garden,
+   three rows. 6 to start, 8 with the cottage, 12 at Sunkeep Lv2.
+   Plots not open yet are staked out with string, so you can see
+   where the garden is going. New plots really appear when they open
+   (the old garden only ever made its plots once).
+   ================================================================ */
+WPLOTS.length=0;for(const y of [342,366,390])for(const x of [214,266,186,294])WPLOTS.push([x,y]);
+function wPlotCount(){return 6+(SW.buildings.some(b=>b.k==='cottage'&&!b.con)?2:0)+(SW.baseLv>=2?4:0)}
+function wPlotSync(){if(W4.fld||!W4.patchBuds||!W4.patchBuds.length)return;const n=wPlotCount();
+ while(W4.patchBuds.length<n){const [x,y]=WPLOTS[W4.patchBuds.length];W4.patchBuds.push({sx:x,sy:y,x,y,type:-1,age:-4,stage:0,mode:'soil',item:false,tx:0,ty:0,dlv:0,seedTy:null,by:null,forPlot:null,bush:null,itemTy:0,t:0});
+  if(!SCOFF){W4.floats.push({x,y:y-12,txt:'NEW PLOT',t:1.8,c:'#7ee787'});swSnd(784,.06,1175)}}}
+function wGardenBake(R,B,path){const n=wPlotCount(),K='#14101e';
+ R('#5a8a3a',166,328,148,76);path(WW/2-9,324,18,84);                       /* grass bed, and the lane runs through */
+ const post=(x,y)=>{R(K,x-1,y-1,5,10);R('#6e5233',x,y,3,8);R('#8a6a48',x,y,3,1)};
+ for(let x=168;x<310;x+=6){if(x>222&&x<254)continue;R('#8a6a48',x,331,6,2);R('#a87948',x,331,6,1);R('#8a6a48',x,397,6,2);R('#a87948',x,397,6,1)}  /* rails, with gaps for the lane */
+ R('#8a6a48',168,331,2,68);R('#8a6a48',310,331,2,68);
+ for(const x of [167,196,222,254,282,309]){post(x,326);post(x,392)}post(167,360);post(309,360);
+ WPLOTS.forEach(([px,py],i)=>{if(i<n){R('#4a3520',px-12,py-7,24,15);R('#6a4a2c',px-11,py-6,22,13);R('#8a6238',px-11,py-6,22,2);R('#5a3d24',px-8,py-1,16,2);R('#5a3d24',px-8,py+3,16,2)}
+  else{for(const [cx,cy] of [[-11,-6],[10,-6],[-11,6],[10,6]]){R(K,px+cx,py+cy-3,2,5);R('#c8b088',px+cx,py+cy-3,1,4)}R('#e8dcc0',px-10,py-6,20,1);R('#e8dcc0',px-10,py+6,20,1);R('#e8dcc0',px-11,py-5,1,11);R('#e8dcc0',px+10,py-5,1,11)}});
+ if(n<WPLOTS.length){const [lx,ly]=WPLOTS[Math.min(WPLOTS.length-1,n)];R(K,lx-9,ly-14,19,8);R('#c49a62',lx-8,ly-13,17,6);R('#5a3d24',lx-6,ly-11,13,1);R('#5a3d24',lx-6,ly-9,10,1)}}

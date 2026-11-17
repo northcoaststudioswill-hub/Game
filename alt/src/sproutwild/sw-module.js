@@ -372,7 +372,7 @@ function wCellFree(gx,gy){const x=wCellX(gx),y=wCellY(gy),cx=x+10,cy=y+10;
  if(x>172&&x<290&&y<112)return false;
  if(cx>218&&cx<262&&cy>100)return false; /* the lane from the Lantern to the south road stays clear */
  if(cx>284&&cx<340&&cy>150&&cy<204)return false; /* the camp fire */
- if(cx>158&&cx<322&&cy>324&&cy<392)return false; /* the garden: nothing builds on the plots */
+ if(cx>160&&cx<320&&cy>320&&cy<410)return false; /* the garden: nothing builds on the plots, or where it will grow */
  for(const b of W4.bushes||[])if(Math.hypot(cx-b.x,cy-b.y)<18)return false;
  if(wPropBlocks(cx,cy))return false; /* v9.6: props stay clear */
  if(SW.quest<2&&Math.hypot(cx-240,cy-296)<52)return false;
@@ -763,7 +763,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
  const cam=W4.cam||{x:0,y:0};
  r('#0c120a',0,0,W,H);
  g.save();g.translate(-cam.x,-cam.y);
- if(W4.groundFor!==sec.id+'x'+(W4.wh||360))wBakeGround();
+ if(W4.groundFor!==sec.id+'x'+(W4.wh||360)+'p'+wPlotCount())wBakeGround();
  g.drawImage(W4.groundCv,0,0);
  W4.front=[];for(const d of(W4.decor||[])){
   if(d.k==='tree'||d.k==='snowrock'||d.tall){if(d.y>P3.y)W4.front.push(['d',d]);else wDrawDecor(d)}

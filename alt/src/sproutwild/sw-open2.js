@@ -12,7 +12,7 @@
       the Meadow she walks you to a calm wild buddy for your first
       catch. No battle can start before that first catch.
    ================================================================ */
-WSEEDPOS[0]=[208,351];WSEEDPOS[2]=[240,351];WSEEDPOS[4]=[272,351]; /* on the top row of garden plots, where garden sprouts stand */
+WSEEDPOS[0]=[214,345];WSEEDPOS[2]=[266,345];WSEEDPOS[4]=[186,345]; /* on the top row of garden plots, where garden sprouts stand */
 /* messages stay up long enough to read */
 function swSay(s,t){W4.msg=s;W4.msgT=Math.max(t||2.2,1.4+String(s).length*.055)}
 /* ---- 1. Louie's berry ---- */
@@ -75,7 +75,6 @@ function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch
   {x:240,y:352,hold:1.5},
   {x:240,y:352,hold:1.1,fn:pop},
   {x:240,y:352,who:'ERIN',txt:'Now it is lit, the garden grows sprouts on its own. Pluck them when they are grown.'},
-  {x:240,y:352,who:'MARCUS',txt:'Every four things you carry home, the Lantern grows one more. Free sprouts, bro.'},
   {who:'MARCUS',txt:'The light reached the wilds too. Three buddies are on their way. Pick one.'}
  ],()=>{W4.choiceT=0;W4.banner={txt:'THE LANTERN STIRS',sub:'Three dim buddies are coming',t:3.5}})}
 /* ---- 4a. Erin walks you to the south road ---- */
