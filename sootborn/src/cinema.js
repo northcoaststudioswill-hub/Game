@@ -29,6 +29,8 @@ const Cutscene = {
     if (s.add) { for (const [id, x, y, dir, who] of s.add) { const p = T(x, y); this.actors.push({ id, who: who || id, x: p.x, y: p.y, dir: dir || 0, sheet: id === 'kael' ? P.sheet : World.sheetFor(who || id), anim: 0, moving: false }); } return false; }
     if (s.remove) { this.actors = this.actors.filter(a => a.id !== s.remove); return false; }
     if (s.face) { const a = this.actor(s.face); if (a) a.dir = s.dir; return false; }
+    if (s.kneel) { for (const a of this.actors) if (s.kneel === 'all' ? !a.sheet.glow && !(s.but || []).includes(a.id) : [].concat(s.kneel).includes(a.id)) a.kneel = s.v === undefined ? 1 : s.v; return false; }
+    if (s.emote) { const a = this.actor(s.emote); if (a) { a.emote = { t: s.t || '!', life: s.life || 1.5 }; a.hop = 0.3; Sound.play(s.t === 'heart' ? 'coin' : 'blip'); } return false; }
     if (s.move) { const a = this.actor(s.move), p = T(s.to[0], s.to[1]); a.tx = p.x; a.ty = p.y; a.spd = s.spd || 30; if (s.wait) { this.block = { type: 'move', a }; return true; } return false; }
     if (s.say || s.narr || s.choice) {
       const st = s.choice ? [{ choice: s.choice }] : s.narr ? [narr(s.narr)] : [say(s.say, s.t)];
@@ -53,8 +55,10 @@ const Cutscene = {
     if (s.fx) s.fx();
     return false;
   },
-  update(dt) {
+  // everything that moves: runs every frame, including while a line of dialogue is up
+  anim(dt) {
     for (const a of this.actors) {
+      a.kn = (a.kn || 0) + ((a.kneel ? 7 : 0) - (a.kn || 0)) * Math.min(1, dt * 7); if (a.hop > 0) a.hop -= dt; if (a.emote) { a.emote.life -= dt; if (a.emote.life <= 0) a.emote = null; }
       if (a.tx === undefined) { a.moving = false; continue; }
       const dx = a.tx - a.x, dy = a.ty - a.y, d = Math.hypot(dx, dy), sp = a.spd * dt;
       if (d <= sp) { a.x = a.tx; a.y = a.ty; a.tx = undefined; a.moving = false; continue; }
@@ -62,11 +66,14 @@ const Cutscene = {
       a.dir = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 2 : 3) : (dy < 0 ? 1 : 0);
     }
     if (this.pan) { const p = this.pan; p.t += dt; const k = Math.min(1, p.t / p.d), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-      this.cam = { x: p.from.x + (p.to.x - p.from.x) * e, y: p.from.y + (p.to.y - p.from.y) * e }; if (k >= 1) { this.pan = null; if (this.block && this.block.type === 'pan') this.next(); } }
+      this.cam = { x: p.from.x + (p.to.x - p.from.x) * e, y: p.from.y + (p.to.y - p.from.y) * e }; if (k >= 1) { this.pan = null; if (this.block && this.block.type === 'pan' && !Dialogue.active) this.next(); } }
     if (this.panel) { this.panel.t += dt; this.panel.st += dt; }
     this.zoom += (this.zoomT - this.zoom) * Math.min(1, dt * 2.5); this.sun += ((this.sunT || 0) - (this.sun || 0)) * Math.min(1, dt * 0.9);
     if (this.heart) { this.heartT -= dt; if (this.heartT <= 0) { Sound.play('heart'); this.heartT = 0.85; } }
     this.flash = Math.max(0, this.flash - dt * 0.8); this.shake = Math.max(0, this.shake - dt); this.beamT += dt;
+  },
+  update(dt) {
+    this.anim(dt);
     const b = this.block; if (!b) return;
     if (b.type === 'card') { b.t += dt; if ((b.t > b.min && (Input.p('A') || this.tapped)) || b.t > b.max) { this.tapped = false; this.next(); } this.tapped = false; }
     else if (b.type === 'wait') { b.t -= dt; if (b.t <= 0) this.next(); }
@@ -143,8 +150,11 @@ const PROLOGUE_A = [
   { fade: 'in' }, { wait: 0.6 },
   { narr: 'Once a year, Cinderwell lights paper lanterns and pretends the Lumen Pillar is the sun. It is the only night anyone stays out past last bell.' },
   { move: 'kael', to: [11, 9], spd: 26, wait: true },
+  { emote: 'seren', t: '!' }, { face: 'seren', dir: 2 },
   { say: 'seren', t: "Don't look. It's not finished." },
+  { face: 'seren', dir: 1 },
   { say: 'kael', t: "It's a sun." },
+  { face: 'seren', dir: 2 },
   { say: 'seren', t: "It's THE sun. The real one. Orin says it's white-gold, and you can't look straight at it, and it never needs a valve." },
   { choice: [
     { t: "I can't look straight at you either. Same problem.", then: [say('seren', '...That was disgusting.'), say('seren', 'Say it again.')] },
@@ -157,21 +167,24 @@ const PROLOGUE_A = [
   { say: 'seren', t: "...That is the worst proposal in the history of Cinderwell." },
   { pstage: 1 }, { sfx: 'coin' },
   { say: 'seren', t: 'Yes. Obviously yes. Put it on me before I come to my senses.' },
-  { wait: 0.9 }, { panel: null },
+  { wait: 0.9 }, { panel: null }, { emote: 'seren', t: 'heart' }, { emote: 'kael', t: 'heart' }, { move: 'ivo', to: [13, 10], spd: 40 }, { move: 'juno', to: [10, 10], spd: 46 }, { move: 'c1', to: [8, 7], spd: 30 }, { move: 'c2', to: [15, 8], spd: 30 },
   { narr: 'Mara binds you at the Pillar, in front of the whole crew, with chalk on your hands and Ivo crying louder than anyone.' },
+  { emote: 'ivo', t: '...' },
   { say: 'ivo', t: "I'm not crying. The square is dusty. The square is VERY dusty." },
+  { emote: 'juno', t: '!' },
   { narr: 'Seren draws the last ray of her sun on your wrist with her finger. "There," she says. "Now you\'ve seen it."' },
   { fade: 'out' },
   { music: 'mystery' },
   { card: 'FORTY-ONE DAYS AGO', sub: 'The fever comes to Tier 6', min: 1.2, max: 4 },
   { scene: 'apt', cam: [4, 4], dark: 'rgba(4,3,12,.55)', zoom: 1.8 },
-  { add: [['tavi', 1.5, 2.4, 0], ['kael', 3, 3, 2], ['nell', 4, 5, 1], ['seren', 6, 7, 1]] },
+  { add: [['tavi', 1.5, 2.4, 0], ['kael', 3, 3, 2], ['nell', 4.4, 3, 2], ['seren', 5.6, 3.6, 2]] },
   { fade: 'in' }, { wait: 0.8 }, { sfx: 'cough' }, { wait: 0.9 }, { sfx: 'cough' },
+  { emote: 'tavi', t: '...' },
   { say: 'tavi', t: '...Kael? Is it morning? It feels like breathing through a sock.' },
   { say: 'kael', t: "Not morning yet, Tav. Sleep. That's an order from your favorite person." },
   { say: 'tavi', t: "Seren's my favorite person." },
   { say: 'seren', t: 'Smart kid.' },
-  { face: 'kael', dir: 3 },
+  { face: 'kael', dir: 3 }, { move: 'seren', to: [5, 3.2], spd: 14 },
   { say: 'nell', t: "I'll be honest, because you'd know if I wasn't. The fever isn't what kills them. It's the air." },
   { panel: 'ward' },
   { say: 'nell', t: 'The Authority cut the clinic to ration pressure two weeks ago. Forty kids, breathing each other\'s breath. Tavi\'s lungs are filling.' },
@@ -187,8 +200,9 @@ const PROLOGUE_A = [
   { say: 'kael', t: "So we bleed it slow. A sliver, into the clinic line. And we balance the bank again before the morning audit. Nobody sees a thing." },
   { narr: 'Stealing air is the one crime the Authority never forgives. They do not fine you for it. They do not jail you. They commit you to the Array, and the Array runs on fire.' },
   { panel: null },
+  { emote: 'nell', t: '...' },
   { say: 'nell', t: "...I didn't hear any of this. I'll have the ward vents open at second bell." },
-  { move: 'nell', to: [6, 8], spd: 30 },
+  { move: 'nell', to: [6, 8], spd: 30 }, { move: 'seren', to: [4.2, 3], spd: 24 },
   { say: 'seren', t: 'Why you? Why does it always have to be you?' },
   { choice: [
     { t: "Because I won't watch Tav drown in their own bed.", fx: () => G.tendency = 'caretaker', then: [say('seren', "...Yeah. That's the answer I married, you idiot. That exact one.")] },
@@ -222,7 +236,7 @@ const PROLOGUE_B = [
   { fade: 'out' }, { music: null },
   { card: 'For three nights, you bled the line and balanced the bank by dawn.', sub: 'On the third night, the fever broke. Tavi asked for bread.', min: 1.6, max: 6 },
   { card: 'On the fourth morning, the audit came early.', sub: 'It did not come by gauge. It came down Lift 0.', min: 1.6, max: 6 },
-  { scene: 'square', cam: [13, 5], dark: 'rgba(10,6,14,.5)', zoom: 1.5 },
+  { scene: 'square', cam: [13, 4], dark: 'rgba(10,6,14,.5)', zoom: 1.5 },
   { add: [['kael', 11, 7, 1], ['mara', 10, 7, 1], ['ivo', 12, 8, 1], ['tavi', 11, 9, 1], ['seren', 15, 7, 1], ['c1', 8, 7, 1, 'c1'], ['c2', 9, 8, 1, 'c2'], ['c3', 14, 9, 1, 'c3'], ['c4', 16, 8, 1, 'c4'],
     ['pell', 7, 8, 1], ['bao', 17, 7, 1], ['juno', 13, 10, 1], ['nell', 18, 8, 1], ['orin', 6, 7, 1], ['vale', 11, 4, 0]] },
   { fade: 'in' }, { wait: 0.8 },
@@ -237,6 +251,7 @@ const PROLOGUE_B = [
   { narr: 'They came down in light. Tall and unhurried, robed in white that had never known a smudge. Their skin had never known soot. Their voices had never needed to be raised.' },
   { narr: "Standing near them felt like standing near the sun Seren painted. You couldn't look straight at them. You couldn't look away." },
   { say: 'vale', t: 'Kneel for High Auditor Celestine Aurel of the Array Authority.' },
+  { kneel: 'all', but: ['vale'] }, { sfx: 'step' },
   { narr: 'Cinderwell kneels. It is very good at kneeling.' },
   { zoom: 2.3 }, { pan: [13, 4], dur: 1.2 },
   { say: 'celestine', t: 'The Cinders. How... warm it is down here. I had been told. One is never quite prepared for the smell.' },
@@ -244,12 +259,14 @@ const PROLOGUE_B = [
   { say: 'celestine', t: 'I confess I admire it. A thief who tidies. It is almost civilized.' },
   { say: 'celestine', t: 'But the account must balance. And an account is not balanced by putting air back. It is balanced by taking something back.' },
   { say: 'vale', t: 'The bleed was routed through Valve Bank Seven. Crew Three. Night shift.' },
+  { emote: 'kael', t: '!' },
   { narr: 'Your heart is a hammer. Your weight shifts to your feet. Mara feels it before you do.' },
   { pan: [11, 7], dur: 0.8 }, { zoom: 2.8 },
   { say: 'mara', t: "Don't. Kael. Don't you dare." },
   { zoom: 2.2 }, { pan: [13, 6], dur: 1 },
-  { move: 'seren', to: [14, 6], spd: 22, wait: true },
+  { kneel: 'seren', v: 0 }, { wait: 0.5 }, { move: 'seren', to: [14, 6], spd: 22, wait: true },
   { say: 'seren', t: 'I turned the valve. Alone. Every night.' },
+  { emote: 'ivo', t: '!' }, { emote: 'tavi', t: '!' },
   { narr: 'Every head in the square turns. She does not look at you. She is very, very careful not to look at you.' },
   { say: 'celestine', t: 'Oh, look. The soot has a spine.' },
   { say: 'celestine', t: 'Your name, little ember?' },
@@ -270,13 +287,14 @@ const PROLOGUE_B = [
   { fade: 'in' }, { wait: 0.6 },
   { narr: 'They did not do it in the dark. The Authority believes in witnesses. All of Crew Three, front row. Tavi too. Especially Tavi.' },
   { say: 'kael', t: "Tav. Don't look. Look at me. Look at my boots." },
+  { emote: 'tavi', t: '...' },
   { say: 'tavi', t: "I'm looking at her. Somebody has to." },
   { pan: [16, 4], dur: 2.2 }, { zoom: 2.4 },
   { say: 'celestine', t: 'Gratitude, Cinderwell, is not a feeling. It is a practice. Let us practice.' },
   { music: 'hum' },
   { narr: 'Somewhere in the back row, someone starts to hum the shift song. Then another. Then all of Crew Three, low, through closed teeth.' },
   { say: 'celestine', t: 'Silence.' },
-  { move: 'wl', to: [15, 7], spd: 40, wait: true }, { sfx: 'hit' }, { shake: 0.5 }, { flash: '#ff2010' }, { face: 'c1', dir: 0 },
+  { move: 'wl', to: [15, 7], spd: 40, wait: true }, { sfx: 'hit' }, { shake: 0.5 }, { flash: '#ff2010' }, { face: 'c1', dir: 0 }, { kneel: 'c1' }, { emote: 'mara', t: '!' },
   { narr: 'A Warden drives a halberd butt into Hollis the welder. He folds without a sound. The humming stops. The silence after is worse.' },
   { move: 'wl', to: [14, 5], spd: 30 },
   { music: null }, { heart: 1 },
@@ -317,6 +335,7 @@ const PROLOGUE_B = [
   { add: [['kael', 12, 6, 1], ['mara', 11, 7, 1], ['ivo', 13, 7, 1], ['tavi', 12, 8, 1], ['celestine', 17, 4, 2], ['wl', 14, 3, 0, 'warden'], ['wr', 16, 3, 0, 'warden'], ['vale', 18, 4, 2]] },
   { fade: 'in', spd: 0.8 }, { wait: 1.4 },
   { narr: 'Ash sifts down from the furnace vents. It lands in your hair. On your hands. You do not brush it off. You will never brush it off.' },
+  { kneel: ['kael'] },
   { say: 'celestine', t: 'Balanced.' },
   { move: 'celestine', to: [13, 5], spd: 12, wait: true }, { face: 'celestine', dir: 2 }, { zoom: 3.2 },
   { say: 'celestine', t: 'You. The loud one.' },
@@ -328,7 +347,9 @@ const PROLOGUE_B = [
   ] },
   { move: 'celestine', to: [19, 3], spd: 14 }, { move: 'wl', to: [19, 2], spd: 14 }, { move: 'wr', to: [20, 3], spd: 14 }, { move: 'vale', to: [21, 4], spd: 14 },
   { wait: 1.5 }, { zoom: 2.4 },
+  { emote: 'mara', t: '...' },
   { say: 'mara', t: "Kael. Kael, son. Get up. She'd want you up." },
+  { kneel: ['kael'], v: 0 },
   { panel: 'kael' },
   { say: 'kael', t: 'She told me to breathe.' },
   { say: 'kael', t: 'So every breath I take now is hers.' },

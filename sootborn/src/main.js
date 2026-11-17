@@ -1,6 +1,7 @@
 // ============================================================
 // main — game flow + fixed-timestep loop
 // ============================================================
+const HEIST_LANE_MID = [[18, 6, 1, 0.9], [18, 6, 0, 0.9], [7, 6, 1, 0.9], [7, 6, 0, 0.9]], HEIST_LANE_N = [[16, 3, 0, 1.1], [5, 3, 0, 1.1]];
 const Game = {
   toTitle() {
     G.mode = 'title'; Dialogue.active = false; $('#dlg').classList.add('hidden'); if (Puzzle.active) Puzzle.close();
@@ -20,11 +21,24 @@ const Game = {
   },
   resetHeist() {
     if (G.heist === 2) return Game.resetFest();
+    // Three lamps whose lanes interlock: no corridor is ever unwatched for long.
+    //  - the Night Proctor walks the middle of the bay end to end, and looks up and down at each end
+    //    (after the relay is cut he moves to the north lane, right past Bank Seven)
+    //  - a second Proctor walks the centre column, and looks left and right at each end
+    //  - the Watchman stands by the relay and turns all the way round
+    const g = (id, x, y, dir, wander) => ({ id, patrol: 1, x: x * 16 + 8, y: y * 16 + 12, dir, home: dir, wander, wi: 0, wait: 1.6, anim: 0, moving: false, face: 0, barkCd: 99 });
     World.npcs = [
-      { id: 'seren', x: 2 * 16 + 8, y: 5 * 16 + 12, dir: 1, home: 1, anim: 0, moving: false, face: 0, barkCd: 99 },
-      { id: 'proctor', patrol: 1, x: 5 * 16 + 8, y: 4 * 16 + 12, dir: 3, home: 3, wander: [[17, 4, 1, 2.2], [17, 8, 2, 1.2], [5, 8, 1, 2], [5, 4, 3, 1.4]], wi: 0, wait: 1.5, anim: 0, moving: false, face: 0, barkCd: 99 },
-      { id: 'watchman', patrol: 1, x: 14 * 16 + 8, y: 10 * 16 + 12, dir: 2, home: 2, wander: [[14, 10, 2, 1.9], [14, 10, 1, 1.4], [14, 10, 3, 1.9], [14, 10, 0, 1.4]], wi: 0, wait: 1.9, anim: 0, moving: false, face: 0, barkCd: 99 }
+      { id: 'seren', x: 1 * 16 + 8, y: 8 * 16 + 12, dir: 1, home: 1, anim: 0, moving: false, face: 0, barkCd: 99 },
+      g('proctor', 7, 6, 0, G.flags.relayCut ? HEIST_LANE_N : HEIST_LANE_MID),
+      g('watchman', 12, 10, 2, [[12, 10, 2, 0.9], [12, 10, 3, 0.9], [12, 3, 3, 0.9], [12, 3, 2, 0.9]]),
+      g('watchman', 19, 9, 2, [[19, 9, 2, 1.7], [19, 9, 1, 1.3], [19, 9, 3, 1.7], [19, 9, 0, 1.3]])
     ];
+    if (G.flags.relayCut) { const p = World.npcs[1]; p.x = 5 * 16 + 8; p.y = 3 * 16 + 12; }
+    World.grace = 2.6;
+    if ((G.flags.caught | 0) >= 3) { // Seren keeps her promise: she knocks something over, far from where you are going
+      const at = G.flags.relayCut ? { x: 3 * 16 + 8, y: 12 * 16 } : { x: 12 * 16 + 8, y: 12 * 16 + 8 };
+      setTimeout(() => { if (G.heist !== 1) return; Sound.play('rumble'); Sound.play('clink'); HUD.toast('Seren knocks something over. Every lamp turns.'); for (const n of World.npcs) if (n.patrol) { n.inv = { x: at.x, y: at.y }; n.invT = 0; n.invGive = 0; n.bark = { t: '?!', life: 1.4 }; } }, 1500);
+    }
     World.caughtT = 0; World.alert = 0; World.alertPeak = 0; World.work = 0; World.seenBy = null;
   },
   onHeistDone() {
@@ -131,7 +145,7 @@ const Game = {
       s('tavi', 6, 13, 3), s('ivo', 8, 14, 1), s('mara', 3, 6, 3), s('hollis', 2, 8, 3), s('marrow', 3, 10, 3), s('pell', 2, 12, 3), s('bao', 5, 11, 3), s('juno', 10, 14, 1), s('orin', 12, 14, 1), s('nell', 17, 14, 1), s('fen', 20, 14, 1), s('kit', 24, 10, 2)
     ];
     if (F('sullWar') && !F('beatSull')) World.npcs.push(g('watchman', 20, 8, 2, [[20, 8, 2, 2], [20, 8, 1, 1.5], [20, 8, 2, 2], [20, 8, 0, 1.5]]));
-    World.caughtT = 0; World.alert = 0; World.alertPeak = 0; World.work = 0; World.seenBy = null;
+    World.caughtT = 0; World.alert = 0; World.alertPeak = 0; World.work = 0; World.seenBy = null; World.grace = 2.2;
     if ((G.flags.caught2 | 0) >= 2) { // Ivo gets clumsy with his cart: every lamp turns east
       setTimeout(() => { if (G.heist !== 2) return; Sound.play('rumble'); Sound.play('clink'); for (const n of World.npcs) if (n.patrol) { n.inv = { x: 23 * 16 + 8, y: 13 * 16 }; n.invT = 0; n.invGive = 0; n.bark = { t: '?!', life: 1.4 }; } const iv = World.npcs.find(n => n.id === 'ivo'); if (iv) iv.bark = { t: 'OH NO. MY CART.', life: 2.4 }; }, 1400);
     }
@@ -199,7 +213,7 @@ function step(dt) {
   else if (G.mode === 'splash') { if (Input.p('A') || Input.p('B')) Splash.padSkip && Splash.padSkip(); }
   else if (UI.stack.length) UI.top().update(dt);
   else if (Fade.busy && Fade.dir > 0) { }
-  else if (Dialogue.active) Dialogue.update(dt);
+  else if (Dialogue.active) { Dialogue.update(dt); if (Cutscene.active) Cutscene.anim(dt); }
   else if (Puzzle.active) Puzzle.update(dt);
   else if (Brawl.active) Brawl.update(dt);
   else if (G.mode === 'world') { G.play += dt; World.update(dt); }

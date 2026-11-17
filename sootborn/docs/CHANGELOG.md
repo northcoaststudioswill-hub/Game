@@ -1,5 +1,27 @@
 # SOOTBORN — changelog
 
+## v0.10 · 2026-11-17 — playtest round: bugs, the heist, animation
+Found by stepping through every cutscene frame, walking the heist with a bot on real inputs, and profiling on a throttled CPU.
+- **Bugs fixed**
+  - Cutscenes froze while a line of dialogue was up: actors stopped walking, story panels stopped animating, and screen flashes hung on screen (the furnace panel stayed washed orange). Everything now keeps moving under the text.
+  - The Lift Zero panel was blown out to white; the three figures are visible now.
+  - Dialogue covered the actors in most scenes. The camera now frames cutscene action above the dialogue box.
+  - The opening world panel dropped to about 17 fps on a slow phone (it redrew 14,000 rectangles a frame). Backgrounds are cached; every area and panel now holds 60 fps at 6x CPU throttle.
+  - Story panels were unreadable in portrait. They now keep their focus in the middle of the frame.
+  - Portrait stealth hint overlapped the objective.
+- **The heist was not a challenge**: a cautious bot walked straight down the middle of the bay to the relay in under seven seconds without ever waiting. Patrols are redesigned so their lanes interlock:
+  - the Night Proctor walks the middle of the bay end to end and looks up and down at each end
+  - a second lamp walks the centre column and looks left and right at each end
+  - the Watchman stands by the relay and turns all the way round, so the relay hold has to be timed
+  - cutting the relay sends the Night Proctor to the north lane, right past Bank Seven
+  - a short grace period after each reset; after three catches Seren knocks something over and every lamp goes to look
+  - the same bot now needs 14 seconds and two close calls by the north route, and gets caught three times going down the middle
+- **Animation**
+  - Characters blink.
+  - Portraits move their mouths while a line types out.
+  - Cutscene acting: characters turn to each other, kneel (the audit, the festival), hop, and show emote bubbles (!, ?, ..., hearts at the proposal).
+  - Footstep dust, pipes that drip, steam off the noodle pot, lamps that breathe and occasionally gutter, and a rat along the south wall now and then.
+
 ## v0.9 · 2026-11-17 — cinematics and stealth (from playtest notes on the prologue)
 - **Story panels**: cutscenes can now cut to full-screen illustrated panels and back, so the story is not told only with pans and zooms. Eight panels so far, all animated:
   - the world as Cinderwell is told it (burning surface, six tiers, the Deep Array, rations, Lift Zero)

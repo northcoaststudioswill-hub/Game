@@ -447,14 +447,14 @@ function outline(c, col, cw, chh) {
 // o = {skin, hair, style:short|long|bun|spiky|bald, shirt, pants, shoe, extra, band, kid, scarf, clean}
 const CH = 20;
 function makeChar(o) {
-  const [c, g] = mk(48, CH * 4);
+  const [c, g] = mk(64, CH * 4); // frames: stand, step, step, blink
   o = Object.assign({ shoe: '#1e1418', pants: '#2a3440', belt: '#22171a' }, o);
-  for (let d = 0; d < 3; d++) for (let f = 0; f < 3; f++) drawChar(g, f * 16, d * CH, d, f, o);
-  for (let f = 0; f < 3; f++) { g.save(); g.translate(f * 16 + 16, CH * 3); g.scale(-1, 1); g.drawImage(c, f * 16, CH * 2, 16, CH, 0, 0, 16, CH); g.restore(); }
+  for (let d = 0; d < 3; d++) for (let f = 0; f < 4; f++) drawChar(g, f * 16, d * CH, d, f === 3 ? 0 : f, o, f === 3);
+  for (let f = 0; f < 4; f++) { g.save(); g.translate(f * 16 + 16, CH * 3); g.scale(-1, 1); g.drawImage(c, f * 16, CH * 2, 16, CH, 0, 0, 16, CH); g.restore(); }
   outline(c, '#120a0e', 16, CH);
   c.fh = CH; return c;
 }
-function drawChar(g, ox, oy, d, f, o) {
+function drawChar(g, ox, oy, d, f, o, blink) {
   const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(ox + x, oy + y, w, h); };
   const Y = o.kid ? 3 : 0, ty = 9 + Y, th = o.kid ? 4 : 6, ly = ty + th, ll = 18 - ly;
   const hair = o.hair, hairL = shade(hair, 1.35), hairD = shade(hair, .72), skin = o.skin, skinD = shade(skin, .8), skinL = shade(skin, 1.1);
@@ -526,6 +526,7 @@ function drawChar(g, ox, oy, d, f, o) {
   if (o.extra === 'hat') { const hc = o.clean ? '#5a5e6a' : PAL.yellow, hd = o.clean ? '#32343c' : '#b88a22', hl = o.clean ? '#8a8e9c' : '#ffe08a';
     if (d < 2) { R(4, 0 + Y, 8, 3, hc); R(5, 0 + Y, 4, 1, hl); R(3, 3 + Y, 10, 1, hd); R(11, 0 + Y, 1, 3, hd); if (d === 0) { R(7, 1 + Y, 2, 1, o.clean ? '#e8c25a' : '#fff6d0'); } }
     else { R(4, 0 + Y, 8, 3, hc); R(5, 0 + Y, 4, 1, hl); R(2, 3 + Y, 10, 1, hd); R(11, 0 + Y, 1, 3, hd); } }
+  if (blink) { if (d === 0) { R(5, 5 + Y, 2, 2, skin); R(9, 5 + Y, 2, 2, skin); R(5, 6 + Y, 2, 1, skinD); R(9, 6 + Y, 2, 1, skinD); } else if (d === 2) { R(5, 5 + Y, 2, 2, skin); R(5, 6 + Y, 2, 1, skinD); } }
 }
 // ---- the Accredited: tall (16x24), pristine, luminous. No soot.
 // ---- the Accredited: tall (16x28), pristine, luminous. No soot.
@@ -1422,7 +1423,7 @@ const Dialogue = {
     box.querySelector('.nm').style.color = sp && sp.acc ? '#ffe9a8' : '';
     box.querySelector('.nm').textContent = sp ? sp.name : '';
     box.querySelector('.nm').style.display = sp ? '' : 'none';
-    this.full = fill(st.t); this.shown = Settings.d.speed === 3 ? this.full.length : 0; this.cur = st;
+    this.full = fill(st.t); this.shown = Settings.d.speed === 3 ? this.full.length : 0; this.cur = st; this.bust = sp && !CAST[st.s === 'you' ? 'kael' : st.s].look().warden ? sp.bust : null; this.bdy = sp && CAST[st.s === 'you' ? 'kael' : st.s].look().kid ? 3 : 0; this.mouth = 0;
     box.querySelector('.choices').innerHTML = '';
     G.log.push((sp ? sp.name + ': ' : '') + this.full); if (G.log.length > 120) G.log.shift();
     this.render();
@@ -1440,7 +1441,7 @@ const Dialogue = {
   hl() { [...$('#dlg .choices').children].forEach((b, i) => b.classList.toggle('sel', i === this.sel)); },
   pick() { const c = this.choices[this.sel]; Sound.play('ok'); G.log.push('> ' + fill(c.t)); this.choices = null; $('#dlg .choices').innerHTML = ''; if (c.fx) c.fx(); if (c.then) this.stack.push({ a: c.then, i: 0 }); this.next(); },
   render() { const tx = $('#dlg .tx'); const done = this.shown >= this.full.length; tx.innerHTML = esc(this.full.slice(0, Math.floor(this.shown))) + (done ? ' <span class="more">▼</span>' : ''); },
-  advance() { if (this.choices) return; if (this.shown < this.full.length) { this.shown = this.full.length; this.render(); } else { Sound.play('blip'); this.next(); } },
+  advance() { if (this.choices) return; if (this.shown < this.full.length) { this.shown = this.full.length; this.render(); if (this.bust && this.mouth) { this.mouth = 0; $('#dlg canvas').getContext('2d').drawImage(this.bust, 0, 0); } } else { Sound.play('blip'); this.next(); } },
   update(dt) {
     if (this.choices) {
       if (Input.rep('up')) { this.sel = (this.sel + this.choices.length - 1) % this.choices.length; this.hl(); Sound.play('move'); }
@@ -1451,8 +1452,10 @@ const Dialogue = {
     if (this.shown < this.full.length) {
       const cps = [28, 55, 110, 9999][Settings.d.speed] || 55; const before = Math.floor(this.shown);
       this.shown = Math.min(this.full.length, this.shown + cps * dt);
+      if (this.bust && !Settings.d.reduce) { const open = this.shown < this.full.length && Math.floor(G.time * 9) % 2 ? 1 : 0; if (open !== this.mouth) { this.mouth = open; const g2 = $('#dlg canvas').getContext('2d'); g2.drawImage(this.bust, 0, 0); if (open) { g2.fillStyle = '#2a0e12'; g2.fillRect(14, 19 + this.bdy, 4, 2); g2.fillStyle = '#7a3a34'; g2.fillRect(14, 21 + this.bdy, 4, 1); } } }
       if (Math.floor(this.shown) !== before) { this.render(); this.blipT -= 1; if (this.blipT <= 0 && this.cur && this.cur.s !== 'narr') { Sound.play('blip'); this.blipT = 3; } }
     }
+    else if (this.mouth && this.bust) { this.mouth = 0; $('#dlg canvas').getContext('2d').drawImage(this.bust, 0, 0); }
     if (Input.p('A') || Input.p('B')) this.advance();
   }
 };
@@ -1616,7 +1619,7 @@ const World = {
   interact(t) {
     G.flags.interacted = 1; HUD.dirty = true;
     if (G.heist === 2) { if (t.id === 'pillarFest') { Game.onFestDone(); return; } Dialogue.start(t.kind === 'npc' && !t.n.patrol ? FEST_WHISPER(t.id) : [narr('Not now. The Pillar. Top hook.')]); return; }
-    if (G.heist) { if (t.id === 'relay') { if (G.flags.relayCut) { Dialogue.start([narr('The relay is dead. The audit gauge is frozen on a lie.')]); return; } G.flags.relayCut = 1; Sound.play('rotate'); Dialogue.start([narr('You pry the panel and pull the audit fuse. The needle on the relay freezes mid-twitch.'), say('kael', 'There. For the next hour, the Authority thinks Bank Seven is the most boring bank in Cinderwell.'), narr('Checkpoint: if you are seen now, you will start back here.')]); return; }
+    if (G.heist) { if (t.id === 'relay') { if (G.flags.relayCut) { Dialogue.start([narr('The relay is dead. The audit gauge is frozen on a lie.')]); return; } G.flags.relayCut = 1; Sound.play('rotate'); { const pr = this.npcs.find(n => n.id === 'proctor'); if (pr) { pr.wander = HEIST_LANE_N; pr.wi = 0; pr.wait = 0.2; } } this.grace = 3; Dialogue.start([narr('You pry the panel and pull the audit fuse. The needle on the relay freezes mid-twitch.'), say('kael', 'There. For the next hour, the Authority thinks Bank Seven is the most boring bank in Cinderwell.'), narr('The click carries. Across the bay, the Night Proctor stops, listens, and turns north. He is going to walk the valve wall now. Right past Bank Seven.'), narr('Checkpoint: if you are seen now, you will start back here.')]); return; }
       if (t.id === 'valves') { if (!G.flags.relayCut) { Dialogue.start([say('kael', "(Not yet. The audit relay on the east wall will log any twitch on this bank. Cut it first.)")]); return; } Puzzle.open([HEIST_PUZZLE], Game.onHeistDone); return; } Dialogue.start([t.id === 'seren' ? say('seren', "Go. I've got the door. If his lantern turns your way, freeze, or get behind something solid.") : narr('Not now. Bank Seven. Before the lantern comes back around.')]); return; }
     if (t.kind === 'npc') { const n = t.n; n.dir = Math.abs(P.x - n.x) > Math.abs(P.y - n.y) ? (P.x < n.x ? 2 : 3) : (P.y < n.y ? 1 : 0); n.face = 2.5; Dialogue.start(TALK[t.id](), () => this.afterBeat()); }
     else { const s = HOT[t.id](); Dialogue.start(s, () => this.afterBeat()); }
@@ -1632,7 +1635,7 @@ const World = {
       if (Math.abs(vx) > Math.abs(vy)) P.dir = vx < 0 ? 2 : 3; else if (Math.abs(vy) > Math.abs(vx)) P.dir = vy < 0 ? 1 : 0; else if (!((P.dir === 2 && vx < 0) || (P.dir === 3 && vx > 0) || (P.dir === 1 && vy < 0) || (P.dir === 0 && vy > 0))) P.dir = vy < 0 ? 1 : 0;
       const sp = 74 * dt, nx = P.x + vx * sp, ny = P.y + vy * sp;
       if (!this.boxHits(nx, P.y)) P.x = nx; if (!this.boxHits(P.x, ny)) P.y = ny;
-      P.anim += dt; P.moved += sp; P.stepT = (P.stepT || 0) + dt; if (P.stepT > 0.3) { P.stepT = 0; Sound.play(this.tileAt(P.x, P.y - 2) === ',' ? 'stepg' : 'step'); }
+      P.anim += dt; P.moved += sp; P.stepT = (P.stepT || 0) + dt; if (P.stepT > 0.3) { P.stepT = 0; Sound.play(this.tileAt(P.x, P.y - 2) === ',' ? 'stepg' : 'step'); if (!Settings.d.reduce) for (let i = 0; i < 2; i++) this.parts.push({ x: P.x - 3 + Math.random() * 6, y: P.y, v: 4 + Math.random() * 5, s: Math.random() * 6, c: '#7a6a60', steam: 1, life: 0.5 }); }
     } else P.anim = 0;
     if (G.heist) { this.heistCheck(dt); if (this.caughtT > 0) return; this.boltCd = (this.boltCd || 0) - dt; if (Input.p('B') && this.boltCd <= 0) this.throwBolt(); const t = this.target = this.findTarget(), hold = t && ((G.heist === 1 && t.id === 'relay' && !G.flags.relayCut) || (G.heist === 2 && t.id === 'pillarFest'));
       if (hold) { if (Input.h('A') && !P.moving) { const w0 = this.work || 0; this.work = w0 + dt; if (Math.floor(this.work * 5) !== Math.floor(w0 * 5)) Sound.play('rotate'); if (this.work >= WORK_T) { this.work = 0; this.interact(t); } } else this.work = Math.max(0, (this.work || 0) - dt * 0.6); }
@@ -1699,10 +1702,10 @@ const World = {
   heistCheck(dt) {
     if (this.bolt) { this.bolt.t += dt / 0.45; if (this.bolt.t >= 1) { const b = this.bolt; this.bolt = null; this.boltLand(b); } }
     if (this.ripple) { this.ripple.t += dt; if (this.ripple.t > 0.7) this.ripple = null; }
-    if (this.caughtT > 0) { if (Dialogue.active) return; this.caughtT -= dt; if (this.caughtT <= 0) { if (G.heist === 2) { P.x = 7 * 16 + 8; P.y = 13 * 16 + 4; P.dir = 1; } else if (G.flags.relayCut) { P.x = 20 * 16 + 8; P.y = 9 * 16 + 4; P.dir = 1; } else { P.x = 24; P.y = 7 * 16 + 4; P.dir = 3; } Game.resetHeist(); } return; }
+    if (this.caughtT > 0) { if (Dialogue.active) return; this.caughtT -= dt; if (this.caughtT <= 0) { if (G.heist === 2) { P.x = 7 * 16 + 8; P.y = 13 * 16 + 4; P.dir = 1; } else if (G.flags.relayCut) { P.x = 20 * 16 + 8; P.y = 6 * 16 + 4; P.dir = 2; } else { P.x = 24; P.y = 7 * 16 + 4; P.dir = 3; } Game.resetHeist(); } return; }
     this.dynLights = this.npcs.filter(n => n.patrol).map(n => { const a = n.ang === undefined ? DIRA[n.dir] : n.ang; return { x: n.x + Math.cos(a) * 14, y: n.y - 6 + Math.sin(a) * 14, r: 46, c: '#ffd070' }; });
-    let seen = 0, by = null;
-    for (const n of this.npcs) if (n.patrol && this.seesPlayer(n)) { const d = Math.hypot(P.x - n.x, P.y - 4 - (n.y - 6)), k = d < 14 ? 99 : 1.5 + (72 - d) / 72 * 2.8; if (k > seen) { seen = k; by = n; } }
+    let seen = 0, by = null; if (this.grace > 0) this.grace -= dt;
+    for (const n of this.npcs) if (n.patrol && !(this.grace > 0) && this.seesPlayer(n)) { const d = Math.hypot(P.x - n.x, P.y - 4 - (n.y - 6)), k = d < 14 ? 99 : 1.5 + (72 - d) / 72 * 2.8; if (k > seen) { seen = k; by = n; } }
     if (seen) { this.alert = Math.min(1, (this.alert || 0) + seen * (G.flags.heistEase ? .6 : 1) * dt); this.alertPeak = Math.max(this.alertPeak || 0, this.alert); this.seenBy = by; this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = 0.32; } }
     else if (this.alert > 0) { this.alert = Math.max(0, this.alert - dt * 0.9); if (this.alert === 0) { if (this.alertPeak > 0.4) { G.flags.closeCalls = (G.flags.closeCalls | 0) + 1; HUD.toast(G.heist === 1 ? ['Seren: "Close. Too close."', 'Seren: "Breathe. He didn\'t see."', 'Seren: "Stop showing off."'][G.flags.closeCalls % 3] : ['Ivo: "I felt that from here."', 'Tavi: "...Kael!"', 'Close call'][G.flags.closeCalls % 3]); Sound.play('back'); } this.alertPeak = 0; this.seenBy = null; } }
     for (const n of this.npcs) if (n === by && this.alert >= 1) {
@@ -1725,11 +1728,12 @@ const World = {
       if (hot > 0.15) ptext(g, hot > 0.6 ? '!' : '?', Math.round(n.x - cx) - 1, Math.round(n.y - cy) - 32, hot > 0.6 ? '#ff5a4a' : '#ffe08a', 2);
     }
     // the eye over Kael's head: how close he is to being made
+    if (this.grace > 0 && Math.floor(t * 8) % 2) { g.fillStyle = 'rgba(160,240,230,.5)'; g.fillRect(Math.round(P.x - cx) - 7, Math.round(P.y - cy) + 1, 14, 1); }
     if (this.alert > 0.02) { const x = Math.round(P.x - cx), y = Math.round(P.y - cy) - 27, a = this.alert; g.fillStyle = '#120a0e'; g.fillRect(x - 9, y - 1, 18, 5); g.fillStyle = '#3a2a24'; g.fillRect(x - 8, y, 16, 3); g.fillStyle = a > 0.6 ? '#ff5a4a' : '#ffb35a'; g.fillRect(x - 8, y, Math.round(16 * a), 3); if (!Settings.d.reduce) { g.fillStyle = `rgba(160,10,10,${a * 0.22})`; g.fillRect(0, 0, W, H); } }
     // hold-to-work progress
     if (this.work > 0 && this.target) { const x = Math.round(this.target.x - cx), y = Math.round(this.target.y - cy) - 8, k = Math.min(1, this.work / WORK_T); g.fillStyle = '#120a0e'; g.fillRect(x - 13, y - 1, 26, 6); g.fillStyle = '#3a2a24'; g.fillRect(x - 12, y, 24, 4); g.fillStyle = '#7cf27c'; g.fillRect(x - 12, y, Math.round(24 * k), 4); }
   },
-  snapCam(hard) { const m = this.map; if (Cutscene.active) { const mw = m.w * 16, mh = m.h * 16, c = Cutscene.cam; this.cam.x = mw <= W ? (mw - W) / 2 : clamp(c.x - W / 2, 0, mw - W); this.cam.y = mh <= H ? (mh - H) / 2 : clamp(c.y - H / 2, 0, mh - H); if (Cutscene.shake && !Settings.d.reduce) { this.cam.x += (Math.random() - .5) * 4 * Cutscene.shake; this.cam.y += (Math.random() - .5) * 4 * Cutscene.shake; } return; } const mw = m.w * 16, mh = m.h * 16, tx = mw <= W ? (mw - W) / 2 : clamp(P.x - W / 2, 0, mw - W), ty = mh <= H ? (mh - H) / 2 : clamp(P.y - 8 - H / 2, 0, mh - H); if (hard || this.camHard || Math.abs(tx - this.cam.x) > 90 || Math.abs(ty - this.cam.y) > 90 || Settings.d.reduce) { this.cam.x = tx; this.cam.y = ty; this.camHard = false; } else { this.cam.x += (tx - this.cam.x) * 0.16; this.cam.y += (ty - this.cam.y) * 0.16; if (Math.abs(tx - this.cam.x) < 0.5) this.cam.x = tx; if (Math.abs(ty - this.cam.y) < 0.5) this.cam.y = ty; } },
+  snapCam(hard) { const m = this.map; if (Cutscene.active) { const mw = m.w * 16, mh = m.h * 16, c = Cutscene.cam, up = this.land ? H * 0.11 : 0; /* keep the action above the dialogue box */ this.cam.x = mw <= W ? (mw - W) / 2 : clamp(c.x - W / 2, 0, mw - W); this.cam.y = mh <= H ? (mh - H) / 2 + (mh <= H * .8 ? up : 0) : clamp(c.y + up - H / 2, 0, mh - H); if (Cutscene.shake && !Settings.d.reduce) { this.cam.x += (Math.random() - .5) * 4 * Cutscene.shake; this.cam.y += (Math.random() - .5) * 4 * Cutscene.shake; } return; } const mw = m.w * 16, mh = m.h * 16, tx = mw <= W ? (mw - W) / 2 : clamp(P.x - W / 2, 0, mw - W), ty = mh <= H ? (mh - H) / 2 : clamp(P.y - 8 - H / 2, 0, mh - H); if (hard || this.camHard || Math.abs(tx - this.cam.x) > 90 || Math.abs(ty - this.cam.y) > 90 || Settings.d.reduce) { this.cam.x = tx; this.cam.y = ty; this.camHard = false; } else { this.cam.x += (tx - this.cam.x) * 0.16; this.cam.y += (ty - this.cam.y) * 0.16; if (Math.abs(tx - this.cam.x) < 0.5) this.cam.x = tx; if (Math.abs(ty - this.cam.y) < 0.5) this.cam.y = ty; } },
   render(g, t) {
     const m = this.map; this.snapCam(); const cx = Math.round(this.cam.x), cy = Math.round(this.cam.y), rm = Settings.d.reduce;
     g.fillStyle = '#0b0709'; g.fillRect(0, 0, W, H);
@@ -1758,11 +1762,15 @@ const World = {
     if (G.mapId === 'apt') { if (Math.floor(t * 1.2) % 2) { g.fillStyle = '#ffd070'; g.fillRect(8 * 16 + 10 - cx, 16 + 5 - cy, 3, 2); } }
     // entities sorted by y
     let ents;
-    if (Cutscene.active) ents = Cutscene.actors.map(a => ({ x: a.x, y: a.y, dir: a.dir, f: a.moving ? 1 + (Math.floor(a.anim * 6) % 2) : 0, sheet: a.sheet }));
+    if (Cutscene.active) ents = Cutscene.actors.map(a => ({ x: a.x, y: a.y, dir: a.dir, f: a.moving ? 1 + (Math.floor(a.anim * 6) % 2) : 0, sheet: a.sheet, kn: a.kn || 0, hop: a.hop > 0 ? Math.sin(a.hop / 0.3 * Math.PI) * 4 : 0, emote: a.emote }));
     else { ents = this.npcs.map(n => ({ x: n.x, y: n.y, dir: n.vdir === undefined ? n.dir : n.vdir, f: n.moving ? 1 + (Math.floor(n.anim * 6) % 2) : 0, sheet: this.sheetFor(n.id) }));
       ents.push({ x: P.x, y: P.y, dir: P.dir, f: P.moving ? 1 + (Math.floor(P.anim * 8) % 2) : 0, sheet: P.sheet, me: 1 }); }
     ents.sort((a, b) => a.y - b.y);
-    for (const e of ents) { const fh = e.sheet.fh || 16, sx = Math.round(e.x - 8 - cx), sy = Math.round(e.y - fh + 1 - cy); g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(sx + 2, sy + fh - 2, 12, 2); g.fillRect(sx + 4, sy + fh - 3, 8, 4); g.fillRect(sx + 3, sy + fh, 10, 1); const br = !e.f && !rm && ((t * 0.9 + e.x * 0.07) % 2.4) < 0.35 ? 1 : 0; g.drawImage(e.sheet, e.f * 16, e.dir * fh, 16, fh - br, sx, sy + br - (e.f === 1 && !rm ? 1 : 0), 16, fh - br); }
+    this.land = !document.body.classList.contains('portrait');
+    for (const e of ents) { const fh = e.sheet.fh || 16, sx = Math.round(e.x - 8 - cx), sy = Math.round(e.y - fh + 1 - cy); if (!e.f && !rm && e.sheet.width >= 64 && ((t * 1.1 + e.x * 0.137 + e.y * 0.071) % 3.9) < 0.13) e.f = 3; g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(sx + 2, sy + fh - 2, 12, 2); g.fillRect(sx + 4, sy + fh - 3, 8, 4); g.fillRect(sx + 3, sy + fh, 10, 1); const br = !e.f && !rm && ((t * 0.9 + e.x * 0.07) % 2.4) < 0.35 ? 1 : 0; const kn = Math.round(e.kn || 0), hp = Math.round(e.hop || 0); g.drawImage(e.sheet, e.f * 16, e.dir * fh, 16, fh - br - kn, sx, sy + br + kn - hp - (e.f === 1 && !rm ? 1 : 0), 16, fh - br - kn);
+      if (e.emote) { const bx = sx + 8, by = sy + kn - 12 - Math.round(Math.min(1, (1.5 - e.emote.life) * 8) * 2), tx = e.emote.t; g.fillStyle = '#120a0e'; g.fillRect(bx - 7, by - 1, 15, 11); g.fillStyle = '#f3e3c3'; g.fillRect(bx - 6, by, 13, 9); g.fillRect(bx - 1, by + 9, 3, 2);
+        if (tx === 'heart') { g.fillStyle = '#c8452e'; g.fillRect(bx - 3, by + 2, 3, 3); g.fillRect(bx + 1, by + 2, 3, 3); g.fillRect(bx - 2, by + 4, 5, 2); g.fillRect(bx - 1, by + 6, 3, 1); g.fillRect(bx, by + 7, 1, 1); g.fillStyle = '#f0a090'; g.fillRect(bx - 3, by + 2, 1, 1); }
+        else ptext(g, tx, bx - Math.floor(ptextW(tx) / 2), by + 2, tx === '!' ? '#c8452e' : '#2a1408'); } }
     // overhead: laundry and chains hang above everyone
     for (const [x0, y0, x1, y1] of m.overhead || []) { const ax = x0 * 16 - cx, ay = y0 * 16 - cy, bx = x1 * 16 - cx, by = y1 * 16 - cy, sw = rm ? 0 : Math.sin(t * 1.4 + x0) * 1.5;
       g.strokeStyle = '#1a1214'; g.lineWidth = 1; g.beginPath(); g.moveTo(ax, ay); g.quadraticCurveTo((ax + bx) / 2, (ay + by) / 2 + 8, bx, by); g.stroke();
@@ -1780,10 +1788,16 @@ const World = {
       if (glitch) { g.fillStyle = 'rgba(160,240,255,.5)'; g.fillRect(x, y + (Math.random() * 10 | 0), w, 1); } }
     // steam from floor vents
     if (!rm) for (const p of m.props) if (p.t === 'vent' && Math.random() < 0.25) this.parts.push({ x: p.x * 16 + 4 + Math.random() * 8, y: p.y * 16 + 8, v: 10 + Math.random() * 8, s: Math.random() * 6, c: '#8a8a90', steam: 1, life: 1.4 });
+    if (!rm && !Cutscene.active) {
+      for (const p of m.props) { if (p.t === 'pipes' && Math.random() < 0.004 * (p.w || 1)) this.parts.push({ x: p.x * 16 + 4 + Math.random() * ((p.w || 1) * 16 - 8), y: p.y * 16 + 12, v: -34, s: 0, c: '#8ac0d0', drip: 1, life: 0.42 }); else if (p.t === 'stall' && Math.random() < 0.2) this.parts.push({ x: p.x * 16 + 7 + Math.random() * 4, y: p.y * 16 - 2, v: 9 + Math.random() * 6, s: Math.random() * 6, c: '#c8c8d0', steam: 1, life: 1.1 }); }
+      // a rat along the south wall, now and then
+      if (!this.rat && !G.heist && (G.mapId === 'square' || G.mapId === 'tunnel' || G.mapId === 'bay') && Math.random() < 0.0016) { const d = Math.random() < .5 ? 1 : -1; this.rat = { x: d > 0 ? cx - 8 : cx + W + 8, y: (m.h - 2) * 16 + 11, d, map: G.mapId }; }
+      if (this.rat) { const r = this.rat; r.x += r.d * 1.5; const X = Math.round(r.x - cx), Y = Math.round(r.y - cy) - (Math.floor(r.x / 5) % 2); if (r.map !== G.mapId || r.x < cx - 20 || r.x > cx + W + 20) this.rat = null; else { g.fillStyle = '#2a2024'; g.fillRect(X - 3, Y - 2, 6, 3); g.fillRect(X + (r.d > 0 ? 2 : -4), Y - 3, 2, 2); g.fillStyle = '#4a3a3e'; g.fillRect(X - 2, Y - 2, 4, 1); g.fillStyle = '#6a4a4a'; g.fillRect(X + (r.d > 0 ? -6 : 3), Y - 1, 3, 1); } }
+    }
     // particles: embers in bay, dust elsewhere
-    if (!rm) { if (this.parts.filter(p => !p.soot && !p.steam).length < (G.mapId === 'bay' ? 26 : 12)) this.parts.push({ x: cx + Math.random() * W, y: cy + H + 4, v: 6 + Math.random() * 10, s: Math.random() * 6, c: G.mapId === 'bay' ? '#ff8a40' : '#8a7a70' });
+    if (!rm) { if (this.parts.filter(p => !p.soot && !p.steam && !p.drip).length < (G.mapId === 'bay' ? 26 : 12)) this.parts.push({ x: cx + Math.random() * W, y: cy + H + 4, v: 6 + Math.random() * 10, s: Math.random() * 6, c: G.mapId === 'bay' ? '#ff8a40' : '#8a7a70' });
       if (Math.random() < 0.35) this.parts.push({ x: cx + Math.random() * W, y: cy - 2, v: -(5 + Math.random() * 6), s: Math.random() * 6, c: '#3a3436', soot: 1 });
-      for (const p of this.parts) { p.y -= p.v / 60; p.x += Math.sin(t * 1.5 + p.s) * (p.soot ? .3 : .15); if (p.life !== undefined) p.life -= 1 / 60; g.fillStyle = p.c; g.globalAlpha = p.steam ? Math.max(0, p.life) * .3 : p.soot ? .7 : .55; const sz = p.steam ? 3 : 1; g.fillRect(Math.round(p.x - cx), Math.round(p.y - cy), sz, sz); g.globalAlpha = 1; }
+      for (const p of this.parts) { p.y -= p.v / 60; p.x += Math.sin(t * 1.5 + p.s) * (p.soot ? .3 : .15); if (p.life !== undefined) p.life -= 1 / 60; g.fillStyle = p.c; g.globalAlpha = p.drip ? .8 : p.steam ? Math.max(0, p.life) * .3 : p.soot ? .7 : .55; const sz = p.steam ? 3 : 1; g.fillRect(Math.round(p.x - cx), Math.round(p.y - cy), p.drip ? 1 : sz, p.drip ? 2 : sz); g.globalAlpha = 1; }
       this.parts = this.parts.filter(p => p.y > cy - 6 && p.y < cy + H + 8 && (p.life === undefined || p.life > 0)).slice(-120); }
     if (G.mapId === 'tunnel') { const off = rm ? 0 : ((t * 12) | 0) % 6; g.fillStyle = 'rgba(255,240,180,.5)'; for (let i = off; i < 40; i += 6) g.fillRect(23 * 16 + 12 + (i * 7) % 10 - cx, 16 + 10 + i - cy, 1, 2); }
     Light.draw(g, m, cx, cy, t);
@@ -1814,7 +1828,7 @@ const Light = {
     lg.globalCompositeOperation = 'source-over'; lg.clearRect(0, 0, W, H); lg.fillStyle = (Cutscene.active && Cutscene.dark) || World.darkOverride || m.dark; lg.fillRect(0, 0, W, H);
     lg.globalCompositeOperation = 'destination-out';
     const all = (Cutscene.active ? m.lights : m.lights.concat([{ x: P.x, y: P.y - 8, r: G.heist === 2 ? 36 : G.heist ? 26 : 44 }])).concat(World.dynLights || []);
-    for (const L of all) { const fl = rm ? 1 : L.furnace ? 1 + Math.sin(t * 7) * .04 + Math.random() * .03 : L.pillar ? 1 + Math.sin(t * 1.3) * .05 : 1;
+    for (const L of all) { const fl = rm ? 1 : L.furnace ? 1 + Math.sin(t * 7) * .04 + Math.random() * .03 : L.pillar ? 1 + Math.sin(t * 1.3) * .05 : 1 + Math.sin(t * 5.3 + L.x * .7) * .018 + (Math.sin(t * 1.7 + L.y) > .985 ? -.07 : 0);
       const x = L.x - cx, y = L.y - cy, r = L.r * fl; if (x < -r || y < -r || x > W + r || y > H + r) continue;
       const gr = lg.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.55, 'rgba(0,0,0,.65)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); lg.fillStyle = gr; lg.fillRect(x - r, y - r, r * 2, r * 2); }
     g.drawImage(this.c, 0, 0);
@@ -1871,6 +1885,8 @@ const Cutscene = {
     if (s.add) { for (const [id, x, y, dir, who] of s.add) { const p = T(x, y); this.actors.push({ id, who: who || id, x: p.x, y: p.y, dir: dir || 0, sheet: id === 'kael' ? P.sheet : World.sheetFor(who || id), anim: 0, moving: false }); } return false; }
     if (s.remove) { this.actors = this.actors.filter(a => a.id !== s.remove); return false; }
     if (s.face) { const a = this.actor(s.face); if (a) a.dir = s.dir; return false; }
+    if (s.kneel) { for (const a of this.actors) if (s.kneel === 'all' ? !a.sheet.glow && !(s.but || []).includes(a.id) : [].concat(s.kneel).includes(a.id)) a.kneel = s.v === undefined ? 1 : s.v; return false; }
+    if (s.emote) { const a = this.actor(s.emote); if (a) { a.emote = { t: s.t || '!', life: s.life || 1.5 }; a.hop = 0.3; Sound.play(s.t === 'heart' ? 'coin' : 'blip'); } return false; }
     if (s.move) { const a = this.actor(s.move), p = T(s.to[0], s.to[1]); a.tx = p.x; a.ty = p.y; a.spd = s.spd || 30; if (s.wait) { this.block = { type: 'move', a }; return true; } return false; }
     if (s.say || s.narr || s.choice) {
       const st = s.choice ? [{ choice: s.choice }] : s.narr ? [narr(s.narr)] : [say(s.say, s.t)];
@@ -1895,8 +1911,10 @@ const Cutscene = {
     if (s.fx) s.fx();
     return false;
   },
-  update(dt) {
+  // everything that moves: runs every frame, including while a line of dialogue is up
+  anim(dt) {
     for (const a of this.actors) {
+      a.kn = (a.kn || 0) + ((a.kneel ? 7 : 0) - (a.kn || 0)) * Math.min(1, dt * 7); if (a.hop > 0) a.hop -= dt; if (a.emote) { a.emote.life -= dt; if (a.emote.life <= 0) a.emote = null; }
       if (a.tx === undefined) { a.moving = false; continue; }
       const dx = a.tx - a.x, dy = a.ty - a.y, d = Math.hypot(dx, dy), sp = a.spd * dt;
       if (d <= sp) { a.x = a.tx; a.y = a.ty; a.tx = undefined; a.moving = false; continue; }
@@ -1904,11 +1922,14 @@ const Cutscene = {
       a.dir = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 2 : 3) : (dy < 0 ? 1 : 0);
     }
     if (this.pan) { const p = this.pan; p.t += dt; const k = Math.min(1, p.t / p.d), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-      this.cam = { x: p.from.x + (p.to.x - p.from.x) * e, y: p.from.y + (p.to.y - p.from.y) * e }; if (k >= 1) { this.pan = null; if (this.block && this.block.type === 'pan') this.next(); } }
+      this.cam = { x: p.from.x + (p.to.x - p.from.x) * e, y: p.from.y + (p.to.y - p.from.y) * e }; if (k >= 1) { this.pan = null; if (this.block && this.block.type === 'pan' && !Dialogue.active) this.next(); } }
     if (this.panel) { this.panel.t += dt; this.panel.st += dt; }
     this.zoom += (this.zoomT - this.zoom) * Math.min(1, dt * 2.5); this.sun += ((this.sunT || 0) - (this.sun || 0)) * Math.min(1, dt * 0.9);
     if (this.heart) { this.heartT -= dt; if (this.heartT <= 0) { Sound.play('heart'); this.heartT = 0.85; } }
     this.flash = Math.max(0, this.flash - dt * 0.8); this.shake = Math.max(0, this.shake - dt); this.beamT += dt;
+  },
+  update(dt) {
+    this.anim(dt);
     const b = this.block; if (!b) return;
     if (b.type === 'card') { b.t += dt; if ((b.t > b.min && (Input.p('A') || this.tapped)) || b.t > b.max) { this.tapped = false; this.next(); } this.tapped = false; }
     else if (b.type === 'wait') { b.t -= dt; if (b.t <= 0) this.next(); }
@@ -1985,8 +2006,11 @@ const PROLOGUE_A = [
   { fade: 'in' }, { wait: 0.6 },
   { narr: 'Once a year, Cinderwell lights paper lanterns and pretends the Lumen Pillar is the sun. It is the only night anyone stays out past last bell.' },
   { move: 'kael', to: [11, 9], spd: 26, wait: true },
+  { emote: 'seren', t: '!' }, { face: 'seren', dir: 2 },
   { say: 'seren', t: "Don't look. It's not finished." },
+  { face: 'seren', dir: 1 },
   { say: 'kael', t: "It's a sun." },
+  { face: 'seren', dir: 2 },
   { say: 'seren', t: "It's THE sun. The real one. Orin says it's white-gold, and you can't look straight at it, and it never needs a valve." },
   { choice: [
     { t: "I can't look straight at you either. Same problem.", then: [say('seren', '...That was disgusting.'), say('seren', 'Say it again.')] },
@@ -1999,21 +2023,24 @@ const PROLOGUE_A = [
   { say: 'seren', t: "...That is the worst proposal in the history of Cinderwell." },
   { pstage: 1 }, { sfx: 'coin' },
   { say: 'seren', t: 'Yes. Obviously yes. Put it on me before I come to my senses.' },
-  { wait: 0.9 }, { panel: null },
+  { wait: 0.9 }, { panel: null }, { emote: 'seren', t: 'heart' }, { emote: 'kael', t: 'heart' }, { move: 'ivo', to: [13, 10], spd: 40 }, { move: 'juno', to: [10, 10], spd: 46 }, { move: 'c1', to: [8, 7], spd: 30 }, { move: 'c2', to: [15, 8], spd: 30 },
   { narr: 'Mara binds you at the Pillar, in front of the whole crew, with chalk on your hands and Ivo crying louder than anyone.' },
+  { emote: 'ivo', t: '...' },
   { say: 'ivo', t: "I'm not crying. The square is dusty. The square is VERY dusty." },
+  { emote: 'juno', t: '!' },
   { narr: 'Seren draws the last ray of her sun on your wrist with her finger. "There," she says. "Now you\'ve seen it."' },
   { fade: 'out' },
   { music: 'mystery' },
   { card: 'FORTY-ONE DAYS AGO', sub: 'The fever comes to Tier 6', min: 1.2, max: 4 },
   { scene: 'apt', cam: [4, 4], dark: 'rgba(4,3,12,.55)', zoom: 1.8 },
-  { add: [['tavi', 1.5, 2.4, 0], ['kael', 3, 3, 2], ['nell', 4, 5, 1], ['seren', 6, 7, 1]] },
+  { add: [['tavi', 1.5, 2.4, 0], ['kael', 3, 3, 2], ['nell', 4.4, 3, 2], ['seren', 5.6, 3.6, 2]] },
   { fade: 'in' }, { wait: 0.8 }, { sfx: 'cough' }, { wait: 0.9 }, { sfx: 'cough' },
+  { emote: 'tavi', t: '...' },
   { say: 'tavi', t: '...Kael? Is it morning? It feels like breathing through a sock.' },
   { say: 'kael', t: "Not morning yet, Tav. Sleep. That's an order from your favorite person." },
   { say: 'tavi', t: "Seren's my favorite person." },
   { say: 'seren', t: 'Smart kid.' },
-  { face: 'kael', dir: 3 },
+  { face: 'kael', dir: 3 }, { move: 'seren', to: [5, 3.2], spd: 14 },
   { say: 'nell', t: "I'll be honest, because you'd know if I wasn't. The fever isn't what kills them. It's the air." },
   { panel: 'ward' },
   { say: 'nell', t: 'The Authority cut the clinic to ration pressure two weeks ago. Forty kids, breathing each other\'s breath. Tavi\'s lungs are filling.' },
@@ -2029,8 +2056,9 @@ const PROLOGUE_A = [
   { say: 'kael', t: "So we bleed it slow. A sliver, into the clinic line. And we balance the bank again before the morning audit. Nobody sees a thing." },
   { narr: 'Stealing air is the one crime the Authority never forgives. They do not fine you for it. They do not jail you. They commit you to the Array, and the Array runs on fire.' },
   { panel: null },
+  { emote: 'nell', t: '...' },
   { say: 'nell', t: "...I didn't hear any of this. I'll have the ward vents open at second bell." },
-  { move: 'nell', to: [6, 8], spd: 30 },
+  { move: 'nell', to: [6, 8], spd: 30 }, { move: 'seren', to: [4.2, 3], spd: 24 },
   { say: 'seren', t: 'Why you? Why does it always have to be you?' },
   { choice: [
     { t: "Because I won't watch Tav drown in their own bed.", fx: () => G.tendency = 'caretaker', then: [say('seren', "...Yeah. That's the answer I married, you idiot. That exact one.")] },
@@ -2064,7 +2092,7 @@ const PROLOGUE_B = [
   { fade: 'out' }, { music: null },
   { card: 'For three nights, you bled the line and balanced the bank by dawn.', sub: 'On the third night, the fever broke. Tavi asked for bread.', min: 1.6, max: 6 },
   { card: 'On the fourth morning, the audit came early.', sub: 'It did not come by gauge. It came down Lift 0.', min: 1.6, max: 6 },
-  { scene: 'square', cam: [13, 5], dark: 'rgba(10,6,14,.5)', zoom: 1.5 },
+  { scene: 'square', cam: [13, 4], dark: 'rgba(10,6,14,.5)', zoom: 1.5 },
   { add: [['kael', 11, 7, 1], ['mara', 10, 7, 1], ['ivo', 12, 8, 1], ['tavi', 11, 9, 1], ['seren', 15, 7, 1], ['c1', 8, 7, 1, 'c1'], ['c2', 9, 8, 1, 'c2'], ['c3', 14, 9, 1, 'c3'], ['c4', 16, 8, 1, 'c4'],
     ['pell', 7, 8, 1], ['bao', 17, 7, 1], ['juno', 13, 10, 1], ['nell', 18, 8, 1], ['orin', 6, 7, 1], ['vale', 11, 4, 0]] },
   { fade: 'in' }, { wait: 0.8 },
@@ -2079,6 +2107,7 @@ const PROLOGUE_B = [
   { narr: 'They came down in light. Tall and unhurried, robed in white that had never known a smudge. Their skin had never known soot. Their voices had never needed to be raised.' },
   { narr: "Standing near them felt like standing near the sun Seren painted. You couldn't look straight at them. You couldn't look away." },
   { say: 'vale', t: 'Kneel for High Auditor Celestine Aurel of the Array Authority.' },
+  { kneel: 'all', but: ['vale'] }, { sfx: 'step' },
   { narr: 'Cinderwell kneels. It is very good at kneeling.' },
   { zoom: 2.3 }, { pan: [13, 4], dur: 1.2 },
   { say: 'celestine', t: 'The Cinders. How... warm it is down here. I had been told. One is never quite prepared for the smell.' },
@@ -2086,12 +2115,14 @@ const PROLOGUE_B = [
   { say: 'celestine', t: 'I confess I admire it. A thief who tidies. It is almost civilized.' },
   { say: 'celestine', t: 'But the account must balance. And an account is not balanced by putting air back. It is balanced by taking something back.' },
   { say: 'vale', t: 'The bleed was routed through Valve Bank Seven. Crew Three. Night shift.' },
+  { emote: 'kael', t: '!' },
   { narr: 'Your heart is a hammer. Your weight shifts to your feet. Mara feels it before you do.' },
   { pan: [11, 7], dur: 0.8 }, { zoom: 2.8 },
   { say: 'mara', t: "Don't. Kael. Don't you dare." },
   { zoom: 2.2 }, { pan: [13, 6], dur: 1 },
-  { move: 'seren', to: [14, 6], spd: 22, wait: true },
+  { kneel: 'seren', v: 0 }, { wait: 0.5 }, { move: 'seren', to: [14, 6], spd: 22, wait: true },
   { say: 'seren', t: 'I turned the valve. Alone. Every night.' },
+  { emote: 'ivo', t: '!' }, { emote: 'tavi', t: '!' },
   { narr: 'Every head in the square turns. She does not look at you. She is very, very careful not to look at you.' },
   { say: 'celestine', t: 'Oh, look. The soot has a spine.' },
   { say: 'celestine', t: 'Your name, little ember?' },
@@ -2112,13 +2143,14 @@ const PROLOGUE_B = [
   { fade: 'in' }, { wait: 0.6 },
   { narr: 'They did not do it in the dark. The Authority believes in witnesses. All of Crew Three, front row. Tavi too. Especially Tavi.' },
   { say: 'kael', t: "Tav. Don't look. Look at me. Look at my boots." },
+  { emote: 'tavi', t: '...' },
   { say: 'tavi', t: "I'm looking at her. Somebody has to." },
   { pan: [16, 4], dur: 2.2 }, { zoom: 2.4 },
   { say: 'celestine', t: 'Gratitude, Cinderwell, is not a feeling. It is a practice. Let us practice.' },
   { music: 'hum' },
   { narr: 'Somewhere in the back row, someone starts to hum the shift song. Then another. Then all of Crew Three, low, through closed teeth.' },
   { say: 'celestine', t: 'Silence.' },
-  { move: 'wl', to: [15, 7], spd: 40, wait: true }, { sfx: 'hit' }, { shake: 0.5 }, { flash: '#ff2010' }, { face: 'c1', dir: 0 },
+  { move: 'wl', to: [15, 7], spd: 40, wait: true }, { sfx: 'hit' }, { shake: 0.5 }, { flash: '#ff2010' }, { face: 'c1', dir: 0 }, { kneel: 'c1' }, { emote: 'mara', t: '!' },
   { narr: 'A Warden drives a halberd butt into Hollis the welder. He folds without a sound. The humming stops. The silence after is worse.' },
   { move: 'wl', to: [14, 5], spd: 30 },
   { music: null }, { heart: 1 },
@@ -2159,6 +2191,7 @@ const PROLOGUE_B = [
   { add: [['kael', 12, 6, 1], ['mara', 11, 7, 1], ['ivo', 13, 7, 1], ['tavi', 12, 8, 1], ['celestine', 17, 4, 2], ['wl', 14, 3, 0, 'warden'], ['wr', 16, 3, 0, 'warden'], ['vale', 18, 4, 2]] },
   { fade: 'in', spd: 0.8 }, { wait: 1.4 },
   { narr: 'Ash sifts down from the furnace vents. It lands in your hair. On your hands. You do not brush it off. You will never brush it off.' },
+  { kneel: ['kael'] },
   { say: 'celestine', t: 'Balanced.' },
   { move: 'celestine', to: [13, 5], spd: 12, wait: true }, { face: 'celestine', dir: 2 }, { zoom: 3.2 },
   { say: 'celestine', t: 'You. The loud one.' },
@@ -2170,7 +2203,9 @@ const PROLOGUE_B = [
   ] },
   { move: 'celestine', to: [19, 3], spd: 14 }, { move: 'wl', to: [19, 2], spd: 14 }, { move: 'wr', to: [20, 3], spd: 14 }, { move: 'vale', to: [21, 4], spd: 14 },
   { wait: 1.5 }, { zoom: 2.4 },
+  { emote: 'mara', t: '...' },
   { say: 'mara', t: "Kael. Kael, son. Get up. She'd want you up." },
+  { kneel: ['kael'], v: 0 },
   { panel: 'kael' },
   { say: 'kael', t: 'She told me to breathe.' },
   { say: 'kael', t: 'So every breath I take now is hers.' },
@@ -2209,8 +2244,8 @@ const Panels = {
   draw(g, p) {
     if (!this.c) [this.c, this.g] = mk(320, 180);
     const pg = this.g; pg.globalAlpha = 1; pg.globalCompositeOperation = 'source-over'; pg.fillStyle = '#07050a'; pg.fillRect(0, 0, 320, 180);
-    const fn = PANELS[p.id]; if (fn) fn(pg, p.t, p.stage, p.st);
-    g.fillStyle = '#07050a'; g.fillRect(0, 0, W, H); g.drawImage(this.c, Math.round((W - 320) / 2), Math.round((H - 180) / 2));
+    this.narrow = W < 320; const fn = PANELS[p.id]; if (fn) fn(pg, p.t, p.stage, p.st);
+    g.fillStyle = '#07050a'; g.fillRect(0, 0, W, H); g.drawImage(this.c, Math.round((W - 320) / 2), Math.round((H - 180) / 2)); // portrait shows the middle 208px: panels keep their focus there
   },
   // a character sprite as a flat dark shape, for figures against a light
   shape(id, dir, col) { const k = id + dir + col; if (!this.sil[k]) { const s = World.sheetFor(id), fh = s.fh || 16, [c, g] = mk(16, fh); g.drawImage(s, 0, dir * fh, 16, fh, 0, 0, 16, fh); g.globalCompositeOperation = 'source-in'; g.fillStyle = col; g.fillRect(0, 0, 16, fh); c.fh = fh; this.sil[k] = c; } return this.sil[k]; }
@@ -2219,8 +2254,8 @@ const PX = {
   R(g, x, y, w, h, c) { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); },
   glow(g, x, y, r, rgb, a) { g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); g.globalCompositeOperation = 'source-over'; },
   plate(g, t, cx, y, dim) { const w = ptextW(t) + 6, x = Math.round(cx - w / 2); PX.R(g, x - 1, y - 1, w + 2, 11, '#0c0808'); PX.R(g, x, y, w, 9, dim ? '#5a4a30' : '#c8a050'); PX.R(g, x + 1, y + 1, w - 2, 7, '#1e1512'); ptext(g, t, x + 3, y + 2, dim ? '#8a7a60' : '#f3e3c3'); },
-  rock(g, y0, y1) { for (let y = y0; y < y1; y += 2) for (let x = 0; x < 320; x += 2) { const r = hash(x, y); PX.R(g, x, y, 2, 2, r < .33 ? '#1a1114' : r < .66 ? '#20151a' : '#150e11'); } },
-  plates(g, c) { PX.R(g, 0, 0, 320, 180, c); for (let y = 0; y < 180; y += 30) for (let x = (y / 30 % 2) * 20; x < 320; x += 40) { PX.R(g, x, y, 1, 30, shade(c, .6)); PX.R(g, x + 1, y, 1, 30, shade(c, 1.2)); PX.R(g, x + 4, y + 4, 1, 1, shade(c, 1.6)); PX.R(g, x + 36, y + 25, 1, 1, shade(c, 1.6)); } for (let y = 0; y < 180; y += 30) { PX.R(g, 0, y, 320, 1, shade(c, .6)); PX.R(g, 0, y + 1, 320, 1, shade(c, 1.15)); } },
+  rock(g, y0, y1) { if (!PX._rock) { const [c, cg] = mk(320, 180); for (let y = 0; y < 180; y += 2) for (let x = 0; x < 320; x += 2) { const r = hash(x, y); cg.fillStyle = r < .33 ? '#1a1114' : r < .66 ? '#20151a' : '#150e11'; cg.fillRect(x, y, 2, 2); } PX._rock = c; } g.drawImage(PX._rock, 0, y0, 320, y1 - y0, 0, y0, 320, y1 - y0); }, // drawn once: 14,000 rects a frame is too many for a phone
+  plates(g, c) { PX._pl = PX._pl || {}; if (PX._pl[c]) { g.drawImage(PX._pl[c], 0, 0); return; } const [pc, og] = mk(320, 180), g0 = g; g = og; PX.R(g, 0, 0, 320, 180, c); for (let y = 0; y < 180; y += 30) for (let x = (y / 30 % 2) * 20; x < 320; x += 40) { PX.R(g, x, y, 1, 30, shade(c, .6)); PX.R(g, x + 1, y, 1, 30, shade(c, 1.2)); PX.R(g, x + 4, y + 4, 1, 1, shade(c, 1.6)); PX.R(g, x + 36, y + 25, 1, 1, shade(c, 1.6)); } for (let y = 0; y < 180; y += 30) { PX.R(g, 0, y, 320, 1, shade(c, .6)); PX.R(g, 0, y + 1, 320, 1, shade(c, 1.15)); } PX._pl[c] = pc; g0.drawImage(pc, 0, 0); },
   spr(g, s, dir, x, y, sc) { const fh = s.fh || 16; g.drawImage(s, 0, dir * fh, 16, fh, Math.round(x - 8 * sc), Math.round(y - fh * sc), 16 * sc, fh * sc); },
   fade(g, a) { if (a > 0) { g.fillStyle = `rgba(7,5,10,${Math.min(1, a)})`; g.fillRect(0, 0, 320, 180); } }
 };
@@ -2233,7 +2268,7 @@ const PANELS = {
     for (let i = 0; i < 26; i++) { const x = (hash(i, 1) * 320 + t * (6 + i % 5)) % 320, y = 28 - ((t * (5 + i % 4) + hash(i, 2) * 30) % 30); R(g, x, y, 1, 1, i % 3 ? '#ffb040' : '#ffe08a'); }
     glow(g, 160, 0, 150, '255,90,30', .35 + Math.sin(t * 1.7) * .06);
     for (let x = 0; x < 320; x += 3) R(g, x, 30 + (hash(x, 3) * 3 | 0), 3, 9, '#2a1c1e');
-    plate(g, 'THE SURFACE  -  BURNS', 232, 17);
+    const nx = Panels.narrow; plate(g, 'THE SURFACE  -  BURNS', nx ? 204 : 232, 17);
     if (st >= 1) { const a = k(s / 1.2 + (st > 1 ? 1 : 0));
       // the Deep Array: one machine through every tier
       g.globalAlpha = a; R(g, 150, 42, 20, 104, '#0c1416'); R(g, 152, 42, 16, 104, '#1e3438'); R(g, 152, 42, 2, 104, '#3a6468'); for (let y = 46; y < 144; y += 10) { const p = (Math.sin(t * 3 - y * .12) + 1) / 2; R(g, 150, y, 20, 3, `rgb(${40 + p * 40 | 0},${150 + p * 90 | 0},${150 + p * 80 | 0})`); } g.globalAlpha = 1;
@@ -2241,12 +2276,12 @@ const PANELS = {
       for (let tier = 0; tier < 6; tier++) { const y = 50 + tier * 17, on = k((s - tier * .35) / .5 + (st > 1 ? 1 : 0)); if (on <= 0) continue; g.globalAlpha = on;
         for (const side of [-1, 1]) for (let j = 0; j < 2; j++) { const cx = 160 + side * (52 + j * 62), rx = 24 - j * 3; g.fillStyle = '#0a0608'; g.beginPath(); g.ellipse(cx, y, rx + 2, 7.5, 0, 0, 6.3); g.fill(); g.fillStyle = tier === 2 ? '#4a3428' : '#33262a'; g.beginPath(); g.ellipse(cx, y, rx, 6, 0, 0, 6.3); g.fill(); R(g, cx - rx + 4, y + 2, rx * 2 - 8, 2, '#221a1c'); for (let q = 0; q < 5; q++) R(g, cx - rx + 6 + hash(cx + q, tier) * (rx * 2 - 12), y - 3 + hash(q, cx) * 5, 1, 1, Math.sin(t * 3 + q + cx) > -.6 ? '#ffd890' : '#6a4a30');
           R(g, Math.min(cx, 160) + (side > 0 ? 10 : rx), y, Math.abs(cx - 160) - rx - 10, 1, '#2e6a68'); if (st >= 2) { const d = Math.abs(cx - 160) - rx - 10, o = (t * 26 + j * 9 + tier * 5) % d; R(g, side > 0 ? 170 + o : 150 - o, y - 1, 2, 3, '#9ff2ea'); } }
-        ptext(g, 'TIER ' + (tier + 4), 6, y - 2, tier === 2 ? '#ffb35a' : '#6a5a50'); g.globalAlpha = 1; }
+        ptext(g, nx ? 'T' + (tier + 4) : 'TIER ' + (tier + 4), nx ? 60 : 6, y - (nx ? 9 : 2), tier === 2 ? '#ffb35a' : '#8a7a70'); g.globalAlpha = 1; }
       if (a >= 1) plate(g, 'THE DEEP ARRAY', 160, 34);
     }
-    if (st >= 2) { plate(g, 'TIER 6 - ASHGATE - HOME', 250, 74); for (let tier = 0; tier < 6; tier++) { const y = 50 + tier * 17, f = .35 + hash(tier, 9) * .3; R(g, 292, y - 4, 22, 5, '#0c0808'); R(g, 293, y - 3, 20, 3, '#3a2a24'); R(g, 293, y - 3, 20 * f, 3, f < .45 ? '#c8452e' : '#e8b23a'); } ptext(g, 'RATION', 291, 40, '#8a7a60'); }
+    if (st >= 2) { plate(g, nx ? 'TIER 6 - HOME' : 'TIER 6 - ASHGATE - HOME', nx ? 222 : 250, 74); for (let tier = 0; tier < 6; tier++) { const y = 50 + tier * 17, f = .35 + hash(tier, 9) * .3; const bx = nx ? 240 : 292; R(g, bx, y - 4, 22, 5, '#0c0808'); R(g, bx + 1, y - 3, 20, 3, '#3a2a24'); R(g, bx + 1, y - 3, 20 * f, 3, f < .45 ? '#c8452e' : '#e8b23a'); } ptext(g, 'RATION', nx ? 239 : 291, 40, '#8a7a60'); }
     if (st >= 3) { R(g, 108, 28, 5, 58, '#0a0608'); R(g, 109, 28, 3, 58, '#e8e4dc'); const y = 30 + (Math.sin(s * .9 - 1.2) * .5 + .5) * 50; R(g, 107, y, 7, 5, '#ffffff'); glow(g, 110, y + 2, 26, '255,246,214', .7);
-      R(g, 96, 12, 28, 18, '#e8e4dc'); R(g, 100, 6, 20, 6, '#f4f2ec'); R(g, 107, 1, 6, 5, '#f4f2ec'); R(g, 96, 28, 28, 2, '#e8c25a'); glow(g, 110, 14, 40, '255,246,214', .35); plate(g, 'LIFT 0', 84, 40); }
+      R(g, 96, 12, 28, 18, '#e8e4dc'); R(g, 100, 6, 20, 6, '#f4f2ec'); R(g, 107, 1, 6, 5, '#f4f2ec'); R(g, 96, 28, 28, 2, '#e8c25a'); glow(g, 110, 14, 40, '255,246,214', .35); plate(g, 'LIFT 0', nx ? 88 : 84, 40); }
   },
   // ---- the washer: three weeks of lunch breaks
   hands(g, t, st, s) {
@@ -2297,8 +2332,8 @@ const PANELS = {
     plate(g, 'ARRAY AUTHORITY  -  SEALED LINE', 160, 18); plate(g, 'CLINIC BRANCH  -  TIER 6', 160, 108);
     const gauge = (cx, cy, v, lab) => { g.fillStyle = '#120a0c'; g.beginPath(); g.arc(cx, cy, 19, 0, 6.3); g.fill(); g.fillStyle = '#c8a050'; g.beginPath(); g.arc(cx, cy, 17, 0, 6.3); g.fill(); g.fillStyle = '#f0e8d0'; g.beginPath(); g.arc(cx, cy, 14, 0, 6.3); g.fill(); for (let i = 0; i <= 6; i++) { const a = Math.PI * (1 + i / 6); R(g, cx + Math.cos(a) * 11 - 1, cy + Math.sin(a) * 11 - 1, 2, 2, i < 2 ? '#c8452e' : '#3a2a20'); }
       const a = Math.PI * (1 + v) + Math.sin(t * 11) * .03; g.strokeStyle = '#c8452e'; g.lineWidth = 2; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + Math.cos(a) * 12, cy + Math.sin(a) * 12); g.stroke(); R(g, cx - 2, cy - 2, 4, 4, '#2a1a14'); ptext(g, lab, cx - ptextW(lab) / 2, cy + 5, '#3a2a20'); };
-    gauge(262, 58, st >= 1 ? .96 - Math.min(.11, s * .06) : .96, st >= 1 ? '-11' : 'FULL'); gauge(262, 132, st >= 1 ? .08 + Math.min(.62, s * .3) : .08 + Math.sin(t * 5) * .02, st >= 1 ? 'AIR' : 'LOW');
-    if (st >= 1) { const h = Math.min(52, s * 60); R(g, 62, 74, 12, h + 2, '#120a0c'); R(g, 64, 74, 8, h, '#2a8a86'); R(g, 64, 74, 2, h, '#9ff2ea'); for (let i = 0; i < 4; i++) { const y = 76 + ((s * 50 + i * 14) % 50); if (y < 74 + h) R(g, 67, y, 2, 4, '#e8fffd'); } R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); if (h >= 52) { glow(g, 68, 132, 30, '79,214,208', .5); plate(g, 'A SLIVER. BALANCED BY DAWN.', 230, 100); } }
+    const gx = Panels.narrow ? 232 : 262; gauge(gx, 58, st >= 1 ? .96 - Math.min(.11, s * .06) : .96, st >= 1 ? '-11' : 'FULL'); gauge(gx, 132, st >= 1 ? .08 + Math.min(.62, s * .3) : .08 + Math.sin(t * 5) * .02, st >= 1 ? 'AIR' : 'LOW');
+    if (st >= 1) { const h = Math.min(52, s * 60); R(g, 62, 74, 12, h + 2, '#120a0c'); R(g, 64, 74, 8, h, '#2a8a86'); R(g, 64, 74, 2, h, '#9ff2ea'); for (let i = 0; i < 4; i++) { const y = 76 + ((s * 50 + i * 14) % 50); if (y < 74 + h) R(g, 67, y, 2, 4, '#e8fffd'); } R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); if (h >= 52) { glow(g, 68, 132, 30, '79,214,208', .5); plate(g, 'A SLIVER. BALANCED BY DAWN.', Panels.narrow ? 160 : 230, 100); } }
     else { R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); R(g, 64, 78, 8, 10, '#2a2a32'); }
   },
   // ---- Lift Zero opens: light, and three shapes in it, and a tier on its knees
@@ -2306,12 +2341,12 @@ const PANELS = {
     const { R, glow } = PX, op = Math.min(1, t / 2.2), w = 6 + op * 54;
     PX.plates(g, '#241c22');
     R(g, 84, 0, 152, 150, '#e4e2dc'); R(g, 84, 0, 4, 150, '#ffffff'); R(g, 232, 0, 4, 150, '#aaa8a4'); R(g, 84, 148, 152, 3, '#e8c25a'); R(g, 92, 0, 136, 148, '#101014');
-    R(g, 160 - w, 0, w * 2, 148, '#fff6dc'); glow(g, 160, 60, 150 * op + 20, '255,244,206', .8);
-    g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 9; i++) { const a = Math.PI / 2 + (i - 4) * .2 + Math.sin(t * .4 + i) * .02; g.fillStyle = `rgba(255,236,180,${.07 * op})`; g.beginPath(); g.moveTo(160, 40); g.lineTo(160 + Math.cos(a - .05) * 300, 40 + Math.sin(a - .05) * 300); g.lineTo(160 + Math.cos(a + .05) * 300, 40 + Math.sin(a + .05) * 300); g.fill(); } g.globalCompositeOperation = 'source-over';
+    R(g, 160 - w, 0, w * 2, 148, '#fff6dc'); glow(g, 160, 70, 90 * op + 20, '255,244,206', .3);
+    g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 9; i++) { const a = Math.PI / 2 + (i - 4) * .2 + Math.sin(t * .4 + i) * .02; g.fillStyle = `rgba(255,236,180,${.045 * op})`; g.beginPath(); g.moveTo(160, 40); g.lineTo(160 + Math.cos(a - .05) * 300, 40 + Math.sin(a - .05) * 300); g.lineTo(160 + Math.cos(a + .05) * 300, 40 + Math.sin(a + .05) * 300); g.fill(); } g.globalCompositeOperation = 'source-over';
     // door leaves sliding apart, gold trim
     R(g, 92, 0, 68 - w, 148, '#b8bcc8'); R(g, 160 + w, 0, 68 - w, 148, '#b8bcc8'); for (let x = 96; x < 160 - w; x += 8) R(g, x, 0, 2, 148, '#7a7e8a'); for (let x = 224; x > 160 + w; x -= 8) R(g, x, 0, 2, 148, '#7a7e8a'); R(g, 160 - w - 3, 0, 3, 148, '#e8c25a'); R(g, 160 + w, 0, 3, 148, '#e8c25a');
     // three figures, taller than anyone you know
-    if (op > .35) { const a = Math.min(1, (op - .35) * 2.2), sc = 3; g.globalAlpha = a; const cs = World.sheetFor('celestine'), ws = World.sheetFor('warden'); PX.spr(g, ws, 0, 122, 150, sc); PX.spr(g, ws, 0, 198, 150, sc); PX.spr(g, cs, 0, 160, 150, sc + 1); g.globalAlpha = 1; glow(g, 160, 60, 50, '255,236,180', .35 * a); }
+    if (op > .35) { const a = Math.min(1, (op - .35) * 2.2), sc = 3; g.globalAlpha = a; const cs = World.sheetFor('celestine'), ws = World.sheetFor('warden'); PX.spr(g, ws, 0, 122, 150, sc); PX.spr(g, ws, 0, 198, 150, sc); PX.spr(g, cs, 0, 160, 150, sc + 1); g.globalAlpha = 1; }
     for (let i = 0; i < 30; i++) { const x = 100 + hash(i, 7) * 120, y = 148 - ((t * (8 + i % 7) + hash(i, 8) * 150) % 150); R(g, x, y, 1, 1, 'rgba(255,246,214,.9)'); }
     // the tier, kneeling, backs to us
     R(g, 0, 150, 320, 30, '#0a0608'); for (let i = 0; i < 17; i++) { const x = 4 + i * 19 + (i % 2) * 4, y = 150 + (i % 3) * 3; g.fillStyle = '#0a0608'; g.beginPath(); g.arc(x + 8, y, 7, 0, 6.3); g.fill(); R(g, x - 2, y + 2, 20, 30, '#0a0608'); R(g, x + 4, y - 6, 8, 1, 'rgba(255,236,180,.35)'); }
@@ -2360,7 +2395,7 @@ const PANELS = {
     const rx = 152, ry = 100; g.strokeStyle = '#0c0808'; g.lineWidth = 8; g.beginPath(); g.ellipse(rx, ry, 10, 7, 0, 0, 6.3); g.stroke(); g.strokeStyle = '#3a2e22'; g.lineWidth = 5; g.stroke(); g.strokeStyle = '#8a6a34'; g.lineWidth = 1; g.beginPath(); g.ellipse(rx, ry - 1, 11, 8, 0, 3.6, 5.2); g.stroke();
     if (Math.sin(t * 1.4) > .93) { R(g, rx - 8, ry - 9, 1, 5, '#ffe9a8'); R(g, rx - 10, ry - 7, 5, 1, '#ffe9a8'); }
     // the invoice
-    if (st >= 1) { const a = Math.min(1, s / .6), ox = 20 - (1 - a) * 60; g.save(); g.translate(ox + 36, 120); g.rotate(-.12); R(g, -34, -52, 70, 96, '#141010'); R(g, -32, -50, 66, 92, '#e8e0cc'); R(g, -32, -20, 66, 1, '#b8b09c'); R(g, -32, 10, 66, 1, '#b8b09c'); ptext(g, 'COMMITMENT', -27, -44, '#2a2018'); ptext(g, 'FUEL', -27, -36, '#2a2018'); ptext(g, '14 SCRIP', -27, -14, '#c8452e'); ptext(g, 'DEDUCTED', -27, -4, '#2a2018'); ptext(g, 'FROM WAGES', -27, 2, '#2a2018'); ptext(g, 'GRATITUDE', -27, 18, '#7a6a50'); ptext(g, 'IS BREATH', -27, 26, '#7a6a50'); R(g, 6, -42, 20, 20, 'rgba(200,69,46,.25)'); R(g, 12, -36, 8, 8, 'rgba(200,69,46,.5)'); g.restore(); }
+    if (st >= 1) { const a = Math.min(1, s / .6), ox = (Panels.narrow ? 46 : 20) - (1 - a) * 60; g.save(); g.translate(ox + 36, 120); g.rotate(-.12); R(g, -34, -52, 70, 96, '#141010'); R(g, -32, -50, 66, 92, '#e8e0cc'); R(g, -32, -20, 66, 1, '#b8b09c'); R(g, -32, 10, 66, 1, '#b8b09c'); ptext(g, 'COMMITMENT', -27, -44, '#2a2018'); ptext(g, 'FUEL', -27, -36, '#2a2018'); ptext(g, '14 SCRIP', -27, -14, '#c8452e'); ptext(g, 'DEDUCTED', -27, -4, '#2a2018'); ptext(g, 'FROM WAGES', -27, 2, '#2a2018'); ptext(g, 'GRATITUDE', -27, 18, '#7a6a50'); ptext(g, 'IS BREATH', -27, 26, '#7a6a50'); R(g, 6, -42, 20, 20, 'rgba(200,69,46,.25)'); R(g, 12, -36, 8, 8, 'rgba(200,69,46,.5)'); g.restore(); }
     g.restore();
   }
 };
@@ -2948,13 +2983,14 @@ function festA() {
     { narr: F('fuseDone') ? 'The ground hums. Every lamp in the square dips. And tonight, for the first time in your life, you know exactly why.' : 'The ground hums. Every lamp in the square dips, the way it does every First Fire.' },
     { flash: '#fff6dc' }, { beam: 1 }, { music: 'surface' }, { sfx: 'choir' }, { fx: () => { Cutscene.lift = 1; } },
     { add: [['celestine', 13, 1, 0], ['wl', 12, 1, 0, 'warden'], ['wr', 14, 1, 0, 'warden']] },
-    { pan: [12, 6], dur: 1.6, hold: false },
+    { pan: [12, 4], dur: 1.6, hold: false },
     { move: 'wl', to: [12, 4], spd: 14 }, { move: 'wr', to: [14, 4], spd: 14 }, { move: 'celestine', to: [13, 4], spd: 14, wait: true },
     { narr: 'She comes down in light, the way she did forty-two days ago. The same white. The same unhurried gold. In her hands, a brass cup on a chain. In the cup, a flame.' },
     { say: 'vale', t: 'Kneel for High Auditor Celestine Aurel. Kneel for the First Fire.' },
+    { kneel: 'all', but: ['vale', 'kael', 'proctor', 'watchman'] }, { sfx: 'step' },
     { choice: [
-      { t: 'Kneel.', fx: () => setF('kneltFest'), then: [narr('You kneel. The lantern does not. You hold it up over your bowed head, like something that outranks you.')] },
-      { t: 'Kneel last.', fx: () => { setF('lastToKneel'); fury(1); }, then: [narr("You are the only one standing in a square of four hundred. One full second. Two. Vale's eyes find you, and widen, very slightly."), narr('Then your knee touches stone. The whole tier breathes out.')] }
+      { t: 'Kneel.', fx: () => { setF('kneltFest'); const a = Cutscene.actor('kael'); if (a) a.kneel = 1; }, then: [narr('You kneel. The lantern does not. You hold it up over your bowed head, like something that outranks you.')] },
+      { t: 'Kneel last.', fx: () => { setF('lastToKneel'); fury(1); }, then: [narr("You are the only one standing in a square of four hundred. One full second. Two. Vale's eyes find you, and widen, very slightly."), fx(() => { const a = Cutscene.actor('kael'); if (a) a.kneel = 1; }), narr('Then your knee touches stone. The whole tier breathes out.')] }
     ] },
     { zoom: 2.4 }, { pan: [13, 4], dur: 1.2 },
     { say: 'celestine', t: 'Cinderwell. How festive. You have made such a brave little effort with the paper.' },
@@ -2966,6 +3002,7 @@ function festA() {
     { say: 'tavi', t: 'Kael. Kael, she means —' },
     { say: 'kael', t: 'I know what she means.' },
     { say: 'celestine', t: 'Gratitude is breath. Come. Take your light.' },
+    { kneel: 'all', v: 0 },
     { narr: "Proctors carry tapers down the rows. The flame passes hand to hand, lantern to lantern. Seren's fire, coming toward you one candle at a time." },
     { choice: [
       { t: "Take it. It's HER fire. They don't get to keep it.", fx: () => setF('fireTheirs'), then: [narr('The taper touches the wick. The paper sun fills up gold from the inside, and for a moment you cannot see anything else in the world.'), say('kael', '(There you are.)')] },
@@ -2984,10 +3021,11 @@ function festA() {
       { t: '(Hold it higher. Say nothing.)', then: [say('celestine', 'Still staring. Still silent. I had so hoped the invoice would improve you.')] },
       { t: 'It has more friends than you do.', fx: () => fury(1), then: [say('celestine', '...Inspector, do they all talk? I was told they mostly coughed.')] }
     ] },
+    { emote: 'tavi', t: '!' },
     { say: 'tavi', t: "It's the SUN." },
     { say: 'celestine', t: 'Is it.' },
     { say: 'celestine', t: 'It is rather more yellow than th—' },
-    { wait: 0.9 },
+    { emote: 'celestine', t: '...' }, { wait: 0.9 },
     { narr: 'The silence is very small. But you were raised on gauges. You know a needle twitch when you see one.' },
     { say: 'celestine', t: 'One imagines.' },
     { say: 'kael', t: '(More yellow than what? ...She has SEEN it.)' },
@@ -3040,6 +3078,7 @@ function festB() {
     F('sullTip') ? { say: 'proctor', t: "...One candle-hour. It's licensed for one candle-hour. Then it comes down." } : F('sullWar') || F('beatSull') ? { say: 'proctor', t: "Brennick. I've got your name spelled right. You hear me? I've got it spelled RIGHT." } : { say: 'proctor', t: "It comes down at first bell. I'll scrub the light off the stones if I have to." },
     F('sullTip') ? { narr: 'He says it loudly, for the record. Then he turns his back on it, and stands guard over the wrong side of the square for exactly one hour.' } : { narr: 'He does not climb. Not with four hundred people humming. He stands under her sun with his whistle in his fist and does not blow it. You can see what that costs him. You enjoy it more than you should.' },
     { move: 'kael', to: [11, 7], spd: 26 }, { move: 'tavi', to: [10, 7], spd: 50, wait: true }, { pan: [11, 7], dur: 1 }, { zoom: 2.6 },
+    { emote: 'tavi', t: '!' },
     { say: 'tavi', t: "She's on everything. Kael, look. She's on EVERYTHING." },
     { say: 'kael', t: 'Happy anniversary, Seren.' },
     { say: 'kael', t: "I carried it. I pretended I didn't want to. It was on the list." },
@@ -3049,6 +3088,7 @@ function festB() {
     { narr: 'The gate opens by itself. No beam. No choir. No one inside.' },
     { narr: "Just the car, lit and empty. On its floor, a puddle of clean water, and one green leaf the size of a child's hand, turning in the draft." },
     F('ivoWatch') ? { say: 'ivo', t: "KAEL. It's — there's nobody. It just CAME. I screamed. Did you hear me scream?" } : null,
+    { emote: 'tavi', t: '?' },
     { say: 'tavi', t: 'What is that?' }, { say: 'kael', t: 'A leaf.' }, { say: 'tavi', t: "What's a leaf?" },
     { narr: 'The gate stands open for eleven seconds. You count them. Everyone counts them. Nobody from Cinderwell gets in.' },
     { fx: () => { Cutscene.lift = 1; } }, { sfx: 'door' },
@@ -3086,7 +3126,7 @@ const HUD = {
   hint() {
     const d = Input.device;
     if (G.mode !== 'world' || Dialogue.active || Puzzle.active || Brawl.active || UI.stack.length) return '';
-    if (G.heist) { const b = d === 'touch' ? 'B' : d === 'pad' ? 'Ⓑ' : 'X', a = d === 'kb' ? 'E' : d === 'pad' ? 'Ⓐ' : 'A'; return `${b}: throw a bolt · hold ${a} to work · watch the lamps turn`; }
+    if (G.heist) { const b = d === 'touch' ? 'B' : d === 'pad' ? 'Ⓑ' : 'X', a = d === 'kb' ? 'E' : d === 'pad' ? 'Ⓐ' : 'A'; return document.body.classList.contains('portrait') ? `${b}: bolt · hold ${a}: work` : `${b}: throw a bolt · hold ${a} to work · watch the lamps turn`; }
     if (P.moved < 40 && !F('talkedTavi')) return d === 'touch' ? 'Drag the pad to move' : d === 'pad' ? 'Left stick or D-pad to move' : 'WASD or arrow keys to move';
     if (World.target && !F('interacted')) return d === 'touch' ? 'Tap A to interact' : d === 'pad' ? 'Press Ⓐ to interact' : 'Press E or Enter to interact';
     return '';
@@ -3432,6 +3472,7 @@ const DayEnd = {
 // ============================================================
 // main — game flow + fixed-timestep loop
 // ============================================================
+const HEIST_LANE_MID = [[18, 6, 1, 0.9], [18, 6, 0, 0.9], [7, 6, 1, 0.9], [7, 6, 0, 0.9]], HEIST_LANE_N = [[16, 3, 0, 1.1], [5, 3, 0, 1.1]];
 const Game = {
   toTitle() {
     G.mode = 'title'; Dialogue.active = false; $('#dlg').classList.add('hidden'); if (Puzzle.active) Puzzle.close();
@@ -3451,11 +3492,24 @@ const Game = {
   },
   resetHeist() {
     if (G.heist === 2) return Game.resetFest();
+    // Three lamps whose lanes interlock: no corridor is ever unwatched for long.
+    //  - the Night Proctor walks the middle of the bay end to end, and looks up and down at each end
+    //    (after the relay is cut he moves to the north lane, right past Bank Seven)
+    //  - a second Proctor walks the centre column, and looks left and right at each end
+    //  - the Watchman stands by the relay and turns all the way round
+    const g = (id, x, y, dir, wander) => ({ id, patrol: 1, x: x * 16 + 8, y: y * 16 + 12, dir, home: dir, wander, wi: 0, wait: 1.6, anim: 0, moving: false, face: 0, barkCd: 99 });
     World.npcs = [
-      { id: 'seren', x: 2 * 16 + 8, y: 5 * 16 + 12, dir: 1, home: 1, anim: 0, moving: false, face: 0, barkCd: 99 },
-      { id: 'proctor', patrol: 1, x: 5 * 16 + 8, y: 4 * 16 + 12, dir: 3, home: 3, wander: [[17, 4, 1, 2.2], [17, 8, 2, 1.2], [5, 8, 1, 2], [5, 4, 3, 1.4]], wi: 0, wait: 1.5, anim: 0, moving: false, face: 0, barkCd: 99 },
-      { id: 'watchman', patrol: 1, x: 14 * 16 + 8, y: 10 * 16 + 12, dir: 2, home: 2, wander: [[14, 10, 2, 1.9], [14, 10, 1, 1.4], [14, 10, 3, 1.9], [14, 10, 0, 1.4]], wi: 0, wait: 1.9, anim: 0, moving: false, face: 0, barkCd: 99 }
+      { id: 'seren', x: 1 * 16 + 8, y: 8 * 16 + 12, dir: 1, home: 1, anim: 0, moving: false, face: 0, barkCd: 99 },
+      g('proctor', 7, 6, 0, G.flags.relayCut ? HEIST_LANE_N : HEIST_LANE_MID),
+      g('watchman', 12, 10, 2, [[12, 10, 2, 0.9], [12, 10, 3, 0.9], [12, 3, 3, 0.9], [12, 3, 2, 0.9]]),
+      g('watchman', 19, 9, 2, [[19, 9, 2, 1.7], [19, 9, 1, 1.3], [19, 9, 3, 1.7], [19, 9, 0, 1.3]])
     ];
+    if (G.flags.relayCut) { const p = World.npcs[1]; p.x = 5 * 16 + 8; p.y = 3 * 16 + 12; }
+    World.grace = 2.6;
+    if ((G.flags.caught | 0) >= 3) { // Seren keeps her promise: she knocks something over, far from where you are going
+      const at = G.flags.relayCut ? { x: 3 * 16 + 8, y: 12 * 16 } : { x: 12 * 16 + 8, y: 12 * 16 + 8 };
+      setTimeout(() => { if (G.heist !== 1) return; Sound.play('rumble'); Sound.play('clink'); HUD.toast('Seren knocks something over. Every lamp turns.'); for (const n of World.npcs) if (n.patrol) { n.inv = { x: at.x, y: at.y }; n.invT = 0; n.invGive = 0; n.bark = { t: '?!', life: 1.4 }; } }, 1500);
+    }
     World.caughtT = 0; World.alert = 0; World.alertPeak = 0; World.work = 0; World.seenBy = null;
   },
   onHeistDone() {
@@ -3562,7 +3616,7 @@ const Game = {
       s('tavi', 6, 13, 3), s('ivo', 8, 14, 1), s('mara', 3, 6, 3), s('hollis', 2, 8, 3), s('marrow', 3, 10, 3), s('pell', 2, 12, 3), s('bao', 5, 11, 3), s('juno', 10, 14, 1), s('orin', 12, 14, 1), s('nell', 17, 14, 1), s('fen', 20, 14, 1), s('kit', 24, 10, 2)
     ];
     if (F('sullWar') && !F('beatSull')) World.npcs.push(g('watchman', 20, 8, 2, [[20, 8, 2, 2], [20, 8, 1, 1.5], [20, 8, 2, 2], [20, 8, 0, 1.5]]));
-    World.caughtT = 0; World.alert = 0; World.alertPeak = 0; World.work = 0; World.seenBy = null;
+    World.caughtT = 0; World.alert = 0; World.alertPeak = 0; World.work = 0; World.seenBy = null; World.grace = 2.2;
     if ((G.flags.caught2 | 0) >= 2) { // Ivo gets clumsy with his cart: every lamp turns east
       setTimeout(() => { if (G.heist !== 2) return; Sound.play('rumble'); Sound.play('clink'); for (const n of World.npcs) if (n.patrol) { n.inv = { x: 23 * 16 + 8, y: 13 * 16 }; n.invT = 0; n.invGive = 0; n.bark = { t: '?!', life: 1.4 }; } const iv = World.npcs.find(n => n.id === 'ivo'); if (iv) iv.bark = { t: 'OH NO. MY CART.', life: 2.4 }; }, 1400);
     }
@@ -3630,7 +3684,7 @@ function step(dt) {
   else if (G.mode === 'splash') { if (Input.p('A') || Input.p('B')) Splash.padSkip && Splash.padSkip(); }
   else if (UI.stack.length) UI.top().update(dt);
   else if (Fade.busy && Fade.dir > 0) { }
-  else if (Dialogue.active) Dialogue.update(dt);
+  else if (Dialogue.active) { Dialogue.update(dt); if (Cutscene.active) Cutscene.anim(dt); }
   else if (Puzzle.active) Puzzle.update(dt);
   else if (Brawl.active) Brawl.update(dt);
   else if (G.mode === 'world') { G.play += dt; World.update(dt); }

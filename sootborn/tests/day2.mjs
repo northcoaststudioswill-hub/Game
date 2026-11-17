@@ -87,7 +87,7 @@ await runCine('fa', 8);
 await wait(1800); console.log('stealth', await ev(() => [BTS.G.heist, BTS.G.mapId, BTS.G.mode, BTS.World.npcs.filter(n => n.patrol).length, BTS.HUD.objective()])); await shot('10-stealth');
 await wait(3000); await shot('10-stealth-b');
 // get caught twice
-for (let i = 0; i < 2; i++) { await ev(() => { const n = BTS.World.npcs.find(n => n.patrol); BTS.P.x = n.x + [0, 0, -1, 1][n.dir] * 30; BTS.P.y = n.y + [1, -1, 0, 0][n.dir] * 30; }); await wait(1100); await shot('11-caught' + i); await talkThrough(); await wait(900); }
+for (let i = 0; i < 2; i++) { await ev(() => { const n = BTS.World.npcs.find(n => n.patrol); BTS.P.x = n.x + [0, 0, -1, 1][n.dir] * 30; BTS.P.y = n.y + [1, -1, 0, 0][n.dir] * 30; }); await wait(i ? 3800 : 1100); await shot('11-caught' + i); await talkThrough(); await wait(900); }
 console.log('caught2', await ev(() => [BTS.G.flags.caught2, BTS.P.x | 0, BTS.P.y | 0])); await wait(2200); await shot('11-distract'); console.log('investigating', await ev(() => BTS.World.npcs.filter(n => n.inv).length));
 // whisper + walk there for real along y=7
 await ev(() => { BTS.P.x = 6 * 16 + 8; BTS.P.y = 12 * 16 + 4; BTS.P.dir = 0; }); await key('KeyE', 1, 250); await talkThrough();

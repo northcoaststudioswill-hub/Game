@@ -44,14 +44,14 @@ function outline(c, col, cw, chh) {
 // o = {skin, hair, style:short|long|bun|spiky|bald, shirt, pants, shoe, extra, band, kid, scarf, clean}
 const CH = 20;
 function makeChar(o) {
-  const [c, g] = mk(48, CH * 4);
+  const [c, g] = mk(64, CH * 4); // frames: stand, step, step, blink
   o = Object.assign({ shoe: '#1e1418', pants: '#2a3440', belt: '#22171a' }, o);
-  for (let d = 0; d < 3; d++) for (let f = 0; f < 3; f++) drawChar(g, f * 16, d * CH, d, f, o);
-  for (let f = 0; f < 3; f++) { g.save(); g.translate(f * 16 + 16, CH * 3); g.scale(-1, 1); g.drawImage(c, f * 16, CH * 2, 16, CH, 0, 0, 16, CH); g.restore(); }
+  for (let d = 0; d < 3; d++) for (let f = 0; f < 4; f++) drawChar(g, f * 16, d * CH, d, f === 3 ? 0 : f, o, f === 3);
+  for (let f = 0; f < 4; f++) { g.save(); g.translate(f * 16 + 16, CH * 3); g.scale(-1, 1); g.drawImage(c, f * 16, CH * 2, 16, CH, 0, 0, 16, CH); g.restore(); }
   outline(c, '#120a0e', 16, CH);
   c.fh = CH; return c;
 }
-function drawChar(g, ox, oy, d, f, o) {
+function drawChar(g, ox, oy, d, f, o, blink) {
   const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(ox + x, oy + y, w, h); };
   const Y = o.kid ? 3 : 0, ty = 9 + Y, th = o.kid ? 4 : 6, ly = ty + th, ll = 18 - ly;
   const hair = o.hair, hairL = shade(hair, 1.35), hairD = shade(hair, .72), skin = o.skin, skinD = shade(skin, .8), skinL = shade(skin, 1.1);
@@ -123,6 +123,7 @@ function drawChar(g, ox, oy, d, f, o) {
   if (o.extra === 'hat') { const hc = o.clean ? '#5a5e6a' : PAL.yellow, hd = o.clean ? '#32343c' : '#b88a22', hl = o.clean ? '#8a8e9c' : '#ffe08a';
     if (d < 2) { R(4, 0 + Y, 8, 3, hc); R(5, 0 + Y, 4, 1, hl); R(3, 3 + Y, 10, 1, hd); R(11, 0 + Y, 1, 3, hd); if (d === 0) { R(7, 1 + Y, 2, 1, o.clean ? '#e8c25a' : '#fff6d0'); } }
     else { R(4, 0 + Y, 8, 3, hc); R(5, 0 + Y, 4, 1, hl); R(2, 3 + Y, 10, 1, hd); R(11, 0 + Y, 1, 3, hd); } }
+  if (blink) { if (d === 0) { R(5, 5 + Y, 2, 2, skin); R(9, 5 + Y, 2, 2, skin); R(5, 6 + Y, 2, 1, skinD); R(9, 6 + Y, 2, 1, skinD); } else if (d === 2) { R(5, 5 + Y, 2, 2, skin); R(5, 6 + Y, 2, 1, skinD); } }
 }
 // ---- the Accredited: tall (16x24), pristine, luminous. No soot.
 // ---- the Accredited: tall (16x28), pristine, luminous. No soot.

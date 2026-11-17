@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Book One. Current build: v0.9 (story panels and stealth rework over the v0.8 art pass) (see CHANGELOG.md).
+Book One. Current build: v0.10 (playtest round: heist redesign, cutscene acting, animation) (see CHANGELOG.md).
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -59,8 +59,9 @@ SOOTBORN ("soot" is the Authority's slur; the title reclaims it). A card game ca
   1. Cut the audit relay (east wall). This sets a checkpoint.
   2. Reach Bank Seven and solve the "Bleed" puzzle (AUTH line → CLINIC).
 - Guards:
-  - The Night Proctor walks a lantern loop and looks around at each corner.
-  - The Night Watchman stands in place and sweeps his lantern.
+  - The Night Proctor walks the middle of the bay end to end and looks up and down at each end. After the relay is cut he walks the north lane past Bank Seven.
+  - A second lamp walks the centre column and looks left and right at each end.
+  - The Night Watchman stands by the relay and turns all the way round.
   - Their vision cones are drawn on screen; crates and walls block line of sight.
 - Lamps sweep smoothly. A detection meter fills while a lamp is on Kael and drains when he breaks line of sight; a full meter sends him back to the checkpoint.
 - Cutting the relay is hold-to-work (about two seconds, standing still).
@@ -128,6 +129,7 @@ Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at F
 - Day 2 lives in `src/day2.js`: `D2T` (talk) and `D2H` (hotspots) wrap the day-1 tables once `day1Done` is set; `D3` holds epilogue lines.
 - `phase()` picks the Pillar color from day flags. Exits take `when` and `deny`.
 - Story panels live in `src/panels.js`. A cutscene step `{panel:'id', stage}` cuts to one, `{pstage:n}` advances it, `{panel:null}` cuts back. Keep each panel's focus in the top two thirds: the caption strip covers the bottom.
+- Cutscenes: `Cutscene.anim(dt)` runs every frame, including under dialogue. Steps `{kneel}` and `{emote}` give actors simple acting. In landscape the cutscene camera sits low so the action clears the dialogue box.
 - Stealth: guards have a facing angle `n.ang` that eases toward their direction; `World.alert` is the detection meter; `World.work` is hold-to-work progress (`WORK_T` seconds).
 
 ## Not yet tested

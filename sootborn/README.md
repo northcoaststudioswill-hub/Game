@@ -56,6 +56,7 @@ node clinic.mjs   # clinic visit
 node day2.mjs     # all of Day 2 from a synthetic Day 1 save (VAR=b for the other branch, PORTRAIT=1 for phone)
 node fight.mjs    # every bout against a mashing bot and a dodging bot
 node sneak.mjs    # walks the festival stealth for real
+node heist.mjs    # walks the prologue heist with a cautious bot (ROUTE=north or south for other routes)
 ```
 
 Screenshots go to `tests/shots/`.

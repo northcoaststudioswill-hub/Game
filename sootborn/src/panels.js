@@ -9,8 +9,8 @@ const Panels = {
   draw(g, p) {
     if (!this.c) [this.c, this.g] = mk(320, 180);
     const pg = this.g; pg.globalAlpha = 1; pg.globalCompositeOperation = 'source-over'; pg.fillStyle = '#07050a'; pg.fillRect(0, 0, 320, 180);
-    const fn = PANELS[p.id]; if (fn) fn(pg, p.t, p.stage, p.st);
-    g.fillStyle = '#07050a'; g.fillRect(0, 0, W, H); g.drawImage(this.c, Math.round((W - 320) / 2), Math.round((H - 180) / 2));
+    this.narrow = W < 320; const fn = PANELS[p.id]; if (fn) fn(pg, p.t, p.stage, p.st);
+    g.fillStyle = '#07050a'; g.fillRect(0, 0, W, H); g.drawImage(this.c, Math.round((W - 320) / 2), Math.round((H - 180) / 2)); // portrait shows the middle 208px: panels keep their focus there
   },
   // a character sprite as a flat dark shape, for figures against a light
   shape(id, dir, col) { const k = id + dir + col; if (!this.sil[k]) { const s = World.sheetFor(id), fh = s.fh || 16, [c, g] = mk(16, fh); g.drawImage(s, 0, dir * fh, 16, fh, 0, 0, 16, fh); g.globalCompositeOperation = 'source-in'; g.fillStyle = col; g.fillRect(0, 0, 16, fh); c.fh = fh; this.sil[k] = c; } return this.sil[k]; }
@@ -19,8 +19,8 @@ const PX = {
   R(g, x, y, w, h, c) { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); },
   glow(g, x, y, r, rgb, a) { g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); g.globalCompositeOperation = 'source-over'; },
   plate(g, t, cx, y, dim) { const w = ptextW(t) + 6, x = Math.round(cx - w / 2); PX.R(g, x - 1, y - 1, w + 2, 11, '#0c0808'); PX.R(g, x, y, w, 9, dim ? '#5a4a30' : '#c8a050'); PX.R(g, x + 1, y + 1, w - 2, 7, '#1e1512'); ptext(g, t, x + 3, y + 2, dim ? '#8a7a60' : '#f3e3c3'); },
-  rock(g, y0, y1) { for (let y = y0; y < y1; y += 2) for (let x = 0; x < 320; x += 2) { const r = hash(x, y); PX.R(g, x, y, 2, 2, r < .33 ? '#1a1114' : r < .66 ? '#20151a' : '#150e11'); } },
-  plates(g, c) { PX.R(g, 0, 0, 320, 180, c); for (let y = 0; y < 180; y += 30) for (let x = (y / 30 % 2) * 20; x < 320; x += 40) { PX.R(g, x, y, 1, 30, shade(c, .6)); PX.R(g, x + 1, y, 1, 30, shade(c, 1.2)); PX.R(g, x + 4, y + 4, 1, 1, shade(c, 1.6)); PX.R(g, x + 36, y + 25, 1, 1, shade(c, 1.6)); } for (let y = 0; y < 180; y += 30) { PX.R(g, 0, y, 320, 1, shade(c, .6)); PX.R(g, 0, y + 1, 320, 1, shade(c, 1.15)); } },
+  rock(g, y0, y1) { if (!PX._rock) { const [c, cg] = mk(320, 180); for (let y = 0; y < 180; y += 2) for (let x = 0; x < 320; x += 2) { const r = hash(x, y); cg.fillStyle = r < .33 ? '#1a1114' : r < .66 ? '#20151a' : '#150e11'; cg.fillRect(x, y, 2, 2); } PX._rock = c; } g.drawImage(PX._rock, 0, y0, 320, y1 - y0, 0, y0, 320, y1 - y0); }, // drawn once: 14,000 rects a frame is too many for a phone
+  plates(g, c) { PX._pl = PX._pl || {}; if (PX._pl[c]) { g.drawImage(PX._pl[c], 0, 0); return; } const [pc, og] = mk(320, 180), g0 = g; g = og; PX.R(g, 0, 0, 320, 180, c); for (let y = 0; y < 180; y += 30) for (let x = (y / 30 % 2) * 20; x < 320; x += 40) { PX.R(g, x, y, 1, 30, shade(c, .6)); PX.R(g, x + 1, y, 1, 30, shade(c, 1.2)); PX.R(g, x + 4, y + 4, 1, 1, shade(c, 1.6)); PX.R(g, x + 36, y + 25, 1, 1, shade(c, 1.6)); } for (let y = 0; y < 180; y += 30) { PX.R(g, 0, y, 320, 1, shade(c, .6)); PX.R(g, 0, y + 1, 320, 1, shade(c, 1.15)); } PX._pl[c] = pc; g0.drawImage(pc, 0, 0); },
   spr(g, s, dir, x, y, sc) { const fh = s.fh || 16; g.drawImage(s, 0, dir * fh, 16, fh, Math.round(x - 8 * sc), Math.round(y - fh * sc), 16 * sc, fh * sc); },
   fade(g, a) { if (a > 0) { g.fillStyle = `rgba(7,5,10,${Math.min(1, a)})`; g.fillRect(0, 0, 320, 180); } }
 };
@@ -33,7 +33,7 @@ const PANELS = {
     for (let i = 0; i < 26; i++) { const x = (hash(i, 1) * 320 + t * (6 + i % 5)) % 320, y = 28 - ((t * (5 + i % 4) + hash(i, 2) * 30) % 30); R(g, x, y, 1, 1, i % 3 ? '#ffb040' : '#ffe08a'); }
     glow(g, 160, 0, 150, '255,90,30', .35 + Math.sin(t * 1.7) * .06);
     for (let x = 0; x < 320; x += 3) R(g, x, 30 + (hash(x, 3) * 3 | 0), 3, 9, '#2a1c1e');
-    plate(g, 'THE SURFACE  -  BURNS', 232, 17);
+    const nx = Panels.narrow; plate(g, 'THE SURFACE  -  BURNS', nx ? 204 : 232, 17);
     if (st >= 1) { const a = k(s / 1.2 + (st > 1 ? 1 : 0));
       // the Deep Array: one machine through every tier
       g.globalAlpha = a; R(g, 150, 42, 20, 104, '#0c1416'); R(g, 152, 42, 16, 104, '#1e3438'); R(g, 152, 42, 2, 104, '#3a6468'); for (let y = 46; y < 144; y += 10) { const p = (Math.sin(t * 3 - y * .12) + 1) / 2; R(g, 150, y, 20, 3, `rgb(${40 + p * 40 | 0},${150 + p * 90 | 0},${150 + p * 80 | 0})`); } g.globalAlpha = 1;
@@ -41,12 +41,12 @@ const PANELS = {
       for (let tier = 0; tier < 6; tier++) { const y = 50 + tier * 17, on = k((s - tier * .35) / .5 + (st > 1 ? 1 : 0)); if (on <= 0) continue; g.globalAlpha = on;
         for (const side of [-1, 1]) for (let j = 0; j < 2; j++) { const cx = 160 + side * (52 + j * 62), rx = 24 - j * 3; g.fillStyle = '#0a0608'; g.beginPath(); g.ellipse(cx, y, rx + 2, 7.5, 0, 0, 6.3); g.fill(); g.fillStyle = tier === 2 ? '#4a3428' : '#33262a'; g.beginPath(); g.ellipse(cx, y, rx, 6, 0, 0, 6.3); g.fill(); R(g, cx - rx + 4, y + 2, rx * 2 - 8, 2, '#221a1c'); for (let q = 0; q < 5; q++) R(g, cx - rx + 6 + hash(cx + q, tier) * (rx * 2 - 12), y - 3 + hash(q, cx) * 5, 1, 1, Math.sin(t * 3 + q + cx) > -.6 ? '#ffd890' : '#6a4a30');
           R(g, Math.min(cx, 160) + (side > 0 ? 10 : rx), y, Math.abs(cx - 160) - rx - 10, 1, '#2e6a68'); if (st >= 2) { const d = Math.abs(cx - 160) - rx - 10, o = (t * 26 + j * 9 + tier * 5) % d; R(g, side > 0 ? 170 + o : 150 - o, y - 1, 2, 3, '#9ff2ea'); } }
-        ptext(g, 'TIER ' + (tier + 4), 6, y - 2, tier === 2 ? '#ffb35a' : '#6a5a50'); g.globalAlpha = 1; }
+        ptext(g, nx ? 'T' + (tier + 4) : 'TIER ' + (tier + 4), nx ? 60 : 6, y - (nx ? 9 : 2), tier === 2 ? '#ffb35a' : '#8a7a70'); g.globalAlpha = 1; }
       if (a >= 1) plate(g, 'THE DEEP ARRAY', 160, 34);
     }
-    if (st >= 2) { plate(g, 'TIER 6 - ASHGATE - HOME', 250, 74); for (let tier = 0; tier < 6; tier++) { const y = 50 + tier * 17, f = .35 + hash(tier, 9) * .3; R(g, 292, y - 4, 22, 5, '#0c0808'); R(g, 293, y - 3, 20, 3, '#3a2a24'); R(g, 293, y - 3, 20 * f, 3, f < .45 ? '#c8452e' : '#e8b23a'); } ptext(g, 'RATION', 291, 40, '#8a7a60'); }
+    if (st >= 2) { plate(g, nx ? 'TIER 6 - HOME' : 'TIER 6 - ASHGATE - HOME', nx ? 222 : 250, 74); for (let tier = 0; tier < 6; tier++) { const y = 50 + tier * 17, f = .35 + hash(tier, 9) * .3; const bx = nx ? 240 : 292; R(g, bx, y - 4, 22, 5, '#0c0808'); R(g, bx + 1, y - 3, 20, 3, '#3a2a24'); R(g, bx + 1, y - 3, 20 * f, 3, f < .45 ? '#c8452e' : '#e8b23a'); } ptext(g, 'RATION', nx ? 239 : 291, 40, '#8a7a60'); }
     if (st >= 3) { R(g, 108, 28, 5, 58, '#0a0608'); R(g, 109, 28, 3, 58, '#e8e4dc'); const y = 30 + (Math.sin(s * .9 - 1.2) * .5 + .5) * 50; R(g, 107, y, 7, 5, '#ffffff'); glow(g, 110, y + 2, 26, '255,246,214', .7);
-      R(g, 96, 12, 28, 18, '#e8e4dc'); R(g, 100, 6, 20, 6, '#f4f2ec'); R(g, 107, 1, 6, 5, '#f4f2ec'); R(g, 96, 28, 28, 2, '#e8c25a'); glow(g, 110, 14, 40, '255,246,214', .35); plate(g, 'LIFT 0', 84, 40); }
+      R(g, 96, 12, 28, 18, '#e8e4dc'); R(g, 100, 6, 20, 6, '#f4f2ec'); R(g, 107, 1, 6, 5, '#f4f2ec'); R(g, 96, 28, 28, 2, '#e8c25a'); glow(g, 110, 14, 40, '255,246,214', .35); plate(g, 'LIFT 0', nx ? 88 : 84, 40); }
   },
   // ---- the washer: three weeks of lunch breaks
   hands(g, t, st, s) {
@@ -97,8 +97,8 @@ const PANELS = {
     plate(g, 'ARRAY AUTHORITY  -  SEALED LINE', 160, 18); plate(g, 'CLINIC BRANCH  -  TIER 6', 160, 108);
     const gauge = (cx, cy, v, lab) => { g.fillStyle = '#120a0c'; g.beginPath(); g.arc(cx, cy, 19, 0, 6.3); g.fill(); g.fillStyle = '#c8a050'; g.beginPath(); g.arc(cx, cy, 17, 0, 6.3); g.fill(); g.fillStyle = '#f0e8d0'; g.beginPath(); g.arc(cx, cy, 14, 0, 6.3); g.fill(); for (let i = 0; i <= 6; i++) { const a = Math.PI * (1 + i / 6); R(g, cx + Math.cos(a) * 11 - 1, cy + Math.sin(a) * 11 - 1, 2, 2, i < 2 ? '#c8452e' : '#3a2a20'); }
       const a = Math.PI * (1 + v) + Math.sin(t * 11) * .03; g.strokeStyle = '#c8452e'; g.lineWidth = 2; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + Math.cos(a) * 12, cy + Math.sin(a) * 12); g.stroke(); R(g, cx - 2, cy - 2, 4, 4, '#2a1a14'); ptext(g, lab, cx - ptextW(lab) / 2, cy + 5, '#3a2a20'); };
-    gauge(262, 58, st >= 1 ? .96 - Math.min(.11, s * .06) : .96, st >= 1 ? '-11' : 'FULL'); gauge(262, 132, st >= 1 ? .08 + Math.min(.62, s * .3) : .08 + Math.sin(t * 5) * .02, st >= 1 ? 'AIR' : 'LOW');
-    if (st >= 1) { const h = Math.min(52, s * 60); R(g, 62, 74, 12, h + 2, '#120a0c'); R(g, 64, 74, 8, h, '#2a8a86'); R(g, 64, 74, 2, h, '#9ff2ea'); for (let i = 0; i < 4; i++) { const y = 76 + ((s * 50 + i * 14) % 50); if (y < 74 + h) R(g, 67, y, 2, 4, '#e8fffd'); } R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); if (h >= 52) { glow(g, 68, 132, 30, '79,214,208', .5); plate(g, 'A SLIVER. BALANCED BY DAWN.', 230, 100); } }
+    const gx = Panels.narrow ? 232 : 262; gauge(gx, 58, st >= 1 ? .96 - Math.min(.11, s * .06) : .96, st >= 1 ? '-11' : 'FULL'); gauge(gx, 132, st >= 1 ? .08 + Math.min(.62, s * .3) : .08 + Math.sin(t * 5) * .02, st >= 1 ? 'AIR' : 'LOW');
+    if (st >= 1) { const h = Math.min(52, s * 60); R(g, 62, 74, 12, h + 2, '#120a0c'); R(g, 64, 74, 8, h, '#2a8a86'); R(g, 64, 74, 2, h, '#9ff2ea'); for (let i = 0; i < 4; i++) { const y = 76 + ((s * 50 + i * 14) % 50); if (y < 74 + h) R(g, 67, y, 2, 4, '#e8fffd'); } R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); if (h >= 52) { glow(g, 68, 132, 30, '79,214,208', .5); plate(g, 'A SLIVER. BALANCED BY DAWN.', Panels.narrow ? 160 : 230, 100); } }
     else { R(g, 56, 70, 24, 7, '#3a3a44'); R(g, 56, 70, 24, 2, '#6a6a78'); R(g, 64, 78, 8, 10, '#2a2a32'); }
   },
   // ---- Lift Zero opens: light, and three shapes in it, and a tier on its knees
@@ -106,12 +106,12 @@ const PANELS = {
     const { R, glow } = PX, op = Math.min(1, t / 2.2), w = 6 + op * 54;
     PX.plates(g, '#241c22');
     R(g, 84, 0, 152, 150, '#e4e2dc'); R(g, 84, 0, 4, 150, '#ffffff'); R(g, 232, 0, 4, 150, '#aaa8a4'); R(g, 84, 148, 152, 3, '#e8c25a'); R(g, 92, 0, 136, 148, '#101014');
-    R(g, 160 - w, 0, w * 2, 148, '#fff6dc'); glow(g, 160, 60, 150 * op + 20, '255,244,206', .8);
-    g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 9; i++) { const a = Math.PI / 2 + (i - 4) * .2 + Math.sin(t * .4 + i) * .02; g.fillStyle = `rgba(255,236,180,${.07 * op})`; g.beginPath(); g.moveTo(160, 40); g.lineTo(160 + Math.cos(a - .05) * 300, 40 + Math.sin(a - .05) * 300); g.lineTo(160 + Math.cos(a + .05) * 300, 40 + Math.sin(a + .05) * 300); g.fill(); } g.globalCompositeOperation = 'source-over';
+    R(g, 160 - w, 0, w * 2, 148, '#fff6dc'); glow(g, 160, 70, 90 * op + 20, '255,244,206', .3);
+    g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 9; i++) { const a = Math.PI / 2 + (i - 4) * .2 + Math.sin(t * .4 + i) * .02; g.fillStyle = `rgba(255,236,180,${.045 * op})`; g.beginPath(); g.moveTo(160, 40); g.lineTo(160 + Math.cos(a - .05) * 300, 40 + Math.sin(a - .05) * 300); g.lineTo(160 + Math.cos(a + .05) * 300, 40 + Math.sin(a + .05) * 300); g.fill(); } g.globalCompositeOperation = 'source-over';
     // door leaves sliding apart, gold trim
     R(g, 92, 0, 68 - w, 148, '#b8bcc8'); R(g, 160 + w, 0, 68 - w, 148, '#b8bcc8'); for (let x = 96; x < 160 - w; x += 8) R(g, x, 0, 2, 148, '#7a7e8a'); for (let x = 224; x > 160 + w; x -= 8) R(g, x, 0, 2, 148, '#7a7e8a'); R(g, 160 - w - 3, 0, 3, 148, '#e8c25a'); R(g, 160 + w, 0, 3, 148, '#e8c25a');
     // three figures, taller than anyone you know
-    if (op > .35) { const a = Math.min(1, (op - .35) * 2.2), sc = 3; g.globalAlpha = a; const cs = World.sheetFor('celestine'), ws = World.sheetFor('warden'); PX.spr(g, ws, 0, 122, 150, sc); PX.spr(g, ws, 0, 198, 150, sc); PX.spr(g, cs, 0, 160, 150, sc + 1); g.globalAlpha = 1; glow(g, 160, 60, 50, '255,236,180', .35 * a); }
+    if (op > .35) { const a = Math.min(1, (op - .35) * 2.2), sc = 3; g.globalAlpha = a; const cs = World.sheetFor('celestine'), ws = World.sheetFor('warden'); PX.spr(g, ws, 0, 122, 150, sc); PX.spr(g, ws, 0, 198, 150, sc); PX.spr(g, cs, 0, 160, 150, sc + 1); g.globalAlpha = 1; }
     for (let i = 0; i < 30; i++) { const x = 100 + hash(i, 7) * 120, y = 148 - ((t * (8 + i % 7) + hash(i, 8) * 150) % 150); R(g, x, y, 1, 1, 'rgba(255,246,214,.9)'); }
     // the tier, kneeling, backs to us
     R(g, 0, 150, 320, 30, '#0a0608'); for (let i = 0; i < 17; i++) { const x = 4 + i * 19 + (i % 2) * 4, y = 150 + (i % 3) * 3; g.fillStyle = '#0a0608'; g.beginPath(); g.arc(x + 8, y, 7, 0, 6.3); g.fill(); R(g, x - 2, y + 2, 20, 30, '#0a0608'); R(g, x + 4, y - 6, 8, 1, 'rgba(255,236,180,.35)'); }
@@ -160,7 +160,7 @@ const PANELS = {
     const rx = 152, ry = 100; g.strokeStyle = '#0c0808'; g.lineWidth = 8; g.beginPath(); g.ellipse(rx, ry, 10, 7, 0, 0, 6.3); g.stroke(); g.strokeStyle = '#3a2e22'; g.lineWidth = 5; g.stroke(); g.strokeStyle = '#8a6a34'; g.lineWidth = 1; g.beginPath(); g.ellipse(rx, ry - 1, 11, 8, 0, 3.6, 5.2); g.stroke();
     if (Math.sin(t * 1.4) > .93) { R(g, rx - 8, ry - 9, 1, 5, '#ffe9a8'); R(g, rx - 10, ry - 7, 5, 1, '#ffe9a8'); }
     // the invoice
-    if (st >= 1) { const a = Math.min(1, s / .6), ox = 20 - (1 - a) * 60; g.save(); g.translate(ox + 36, 120); g.rotate(-.12); R(g, -34, -52, 70, 96, '#141010'); R(g, -32, -50, 66, 92, '#e8e0cc'); R(g, -32, -20, 66, 1, '#b8b09c'); R(g, -32, 10, 66, 1, '#b8b09c'); ptext(g, 'COMMITMENT', -27, -44, '#2a2018'); ptext(g, 'FUEL', -27, -36, '#2a2018'); ptext(g, '14 SCRIP', -27, -14, '#c8452e'); ptext(g, 'DEDUCTED', -27, -4, '#2a2018'); ptext(g, 'FROM WAGES', -27, 2, '#2a2018'); ptext(g, 'GRATITUDE', -27, 18, '#7a6a50'); ptext(g, 'IS BREATH', -27, 26, '#7a6a50'); R(g, 6, -42, 20, 20, 'rgba(200,69,46,.25)'); R(g, 12, -36, 8, 8, 'rgba(200,69,46,.5)'); g.restore(); }
+    if (st >= 1) { const a = Math.min(1, s / .6), ox = (Panels.narrow ? 46 : 20) - (1 - a) * 60; g.save(); g.translate(ox + 36, 120); g.rotate(-.12); R(g, -34, -52, 70, 96, '#141010'); R(g, -32, -50, 66, 92, '#e8e0cc'); R(g, -32, -20, 66, 1, '#b8b09c'); R(g, -32, 10, 66, 1, '#b8b09c'); ptext(g, 'COMMITMENT', -27, -44, '#2a2018'); ptext(g, 'FUEL', -27, -36, '#2a2018'); ptext(g, '14 SCRIP', -27, -14, '#c8452e'); ptext(g, 'DEDUCTED', -27, -4, '#2a2018'); ptext(g, 'FROM WAGES', -27, 2, '#2a2018'); ptext(g, 'GRATITUDE', -27, 18, '#7a6a50'); ptext(g, 'IS BREATH', -27, 26, '#7a6a50'); R(g, 6, -42, 20, 20, 'rgba(200,69,46,.25)'); R(g, 12, -36, 8, 8, 'rgba(200,69,46,.5)'); g.restore(); }
     g.restore();
   }
 };

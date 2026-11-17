@@ -63,7 +63,7 @@ const Dialogue = {
     box.querySelector('.nm').style.color = sp && sp.acc ? '#ffe9a8' : '';
     box.querySelector('.nm').textContent = sp ? sp.name : '';
     box.querySelector('.nm').style.display = sp ? '' : 'none';
-    this.full = fill(st.t); this.shown = Settings.d.speed === 3 ? this.full.length : 0; this.cur = st;
+    this.full = fill(st.t); this.shown = Settings.d.speed === 3 ? this.full.length : 0; this.cur = st; this.bust = sp && !CAST[st.s === 'you' ? 'kael' : st.s].look().warden ? sp.bust : null; this.bdy = sp && CAST[st.s === 'you' ? 'kael' : st.s].look().kid ? 3 : 0; this.mouth = 0;
     box.querySelector('.choices').innerHTML = '';
     G.log.push((sp ? sp.name + ': ' : '') + this.full); if (G.log.length > 120) G.log.shift();
     this.render();
@@ -81,7 +81,7 @@ const Dialogue = {
   hl() { [...$('#dlg .choices').children].forEach((b, i) => b.classList.toggle('sel', i === this.sel)); },
   pick() { const c = this.choices[this.sel]; Sound.play('ok'); G.log.push('> ' + fill(c.t)); this.choices = null; $('#dlg .choices').innerHTML = ''; if (c.fx) c.fx(); if (c.then) this.stack.push({ a: c.then, i: 0 }); this.next(); },
   render() { const tx = $('#dlg .tx'); const done = this.shown >= this.full.length; tx.innerHTML = esc(this.full.slice(0, Math.floor(this.shown))) + (done ? ' <span class="more">▼</span>' : ''); },
-  advance() { if (this.choices) return; if (this.shown < this.full.length) { this.shown = this.full.length; this.render(); } else { Sound.play('blip'); this.next(); } },
+  advance() { if (this.choices) return; if (this.shown < this.full.length) { this.shown = this.full.length; this.render(); if (this.bust && this.mouth) { this.mouth = 0; $('#dlg canvas').getContext('2d').drawImage(this.bust, 0, 0); } } else { Sound.play('blip'); this.next(); } },
   update(dt) {
     if (this.choices) {
       if (Input.rep('up')) { this.sel = (this.sel + this.choices.length - 1) % this.choices.length; this.hl(); Sound.play('move'); }
@@ -92,8 +92,10 @@ const Dialogue = {
     if (this.shown < this.full.length) {
       const cps = [28, 55, 110, 9999][Settings.d.speed] || 55; const before = Math.floor(this.shown);
       this.shown = Math.min(this.full.length, this.shown + cps * dt);
+      if (this.bust && !Settings.d.reduce) { const open = this.shown < this.full.length && Math.floor(G.time * 9) % 2 ? 1 : 0; if (open !== this.mouth) { this.mouth = open; const g2 = $('#dlg canvas').getContext('2d'); g2.drawImage(this.bust, 0, 0); if (open) { g2.fillStyle = '#2a0e12'; g2.fillRect(14, 19 + this.bdy, 4, 2); g2.fillStyle = '#7a3a34'; g2.fillRect(14, 21 + this.bdy, 4, 1); } } }
       if (Math.floor(this.shown) !== before) { this.render(); this.blipT -= 1; if (this.blipT <= 0 && this.cur && this.cur.s !== 'narr') { Sound.play('blip'); this.blipT = 3; } }
     }
+    else if (this.mouth && this.bust) { this.mouth = 0; $('#dlg canvas').getContext('2d').drawImage(this.bust, 0, 0); }
     if (Input.p('A') || Input.p('B')) this.advance();
   }
 };
@@ -257,7 +259,7 @@ const World = {
   interact(t) {
     G.flags.interacted = 1; HUD.dirty = true;
     if (G.heist === 2) { if (t.id === 'pillarFest') { Game.onFestDone(); return; } Dialogue.start(t.kind === 'npc' && !t.n.patrol ? FEST_WHISPER(t.id) : [narr('Not now. The Pillar. Top hook.')]); return; }
-    if (G.heist) { if (t.id === 'relay') { if (G.flags.relayCut) { Dialogue.start([narr('The relay is dead. The audit gauge is frozen on a lie.')]); return; } G.flags.relayCut = 1; Sound.play('rotate'); Dialogue.start([narr('You pry the panel and pull the audit fuse. The needle on the relay freezes mid-twitch.'), say('kael', 'There. For the next hour, the Authority thinks Bank Seven is the most boring bank in Cinderwell.'), narr('Checkpoint: if you are seen now, you will start back here.')]); return; }
+    if (G.heist) { if (t.id === 'relay') { if (G.flags.relayCut) { Dialogue.start([narr('The relay is dead. The audit gauge is frozen on a lie.')]); return; } G.flags.relayCut = 1; Sound.play('rotate'); { const pr = this.npcs.find(n => n.id === 'proctor'); if (pr) { pr.wander = HEIST_LANE_N; pr.wi = 0; pr.wait = 0.2; } } this.grace = 3; Dialogue.start([narr('You pry the panel and pull the audit fuse. The needle on the relay freezes mid-twitch.'), say('kael', 'There. For the next hour, the Authority thinks Bank Seven is the most boring bank in Cinderwell.'), narr('The click carries. Across the bay, the Night Proctor stops, listens, and turns north. He is going to walk the valve wall now. Right past Bank Seven.'), narr('Checkpoint: if you are seen now, you will start back here.')]); return; }
       if (t.id === 'valves') { if (!G.flags.relayCut) { Dialogue.start([say('kael', "(Not yet. The audit relay on the east wall will log any twitch on this bank. Cut it first.)")]); return; } Puzzle.open([HEIST_PUZZLE], Game.onHeistDone); return; } Dialogue.start([t.id === 'seren' ? say('seren', "Go. I've got the door. If his lantern turns your way, freeze, or get behind something solid.") : narr('Not now. Bank Seven. Before the lantern comes back around.')]); return; }
     if (t.kind === 'npc') { const n = t.n; n.dir = Math.abs(P.x - n.x) > Math.abs(P.y - n.y) ? (P.x < n.x ? 2 : 3) : (P.y < n.y ? 1 : 0); n.face = 2.5; Dialogue.start(TALK[t.id](), () => this.afterBeat()); }
     else { const s = HOT[t.id](); Dialogue.start(s, () => this.afterBeat()); }
@@ -273,7 +275,7 @@ const World = {
       if (Math.abs(vx) > Math.abs(vy)) P.dir = vx < 0 ? 2 : 3; else if (Math.abs(vy) > Math.abs(vx)) P.dir = vy < 0 ? 1 : 0; else if (!((P.dir === 2 && vx < 0) || (P.dir === 3 && vx > 0) || (P.dir === 1 && vy < 0) || (P.dir === 0 && vy > 0))) P.dir = vy < 0 ? 1 : 0;
       const sp = 74 * dt, nx = P.x + vx * sp, ny = P.y + vy * sp;
       if (!this.boxHits(nx, P.y)) P.x = nx; if (!this.boxHits(P.x, ny)) P.y = ny;
-      P.anim += dt; P.moved += sp; P.stepT = (P.stepT || 0) + dt; if (P.stepT > 0.3) { P.stepT = 0; Sound.play(this.tileAt(P.x, P.y - 2) === ',' ? 'stepg' : 'step'); }
+      P.anim += dt; P.moved += sp; P.stepT = (P.stepT || 0) + dt; if (P.stepT > 0.3) { P.stepT = 0; Sound.play(this.tileAt(P.x, P.y - 2) === ',' ? 'stepg' : 'step'); if (!Settings.d.reduce) for (let i = 0; i < 2; i++) this.parts.push({ x: P.x - 3 + Math.random() * 6, y: P.y, v: 4 + Math.random() * 5, s: Math.random() * 6, c: '#7a6a60', steam: 1, life: 0.5 }); }
     } else P.anim = 0;
     if (G.heist) { this.heistCheck(dt); if (this.caughtT > 0) return; this.boltCd = (this.boltCd || 0) - dt; if (Input.p('B') && this.boltCd <= 0) this.throwBolt(); const t = this.target = this.findTarget(), hold = t && ((G.heist === 1 && t.id === 'relay' && !G.flags.relayCut) || (G.heist === 2 && t.id === 'pillarFest'));
       if (hold) { if (Input.h('A') && !P.moving) { const w0 = this.work || 0; this.work = w0 + dt; if (Math.floor(this.work * 5) !== Math.floor(w0 * 5)) Sound.play('rotate'); if (this.work >= WORK_T) { this.work = 0; this.interact(t); } } else this.work = Math.max(0, (this.work || 0) - dt * 0.6); }
@@ -340,10 +342,10 @@ const World = {
   heistCheck(dt) {
     if (this.bolt) { this.bolt.t += dt / 0.45; if (this.bolt.t >= 1) { const b = this.bolt; this.bolt = null; this.boltLand(b); } }
     if (this.ripple) { this.ripple.t += dt; if (this.ripple.t > 0.7) this.ripple = null; }
-    if (this.caughtT > 0) { if (Dialogue.active) return; this.caughtT -= dt; if (this.caughtT <= 0) { if (G.heist === 2) { P.x = 7 * 16 + 8; P.y = 13 * 16 + 4; P.dir = 1; } else if (G.flags.relayCut) { P.x = 20 * 16 + 8; P.y = 9 * 16 + 4; P.dir = 1; } else { P.x = 24; P.y = 7 * 16 + 4; P.dir = 3; } Game.resetHeist(); } return; }
+    if (this.caughtT > 0) { if (Dialogue.active) return; this.caughtT -= dt; if (this.caughtT <= 0) { if (G.heist === 2) { P.x = 7 * 16 + 8; P.y = 13 * 16 + 4; P.dir = 1; } else if (G.flags.relayCut) { P.x = 20 * 16 + 8; P.y = 6 * 16 + 4; P.dir = 2; } else { P.x = 24; P.y = 7 * 16 + 4; P.dir = 3; } Game.resetHeist(); } return; }
     this.dynLights = this.npcs.filter(n => n.patrol).map(n => { const a = n.ang === undefined ? DIRA[n.dir] : n.ang; return { x: n.x + Math.cos(a) * 14, y: n.y - 6 + Math.sin(a) * 14, r: 46, c: '#ffd070' }; });
-    let seen = 0, by = null;
-    for (const n of this.npcs) if (n.patrol && this.seesPlayer(n)) { const d = Math.hypot(P.x - n.x, P.y - 4 - (n.y - 6)), k = d < 14 ? 99 : 1.5 + (72 - d) / 72 * 2.8; if (k > seen) { seen = k; by = n; } }
+    let seen = 0, by = null; if (this.grace > 0) this.grace -= dt;
+    for (const n of this.npcs) if (n.patrol && !(this.grace > 0) && this.seesPlayer(n)) { const d = Math.hypot(P.x - n.x, P.y - 4 - (n.y - 6)), k = d < 14 ? 99 : 1.5 + (72 - d) / 72 * 2.8; if (k > seen) { seen = k; by = n; } }
     if (seen) { this.alert = Math.min(1, (this.alert || 0) + seen * (G.flags.heistEase ? .6 : 1) * dt); this.alertPeak = Math.max(this.alertPeak || 0, this.alert); this.seenBy = by; this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = 0.32; } }
     else if (this.alert > 0) { this.alert = Math.max(0, this.alert - dt * 0.9); if (this.alert === 0) { if (this.alertPeak > 0.4) { G.flags.closeCalls = (G.flags.closeCalls | 0) + 1; HUD.toast(G.heist === 1 ? ['Seren: "Close. Too close."', 'Seren: "Breathe. He didn\'t see."', 'Seren: "Stop showing off."'][G.flags.closeCalls % 3] : ['Ivo: "I felt that from here."', 'Tavi: "...Kael!"', 'Close call'][G.flags.closeCalls % 3]); Sound.play('back'); } this.alertPeak = 0; this.seenBy = null; } }
     for (const n of this.npcs) if (n === by && this.alert >= 1) {
@@ -366,11 +368,12 @@ const World = {
       if (hot > 0.15) ptext(g, hot > 0.6 ? '!' : '?', Math.round(n.x - cx) - 1, Math.round(n.y - cy) - 32, hot > 0.6 ? '#ff5a4a' : '#ffe08a', 2);
     }
     // the eye over Kael's head: how close he is to being made
+    if (this.grace > 0 && Math.floor(t * 8) % 2) { g.fillStyle = 'rgba(160,240,230,.5)'; g.fillRect(Math.round(P.x - cx) - 7, Math.round(P.y - cy) + 1, 14, 1); }
     if (this.alert > 0.02) { const x = Math.round(P.x - cx), y = Math.round(P.y - cy) - 27, a = this.alert; g.fillStyle = '#120a0e'; g.fillRect(x - 9, y - 1, 18, 5); g.fillStyle = '#3a2a24'; g.fillRect(x - 8, y, 16, 3); g.fillStyle = a > 0.6 ? '#ff5a4a' : '#ffb35a'; g.fillRect(x - 8, y, Math.round(16 * a), 3); if (!Settings.d.reduce) { g.fillStyle = `rgba(160,10,10,${a * 0.22})`; g.fillRect(0, 0, W, H); } }
     // hold-to-work progress
     if (this.work > 0 && this.target) { const x = Math.round(this.target.x - cx), y = Math.round(this.target.y - cy) - 8, k = Math.min(1, this.work / WORK_T); g.fillStyle = '#120a0e'; g.fillRect(x - 13, y - 1, 26, 6); g.fillStyle = '#3a2a24'; g.fillRect(x - 12, y, 24, 4); g.fillStyle = '#7cf27c'; g.fillRect(x - 12, y, Math.round(24 * k), 4); }
   },
-  snapCam(hard) { const m = this.map; if (Cutscene.active) { const mw = m.w * 16, mh = m.h * 16, c = Cutscene.cam; this.cam.x = mw <= W ? (mw - W) / 2 : clamp(c.x - W / 2, 0, mw - W); this.cam.y = mh <= H ? (mh - H) / 2 : clamp(c.y - H / 2, 0, mh - H); if (Cutscene.shake && !Settings.d.reduce) { this.cam.x += (Math.random() - .5) * 4 * Cutscene.shake; this.cam.y += (Math.random() - .5) * 4 * Cutscene.shake; } return; } const mw = m.w * 16, mh = m.h * 16, tx = mw <= W ? (mw - W) / 2 : clamp(P.x - W / 2, 0, mw - W), ty = mh <= H ? (mh - H) / 2 : clamp(P.y - 8 - H / 2, 0, mh - H); if (hard || this.camHard || Math.abs(tx - this.cam.x) > 90 || Math.abs(ty - this.cam.y) > 90 || Settings.d.reduce) { this.cam.x = tx; this.cam.y = ty; this.camHard = false; } else { this.cam.x += (tx - this.cam.x) * 0.16; this.cam.y += (ty - this.cam.y) * 0.16; if (Math.abs(tx - this.cam.x) < 0.5) this.cam.x = tx; if (Math.abs(ty - this.cam.y) < 0.5) this.cam.y = ty; } },
+  snapCam(hard) { const m = this.map; if (Cutscene.active) { const mw = m.w * 16, mh = m.h * 16, c = Cutscene.cam, up = this.land ? H * 0.11 : 0; /* keep the action above the dialogue box */ this.cam.x = mw <= W ? (mw - W) / 2 : clamp(c.x - W / 2, 0, mw - W); this.cam.y = mh <= H ? (mh - H) / 2 + (mh <= H * .8 ? up : 0) : clamp(c.y + up - H / 2, 0, mh - H); if (Cutscene.shake && !Settings.d.reduce) { this.cam.x += (Math.random() - .5) * 4 * Cutscene.shake; this.cam.y += (Math.random() - .5) * 4 * Cutscene.shake; } return; } const mw = m.w * 16, mh = m.h * 16, tx = mw <= W ? (mw - W) / 2 : clamp(P.x - W / 2, 0, mw - W), ty = mh <= H ? (mh - H) / 2 : clamp(P.y - 8 - H / 2, 0, mh - H); if (hard || this.camHard || Math.abs(tx - this.cam.x) > 90 || Math.abs(ty - this.cam.y) > 90 || Settings.d.reduce) { this.cam.x = tx; this.cam.y = ty; this.camHard = false; } else { this.cam.x += (tx - this.cam.x) * 0.16; this.cam.y += (ty - this.cam.y) * 0.16; if (Math.abs(tx - this.cam.x) < 0.5) this.cam.x = tx; if (Math.abs(ty - this.cam.y) < 0.5) this.cam.y = ty; } },
   render(g, t) {
     const m = this.map; this.snapCam(); const cx = Math.round(this.cam.x), cy = Math.round(this.cam.y), rm = Settings.d.reduce;
     g.fillStyle = '#0b0709'; g.fillRect(0, 0, W, H);
@@ -399,11 +402,15 @@ const World = {
     if (G.mapId === 'apt') { if (Math.floor(t * 1.2) % 2) { g.fillStyle = '#ffd070'; g.fillRect(8 * 16 + 10 - cx, 16 + 5 - cy, 3, 2); } }
     // entities sorted by y
     let ents;
-    if (Cutscene.active) ents = Cutscene.actors.map(a => ({ x: a.x, y: a.y, dir: a.dir, f: a.moving ? 1 + (Math.floor(a.anim * 6) % 2) : 0, sheet: a.sheet }));
+    if (Cutscene.active) ents = Cutscene.actors.map(a => ({ x: a.x, y: a.y, dir: a.dir, f: a.moving ? 1 + (Math.floor(a.anim * 6) % 2) : 0, sheet: a.sheet, kn: a.kn || 0, hop: a.hop > 0 ? Math.sin(a.hop / 0.3 * Math.PI) * 4 : 0, emote: a.emote }));
     else { ents = this.npcs.map(n => ({ x: n.x, y: n.y, dir: n.vdir === undefined ? n.dir : n.vdir, f: n.moving ? 1 + (Math.floor(n.anim * 6) % 2) : 0, sheet: this.sheetFor(n.id) }));
       ents.push({ x: P.x, y: P.y, dir: P.dir, f: P.moving ? 1 + (Math.floor(P.anim * 8) % 2) : 0, sheet: P.sheet, me: 1 }); }
     ents.sort((a, b) => a.y - b.y);
-    for (const e of ents) { const fh = e.sheet.fh || 16, sx = Math.round(e.x - 8 - cx), sy = Math.round(e.y - fh + 1 - cy); g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(sx + 2, sy + fh - 2, 12, 2); g.fillRect(sx + 4, sy + fh - 3, 8, 4); g.fillRect(sx + 3, sy + fh, 10, 1); const br = !e.f && !rm && ((t * 0.9 + e.x * 0.07) % 2.4) < 0.35 ? 1 : 0; g.drawImage(e.sheet, e.f * 16, e.dir * fh, 16, fh - br, sx, sy + br - (e.f === 1 && !rm ? 1 : 0), 16, fh - br); }
+    this.land = !document.body.classList.contains('portrait');
+    for (const e of ents) { const fh = e.sheet.fh || 16, sx = Math.round(e.x - 8 - cx), sy = Math.round(e.y - fh + 1 - cy); if (!e.f && !rm && e.sheet.width >= 64 && ((t * 1.1 + e.x * 0.137 + e.y * 0.071) % 3.9) < 0.13) e.f = 3; g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(sx + 2, sy + fh - 2, 12, 2); g.fillRect(sx + 4, sy + fh - 3, 8, 4); g.fillRect(sx + 3, sy + fh, 10, 1); const br = !e.f && !rm && ((t * 0.9 + e.x * 0.07) % 2.4) < 0.35 ? 1 : 0; const kn = Math.round(e.kn || 0), hp = Math.round(e.hop || 0); g.drawImage(e.sheet, e.f * 16, e.dir * fh, 16, fh - br - kn, sx, sy + br + kn - hp - (e.f === 1 && !rm ? 1 : 0), 16, fh - br - kn);
+      if (e.emote) { const bx = sx + 8, by = sy + kn - 12 - Math.round(Math.min(1, (1.5 - e.emote.life) * 8) * 2), tx = e.emote.t; g.fillStyle = '#120a0e'; g.fillRect(bx - 7, by - 1, 15, 11); g.fillStyle = '#f3e3c3'; g.fillRect(bx - 6, by, 13, 9); g.fillRect(bx - 1, by + 9, 3, 2);
+        if (tx === 'heart') { g.fillStyle = '#c8452e'; g.fillRect(bx - 3, by + 2, 3, 3); g.fillRect(bx + 1, by + 2, 3, 3); g.fillRect(bx - 2, by + 4, 5, 2); g.fillRect(bx - 1, by + 6, 3, 1); g.fillRect(bx, by + 7, 1, 1); g.fillStyle = '#f0a090'; g.fillRect(bx - 3, by + 2, 1, 1); }
+        else ptext(g, tx, bx - Math.floor(ptextW(tx) / 2), by + 2, tx === '!' ? '#c8452e' : '#2a1408'); } }
     // overhead: laundry and chains hang above everyone
     for (const [x0, y0, x1, y1] of m.overhead || []) { const ax = x0 * 16 - cx, ay = y0 * 16 - cy, bx = x1 * 16 - cx, by = y1 * 16 - cy, sw = rm ? 0 : Math.sin(t * 1.4 + x0) * 1.5;
       g.strokeStyle = '#1a1214'; g.lineWidth = 1; g.beginPath(); g.moveTo(ax, ay); g.quadraticCurveTo((ax + bx) / 2, (ay + by) / 2 + 8, bx, by); g.stroke();
@@ -421,10 +428,16 @@ const World = {
       if (glitch) { g.fillStyle = 'rgba(160,240,255,.5)'; g.fillRect(x, y + (Math.random() * 10 | 0), w, 1); } }
     // steam from floor vents
     if (!rm) for (const p of m.props) if (p.t === 'vent' && Math.random() < 0.25) this.parts.push({ x: p.x * 16 + 4 + Math.random() * 8, y: p.y * 16 + 8, v: 10 + Math.random() * 8, s: Math.random() * 6, c: '#8a8a90', steam: 1, life: 1.4 });
+    if (!rm && !Cutscene.active) {
+      for (const p of m.props) { if (p.t === 'pipes' && Math.random() < 0.004 * (p.w || 1)) this.parts.push({ x: p.x * 16 + 4 + Math.random() * ((p.w || 1) * 16 - 8), y: p.y * 16 + 12, v: -34, s: 0, c: '#8ac0d0', drip: 1, life: 0.42 }); else if (p.t === 'stall' && Math.random() < 0.2) this.parts.push({ x: p.x * 16 + 7 + Math.random() * 4, y: p.y * 16 - 2, v: 9 + Math.random() * 6, s: Math.random() * 6, c: '#c8c8d0', steam: 1, life: 1.1 }); }
+      // a rat along the south wall, now and then
+      if (!this.rat && !G.heist && (G.mapId === 'square' || G.mapId === 'tunnel' || G.mapId === 'bay') && Math.random() < 0.0016) { const d = Math.random() < .5 ? 1 : -1; this.rat = { x: d > 0 ? cx - 8 : cx + W + 8, y: (m.h - 2) * 16 + 11, d, map: G.mapId }; }
+      if (this.rat) { const r = this.rat; r.x += r.d * 1.5; const X = Math.round(r.x - cx), Y = Math.round(r.y - cy) - (Math.floor(r.x / 5) % 2); if (r.map !== G.mapId || r.x < cx - 20 || r.x > cx + W + 20) this.rat = null; else { g.fillStyle = '#2a2024'; g.fillRect(X - 3, Y - 2, 6, 3); g.fillRect(X + (r.d > 0 ? 2 : -4), Y - 3, 2, 2); g.fillStyle = '#4a3a3e'; g.fillRect(X - 2, Y - 2, 4, 1); g.fillStyle = '#6a4a4a'; g.fillRect(X + (r.d > 0 ? -6 : 3), Y - 1, 3, 1); } }
+    }
     // particles: embers in bay, dust elsewhere
-    if (!rm) { if (this.parts.filter(p => !p.soot && !p.steam).length < (G.mapId === 'bay' ? 26 : 12)) this.parts.push({ x: cx + Math.random() * W, y: cy + H + 4, v: 6 + Math.random() * 10, s: Math.random() * 6, c: G.mapId === 'bay' ? '#ff8a40' : '#8a7a70' });
+    if (!rm) { if (this.parts.filter(p => !p.soot && !p.steam && !p.drip).length < (G.mapId === 'bay' ? 26 : 12)) this.parts.push({ x: cx + Math.random() * W, y: cy + H + 4, v: 6 + Math.random() * 10, s: Math.random() * 6, c: G.mapId === 'bay' ? '#ff8a40' : '#8a7a70' });
       if (Math.random() < 0.35) this.parts.push({ x: cx + Math.random() * W, y: cy - 2, v: -(5 + Math.random() * 6), s: Math.random() * 6, c: '#3a3436', soot: 1 });
-      for (const p of this.parts) { p.y -= p.v / 60; p.x += Math.sin(t * 1.5 + p.s) * (p.soot ? .3 : .15); if (p.life !== undefined) p.life -= 1 / 60; g.fillStyle = p.c; g.globalAlpha = p.steam ? Math.max(0, p.life) * .3 : p.soot ? .7 : .55; const sz = p.steam ? 3 : 1; g.fillRect(Math.round(p.x - cx), Math.round(p.y - cy), sz, sz); g.globalAlpha = 1; }
+      for (const p of this.parts) { p.y -= p.v / 60; p.x += Math.sin(t * 1.5 + p.s) * (p.soot ? .3 : .15); if (p.life !== undefined) p.life -= 1 / 60; g.fillStyle = p.c; g.globalAlpha = p.drip ? .8 : p.steam ? Math.max(0, p.life) * .3 : p.soot ? .7 : .55; const sz = p.steam ? 3 : 1; g.fillRect(Math.round(p.x - cx), Math.round(p.y - cy), p.drip ? 1 : sz, p.drip ? 2 : sz); g.globalAlpha = 1; }
       this.parts = this.parts.filter(p => p.y > cy - 6 && p.y < cy + H + 8 && (p.life === undefined || p.life > 0)).slice(-120); }
     if (G.mapId === 'tunnel') { const off = rm ? 0 : ((t * 12) | 0) % 6; g.fillStyle = 'rgba(255,240,180,.5)'; for (let i = off; i < 40; i += 6) g.fillRect(23 * 16 + 12 + (i * 7) % 10 - cx, 16 + 10 + i - cy, 1, 2); }
     Light.draw(g, m, cx, cy, t);
@@ -455,7 +468,7 @@ const Light = {
     lg.globalCompositeOperation = 'source-over'; lg.clearRect(0, 0, W, H); lg.fillStyle = (Cutscene.active && Cutscene.dark) || World.darkOverride || m.dark; lg.fillRect(0, 0, W, H);
     lg.globalCompositeOperation = 'destination-out';
     const all = (Cutscene.active ? m.lights : m.lights.concat([{ x: P.x, y: P.y - 8, r: G.heist === 2 ? 36 : G.heist ? 26 : 44 }])).concat(World.dynLights || []);
-    for (const L of all) { const fl = rm ? 1 : L.furnace ? 1 + Math.sin(t * 7) * .04 + Math.random() * .03 : L.pillar ? 1 + Math.sin(t * 1.3) * .05 : 1;
+    for (const L of all) { const fl = rm ? 1 : L.furnace ? 1 + Math.sin(t * 7) * .04 + Math.random() * .03 : L.pillar ? 1 + Math.sin(t * 1.3) * .05 : 1 + Math.sin(t * 5.3 + L.x * .7) * .018 + (Math.sin(t * 1.7 + L.y) > .985 ? -.07 : 0);
       const x = L.x - cx, y = L.y - cy, r = L.r * fl; if (x < -r || y < -r || x > W + r || y > H + r) continue;
       const gr = lg.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.55, 'rgba(0,0,0,.65)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); lg.fillStyle = gr; lg.fillRect(x - r, y - r, r * 2, r * 2); }
     g.drawImage(this.c, 0, 0);
