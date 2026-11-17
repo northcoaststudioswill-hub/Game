@@ -16,6 +16,11 @@
     heartQueue: [],
   };
   G.save = function () { store.set('starhaven.save.v1', G.progress); };
+
+  // What Wren can do in this chapter. Mortal in the Winter Woods: one jump, no dash, a bow instead of daggers.
+  const ABILITIES = { double: true, dash: true, daggers: true, bow: false };
+  G.can = name => { const ch = G.chapterDef(); const a = Object.assign({}, ABILITIES, ch && ch.abilities); return !!a[name]; };
+  Object.defineProperty(G, 'mortal', { get: () => !!(G.chapterDef() && G.chapterDef().mortal) });
   G.chapterDef = () => ST.CHAPTERS[G.chapter];
 
   // ---------------------------------------------------------------- building a room
@@ -45,6 +50,9 @@
         fx.ring(player.x, player.y - 20, '#9fe8ff', 44, 22, 2);
       },
       onKnockout() { G.knockout(); },
+      arrows: [],
+      spawnArrow(x, y, dir) { this.arrows.push({ x, y, vx: dir * 8, vy: -0.5, life: 110, stuck: false }); },
+      onStagDown() { G.queueScript('woods_kill'); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
@@ -53,6 +61,7 @@
     G.snapCamera();
     G.hud.hearts(player.hearts, player.maxHearts);
     G.hud.prompt(null); G.hud.talkButton(null);
+    G.hud.abilities();
     return w;
   };
 
@@ -94,7 +103,7 @@
   };
 
   G.knownPeople = function () {
-    const ids = new Set(ST.KNOWN_FROM.prologue);
+    const ids = new Set();
     for (let i = 0; i <= G.chapter; i++) (ST.KNOWN_FROM[ST.CHAPTERS[i].id] || []).forEach(x => ids.add(x));
     G.progress.met.forEach(x => ids.add(x));
     return ST.PEOPLE.filter(p => ids.has(p.id));
@@ -165,6 +174,7 @@
       case 'meet': G.meet(st.who); break;
       case 'bond': G.bond(st.who, st.pts); break;
       case 'art': G.hud.sceneArt(st.id, st.title); break;
+      case 'cue': G.hud.sceneCue(st.name); break;
       case 'goto': { const sc = G.script; sc.steps = sc.steps.slice(0, sc.i).concat(ST.SCRIPTS[st.id], sc.steps.slice(sc.i)); break; }
       case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
@@ -241,6 +251,20 @@
     const painting = G.paintStep();
     if (!painting) p.update(w);
     for (const e of w.things) e.update(w);
+    // arrows fly, drop a little, stick in the ground, and bring down the stag
+    for (const a of w.arrows) {
+      a.life--;
+      if (a.stuck) continue;
+      a.vy += 0.05; a.x += a.vx; a.y += a.vy;
+      const tile = w.room.get(Math.floor(a.x / TS), Math.floor(a.y / TS));
+      if (tile === SH.T_SOLID) { a.stuck = true; a.life = Math.min(a.life, 60); continue; }
+      for (const e of w.things) {
+        if (!e.arrowOnly || !e.hittable()) continue;
+        const hb = e.hurtBox();
+        if (a.x > hb.l && a.x < hb.r && a.y > hb.t && a.y < hb.b) { e.takeHit({ arrow: true, dir: Math.sign(a.vx) }, w); a.life = 0; break; }
+      }
+    }
+    w.arrows = w.arrows.filter(a => a.life > 0);
 
     // thorns and pits
     const b = p.box();
@@ -419,7 +443,6 @@
   G.menuInput = function () {
     const go = () => input.take('jump') || input.take('attack');
     if (G.state === 'title') { if (go()) G.hud.titlePrimary(); }
-    else if (G.state === 'cutscene') { if (go()) G.hud.cutNext(); }
     else if (G.state === 'card') { if (go()) G.hud.cardGo(); }
     else if (G.state === 'pause') { if (input.take('pause')) G.resume(); }
   };
@@ -427,8 +450,7 @@
   G.newGame = function () {
     G.progress = { reached: 0, bonds: {}, met: [] }; G.save();
     G.hud.title(false);
-    G.state = 'cutscene';
-    G.hud.cutscene(ST.INTRO, () => G.startChapter(0));
+    G.startChapter(0);
   };
 
   // ---------------------------------------------------------------- screen size
@@ -451,10 +473,11 @@
     load(chapterOrRoom, opts) {
       opts = opts || {};
       G.frozen = true; input.forced = { held: {}, pressed: {} };
-      G.hud.title(false); G.hud.cutscene(null);
+      G.hud.title(false);
       if (typeof chapterOrRoom === 'number') { G.startChapter(chapterOrRoom); G.hud.cardGo(); }
       else {
-        G.chapter = 0; G.flags = { combo: true, pit: true, arrive: true }; G.activeGoal = null; G.script = null; G.pending = null;
+        const ci = ST.CHAPTERS.findIndex(c => c.room === chapterOrRoom);
+        G.chapter = ci >= 0 ? ci : ST.CHAPTERS.length - 1; G.flags = { combo: true, pit: true, arrive: true }; G.activeGoal = null; G.script = null; G.pending = null;
         fx.reset(); G.build(chapterOrRoom);
         const w = G.world;
         for (const g of w.gates) w.room.setGate(g, false);

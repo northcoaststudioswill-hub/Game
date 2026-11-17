@@ -10,7 +10,7 @@
       facing: 1, grounded: false, wasGrounded: false,
       coyote: 0, jumpBuf: 0, dashBuf: 0, atkBuf: 0,
       airJumps: 1, airDashes: 1, rising: false,
-      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0,
+      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, bowCd: 0, bowT: 0,
       invuln: 0, stun: 0,
       swing: null, comboStep: 0, comboKind: null, comboGap: 0,
       hearts: P.hearts, maxHearts: P.hearts,
@@ -39,8 +39,10 @@
     // ---- buffers
     if (inp.pressed.jump) this.jumpBuf = t.jumpBufferFrames; else if (this.jumpBuf > 0) this.jumpBuf--;
     if (inp.pressed.dash) this.dashBuf = 6; else if (this.dashBuf > 0) this.dashBuf--;
-    if (inp.pressed.attack) this.atkBuf = C.attackBuffer; else if (this.atkBuf > 0) this.atkBuf--;
+    if (inp.pressed.attack || inp.pressed.downstrike) this.atkBuf = C.attackBuffer; else if (this.atkBuf > 0) this.atkBuf--;
     if (this.dashCd > 0) this.dashCd--;
+    if (this.bowCd > 0) this.bowCd--;
+    if (this.bowT > 0) this.bowT--;
     if (this.iframes > 0) this.iframes--;
     if (this.invuln > 0) this.invuln--;
     if (this.comboGap > 0) this.comboGap--; else if (!this.swing) this.comboStep = 0;
@@ -49,11 +51,13 @@
     const stunned = this.stun > 0;
     if (stunned) this.stun--;
 
-    if (this.grounded) { this.coyote = t.coyoteFrames; this.airJumps = 1; this.airDashes = 1; }
+    // Mortal Wren (the Winter Woods) has one jump and no dash; the fae body brings the rest.
+    const can = SH.game.can;
+    if (this.grounded) { this.coyote = t.coyoteFrames; this.airJumps = can('double') ? 1 : 0; this.airDashes = 1; }
     else if (this.coyote > 0) this.coyote--;
 
     // ---- dash start
-    if (!stunned && this.dashT <= 0 && this.dashBuf > 0 && this.dashCd <= 0 && (this.grounded || this.airDashes > 0)) {
+    if (!stunned && this.dashT <= 0 && this.dashBuf > 0 && this.dashCd <= 0 && can('dash') && (this.grounded || this.airDashes > 0)) {
       this.dashBuf = 0;
       if (!this.grounded) this.airDashes--;
       this.dashDir = dir !== 0 ? dir : this.facing;
@@ -178,11 +182,19 @@
 
   Player.prototype.tryAttack = function (world, inp) {
     if (this.atkBuf <= 0) return;
+    if (!SH.game.can('daggers')) { // the hunting bow: one arrow, straight ahead
+      if (SH.game.can('bow') && this.bowCd <= 0 && this.grounded) {
+        this.atkBuf = 0; this.bowCd = 30; this.bowT = 16; this.vx = 0;
+        const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
+        world.spawnArrow(this.x + this.facing * 12, this.y - 27, this.facing);
+      }
+      return;
+    }
     const C = SH.COMBAT;
     let kind, step;
     // On touch, a strike in the air aims down by itself when there's something to bounce on below (doc: auto-aim on phones).
     const autoDown = !this.grounded && !inp.held.down && SH.input.source === 'touch' && SH.settings.autoDown && this.somethingBelow(world);
-    if (!this.grounded && (inp.held.down || autoDown)) { kind = 'pogo'; step = 0; }
+    if (!this.grounded && (inp.held.down || inp.pressed.downstrike || autoDown)) { kind = 'pogo'; step = 0; }
     else {
       kind = this.grounded ? 'ground' : 'air';
       const list = C[kind];
@@ -206,7 +218,7 @@
     for (const t of world.targets) {
       if (!t.hittable() || t.kind === 'dummy') continue;
       const hb = t.hurtBox(), cx = (hb.l + hb.r) / 2, cy = (hb.t + hb.b) / 2;
-      if (Math.abs(cx - this.x) < 34 && cy > this.y - 6 && cy < this.y + 84) return true;
+      if (Math.abs(cx - this.x) < 46 && cy > this.y - 14 && cy < this.y + 110) return true;
     }
     const TS = SH.TILE, tx = Math.floor(this.x / TS);
     for (let d = 0; d < 4; d++) {
@@ -219,7 +231,7 @@
 
   Player.prototype.swingBox = function () {
     const s = this.swing, d = s.def;
-    if (s.kind === 'pogo') return { l: this.x - 17, r: this.x + 17, t: this.y - 6, b: this.y + d.reach };
+    if (s.kind === 'pogo') return { l: this.x - 22, r: this.x + 22, t: this.y - 8, b: this.y + d.reach };
     const f = this.facing, cy = this.y - 20;
     const h = d.arc === 'big' ? 40 : 30;
     const near = this.x + f * 2, far = this.x + f * d.reach;

@@ -118,6 +118,14 @@ const path = require('path');
       check('Touch auto-aim: STRIKE in the air bounces off the buds without holding down', p.x >= 60 * T && p.stats.hurt === 0, { tx: +(p.x / T).toFixed(2), pogos: p.stats.pogos });
     })();
 
+    // --- The \u25BC button: one tap in the air is a down-strike
+    (function () {
+      fresh(); SH.test.place(30, 16); const p = P();
+      step({ jump: true }, ['jump']); for (let i = 0; i < 8; i++) step({ jump: true });
+      step({}, ['downstrike']);
+      check('Down-strike button: one tap in the air strikes down', p.swing && p.swing.kind === 'pogo', { swing: p.swing && p.swing.kind });
+    })();
+
     // --- Thorns send you back to safe ground and cost one heart
     (function () {
       fresh(); SH.test.place(39, 16); const p = P();
@@ -208,32 +216,75 @@ const path = require('path');
       return press;
     }
 
-    // Prologue: the Deep, including the Wyrm chase
+    const seen = new Set();
+    const origRun = G.runScript; G.runScript = function (id) { seen.add(id); return origRun.apply(this, arguments); };
+    const origAct = G.act; G.act = function (st) { if (st.do === 'goto') seen.add(st.id); return origAct.apply(this, arguments); };
+    const origAdv = G.advance; G.advance = function () { if (G.script) seen.add(G.script.id); const r = origAdv.apply(this, arguments); if (G.script) seen.add(G.script.id); return r; };
+    // Prologue part 1: the Winter Woods. Mortal Wren walks out, shoots the stag, and the cinematics play to the Deep.
     (function () {
       SH.test.load(0); const p = P();
+      // mortal: no double jump, no dash
+      SH.test.place(12, 16); talk({}, null);
+      for (let i = 0; i < 200 && G.state === 'talk'; i++) talk({}, null);
+      step({ jump: true }, ['jump']); for (let i = 0; i < 12; i++) step({ jump: true });
+      const vy1 = p.vy; step({ jump: true }, ['jump']); const vy2 = p.vy;
+      for (let i = 0; i < 80; i++) step({});
+      const x0 = p.x; step({ right: true }, ['dash']); for (let i = 0; i < 6; i++) step({ right: true });
+      check('Winter Woods: mortal Wren has one jump and no dash', vy2 >= vy1 && p.x - x0 < 6 * 3.6 + 1, { vy1: +vy1.toFixed(2), vy2: +vy2.toFixed(2), dashDist: +(p.x - x0).toFixed(1) });
+      SH.test.load(0);
+      const q = P(), jumps = [18.6, 28.6, 42.9, 53.6];
+      let k = 0, f = 0, shot = false;
+      const seenHere = new Set();
+      while (f++ < 60 * 120 && G.chapter === 0) {
+        const tx = q.x / T; let press = null, held = { right: true, jump: true };
+        if (G.state === 'play') {
+          if (k < jumps.length && tx >= jumps[k] && q.grounded) { press = ['jump']; k++; }
+          if (tx >= 72) { held = {}; if (!shot || f % 40 === 0) { press = ['attack']; shot = true; } }
+        }
+        if (G.script) seenHere.add(G.script.id);
+        talk(held, press);
+      }
+      check('Winter Woods: the hunt, the stag cinematic, Rowan, and Beyond the Wall lead into the Deep', G.chapter === 1 && seenHere.has('woods_kill') && seenHere.has('beyond_wall'),
+        { chapter: G.chapter, scripts: [...seenHere], seconds: +(f / 60).toFixed(1) });
+    })();
+
+    // The riddle: a wrong answer makes the queen ask again; the right one starts the maze
+    (function () {
+      SH.test.load(1);
+      for (let i = 0; i < 60 && !G.choosing; i++) SH.test.step(1, {}, null, false), (G.state === 'talk' && G.talkWait <= 0 && !G.choosing && G.advance());
+      G.pick(0);                                   // "A secret": wrong
+      for (let i = 0; i < 60 && !G.choosing; i++) { SH.test.step(1, {}); if (G.state === 'talk' && G.talkWait <= 0 && !G.choosing) G.advance(); }
+      const askedAgain = !!G.choosing && !G.flags.riddle;
+      G.pick(1);                                   // "A seed": right
+      for (let i = 0; i < 200 && G.state === 'talk'; i++) { SH.test.step(1, {}); if (G.state === 'talk' && G.talkWait <= 0 && !G.choosing) G.advance(); }
+      check('Riddle: a wrong answer gets asked again; "A seed" passes the first trial', askedAgain && G.flags.riddle && G.activeGoal === 'maze', { askedAgain, riddle: !!G.flags.riddle, goal: G.activeGoal });
+    })();
+
+    // Prologue part 2: the Deep, including the Wyrm chase
+    (function () {
+      SH.test.choice = 1;   // the riddle: "A seed"
+      SH.test.load(1); const p = P();
       const jumps = [[22.6], [30.7], [40.7], [52.6, 'jump'], [65.6, 'jump', 'dash'], [83.6], [102.8], [116.6], [125.6], [135.6]];
       let k = 0, moves = [], f = 0, sawWyrm = false;
-      while (f++ < 60 * 120 && G.chapter === 0) {
+      while (f++ < 60 * 120 && G.chapter === 1) {
         const tx = p.x / T; let press = null;
         if (G.state === 'play' && k < jumps.length && tx >= jumps[k][0] && p.grounded) { press = ['jump']; moves = jumps[k].slice(1); k++; }
         else if (moves.length && !p.grounded && p.vy > -0.6 && p.dashT <= 0) press = [moves.shift()];
         if (G.world.wyrm && G.world.wyrm.on) sawWyrm = true;
         talk({ right: true, jump: true }, press);
       }
-      check('Prologue: playable start to finish (story, chase, wake-up), Wyrm never catches a steady runner', G.chapter === 1 && sawWyrm && caught === 0,
+      SH.test.choice = 0;
+      check('Under the Mountain: riddle, maze, Wyrm chase, death and Caelum\'s blood, Wyrm never catches a steady runner', G.chapter === 2 && sawWyrm && caught === 0 && seen.has('deep_end'),
         { chapter: G.chapter, sawWyrm, caught, seconds: +(f / 60).toFixed(1), hurt: p.stats.hurt });
     })();
 
     // Chapter 1: Ashes. Walk with Caelum, paint the mural, climb to the roof, then the first evening
-    const seen = new Set(); const origRun = G.runScript; G.runScript = function (id) { seen.add(id); return origRun.apply(this, arguments); };
-    const origAct = G.act; G.act = function (st) { if (st.do === 'goto') seen.add(st.id); return origAct.apply(this, arguments); };
-    const origAdv = G.advance; G.advance = function () { if (G.script) seen.add(G.script.id); const r = origAdv.apply(this, arguments); if (G.script) seen.add(G.script.id); return r; };
     (function () {
       G.progress.bonds = {}; SH.test.choice = 0;
-      SH.test.load(1); const p = P(), w = G.world;
+      SH.test.load(2); const p = P(), w = G.world;
       const jumps = [21.3, 29.3, 98.6, 102.4];
       let k = 0, f = 0, light0 = w.cityLight, painted = false;
-      while (f++ < 60 * 120 && G.chapter === 1) {
+      while (f++ < 60 * 120 && G.chapter === 2) {
         const tx = p.x / T; let press = null, held = { right: true, jump: true };
         if (G.flags.arrive && !G.flags.painted && tx > 71.5 && tx < 74) held = { up: true };
         if (G.flags.painted) painted = true;
@@ -241,13 +292,13 @@ const path = require('path');
         talk(held, press);
       }
       const cb = G.progress.bonds.caelum || { pts: 0 };
-      check('Chapter 1 + first evening: walk, mural, rooftop; Caelum reaches heart 2 with his heart scene', G.chapter === 2 && painted && G.heartsFor(cb.pts) >= 2 && seen.has('heart_caelum_2'),
+      check('Chapter 1 + first evening: walk, mural, rooftop; Caelum reaches heart 2 with his heart scene', G.chapter === 3 && painted && G.heartsFor(cb.pts) >= 2 && seen.has('heart_caelum_2'),
         { chapter: G.chapter, painted, caelumPoints: cb.pts, hearts: G.heartsFor(cb.pts), heartScene: seen.has('heart_caelum_2'), seconds: +(f / 60).toFixed(1) });
     })();
 
     // Chapter 2: The Five. Dummy combo, the thorn pit, three thorn sprites
     (function () {
-      SH.test.load(2); const p = P(), w = G.world;
+      SH.test.load(3); const p = P(), w = G.world;
       const buds = w.things.filter(t => t.kind === 'bulb');
       let f = 0, swings = 0;
       while (f++ < 60 * 150 && G.state !== 'end') {
@@ -278,7 +329,7 @@ const path = require('path');
 
     // Evening 2 choices lead to the right person and add their bond points
     for (const [choice, who, script] of [[1, 'bram', 'ev2_bram'], [2, 'iris', 'ev2_iris']]) {
-      SH.test.load(2); G.progress.bonds = {}; SH.test.choice = choice;
+      SH.test.load(3); G.progress.bonds = {}; SH.test.choice = choice;
       G.runScript('evening2');
       let f = 0; while (G.state === 'talk' && f++ < 2000) SH.test.step(1, {}, null, true);
       const b = G.progress.bonds[who] || { pts: 0 };

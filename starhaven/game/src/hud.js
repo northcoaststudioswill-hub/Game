@@ -3,7 +3,7 @@
   const $ = id => document.getElementById(id);
   const ST = SH.STORY;
   const H = {};
-  let lastHearts = -1, lastPrompt = null, toastT = 0, cardDone = null, cut = null;
+  let lastHearts = -1, lastPrompt = null, toastT = 0, cardDone = null;
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
   H.hearts = function (n, max) {
@@ -80,15 +80,36 @@
   H.choiceIndex = () => choiceSel;
 
   // ---------------- full-screen illustrated scenes behind the dialogue
+  // Scenes animate: cinematics from cine.js, or a still panel with a slow push-in and drifting particles.
+  let scene = null;
   H.sceneArt = function (id, title) {
     const el = $('scene');
-    if (!id) { el.classList.remove('show'); return; }
-    const cv = $('scene-art'), g = cv.getContext('2d');
-    g.imageSmoothingEnabled = false;
-    g.drawImage(SH.art.panel(id), 0, 0, cv.width, cv.height);
+    if (!id) { el.classList.remove('show'); scene = null; return; }
+    const fresh = !scene;
+    if (!scene || scene.id !== id) scene = { id, t: 0, cue: null };
     $('scene-title').textContent = title || '';
     el.classList.add('show');
+    H.sceneDraw();
+    if (fresh) requestAnimationFrame(H.sceneTick);
   };
+  H.sceneCue = function (name) { if (scene) scene.cue = { name, start: scene.t }; };
+  H.sceneTick = function () {
+    if (!scene) return;
+    scene.t++;
+    H.sceneDraw();
+    requestAnimationFrame(H.sceneTick);
+  };
+  H.sceneDraw = function () {
+    if (!scene) return;
+    const g = $('scene-art').getContext('2d');
+    g.setTransform(3, 0, 0, 3, 0, 0);
+    g.imageSmoothingEnabled = false;
+    const cue = scene.cue ? { name: scene.cue.name, t: scene.t - scene.cue.start } : null;
+    if (SH.cine.has(scene.id)) SH.cine[scene.id](g, scene.t, cue);
+    else SH.cine.drawStatic(g, scene.id, scene.t);
+    g.setTransform(1, 0, 0, 1, 0, 0);
+  };
+  H.sceneAdvance = function (n) { if (scene) { scene.t += n; H.sceneDraw(); } }; // tests and screenshots
 
   // ---------------- chapter cards (start and end of each chapter)
   H.card = function (o, done) {
@@ -107,32 +128,12 @@
     if (f) f();
   };
 
-  // ---------------- intro cutscene: painted panels, tap to go on
-  H.cutscene = function (panels, done) {
-    const el = $('cut');
-    if (!panels) { el.classList.remove('show'); cut = null; return; }
-    cut = { panels, i: 0, done };
-    el.classList.add('show');
-    H.cutShow();
-  };
-  H.cutShow = function () {
-    const p = cut.panels[cut.i], cv = $('cut-art'), g = cv.getContext('2d');
-    g.imageSmoothingEnabled = false;
-    g.clearRect(0, 0, cv.width, cv.height);
-    g.drawImage(SH.art.panel(p.art), 0, 0, cv.width, cv.height);
-    $('cut-text').textContent = p.text;
-    $('cut-count').textContent = `${cut.i + 1} / ${cut.panels.length}`;
-    const t = $('cut-text'); t.classList.remove('in'); void t.offsetWidth; t.classList.add('in');
-  };
-  H.cutNext = function () {
-    if (!cut) return;
-    cut.i++;
-    if (cut.i >= cut.panels.length) H.cutEnd(); else H.cutShow();
-  };
-  H.cutEnd = function () {
-    if (!cut) return;
-    const f = cut.done; $('cut').classList.remove('show'); cut = null;
-    if (f) f();
+  // Touch buttons and labels follow what Wren can do this chapter.
+  H.abilities = function () {
+    const G = SH.game;
+    $('b-dash').style.display = G.can('dash') ? '' : 'none';
+    $('b-down').style.display = G.can('daggers') ? '' : 'none';
+    $('b-attack').textContent = G.can('daggers') ? 'STRIKE' : 'SHOOT';
   };
 
   // ---------------- title
@@ -225,8 +226,6 @@
     on('t-new', () => G.newGame());
     on('t-continue', () => H.titlePrimary());
     $('t-chapters').addEventListener('click', e => { const b = e.target.closest('[data-ch]'); if (b) { H.title(false); G.startChapter(+b.dataset.ch); } });
-    on('cut', e => { if (!e.target.closest('#cut-skip')) H.cutNext(); });
-    on('cut-skip', () => H.cutEnd());
     on('c-go', () => H.cardGo());
     // In a conversation, a tap anywhere goes to the next line.
     document.addEventListener('pointerdown', e => {

@@ -134,15 +134,58 @@
   Bulb.prototype.reset = function () { this.closed = 0; };
   Bulb.prototype.hittable = function () { return this.closed <= 0; };
   Bulb.prototype.hurtBox = function () { const y = this.y + Math.sin(this.t) * 3; return { l: this.x - this.r, r: this.x + this.r, t: y - this.r, b: y + this.r }; };
-  Bulb.prototype.update = function () {
+  Bulb.prototype.update = function (world) {
     this.t += 0.05;
     if (this.closed > 0) this.closed--;
+    // Touch assist: buds are springy. Falling onto an open bud bounces you, strike or no strike.
+    const p = world && world.player;
+    if (p && this.closed <= 0 && SH.input.source === 'touch' && SH.settings.autoDown && p.vy > 0 && !p.grounded) {
+      const y = this.y + Math.sin(this.t) * 3;
+      if (Math.abs(p.x - this.x) < this.r + 10 && p.y > y - this.r - 6 && p.y < y + 4) {
+        this.closed = SH.ENEMY_DEFS.bulb.regrow;
+        SH.fx.burst(this.x, y, 10, { speed: 2.2, life: 22, colors: ['#ff8fb8', '#ffd27a', '#ffffff'], glow: true });
+        p.bounce();
+      }
+    }
   };
   Bulb.prototype.takeHit = function (hit) {
     if (!hit.pogo) { SH.fx.word(this.x, this.y - 22, 'strike down', '#ffd27a', 40); return { landed: true, killed: false }; }
     this.closed = SH.ENEMY_DEFS.bulb.regrow;
     SH.fx.burst(this.x, this.y, 10, { speed: 2.2, life: 22, colors: ['#ff8fb8', '#ffd27a', '#ffffff'], glow: true });
     return { landed: true, killed: false };
+  };
+
+  // ---------------- The white stag (the Winter Woods). Grazes; bolts if you get too close; only an arrow brings it down.
+  function Stag(x, y, spots) {
+    Object.assign(this, { kind: 'stag', x, y, w: 40, h: 34, spots, spot: 0, state: 'graze', t: 0, fall: 0, dir: -1, arrowOnly: true });
+  }
+  Stag.prototype.reset = function () { };
+  Stag.prototype.hittable = function () { return this.state !== 'down'; };
+  Stag.prototype.hurtBox = function () { return { l: this.x - 20, r: this.x + 20, t: this.y - 34, b: this.y }; };
+  Stag.prototype.update = function (world) {
+    const T = SH.TILE, p = world.player;
+    this.t++;
+    if (this.state === 'down') { this.fall = Math.min(1, this.fall + 0.03); return; }
+    if (this.state === 'flee') {
+      const tx = this.spots[this.spot] * T + T / 2;
+      this.dir = 1; this.x = Math.min(tx, this.x + 5);
+      if (this.x >= tx) { this.state = 'graze'; this.dir = -1; }
+      return;
+    }
+    // too close, and it bolts deeper into the clearing (twice at most)
+    if (Math.abs(p.x - this.x) < 3.5 * T && this.spot < this.spots.length - 1) {
+      this.spot++; this.state = 'flee';
+      SH.game.hud.toast('Too close. The stag bolted. Stop further back and shoot.');
+      SH.fx.burst(this.x, this.y, 10, { angle: Math.PI, spread: 1, speed: 2, life: 22, colors: ['#ffffff', '#dfe8ff'] });
+    }
+  };
+  Stag.prototype.takeHit = function (hit, world) {
+    if (!hit.arrow) return null;
+    this.state = 'down';
+    SH.fx.burst(this.x, this.y - 20, 24, { speed: 2.4, life: 50, gravity: -0.04, colors: ['#ffd27a', '#fff6d8'], glow: true });
+    SH.fx.flashScreen(8, 'rgba(255,255,255,0.6)');
+    if (world.onStagDown) world.onStagDown();
+    return { landed: true, killed: true };
   };
 
   SH.makeSpawn = function (s, room) {
@@ -152,6 +195,7 @@
     const y = s.y != null ? s.y * T : room.groundY(Math.floor(s.x), 0);
     if (s.kind === 'thornSprite') { const e = new ThornSprite(x, y); e.respawns = s.respawn; return e; }
     if (s.kind === 'dummy') return new Dummy(x, y);
+    if (s.kind === 'stag') return new Stag(x, y, s.spots || [s.x]);
     throw new Error('unknown spawn ' + s.kind);
   };
 })(window.SH = window.SH || {});

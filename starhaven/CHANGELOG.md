@@ -1,5 +1,41 @@
 # Starhaven — Changelog
 
+## Rebuild 4 — The prologue: the stag, the Wall, the trials, the blood bond (Nov 17, 2026)
+Will's notes: the down-strike is still hard; build a real prologue (how Wren ends up in the fae world: the deer, the
+lord, the kidnapping), the three trials, dying on the last one, Caelum's blood, the mate bond, the war with Spring;
+more cinematics, animation and character building.
+
+- **Down-strike on touch, three ways:** a dedicated **\u25BC button** (one tap in the air = down-strike); **springy buds**
+  (on touch, landing on an open bud bounces you even without striking); and a bigger down-strike hit area plus a wider
+  auto-aim window.
+- **Prologue, part 1: The Winter Woods (new, playable):** mortal Wren (round ears, one jump, no dash, a hunting bow),
+  the sisters' cottage, Nessa and Lissa to talk to (with choices), glittering tracks, and a white stag that bolts if
+  you get too close.
+- **Animated cinematics (new engine, `cine.js`):** the shot (arrow, the stag falling, fae light pouring out); the cottage
+  at night (fire, the door bursting in, snow blowing, Rowan's silhouette); the Wall (a curtain of light, spring on the
+  other side); the Spring Court garden (Wren painting, the canvas filling in, petals); the Thorn Queen's blight (thorns
+  growing); the cell (Caelum appearing out of starlight); the trials (riddle runes, the maze drawing itself, the beast,
+  the killing thorn); Caelum's blood (drops falling, Wren rising, the gold thread of the bond). Cinematics react to cues
+  in the dialogue. Every other scene now slowly pushes in, with snow, petals, embers or stars drifting.
+- **Prologue, part 2: Under the Mountain** (the old Deep level, now the real trials): the riddle (wrong answers get asked
+  again), the maze (Caelum talks to her through the bargain and lends her the double jump and dash), the beast (the
+  Wyrm chase), then death, Caelum's blood, and the bond.
+- **Chapter 1:** opens three months later in Rowan's locked court; Caelum steals her; on the rooftop he tells her they
+  are mates; Rowan declares war. **Chapter 2:** the war on the southern border and the Iron King to the north.
+- **New characters:** Nessa, Lissa, Lord Rowan (portraits, world sprites for the sisters, journal entries).
+- Per-chapter abilities (mortal Wren in the woods); touch buttons show only what Wren can do (SHOOT instead of STRIKE,
+  no DASH or \u25BC while mortal). The old intro panels are gone: the prologue now plays the story instead of telling it.
+- `DESIGN.md` has a "Story changes since this outline" section with Will's new plot.
+- Fixes: the bow's cooldown didn't start at zero (no first shot); scene titles get a dark backing so they read on bright
+  scenes.
+
+Verified (`game/tests/feel.js`, 27/27): all earlier checks, plus mortal Wren has one jump and no dash; an autopilot plays
+the Winter Woods (walk, jumps, shoot the stag) through the stag, Rowan and Beyond the Wall cinematics into part 2; a
+wrong riddle answer is asked again and "A seed" starts the maze; Under the Mountain plays through the riddle, maze,
+Wyrm chase, death and Caelum's blood; the \u25BC button strikes down in the air. Phone screenshots of every new cinematic
+checked. NOT tested: human play; a real controller on a real phone.
+
+
 ## Rebuild 3 — Relationships, cutscenes, and an easier down-strike (Nov 17, 2026)
 Will's notes: the strike down is hard on mobile; can a Bluetooth controller be used; more relationship development,
 more story, more cutscenes.

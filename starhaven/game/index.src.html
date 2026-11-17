@@ -75,7 +75,8 @@ body[data-state="talk"] #sign, body[data-state="talk"] #pause-btn { display: non
 #scene.show { display: block; }
 #scene-art { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; display: block; }
 #scene-title { position: absolute; left: 50%; top: 18px; transform: translateX(-50%); font-family: var(--display);
-  color: var(--gold); letter-spacing: .14em; font-size: 15px; text-transform: uppercase; text-shadow: 0 2px 6px #000; white-space: nowrap; }
+  color: var(--gold); letter-spacing: .14em; font-size: 15px; text-transform: uppercase; text-shadow: 0 2px 6px #000; white-space: nowrap;
+  background: rgba(8, 8, 24, 0.6); padding: 4px 14px; border-radius: 999px; }
 .bond .hearts { color: #ff8fb8; letter-spacing: 2px; }
 .bond .hearts .dim { color: #5a4a70; }
 .bond .bar { height: 6px; background: #2a2650; border-radius: 3px; margin: 4px 0 2px; overflow: hidden; }
@@ -96,6 +97,7 @@ body[data-input="touch"] #touch { display: block; }
 #b-jump { width: 92px; height: 92px; right: max(24px, env(safe-area-inset-right)); bottom: 28px; font-size: 15px; }
 #b-attack { width: 76px; height: 76px; right: calc(max(24px, env(safe-area-inset-right)) + 104px); bottom: 22px; }
 #b-dash { width: 70px; height: 70px; right: calc(max(24px, env(safe-area-inset-right)) + 40px); bottom: 132px; }
+#b-down { width: 64px; height: 64px; right: calc(max(24px, env(safe-area-inset-right)) + 192px); bottom: 30px; font-size: 22px; }
 #b-talk { width: 70px; height: 70px; right: calc(max(24px, env(safe-area-inset-right)) + 122px); bottom: 112px; display: none;
   background: rgba(255,210,122,.25); border-color: var(--gold); color: var(--gold); }
 #b-talk.show { display: flex; }
@@ -121,15 +123,6 @@ body[data-input="touch"] #touch { display: block; }
 #title summary { cursor: pointer; padding: 6px; font-weight: 700; }
 #title .small { font-size: 12px; color: var(--ink-dim); margin-top: 10px; }
 
-#cut { background: #05050e; flex-direction: column; cursor: pointer; padding: 10px; }
-#cut-art { width: min(720px, 92vw, calc(62vh * 320 / 150)); aspect-ratio: 320 / 150; image-rendering: pixelated; border-radius: 10px; border: 1px solid var(--panel-line); }
-#cut-text { width: min(720px, 92vw); font-size: clamp(16px, 4.4vh, 21px); line-height: 1.45; text-align: center; margin: 14px 0 6px; font-weight: 600; }
-#cut-text.in { animation: fadein .5s; }
-@keyframes fadein { from { opacity: 0; transform: translateY(6px); } }
-#cut-foot { display: flex; gap: 18px; align-items: center; color: var(--ink-dim); font-size: 14px; }
-#cut-foot .go { color: var(--gold); font-weight: 800; animation: pulse 1.6s infinite; }
-#cut-skip { position: absolute; top: 12px; right: max(12px, env(safe-area-inset-right)); background: var(--panel); color: var(--ink); border: 1px solid var(--panel-line);
-  border-radius: 10px; padding: 8px 14px; font: 800 14px var(--body); }
 
 #card .card { text-align: left; }
 #c-label { color: var(--gold); font-family: var(--display); letter-spacing: .16em; font-size: 14px; text-transform: uppercase; }
@@ -184,6 +177,7 @@ body[data-input="touch"] #touch { display: block; }
   <div id="stick"><div id="knob"></div></div>
   <div id="touch-hint">Hold and slide anywhere on this side to move</div>
   <div class="tbtn" id="b-talk" data-act="up">TALK</div>
+  <div class="tbtn" id="b-down" data-act="downstrike" aria-label="Strike down">&#9660;</div>
   <div class="tbtn" id="b-dash" data-act="dash">DASH</div>
   <div class="tbtn" id="b-attack" data-act="attack">STRIKE</div>
   <div class="tbtn" id="b-jump" data-act="jump">JUMP</div>
@@ -209,13 +203,6 @@ body[data-input="touch"] #touch { display: block; }
     </details>
   </div>
   <div class="small">Concept build: the Prologue through Chapter 2. Placeholder art. Best on a phone held sideways.</div>
-</div>
-
-<div class="screen" id="cut">
-  <canvas id="cut-art" width="640" height="300"></canvas>
-  <div id="cut-text"></div>
-  <div id="cut-foot"><span id="cut-count"></span><span class="go">Tap to continue</span></div>
-  <button id="cut-skip">Skip</button>
 </div>
 
 <div class="screen" id="card">

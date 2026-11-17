@@ -11,6 +11,9 @@
     caelum: { bg: ['#3a2a6a', '#120d2a'], skin: '#ecd5c8', shade: '#cfb0a4', hair: '#1a1530', hairD: '#0c0a1a', eye: '#a58bff', style: 'swept', ears: true, cloth: '#1c1838', clothD: '#0e0c20', trim: '#cfd6ff', circlet: true, wings: true },
     queen: { bg: ['#4a1426', '#14060c'], skin: '#efe4ea', shade: '#cdbac4', hair: '#2a0a16', hairD: '#14040a', eye: '#ff4a5a', style: 'long', ears: true, cloth: '#2a0a16', clothD: '#14040a', crown: true, lips: '#c0203a' },
     bram: { bg: ['#5a3a1c', '#1c1008'], skin: '#d9a77f', shade: '#b8865f', hair: '#3a2a20', hairD: '#2a1c14', eye: '#5a3a22', style: 'shaved', ears: true, cloth: '#a8743a', clothD: '#6e4a22', beard: '#8a4426', scar: true, broad: true },
+    nessa: { bg: ['#4a4a5a', '#16161e'], skin: '#f0d4c0', shade: '#d4b49e', hair: '#2a1a14', hairD: '#140c08', eye: '#5a6a7a', style: 'braid', ears: false, cloth: '#5a5a6a', clothD: '#3a3a48' },
+    lissa: { bg: ['#4a6a3a', '#141e10'], skin: '#f6dcc6', shade: '#dcbca8', hair: '#b8864a', hairD: '#8a5a2a', eye: '#6a9a5a', style: 'long', ears: false, cloth: '#4a7a4a', clothD: '#2f5a2f', flower: true },
+    rowan: { bg: ['#6a8a3a', '#1a2410'], skin: '#f2d8b8', shade: '#d4b490', hair: '#e8c070', hairD: '#b8903a', eye: '#4ac06a', style: 'swept', ears: true, cloth: '#3a5a2a', clothD: '#24381a', trim: '#e8c070', antlers: true },
     iris: { bg: ['#2a5a7a', '#0c1a2a'], skin: '#f2d9c8', shade: '#dcbca8', hair: '#f4f0ff', hairD: '#c8c0e8', eye: '#8fd8ff', style: 'bun', ears: true, cloth: '#4f88c0', clothD: '#2f5a88', thread: true },
   };
 
@@ -41,6 +44,10 @@
     if (L.style === 'swept') { R(14, 8, 20, 6, L.hair); R(14, 12, 4, 10, L.hair); R(26, 12, 7, 3, L.hair); R(30, 12, 4, 8, L.hairD); }
     if (L.style === 'long') { R(14, 8, 20, 6, L.hair); R(14, 12, 3, 22, L.hair); R(31, 12, 3, 22, L.hair); }
     if (L.style === 'shaved') { R(15, 10, 18, 3, L.hair); }
+    if (L.style === 'braid') { R(14, 9, 20, 5, L.hair); R(14, 12, 3, 9, L.hair); R(31, 12, 3, 9, L.hair); R(33, 18, 4, 4, L.hairD); R(34, 22, 4, 4, L.hair); R(35, 26, 4, 4, L.hairD); R(35, 30, 4, 4, L.hair); }
+    if (L.flower) { R(30, 10, 4, 4, '#ff9ac0'); R(31, 11, 2, 2, '#ffe9a8'); }
+    if (L.antlers) { R(14, 12, 20, 1, '#e8c070'); R(17, 10, 2, 3, '#7ac05a'); R(29, 10, 2, 3, '#7ac05a');
+      g.strokeStyle = '#d8c8a0'; g.beginPath(); g.moveTo(15, 9); g.lineTo(10, 1); g.moveTo(12, 5); g.lineTo(7, 4); g.moveTo(33, 9); g.lineTo(38, 1); g.moveTo(36, 5); g.lineTo(41, 4); g.stroke(); }
     if (L.style === 'bun') { R(14, 9, 20, 5, L.hair); R(19, 3, 10, 7, L.hair); R(14, 12, 3, 7, L.hair); R(31, 12, 3, 7, L.hair); R(21, 4, 6, 1, L.hairD); }
     // eyes, brows, mouth
     R(18, 20, 4, 3, '#ffffff'); R(26, 20, 4, 3, '#ffffff');
@@ -238,6 +245,14 @@
       R(-14, -34 + breathe, 5, 14, '#d9a77f'); R(10, -34 + breathe, 5, 14, '#d9a77f');
       R(-5, -48 + breathe, 11, 12, '#d9a77f'); R(-5, -49 + breathe, 11, 2, '#3a2a20');
       R(-5, -41 + breathe, 11, 7, '#8a4426'); R(2, -45 + breathe, 2, 2, '#2a1a10');
+    } else if (n.id === 'nessa' || n.id === 'lissa') {
+      const ness = n.id === 'nessa';
+      R(-6, -30 + breathe, 12, 30, ness ? '#5a5a6a' : '#4a7a4a'); R(-6, -30 + breathe, 3, 30, ness ? '#3a3a48' : '#2f5a2f');
+      R(-4, -40 + breathe, 9, 10, '#f0d4c0');
+      R(-5, -42 + breathe, 11, 4, ness ? '#2a1a14' : '#b8864a'); R(-6, -40 + breathe, 3, ness ? 12 : 14, ness ? '#2a1a14' : '#b8864a');
+      R(2, -36 + breathe, 2, 2, '#2a1a14');
+      if (ness) { R(-12, -22, 3, 20, '#6a4a2a'); R(-14, -24, 7, 4, '#9aa0b0'); } // her axe
+      else { R(4, -18, 8, 6, '#a8743a'); R(5, -20, 2, 2, '#ff9ac0'); R(9, -20, 2, 2, '#ffe9a8'); } // a basket
     } else if (n.id === 'iris') {
       R(-7, -30 + breathe, 14, 30, '#4f88c0'); R(-7, -30 + breathe, 3, 30, '#2f5a88');
       R(-4, -40 + breathe, 9, 10, '#f2d9c8'); R(-5, -42 + breathe, 11, 4, '#f4f0ff'); R(-3, -47 + breathe, 6, 5, '#f4f0ff');

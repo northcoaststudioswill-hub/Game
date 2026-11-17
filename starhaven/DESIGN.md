@@ -346,6 +346,19 @@ The save is one object per save slot (3 slots), written after every mission, eve
 }
 ```
 
+## Story changes since this outline (Nov 17, 2026, from Will)
+These replace the matching parts of "Story outline" above. The playable concept follows them (see `STORY.md`).
+- **The prologue starts in the mortal lands:** Wren kills a white stag sacred to the Spring Court; Lord Rowan of Spring
+  takes her across the Wall as payment (a life for a life).
+- **Under the Mountain:** Wren goes after Rowan when the Thorn Queen takes him. Three trials: a riddle, a maze, a beast.
+  She wins and dies on the last one.
+- **Caelum's blood, not seven sparks:** Caelum brings her back with his blood. Wren and Caelum are **fated mates**: he
+  felt the bond from the start; as a mortal she couldn't. Becoming fae lets her feel it.
+- **The war:** Caelum steals Wren out of the Spring Court, and Rowan declares war on the Court of Dusk. The Iron King uses
+  that war.
+- **Open:** where the seven court gifts now come from (the concept ends with fire waking in Wren's palm as "something
+  older" than Caelum's blood).
+
 ## Open questions
 
 - [ ] Game title and final names: are Wren, Caelum, Starhaven and the Court of Dusk keepers?

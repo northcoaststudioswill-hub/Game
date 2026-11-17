@@ -75,7 +75,8 @@ body[data-state="talk"] #sign, body[data-state="talk"] #pause-btn { display: non
 #scene.show { display: block; }
 #scene-art { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; display: block; }
 #scene-title { position: absolute; left: 50%; top: 18px; transform: translateX(-50%); font-family: var(--display);
-  color: var(--gold); letter-spacing: .14em; font-size: 15px; text-transform: uppercase; text-shadow: 0 2px 6px #000; white-space: nowrap; }
+  color: var(--gold); letter-spacing: .14em; font-size: 15px; text-transform: uppercase; text-shadow: 0 2px 6px #000; white-space: nowrap;
+  background: rgba(8, 8, 24, 0.6); padding: 4px 14px; border-radius: 999px; }
 .bond .hearts { color: #ff8fb8; letter-spacing: 2px; }
 .bond .hearts .dim { color: #5a4a70; }
 .bond .bar { height: 6px; background: #2a2650; border-radius: 3px; margin: 4px 0 2px; overflow: hidden; }
@@ -96,6 +97,7 @@ body[data-input="touch"] #touch { display: block; }
 #b-jump { width: 92px; height: 92px; right: max(24px, env(safe-area-inset-right)); bottom: 28px; font-size: 15px; }
 #b-attack { width: 76px; height: 76px; right: calc(max(24px, env(safe-area-inset-right)) + 104px); bottom: 22px; }
 #b-dash { width: 70px; height: 70px; right: calc(max(24px, env(safe-area-inset-right)) + 40px); bottom: 132px; }
+#b-down { width: 64px; height: 64px; right: calc(max(24px, env(safe-area-inset-right)) + 192px); bottom: 30px; font-size: 22px; }
 #b-talk { width: 70px; height: 70px; right: calc(max(24px, env(safe-area-inset-right)) + 122px); bottom: 112px; display: none;
   background: rgba(255,210,122,.25); border-color: var(--gold); color: var(--gold); }
 #b-talk.show { display: flex; }
@@ -121,15 +123,6 @@ body[data-input="touch"] #touch { display: block; }
 #title summary { cursor: pointer; padding: 6px; font-weight: 700; }
 #title .small { font-size: 12px; color: var(--ink-dim); margin-top: 10px; }
 
-#cut { background: #05050e; flex-direction: column; cursor: pointer; padding: 10px; }
-#cut-art { width: min(720px, 92vw, calc(62vh * 320 / 150)); aspect-ratio: 320 / 150; image-rendering: pixelated; border-radius: 10px; border: 1px solid var(--panel-line); }
-#cut-text { width: min(720px, 92vw); font-size: clamp(16px, 4.4vh, 21px); line-height: 1.45; text-align: center; margin: 14px 0 6px; font-weight: 600; }
-#cut-text.in { animation: fadein .5s; }
-@keyframes fadein { from { opacity: 0; transform: translateY(6px); } }
-#cut-foot { display: flex; gap: 18px; align-items: center; color: var(--ink-dim); font-size: 14px; }
-#cut-foot .go { color: var(--gold); font-weight: 800; animation: pulse 1.6s infinite; }
-#cut-skip { position: absolute; top: 12px; right: max(12px, env(safe-area-inset-right)); background: var(--panel); color: var(--ink); border: 1px solid var(--panel-line);
-  border-radius: 10px; padding: 8px 14px; font: 800 14px var(--body); }
 
 #card .card { text-align: left; }
 #c-label { color: var(--gold); font-family: var(--display); letter-spacing: .16em; font-size: 14px; text-transform: uppercase; }
@@ -184,6 +177,7 @@ body[data-input="touch"] #touch { display: block; }
   <div id="stick"><div id="knob"></div></div>
   <div id="touch-hint">Hold and slide anywhere on this side to move</div>
   <div class="tbtn" id="b-talk" data-act="up">TALK</div>
+  <div class="tbtn" id="b-down" data-act="downstrike" aria-label="Strike down">&#9660;</div>
   <div class="tbtn" id="b-dash" data-act="dash">DASH</div>
   <div class="tbtn" id="b-attack" data-act="attack">STRIKE</div>
   <div class="tbtn" id="b-jump" data-act="jump">JUMP</div>
@@ -209,13 +203,6 @@ body[data-input="touch"] #touch { display: block; }
     </details>
   </div>
   <div class="small">Concept build: the Prologue through Chapter 2. Placeholder art. Best on a phone held sideways.</div>
-</div>
-
-<div class="screen" id="cut">
-  <canvas id="cut-art" width="640" height="300"></canvas>
-  <div id="cut-text"></div>
-  <div id="cut-foot"><span id="cut-count"></span><span class="go">Tap to continue</span></div>
-  <button id="cut-skip">Skip</button>
 </div>
 
 <div class="screen" id="card">
@@ -353,7 +340,7 @@ body[data-input="touch"] #touch { display: block; }
       { frames: 12, active: [2, 6], next: 7, lunge: 0, kb: 2.6, stop: 3, reach: 36, arc: 'high' },
       { frames: 14, active: [2, 7], next: 99, lunge: 0, kb: 4.5, stop: 4, reach: 38, arc: 'low', finisher: true },
     ],
-    pogo: { frames: 14, active: [1, 9], next: 99, kb: 1.5, stop: 5, reach: 30, arc: 'down' },
+    pogo: { frames: 16, active: [1, 11], next: 99, kb: 1.5, stop: 5, reach: 36, arc: 'down' },
     killStop: 6,
     recoil: 1.6,        // small push back on you when your blade connects
   };
@@ -393,6 +380,9 @@ body[data-input="touch"] #touch { display: block; }
     queen: { name: 'The Thorn Queen', color: '#ff7a8a' },
     bram: { name: 'Bram', color: '#f0a860' },
     iris: { name: 'Iris', color: '#9fe0ff' },
+    nessa: { name: 'Nessa', color: '#c8d0e0' },
+    lissa: { name: 'Lissa', color: '#b8e8a0' },
+    rowan: { name: 'Lord Rowan', color: '#e8c070' },
     narr: { name: '', color: '#b9b2dd' },
   };
 
@@ -404,43 +394,48 @@ body[data-input="touch"] #touch { display: block; }
     iris: { loves: 'Sugared plums, old maps', perk: 'Shows hidden chests on the map (later chapters).' },
   };
 
-  // The opening cutscene. Each panel: a painted scene (drawn in art.js) and one or two lines.
-  S.INTRO = [
-    { art: 'woods', text: 'Wren grew up a mortal huntress in the winter woods, keeping her two sisters, Nessa and Lissa, alive one hunt at a time.' },
-    { art: 'mountain', text: 'Then the Thorn Queen, a cruel fae tyrant, dragged her Under the Mountain, into a prison called the Deep. Wren beat the queen\'s trials. It killed her.' },
-    { art: 'sparks', text: 'The seven High Lords of the fae courts each gave a spark of their power to bring her back. Wren woke up fae: stronger, faster, and not quite herself.' },
-    { art: 'caelum', text: 'In the Deep she made a bargain with one of them, Lord Caelum of the Court of Dusk. His help then, for her time later. Now he has come to collect.' },
-    { art: 'ships', text: 'Across the sea, the Iron King is building an army, and his spies are already in the woods. Caelum\'s hidden city, Starhaven, will need everyone it has.' },
-  ];
-
-  // Short version of the intro, for the journal.
-  S.RECAP = 'Wren, a mortal huntress, died in the Thorn Queen\'s prison, the Deep, and the seven High Lords brought her back as fae. She owes Lord Caelum of the Court of Dusk a bargain. Across the sea, the Iron King is preparing for war, and Caelum\'s hidden city, Starhaven, has gone dark.';
+  // Short version of the story so far, for the journal.
+  S.RECAP = 'Wren was a mortal huntress feeding her two sisters through a starving winter. She killed a white stag sacred to the fae, and Lord Rowan of the Spring Court took her across the Wall as payment. When the Thorn Queen seized the courts, Wren went Under the Mountain after him, made a bargain with Lord Caelum of the Court of Dusk, and won the queen\'s three trials. The queen killed her anyway. Caelum brought her back with his blood, and as a fae she can finally feel what he always felt: they are mates.';
 
   S.CHAPTERS = [
     {
-      id: 'prologue', label: 'Prologue', name: 'The Deep', room: 'deep',
-      card: 'Three months after the Deep, Wren still dreams of it every night. Tonight, she runs.',
+      id: 'woods', label: 'Prologue, part 1', name: 'The Winter Woods', room: 'woods', mortal: true,
+      abilities: { double: false, dash: false, daggers: false, bow: true },
+      card: 'Before the Deep, before the fae. Wren is nineteen, mortal, and the only hunter in a family that is slowly starving.',
       goals: [
-        { id: 'escape', text: 'Escape the Deep: run right, toward the light' },
+        { id: 'hunt', text: 'Hunt in the woods east of the cottage' },
+        { id: 'stag', text: 'Shoot the white stag in the clearing' },
       ],
-      summary: 'Wren relived the Deep in a nightmare and woke up at the Spring Court, safe, smothered and unable to leave.',
-      done: 'Wren wakes up at the Spring Court, where everyone keeps her safe and nobody lets her go.',
+      summary: 'Wren killed a white stag sacred to the Spring Court. That night Lord Rowan came for her and took her across the Wall: a life for a life.',
+      done: 'A life for a life. Wren crosses the Wall into the fae lands, and doesn\'t look back, because if she does she won\'t go.',
+      after: 'beyond_wall',
+    },
+    {
+      id: 'prologue', label: 'Prologue, part 2', name: 'Under the Mountain', room: 'deep', mortal: true,
+      card: 'The Thorn Queen\'s three trials: a riddle, a maze, and a beast. Win them all and Rowan goes free. Lose one, and Wren stays in the Deep forever. The stars of Caelum\'s bargain glow on her wrist.',
+      goals: [
+        { id: 'riddle', text: 'Trial 1: answer the queen\'s riddle' },
+        { id: 'maze', text: 'Trial 2: get through the maze (keep going right)' },
+        { id: 'beast', text: 'Trial 3: outrun the Wyrm to the light' },
+      ],
+      summary: 'Wren won the Thorn Queen\'s three trials and freed Rowan. The queen killed her anyway. Caelum brought her back with his blood, and she woke up fae, feeling a bond to him she had never felt before.',
+      done: 'Wren is fae now. Rowan carries her home to Spring. But a thread of light in her chest pulls the other way, toward the Court of Dusk.',
     },
     {
       id: 'ch1', label: 'Chapter 1', name: 'Ashes', room: 'ashes',
-      card: 'Wren is living a gilded, empty life at the Spring Court. One night, Lord Caelum appears at her window to call in their bargain.',
+      card: 'Three months later. Rowan has locked the windows of the Spring Court and doubled the guards, terrified of losing Wren again. Every night, the thread in her chest pulls toward the Court of Dusk.',
       goals: [
         { id: 'arrive', text: 'Walk with Caelum to Starhaven' },
         { id: 'mural', text: 'Paint the first mural on the dark street' },
         { id: 'rooftop', text: 'Meet Caelum on his rooftop, at the end of the street' },
       ],
-      summary: 'Caelum brought Wren to Starhaven, a hidden city gone dark from the war. Her first mural woke up a street. On his rooftop, she agreed to stay a while.',
-      done: 'Starhaven has one bright street again, and Wren has a room on a rooftop. Tomorrow, she meets the Five.',
+      summary: 'Caelum stole Wren out of the Spring Court and brought her to Starhaven. Her first mural woke up a street. On his rooftop he told her the truth: they are mates. Rowan called it theft and declared war.',
+      done: 'In the Spring Court, Rowan finds an empty bed and calls it theft. By morning, the armies of Spring are marching on the Court of Dusk.',
       after: 'evening1',
     },
     {
       id: 'ch2', label: 'Chapter 2', name: 'The Five', room: 'ring',
-      card: 'Caelum\'s inner circle, the Five, want to see what the reborn huntress can do. First stop: the Training Ring, and Bram.',
+      card: 'Spring\'s army gathers on Dusk\'s southern border, and the Iron King\'s creatures are testing the north. Caelum\'s inner circle, the Five, want to see what the reborn huntress can do.',
       goals: [
         { id: 'combo', text: 'Show Bram your daggers on the training dummy' },
         { id: 'pit', text: 'Cross Bram\'s thorn pit by bouncing on the buds' },
@@ -453,43 +448,184 @@ body[data-input="touch"] #touch { display: block; }
   ];
 
   S.SCRIPTS = {
-    // ======================================================== Prologue: the Deep
+    // ======================================================== Prologue part 1: the Winter Woods
+    woods_start: [
+      ['narr', 'The mortal lands, deep winter. The village has eaten its last stores, and the woods are almost empty.'],
+      ['nessa', 'You\'re going out again? There\'s nothing left out there, Wren.'],
+      ['wren', 'There\'s always something. You just have to go farther than everyone else.'],
+      ['lissa', 'Bring back anything green? I found seeds in Mother\'s old trunk. When the thaw comes, I want to be ready.'],
+      ['wren', 'I\'ll bring back dinner. Seeds are your department.'],
+      ['nessa', 'Be back before dark. People have seen lights near the Wall again.'],
+      { do: 'goal', id: 'hunt' },
+    ],
+    woods_lissa: [
+      ['lissa', 'Wren? When we have enough again... will you paint something on the wall? Like you used to, before.'],
+      { choose: [
+        { text: '"Maybe in spring."', then: [['lissa', 'I\'ll hold you to that. Spring always comes. That\'s the whole point of it.']] },
+        { text: '"Paint doesn\'t feed anyone."', then: [['lissa', 'Neither do I, and you keep me around.'], ['wren', 'Barely.'], ['narr', 'Lissa laughs. It\'s the first time in a week.']] },
+      ] },
+    ],
+    woods_nessa: [
+      ['narr', 'Nessa is splitting the last of the firewood. She hasn\'t eaten today either. She thinks Wren hasn\'t noticed.'],
+      ['nessa', 'I\'d go with you if I could shoot.'],
+      { choose: [
+        { text: '"You\'d scare everything off with your opinions."', then: [['nessa', 'Someone in this family has to have them.']] },
+        { text: '"Eat something, Ness. I\'ll find more."', then: [['nessa', '...You first.'], ['narr', 'Neither of them moves. They\'ve been having this argument all winter.']] },
+      ] },
+    ],
+    woods_tracks: [
+      ['wren', 'Tracks. Huge ones. Something this size would feed us for a month.'],
+      ['wren', '...They glitter. Tracks don\'t glitter.'],
+    ],
+    woods_stag: [
+      { do: 'flag', name: 'stagseen' },
+      ['narr', 'In the clearing stands a white stag, taller than any deer Wren has ever seen, with antlers like silver branches.'],
+      ['wren', 'The old stories say white stags belong to the fae.'],
+      ['wren', 'The old stories don\'t feed anyone.'],
+      { do: 'goal', id: 'stag' },
+    ],
+    woods_kill: [
+      { do: 'flag', name: 'hunt' },
+      { do: 'art', id: 'hunt', title: 'The White Stag' },
+      { do: 'cue', name: 'shoot' },
+      ['narr', 'The arrow flies true.'],
+      ['narr', 'As the stag falls, light pours out of it, gold and warm, like a door opening onto summer.'],
+      ['wren', '...What did I just do?'],
+      { do: 'art', id: 'cottage', title: 'That night' },
+      ['narr', 'That night there is meat in the pot for the first time in weeks. Lissa laughs. Even Nessa smiles.'],
+      { do: 'cue', name: 'door' },
+      ['narr', 'Then the door bursts open, and winter comes in with him.'],
+      ['rowan', 'Who killed the white stag?'],
+      ['narr', 'He is tall and golden, with antlers rising from a crown of leaves, and eyes like a summer field on fire.'],
+      { choose: [
+        { text: 'Step forward: "I did."', then: [['rowan', 'Honest, at least. That will make this easier.']] },
+        { text: '"It was a deer. We were starving."', then: [['rowan', 'It was the sacred stag of the Spring Court, and its blood is on your hands.']] },
+        { text: 'Reach for your knife', then: [['rowan', 'Put it down, huntress. Mortal steel won\'t touch me, and I didn\'t come here to hurt your family.']] },
+      ] },
+      ['rowan', 'The Treaty between our peoples is old and simple. A fae life taken by a mortal is paid for with a mortal life.'],
+      ['nessa', 'Then take me instead.'],
+      ['wren', 'No. Nessa, no.'],
+      ['rowan', 'There is another way. Come with me across the Wall and live the rest of your days in the Spring Court. Your sisters keep their lives, and you keep yours.'],
+      ['lissa', 'Wren...'],
+      ['wren', 'Look after each other. Lissa, plant your seeds. Nessa... eat something.'],
+      ['nessa', 'Come back.'],
+      ['wren', 'I will.'],
+      { do: 'art', id: 'wall', title: 'The Wall' },
+      ['narr', 'They ride east through the snow until the night itself shimmers like a curtain: the Wall, the old line between the mortal lands and the fae.'],
+      ['rowan', 'Nobody will hurt you on the other side. You have my word.'],
+      ['wren', 'You just took me from my home.'],
+      ['rowan', '...Yes. I did.'],
+      ['narr', 'On the other side of the Wall, it is spring.'],
+      { do: 'flag', name: 'stag' },
+      { do: 'complete' },
+    ],
+
+    // ---------------- Beyond the Wall: the Spring Court, the Thorn Queen, the bargain, the trials, the sparks
+    beyond_wall: [
+      { do: 'art', id: 'garden', title: 'The Spring Court' },
+      ['narr', 'The Spring Court is beautiful: flowers that never die, music that never stops, and a lord who is kind, in his careful way.'],
+      ['rowan', 'I had paints brought from three courts. You said once that you used to paint.'],
+      ['wren', 'I said that one time. At dinner. You remembered?'],
+      ['rowan', 'I remember everything you say. You say so little.'],
+      { choose: [
+        { text: '"Thank you, Rowan."', then: [['narr', 'Rowan smiles like the sun came out. For a while, Wren lets herself be happy here.']] },
+        { text: '"Paint won\'t make me forget my sisters."', then: [['rowan', 'I don\'t want you to forget them. I only want you to stay.']] },
+      ] },
+      ['narr', 'She paints for the first time in years. She is never allowed past the garden walls.'],
+      { do: 'art', id: 'thorns', title: 'The Blight' },
+      ['narr', 'Then the blight came. Thorns crept through the fae courts, and the flowers of Spring began to die.'],
+      ['queen', 'Every court will kneel to me. Every High Lord will bring me his crown. Starting with Spring.'],
+      ['narr', 'The Thorn Queen dragged the High Lords Under the Mountain, into her prison, the Deep. When her thorns took Rowan, Wren went after him.'],
+      ['wren', 'He took me from my home. But he never hurt me, and nobody else was going to save him.'],
+      { do: 'art', id: 'cell', title: 'Under the Mountain' },
+      ['narr', 'The Deep. A cell, a fever, and a wound from the queen\'s thorns that would not close.'],
+      { do: 'cue', name: 'caelum' },
+      ['caelum', 'So you\'re the mortal who walked in here on purpose. That was either very brave or very stupid.'],
+      ['wren', 'Who... are you?'],
+      ['caelum', 'Caelum. High Lord of the Court of Dusk, and the queen\'s favorite prisoner. I can close that wound, if you let me.'],
+      ['caelum', 'But nothing is free Under the Mountain. One week of every month, for the rest of your life, at my home. Say yes, huntress.'],
+      { choose: [
+        { text: '"Why would you help me?"', bond: { caelum: 5 }, then: [['caelum', 'Because you\'re the first person in fifty years to make the queen nervous. I\'d like you alive.']] },
+        { text: '"What do you really want?"', bond: { caelum: 10 }, then: [['caelum', 'Someone on my side when this is over. Someone who doesn\'t kneel.']] },
+        { text: '"I don\'t make deals with fae."', bond: { caelum: 5 }, then: [['caelum', 'Then you\'ll die of a fever before the first trial. Your choice.']] },
+      ] },
+      ['wren', '...Yes.'],
+      { do: 'meet', who: 'caelum' },
+      ['narr', 'A ring of tiny stars curls around Wren\'s wrist, glowing faintly. The bargain is struck.'],
+      { do: 'art', id: 'thorns', title: 'The Thorn Queen' },
+      ['queen', 'Three trials, little huntress. A riddle, a maze, and a beast. Win them all, and I free your Spring lord.'],
+      ['queen', 'Lose one, and you both stay in my Deep forever.'],
+    ],
+
+    // ======================================================== Prologue part 2: Under the Mountain, the three trials
     deep_start: [
-      ['queen', 'Back again, little huntress? You never really left my Deep.'],
-      ['wren', 'It\'s a dream. Only a dream. Keep moving and it ends.'],
-      { do: 'goal', id: 'escape' },
+      ['queen', 'The first trial. Answer my riddle and you may walk my maze. Answer wrong, and I\'ll ask again until you break.'],
+      { do: 'goto', id: 'deep_riddle' },
+    ],
+    deep_riddle: [
+      ['queen', 'What is buried in the dark, and grows anyway?'],
+      { choose: [
+        { text: '"A secret."', then: [['queen', 'Wrong. Secrets rot in the dark. Try again, little huntress.'], { do: 'goto', id: 'deep_riddle' }] },
+        { text: '"A seed."', then: [
+          ['wren', '...A seed. Lissa\'s seeds, waiting for spring. The answer is a seed.'],
+          ['queen', 'Correct. How very dull. Go on, then. My maze is waiting.'],
+          { do: 'flag', name: 'riddle' },
+          ['caelum', 'Well done, huntress. Can you hear me? The bargain lets me speak to you. And lend you a little of what I have.'],
+          ['narr', 'The stars on Wren\'s wrist burn bright. Her legs feel lighter than they have ever felt.'],
+          { do: 'goal', id: 'maze' },
+        ] },
+        { text: '"Grief."', then: [['queen', 'Wrong. Grief doesn\'t grow. It just gets heavier. Again.'], { do: 'goto', id: 'deep_riddle' }] },
+      ] },
     ],
     deep_wall: [
       ['queen', 'A wall you can\'t climb. Mortals always hit a wall.'],
-      ['wren', 'I\'m not mortal anymore.'],
+      ['caelum', 'Jump, then jump again, off nothing at all. I\'ve got you.'],
     ],
     deep_dash: [
-      ['wren', 'Too far to jump. But this body is fast. Faster than I ever was.'],
+      ['wren', 'Too far to jump.'],
+      ['caelum', 'Then don\'t jump. Move like a shadow does. Fast, and all at once.'],
     ],
     deep_thorns: [
-      ['queen', 'My thorns remember you. They remember how you bled.'],
+      ['queen', 'My thorns remember mortals. They remember how you bleed.'],
     ],
     deep_chase: [
-      ['queen', 'Enough running. Wake up, my Wyrm. Bring her back to me.'],
-      ['wren', 'No. No no no. RUN.'],
+      { do: 'flag', name: 'maze' },
+      ['queen', 'You got through my maze. Then the last trial is the beast. Wake up, my Wyrm. She\'s yours.'],
+      ['caelum', 'Wren. Run. Don\'t look back. Run for the light.'],
+      { do: 'goal', id: 'beast' },
       { do: 'wyrm' },
     ],
     deep_end: [
-      ['wren', 'Light. It\'s light. I\'m waking up...'],
-      { do: 'art', id: 'spring', title: 'The Spring Court' },
-      ['narr', 'Wren wakes in a bed of silk at the Spring Court, where the flowers never die and the music never stops.'],
-      ['narr', 'Since the Deep she has lived here as a guest of honor. Everyone tells her she is safe. Nobody lets her leave.'],
-      ['wren', 'Another morning of smiling at people who look at me like I\'m made of glass.'],
-      ['narr', 'On her desk sits a letter from her sisters, three months old. She still hasn\'t answered it. She doesn\'t know what to say.'],
+      { do: 'flag', name: 'beast' },
+      { do: 'art', id: 'trials', title: 'The Queen\'s Throne' },
+      { do: 'cue', name: 'end' },
+      ['queen', 'Three trials. A mortal won all three. That has never happened.'],
+      ['queen', 'I keep my promises. Your Spring lord is free. All the High Lords are free.'],
+      ['narr', 'Then, smiling, the Thorn Queen drove her last thorn into Wren\'s heart.'],
+      ['wren', 'Tell my sisters...'],
+      { do: 'art', id: 'rebirth', title: 'Caelum\'s Blood' },
+      ['narr', 'Her heart stopped. The queen fell. And Caelum, free at last, was already kneeling beside her.'],
+      ['caelum', 'No. Not like this. Not you.'],
+      ['narr', 'He cut his palm and let his blood fall onto her lips: the old magic of a High Lord, starlight and shadow.'],
+      { do: 'cue', name: 'rise' },
+      ['narr', 'It burned through her like a comet. Her heart started again. Her ears grew pointed, her senses sharpened, and her mortal body became fae.'],
+      ['narr', 'And for the first time, Wren felt it: a thread of light pulled tight in her chest, running straight to him. It had always been there. She had only been too mortal to feel it.'],
+      ['wren', '...Caelum? What is this?'],
+      ['caelum', '...You can feel it now.'],
+      ['narr', 'Before he could say anything more, Rowan pulled her into his arms, and carried her home to Spring.'],
       { do: 'complete' },
     ],
 
     // ======================================================== Chapter 1: Ashes
     ashes_start: [
+      { do: 'art', id: 'spring', title: 'The Spring Court, three months later' },
+      ['narr', 'Three months later. Rowan has given Wren everything: silk, music, a garden, guards at every door.'],
+      ['narr', 'He has not given her a way out. And every night the thread in her chest pulls east, toward the Court of Dusk.'],
+      ['wren', 'I can feel him. Even from here. What did he do to me?'],
       { do: 'art', id: 'window', title: 'Midnight at the Spring Court' },
       ['narr', 'Midnight. The Spring Court is asleep. Wren is not.'],
       ['caelum', 'Good evening, Wren. You look like you haven\'t slept in three months.'],
-      ['wren', 'Caelum. You can\'t be here. If they find the High Lord of Dusk in the Spring Court...'],
+      ['wren', 'Caelum. You can\'t be here. If Rowan finds the High Lord of Dusk in his court...'],
       ['caelum', 'They\'d be terribly rude about it. I\'m here for what I\'m owed: one week of every month, at my home. Our bargain from the Deep.'],
       { do: 'meet', who: 'caelum' },
       { choose: [
@@ -503,6 +639,8 @@ body[data-input="touch"] #touch { display: block; }
           ['caelum', 'Because the Iron King is moving, and I need people I trust. You are one of very few.'],
         ] },
       ] },
+      ['wren', 'And this thread between us? Since the Deep, I can feel you. All the time. What did your blood do to me?'],
+      ['caelum', 'Nothing that wasn\'t already there. I\'ll tell you everything, I promise. Not here, with Rowan\'s guards outside the door.'],
       ['caelum', 'Take my hand.'],
       ['narr', 'The room folds into shadow and starlight, and then there is cold air, and a road, and the smell of pine.'],
       { do: 'art', id: null },
@@ -549,7 +687,23 @@ body[data-input="touch"] #touch { display: block; }
           ['caelum', 'Too late. I\'m unbearable when I\'m sentimental. Ask anyone.'],
         ] },
       ] },
-      ['caelum', 'Tomorrow you meet the Five, my inner circle. Try not to stab any of them.'],
+      ['wren', 'You promised to tell me. The thread. What is it?'],
+      ['caelum', 'A mating bond. The rarest thing there is between two people. Fate\'s doing, not mine.'],
+      ['caelum', 'I felt it the first moment I saw you, Under the Mountain. You were mortal, so you couldn\'t. My blood didn\'t make the bond. It only let you feel what was already there.'],
+      { choose: [
+        { text: '"You should have told me."', bond: { caelum: 5 }, then: [
+          ['caelum', 'Yes. And you\'d have thought it was a trick to keep you. I wanted you to choose for yourself, with all of it in front of you.'],
+        ] },
+        { text: '"Is that why you saved me?"', bond: { caelum: 5 }, then: [
+          ['caelum', 'I saved you because you were dying. The bond is why I could never have lived with not trying.'],
+        ] },
+        { text: 'Say nothing. Take his hand.', bond: { caelum: 10 }, then: [
+          ['narr', 'The thread between them hums like a plucked string. Neither of them lets go for a long time.'],
+        ] },
+      ] },
+      ['caelum', 'It doesn\'t bind you to anything. You owe me nothing for it. Whatever you choose, it\'s yours to choose.'],
+      ['wren', 'Rowan will come for me.'],
+      ['caelum', 'He\'ll come for me. Let him. Tomorrow you meet the Five, my inner circle. Try not to stab any of them.'],
       ['wren', 'No promises.'],
       { do: 'bond', who: 'caelum', pts: 10 },
       { do: 'flag', name: 'rooftop' },
@@ -587,7 +741,8 @@ body[data-input="touch"] #touch { display: block; }
     ring_start: [
       ['bram', 'So you\'re the huntress who walked out of the Deep. I\'m Bram. I run the Training Ring.'],
       { do: 'meet', who: 'bram' },
-      ['bram', 'Caelum says you can fight. I\'d like to see it before I believe it.'],
+      ['bram', 'Half of Spring wants your head for running off with our High Lord. Or him running off with you. The songs disagree.'],
+      ['bram', 'Either way, there\'s an army on our southern border with your name on its banners. Caelum says you can fight. I\'d like to see it.'],
       { choose: [
         { text: '"Point me at something."', bond: { bram: 10 }, then: [
           ['bram', 'Ha! I like you already. Don\'t tell Caelum.'],
@@ -641,6 +796,7 @@ body[data-input="touch"] #touch { display: block; }
       ['iris', 'Two mortal girls. Your thread is tied to theirs, Wren. And the iron is getting closer.'],
       ['wren', 'My sisters.'],
       ['caelum', 'Then the Iron King knows who you are. Those sprites weren\'t testing our walls. They were looking for you.'],
+      ['bram', 'Spring at our southern border, iron at our north. He wants us fighting Rowan while he walks in the back door.'],
       { choose: [
         { text: '"If he touches them, I\'ll kill him."', bond: { bram: 10 }, then: [
           ['bram', 'Get in line, huntress. But I\'ll hold your coat.'],
@@ -670,7 +826,8 @@ body[data-input="touch"] #touch { display: block; }
     ev2_caelum: [
       { do: 'art', id: 'rooftop', title: 'Evening with Caelum' },
       ['narr', 'The rooftop again. Caelum hasn\'t slept. Reports are stacked under a wine bottle.'],
-      ['caelum', 'My spies say the Iron King asked about you by name. My people are already watching your sisters\' village.'],
+      ['caelum', 'Rowan sent a letter today. He says I stole you, and he will have you back, or have my court in ashes.'],
+      ['caelum', 'And my spies say the Iron King asked about you by name. My people are already watching your sisters\' village.'],
       { choose: [
         { text: '"Thank you."', bond: { caelum: 10 }, then: [
           ['caelum', 'Don\'t. It isn\'t a favor. It\'s what you do for your own.'],
@@ -758,7 +915,7 @@ body[data-input="touch"] #touch { display: block; }
     finale: [
       { do: 'art', id: 'spark', title: 'Next: Chapter 3, First Light' },
       ['narr', 'That night, for the first time since the Deep, Wren dreams of fire instead of thorns.'],
-      ['narr', 'She wakes with her palm glowing, warm as an ember. A spark of a High Lord\'s power, waking up.'],
+      ['narr', 'She wakes with her palm glowing, warm as an ember. Caelum\'s blood made her fae. Something else, something older, is waking up in her now.'],
       ['wren', '...What is this?'],
       { do: 'end' },
     ],
@@ -768,14 +925,15 @@ body[data-input="touch"] #touch { display: block; }
   S.PEOPLE = [
     { id: 'wren', name: 'Wren', text: 'You. A mortal huntress who died in the Deep and woke up fae. Fights with daggers. Used to paint.' },
     { id: 'sisters', name: 'Nessa and Lissa', text: 'Wren\'s sisters, still mortal, across the sea. Nessa is sharp-tongued and protective. Lissa is gentle and loves her garden.' },
+    { id: 'rowan', name: 'Lord Rowan', text: 'High Lord of the Spring Court. He took Wren across the Wall for killing his sacred stag, and she saved him Under the Mountain. Kind in his careful way, terrified of losing her, and now at war with the Court of Dusk.' },
     { id: 'queen', name: 'The Thorn Queen', text: 'The fae tyrant who held Wren in the Deep. Gone now, but not from Wren\'s dreams.' },
-    { id: 'caelum', name: 'Lord Caelum', text: 'High Lord of the Court of Dusk and ruler of Starhaven. Charming in public, burdened in private. Wren owes him a bargain.' },
+    { id: 'caelum', name: 'Lord Caelum', text: 'High Lord of the Court of Dusk and ruler of Starhaven. Charming in public, burdened in private. His blood made Wren fae, and he is her mate: he felt the bond from the first day; she only feels it now.' },
     { id: 'ironking', name: 'The Iron King', text: 'A king across the sea, building an army. His creatures are already in the woods, and he knows Wren\'s name.' },
     { id: 'bram', name: 'Bram', text: 'One of the Five. A general and brawler who runs the Training Ring. The big brother of the group.' },
     { id: 'iris', name: 'Iris', text: 'One of the Five. A seer who sees threads of fate. Oddly cheerful about it.' },
   ];
   // Who you know about at the start of each chapter (the intro covers the first five).
-  S.KNOWN_FROM = { prologue: ['wren', 'sisters', 'queen', 'caelum', 'ironking'], ch1: [], ch2: ['bram'] };
+  S.KNOWN_FROM = { woods: ['wren', 'sisters'], prologue: ['rowan', 'queen', 'caelum'], ch1: ['ironking'], ch2: ['bram'] };
 
   S.END = {
     title: 'End of the concept',
@@ -794,6 +952,36 @@ body[data-input="touch"] #touch { display: block; }
 //   gates:    wooden gates that block the way until a script opens them
 (function (SH) {
   SH.ROOMS = {};
+
+  // ---------------------------------------------------------------- Prologue part 1: The Winter Woods (mortal Wren, a bow, no enemies)
+  SH.ROOMS.woods = {
+    id: 'woods', width: 100, height: 20, theme: 'winter',
+    start: { x: 10, y: 16 },
+    cottage: 2,                          // the sisters' cottage, where it starts
+    shapes: [
+      ['solid', 0, 2, 0, 20],
+      ['ground', 2, 44, 16],
+      ['solid', 20, 22, 15, 16],         // a fallen log
+      ['ground', 30, 38, 15],            // a snowbank
+      ['ground', 47, 100, 16],           // a frozen creek between 44 and 47
+      ['solid', 55, 57, 14, 16],         // a boulder
+      ['solid', 98, 100, 0, 20],
+    ],
+    hints: [
+      { x0: 9, x1: 17, text: 'Move with {MOVE}. Lissa and Nessa have something to say: walk up to them and use {TALK}.' },
+      { x0: 17, x1: 26, text: 'Jump with {JUMP}. Wren is still mortal: one jump, no more.' },
+      { x0: 64, x1: 79, text: 'Shoot with {SHOOT}. Get too close and the stag will bolt.', flag: 'stagseen' },
+    ],
+    triggers: [
+      { x: 10, script: 'woods_start' },
+      { x: 40, script: 'woods_tracks' },
+      { x: 63, script: 'woods_stag' },
+    ],
+    lanterns: [{ x: 12, lit: true }, { x: 48 }],
+    npcs: [{ id: 'lissa', x: 7, optional: 'woods_lissa' }, { id: 'nessa', x: 15.5, optional: 'woods_nessa' }],
+    gates: [],
+    spawns: [{ kind: 'stag', x: 80, spots: [80, 88, 94] }],
+  };
 
   // ---------------------------------------------------------------- Prologue: The Deep (movement only, no enemies)
   SH.ROOMS.deep = {
@@ -955,7 +1143,7 @@ body[data-input="touch"] #touch { display: block; }
 // Starhaven — input. Keyboard, gamepad and touch all feed the same actions.
 // held[a]: is it down right now. pressed[a]: was it pressed since the last game frame.
 (function (SH) {
-  const ACTIONS = ['left', 'right', 'up', 'down', 'jump', 'attack', 'dash', 'pause'];
+  const ACTIONS = ['left', 'right', 'up', 'down', 'jump', 'attack', 'dash', 'pause', 'downstrike'];
   const KEYS = {
     ArrowLeft: 'left', KeyA: 'left',
     ArrowRight: 'right', KeyD: 'right',
@@ -1096,9 +1284,9 @@ body[data-input="touch"] #touch { display: block; }
 
   // Button names shown in signs, per input type.
   input.LABELS = {
-    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J' },
-    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'press STRIKE (it aims down by itself)' },
-    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X' },
+    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', SHOOT: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J' },
+    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'tap the \u25BC button' },
+    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', SHOOT: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X' },
   };
   input.fill = function (text) {
     const L = input.LABELS[input.source] || input.LABELS.kb;
@@ -1243,7 +1431,7 @@ body[data-input="touch"] #touch { display: block; }
       facing: 1, grounded: false, wasGrounded: false,
       coyote: 0, jumpBuf: 0, dashBuf: 0, atkBuf: 0,
       airJumps: 1, airDashes: 1, rising: false,
-      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0,
+      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, bowCd: 0, bowT: 0,
       invuln: 0, stun: 0,
       swing: null, comboStep: 0, comboKind: null, comboGap: 0,
       hearts: P.hearts, maxHearts: P.hearts,
@@ -1272,8 +1460,10 @@ body[data-input="touch"] #touch { display: block; }
     // ---- buffers
     if (inp.pressed.jump) this.jumpBuf = t.jumpBufferFrames; else if (this.jumpBuf > 0) this.jumpBuf--;
     if (inp.pressed.dash) this.dashBuf = 6; else if (this.dashBuf > 0) this.dashBuf--;
-    if (inp.pressed.attack) this.atkBuf = C.attackBuffer; else if (this.atkBuf > 0) this.atkBuf--;
+    if (inp.pressed.attack || inp.pressed.downstrike) this.atkBuf = C.attackBuffer; else if (this.atkBuf > 0) this.atkBuf--;
     if (this.dashCd > 0) this.dashCd--;
+    if (this.bowCd > 0) this.bowCd--;
+    if (this.bowT > 0) this.bowT--;
     if (this.iframes > 0) this.iframes--;
     if (this.invuln > 0) this.invuln--;
     if (this.comboGap > 0) this.comboGap--; else if (!this.swing) this.comboStep = 0;
@@ -1282,11 +1472,13 @@ body[data-input="touch"] #touch { display: block; }
     const stunned = this.stun > 0;
     if (stunned) this.stun--;
 
-    if (this.grounded) { this.coyote = t.coyoteFrames; this.airJumps = 1; this.airDashes = 1; }
+    // Mortal Wren (the Winter Woods) has one jump and no dash; the fae body brings the rest.
+    const can = SH.game.can;
+    if (this.grounded) { this.coyote = t.coyoteFrames; this.airJumps = can('double') ? 1 : 0; this.airDashes = 1; }
     else if (this.coyote > 0) this.coyote--;
 
     // ---- dash start
-    if (!stunned && this.dashT <= 0 && this.dashBuf > 0 && this.dashCd <= 0 && (this.grounded || this.airDashes > 0)) {
+    if (!stunned && this.dashT <= 0 && this.dashBuf > 0 && this.dashCd <= 0 && can('dash') && (this.grounded || this.airDashes > 0)) {
       this.dashBuf = 0;
       if (!this.grounded) this.airDashes--;
       this.dashDir = dir !== 0 ? dir : this.facing;
@@ -1411,11 +1603,19 @@ body[data-input="touch"] #touch { display: block; }
 
   Player.prototype.tryAttack = function (world, inp) {
     if (this.atkBuf <= 0) return;
+    if (!SH.game.can('daggers')) { // the hunting bow: one arrow, straight ahead
+      if (SH.game.can('bow') && this.bowCd <= 0 && this.grounded) {
+        this.atkBuf = 0; this.bowCd = 30; this.bowT = 16; this.vx = 0;
+        const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
+        world.spawnArrow(this.x + this.facing * 12, this.y - 27, this.facing);
+      }
+      return;
+    }
     const C = SH.COMBAT;
     let kind, step;
     // On touch, a strike in the air aims down by itself when there's something to bounce on below (doc: auto-aim on phones).
     const autoDown = !this.grounded && !inp.held.down && SH.input.source === 'touch' && SH.settings.autoDown && this.somethingBelow(world);
-    if (!this.grounded && (inp.held.down || autoDown)) { kind = 'pogo'; step = 0; }
+    if (!this.grounded && (inp.held.down || inp.pressed.downstrike || autoDown)) { kind = 'pogo'; step = 0; }
     else {
       kind = this.grounded ? 'ground' : 'air';
       const list = C[kind];
@@ -1439,7 +1639,7 @@ body[data-input="touch"] #touch { display: block; }
     for (const t of world.targets) {
       if (!t.hittable() || t.kind === 'dummy') continue;
       const hb = t.hurtBox(), cx = (hb.l + hb.r) / 2, cy = (hb.t + hb.b) / 2;
-      if (Math.abs(cx - this.x) < 34 && cy > this.y - 6 && cy < this.y + 84) return true;
+      if (Math.abs(cx - this.x) < 46 && cy > this.y - 14 && cy < this.y + 110) return true;
     }
     const TS = SH.TILE, tx = Math.floor(this.x / TS);
     for (let d = 0; d < 4; d++) {
@@ -1452,7 +1652,7 @@ body[data-input="touch"] #touch { display: block; }
 
   Player.prototype.swingBox = function () {
     const s = this.swing, d = s.def;
-    if (s.kind === 'pogo') return { l: this.x - 17, r: this.x + 17, t: this.y - 6, b: this.y + d.reach };
+    if (s.kind === 'pogo') return { l: this.x - 22, r: this.x + 22, t: this.y - 8, b: this.y + d.reach };
     const f = this.facing, cy = this.y - 20;
     const h = d.arc === 'big' ? 40 : 30;
     const near = this.x + f * 2, far = this.x + f * d.reach;
@@ -1667,15 +1867,58 @@ body[data-input="touch"] #touch { display: block; }
   Bulb.prototype.reset = function () { this.closed = 0; };
   Bulb.prototype.hittable = function () { return this.closed <= 0; };
   Bulb.prototype.hurtBox = function () { const y = this.y + Math.sin(this.t) * 3; return { l: this.x - this.r, r: this.x + this.r, t: y - this.r, b: y + this.r }; };
-  Bulb.prototype.update = function () {
+  Bulb.prototype.update = function (world) {
     this.t += 0.05;
     if (this.closed > 0) this.closed--;
+    // Touch assist: buds are springy. Falling onto an open bud bounces you, strike or no strike.
+    const p = world && world.player;
+    if (p && this.closed <= 0 && SH.input.source === 'touch' && SH.settings.autoDown && p.vy > 0 && !p.grounded) {
+      const y = this.y + Math.sin(this.t) * 3;
+      if (Math.abs(p.x - this.x) < this.r + 10 && p.y > y - this.r - 6 && p.y < y + 4) {
+        this.closed = SH.ENEMY_DEFS.bulb.regrow;
+        SH.fx.burst(this.x, y, 10, { speed: 2.2, life: 22, colors: ['#ff8fb8', '#ffd27a', '#ffffff'], glow: true });
+        p.bounce();
+      }
+    }
   };
   Bulb.prototype.takeHit = function (hit) {
     if (!hit.pogo) { SH.fx.word(this.x, this.y - 22, 'strike down', '#ffd27a', 40); return { landed: true, killed: false }; }
     this.closed = SH.ENEMY_DEFS.bulb.regrow;
     SH.fx.burst(this.x, this.y, 10, { speed: 2.2, life: 22, colors: ['#ff8fb8', '#ffd27a', '#ffffff'], glow: true });
     return { landed: true, killed: false };
+  };
+
+  // ---------------- The white stag (the Winter Woods). Grazes; bolts if you get too close; only an arrow brings it down.
+  function Stag(x, y, spots) {
+    Object.assign(this, { kind: 'stag', x, y, w: 40, h: 34, spots, spot: 0, state: 'graze', t: 0, fall: 0, dir: -1, arrowOnly: true });
+  }
+  Stag.prototype.reset = function () { };
+  Stag.prototype.hittable = function () { return this.state !== 'down'; };
+  Stag.prototype.hurtBox = function () { return { l: this.x - 20, r: this.x + 20, t: this.y - 34, b: this.y }; };
+  Stag.prototype.update = function (world) {
+    const T = SH.TILE, p = world.player;
+    this.t++;
+    if (this.state === 'down') { this.fall = Math.min(1, this.fall + 0.03); return; }
+    if (this.state === 'flee') {
+      const tx = this.spots[this.spot] * T + T / 2;
+      this.dir = 1; this.x = Math.min(tx, this.x + 5);
+      if (this.x >= tx) { this.state = 'graze'; this.dir = -1; }
+      return;
+    }
+    // too close, and it bolts deeper into the clearing (twice at most)
+    if (Math.abs(p.x - this.x) < 3.5 * T && this.spot < this.spots.length - 1) {
+      this.spot++; this.state = 'flee';
+      SH.game.hud.toast('Too close. The stag bolted. Stop further back and shoot.');
+      SH.fx.burst(this.x, this.y, 10, { angle: Math.PI, spread: 1, speed: 2, life: 22, colors: ['#ffffff', '#dfe8ff'] });
+    }
+  };
+  Stag.prototype.takeHit = function (hit, world) {
+    if (!hit.arrow) return null;
+    this.state = 'down';
+    SH.fx.burst(this.x, this.y - 20, 24, { speed: 2.4, life: 50, gravity: -0.04, colors: ['#ffd27a', '#fff6d8'], glow: true });
+    SH.fx.flashScreen(8, 'rgba(255,255,255,0.6)');
+    if (world.onStagDown) world.onStagDown();
+    return { landed: true, killed: true };
   };
 
   SH.makeSpawn = function (s, room) {
@@ -1685,6 +1928,7 @@ body[data-input="touch"] #touch { display: block; }
     const y = s.y != null ? s.y * T : room.groundY(Math.floor(s.x), 0);
     if (s.kind === 'thornSprite') { const e = new ThornSprite(x, y); e.respawns = s.respawn; return e; }
     if (s.kind === 'dummy') return new Dummy(x, y);
+    if (s.kind === 'stag') return new Stag(x, y, s.spots || [s.x]);
     throw new Error('unknown spawn ' + s.kind);
   };
 })(window.SH = window.SH || {});
@@ -1705,6 +1949,9 @@ body[data-input="touch"] #touch { display: block; }
     caelum: { bg: ['#3a2a6a', '#120d2a'], skin: '#ecd5c8', shade: '#cfb0a4', hair: '#1a1530', hairD: '#0c0a1a', eye: '#a58bff', style: 'swept', ears: true, cloth: '#1c1838', clothD: '#0e0c20', trim: '#cfd6ff', circlet: true, wings: true },
     queen: { bg: ['#4a1426', '#14060c'], skin: '#efe4ea', shade: '#cdbac4', hair: '#2a0a16', hairD: '#14040a', eye: '#ff4a5a', style: 'long', ears: true, cloth: '#2a0a16', clothD: '#14040a', crown: true, lips: '#c0203a' },
     bram: { bg: ['#5a3a1c', '#1c1008'], skin: '#d9a77f', shade: '#b8865f', hair: '#3a2a20', hairD: '#2a1c14', eye: '#5a3a22', style: 'shaved', ears: true, cloth: '#a8743a', clothD: '#6e4a22', beard: '#8a4426', scar: true, broad: true },
+    nessa: { bg: ['#4a4a5a', '#16161e'], skin: '#f0d4c0', shade: '#d4b49e', hair: '#2a1a14', hairD: '#140c08', eye: '#5a6a7a', style: 'braid', ears: false, cloth: '#5a5a6a', clothD: '#3a3a48' },
+    lissa: { bg: ['#4a6a3a', '#141e10'], skin: '#f6dcc6', shade: '#dcbca8', hair: '#b8864a', hairD: '#8a5a2a', eye: '#6a9a5a', style: 'long', ears: false, cloth: '#4a7a4a', clothD: '#2f5a2f', flower: true },
+    rowan: { bg: ['#6a8a3a', '#1a2410'], skin: '#f2d8b8', shade: '#d4b490', hair: '#e8c070', hairD: '#b8903a', eye: '#4ac06a', style: 'swept', ears: true, cloth: '#3a5a2a', clothD: '#24381a', trim: '#e8c070', antlers: true },
     iris: { bg: ['#2a5a7a', '#0c1a2a'], skin: '#f2d9c8', shade: '#dcbca8', hair: '#f4f0ff', hairD: '#c8c0e8', eye: '#8fd8ff', style: 'bun', ears: true, cloth: '#4f88c0', clothD: '#2f5a88', thread: true },
   };
 
@@ -1735,6 +1982,10 @@ body[data-input="touch"] #touch { display: block; }
     if (L.style === 'swept') { R(14, 8, 20, 6, L.hair); R(14, 12, 4, 10, L.hair); R(26, 12, 7, 3, L.hair); R(30, 12, 4, 8, L.hairD); }
     if (L.style === 'long') { R(14, 8, 20, 6, L.hair); R(14, 12, 3, 22, L.hair); R(31, 12, 3, 22, L.hair); }
     if (L.style === 'shaved') { R(15, 10, 18, 3, L.hair); }
+    if (L.style === 'braid') { R(14, 9, 20, 5, L.hair); R(14, 12, 3, 9, L.hair); R(31, 12, 3, 9, L.hair); R(33, 18, 4, 4, L.hairD); R(34, 22, 4, 4, L.hair); R(35, 26, 4, 4, L.hairD); R(35, 30, 4, 4, L.hair); }
+    if (L.flower) { R(30, 10, 4, 4, '#ff9ac0'); R(31, 11, 2, 2, '#ffe9a8'); }
+    if (L.antlers) { R(14, 12, 20, 1, '#e8c070'); R(17, 10, 2, 3, '#7ac05a'); R(29, 10, 2, 3, '#7ac05a');
+      g.strokeStyle = '#d8c8a0'; g.beginPath(); g.moveTo(15, 9); g.lineTo(10, 1); g.moveTo(12, 5); g.lineTo(7, 4); g.moveTo(33, 9); g.lineTo(38, 1); g.moveTo(36, 5); g.lineTo(41, 4); g.stroke(); }
     if (L.style === 'bun') { R(14, 9, 20, 5, L.hair); R(19, 3, 10, 7, L.hair); R(14, 12, 3, 7, L.hair); R(31, 12, 3, 7, L.hair); R(21, 4, 6, 1, L.hairD); }
     // eyes, brows, mouth
     R(18, 20, 4, 3, '#ffffff'); R(26, 20, 4, 3, '#ffffff');
@@ -1932,6 +2183,14 @@ body[data-input="touch"] #touch { display: block; }
       R(-14, -34 + breathe, 5, 14, '#d9a77f'); R(10, -34 + breathe, 5, 14, '#d9a77f');
       R(-5, -48 + breathe, 11, 12, '#d9a77f'); R(-5, -49 + breathe, 11, 2, '#3a2a20');
       R(-5, -41 + breathe, 11, 7, '#8a4426'); R(2, -45 + breathe, 2, 2, '#2a1a10');
+    } else if (n.id === 'nessa' || n.id === 'lissa') {
+      const ness = n.id === 'nessa';
+      R(-6, -30 + breathe, 12, 30, ness ? '#5a5a6a' : '#4a7a4a'); R(-6, -30 + breathe, 3, 30, ness ? '#3a3a48' : '#2f5a2f');
+      R(-4, -40 + breathe, 9, 10, '#f0d4c0');
+      R(-5, -42 + breathe, 11, 4, ness ? '#2a1a14' : '#b8864a'); R(-6, -40 + breathe, 3, ness ? 12 : 14, ness ? '#2a1a14' : '#b8864a');
+      R(2, -36 + breathe, 2, 2, '#2a1a14');
+      if (ness) { R(-12, -22, 3, 20, '#6a4a2a'); R(-14, -24, 7, 4, '#9aa0b0'); } // her axe
+      else { R(4, -18, 8, 6, '#a8743a'); R(5, -20, 2, 2, '#ff9ac0'); R(9, -20, 2, 2, '#ffe9a8'); } // a basket
     } else if (n.id === 'iris') {
       R(-7, -30 + breathe, 14, 30, '#4f88c0'); R(-7, -30 + breathe, 3, 30, '#2f5a88');
       R(-4, -40 + breathe, 9, 10, '#f2d9c8'); R(-5, -42 + breathe, 11, 4, '#f4f0ff'); R(-3, -47 + breathe, 6, 5, '#f4f0ff');
@@ -1953,6 +2212,265 @@ body[data-input="touch"] #touch { display: block; }
       ctx.fillStyle = '#1c1430'; for (let i = 0; i < 3; i++) ctx.fillRect(x - 6 + i * 5, by + 5, 2, 2);
     }
   };
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/cine.js
+// Starhaven — animated cinematics. Each scene draws itself at 320 x 150 for frame t (60 per second).
+// `cue` is the last cue the story script sent ({ name, t: frames since }), so dialogue can trigger the action:
+// e.g. { do: 'cue', name: 'shoot' } fires the arrow. Static panels (art.js) get a slow push-in and drifting particles.
+(function (SH) {
+  const W = 320, H = 150;
+  const C = SH.cine = {};
+  const ease = k => k < 0 ? 0 : k > 1 ? 1 : k * k * (3 - 2 * k);
+  const clamp01 = k => Math.max(0, Math.min(1, k));
+  function rnd(i) { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+
+  // helpers ---------------------------------------------------------------
+  function sky(g, a, b) { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, a); gr.addColorStop(1, b); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
+  function R(g, x, y, w, h, c) { g.fillStyle = c; g.fillRect(x, y, w, h); }
+  function stars(g, n, seed, t) { for (let i = 0; i < n; i++) { g.globalAlpha = 0.5 + 0.5 * Math.sin(t * 0.04 + i); R(g, rnd(i + seed) * W, rnd(i * 3 + seed) * 95, 1, 1, '#eef'); } g.globalAlpha = 1; }
+  function pines(g, base, col, seed, n) { g.fillStyle = col; for (let i = 0; i < n; i++) { const x = rnd(i + seed) * W, h = 40 + rnd(i * 7 + seed) * 50; g.beginPath(); g.moveTo(x, base - h); g.lineTo(x - 13, base); g.lineTo(x + 13, base); g.fill(); } }
+  function snow(g, t, n, wind) { g.fillStyle = '#ffffff'; for (let i = 0; i < n; i++) { const x = ((rnd(i) * W + t * (0.2 + wind) + Math.sin(t * 0.02 + i) * 6) % W + W) % W, y = (rnd(i * 5) * H + t * (0.35 + rnd(i * 9) * 0.4)) % H; g.globalAlpha = 0.5 + rnd(i * 2) * 0.5; g.fillRect(x, y, rnd(i) < 0.2 ? 2 : 1, rnd(i) < 0.2 ? 2 : 1); } g.globalAlpha = 1; }
+  function glow(g, x, y, r, col) { const gr = g.createRadialGradient(x, y, 1, x, y, r); gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
+  function stag(g, x, y, s, fall, headDown) {
+    // a white stag with silver antlers; fall 0..1 tips it onto its side
+    if (fall > 0.5) { // lying in the snow
+      g.save(); g.translate(x, y); g.scale(s, s); g.globalAlpha = Math.min(1, (fall - 0.5) * 3);
+      g.fillStyle = 'rgba(70,80,120,0.35)'; g.beginPath(); g.ellipse(0, 1, 30, 4, 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#8a96b8'; g.fillRect(-19, -10, 34, 11); g.fillRect(13, -7, 14, 7);
+      g.fillStyle = '#f2f4ff'; g.fillRect(-18, -9, 32, 9); g.fillRect(14, -6, 12, 5);
+      g.fillRect(-14, -3, 12, 2); g.fillRect(2, -3, 12, 2);
+      g.strokeStyle = '#d6dcff'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(24, -5); g.lineTo(32, -12); g.lineTo(36, -16); g.moveTo(32, -12); g.lineTo(38, -10); g.stroke();
+      g.fillStyle = '#1a1430'; g.fillRect(22, -5, 2, 1);
+      g.restore(); g.globalAlpha = 1; return;
+    }
+    g.save(); g.translate(x, y); g.rotate(fall * 0.5); g.scale(s, s);
+    g.fillStyle = '#f2f4ff';
+    g.fillRect(-16, -22, 30, 12);                 // body
+    g.fillRect(-14, -12, 3, 12); g.fillRect(-8, -12, 3, 12); g.fillRect(4, -12, 3, 12); g.fillRect(10, -12, 3, 12);
+    const hy = headDown ? -14 : -34;
+    g.fillRect(10, hy, 6, 18 - (headDown ? 6 : 0)); g.fillRect(12, hy - 4, 10, 7);
+    g.strokeStyle = '#d6dcff'; g.lineWidth = 1.5; g.beginPath();
+    g.moveTo(14, hy - 4); g.lineTo(10, hy - 14); g.lineTo(6, hy - 18); g.moveTo(10, hy - 14); g.lineTo(14, hy - 20);
+    g.moveTo(17, hy - 4); g.lineTo(21, hy - 14); g.lineTo(25, hy - 17); g.moveTo(21, hy - 14); g.lineTo(19, hy - 21); g.stroke();
+    g.fillStyle = '#1a1430'; g.fillRect(19, hy - 2, 2, 2);
+    g.restore();
+  }
+  function figure(g, x, y, h, col, hair) { R(g, x - 3, y - h, 6, h - 6, col); R(g, x - 2, y - h - 6, 5, 6, '#f6dcc6'); if (hair) R(g, x - 3, y - h - 7, 6, 4, hair); R(g, x - 3, y - 6, 2, 6, col); R(g, x + 1, y - 6, 2, 6, col); }
+
+  // the shot -------------------------------------------------------------
+  C.hunt = function (g, t, cue) {
+    sky(g, '#9fb4d8', '#e6eefc');
+    pines(g, 110, '#6a7ea8', 3, 16); pines(g, 120, '#40506e', 9, 12);
+    R(g, 0, 112, W, 38, '#f4f8ff'); R(g, 0, 112, W, 2, '#ffffff');
+    const shot = cue && cue.name === 'shoot' ? cue.t : -1;
+    const hit = shot >= 0 && shot > 22;
+    const fall = hit ? ease((shot - 22) / 40) : 0;
+    stag(g, 230, 114, 1.3, fall, !hit && Math.sin(t * 0.02) > 0);
+    // Wren, kneeling with the bow drawn
+    figure(g, 60, 114, 20, '#2f8f7a', '#d8653a');
+    g.strokeStyle = '#8a5a2a'; g.lineWidth = 2; g.beginPath(); g.arc(66, 100, 9, -1.3, 1.3); g.stroke();
+    if (shot < 0) { g.strokeStyle = '#e8e0c8'; g.lineWidth = 1; g.beginPath(); g.moveTo(69, 92); g.lineTo(62, 100); g.lineTo(69, 108); g.stroke(); }
+    if (shot >= 0 && shot <= 22) { const k = shot / 22, ax = 70 + k * 158, ay = 100 - Math.sin(k * Math.PI) * 6; R(g, ax - 10, ay, 12, 1, '#5a3a1a'); R(g, ax, ay - 1, 3, 3, '#c0c8d8'); }
+    if (hit) {
+      if (shot < 30) { g.fillStyle = 'rgba(255,255,255,' + (1 - (shot - 22) / 8) + ')'; g.fillRect(0, 0, W, H); }
+      // golden fae light rising out of the stag: it was never just a deer
+      for (let i = 0; i < 18; i++) { const k = ((shot - 30) * 0.6 + i * 7) % 80; if (shot < 30) break; g.globalAlpha = 1 - k / 80; R(g, 222 + rnd(i) * 30, 100 - k, 2, 2, '#ffd27a'); }
+      g.globalAlpha = 1;
+      if (shot > 40) glow(g, 236, 100, 40 + Math.sin(t * 0.1) * 4, 'rgba(255,210,122,0.35)');
+    }
+    snow(g, t, 60, 0.1);
+  };
+
+  // the cottage at night; the door bursts in -----------------------------
+  C.cottage = function (g, t, cue) {
+    R(g, 0, 0, W, H, '#2a1c18');
+    for (let x = 0; x < W; x += 22) R(g, x, 0, 2, 112, '#20140f');
+    R(g, 0, 112, W, 38, '#3a2a20');
+    // the fire
+    const f = Math.sin(t * 0.3) * 2;
+    glow(g, 60, 98, 90 + f * 3, 'rgba(255,150,70,0.45)');
+    R(g, 36, 82, 48, 30, '#4a3428'); R(g, 44, 92, 32, 20, '#120a08');
+    g.fillStyle = '#ff8a3a'; g.beginPath(); g.moveTo(48, 112); g.lineTo(60, 92 + f); g.lineTo(72, 112); g.fill();
+    g.fillStyle = '#ffe08a'; g.beginPath(); g.moveTo(54, 112); g.lineTo(60, 100 - f); g.lineTo(66, 112); g.fill();
+    figure(g, 100, 116, 20, '#5a5a6a', '#2a1a14');   // Nessa
+    figure(g, 116, 116, 17, '#4a7a4a', '#a87a4a');   // Lissa
+    figure(g, 140, 116, 22, '#2f8f7a', '#d8653a');   // Wren
+    // the door
+    const d = cue && cue.name === 'door' ? cue.t : -1;
+    const open = d >= 0 ? ease(d / 10) : 0;
+    R(g, 236, 40, 52, 72, '#0a0c18');
+    if (d >= 0) {
+      sky(g, 'rgba(0,0,0,0)', 'rgba(0,0,0,0)');
+      g.save(); g.beginPath(); g.rect(236, 40, 52, 72); g.clip();
+      R(g, 236, 40, 52, 72, '#1a2240'); snow(g, t * 3, 30, 2);
+      // the lord in the doorway: antler crown, gold eyes
+      const k = clamp01((d - 12) / 30);
+      g.globalAlpha = k; R(g, 252, 52, 20, 60, '#05060c'); R(g, 256, 44, 12, 12, '#05060c');
+      g.strokeStyle = '#05060c'; g.lineWidth = 2; g.beginPath(); g.moveTo(258, 46); g.lineTo(252, 34); g.moveTo(266, 46); g.lineTo(272, 34); g.moveTo(255, 40); g.lineTo(249, 38); g.moveTo(269, 40); g.lineTo(275, 38); g.stroke();
+      R(g, 258, 49, 2, 2, '#ffd27a'); R(g, 264, 49, 2, 2, '#ffd27a');
+      g.globalAlpha = 1; g.restore();
+      // snow blowing into the room
+      g.fillStyle = '#ffffff';
+      for (let i = 0; i < 40; i++) { const k2 = ((d * 3 + i * 17) % 220); g.globalAlpha = 1 - k2 / 220; g.fillRect(236 - k2 * (0.8 + rnd(i) * 0.5), 50 + rnd(i * 3) * 60 + Math.sin(k2 * 0.1 + i) * 4, 2, 1); }
+      g.globalAlpha = 1;
+    }
+    g.save(); g.translate(236, 40); g.scale(1 - open * 0.92, 1); R(g, 0, 0, 52, 72, '#5a3a24'); R(g, 4, 6, 44, 2, '#3a2414'); R(g, 4, 60, 44, 2, '#3a2414'); g.restore();
+    if (d >= 0 && d < 8) { g.fillStyle = 'rgba(255,255,255,' + (0.5 - d / 16) + ')'; g.fillRect(0, 0, W, H); }
+  };
+
+  // crossing the Wall ------------------------------------------------------
+  C.wall = function (g, t) {
+    sky(g, '#0c1026', '#2a2448'); stars(g, 50, 5, t);
+    R(g, 0, 112, W, 38, '#e8eef8');
+    // the Wall: a curtain of shimmering light between the mortal lands and the fae
+    for (let y = 0; y < 112; y += 2) { const x = 180 + Math.sin(y * 0.08 + t * 0.05) * 3; g.globalAlpha = 0.25 + 0.2 * Math.sin(y * 0.3 + t * 0.1); R(g, x, y, 6, 2, '#b9f0ff'); }
+    g.globalAlpha = 1;
+    // beyond the Wall, it is spring
+    g.save(); g.beginPath(); g.rect(186, 0, W - 186, H); g.clip();
+    sky(g, '#f8d8e8', '#ffeef4'); R(g, 0, 112, W, 38, '#9ad08a');
+    for (let i = 0; i < 20; i++) R(g, 190 + rnd(i) * 130, 108 - rnd(i * 3) * 30, 4, 4, i % 2 ? '#ff9ac0' : '#fff0f6');
+    g.restore();
+    const k = ((t % 600) / 600), x = 40 + k * 220;
+    figure(g, x, 114, 30, '#3a5a2a', '#e8c070');           // the lord
+    figure(g, x - 16, 114, 22, '#2f8f7a', '#d8653a');      // Wren, a step behind
+    if (Math.abs(x - 183) < 20) glow(g, 183, 80, 50, 'rgba(185,240,255,0.5)');
+    snow(g, t, 25, 0);
+  };
+
+  // the Spring Court garden: Wren paints for the first time -------------------
+  C.garden = function (g, t) {
+    sky(g, '#ffe4ee', '#fff6f0');
+    R(g, 0, 108, W, 42, '#8ac87a'); R(g, 0, 108, W, 2, '#b8e8a0');
+    for (let i = 0; i < 8; i++) { const x = 20 + i * 42; R(g, x, 60, 6, 48, '#7a5a3a'); g.fillStyle = '#ffb8d0'; g.beginPath(); g.arc(x + 3, 56, 18, 0, Math.PI * 2); g.fill(); }
+    // easel and the painting growing stroke by stroke
+    R(g, 150, 70, 3, 40, '#7a5a3a'); R(g, 176, 70, 3, 40, '#7a5a3a'); R(g, 146, 62, 38, 30, '#fffaf0');
+    const n = Math.min(40, Math.floor(t / 8)), cols = ['#2a3a7a', '#6a3a9a', '#ffd27a', '#2f8f7a', '#ff9a7a'];
+    for (let i = 0; i < n; i++) R(g, 149 + rnd(i) * 30, 65 + rnd(i * 3) * 24, 4, 2, cols[i % cols.length]);
+    figure(g, 134, 112, 22, '#2f8f7a', '#d8653a');
+    R(g, 138, 92 + Math.sin(t * 0.2) * 2, 6, 1, '#7a5a3a');
+    figure(g, 230, 112, 30, '#3a5a2a', '#e8c070');           // Rowan, watching
+    for (let i = 0; i < 30; i++) { const y = (rnd(i) * H + t * (0.3 + rnd(i) * 0.3)) % H, x = (rnd(i * 2) * W + Math.sin(t * 0.02 + i) * 10 + W) % W; R(g, x, y, 2, 2, i % 2 ? '#ff9ac0' : '#ffffff'); }
+  };
+
+  // the Thorn Queen's blight spreads ----------------------------------------
+  C.thorns = function (g, t) {
+    sky(g, '#2a0a12', '#6a1a22');
+    g.fillStyle = '#12040a'; g.beginPath(); g.moveTo(110, 120); g.lineTo(170, 30); g.lineTo(240, 120); g.fill();
+    glow(g, 170, 90, 40, 'rgba(255,60,90,0.35)');
+    R(g, 0, 118, W, 32, '#1a0810');
+    const grow = Math.min(1, t / 360);
+    g.strokeStyle = '#4a1a2a'; g.lineWidth = 3;
+    for (let i = 0; i < 12; i++) {
+      const x0 = rnd(i) * W, len = grow * (60 + rnd(i * 2) * 70);
+      g.beginPath(); g.moveTo(x0, H);
+      for (let k = 0; k < len; k += 6) g.lineTo(x0 + Math.sin(k * 0.08 + i) * 10, H - k);
+      g.stroke();
+      if (len > 20) R(g, x0 + Math.sin(len * 0.08 + i) * 10 - 1, H - len, 3, 3, '#ff4a5a');
+    }
+    g.lineWidth = 1;
+  };
+
+  // a cell in the Deep. Caelum comes out of the dark --------------------------
+  C.cell = function (g, t, cue) {
+    R(g, 0, 0, W, H, '#07080a');
+    for (let x = 60; x < 260; x += 16) R(g, x, 0, 4, 120, '#1a1c20');
+    R(g, 0, 118, W, 32, '#101214');
+    figure(g, 120, 120, 14, '#2f6a5a', '#a8452a');   // Wren, curled up, feverish
+    R(g, 112, 112, 16, 6, '#2f6a5a');
+    const c = cue && cue.name === 'caelum' ? cue.t : -1;
+    if (c >= 0) {
+      const k = clamp01(c / 60);
+      glow(g, 190, 80, 70 * k, 'rgba(160,140,255,0.35)');
+      for (let i = 0; i < 40; i++) { const a = i / 40 * Math.PI * 2 + t * 0.01, r = 40 * k + rnd(i) * 20; g.globalAlpha = k * (0.5 + 0.5 * Math.sin(t * 0.1 + i)); R(g, 190 + Math.cos(a) * r, 80 + Math.sin(a) * r * 0.6, 1, 1, '#ffffff'); }
+      g.globalAlpha = k;
+      g.fillStyle = '#05040e';
+      g.beginPath(); g.moveTo(186, 70); g.quadraticCurveTo(150, 50, 146, 104); g.lineTo(176, 90); g.fill();
+      g.beginPath(); g.moveTo(196, 70); g.quadraticCurveTo(232, 50, 236, 104); g.lineTo(206, 90); g.fill();
+      figure(g, 191, 120, 34, '#05040e', '#05040e');
+      R(g, 190, 74, 2, 2, '#a58bff');
+      g.globalAlpha = 1;
+    }
+  };
+
+  // the three trials ------------------------------------------------------
+  C.trials = function (g, t, cue) {
+    const name = cue ? cue.name : 'riddle', ct = cue ? cue.t : t;
+    if (name === 'riddle' || !cue) {
+      R(g, 0, 0, W, H, '#14060c');
+      for (let i = 0; i < 9; i++) { g.globalAlpha = 0.4 + 0.4 * Math.sin(t * 0.05 + i); g.fillStyle = '#ff7a8a'; g.font = '14px serif'; g.fillText('ᚠᚱᛁᛟᛒᚹ'.charAt(i % 6), 40 + i * 30, 50 + Math.sin(i) * 20); }
+      g.globalAlpha = 1; figure(g, 160, 130, 22, '#2f8f7a', '#d8653a');
+    } else if (name === 'maze') {
+      R(g, 0, 0, W, H, '#0a0a08');
+      g.strokeStyle = '#6a5a3a'; g.lineWidth = 2;
+      const n = Math.min(60, ct / 2);
+      for (let i = 0; i < n; i++) { const x = 20 + (i % 10) * 28, y = 14 + Math.floor(i / 10) * 22; g.beginPath(); g.moveTo(x, y); rnd(i) < 0.5 ? g.lineTo(x + 28, y) : g.lineTo(x, y + 22); g.stroke(); }
+      g.lineWidth = 1; R(g, 30 + Math.min(240, ct * 1.2), 128, 4, 6, '#ffd27a');
+    } else if (name === 'beast') {
+      R(g, 0, 0, W, H, '#0a0f0a'); R(g, 0, 100, W, 50, '#1a2418');
+      const k = clamp01(ct / 50);
+      for (let i = 0; i < 6; i++) { g.fillStyle = '#050805'; g.beginPath(); g.ellipse(80 + i * 34, 104 - Math.sin(t * 0.05 + i) * 6 * k, 22, 14 * k + 2, 0, 0, Math.PI * 2); g.fill(); }
+      R(g, 250, 82, 10, 4, '#d6f0dc'); R(g, 250, 96, 10, 4, '#d6f0dc');
+      figure(g, 60, 110, 20, '#2f8f7a', '#d8653a');
+    } else if (name === 'end') {
+      R(g, 0, 0, W, H, '#1a0408');
+      figure(g, 160, 120, 22, '#2f8f7a', '#d8653a');
+      const k = clamp01(ct / 30);
+      g.strokeStyle = '#4a1a2a'; g.lineWidth = 3;
+      for (let i = 0; i < 7; i++) { g.beginPath(); g.moveTo(rnd(i) * W, H); g.lineTo(160 + (rnd(i) - 0.5) * 6, 120 - 14 * k * rnd(i * 4)); g.stroke(); }
+      g.lineWidth = 1;
+      if (ct > 30) { g.fillStyle = 'rgba(0,0,0,' + clamp01((ct - 30) / 60) + ')'; g.fillRect(0, 0, W, H); }
+    }
+  };
+
+  // Caelum's blood brings her back, and the bond wakes -----------------------
+  C.rebirth = function (g, t, cue) {
+    sky(g, '#05060e', '#141436'); stars(g, 70, 11, t);
+    R(g, 0, 124, W, 26, '#1a1830');
+    const rise = cue && cue.name === 'rise' ? cue.t : -1;
+    // Caelum, kneeling, wings half open
+    g.fillStyle = '#05040e';
+    const wing = 0.6 + 0.2 * Math.sin(t * 0.03);
+    g.beginPath(); g.moveTo(196, 86); g.quadraticCurveTo(160, 40 - wing * 20, 150, 110); g.lineTo(184, 98); g.fill();
+    g.beginPath(); g.moveTo(206, 86); g.quadraticCurveTo(246, 40 - wing * 20, 256, 110); g.lineTo(218, 98); g.fill();
+    R(g, 194, 84, 16, 30, '#100e22'); g.beginPath(); g.arc(202, 78, 6, 0, Math.PI * 2); g.fill();
+    R(g, 196, 112, 22, 12, '#100e22');
+    R(g, 201, 70, 2, 2, '#cfd6ff'); R(g, 204, 77, 2, 2, '#a58bff');
+    R(g, 176, 96, 20, 3, '#100e22');                     // his arm, reaching over her
+    if (rise < 0) {
+      R(g, 130, 116, 46, 8, '#2f8f7a'); R(g, 124, 114, 8, 8, '#f6dcc6'); R(g, 120, 113, 6, 5, '#d8653a');
+      // drops of starlight blood
+      for (let i = 0; i < 3; i++) { const k = ((t + i * 25) % 75) / 75; g.globalAlpha = 1 - k * 0.4; R(g, 176, 99 + k * 15, 2, 3, i % 2 ? '#c8b8ff' : '#ffffff'); }
+      g.globalAlpha = 1;
+      glow(g, 128, 116, 18 + Math.sin(t * 0.08) * 3, 'rgba(185,168,255,0.35)');
+    } else {
+      const k = ease(rise / 60);
+      if (rise < 12) { g.fillStyle = 'rgba(255,255,255,' + (1 - rise / 12) + ')'; g.fillRect(0, 0, W, H); }
+      glow(g, 150, 100, 40 + 10 * Math.sin(t * 0.1), 'rgba(255,246,216,0.3)');
+      figure(g, 150, 124, 10 + 14 * k, '#2f8f7a', '#d8653a');
+      // the bond: a thread of gold light between them, pulsing
+      g.strokeStyle = 'rgba(255,210,122,' + (0.4 + 0.4 * Math.sin(t * 0.12)) * k + ')'; g.lineWidth = 1.5;
+      g.beginPath(); g.moveTo(151, 112 - 14 * k); g.quadraticCurveTo(176, 80 + Math.sin(t * 0.05) * 6, 200, 92); g.stroke(); g.lineWidth = 1;
+    }
+  };
+
+  // Static panels get a slow push-in and drifting particles, so no scene is a still picture.
+  const DRIFT = { woods: 'snow', spring: 'petals', window: 'stars', rooftop: 'stars', city: 'stars', vision: 'threads', fire: 'embers', observatory: 'stars', spark: 'embers', mountain: 'embers', caelum: 'stars', ships: 'embers' };
+  C.drawStatic = function (g, id, t) {
+    const img = SH.art.panel(id), z = 1 + Math.min(0.08, t / 6000);
+    g.save(); g.translate(W / 2, H / 2); g.scale(z, z); g.translate(-W / 2, -H / 2);
+    g.drawImage(img, 0, 0, W, H); g.restore();
+    const kind = DRIFT[id];
+    if (kind === 'snow') snow(g, t, 50, 0.1);
+    else if (kind === 'petals') for (let i = 0; i < 24; i++) { const y = (rnd(i) * H + t * 0.3) % H, x = (rnd(i * 2) * W + Math.sin(t * 0.02 + i) * 10 + W) % W; R(g, x, y, 2, 2, i % 2 ? '#ff9ac0' : '#ffffff'); }
+    else if (kind === 'embers') for (let i = 0; i < 20; i++) { const y = H - (rnd(i) * H + t * 0.4) % H, x = rnd(i * 2) * W + Math.sin(t * 0.03 + i) * 6; g.globalAlpha = y / H; R(g, x, y, 1, 2, '#ffb060'); g.globalAlpha = 1; }
+    else if (kind === 'stars') for (let i = 0; i < 16; i++) { g.globalAlpha = Math.max(0, Math.sin(t * 0.03 + i * 1.7)); R(g, rnd(i) * W, rnd(i * 4) * 90, 1, 1, '#ffffff'); g.globalAlpha = 1; }
+    else if (kind === 'threads') { g.strokeStyle = 'rgba(255,233,168,0.3)'; g.beginPath(); g.moveTo(0, 70 + Math.sin(t * 0.02) * 10); g.bezierCurveTo(100, 40, 220, 110 + Math.sin(t * 0.03) * 10, W, 60); g.stroke(); }
+  };
+
+  C.has = id => typeof C[id] === 'function' && !['has', 'drawStatic'].includes(id);
 })(window.SH = window.SH || {});
 
 </script>
@@ -1993,6 +2511,12 @@ body[data-input="touch"] #touch { display: block; }
       ground: '#0b0b1a', speck: '#141632', edgeLight: '#e6dcff', edgeMid: '#6a62a8', grass: '#6a7ab8', grassDark: '#3a4278', side: '#22264e',
       motes: ['#ffe9a8', '#fff6d8'],
     },
+    winter: {
+      sky: ['#46557e', '#7a8cbc', '#b4c2e2', '#e2eafa'], stars: false, far: 'mountains', mid: 'pines', snow: true,
+      farA: '#8a9ac4', farB: '#6a7aa6', midC: '#34405e', mist: 'rgba(255,255,255,0.22)',
+      ground: '#1a2236', speck: '#222c44', edgeLight: '#ffffff', edgeMid: '#c8d6f0', grass: '#ffffff', grassDark: '#dfe8f8', side: '#2a3450',
+      motes: ['#ffffff', '#e8f0ff'],
+    },
     thornwood: {
       sky: ['#090b20', '#191a45', '#33295c', '#4d3a72'], stars: true, far: 'mountains', mid: 'trees',
       farA: '#23275a', farB: '#181b42', midC: '#11132e', mist: 'rgba(110,100,190,0.18)',
@@ -2032,7 +2556,7 @@ body[data-input="touch"] #touch { display: block; }
     g.fillStyle = gr; g.fillRect(0, 0, 16, 360);
     out.sky = s;
     out.far = T.far === 'cave' ? makeCave(T) : makeMountains(T);
-    out.mid = T.mid === 'roots' ? makeRoots(T) : T.mid === 'spires' ? makeSpires(T) : makeTrees(T);
+    out.mid = T.mid === 'roots' ? makeRoots(T) : T.mid === 'spires' ? makeSpires(T) : T.mid === 'pines' ? makePines(T) : makeTrees(T);
     return out;
   }
   function makeStars() {
@@ -2071,6 +2595,16 @@ body[data-input="touch"] #touch { display: block; }
       g.beginPath(); g.ellipse(x + tw / 2, top + 6, 22 + r() * 22, 14 + r() * 12, 0, 0, Math.PI * 2); g.fill();
     }
     g.fillStyle = T.midC; g.fillRect(0, 330, w, 30);
+    return c;
+  }
+  function makePines(T) {
+    const w = 1300, c = canvas(w, 360), g = c.getContext('2d'), r = rng(41);
+    for (let i = 0; i < 34; i++) {
+      const x = r() * w, h = 120 + r() * 150, base = 340;
+      g.fillStyle = T.midC; g.fillRect(x - 2, base - 30, 4, 40);
+      for (let k = 0; k < 4; k++) { const y = base - 30 - k * h / 5, wd = 26 - k * 5; g.beginPath(); g.moveTo(x, y - h / 4); g.lineTo(x - wd, y); g.lineTo(x + wd, y); g.fill(); g.fillStyle = 'rgba(255,255,255,0.5)'; g.fillRect(x - wd + 4, y - 2, wd * 2 - 8, 2); g.fillStyle = T.midC; }
+    }
+    g.fillRect(0, 336, w, 24);
     return c;
   }
   function makeSpires(T) {
@@ -2183,6 +2717,7 @@ body[data-input="touch"] #touch { display: block; }
     ctx.translate(-cx + sx, -cy + sy);
     if (def.cityFrom != null) drawStreet(ctx, w, cx, vw, t);
     if (def.arch != null) drawArch(ctx, w, def.arch);
+    if (def.cottage != null) drawCottage(ctx, w, def.cottage, t);
     ctx.drawImage(layers.level, cx, cy, vw, VH, cx, cy, vw, VH);
     if (def.house) drawHouse(ctx, w, def.house);
     if (def.mural) drawMural(ctx, w, def.mural, t);
@@ -2195,6 +2730,12 @@ body[data-input="touch"] #touch { display: block; }
       if (e.kind === 'thornSprite') drawSprite(ctx, e, t);
       else if (e.kind === 'dummy') drawDummy(ctx, e);
       else if (e.kind === 'bulb') drawBulb(ctx, e, t);
+      else if (e.kind === 'stag') drawStag(ctx, e, t);
+    }
+    for (const a of w.arrows || []) {
+      ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(Math.atan2(a.vy, a.vx)); ctx.globalAlpha = Math.min(1, a.life / 20);
+      ctx.fillStyle = '#6a4a2a'; ctx.fillRect(-14, -1, 14, 2); ctx.fillStyle = '#c8d0e0'; ctx.fillRect(0, -2, 4, 4); ctx.fillStyle = '#e8e0c8'; ctx.fillRect(-16, -2, 3, 4);
+      ctx.restore();
     }
     for (const g of fx.ghosts) drawWren(ctx, w.player, { ghost: g });
     drawWren(ctx, w.player, {});
@@ -2228,9 +2769,9 @@ body[data-input="touch"] #touch { display: block; }
     mist.addColorStop(0, 'rgba(0,0,0,0)'); mist.addColorStop(1, T.mist);
     ctx.fillStyle = mist; ctx.fillRect(0, 0, vw, VH);
     // drifting motes
-    for (let i = 0; i < 22; i++) {
-      const px = ((i * 137 + t * (0.15 + (i % 5) * 0.05) - cx * 0.6) % (vw + 40) + vw + 40) % (vw + 40) - 20;
-      const py = (i * 53 + Math.sin(t * 0.01 + i) * 20 - cy * 0.5 + 400) % VH;
+    for (let i = 0; i < (T.snow ? 70 : 22); i++) {
+      const px = ((i * 137 + t * (0.15 + (i % 5) * 0.05) - cx * 0.6 + Math.sin(t * 0.02 + i) * 8) % (vw + 40) + vw + 40) % (vw + 40) - 20;
+      const py = T.snow ? ((i * 53 + t * (0.5 + (i % 4) * 0.2) - cy * 0.5) % VH + VH) % VH : (i * 53 + Math.sin(t * 0.01 + i) * 20 - cy * 0.5 + 400) % VH;
       ctx.globalAlpha = alpha * (0.3 + 0.3 * Math.sin(t * 0.04 + i));
       ctx.fillStyle = T.motes[i % 2]; ctx.fillRect(px, py, 2, 2);
     }
@@ -2435,6 +2976,35 @@ body[data-input="touch"] #touch { display: block; }
     ctx.fillRect(x - 1, y - 30 + bob, 2, 6); ctx.fillRect(x - 3, y - 25 + bob, 6, 2); ctx.fillRect(x - 1, y - 23 + bob, 2, 2);
   }
 
+  function drawCottage(ctx, w, cx0, t) {
+    // the sisters' cottage at the edge of the village
+    const TS = SH.TILE, x = cx0 * TS, gy = 16 * TS;
+    ctx.fillStyle = '#3a2a24'; ctx.fillRect(x, gy - 70, 110, 70);
+    ctx.fillStyle = '#4a3a30'; for (let y = gy - 66; y < gy; y += 10) ctx.fillRect(x, y, 110, 2);
+    ctx.fillStyle = '#e8eef8'; ctx.beginPath(); ctx.moveTo(x - 10, gy - 70); ctx.lineTo(x + 55, gy - 112); ctx.lineTo(x + 120, gy - 70); ctx.fill();
+    ctx.fillStyle = '#2a1c18'; ctx.fillRect(x + 80, gy - 112, 12, 30);
+    for (let i = 0; i < 6; i++) { const k = ((t * 0.4 + i * 20) % 120) / 120; ctx.globalAlpha = 0.5 * (1 - k); ctx.fillStyle = '#c8d0e0'; ctx.beginPath(); ctx.arc(x + 86 + Math.sin(k * 6 + i) * 6, gy - 116 - k * 70, 4 + k * 8, 0, Math.PI * 2); ctx.fill(); }
+    ctx.globalAlpha = 1;
+    const g = ctx.createRadialGradient(x + 30, gy - 40, 2, x + 30, gy - 40, 40); g.addColorStop(0, 'rgba(255,190,110,0.5)'); g.addColorStop(1, 'rgba(255,190,110,0)');
+    ctx.fillStyle = g; ctx.fillRect(x - 10, gy - 80, 80, 80);
+    ctx.fillStyle = '#ffc070'; ctx.fillRect(x + 20, gy - 50, 20, 16); ctx.fillStyle = '#3a2a24'; ctx.fillRect(x + 29, gy - 50, 2, 16);
+    ctx.fillStyle = '#5a3a24'; ctx.fillRect(x + 66, gy - 40, 18, 40);
+  }
+  function drawStag(ctx, e, t) {
+    ctx.save(); ctx.translate(e.x, e.y);
+    if (e.state !== 'down') { const gl = ctx.createRadialGradient(0, -20, 2, 0, -20, 46); gl.addColorStop(0, 'rgba(255,246,216,0.25)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(-46, -66, 92, 92); }
+    ctx.rotate(e.fall * 1.4); ctx.scale(e.dir, 1);
+    const run = e.state === 'flee' ? Math.sin(t * 0.5) * 3 : 0, graze = e.state === 'graze' && Math.sin(t * 0.02) > 0.2;
+    ctx.fillStyle = '#f2f4ff'; ctx.fillRect(-18, -28, 32, 13);
+    ctx.fillRect(-16, -16, 4, 16 + run); ctx.fillRect(-9, -16, 4, 16 - run); ctx.fillRect(4, -16, 4, 16 + run); ctx.fillRect(10, -16, 4, 16 - run);
+    const hy = graze ? -20 : -42;
+    ctx.fillRect(10, hy, 7, 16 + (graze ? 0 : 12)); ctx.fillRect(12, hy - 5, 12, 8);
+    ctx.strokeStyle = '#d6dcff'; ctx.lineWidth = 2; ctx.beginPath();
+    ctx.moveTo(15, hy - 5); ctx.lineTo(10, hy - 17); ctx.lineTo(5, hy - 22); ctx.moveTo(10, hy - 17); ctx.lineTo(15, hy - 25);
+    ctx.moveTo(19, hy - 5); ctx.lineTo(24, hy - 17); ctx.lineTo(29, hy - 21); ctx.moveTo(24, hy - 17); ctx.lineTo(21, hy - 26); ctx.stroke();
+    ctx.fillStyle = '#1a1430'; ctx.fillRect(20, hy - 2, 2, 2);
+    ctx.restore();
+  }
   function drawSprite(ctx, e, t) {
     if (e.dead) return;
     const d = e.def, cy = e.y - d.h / 2;
@@ -2562,8 +3132,9 @@ body[data-input="touch"] #touch { display: block; }
     // ponytail swings opposite to motion
     const tail = pose === 'run' ? Math.sin(run * 2) * 2 : pose === 'fall' ? -3 : 0;
     ctx.fillStyle = C(PAL.hair); ctx.fillRect(-9, hy + 1 + Math.round(tail), 5, 4); ctx.fillRect(-11, hy + 3 + Math.round(tail * 1.4), 3, 5);
-    // pointed fae ear
-    ctx.fillStyle = C(PAL.skin); ctx.fillRect(0, hy + 3, 2, 3); ctx.fillRect(-1, hy + 1, 2, 2); ctx.fillRect(-2, hy - 1, 1, 2);
+    // ear: round while she's mortal, pointed once she's fae
+    ctx.fillStyle = C(PAL.skin); ctx.fillRect(0, hy + 3, 2, 3);
+    if (!SH.game.mortal) { ctx.fillRect(-1, hy + 1, 2, 2); ctx.fillRect(-2, hy - 1, 1, 2); }
     if (!tint) { ctx.fillStyle = '#1a1430'; ctx.fillRect(4, hy + 4, 2, 3); ctx.fillStyle = '#ffffff'; ctx.fillRect(5, hy + 4, 1, 1); }
 
     // arm + dagger
@@ -2582,12 +3153,19 @@ body[data-input="touch"] #touch { display: block; }
       else if (sw.def.arc === 'big') armAng = -3.4 + k * 3.4;
     }
     if (pose === 'pogo') armAng = 0;
+    const bow = !g && SH.game.can('bow') && !SH.game.can('daggers');
+    if (bow) { showBlade = false; if (p.bowT > 0) armAng = -1.57; }
     ctx.save();
     ctx.translate(2, -28 + breathe);
     ctx.rotate(armAng);
     ctx.fillStyle = C(PAL.tunic); ctx.fillRect(-2, 0, 4, 7);
     ctx.fillStyle = C(PAL.skin); ctx.fillRect(-2, 7, 4, 4);
     if (showBlade) { ctx.fillStyle = C(PAL.blade); ctx.fillRect(-1, 10, 2, 9); ctx.fillStyle = C(PAL.gold); ctx.fillRect(-2, 10, 4, 1); }
+    if (bow) { // a hunting bow in her hand, drawn back while she shoots
+      const pull = p.bowT > 8 ? 4 : 0;
+      ctx.strokeStyle = '#8a5a2a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 10, 9, -0.2 * Math.PI + Math.PI / 2 - 1.2, Math.PI / 2 + 1.2 - 0.2 * Math.PI); ctx.stroke();
+      ctx.strokeStyle = '#e8e0c8'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(-6, 4 + pull * 0); ctx.lineTo(-pull, 10); ctx.lineTo(-6, 17); ctx.stroke();
+    }
     ctx.restore();
     ctx.restore(); // lean
 
@@ -2647,6 +3225,11 @@ body[data-input="touch"] #touch { display: block; }
     heartQueue: [],
   };
   G.save = function () { store.set('starhaven.save.v1', G.progress); };
+
+  // What Wren can do in this chapter. Mortal in the Winter Woods: one jump, no dash, a bow instead of daggers.
+  const ABILITIES = { double: true, dash: true, daggers: true, bow: false };
+  G.can = name => { const ch = G.chapterDef(); const a = Object.assign({}, ABILITIES, ch && ch.abilities); return !!a[name]; };
+  Object.defineProperty(G, 'mortal', { get: () => !!(G.chapterDef() && G.chapterDef().mortal) });
   G.chapterDef = () => ST.CHAPTERS[G.chapter];
 
   // ---------------------------------------------------------------- building a room
@@ -2676,6 +3259,9 @@ body[data-input="touch"] #touch { display: block; }
         fx.ring(player.x, player.y - 20, '#9fe8ff', 44, 22, 2);
       },
       onKnockout() { G.knockout(); },
+      arrows: [],
+      spawnArrow(x, y, dir) { this.arrows.push({ x, y, vx: dir * 8, vy: -0.5, life: 110, stuck: false }); },
+      onStagDown() { G.queueScript('woods_kill'); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
@@ -2684,6 +3270,7 @@ body[data-input="touch"] #touch { display: block; }
     G.snapCamera();
     G.hud.hearts(player.hearts, player.maxHearts);
     G.hud.prompt(null); G.hud.talkButton(null);
+    G.hud.abilities();
     return w;
   };
 
@@ -2725,7 +3312,7 @@ body[data-input="touch"] #touch { display: block; }
   };
 
   G.knownPeople = function () {
-    const ids = new Set(ST.KNOWN_FROM.prologue);
+    const ids = new Set();
     for (let i = 0; i <= G.chapter; i++) (ST.KNOWN_FROM[ST.CHAPTERS[i].id] || []).forEach(x => ids.add(x));
     G.progress.met.forEach(x => ids.add(x));
     return ST.PEOPLE.filter(p => ids.has(p.id));
@@ -2796,6 +3383,7 @@ body[data-input="touch"] #touch { display: block; }
       case 'meet': G.meet(st.who); break;
       case 'bond': G.bond(st.who, st.pts); break;
       case 'art': G.hud.sceneArt(st.id, st.title); break;
+      case 'cue': G.hud.sceneCue(st.name); break;
       case 'goto': { const sc = G.script; sc.steps = sc.steps.slice(0, sc.i).concat(ST.SCRIPTS[st.id], sc.steps.slice(sc.i)); break; }
       case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
@@ -2872,6 +3460,20 @@ body[data-input="touch"] #touch { display: block; }
     const painting = G.paintStep();
     if (!painting) p.update(w);
     for (const e of w.things) e.update(w);
+    // arrows fly, drop a little, stick in the ground, and bring down the stag
+    for (const a of w.arrows) {
+      a.life--;
+      if (a.stuck) continue;
+      a.vy += 0.05; a.x += a.vx; a.y += a.vy;
+      const tile = w.room.get(Math.floor(a.x / TS), Math.floor(a.y / TS));
+      if (tile === SH.T_SOLID) { a.stuck = true; a.life = Math.min(a.life, 60); continue; }
+      for (const e of w.things) {
+        if (!e.arrowOnly || !e.hittable()) continue;
+        const hb = e.hurtBox();
+        if (a.x > hb.l && a.x < hb.r && a.y > hb.t && a.y < hb.b) { e.takeHit({ arrow: true, dir: Math.sign(a.vx) }, w); a.life = 0; break; }
+      }
+    }
+    w.arrows = w.arrows.filter(a => a.life > 0);
 
     // thorns and pits
     const b = p.box();
@@ -3050,7 +3652,6 @@ body[data-input="touch"] #touch { display: block; }
   G.menuInput = function () {
     const go = () => input.take('jump') || input.take('attack');
     if (G.state === 'title') { if (go()) G.hud.titlePrimary(); }
-    else if (G.state === 'cutscene') { if (go()) G.hud.cutNext(); }
     else if (G.state === 'card') { if (go()) G.hud.cardGo(); }
     else if (G.state === 'pause') { if (input.take('pause')) G.resume(); }
   };
@@ -3058,8 +3659,7 @@ body[data-input="touch"] #touch { display: block; }
   G.newGame = function () {
     G.progress = { reached: 0, bonds: {}, met: [] }; G.save();
     G.hud.title(false);
-    G.state = 'cutscene';
-    G.hud.cutscene(ST.INTRO, () => G.startChapter(0));
+    G.startChapter(0);
   };
 
   // ---------------------------------------------------------------- screen size
@@ -3082,10 +3682,11 @@ body[data-input="touch"] #touch { display: block; }
     load(chapterOrRoom, opts) {
       opts = opts || {};
       G.frozen = true; input.forced = { held: {}, pressed: {} };
-      G.hud.title(false); G.hud.cutscene(null);
+      G.hud.title(false);
       if (typeof chapterOrRoom === 'number') { G.startChapter(chapterOrRoom); G.hud.cardGo(); }
       else {
-        G.chapter = 0; G.flags = { combo: true, pit: true, arrive: true }; G.activeGoal = null; G.script = null; G.pending = null;
+        const ci = ST.CHAPTERS.findIndex(c => c.room === chapterOrRoom);
+        G.chapter = ci >= 0 ? ci : ST.CHAPTERS.length - 1; G.flags = { combo: true, pit: true, arrive: true }; G.activeGoal = null; G.script = null; G.pending = null;
         fx.reset(); G.build(chapterOrRoom);
         const w = G.world;
         for (const g of w.gates) w.room.setGate(g, false);
@@ -3128,7 +3729,7 @@ body[data-input="touch"] #touch { display: block; }
   const $ = id => document.getElementById(id);
   const ST = SH.STORY;
   const H = {};
-  let lastHearts = -1, lastPrompt = null, toastT = 0, cardDone = null, cut = null;
+  let lastHearts = -1, lastPrompt = null, toastT = 0, cardDone = null;
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
   H.hearts = function (n, max) {
@@ -3205,15 +3806,36 @@ body[data-input="touch"] #touch { display: block; }
   H.choiceIndex = () => choiceSel;
 
   // ---------------- full-screen illustrated scenes behind the dialogue
+  // Scenes animate: cinematics from cine.js, or a still panel with a slow push-in and drifting particles.
+  let scene = null;
   H.sceneArt = function (id, title) {
     const el = $('scene');
-    if (!id) { el.classList.remove('show'); return; }
-    const cv = $('scene-art'), g = cv.getContext('2d');
-    g.imageSmoothingEnabled = false;
-    g.drawImage(SH.art.panel(id), 0, 0, cv.width, cv.height);
+    if (!id) { el.classList.remove('show'); scene = null; return; }
+    const fresh = !scene;
+    if (!scene || scene.id !== id) scene = { id, t: 0, cue: null };
     $('scene-title').textContent = title || '';
     el.classList.add('show');
+    H.sceneDraw();
+    if (fresh) requestAnimationFrame(H.sceneTick);
   };
+  H.sceneCue = function (name) { if (scene) scene.cue = { name, start: scene.t }; };
+  H.sceneTick = function () {
+    if (!scene) return;
+    scene.t++;
+    H.sceneDraw();
+    requestAnimationFrame(H.sceneTick);
+  };
+  H.sceneDraw = function () {
+    if (!scene) return;
+    const g = $('scene-art').getContext('2d');
+    g.setTransform(3, 0, 0, 3, 0, 0);
+    g.imageSmoothingEnabled = false;
+    const cue = scene.cue ? { name: scene.cue.name, t: scene.t - scene.cue.start } : null;
+    if (SH.cine.has(scene.id)) SH.cine[scene.id](g, scene.t, cue);
+    else SH.cine.drawStatic(g, scene.id, scene.t);
+    g.setTransform(1, 0, 0, 1, 0, 0);
+  };
+  H.sceneAdvance = function (n) { if (scene) { scene.t += n; H.sceneDraw(); } }; // tests and screenshots
 
   // ---------------- chapter cards (start and end of each chapter)
   H.card = function (o, done) {
@@ -3232,32 +3854,12 @@ body[data-input="touch"] #touch { display: block; }
     if (f) f();
   };
 
-  // ---------------- intro cutscene: painted panels, tap to go on
-  H.cutscene = function (panels, done) {
-    const el = $('cut');
-    if (!panels) { el.classList.remove('show'); cut = null; return; }
-    cut = { panels, i: 0, done };
-    el.classList.add('show');
-    H.cutShow();
-  };
-  H.cutShow = function () {
-    const p = cut.panels[cut.i], cv = $('cut-art'), g = cv.getContext('2d');
-    g.imageSmoothingEnabled = false;
-    g.clearRect(0, 0, cv.width, cv.height);
-    g.drawImage(SH.art.panel(p.art), 0, 0, cv.width, cv.height);
-    $('cut-text').textContent = p.text;
-    $('cut-count').textContent = `${cut.i + 1} / ${cut.panels.length}`;
-    const t = $('cut-text'); t.classList.remove('in'); void t.offsetWidth; t.classList.add('in');
-  };
-  H.cutNext = function () {
-    if (!cut) return;
-    cut.i++;
-    if (cut.i >= cut.panels.length) H.cutEnd(); else H.cutShow();
-  };
-  H.cutEnd = function () {
-    if (!cut) return;
-    const f = cut.done; $('cut').classList.remove('show'); cut = null;
-    if (f) f();
+  // Touch buttons and labels follow what Wren can do this chapter.
+  H.abilities = function () {
+    const G = SH.game;
+    $('b-dash').style.display = G.can('dash') ? '' : 'none';
+    $('b-down').style.display = G.can('daggers') ? '' : 'none';
+    $('b-attack').textContent = G.can('daggers') ? 'STRIKE' : 'SHOOT';
   };
 
   // ---------------- title
@@ -3350,8 +3952,6 @@ body[data-input="touch"] #touch { display: block; }
     on('t-new', () => G.newGame());
     on('t-continue', () => H.titlePrimary());
     $('t-chapters').addEventListener('click', e => { const b = e.target.closest('[data-ch]'); if (b) { H.title(false); G.startChapter(+b.dataset.ch); } });
-    on('cut', e => { if (!e.target.closest('#cut-skip')) H.cutNext(); });
-    on('cut-skip', () => H.cutEnd());
     on('c-go', () => H.cardGo());
     // In a conversation, a tap anywhere goes to the next line.
     document.addEventListener('pointerdown', e => {

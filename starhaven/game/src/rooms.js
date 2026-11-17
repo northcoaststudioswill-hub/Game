@@ -7,6 +7,36 @@
 (function (SH) {
   SH.ROOMS = {};
 
+  // ---------------------------------------------------------------- Prologue part 1: The Winter Woods (mortal Wren, a bow, no enemies)
+  SH.ROOMS.woods = {
+    id: 'woods', width: 100, height: 20, theme: 'winter',
+    start: { x: 10, y: 16 },
+    cottage: 2,                          // the sisters' cottage, where it starts
+    shapes: [
+      ['solid', 0, 2, 0, 20],
+      ['ground', 2, 44, 16],
+      ['solid', 20, 22, 15, 16],         // a fallen log
+      ['ground', 30, 38, 15],            // a snowbank
+      ['ground', 47, 100, 16],           // a frozen creek between 44 and 47
+      ['solid', 55, 57, 14, 16],         // a boulder
+      ['solid', 98, 100, 0, 20],
+    ],
+    hints: [
+      { x0: 9, x1: 17, text: 'Move with {MOVE}. Lissa and Nessa have something to say: walk up to them and use {TALK}.' },
+      { x0: 17, x1: 26, text: 'Jump with {JUMP}. Wren is still mortal: one jump, no more.' },
+      { x0: 64, x1: 79, text: 'Shoot with {SHOOT}. Get too close and the stag will bolt.', flag: 'stagseen' },
+    ],
+    triggers: [
+      { x: 10, script: 'woods_start' },
+      { x: 40, script: 'woods_tracks' },
+      { x: 63, script: 'woods_stag' },
+    ],
+    lanterns: [{ x: 12, lit: true }, { x: 48 }],
+    npcs: [{ id: 'lissa', x: 7, optional: 'woods_lissa' }, { id: 'nessa', x: 15.5, optional: 'woods_nessa' }],
+    gates: [],
+    spawns: [{ kind: 'stag', x: 80, spots: [80, 88, 94] }],
+  };
+
   // ---------------------------------------------------------------- Prologue: The Deep (movement only, no enemies)
   SH.ROOMS.deep = {
     id: 'deep', width: 150, height: 20, theme: 'deep',

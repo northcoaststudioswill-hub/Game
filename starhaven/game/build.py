@@ -18,6 +18,7 @@ ORDER = [
     'player.js',     # Wren
     'enemies.js',    # thorn sprite, dummy, thorn buds
     'art.js',        # portraits, intro panels, people
+    'cine.js',       # animated cinematics
     'draw.js',       # world drawing
     'game.js',       # loop, camera, checkpoints
     'hud.js',        # HTML HUD and menus

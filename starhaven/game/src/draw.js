@@ -33,6 +33,12 @@
       ground: '#0b0b1a', speck: '#141632', edgeLight: '#e6dcff', edgeMid: '#6a62a8', grass: '#6a7ab8', grassDark: '#3a4278', side: '#22264e',
       motes: ['#ffe9a8', '#fff6d8'],
     },
+    winter: {
+      sky: ['#46557e', '#7a8cbc', '#b4c2e2', '#e2eafa'], stars: false, far: 'mountains', mid: 'pines', snow: true,
+      farA: '#8a9ac4', farB: '#6a7aa6', midC: '#34405e', mist: 'rgba(255,255,255,0.22)',
+      ground: '#1a2236', speck: '#222c44', edgeLight: '#ffffff', edgeMid: '#c8d6f0', grass: '#ffffff', grassDark: '#dfe8f8', side: '#2a3450',
+      motes: ['#ffffff', '#e8f0ff'],
+    },
     thornwood: {
       sky: ['#090b20', '#191a45', '#33295c', '#4d3a72'], stars: true, far: 'mountains', mid: 'trees',
       farA: '#23275a', farB: '#181b42', midC: '#11132e', mist: 'rgba(110,100,190,0.18)',
@@ -72,7 +78,7 @@
     g.fillStyle = gr; g.fillRect(0, 0, 16, 360);
     out.sky = s;
     out.far = T.far === 'cave' ? makeCave(T) : makeMountains(T);
-    out.mid = T.mid === 'roots' ? makeRoots(T) : T.mid === 'spires' ? makeSpires(T) : makeTrees(T);
+    out.mid = T.mid === 'roots' ? makeRoots(T) : T.mid === 'spires' ? makeSpires(T) : T.mid === 'pines' ? makePines(T) : makeTrees(T);
     return out;
   }
   function makeStars() {
@@ -111,6 +117,16 @@
       g.beginPath(); g.ellipse(x + tw / 2, top + 6, 22 + r() * 22, 14 + r() * 12, 0, 0, Math.PI * 2); g.fill();
     }
     g.fillStyle = T.midC; g.fillRect(0, 330, w, 30);
+    return c;
+  }
+  function makePines(T) {
+    const w = 1300, c = canvas(w, 360), g = c.getContext('2d'), r = rng(41);
+    for (let i = 0; i < 34; i++) {
+      const x = r() * w, h = 120 + r() * 150, base = 340;
+      g.fillStyle = T.midC; g.fillRect(x - 2, base - 30, 4, 40);
+      for (let k = 0; k < 4; k++) { const y = base - 30 - k * h / 5, wd = 26 - k * 5; g.beginPath(); g.moveTo(x, y - h / 4); g.lineTo(x - wd, y); g.lineTo(x + wd, y); g.fill(); g.fillStyle = 'rgba(255,255,255,0.5)'; g.fillRect(x - wd + 4, y - 2, wd * 2 - 8, 2); g.fillStyle = T.midC; }
+    }
+    g.fillRect(0, 336, w, 24);
     return c;
   }
   function makeSpires(T) {
@@ -223,6 +239,7 @@
     ctx.translate(-cx + sx, -cy + sy);
     if (def.cityFrom != null) drawStreet(ctx, w, cx, vw, t);
     if (def.arch != null) drawArch(ctx, w, def.arch);
+    if (def.cottage != null) drawCottage(ctx, w, def.cottage, t);
     ctx.drawImage(layers.level, cx, cy, vw, VH, cx, cy, vw, VH);
     if (def.house) drawHouse(ctx, w, def.house);
     if (def.mural) drawMural(ctx, w, def.mural, t);
@@ -235,6 +252,12 @@
       if (e.kind === 'thornSprite') drawSprite(ctx, e, t);
       else if (e.kind === 'dummy') drawDummy(ctx, e);
       else if (e.kind === 'bulb') drawBulb(ctx, e, t);
+      else if (e.kind === 'stag') drawStag(ctx, e, t);
+    }
+    for (const a of w.arrows || []) {
+      ctx.save(); ctx.translate(a.x, a.y); ctx.rotate(Math.atan2(a.vy, a.vx)); ctx.globalAlpha = Math.min(1, a.life / 20);
+      ctx.fillStyle = '#6a4a2a'; ctx.fillRect(-14, -1, 14, 2); ctx.fillStyle = '#c8d0e0'; ctx.fillRect(0, -2, 4, 4); ctx.fillStyle = '#e8e0c8'; ctx.fillRect(-16, -2, 3, 4);
+      ctx.restore();
     }
     for (const g of fx.ghosts) drawWren(ctx, w.player, { ghost: g });
     drawWren(ctx, w.player, {});
@@ -268,9 +291,9 @@
     mist.addColorStop(0, 'rgba(0,0,0,0)'); mist.addColorStop(1, T.mist);
     ctx.fillStyle = mist; ctx.fillRect(0, 0, vw, VH);
     // drifting motes
-    for (let i = 0; i < 22; i++) {
-      const px = ((i * 137 + t * (0.15 + (i % 5) * 0.05) - cx * 0.6) % (vw + 40) + vw + 40) % (vw + 40) - 20;
-      const py = (i * 53 + Math.sin(t * 0.01 + i) * 20 - cy * 0.5 + 400) % VH;
+    for (let i = 0; i < (T.snow ? 70 : 22); i++) {
+      const px = ((i * 137 + t * (0.15 + (i % 5) * 0.05) - cx * 0.6 + Math.sin(t * 0.02 + i) * 8) % (vw + 40) + vw + 40) % (vw + 40) - 20;
+      const py = T.snow ? ((i * 53 + t * (0.5 + (i % 4) * 0.2) - cy * 0.5) % VH + VH) % VH : (i * 53 + Math.sin(t * 0.01 + i) * 20 - cy * 0.5 + 400) % VH;
       ctx.globalAlpha = alpha * (0.3 + 0.3 * Math.sin(t * 0.04 + i));
       ctx.fillStyle = T.motes[i % 2]; ctx.fillRect(px, py, 2, 2);
     }
@@ -475,6 +498,35 @@
     ctx.fillRect(x - 1, y - 30 + bob, 2, 6); ctx.fillRect(x - 3, y - 25 + bob, 6, 2); ctx.fillRect(x - 1, y - 23 + bob, 2, 2);
   }
 
+  function drawCottage(ctx, w, cx0, t) {
+    // the sisters' cottage at the edge of the village
+    const TS = SH.TILE, x = cx0 * TS, gy = 16 * TS;
+    ctx.fillStyle = '#3a2a24'; ctx.fillRect(x, gy - 70, 110, 70);
+    ctx.fillStyle = '#4a3a30'; for (let y = gy - 66; y < gy; y += 10) ctx.fillRect(x, y, 110, 2);
+    ctx.fillStyle = '#e8eef8'; ctx.beginPath(); ctx.moveTo(x - 10, gy - 70); ctx.lineTo(x + 55, gy - 112); ctx.lineTo(x + 120, gy - 70); ctx.fill();
+    ctx.fillStyle = '#2a1c18'; ctx.fillRect(x + 80, gy - 112, 12, 30);
+    for (let i = 0; i < 6; i++) { const k = ((t * 0.4 + i * 20) % 120) / 120; ctx.globalAlpha = 0.5 * (1 - k); ctx.fillStyle = '#c8d0e0'; ctx.beginPath(); ctx.arc(x + 86 + Math.sin(k * 6 + i) * 6, gy - 116 - k * 70, 4 + k * 8, 0, Math.PI * 2); ctx.fill(); }
+    ctx.globalAlpha = 1;
+    const g = ctx.createRadialGradient(x + 30, gy - 40, 2, x + 30, gy - 40, 40); g.addColorStop(0, 'rgba(255,190,110,0.5)'); g.addColorStop(1, 'rgba(255,190,110,0)');
+    ctx.fillStyle = g; ctx.fillRect(x - 10, gy - 80, 80, 80);
+    ctx.fillStyle = '#ffc070'; ctx.fillRect(x + 20, gy - 50, 20, 16); ctx.fillStyle = '#3a2a24'; ctx.fillRect(x + 29, gy - 50, 2, 16);
+    ctx.fillStyle = '#5a3a24'; ctx.fillRect(x + 66, gy - 40, 18, 40);
+  }
+  function drawStag(ctx, e, t) {
+    ctx.save(); ctx.translate(e.x, e.y);
+    if (e.state !== 'down') { const gl = ctx.createRadialGradient(0, -20, 2, 0, -20, 46); gl.addColorStop(0, 'rgba(255,246,216,0.25)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(-46, -66, 92, 92); }
+    ctx.rotate(e.fall * 1.4); ctx.scale(e.dir, 1);
+    const run = e.state === 'flee' ? Math.sin(t * 0.5) * 3 : 0, graze = e.state === 'graze' && Math.sin(t * 0.02) > 0.2;
+    ctx.fillStyle = '#f2f4ff'; ctx.fillRect(-18, -28, 32, 13);
+    ctx.fillRect(-16, -16, 4, 16 + run); ctx.fillRect(-9, -16, 4, 16 - run); ctx.fillRect(4, -16, 4, 16 + run); ctx.fillRect(10, -16, 4, 16 - run);
+    const hy = graze ? -20 : -42;
+    ctx.fillRect(10, hy, 7, 16 + (graze ? 0 : 12)); ctx.fillRect(12, hy - 5, 12, 8);
+    ctx.strokeStyle = '#d6dcff'; ctx.lineWidth = 2; ctx.beginPath();
+    ctx.moveTo(15, hy - 5); ctx.lineTo(10, hy - 17); ctx.lineTo(5, hy - 22); ctx.moveTo(10, hy - 17); ctx.lineTo(15, hy - 25);
+    ctx.moveTo(19, hy - 5); ctx.lineTo(24, hy - 17); ctx.lineTo(29, hy - 21); ctx.moveTo(24, hy - 17); ctx.lineTo(21, hy - 26); ctx.stroke();
+    ctx.fillStyle = '#1a1430'; ctx.fillRect(20, hy - 2, 2, 2);
+    ctx.restore();
+  }
   function drawSprite(ctx, e, t) {
     if (e.dead) return;
     const d = e.def, cy = e.y - d.h / 2;
@@ -602,8 +654,9 @@
     // ponytail swings opposite to motion
     const tail = pose === 'run' ? Math.sin(run * 2) * 2 : pose === 'fall' ? -3 : 0;
     ctx.fillStyle = C(PAL.hair); ctx.fillRect(-9, hy + 1 + Math.round(tail), 5, 4); ctx.fillRect(-11, hy + 3 + Math.round(tail * 1.4), 3, 5);
-    // pointed fae ear
-    ctx.fillStyle = C(PAL.skin); ctx.fillRect(0, hy + 3, 2, 3); ctx.fillRect(-1, hy + 1, 2, 2); ctx.fillRect(-2, hy - 1, 1, 2);
+    // ear: round while she's mortal, pointed once she's fae
+    ctx.fillStyle = C(PAL.skin); ctx.fillRect(0, hy + 3, 2, 3);
+    if (!SH.game.mortal) { ctx.fillRect(-1, hy + 1, 2, 2); ctx.fillRect(-2, hy - 1, 1, 2); }
     if (!tint) { ctx.fillStyle = '#1a1430'; ctx.fillRect(4, hy + 4, 2, 3); ctx.fillStyle = '#ffffff'; ctx.fillRect(5, hy + 4, 1, 1); }
 
     // arm + dagger
@@ -622,12 +675,19 @@
       else if (sw.def.arc === 'big') armAng = -3.4 + k * 3.4;
     }
     if (pose === 'pogo') armAng = 0;
+    const bow = !g && SH.game.can('bow') && !SH.game.can('daggers');
+    if (bow) { showBlade = false; if (p.bowT > 0) armAng = -1.57; }
     ctx.save();
     ctx.translate(2, -28 + breathe);
     ctx.rotate(armAng);
     ctx.fillStyle = C(PAL.tunic); ctx.fillRect(-2, 0, 4, 7);
     ctx.fillStyle = C(PAL.skin); ctx.fillRect(-2, 7, 4, 4);
     if (showBlade) { ctx.fillStyle = C(PAL.blade); ctx.fillRect(-1, 10, 2, 9); ctx.fillStyle = C(PAL.gold); ctx.fillRect(-2, 10, 4, 1); }
+    if (bow) { // a hunting bow in her hand, drawn back while she shoots
+      const pull = p.bowT > 8 ? 4 : 0;
+      ctx.strokeStyle = '#8a5a2a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 10, 9, -0.2 * Math.PI + Math.PI / 2 - 1.2, Math.PI / 2 + 1.2 - 0.2 * Math.PI); ctx.stroke();
+      ctx.strokeStyle = '#e8e0c8'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(-6, 4 + pull * 0); ctx.lineTo(-pull, 10); ctx.lineTo(-6, 17); ctx.stroke();
+    }
     ctx.restore();
     ctx.restore(); // lean
 

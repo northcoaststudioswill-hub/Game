@@ -66,7 +66,7 @@
       { frames: 12, active: [2, 6], next: 7, lunge: 0, kb: 2.6, stop: 3, reach: 36, arc: 'high' },
       { frames: 14, active: [2, 7], next: 99, lunge: 0, kb: 4.5, stop: 4, reach: 38, arc: 'low', finisher: true },
     ],
-    pogo: { frames: 14, active: [1, 9], next: 99, kb: 1.5, stop: 5, reach: 30, arc: 'down' },
+    pogo: { frames: 16, active: [1, 11], next: 99, kb: 1.5, stop: 5, reach: 36, arc: 'down' },
     killStop: 6,
     recoil: 1.6,        // small push back on you when your blade connects
   };
