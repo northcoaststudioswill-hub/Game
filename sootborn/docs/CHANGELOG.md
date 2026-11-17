@@ -1,5 +1,15 @@
 # SOOTBORN — changelog
 
+## v0.8 · 2026-11-17 — art pass (no new content)
+- Tiles redrawn: hand-laid flagstones in the square, riveted deck plates in the bays, floorboards with grain at home, packed dirt in the tunnel, steel grating with frames. Every surface has a lit top-left edge and a dark bottom-right edge.
+- Walls: dressed stone courses with timber props, iron panels with girders and rust in the bays, lumped cave rock with ore glints around every room. Walls now cast contact shadows on the floor.
+- Characters: all workers redrawn at 16×20 with three-tone shading, real faces, hands, boots, hair highlights and soot. The Accredited are now 16×28 so they still tower.
+- Props redrawn with lit tops, dark sides and hardware: crates, barrels, benches, the noodle stall, lamp posts, Ivo's cart, pipes, doors, the clinic door, the heart-furnace, the Pillar plinth, conveyor, cots. Blocking props cast shadows.
+- Lift Zero's gate is now white steel with gold trim and the sun-eye emblem: the one clean thing in the square.
+- Old tunnel: brighter, with rails, an ore cart, a proper rockfall and more lamps.
+- Menus, dialogue box, objective and toasts are framed like engraved brass plates.
+- The Ember Ring is fought on the square's flagstones.
+
 ## v0.7 · 2026-11-17 — "First Fire"
 - **Day 2 is playable**: the Festival of the First Fire, one year to the night after the wedding. Roughly 30–40 more minutes.
   - Seren left a list in her lantern frame. Kael gathers wire (Ivo), gold (Orin) and a wick (Nell), and collects paper "rays" from up to ten people who loved her. The ray count decides who stands in front of the lantern at the end.

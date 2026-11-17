@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Book One. Current build: v0.7 "First Fire" (see CHANGELOG.md).
+Book One. Current build: v0.8 (art pass over v0.7 "First Fire") (see CHANGELOG.md).
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -112,8 +112,9 @@ Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at F
 ## Art direction
 - Reference boards from the user show the target look: dense 16-bit pixel art, a cutaway with a pristine ruling settlement above and lamp-lit warrens below, gold-edged sign plates naming every chamber, banners, and framed menu panels with a world map.
 - Those boards use another property's names, emblems and characters. They are mood references only. Nothing from them is copied into the game.
-- Translated to this world so far: the cutaway Map of Cinderwell, sign plates, Authority banners (white cloth, gold sun with an eye).
-- Still far from the reference: character and tile detail. That needs larger sprites and hand-made tilesets, not more procedural drawing.
+- Translated to this world so far: the cutaway Map of Cinderwell, sign plates, Authority banners (white cloth, gold sun with an eye), and the v0.8 art pass (shaded stone, plate and timber tiles; 16×20 workers and 16×28 Accredited; redrawn props; brass-framed menus).
+- Rule of the art: every surface is lit from the top left; the Belowborn world is warm brown and soot; anything of the Authority is white, gold and clean.
+- Still short of the reference: it is all drawn by code at a 320×180 screen. Matching the boards fully needs a higher base resolution or hand-made sprite sheets.
 
 ## Tech notes
 - Cinematic zoom: `Cutscene.zoom` renders a smaller window scaled up, so `W` and `H` are `let`.

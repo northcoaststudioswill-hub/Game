@@ -113,14 +113,15 @@ const Brawl = {
     const sx = this.shake > 0 && !rm ? Math.round((Math.random() - .5) * 5) : 0, sy = this.shake > 0 && !rm ? Math.round((Math.random() - .5) * 3) : 0;
     g.fillStyle = '#120c10'; g.fillRect(0, 0, W, H);
     g.save(); g.translate(sx, sy);
-    for (let y = 0; y < H; y += 16) for (let x = 0; x < W; x += 16) { g.fillStyle = ((x + y) >> 4) % 2 ? '#2a252b' : '#302a31'; g.fillRect(x, y, 15, 15); }
+    if (!this.floor) { const fm = { w: 21, h: 12, theme: 'city', seed: 5, grid: Array.from({ length: 12 }, () => Array(21).fill('.')) }; const [fc, fg] = mk(336, 192); for (let ty = 0; ty < 12; ty++) for (let tx = 0; tx < 21; tx++) drawTile(fg, fm, tx, ty); this.floor = fc; }
+    g.drawImage(this.floor, 0, 0);
     // chalk ring
     g.fillStyle = 'rgba(20,12,16,.45)'; g.beginPath(); g.ellipse(G0.cx, G0.cy, G0.rx, G0.ry, 0, 0, 6.3); g.fill();
     g.fillStyle = '#e8e0d0'; for (let a = 0; a < 6.283; a += 0.05) g.fillRect(Math.round(G0.cx + Math.cos(a) * G0.rx), Math.round(G0.cy + Math.sin(a) * G0.ry), 2, 1);
     g.fillStyle = '#e8b23a'; g.fillRect(G0.cx - 2, G0.cy - 2, 5, 5); for (const [a, b] of [[-5, 0], [5, 0], [0, -5], [0, 5]]) g.fillRect(G0.cx + a, G0.cy + b, 1, 1);
     // crowd, top and bottom
     const crowd = this.crowd, n = Math.floor(W / 20);
-    for (let i = 0; i < n; i++) { const s = crowd[i % crowd.length], bob = rm ? 0 : Math.round(Math.abs(Math.sin(t * 3 + i * 1.3)) * 2); g.drawImage(s, 0, 0, 16, 16, 6 + i * 20, G0.cy - G0.ry - 24 - bob, 16, 16); }
+    for (let i = 0; i < n; i++) { const s = crowd[i % crowd.length], bob = rm ? 0 : Math.round(Math.abs(Math.sin(t * 3 + i * 1.3)) * 2); g.drawImage(s, 0, 0, 16, s.fh || 16, 6 + i * 20, G0.cy - G0.ry - 28 - bob, 16, s.fh || 16); }
     // telegraphs
     for (const f of this.foes) if (f.st === 'wind') { const w = f.mode === 'charge' ? f.K.wind + .15 : f.second ? .3 : f.K.wind, k = Math.min(1, f.t / w); g.fillStyle = `rgba(255,70,50,${.18 + k * .4})`;
       if (f.mode === 'sweep') { g.beginPath(); g.ellipse(f.x, f.y, (f.K.reach + 6) * k, (f.K.reach + 6) * k * .7, 0, 0, 6.3); g.fill(); }
@@ -144,19 +145,19 @@ const Brawl = {
       if (e.foe && o.bark) { const tw = ptextW(o.bark.t), bx = clamp(Math.round(o.x - tw / 2 - 3), 2, W - tw - 8), by = Math.round(o.y - fh * 2 - 18); g.fillStyle = '#120a0e'; g.fillRect(bx - 1, by - 1, tw + 8, 11); g.fillStyle = '#f3e3c3'; g.fillRect(bx, by, tw + 6, 9); ptext(g, o.bark.t, bx + 3, by + 2, '#2a1408'); }
     }
     for (const q of this.parts) { g.fillStyle = q.c; g.fillRect(Math.round(q.x), Math.round(q.y), 2, 2); }
-    for (let i = 0; i < n; i++) { const s = crowd[(i + 5) % crowd.length]; g.drawImage(s, 0, 16, 16, 16, 16 + i * 20, G0.cy + G0.ry + 6, 16, 16); }
+    for (let i = 0; i < n; i++) { const s = crowd[(i + 5) % crowd.length]; g.drawImage(s, 0, s.fh || 16, 16, s.fh || 16, 16 + i * 20, G0.cy + G0.ry + 5, 16, s.fh || 16); }
     g.restore();
     // darkness + lantern warmth
     const gr = g.createRadialGradient(G0.cx, G0.cy, 30, G0.cx, G0.cy, W * .62); gr.addColorStop(0, 'rgba(255,170,80,.06)'); gr.addColorStop(1, 'rgba(6,3,8,.7)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
     if (this.slow > 0) { g.fillStyle = 'rgba(255,224,138,.10)'; g.fillRect(0, 0, W, H); }
     // HUD
-    g.fillStyle = 'rgba(12,8,10,.8)'; g.fillRect(0, 0, W, 13); ptext(g, 'KAEL', 4, 4, PAL.cream);
+    g.fillStyle = '#0e090b'; g.fillRect(0, 0, W, 13); g.fillStyle = '#6a5228'; g.fillRect(0, 12, W, 1); ptext(g, 'KAEL', 4, 4, PAL.cream);
     for (let i = 0; i < p.max; i++) { g.fillStyle = i < p.hp ? '#ffb35a' : '#3a2a24'; g.fillRect(24 + i * 6, 4, 4, 5); }
     const live = this.foes.filter(f => f.st !== 'down'), nm = (live[0] || this.foes[0]).name.toUpperCase() + (live.length > 1 ? ' +' + (live.length - 1) : ''); ptext(g, nm, W - 4 - ptextW(nm), 4, '#ff8a6a');
-    g.fillStyle = 'rgba(12,8,10,.8)'; g.fillRect(0, H - 11, W, 11);
-    const tip = Input.device === 'touch' ? 'A STRIKE  B DODGE' : Input.device === 'pad' ? 'A STRIKE  B DODGE' : 'E STRIKE  X DODGE'; if (this.phase === 'fight') { const full = tip + (W > 240 ? '  -  DODGE A SWING TO OPEN THEM UP' : ''); ptext(g, full, Math.max(3, W / 2 - ptextW(full) / 2), H - 8, '#b8a890'); }
-    const big = (s, c, y) => ptext(g, s, W / 2 - ptextW(s, 2) / 2, y, c, 2);
-    if (this.phase === 'intro') { g.fillStyle = 'rgba(8,4,6,.6)'; g.fillRect(0, H / 2 - 22, W, 40); big(this.def.title, '#ffe08a', H / 2 - 16); if (this.def.sub) ptext(g, this.def.sub, W / 2 - ptextW(this.def.sub) / 2, H / 2 + 2, PAL.cream); }
+    g.fillStyle = '#0e090b'; g.fillRect(0, H - 11, W, 11); g.fillStyle = '#6a5228'; g.fillRect(0, H - 11, W, 1);
+    const tip = Input.device === 'touch' ? 'A STRIKE  B DODGE' : Input.device === 'pad' ? 'A STRIKE  B DODGE' : 'E STRIKE  X DODGE'; if (this.phase === 'fight') { const full = tip + (W > 240 ? '  -  DODGE A SWING TO OPEN THEM UP' : ''); ptext(g, full, Math.max(3, Math.round(W / 2 - ptextW(full) / 2)), H - 8, '#f3e3c3'); }
+    const big = (s, c, y) => { const bx = Math.round(W / 2 - ptextW(s, 2) / 2); ptext(g, s, bx + 1, y + 1, '#120a0e', 2); ptext(g, s, bx, y, c, 2); };
+    if (this.phase === 'intro') { g.fillStyle = 'rgba(8,4,6,.6)'; g.fillRect(0, H / 2 - 22, W, 40); big(this.def.title, '#ffe08a', H / 2 - 16); if (this.def.sub) ptext(g, this.def.sub, Math.round(W / 2 - ptextW(this.def.sub) / 2), H / 2 + 2, PAL.cream); }
     else if (this.phase === 'win') big(this.def.winText || 'DOWN!', '#ffe08a', 26);
     else if (this.phase === 'lose') big('KAEL IS DOWN', '#ff5a4a', 26);
     else if (this.msgT > 0) big(this.msg, '#ffe08a', 26);

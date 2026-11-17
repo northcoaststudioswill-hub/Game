@@ -246,7 +246,7 @@ const World = {
     const FX = [0, 0, -1, 1][P.dir], FY = [1, -1, 0, 0][P.dir]; // facing: 0 down, 1 up, 2 left, 3 right
     const fx = P.x + FX * 12, fy = P.y - 4 + FY * 12;
     let best = null, bd = 13;
-    for (const n of this.npcs) { const d = Math.hypot(n.x - fx, n.y - 4 - fy); if (d < bd) { bd = d; best = { kind: 'npc', id: n.id, n, x: n.x, y: n.y - 18 }; } }
+    for (const n of this.npcs) { const d = Math.hypot(n.x - fx, n.y - 4 - fy); if (d < bd) { bd = d; best = { kind: 'npc', id: n.id, n, x: n.x, y: n.y - 23 }; } }
     if (best) return best;
     const probes = [[fx, fy], [fx + FY * 5, fy + FX * 5], [fx - FY * 5, fy - FX * 5]];
     for (const [px, py] of probes) { const tx = Math.floor(px / 16), ty = Math.floor(py / 16);
@@ -413,7 +413,7 @@ const World = {
     if (this.flash > 0) { g.fillStyle = this.flashC; g.globalAlpha = Math.min(1, this.flash) * (Settings.d.reduce ? .25 : .7); g.fillRect(0, 0, W, H); g.globalAlpha = 1; this.flash -= 1 / 60; }
     if (phase() === 'evening' && G.mapId !== 'tunnel') { g.fillStyle = 'rgba(70,12,30,.16)'; g.fillRect(0, 0, W, H); }
     // ambient bark bubbles
-    if (!Dialogue.active) for (const n of this.npcs) if (n.bark) { const tw = ptextW(n.bark.t), bx = clamp(Math.round(n.x - cx - tw / 2 - 3), 2, W - tw - 8), by = Math.round(n.y - cy - 30);
+    if (!Dialogue.active) for (const n of this.npcs) if (n.bark) { const tw = ptextW(n.bark.t), bx = clamp(Math.round(n.x - cx - tw / 2 - 3), 2, W - tw - 8), by = Math.round(n.y - cy - 35);
       g.fillStyle = '#120a0e'; g.fillRect(bx - 1, by - 1, tw + 8, 11); g.fillStyle = '#f3e3c3'; g.fillRect(bx, by, tw + 6, 9); g.fillRect(clamp(Math.round(n.x - cx) - 1, bx + 2, bx + tw + 2), by + 9, 3, 2); ptext(g, n.bark.t, bx + 3, by + 2, '#2a1408'); }
     // interaction prompt
     if (Cutscene.active) { Cutscene.renderFX(g, cx, cy, t); return; }
@@ -421,7 +421,7 @@ const World = {
     if (show) { const bx = Math.round(this.target.x - cx), by = Math.round(this.target.y - cy) + (rm ? 0 : Math.round(Math.sin(t * 5))); g.fillStyle = '#120a0e'; g.fillRect(bx - 5, by - 6, 11, 10); g.fillStyle = PAL.amber; g.fillRect(bx - 4, by - 5, 9, 8); g.fillStyle = '#120a0e'; g.fillRect(bx, by + 3, 1, 2); ptext(g, Input.device === 'kb' ? 'E' : 'A', bx - 1, by - 4, '#2a1408'); }
     if (Settings.d.highlight && !Dialogue.active) { const a = Math.floor(t * 2) % 2 ? PAL.cyan : PAL.amber; g.fillStyle = a;
       for (const h of m.hot) { const [hx, hy] = h.tiles[0]; g.fillRect(hx * 16 + 7 - cx, hy * 16 - cy + (isWall(m.grid[hy][hx]) ? 13 : 1), 2, 2); }
-      for (const n of this.npcs) g.fillRect(Math.round(n.x - 1 - cx), Math.round(n.y - 19 - cy), 2, 2); }
+      for (const n of this.npcs) g.fillRect(Math.round(n.x - 1 - cx), Math.round(n.y - 24 - cy), 2, 2); }
   }
 };
 

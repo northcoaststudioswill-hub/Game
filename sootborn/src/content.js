@@ -82,13 +82,13 @@ const MAPS = {
     exits: [{ tiles: [[7, 8]], to: 'square', spawn: { x: 21 * 16 + 8, y: 2 * 16 + 12, dir: 0 } }]
   }),
   tunnel: buildMap({
-    name: 'Old Service Tunnel', w: 26, h: 8, theme: 'tunnel', music: 'mystery', dark: 'rgba(5,3,7,.8)',
+    name: 'Old Service Tunnel', w: 26, h: 8, theme: 'tunnel', music: 'mystery', dark: 'rgba(5,3,7,.66)',
     set: [[0, 3, 'E'], [0, 4, 'E'], [1, 2, 24, 5, ',']],
     props: [{ t: 'pipes', x: 1, y: 1, w: 7 }, { t: 'sealdoor', x: 8, y: 1 }, { t: 'pipes', x: 9, y: 1, w: 5 }, { t: 'chalk', x: 14, y: 1 }, { t: 'pipes', x: 15, y: 1, w: 8 },
       { t: 'stencil', x: 4, y: 1 }, { t: 'stencil', x: 18, y: 1 }, { t: 'riser', x: 23, y: 1 }, { t: 'ladder', x: 1, y: 2 },
       { t: 'sign', x: 8, y: 0, a: 'CORRIDOR 4' }, { t: 'sign', x: 23.5, y: 0, a: 'RISER 9' }, { t: 'sign', x: 1.5, y: 0, a: 'BAY 3' },
-      { t: 'rubble', x: 12, y: 5, block: blk(12, 5, 2, 2) }, { t: 'cagelamp', x: 6, y: 1 }, { t: 'cagelamp', x: 19, y: 1 }],
-    lights: [{ x: 24, y: 48, r: 46 }, { x: 104, y: 30, r: 44 }, { x: 312, y: 30, r: 44 }, { x: 384, y: 36, r: 80, c: '#fff0b0', riser: 1 }],
+      { t: 'rails', x: 2, y: 3, w: 20 }, { t: 'orecart', x: 17, y: 3, block: blk(17, 3) }, { t: 'rubble', x: 12, y: 5, block: blk(12, 5, 2, 2) }, { t: 'cagelamp', x: 6, y: 1 }, { t: 'cagelamp', x: 12, y: 1 }, { t: 'cagelamp', x: 19, y: 1 }, { t: 'crate', x: 4, y: 6, block: blk(4, 6) }, { t: 'barrel', x: 21, y: 6, block: blk(21, 6) }],
+    lights: [{ x: 24, y: 48, r: 50 }, { x: 104, y: 30, r: 58 }, { x: 200, y: 30, r: 58 }, { x: 312, y: 30, r: 58 }, { x: 384, y: 36, r: 84, c: '#fff0b0', riser: 1 }, { x: 216, y: 96, r: 36, c: '#ffb060' }],
     hot: [{ id: 'sealdoor', tiles: blk(8, 1) }, { id: 'chalk', tiles: blk(14, 1) }, { id: 'rubble', tiles: blk(12, 5, 2, 2) }, { id: 'riser', tiles: blk(23, 1, 2) }, { id: 'tpipe', tiles: [[3, 1], [4, 1], [17, 1], [18, 1]] }],
     exits: [{ tiles: [[0, 3], [0, 4]], to: 'bay', spawn: { x: 11 * 16 + 8, y: 11 * 16 + 12, dir: 0 } }]
   }),

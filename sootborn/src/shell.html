@@ -117,6 +117,24 @@ body.portrait #hint{bottom:auto;top:calc(var(--cy) + var(--ch) + 64px)}
 #cskip{position:absolute;right:calc(var(--sar) + 10px);bottom:calc(var(--sab) + 10px);min-height:44px;padding:6px 14px;background:rgba(36,23,26,.85);border:2px solid #3a2620;color:var(--cream);font:inherit;border-radius:4px;pointer-events:auto;z-index:5}
 #dbg{position:absolute;left:4px;bottom:4px;font-size:10px;background:rgba(0,0,0,.7);padding:4px;white-space:pre;pointer-events:none;z-index:9}
 @media (prefers-reduced-motion:reduce){.press,#dlg .more{animation:none}}
+
+/* art pass: panels framed like engraved brass plates */
+:root{--gold:#c8a050;--goldL:#f0d48a;--goldD:#6a5228}
+#dlg,.panel{border:2px solid var(--gold);border-radius:3px;box-shadow:0 0 0 1px #0c0808,0 0 0 3px var(--goldD),0 0 0 4px #0c0808,inset 0 0 0 1px #0c0808,inset 0 0 0 2px #3a2a1c,0 8px 22px rgba(0,0,0,.6)}
+.panel{background:linear-gradient(#1c1316,#150e11)}
+#dlg{background:linear-gradient(rgba(30,20,22,.97),rgba(18,11,14,.97))}
+.panel h2{border-bottom:1px solid var(--goldD);padding-bottom:6px;text-shadow:0 2px 0 #4a2a10}
+.panel h2::before{content:'\25C6\00a0';color:var(--gold);font-size:.7em;vertical-align:middle}
+#dlg canvas{border:2px solid var(--gold);box-shadow:0 0 0 1px #0c0808}
+#obj{border:1px solid var(--goldD);border-left:3px solid var(--gold);background:rgba(22,14,16,.9)}
+#stat{border:1px solid var(--goldD);background:rgba(22,14,16,.9)}
+#toast{border:2px solid var(--gold);box-shadow:0 0 0 1px #0c0808,0 0 0 3px var(--goldD);background:#1e1512;border-radius:2px;letter-spacing:.06em}
+.mi{border:1px solid #4a3626;border-left:3px solid #4a3626;background:linear-gradient(#281a1c,#201417);border-radius:2px}
+.mi.sel{border-color:var(--gold);border-left-color:var(--goldL);background:linear-gradient(#3a2618,#2a1a16);color:#fff3d8}
+.card{border:1px solid #3a2a22;border-left:3px solid var(--gold);background:#1e1416}
+.tabs button.on{border-color:var(--gold);color:var(--goldL);background:#33201a}
+#hint span{border:1px solid var(--goldD)}
+.modal.clear .panel{box-shadow:0 0 0 1px #0c0808,0 0 0 3px var(--goldD),0 0 0 4px #0c0808,0 8px 22px rgba(0,0,0,.6)}
 </style>
 </head>
 <body>

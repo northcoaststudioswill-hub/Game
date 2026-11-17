@@ -97,7 +97,7 @@ const Cutscene = {
       const x = Math.round(a.x - cx), y = Math.round(a.y - cy) - 10;
       g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 0, x, y, 26); gr.addColorStop(0, 'rgba(255,230,160,.35)'); gr.addColorStop(1, 'rgba(255,230,160,0)'); g.fillStyle = gr; g.fillRect(x - 26, y - 26, 52, 52);
       g.globalCompositeOperation = 'source-over';
-      const f = a.moving ? 1 + (Math.floor(a.anim * 5) % 2) : 0; g.drawImage(a.sheet, f * 16, a.dir * 24, 16, 24, x - 8, Math.round(a.y - cy) - 23, 16, 24);
+      const f = a.moving ? 1 + (Math.floor(a.anim * 5) % 2) : 0; const ah = a.sheet.fh; g.drawImage(a.sheet, f * 16, a.dir * ah, 16, ah, x - 8, Math.round(a.y - cy) - ah + 1, 16, ah);
     }
     if (this.glowK) { const a = this.actor('kael'); if (a) { const x = Math.round(a.x - cx) + (a.dir === 2 ? -7 : 7), y = Math.round(a.y - cy) - 9; g.fillStyle = '#e8a040'; g.fillRect(x - 2, y - 2, 5, 5); g.fillStyle = '#fff0b0'; g.fillRect(x - 1, y - 1, 3, 3); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 0, x, y, 30); gr.addColorStop(0, 'rgba(255,200,110,.5)'); gr.addColorStop(1, 'rgba(255,200,110,0)'); g.fillStyle = gr; g.fillRect(x - 30, y - 30, 60, 60); g.globalCompositeOperation = 'source-over'; } }
     if (this.sun > 0.01) { const x = 13 * 16 + 8 - cx, y = 8 * 16 - 24 - cy, k = this.sun, rm = Settings.d.reduce;
