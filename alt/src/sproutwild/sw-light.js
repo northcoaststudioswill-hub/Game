@@ -13,7 +13,7 @@
 const WASIG={BLOOMBOAR:{n:'VERDANT SIGIL',c:'#7ec850',d:'#3a8a32'},PYTHORN:{n:'ROOT SIGIL',c:'#c89058',d:'#6a4a2a'},
  STONESQUIRE:{n:'STONE SIGIL',c:'#c8ccd4',d:'#6e7280'},AURICORN:{n:'GOLD SIGIL',c:'#f8e060',d:'#b07808'}};
 /* the Meadow alpha is the first real test: a little gentler */
-FMAPS.MEADOW.key.A.lv=7;
+FMAPS.MEADOW.key.A.lv=6; /* simulated: every starter at Lv6 with a Lv4 buddy wins 3/3 */
 /* an alpha given the light gives up its Sigil */
 function alphaSigil(sp){const S=WASIG[sp];if(!S||SW.badges.includes(S.n))return;SW.badges.push(S.n);W4.sigilQ={sp,n:SW.badges.length};swSave()}
 /* trainers talk now; the King lowers the dome for four Sigils */
@@ -35,4 +35,4 @@ function wLightBurn(nS){const foe=BT.foe,mx=wStats(foe).max,kin=wKinship(BT.toss
 /* goals: the alphas are the way */
 const WNEXT=['Meadow ALPHA (behind the boulder wall): bring it the light','Bring the light to an ALPHA: Crooked Hollow or Squire\'s Woods','Next ALPHA: Crooked Hollow or Squire\'s Woods','Gloom Hollow ALPHA (Town, the Shore, then Gloom)','King Bibi waits in Gloom Hollow: show him 4 Sigils'];
 function wGymGoal(){if(SW.quest<5)return null;if(SW.fl.bibi)return SW.bottieBeat?null:"Bottie's tower is on the Peak. End this.";
- const n=SW.badges.length;if(n===0){const L=Math.max(0,...SW.party.map(m=>m.lv));if(L<8)return'Meadow ALPHA is Lv7: train to Lv8 (SELECT)'}return WNEXT[Math.min(n,4)]}
+ const n=SW.badges.length;if(n===0){const L=Math.max(0,...SW.party.map(m=>m.lv)),A=FMAPS.MEADOW.key.A.lv;if(L<A)return'Meadow ALPHA is Lv'+A+': train to Lv'+A+' (SELECT)'}return WNEXT[Math.min(n,4)]}

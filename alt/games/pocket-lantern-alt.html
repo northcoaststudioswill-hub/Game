@@ -10744,7 +10744,7 @@ function scGymCheck(){if(SCOFF||SW.quest<5||SW.badges.length||SW.lessons.scGym||
  scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Now the real work: the dark out there.'},
   {who:'MARCUS',txt:'Every place has an ALPHA, bro. Biggest, darkest buddy around. Ours sleeps behind the boulder wall.'},
   {who:'ERIN',txt:'Bring an alpha the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome.'},
-  {who:'MARCUS',txt:'Meadow alpha is Lv'+FMAPS.MEADOW.key.A.lv+'. Battle wilds with SELECT till your lead is Lv'+(FMAPS.MEADOW.key.A.lv+1)+'. Then throw sprouts. See one, light one.'}],()=>swSave())}
+  {who:'MARCUS',txt:'Meadow alpha is Lv'+FMAPS.MEADOW.key.A.lv+'. Battle wilds with SELECT till your lead is Lv'+FMAPS.MEADOW.key.A.lv+'. Then throw sprouts. See one, light one.'}],()=>swSave())}
 function wGymGoal(){if(SW.quest<5||SW.badges.length)return null;const L=Math.max(0,...SW.party.map(m=>m.lv));
  const T=Math.max(...WGYMS[0].team.map(t=>t[1]))+1;return L<T?'Ranger gym, north road: train to Lv'+T+' (SELECT)':"Lantern Town (north road): win the Ranger's Sigil"}
 /* ================================================================
@@ -10851,7 +10851,7 @@ function loreBibi(){if(W4.fld||W4.sector!=='BASE'||!SW.bottieSeen||SW.lessons.sc
 const WASIG={BLOOMBOAR:{n:'VERDANT SIGIL',c:'#7ec850',d:'#3a8a32'},PYTHORN:{n:'ROOT SIGIL',c:'#c89058',d:'#6a4a2a'},
  STONESQUIRE:{n:'STONE SIGIL',c:'#c8ccd4',d:'#6e7280'},AURICORN:{n:'GOLD SIGIL',c:'#f8e060',d:'#b07808'}};
 /* the Meadow alpha is the first real test: a little gentler */
-FMAPS.MEADOW.key.A.lv=7;
+FMAPS.MEADOW.key.A.lv=6; /* simulated: every starter at Lv6 with a Lv4 buddy wins 3/3 */
 /* an alpha given the light gives up its Sigil */
 function alphaSigil(sp){const S=WASIG[sp];if(!S||SW.badges.includes(S.n))return;SW.badges.push(S.n);W4.sigilQ={sp,n:SW.badges.length};swSave()}
 /* trainers talk now; the King lowers the dome for four Sigils */
@@ -10873,7 +10873,7 @@ function wLightBurn(nS){const foe=BT.foe,mx=wStats(foe).max,kin=wKinship(BT.toss
 /* goals: the alphas are the way */
 const WNEXT=['Meadow ALPHA (behind the boulder wall): bring it the light','Bring the light to an ALPHA: Crooked Hollow or Squire\'s Woods','Next ALPHA: Crooked Hollow or Squire\'s Woods','Gloom Hollow ALPHA (Town, the Shore, then Gloom)','King Bibi waits in Gloom Hollow: show him 4 Sigils'];
 function wGymGoal(){if(SW.quest<5)return null;if(SW.fl.bibi)return SW.bottieBeat?null:"Bottie's tower is on the Peak. End this.";
- const n=SW.badges.length;if(n===0){const L=Math.max(0,...SW.party.map(m=>m.lv));if(L<8)return'Meadow ALPHA is Lv7: train to Lv8 (SELECT)'}return WNEXT[Math.min(n,4)]}
+ const n=SW.badges.length;if(n===0){const L=Math.max(0,...SW.party.map(m=>m.lv)),A=FMAPS.MEADOW.key.A.lv;if(L<A)return'Meadow ALPHA is Lv'+A+': train to Lv'+A+' (SELECT)'}return WNEXT[Math.min(n,4)]}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */
