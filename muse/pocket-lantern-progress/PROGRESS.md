@@ -13,6 +13,12 @@ Estimates: Sproutwild is Claude's, Rootdeep and the note on the others are Will'
 | **Sproutwild / Pocket Lantern (cart 5)** | `alt/src/sproutwild/` | v9.9 | **35%** | The castle path works end to end, and the Meadow and Sunkeep are playable. Sigils 2 to 4, Bottie's final tower and the post-game are not played by hand. About 4 hours of content is the target. |
 | **Thornwatch** (slot 4 of the Thornwatch file) | `muse/games/thornwatch/` on `claude/2d-fighter-game-characters-r9oir7` | v3.7 (v4.0 not started) | **30%** | A working tower defense with three gardens, but it reads as a mini-game. v4 research is done; no v4 build yet. |
 | Starhaven (separate project) | `starhaven` branch | outline | 10% | Design outline only. Not part of Pocket Lantern. |
+| Sootborn (standalone, not Pocket Lantern) | `sootborn/` on the `sootborn` branch | v0.6 vertical slice | 15% | Claude's guess. A playable prologue and one shift in the present day. Will loves the story. |
+
+## How we work (notes from Will)
+
+- Spreading across several projects is how Will is learning; the games get better together. Focus can come later, as the lessons settle.
+- Starting new projects inside this repo (Starhaven and Sootborn, then Sprouts fully here) went better than editing the Muse copies. Muse-first took longer to reach a game Will liked.
 
 ## Open questions for Will
 
