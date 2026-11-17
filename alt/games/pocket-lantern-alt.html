@@ -9942,10 +9942,10 @@ function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch
   {x:240,y:70,who:'ERIN',txt:'The Great Lantern is awake. Your berries did that.'},
   {x:240,y:352,hold:1.5},
   {x:240,y:352,hold:1.1,fn:pop},
-  {x:240,y:352,who:'ERIN',txt:'This is the GARDEN. From now on, new sprouts grow here.'},
+  {x:240,y:352,who:'ERIN',txt:"This is the LANTERN'S SOIL. From now on, new sprouts grow here."},
   {x:240,y:352,who:'ERIN',txt:'Walk up to a grown one and press A to pluck it. It joins your squad.'},
   {who:'MARCUS',txt:'Light reached the wilds too. Three buddies incoming. Pick one. I would pick the blue one. Hydro.'}
- ],()=>{W4.choiceT=0;W4.banner={txt:'THE LANTERN STIRS',sub:'Pluck sprouts in the garden to the south',t:3.5}})}
+ ],()=>{W4.choiceT=0;W4.banner={txt:'THE LANTERN STIRS',sub:"Pluck sprouts in the Lantern's soil, to the south",t:3.5}})}
 /* first steps in the Meadow: where buddies live, and what A does out here */
 function scMeadow(F){SW.lessons.scMeadow=1;const sec=wSector(W4.sector);
  if(!W4.wilds.length&&F.grass.length)W4.wilds.push(fSpawnWild(F,sec));
@@ -10724,7 +10724,7 @@ function ewTick(F,dt){if(SCOFF||F.id!=='MEADOW'||wOp()<3||W4.scene||F.dlg||F.spo
   if(ewGo(F,E,tg.x,tg.y,62,go)<4){E.mv=false;E.dir=[P3.x>E.x?1:-1,0];if(dp<70)fTalk(F,'ERIN',EW2[st],()=>{SW.walk2=st+1;if(st===9){SW.walk2=10;SW.walk3=7;E.leave=1}swSave()})}return}
  E.mv=false;E.t+=dt;E.dir=[P3.x>E.x?1:-1,0];
  const done=st===2?SW.quest>=3:st===4?!F.buds.some(b=>b.type===1):st===6?!F.gates.some(g2=>g2.type===1&&!g2.open):st===8?!F.sites.some(s=>!s.done):true;
- if(done&&st===2&&!SW.lessons.tutFight){for(const w of W4.wilds)w.tame=0;ewFightSetup(F);fTalk(F,'ERIN',["ERIN: Your first catch! See how the dark broke right off it? That is the whole job, keeper.","ERIN: Buddies can fight, too. Look, another wild one. Stand next to it and press SELECT to battle it.","ERIN: Go on. I'll watch."],()=>{SW.lessons.tutFight=1;swSave()});E.t=0;return}
+ if(done&&st===2&&!SW.lessons.tutFight){for(const w of W4.wilds)w.tame=0;if(!W4.wilds.some(w=>w.fightMe))ewFightSetup(F); /* v12.3: one, not one a frame while a message holds the dialogue back */if(F.dlgPend){E.t=0;return}fTalk(F,'ERIN',["ERIN: Your first catch! See how the dark broke right off it? That is the whole job, keeper.","ERIN: Buddies can fight, too. Look, another wild one. Stand next to it and press SELECT to battle it.","ERIN: Go on. I'll watch."],()=>{SW.lessons.tutFight=1;swSave()});E.t=0;return}
  if(st===2&&SW.lessons.tutFight===1){if(!W4.wilds.some(w=>w.fightMe))ewFightSetup(F);if(E.t>40){E.t=0;fTalk(F,'ERIN',["ERIN: Stand next to the wild one and press SELECT. That starts a battle."],()=>{})}return}
  if(done){if(st===2)for(const w of W4.wilds)w.tame=0;fTalk(F,'ERIN',EWDONE[st],()=>{ewAfter(st,E);swSave()});E.t=0;return}
  if(E.t>75&&st!==2){E.t=0;fTalk(F,'ERIN',["ERIN: No rush. I'll wait right here."],()=>{})}}
@@ -10860,7 +10860,7 @@ function fBarrierDraw(F){fSignsDraw(F);for(const e of F.exits){if(!wBarred(e.to)
 function fTalk(F,who,lines,after){const d={who,lines,i:0,after};if(!SCOFF&&swBusy()&&!F.dlg){F.dlgPend=d;return}F.dlgPend=null;F.dlg=d}
 /* v8.7: after the cottage and the first crop, the game points you at the Ranger's gym */
 function scGymCheck(){if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return; /* v8.9: cottage and a crop are enough (the garden lesson can come after) */ /* queued right away: it plays as soon as the crop line has been read */SW.lessons.scGym=1;
- scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Now the real work: the dark out there.'},
+ scStart([{who:'ERIN',txt:'Sunkeep has a roof and a crop growing. Now the real work: the dark out there.'},
   {who:'MARCUS',txt:'Every place has a GUARDIAN OF THE LIGHT, bro. They went dim when the Lantern did. Ours sleeps behind the boulder wall.'},
   {who:'ERIN',txt:'Bring a guardian the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome.'},
   {who:'MARCUS',txt:'Meadow guardian is Lv'+FMAPS.MEADOW.key.A.lv+'. Battle wilds with SELECT till your lead is Lv'+FMAPS.MEADOW.key.A.lv+'. Then throw sprouts. See one, light one.'}],()=>swSave())}
@@ -10943,7 +10943,7 @@ WSTORY.length=0;WSTORY.push( /* v9.2: twelve scenes */
  {sc:9,who:'',t:"In the dark the valley's buddies forgot the promise. They went wild, and their GUARDIANS OF THE LIGHT went dim. A dim Guardian spells peril for the kingdom."},
  {sc:1,who:'',t:'But the light fell as seeds, and the seeds grew legs: SPROUTS. Throw one at a wild buddy and it remembers.'},
  {sc:3,who:'',t:'Bring a buddy enough light and the dark breaks. It comes home calm.'},
- {sc:2,who:'',t:'That night three people were called to Sunkeep, and none of them knows why. Marcus left a Flow Pros job with Derek. Erin and Will left their wedding plans on the table.'},
+ {sc:2,who:'',t:'That night three people were called to Sunkeep. None of them knows why. Marcus left a Flow Pros job. Erin and Will left their wedding plans.'},
  {sc:2,who:'ERIN',t:'You got here last, Will, so we will fill you in. Sunkeep still grows sprouts. Show the buddies the light.'},
  {sc:4,who:'MARCUS',t:'Four Guardians hold four Sigil stones, bro. Light them and the stones come home to the Lantern. Then Bibi drops the dome and we face Bottie. I supervise.'});
 /* first visit to Lantern Town: the Elder explains what the domes did */
@@ -11163,7 +11163,7 @@ function wBarredSay(to){return to==='SQUIRE'?"RANGER'S BARRIER: Squire's Woods i
 /* after the cottage and the first crop: the castle */
 function scGymCheck(){wStoryBeats();if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||!SW.lessons.scDab||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return;SW.lessons.scGym=1;
  const L=FMAPS.SQUIRE.key.A.lv;
- scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Now the real work: the dark out there.'},
+ scStart([{who:'ERIN',txt:'Sunkeep has a roof and a crop growing. Now the real work: the dark out there.'},
   {who:'MARCUS',txt:"Every place has a GUARDIAN OF THE LIGHT, bro. They went dim when the Lantern did. Ours moved into the old castle in Squire's Woods."},
   {who:'ERIN',txt:"South through the Meadow. Bring the guardian the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome."},
   {who:'MARCUS',txt:'Castle guardian is Lv'+L+'. Battle wilds with SELECT on the way till your lead is Lv'+(L-1)+'. See one, light one.'},
@@ -11773,6 +11773,15 @@ WCBEATS.push(['called',()=>wOp()===1,[['MARCUS',"I was on a Flow Pros job with D
  ['last',()=>wOp()===2,[['ERIN','You got here last, so ask us anything. We have had a whole day more than you.']]]);
 if(typeof WCIDLE!=='undefined'){if(WCIDLE.MARCUS)WCIDLE.MARCUS.push('Derek is still on that Flow Pros job. Probably thinks I went for lunch.','Nobody told me why it is us, bro. I just keep the fire going.');
  if(WCIDLE.ERIN)WCIDLE.ERIN.push('The seating chart is still on our kitchen table. I think about that a lot.','Whoever called us here did not leave a note.')}
+/* ---- v12.3: nothing hangs on screen. Bubbles, messages and banners counted down only while the world was
+   running, so a scene or a menu froze them in place: a fresh-save run had one bubble up for 41 seconds and a
+   message for 30. Every one of them now also expires by the clock. ---- */
+function wStaleSweep(){const now=time,old=(o,dur,grace)=>{if(o._at==null){o._at=now;o._dur=dur}return now-o._at>o._dur+grace};
+ if(W4.lsay&&old(W4.lsay,W4.lsay.t||2,.6))W4.lsay=null;
+ if(W4.quips&&W4.quips.length&&old(W4.quips[0],W4.quips[0].t||3,1)){W4.quips=[];W4.quipGap=.7}
+ if(W4.banner&&W4.banner.t>0&&old(W4.banner,W4.banner.t,1.5))W4.banner.t=0;
+ if(W4.msgT>0&&W4.msg){if(W4._ms!==W4.msg){W4._ms=W4.msg;W4._mAt=now;W4._mDur=W4.msgT}else if(now-W4._mAt>W4._mDur+1||(W4.scene&&now-W4._mAt>1.5))W4.msgT=0}else W4._ms=null}
+{const _wh=wHud;wHud=function(){wStaleSweep();_wh()}}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */

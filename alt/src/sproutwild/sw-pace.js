@@ -44,7 +44,7 @@ function fBarrierDraw(F){fSignsDraw(F);for(const e of F.exits){if(!wBarred(e.to)
 function fTalk(F,who,lines,after){const d={who,lines,i:0,after};if(!SCOFF&&swBusy()&&!F.dlg){F.dlgPend=d;return}F.dlgPend=null;F.dlg=d}
 /* v8.7: after the cottage and the first crop, the game points you at the Ranger's gym */
 function scGymCheck(){if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return; /* v8.9: cottage and a crop are enough (the garden lesson can come after) */ /* queued right away: it plays as soon as the crop line has been read */SW.lessons.scGym=1;
- scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Now the real work: the dark out there.'},
+ scStart([{who:'ERIN',txt:'Sunkeep has a roof and a crop growing. Now the real work: the dark out there.'},
   {who:'MARCUS',txt:'Every place has a GUARDIAN OF THE LIGHT, bro. They went dim when the Lantern did. Ours sleeps behind the boulder wall.'},
   {who:'ERIN',txt:'Bring a guardian the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome.'},
   {who:'MARCUS',txt:'Meadow guardian is Lv'+FMAPS.MEADOW.key.A.lv+'. Battle wilds with SELECT till your lead is Lv'+FMAPS.MEADOW.key.A.lv+'. Then throw sprouts. See one, light one.'}],()=>swSave())}

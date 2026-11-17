@@ -27,7 +27,7 @@ function wBarredSay(to){return to==='SQUIRE'?"RANGER'S BARRIER: Squire's Woods i
 /* after the cottage and the first crop: the castle */
 function scGymCheck(){wStoryBeats();if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||!SW.lessons.scDab||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return;SW.lessons.scGym=1;
  const L=FMAPS.SQUIRE.key.A.lv;
- scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Now the real work: the dark out there.'},
+ scStart([{who:'ERIN',txt:'Sunkeep has a roof and a crop growing. Now the real work: the dark out there.'},
   {who:'MARCUS',txt:"Every place has a GUARDIAN OF THE LIGHT, bro. They went dim when the Lantern did. Ours moved into the old castle in Squire's Woods."},
   {who:'ERIN',txt:"South through the Meadow. Bring the guardian the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome."},
   {who:'MARCUS',txt:'Castle guardian is Lv'+L+'. Battle wilds with SELECT on the way till your lead is Lv'+(L-1)+'. See one, light one.'},

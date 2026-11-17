@@ -23,7 +23,7 @@ WSTORY.length=0;WSTORY.push( /* v9.2: twelve scenes */
  {sc:9,who:'',t:"In the dark the valley's buddies forgot the promise. They went wild, and their GUARDIANS OF THE LIGHT went dim. A dim Guardian spells peril for the kingdom."},
  {sc:1,who:'',t:'But the light fell as seeds, and the seeds grew legs: SPROUTS. Throw one at a wild buddy and it remembers.'},
  {sc:3,who:'',t:'Bring a buddy enough light and the dark breaks. It comes home calm.'},
- {sc:2,who:'',t:'That night three people were called to Sunkeep, and none of them knows why. Marcus left a Flow Pros job with Derek. Erin and Will left their wedding plans on the table.'},
+ {sc:2,who:'',t:'That night three people were called to Sunkeep. None of them knows why. Marcus left a Flow Pros job. Erin and Will left their wedding plans.'},
  {sc:2,who:'ERIN',t:'You got here last, Will, so we will fill you in. Sunkeep still grows sprouts. Show the buddies the light.'},
  {sc:4,who:'MARCUS',t:'Four Guardians hold four Sigil stones, bro. Light them and the stones come home to the Lantern. Then Bibi drops the dome and we face Bottie. I supervise.'});
 /* first visit to Lantern Town: the Elder explains what the domes did */

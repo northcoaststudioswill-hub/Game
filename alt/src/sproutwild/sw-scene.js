@@ -28,10 +28,10 @@ function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch
   {x:240,y:70,who:'ERIN',txt:'The Great Lantern is awake. Your berries did that.'},
   {x:240,y:352,hold:1.5},
   {x:240,y:352,hold:1.1,fn:pop},
-  {x:240,y:352,who:'ERIN',txt:'This is the GARDEN. From now on, new sprouts grow here.'},
+  {x:240,y:352,who:'ERIN',txt:"This is the LANTERN'S SOIL. From now on, new sprouts grow here."},
   {x:240,y:352,who:'ERIN',txt:'Walk up to a grown one and press A to pluck it. It joins your squad.'},
   {who:'MARCUS',txt:'Light reached the wilds too. Three buddies incoming. Pick one. I would pick the blue one. Hydro.'}
- ],()=>{W4.choiceT=0;W4.banner={txt:'THE LANTERN STIRS',sub:'Pluck sprouts in the garden to the south',t:3.5}})}
+ ],()=>{W4.choiceT=0;W4.banner={txt:'THE LANTERN STIRS',sub:"Pluck sprouts in the Lantern's soil, to the south",t:3.5}})}
 /* first steps in the Meadow: where buddies live, and what A does out here */
 function scMeadow(F){SW.lessons.scMeadow=1;const sec=wSector(W4.sector);
  if(!W4.wilds.length&&F.grass.length)W4.wilds.push(fSpawnWild(F,sec));

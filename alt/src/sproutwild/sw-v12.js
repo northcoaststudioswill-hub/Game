@@ -123,3 +123,12 @@ WCBEATS.push(['called',()=>wOp()===1,[['MARCUS',"I was on a Flow Pros job with D
  ['last',()=>wOp()===2,[['ERIN','You got here last, so ask us anything. We have had a whole day more than you.']]]);
 if(typeof WCIDLE!=='undefined'){if(WCIDLE.MARCUS)WCIDLE.MARCUS.push('Derek is still on that Flow Pros job. Probably thinks I went for lunch.','Nobody told me why it is us, bro. I just keep the fire going.');
  if(WCIDLE.ERIN)WCIDLE.ERIN.push('The seating chart is still on our kitchen table. I think about that a lot.','Whoever called us here did not leave a note.')}
+/* ---- v12.3: nothing hangs on screen. Bubbles, messages and banners counted down only while the world was
+   running, so a scene or a menu froze them in place: a fresh-save run had one bubble up for 41 seconds and a
+   message for 30. Every one of them now also expires by the clock. ---- */
+function wStaleSweep(){const now=time,old=(o,dur,grace)=>{if(o._at==null){o._at=now;o._dur=dur}return now-o._at>o._dur+grace};
+ if(W4.lsay&&old(W4.lsay,W4.lsay.t||2,.6))W4.lsay=null;
+ if(W4.quips&&W4.quips.length&&old(W4.quips[0],W4.quips[0].t||3,1)){W4.quips=[];W4.quipGap=.7}
+ if(W4.banner&&W4.banner.t>0&&old(W4.banner,W4.banner.t,1.5))W4.banner.t=0;
+ if(W4.msgT>0&&W4.msg){if(W4._ms!==W4.msg){W4._ms=W4.msg;W4._mAt=now;W4._mDur=W4.msgT}else if(now-W4._mAt>W4._mDur+1||(W4.scene&&now-W4._mAt>1.5))W4.msgT=0}else W4._ms=null}
+{const _wh=wHud;wHud=function(){wStaleSweep();_wh()}}

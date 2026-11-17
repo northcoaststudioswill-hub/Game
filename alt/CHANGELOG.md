@@ -3,6 +3,16 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v12.3: things found by reading a fresh-save run
+- Text that hung on screen. Speech bubbles, messages and banners only counted down while the world was running, so a scene or a menu froze them in place. One run had a bubble up for 41 seconds and "CROP PLOT dug" for 30, still showing in the Meadow. Each now also expires by the clock, and a message is dropped when a scene starts. Same run after the fix: longest bubble 10 seconds, longest message 6.5.
+- A pile of wild buddies after the first catch. If a message was on screen when Erin began the battle lesson, the game added a new wild buddy every frame until the message cleared: dozens, stacked on one spot. (My bug, from v10.1.) Now exactly one.
+- Erin's "Sunkeep has a roof and a garden" is now "a roof and a crop growing".
+- The new opening-story page is shorter, so it no longer covers Will and Erin in the picture.
+- More "garden" wording changed to "the Lantern's soil".
+- Checked the Buddy Barn's price by the numbers: a rock takes 5 swings by hand and gives 3 stone, so 8 stone is 3 rocks; 6 wood is 2 trees. It is reachable without a mining buddy.
+
+Checked: field lab; the pile-up reproduced and fixed; a real-time fresh-save run to the crop plot with no errors.
+
 ## v12.2: the walkthrough ends on the catch and the battle (Will, Nov 17)
 Will: the Bibi scene never came after the first SELECT battle, Erin's lines about it came far too late, some text stayed up too long, and the new Sunkeep items were in the wrong places.
 
