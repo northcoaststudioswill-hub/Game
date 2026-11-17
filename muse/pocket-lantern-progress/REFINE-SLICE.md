@@ -37,6 +37,12 @@ Will, Nov 17. The Sigil 2 to 4 playthrough waits. This is the work on the slice 
 - **Creatures and sprouts pile up.** Eventually there will be too many. Add a way to sell or release a creature or sprout at the base (the Buddy Barn stores them, per v9.2). Bugs already sell to Pip, so reuse that pattern. Check `pfSend` and the box in `sw-party.js`, and the Buddy Barn in `sw-sunkeep.js`.
 - **Name it for players.** "Sell" or "release" is Will's call. Ask before choosing the word.
 
+## Castle puzzle and the storage gate (Will, Nov 17)
+
+- **A small puzzle before the first alpha.** Right now the castle is one boulder wall (PEB) and one thorn gate (LEAF). Make the approach a few steps, each using a different sprout's job: LEAF clears the thorns, PEB cracks a rock, and sprouts or buddies build a plank bridge over the moat (the same bridge idea as Erin's Meadow lesson). Each step is small and teaches one thing. Check `sw-castle.js` (the castle map) and the gate and wall code in `sw-field.js`.
+- **Build a Buddy Barn before the first fight.** The first alpha won't take a challenge until the player has a Buddy Barn (the extra-storage building, `datacenter` in code). Without it you're capped at three buddies, and the player found out too late. Gate it in the alpha interaction (`fNear`, the `alpha` case, in `sw-field.js`) with `wHasDC()` (in `sw-starters.js`).
+- **Marcus explains it at the castle.** Something like: "Bro, are you kidding? We need to see one, send one, and get you a box made. Lots of purifying to do." His line plays when the player reaches the castle before the Barn exists. Put it in the castle reveal in `sw-castle.js` (`sqArrive`), so it's a teaching beat, not a wall of text.
+
 ## Not now
 
 - The Sigil 2 to 4 playthrough (Will says he usually stops around the cottage).
