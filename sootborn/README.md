@@ -1,4 +1,4 @@
-# SOOTBORN — Book One: The First Shift
+# SOOTBORN — Book One
 
 A North Coast Studios × E Concepts game. A 16-bit story RPG set in Cinderwell, an undercity
 that runs the air for a gleaming upper world it is told does not exist.
@@ -7,13 +7,15 @@ Forty-one days ago, the Array Authority burned Seren Holloway in the heart-furna
 her husband, Kael Brennick, committed. Today Kael goes back to work on the same valve bank.
 
 This is a **standalone game** (not a Pocket Lantern cartridge). It is the current vertical slice:
-a playable prologue (proposal, fever, stealth heist, execution), then one full shift in the present day.
+a playable prologue (proposal, fever, stealth heist, execution), then two full days in the present:
+the first shift back, and the Festival of the First Fire.
 
 ## Play
 
 Open `index.html` in a browser. It is a single self-contained file.
 
-- **Touch:** on-screen pad, A to interact, B to go back (throws a bolt during the heist), ☰ for the menu.
+- **Touch:** on-screen pad, A to interact, B to go back (throws a bolt during stealth), ☰ for the menu.
+- **Fights:** A strikes (three-hit chain), B dodges. Dodge through a swing to open the foe up.
 - **Keyboard:** WASD/arrows, E or Enter, Esc or X, M for the menu, Q/R for journal tabs, H for a puzzle hint.
 - **Controller:** stick or D-pad, Ⓐ, Ⓑ, Start, shoulder buttons.
 
@@ -30,11 +32,13 @@ node build.mjs
 | `src/shell.html` | Page, CSS, DOM overlays (dialogue, menus, touch controls) |
 | `src/core.js` | Constants, storage, settings, input (touch/keyboard/gamepad), WebAudio synth and music, layout |
 | `src/art.js` | Palette, 3×5 pixel font, character / Accredited / portrait generators, tiles and props |
-| `src/content.js` | Story helpers and maps (apartment, Ashgate Square, Bay 3, clinic, old tunnel) |
+| `src/content.js` | Story helpers and maps (apartment, Ashgate Square, Bay 3, Fuse Room C, clinic, old tunnel, festival night) |
 | `src/story.js` | Cast, journal, dialogue, hotspots, puzzles, ambient barks |
 | `src/systems.js` | State, saves, dialogue runner, pipe puzzle, world, heist stealth, lighting, fades |
 | `src/cinema.js` | Cutscene engine and the prologue scripts |
-| `src/ui.js` | HUD, menus, splash, title, day-end |
+| `src/brawl.js` | Real-time melee: the base for every fight |
+| `src/day2.js` | Day 2 "First Fire": dialogue, hotspots, the Ember Ring, festival cutscenes |
+| `src/ui.js` | HUD, menus, cutaway map, splash, title, day-end |
 | `src/main.js` | Game flow and the fixed-timestep loop |
 
 All art and music are generated in code. There are no external assets.
@@ -48,6 +52,9 @@ cd tests
 node play.mjs     # full run: prologue, heist, furnace, whole shift, save/reload
 node mobile.mjs   # portrait phone, landscape phone, 1280x800 layouts
 node clinic.mjs   # clinic visit
+node day2.mjs     # all of Day 2 from a synthetic Day 1 save (VAR=b for the other branch, PORTRAIT=1 for phone)
+node fight.mjs    # every bout against a mashing bot and a dodging bot
+node sneak.mjs    # walks the festival stealth for real
 ```
 
 Screenshots go to `tests/shots/`.

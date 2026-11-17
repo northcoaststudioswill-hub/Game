@@ -4,8 +4,9 @@
 const HUD = {
   dirty: true, tt: 0,
   objective() {
+    if (G.heist === 2) return D2OBJ();
     if (G.heist) return G.flags.relayCut ? 'Reach Valve Bank 7 (north wall) unseen' : 'Cut the audit relay (east wall) unseen';
-    if (F('day1Done')) return "Day 2 isn't built yet — explore freely";
+    if (F('day1Done')) return D2OBJ();
     if (!F('talkedTavi')) return 'Talk to Tavi';
     if (!F('talkedMara1')) return G.mapId === 'bay' ? 'Report to Mara' : 'Go to the Maintenance Bay (east, through the square)';
     if (!F('tookOrder')) return 'Take your work order from the shift board';
@@ -18,7 +19,7 @@ const HUD = {
   },
   hint() {
     const d = Input.device;
-    if (G.mode !== 'world' || Dialogue.active || Puzzle.active || UI.stack.length) return '';
+    if (G.mode !== 'world' || Dialogue.active || Puzzle.active || Brawl.active || UI.stack.length) return '';
     if (G.heist) return d === 'touch' ? 'B: throw a bolt · stay out of the light' : d === 'pad' ? 'Ⓑ throw a bolt · stay out of the light' : 'Esc/X: throw a bolt · stay out of the light';
     if (P.moved < 40 && !F('talkedTavi')) return d === 'touch' ? 'Drag the pad to move' : d === 'pad' ? 'Left stick or D-pad to move' : 'WASD or arrow keys to move';
     if (World.target && !F('interacted')) return d === 'touch' ? 'Tap A to interact' : d === 'pad' ? 'Press Ⓐ to interact' : 'Press E or Enter to interact';
@@ -27,11 +28,11 @@ const HUD = {
   update(dt) {
     const world = G.mode === 'world' && !UI.stack.length;
     const o = $('#obj'), s = $('#stat'), h = $('#hint');
-    o.classList.toggle('hidden', !(world && !Dialogue.active) && !Puzzle.active);
-    s.classList.toggle('hidden', !world || Dialogue.active || Puzzle.active);
-    if (Puzzle.active) { o.querySelector('b').textContent = 'WO-114 · VALVE ' + Puzzle.defs[Puzzle.si].name; o.querySelector('span').textContent = Puzzle.defs[Puzzle.si].tip; }
+    o.classList.toggle('hidden', (!(world && !Dialogue.active) && !Puzzle.active) || Brawl.active);
+    s.classList.toggle('hidden', !world || Dialogue.active || Puzzle.active || Brawl.active);
+    if (Puzzle.active) { o.querySelector('b').textContent = Puzzle.defs[Puzzle.si].wo || ('WO-114 · VALVE ' + Puzzle.defs[Puzzle.si].name); o.querySelector('span').textContent = Puzzle.defs[Puzzle.si].tip; }
     else { o.querySelector('b').textContent = 'OBJECTIVE'; o.querySelector('span').textContent = this.objective(); }
-    s.textContent = `Day ${G.day} · ${G.scrip} scrip` + (G.newJ ? ` · ✎${G.newJ}` : '');
+    s.textContent = `Day ${G.day} · ${G.scrip} scrip` + (F('d2Tavi') && !F('day2Done') ? ` · ☀${G.flags.rays | 0}` : '') + (G.newJ ? ` · ✎${G.newJ}` : '');
     const ht = this.hint(); h.classList.toggle('hidden', !ht); h.querySelector('span').textContent = ht;
     document.body.classList.toggle('ctlfade', Dialogue.active || Puzzle.active);
     document.body.classList.toggle('ingame', world);
@@ -96,7 +97,8 @@ const Menus = {
     UI.push(modal({ title: 'Paused', startCloses: true, build(b) { b.innerHTML = `<p>${esc(G.name)} · Day ${G.day} · ${esc(MAPS[G.mapId].name)}${G.tendency ? ' · ' + TEND[G.tendency] : ''}</p>`; }, items: [
       { label: 'Resume', act: () => UI.pop() },
       { label: () => 'Journal' + (G.newJ ? ` (${G.newJ} new)` : ''), act: () => Menus.journal() },
-      { label: 'Save game', act: () => { const ok = Save.write('manual'); HUD.toast(ok ? 'Game saved' : 'Saved for this session — use Save data to keep it'); Sound.play('coin'); } },
+      { label: 'Map of Cinderwell', act: () => Menus.map() },
+      { label: 'Save game', act: () => { if (G.heist) { HUD.toast('Not now — finish this first'); Sound.play('deny'); return; } const ok = Save.write('manual'); HUD.toast(ok ? 'Game saved' : 'Saved for this session — use Save data to keep it'); Sound.play('coin'); } },
       { label: 'Settings', act: () => Menus.settings() },
       { label: 'Dialogue history', act: () => Menus.log() },
       { label: 'Save data (export / import)', act: () => Menus.saveData() },
@@ -126,6 +128,42 @@ const Menus = {
       },
       items: [{ label: 'Close', act: () => UI.pop() }] });
     UI.push(m);
+  },
+  // cutaway of the world as Kael understands it: what is known is lit, what is not is rock
+  map() {
+    UI.push(modal({ title: 'Cinderwell', startCloses: true, build(b) {
+      const [c, g] = mk(300, 190); c.style.cssText = 'width:100%;image-rendering:pixelated;display:block;border:2px solid #c8a050;border-radius:2px'; b.appendChild(c);
+      const J = id => G.journal.includes(id), R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+      for (let y = 0; y < 190; y += 2) for (let x = 0; x < 300; x += 2) { const r = hash(x, y); R(x, y, 2, 2, r < .33 ? '#1a1114' : r < .66 ? '#20151a' : '#150e11'); }
+      const cave = (cx, cy, rx, ry, lit, glow) => { g.fillStyle = '#0a0608'; g.beginPath(); g.ellipse(cx, cy, rx + 2, ry + 2, 0, 0, 6.3); g.fill(); g.fillStyle = lit ? '#3a2a24' : '#221a1c'; g.beginPath(); g.ellipse(cx, cy, rx, ry, 0, 0, 6.3); g.fill(); g.fillStyle = lit ? '#4a352a' : '#281e20'; g.fillRect(cx - rx + 4, cy + ry - 5, rx * 2 - 8, 3);
+        if (lit) { const gr = g.createRadialGradient(cx, cy, 0, cx, cy, rx); gr.addColorStop(0, (glow || '#ffb35a') + '55'); gr.addColorStop(1, (glow || '#ffb35a') + '00'); g.fillStyle = gr; g.fillRect(cx - rx, cy - ry, rx * 2, ry * 2); for (let i = 0; i < rx / 5; i++) R(Math.round(cx - rx + 6 + hash(cx + i, cy) * (rx * 2 - 12)), Math.round(cy - 3 + hash(i, cx) * 8), 1, 1, '#ffd890'); } };
+      const plate = (t, cx, y, dim) => { const w = ptextW(t) + 6, x = Math.round(cx - w / 2); R(x - 1, y - 1, w + 2, 11, '#0c0808'); R(x, y, w, 9, dim ? '#5a4a30' : '#c8a050'); R(x + 1, y + 1, w - 2, 7, '#1e1512'); ptext(g, t, x + 3, y + 2, dim ? '#8a7a60' : '#f3e3c3'); };
+      const here = (cx, cy) => { R(cx - 3, cy - 3, 7, 7, '#120a0e'); R(cx - 2, cy - 2, 5, 5, '#ff6a3d'); R(cx - 1, cy - 1, 3, 3, '#ffe08a'); };
+      // above: what they told us, and what we have started to suspect
+      const sus = F('celestineSlip') || J('e_riser') || J('pl_meridian');
+      for (let y = 0; y < 30; y++) R(0, y, 300, 1, sus ? `rgb(${30 + y * 2},${24 + y},${34 - y / 2})` : `rgb(${40 + y},${10 + y / 3},${10})`);
+      if (sus) { const gr = g.createRadialGradient(120, 4, 0, 120, 4, 90); gr.addColorStop(0, 'rgba(255,236,170,.5)'); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.fillRect(0, 0, 300, 30); }
+      R(104, 14, 32, 16, '#e8e4dc'); R(108, 8, 24, 6, '#f4f2ec'); R(116, 2, 8, 6, '#f4f2ec'); R(119, 0, 2, 2, '#e8c25a'); R(104, 28, 32, 2, '#e8c25a'); for (let i = 0; i < 4; i++) R(108 + i * 7, 16, 3, 10, '#c8ccd8');
+      plate(J('pl_meridian') ? 'MERIDIAN TERRACE - TIER 1?' : sus ? 'ABOVE - NOT BURNING?' : 'THE SURFACE - BURNS', 214, 10, !sus);
+      for (let x = 0; x < 300; x += 3) R(x, 30 + (hash(x, 3) * 3 | 0), 3, 9, '#2a1c1e');
+      // tiers we only hear through the pipes
+      for (const [x, y, rx] of [[40, 56, 20], [86, 54, 16], [170, 56, 22]]) cave(x, y, rx, 7, false); plate('TIERS 4-5', 40, 50, true);
+      for (const [x, y, rx] of [[36, 160, 24], [104, 166, 20], [168, 160, 26], [236, 172, 18]]) cave(x, y, rx, 8, false); plate('TIERS 7-9', 104, 176, true);
+      // shafts
+      R(118, 30, 5, 58, '#0a0608'); R(119, 30, 3, 58, F('day1Done') ? '#fff6dc' : '#8a8a92'); R(238, 44, 5, 46, '#0a0608'); R(239, 44, 3, 46, '#6a5a2a'); for (let y = 30; y < 44; y += 3) R(240, y, 1, 2, J('e_crate') ? '#e8b23a' : '#3a2c1e');
+      // tier 6: home
+      cave(40, 98, 22, 10, true); cave(120, 100, 44, 14, true, '#ffe2b0'); cave(184, 82, 20, 8, F('visitedWard') || G.mapId === 'clinic', '#cfe8ff'); cave(226, 102, 34, 13, J('pl_bay') || G.mapId === 'bay', '#ff7a30'); cave(266, 84, 14, 7, J('pl_fuse'), '#4fd6d0');
+      R(62, 97, 14, 4, '#3a2a24'); R(160, 88, 8, 3, '#3a2a24'); R(164, 99, 28, 4, '#3a2a24'); R(256, 90, 6, 3, '#3a2a24');
+      R(119, 90, 3, 14, '#ffd890'); R(117, 104, 7, 2, '#5a5058'); R(230, 92, 8, 6, '#ff6a20'); R(232, 93, 4, 3, '#ffe08a');
+      plate('ROW K', 40, 82); plate('ASHGATE SQUARE', 120, 116); plate('LIFT 0', 96, 62); if (F('visitedWard') || G.mapId === 'clinic') plate('FEVER WARD', 184, 68); if (J('pl_bay') || G.mapId === 'bay') plate('BAY 3', 206, 117); if (J('pl_fuse')) plate('FUSE C', 262, 70); if (J('e_crate')) plate('FREIGHT 3', 216, 50);
+      // under the floor
+      if (J('pl_tunnel') || G.mapId === 'tunnel') { g.fillStyle = '#0a0608'; g.fillRect(204, 127, 88, 12); R(206, 129, 84, 8, '#2a2024'); R(226, 115, 3, 14, '#2a2024'); R(206, 132, 84, 1, '#c87a3a'); plate('OLD TUNNEL', 236, 141);
+        if (J('e_dacenote')) { R(250, 129, 5, 8, '#1a1114'); R(244, 133, 2, 2, '#ffd890'); }
+        if (J('e_riser')) { R(286, 30, 3, 100, '#0a0608'); R(287, 30, 1, 100, '#e8b23a'); for (let y = 34; y < 128; y += 8) R(287, y, 1, 3, '#fff0b0'); plate('RISER 9', 268, 52); } }
+      if (J('e_aux9')) { R(214, 108, 1, 22, '#c87a3a'); plate('AUX-9', 168, 128); R(180, 132, 34, 1, '#c87a3a'); }
+      const at = { apt: [40, 100], square: [120, 106], fest: [120, 106], clinic: [184, 84], bay: [222, 106], fuse: [266, 86], tunnel: [222, 133] }[G.mapId]; if (at) here(at[0], at[1]);
+      const p = document.createElement('p'); p.style.opacity = .7; p.textContent = 'What Kael knows is lit. The rest is rock. The map fills in as you find things.'; b.appendChild(p);
+    }, items: [{ label: 'Close', act: () => UI.pop() }] }));
   },
   settings() {
     const S = Settings.d, upd = () => { Settings.save(); Settings.apply(); };
@@ -174,9 +212,9 @@ const Menus = {
     ] }));
   },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. Book One vertical slice (v0.3): the prologue and one shift in Cinderwell.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. Book One vertical slice (v0.7): the prologue and two days in Cinderwell.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
-      <p><b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
+      <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
   },
   newGame() {
@@ -253,7 +291,8 @@ const Intro = {
 
 // ---------- day end + outro
 const DayEnd = {
-  run() {
+  run(day) {
+    if (day === 2) return this.run2();
     G.mode = 'dayend'; Sound.music('mystery');
     const lines = [], t0 = G.trust0, desc = (id, nm, up, down, same) => { const d = (G.trust[id] || 0) - (t0[id] || 0); lines.push(d > 0 ? `${nm} ${up}` : d < 0 ? `${nm} ${down}` : `${nm} ${same}`); };
     lines.push(`Wages: 18 scrip${F('ateNoodles') ? ' (minus noodles, worth it)' : ''}`);
@@ -274,15 +313,49 @@ const DayEnd = {
     UI.push(modal({ title: 'End of Day 1', onBack: null, build(b) { b.innerHTML = lines.map(l => `<p>· ${esc(l)}</p>`).join('') + (choice ? `<p>· ${esc(choice)}</p>` : '') + `<p style="opacity:.7">${ok ? 'Progress saved.' : 'Progress kept for this session — export it from Save data to keep it.'}</p>`; },
       items: [{ label: 'Continue', act: () => { UI.pop(); DayEnd.outro(); } }] }));
   },
+  run2() {
+    G.mode = 'dayend'; Sound.music('mystery'); Fade.a = 0; Fade.dir = 0; Fade.busy = false; World.load('square', { x: 11 * 16 + 8, y: 7 * 16 + 12, dir: 0 }, true);
+    const L = [], n = G.flags.rays | 0, r = G.flags.ring | 0;
+    L.push(`Seren's lantern hung on the Pillar with ${n} borrowed ray${n === 1 ? '' : 's'}.` + (n >= 7 ? ' The whole square stood in a row for it.' : n >= 4 ? ' Three people stood in front of it.' : ' Mara stood in front of it alone.'));
+    L.push(F('fireTheirs') ? 'You lit it from the First Fire. Her fire. They do not get to keep it.' : F('fireOwn') ? 'You lit it with your own striker. An unlicensed light.' : F('fireTavi') ? 'Tavi lit it. Fourth try.' : 'It burned for three candle-hours.');
+    if (F('washerOn')) L.push('Her ring hung in the middle of the sun.');
+    L.push(r >= 3 ? 'You hold the Ember Ring belt. Three notches. Two are hers.' : r > 0 ? `You won ${r} bout${r > 1 ? 's' : ''} in the Ember Ring. The belt is still on Hollis's shoulder.` : 'You never stepped into the chalk.');
+    if (F('beatSull')) L.push('You put a Proctor on the ground. Nothing was written down.');
+    else if (F('sullTip')) L.push('Sull complained to you about his knee. Then he guarded the wrong side of the square for an hour.');
+    else if (F('sullWar')) L.push('Sull has your name spelled right, and your sibling\'s.');
+    L.push(F('valeDebt') ? 'You owe Vale one silence.' : F('valeWhy') ? "Vale's sister was in the ninth cot. Nobody bled a line for her." : F('valeDefied') ? 'Vale struck his note. You told him you would do it again.' : 'Vale wrote: "Compliant."');
+    if (F('spareOn')) L.push('The festival ran two amps bright. Faulty panel.');
+    if (F('lockerD')) L.push(F('tookBlood') ? "You took the fifty scrip from Dace's locker." : F('burnBlood') ? 'You burned an informant envelope in their own fire. Marrow and Hollis saw.' : 'You left the envelope sealed, the way Dace left it.');
+    if (F('daceNote')) L.push('Dace is alive, under the floor, and waiting for you.');
+    L.push('"It is rather more yellow than—" She has seen the sun.');
+    const fu = G.flags.fury || 0; L.push(fu >= 8 ? 'The ember in Kael is white-hot. He has stopped trying to bank it.' : fu >= 4 ? 'The ember in Kael is burning steady. He is learning where to aim it.' : 'Kael is still keeping count. The list is longer.');
+    Object.assign(G.flags, { day2Done: 1 }); G.day = 3; G.trust0 = { ...G.trust }; addJ('e_leaf', true); addJ('e_slip', true); G.newJ = 0;
+    G.mapId = 'apt'; P.x = 3 * 16 + 8; P.y = 4 * 16 + 12; P.dir = 0;
+    const ok = Save.write('auto');
+    UI.push(modal({ title: 'End of Day 2 — First Fire', onBack: null, build(b) { b.innerHTML = L.map(l => `<p>· ${esc(l)}</p>`).join('') + `<p style="opacity:.7">${ok ? 'Progress saved.' : 'Progress kept for this session — export it from Save data to keep it.'}</p>`; },
+      items: [{ label: 'Continue', act: () => { UI.pop(); DayEnd.outro2(); } }] }));
+  },
+  outro2() {
+    UI.push(modal({ clear: true, onBack: null, build(b) {
+      b.parentNode.style.textAlign = 'center'; b.parentNode.style.background = 'rgba(10,6,9,.9)';
+      b.innerHTML = `<p>By first bell the Proctors have taken the lantern down. It does not matter. Four hundred people saw a sun, and you cannot scrub a thing like that off stone.</p>
+        <p>In Row K, a child sleeps with a leaf pressed in a worksheet. In Fuse Room C, one bus hums at nineteen, exactly. And at the gate of Lift Zero, a grey Inspector waits with a ledger, to see who comes to carry it up.</p>
+        <p><i>"Be too much for them."</i></p>
+        <h2 style="margin-top:16px">END OF FIRST FIRE</h2><p style="opacity:.7">SOOTBORN · Book One vertical slice · thanks for playing.</p>`;
+    }, items: [
+      { label: 'Keep exploring (Day 3)', act: () => { UI.clear(); Game.loadSave(Save.read('auto') || Save.snapshot()); } },
+      { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }
+    ] }));
+  },
   outro() {
     UI.push(modal({ clear: true, onBack: null, build(b) {
       b.parentNode.style.textAlign = 'center'; b.parentNode.style.background = 'rgba(10,6,9,.9)';
       b.innerHTML = `<p>Far above Cinderwell — above the rock, above the warnings — a crate of cold greens arrives somewhere that doesn't exist.</p>
         <p>Below, Kael Brennick dreams of ${F('sawRiser') ? 'warm air falling from a pipe with no destination' : 'a lift light, green for eleven seconds'} — and of Seren, laughing at him for being right.</p>
         <p><i>"They came down in light. One day, I'm going up in it."</i></p>
-        <h2 style="margin-top:16px">END OF THE FIRST SHIFT</h2><p style="opacity:.7">SOOTBORN · Book One vertical slice v0.3 · thanks for playing.</p>`;
+        <h2 style="margin-top:16px">END OF THE FIRST SHIFT</h2><p style="opacity:.7">SOOTBORN · Book One vertical slice · thanks for playing.</p>`;
     }, items: [
-      { label: 'Keep exploring (Day 2)', act: () => { UI.clear(); Game.loadSave(Save.read('auto') || Save.snapshot()); } },
+      { label: 'Wake up: Day 2 — First Fire', act: () => { UI.clear(); Game.loadSave(Save.read('auto') || Save.snapshot()); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }
     ] }));
   }

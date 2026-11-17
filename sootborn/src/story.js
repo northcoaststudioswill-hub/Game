@@ -46,10 +46,10 @@ const NPCS = [
   { id: 'ivo', map: 'square', at: [22, 12], dir: 2, when: () => !F('crateC') || F('ivoTalk2') },
   { id: 'ivo', map: 'square', at: [25, 8], dir: 2, when: () => F('crateC') && !F('ivoTalk2') },
   { id: 'orin', map: 'square', at: [17, 11], dir: 0 },
-  { id: 'proctor', map: 'square', at: [13, 9], dir: 1, when: () => !F('proctorDone') },
+  { id: 'proctor', map: 'square', at: [13, 9], dir: 1, when: () => !F('proctorDone') && !F('day1Done') },
   { id: 'nell', map: 'clinic', at: [7, 3], dir: 0 },
   { id: 'pip', map: 'clinic', at: [3, 4], dir: 0 }, { id: 'mosi', map: 'clinic', at: [5, 4], dir: 2 }, { id: 'ada', map: 'clinic', at: [11, 5], dir: 2 },
-  { id: 'hollis', map: 'square', at: [19, 7], dir: 0, wander: [[19, 7], [24, 7], [24, 10], [19, 10]] },
+  { id: 'hollis', map: 'square', at: [19, 7], dir: 0, wander: [[19, 7], [24, 7], [24, 10], [19, 10]], when: () => !F('day1Done') },
   { id: 'marrow', map: 'square', at: [8, 13], dir: 0 },
   { id: 'fen', map: 'square', at: [20, 14], dir: 1 },
   { id: 'kit', map: 'square', at: [26, 5], dir: 2 },
@@ -184,7 +184,7 @@ const TALK = {
   },
   dace() {
     if (!F('metDace')) return [say('dace', 'Kael. ...I\'m glad you came back.'), say('dace', "She'd have — never mind. If Seven bites, bite back. For her."), say('dace', "And don't tell Mara I got sentimental. She'll make me grease Conveyor Two with my own hair."), fx(() => setF('metDace'))];
-    return [say('dace', 'Festival in three days. I was going to carry her lantern. Now I don\'t know who\'s carrying what.')];
+    return [say('dace', 'Festival tomorrow night. I was going to carry her lantern. Now I don\'t know who\'s carrying what.')];
   },
   ivo() {
     if (F('crateC') && !F('ivoTalk2')) return [
@@ -261,7 +261,7 @@ const TALK = {
   mosi() { return [say('mosi', "I drew her. Look. That's her, and that's the sun. Her head is the sun because she's warm."), narr('The drawing is crayon on the back of a ration wrapper. A woman with a sun for a head, holding hands with forty stick children.'),
     ...(F('gotDrawing') ? [] : [{ choice: [{ t: 'Can I keep it?', fx: () => { setF('gotDrawing'); addJ('e_drawing'); }, then: [say('mosi', "...Okay. But you have to put it somewhere high up. Where the sky would be.")] }, { t: "It's perfect. Keep it safe.", then: [say('mosi', "I'm putting it under my pillow. The Proctors don't check under pillows.")] }] }])]; },
   ada() { if (F('bledAgain')) return [say('ada', 'The storm came back! The fan did the storm again! ...Was that you?'), say('kael', 'Storms just happen, sweetheart. Nobody does them.'), say('ada', '...Seren said that too. Exactly like that.')]; return [narr('Ada is very small and very still. She is breathing on her own, slow and steady, which six weeks ago she could not do.'), say('ada', '...Is she coming back to fix the fan again?'), say('kael', '...No, sweetheart. But I will. I\'m very good at fans.')]; },
-  pell() { const l = ["Sorry about Seren, Kael. She swept better than me. Don't tell anyone.", "Festival's in three days. I'm sweeping early. Like a professional.", "Pillar's going white soon. Day's half gone."]; return [say('pell', l[(G.talkCount.pell = (G.talkCount.pell || 0) + 1) % l.length])]; },
+  pell() { const l = ["Sorry about Seren, Kael. She swept better than me. Don't tell anyone.", "Festival's tomorrow. I'm sweeping early. Like a professional.", "Pillar's going white soon. Day's half gone."]; return [say('pell', l[(G.talkCount.pell = (G.talkCount.pell || 0) + 1) % l.length])]; },
   juno() { const l = ["I drew Seren's sun on the Pillar again! The grey men scrub it. I draw it faster.", 'My brother says the sky is fire. My other brother says it\'s soup.', "When I grow up I'm gonna ride Lift Zero and never come back. Except for noodles."]; return [say('juno', l[(G.talkCount.juno = (G.talkCount.juno || 0) + 1) % l.length])]; },
   bao() { return HOT.stall(); }
 };
@@ -281,7 +281,7 @@ const HOT = {
     if (!F('clockedOut')) return [narr(F('talkedTavi') ? "No time. The bell's already rung." : "Tavi's giving you a look. The 'get up' look.")];
     return [narr('Sleep and end the day?'), { choice: [{ t: 'Sleep.', then: [fx(() => Game.dayEnd())] }, { t: 'Not yet.' }] }];
   },
-  notice: () => [narr('FESTIVAL OF THE FIRST FIRE — three days. Bring a lantern.'), narr('BY ORDER OF THE ARRAY AUTHORITY: Theft of air is theft from all. Gratitude is breath.'), narr("Someone has scratched beneath it, very small: 'SEREN.'")],
+  notice: () => [narr('FESTIVAL OF THE FIRST FIRE — tomorrow, last bell. Bring a lantern.'), narr('BY ORDER OF THE ARRAY AUTHORITY: Theft of air is theft from all. Gratitude is breath.'), narr("Someone has scratched beneath it, very small: 'SEREN.'")],
   lift0: () => [narr('LIFT 0 — ARRAY AUTHORITY USE ONLY.'), narr('Forty-one days ago it came down full of light. It went back up full of light. Nobody from Cinderwell got in.'),
     ...byTend({ seeker: 'The gate rails are freshly greased. Someone up there uses this more than they admit.', tinkerer: 'The conduit feeding it is new, and thicker than the one feeding the whole clinic.', caretaker: "Kids dare each other to touch it. Since Seren, nobody's daring anymore." }),
     narr(F('ivoTalk2') ? 'The call light is dark now. You stare at it anyway.' : "Behind the grille, the call light is dark. You'd swear it's warm."), fx(() => addJ('e_lift', true))],

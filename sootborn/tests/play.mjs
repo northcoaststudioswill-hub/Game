@@ -107,7 +107,7 @@ await goTo('apt', 7, 4, 1); await use(1); // tavi night
 await goTo('apt', 3, 3, 2); await key('KeyE', 1, 300); await talkThrough(0); await wait(1500);
 await shot('16-dayend'); console.log('dayend', await state());
 await page.getByText('Continue', { exact: true }).click(); await wait(500); await shot('17-outro');
-await page.getByText('Keep exploring (Day 2)').click(); await wait(1200); await shot('18-day2');
+await page.getByText('Wake up: Day 2').click(); await wait(1200); await shot('18-day2');
 console.log('day2', await state());
 // journal
 await key('KeyM', 1, 400); await page.getByText('Journal', { exact: false }).first().click(); await wait(400); await shot('19-journal');

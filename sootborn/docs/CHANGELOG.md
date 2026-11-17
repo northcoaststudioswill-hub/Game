@@ -1,5 +1,26 @@
 # SOOTBORN — changelog
 
+## v0.7 · 2026-11-17 — "First Fire"
+- **Day 2 is playable**: the Festival of the First Fire, one year to the night after the wedding. Roughly 30–40 more minutes.
+  - Seren left a list in her lantern frame. Kael gathers wire (Ivo), gold (Orin) and a wick (Nell), and collects paper "rays" from up to ten people who loved her. The ray count decides who stands in front of the lantern at the end.
+  - Fuse Room C (new map, off Bay 3): Crew Three's lockers, Dace's sealed informant envelope, and a new breaker-balancing puzzle. The "standby" bus turns out to be Lift Zero, charging on Tier 6's lights.
+  - Vale's follow-up: what he wrote down about the bleed, and why he struck it.
+  - Sull's consequence scene, in three versions (threatened / charmed / ignored on Day 1).
+  - The ceremony: Celestine brings the First Fire, drawn from the furnace that burned Seren. Kael chooses how the lantern is lit. Celestine lets slip that she has seen the sun.
+  - Stealth finale: hang the lantern on the Pillar past three Proctors. Then the sun on the square, the row, and Lift Zero opening by itself.
+  - Dace is alive: new chalk in the old tunnel.
+  - End-of-day summary for Day 2, and a short Day 3 epilogue roam.
+- **Combat foundation** (`src/brawl.js`): real-time melee for every future fight.
+  - A strikes (three-hit chain), B dodges with brief invulnerability.
+  - Foes telegraph on the ground. Dodge through a swing and time slows: an "opening" where hits land harder and break guards.
+  - Foes guard after a full chain and counter; mashing loses to anyone past the first bout.
+  - Handles any number of foes; five foe kinds so far (jab, quick, heavy, baton with sweep and charge, boss with a double strike).
+  - First use: the Ember Ring, a three-bout festival fight ring. Bout two is Proctor Sull if Kael threatened him. The last bout is Mara.
+- **Map of Cinderwell** in the pause menu: a cutaway that fills in as Kael learns things (Riser 9, Freight 3, the tunnel, what is above).
+- **World dressing**: gold-edged sign plates over doors and machines, Authority banners (white, gold sun-eye), a chalk ring and unlit lantern strings in the square on festival day.
+- Engine: doors can be locked behind story flags; puzzles can be breaker boards (`kind: 'breaker'`); stealth is reusable (`G.heist = 2`); day-2 scripts wrap day-1 scripts in `src/day2.js`.
+- Day 1 text now says the festival is "tomorrow."
+
 ## v0.6 · 2026-11-17
 - Dialogue portraits:
   - Every speaker gets a 32×32 bust built from their look: soot on the Belowborn; a gold halo, gold eyes and a crown for the Accredited; masked Wardens; goggles, beard and hats as on their sprites.

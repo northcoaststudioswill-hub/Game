@@ -8,7 +8,7 @@ const Cutscene = {
   active: false, steps: [], i: 0, actors: [], cam: { x: 0, y: 0 }, block: null, letter: 0, beam: 0, beamT: 0, flash: 0, flashC: '#fff', shake: 0, dark: null, onEnd: null, pillarRed: false, motes: [],
   actor(id) { return this.actors.find(a => a.id === id); },
   play(steps, onEnd) {
-    Object.assign(this, { steps, i: 0, onEnd, active: true, actors: [], letter: 1, beam: 0, flash: 0, shake: 0, dark: null, pillarRed: false, motes: [], furnace: 0, zoom: 1, zoomT: 1, heart: 0, heartT: 0, vignette: 0 });
+    Object.assign(this, { steps, i: 0, onEnd, active: true, actors: [], letter: 1, beam: 0, flash: 0, shake: 0, dark: null, pillarRed: false, motes: [], furnace: 0, zoom: 1, zoomT: 1, heart: 0, heartT: 0, vignette: 0, lift: 0, hung: 0, glowK: 0, sun: 0, sunT: 0 });
     G.mode = 'cine'; $('#cskip').classList.remove('hidden'); this.next();
   },
   next() {
@@ -61,7 +61,7 @@ const Cutscene = {
     }
     if (this.pan) { const p = this.pan; p.t += dt; const k = Math.min(1, p.t / p.d), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
       this.cam = { x: p.from.x + (p.to.x - p.from.x) * e, y: p.from.y + (p.to.y - p.from.y) * e }; if (k >= 1) { this.pan = null; if (this.block && this.block.type === 'pan') this.next(); } }
-    this.zoom += (this.zoomT - this.zoom) * Math.min(1, dt * 2.5);
+    this.zoom += (this.zoomT - this.zoom) * Math.min(1, dt * 2.5); this.sun += ((this.sunT || 0) - (this.sun || 0)) * Math.min(1, dt * 0.9);
     if (this.heart) { this.heartT -= dt; if (this.heartT <= 0) { Sound.play('heart'); this.heartT = 0.85; } }
     this.flash = Math.max(0, this.flash - dt * 0.8); this.shake = Math.max(0, this.shake - dt); this.beamT += dt;
     const b = this.block; if (!b) return;
@@ -78,7 +78,7 @@ const Cutscene = {
   },
   end() {
     this.active = false; this.hideCard(); $('#cskip').classList.add('hidden');
-    this.beam = 0; this.letter = 0; this.dark = null; this.actors = []; this.block = null; this.furnace = 0; this.zoom = this.zoomT = 1; this.heart = 0; this.vignette = 0;
+    this.beam = 0; this.letter = 0; this.dark = null; this.actors = []; this.block = null; this.furnace = 0; this.zoom = this.zoomT = 1; this.heart = 0; this.vignette = 0; this.lift = 0; this.hung = 0; this.glowK = 0; this.sun = this.sunT = 0;
     const cb = this.onEnd; this.onEnd = null; Input.consume(); cb && cb();
   },
   // drawn after World lighting: the Accredited are never in shadow
@@ -99,6 +99,14 @@ const Cutscene = {
       g.globalCompositeOperation = 'source-over';
       const f = a.moving ? 1 + (Math.floor(a.anim * 5) % 2) : 0; g.drawImage(a.sheet, f * 16, a.dir * 24, 16, 24, x - 8, Math.round(a.y - cy) - 23, 16, 24);
     }
+    if (this.glowK) { const a = this.actor('kael'); if (a) { const x = Math.round(a.x - cx) + (a.dir === 2 ? -7 : 7), y = Math.round(a.y - cy) - 9; g.fillStyle = '#e8a040'; g.fillRect(x - 2, y - 2, 5, 5); g.fillStyle = '#fff0b0'; g.fillRect(x - 1, y - 1, 3, 3); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 0, x, y, 30); gr.addColorStop(0, 'rgba(255,200,110,.5)'); gr.addColorStop(1, 'rgba(255,200,110,0)'); g.fillStyle = gr; g.fillRect(x - 30, y - 30, 60, 60); g.globalCompositeOperation = 'source-over'; } }
+    if (this.sun > 0.01) { const x = 13 * 16 + 8 - cx, y = 8 * 16 - 24 - cy, k = this.sun, rm = Settings.d.reduce;
+      g.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6 + (rm ? 0 : t * 0.07), wd = i % 2 ? 0.07 : 0.11; g.fillStyle = `rgba(255,214,120,${0.11 * k})`; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a - wd) * 300, y + Math.sin(a - wd) * 300); g.lineTo(x + Math.cos(a + wd) * 300, y + Math.sin(a + wd) * 300); g.closePath(); g.fill(); }
+      const gr = g.createRadialGradient(x, y, 0, x, y, 180 * k + 1); gr.addColorStop(0, `rgba(255,236,170,${0.7 * k})`); gr.addColorStop(.35, `rgba(255,200,110,${0.3 * k})`); gr.addColorStop(1, 'rgba(255,170,80,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      g.fillStyle = `rgba(255,224,140,${0.2 * k})`; g.beginPath(); g.ellipse(x, y + 74, 78 * k, 34 * k, 0, 0, 6.3); g.fill();
+      g.globalCompositeOperation = 'source-over';
+      if (F('washerOn')) { g.strokeStyle = `rgba(40,20,10,${0.5 * k})`; g.lineWidth = 3; g.beginPath(); g.ellipse(x, y + 74, 12, 5, 0, 0, 6.3); g.stroke(); } }
     if (this.furnace) { const fx = 15 * 16 - cx, fy = 16 + 8 - cy, k = 0.8 + Math.sin(t * 9) * .08 + Math.random() * .06;
       g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(fx, fy, 0, fx, fy, 130 * k); gr.addColorStop(0, 'rgba(255,190,90,.75)'); gr.addColorStop(.4, 'rgba(255,90,30,.35)'); gr.addColorStop(1, 'rgba(255,40,10,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
       g.fillStyle = 'rgba(255,240,200,.9)'; g.fillRect(fx - 12, fy - 6, 24, 8); g.globalCompositeOperation = 'source-over';

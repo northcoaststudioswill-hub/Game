@@ -85,18 +85,51 @@ SOOTBORN ("soot" is the Authority's slur; the title reclaims it). A card game ca
    - Bay: Vale, Bank Seven (then the optional timed "bleed again"), the fuel deduction, furnace flashback.
    - Optional tunnel, crate, Ivo, Tavi, sleep, summary, Day 2 roam.
 
+## Day 2 — First Fire (~30–40 min)
+1. Home: Tavi shows Kael the list Seren left in her lantern frame (wire, gold, wick, "make Kael carry it"). Tavi's rule: everyone who loved her adds a paper ray.
+2. Square: festival setup; Sull's consequence scene; the Ember Ring (Hollis referees: Ivo, then the Garran brothers or Sull, then Mara for Seren's belt).
+3. Bay 3: Mara assigns WO-116. Fuse Room C: lockers (Seren's emptied, Dace's holds a sealed 50-scrip informant envelope and his note that the Authority sends one to everyone near a commitment), then the breaker panel.
+   - Reveal: the "standby" bus is L0 STBY. Lift Zero charges on Tier 6's lights every First Fire.
+   - Choice: throw the spare breaker onto Tier 6, or leave it.
+   - Vale walks in. If Kael bled the line on Day 1, Vale shows his notebook with the entry struck out (his sister died in a Tier 8 fever ward). He warns that Celestine is coming and that Dace "went looking under the floor."
+4. Gather: Ivo's wire is Authority copper from the Lift Zero housing; Orin's gold is forbidden engineer's chalk; Nell's wick lit the ward lamp through Seren's three nights. Rays from Mara, Ivo, the ward kids, Bao, Hollis, Marrow, Pell, Juno, Fen (a void LIFT 0 ticket) and Kit (who also delivers Sable's summons).
+5. Optional: the old tunnel. The collapse has a gap; Dace's lamp is warm; chalk tells Kael to light the lantern first, then follow.
+6. Home: build the lantern. Optional: hang Seren's washer in the middle of the sun.
+7. The ceremony (cutscene): Celestine brings the First Fire, drawn from the heart-furnace. "It burns on whatever it is given. This year it was given rather well." Kael lights the lantern from her fire, his own striker, or Tavi's hands. Tavi says "It's the SUN." Celestine: "It is rather more yellow than th—". She bans lanterns on the Pillar and asks for the Bank Seven ledger by first bell.
+8. Stealth: hang the lantern on the top hook past Sull's loop and two lamp sentries.
+9. Finale: the Pillar shines through the paper and throws a sun across the square. Sull charges; the tier stands in a row (size depends on rays). Lift Zero opens by itself: empty, clean water, one green leaf. Vale: someone must carry the ledger up. "You have until first bell."
+
+Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at Freight Three; Dace under the floor; Nell and the cold crate; what Celestine has seen.
+
+## Combat
+- `src/brawl.js` is the base for all fighting. Top-down, real time, inside an arena.
+- Player: move, strike (three-hit chain, third hit knocks back), dodge with invulnerability frames.
+- Foes telegraph each attack as a red shape on the ground, then commit. Dodging through a committed swing gives an "opening": slow time and stronger, guard-breaking hits.
+- Foes guard after taking a full chain and counter at once, so the rhythm is chain, dodge the counter, punish.
+- Any number of foes; only one winds up at a time.
+- Where it goes next for large battles: allies fighting beside Kael with simple orders, more foes on larger fields, weapons, and Accredited opponents who break these rules.
+
+## Art direction
+- Reference boards from the user show the target look: dense 16-bit pixel art, a cutaway with a pristine ruling settlement above and lamp-lit warrens below, gold-edged sign plates naming every chamber, banners, and framed menu panels with a world map.
+- Those boards use another property's names, emblems and characters. They are mood references only. Nothing from them is copied into the game.
+- Translated to this world so far: the cutaway Map of Cinderwell, sign plates, Authority banners (white cloth, gold sun with an eye).
+- Still far from the reference: character and tile detail. That needs larger sprites and hand-made tilesets, not more procedural drawing.
+
 ## Tech notes
 - Cinematic zoom: `Cutscene.zoom` renders a smaller window scaled up, so `W` and `H` are `let`.
 - `renderOverlay`: letterbox, flash, heartbeat vignette.
 - Cutscene step types include `{zoom}`, `{heart}`, `{vignette}`.
 - Heist: `World.throwBolt` / `boltLand` / investigate logic in `updateNPCs`.
 - Maps carry `overhead` and `screens` arrays.
-- Saves are schema v2; v1 saves migrate. No saving during the prologue or heist.
+- Saves are schema v2; v1 saves migrate. No saving during the prologue, the heist or the festival stealth.
+- Day 2 lives in `src/day2.js`: `D2T` (talk) and `D2H` (hotspots) wrap the day-1 tables once `day1Done` is set; `D3` holds epilogue lines.
+- `phase()` picks the Pillar color from day flags. Exits take `when` and `deny`.
 
 ## Not yet tested
-Real devices, sound by ear, heist difficulty with a human player.
+Real devices, sound by ear, and how the heist, the festival stealth and the fights feel with a human player (fight balance so far comes from two bots: one mashes, one dodges).
 
 ## Next steps
-- Art: the procedural 16px characters are the main limit on "selling the universe." The next big leap is an art pass: 24–32px characters, hand-authored tilesets and more portrait expressions, or commissioned or user-supplied art.
-- Fun: the heist is the core "play" moment. Tune it from playtest notes before adding more systems.
-- Content: Day 2 (Festival of the First Fire / Seren's lantern), Vale's follow-up on what he wrote down, a Sull consequence scene, Fuse Room C.
+- Playtest the fights and both stealth scenes with a person and tune from notes.
+- Art pass toward the reference boards: 24–32px characters, hand-made tilesets, more portrait expressions.
+- Day 3: the ledger and Lift Zero, Sable at Freight Three, Dace under the floor.
+- Combat growth toward battles: allies with orders, bigger fields, weapons.

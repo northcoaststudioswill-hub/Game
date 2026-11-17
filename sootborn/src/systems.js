@@ -7,7 +7,7 @@ function freshState(name, look) {
   Object.assign(G, { name: name || 'Wren', look: look || 0, tendency: null, day: 1, mapId: 'apt', flags: {}, trust: { mara: 0, ivo: 0, tavi: 1, orin: 0, nell: 0 }, scrip: 6, journal: [], newJ: 0, log: [], play: 0, talkCount: {} });
   G.trust0 = { ...G.trust };
 }
-function phase() { if (typeof Cutscene !== 'undefined' && Cutscene.active) return Cutscene.pillarRed ? 'evening' : 'morning'; if (F('day1Done')) return 'morning'; if (F('clockedOut')) return 'evening'; if (F('puzzleDone')) return 'noon'; return 'morning'; }
+function phase() { if (typeof Cutscene !== 'undefined' && Cutscene.active) return Cutscene.pillarRed ? 'evening' : 'morning'; if (G.mapId === 'fest') return 'evening'; if (F('day2Done')) return 'morning'; if (F('day1Done')) return F('lanternBuilt') ? 'evening' : F('fuseDone') ? 'noon' : 'morning'; if (F('clockedOut')) return 'evening'; if (F('puzzleDone')) return 'noon'; return 'morning'; }
 function trust(id, n) { G.trust[id] = clamp((G.trust[id] || 0) + n, -2, 2); }
 function addJ(id, quiet) {
   if (G.journal.includes(id)) return; G.journal.push(id); G.newJ++;
@@ -118,8 +118,9 @@ const Puzzle = {
     return g;
   },
   open(defs, onDone) { this.defs = defs; this.onDone = onDone; this.timeLeft = defs[0].timer || 0; this.si = (defs === PUZZLES && G.flags.p1) ? 1 : 0; this.load(); this.active = true; Sound.music('work'); $('#pbar').classList.remove('hidden'); HUD.dirty = true; Input.consume(); },
-  load() { const d = this.defs[this.si]; this.cols = d.cols; this.rows = d.rows; this.grid = this.build(d, 11 + this.si * 31); this.solved = false; this.solveT = 0; this.moves = 0; this.T = d.cols > 4 ? 24 : 28;
+  load() { const d = this.defs[this.si]; this.bk = null; this.cols = d.cols; this.rows = d.rows; if (d.kind !== 'breaker') this.grid = this.build(d, 11 + this.si * 31); this.solved = false; this.solveT = 0; this.moves = 0; this.T = d.cols > 4 ? 24 : 28;
     
+    if (d.kind === 'breaker') { this.bk = { st: d.loads.map(() => 0), cur: 0 }; this.grid = [[]]; this.flowR = { seen: new Set(), leaks: [], total: 0 }; HUD.dirty = true; return; }
     const first = this.grid.flat().findIndex(c => c.kind === 'pipe'); this.cur = { x: first % this.cols, y: Math.floor(first / this.cols) }; this.flowR = this.flow(); HUD.dirty = true; },
   close() { this.active = false; $('#pbar').classList.add('hidden'); Sound.music(MAPS[G.mapId].music); HUD.dirty = true; Input.consume(); },
   cell(x, y) { return x >= 0 && y >= 0 && x < this.cols && y < this.rows ? this.grid[y][x] : null; },
@@ -139,19 +140,42 @@ const Puzzle = {
     c.m = rotCW(c.m); this.moves++; Sound.play('rotate'); this.flowR = this.flow();
     if (this.flowR.ok) { this.solved = true; this.solveT = 0; Sound.play(this.si === this.defs.length - 1 ? 'solved' : 'stage'); }
   },
-  hint() { if (this.solved) return; const flat = this.grid.flat(); const i = flat.findIndex(c => c.kind === 'pipe' && c.m !== c.sol); if (i < 0) return; this.cur = { x: i % this.cols, y: Math.floor(i / this.cols) }; this.hintT = 2; this.hintC = { ...this.cur }; Sound.play('move'); },
-  tap(lx, ly) { const x = Math.floor((lx - this.ox) / this.T), y = Math.floor((ly - this.oy) / this.T); if (this.cell(x, y)) { this.cur = { x, y }; this.rotate(x, y); } },
+  hint() { if (this.solved) return; if (this.bk) { const d = this.defs[this.si], i = d.sol.findIndex((v, k) => v !== this.bk.st[k]); if (i >= 0) { this.bk.cur = i; this.hintT = 2; Sound.play('move'); } return; } const flat = this.grid.flat(); const i = flat.findIndex(c => c.kind === 'pipe' && c.m !== c.sol); if (i < 0) return; this.cur = { x: i % this.cols, y: Math.floor(i / this.cols) }; this.hintT = 2; this.hintC = { ...this.cur }; Sound.play('move'); },
+  bkSum(k) { const d = this.defs[this.si]; return d.loads.reduce((s, v, i) => s + (this.bk.st[i] === k ? v : 0), 0); },
+  bkGeo() { const n = this.defs[this.si].loads.length, cw = Math.min(40, Math.floor((W - 12) / n)); return { n, cw, ox: Math.floor((W - cw * n) / 2), top: 46, bot: H - 52 }; },
+  bkSet(i, dirn) { if (this.solved) return; const b = this.bk, d = this.defs[this.si]; b.cur = i; const s = b.st[i]; b.st[i] = dirn === 0 ? (s + 1) % 3 : dirn < 0 ? (s === 2 ? 0 : 1) : (s === 1 ? 0 : 2); if (b.st[i] !== s) { this.moves++; Sound.play('rotate'); }
+    if (this.bkSum(1) === d.A && this.bkSum(2) === d.B) { this.solved = true; this.solveT = 0; Sound.play(this.si === this.defs.length - 1 ? 'solved' : 'stage'); } },
+  bkUpdate() { const b = this.bk, n = b.st.length;
+    if (Input.rep('left')) { b.cur = (b.cur + n - 1) % n; Sound.play('move'); } if (Input.rep('right')) { b.cur = (b.cur + 1) % n; Sound.play('move'); }
+    if (Input.rep('up')) this.bkSet(b.cur, -1); if (Input.rep('down')) this.bkSet(b.cur, 1); if (Input.p('A')) this.bkSet(b.cur, 0); if (Input.p('Y')) this.hint();
+    if (Input.p('B') || Input.p('START')) { this.close(); HUD.toast(this.defs[this.si].leaveMsg || 'Come back any time'); } },
+  bkRender(g) { const d = this.defs[this.si], b = this.bk, G0 = this.bkGeo(), rm = Settings.d.reduce, a = this.bkSum(1), bb = this.bkSum(2);
+    g.fillStyle = '#0d0f13'; g.fillRect(0, 0, W, H); for (let y = 0; y < H; y += 8) { g.fillStyle = y % 16 ? '#12151a' : '#101318'; g.fillRect(0, y, W, 8); }
+    const bar = (y, lab, v, tg, col) => { const ok = v === tg, over = v > tg, c = ok ? '#7cf27c' : over ? '#ff5a4a' : col; g.fillStyle = '#1e232b'; g.fillRect(6, y, W - 12, 13); g.fillStyle = '#2c333e'; g.fillRect(6, y, W - 12, 1); g.fillStyle = c; g.globalAlpha = .28; g.fillRect(7, y + 1, Math.min(1, v / tg) * (W - 14), 11); g.globalAlpha = 1; g.fillRect(7, y + 11, Math.min(1, v / tg) * (W - 14), 1); ptext(g, lab, 10, y + 4, c); const t = v + '/' + tg; ptext(g, t, W - 10 - ptextW(t, 2), y + 2, c, 2); return c; };
+    const ca = bar(26, d.labA, a, d.A, PAL.amber), cb = bar(G0.bot + 8, d.labB, bb, d.B, '#e8c25a');
+    for (let i = 0; i < G0.n; i++) { const x = G0.ox + i * G0.cw, cx = x + (G0.cw >> 1), st = b.st[i], mid = (G0.top + G0.bot) >> 1, ky = st === 1 ? G0.top + 8 : st === 2 ? G0.bot - 8 : mid;
+      g.fillStyle = '#191d24'; g.fillRect(x + 2, G0.top, G0.cw - 4, G0.bot - G0.top); g.fillStyle = '#0c0e12'; g.fillRect(cx - 2, G0.top + 4, 4, G0.bot - G0.top - 8);
+      if (st) { g.fillStyle = st === 1 ? ca : cb; if (st === 1) g.fillRect(cx - 1, 39, 2, ky - 39); else g.fillRect(cx - 1, ky, 2, G0.bot + 8 - ky); if (!rm) { g.fillStyle = '#fff'; const o = ((this.t * 30) | 0) % 9; g.fillRect(cx - 1, st === 1 ? ky - o : ky + o, 2, 2); } }
+      const kw = Math.min(22, G0.cw - 6); g.fillStyle = '#0a0b0e'; g.fillRect(cx - kw / 2 - 1, ky - 8, kw + 2, 16); g.fillStyle = st === 1 ? '#8a5a20' : st === 2 ? '#7a6a20' : '#4a5260'; g.fillRect(cx - kw / 2, ky - 7, kw, 14); g.fillStyle = st ? '#ffe9a8' : '#aab2c0'; g.fillRect(cx - kw / 2, ky - 7, kw, 2);
+      const t = String(d.loads[i]); ptext(g, t, cx - ptextW(t, 2) / 2 + 1, ky - 3, st ? '#fff6d0' : '#d8dce4', 2);
+      if (!this.solved && i === b.cur && (Input.device !== 'touch' || !this.moves) && Math.floor(this.t * 3) % 3) { g.strokeStyle = PAL.amber; g.lineWidth = 2; g.strokeRect(x + 2, G0.top, G0.cw - 4, G0.bot - G0.top); }
+      if (this.hintT > 0 && i === b.cur && Math.floor(this.hintT * 6) % 2) { g.strokeStyle = '#7cf27c'; g.lineWidth = 2; g.strokeRect(x + 1, G0.top - 1, G0.cw - 2, G0.bot - G0.top + 2); } }
+    ptext(g, d.name, 8, H - 12, '#8a94a4'); const help = Input.device === 'touch' ? 'TAP ABOVE OR BELOW' : 'UP: TOP BUS  DOWN: LOW BUS'; ptext(g, help, W - 8 - ptextW(help), H - 12, '#6a7484');
+    if (this.solved) { g.fillStyle = 'rgba(10,30,18,.6)'; g.fillRect(0, H / 2 - 14, W, 28); const t = this.si === this.defs.length - 1 ? (d.doneText || 'BALANCED') : 'STAGE CLEAR'; ptext(g, t, W / 2 - ptextW(t, 2) / 2, H / 2 - 5, '#9ff2c0', 2); } },
+  tap(lx, ly) { if (this.bk) { const G0 = this.bkGeo(), i = Math.floor((lx - G0.ox) / G0.cw); if (i >= 0 && i < G0.n) { const st = this.bk.st[i], mid = (G0.top + G0.bot) / 2, ky = st === 1 ? G0.top + 8 : st === 2 ? G0.bot - 8 : mid; this.bkSet(i, Math.abs(ly - ky) < 9 ? 0 : ly < ky ? -1 : 1); } return; } const x = Math.floor((lx - this.ox) / this.T), y = Math.floor((ly - this.oy) / this.T); if (this.cell(x, y)) { this.cur = { x, y }; this.rotate(x, y); } },
   update(dt) {
     this.t += dt; this.hintT = Math.max(0, this.hintT - dt);
-    if (this.solved) { this.solveT += dt; if (this.solveT > 1.5) { if (this.si < this.defs.length - 1) { this.si++; G.flags.p1 = 1; this.load(); HUD.toast(this.defs[this.si].name); } else { this.close(); this.onDone && this.onDone(); } } return; }
+    if (this.solved) { this.solveT += dt; if (this.solveT > 1.5) { if (this.si < this.defs.length - 1) { this.si++; if (this.defs === PUZZLES) G.flags.p1 = 1; this.load(); HUD.toast(this.defs[this.si].name); } else { this.close(); this.onDone && this.onDone(); } } return; }
+    if (this.bk) return this.bkUpdate();
     const mv = (dx, dy) => { let x = this.cur.x, y = this.cur.y; for (let i = 0; i < 8; i++) { x = (x + dx + this.cols) % this.cols; y = (y + dy + this.rows) % this.rows; if (this.grid[y][x].kind !== 'blank') break; } this.cur = { x, y }; Sound.play('move'); };
     if (Input.rep('left')) mv(-1, 0); if (Input.rep('right')) mv(1, 0); if (Input.rep('up')) mv(0, -1); if (Input.rep('down')) mv(0, 1);
     if (this.timeLeft > 0) { this.timeLeft -= dt; if (this.timeLeft <= 0) { const fail = this.defs[this.si].onFail; this.close(); fail && fail(); return; } if (Math.floor(this.timeLeft) !== Math.floor(this.timeLeft + dt) && this.timeLeft < 6) Sound.play('heart'); }
     if (Input.p('A')) this.rotate(this.cur.x, this.cur.y);
     if (Input.p('Y')) this.hint();
-    if (Input.p('B') || Input.p('START')) { this.close(); HUD.toast('Bank 7 still drifting — come back any time'); }
+    if (Input.p('B') || Input.p('START')) { this.close(); HUD.toast(this.defs[this.si].leaveMsg || 'Bank 7 still drifting — come back any time'); }
   },
   render(g) {
+    if (this.bk) return this.bkRender(g);
     const T = this.T, fr = this.flowR, rm = Settings.d.reduce;
     g.fillStyle = '#0f0b0e'; g.fillRect(0, 0, W, H);
     for (let y = 0; y < H; y += 8) { g.fillStyle = y % 16 ? '#141014' : '#120d11'; g.fillRect(0, y, W, 8); }
@@ -179,7 +203,7 @@ const Puzzle = {
     if (!this.solved && (Input.device !== 'touch' || this.moves === 0) && Math.floor(this.t * 3) % 3) { const px = this.ox + this.cur.x * T, py = this.oy + this.cur.y * T; g.strokeStyle = PAL.amber; g.lineWidth = 2; g.strokeRect(px + 1, py + 1, T - 2, T - 2); }
     ptext(g, `FED ${fr.seen.size}/${fr.total}   LEAKS ${fr.leaks.length}`, 8, H - 12, fr.leaks.length ? '#ff8a6a' : '#9ff2ea');
     if (this.timeLeft > 0 && !this.solved) { const tl = `VALE: ${Math.ceil(this.timeLeft)}S`; ptext(g, tl, W - ptextW(tl, 2) - 8, H - 14, this.timeLeft < 6 ? '#ff5a4a' : PAL.amber, 2); if (this.timeLeft < 6 && !Settings.d.reduce) { g.fillStyle = `rgba(120,0,0,${0.15 + 0.1 * Math.sin(this.t * 12)})`; g.fillRect(0, 0, W, H); } }
-    if (this.solved) { g.fillStyle = 'rgba(10,30,28,.55)'; g.fillRect(0, H / 2 - 14, W, 28); const t = this.si === this.defs.length - 1 ? 'BANK 7 BALANCED' : 'STAGE CLEAR'; ptext(g, t, W / 2 - ptextW(t, 2) / 2, H / 2 - 5, '#9ff2ea', 2); }
+    if (this.solved) { g.fillStyle = 'rgba(10,30,28,.55)'; g.fillRect(0, H / 2 - 14, W, 28); const t = this.si === this.defs.length - 1 ? (this.defs[this.si].doneText || 'BANK 7 BALANCED') : 'STAGE CLEAR'; ptext(g, t, W / 2 - ptextW(t, 2) / 2, H / 2 - 5, '#9ff2ea', 2); }
   }
 };
 $('#pHint').onclick = () => Puzzle.hint();
@@ -231,6 +255,7 @@ const World = {
   },
   interact(t) {
     G.flags.interacted = 1; HUD.dirty = true;
+    if (G.heist === 2) { if (t.id === 'pillarFest') { Game.onFestDone(); return; } Dialogue.start(t.kind === 'npc' && !t.n.patrol ? FEST_WHISPER(t.id) : [narr('Not now. The Pillar. Top hook.')]); return; }
     if (G.heist) { if (t.id === 'relay') { if (G.flags.relayCut) { Dialogue.start([narr('The relay is dead. The audit gauge is frozen on a lie.')]); return; } G.flags.relayCut = 1; Sound.play('rotate'); Dialogue.start([narr('You pry the panel and pull the audit fuse. The needle on the relay freezes mid-twitch.'), say('kael', 'There. For the next hour, the Authority thinks Bank Seven is the most boring bank in Cinderwell.'), narr('Checkpoint: if you are seen now, you will start back here.')]); return; }
       if (t.id === 'valves') { if (!G.flags.relayCut) { Dialogue.start([say('kael', "(Not yet. The audit relay on the east wall will log any twitch on this bank. Cut it first.)")]); return; } Puzzle.open([HEIST_PUZZLE], Game.onHeistDone); return; } Dialogue.start([t.id === 'seren' ? say('seren', "Go. I've got the door. If his lantern turns your way, freeze, or get behind something solid.") : narr('Not now. Bank Seven. Before the lantern comes back around.')]); return; }
     if (t.kind === 'npc') { const n = t.n; n.dir = Math.abs(P.x - n.x) > Math.abs(P.y - n.y) ? (P.x < n.x ? 2 : 3) : (P.y < n.y ? 1 : 0); n.face = 2.5; Dialogue.start(TALK[t.id](), () => this.afterBeat()); }
@@ -251,7 +276,7 @@ const World = {
     } else P.anim = 0;
     if (G.heist) { this.heistCheck(dt); if (this.caughtT > 0) return; this.boltCd = (this.boltCd || 0) - dt; if (Input.p('B') && this.boltCd <= 0) this.throwBolt(); this.target = this.findTarget(); if (Input.p('A') && this.target) { Sound.play('blip'); this.interact(this.target); } this.updateNPCs(dt); return; }
     const ex = this.exitAt(P.x, P.y);
-    if (!ex) this.exitArmed = true; else if (this.exitArmed) { this.exitArmed = false; Sound.play('door'); Fade.go(() => { this.load(ex.to, ex.spawn); Game.autosave(); }); return; }
+    if (!ex) this.exitArmed = true; else if (this.exitArmed && ex.when && !ex.when()) { this.exitArmed = false; Sound.play('deny'); Dialogue.start(ex.deny()); return; } else if (this.exitArmed) { this.exitArmed = false; Sound.play('door'); Fade.go(() => { this.load(ex.to, ex.spawn); Game.autosave(); }); return; }
     this.target = this.findTarget();
     if (Input.p('A') && this.target) { Sound.play('blip'); this.interact(this.target); }
     this.updateNPCs(dt);
@@ -307,9 +332,10 @@ const World = {
   heistCheck(dt) {
     if (this.bolt) { this.bolt.t += dt / 0.45; if (this.bolt.t >= 1) { const b = this.bolt; this.bolt = null; this.boltLand(b); } }
     if (this.ripple) { this.ripple.t += dt; if (this.ripple.t > 0.7) this.ripple = null; }
-    if (this.caughtT > 0) { if (Dialogue.active) return; this.caughtT -= dt; if (this.caughtT <= 0) { if (G.flags.relayCut) { P.x = 20 * 16 + 8; P.y = 9 * 16 + 4; P.dir = 1; } else { P.x = 24; P.y = 7 * 16 + 4; P.dir = 3; } Game.resetHeist(); } return; }
+    if (this.caughtT > 0) { if (Dialogue.active) return; this.caughtT -= dt; if (this.caughtT <= 0) { if (G.heist === 2) { P.x = 7 * 16 + 8; P.y = 13 * 16 + 4; P.dir = 1; } else if (G.flags.relayCut) { P.x = 20 * 16 + 8; P.y = 9 * 16 + 4; P.dir = 1; } else { P.x = 24; P.y = 7 * 16 + 4; P.dir = 3; } Game.resetHeist(); } return; }
     this.dynLights = this.npcs.filter(n => n.patrol).map(n => ({ x: n.x + [0, 0, -1, 1][n.dir] * 10, y: n.y - 6 + [1, -1, 0, 0][n.dir] * 10, r: 46, c: '#ffd070' }));
     for (const n of this.npcs) if (n.patrol && this.seesPlayer(n)) {
+      if (G.heist === 2) { this.caughtT = 0.6; const k = G.flags.caught2 = (G.flags.caught2 || 0) + 1; Sound.play('alarm'); this.fxFlash('#ff3020', 0.4); if (k >= 2) G.flags.heistEase = 1; Dialogue.start(FEST_CAUGHT(k, n.id)); return; }
       this.caughtT = 0.6; G.flags.caught = (G.flags.caught || 0) + 1; Sound.play('alarm'); this.fxFlash('#ff3020', 0.4);
       const n2 = G.flags.caught; if (n2 >= 3) G.flags.heistEase = 1;
       Dialogue.start([say('seren', ['Back! Back! He nearly had you.', 'Kael! Down! ...Okay. Okay. Slower this time. Use the crates.', "I'll knock something over by the door when he's at the far end. Move when you hear it."][Math.min(2, n2 - 1)])]);
@@ -333,12 +359,16 @@ const World = {
     const sk = this.shakeT > 0 && !Settings.d.reduce ? Math.round((Math.random() - .5) * 4) : 0;
     g.drawImage(this.layer, -cx + sk, -cy);
     // animated props
-    if (G.mapId === 'square') {
+    if (G.mapId === 'square' || G.mapId === 'fest') {
       const px = 13 * 16 - cx, py = 8 * 16 - cy, pulse = rm ? 0 : Math.sin(t * 1.3) * .5 + .5, ph = phase();
       g.fillStyle = '#5a5058'; g.fillRect(px + 4, py - 22, 8, 32); g.fillStyle = ph === 'evening' ? `rgb(255,${90 + pulse * 30 | 0},${70 + pulse * 20 | 0})` : ph === 'noon' ? `rgb(255,${238 + pulse * 15 | 0},${215 + pulse * 30 | 0})` : `rgb(255,${180 + pulse * 30 | 0},${100 + pulse * 40 | 0})`; g.fillRect(px + 5, py - 21, 6, 29); g.fillStyle = '#fff6e0'; g.fillRect(px + 7, py - 20, 2, 27);
       for (const [lx, ly] of [[7, 4], [19, 4], [9, 13], [22, 9]]) { g.fillStyle = '#3a3a40'; g.fillRect(lx * 16 + 4 - cx, ly * 16 - 13 - cy, 8, 4); g.fillStyle = '#ffd890'; g.fillRect(lx * 16 + 5 - cx, ly * 16 - 9 - cy, 6, 2); }
-      g.fillStyle = F('ivoTalk2') && Math.floor(t * 1.5) % 7 === 0 && !rm ? '#3aff6a' : '#1a2a1a'; g.fillRect(12 * 16 + 28 - cx, 16 + 6 - cy, 2, 2);
+      const cs = typeof Cutscene !== 'undefined' && Cutscene.active ? Cutscene : null, liftOn = (cs && cs.lift) || (F('day1Done') && !F('day2Done')) || G.mapId === 'fest';
+      g.fillStyle = cs && cs.lift > 1 ? '#ffffff' : liftOn ? '#3aff6a' : F('ivoTalk2') && Math.floor(t * 1.5) % 7 === 0 && !rm ? '#3aff6a' : '#1a2a1a'; g.fillRect(12 * 16 + 28 - cx, 16 + 6 - cy, 2, 2);
+      if (cs && cs.lift > 1) { g.fillStyle = '#fff6dc'; g.fillRect(12 * 16 + 3 - cx, 16 + 4 - cy, 26, 12); g.fillStyle = '#cfe8ff'; g.fillRect(12 * 16 + 5 - cx, 16 + 13 - cy, 22, 3); g.fillStyle = '#3ac85a'; g.fillRect(12 * 16 + 15 - cx, 16 + 13 - cy, 3, 2); g.fillRect(12 * 16 + 16 - cx, 16 + 12 - cy, 1, 1); }
+      if ((cs && cs.hung) || (F('hungLantern') && !F('day2Done') && G.mapId === 'fest')) { const lx = px + 8, ly = py - 27; g.fillStyle = '#3a2a14'; g.fillRect(lx, ly - 4, 1, 4); g.fillStyle = '#e8a040'; g.fillRect(lx - 3, ly - 1, 7, 7); g.fillRect(lx - 4, ly, 9, 5); g.fillStyle = '#ffe08a'; g.fillRect(lx - 2, ly, 5, 5); g.fillStyle = '#fff6d0'; g.fillRect(lx - 1, ly + 1, 3, 3); g.fillStyle = '#e8a040'; for (const [a, b] of [[-6, 2], [6, 2], [0, -4], [0, 8], [-4, -2], [4, -2], [-4, 6], [4, 6]]) g.fillRect(lx + a, ly + b, 1, 1); }
     }
+    if (G.mapId === 'square' && F('day1Done') && !F('day2Done')) { g.fillStyle = '#d8d0c0'; for (let k = 0; k < 6.283; k += 0.14) g.fillRect(Math.round(21.5 * 16 + Math.cos(k) * 30 - cx), Math.round(6 * 16 + 12 + Math.sin(k) * 15 - cy), 2, 1); g.fillStyle = '#e8b23a'; g.fillRect(21.5 * 16 - 1 - cx, 6 * 16 + 11 - cy, 3, 3); }
     if (G.mapId === 'bay') {
       const fl = rm ? 0 : Math.random() * .3; g.fillStyle = `rgba(255,${110 + fl * 100 | 0},40,${.75 + fl})`; for (let i = 5; i < 28; i += 4) g.fillRect(14 * 16 + i - cx, 16 + 5 - cy, 2, 8);
       const off = rm || F('puzzleDone') ? 0 : ((t * 20) | 0) % 8; g.fillStyle = '#4a4a52'; for (let i = off; i < 96; i += 8) g.fillRect(2 * 16 + i - cx, 10 * 16 + 6 - cy, 4, 6);
@@ -346,6 +376,7 @@ const World = {
       if (Math.floor(t * 2) % 2) { g.fillStyle = '#ff3020'; g.fillRect(19 * 16 + 29 - cx, 16 + 4 - cy, 2, 2); }
     }
     if (G.mapId === 'clinic') { const a = t * (F('bledAgain') ? 7 : 1.6); g.fillStyle = '#8a9a94'; for (let i = 0; i < 4; i++) { const ang = a + i * Math.PI / 2; g.fillRect(Math.round(7 * 16 + 8 - cx + Math.cos(ang) * 4) - 1, Math.round(16 + 7 - cy + Math.sin(ang) * 4) - 1, 3, 2); } }
+    if (G.mapId === 'fuse') { for (let i = 0; i < 7; i++) { g.fillStyle = F('fuseDone') ? '#7cf27c' : Math.floor(t * 3 + i * 1.7) % 4 ? '#e8b23a' : '#3a2a10'; g.fillRect(2 * 16 + 5 + i * 6 - cx, 16 + 2 - cy, 2, 1); } }
     if (G.mapId === 'apt') { if (Math.floor(t * 1.2) % 2) { g.fillStyle = '#ffd070'; g.fillRect(8 * 16 + 10 - cx, 16 + 5 - cy, 3, 2); } }
     // entities sorted by y
     let ents;
@@ -360,6 +391,7 @@ const World = {
       const cols = G.mapId === 'bay' ? ['#4a4a52', '#5a5a62'] : ['#8a5a4a', '#5a6a7a', '#a89a7a', '#6a4a5a'];
       for (let i = 1; i < 7; i++) { const k = i / 7, px = ax + (bx - ax) * k, py = ay + (by - ay) * k + Math.sin(k * Math.PI) * 6; g.fillStyle = cols[i % cols.length];
         if (G.mapId === 'bay') { g.fillRect(Math.round(px), Math.round(py), 1, 6); g.fillRect(Math.round(px) - 1, Math.round(py) + 6, 3, 2); }
+        else if (G.mapId === 'fest' || (F('day1Done') && !F('day2Done') && G.mapId === 'square')) { const lit = G.mapId === 'fest', X = Math.round(px + sw * (i % 2 ? 1 : -1)), Y = Math.round(py); g.fillStyle = '#1a1214'; g.fillRect(X, Y, 1, 2); g.fillStyle = lit ? ['#ffb040', '#ff8a3a', '#ffd070'][i % 3] : ['#8a6a3a', '#7a4a3a', '#8a7a4a'][i % 3]; g.fillRect(X - 2, Y + 2, 5, 5); if (lit) { g.fillStyle = '#fff0b0'; g.fillRect(X - 1, Y + 3, 3, 3); g.globalAlpha = .18; g.fillStyle = '#ffb040'; g.fillRect(X - 5, Y - 1, 11, 11); g.globalAlpha = 1; } }
         else g.fillRect(Math.round(px + sw * (i % 2 ? 1 : -1)) - 3, Math.round(py), 6, 5 + (i % 3)); } }
     // Authority screens: propaganda on a loop, the Watcher between messages
     for (const [sx0, sy0, sw0] of m.screens || []) { const x = sx0 * 16 - cx + 2, y = sy0 * 16 - cy + 2, w = sw0 * 16 - 4, phs = Math.floor(t / 3.2) % 5, glitch = !rm && Math.random() < 0.02;
@@ -401,7 +433,7 @@ const Light = {
     const lg = this.g, rm = Settings.d.reduce;
     lg.globalCompositeOperation = 'source-over'; lg.clearRect(0, 0, W, H); lg.fillStyle = (Cutscene.active && Cutscene.dark) || World.darkOverride || m.dark; lg.fillRect(0, 0, W, H);
     lg.globalCompositeOperation = 'destination-out';
-    const all = (Cutscene.active ? m.lights : m.lights.concat([{ x: P.x, y: P.y - 8, r: G.heist ? 26 : 44 }])).concat(World.dynLights || []);
+    const all = (Cutscene.active ? m.lights : m.lights.concat([{ x: P.x, y: P.y - 8, r: G.heist === 2 ? 36 : G.heist ? 26 : 44 }])).concat(World.dynLights || []);
     for (const L of all) { const fl = rm ? 1 : L.furnace ? 1 + Math.sin(t * 7) * .04 + Math.random() * .03 : L.pillar ? 1 + Math.sin(t * 1.3) * .05 : 1;
       const x = L.x - cx, y = L.y - cy, r = L.r * fl; if (x < -r || y < -r || x > W + r || y > H + r) continue;
       const gr = lg.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.55, 'rgba(0,0,0,.65)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); lg.fillStyle = gr; lg.fillRect(x - r, y - r, r * 2, r * 2); }
