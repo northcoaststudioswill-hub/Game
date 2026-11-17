@@ -5,7 +5,7 @@ Updated Nov 17 2026. Newest game first. "Not confirmed on iPhone" applies to eve
 ## Sproutwild (cartridge 5, v12.0)
 
 ### Known bugs
-- v12.0: you can't pick which buddy tends which crop plot; the best waterer or planter tends all of them.
+- v12.4: the buddy you set to tend a plot does not walk over and stand at it; the bonus applies wherever it is.
 - v12.0: old saves lose any crop that was set on a soil plot (crops live on built CROP PLOTs now). Buildings an old save put where a street now runs stay there.
 - v12.0: a crop plot can't be removed or moved once placed.
 - v11.0: the three town houses are rooms to look at only.

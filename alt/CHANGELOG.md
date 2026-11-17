@@ -3,6 +3,16 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v12.4: you choose who tends each crop plot
+- The crop plot's menu has a new row, TENDED BY. A steps through your home buddies (and back to nobody). One buddy, one plot.
+- A tended plot grows faster: +50% for each level of WATERING or PLANTING that buddy has, +25% for any other buddy. A plot with nobody grows at the plain rate.
+- This replaces v12.0's rule, where the single best waterer sped up every plot at once.
+- The plot's label says who: "BERRIES · 40% · DRIZZLET tends it", or "nobody tends it".
+- Field Lane is shorter at both ends: two of Sunkeep's trees stood in it.
+- Test scripts: the autopilot now goes home for the Buddy Barn (gathers stone and wood at Sunkeep, builds it) and knows the castle's three steps, so fresh-save runs can reach the first Guardian.
+
+Checked: field lab; assigning, swapping and clearing a tender on screen, and the growth difference between two plots over 5 seconds.
+
 ## v12.3: things found by reading a fresh-save run
 - Text that hung on screen. Speech bubbles, messages and banners only counted down while the world was running, so a scene or a menu froze them in place. One run had a bubble up for 41 seconds and "CROP PLOT dug" for 30, still showing in the Meadow. Each now also expires by the clock, and a message is dropped when a scene starts. Same run after the fix: longest bubble 10 seconds, longest message 6.5.
 - A pile of wild buddies after the first catch. If a message was on screen when Erin began the battle lesson, the game added a new wild buddy every frame until the message cleared: dozens, stacked on one spot. (My bug, from v10.1.) Now exactly one.

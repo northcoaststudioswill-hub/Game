@@ -11674,7 +11674,7 @@ function wPropSolid(x,y){if(W4.sector!=='BASE')return false;for(const p of WPROP
    - LORE. Four things to read: the Lantern plaque, the founders'
      stone, the soil sign, the waystone at the gate.
    ================================================================ */
-const WSTREETS=[{n:'LANTERN ROW',y:127,x0:70,x1:410},{n:'FIELD LANE',y:299,x0:40,x1:440},{n:'GATE LANE',y:431,x0:60,x1:420}],WAVE_X=240;
+const WSTREETS=[{n:'LANTERN ROW',y:127,x0:70,x1:410},{n:'FIELD LANE',y:299,x0:84,x1:396},{n:'GATE LANE',y:431,x0:60,x1:420}],WAVE_X=240;
 /* ---- roads: the nearest point on a street or the avenue, and a walk between two points that uses them ---- */
 function wRoadNear(x,y){let best={x:WAVE_X,y:Math.max(96,Math.min(506,y)),s:-1},bd=Math.hypot(x-best.x,y-best.y);
  WSTREETS.forEach((S,i)=>{const px=Math.max(S.x0,Math.min(S.x1,x)),d=Math.hypot(x-px,y-S.y);if(d<bd){bd=d;best={x:px,y:S.y,s:i}}});return best}
@@ -11782,6 +11782,30 @@ function wStaleSweep(){const now=time,old=(o,dur,grace)=>{if(o._at==null){o._at=
  if(W4.banner&&W4.banner.t>0&&old(W4.banner,W4.banner.t,1.5))W4.banner.t=0;
  if(W4.msgT>0&&W4.msg){if(W4._ms!==W4.msg){W4._ms=W4.msg;W4._mAt=now;W4._mDur=W4.msgT}else if(now-W4._mAt>W4._mDur+1||(W4.scene&&now-W4._mAt>1.5))W4.msgT=0}else W4._ms=null}
 {const _wh=wHud;wHud=function(){wStaleSweep();_wh()}}
+/* ---- v12.4: you choose who tends each crop plot (Will: "assign buddies to work at them") ----
+   A plot with no buddy grows at the plain rate. Give it a home buddy and it grows faster: +50% for each level
+   of WATERING or PLANTING that buddy has, and +25% for any other buddy. One buddy, one plot. */
+function wPlotKey(b){return b.gx+','+b.gy}
+function wHomeBuds(){return SW.party.slice(1).concat(SW.box)}
+function wPlotBud(b){const k=wPlotKey(b);return wHomeBuds().find(m=>m.plot===k)||null}
+function wPlotBonus(m){if(!m)return 0;const sk=wkSkills({kind:'b',ref:m}),l=Math.max(sk.WATERING||0,sk.PLANTING||0);return l?l*.5:.25}
+plRate=function(){return 1}; /* the shared bonus is gone: each plot has its own buddy now */
+{const _pt=plTick;plTick=function(dt){_pt(dt);if(!W4.patchBuds||!wHasRoof())return;for(const pb of W4.patchBuds){if(!pb.plotB||!pb.crop||pb.ripe)continue;const bo=wPlotBonus(wPlotBud(pb.plotB));if(bo)pb.cg=(pb.cg||0)+dt*bo}}}
+wPlotTender=function(b){return b?wPlotBud(b):null};
+wPlotLabel=function(b){const pb=(W4.patchBuds||[]).find(q=>q.plotB===b),C=WCROPS[b.crop]||WCROPS.berry,m=wPlotBud(b);
+ if(pb&&pb.ripe)return'HARVEST '+C.n;return C.n+' · '+Math.min(99,Math.round(((pb&&pb.cg)||0)/C.need*100))+'%'+(m?' · '+m.sp+' tends it':' · nobody tends it')};
+function wPlotCycle(b){const k=wPlotKey(b),list=wHomeBuds().filter(m=>!m.plot||m.plot===k),cur=wPlotBud(b),i=cur?list.indexOf(cur):-1;if(cur)delete cur.plot;const nx=list[i+1];if(nx)nx.plot=k;swSave();return nx||null}
+plotUpdate=function(){const pb=W4.plotPb,rows=['BERRIES','FIBER REEDS','TENDED BY','LEAVE'];swNav(rows.length);
+ if(pressed('b')||!pb){state='g4world';return}
+ if(pressed('a')){const r2=rows[swSel];if(r2==='LEAVE'){state='g4world';return}
+  if(r2==='TENDED BY'){if(!wHasRoof()||!wHomeBuds().length){swSnd(140,.08);W4.plotMsg='You need a buddy at home. Catch a second one: only your lead walks with you.';W4.plotMsgAt=time;return}
+   const m=wPlotCycle(pb.plotB);swSnd(660,.06,880);W4.plotMsg=m?m.sp+' tends this plot now: grows '+Math.round(wPlotBonus(m)*100)+'% faster.':'Nobody tends this plot now.';W4.plotMsgAt=time;return}
+  if(r2==='FIBER REEDS'&&SW.baseLv<2){swSnd(140,.08);W4.plotMsg='FIBER REEDS need Sunkeep Lv2.';W4.plotMsgAt=time;return}
+  const crop=r2==='BERRIES'?'berry':'fiber';if(pb.crop!==crop)plSet(pb,crop);swSay(WCROPS[crop].n+' planted.',2.2);swSnd(660,.08,990);state='g4world'}};
+drawPlot=function(){const pb=W4.plotPb,cur=pb&&pb.crop,m=pb&&wPlotBud(pb.plotB);swShell('CROP PLOT',plCrops()+' of '+wPlotMax()+' plots');
+ swRows([{a:'BERRIES',b:cur==='berry'?'growing here':'2 every '+WCROPS.berry.need+'s'},{a:'FIBER REEDS',b:SW.baseLv<2?'Sunkeep Lv2':cur==='fiber'?'growing here':'1 every '+WCROPS.fiber.need+'s'},
+  {a:'TENDED BY',b:m?m.sp+' +'+Math.round(wPlotBonus(m)*100)+'%':'nobody · A to choose'},{a:'LEAVE',b:''}],swSel,
+  W4.plotMsg&&time-W4.plotMsgAt<3.5?W4.plotMsg:swSel===0?WCROPS.berry.d:swSel===1?WCROPS.fiber.d:swSel===2?'A steps through your home buddies. Waterers and planters are best: +50% a level. Any other buddy: +25%. One buddy, one plot.':'Each plot grows one crop.')};
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */
