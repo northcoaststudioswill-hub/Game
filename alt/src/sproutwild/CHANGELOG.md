@@ -21,6 +21,37 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v9.6 · 2026-11-17 · Sunkeep, lived in
+
+Will: keep improving the visuals, item placement and design; more story triggers; more content inside the slice we have.
+
+`shots/v9.6-sunkeep-props-and-courtyard.png`
+
+- **Sunkeep's empty fields have things in them now:**
+  - a stone well with a red roof by the plaza
+  - a notice board across the lane
+  - two benches by the campfire
+  - flower beds either side of the Lantern steps
+  - a lily pond with reeds and a frog's ripple
+  - a fenced lane down to the gate
+  - a mushroom ring
+
+  Buildings can't be placed on top of any of them.
+- **Four of them do something:**
+  - **The notice board** reads you today's goal, a note that changes with your progress (Marcus wanting a cottage; Erin on the dark castle; then "THE CASTLE IS CALM!"; a warning about robots once Bottie has visited), your LIGHT SHOWN count, and an old note from the first keeper about the promise. A gold dot on the board means there's something new.
+  - **The well** gives one heart a day.
+  - **The benches** rest your buddies.
+  - **The pond** has three things to notice.
+- **New story beats, each on something you do:**
+  - The first night at Sunkeep, the camera goes to the fire. Erin and Marcus on the dark, the Lantern, and sleeping in the cottage.
+  - The moment your lead reaches the level the castle needs, Marcus: "BESSLING is Lv6! Look at you. Castle time, bro." Then Erin on the thorn gate.
+  - Stepping into the castle courtyard, the camera goes to the alpha. Louie: "Shh. It's waking up..." Then the narrator: "Dark pours off it like smoke off a candle."
+  - The first buddy you calm, Erin: "The dark broke right off it. That is the whole job, keeper." Marcus calls the rest of the valley a backlog. During Erin's Meadow walk she says it herself in her first-catch line, so the two never stack (a real-time run caught them back to back).
+- Lab: 124 checks, unchanged.
+- Played in real time from the title (autopilot, 430x932) through the opening and Erin's Meadow walk to the bridge: 0 timing flags, no page errors. The board, the well and the courtyard beat were checked by a script from their own spots.
+
+**Not checked:** the first night at the fire in real time; iPhone.
+
 ## v9.5 · 2026-11-17 · the first alpha lives in the castle
 
 Will: refine what we have, no new content; clean up, make things work better, fill tutorial and onboarding gaps, flesh out the first area. The flow to the first alpha is bad: it should be in Squire's Woods, which should have a castle. And look hard at the battles: is this style right, or should it pivot to Mario RPG style or multi-battlers?

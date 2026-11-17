@@ -52,7 +52,7 @@ while(T()<CAP){
  const ph=s.state+'/'+s.sec+'/op'+s.op+'/q'+s.q+'/w'+s.w2+'/bw'+s.bw;if(ph!==phase){log.push(T().toFixed(1)+'s == '+ph);phase=ph}
  if(Date.now()-lastShot>6000){await shot(s.state);lastShot=Date.now()}
  if(s.state==='g4dab'){globalThis.__sawDab=1;if(Date.now()-lastShot>2500){await shot('dab');lastShot=Date.now()}}
- if(!globalThis.__dbgT||Date.now()-globalThis.__dbgT>20000){globalThis.__dbgT=Date.now();log.push(T().toFixed(1)+'s DBG cot='+s.cot+' crop='+s.crop+' plot='+JSON.stringify(s.plot)+' q='+s.q+' P='+s.P.map(Math.round)+' sec='+s.sec+' fid='+s.fid+' state='+s.state)}
+ if(!globalThis.__dbgT||Date.now()-globalThis.__dbgT>20000){globalThis.__dbgT=Date.now();log.push(T().toFixed(1)+'s DBG cot='+s.cot+' crop='+s.crop+' plot='+JSON.stringify(s.plot)+' q='+s.q+' P='+s.P.map(Math.round)+' sec='+s.sec+' fid='+s.fid+' state='+s.state+' lead='+JSON.stringify(s.lead)+' tgt='+s.target+' alpha='+JSON.stringify(s.alpha)+' sqgate='+!!s.sqgate+' erin='+JSON.stringify(s.erin)+' w2='+s.w2+' w3='+s.w3)}
  if(s.goal!==globalThis.__goal){globalThis.__goal=s.goal;log.push(T().toFixed(1)+'s GOAL '+s.goal+'   [team '+s.lv+']')}
  if(s.badges>=1){log.push(T().toFixed(1)+'s FIRST SIGIL [team '+s.lv+']');await sleep(3000);await shot('sigil');break}
  const txt=s.scene||s.dlg||(s.state!=='g4world'?s.state:'');if(txt!==lastTxt){lastTxt=txt;txtAt=Date.now()}

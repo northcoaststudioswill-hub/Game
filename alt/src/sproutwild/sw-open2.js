@@ -101,7 +101,7 @@ const EW2={
  5:["ERIN: A boulder wall. Only PEB sprouts can crack rock.","ERIN: Face it and press A. Throw a few if it's tough."],
  7:["ERIN: Sprouts build, too. See the planks out in the water?","ERIN: Face them and press A. A few sprouts make a bridge."],
  9:["ERIN: That's the Meadow. Every kind of sprout has its own job."]};
-const EWDONE={2:["ERIN: Your first catch! It walks with you now.","ERIN: Buddies can fight, too. Stand next to a wild one and press SELECT to battle it. Battles make them stronger.","ERIN: Not now, though. Come on, there's more to see."],
+const EWDONE={2:["ERIN: Your first catch! See how the dark broke right off it? That is the whole job, keeper.","ERIN: Buddies can fight, too. Stand next to a wild one and press SELECT to battle it. Battles make them stronger.","ERIN: Not now, though. Come on, there's more to see."],
  4:["ERIN: There. A PEB walks with you now. Over this way!"],6:["ERIN: Ha! The rock never stood a chance. One more thing."],8:["ERIN: A bridge! Whatever's on that island is yours."]};
 function ewTick(F,dt){if(SCOFF||F.id!=='MEADOW'||wOp()<3||W4.scene||F.dlg||F.spot)return;SW.lessons.scMeadow=1;const st=SW.walk2||0;
  if(SW.quest<3&&st>=1){const tm=W4.wilds.find(w=>w.tame);if(tm)for(const w of W4.wilds)if(w!==tm&&!(w.lat&&w.lat.length)&&Math.hypot(w.x-tm.x,w.y-tm.y)<110)w.gone=1;W4.wilds=W4.wilds.filter(w=>!w.gone)} /* the lesson buddy has the grass to itself */if(st>=10&&!(W4.ew&&W4.ew.leave)&&!(SW.walk3>0&&SW.walk3<7))return;

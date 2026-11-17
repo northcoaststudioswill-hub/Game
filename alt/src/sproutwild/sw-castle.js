@@ -25,7 +25,7 @@ WSECSUB.SQUIRE='The castle in the woods. Wilds Lv3 to 6.';
 function wBarred(to){return to==='SQUIRE'?SW.quest<5:to==='HOLLOW'?SW.badges.length<1:false}
 function wBarredSay(to){return to==='SQUIRE'?"RANGER'S BARRIER: Squire's Woods is wild. Build Sunkeep a cottage and grow a crop first.":"RANGER'S BARRIER: Crooked Hollow is darker still. Win a Sigil from the castle alpha in Squire's Woods first."}
 /* after the cottage and the first crop: the castle */
-function scGymCheck(){if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return;SW.lessons.scGym=1;
+function scGymCheck(){wStoryBeats();if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return;SW.lessons.scGym=1;
  const L=FMAPS.SQUIRE.key.A.lv;
  scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Now the real work: the dark out there.'},
   {who:'MARCUS',txt:"Every place has an ALPHA, bro. Biggest, darkest buddy around. Ours moved into the old castle in Squire's Woods."},

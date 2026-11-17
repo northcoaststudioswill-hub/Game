@@ -374,6 +374,7 @@ function wCellFree(gx,gy){const x=wCellX(gx),y=wCellY(gy),cx=x+10,cy=y+10;
  if(cx>284&&cx<340&&cy>150&&cy<204)return false; /* the camp fire */
  if(cx>158&&cx<322&&cy>324&&cy<392)return false; /* the garden: nothing builds on the plots */
  for(const b of W4.bushes||[])if(Math.hypot(cx-b.x,cy-b.y)<18)return false;
+ if(wPropBlocks(cx,cy))return false; /* v9.6: props stay clear */
  if(SW.quest<2&&Math.hypot(cx-240,cy-296)<52)return false;
  for(const np of wNpcList())if(Math.hypot(cx-np.x,cy-np.y)<16)return false;
  for(const nd of W4.nodes)if(!nd.got&&Math.hypot(cx-nd.x,cy-nd.y)<17)return false;
@@ -437,6 +438,7 @@ function wEnterSector(id){W4.sector=id;SW.sector=id;const sec=wSector(id);W4.ww=
   if(dk)for(let i=0;i<9;i++){const x=26+dr()*(WW-52),y=54+dr()*(WH-90);
    if(wGrassPatches().some(p2=>x>p2.x&&x<p2.x+p2.w&&y>p2.y&&y<p2.y+p2.h))continue;
    W4.decor.push({k:dk,x,y,s:.7+dr()*.6})}}
+ if(id==='BASE')wBaseProps(); /* v9.6 */
  W4.wilds=[];W4.wildCd=0;W4.items=null;
  W4.bushes=id==='BASE'?[{x:150,y:354,type:0,fruit:2,rg:0},{x:330,y:354,type:2,fruit:2,rg:0},{x:240,y:408,type:4,fruit:2,rg:0}]:null;
  if(W4.patchBuds)for(const q of W4.patchBuds)q.by=null;
@@ -529,6 +531,7 @@ function wNear(){const sec=wSector(W4.sector),px=P3.x+P3.ax*13,py=P3.y+P3.ay*13;
  if(false&&W4.sector==='BASE'&&SW.quest<=1&&!SW.tendDone&&Math.hypot(px-240,py-352)<26)return{k:'patch',txt:SW.tendStage===0?'WATER THE SEEDS':SW.tendStage>=3?'PLUCK THE GROWN ONES':'THE SPROUT PATCH'};
  if(W4.sector==='BASE'&&SW.quest===1&&SW.tendDone&&!SW.party.length)for(const c of WCHOICE)
    if(Math.hypot(px-c.x,py-c.y)<24)return{k:'choice',sp:c.sp,txt:'GREET '+c.sp};
+ if(W4.sector==='BASE')for(const d of W4.decor||[])if(d.act&&Math.hypot(px-d.x,py-d.y)<(d.r||18))return{k:'prop',d,txt:d.act}; /* v9.6 */
  if(sec.gym>=0&&Math.hypot(px-WW/2,py-66)<20)return{k:'gym',txt:'GYM'};
  if(W4.sector!=='BASE'&&Math.hypot(px-WW/2,py-(W4.wh-22))<17)return{k:'sign',txt:'LANTERN GATE'};
  if(W4.sector==='BASE'){for(const b of SW.buildings){const bx=wCellX(b.gx)+10,by=wCellY(b.gy)+12;
@@ -636,6 +639,7 @@ function worldUpdate(dt){if(W4.scene){scTick(dt);return}scAuto();if(W4.fld){fUpd
  W4.near=wNear();
  if(pressed('a')&&W4.near){const n=W4.near;
   if(n.k==='fbud')wPluckSeed(n.b);
+  else if(n.k==='prop')wPropUse(n.d);
   else if(n.k==='node')wNodeAct(n.nd);
   else if(n.k==='sign'){if(W4.sector==='BASE'&&SW.quest===2&&!SW.gateSeen){SW.gateSeen=1;W4.gatePage=0;state='g4gate';swSave()}
    else{swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}}
@@ -707,7 +711,7 @@ function wDrawHouse(x,y){r('rgba(0,0,0,.18)',x-2,y+42,68,4);
  r('#5a4632',x+27,y+26,10,18);r('#3a2a1c',x+28,y+27,8,17);r('#ffd94d',x+34,y+35,2,2);
  r('#d8c8a8',x+7,y+20,11,10);r('#7ec8e8',x+9,y+22,7,6);
  r('#d8c8a8',x+45,y+20,11,10);r('#ffd94d',x+47,y+22,7,6);r('#fff3b0',x+48,y+23,3,3)}
-function wDrawDecor(d){const x=d.x,y=d.y,s=d.s||1;
+function wDrawDecor(d){if(d.prop){wPropDraw(d);return}const x=d.x,y=d.y,s=d.s||1;
  if(d.k==='house'){wDrawHouse(x,y);return}
  if(d.k==='tree')wDrawTree(x,y,s);
  else if(d.k==='flower'){r('#35702c',x-1,y-5,2,6);r('#f078c0',x-3,y-9,6,5);r('#fff3b0',x-1,y-7,2,2)}
@@ -762,7 +766,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
  if(W4.groundFor!==sec.id+'x'+(W4.wh||360))wBakeGround();
  g.drawImage(W4.groundCv,0,0);
  W4.front=[];for(const d of(W4.decor||[])){
-  if(d.k==='tree'||d.k==='snowrock'){if(d.y>P3.y)W4.front.push(['d',d]);else wDrawDecor(d)}
+  if(d.k==='tree'||d.k==='snowrock'||d.tall){if(d.y>P3.y)W4.front.push(['d',d]);else wDrawDecor(d)}
   else wDrawDecor(d)}
  for(const p of wGrassPatches())if(sec.table){r('#2f6629',p.x,p.y,p.w,p.h);
   const gr=wSeedRand(wSectorSeed(sec.id)+p.x*3+p.y);
