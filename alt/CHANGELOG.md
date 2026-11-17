@@ -3,6 +3,39 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Patch & Plate v0.5: big moments, kitchen buddies, Bottie and Derek (Nov 17 2026)
+
+Will: make sure Will, Marcus, Bottie and Derek all make more appearances; if something really cool happens, trigger scenes
+like in Sproutwild and the fighter; as you level up, up to 3 buddies in your kitchen over time.
+
+- **Big moments.** A cut-in in the fighter's style (slanted band in the speaker's colour, speed lines, the face sliding in,
+  the words slammed on with a flash), then a line or two. A skips a line, Start skips it all. Each plays once per file:
+  - FIVE IN A ROW! (Marcus) and EIGHT IN A ROW! (Will), during the day, the first time you get that streak
+  - PERFECT DAY! (Will or Marcus), after a 3-star day with nobody missed, once per day number
+  - BOTTIE IS IN LINE! and DEREK PULLS UP!, the first time each walks up
+  - <BUDDY> MOVES IN!, when a kitchen buddy arrives
+  - THE VALLEY IS FED! (the Elder, Marcus), the first time LANTERN NIGHT is cleared
+  Scenes earned by a day play before the results screen, one after another.
+- **Kitchen buddies.** The stand's level is its total stars. CUYAPUP moves in at 6 stars (stoves 15% faster), BESSLING at
+  15 (crops grow 15% faster), GRASSKIN at 27 (customers wait 8 longer). Three at most. They are Sproutwild's three
+  starters, drawn with Sproutwild's art, sitting on the counters between the stoves. The stand hub says when the next
+  one comes ("KITCHEN BUDDY 2 OF 3: 15 STARS"). A file that already has the stars gets them after its next finished day.
+- **Bottie and Derek are customers.** DEREK (Flow Pros truck) from BURGER TIME on, BOTTIE from FRY DAY on. Bottie eats and
+  never tips. Derek is on the FRIENDS page. Derek's sprite is new (Marcus's build, Sproutwild's Derek colours).
+- **Will and Marcus come by most**: three in thirteen customers each on a late day (Scout and Ranger two each).
+  More of their lines in the quips, plus four new night scenes with Bottie, Derek, Marcus and Will.
+- New save fields `buds` and `big`, both with defaults; old saves load as before.
+
+**Files:** `src/patchplate.js`, `src/console.js` (Patch & Plate is also handed Sproutwild's buddy sprites, read-only),
+`tests/pp_test.js`.
+**Tested:** `tests/pp_test.js` 107/107 (14 new checks: who joins the line and when, buddy thresholds on a wiped file, a
+text audit of all eight big moments, three buddies in the kitchen with Bottie and Derek at the windows, Bottie's tip is 0,
+the friends page with Derek). Sproutwild lab 124/124. Screenshots looked at: `playtest/pp-v0.5/` (seven).
+**Not tested:** the big moments were put on screen by the test, and the bot's days ran through them, but nobody has watched
+one fire in real time from a real streak. Whether a scene in the middle of a rush feels good or gets in the way is for a
+person to say. Buddy numbers (6/15/27 stars, 15%, +8) are guesses. Not played on a phone.
+**All new, flag to Will:** every line, the buddy perks, and Bottie being allowed to queue for lunch.
+
 ## Patch & Plate v0.4: the Sunkeep update (Nov 17 2026)
 
 Will: the cooking game needs an update and testing; bring in the lore from the newest Sproutwild so the games connect.

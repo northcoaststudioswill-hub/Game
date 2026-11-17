@@ -16,11 +16,14 @@ A pocket game console in one HTML file, by North Coast Studios. Five game cartri
 | 1 | **Sprouts** | Pikmin-style garden game: throw sprouts, grow the garden, Louie the dog helps | Stable | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (Sprouts section) and [`v0.35/CHANGELOG.md`](v0.35/CHANGELOG.md) |
 | 2 | **North Coast Knockout** | 2D fighter with Will, Marcus, Erin, King Bibi and friends; supers, cinematics, arcade tower | Paused (between Fable passes) | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) |
 | 3 | **Rootdeep** | Roguelite dungeon crawler | Stable | [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md) |
-| 4 | **Patch & Plate** | Erin's cooking and garden life game, set at Sunkeep in Sproutwild's valley | v0.4 (Nov 17 2026) | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (v0.4), before that [`v0.3/CHANGELOG.md`](v0.3/CHANGELOG.md) |
+| 4 | **Patch & Plate** | Erin's cooking and garden life game, set at Sunkeep in Sproutwild's valley | v0.5 (Nov 17 2026) | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (v0.4), before that [`v0.3/CHANGELOG.md`](v0.3/CHANGELOG.md) |
 | 5 | **Sproutwild** | Creature collector: Pikmin + Palworld + Pokemon, set in an Ohio-lore valley | **In active development (v8.0)** | [`alt/src/sproutwild/CHANGELOG.md`](alt/src/sproutwild/CHANGELOG.md) |
 
 ## Latest updates
 
+- **Patch & Plate v0.5 (Nov 17 2026):** fighter-style cut-in scenes for big moments, up to three kitchen buddies
+  (Cuyapup, Bessling, Grasskin) as the stand earns stars, Bottie and Derek as customers, more Will and Marcus.
+  Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
 - **Patch & Plate v0.4, the Sunkeep update (Nov 17 2026):** the stand is in Sproutwild's valley now (same universe,
   separate saves): the Great Lantern on screen, the Elder and Pip as customers, a 13th day (LANTERN NIGHT), valley talk in
   the lines. Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).

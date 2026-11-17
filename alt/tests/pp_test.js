@@ -59,6 +59,7 @@ const PAGE_KIT = () => {
   window.__playDay = (maxSec = 400) => {
     let f = 0;
     while ((PP.G.s === 'play' || (PP.G.s === 'cine' && PP.G.cine.from === 'play')) && f < maxSec * 60) { __botTick(); (f % 15 === 0 ? __step : __upd)(1 / 60); f++; }
+    for (let k = 0; PP.G.s === 'cine' && k < 60 * 60; k++) __upd(1 / 60);   /* big moments after the day play out before the results */
     clear(); K.a = K.b = 0;
     return f;
   };
@@ -291,6 +292,28 @@ async function main() {
   await shot('pp_65_long_quip.png'); await audit('a long quip takes two rows');
   await pp("__g.PP._.G.s='title'"); await shot('pp_63_title_lantern.png'); await audit('title with the Great Lantern');
   await pp("__g.PP._.G.s='friends'"); await shot('pp_64_friends_town.png'); await audit('friends with the ELDER and PIP');
+  /* 4a2. v0.5: Bottie and Derek, big moments, kitchen buddies */
+  const v5 = await page.evaluate(() => { const P = __g.PP._, a = P.peopleFor(2), b = P.peopleFor(12), n = w => b.filter(x => x === w).length; return { early: a.includes('DEREK') || a.includes('BOTTIE'), late: b.includes('DEREK') && b.includes('BOTTIE'), will: n('WILL'), marcus: n('MARCUS'), scout: n('SCOUT') }; });
+  check(!v5.early && v5.late && v5.will > v5.scout && v5.marcus > v5.scout, 'DEREK and BOTTIE join the line on their days; WILL and MARCUS come by most: ' + JSON.stringify(v5));
+  const bigFit = await page.evaluate(() => { const P = __g.PP._, bad = []; for (const k in P.BUDLINE) P.BUDLINE[k].forEach(l => { const w = P.wrap(l[1], 210, 2); if (w.length > 3) bad.push(l[1]); }); return bad; });
+  check(!bigFit.length, 'buddy scene lines fit' + (bigFit.length ? ': ' + bigFit.join(' | ') : ''));
+  /* a fresh file: the buddies move in at 6, 15 and 27 stars, one scene each, and each one helps */
+  const bud = await page.evaluate(() => { const P = __g.PP._, out = [], keep = JSON.stringify(P.SV);
+    P.SV.stars = {}; P.SV.buds = []; P.SV.big = {};
+    for (const [n, want] of [[5, 0], [6, 1], [15, 2], [27, 3], [39, 3]]) { P.SV.stars = {}; for (let i = 0; i < 13; i++) P.SV.stars[i] = Math.min(3, Math.max(0, n - i * 3)); P.dayBigs({ missed: 1 }, 1, 0); out.push([n, P.SV.buds.length, want, P.G.bigQ.length]); }
+    P.G.bigQ = []; const res = { out, ok: out.every(o => o[1] === o[2]), names: P.SV.buds.slice() }; P.SV = JSON.parse(keep); P.store(); return res; });
+  check(bud.ok && bud.names.join() === 'CUYAPUP,BESSLING,GRASSKIN', 'kitchen buddies move in at 6, 15 and 27 stars, never more than three: ' + JSON.stringify(bud));
+  for (const [i, who, title, shotName] of [[0, 'CUYAPUP', 'CUYAPUP|MOVES IN!', 'pp_70_big_buddy.png'], [1, 'BOTTIE', 'BOTTIE IS|IN LINE!', 'pp_71_big_bottie.png'], [2, 'DEREK', 'DEREK|PULLS UP!', 'pp_72_big_derek.png'], [3, 'MARCUS', 'FIVE IN|A ROW!', 'pp_73_big_streak.png'], [4, 'ELDER', 'THE VALLEY|IS FED!', null], [5, 'BESSLING', 'BESSLING|MOVES IN!', null], [6, 'GRASSKIN', 'GRASSKIN|MOVES IN!', 'pp_74_big_grasskin.png'], [7, 'WILL', 'PERFECT|DAY!', null]]) {
+    await page.evaluate(([who, title]) => { const P = __g.PP._; P.G.s = 'stand'; P.big(who, title, [[who === 'CUYAPUP' || who === 'BESSLING' || who === 'GRASSKIN' ? 'ERIN' : who, 'YO! THE FLOW PROS TRUCK DIED. AGAIN. GOT FRIES?']], () => { }); for (let k = 0; k < 60; k++)__upd(1 / 60); }, [who, title]);
+    if (shotName) await shot(shotName);
+    await audit('big moment: ' + title.replace('|', ' '));
+    await pp("__g.PP._.G.cine=null;__g.PP._.G.s='stand'");
+  }
+  await page.evaluate(() => { const P = __g.PP._; P.SV.buds = ['CUYAPUP', 'BESSLING', 'GRASSKIN']; P.startDay(12); P.G.s = 'play'; for (let i = 0; i < 60 * 25; i++) { __botTick(); __upd(1 / 60); } const cu = P.G.L.cu; let k = 0; for (const c of cu) if (c) c.who = ['BOTTIE', 'DEREK', 'BOTTIE'][k++]; });
+  await shot('pp_75_three_buddies.png'); await audit('three buddies in the kitchen, BOTTIE and DEREK at the windows');
+  const tip = await page.evaluate(() => { const P = __g.PP._, L = P.G.L; L.cu[0] = { who: 'BOTTIE', rc: 'salad', pat: 60, pmax: 60, st: 'wait', x: 40, side: -1, t: 0, say: '', gain: 0 }; const t0 = L.tips; L.held = { k: 'plate', c: ['let_c'] }; const P2 = L.P; P2.x = 2; P2.y = 2; P2.fx = 0; P2.fy = -1; P2.mv = 0; const a = P.act(true); if (a && a.ok) P.act(); return { tipped: L.tips - t0, st: L.cu[0] && L.cu[0].st }; });
+  check(tip.st === 'happy' && tip.tipped === 0, 'BOTTIE eats and never tips: ' + JSON.stringify(tip));
+  await pp("__g.PP._.G.cine=null;__g.PP._.G.s='friends'"); await shot('pp_76_friends_derek.png'); await audit('friends with DEREK');
   await pp("__g.PP._.startDay(11)");   /* back to where the reload check below starts from */
 
   /* 4b. CONTINUE after a reload */

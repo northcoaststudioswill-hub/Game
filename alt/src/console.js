@@ -230,7 +230,7 @@ const say=(s,t=4)=>{msg=s;msgT=t};
 /* ---------- cartridge 2: North Coast Knockout (src/knockout.js) ---------- */
 let cart=0;
 const KO=window.KO_CART?window.KO_CART({g,W,H:()=>H,r,text,ctext,tw,snd,noise,keys,pressed,mk,flip,ac:()=>ac,meta:()=>meta,eject:()=>eject(),hasTracks:n=>TRACKS.some(t=>t.use.includes(n))}):null;
-const PP=window.PP_CART?window.PP_CART({g,W,H:()=>H,r,text,tw,snd,noise,keys,pressed,mk,flip,CH,LOU,TL,sw:()=>SWCHR,will:()=>SP,meta:()=>meta,persist:()=>persist(true),eject:()=>eject(),active:()=>state==='pp',hasTracks:n=>TRACKS.some(t=>t.use.includes(n))}):null;
+const PP=window.PP_CART?window.PP_CART({g,W,H:()=>H,r,text,tw,snd,noise,keys,pressed,mk,flip,CH,LOU,TL,sw:()=>({chr:SWCHR,bud:id=>wSp(id)._spr}),will:()=>SP,meta:()=>meta,persist:()=>persist(true),eject:()=>eject(),active:()=>state==='pp',hasTracks:n=>TRACKS.some(t=>t.use.includes(n))}):null;
 const PAD=[['act','call','swap','pause'],['light','heavy','super','pause'],['attack','cast','swap','pause'],['use','toss','recipes','pause'],['act','call','select','menu']];
 function setPad(i){try{const q=(s,t)=>{const e=document.querySelector(s);if(e)e.textContent=t},L=PAD[i]||PAD[0];q('#bA span',L[0]);q('#bB span',L[1]);q('#bSel small',L[2]);q('#bSta small',L[3]);const cs=$('console');if(cs)cs.classList.toggle('ko',i===1||i===2);const sl=$('bSel');if(sl)sl.classList.remove('ready')}catch(e){}}
 const toast=s=>toasts.push({s,t:3.2});
