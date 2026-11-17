@@ -42,6 +42,7 @@ function wBoardNotes(){const n=[],q=(()=>{try{return wQuestText()}catch(e){retur
  else n.push({who:'NOTICE BOARD',txt:'THE CASTLE IS CALM! One Sigil home. Crooked Hollow next, east of the Meadow. -- Erin'});
  if(SW.bottieSeen)n.push({who:'NOTICE BOARD',txt:'If a robot asks for the Lantern, the answer is no. -- The Management (Marcus)'});
  n.push({who:'NOTICE BOARD',txt:(SW.shown||0)<10?'LIGHT SHOWN: '+(SW.shown||0)+'. The Lantern grows a ring at 10.':'LIGHT SHOWN: '+SW.shown+'. The Lantern has grown '+Math.floor(SW.shown/10)+' ring'+(SW.shown>=20?'s':'')+'.'});
+ n.push({who:'NOTICE BOARD',txt:"ERIN'S FARM STAND, by the garden. Salad, bread, burgers. A fed valley is a calm valley. Louie eats first. -- Erin"});
  n.push({who:'NOTICE BOARD',txt:'(pinned under everything, very old:) This valley was promised to sprouts and buddies. Keep the promise. -- the first keeper'});
  return n}
 function wPropUse(d){if(d.k==='board'){SW.boardSeen=wBoardKey();scStart(wBoardNotes().map(s=>Object.assign({x:d.x,y:d.y},s)),()=>swSave());return}

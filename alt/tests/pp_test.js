@@ -120,7 +120,7 @@ async function main() {
   check(await pp('__g.PP._.G.s') === 'cine' && await pp('__g.PP._.G.cine.k') === 'open', 'the first day starts with the opening scene');
   await pp('for(let i=0;i<60*1.2;i++)__upd(1/60)');
   await shot('pp_12a_opening_scene.png'); await audit('opening scene');
-  await pp('for(let i=0;i<60*12&&__g.PP._.G.s===\'cine\';i++)__upd(1/60)');
+  await pp('for(let i=0;i<60*18&&__g.PP._.G.s===\'cine\';i++)__upd(1/60)');
   check(await pp('__g.PP._.G.s') === 'intro', 'the opening scene plays itself out, then day 1 opens its intro card');
   await shot('pp_12_intro_day1.png'); await audit('intro day 1');
   await pp("__tap('a')");
@@ -256,6 +256,42 @@ async function main() {
   await shot('pp_33_kitchen.png'); await audit('kitchen page');
   await pp("__g.PP._.startDay(11)");
   await shot('pp_34_intro_day12.png'); await audit('intro day 12');
+
+  /* 4a. v0.4, the Sunkeep update: lore lines, Lantern Town customers, LANTERN NIGHT (day 13) */
+  const fit = await page.evaluate(() => {
+    const P = __g.PP._, bad = [], W = P.tw;
+        const lines = (s, max, sc, n, what) => { const l = P.wrap(s, max, sc); if (l.length > n || l.some(x => W(x, sc) > max)) bad.push(what + ': ' + s); };
+    for (const w in P.HI) P.HI[w].forEach(s => lines(s, 206, 1, 2, 'hello'));
+    for (const w in P.HURRY) P.HURRY[w].forEach(s => lines(s, 206, 1, 2, 'hurry'));
+    for (const k in P.QP) P.QP[k].forEach(q => lines(q[1], 206, 1, 2, 'quip'));
+    for (const w in P.WHO) P.WHO[w].yum.concat(P.WHO[w].bye).forEach(s => lines(s, 70, 1, 2, 'order card'));
+    const sc = []; for (const k in P.NIGHT) P.NIGHT[k].forEach(e => sc.push(...e)); P.NIGHT_V.forEach(e => sc.push(...e)); for (const w in P.HS) P.HS[w].forEach(e => sc.push(...e));
+    for (const k in P.TASTE) sc.push(['', P.TASTE[k]]); for (const k in P.TASTE_M) sc.push(['', P.TASTE_M[k]]);
+    sc.forEach(l => lines(l[1], 210, 2, 3, 'scene')); P.DAYS.forEach(D => lines(D.s, 156, 2, 6, 'day card'));
+    return { bad, n: sc.length };
+  });
+  check(!fit.bad.length, 'every hello, hurry, quip, order card, scene and day line fits the box it is drawn in' + (fit.bad.length ? ': ' + fit.bad.join(' | ') : ''));
+  const town = await page.evaluate(() => { const P = __g.PP._, early = P.peopleFor(1), late = P.peopleFor(12); let bad = 0; for (let i = 0; i < 400; i++) { const w = P.nightPick(3, 0)[0][0]; if (w === 'ELDER' || w === 'PIP') bad++; } return { early: early.includes('ELDER') || early.includes('PIP'), late: late.includes('ELDER') && late.includes('PIP'), bad, days: P.DAYS.length, last: P.DAYS[12].n }; });
+  check(!town.early && town.late && !town.bad, 'the ELDER and PIP only come by (and only get a night scene) once their day has opened: ' + JSON.stringify(town));
+  check(town.days === 13 && town.last === 'LANTERN NIGHT', 'day 13 is LANTERN NIGHT');
+  await pp("__g.PP._.setDay(13);__g.PP._.startDay(12)");
+  await shot('pp_60_intro_day13.png'); await audit('intro day 13');
+  await page.evaluate(() => { const PP = __g.PP._; PP.G.s = 'play'; for (let i = 0; i < 60 * 30; i++) { __botTick(); __upd(1 / 60); } const cu = PP.G.L.cu; let k = 0; for (const c of cu) if (c) c.who = ['ELDER', 'PIP', 'ELDER'][k++]; });
+  await shot('pp_61_day13_playing.png'); await audit('day 13 playing, the ELDER and PIP at the windows');
+  const d13 = await page.evaluate(() => { const PP = __g.PP._; const f = __playDay(); const R = PP.G.res; return { s: PP.G.s, sec: Math.round(f / 60), st: R && R.st, coins: R && R.coins, served: R && R.served, n: R && R.n, day: PP.SV.day }; });
+  check(d13.s === 'done' && d13.served >= 1, `day 13: bot finished in ${d13.sec}s, ${d13.st} stars, ${d13.coins} coins, served ${d13.served}/${d13.n}`);
+  let nightBad = 0;
+  for (let i = 0; i < 8; i++) {
+    await page.evaluate(i => { const PP = __g.PP._, ex = PP.NIGHT_V[i]; PP.G.s = 'stand'; PP.cine('night', { who: ex[0][0], day: 3 }, ex, () => { PP.G.s = 'stand'; }); for (let k = 0; k < 50; k++)__upd(1 / 60); }, i);
+    if (i === 6) await shot('pp_62_night_elder.png');
+    const before = fails.length; await audit('valley night ' + (i + 1)); if (fails.length > before) nightBad++;
+    await pp("__g.PP._.G.cine=null;__g.PP._.G.s='stand'");
+  }
+  await pp("__g.PP._.startDay(12);__g.PP._.G.s='play';for(let i=0;i<30;i++)__upd(1/60);__g.PP._.G.quip={who:'MARCUS',s:\"I'VE GOT A GUY. THE GUY IS ME. THE GUY IS HUNGRY.\",t:.5}");
+  await shot('pp_65_long_quip.png'); await audit('a long quip takes two rows');
+  await pp("__g.PP._.G.s='title'"); await shot('pp_63_title_lantern.png'); await audit('title with the Great Lantern');
+  await pp("__g.PP._.G.s='friends'"); await shot('pp_64_friends_town.png'); await audit('friends with the ELDER and PIP');
+  await pp("__g.PP._.startDay(11)");   /* back to where the reload check below starts from */
 
   /* 4b. CONTINUE after a reload */
   await pp("__g.PP._.G.s='play';for(let i=0;i<60*20;i++){__botTick();__upd(1/60)};__g.PP._.snap()");

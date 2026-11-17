@@ -1,7 +1,49 @@
 # Pocket Lantern ALT changelog
 
-ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
+ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
+
+## Patch & Plate v0.4: the Sunkeep update (Nov 17 2026)
+
+Will: the cooking game needs an update and testing; bring in the lore from the newest Sproutwild so the games connect.
+Will, during the work: no save link between them. They are separate games in the same universe.
+
+**The canon this assumes (new, flag to Will):** Erin's stand is at Sunkeep, beside the Great Lantern, in Sproutwild's valley.
+Her garden is the "one good patch of soil left" that Sproutwild's opening mentions. The stand feeds the valley while the
+keeper is out bringing the light back ("a fed valley is a calm valley"). It is flavour in the lines only; there is still no
+story to remember, and **neither game reads or writes the other's save.**
+
+- **The Great Lantern is on screen.** On the title (with "AT SUNKEEP, UNDER THE GREAT LANTERN") and behind the stand in every
+  scene, drawn the way Sproutwild draws it.
+- **Two customers from Lantern Town.** The ELDER walks down from BREAD DAY on, PIP (the bug buyer) from BERRY GOOD on, about
+  one customer in ten each. They use their Sproutwild sprites, have their own hellos, thanks and hurry-ups, and sit on the
+  FRIENDS page.
+- **Day 13, LANTERN NIGHT.** A feast under the Lantern at dusk: every recipe, 11 customers, the Elder gives the briefing.
+  A save that had finished all 12 days finds day 13 open.
+- **Valley talk.** New lines in the hellos, thanks, quips and day cards about the Lantern, the Iron Dome, Bottie, the Sigils
+  and calm buddies. Eight new night scenes about the valley; about 4 nights in 10 play one instead of a star night.
+  The opening scene says where you are. MARKET DAY and HARVEST FEST name Lantern Town and "the first since the dark".
+- **A LANTERN awning** in the wardrobe (90 coins).
+- **Sproutwild's side** (`src/sproutwild/`): the Sunkeep notice board has a note for Erin's farm stand, and Erin, Marcus and
+  Will each have a new idle line about it. See v9.10 in `src/sproutwild/CHANGELOG.md`.
+
+**Fixed while testing (both were in v0.3 too):**
+- Long quips were squeezed narrow to fit one row ("I'VE GOT A GUY. THE GUY IS ME. THE GUY IS HUNGRY.", Louie's "wants"
+  lines). A long quip now takes a second row. This is what made the text audit fail at random in earlier runs.
+- Two thank-yous on the order card lost their last words ("TEN OUT OF TEN. LIKE ME." showed two of three rows; "FOR SCIENCE.
+  YUM." the same). Reworded to fit: "TEN OF TEN. LIKE ME.", "YUM. FOR SCIENCE."
+
+**Files:** `src/patchplate.js`; `src/console.js` (one word: Patch & Plate is handed Sproutwild's character sprites);
+`tests/pp_test.js` (17 new checks).
+
+**Tested:** `tests/pp_test.js` 93/93, two runs in a row, at 440x956 in headless Chromium. New checks: every hello, hurry,
+quip, order-card, scene and day-card line is measured against the box it is drawn in; the Elder and Pip only appear once
+their day is open; the bot plays day 13 to the results screen through the real controls; text audits on the day 13 card,
+day 13 with the Elder and Pip at the windows, all eight valley nights, the title, the friends page and a two-row quip.
+Sproutwild `tests/sproutwild/field-lab.js` 124/124, no page errors. Screenshots looked at: `playtest/pp-v0.4/` (six).
+**Not tested:** Knockout and Rootdeep suites were not re-run (their code is untouched). Not played on a phone. The days
+were played by the test bot with the clock stepped by hand, not by a person in real time.
+**Size:** 14.6 MB of the 16 MB limit.
 
 ## Cartridge 5: Sproutwild fused in (Nov 15 2026)
 

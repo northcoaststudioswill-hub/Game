@@ -21,6 +21,15 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v9.10 · 2026-11-17 · Erin's stand is in the valley
+
+Will: make the cooking game and Sproutwild connect in lore. Same universe, separate games, no save link.
+
+- **The notice board at Sunkeep has a note for Erin's farm stand:** "ERIN'S FARM STAND, by the garden. Salad, bread, burgers. A fed valley is a calm valley. Louie eats first. -- Erin"
+- **New idle lines at home:** Erin (two, about opening the stand again and a fed valley), Marcus (the burger with aura) and Will (he is most of half the valley).
+- Patch & Plate's side of this (the Lantern on its title, the Elder and Pip as customers, Lantern Night) is in `alt/CHANGELOG.md`, v0.4.
+- Nothing reads Patch & Plate's save. Lab: 124 checks, all pass. The new lines were read back from the built game by script, not seen in play.
+
 ## v9.9 · 2026-11-17 · loose ends
 
 Will: keep working on the game.

@@ -2,7 +2,7 @@
 
 Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v9.9)
+## Sproutwild (cartridge 5, v9.10)
 
 ### Known bugs
 - "BERRIES planted" stayed up 16 s in one run (too long, not too short). Not looked into yet.
@@ -102,6 +102,13 @@ From [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), still open:
 - The Mothshade caused every death in the bot playtest; its blink-behind may feel unfair.
 - Rooms are short (4 to 10 seconds); difficulty untouched until Will has played more.
 - The music is a placeholder synth loop; it needs a William Cohen track.
+
+## Patch & Plate (cartridge 4, v0.4)
+
+- Not played on a phone or by a person in real time since v0.4; the test bot played every day, day 13 included.
+- The lore placement is new (the stand is at Sunkeep, during Sproutwild's story). Will has not confirmed it as canon.
+- LANTERN NIGHT's difficulty (11 customers, every recipe) is a guess; the bot's result is in the test output.
+- The Elder and Pip have hearts on the FRIENDS page but no heart scenes yet.
 
 ## Sprouts and Patch & Plate (cartridges 1 and 4)
 
