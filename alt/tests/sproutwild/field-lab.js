@@ -64,7 +64,8 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  {const lg=f.items.find(i=>i.res==='wood');F.setPos(lg.x,lg.y+30);f.dir=[0,-1];for(const q of f.sq){q.x=F.pos().x;q.y=F.pos().y+8;q.st='follow'}step(6);for(let i=0;i<3;i++){tap('a');step(6)}step(1500)}
  ok('sprouts carry the log home',S.res.wood>w0,S.res.wood);S.party.push(S.party.shift());
  /* alpha guards its treasure */
- const al=f.alphas[0],gt=f.items.find(i=>i.guard);ok('an alpha guards the plateau treasure',!!al&&!!gt);
+ ok('the Meadow is the training ground: no alpha in it (v9.5)',!f.alphas.length,f.alphas.length);
+ {const p0=F.pos();F.setPos(f.start.x,f.start.y+14);f.dir=[0,-1];step(2);ok('at the Lantern post the prompt is the post, not a road sign',F.near()&&F.near().k==='sign',F.near()&&F.near().txt);F.setPos(p0.x,p0.y);step(1)}
  /* walking off the edge travels; arriving puts you by the matching exit */
  at(17,1,[0,-1]);for(let i=0;i<40&&F.fld().id==='MEADOW';i++)step(1,['up']);f=F.fld();ok('north edge of the meadow leads to town',f.id==='TOWN',f.id);
  ok('you arrive at the town south gate',F.pos().y>14*T,Math.round(F.pos().y));
@@ -74,8 +75,8 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  const dg=f.npcs.find(n=>n.who==='DEREK');step(50);at(21,11,[0,1]);step(2);ok('a trainer spots you on the road',!!f.spot||!!f.dlg);
  step(60);for(let i=0;i<4;i++){tap('a');step(4)}step(40);ok('...and only talks: no trainer battles (v9.1)',F.state()==='g4world'&&S.fl[dg.fk]===1,F.state());
  /* v9.1: an alpha given the light gives up its Sigil */
- {F.enter('MEADOW');const fm=F.fld();const al=fm.alphas.find(q=>q.sp==='BLOOMBOAR');S.badges=[];S.party[0].hp=200;F.setPos(al.x,al.y+22);fm.dir=[0,-1];fm.arrive=null;step(3);tap('a');step(30);
-  fight();step(20);ok('bringing the light to the Meadow alpha gives the VERDANT SIGIL',S.badges.includes('VERDANT SIGIL'),JSON.stringify(S.badges)+' '+F.state());F.enter('WASTES');f=F.fld()}
+ {F.enter('SQUIRE');const fm=F.fld();const al=fm.alphas.find(q=>q.sp==='STONESQUIRE');S.badges=[];S.party[0].hp=200;F.setPos(al.x,al.y+22);fm.dir=[0,-1];fm.arrive=null;step(3);tap('a');step(30);
+  fight();step(20);ok('bringing the light to the castle alpha gives the STONE SIGIL',S.badges.includes('STONE SIGIL'),JSON.stringify(S.badges)+' '+F.state());F.enter('WASTES');f=F.fld()}
  /* the dome and the king */
  f=F.fld();at(20,3,[0,-1]);step(60,['up']);ok('the iron dome blocks the peak road',F.fld().id==='WASTES'&&F.pos().y>2*T+12,Math.round(F.pos().y));
  F.enter('GLOOM');f=F.fld();const kb=f.npcs.find(n=>n.boss);F.setPos(kb.x,kb.y+14);f.dir=[0,-1];step(3);tap('a');step(3);
@@ -173,7 +174,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   F.build('datacenter',6,12);ok('a Data Center makes room',!F.buddyFull());F.noCap(true)}
  /* v7.9: bugs */
  {F.noBugs(false);S.buds.ZIP=3;S.buds.DEW=3;F.travel('MEADOW','BASE');S.bugs={};S.bugSeen={};for(let i=0;i<40*30&&F.bugs().length<2;i++)step(1);const bs=F.bugs();ok('bugs live in the Meadow',bs.length>=1,bs.length);
-  if(bs.length){const bg=bs[0],f4=F.fld();F.wilds().length=0;f4.items=f4.items.filter(it=>Math.hypot(it.x-bg.x,it.y-bg.y)>90); /* v9.3: a loose item by the bug takes the aim too */ /* v8.1: a wild buddy beside the bug can take the aim; this check is about bugs */bg.hx=bg.x;bg.hy=bg.y;F.setPos(bg.x,bg.y+20);f4.dir=[0,-1];f4.arrive=null;for(const s of f4.sq){s.st='follow';s.x=F.pos().x;s.y=F.pos().y+6}step(4);
+  if(bs.length){const bg=bs[0],f4=F.fld();if(bg.sp!=='LADYBUG'){bg.sp='LADYBUG';bg.x=bg.hx=bg.wx=8*16+8;bg.y=bg.hy=bg.wy=26*16+8} /* v9.5: a grass bug in open ground, so the check is about catching */F.wilds().length=0;f4.items=f4.items.filter(it=>Math.hypot(it.x-bg.x,it.y-bg.y)>90); /* v9.3: a loose item by the bug takes the aim too */ /* v8.1: a wild buddy beside the bug can take the aim; this check is about bugs */bg.hx=bg.x;bg.hy=bg.y;F.setPos(bg.x,bg.y+20);f4.dir=[0,-1];f4.arrive=null;for(const s of f4.sq){s.st='follow';s.x=F.pos().x;s.y=F.pos().y+6}step(4);
    for(let k=0;k<8&&!(F.near()&&F.near().k==='bug');k++){F.setPos(bg.x,bg.y+20);f4.dir=[0,-1];step(1)} /* v9.2: a flying bug drifts; re-aim before the throw */
    const nr=JSON.stringify(F.near()),b0=JSON.stringify({x:Math.round(bg.x),y:Math.round(bg.y),sp:bg.sp}),me=JSON.stringify(F.pos());tap('a');step(3);const lab=nr+' '+b0+' me'+me+' sq:'+f4.sq.map(s=>s.st+(s.aim?s.aim.kind:'')).join(',');step(57);ok('a sprout thrown at a bug catches it',Object.values(S.bugs).reduce((a,v)=>a+v,0)>=1,lab+' / '+JSON.stringify(S.bugs))}
   F.noBugs(true)}
@@ -207,16 +208,16 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   ok('the Meadow east road leads to Crooked Hollow',f2&&f2.id==='HOLLOW',f2&&f2.id);
   ok('you arrive on its west side, heading east',F.pos().x<60&&f2.dir[0]===1,Math.round(F.pos().x));
   ok('the Peninsula Python guards the trunk',f2.alphas.some(a=>a.sp==='PYTHORN')&&f2.items.some(i=>i.n==='CIRCUS TRUNK'));
-  ok('Hollow wilds are Lv4 or more once you have caught a buddy',S.quest<3||F.wilds().every(w=>w.lv>=4),F.wilds().map(w=>w.lv).join());
+  ok('Hollow wilds are Lv6 or more (v9.5: the second area)',S.quest<3||F.wilds().every(w=>w.lv>=6),F.wilds().map(w=>w.lv).join());
   step(10);F.setPos(20,9*16+10);f2.dir=[-1,0];f2.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='HOLLOW';i++)step(1,['left']);
   ok('and the west road leads back to the Meadow',F.fld()&&F.fld().id==='MEADOW',F.fld()&&F.fld().id)}
  /* v8.3: Squire's Woods, south of the Meadow */
- {F.travel('MEADOW','BASE');step(3);let f3=F.fld();const q1=S.quest;S.badges=[];F.setPos(17*16+8,37*16+10);f3.dir=[0,1];f3.arrive=null;for(let i=0;i<40;i++)step(1,['down']);ok('the south road is barred until your first Sigil',F.fld().id==='MEADOW');S.quest=Math.max(5,q1);S.badges=['VERDANT SIGIL'];
+ {F.travel('MEADOW','BASE');step(3);let f3=F.fld();const q1=S.quest;S.badges=[];S.quest=4;F.setPos(17*16+8,37*16+10);f3.dir=[0,1];f3.arrive=null;for(let i=0;i<40;i++)step(1,['down']);ok('the south road is barred until the cottage and a crop',F.fld().id==='MEADOW');S.quest=Math.max(5,q1);
   F.setPos(17*16+8,37*16+10);f3.dir=[0,1];f3.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='MEADOW';i++)step(1,['down']);f3=F.fld();
   ok("the Meadow south road leads to Squire's Woods",f3&&f3.id==='SQUIRE',f3&&f3.id);
   ok('you arrive at its north edge, heading south',F.pos().y<60&&f3.dir[1]===1,Math.round(F.pos().y));
   ok("the stone gatehouse guards the Squire's Lantern",f3.alphas.some(a=>a.sp==='STONESQUIRE')&&f3.items.some(i=>i.n==="SQUIRE'S LANTERN"));
-  ok("Squire's wilds are Lv6 or more and a Lanternwisp is home",F.wilds().every(w=>w.lv>=6)&&(step(2),F.wilds().some(w=>w.sp==='LANTERNWISP')),F.wilds().map(w=>w.sp+w.lv).join());
+  ok("Squire's wilds are Lv3 or more and a Lanternwisp is home",F.wilds().every(w=>w.lv>=3)&&(step(2),F.wilds().some(w=>w.sp==='LANTERNWISP')),F.wilds().map(w=>w.sp+w.lv).join());
   F.wilds().length=0;S.buds.LEAF=3;S.buds.PEB=3;
   at(7,13,[1,0]);step(10);for(let i=0;i<6;i++){tap('a');step(5)}step(700);const site=f3.sites[0];
   ok('sprouts build the river bridge to the south-west meadow',site.done,site.hp);

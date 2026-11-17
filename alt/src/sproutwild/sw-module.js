@@ -1157,6 +1157,7 @@ function wDamage(att,def,move,aSt,dSt){const A=wStats(att).atk*(1+.25*(aSt.atk||
  const crit=Math.random()<(move.crit?.22:.06)?1.5:1;
  let dmg=Math.max(1,Math.round(move.p*(A/D)*(0.32+att.lv*0.05)*stab*mult*crit*(0.85+Math.random()*0.3)/1.4));
  if((SW.shown||0)>=30&&SW.party.includes(att))dmg=Math.max(1,Math.round(dmg*1.12));
+ if(BT&&BT.aimX&&SW.party.includes(att))dmg=Math.max(1,Math.round(dmg*BT.aimX)); /* v9.5: timed strike */
  if(!SW.badges.length&&SW.party.includes(def))dmg=Math.min(dmg,Math.ceil(wStats(def).max*.45)); /* before the first Sigil nothing takes more than 45% in one hit */
  return{dmg,mult,crit:crit>1}}
 function wDoMove(att,def,move,aSt,dSt,who){ /* returns log lines, applies damage */
@@ -1251,7 +1252,7 @@ function wKeeperMove(){if(BT.keeperUsed){swSnd(140,.08);return}
   foe.hp=Math.max(0,foe.hp-r2.dmg);
   BT.log.push({txt:'MARCUS used HYDRO JET! ('+r2.dmg+')'});
   if(foe.hp<=0)wFoeDown();else BT.after='keeperfoe'}}
-function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.phase==='menu'&&BT._lp!=='menu')swSel=0;BT._lp=BT.phase; /* the battle menu always opens on FIGHT */if(BT.shake>0)BT.shake=Math.max(0,BT.shake-dt*6);
+function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.phase==='aim'){aimUpdate(dt);return}if(BT.phase==='menu'&&BT._lp!=='menu')swSel=0;BT._lp=BT.phase; /* the battle menu always opens on FIGHT */if(BT.shake>0)BT.shake=Math.max(0,BT.shake-dt*6);
  if(BT.phase==='intro'){if(BT.t>.7){BT.phase='msg'}return}
  if(BT.phase==='msg'){
   if((pressed('a')&&BT.t>.25)||BT.t>2.6){BT.t=0;BT.log.shift();
@@ -1290,7 +1291,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.phase===
   return}
  if(BT.phase==='moves'){const me=btCur();wGridNav(2,me.moves.length);
   if(pressed('b')){BT.phase='menu';swSel=0;return}
-  if(pressed('a')){const mv=WMOVES[me.moves[swSel]];BT.phase='msg';BT.t=0;wResolveTurn(mv);return}
+  if(pressed('a')){const mv=WMOVES[me.moves[swSel]];if(mv.p>0){BT.phase='aim';BT.aimMv=mv;BT.aimT=0;return}BT.phase='msg';BT.t=0;wResolveTurn(mv);return} /* v9.5: a damaging move gets a timed strike first */
   return}
  if(BT.phase==='party'){const list=SW.party;
   swNav(list.length);
@@ -2007,7 +2008,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4cine':swDrawCine();return;
  case 'g4bottie':drawBottie();return;
  case 'g4engage':engageDraw();return;
-  case 'g4battle':wDrawBattle();return;
+  case 'g4battle':wDrawBattle();aimDraw();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
 const SWF={cast:()=>W4.cast,noBugs:v=>{WNOBUG=v},walk:()=>({st:SW.walk||0,ew:W4.ew}),bugs:()=>W4.bugs||[],bugCatch:b=>bgCatch(b),bugCatch:b=>bgCatch(b),lst:()=>louSt(),louPet:()=>louPetOK(),noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,

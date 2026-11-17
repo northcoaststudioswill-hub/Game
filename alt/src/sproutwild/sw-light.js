@@ -5,15 +5,15 @@
    a SIGIL. Four Sigils and King Bibi lowers his IRON DOME; then Bottie,
    once and for all. Sprouts matter in battle: a throw that does not
    bloom still burns away some of the dark.
-     BLOOMBOAR (Meadow)          VERDANT SIGIL   opens the Hollow, Squire's Woods, the Wastes
+     STONESQUIRE (Squire's castle) STONE SIGIL  the first; opens Crooked Hollow and the Wastes
      PYTHORN   (Crooked Hollow)  ROOT SIGIL   \
-     STONESQUIRE (Squire's Woods) STONE SIGIL  /  two Sigils open the Shore, three Gloom Hollow
+     BLOOMBOAR (Ember Wastes)    VERDANT SIGIL /  two Sigils open the Shore, three Gloom Hollow
      AURICORN  (Gloom Hollow)    GOLD SIGIL      the King will see you
    ================================================================ */
 const WASIG={BLOOMBOAR:{n:'VERDANT SIGIL',c:'#7ec850',d:'#3a8a32'},PYTHORN:{n:'ROOT SIGIL',c:'#c89058',d:'#6a4a2a'},
  STONESQUIRE:{n:'STONE SIGIL',c:'#c8ccd4',d:'#6e7280'},AURICORN:{n:'GOLD SIGIL',c:'#f8e060',d:'#b07808'}};
-/* the Meadow alpha is the first real test: a little gentler */
-FMAPS.MEADOW.key.A.lv=6; /* simulated: every starter at Lv6 with a Lv4 buddy wins 3/3 */
+/* v9.5: the first alpha is STONESQUIRE in Squire's castle (sw-castle.js) */
+/* v9.5: the first alpha is in Squire's Woods now (sw-castle.js) */
 /* an alpha given the light gives up its Sigil */
 function alphaSigil(sp){const S=WASIG[sp];if(!S||SW.badges.includes(S.n))return;SW.badges.push(S.n);W4.sigilQ={sp,n:SW.badges.length};swSave()}
 /* trainers talk now; the King lowers the dome for four Sigils */
@@ -27,16 +27,16 @@ function fChallenge(F,np){
   else fTalk(F,'KING BIBI',['KING BIBI: Ah. The little keeper. Sit. I have brought a chart.','This is the Lantern. This is the night the robot nuked the Data Center. I drew it myself. With a marker.','The valley was promised to sprouts and buddies three thousand years ago. Then: dark. So: dome.','Bring the light to the four alphas. Four Sigils, and the dome comes down. You have '+SW.badges.length+'.']);return}
  const t=WTRTALK[np.who]||[np.pre||['...'],np.after||'...'];fTalk(F,np.who,t[0].concat([t[1]]),()=>{SW.fl[np.fk]=1;swSave()})}
 /* the gym buildings are lodges now; the Peak's is Bottie's tower and the last battle */
-const WLODGE={TOWN:"RANGER: No battles at my lodge, keeper. Bring the light to the Meadow's alpha. That is the real test.",
+const WLODGE={TOWN:"RANGER: No battles at my lodge, keeper. The castle in Squire's Woods has an alpha. That is the real test.",
  WASTES:"MARCUS: Gym's closed, bro. I'm in lighting now. Go light up some alphas.",SHORE:'ERIN: No battles here. Every alpha you bring the light to gives up a Sigil.'};
 function gymTalk(sec){if(sec.id==='PEAK'){if(SW.badges.length>=4&&SW.fl.bibi){W4.gymIx=5;W4.gymPage=0;swSel=0;state='g4gym'}else swSay("BOTTIE'S TOWER. A sign: NO VISITORS WITHOUT FOUR SIGILS. bzzt.",3);return}
  swSay(WLODGE[sec.id]||'The lodge is quiet.',3.4)}
 /* sprouts matter in battle: a throw that does not bloom still burns away some of the dark */
 function wLightBurn(nS){const foe=BT.foe,mx=wStats(foe).max,kin=wKinship(BT.tossIx||0,foe.sp)>1?2:1,d=Math.max(1,Math.round(mx*.05*nS*kin));if(foe.hp>1){foe.hp=Math.max(1,foe.hp-d);return d}return 0}
 /* goals: the alphas are the way */
-const WNEXT=['Light the Meadow ALPHA (boulder wall)','Next ALPHA: the Hollow or Squire\'s','Next ALPHA: the Hollow or Squire\'s','Light the Gloom Hollow ALPHA','Show King Bibi 4 Sigils (Gloom)']; /* v9.2: short enough for the goal bar */
+const WNEXT=['Light the castle ALPHA (Squire\'s Woods)','Next ALPHA: Crooked Hollow or the Wastes','Next ALPHA: Crooked Hollow or the Wastes','Light the Gloom Hollow ALPHA','Show King Bibi 4 Sigils (Gloom)']; /* v9.2: short enough for the goal bar */
 function wGymGoal(){if(SW.quest<5)return null;if(SW.fl.bibi)return SW.bottieBeat?null:"Bottie's tower is on the Peak. End this.";
- const n=SW.badges.length;if(n>=4&&(SW.shown||0)<WSHOWN)return'Calm '+WSHOWN+' wild buddies ('+(SW.shown||0)+'/'+WSHOWN+')';if(n===0){const L=Math.max(0,...SW.party.map(m=>m.lv)),A=FMAPS.MEADOW.key.A.lv;if(L<A)return'ALPHA is Lv'+A+': train to Lv'+A+' (SELECT)'}return WNEXT[Math.min(n,4)]}
+ const n=SW.badges.length;if(n>=4&&(SW.shown||0)<WSHOWN)return'Calm '+WSHOWN+' wild buddies ('+(SW.shown||0)+'/'+WSHOWN+')';if(n===0){const L=Math.max(0,...SW.party.map(m=>m.lv)),A=FMAPS.SQUIRE.key.A.lv,TG=A-1;if(L<TG)return'Stone ALPHA Lv'+A+': train to Lv'+TG+' (SELECT)'}return WNEXT[Math.min(n,4)]}
 /* v9.2 LIGHT SHOWN: every wild buddy you calm (a battle won or a bloom) counts.
    The King wants a calm valley, not just four Sigils: WSHOWN calmed buddies.
    Every 10 the Great Lantern grows a ring (a little celebration and +3 hearts). */

@@ -7205,6 +7205,7 @@ function wDamage(att,def,move,aSt,dSt){const A=wStats(att).atk*(1+.25*(aSt.atk||
  const crit=Math.random()<(move.crit?.22:.06)?1.5:1;
  let dmg=Math.max(1,Math.round(move.p*(A/D)*(0.32+att.lv*0.05)*stab*mult*crit*(0.85+Math.random()*0.3)/1.4));
  if((SW.shown||0)>=30&&SW.party.includes(att))dmg=Math.max(1,Math.round(dmg*1.12));
+ if(BT&&BT.aimX&&SW.party.includes(att))dmg=Math.max(1,Math.round(dmg*BT.aimX)); /* v9.5: timed strike */
  if(!SW.badges.length&&SW.party.includes(def))dmg=Math.min(dmg,Math.ceil(wStats(def).max*.45)); /* before the first Sigil nothing takes more than 45% in one hit */
  return{dmg,mult,crit:crit>1}}
 function wDoMove(att,def,move,aSt,dSt,who){ /* returns log lines, applies damage */
@@ -7299,7 +7300,7 @@ function wKeeperMove(){if(BT.keeperUsed){swSnd(140,.08);return}
   foe.hp=Math.max(0,foe.hp-r2.dmg);
   BT.log.push({txt:'MARCUS used HYDRO JET! ('+r2.dmg+')'});
   if(foe.hp<=0)wFoeDown();else BT.after='keeperfoe'}}
-function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.phase==='menu'&&BT._lp!=='menu')swSel=0;BT._lp=BT.phase; /* the battle menu always opens on FIGHT */if(BT.shake>0)BT.shake=Math.max(0,BT.shake-dt*6);
+function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.phase==='aim'){aimUpdate(dt);return}if(BT.phase==='menu'&&BT._lp!=='menu')swSel=0;BT._lp=BT.phase; /* the battle menu always opens on FIGHT */if(BT.shake>0)BT.shake=Math.max(0,BT.shake-dt*6);
  if(BT.phase==='intro'){if(BT.t>.7){BT.phase='msg'}return}
  if(BT.phase==='msg'){
   if((pressed('a')&&BT.t>.25)||BT.t>2.6){BT.t=0;BT.log.shift();
@@ -7338,7 +7339,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.phase===
   return}
  if(BT.phase==='moves'){const me=btCur();wGridNav(2,me.moves.length);
   if(pressed('b')){BT.phase='menu';swSel=0;return}
-  if(pressed('a')){const mv=WMOVES[me.moves[swSel]];BT.phase='msg';BT.t=0;wResolveTurn(mv);return}
+  if(pressed('a')){const mv=WMOVES[me.moves[swSel]];if(mv.p>0){BT.phase='aim';BT.aimMv=mv;BT.aimT=0;return}BT.phase='msg';BT.t=0;wResolveTurn(mv);return} /* v9.5: a damaging move gets a timed strike first */
   return}
  if(BT.phase==='party'){const list=SW.party;
   swNav(list.length);
@@ -8355,6 +8356,7 @@ function fNear(F){const px=P3.x+F.dir[0]*11,py=P3.y+F.dir[1]*11,in2=(o,r2)=>Math
  for(const b of F.buds)if(in2(b))return{k:'bud',b,txt:'PLUCK '+TYPES[b.type].n+' SPROUT'};
  for(const np of F.npcs)if(in2(np,18))return{k:'npc',np,txt:np.team&&!SW.fl[np.fk]?'BATTLE '+np.who:'TALK'};
  for(const al of F.alphas)if(in2(al,22))return{k:'alpha',al,txt:'CHALLENGE ALPHA '+al.sp};
+ for(const sg of (FSIGNS[F.id]||[]))if(!in2(F.start,18)&&in2({x:sg[0]*FT+8,y:sg[1]*FT+10},14))return{k:'road',msg:sg[2],txt:'READ SIGN'}; /* v9.5: road signs (the Lantern post always wins) */
  for(const wd of W4.wilds)if(SW.quest>=3&&in2(wd)&&!wd.cap&&!pfCan(F,wd))return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv+(F.sq.length?' · too strong to catch':'')};
  if(F.gym&&in2(F.gym,18))return{k:'gym',txt:W4.sector==='PEAK'?'TOWER':'LODGE'};
  for(const dr of F.doors)if(in2(dr,14))return{k:'door',txt:'KNOCK'};
@@ -8405,7 +8407,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    if(!(SW.gear&&SW.gear.rope)&&!(W4.msgT>0)){swSay('A ledge. With a CLIMBING ROPE from the bench you could get up here.',2.6)}}
   if(my>0&&fTile(F,Math.floor(P3.x/FT),Math.floor((P3.y+7)/FT))==='-'){const ty=Math.floor((P3.y+7)/FT)+1;
    if(fWalkTile(F,Math.floor(P3.x/FT),ty)){F.hop={t:0,sy:P3.y,ty:ty*FT+8};swSnd(440,.06,660);return}}
-  const exAt=(x,y)=>{const e=F.exits.find(e2=>e2.tx===Math.floor(x/FT)&&e2.ty===Math.floor(y/FT));if(e&&(e.to==='HOLLOW'||e.to==='SQUIRE')&&SW.badges.length<1){if(!(W4.msgT>0))swSay("RANGER'S BARRIER: closed until you bring the light to the Meadow's ALPHA (behind the boulder wall) and win its Sigil.",3.4);return true}return!!(F.arrive&&e)}; /* just arrived: the way back is shut until you let go once */
+  const exAt=(x,y)=>{const e=F.exits.find(e2=>e2.tx===Math.floor(x/FT)&&e2.ty===Math.floor(y/FT));if(e&&wBarred(e.to)){if(!(W4.msgT>0))swSay(wBarredSay(e.to),3.4);return true}return!!(F.arrive&&e)}; /* just arrived: the way back is shut until you let go once */
   if(!fBox(F,nx,P3.y)&&!exAt(nx,P3.y))P3.x=nx;if(!fBox(F,P3.x,ny)&&!exAt(P3.x,ny))P3.y=ny}
  /* leaving by the edge of the map */
  /* an exit only fires once you have stepped away from where you came in: holding the stick across a border must not bounce you back */
@@ -8439,6 +8441,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    else fTalk(F,np.who,[np.after||'...'])}
   else if(n.k==='gym'){gymTalk(sec)} /* v9.1: lodges talk; only Bottie's tower is a battle */
   else if(n.k==='louie')wLouTalk();
+  else if(n.k==='road'){swSay(n.msg,3.6);swSnd(520,.04,660)}
   else if(n.k==='door')swSay(['Nobody home. A sprout waves from the window.','Locked. It smells like berry pie in there.','A note: GONE TO THE GYM. BACK NEVER.'][(F.t0*7|0)%3],2.2);
   else if(n.k==='sign'){const hurt=SW.party.some(m=>m.hp<wStats(m).max);for(const m of SW.party)m.hp=wStats(m).max;if(hurt){swSnd(880,.1,1175);for(let i=0;i<10;i++)W4.floats.push({x:P3.x+(Math.random()*30-15),y:P3.y-10-Math.random()*20,txt:'+',t:.8+Math.random()*.5,c:'#7ee787'});swSay('The Lantern light mends your buddies. Press A again to travel.',3);swSave();return} /* v8.8: a rest is its own moment; the map opens on the next press */W4.mapRO=0;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(n.k==='info'){swSay(n.msg,2.6);swSnd(660,.05,880)}
@@ -8522,6 +8525,7 @@ function fBake(F){const B=F.bio,cv=document.createElement('canvas');cv.width=F.w
    for(const [dx,dy] of [[0,-1],[0,1],[-1,0],[1,0]])if(fTile(F,tx+dx,ty+dy)==='~'&&rnd()<.55){const rx=x+(dx>0?FT-4:dx<0?2:3+((rnd()*9)|0)),ry=y+(dy>0?FT-7:dy<0?1:4+((rnd()*6)|0));R('#2e6a2a',rx,ry,1,6);R('#3f8a38',rx+2,ry+1,1,5);R('#8a5a28',rx,ry-1,1,2)}
    /* flowers along the road */
    if((is(tx-1,ty,':')||is(tx+1,ty,':')||is(tx,ty-1,':')||is(tx,ty+1,':'))&&rnd()<.35){const fx=x+2+((rnd()*11)|0),fy=y+3+((rnd()*10)|0),fc=B.fl[((rnd()*B.fl.length)|0)];R(B.g3,fx,fy+2,1,2);R(fc,fx-1,fy,3,2);R('#fff3b0',fx,fy,1,1)}}}
+ castleBake(F,b,B,R,is); /* v9.5: Squire's castle */
  F.cv=cv}
 function fTree(B,x,y,s){ /* x,y = base centre */
  const k=B.tree;
@@ -9549,7 +9553,7 @@ function wDrawBattle(){const B=FBIO[W4.sector]||FBIO.MEADOW,foe=BT.foe,me=btCur(
  {const rr=wSeedRand(wSectorSeed(W4.sector)+7);for(let i=0;i<34;i++){const gx=rr()*W,gy=HY+10+rr()*(top-HY-14);r(i%7===0?B.fl[i%B.fl.length]:B.g3,Math.round(gx),Math.round(gy),i%7===0?2:1,i%7===0?2:3)}}
  /* ---- positions ---- */
  const FGx=Math.round(W*.71),FGy=Math.round(top*.50),MGx=Math.round(W*.30),MGy=top-12;
- wbPlat(FGx,FGy,96,B);wbPlat(MGx,MGy,112,B);
+ wbPlat(FGx,FGy,96,B);wbPlat(MGx,MGy,112,B);BT._fg=[FGx,FGy];
  const fw=fs.ow*sc,fh=fs.oh*sc,mw=ms.ow*sc,mh=ms.oh*sc,ease=t=>{const k=Math.min(1,Math.max(0,t/.35));return 1-(1-k)*(1-k)};
  let fx=FGx+(1-ease(time-d.fin))*130,fy=FGy+Math.round(Math.sin(time*2.2)*1.5),mx=MGx-(1-ease(time-d.min))*150,my=MGy+Math.round(Math.sin(time*2.2+1.3)*1.5);
  if(an&&at<.34){const k=Math.sin(Math.min(1,at/.34)*Math.PI);if(an.who==='me'){mx+=k*16;my-=k*8}else if(an.who==='foe'){fx-=k*16;fy+=k*8}}
@@ -10793,7 +10797,7 @@ function dabStart(){SW.lessons.scDab=1;if(!(typeof KO!=='undefined'&&KO&&KO._)){
 function dabGo(){W4.dabC=0;W4.talk=null;W4.quips=[];W4.quipQ=[];state='g4dab';swSave()}
 function wCineMon(sp,sub){if(W4.msg&&/Latched|SHOOK|Fill the bar/i.test(W4.msg))W4.msgT=0;W4.cine={kind:'mon',id:sp,sub:sub||'',t:0};state='g4cine';swSnd(523,.1,784)}
 /* the Ranger's barrier on the roads to the Hollow and Squire's Woods, until the first Sigil (v8.5) */
-function fBarrierDraw(F){if(SW.badges.length>=1)return;for(const e of F.exits){if(e.to!=='HOLLOW'&&e.to!=='SQUIRE')continue;const x=e.tx*FT,y=e.ty*FT;
+function fBarrierDraw(F){fSignsDraw(F);for(const e of F.exits){if(!wBarred(e.to))continue;const x=e.tx*FT,y=e.ty*FT;
  r('#5a3a1e',x+1,y+2,3,13);r('#5a3a1e',x+12,y+2,3,13);
  for(let i=0;i<2;i++){const by=y+4+i*6;r('#f4ecd8',x-1,by,18,3);for(let k=0;k<18;k+=6)r('#c84030',x-1+k,by,3,3)}
  r('#14101e',x+5,y-6,6,6);r('#ffd94d',x+6,y-5,4,4)}}
@@ -10907,15 +10911,15 @@ function loreBibi(){if(W4.fld||W4.sector!=='BASE'||!SW.bottieSeen||SW.lessons.sc
    a SIGIL. Four Sigils and King Bibi lowers his IRON DOME; then Bottie,
    once and for all. Sprouts matter in battle: a throw that does not
    bloom still burns away some of the dark.
-     BLOOMBOAR (Meadow)          VERDANT SIGIL   opens the Hollow, Squire's Woods, the Wastes
+     STONESQUIRE (Squire's castle) STONE SIGIL  the first; opens Crooked Hollow and the Wastes
      PYTHORN   (Crooked Hollow)  ROOT SIGIL   \
-     STONESQUIRE (Squire's Woods) STONE SIGIL  /  two Sigils open the Shore, three Gloom Hollow
+     BLOOMBOAR (Ember Wastes)    VERDANT SIGIL /  two Sigils open the Shore, three Gloom Hollow
      AURICORN  (Gloom Hollow)    GOLD SIGIL      the King will see you
    ================================================================ */
 const WASIG={BLOOMBOAR:{n:'VERDANT SIGIL',c:'#7ec850',d:'#3a8a32'},PYTHORN:{n:'ROOT SIGIL',c:'#c89058',d:'#6a4a2a'},
  STONESQUIRE:{n:'STONE SIGIL',c:'#c8ccd4',d:'#6e7280'},AURICORN:{n:'GOLD SIGIL',c:'#f8e060',d:'#b07808'}};
-/* the Meadow alpha is the first real test: a little gentler */
-FMAPS.MEADOW.key.A.lv=6; /* simulated: every starter at Lv6 with a Lv4 buddy wins 3/3 */
+/* v9.5: the first alpha is STONESQUIRE in Squire's castle (sw-castle.js) */
+/* v9.5: the first alpha is in Squire's Woods now (sw-castle.js) */
 /* an alpha given the light gives up its Sigil */
 function alphaSigil(sp){const S=WASIG[sp];if(!S||SW.badges.includes(S.n))return;SW.badges.push(S.n);W4.sigilQ={sp,n:SW.badges.length};swSave()}
 /* trainers talk now; the King lowers the dome for four Sigils */
@@ -10929,16 +10933,16 @@ function fChallenge(F,np){
   else fTalk(F,'KING BIBI',['KING BIBI: Ah. The little keeper. Sit. I have brought a chart.','This is the Lantern. This is the night the robot nuked the Data Center. I drew it myself. With a marker.','The valley was promised to sprouts and buddies three thousand years ago. Then: dark. So: dome.','Bring the light to the four alphas. Four Sigils, and the dome comes down. You have '+SW.badges.length+'.']);return}
  const t=WTRTALK[np.who]||[np.pre||['...'],np.after||'...'];fTalk(F,np.who,t[0].concat([t[1]]),()=>{SW.fl[np.fk]=1;swSave()})}
 /* the gym buildings are lodges now; the Peak's is Bottie's tower and the last battle */
-const WLODGE={TOWN:"RANGER: No battles at my lodge, keeper. Bring the light to the Meadow's alpha. That is the real test.",
+const WLODGE={TOWN:"RANGER: No battles at my lodge, keeper. The castle in Squire's Woods has an alpha. That is the real test.",
  WASTES:"MARCUS: Gym's closed, bro. I'm in lighting now. Go light up some alphas.",SHORE:'ERIN: No battles here. Every alpha you bring the light to gives up a Sigil.'};
 function gymTalk(sec){if(sec.id==='PEAK'){if(SW.badges.length>=4&&SW.fl.bibi){W4.gymIx=5;W4.gymPage=0;swSel=0;state='g4gym'}else swSay("BOTTIE'S TOWER. A sign: NO VISITORS WITHOUT FOUR SIGILS. bzzt.",3);return}
  swSay(WLODGE[sec.id]||'The lodge is quiet.',3.4)}
 /* sprouts matter in battle: a throw that does not bloom still burns away some of the dark */
 function wLightBurn(nS){const foe=BT.foe,mx=wStats(foe).max,kin=wKinship(BT.tossIx||0,foe.sp)>1?2:1,d=Math.max(1,Math.round(mx*.05*nS*kin));if(foe.hp>1){foe.hp=Math.max(1,foe.hp-d);return d}return 0}
 /* goals: the alphas are the way */
-const WNEXT=['Light the Meadow ALPHA (boulder wall)','Next ALPHA: the Hollow or Squire\'s','Next ALPHA: the Hollow or Squire\'s','Light the Gloom Hollow ALPHA','Show King Bibi 4 Sigils (Gloom)']; /* v9.2: short enough for the goal bar */
+const WNEXT=['Light the castle ALPHA (Squire\'s Woods)','Next ALPHA: Crooked Hollow or the Wastes','Next ALPHA: Crooked Hollow or the Wastes','Light the Gloom Hollow ALPHA','Show King Bibi 4 Sigils (Gloom)']; /* v9.2: short enough for the goal bar */
 function wGymGoal(){if(SW.quest<5)return null;if(SW.fl.bibi)return SW.bottieBeat?null:"Bottie's tower is on the Peak. End this.";
- const n=SW.badges.length;if(n>=4&&(SW.shown||0)<WSHOWN)return'Calm '+WSHOWN+' wild buddies ('+(SW.shown||0)+'/'+WSHOWN+')';if(n===0){const L=Math.max(0,...SW.party.map(m=>m.lv)),A=FMAPS.MEADOW.key.A.lv;if(L<A)return'ALPHA is Lv'+A+': train to Lv'+A+' (SELECT)'}return WNEXT[Math.min(n,4)]}
+ const n=SW.badges.length;if(n>=4&&(SW.shown||0)<WSHOWN)return'Calm '+WSHOWN+' wild buddies ('+(SW.shown||0)+'/'+WSHOWN+')';if(n===0){const L=Math.max(0,...SW.party.map(m=>m.lv)),A=FMAPS.SQUIRE.key.A.lv,TG=A-1;if(L<TG)return'Stone ALPHA Lv'+A+': train to Lv'+TG+' (SELECT)'}return WNEXT[Math.min(n,4)]}
 /* v9.2 LIGHT SHOWN: every wild buddy you calm (a battle won or a bloom) counts.
    The King wants a calm valley, not just four Sigils: WSHOWN calmed buddies.
    Every 10 the Great Lantern grows a ring (a little celebration and +3 hearts). */
@@ -11051,6 +11055,103 @@ function wDarkHaze(x,y,h,seed){for(let i=0;i<4;i++){const k=((time*.5+i*.25+seed
 /* is this battle's foe one of the dark ones? (every mode but the old trainer battles) */
 function wFoeDark(){return BT&&BT.mode!=='trainer'}
 /* ================================================================
+   TIMED STRIKE (v9.5, a prototype for Will's battle question): after
+   you pick a damaging move, a ring closes in on the foe. Press A as it
+   meets the target ring: GREAT is +30% damage, GOOD +12%, a miss is a
+   normal hit. If you never press, the ring runs out and you hit
+   normally, so nobody is punished for not knowing.
+   ================================================================ */
+const WAIM={T:1.0,R0:44,R1:10};
+function aimR(){return WAIM.R0-(WAIM.R0-WAIM.R1)*Math.min(1.25,(BT.aimT||0)/(WAIM.T*.8))}
+function aimUpdate(dt){BT.aimT=(BT.aimT||0)+dt;const rr=aimR();let q=null;
+ if(pressed('a')){const d=Math.abs(rr-WAIM.R1);q=d<=4.5?'GREAT':d<=10?'GOOD':'MISS'}else if(BT.aimT>=WAIM.T)q='MISS';
+ if(!q)return;BT.aimX=q==='GREAT'?1.3:q==='GOOD'?1.12:0;BT.aimQ={q,t:time};if(q!=='MISS')swSnd(q==='GREAT'?1046:784,.08,1568);
+ SW.lessons.aimN=(SW.lessons.aimN||0)+1;const mv=BT.aimMv;BT.aimMv=null;BT.phase='msg';BT.t=0;wResolveTurn(mv);BT.aimX=0;
+ if(q!=='MISS'&&BT.log&&BT.log.length){const i=BT.log.findIndex(l=>l.txt.indexOf(' used ')>0&&l.txt.startsWith(btCur().sp+' '));if(i>=0)BT.log.splice(i+1,0,{txt:q==='GREAT'?'GREAT timing! It hit hard.':'Good timing!'})}}
+function aimDraw(){if(!BT)return;const fg=BT._fg||[W*.71,120];
+ if(BT.phase==='aim'){const x=Math.round(fg[0]),y=Math.round(fg[1])-14,rr=aimR(),ring=(rad,c,w)=>{if(!g.beginPath)return;g.strokeStyle=c;g.lineWidth=w;g.beginPath();g.arc(x,y,Math.max(1,rad),0,6.3);g.stroke()};
+  ring(WAIM.R1,'#ffffff',2);ring(WAIM.R1+3,'rgba(255,255,255,.35)',1);ring(rr,'#ffd94d',2);
+  const t2='PRESS A!';r('#14101e',x-tw(t2,1)/2-3,y+WAIM.R0+2,tw(t2,1)+6,10);text(t2,x-tw(t2,1)/2,y+WAIM.R0+3,1,'#ffd94d',null);
+  if((SW.lessons.aimN||0)<3){const t3='as the gold ring meets the white one';r('#14101e',W/2-tw(t3,1)/2-3,y+WAIM.R0+14,tw(t3,1)+6,10);text(t3,W/2-tw(t3,1)/2,y+WAIM.R0+15,1,'#ffffff',null)}}
+ const Q=BT.aimQ;if(Q&&time-Q.t<.9&&Q.q!=='MISS'){const k=(time-Q.t)/.9;g.globalAlpha=1-k;const t2=Q.q+'!';text(t2,Math.round(fg[0]-tw(t2,2)/2),Math.round(fg[1]-44-k*10),2,Q.q==='GREAT'?'#ffd94d':'#ffffff',null);g.globalAlpha=1}}
+/* ================================================================
+   THE FIRST ALPHA LIVES IN THE CASTLE (v9.5). Will: the flow to the
+   first alpha was bad; it should be in Squire's Woods, which should
+   have a castle.
+   - The Meadow is the training ground: no alpha behind its boulder
+     wall any more (the wall, the ore and the buried PEB stay).
+   - Squire's Woods opens once Sunkeep has its cottage and a crop.
+     Its walls are drawn as a castle: grey brick, battlements, round
+     corner towers with arrow slits, a gatehouse over the thorn gate,
+     a flagstone courtyard. STONESQUIRE, the castle's own gatehouse
+     come alive, is the first alpha (Lv7) and gives the first Sigil.
+   - Crooked Hollow (Lv6 to 9) is the road after the first Sigil.
+   - BLOOMBOAR moves to the Ember Wastes, guarding the glassware.
+   ================================================================ */
+/* the Meadow: no alpha; its old spot is grass */
+{const R=FMAPS.MEADOW.rows;for(let y=0;y<R.length;y++)if(R[y].includes('A'))R[y]=R[y].replace('A','.');delete FMAPS.MEADOW.key.A}
+/* the Wastes: BLOOMBOAR in front of the walled pocket in the south-east */
+{const R=FMAPS.WASTES.rows;R[14]=R[14].slice(0,27)+'A'+R[14].slice(28);FMAPS.WASTES.key.A={k:'alpha',sp:'BLOOMBOAR',lv:12,guards:'3'}}
+/* Squire's Woods: first after the Meadow; the Hollow after the first Sigil */
+FMAPS.SQUIRE.key.A.lv=7;
+{const R=FMAPS.SQUIRE.rows;R[4]=R[4].slice(0,12)+'.'+R[4].slice(13)} /* the tree that hid the Lantern post */
+{const sq=wSector('SQUIRE'),ho=wSector('HOLLOW');sq.req=0;sq.lv=[3,6];sq.sub='An old castle in the woods. Its gatehouse is awake.';ho.req=1;ho.lv=[6,9]}
+WSECSUB.SQUIRE='The castle in the woods. Wilds Lv3 to 6.';
+/* which roads are shut, and what the sign says */
+function wBarred(to){return to==='SQUIRE'?SW.quest<5:to==='HOLLOW'?SW.badges.length<1:false}
+function wBarredSay(to){return to==='SQUIRE'?"RANGER'S BARRIER: Squire's Woods is wild. Build Sunkeep a cottage and grow a crop first.":"RANGER'S BARRIER: Crooked Hollow is darker still. Win a Sigil from the castle alpha in Squire's Woods first."}
+/* after the cottage and the first crop: the castle */
+function scGymCheck(){if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return;SW.lessons.scGym=1;
+ const L=FMAPS.SQUIRE.key.A.lv;
+ scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Now the real work: the dark out there.'},
+  {who:'MARCUS',txt:"Every place has an ALPHA, bro. Biggest, darkest buddy around. Ours moved into the old castle in Squire's Woods."},
+  {who:'ERIN',txt:"South through the Meadow. Bring the alpha the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome."},
+  {who:'MARCUS',txt:'Castle alpha is Lv'+L+'. Battle wilds with SELECT on the way till your lead is Lv'+(L-1)+'. See one, light one.'},
+  {who:'ERIN',txt:'And it is made of stone. Water and leaves wear stone down. A DEW or LEAF buddy from the woods will help.'}],()=>swSave())}
+WSIGOPEN[1]={a:'ROADS',b:'OPEN',sub:'',end:'One Sigil. Crooked Hollow is open, east of the Meadow, and so is the road past Lantern Town.'};
+/* ---- the castle, drawn over the ruin's walls ---- */
+function castleBake(F,b,B,R,is){if(F.id!=='SQUIRE')return;let x0=1e9,y0=1e9,x1=-1,y1=-1;
+ for(let ty=0;ty<F.h;ty++)for(let tx=0;tx<F.w;tx++)if(F.t[ty][tx]==='#'){x0=Math.min(x0,tx);y0=Math.min(y0,ty);x1=Math.max(x1,tx);y1=Math.max(y1,ty)}if(x1<0)return;
+ const ST='#8c909c',LT='#a8acb6',DK='#5e626e',K='#14101e';
+ /* courtyard flagstones */
+ for(let ty=y0+1;ty<y1;ty++)for(let tx=x0+1;tx<x1;tx++){if(F.t[ty][tx]==='#')continue;const x=tx*FT,y=ty*FT;R('#9a9488',x,y,FT,FT);R('#867f74',x,y+7,FT,1);R('#867f74',x+((ty%2)?4:11),y,1,7);R('#867f74',x+((ty%2)?11:4),y+8,1,8);if((tx*7+ty*3)%5===0){R('#58b848',x+3,y+12,2,1);R('#58b848',x+10,y+5,1,2)}}
+ /* walls: brick, battlements on the outside top edge */
+ for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){if(F.t[ty][tx]!=='#')continue;const x=tx*FT,y=ty*FT;
+  R(ST,x,y,FT,FT);for(let row=0;row<4;row++){R(DK,x,y+row*4+3,FT,1);R(DK,x+((row+tx)%2?3:10),y+row*4,1,3)}
+  if(ty===y0||ty===y1){R(LT,x,y,FT,2);for(let i=0;i<FT;i+=6){R(K,x+i+3,y-3,3,3);R(LT,x+i,y-3,3,3)}}
+  if(tx===x0||tx===x1){R(LT,x+(tx===x0?0:FT-2),y,2,FT)}
+  R('rgba(0,0,0,.18)',x,y+FT-1,FT,1)}
+ /* round corner towers with arrow slits and pennants */
+ for(const [tx,ty] of [[x0,y0],[x1,y0],[x0,y1],[x1,y1]]){const cx=tx*FT+8,cy=ty*FT+6;
+  R(K,cx-11,cy-12,22,24);R(ST,cx-10,cy-11,20,22);R(LT,cx-10,cy-11,20,3);R(DK,cx-10,cy+9,20,2);
+  for(let i=-10;i<10;i+=5){R(K,cx+i+2,cy-15,3,3);R(LT,cx+i,cy-15,3,3)}
+  R(K,cx-1,cy-4,2,6);R('#ffd94d',cx-1,cy-3,1,3);
+  R('#5a3d22',cx+6,cy-26,1,12);R('#a33b2e',cx+7,cy-26,6,4);R('#c84030',cx+7,cy-26,6,1)}
+ /* the gatehouse over the thorn gate */
+ for(let tx=x0;tx<=x1;tx++)if(F.t[y1][tx]==='v'||(F.t[y1][tx]!=='#'&&tx>x0&&tx<x1)){const x=tx*FT,y=y1*FT;
+  R(K,x-5,y-9,6,25);R(ST,x-4,y-8,4,23);R(K,x+FT-1,y-9,6,25);R(ST,x+FT,y-8,4,23);
+  R(K,x-5,y-12,FT+10,5);R(LT,x-4,y-11,FT+8,3);R(DK,x+2,y-6,FT-4,1);break}}
+/* first visit to Squire's Woods: the castle, shown, with Louie on what to do (replaces the old one-liner) */
+function sqArrive(F){if(!F||F.id!=='SQUIRE'||SW.lessons.squire)return;if((W4.banner&&W4.banner.t>0)||W4.scene||swBusy())return;
+ if(SCOFF){SW.lessons.squire=1;return}F.sqT=(F.sqT||0)+1/60;if(F.sqT<.8)return;SW.lessons.squire=1;
+ const gx=23*FT+8,gy=8*FT+6,al=(F.alphas||[])[0],ax=al?al.x:21*FT+8,ay=al?al.y+10:44;
+ scStart([{hold:.4},{x:gx,y:gy-20,hold:1.4},
+  {x:gx,y:gy-20,who:'',txt:"Squire's castle. Somebody started building it long ago and never finished. The dark moved in instead."},
+  {x:ax,y:ay,hold:1.0},{x:ax,y:ay,who:'LOUIE',txt:'Grrr... the ALPHA. Stone all the way through. Water and leaves wear it down. Woof.'},
+  {x:gx,y:gy,who:'LOUIE',txt:'THORN VINES on the gate. LEAF sprouts clear them: face the gate and press A.'},{hold:.3}],()=>swSave())}
+/* in any wild area: Louie sniffs out the castle road, and points you at the Lantern post the first time you are hurt */
+function sqHint(F){if(!F||W4.scene||state!=='g4world'||(W4.banner&&W4.banner.t>0))return;
+ if(F.id==='MEADOW'&&SW.quest>=5&&SW.badges.length<1&&!(SW.visited&&SW.visited.SQUIRE)&&!SW.lessons.sqHint&&P3.y>17*16&&Math.abs(P3.x-(17*16+16))<70){SW.lessons.sqHint=1;louSay('SNIFF! A CASTLE, SOUTH!',2.8);swSnd(600,.05,420)}
+ const ld=SW.party[0];if(!SW.lessons.post&&ld&&ld.hp>0&&ld.hp<wStats(ld).max*.5&&!swBusy()&&F.start){SW.lessons.post=1;if(SCOFF)return;
+  scStart([{x:F.start.x,y:F.start.y,hold:1.0},{x:F.start.x,y:F.start.y,who:'LOUIE',txt:"Hurt? This is a LANTERN POST. Walk up to it and press A: it heals your buddies."},
+   {x:F.start.x,y:F.start.y,who:'LOUIE',txt:'Press A there again and it sends you home, or to any post you have lit. Woof.'},{hold:.3}],()=>swSave())}}
+/* road signs in the Meadow, so you always know which way is which: [tile x, tile y, what it says] */
+const FSIGNS={MEADOW:[[4,6,'HOME: SUNKEEP. The garden, the cottage, the Great Lantern.'],[19,2,"NORTH: LANTERN TOWN. The Elder, the Ranger's lodge, the road beyond."],
+ [33,11,'EAST: CROOKED HOLLOW. Darker woods. The Ranger lets you in once you hold a Sigil.'],[16,35,"SOUTH: SQUIRE'S WOODS. An old castle, and an alpha awake inside it."]]};
+function fSignsDraw(F){for(const [tx,ty] of FSIGNS[F.id]||[]){const x=tx*FT+8,y=ty*FT+12,K='#14101e';
+ r('rgba(0,0,0,.22)',x-5,y+1,10,3);r(K,x-1,y-12,3,13);r('#8a6a48',x,y-11,1,12);
+ r(K,x-8,y-17,17,8);r('#c49a62',x-7,y-16,15,6);r('#a87948',x-7,y-12,15,2);r('#5a3d22',x-5,y-14,11,1)}}
+/* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */
 function g4Update(dt){switch(state){
@@ -11127,7 +11228,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4cine':swDrawCine();return;
  case 'g4bottie':drawBottie();return;
  case 'g4engage':engageDraw();return;
-  case 'g4battle':wDrawBattle();return;
+  case 'g4battle':wDrawBattle();aimDraw();return;
  default:if(state==='g4gate'){drawGate();return}wDrawWorld();if(state==='g4place')drawPlace();if(state==='g4gym')drawGym();return}}
 const SWF={cast:()=>W4.cast,noBugs:v=>{WNOBUG=v},walk:()=>({st:SW.walk||0,ew:W4.ew}),bugs:()=>W4.bugs||[],bugCatch:b=>bgCatch(b),bugCatch:b=>bgCatch(b),lst:()=>louSt(),louPet:()=>louPetOK(),noScenes:v=>{SCOFF=v},plots:()=>W4.patchBuds,plotSet:(i,c)=>plSet(W4.patchBuds[i],c),builds:()=>WBUILD.map(b=>b.k),noCap:v=>{WNOCAP=v},buddyFull:()=>wBuddyFull(),starters:()=>WCHOICE.map(c=>c.sp),scene:()=>W4.scene?{i:W4.scene.i,n:W4.scene.steps.length,txt:W4.scene.steps[W4.scene.i].txt||''}:null,pf:()=>(W4.fld||W4.bf||{}).pf,op:()=>wOp(),spots:()=>W4.fld&&W4.fld.spots,wk:()=>{wkSync();return W4.wk},wkSkills:w=>wkSkills(w),craftQ:()=>SW.craftQ,bf:()=>W4.bf,fld:()=>W4.fld,travel:(to,from)=>{W4.from=from;wEnterSector(to);state='g4world'},state:()=>state,start:()=>g4StartTitle(),meta:()=>SW,bt:()=>BT,
  species:()=>WSPECIES,

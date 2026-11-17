@@ -2,7 +2,7 @@
 
 Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v9.4)
+## Sproutwild (cartridge 5, v9.5)
 
 ### Known bugs
 - "BERRIES planted" stayed up 16 s in one run (too long, not too short). Not looked into yet.
@@ -68,6 +68,7 @@ Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to eve
 - Garden sprouts and the opening seeds had two growing looks; now one (confirmed on screen in v8.2).
 
 ### Not tested in play yet
+- Since v9.5: the timed strike by a real thumb on a phone (the window is about 0.2 s for GREAT); the castle alpha with a CUYAPUP team in real time.
 - Since v9.3: the Lantern ring gifts at 10, 20 and 30 LIGHT SHOWN in a real session; whether 20 calmed buddies before the dome feels right.
 - Since v9.1 (alphas instead of gyms): Sigils 2 to 4 by hand, the King lowering the dome in real time, Bottie's tower as the final battle.
 - Watching a starter evolve at Lv16 in a battle.

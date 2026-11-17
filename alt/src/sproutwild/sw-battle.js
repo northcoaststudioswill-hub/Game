@@ -47,7 +47,7 @@ function wDrawBattle(){const B=FBIO[W4.sector]||FBIO.MEADOW,foe=BT.foe,me=btCur(
  {const rr=wSeedRand(wSectorSeed(W4.sector)+7);for(let i=0;i<34;i++){const gx=rr()*W,gy=HY+10+rr()*(top-HY-14);r(i%7===0?B.fl[i%B.fl.length]:B.g3,Math.round(gx),Math.round(gy),i%7===0?2:1,i%7===0?2:3)}}
  /* ---- positions ---- */
  const FGx=Math.round(W*.71),FGy=Math.round(top*.50),MGx=Math.round(W*.30),MGy=top-12;
- wbPlat(FGx,FGy,96,B);wbPlat(MGx,MGy,112,B);
+ wbPlat(FGx,FGy,96,B);wbPlat(MGx,MGy,112,B);BT._fg=[FGx,FGy];
  const fw=fs.ow*sc,fh=fs.oh*sc,mw=ms.ow*sc,mh=ms.oh*sc,ease=t=>{const k=Math.min(1,Math.max(0,t/.35));return 1-(1-k)*(1-k)};
  let fx=FGx+(1-ease(time-d.fin))*130,fy=FGy+Math.round(Math.sin(time*2.2)*1.5),mx=MGx-(1-ease(time-d.min))*150,my=MGy+Math.round(Math.sin(time*2.2+1.3)*1.5);
  if(an&&at<.34){const k=Math.sin(Math.min(1,at/.34)*Math.PI);if(an.who==='me'){mx+=k*16;my-=k*8}else if(an.who==='foe'){fx-=k*16;fy+=k*8}}

@@ -375,6 +375,7 @@ function fNear(F){const px=P3.x+F.dir[0]*11,py=P3.y+F.dir[1]*11,in2=(o,r2)=>Math
  for(const b of F.buds)if(in2(b))return{k:'bud',b,txt:'PLUCK '+TYPES[b.type].n+' SPROUT'};
  for(const np of F.npcs)if(in2(np,18))return{k:'npc',np,txt:np.team&&!SW.fl[np.fk]?'BATTLE '+np.who:'TALK'};
  for(const al of F.alphas)if(in2(al,22))return{k:'alpha',al,txt:'CHALLENGE ALPHA '+al.sp};
+ for(const sg of (FSIGNS[F.id]||[]))if(!in2(F.start,18)&&in2({x:sg[0]*FT+8,y:sg[1]*FT+10},14))return{k:'road',msg:sg[2],txt:'READ SIGN'}; /* v9.5: road signs (the Lantern post always wins) */
  for(const wd of W4.wilds)if(SW.quest>=3&&in2(wd)&&!wd.cap&&!pfCan(F,wd))return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv+(F.sq.length?' · too strong to catch':'')};
  if(F.gym&&in2(F.gym,18))return{k:'gym',txt:W4.sector==='PEAK'?'TOWER':'LODGE'};
  for(const dr of F.doors)if(in2(dr,14))return{k:'door',txt:'KNOCK'};
@@ -425,7 +426,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    if(!(SW.gear&&SW.gear.rope)&&!(W4.msgT>0)){swSay('A ledge. With a CLIMBING ROPE from the bench you could get up here.',2.6)}}
   if(my>0&&fTile(F,Math.floor(P3.x/FT),Math.floor((P3.y+7)/FT))==='-'){const ty=Math.floor((P3.y+7)/FT)+1;
    if(fWalkTile(F,Math.floor(P3.x/FT),ty)){F.hop={t:0,sy:P3.y,ty:ty*FT+8};swSnd(440,.06,660);return}}
-  const exAt=(x,y)=>{const e=F.exits.find(e2=>e2.tx===Math.floor(x/FT)&&e2.ty===Math.floor(y/FT));if(e&&(e.to==='HOLLOW'||e.to==='SQUIRE')&&SW.badges.length<1){if(!(W4.msgT>0))swSay("RANGER'S BARRIER: closed until you bring the light to the Meadow's ALPHA (behind the boulder wall) and win its Sigil.",3.4);return true}return!!(F.arrive&&e)}; /* just arrived: the way back is shut until you let go once */
+  const exAt=(x,y)=>{const e=F.exits.find(e2=>e2.tx===Math.floor(x/FT)&&e2.ty===Math.floor(y/FT));if(e&&wBarred(e.to)){if(!(W4.msgT>0))swSay(wBarredSay(e.to),3.4);return true}return!!(F.arrive&&e)}; /* just arrived: the way back is shut until you let go once */
   if(!fBox(F,nx,P3.y)&&!exAt(nx,P3.y))P3.x=nx;if(!fBox(F,P3.x,ny)&&!exAt(P3.x,ny))P3.y=ny}
  /* leaving by the edge of the map */
  /* an exit only fires once you have stepped away from where you came in: holding the stick across a border must not bounce you back */
@@ -459,6 +460,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    else fTalk(F,np.who,[np.after||'...'])}
   else if(n.k==='gym'){gymTalk(sec)} /* v9.1: lodges talk; only Bottie's tower is a battle */
   else if(n.k==='louie')wLouTalk();
+  else if(n.k==='road'){swSay(n.msg,3.6);swSnd(520,.04,660)}
   else if(n.k==='door')swSay(['Nobody home. A sprout waves from the window.','Locked. It smells like berry pie in there.','A note: GONE TO THE GYM. BACK NEVER.'][(F.t0*7|0)%3],2.2);
   else if(n.k==='sign'){const hurt=SW.party.some(m=>m.hp<wStats(m).max);for(const m of SW.party)m.hp=wStats(m).max;if(hurt){swSnd(880,.1,1175);for(let i=0;i<10;i++)W4.floats.push({x:P3.x+(Math.random()*30-15),y:P3.y-10-Math.random()*20,txt:'+',t:.8+Math.random()*.5,c:'#7ee787'});swSay('The Lantern light mends your buddies. Press A again to travel.',3);swSave();return} /* v8.8: a rest is its own moment; the map opens on the next press */W4.mapRO=0;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
   else if(n.k==='info'){swSay(n.msg,2.6);swSnd(660,.05,880)}
@@ -542,6 +544,7 @@ function fBake(F){const B=F.bio,cv=document.createElement('canvas');cv.width=F.w
    for(const [dx,dy] of [[0,-1],[0,1],[-1,0],[1,0]])if(fTile(F,tx+dx,ty+dy)==='~'&&rnd()<.55){const rx=x+(dx>0?FT-4:dx<0?2:3+((rnd()*9)|0)),ry=y+(dy>0?FT-7:dy<0?1:4+((rnd()*6)|0));R('#2e6a2a',rx,ry,1,6);R('#3f8a38',rx+2,ry+1,1,5);R('#8a5a28',rx,ry-1,1,2)}
    /* flowers along the road */
    if((is(tx-1,ty,':')||is(tx+1,ty,':')||is(tx,ty-1,':')||is(tx,ty+1,':'))&&rnd()<.35){const fx=x+2+((rnd()*11)|0),fy=y+3+((rnd()*10)|0),fc=B.fl[((rnd()*B.fl.length)|0)];R(B.g3,fx,fy+2,1,2);R(fc,fx-1,fy,3,2);R('#fff3b0',fx,fy,1,1)}}}
+ castleBake(F,b,B,R,is); /* v9.5: Squire's castle */
  F.cv=cv}
 function fTree(B,x,y,s){ /* x,y = base centre */
  const k=B.tree;

@@ -35,7 +35,7 @@ function dabStart(){SW.lessons.scDab=1;if(!(typeof KO!=='undefined'&&KO&&KO._)){
 function dabGo(){W4.dabC=0;W4.talk=null;W4.quips=[];W4.quipQ=[];state='g4dab';swSave()}
 function wCineMon(sp,sub){if(W4.msg&&/Latched|SHOOK|Fill the bar/i.test(W4.msg))W4.msgT=0;W4.cine={kind:'mon',id:sp,sub:sub||'',t:0};state='g4cine';swSnd(523,.1,784)}
 /* the Ranger's barrier on the roads to the Hollow and Squire's Woods, until the first Sigil (v8.5) */
-function fBarrierDraw(F){if(SW.badges.length>=1)return;for(const e of F.exits){if(e.to!=='HOLLOW'&&e.to!=='SQUIRE')continue;const x=e.tx*FT,y=e.ty*FT;
+function fBarrierDraw(F){fSignsDraw(F);for(const e of F.exits){if(!wBarred(e.to))continue;const x=e.tx*FT,y=e.ty*FT;
  r('#5a3a1e',x+1,y+2,3,13);r('#5a3a1e',x+12,y+2,3,13);
  for(let i=0;i<2;i++){const by=y+4+i*6;r('#f4ecd8',x-1,by,18,3);for(let k=0;k<18;k+=6)r('#c84030',x-1+k,by,3,3)}
  r('#14101e',x+5,y-6,6,6);r('#ffd94d',x+6,y-5,4,4)}}

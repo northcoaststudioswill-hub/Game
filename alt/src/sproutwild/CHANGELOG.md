@@ -21,6 +21,22 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v9.5 · 2026-11-17 · the first alpha lives in the castle
+
+Will: refine what we have, no new content; clean up, make things work better, fill tutorial and onboarding gaps, flesh out the first area. The flow to the first alpha is bad: it should be in Squire's Woods, which should have a castle. And look hard at the battles: is this style right, or should it pivot to Mario RPG style or multi-battlers?
+
+`shots/v9.5-castle-strike-signs.png`: the castle, the timed strike, a road sign.
+
+- **The first alpha is in Squire's castle.** Squire's Woods opens once Sunkeep has a cottage and a crop (the Ranger's barrier says so until then). Its old walls are drawn as a castle now: grey brick with battlements, round corner towers with arrow slits and red pennants, a gatehouse over the thorn gate, and a flagstone courtyard where STONESQUIRE, the castle's own gatehouse come alive, waits dark. It is Lv7 and gives the first Sigil (STONE). The woods' wilds are Lv3 to 6.
+- **The Meadow is the training ground.** No alpha behind its boulder wall; the wall, the ore and the buried PEB stay for Erin's lessons. Crooked Hollow (Lv6 to 9) opens with the first Sigil. BLOOMBOAR moved to the Ember Wastes (Lv12, guarding the glassware), so there are still four alphas.
+- **Balance, by simulation** (one starter at Lv6 or 7 plus a Lv4 PEBBLIT, 6 fights each): BESSLING and GRASSKIN win 6/6 against the Lv7 alpha, even at Lv8. CUYAPUP (fire, weak to stone) loses most, but with a Lv5 DRIZZLET it wins 6/6. So the game teaches it: Erin says "it is made of stone. Water and leaves wear stone down. A DEW or LEAF buddy from the woods will help", and Louie says it again at the castle. The training goal is Lv6 ("Stone ALPHA Lv7: train to Lv6"); at Lv7 it took over 6 minutes of grinding in a real-time run.
+- **Arriving at the castle** is a short scene now: the camera pans to the gatehouse, the narrator on the castle nobody finished, then to the dark alpha and Louie on stone, then back to the gate and how to clear the thorns.
+- **The Lantern post gets a lesson.** The first time your lead buddy drops below half in the wild, Louie walks the camera to the area's Lantern post: A heals, A again travels.
+- **Road signs in the Meadow** at the four ways out (home, Lantern Town, Crooked Hollow, Squire's Woods). Walk up and press A to read. (The first version put the HOME sign on the Lantern post and hid the post's prompt; a real-time run caught it, the sign moved, and the post always wins now. New lab check.)
+- **The Squire's Woods Lantern post** was hidden under a tree's canopy; the tree is gone.
+- **A timed strike (prototype, for the battle question).** After you pick a damaging move, a gold ring closes on the foe; press A as it meets the white ring for GREAT (+30%, about a fifth of a second) or GOOD (+12%, about half a second). A miss, or no press, is a normal hit. The first three times, a line under it explains. The story bible has a new section, "Battles: keep, change or pivot?", with the recommendation: keep 1 vs 1, add timing (strike now, guard next), and make sprouts the team that breaks an alpha's dark shield. A full multi-battler would cost the most and fit a 240 px screen worst.
+- Lab: 124 checks, updated: the Meadow has no alpha, the castle alpha gives the STONE SIGIL, Squire's Woods is barred until the cottage and a crop, the Hollow until the first Sigil, and the level ranges. The bug-catch check uses a grass bug in open ground (a water bug at the edge failed once).
+
 ## v9.4 · 2026-11-17 · dark and lit
 
 Will: keep working. Round 3 of the story bible starts with the core reward: seeing a buddy go from dark to lit.
