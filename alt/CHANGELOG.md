@@ -3,6 +3,19 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: the story run (Nov 17 2026)
+
+Will: one more pass, then push. No game code changed in this one; it is a check of the whole arc.
+
+- New `tests/sprouts_story.js` (17 checks) plays the story by script: the berry field and meadow shards carried home, the
+  island shard swum home by Dews only (aiming at water picks Dews by itself), a crowd waking Old Thornback with his new
+  guardian lines, the last shard and the ending, then five sprouts and three star sprouts moving into the house, Pebs sent
+  to the Waterworks, the evening report, and the next morning. All pass, three runs in a row.
+- Looked at on screen: the first-shard scene, Thornback's guardian line, both ending frames, the house inside, the desk
+  menu, and the Lantern skipping at night. Nothing wrong found.
+- Seen but left alone: after a big day the morning can queue eight toasts, about 25 seconds of them (that is how the
+  toasts have always worked).
+
 ## Sprouts: the checking pass (Nov 17 2026)
 
 Will: another pass refining the new Pikmin mechanics and making sure the game does what it means to.
