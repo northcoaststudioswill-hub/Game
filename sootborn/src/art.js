@@ -137,7 +137,7 @@ function makeAccredited(o) {
     else if (d === 1) { R(5, 9, 6, 1, trim); }
     else { R(5, 9, 5, 1, trim); R(4, 8, 2, 2, trim); R(7, 12, 2, 6, shade(robe, .9)); R(7, 18, 2, 1, sk); }
     if (o.warden) {
-      R(5, 1, 6, 7, '#d8dce4'); R(5, 1, 6, 1, '#f4f6fa'); if (d === 0) { R(6, 4, 4, 1, trim); R(3, 9, 2, 3, '#e8ecf2'); R(11, 9, 2, 3, '#e8ecf2'); } else if (d > 1) R(5, 4, 2, 1, trim);
+      R(5, 1, 6, 7, '#d8dce4'); R(5, 1, 6, 1, '#f4f6fa'); if (d === 0) { R(6, 3, 4, 1, trim); R(5, 5, 6, 1, '#1e1e28'); R(7, 6, 2, 2, '#b8bcc8'); R(3, 9, 2, 3, '#e8ecf2'); R(11, 9, 2, 3, '#e8ecf2'); R(3, 9, 2, 1, trim); R(11, 9, 2, 1, trim); } else if (d > 1) R(5, 4, 2, 1, trim);
       R(d === 2 ? 2 : 13, 0, 1, AH, '#b8bcc8'); R(d === 2 ? 1 : 12, 0, 3, 2, trim); R(d === 2 ? 2 : 13, -1, 1, 1, '#fff');
     } else {
       // head, long pale hair, circlet
@@ -266,11 +266,16 @@ function drawTile(g, m, tx, ty) {
     for (let i = 1; i < 16; i += 3) { R(0, i, 16, 2, '#3e3a46'); R(0, i, 16, 1, '#5c5868'); } for (let i = 3; i < 16; i += 6) R(i, 0, 1, 16, '#2c2932');
     if (at(-1, 0) !== ',') { R(0, 0, 2, 16, '#55515f'); R(0, 0, 1, 16, '#7a7686'); } if (at(1, 0) !== ',') { R(14, 0, 2, 16, '#3a3742'); R(15, 0, 1, 16, '#1a181e'); }
     if (at(0, -1) !== ',') { R(0, 0, 16, 2, '#55515f'); R(0, 0, 16, 1, '#7a7686'); } if (at(0, 1) !== ',') { R(0, 14, 16, 2, '#3a3742'); R(0, 15, 16, 1, '#1a181e'); }
-  } else if (bay) { // deck plates: bevel, rivets, tread, stains
-    const c = r < .5 ? '#43414b' : '#484650'; stoneAt(g, x, y, 16, 16, c, '#26242c');
-    for (const [a, b] of [[2, 2], [12, 2], [2, 12], [12, 12]]) { R(a, b, 1, 1, '#8a8894'); R(a + 1, b + 1, 1, 1, '#2a2830'); }
-    if (r2 < .16) for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) { R(4 + i * 3, 5 + j * 4, 2, 1, shade(c, 1.25)); R(5 + i * 3, 6 + j * 4, 1, 1, shade(c, .7)); }
-    else if (r2 > .82) { R(4, 6, 7, 4, shade(c, .78)); R(5, 5, 4, 1, shade(c, .78)); R(6, 7, 3, 1, '#5a3a2a'); }
+  } else if (bay) { // big deck plates (2x2 tiles): seams, corner rivets, scuffs, the odd tread panel
+    const c = hash((tx >> 1) + m.seed, ty >> 1) < .5 ? '#3f3d47' : '#44424c', L = !(tx & 1), T = !(ty & 1);
+    R(0, 0, 16, 16, c);
+    for (let i = 0; i < 4; i++) { const a = hash(tx * 9 + i, ty * 5 + 1), b2 = hash(tx * 3 + i, ty * 11 + 2); R((a * 14) | 0, (b2 * 14) | 0, 2 + (i & 1), 1, shade(c, i % 2 ? 1.12 : .88)); }
+    if (L) { R(0, 0, 1, 16, '#1e1c24'); R(1, 0, 1, 16, shade(c, 1.28)); } else R(15, 0, 1, 16, shade(c, .72));
+    if (T) { R(0, 0, 16, 1, '#1e1c24'); R(0, 1, 16, 1, shade(c, 1.28)); } else R(0, 15, 16, 1, shade(c, .72));
+    const rx = L ? 3 : 12, ry = T ? 3 : 12; R(rx, ry, 1, 1, '#8c8a98'); R(rx + 1, ry + 1, 1, 1, '#1e1c24');
+    if (r2 < .1) { for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { R(4 + i * 3, 4 + j * 3, 2, 1, shade(c, 1.3)); R(5 + i * 3, 5 + j * 3, 1, 1, shade(c, .65)); } }
+    else if (r2 > .88) { R(4, 6, 8, 4, 'rgba(14,10,14,.4)'); R(6, 5, 4, 6, 'rgba(14,10,14,.4)'); R(7, 7, 2, 1, 'rgba(120,70,40,.5)'); }
+    else if (r2 > .8) { R(3, 8, 9, 1, shade(c, .7)); R(5, 9, 5, 1, shade(c, .8)); }
   } else { // flagstones, laid by hand a long time ago
     const mortar = '#2a201e', cols = ['#584a44', '#5f5049', '#51453f', '#64554c'], pick = k => cols[(hash(tx * 4 + k, ty * 4 + m.seed) * 4) | 0], pat = (r * 4) | 0;
     R(0, 0, 16, 16, mortar);
@@ -381,6 +386,23 @@ Object.assign(PROPS, {
   rails(g, x, y, w) { const R = (a, b, ww, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, ww, h); }; w *= 16; for (let i = 2; i < w; i += 6) { R(i, 3, 3, 11, '#4a3420'); R(i, 3, 3, 1, '#6e5030'); R(i + 2, 4, 1, 10, '#2e2014'); } R(0, 5, w, 2, '#3a3a44'); R(0, 5, w, 1, '#8a8a98'); R(0, 11, w, 2, '#3a3a44'); R(0, 11, w, 1, '#8a8a98'); },
   orecart(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(1, 4, 14, 9, '#2a2a32'); R(2, 5, 12, 7, '#4e4e5a'); R(2, 5, 12, 1, '#7a7a88'); R(2, 11, 12, 1, '#30303a'); for (let i = 5; i < 14; i += 4) R(i, 5, 1, 7, '#30303a'); R(3, 1, 10, 4, '#2e2420'); R(4, 0, 4, 2, '#4a3a34'); R(8, 1, 4, 2, '#3a2c28'); R(5, 0, 2, 1, '#6a5a50'); R(10, 2, 1, 1, '#e8b23a'); R(6, 3, 1, 1, '#e8b23a'); R(2, 13, 4, 3, '#18161a'); R(10, 13, 4, 3, '#18161a'); R(3, 14, 2, 1, '#6a6a76'); R(11, 14, 2, 1, '#6a6a76'); },
   rubble(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; const r = rng(x * 7 + y + 1); for (let i = 0; i < 16; i++) { const w = 5 + (r() * 7 | 0), h = 4 + (r() * 4 | 0), a = (r() * (31 - w)) | 0, b = 4 + ((r() * (26 - h)) | 0), c = ['#4e4038', '#5c4c42', '#40342e'][i % 3]; R(a + 1, b, w - 2, h, c); R(a, b + 1, w, h - 2, c); R(a + 1, b, w - 3, 1, shade(c, 1.4)); R(a, b + 1, 1, h - 3, shade(c, 1.25)); R(a + 1, b + h - 1, w - 2, 1, shade(c, .55)); } R(20, 22, 4, 3, '#8a7a4a'); R(20, 22, 4, 1, '#b8a468'); },
+  valves(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(-1, -2, 50, 17, '#14181c'); R(0, -1, 48, 15, '#3c4854'); R(0, -1, 48, 1, '#6c7c8c'); R(0, -1, 1, 15, '#5a6a7a'); R(47, -1, 1, 15, '#222a32'); R(0, 13, 48, 1, '#222a32');
+    for (let i = 0; i < 3; i++) { const cx = 8 + i * 16; R(cx - 4, 1, 9, 8, '#14181c'); R(cx - 3, 0, 7, 10, '#14181c'); R(cx - 3, 1, 7, 8, '#e8e0c8'); R(cx - 2, 2, 5, 6, '#f8f0d8'); R(cx, 5, 1, 1, '#1a1a1a'); R(cx + 1, 4, 1, 1, PAL.red); R(cx + 2, 3, 1, 1, PAL.red); R(cx - 2, 7, 5, 1, '#c8c0a8'); R(cx - 5, 10, 4, 3, '#14181c'); R(cx + 3, 10, 5, 4, PAL.red); R(cx + 3, 10, 5, 1, '#e8705a'); R(cx + 5, 11, 1, 2, '#6a1e14'); }
+    for (const a of [1, 46]) for (const b of [0, 12]) R(a, b, 1, 1, '#9aaaba'); R(15, 0, 1, 13, '#2a343e'); R(31, 0, 1, 13, '#2a343e'); },
+  freight(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(-1, -3, 34, 19, '#141418'); for (let i = 0; i < 32; i += 4) { R(i, -2, 2, 3, PAL.yellow); R(i + 2, -2, 2, 3, '#1a1a1e'); } R(0, 1, 2, 15, '#5a5e68'); R(30, 1, 2, 15, '#34363e'); R(0, 1, 1, 15, '#8a8e9a');
+    R(2, 1, 28, 15, '#2a2c34'); for (let i = 2; i < 16; i += 3) { R(2, i, 28, 2, '#4a4e58'); R(2, i, 28, 1, '#6e727e'); } R(15, 1, 2, 15, '#1a1a1e'); R(4, 12, 9, 3, '#1a1a1e'); ptext(g, '3', x + 7, y + 6, PAL.yellow); R(27, 3, 4, 4, '#141418'); },
+  board(g, x, y, w) { w = (w || 1) * 16; const R = (a, b, ww, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, ww, h); }; R(0, 0, w, 14, '#2a1a10'); R(1, 1, w - 2, 12, '#7a5a34'); R(1, 1, w - 2, 1, '#a07c4a'); R(2, 2, w - 4, 10, '#9a7a4a'); for (let i = 3; i < w - 3; i += 5) R(i, 3 + (i % 3), 1, 1, '#86683c');
+    const cols = ['#e8e0cc', '#d8c890', '#ecd8b0', '#c8d0d8']; for (let i = 0, k = 0; i < w - 9; i += 7, k++) { const py = 3 + (k % 2) * 2; R(3 + i + 1, py + 1, 5, 6, 'rgba(30,18,10,.5)'); R(3 + i, py, 5, 6, cols[k % 4]); R(4 + i, py + 2, 3, 1, '#6a5a4a'); R(4 + i, py + 4, 2, 1, '#6a5a4a'); R(5 + i, py, 1, 1, k % 2 ? PAL.red : '#3a6a8a'); } },
+  bed(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(0, 1, 32, 31, '#22140e'); R(1, 1, 30, 5, '#6a4628'); R(1, 1, 30, 1, '#92683c'); R(1, 5, 30, 1, '#3a2414'); for (let i = 6; i < 30; i += 6) R(i, 2, 1, 3, '#3a2414'); R(2, 6, 28, 24, '#c8bca4'); R(2, 6, 28, 1, '#e8dcc4');
+    R(4, 7, 12, 7, PAL.cream); R(4, 7, 12, 1, '#ffffff'); R(4, 13, 12, 1, '#c8b898'); R(17, 8, 11, 6, '#e0d4bc'); R(2, 15, 28, 15, '#2e6a6e'); R(2, 15, 28, 2, '#4a9296'); R(2, 28, 28, 2, '#1c4a4e'); for (let i = 0; i < 28; i += 7) { R(2 + i, 18, 1, 10, '#245a5e'); R(5 + i, 21, 2, 2, '#e8b23a'); } R(1, 30, 30, 2, '#4a2e1a'); R(1, 30, 30, 1, '#6a4628'); },
+  table(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(0, 2, 32, 12, '#22140e'); R(1, 2, 30, 8, '#7a5634'); R(1, 2, 30, 1, '#a47a4a'); for (let i = 5; i < 30; i += 8) R(i, 3, 1, 7, '#5e4026'); R(1, 10, 30, 3, '#4a301c'); R(1, 10, 30, 1, '#5e4026'); R(3, 13, 2, 3, '#2e1c10'); R(27, 13, 2, 3, '#2e1c10');
+    R(5, 0, 5, 6, '#8a8e96'); R(5, 0, 5, 1, '#c8ccd4'); R(6, 1, 3, 1, '#3a2418'); R(10, 2, 1, 2, '#8a8e96'); R(15, 3, 9, 6, '#ece4d0'); R(16, 5, 6, 1, '#6a5a4a'); R(16, 7, 4, 1, '#6a5a4a'); R(25, 2, 2, 5, '#e8d8a0'); R(25, 1, 2, 1, '#ffb35a'); },
+  hatch(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(0, 0, 16, 16, '#141418'); for (let i = 0; i < 16; i += 4) { R(i, 0, 2, 1, PAL.yellow); R(i + 2, 15, 2, 1, PAL.yellow); R(0, i + 2, 1, 2, PAL.yellow); R(15, i, 1, 2, PAL.yellow); } R(1, 1, 14, 14, '#4a505c'); R(1, 1, 14, 1, '#7a808c'); R(1, 1, 1, 14, '#6a707c'); R(14, 2, 1, 13, '#2a2e36'); R(2, 14, 13, 1, '#2a2e36');
+    for (let i = 4; i < 13; i += 3) for (let j = 4; j < 13; j += 3) { R(i, j, 2, 1, '#6a707c'); R(i + 1, j + 1, 1, 1, '#30343c'); } R(6, 6, 4, 4, '#1c1e24'); R(7, 7, 2, 2, '#c8ccd4'); R(2, 2, 1, 1, '#aab0bc'); R(13, 2, 1, 1, '#aab0bc'); R(2, 13, 1, 1, '#aab0bc'); R(13, 13, 1, 1, '#aab0bc'); },
+  vent(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(1, 2, 14, 12, '#0e0c10'); R(1, 2, 14, 1, '#5e5a66'); R(1, 2, 1, 12, '#4e4a56'); R(14, 3, 1, 11, '#201e26'); R(2, 13, 13, 1, '#201e26'); for (let i = 4; i < 13; i += 2) { R(3, i, 10, 1, '#46424e'); } R(3, 4, 1, 9, '#2c2932'); R(12, 4, 1, 9, '#2c2932'); R(7, 4, 1, 9, '#2c2932'); },
+  canisters(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; for (let i = 0; i < 3; i++) { const cx = 1 + i * 5; R(cx - 0, 3, 4, 13, '#1c2824'); R(cx, 3, 4, 12, '#4e7262'); R(cx, 3, 1, 12, '#7ea896'); R(cx + 3, 4, 1, 11, '#2e4a3e'); R(cx, 3, 4, 1, '#96bca8'); R(cx + 1, 1, 2, 2, '#8a8e96'); R(cx + 1, 0, 2, 1, '#c8ccd4'); R(cx, 8, 4, 2, '#e8e0c8'); R(cx + 1, 8, 1, 1, PAL.red); } },
+  awning(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(-1, 5, 50, 12, '#1e100c'); for (let i = 0; i < 48; i += 8) { R(i, 6, 4, 9, PAL.red); R(i, 6, 4, 1, '#f07a62'); R(i, 13, 4, 2, '#8a2a1c'); R(i + 4, 6, 4, 9, PAL.cream); R(i + 4, 13, 4, 2, '#b8a888'); R(i, 15, 3, 1, PAL.red); R(i + 4, 15, 3, 1, PAL.cream); }
+    R(8, -6, 32, 10, '#1e100c'); R(9, -5, 30, 8, '#4a2c18'); R(9, -5, 30, 1, '#7a5030'); ptext(g, 'NOODLES', x + 11, y - 3, '#ffb35a'); R(4, 4, 1, 2, '#3a3038'); R(43, 4, 1, 2, '#3a3038'); },
   cot(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(1, 1, 14, 14, '#4a4e54'); R(1, 1, 14, 1, '#8a8e96'); R(2, 2, 12, 12, '#d0d4cc'); R(2, 2, 12, 4, '#f0f4ec'); R(3, 3, 6, 2, '#ffffff'); R(2, 7, 12, 7, '#5a7e90'); R(2, 7, 12, 1, '#82a8ba'); R(2, 13, 12, 1, '#3a5464'); for (let i = 4; i < 13; i += 4) R(i, 8, 1, 5, '#4a6a7c'); R(1, 15, 2, 1, '#222'); R(13, 15, 2, 1, '#222'); }
 });
 function renderMapLayer(m) {

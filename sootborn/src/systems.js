@@ -179,19 +179,20 @@ const Puzzle = {
     const T = this.T, fr = this.flowR, rm = Settings.d.reduce;
     g.fillStyle = '#0f0b0e'; g.fillRect(0, 0, W, H);
     for (let y = 0; y < H; y += 8) { g.fillStyle = y % 16 ? '#141014' : '#120d11'; g.fillRect(0, y, W, 8); }
-    g.fillStyle = '#2a2024'; g.fillRect(this.ox - 6, this.oy - 6, this.cols * T + 12, this.rows * T + 12);
-    g.fillStyle = '#3a2c2e'; g.fillRect(this.ox - 6, this.oy - 6, this.cols * T + 12, 2);
+    { const bx = this.ox - 7, by = this.oy - 7, bw = this.cols * T + 14, bh = this.rows * T + 14; g.fillStyle = '#0c0808'; g.fillRect(bx - 2, by - 2, bw + 4, bh + 4); g.fillStyle = '#c8a050'; g.fillRect(bx - 1, by - 1, bw + 2, bh + 2); g.fillStyle = '#6a5228'; g.fillRect(bx, by + bh, bw + 1, 1); g.fillRect(bx + bw, by, 1, bh + 1); g.fillStyle = '#2c2226'; g.fillRect(bx, by, bw, bh); g.fillStyle = '#e8c25a'; for (const [a, b] of [[bx + 1, by + 1], [bx + bw - 3, by + 1], [bx + 1, by + bh - 3], [bx + bw - 3, by + bh - 3]]) g.fillRect(a, b, 2, 2); }
     for (let y = 0; y < this.rows; y++) for (let x = 0; x < this.cols; x++) {
       const c = this.grid[y][x], px = this.ox + x * T, py = this.oy + y * T, wet = fr.seen.has(x + ',' + y), cx = px + T / 2, cy = py + T / 2;
-      if (c.kind === 'blank') { g.fillStyle = '#1a1316'; g.fillRect(px + 1, py + 1, T - 2, T - 2); g.fillStyle = '#241a1c'; g.fillRect(px + 4, py + 4, 2, 2); g.fillRect(px + T - 6, py + T - 6, 2, 2); continue; }
-      g.fillStyle = '#1e1619'; g.fillRect(px + 1, py + 1, T - 2, T - 2);
+      if (c.kind === 'blank') { stoneAt(g, px, py, T, T, '#231a1d', '#140d10'); g.fillStyle = '#3a2c30'; g.fillRect(px + 3, py + 3, 1, 1); g.fillRect(px + T - 5, py + 3, 1, 1); g.fillRect(px + 3, py + T - 5, 1, 1); g.fillRect(px + T - 5, py + T - 5, 1, 1); continue; }
+      stoneAt(g, px, py, T, T, '#2e2428', '#140d10');
       const col = this.solved ? '#9ff2ea' : wet ? PAL.cyan : '#7a5038', w = 6;
       for (let k = 0; k < 4; k++) if (c.m & (1 << k)) {
         g.fillStyle = '#120c0e'; if (k === 0) g.fillRect(cx - w / 2 - 1, py, w + 2, T / 2); if (k === 2) g.fillRect(cx - w / 2 - 1, cy, w + 2, T / 2); if (k === 1) g.fillRect(cx, cy - w / 2 - 1, T / 2, w + 2); if (k === 3) g.fillRect(px, cy - w / 2 - 1, T / 2, w + 2);
         g.fillStyle = col; if (k === 0) g.fillRect(cx - w / 2, py, w, T / 2); if (k === 2) g.fillRect(cx - w / 2, cy, w, T / 2); if (k === 1) g.fillRect(cx, cy - w / 2, T / 2, w); if (k === 3) g.fillRect(px, cy - w / 2, T / 2, w);
+        g.fillStyle = this.solved ? '#e0fffb' : wet ? '#a8f4ee' : '#b07a52'; if (k === 0) g.fillRect(cx - w / 2, py, 1, T / 2); if (k === 2) g.fillRect(cx - w / 2, cy, 1, T / 2); if (k === 1) g.fillRect(cx, cy - w / 2, T / 2, 1); if (k === 3) g.fillRect(px, cy - w / 2, T / 2, 1);
+        g.fillStyle = this.solved ? '#5ab8b0' : wet ? '#2a8a86' : '#4a2e1e'; if (k === 0) g.fillRect(cx + w / 2 - 1, py, 1, T / 2); if (k === 2) g.fillRect(cx + w / 2 - 1, cy, 1, T / 2); if (k === 1) g.fillRect(cx, cy + w / 2 - 1, T / 2, 1); if (k === 3) g.fillRect(px, cy + w / 2 - 1, T / 2, 1);
         if (wet && !rm) { g.fillStyle = '#e8fffd'; const o = ((this.t * 24) | 0) % 8; for (let s = o; s < T / 2; s += 8) { if (k === 0) g.fillRect(cx - 1, cy - s, 2, 2); if (k === 2) g.fillRect(cx - 1, cy + s - 1, 2, 2); if (k === 1) g.fillRect(cx + s - 1, cy - 1, 2, 2); if (k === 3) g.fillRect(cx - s, cy - 1, 2, 2); } }
       }
-      g.fillStyle = wet ? '#2a7a76' : '#4a3024'; g.fillRect(cx - 4, cy - 4, 8, 8); g.fillStyle = col; g.fillRect(cx - 2, cy - 2, 4, 4);
+      g.fillStyle = '#120c0e'; g.fillRect(cx - 5, cy - 5, 10, 10); g.fillStyle = wet ? '#2a7a76' : '#5a3a28'; g.fillRect(cx - 4, cy - 4, 8, 8); g.fillStyle = wet ? '#6adad2' : '#8a5e40'; g.fillRect(cx - 4, cy - 4, 8, 1); g.fillRect(cx - 4, cy - 4, 1, 8); g.fillStyle = col; g.fillRect(cx - 2, cy - 2, 4, 4); g.fillStyle = '#fff'; g.globalAlpha = .5; g.fillRect(cx - 2, cy - 2, 1, 1); g.globalAlpha = 1;
       if (c.kind === 'src') { g.fillStyle = PAL.amber; g.fillRect(cx - 7, cy - 7, 14, 14); g.fillStyle = '#5a2a10'; g.fillRect(cx - 5, cy - 5, 10, 10); ptext(g, 'P', cx - 1, cy - 2, PAL.amber); if (c.label) ptext(g, c.label, cx - ptextW(c.label) / 2, py + T - 5, PAL.red); }
       if (c.kind === 'out') { const lit = wet && fr.leaks.length === 0; g.fillStyle = '#d8dcd0'; g.fillRect(cx - 7, cy - 8, 14, 12); g.fillStyle = '#1a1e24'; g.fillRect(cx - 6, cy - 7, 12, 10);
         const a = lit ? 0.3 : 2.6 + (rm ? 0 : Math.sin(this.t * 9) * .15); g.fillStyle = lit ? '#7cf27c' : PAL.red; for (let s = 0; s < 6; s++) g.fillRect(cx + Math.round(Math.cos(-a) * s) - 1, cy - 1 + Math.round(-Math.sin(a) * s * .8), 2, 2);
@@ -220,7 +221,7 @@ const World = {
     G.mapId = id; this.map = MAPS[id]; this.layer = renderMapLayer(this.map);
     if (spawn) { P.x = spawn.x; P.y = spawn.y; P.dir = spawn.dir | 0; }
     this.exitArmed = !this.exitAt(P.x, P.y);
-    if (noNPC) this.npcs = []; else { this.refreshNPCs(); if (G.mode === 'world' && !G.heist) setTimeout(() => HUD.toast(this.map.name), 350); } this.parts = []; if (!noNPC) Sound.music(this.map.music); this.snapCam(); HUD.dirty = true;
+    if (noNPC) this.npcs = []; else { this.refreshNPCs(); if (G.mode === 'world' && !G.heist) setTimeout(() => HUD.toast(this.map.name), 350); } this.parts = []; if (!noNPC) Sound.music(this.map.music); this.snapCam(true); HUD.dirty = true;
     if (!this.map.visited) { this.map.visited = 1; }
   },
   refreshNPCs() {
@@ -351,7 +352,7 @@ const World = {
       g.beginPath(); g.moveTo(ox, oy); for (let a = -0.55; a <= 0.551; a += 0.11) { let r = 0; while (r < R && !this.solidAt(n.x + Math.cos(a0 + a) * r, n.y - 6 + Math.sin(a0 + a) * r)) r += 3; g.lineTo(ox + Math.cos(a0 + a) * r, oy + Math.sin(a0 + a) * r); } g.closePath(); g.fill();
     }
   },
-  snapCam() { const m = this.map; if (Cutscene.active) { const mw = m.w * 16, mh = m.h * 16, c = Cutscene.cam; this.cam.x = mw <= W ? (mw - W) / 2 : clamp(c.x - W / 2, 0, mw - W); this.cam.y = mh <= H ? (mh - H) / 2 : clamp(c.y - H / 2, 0, mh - H); if (Cutscene.shake && !Settings.d.reduce) { this.cam.x += (Math.random() - .5) * 4 * Cutscene.shake; this.cam.y += (Math.random() - .5) * 4 * Cutscene.shake; } return; } const mw = m.w * 16, mh = m.h * 16; this.cam.x = mw <= W ? (mw - W) / 2 : clamp(P.x - W / 2, 0, mw - W); this.cam.y = mh <= H ? (mh - H) / 2 : clamp(P.y - 8 - H / 2, 0, mh - H); },
+  snapCam(hard) { const m = this.map; if (Cutscene.active) { const mw = m.w * 16, mh = m.h * 16, c = Cutscene.cam; this.cam.x = mw <= W ? (mw - W) / 2 : clamp(c.x - W / 2, 0, mw - W); this.cam.y = mh <= H ? (mh - H) / 2 : clamp(c.y - H / 2, 0, mh - H); if (Cutscene.shake && !Settings.d.reduce) { this.cam.x += (Math.random() - .5) * 4 * Cutscene.shake; this.cam.y += (Math.random() - .5) * 4 * Cutscene.shake; } return; } const mw = m.w * 16, mh = m.h * 16, tx = mw <= W ? (mw - W) / 2 : clamp(P.x - W / 2, 0, mw - W), ty = mh <= H ? (mh - H) / 2 : clamp(P.y - 8 - H / 2, 0, mh - H); if (hard || this.camHard || Math.abs(tx - this.cam.x) > 90 || Math.abs(ty - this.cam.y) > 90 || Settings.d.reduce) { this.cam.x = tx; this.cam.y = ty; this.camHard = false; } else { this.cam.x += (tx - this.cam.x) * 0.16; this.cam.y += (ty - this.cam.y) * 0.16; if (Math.abs(tx - this.cam.x) < 0.5) this.cam.x = tx; if (Math.abs(ty - this.cam.y) < 0.5) this.cam.y = ty; } },
   render(g, t) {
     const m = this.map; this.snapCam(); const cx = Math.round(this.cam.x), cy = Math.round(this.cam.y), rm = Settings.d.reduce;
     g.fillStyle = '#0b0709'; g.fillRect(0, 0, W, H);
@@ -384,7 +385,7 @@ const World = {
     else { ents = this.npcs.map(n => ({ x: n.x, y: n.y, dir: n.dir, f: n.moving ? 1 + (Math.floor(n.anim * 6) % 2) : 0, sheet: this.sheetFor(n.id) }));
       ents.push({ x: P.x, y: P.y, dir: P.dir, f: P.moving ? 1 + (Math.floor(P.anim * 8) % 2) : 0, sheet: P.sheet, me: 1 }); }
     ents.sort((a, b) => a.y - b.y);
-    for (const e of ents) { const fh = e.sheet.fh || 16, sx = Math.round(e.x - 8 - cx), sy = Math.round(e.y - fh + 1 - cy); g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(sx + 3, sy + fh - 2, 10, 2); g.fillRect(sx + 4, sy + fh - 3, 8, 4); const br = !e.f && !rm && ((t * 0.9 + e.x * 0.07) % 2.4) < 0.35 ? 1 : 0; g.drawImage(e.sheet, e.f * 16, e.dir * fh, 16, fh - br, sx, sy + br, 16, fh - br); }
+    for (const e of ents) { const fh = e.sheet.fh || 16, sx = Math.round(e.x - 8 - cx), sy = Math.round(e.y - fh + 1 - cy); g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(sx + 2, sy + fh - 2, 12, 2); g.fillRect(sx + 4, sy + fh - 3, 8, 4); g.fillRect(sx + 3, sy + fh, 10, 1); const br = !e.f && !rm && ((t * 0.9 + e.x * 0.07) % 2.4) < 0.35 ? 1 : 0; g.drawImage(e.sheet, e.f * 16, e.dir * fh, 16, fh - br, sx, sy + br - (e.f === 1 && !rm ? 1 : 0), 16, fh - br); }
     // overhead: laundry and chains hang above everyone
     for (const [x0, y0, x1, y1] of m.overhead || []) { const ax = x0 * 16 - cx, ay = y0 * 16 - cy, bx = x1 * 16 - cx, by = y1 * 16 - cy, sw = rm ? 0 : Math.sin(t * 1.4 + x0) * 1.5;
       g.strokeStyle = '#1a1214'; g.lineWidth = 1; g.beginPath(); g.moveTo(ax, ay); g.quadraticCurveTo((ax + bx) / 2, (ay + by) / 2 + 8, bx, by); g.stroke();
@@ -409,6 +410,8 @@ const World = {
       this.parts = this.parts.filter(p => p.y > cy - 6 && p.y < cy + H + 8 && (p.life === undefined || p.life > 0)).slice(-120); }
     if (G.mapId === 'tunnel') { const off = rm ? 0 : ((t * 12) | 0) % 6; g.fillStyle = 'rgba(255,240,180,.5)'; for (let i = off; i < 40; i += 6) g.fillRect(23 * 16 + 12 + (i * 7) % 10 - cx, 16 + 10 + i - cy, 1, 2); }
     Light.draw(g, m, cx, cy, t);
+    if (!this.vig || this.vig.width !== W || this.vig.height !== H) { const [vc, vg] = mk(W, H), gr = vg.createRadialGradient(W / 2, H / 2, H * .42, W / 2, H / 2, W * .68); gr.addColorStop(0, 'rgba(6,3,6,0)'); gr.addColorStop(1, 'rgba(6,3,6,.55)'); vg.fillStyle = gr; vg.fillRect(0, 0, W, H); this.vig = vc; }
+    g.drawImage(this.vig, 0, 0);
     if (G.heist) this.drawCones(g, cx, cy, t);
     if (this.flash > 0) { g.fillStyle = this.flashC; g.globalAlpha = Math.min(1, this.flash) * (Settings.d.reduce ? .25 : .7); g.fillRect(0, 0, W, H); g.globalAlpha = 1; this.flash -= 1 / 60; }
     if (phase() === 'evening' && G.mapId !== 'tunnel') { g.fillStyle = 'rgba(70,12,30,.16)'; g.fillRect(0, 0, W, H); }

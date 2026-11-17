@@ -95,7 +95,7 @@ const Cutscene = {
     }
     for (const a of this.actors) if (a.sheet.glow) {
       const x = Math.round(a.x - cx), y = Math.round(a.y - cy) - 10;
-      g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 0, x, y, 26); gr.addColorStop(0, 'rgba(255,230,160,.35)'); gr.addColorStop(1, 'rgba(255,230,160,0)'); g.fillStyle = gr; g.fillRect(x - 26, y - 26, 52, 52);
+      g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 0, x, y, 26); gr.addColorStop(0, 'rgba(255,230,160,.2)'); gr.addColorStop(1, 'rgba(255,230,160,0)'); g.fillStyle = gr; g.fillRect(x - 26, y - 26, 52, 52);
       g.globalCompositeOperation = 'source-over';
       const f = a.moving ? 1 + (Math.floor(a.anim * 5) % 2) : 0; const ah = a.sheet.fh; g.drawImage(a.sheet, f * 16, a.dir * ah, 16, ah, x - 8, Math.round(a.y - cy) - ah + 1, 16, ah);
     }

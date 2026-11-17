@@ -9,6 +9,13 @@
 - Old tunnel: brighter, with rails, an ore cart, a proper rockfall and more lamps.
 - Menus, dialogue box, objective and toasts are framed like engraved brass plates.
 - The Ember Ring is fought on the square's flagstones.
+- Second polish round (v0.8.1):
+  - Bay floors are now large deck plates with seams and corner rivets instead of a busy per-tile grid.
+  - More props redrawn: Bank Seven (gauges, wheels), Freight Three's shutter, the shift board, bed, table, floor hatch, vents, air canisters, the noodle awning and sign.
+  - The pipe puzzle has a brass frame, plated cells and shaded pipes.
+  - Camera eases after the player instead of snapping; a soft vignette darkens the screen edges; rounder shadows and a small step bob on walking characters.
+  - Fights show the punch: a fist on every strike, for Kael and for foes.
+  - Wardens have a visor; the glow on the Accredited is toned down so their detail survives the light beam.
 
 ## v0.7 · 2026-11-17 — "First Fire"
 - **Day 2 is playable**: the Festival of the First Fire, one year to the night after the wedding. Roughly 30–40 more minutes.
