@@ -1,223 +1,206 @@
 # THORNWATCH — Handoff
 
-*Written Nov 16, 2026 by lil Bottie (Will's Muse) at Will's request, so any
-future session updating this game starts from the real state: what's built,
-what Will has asked for, what's still open, and how the work is done here.
-Read this first, then the CHANGELOG, then the latest PLAYTEST report.*
+*Original handoff: lil Bottie, Nov 16, 2026. Cleaned up Nov 17, 2026 at Will's
+request: stale workdir paths moved to one place, duplicate process notes
+merged, the v4 direction added. No standing direction or open item was
+dropped. Read this first, then CHANGELOG.md, then the latest PLAYTEST report.*
 
 ---
 
 ## 1. What this is
 
-**Thornwatch** is a garden tower-defense game for the Pocket Lantern
-handheld, built by Bottie at Will's commission (Nov 15, 2026) as a NEW
-cartridge in the Sprouts universe — Bottie's own idea, Will-approved
-concept: by day you plant sprout towers in Erin's Garden; by night Old
-Thornback's bramble creeps march the dirt track toward the Garden Heart;
-Louie the dog is the lookout and narrator.
+**Thornwatch** is a garden tower-defense cartridge in the Sprouts universe.
+By day you plant sprout towers in Erin's Garden. By night Old Thornback's
+bramble creeps march the dirt track toward the Garden Heart. Louie the dog
+is the lookout and narrator.
 
-It lives in **cartridge slot 4** of a four-game file (Sprouts + Rootdeep +
-Sproutwild + Thornwatch). The other three games are NOT yours to change —
-Rootdeep is finished and handed off (do not resume it), Sproutwild is a
-separate ongoing project, Sprouts is the read-only reference original.
+It is **cartridge slot 4** of the four-game console file
+`Sprouts+Rootdeep+Sproutwild+Thornwatch.html`. The other cartridges are not
+changed from here:
+- **Rootdeep:** finished and handed off. Do not resume it.
+- **Sproutwild:** Pocket Lantern. A separate project with its own branch.
+- **Sprouts:** the read-only reference original.
 
-**The one file that matters:**
-`Sprouts+Rootdeep+Sproutwild+Thornwatch.html` — the whole console + all
-four cartridges in a single HTML file.
+## 2. Current state
 
-## 2. Where everything lives
+- **Build:** v3.7 (Nov 16, 2026). 4,837,466 bytes,
+  md5 `9b879390975751c7426542bee1b1e11f`.
+- **GitHub:** docs commit `c623acc`, game commit `9d216c9`.
+- **Will's phone verdict on v3.7:** PENDING.
+- **v3.7 regression tails (Rootdeep 6/6, Sproutwild 23/23):** UNVERIFIED.
+  Re-run them on the next update and log in `regressions-v37.log`.
+- **v4 direction:** set Nov 17 (section 3a). No v4 build exists yet.
+
+## 3. Where things live
 
 | Thing | Place |
 |---|---|
-| This handoff + game + docs (GitHub) | `muse/games/thornwatch/` on branch `claude/2d-fighter-game-characters-r9oir7` of `northcoaststudioswill-hub/Game` |
-| Deliverable copy (Will's files) | `~/workspace/your_files/thornwatch/` (game + CHANGELOG.md + 43 files incl. ~30 screenshots) |
-| Workdir | `~/workspace/thornwatch/` — `tw-module.js` (the cartridge source), `build.py`, `patch*.py`, test harnesses, `PLAYTEST-v*.md`, `RESEARCH-v*.md`, `backup-v*/` snapshots, `out/` build output |
-| Sync ledger | `~/workspace/muse-section-src.muse-github-snapshot-sync.json` (append a record after every confirmed push) |
-| Staging for pushes | `~/workspace/muse-section-src/muse/games/thornwatch/` |
+| Handoff, game, docs (GitHub) | `muse/games/thornwatch/` on `claude/2d-fighter-game-characters-r9oir7` |
+| Builder's source and tests | Bottie's workdir (`~/workspace/thornwatch/`): `tw-module.js`, `build.py`, patch scripts, test harnesses, `out/`, `backup-v*/`. Not in the repo. |
+| Deliverables with screenshots | Bottie's `~/workspace/your_files/thornwatch/`. Screenshots are binary and stay out of GitHub. |
+| Sync ledger | Bottie's `muse-section-src.muse-github-snapshot-sync.json`. Append a record after each confirmed push. |
 
-**Current build: v3.7** (Nov 16, 2026) — 4,837,466 bytes,
-md5 `9b879390975751c7426542bee1b1e11f`.
-GitHub sync: docs commit `c623acc267121ad8a4040ca68ac84c49ce9853b8`,
-game commit `9d216c92a14a79b5efb65395d9bc7ea893d24411`
-(9 records in the sync ledger; this handoff pushes separately).
+Push rules are in section 7.
 
-## 3. The game at v3.7
+## 3a. v4 direction (Will, Nov 17)
 
-- **Front door** (v3.4): living title screen → main menu (PLAY / NIGHTS /
-  UPGRADES / INTRO / HOW TO PLAY / FIELD GUIDE / SETTINGS / SWAP
-  CARTRIDGE) → 4-scene drawn intro cinematic (plays once on a fresh
-  save, START skips, replayable) → Louie-led guided first run.
-- **3 gardens, 26 nights:** Erin's Garden (10 nights, S-bend track, boss
-  OLD THORNBACK 780 HP) · The Long Beds (8 nights, 624px snake track,
-  boss THE BRAMBLE MAW 950) · The Crossroads (8 nights, two entrances
-  alternating, boss OLD THORNBACK PRIME 1,600, enrage + mite-shed).
-  Maps unlock in sequence.
-- **Towers:** the 6 canonical Sprouts types as tower classes (EMBER burns,
-  PEB heavy/armor-shred, DEW slow/camo-reveal, ZIP chain-zap, LEAF
-  economy, LUCKY crits) — each with a 2-variant LV2 fork and a GRAND LV3
-  upgrade (340–480 petals). LEAF's SUNFARM fork is the farm (pays petals
-  in visible bursts all night, no attack).
-- **Creeps:** standard, DART, BULWARK (armor), MOSS (camo), IRONBARK
-  (lead-class), REGROW, SPLITTER→MITES, BRAMBLE MAULER, BUBBLEBRAM
-  (shield bubble), BURROWER (underground 40% of track).
-- **Heroes:** 6 placeable keepers, one of each — WILL (MAZEL TOV LASER),
-  ERIN (TOWEL WHIP), MARCUS (HYDRO JET), RANGER (LANTERN FLARE), SCOUT
-  (FORAGER'S FIND), MAMA (YUKON) — cooldown abilities, trainable to Lv3
-  with petals. LOUIE: THE BOOF auto-stun once a night + all warning
-  barks. 4 placeholder keepers shown as silhouettes (KING BIBI, CORBIN,
-  LIL BOTTIE, DEREK — see §6, Derek is flagged).
-- **Systems:** pop-drip economy + bounties that fly to the counter;
-  POWERS on SELECT mid-round (SUNBURST / RAIN OF DEW / LOUIE'S HOWL);
-  stars per map×mode×night; HARD + ALT NIGHTS modes per map; Sun Drops
-  meta-currency → 8 permanent Lantern Upgrades; endless mode THE LONG
-  NIGHT (unlocks at Prime); standalone-night purse grants so map-select
-  starts are fair; save key `thornwatch-v1` (stars/drops/perks/endless
-  migrate honestly from every older shape).
-- **Controls canon:** D-pad cursor (grid-snapped), A = context action
-  (always labeled in the info bar), B = back/uproot/speed, START =
-  begin night/pause. **SELECT is demoted to rare actions only** (Will
-  finds it awkward on the Lantern) — powers live there by his current
-  design, nothing core may move to SELECT.
+Will's words, in short. Treat these as the brief for v4.0.
 
-## 4. What Will has asked for (his standing directions)
+- **Inspired by Bloons TD6**, and best-in-genre patterns for the Sprouts universe.
+- **The current game is too small.** It is close to a vertical slice. It is
+  not yet a game you'd play for minutes before wanting to change something.
+- **The art needs a full rework.** The current look is ugly.
+- **The feel needs work.** It isn't fun or addictive yet.
+- **Story and cut-scenes are missing.** There should be real cut-scenes with
+  our characters, and lore.
+- **Menus and text are weak.** They need a proper pass.
+- **Playability and replay are thin.** It needs more reasons to come back.
+- **Pocket Lantern Easter eggs**, plus nods to the other console games.
+- **Tower defense as a whole game, not a side game.** The v3 build plays like
+  a mini-game hidden inside Rootdeep. Thornwatch should stand alone in the same
+  universe, the way every other cartridge does.
+- **The whole game gets updated.** The research round comes first
+  (`RESEARCH-v4.0.md`), then the rebuild plan.
 
-These are Will's own verdicts and rules, accumulated over v1.0→v3.7.
-They outrank your taste. Most were learned the hard way — he had to
-name each missing layer himself; don't make him name them again.
+## 4. What v3.7 has (for reference)
 
-1. **Playtest like a stranger, every version.** Naive-player runs from a
-   fresh save with phone-realistic inputs; time the core loop; play the
-   defeat paths; check old saves load honestly. (Skill:
-   `~/workspace/custom-skills/game_build_playtest/SKILL.md`.)
-2. **Research the genre before building.** Bloons TD6 is the reference
-   (his friends love it; he has never played it) — Kingdom Rush and
-   Plants vs. Zombies patterns also mined. Map adoptions honestly;
-   name rejections. Rounds live in `RESEARCH-v*.md`.
-3. **Width before length.** "I don't think the scope is wide enough
-   before we make it longer" — new maps/systems/modes beat more nights
-   on the same board. 20-nights-on-one-map was planned and cancelled
-   by Will mid-build; don't resurrect it.
-4. **Money must never become useless.** If a winning run ends rich,
-   that's a design bug: the game needs sinks with real tension (farm,
-   Grands, powers, training are the current answer; sims must prove
-   end-of-run petal counts, not assert them).
-5. **No circle around the aimer.** (v3.4 verdict.) The cursor is a clean
-   square; a tower's range shows only while inspecting that tower,
-   as a thin dashed ring.
-6. **Text must be readable, always.** A contrast audit (v3.4/v3.5) and
-   a size-fit audit (v3.6) are standing checks: no dark text on dark
-   ground, no string wider than the 240px screen, every screen
-   re-captured and eyeballed at phone size.
-7. **A proper front door.** Title, menu, explainer, settings — a game
-   that boots straight into gameplay reads as a minigame to him.
-8. **It must not feel like a minigame.** His words: fleshed out, wide
-   scope, systems that accumulate (stars, drops, perks, modes).
-9. **Screenshots every build, CHANGELOG every version.** Capture, look
-   at them yourself at full size and at 360px, file them with the
-   deliverable. The changelog is a standalone file, kept current.
-10. **Never call it fixed until Will confirms on his phone.** All
-    verification here is headless-rig. Say "delivered, awaiting your
-    verdict" — his iPhone 16 Pro Max is the only real test.
-11. **Louie lines ≤43 chars**, field-guide counters are the game's own
-    teaching voice; defeat screens must teach (name the biggest leaker
-    + its counter).
-12. **Canon is canon.** Fighting-game move names (MAZEL TOV LASER,
-    TOWEL WHIP, HYDRO JET, THE BOOF, YUKON…) come from Will's fighting
-    game and the repo's Knockout canon — never rename, never invent
-    moves; ask Will. Sprout types/order/colors are Sprouts canon.
-    Art is PORTED from Sprouts/Rootdeep sprite data, not invented,
-    wherever a family asset exists.
+- **Front door (v3.4):** living title, main menu (PLAY / NIGHTS / UPGRADES /
+  INTRO / HOW TO PLAY / FIELD GUIDE / SETTINGS / SWAP CARTRIDGE), a 4-scene
+  intro cinematic (plays once, START skips), and a Louie-led first run.
+- **3 gardens, 26 nights:**
+  - Erin's Garden: 10 nights, S-bend track, boss OLD THORNBACK 780 HP.
+  - The Long Beds: 8 nights, 624px snake track, boss THE BRAMBLE MAW 950.
+  - The Crossroads: 8 nights, two entrances alternating, boss OLD THORNBACK
+    PRIME 1,600 HP, enrage and mite-shed.
+  - Maps unlock in sequence.
+- **Towers:** the 6 Sprouts types (EMBER burns, PEB heavy/armour-shred, DEW
+  slow and camo-reveal, ZIP chain-zap, LEAF economy, LUCKY crits). Each has a
+  2-variant LV2 fork and a GRAND LV3 upgrade (340 to 480 petals). LEAF's
+  SUNFARM fork pays petals all night and does not attack.
+- **Creeps:** standard, DART, BULWARK (armour), MOSS (camo), IRONBARK
+  (lead-class), REGROW, SPLITTER (splits into MITES), BRAMBLE MAULER, BUBBLEBRAM
+  (shield bubble), BURROWER (underground for 40% of the track).
+- **Heroes:** 6 placeable keepers, one of each: WILL (MAZEL TOV LASER), ERIN
+  (TOWEL WHIP), MARCUS (HYDRO JET), RANGER (LANTERN FLARE), SCOUT (FORAGER'S
+  FIND), MAMA (YUKON). Each has a cooldown ability and trains to Lv3 with
+  petals. LOUIE: THE BOOF auto-stuns once a night and gives all warning barks.
+  Four placeholder keepers appear as silhouettes: KING BIBI, CORBIN, LIL BOTTIE,
+  DEREK (see section 6).
+- **Systems:** pop-drip economy and bounties that fly to the counter. POWERS on
+  SELECT mid-round: SUNBURST, RAIN OF DEW, LOUIE'S HOWL. Stars per map, mode and
+  night. HARD and ALT NIGHTS modes per map. Sun Drops meta-currency buys 8
+  permanent Lantern Upgrades. Endless mode, THE LONG NIGHT, unlocks at Prime.
+  Save key `thornwatch-v1`. Older save shapes migrate honestly.
+- **Controls:** D-pad moves a grid-snapped cursor. A is the context action,
+  labelled in the info bar. B is back, uproot or speed. START begins a night or
+  pauses. **SELECT is for rare actions only.** Will finds it awkward on the
+  Lantern, so nothing core may move there.
 
-## 5. How updates are done here (process)
+## 5. Will's standing directions
 
-- **Delivery-first:** build → Thornwatch suites + soak green → copy
-  deliverable + screenshots + CHANGELOG into
-  `~/workspace/your_files/thornwatch/` → THEN the muse/ sync → THEN the
-  Rootdeep 6/6 + Sproutwild 23/23 regression tails. Never let the
-  tails hold the deliverable hostage (a v3.1 delivery once stalled
-  ~100 min that way).
-- **Patch discipline:** exact-string replacements with count asserts,
-  atomic (a failed assert writes nothing); grep the live module before
-  patching (anchors drift); `node --check` the extracted module;
-  **zero duplicate function names file-wide** after every build
-  (duplicate declarations across cartridges silently override — this
-  has bitten before); every identifier in this cartridge is
-  `TW`/`tw`-prefixed, states are `g5`-prefixed.
-- **Balance changes need sim evidence** (before/after numbers in the
-  PLAYTEST report); judgment calls get flagged for Will, not silently
-  decided.
-- **Saves:** any new field ships with an honest migration for every
-  prior shape (v3.2→v3.7 shapes are the test set). Never gift unearned
-  progress in a migration.
+These are Will's verdicts. They outrank taste. Most were learned the hard way.
+Don't make him name a missing layer again.
 
-## 6. Open items — read before building
+1. **Playtest like a stranger, every version.** Fresh save, phone-realistic
+   inputs, time the core loop, play the defeat paths, check old saves load.
+2. **Research the genre before building.** Bloons TD6 is the reference. Kingdom
+   Rush and Plants vs. Zombies are also mined. Name adoptions and rejections
+   honestly. Rounds live in `RESEARCH-v*.md`.
+3. **Width before length.** New maps, systems and modes beat more nights on the
+   same board. A 20-nights-on-one-map plan was cancelled mid-build. Don't bring
+   it back.
+4. **Money must never become useless.** A winning run that ends rich is a design
+   bug. Sinks need real tension. Sims must prove end-of-run petal counts.
+5. **No circle around the aimer.** The cursor is a clean square. Range shows
+   only while inspecting a tower, as a thin dashed ring.
+6. **Text must be readable.** Contrast and size-fit audits are standing checks.
+   No dark text on dark ground, no string wider than 240px, and every screen is
+   checked at phone size.
+7. **A proper front door.** A game that boots straight into gameplay reads as a
+   mini-game to him.
+8. **It must not feel like a mini-game.** Fleshed out, wide scope, systems that
+   build on each other (stars, drops, perks, modes).
+9. **Screenshots every build, a CHANGELOG entry every version.** Look at the
+   screenshots at full size and at 360px.
+10. **Never call it fixed until Will confirms on his phone.** All checks so far
+    are headless. Say "delivered, awaiting your verdict." His iPhone 16 Pro Max
+    is the only real test.
+11. **Louie lines are 43 characters or fewer.** Field-guide counters are the
+    game's teaching voice. Defeat screens must teach: name the biggest leaker and
+    its counter.
+12. **Canon is canon.** Fighting-game move names (MAZEL TOV LASER, TOWEL WHIP,
+    HYDRO JET, THE BOOF, YUKON) come from Will's fighting game and the Knockout
+    canon. Never rename them or invent new ones. Ask Will. Sprout types, order
+    and colours are Sprouts canon. Art is ported from Sprouts or Rootdeep sprite
+    data, not invented, wherever a family asset exists.
 
-- **Will's phone verdict on v3.7 is pending** (and on v3.5/v3.6 as
-  distinct builds — v3.7 supersedes them; his next play is the gate).
-- **DEREK placeholder keeper: Will's veto still pending.** Derek was
-  absorbed in v3.4 from Will's own Knockout notes ("Marcus's guy. He
-  pulls up.") and flagged in every report since. Do not promote him to
-  a full hero, do not remove him — it's Will's call, still unanswered.
-  (FENTANYAHU was deliberately NOT absorbed: Will hasn't settled his
-  look.)
-- **v3.7 regression tails are UNVERIFIED.** The builder went quiet
-  after delivering v3.7; its Rootdeep/Sproutwild tail runs were
-  sigtermed mid-run when it was closed. Thornwatch's own suites were
-  green (PLAYTEST-v3.7.md). Re-running the tails on the v3.7 file is
-  OWED — do it on the next update round and log it in
-  `regressions-v37.log`.
-- **Known feel leftovers (v3.7):** watch-only stretches up to ~15s on
-  late nights for entrance-campers (a mid-path event system would be
-  a feature, not a fix — needs Will's appetite); heroes/powers/train/
-  farm discovery still leans on guide step 7 + Louie tips; LOUIE'S
-  HOWL is deliberately the weakest power (panic button); the
-  Crossroads gate-glow tell is small (13×18) — enlarging is Will's
-  call; Hard seed 99 beats the standard script line but loses to a
-  line that obeys Louie's warnings (judged fair-hard).
-- **Old flags, still Will's to settle:** Thornback at 780 HP (retuned
-  from 900 in v3.0 for the longer track) — never re-confirmed;
-  SUNLEAF's old Heart-mend was removed in v3.5 when SUNFARM arrived
-  (logged, not announced as a question).
-- **MESSAGE-TO-CLAUDE.md** (repo root of muse/) does not list
-  Thornwatch — it's a shared file authored across sessions; per the
-  hands-off rule it stays untouched unless Will says otherwise.
+## 6. Open items: Will's call
 
-## 7. GitHub rules for this repo (Will's, amended Nov 16, 2026)
+- **Will's phone verdict on v3.7** (and on v3.5 and v3.6 as separate builds).
+  v3.7 supersedes them. His next play is the gate.
+- **DEREK placeholder keeper: Will's veto is pending.** Derek was taken in at
+  v3.4 from Will's own Knockout notes ("Marcus's guy. He pulls up."). Do not
+  promote him to a full hero. Do not remove him. This is Will's call.
+  FENTANYAHU was deliberately not taken in, since Will hasn't settled his look.
+- **v3.7 regression tails are still owed** (section 2).
+- **Feel leftovers:** watch-only stretches up to about 15 seconds on late nights
+  for entrance-campers. A mid-path event would be a feature, not a fix, and needs
+  Will's appetite. Heroes, powers, training and farm discovery lean on guide
+  step 7 and Louie's tips. LOUIE'S HOWL is deliberately the weakest power, a
+  panic button. The Crossroads gate-glow tell is 13x18px; enlarging it is Will's
+  call. Hard seed 99 beats the standard script line but loses to one that obeys
+  Louie's warnings. That was judged fair-hard.
+- **Old flags, still Will's to settle:** Thornback at 780 HP (cut from 900 in
+  v3.0 for the longer track, never re-confirmed). SUNLEAF's old Heart-mend was
+  removed in v3.5 when SUNFARM arrived. That was logged, not put to Will.
+- **MESSAGE-TO-CLAUDE.md** (muse/ root) does not list Thornwatch. It's a shared
+  file, so it stays hands-off unless Will says otherwise.
 
-- The `muse/` section is Bottie's home: Thornwatch's work product
-  (game file, CHANGELOG, RESEARCH/PLAYTEST reports, this handoff —
-  text only) syncs there as builds land, without asking each time.
-- **Additive-only: never overwrite anything authored by the other
-  Claude sessions, anywhere in the repo, muse/ included.** Updating
-  Thornwatch's own files is the work. Shared files are hands-off.
-- Everything outside `muse/` is ask-first / read-only. Reading the
-  other sessions' material for context is explicitly fine.
-- Push mechanics: use `github push-files` with `--source-dir
-  ~/workspace/muse-section-src` and a NUL-delimited `--paths-file`
-  manifest (paths relative to the repo root). Never pass file contents
-  via `--arguments-json` (argv limit ~4.8 MB). The git-data API
-  intermittently 500s at the ref-update on big pushes — verify the
-  branch head, then retry the identical push. Append a record to the
-  sync ledger after each CONFIRMED push (format: see the v3.7 entry).
-  The connector pushes TEXT only — no binaries (screenshots stay in
-  Will's files).
+## 7. How updates are done
 
-## 8. Docs index (all in this folder on GitHub, full set in the workdir)
+- **Delivery first.** Build, then the Thornwatch suites and soak must be green.
+  Copy the deliverable, screenshots and CHANGELOG to Will's files. Then sync to
+  `muse/`. Then run the Rootdeep and Sproutwild regression tails. Never let the
+  tails hold up a delivery (a v3.1 delivery once stalled about 100 minutes that
+  way).
+- **Patch discipline.** Exact-string replacements with count asserts, all or
+  nothing. Grep the live source before patching, since anchors drift. Run
+  `node --check` on the extracted module. After every build, check for zero
+  duplicate function names across the file. Duplicates silently override each
+  other across cartridges, and this has bitten before. Every identifier is
+  `TW`/`tw`-prefixed. States are `g5`-prefixed.
+- **Balance changes need sim evidence,** with before-and-after numbers in the
+  PLAYTEST report. Judgment calls are flagged for Will, not decided silently.
+- **Saves.** Any new field needs an honest migration from every older shape
+  (v3.2 to v3.7 is the test set). Never grant unearned progress in a migration.
 
-- `CHANGELOG.md` — every version, v1.0→v3.7, with the why.
-- `PLAYTEST-v3.4.md` … `PLAYTEST-v3.7.md` — per-round playtest records
-  (earlier rounds v2–v3.3 live in the workdir only).
-- `RESEARCH-v3.4.md`, `RESEARCH-v3.5.md`, `RESEARCH-v3.7.md` — genre
-  research (front-end patterns; BTD6 width/economy; noob fun/juice).
-- `HANDOFF.md` — this file. Update it when the state changes
-  materially; it is the first thing the next builder reads.
+## 8. GitHub rules (Will's, amended Nov 16, 2026)
 
-## 9. Version arc in one breath
+- **The `muse/` section is Bottie's home.** Thornwatch's own work (game file,
+  CHANGELOG, research and playtest reports, this handoff, text only) syncs there
+  as builds land.
+- **Additive only.** Never overwrite anything authored by another Claude
+  session, anywhere in the repo, `muse/` included. Updating Thornwatch's own
+  files is the work. Shared files are hands-off.
+- **Everything outside `muse/` is ask-first or read-only.** Reading other
+  sessions' material for context is fine.
+- **Push mechanics:** `github push-files` with a NUL-delimited paths manifest,
+  text only. Never pass file contents as arguments. The git-data API sometimes
+  returns 500 at the ref update on big pushes. Verify the branch head, then retry
+  the identical push. Log each confirmed push in the sync ledger.
+- **Pushes wait for Will's "push."** Nothing goes up on an automatic reminder.
 
-v1.0 lanes-and-grid TD → v2.0 heroes + forks + counters → v3.0 Bloons
-rebuild (one track, build anytime, fast-forward) → v3.1 real sprites →
-v3.2 ported family art → v3.3 controls + guided onboarding → v3.4 the
-front door (title/menu/cinematic/settings) → v3.5 width (3 gardens,
-economy sinks, modes, meta) → v3.6 playtest fixes (standalone starts,
-fit audit, Yukon path bug) → v3.7 the noob round (juice, reward
-cadence, teaching defeats, mash protection). Full detail: CHANGELOG.
+## 9. Docs index and version arc
+
+- `CHANGELOG.md`: every version, v1.0 to v3.7, with the reasons.
+- `PLAYTEST-v3.4.md` to `PLAYTEST-v3.7.md`: per-round playtest records.
+- `RESEARCH-v3.4.md`, `RESEARCH-v3.5.md`, `RESEARCH-v3.7.md`: genre research
+  (front-end patterns, BTD6 width and economy, early-game fun and juice).
+- `RESEARCH-v4.0.md`: the v4 research round (see the same folder).
+- **Version arc in one breath:** v1.0 lanes-and-grid TD. v2.0 heroes, forks and
+  counters. v3.0 Bloons rebuild (one track, build anytime, fast-forward). v3.1
+  real sprites. v3.2 ported family art. v3.3 controls and guided onboarding. v3.4
+  the front door (title, menu, cinematic, settings). v3.5 width (3 gardens,
+  economy sinks, modes, meta). v3.6 playtest fixes (standalone starts, fit audit,
+  the Yukon path bug). v3.7 the noob round (juice, reward cadence, teaching
+  defeats, mash protection). Full detail is in CHANGELOG.md.
