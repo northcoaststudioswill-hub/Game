@@ -376,7 +376,7 @@ function fNear(F){const px=P3.x+F.dir[0]*11,py=P3.y+F.dir[1]*11,in2=(o,r2)=>Math
  for(const np of F.npcs)if(in2(np,18))return{k:'npc',np,txt:np.team&&!SW.fl[np.fk]?'BATTLE '+np.who:'TALK'};
  for(const al of F.alphas)if(in2(al,22))return{k:'alpha',al,txt:'CHALLENGE ALPHA '+al.sp};
  for(const wd of W4.wilds)if(SW.quest>=3&&in2(wd)&&!wd.cap&&!pfCan(F,wd))return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv+(F.sq.length?' · too strong to catch':'')};
- if(F.gym&&in2(F.gym,18))return{k:'gym',txt:'GYM'};
+ if(F.gym&&in2(F.gym,18))return{k:'gym',txt:W4.sector==='PEAK'?'TOWER':'LODGE'};
  for(const dr of F.doors)if(in2(dr,14))return{k:'door',txt:'KNOCK'};
  if(in2(F.start,18))return{k:'sign',txt:'LANTERN POST · REST, TRAVEL'};
  for(const nd of W4.nodes)if(!nd.got&&nd.k!=='bush'&&in2(nd)&&!pfBest(F,nd)&&!(F.pf||[]).some(b=>b.tg===nd))return{k:'node',nd,txt:'CHOP BY HAND'.replace('CHOP',nd.k==='rock'?'MINE':'CHOP')};
@@ -425,7 +425,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
    if(!(SW.gear&&SW.gear.rope)&&!(W4.msgT>0)){swSay('A ledge. With a CLIMBING ROPE from the bench you could get up here.',2.6)}}
   if(my>0&&fTile(F,Math.floor(P3.x/FT),Math.floor((P3.y+7)/FT))==='-'){const ty=Math.floor((P3.y+7)/FT)+1;
    if(fWalkTile(F,Math.floor(P3.x/FT),ty)){F.hop={t:0,sy:P3.y,ty:ty*FT+8};swSnd(440,.06,660);return}}
-  const exAt=(x,y)=>{const e=F.exits.find(e2=>e2.tx===Math.floor(x/FT)&&e2.ty===Math.floor(y/FT));if(e&&(e.to==='HOLLOW'||e.to==='SQUIRE')&&SW.badges.length<1){if(!(W4.msgT>0))swSay("RANGER'S BARRIER: closed until you win the VERDANT SIGIL from the Ranger in Lantern Town (the north road).",3.4);return true}return!!(F.arrive&&e)}; /* just arrived: the way back is shut until you let go once */
+  const exAt=(x,y)=>{const e=F.exits.find(e2=>e2.tx===Math.floor(x/FT)&&e2.ty===Math.floor(y/FT));if(e&&(e.to==='HOLLOW'||e.to==='SQUIRE')&&SW.badges.length<1){if(!(W4.msgT>0))swSay("RANGER'S BARRIER: closed until you bring the light to the Meadow's ALPHA (behind the boulder wall) and win its Sigil.",3.4);return true}return!!(F.arrive&&e)}; /* just arrived: the way back is shut until you let go once */
   if(!fBox(F,nx,P3.y)&&!exAt(nx,P3.y))P3.x=nx;if(!fBox(F,P3.x,ny)&&!exAt(P3.x,ny))P3.y=ny}
  /* leaving by the edge of the map */
  /* an exit only fires once you have stepped away from where you came in: holding the stick across a border must not bounce you back */
@@ -452,13 +452,12 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
   else if(n.k==='wild'){const wd=n.wd;W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv))}
   else if(n.k==='alpha'){const al=n.al;if(!SW.party.some(m=>m.hp>0)){swSay('No buddy fit to battle.',1.6);return}
    wEngage('ALPHA '+al.sp+'!',()=>{wStartWildAt(al.sp,al.lv);BT.log.unshift({txt:'The ALPHA '+al.sp+' rears up — it is huge!'});
-    BT.onEnd=(won,bt)=>{if(bt.foe.hp<=0||bt.orbOk){SW.fl[al.fk]=1;const i=F.alphas.indexOf(al);if(i>=0)F.alphas.splice(i,1);swSay('The alpha is gone. Its treasure is unguarded!',3);swSave()}}})}
+    BT.onEnd=(won,bt)=>{if(bt.foe.hp<=0||bt.orbOk){SW.fl[al.fk]=1;const i=F.alphas.indexOf(al);if(i>=0)F.alphas.splice(i,1);swSay('The alpha has the light again. Its treasure is unguarded!',3);alphaSigil(al.sp);swSave()}}})}
   else if(n.k==='npc'){const np=n.np;
    if(np.ask)wOpenAsk(np.who);
    else if(np.team&&!SW.fl[np.fk])fChallenge(F,np);
    else fTalk(F,np.who,[np.after||'...'])}
-  else if(n.k==='gym'){if(SW.quest<5)swSay(WGYMS[sec.gym].leader+': "Easy, keeper. Set up camp and catch a buddy first — then we battle."',3.4);
-   else{W4.gymIx=wGymIx(sec);W4.gymPage=0;swSel=0;state='g4gym'}}
+  else if(n.k==='gym'){gymTalk(sec)} /* v9.1: lodges talk; only Bottie's tower is a battle */
   else if(n.k==='louie')wLouTalk();
   else if(n.k==='door')swSay(['Nobody home. A sprout waves from the window.','Locked. It smells like berry pie in there.','A note: GONE TO THE GYM. BACK NEVER.'][(F.t0*7|0)%3],2.2);
   else if(n.k==='sign'){const hurt=SW.party.some(m=>m.hp<wStats(m).max);for(const m of SW.party)m.hp=wStats(m).max;if(hurt){swSnd(880,.1,1175);for(let i=0;i<10;i++)W4.floats.push({x:P3.x+(Math.random()*30-15),y:P3.y-10-Math.random()*20,txt:'+',t:.8+Math.random()*.5,c:'#7ee787'});swSay('The Lantern light mends your buddies. Press A again to travel.',3);swSave();return} /* v8.8: a rest is its own moment; the map opens on the next press */W4.mapRO=0;swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}
@@ -575,7 +574,7 @@ function fHouse(x,y,gymSec){ /* x,y = door centre */
   r('#7a2e22',gx+12,gy-4,40,6);r('#8a3a2a',gx+4,gy+2,56,6);r('#9a4634',gx-4,gy+8,72,5);r('#5a241c',gx-4,gy+13,72,2);
   r(gc,gx+12,gy+16,4,16);r(gc,gx+48,gy+16,4,16);r('#ffffff',gx+12,gy+18,4,2);r('#ffffff',gx+48,gy+18,4,2);
   r('#ffd23f',gx+24,gy+22,16,20);r('#3a2a1c',gx+26,gy+24,12,18);r('#ffd94d',gx+35,gy+33,2,2);
-  const lab=gl.leader+"'S GYM",lw=tw(lab,1)+8;r('#14101e',x-lw/2-1,gy+1,lw+2,12);r('#f8f4e0',x-lw/2,gy+2,lw,10);text(lab,x-lw/2+4,gy+3,1,'#7a2e22',null);return}
+  const lab=W4.sector==='PEAK'?"BOTTIE'S TOWER":gl.leader+"'S LODGE",lw=tw(lab,1)+8;r('#14101e',x-lw/2-1,gy+1,lw+2,12);r('#f8f4e0',x-lw/2,gy+2,lw,10);text(lab,x-lw/2+4,gy+3,1,'#7a2e22',null);return}
  const hx=x-24,hy=y-38;r('rgba(0,0,0,.22)',hx-2,hy+35,52,5);r('#14101e',hx-3,hy-3,54,40);
  r('#e8dcc0',hx,hy+12,48,24);r('#d0c0a0',hx,hy+31,48,5);
  r('#4a6ab0',hx+6,hy-2,36,6);r('#5a7ac0',hx+2,hy+3,44,5);r('#6a8ad0',hx-2,hy+8,52,5);r('#34508c',hx-2,hy+12,52,2);

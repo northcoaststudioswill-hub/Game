@@ -84,8 +84,8 @@ function bwTick(dt){if(SCOFF||W4.sector!=='BASE'||SW.quest!==2||!SW.lessons.scSe
  if(st===0){W4.bwT=(W4.bwT||0)+dt;if(W4.bwT<1.2)return;W4.bwHold=1;scStart([{who:'ERIN',txt:"Ready for the wilds? I'll walk you to the Meadow. Stay close!"}],()=>{SW.bwalk=1;swSave()});return}
  const go=(x,y,v)=>{const dx=x-c.x,dy=y-c.y,d=Math.hypot(dx,dy);c.mv=d>2;if(d>2){const s=Math.min(d*5,v);c.x+=dx/d*s*dt;c.y+=dy/d*s*dt;c.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}c.tx=c.x;c.ty=c.y;c.t=5;return d};
  if(st===1){const behind=Math.hypot(P3.x-240,P3.y-gy)>Math.hypot(c.x-240,c.y-gy)+20;if(dp>80&&behind){c.mv=false;c.tx=c.x;c.ty=c.y;c.t=5;c.dir=[P3.x>c.x?1:-1,0];return} /* waits only when you fall behind */
-  if(go(240,gy,dp<40?80:62)<4&&dp<70){scStart([{who:'ERIN',txt:'The south road. The Meadow is just through here. Walk on down, I will meet you on the other side!'}],()=>{SW.bwalk=2;swSave()})}return}
- if(st===2){go(240,gy+40,50);c.tx=c.x;c.ty=c.y}}
+  if(ewGo(W4.bf,c,240,gy,dp<40?80:62,go)<4&&dp<70){scStart([{who:'ERIN',txt:'The south road. The Meadow is just through here. Walk on down, I will meet you on the other side!'}],()=>{SW.bwalk=2;swSave()})}return}
+ if(st===2){ewGo(W4.bf,c,240,gy+40,50,go);c.tx=c.x;c.ty=c.y}}
 /* ---- 4b. the Meadow walk, with your first catch first ---- */
 function scMeadow(F){SW.lessons.scMeadow=1} /* Erin covers the Meadow now; Louie keeps quiet */
 function ewTame(F){let wd=W4.wilds.find(w=>w.tame);if(wd)return wd;const sec=wSector(F.id),gr=F.grass.slice().sort((a,b)=>Math.hypot(a[0]*FT-F.start.x,a[1]*FT-F.start.y)-Math.hypot(b[0]*FT-F.start.x,b[1]*FT-F.start.y))[3]||F.grass[0];

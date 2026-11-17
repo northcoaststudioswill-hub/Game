@@ -30,7 +30,7 @@ function ewTame(F){let wd=W4.wilds.find(w=>w.tame);if(wd)return wd;const sec=wSe
 /* ---- Erin walks around water and walls (v8.6): a tile path, recomputed every second ---- */
 function ewBFS(F,s,g){const W=F.w,H=F.h,prev=new Int32Array(W*H).fill(-2),q=[s[1]*W+s[0]];if(s[0]<0||s[1]<0||s[0]>=W||s[1]>=H)return null;prev[q[0]]=-1;
  for(let qi=0;qi<q.length;qi++){const c=q[qi],x=c%W,y=(c/W)|0;if(x===g[0]&&y===g[1]){const path=[];let k=c;while(prev[k]!==-1){path.unshift([(k%W)*FT+8,((k/W)|0)*FT+10]);k=prev[k]}return path}
-  for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+a,ny=y+b;if(nx<0||ny<0||nx>=W||ny>=H)continue;const n=ny*W+nx;if(prev[n]!==-2||!fWalkTile(F,nx,ny))continue;prev[n]=c;q.push(n)}}
+  for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+a,ny=y+b;if(nx<0||ny<0||nx>=W||ny>=H)continue;const n=ny*W+nx;if(prev[n]!==-2||!fWalkTile(F,nx,ny)||(F.base&&nx*FT+8>=150&&nx*FT+8<=330&&ny*FT+10>=318&&ny*FT+10<=400))continue; /* at Sunkeep she walks round the garden, not over the plots */prev[n]=c;q.push(n)}}
  return null}
 function ewGo(F,E,tx,ty,v,go){const key=Math.round(tx/8)+','+Math.round(ty/8);
  if(E.pk!==key||!E.path||(E.pt=(E.pt||0)+1)>60){E.pk=key;E.pt=0;E.path=ewBFS(F,[Math.floor(E.x/FT),Math.floor(E.y/FT)],[Math.floor(tx/FT),Math.floor(ty/FT)])}

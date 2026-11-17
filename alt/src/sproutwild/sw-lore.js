@@ -13,21 +13,21 @@
    - After Bottie shows up, Erin and Marcus say who he is.
    ================================================================ */
 WSTORY.length=0;WSTORY.push(
- {sc:0,who:'',t:'The Great Lantern lit the valley of Sproutwild, and every buddy in it lived in good order.'},
+ {sc:0,who:'',t:'Three thousand years ago, the valley of Sproutwild was promised to sprouts and buddies, under the Great Lantern.'},
  {sc:0,who:'',t:'Then BOTTIE nuked the DATA CENTER. The whole simulation glitched, and the Great Lantern cracked.'},
  {sc:5,who:'BOTTIE',t:'bzzt. CLANK. Oops. Anyway, the feed is mine now, gang.',acc:'#2a5a6a'},
  {sc:5,who:'KING BIBI',t:'Citizens! The light is out. Stay calm. I am raising the IRON DOME. Temporarily.',acc:'#1e2c5a'},
  {sc:1,who:'',t:"In the dark the valley's buddies went wild. They roam the tall grass and answer to nobody."},
  {sc:3,who:'',t:'But the light fell as seeds, and the seeds grew legs: SPROUTS. Throw one at a wild buddy and it remembers.'},
- {sc:2,who:'ERIN',t:'Sunkeep still grows sprouts, keeper. Light the Lantern, calm the buddies, bring the order back.'},
- {sc:4,who:'MARCUS',t:"Four gyms, four Sigils, bro. Win them, the kingdom's back in order, and Bibi drops the dome. I supervise."});
+ {sc:2,who:'ERIN',t:'Sunkeep still grows sprouts, keeper. Cleanse the dark from the buddies. Show them the light.'},
+ {sc:4,who:'MARCUS',t:'Four alphas hold four Sigils, bro. Light them all, Bibi drops the dome, and we face Bottie. I supervise.'});
 /* first visit to Lantern Town: the Elder explains what the domes did */
 function loreTown(){const F=W4.fld;if(!F||F.id!=='TOWN'||SW.lessons.scTown||W4.scene||state!=='g4world'||(W4.banner&&W4.banner.t>0))return;
  SW.lessons.scTown=1;scStart([
   {who:'ELDER',txt:'Welcome to Lantern Town, keeper. We were the brightest street in the valley once.'},
   {who:'ELDER',txt:'When the light went out, the King raised his IRON DOME and shut the roads. The buddies went wild.'},
-  {who:'ELDER',txt:"The Ranger kept our one road open, the one you walked in on. Win her Sigil and she'll open more."},
-  {who:'ELDER',txt:"Four Sigils and the King will believe it's safe again. Bring the order back, keeper."}],()=>swSave())}
+  {who:'ELDER',txt:'Every place out there has an ALPHA, the biggest, darkest buddy around. Bring one the light and it gives up a Sigil.'},
+  {who:'ELDER',txt:"Four Sigils and the King will believe it's safe again. The valley was promised to you, keeper. Take it back."}],()=>swSave())}
 /* after Bottie's visit: Erin and Marcus on who he is */
 function loreBibi(){if(W4.fld||W4.sector!=='BASE'||!SW.bottieSeen||SW.lessons.scBibi||W4.scene||state!=='g4world')return;
  W4.bibiT=(W4.bibiT||0)+1;if(W4.bibiT<90)return;SW.lessons.scBibi=1;scStart([

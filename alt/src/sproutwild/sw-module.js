@@ -639,8 +639,7 @@ function worldUpdate(dt){if(W4.scene){scTick(dt);return}scAuto();if(W4.fld){fUpd
   else if(n.k==='node')wNodeAct(n.nd);
   else if(n.k==='sign'){if(W4.sector==='BASE'&&SW.quest===2&&!SW.gateSeen){SW.gateSeen=1;W4.gatePage=0;state='g4gate';swSave()}
    else{swSel=Math.max(0,WSECTORS.findIndex(s=>s.id===W4.sector));state='g4map'}}
-  else if(n.k==='gym'){if(SW.quest<5)swSay(WGYMS[sec.gym].leader+': "Easy, keeper. Set up camp and catch a buddy first — then we battle."',3.4);
-   else{W4.gymIx=wGymIx(sec);W4.gymPage=0;swSel=0;state='g4gym'}}
+  else if(n.k==='gym'){gymTalk(sec)}
   else if(n.k==='choice'){W4.choiceSp=n.sp;state='g4choice'}
   else if(n.k==='wild'){const wd=n.wd;W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=18;
    wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv))}
@@ -1186,7 +1185,7 @@ function wResolveTurn(myMove){const me=btCur(),foe=BT.foe;
    if(me.hp<=0){wMineDown();break}}}
  if(BT.log.length===0)BT.log.push({txt:'...'});
  if(!BT.after)BT.after='menu';BT.phase='msg'}
-function wFoeDown(){const me=btCur(),foe=BT.foe;BT.log.push({txt:foe.sp+' fainted!'});
+function wFoeDown(){const me=btCur(),foe=BT.foe;BT.log.push({txt:BT.mode==='wild'?'The dark breaks! '+foe.sp+' settles down, calm.':foe.sp+' fainted!'}); /* v9.1: we cleanse, we do not knock out */
  if(BT.mode==='wild'){const dk=[0,1].includes(wSp(foe.sp).t[0])?'ore':'fiber';SW.res[dk]=(SW.res[dk]||0)+1;
   BT.log.push({txt:'It dropped '+dk.toUpperCase()+'. (+1)'})}
  const gain=Math.round((5+foe.lv*3)*(BT.mode==='gym'||BT.mode==='raid'||BT.mode==='trainer'?1.5:1));
@@ -1311,7 +1310,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.phase===
      if(SW.party.length<3)SW.party.push(foe);else SW.box.push(foe);
      BT.log=[{txt:'The '+TYPES[BT.tossIx||0].n+' sprouts bloom on '+foe.sp+'. It remembers the Lantern light!'},{txt:SW.party.includes(foe)?foe.sp+' joined your buddies.':foe.sp+' now works for you — sent to your base box.'}];
      BT.after='endwin';BT.phase='msg';BT.t=0}
-    else{BT.dz=BT.dz||{};BT.dz[BT.tossIx||0]=1;BT.log=[{txt:BT.foe.sp+' shook the sprouts off! They sit out the rest of this fight.'}];BT.phase='msg';BT.t=0;
+    else{BT.dz=BT.dz||{};BT.dz[BT.tossIx||0]=1;BT.log=[{txt:BT.foe.sp+' shook the sprouts off! They sit out the rest of this fight.'}];{const lb=wLightBurn(BT.tossN||1);if(lb)BT.log.push({txt:'Their light burned away some of the dark. (-'+lb+')'})} /* v9.1 */BT.phase='msg';BT.t=0;
      const lines=wDoMove(BT.foe,btCur(),wFoeMove(),BT.foeStage,BT.myStage);
      BT.log=BT.log.concat(lines.map(t=>({txt:t})));
      if(btCur().hp<=0)wMineDown();else BT.after='menu'}}

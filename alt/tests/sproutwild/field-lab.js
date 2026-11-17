@@ -72,16 +72,17 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  S.badges=['A','B','C'];at(27,6,[1,0]);for(let i=0;i<40&&F.fld().id==='TOWN';i++)step(1,['right']);f=F.fld();ok('with sigils the east road opens',f.id==='WASTES',f.id);
  /* trainers spot you */
  const dg=f.npcs.find(n=>n.who==='DEREK');step(50);at(21,11,[0,1]);step(2);ok('a trainer spots you on the road',!!f.spot||!!f.dlg);
- step(60);for(let i=0;i<4;i++){tap('a');step(4)}step(40);ok('...and battles you',F.state()==='g4battle'&&F.bt().mode==='trainer',F.state());
- fight();
- ok('beating a trainer pays and is remembered',S.fl[dg.fk]===1&&F.state()==='g4world',F.state());
+ step(60);for(let i=0;i<4;i++){tap('a');step(4)}step(40);ok('...and only talks: no trainer battles (v9.1)',F.state()==='g4world'&&S.fl[dg.fk]===1,F.state());
+ /* v9.1: an alpha given the light gives up its Sigil */
+ {F.enter('MEADOW');const fm=F.fld();const al=fm.alphas.find(q=>q.sp==='BLOOMBOAR');S.badges=[];S.party[0].hp=200;F.setPos(al.x,al.y+22);fm.dir=[0,-1];fm.arrive=null;step(3);tap('a');step(30);
+  fight();step(20);ok('bringing the light to the Meadow alpha gives the VERDANT SIGIL',S.badges.includes('VERDANT SIGIL'),JSON.stringify(S.badges)+' '+F.state());F.enter('WASTES');f=F.fld()}
  /* the dome and the king */
  f=F.fld();at(20,3,[0,-1]);step(60,['up']);ok('the iron dome blocks the peak road',F.fld().id==='WASTES'&&F.pos().y>2*T+12,Math.round(F.pos().y));
  F.enter('GLOOM');f=F.fld();const kb=f.npcs.find(n=>n.boss);F.setPos(kb.x,kb.y+14);f.dir=[0,-1];step(3);tap('a');step(3);
- ok('king bibi talks before he fights',!!f.dlg&&f.dlg.who==='KING BIBI');
- for(let i=0;i<5;i++){tap('a');step(4)}step(40);
- fight();
- ok('beating king bibi sets the flag',S.fl.bibi===1,F.state()+' '+(F.bt()?F.bt().phase+' ai'+F.bt().aiIx+' foe'+F.bt().foe.sp+':'+F.bt().foe.hp+' q'+(F.bt().queue||[]).length+' hp'+S.party.map(m=>m.hp).join('/')+' log:'+JSON.stringify((F.bt().log||[]).slice(-1)):''));
+ ok('king bibi talks',!!f.dlg&&f.dlg.who==='KING BIBI');
+ for(let i=0;i<6;i++){tap('a');step(4)}step(20);ok('without four Sigils the King keeps the dome up',S.fl.bibi!==1&&F.state()==='g4world',F.state());
+ S.badges=['VERDANT SIGIL','ROOT SIGIL','STONE SIGIL','GOLD SIGIL'];F.setPos(kb.x,kb.y+14);f.dir=[0,-1];step(3);tap('a');step(3);for(let i=0;i<10;i++){tap('a');step(10)}step(20);
+ ok('with four Sigils King Bibi lowers the dome',S.fl.bibi===1,'dlg='+JSON.stringify(f.dlg&&{who:f.dlg.who,i:f.dlg.i,n:f.dlg.lines.length})+' near='+JSON.stringify(F.near()&&F.near().k)+' ',F.state()+' '+(F.bt()?F.bt().phase+' ai'+F.bt().aiIx+' foe'+F.bt().foe.sp+':'+F.bt().foe.hp+' q'+(F.bt().queue||[]).length+' hp'+S.party.map(m=>m.hp).join('/')+' log:'+JSON.stringify((F.bt().log||[]).slice(-1)):''));
  F.enter('WASTES');at(20,3,[0,-1]);for(let i=0;i<80&&F.fld().id==='WASTES';i++)step(1,['up']);ok('the dome is down: the peak road is open',F.fld().id==='PEAK',F.fld().id);
  /* swarming: sprouts bloom on a tired buddy; none are used up */
  {F.enter('MEADOW');S.buds={EMBER:2,PEB:0,DEW:0,ZIP:0,LEAF:4,LUCKY:0};step(3);const b0=S.buds.LEAF,box0=S.box.length+S.party.length;S.quest=2;F.forceWild('FERNFANG',3);
