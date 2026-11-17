@@ -52,4 +52,30 @@ else if(POINT==='plot'){
  await sl(3500);await scenes(8);await ev("W4.scene=null;W4.scPend=[];const b=SW.buildings.find(q=>q.k==='plot');P3.x=wCellX(b.gx)+10;P3.y=wCellY(b.gy)+34;P3.ax=0;P3.ay=-1;0");await key('up');await sl(500);
  ok('the plot says nobody tends it',/nobody/.test(await ev("W4.near&&W4.near.txt")||''),await ev("W4.near&&W4.near.txt"));await key('a');await sl(400);await ev('swSel=2');await key('a');await sl(300);
  ok('A on TENDED BY picks a home buddy',/DRIZZLET tends/.test(await ev('W4.plotMsg')||''),await ev('W4.plotMsg'));await shot('tender')}
+else if(POINT==='walkend'){ /* Erin's last lesson: the catch, the battle, why it died, King Bibi's beam, then home */
+ await p.evaluate(()=>{const F=window.__g.SWF(),S=F.meta();S.intro=1;S.lit=1;S.tendDone=true;S.tendStage=4;S.bwalk=2;S.quest=2;S.walk2=1;S.walk3=7;S.lessons.scMeadow=1;S.tutSeen=1;S.buds.LEAF=3;S.buds.DEW=2;S.buds.EMBER=1;F.giveMon('BESSLING',5);F.enter('MEADOW')});await sl(1500);
+ await ev("W4.scene=null;P3.x=19*16;P3.y=20*16;0");await sl(1500);ok('only the lesson buddy is out for the catch',(await ev("W4.wilds.filter(w=>!w.tame).length"))===0,await ev('W4.wilds.length'));
+ let seen=[];const talk=async(max=8)=>{for(let i=0;i<max;i++){const t=await ev("W4.scene&&W4.scene.steps[Math.max(0,W4.scene.i)]?(W4.scene.steps[Math.max(0,W4.scene.i)].who||'')+': '+(W4.scene.steps[Math.max(0,W4.scene.i)].txt||''):(W4.fld&&W4.fld.dlg?W4.fld.dlg.lines[W4.fld.dlg.i]:'')");if(t&&t.length>3&&seen[seen.length-1]!==t)seen.push(t);if(!t&&i>1)break;await key('a');await sl(520)}};
+ for(let i=0;i<30&&await ev('SW.walk2')<2;i++){await ev("const w=W4.wilds.find(q=>q.tame);if(w&&W4.ew){P3.x=w.x-4;P3.y=w.y+26;W4.fld.dir=[0,-1]}0");await sl(500);await talk(5)}
+ ok('Erin shows you the wild buddy',await ev('SW.walk2')===2,await ev('SW.walk2'));
+ for(let i=0;i<40&&await ev('SW.quest')<3;i++){await ev("const w=W4.wilds.find(q=>q.tame);if(w){P3.x=w.x;P3.y=w.y+22;W4.fld.dir=[0,-1]}0");await sl(200);await key('a');await sl(350);if(await ev("state")!=='g4world'){await key('a');await sl(400)}}
+ ok('throwing sprouts catches it',await ev('SW.quest')>=3,'party '+await ev("SW.party.map(m=>m.sp).join()"));
+ for(let i=0;i<14&&await ev('state')!=='g4world';i++){await key('a');await sl(500)}await sl(1200);await talk(8);
+ ok('then Erin asks for a battle',await ev('SW.lessons.tutFight')===1&&seen.some(t=>/press SELECT/.test(t)));ok('exactly one wild is set out for it',(await ev("W4.wilds.filter(q=>q.fightMe).length"))===1,await ev('W4.wilds.length')+' wilds');
+ await ev("const w=W4.wilds.find(q=>q.fightMe);P3.x=w.x-18;P3.y=w.y;W4.fld.dir=[1,0];w.tx=w.x;w.ty=w.y;0");await sl(300);await key('sel');for(let i=0;i<30&&await ev('state')!=='g4battle';i++)await sl(250);ok('SELECT starts the battle',await ev('state')==='g4battle');
+ const tB=Date.now();for(let i=0;i<60&&await ev("state")==='g4battle';i++){const ph=await ev('BT.phase');if(ph==='menu'||ph==='moves')await ev('swSel='+(ph==='moves'?1:0));await key('a');await sl(360)}
+ ok('you win it with real turns',await ev('SW.lessons.defeat1')>=1,Math.round((Date.now()-tB)/1000)+'s');
+ const t0=Date.now();seen=[];let beamAt=0,whyAt=0;for(let i=0;i<70;i++){const st=await ev('state');if(st==='g4beam'){if(!beamAt){beamAt=Date.now()-t0;await sl(2200);await shot('beam')}await sl(400);continue}await talk(2);if(!whyAt&&seen.some(t=>/That one's gone/.test(t)))whyAt=Date.now()-t0;if(await ev('SW.walk2')>=10&&!(await ev('!!(W4.fld&&W4.fld.dlg)')))break;await sl(250)}
+ ok("Erin says why it is gone, right after",whyAt>0&&whyAt<25000,Math.round(whyAt/1000)+'s after the battle');ok("King Bibi's beam follows",beamAt>0&&beamAt<45000,Math.round(beamAt/1000)+'s after the battle');
+ ok('Will says his lines',seen.some(t=>/My own head/.test(t)));ok('Erin sends you home',seen.some(t=>/Head home/.test(t))&&await ev('SW.walk2')>=10,await ev('SW.walk2'));ok('the tutorial is over',await ev('wTutDone()'));await shot('end')}
+else if(POINT==='reload'){ /* a save with a crop plot, a tender and a Buddy Barn must reopen: it once stopped the game starting */
+ await p.evaluate(D=>{const F=window.__g.SWF(),S=F.meta();eval(D);S.quest=5;S.badges=['STONE SIGIL'];S.sigHome=1;F.giveMon('BESSLING',8);F.giveMon('DRIZZLET',5);F.build('cottage',4,6);F.build('datacenter',8,6);F.build('plot',3,14);F.enter('BASE')},DONE);await sl(1500);
+ await ev("W4.scene=null;W4.scPend=[];wInitPatch();wPlotSync();SW.party[1].plot=wPlotKey(SW.buildings.find(b=>b.k==='plot'));SW.exp=[{i:4,n:3,t:90}];SW.day=3;swSave();0");await sl(400);
+ await p.reload();await sl(800);const started=await p.evaluate(()=>{const c=document.querySelector('.cart[data-i="4"]');if(c)c.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));return !!c});await sl(4400);
+ ok('the game starts again after closing',started&&await p.evaluate(()=>!!window.__g&&typeof window.__g.ev==='function'));
+ for(let i=0;i<8&&await ev('state')==='g4title';i++){await key('a');await sl(600)}
+ ok('CONTINUE brings the file back',await ev('state')!=='g4title'&&await ev('state')!=='g4intro'&&await ev('SW.day')===3,await ev('state')+' day '+await ev('SW.day'));
+ ok('the Barn and the crop plot are still there',await ev("SW.buildings.map(b=>b.k).sort().join()")==='cottage,datacenter,plot',await ev("SW.buildings.map(b=>b.k).join()"));
+ await sl(1500);ok('the plot still grows berries and DRIZZLET still tends it',await ev("(()=>{const b=SW.buildings.find(q=>q.k==='plot');return b.crop==='berry'&&!!wPlotBud(b)&&wPlotBud(b).sp==='DRIZZLET'})()"));
+ ok('the expedition is still out',await ev('(SW.exp||[]).length')===1);ok('the Sigil stone is still home',await ev('SW.sigHome')===1&&await ev('SW.badges.length')===1)}
 console.log(errs.length?'PAGE ERRORS '+JSON.stringify(errs):'no page errors');console.log(fails?fails+' FAILED':'all passed');await b.close()})();

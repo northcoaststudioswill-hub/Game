@@ -9459,7 +9459,7 @@ function wQuestText(){const op=wOp();
  if(SW.quest===2)return W4.fld?((SW.walk2||0)<1?'Meet Erin down the road':(SW.walk2===1||SW.walk2===2)?'Follow Erin: a wild buddy':'Follow Erin'):'Take the south road to the Meadow';
  if(!W4.fld&&wHasRoof()&&wDark()>.7)return'Night: sleep in the cottage to skip it';
  if(SW.quest===4&&!W4.fld&&W4.patchBuds&&!W4.patchBuds.some(q=>q.type<0&&!q.crop))return'Garden full: pluck a sprout, then grow BERRIES'; /* v8.9 */
- if(SW.quest===3&&W4.fld&&typeof wTutDone==='function'&&!wTutDone()&&W4.fld.id==='MEADOW')return'Follow Erin: your first battle';
+ if(SW.quest===3&&W4.fld&&typeof wTutDone==='function'&&!wTutDone()&&W4.fld.id==='MEADOW')return SW.walk2===2?'Follow Erin: your first battle':'Follow Erin';
  if(SW.quest<5)return(W4.fld&&SW.quest>=3?'Home: ':'')+WQUEST[SW.quest];
  if(W4.fld){const ld=SW.party.find(m=>m.hp>0),sec=wSector(W4.sector);
   if(!ld||ld.hp<wStats(ld).max*.25)return'Your buddy is hurt: rest at a Lantern post';
@@ -9673,7 +9673,7 @@ function wNormalize(j){const D=SWDEF(),S=Object.assign(SWDEF(),(j&&typeof j==='o
  const okMon=m=>m&&typeof m==='object'&&wSp(m.sp)&&m.lv>0;S.box=S.box.filter(okMon);S.party=S.party.filter(okMon);while(S.party.length>3)S.box.push(S.party.pop());
  for(const m of S.party.concat(S.box)){m.lv=Math.min(40,m.lv|0);const st=wStats(m);if(!(m.hp>=0))m.hp=st.max;m.hp=Math.min(m.hp,st.max);if(!(m.xp>=0))m.xp=0;
   if(!Array.isArray(m.moves)||!m.moves.length||m.moves.some(id=>!WMOVES[id]))m.moves=wMovesAt(wSp(m.sp),m.lv)}
- S.buildings=S.buildings.filter(b=>b&&wBuildDef(b.k)&&b.gx>=0&&b.gy>=0);for(const b of S.buildings){b.workers=[];if(b.crop&&!wSp(b.crop.sp))b.crop=null}
+ S.buildings=S.buildings.filter(b=>{if(!b||!(b.gx>=0)||!(b.gy>=0))return false;try{return!!wBuildDef(b.k)}catch(e){return true}}); /* v12.10: at start-up the later building lists are not ready yet; a save with a Buddy Barn or a crop plot crashed here and the game never started. Unknown kinds are weeded out again once everything is loaded (sw-v12). */for(const b of S.buildings){b.workers=[];if(b.crop&&!wSp(b.crop.sp))b.crop=null}
  S.crew=S.crew.filter(c=>c&&c.type>=0&&c.type<TYPES.length);for(const c of S.crew)if(c.job>=S.buildings.length)c.job=-1;
  for(const ty of S.followers)if(TYPES[ty])S.buds[TYPES[ty].n]++;S.followers=[];
  if(!wSector(S.sector))S.sector='BASE';S.keeper='WILL'; /* v9.2: only the keeper is played */for(const m of (S.party||[]).concat(S.box||[]))if(m&&m.sp==='GRASSMAN')m.sp='MOSSMAN';if(S.caught&&S.caught.GRASSMAN){S.caught.MOSSMAN=S.caught.GRASSMAN;delete S.caught.GRASSMAN}
@@ -10712,7 +10712,7 @@ const EWDONE={2:["ERIN: That's a battle. Tap right as the ring closes and the hi
  4:["ERIN: There. A PEB walks with you now. Over this way!"],6:["ERIN: Ha! The rock never stood a chance. One more thing."],8:["ERIN: A bridge! Whatever's on that island is yours."]};
 function ewTick(F,dt){if(SCOFF||F.id!=='MEADOW'||wOp()<3||W4.scene||F.dlg||F.spot)return;SW.lessons.scMeadow=1;const st=SW.walk2||0;
  if(SW.quest<3&&st!==1&&st!==2)W4.wilds=W4.wilds.filter(w=>w.lat&&w.lat.length); /* v12.2: no wild buddies until the catch lesson, which is the last one */
- if(SW.quest<3&&(st===1||st===2)){const tm=W4.wilds.find(w=>w.tame);if(tm)for(const w of W4.wilds)if(w!==tm&&!(w.lat&&w.lat.length)&&Math.hypot(w.x-tm.x,w.y-tm.y)<110)w.gone=1;W4.wilds=W4.wilds.filter(w=>!w.gone)} /* the lesson buddy has the grass to itself */if(st>=10&&!(W4.ew&&W4.ew.leave)&&!(SW.walk3>0&&SW.walk3<7))return;
+ if(SW.quest<3&&(st===1||st===2)){const tm=W4.wilds.find(w=>w.tame);if(tm)for(const w of W4.wilds)if(w!==tm&&!(w.lat&&w.lat.length))w.gone=1; /* v12.10: only the lesson buddy is out, anywhere in the Meadow */W4.wilds=W4.wilds.filter(w=>!w.gone)} /* the lesson buddy has the grass to itself */if(st>=10&&!(W4.ew&&W4.ew.leave)&&!(SW.walk3>0&&SW.walk3<7))return;
  if(!W4.ew||W4.ewFor!==F){W4.ewFor=F;const p=st===0?{x:19*FT+8,y:21*FT+10}:ewNear(F,P3.x-24,P3.y+10);W4.ew={x:p.x,y:p.y,dir:[-1,0],mv:false,t:0}} /* v9.8: on your first visit she waits at the crossroads */
  const E=W4.ew,go=(x,y,v)=>{const dx=x-E.x,dy=y-E.y,d=Math.hypot(dx,dy);E.mv=d>2;if(d>2){const s=Math.min(d*5,v);E.x+=dx/d*s*dt;E.y+=dy/d*s*dt;E.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}return d};
  if(E.leave){if(E.fade!=null){E.fade-=dt*1.6;E.mv=false;if(E.fade<=0)W4.ew=null;return}if(ewGo(F,E,F.start.x,F.start.y-14,70,go)<4)E.fade=1;return} /* v9.2: she walks up the road and fades out at the gate, not pops */
@@ -11847,6 +11847,10 @@ function wWeakWarn(al){const w=wWeakLead(al.sp);if(!w||W4.weakTold===al.sp)retur
   {who:'LOUIE',txt:w.better?'Lead with '+w.better.sp+': START, BUDDIES, then A on it. Or press A here again to fight anyway.':'Catch a '+kinds+' buddy first. Or press A here again to fight anyway. Woof.'}]);return true}
 {const _gg=wGymGoal;wGymGoal=function(){const base=_gg();if(SW.quest>=5&&!SW.badges.length&&wHasDC()&&base&&/GUARDIAN/.test(base)){const w=wWeakLead('STONESQUIRE');
   if(w)return w.better?'Stone GUARDIAN: lead with '+w.better.sp+' (START, BUDDIES). '+w.lead.sp+' is weak to stone':'Stone GUARDIAN: catch a DEW or LEAF buddy. '+w.lead.sp+' is weak to stone'}return base}}
+
+/* v12.10: the building check that could not run safely at start-up runs here, once every list exists */
+if(SW&&Array.isArray(SW.buildings))SW.buildings=SW.buildings.filter(b=>b&&wBuildDef(b.k));
+{const _ls=wLoadSlot;wLoadSlot=function(i){const r2=_ls(i);if(Array.isArray(SW.buildings))SW.buildings=SW.buildings.filter(b=>b&&wBuildDef(b.k));return r2}}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */

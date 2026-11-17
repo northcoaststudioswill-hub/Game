@@ -3,6 +3,16 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v12.10: a save that stopped the game from starting
+- **Serious, now fixed.** Reopening the game with a file-1 save that held a Buddy Barn or a crop plot crashed at start-up, before the title: the load code checked each building against a list that is only filled in later. The Barn case is old (it is on main too). The crop plot case was new in v12.0, and the tutorial tells every player to build one, so every file-1 player would have been locked out the next time they opened the game.
+- Found by loading saves made with main's build. New test, `alt/tests/sproutwild/old-saves-from-main.js`: makes three v9.9 saves (mid-tutorial, home with crops, one Sigil with a Barn) and continues each in this build. All three load now.
+- New checkpoint, `reload`: a save from this build with a crop plot, a tender, a Buddy Barn, an expedition out and a Sigil home is closed and reopened. Everything is still there.
+- New checkpoint, `walkend`: the end of Erin's walk from a saved point (12 checks). From the end of the battle, Erin's talk starts 19 seconds later and King Bibi's beam 21.
+- During the catch lesson only the lesson buddy is out in the Meadow (others could wander in from further away).
+- An old save that is mid-tutorial showed the goal "Follow Erin: your first battle" at the wrong lesson. It says "Follow Erin" until the battle step.
+
+Checked: field lab; checkpoints castle, barn, plot, walkend, reload; the three old saves.
+
 ## v12.9: a fair warning before the first Guardian
 - Fought the stone Guardian for real, every turn, with each starter at the level the game asks for (Lv6) and a Lv3-4 second buddy:
   - BESSLING (water): wins with 28 of 68 health left. With timed taps: wins.

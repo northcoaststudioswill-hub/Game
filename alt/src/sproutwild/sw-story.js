@@ -166,7 +166,7 @@ function wQuestText(){const op=wOp();
  if(SW.quest===2)return W4.fld?((SW.walk2||0)<1?'Meet Erin down the road':(SW.walk2===1||SW.walk2===2)?'Follow Erin: a wild buddy':'Follow Erin'):'Take the south road to the Meadow';
  if(!W4.fld&&wHasRoof()&&wDark()>.7)return'Night: sleep in the cottage to skip it';
  if(SW.quest===4&&!W4.fld&&W4.patchBuds&&!W4.patchBuds.some(q=>q.type<0&&!q.crop))return'Garden full: pluck a sprout, then grow BERRIES'; /* v8.9 */
- if(SW.quest===3&&W4.fld&&typeof wTutDone==='function'&&!wTutDone()&&W4.fld.id==='MEADOW')return'Follow Erin: your first battle';
+ if(SW.quest===3&&W4.fld&&typeof wTutDone==='function'&&!wTutDone()&&W4.fld.id==='MEADOW')return SW.walk2===2?'Follow Erin: your first battle':'Follow Erin';
  if(SW.quest<5)return(W4.fld&&SW.quest>=3?'Home: ':'')+WQUEST[SW.quest];
  if(W4.fld){const ld=SW.party.find(m=>m.hp>0),sec=wSector(W4.sector);
   if(!ld||ld.hp<wStats(ld).max*.25)return'Your buddy is hurt: rest at a Lantern post';

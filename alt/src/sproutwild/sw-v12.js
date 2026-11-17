@@ -196,3 +196,7 @@ function wWeakWarn(al){const w=wWeakLead(al.sp);if(!w||W4.weakTold===al.sp)retur
   {who:'LOUIE',txt:w.better?'Lead with '+w.better.sp+': START, BUDDIES, then A on it. Or press A here again to fight anyway.':'Catch a '+kinds+' buddy first. Or press A here again to fight anyway. Woof.'}]);return true}
 {const _gg=wGymGoal;wGymGoal=function(){const base=_gg();if(SW.quest>=5&&!SW.badges.length&&wHasDC()&&base&&/GUARDIAN/.test(base)){const w=wWeakLead('STONESQUIRE');
   if(w)return w.better?'Stone GUARDIAN: lead with '+w.better.sp+' (START, BUDDIES). '+w.lead.sp+' is weak to stone':'Stone GUARDIAN: catch a DEW or LEAF buddy. '+w.lead.sp+' is weak to stone'}return base}}
+
+/* v12.10: the building check that could not run safely at start-up runs here, once every list exists */
+if(SW&&Array.isArray(SW.buildings))SW.buildings=SW.buildings.filter(b=>b&&wBuildDef(b.k));
+{const _ls=wLoadSlot;wLoadSlot=function(i){const r2=_ls(i);if(Array.isArray(SW.buildings))SW.buildings=SW.buildings.filter(b=>b&&wBuildDef(b.k));return r2}}

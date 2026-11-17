@@ -11,7 +11,6 @@ Updated Nov 17 2026. Newest game first. "Not confirmed on iPhone" applies to eve
 - v11.0: the three town houses are rooms to look at only.
 - v10.1: nobody has played the new castle puzzle or the tutorial fight from a fresh save by hand yet.
 - v10.1: a buddy sent to a job across a pond hops straight to it (no walk-around path).
-- v10.1: the old-saves test can't run here (old builds missing), so old saves are untested against the new castle map.
 - "BERRIES planted" stayed up 16 s in one run (too long, not too short). Not looked into yet.
 - One real-time bug catch missed during testing in v7.9 (a step-by-step run caught 4 of 4). Not seen since; a wild
   buddy next to a bug takes the aim, which may be what happened.
