@@ -490,7 +490,7 @@ function fRing(F){if(F.sq.length||(F.pf&&F.pf.length)){const a=fAim(F),T=a.kind=
   if(a.tg){const c=a.need>=0?'#e04838':T.l,rr=a.kind==='site'?14:11;
    for(const [sx,sy] of [[-1,-1],[1,-1],[-1,1],[1,1]]){r('#14101e',ax+sx*(rr+ph)-2,ay-6+sy*(rr-2+ph)-2,5,5);r(c,ax+sx*(rr+ph)-1,ay-6+sy*(rr-2+ph)-1,3,1);r(c,ax+sx*(rr+ph)-(sx<0?1:-1),ay-6+sy*(rr-2+ph)-1,1,3)}
    for(let i=1;i<5;i++){const k=i/5,px=P3.x+(a.x-P3.x)*k,py=P3.y-6+(a.y-P3.y+6)*k-Math.sin(k*Math.PI)*12;r('rgba(255,255,255,.6)',Math.round(px),Math.round(py),1,1)}
-   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='bug'?'CATCH '+a.tg.sp:a.kind==='wild'?(wBuddyFull()?'No room for more buddies · build a DATA CENTER':pfCan(F,a.tg)?'CATCH · needs '+pfNeed(a.tg)+(Math.hypot(a.tg.x-P3.x,a.tg.y-P3.y)<64?(SW.quest>=3?' · SELECT: fight':''):' sprouts'):'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
+   const lab=a.kind==='bwork'?'SEND '+a.buddy.m.sp+' · '+(a.tg.k==='tree'?'CHOP':a.tg.k==='rock'?'MINE':'GET '+a.tg.k.toUpperCase()):a.need>=0?'NEEDS '+TYPES[a.need].n:a.kind==='bug'?'CATCH '+a.tg.sp:a.kind==='wild'?(wBuddyFull()?'No room for more buddies · build a BUDDY BARN':pfCan(F,a.tg)?'CATCH · needs '+pfNeed(a.tg)+(Math.hypot(a.tg.x-P3.x,a.tg.y-P3.y)<64?(SW.quest>=3?' · SELECT: fight':''):' sprouts'):'Lv'+a.tg.lv+' · needs '+pfNeed(a.tg)+' sprouts · walk up to battle'):a.kind==='gate'?a.tg.n:a.kind==='site'?'BUILD BRIDGE':a.kind==='node'?'PICK BERRIES':(a.tg.k==='tre'?a.tg.n:a.tg.res.toUpperCase())+' · weight '+a.tg.w;
    F.aimLab=lab;F.aimNeed=a.need>=0}
   else{F.aimLab=null;r('rgba(255,255,255,.35)',ax-1,ay-1,2,2)}}else F.aimLab=null;
  if(F.whistle){g.strokeStyle='rgba(255,244,180,.8)';g.lineWidth=1;g.beginPath();g.arc(P3.x,P3.y-2,F.whistle,0,7);g.stroke();
@@ -616,7 +616,7 @@ function fItemDraw(it){const x=Math.round(it.x),y=Math.round(it.y)-(it.car.lengt
  if(it.car.length||it.guard){const st=fStr(it),ok=st>=it.w,lab=it.block?'NO WAY HOME':st+'/'+it.w;
   const lw=tw(lab,1)+4;r(ok&&!it.block?'#1d5a2a':'#5a1d1d',x-lw/2,y-23,lw,9);text(lab,x-lw/2+2,y-22,1,'#ffffff',null)}}
 function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*FT;
- const cx=mw<=W?(mw-W)/2:Math.max(0,Math.min(mw-W,(W4.scene||P3).x-W/2)),cy=mh<=H?(mh-H)/2:Math.max(0,Math.min(mh-H,(W4.scene||P3).y-H/2-4));
+ const cx=mw<=W?(mw-W)/2:Math.max(0,Math.min(mw-W,(W4.scene||P3).x-W/2)),cy=mh<=H?(mh-H)/2:Math.max(-30,Math.min(mh-H+16,(W4.scene||P3).y-H/2-4)); /* v9.2: the top row and its exits scroll clear of the HUD */
  W4.cam={x:cx,y:cy};
  r(B.t1,0,0,W,H);g.save();g.translate(-Math.round(cx),-Math.round(cy));
  if(!F.cv)fBake(F);if(F.cv&&F.cv.width)g.drawImage(F.cv,0,0);

@@ -2,12 +2,21 @@
 
 Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v9.1)
+## Sproutwild (cartridge 5, v9.2)
 
 ### Known bugs
 - "BERRIES planted" stayed up 16 s in one run (too long, not too short). Not looked into yet.
 - One real-time bug catch missed during testing in v7.9 (a step-by-step run caught 4 of 4). Not seen since; a wild
   buddy next to a bug takes the aim, which may be what happened.
+
+### Fixed in v9.2
+- Erin led you off the road through the trees to your first wild buddy; she now keeps to dirt paths (new paths to the big field and the rocks).
+- Erin vanished when she left the Meadow; she now walks to the gate and fades out.
+- The three starters bunched up in front of the Lantern steps, under the banner, with labels on top of each other.
+- The top row of each wild area (and its exits) sat under the HUD bars; the view now scrolls them clear.
+- "How Sunkeep works" still said "win the four gyms"; Town and townsfolk lines still talked about the gym.
+- The garden lesson, the cottage party and the alpha scene could start while you were elsewhere; they now wait till you are at the garden, the cottage, or home.
+- Real-world names (Ohio, Lake Erie, the Cuyahoga, Grassman) replaced with names from the valley.
 
 ### Fixed in v8.9
 - A full garden blocked the crop step (no empty plot, no hint).

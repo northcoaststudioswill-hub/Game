@@ -21,6 +21,24 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v9.2 · 2026-11-17 · first fixes from the story bible
+
+Will: make a doc of story events, triggers and ideas; the top of the map is covered; text covers too much; the tutorial pathing takes you to the old area by the trees with no path and Erin disappears; the first area is ugly; base building has to feed the goal; buddy text overlaps at the start; things trigger at odd times; more intro scenes; no more playable Marcus or Erin; the pause menus are ugly; real-world names go; aim for a four-hour game with post-game later.
+
+- **The story bible** is a doc now (Sproutwild: Story and Systems Bible): the lore, the goal loop and how every system should feed it, all 20 story beats with their triggers and problems, the opening reworked, the cast, a five-act four-hour arc with post-game ideas, and the fix list in rounds. This version is round 1.
+- **Erin keeps to the paths.** New dirt paths run off the south road to the big field and to the rocks where the PEB is buried. Erin's route finder now prefers dirt (a road tile costs 1, grass 4), so she walks you down the road and along the path instead of cutting through the trees. When she leaves she walks up the road and fades out at the gate instead of popping out of sight.
+- **The three starters stand apart**, below the road and clear of the Lantern steps, the banner and the campfire. One name tag at a time, never on top of another.
+- **The top of the map scrolls clear of the HUD.** In the wild areas the view can now go 30 px above the map's top row and 16 px past its bottom, so the top row and its exits are no longer stuck under the bars.
+- **A new pause menu**: a header with where you are, the day and your four Sigils (lit in their own colours, with how many alphas are left), eight big tiles with icons in a 2 x 4 grid, and your supplies along the bottom with colour keys. B or START goes back to play.
+- **Only the keeper is played.** The KEEPER row is gone from the menu, talking to Erin or Marcus no longer offers to hand them the lantern, and old saves load as the keeper.
+- **Real-world names are gone:** Ohio becomes the valley, Lake Erie the Wending Lake, the Cuyahoga the Crooked River, and Grasskin evolves into MOSSMAN (old saves are moved over).
+- **No more gym talk:** "How Sunkeep works" says "Light the four alphas. Each gives a Sigil."; Lantern Town, Pip and the Elder talk about alphas. The base's DATA CENTER building is now the BUDDY BARN (the Data Center is what Bottie nuked).
+- **Scenes wait for the right place:** the cottage party waits till you are by the cottage, the garden lesson till you walk to the garden, and the alpha scene till you are home.
+- Lab: 120 checks, updated for the new starter spots and the grid menu.
+- Played in real time from the title (autopilot, 430x932): the starters, Erin's walk to the south road and her Meadow walk on the dirt paths to the first catch, 0 timing flags, no page errors (`shots/v9.2-menu-and-starters.png`).
+
+**Not checked:** the rest of the Meadow walk after the PEB, Erin's fade at the gate in real time, the pause-menu tiles opening each screen by hand, iPhone. Not done yet from round 1: the keeper picking up Erin's and Marcus's perks; three beats (the send lesson, the build lesson, "That was Bottie") still start on short timers.
+
 ## v9.1 · 2026-11-17 · bring the light: alphas, not gyms
 
 Will: the valley was promised to sprouts and buddies 3000 years ago. After the Data Center was nuked the light was lost; sprouts bring it back to the buddies. The goal is cleansing the dark from the buddies and showing them the light so Bibi can lower the dome and we face Bottie once and for all. No gyms or trainer battles: just buddies and alphas to bring the light to. Sprouts should matter in battles. Light enough buddies and find the Sigils, and you face Bottie. Also: Erin's first pathing looked weird.

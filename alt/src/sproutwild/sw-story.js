@@ -21,7 +21,7 @@
    ================================================================ */
 if(SW.res.fiber==null)SW.res.fiber=0;if(SW.res.ore==null)SW.res.ore=0;if(!SW.pouch)SW.pouch=8;
 if(SW.quest>=2||SW.tendDone)SW.lit=1;
-WCHOICE[0].x=188;WCHOICE[0].y=166;WCHOICE[1].x=240;WCHOICE[1].y=152;WCHOICE[2].x=292;WCHOICE[2].y=166;
+WCHOICE[0].x=166;WCHOICE[0].y=232;WCHOICE[1].x=240;WCHOICE[1].y=212;WCHOICE[2].x=310;WCHOICE[2].y=236; /* v9.2: well apart, below the road, clear of the Lantern steps */
 const WSEEDPOS={0:[206,126],2:[240,134],4:[274,126]};
 const wLit=()=>!!SW.lit||SW.quest>=2;
 const wOp=()=>SW.quest>=2?3:SW.lit?2:(SW.seeds&&SW.seeds.length)?0:1;
@@ -238,7 +238,7 @@ function fFetchTick(F,dt,lead){const fe=W4.fetch;if(!fe)return false;const pt=W4
 /* mission lines say where the materials come from when you are short (v7.7) */
 function wMissionHint(nx){const [key,lab]=nx,[k,v]=key.split(':');
  if(k==='build'&&v==='kiln'&&!wCanPay(wBuildDef('kiln').cost))return'Kiln: 8 stone, 4 wood (rocks, trees)';
- if(k==='build'&&v==='datacenter'&&(SW.res.ingot||0)<2)return(SW.buildings.some(b=>b.k==='kiln')?'Data Center: 2 ingots. Ore veins, then kiln':'Data Center: needs a kiln for ingots');
- if(k==='buddies'&&wBuddyFull())return'Buddies: build a Data Center for room';
+ if(k==='build'&&v==='datacenter'&&(SW.res.ingot||0)<2)return(SW.buildings.some(b=>b.k==='kiln')?'Buddy Barn: 2 ingots. Ore veins, then kiln':'Buddy Barn: needs a kiln for ingots');
+ if(k==='buddies'&&wBuddyFull())return'Buddies: build a Buddy Barn for room';
  if(k==='crop'&&W4.patchBuds&&!W4.patchBuds.some(q=>q.type<0&&!q.crop))return'Garden full: pluck a sprout, then grow BERRIES'; /* v8.9 */
  return lab}

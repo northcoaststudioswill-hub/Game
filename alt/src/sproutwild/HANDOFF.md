@@ -84,7 +84,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
   and `let` names must be unique across all files, or the page fails to load.
 - Build order (see `SPROUTWILD=[...]` in `alt/build.py`): sw-cartart, sw-module, sw-field, sw-front,
   sw-base, sw-art, sw-story, sw-battle, sw-save, sw-text, sw-cast, sw-party, sw-scene, sw-starters,
-  sw-plots, sw-hollow, sw-squire, sw-louie, sw-bugs, sw-walk, sw-open2, sw-meadow2, sw-pace, sw-sigil, sw-lore, sw-light.
+  sw-plots, sw-hollow, sw-squire, sw-louie, sw-bugs, sw-walk, sw-open2, sw-meadow2, sw-pace, sw-sigil, sw-lore, sw-light, sw-menu.
 - Several functions exist in more than one file on purpose (the later one is live). Known pairs:
   `swPauseUpdate/drawPause` (live: sw-save.js), `cotUpdate/drawCot` (live: sw-story.js),
   `wQuestText` (two copies in sw-story.js; the second is live), `wBaseArrive`, `scIntro`, `scWake`,
@@ -146,6 +146,9 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
 - v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
   "FOUND ONE!" bubble stays on screen.
+- v9.2: story bible doc (https://claude.ai/artifact/A3MMHmbJHANhn1Z9WmbFq6) and round 1 of its fix list: Erin keeps to
+  dirt paths (cost-based route), starters spread out, map edges scroll clear of the HUD, grid pause menu (sw-menu.js),
+  keeper only (no Erin/Marcus switching), real-world names out (GRASSMAN is MOSSMAN), Data Center building is the Buddy Barn.
 - v9.1: bring the light - alphas give Sigils, no gyms or trainer battles, sprout light burn, Meadow alpha Lv6,
   Erin's Sunkeep escort pathed round the garden.
 - v9.0: the story reworked to Will's lore (Bottie the villain, Bibi the king behind his dome) across the intro,

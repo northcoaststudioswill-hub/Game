@@ -62,7 +62,7 @@ while(T()<CAP){
  if(['g4title','g4intro','g4loop','g4kind','g4cine','g4choice','g4file','g4slot','g4save'].includes(s.state)||(s.state!=='g4world'&&!['g4build','g4place','g4pause','g4battle','g4plot'].includes(s.state))){if(Date.now()-txtAt>2200){await key('a');txtAt=Date.now()}await sleep(150);continue}
  if(s.state==='g4battle'){await aPress(500);await sleep(150);continue}
  if(s.state==='g4plot'){const sel=+(await ev('swSel'));if(sel<1)await key('down');else if(sel>1)await key('up');else await key('a');await sleep(250);continue}
- if(s.state==='g4pause'){const sel=+(await ev('swSel'));if(sel<3)await key('down');else if(sel>3)await key('up');else await key('a');await sleep(200);continue}
+ if(s.state==='g4pause'){const sel=+(await ev('swSel'));if(sel<2)await key('down');else if(sel===2)await key('right');else if(sel!==3)await key('up');else await key('a'); /* v9.2 grid menu: BUILD is tile 3 */await sleep(200);continue}
  if(s.state==='g4build'){const want=+(await ev("WBUILD.findIndex(d=>d.k==='cottage')")),sel=+(await ev('swSel'));if(sel<want)await key('down');else if(sel>want)await key('up');else await key('a');await sleep(200);continue}
  if(s.state==='g4place'){placeTries++;if(placeTries%3===0)await key(placeTries%6===0?'down':'right');await key('a');await sleep(300);continue}
  // 2. the world
@@ -70,7 +70,7 @@ while(T()<CAP){
  if(s.sec==='BASE'&&!s.fid){
   if(s.op===0){const bd=s.buds.find(x=>x[2]>=1);if(bd){if(await moveTo(s,bd[0],bd[1]+13)){await face(0,-1);await aPress()}}await sleep(150);continue}
   if(s.op===1){const it=s.items[0];if(it){if(await moveTo(s,it[0]+30,it[1]+2)){await face(-1,0);await aPress(900)}}await sleep(150);continue}
-  if(s.op===2){if(await moveTo(s,240,170)){await face(0,-1);await aPress(1200)}await sleep(150);continue}
+  if(s.op===2){if(await moveTo(s,240,194)){await face(0,1);await aPress(1200)}await sleep(150);continue}
   if(s.q<=2){if(s.erin&&s.bw<2){const dx=s.P[0]-s.erin[0],dy=s.P[1]-s.erin[1],d=Math.hypot(dx,dy)||1;if(d>30)await moveTo(s,s.erin[0]+dx/d*26,s.erin[1]+dy/d*26-(dy>0?40:0),9);}else{await moveTo(s,240,s.wh-8,11);await key('down',120)}await sleep(150);continue}
   if(s.cot&&!s.crop&&!s.plot){const gs=JSON.parse(await ev("JSON.stringify((W4.patchBuds||[]).filter(q=>q.type>=0&&q.stage>=2&&q.mode==='soil').map(q=>[q.sx,q.sy]))"))[0];if(gs){if(await moveTo(s,gs[0],gs[1]+14)){await face(0,-1);await aPress(1200)}}await sleep(150);continue}
   if(s.cot&&!s.crop&&s.plot){if(await moveTo(s,s.plot[0],s.plot[1]+14)){await face(0,-1);await aPress(1500)}await sleep(150);continue}

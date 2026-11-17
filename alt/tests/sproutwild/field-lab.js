@@ -20,7 +20,7 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   ok('plucking them gives a squad of three',bf.sq.length===3&&F.op()===1,bf.sq.length);
   for(let n=0;n<3;n++){const it=bf.items.find(i=>i.op&&!i.car.length);if(!it)break;F.setPos(it.x+40,it.y+2);step(2,['left']);for(const q of bf.sq)if(q.st==='follow'){q.x=F.pos().x+8;q.y=F.pos().y}step(4);tap('a');step(20)}
   step(500);ok('thrown sprouts carry the berries home and the Lantern stirs',!!S.lit&&F.op()===2,S.fedN);
-  F.setPos(240,170);step(2,['up']);step(2);ok('dim buddies come to the light',F.near()&&F.near().k==='choice',F.near()&&F.near().k);
+  F.setPos(240,236);step(2,['up']);step(2);ok('dim buddies come to the light',F.near()&&F.near().k==='choice',F.near()&&F.near().k);
   tap('a');step(4);tap('a');step(10);tap('a');step(10);ok('greeting one makes it your first buddy',S.party.length===1&&S.quest===2,S.quest);
   F.setPos(F.louie().x+13,F.louie().y);step(2,['left']);const st0=F.state();tap('a');step(3);ok('Louie is a dog, not a menu',F.state()==='g4world',F.state());
   F.setPos(240,470);for(let i=0;i<60&&!F.fld();i++)step(1,['down']);ok('now the south road leads to the Meadow',F.fld()&&F.fld().id==='MEADOW',F.state()+' pos='+JSON.stringify(F.pos())+' q='+S.quest+' sec='+S.sector)}
@@ -152,14 +152,14 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   tap('a');step(2);tap('down');tap('a');step(3);
   ok('an empty file starts a NEW GAME',F.state()==='g4intro'&&F.meta().quest===0&&!F.meta().party.length&&F.meta().res.wood===0,F.state());
   tap('b');step(5);ok('...which begins at the Lantern',F.state()==='g4world'&&F.op()===0,F.op());
-  F.meta().day=4;tap('start');for(let i=0;i<8;i++)tap('down');tap('a');step(3);ok('SAVE AND QUIT returns to the title',F.state()==='g4title',F.state());
+  F.meta().day=4;tap('start');for(let i=0;i<3;i++)tap('down');tap('right');tap('a');step(3);ok('SAVE AND QUIT returns to the title',F.state()==='g4title',F.state());
   tap('a');step(2);tap('a');step(4);ok('CONTINUE loads that file back',F.state()==='g4world'&&F.meta().day===4&&F.op()===0,F.meta().day);
   const f1=JSON.parse(localStorage.getItem('sproutwild-v1'));ok('file 1 is untouched by playing file 2',f1.quest===5&&f1.day===9&&f1.res.wood===77,f1.day);
-  tap('start');for(let i=0;i<8;i++)tap('down');tap('a');step(3);tap('a');step(2);tap('sel');step(2);tap('a');step(2);
+  tap('start');for(let i=0;i<3;i++)tap('down');tap('right');tap('a');step(3);tap('a');step(2);tap('sel');step(2);tap('a');step(2);
   ok('SELECT erases a file after asking',localStorage.getItem('sproutwild-s2')===null);
   tap('up');tap('a');step(5);ok('file 1 continues where it was',F.state()==='g4world'&&F.meta().day===9&&F.meta().res.wood===77,F.meta().day);
   localStorage.setItem('sproutwild-s3','{"intro":1,"party":[{"sp":"NOPE","lv":3}],"box":"x","sector":"NOWHERE","quest":9,"buildings":[{"k":"castle"}],"res":null}');
-  tap('start');for(let i=0;i<8;i++)tap('down');tap('a');step(3);tap('a');step(2);tap('down');tap('down');tap('a');step(8);G.draw();
+  tap('start');for(let i=0;i<3;i++)tap('down');tap('right');tap('a');step(3);tap('a');step(2);tap('down');tap('down');tap('a');step(8);G.draw();
   ok('a damaged save loads safely',F.state()==='g4world'&&F.meta().sector==='BASE'&&F.meta().party.length===0&&F.meta().buildings.length===0,F.state()+' '+F.meta().quest)}
  /* v7.0: starters and the Data Center */
  {const st=F.starters();ok('the three starters are the Ohio trio',st.join()==='CUYAPUP,BESSLING,GRASSKIN',st.join());
@@ -184,8 +184,8 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   if(wd){wd.lv=2;wd.tx=wd.x;wd.ty=wd.y;wd.t=99;F.setPos(wd.x,wd.y+20);f3.dir=[0,-1];f3.arrive=null;step(2);tap('sel');step(40);ok('SELECT next to a wild starts a battle',F.state()==='g4battle'||F.state()==='g4engage',F.state());
    for(let i=0;i<300&&F.state()!=='g4world';i++){tap('b');tap('a');step(2)}}else ok('SELECT next to a wild starts a battle',false,'no wild')}
  /* v7.2: starters grow up */
- {const sp=F.species(),has=id=>sp.some(x=>x.id===id&&x.starter&&x._spr);ok('each starter has an evolved form',has('CUYAFLARE')&&has('BESSIE')&&has('GRASSMAN'));
-  const a=sp.find(x=>x.id==='GRASSKIN'),b2=sp.find(x=>x.id==='GRASSMAN');ok('the evolved form is stronger and better at its jobs',b2.hp>a.hp&&b2.atk>a.atk&&b2.work.PLANTING>a.work.PLANTING,b2.hp+'/'+a.hp)}
+ {const sp=F.species(),has=id=>sp.some(x=>x.id===id&&x.starter&&x._spr);ok('each starter has an evolved form',has('CUYAFLARE')&&has('BESSIE')&&has('MOSSMAN'));
+  const a=sp.find(x=>x.id==='GRASSKIN'),b2=sp.find(x=>x.id==='MOSSMAN');ok('the evolved form is stronger and better at its jobs',b2.hp>a.hp&&b2.atk>a.atk&&b2.work.PLANTING>a.work.PLANTING,b2.hp+'/'+a.hp)}
  /* v7.0: garden plots grow what you choose */
  {S.buildings=[];S.box=[];S.plotCrop={};F.build('cottage',18,12);F.enter('BASE');step(5);const pl=F.plots();
   ok('the garden bed building is retired',!F.builds().includes('bed')&&F.builds().includes('datacenter'),F.builds().join());

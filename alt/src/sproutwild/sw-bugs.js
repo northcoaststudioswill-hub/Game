@@ -4,15 +4,15 @@
    water, some in the trees, some only at night. Face one and press A:
    a sprout catches it. Caught bugs go in the BUG JAR (START menu),
    where each can be turned into a resource, or sold to PIP in Lantern
-   Town for petals. All eight come from Ohio summers.
+   Town for petals. All eight come from valley summers.
    ================================================================ */
 const WBUGS=[
- {id:'LADYBUG',hab:'grass',c:'#e04838',c2:'#14101e',yield:['berry',2],val:4,w:5,lore:"Ohio's state insect. Gardens love it."},
+ {id:'LADYBUG',hab:'grass',c:'#e04838',c2:'#14101e',yield:['berry',2],val:4,w:5,lore:"The valley's luck bug. Gardens love it."},
  {id:'WOOLLY BEAR',hab:'grass',c:'#3a2414',c2:'#d8902c',yield:['fiber',2],val:6,w:4,lore:'Vermilion throws it a festival. Its stripes forecast winter.'},
  {id:'LIGHTNING BUG',hab:'grass',night:1,fly:1,c:'#3a3a28',c2:'#fff3b0',yield:['light',1],val:8,w:5,lore:'Summer nights in the valley. Feeds a spark to the Lantern.'},
- {id:'MAYFLY',hab:'water',fly:1,c:'#b8a868',c2:'#f0e8c8',yield:['fiber',1],val:3,w:5,lore:'Lake Erie swarms of them every June. Lives a single day.'},
+ {id:'MAYFLY',hab:'water',fly:1,c:'#b8a868',c2:'#f0e8c8',yield:['fiber',1],val:3,w:5,lore:'The Wending Lake swarms with them every June. Lives a single day.'},
  {id:'CICADA',hab:'tree',fly:1,c:'#4a6a3a',c2:'#d8e8f0',yield:['wood',3],val:10,w:3,lore:'Sleeps underground seventeen years, then sings all summer.'},
- {id:'HELLGRAMMITE',hab:'water',c:'#3a2c22',c2:'#8a6a48',yield:['ore',1],val:14,w:2,lore:'A river monster in miniature. Lives under Cuyahoga stones.'},
+ {id:'HELLGRAMMITE',hab:'water',c:'#3a2c22',c2:'#8a6a48',yield:['ore',1],val:14,w:2,lore:'A river monster in miniature. Lives under Crooked River stones.'},
  {id:'LUNA MOTH',hab:'tree',night:1,fly:1,c:'#a8e8b8',c2:'#e8fff0',yield:['fiber',4],val:25,w:1,lore:'Pale green, out only at night. Its silk is like moonlight.'},
  {id:'MANTIS',hab:'grass',c:'#7ec850',c2:'#3a7d2e',yield:['heart',1],val:18,w:1,lore:'Bows to everyone. The Lantern likes its manners.'}];
 const WBUGRES={berry:'BERRY',fiber:'FIBER',wood:'WOOD',ore:'ORE',light:'LANTERN LIGHT',heart:'HEART'};

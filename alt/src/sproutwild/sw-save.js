@@ -21,7 +21,7 @@ function wNormalize(j){const D=SWDEF(),S=Object.assign(SWDEF(),(j&&typeof j==='o
  S.buildings=S.buildings.filter(b=>b&&wBuildDef(b.k)&&b.gx>=0&&b.gy>=0);for(const b of S.buildings){b.workers=[];if(b.crop&&!wSp(b.crop.sp))b.crop=null}
  S.crew=S.crew.filter(c=>c&&c.type>=0&&c.type<TYPES.length);for(const c of S.crew)if(c.job>=S.buildings.length)c.job=-1;
  for(const ty of S.followers)if(TYPES[ty])S.buds[TYPES[ty].n]++;S.followers=[];
- if(!wSector(S.sector))S.sector='BASE';if(!WKEEPERS[S.keeper])S.keeper='WILL';
+ if(!wSector(S.sector))S.sector='BASE';S.keeper='WILL'; /* v9.2: only the keeper is played */for(const m of (S.party||[]).concat(S.box||[]))if(m&&m.sp==='GRASSMAN')m.sp='MOSSMAN';if(S.caught&&S.caught.GRASSMAN){S.caught.MOSSMAN=S.caught.GRASSMAN;delete S.caught.GRASSMAN}
  S.quest=Math.max(0,Math.min(5,S.quest|0));S.baseLv=Math.max(1,S.baseLv|0);S.day=Math.max(1,S.day|0);if(!(S.stam>=0))S.stam=100;if(!(S.tonics>=0))S.tonics=0;
  if(!(S.hearts>=0))S.hearts=0;if(!(S.heartsTotal>=0))S.heartsTotal=S.hearts;if(!(S.playT>=0))S.playT=0;S.pouch=Math.max(8,Math.min(24,S.pouch|0||8));if(!Array.isArray(S.craftQ))S.craftQ=[];
  S.craftQ=S.craftQ.filter(q=>q&&WRECIPES.some(rc=>rc.id===q.id));
@@ -57,7 +57,7 @@ function wTitleFiles(){const K='#14101e',tm=W4.tm|0,pw=W-20,rh=34,ph=3*rh+40,py=
  if(tm===2){const y=Math.round(H/2-36),t1='ERASE FILE '+(swSel+1)+'?';r('rgba(6,8,6,.7)',0,0,W,H);r(K,16,y,W-32,72);r('#f8f4e0',18,y+2,W-36,68);r('#e04838',18,y+2,W-36,3);
   text(t1,Math.round(W/2-tw(t1,2)/2),y+11,2,'#a33b2e',null);ctext('This cannot be undone.',y+31,1,'#282838',null);text('A  ERASE',30,y+52,1,'#a33b2e',null);text('B  KEEP IT',W-30-tw('B  KEEP IT',1),y+52,1,'#1d5a2a',null)}}
 /* ---------------- pause: save and quit ---------------- */
-function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUG JAR','BUILD','SECTORS','BASE','KEEPER','GUIDE','SAVE AND QUIT','RESUME'];swNav(rows.length);
+function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUG JAR','BUILD','SECTORS','BASE','GUIDE','SAVE AND QUIT','RESUME'];swNav(rows.length);
  if(pressed('b')){state='g4world';return}
  if(pressed('a')){const r2=rows[swSel];
   if(r2==='BUDDIES'){swSel=0;state='g4party'}
@@ -72,6 +72,6 @@ function swPauseUpdate(){const rows=['BUDDIES','BUDDY GUIDE','BUG JAR','BUILD','
   else state='g4world'}}
 function drawPause(){swShell('KEEPER MENU','FILE '+(wSlot+1));
  swRows([{a:'BUDDIES',b:SW.party.length+(SW.party.length===1?' buddy':' buddies')},{a:'BUDDY GUIDE',b:Object.keys(SW.caught).length+'/'+WSPECIES.length+' met'},{a:'BUG JAR',b:Object.values(SW.bugs||{}).reduce((a,v)=>a+v,0)+' bugs'},
-  {a:'BUILD',b:W4.sector==='BASE'?'at home':'only at home'},{a:'MAP',b:'look only'},{a:'WORK BOARD',b:'Sunkeep Lv'+SW.baseLv},{a:'KEEPER',b:SW.keeper},{a:'GUIDE',b:'how it works'},
+  {a:'BUILD',b:W4.sector==='BASE'?'at home':'only at home'},{a:'MAP',b:'look only'},{a:'WORK BOARD',b:'Sunkeep Lv'+SW.baseLv},{a:'GUIDE',b:'how it works'},
   {a:'SAVE AND QUIT',b:'to the title'},{a:'RESUME',b:''}],swSel,
   'Sprouts '+wBudTotal()+'/'+(SW.pouch||8)+' · Tonic '+SW.tonics+' · Berry '+SW.res.berry+' · Ingot '+SW.res.ingot+' · Ore '+(SW.res.ore||0)+' · Fiber '+(SW.res.fiber||0)+'. Saves by itself.')}

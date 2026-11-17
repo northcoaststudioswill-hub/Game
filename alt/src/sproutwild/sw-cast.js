@@ -52,7 +52,7 @@ function wCastTick(dt){if(!W4.cast)wCastInit();if(!SW.beats)SW.beats={};const op
  for(const q of W4.quips)q.t-=dt;if(W4.quips.length&&W4.quips[0].t<=0){W4.quips=[];W4.quipGap=.7}
  if(!W4.quips.length){W4.quipGap=(W4.quipGap||0)-dt;if(W4.quipGap<=0&&W4.quipQ.length&&!(typeof swBusy==='function'&&swBusy())&&!(W4.scPend&&W4.scPend.length)){ /* and waits for a scene that is waiting */ /* one voice at a time: chatter waits for the message */const q=W4.quipQ.shift();W4.quips=[q];swSnd(q.who==='LOUIE'?700:q.who==='MARCUS'?300:520,.04,q.who==='LOUIE'?500:q.who==='MARCUS'?260:640)}}
  /* the dim buddies walk in to the light rather than appearing */
- if(wOp()===2){if(!W4.choiceT)W4.choiceT=time;const k=Math.min(1,(time-W4.choiceT)/2.6);[[188,166],[240,152],[292,166]].forEach((q,i)=>{WCHOICE[i].x=q[0]+(i-1)*30*(1-k);WCHOICE[i].y=q[1]+(1-k)*(130+i*14)})}}
+ if(wOp()===2){if(!W4.choiceT)W4.choiceT=time;const k=Math.min(1,(time-W4.choiceT)/2.6);[[166,232],[240,212],[310,236]].forEach((q,i)=>{WCHOICE[i].x=q[0]+(i-1)*30*(1-k);WCHOICE[i].y=q[1]+(1-k)*(130+i*14)})}}
 function wQuipDraw(){const K='#14101e',cx=W4.cam?W4.cam.x:0,cy=W4.cam?W4.cam.y:0,placed=[];
  for(const q of W4.quips||[]){const sp=wSpeaker(q.who);if(!sp)continue;const lines=swWrap(q.txt,124).slice(0,5),w=Math.max(...lines.map(l=>tw(l,1)))+10,h=lines.length*10+6;
   let x=Math.round(sp.x-w/2),y=Math.round(sp.y-sp.h-h-4);x=Math.max(cx+3,Math.min(cx+W-w-3,x));y=Math.max(cy+41,y);

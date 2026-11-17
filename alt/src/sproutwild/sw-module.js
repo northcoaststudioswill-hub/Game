@@ -301,7 +301,7 @@ const WSECTORS=[
  {id:'BASE',n:'SUNKEEP BASE',sub:'Home. Build it up.',req:0,pal:{g:'#548c40',g2:'#477a35',a:'#8fd45e'}},
  {id:'MEADOW',n:'VERDANT MEADOW',sub:'The road to town. Wilds rustle both sides.',req:0,lv:[2,5],gym:-1,pal:{g:'#5da244',g2:'#4c8a38',a:'#c4ec8a'},
   table:[['CINDERCAP',3],['PEBBLIT',3],['FERNFANG',3],['DRIZZLET',2],['ZIPWIG',2]]},
- {id:'TOWN',n:'LANTERN TOWN',sub:'The road ends. Ranger keeps the gym.',req:0,gym:0,pal:{g:'#639a48',g2:'#548239',a:'#ffd94d'}},
+ {id:'TOWN',n:'LANTERN TOWN',sub:'The brightest street, once. The Elder remembers.',req:0,gym:0,pal:{g:'#639a48',g2:'#548239',a:'#ffd94d'}},
  {id:'WASTES',n:'EMBER WASTES',sub:'Hot rocks, hotter tempers.',req:1,lv:[6,10],gym:1,pal:{g:'#a06a34',g2:'#8a5a2c',a:'#f0a050'},
   table:[['CINDERCAP',3],['MAGMOSS',2],['PEBBLIT',2],['BOULDERHOUND',2],['ZIPWIG',2]]},
  {id:'SHORE',n:'DEWMIST SHORE',sub:'Tide pools and tall reeds.',req:2,lv:[10,15],gym:2,pal:{g:'#86ac60',g2:'#77994f',a:'#7fd0e8'},
@@ -315,8 +315,8 @@ const WKEEPERS={
  WILL:{pas:'Lantern Charm: catch +15%',act:'SELFIE FLASH',actD:'Dazzled foe: ATK down, loses a turn.'},
  ERIN:{pas:'Green Hands: +1 yield',act:'TOWEL WHIP',actD:'Damage + the foe loses its turn.'},
  MARCUS:{pas:'Drill Sergeant: hits +12%',act:'HYDRO JET',actD:'A pressurized DEW blast.'}};
-const WTALK={PIP:['A wild ZIPWIG chased me home once. It just wanted my sandwich, I think.','When I grow up I want a whole FORTUNE sprout. They bring luck AND snacks.','The gym leader? That is Ranger. He is tough but he shares his berries.'],
- ELDER:['Lantern Town was three tents and a dream when I was your size, keeper.','A good base is a garden and a workshop at once. Tend both.','The Sigils are old promises. Ranger keeps the first, down at the gym.'],WILL:["I catalog every sprout in this valley. Twice.","The Lantern chose us. No pressure or anything.","If Marcus asks, I was absolutely working."],
+const WTALK={PIP:['A wild ZIPWIG chased me home once. It just wanted my sandwich, I think.','When I grow up I want a whole FORTUNE sprout. They bring luck AND snacks.','Ranger says every place has an ALPHA. I hid from ours under the porch.'],
+ ELDER:['Lantern Town was three tents and a dream when I was your size, keeper.','A good base is a garden and a workshop at once. Tend both.','The Sigils are old promises. The alphas have kept them through the dark.'],WILL:["I catalog every sprout in this valley. Twice.","The Lantern chose us. No pressure or anything.","If Marcus asks, I was absolutely working."],
 ERIN:["The beds grow better when someone sings. I sing.","Louie has a route. Always trust the route.","A tidy base is a happy base. Mostly."],
 MARCUS:["I'm not an NPC. I'm between protagonists.","Your form is terrible. The sprouts respect it anyway.","Hydro Jet solves most problems. The rest are personal."]};
 function wNpcList(){if(W4.sector==='TOWN')return[{who:'PIP',x:168,y:214},{who:'ELDER',x:312,y:214}];
@@ -356,7 +356,7 @@ const WBUILD=[
 function wBuildDef(k){return WBUILD.find(b=>b.k===k)}
 function wWorkerCap(){return 2+(SW.baseLv-1)*2+SW.buildings.filter(b=>b.k==='pen').length*2}
 const WBASEMS={1:[['build:cottage','Build a Cottage'],['crop:1','Grow a crop on a garden plot'],['buddies:3','Have 3 buddies'],['build:kiln','Build a Kiln (ore makes ingots)']],
- 2:[['build:datacenter','Build a Data Center'],['buddies:5','Have 5 buddies'],['sigils:1','Earn 1 Sigil'],['build:bench','Build a Tinker Bench']]};
+ 2:[['build:datacenter','Build a Buddy Barn'],['buddies:5','Have 5 buddies'],['sigils:1','Earn 1 Sigil'],['build:bench','Build a Tinker Bench']]};
 function wMissionDone(key){const [k,v]=key.split(':');
  if(k==='build')return SW.buildings.some(b=>b.k===v);
  if(k==='crop')return plCrops()>=+v||SW.buildings.some(b=>b.k==='bed');
@@ -407,7 +407,7 @@ const wCellX=gx=>10+gx*20, wCellY=gy=>38+gy*20;
 const WCHOICE=[{sp:'CINDERCAP',x:184,y:302},{sp:'DRIZZLET',x:240,y:286},{sp:'FERNFANG',x:296,y:302}];
 
 function wCamUpdate(tx,ty){W4.cam=W4.cam||{x:0,y:0};if(!W4.fld&&ty<240)ty-=Math.min(60,(240-ty)*.7); /* near the Great Lantern the view leans up to take it in */
- W4.cam.x=Math.max(0,Math.min(WW-W,tx-W/2));W4.cam.y=Math.max(W4.fld?0:-44,Math.min((W4.wh||360)-H,ty-H/2))}
+ W4.cam.x=Math.max(0,Math.min(WW-W,tx-W/2));W4.cam.y=Math.max(W4.fld?-30:-44,Math.min((W4.wh||360)-H+16,ty-H/2))} /* v9.2: the map's top and bottom rows can scroll clear of the HUD bars */
 function wGrassPatches(){return[{x:36,y:70,w:76,h:44},{x:368,y:64,w:78,h:46},{x:60,y:200,w:84,h:48},{x:330,y:210,w:88,h:50},{x:196,y:140,w:80,h:44},{x:392,y:140,w:64,h:40},{x:150,y:262,w:90,h:46}]}
 function wInitPatch(){if(W4.patchBuds&&W4.patchBuds.length)return; /* the patch is alive — never reseed it */
  W4.patchBuds=WPLOTS.slice(0,wPlotCount()).map(([x,y])=>({sx:x,sy:y,x,y,type:-1,age:-4,stage:0,mode:'soil',item:false,tx:0,ty:0,dlv:0,seedTy:null,by:null,forPlot:null,bush:null,itemTy:0,t:0}));
@@ -571,8 +571,8 @@ function worldUpdate(dt){if(W4.scene){scTick(dt);return}scAuto();if(W4.fld){fUpd
  for(const f of W4.floats)f.t-=dt;W4.floats=W4.floats.filter(f=>f.t>0);
  if(W4.talk){const tk=W4.talk;
   if(pressed('b'))W4.talk=null;
-  else if(pressed('a')){if(tk.page===0)tk.page=1;
-   else{const who=tk.who;W4.talk=null;if(['WILL','ERIN','MARCUS'].includes(who)){SW.keeper=who;swSay(who+' takes the lantern!',2);swSnd(784,.09,1175);swSave()}}}
+  else if(pressed('a')){if(tk.page===0&&false)tk.page=1;
+   else{const who=tk.who;W4.talk=null;/* v9.2: Erin and Marcus are cast, not playable */}}
   return}
  const sp=78;let mx=0,my=0;
  if(pressed('left'))W4.lastDir='left';if(pressed('right'))W4.lastDir='right';
@@ -888,7 +888,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
  louBubDraw();wQuipDraw();g.restore();
  fxAtmos();wHud();
  if(W4.talk){const tk=W4.talk,line=tk.page===0?WTALK[tk.who][(SW.talkN[tk.who]-1)%3]:'Hand over the lantern?';
-  uiSay(tk.who,line,null,tk.page===0?'A  MORE · B  BYE':'A  BECOME '+tk.who+' · B  NO')}}
+  uiSay(tk.who,line,null,'A  OK')}}
 
 function wDrawBuilding(b){const x=wCellX(b.gx),y=wCellY(b.gy);
  if(b.k==='cottage'){r('rgba(0,0,0,.18)',x-2,y+18,24,3);
@@ -1272,7 +1272,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.phase===
   if(pressed('a')){const o=opts[swSel];
    if(o==='FIGHT'){BT.phase='moves';swSel=0}
    else if(o==='KEEPER')wKeeperMove();
-   else if(o==='SPROUT'){if(wBuddyFull()){BT.log=[{txt:wHasDC()?'The Data Center is full.':'No room for another buddy. Build a DATA CENTER at Sunkeep first.'}];BT.after='menu';BT.phase='msg';BT.t=0}else if(wBudTotal()<=0){BT.log=[{txt:'No sprouts with you. Pluck some, or carry things home so the Lantern grows more.'}];BT.after='menu';BT.phase='msg';BT.t=0}
+   else if(o==='SPROUT'){if(wBuddyFull()){BT.log=[{txt:wHasDC()?'The Buddy Barn is full.':'No room for another buddy. Build a BUDDY BARN at Sunkeep first.'}];BT.after='menu';BT.phase='msg';BT.t=0}else if(wBudTotal()<=0){BT.log=[{txt:'No sprouts with you. Pluck some, or carry things home so the Lantern grows more.'}];BT.after='menu';BT.phase='msg';BT.t=0}
     else{BT.phase='budpick';swSel=0}}
    else if(o==='BUDDY'){const ok=SW.party.findIndex((m,i)=>i!==BT.aiIx&&m.hp>0);if(ok<0){swSnd(140,.08);BT.noSwap=1.6}else{BT.phase='party';swSel=ok;BT.partyFrom='menu'}}
    else if(o==='RUN'){if(Math.random()<.7){if(BT.mode==='raid'){const lost=Math.min(15,SW.res.petal);SW.res.petal-=lost;BT.log=[{txt:'You fled — Bottie trashed the place on his way out. (-'+lost+' petals)'}]}else BT.log=[{txt:'Got away safely!'}];BT.after='endwin';BT.phase='msg';BT.t=0}

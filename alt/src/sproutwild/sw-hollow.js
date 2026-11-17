@@ -2,8 +2,8 @@
    CROOKED HOLLOW (v7.0): a second wild area before the gym
    Old woods east of the Meadow, reached by the east road. Wilds are
    Lv4-7, so it is where a team grows up before facing the Ranger.
-   Two creatures from north-east Ohio lore live only here:
-     MELONKIN  the Melon Heads of the Kirtland woods
+   Two creatures from valley lore live only here:
+     MELONKIN  the melon-headed folk of the Hollow woods
      PYTHORN   the Peninsula Python, loose since a 1944 circus wreck;
                it sleeps on the Hollow's treasure as the area's alpha.
    ================================================================ */
