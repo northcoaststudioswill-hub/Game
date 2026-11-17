@@ -3,6 +3,11 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v10.0: Buddy Barn before the first alpha
+- Pressing A on the castle alpha with no Buddy Barn and no sigil now stops the fight. Marcus says: "Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do." He then names the cost: 8 stone, 2 ingots, at Sunkeep.
+- The goal line says to build the Buddy Barn first until it's built. After that it's back to "Light the castle ALPHA".
+- Checked in the lab at 430x932: the gate stops the fight without a barn and the battle starts with one, with no page errors. Not yet played by hand from a fresh save.
+
 ## Cartridge 5: Sproutwild fused in (Nov 15 2026)
 
 ALT is now the main line of the game, with five cartridges: Sprouts, Knockout, Rootdeep, Patch & Plate, **Sproutwild**.

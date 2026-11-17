@@ -8437,7 +8437,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
   else if(n.k==='spot')fFetch(F,n.sp);
   else if(n.k==='node')wNodeAct(n.nd);
   else if(n.k==='wild'){const wd=n.wd;W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv))}
-  else if(n.k==='alpha'){const al=n.al;if(!SW.party.some(m=>m.hp>0)){swSay('No buddy fit to battle.',1.6);return}
+  else if(n.k==='alpha'){const al=n.al;if(!SW.party.some(m=>m.hp>0)){swSay('No buddy fit to battle.',1.6);return}if(!SCOFF&&!SW.badges.length&&!wHasDC()){scStart([{who:'MARCUS',txt:"Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do."},{who:'MARCUS',txt:'Build a BUDDY BARN at Sunkeep first: 8 stone, 2 ingots. Then we take this alpha.'}]);return}
    wEngage('ALPHA '+al.sp+'!',()=>{wStartWildAt(al.sp,al.lv);BT.log.unshift({txt:'The ALPHA '+al.sp+' rears up — it is huge!'});
     BT.onEnd=(won,bt)=>{if(bt.foe.hp<=0||bt.orbOk){SW.fl[al.fk]=1;const i=F.alphas.indexOf(al);if(i>=0)F.alphas.splice(i,1);swSay('The alpha has the light again. Its treasure is unguarded!',3);alphaSigil(al.sp);swSave()}}})}
   else if(n.k==='npc'){const np=n.np;
@@ -11337,6 +11337,9 @@ function wTutNear(n){const st=wTutStage();if(!st)return true;
  if(n.k==='bud')return st==='a3'||st==='a4';
  return false}
 function wTutHint(){if(time<(W4.tutHintT||0))return;W4.tutHintT=time+4;swSay("ERIN: Hang on! I'll show you that. Stick with me.",2.4)}
+
+/* v10.0: the first alpha waits for a Buddy Barn */
+const _wGG10=wGymGoal;wGymGoal=function(){if(SW.quest>=5&&!SW.badges.length&&!wHasDC())return 'Build a BUDDY BARN at Sunkeep (8 stone, 2 ingots) before the castle alpha.';return _wGG10()};
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */

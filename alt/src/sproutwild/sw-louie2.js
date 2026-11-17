@@ -71,3 +71,6 @@ function wTutNear(n){const st=wTutStage();if(!st)return true;
  if(n.k==='bud')return st==='a3'||st==='a4';
  return false}
 function wTutHint(){if(time<(W4.tutHintT||0))return;W4.tutHintT=time+4;swSay("ERIN: Hang on! I'll show you that. Stick with me.",2.4)}
+
+/* v10.0: the first alpha waits for a Buddy Barn */
+const _wGG10=wGymGoal;wGymGoal=function(){if(SW.quest>=5&&!SW.badges.length&&!wHasDC())return 'Build a BUDDY BARN at Sunkeep (8 stone, 2 ingots) before the castle alpha.';return _wGG10()};
