@@ -26,12 +26,16 @@ const WAIM={T:1.0,R0:44,R1:10};
 function aimR(){return WAIM.R0-(WAIM.R0-WAIM.R1)*Math.min(1.25,(BT.aimT||0)/(WAIM.T*.8))}
 function aimUpdate(dt){BT.aimT=(BT.aimT||0)+dt;const rr=aimR();let q=null;
  if(pressed('a')){const d=Math.abs(rr-WAIM.R1);q=d<=4.5?'GREAT':d<=10?'GOOD':'MISS'}else if(BT.aimT>=WAIM.T)q='MISS';
- if(!q)return;BT.aimX=q==='GREAT'?1.3:q==='GOOD'?1.12:0;BT.aimQ={q,t:time};if(q!=='MISS')swSnd(q==='GREAT'?1046:784,.08,1568);
+ if(!q)return;BT.aimX=q==='GREAT'?1.3:q==='GOOD'?1.12:0;BT.aimQ={q,t:time,why:q!=='MISS'?'':pressed('a')&&rr>WAIM.R1?'TOO EARLY':'TOO LATE'};if(q!=='MISS')swSnd(q==='GREAT'?1046:784,.08,1568);else swSnd(196,.07,150);
  SW.lessons.aimN=(SW.lessons.aimN||0)+1;const mv=BT.aimMv;BT.aimMv=null;BT.phase='msg';BT.t=0;wResolveTurn(mv);BT.aimX=0;
  if(q!=='MISS'&&BT.log&&BT.log.length){const i=BT.log.findIndex(l=>l.txt.indexOf(' used ')>0&&l.txt.startsWith(btCur().sp+' '));if(i>=0)BT.log.splice(i+1,0,{txt:q==='GREAT'?'GREAT timing! It hit hard.':'Good timing!'})}}
 function aimDraw(){if(!BT)return;const fg=BT._fg||[W*.71,120];
  if(BT.phase==='aim'){const x=Math.round(fg[0]),y=Math.round(fg[1])-14,rr=aimR(),ring=(rad,c,w)=>{if(!g.beginPath)return;g.strokeStyle=c;g.lineWidth=w;g.beginPath();g.arc(x,y,Math.max(1,rad),0,6.3);g.stroke()};
-  ring(WAIM.R1,'#ffffff',2);ring(WAIM.R1+3,'rgba(255,255,255,.35)',1);ring(rr,'#ffd94d',2);
+  /* v10.1: the window is a band you can see. Pale = GOOD, bright = GREAT. The closing ring turns green inside GREAT. */
+  const dd=Math.abs(rr-WAIM.R1),hot=dd<=4.5,warm=dd<=10;
+  ring(WAIM.R1+5,'rgba(255,255,255,.28)',10);ring(WAIM.R1,'rgba(255,255,255,.95)',5);ring(rr,'#14101e',5);ring(rr,hot?'#7dff7a':warm?'#ffffff':'#ffd94d',3);
+  {const bw=84,bx=Math.round(W/2-bw/2),by=y+WAIM.R0+28+((SW.lessons.aimN||0)<3?12:0)-14,k=Math.min(1.25,(BT.aimT||0)/(WAIM.T*.8)),u=v=>bx+Math.round(bw*v/1.25),k4=4.5/(WAIM.R0-WAIM.R1),k10=10/(WAIM.R0-WAIM.R1);
+   r('#14101e',bx-2,by-2,bw+4,9);r('#3a3448',bx,by,bw,5);r('rgba(255,255,255,.45)',u(1-k10),by,u(1+k10)-u(1-k10),5);r('#ffffff',u(1-k4),by,u(1+k4)-u(1-k4),5);r(hot?'#7dff7a':'#ffd94d',u(k)-1,by-2,3,9)}
   const t2='PRESS A!';r('#14101e',x-tw(t2,1)/2-3,y+WAIM.R0+2,tw(t2,1)+6,10);text(t2,x-tw(t2,1)/2,y+WAIM.R0+3,1,'#ffd94d',null);
-  if((SW.lessons.aimN||0)<3){const t3='as the gold ring meets the white one';r('#14101e',W/2-tw(t3,1)/2-3,y+WAIM.R0+14,tw(t3,1)+6,10);text(t3,W/2-tw(t3,1)/2,y+WAIM.R0+15,1,'#ffffff',null)}}
- const Q=BT.aimQ;if(Q&&time-Q.t<.9&&Q.q!=='MISS'){const k=(time-Q.t)/.9;g.globalAlpha=1-k;const t2=Q.q+'!';text(t2,Math.round(fg[0]-tw(t2,2)/2),Math.round(fg[1]-44-k*10),2,Q.q==='GREAT'?'#ffd94d':'#ffffff',null);g.globalAlpha=1}}
+  if((SW.lessons.aimN||0)<3){const t3='when the ring turns green';r('#14101e',W/2-tw(t3,1)/2-3,y+WAIM.R0+14,tw(t3,1)+6,10);text(t3,W/2-tw(t3,1)/2,y+WAIM.R0+15,1,'#ffffff',null)}}
+ const Q=BT.aimQ;if(Q&&time-Q.t<.9){const k=(time-Q.t)/.9,miss=Q.q==='MISS';g.globalAlpha=1-k;const t2=miss?Q.why:Q.q+'!',sz=miss?1:2;if(t2)text(t2,Math.round(fg[0]-tw(t2,sz)/2),Math.round(fg[1]-(miss?74:44)-k*(miss?4:10)),sz,miss?'#b8b0c8':Q.q==='GREAT'?'#ffd94d':'#ffffff',miss?'#14101e':null);g.globalAlpha=1}}

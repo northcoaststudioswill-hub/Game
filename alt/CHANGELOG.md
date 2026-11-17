@@ -3,6 +3,34 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v10.1: the slice refinements (Will's list, Nov 17)
+Tutorial
+- Erin's walk now has a real battle step. After your first catch she points at a second wild one and waits until you press SELECT on it. Before, she told you about SELECT and the game blocked it.
+- After your first defeat Erin explains it: a buddy you can't show the light stays dark, so a battle is sometimes the only way. No blame, no penalty.
+- Defeat wording changed to "The dark breaks. X is gone." (Will: a defeat kills the buddy.) The game quietly counts these for the soul story later.
+
+Castle
+- The castle is a three-step puzzle: sprouts build a bridge over a moat, LEAF clears the thorn gate, PEB cracks a boulder wall inside. A PEB grows in the courtyard so nobody is stuck.
+- Louie's castle reveal names the three steps. If you have no Buddy Barn, Marcus says his line there too.
+- **The Buddy Barn now costs 8 stone and 6 wood, not 2 ingots.** Ingots needed a kiln, ore and smelting time, which is too long a chain in front of the first alpha. Will: say if you want ingots back.
+
+Battles
+- The timed strike is easier to read: a white band shows the window, the closing ring turns green inside it, and a slide bar under it shows the same timing.
+- A miss now says TOO EARLY or TOO LATE, with a low sound.
+
+Field and base
+- Louie and your buddies no longer walk on water. Blocked by a pond, they hop to your side.
+- The bottom bar shows your buddies: face, health line, and a gold dot while one is off working.
+- Pop-ups are calmer: the same pickup merges into one count, they fade out, and at most four show at once.
+- At Sunkeep one line under the goal says what each worker is doing, one at a time.
+
+Buddies
+- Two grades on the Buddies screen: BATTLE (the level) and WORK (from jobs done), with what's left to the next of each.
+- You can release a boxed buddy: START, then START again. The word "release" is a placeholder until Will picks one.
+
+Checked: field lab passes with no page errors. Real-time at 430x932: tutorial fight step, castle puzzle start to end, battle ring, water, party and box screens, crew line.
+Not checked: a full fresh-save playthrough by hand; old-save test could not run (its old builds are not in this checkout).
+
 ## v10.0: Buddy Barn before the first alpha
 - Pressing A on the castle alpha with no Buddy Barn and no sigil now stops the fight. Marcus says: "Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do." He then names the cost: 8 stone, 2 ingots, at Sunkeep.
 - The goal line says to build the Buddy Barn first until it's built. After that it's back to "Light the castle ALPHA".

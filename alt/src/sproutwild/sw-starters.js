@@ -80,7 +80,7 @@ function drawChoice(){const sp=W4.choiceSp,s2=wSp(sp),spr=s2._spr,T=TYPES[s2.t[0
  if(t>3.6){r('#14121e',0,H-18,W,18);const a='A  BEFRIEND',b='B  SEE THE OTHERS';text(a,8,H-13,1,'#7ee787',null);text(b,W-8-tw(b,1),H-13,1,'#a89ec2',null)}
  else{const s='A  SKIP';text(s,W-8-tw(s,1),H-13,1,'#5a5870',null)}}
 /* ---------------- the Data Center: where buddies beyond three are kept ---------------- */
-WBUILD.push({k:'datacenter',n:'BUDDY BARN',cost:{stone:8,ingot:2},max:1,d:'Stores 12 more buddies. Without it you can keep only three.'});
+WBUILD.push({k:'datacenter',n:'BUDDY BARN',cost:{stone:8,wood:6},max:1,d:'Stores 12 more buddies. Without it you can keep only three.'});
 function wHasDC(){return SW.buildings.some(b=>b.k==='datacenter'&&!b.con)}
 function wBuddyCap(){return wHasDC()?15:3}
 let WNOCAP=false;

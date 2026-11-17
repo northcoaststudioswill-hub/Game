@@ -571,7 +571,7 @@ function worldUpdate(dt){if(W4.scene){scTick(dt);return}scAuto();if(W4.fld){fUpd
  if(W4.msgT>0)W4.msgT-=dt;
  if(W4.tossFx){W4.tossFx.t-=dt;if(W4.tossFx.t<=0)W4.tossFx=null}
  if(W4.cmdT&&W4.cmdT.nd.got)W4.cmdT=null;
- for(const f of W4.floats)f.t-=dt;W4.floats=W4.floats.filter(f=>f.t>0);
+ wFloatCalm();for(const f of W4.floats)f.t-=dt;W4.floats=W4.floats.filter(f=>f.t>0);
  if(W4.talk){const tk=W4.talk;
   if(pressed('b'))W4.talk=null;
   else if(pressed('a')){if(tk.page===0&&false)tk.page=1;
@@ -873,7 +873,7 @@ function wDrawWorld(){if(W4.fld){fDraw();return}const sec=wSector(W4.sector),pal
  if(W4.bf){fSqDraw(W4.bf,true);wkDraw(true);fRing(W4.bf)}
  for(const f of W4.floats){const ft=wFit(f.txt,190),cx0=W4.cam?W4.cam.x:0;
   const fx2=Math.max(cx0+tw(ft,1)/2+3,Math.min(cx0+W-tw(ft,1)/2-3,f.x));
-  text(ft,Math.round(fx2-tw(ft,1)/2),Math.round(f.y-(1.4-f.t)*8),1,f.c,null)}
+  g.globalAlpha=Math.max(0,Math.min(1,f.t*2.5));text(ft,Math.round(fx2-tw(ft,1)/2),Math.round(f.y-(1.4-Math.min(1.4,f.t))*8),1,f.c,null);g.globalAlpha=1}
  for(const [fk,fo] of (W4.front||[])){if(fk==='n')wDrawNode(fo);else wDrawDecor(fo)}
  if(W4.sector==='PEAK'&&SW.bottieSeen&&!SW.bottieBeat){wChar('BOTTIE',300,124+Math.round(Math.sin(time*1.7)*2),22);
   if(Math.hypot(P3.x-300,P3.y-120)>34){r('rgba(10,14,8,.55)',300-tw('BOTTIE',1)/2-2,126,tw('BOTTIE',1)+4,9);text('BOTTIE',300-tw('BOTTIE',1)/2,127,1,'#7ee7ff',null)}}
@@ -1190,7 +1190,7 @@ function wResolveTurn(myMove){const me=btCur(),foe=BT.foe;
    if(me.hp<=0){wMineDown();break}}}
  if(BT.log.length===0)BT.log.push({txt:'...'});
  if(!BT.after)BT.after='menu';BT.phase='msg'}
-function wFoeDown(){const me=btCur(),foe=BT.foe;if(BT.mode==='wild')wShowLight();BT.log.push({txt:BT.mode==='wild'?'The dark breaks! '+foe.sp+' settles down, calm.':foe.sp+' fainted!'}); /* v9.1: we cleanse, we do not knock out */
+function wFoeDown(){const me=btCur(),foe=BT.foe;if(BT.mode==='wild')wShowLight();BT.log.push({txt:BT.mode==='wild'?'The dark breaks. '+foe.sp+' is gone.':foe.sp+' fainted!'});if(BT.mode==='wild'){SW.souls=(SW.souls||0)+1;if(!SW.lessons.defeat1)SW.lessons.defeat1=1} /* v10.1 (Will): a defeat kills the buddy, no penalty */
  if(BT.mode==='wild'){const dk=[0,1].includes(wSp(foe.sp).t[0])?'ore':'fiber';SW.res[dk]=(SW.res[dk]||0)+1;
   BT.log.push({txt:'It dropped '+dk.toUpperCase()+'. (+1)'})}
  const gain=Math.round((5+foe.lv*3)*(BT.mode==='gym'||BT.mode==='raid'||BT.mode==='trainer'?1.5:1));
@@ -1819,18 +1819,21 @@ function partyUpdate(){swNav(Math.max(1,SW.party.length+1));
   else swSnd(140,.08)}
  if(pressed('start')&&SW.party.length>1&&swSel<SW.party.length){const m=SW.party.splice(swSel,1)[0];SW.box.push(m);
   swSay(m.sp+' moved to the base box.',1.5);swSel=0;swSave()}}
-function drawParty(){swShell('BUDDIES','START: send to box');
- const items=SW.party.map((m,i)=>{const st=wStats(m);return{a:(i===0?'★ ':'')+m.sp+' Lv'+m.lv,b:'HP '+m.hp+'/'+st.max+(i===0?' · LEADER':'')}});
+function drawParty(){swShell('BUDDIES','A: lead/tonic · START: box');
+ const items=SW.party.map((m,i)=>({a:(i===0?'★ ':'')+m.sp,b:'BATTLE '+m.lv+' · WORK '+wWorkGrade(m)}));
  items.push({a:'— BASE BOX —',b:SW.box.length+' buddies'});
- const m=SW.party[Math.min(swSel,SW.party.length-1)];
- swRows(items,swSel,m?wSp(m.sp).t.map(t=>WT[t]).join('/')+' · Moves: '+m.moves.map(x=>WMOVES[x].n).join(', ')+'. Work: '+Object.entries(wSp(m.sp).work).map(([k,v])=>k+' '+v).join(', ')+'.'+(m.wxp?' Work XP '+m.wxp+' (skill +'+Math.min(3,((m.wxp||0)/3)|0)+').':'')+' XP to next: '+Math.max(0,wXpNext(m.lv)-m.xp)+(swSel===0?'. A: use Tonic.':'. A: make leader.'):'Buddies resting at base.')}
+ const m=SW.party[Math.min(swSel,SW.party.length-1)],wg=m?wWorkGrade(m):0;
+ swRows(items,swSel,m?'HP '+m.hp+'/'+wStats(m).max+' · '+wSp(m.sp).t.map(t=>WT[t]).join('/')+' · '+Math.max(0,wXpNext(m.lv)-m.xp)+' XP to next BATTLE grade'+(wg<4?' · '+(3-((m.wxp||0)%3))+' jobs to next WORK grade':'')+'. Jobs: '+Object.entries(wSp(m.sp).work).map(([k,v])=>k+' '+v).join(', ')+'.':'Buddies resting at base.')}
 function boxUpdate(){swNav(Math.max(1,SW.box.length));
- if(pressed('b')){state='g4party';swSel=0;return}
+ if(pressed('b')){if(W4.relAsk&&time<(W4.relT||0)){W4.relAsk=null;return}state='g4party';swSel=0;return}
+ if(pressed('start')&&SW.box.length){const m=SW.box[swSel]; /* v10.1: release a boxed buddy. START twice, so it can't happen by accident */
+  if(W4.relAsk===m&&time<(W4.relT||0)){SW.box.splice(swSel,1);W4.relAsk=null;swSel=Math.max(0,Math.min(swSel,SW.box.length-1));swSnd(660,.08,990);swSay(m.sp+' goes back to the wild, bright and free.',2);swSave()}
+  else{W4.relAsk=m;W4.relT=time+8;swSnd(300,.05);swSay('Release '+m.sp+' Lv'+m.lv+' for good? Press START again.',3.6)}return}
  if(pressed('a')&&SW.box.length){if(SW.party.length>=3){swSnd(140,.08);swSay('Your buddy crew is full (3).',1.4);return}
   const m=SW.box.splice(swSel,1)[0];SW.party.push(m);swSay(m.sp+' joined your buddies.',1.5);swSel=0;swSave()}}
-function drawBox(){swShell('BASE BOX','A: bring to party');
+function drawBox(){swShell('BASE BOX','A: bring · START: release');
  if(!SW.box.length){ctext('No buddies at base yet.',60,1,'#a8c898',null);return}
- swRows(SW.box.map(m=>({a:m.sp+' Lv'+m.lv,b:'HP '+m.hp+'/'+wStats(m).max})),swSel,'Caught buddies live here. Production workers are picked from the box.')}
+ swRows(SW.box.map(m=>({a:m.sp,b:'BATTLE '+m.lv+' · WORK '+wWorkGrade(m)})),swSel,W4.relAsk&&W4.relAsk===SW.box[swSel]&&time<(W4.relT||0)?'Release '+W4.relAsk.sp+' for good? START again: release. B: keep it.':'Caught buddies live here. Home workers are picked from the box. START releases one for good.')}
 function dexUpdate(){swNav(WSPECIES.length);if(pressed('b')){state='g4pause';swSel=0}}
 function drawDex(){swShell('BUDDY GUIDE','');
  swRows(WSPECIES.map(s=>({a:SW.seen[s.id]?(SW.caught[s.id]?'● ':'○ ')+s.id:'???',b:SW.seen[s.id]?s.t.map(t=>WT[t]).join('/'):''})),
@@ -2034,3 +2037,6 @@ const SWF={cast:()=>W4.cast,noBugs:v=>{WNOBUG=v},walk:()=>({st:SW.walk||0,ew:W4.
  npcs:()=>wNpcList(),talk:()=>W4.talk,banner:()=>W4.banner,groundHearts:()=>W4.groundHearts||[],
  plot:()=>wPlot(),cursor:()=>W4.cursor,setKeeper:(k)=>{SW.keeper=k;swSave()},
  stam:(v)=>{if(v!=null)SW.stam=v;return SW.stam},tools:()=>SW.tools,tend:()=>{SW.tended=6;SW.tendDone=true;SW.tendStage=4;SW.plucked=2;SW.trioPlucked=[0,2];SW.buds.EMBER=(SW.buds.EMBER||0)+1;SW.buds.DEW=(SW.buds.DEW||0)+1;wInitPatch();swSave()},tendState:()=>({tended:SW.tended,done:!!SW.tendDone,stage:SW.tendStage,plucked:SW.plucked}),tendBuds:()=>W4.tend?W4.tend.buds:null,patch:()=>W4.patchBuds,loose:()=>W4.loose,ask:(who)=>SW.asks?SW.asks[who]||null:null,dayT:(v)=>{if(v!=null)W4.dayT=v;return W4.dayT},treasure:()=>W4.treasure,lesson:()=>W4.lesson,guidePage:()=>W4.guidePage,bottie:()=>({seen:SW.bottieSeen,beat:SW.bottieBeat}),raid:()=>wStartRaid(),gymIx:()=>wGymIx(wSector(W4.sector)),cine:()=>W4.cine,confirm:()=>W4.confirm,botState:()=>({ph:W4.botPhase,pg:W4.botPage}),crew:()=>SW.crew,followers:()=>SW.followers,fol:()=>W4.fol,cmdMode:()=>SW.cmdMode,items:()=>W4.items,bushes:()=>W4.bushes,engage:()=>W4.engage,addCrew:(ty)=>{SW.crew.push({type:ty,dlv:3,wxp:0,job:-1});swSave()},quest:()=>SW.quest,moves:()=>WMOVES,species:()=>WSPECIES,sel:()=>swSel,cam:()=>W4.cam,part:()=>W4.part,wilds:()=>W4.wilds};
+
+/* v10.1: two grades. Battle grade is the level; work grade comes from jobs done. */
+function wWorkGrade(m){return 1+Math.min(3,((m.wxp||0)/3)|0)}

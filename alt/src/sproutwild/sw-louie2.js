@@ -57,8 +57,9 @@ function scWalkUp(steps){if(W4.fld||!W4.cast||steps.some(s=>s.fn))return steps;
    Talking, petting Louie, the Lantern post and signs always work.
    ================================================================ */
 function wTutStage(){if(SCOFF||!W4.fld||W4.fld.id!=='MEADOW')return null;const w2=SW.walk2||0,w3=SW.walk3||0;
- if(w2<10)return'a'+w2;if(w3>=1&&w3<7)return'b'+w3;return null}
+ if(w2===2&&SW.lessons.tutFight===1)return'af';if(w2<10)return'a'+w2;if(w3>=1&&w3<7)return'b'+w3;return null}
 function wTutAim(o,k){const st=wTutStage();if(!st||W4.tutOff)return true;
+ if(st==='af')return k==='wild';
  if(st==='a1'||st==='a2')return k==='wild'&&!!o.tame;
  if(st==='a5'||st==='a6')return k==='gate';
  if(st==='a7'||st==='a8')return k==='site';
@@ -73,4 +74,11 @@ function wTutNear(n){const st=wTutStage();if(!st)return true;
 function wTutHint(){if(time<(W4.tutHintT||0))return;W4.tutHintT=time+4;swSay("ERIN: Hang on! I'll show you that. Stick with me.",2.4)}
 
 /* v10.0: the first alpha waits for a Buddy Barn */
-const _wGG10=wGymGoal;wGymGoal=function(){if(SW.quest>=5&&!SW.badges.length&&!wHasDC())return 'Build a BUDDY BARN at Sunkeep (8 stone, 2 ingots) before the castle alpha.';return _wGG10()};
+const _wGG10=wGymGoal;wGymGoal=function(){if(SW.quest>=5&&!SW.badges.length&&!wHasDC())return 'Build a BUDDY BARN at Sunkeep (8 stone, 6 wood) before the castle alpha.';return _wGG10()};
+
+/* v10.1: the castle is a three-step puzzle. A moat (sprouts build the bridge), the thorn gate (LEAF),
+   then an inner boulder wall (PEB) in front of the alpha. A PEB grows in the courtyard, so nobody is stuck. */
+{const R=FMAPS.SQUIRE.rows,put=(y,x,s)=>{R[y]=R[y].slice(0,x)+s+R[y].slice(x+s.length)};
+ put(4,25,'.');put(5,20,'###x###');put(6,25,'q');put(7,21,'u');
+ put(9,18,'::~~~b~~~~');put(9,28,'.');put(10,16,'::::::::');
+ FMAPS.SQUIRE.key.u={k:'bud',type:1}}

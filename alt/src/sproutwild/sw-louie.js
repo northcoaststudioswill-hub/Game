@@ -10,7 +10,7 @@ function louSay(s,t){W4.lsay={s,t:t||2}}
 function louSt(){if(!W4.lst)W4.lst={st:'follow',t:0,dig:R2(25,40),bark:6,sx:lou.x,sy:lou.y,fx:-1};return W4.lst}
 function R2(a,b){return a+Math.random()*(b-a)}
 function louIdleTick(dt){const moving=keys.up||keys.down||keys.left||keys.right;W4.pIdle=moving?0:(W4.pIdle||0)+dt;if(W4.lsay){W4.lsay.t-=dt;if(W4.lsay.t<=0)W4.lsay=null}}
-function louGo(L,tx,ty,v,dt){const dx=tx-lou.x,dy=ty-lou.y,d=Math.hypot(dx,dy);W4.louMv=d>3;if(d>3){const s=Math.min(d*6,v);lou.x+=dx/d*s*dt;lou.y+=dy/d*s*dt;if(Math.abs(dx)>1)L.fx=dx>0?1:-1}return d}
+function louGo(L,tx,ty,v,dt){const dx=tx-lou.x,dy=ty-lou.y,d=Math.hypot(dx,dy);W4.louMv=d>3;if(d>3){const s=Math.min(d*6,v);fDryStep(lou,lou.x+dx/d*s*dt,lou.y+dy/d*s*dt,dt);if(Math.abs(dx)>1)L.fx=dx>0?1:-1}return d}
 /* at your side, not behind you; holds still when you do */
 function louSide(L,dir){const dx=dir[0],dy=dir[1],fx=P3.x+dx*14-lou.x,fy=P3.y+dy*14-lou.y,facing=Math.hypot(fx,fy)<30&&(dx*(lou.x-P3.x)+dy*(lou.y-P3.y))>0;if(facing){L.sx=lou.x;L.sy=lou.y;return} /* walking toward him: he holds still so you can reach him */
  if(W4.pIdle<.15){const px=-dy,py=dx;L.sx=P3.x-dx*4+px*22;L.sy=P3.y+4-dy*4+py*22;

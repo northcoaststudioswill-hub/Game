@@ -62,7 +62,7 @@ function sqArrive(F){if(!F||F.id!=='SQUIRE'||SW.lessons.squire)return;if((W4.ban
  scStart([{hold:.4},{x:gx,y:gy-20,hold:1.4},
   {x:gx,y:gy-20,who:'',txt:"Squire's castle. Somebody started building it long ago and never finished. The dark moved in instead."},
   {x:ax,y:ay,hold:1.0},{x:ax,y:ay,who:'LOUIE',txt:'Grrr... the ALPHA. Stone all the way through. Water and leaves wear it down. Woof.'},
-  {x:gx,y:gy,who:'LOUIE',txt:'THORN VINES on the gate. LEAF sprouts clear them: face the gate and press A.'},{hold:.3}],()=>swSave())}
+  {x:gx,y:gy+16,who:'LOUIE',txt:'A MOAT, then THORN VINES, then a BOULDER inside. Sprouts build the bridge. LEAF clears thorns. PEB cracks rock. Woof.'},{hold:.3}].concat(wHasDC()?[]:[{x:gx,y:gy+16,who:'MARCUS',txt:"Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do."},{x:gx,y:gy+16,who:'MARCUS',txt:'A BUDDY BARN, bro. 8 stone, 6 wood, back at Sunkeep. The alpha can wait for that.'}]),()=>{if(!wHasDC())SW.lessons.barnTold=1;swSave()})}
 /* in any wild area: Louie sniffs out the castle road, and points you at the Lantern post the first time you are hurt */
 function sqHint(F){if(!F||W4.scene||state!=='g4world'||(W4.banner&&W4.banner.t>0))return;
  if(F.id==='MEADOW'&&SW.quest>=5&&SW.badges.length<1&&!(SW.visited&&SW.visited.SQUIRE)&&!SW.lessons.sqHint&&P3.y>17*16&&Math.abs(P3.x-(17*16+16))<70){SW.lessons.sqHint=1;louSay('SNIFF! A CASTLE, SOUTH!',2.8);swSnd(600,.05,420)}

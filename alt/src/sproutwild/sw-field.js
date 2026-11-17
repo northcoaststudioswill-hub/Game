@@ -403,7 +403,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
  for(const g2 of F.gates)if(g2.shake>0)g2.shake-=dt;
  if(SW.quest<5)wQuestTick();
  if(W4.banner&&W4.banner.t>0)W4.banner.t-=dt;if(W4.msgT>0)W4.msgT-=dt;
- for(const f of W4.floats)f.t-=dt;W4.floats=W4.floats.filter(f=>f.t>0);
+ wFloatCalm();for(const f of W4.floats)f.t-=dt;W4.floats=W4.floats.filter(f=>f.t>0);
  W4.dayT=(W4.dayT||0)+dt;if(W4.dayT>=300){W4.dayT-=300;SW.day=(SW.day||1)+1;swSave()}
  if(wDark()>.5&&SW.lessons&&!SW.lessons.night){SW.lessons.night=1;swSay('Night falls. Wild buddies grow bolder out there.',2.6);swSave()}
  F.t0+=dt;if(F.got){F.got.t-=dt;if(F.got.t<=0)F.got=null}
@@ -452,7 +452,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
   else if(n.k==='spot')fFetch(F,n.sp);
   else if(n.k==='node')wNodeAct(n.nd);
   else if(n.k==='wild'){const wd=n.wd;W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv))}
-  else if(n.k==='alpha'){const al=n.al;if(!SW.party.some(m=>m.hp>0)){swSay('No buddy fit to battle.',1.6);return}if(!SCOFF&&!SW.badges.length&&!wHasDC()){scStart([{who:'MARCUS',txt:"Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do."},{who:'MARCUS',txt:'Build a BUDDY BARN at Sunkeep first: 8 stone, 2 ingots. Then we take this alpha.'}]);return}
+  else if(n.k==='alpha'){const al=n.al;if(!SW.party.some(m=>m.hp>0)){swSay('No buddy fit to battle.',1.6);return}if(!SCOFF&&!SW.badges.length&&!wHasDC()){scStart(SW.lessons.barnTold?[{who:'MARCUS',txt:'Bro. The box first. Build a BUDDY BARN at Sunkeep: 8 stone, 6 wood. Then we take this alpha.'}]:[{who:'MARCUS',txt:"Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do."},{who:'MARCUS',txt:'Build a BUDDY BARN at Sunkeep first: 8 stone, 6 wood. Then we take this alpha.'}],()=>{SW.lessons.barnTold=1;swSave()});return}
    wEngage('ALPHA '+al.sp+'!',()=>{wStartWildAt(al.sp,al.lv);BT.log.unshift({txt:'The ALPHA '+al.sp+' rears up — it is huge!'});
     BT.onEnd=(won,bt)=>{if(bt.foe.hp<=0||bt.orbOk){SW.fl[al.fk]=1;const i=F.alphas.indexOf(al);if(i>=0)F.alphas.splice(i,1);swSay('The alpha has the light again. Its treasure is unguarded!',3);alphaSigil(al.sp);swSave()}}})}
   else if(n.k==='npc'){const np=n.np;
@@ -470,7 +470,7 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
  if(pressed('start')){swSel=0;state='g4pause'}}
 /* squad orders, shared by the field and Sunkeep: SELECT picks the kind, B throws, hold B whistles */
 function fCommand(F,dt){if(F.manT>0)F.manT-=dt;
- if(pressed('sel')&&W4.fld){const a=fAim(F),wd=a.kind==='wild'&&a.tg;if(wd&&wTutStage()&&!SCOFF){wTutHint()}else if(wd&&SW.quest>=3&&!wd.cap&&!(wd.lat&&wd.lat.length)&&Math.hypot(wd.x-P3.x,wd.y-P3.y)<64&&SW.party.some(m=>m.hp>0)){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv));return}}
+ if(pressed('sel')&&W4.fld){const a=fAim(F),wd=a.kind==='wild'&&a.tg;if(wd&&wTutStage()&&wTutStage()!=='af'&&!SCOFF){wTutHint()}else if(wd&&SW.quest>=3&&!wd.cap&&!(wd.lat&&wd.lat.length)&&Math.hypot(wd.x-P3.x,wd.y-P3.y)<64&&SW.party.some(m=>m.hp>0)){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;if(SW.lessons.tutFight===1)SW.lessons.tutFight=2;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv));return}}
  if(pressed('sel')){let i=SW.selType;for(let n=0;n<TYPES.length;n++){i=(i+1)%TYPES.length;if(F.sq.some(s=>s.type===i))break}
   SW.selType=i;F.manT=4;swSnd(660,.06,990);W4.floats.push({x:P3.x,y:P3.y-20,txt:TYPES[i].n+' SPROUTS UP NEXT',t:1.2,c:TYPES[i].l})}
  if(!keys.a&&F.aT>8)F.aT=0;
@@ -713,7 +713,7 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
  for(const nd of W4.nodes)if(!nd.got&&nd.hp<nd.max){r('#00000088',nd.x-11,nd.y-30,22,4);r('#7ee787',nd.x-10,nd.y-29,Math.round(20*Math.max(0,nd.hp)/nd.max),2)}
  if(!F.dlg&&!F.spot)fRing(F);
  for(const f of W4.floats){const ft=wFit(f.txt,200),fx2=Math.max(cx+tw(ft,1)/2+3,Math.min(cx+W-tw(ft,1)/2-3,f.x));
-  text(ft,Math.round(fx2-tw(ft,1)/2),Math.round(f.y-(1.4-Math.min(1.4,f.t))*8),1,f.c,'#14101e')}
+  g.globalAlpha=Math.min(1,f.t*2.5);text(ft,Math.round(fx2-tw(ft,1)/2),Math.round(f.y-(1.4-Math.min(1.4,f.t))*8),1,f.c,'#14101e');g.globalAlpha=1}
  /* weather motes */
  {const sid=F.id,pm=sid==='PEAK'?10:sid==='SHORE'?0:6;for(let i=0;i<pm;i++){const sd=i*47.3;
    if(sid==='PEAK')r('rgba(255,255,255,.9)',Math.round(cx+((sd*7+time*14*(1+i%3))%(W+16))-8),Math.round(cy+((sd*3+time*22)%(H+10))-5),1,1);
@@ -729,3 +729,16 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
  if(F.got){const a=Math.min(1,F.got.t*2);g.globalAlpha=a;r('#14101e',20,H/2-26,200,44);r('#ffd23f',20,H/2-26,200,2);r('#ffd23f',20,H/2+16,200,2);
   ctext('TREASURE HOME!',H/2-21,1,'#ffd94d',null);ctext(wFit(F.got.n,190),H/2-9,2,'#ffffff',null);ctext(F.got.txt,H/2+6,1,'#7ee787',null);g.globalAlpha=1}
  if(F.dlg){const dl=F.dlg,L=FLOOK[dl.who];uiSay(dl.who,dl.lines[dl.i].replace(dl.who+': ',''),null,'A  NEXT',L&&L.crown?'#1e2c5a':null)}}
+
+/* v10.1: followers keep off the water. Blocked for a moment and far from you, they hop to your side. */
+function fWet(x,y){const F=W4.fld;if(!F||F.base)return false;return fTile(F,Math.floor(x/FT),Math.floor(y/FT))==='~'}
+function fDryStep(o,nx,ny,dt,dest){if(!W4.fld||W4.fld.base||fWet(o.x,o.y)){o.x=nx;o.y=ny;return}
+ let blk=0;if(!fWet(nx,o.y+2))o.x=nx;else blk=1;if(!fWet(o.x,ny+2))o.y=ny;else blk=1;
+ if(blk&&dest){o.wetT=(o.wetT||0)+dt;if(o.wetT>.7){o.wetT=0;if(fWet(dest.x,dest.y)){o.x=nx;o.y=ny}else{o.x=dest.x;o.y=dest.y}}return} /* off to a job across the pond: a quick hop to it */
+ if(blk&&Math.hypot(P3.x-o.x,P3.y-o.y)>46){o.wetT=(o.wetT||0)+dt;if(o.wetT>1.1&&!fWet(P3.x,P3.y)){o.wetT=0;const F=W4.fld;o.x=P3.x-F.dir[0]*12;o.y=P3.y+5-F.dir[1]*8;if(fWet(o.x,o.y)){o.x=P3.x;o.y=P3.y+4}}}else o.wetT=0}
+
+/* v10.1: calmer pop-ups. Same pickups merge into one count, they fade out, and no more than four float at once. */
+function wFloatCalm(){const fl=W4.floats;for(let i=0;i<fl.length;i++){const f=fl[i];if(f.seen)continue;f.seen=1;f.t=Math.min(f.t,1.5);const m=/^\+(\d+) (.+)$/.exec(f.txt||'');if(!m)continue;
+  const o=fl.find(q=>q!==f&&q.seen&&q.lab===m[2]&&q.t>.25&&Math.hypot(q.x-f.x,q.y-f.y)<90);
+  if(o){o.n+=+m[1];o.txt='+'+o.n+' '+o.lab;o.t=Math.max(o.t,1);f.t=0}else{f.lab=m[2];f.n=+m[1]}}
+ let live=fl.filter(f=>f.t>0);while(live.length>4){live[0].t=0;live.shift()}}

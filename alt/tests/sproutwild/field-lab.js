@@ -219,9 +219,9 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   ok("the stone gatehouse guards the Squire's Lantern",f3.alphas.some(a=>a.sp==='STONESQUIRE')&&f3.items.some(i=>i.n==="SQUIRE'S LANTERN"));
   ok("Squire's wilds are Lv3 or more and a Lanternwisp is home",F.wilds().every(w=>w.lv>=3)&&(step(2),F.wilds().some(w=>w.sp==='LANTERNWISP')),F.wilds().map(w=>w.sp+w.lv).join());
   F.wilds().length=0;S.buds.LEAF=3;S.buds.PEB=3;
-  at(7,13,[1,0]);step(10);for(let i=0;i<6;i++){tap('a');step(5)}step(700);const site=f3.sites[0];
+  at(7,13,[1,0]);step(10);for(let i=0;i<6;i++){tap('a');step(5)}step(700);const site=f3.sites.slice().sort((p,q)=>Math.hypot(p.x-8*16,p.y-13*16)-Math.hypot(q.x-8*16,q.y-13*16))[0];
   ok('sprouts build the river bridge to the south-west meadow',site.done,site.hp);
-  step(40,['b']);step(30);const vg=f3.gates[0];at(23,9,[0,-1]);step(10);tap('a');step(500);
+  step(40,['b']);step(30);const vg=f3.gates.find(q=>q.c==='v');for(const q of f3.sites)q.done=1;at(23,9,[0,-1]);step(10);tap('a');step(500);
   ok('LEAF sprouts clear the thorn vines into the ruin',vg.open,vg.hp);
   step(40,['b']);step(20);F.setPos(14*16+8,1*16+10);f3.dir=[0,-1];f3.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='SQUIRE';i++)step(1,['up']);
   ok('and the north road leads back to the Meadow',F.fld()&&F.fld().id==='MEADOW',F.fld()&&F.fld().id)}

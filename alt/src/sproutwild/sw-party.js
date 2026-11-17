@@ -23,7 +23,7 @@ function pfSend(F,b,o){b.st='go';b.tg=o;b.job=pfJob(o);b.t=0;swSnd(520,.07,880);
  if(b.job==='ore'||b.job==='fiber'){if(!SW.lessons.fetch){SW.lessons.fetch=1;swSay('Buddies fetch what sprouts cannot: ORE and FIBER. The bench turns them into gear.',4)}}}
 function pfTick(F,dt){pfSync(F);const n=F.pf.filter(b=>b.st==='follow').length;let i=0;
  for(const b of F.pf){b.mv=false;
-  const go=(x,y,v,arr)=>{const dx=x-b.x,dy=y-b.y,d=Math.hypot(dx,dy);if(d<=arr)return true;const s=Math.min(d*5,v);b.x+=dx/d*s*dt;b.y+=dy/d*s*dt;b.mv=d>3;if(Math.abs(dx)>1)b.fx=dx<0?-1:1;return false};
+  const go=(x,y,v,arr)=>{const dx=x-b.x,dy=y-b.y,d=Math.hypot(dx,dy);if(d<=arr)return true;const s=Math.min(d*5,v);fDryStep(b,b.x+dx/d*s*dt,b.y+dy/d*s*dt,dt,b.st==='go'?{x,y}:null);b.mv=d>3;if(Math.abs(dx)>1)b.fx=dx<0?-1:1;return false};
   if(b.st==='follow'){const k=i++,bx=-F.dir[0],by=-F.dir[1],lx=-by,ly=bx,lat=n===1?0:(k%2?7:-7);
    const back=n===1?18:18+k*15,tx=P3.x+bx*back+lx*lat,ty=P3.y+4+by*back+ly*lat;go(tx,ty,110,3);continue}
   if(b.st==='ret'){if(go(P3.x,P3.y+8,130,22))b.st='follow';continue}
