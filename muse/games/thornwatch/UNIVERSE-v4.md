@@ -29,9 +29,11 @@ Five cartridges in one console (LATEST.md): **Sprouts** (the original, read-only
 
 ## Rules to keep it in the universe
 
+0. **The fighting game feeds the other games, not the other way round.** Its characters and moves were used in the other games. Later, things can feed back into it.
+
 1. **Canon names come from Will.** Move names are his fighting-game canon (handoff §5, rule 12). Ask before adding any.
 2. **Standalone, but one world.** A cartridge can be played alone. A nod to another game should be a small surprise, never a requirement.
-3. **Bottie and Bibi cameo only with Will's yes** (open question 3 in PROGRESS.md).
+3. **Reuse is fine.** Bottie and Bibi can appear (Will, Nov 17). Only the placeholder characters (Kiss, Scout, Ranger, Elder and similar) are open to change, so don't build meaningful stories around them.
 4. **Art is ported, not drawn new,** wherever a family sprite exists (handoff rule 12).
 
 ## Not checked

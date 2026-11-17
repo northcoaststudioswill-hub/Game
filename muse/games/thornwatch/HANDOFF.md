@@ -138,10 +138,7 @@ Don't make him name a missing layer again.
 
 - **Will's phone verdict on v3.7** (and on v3.5 and v3.6 as separate builds).
   v3.7 supersedes them. His next play is the gate.
-- **DEREK placeholder keeper: Will's veto is pending.** Derek was taken in at
-  v3.4 from Will's own Knockout notes ("Marcus's guy. He pulls up."). Do not
-  promote him to a full hero. Do not remove him. This is Will's call.
-  FENTANYAHU was deliberately not taken in, since Will hasn't settled his look.
+- **DEREK: resolved (Nov 17).** He's a recurring character, Marcus's friend, coworker and business partner. Will likes every use so far. Keep him as a keeper in Thornwatch and use him in other games too. FENTANYAHU is still not taken in, since Will hasn't settled his look.
 - **v3.7 regression tails are still owed** (section 2).
 - **Feel leftovers:** watch-only stretches up to about 15 seconds on late nights
   for entrance-campers. A mid-path event would be a feature, not a fix, and needs

@@ -20,14 +20,23 @@ Estimates: Sproutwild is Claude's, Rootdeep and the note on the others are Will'
 - Spreading across several projects is how Will is learning; the games get better together. Focus can come later, as the lessons settle.
 - Starting new projects inside this repo (Starhaven and Sootborn, then Sprouts fully here) went better than editing the Muse copies. Muse-first took longer to reach a game Will liked.
 
+## Decisions from Will (Nov 17)
+
+- **Derek is a recurring character, not a placeholder.** He's Marcus's friend, coworker and business partner. Will likes every use so far. Keep him, and use him in more games.
+- **Reuse is fine.** Characters and scenes can recur across games. Only the placeholder characters are open: Kiss, Scout, Ranger, Elder and similar. They can be renamed or become something else later, so don't build meaningful stories around them yet.
+- **Fighting game (Knockout):** its characters and moves fed the other games. Later, things can feed back into it. It's not the main project.
+- **Lore:** Sproutwild has the most developed story so far. Easter eggs can cross games. Thornwatch sits in the same Pocket Lantern universe.
+- **Bessie:** the lake monster is named BESSIE, not BESSLING.
+- **Sproutwild monsters:** they'll need an art overhaul eventually. Several look good from afar, but close up some sprites and eyes are messy. Don't rip them up now. Names and art can change later, and the Minecraft-style look has grown on Will.
+
 ## Open questions for Will
 
-1. **Derek.** Keep as a placeholder, cut, or promote to a full hero in Thornwatch?
+1. ~~Derek.~~ **Answered:** recurring character, keep.
 2. **Canon move names.** Can v4 upgrade paths use new names, or are MAZEL TOV LASER, TOWEL WHIP and the rest fixed?
-3. **Bottie and Bibi in Thornwatch.** Okay to appear in its cut-scenes, given they belong to Pocket Lantern's story?
+3. **Bottie and Bibi in Thornwatch.** Reuse is fine, so this is only a yes or no on the cut-scenes.
 4. **Thornwatch's home.** Keep it in the four-game console file, or give it its own cartridge file once v4 is ready?
 5. **Thornwatch's width.** Three gardens with a Long Night is the target. Want a fourth?
-6. **Sprout names.** Cuyapup and Bessling still point at the Cuyahoga River and Lake Erie's "Bessie". Keep or rename?
+6. ~~Sprout names.~~ **Answered:** the lake monster is BESSIE.
 7. **Starhaven.** Its outline draws on a published fantasy series. Confirm it will be an original world before it's sold or shared publicly?
 8. **Repo visibility.** Make the repo private now, or once Pocket Lantern is finished?
 
