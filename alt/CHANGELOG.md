@@ -3,6 +3,15 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v10.6: King Bibi beams it in (Will, Nov 17)
+The soul story is now two beats, spaced apart, so it no longer lands on top of "build the cottage".
+- Beat 1, right after your first kill and Erin's "why": a cut-in in the style of the HASBARA super in Knockout. Here it is KING BIBI at the desk inside the Iron Dome, and the target on his screen is the keeper. "The little keeper is asking why. Give him an answer. Make it feel like his own." A beam crosses the night into the keeper's head: AN IDEA! Then the keeper: "What if their light isn't lost? What if somebody could keep it?" Erin: "Where did that come from?" "My own head. Obviously." About 7 seconds; START skips it.
+- Beat 2, at home after the cottage is built and its party is over (plus a short quiet gap): the keeper finds the lamp while unpacking and tells Marcus the idea. "Bro. You're J-lighting again. Making up a story and calling it yours. You're way too beholden to King Bibi." "It is MY idea." Erin says keep it. You get the SOUL LAMP.
+- The keeper now speaks these lines under their own name (WILL by default).
+- The v10.5 version (one long scene on your first return home) is gone.
+
+Checked: field lab; both beats played in real time at 430x932, frames looked at.
+
 ## v10.5: expeditions and the Soul Lamp (Will's ideas, Nov 17)
 Expeditions
 - New EXPEDITION tile in the pause menu (the grid is now five shorter rows). Open after the cottage.
