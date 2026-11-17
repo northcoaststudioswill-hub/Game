@@ -21,6 +21,15 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v9.9 · 2026-11-17 · loose ends
+
+Will: keep working on the game.
+
+- **Erin's gating says so.** Pressing A at something she hasn't shown you yet (the boulder wall during the PEB lesson, say) did nothing at all; now she says "Hang on! I'll show you that. Stick with me." Checked with a real press from the spot.
+- **A prop you face wins over Louie.** At the notice board, the prompt was PET LOUIE whenever he stood beside you; it's READ THE BOARD now.
+- **The castle path, walked by script** (the autopilot never managed it in real time): LEAF sprouts at the thorn gate open it; walking in plays the courtyard scene ("Shh. It's waking up..."); CHALLENGE ALPHA STONESQUIRE starts the fight; bringing it the light gives the STONE SIGIL and counts as LIGHT SHOWN; the Sigil cinematic plays and ends "One Sigil. Crooked Hollow is open, east of the Meadow, and so is the road past Lantern Town."; the Hollow's barrier is gone. No page errors.
+- Lab: 124 checks.
+
 ## v9.8 · 2026-11-17 · Erin's Meadow walk, straightened out
 
 Will: during the tutorial you shouldn't be able to do things until Erin shows you; when you first enter you should walk more before she starts, it's awkward; the whole pathing in that first part is weird.

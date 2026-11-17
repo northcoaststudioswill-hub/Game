@@ -6567,7 +6567,7 @@ function wSproutInfo(px,py){ /* the catch-all: any sprout can be asked what it i
  return null}
 function wNear(){const sec=wSector(W4.sector),px=P3.x+P3.ax*13,py=P3.y+P3.ay*13;
  {const ex=wNearExtra(px,py);if(ex)return ex}
- if(W4.sector==='BASE'&&louPetOK()&&Math.hypot(P3.x+(P3.ax||0)*12-lou.x,P3.y+(P3.ay||0)*12-lou.y)<14)return{k:'louie',txt:'PET LOUIE'}; /* facing him, standing still: that is a pet */
+ if(W4.sector==='BASE'&&louPetOK()&&Math.hypot(P3.x+(P3.ax||0)*12-lou.x,P3.y+(P3.ay||0)*12-lou.y)<14&&!(W4.decor||[]).some(d=>d.act&&Math.hypot(px-d.x,py-d.y)<(d.r||18)))return{k:'louie',txt:'PET LOUIE'}; /* v9.9: a prop you face wins over Louie */ /* facing him, standing still: that is a pet */
  const aimT=!!(W4.bf&&(W4.bf.sq.length||(W4.bf.pf&&W4.bf.pf.length))&&fAim(W4.bf).tg);
  if(W4.loose)for(const lb of W4.loose)if(Math.hypot(px-lb.x,py-lb.y)<17)return{k:'wildpluck',lb,txt:'PLUCK '+TYPES[lb.type].n+' SPROUT'};
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)
@@ -8458,7 +8458,9 @@ function fCommand(F,dt){if(F.manT>0)F.manT-=dt;
  if(pressed('sel')&&W4.fld){const a=fAim(F),wd=a.kind==='wild'&&a.tg;if(wd&&wTutStage()&&!SCOFF){wTutHint()}else if(wd&&SW.quest>=3&&!wd.cap&&!(wd.lat&&wd.lat.length)&&Math.hypot(wd.x-P3.x,wd.y-P3.y)<64&&SW.party.some(m=>m.hp>0)){W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv));return}}
  if(pressed('sel')){let i=SW.selType;for(let n=0;n<TYPES.length;n++){i=(i+1)%TYPES.length;if(F.sq.some(s=>s.type===i))break}
   SW.selType=i;F.manT=4;swSnd(660,.06,990);W4.floats.push({x:P3.x,y:P3.y-20,txt:TYPES[i].n+' SPROUTS UP NEXT',t:1.2,c:TYPES[i].l})}
- if(keys.a&&!W4.near){if(pressed('a')){fThrow(F);F.aT=.26}else{F.aT=(F.aT||0)-dt;if(F.aT<=0){fThrow(F,true);F.aT=.2}}}
+ if(!keys.a&&F.aT>8)F.aT=0;
+ if(pressed('a')&&!W4.near&&wTutStage()&&!fAim(F).tg){W4.tutOff=1;const raw=fAim(F);W4.tutOff=0;if(raw.tg){wTutHint();F.aT=9}} /* v9.8: something Erin hasn't shown you yet */
+ if(keys.a&&!W4.near&&!(F.aT>8)){if(pressed('a')){fThrow(F);F.aT=.26}else{F.aT=(F.aT||0)-dt;if(F.aT<=0){fThrow(F,true);F.aT=.2}}}
  if(keys.b){F.bHold=(F.bHold||0)+dt;const wr=Math.min(84,14+F.bHold*150);F.whistle=wr;if(((F.bHold*10)|0)%3===0)swSnd(900+wr*9,.03);
   for(const s of F.sq)if(s.st!=='follow'&&s.st!=='fly'&&s.st!=='ret'&&Math.hypot(s.x-P3.x,s.y-P3.y)<wr){fDrop(F,s);s.st='ret'}
   if(F.pf)pfRecall(F,wr)}
@@ -11322,7 +11324,7 @@ function scWalkUp(steps){if(W4.fld||!W4.cast||steps.some(s=>s.fn))return steps;
    ================================================================ */
 function wTutStage(){if(SCOFF||!W4.fld||W4.fld.id!=='MEADOW')return null;const w2=SW.walk2||0,w3=SW.walk3||0;
  if(w2<10)return'a'+w2;if(w3>=1&&w3<7)return'b'+w3;return null}
-function wTutAim(o,k){const st=wTutStage();if(!st)return true;
+function wTutAim(o,k){const st=wTutStage();if(!st||W4.tutOff)return true;
  if(st==='a1'||st==='a2')return k==='wild'&&!!o.tame;
  if(st==='a5'||st==='a6')return k==='gate';
  if(st==='a7'||st==='a8')return k==='site';

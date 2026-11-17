@@ -519,7 +519,7 @@ function wSproutInfo(px,py){ /* the catch-all: any sprout can be asked what it i
  return null}
 function wNear(){const sec=wSector(W4.sector),px=P3.x+P3.ax*13,py=P3.y+P3.ay*13;
  {const ex=wNearExtra(px,py);if(ex)return ex}
- if(W4.sector==='BASE'&&louPetOK()&&Math.hypot(P3.x+(P3.ax||0)*12-lou.x,P3.y+(P3.ay||0)*12-lou.y)<14)return{k:'louie',txt:'PET LOUIE'}; /* facing him, standing still: that is a pet */
+ if(W4.sector==='BASE'&&louPetOK()&&Math.hypot(P3.x+(P3.ax||0)*12-lou.x,P3.y+(P3.ay||0)*12-lou.y)<14&&!(W4.decor||[]).some(d=>d.act&&Math.hypot(px-d.x,py-d.y)<(d.r||18)))return{k:'louie',txt:'PET LOUIE'}; /* v9.9: a prop you face wins over Louie */ /* facing him, standing still: that is a pet */
  const aimT=!!(W4.bf&&(W4.bf.sq.length||(W4.bf.pf&&W4.bf.pf.length))&&fAim(W4.bf).tg);
  if(W4.loose)for(const lb of W4.loose)if(Math.hypot(px-lb.x,py-lb.y)<17)return{k:'wildpluck',lb,txt:'PLUCK '+TYPES[lb.type].n+' SPROUT'};
  if(W4.sector==='BASE'&&W4.patchBuds)for(const pb of W4.patchBuds)

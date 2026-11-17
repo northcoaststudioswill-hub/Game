@@ -58,7 +58,7 @@ function scWalkUp(steps){if(W4.fld||!W4.cast||steps.some(s=>s.fn))return steps;
    ================================================================ */
 function wTutStage(){if(SCOFF||!W4.fld||W4.fld.id!=='MEADOW')return null;const w2=SW.walk2||0,w3=SW.walk3||0;
  if(w2<10)return'a'+w2;if(w3>=1&&w3<7)return'b'+w3;return null}
-function wTutAim(o,k){const st=wTutStage();if(!st)return true;
+function wTutAim(o,k){const st=wTutStage();if(!st||W4.tutOff)return true;
  if(st==='a1'||st==='a2')return k==='wild'&&!!o.tame;
  if(st==='a5'||st==='a6')return k==='gate';
  if(st==='a7'||st==='a8')return k==='site';
