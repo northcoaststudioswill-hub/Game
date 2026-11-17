@@ -31,6 +31,9 @@ Estimates: Sproutwild is Claude's, Rootdeep and the note on the others are Will'
 
 ## Open questions for Will
 
+- **Defeat:** answered (Nov 17): defeat kills the buddy, no penalty. See STORY-NOTES.md.
+
+
 1. ~~Derek.~~ **Answered:** recurring character, keep.
 2. **Canon move names.** Can v4 upgrade paths use new names, or are MAZEL TOV LASER, TOWEL WHIP and the rest fixed?
 3. **Bottie and Bibi in Thornwatch.** Reuse is fine, so this is only a yes or no on the cut-scenes.
