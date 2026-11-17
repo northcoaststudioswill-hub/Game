@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#090b20">
+<title>Starhaven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #f3eeff; --ink-dim: #b9b2dd; --gold: #ffd27a; --gold-deep: #d9973f;
+  --panel: rgba(12, 12, 34, 0.86); --panel-line: rgba(255, 210, 122, 0.35);
+  --night: #090b20; --danger: #ff6f86;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--night); overflow: hidden; color: var(--ink);
+  font-family: 'Nunito', system-ui, -apple-system, sans-serif; -webkit-user-select: none; user-select: none; touch-action: none; }
+#stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+canvas#game { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+
+/* HUD */
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 3; }
+#hearts { position: absolute; left: max(14px, env(safe-area-inset-left)); top: 12px; display: flex; gap: 6px; }
+#hearts.hit { animation: shake .35s; }
+@keyframes shake { 0%,100% { transform: none } 25% { transform: translateX(-4px) } 75% { transform: translateX(4px) } }
+.gem { width: 22px; height: 22px; transform: rotate(45deg); border-radius: 4px; border: 2px solid #fff6d8; }
+.gem.full { background: linear-gradient(135deg, #fff6d8, var(--gold) 45%, var(--gold-deep)); box-shadow: 0 0 10px rgba(255, 210, 122, .6); }
+.gem.empty { background: rgba(20, 18, 48, .7); border-color: #4b4680; }
+#goal { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
+  padding: 6px 14px; border-radius: 999px; font-size: 15px; font-weight: 800; white-space: nowrap; max-width: 60vw; overflow: hidden; text-overflow: ellipsis; }
+#goal .tag { color: var(--gold); margin-right: 6px; letter-spacing: .08em; }
+#goal .arrow { color: var(--gold); }
+#pause-btn { pointer-events: auto; position: absolute; right: max(12px, env(safe-area-inset-right)); top: 10px; width: 44px; height: 44px; border-radius: 12px;
+  background: var(--panel); border: 1px solid var(--panel-line); color: var(--ink); font: 800 16px 'Nunito', sans-serif; }
+#sign { position: absolute; left: 50%; top: 58px; transform: translate(-50%, -8px); width: min(620px, 74vw); background: var(--panel);
+  border: 2px solid var(--panel-line); border-radius: 14px; padding: 12px 18px; font-size: 19px; line-height: 1.35; font-weight: 600;
+  opacity: 0; transition: opacity .18s, transform .18s; text-align: center; }
+#sign.show { opacity: 1; transform: translate(-50%, 0); }
+#sign b { color: var(--gold); }
+#toast { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
+  border-radius: 12px; padding: 10px 16px; font-size: 17px; font-weight: 700; opacity: 0; transition: opacity .25s; max-width: 70vw; text-align: center; }
+#toast.show { opacity: 1; }
+
+/* Touch controls (landscape phone) */
+#touch { position: fixed; inset: 0; display: none; touch-action: none; z-index: 2; }
+body[data-input="touch"] #touch { display: block; }
+#stick { position: absolute; width: 110px; height: 110px; margin: -55px 0 0 -55px; border-radius: 50%; border: 2px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.06); opacity: 0; pointer-events: none; left: 22%; top: 70%; }
+#stick.on { opacity: 1; }
+#knob { position: absolute; left: 50%; top: 50%; width: 48px; height: 48px; margin: -24px 0 0 -24px; border-radius: 50%; background: rgba(255,246,216,.55); }
+.tbtn { position: absolute; border-radius: 50%; border: 2px solid rgba(255,246,216,.45); background: rgba(20,18,48,.45); color: var(--ink);
+  font: 800 13px 'Nunito', sans-serif; letter-spacing: .05em; display: flex; align-items: center; justify-content: center; touch-action: none; }
+.tbtn.on { background: rgba(255,210,122,.45); border-color: var(--gold); }
+#b-jump { width: 92px; height: 92px; right: max(24px, env(safe-area-inset-right)); bottom: 28px; font-size: 15px; }
+#b-attack { width: 76px; height: 76px; right: calc(max(24px, env(safe-area-inset-right)) + 104px); bottom: 22px; }
+#b-dash { width: 70px; height: 70px; right: calc(max(24px, env(safe-area-inset-right)) + 40px); bottom: 132px; }
+#touch-hint { position: absolute; left: 6%; bottom: 18px; color: rgba(255,255,255,.45); font-size: 13px; font-weight: 700; }
+
+/* Screens */
+.screen { position: fixed; inset: 0; z-index: 5; display: none; align-items: center; justify-content: center; background: rgba(6,6,20,.72); }
+.screen.show { display: flex; }
+.card { background: var(--panel); border: 2px solid var(--panel-line); border-radius: 18px; padding: 22px 28px; width: min(560px, 90vw);
+  max-height: 92vh; overflow: auto; text-align: center; touch-action: pan-y; }
+.btn { display: block; width: 100%; margin: 10px 0 0; padding: 12px; border-radius: 12px; border: 1px solid var(--panel-line);
+  background: rgba(255,210,122,.10); color: var(--ink); font: 800 17px 'Nunito', sans-serif; cursor: pointer; }
+.btn.primary { background: var(--gold); color: #1c1430; border-color: var(--gold); }
+#title { background: radial-gradient(ellipse at 50% 60%, rgba(40,30,70,.94), rgba(6,6,20,.97) 70%); flex-direction: column; text-align: center; cursor: pointer; }
+#title h1 { font-family: 'Cinzel', Georgia, serif; font-weight: 800; letter-spacing: .14em; font-size: clamp(40px, 9vh, 78px); margin: 0;
+  color: #fff6d8; text-shadow: 0 0 24px rgba(255,210,122,.55); }
+#title .sub { font-family: 'Cinzel', Georgia, serif; color: var(--gold); letter-spacing: .2em; font-size: 15px; margin: 4px 0 18px; }
+#title p { max-width: 560px; font-size: 18px; line-height: 1.45; color: var(--ink); margin: 0 20px 18px; }
+#title .go { font-weight: 800; color: var(--gold); animation: pulse 1.6s infinite; }
+#title .small { font-size: 13px; color: var(--ink-dim); margin-top: 10px; }
+@keyframes pulse { 50% { opacity: .45 } }
+#results .big { font-family: 'Cinzel', Georgia, serif; font-size: 44px; color: var(--gold); }
+#results .sub { color: var(--ink-dim); margin-bottom: 10px; }
+#results ul { list-style: none; padding: 0; margin: 0 0 6px; font-size: 17px; }
+#results h2, #menu h2, #tune h2 { font-family: 'Cinzel', Georgia, serif; margin: 0 0 6px; letter-spacing: .08em; }
+#controls { display: none; text-align: left; font-size: 15px; margin-top: 10px; color: var(--ink-dim); }
+#controls.show { display: block; }
+#controls b { color: var(--ink); }
+#tune .card { width: min(640px, 94vw); text-align: left; }
+#tune p { margin: 0 0 8px; color: var(--ink-dim); font-size: 14px; }
+.trow { display: grid; grid-template-columns: 1fr 140px 48px; gap: 10px; align-items: center; padding: 5px 0; font-size: 15px; }
+.trow input { width: 100%; }
+.tv { text-align: right; font-weight: 800; }
+.tv.changed { color: var(--gold); }
+.tbtns { display: flex; gap: 8px; }
+.tbtns .btn { margin-top: 12px; }
+#t-out { display: none; width: 100%; height: 120px; margin-top: 8px; background: #0c0c22; color: var(--ink); border: 1px solid var(--panel-line); border-radius: 8px; font: 12px monospace; }
+#rotate { display: none; position: fixed; inset: 0; background: var(--night); align-items: center; justify-content: center; text-align: center; font-size: 22px; font-weight: 800; padding: 30px; z-index: 10; }
+@media (orientation: portrait) and (pointer: coarse) { #rotate { display: flex; } }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="game" width="640" height="320"></canvas></div>
+
+<div id="hud">
+  <div id="hearts"></div>
+  <div id="goal"></div>
+  <button id="pause-btn" aria-label="Menu">II</button>
+  <div id="sign"></div>
+  <div id="toast"></div>
+</div>
+
+<div id="touch">
+  <div id="stick"><div id="knob"></div></div>
+  <div id="touch-hint">Hold and slide anywhere on this side to move</div>
+  <div class="tbtn" id="b-dash" data-act="dash">DASH</div>
+  <div class="tbtn" id="b-attack" data-act="attack">STRIKE</div>
+  <div class="tbtn" id="b-jump" data-act="jump">JUMP</div>
+</div>
+
+<div class="screen show" id="title">
+  <h1>STARHAVEN</h1>
+  <div class="sub">THE TRAINING GROVE</div>
+  <p>Wren died a mortal huntress and woke up fae. Her new body is faster and lighter than anything she knew.
+     Before Lord Caelum brings her into Starhaven, she tests it in the grove at the city's edge.</p>
+  <div class="go">Tap or press any button to begin</div>
+  <div class="small" id="title-best"></div>
+  <div class="small">Milestones 1 and 2: movement and combat feel. Placeholder art.</div>
+</div>
+
+<div class="screen" id="menu">
+  <div class="card">
+    <h2>Paused</h2>
+    <button class="btn primary" id="m-resume">Resume</button>
+    <button class="btn" id="m-tune">Tune the feel</button>
+    <button class="btn" id="m-restart">Restart the grove</button>
+    <button class="btn" id="m-controls">Controls</button>
+    <button class="btn" id="m-fullscreen">Fullscreen</button>
+    <div id="controls">
+      <p><b>Keyboard:</b> A/D or arrows move, Space jump, J strike, Shift dash, S + J in the air strikes down, Esc menu.
+         (Z / X / C also jump / strike / dash.)</p>
+      <p><b>Gamepad:</b> stick or D-pad move, A jump, X strike, B dash, Start menu.</p>
+      <p><b>Touch:</b> hold and slide on the left half to move (slide down to aim a downward strike), buttons on the right.</p>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="tune">
+  <div class="card">
+    <h2>Tune the feel</h2>
+    <p>Changes apply as soon as you close this. Gold numbers are changed from the defaults. "Copy numbers" copies them so you can send them over.</p>
+    <div id="tune-list"></div>
+    <div class="tbtns">
+      <button class="btn primary" id="t-back">Back to the grove</button>
+      <button class="btn" id="t-copy">Copy numbers</button>
+      <button class="btn" id="t-reset">Reset all</button>
+    </div>
+    <textarea id="t-out" readonly></textarea>
+  </div>
+</div>
+
+<div class="screen" id="results">
+  <div class="card">
+    <h2>Grove cleared</h2>
+    <div id="res-body"></div>
+    <button class="btn primary" id="r-again">Run it again</button>
+    <button class="btn" id="r-stay">Keep playing here</button>
+  </div>
+</div>
+
+<div id="rotate">Turn your phone sideways to play Starhaven.</div>
+
+<script>
+// ---- src/tuning.js
+// Starhaven — tuning data. Every feel number lives here (data, not code).
+// Units: pixels and frames at 60 frames per second. One tile = 24 px.
+(function (SH) {
+  SH.TILE = 24;
+  SH.VIEW_H = 320; // native height (a close camera so Wren reads on a phone); width follows the screen's shape
+
+  // Movement. The in-game TUNE panel edits a copy of these.
+  SH.TUNE_DEFAULTS = {
+    runSpeed: 3.4,         // top run speed, px/frame (about 8.5 tiles a second)
+    runAccelFrames: 3,     // frames from standing to full speed
+    stopFrames: 3,         // frames from full speed to standing
+    turnFrames: 4,         // frames to reverse direction at full speed
+    airControl: 0.8,       // share of ground acceleration you keep in the air
+    gravityUp: 0.42,       // gravity while rising
+    gravityDown: 0.66,     // gravity while falling (firmer, so jumps don't float)
+    apexFloat: 0.6,        // gravity multiplier near the top of a held jump
+    maxFall: 9.5,
+    jumpTiles: 4.2,        // held jump height, in tiles
+    doubleJumpTiles: 2.9,  // second jump height, in tiles
+    jumpCut: 0.42,         // letting go of jump early keeps this share of upward speed
+    coyoteFrames: 6,       // you can still jump this long after running off a ledge
+    jumpBufferFrames: 7,   // a jump pressed this early before landing still counts
+    dashSpeed: 7.4,
+    dashFrames: 12,
+    dashCooldown: 30,      // 0.5 s, from the design doc
+    dashIFrames: 18,       // 0.3 s of invincibility, from the design doc
+    pogoBounce: 8.6,
+  };
+
+  // Labels and ranges for the TUNE panel.
+  SH.TUNE_SLIDERS = [
+    { key: 'runSpeed', label: 'Run speed', min: 2, max: 5.5, step: 0.1 },
+    { key: 'runAccelFrames', label: 'Start-up (frames to full speed)', min: 1, max: 12, step: 1 },
+    { key: 'stopFrames', label: 'Stopping (frames to stand still)', min: 1, max: 12, step: 1 },
+    { key: 'airControl', label: 'Air control', min: 0.3, max: 1, step: 0.05 },
+    { key: 'jumpTiles', label: 'Jump height (tiles)', min: 2.5, max: 6.5, step: 0.1 },
+    { key: 'doubleJumpTiles', label: 'Double jump height (tiles)', min: 1.5, max: 5, step: 0.1 },
+    { key: 'gravityUp', label: 'Rise gravity (lower = floatier)', min: 0.25, max: 0.8, step: 0.01 },
+    { key: 'gravityDown', label: 'Fall gravity (higher = drops faster)', min: 0.35, max: 1.1, step: 0.01 },
+    { key: 'dashSpeed', label: 'Dash speed', min: 5, max: 11, step: 0.1 },
+    { key: 'dashFrames', label: 'Dash length (frames)', min: 6, max: 20, step: 1 },
+    { key: 'pogoBounce', label: 'Pogo bounce', min: 6, max: 11, step: 0.1 },
+  ];
+
+  SH.PLAYER = {
+    w: 14, h: 38,
+    hearts: 5,
+    hurtInvuln: 70,   // frames of flicker after a hit
+    hurtStun: 14,     // frames you can't act after a hit
+    hazardInvuln: 60,
+  };
+
+  // Daggers. active = [first, last] frame the blade can hit.
+  SH.COMBAT = {
+    damage: 2,
+    attackBuffer: 8,
+    ground: [
+      { frames: 13, active: [2, 6], next: 7, lunge: 1.4, kb: 2.6, stop: 3, reach: 34, arc: 'high' },
+      { frames: 13, active: [2, 6], next: 7, lunge: 1.4, kb: 2.6, stop: 3, reach: 34, arc: 'low' },
+      { frames: 20, active: [3, 8], next: 99, lunge: 2.6, kb: 6.0, stop: 5, reach: 40, arc: 'big', finisher: true },
+    ],
+    air: [
+      { frames: 12, active: [2, 6], next: 7, lunge: 0, kb: 2.6, stop: 3, reach: 36, arc: 'high' },
+      { frames: 14, active: [2, 7], next: 99, lunge: 0, kb: 4.5, stop: 4, reach: 38, arc: 'low', finisher: true },
+    ],
+    pogo: { frames: 14, active: [1, 9], next: 99, kb: 1.5, stop: 5, reach: 30, arc: 'down' },
+    killStop: 6,
+    recoil: 1.6,        // small push back on you when your blade connects
+  };
+
+  SH.ENEMY_DEFS = {
+    thornSprite: {
+      name: 'Thorn sprite', hp: 4, w: 24, h: 22,
+      wander: 0.55, sight: 150, sightY: 50,
+      windup: 26, lungeSpeed: 5.4, lungeHop: 2.6, lungeFrames: 20, recover: 42,
+      respawn: 300, damage: 1, gravity: 0.5,
+    },
+    dummy: { name: 'Training dummy', w: 22, h: 40 },
+    bulb: { name: 'Thorn bud', r: 13, regrow: 40 },
+  };
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/room-grove.js
+// Starhaven — the Training Grove. Level data only.
+// Coordinates are in tiles. x ranges are [start, end) — end is not filled.
+// Each section teaches one move before it is needed. Enemies come last.
+(function (SH) {
+  SH.ROOMS = SH.ROOMS || {};
+
+  SH.ROOMS.grove = {
+    id: 'grove',
+    name: 'The Training Grove',
+    width: 204,
+    height: 20,
+    start: { x: 6, y: 16 },
+    // Starhaven glows on the far horizon, so the goal is always in sight.
+    cityGlowX: 210,
+
+    shapes: [
+      ['solid', 0, 2, 0, 20],          // left wall
+      ['ground', 2, 24, 16],           // 1. move
+      ['ground', 24, 31, 14],          // 2. jump: a two-tile step up...
+      ['ground', 34, 41, 14],          //    ...a 3-tile gap...
+      ['ground', 45, 66, 16],          //    ...and a 4-tile gap down
+      ['solid', 54, 61, 11, 16],       // 3. double jump: a wall one jump can't clear
+      ['ground', 76, 128, 16],         // 4. dash: a 10-tile gap (66..76)
+      ['ground', 128, 148, 16],        // 6. pogo: a floor of thorns...
+      ['thorns', 129, 147, 15],
+      ['ground', 148, 202, 16],        // 7. thorn sprites
+      ['oneway', 168, 174, 12],
+      ['solid', 202, 204, 0, 20],      // right wall
+    ],
+
+    // Signs. Text tokens like {JUMP} become the right button for keyboard, touch or gamepad.
+    signs: [
+      { x: 9, id: 'move', text: 'Move with {MOVE}. Head right: the far lantern marks the end of the grove.' },
+      { x: 21, id: 'jump', text: 'Jump with {JUMP}. Hold it to jump high, tap it for a small hop.' },
+      { x: 50, id: 'double', text: 'Your fae body can jump twice. Press {JUMP} again in the air to clear the wall.' },
+      { x: 63, id: 'dash', text: 'Dash with {DASH}. It works in the air too. This gap takes all three: jump, jump again, then dash.' },
+      { x: 96, id: 'dagger', text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
+      { x: 124, id: 'pogo', text: 'Thorns hurt. In the air, hold {DOWN} and press {ATTACK} to strike downward and bounce off the thorn buds. Each bounce gives back your second jump and your dash.' },
+      { x: 152, id: 'sprites', text: 'Thorn sprites ahead. They glow orange before they lunge. Dash through the lunge, then strike.' },
+    ],
+
+    lanterns: [
+      { x: 5, id: 'l_start', lit: true },
+      { x: 47, id: 'l_double' },
+      { x: 79, id: 'l_dash' },
+      { x: 127, id: 'l_pogo' },
+      { x: 150, id: 'l_sprites' },
+      { x: 196, id: 'l_end', end: true },
+    ],
+
+    spawns: [
+      { kind: 'dummy', x: 106 },
+      { kind: 'bulb', x: 132.5, y: 12.6 },
+      { kind: 'bulb', x: 137.5, y: 12.4 },
+      { kind: 'bulb', x: 142.5, y: 12.6 },
+      { kind: 'thornSprite', x: 163 },
+      { kind: 'thornSprite', x: 171, y: 12 },
+      { kind: 'thornSprite', x: 183 },
+    ],
+  };
+
+  // Tile codes
+  SH.T_EMPTY = 0; SH.T_SOLID = 1; SH.T_ONEWAY = 2; SH.T_THORNS = 3;
+
+  SH.buildRoom = function (def) {
+    const w = def.width, h = def.height;
+    const tiles = new Uint8Array(w * h);
+    const set = (x, y, v) => { if (x >= 0 && y >= 0 && x < w && y < h) tiles[y * w + x] = v; };
+    for (const s of def.shapes) {
+      const [kind, x0, x1] = s;
+      if (kind === 'ground') { for (let x = x0; x < x1; x++) for (let y = s[3]; y < h; y++) set(x, y, SH.T_SOLID); }
+      else if (kind === 'solid') { for (let x = x0; x < x1; x++) for (let y = s[3]; y < s[4]; y++) set(x, y, SH.T_SOLID); }
+      else if (kind === 'oneway') { for (let x = x0; x < x1; x++) set(x, s[3], SH.T_ONEWAY); }
+      else if (kind === 'thorns') { for (let x = x0; x < x1; x++) set(x, s[3], SH.T_THORNS); }
+    }
+    const room = {
+      def, w, h, tiles,
+      pxW: w * SH.TILE, pxH: h * SH.TILE,
+      get(tx, ty) {
+        if (tx < 0 || tx >= w) return SH.T_SOLID;      // side edges are walls
+        if (ty < 0 || ty >= h) return SH.T_EMPTY;      // top is open, bottom is a pit
+        return tiles[ty * w + tx];
+      },
+      // Top of the ground (in px) under tile column tx, searching down from row ty0.
+      groundY(tx, ty0) {
+        for (let ty = ty0 || 0; ty < h; ty++) { const t = this.get(tx, ty); if (t === SH.T_SOLID || t === SH.T_ONEWAY) return ty * SH.TILE; }
+        return null;
+      },
+    };
+    return room;
+  };
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/input.js
+// Starhaven — input. Keyboard, gamepad and touch all feed the same actions.
+// held[a]: is it down right now. pressed[a]: was it pressed since the last game frame.
+(function (SH) {
+  const ACTIONS = ['left', 'right', 'up', 'down', 'jump', 'attack', 'dash', 'pause'];
+  const KEYS = {
+    ArrowLeft: 'left', KeyA: 'left',
+    ArrowRight: 'right', KeyD: 'right',
+    ArrowUp: 'up', KeyW: 'up',
+    ArrowDown: 'down', KeyS: 'down',
+    Space: 'jump', KeyZ: 'jump',
+    KeyJ: 'attack', KeyX: 'attack',
+    ShiftLeft: 'dash', ShiftRight: 'dash', KeyC: 'dash', KeyK: 'dash',
+    Escape: 'pause', KeyP: 'pause', Enter: 'pause',
+  };
+
+  const src = { kb: {}, touch: {}, pad: {} };
+  const queue = {};
+  const input = {
+    held: {}, pressed: {},
+    source: 'kb',          // last used: 'kb' | 'touch' | 'pad'
+    onSourceChange: null,
+    enabled: true,
+  };
+  ACTIONS.forEach(a => { queue[a] = 0; input.held[a] = false; input.pressed[a] = false; });
+
+  function setSource(s) {
+    if (input.source !== s) { input.source = s; if (input.onSourceChange) input.onSourceChange(s); }
+  }
+  function down(which, a) {
+    if (!src[which][a]) { src[which][a] = true; queue[a]++; }
+  }
+  function up(which, a) { src[which][a] = false; }
+
+  // Called once per game frame (60/s).
+  input.step = function () {
+    if (input.forced) { // automated tests drive the game through this
+      for (const a of ACTIONS) { input.held[a] = !!input.forced.held[a]; input.pressed[a] = !!input.forced.pressed[a]; }
+      input.forced.pressed = {};
+      return;
+    }
+    for (const a of ACTIONS) {
+      input.held[a] = !!(src.kb[a] || src.touch[a] || src.pad[a]);
+      input.pressed[a] = queue[a] > 0;
+      queue[a] = 0;
+    }
+  };
+  input.clear = function () {
+    for (const a of ACTIONS) { queue[a] = 0; src.kb[a] = src.touch[a] = src.pad[a] = false; input.held[a] = input.pressed[a] = false; }
+  };
+  // For menus: did this action get pressed (consumes it).
+  input.take = function (a) { if (queue[a] > 0) { queue[a] = 0; return true; } return false; };
+
+  // ---- keyboard
+  window.addEventListener('keydown', e => {
+    const a = KEYS[e.code];
+    if (!a) return;
+    e.preventDefault();
+    setSource('kb');
+    if (!e.repeat) down('kb', a);
+    if (input.onAnyPress) input.onAnyPress(a);
+  });
+  window.addEventListener('keyup', e => { const a = KEYS[e.code]; if (a) { e.preventDefault(); up('kb', a); } });
+  window.addEventListener('blur', () => input.clear());
+
+  // ---- gamepad (standard mapping: A jump, X attack, B dash, Start pause)
+  const PAD_BTNS = { 0: 'jump', 2: 'attack', 1: 'dash', 3: 'dash', 5: 'dash', 9: 'pause', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
+  input.pollPad = function () {
+    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    let pad = null;
+    for (const p of pads) if (p && p.connected) { pad = p; break; }
+    if (!pad) return;
+    const want = {};
+    for (const i in PAD_BTNS) { const b = pad.buttons[i]; if (b && b.pressed) want[PAD_BTNS[i]] = true; }
+    const ax = pad.axes[0] || 0, ay = pad.axes[1] || 0;
+    if (ax < -0.4) want.left = true;
+    if (ax > 0.4) want.right = true;
+    if (ay > 0.5) want.down = true;
+    if (ay < -0.5) want.up = true;
+    let any = false;
+    for (const a of ACTIONS) {
+      if (want[a] && !src.pad[a]) { down('pad', a); any = true; if (input.onAnyPress) input.onAnyPress(a); }
+      else if (!want[a] && src.pad[a]) up('pad', a);
+    }
+    if (any) setSource('pad');
+  };
+
+  // ---- touch: floating stick on the left half, buttons on the right
+  input.bindTouch = function (layer, stickBase, stickKnob) {
+    let stickId = null, ox = 0, oy = 0;
+    const DEAD = 14, DOWN = 26, MAXR = 46;
+    function stickSet(dx, dy) {
+      const ang = Math.atan2(dy, dx), dist = Math.min(MAXR, Math.hypot(dx, dy));
+      stickKnob.style.transform = `translate(${Math.cos(ang) * dist}px, ${Math.sin(ang) * dist}px)`;
+      const L = dx < -DEAD, R = dx > DEAD, D = dy > DOWN && dy > Math.abs(dx) * 0.6, U = dy < -DOWN && -dy > Math.abs(dx) * 0.6;
+      L ? down('touch', 'left') : up('touch', 'left');
+      R ? down('touch', 'right') : up('touch', 'right');
+      D ? down('touch', 'down') : up('touch', 'down');
+      U ? down('touch', 'up') : up('touch', 'up');
+    }
+    layer.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'mouse') return;
+      setSource('touch');
+      const btn = e.target.closest('[data-act]');
+      if (btn) {
+        e.preventDefault();
+        btn.setPointerCapture(e.pointerId);
+        btn.classList.add('on');
+        down('touch', btn.dataset.act);
+        if (input.onAnyPress) input.onAnyPress(btn.dataset.act);
+        return;
+      }
+      const r = layer.getBoundingClientRect();
+      if (stickId === null && e.clientX - r.left < r.width * 0.5) {
+        e.preventDefault();
+        stickId = e.pointerId; ox = e.clientX; oy = e.clientY;
+        layer.setPointerCapture(e.pointerId);
+        stickBase.style.left = (ox - r.left) + 'px'; stickBase.style.top = (oy - r.top) + 'px';
+        stickBase.classList.add('on');
+        stickSet(0, 0);
+      }
+    });
+    layer.addEventListener('pointermove', e => {
+      if (e.pointerId === stickId) { e.preventDefault(); stickSet(e.clientX - ox, e.clientY - oy); }
+    });
+    const end = e => {
+      const btn = e.target.closest && e.target.closest('[data-act]');
+      if (btn && btn.classList.contains('on')) { btn.classList.remove('on'); up('touch', btn.dataset.act); }
+      if (e.pointerId === stickId) {
+        stickId = null; stickBase.classList.remove('on');
+        ['left', 'right', 'up', 'down'].forEach(a => up('touch', a));
+      }
+    };
+    layer.addEventListener('pointerup', end);
+    layer.addEventListener('pointercancel', end);
+    layer.addEventListener('lostpointercapture', end);
+  };
+
+  input.isTouchDevice = (window.matchMedia && matchMedia('(pointer: coarse)').matches) || ('ontouchstart' in window);
+  if (input.isTouchDevice) input.source = 'touch';
+
+  // Button names shown in signs, per input type.
+  input.LABELS = {
+    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', DASH: 'Shift', DOWN: 'S' },
+    touch: { MOVE: 'the left side of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', DASH: 'the DASH button', DOWN: 'down on the stick' },
+    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', DASH: 'B', DOWN: 'down' },
+  };
+  input.fill = function (text) {
+    const L = input.LABELS[input.source] || input.LABELS.kb;
+    return text.replace(/\{(\w+)\}/g, (m, k) => L[k] ? `<b>${L[k]}</b>` : m);
+  };
+
+  SH.input = input;
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/physics.js
+// Starhaven — tile collision. Bodies use x = center, y = feet (bottom).
+(function (SH) {
+  const T = () => SH.TILE;
+
+  SH.isSolid = t => t === SH.T_SOLID;
+
+  // Moves a body by its velocity and resolves against the room's tiles.
+  // b: { x, y, w, h, vx, vy, dropThrough }
+  SH.moveBody = function (room, b) {
+    const TS = T();
+    const res = { wall: 0, ceil: false, ground: false, groundTile: 0 };
+
+    // --- horizontal
+    b.x += b.vx;
+    let top = b.y - b.h, bot = b.y - 0.01;
+    let ty0 = Math.floor(top / TS), ty1 = Math.floor(bot / TS);
+    if (b.vx > 0) {
+      const tx = Math.floor((b.x + b.w / 2 - 0.01) / TS);
+      for (let ty = ty0; ty <= ty1; ty++) if (SH.isSolid(room.get(tx, ty))) { b.x = tx * TS - b.w / 2; b.vx = 0; res.wall = 1; break; }
+    } else if (b.vx < 0) {
+      const tx = Math.floor((b.x - b.w / 2) / TS);
+      for (let ty = ty0; ty <= ty1; ty++) if (SH.isSolid(room.get(tx, ty))) { b.x = (tx + 1) * TS + b.w / 2; b.vx = 0; res.wall = -1; break; }
+    }
+
+    // --- vertical
+    const prevBot = b.y;
+    b.y += b.vy;
+    const tx0 = Math.floor((b.x - b.w / 2 + 0.01) / TS), tx1 = Math.floor((b.x + b.w / 2 - 0.01) / TS);
+    if (b.vy > 0) {
+      const ty = Math.floor(b.y / TS);
+      for (let tx = tx0; tx <= tx1; tx++) {
+        const t = room.get(tx, ty);
+        if (SH.isSolid(t) || (t === SH.T_ONEWAY && prevBot <= ty * TS + 0.01 && !b.dropThrough)) {
+          b.y = ty * TS; b.vy = 0; res.ground = true; res.groundTile = t; break;
+        }
+      }
+    } else if (b.vy < 0) {
+      const ty = Math.floor((b.y - b.h) / TS);
+      for (let tx = tx0; tx <= tx1; tx++) if (SH.isSolid(room.get(tx, ty))) { b.y = (ty + 1) * TS + b.h; b.vy = 0; res.ceil = true; break; }
+    }
+    return res;
+  };
+
+  // Is there floor under a point just ahead (used by walkers so they don't fall off ledges)?
+  SH.floorAhead = function (room, x, y) {
+    const TS = T();
+    const t = room.get(Math.floor(x / TS), Math.floor((y + 2) / TS));
+    return SH.isSolid(t) || t === SH.T_ONEWAY;
+  };
+
+  // Does a box touch any thorn tile? Thorns only hurt in their lower part.
+  SH.touchesThorns = function (room, l, t, r, b) {
+    const TS = T();
+    for (let tx = Math.floor(l / TS); tx <= Math.floor((r - 0.01) / TS); tx++)
+      for (let ty = Math.floor(t / TS); ty <= Math.floor((b - 0.01) / TS); ty++)
+        if (room.get(tx, ty) === SH.T_THORNS && b > ty * TS + 9) return true;
+    return false;
+  };
+
+  SH.overlap = (a, b) => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
+  SH.boxOf = o => ({ l: o.x - o.w / 2, r: o.x + o.w / 2, t: o.y - o.h, b: o.y });
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/fx.js
+// Starhaven — game feel effects: particles, rings, hit-stop, shake, slow-motion, floating words.
+(function (SH) {
+  const fx = {
+    parts: [], rings: [], words: [], ghosts: [],
+    hitstop: 0, shake: 0, flash: 0, flashColor: '#fff',
+    slowmo: 0,
+  };
+
+  fx.reset = function () { fx.parts.length = fx.rings.length = fx.words.length = fx.ghosts.length = 0; fx.hitstop = fx.shake = fx.flash = fx.slowmo = 0; };
+
+  fx.stop = function (frames) { fx.hitstop = Math.max(fx.hitstop, frames); };
+  fx.kick = function (amount) { fx.shake = Math.max(fx.shake, amount); };
+  fx.flashScreen = function (frames, color) { fx.flash = frames; fx.flashColor = color || '#fff'; };
+
+  fx.burst = function (x, y, n, o) {
+    o = o || {};
+    for (let i = 0; i < n; i++) {
+      const a = (o.angle != null ? o.angle : Math.random() * Math.PI * 2) + (Math.random() - 0.5) * (o.spread != null ? o.spread : Math.PI * 2);
+      const sp = (o.speed || 2) * (0.4 + Math.random() * 0.8);
+      const life = (o.life || 24) * (0.6 + Math.random() * 0.6);
+      fx.parts.push({
+        x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - (o.up || 0),
+        g: o.gravity != null ? o.gravity : 0.12, drag: o.drag || 0.94,
+        life, max: life, size: o.size || 2, color: o.colors ? o.colors[(Math.random() * o.colors.length) | 0] : (o.color || '#fff'),
+        glow: !!o.glow, shape: o.shape || 'sq',
+      });
+    }
+  };
+  fx.dust = function (x, y, dir, n) {
+    fx.burst(x, y - 2, n || 5, { angle: dir > 0 ? Math.PI : dir < 0 ? 0 : -Math.PI / 2, spread: 1.2, speed: 1.4, gravity: -0.02, life: 20, size: 3, colors: ['#8a86b8', '#6c6a99', '#b3b0d9'], drag: 0.9 });
+  };
+  fx.ring = function (x, y, color, r1, life, width) { fx.rings.push({ x, y, r: 2, r1: r1 || 26, life: life || 16, max: life || 16, color: color || '#fff', width: width || 2 }); };
+  fx.word = function (x, y, text, color, life) { fx.words.push({ x, y, text, color: color || '#fff', life: life || 50, max: life || 50 }); };
+  fx.ghost = function (snap) { fx.ghosts.push(snap); };
+
+  fx.update = function () {
+    for (const p of fx.parts) { p.vx *= p.drag; p.vy = p.vy * p.drag + p.g; p.x += p.vx; p.y += p.vy; p.life--; }
+    fx.parts = fx.parts.filter(p => p.life > 0);
+    for (const r of fx.rings) { r.life--; r.r = r.r1 * (1 - Math.pow(r.life / r.max, 2)); }
+    fx.rings = fx.rings.filter(r => r.life > 0);
+    for (const w of fx.words) { w.life--; w.y -= 0.35; }
+    fx.words = fx.words.filter(w => w.life > 0);
+    for (const g of fx.ghosts) g.life--;
+    fx.ghosts = fx.ghosts.filter(g => g.life > 0);
+    if (fx.shake > 0) fx.shake = Math.max(0, fx.shake * 0.85 - 0.05);
+    if (fx.flash > 0) fx.flash--;
+  };
+
+  SH.fx = fx;
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/player.js
+// Starhaven — Wren. Movement (run, jump, double jump, dash) and daggers (combo, air combo, pogo).
+(function (SH) {
+  const sign = v => (v > 0 ? 1 : v < 0 ? -1 : 0);
+  const approach = (v, target, rate) => (v < target ? Math.min(v + rate, target) : Math.max(v - rate, target));
+
+  function Player(x, y) {
+    const P = SH.PLAYER;
+    Object.assign(this, {
+      x, y, vx: 0, vy: 0, w: P.w, h: P.h,
+      facing: 1, grounded: false, wasGrounded: false,
+      coyote: 0, jumpBuf: 0, dashBuf: 0, atkBuf: 0,
+      airJumps: 1, airDashes: 1, rising: false,
+      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0,
+      invuln: 0, stun: 0,
+      swing: null, comboStep: 0, comboKind: null, comboGap: 0,
+      hearts: P.hearts, maxHearts: P.hearts,
+      lastSafe: { x, y }, dropT: 0,
+      anim: { t: 0, run: 0, squash: 0, land: 0 },
+      scarf: [], dead: false,
+      stats: { hits: 0, hurt: 0, perfect: 0, pogos: 0 },
+    });
+    for (let i = 0; i < 6; i++) this.scarf.push({ x: x, y: y - 30 });
+  }
+
+  Player.prototype.box = function () { return SH.boxOf(this); };
+
+  Player.prototype.jumpV = function (tiles) {
+    const t = SH.tune;
+    // Speed needed to rise this many tiles under rising gravity (ignores the apex float, which adds a little).
+    return Math.sqrt(2 * t.gravityUp * tiles * SH.TILE) * 0.94;
+  };
+
+  Player.prototype.update = function (world) {
+    const t = SH.tune, inp = world.input, C = SH.COMBAT, fx = SH.fx;
+    const a = this.anim;
+    a.t++;
+    if (this.dead) return;
+
+    // ---- buffers
+    if (inp.pressed.jump) this.jumpBuf = t.jumpBufferFrames; else if (this.jumpBuf > 0) this.jumpBuf--;
+    if (inp.pressed.dash) this.dashBuf = 6; else if (this.dashBuf > 0) this.dashBuf--;
+    if (inp.pressed.attack) this.atkBuf = C.attackBuffer; else if (this.atkBuf > 0) this.atkBuf--;
+    if (this.dashCd > 0) this.dashCd--;
+    if (this.iframes > 0) this.iframes--;
+    if (this.invuln > 0) this.invuln--;
+    if (this.comboGap > 0) this.comboGap--; else if (!this.swing) this.comboStep = 0;
+
+    const dir = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0);
+    const stunned = this.stun > 0;
+    if (stunned) this.stun--;
+
+    if (this.grounded) { this.coyote = t.coyoteFrames; this.airJumps = 1; this.airDashes = 1; }
+    else if (this.coyote > 0) this.coyote--;
+
+    // ---- dash start
+    if (!stunned && this.dashT <= 0 && this.dashBuf > 0 && this.dashCd <= 0 && (this.grounded || this.airDashes > 0)) {
+      this.dashBuf = 0;
+      if (!this.grounded) this.airDashes--;
+      this.dashDir = dir !== 0 ? dir : this.facing;
+      this.facing = this.dashDir;
+      this.dashT = t.dashFrames;
+      this.iframes = t.dashIFrames;
+      this.swing = null;
+      this.vy = 0;
+      fx.dust(this.x, this.y, this.dashDir, this.grounded ? 6 : 0);
+      fx.burst(this.x - this.dashDir * 6, this.y - 20, 6, { angle: this.dashDir > 0 ? Math.PI : 0, spread: 0.6, speed: 2.6, gravity: 0, life: 14, size: 2, colors: ['#ffe9a8', '#9fe8ff'], glow: true });
+      if (world.onDash) world.onDash(this);
+    }
+
+    if (this.dashT > 0) {
+      // ---- dashing: straight line, no gravity
+      this.dashT--;
+      this.vx = this.dashDir * t.dashSpeed;
+      this.vy = this.grounded ? 0.5 : 0; // a ground dash hugs the floor; an air dash flies dead straight
+      if (a.t % 2 === 0) fx.ghost({ x: this.x, y: this.y, facing: this.facing, pose: 'dash', life: 12, max: 12 });
+      // Jumping out of a ground dash keeps some of its speed.
+      if (this.jumpBuf > 0 && (this.grounded || this.coyote > 0)) {
+        this.dashT = 0; this.dashCd = t.dashCooldown; this.doJump(false);
+        this.vx = this.dashDir * Math.max(t.runSpeed, t.dashSpeed * 0.7);
+      } else if (this.dashT === 0) {
+        this.dashCd = t.dashCooldown;
+        this.vx = this.dashDir * t.runSpeed * (dir === this.dashDir ? 1 : 0.3);
+      }
+    } else if (!stunned) {
+      // ---- run
+      const accel = t.runSpeed / Math.max(1, t.runAccelFrames);
+      const decel = t.runSpeed / Math.max(1, t.stopFrames);
+      const turn = (t.runSpeed * 2) / Math.max(1, t.turnFrames);
+      const air = this.grounded ? 1 : t.airControl;
+      let target = dir * t.runSpeed;
+      if (this.swing && this.grounded && this.comboKind === 'ground') target *= 0.25;
+      // Above run speed (after a dash-jump) bleed speed off gently instead of snapping.
+      let rate;
+      if (dir === 0) rate = decel * air;
+      else if (sign(this.vx) !== 0 && sign(this.vx) !== dir) rate = turn * air;
+      else if (Math.abs(this.vx) > t.runSpeed) rate = 0.12;
+      else rate = accel * air;
+      if (this.grounded && dir !== 0 && sign(this.vx) === -dir && Math.abs(this.vx) > t.runSpeed * 0.6) fx.dust(this.x, this.y, -dir, 2);
+      this.vx = approach(this.vx, target, rate);
+      if (dir !== 0 && (!this.swing || this.swing.f >= this.swing.def.next)) this.facing = dir;
+
+      // ---- jump / double jump
+      if (inp.pressed.jump && !this.grounded && this.coyote <= 0 && this.airJumps > 0) {
+        this.airJumps--; this.jumpBuf = 0; this.doJump(true);
+      } else if (this.jumpBuf > 0 && (this.grounded || this.coyote > 0)) {
+        if (inp.held.down && this.groundTile === SH.T_ONEWAY && this.grounded) { this.dropT = 10; this.jumpBuf = 0; this.y += 1; }
+        else this.doJump(false);
+      }
+      if (this.rising && !inp.held.jump && this.vy < 0) { this.vy *= t.jumpCut; this.rising = false; }
+      if (this.vy >= 0) this.rising = false;
+
+      // ---- gravity
+      let g = this.vy < 0 ? t.gravityUp : t.gravityDown;
+      if (Math.abs(this.vy) < 1.4 && inp.held.jump) g *= t.apexFloat;
+      this.vy = Math.min(this.vy + g, t.maxFall);
+    } else {
+      // stunned after a hit: just fall and slow down
+      this.vx = approach(this.vx, 0, 0.18);
+      this.vy = Math.min(this.vy + t.gravityDown, t.maxFall);
+    }
+
+    // ---- attacks
+    if (!stunned && this.dashT <= 0) this.tryAttack(world, inp);
+    if (this.swing) this.updateSwing(world);
+
+    // ---- move and collide
+    if (this.dropT > 0) this.dropT--;
+    this.dropThrough = this.dropT > 0;
+    this.wasGrounded = this.grounded;
+    const fallSpeed = this.vy;
+    const res = SH.moveBody(world.room, this);
+    this.grounded = res.ground;
+    this.groundTile = res.groundTile;
+    if (res.ceil) this.rising = false;
+
+    if (this.grounded && !this.wasGrounded) {
+      a.land = 8; a.squash = Math.min(1, fallSpeed / 9);
+      if (fallSpeed > 3) fx.dust(this.x, this.y, 0, fallSpeed > 7 ? 8 : 4);
+    }
+    if (a.land > 0) a.land--;
+    if (this.grounded && Math.abs(this.vx) > 0.5) {
+      a.run += Math.abs(this.vx) * 0.075;
+      if (Math.floor(a.run * 2) !== Math.floor((a.run - Math.abs(this.vx) * 0.075) * 2) && Math.abs(this.vx) > 2) fx.dust(this.x - this.facing * 4, this.y, this.facing, 1);
+    } else if (this.grounded) a.run = 0;
+
+    // ---- remember safe footing (both feet on solid ground, no thorns close by)
+    if (this.grounded && this.groundTile === SH.T_SOLID) {
+      const TS = SH.TILE, room = world.room, ty = Math.floor(this.y / TS);
+      const l = Math.floor((this.x - 10) / TS), r = Math.floor((this.x + 10) / TS);
+      let ok = SH.isSolid(room.get(l, ty)) && SH.isSolid(room.get(r, ty));
+      for (let tx = l - 1; tx <= r + 1 && ok; tx++) if (room.get(tx, ty - 1) === SH.T_THORNS) ok = false;
+      if (ok) { this.lastSafe.x = this.x; this.lastSafe.y = this.y; }
+    }
+
+    // ---- scarf trails behind
+    const anchor = { x: this.x - this.facing * 3, y: this.y - 31 };
+    this.scarf[0].x = anchor.x; this.scarf[0].y = anchor.y;
+    for (let i = 1; i < this.scarf.length; i++) {
+      const p = this.scarf[i], q = this.scarf[i - 1];
+      p.x += (q.x - this.facing * 3.2 - p.x) * 0.45 - this.vx * 0.04;
+      p.y += (q.y + 0.9 - p.y) * 0.45 + Math.sin(a.t * 0.15 + i) * 0.25;
+      const dx = p.x - q.x, dy = p.y - q.y, d = Math.hypot(dx, dy) || 1;
+      if (d > 4) { p.x = q.x + dx / d * 4; p.y = q.y + dy / d * 4; }
+    }
+  };
+
+  Player.prototype.doJump = function (isDouble) {
+    const t = SH.tune, fx = SH.fx;
+    this.vy = -this.jumpV(isDouble ? t.doubleJumpTiles : t.jumpTiles);
+    this.rising = true;
+    this.coyote = 0; this.jumpBuf = 0; this.grounded = false;
+    this.anim.squash = -0.6;
+    if (isDouble) {
+      fx.ring(this.x, this.y - 4, '#bfe9ff', 20, 14, 2);
+      fx.burst(this.x, this.y - 2, 8, { angle: Math.PI / 2, spread: 2.2, speed: 1.8, gravity: 0.02, life: 18, size: 2, colors: ['#e6f6ff', '#9fd8ff', '#ffe9a8'], glow: true });
+    } else fx.dust(this.x, this.y, 0, 4);
+  };
+
+  Player.prototype.tryAttack = function (world, inp) {
+    if (this.atkBuf <= 0) return;
+    const C = SH.COMBAT;
+    let kind, step;
+    if (!this.grounded && inp.held.down) { kind = 'pogo'; step = 0; }
+    else {
+      kind = this.grounded ? 'ground' : 'air';
+      const list = C[kind];
+      if (this.swing) {
+        if (this.swing.kind !== kind || this.swing.f < this.swing.def.next || this.comboStep >= list.length) return;
+        step = this.comboStep;
+      } else step = (this.comboKind === kind && this.comboGap > 0 && this.comboStep < list.length) ? this.comboStep : 0;
+    }
+    if (this.swing && kind === 'pogo') return;
+    const def = kind === 'pogo' ? C.pogo : C[kind][step];
+    this.atkBuf = 0;
+    this.comboKind = kind;
+    this.comboStep = step + 1;
+    if (kind !== 'pogo') { const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d; }
+    this.swing = { kind, step, def, f: 0, hits: new Set() };
+    if (def.lunge && this.grounded) this.vx = this.facing * Math.max(Math.abs(this.vx) * 0.5, def.lunge * 1.6);
+  };
+
+  Player.prototype.swingBox = function () {
+    const s = this.swing, d = s.def;
+    if (s.kind === 'pogo') return { l: this.x - 17, r: this.x + 17, t: this.y - 6, b: this.y + d.reach };
+    const f = this.facing, cy = this.y - 20;
+    const h = d.arc === 'big' ? 40 : 30;
+    const near = this.x + f * 2, far = this.x + f * d.reach;
+    return { l: Math.min(near, far), r: Math.max(near, far), t: cy - h / 2, b: cy + h / 2 };
+  };
+
+  Player.prototype.updateSwing = function (world) {
+    const s = this.swing, d = s.def, C = SH.COMBAT, fx = SH.fx;
+    s.f++;
+    if (s.f >= d.active[0] && s.f <= d.active[1]) {
+      const hb = this.swingBox();
+      for (const tgt of world.targets) {
+        if (s.hits.has(tgt) || !tgt.hittable()) continue;
+        if (!SH.overlap(hb, tgt.hurtBox())) continue;
+        s.hits.add(tgt);
+        const r = tgt.takeHit({ dmg: C.damage, kb: d.kb, dir: this.facing, finisher: !!d.finisher, pogo: s.kind === 'pogo' }, world);
+        if (!r) continue;
+        this.stats.hits++;
+        fx.stop(r.killed ? C.killStop : d.stop);
+        fx.kick(r.killed ? 4 : d.finisher ? 3 : 1.6);
+        if (s.kind === 'pogo') this.bounce();
+        else if (this.grounded) this.vx -= this.facing * C.recoil;
+      }
+      // Pogo also bounces off thorn tiles (a forgiving rule: chill, not punishing).
+      if (s.kind === 'pogo' && !s.bounced && SH.touchesThorns(world.room, hb.l, hb.t, hb.r, hb.b + 6)) {
+        s.bounced = true; this.bounce(); fx.stop(4);
+        fx.burst(this.x, this.y + 16, 8, { angle: -Math.PI / 2, spread: 1.6, speed: 2.2, life: 16, colors: ['#ffd27a', '#ff7a8a'], glow: true });
+      }
+    }
+    if (s.f >= d.frames) {
+      this.swing = null;
+      this.comboGap = 14;
+      if (s.kind === 'pogo' || this.comboStep >= (SH.COMBAT[s.kind] || []).length) { this.comboStep = 0; this.comboGap = 0; }
+    }
+  };
+
+  Player.prototype.bounce = function () {
+    this.vy = -SH.tune.pogoBounce;
+    this.rising = false;
+    this.airJumps = 1; this.airDashes = 1; this.dashCd = 0;
+    this.stats.pogos++;
+    SH.fx.ring(this.x, this.y + 12, '#ffe9a8', 26, 14, 2);
+    if (this.swing) this.swing.bounced = true;
+  };
+
+  // Returns true if the hit landed.
+  Player.prototype.hurt = function (fromX, dmg, world) {
+    if (this.dead || this.invuln > 0) return false;
+    if (this.iframes > 0) return false;
+    const fx = SH.fx;
+    this.hearts = Math.max(0, this.hearts - dmg);
+    this.stats.hurt++;
+    this.invuln = SH.PLAYER.hurtInvuln;
+    this.stun = SH.PLAYER.hurtStun;
+    this.swing = null; this.dashT = 0;
+    const d = this.x >= fromX ? 1 : -1;
+    this.vx = d * 4.2; this.vy = -5;
+    this.rising = false;
+    fx.stop(7); fx.kick(5); fx.flashScreen(6, 'rgba(255,90,110,0.35)');
+    fx.burst(this.x, this.y - 20, 12, { speed: 3, life: 22, colors: ['#ff7a8a', '#ffd0d6', '#ffffff'], glow: true });
+    if (this.hearts <= 0 && world.onKnockout) world.onKnockout();
+    return true;
+  };
+
+  Player.prototype.respawnAt = function (x, y, invuln) {
+    this.x = x; this.y = y; this.vx = this.vy = 0;
+    this.dashT = 0; this.swing = null; this.stun = 0;
+    this.invuln = invuln || 0;
+    this.grounded = false;
+    for (const p of this.scarf) { p.x = x; p.y = y - 30; }
+  };
+
+  SH.Player = Player;
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/enemies.js
+// Starhaven — things you hit: the thorn sprite (first enemy), the training dummy, and thorn buds (pogo targets).
+(function (SH) {
+  const TS = () => SH.TILE;
+
+  // ---------------- Thorn sprite: wanders, glows orange, then lunges. 4 HP = 2 dagger hits.
+  function ThornSprite(x, y) {
+    const d = SH.ENEMY_DEFS.thornSprite;
+    Object.assign(this, { kind: 'thornSprite', def: d, home: { x, y }, w: d.w, h: d.h });
+    this.reset();
+  }
+  ThornSprite.prototype.reset = function () {
+    Object.assign(this, {
+      x: this.home.x, y: this.home.y, vx: 0, vy: 0,
+      hp: this.def.hp, dir: Math.random() < 0.5 ? -1 : 1,
+      state: 'wander', t: 0, flash: 0, dead: false, deadT: 0, grounded: false,
+      wobble: Math.random() * 6, pause: 0,
+    });
+  };
+  ThornSprite.prototype.hittable = function () { return !this.dead; };
+  ThornSprite.prototype.hurtBox = function () { return { l: this.x - this.w / 2 - 2, r: this.x + this.w / 2 + 2, t: this.y - this.h - 2, b: this.y }; };
+  ThornSprite.prototype.bodyBox = function () { return { l: this.x - this.w / 2 + 3, r: this.x + this.w / 2 - 3, t: this.y - this.h + 4, b: this.y }; };
+
+  ThornSprite.prototype.update = function (world) {
+    const d = this.def, p = world.player, fx = SH.fx;
+    this.wobble += 0.12;
+    if (this.flash > 0) this.flash--;
+    if (this.dead) {
+      this.deadT++;
+      // Come back after a while, but never in view.
+      if (this.deadT > d.respawn && Math.abs(this.home.x - world.camCenterX()) > world.viewW * 0.6) this.reset();
+      return;
+    }
+    this.t++;
+    const dx = p.x - this.x, dy = p.y - this.y;
+    const sees = !p.dead && Math.abs(dx) < d.sight && Math.abs(dy) < d.sightY;
+
+    switch (this.state) {
+      case 'wander':
+        if (this.pause > 0) { this.pause--; this.vx = 0; }
+        else {
+          this.vx = this.dir * d.wander;
+          if (!SH.floorAhead(world.room, this.x + this.dir * (this.w / 2 + 2), this.y) || this.hitWall) { this.dir *= -1; this.pause = 30; }
+          if (Math.random() < 0.004) this.pause = 40 + Math.random() * 40;
+        }
+        if (sees && this.grounded) { this.state = 'windup'; this.t = 0; this.dir = dx > 0 ? 1 : -1; this.vx = 0; fx.word(this.x, this.y - this.h - 8, '!', '#ffb057', 28); }
+        break;
+      case 'windup':
+        this.vx = 0;
+        if (this.t >= d.windup) {
+          this.state = 'lunge'; this.t = 0;
+          this.vx = this.dir * d.lungeSpeed; this.vy = -d.lungeHop;
+          fx.burst(this.x, this.y, 6, { angle: this.dir > 0 ? Math.PI : 0, spread: 0.8, speed: 1.6, life: 14, colors: ['#ffb057', '#ffe0a0'] });
+        }
+        break;
+      case 'lunge':
+        if (this.grounded && this.t > 4) this.vx *= 0.86;
+        if (this.t >= d.lungeFrames) { this.state = 'recover'; this.t = 0; }
+        break;
+      case 'recover':
+        this.vx *= 0.8;
+        if (this.t >= d.recover) { this.state = 'wander'; this.t = 0; this.pause = 20; }
+        break;
+      case 'stagger':
+        this.vx *= 0.88;
+        if (this.t >= 18) { this.state = 'recover'; this.t = d.recover - 16; }
+        break;
+    }
+
+    this.vy = Math.min(this.vy + d.gravity, 8);
+    const res = SH.moveBody(world.room, this);
+    this.grounded = res.ground;
+    this.hitWall = res.wall !== 0;
+    if (this.y > world.room.pxH + 60) { this.dead = true; this.deadT = 0; }
+
+    // Touching Wren hurts her (dash invincibility protects; a dash through a lunge is a perfect dodge).
+    if (SH.overlap(this.bodyBox(), p.box())) {
+      if (p.dashT > 0 && p.iframes > 0) {
+        if (this.state === 'lunge' && !this.dodged) { this.dodged = true; world.onPerfectDodge(this); }
+      } else p.hurt(this.x, d.damage, world);
+    }
+    if (this.state !== 'lunge') this.dodged = false;
+  };
+
+  ThornSprite.prototype.takeHit = function (hit, world) {
+    const fx = SH.fx;
+    this.hp -= hit.dmg;
+    this.flash = 8;
+    const kb = hit.pogo ? 0 : hit.kb;
+    this.vx = hit.dir * kb; this.vy = hit.pogo ? 1 : -1.8;
+    fx.burst(this.x, this.y - this.h / 2, 7, { angle: hit.pogo ? Math.PI / 2 : (hit.dir > 0 ? 0 : Math.PI), spread: 1.4, speed: 2.4, life: 18, colors: ['#9be07a', '#d8ffb8', '#ffffff'] });
+    if (this.hp <= 0) {
+      this.dead = true; this.deadT = 0;
+      fx.burst(this.x, this.y - this.h / 2, 22, { speed: 3.2, life: 34, size: 3, gravity: 0.08, colors: ['#5f9e4c', '#9be07a', '#3d6b33', '#ffe9a8'] });
+      fx.ring(this.x, this.y - this.h / 2, '#d8ffb8', 30, 18, 2);
+      world.onKill(this);
+      return { landed: true, killed: true };
+    }
+    this.state = 'stagger'; this.t = 0;
+    return { landed: true, killed: false };
+  };
+
+  // ---------------- Training dummy: can't die, counts your combo.
+  function Dummy(x, y) {
+    const d = SH.ENEMY_DEFS.dummy;
+    Object.assign(this, { kind: 'dummy', x, y, w: d.w, h: d.h, tilt: 0, tiltV: 0, flash: 0, combo: 0, comboT: 0 });
+  }
+  Dummy.prototype.reset = function () { this.tilt = this.tiltV = 0; this.combo = 0; };
+  Dummy.prototype.hittable = () => true;
+  Dummy.prototype.hurtBox = function () { return { l: this.x - this.w / 2, r: this.x + this.w / 2, t: this.y - this.h, b: this.y }; };
+  Dummy.prototype.update = function () {
+    this.tiltV += -this.tilt * 0.12; this.tiltV *= 0.86; this.tilt += this.tiltV;
+    if (this.flash > 0) this.flash--;
+    if (this.comboT > 0) this.comboT--; else this.combo = 0;
+  };
+  Dummy.prototype.takeHit = function (hit) {
+    this.tiltV += hit.dir * (hit.finisher ? 0.22 : 0.1);
+    this.flash = 7;
+    this.combo++; this.comboT = 50;
+    const label = hit.finisher ? `${this.combo} hits!` : `${this.combo}`;
+    SH.fx.word(this.x, this.y - this.h - 10, label, hit.finisher ? '#ffd27a' : '#ffffff', 40);
+    SH.fx.burst(this.x - hit.dir * 4, this.y - this.h * 0.6, 6, { angle: hit.dir > 0 ? 0 : Math.PI, spread: 1.2, speed: 2, life: 18, colors: ['#e8c77a', '#b8924a', '#fff2c9'] });
+    if (hit.finisher) SH.fx.ring(this.x, this.y - this.h * 0.6, '#ffd27a', 24, 14, 2);
+    return { landed: true, killed: false };
+  };
+
+  // ---------------- Thorn bud: floats over thorns. Pogo off it; it closes, then reopens.
+  function Bulb(x, y) {
+    const d = SH.ENEMY_DEFS.bulb;
+    Object.assign(this, { kind: 'bulb', x, y, r: d.r, w: d.r * 2, h: d.r * 2, closed: 0, t: Math.random() * 6 });
+  }
+  Bulb.prototype.reset = function () { this.closed = 0; };
+  Bulb.prototype.hittable = function () { return this.closed <= 0; };
+  Bulb.prototype.hurtBox = function () { const y = this.y + Math.sin(this.t) * 3; return { l: this.x - this.r, r: this.x + this.r, t: y - this.r, b: y + this.r }; };
+  Bulb.prototype.update = function () {
+    this.t += 0.05;
+    if (this.closed > 0) this.closed--;
+  };
+  Bulb.prototype.takeHit = function (hit) {
+    if (!hit.pogo) { SH.fx.word(this.x, this.y - 22, 'strike down', '#ffd27a', 40); return { landed: true, killed: false }; }
+    this.closed = SH.ENEMY_DEFS.bulb.regrow;
+    SH.fx.burst(this.x, this.y, 10, { speed: 2.2, life: 22, colors: ['#ff8fb8', '#ffd27a', '#ffffff'], glow: true });
+    return { landed: true, killed: false };
+  };
+
+  SH.makeSpawn = function (s, room) {
+    const T = TS();
+    const x = s.x * T + T / 2;
+    if (s.kind === 'bulb') return new Bulb(s.x * T, s.y * T);
+    const y = s.y != null ? s.y * T : room.groundY(Math.floor(s.x), 0);
+    if (s.kind === 'thornSprite') return new ThornSprite(x, y);
+    if (s.kind === 'dummy') return new Dummy(x, y);
+    throw new Error('unknown spawn ' + s.kind);
+  };
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/draw.js
+// Starhaven — drawing. Placeholder art with a fixed direction: moody painted-style depth behind,
+// a near-black play layer with moonlit edges, and a bright, clearly outlined Wren in front.
+(function (SH) {
+  const PAL = {
+    skyTop: '#090b20', skyMid: '#191a45', skyLow: '#33295c', horizon: '#4d3a72',
+    star: '#ffffff', starDim: '#a9b8ff',
+    farRidge: '#23275a', nearRidge: '#181b42', ridgeLight: '#3a4088',
+    trees: '#11132e', treesLight: '#1f2350',
+    ground: '#0a0b17', groundSpeck: '#121430', edgeLight: '#c3cdff', edgeMid: '#56609c', grass: '#5ba39a', grassDark: '#2f6a66',
+    plank: '#29233f', plankTop: '#cbb8ff',
+    thornDark: '#2a1024', thornMid: '#5a1d3e', thornTip: '#ff5a78',
+    gold: '#ffd27a', goldDeep: '#d9973f', warm: '#ffe9a8',
+    hair: '#e0703f', hairDark: '#a8452a', skin: '#f6dcc6', tunic: '#2f8f7a', tunicDark: '#1f6656',
+    cloak: '#2c3d74', cloakRim: '#9fc2ff', legs: '#3b3150', boots: '#6a4430', blade: '#eef8ff',
+    sprite: '#2f5c2b', spriteRim: '#8fd16b', spriteEye: '#ffb057', spriteAngry: '#ff8a3a',
+  };
+  SH.PAL = PAL;
+
+  // Deterministic random so the art is the same every time.
+  function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+
+  const D = {};
+  let room, layers = {};
+
+  D.init = function (r, viewW) {
+    room = r;
+    layers.level = makeLevel(r);
+    D.resize(viewW);
+    if (!layers.mountains) layers.mountains = makeMountains();
+    if (!layers.trees) layers.trees = makeTrees();
+    if (!layers.stars) layers.stars = makeStars();
+  };
+  D.resize = function (viewW) {
+    layers.viewW = viewW;
+    layers.sky = makeSky(viewW);
+    layers.vignette = makeVignette(viewW);
+  };
+
+  function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+
+  function makeSky(w) {
+    const c = canvas(w, 360), g = c.getContext('2d');
+    const gr = g.createLinearGradient(0, 0, 0, 360);
+    gr.addColorStop(0, PAL.skyTop); gr.addColorStop(0.45, PAL.skyMid); gr.addColorStop(0.78, PAL.skyLow); gr.addColorStop(1, PAL.horizon);
+    g.fillStyle = gr; g.fillRect(0, 0, w, 360);
+    return c;
+  }
+  function makeStars() {
+    const r = rng(7), out = [];
+    for (let i = 0; i < 140; i++) out.push({ x: r() * 2400, y: r() * 230, s: r() < 0.12 ? 2 : 1, tw: r() * 6, sp: 0.02 + r() * 0.05 });
+    return out;
+  }
+  function ridge(g, r, w, base, amp, color, light) {
+    g.fillStyle = color; g.beginPath(); g.moveTo(0, 360);
+    let y = base, pts = [];
+    for (let x = 0; x <= w; x += 8) {
+      const n = Math.sin(x * 0.004 + 1.3) * amp + Math.sin(x * 0.011) * amp * 0.45 + Math.sin(x * 0.031 + 2) * amp * 0.12;
+      y = base - Math.abs(n);
+      pts.push([x, y]); g.lineTo(x, y);
+    }
+    g.lineTo(w, 360); g.closePath(); g.fill();
+    if (light) { g.strokeStyle = light; g.globalAlpha = 0.5; g.lineWidth = 1; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); g.globalAlpha = 1; }
+  }
+  function makeMountains() {
+    const w = 1600, c = canvas(w, 360), g = c.getContext('2d'), r = rng(3);
+    ridge(g, r, w, 250, 80, PAL.farRidge, PAL.ridgeLight);
+    // a soft mist band between ridges
+    const m = g.createLinearGradient(0, 200, 0, 300); m.addColorStop(0, 'rgba(120,110,200,0)'); m.addColorStop(1, 'rgba(120,110,200,0.22)');
+    g.fillStyle = m; g.fillRect(0, 200, w, 160);
+    ridge(g, r, w, 300, 46, PAL.nearRidge, null);
+    return c;
+  }
+  function makeTrees() {
+    const w = 1400, c = canvas(w, 360), g = c.getContext('2d'), r = rng(11);
+    for (let i = 0; i < 26; i++) {
+      const x = r() * w, top = 70 + r() * 150, tw = 5 + r() * 9;
+      g.fillStyle = PAL.trees;
+      g.fillRect(x, top, tw, 360 - top);
+      // branches and leaf masses
+      for (let b = 0; b < 4; b++) {
+        const by = top + 10 + r() * 90, dir = r() < 0.5 ? -1 : 1, len = 14 + r() * 26;
+        g.save(); g.translate(x + tw / 2, by); g.rotate(dir * (0.5 + r() * 0.5) - Math.PI / 2 * 0);
+        g.fillRect(0, -1.5, dir * len, 3); g.restore();
+      }
+      g.beginPath(); g.ellipse(x + tw / 2, top + 6, 22 + r() * 22, 14 + r() * 12, 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = PAL.treesLight; g.globalAlpha = 0.5; g.fillRect(x + tw - 1, top + 8, 1, 360 - top); g.globalAlpha = 1;
+    }
+    g.fillStyle = PAL.trees; g.fillRect(0, 330, w, 30);
+    return c;
+  }
+  function makeVignette(w) {
+    const VH = SH.VIEW_H, c = canvas(w, VH), g = c.getContext('2d');
+    const gr = g.createRadialGradient(w / 2, VH / 2, 120, w / 2, VH / 2, w * 0.62);
+    gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(3,3,12,0.55)');
+    g.fillStyle = gr; g.fillRect(0, 0, w, VH);
+    return c;
+  }
+
+  function makeLevel(r) {
+    const TS = SH.TILE, c = canvas(r.pxW, r.pxH), g = c.getContext('2d'), rand = rng(21);
+    const get = (x, y) => r.get(x, y);
+    const solid = (x, y) => get(x, y) === SH.T_SOLID;
+    for (let ty = 0; ty < r.h; ty++) for (let tx = 0; tx < r.w; tx++) {
+      const t = get(tx, ty), x = tx * TS, y = ty * TS;
+      if (t === SH.T_SOLID) {
+        g.fillStyle = PAL.ground; g.fillRect(x, y, TS, TS);
+        for (let i = 0; i < 3; i++) { g.fillStyle = PAL.groundSpeck; g.fillRect(x + ((rand() * TS) | 0), y + ((rand() * TS) | 0), 2, 2); }
+        const openUp = !solid(tx, ty - 1), openL = !solid(tx - 1, ty), openR = !solid(tx + 1, ty);
+        if (openL) { g.fillStyle = '#20264d'; g.fillRect(x, y, 2, TS); }
+        if (openR) { g.fillStyle = '#20264d'; g.fillRect(x + TS - 2, y, 2, TS); }
+        if (openUp) {
+          g.fillStyle = PAL.edgeMid; g.fillRect(x, y + 2, TS, 2);
+          g.fillStyle = PAL.edgeLight; g.fillRect(x, y, TS, 2);
+          for (let i = 0; i < 5; i++) {
+            const gx = x + ((rand() * TS) | 0), gh = 1 + ((rand() * 4) | 0);
+            g.fillStyle = rand() < 0.5 ? PAL.grass : PAL.grassDark; g.fillRect(gx, y - gh, 1, gh);
+          }
+          // Gold glint on a ledge that drops into a pit: "careful, edge here".
+          const pitL = openL && r.groundY(tx - 1, ty) === null, pitR = openR && r.groundY(tx + 1, ty) === null;
+          if (pitL) { g.fillStyle = PAL.gold; g.fillRect(x, y, 5, 2); g.fillRect(x, y, 2, 6); }
+          if (pitR) { g.fillStyle = PAL.gold; g.fillRect(x + TS - 5, y, 5, 2); g.fillRect(x + TS - 2, y, 2, 6); }
+        }
+      } else if (t === SH.T_ONEWAY) {
+        g.fillStyle = PAL.plank; g.fillRect(x, y, TS, 7);
+        g.fillStyle = PAL.plankTop; g.fillRect(x, y, TS, 2);
+        g.fillStyle = '#17132a'; g.fillRect(x + 2, y + 7, 2, 4); g.fillRect(x + TS - 4, y + 7, 2, 4);
+      } else if (t === SH.T_THORNS) {
+        const glow = g.createLinearGradient(0, y - 8, 0, y + TS); glow.addColorStop(0, 'rgba(255,60,100,0)'); glow.addColorStop(1, 'rgba(255,60,100,0.22)');
+        g.fillStyle = glow; g.fillRect(x, y - 8, TS, TS + 8);
+        g.fillStyle = PAL.thornDark; g.fillRect(x, y + TS - 6, TS, 6);
+        for (let i = 0; i < 4; i++) {
+          const bx = x + i * 6 + rand() * 3, h = 9 + rand() * 9;
+          g.fillStyle = PAL.thornMid; g.beginPath(); g.moveTo(bx, y + TS); g.lineTo(bx + 3, y + TS - h); g.lineTo(bx + 6, y + TS); g.fill();
+          g.fillStyle = PAL.thornTip; g.fillRect(bx + 2, y + TS - h, 2, 3);
+        }
+      }
+    }
+    return c;
+  }
+
+  // ---------------------------------------------------------------- per frame
+  D.frame = function (ctx, w) {
+    const vw = layers.viewW, cam = w.cam, fx = SH.fx, t = w.time;
+    let sx = 0, sy = 0;
+    if (fx.shake > 0) { sx = Math.round((Math.random() - 0.5) * fx.shake * 2); sy = Math.round((Math.random() - 0.5) * fx.shake * 2); }
+    const cx = Math.round(cam.x), cy = Math.round(cam.y);
+
+    ctx.drawImage(layers.sky, 0, 0);
+    // stars
+    for (const s of layers.stars) {
+      const x = ((s.x - cx * s.sp) % 2400 + 2400) % 2400;
+      if (x > vw) continue;
+      ctx.globalAlpha = 0.45 + 0.55 * Math.abs(Math.sin(t * 0.03 + s.tw));
+      ctx.fillStyle = s.s > 1 ? PAL.star : PAL.starDim; ctx.fillRect(x, s.y - cy * 0.02, s.s, s.s);
+    }
+    ctx.globalAlpha = 1;
+    drawCity(ctx, w, vw, cx, cy);
+    tile(ctx, layers.mountains, cx * 0.12, 10 - cy * 0.08, vw);
+    ctx.globalAlpha = 0.8; tile(ctx, layers.trees, cx * 0.38, 30 - cy * 0.3, vw); ctx.globalAlpha = 1;
+    // mist in front of the trees
+    const VH = SH.VIEW_H;
+    const mist = ctx.createLinearGradient(0, 180 - cy * 0.3, 0, VH);
+    mist.addColorStop(0, 'rgba(110,100,190,0)'); mist.addColorStop(1, 'rgba(110,100,190,0.20)');
+    ctx.fillStyle = mist; ctx.fillRect(0, 0, vw, VH);
+
+    ctx.save();
+    ctx.translate(-cx + sx, -cy + sy);
+    ctx.drawImage(layers.level, cx, cy, vw, VH, cx, cy, vw, VH);
+    for (const l of w.lanterns) drawLantern(ctx, l, t);
+    for (const s of w.signs) drawSign(ctx, s, t);
+    for (const e of w.things) {
+      if (e.x < cx - 80 || e.x > cx + vw + 80) continue;
+      if (e.kind === 'thornSprite') drawSprite(ctx, e, t);
+      else if (e.kind === 'dummy') drawDummy(ctx, e);
+      else if (e.kind === 'bulb') drawBulb(ctx, e, t);
+    }
+    for (const g of fx.ghosts) drawWren(ctx, w.player, { ghost: g });
+    drawWren(ctx, w.player, {});
+    drawParticles(ctx, fx);
+    ctx.restore();
+
+    ctx.drawImage(layers.vignette, 0, 0);
+    if (fx.flash > 0) { ctx.fillStyle = fx.flashColor; ctx.globalAlpha = Math.min(1, fx.flash / 6); ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = 1; }
+    if (fx.slowmo > 0) { ctx.fillStyle = 'rgba(120,190,255,0.10)'; ctx.fillRect(0, 0, vw, VH); }
+    if (w.fade > 0) { ctx.fillStyle = '#05050d'; ctx.globalAlpha = Math.min(1, w.fade); ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = 1; }
+  };
+
+  function tile(ctx, img, ox, oy, vw) {
+    const iw = img.width; let x = -(((ox % iw) + iw) % iw);
+    for (; x < vw; x += iw) ctx.drawImage(img, Math.round(x), Math.round(oy));
+  }
+
+  function drawCity(ctx, w, vw, cx, cy) {
+    // Starhaven on the far horizon: the place you are working toward.
+    const worldX = w.room.def.cityGlowX * SH.TILE;
+    const x = Math.round(vw * 0.5 + (worldX - cx - vw * 0.5) * 0.06), y = 232 - cy * 0.05;
+    if (x < -120 || x > vw + 120) return;
+    const glow = ctx.createRadialGradient(x, y, 4, x, y, 110);
+    glow.addColorStop(0, 'rgba(255,210,122,0.38)'); glow.addColorStop(1, 'rgba(255,210,122,0)');
+    ctx.fillStyle = glow; ctx.fillRect(x - 120, y - 120, 240, 240);
+    ctx.fillStyle = '#2a2558';
+    const spires = [[-34, 18], [-24, 30], [-14, 22], [-6, 44], [4, 26], [12, 36], [22, 20], [30, 28]];
+    for (const [dx, h] of spires) { ctx.fillRect(x + dx, y - h, 6, h + 20); ctx.beginPath(); ctx.moveTo(x + dx, y - h); ctx.lineTo(x + dx + 3, y - h - 8); ctx.lineTo(x + dx + 6, y - h); ctx.fill(); }
+    ctx.fillStyle = PAL.gold;
+    for (const [dx, h] of spires) for (let k = 6; k < h; k += 8) ctx.fillRect(x + dx + 2, y - h + k, 2, 2);
+    // the guiding star above the city
+    const tw = 0.7 + 0.3 * Math.sin(w.time * 0.05);
+    ctx.globalAlpha = tw; ctx.fillStyle = '#fff6d8';
+    ctx.fillRect(x - 1, y - 74, 3, 3); ctx.fillRect(x - 5, y - 73, 11, 1); ctx.fillRect(x, y - 79, 1, 13);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawParticles(ctx, fx) {
+    for (const r of fx.rings) {
+      ctx.globalAlpha = r.life / r.max; ctx.strokeStyle = r.color; ctx.lineWidth = r.width;
+      ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2); ctx.stroke();
+    }
+    for (const p of fx.parts) {
+      const a = Math.min(1, p.life / p.max * 1.4);
+      if (p.glow) { ctx.globalAlpha = a * 0.3; ctx.fillStyle = p.color; ctx.fillRect(p.x - p.size, p.y - p.size, p.size * 3, p.size * 3); }
+      ctx.globalAlpha = a; ctx.fillStyle = p.color; ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
+    }
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'center'; ctx.font = 'bold 13px system-ui, sans-serif';
+    for (const wd of fx.words) {
+      ctx.globalAlpha = Math.min(1, wd.life / 15);
+      ctx.fillStyle = '#05050d'; ctx.fillText(wd.text, wd.x + 1, wd.y + 1);
+      ctx.fillStyle = wd.color; ctx.fillText(wd.text, wd.x, wd.y);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ---------------------------------------------------------------- props
+  function drawLantern(ctx, l, t) {
+    const x = l.px, y = l.py, big = l.end;
+    const h = big ? 58 : 42;
+    if (l.lit) {
+      const r = (big ? 70 : 46) + Math.sin(t * 0.08 + x) * 3;
+      const g = ctx.createRadialGradient(x, y - h, 2, x, y - h, r);
+      g.addColorStop(0, 'rgba(255,214,130,0.55)'); g.addColorStop(1, 'rgba(255,214,130,0)');
+      ctx.fillStyle = g; ctx.fillRect(x - r, y - h - r, r * 2, r * 2);
+    }
+    ctx.fillStyle = '#1b1830'; ctx.fillRect(x - 2, y - h + 6, 4, h - 6);
+    ctx.fillRect(x - 6, y - 2, 12, 2);
+    ctx.fillStyle = '#1b1830'; ctx.fillRect(x - 7, y - h - 8, 14, 16);
+    ctx.fillStyle = l.lit ? (Math.sin(t * 0.2 + x) > -0.8 ? PAL.warm : PAL.gold) : '#3a3560';
+    ctx.fillRect(x - 5, y - h - 6, 10, 12);
+    ctx.fillStyle = '#1b1830'; ctx.fillRect(x - 1, y - h - 6, 2, 12);
+    if (big) {
+      ctx.fillStyle = l.lit ? '#fff6d8' : '#5a5590';
+      ctx.fillRect(x - 1, y - h - 22, 2, 10); ctx.fillRect(x - 5, y - h - 18, 10, 2);
+    }
+  }
+
+  function drawSign(ctx, s, t) {
+    const x = s.px, y = s.py;
+    ctx.fillStyle = '#2a2140'; ctx.fillRect(x - 2, y - 24, 4, 24);
+    ctx.fillStyle = s.read ? '#3a2f55' : '#4a3a6a'; ctx.fillRect(x - 14, y - 34, 28, 16);
+    ctx.fillStyle = s.near ? PAL.gold : '#a99ad8'; ctx.fillRect(x - 14, y - 34, 28, 2);
+    ctx.fillStyle = '#d8ccff';
+    for (let i = 0; i < 3; i++) ctx.fillRect(x - 9, y - 29 + i * 4, 18 - (i === 2 ? 6 : 0), 1);
+    if (!s.read && !s.near) {
+      const bob = Math.round(Math.sin(t * 0.1) * 2);
+      ctx.fillStyle = PAL.gold; ctx.fillRect(x - 1, y - 48 + bob, 3, 7); ctx.fillRect(x - 1, y - 39 + bob, 3, 3);
+    }
+  }
+
+  function drawDummy(ctx, d) {
+    ctx.save(); ctx.translate(d.x, d.y); ctx.rotate(d.tilt);
+    ctx.fillStyle = '#3a2a1e'; ctx.fillRect(-2, -40, 4, 40);
+    ctx.fillStyle = d.flash > 0 ? '#ffffff' : '#c89c52'; ctx.fillRect(-10, -36, 20, 22);
+    ctx.fillStyle = '#8a6630'; ctx.fillRect(-10, -26, 20, 2); ctx.fillRect(-12, -34, 24, 3);
+    ctx.fillStyle = d.flash > 0 ? '#ffffff' : '#e2c48a'; ctx.fillRect(-7, -48, 14, 13);
+    ctx.fillStyle = '#5a3f22'; ctx.fillRect(-3, -44, 2, 2); ctx.fillRect(2, -44, 2, 2);
+    ctx.restore();
+  }
+
+  function drawBulb(ctx, b, t) {
+    const y = b.y + Math.sin(b.t) * 3, x = b.x;
+    if (b.closed > 0) {
+      ctx.fillStyle = '#4a1d3a'; ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill();
+      return;
+    }
+    const g = ctx.createRadialGradient(x, y, 2, x, y, 26); g.addColorStop(0, 'rgba(255,143,184,0.45)'); g.addColorStop(1, 'rgba(255,143,184,0)');
+    ctx.fillStyle = g; ctx.fillRect(x - 26, y - 26, 52, 52);
+    for (let i = 0; i < 6; i++) {
+      const a = i / 6 * Math.PI * 2 + b.t * 0.6;
+      ctx.fillStyle = i % 2 ? '#c2477a' : '#ff8fb8';
+      ctx.beginPath(); ctx.ellipse(x + Math.cos(a) * 7, y + Math.sin(a) * 7, 7, 4, a, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.fillStyle = PAL.gold; ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+    // a down-arrow hint above: strike down here
+    const bob = Math.round(Math.sin(t * 0.12) * 2);
+    ctx.fillStyle = 'rgba(255,233,168,0.8)';
+    ctx.fillRect(x - 1, y - 30 + bob, 2, 6); ctx.fillRect(x - 3, y - 25 + bob, 6, 2); ctx.fillRect(x - 1, y - 23 + bob, 2, 2);
+  }
+
+  function drawSprite(ctx, e, t) {
+    if (e.dead) return;
+    const d = e.def, cy = e.y - d.h / 2;
+    let x = e.x;
+    const angry = e.state === 'windup' || e.state === 'lunge';
+    if (e.state === 'windup') x += Math.round(Math.sin(e.t * 1.7) * 1.5);
+    if (angry) {
+      const k = e.state === 'windup' ? e.t / d.windup : 1;
+      const g = ctx.createRadialGradient(x, cy, 2, x, cy, 30);
+      g.addColorStop(0, `rgba(255,150,60,${0.55 * k})`); g.addColorStop(1, 'rgba(255,150,60,0)');
+      ctx.fillStyle = g; ctx.fillRect(x - 30, cy - 30, 60, 60);
+    }
+    const spikes = 10, rot = e.wobble * 0.2 * (e.dir || 1);
+    const body = e.flash > 0 ? '#ffffff' : angry ? '#6a4a1c' : PAL.sprite;
+    const rim = e.flash > 0 ? '#ffffff' : angry ? PAL.spriteAngry : PAL.spriteRim;
+    ctx.fillStyle = rim;
+    star(ctx, x, cy, 14, 9, spikes, rot);
+    ctx.fillStyle = body;
+    star(ctx, x, cy + 1, 11.5, 7.5, spikes, rot);
+    // eyes look toward where it's going
+    ctx.fillStyle = angry ? '#ffe0a0' : PAL.spriteEye;
+    const ex = (e.dir || 1) * 3;
+    ctx.fillRect(Math.round(x + ex - 4), Math.round(cy - 2), 3, 3);
+    ctx.fillRect(Math.round(x + ex + 2), Math.round(cy - 2), 3, 3);
+    if (e.state === 'recover' || e.state === 'stagger') { ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 0.6; ctx.fillRect(Math.round(x + ex - 4), Math.round(cy), 3, 1); ctx.fillRect(Math.round(x + ex + 2), Math.round(cy), 3, 1); ctx.globalAlpha = 1; }
+    // health pips once it's been hit
+    if (e.hp < d.hp) {
+      const n = Math.ceil(d.hp / SH.COMBAT.damage), left = Math.ceil(e.hp / SH.COMBAT.damage);
+      for (let i = 0; i < n; i++) { ctx.fillStyle = i < left ? '#9be07a' : '#2a2a3a'; ctx.fillRect(Math.round(x - n * 4 + i * 8 + 1), Math.round(e.y - d.h - 12), 6, 3); }
+    }
+  }
+  function star(ctx, x, y, R, r, n, rot) {
+    ctx.beginPath();
+    for (let i = 0; i < n * 2; i++) { const a = rot + i / (n * 2) * Math.PI * 2, rr = i % 2 ? r : R; i ? ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr) : ctx.moveTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    ctx.closePath(); ctx.fill();
+  }
+
+  // ---------------------------------------------------------------- Wren
+  function poseOf(p) {
+    if (p.dashT > 0) return 'dash';
+    if (p.stun > 0) return 'hurt';
+    if (p.swing) return p.swing.kind === 'pogo' ? 'pogo' : 'attack';
+    if (!p.grounded) return p.vy < -1 ? 'rise' : p.vy > 1.5 ? 'fall' : 'apex';
+    if (Math.abs(p.vx) > 0.4) return 'run';
+    return 'idle';
+  }
+
+  function drawWren(ctx, p, opt) {
+    const g = opt.ghost;
+    const x = g ? g.x : p.x, y = g ? g.y : p.y, f = g ? g.facing : p.facing;
+    const pose = g ? g.pose : poseOf(p);
+    const a = p.anim;
+    const tint = g ? 'rgba(140,220,255,' + (0.35 * g.life / g.max).toFixed(3) + ')' : null;
+    const flicker = !g && p.invuln > 0 && Math.floor(p.invuln / 3) % 2 === 0 && p.stun <= 0;
+    if (flicker) return;
+
+    // scarf first (behind the body), in world space
+    if (!g) {
+      ctx.lineCap = 'round';
+      for (let i = 1; i < p.scarf.length; i++) {
+        const q0 = p.scarf[i - 1], q1 = p.scarf[i];
+        ctx.strokeStyle = i % 2 ? PAL.gold : PAL.goldDeep;
+        ctx.lineWidth = Math.max(1.5, 4.5 - i * 0.8);
+        ctx.beginPath(); ctx.moveTo(q0.x, q0.y); ctx.lineTo(q1.x, q1.y); ctx.stroke();
+      }
+      // soft starlight halo so Wren always reads against the dark
+      const h = ctx.createRadialGradient(x, y - 22, 4, x, y - 22, 34);
+      h.addColorStop(0, 'rgba(200,220,255,0.16)'); h.addColorStop(1, 'rgba(200,220,255,0)');
+      ctx.fillStyle = h; ctx.fillRect(x - 34, y - 56, 68, 68);
+    }
+
+    ctx.save();
+    ctx.translate(Math.round(x), Math.round(y));
+    // squash and stretch
+    let sxS = 1, syS = 1;
+    if (!g) {
+      if (a.land > 0) { const k = a.squash * (a.land / 8); sxS = 1 + k * 0.22; syS = 1 - k * 0.2; }
+      else if (pose === 'rise') { sxS = 0.92; syS = 1.08; }
+      if (pose === 'dash') { sxS = 1.12; syS = 0.9; }
+    } else if (pose === 'dash') { sxS = 1.12; syS = 0.9; }
+    ctx.scale(f * sxS, syS);
+
+    const C = c => tint || c;
+    const breathe = pose === 'idle' ? Math.round(Math.sin(a.t * 0.06) * 0.8) : 0;
+    const run = a.run * Math.PI;
+    const lean = pose === 'run' ? 0.12 : pose === 'dash' ? 0.25 : 0;
+
+    // legs
+    let legA = 0, legB = 0;
+    if (pose === 'run') { legA = Math.sin(run) * 0.9; legB = -legA; }
+    else if (pose === 'rise') { legA = -0.7; legB = 0.4; }
+    else if (pose === 'apex' || pose === 'pogo') { legA = -0.9; legB = 0.6; }
+    else if (pose === 'fall') { legA = 0.35; legB = -0.25; }
+    else if (pose === 'dash') { legA = 0.9; legB = -1.0; }
+    else if (pose === 'hurt') { legA = 0.6; legB = -0.5; }
+    else if (pose === 'attack') { legA = 0.55; legB = -0.45; }
+    const hipY = -16 + breathe;
+    limb(ctx, -1, hipY, legB, 16, 5, C(PAL.legs), C('#2a2238'));
+    limb(ctx, 1, hipY, legA, 16, 5, C(PAL.legs), C(PAL.boots));
+
+    ctx.save();
+    ctx.rotate(lean);
+    // cloak flows behind
+    const flow = Math.min(1, Math.abs(p.vx) / 4) * (g ? 1 : 1);
+    const lift = pose === 'fall' ? -6 : pose === 'rise' ? 4 : 0;
+    ctx.fillStyle = C(PAL.cloak);
+    ctx.beginPath();
+    ctx.moveTo(-2, -31 + breathe);
+    ctx.lineTo(-9 - flow * 8, -6 + lift - flow * 6 + Math.sin(a.t * 0.2) * flow * 2);
+    ctx.lineTo(-3, -10 + lift * 0.5);
+    ctx.lineTo(3, -30 + breathe);
+    ctx.closePath(); ctx.fill();
+
+    // torso
+    ctx.fillStyle = C(PAL.tunic); ctx.fillRect(-5, -31 + breathe, 11, 16);
+    ctx.fillStyle = C(PAL.tunicDark); ctx.fillRect(-5, -31 + breathe, 3, 16);
+    ctx.fillStyle = C('#6a4a2a'); ctx.fillRect(-5, -18 + breathe, 11, 2);
+
+    // head
+    const hy = -42 + breathe;
+    ctx.fillStyle = C(PAL.skin); ctx.fillRect(-3, hy, 10, 11);
+    ctx.fillStyle = C(PAL.hair); ctx.fillRect(-5, hy - 2, 11, 5); ctx.fillRect(-5, hy, 5, 9);
+    ctx.fillStyle = C(PAL.hairDark); ctx.fillRect(-5, hy + 6, 3, 4);
+    // ponytail swings opposite to motion
+    const tail = pose === 'run' ? Math.sin(run * 2) * 2 : pose === 'fall' ? -3 : 0;
+    ctx.fillStyle = C(PAL.hair); ctx.fillRect(-9, hy + 1 + Math.round(tail), 5, 4); ctx.fillRect(-11, hy + 3 + Math.round(tail * 1.4), 3, 5);
+    // pointed fae ear
+    ctx.fillStyle = C(PAL.skin); ctx.fillRect(0, hy + 3, 2, 3); ctx.fillRect(-1, hy + 1, 2, 2); ctx.fillRect(-2, hy - 1, 1, 2);
+    if (!tint) { ctx.fillStyle = '#1a1430'; ctx.fillRect(4, hy + 4, 2, 3); ctx.fillStyle = '#ffffff'; ctx.fillRect(5, hy + 4, 1, 1); }
+
+    // arm + dagger
+    const sw = p.swing;
+    // Arm angle: 0 = hanging down, -1.57 = straight forward, -3.14 = straight up, +1.57 = straight back.
+    let armAng = -0.25 + Math.sin(a.t * 0.06) * 0.05, showBlade = true;
+    if (pose === 'run') armAng = -0.3 - Math.sin(run) * 0.7;
+    if (pose === 'rise' || pose === 'apex') armAng = -1.2;
+    if (pose === 'fall') armAng = -2.2;
+    if (pose === 'dash') armAng = 1.3;
+    if (pose === 'hurt') armAng = 2.4;
+    if (!g && sw) {
+      const k = Math.min(1, sw.f / Math.max(1, sw.def.active[1]));
+      if (sw.def.arc === 'high') armAng = -3.0 + k * 2.5;
+      else if (sw.def.arc === 'low') armAng = -0.4 - k * 2.2;
+      else if (sw.def.arc === 'big') armAng = -3.4 + k * 3.4;
+    }
+    if (pose === 'pogo') armAng = 0;
+    ctx.save();
+    ctx.translate(2, -28 + breathe);
+    ctx.rotate(armAng);
+    ctx.fillStyle = C(PAL.tunic); ctx.fillRect(-2, 0, 4, 7);
+    ctx.fillStyle = C(PAL.skin); ctx.fillRect(-2, 7, 4, 4);
+    if (showBlade) { ctx.fillStyle = C(PAL.blade); ctx.fillRect(-1, 10, 2, 9); ctx.fillStyle = C(PAL.gold); ctx.fillRect(-2, 10, 4, 1); }
+    ctx.restore();
+    ctx.restore(); // lean
+
+    // slash arc
+    if (!g && sw && sw.f <= sw.def.active[1] + 3) drawSlash(ctx, sw);
+    ctx.restore();
+  }
+
+  function limb(ctx, x, y, ang, len, w, col, foot) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang * 0.6);
+    ctx.fillStyle = col; ctx.fillRect(-w / 2, 0, w, len - 3);
+    ctx.fillStyle = foot; ctx.fillRect(-w / 2, len - 4, w + 2, 4);
+    ctx.restore();
+  }
+
+  function drawSlash(ctx, sw) {
+    const d = sw.def, k = (sw.f - d.active[0] + 1) / (d.active[1] - d.active[0] + 4);
+    if (sw.f < d.active[0]) return;
+    const alpha = Math.max(0, 1 - k);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    let cx = 6, cy = -21, R = d.reach - 4, a0, a1;
+    if (d.arc === 'high') { a0 = -1.9; a1 = 0.9; }
+    else if (d.arc === 'low') { a0 = 1.2; a1 = -1.3; }
+    else if (d.arc === 'big') { a0 = -2.4; a1 = 1.6; R += 4; }
+    else { cx = 0; cy = 2; a0 = 0.3; a1 = Math.PI - 0.3; R = d.reach - 6; }
+    const ccw = a1 < a0;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(150,220,255,0.7)'; ctx.lineWidth = 7;
+    ctx.beginPath(); ctx.arc(cx, cy, R - 3, a0, a1, ccw); ctx.stroke();
+    ctx.strokeStyle = '#fff6d8'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(cx, cy, R, a0, a1, ccw); ctx.stroke();
+    ctx.restore();
+  }
+
+  SH.draw = D;
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/game.js
+// Starhaven — the game: world setup, the 60 fps loop, camera, checkpoints, hazards, signs, knockouts, results.
+(function (SH) {
+  const fx = SH.fx, input = SH.input;
+  const TS = SH.TILE;
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode: fine */ } },
+  };
+  SH.store = store;
+
+  // Live tuning = defaults + anything saved from the TUNE panel.
+  SH.tune = Object.assign({}, SH.TUNE_DEFAULTS, store.get('starhaven.tune.v1', {}));
+
+  const G = SH.game = { state: 'title', world: null, frozen: false };
+
+  G.build = function () {
+    const def = SH.ROOMS.grove, room = SH.buildRoom(def);
+    const st = def.start;
+    const player = new SH.Player(st.x * TS + TS / 2, st.y * TS);
+    const things = def.spawns.map(s => SH.makeSpawn(s, room));
+    const lanterns = def.lanterns.map(l => ({ ...l, px: l.x * TS + TS / 2, py: room.groundY(l.x, 0), lit: !!l.lit }));
+    const signs = def.signs.map(s => ({ ...s, px: s.x * TS + TS / 2, py: room.groundY(s.x, 0), near: false, read: false }));
+    const w = {
+      room, player, things, lanterns, signs, input,
+      targets: things,
+      cam: { x: 0, y: 0 }, viewW: G.viewW || 640, time: 0, fade: 0,
+      checkpoint: lanterns[0],
+      run: { started: false, frames: 0, done: false },
+      camCenterX() { return this.cam.x + this.viewW / 2; },
+      onKill() { },
+      onDash() { },
+      onPerfectDodge(e) {
+        fx.slowmo = 26; player.stats.perfect++;
+        player.dashCd = 0; player.airDashes = 1;
+        fx.word(player.x, player.y - 52, 'PERFECT DODGE', '#9fe8ff', 60);
+        fx.ring(player.x, player.y - 20, '#9fe8ff', 44, 22, 2);
+      },
+      onKnockout() { G.knockout(); },
+    };
+    G.world = w;
+    SH.draw.init(room, w.viewW);
+    G.snapCamera();
+    G.hud.hearts(player.hearts, player.maxHearts);
+    G.hud.goal();
+    return w;
+  };
+
+  G.snapCamera = function () { const w = G.world; G.cameraTarget(); w.cam.x = w.camT.x; w.cam.y = w.camT.y; };
+  G.cameraTarget = function () {
+    const w = G.world, p = w.player;
+    const look = p.facing * 46 + p.vx * 8;
+    let tx = p.x + look - w.viewW / 2;
+    let ty = p.y - SH.VIEW_H * 0.64;
+    tx = Math.max(0, Math.min(w.room.pxW - w.viewW, tx));
+    ty = Math.max(0, Math.min(w.room.pxH - SH.VIEW_H, ty));
+    w.camT = { x: tx, y: ty };
+  };
+
+  // ---------------------------------------------------------------- one game frame (1/60 s)
+  G.step = function () {
+    const w = G.world, p = w.player;
+    input.step();
+    if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
+    if (G.state !== 'play') return;
+    if (w.koT > 0) { G.koStep(); fx.update(); return; }
+    if (fx.hitstop > 0) {
+      // Frozen for impact, but presses made now still count when it resumes.
+      fx.hitstop--;
+      if (input.pressed.attack) p.atkBuf = SH.COMBAT.attackBuffer + 1;
+      if (input.pressed.jump) p.jumpBuf = SH.tune.jumpBufferFrames + 1;
+      if (input.pressed.dash) p.dashBuf = 7;
+      return;
+    }
+    if (fx.slowmo > 0) fx.slowmo--;
+    w.time++;
+
+    p.update(w);
+    for (const e of w.things) e.update(w);
+
+    // Run timer starts on your first move.
+    if (!w.run.started && (Math.abs(p.vx) > 0.5 || !p.grounded)) w.run.started = true;
+    if (w.run.started && !w.run.done) w.run.frames++;
+
+    // Thorns and pits: lose a heart, go back to safe ground.
+    const b = p.box();
+    const inThorns = SH.touchesThorns(w.room, b.l + 3, b.t, b.r - 3, b.b);
+    if (inThorns || p.y > w.room.pxH + 40) G.hazard(inThorns ? 'thorns' : 'pit');
+
+    // Lanterns: checkpoint, and they restore your hearts.
+    for (const l of w.lanterns) {
+      if (Math.abs(p.x - l.px) < 22 && Math.abs(p.y - l.py) < 30) {
+        if (!l.lit) {
+          l.lit = true;
+          fx.ring(l.px, l.py - 46, '#ffd27a', 50, 26, 2);
+          fx.burst(l.px, l.py - 46, 16, { speed: 2, life: 30, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
+          // Lighting a lantern restores your hearts once; after that it's a place to come back to.
+          p.hearts = p.maxHearts;
+          if (!l.end) G.hud.toast('Lantern lit. Hearts restored, and you will start here if knocked out.');
+        }
+        if (w.checkpoint !== l && !l.end) w.checkpoint = l;
+        if (l.end && !w.run.done) G.finish();
+      }
+    }
+
+    // Signs: stand near one to read it.
+    let near = null;
+    for (const s of w.signs) { s.near = Math.abs(p.x - s.px) < 44 && Math.abs(p.y - s.py) < 60; if (s.near) near = s; }
+    G.hud.sign(near);
+    if (near) near.read = true;
+
+    G.hud.hearts(p.hearts, p.maxHearts);
+    G.cameraTarget();
+    w.cam.x += (w.camT.x - w.cam.x) * 0.14;
+    w.cam.y += (w.camT.y - w.cam.y) * 0.10;
+    fx.update();
+    if (w.fade > 0) w.fade = Math.max(0, w.fade - 0.08);
+  };
+
+  G.hazard = function (kind) {
+    const w = G.world, p = w.player;
+    if (p.invuln <= 0) { p.hearts = Math.max(0, p.hearts - 1); p.stats.hurt++; }
+    fx.flashScreen(8, kind === 'thorns' ? 'rgba(255,80,110,0.4)' : 'rgba(10,10,30,0.8)');
+    fx.kick(4);
+    if (p.hearts <= 0) { G.knockout(); return; }
+    p.respawnAt(p.lastSafe.x, p.lastSafe.y, SH.PLAYER.hazardInvuln);
+    G.snapCamera();
+    w.fade = 0.7;
+    fx.word(p.x, p.y - 52, kind === 'thorns' ? 'ouch: thorns' : 'fell', '#ff9aa8', 40);
+  };
+
+  G.knockout = function () {
+    const w = G.world;
+    if (w.koT > 0) return;
+    w.koT = 1;
+    w.player.dead = true;
+  };
+  G.koStep = function () {
+    const w = G.world, p = w.player;
+    w.koT++;
+    w.fade = Math.min(1, w.koT / 30);
+    if (w.koT === 45) {
+      const c = w.checkpoint;
+      p.dead = false;
+      p.hearts = p.maxHearts;
+      p.respawnAt(c.px + 14, c.py, 40);
+      p.facing = 1;
+      for (const e of w.things) if (e.reset) e.reset();
+      G.snapCamera();
+      G.hud.toast('Knocked out. Back at the last lantern, no harm done.');
+    }
+    if (w.koT >= 46) { w.fade = Math.max(0, 1 - (w.koT - 46) / 25); }
+    if (w.koT > 72) { w.koT = 0; w.fade = 0; }
+  };
+
+  G.finish = function () {
+    const w = G.world, p = w.player;
+    w.run.done = true;
+    const secs = w.run.frames / 60;
+    const best = store.get('starhaven.best.v1', null);
+    const isBest = best == null || secs < best;
+    if (isBest) store.set('starhaven.best.v1', secs);
+    G.hud.goal('done');
+    G.hud.results({ secs, best: isBest ? secs : best, isBest, hurt: p.stats.hurt, perfect: p.stats.perfect, pogos: p.stats.pogos });
+    G.state = 'results';
+  };
+
+  G.restart = function () {
+    const vw = G.world ? G.world.viewW : 640;
+    fx.reset();
+    G.build();
+    G.world.viewW = vw;
+    G.state = 'play';
+    G.hud.goal();
+  };
+
+  G.pause = function () { if (G.state !== 'play') return; G.state = 'pause'; input.clear(); G.hud.menu(true); };
+  G.resume = function () { G.state = 'play'; input.clear(); G.hud.menu(false); G.hud.tune(false); };
+
+  // ---------------------------------------------------------------- loop
+  let acc = 0, last = 0;
+  G.loop = function (now) {
+    const dt = last ? Math.min(0.1, (now - last) / 1000) : 1 / 60;
+    last = now;
+    input.pollPad();
+    if (!G.frozen) {
+      if (G.state === 'play') {
+        acc += dt * (fx.slowmo > 0 ? 0.4 : 1);
+        let n = 0;
+        while (acc >= 1 / 60 && n < 5) { G.step(); acc -= 1 / 60; n++; }
+        if (n === 5) acc = 0;
+      } else {
+        acc = 0;
+        G.menuInput();
+      }
+    }
+    G.render();
+    requestAnimationFrame(G.loop);
+  };
+  G.render = function () {
+    const ctx = G.ctx, w = G.world;
+    if (!w) return;
+    ctx.imageSmoothingEnabled = false;
+    SH.draw.frame(ctx, w);
+  };
+
+  // Menus can be driven by keyboard and gamepad as well as taps.
+  G.menuInput = function () {
+    if (G.state === 'title') { if (input.take('jump') || input.take('attack') || input.take('pause')) G.start(); }
+    else if (G.state === 'pause') { if (input.take('pause')) G.resume(); }
+    else if (G.state === 'results') { if (input.take('jump') || input.take('pause')) { G.hud.results(null); G.restart(); } }
+  };
+
+  G.start = function () {
+    if (G.state !== 'title') return;
+    G.hud.title(false);
+    G.state = 'play';
+    input.clear();
+  };
+
+  // ---------------------------------------------------------------- screen size
+  G.fit = function () {
+    const W = window.innerWidth, H = window.innerHeight;
+    const viewW = Math.max(420, Math.min(720, Math.round(SH.VIEW_H * W / H)));
+    const scale = Math.min(W / viewW, H / SH.VIEW_H);
+    const cv = G.canvas;
+    if (cv.width !== viewW) { cv.width = viewW; cv.height = SH.VIEW_H; }
+    cv.style.width = Math.floor(viewW * scale) + 'px';
+    cv.style.height = Math.floor(SH.VIEW_H * scale) + 'px';
+    G.viewW = viewW;
+    if (G.world) { G.world.viewW = viewW; SH.draw.resize(viewW); G.snapCamera(); }
+  };
+
+  // ---------------------------------------------------------------- test hooks (used by tests/*.js)
+  SH.test = {
+    freeze() { G.frozen = true; input.forced = { held: {}, pressed: {} }; if (G.state === 'title') { G.hud.title(false); G.state = 'play'; } },
+    // Step n frames holding `held` (e.g. {right:true}); `press` actions are pressed on the first frame.
+    step(n, held, press) {
+      for (let i = 0; i < n; i++) {
+        input.forced.held = held || {};
+        input.forced.pressed = {};
+        if (i === 0 && press) for (const a of press) input.forced.pressed[a] = true;
+        G.step();
+      }
+      return SH.test.state();
+    },
+    place(tx, ty) { const p = G.world.player; p.respawnAt(tx * TS + TS / 2, ty * TS); p.grounded = true; G.snapCamera(); },
+    state() {
+      const p = G.world.player;
+      return { x: p.x, y: p.y, tx: p.x / TS, ty: p.y / TS, vx: p.vx, vy: p.vy, grounded: p.grounded, hearts: p.hearts, stats: p.stats, state: G.state, ko: G.world.koT || 0 };
+    },
+    render() { G.render(); },
+  };
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/hud.js
+// Starhaven — the HUD and menus (HTML on top of the game canvas, so text stays sharp on a phone).
+(function (SH) {
+  const $ = id => document.getElementById(id);
+  const H = {};
+  let lastHearts = -1, lastSign = null, toastT = 0;
+
+  H.hearts = function (n, max) {
+    if (n === lastHearts) return;
+    const el = $('hearts');
+    let html = '';
+    for (let i = 0; i < max; i++) html += `<span class="gem ${i < n ? 'full' : 'empty'}"></span>`;
+    el.innerHTML = html;
+    if (lastHearts > n) { el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); }
+    lastHearts = n;
+  };
+
+  H.goal = function (mode) {
+    $('goal').innerHTML = mode === 'done'
+      ? 'Grove cleared. Run it again, or open the menu to tune the feel.'
+      : '<span class="tag">GOAL</span> Cross the grove to the far lantern <span class="arrow">&rarr;</span>';
+  };
+
+  H.sign = function (s) {
+    if (s === lastSign && !H.dirty) return;
+    H.dirty = false;
+    lastSign = s;
+    const el = $('sign');
+    if (!s) { el.classList.remove('show'); return; }
+    el.innerHTML = SH.input.fill(s.text);
+    el.classList.add('show');
+  };
+
+  H.toast = function (text) {
+    const el = $('toast');
+    el.textContent = text;
+    el.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => el.classList.remove('show'), 3200);
+  };
+
+  H.title = function (show) { $('title').classList.toggle('show', show); };
+  H.menu = function (show) { $('menu').classList.toggle('show', show); };
+
+  const fmt = s => { const m = Math.floor(s / 60), r = s - m * 60; return (m ? m + ':' + (r < 10 ? '0' : '') : '') + r.toFixed(1) + (m ? '' : ' s'); };
+  H.results = function (r) {
+    const el = $('results');
+    if (!r) { el.classList.remove('show'); return; }
+    $('res-body').innerHTML = `
+      <div class="big">${fmt(r.secs)}</div>
+      <div class="sub">${r.isBest ? 'New best time' : 'Best: ' + fmt(r.best)}</div>
+      <ul>
+        <li><b>${r.hurt}</b> hits taken</li>
+        <li><b>${r.perfect}</b> perfect dodges</li>
+        <li><b>${r.pogos}</b> pogo bounces</li>
+      </ul>`;
+    el.classList.add('show');
+  };
+
+  // ---------------- TUNE panel: live sliders for the movement numbers
+  H.tune = function (show) {
+    const el = $('tune');
+    el.classList.toggle('show', !!show);
+    if (show) H.buildTune();
+  };
+  H.buildTune = function () {
+    const list = $('tune-list');
+    list.innerHTML = '';
+    for (const s of SH.TUNE_SLIDERS) {
+      const row = document.createElement('label');
+      row.className = 'trow';
+      const val = SH.tune[s.key];
+      row.innerHTML = `<span class="tl">${s.label}</span><input type="range" min="${s.min}" max="${s.max}" step="${s.step}" value="${val}"><span class="tv">${fmtNum(val, s.step)}</span>`;
+      const input = row.querySelector('input'), out = row.querySelector('.tv');
+      input.addEventListener('input', () => {
+        SH.tune[s.key] = parseFloat(input.value);
+        out.textContent = fmtNum(SH.tune[s.key], s.step);
+        out.classList.toggle('changed', SH.tune[s.key] !== SH.TUNE_DEFAULTS[s.key]);
+        H.saveTune();
+      });
+      out.classList.toggle('changed', val !== SH.TUNE_DEFAULTS[s.key]);
+      list.appendChild(row);
+    }
+  };
+  const fmtNum = (v, step) => step >= 1 ? String(Math.round(v)) : v.toFixed(step < 0.05 ? 2 : 1);
+  H.saveTune = function () {
+    const diff = {};
+    for (const k in SH.TUNE_DEFAULTS) if (SH.tune[k] !== SH.TUNE_DEFAULTS[k]) diff[k] = SH.tune[k];
+    SH.store.set('starhaven.tune.v1', diff);
+  };
+  H.tuneText = function () {
+    const parts = SH.TUNE_SLIDERS.map(s => `${s.label}: ${fmtNum(SH.tune[s.key], s.step)}${SH.tune[s.key] !== SH.TUNE_DEFAULTS[s.key] ? ' (changed)' : ''}`);
+    return 'Starhaven feel numbers\n' + parts.join('\n');
+  };
+
+  H.bind = function () {
+    const G = SH.game;
+    $('title').addEventListener('click', () => G.start());
+    $('pause-btn').addEventListener('click', () => G.state === 'pause' ? G.resume() : G.pause());
+    $('m-resume').addEventListener('click', () => G.resume());
+    $('m-tune').addEventListener('click', () => { H.menu(false); H.tune(true); });
+    $('m-restart').addEventListener('click', () => { H.menu(false); G.restart(); });
+    $('m-controls').addEventListener('click', () => $('controls').classList.toggle('show'));
+    const fs = $('m-fullscreen');
+    if (document.documentElement.requestFullscreen) fs.addEventListener('click', () => { document.documentElement.requestFullscreen().catch(() => { }); G.resume(); });
+    else fs.style.display = 'none';
+    $('t-back').addEventListener('click', () => G.resume());
+    $('t-reset').addEventListener('click', () => { SH.tune = Object.assign({}, SH.TUNE_DEFAULTS); H.saveTune(); H.buildTune(); });
+    $('t-copy').addEventListener('click', () => {
+      const text = H.tuneText(), btn = $('t-copy');
+      const done = () => { btn.textContent = 'Copied'; setTimeout(() => (btn.textContent = 'Copy numbers'), 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, () => { $('t-out').value = text; $('t-out').style.display = 'block'; });
+      else { $('t-out').value = text; $('t-out').style.display = 'block'; }
+    });
+    $('r-again').addEventListener('click', () => { H.results(null); G.restart(); });
+    $('r-stay').addEventListener('click', () => { H.results(null); G.state = 'play'; SH.input.clear(); });
+    SH.input.onSourceChange = src => {
+      document.body.dataset.input = src;
+      H.dirty = true;
+    };
+    document.body.dataset.input = SH.input.source;
+    const best = SH.store.get('starhaven.best.v1', null);
+    if (best != null) $('title-best').textContent = 'Best time: ' + fmt(best);
+  };
+
+  SH.game.hud = H;
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+(function () {
+  const SH = window.SH, G = SH.game;
+  G.canvas = document.getElementById('game');
+  G.ctx = G.canvas.getContext('2d', { alpha: false });
+  G.hud.bind();
+  SH.input.bindTouch(document.getElementById('touch'), document.getElementById('stick'), document.getElementById('knob'));
+  SH.input.onAnyPress = () => { if (G.state === 'title') { /* handled in menuInput */ } };
+  G.fit();
+  G.build();
+  window.addEventListener('resize', G.fit);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) G.pause(); });
+  requestAnimationFrame(G.loop);
+})();
+</script>
+</body>
+</html>

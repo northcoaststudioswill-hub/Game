@@ -1,5 +1,47 @@
 # Starhaven — Changelog
 
+## Rebuild 1 — The Training Grove: movement and combat feel (Nov 17, 2026)
+A fresh start in this repo (`game/`), built from `DESIGN.md` and `BUILD-PLAN.md`. Muse's browser slice (v1 to v5 below) was
+never committed here and was not reused. This build covers **Milestone 1 (movement feel)** and **Milestone 2 (combat feel)** only.
+
+- **Play it:** open `game/starhaven.html` in a browser (phone held sideways, keyboard or gamepad). Rebuild with `python3 starhaven/game/build.py`.
+- **The Training Grove:** one level, left to right. Each section teaches one move on a sign before it is needed:
+  move, jump (3- and 4-tile gaps, a 2-tile step), double jump (a 5-tile wall), dash (a 10-tile gap that takes jump + jump + dash),
+  daggers (a training dummy that counts your combo), pogo (a floor of thorns crossed by striking down on floating thorn buds),
+  then the first enemy, thorn sprites. Lanterns are checkpoints. The far lantern ends the run with your time and stats.
+- **Movement:** acceleration model (full speed in 3 frames, stop in 3), firmer fall than rise, a soft float at the top of a
+  held jump, tap for a hop and hold for a full jump, coyote time (6 frames), jump buffering (7 frames), double jump,
+  dash with 0.3 s invincibility and 0.5 s cooldown (from the design doc), jump out of a ground dash to keep its speed.
+- **Combat:** 3-hit ground combo (third hit knocks back), 2-hit air combo, down-strike pogo that gives back your double jump
+  and dash, hit-stop and screen shake on every hit, a small recoil when your blade connects. Thorn sprite: HP 4, dies in
+  exactly 2 dagger hits (design doc), glows orange before it lunges. Dashing through a lunge is a **perfect dodge**: no damage,
+  time slows for a second (design doc).
+- **Getting hurt:** 5 hearts. Thorns and pits cost a heart and put you back on safe ground. At 0 hearts you are knocked out
+  and return to the last lantern with full hearts, no other penalty (design doc: chill, not punishing).
+- **Readability (the v1 lesson):** near-black play layer with moonlit edges, gold marks on every ledge that drops into a pit,
+  crimson thorns, bright Wren with a gold scarf and a soft halo, sharp HTML text for the HUD and signs, an always-on GOAL line.
+  Starhaven glows on the far horizon the whole way, so the goal is always in sight.
+- **Phone:** landscape, floating stick on the left half, JUMP / STRIKE / DASH on the right, "turn your phone sideways" screen in portrait.
+  Signs name the right buttons for touch, keyboard or gamepad.
+- **TUNE panel** (menu > Tune the feel): live sliders for run speed, start-up, stopping, air control, jump and double jump
+  height, rise and fall gravity, dash speed and length, pogo bounce. Saved on the device. "Copy numbers" copies them so Will
+  can send exact feedback.
+- **Placeholder art.** Shapes drawn in code, in the direction the design doc sets (Hollow Knight mood, pixel crispness).
+  Real art waits for an art direction Will approves (BUILD-PLAN rule).
+
+Verified (`game/tests/feel.js`, real input and physics, 18/18 pass): each gap needs exactly the move its sign teaches
+(running falls into the 3-tile gap; one jump clears the 3- and 4-tile gaps; one jump can't top the wall, a double jump can;
+jump + double and jump + dash both fall short of the 10-tile gap, jump + double + dash clears it); a scripted pogo run
+crosses the thorn floor on the 3 buds without a scratch; thorns cost 1 heart and return you to safe ground; 3 presses = 3
+hits with the finisher on the third; thorn sprite alive after 1 hit, gone after 2; its lunge costs a heart; dashing through
+it is a perfect dodge with no damage; knockout returns you to the last lantern with full hearts; coyote time and jump
+buffer work; an autopilot runs the whole grove start to end lantern (23.5 s). `game/tests/smoke.js` loads it on desktop and a
+landscape phone with no errors. A real-time check moved Wren with real key presses and real touch drags.
+NOT tested: how it feels in Will's hands on his phone, real gamepad hardware, iPhone Safari specifically, sound (there is none yet).
+
+---
+*Entries below are Muse's browser slice (v1 to v5). Its code is not in this repo.*
+
 ## v5 — Flame, the first court gift (Nov 16, 2026)
 BUILD-PLAN Milestone 6. After mission 1, Caelum grants Flame (story: Wren carries a spark of every court's power, Flame first to stir). Cast: F/Q keyboard, Y gamepad, flame touch button (appears only after unlock). 3 moon-pips by the hearts after unlock; fireball costs 1 pip; pips refill slowly, faster on dagger hits. Fireball: 2 damage + burn, lights braziers in both scenes. Thorn wall deep in Thornwood blocks a raised alcove (5 bonus motes + brazier): daggers spark off with an "only flame can burn this away" hint; Flame burns it permanently (thornWallBurned saved). GOAL bar points to Caelum, then the wall, ahead of the paint goal. Save extended additively (flame + thornWallBurned flags, safe defaults) — old v1-v4 saves migrate forward, verified with a real v1 save.
 Verified: autopilot ran the extended loop TWICE, 23/23 steps both runs, identical totals — all 13 v4 steps plus migration, unlock, cast (exactly 1 pip), dagger-hint, burn, alcove motes, brazier, second mission clear, real reload restoring flame + burned wall. Fixes during verification: removed a ground block at tx200 shadowed by the wall; moved a thorn sprite spawn out of the pillar steps (tx54 -> tx68); GOAL priority fixed so the unburned wall outranks painting.

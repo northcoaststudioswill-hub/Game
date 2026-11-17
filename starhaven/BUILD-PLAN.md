@@ -13,6 +13,8 @@
 4. Scope stays sliced: finish the slice, get Will's verdict, then widen.
 
 ## Milestones
+Status: 1 and 2 built in `game/` (Rebuild 1, Nov 17 2026) and waiting for Will's play. 3 to 6 not started in this repo.
+
 1. **Movement feel** — Wren in an empty test room: run, jump, double jump, dash. Tuning numbers from the test brief. Nothing else.
 2. **Combat feel** — daggers (3-hit combo, air slash, pogo), one thorn sprite, getting hit, hearts.
 3. **One mission** — Thornwood: tutorial signs, gaps, 4 lantern checkpoints, motes, end portal, save/load.
