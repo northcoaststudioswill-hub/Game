@@ -130,10 +130,10 @@ const UPS=[
    Three files. File 1 keeps the first key ('patchplate-v1'), so saves made before files existed carry on.
    'patchplate-meta' remembers the file played last. Add new fields with defaults; never rename the keys. */
 const SLOTKEY=['patchplate-v1','patchplate-v1-s2','patchplate-v1-s3'],METAKEY='patchplate-meta',KEY=SLOTKEY[0];
-const DEF=()=>({v:1,day:0,stars:{},best:{},coins:0,earned:0,served:0,up:{},tix:{},plays:0,run:null,seeds:[],crew:[],cxp:{},tasted:{},opened:0,buds:[],big:{},
+const DEF=()=>({v:1,day:0,stars:{},best:{},coins:0,earned:0,served:0,up:{},tix:{},plays:0,run:null,seeds:[],crew:[],cxp:{},tasted:{},opened:0,buds:[],big:{},story:{},fav:{},
  look:{dress:0,apron:0,hat:0,awn:0},own:{dress:[0],apron:[0,3],hat:[0],awn:[0]},friend:{},hseen:{},hpend:[],lou:{fed:0,pets:0},daily:null,asksDone:0});
 function fixSV(s){const o=Object.assign(DEF(),s);
- for(const k of ['stars','best','up','tix','cxp','tasted','friend','hseen','lou','big'])o[k]=Object.assign(DEF()[k],s[k]||{});
+ for(const k of ['stars','best','up','tix','cxp','tasted','friend','hseen','lou','big','story','fav'])o[k]=Object.assign(DEF()[k],s[k]||{});
  for(const k of ['seeds','crew','hpend','buds'])o[k]=Array.isArray(s[k])?s[k].slice():[];
  o.look=Object.assign(DEF().look,s.look||{});const own=DEF().own;o.own={};for(const k in own)o.own[k]=Array.isArray((s.own||{})[k])?s.own[k].slice():own[k];return o;}
 function readSlot(i){try{const s=JSON.parse(localStorage.getItem(SLOTKEY[i])||'null');return s&&typeof s==='object'?fixSV(s):null}catch(e){return null}}
@@ -300,10 +300,11 @@ function act(dry){const L=G.L,P=L.P,tx=P.x+P.fx,ty=P.y+P.fy,k=kind(tx,ty),h=L.he
   if(hc&&same(hc,rc.c))return go('SERVE '+rc.n,()=>serve(i));return no(cu.who+' WANTS '+rc.n);}
  return no('');}
 function toss(){const L=G.L;if(!L.held)return;if(L.held.k==='sseed')L.sown.splice(L.sown.indexOf(L.held.id),1);L.held=null;SFX.toss();const P=L.P;G.fx.push({k:'poof',x:P.x*TS+8,y:P.y*TS,t:0});}
-function serve(i){const L=G.L,cu=L.cu[i],rc=RC[cu.rc],tip=Math.round(rc.v*(crewHas('LUCKY')?.5+.1*spLv('LUCKY'):.5)*(louHappy()?1.1:1)*Math.max(0,cu.pat/cu.pmax)*(cu.who==='BOTTIE'?0:1)),c=rc.v+tip;
+function serve(i){const L=G.L,cu=L.cu[i],rc=RC[cu.rc],tip=Math.round(rc.v*(crewHas('LUCKY')?.5+.1*spLv('LUCKY'):.5)*(louHappy()?1.1:1)*Math.max(0,cu.pat/cu.pmax)*(cu.who==='BOTTIE'&&heartsOf('BOTTIE')<4?0:1)),c=rc.v+tip;
  L.coins+=c;L.tips+=tip;L.served++;L.held=null;cu.st='happy';cu.t=0;cu.say=pick(WHO[cu.who].yum);cu.gain=c;SFX.serve();
  L.streak=(L.streak|0)+1;const left=L.q.length-L.served-L.missed;
- friend(cu.who,cu.pat/cu.pmax>.5?2:1);bumpAsk('serve');bumpAsk('streak',L.streak,1);if(['burger','gburger','deluxe','combo'].includes(cu.rc))bumpAsk('burger');
+ const fav=FAV[cu.who]===cu.rc;if(fav){cu.say=FAVSAY[cu.who];SV.fav[cu.who]=1;G.fx.push({k:'txt',s:'FAVORITE!',x:WIN[i]*TS+8,y:TS+14,t:0,c:'#f878a8'})}
+ friend(cu.who,((cu.pat/cu.pmax>.5?2:1)+(fav?2:0))*(WHODAY[cu.who]?3:1));bumpAsk('serve');bumpAsk('streak',L.streak,1);if(['burger','gburger','deluxe','combo'].includes(cu.rc))bumpAsk('burger');
  if(!SV.tasted[cu.rc]){SV.tasted[cu.rc]=1;store();const w=cu.who;cine('taste',{who:w,rc:cu.rc},[[w,w==='MARCUS'&&TASTE_M[cu.rc]?TASTE_M[cu.rc]:TASTE[cu.rc]]])}
  else if(cu.pat/cu.pmax<.2)quip('clutch',1);else if(left===0&&L.q.length>3)quip('last',1);else if(L.streak===4||L.streak===8)quip('streak',1);else if(L.served===1&&Math.random()<.5)quip('first');
  G.fx.push({k:'txt',s:'+'+c,x:WIN[i]*TS+8,y:TS+4,t:0,c:'#f8d040'});
@@ -536,6 +537,20 @@ function dayBigs(L,st,d){const q=G.bigQ=[];
  if(d===12&&st>=1&&bigOnce('fed'))q.push(['ELDER','THE VALLEY|IS FED!',[['ELDER','EVERY TABLE FULL, UNDER THE LIGHT. LIKE THE PROMISE SAID.'],['MARCUS','AND I SUPERVISED ALL OF IT. DAP ME UP, CHEF.']]]);
  store();}
 
+/* ---------- v0.6: the story, in six short chapters. The first time a chapter's day is cleared, it plays on the way out
+   of the results screen (before any heart scene and the night). Nothing to remember; Start skips it. ---------- */
+const STORY={
+ 0:['THE YEAR OF DARK',[['WILL','A YEAR OF DARK, AND THE FIRST THING YOU GROW IS LETTUCE.'],['ERIN','LETTUCE IS BRAVE. IT GOES FIRST.'],['MARCUS','BRO, I\'D HAVE GONE WITH BURGERS.']]],
+ 3:['MARCUS WATERWORKS',[['MARCUS','ONE DAY THIS IS ALL MARCUS WATERWORKS. LAZY RIVER. A VAN.'],['DEREK','YO, THE VAN DIED.'],['MARCUS','ONE DAY, DEREK.'],['ERIN','YOU TWO STILL OWE FOR LUNCH.']]],
+ 6:['THE ROBOT',[['BOTTIE','BZZT. I WILL TRADE YOU ONE FOLLOW FOR THE GREAT LANTERN.'],['ERIN','NO.'],['BOTTIE','TWO FOLLOWS.'],['MARCUS','THE ANSWER IS NO, BRO. SIGNED, THE MANAGEMENT.']]],
+ 9:['THE KING\'S ORDER',[['RANGER','A DOME GUARD CAME BY. KING BIBI WANTS A COMBO MEAL. TO GO.'],['ERIN','HE CAN LOWER THE DOME AND COME GET IT.'],['WILL','YOU JUST TOLD A KING TO WAIT IN LINE.'],['ERIN','EVERYBODY WAITS IN LINE.']]],
+ 11:['THE FIRST HARVEST',[['ELDER','A HARVEST FEST. I DID NOT THINK I WOULD SEE ANOTHER.'],['WILL','THE KEEPER BRINGS THE LIGHT. ERIN BRINGS LUNCH.'],['ERIN','SAME JOB. DIFFERENT APRON.']]],
+ 12:['ONE TABLE',[['WILL','LOOK AT THEM ALL. SPROUTS, BUDDIES, PEOPLE. ONE TABLE.'],['ERIN','THAT WAS THE PROMISE, WASN\'T IT?'],['LOUIE','ARF! (AND I\'M STILL THE KING.)']]]};
+function playStory(d,after){SV.story[d]=1;store();const S=STORY[d];cine('story',{title:S[0]},S[1],after);}
+/* ---------- v0.6: everybody has a favourite. Serve it and they say so, and the friendship grows faster. ---------- */
+const FAV={WILL:'gsalad',MARCUS:'burger',SCOUT:'salad',RANGER:'combo',ELDER:'bread',PIP:'smoothie',DEREK:'fries',BOTTIE:'fries'};
+const FAVSAY={WILL:'MY FAVORITE!',MARCUS:'BURGER. GOAT.',SCOUT:'OPTIMAL SALAD.',RANGER:'COMBO! BLESS.',ELDER:'BREAD. HOME.',PIP:'BERRY BEST!',DEREK:'YO. FRIES.',BOTTIE:'BZZT. FRIES.'};
+
 /* ---------- friends: hearts grow by serving them (and by feeding and petting Louie) ----------
    Each new heart with Will, Marcus or Louie plays a short scene after the day. Lines are new: flag to Will. */
 const HEARTS=[4,12,24,40],FRIENDS=['WILL','MARCUS','LOUIE','SCOUT','RANGER','ELDER','PIP','DEREK'];
@@ -552,7 +567,32 @@ const HS={
  LOUIE:[[['LOUIE','*NUDGES YOUR HAND*'],['ERIN','ANOTHER SCRATCH? FINE. ONE MORE.'],['LOUIE','*TWELVE MORE*']],
   [['LOUIE','ARF! (LOUIE HAS BROUGHT YOU HIS SECOND FAVORITE STICK.)'],['ERIN','THANK YOU, LOUIE. I\'LL KEEP IT FOREVER.']],
   [['WILL','LOUIE ONLY EATS IF YOU\'RE THE ONE WHO FEEDS HIM NOW.'],['ERIN','BECAUSE I NEVER CHANGE MY MIND.'],['LOUIE','*CHANGES HIS MIND*']],
-  [['LOUIE','*FALLS ASLEEP ON YOUR FEET*'],['ERIN','BEST STAND IN THE VALLEY. BEST DOG IN THE VALLEY.']]]};
+  [['LOUIE','*FALLS ASLEEP ON YOUR FEET*'],['ERIN','BEST STAND IN THE VALLEY. BEST DOG IN THE VALLEY.']]],
+ /* v0.6: everybody has four heart scenes now. Bottie's are kept off the FRIENDS page; at four hearts he starts to tip. */
+ SCOUT:[[['SCOUT','FIELD NOTE ONE: YOUR SALAD IS 40 PERCENT CRUNCH.'],['ERIN','IS THAT GOOD?'],['SCOUT','IT IS A RECORD.']],
+  [['SCOUT','I AM CATALOGUING EVERY BUDDY IN THE VALLEY. CALM ONES FIRST.'],['ERIN','AND THE WILD ONES?'],['SCOUT','FROM FAR AWAY. WITH A SANDWICH.']],
+  [['SCOUT','HYPOTHESIS: SPROUTS WORK HARDER NEAR YOUR KITCHEN.'],['ERIN','THEY LIKE THE SMELL.'],['SCOUT','WRITING THAT DOWN. "SMELL." SCIENCE.']],
+  [['SCOUT','I NAMED A BEETLE AFTER YOU. IT IS VERY ORGANIZED.'],['ERIN','THAT MIGHT BE THE NICEST THING ANYONE\'S SAID.']]],
+ RANGER:[[['RANGER','THE KING SHUT THE ROADS. I STILL WALK THEM. SOMEBODY SHOULD.'],['ERIN','TAKE A LOAF FOR THE TRAIL.']],
+  [['RANGER','SAW AN ALPHA ON THE RIDGE. BIG AS A BARN. DARK POURING OFF IT.'],['ERIN','WERE YOU SCARED?'],['RANGER','I WAS HUNGRY. THEN SCARED.']],
+  [['RANGER','NO BATTLES AT MY LODGE. BUT I KEEP A TABLE FOR YOUR BREAD.'],['ERIN','I\'LL SEND IT WITH A ZIP SPROUT.']],
+  [['RANGER','WHEN THE DOME DROPS I\'LL WALK YOU TO THE LAKE. BEST VIEW THERE IS.'],['ERIN','BRING WILL. HE\'LL CARRY THE PICNIC.']]],
+ ELDER:[[['ELDER','I KEPT A LAMP IN MY WINDOW THE WHOLE YEAR OF DARK. ONE LAMP.'],['ERIN','DID IT HELP?'],['ELDER','IT HELPED ME. THAT COUNTS.']],
+  [['ELDER','MY GRANDMOTHER SAID THE FIRST KEEPER BAKED BREAD FOR THE BUDDIES.'],['ERIN','SO I\'M KEEPING A TRADITION.'],['ELDER','YOU ARE KEEPING A PROMISE. IT TASTES BETTER.']],
+  [['ELDER','LANTERN TOWN LIT A SECOND STREET LAMP. BECAUSE OF YOUR BREAD LINE.'],['ERIN','BECAUSE OF BREAD?'],['ELDER','PEOPLE WALK HOME FULL. FULL PEOPLE LIGHT LAMPS.']],
+  [['ELDER','WHEN THE DOME COMES DOWN, I WILL TELL THE KING WHERE TO EAT.'],['ERIN','HE CAN WAIT IN LINE.'],['ELDER','HE WILL. I WILL STAND BEHIND HIM AND COUGH.']]],
+ PIP:[[['PIP','I TRADED A WOOLLYBEAR FOR THIS LUNCH MONEY. FAIR DEAL.'],['ERIN','FOR THE WOOLLYBEAR?'],['PIP','IT GOT A NICE JAR. EVERYBODY WINS.']],
+  [['PIP','HERE. A LIGHTNING BUG. IT LIKES YOUR GARDEN BEST.'],['ERIN','IT\'S A LITTLE LANTERN.'],['PIP','THAT\'S WHAT I KEEP TELLING PEOPLE!']],
+  [['PIP','MAYFLIES ARE UP OFF THE LAKE. MEANS THE WATER\'S GETTING CLEAN.'],['ERIN','YOU KNOW A LOT FOR A BUG SELLER.'],['PIP','BUG EXPERT. THE SELLING IS A HOBBY.']],
+  [['PIP','WHEN I\'M BIG I WANT A STAND NEXT TO YOURS. BUGS AND BURGERS.'],['ERIN','SEPARATE COUNTERS.'],['PIP','VERY SEPARATE COUNTERS. DEAL.']]],
+ DEREK:[[['DEREK','YO. THE TRUCK NEEDS A PART. THE PART NEEDS A TRUCK TO GO GET IT.'],['ERIN','SO YOU\'RE STUCK.'],['DEREK','I PREFER "LOCAL."']],
+  [['DEREK','FLOW PROS FIXED YOUR SPRINKLER LINE. ON THE HOUSE.'],['ERIN','I DIDN\'T KNOW IT WAS BROKEN.'],['DEREK','IT WASN\'T. NOW IT\'S BETTER. DON\'T ASK MARCUS.']],
+  [['DEREK','WILD BUDDIES CHASED ME OFF THE ROAD. A SPROUT WALKED ME HOME.'],['ERIN','WHICH ONE?'],['DEREK','LITTLE BLUE GUY. I OWE HIM A COLD ONE. A SMALL ONE.']],
+  [['DEREK','MARCUS WANTS A LAZY RIVER ROUND YOUR STAND. I DREW IT UP.'],['ERIN','NO.'],['DEREK','YEAH, I TOLD HIM YOU\'D SAY THAT. FRIES?']]],
+ BOTTIE:[[['BOTTIE','BZZT. YOUR FRIES HAVE NO SUBSCRIBE BUTTON. BAD DESIGN.'],['ERIN','THEY HAVE SALT.'],['BOTTIE','CLANK. ACCEPTABLE.']],
+  [['BOTTIE','BZZT. I PRESSED ONE BUTTON. ONE. EVERYBODY IS SO DRAMATIC.'],['ERIN','THE LANTERN CRACKED, BOTTIE.'],['BOTTIE','...IT WAS A VERY RED BUTTON.']],
+  [['BOTTIE','BZZT. NOBODY FEEDS ME UP ON THE PEAK. GANG.'],['ERIN','IS THAT WHY YOU WANT THE LIGHT? COMPANY?'],['BOTTIE','CLANK. NO COMMENT. MORE FRIES.']],
+  [['BOTTIE','BZZT. HERE. ONE COIN. DO NOT POST ABOUT IT.'],['ERIN','YOUR FIRST TIP.'],['MARCUS','BRO. THE VILLAIN HAS A SOFT SPOT. I CALLED IT.']]]};
 const HGIFT={'WILL:2':'NEW HAT: FLOWER CROWN','MARCUS:3':'NEW HAT: BRO CAP'};
 function friend(w,n){const a=heartsOf(w);SV.friend[w]=(SV.friend[w]|0)+n;const b=heartsOf(w);
  if(b>a){if(HS[w]&&HS[w][b-1]&&!SV.hseen[w+':'+b])SV.hpend.push(w+':'+b);if(G.L)G.fx.push({k:'heart',s:w,x:120,y:28,t:0});snd(1047,.05,0,'sine',.05);later(()=>snd(1568,.12,0,'sine',.05),90)}}
@@ -585,7 +625,7 @@ const HURRY={WILL:['NO RUSH! (A LITTLE RUSH.)','MY STOMACH IS TALKING TO ME.'],M
  DEREK:['YO, THE METER\'S RUNNING. ON MY TRUCK.'],BOTTIE:['BZZT. PATIENCE.EXE NOT FOUND.'],
  ELDER:['I WAITED OUT THE DARK. I CAN WAIT.'],PIP:['MY BUGS ARE GETTING AWAY!']};
 function quipSp(T,s){G.quip={sp:T,who:T,s,t:0};if(G.L)G.L.qcd=6;}
-function cine(k,d,lines,after){G.cine={k,d:d||{},ln:lines||[],li:0,lt:0,t:0,from:G.s,after,dur:{open:3.2,night:4.6,taste:1.6,sprout:2.2,heart:2.5,big:2.4}[k]||2};G.s='cine';}
+function cine(k,d,lines,after){G.cine={k,d:d||{},ln:lines||[],li:0,lt:0,t:0,from:G.s,after,dur:{open:3.2,night:4.6,taste:1.6,sprout:2.2,heart:2.5,big:2.4,story:2.5}[k]||2};G.s='cine';}
 function cineEnd(){const c=G.cine;G.cine=null;G.s=c.from==='cine'?'stand':c.from;if(c.after)c.after();}
 function cineUpd(dt){const c=G.cine;c.t+=dt;c.lt+=dt;
  if(pressed('start')){cineEnd();return}
@@ -646,6 +686,10 @@ function drawCine(){const c=G.cine;if(!c)return;const{VH}=begin(),t=c.t,bob=((G.
   if(w==='LOUIE'){try{const sp=A.LOU.l[((G.t*3)|0)%2];g.drawImage(sp,150,gy+8,60,39)}catch(e){}}else actor(sprOf(w),170,gy+34,talking(w)?3:2,talking(w)?bob:0);
   for(let i=0;i<6;i++)heartI(30+i*36,Math.round(40+((c.t*14+i*11)%30)),true,2);
   ftext(w+' ',W/2-20,22,W-20,3,'#fff8e0','#783048');for(let i=0;i<4;i++)heartI(W/2+30+i*12,26,i<c.d.n,2);}
+ else if(c.k==='story'){const gy=stageBG('dusk',VH,Math.round(VH*.42));stageStand(W/2,gy,'CLOSED');let w=null;for(let i=Math.min(c.li,c.ln.length-1);i>=0&&!w;i--)if(c.ln[i][0]!=='ERIN')w=c.ln[i][0];
+  erinActor(W/2-8,gy-14,talking('ERIN')?3:2,talking('ERIN')?bob:0);
+  if(w==='LOUIE'){try{g.drawImage(A.LOU.r[((G.t*3)|0)%2],22,gy+6,60,39)}catch(e3){}}else if(w){const sp=sprOf(w),sc=talking(w)?3:2;if(sp)actor(sp,52,gy+34,w==='BOTTIE'?sc-1:sc,talking(w)?bob:0)}
+  r('rgba(24,16,32,.8)',0,16,W,30);ftext('THE STORY SO FAR',W/2,19,W-20,1,'#f8b070',null);ftext(c.d.title,W/2,29,W-20,2,'#fff8e0',null);}
  else if(c.k==='big'){const w=c.d.who,col=WHOC(w),isB=BUDS.some(b=>b[0]===w),by=Math.round(VH*.36),e=Math.min(1,t*5),e2=1-Math.pow(1-e,3);
   r('#181020',0,0,W,VH);g.globalAlpha=.3;r(col,0,0,W,VH);g.globalAlpha=1;
   for(let i=0;i<28;i++){const ln=30+(i*17)%70,y=14+(i*29)%(VH-80),x=W-((G.t*(380+i*45)+i*53)%(W+ln));g.globalAlpha=.25+(i%3)*.2;r('#ffffff',Math.round(x),y,ln,1+(i%2));}g.globalAlpha=1;
@@ -747,7 +791,8 @@ function update(dt){H=A.H();G.t+=dt;if(G.nope>0&&G.s!=='play')G.nope-=dt;
   if(G.t>.5&&(pressed('a')||pressed('start'))){const k=it[G.ri],d=G.res.d;
    const go2=()=>{if(k==='NEXT DAY'){const ex=nightPick(G.res.st,d);cine('night',{who:ex[0][0],day:d+1},ex,()=>startDay(d+1))}
     else if(k==='PLAY AGAIN'||k==='TRY AGAIN')startDay(d);else{G.s='stand';G.si=0;asks();SFX.nav()}};
-   if(SV.hpend.length)playHeart(go2);else go2();}
+   const go1=()=>{if(SV.hpend.length)playHeart(go2);else go2()};
+   if(k!=='PLAY AGAIN'&&k!=='TRY AGAIN'&&G.res.st>=1&&STORY[d]&&!SV.story[d])playStory(d,go1);else go1();}
   return;}}}
 
 /* ---------- drawing helpers ---------- */
@@ -982,7 +1027,7 @@ function drawFriends(){const{VH}=begin();r('#3a2030',0,0,W,VH);for(let y=0;y<VH;
   text(w,32,y+3,2,WHOC(w));for(let j=0;j<4;j++)heartI(W-64+j*13,y+4,j<h,2);
   if(nx)bar(W-64,y+17,50,(p2-pv)/(nx-pv),'#f878a8');else rtextR('BEST FRIENDS',W-12,y+17,1,'#f8a0c0');
   const gift=Object.keys(HGIFT).find(k=>k.split(':')[0]===w&&+k.split(':')[1]>h),note=h>=4?(w==='LOUIE'?'HE ADORES YOU':'A FRIEND FOR LIFE'):w==='LOUIE'?'FEED AND PET HIM':gift?(+gift.split(':')[1])+' HEARTS: A GIFT':HS[w]&&h<4?'NEXT HEART: A SCENE':'SERVE THEM TO GROW';
-  text(note,32,y+16,1,'#c8a8b8',null)});
+  text(SV.fav[w]&&h<4&&FAV[w]?'LOVES '+RC[FAV[w]].n:note,32,y+16,1,'#c8a8b8',null)});
  ftext('SERVE THEM TO GROW HEARTS.  B: BACK',W/2,VH-13,W-12,1,'#c8a8b8',null);g.restore();}
 function drawShop(){const{VH}=begin();r('#2a3a30',0,0,W,VH);text('UPGRADES',6,6,3,'#f8e060');coinTxt(SV.coins,W-14-tw(String(SV.coins)),9);
  const it=UPS.concat([null]),st=24,y0=28,max=Math.max(3,Math.floor((VH-y0-22)/st));
@@ -1061,6 +1106,6 @@ return{
  mus:()=>A.hasTracks&&A.hasTracks('pp')?'pp':'game',
  paused:()=>G.s==='pause'||G.s==='cine'&&G.cine&&G.cine.from==='play'||G.s==='intro'||G.s==='book'&&G.bookFrom!=='stand',
  update,draw,
- _:{G,cine,quip,useSlot,eraseSlot,slotUsed,asks,bumpAsk,friend,heartsOf,owns,louPick,get SLOT(){return SLOT},get SV(){return SV},set SV(v){SV=v},DAYS,RC,UPS,MAP,WIN,WHO,HI,HURRY,QP,NIGHT,NIGHT_V,HS,BUDS,BUDLINE,WHODAY,big,dayBigs,playBigs,budHas,totalStars,TASTE,TASTE_M,FRIENDS,peopleFor,nightPick,wrap,tw,plan,need,act,walkable,kind,newDay,startDay,finish,snap,store,KEY,
+ _:{G,cine,quip,useSlot,eraseSlot,slotUsed,asks,bumpAsk,friend,heartsOf,owns,louPick,get SLOT(){return SLOT},get SV(){return SV},set SV(v){SV=v},DAYS,RC,UPS,MAP,WIN,WHO,HI,HURRY,QP,NIGHT,NIGHT_V,HS,BUDS,BUDLINE,WHODAY,STORY,FAV,FAVSAY,playStory,big,dayBigs,playBigs,budHas,totalStars,TASTE,TASTE_M,FRIENDS,peopleFor,nightPick,wrap,tw,plan,need,act,walkable,kind,newDay,startDay,finish,snap,store,KEY,
   setDay(d){SV.day=d;store()}}};
 };

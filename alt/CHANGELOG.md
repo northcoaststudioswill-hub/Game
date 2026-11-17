@@ -3,6 +3,37 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Patch & Plate v0.6: the story so far, a favourite each, heart scenes for everyone (Nov 17 2026)
+
+Will: only the cooking game from here; leave the other games alone. More lore, the characters, their personalities and
+stories. **Only `src/patchplate.js` and `tests/pp_test.js` changed this round** (no other game's file, not `console.js`).
+
+- **The story so far: six short chapters.** The first time a chapter's day is cleared, it plays on the way out of the
+  results screen, with a title card. Start skips it. Each plays once per file.
+  1. THE YEAR OF DARK (after day 1): why lettuce goes first
+  2. MARCUS WATERWORKS (day 4): Marcus's lazy river, Derek's van
+  3. THE ROBOT (day 7): Bottie offers one follow for the Great Lantern
+  4. THE KING'S ORDER (day 10): King Bibi wants a combo meal, to go
+  5. THE FIRST HARVEST (day 12): the Elder, Will, "same job, different apron"
+  6. ONE TABLE (day 13): sprouts, buddies and people eating together
+- **Heart scenes for everyone.** Scout, Ranger, the Elder, Pip, Derek and Bottie each get four (24 new scenes), so all
+  nine characters have a full set. Scout takes field notes; the Ranger still walks the shut roads; the Elder kept one
+  lamp lit through the dark; Pip wants a bug stand next door; Derek's truck needs a part that needs a truck.
+- **Bottie's arc.** His hearts are kept off the FRIENDS page. He admits it was "a very red button", then that nobody feeds
+  him up on the Peak. At four hearts he leaves his first tip, and tips from then on.
+- **A favourite each.** Will: big salad. Marcus: burger. Scout: salad. Ranger: combo. Elder: bread. Pip: smoothie. Derek
+  and Bottie: fries. Serve someone their favourite and they say so on the card, FAVORITE! pops up, and the friendship
+  grows faster (+2). Once found, the FRIENDS page shows "LOVES FRIES".
+- **The rarer faces grow hearts three times as fast** (Elder, Pip, Derek, Bottie), since they come by less often.
+- New save fields `story` and `fav`, with defaults.
+
+**Tested:** `tests/pp_test.js` 119/119, two runs in a row (12 new checks: every new line measured against its box, a text
+audit of all six chapters, a chapter plays once and only once, Derek's favourite, Bottie's tip at four hearts, the friends
+page). Screenshots looked at: `playtest/pp-v0.6/` (four).
+**Not tested:** other games' suites were not run this round (none of their files changed). The 24 new heart scenes were
+checked for fit, not each put on screen. Nothing played by a person in real time or on a phone.
+**All new, flag to Will:** every line and every favourite. King Bibi is mentioned by name once (chapter 4).
+
 ## Patch & Plate v0.5: big moments, kitchen buddies, Bottie and Derek (Nov 17 2026)
 
 Will: make sure Will, Marcus, Bottie and Derek all make more appearances; if something really cool happens, trigger scenes

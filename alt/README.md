@@ -35,7 +35,7 @@ real game can't read or overwrite Erin's Patch & Plate days, Rootdeep runs, or a
 | `tests/fable_lab.js` | Fable pass 1: parry, wall bounce, K.O. frame, stances, rules and Trials (20 pass/fail checks, sheets in `playtest/fable/`). |
 | `tests/sprouts_tour.js` | Plays Sprouts in real time from a fresh save by following the objective marker. |
 | `tests/lantern_shots.js` | The Lantern menu's stats, achievements and ticket pages with sample saves. |
-| `tests/pp_test.js` | Patch & Plate test (107 checks): v0.3's 76 plus the v0.4 and v0.5 checks. |
+| `tests/pp_test.js` | Patch & Plate test (119 checks): v0.3's 76 plus the v0.4 to v0.6 checks. |
 | `tests/v02/` | v0.2's Rootdeep/console tests, copied so their screenshots land here instead of in `v0.2/`. |
 | `playtest/` | Screenshots and frame sheets from the runs above. |
 

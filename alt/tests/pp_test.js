@@ -267,6 +267,7 @@ async function main() {
     for (const k in P.QP) P.QP[k].forEach(q => lines(q[1], 206, 1, 2, 'quip'));
     for (const w in P.WHO) P.WHO[w].yum.concat(P.WHO[w].bye).forEach(s => lines(s, 70, 1, 2, 'order card'));
     const sc = []; for (const k in P.NIGHT) P.NIGHT[k].forEach(e => sc.push(...e)); P.NIGHT_V.forEach(e => sc.push(...e)); for (const w in P.HS) P.HS[w].forEach(e => sc.push(...e));
+    for (const k in P.STORY) sc.push(...P.STORY[k][1]); for (const w in P.FAVSAY) lines(P.FAVSAY[w], 70, 1, 2, 'favourite');
     for (const k in P.TASTE) sc.push(['', P.TASTE[k]]); for (const k in P.TASTE_M) sc.push(['', P.TASTE_M[k]]);
     sc.forEach(l => lines(l[1], 210, 2, 3, 'scene')); P.DAYS.forEach(D => lines(D.s, 156, 2, 6, 'day card'));
     return { bad, n: sc.length };
@@ -311,9 +312,26 @@ async function main() {
   }
   await page.evaluate(() => { const P = __g.PP._; P.SV.buds = ['CUYAPUP', 'BESSLING', 'GRASSKIN']; P.startDay(12); P.G.s = 'play'; for (let i = 0; i < 60 * 25; i++) { __botTick(); __upd(1 / 60); } const cu = P.G.L.cu; let k = 0; for (const c of cu) if (c) c.who = ['BOTTIE', 'DEREK', 'BOTTIE'][k++]; });
   await shot('pp_75_three_buddies.png'); await audit('three buddies in the kitchen, BOTTIE and DEREK at the windows');
-  const tip = await page.evaluate(() => { const P = __g.PP._, L = P.G.L; L.cu[0] = { who: 'BOTTIE', rc: 'salad', pat: 60, pmax: 60, st: 'wait', x: 40, side: -1, t: 0, say: '', gain: 0 }; const t0 = L.tips; L.held = { k: 'plate', c: ['let_c'] }; const P2 = L.P; P2.x = 2; P2.y = 2; P2.fx = 0; P2.fy = -1; P2.mv = 0; const a = P.act(true); if (a && a.ok) P.act(); return { tipped: L.tips - t0, st: L.cu[0] && L.cu[0].st }; });
+  const tip = await page.evaluate(() => { const P = __g.PP._, L = P.G.L; P.SV.friend.BOTTIE = 0; L.cu[0] = { who: 'BOTTIE', rc: 'salad', pat: 60, pmax: 60, st: 'wait', x: 40, side: -1, t: 0, say: '', gain: 0 }; const t0 = L.tips; L.held = { k: 'plate', c: ['let_c'] }; const P2 = L.P; P2.x = 2; P2.y = 2; P2.fx = 0; P2.fy = -1; P2.mv = 0; const a = P.act(true); if (a && a.ok) P.act(); return { tipped: L.tips - t0, st: L.cu[0] && L.cu[0].st }; });
   check(tip.st === 'happy' && tip.tipped === 0, 'BOTTIE eats and never tips: ' + JSON.stringify(tip));
   await pp("__g.PP._.G.cine=null;__g.PP._.G.s='friends'"); await shot('pp_76_friends_derek.png'); await audit('friends with DEREK');
+  /* 4a3. v0.6: story chapters, a favourite each, heart scenes for everyone */
+  const v6 = await page.evaluate(() => { const P = __g.PP._, hs = Object.keys(P.HS).filter(w => P.HS[w].length === 4), favOK = Object.keys(P.FAV).every(w => P.RC[P.FAV[w]] && P.FAVSAY[w] && P.WHO[w]); return { hs, favOK, chapters: Object.keys(P.STORY).length }; });
+  check(v6.hs.length === 9 && v6.favOK && v6.chapters === 6, 'nine characters have four heart scenes each, eight have a favourite dish, six story chapters: ' + JSON.stringify(v6));
+  for (const d of [0, 3, 6, 9, 11, 12]) {
+    await page.evaluate(d => { const P = __g.PP._; P.G.s = 'stand'; P.playStory(d, () => { P.G.s = 'stand'; }); for (let k = 0; k < 50; k++)__upd(1 / 60); }, d);
+    if (d === 6) await shot('pp_80_story_robot.png'); if (d === 3) { await page.evaluate(() => { const c = __g.PP._.G.cine; c.li = 1; c.lt = 9; }); await shot('pp_81_story_waterworks.png'); }
+    await audit('story chapter after day ' + (d + 1));
+    await pp("__g.PP._.G.cine=null;__g.PP._.G.s='stand'");
+  }
+  const st6 = await page.evaluate(() => { const P = __g.PP._; P.SV.story = {}; P.SV.hpend = []; P.G.res = { d: 3, st: 2, coins: 90, tips: 10, served: 6, n: 6, missed: 0 }; P.G.s = 'done'; P.G.t = 1; P.G.ri = 2; __tap('a'); const a = P.G.s === 'cine' && P.G.cine.k; for (let k = 0; k < 60 * 30 && P.G.s === 'cine'; k++)__upd(1 / 60); const mid = P.G.s; P.G.res = { d: 3, st: 2, coins: 90, tips: 10, served: 6, n: 6, missed: 0 }; P.G.s = 'done'; P.G.t = 1; P.G.ri = 2; __tap('a'); return { a, mid, again: P.G.s, seen: P.SV.story[3] }; });
+  check(st6.a === 'story' && st6.mid === 'stand' && st6.again === 'stand' && st6.seen === 1, 'a chapter plays once, the first time its day is cleared, then the stand as usual: ' + JSON.stringify(st6));
+  const fav = await page.evaluate(() => { const P = __g.PP._; P.startDay(12); P.G.s = 'play'; P.G.fx.length = 0; const L = P.G.L; P.SV.friend.DEREK = 0; P.SV.fav = {}; L.cu[0] = { who: 'DEREK', rc: 'fries', pat: 60, pmax: 60, st: 'wait', x: 40, side: -1, t: 0, say: '', gain: 0 }; L.held = { k: 'plate', c: ['fry'] }; const Q = L.P; Q.x = 2; Q.y = 2; Q.fx = 0; Q.fy = -1; Q.mv = 0; P.SV.tasted.fries = 1; const a = P.act(true); if (a && a.ok) P.act(); return { say: L.cu[0].say, pts: P.SV.friend.DEREK, known: P.SV.fav.DEREK }; });
+  check(fav.say === 'YO. FRIES.' && fav.pts === 12 && fav.known === 1, "DEREK gets his favourite: he says so and the friendship jumps: " + JSON.stringify(fav));
+  await pp("for(let i=0;i<20;i++)__upd(1/60)"); await shot('pp_82_favourite.png'); await audit('a favourite served');
+  const bt = await page.evaluate(() => { const P = __g.PP._, L = P.G.L; P.SV.friend.BOTTIE = 40; P.SV.hseen = Object.assign(P.SV.hseen, { 'BOTTIE:1': 1, 'BOTTIE:2': 1, 'BOTTIE:3': 1, 'BOTTIE:4': 1 }); L.cu[1] = { who: 'BOTTIE', rc: 'salad', pat: 60, pmax: 60, st: 'wait', x: 120, side: -1, t: 0, say: '', gain: 0 }; const t0 = L.tips; L.held = { k: 'plate', c: ['let_c'] }; const Q = L.P; Q.x = 7; Q.y = 2; Q.fx = 0; Q.fy = -1; Q.mv = 0; P.SV.tasted.salad = 1; const a = P.act(true); if (a && a.ok) P.act(); P.SV.friend.BOTTIE = 0; P.SV.hpend = []; return L.tips - t0; });
+  check(bt > 0, 'at four hearts BOTTIE finally tips (' + bt + ')');
+  await pp("__g.PP._.G.cine=null;__g.PP._.G.s='friends'"); await shot('pp_83_friends_fav.png'); await audit('friends with a known favourite');
   await pp("__g.PP._.startDay(11)");   /* back to where the reload check below starts from */
 
   /* 4b. CONTINUE after a reload */

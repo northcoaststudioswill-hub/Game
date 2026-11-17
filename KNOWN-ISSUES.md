@@ -103,11 +103,13 @@ From [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), still open:
 - Rooms are short (4 to 10 seconds); difficulty untouched until Will has played more.
 - The music is a placeholder synth loop; it needs a William Cohen track.
 
-## Patch & Plate (cartridge 4, v0.5)
+## Patch & Plate (cartridge 4, v0.6)
 
+- Since v0.6: the 24 new heart scenes were measured for fit but not each watched; how fast hearts grow for the rarer customers (three times the usual) is a guess.
+- Since v0.6: after a first clear you can get a big moment, then a story chapter, then a heart scene, then the night. All skippable, but it may be a lot in a row.
 - Since v0.5: no big-moment scene has been watched firing in real time from real play; the streak scenes pause the day, which may or may not feel right in a rush.
 - Since v0.5: kitchen buddy numbers (6, 15, 27 stars; 15% faster; +8 patience) are untuned.
-- Bottie and Derek have no heart scenes; Bottie is not on the FRIENDS page.
+- Bottie is not on the FRIENDS page (on purpose; his hearts are hidden).
 - Not played on a phone or by a person in real time since v0.4; the test bot played every day, day 13 included.
 - The lore placement is new (the stand is at Sunkeep, during Sproutwild's story). Will has not confirmed it as canon.
 - LANTERN NIGHT's difficulty (11 customers, every recipe) is a guess; the bot's result is in the test output.
