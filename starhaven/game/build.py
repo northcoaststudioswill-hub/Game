@@ -10,13 +10,15 @@ import pathlib
 HERE = pathlib.Path(__file__).resolve().parent
 ORDER = [
     'tuning.js',     # every feel number
-    'room-grove.js', # level data
+    'story.js',      # intro, chapters, goals, dialogue, journal
+    'rooms.js',      # level data
     'input.js',      # keyboard, gamepad, touch
     'physics.js',    # tile collision
     'fx.js',         # particles, hit-stop, shake
     'player.js',     # Wren
     'enemies.js',    # thorn sprite, dummy, thorn buds
-    'draw.js',       # all drawing
+    'art.js',        # portraits, intro panels, people
+    'draw.js',       # world drawing
     'game.js',       # loop, camera, checkpoints
     'hud.js',        # HTML HUD and menus
 ]

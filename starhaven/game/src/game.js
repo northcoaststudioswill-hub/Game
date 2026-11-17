@@ -1,47 +1,57 @@
-// Starhaven — the game: world setup, the 60 fps loop, camera, checkpoints, hazards, signs, knockouts, results.
+// Starhaven — the game: chapters, story scripts, the 60 fps loop, camera, checkpoints, hazards, knockouts.
+// Flow: title -> intro panels -> chapter card -> play (story scripts pause play for dialogue) -> chapter complete -> next.
 (function (SH) {
-  const fx = SH.fx, input = SH.input;
-  const TS = SH.TILE;
+  const fx = SH.fx, input = SH.input, TS = SH.TILE, ST = SH.STORY;
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode: fine */ } },
   };
   SH.store = store;
-
-  // Live tuning = defaults + anything saved from the TUNE panel.
   SH.tune = Object.assign({}, SH.TUNE_DEFAULTS, store.get('starhaven.tune.v1', {}));
 
-  const G = SH.game = { state: 'title', world: null, frozen: false };
+  const G = SH.game = {
+    state: 'title', world: null, frozen: false,
+    chapter: 0, flags: {}, activeGoal: null, script: null,
+    progress: Object.assign({ reached: 0, hearts: {}, met: [] }, store.get('starhaven.save.v1', {})),
+  };
+  G.save = function () { store.set('starhaven.save.v1', G.progress); };
+  G.chapterDef = () => ST.CHAPTERS[G.chapter];
 
-  G.build = function () {
-    const def = SH.ROOMS.grove, room = SH.buildRoom(def);
-    const st = def.start;
-    const player = new SH.Player(st.x * TS + TS / 2, st.y * TS);
+  // ---------------------------------------------------------------- building a room
+  G.build = function (roomId) {
+    const def = SH.ROOMS[roomId], room = SH.buildRoom(def);
+    const player = new SH.Player(def.start.x * TS + TS / 2, def.start.y * TS);
     const things = def.spawns.map(s => SH.makeSpawn(s, room));
     const lanterns = def.lanterns.map(l => ({ ...l, px: l.x * TS + TS / 2, py: room.groundY(l.x, 0), lit: !!l.lit }));
-    const signs = def.signs.map(s => ({ ...s, px: s.x * TS + TS / 2, py: room.groundY(s.x, 0), near: false, read: false }));
+    const npcs = def.npcs.map(n => ({ ...n, x: n.x * TS + TS / 2, y: room.groundY(Math.floor(n.x), 0), facing: -1, near: false }));
+    const gates = def.gates.map(g => ({ ...g }));
     const w = {
-      room, player, things, lanterns, signs, input,
+      room, player, things, lanterns, npcs, gates, input,
       targets: things,
       cam: { x: 0, y: 0 }, viewW: G.viewW || 640, time: 0, fade: 0,
       checkpoint: lanterns[0],
-      run: { started: false, frames: 0, done: false },
+      fired: {},
+      cityLight: def.cityLight || 0.05, cityLightTarget: def.cityLight || 0.05,
+      muralProgress: 0,
+      wyrm: def.chase ? { on: false, x: def.chase.wyrmX * TS, speed: def.chase.speed } : null,
       camCenterX() { return this.cam.x + this.viewW / 2; },
-      onKill() { },
+      onKill() { G.hud.goal(); },
       onDash() { },
-      onPerfectDodge(e) {
+      onPerfectDodge() {
         fx.slowmo = 26; player.stats.perfect++;
         player.dashCd = 0; player.airDashes = 1;
         fx.word(player.x, player.y - 52, 'PERFECT DODGE', '#9fe8ff', 60);
         fx.ring(player.x, player.y - 20, '#9fe8ff', 44, 22, 2);
       },
       onKnockout() { G.knockout(); },
+      onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
-    SH.draw.init(room, w.viewW);
+    SH.draw.init(room, w.viewW);   // drawn with gates open, so gates draw on top as objects
+    for (const g of gates) room.setGate(g, true);
     G.snapCamera();
     G.hud.hearts(player.hearts, player.maxHearts);
-    G.hud.goal();
+    G.hud.prompt(null); G.hud.talkButton(null);
     return w;
   };
 
@@ -56,15 +66,117 @@
     w.camT = { x: tx, y: ty };
   };
 
+  // ---------------------------------------------------------------- chapters
+  G.startChapter = function (i) {
+    G.chapter = i;
+    G.flags = {}; G.activeGoal = null; G.script = null; G.pending = null;
+    fx.reset();
+    const ch = G.chapterDef();
+    G.build(ch.room);
+    G.state = 'card';
+    G.hud.card({ label: ch.label, name: ch.name, text: ch.card, goals: ch.goals.map(g => g.text), button: 'Begin' }, () => {
+      G.state = 'play'; input.clear(); G.hud.goal();
+    });
+    G.hud.goal();
+  };
+
+  G.completeChapter = function () {
+    const ch = G.chapterDef(), next = G.chapter + 1;
+    G.progress.reached = Math.max(G.progress.reached, next);
+    G.save();
+    G.state = 'card';
+    G.hud.card({ label: ch.label + ' complete', name: ch.name, text: ch.done, goals: null, button: next < ST.CHAPTERS.length ? 'Continue' : 'Finish' }, () => {
+      if (next < ST.CHAPTERS.length) G.startChapter(next);
+      else { G.state = 'end'; G.hud.end(true); }
+    });
+  };
+
+  G.knownPeople = function () {
+    const ids = new Set(ST.KNOWN_FROM.prologue);
+    for (let i = 0; i <= G.chapter; i++) (ST.KNOWN_FROM[ST.CHAPTERS[i].id] || []).forEach(x => ids.add(x));
+    G.progress.met.forEach(x => ids.add(x));
+    return ST.PEOPLE.filter(p => ids.has(p.id));
+  };
+  // Text for the GOAL line.
+  G.goalText = function () {
+    const ch = G.chapterDef();
+    if (!ch) return '';
+    const g = ch.goals.find(x => x.id === G.activeGoal) || ch.goals.find(x => !G.flags[x.id]);
+    if (!g) return '';
+    let text = g.text;
+    if (g.count && G.world) {
+      const n = G.world.things.filter(e => e.kind === 'thornSprite' && e.dead).length;
+      text += ` (${n}/${g.count})`;
+    }
+    return text;
+  };
+
+  // ---------------------------------------------------------------- story scripts
+  G.queueScript = function (id) { if (!G.world.fired['s:' + id]) { G.world.fired['s:' + id] = true; G.pending = id; } };
+  G.runScript = function (id) {
+    const steps = ST.SCRIPTS[id];
+    if (!steps) throw new Error('no script ' + id);
+    G.script = { id, steps, i: 0 };
+    G.state = 'talk';
+    const p = G.world.player; p.vx = 0; p.swing = null; p.dashT = 0;
+    G.hud.prompt(null); G.hud.talkButton(null);
+    input.clear();
+    G.advance();
+  };
+  G.advance = function () {
+    const sc = G.script;
+    if (!sc) return;
+    while (sc.i < sc.steps.length) {
+      const st = sc.steps[sc.i++];
+      if (Array.isArray(st)) {
+        G.hud.dialog(st[0], st[1]);
+        G.talkWait = 10; // a short pause so a held button doesn't skip the line
+        return;
+      }
+      G.act(st);
+    }
+    G.script = null;
+    G.hud.dialog(null);
+    input.clear();
+    if (G.afterScript) { const f = G.afterScript; G.afterScript = null; f(); }
+    else if (G.state === 'talk') G.state = 'play';
+  };
+  G.act = function (st) {
+    const w = G.world;
+    switch (st.do) {
+      case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
+      case 'flag': G.flags[st.name] = true; G.hud.goal(); break;
+      case 'wyrm': w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
+      case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
+      case 'heart': G.progress.hearts[st.who] = Math.max(1, G.progress.hearts[st.who] || 0); G.save(); G.hud.toast(`${ST.CAST[st.who].name}: bond heart 1 of 5`); break;
+      case 'meet': if (!G.progress.met.includes(st.who)) { G.progress.met.push(st.who); G.save(); } break;
+      case 'winnow': G.winnow(st.npc, st.to, st.y); break;
+      case 'complete': G.afterScript = () => G.completeChapter(); break;
+    }
+  };
+  // Fae can "winnow": vanish in starlight and reappear somewhere else.
+  G.winnow = function (id, toX, row) {
+    const w = G.world;
+    let n = w.npcs.find(x => x.id === id);
+    if (!n) { n = { id, x: 0, y: 0, facing: -1, hidden: true }; w.npcs.push(n); }
+    const sparkle = (x, y) => fx.burst(x, y - 24, 16, { speed: 2, life: 30, gravity: -0.02, colors: ['#b9a8ff', '#fff6d8', '#6a5aa8'], glow: true });
+    if (!n.hidden) sparkle(n.x, n.y);
+    n.x = toX * TS + TS / 2;
+    n.y = row != null ? row * TS : w.room.groundY(Math.floor(toX), 0);
+    n.hidden = false;
+    sparkle(n.x, n.y);
+  };
+
   // ---------------------------------------------------------------- one game frame (1/60 s)
   G.step = function () {
     const w = G.world, p = w.player;
     input.step();
+    if (G.state === 'talk') { G.talkStep(); fx.update(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
+    if (G.pending) { const id = G.pending; G.pending = null; G.runScript(id); return; }
     if (w.koT > 0) { G.koStep(); fx.update(); return; }
     if (fx.hitstop > 0) {
-      // Frozen for impact, but presses made now still count when it resumes.
       fx.hitstop--;
       if (input.pressed.attack) p.atkBuf = SH.COMBAT.attackBuffer + 1;
       if (input.pressed.jump) p.jumpBuf = SH.tune.jumpBufferFrames + 1;
@@ -74,46 +186,100 @@
     if (fx.slowmo > 0) fx.slowmo--;
     w.time++;
 
-    p.update(w);
+    const def = w.room.def;
+    const painting = G.paintStep();
+    if (!painting) p.update(w);
     for (const e of w.things) e.update(w);
 
-    // Run timer starts on your first move.
-    if (!w.run.started && (Math.abs(p.vx) > 0.5 || !p.grounded)) w.run.started = true;
-    if (w.run.started && !w.run.done) w.run.frames++;
-
-    // Thorns and pits: lose a heart, go back to safe ground.
+    // thorns and pits
     const b = p.box();
     const inThorns = SH.touchesThorns(w.room, b.l + 3, b.t, b.r - 3, b.b);
     if (inThorns || p.y > w.room.pxH + 40) G.hazard(inThorns ? 'thorns' : 'pit');
 
-    // Lanterns: checkpoint, and they restore your hearts.
-    for (const l of w.lanterns) {
-      if (Math.abs(p.x - l.px) < 22 && Math.abs(p.y - l.py) < 30) {
-        if (!l.lit) {
-          l.lit = true;
-          fx.ring(l.px, l.py - 46, '#ffd27a', 50, 26, 2);
-          fx.burst(l.px, l.py - 46, 16, { speed: 2, life: 30, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
-          // Lighting a lantern restores your hearts once; after that it's a place to come back to.
-          p.hearts = p.maxHearts;
-          if (!l.end) G.hud.toast('Lantern lit. Hearts restored, and you will start here if knocked out.');
-        }
-        if (w.checkpoint !== l && !l.end) w.checkpoint = l;
-        if (l.end && !w.run.done) G.finish();
-      }
+    // the Deep Wyrm
+    if (w.wyrm && w.wyrm.on) {
+      w.wyrm.x += w.wyrm.speed;
+      if (w.time % 3 === 0) fx.kick(1.2);
+      if (p.x - p.w / 2 < w.wyrm.x + 12 && !p.dead) G.caught();
     }
 
-    // Signs: stand near one to read it.
-    let near = null;
-    for (const s of w.signs) { s.near = Math.abs(p.x - s.px) < 44 && Math.abs(p.y - s.py) < 60; if (s.near) near = s; }
-    G.hud.sign(near);
-    if (near) near.read = true;
+    // lanterns: checkpoints that restore your hearts when first lit
+    for (const l of w.lanterns) {
+      const at = Math.abs(p.x - l.px) < 22 && Math.abs(p.y - l.py) < 30;
+      if (at && !l.lit) {
+        l.lit = true; p.hearts = p.maxHearts;
+        fx.ring(l.px, l.py - 46, '#ffd27a', 50, 26, 2);
+        fx.burst(l.px, l.py - 46, 16, { speed: 2, life: 30, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
+        G.hud.toast('Lantern lit: hearts restored. You come back here if knocked out.');
+      }
+      if (at && w.checkpoint !== l) w.checkpoint = l;
+    }
 
+    const tx = p.x / TS;
+    // story triggers
+    for (let i = 0; i < (def.triggers || []).length; i++) {
+      const tr = def.triggers[i];
+      if (w.fired[i] || tx < tr.x || (tr.flag && !G.flags[tr.flag])) continue;
+      if (tr.above != null && !(p.grounded && p.y <= tr.above * TS + 2)) continue;
+      w.fired[i] = true; G.runScript(tr.script); return;
+    }
+    // optional people you can talk to
+    let talkable = null;
+    for (const n of w.npcs) {
+      n.near = !n.hidden && Math.abs(p.x - n.x) < 46 && Math.abs(p.y - n.y) < 50;
+      if (!n.hidden) n.facing = p.x > n.x ? 1 : -1;
+      n.bubble = !!n.optional && !w.fired['talk:' + n.id] && !n.hidden;
+      if (n.near && n.optional) talkable = n;
+    }
+    if (talkable && input.pressed.up) { w.fired['talk:' + talkable.id] = true; G.runScript(talkable.optional); return; }
+    // chapter 2: all sprites cleared -> Caelum arrives
+    if (G.activeGoal === 'sprites' && !w.fired.spritesDone && w.things.filter(e => e.kind === 'thornSprite').every(e => e.dead)) {
+      w.fired.spritesDone = true;
+      G.winnow('caelum', Math.min(def.width - 4, Math.floor(tx) + 3));
+      G.queueScript('ring_done');
+    }
+
+    // control hints and the TALK / PAINT button
+    const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]));
+    const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
+    G.hud.prompt(hint ? input.fill(hint.text) : canPaint ? input.fill('Hold {PAINT} to paint the wall.') : null);
+    G.hud.talkButton(talkable ? 'TALK' : canPaint ? 'PAINT' : null);
+
+    for (const g of w.gates) if (!g.closed && (g.lift || 0) < 1) g.lift = (g.lift || 0) + 0.03;
+    w.cityLight += (w.cityLightTarget - w.cityLight) * 0.03;
     G.hud.hearts(p.hearts, p.maxHearts);
     G.cameraTarget();
     w.cam.x += (w.camT.x - w.cam.x) * 0.14;
     w.cam.y += (w.camT.y - w.cam.y) * 0.10;
     fx.update();
     if (w.fade > 0) w.fade = Math.max(0, w.fade - 0.08);
+  };
+
+  // Painting the mural: stand at the wall and hold TALK.
+  G.paintStep = function () {
+    const w = G.world, p = w.player, m = w.room.def.mural;
+    if (!m) return false;
+    const cx = (m.x + m.w / 2) * TS;
+    w.muralNear = Math.abs(p.x - cx) < m.w * TS / 2 + 10 && p.grounded && !!G.flags[m.needs] && !G.flags[m.flag];
+    if (!w.muralNear || !input.held.up) return false;
+    p.vx = 0; p.swing = null;
+    w.muralProgress = Math.min(1, w.muralProgress + 1 / m.frames);
+    if (w.time % 4 === 0) fx.burst(m.x * TS + m.w * TS * w.muralProgress, 16 * TS - 40 - Math.random() * 60, 2, { speed: 1, life: 20, colors: ['#ffd27a', '#ff9a7a', '#8a6aff', '#4ad8c8'], glow: true });
+    if (w.muralProgress >= 1) {
+      G.flags[m.flag] = true;
+      G.flags.mural = true;
+      w.cityLightTarget = 1;
+      fx.ring(cx, 16 * TS - 54, '#ffd27a', 90, 40, 3);
+      fx.burst(cx, 16 * TS - 54, 40, { speed: 3, life: 50, gravity: -0.02, colors: ['#ffd27a', '#fff6d8', '#ff9a7a', '#8a6aff'], glow: true });
+      G.hud.toast('The first mural is finished. The street wakes up.');
+      G.queueScript(m.script);
+    }
+    return true;
+  };
+
+  G.talkStep = function () {
+    if (G.talkWait > 0) { G.talkWait--; return; }
+    if (input.pressed.jump || input.pressed.attack || input.pressed.up || input.pressed.dash) G.advance();
   };
 
   G.hazard = function (kind) {
@@ -123,9 +289,20 @@
     fx.kick(4);
     if (p.hearts <= 0) { G.knockout(); return; }
     p.respawnAt(p.lastSafe.x, p.lastSafe.y, SH.PLAYER.hazardInvuln);
+    if (w.wyrm && w.wyrm.on) w.wyrm.x = Math.min(w.wyrm.x, p.x - 9 * TS);
     G.snapCamera();
     w.fade = 0.7;
     fx.word(p.x, p.y - 52, kind === 'thorns' ? 'ouch: thorns' : 'fell', '#ff9aa8', 40);
+  };
+
+  G.caught = function () {
+    const w = G.world, p = w.player;
+    fx.flashScreen(10, 'rgba(0,0,0,0.9)'); fx.kick(6);
+    G.hud.toast('The Wyrm caught you. Try again: keep running and jump the gaps.');
+    const c = w.checkpoint;
+    p.respawnAt(c.px + 14, c.py, 40); p.facing = 1; p.hearts = p.maxHearts;
+    w.wyrm.x = p.x - 13 * TS;
+    G.snapCamera(); w.fade = 1;
   };
 
   G.knockout = function () {
@@ -145,36 +322,16 @@
       p.respawnAt(c.px + 14, c.py, 40);
       p.facing = 1;
       for (const e of w.things) if (e.reset) e.reset();
+      if (w.wyrm && w.wyrm.on) w.wyrm.x = p.x - 13 * TS;
       G.snapCamera();
       G.hud.toast('Knocked out. Back at the last lantern, no harm done.');
     }
-    if (w.koT >= 46) { w.fade = Math.max(0, 1 - (w.koT - 46) / 25); }
+    if (w.koT >= 46) w.fade = Math.max(0, 1 - (w.koT - 46) / 25);
     if (w.koT > 72) { w.koT = 0; w.fade = 0; }
   };
 
-  G.finish = function () {
-    const w = G.world, p = w.player;
-    w.run.done = true;
-    const secs = w.run.frames / 60;
-    const best = store.get('starhaven.best.v1', null);
-    const isBest = best == null || secs < best;
-    if (isBest) store.set('starhaven.best.v1', secs);
-    G.hud.goal('done');
-    G.hud.results({ secs, best: isBest ? secs : best, isBest, hurt: p.stats.hurt, perfect: p.stats.perfect, pogos: p.stats.pogos });
-    G.state = 'results';
-  };
-
-  G.restart = function () {
-    const vw = G.world ? G.world.viewW : 640;
-    fx.reset();
-    G.build();
-    G.world.viewW = vw;
-    G.state = 'play';
-    G.hud.goal();
-  };
-
   G.pause = function () { if (G.state !== 'play') return; G.state = 'pause'; input.clear(); G.hud.menu(true); };
-  G.resume = function () { G.state = 'play'; input.clear(); G.hud.menu(false); G.hud.tune(false); };
+  G.resume = function () { G.state = 'play'; input.clear(); G.hud.menu(false); G.hud.tune(false); G.hud.journal(false); };
 
   // ---------------------------------------------------------------- loop
   let acc = 0, last = 0;
@@ -183,38 +340,37 @@
     last = now;
     input.pollPad();
     if (!G.frozen) {
-      if (G.state === 'play') {
+      if (G.state === 'play' || G.state === 'talk') {
         acc += dt * (fx.slowmo > 0 ? 0.4 : 1);
         let n = 0;
         while (acc >= 1 / 60 && n < 5) { G.step(); acc -= 1 / 60; n++; }
         if (n === 5) acc = 0;
-      } else {
-        acc = 0;
-        G.menuInput();
-      }
+      } else { acc = 0; G.menuInput(); }
     }
     G.render();
     requestAnimationFrame(G.loop);
   };
   G.render = function () {
-    const ctx = G.ctx, w = G.world;
+    if (document.body.dataset.state !== G.state) document.body.dataset.state = G.state;
+    const w = G.world;
     if (!w) return;
-    ctx.imageSmoothingEnabled = false;
-    SH.draw.frame(ctx, w);
+    G.ctx.imageSmoothingEnabled = false;
+    SH.draw.frame(G.ctx, w);
   };
 
   // Menus can be driven by keyboard and gamepad as well as taps.
   G.menuInput = function () {
-    if (G.state === 'title') { if (input.take('jump') || input.take('attack') || input.take('pause')) G.start(); }
+    const go = () => input.take('jump') || input.take('attack');
+    if (G.state === 'title') { if (go()) G.hud.titlePrimary(); }
+    else if (G.state === 'cutscene') { if (go()) G.hud.cutNext(); }
+    else if (G.state === 'card') { if (go()) G.hud.cardGo(); }
     else if (G.state === 'pause') { if (input.take('pause')) G.resume(); }
-    else if (G.state === 'results') { if (input.take('jump') || input.take('pause')) { G.hud.results(null); G.restart(); } }
   };
 
-  G.start = function () {
-    if (G.state !== 'title') return;
+  G.newGame = function () {
     G.hud.title(false);
-    G.state = 'play';
-    input.clear();
+    G.state = 'cutscene';
+    G.hud.cutscene(ST.INTRO, () => G.startChapter(0));
   };
 
   // ---------------------------------------------------------------- screen size
@@ -230,15 +386,35 @@
     if (G.world) { G.world.viewW = viewW; SH.draw.resize(viewW); G.snapCamera(); }
   };
 
-  // ---------------------------------------------------------------- test hooks (used by tests/*.js)
+  // ---------------------------------------------------------------- test hooks (tests/*.js)
   SH.test = {
-    freeze() { G.frozen = true; input.forced = { held: {}, pressed: {} }; if (G.state === 'title') { G.hud.title(false); G.state = 'play'; } },
+    // load(chapterIndex): that chapter with its story, past its title card.
+    // load('roomId', { story: false }): a bare room, every gate open, no story scripts.
+    load(chapterOrRoom, opts) {
+      opts = opts || {};
+      G.frozen = true; input.forced = { held: {}, pressed: {} };
+      G.hud.title(false); G.hud.cutscene(null);
+      if (typeof chapterOrRoom === 'number') { G.startChapter(chapterOrRoom); G.hud.cardGo(); }
+      else {
+        G.chapter = 0; G.flags = { combo: true, pit: true, arrive: true }; G.activeGoal = null; G.script = null; G.pending = null;
+        fx.reset(); G.build(chapterOrRoom);
+        const w = G.world;
+        for (const g of w.gates) w.room.setGate(g, false);
+        if (opts.story === false) (w.room.def.triggers || []).forEach((t, i) => (w.fired[i] = true));
+        G.state = 'play';
+      }
+      G.hud.dialog(null);
+      return SH.test.state();
+    },
     // Step n frames holding `held` (e.g. {right:true}); `press` actions are pressed on the first frame.
-    step(n, held, press) {
+    // With autoTalk, dialogue and chapter cards are clicked through as they appear.
+    step(n, held, press, autoTalk) {
       for (let i = 0; i < n; i++) {
         input.forced.held = held || {};
         input.forced.pressed = {};
         if (i === 0 && press) for (const a of press) input.forced.pressed[a] = true;
+        if (autoTalk && G.state === 'talk' && G.talkWait <= 0) input.forced.pressed.jump = true;
+        if (autoTalk && G.state === 'card') G.hud.cardGo();
         G.step();
       }
       return SH.test.state();
@@ -246,7 +422,7 @@
     place(tx, ty) { const p = G.world.player; p.respawnAt(tx * TS + TS / 2, ty * TS); p.grounded = true; G.snapCamera(); },
     state() {
       const p = G.world.player;
-      return { x: p.x, y: p.y, tx: p.x / TS, ty: p.y / TS, vx: p.vx, vy: p.vy, grounded: p.grounded, hearts: p.hearts, stats: p.stats, state: G.state, ko: G.world.koT || 0 };
+      return { x: p.x, y: p.y, tx: p.x / TS, ty: p.y / TS, vx: p.vx, vy: p.vy, grounded: p.grounded, hearts: p.hearts, stats: p.stats, state: G.state, chapter: G.chapter, goal: G.activeGoal, flags: Object.assign({}, G.flags), ko: G.world.koT || 0 };
     },
     render() { G.render(); },
   };

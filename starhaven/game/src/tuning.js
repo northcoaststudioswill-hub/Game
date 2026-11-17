@@ -71,7 +71,7 @@
   SH.ENEMY_DEFS = {
     thornSprite: {
       name: 'Thorn sprite', hp: 4, w: 24, h: 22,
-      wander: 0.55, sight: 150, sightY: 50,
+      wander: 0.55, sight: 150, sightY: 50, leash: 5,
       windup: 26, lungeSpeed: 5.4, lungeHop: 2.6, lungeFrames: 20, recover: 42,
       respawn: 300, damage: 1, gravity: 0.5,
     },

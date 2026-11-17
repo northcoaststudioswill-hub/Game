@@ -62,8 +62,8 @@
   window.addEventListener('keyup', e => { const a = KEYS[e.code]; if (a) { e.preventDefault(); up('kb', a); } });
   window.addEventListener('blur', () => input.clear());
 
-  // ---- gamepad (standard mapping: A jump, X attack, B dash, Start pause)
-  const PAD_BTNS = { 0: 'jump', 2: 'attack', 1: 'dash', 3: 'dash', 5: 'dash', 9: 'pause', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
+  // ---- gamepad (standard mapping: A jump, X attack, B dash, Y talk, Start pause)
+  const PAD_BTNS = { 0: 'jump', 2: 'attack', 1: 'dash', 3: 'up', 5: 'dash', 9: 'pause', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
   input.pollPad = function () {
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];
     let pad = null;
@@ -140,9 +140,9 @@
 
   // Button names shown in signs, per input type.
   input.LABELS = {
-    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', DASH: 'Shift', DOWN: 'S' },
-    touch: { MOVE: 'the left side of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', DASH: 'the DASH button', DOWN: 'down on the stick' },
-    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', DASH: 'B', DOWN: 'down' },
+    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W' },
+    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button' },
+    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y' },
   };
   input.fill = function (text) {
     const L = input.LABELS[input.source] || input.LABELS.kb;

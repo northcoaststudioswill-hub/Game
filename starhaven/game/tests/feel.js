@@ -16,12 +16,12 @@ const path = require('path');
 
   const results = await page.evaluate(() => {
     const T = SH.TILE, G = SH.game;
-    SH.test.freeze();
     const P = () => G.world.player;
     const out = [];
     const check = (name, ok, info) => out.push({ name, ok: !!ok, info });
 
-    function fresh() { G.restart(); SH.test.freeze(); SH.fx.reset(); }
+    let ROOM = 'deep';
+    function fresh() { SH.test.load(ROOM, { story: false }); }
     function step(held, press) { SH.test.step(1, held, press); }
 
     // Run right from (tx, ty); at edgeTx jump, then use `moves` (in order) each at the top of the current arc.
@@ -77,36 +77,37 @@ const path = require('path');
     r = attempt(61, 16, 65.6, ['dash']); check('10-tile gap: jump + dash falls short', r.hurt > 0, r);
     r = attempt(61, 16, 65.6, ['double', 'dash']); check('10-tile gap: jump + double + dash clears it', r.hurt === 0 && r.tx > 76, r);
 
-    // --- 6. Pogo over the thorn floor (129..147): bounce off the buds with down-strikes
+    // --- Training Ring: pogo over the thorn pit (42..59): bounce off the buds with down-strikes
+    ROOM = 'ring';
     (function () {
-      fresh(); SH.test.place(124, 16); const p = P();
+      fresh(); SH.test.place(37, 16); const p = P();
       const buds = G.world.things.filter(t => t.kind === 'bulb');
-      while (p.x < 127.7 * T) step({ right: true });
+      while (p.x < 40.7 * T) step({ right: true });
       step({ right: true, jump: true }, ['jump']);
       let i = 0;
-      while (i++ < 600 && p.x < 148.5 * T && p.stats.hurt === 0) {
+      while (i++ < 600 && p.x < 60.5 * T && p.stats.hurt === 0) {
         let press = null, down = false;
         // aim: when falling toward a bud just ahead/below, strike down
         const bud = buds.find(b => b.hittable() && Math.abs(b.x - p.x) < 26 && b.y - p.y > -4 && b.y - p.y < 46);
         if (p.vy > 0 && bud && !p.swing) { press = ['attack']; down = true; }
         // hold right only until over the next bud
         const next = buds.find(b => b.x > p.x - 10);
-        const right = !next || p.x < next.x - 2 || p.vy < -4 || p.x > 145 * T;
+        const right = !next || p.x < next.x - 2 || p.vy < -4 || p.x > 57 * T;
         step({ right, jump: true, down: down || (p.swing && p.swing.kind === 'pogo') }, press);
       }
-      check('Pogo: crosses the thorn floor on the buds without a scratch', p.x >= 148 * T && p.stats.hurt === 0, { tx: +(p.x / T).toFixed(2), pogos: p.stats.pogos, hurt: p.stats.hurt });
+      check('Pogo: crosses the thorn pit on the buds without a scratch', p.x >= 60 * T && p.stats.hurt === 0, { tx: +(p.x / T).toFixed(2), pogos: p.stats.pogos, hurt: p.stats.hurt });
     })();
 
     // --- Thorns send you back to safe ground and cost one heart
     (function () {
-      fresh(); SH.test.place(126, 16); const p = P();
+      fresh(); SH.test.place(39, 16); const p = P();
       for (let i = 0; i < 120 && p.stats.hurt === 0; i++) step({ right: true });
-      check('Thorns: cost one heart and return you to safe ground', p.hearts === 4 && p.x < 129 * T, { hearts: p.hearts, tx: p.x / T });
+      check('Thorns: cost one heart and return you to safe ground', p.hearts === 4 && p.x < 42 * T, { hearts: p.hearts, tx: p.x / T });
     })();
 
     // --- 5. Daggers: the 3-hit combo on the dummy
     (function () {
-      fresh(); SH.test.place(104, 16); const p = P(); step({});
+      fresh(); SH.test.place(22, 16); const p = P(); step({});
       const dummy = G.world.things.find(t => t.kind === 'dummy');
       let hits = 0, finisher = false;
       const orig = dummy.takeHit.bind(dummy);
@@ -149,13 +150,11 @@ const path = require('path');
 
     // --- Knocked out: back to the last lantern with full hearts
     (function () {
-      fresh(); const p = P();
-      SH.test.place(126, 16);
-      for (let i = 0; i < 40; i++) step({ right: i < 12 }); // walk up to (and light) the lantern...
+      ROOM = 'deep'; fresh(); SH.test.place(77, 16); const p = P();
+      for (let i = 0; i < 40; i++) step({ right: i < 14 }); // walk up to (and light) the lantern...
       p.hearts = 1;                                           // ...then arrive at the thorns on your last heart
       for (let i = 0; i < 200; i++) step({ right: i < 60 });
-      const lit = G.world.checkpoint.id;
-      check('Knockout: return to the last lantern with full hearts', p.hearts === 5 && !p.dead && Math.abs(p.x - G.world.checkpoint.px) < 40, { hearts: p.hearts, checkpoint: lit, tx: +(p.x / T).toFixed(1) });
+      check('Knockout: return to the last lantern with full hearts', p.hearts === 5 && !p.dead && Math.abs(p.x - G.world.checkpoint.px) < 40, { hearts: p.hearts, tx: +(p.x / T).toFixed(1) });
     })();
 
     // --- Coyote time and jump buffering
@@ -176,36 +175,80 @@ const path = require('path');
       check('Jump buffer: pressing just before landing jumps on landing', q.vy < -2 && !q.grounded, { vy: q.vy });
     })();
 
-    // --- Full run, start to the end lantern, with a simple autopilot
+    // ================= Story: each chapter played start to finish with its dialogue (clicked through)
+    let caught = 0; const origCaught = G.caught; G.caught = function () { caught++; return origCaught.apply(this, arguments); };
+    const talk = (held, press) => SH.test.step(1, held, press, true);
+    function pogoPolicy(p, held, buds, endX) {
+      let press = null;
+      const bud = buds.find(b => b.hittable() && Math.abs(b.x - p.x) < 26 && b.y - p.y > -4 && b.y - p.y < 46);
+      if (p.vy > 0 && bud && !p.swing) { press = ['attack']; held.down = true; }
+      if (p.swing && p.swing.kind === 'pogo') held.down = true;
+      const next = buds.find(b => b.x > p.x - 10);
+      held.right = !next || p.x < next.x - 2 || p.vy < -4 || p.x > endX * T;
+      return press;
+    }
+
+    // Prologue: the Deep, including the Wyrm chase
     (function () {
-      fresh(); const p = P(), w = G.world;
-      const buds = w.things.filter(t => t.kind === 'bulb');
-      const jumpAt = [22.6, 30.7, 40.7, 52.6, 65.6];
-      let phase = 0, f = 0, moves = [], hold = 0;
-      while (f++ < 60 * 90 && G.state === 'play' && !w.run.done) {
-        const tx = p.x / T;
-        let held = { right: true, jump: true }, press = null;
-        if (phase < jumpAt.length && tx >= jumpAt[phase] && p.grounded) {
-          press = ['jump'];
-          moves = phase === 3 ? ['jump'] : phase === 4 ? ['jump', 'dash'] : [];
-          phase++;
-        } else if (moves.length && !p.grounded && p.vy > -0.6 && p.dashT <= 0) press = [moves.shift()];
-        if (tx > 127.7 && tx < 148) {
-          if (p.grounded && tx < 129) press = ['jump'];
-          const bud = buds.find(b => b.hittable() && Math.abs(b.x - p.x) < 26 && b.y - p.y > -4 && b.y - p.y < 46);
-          if (p.vy > 0 && bud && !p.swing) { press = ['attack']; held.down = true; }
-          if (p.swing && p.swing.kind === 'pogo') held.down = true;
-          const next = buds.find(b => b.x > p.x - 10);
-          held.right = !next || p.x < next.x - 2 || p.vy < -4 || p.x > 145 * T;
-        }
-        if (tx > 150) {
-          const foe = w.things.find(e => e.kind === 'thornSprite' && !e.dead && Math.abs(e.x - p.x) < 44 && Math.abs(e.y - p.y) < 30);
-          if (foe) { held.right = foe.x > p.x; held.left = !held.right; if (!p.swing && (f % 4 === 0)) press = ['attack']; }
-          if (p.grounded && tx > 166 && tx < 168) press = press || ['jump'];
-        }
-        step(held, press);
+      SH.test.load(0); const p = P();
+      const jumps = [[22.6], [30.7], [40.7], [52.6, 'jump'], [65.6, 'jump', 'dash'], [83.6], [102.8], [116.6], [125.6], [135.6]];
+      let k = 0, moves = [], f = 0, sawWyrm = false;
+      while (f++ < 60 * 120 && G.chapter === 0) {
+        const tx = p.x / T; let press = null;
+        if (G.state === 'play' && k < jumps.length && tx >= jumps[k][0] && p.grounded) { press = ['jump']; moves = jumps[k].slice(1); k++; }
+        else if (moves.length && !p.grounded && p.vy > -0.6 && p.dashT <= 0) press = [moves.shift()];
+        if (G.world.wyrm && G.world.wyrm.on) sawWyrm = true;
+        talk({ right: true, jump: true }, press);
       }
-      check('Full run: autopilot reaches the end lantern', w.run.done, { seconds: +(w.run.frames / 60).toFixed(1), hurt: p.stats.hurt, kos: 0, tx: +(p.x / T).toFixed(1), state: G.state });
+      check('Prologue: playable start to finish (story, chase, wake-up), Wyrm never catches a steady runner', G.chapter === 1 && sawWyrm && caught === 0,
+        { chapter: G.chapter, sawWyrm, caught, seconds: +(f / 60).toFixed(1), hurt: p.stats.hurt });
+    })();
+
+    // Chapter 1: Ashes. Walk with Caelum, paint the mural, climb to the roof
+    (function () {
+      SH.test.load(1); const p = P(), w = G.world;
+      const jumps = [21.3, 29.3, 98.6, 102.4];
+      let k = 0, f = 0, light0 = w.cityLight, painted = false;
+      while (f++ < 60 * 120 && G.chapter === 1) {
+        const tx = p.x / T; let press = null, held = { right: true, jump: true };
+        if (G.flags.arrive && !G.flags.painted && tx > 71.5 && tx < 74) held = { up: true };
+        if (G.flags.painted) painted = true;
+        if (G.state === 'play' && k < jumps.length && tx >= jumps[k] && p.grounded && (k < 2 || G.flags.painted)) { press = ['jump']; k++; }
+        talk(held, press);
+      }
+      check('Chapter 1: walk, mural, rooftop all reachable; the street lights up', G.chapter === 2 && painted && G.progress.hearts.caelum >= 1,
+        { chapter: G.chapter, painted, cityLightBefore: +light0.toFixed(2), caelumHeart: G.progress.hearts.caelum, seconds: +(f / 60).toFixed(1) });
+    })();
+
+    // Chapter 2: The Five. Dummy combo, the thorn pit, three thorn sprites
+    (function () {
+      SH.test.load(2); const p = P(), w = G.world;
+      const buds = w.things.filter(t => t.kind === 'bulb');
+      let f = 0, swings = 0;
+      while (f++ < 60 * 150 && G.state !== 'end') {
+        const tx = p.x / T; let press = null, held = { right: true, jump: true };
+        if (G.state === 'play') {
+          if (!G.flags.combo) {
+            if (tx >= 22.4) { held = {}; if (!p.swing && f % 9 === 0) press = ['attack']; }
+          } else if (!G.flags.pit) {
+            if (tx >= 40.7 && p.grounded && tx < 42) press = ["jump"];
+            if (tx > 40.7 && tx < 60) press = pogoPolicy(p, held, buds, 57) || press;
+          } else {
+            // hunt the nearest live sprite; jump up to it if it's on the ledge
+            const alive = w.things.filter(e => e.kind === 'thornSprite' && !e.dead).sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x));
+            const foe = alive[0];
+            if (foe && tx > 62) {
+              const dx = foe.x - p.x, dy = foe.y - p.y;
+              held.right = dx > 0; held.left = dx < 0;
+              if (Math.abs(dx) < 40 && Math.abs(dy) < 30) { held.right = held.left = false; p.facing = dx > 0 ? 1 : -1; if (!p.swing && f % 4 === 0) { press = ['attack']; swings++; } }
+              else if (dy < -40 && Math.abs(dx) < 70 && p.grounded) press = ['jump'];
+            }
+          }
+        }
+        talk(held, press);
+      }
+      check('Chapter 2: dummy combo, thorn pit and all three thorn sprites; ends on the concept end screen', G.state === 'end' && G.progress.reached >= 3,
+        { state: G.state, reached: G.progress.reached, seconds: +(f / 60).toFixed(1), hurt: p.stats.hurt, swings });
     })();
 
     return out;

@@ -1,0 +1,175 @@
+// Starhaven — placeholder art drawn in code: dialogue portraits, intro panels, and the people in the world.
+// Real art replaces this once Will approves an art direction (BUILD-PLAN rule).
+(function (SH) {
+  const A = SH.art = {};
+  const cache = {};
+  function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+
+  // ---------------------------------------------------------------- portraits (48 x 48 pixels, shown big)
+  const LOOKS = {
+    wren: { bg: ['#2c3d74', '#11163a'], skin: '#f6dcc6', shade: '#e2b89c', hair: '#d8653a', hairD: '#9e3f22', eye: '#3f9c7a', style: 'pony', ears: true, cloth: '#2f8f7a', clothD: '#1f6656', scarf: '#ffd27a' },
+    caelum: { bg: ['#3a2a6a', '#120d2a'], skin: '#ecd5c8', shade: '#cfb0a4', hair: '#1a1530', hairD: '#0c0a1a', eye: '#a58bff', style: 'swept', ears: true, cloth: '#1c1838', clothD: '#0e0c20', trim: '#cfd6ff', circlet: true, wings: true },
+    queen: { bg: ['#4a1426', '#14060c'], skin: '#efe4ea', shade: '#cdbac4', hair: '#2a0a16', hairD: '#14040a', eye: '#ff4a5a', style: 'long', ears: true, cloth: '#2a0a16', clothD: '#14040a', crown: true, lips: '#c0203a' },
+    bram: { bg: ['#5a3a1c', '#1c1008'], skin: '#d9a77f', shade: '#b8865f', hair: '#3a2a20', hairD: '#2a1c14', eye: '#5a3a22', style: 'shaved', ears: true, cloth: '#a8743a', clothD: '#6e4a22', beard: '#8a4426', scar: true, broad: true },
+    iris: { bg: ['#2a5a7a', '#0c1a2a'], skin: '#f2d9c8', shade: '#dcbca8', hair: '#f4f0ff', hairD: '#c8c0e8', eye: '#8fd8ff', style: 'bun', ears: true, cloth: '#4f88c0', clothD: '#2f5a88', thread: true },
+  };
+
+  A.portrait = function (who) {
+    if (cache['p_' + who]) return cache['p_' + who];
+    const L = LOOKS[who], c = canvas(48, 48), g = c.getContext('2d');
+    const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+    // backdrop
+    const gr = g.createRadialGradient(24, 20, 2, 24, 24, 34); gr.addColorStop(0, L.bg[0]); gr.addColorStop(1, L.bg[1]);
+    g.fillStyle = gr; g.fillRect(0, 0, 48, 48);
+    if (L.wings) { R(2, 14, 8, 30, '#0a0818'); R(38, 14, 8, 30, '#0a0818'); R(4, 10, 6, 6, '#0a0818'); R(38, 10, 6, 6, '#0a0818'); R(3, 14, 1, 26, '#6a5aa8'); R(44, 14, 1, 26, '#6a5aa8'); }
+    if (L.thread) { g.strokeStyle = '#ffe9a8'; g.globalAlpha = 0.8; g.beginPath(); g.moveTo(0, 40); g.bezierCurveTo(14, 24, 30, 46, 48, 30); g.stroke(); g.globalAlpha = 1; }
+    // long hair behind
+    if (L.style === 'long') { R(11, 10, 26, 34, L.hair); }
+    if (L.style === 'pony') { R(32, 14, 6, 16, L.hair); R(34, 28, 5, 8, L.hairD); }
+    // shoulders
+    const sw = L.broad ? 40 : 32, sx = 24 - sw / 2;
+    R(sx, 38, sw, 10, L.cloth); R(sx, 38, 4, 10, L.clothD);
+    if (L.trim) { R(18, 37, 12, 2, L.trim); R(22, 39, 4, 9, L.trim); }
+    if (L.scarf) { R(15, 35, 18, 4, L.scarf); R(15, 38, 4, 7, L.scarf); }
+    // neck + face
+    R(20, 32, 8, 7, L.shade);
+    R(15, 12, 18, 22, L.skin);
+    R(15, 30, 18, 4, L.shade);
+    if (L.ears) { R(12, 18, 3, 6, L.skin); R(11, 15, 2, 4, L.skin); R(33, 18, 3, 6, L.skin); R(35, 15, 2, 4, L.skin); }
+    // hair on top
+    if (L.style === 'pony') { R(14, 9, 20, 6, L.hair); R(14, 12, 3, 9, L.hair); R(30, 11, 4, 6, L.hairD); }
+    if (L.style === 'swept') { R(14, 8, 20, 6, L.hair); R(14, 12, 4, 10, L.hair); R(26, 12, 7, 3, L.hair); R(30, 12, 4, 8, L.hairD); }
+    if (L.style === 'long') { R(14, 8, 20, 6, L.hair); R(14, 12, 3, 22, L.hair); R(31, 12, 3, 22, L.hair); }
+    if (L.style === 'shaved') { R(15, 10, 18, 3, L.hair); }
+    if (L.style === 'bun') { R(14, 9, 20, 5, L.hair); R(19, 3, 10, 7, L.hair); R(14, 12, 3, 7, L.hair); R(31, 12, 3, 7, L.hair); R(21, 4, 6, 1, L.hairD); }
+    // eyes, brows, mouth
+    R(18, 20, 4, 3, '#ffffff'); R(26, 20, 4, 3, '#ffffff');
+    R(19, 20, 2, 3, L.eye); R(27, 20, 2, 3, L.eye);
+    R(18, 18, 4, 1, L.hairD); R(26, 18, 4, 1, L.hairD);
+    R(23, 23, 2, 4, L.shade);
+    R(21, 28, 6, 1, L.lips || '#a5605a');
+    if (L.beard) { R(15, 25, 18, 11, L.beard); R(17, 36, 14, 3, L.beard); R(21, 28, 6, 1, '#4a1a10'); R(18, 24, 12, 2, L.beard); }
+    if (L.scar) { R(27, 16, 1, 9, '#a85a4a'); }
+    if (L.circlet) { R(15, 13, 18, 1, '#cfd6ff'); R(23, 11, 2, 3, '#ffffff'); R(22, 12, 4, 1, '#ffffff'); }
+    if (L.crown) {
+      for (let i = 0; i < 6; i++) { R(14 + i * 4, 4 + (i % 2) * 2, 2, 7 - (i % 2) * 2, '#4a1a2a'); R(14 + i * 4, 4 + (i % 2) * 2, 2, 1, '#ff4a5a'); }
+      R(14, 10, 20, 2, '#4a1a2a');
+    }
+    // rim light on the side away from the viewer
+    g.globalAlpha = 0.35; R(32, 13, 1, 20, '#ffffff'); g.globalAlpha = 1;
+    return (cache['p_' + who] = c);
+  };
+  A.portraitURL = function (who) {
+    if (cache['u_' + who]) return cache['u_' + who];
+    return (cache['u_' + who] = A.portrait(who).toDataURL());
+  };
+
+  // ---------------------------------------------------------------- intro panels (320 x 150)
+  A.panel = function (id) {
+    if (cache['panel_' + id]) return cache['panel_' + id];
+    const W = 320, H = 150, c = canvas(W, H), g = c.getContext('2d');
+    const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+    const sky = (a, b) => { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, a); gr.addColorStop(1, b); g.fillStyle = gr; g.fillRect(0, 0, W, H); };
+    const stars = (n, seed) => { let s = seed; for (let i = 0; i < n; i++) { s = (s * 9301 + 49297) % 233280; const x = s % W; s = (s * 9301 + 49297) % 233280; R(x, s % 90, 1, 1, '#e8ecff'); } };
+    const tri = (x1, y1, x2, y2, x3, y3, col) => { g.fillStyle = col; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.lineTo(x3, y3); g.fill(); };
+    const person = (x, y, h, col, extra) => { R(x - 3, y - h, 6, h - 6, col); R(x - 2, y - h - 6, 5, 6, col); R(x - 3, y - 6, 2, 6, col); R(x + 1, y - 6, 2, 6, col); if (extra) extra(x, y); };
+
+    if (id === 'woods') {
+      sky('#1a2348', '#5a6a98'); stars(40, 3);
+      g.fillStyle = '#0f1530';
+      for (let i = 0; i < 14; i++) { const x = i * 25 + (i % 3) * 6, h = 60 + (i % 4) * 14; tri(x, 120 - h, x - 14, 122, x + 14, 122, '#121a3a'); }
+      R(0, 118, W, 32, '#dfe8ff'); R(0, 118, W, 2, '#ffffff');
+      person(140, 120, 26, '#2a2238', (x) => { g.strokeStyle = '#6a4a2a'; g.beginPath(); g.arc(x + 6, 102, 9, -1.3, 1.3); g.stroke(); });
+      person(160, 120, 22, '#3a2a4a'); person(174, 120, 18, '#4a3a5a');
+      R(138, 92, 6, 3, '#d8653a');
+    } else if (id === 'mountain') {
+      sky('#120610', '#3a0f1e');
+      tri(160, 10, 20, 150, 300, 150, '#0a0306'); tri(160, 10, 120, 70, 200, 70, '#1a0810');
+      R(150, 110, 20, 40, '#ff4a5a'); R(152, 112, 16, 38, '#ff9aa8');
+      for (let i = 0; i < 7; i++) { R(128 + i * 9, 26 - (i % 2) * 5, 3, 12 + (i % 2) * 5, '#5a1a2a'); R(128 + i * 9, 26 - (i % 2) * 5, 3, 2, '#ff4a5a'); }
+      R(128, 36, 64, 3, '#5a1a2a');
+      person(160, 150, 22, '#0a0306');
+    } else if (id === 'sparks') {
+      sky('#0a0c20', '#1a1440'); stars(60, 7);
+      R(110, 118, 100, 6, '#2a2a4a'); R(130, 112, 60, 6, '#3a3a5a');
+      const cols = ['#ff8a3a', '#9fd8ff', '#8a6aff', '#ffe08a', '#4ad8c8', '#7ad86a', '#f0f4ff'];
+      cols.forEach((col, i) => {
+        const a = Math.PI + (i + 0.5) / 7 * Math.PI, x = 160 + Math.cos(a) * 90, y = 112 + Math.sin(a) * 80;
+        const gr = g.createRadialGradient(x, y, 1, x, y, 14); gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = gr; g.fillRect(x - 14, y - 14, 28, 28); R(x - 2, y - 2, 4, 4, '#ffffff');
+        g.strokeStyle = col; g.globalAlpha = 0.35; g.beginPath(); g.moveTo(x, y); g.lineTo(160, 108); g.stroke(); g.globalAlpha = 1;
+      });
+      R(140, 106, 40, 6, '#f6dcc6'); R(176, 104, 8, 8, '#d8653a');
+    } else if (id === 'caelum') {
+      sky('#0c0a24', '#3a2a6a'); stars(90, 11);
+      const gr = g.createRadialGradient(240, 120, 4, 240, 120, 80); gr.addColorStop(0, 'rgba(255,210,122,0.6)'); gr.addColorStop(1, 'rgba(255,210,122,0)');
+      g.fillStyle = gr; g.fillRect(140, 30, 200, 120);
+      for (let i = 0; i < 9; i++) { const x = 200 + i * 10, h = 20 + (i % 3) * 14; R(x, 140 - h, 7, h + 10, '#1a1640'); R(x + 2, 140 - h + 4, 2, 2, '#ffd27a'); }
+      g.fillStyle = '#05040e';
+      g.beginPath(); g.moveTo(110, 70); g.quadraticCurveTo(40, 30, 20, 90); g.lineTo(60, 80); g.lineTo(50, 110); g.lineTo(100, 96); g.fill();
+      g.beginPath(); g.moveTo(130, 70); g.quadraticCurveTo(200, 30, 220, 90); g.lineTo(180, 80); g.lineTo(190, 110); g.lineTo(140, 96); g.fill();
+      g.beginPath(); g.arc(120, 52, 8, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.moveTo(108, 64); g.lineTo(132, 64); g.lineTo(140, 150); g.lineTo(100, 150); g.closePath(); g.fill();
+      R(116, 58, 8, 8, '#05040e');
+      R(119, 40, 2, 5, '#ffffff'); R(116, 42, 8, 1, '#ffffff');
+    } else if (id === 'ships') {
+      sky('#1a0c0a', '#4a1c14');
+      R(0, 100, W, 50, '#140a12'); for (let x = 0; x < W; x += 12) R(x, 100 + (x % 24 === 0 ? 0 : 2), 8, 1, '#5a2a22');
+      for (let i = 0; i < 5; i++) {
+        const x = 30 + i * 62, y = 102 - (i % 2) * 6, s = 1 - (i % 2) * 0.25;
+        R(x, y - 6 * s, 40 * s, 8 * s, '#2a2a30'); R(x + 18 * s, y - 40 * s, 2, 34 * s, '#2a2a30');
+        tri(x + 20 * s, y - 38 * s, x + 20 * s, y - 12 * s, x + 38 * s, y - 14 * s, '#8a1a14');
+      }
+      for (let i = 0; i < 5; i++) R(132 + i * 12, 14 + (i % 2 ? 4 : 0), 6, 14 - (i % 2 ? 4 : 0), '#6a6a74');
+      R(130, 26, 62, 6, '#6a6a74');
+    }
+    return (cache['panel_' + id] = c);
+  };
+
+  // ---------------------------------------------------------------- people in the world (feet at x, y)
+  A.npc = function (ctx, n, t) {
+    if (n.hidden) return;
+    const x = Math.round(n.x), y = Math.round(n.y), f = n.facing || 1;
+    const R = (dx, dy, w, h, col) => { ctx.fillStyle = col; ctx.fillRect(x + (f > 0 ? dx : -dx - w), y + dy, w, h); };
+    const breathe = Math.round(Math.sin(t * 0.05 + x) * 0.8);
+    // a soft glow so people read against the dark
+    const gl = ctx.createRadialGradient(x, y - 24, 4, x, y - 24, 36);
+    gl.addColorStop(0, n.glow || 'rgba(200,190,255,0.14)'); gl.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = gl; ctx.fillRect(x - 36, y - 60, 72, 72);
+    if (n.id === 'caelum') {
+      // folded wings
+      R(-12, -50 + breathe, 7, 40, '#0a0818'); R(-10, -54 + breathe, 5, 6, '#0a0818'); R(-12, -48 + breathe, 1, 36, '#6a5aa8');
+      R(-4, -16, 4, 16, '#100e22'); R(1, -16, 4, 16, '#100e22');
+      R(-7, -38 + breathe, 14, 26, '#1c1838'); R(-7, -14, 15, 3, '#1c1838');
+      R(-1, -38 + breathe, 2, 26, '#cfd6ff');
+      R(-5, -49 + breathe, 10, 11, '#ecd5c8'); R(-6, -51 + breathe, 12, 5, '#1a1530'); R(-6, -48 + breathe, 3, 7, '#1a1530');
+      R(2, -45 + breathe, 2, 2, '#a58bff'); R(-5, -47 + breathe, 10, 1, '#cfd6ff');
+      R(-7, -46 + breathe, 2, 3, '#ecd5c8'); R(-8, -48 + breathe, 1, 2, '#ecd5c8');
+    } else if (n.id === 'bram') {
+      R(-6, -16, 5, 16, '#3a2a20'); R(2, -16, 5, 16, '#3a2a20');
+      R(-10, -36 + breathe, 20, 22, '#a8743a'); R(-10, -36 + breathe, 20, 3, '#d9a060'); R(-11, -20, 22, 4, '#5a3a1c');
+      R(-14, -34 + breathe, 5, 14, '#d9a77f'); R(10, -34 + breathe, 5, 14, '#d9a77f');
+      R(-5, -48 + breathe, 11, 12, '#d9a77f'); R(-5, -49 + breathe, 11, 2, '#3a2a20');
+      R(-5, -41 + breathe, 11, 7, '#8a4426'); R(2, -45 + breathe, 2, 2, '#2a1a10');
+    } else if (n.id === 'iris') {
+      R(-7, -30 + breathe, 14, 30, '#4f88c0'); R(-7, -30 + breathe, 3, 30, '#2f5a88');
+      R(-4, -40 + breathe, 9, 10, '#f2d9c8'); R(-5, -42 + breathe, 11, 4, '#f4f0ff'); R(-3, -47 + breathe, 6, 5, '#f4f0ff');
+      R(2, -36 + breathe, 2, 2, '#8fd8ff');
+      ctx.strokeStyle = '#ffe9a8'; ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.moveTo(x + f * 6, y - 20);
+      ctx.bezierCurveTo(x + f * 16, y - 34 + Math.sin(t * 0.05) * 4, x + f * 22, y - 10, x + f * 30, y - 26); ctx.stroke(); ctx.globalAlpha = 1;
+    }
+    // name tag, and a speech bubble when they have something to say
+    if (n.near || n.bubble) {
+      ctx.font = 'bold 10px system-ui, sans-serif'; ctx.textAlign = 'center';
+      const name = SH.STORY.CAST[n.id].name;
+      ctx.fillStyle = 'rgba(8,8,24,0.75)'; const tw = ctx.measureText(name).width + 8;
+      ctx.fillRect(x - tw / 2, y - 72, tw, 13);
+      ctx.fillStyle = SH.STORY.CAST[n.id].color; ctx.fillText(name, x, y - 62);
+    }
+    if (n.bubble) {
+      const by = y - 86 + Math.round(Math.sin(t * 0.1) * 2);
+      ctx.fillStyle = '#fff6d8'; ctx.fillRect(x - 9, by, 18, 11); ctx.fillRect(x - 3, by + 11, 4, 3);
+      ctx.fillStyle = '#1c1430'; for (let i = 0; i < 3; i++) ctx.fillRect(x - 6 + i * 5, by + 5, 2, 2);
+    }
+  };
+})(window.SH = window.SH || {});

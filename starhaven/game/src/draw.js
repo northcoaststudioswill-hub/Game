@@ -1,12 +1,10 @@
 // Starhaven — drawing. Placeholder art with a fixed direction: moody painted-style depth behind,
-// a near-black play layer with moonlit edges, and a bright, clearly outlined Wren in front.
+// a near-black play layer with lit edges, and a bright, clearly outlined Wren in front.
+// Each place has its own palette (DESIGN.md "Palette by place"): the Deep in pale greens and roses,
+// the road at dusk in violet and rose, Starhaven in night blues and starlight gold, the Thornwood in cold blue.
 (function (SH) {
   const PAL = {
-    skyTop: '#090b20', skyMid: '#191a45', skyLow: '#33295c', horizon: '#4d3a72',
     star: '#ffffff', starDim: '#a9b8ff',
-    farRidge: '#23275a', nearRidge: '#181b42', ridgeLight: '#3a4088',
-    trees: '#11132e', treesLight: '#1f2350',
-    ground: '#0a0b17', groundSpeck: '#121430', edgeLight: '#c3cdff', edgeMid: '#56609c', grass: '#5ba39a', grassDark: '#2f6a66',
     plank: '#29233f', plankTop: '#cbb8ff',
     thornDark: '#2a1024', thornMid: '#5a1d3e', thornTip: '#ff5a78',
     gold: '#ffd27a', goldDeep: '#d9973f', warm: '#ffe9a8',
@@ -16,76 +14,140 @@
   };
   SH.PAL = PAL;
 
+  const THEMES = {
+    deep: {
+      sky: ['#050807', '#0b1411', '#13201b', '#1b2a22'], stars: false, far: 'cave', mid: 'roots',
+      farA: '#132019', farB: '#0d1712', midC: '#08100c', mist: 'rgba(150,220,180,0.10)', glow: 'rgba(255,140,170,0.20)',
+      ground: '#060908', speck: '#0d1611', edgeLight: '#d6f0dc', edgeMid: '#4f7a62', grass: '#8ccaa8', grassDark: '#3f6a58', side: '#16261e',
+      motes: ['#cfeedd', '#ffb8c8'],
+    },
+    dusk: {
+      sky: ['#0d0c26', '#2a2058', '#5a3270', '#9a5070'], stars: true, far: 'mountains', mid: 'trees',
+      farA: '#2e2560', farB: '#221b4a', midC: '#16123a', mist: 'rgba(255,150,170,0.12)',
+      ground: '#0b0a18', speck: '#151230', edgeLight: '#ffd6e0', edgeMid: '#8a5a8a', grass: '#7aa89a', grassDark: '#3f6a66', side: '#241c46',
+      motes: ['#ffe9a8', '#ffc0d0'],
+    },
+    city: {
+      sky: ['#070a22', '#151a48', '#2a2a60', '#3a3270'], stars: true, far: 'mountains', mid: 'spires',
+      farA: '#1e2458', farB: '#161b46', midC: '#121540', mist: 'rgba(150,140,230,0.12)',
+      ground: '#0b0b1a', speck: '#141632', edgeLight: '#e6dcff', edgeMid: '#6a62a8', grass: '#6a7ab8', grassDark: '#3a4278', side: '#22264e',
+      motes: ['#ffe9a8', '#fff6d8'],
+    },
+    thornwood: {
+      sky: ['#090b20', '#191a45', '#33295c', '#4d3a72'], stars: true, far: 'mountains', mid: 'trees',
+      farA: '#23275a', farB: '#181b42', midC: '#11132e', mist: 'rgba(110,100,190,0.18)',
+      ground: '#0a0b17', speck: '#121430', edgeLight: '#c3cdff', edgeMid: '#56609c', grass: '#5ba39a', grassDark: '#2f6a66', side: '#20264d',
+      motes: ['#cfe0ff', '#ffe9a8'],
+    },
+  };
+  SH.THEMES = THEMES;
+
   // Deterministic random so the art is the same every time.
   function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
 
   const D = {};
-  let room, layers = {};
+  let room, layers = { bg: {} };
 
   D.init = function (r, viewW) {
     room = r;
-    layers.level = makeLevel(r);
-    D.resize(viewW);
-    if (!layers.mountains) layers.mountains = makeMountains();
-    if (!layers.trees) layers.trees = makeTrees();
+    const def = r.def;
+    layers.level = makeLevel(r, THEMES[def.theme]);
+    const themes = def.zones ? def.zones.map(z => z.theme) : [def.theme];
+    for (const th of themes) if (!layers.bg[th]) layers.bg[th] = makeBackdrop(THEMES[th], th);
     if (!layers.stars) layers.stars = makeStars();
+    D.resize(viewW);
   };
   D.resize = function (viewW) {
     layers.viewW = viewW;
-    layers.sky = makeSky(viewW);
     layers.vignette = makeVignette(viewW);
   };
 
   function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 
-  function makeSky(w) {
-    const c = canvas(w, 360), g = c.getContext('2d');
+  function makeBackdrop(T, name) {
+    const out = {};
+    const s = canvas(16, 360), g = s.getContext('2d');
     const gr = g.createLinearGradient(0, 0, 0, 360);
-    gr.addColorStop(0, PAL.skyTop); gr.addColorStop(0.45, PAL.skyMid); gr.addColorStop(0.78, PAL.skyLow); gr.addColorStop(1, PAL.horizon);
-    g.fillStyle = gr; g.fillRect(0, 0, w, 360);
-    return c;
+    gr.addColorStop(0, T.sky[0]); gr.addColorStop(0.45, T.sky[1]); gr.addColorStop(0.78, T.sky[2]); gr.addColorStop(1, T.sky[3]);
+    g.fillStyle = gr; g.fillRect(0, 0, 16, 360);
+    out.sky = s;
+    out.far = T.far === 'cave' ? makeCave(T) : makeMountains(T);
+    out.mid = T.mid === 'roots' ? makeRoots(T) : T.mid === 'spires' ? makeSpires(T) : makeTrees(T);
+    return out;
   }
   function makeStars() {
     const r = rng(7), out = [];
     for (let i = 0; i < 140; i++) out.push({ x: r() * 2400, y: r() * 230, s: r() < 0.12 ? 2 : 1, tw: r() * 6, sp: 0.02 + r() * 0.05 });
     return out;
   }
-  function ridge(g, r, w, base, amp, color, light) {
+  function ridge(g, w, base, amp, color, light, seed) {
     g.fillStyle = color; g.beginPath(); g.moveTo(0, 360);
-    let y = base, pts = [];
+    const pts = [];
     for (let x = 0; x <= w; x += 8) {
-      const n = Math.sin(x * 0.004 + 1.3) * amp + Math.sin(x * 0.011) * amp * 0.45 + Math.sin(x * 0.031 + 2) * amp * 0.12;
-      y = base - Math.abs(n);
-      pts.push([x, y]); g.lineTo(x, y);
+      const n = Math.sin(x * 0.004 + seed) * amp + Math.sin(x * 0.011 + seed * 2) * amp * 0.45 + Math.sin(x * 0.031 + 2) * amp * 0.12;
+      const y = base - Math.abs(n); pts.push([x, y]); g.lineTo(x, y);
     }
     g.lineTo(w, 360); g.closePath(); g.fill();
     if (light) { g.strokeStyle = light; g.globalAlpha = 0.5; g.lineWidth = 1; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); g.globalAlpha = 1; }
   }
-  function makeMountains() {
-    const w = 1600, c = canvas(w, 360), g = c.getContext('2d'), r = rng(3);
-    ridge(g, r, w, 250, 80, PAL.farRidge, PAL.ridgeLight);
-    // a soft mist band between ridges
-    const m = g.createLinearGradient(0, 200, 0, 300); m.addColorStop(0, 'rgba(120,110,200,0)'); m.addColorStop(1, 'rgba(120,110,200,0.22)');
+  function makeMountains(T) {
+    const w = 1600, c = canvas(w, 360), g = c.getContext('2d');
+    ridge(g, w, 250, 80, T.farA, 'rgba(255,255,255,0.25)', 1.3);
+    const m = g.createLinearGradient(0, 200, 0, 300); m.addColorStop(0, 'rgba(0,0,0,0)'); m.addColorStop(1, T.mist);
     g.fillStyle = m; g.fillRect(0, 200, w, 160);
-    ridge(g, r, w, 300, 46, PAL.nearRidge, null);
+    ridge(g, w, 300, 46, T.farB, null, 2.1);
     return c;
   }
-  function makeTrees() {
+  function makeTrees(T) {
     const w = 1400, c = canvas(w, 360), g = c.getContext('2d'), r = rng(11);
     for (let i = 0; i < 26; i++) {
       const x = r() * w, top = 70 + r() * 150, tw = 5 + r() * 9;
-      g.fillStyle = PAL.trees;
+      g.fillStyle = T.midC;
       g.fillRect(x, top, tw, 360 - top);
-      // branches and leaf masses
       for (let b = 0; b < 4; b++) {
         const by = top + 10 + r() * 90, dir = r() < 0.5 ? -1 : 1, len = 14 + r() * 26;
-        g.save(); g.translate(x + tw / 2, by); g.rotate(dir * (0.5 + r() * 0.5) - Math.PI / 2 * 0);
-        g.fillRect(0, -1.5, dir * len, 3); g.restore();
+        g.save(); g.translate(x + tw / 2, by); g.rotate(dir * (0.5 + r() * 0.5)); g.fillRect(0, -1.5, dir * len, 3); g.restore();
       }
       g.beginPath(); g.ellipse(x + tw / 2, top + 6, 22 + r() * 22, 14 + r() * 12, 0, 0, Math.PI * 2); g.fill();
-      g.fillStyle = PAL.treesLight; g.globalAlpha = 0.5; g.fillRect(x + tw - 1, top + 8, 1, 360 - top); g.globalAlpha = 1;
     }
-    g.fillStyle = PAL.trees; g.fillRect(0, 330, w, 30);
+    g.fillStyle = T.midC; g.fillRect(0, 330, w, 30);
+    return c;
+  }
+  function makeSpires(T) {
+    // Starhaven's skyline: towers with gold windows
+    const w = 1500, c = canvas(w, 360), g = c.getContext('2d'), r = rng(31);
+    for (let i = 0; i < 40; i++) {
+      const x = r() * w, bw = 14 + r() * 26, top = 120 + r() * 140;
+      g.fillStyle = T.midC; g.fillRect(x, top, bw, 360 - top);
+      g.beginPath(); g.moveTo(x - 2, top); g.lineTo(x + bw / 2, top - 14 - r() * 20); g.lineTo(x + bw + 2, top); g.fill();
+      for (let wy = top + 8; wy < 330; wy += 12) for (let wx = x + 4; wx < x + bw - 4; wx += 8) if (r() < 0.35) { g.fillStyle = r() < 0.5 ? '#ffd27a' : '#c9a050'; g.fillRect(wx, wy, 2, 3); }
+    }
+    return c;
+  }
+  function makeCave(T) {
+    // the Deep: far rock walls and a faint rose glow from somewhere below
+    const w = 1400, c = canvas(w, 360), g = c.getContext('2d'), r = rng(5);
+    for (let i = 0; i < 9; i++) {
+      const x = r() * w, gr = g.createRadialGradient(x, 200 + r() * 80, 4, x, 240, 140);
+      gr.addColorStop(0, T.glow); gr.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = gr; g.fillRect(x - 140, 100, 280, 260);
+    }
+    g.fillStyle = T.farA;
+    for (let x = 0; x < w; x += 40) { const h = 60 + r() * 120; g.fillRect(x, 0, 42, h); g.beginPath(); g.moveTo(x, h); g.lineTo(x + 20, h + 20 + r() * 40); g.lineTo(x + 42, h); g.fill(); }
+    for (let x = 0; x < w; x += 50) { const h = 40 + r() * 90; g.fillRect(x, 360 - h, 52, h); }
+    return c;
+  }
+  function makeRoots(T) {
+    const w = 1200, c = canvas(w, 360), g = c.getContext('2d'), r = rng(9);
+    g.strokeStyle = T.midC; g.lineCap = 'round';
+    for (let i = 0; i < 30; i++) {
+      let x = r() * w, y = 0; g.lineWidth = 2 + r() * 5; g.beginPath(); g.moveTo(x, y);
+      const len = 80 + r() * 200;
+      while (y < len) { x += (r() - 0.5) * 18; y += 12; g.lineTo(x, y); }
+      g.stroke();
+    }
+    g.fillStyle = T.midC;
+    for (let x = 0; x < w; x += 30) { const h = 20 + r() * 50; g.beginPath(); g.moveTo(x, 360); g.lineTo(x + 15, 360 - h); g.lineTo(x + 30, 360); g.fill(); }
     return c;
   }
   function makeVignette(w) {
@@ -96,24 +158,28 @@
     return c;
   }
 
-  function makeLevel(r) {
+  function makeLevel(r, T) {
     const TS = SH.TILE, c = canvas(r.pxW, r.pxH), g = c.getContext('2d'), rand = rng(21);
     const get = (x, y) => r.get(x, y);
     const solid = (x, y) => get(x, y) === SH.T_SOLID;
     for (let ty = 0; ty < r.h; ty++) for (let tx = 0; tx < r.w; tx++) {
       const t = get(tx, ty), x = tx * TS, y = ty * TS;
       if (t === SH.T_SOLID) {
-        g.fillStyle = PAL.ground; g.fillRect(x, y, TS, TS);
-        for (let i = 0; i < 3; i++) { g.fillStyle = PAL.groundSpeck; g.fillRect(x + ((rand() * TS) | 0), y + ((rand() * TS) | 0), 2, 2); }
-        const openUp = !solid(tx, ty - 1), openL = !solid(tx - 1, ty), openR = !solid(tx + 1, ty);
-        if (openL) { g.fillStyle = '#20264d'; g.fillRect(x, y, 2, TS); }
-        if (openR) { g.fillStyle = '#20264d'; g.fillRect(x + TS - 2, y, 2, TS); }
+        g.fillStyle = T.ground; g.fillRect(x, y, TS, TS);
+        for (let i = 0; i < 3; i++) { g.fillStyle = T.speck; g.fillRect(x + ((rand() * TS) | 0), y + ((rand() * TS) | 0), 2, 2); }
+        const openUp = !solid(tx, ty - 1) && ty > 0, openL = !solid(tx - 1, ty), openR = !solid(tx + 1, ty), openDown = !solid(tx, ty + 1) && ty < r.h - 1;
+        if (openL) { g.fillStyle = T.side; g.fillRect(x, y, 2, TS); }
+        if (openR) { g.fillStyle = T.side; g.fillRect(x + TS - 2, y, 2, TS); }
+        if (openDown) { // a roof edge: hanging roots
+          g.fillStyle = T.side; g.fillRect(x, y + TS - 2, TS, 2);
+          if (rand() < 0.5) { g.fillStyle = T.grassDark; g.fillRect(x + ((rand() * TS) | 0), y + TS, 1, 3 + ((rand() * 8) | 0)); }
+        }
         if (openUp) {
-          g.fillStyle = PAL.edgeMid; g.fillRect(x, y + 2, TS, 2);
-          g.fillStyle = PAL.edgeLight; g.fillRect(x, y, TS, 2);
+          g.fillStyle = T.edgeMid; g.fillRect(x, y + 2, TS, 2);
+          g.fillStyle = T.edgeLight; g.fillRect(x, y, TS, 2);
           for (let i = 0; i < 5; i++) {
             const gx = x + ((rand() * TS) | 0), gh = 1 + ((rand() * 4) | 0);
-            g.fillStyle = rand() < 0.5 ? PAL.grass : PAL.grassDark; g.fillRect(gx, y - gh, 1, gh);
+            g.fillStyle = rand() < 0.5 ? T.grass : T.grassDark; g.fillRect(gx, y - gh, 1, gh);
           }
           // Gold glint on a ledge that drops into a pit: "careful, edge here".
           const pitL = openL && r.groundY(tx - 1, ty) === null, pitR = openR && r.groundY(tx + 1, ty) === null;
@@ -140,34 +206,30 @@
 
   // ---------------------------------------------------------------- per frame
   D.frame = function (ctx, w) {
-    const vw = layers.viewW, cam = w.cam, fx = SH.fx, t = w.time;
+    const vw = layers.viewW, cam = w.cam, fx = SH.fx, t = w.time, VH = SH.VIEW_H;
     let sx = 0, sy = 0;
     if (fx.shake > 0) { sx = Math.round((Math.random() - 0.5) * fx.shake * 2); sy = Math.round((Math.random() - 0.5) * fx.shake * 2); }
     const cx = Math.round(cam.x), cy = Math.round(cam.y);
+    const def = w.room.def;
 
-    ctx.drawImage(layers.sky, 0, 0);
-    // stars
-    for (const s of layers.stars) {
-      const x = ((s.x - cx * s.sp) % 2400 + 2400) % 2400;
-      if (x > vw) continue;
-      ctx.globalAlpha = 0.45 + 0.55 * Math.abs(Math.sin(t * 0.03 + s.tw));
-      ctx.fillStyle = s.s > 1 ? PAL.star : PAL.starDim; ctx.fillRect(x, s.y - cy * 0.02, s.s, s.s);
-    }
-    ctx.globalAlpha = 1;
-    drawCity(ctx, w, vw, cx, cy);
-    tile(ctx, layers.mountains, cx * 0.12, 10 - cy * 0.08, vw);
-    ctx.globalAlpha = 0.8; tile(ctx, layers.trees, cx * 0.38, 30 - cy * 0.3, vw); ctx.globalAlpha = 1;
-    // mist in front of the trees
-    const VH = SH.VIEW_H;
-    const mist = ctx.createLinearGradient(0, 180 - cy * 0.3, 0, VH);
-    mist.addColorStop(0, 'rgba(110,100,190,0)'); mist.addColorStop(1, 'rgba(110,100,190,0.20)');
-    ctx.fillStyle = mist; ctx.fillRect(0, 0, vw, VH);
+    // backdrop: one theme, or two blended where the room changes place
+    const zones = def.zones || [{ x: 0, theme: def.theme }];
+    const mid = (cx + vw / 2) / SH.TILE;
+    let zi = 0; for (let i = 0; i < zones.length; i++) if (mid >= zones[i].x - 6) zi = i;
+    drawBackdrop(ctx, w, zones[Math.max(0, zi - 1)].theme, cx, cy, vw, VH, 1);
+    if (zi > 0) { const k = Math.min(1, (mid - (zones[zi].x - 6)) / 12); drawBackdrop(ctx, w, zones[zi].theme, cx, cy, vw, VH, k); }
 
     ctx.save();
     ctx.translate(-cx + sx, -cy + sy);
+    if (def.cityFrom != null) drawStreet(ctx, w, cx, vw, t);
+    if (def.arch != null) drawArch(ctx, w, def.arch);
     ctx.drawImage(layers.level, cx, cy, vw, VH, cx, cy, vw, VH);
+    if (def.house) drawHouse(ctx, w, def.house);
+    if (def.mural) drawMural(ctx, w, def.mural, t);
+    for (const g of w.gates) drawGate(ctx, g);
+    if (def.exitLight != null) drawExitLight(ctx, def.exitLight, t);
     for (const l of w.lanterns) drawLantern(ctx, l, t);
-    for (const s of w.signs) drawSign(ctx, s, t);
+    for (const n of w.npcs) SH.art.npc(ctx, n, t);
     for (const e of w.things) {
       if (e.x < cx - 80 || e.x > cx + vw + 80) continue;
       if (e.kind === 'thornSprite') drawSprite(ctx, e, t);
@@ -176,14 +238,44 @@
     }
     for (const g of fx.ghosts) drawWren(ctx, w.player, { ghost: g });
     drawWren(ctx, w.player, {});
+    if (w.wyrm && w.wyrm.on) drawWyrm(ctx, w.wyrm, cy, t);
     drawParticles(ctx, fx);
     ctx.restore();
 
     ctx.drawImage(layers.vignette, 0, 0);
     if (fx.flash > 0) { ctx.fillStyle = fx.flashColor; ctx.globalAlpha = Math.min(1, fx.flash / 6); ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = 1; }
     if (fx.slowmo > 0) { ctx.fillStyle = 'rgba(120,190,255,0.10)'; ctx.fillRect(0, 0, vw, VH); }
-    if (w.fade > 0) { ctx.fillStyle = '#05050d'; ctx.globalAlpha = Math.min(1, w.fade); ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = 1; }
+    if (w.fade > 0) { ctx.fillStyle = w.fadeColor || '#05050d'; ctx.globalAlpha = Math.min(1, w.fade); ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = 1; }
   };
+
+  function drawBackdrop(ctx, w, theme, cx, cy, vw, VH, alpha) {
+    const T = THEMES[theme], L = layers.bg[theme], t = w.time;
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(L.sky, 0, 0, vw, 360);
+    if (T.stars) {
+      for (const s of layers.stars) {
+        const x = ((s.x - cx * s.sp) % 2400 + 2400) % 2400;
+        if (x > vw) continue;
+        ctx.globalAlpha = alpha * (0.45 + 0.55 * Math.abs(Math.sin(t * 0.03 + s.tw)));
+        ctx.fillStyle = s.s > 1 ? PAL.star : PAL.starDim; ctx.fillRect(x, s.y - cy * 0.02, s.s, s.s);
+      }
+      ctx.globalAlpha = alpha;
+    }
+    if (w.room.def.cityGlowX != null) drawCity(ctx, w, vw, cx, cy);
+    tile(ctx, L.far, cx * 0.12, 10 - cy * 0.08, vw);
+    ctx.globalAlpha = alpha * 0.85; tile(ctx, L.mid, cx * 0.38, 30 - cy * 0.3, vw); ctx.globalAlpha = alpha;
+    const mist = ctx.createLinearGradient(0, 180 - cy * 0.3, 0, VH);
+    mist.addColorStop(0, 'rgba(0,0,0,0)'); mist.addColorStop(1, T.mist);
+    ctx.fillStyle = mist; ctx.fillRect(0, 0, vw, VH);
+    // drifting motes
+    for (let i = 0; i < 22; i++) {
+      const px = ((i * 137 + t * (0.15 + (i % 5) * 0.05) - cx * 0.6) % (vw + 40) + vw + 40) % (vw + 40) - 20;
+      const py = (i * 53 + Math.sin(t * 0.01 + i) * 20 - cy * 0.5 + 400) % VH;
+      ctx.globalAlpha = alpha * (0.3 + 0.3 * Math.sin(t * 0.04 + i));
+      ctx.fillStyle = T.motes[i % 2]; ctx.fillRect(px, py, 2, 2);
+    }
+    ctx.globalAlpha = 1;
+  }
 
   function tile(ctx, img, ox, oy, vw) {
     const iw = img.width; let x = -(((ox % iw) + iw) % iw);
@@ -203,11 +295,112 @@
     for (const [dx, h] of spires) { ctx.fillRect(x + dx, y - h, 6, h + 20); ctx.beginPath(); ctx.moveTo(x + dx, y - h); ctx.lineTo(x + dx + 3, y - h - 8); ctx.lineTo(x + dx + 6, y - h); ctx.fill(); }
     ctx.fillStyle = PAL.gold;
     for (const [dx, h] of spires) for (let k = 6; k < h; k += 8) ctx.fillRect(x + dx + 2, y - h + k, 2, 2);
-    // the guiding star above the city
     const tw = 0.7 + 0.3 * Math.sin(w.time * 0.05);
-    ctx.globalAlpha = tw; ctx.fillStyle = '#fff6d8';
+    ctx.save(); ctx.globalAlpha *= tw; ctx.fillStyle = '#fff6d8';
     ctx.fillRect(x - 1, y - 74, 3, 3); ctx.fillRect(x - 5, y - 73, 11, 1); ctx.fillRect(x, y - 79, 1, 13);
-    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  // ---------------------------------------------------------------- Starhaven pieces
+  // House fronts along the street. Their windows light up as the street is restored (w.cityLight 0..1).
+  function drawStreet(ctx, w, cx, vw, t) {
+    const TS = SH.TILE, def = w.room.def, x0 = def.cityFrom * TS, x1 = (def.cityTo != null ? def.cityTo : def.house ? def.house.x0 : def.width) * TS;
+    const gy = 16 * TS, light = w.cityLight || 0;
+    if (!w.street) { // lay the street out once per room so it never shifts
+      const r = rng(77); w.street = [];
+      for (let x = x0; x < x1;) {
+        const b = { x, bw: 70 + ((r() * 50) | 0), bh: 90 + ((r() * 70) | 0), hue: r(), wins: [] };
+        for (let wy = gy - b.bh + 14; wy < gy - 26; wy += 22) for (let wx = x + 10; wx < x + b.bw - 22; wx += 22) b.wins.push({ wx, wy, k: r() });
+        w.street.push(b); x += b.bw;
+      }
+    }
+    for (const b of w.street) {
+      const x = b.x, bw = b.bw, bh = b.bh;
+      if (x + bw < cx - 20 || x > cx + vw + 20) continue;
+      ctx.fillStyle = b.hue < 0.5 ? '#1a1838' : '#201c40'; ctx.fillRect(x, gy - bh, bw - 6, bh);
+      ctx.fillStyle = '#2c2856'; ctx.beginPath(); ctx.moveTo(x - 4, gy - bh); ctx.lineTo(x + (bw - 6) / 2, gy - bh - 22); ctx.lineTo(x + bw - 2, gy - bh); ctx.fill();
+      for (const { wx, wy, k } of b.wins) {
+        const on = k < light * 1.1;
+        ctx.fillStyle = on ? (Math.sin(t * 0.05 + wx) > -0.9 ? '#ffd98a' : '#e8b860') : '#0e0c22';
+        ctx.fillRect(wx, wy, 9, 12);
+        if (on) { ctx.globalAlpha = 0.18; ctx.fillStyle = '#ffd27a'; ctx.fillRect(wx - 6, wy - 6, 21, 24); ctx.globalAlpha = 1; }
+      }
+      ctx.fillStyle = '#0c0a1e'; ctx.fillRect(x + (bw - 6) / 2 - 7, gy - 26, 14, 26);
+    }
+    // street lamps
+    for (let lx = x0 + 60; lx < x1; lx += 200) {
+      const on = light > 0.3;
+      if (on) { const g = ctx.createRadialGradient(lx, gy - 54, 2, lx, gy - 54, 50); g.addColorStop(0, 'rgba(255,214,130,0.4)'); g.addColorStop(1, 'rgba(255,214,130,0)'); ctx.fillStyle = g; ctx.fillRect(lx - 50, gy - 104, 100, 100); }
+      ctx.fillStyle = '#16142c'; ctx.fillRect(lx - 1, gy - 50, 3, 50); ctx.fillRect(lx - 5, gy - 58, 11, 8);
+      ctx.fillStyle = on ? PAL.warm : '#2a2850'; ctx.fillRect(lx - 3, gy - 56, 7, 5);
+    }
+  }
+  function drawArch(ctx, w, ax) {
+    const TS = SH.TILE, x = ax * TS, gy = 16 * TS;
+    ctx.fillStyle = '#1e1a3c';
+    ctx.fillRect(x - 40, gy - 120, 16, 120); ctx.fillRect(x + 24, gy - 120, 16, 120);
+    ctx.beginPath(); ctx.moveTo(x - 44, gy - 116); ctx.quadraticCurveTo(x, gy - 170, x + 44, gy - 116); ctx.lineTo(x + 44, gy - 104); ctx.quadraticCurveTo(x, gy - 150, x - 44, gy - 104); ctx.fill();
+    ctx.fillStyle = PAL.gold; ctx.fillRect(x - 1, gy - 150, 3, 10); ctx.fillRect(x - 5, gy - 146, 11, 2);
+    ctx.font = 'bold 9px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#cfc4ff'; ctx.fillText('STARHAVEN', x, gy - 128);
+  }
+  function drawHouse(ctx, w, h) {
+    const TS = SH.TILE, x0 = h.x0 * TS, x1 = h.x1 * TS, top = h.top * TS, gy = 16 * TS;
+    ctx.fillStyle = '#1c1a3a'; ctx.fillRect(x0, top + 4, x1 - x0, gy - top - 4);
+    ctx.fillStyle = '#d6ccff'; ctx.fillRect(x0, top, x1 - x0, 2);
+    const light = w.cityLight || 0;
+    for (let x = x0 + 18; x < x1 - 30; x += 40) { ctx.fillStyle = light > 0.5 ? '#ffd98a' : '#0e0c22'; ctx.fillRect(x, top + 26, 14, 18); ctx.fillRect(x, top + 74, 14, 18); }
+    ctx.fillStyle = '#3a2a1e'; ctx.fillRect(x1 - 52, gy - 40, 22, 40); ctx.fillStyle = PAL.gold; ctx.fillRect(x1 - 34, gy - 22, 2, 2);
+    // rooftop rail and a lantern
+    ctx.fillStyle = '#2a2650'; for (let x = x0; x < x1; x += 10) ctx.fillRect(x, top - 10, 2, 10); ctx.fillRect(x0, top - 12, x1 - x0, 2);
+  }
+  function drawMural(ctx, w, m, t) {
+    const TS = SH.TILE, x = m.x * TS, wd = m.w * TS, gy = 16 * TS, ht = 96, y = gy - ht - 6;
+    ctx.fillStyle = '#2a2648'; ctx.fillRect(x - 4, y - 4, wd + 8, ht + 10);
+    ctx.fillStyle = '#4a4668'; ctx.fillRect(x, y, wd, ht);
+    for (let by = y; by < y + ht; by += 12) { ctx.fillStyle = '#3e3a5c'; ctx.fillRect(x, by, wd, 1); }
+    const k = w.muralProgress || 0;
+    if (k > 0) {
+      ctx.save(); ctx.beginPath(); ctx.rect(x, y, wd * k, ht); ctx.clip();
+      const g = ctx.createLinearGradient(0, y, 0, y + ht); g.addColorStop(0, '#1a2a7a'); g.addColorStop(0.6, '#6a3a9a'); g.addColorStop(1, '#ff9a7a');
+      ctx.fillStyle = g; ctx.fillRect(x, y, wd, ht);
+      ctx.fillStyle = '#fff6d8'; for (let i = 0; i < 14; i++) ctx.fillRect(x + (i * 37) % wd, y + 6 + (i * 13) % 40, 2, 2);
+      ctx.fillStyle = '#ffd27a'; ctx.beginPath(); ctx.arc(x + wd * 0.75, y + 24, 12, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#1a1438';
+      for (let i = 0; i < 7; i++) { const bx = x + 8 + i * 15, bh = 20 + (i % 3) * 12; ctx.fillRect(bx, y + ht - bh, 11, bh); }
+      ctx.fillStyle = '#ffd27a'; for (let i = 0; i < 7; i++) ctx.fillRect(x + 12 + i * 15, y + ht - 14, 3, 3);
+      ctx.restore();
+      if (k < 1) { ctx.fillStyle = '#fff6d8'; ctx.fillRect(x + wd * k - 1, y, 2, ht); }
+    }
+    if (w.muralNear && k < 1) {
+      const bob = Math.round(Math.sin(t * 0.1) * 2);
+      ctx.fillStyle = PAL.gold; ctx.fillRect(x + wd / 2 - 1, y - 18 + bob, 3, 8); ctx.fillRect(x + wd / 2 - 1, y - 8 + bob, 3, 3);
+    }
+  }
+  function drawGate(ctx, g) {
+    if (!g.closed && (g.lift || 0) >= 1) return;
+    const TS = SH.TILE, x = g.x * TS, top = g.top * TS, bot = g.bottom * TS, lift = (g.lift || 0) * (bot - top);
+    ctx.fillStyle = '#3a2a1e'; ctx.fillRect(x + 2, top - lift, TS - 4, bot - top);
+    ctx.fillStyle = '#5a4430'; for (let y = top - lift + 6; y < bot - lift; y += 14) ctx.fillRect(x + 2, y, TS - 4, 3);
+    ctx.fillStyle = '#ffd27a'; ctx.fillRect(x + TS / 2 - 2, bot - lift - 40, 4, 4);
+  }
+  function drawExitLight(ctx, ex, t) {
+    const TS = SH.TILE, x = ex * TS + TS / 2;
+    const g = ctx.createRadialGradient(x, 300, 6, x, 300, 150 + Math.sin(t * 0.05) * 10);
+    g.addColorStop(0, 'rgba(255,250,230,0.85)'); g.addColorStop(0.3, 'rgba(255,220,180,0.35)'); g.addColorStop(1, 'rgba(255,220,180,0)');
+    ctx.fillStyle = g; ctx.fillRect(x - 160, 140, 320, 280);
+    ctx.fillStyle = 'rgba(255,252,240,0.9)'; ctx.fillRect(x - 10, 96, 20, 288);
+  }
+  function drawWyrm(ctx, wy, cy, t) {
+    // the Deep Wyrm: a wall of dark coils with pale eyes, filling everything behind its front edge
+    const x = wy.x, top = cy - 20, bot = cy + SH.VIEW_H + 20;
+    ctx.fillStyle = '#020403'; ctx.fillRect(x - 2000, top, 2000, bot - top);
+    ctx.beginPath(); ctx.moveTo(x, top);
+    for (let y = top; y <= bot; y += 16) ctx.lineTo(x + 18 + Math.sin(y * 0.05 + t * 0.2) * 14, y);
+    ctx.lineTo(x - 10, bot); ctx.fill();
+    ctx.fillStyle = '#d6f0dc';
+    const ey = cy + 150 + Math.sin(t * 0.07) * 10;
+    ctx.fillRect(x - 6, ey, 10, 4); ctx.fillRect(x - 6, ey + 30, 10, 4);
+    ctx.fillStyle = '#ff7a8a'; ctx.fillRect(x - 2, ey + 1, 3, 2); ctx.fillRect(x - 2, ey + 31, 3, 2);
   }
 
   function drawParticles(ctx, fx) {
@@ -249,19 +442,6 @@
     if (big) {
       ctx.fillStyle = l.lit ? '#fff6d8' : '#5a5590';
       ctx.fillRect(x - 1, y - h - 22, 2, 10); ctx.fillRect(x - 5, y - h - 18, 10, 2);
-    }
-  }
-
-  function drawSign(ctx, s, t) {
-    const x = s.px, y = s.py;
-    ctx.fillStyle = '#2a2140'; ctx.fillRect(x - 2, y - 24, 4, 24);
-    ctx.fillStyle = s.read ? '#3a2f55' : '#4a3a6a'; ctx.fillRect(x - 14, y - 34, 28, 16);
-    ctx.fillStyle = s.near ? PAL.gold : '#a99ad8'; ctx.fillRect(x - 14, y - 34, 28, 2);
-    ctx.fillStyle = '#d8ccff';
-    for (let i = 0; i < 3; i++) ctx.fillRect(x - 9, y - 29 + i * 4, 18 - (i === 2 ? 6 : 0), 1);
-    if (!s.read && !s.near) {
-      const bob = Math.round(Math.sin(t * 0.1) * 2);
-      ctx.fillStyle = PAL.gold; ctx.fillRect(x - 1, y - 48 + bob, 3, 7); ctx.fillRect(x - 1, y - 39 + bob, 3, 3);
     }
   }
 
@@ -348,6 +528,7 @@
     const pose = g ? g.pose : poseOf(p);
     const a = p.anim;
     const tint = g ? 'rgba(140,220,255,' + (0.35 * g.life / g.max).toFixed(3) + ')' : null;
+    if (!g && p.hidden) return;
     const flicker = !g && p.invuln > 0 && Math.floor(p.invuln / 3) % 2 === 0 && p.stun <= 0;
     if (flicker) return;
 

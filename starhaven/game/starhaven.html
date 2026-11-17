@@ -11,37 +11,57 @@
 <style>
 :root {
   --ink: #f3eeff; --ink-dim: #b9b2dd; --gold: #ffd27a; --gold-deep: #d9973f;
-  --panel: rgba(12, 12, 34, 0.86); --panel-line: rgba(255, 210, 122, 0.35);
+  --panel: rgba(12, 12, 34, 0.88); --panel-line: rgba(255, 210, 122, 0.35);
   --night: #090b20; --danger: #ff6f86;
+  --display: 'Cinzel', Georgia, 'Times New Roman', serif;
+  --body: 'Nunito', system-ui, -apple-system, sans-serif;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; height: 100%; background: var(--night); overflow: hidden; color: var(--ink);
-  font-family: 'Nunito', system-ui, -apple-system, sans-serif; -webkit-user-select: none; user-select: none; touch-action: none; }
+  font-family: var(--body); -webkit-user-select: none; user-select: none; touch-action: none; }
 #stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
 canvas#game { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+button { font-family: var(--body); }
+button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
 /* HUD */
 #hud { position: fixed; inset: 0; pointer-events: none; z-index: 3; }
 #hearts { position: absolute; left: max(14px, env(safe-area-inset-left)); top: 12px; display: flex; gap: 6px; }
 #hearts.hit { animation: shake .35s; }
 @keyframes shake { 0%,100% { transform: none } 25% { transform: translateX(-4px) } 75% { transform: translateX(4px) } }
-.gem { width: 22px; height: 22px; transform: rotate(45deg); border-radius: 4px; border: 2px solid #fff6d8; }
+.gem { width: 20px; height: 20px; transform: rotate(45deg); border-radius: 4px; border: 2px solid #fff6d8; }
 .gem.full { background: linear-gradient(135deg, #fff6d8, var(--gold) 45%, var(--gold-deep)); box-shadow: 0 0 10px rgba(255, 210, 122, .6); }
 .gem.empty { background: rgba(20, 18, 48, .7); border-color: #4b4680; }
-#goal { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
-  padding: 6px 14px; border-radius: 999px; font-size: 15px; font-weight: 800; white-space: nowrap; max-width: 60vw; overflow: hidden; text-overflow: ellipsis; }
+#goal { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
+  padding: 6px 14px; border-radius: 999px; font-size: 15px; font-weight: 800; white-space: nowrap; max-width: calc(100vw - 260px); overflow: hidden; text-overflow: ellipsis; }
+#goal .ch { color: var(--ink-dim); margin-right: 8px; font-weight: 600; }
 #goal .tag { color: var(--gold); margin-right: 6px; letter-spacing: .08em; }
-#goal .arrow { color: var(--gold); }
-#pause-btn { pointer-events: auto; position: absolute; right: max(12px, env(safe-area-inset-right)); top: 10px; width: 44px; height: 44px; border-radius: 12px;
-  background: var(--panel); border: 1px solid var(--panel-line); color: var(--ink); font: 800 16px 'Nunito', sans-serif; }
-#sign { position: absolute; left: 50%; top: 58px; transform: translate(-50%, -8px); width: min(620px, 74vw); background: var(--panel);
-  border: 2px solid var(--panel-line); border-radius: 14px; padding: 12px 18px; font-size: 19px; line-height: 1.35; font-weight: 600;
+#goal.new { animation: glowpulse 1.4s 2; }
+@keyframes glowpulse { 50% { box-shadow: 0 0 22px rgba(255,210,122,.8); border-color: var(--gold); } }
+#pause-btn { pointer-events: auto; position: absolute; right: max(12px, env(safe-area-inset-right)); top: 8px; height: 44px; padding: 0 14px; border-radius: 12px;
+  background: var(--panel); border: 1px solid var(--panel-line); color: var(--ink); font: 800 14px var(--body); letter-spacing: .06em; }
+#sign { position: absolute; left: 50%; top: 56px; transform: translate(-50%, -8px); width: min(620px, 74vw); background: var(--panel);
+  border: 2px solid var(--panel-line); border-radius: 14px; padding: 10px 18px; font-size: 18px; line-height: 1.35; font-weight: 600;
   opacity: 0; transition: opacity .18s, transform .18s; text-align: center; }
 #sign.show { opacity: 1; transform: translate(-50%, 0); }
 #sign b { color: var(--gold); }
 #toast { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
   border-radius: 12px; padding: 10px 16px; font-size: 17px; font-weight: 700; opacity: 0; transition: opacity .25s; max-width: 70vw; text-align: center; }
 #toast.show { opacity: 1; }
+body[data-state="talk"] #toast { top: auto; bottom: 18%; }
+/* In-game controls only show while playing; story screens and conversations get the whole screen. */
+body:not([data-state="play"]) #touch, body:not([data-state="play"]):not([data-state="talk"]) #hud { display: none !important; }
+body[data-state="talk"] #sign, body[data-state="talk"] #pause-btn { display: none; }
+
+/* Dialogue */
+#dialog { position: fixed; left: 50%; top: 56px; transform: translateX(-50%); width: min(760px, 94vw); z-index: 6;
+  display: none; gap: 14px; align-items: flex-start; background: var(--panel); border: 2px solid var(--panel-line); border-radius: 16px; padding: 12px 16px 12px 12px; cursor: pointer; }
+#dialog.show { display: flex; }
+#d-face { width: 96px; height: 96px; image-rendering: pixelated; border-radius: 10px; border: 2px solid rgba(255,255,255,.2); flex: none; }
+#d-body { min-width: 0; flex: 1; }
+#d-name { font-family: var(--display); font-weight: 800; font-size: 17px; letter-spacing: .06em; margin: 2px 0 4px; }
+#d-text { font-size: 19px; line-height: 1.4; font-weight: 600; }
+#d-more { position: absolute; right: 14px; bottom: 8px; color: var(--gold); font-size: 13px; font-weight: 800; animation: pulse 1.2s infinite; }
 
 /* Touch controls (landscape phone) */
 #touch { position: fixed; inset: 0; display: none; touch-action: none; z-index: 2; }
@@ -51,33 +71,66 @@ body[data-input="touch"] #touch { display: block; }
 #stick.on { opacity: 1; }
 #knob { position: absolute; left: 50%; top: 50%; width: 48px; height: 48px; margin: -24px 0 0 -24px; border-radius: 50%; background: rgba(255,246,216,.55); }
 .tbtn { position: absolute; border-radius: 50%; border: 2px solid rgba(255,246,216,.45); background: rgba(20,18,48,.45); color: var(--ink);
-  font: 800 13px 'Nunito', sans-serif; letter-spacing: .05em; display: flex; align-items: center; justify-content: center; touch-action: none; }
+  font: 800 13px var(--body); letter-spacing: .05em; display: flex; align-items: center; justify-content: center; touch-action: none; }
 .tbtn.on { background: rgba(255,210,122,.45); border-color: var(--gold); }
 #b-jump { width: 92px; height: 92px; right: max(24px, env(safe-area-inset-right)); bottom: 28px; font-size: 15px; }
 #b-attack { width: 76px; height: 76px; right: calc(max(24px, env(safe-area-inset-right)) + 104px); bottom: 22px; }
 #b-dash { width: 70px; height: 70px; right: calc(max(24px, env(safe-area-inset-right)) + 40px); bottom: 132px; }
+#b-talk { width: 70px; height: 70px; right: calc(max(24px, env(safe-area-inset-right)) + 122px); bottom: 112px; display: none;
+  background: rgba(255,210,122,.25); border-color: var(--gold); color: var(--gold); }
+#b-talk.show { display: flex; }
 #touch-hint { position: absolute; left: 6%; bottom: 18px; color: rgba(255,255,255,.45); font-size: 13px; font-weight: 700; }
 
 /* Screens */
-.screen { position: fixed; inset: 0; z-index: 5; display: none; align-items: center; justify-content: center; background: rgba(6,6,20,.72); }
+.screen { position: fixed; inset: 0; z-index: 7; display: none; align-items: center; justify-content: center; background: rgba(6,6,20,.78); }
 .screen.show { display: flex; }
-.card { background: var(--panel); border: 2px solid var(--panel-line); border-radius: 18px; padding: 22px 28px; width: min(560px, 90vw);
-  max-height: 92vh; overflow: auto; text-align: center; touch-action: pan-y; }
+.card { background: var(--panel); border: 2px solid var(--panel-line); border-radius: 18px; padding: 20px 26px; width: min(600px, 92vw);
+  max-height: 92vh; overflow: auto; text-align: center; touch-action: pan-y; -webkit-user-select: text; user-select: text; }
 .btn { display: block; width: 100%; margin: 10px 0 0; padding: 12px; border-radius: 12px; border: 1px solid var(--panel-line);
-  background: rgba(255,210,122,.10); color: var(--ink); font: 800 17px 'Nunito', sans-serif; cursor: pointer; }
+  background: rgba(255,210,122,.10); color: var(--ink); font: 800 17px var(--body); cursor: pointer; }
 .btn.primary { background: var(--gold); color: #1c1430; border-color: var(--gold); }
-#title { background: radial-gradient(ellipse at 50% 60%, rgba(40,30,70,.94), rgba(6,6,20,.97) 70%); flex-direction: column; text-align: center; cursor: pointer; }
-#title h1 { font-family: 'Cinzel', Georgia, serif; font-weight: 800; letter-spacing: .14em; font-size: clamp(40px, 9vh, 78px); margin: 0;
-  color: #fff6d8; text-shadow: 0 0 24px rgba(255,210,122,.55); }
-#title .sub { font-family: 'Cinzel', Georgia, serif; color: var(--gold); letter-spacing: .2em; font-size: 15px; margin: 4px 0 18px; }
-#title p { max-width: 560px; font-size: 18px; line-height: 1.45; color: var(--ink); margin: 0 20px 18px; }
-#title .go { font-weight: 800; color: var(--gold); animation: pulse 1.6s infinite; }
-#title .small { font-size: 13px; color: var(--ink-dim); margin-top: 10px; }
+.btn.small { font-size: 15px; padding: 9px; margin-top: 6px; }
 @keyframes pulse { 50% { opacity: .45 } }
-#results .big { font-family: 'Cinzel', Georgia, serif; font-size: 44px; color: var(--gold); }
-#results .sub { color: var(--ink-dim); margin-bottom: 10px; }
-#results ul { list-style: none; padding: 0; margin: 0 0 6px; font-size: 17px; }
-#results h2, #menu h2, #tune h2 { font-family: 'Cinzel', Georgia, serif; margin: 0 0 6px; letter-spacing: .08em; }
+
+#title { background: radial-gradient(ellipse at 50% 60%, rgba(40,30,70,.94), rgba(6,6,20,.98) 70%); flex-direction: column; text-align: center; gap: 0; padding: 12px; }
+#title h1 { font-family: var(--display); font-weight: 800; letter-spacing: .14em; font-size: clamp(36px, 10vh, 76px); margin: 0;
+  color: #fff6d8; text-shadow: 0 0 24px rgba(255,210,122,.55); }
+#title .sub { font-family: var(--display); color: var(--gold); letter-spacing: .18em; font-size: 14px; margin: 2px 0 14px; }
+#title .menu { width: min(380px, 86vw); }
+#title details { margin-top: 8px; color: var(--ink-dim); font-size: 14px; }
+#title summary { cursor: pointer; padding: 6px; font-weight: 700; }
+#title .small { font-size: 12px; color: var(--ink-dim); margin-top: 10px; }
+
+#cut { background: #05050e; flex-direction: column; cursor: pointer; padding: 10px; }
+#cut-art { width: min(720px, 92vw, calc(62vh * 320 / 150)); aspect-ratio: 320 / 150; image-rendering: pixelated; border-radius: 10px; border: 1px solid var(--panel-line); }
+#cut-text { width: min(720px, 92vw); font-size: clamp(16px, 4.4vh, 21px); line-height: 1.45; text-align: center; margin: 14px 0 6px; font-weight: 600; }
+#cut-text.in { animation: fadein .5s; }
+@keyframes fadein { from { opacity: 0; transform: translateY(6px); } }
+#cut-foot { display: flex; gap: 18px; align-items: center; color: var(--ink-dim); font-size: 14px; }
+#cut-foot .go { color: var(--gold); font-weight: 800; animation: pulse 1.6s infinite; }
+#cut-skip { position: absolute; top: 12px; right: max(12px, env(safe-area-inset-right)); background: var(--panel); color: var(--ink); border: 1px solid var(--panel-line);
+  border-radius: 10px; padding: 8px 14px; font: 800 14px var(--body); }
+
+#card .card { text-align: left; }
+#c-label { color: var(--gold); font-family: var(--display); letter-spacing: .16em; font-size: 14px; text-transform: uppercase; }
+#c-name { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 7vh, 40px); margin: 2px 0 8px; color: #fff6d8; }
+#c-text { font-size: 18px; line-height: 1.45; margin: 0 0 8px; }
+#c-goals { margin: 0; padding: 0 0 0 20px; font-size: 16px; color: var(--ink); }
+#c-goals .gl { margin: 6px 0 4px -20px; color: var(--gold); font-weight: 800; letter-spacing: .08em; font-size: 13px; }
+#c-goals li { margin: 3px 0; }
+
+#journal .card { text-align: left; width: min(680px, 94vw); }
+#journal h2 { font-family: var(--display); margin: 0 0 4px; }
+#journal h3 { font-family: var(--display); color: var(--gold); font-size: 16px; letter-spacing: .06em; margin: 14px 0 6px; }
+#journal p { margin: 0 0 8px; line-height: 1.45; font-size: 15px; }
+#journal .goals { list-style: none; padding: 0; margin: 0; font-size: 16px; }
+#journal .goals li { padding: 3px 0; color: var(--ink-dim); }
+#journal .goals li.now { color: var(--ink); font-weight: 800; }
+#journal .goals li.done { color: #9be07a; }
+.person { display: flex; gap: 10px; align-items: center; margin: 6px 0; font-size: 14px; line-height: 1.35; }
+.person img { width: 48px; height: 48px; image-rendering: pixelated; border-radius: 8px; flex: none; }
+
+#menu h2, #tune h2, #end h2 { font-family: var(--display); margin: 0 0 6px; letter-spacing: .08em; }
 #controls { display: none; text-align: left; font-size: 15px; margin-top: 10px; color: var(--ink-dim); }
 #controls.show { display: block; }
 #controls b { color: var(--ink); }
@@ -90,8 +143,10 @@ body[data-input="touch"] #touch { display: block; }
 .tbtns { display: flex; gap: 8px; }
 .tbtns .btn { margin-top: 12px; }
 #t-out { display: none; width: 100%; height: 120px; margin-top: 8px; background: #0c0c22; color: var(--ink); border: 1px solid var(--panel-line); border-radius: 8px; font: 12px monospace; }
-#rotate { display: none; position: fixed; inset: 0; background: var(--night); align-items: center; justify-content: center; text-align: center; font-size: 22px; font-weight: 800; padding: 30px; z-index: 10; }
+#end p { font-size: 17px; line-height: 1.5; }
+#rotate { display: none; position: fixed; inset: 0; background: var(--night); align-items: center; justify-content: center; text-align: center; font-size: 22px; font-weight: 800; padding: 30px; z-index: 20; }
 @media (orientation: portrait) and (pointer: coarse) { #rotate { display: flex; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
@@ -100,7 +155,7 @@ body[data-input="touch"] #touch { display: block; }
 <div id="hud">
   <div id="hearts"></div>
   <div id="goal"></div>
-  <button id="pause-btn" aria-label="Menu">II</button>
+  <button id="pause-btn" aria-label="Menu">MENU</button>
   <div id="sign"></div>
   <div id="toast"></div>
 </div>
@@ -108,35 +163,75 @@ body[data-input="touch"] #touch { display: block; }
 <div id="touch">
   <div id="stick"><div id="knob"></div></div>
   <div id="touch-hint">Hold and slide anywhere on this side to move</div>
+  <div class="tbtn" id="b-talk" data-act="up">TALK</div>
   <div class="tbtn" id="b-dash" data-act="dash">DASH</div>
   <div class="tbtn" id="b-attack" data-act="attack">STRIKE</div>
   <div class="tbtn" id="b-jump" data-act="jump">JUMP</div>
 </div>
 
+<div id="dialog" role="dialog" aria-live="polite">
+  <img id="d-face" alt="">
+  <div id="d-body"><div id="d-name"></div><div id="d-text"></div></div>
+  <div id="d-more">tap anywhere &#9656;</div>
+</div>
+
 <div class="screen show" id="title">
   <h1>STARHAVEN</h1>
-  <div class="sub">THE TRAINING GROVE</div>
-  <p>Wren died a mortal huntress and woke up fae. Her new body is faster and lighter than anything she knew.
-     Before Lord Caelum brings her into Starhaven, she tests it in the grove at the city's edge.</p>
-  <div class="go">Tap or press any button to begin</div>
-  <div class="small" id="title-best"></div>
-  <div class="small">Milestones 1 and 2: movement and combat feel. Placeholder art.</div>
+  <div class="sub">A COURT OF DUSK AND STARLIGHT</div>
+  <div class="menu">
+    <button class="btn primary" id="t-continue" style="display:none">Continue</button>
+    <button class="btn" id="t-new">New game</button>
+    <details>
+      <summary>Chapters (all open in this concept build)</summary>
+      <div id="t-chapters"></div>
+    </details>
+  </div>
+  <div class="small">Concept build: the Prologue through Chapter 2. Placeholder art. Best on a phone held sideways.</div>
+</div>
+
+<div class="screen" id="cut">
+  <canvas id="cut-art" width="640" height="300"></canvas>
+  <div id="cut-text"></div>
+  <div id="cut-foot"><span id="cut-count"></span><span class="go">Tap to continue</span></div>
+  <button id="cut-skip">Skip</button>
+</div>
+
+<div class="screen" id="card">
+  <div class="card">
+    <div id="c-label"></div>
+    <div id="c-name"></div>
+    <p id="c-text"></p>
+    <ul id="c-goals"></ul>
+    <button class="btn primary" id="c-go">Begin</button>
+  </div>
 </div>
 
 <div class="screen" id="menu">
   <div class="card">
     <h2>Paused</h2>
     <button class="btn primary" id="m-resume">Resume</button>
+    <button class="btn" id="m-journal">Story &amp; goals</button>
     <button class="btn" id="m-tune">Tune the feel</button>
-    <button class="btn" id="m-restart">Restart the grove</button>
+    <button class="btn" id="m-restart">Restart this chapter</button>
     <button class="btn" id="m-controls">Controls</button>
     <button class="btn" id="m-fullscreen">Fullscreen</button>
+    <button class="btn" id="m-title">Title screen</button>
     <div id="controls">
-      <p><b>Keyboard:</b> A/D or arrows move, Space jump, J strike, Shift dash, S + J in the air strikes down, Esc menu.
+      <p><b>Keyboard:</b> A/D or arrows move, Space jump, J strike, Shift dash, W talk or paint, S + J in the air strikes down, Esc menu.
          (Z / X / C also jump / strike / dash.)</p>
-      <p><b>Gamepad:</b> stick or D-pad move, A jump, X strike, B dash, Start menu.</p>
-      <p><b>Touch:</b> hold and slide on the left half to move (slide down to aim a downward strike), buttons on the right.</p>
+      <p><b>Gamepad:</b> stick or D-pad move, A jump, X strike, B dash, Y talk or paint, Start menu.</p>
+      <p><b>Touch:</b> hold and slide on the left half to move (slide down to aim a downward strike). JUMP, STRIKE and DASH on the right.
+         A TALK or PAINT button appears when there's someone to talk to or something to paint.</p>
+      <p>In conversations, tap the box or press any button to go on.</p>
     </div>
+  </div>
+</div>
+
+<div class="screen" id="journal">
+  <div class="card">
+    <h2>Story &amp; goals</h2>
+    <div id="j-body"></div>
+    <button class="btn primary" id="j-back">Back</button>
   </div>
 </div>
 
@@ -146,7 +241,7 @@ body[data-input="touch"] #touch { display: block; }
     <p>Changes apply as soon as you close this. Gold numbers are changed from the defaults. "Copy numbers" copies them so you can send them over.</p>
     <div id="tune-list"></div>
     <div class="tbtns">
-      <button class="btn primary" id="t-back">Back to the grove</button>
+      <button class="btn primary" id="t-back">Back</button>
       <button class="btn" id="t-copy">Copy numbers</button>
       <button class="btn" id="t-reset">Reset all</button>
     </div>
@@ -154,12 +249,12 @@ body[data-input="touch"] #touch { display: block; }
   </div>
 </div>
 
-<div class="screen" id="results">
+<div class="screen" id="end">
   <div class="card">
-    <h2>Grove cleared</h2>
-    <div id="res-body"></div>
-    <button class="btn primary" id="r-again">Run it again</button>
-    <button class="btn" id="r-stay">Keep playing here</button>
+    <h2 id="e-head"></h2>
+    <p id="e-text"></p>
+    <button class="btn primary" id="e-again">Play again from the start</button>
+    <button class="btn" id="e-home">Title screen</button>
   </div>
 </div>
 
@@ -240,7 +335,7 @@ body[data-input="touch"] #touch { display: block; }
   SH.ENEMY_DEFS = {
     thornSprite: {
       name: 'Thorn sprite', hp: 4, w: 24, h: 22,
-      wander: 0.55, sight: 150, sightY: 50,
+      wander: 0.55, sight: 150, sightY: 50, leash: 5,
       windup: 26, lungeSpeed: 5.4, lungeHop: 2.6, lungeFrames: 20, recover: 42,
       respawn: 300, damage: 1, gravity: 0.5,
     },
@@ -251,66 +346,319 @@ body[data-input="touch"] #touch { display: block; }
 
 </script>
 <script>
-// ---- src/room-grove.js
-// Starhaven — the Training Grove. Level data only.
-// Coordinates are in tiles. x ranges are [start, end) — end is not filled.
-// Each section teaches one move before it is needed. Enemies come last.
+// ---- src/story.js
+// Starhaven — the story: intro panels, chapters, goals, every line of dialogue, and the journal.
+// Data only. Follows DESIGN.md "Story outline" and "Chapter goals" (Prologue through Chapter 2 = the first playable).
 (function (SH) {
-  SH.ROOMS = SH.ROOMS || {};
+  const S = SH.STORY = {};
 
-  SH.ROOMS.grove = {
-    id: 'grove',
-    name: 'The Training Grove',
-    width: 204,
-    height: 20,
-    start: { x: 6, y: 16 },
-    // Starhaven glows on the far horizon, so the goal is always in sight.
-    cityGlowX: 210,
+  // Who can speak. Portraits are drawn by art.js.
+  S.CAST = {
+    wren: { name: 'Wren', color: '#ffd27a' },
+    caelum: { name: 'Lord Caelum', color: '#b9a8ff' },
+    queen: { name: 'The Thorn Queen', color: '#ff7a8a' },
+    bram: { name: 'Bram', color: '#f0a860' },
+    iris: { name: 'Iris', color: '#9fe0ff' },
+  };
 
+  // The opening cutscene. Each panel: a painted scene (drawn in art.js) and one or two lines.
+  S.INTRO = [
+    { art: 'woods', text: 'Wren grew up a mortal huntress in the winter woods, keeping her two sisters, Nessa and Lissa, alive one hunt at a time.' },
+    { art: 'mountain', text: 'Then the Thorn Queen, a cruel fae tyrant, dragged her Under the Mountain, into a prison called the Deep. Wren beat the queen\'s trials. It killed her.' },
+    { art: 'sparks', text: 'The seven High Lords of the fae courts each gave a spark of their power to bring her back. Wren woke up fae: stronger, faster, and not quite herself.' },
+    { art: 'caelum', text: 'In the Deep she made a bargain with one of them, Lord Caelum of the Court of Dusk. His help then, for her time later. Now he has come to collect.' },
+    { art: 'ships', text: 'Across the sea, the Iron King is building an army, and his spies are already in the woods. Caelum\'s hidden city, Starhaven, will need everyone it has.' },
+  ];
+
+  // Short version of the intro, for the journal.
+  S.RECAP = 'Wren, a mortal huntress, died in the Thorn Queen\'s prison, the Deep, and the seven High Lords brought her back as fae. She owes Lord Caelum of the Court of Dusk a bargain. Across the sea, the Iron King is preparing for war, and Caelum\'s hidden city, Starhaven, has gone dark.';
+
+  S.CHAPTERS = [
+    {
+      id: 'prologue', label: 'Prologue', name: 'The Deep', room: 'deep',
+      card: 'Three months later, Wren still dreams of the Deep every night. Tonight, she runs.',
+      goals: [
+        { id: 'escape', text: 'Escape the Deep: run right, toward the light' },
+      ],
+      summary: 'Wren relived the Deep in a nightmare, outran the Thorn Queen\'s Wyrm, and woke up.',
+      done: 'Wren wakes up gasping, in a silk bed, at a court that isn\'t hers.',
+    },
+    {
+      id: 'ch1', label: 'Chapter 1', name: 'Ashes', room: 'ashes',
+      card: 'Wren is living a gilded, empty life at another court. One evening, Lord Caelum appears to call in their bargain.',
+      goals: [
+        { id: 'arrive', text: 'Walk with Caelum to Starhaven' },
+        { id: 'mural', text: 'Paint the first mural on the dark street' },
+        { id: 'rooftop', text: 'Meet Caelum on his rooftop, at the end of the street' },
+      ],
+      summary: 'Caelum brought Wren to Starhaven, a hidden city gone dark from the war. Her first mural woke up a street.',
+      done: 'Starhaven has one bright street again. Tomorrow, Wren meets the Five.',
+    },
+    {
+      id: 'ch2', label: 'Chapter 2', name: 'The Five', room: 'ring',
+      card: 'Caelum\'s inner circle, the Five, want to see what the reborn huntress can do. First stop: the Training Ring, and Bram.',
+      goals: [
+        { id: 'combo', text: 'Show Bram your daggers on the training dummy' },
+        { id: 'pit', text: 'Cross Bram\'s thorn pit by bouncing on the buds' },
+        { id: 'sprites', text: 'Clear the thorn sprites past the north gate', count: 3 },
+      ],
+      summary: 'Wren trained with Bram, met Iris, and cleared the Iron King\'s thorn sprites from the north wall.',
+      done: 'The Five are starting to trust her. The Iron King\'s creatures are getting closer.',
+    },
+  ];
+
+  // Dialogue scripts. A step is a line ['who', 'text'] or an action { do: ... }.
+  S.SCRIPTS = {
+    // ---------------- Prologue: the Deep
+    deep_start: [
+      ['queen', 'Back again, little huntress? You never really left my Deep.'],
+      ['wren', 'It\'s a dream. Only a dream. Keep moving and it ends.'],
+      { do: 'goal', id: 'escape' },
+    ],
+    deep_wall: [
+      ['queen', 'A wall you can\'t climb. Mortals always hit a wall.'],
+      ['wren', 'I\'m not mortal anymore.'],
+    ],
+    deep_dash: [
+      ['wren', 'Too far to jump. But this body is fast. Faster than I ever was.'],
+    ],
+    deep_thorns: [
+      ['queen', 'My thorns remember you. They remember how you bled.'],
+    ],
+    deep_chase: [
+      ['queen', 'Enough running. Wake up, my Wyrm. Bring her back to me.'],
+      ['wren', 'No. No no no. RUN.'],
+      { do: 'wyrm' },
+    ],
+    deep_end: [
+      ['wren', 'Light. It\'s light. I\'m waking up...'],
+      { do: 'complete' },
+    ],
+
+    // ---------------- Chapter 1: Ashes
+    ashes_start: [
+      ['caelum', 'Good evening, Wren. You look like you haven\'t slept in three months.'],
+      ['wren', 'Caelum. What do you want?'],
+      ['caelum', 'What I\'m owed. One week of every month, at my home. That was our bargain in the Deep.'],
+      ['caelum', 'Walk with me. I\'ll meet you up the road. I want to show you something.'],
+      { do: 'goal', id: 'arrive' },
+      { do: 'winnow', npc: 'caelum', to: 41 },
+    ],
+    ashes_overlook: [
+      ['caelum', 'That glow ahead is Starhaven. Hidden from every other court for a thousand years.'],
+      ['wren', 'Why show it to me?'],
+      ['caelum', 'Because the Iron King is coming, and my city has gone dark. It needs someone who can make it shine again.'],
+      { do: 'winnow', npc: 'caelum', to: 57 },
+    ],
+    ashes_gate: [
+      ['caelum', 'The war took our painters and our lamplighters. Half of Starhaven sits in the dark now.'],
+      ['caelum', 'You painted once, before the hunting. You told me, in the Deep.'],
+      ['wren', '...I remember.'],
+      ['caelum', 'There\'s a bare wall halfway down this street. Paint something on it.'],
+      { do: 'flag', name: 'arrive' },
+      { do: 'goal', id: 'mural' },
+      { do: 'winnow', npc: 'caelum', to: 80 },
+    ],
+    ashes_painted: [
+      ['wren', 'I\'d forgotten how much I missed this.'],
+      ['caelum', 'Look. The street is waking up. Every mural you paint brings a little more of Starhaven back.'],
+      ['caelum', 'My house is at the end of the street. Climb up to the roof. I\'ll be waiting.'],
+      { do: 'goal', id: 'rooftop' },
+      { do: 'winnow', npc: 'caelum', to: 110, y: 10 },
+    ],
+    ashes_roof: [
+      ['caelum', 'This is the Rooftop House. It\'s yours too, if you want it.'],
+      ['wren', 'And if I don\'t?'],
+      ['caelum', 'Then you get a very nice room and a very annoying neighbor.'],
+      ['caelum', 'Tomorrow you meet the Five, my inner circle. Try not to stab any of them.'],
+      ['wren', 'No promises.'],
+      { do: 'heart', who: 'caelum' },
+      { do: 'flag', name: 'rooftop' },
+      { do: 'complete' },
+    ],
+
+    // ---------------- Chapter 2: The Five
+    ring_start: [
+      ['bram', 'So you\'re the huntress who walked out of the Deep. I\'m Bram. I run the Training Ring.'],
+      ['bram', 'Caelum says you can fight. I\'d like to see it before I believe it.'],
+      ['bram', 'Go hit the dummy. Three cuts in a row, and make the last one count.'],
+      { do: 'goal', id: 'combo' },
+    ],
+    ring_combo: [
+      ['bram', 'Not bad. Now my thorn pit.'],
+      ['bram', 'Jump over it, hold down, and strike the buds below you. Each bounce gives you your jumps back. Don\'t touch the floor.'],
+      { do: 'flag', name: 'combo' },
+      { do: 'goal', id: 'pit' },
+      { do: 'gate', id: 'pitgate' },
+    ],
+    ring_pit: [
+      ['bram', 'Ha! Clean. Now some real work.'],
+      ['bram', 'Thorn sprites, the Iron King\'s creatures, came over the north wall last night. Three of them. Clear them out.'],
+      ['bram', 'They glow orange right before they lunge. Dash through the lunge, then cut them down.'],
+      { do: 'flag', name: 'pit' },
+      { do: 'goal', id: 'sprites' },
+      { do: 'gate', id: 'northgate' },
+    ],
+    iris: [
+      ['iris', 'Oh! You\'re the new one. I\'m Iris. I see threads of fate.'],
+      ['iris', 'Yours is very tangled and very shiny. Anyway, hi! Go stab things. Bram likes that.'],
+      { do: 'meet', who: 'iris' },
+    ],
+    ring_done: [
+      ['caelum', 'Three thorn sprites and not a scratch. Bram owes me a drink.'],
+      ['bram', 'Bram owes nobody anything.'],
+      ['caelum', 'The Iron King is testing our walls, Wren. Next time it won\'t be sprites.'],
+      { do: 'flag', name: 'sprites' },
+      { do: 'complete' },
+    ],
+  };
+
+  // The journal's "People" page. Unlocked as Wren meets or hears of them.
+  S.PEOPLE = [
+    { id: 'wren', name: 'Wren', text: 'You. A mortal huntress who died in the Deep and woke up fae. Fights with daggers. Used to paint.' },
+    { id: 'sisters', name: 'Nessa and Lissa', text: 'Wren\'s sisters, still mortal. Nessa is sharp-tongued and protective. Lissa is gentle and loves her garden.' },
+    { id: 'queen', name: 'The Thorn Queen', text: 'The fae tyrant who held Wren in the Deep. Gone now, but not from Wren\'s dreams.' },
+    { id: 'caelum', name: 'Lord Caelum', text: 'High Lord of the Court of Dusk and ruler of Starhaven. Charming in public, burdened in private. Wren owes him a bargain.' },
+    { id: 'ironking', name: 'The Iron King', text: 'A king across the sea, building an army. His spies and creatures are already in the woods.' },
+    { id: 'bram', name: 'Bram', text: 'One of the Five. A general and brawler who runs the Training Ring. The big brother of the group.' },
+    { id: 'iris', name: 'Iris', text: 'One of the Five. A seer who sees threads of fate. Oddly cheerful about it.' },
+  ];
+  // Who you know about at the start of each chapter (the intro covers the first five).
+  S.KNOWN_FROM = { prologue: ['wren', 'sisters', 'queen', 'caelum', 'ironking'], ch1: [], ch2: ['bram'] };
+
+  S.END = {
+    title: 'End of the concept',
+    text: 'That was the Prologue through Chapter 2, the first playable slice from the design doc, in miniature. If this direction feels right, next comes the Starhaven hub: districts to restore, bond evenings with Caelum and the Five, the bow, and Wren\'s first court gift, Flame.',
+  };
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/rooms.js
+// Starhaven — rooms (levels). Data only. Coordinates are tiles; x ranges are [start, end).
+// Ground top is row 16 unless a shape says otherwise. 20 rows tall.
+//   hints:    control tips shown while Wren stands between x0 and x1 (optionally only once a story flag is set)
+//   triggers: story scripts that start when Wren reaches x (once each)
+//   npcs:     people. Story beats start on their own; optional people can be talked to with TALK.
+//   gates:    wooden gates that block the way until a script opens them
+(function (SH) {
+  SH.ROOMS = {};
+
+  // ---------------------------------------------------------------- Prologue: The Deep (movement only, no enemies)
+  SH.ROOMS.deep = {
+    id: 'deep', width: 150, height: 20, theme: 'deep',
+    start: { x: 5, y: 16 },
     shapes: [
-      ['solid', 0, 2, 0, 20],          // left wall
-      ['ground', 2, 24, 16],           // 1. move
-      ['ground', 24, 31, 14],          // 2. jump: a two-tile step up...
-      ['ground', 34, 41, 14],          //    ...a 3-tile gap...
-      ['ground', 45, 66, 16],          //    ...and a 4-tile gap down
-      ['solid', 54, 61, 11, 16],       // 3. double jump: a wall one jump can't clear
-      ['ground', 76, 128, 16],         // 4. dash: a 10-tile gap (66..76)
-      ['ground', 128, 148, 16],        // 6. pogo: a floor of thorns...
-      ['thorns', 129, 147, 15],
-      ['ground', 148, 202, 16],        // 7. thorn sprites
-      ['oneway', 168, 174, 12],
-      ['solid', 202, 204, 0, 20],      // right wall
+      ['solid', 0, 2, 0, 20],
+      ['solid', 0, 150, 0, 4],          // the Deep has a roof
+      ['ground', 2, 24, 16],
+      ['ground', 24, 31, 14],           // step up, then a 3-tile gap
+      ['ground', 34, 41, 14],           // 4-tile gap down
+      ['ground', 45, 66, 16],
+      ['solid', 54, 61, 11, 16],        // the wall: needs a double jump
+      ['ground', 76, 104, 16],          // 10-tile gap before this: jump, jump, dash
+      ['thorns', 85, 88, 15],           // first thorns: 3 tiles, one plain jump
+      ['ground', 107, 118, 16],         // the chase
+      ['ground', 118, 126, 14],
+      ['ground', 130, 148, 16],
+      ['thorns', 137, 140, 15],
+      ['solid', 148, 150, 0, 20],
     ],
-
-    // Signs. Text tokens like {JUMP} become the right button for keyboard, touch or gamepad.
-    signs: [
-      { x: 9, id: 'move', text: 'Move with {MOVE}. Head right: the far lantern marks the end of the grove.' },
-      { x: 21, id: 'jump', text: 'Jump with {JUMP}. Hold it to jump high, tap it for a small hop.' },
-      { x: 50, id: 'double', text: 'Your fae body can jump twice. Press {JUMP} again in the air to clear the wall.' },
-      { x: 63, id: 'dash', text: 'Dash with {DASH}. It works in the air too. This gap takes all three: jump, jump again, then dash.' },
-      { x: 96, id: 'dagger', text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
-      { x: 124, id: 'pogo', text: 'Thorns hurt. In the air, hold {DOWN} and press {ATTACK} to strike downward and bounce off the thorn buds. Each bounce gives back your second jump and your dash.' },
-      { x: 152, id: 'sprites', text: 'Thorn sprites ahead. They glow orange before they lunge. Dash through the lunge, then strike.' },
+    hints: [
+      { x0: 3, x1: 17, text: 'Move with {MOVE}.' },
+      { x0: 17, x1: 31, text: 'Jump with {JUMP}. Hold it to jump higher, tap it for a small hop.' },
+      { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.' },
+      { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.' },
+      { x0: 80, x1: 85, text: 'Thorns hurt. Jump over them.' },
+      { x0: 94, x1: 104, text: 'RUN. Keep moving right and jump the gaps.' },
     ],
-
-    lanterns: [
-      { x: 5, id: 'l_start', lit: true },
-      { x: 47, id: 'l_double' },
-      { x: 79, id: 'l_dash' },
-      { x: 127, id: 'l_pogo' },
-      { x: 150, id: 'l_sprites' },
-      { x: 196, id: 'l_end', end: true },
+    triggers: [
+      { x: 5, script: 'deep_start' },
+      { x: 50, script: 'deep_wall' },
+      { x: 62, script: 'deep_dash' },
+      { x: 80, script: 'deep_thorns' },
+      { x: 94, script: 'deep_chase' },
+      { x: 143, script: 'deep_end' },
     ],
+    lanterns: [{ x: 4, lit: true }, { x: 47 }, { x: 79 }, { x: 93 }],
+    exitLight: 145,
+    chase: { from: 94, wyrmX: 80, speed: 2.7 },
+    npcs: [], gates: [], spawns: [],
+  };
 
+  // ---------------------------------------------------------------- Chapter 1: Ashes (walk, talk, first mural, no enemies)
+  SH.ROOMS.ashes = {
+    id: 'ashes', width: 122, height: 20, theme: 'dusk',
+    start: { x: 4, y: 16 },
+    cityFrom: 50,                       // Starhaven's houses begin here
+    cityGlowX: 70,
+    shapes: [
+      ['solid', 0, 2, 0, 20],
+      ['ground', 2, 22, 16],
+      ['ground', 22, 30, 15],
+      ['ground', 30, 46, 14],           // the overlook
+      ['ground', 46, 122, 16],
+      ['oneway', 99, 104, 13],          // ledge up to the roof
+      ['solid', 104, 118, 10, 16],      // the Rooftop House
+      ['solid', 118, 122, 0, 20],
+    ],
+    hints: [
+      { x0: 3, x1: 14, text: 'Move with {MOVE}. Caelum will meet you up the road.' },
+      { x0: 19, x1: 31, text: 'Jump with {JUMP}.' },
+      { x0: 94, x1: 104, text: 'Jump up the ledge to reach the roof.', flag: 'painted' },
+    ],
+    triggers: [
+      { x: 4, script: 'ashes_start' },
+      { x: 39, script: 'ashes_overlook' },
+      { x: 55, script: 'ashes_gate' },
+      { x: 106, above: 10, script: 'ashes_roof', flag: 'painted' },
+    ],
+    mural: { x: 70, w: 5, needs: 'arrive', flag: 'painted', script: 'ashes_painted', frames: 80 },
+    arch: 52,
+    house: { x0: 104, x1: 118, top: 10 },
+    lanterns: [{ x: 3, lit: true }],
+    npcs: [{ id: 'caelum', x: 8 }],
+    gates: [], spawns: [],
+  };
+
+  // ---------------------------------------------------------------- Chapter 2: The Five (daggers, pogo, first enemies)
+  SH.ROOMS.ring = {
+    id: 'ring', width: 150, height: 20, theme: 'city',
+    zones: [{ x: 0, theme: 'city' }, { x: 66, theme: 'thornwood' }],
+    start: { x: 5, y: 16 },
+    cityGlowX: 30,
+    cityFrom: 3, cityTo: 36, cityLight: 0.75,  // the Training Ring sits on a lit Starhaven street
+    shapes: [
+      ['solid', 0, 2, 0, 20],
+      ['ground', 2, 41, 16],
+      ['ground', 41, 60, 16],           // Bram's thorn pit
+      ['thorns', 42, 59, 15],
+      ['ground', 60, 148, 16],
+      ['oneway', 88, 94, 12],
+      ['solid', 148, 150, 0, 20],
+    ],
+    hints: [
+      { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
+      { x0: 36, x1: 44, text: 'Jump toward a bud. While you are above it, hold {DOWN} and press {ATTACK} to strike down and bounce.', flag: 'combo' },
+      { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
+    ],
+    triggers: [
+      { x: 4, script: 'ring_start' },
+      { x: 60, script: 'ring_pit', flag: 'combo' },
+    ],
+    gates: [{ id: 'pitgate', x: 38, top: 6 }, { id: 'northgate', x: 64, top: 6 }],
+    lanterns: [{ x: 4, lit: true }, { x: 61 }, { x: 68 }],
+    npcs: [{ id: 'bram', x: 11 }, { id: 'iris', x: 62.5, optional: 'iris' }],
     spawns: [
-      { kind: 'dummy', x: 106 },
-      { kind: 'bulb', x: 132.5, y: 12.6 },
-      { kind: 'bulb', x: 137.5, y: 12.4 },
-      { kind: 'bulb', x: 142.5, y: 12.6 },
-      { kind: 'thornSprite', x: 163 },
-      { kind: 'thornSprite', x: 171, y: 12 },
-      { kind: 'thornSprite', x: 183 },
+      { kind: 'dummy', x: 24 },
+      { kind: 'bulb', x: 45.5, y: 12.6 },
+      { kind: 'bulb', x: 50.5, y: 12.4 },
+      { kind: 'bulb', x: 55.5, y: 12.6 },
+      { kind: 'thornSprite', x: 80, respawn: false },
+      { kind: 'thornSprite', x: 91, y: 12, respawn: false },
+      { kind: 'thornSprite', x: 104, respawn: false },
     ],
+    dummyCombo: 'ring_combo',          // landing a full 3-hit combo on the dummy runs this
   };
 
   // Tile codes
@@ -331,14 +679,19 @@ body[data-input="touch"] #touch { display: block; }
       def, w, h, tiles,
       pxW: w * SH.TILE, pxH: h * SH.TILE,
       get(tx, ty) {
-        if (tx < 0 || tx >= w) return SH.T_SOLID;      // side edges are walls
-        if (ty < 0 || ty >= h) return SH.T_EMPTY;      // top is open, bottom is a pit
+        if (tx < 0 || tx >= w) return SH.T_SOLID;
+        if (ty < 0 || ty >= h) return SH.T_EMPTY;
         return tiles[ty * w + tx];
       },
-      // Top of the ground (in px) under tile column tx, searching down from row ty0.
       groundY(tx, ty0) {
         for (let ty = ty0 || 0; ty < h; ty++) { const t = this.get(tx, ty); if (t === SH.T_SOLID || t === SH.T_ONEWAY) return ty * SH.TILE; }
         return null;
+      },
+      // Gates are solid tiles that a script can remove.
+      setGate(g, closed) {
+        if (g.bottom == null) g.bottom = this.groundY(g.x, g.top) / SH.TILE; // measured once, while the gate is open
+        for (let y = g.top; y < g.bottom; y++) set(g.x, y, closed ? SH.T_SOLID : SH.T_EMPTY);
+        g.closed = closed;
       },
     };
     return room;
@@ -412,8 +765,8 @@ body[data-input="touch"] #touch { display: block; }
   window.addEventListener('keyup', e => { const a = KEYS[e.code]; if (a) { e.preventDefault(); up('kb', a); } });
   window.addEventListener('blur', () => input.clear());
 
-  // ---- gamepad (standard mapping: A jump, X attack, B dash, Start pause)
-  const PAD_BTNS = { 0: 'jump', 2: 'attack', 1: 'dash', 3: 'dash', 5: 'dash', 9: 'pause', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
+  // ---- gamepad (standard mapping: A jump, X attack, B dash, Y talk, Start pause)
+  const PAD_BTNS = { 0: 'jump', 2: 'attack', 1: 'dash', 3: 'up', 5: 'dash', 9: 'pause', 12: 'up', 13: 'down', 14: 'left', 15: 'right' };
   input.pollPad = function () {
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];
     let pad = null;
@@ -490,9 +843,9 @@ body[data-input="touch"] #touch { display: block; }
 
   // Button names shown in signs, per input type.
   input.LABELS = {
-    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', DASH: 'Shift', DOWN: 'S' },
-    touch: { MOVE: 'the left side of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', DASH: 'the DASH button', DOWN: 'down on the stick' },
-    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', DASH: 'B', DOWN: 'down' },
+    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W' },
+    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button' },
+    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y' },
   };
   input.fill = function (text) {
     const L = input.LABELS[input.source] || input.LABELS.kb;
@@ -936,7 +1289,7 @@ body[data-input="touch"] #touch { display: block; }
     if (this.dead) {
       this.deadT++;
       // Come back after a while, but never in view.
-      if (this.deadT > d.respawn && Math.abs(this.home.x - world.camCenterX()) > world.viewW * 0.6) this.reset();
+      if (this.respawns !== false && this.deadT > d.respawn && Math.abs(this.home.x - world.camCenterX()) > world.viewW * 0.6) this.reset();
       return;
     }
     this.t++;
@@ -948,7 +1301,9 @@ body[data-input="touch"] #touch { display: block; }
         if (this.pause > 0) { this.pause--; this.vx = 0; }
         else {
           this.vx = this.dir * d.wander;
-          if (!SH.floorAhead(world.room, this.x + this.dir * (this.w / 2 + 2), this.y) || this.hitWall) { this.dir *= -1; this.pause = 30; }
+          // turn at ledges and walls, and stay near home (a leash of a few tiles) so sprites never wander into town
+          const away = (this.x - this.home.x) * this.dir > d.leash * SH.TILE;
+          if (!SH.floorAhead(world.room, this.x + this.dir * (this.w / 2 + 2), this.y) || this.hitWall || away) { this.dir *= -1; this.pause = 30; }
           if (Math.random() < 0.004) this.pause = 40 + Math.random() * 40;
         }
         if (sees && this.grounded) { this.state = 'windup'; this.t = 0; this.dir = dx > 0 ? 1 : -1; this.vx = 0; fx.word(this.x, this.y - this.h - 8, '!', '#ffb057', 28); }
@@ -1021,7 +1376,7 @@ body[data-input="touch"] #touch { display: block; }
     if (this.flash > 0) this.flash--;
     if (this.comboT > 0) this.comboT--; else this.combo = 0;
   };
-  Dummy.prototype.takeHit = function (hit) {
+  Dummy.prototype.takeHit = function (hit, world) {
     this.tiltV += hit.dir * (hit.finisher ? 0.22 : 0.1);
     this.flash = 7;
     this.combo++; this.comboT = 50;
@@ -1029,6 +1384,7 @@ body[data-input="touch"] #touch { display: block; }
     SH.fx.word(this.x, this.y - this.h - 10, label, hit.finisher ? '#ffd27a' : '#ffffff', 40);
     SH.fx.burst(this.x - hit.dir * 4, this.y - this.h * 0.6, 6, { angle: hit.dir > 0 ? 0 : Math.PI, spread: 1.2, speed: 2, life: 18, colors: ['#e8c77a', '#b8924a', '#fff2c9'] });
     if (hit.finisher) SH.fx.ring(this.x, this.y - this.h * 0.6, '#ffd27a', 24, 14, 2);
+    if (hit.finisher && this.combo >= 3 && world && world.onDummyCombo) world.onDummyCombo();
     return { landed: true, killed: false };
   };
 
@@ -1056,7 +1412,7 @@ body[data-input="touch"] #touch { display: block; }
     const x = s.x * T + T / 2;
     if (s.kind === 'bulb') return new Bulb(s.x * T, s.y * T);
     const y = s.y != null ? s.y * T : room.groundY(Math.floor(s.x), 0);
-    if (s.kind === 'thornSprite') return new ThornSprite(x, y);
+    if (s.kind === 'thornSprite') { const e = new ThornSprite(x, y); e.respawns = s.respawn; return e; }
     if (s.kind === 'dummy') return new Dummy(x, y);
     throw new Error('unknown spawn ' + s.kind);
   };
@@ -1064,16 +1420,193 @@ body[data-input="touch"] #touch { display: block; }
 
 </script>
 <script>
+// ---- src/art.js
+// Starhaven — placeholder art drawn in code: dialogue portraits, intro panels, and the people in the world.
+// Real art replaces this once Will approves an art direction (BUILD-PLAN rule).
+(function (SH) {
+  const A = SH.art = {};
+  const cache = {};
+  function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+
+  // ---------------------------------------------------------------- portraits (48 x 48 pixels, shown big)
+  const LOOKS = {
+    wren: { bg: ['#2c3d74', '#11163a'], skin: '#f6dcc6', shade: '#e2b89c', hair: '#d8653a', hairD: '#9e3f22', eye: '#3f9c7a', style: 'pony', ears: true, cloth: '#2f8f7a', clothD: '#1f6656', scarf: '#ffd27a' },
+    caelum: { bg: ['#3a2a6a', '#120d2a'], skin: '#ecd5c8', shade: '#cfb0a4', hair: '#1a1530', hairD: '#0c0a1a', eye: '#a58bff', style: 'swept', ears: true, cloth: '#1c1838', clothD: '#0e0c20', trim: '#cfd6ff', circlet: true, wings: true },
+    queen: { bg: ['#4a1426', '#14060c'], skin: '#efe4ea', shade: '#cdbac4', hair: '#2a0a16', hairD: '#14040a', eye: '#ff4a5a', style: 'long', ears: true, cloth: '#2a0a16', clothD: '#14040a', crown: true, lips: '#c0203a' },
+    bram: { bg: ['#5a3a1c', '#1c1008'], skin: '#d9a77f', shade: '#b8865f', hair: '#3a2a20', hairD: '#2a1c14', eye: '#5a3a22', style: 'shaved', ears: true, cloth: '#a8743a', clothD: '#6e4a22', beard: '#8a4426', scar: true, broad: true },
+    iris: { bg: ['#2a5a7a', '#0c1a2a'], skin: '#f2d9c8', shade: '#dcbca8', hair: '#f4f0ff', hairD: '#c8c0e8', eye: '#8fd8ff', style: 'bun', ears: true, cloth: '#4f88c0', clothD: '#2f5a88', thread: true },
+  };
+
+  A.portrait = function (who) {
+    if (cache['p_' + who]) return cache['p_' + who];
+    const L = LOOKS[who], c = canvas(48, 48), g = c.getContext('2d');
+    const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+    // backdrop
+    const gr = g.createRadialGradient(24, 20, 2, 24, 24, 34); gr.addColorStop(0, L.bg[0]); gr.addColorStop(1, L.bg[1]);
+    g.fillStyle = gr; g.fillRect(0, 0, 48, 48);
+    if (L.wings) { R(2, 14, 8, 30, '#0a0818'); R(38, 14, 8, 30, '#0a0818'); R(4, 10, 6, 6, '#0a0818'); R(38, 10, 6, 6, '#0a0818'); R(3, 14, 1, 26, '#6a5aa8'); R(44, 14, 1, 26, '#6a5aa8'); }
+    if (L.thread) { g.strokeStyle = '#ffe9a8'; g.globalAlpha = 0.8; g.beginPath(); g.moveTo(0, 40); g.bezierCurveTo(14, 24, 30, 46, 48, 30); g.stroke(); g.globalAlpha = 1; }
+    // long hair behind
+    if (L.style === 'long') { R(11, 10, 26, 34, L.hair); }
+    if (L.style === 'pony') { R(32, 14, 6, 16, L.hair); R(34, 28, 5, 8, L.hairD); }
+    // shoulders
+    const sw = L.broad ? 40 : 32, sx = 24 - sw / 2;
+    R(sx, 38, sw, 10, L.cloth); R(sx, 38, 4, 10, L.clothD);
+    if (L.trim) { R(18, 37, 12, 2, L.trim); R(22, 39, 4, 9, L.trim); }
+    if (L.scarf) { R(15, 35, 18, 4, L.scarf); R(15, 38, 4, 7, L.scarf); }
+    // neck + face
+    R(20, 32, 8, 7, L.shade);
+    R(15, 12, 18, 22, L.skin);
+    R(15, 30, 18, 4, L.shade);
+    if (L.ears) { R(12, 18, 3, 6, L.skin); R(11, 15, 2, 4, L.skin); R(33, 18, 3, 6, L.skin); R(35, 15, 2, 4, L.skin); }
+    // hair on top
+    if (L.style === 'pony') { R(14, 9, 20, 6, L.hair); R(14, 12, 3, 9, L.hair); R(30, 11, 4, 6, L.hairD); }
+    if (L.style === 'swept') { R(14, 8, 20, 6, L.hair); R(14, 12, 4, 10, L.hair); R(26, 12, 7, 3, L.hair); R(30, 12, 4, 8, L.hairD); }
+    if (L.style === 'long') { R(14, 8, 20, 6, L.hair); R(14, 12, 3, 22, L.hair); R(31, 12, 3, 22, L.hair); }
+    if (L.style === 'shaved') { R(15, 10, 18, 3, L.hair); }
+    if (L.style === 'bun') { R(14, 9, 20, 5, L.hair); R(19, 3, 10, 7, L.hair); R(14, 12, 3, 7, L.hair); R(31, 12, 3, 7, L.hair); R(21, 4, 6, 1, L.hairD); }
+    // eyes, brows, mouth
+    R(18, 20, 4, 3, '#ffffff'); R(26, 20, 4, 3, '#ffffff');
+    R(19, 20, 2, 3, L.eye); R(27, 20, 2, 3, L.eye);
+    R(18, 18, 4, 1, L.hairD); R(26, 18, 4, 1, L.hairD);
+    R(23, 23, 2, 4, L.shade);
+    R(21, 28, 6, 1, L.lips || '#a5605a');
+    if (L.beard) { R(15, 25, 18, 11, L.beard); R(17, 36, 14, 3, L.beard); R(21, 28, 6, 1, '#4a1a10'); R(18, 24, 12, 2, L.beard); }
+    if (L.scar) { R(27, 16, 1, 9, '#a85a4a'); }
+    if (L.circlet) { R(15, 13, 18, 1, '#cfd6ff'); R(23, 11, 2, 3, '#ffffff'); R(22, 12, 4, 1, '#ffffff'); }
+    if (L.crown) {
+      for (let i = 0; i < 6; i++) { R(14 + i * 4, 4 + (i % 2) * 2, 2, 7 - (i % 2) * 2, '#4a1a2a'); R(14 + i * 4, 4 + (i % 2) * 2, 2, 1, '#ff4a5a'); }
+      R(14, 10, 20, 2, '#4a1a2a');
+    }
+    // rim light on the side away from the viewer
+    g.globalAlpha = 0.35; R(32, 13, 1, 20, '#ffffff'); g.globalAlpha = 1;
+    return (cache['p_' + who] = c);
+  };
+  A.portraitURL = function (who) {
+    if (cache['u_' + who]) return cache['u_' + who];
+    return (cache['u_' + who] = A.portrait(who).toDataURL());
+  };
+
+  // ---------------------------------------------------------------- intro panels (320 x 150)
+  A.panel = function (id) {
+    if (cache['panel_' + id]) return cache['panel_' + id];
+    const W = 320, H = 150, c = canvas(W, H), g = c.getContext('2d');
+    const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+    const sky = (a, b) => { const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, a); gr.addColorStop(1, b); g.fillStyle = gr; g.fillRect(0, 0, W, H); };
+    const stars = (n, seed) => { let s = seed; for (let i = 0; i < n; i++) { s = (s * 9301 + 49297) % 233280; const x = s % W; s = (s * 9301 + 49297) % 233280; R(x, s % 90, 1, 1, '#e8ecff'); } };
+    const tri = (x1, y1, x2, y2, x3, y3, col) => { g.fillStyle = col; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.lineTo(x3, y3); g.fill(); };
+    const person = (x, y, h, col, extra) => { R(x - 3, y - h, 6, h - 6, col); R(x - 2, y - h - 6, 5, 6, col); R(x - 3, y - 6, 2, 6, col); R(x + 1, y - 6, 2, 6, col); if (extra) extra(x, y); };
+
+    if (id === 'woods') {
+      sky('#1a2348', '#5a6a98'); stars(40, 3);
+      g.fillStyle = '#0f1530';
+      for (let i = 0; i < 14; i++) { const x = i * 25 + (i % 3) * 6, h = 60 + (i % 4) * 14; tri(x, 120 - h, x - 14, 122, x + 14, 122, '#121a3a'); }
+      R(0, 118, W, 32, '#dfe8ff'); R(0, 118, W, 2, '#ffffff');
+      person(140, 120, 26, '#2a2238', (x) => { g.strokeStyle = '#6a4a2a'; g.beginPath(); g.arc(x + 6, 102, 9, -1.3, 1.3); g.stroke(); });
+      person(160, 120, 22, '#3a2a4a'); person(174, 120, 18, '#4a3a5a');
+      R(138, 92, 6, 3, '#d8653a');
+    } else if (id === 'mountain') {
+      sky('#120610', '#3a0f1e');
+      tri(160, 10, 20, 150, 300, 150, '#0a0306'); tri(160, 10, 120, 70, 200, 70, '#1a0810');
+      R(150, 110, 20, 40, '#ff4a5a'); R(152, 112, 16, 38, '#ff9aa8');
+      for (let i = 0; i < 7; i++) { R(128 + i * 9, 26 - (i % 2) * 5, 3, 12 + (i % 2) * 5, '#5a1a2a'); R(128 + i * 9, 26 - (i % 2) * 5, 3, 2, '#ff4a5a'); }
+      R(128, 36, 64, 3, '#5a1a2a');
+      person(160, 150, 22, '#0a0306');
+    } else if (id === 'sparks') {
+      sky('#0a0c20', '#1a1440'); stars(60, 7);
+      R(110, 118, 100, 6, '#2a2a4a'); R(130, 112, 60, 6, '#3a3a5a');
+      const cols = ['#ff8a3a', '#9fd8ff', '#8a6aff', '#ffe08a', '#4ad8c8', '#7ad86a', '#f0f4ff'];
+      cols.forEach((col, i) => {
+        const a = Math.PI + (i + 0.5) / 7 * Math.PI, x = 160 + Math.cos(a) * 90, y = 112 + Math.sin(a) * 80;
+        const gr = g.createRadialGradient(x, y, 1, x, y, 14); gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = gr; g.fillRect(x - 14, y - 14, 28, 28); R(x - 2, y - 2, 4, 4, '#ffffff');
+        g.strokeStyle = col; g.globalAlpha = 0.35; g.beginPath(); g.moveTo(x, y); g.lineTo(160, 108); g.stroke(); g.globalAlpha = 1;
+      });
+      R(140, 106, 40, 6, '#f6dcc6'); R(176, 104, 8, 8, '#d8653a');
+    } else if (id === 'caelum') {
+      sky('#0c0a24', '#3a2a6a'); stars(90, 11);
+      const gr = g.createRadialGradient(240, 120, 4, 240, 120, 80); gr.addColorStop(0, 'rgba(255,210,122,0.6)'); gr.addColorStop(1, 'rgba(255,210,122,0)');
+      g.fillStyle = gr; g.fillRect(140, 30, 200, 120);
+      for (let i = 0; i < 9; i++) { const x = 200 + i * 10, h = 20 + (i % 3) * 14; R(x, 140 - h, 7, h + 10, '#1a1640'); R(x + 2, 140 - h + 4, 2, 2, '#ffd27a'); }
+      g.fillStyle = '#05040e';
+      g.beginPath(); g.moveTo(110, 70); g.quadraticCurveTo(40, 30, 20, 90); g.lineTo(60, 80); g.lineTo(50, 110); g.lineTo(100, 96); g.fill();
+      g.beginPath(); g.moveTo(130, 70); g.quadraticCurveTo(200, 30, 220, 90); g.lineTo(180, 80); g.lineTo(190, 110); g.lineTo(140, 96); g.fill();
+      g.beginPath(); g.arc(120, 52, 8, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.moveTo(108, 64); g.lineTo(132, 64); g.lineTo(140, 150); g.lineTo(100, 150); g.closePath(); g.fill();
+      R(116, 58, 8, 8, '#05040e');
+      R(119, 40, 2, 5, '#ffffff'); R(116, 42, 8, 1, '#ffffff');
+    } else if (id === 'ships') {
+      sky('#1a0c0a', '#4a1c14');
+      R(0, 100, W, 50, '#140a12'); for (let x = 0; x < W; x += 12) R(x, 100 + (x % 24 === 0 ? 0 : 2), 8, 1, '#5a2a22');
+      for (let i = 0; i < 5; i++) {
+        const x = 30 + i * 62, y = 102 - (i % 2) * 6, s = 1 - (i % 2) * 0.25;
+        R(x, y - 6 * s, 40 * s, 8 * s, '#2a2a30'); R(x + 18 * s, y - 40 * s, 2, 34 * s, '#2a2a30');
+        tri(x + 20 * s, y - 38 * s, x + 20 * s, y - 12 * s, x + 38 * s, y - 14 * s, '#8a1a14');
+      }
+      for (let i = 0; i < 5; i++) R(132 + i * 12, 14 + (i % 2 ? 4 : 0), 6, 14 - (i % 2 ? 4 : 0), '#6a6a74');
+      R(130, 26, 62, 6, '#6a6a74');
+    }
+    return (cache['panel_' + id] = c);
+  };
+
+  // ---------------------------------------------------------------- people in the world (feet at x, y)
+  A.npc = function (ctx, n, t) {
+    if (n.hidden) return;
+    const x = Math.round(n.x), y = Math.round(n.y), f = n.facing || 1;
+    const R = (dx, dy, w, h, col) => { ctx.fillStyle = col; ctx.fillRect(x + (f > 0 ? dx : -dx - w), y + dy, w, h); };
+    const breathe = Math.round(Math.sin(t * 0.05 + x) * 0.8);
+    // a soft glow so people read against the dark
+    const gl = ctx.createRadialGradient(x, y - 24, 4, x, y - 24, 36);
+    gl.addColorStop(0, n.glow || 'rgba(200,190,255,0.14)'); gl.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = gl; ctx.fillRect(x - 36, y - 60, 72, 72);
+    if (n.id === 'caelum') {
+      // folded wings
+      R(-12, -50 + breathe, 7, 40, '#0a0818'); R(-10, -54 + breathe, 5, 6, '#0a0818'); R(-12, -48 + breathe, 1, 36, '#6a5aa8');
+      R(-4, -16, 4, 16, '#100e22'); R(1, -16, 4, 16, '#100e22');
+      R(-7, -38 + breathe, 14, 26, '#1c1838'); R(-7, -14, 15, 3, '#1c1838');
+      R(-1, -38 + breathe, 2, 26, '#cfd6ff');
+      R(-5, -49 + breathe, 10, 11, '#ecd5c8'); R(-6, -51 + breathe, 12, 5, '#1a1530'); R(-6, -48 + breathe, 3, 7, '#1a1530');
+      R(2, -45 + breathe, 2, 2, '#a58bff'); R(-5, -47 + breathe, 10, 1, '#cfd6ff');
+      R(-7, -46 + breathe, 2, 3, '#ecd5c8'); R(-8, -48 + breathe, 1, 2, '#ecd5c8');
+    } else if (n.id === 'bram') {
+      R(-6, -16, 5, 16, '#3a2a20'); R(2, -16, 5, 16, '#3a2a20');
+      R(-10, -36 + breathe, 20, 22, '#a8743a'); R(-10, -36 + breathe, 20, 3, '#d9a060'); R(-11, -20, 22, 4, '#5a3a1c');
+      R(-14, -34 + breathe, 5, 14, '#d9a77f'); R(10, -34 + breathe, 5, 14, '#d9a77f');
+      R(-5, -48 + breathe, 11, 12, '#d9a77f'); R(-5, -49 + breathe, 11, 2, '#3a2a20');
+      R(-5, -41 + breathe, 11, 7, '#8a4426'); R(2, -45 + breathe, 2, 2, '#2a1a10');
+    } else if (n.id === 'iris') {
+      R(-7, -30 + breathe, 14, 30, '#4f88c0'); R(-7, -30 + breathe, 3, 30, '#2f5a88');
+      R(-4, -40 + breathe, 9, 10, '#f2d9c8'); R(-5, -42 + breathe, 11, 4, '#f4f0ff'); R(-3, -47 + breathe, 6, 5, '#f4f0ff');
+      R(2, -36 + breathe, 2, 2, '#8fd8ff');
+      ctx.strokeStyle = '#ffe9a8'; ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.moveTo(x + f * 6, y - 20);
+      ctx.bezierCurveTo(x + f * 16, y - 34 + Math.sin(t * 0.05) * 4, x + f * 22, y - 10, x + f * 30, y - 26); ctx.stroke(); ctx.globalAlpha = 1;
+    }
+    // name tag, and a speech bubble when they have something to say
+    if (n.near || n.bubble) {
+      ctx.font = 'bold 10px system-ui, sans-serif'; ctx.textAlign = 'center';
+      const name = SH.STORY.CAST[n.id].name;
+      ctx.fillStyle = 'rgba(8,8,24,0.75)'; const tw = ctx.measureText(name).width + 8;
+      ctx.fillRect(x - tw / 2, y - 72, tw, 13);
+      ctx.fillStyle = SH.STORY.CAST[n.id].color; ctx.fillText(name, x, y - 62);
+    }
+    if (n.bubble) {
+      const by = y - 86 + Math.round(Math.sin(t * 0.1) * 2);
+      ctx.fillStyle = '#fff6d8'; ctx.fillRect(x - 9, by, 18, 11); ctx.fillRect(x - 3, by + 11, 4, 3);
+      ctx.fillStyle = '#1c1430'; for (let i = 0; i < 3; i++) ctx.fillRect(x - 6 + i * 5, by + 5, 2, 2);
+    }
+  };
+})(window.SH = window.SH || {});
+
+</script>
+<script>
 // ---- src/draw.js
 // Starhaven — drawing. Placeholder art with a fixed direction: moody painted-style depth behind,
-// a near-black play layer with moonlit edges, and a bright, clearly outlined Wren in front.
+// a near-black play layer with lit edges, and a bright, clearly outlined Wren in front.
+// Each place has its own palette (DESIGN.md "Palette by place"): the Deep in pale greens and roses,
+// the road at dusk in violet and rose, Starhaven in night blues and starlight gold, the Thornwood in cold blue.
 (function (SH) {
   const PAL = {
-    skyTop: '#090b20', skyMid: '#191a45', skyLow: '#33295c', horizon: '#4d3a72',
     star: '#ffffff', starDim: '#a9b8ff',
-    farRidge: '#23275a', nearRidge: '#181b42', ridgeLight: '#3a4088',
-    trees: '#11132e', treesLight: '#1f2350',
-    ground: '#0a0b17', groundSpeck: '#121430', edgeLight: '#c3cdff', edgeMid: '#56609c', grass: '#5ba39a', grassDark: '#2f6a66',
     plank: '#29233f', plankTop: '#cbb8ff',
     thornDark: '#2a1024', thornMid: '#5a1d3e', thornTip: '#ff5a78',
     gold: '#ffd27a', goldDeep: '#d9973f', warm: '#ffe9a8',
@@ -1083,76 +1616,140 @@ body[data-input="touch"] #touch { display: block; }
   };
   SH.PAL = PAL;
 
+  const THEMES = {
+    deep: {
+      sky: ['#050807', '#0b1411', '#13201b', '#1b2a22'], stars: false, far: 'cave', mid: 'roots',
+      farA: '#132019', farB: '#0d1712', midC: '#08100c', mist: 'rgba(150,220,180,0.10)', glow: 'rgba(255,140,170,0.20)',
+      ground: '#060908', speck: '#0d1611', edgeLight: '#d6f0dc', edgeMid: '#4f7a62', grass: '#8ccaa8', grassDark: '#3f6a58', side: '#16261e',
+      motes: ['#cfeedd', '#ffb8c8'],
+    },
+    dusk: {
+      sky: ['#0d0c26', '#2a2058', '#5a3270', '#9a5070'], stars: true, far: 'mountains', mid: 'trees',
+      farA: '#2e2560', farB: '#221b4a', midC: '#16123a', mist: 'rgba(255,150,170,0.12)',
+      ground: '#0b0a18', speck: '#151230', edgeLight: '#ffd6e0', edgeMid: '#8a5a8a', grass: '#7aa89a', grassDark: '#3f6a66', side: '#241c46',
+      motes: ['#ffe9a8', '#ffc0d0'],
+    },
+    city: {
+      sky: ['#070a22', '#151a48', '#2a2a60', '#3a3270'], stars: true, far: 'mountains', mid: 'spires',
+      farA: '#1e2458', farB: '#161b46', midC: '#121540', mist: 'rgba(150,140,230,0.12)',
+      ground: '#0b0b1a', speck: '#141632', edgeLight: '#e6dcff', edgeMid: '#6a62a8', grass: '#6a7ab8', grassDark: '#3a4278', side: '#22264e',
+      motes: ['#ffe9a8', '#fff6d8'],
+    },
+    thornwood: {
+      sky: ['#090b20', '#191a45', '#33295c', '#4d3a72'], stars: true, far: 'mountains', mid: 'trees',
+      farA: '#23275a', farB: '#181b42', midC: '#11132e', mist: 'rgba(110,100,190,0.18)',
+      ground: '#0a0b17', speck: '#121430', edgeLight: '#c3cdff', edgeMid: '#56609c', grass: '#5ba39a', grassDark: '#2f6a66', side: '#20264d',
+      motes: ['#cfe0ff', '#ffe9a8'],
+    },
+  };
+  SH.THEMES = THEMES;
+
   // Deterministic random so the art is the same every time.
   function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
 
   const D = {};
-  let room, layers = {};
+  let room, layers = { bg: {} };
 
   D.init = function (r, viewW) {
     room = r;
-    layers.level = makeLevel(r);
-    D.resize(viewW);
-    if (!layers.mountains) layers.mountains = makeMountains();
-    if (!layers.trees) layers.trees = makeTrees();
+    const def = r.def;
+    layers.level = makeLevel(r, THEMES[def.theme]);
+    const themes = def.zones ? def.zones.map(z => z.theme) : [def.theme];
+    for (const th of themes) if (!layers.bg[th]) layers.bg[th] = makeBackdrop(THEMES[th], th);
     if (!layers.stars) layers.stars = makeStars();
+    D.resize(viewW);
   };
   D.resize = function (viewW) {
     layers.viewW = viewW;
-    layers.sky = makeSky(viewW);
     layers.vignette = makeVignette(viewW);
   };
 
   function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 
-  function makeSky(w) {
-    const c = canvas(w, 360), g = c.getContext('2d');
+  function makeBackdrop(T, name) {
+    const out = {};
+    const s = canvas(16, 360), g = s.getContext('2d');
     const gr = g.createLinearGradient(0, 0, 0, 360);
-    gr.addColorStop(0, PAL.skyTop); gr.addColorStop(0.45, PAL.skyMid); gr.addColorStop(0.78, PAL.skyLow); gr.addColorStop(1, PAL.horizon);
-    g.fillStyle = gr; g.fillRect(0, 0, w, 360);
-    return c;
+    gr.addColorStop(0, T.sky[0]); gr.addColorStop(0.45, T.sky[1]); gr.addColorStop(0.78, T.sky[2]); gr.addColorStop(1, T.sky[3]);
+    g.fillStyle = gr; g.fillRect(0, 0, 16, 360);
+    out.sky = s;
+    out.far = T.far === 'cave' ? makeCave(T) : makeMountains(T);
+    out.mid = T.mid === 'roots' ? makeRoots(T) : T.mid === 'spires' ? makeSpires(T) : makeTrees(T);
+    return out;
   }
   function makeStars() {
     const r = rng(7), out = [];
     for (let i = 0; i < 140; i++) out.push({ x: r() * 2400, y: r() * 230, s: r() < 0.12 ? 2 : 1, tw: r() * 6, sp: 0.02 + r() * 0.05 });
     return out;
   }
-  function ridge(g, r, w, base, amp, color, light) {
+  function ridge(g, w, base, amp, color, light, seed) {
     g.fillStyle = color; g.beginPath(); g.moveTo(0, 360);
-    let y = base, pts = [];
+    const pts = [];
     for (let x = 0; x <= w; x += 8) {
-      const n = Math.sin(x * 0.004 + 1.3) * amp + Math.sin(x * 0.011) * amp * 0.45 + Math.sin(x * 0.031 + 2) * amp * 0.12;
-      y = base - Math.abs(n);
-      pts.push([x, y]); g.lineTo(x, y);
+      const n = Math.sin(x * 0.004 + seed) * amp + Math.sin(x * 0.011 + seed * 2) * amp * 0.45 + Math.sin(x * 0.031 + 2) * amp * 0.12;
+      const y = base - Math.abs(n); pts.push([x, y]); g.lineTo(x, y);
     }
     g.lineTo(w, 360); g.closePath(); g.fill();
     if (light) { g.strokeStyle = light; g.globalAlpha = 0.5; g.lineWidth = 1; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); g.globalAlpha = 1; }
   }
-  function makeMountains() {
-    const w = 1600, c = canvas(w, 360), g = c.getContext('2d'), r = rng(3);
-    ridge(g, r, w, 250, 80, PAL.farRidge, PAL.ridgeLight);
-    // a soft mist band between ridges
-    const m = g.createLinearGradient(0, 200, 0, 300); m.addColorStop(0, 'rgba(120,110,200,0)'); m.addColorStop(1, 'rgba(120,110,200,0.22)');
+  function makeMountains(T) {
+    const w = 1600, c = canvas(w, 360), g = c.getContext('2d');
+    ridge(g, w, 250, 80, T.farA, 'rgba(255,255,255,0.25)', 1.3);
+    const m = g.createLinearGradient(0, 200, 0, 300); m.addColorStop(0, 'rgba(0,0,0,0)'); m.addColorStop(1, T.mist);
     g.fillStyle = m; g.fillRect(0, 200, w, 160);
-    ridge(g, r, w, 300, 46, PAL.nearRidge, null);
+    ridge(g, w, 300, 46, T.farB, null, 2.1);
     return c;
   }
-  function makeTrees() {
+  function makeTrees(T) {
     const w = 1400, c = canvas(w, 360), g = c.getContext('2d'), r = rng(11);
     for (let i = 0; i < 26; i++) {
       const x = r() * w, top = 70 + r() * 150, tw = 5 + r() * 9;
-      g.fillStyle = PAL.trees;
+      g.fillStyle = T.midC;
       g.fillRect(x, top, tw, 360 - top);
-      // branches and leaf masses
       for (let b = 0; b < 4; b++) {
         const by = top + 10 + r() * 90, dir = r() < 0.5 ? -1 : 1, len = 14 + r() * 26;
-        g.save(); g.translate(x + tw / 2, by); g.rotate(dir * (0.5 + r() * 0.5) - Math.PI / 2 * 0);
-        g.fillRect(0, -1.5, dir * len, 3); g.restore();
+        g.save(); g.translate(x + tw / 2, by); g.rotate(dir * (0.5 + r() * 0.5)); g.fillRect(0, -1.5, dir * len, 3); g.restore();
       }
       g.beginPath(); g.ellipse(x + tw / 2, top + 6, 22 + r() * 22, 14 + r() * 12, 0, 0, Math.PI * 2); g.fill();
-      g.fillStyle = PAL.treesLight; g.globalAlpha = 0.5; g.fillRect(x + tw - 1, top + 8, 1, 360 - top); g.globalAlpha = 1;
     }
-    g.fillStyle = PAL.trees; g.fillRect(0, 330, w, 30);
+    g.fillStyle = T.midC; g.fillRect(0, 330, w, 30);
+    return c;
+  }
+  function makeSpires(T) {
+    // Starhaven's skyline: towers with gold windows
+    const w = 1500, c = canvas(w, 360), g = c.getContext('2d'), r = rng(31);
+    for (let i = 0; i < 40; i++) {
+      const x = r() * w, bw = 14 + r() * 26, top = 120 + r() * 140;
+      g.fillStyle = T.midC; g.fillRect(x, top, bw, 360 - top);
+      g.beginPath(); g.moveTo(x - 2, top); g.lineTo(x + bw / 2, top - 14 - r() * 20); g.lineTo(x + bw + 2, top); g.fill();
+      for (let wy = top + 8; wy < 330; wy += 12) for (let wx = x + 4; wx < x + bw - 4; wx += 8) if (r() < 0.35) { g.fillStyle = r() < 0.5 ? '#ffd27a' : '#c9a050'; g.fillRect(wx, wy, 2, 3); }
+    }
+    return c;
+  }
+  function makeCave(T) {
+    // the Deep: far rock walls and a faint rose glow from somewhere below
+    const w = 1400, c = canvas(w, 360), g = c.getContext('2d'), r = rng(5);
+    for (let i = 0; i < 9; i++) {
+      const x = r() * w, gr = g.createRadialGradient(x, 200 + r() * 80, 4, x, 240, 140);
+      gr.addColorStop(0, T.glow); gr.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = gr; g.fillRect(x - 140, 100, 280, 260);
+    }
+    g.fillStyle = T.farA;
+    for (let x = 0; x < w; x += 40) { const h = 60 + r() * 120; g.fillRect(x, 0, 42, h); g.beginPath(); g.moveTo(x, h); g.lineTo(x + 20, h + 20 + r() * 40); g.lineTo(x + 42, h); g.fill(); }
+    for (let x = 0; x < w; x += 50) { const h = 40 + r() * 90; g.fillRect(x, 360 - h, 52, h); }
+    return c;
+  }
+  function makeRoots(T) {
+    const w = 1200, c = canvas(w, 360), g = c.getContext('2d'), r = rng(9);
+    g.strokeStyle = T.midC; g.lineCap = 'round';
+    for (let i = 0; i < 30; i++) {
+      let x = r() * w, y = 0; g.lineWidth = 2 + r() * 5; g.beginPath(); g.moveTo(x, y);
+      const len = 80 + r() * 200;
+      while (y < len) { x += (r() - 0.5) * 18; y += 12; g.lineTo(x, y); }
+      g.stroke();
+    }
+    g.fillStyle = T.midC;
+    for (let x = 0; x < w; x += 30) { const h = 20 + r() * 50; g.beginPath(); g.moveTo(x, 360); g.lineTo(x + 15, 360 - h); g.lineTo(x + 30, 360); g.fill(); }
     return c;
   }
   function makeVignette(w) {
@@ -1163,24 +1760,28 @@ body[data-input="touch"] #touch { display: block; }
     return c;
   }
 
-  function makeLevel(r) {
+  function makeLevel(r, T) {
     const TS = SH.TILE, c = canvas(r.pxW, r.pxH), g = c.getContext('2d'), rand = rng(21);
     const get = (x, y) => r.get(x, y);
     const solid = (x, y) => get(x, y) === SH.T_SOLID;
     for (let ty = 0; ty < r.h; ty++) for (let tx = 0; tx < r.w; tx++) {
       const t = get(tx, ty), x = tx * TS, y = ty * TS;
       if (t === SH.T_SOLID) {
-        g.fillStyle = PAL.ground; g.fillRect(x, y, TS, TS);
-        for (let i = 0; i < 3; i++) { g.fillStyle = PAL.groundSpeck; g.fillRect(x + ((rand() * TS) | 0), y + ((rand() * TS) | 0), 2, 2); }
-        const openUp = !solid(tx, ty - 1), openL = !solid(tx - 1, ty), openR = !solid(tx + 1, ty);
-        if (openL) { g.fillStyle = '#20264d'; g.fillRect(x, y, 2, TS); }
-        if (openR) { g.fillStyle = '#20264d'; g.fillRect(x + TS - 2, y, 2, TS); }
+        g.fillStyle = T.ground; g.fillRect(x, y, TS, TS);
+        for (let i = 0; i < 3; i++) { g.fillStyle = T.speck; g.fillRect(x + ((rand() * TS) | 0), y + ((rand() * TS) | 0), 2, 2); }
+        const openUp = !solid(tx, ty - 1) && ty > 0, openL = !solid(tx - 1, ty), openR = !solid(tx + 1, ty), openDown = !solid(tx, ty + 1) && ty < r.h - 1;
+        if (openL) { g.fillStyle = T.side; g.fillRect(x, y, 2, TS); }
+        if (openR) { g.fillStyle = T.side; g.fillRect(x + TS - 2, y, 2, TS); }
+        if (openDown) { // a roof edge: hanging roots
+          g.fillStyle = T.side; g.fillRect(x, y + TS - 2, TS, 2);
+          if (rand() < 0.5) { g.fillStyle = T.grassDark; g.fillRect(x + ((rand() * TS) | 0), y + TS, 1, 3 + ((rand() * 8) | 0)); }
+        }
         if (openUp) {
-          g.fillStyle = PAL.edgeMid; g.fillRect(x, y + 2, TS, 2);
-          g.fillStyle = PAL.edgeLight; g.fillRect(x, y, TS, 2);
+          g.fillStyle = T.edgeMid; g.fillRect(x, y + 2, TS, 2);
+          g.fillStyle = T.edgeLight; g.fillRect(x, y, TS, 2);
           for (let i = 0; i < 5; i++) {
             const gx = x + ((rand() * TS) | 0), gh = 1 + ((rand() * 4) | 0);
-            g.fillStyle = rand() < 0.5 ? PAL.grass : PAL.grassDark; g.fillRect(gx, y - gh, 1, gh);
+            g.fillStyle = rand() < 0.5 ? T.grass : T.grassDark; g.fillRect(gx, y - gh, 1, gh);
           }
           // Gold glint on a ledge that drops into a pit: "careful, edge here".
           const pitL = openL && r.groundY(tx - 1, ty) === null, pitR = openR && r.groundY(tx + 1, ty) === null;
@@ -1207,34 +1808,30 @@ body[data-input="touch"] #touch { display: block; }
 
   // ---------------------------------------------------------------- per frame
   D.frame = function (ctx, w) {
-    const vw = layers.viewW, cam = w.cam, fx = SH.fx, t = w.time;
+    const vw = layers.viewW, cam = w.cam, fx = SH.fx, t = w.time, VH = SH.VIEW_H;
     let sx = 0, sy = 0;
     if (fx.shake > 0) { sx = Math.round((Math.random() - 0.5) * fx.shake * 2); sy = Math.round((Math.random() - 0.5) * fx.shake * 2); }
     const cx = Math.round(cam.x), cy = Math.round(cam.y);
+    const def = w.room.def;
 
-    ctx.drawImage(layers.sky, 0, 0);
-    // stars
-    for (const s of layers.stars) {
-      const x = ((s.x - cx * s.sp) % 2400 + 2400) % 2400;
-      if (x > vw) continue;
-      ctx.globalAlpha = 0.45 + 0.55 * Math.abs(Math.sin(t * 0.03 + s.tw));
-      ctx.fillStyle = s.s > 1 ? PAL.star : PAL.starDim; ctx.fillRect(x, s.y - cy * 0.02, s.s, s.s);
-    }
-    ctx.globalAlpha = 1;
-    drawCity(ctx, w, vw, cx, cy);
-    tile(ctx, layers.mountains, cx * 0.12, 10 - cy * 0.08, vw);
-    ctx.globalAlpha = 0.8; tile(ctx, layers.trees, cx * 0.38, 30 - cy * 0.3, vw); ctx.globalAlpha = 1;
-    // mist in front of the trees
-    const VH = SH.VIEW_H;
-    const mist = ctx.createLinearGradient(0, 180 - cy * 0.3, 0, VH);
-    mist.addColorStop(0, 'rgba(110,100,190,0)'); mist.addColorStop(1, 'rgba(110,100,190,0.20)');
-    ctx.fillStyle = mist; ctx.fillRect(0, 0, vw, VH);
+    // backdrop: one theme, or two blended where the room changes place
+    const zones = def.zones || [{ x: 0, theme: def.theme }];
+    const mid = (cx + vw / 2) / SH.TILE;
+    let zi = 0; for (let i = 0; i < zones.length; i++) if (mid >= zones[i].x - 6) zi = i;
+    drawBackdrop(ctx, w, zones[Math.max(0, zi - 1)].theme, cx, cy, vw, VH, 1);
+    if (zi > 0) { const k = Math.min(1, (mid - (zones[zi].x - 6)) / 12); drawBackdrop(ctx, w, zones[zi].theme, cx, cy, vw, VH, k); }
 
     ctx.save();
     ctx.translate(-cx + sx, -cy + sy);
+    if (def.cityFrom != null) drawStreet(ctx, w, cx, vw, t);
+    if (def.arch != null) drawArch(ctx, w, def.arch);
     ctx.drawImage(layers.level, cx, cy, vw, VH, cx, cy, vw, VH);
+    if (def.house) drawHouse(ctx, w, def.house);
+    if (def.mural) drawMural(ctx, w, def.mural, t);
+    for (const g of w.gates) drawGate(ctx, g);
+    if (def.exitLight != null) drawExitLight(ctx, def.exitLight, t);
     for (const l of w.lanterns) drawLantern(ctx, l, t);
-    for (const s of w.signs) drawSign(ctx, s, t);
+    for (const n of w.npcs) SH.art.npc(ctx, n, t);
     for (const e of w.things) {
       if (e.x < cx - 80 || e.x > cx + vw + 80) continue;
       if (e.kind === 'thornSprite') drawSprite(ctx, e, t);
@@ -1243,14 +1840,44 @@ body[data-input="touch"] #touch { display: block; }
     }
     for (const g of fx.ghosts) drawWren(ctx, w.player, { ghost: g });
     drawWren(ctx, w.player, {});
+    if (w.wyrm && w.wyrm.on) drawWyrm(ctx, w.wyrm, cy, t);
     drawParticles(ctx, fx);
     ctx.restore();
 
     ctx.drawImage(layers.vignette, 0, 0);
     if (fx.flash > 0) { ctx.fillStyle = fx.flashColor; ctx.globalAlpha = Math.min(1, fx.flash / 6); ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = 1; }
     if (fx.slowmo > 0) { ctx.fillStyle = 'rgba(120,190,255,0.10)'; ctx.fillRect(0, 0, vw, VH); }
-    if (w.fade > 0) { ctx.fillStyle = '#05050d'; ctx.globalAlpha = Math.min(1, w.fade); ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = 1; }
+    if (w.fade > 0) { ctx.fillStyle = w.fadeColor || '#05050d'; ctx.globalAlpha = Math.min(1, w.fade); ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = 1; }
   };
+
+  function drawBackdrop(ctx, w, theme, cx, cy, vw, VH, alpha) {
+    const T = THEMES[theme], L = layers.bg[theme], t = w.time;
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(L.sky, 0, 0, vw, 360);
+    if (T.stars) {
+      for (const s of layers.stars) {
+        const x = ((s.x - cx * s.sp) % 2400 + 2400) % 2400;
+        if (x > vw) continue;
+        ctx.globalAlpha = alpha * (0.45 + 0.55 * Math.abs(Math.sin(t * 0.03 + s.tw)));
+        ctx.fillStyle = s.s > 1 ? PAL.star : PAL.starDim; ctx.fillRect(x, s.y - cy * 0.02, s.s, s.s);
+      }
+      ctx.globalAlpha = alpha;
+    }
+    if (w.room.def.cityGlowX != null) drawCity(ctx, w, vw, cx, cy);
+    tile(ctx, L.far, cx * 0.12, 10 - cy * 0.08, vw);
+    ctx.globalAlpha = alpha * 0.85; tile(ctx, L.mid, cx * 0.38, 30 - cy * 0.3, vw); ctx.globalAlpha = alpha;
+    const mist = ctx.createLinearGradient(0, 180 - cy * 0.3, 0, VH);
+    mist.addColorStop(0, 'rgba(0,0,0,0)'); mist.addColorStop(1, T.mist);
+    ctx.fillStyle = mist; ctx.fillRect(0, 0, vw, VH);
+    // drifting motes
+    for (let i = 0; i < 22; i++) {
+      const px = ((i * 137 + t * (0.15 + (i % 5) * 0.05) - cx * 0.6) % (vw + 40) + vw + 40) % (vw + 40) - 20;
+      const py = (i * 53 + Math.sin(t * 0.01 + i) * 20 - cy * 0.5 + 400) % VH;
+      ctx.globalAlpha = alpha * (0.3 + 0.3 * Math.sin(t * 0.04 + i));
+      ctx.fillStyle = T.motes[i % 2]; ctx.fillRect(px, py, 2, 2);
+    }
+    ctx.globalAlpha = 1;
+  }
 
   function tile(ctx, img, ox, oy, vw) {
     const iw = img.width; let x = -(((ox % iw) + iw) % iw);
@@ -1270,11 +1897,112 @@ body[data-input="touch"] #touch { display: block; }
     for (const [dx, h] of spires) { ctx.fillRect(x + dx, y - h, 6, h + 20); ctx.beginPath(); ctx.moveTo(x + dx, y - h); ctx.lineTo(x + dx + 3, y - h - 8); ctx.lineTo(x + dx + 6, y - h); ctx.fill(); }
     ctx.fillStyle = PAL.gold;
     for (const [dx, h] of spires) for (let k = 6; k < h; k += 8) ctx.fillRect(x + dx + 2, y - h + k, 2, 2);
-    // the guiding star above the city
     const tw = 0.7 + 0.3 * Math.sin(w.time * 0.05);
-    ctx.globalAlpha = tw; ctx.fillStyle = '#fff6d8';
+    ctx.save(); ctx.globalAlpha *= tw; ctx.fillStyle = '#fff6d8';
     ctx.fillRect(x - 1, y - 74, 3, 3); ctx.fillRect(x - 5, y - 73, 11, 1); ctx.fillRect(x, y - 79, 1, 13);
-    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  // ---------------------------------------------------------------- Starhaven pieces
+  // House fronts along the street. Their windows light up as the street is restored (w.cityLight 0..1).
+  function drawStreet(ctx, w, cx, vw, t) {
+    const TS = SH.TILE, def = w.room.def, x0 = def.cityFrom * TS, x1 = (def.cityTo != null ? def.cityTo : def.house ? def.house.x0 : def.width) * TS;
+    const gy = 16 * TS, light = w.cityLight || 0;
+    if (!w.street) { // lay the street out once per room so it never shifts
+      const r = rng(77); w.street = [];
+      for (let x = x0; x < x1;) {
+        const b = { x, bw: 70 + ((r() * 50) | 0), bh: 90 + ((r() * 70) | 0), hue: r(), wins: [] };
+        for (let wy = gy - b.bh + 14; wy < gy - 26; wy += 22) for (let wx = x + 10; wx < x + b.bw - 22; wx += 22) b.wins.push({ wx, wy, k: r() });
+        w.street.push(b); x += b.bw;
+      }
+    }
+    for (const b of w.street) {
+      const x = b.x, bw = b.bw, bh = b.bh;
+      if (x + bw < cx - 20 || x > cx + vw + 20) continue;
+      ctx.fillStyle = b.hue < 0.5 ? '#1a1838' : '#201c40'; ctx.fillRect(x, gy - bh, bw - 6, bh);
+      ctx.fillStyle = '#2c2856'; ctx.beginPath(); ctx.moveTo(x - 4, gy - bh); ctx.lineTo(x + (bw - 6) / 2, gy - bh - 22); ctx.lineTo(x + bw - 2, gy - bh); ctx.fill();
+      for (const { wx, wy, k } of b.wins) {
+        const on = k < light * 1.1;
+        ctx.fillStyle = on ? (Math.sin(t * 0.05 + wx) > -0.9 ? '#ffd98a' : '#e8b860') : '#0e0c22';
+        ctx.fillRect(wx, wy, 9, 12);
+        if (on) { ctx.globalAlpha = 0.18; ctx.fillStyle = '#ffd27a'; ctx.fillRect(wx - 6, wy - 6, 21, 24); ctx.globalAlpha = 1; }
+      }
+      ctx.fillStyle = '#0c0a1e'; ctx.fillRect(x + (bw - 6) / 2 - 7, gy - 26, 14, 26);
+    }
+    // street lamps
+    for (let lx = x0 + 60; lx < x1; lx += 200) {
+      const on = light > 0.3;
+      if (on) { const g = ctx.createRadialGradient(lx, gy - 54, 2, lx, gy - 54, 50); g.addColorStop(0, 'rgba(255,214,130,0.4)'); g.addColorStop(1, 'rgba(255,214,130,0)'); ctx.fillStyle = g; ctx.fillRect(lx - 50, gy - 104, 100, 100); }
+      ctx.fillStyle = '#16142c'; ctx.fillRect(lx - 1, gy - 50, 3, 50); ctx.fillRect(lx - 5, gy - 58, 11, 8);
+      ctx.fillStyle = on ? PAL.warm : '#2a2850'; ctx.fillRect(lx - 3, gy - 56, 7, 5);
+    }
+  }
+  function drawArch(ctx, w, ax) {
+    const TS = SH.TILE, x = ax * TS, gy = 16 * TS;
+    ctx.fillStyle = '#1e1a3c';
+    ctx.fillRect(x - 40, gy - 120, 16, 120); ctx.fillRect(x + 24, gy - 120, 16, 120);
+    ctx.beginPath(); ctx.moveTo(x - 44, gy - 116); ctx.quadraticCurveTo(x, gy - 170, x + 44, gy - 116); ctx.lineTo(x + 44, gy - 104); ctx.quadraticCurveTo(x, gy - 150, x - 44, gy - 104); ctx.fill();
+    ctx.fillStyle = PAL.gold; ctx.fillRect(x - 1, gy - 150, 3, 10); ctx.fillRect(x - 5, gy - 146, 11, 2);
+    ctx.font = 'bold 9px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#cfc4ff'; ctx.fillText('STARHAVEN', x, gy - 128);
+  }
+  function drawHouse(ctx, w, h) {
+    const TS = SH.TILE, x0 = h.x0 * TS, x1 = h.x1 * TS, top = h.top * TS, gy = 16 * TS;
+    ctx.fillStyle = '#1c1a3a'; ctx.fillRect(x0, top + 4, x1 - x0, gy - top - 4);
+    ctx.fillStyle = '#d6ccff'; ctx.fillRect(x0, top, x1 - x0, 2);
+    const light = w.cityLight || 0;
+    for (let x = x0 + 18; x < x1 - 30; x += 40) { ctx.fillStyle = light > 0.5 ? '#ffd98a' : '#0e0c22'; ctx.fillRect(x, top + 26, 14, 18); ctx.fillRect(x, top + 74, 14, 18); }
+    ctx.fillStyle = '#3a2a1e'; ctx.fillRect(x1 - 52, gy - 40, 22, 40); ctx.fillStyle = PAL.gold; ctx.fillRect(x1 - 34, gy - 22, 2, 2);
+    // rooftop rail and a lantern
+    ctx.fillStyle = '#2a2650'; for (let x = x0; x < x1; x += 10) ctx.fillRect(x, top - 10, 2, 10); ctx.fillRect(x0, top - 12, x1 - x0, 2);
+  }
+  function drawMural(ctx, w, m, t) {
+    const TS = SH.TILE, x = m.x * TS, wd = m.w * TS, gy = 16 * TS, ht = 96, y = gy - ht - 6;
+    ctx.fillStyle = '#2a2648'; ctx.fillRect(x - 4, y - 4, wd + 8, ht + 10);
+    ctx.fillStyle = '#4a4668'; ctx.fillRect(x, y, wd, ht);
+    for (let by = y; by < y + ht; by += 12) { ctx.fillStyle = '#3e3a5c'; ctx.fillRect(x, by, wd, 1); }
+    const k = w.muralProgress || 0;
+    if (k > 0) {
+      ctx.save(); ctx.beginPath(); ctx.rect(x, y, wd * k, ht); ctx.clip();
+      const g = ctx.createLinearGradient(0, y, 0, y + ht); g.addColorStop(0, '#1a2a7a'); g.addColorStop(0.6, '#6a3a9a'); g.addColorStop(1, '#ff9a7a');
+      ctx.fillStyle = g; ctx.fillRect(x, y, wd, ht);
+      ctx.fillStyle = '#fff6d8'; for (let i = 0; i < 14; i++) ctx.fillRect(x + (i * 37) % wd, y + 6 + (i * 13) % 40, 2, 2);
+      ctx.fillStyle = '#ffd27a'; ctx.beginPath(); ctx.arc(x + wd * 0.75, y + 24, 12, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#1a1438';
+      for (let i = 0; i < 7; i++) { const bx = x + 8 + i * 15, bh = 20 + (i % 3) * 12; ctx.fillRect(bx, y + ht - bh, 11, bh); }
+      ctx.fillStyle = '#ffd27a'; for (let i = 0; i < 7; i++) ctx.fillRect(x + 12 + i * 15, y + ht - 14, 3, 3);
+      ctx.restore();
+      if (k < 1) { ctx.fillStyle = '#fff6d8'; ctx.fillRect(x + wd * k - 1, y, 2, ht); }
+    }
+    if (w.muralNear && k < 1) {
+      const bob = Math.round(Math.sin(t * 0.1) * 2);
+      ctx.fillStyle = PAL.gold; ctx.fillRect(x + wd / 2 - 1, y - 18 + bob, 3, 8); ctx.fillRect(x + wd / 2 - 1, y - 8 + bob, 3, 3);
+    }
+  }
+  function drawGate(ctx, g) {
+    if (!g.closed && (g.lift || 0) >= 1) return;
+    const TS = SH.TILE, x = g.x * TS, top = g.top * TS, bot = g.bottom * TS, lift = (g.lift || 0) * (bot - top);
+    ctx.fillStyle = '#3a2a1e'; ctx.fillRect(x + 2, top - lift, TS - 4, bot - top);
+    ctx.fillStyle = '#5a4430'; for (let y = top - lift + 6; y < bot - lift; y += 14) ctx.fillRect(x + 2, y, TS - 4, 3);
+    ctx.fillStyle = '#ffd27a'; ctx.fillRect(x + TS / 2 - 2, bot - lift - 40, 4, 4);
+  }
+  function drawExitLight(ctx, ex, t) {
+    const TS = SH.TILE, x = ex * TS + TS / 2;
+    const g = ctx.createRadialGradient(x, 300, 6, x, 300, 150 + Math.sin(t * 0.05) * 10);
+    g.addColorStop(0, 'rgba(255,250,230,0.85)'); g.addColorStop(0.3, 'rgba(255,220,180,0.35)'); g.addColorStop(1, 'rgba(255,220,180,0)');
+    ctx.fillStyle = g; ctx.fillRect(x - 160, 140, 320, 280);
+    ctx.fillStyle = 'rgba(255,252,240,0.9)'; ctx.fillRect(x - 10, 96, 20, 288);
+  }
+  function drawWyrm(ctx, wy, cy, t) {
+    // the Deep Wyrm: a wall of dark coils with pale eyes, filling everything behind its front edge
+    const x = wy.x, top = cy - 20, bot = cy + SH.VIEW_H + 20;
+    ctx.fillStyle = '#020403'; ctx.fillRect(x - 2000, top, 2000, bot - top);
+    ctx.beginPath(); ctx.moveTo(x, top);
+    for (let y = top; y <= bot; y += 16) ctx.lineTo(x + 18 + Math.sin(y * 0.05 + t * 0.2) * 14, y);
+    ctx.lineTo(x - 10, bot); ctx.fill();
+    ctx.fillStyle = '#d6f0dc';
+    const ey = cy + 150 + Math.sin(t * 0.07) * 10;
+    ctx.fillRect(x - 6, ey, 10, 4); ctx.fillRect(x - 6, ey + 30, 10, 4);
+    ctx.fillStyle = '#ff7a8a'; ctx.fillRect(x - 2, ey + 1, 3, 2); ctx.fillRect(x - 2, ey + 31, 3, 2);
   }
 
   function drawParticles(ctx, fx) {
@@ -1316,19 +2044,6 @@ body[data-input="touch"] #touch { display: block; }
     if (big) {
       ctx.fillStyle = l.lit ? '#fff6d8' : '#5a5590';
       ctx.fillRect(x - 1, y - h - 22, 2, 10); ctx.fillRect(x - 5, y - h - 18, 10, 2);
-    }
-  }
-
-  function drawSign(ctx, s, t) {
-    const x = s.px, y = s.py;
-    ctx.fillStyle = '#2a2140'; ctx.fillRect(x - 2, y - 24, 4, 24);
-    ctx.fillStyle = s.read ? '#3a2f55' : '#4a3a6a'; ctx.fillRect(x - 14, y - 34, 28, 16);
-    ctx.fillStyle = s.near ? PAL.gold : '#a99ad8'; ctx.fillRect(x - 14, y - 34, 28, 2);
-    ctx.fillStyle = '#d8ccff';
-    for (let i = 0; i < 3; i++) ctx.fillRect(x - 9, y - 29 + i * 4, 18 - (i === 2 ? 6 : 0), 1);
-    if (!s.read && !s.near) {
-      const bob = Math.round(Math.sin(t * 0.1) * 2);
-      ctx.fillStyle = PAL.gold; ctx.fillRect(x - 1, y - 48 + bob, 3, 7); ctx.fillRect(x - 1, y - 39 + bob, 3, 3);
     }
   }
 
@@ -1415,6 +2130,7 @@ body[data-input="touch"] #touch { display: block; }
     const pose = g ? g.pose : poseOf(p);
     const a = p.anim;
     const tint = g ? 'rgba(140,220,255,' + (0.35 * g.life / g.max).toFixed(3) + ')' : null;
+    if (!g && p.hidden) return;
     const flicker = !g && p.invuln > 0 && Math.floor(p.invuln / 3) % 2 === 0 && p.stun <= 0;
     if (flicker) return;
 
@@ -1555,50 +2271,60 @@ body[data-input="touch"] #touch { display: block; }
 </script>
 <script>
 // ---- src/game.js
-// Starhaven — the game: world setup, the 60 fps loop, camera, checkpoints, hazards, signs, knockouts, results.
+// Starhaven — the game: chapters, story scripts, the 60 fps loop, camera, checkpoints, hazards, knockouts.
+// Flow: title -> intro panels -> chapter card -> play (story scripts pause play for dialogue) -> chapter complete -> next.
 (function (SH) {
-  const fx = SH.fx, input = SH.input;
-  const TS = SH.TILE;
+  const fx = SH.fx, input = SH.input, TS = SH.TILE, ST = SH.STORY;
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode: fine */ } },
   };
   SH.store = store;
-
-  // Live tuning = defaults + anything saved from the TUNE panel.
   SH.tune = Object.assign({}, SH.TUNE_DEFAULTS, store.get('starhaven.tune.v1', {}));
 
-  const G = SH.game = { state: 'title', world: null, frozen: false };
+  const G = SH.game = {
+    state: 'title', world: null, frozen: false,
+    chapter: 0, flags: {}, activeGoal: null, script: null,
+    progress: Object.assign({ reached: 0, hearts: {}, met: [] }, store.get('starhaven.save.v1', {})),
+  };
+  G.save = function () { store.set('starhaven.save.v1', G.progress); };
+  G.chapterDef = () => ST.CHAPTERS[G.chapter];
 
-  G.build = function () {
-    const def = SH.ROOMS.grove, room = SH.buildRoom(def);
-    const st = def.start;
-    const player = new SH.Player(st.x * TS + TS / 2, st.y * TS);
+  // ---------------------------------------------------------------- building a room
+  G.build = function (roomId) {
+    const def = SH.ROOMS[roomId], room = SH.buildRoom(def);
+    const player = new SH.Player(def.start.x * TS + TS / 2, def.start.y * TS);
     const things = def.spawns.map(s => SH.makeSpawn(s, room));
     const lanterns = def.lanterns.map(l => ({ ...l, px: l.x * TS + TS / 2, py: room.groundY(l.x, 0), lit: !!l.lit }));
-    const signs = def.signs.map(s => ({ ...s, px: s.x * TS + TS / 2, py: room.groundY(s.x, 0), near: false, read: false }));
+    const npcs = def.npcs.map(n => ({ ...n, x: n.x * TS + TS / 2, y: room.groundY(Math.floor(n.x), 0), facing: -1, near: false }));
+    const gates = def.gates.map(g => ({ ...g }));
     const w = {
-      room, player, things, lanterns, signs, input,
+      room, player, things, lanterns, npcs, gates, input,
       targets: things,
       cam: { x: 0, y: 0 }, viewW: G.viewW || 640, time: 0, fade: 0,
       checkpoint: lanterns[0],
-      run: { started: false, frames: 0, done: false },
+      fired: {},
+      cityLight: def.cityLight || 0.05, cityLightTarget: def.cityLight || 0.05,
+      muralProgress: 0,
+      wyrm: def.chase ? { on: false, x: def.chase.wyrmX * TS, speed: def.chase.speed } : null,
       camCenterX() { return this.cam.x + this.viewW / 2; },
-      onKill() { },
+      onKill() { G.hud.goal(); },
       onDash() { },
-      onPerfectDodge(e) {
+      onPerfectDodge() {
         fx.slowmo = 26; player.stats.perfect++;
         player.dashCd = 0; player.airDashes = 1;
         fx.word(player.x, player.y - 52, 'PERFECT DODGE', '#9fe8ff', 60);
         fx.ring(player.x, player.y - 20, '#9fe8ff', 44, 22, 2);
       },
       onKnockout() { G.knockout(); },
+      onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
-    SH.draw.init(room, w.viewW);
+    SH.draw.init(room, w.viewW);   // drawn with gates open, so gates draw on top as objects
+    for (const g of gates) room.setGate(g, true);
     G.snapCamera();
     G.hud.hearts(player.hearts, player.maxHearts);
-    G.hud.goal();
+    G.hud.prompt(null); G.hud.talkButton(null);
     return w;
   };
 
@@ -1613,15 +2339,117 @@ body[data-input="touch"] #touch { display: block; }
     w.camT = { x: tx, y: ty };
   };
 
+  // ---------------------------------------------------------------- chapters
+  G.startChapter = function (i) {
+    G.chapter = i;
+    G.flags = {}; G.activeGoal = null; G.script = null; G.pending = null;
+    fx.reset();
+    const ch = G.chapterDef();
+    G.build(ch.room);
+    G.state = 'card';
+    G.hud.card({ label: ch.label, name: ch.name, text: ch.card, goals: ch.goals.map(g => g.text), button: 'Begin' }, () => {
+      G.state = 'play'; input.clear(); G.hud.goal();
+    });
+    G.hud.goal();
+  };
+
+  G.completeChapter = function () {
+    const ch = G.chapterDef(), next = G.chapter + 1;
+    G.progress.reached = Math.max(G.progress.reached, next);
+    G.save();
+    G.state = 'card';
+    G.hud.card({ label: ch.label + ' complete', name: ch.name, text: ch.done, goals: null, button: next < ST.CHAPTERS.length ? 'Continue' : 'Finish' }, () => {
+      if (next < ST.CHAPTERS.length) G.startChapter(next);
+      else { G.state = 'end'; G.hud.end(true); }
+    });
+  };
+
+  G.knownPeople = function () {
+    const ids = new Set(ST.KNOWN_FROM.prologue);
+    for (let i = 0; i <= G.chapter; i++) (ST.KNOWN_FROM[ST.CHAPTERS[i].id] || []).forEach(x => ids.add(x));
+    G.progress.met.forEach(x => ids.add(x));
+    return ST.PEOPLE.filter(p => ids.has(p.id));
+  };
+  // Text for the GOAL line.
+  G.goalText = function () {
+    const ch = G.chapterDef();
+    if (!ch) return '';
+    const g = ch.goals.find(x => x.id === G.activeGoal) || ch.goals.find(x => !G.flags[x.id]);
+    if (!g) return '';
+    let text = g.text;
+    if (g.count && G.world) {
+      const n = G.world.things.filter(e => e.kind === 'thornSprite' && e.dead).length;
+      text += ` (${n}/${g.count})`;
+    }
+    return text;
+  };
+
+  // ---------------------------------------------------------------- story scripts
+  G.queueScript = function (id) { if (!G.world.fired['s:' + id]) { G.world.fired['s:' + id] = true; G.pending = id; } };
+  G.runScript = function (id) {
+    const steps = ST.SCRIPTS[id];
+    if (!steps) throw new Error('no script ' + id);
+    G.script = { id, steps, i: 0 };
+    G.state = 'talk';
+    const p = G.world.player; p.vx = 0; p.swing = null; p.dashT = 0;
+    G.hud.prompt(null); G.hud.talkButton(null);
+    input.clear();
+    G.advance();
+  };
+  G.advance = function () {
+    const sc = G.script;
+    if (!sc) return;
+    while (sc.i < sc.steps.length) {
+      const st = sc.steps[sc.i++];
+      if (Array.isArray(st)) {
+        G.hud.dialog(st[0], st[1]);
+        G.talkWait = 10; // a short pause so a held button doesn't skip the line
+        return;
+      }
+      G.act(st);
+    }
+    G.script = null;
+    G.hud.dialog(null);
+    input.clear();
+    if (G.afterScript) { const f = G.afterScript; G.afterScript = null; f(); }
+    else if (G.state === 'talk') G.state = 'play';
+  };
+  G.act = function (st) {
+    const w = G.world;
+    switch (st.do) {
+      case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
+      case 'flag': G.flags[st.name] = true; G.hud.goal(); break;
+      case 'wyrm': w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
+      case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
+      case 'heart': G.progress.hearts[st.who] = Math.max(1, G.progress.hearts[st.who] || 0); G.save(); G.hud.toast(`${ST.CAST[st.who].name}: bond heart 1 of 5`); break;
+      case 'meet': if (!G.progress.met.includes(st.who)) { G.progress.met.push(st.who); G.save(); } break;
+      case 'winnow': G.winnow(st.npc, st.to, st.y); break;
+      case 'complete': G.afterScript = () => G.completeChapter(); break;
+    }
+  };
+  // Fae can "winnow": vanish in starlight and reappear somewhere else.
+  G.winnow = function (id, toX, row) {
+    const w = G.world;
+    let n = w.npcs.find(x => x.id === id);
+    if (!n) { n = { id, x: 0, y: 0, facing: -1, hidden: true }; w.npcs.push(n); }
+    const sparkle = (x, y) => fx.burst(x, y - 24, 16, { speed: 2, life: 30, gravity: -0.02, colors: ['#b9a8ff', '#fff6d8', '#6a5aa8'], glow: true });
+    if (!n.hidden) sparkle(n.x, n.y);
+    n.x = toX * TS + TS / 2;
+    n.y = row != null ? row * TS : w.room.groundY(Math.floor(toX), 0);
+    n.hidden = false;
+    sparkle(n.x, n.y);
+  };
+
   // ---------------------------------------------------------------- one game frame (1/60 s)
   G.step = function () {
     const w = G.world, p = w.player;
     input.step();
+    if (G.state === 'talk') { G.talkStep(); fx.update(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
+    if (G.pending) { const id = G.pending; G.pending = null; G.runScript(id); return; }
     if (w.koT > 0) { G.koStep(); fx.update(); return; }
     if (fx.hitstop > 0) {
-      // Frozen for impact, but presses made now still count when it resumes.
       fx.hitstop--;
       if (input.pressed.attack) p.atkBuf = SH.COMBAT.attackBuffer + 1;
       if (input.pressed.jump) p.jumpBuf = SH.tune.jumpBufferFrames + 1;
@@ -1631,46 +2459,100 @@ body[data-input="touch"] #touch { display: block; }
     if (fx.slowmo > 0) fx.slowmo--;
     w.time++;
 
-    p.update(w);
+    const def = w.room.def;
+    const painting = G.paintStep();
+    if (!painting) p.update(w);
     for (const e of w.things) e.update(w);
 
-    // Run timer starts on your first move.
-    if (!w.run.started && (Math.abs(p.vx) > 0.5 || !p.grounded)) w.run.started = true;
-    if (w.run.started && !w.run.done) w.run.frames++;
-
-    // Thorns and pits: lose a heart, go back to safe ground.
+    // thorns and pits
     const b = p.box();
     const inThorns = SH.touchesThorns(w.room, b.l + 3, b.t, b.r - 3, b.b);
     if (inThorns || p.y > w.room.pxH + 40) G.hazard(inThorns ? 'thorns' : 'pit');
 
-    // Lanterns: checkpoint, and they restore your hearts.
-    for (const l of w.lanterns) {
-      if (Math.abs(p.x - l.px) < 22 && Math.abs(p.y - l.py) < 30) {
-        if (!l.lit) {
-          l.lit = true;
-          fx.ring(l.px, l.py - 46, '#ffd27a', 50, 26, 2);
-          fx.burst(l.px, l.py - 46, 16, { speed: 2, life: 30, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
-          // Lighting a lantern restores your hearts once; after that it's a place to come back to.
-          p.hearts = p.maxHearts;
-          if (!l.end) G.hud.toast('Lantern lit. Hearts restored, and you will start here if knocked out.');
-        }
-        if (w.checkpoint !== l && !l.end) w.checkpoint = l;
-        if (l.end && !w.run.done) G.finish();
-      }
+    // the Deep Wyrm
+    if (w.wyrm && w.wyrm.on) {
+      w.wyrm.x += w.wyrm.speed;
+      if (w.time % 3 === 0) fx.kick(1.2);
+      if (p.x - p.w / 2 < w.wyrm.x + 12 && !p.dead) G.caught();
     }
 
-    // Signs: stand near one to read it.
-    let near = null;
-    for (const s of w.signs) { s.near = Math.abs(p.x - s.px) < 44 && Math.abs(p.y - s.py) < 60; if (s.near) near = s; }
-    G.hud.sign(near);
-    if (near) near.read = true;
+    // lanterns: checkpoints that restore your hearts when first lit
+    for (const l of w.lanterns) {
+      const at = Math.abs(p.x - l.px) < 22 && Math.abs(p.y - l.py) < 30;
+      if (at && !l.lit) {
+        l.lit = true; p.hearts = p.maxHearts;
+        fx.ring(l.px, l.py - 46, '#ffd27a', 50, 26, 2);
+        fx.burst(l.px, l.py - 46, 16, { speed: 2, life: 30, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
+        G.hud.toast('Lantern lit: hearts restored. You come back here if knocked out.');
+      }
+      if (at && w.checkpoint !== l) w.checkpoint = l;
+    }
 
+    const tx = p.x / TS;
+    // story triggers
+    for (let i = 0; i < (def.triggers || []).length; i++) {
+      const tr = def.triggers[i];
+      if (w.fired[i] || tx < tr.x || (tr.flag && !G.flags[tr.flag])) continue;
+      if (tr.above != null && !(p.grounded && p.y <= tr.above * TS + 2)) continue;
+      w.fired[i] = true; G.runScript(tr.script); return;
+    }
+    // optional people you can talk to
+    let talkable = null;
+    for (const n of w.npcs) {
+      n.near = !n.hidden && Math.abs(p.x - n.x) < 46 && Math.abs(p.y - n.y) < 50;
+      if (!n.hidden) n.facing = p.x > n.x ? 1 : -1;
+      n.bubble = !!n.optional && !w.fired['talk:' + n.id] && !n.hidden;
+      if (n.near && n.optional) talkable = n;
+    }
+    if (talkable && input.pressed.up) { w.fired['talk:' + talkable.id] = true; G.runScript(talkable.optional); return; }
+    // chapter 2: all sprites cleared -> Caelum arrives
+    if (G.activeGoal === 'sprites' && !w.fired.spritesDone && w.things.filter(e => e.kind === 'thornSprite').every(e => e.dead)) {
+      w.fired.spritesDone = true;
+      G.winnow('caelum', Math.min(def.width - 4, Math.floor(tx) + 3));
+      G.queueScript('ring_done');
+    }
+
+    // control hints and the TALK / PAINT button
+    const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]));
+    const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
+    G.hud.prompt(hint ? input.fill(hint.text) : canPaint ? input.fill('Hold {PAINT} to paint the wall.') : null);
+    G.hud.talkButton(talkable ? 'TALK' : canPaint ? 'PAINT' : null);
+
+    for (const g of w.gates) if (!g.closed && (g.lift || 0) < 1) g.lift = (g.lift || 0) + 0.03;
+    w.cityLight += (w.cityLightTarget - w.cityLight) * 0.03;
     G.hud.hearts(p.hearts, p.maxHearts);
     G.cameraTarget();
     w.cam.x += (w.camT.x - w.cam.x) * 0.14;
     w.cam.y += (w.camT.y - w.cam.y) * 0.10;
     fx.update();
     if (w.fade > 0) w.fade = Math.max(0, w.fade - 0.08);
+  };
+
+  // Painting the mural: stand at the wall and hold TALK.
+  G.paintStep = function () {
+    const w = G.world, p = w.player, m = w.room.def.mural;
+    if (!m) return false;
+    const cx = (m.x + m.w / 2) * TS;
+    w.muralNear = Math.abs(p.x - cx) < m.w * TS / 2 + 10 && p.grounded && !!G.flags[m.needs] && !G.flags[m.flag];
+    if (!w.muralNear || !input.held.up) return false;
+    p.vx = 0; p.swing = null;
+    w.muralProgress = Math.min(1, w.muralProgress + 1 / m.frames);
+    if (w.time % 4 === 0) fx.burst(m.x * TS + m.w * TS * w.muralProgress, 16 * TS - 40 - Math.random() * 60, 2, { speed: 1, life: 20, colors: ['#ffd27a', '#ff9a7a', '#8a6aff', '#4ad8c8'], glow: true });
+    if (w.muralProgress >= 1) {
+      G.flags[m.flag] = true;
+      G.flags.mural = true;
+      w.cityLightTarget = 1;
+      fx.ring(cx, 16 * TS - 54, '#ffd27a', 90, 40, 3);
+      fx.burst(cx, 16 * TS - 54, 40, { speed: 3, life: 50, gravity: -0.02, colors: ['#ffd27a', '#fff6d8', '#ff9a7a', '#8a6aff'], glow: true });
+      G.hud.toast('The first mural is finished. The street wakes up.');
+      G.queueScript(m.script);
+    }
+    return true;
+  };
+
+  G.talkStep = function () {
+    if (G.talkWait > 0) { G.talkWait--; return; }
+    if (input.pressed.jump || input.pressed.attack || input.pressed.up || input.pressed.dash) G.advance();
   };
 
   G.hazard = function (kind) {
@@ -1680,9 +2562,20 @@ body[data-input="touch"] #touch { display: block; }
     fx.kick(4);
     if (p.hearts <= 0) { G.knockout(); return; }
     p.respawnAt(p.lastSafe.x, p.lastSafe.y, SH.PLAYER.hazardInvuln);
+    if (w.wyrm && w.wyrm.on) w.wyrm.x = Math.min(w.wyrm.x, p.x - 9 * TS);
     G.snapCamera();
     w.fade = 0.7;
     fx.word(p.x, p.y - 52, kind === 'thorns' ? 'ouch: thorns' : 'fell', '#ff9aa8', 40);
+  };
+
+  G.caught = function () {
+    const w = G.world, p = w.player;
+    fx.flashScreen(10, 'rgba(0,0,0,0.9)'); fx.kick(6);
+    G.hud.toast('The Wyrm caught you. Try again: keep running and jump the gaps.');
+    const c = w.checkpoint;
+    p.respawnAt(c.px + 14, c.py, 40); p.facing = 1; p.hearts = p.maxHearts;
+    w.wyrm.x = p.x - 13 * TS;
+    G.snapCamera(); w.fade = 1;
   };
 
   G.knockout = function () {
@@ -1702,36 +2595,16 @@ body[data-input="touch"] #touch { display: block; }
       p.respawnAt(c.px + 14, c.py, 40);
       p.facing = 1;
       for (const e of w.things) if (e.reset) e.reset();
+      if (w.wyrm && w.wyrm.on) w.wyrm.x = p.x - 13 * TS;
       G.snapCamera();
       G.hud.toast('Knocked out. Back at the last lantern, no harm done.');
     }
-    if (w.koT >= 46) { w.fade = Math.max(0, 1 - (w.koT - 46) / 25); }
+    if (w.koT >= 46) w.fade = Math.max(0, 1 - (w.koT - 46) / 25);
     if (w.koT > 72) { w.koT = 0; w.fade = 0; }
   };
 
-  G.finish = function () {
-    const w = G.world, p = w.player;
-    w.run.done = true;
-    const secs = w.run.frames / 60;
-    const best = store.get('starhaven.best.v1', null);
-    const isBest = best == null || secs < best;
-    if (isBest) store.set('starhaven.best.v1', secs);
-    G.hud.goal('done');
-    G.hud.results({ secs, best: isBest ? secs : best, isBest, hurt: p.stats.hurt, perfect: p.stats.perfect, pogos: p.stats.pogos });
-    G.state = 'results';
-  };
-
-  G.restart = function () {
-    const vw = G.world ? G.world.viewW : 640;
-    fx.reset();
-    G.build();
-    G.world.viewW = vw;
-    G.state = 'play';
-    G.hud.goal();
-  };
-
   G.pause = function () { if (G.state !== 'play') return; G.state = 'pause'; input.clear(); G.hud.menu(true); };
-  G.resume = function () { G.state = 'play'; input.clear(); G.hud.menu(false); G.hud.tune(false); };
+  G.resume = function () { G.state = 'play'; input.clear(); G.hud.menu(false); G.hud.tune(false); G.hud.journal(false); };
 
   // ---------------------------------------------------------------- loop
   let acc = 0, last = 0;
@@ -1740,38 +2613,37 @@ body[data-input="touch"] #touch { display: block; }
     last = now;
     input.pollPad();
     if (!G.frozen) {
-      if (G.state === 'play') {
+      if (G.state === 'play' || G.state === 'talk') {
         acc += dt * (fx.slowmo > 0 ? 0.4 : 1);
         let n = 0;
         while (acc >= 1 / 60 && n < 5) { G.step(); acc -= 1 / 60; n++; }
         if (n === 5) acc = 0;
-      } else {
-        acc = 0;
-        G.menuInput();
-      }
+      } else { acc = 0; G.menuInput(); }
     }
     G.render();
     requestAnimationFrame(G.loop);
   };
   G.render = function () {
-    const ctx = G.ctx, w = G.world;
+    if (document.body.dataset.state !== G.state) document.body.dataset.state = G.state;
+    const w = G.world;
     if (!w) return;
-    ctx.imageSmoothingEnabled = false;
-    SH.draw.frame(ctx, w);
+    G.ctx.imageSmoothingEnabled = false;
+    SH.draw.frame(G.ctx, w);
   };
 
   // Menus can be driven by keyboard and gamepad as well as taps.
   G.menuInput = function () {
-    if (G.state === 'title') { if (input.take('jump') || input.take('attack') || input.take('pause')) G.start(); }
+    const go = () => input.take('jump') || input.take('attack');
+    if (G.state === 'title') { if (go()) G.hud.titlePrimary(); }
+    else if (G.state === 'cutscene') { if (go()) G.hud.cutNext(); }
+    else if (G.state === 'card') { if (go()) G.hud.cardGo(); }
     else if (G.state === 'pause') { if (input.take('pause')) G.resume(); }
-    else if (G.state === 'results') { if (input.take('jump') || input.take('pause')) { G.hud.results(null); G.restart(); } }
   };
 
-  G.start = function () {
-    if (G.state !== 'title') return;
+  G.newGame = function () {
     G.hud.title(false);
-    G.state = 'play';
-    input.clear();
+    G.state = 'cutscene';
+    G.hud.cutscene(ST.INTRO, () => G.startChapter(0));
   };
 
   // ---------------------------------------------------------------- screen size
@@ -1787,15 +2659,35 @@ body[data-input="touch"] #touch { display: block; }
     if (G.world) { G.world.viewW = viewW; SH.draw.resize(viewW); G.snapCamera(); }
   };
 
-  // ---------------------------------------------------------------- test hooks (used by tests/*.js)
+  // ---------------------------------------------------------------- test hooks (tests/*.js)
   SH.test = {
-    freeze() { G.frozen = true; input.forced = { held: {}, pressed: {} }; if (G.state === 'title') { G.hud.title(false); G.state = 'play'; } },
+    // load(chapterIndex): that chapter with its story, past its title card.
+    // load('roomId', { story: false }): a bare room, every gate open, no story scripts.
+    load(chapterOrRoom, opts) {
+      opts = opts || {};
+      G.frozen = true; input.forced = { held: {}, pressed: {} };
+      G.hud.title(false); G.hud.cutscene(null);
+      if (typeof chapterOrRoom === 'number') { G.startChapter(chapterOrRoom); G.hud.cardGo(); }
+      else {
+        G.chapter = 0; G.flags = { combo: true, pit: true, arrive: true }; G.activeGoal = null; G.script = null; G.pending = null;
+        fx.reset(); G.build(chapterOrRoom);
+        const w = G.world;
+        for (const g of w.gates) w.room.setGate(g, false);
+        if (opts.story === false) (w.room.def.triggers || []).forEach((t, i) => (w.fired[i] = true));
+        G.state = 'play';
+      }
+      G.hud.dialog(null);
+      return SH.test.state();
+    },
     // Step n frames holding `held` (e.g. {right:true}); `press` actions are pressed on the first frame.
-    step(n, held, press) {
+    // With autoTalk, dialogue and chapter cards are clicked through as they appear.
+    step(n, held, press, autoTalk) {
       for (let i = 0; i < n; i++) {
         input.forced.held = held || {};
         input.forced.pressed = {};
         if (i === 0 && press) for (const a of press) input.forced.pressed[a] = true;
+        if (autoTalk && G.state === 'talk' && G.talkWait <= 0) input.forced.pressed.jump = true;
+        if (autoTalk && G.state === 'card') G.hud.cardGo();
         G.step();
       }
       return SH.test.state();
@@ -1803,7 +2695,7 @@ body[data-input="touch"] #touch { display: block; }
     place(tx, ty) { const p = G.world.player; p.respawnAt(tx * TS + TS / 2, ty * TS); p.grounded = true; G.snapCamera(); },
     state() {
       const p = G.world.player;
-      return { x: p.x, y: p.y, tx: p.x / TS, ty: p.y / TS, vx: p.vx, vy: p.vy, grounded: p.grounded, hearts: p.hearts, stats: p.stats, state: G.state, ko: G.world.koT || 0 };
+      return { x: p.x, y: p.y, tx: p.x / TS, ty: p.y / TS, vx: p.vx, vy: p.vy, grounded: p.grounded, hearts: p.hearts, stats: p.stats, state: G.state, chapter: G.chapter, goal: G.activeGoal, flags: Object.assign({}, G.flags), ko: G.world.koT || 0 };
     },
     render() { G.render(); },
   };
@@ -1812,11 +2704,13 @@ body[data-input="touch"] #touch { display: block; }
 </script>
 <script>
 // ---- src/hud.js
-// Starhaven — the HUD and menus (HTML on top of the game canvas, so text stays sharp on a phone).
+// Starhaven — HUD, dialogue, story screens and menus (HTML over the canvas so text stays sharp on a phone).
 (function (SH) {
   const $ = id => document.getElementById(id);
+  const ST = SH.STORY;
   const H = {};
-  let lastHearts = -1, lastSign = null, toastT = 0;
+  let lastHearts = -1, lastPrompt = null, toastT = 0, cardDone = null, cut = null;
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
   H.hearts = function (n, max) {
     if (n === lastHearts) return;
@@ -1828,20 +2722,28 @@ body[data-input="touch"] #touch { display: block; }
     lastHearts = n;
   };
 
-  H.goal = function (mode) {
-    $('goal').innerHTML = mode === 'done'
-      ? 'Grove cleared. Run it again, or open the menu to tune the feel.'
-      : '<span class="tag">GOAL</span> Cross the grove to the far lantern <span class="arrow">&rarr;</span>';
+  // The GOAL line: chapter name + the one thing to do now. `fresh` makes it pulse (a new goal).
+  H.goal = function (fresh) {
+    const G = SH.game, ch = G.chapterDef();
+    const text = G.goalText();
+    $('goal').innerHTML = ch ? `<span class="ch">${esc(ch.label)}</span><span class="tag">GOAL</span> ${esc(text || 'Keep going')}` : '';
+    if (fresh) { const el = $('goal'); el.classList.remove('new'); void el.offsetWidth; el.classList.add('new'); }
   };
 
-  H.sign = function (s) {
-    if (s === lastSign && !H.dirty) return;
-    H.dirty = false;
-    lastSign = s;
+  // Control hints (how to do the thing), shown near where you need them.
+  H.prompt = function (html) {
+    if (html === lastPrompt) return;
+    lastPrompt = html;
     const el = $('sign');
-    if (!s) { el.classList.remove('show'); return; }
-    el.innerHTML = SH.input.fill(s.text);
+    if (!html) { el.classList.remove('show'); return; }
+    el.innerHTML = html;
     el.classList.add('show');
+  };
+
+  H.talkButton = function (label) {
+    const b = $('b-talk');
+    if (!label) { b.classList.remove('show'); return; }
+    b.textContent = label; b.classList.add('show');
   };
 
   H.toast = function (text) {
@@ -1849,33 +2751,113 @@ body[data-input="touch"] #touch { display: block; }
     el.textContent = text;
     el.classList.add('show');
     clearTimeout(toastT);
-    toastT = setTimeout(() => el.classList.remove('show'), 3200);
+    toastT = setTimeout(() => el.classList.remove('show'), 3400);
   };
 
-  H.title = function (show) { $('title').classList.toggle('show', show); };
+  // ---------------- dialogue box with a portrait
+  H.dialog = function (who, text) {
+    const el = $('dialog');
+    if (!who) { el.classList.remove('show'); return; }
+    const c = ST.CAST[who];
+    $('d-face').src = SH.art.portraitURL(who);
+    $('d-name').textContent = c.name;
+    $('d-name').style.color = c.color;
+    $('d-text').textContent = text;
+    el.classList.add('show');
+  };
+
+  // ---------------- chapter cards (start and end of each chapter)
+  H.card = function (o, done) {
+    $('c-label').textContent = o.label;
+    $('c-name').textContent = o.name;
+    $('c-text').textContent = o.text;
+    $('c-goals').innerHTML = o.goals ? '<div class="gl">Goals</div>' + o.goals.map(g => `<li>${esc(g)}</li>`).join('') : '';
+    $('c-go').textContent = o.button;
+    $('card').classList.add('show');
+    cardDone = done;
+  };
+  H.cardGo = function () {
+    if (!$('card').classList.contains('show')) return;
+    $('card').classList.remove('show');
+    const f = cardDone; cardDone = null;
+    if (f) f();
+  };
+
+  // ---------------- intro cutscene: painted panels, tap to go on
+  H.cutscene = function (panels, done) {
+    const el = $('cut');
+    if (!panels) { el.classList.remove('show'); cut = null; return; }
+    cut = { panels, i: 0, done };
+    el.classList.add('show');
+    H.cutShow();
+  };
+  H.cutShow = function () {
+    const p = cut.panels[cut.i], cv = $('cut-art'), g = cv.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    g.clearRect(0, 0, cv.width, cv.height);
+    g.drawImage(SH.art.panel(p.art), 0, 0, cv.width, cv.height);
+    $('cut-text').textContent = p.text;
+    $('cut-count').textContent = `${cut.i + 1} / ${cut.panels.length}`;
+    const t = $('cut-text'); t.classList.remove('in'); void t.offsetWidth; t.classList.add('in');
+  };
+  H.cutNext = function () {
+    if (!cut) return;
+    cut.i++;
+    if (cut.i >= cut.panels.length) H.cutEnd(); else H.cutShow();
+  };
+  H.cutEnd = function () {
+    if (!cut) return;
+    const f = cut.done; $('cut').classList.remove('show'); cut = null;
+    if (f) f();
+  };
+
+  // ---------------- title
+  H.title = function (show) { $('title').classList.toggle('show', show); if (show) H.titleButtons(); };
+  H.titleButtons = function () {
+    const G = SH.game, r = G.progress.reached, n = ST.CHAPTERS.length;
+    const cont = $('t-continue');
+    cont.style.display = r > 0 && r < n ? '' : 'none';
+    if (r > 0 && r < n) cont.textContent = `Continue: ${ST.CHAPTERS[r].label}, ${ST.CHAPTERS[r].name}`;
+    const list = $('t-chapters');
+    list.innerHTML = ST.CHAPTERS.map((c, i) => `<button class="btn small" data-ch="${i}">${esc(c.label)}: ${esc(c.name)}</button>`).join('');
+  };
+  H.titlePrimary = function () {
+    const G = SH.game, r = G.progress.reached;
+    if (r > 0 && r < ST.CHAPTERS.length) { H.title(false); G.startChapter(r); } else G.newGame();
+  };
+
   H.menu = function (show) { $('menu').classList.toggle('show', show); };
 
-  const fmt = s => { const m = Math.floor(s / 60), r = s - m * 60; return (m ? m + ':' + (r < 10 ? '0' : '') : '') + r.toFixed(1) + (m ? '' : ' s'); };
-  H.results = function (r) {
-    const el = $('results');
-    if (!r) { el.classList.remove('show'); return; }
-    $('res-body').innerHTML = `
-      <div class="big">${fmt(r.secs)}</div>
-      <div class="sub">${r.isBest ? 'New best time' : 'Best: ' + fmt(r.best)}</div>
-      <ul>
-        <li><b>${r.hurt}</b> hits taken</li>
-        <li><b>${r.perfect}</b> perfect dodges</li>
-        <li><b>${r.pogos}</b> pogo bounces</li>
-      </ul>`;
-    el.classList.add('show');
+  // ---------------- journal: what to do now, the story so far, and who's who
+  H.journal = function (show) {
+    $('journal').classList.toggle('show', !!show);
+    if (!show) return;
+    const G = SH.game, ch = G.chapterDef();
+    let html = `<h3>Now: ${esc(ch.label)}, ${esc(ch.name)}</h3><ul class="goals">`;
+    for (const g of ch.goals) {
+      const done = !!G.flags[g.id];
+      html += `<li class="${done ? 'done' : g.id === G.activeGoal ? 'now' : ''}">${done ? '&#10003;' : g.id === G.activeGoal ? '&#9656;' : '&#9675;'} ${esc(g.text)}</li>`;
+    }
+    html += '</ul><h3>The story so far</h3>';
+    html += `<p>${esc(ST.RECAP)}</p>`;
+    for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
+    html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
+    html += '<h3>People</h3>';
+    for (const p of G.knownPeople()) html += `<div class="person"><img src="${SH.STORY.CAST[p.id] ? SH.art.portraitURL(p.id) : ''}" alt="" ${SH.STORY.CAST[p.id] ? '' : 'style="visibility:hidden"'}><div><b>${esc(p.name)}</b><br>${esc(p.text)}</div></div>`;
+    $('j-body').innerHTML = html;
+  };
+
+  H.end = function (show) {
+    $('end').classList.toggle('show', show);
+    if (show) { $('e-head').textContent = ST.END.title; $('e-text').textContent = ST.END.text; }
   };
 
   // ---------------- TUNE panel: live sliders for the movement numbers
   H.tune = function (show) {
-    const el = $('tune');
-    el.classList.toggle('show', !!show);
+    $('tune').classList.toggle('show', !!show);
     if (show) H.buildTune();
   };
+  const fmtNum = (v, step) => step >= 1 ? String(Math.round(v)) : v.toFixed(step < 0.05 ? 2 : 1);
   H.buildTune = function () {
     const list = $('tune-list');
     list.innerHTML = '';
@@ -1883,10 +2865,10 @@ body[data-input="touch"] #touch { display: block; }
       const row = document.createElement('label');
       row.className = 'trow';
       const val = SH.tune[s.key];
-      row.innerHTML = `<span class="tl">${s.label}</span><input type="range" min="${s.min}" max="${s.max}" step="${s.step}" value="${val}"><span class="tv">${fmtNum(val, s.step)}</span>`;
-      const input = row.querySelector('input'), out = row.querySelector('.tv');
-      input.addEventListener('input', () => {
-        SH.tune[s.key] = parseFloat(input.value);
+      row.innerHTML = `<span class="tl">${s.label}</span><input type="range" id="tune-${s.key}" min="${s.min}" max="${s.max}" step="${s.step}" value="${val}"><span class="tv">${fmtNum(val, s.step)}</span>`;
+      const inp = row.querySelector('input'), out = row.querySelector('.tv');
+      inp.addEventListener('input', () => {
+        SH.tune[s.key] = parseFloat(inp.value);
         out.textContent = fmtNum(SH.tune[s.key], s.step);
         out.classList.toggle('changed', SH.tune[s.key] !== SH.TUNE_DEFAULTS[s.key]);
         H.saveTune();
@@ -1895,45 +2877,52 @@ body[data-input="touch"] #touch { display: block; }
       list.appendChild(row);
     }
   };
-  const fmtNum = (v, step) => step >= 1 ? String(Math.round(v)) : v.toFixed(step < 0.05 ? 2 : 1);
   H.saveTune = function () {
     const diff = {};
     for (const k in SH.TUNE_DEFAULTS) if (SH.tune[k] !== SH.TUNE_DEFAULTS[k]) diff[k] = SH.tune[k];
     SH.store.set('starhaven.tune.v1', diff);
   };
   H.tuneText = function () {
-    const parts = SH.TUNE_SLIDERS.map(s => `${s.label}: ${fmtNum(SH.tune[s.key], s.step)}${SH.tune[s.key] !== SH.TUNE_DEFAULTS[s.key] ? ' (changed)' : ''}`);
-    return 'Starhaven feel numbers\n' + parts.join('\n');
+    return 'Starhaven feel numbers\n' + SH.TUNE_SLIDERS.map(s => `${s.label}: ${fmtNum(SH.tune[s.key], s.step)}${SH.tune[s.key] !== SH.TUNE_DEFAULTS[s.key] ? ' (changed)' : ''}`).join('\n');
   };
 
   H.bind = function () {
-    const G = SH.game;
-    $('title').addEventListener('click', () => G.start());
-    $('pause-btn').addEventListener('click', () => G.state === 'pause' ? G.resume() : G.pause());
-    $('m-resume').addEventListener('click', () => G.resume());
-    $('m-tune').addEventListener('click', () => { H.menu(false); H.tune(true); });
-    $('m-restart').addEventListener('click', () => { H.menu(false); G.restart(); });
-    $('m-controls').addEventListener('click', () => $('controls').classList.toggle('show'));
+    const G = SH.game, on = (id, f) => $(id).addEventListener('click', f);
+    on('t-new', () => G.newGame());
+    on('t-continue', () => H.titlePrimary());
+    $('t-chapters').addEventListener('click', e => { const b = e.target.closest('[data-ch]'); if (b) { H.title(false); G.startChapter(+b.dataset.ch); } });
+    on('cut', e => { if (!e.target.closest('#cut-skip')) H.cutNext(); });
+    on('cut-skip', () => H.cutEnd());
+    on('c-go', () => H.cardGo());
+    // In a conversation, a tap anywhere goes to the next line.
+    document.addEventListener('pointerdown', e => {
+      if (G.state === 'talk' && G.talkWait <= 0 && !e.target.closest('button')) { e.preventDefault(); G.advance(); }
+    });
+    on('pause-btn', () => G.state === 'pause' ? G.resume() : G.pause());
+    on('m-resume', () => G.resume());
+    on('m-journal', () => { H.menu(false); H.journal(true); });
+    on('m-tune', () => { H.menu(false); H.tune(true); });
+    on('m-restart', () => { H.menu(false); G.startChapter(G.chapter); });
+    on('m-controls', () => $('controls').classList.toggle('show'));
+    on('m-title', () => { H.menu(false); G.state = 'title'; H.title(true); });
     const fs = $('m-fullscreen');
     if (document.documentElement.requestFullscreen) fs.addEventListener('click', () => { document.documentElement.requestFullscreen().catch(() => { }); G.resume(); });
     else fs.style.display = 'none';
-    $('t-back').addEventListener('click', () => G.resume());
-    $('t-reset').addEventListener('click', () => { SH.tune = Object.assign({}, SH.TUNE_DEFAULTS); H.saveTune(); H.buildTune(); });
-    $('t-copy').addEventListener('click', () => {
+    on('j-back', () => G.resume());
+    on('t-back', () => G.resume());
+    on('t-reset', () => { SH.tune = Object.assign({}, SH.TUNE_DEFAULTS); H.saveTune(); H.buildTune(); });
+    on('t-copy', () => {
       const text = H.tuneText(), btn = $('t-copy');
-      const done = () => { btn.textContent = 'Copied'; setTimeout(() => (btn.textContent = 'Copy numbers'), 1500); };
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, () => { $('t-out').value = text; $('t-out').style.display = 'block'; });
-      else { $('t-out').value = text; $('t-out').style.display = 'block'; }
+      const show = () => { $('t-out').value = text; $('t-out').style.display = 'block'; $('t-out').select(); };
+      try {
+        navigator.clipboard.writeText(text).then(() => { btn.textContent = 'Copied'; setTimeout(() => (btn.textContent = 'Copy numbers'), 1500); }, show);
+      } catch (e) { show(); }
     });
-    $('r-again').addEventListener('click', () => { H.results(null); G.restart(); });
-    $('r-stay').addEventListener('click', () => { H.results(null); G.state = 'play'; SH.input.clear(); });
-    SH.input.onSourceChange = src => {
-      document.body.dataset.input = src;
-      H.dirty = true;
-    };
+    on('e-again', () => { H.end(false); G.newGame(); });
+    on('e-home', () => { H.end(false); G.state = 'title'; H.title(true); });
+    SH.input.onSourceChange = src => { document.body.dataset.input = src; lastPrompt = null; };
     document.body.dataset.input = SH.input.source;
-    const best = SH.store.get('starhaven.best.v1', null);
-    if (best != null) $('title-best').textContent = 'Best time: ' + fmt(best);
+    H.titleButtons();
   };
 
   SH.game.hud = H;
@@ -1947,9 +2936,9 @@ body[data-input="touch"] #touch { display: block; }
   G.ctx = G.canvas.getContext('2d', { alpha: false });
   G.hud.bind();
   SH.input.bindTouch(document.getElementById('touch'), document.getElementById('stick'), document.getElementById('knob'));
-  SH.input.onAnyPress = () => { if (G.state === 'title') { /* handled in menuInput */ } };
   G.fit();
-  G.build();
+  G.build('ashes');          // the title screen sits over the road to Starhaven
+  G.world.player.hidden = true;
   window.addEventListener('resize', G.fit);
   document.addEventListener('visibilitychange', () => { if (document.hidden) G.pause(); });
   requestAnimationFrame(G.loop);

@@ -1,5 +1,40 @@
 # Starhaven — Changelog
 
+## Rebuild 2 — Story-led concept: Prologue through Chapter 2 (Nov 17, 2026)
+Will's notes on Rebuild 1 and on Muse's slice: no outline of the story, no idea what to do or what was going on. This build
+is a phone-playable concept (no Godot for now) of the design doc's first playable: **the Prologue through Chapter 2**,
+told as a story from the first screen. Full outline of what the player sees: [`STORY.md`](STORY.md).
+
+- **Intro:** 5 painted panels (placeholder art) tell who Wren is, the Deep, the High Lords' sparks, the bargain with
+  Caelum, and the Iron King. Skippable.
+- **Prologue, The Deep:** a nightmare that teaches movement only (design doc: no enemies until controls are taught).
+  The Thorn Queen speaks as you run. Ends with the Deep Wyrm chasing you to the light (the doc's dodge-only escape).
+- **Chapter 1, Ashes:** Caelum calls in the bargain and walks Wren to Starhaven, winnowing ahead in starlight. Paint the
+  first mural (hold PAINT) and the dark street lights up house by house. Rooftop talk, Caelum bond heart 1. No enemies.
+- **Chapter 2, The Five:** Bram's Training Ring (dummy combo), his thorn pit (pogo), Iris (optional talk), then three
+  thorn sprites past the north gate. Gates open as Bram's lessons are passed. Caelum closes the chapter.
+- **Always knowing what to do:** chapter cards with goals at the start and a "what changed" card at the end; a GOAL line
+  showing chapter + current goal (with a counter for the sprites); dialogue with portraits for every story beat;
+  control hints exactly where a move is first needed; **Menu > Story & goals** with the goal checklist, the story so far,
+  and everyone you've met.
+- **Places have their own palettes** (design doc): the Deep in pale greens and roses, the road at dusk in violet and rose,
+  Starhaven in night blues and gold, the Thornwood in cold blue.
+- **Controls:** more than 2 buttons, as asked: move stick, JUMP, STRIKE, DASH, plus a TALK / PAINT button that appears
+  only when there's someone to talk to or a wall to paint. Keyboard W and gamepad Y do the same.
+- **Saves** which chapter you reached (Continue on the title screen). All chapters are open from the title in this concept.
+- Kept from Rebuild 1: all movement and combat feel, the TUNE panel, hit-stop, perfect dodge, checkpoints.
+- Fixes found while testing: lanterns restore hearts only when first lit (thorns next to a lantern were free);
+  thorn sprites stay within 5 tiles of home (one walked back through an open gate into town); the first thorn patch in the
+  Deep is 3 tiles, not 4; the dialogue box sits at the top so it never covers the people talking.
+
+Verified (`game/tests/feel.js`, 20/20): all 17 movement and combat checks still pass in the new rooms, plus an autopilot
+that plays **each chapter start to finish with its dialogue clicked through**: Prologue (story, Wyrm chase, wake-up,
+never caught), Chapter 1 (walk, mural, rooftop, the street lights up, Caelum heart saved), Chapter 2 (combo, thorn pit,
+3 sprites, ends on the concept end screen). `game/tests/smoke.js` screenshots every story screen on a landscape phone
+with no errors.
+NOT tested: Will playing it on his phone; real iPhone Safari; a real gamepad; sound (there is none yet). Placeholder art.
+
+
 ## Rebuild 1 — The Training Grove: movement and combat feel (Nov 17, 2026)
 A fresh start in this repo (`game/`), built from `DESIGN.md` and `BUILD-PLAN.md`. Muse's browser slice (v1 to v5 below) was
 never committed here and was not reused. This build covers **Milestone 1 (movement feel)** and **Milestone 2 (combat feel)** only.

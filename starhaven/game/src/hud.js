@@ -1,8 +1,10 @@
-// Starhaven — the HUD and menus (HTML on top of the game canvas, so text stays sharp on a phone).
+// Starhaven — HUD, dialogue, story screens and menus (HTML over the canvas so text stays sharp on a phone).
 (function (SH) {
   const $ = id => document.getElementById(id);
+  const ST = SH.STORY;
   const H = {};
-  let lastHearts = -1, lastSign = null, toastT = 0;
+  let lastHearts = -1, lastPrompt = null, toastT = 0, cardDone = null, cut = null;
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
   H.hearts = function (n, max) {
     if (n === lastHearts) return;
@@ -14,20 +16,28 @@
     lastHearts = n;
   };
 
-  H.goal = function (mode) {
-    $('goal').innerHTML = mode === 'done'
-      ? 'Grove cleared. Run it again, or open the menu to tune the feel.'
-      : '<span class="tag">GOAL</span> Cross the grove to the far lantern <span class="arrow">&rarr;</span>';
+  // The GOAL line: chapter name + the one thing to do now. `fresh` makes it pulse (a new goal).
+  H.goal = function (fresh) {
+    const G = SH.game, ch = G.chapterDef();
+    const text = G.goalText();
+    $('goal').innerHTML = ch ? `<span class="ch">${esc(ch.label)}</span><span class="tag">GOAL</span> ${esc(text || 'Keep going')}` : '';
+    if (fresh) { const el = $('goal'); el.classList.remove('new'); void el.offsetWidth; el.classList.add('new'); }
   };
 
-  H.sign = function (s) {
-    if (s === lastSign && !H.dirty) return;
-    H.dirty = false;
-    lastSign = s;
+  // Control hints (how to do the thing), shown near where you need them.
+  H.prompt = function (html) {
+    if (html === lastPrompt) return;
+    lastPrompt = html;
     const el = $('sign');
-    if (!s) { el.classList.remove('show'); return; }
-    el.innerHTML = SH.input.fill(s.text);
+    if (!html) { el.classList.remove('show'); return; }
+    el.innerHTML = html;
     el.classList.add('show');
+  };
+
+  H.talkButton = function (label) {
+    const b = $('b-talk');
+    if (!label) { b.classList.remove('show'); return; }
+    b.textContent = label; b.classList.add('show');
   };
 
   H.toast = function (text) {
@@ -35,33 +45,113 @@
     el.textContent = text;
     el.classList.add('show');
     clearTimeout(toastT);
-    toastT = setTimeout(() => el.classList.remove('show'), 3200);
+    toastT = setTimeout(() => el.classList.remove('show'), 3400);
   };
 
-  H.title = function (show) { $('title').classList.toggle('show', show); };
+  // ---------------- dialogue box with a portrait
+  H.dialog = function (who, text) {
+    const el = $('dialog');
+    if (!who) { el.classList.remove('show'); return; }
+    const c = ST.CAST[who];
+    $('d-face').src = SH.art.portraitURL(who);
+    $('d-name').textContent = c.name;
+    $('d-name').style.color = c.color;
+    $('d-text').textContent = text;
+    el.classList.add('show');
+  };
+
+  // ---------------- chapter cards (start and end of each chapter)
+  H.card = function (o, done) {
+    $('c-label').textContent = o.label;
+    $('c-name').textContent = o.name;
+    $('c-text').textContent = o.text;
+    $('c-goals').innerHTML = o.goals ? '<div class="gl">Goals</div>' + o.goals.map(g => `<li>${esc(g)}</li>`).join('') : '';
+    $('c-go').textContent = o.button;
+    $('card').classList.add('show');
+    cardDone = done;
+  };
+  H.cardGo = function () {
+    if (!$('card').classList.contains('show')) return;
+    $('card').classList.remove('show');
+    const f = cardDone; cardDone = null;
+    if (f) f();
+  };
+
+  // ---------------- intro cutscene: painted panels, tap to go on
+  H.cutscene = function (panels, done) {
+    const el = $('cut');
+    if (!panels) { el.classList.remove('show'); cut = null; return; }
+    cut = { panels, i: 0, done };
+    el.classList.add('show');
+    H.cutShow();
+  };
+  H.cutShow = function () {
+    const p = cut.panels[cut.i], cv = $('cut-art'), g = cv.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    g.clearRect(0, 0, cv.width, cv.height);
+    g.drawImage(SH.art.panel(p.art), 0, 0, cv.width, cv.height);
+    $('cut-text').textContent = p.text;
+    $('cut-count').textContent = `${cut.i + 1} / ${cut.panels.length}`;
+    const t = $('cut-text'); t.classList.remove('in'); void t.offsetWidth; t.classList.add('in');
+  };
+  H.cutNext = function () {
+    if (!cut) return;
+    cut.i++;
+    if (cut.i >= cut.panels.length) H.cutEnd(); else H.cutShow();
+  };
+  H.cutEnd = function () {
+    if (!cut) return;
+    const f = cut.done; $('cut').classList.remove('show'); cut = null;
+    if (f) f();
+  };
+
+  // ---------------- title
+  H.title = function (show) { $('title').classList.toggle('show', show); if (show) H.titleButtons(); };
+  H.titleButtons = function () {
+    const G = SH.game, r = G.progress.reached, n = ST.CHAPTERS.length;
+    const cont = $('t-continue');
+    cont.style.display = r > 0 && r < n ? '' : 'none';
+    if (r > 0 && r < n) cont.textContent = `Continue: ${ST.CHAPTERS[r].label}, ${ST.CHAPTERS[r].name}`;
+    const list = $('t-chapters');
+    list.innerHTML = ST.CHAPTERS.map((c, i) => `<button class="btn small" data-ch="${i}">${esc(c.label)}: ${esc(c.name)}</button>`).join('');
+  };
+  H.titlePrimary = function () {
+    const G = SH.game, r = G.progress.reached;
+    if (r > 0 && r < ST.CHAPTERS.length) { H.title(false); G.startChapter(r); } else G.newGame();
+  };
+
   H.menu = function (show) { $('menu').classList.toggle('show', show); };
 
-  const fmt = s => { const m = Math.floor(s / 60), r = s - m * 60; return (m ? m + ':' + (r < 10 ? '0' : '') : '') + r.toFixed(1) + (m ? '' : ' s'); };
-  H.results = function (r) {
-    const el = $('results');
-    if (!r) { el.classList.remove('show'); return; }
-    $('res-body').innerHTML = `
-      <div class="big">${fmt(r.secs)}</div>
-      <div class="sub">${r.isBest ? 'New best time' : 'Best: ' + fmt(r.best)}</div>
-      <ul>
-        <li><b>${r.hurt}</b> hits taken</li>
-        <li><b>${r.perfect}</b> perfect dodges</li>
-        <li><b>${r.pogos}</b> pogo bounces</li>
-      </ul>`;
-    el.classList.add('show');
+  // ---------------- journal: what to do now, the story so far, and who's who
+  H.journal = function (show) {
+    $('journal').classList.toggle('show', !!show);
+    if (!show) return;
+    const G = SH.game, ch = G.chapterDef();
+    let html = `<h3>Now: ${esc(ch.label)}, ${esc(ch.name)}</h3><ul class="goals">`;
+    for (const g of ch.goals) {
+      const done = !!G.flags[g.id];
+      html += `<li class="${done ? 'done' : g.id === G.activeGoal ? 'now' : ''}">${done ? '&#10003;' : g.id === G.activeGoal ? '&#9656;' : '&#9675;'} ${esc(g.text)}</li>`;
+    }
+    html += '</ul><h3>The story so far</h3>';
+    html += `<p>${esc(ST.RECAP)}</p>`;
+    for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
+    html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
+    html += '<h3>People</h3>';
+    for (const p of G.knownPeople()) html += `<div class="person"><img src="${SH.STORY.CAST[p.id] ? SH.art.portraitURL(p.id) : ''}" alt="" ${SH.STORY.CAST[p.id] ? '' : 'style="visibility:hidden"'}><div><b>${esc(p.name)}</b><br>${esc(p.text)}</div></div>`;
+    $('j-body').innerHTML = html;
+  };
+
+  H.end = function (show) {
+    $('end').classList.toggle('show', show);
+    if (show) { $('e-head').textContent = ST.END.title; $('e-text').textContent = ST.END.text; }
   };
 
   // ---------------- TUNE panel: live sliders for the movement numbers
   H.tune = function (show) {
-    const el = $('tune');
-    el.classList.toggle('show', !!show);
+    $('tune').classList.toggle('show', !!show);
     if (show) H.buildTune();
   };
+  const fmtNum = (v, step) => step >= 1 ? String(Math.round(v)) : v.toFixed(step < 0.05 ? 2 : 1);
   H.buildTune = function () {
     const list = $('tune-list');
     list.innerHTML = '';
@@ -69,10 +159,10 @@
       const row = document.createElement('label');
       row.className = 'trow';
       const val = SH.tune[s.key];
-      row.innerHTML = `<span class="tl">${s.label}</span><input type="range" min="${s.min}" max="${s.max}" step="${s.step}" value="${val}"><span class="tv">${fmtNum(val, s.step)}</span>`;
-      const input = row.querySelector('input'), out = row.querySelector('.tv');
-      input.addEventListener('input', () => {
-        SH.tune[s.key] = parseFloat(input.value);
+      row.innerHTML = `<span class="tl">${s.label}</span><input type="range" id="tune-${s.key}" min="${s.min}" max="${s.max}" step="${s.step}" value="${val}"><span class="tv">${fmtNum(val, s.step)}</span>`;
+      const inp = row.querySelector('input'), out = row.querySelector('.tv');
+      inp.addEventListener('input', () => {
+        SH.tune[s.key] = parseFloat(inp.value);
         out.textContent = fmtNum(SH.tune[s.key], s.step);
         out.classList.toggle('changed', SH.tune[s.key] !== SH.TUNE_DEFAULTS[s.key]);
         H.saveTune();
@@ -81,45 +171,52 @@
       list.appendChild(row);
     }
   };
-  const fmtNum = (v, step) => step >= 1 ? String(Math.round(v)) : v.toFixed(step < 0.05 ? 2 : 1);
   H.saveTune = function () {
     const diff = {};
     for (const k in SH.TUNE_DEFAULTS) if (SH.tune[k] !== SH.TUNE_DEFAULTS[k]) diff[k] = SH.tune[k];
     SH.store.set('starhaven.tune.v1', diff);
   };
   H.tuneText = function () {
-    const parts = SH.TUNE_SLIDERS.map(s => `${s.label}: ${fmtNum(SH.tune[s.key], s.step)}${SH.tune[s.key] !== SH.TUNE_DEFAULTS[s.key] ? ' (changed)' : ''}`);
-    return 'Starhaven feel numbers\n' + parts.join('\n');
+    return 'Starhaven feel numbers\n' + SH.TUNE_SLIDERS.map(s => `${s.label}: ${fmtNum(SH.tune[s.key], s.step)}${SH.tune[s.key] !== SH.TUNE_DEFAULTS[s.key] ? ' (changed)' : ''}`).join('\n');
   };
 
   H.bind = function () {
-    const G = SH.game;
-    $('title').addEventListener('click', () => G.start());
-    $('pause-btn').addEventListener('click', () => G.state === 'pause' ? G.resume() : G.pause());
-    $('m-resume').addEventListener('click', () => G.resume());
-    $('m-tune').addEventListener('click', () => { H.menu(false); H.tune(true); });
-    $('m-restart').addEventListener('click', () => { H.menu(false); G.restart(); });
-    $('m-controls').addEventListener('click', () => $('controls').classList.toggle('show'));
+    const G = SH.game, on = (id, f) => $(id).addEventListener('click', f);
+    on('t-new', () => G.newGame());
+    on('t-continue', () => H.titlePrimary());
+    $('t-chapters').addEventListener('click', e => { const b = e.target.closest('[data-ch]'); if (b) { H.title(false); G.startChapter(+b.dataset.ch); } });
+    on('cut', e => { if (!e.target.closest('#cut-skip')) H.cutNext(); });
+    on('cut-skip', () => H.cutEnd());
+    on('c-go', () => H.cardGo());
+    // In a conversation, a tap anywhere goes to the next line.
+    document.addEventListener('pointerdown', e => {
+      if (G.state === 'talk' && G.talkWait <= 0 && !e.target.closest('button')) { e.preventDefault(); G.advance(); }
+    });
+    on('pause-btn', () => G.state === 'pause' ? G.resume() : G.pause());
+    on('m-resume', () => G.resume());
+    on('m-journal', () => { H.menu(false); H.journal(true); });
+    on('m-tune', () => { H.menu(false); H.tune(true); });
+    on('m-restart', () => { H.menu(false); G.startChapter(G.chapter); });
+    on('m-controls', () => $('controls').classList.toggle('show'));
+    on('m-title', () => { H.menu(false); G.state = 'title'; H.title(true); });
     const fs = $('m-fullscreen');
     if (document.documentElement.requestFullscreen) fs.addEventListener('click', () => { document.documentElement.requestFullscreen().catch(() => { }); G.resume(); });
     else fs.style.display = 'none';
-    $('t-back').addEventListener('click', () => G.resume());
-    $('t-reset').addEventListener('click', () => { SH.tune = Object.assign({}, SH.TUNE_DEFAULTS); H.saveTune(); H.buildTune(); });
-    $('t-copy').addEventListener('click', () => {
+    on('j-back', () => G.resume());
+    on('t-back', () => G.resume());
+    on('t-reset', () => { SH.tune = Object.assign({}, SH.TUNE_DEFAULTS); H.saveTune(); H.buildTune(); });
+    on('t-copy', () => {
       const text = H.tuneText(), btn = $('t-copy');
-      const done = () => { btn.textContent = 'Copied'; setTimeout(() => (btn.textContent = 'Copy numbers'), 1500); };
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, () => { $('t-out').value = text; $('t-out').style.display = 'block'; });
-      else { $('t-out').value = text; $('t-out').style.display = 'block'; }
+      const show = () => { $('t-out').value = text; $('t-out').style.display = 'block'; $('t-out').select(); };
+      try {
+        navigator.clipboard.writeText(text).then(() => { btn.textContent = 'Copied'; setTimeout(() => (btn.textContent = 'Copy numbers'), 1500); }, show);
+      } catch (e) { show(); }
     });
-    $('r-again').addEventListener('click', () => { H.results(null); G.restart(); });
-    $('r-stay').addEventListener('click', () => { H.results(null); G.state = 'play'; SH.input.clear(); });
-    SH.input.onSourceChange = src => {
-      document.body.dataset.input = src;
-      H.dirty = true;
-    };
+    on('e-again', () => { H.end(false); G.newGame(); });
+    on('e-home', () => { H.end(false); G.state = 'title'; H.title(true); });
+    SH.input.onSourceChange = src => { document.body.dataset.input = src; lastPrompt = null; };
     document.body.dataset.input = SH.input.source;
-    const best = SH.store.get('starhaven.best.v1', null);
-    if (best != null) $('title-best').textContent = 'Best time: ' + fmt(best);
+    H.titleButtons();
   };
 
   SH.game.hud = H;

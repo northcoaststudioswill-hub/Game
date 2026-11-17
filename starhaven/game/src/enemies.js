@@ -27,7 +27,7 @@
     if (this.dead) {
       this.deadT++;
       // Come back after a while, but never in view.
-      if (this.deadT > d.respawn && Math.abs(this.home.x - world.camCenterX()) > world.viewW * 0.6) this.reset();
+      if (this.respawns !== false && this.deadT > d.respawn && Math.abs(this.home.x - world.camCenterX()) > world.viewW * 0.6) this.reset();
       return;
     }
     this.t++;
@@ -39,7 +39,9 @@
         if (this.pause > 0) { this.pause--; this.vx = 0; }
         else {
           this.vx = this.dir * d.wander;
-          if (!SH.floorAhead(world.room, this.x + this.dir * (this.w / 2 + 2), this.y) || this.hitWall) { this.dir *= -1; this.pause = 30; }
+          // turn at ledges and walls, and stay near home (a leash of a few tiles) so sprites never wander into town
+          const away = (this.x - this.home.x) * this.dir > d.leash * SH.TILE;
+          if (!SH.floorAhead(world.room, this.x + this.dir * (this.w / 2 + 2), this.y) || this.hitWall || away) { this.dir *= -1; this.pause = 30; }
           if (Math.random() < 0.004) this.pause = 40 + Math.random() * 40;
         }
         if (sees && this.grounded) { this.state = 'windup'; this.t = 0; this.dir = dx > 0 ? 1 : -1; this.vx = 0; fx.word(this.x, this.y - this.h - 8, '!', '#ffb057', 28); }
@@ -112,7 +114,7 @@
     if (this.flash > 0) this.flash--;
     if (this.comboT > 0) this.comboT--; else this.combo = 0;
   };
-  Dummy.prototype.takeHit = function (hit) {
+  Dummy.prototype.takeHit = function (hit, world) {
     this.tiltV += hit.dir * (hit.finisher ? 0.22 : 0.1);
     this.flash = 7;
     this.combo++; this.comboT = 50;
@@ -120,6 +122,7 @@
     SH.fx.word(this.x, this.y - this.h - 10, label, hit.finisher ? '#ffd27a' : '#ffffff', 40);
     SH.fx.burst(this.x - hit.dir * 4, this.y - this.h * 0.6, 6, { angle: hit.dir > 0 ? 0 : Math.PI, spread: 1.2, speed: 2, life: 18, colors: ['#e8c77a', '#b8924a', '#fff2c9'] });
     if (hit.finisher) SH.fx.ring(this.x, this.y - this.h * 0.6, '#ffd27a', 24, 14, 2);
+    if (hit.finisher && this.combo >= 3 && world && world.onDummyCombo) world.onDummyCombo();
     return { landed: true, killed: false };
   };
 
@@ -147,7 +150,7 @@
     const x = s.x * T + T / 2;
     if (s.kind === 'bulb') return new Bulb(s.x * T, s.y * T);
     const y = s.y != null ? s.y * T : room.groundY(Math.floor(s.x), 0);
-    if (s.kind === 'thornSprite') return new ThornSprite(x, y);
+    if (s.kind === 'thornSprite') { const e = new ThornSprite(x, y); e.respawns = s.respawn; return e; }
     if (s.kind === 'dummy') return new Dummy(x, y);
     throw new Error('unknown spawn ' + s.kind);
   };

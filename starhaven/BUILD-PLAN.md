@@ -13,7 +13,8 @@
 4. Scope stays sliced: finish the slice, get Will's verdict, then widen.
 
 ## Milestones
-Status: 1 and 2 built in `game/` (Rebuild 1, Nov 17 2026) and waiting for Will's play. 3 to 6 not started in this repo.
+Status (Nov 17 2026): the concept build covers 1, 2 and the story side of 3 to 5 in miniature (Prologue to Chapter 2 with
+checkpoints, a city street, Caelum dialogue and a bond heart). No save slots or real hub yet. 6 (Flame) not started. See `STORY.md`.
 
 1. **Movement feel** — Wren in an empty test room: run, jump, double jump, dash. Tuning numbers from the test brief. Nothing else.
 2. **Combat feel** — daggers (3-hit combo, air slash, pogo), one thorn sprite, getting hit, hearts.
