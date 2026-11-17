@@ -21,6 +21,22 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v9.1 · 2026-11-17 · bring the light: alphas, not gyms
+
+Will: the valley was promised to sprouts and buddies 3000 years ago. After the Data Center was nuked the light was lost; sprouts bring it back to the buddies. The goal is cleansing the dark from the buddies and showing them the light so Bibi can lower the dome and we face Bottie once and for all. No gyms or trainer battles: just buddies and alphas to bring the light to. Sprouts should matter in battles. Light enough buddies and find the Sigils, and you face Bottie. Also: Erin's first pathing looked weird.
+
+New `sw-light.js`:
+- **The four alphas hold the four Sigils.** Bring an alpha the light (wear it down, or bloom it with sprouts) and it gives up its Sigil: BLOOMBOAR in the Meadow, the VERDANT SIGIL (opens the Hollow, Squire's Woods and the Wastes); PYTHORN in Crooked Hollow, the ROOT SIGIL; STONESQUIRE in Squire's Woods, the STONE SIGIL (two Sigils open the Shore, three Gloom Hollow); AURICORN in Gloom Hollow, the GOLD SIGIL. Each one gets the cinematic, in its own colours, ending on what it opens (`shots/v9.1-bring-the-light.png`).
+- **No gyms, no trainer battles.** Trainers walk up and talk (new lines: KISS asks who keeps a promise for 3000 years; DEREK got chased off the road by wild buddies; MAMA's beach buddies hiss now; the DOME GUARDS say four Sigils and the King might listen). The gym buildings are lodges where the Ranger, Marcus and Erin point you at the alphas; the Peak's is BOTTIE'S TOWER, the one battle left, open once the dome is down.
+- **King Bibi lowers the dome for four Sigils**, no fight: "Four Sigils. Four alphas, lit. ...The buddies are calm again? Fine. FINE. The dome comes down." Before that he tells you how many you have.
+- **Sprouts matter in battle.** A sprout throw that does not bloom still burns away some of the dark ("Their light burned away some of the dark. (-24)" on the Meadow alpha). Wild fights end "The dark breaks! BLOOMBOAR settles down, calm."
+- **Story text:** the intro opens on the 3000-year promise; Erin: "Cleanse the dark from the buddies. Show them the light."; Marcus: "Four alphas hold four Sigils, bro. Light them all, Bibi drops the dome, and we face Bottie." The Elder and the scene after your first crop point you at the alphas. Goal lines lead alpha to alpha, then to the King, then to Bottie's tower.
+- **The Meadow alpha is Lv6**, from simulations: every starter at Lv6 with a Lv4 buddy wins 3 of 3 against it (at Lv7, two starters lost every time). Real time with the autopilot: cottage to the first Sigil in about 6.5 minutes (train to Lv6, lose once, rest, win), 0 flags, no page errors.
+- **Erin's first walk** (Sunkeep to the south road) walked straight across the garden plots. She now follows a path, down the east lane and round the garden to the gate.
+- Lab: 120 checks (new: trainers only talk; the Meadow alpha gives the VERDANT SIGIL; the King keeps the dome up without four Sigils and lowers it with them), twice clean.
+
+**Not checked:** Sigils 2 to 4 played by hand (the Hollow, Squire's and Gloom alphas, the King's talk in real time); Bottie's tower as the final battle in real time; iPhone.
+
 ## v9.0 · 2026-11-16 · the story as it stands: Bottie is the villain
 
 Will set the lore: King Bibi is the king, and he raised the IRON DOME when the light went out. When the light went out the buddies began to roam wild, and someone found that sprouts bring the light back to them and restore order. The villain is BOTTIE: he nuked the DATA CENTER, which glitched the Sproutwild simulation. We use sprouts to bring the light back, restore order among the buddies, and collect the four Sigils to restore order in the kingdom.

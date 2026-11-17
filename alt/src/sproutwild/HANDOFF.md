@@ -7,8 +7,9 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - BOTTIE is the villain: he nuked the DATA CENTER, the Sproutwild simulation glitched and the Great Lantern cracked.
 - KING BIBI is the king: when the light went out he raised the IRON DOME ("temporarily") and shut the roads.
 - In the dark the buddies went wild. Sprouts carry the light that calms them and restores order.
-- Goal: bring the light back, restore order among the buddies, win four Sigils to restore order in the kingdom;
-  then the King drops the dome and the Peak road opens to Bottie. Tone: warm Erin, Marcus "bro", Bottie "bzzt, clank, gang".
+- The valley was promised to sprouts and buddies 3000 years ago. Goal: cleanse the dark from the buddies, show them
+  the light. No gyms, no trainer battles (v9.1): the four ALPHAS give the four Sigils (sw-light.js); four Sigils and
+  the King lowers the dome; Bottie's tower on the Peak is the final battle. Sprouts matter in battle. Tone: warm Erin, Marcus "bro", Bottie "bzzt, clank, gang".
 
 ## Ground rules from Will
 - Branch for v8.1: `claude/sproutwild-v8.1`, made from `main` (earlier rounds used `claude/festive-knuth-f30w4u`).
@@ -24,7 +25,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
   (order listed in `SPROUTWILD=[...]`; later files override earlier functions by redeclaring them;
   `const` names must be unique). Output: `alt/games/pocket-lantern-alt.html` (~14.5 MB, limit 16).
 - `python3 alt/build.py` then `node alt/tests/sproutwild/field-lab.js alt/games/pocket-lantern-alt.html`
-  (119 checks; lab turns off scenes, the buddy cap, bugs and Louie's digging so results are steady).
+  (120 checks; lab turns off scenes, the buddy cap, bugs and Louie's digging so results are steady).
 - Test hooks: `window.__g.SWF()` (state, meta, enter, travel, setPos, pos, near, fld, bf, wilds,
   bugs, plots, cast, walk, lst, scene, noScenes, noCap, noBugs, ...).
 - Real-time playtests: Playwright scripts in the session scratchpad (`play31.js` = title to first
@@ -83,7 +84,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
   and `let` names must be unique across all files, or the page fails to load.
 - Build order (see `SPROUTWILD=[...]` in `alt/build.py`): sw-cartart, sw-module, sw-field, sw-front,
   sw-base, sw-art, sw-story, sw-battle, sw-save, sw-text, sw-cast, sw-party, sw-scene, sw-starters,
-  sw-plots, sw-hollow, sw-squire, sw-louie, sw-bugs, sw-walk, sw-open2, sw-meadow2, sw-pace, sw-sigil, sw-lore.
+  sw-plots, sw-hollow, sw-squire, sw-louie, sw-bugs, sw-walk, sw-open2, sw-meadow2, sw-pace, sw-sigil, sw-lore, sw-light.
 - Several functions exist in more than one file on purpose (the later one is live). Known pairs:
   `swPauseUpdate/drawPause` (live: sw-save.js), `cotUpdate/drawCot` (live: sw-story.js),
   `wQuestText` (two copies in sw-story.js; the second is live), `wBaseArrive`, `scIntro`, `scWake`,
@@ -145,6 +146,8 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
 - v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
   "FOUND ONE!" bubble stays on screen.
+- v9.1: bring the light - alphas give Sigils, no gyms or trainer battles, sprout light burn, Meadow alpha Lv6,
+  Erin's Sunkeep escort pathed round the garden.
 - v9.0: the story reworked to Will's lore (Bottie the villain, Bibi the king behind his dome) across the intro,
   scenes, Bottie, the King's fight, his guards and the guide.
 - v8.9: sw-lore.js (8-slide intro, Elder and Erin/Marcus scenes about KING BIBI), full-garden hint, scenes no

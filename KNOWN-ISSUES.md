@@ -2,7 +2,7 @@
 
 Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v9.0)
+## Sproutwild (cartridge 5, v9.1)
 
 ### Known bugs
 - "BERRIES planted" stayed up 16 s in one run (too long, not too short). Not looked into yet.
@@ -52,6 +52,7 @@ Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to eve
 - Garden sprouts and the opening seeds had two growing looks; now one (confirmed on screen in v8.2).
 
 ### Not tested in play yet
+- Since v9.1 (alphas instead of gyms): Sigils 2 to 4 by hand, the King lowering the dome in real time, Bottie's tower as the final battle.
 - Watching a starter evolve at Lv16 in a battle.
 - Petting Louie at Sunkeep in real time (checked by the automated test only).
 
