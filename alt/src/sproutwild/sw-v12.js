@@ -24,7 +24,7 @@
    - LORE. Four things to read: the Lantern plaque, the founders'
      stone, the soil sign, the waystone at the gate.
    ================================================================ */
-const WSTREETS=[{n:'LANTERN ROW',y:127,x0:70,x1:410},{n:'FIELD LANE',y:299,x0:84,x1:396},{n:'GATE LANE',y:431,x0:60,x1:420}],WAVE_X=240;
+const WSTREETS=[{n:'LANTERN ROW',y:127,x0:70,x1:410},{n:'FIELD LANE',y:299,x0:84,x1:396},{n:'GATE LANE',y:431,x0:104,x1:356}],WAVE_X=240;
 /* ---- roads: the nearest point on a street or the avenue, and a walk between two points that uses them ---- */
 function wRoadNear(x,y){let best={x:WAVE_X,y:Math.max(96,Math.min(506,y)),s:-1},bd=Math.hypot(x-best.x,y-best.y);
  WSTREETS.forEach((S,i)=>{const px=Math.max(S.x0,Math.min(S.x1,x)),d=Math.hypot(x-px,y-S.y);if(d<bd){bd=d;best={x:px,y:S.y,s:i}}});return best}
@@ -101,7 +101,7 @@ const WLORE={plaque:['THE GREAT LANTERN. Lit by the first keepers. "While it bur
   if(d.k==='plaque'){r('rgba(0,0,0,.2)',x-9,y+1,18,3);r(K,x-8,y-10,16,12);r('#8c909c',x-7,y-9,14,10);r('#f8e060',x-5,y-7,10,6);r('#b08a20',x-4,y-5,8,1);r('#b08a20',x-4,y-3,6,1)}
   else if(d.k==='fstone'){r('rgba(0,0,0,.25)',x-9,y+1,18,4);r(K,x-8,y-24,16,26);r(K,x-6,y-27,12,4);r('#8c909c',x-7,y-23,14,24);r('#8c909c',x-5,y-26,10,3);r('#a8acb6',x-7,y-23,3,22);r('#6e7280',x-3,y-18,7,1);r('#6e7280',x-3,y-14,5,1);r('#6e7280',x-1,y-8,3,3);r('#58b848',x-7,y-2,5,3);r('#58b848',x+3,y-4,4,5)}
   else if(d.k==='soilsign'){r(K,x-1,y-8,3,10);r('#6e5233',x,y-7,1,8);r(K,x-10,y-18,20,11);r('#c49a62',x-9,y-17,18,9);r('#5a3d24',x-7,y-15,14,1);r('#5a3d24',x-7,y-12,10,1)}
-  else{r('rgba(0,0,0,.25)',x-8,y+1,16,4);r(K,x-7,y-20,14,22);r('#a39a86',x-6,y-19,12,20);r('#b8b09c',x-6,y-19,12,2);r(K,x-3,y-15,6,1);r(K,x-1,y-17,2,5);r(K,x-3,y-9,6,1);r('#f4f0ea',x-4,y-6,8,1)}
+  else{r('rgba(0,0,0,.25)',x-8,y+1,16,4);r(K,x-7,y-16,14,18);r(K,x-5,y-19,10,4);r('#a39a86',x-6,y-15,12,16);r('#a39a86',x-4,y-18,8,3);r('#b8b09c',x-6,y-15,3,14);r(K,x-1,y-13,2,7);r(K,x-3,y-8,6,1);r(K,x-2,y-7,4,1);r(K,x-1,y-6,2,1);r('#ffd94d',x-1,y-17,2,2)} /* a milestone: an arrow south, a spot of Lantern gold */
   return true}}
 {const _ps=wPropSolid;wPropSolid=function(x,y){if(_ps(x,y))return true;if(W4.sector!=='BASE')return false;for(const p of WPROPS){if(!WLORE[p.k])continue;const dx=Math.abs(x-p.x),dy=y-p.y;if(dx<8&&dy>-6&&dy<3)return true}return false}}
 /* words that named the old garden */
@@ -156,3 +156,11 @@ drawPlot=function(){const pb=W4.plotPb,cur=pb&&pb.crop,m=pb&&wPlotBud(pb.plotB);
  swRows([{a:'BERRIES',b:cur==='berry'?'growing here':'2 every '+WCROPS.berry.need+'s'},{a:'FIBER REEDS',b:SW.baseLv<2?'Sunkeep Lv2':cur==='fiber'?'growing here':'1 every '+WCROPS.fiber.need+'s'},
   {a:'TENDED BY',b:m?m.sp+' +'+Math.round(wPlotBonus(m)*100)+'%':'nobody · A to choose'},{a:'LEAVE',b:''}],swSel,
   W4.plotMsg&&time-W4.plotMsgAt<3.5?W4.plotMsg:swSel===0?WCROPS.berry.d:swSel===1?WCROPS.fiber.d:swSel===2?'A steps through your home buddies. Waterers and planters are best: +50% a level. Any other buddy: +25%. One buddy, one plot.':'Each plot grows one crop.')};
+/* ---- v12.5: the build list, tidied ----
+   - The first CROP PLOT is free. The cottage takes 8 wood, and the game then asks for a plot at once: being one
+     log short there was a chore with no point (a fresh-save run stalled on exactly that).
+   - The three things you build first sit at the top: COTTAGE, CROP PLOT, BUDDY BARN. */
+{const d=WBUILD.find(q=>q.k==='plot');if(d){Object.defineProperty(d,'cost',{get(){return SW.buildings.some(b=>b.k==='plot')?{wood:2}:{}},configurable:true});
+  d.d='A tilled bed for BERRIES, or FIBER REEDS from Sunkeep Lv2. Your first one is free. Set a home buddy to tend it.'}
+ const top=['cottage','plot','datacenter'],rest=WBUILD.filter(q=>!top.includes(q.k)),first=top.map(k=>WBUILD.find(q=>q.k===k)).filter(Boolean);WBUILD.splice(0,WBUILD.length,...first,...rest)}
+{const _cs=wCostStr;wCostStr=function(c){const s=_cs(c);return s||'FREE'}}

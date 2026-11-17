@@ -3,6 +3,14 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v12.5: a free first crop plot, and a tidier build list
+- Your first CROP PLOT is free (the next ones cost 2 wood). The cottage takes 8 wood and the game asks for a plot straight after; a fresh-save run stalled there, one log short. A real player could too.
+- The build list starts with the three things you build first: COTTAGE, CROP PLOT, BUDDY BARN.
+- Gate Lane is shorter: its east end ran into the pond.
+- The waystone at the gate is redrawn as a milestone with an arrow south. It looked like a gravestone.
+
+Checked: field lab; building a plot with 1 wood in hand through the menus.
+
 ## v12.4: you choose who tends each crop plot
 - The crop plot's menu has a new row, TENDED BY. A steps through your home buddies (and back to nobody). One buddy, one plot.
 - A tended plot grows faster: +50% for each level of WATERING or PLANTING that buddy has, +25% for any other buddy. A plot with nobody grows at the plain rate.
