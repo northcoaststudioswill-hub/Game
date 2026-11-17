@@ -1965,6 +1965,7 @@ function g4Update(dt){switch(state){
  case 'g4dome':domeUpdate(dt);return;
  case 'g4loop':loopUpdate();return;
  case 'g4jar':jarUpdate();return;
+ case 'g4exp':expUpdate();return;
  case 'g4kind':kindUpdate();return;
  case 'g4cot':cotUpdate();return;
  case 'g4nur':nurUpdate();return;
@@ -2002,6 +2003,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4dome':drawDome();return;
  case 'g4loop':drawLoop();return;
  case 'g4jar':drawJar();return;
+ case 'g4exp':drawExp();return;
  case 'g4kind':drawKind();return;
  case 'g4cot':drawCot();return;
  case 'g4nur':drawNur();return;

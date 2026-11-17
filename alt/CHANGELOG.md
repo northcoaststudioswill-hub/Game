@@ -3,6 +3,24 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v10.5: expeditions and the Soul Lamp (Will's ideas, Nov 17)
+Expeditions
+- New EXPEDITION tile in the pause menu (the grid is now five shorter rows). Open after the cottage.
+- Send a party of 3 sprouts of one kind. They are gone about 3 minutes of play and come home on their own with what their kind finds (PEB stone, LEAF wood, DEW berries, EMBER ore, ZIP fiber, LUCKY petals) and one gratitude heart for the light they carried.
+- One party at a time; a Buddy Barn lets you send two.
+- If you own more sprouts than your pouch holds, one of the party stays out there "to carry the light on". That is the gentle trim on a crowd.
+- All numbers are first guesses, not tuned.
+
+The Soul Lamp
+- After your first defeat and Erin's talk, the next time you are home a word drifts through the keeper's head ("Hasbara"), then an idea that feels like the keeper's own. The game does not say it is King Bibi.
+- The keeper finds a lamp holding the lights of the lost. Erin tells Marcus. Marcus: "Bro. You're J-lighting again. Making up a story and calling it yours. You're way too beholden to King Bibi."
+- From then on a defeat adds "Its light drifts into your SOUL LAMP", and the pause menu shows SOULS next to LIGHT.
+- "SOUL LAMP" is a placeholder name. What the lamp does later is Will's call; this only sets it up and keeps count.
+
+Also: Erin's "castle time" line tells you to build the Buddy Barn first if you have none.
+
+Checked: field lab; real-time at 430x932: the whole soul scene, the menu, sending a party, the second-party refusal, and the return with one sprout staying out.
+
 ## v10.4: quieter screen, clearer battle menu
 - Battle menu: the left box now says what the highlighted choice does (FIGHT, SWARM, KEEPER, BUDDY, RUN), not "What will X do?".
 - A plain pickup like "+2 WOOD" is a small float over your head now, not a message box across the screen.

@@ -65,7 +65,7 @@ function wStoryBeats(){wPlotSync();{const cot=SW.buildings.some(b=>b.k==='cottag
  /* strong enough for the castle */
  const A=FMAPS.SQUIRE.key.A.lv,ld=SW.party[0];
  if(SW.quest>=5&&!SW.badges.length&&ld&&ld.lv>=A-1&&!L.readyCastle&&SW.lessons.scGym){L.readyCastle=1;
-  scStart([{who:'MARCUS',txt:ld.sp+' is Lv'+ld.lv+'! Look at you. Castle time, bro.'},{who:'ERIN',txt:"South through the Meadow to Squire's Woods. Clear the thorns on the gate with LEAF sprouts."}],()=>swSave());return}
+  scStart([{who:'MARCUS',txt:ld.sp+' is Lv'+ld.lv+'! Look at you. Castle time, bro.'},{who:'ERIN',txt:wHasDC()?"South through the Meadow to Squire's Woods. A moat, a thorn gate and a boulder stand in the way.":"Build a BUDDY BARN first: 8 stone, 6 wood. Then south through the Meadow to Squire's Woods."}],()=>swSave());return}
  /* the courtyard: the alpha wakes */
  const F=W4.fld;if(F&&F.id==='SQUIRE'&&!L.court&&F.alphas&&F.alphas.length&&P3.x>19*FT&&P3.x<27*FT&&P3.y>FT&&P3.y<8*FT){L.court=1;const al=F.alphas[0];
   scStart([{x:al.x,y:al.y+10,hold:1.0},{x:al.x,y:al.y+10,who:'LOUIE',txt:"Shh. It's waking up..."},
