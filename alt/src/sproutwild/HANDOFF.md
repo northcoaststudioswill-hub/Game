@@ -84,7 +84,7 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
   and `let` names must be unique across all files, or the page fails to load.
 - Build order (see `SPROUTWILD=[...]` in `alt/build.py`): sw-cartart, sw-module, sw-field, sw-front,
   sw-base, sw-art, sw-story, sw-battle, sw-save, sw-text, sw-cast, sw-party, sw-scene, sw-starters,
-  sw-plots, sw-hollow, sw-squire, sw-louie, sw-bugs, sw-walk, sw-open2, sw-meadow2, sw-pace, sw-sigil, sw-lore, sw-light, sw-menu.
+  sw-plots, sw-hollow, sw-squire, sw-louie, sw-bugs, sw-walk, sw-open2, sw-meadow2, sw-pace, sw-sigil, sw-lore, sw-light, sw-menu, sw-dark.
 - Several functions exist in more than one file on purpose (the later one is live). Known pairs:
   `swPauseUpdate/drawPause` (live: sw-save.js), `cotUpdate/drawCot` (live: sw-story.js),
   `wQuestText` (two copies in sw-story.js; the second is live), `wBaseArrive`, `scIntro`, `scWake`,
@@ -146,6 +146,8 @@ Read this first in a new session. Details live in `CHANGELOG.md` (newest at top)
 - v8.0: earned opening (Louie's berry, seeds grow in the garden), Erin escort, guided first catch.
 - v8.1: Louie fetches lost sprouts (timing, sprouts stuck on walls), one growing look for garden and seeds,
   "FOUND ONE!" bubble stays on screen.
+- v9.4: dark and lit forms (sw-dark.js: wDarkImg tints a sprite once, wDarkHaze; field wilds, alphas until their
+  Sigil, battle foes; "The dark breaks!" now drives a light-up in sw-battle.js instead of a faint).
 - v9.3: 12-scene intro (scenes 6-9 new in swDrawIntro), LIGHT SHOWN counter (SW.shown, wShowLight in sw-light.js;
   the King needs WSHOWN=20 plus 4 Sigils; rings at 10/20/30 carry the old Erin/Marcus perks), soft field edges in fBake,
   scrolling goal bar.

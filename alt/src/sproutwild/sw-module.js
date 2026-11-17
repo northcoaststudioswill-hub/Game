@@ -1310,7 +1310,7 @@ function battleUpdate(dt){if(!BT){state='g4world';return}BT.t+=dt;if(BT.phase===
      if(SW.party.length<3)SW.party.push(foe);else SW.box.push(foe);
      BT.log=[{txt:'The '+TYPES[BT.tossIx||0].n+' sprouts bloom on '+foe.sp+'. It remembers the Lantern light!'},{txt:SW.party.includes(foe)?foe.sp+' joined your buddies.':foe.sp+' now works for you — sent to your base box.'}];
      BT.after='endwin';BT.phase='msg';BT.t=0}
-    else{BT.dz=BT.dz||{};BT.dz[BT.tossIx||0]=1;BT.log=[{txt:BT.foe.sp+' shook the sprouts off! They sit out the rest of this fight.'}];{const lb=wLightBurn(BT.tossN||1);if(lb)BT.log.push({txt:'Their light burned away some of the dark. (-'+lb+')'})} /* v9.1 */BT.phase='msg';BT.t=0;
+    else{BT.dz=BT.dz||{};BT.dz[BT.tossIx||0]=1;BT.log=[{txt:BT.foe.sp+' shook the sprouts off! They sit out the rest of this fight.'}];{const lb=wLightBurn(BT.tossN||1),kin=wKinship(BT.tossIx||0,BT.foe.sp)>1;if(lb)BT.log.push({txt:kin?TYPES[BT.tossIx||0].n+' sprouts burn bright on '+BT.foe.sp+'! The dark burns double. (-'+lb+')':'Their light burned away some of the dark. (-'+lb+')'})} /* v9.4: say when the sprout kind was right */ /* v9.1 */BT.phase='msg';BT.t=0;
      const lines=wDoMove(BT.foe,btCur(),wFoeMove(),BT.foeStage,BT.myStage);
      BT.log=BT.log.concat(lines.map(t=>({txt:t})));
      if(btCur().hp<=0)wMineDown();else BT.after='menu'}}
@@ -1954,6 +1954,7 @@ function g4Update(dt){switch(state){
  case 'g4plot':plotUpdate();return;
  case 'g4dab':dabUpdate(dt);return;
  case 'g4sigil':sigilUpdate(dt);return;
+ case 'g4dome':domeUpdate(dt);return;
  case 'g4loop':loopUpdate();return;
  case 'g4jar':jarUpdate();return;
  case 'g4kind':kindUpdate();return;
@@ -1990,6 +1991,7 @@ function g4Draw(){ox=0;oy=0; /* Sprouts' camera globals: drawBud subtracts them;
  case 'g4plot':drawPlot();return;
  case 'g4dab':drawDab();return;
  case 'g4sigil':drawSigil();return;
+ case 'g4dome':drawDome();return;
  case 'g4loop':drawLoop();return;
  case 'g4jar':drawJar();return;
  case 'g4kind':drawKind();return;

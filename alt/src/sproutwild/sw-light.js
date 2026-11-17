@@ -23,7 +23,7 @@ const WTRTALK={KISS:[['KISS: Hey. Keeper. One question.','Three thousand years a
  'DOME GUARD':[["DOME GUARD: Halt. King's orders: the dome stays up till the valley is safe.",'Bring the light to the four alphas. Four Sigils, and the King might listen.'],'The IRON DOME only drops for the King. He sits in the Gloom.']};
 function fChallenge(F,np){
  if(np.boss){if(SW.badges.length>=4&&(SW.shown||0)<WSHOWN){fTalk(F,'KING BIBI',['KING BIBI: Four Sigils! Splendid. Splendid. But I looked out the window.','The buddies out there are still wild, keeper. '+(SW.shown||0)+' calmed. I need '+WSHOWN+' before I drop a single bolt.']);return}
-  if(SW.badges.length>=4){fTalk(F,'KING BIBI',['KING BIBI: Four Sigils. Four alphas, lit. ...The buddies are calm again?','Fine. FINE. The dome comes down. Order is restored. I was always going to do this.',"Bottie is up the Peak road. Go unplug that robot, keeper. And knock first."],()=>{SW.fl[np.fk]=1;SW.fl.bibi=1;swSay('The IRON DOME flickers out across the valley. The Peak road is open!',3.4);swSnd(523,.3,1046);swSave()})}
+  if(SW.badges.length>=4){fTalk(F,'KING BIBI',['KING BIBI: Four Sigils. Four alphas, lit. ...The buddies are calm again?','Fine. FINE. The dome comes down. Order is restored. I was always going to do this.',"Bottie is up the Peak road. Go unplug that robot, keeper. And knock first."],()=>{SW.fl[np.fk]=1;SW.fl.bibi=1;swSave();if(SCOFF){swSay('The IRON DOME flickers out across the valley. The Peak road is open!',3.4);return}W4.domeT=0;W4.domeP=0;state='g4dome';swSnd(523,.3,1046)})}
   else fTalk(F,'KING BIBI',['KING BIBI: Ah. The little keeper. Sit. I have brought a chart.','This is the Lantern. This is the night the robot nuked the Data Center. I drew it myself. With a marker.','The valley was promised to sprouts and buddies three thousand years ago. Then: dark. So: dome.','Bring the light to the four alphas. Four Sigils, and the dome comes down. You have '+SW.badges.length+'.']);return}
  const t=WTRTALK[np.who]||[np.pre||['...'],np.after||'...'];fTalk(F,np.who,t[0].concat([t[1]]),()=>{SW.fl[np.fk]=1;swSave()})}
 /* the gym buildings are lodges now; the Peak's is Bottie's tower and the last battle */
@@ -44,5 +44,25 @@ const WSHOWN=20;
 /* each ring gives the keeper a gift (v9.2: what Erin and Marcus used to give as keepers) */
 const WRING={1:'GREEN HANDS, +1 from every harvest.',2:'WARM LIGHT, buddies heal a little after each win.',3:'BIG HEART, buddies hit 12% harder.'};
 function wShowLight(){SW.shown=(SW.shown||0)+1;const n=SW.shown;
- if(n%10===0){SW.hearts=(SW.hearts||0)+3;SW.heartsTotal=(SW.heartsTotal||0)+3;const gift=WRING[n/10]||'+3 hearts';swSay(n+' buddies shown the light! The Great Lantern grows a ring: '+gift,3.6);swSnd(784,.12,1568)}
+ if(n%10===0){SW.hearts=(SW.hearts||0)+3;SW.heartsTotal=(SW.heartsTotal||0)+3;const gift=WRING[n/10]||'+3 hearts',m=n+' buddies shown the light! The Great Lantern grows a ring: '+gift;if(state==='g4world'){swSay(m,3.6);swSnd(784,.12,1568)}else W4.ringPend=m} /* v9.4: said in a battle, it waits till you are back out */
  else if(W4.floats)W4.floats.push({x:P3.x,y:P3.y-30,txt:'LIGHT SHOWN '+n,t:1.6,c:'#ffd94d'})}
+/* v9.4: the dome comes down, as a cinematic. A pages through, B skips */
+const WDOME=[{who:'KING BIBI',t:'...Lower it. All of it. Yes, the whole thing. I am sure. Mostly.',acc:'#1e2c5a'},
+ {who:'',t:'The IRON DOME flickers, thins, and folds away into the dawn. The roads of the valley are open.'},
+ {who:'BOTTIE',t:'bzzt. ...The dome is down? Uh oh. I mean: COME AT ME, GANG.',acc:'#2a5a6a'},
+ {who:'ERIN',t:"That's it, keeper. Bottie's tower is up the Peak road. Let's finish this."}];
+function domeUpdate(dt){W4.domeT=(W4.domeT||0)+dt;if(pressed('b')){state='g4world';swSay('The Peak road is open!',2.6);return}
+ if(pressed('a')&&W4.domeT>.6){W4.domeP=(W4.domeP||0)+1;W4.domeT=Math.min(W4.domeT,3);swSnd(660,.05);if(W4.domeP>=WDOME.length){state='g4world';swSay('The Peak road is open!',2.6)}}}
+function drawDome(){const p=Math.min(W4.domeP||0,WDOME.length-1),S=WDOME[p],gy=H-78,t=(W4.domeP?3:0)+(W4.domeT||0);ox=0;oy=0;
+ const dawn=Math.min(1,Math.max(0,(t-1.6)/2));uiSky(dawn<.5?['#0c0a20','#241f44','#3d3760','#5a4a80']:['#2a3a6a','#7a6aa0','#e0a080','#f8d8a0'],gy);if(dawn<.5)uiStars(30,gy-30,5);
+ uiHills(gy,20,dawn<.5?'#241f36':'#4a4a6a',1.9,1.5);r(dawn<.5?'#262244':'#3f5a3a',0,gy,W,H);
+ const rad=Math.round(96*Math.max(0,1-t/2.4));
+ if(g.beginPath&&rad>2){g.save();g.beginPath();g.rect(0,0,W,gy);g.clip();g.globalAlpha=.2*(rad/96)+.05;g.fillStyle='#58a0f0';g.beginPath();g.arc(W/2,gy,rad,0,6.3);g.fill();
+  g.globalAlpha=.8;g.strokeStyle='#b0e0f8';g.lineWidth=1;g.beginPath();g.arc(W/2,gy,rad,0,6.3);g.stroke();g.restore();g.globalAlpha=1}
+ if(t<3.2)for(let i=0;i<18;i++){const k=Math.min(1,t/2.4),a=i*.35+.2,rd=rad+k*40+((i*13)%20);const x=Math.round(W/2+Math.cos(a+Math.PI)*rd),y=Math.round(gy-Math.abs(Math.sin(a))*rd);if(y<gy){g.globalAlpha=Math.max(0,1-t/3.2);r(i%2?'#b0e0f8':'#fff3b0',x,y,2,2);g.globalAlpha=1}}
+ if(dawn>0)uiRays(W/2,gy-10,140,10,'#ffd94d',.08*dawn);
+ fFort(W/2,gy+8);fChibi(W/2,gy+18,FLOOK['KING BIBI'],[0,1],false);fChibi(W/2-40,gy+16,FLOOK['DOME GUARD'],[0,1],false);fChibi(W/2+40,gy+16,FLOOK['DOME GUARD'],[0,1],false);
+ if(p===2){const by=Math.round(gy*.30+Math.sin(time*1.4)*2);g.globalAlpha=.14+.06*Math.sin(time*5);r('#7ee7ff',W-66,by-30,40,34);g.globalAlpha=1;wChar('BOTTIE',W-46,by,30)}
+ if(p===3)fChibi(W/2-80,gy+18,Object.assign({},FLOOK.ERIN,{sc:2}),[1,0],false);
+ r('#000000',0,0,W,9);ctext('THE DOME COMES DOWN',1,1,'#ffd94d',null);
+ if(t>1||p>0)uiSay(S.who,S.t,(p===0?t-1:W4.domeT)*60,'A  NEXT · B  SKIP',S.acc)}

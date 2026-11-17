@@ -678,7 +678,8 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
   else if(k===5)fBudDraw(o);
   else if(k===6)pfWildDraw(o,feet);
   else if(k===7){const spr=wSp(o.sp)._spr,w2=Math.round(spr.ow*1.5),h2=Math.round(spr.oh*1.5),X=Math.round(o.x),Y=Math.round(o.y)+4,br=Math.round(Math.sin(time*1.6)*1.5);
-   r('rgba(0,0,0,.28)',X-14,Y-2,28,5);g.drawImage(spr.ol,X-w2/2,Y-h2+2-br,w2,h2+br);
+   r('rgba(0,0,0,.28)',X-14,Y-2,28,5);const aLit=typeof WASIG!=='undefined'&&WASIG[o.sp]&&SW.badges.includes(WASIG[o.sp].n),aImg=aLit?spr.ol:(wDarkImg(spr)||spr.ol); /* v9.4: an alpha is darkest of all until it has the light */
+   if(!aLit){g.globalAlpha=.16+.08*Math.sin(time*2.4);r('#5a1a6a',X-w2/2-6,Y-h2-4,w2+12,h2+8);g.globalAlpha=1}g.drawImage(aImg,X-w2/2,Y-h2+2-br,w2,h2+br);if(!aLit){wDarkHaze(X-6,Y,h2,7);wDarkHaze(X+6,Y,h2,11)}
    r('#14101e',X-13,Y-h2-9,26,9);text('ALPHA',X-tw('ALPHA',1)/2,Y-h2-8,1,'#ff7a6a',null);
    const zz=((time*1.5)|0)%3;text('z',X+10+zz*2,Y-h2+4-zz*3,1,'#d8e8c8',null)}
   else if(k===8){const done=!o.team||SW.fl[o.fk];if(o.prop)fProp(o.prop,o.hx+12,o.hy+2);

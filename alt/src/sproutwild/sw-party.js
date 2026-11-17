@@ -73,7 +73,8 @@ function pfWildDraw(o,feet){const spr=wSp(o.sp)._spr,w=Math.round(spr.ow*PSC),h=
  if(c||(o.lat&&o.lat.length)){const fl=.5+.5*Math.sin(time*8);g.globalAlpha=.18+.15*fl;r('#fff3b0',X-w/2-4,Y-h-2,w+8,h+6);g.globalAlpha=1;if(c)uiRays(X,Y-h/2,30+c.t*30,8,'#fff3b0',.18)}
  if(c&&c.t>=1.8&&c.ok){for(let i=0;i<12;i++){const a=i*.52+c.t*4,rad=6+(c.t-1.8)*80;r(i%2?'#fff3b0':'#7ee787',Math.round(X+Math.cos(a)*rad),Math.round(Y-h/2+Math.sin(a)*rad*.7),2,2)}}
  if(sc<=0)return;const ww=Math.max(1,Math.round(w*sc)),hh=Math.max(1,Math.round(h*sc));
- r('rgba(0,0,0,.22)',X-6,Y-1,12,3);const img=white&&spr.hol?spr.hol:spr.ol;
+ r('rgba(0,0,0,.22)',X-6,Y-1,12,3);const dk=!c&&!white&&wDarkImg(spr),img=white&&spr.hol?spr.hol:dk||spr.ol; /* v9.4: wild buddies are dark until you bring them the light */
+ if(dk)wDarkHaze(X,Y,hh,o.x);
  if(o.fx>0&&spr.fable){g.save();g.translate(X+Math.round(ww/2),Y-hh+2-bob);g.scale(-1,1);g.drawImage(img,0,0,ww,hh);g.restore()}else g.drawImage(img,X-Math.round(ww/2),Y-hh+2-bob,ww,hh);
  if(!c&&Math.hypot(o.x-P3.x,o.y-P3.y)<90){const lt=(o===wTagWild()?o.sp+' ':'')+'Lv'+o.lv,lw=tw(lt,1),ty=(P3.y>o.y&&P3.y-o.y<34&&Math.abs(P3.x-o.x)<30)?Y-hh-11:Y+3;r('rgba(10,14,8,.7)',X-lw/2-2,ty,lw+4,9);text(lt,X-lw/2,ty+1,1,'#ffe8b0',null)}
  if(!c&&feet)feet(o.x,o.y)}

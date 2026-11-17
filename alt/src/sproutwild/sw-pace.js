@@ -16,7 +16,7 @@ function swSay(s,t){s=String(s);const need=Math.max(t||2.2,swReadT(s));W4.msgQ=W
  W4.msg=s;W4.msgT=need;W4.msgAt=time;W4.msgMin=Math.min(need,1.2+s.length*.045)}
 function swBusy(){return W4.msgT>0||(W4.msgQ&&W4.msgQ.length)}
 /* called every world frame (scAuto): next message, then a waiting scene */
-function swMsgPump(){{const F=W4.fld;if(F&&F.dlgPend&&!F.dlg&&!W4.scene&&!swBusy()){F.dlg=F.dlgPend;F.dlgPend=null;return}}
+function swMsgPump(){if(W4.ringPend&&state==='g4world'){const m=W4.ringPend;W4.ringPend=null;swSay(m,3.6);swSnd(784,.12,1568)}{const F=W4.fld;if(F&&F.dlgPend&&!F.dlg&&!W4.scene&&!swBusy()){F.dlg=F.dlgPend;F.dlgPend=null;return}}
  if(W4.scene||(W4.fld&&W4.fld.dlg)||W4.talk||(W4.quips&&W4.quips.length))return;W4.msgQ=W4.msgQ||[];
  if(W4.msgT>0)return;
  if(W4.scPend&&W4.scPend.length){const p=W4.scPend.shift();if(p.dab)dabGo();else scGo(p.steps,p.done);return} /* v8.9: a waiting scene goes before messages not yet shown */

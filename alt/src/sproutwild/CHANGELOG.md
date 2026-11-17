@@ -21,6 +21,22 @@ screenshots and a changelog from here on, every build.*
 
 ---
 
+## v9.4 · 2026-11-17 · dark and lit
+
+Will: keep working. Round 3 of the story bible starts with the core reward: seeing a buddy go from dark to lit.
+
+- **Every wild buddy is dark** (`shots/v9.4-dark-and-lit.png`): a purple-black tint over its own colours and a faint haze rising off it, in the grass and in battle. That covers every foe in the story: wild buddies, alphas and Bottie's glitched team.
+- **Alphas are darkest of all**: a dark sprite, a slow purple aura and two trails of haze, until you have their Sigil. Then they stand in the field in their own colours.
+- **Calming a buddy is a light-up, not a knock-out.** When "The dark breaks!" comes up, the foe stays where it stands while the dark drains off it over about a second in a burst of rays and sparks, with a chime, and it ends in its true colours. (The battle used to watch only for "fainted", so since v9.1 wild foes just stood there; fixed.)
+- **The right sprouts say so.** When a sprout throw doesn't bloom but the kind was right for that buddy (its own kind, or one that beats it), the burn already counted double; now the battle says it: "EMBER sprouts burn bright on FERNFANG! The dark burns double. (-24)".
+- **The dome comes down as a cinematic** (`shots/v9.4-the-dome-comes-down.png`): when King Bibi agrees, the IRON DOME shrinks away over the castle in a spray of sparks while the night sky turns to dawn. Then four voices, one at a time: Bibi ("...Lower it. All of it. Yes, the whole thing. I am sure. Mostly."), the narrator, Bottie from far off ("bzzt. ...The dome is down? Uh oh. I mean: COME AT ME, GANG.") and Erin pointing you up the Peak road. A pages through, B skips.
+- **The first ring waits for you.** In a real-time run the "10 buddies shown the light" message came up during a battle, under the battle screen. A ring reached in battle is now said when you're back out.
+- Done in one new file, `sw-dark.js`: the dark version of each sprite is made once and kept.
+- Lab: 123 checks, unchanged.
+- Played in real time from the cottage (autopilot, 430x932): trained, beat the dark Meadow alpha, VERDANT SIGIL at 216 s, the first ring message shown after the battle, 0 timing flags, no page errors. One earlier run stalled at the alpha after a loss; that was the autopilot standing 3 px off its spot and never pressing A, not the game (a probe from the same spot gets CHALLENGE ALPHA). The autopilot now accepts 8 px.
+
+**Not checked:** the dome cinematic in a real run to four Sigils (checked by screenshot from its own screen); Bottie's team in its dark form in real time; iPhone.
+
 ## v9.3 · 2026-11-17 · round 2: the intro, LIGHT SHOWN, a softer Meadow
 
 Will: keep working on the game. Round 2 of the story bible's fix list.

@@ -94,7 +94,7 @@ while(T()<CAP){
    if(s.lead[1]<.4&&s.start){if(await moveTo(s,s.start[0],s.start[1]+16)){await face(0,-1);await aPress(1200);if(!globalThis.__restLog||Date.now()-globalThis.__restLog>8000){globalThis.__restLog=Date.now();log.push(T().toFixed(1)+'s REST try at the post, lead hp '+(s.lead[1]*100|0)+'% near='+await ev("JSON.stringify(W4.near&&W4.near.txt||null)"))}}await sleep(150);continue}
    const wd=s.wilds.filter(w=>w[2]<=s.lead[0]+1).sort((a,b2)=>Math.hypot(a[0]-s.P[0],a[1]-s.P[1])-Math.hypot(b2[0]-s.P[0],b2[1]-s.P[1]))[0];
    if(wd){if(await moveTo(s,wd[0],wd[1]+20)){await face(0,-1);if(Date.now()-lastA>1500){lastA=Date.now();await key('sel')}}}await sleep(150);continue}
-  if(s.q>=5&&s.badges<1&&s.alpha){if(await moveTo(s,s.alpha[0],s.alpha[1]+22)){await face(0,-1);await aPress(1500)}await sleep(150);continue} /* v9.1: the first Sigil is the Meadow alpha */
+  if(s.q>=5&&s.badges<1&&s.alpha){if(await moveTo(s,s.alpha[0],s.alpha[1]+22,8)){await face(0,-1);await aPress(1500)}await sleep(150);continue} /* v9.1: the first Sigil is the Meadow alpha */
   if(s.q>=5){if(s.P[1]>24||Math.abs(s.P[0]-(17*16+16))>6){await moveTo(s,17*16+16,s.P[1]>24?Math.max(20,s.P[1]-11):20)}else{await key('up',150)}await sleep(150);continue}
   if(s.w2>=10||s.q>=3){// home: up the west lane to the north gate
    if(s.P[1]>40){await moveTo(s,s.P[0]>60?s.P[0]-11:40,s.P[1]-11)}else{await key('up',150)}
