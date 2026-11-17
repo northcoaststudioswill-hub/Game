@@ -73,11 +73,11 @@ function wTutNear(n){const st=wTutStage();if(!st)return true;
  return false}
 function wTutHint(){if(time<(W4.tutHintT||0))return;W4.tutHintT=time+4;swSay("ERIN: Hang on! I'll show you that. Stick with me.",2.4)}
 
-/* v10.0: the first alpha waits for a Buddy Barn */
-const _wGG10=wGymGoal;wGymGoal=function(){if(SW.quest>=5&&!SW.badges.length&&!wHasDC())return 'Build a BUDDY BARN at Sunkeep (8 stone, 6 wood) before the castle alpha.';return _wGG10()};
+/* v10.0: the first guardian waits for a Buddy Barn */
+const _wGG10=wGymGoal;wGymGoal=function(){if(SW.quest>=5&&!SW.badges.length&&!wHasDC())return 'Build a BUDDY BARN at Sunkeep (8 stone, 6 wood) before the castle guardian.';return _wGG10()};
 
 /* v10.1: the castle is a three-step puzzle. A moat (sprouts build the bridge), the thorn gate (LEAF),
-   then an inner boulder wall (PEB) in front of the alpha. A PEB grows in the courtyard, so nobody is stuck. */
+   then an inner boulder wall (PEB) in front of the guardian. A PEB grows in the courtyard, so nobody is stuck. */
 {const R=FMAPS.SQUIRE.rows,put=(y,x,s)=>{R[y]=R[y].slice(0,x)+s+R[y].slice(x+s.length)};
  put(4,25,'.');put(5,20,'###x###');put(6,25,'q');put(7,21,'u');
  put(9,18,'::~~~b~~~~');put(9,28,'.');put(10,16,'::::::::');

@@ -9,7 +9,7 @@
        TREASURES home to the Lantern beacon (weight vs. strength,
        PEB counts double), build bridges, and clear TYPE GATES
        (boulders=PEB, fire=EMBER, vines=LEAF, sparks=ZIP, blooms=DEW)
-     · wild buddies live in the tall grass and are visible; ALPHAS
+     · wild buddies live in the tall grass and are visible; GUARDIANS
        guard the best treasure; TRAINERS spot you on the road
      · ledges hop one way; routes join edge to edge (the Lantern
        Gate is still fast travel)
@@ -304,7 +304,7 @@ function fLand(F,s){const a=s.aim||{};s.z=0;s.aim=null;
  if(kind==='wild'&&W4.wilds.includes(tg)){if(wBuddyFull()){wFullSay();s.st='ret';return}pfLatch(F,s,tg);return}
  if(kind==='gate'){if(tg.open){s.st='idle';s.t=0;return}
   if(tg.type!==s.type){s.st='ret';W4.floats.push({x:tg.x,y:tg.y-20,txt:tg.n+' — NEEDS '+TYPES[tg.type].n+' SPROUTS',t:1.6,c:'#ffd94d'});swSnd(200,.06);return}}
- if(kind==='item'&&tg.guard&&F.alphas.includes(tg.guard)){s.st='ret';W4.floats.push({x:tg.x,y:tg.y-20,txt:'THE ALPHA GUARDS IT!',t:1.4,c:'#e88'});return}
+ if(kind==='item'&&tg.guard&&F.alphas.includes(tg.guard)){s.st='ret';W4.floats.push({x:tg.x,y:tg.y-20,txt:'THE GUARDIAN GUARDS IT!',t:1.4,c:'#e88'});return}
  if(tg&&kind){s.tg=tg;s.kind=kind;s.wt=0;
   if(kind==='item'){s.st='carry';if(!tg.car.includes(s))tg.car.push(s)}else s.st='work';return}
  if(fSolid(F,s.x,s.y)){s.st='ret';return}
@@ -374,7 +374,7 @@ function fItems(F,dt){for(const it of F.items.slice()){it.moving=false;if(!it.ca
 function fNear(F){const px=P3.x+F.dir[0]*11,py=P3.y+F.dir[1]*11,in2=(o,r2)=>Math.hypot(px-o.x,py-o.y)<(r2||17);
  for(const b of F.buds)if(in2(b))return{k:'bud',b,txt:'PLUCK '+TYPES[b.type].n+' SPROUT'};
  for(const np of F.npcs)if(in2(np,18))return{k:'npc',np,txt:np.team&&!SW.fl[np.fk]?'BATTLE '+np.who:'TALK'};
- for(const al of F.alphas)if(in2(al,22))return{k:'alpha',al,txt:'CHALLENGE ALPHA '+al.sp};
+ for(const al of F.alphas)if(in2(al,22))return{k:'alpha',al,txt:'CHALLENGE GUARDIAN '+al.sp};
  for(const sg of (FSIGNS[F.id]||[]))if(!in2(F.start,18)&&in2({x:sg[0]*FT+8,y:sg[1]*FT+10},14))return{k:'road',msg:sg[2],txt:'READ SIGN'}; /* v9.5: road signs (the Lantern post always wins) */
  for(const wd of W4.wilds)if(SW.quest>=3&&in2(wd)&&!wd.cap&&!pfCan(F,wd))return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv+(F.sq.length?' · too strong to catch':'')};
  if(F.gym&&in2(F.gym,18))return{k:'gym',txt:W4.sector==='PEAK'?'TOWER':'LODGE'};
@@ -452,9 +452,9 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
   else if(n.k==='spot')fFetch(F,n.sp);
   else if(n.k==='node')wNodeAct(n.nd);
   else if(n.k==='wild'){const wd=n.wd;W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv))}
-  else if(n.k==='alpha'){const al=n.al;if(!SW.party.some(m=>m.hp>0)){swSay('No buddy fit to battle.',1.6);return}if(!SCOFF&&!SW.badges.length&&!wHasDC()){scStart(SW.lessons.barnTold?[{who:'MARCUS',txt:'Bro. The box first. Build a BUDDY BARN at Sunkeep: 8 stone, 6 wood. Then we take this alpha.'}]:[{who:'MARCUS',txt:"Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do."},{who:'MARCUS',txt:'Build a BUDDY BARN at Sunkeep first: 8 stone, 6 wood. Then we take this alpha.'}],()=>{SW.lessons.barnTold=1;swSave()});return}
-   wEngage('ALPHA '+al.sp+'!',()=>{wStartWildAt(al.sp,al.lv);BT.log.unshift({txt:'The ALPHA '+al.sp+' rears up — it is huge!'});
-    BT.onEnd=(won,bt)=>{if(bt.foe.hp<=0||bt.orbOk){SW.fl[al.fk]=1;const i=F.alphas.indexOf(al);if(i>=0)F.alphas.splice(i,1);swSay('The alpha has the light again. Its treasure is unguarded!',3);alphaSigil(al.sp);swSave()}}})}
+  else if(n.k==='alpha'){const al=n.al;if(!SW.party.some(m=>m.hp>0)){swSay('No buddy fit to battle.',1.6);return}if(!SCOFF&&!SW.badges.length&&!wHasDC()){scStart(SW.lessons.barnTold?[{who:'MARCUS',txt:'Bro. The box first. Build a BUDDY BARN at Sunkeep: 8 stone, 6 wood. Then we take this guardian.'}]:[{who:'MARCUS',txt:"Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do."},{who:'MARCUS',txt:'Build a BUDDY BARN at Sunkeep first: 8 stone, 6 wood. Then we take this guardian.'}],()=>{SW.lessons.barnTold=1;swSave()});return}
+   wEngage('GUARDIAN '+al.sp+'!',()=>{wStartWildAt(al.sp,al.lv);BT.log.unshift({txt:'The GUARDIAN '+al.sp+' rears up — it is huge!'});
+    BT.onEnd=(won,bt)=>{if(bt.foe.hp<=0||bt.orbOk){SW.fl[al.fk]=1;const i=F.alphas.indexOf(al);if(i>=0)F.alphas.splice(i,1);swSay('The guardian has the light again. Its treasure is unguarded!',3);alphaSigil(al.sp);swSave()}}})}
   else if(n.k==='npc'){const np=n.np;
    if(np.ask)wOpenAsk(np.who);
    else if(np.team&&!SW.fl[np.fk])fChallenge(F,np);
@@ -685,9 +685,9 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
   else if(k===5)fBudDraw(o);
   else if(k===6)pfWildDraw(o,feet);
   else if(k===7){const spr=wSp(o.sp)._spr,w2=Math.round(spr.ow*1.5),h2=Math.round(spr.oh*1.5),X=Math.round(o.x),Y=Math.round(o.y)+4,br=Math.round(Math.sin(time*1.6)*1.5);
-   r('rgba(0,0,0,.28)',X-14,Y-2,28,5);const aLit=typeof WASIG!=='undefined'&&WASIG[o.sp]&&SW.badges.includes(WASIG[o.sp].n),aImg=aLit?spr.ol:(wDarkImg(spr)||spr.ol); /* v9.4: an alpha is darkest of all until it has the light */
+   r('rgba(0,0,0,.28)',X-14,Y-2,28,5);const aLit=typeof WASIG!=='undefined'&&WASIG[o.sp]&&SW.badges.includes(WASIG[o.sp].n),aImg=aLit?spr.ol:(wDarkImg(spr)||spr.ol); /* v9.4: a guardian is darkest of all until it has the light */
    if(!aLit){g.globalAlpha=.16+.08*Math.sin(time*2.4);r('#5a1a6a',X-w2/2-6,Y-h2-4,w2+12,h2+8);g.globalAlpha=1}g.drawImage(aImg,X-w2/2,Y-h2+2-br,w2,h2+br);if(!aLit){wDarkHaze(X-6,Y,h2,7);wDarkHaze(X+6,Y,h2,11)}
-   r('#14101e',X-13,Y-h2-9,26,9);text('ALPHA',X-tw('ALPHA',1)/2,Y-h2-8,1,'#ff7a6a',null);
+   r('#14101e',X-Math.round(tw('GUARDIAN',1)/2)-3,Y-h2-9,tw('GUARDIAN',1)+6,9);text('GUARDIAN',X-tw('GUARDIAN',1)/2,Y-h2-8,1,'#ff7a6a',null);
    const zz=((time*1.5)|0)%3;text('z',X+10+zz*2,Y-h2+4-zz*3,1,'#d8e8c8',null)}
   else if(k===8){const done=!o.team||SW.fl[o.fk];if(o.prop)fProp(o.prop,o.hx+12,o.hy+2);
    if(FLOOK[o.who])fChibi(Math.round(o.x),Math.round(o.y)+2,FLOOK[o.who],o.dir||[0,1],!!o.mv);

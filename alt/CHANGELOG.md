@@ -3,6 +3,16 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v12.1: Guardians of the Light, and why they are at Sunkeep (Will, Nov 17)
+- Every "alpha" the player can read is now a GUARDIAN. In story terms they are the Guardians of the Light: every place has one, they went dim when the Lantern did, and a dim Guardian spells peril for the kingdom. (The code still calls them `alpha` inside.)
+- When you bring one the light, its Sigil stone goes home to the Lantern. The Sigil scene, the Elder, Marcus, the guide page and the opening story all say so.
+- The opening story has one new page: three people were called to Sunkeep and none of them knows why. Marcus left a Flow Pros job with Derek. Erin and Will left their wedding plans on the table. Erin: "You got here last, Will, so we will fill you in."
+- Two early lines at Sunkeep from Marcus and Erin about being called, and four new idle lines.
+- New file `alt/STORY-NOTES.md`: Will's story decisions in one place, with what is still open (why Sunkeep exists, who called them, the lamp's name).
+- Also in this build: a street-following fix. Workers walking to a building site restarted their route every frame and never arrived, so a cottage placed away from the avenue was never built. Found by the fresh-save run.
+
+Checked: field lab; the castle label and prompt on screen. The fresh-save run on this build is still going.
+
 ## v12.0: Sunkeep, redesigned (Will, Nov 17)
 Will: cluttered, hard to build at, characters ignore the paths, weird plots; grow sprouts in one big bed like Sprouts, then placeable plots, buddies working them, level-gated recipes; keep the furniture; more lore; clean it up.
 

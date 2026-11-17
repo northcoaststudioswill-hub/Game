@@ -1,6 +1,6 @@
 /* ================================================================
    DARK AND LIT (v9.4): the core reward of the game, on screen.
-   Every wild buddy, alpha and glitched foe is drawn in its DARK form:
+   Every wild buddy, guardian and glitched foe is drawn in its DARK form:
    a purple-black tint and a faint haze rising off it. Calm it and the
    dark drains away in a burst of light: in battle the foe no longer
    faints and sinks, it lights up where it stands.

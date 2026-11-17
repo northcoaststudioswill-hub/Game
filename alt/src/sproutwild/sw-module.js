@@ -315,8 +315,8 @@ const WKEEPERS={
  WILL:{pas:'Lantern Charm: catch +15%',act:'SELFIE FLASH',actD:'Dazzled foe: ATK down, loses a turn.'},
  ERIN:{pas:'Green Hands: +1 yield',act:'TOWEL WHIP',actD:'Damage + the foe loses its turn.'},
  MARCUS:{pas:'Drill Sergeant: hits +12%',act:'HYDRO JET',actD:'A pressurized DEW blast.'}};
-const WTALK={PIP:['A wild ZIPWIG chased me home once. It just wanted my sandwich, I think.','When I grow up I want a whole FORTUNE sprout. They bring luck AND snacks.','Ranger says every place has an ALPHA. I hid from ours under the porch.'],
- ELDER:['Lantern Town was three tents and a dream when I was your size, keeper.','A good base is a garden and a workshop at once. Tend both.','The Sigils are old promises. The alphas have kept them through the dark.'],WILL:["I catalog every sprout in this valley. Twice.","The Lantern chose us. No pressure or anything.","If Marcus asks, I was absolutely working."],
+const WTALK={PIP:['A wild ZIPWIG chased me home once. It just wanted my sandwich, I think.','When I grow up I want a whole FORTUNE sprout. They bring luck AND snacks.','Ranger says every place has a GUARDIAN. I hid from ours under the porch.'],
+ ELDER:['Lantern Town was three tents and a dream when I was your size, keeper.','A good base is a garden and a workshop at once. Tend both.','The Sigils are old promises. The guardians have kept them through the dark.'],WILL:["I catalog every sprout in this valley. Twice.","The Lantern chose us. No pressure or anything.","If Marcus asks, I was absolutely working."],
 ERIN:["The beds grow better when someone sings. I sing.","Louie has a route. Always trust the route.","A tidy base is a happy base. Mostly."],
 MARCUS:["I'm not an NPC. I'm between protagonists.","Your form is terrible. The sprouts respect it anyway.","Hydro Jet solves most problems. The rest are personal."]};
 function wNpcList(){if(W4.sector==='TOWN')return[{who:'PIP',x:168,y:214},{who:'ELDER',x:312,y:214}];
@@ -1068,7 +1068,7 @@ function wNextGoal(){
  if(!SW.buildings.some(b=>b.k==='cottage'))return{x:240,y:300,label:'Build a COTTAGE first — START menu, then BUILD. Any open ground works. Woof.'}
  if(wBaseReady())return{x:WW/2,y:70,label:'The missions are done! Ring the Great Lantern — the plot grows!'};
  if(SW.crew.length&&!wAssignedCount()&&SW.buildings.length)return{x:wCellX(SW.buildings[0].gx)+10,y:wCellY(SW.buildings[0].gy)+30,label:'Give a sprout a job — walk to a building and press A. Sprouts work; buddies fight.'};
- if(SW.badges.length<4)return{x:WW/2,y:(W4.wh||360)-40,label:'Adventure! The Lantern Gate leads to the wilds and the alphas.'};
+ if(SW.badges.length<4)return{x:WW/2,y:(W4.wh||360)-40,label:'Adventure! The Lantern Gate leads to the wilds and the guardians.'};
  return{x:WW/2,y:70,label:'Home sweet home. Everything is built, boss.'}}
 function wLouieTip(){const tips=[
  'Weakened wilds are far easier to command. Soften first, bud second — and kin buds command best.',
@@ -1125,7 +1125,7 @@ function wQuestTick(){
  if(SW.quest===3&&SW.buildings.some(b=>b.k==='cottage'&&!b.con)){SW.quest=4;
   swSay('A roof over Sunkeep! Now build a CROP PLOT: START, then BUILD.',3.4);swSnd(784,.09,1175);swSave()}
  else if(SW.quest===4&&(plCrops()>0||SW.buildings.some(b=>b.k==='bed'))){SW.quest=5;
-  swSay('Sunkeep stands! The valley is yours, keeper. The alphas await.',3.8);swSnd(784,.09,1175);swSave()}}
+  swSay('Sunkeep stands! The valley is yours, keeper. The guardians await.',3.8);swSnd(784,.09,1175);swSave()}}
 let BT=null;
 function wAliveParty(){return SW.party.filter(m=>m.hp>0)}
 function wSetupBattle(){BT.phase='intro';BT.t=0;BT.log=[];BT.after=null;BT.myStage={atk:0,def:0};BT.foeStage={atk:0,def:0};
@@ -1684,7 +1684,7 @@ const WBLURB={CINDERCAP:'Bold and warm-hearted. Your hardest hitter — and it c
 const WGATEPAGES=[
  'Woof! Stop a second, keeper — see this arch? This is the LANTERN GATE.',
  'Step in and the Lantern light carries you: the Meadow road, Lantern Town, and every corner of the valley.',
- 'Roads past town need Sigils. Bring the alphas the light and the whole valley opens. Now let us go catch you a buddy!'];
+ 'Roads past town need Sigils. Bring the guardians the light and the whole valley opens. Now let us go catch you a buddy!'];
 function gateUpdate(){if(pressed('b')){state='g4world';return}
  if(pressed('a')||pressed('start')){W4.gatePage=(W4.gatePage||0)+1;swSnd(660,.05);
   if(W4.gatePage>=WGATEPAGES.length){swSel=Math.max(0,WSECTORS.findIndex(s=>s.id==='MEADOW'));state='g4map'}}}

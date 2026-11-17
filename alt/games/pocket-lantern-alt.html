@@ -6363,8 +6363,8 @@ const WKEEPERS={
  WILL:{pas:'Lantern Charm: catch +15%',act:'SELFIE FLASH',actD:'Dazzled foe: ATK down, loses a turn.'},
  ERIN:{pas:'Green Hands: +1 yield',act:'TOWEL WHIP',actD:'Damage + the foe loses its turn.'},
  MARCUS:{pas:'Drill Sergeant: hits +12%',act:'HYDRO JET',actD:'A pressurized DEW blast.'}};
-const WTALK={PIP:['A wild ZIPWIG chased me home once. It just wanted my sandwich, I think.','When I grow up I want a whole FORTUNE sprout. They bring luck AND snacks.','Ranger says every place has an ALPHA. I hid from ours under the porch.'],
- ELDER:['Lantern Town was three tents and a dream when I was your size, keeper.','A good base is a garden and a workshop at once. Tend both.','The Sigils are old promises. The alphas have kept them through the dark.'],WILL:["I catalog every sprout in this valley. Twice.","The Lantern chose us. No pressure or anything.","If Marcus asks, I was absolutely working."],
+const WTALK={PIP:['A wild ZIPWIG chased me home once. It just wanted my sandwich, I think.','When I grow up I want a whole FORTUNE sprout. They bring luck AND snacks.','Ranger says every place has a GUARDIAN. I hid from ours under the porch.'],
+ ELDER:['Lantern Town was three tents and a dream when I was your size, keeper.','A good base is a garden and a workshop at once. Tend both.','The Sigils are old promises. The guardians have kept them through the dark.'],WILL:["I catalog every sprout in this valley. Twice.","The Lantern chose us. No pressure or anything.","If Marcus asks, I was absolutely working."],
 ERIN:["The beds grow better when someone sings. I sing.","Louie has a route. Always trust the route.","A tidy base is a happy base. Mostly."],
 MARCUS:["I'm not an NPC. I'm between protagonists.","Your form is terrible. The sprouts respect it anyway.","Hydro Jet solves most problems. The rest are personal."]};
 function wNpcList(){if(W4.sector==='TOWN')return[{who:'PIP',x:168,y:214},{who:'ELDER',x:312,y:214}];
@@ -7116,7 +7116,7 @@ function wNextGoal(){
  if(!SW.buildings.some(b=>b.k==='cottage'))return{x:240,y:300,label:'Build a COTTAGE first — START menu, then BUILD. Any open ground works. Woof.'}
  if(wBaseReady())return{x:WW/2,y:70,label:'The missions are done! Ring the Great Lantern — the plot grows!'};
  if(SW.crew.length&&!wAssignedCount()&&SW.buildings.length)return{x:wCellX(SW.buildings[0].gx)+10,y:wCellY(SW.buildings[0].gy)+30,label:'Give a sprout a job — walk to a building and press A. Sprouts work; buddies fight.'};
- if(SW.badges.length<4)return{x:WW/2,y:(W4.wh||360)-40,label:'Adventure! The Lantern Gate leads to the wilds and the alphas.'};
+ if(SW.badges.length<4)return{x:WW/2,y:(W4.wh||360)-40,label:'Adventure! The Lantern Gate leads to the wilds and the guardians.'};
  return{x:WW/2,y:70,label:'Home sweet home. Everything is built, boss.'}}
 function wLouieTip(){const tips=[
  'Weakened wilds are far easier to command. Soften first, bud second — and kin buds command best.',
@@ -7173,7 +7173,7 @@ function wQuestTick(){
  if(SW.quest===3&&SW.buildings.some(b=>b.k==='cottage'&&!b.con)){SW.quest=4;
   swSay('A roof over Sunkeep! Now build a CROP PLOT: START, then BUILD.',3.4);swSnd(784,.09,1175);swSave()}
  else if(SW.quest===4&&(plCrops()>0||SW.buildings.some(b=>b.k==='bed'))){SW.quest=5;
-  swSay('Sunkeep stands! The valley is yours, keeper. The alphas await.',3.8);swSnd(784,.09,1175);swSave()}}
+  swSay('Sunkeep stands! The valley is yours, keeper. The guardians await.',3.8);swSnd(784,.09,1175);swSave()}}
 let BT=null;
 function wAliveParty(){return SW.party.filter(m=>m.hp>0)}
 function wSetupBattle(){BT.phase='intro';BT.t=0;BT.log=[];BT.after=null;BT.myStage={atk:0,def:0};BT.foeStage={atk:0,def:0};
@@ -7732,7 +7732,7 @@ const WBLURB={CINDERCAP:'Bold and warm-hearted. Your hardest hitter — and it c
 const WGATEPAGES=[
  'Woof! Stop a second, keeper — see this arch? This is the LANTERN GATE.',
  'Step in and the Lantern light carries you: the Meadow road, Lantern Town, and every corner of the valley.',
- 'Roads past town need Sigils. Bring the alphas the light and the whole valley opens. Now let us go catch you a buddy!'];
+ 'Roads past town need Sigils. Bring the guardians the light and the whole valley opens. Now let us go catch you a buddy!'];
 function gateUpdate(){if(pressed('b')){state='g4world';return}
  if(pressed('a')||pressed('start')){W4.gatePage=(W4.gatePage||0)+1;swSnd(660,.05);
   if(W4.gatePage>=WGATEPAGES.length){swSel=Math.max(0,WSECTORS.findIndex(s=>s.id==='MEADOW'));state='g4map'}}}
@@ -7998,7 +7998,7 @@ function drawGym(){const g=WGYMS[W4.gymIx],done=SW.gymDone[W4.gymIx];
        TREASURES home to the Lantern beacon (weight vs. strength,
        PEB counts double), build bridges, and clear TYPE GATES
        (boulders=PEB, fire=EMBER, vines=LEAF, sparks=ZIP, blooms=DEW)
-     · wild buddies live in the tall grass and are visible; ALPHAS
+     · wild buddies live in the tall grass and are visible; GUARDIANS
        guard the best treasure; TRAINERS spot you on the road
      · ledges hop one way; routes join edge to edge (the Lantern
        Gate is still fast travel)
@@ -8293,7 +8293,7 @@ function fLand(F,s){const a=s.aim||{};s.z=0;s.aim=null;
  if(kind==='wild'&&W4.wilds.includes(tg)){if(wBuddyFull()){wFullSay();s.st='ret';return}pfLatch(F,s,tg);return}
  if(kind==='gate'){if(tg.open){s.st='idle';s.t=0;return}
   if(tg.type!==s.type){s.st='ret';W4.floats.push({x:tg.x,y:tg.y-20,txt:tg.n+' — NEEDS '+TYPES[tg.type].n+' SPROUTS',t:1.6,c:'#ffd94d'});swSnd(200,.06);return}}
- if(kind==='item'&&tg.guard&&F.alphas.includes(tg.guard)){s.st='ret';W4.floats.push({x:tg.x,y:tg.y-20,txt:'THE ALPHA GUARDS IT!',t:1.4,c:'#e88'});return}
+ if(kind==='item'&&tg.guard&&F.alphas.includes(tg.guard)){s.st='ret';W4.floats.push({x:tg.x,y:tg.y-20,txt:'THE GUARDIAN GUARDS IT!',t:1.4,c:'#e88'});return}
  if(tg&&kind){s.tg=tg;s.kind=kind;s.wt=0;
   if(kind==='item'){s.st='carry';if(!tg.car.includes(s))tg.car.push(s)}else s.st='work';return}
  if(fSolid(F,s.x,s.y)){s.st='ret';return}
@@ -8363,7 +8363,7 @@ function fItems(F,dt){for(const it of F.items.slice()){it.moving=false;if(!it.ca
 function fNear(F){const px=P3.x+F.dir[0]*11,py=P3.y+F.dir[1]*11,in2=(o,r2)=>Math.hypot(px-o.x,py-o.y)<(r2||17);
  for(const b of F.buds)if(in2(b))return{k:'bud',b,txt:'PLUCK '+TYPES[b.type].n+' SPROUT'};
  for(const np of F.npcs)if(in2(np,18))return{k:'npc',np,txt:np.team&&!SW.fl[np.fk]?'BATTLE '+np.who:'TALK'};
- for(const al of F.alphas)if(in2(al,22))return{k:'alpha',al,txt:'CHALLENGE ALPHA '+al.sp};
+ for(const al of F.alphas)if(in2(al,22))return{k:'alpha',al,txt:'CHALLENGE GUARDIAN '+al.sp};
  for(const sg of (FSIGNS[F.id]||[]))if(!in2(F.start,18)&&in2({x:sg[0]*FT+8,y:sg[1]*FT+10},14))return{k:'road',msg:sg[2],txt:'READ SIGN'}; /* v9.5: road signs (the Lantern post always wins) */
  for(const wd of W4.wilds)if(SW.quest>=3&&in2(wd)&&!wd.cap&&!pfCan(F,wd))return{k:'wild',wd,txt:'BATTLE '+wd.sp+' Lv'+wd.lv+(F.sq.length?' · too strong to catch':'')};
  if(F.gym&&in2(F.gym,18))return{k:'gym',txt:W4.sector==='PEAK'?'TOWER':'LODGE'};
@@ -8441,9 +8441,9 @@ function fUpdate(dt){const F=W4.fld,sec=wSector(W4.sector);
   else if(n.k==='spot')fFetch(F,n.sp);
   else if(n.k==='node')wNodeAct(n.nd);
   else if(n.k==='wild'){const wd=n.wd;W4.wilds.splice(W4.wilds.indexOf(wd),1);W4.wildCd=14;wEngage('WILD '+wd.sp+'!',()=>wStartWildAt(wd.sp,wd.lv))}
-  else if(n.k==='alpha'){const al=n.al;if(!SW.party.some(m=>m.hp>0)){swSay('No buddy fit to battle.',1.6);return}if(!SCOFF&&!SW.badges.length&&!wHasDC()){scStart(SW.lessons.barnTold?[{who:'MARCUS',txt:'Bro. The box first. Build a BUDDY BARN at Sunkeep: 8 stone, 6 wood. Then we take this alpha.'}]:[{who:'MARCUS',txt:"Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do."},{who:'MARCUS',txt:'Build a BUDDY BARN at Sunkeep first: 8 stone, 6 wood. Then we take this alpha.'}],()=>{SW.lessons.barnTold=1;swSave()});return}
-   wEngage('ALPHA '+al.sp+'!',()=>{wStartWildAt(al.sp,al.lv);BT.log.unshift({txt:'The ALPHA '+al.sp+' rears up — it is huge!'});
-    BT.onEnd=(won,bt)=>{if(bt.foe.hp<=0||bt.orbOk){SW.fl[al.fk]=1;const i=F.alphas.indexOf(al);if(i>=0)F.alphas.splice(i,1);swSay('The alpha has the light again. Its treasure is unguarded!',3);alphaSigil(al.sp);swSave()}}})}
+  else if(n.k==='alpha'){const al=n.al;if(!SW.party.some(m=>m.hp>0)){swSay('No buddy fit to battle.',1.6);return}if(!SCOFF&&!SW.badges.length&&!wHasDC()){scStart(SW.lessons.barnTold?[{who:'MARCUS',txt:'Bro. The box first. Build a BUDDY BARN at Sunkeep: 8 stone, 6 wood. Then we take this guardian.'}]:[{who:'MARCUS',txt:"Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do."},{who:'MARCUS',txt:'Build a BUDDY BARN at Sunkeep first: 8 stone, 6 wood. Then we take this guardian.'}],()=>{SW.lessons.barnTold=1;swSave()});return}
+   wEngage('GUARDIAN '+al.sp+'!',()=>{wStartWildAt(al.sp,al.lv);BT.log.unshift({txt:'The GUARDIAN '+al.sp+' rears up — it is huge!'});
+    BT.onEnd=(won,bt)=>{if(bt.foe.hp<=0||bt.orbOk){SW.fl[al.fk]=1;const i=F.alphas.indexOf(al);if(i>=0)F.alphas.splice(i,1);swSay('The guardian has the light again. Its treasure is unguarded!',3);alphaSigil(al.sp);swSave()}}})}
   else if(n.k==='npc'){const np=n.np;
    if(np.ask)wOpenAsk(np.who);
    else if(np.team&&!SW.fl[np.fk])fChallenge(F,np);
@@ -8674,9 +8674,9 @@ function fDraw(){const F=W4.fld,B=F.bio,sec=wSector(W4.sector),mw=F.w*FT,mh=F.h*
   else if(k===5)fBudDraw(o);
   else if(k===6)pfWildDraw(o,feet);
   else if(k===7){const spr=wSp(o.sp)._spr,w2=Math.round(spr.ow*1.5),h2=Math.round(spr.oh*1.5),X=Math.round(o.x),Y=Math.round(o.y)+4,br=Math.round(Math.sin(time*1.6)*1.5);
-   r('rgba(0,0,0,.28)',X-14,Y-2,28,5);const aLit=typeof WASIG!=='undefined'&&WASIG[o.sp]&&SW.badges.includes(WASIG[o.sp].n),aImg=aLit?spr.ol:(wDarkImg(spr)||spr.ol); /* v9.4: an alpha is darkest of all until it has the light */
+   r('rgba(0,0,0,.28)',X-14,Y-2,28,5);const aLit=typeof WASIG!=='undefined'&&WASIG[o.sp]&&SW.badges.includes(WASIG[o.sp].n),aImg=aLit?spr.ol:(wDarkImg(spr)||spr.ol); /* v9.4: a guardian is darkest of all until it has the light */
    if(!aLit){g.globalAlpha=.16+.08*Math.sin(time*2.4);r('#5a1a6a',X-w2/2-6,Y-h2-4,w2+12,h2+8);g.globalAlpha=1}g.drawImage(aImg,X-w2/2,Y-h2+2-br,w2,h2+br);if(!aLit){wDarkHaze(X-6,Y,h2,7);wDarkHaze(X+6,Y,h2,11)}
-   r('#14101e',X-13,Y-h2-9,26,9);text('ALPHA',X-tw('ALPHA',1)/2,Y-h2-8,1,'#ff7a6a',null);
+   r('#14101e',X-Math.round(tw('GUARDIAN',1)/2)-3,Y-h2-9,tw('GUARDIAN',1)+6,9);text('GUARDIAN',X-tw('GUARDIAN',1)/2,Y-h2-8,1,'#ff7a6a',null);
    const zz=((time*1.5)|0)%3;text('z',X+10+zz*2,Y-h2+4-zz*3,1,'#d8e8c8',null)}
   else if(k===8){const done=!o.team||SW.fl[o.fk];if(o.prop)fProp(o.prop,o.hx+12,o.hy+2);
    if(FLOOK[o.who])fChibi(Math.round(o.x),Math.round(o.y)+2,FLOOK[o.who],o.dir||[0,1],!!o.mv);
@@ -9340,7 +9340,7 @@ function wLouieTip(){const tips=[
  'Kin sprouts bloom best: LEAF sprouts on LEAF buddies. Tire the buddy out first.',
  'Hold B and they all come running. I taught them that. Mostly.',
  'The Lantern can send you to any Lantern post you have lit. The south road is nicer, though.',
- 'A sleeping ALPHA guards the good stuff. Wake it only if your buddy is ready.',
+ 'A sleeping GUARDIAN guards the good stuff. Wake it only if your buddy is ready.',
  'King Bibi says the dome is temporary. I am a dog and even I do not believe him.'];
  SW.talkN.LOUIE=(SW.talkN.LOUIE||0)+1;return tips[(SW.talkN.LOUIE-1)%tips.length]}
 function wLouTalk(){if(!(W4.petCd>0)){W4.petCd=18;if(Math.random()<.5){SW.hearts++;SW.heartsTotal++;W4.floats.push({x:lou.x,y:lou.y-16,txt:'+1 ♥',t:1.2,c:'#f078c0'})}}
@@ -9462,7 +9462,7 @@ function wQuestText(){const op=wOp();
  if(W4.fld){const ld=SW.party.find(m=>m.hp>0),sec=wSector(W4.sector);
   if(!ld||ld.hp<wStats(ld).max*.25)return'Your buddy is hurt: rest at a Lantern post';
   if(sec.gym>=0&&!SW.gymDone[sec.gym])return'The '+WGYMS[sec.gym].leader+' gym is here: win the '+WGYMS[sec.gym].sig;
-  if(SW.quest>=5&&(W4.fld.alphas||[]).some(a=>Math.hypot(a.x-P3.x,a.y-P3.y)<130))return'ALPHA nearby: it guards treasure'}
+  if(SW.quest>=5&&(W4.fld.alphas||[]).some(a=>Math.hypot(a.x-P3.x,a.y-P3.y)<130))return'GUARDIAN nearby: it guards treasure'}
  if(W4.fld){const gg=wGymGoal();if(gg)return gg} /* v8.7: in the field the next big goal is the gym */
  const ms=WBASEMS[SW.baseLv];if(!ms)return SW.badges.length<4?'Earn the Sigils. Free the roads.':'';
  const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?(W4.fld?'Home: ':'Sunkeep Lv'+SW.baseLv+': ')+wMissionHint(nx):(W4.fld?'Home: ask':'Ask')+' the Lantern to grow'}
@@ -9499,7 +9499,7 @@ WGUIDE.length=0;WGUIDE.push(
  ['ORE AND FIBER','Sprouts cannot get these.','Find a vein or a thicket and','press A: your lead buddy','fetches it. Beaten wilds drop','them too. The bench turns','them into a SEED POUCH, a','CLIMBING ROPE, better tools.'],
  ['SUNKEEP AT WORK','Buddies you leave at home','work the buildings by skill:','KINDLE, WATER, PLANT, MINE,','LUMBER, CRAFT, HAUL, LUCK.','What they make must be','carried to the Lantern. The','work board shows who is who.'],
  ['GATES AND GEAR','Boulders want PEB sprouts,','fire EMBER, vines LEAF, sparks','ZIP, dry blooms DEW. Ledges','hop down only, until you own','a CLIMBING ROPE. Heavy loot','needs more sprouts: PEB','counts double.'],
- ['THE VALLEY','Bottie nuked the Data Center','and the Lantern cracked. KING','BIBI raised his IRON DOME and','the buddies went wild. Four','ALPHAS hold four Sigils:','bring each one the light and','it gives its Sigil up.'],
+ ['THE VALLEY','Bottie nuked the Data Center','and the Lantern cracked. KING','BIBI raised his IRON DOME and','the buddies went wild. Four','GUARDIANS hold four Sigils:','bring each one the light and','its Sigil stone comes home.'],
  ['LIGHT SHOWN','Every wild buddy you calm,','by battle or by bloom, is','LIGHT SHOWN. Every 10 the','Lantern grows a ring and','gives you a gift. Four Sigils','and 20 calmed buddies, and','the King drops the dome.']);
 /* gear: ore finally matters */
 WRECIPES.splice(2,0,{id:'rope',n:'CLIMBING ROPE',cost:{fiber:6,ore:2},need:20,d:'Climb ledges from below. Opens shortcuts and high ground in every sector.'});
@@ -10258,7 +10258,7 @@ MOSSMAN(D){const fur='#5a7a30',dk='#3e5a22',fc='#e0c090';
 /* ---------------- "how Sunkeep works": one card, once, right after your first buddy ---------------- */
 function loopUpdate(){W4.loopT=(W4.loopT||0)+1/30;if((pressed('a')||pressed('start'))&&W4.loopT>.8){swSnd(660,.06,990);W4.loopT=0;if(!W4.loopP){W4.loopP=1;return}W4.loopP=0;SW.lessons.loop=1;state='g4world';swSave()}}
 function drawLoop(){if(W4.loopP){drawLoop2();return}const K='#0c1410',t=W4.loopT||0,rows=[['1','THROW','A throws sprouts at berries, logs and wild buddies.','#f8902c'],['2','CARRY','They carry it all home. The Lantern grows more sprouts.','#58a0f0'],
-  ['3','CATCH','Enough sprouts on a wild buddy and it joins you.','#7ee787'],['4','BUILD','Buddies you leave home do the work. Build Sunkeep up.','#ffd94d'],['5','SIGILS','Light the four alphas. Each gives a Sigil.','#f078c0']];
+  ['3','CATCH','Enough sprouts on a wild buddy and it joins you.','#7ee787'],['4','BUILD','Buddies you leave home do the work. Build Sunkeep up.','#ffd94d'],['5','SIGILS','Light the four guardians. Each gives a Sigil.','#f078c0']];
  ox=0;oy=0;r(K,0,0,W,H);r('#ffd94d',0,22,W,1);ctext('HOW SUNKEEP WORKS',8,1,'#ffd94d');
  rows.forEach(([n,h,d,c],i)=>{const at=.15+i*.18;if(t<at)return;const y=34+i*46,k=Math.min(1,(t-at)/.2),xo=Math.round((1-k)*40);g.globalAlpha=k;
   r('#14101e',8+xo,y,22,22);r(c,10+xo,y+2,18,18);text(n,16+xo,y+7,1,'#14101e',null);text(h,38+xo,y+2,1,c,null);swWrap(d,W-50).slice(0,3).forEach((l,j)=>text(l,38+xo,y+14+j*10,1,'#e8f4d8',null));g.globalAlpha=1});
@@ -10325,7 +10325,7 @@ function scPlots(){SW.lessons.scPlot=1;scStart([{hold:.5},{x:240,y:352,hold:1.1}
    Two creatures from valley lore live only here:
      MELONKIN  the melon-headed folk of the Hollow woods
      PYTHORN   the Peninsula Python, loose since a 1944 circus wreck;
-               it sleeps on the Hollow's treasure as the area's alpha.
+               it sleeps on the Hollow's treasure as the area's guardian.
    ================================================================ */
 const WHOLLOWART={
 MELONKIN(D){const sk='#e8e0c8',gn='#58b848',dg='#2e7d32';
@@ -10850,9 +10850,9 @@ function fTalk(F,who,lines,after){const d={who,lines,i:0,after};if(!SCOFF&&swBus
 /* v8.7: after the cottage and the first crop, the game points you at the Ranger's gym */
 function scGymCheck(){if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return; /* v8.9: cottage and a crop are enough (the garden lesson can come after) */ /* queued right away: it plays as soon as the crop line has been read */SW.lessons.scGym=1;
  scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Now the real work: the dark out there.'},
-  {who:'MARCUS',txt:'Every place has an ALPHA, bro. Biggest, darkest buddy around. Ours sleeps behind the boulder wall.'},
-  {who:'ERIN',txt:'Bring an alpha the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome.'},
-  {who:'MARCUS',txt:'Meadow alpha is Lv'+FMAPS.MEADOW.key.A.lv+'. Battle wilds with SELECT till your lead is Lv'+FMAPS.MEADOW.key.A.lv+'. Then throw sprouts. See one, light one.'}],()=>swSave())}
+  {who:'MARCUS',txt:'Every place has a GUARDIAN OF THE LIGHT, bro. They went dim when the Lantern did. Ours sleeps behind the boulder wall.'},
+  {who:'ERIN',txt:'Bring a guardian the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome.'},
+  {who:'MARCUS',txt:'Meadow guardian is Lv'+FMAPS.MEADOW.key.A.lv+'. Battle wilds with SELECT till your lead is Lv'+FMAPS.MEADOW.key.A.lv+'. Then throw sprouts. See one, light one.'}],()=>swSave())}
 function wGymGoal(){if(SW.quest<5||SW.badges.length)return null;const L=Math.max(0,...SW.party.map(m=>m.lv));
  const T=Math.max(...WGYMS[0].team.map(t=>t[1]))+1;return L<T?'Ranger gym, north road: train to Lv'+T+' (SELECT)':"Lantern Town (north road): win the Ranger's Sigil"}
 /* ================================================================
@@ -10861,10 +10861,10 @@ function wGymGoal(){if(SW.quest<5||SW.badges.length)return null;const L=Math.max
    the roads the Ranger kept shut open: east to Crooked Hollow, south
    to Squire's Woods. About 4.5 s; A skips after 1.2 s.
    ================================================================ */
-/* v9.1: one cinematic for each alpha's Sigil; what it opens depends on how many you hold */
+/* v9.1: one cinematic for each guardian's Sigil; what it opens depends on how many you hold */
 const WSIGOPEN=[null,{a:'ROADS',b:'OPEN',sub:'',end:"The roads are open. Crooked Hollow is east of the Meadow, Squire's Woods south."},
  {a:'SHORE ROAD',b:'OPEN',sub:'Lantern Town, the south-east road',end:'Two Sigils. The Shore road from Lantern Town is open.'},
- {a:'GLOOM HOLLOW',b:'OPEN',sub:'past the Shore',end:'Three Sigils. Gloom Hollow is open, past the Shore. Its alpha waits.'},
+ {a:'GLOOM HOLLOW',b:'OPEN',sub:'past the Shore',end:'Three Sigils. Gloom Hollow is open, past the Shore. Its guardian waits.'},
  {a:'THE KING',b:'WILL SEE YOU',sub:'Gloom Hollow. Bring your Sigils.',end:'Four Sigils. King Bibi will see you in Gloom Hollow.'}];
 function sigilCheck(){if(W4.sigilQ&&SCOFF){W4.sigilQ=0;return}if(!W4.sigilQ||state!=='g4world'||W4.scene||swBusy())return;const Q=typeof W4.sigilQ==='object'?W4.sigilQ:{sp:'BLOOMBOAR',n:1};W4.sigilQ=0;W4.sigQ=Q;
  if(!(typeof KO!=='undefined'&&KO&&KO._)){swSay(WSIGOPEN[Math.min(4,Q.n)].end,3.6);return}
@@ -10895,7 +10895,7 @@ function drawSigil(){const KC=KO._,C=KC.CH,M=C[C.findIndex(c=>c.id==='marcus')],
   g.fillStyle=SG.d;g.beginPath();g.moveTo(0,-24);g.lineTo(18,0);g.lineTo(0,24);g.lineTo(-18,0);g.closePath();g.fill();
   g.fillStyle=SG.c;g.beginPath();g.ellipse(0,0,6,15,.5,0,7);g.fill();r(SG.d,-1,-12,2,24);g.restore();
   slam(WD[0],cy+40,4,'#ffffff',1.5);slam('SIGIL',cy+72,5,'#f8e060',1.75);
-  if(u>1.4)ctext0(Q.n===1?"The Ranger's barriers are down":'An alpha has the light again',cy+104,1,'#cfe0b8',null);
+  if(u>1.4)ctext0(Q.n===1?"The Ranger's barriers are down":'Its Sigil stone goes home to the Lantern',cy+104,1,'#cfe0b8',null);
   if(u<.14)r('rgba(255,255,255,'+(1-u/.14).toFixed(2)+')',0,0,W,H);return}
  {/* what opens */const u=t-3.0;r('#0c1420',0,0,W,H);lines(W/2,cy,'rgba(248,224,96,.25)',30);
   if(Q.n>1){slam(OP.a,cy-30,tw0(OP.a,5)>W-16?4:5,'#ffffff',3.0);slam(OP.b,cy+8,tw0(OP.b,5)>W-16?4:5,SG.c,3.2);if(u>.6)ctext0(OP.sub,cy+48,1,'#cfe0b8',null);if(u>1.2)ctext0('A  CONTINUE',H-14,1,'#8a86a0',null);if(u<.1)r('rgba(255,255,255,'+(1-u/.1).toFixed(2)+')',0,0,W,H);return}
@@ -10929,17 +10929,18 @@ WSTORY.length=0;WSTORY.push( /* v9.2: twelve scenes */
  {sc:8,who:'',t:'BOTTIE nuked the Data Center. The simulation glitched.'},
  {sc:0,who:'',t:'And the Great Lantern cracked and went dark.'},
  {sc:5,who:'KING BIBI',t:'Citizens! The light is out. Stay calm. I am raising the IRON DOME. Temporarily.',acc:'#1e2c5a'},
- {sc:9,who:'',t:"In the dark the valley's buddies forgot the promise. They went wild, and the biggest became ALPHAS."},
+ {sc:9,who:'',t:"In the dark the valley's buddies forgot the promise. They went wild, and their GUARDIANS OF THE LIGHT went dim. A dim Guardian spells peril for the kingdom."},
  {sc:1,who:'',t:'But the light fell as seeds, and the seeds grew legs: SPROUTS. Throw one at a wild buddy and it remembers.'},
  {sc:3,who:'',t:'Bring a buddy enough light and the dark breaks. It comes home calm.'},
- {sc:2,who:'ERIN',t:'Sunkeep still grows sprouts, keeper. Cleanse the dark from the buddies. Show them the light.'},
- {sc:4,who:'MARCUS',t:'Four alphas hold four Sigils, bro. Light them all, Bibi drops the dome, and we face Bottie. I supervise.'});
+ {sc:2,who:'',t:'That night three people were called to Sunkeep, and none of them knows why. Marcus left a Flow Pros job with Derek. Erin and Will left their wedding plans on the table.'},
+ {sc:2,who:'ERIN',t:'You got here last, Will, so we will fill you in. Sunkeep still grows sprouts. Show the buddies the light.'},
+ {sc:4,who:'MARCUS',t:'Four Guardians hold four Sigil stones, bro. Light them and the stones come home to the Lantern. Then Bibi drops the dome and we face Bottie. I supervise.'});
 /* first visit to Lantern Town: the Elder explains what the domes did */
 function loreTown(){const F=W4.fld;if(!F||F.id!=='TOWN'||SW.lessons.scTown||W4.scene||state!=='g4world'||(W4.banner&&W4.banner.t>0))return;
  SW.lessons.scTown=1;scStart([
   {who:'ELDER',txt:'Welcome to Lantern Town, keeper. We were the brightest street in the valley once.'},
   {who:'ELDER',txt:'When the light went out, the King raised his IRON DOME and shut the roads. The buddies went wild.'},
-  {who:'ELDER',txt:'Every place out there has an ALPHA, the biggest, darkest buddy around. Bring one the light and it gives up a Sigil.'},
+  {who:'ELDER',txt:'Every place out there has a GUARDIAN OF THE LIGHT. They have gone dim, and a dim Guardian spells peril for the kingdom. Bring one the light and its Sigil stone goes home to the Lantern.'},
   {who:'ELDER',txt:"Four Sigils and the King will believe it's safe again. The valley was promised to you, keeper. Take it back."}],()=>swSave())}
 /* after Bottie's visit: Erin and Marcus on who he is */
 function loreBibi(){if(W4.fld||W4.sector!=='BASE'||!SW.bottieSeen||SW.lessons.scBibi||W4.scene||state!=='g4world')return;
@@ -10950,8 +10951,8 @@ function loreBibi(){if(W4.fld||W4.sector!=='BASE'||!SW.bottieSeen||SW.lessons.sc
   {who:'MARCUS',txt:'Four Sigils, then we clank up the PEAK and unplug him. I do the talking. Dap me up.'}],()=>swSave())}
 /* ================================================================
    BRING THE LIGHT (v9.1): Will's design. No gyms, no trainer battles.
-   You battle wild buddies and ALPHAS to cleanse the dark and show them
-   the light. Each of the four alphas, once it has the light, gives up
+   You battle wild buddies and GUARDIANS to cleanse the dark and show them
+   the light. Each of the four guardians, once it has the light, gives up
    a SIGIL. Four Sigils and King Bibi lowers his IRON DOME; then Bottie,
    once and for all. Sprouts matter in battle: a throw that does not
    bloom still burns away some of the dark.
@@ -10962,31 +10963,31 @@ function loreBibi(){if(W4.fld||W4.sector!=='BASE'||!SW.bottieSeen||SW.lessons.sc
    ================================================================ */
 const WASIG={BLOOMBOAR:{n:'VERDANT SIGIL',c:'#7ec850',d:'#3a8a32'},PYTHORN:{n:'ROOT SIGIL',c:'#c89058',d:'#6a4a2a'},
  STONESQUIRE:{n:'STONE SIGIL',c:'#c8ccd4',d:'#6e7280'},AURICORN:{n:'GOLD SIGIL',c:'#f8e060',d:'#b07808'}};
-/* v9.5: the first alpha is STONESQUIRE in Squire's castle (sw-castle.js) */
-/* v9.5: the first alpha is in Squire's Woods now (sw-castle.js) */
-/* an alpha given the light gives up its Sigil */
+/* v9.5: the first guardian is STONESQUIRE in Squire's castle (sw-castle.js) */
+/* v9.5: the first guardian is in Squire's Woods now (sw-castle.js) */
+/* a guardian given the light gives up its Sigil */
 function alphaSigil(sp){const S=WASIG[sp];if(!S||SW.badges.includes(S.n))return;SW.badges.push(S.n);W4.sigilQ={sp,n:SW.badges.length};swSave()}
 /* trainers talk now; the King lowers the dome for four Sigils */
 const WTRTALK={KISS:[['KISS: Hey. Keeper. One question.','Three thousand years ago this valley was promised to sprouts and buddies. Who keeps a promise that long?'],'KISS: The light, I guess. Bring it back and ask me again.'],
  DEREK:[['DEREK: Yo! The Flow Pros truck died. Again.','Wild buddies chased me off the road. Your sprouts calm them down? Wild.'],'Tell Marcus the truck is, uh, fine.'],
  MAMA:[['MAMA: I have been up since four, keeper.','The buddies on this beach used to bring me shells. Now they hiss. Bring them the light, will you?'],'MAMA: And eat something. You look thin.'],
- 'DOME GUARD':[["DOME GUARD: Halt. King's orders: the dome stays up till the valley is safe.",'Bring the light to the four alphas. Four Sigils, and the King might listen.'],'The IRON DOME only drops for the King. He sits in the Gloom.']};
+ 'DOME GUARD':[["DOME GUARD: Halt. King's orders: the dome stays up till the valley is safe.",'Bring the light to the four guardians. Four Sigils, and the King might listen.'],'The IRON DOME only drops for the King. He sits in the Gloom.']};
 function fChallenge(F,np){
  if(np.boss){if(SW.badges.length>=4&&(SW.shown||0)<WSHOWN){fTalk(F,'KING BIBI',['KING BIBI: Four Sigils! Splendid. Splendid. But I looked out the window.','The buddies out there are still wild, keeper. '+(SW.shown||0)+' calmed. I need '+WSHOWN+' before I drop a single bolt.']);return}
-  if(SW.badges.length>=4){fTalk(F,'KING BIBI',['KING BIBI: Four Sigils. Four alphas, lit. ...The buddies are calm again?','Fine. FINE. The dome comes down. Order is restored. I was always going to do this.',"Bottie is up the Peak road. Go unplug that robot, keeper. And knock first."],()=>{SW.fl[np.fk]=1;SW.fl.bibi=1;swSave();if(SCOFF){swSay('The IRON DOME flickers out across the valley. The Peak road is open!',3.4);return}W4.domeT=0;W4.domeP=0;state='g4dome';swSnd(523,.3,1046)})}
-  else fTalk(F,'KING BIBI',['KING BIBI: Ah. The little keeper. Sit. I have brought a chart.','This is the Lantern. This is the night the robot nuked the Data Center. I drew it myself. With a marker.','The valley was promised to sprouts and buddies three thousand years ago. Then: dark. So: dome.','Bring the light to the four alphas. Four Sigils, and the dome comes down. You have '+SW.badges.length+'.']);return}
+  if(SW.badges.length>=4){fTalk(F,'KING BIBI',['KING BIBI: Four Sigils. Four guardians, lit. ...The buddies are calm again?','Fine. FINE. The dome comes down. Order is restored. I was always going to do this.',"Bottie is up the Peak road. Go unplug that robot, keeper. And knock first."],()=>{SW.fl[np.fk]=1;SW.fl.bibi=1;swSave();if(SCOFF){swSay('The IRON DOME flickers out across the valley. The Peak road is open!',3.4);return}W4.domeT=0;W4.domeP=0;state='g4dome';swSnd(523,.3,1046)})}
+  else fTalk(F,'KING BIBI',['KING BIBI: Ah. The little keeper. Sit. I have brought a chart.','This is the Lantern. This is the night the robot nuked the Data Center. I drew it myself. With a marker.','The valley was promised to sprouts and buddies three thousand years ago. Then: dark. So: dome.','Bring the light to the four guardians. Four Sigils, and the dome comes down. You have '+SW.badges.length+'.']);return}
  const t=WTRTALK[np.who]||[np.pre||['...'],np.after||'...'];fTalk(F,np.who,t[0].concat([t[1]]),()=>{SW.fl[np.fk]=1;swSave()})}
 /* the gym buildings are lodges now; the Peak's is Bottie's tower and the last battle */
-const WLODGE={TOWN:"RANGER: No battles at my lodge, keeper. The castle in Squire's Woods has an alpha. That is the real test.",
- WASTES:"MARCUS: Gym's closed, bro. I'm in lighting now. Go light up some alphas.",SHORE:'ERIN: No battles here. Every alpha you bring the light to gives up a Sigil.'};
+const WLODGE={TOWN:"RANGER: No battles at my lodge, keeper. The castle in Squire's Woods has a guardian. That is the real test.",
+ WASTES:"MARCUS: Gym's closed, bro. I'm in lighting now. Go light up some guardians.",SHORE:'ERIN: No battles here. Every guardian you bring the light to gives up a Sigil.'};
 function gymTalk(sec){if(sec.id==='PEAK'){if(SW.badges.length>=4&&SW.fl.bibi){W4.gymIx=5;W4.gymPage=0;swSel=0;state='g4gym'}else swSay("BOTTIE'S TOWER. A sign: NO VISITORS WITHOUT FOUR SIGILS. bzzt.",3);return}
  swSay(WLODGE[sec.id]||'The lodge is quiet.',3.4)}
 /* sprouts matter in battle: a throw that does not bloom still burns away some of the dark */
 function wLightBurn(nS){const foe=BT.foe,mx=wStats(foe).max,kin=wKinship(BT.tossIx||0,foe.sp)>1?2:1,d=Math.max(1,Math.round(mx*.05*nS*kin));if(foe.hp>1){foe.hp=Math.max(1,foe.hp-d);return d}return 0}
-/* goals: the alphas are the way */
-const WNEXT=['Light the castle ALPHA (Squire\'s Woods)','Next ALPHA: Crooked Hollow or the Wastes','Next ALPHA: Crooked Hollow or the Wastes','Light the Gloom Hollow ALPHA','Show King Bibi 4 Sigils (Gloom)']; /* v9.2: short enough for the goal bar */
+/* goals: the guardians are the way */
+const WNEXT=['Light the castle GUARDIAN (Squire\'s Woods)','Next GUARDIAN: Crooked Hollow or the Wastes','Next GUARDIAN: Crooked Hollow or the Wastes','Light the Gloom Hollow GUARDIAN','Show King Bibi 4 Sigils (Gloom)']; /* v9.2: short enough for the goal bar */
 function wGymGoal(){if(SW.quest<5)return null;if(SW.fl.bibi)return SW.bottieBeat?null:"Bottie's tower is on the Peak. End this.";
- const n=SW.badges.length;if(n>=4&&(SW.shown||0)<WSHOWN)return'Calm '+WSHOWN+' wild buddies ('+(SW.shown||0)+'/'+WSHOWN+')';if(n===0){const L=Math.max(0,...SW.party.map(m=>m.lv)),A=FMAPS.SQUIRE.key.A.lv,TG=A-1;if(L<TG)return'Stone ALPHA Lv'+A+': train to Lv'+TG+' (SELECT)'}return WNEXT[Math.min(n,4)]}
+ const n=SW.badges.length;if(n>=4&&(SW.shown||0)<WSHOWN)return'Calm '+WSHOWN+' wild buddies ('+(SW.shown||0)+'/'+WSHOWN+')';if(n===0){const L=Math.max(0,...SW.party.map(m=>m.lv)),A=FMAPS.SQUIRE.key.A.lv,TG=A-1;if(L<TG)return'Stone GUARDIAN Lv'+A+': train to Lv'+TG+' (SELECT)'}return WNEXT[Math.min(n,4)]}
 /* v9.2 LIGHT SHOWN: every wild buddy you calm (a battle won or a bloom) counts.
    The King wants a calm valley, not just four Sigils: WSHOWN calmed buddies.
    Every 10 the Great Lantern grows a ring (a little celebration and +3 hearts). */
@@ -11083,7 +11084,7 @@ function swRows(items,sel,desc){const room=H-26-(desc?40:8),rh=Math.max(10,Math.
   swWrap(desc,W-26).slice(0,3).forEach((l,j)=>text(l,12,H-33+j*9,1,'#d8e0e8',null))}}
 /* ================================================================
    DARK AND LIT (v9.4): the core reward of the game, on screen.
-   Every wild buddy, alpha and glitched foe is drawn in its DARK form:
+   Every wild buddy, guardian and glitched foe is drawn in its DARK form:
    a purple-black tint and a faint haze rising off it. Calm it and the
    dark drains away in a burst of light: in battle the foe no longer
    faints and sinks, it lights up where it stands.
@@ -11123,16 +11124,16 @@ function aimDraw(){if(!BT)return;const fg=BT._fg||[W*.71,120];
   if((SW.lessons.aimN||0)<3){const t3='when the ring turns green';r('#14101e',W/2-tw(t3,1)/2-3,y+WAIM.R0+14,tw(t3,1)+6,10);text(t3,W/2-tw(t3,1)/2,y+WAIM.R0+15,1,'#ffffff',null)}}
  const Q=BT.aimQ;if(Q&&time-Q.t<.9){const k=(time-Q.t)/.9,miss=Q.q==='MISS';g.globalAlpha=1-k;const t2=miss?Q.why:Q.q+'!',sz=miss?1:2;if(t2)text(t2,Math.round(fg[0]-tw(t2,sz)/2),Math.round(fg[1]-(miss?74:44)-k*(miss?4:10)),sz,miss?'#b8b0c8':Q.q==='GREAT'?'#ffd94d':'#ffffff',miss?'#14101e':null);g.globalAlpha=1}}
 /* ================================================================
-   THE FIRST ALPHA LIVES IN THE CASTLE (v9.5). Will: the flow to the
-   first alpha was bad; it should be in Squire's Woods, which should
+   THE FIRST GUARDIAN LIVES IN THE CASTLE (v9.5). Will: the flow to the
+   first guardian was bad; it should be in Squire's Woods, which should
    have a castle.
-   - The Meadow is the training ground: no alpha behind its boulder
+   - The Meadow is the training ground: no guardian behind its boulder
      wall any more (the wall, the ore and the buried PEB stay).
    - Squire's Woods opens once Sunkeep has its cottage and a crop.
      Its walls are drawn as a castle: grey brick, battlements, round
      corner towers with arrow slits, a gatehouse over the thorn gate,
      a flagstone courtyard. STONESQUIRE, the castle's own gatehouse
-     come alive, is the first alpha (Lv7) and gives the first Sigil.
+     come alive, is the first guardian (Lv7) and gives the first Sigil.
    - Crooked Hollow (Lv6 to 9) is the road after the first Sigil.
    - BLOOMBOAR moves to the Ember Wastes, guarding the glassware.
    ================================================================ */
@@ -11147,14 +11148,14 @@ FMAPS.SQUIRE.key.A.lv=7;
 WSECSUB.SQUIRE='The castle in the woods. Wilds Lv3 to 6.';
 /* which roads are shut, and what the sign says */
 function wBarred(to){return to==='SQUIRE'?SW.quest<5:to==='HOLLOW'?SW.badges.length<1:false}
-function wBarredSay(to){return to==='SQUIRE'?"RANGER'S BARRIER: Squire's Woods is wild. Build Sunkeep a cottage and grow a crop first.":"RANGER'S BARRIER: Crooked Hollow is darker still. Win a Sigil from the castle alpha in Squire's Woods first."}
+function wBarredSay(to){return to==='SQUIRE'?"RANGER'S BARRIER: Squire's Woods is wild. Build Sunkeep a cottage and grow a crop first.":"RANGER'S BARRIER: Crooked Hollow is darker still. Win a Sigil from the castle guardian in Squire's Woods first."}
 /* after the cottage and the first crop: the castle */
 function scGymCheck(){wStoryBeats();if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||!SW.lessons.scDab||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return;SW.lessons.scGym=1;
  const L=FMAPS.SQUIRE.key.A.lv;
  scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Now the real work: the dark out there.'},
-  {who:'MARCUS',txt:"Every place has an ALPHA, bro. Biggest, darkest buddy around. Ours moved into the old castle in Squire's Woods."},
-  {who:'ERIN',txt:"South through the Meadow. Bring the alpha the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome."},
-  {who:'MARCUS',txt:'Castle alpha is Lv'+L+'. Battle wilds with SELECT on the way till your lead is Lv'+(L-1)+'. See one, light one.'},
+  {who:'MARCUS',txt:"Every place has a GUARDIAN OF THE LIGHT, bro. They went dim when the Lantern did. Ours moved into the old castle in Squire's Woods."},
+  {who:'ERIN',txt:"South through the Meadow. Bring the guardian the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome."},
+  {who:'MARCUS',txt:'Castle guardian is Lv'+L+'. Battle wilds with SELECT on the way till your lead is Lv'+(L-1)+'. See one, light one.'},
   {who:'ERIN',txt:'And it is made of stone. Water and leaves wear stone down. A DEW or LEAF buddy from the woods will help.'}],()=>swSave())}
 WSIGOPEN[1]={a:'ROADS',b:'OPEN',sub:'',end:'One Sigil. Crooked Hollow is open, east of the Meadow, and so is the road past Lantern Town.'};
 /* ---- the castle, drawn over the ruin's walls ---- */
@@ -11185,8 +11186,8 @@ function sqArrive(F){if(!F||F.id!=='SQUIRE'||SW.lessons.squire)return;if((W4.ban
  const gx=23*FT+8,gy=8*FT+6,al=(F.alphas||[])[0],ax=al?al.x:21*FT+8,ay=al?al.y+10:44;
  scStart([{hold:.4},{x:gx,y:gy-20,hold:1.4},
   {x:gx,y:gy-20,who:'',txt:"Squire's castle. Somebody started building it long ago and never finished. The dark moved in instead."},
-  {x:ax,y:ay,hold:1.0},{x:ax,y:ay,who:'LOUIE',txt:'Grrr... the ALPHA. Stone all the way through. Water and leaves wear it down. Woof.'},
-  {x:gx,y:gy+16,who:'LOUIE',txt:'A MOAT, then THORN VINES, then a BOULDER inside. Sprouts build the bridge. LEAF clears thorns. PEB cracks rock. Woof.'},{hold:.3}].concat(wHasDC()?[]:[{x:gx,y:gy+16,who:'MARCUS',txt:"Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do."},{x:gx,y:gy+16,who:'MARCUS',txt:'A BUDDY BARN, bro. 8 stone, 6 wood, back at Sunkeep. The alpha can wait for that.'}]),()=>{if(!wHasDC())SW.lessons.barnTold=1;swSave()})}
+  {x:ax,y:ay,hold:1.0},{x:ax,y:ay,who:'LOUIE',txt:'Grrr... the GUARDIAN. Stone all the way through. Water and leaves wear it down. Woof.'},
+  {x:gx,y:gy+16,who:'LOUIE',txt:'A MOAT, then THORN VINES, then a BOULDER inside. Sprouts build the bridge. LEAF clears thorns. PEB cracks rock. Woof.'},{hold:.3}].concat(wHasDC()?[]:[{x:gx,y:gy+16,who:'MARCUS',txt:"Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do."},{x:gx,y:gy+16,who:'MARCUS',txt:'A BUDDY BARN, bro. 8 stone, 6 wood, back at Sunkeep. The guardian can wait for that.'}]),()=>{if(!wHasDC())SW.lessons.barnTold=1;swSave()})}
 /* in any wild area: Louie sniffs out the castle road, and points you at the Lantern post the first time you are hurt */
 function sqHint(F){if(!F||W4.scene||state!=='g4world'||(W4.banner&&W4.banner.t>0))return;
  if(F.id==='MEADOW'&&SW.quest>=5&&SW.badges.length<1&&!(SW.visited&&SW.visited.SQUIRE)&&!SW.lessons.sqHint&&P3.y>17*16&&Math.abs(P3.x-(17*16+16))<70){SW.lessons.sqHint=1;louSay('SNIFF! A CASTLE, SOUTH!',2.8);swSnd(600,.05,420)}
@@ -11195,7 +11196,7 @@ function sqHint(F){if(!F||W4.scene||state!=='g4world'||(W4.banner&&W4.banner.t>0
    {x:F.start.x,y:F.start.y,who:'LOUIE',txt:'Press A there again and it sends you home, or to any post you have lit. Woof.'},{hold:.3}],()=>swSave())}}
 /* road signs in the Meadow, so you always know which way is which: [tile x, tile y, what it says] */
 const FSIGNS={MEADOW:[[4,6,'HOME: SUNKEEP. The garden, the cottage, the Great Lantern.'],[19,2,"NORTH: LANTERN TOWN. The Elder, the Ranger's lodge, the road beyond."],
- [33,11,'EAST: CROOKED HOLLOW. Darker woods. The Ranger lets you in once you hold a Sigil.'],[16,35,"SOUTH: SQUIRE'S WOODS. An old castle, and an alpha awake inside it."]]};
+ [33,11,'EAST: CROOKED HOLLOW. Darker woods. The Ranger lets you in once you hold a Sigil.'],[16,35,"SOUTH: SQUIRE'S WOODS. An old castle, and a guardian awake inside it."]]};
 function fSignsDraw(F){for(const [tx,ty] of FSIGNS[F.id]||[]){const x=tx*FT+8,y=ty*FT+12,K='#14101e';
  r('rgba(0,0,0,.22)',x-5,y+1,10,3);r(K,x-1,y-12,3,13);r('#8a6a48',x,y-11,1,12);
  r(K,x-8,y-17,17,8);r('#c49a62',x-7,y-16,15,6);r('#a87948',x-7,y-12,15,2);r('#5a3d22',x-5,y-14,11,1)}}
@@ -11204,7 +11205,7 @@ function fSignsDraw(F){for(const [tx,ty] of FSIGNS[F.id]||[]){const x=tx*FT+8,y=
 {const M=FMAPS.MEADOW.rows,set=(x,y,c)=>{M[y]=M[y].slice(0,x)+c+M[y].slice(x+1)};
  set(2,0,'e');set(3,0,'e');set(17,0,'h');set(18,0,'h');set(4,1,'.');set(20,1,'S')}
 FSIGNS.MEADOW=[[19,3,'HOME: SUNKEEP, straight up the road. The garden, the cottage, the Great Lantern.'],[4,6,"LANTERN TOWN: up the west lane. The Elder, the Ranger's lodge, the road beyond."],
- [33,11,'EAST: CROOKED HOLLOW. Darker woods. The Ranger lets you in once you hold a Sigil.'],[16,35,"SOUTH: SQUIRE'S WOODS. An old castle, and an alpha awake inside it."]];
+ [33,11,'EAST: CROOKED HOLLOW. Darker woods. The Ranger lets you in once you hold a Sigil.'],[16,35,"SOUTH: SQUIRE'S WOODS. An old castle, and a guardian awake inside it."]];
 WSECSUB.MEADOW='Wild buddies live in the tall grass.'; /* v9.8: not "wildsprouts" */
 /* ================================================================
    SUNKEEP, LIVED IN (v9.6). Will: better visuals, item placement and
@@ -11274,7 +11275,7 @@ function wStoryBeats(){wPlotSync();{const cot=SW.buildings.some(b=>b.k==='cottag
  const A=FMAPS.SQUIRE.key.A.lv,ld=SW.party[0];
  if(SW.quest>=5&&!SW.badges.length&&ld&&ld.lv>=A-1&&!L.readyCastle&&SW.lessons.scGym){L.readyCastle=1;
   scStart([{who:'MARCUS',txt:ld.sp+' is Lv'+ld.lv+'! Look at you. Castle time, bro.'},{who:'ERIN',txt:wHasDC()?"South through the Meadow to Squire's Woods. A moat, a thorn gate and a boulder stand in the way.":"Build a BUDDY BARN first: 8 stone, 6 wood. Then south through the Meadow to Squire's Woods."}],()=>swSave());return}
- /* the courtyard: the alpha wakes */
+ /* the courtyard: the guardian wakes */
  const F=W4.fld;if(F&&F.id==='SQUIRE'&&!L.court&&F.alphas&&F.alphas.length&&P3.x>19*FT&&P3.x<27*FT&&P3.y>FT&&P3.y<8*FT){L.court=1;const al=F.alphas[0];
   scStart([{x:al.x,y:al.y+10,hold:1.0},{x:al.x,y:al.y+10,who:'LOUIE',txt:"Shh. It's waking up..."},
    {x:al.x,y:al.y+10,who:'',txt:'STONESQUIRE stirs. Dark pours off it like smoke off a candle.'},
@@ -11380,11 +11381,11 @@ function wTutNear(n){const st=wTutStage();if(!st)return true;
  return false}
 function wTutHint(){if(time<(W4.tutHintT||0))return;W4.tutHintT=time+4;swSay("ERIN: Hang on! I'll show you that. Stick with me.",2.4)}
 
-/* v10.0: the first alpha waits for a Buddy Barn */
-const _wGG10=wGymGoal;wGymGoal=function(){if(SW.quest>=5&&!SW.badges.length&&!wHasDC())return 'Build a BUDDY BARN at Sunkeep (8 stone, 6 wood) before the castle alpha.';return _wGG10()};
+/* v10.0: the first guardian waits for a Buddy Barn */
+const _wGG10=wGymGoal;wGymGoal=function(){if(SW.quest>=5&&!SW.badges.length&&!wHasDC())return 'Build a BUDDY BARN at Sunkeep (8 stone, 6 wood) before the castle guardian.';return _wGG10()};
 
 /* v10.1: the castle is a three-step puzzle. A moat (sprouts build the bridge), the thorn gate (LEAF),
-   then an inner boulder wall (PEB) in front of the alpha. A PEB grows in the courtyard, so nobody is stuck. */
+   then an inner boulder wall (PEB) in front of the guardian. A PEB grows in the courtyard, so nobody is stuck. */
 {const R=FMAPS.SQUIRE.rows,put=(y,x,s)=>{R[y]=R[y].slice(0,x)+s+R[y].slice(x+s.length)};
  put(4,25,'.');put(5,20,'###x###');put(6,25,'q');put(7,21,'u');
  put(9,18,'::~~~b~~~~');put(9,28,'.');put(10,16,'::::::::');
@@ -11752,6 +11753,15 @@ scPlots=function(){SW.lessons.scPlot=1;scStart([{hold:.5},{x:240,y:352,hold:1.1}
 
 function wPlotLabel(b){const pb=(W4.patchBuds||[]).find(q=>q.plotB===b),C=WCROPS[b.crop]||WCROPS.berry,tn=wPlotTender();
  if(pb&&pb.ripe)return'HARVEST '+C.n;return C.n+' · '+Math.min(99,Math.round(((pb&&pb.cg)||0)/C.need*100))+'%'+(tn?' · '+wkName(tn)+' tends it':' · change crop')}
+
+/* ---- v12.1 (Will): why these three are at Sunkeep. They don't know either. ----
+   Marcus was on a Flow Pros job with Derek. Will and Erin were planning their wedding. The light went dark
+   and they were called. Will arrived last, which is why the other two fill him in. Why Sunkeep exists, and
+   who called them, is for later. */
+WCBEATS.push(['called',()=>wOp()===1,[['MARCUS',"I was on a Flow Pros job with Derek. Then I was here. Don't ask me how, bro."],['ERIN','We were planning the wedding. The light went out and we were called. Nobody knows why us.']]],
+ ['last',()=>wOp()===2,[['ERIN','You got here last, so ask us anything. We have had a whole day more than you.']]]);
+if(typeof WCIDLE!=='undefined'){if(WCIDLE.MARCUS)WCIDLE.MARCUS.push('Derek is still on that Flow Pros job. Probably thinks I went for lunch.','Nobody told me why it is us, bro. I just keep the fire going.');
+ if(WCIDLE.ERIN)WCIDLE.ERIN.push('The seating chart is still on our kitchen table. I think about that a lot.','Whoever called us here did not leave a note.')}
 /* ================================================================
    DISPATCH + TEST HOOKS
    ================================================================ */

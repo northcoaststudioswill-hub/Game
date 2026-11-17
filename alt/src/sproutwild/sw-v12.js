@@ -114,3 +114,12 @@ scPlots=function(){SW.lessons.scPlot=1;scStart([{hold:.5},{x:240,y:352,hold:1.1}
 
 function wPlotLabel(b){const pb=(W4.patchBuds||[]).find(q=>q.plotB===b),C=WCROPS[b.crop]||WCROPS.berry,tn=wPlotTender();
  if(pb&&pb.ripe)return'HARVEST '+C.n;return C.n+' · '+Math.min(99,Math.round(((pb&&pb.cg)||0)/C.need*100))+'%'+(tn?' · '+wkName(tn)+' tends it':' · change crop')}
+
+/* ---- v12.1 (Will): why these three are at Sunkeep. They don't know either. ----
+   Marcus was on a Flow Pros job with Derek. Will and Erin were planning their wedding. The light went dark
+   and they were called. Will arrived last, which is why the other two fill him in. Why Sunkeep exists, and
+   who called them, is for later. */
+WCBEATS.push(['called',()=>wOp()===1,[['MARCUS',"I was on a Flow Pros job with Derek. Then I was here. Don't ask me how, bro."],['ERIN','We were planning the wedding. The light went out and we were called. Nobody knows why us.']]],
+ ['last',()=>wOp()===2,[['ERIN','You got here last, so ask us anything. We have had a whole day more than you.']]]);
+if(typeof WCIDLE!=='undefined'){if(WCIDLE.MARCUS)WCIDLE.MARCUS.push('Derek is still on that Flow Pros job. Probably thinks I went for lunch.','Nobody told me why it is us, bro. I just keep the fire going.');
+ if(WCIDLE.ERIN)WCIDLE.ERIN.push('The seating chart is still on our kitchen table. I think about that a lot.','Whoever called us here did not leave a note.')}

@@ -48,7 +48,7 @@ function wLouieTip(){const tips=[
  'Kin sprouts bloom best: LEAF sprouts on LEAF buddies. Tire the buddy out first.',
  'Hold B and they all come running. I taught them that. Mostly.',
  'The Lantern can send you to any Lantern post you have lit. The south road is nicer, though.',
- 'A sleeping ALPHA guards the good stuff. Wake it only if your buddy is ready.',
+ 'A sleeping GUARDIAN guards the good stuff. Wake it only if your buddy is ready.',
  'King Bibi says the dome is temporary. I am a dog and even I do not believe him.'];
  SW.talkN.LOUIE=(SW.talkN.LOUIE||0)+1;return tips[(SW.talkN.LOUIE-1)%tips.length]}
 function wLouTalk(){if(!(W4.petCd>0)){W4.petCd=18;if(Math.random()<.5){SW.hearts++;SW.heartsTotal++;W4.floats.push({x:lou.x,y:lou.y-16,txt:'+1 ♥',t:1.2,c:'#f078c0'})}}
@@ -170,7 +170,7 @@ function wQuestText(){const op=wOp();
  if(W4.fld){const ld=SW.party.find(m=>m.hp>0),sec=wSector(W4.sector);
   if(!ld||ld.hp<wStats(ld).max*.25)return'Your buddy is hurt: rest at a Lantern post';
   if(sec.gym>=0&&!SW.gymDone[sec.gym])return'The '+WGYMS[sec.gym].leader+' gym is here: win the '+WGYMS[sec.gym].sig;
-  if(SW.quest>=5&&(W4.fld.alphas||[]).some(a=>Math.hypot(a.x-P3.x,a.y-P3.y)<130))return'ALPHA nearby: it guards treasure'}
+  if(SW.quest>=5&&(W4.fld.alphas||[]).some(a=>Math.hypot(a.x-P3.x,a.y-P3.y)<130))return'GUARDIAN nearby: it guards treasure'}
  if(W4.fld){const gg=wGymGoal();if(gg)return gg} /* v8.7: in the field the next big goal is the gym */
  const ms=WBASEMS[SW.baseLv];if(!ms)return SW.badges.length<4?'Earn the Sigils. Free the roads.':'';
  const nx=ms.find(([k2])=>!wMissionDone(k2));return nx?(W4.fld?'Home: ':'Sunkeep Lv'+SW.baseLv+': ')+wMissionHint(nx):(W4.fld?'Home: ask':'Ask')+' the Lantern to grow'}
@@ -207,7 +207,7 @@ WGUIDE.length=0;WGUIDE.push(
  ['ORE AND FIBER','Sprouts cannot get these.','Find a vein or a thicket and','press A: your lead buddy','fetches it. Beaten wilds drop','them too. The bench turns','them into a SEED POUCH, a','CLIMBING ROPE, better tools.'],
  ['SUNKEEP AT WORK','Buddies you leave at home','work the buildings by skill:','KINDLE, WATER, PLANT, MINE,','LUMBER, CRAFT, HAUL, LUCK.','What they make must be','carried to the Lantern. The','work board shows who is who.'],
  ['GATES AND GEAR','Boulders want PEB sprouts,','fire EMBER, vines LEAF, sparks','ZIP, dry blooms DEW. Ledges','hop down only, until you own','a CLIMBING ROPE. Heavy loot','needs more sprouts: PEB','counts double.'],
- ['THE VALLEY','Bottie nuked the Data Center','and the Lantern cracked. KING','BIBI raised his IRON DOME and','the buddies went wild. Four','ALPHAS hold four Sigils:','bring each one the light and','it gives its Sigil up.'],
+ ['THE VALLEY','Bottie nuked the Data Center','and the Lantern cracked. KING','BIBI raised his IRON DOME and','the buddies went wild. Four','GUARDIANS hold four Sigils:','bring each one the light and','its Sigil stone comes home.'],
  ['LIGHT SHOWN','Every wild buddy you calm,','by battle or by bloom, is','LIGHT SHOWN. Every 10 the','Lantern grows a ring and','gives you a gift. Four Sigils','and 20 calmed buddies, and','the King drops the dome.']);
 /* gear: ore finally matters */
 WRECIPES.splice(2,0,{id:'rope',n:'CLIMBING ROPE',cost:{fiber:6,ore:2},need:20,d:'Climb ledges from below. Opens shortcuts and high ground in every sector.'});
