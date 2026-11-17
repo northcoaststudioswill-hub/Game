@@ -62,7 +62,7 @@ function wkTick(dt){if(!W4.bf)return;wkSync();const bench=SW.buildings.find(b=>b
  if(bench&&SW.craftQ.length&&!wkAt(bench,'craft').some(w=>w.at)&&Math.hypot(P3.x-(wCellX(bench.gx)+10),P3.y-(wCellY(bench.gy)+22))<30){const q=SW.craftQ[0],ns=W4.bf.sq.filter(s=>s.st==='follow').length;q.done+=(1.2+.15*Math.min(8,ns))*dt;bench.busy=1;W4.byHand=.3;if(ns&&((time*4)|0)!==(((time-dt)*4)|0))fSpark(wCellX(bench.gx)+10+(Math.random()*20-10),wCellY(bench.gy)+4-Math.random()*8,'#fff3b0');if(q.done>=q.need){SW.craftQ.shift();wkCraftDone(q,bench)}}
  if(W4.byHand>0)W4.byHand-=dt;
  for(const w of W4.wk){const sk=wkSkills(w),spd=w.kind==='s'?44:56;w.mv=false;w.at=false;
-  const go=(x,y,arr)=>{const dx=x-w.x,dy=y-w.y,d=Math.hypot(dx,dy);if(d<=(arr||3))return true;w.x+=dx/d*spd*dt;w.y+=dy/d*spd*dt;w.mv=true;if(Math.abs(dx)>1)w.fx=dx<0?-1:1;return false};
+  const go=(x,y,arr)=>{const dx=x-w.x,dy=y-w.y,d=Math.hypot(dx,dy);if(d<=(arr||3))return true;const [sx]=wRoadStep(w,x,y,Math.min(d,spd*dt));w.mv=true;if(Math.abs(sx)>1)w.fx=sx<0?-1:1;return false}; /* v12: home workers keep to the streets */
   if(w.kind==='b'&&w.task&&(w.task.k==='bld'||w.task.k==='craft')&&wDark()>.7)w.task=null; /* buddies down tools at night */
   if(!w.task){w.t-=dt;if(w.t<=0){w.task=wkPick(w);w.t=.6}continue}
   const tk=w.task,b=tk.b;

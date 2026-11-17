@@ -18,7 +18,7 @@ function wNormalize(j){const D=SWDEF(),S=Object.assign(SWDEF(),(j&&typeof j==='o
  const okMon=m=>m&&typeof m==='object'&&wSp(m.sp)&&m.lv>0;S.box=S.box.filter(okMon);S.party=S.party.filter(okMon);while(S.party.length>3)S.box.push(S.party.pop());
  for(const m of S.party.concat(S.box)){m.lv=Math.min(40,m.lv|0);const st=wStats(m);if(!(m.hp>=0))m.hp=st.max;m.hp=Math.min(m.hp,st.max);if(!(m.xp>=0))m.xp=0;
   if(!Array.isArray(m.moves)||!m.moves.length||m.moves.some(id=>!WMOVES[id]))m.moves=wMovesAt(wSp(m.sp),m.lv)}
- S.buildings=S.buildings.filter(b=>b&&wBuildDef(b.k)&&b.gx>=0&&b.gy>=0);for(const b of S.buildings){b.workers=[];if(b.crop&&!wSp(b.crop.sp))b.crop=null}
+ S.buildings=S.buildings.filter(b=>{if(!b||!(b.gx>=0)||!(b.gy>=0))return false;try{return!!wBuildDef(b.k)}catch(e){return true}}); /* v12.10: at start-up the later building lists are not ready yet; a save with a Buddy Barn or a crop plot crashed here and the game never started. Unknown kinds are weeded out again once everything is loaded (sw-v12). */for(const b of S.buildings){b.workers=[];if(b.crop&&!wSp(b.crop.sp))b.crop=null}
  S.crew=S.crew.filter(c=>c&&c.type>=0&&c.type<TYPES.length);for(const c of S.crew)if(c.job>=S.buildings.length)c.job=-1;
  for(const ty of S.followers)if(TYPES[ty])S.buds[TYPES[ty].n]++;S.followers=[];
  if(!wSector(S.sector))S.sector='BASE';S.keeper='WILL'; /* v9.2: only the keeper is played */for(const m of (S.party||[]).concat(S.box||[]))if(m&&m.sp==='GRASSMAN')m.sp='MOSSMAN';if(S.caught&&S.caught.GRASSMAN){S.caught.MOSSMAN=S.caught.GRASSMAN;delete S.caught.GRASSMAN}

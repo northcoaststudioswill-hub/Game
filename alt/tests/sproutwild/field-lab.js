@@ -195,13 +195,13 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
  /* v7.0: garden plots grow what you choose */
  {S.buildings=[];S.box=[];S.plotCrop={};F.build('cottage',18,12);F.enter('BASE');step(5);const pl=F.plots();
   ok('the garden bed building is retired',!F.builds().includes('bed')&&F.builds().includes('datacenter'),F.builds().join());
-  if(!pl.some(q=>q.type<0&&!q.crew)){const q=pl[pl.length-1];Object.assign(q,{type:-1,seedTy:null,crew:false,mode:'soil',age:-4,stage:0,by:null})}
-  const ix=pl.findIndex(q=>q.type<0&&!q.crew);ok('there is an empty plot to plan',ix>=0,pl.map(q=>q.type).join());
-  F.plotSet(ix,'berry');const b0=S.res.berry;ok('a plot can be set to berries',pl[ix].crop==='berry'&&S.plotCrop[ix]==='berry');
-  F.dayT(20);F.setPos(60,460);for(let i=0;i<1500&&!pl[ix].ripe;i++)step(1);ok('berries ripen on the plot',pl[ix].ripe===true,Math.round(pl[ix].cg||0)+' type'+pl[ix].type+' seed'+pl[ix].seedTy+' crop'+pl[ix].crop+' same'+(F.plots()===pl)+' crew'+pl[ix].crew+' mode'+pl[ix].mode+' st'+F.state()+' q'+S.quest);
+  /* v12: the soil grows sprouts only; crops grow on a CROP PLOT you build */
+  ok("the Lantern's soil takes no crops",pl.every(q=>!q.crop),pl.map(q=>q.crop||'-').join());
+  F.build('plot',3,14);step(5);const cp=F.plots().find(q=>q.plotB),b0=S.res.berry;ok('a built crop plot starts with berries',!!cp&&cp.crop==='berry'&&cp.type<0,cp&&cp.crop);
+  F.dayT(20);F.setPos(60,460);for(let i=0;i<1500&&!cp.ripe;i++)step(1);ok('berries ripen on the plot',cp.ripe===true,Math.round(cp.cg||0)+' st'+F.state()+' q'+S.quest);
   F.giveMon('PEBBLIT',4,true);for(let i=0;i<1500&&S.res.berry<=b0;i++)step(1);ok('a home buddy harvests and the berries reach the Lantern',S.res.berry>b0,S.res.berry+' vs '+b0);
-  ok('no sprout seed takes a crop plot',pl[ix].type<0&&pl[ix].seedTy==null);
-  F.plotSet(ix,null);ok('the plot can go back to sprouts',!pl[ix].crop&&S.plotCrop[ix]===undefined)}
+  ok('no sprout seed takes a crop plot',cp.type<0&&cp.seedTy==null);
+  S.buildings=S.buildings.filter(q=>q.k!=='plot');step(3);ok('a removed crop plot leaves the patch',!F.plots().some(q=>q.plotB))}
  /* v7.0: Crooked Hollow, east of the Meadow */
  {F.travel('MEADOW','BASE');step(3);let f2=F.fld();const q0=S.quest,b0=S.badges;S.badges=[];F.setPos(34*16+2,9*16+10);f2.dir=[1,0];f2.arrive=null;for(let i=0;i<40;i++)step(1,['right']);ok('the Hollow is barred until your first Sigil',F.fld().id==='MEADOW');S.quest=Math.max(5,q0);S.badges=['VERDANT SIGIL'];
   F.setPos(34*16+2,9*16+10);f2.dir=[1,0];f2.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='MEADOW';i++)step(1,['right']);f2=F.fld();
@@ -219,9 +219,9 @@ const res=await p.evaluate(()=>{const G=window.__g,F=G.SWF(),S=F.meta(),out=[];F
   ok("the stone gatehouse guards the Squire's Lantern",f3.alphas.some(a=>a.sp==='STONESQUIRE')&&f3.items.some(i=>i.n==="SQUIRE'S LANTERN"));
   ok("Squire's wilds are Lv3 or more and a Lanternwisp is home",F.wilds().every(w=>w.lv>=3)&&(step(2),F.wilds().some(w=>w.sp==='LANTERNWISP')),F.wilds().map(w=>w.sp+w.lv).join());
   F.wilds().length=0;S.buds.LEAF=3;S.buds.PEB=3;
-  at(7,13,[1,0]);step(10);for(let i=0;i<6;i++){tap('a');step(5)}step(700);const site=f3.sites[0];
+  at(7,13,[1,0]);step(10);for(let i=0;i<6;i++){tap('a');step(5)}step(700);const site=f3.sites.slice().sort((p,q)=>Math.hypot(p.x-8*16,p.y-13*16)-Math.hypot(q.x-8*16,q.y-13*16))[0];
   ok('sprouts build the river bridge to the south-west meadow',site.done,site.hp);
-  step(40,['b']);step(30);const vg=f3.gates[0];at(23,9,[0,-1]);step(10);tap('a');step(500);
+  step(40,['b']);step(30);const vg=f3.gates.find(q=>q.c==='v');for(const q of f3.sites)q.done=1;at(23,9,[0,-1]);step(10);tap('a');step(500);
   ok('LEAF sprouts clear the thorn vines into the ruin',vg.open,vg.hp);
   step(40,['b']);step(20);F.setPos(14*16+8,1*16+10);f3.dir=[0,-1];f3.arrive=null;for(let i=0;i<60&&F.fld()&&F.fld().id==='SQUIRE';i++)step(1,['up']);
   ok('and the north road leads back to the Meadow',F.fld()&&F.fld().id==='MEADOW',F.fld()&&F.fld().id)}

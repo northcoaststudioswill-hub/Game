@@ -20,17 +20,18 @@ WSTORY.length=0;WSTORY.push( /* v9.2: twelve scenes */
  {sc:8,who:'',t:'BOTTIE nuked the Data Center. The simulation glitched.'},
  {sc:0,who:'',t:'And the Great Lantern cracked and went dark.'},
  {sc:5,who:'KING BIBI',t:'Citizens! The light is out. Stay calm. I am raising the IRON DOME. Temporarily.',acc:'#1e2c5a'},
- {sc:9,who:'',t:"In the dark the valley's buddies forgot the promise. They went wild, and the biggest became ALPHAS."},
+ {sc:9,who:'',t:"In the dark the valley's buddies forgot the promise. They went wild, and their GUARDIANS OF THE LIGHT went dim. A dim Guardian spells peril for the kingdom."},
  {sc:1,who:'',t:'But the light fell as seeds, and the seeds grew legs: SPROUTS. Throw one at a wild buddy and it remembers.'},
  {sc:3,who:'',t:'Bring a buddy enough light and the dark breaks. It comes home calm.'},
- {sc:2,who:'ERIN',t:'Sunkeep still grows sprouts, keeper. Cleanse the dark from the buddies. Show them the light.'},
- {sc:4,who:'MARCUS',t:'Four alphas hold four Sigils, bro. Light them all, Bibi drops the dome, and we face Bottie. I supervise.'});
+ {sc:2,who:'',t:'That night three people were called to Sunkeep. None of them knows why. Marcus left a Flow Pros job. Erin and Will left their wedding plans.'},
+ {sc:2,who:'ERIN',t:'You got here last, Will, so we will fill you in. Sunkeep still grows sprouts. Show the buddies the light.'},
+ {sc:4,who:'MARCUS',t:'Four Guardians hold four Sigil stones, bro. Light them and the stones come home to the Lantern. Then Bibi drops the dome and we face Bottie. I supervise.'});
 /* first visit to Lantern Town: the Elder explains what the domes did */
 function loreTown(){const F=W4.fld;if(!F||F.id!=='TOWN'||SW.lessons.scTown||W4.scene||state!=='g4world'||(W4.banner&&W4.banner.t>0))return;
  SW.lessons.scTown=1;scStart([
   {who:'ELDER',txt:'Welcome to Lantern Town, keeper. We were the brightest street in the valley once.'},
   {who:'ELDER',txt:'When the light went out, the King raised his IRON DOME and shut the roads. The buddies went wild.'},
-  {who:'ELDER',txt:'Every place out there has an ALPHA, the biggest, darkest buddy around. Bring one the light and it gives up a Sigil.'},
+  {who:'ELDER',txt:'Every place out there has a GUARDIAN OF THE LIGHT. They have gone dim, and a dim Guardian spells peril for the kingdom. Bring one the light and its Sigil stone goes home to the Lantern.'},
   {who:'ELDER',txt:"Four Sigils and the King will believe it's safe again. The valley was promised to you, keeper. Take it back."}],()=>swSave())}
 /* after Bottie's visit: Erin and Marcus on who he is */
 function loreBibi(){if(W4.fld||W4.sector!=='BASE'||!SW.bottieSeen||SW.lessons.scBibi||W4.scene||state!=='g4world')return;

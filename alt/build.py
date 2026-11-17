@@ -77,7 +77,7 @@ if console.count('/*@include rootdeep.js*/') != 1:
     die('console.js needs exactly one /*@include rootdeep.js*/')
 console = console.replace('/*@include rootdeep.js*/', code('rootdeep.js'))
 # cartridge 5, Sproutwild: its files share the console's scope, in this order
-SPROUTWILD = ['sw-cartart', 'sw-module', 'sw-field', 'sw-front', 'sw-base', 'sw-art', 'sw-story', 'sw-battle', 'sw-save', 'sw-text', 'sw-cast', 'sw-party', 'sw-scene', 'sw-starters', 'sw-plots', 'sw-hollow', 'sw-squire', 'sw-louie', 'sw-bugs', 'sw-walk', 'sw-open2', 'sw-meadow2', 'sw-pace', 'sw-sigil', 'sw-lore', 'sw-light', 'sw-menu', 'sw-dark', 'sw-castle', 'sw-sunkeep', 'sw-louie2']
+SPROUTWILD = ['sw-cartart', 'sw-module', 'sw-field', 'sw-front', 'sw-base', 'sw-art', 'sw-story', 'sw-battle', 'sw-save', 'sw-text', 'sw-cast', 'sw-party', 'sw-scene', 'sw-starters', 'sw-plots', 'sw-hollow', 'sw-squire', 'sw-louie', 'sw-bugs', 'sw-walk', 'sw-open2', 'sw-meadow2', 'sw-pace', 'sw-sigil', 'sw-lore', 'sw-light', 'sw-menu', 'sw-dark', 'sw-castle', 'sw-sunkeep', 'sw-louie2', 'sw-v10', 'sw-v11', 'sw-v12']
 if console.count('/*@include sproutwild*/') != 1:
     die('console.js needs exactly one /*@include sproutwild*/')
 swmod = code('sproutwild/sw-module.js')

@@ -5,7 +5,7 @@
    Two creatures from valley lore live only here:
      MELONKIN  the melon-headed folk of the Hollow woods
      PYTHORN   the Peninsula Python, loose since a 1944 circus wreck;
-               it sleeps on the Hollow's treasure as the area's alpha.
+               it sleeps on the Hollow's treasure as the area's guardian.
    ================================================================ */
 const WHOLLOWART={
 MELONKIN(D){const sk='#e8e0c8',gn='#58b848',dg='#2e7d32';

@@ -24,11 +24,13 @@ const SNAP=`JSON.stringify((()=>{const F=W4.fld,bf=W4.bf,sc=W4.scene,st=sc&&sc.s
   talk:W4.talk?W4.talk.who:'',quip:(W4.quips||[]).map(q=>q.txt||q.t||'').join('|'),
   buds:(bf&&!F?bf.buds:[]).map(b=>[b.x,b.y,b.g==null?1:b.g]),
   items:((F||bf)?(F||bf).items:[]).filter(i=>!i.done&&!i.guard&&!(i.car&&i.car.length)).map(i=>[i.x,i.y,i.k||'',i.res||'']),
-  trees:(!F?W4.nodes:[]).filter(n=>n.k==='tree'&&!n.got).map(n=>[n.x,n.y]),
+  trees:(!F?W4.nodes:[]).filter(n=>n.k==='tree'&&!n.got).map(n=>[n.x,n.y]),rocks:(!F?W4.nodes:[]).filter(n=>n.k==='rock'&&!n.got).map(n=>[n.x,n.y]),stone:SW.res.stone,barn:typeof wHasDC==='function'&&wHasDC(),barnB:SW.buildings.some(b=>b.k==='datacenter'),
+  thorn:F&&F.id==='SQUIRE'?(F.gates.find(g=>g.c==='v'&&!g.open)||null):null,boulder:F&&F.id==='SQUIRE'?(F.gates.find(g=>g.c==='x'&&!g.open)||null):null,moat:F&&F.id==='SQUIRE'?(F.sites.find(q=>!q.done&&Math.abs(q.x-23*16-8)<40&&q.y<12*16)||null):null,pebs:F?F.sq.filter(q=>q.type===1).length:0,
   erin:F?(W4.ew&&!W4.ew.leave?[W4.ew.x,W4.ew.y]:null):(cast?[cast.x,cast.y]:null),
   tame:(W4.wilds||[]).filter(w=>w.tame).map(w=>[w.x,w.y])[0]||null,
+  fight:(SW.lessons.tutFight===1&&(W4.wilds||[]).filter(w=>w.fightMe).map(w=>[w.x,w.y])[0])||null,
   peb:F?(F.buds.find(b=>b.type===1)||null):null,gate:F?(F.gates.find(g=>g.type===1&&!g.open)||null):null,sqgate:F&&F.id==='SQUIRE'?(F.gates.find(g=>!g.open)||null):null,site:F?(F.sites.find(s=>!s.done)||null):null,
-  sq:((F||bf)&&(F||bf).sq||[]).filter(s=>s.st==='follow').length,w3:SW.walk3||0,goal:(()=>{try{return wQuestText()}catch(e){return ''}})(),badges:SW.badges.length,crop:Object.keys(SW.plotCrop||{}).length,plot:(W4.patchBuds||[]).filter(q=>q.type<0&&!q.crop).map(q=>[q.sx,q.sy])[0]||null,gym:F&&F.gym?[F.gym.x,F.gym.y]:null,lv:SW.party.map(m=>m.sp+m.lv).join(' '),lead:SW.party[0]?[SW.party[0].lv,SW.party[0].hp/wStats(SW.party[0]).max]:[0,0],target:FMAPS.SQUIRE.key.A.lv-1,alpha:F&&F.alphas&&F.alphas[0]?[F.alphas[0].x,F.alphas[0].y]:null,wilds:(W4.wilds||[]).filter(w=>!w.cap).map(w=>[w.x,w.y,w.lv]),start:F&&F.start?[F.start.x,F.start.y]:null,etree:W4.ew&&W4.ew.tree&&!W4.ew.tree.got?[W4.ew.tree.x,W4.ew.tree.y]:null,ebug:W4.ew&&W4.ew.bug&&(W4.bugs||[]).includes(W4.ew.bug)?[W4.ew.bug.x,W4.ew.bug.y]:null,wh:W4.wh||520}})())`;
+  sq:((F||bf)&&(F||bf).sq||[]).filter(s=>s.st==='follow').length,w3:SW.walk3||0,goal:(()=>{try{return wQuestText()}catch(e){return ''}})(),badges:SW.badges.length,crop:plCrops(),plot:(W4.patchBuds||[]).filter(q=>q.type<0&&!q.crop).map(q=>[q.sx,q.sy])[0]||null,gym:F&&F.gym?[F.gym.x,F.gym.y]:null,lv:SW.party.map(m=>m.sp+m.lv).join(' '),lead:SW.party[0]?[SW.party[0].lv,SW.party[0].hp/wStats(SW.party[0]).max]:[0,0],target:FMAPS.SQUIRE.key.A.lv-1,alpha:F&&F.alphas&&F.alphas[0]?[F.alphas[0].x,F.alphas[0].y]:null,wilds:(W4.wilds||[]).filter(w=>!w.cap).map(w=>[w.x,w.y,w.lv]),start:F&&F.start?[F.start.x,F.start.y]:null,etree:W4.ew&&W4.ew.tree&&!W4.ew.tree.got?[W4.ew.tree.x,W4.ew.tree.y]:null,ebug:W4.ew&&W4.ew.bug&&(W4.bugs||[]).includes(W4.ew.bug)?[W4.ew.bug.x,W4.ew.bug.y]:null,wh:W4.wh||520}})())`;
 const log=[];const open={};const flags=[];const t0=Date.now();const T=()=>(Date.now()-t0)/1000;
 const readT=s=>1.2+String(s).length*.045;
 function track(k,v,s){const now=T();const cur=open[k];
@@ -63,7 +65,7 @@ while(T()<CAP){
  if(s.state==='g4battle'){await aPress(500);await sleep(150);continue}
  if(s.state==='g4plot'){const sel=+(await ev('swSel'));if(sel<1)await key('down');else if(sel>1)await key('up');else await key('a');await sleep(250);continue}
  if(s.state==='g4pause'){const sel=+(await ev('swSel'));if(sel<2)await key('down');else if(sel===2)await key('right');else if(sel!==3)await key('up');else await key('a'); /* v9.2 grid menu: BUILD is tile 3 */await sleep(200);continue}
- if(s.state==='g4build'){const want=+(await ev("WBUILD.findIndex(d=>d.k==='cottage')")),sel=+(await ev('swSel'));if(sel<want)await key('down');else if(sel>want)await key('up');else await key('a');await sleep(200);continue}
+ if(s.state==='g4build'){const want=+(await ev("WBUILD.findIndex(d=>d.k===(!SW.buildings.some(b=>b.k==='cottage')?'cottage':!plCrops()?'plot':'datacenter'))")),sel=+(await ev('swSel'));if(sel<want)await key('down');else if(sel>want)await key('up');else await key('a');await sleep(200);continue}
  if(s.state==='g4place'){placeTries++;if(placeTries%3===0)await key(placeTries%6===0?'down':'right');await key('a');await sleep(300);continue}
  // 2. the world
  if(s.state!=='g4world'){await sleep(150);continue}
@@ -72,8 +74,15 @@ while(T()<CAP){
   if(s.op===1){const it=s.items[0];if(it){if(await moveTo(s,it[0]+30,it[1]+2)){await face(-1,0);await aPress(900)}}await sleep(150);continue}
   if(s.op===2){if(await moveTo(s,240,194)){await face(0,1);await aPress(1200)}await sleep(150);continue}
   if(s.q<=2){if(s.erin&&s.bw<2){const dx=s.P[0]-s.erin[0],dy=s.P[1]-s.erin[1],d=Math.hypot(dx,dy)||1;if(d>30)await moveTo(s,s.erin[0]+dx/d*26,s.erin[1]+dy/d*26-(dy>0?40:0),9);}else{await moveTo(s,240,s.wh-8,11);await key('down',120)}await sleep(150);continue}
-  if(s.cot&&!s.crop&&!s.plot){const gs=JSON.parse(await ev("JSON.stringify((W4.patchBuds||[]).filter(q=>q.type>=0&&q.stage>=2&&q.mode==='soil').map(q=>[q.sx,q.sy]))"))[0];if(gs){if(await moveTo(s,gs[0],gs[1]+14)){await face(0,-1);await aPress(1200)}}await sleep(150);continue}
-  if(s.cot&&!s.crop&&s.plot){if(await moveTo(s,s.plot[0],s.plot[1]+14)){await face(0,-1);await aPress(1500)}await sleep(150);continue}
+  if(s.cot&&!s.crop){if(s.cons){await sleep(400);continue}await moveTo(s,120,350,14);await key('start');await sleep(300);continue} /* v12: crops need a crop plot, which you build */
+  if(s.cot&&s.q>=5&&!s.barn&&s.badges<1){ /* v12.4: the Buddy Barn comes before the castle: 8 stone and 6 wood, gathered at home */
+   if(s.barnB){await sleep(500);continue}
+   if(s.wood>=6&&s.stone>=8){await moveTo(s,340,360,14);await key('start');await sleep(300);continue}
+   const it=s.items.find(i=>i[2]==='pel'||i[3]==='wood'||i[3]==='stone');
+   if(it&&s.sq){if(await moveTo(s,it[0]+28,it[1]+2)){await face(-1,0);await aPress(900)}await sleep(150);continue}
+   const nd=(s.stone<8?s.rocks:s.trees).concat(s.stone<8?s.trees:s.rocks).sort((a,b2)=>0)[0];
+   if(nd){if(await moveTo(s,nd[0],nd[1]+22)){await face(0,-1);for(let i=0;i<6;i++){await key('a',90);await sleep(260)}}await sleep(150);continue}
+   await sleep(600);continue}
   if(s.cot&&s.q>=5){await moveTo(s,240,s.wh-8,11);await key('down',120);await sleep(150);continue}
   if(!s.cot){if(s.wood>=8){await key('start');await sleep(300);continue}
    const it=s.items.find(i=>i[3]==='wood'||i[2]==='log'||i[2]==='pel')||s.items[0];
@@ -81,7 +90,8 @@ while(T()<CAP){
    const tr=s.trees.sort((a,b2)=>Math.hypot(a[0]-s.P[0],a[1]-s.P[1])-Math.hypot(b2[0]-s.P[0],b2[1]-s.P[1]))[0];
    if(tr){if(await moveTo(s,tr[0],tr[1]+24)){await face(0,-1);await aPress(2500)}}await sleep(150);continue}
   await sleep(200);continue}
- if(s.fid==='MEADOW'){
+ if(s.fid==='MEADOW'||s.fid==='SQUIRE'){ /* v12.6: the castle rules sat inside a Meadow-only block and never ran */
+  if(s.w2===2&&s.fight){if(await moveTo(s,s.fight[0],s.fight[1]+20)){await face(0,-1);await p.evaluate(()=>{window.__g.keys.sel=1});await sleep(90);await p.evaluate(()=>{window.__g.keys.sel=0})}await sleep(300);continue}
   if(s.w2===2&&s.tame){if(await moveTo(s,s.tame[0],s.tame[1]+24)){await face(0,-1);await aPress(700)}await sleep(150);continue}
   if(s.w2===4&&s.peb){if(await moveTo(s,s.peb.x,s.peb.y+12)){await face(0,-1);await aPress()}await sleep(150);continue}
   if(s.w2===6&&s.gate){if(await moveTo(s,s.gate.x,s.gate.y+22)){await face(0,-1);await aPress(1000)}await sleep(150);continue}
@@ -90,22 +100,28 @@ while(T()<CAP){
   if(s.w2>=10&&s.w3===3){const it=s.items.find(i=>i[3]==='wood');if(it){if(await moveTo(s,it[0]+28,it[1]+2)){await face(-1,0);await aPress(900)}await sleep(150);continue}}
   if(s.w2>=10&&s.w3===5&&s.ebug){if(await moveTo(s,s.ebug[0],s.ebug[1]+20)){await face(0,-1);await aPress(800)}await sleep(150);continue}
   if(s.erin&&(s.w2<10||(s.w3>0&&s.w3<7))){const dx=s.P[0]-s.erin[0],dy=s.P[1]-s.erin[1],d=Math.hypot(dx,dy)||1;if(d>34)await moveTo(s,s.erin[0]+dx/d*26,s.erin[1]+dy/d*26,10);await sleep(150);continue}
+  if(s.q>=5&&s.badges<1&&!s.barn&&s.fid==='MEADOW'){const HX=17*16+16;if(Math.abs(s.P[0]-HX)>6&&s.P[1]>30)await moveTo(s,HX,s.P[1]);else if(s.P[1]>24)await moveTo(s,HX,Math.max(20,s.P[1]-11));else await key('up',150);await sleep(150);continue} /* v12.4: home for the Buddy Barn first */
   if(s.q>=5&&s.badges<1&&s.lead[0]<s.target){// train like a player: rest when hurt, else battle the nearest wild with SELECT
    if(s.lead[1]<.4&&s.start){if(await moveTo(s,s.start[0],s.start[1]+16)){await face(0,-1);await aPress(1200);if(!globalThis.__restLog||Date.now()-globalThis.__restLog>8000){globalThis.__restLog=Date.now();log.push(T().toFixed(1)+'s REST try at the post, lead hp '+(s.lead[1]*100|0)+'% near='+await ev("JSON.stringify(W4.near&&W4.near.txt||null)"))}}await sleep(150);continue}
    const wd=s.wilds.filter(w=>w[2]<=s.lead[0]+1).sort((a,b2)=>Math.hypot(a[0]-s.P[0],a[1]-s.P[1])-Math.hypot(b2[0]-s.P[0],b2[1]-s.P[1]))[0];
    if(wd){if(await moveTo(s,wd[0],wd[1]+20)){await face(0,-1);if(Date.now()-lastA>1500){lastA=Date.now();await key('sel')}}}await sleep(150);continue}
   if(s.q>=5&&s.badges<1&&!s.alpha&&s.fid==='MEADOW'&&s.lead[0]>=s.target){await moveTo(s,17*16+12,38*16+8,6);await sleep(150);continue} /* v9.5: the first alpha is south, in Squire's castle */
-  if(s.q>=5&&s.badges<1&&s.fid==='SQUIRE'&&s.lead[0]>=s.target){ /* v9.5: into the castle: clear the thorn gate, step into the courtyard */
-   const RX=14*16+8,RY=9*16+8,GX=23*16+8; /* waypoints: down the north road, east along the river path, up through the gate */
-   if(s.P[1]<RY-4&&s.P[0]<19*16){if(Math.abs(s.P[0]-RX)>4)await moveTo(s,RX,s.P[1]);else await moveTo(s,RX,RY);await sleep(150);continue}
-   if(s.sqgate){if(Math.abs(s.P[1]-RY)>4&&Math.abs(s.P[0]-GX)>4){await moveTo(s,s.P[0],RY);await sleep(150);continue}
-    if(Math.abs(s.P[0]-GX)>4){await moveTo(s,GX,RY);await sleep(150);continue}
-    if(await moveTo(s,GX,s.sqgate.y+24,6)){await face(0,-1);await aPress(900)}await sleep(150);continue}
-   if(s.P[1]>8*16+4){if(Math.abs(s.P[0]-GX)>4){await moveTo(s,GX,RY);await sleep(150);continue}await moveTo(s,GX,7*16+6,6);await sleep(150);continue}}
+  if(s.q>=5&&s.badges<1&&s.fid==='SQUIRE'&&s.lead[0]>=s.target){ /* v12.4: the castle puzzle: bridge, thorns, pluck the PEB, boulder */
+   const RX=14*16+8,RY=10*16+10,GX=23*16+8;
+   if(s.moat||s.thorn){ /* outside the walls */
+    if(s.P[1]<RY-6&&s.P[0]<19*16){if(Math.abs(s.P[0]-RX)>4)await moveTo(s,RX,s.P[1]);else await moveTo(s,RX,RY);await sleep(150);continue}
+    if(s.moat){if(Math.abs(s.P[1]-RY)>5&&Math.abs(s.P[0]-GX)>5){await moveTo(s,s.P[0],RY);await sleep(150);continue}
+     if(await moveTo(s,GX,RY,5)){await face(0,-1);await aPress(900)}await sleep(300);continue}
+    if(await moveTo(s,GX,9*16+12,5)){await face(0,-1);await aPress(900)}await sleep(300);continue}
+   if(s.boulder){ /* in the lower courtyard */
+    if(s.P[1]>8*16+6){await moveTo(s,GX,7*16+8,5);await sleep(150);continue}
+    if(!s.pebs&&s.peb){if(await moveTo(s,s.peb.x,s.peb.y+14,5)){await face(0,-1);await aPress(700)}await sleep(200);continue}
+    if(await moveTo(s,GX,6*16+10,5)){await face(0,-1);await aPress(900)}await sleep(300);continue}
+   if(s.P[1]>5*16){await moveTo(s,GX,4*16,6);await sleep(150);continue}}
   if(s.q>=5&&s.badges<1&&s.alpha){if(await moveTo(s,s.alpha[0],s.alpha[1]+22,8)){await face(0,-1);await aPress(1500)}await sleep(150);continue} /* v9.1: the first Sigil is the Meadow alpha */
   if(s.q>=5){if(s.P[1]>24||Math.abs(s.P[0]-(17*16+16))>6){await moveTo(s,17*16+16,s.P[1]>24?Math.max(20,s.P[1]-11):20)}else{await key('up',150)}await sleep(150);continue}
-  if(s.w2>=10||s.q>=3){// home: up the west lane to the north gate
-   if(s.P[1]>40){await moveTo(s,s.P[0]>60?s.P[0]-11:40,s.P[1]-11)}else{await key('up',150)}
+  if(s.w2>=10||s.q>=3){// home: the main road north
+   {const HX=17*16+16;if(Math.abs(s.P[0]-HX)>6&&s.P[1]>30)await moveTo(s,HX,s.P[1]);else if(s.P[1]>24)await moveTo(s,HX,Math.max(20,s.P[1]-11));else await key('up',150)} /* v10.2: home is the north road */
    stuck=(lastP===s.P.join())?stuck+1:0;lastP=s.P.join();if(stuck>40){await p.evaluate(()=>window.__g.SWF().travel('BASE','MEADOW'));log.push(T().toFixed(1)+'s (autopilot: travel hook home after being stuck)')}
    await sleep(150);continue}
   await sleep(150);continue}

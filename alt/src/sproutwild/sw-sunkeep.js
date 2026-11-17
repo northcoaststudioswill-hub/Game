@@ -55,6 +55,8 @@ function wStoryBeats(){wPlotSync();{const cot=SW.buildings.some(b=>b.k==='cottag
   if(cot&&!SW.lessons.cotDay){SW.lessons.cotDay=1;if((SW.day||1)===1)W4.dayT=Math.min(W4.dayT||0,95)}} /* ...and then a good afternoon before the first evening */
  if(SW.party.length&&!SW.lessons.scSend){SW.lessons.scSend=1} /* v9.7: Erin teaches sending a buddy at a tree in the Meadow; no second lesson at home */
  if(SCOFF||state!=='g4world'||W4.scene||swBusy()||(W4.scPend&&W4.scPend.length)||(W4.banner&&W4.banner.t>0))return;const L=SW.lessons;
+ /* v10.1: after the first defeat, Erin says why (Will) */
+ if(L.defeat1===1&&wWhyReady()){L.defeat1=2;scStart([{who:'ERIN',txt:"That one's gone, keeper. The dark had it too deep."},{who:'ERIN',txt:"A buddy you can't show the light stays dark, and a dark buddy keeps the valley dark. Sometimes a battle is the only way to clear it."},{who:'ERIN',txt:"Nobody blames you for it. But catch them when you can. Showing the light is the real job."}],()=>swSave());return}
  /* the first night at home: the fire */
  if(!W4.fld&&W4.sector==='BASE'&&SW.quest>=3&&wDark()>.5&&!L.nightFire){L.nightFire=1;L.night=1;
   scStart([{who:'ERIN',txt:"The sun's going down. Out there the dark is strongest, and the wilds get bolder."},
@@ -63,8 +65,8 @@ function wStoryBeats(){wPlotSync();{const cot=SW.buildings.some(b=>b.k==='cottag
  /* strong enough for the castle */
  const A=FMAPS.SQUIRE.key.A.lv,ld=SW.party[0];
  if(SW.quest>=5&&!SW.badges.length&&ld&&ld.lv>=A-1&&!L.readyCastle&&SW.lessons.scGym){L.readyCastle=1;
-  scStart([{who:'MARCUS',txt:ld.sp+' is Lv'+ld.lv+'! Look at you. Castle time, bro.'},{who:'ERIN',txt:"South through the Meadow to Squire's Woods. Clear the thorns on the gate with LEAF sprouts."}],()=>swSave());return}
- /* the courtyard: the alpha wakes */
+  scStart([{who:'MARCUS',txt:ld.sp+' is Lv'+ld.lv+'! Look at you. Castle time, bro.'},{who:'ERIN',txt:wHasDC()?"South through the Meadow to Squire's Woods. A moat, a thorn gate and a boulder stand in the way.":"Build a BUDDY BARN first: 8 stone, 6 wood. Then south through the Meadow to Squire's Woods."}],()=>swSave());return}
+ /* the courtyard: the guardian wakes */
  const F=W4.fld;if(F&&F.id==='SQUIRE'&&!L.court&&F.alphas&&F.alphas.length&&P3.x>19*FT&&P3.x<27*FT&&P3.y>FT&&P3.y<8*FT){L.court=1;const al=F.alphas[0];
   scStart([{x:al.x,y:al.y+10,hold:1.0},{x:al.x,y:al.y+10,who:'LOUIE',txt:"Shh. It's waking up..."},
    {x:al.x,y:al.y+10,who:'',txt:'STONESQUIRE stirs. Dark pours off it like smoke off a candle.'},
@@ -87,7 +89,7 @@ function wPlotSync(){if(W4.fld||!W4.patchBuds||!W4.patchBuds.length)return;const
  while(W4.patchBuds.length<n){const [x,y]=WPLOTS[W4.patchBuds.length];W4.patchBuds.push({sx:x,sy:y,x,y,type:-1,age:-4,stage:0,mode:'soil',item:false,tx:0,ty:0,dlv:0,seedTy:null,by:null,forPlot:null,bush:null,itemTy:0,t:0});
   if(!SCOFF){W4.floats.push({x,y:y-12,txt:'NEW PLOT',t:1.8,c:'#7ee787'});swSnd(784,.06,1175)}}}
 function wGardenBake(R,B,path){const n=wPlotCount(),K='#14101e';
- R('#5a8a3a',166,328,148,76);path(WW/2-9,324,18,84);                       /* grass bed, and the lane runs through */
+ R('#5a8a3a',166,328,148,76);path(WW/2-13,324,26,84);                       /* grass bed, and the lane runs through */
  const post=(x,y)=>{R(K,x-1,y-1,5,10);R('#6e5233',x,y,3,8);R('#8a6a48',x,y,3,1)};
  for(let x=168;x<310;x+=6){if(x>222&&x<254)continue;R('#8a6a48',x,331,6,2);R('#a87948',x,331,6,1);R('#8a6a48',x,397,6,2);R('#a87948',x,397,6,1)}  /* rails, with gaps for the lane */
  R('#8a6a48',168,331,2,68);R('#8a6a48',310,331,2,68);
