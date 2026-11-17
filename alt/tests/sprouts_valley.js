@@ -1,0 +1,42 @@
+/* Sprouts, the valley update: the bridge, nectar, the golden pear, lantern seeds, buried treasure, saves, and the
+   three functions Sproutwild used to redefine. Stepped (no real-time waits), fresh save.
+   Run from the repo root:  node alt/tests/sprouts_valley.js [build.html] */
+const { chromium } = require('playwright');
+const path = require('path');
+const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/pocket-lantern-alt.html'));
+(async () => {
+  const browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 440, height: 956 } });
+  const errs = []; page.on('pageerror', e => errs.push(e.message));
+  await page.goto('file://' + BUILD + '?dev'); await page.waitForTimeout(500);
+  await page.evaluate(() => document.querySelector('.cart[data-i="0"]').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })));
+  const E = s => page.evaluate(s => __g.ev(s), s);
+  for (let i = 0; i < 60 && (await E('state')) !== 'menu'; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(200); }
+  let fail = 0; const ok = (name, cond, info) => { if (!cond) fail++; console.log((cond ? 'PASS ' : 'FAIL ') + name + (info !== undefined ? '  [' + JSON.stringify(info) + ']' : '')); };
+  const step = (n, dt = 1 / 30) => E(`(()=>{for(let i=0;i<${n};i++){__g.update(${dt});for(const k in __g.keys)__g.prev[k]=__g.keys[k]}})()`);
+  const tp = (tx, ty) => E(`P.x=${tx}*16+8;P.y=${ty}*16+8;P.dx=0;P.dy=-1;LO.x=LO.sx=P.x-18;LO.y=LO.sy=P.y+4;trail=[];buds.forEach(b=>{release(b);b.x=P.x;b.y=P.y+4;b.st='follow'});void 0`);
+  const throwFor = async n => { await E(`keys.a=1;void 0`); await step(n); await E(`keys.a=0;void 0`); };
+  await E(`init();live=true;state='play';npcs[0].st='active';ZONES.forEach(z=>run.seen[z[0]]=1);run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1};found=found.map(()=>true);for(let i=0;i<12;i++)mkBud(i%6,0,P.x,P.y);void 0`);
+  ok('Sprouts keeps its own Louie bubble, garden bed and build screen', await E(`/LO\\.say/.test(String(spSay))&&/p\\.flower/.test(String(drawBed))&&/pjS\\(p\\)/.test(String(drawPjBuild))`));
+  await E(`spSay('WOOF!');void 0`); ok("Louie's bubble is set", (await E('LO.say&&LO.say.s')) === 'WOOF!');
+  ok('the falls are cut off until the bridge is built', await E('gates[5].alive&&fieldL[8*MW+61]<0'));
+  await tp(61, 14); await step(12); ok('a hint explains the bridge', /BRIDGE/.test(await E('msg')), await E('msg'));
+  await throwFor(90); ok('any sprout works on the bridge', (await E('gates[5].on.length')) >= 10, await E('gates[5].on.length'));
+  await step(30 * 14); ok('the bridge gets built and can be walked', await E('!gates[5].alive&&map[11*MW+60]===D&&fieldL[8*MW+61]>0'), await E('msg'));
+  await tp(63, 5); await E(`buds.forEach(b=>b.stage=0);void 0`); await step(4); await throwFor(2); await step(60);
+  ok('nectar blooms the crew', (await E('buds.filter(b=>b.stage===2).length')) === 12, await E('msg'));
+  await tp(66, 8); await step(4); await throwFor(120); const d0 = await E('run.delivered'); let t = 0; for (; t < 90; t++) { await step(30); if (await E('run.delivered') > d0) break; }
+  ok('the golden pear is carried home over the bridge', t < 90, t + ' s'); ok('the lantern throws its seeds', (await E('seeds.length')) > 0, await E('seeds.length'));
+  const n0 = await E('sprouts.length'); await step(45); ok('the seeds land and sprout', await E(`seeds.length===0&&sprouts.length>${n0}`));
+  await E(`run.spark={x:24*16+8,y:19*16+8,i:3,hp:8};digSync();void 0`); await tp(24, 21); await step(4); await throwFor(40);
+  ok('sprouts dig at the buried spot', (await E('DIG.on.length')) > 0, await E('DIG.on.length'));
+  for (t = 0; t < 40; t++) { await step(30); if ((await E('state')) === 'card') break; }
+  ok('the treasure is dug up, carried home and filed', await E(`state==='card'&&meta.trs.includes(3)`), await E('card&&card.title')); await E(`state='play';void 0`);
+  await E(`run.spark={x:24*16+8,y:19*16+8,i:5,hp:.01};digSync();buds[0].tgt=DIG;buds[0].st='work';DIG.on.push(buds[0]);seeds.push({type:2,tx:420,ty:370,t:0});void 0`); await step(2);
+  const sig = `JSON.stringify([sprouts.length+seeds.length,buds.length,items.filter(i=>i.alive).map(i=>i.sub+(i.tri===undefined?'':i.tri)).sort(),gates.map(g=>g.alive)])`;
+  const a = await E(sig); await E(`restore(JSON.parse(JSON.stringify(snap())));void 0`); ok('save and load keep the bridge, a treasure in transit and seeds in the air', a === await E(sig));
+  ok('a save from before this update still loads', await E(`(()=>{init();const o=JSON.parse(JSON.stringify(snap()));delete o.gates.orchardBridge;o.items=o.items.filter(q=>q[0]==='berry'||q[0]==='big'||q[0]==='shard').map(q=>q.slice(0,6));o.run.spark={x:400,y:300,i:1};restore(o);return gates[5].alive&&run.spark.hp===8&&DIG.alive})()`));
+  await E(`newDay();void 0`); ok('nectar blossoms open again in the morning', (await E(`items.filter(i=>i.alive&&i.sub==='nectar').length`)) === 6);
+  await E(`dayT=DAYLEN*.95;void 0`); await E(`__g.draw();void 0`); ok('night draws', true);
+  ok('no page errors', !errs.length, errs);
+  console.log(fail ? fail + ' FAILED' : 'ALL PASS'); await browser.close(); process.exit(fail ? 1 : 0);
+})();

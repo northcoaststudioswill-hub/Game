@@ -13,7 +13,7 @@ A pocket game console in one HTML file, by North Coast Studios. Five game cartri
 
 | # | Game | What it is | Status | Changelog |
 |---|------|-----------|--------|-----------|
-| 1 | **Sprouts** | Pikmin-style garden game: throw sprouts, grow the garden, Louie the dog helps | Stable | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (Sprouts section) and [`v0.35/CHANGELOG.md`](v0.35/CHANGELOG.md) |
+| 1 | **Sprouts** | Pikmin-style garden game: throw sprouts, grow the garden, build a bridge, dig up treasure, Louie the dog helps | **Updated Nov 17 2026 (the valley update)** | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (Sprouts section) and [`v0.35/CHANGELOG.md`](v0.35/CHANGELOG.md) |
 | 2 | **North Coast Knockout** | 2D fighter with Will, Marcus, Erin, King Bibi and friends; supers, cinematics, arcade tower | Paused (between Fable passes) | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) |
 | 3 | **Rootdeep** | Roguelite dungeon crawler | Stable | [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md) |
 | 4 | **Patch & Plate** | Erin's cooking and garden life game | Stable | [`v0.3/CHANGELOG.md`](v0.3/CHANGELOG.md) |
@@ -21,6 +21,9 @@ A pocket game console in one HTML file, by North Coast Studios. Five game cartri
 
 ## Latest updates
 
+- **Sprouts, the valley update (Nov 17 2026):** the valley repainted with real nights, a bridge the sprouts build to a new
+  place (Willow Falls), nectar, treasure that is dug up and carried home, and three fixes for things Sproutwild had broken
+  in Sprouts (garden beds, Louie's bubbles, the project screen). Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
 - **Sproutwild v8.0 (Nov 16 2026):** an opening you earn (Louie's berry lights the Lantern, seeds grow in the
   garden), Erin walks you out and guides your first catch, Ohio-lore starters with a reveal, garden plot crops,
   Data Center, bug collecting, Crooked Hollow, cottage party cinematic.

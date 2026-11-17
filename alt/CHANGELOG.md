@@ -3,6 +3,52 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: the valley update (Nov 17 2026)
+
+Cartridge 1, `src/console.js`. Checked in headless Chromium only; not played on the phone yet.
+
+![The valley update](playtest/sprouts-valley-update.png)
+
+### Fixed: three things Sproutwild had broken in Sprouts
+
+Sproutwild shares the console's scope and declared three functions with the same names as Sprouts', so its versions
+replaced them. Since Sproutwild went in (v7.0 for the garden), in Sprouts:
+- **Erin's garden beds** drew Sproutwild's "GARDEN PLOT" menu over the screen instead of the bed.
+- **Louie's speech bubbles** (WOOF!, BERRY!, FOUND ONE!, GRR! GRUB!) never appeared.
+- **The valley project screen** (Waterworks, greenhouse and the rest) showed Sproutwild's BUILD menu.
+
+Sprouts' own are now `spSay`, `drawBed` and `drawPjBuild`. Sproutwild is untouched.
+
+### More like Pikmin
+- **Build a bridge.** A river now cuts off the north of the Sunny Orchard. Throw sprouts at the stakes (any kind) and they
+  lay it plank by plank. Ranger asks for it after the west crystal (new mission, `r5`).
+- **Willow Falls**, the new place across the bridge: a waterfall and pool, wild Dews and Luckies, berries, bugs, a trail
+  post, and a **golden pear** that needs 8 carrying strength and pays 4 seeds and 10 petals.
+- **Nectar blossoms.** Six in the valley, fresh every morning. Throw one sprout at it and up to 12 nearby sprouts bloom at once.
+- **Buried treasure is dug up and carried home.** The morning sparkle is no longer picked up by walking over it: sprouts
+  dig it out, then haul it to the lantern (2 to 4 strength), where it is filed in the Collection for 20 petals.
+- **The lantern throws its seeds.** Each new seed arcs out of the lantern and plants itself in the soil.
+- **Faster throwing** the longer A is held (5 a second up to 11).
+- Carriers hop when they bring something home. The evening report has a roll call by sprout kind.
+
+### A nicer world
+- The whole valley is repainted: each place has its own ground and trees (sand on the beach, moss and mushrooms in the
+  hollow, fruit trees and fallen petals in the orchard, tall grass and wildflowers in the meadow, a striped lawn in the
+  garden), grass frays into the paths, ponds have banks, foam, lily pads and reeds, and trees are round crowns with trunks
+  that you walk behind at the bottom edge of a field.
+- Flowers, reeds, water and the waterfall move.
+- Night is properly dark, with pools of light at the lantern, the house windows, the trail-post lamps, glowing mushrooms
+  and fireflies. Mornings start warm.
+- Drifting pollen, petals, spores and mist by place, fireflies at dusk, cloud shadows, chimney smoke, birdsong by day and
+  crickets in the evening.
+
+### How it is built
+- The ground is painted once into two animation frames plus a layer drawn over the characters, and repainted when the map
+  changes (68 ms in the test browser). A frame costs about 1.5 ms by day and 2 ms at night there.
+- Saves: old saves load. The bridge starts unbuilt, new blossoms and fruit appear the next morning, and an old sparkle
+  becomes a dig spot. Wild sprouts at the falls only exist in new games.
+- Test: `tests/sprouts_valley.js` (17 checks). Sproutwild's `field-lab.js` still passes 124 of 124.
+
 ## Cartridge 5: Sproutwild fused in (Nov 15 2026)
 
 ALT is now the main line of the game, with five cartridges: Sprouts, Knockout, Rootdeep, Patch & Plate, **Sproutwild**.

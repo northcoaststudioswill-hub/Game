@@ -103,6 +103,20 @@ From [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), still open:
 - Rooms are short (4 to 10 seconds); difficulty untouched until Will has played more.
 - The music is a placeholder synth loop; it needs a William Cohen track.
 
+## Sprouts (cartridge 1, the valley update)
+
+### Fixed Nov 17 2026
+- Erin's garden beds drew a Sproutwild menu, Louie's speech bubbles never showed, and the valley project screen was
+  Sproutwild's (shared function names). All three were broken in every build since Sproutwild joined.
+
+### Not tested in play yet
+- Everything in the valley update on a phone: night darkness, the bridge, nectar, digging, how fast held-A throwing feels.
+- A whole day played by hand. The checks are stepped, plus one short real-time run of pluck, throw and deliver.
+
+### Balance to check
+- The bridge takes 80 sprout-seconds (12 sprouts: about 7 s). Nectar blooms up to 12 sprouts, six blossoms a day.
+- `tests/sprouts_tour.js` still wanders into the house on the berry step and stays there (the bot, not the game).
+
 ## Sprouts and Patch & Plate (cartridges 1 and 4)
 
 - Their William Cohen songs only play on claude.ai; the GitHub Pages copy and downloads are silent for them.
