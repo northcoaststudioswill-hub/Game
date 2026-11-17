@@ -111,7 +111,7 @@ function beamDraw(){const t=W4.beamT||0,cy=Math.round(H/2),K='#14101e',BB=FLOOK[
   if(tt>BEAM[2]-BEAM[1]-.15)r('#ffffff',0,0,W,H)}}
 {const _sb=wStoryBeats;wStoryBeats=function(){_sb();wExpTick(1/60);
  if(SCOFF||state!=='g4world'||W4.scene||swBusy()||(W4.scPend&&W4.scPend.length)||(W4.banner&&W4.banner.t>0))return;const L=SW.lessons;
- if(L.defeat1===2&&!L.soul1){beamStart();return}
+ if(L.defeat1===2&&!L.soul1&&wBeamReady()){beamStart();return}
  if(L.soul1&&!L.soul2&&SW.soulLamp){L.soul2=1;return} /* a v10.5 save already has the lamp */
  if(L.soul1&&!L.soul2&&L.scDab&&wHasRoof()&&!W4.fld&&W4.sector==='BASE'){W4.soulW=(W4.soulW||0)+1/60;if(W4.soulW<25)return;
   L.soul2=1;SW.soulLamp=1;const n=SW.souls||1,K_=SW.keeper||'WILL';

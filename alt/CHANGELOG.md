@@ -3,6 +3,29 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## v11.0: Will's notes after playing to the Bibi scene (Nov 17)
+Pacing
+- Erin's "why" talk now waits until her tutorial is over. It used to land in the middle of it, right after the battle lesson.
+- The King Bibi beam waits for a quiet minute out in the field after that talk. It no longer fires at home, on top of "build the cottage".
+- The lamp scene with Marcus still waits for the cottage and its party.
+
+Kiss
+- He does not appear until the tutorial is done, and he has moved from the Meadow's north gate to the south road, by the way to the castle. His tip is now about LEAF sprouts and the thorn gate.
+
+Travel
+- Going from one area to another plays a short side-on scene (under 3 seconds, A skips): the place you are going, its name, and the keeper walking in with up to four of your sprouts. No buddies in it, on purpose.
+- Landmarks so far: the Lantern tree (Sunkeep), houses (Lantern Town), the castle (Squire's Woods), crooked trees (the Hollow), the pond and tall grass (the Meadow). Other areas get plain trees for now.
+
+Rooms
+- The three houses in Lantern Town open: the baker's, the gym goer's, the sprout lover's. Walk in, look at things with A, leave by the mat or B. They do nothing else yet. This replaces the "KNOCK" one-liners.
+
+Sunkeep
+- The well, notice board, benches, flower beds and pond are solid. You used to walk straight through all of them.
+- The road from the Lantern to the south gate is wider with a paved middle, lamp posts that light at dusk, and stone gate posts where it leaves for the Meadow.
+
+Checked: field lab; real-time at 430x932: five travel scenes, all three rooms, Kiss's new spot, Sunkeep top to bottom.
+Not checked yet: the new pacing from a fresh save (a run is going), and old saves.
+
 ## v10.6: King Bibi beams it in (Will, Nov 17)
 The soul story is now two beats, spaced apart, so it no longer lands on top of "build the cottage".
 - Beat 1, right after your first kill and Erin's "why": a cut-in in the style of the HASBARA super in Knockout. Here it is KING BIBI at the desk inside the Iron Dome, and the target on his screen is the keeper. "The little keeper is asking why. Give him an answer. Make it feel like his own." A beam crosses the night into the keeper's head: AN IDEA! Then the keeper: "What if their light isn't lost? What if somebody could keep it?" Erin: "Where did that come from?" "My own head. Obviously." About 7 seconds; START skips it.
