@@ -19,6 +19,11 @@ A pocket game console in one HTML file, by North Coast Studios. Five game cartri
 | 4 | **Patch & Plate** | Erin's cooking and garden life game | Stable | [`v0.3/CHANGELOG.md`](v0.3/CHANGELOG.md) |
 | 5 | **Sproutwild** | Creature collector: Pikmin + Palworld + Pokemon, set in an Ohio-lore valley | **In active development (v8.0)** | [`alt/src/sproutwild/CHANGELOG.md`](alt/src/sproutwild/CHANGELOG.md) |
 
+## Play everything: North Coast Arcade
+
+One page with a Play button for the newest build of every game (Starhaven, Pocket Lantern, Below the Sun):
+[`arcade/`](arcade/README.md).
+
 ## Also from North Coast Studios: Starhaven
 
 A separate game, not a cartridge: **Starhaven**, a fae-court action RPG for phones. Its own page, with how to play and

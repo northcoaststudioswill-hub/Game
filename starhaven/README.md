@@ -8,7 +8,7 @@ landscape on a phone (touch or a Bluetooth controller) or in any browser. All ch
 > veins and a bond to him she can finally feel. Now Spring is at war with Dusk over her, the Iron King is coming from
 > across the sea, and the stolen powers of seven courts are waking up inside her.
 
-**Play it:** download [`game/starhaven.html`](game/starhaven.html) and open it in a browser, or use the shared Claude
+**Play it:** from the North Coast Arcade page ([`arcade/`](../arcade/README.md)), or download [`game/starhaven.html`](game/starhaven.html) and open it in a browser, or use the shared Claude
 link Will has. Hold your phone sideways.
 
 > **New here?** Read this page, then [`STORY.md`](STORY.md) (what happens, chapter by chapter) and
