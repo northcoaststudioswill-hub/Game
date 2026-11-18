@@ -7,7 +7,7 @@ const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a), 
 const st = () => ev(() => ({ mode: BTS.G.mode, cine: BTS.Cutscene.active, panel: BTS.Cutscene.panel && BTS.Cutscene.panel.id, brawl: BTS.Brawl.active, bc: !!BTS.Brawl.cine, ph: BTS.Brawl.phase, dlg: BTS.Dialogue.active, fade: BTS.Fade.a, card: !document.querySelector('#card').classList.contains('hidden') }));
 await page.goto(new URL('../index.html', import.meta.url).href + ''); await wait(600); await page.keyboard.press('Enter');
 for (let i = 0; i < 100 && !(await ev(() => BTS.G.mode === 'opening')); i++) await wait(100);
-await wait(46000); console.log('opening ran out ->', JSON.stringify(await st())); await shot('title');
+for (let i = 0; i < 300 && (await ev(() => BTS.G.mode === 'opening')); i++) await wait(500); console.log('opening ran out ->', JSON.stringify(await st())); await shot('title');
 await ev(() => { BTS.UI.clear(); BTS.Game.newGame(); }); await wait(600); console.log('card', JSON.stringify(await st())); await shot('card');
 await wait(3800); console.log('ff1 cine', JSON.stringify(await st()));
 for (let i = 0; i < 4; i++) { await page.keyboard.press('KeyE'); await wait(500); } await wait(1800); console.log('ff1 fight', JSON.stringify(await st()));

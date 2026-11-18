@@ -1,5 +1,11 @@
 # SOOTBORN — changelog
 
+## v0.12.3 · 2026-11-18 — light, and more rage
+- **Bloom**: the 3D scenes now render through a glow pass. Anything that gives off light (blades, gold trim, fire, the sun, sword ribbons, sparks) bleeds into the picture around it, with a soft vignette at the edges. Rendered slightly above screen resolution to keep edges clean. `#nopost` in the URL turns it off.
+- **Rage you can see on the ground**: from about half fury the earth under Kael scorches and splits into glowing cracks that grow with the bar; the hem of his cape catches; the whole picture tints red and the vignette closes in.
+- **Rage kills**: finishing an enemy with fury at 60 or more drops into slow motion, tilts the camera and throws the body further.
+- Kael wears Seren's washer on a cord at his chest.
+
 ## v0.12.2 · 2026-11-18 — more polish above ground
 - **Animation**: Kael stands hunched and breathing hard at full fury, blade low; enemies facing him then raise their guard and back off. On a win he sinks over his sword while his allies raise theirs. The dodge rolls in the direction of travel. Cutscene figures can raise a blade or kneel (the cadets chanting after the valley; Lucan on one knee after the duel).
 - **Fighting**: press strike during a dodge for a dash strike that closes distance and hits hard. Damage numbers pop off every hit. Clash now needs a deliberate, well-timed strike: a mashing bot was triggering it constantly and winning the last Ember Ring bout without taking a hit, which the test run caught.
