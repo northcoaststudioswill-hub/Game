@@ -149,7 +149,16 @@ function makeAccredited(o) {
       if (o.crown) { R(4, 1, 8, 1, trim); R(7, 0, 2, 1, trim); R(7, 1, 2, 1, '#ffffff'); }
     }
   }
-  for (let f = 0; f < 3; f++) { g.save(); g.translate(f * 16 + 16, AH * 3); g.scale(-1, 1); g.drawImage(c, f * 16, AH * 2, 16, AH, 0, 0, 16, AH); g.restore(); }
+  if (o.band) for (let d = 0; d < 3; d++) for (let f = 0; f < 3; f++) { // Kael: built by hand, not by the template
+    const ox = f * 16, oy = d * AH, R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(ox + x, oy + y, w, h); }, ram = '#a87a3a', ramD = '#6a4a22';
+    if (d === 0) { R(2, 8, 3, 3, trim); R(11, 8, 3, 3, trim); R(2, 8, 3, 1, '#fff2c0'); R(11, 8, 3, 1, '#fff2c0'); R(2, 11, 2, 1, shade(trim, .7)); R(12, 11, 2, 1, shade(trim, .7)); // pauldrons
+      R(5, 4, 6, 1, shade(sk, .8)); R(6, 5, 1, 1, '#ffd24a'); R(9, 5, 1, 1, '#ffd24a'); R(5, 6, 1, 2, shade(sk, .86)); R(10, 6, 1, 2, shade(sk, .86)); R(7, 8, 2, 1, shade(sk, .74)); R(10, 4, 1, 3, '#b86a5a'); // brow, gold eyes, jaw, the scar
+      R(5, 1, 6, 1, shade(hair, 1.2)); R(4, 3, 1, 2, shade(hair, .8)); R(11, 3, 1, 2, shade(hair, .8)); R(7, 10, 2, 1, '#8a8478'); R(7, 11, 2, 2, '#c8a45a'); R(7, 11, 1, 1, '#fff2c0'); // hair light, the washer on its cord
+      R(12, 14, 2, 4, ram); R(12, 14, 2, 1, '#e8c25a'); R(12, 17, 2, 1, ramD); R(4, 15, 8, 1, shade(arm, .78)); R(5, 22, 2, 1, trim); R(9, 22, 2, 1, trim); }
+    else if (d === 1) { R(2, 8, 3, 3, trim); R(11, 8, 3, 3, trim); R(2, 8, 3, 1, '#fff2c0'); R(11, 8, 3, 1, '#fff2c0'); R(5, 1, 6, 1, shade(hair, 1.2)); R(7, 3, 2, 4, shade(hair, .8)); R(2, 14, 2, 4, ram); R(2, 14, 2, 1, '#e8c25a'); if (o.cape) { R(4, 10, 8, 1, shade(o.cape, 1.3)); R(6, 12, 1, 11, shade(o.cape, .8)); R(9, 13, 1, 10, shade(o.cape, .8)); } }
+    else { R(5, 8, 5, 3, trim); R(5, 8, 5, 1, '#fff2c0'); R(6, 4, 3, 1, shade(sk, .8)); R(6, 5, 1, 1, '#ffd24a'); R(5, 6, 1, 2, shade(sk, .86)); R(6, 1, 5, 1, shade(hair, 1.2)); R(9, 4, 2, 3, shade(hair, .8)); R(6, 14, 2, 4, ram); R(6, 14, 2, 1, '#e8c25a'); R(6, 17, 2, 1, ramD); R(5, 22, 3, 1, trim); if (o.cape) { R(10, 11, 1, 12, shade(o.cape, .8)); } }
+  }
+  for (let f = 0; f < 3; f++) { g.clearRect(f * 16, AH * 3, 16, AH); g.save(); g.translate(f * 16 + 16, AH * 3); g.scale(-1, 1); g.drawImage(c, f * 16, AH * 2, 16, AH, 0, 0, 16, AH); g.restore(); }
   outline(c, '#3a2e1a', 16, AH);
   c.fh = AH; c.glow = 1; return c;
 }

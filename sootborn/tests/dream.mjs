@@ -28,5 +28,6 @@ const W = process.env.W || 'd1';
 if (W === 'd1') await run('Story beats', 'End of Day 1', 'd1', 260);
 if (W === 'd2') await run('Story beats', 'End of Day 2', 'd2', 200);
 if (W === 'fall') await run('Fights', 'The Fall', 'fall', 120);
+if (W === 'd3') await run('Story beats', 'Day 3', 'd3', 320);
 if (W === 'valley') await run('Fights', 'The Valley', 'val', 120);
 await browser.close();

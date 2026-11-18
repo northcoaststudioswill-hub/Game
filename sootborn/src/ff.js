@@ -13,7 +13,7 @@ const cu = (x, y, s0, s1, dx) => ({ cam: [x + (dx || 0), y + 200 / s0, 54, 200],
 const FIELD = { kind: 'rect', w: 250, h: 120 }, V = ['cadv1', 'cadv2'], TL = ['cadt1', 'cadt2'];
 const FF = {
   valley: () => ({
-    title: 'THE ASSAY', sub: 'HOUSE VIOLET - HOLD THE VALLEY', bg: 'valley', arena: FIELD, music: 'battle', rage: 1, legend: 1, foeName: 'House Teal', winText: 'THE VALLEY HOLDS',
+    era: 3, title: 'THE ASSAY', sub: 'HOUSE VIOLET - HOLD THE VALLEY', bg: 'valley', arena: FIELD, music: 'battle', rage: 1, legend: 1, foeName: 'House Teal', winText: 'THE VALLEY HOLDS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 40 }, allies: V, shouts: ['FOR VIOLET!', 'WITH HIM!', 'PUSH!'],
     waves: [[{ id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 6 }, { id: 'cadt2', name: 'Teal', kind: 'cadet', hp: 6 }, { id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 6 }, { id: 'cadt2', name: 'Teal', kind: 'lancer', hp: 7 }],
       [{ id: 'cadt2', name: 'Teal', kind: 'lancer', hp: 8 }, { id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 7 }, { id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 7 }, { id: 'cadt2', name: 'Teal', kind: 'lancer', hp: 8 }, { id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 7 }]],
@@ -39,7 +39,7 @@ const FF = {
     ]
   }),
   ford: () => ({
-    title: 'THE FORD', sub: 'SINGLE COMBAT FOR THE CROSSING', bg: 'ford', arena: FIELD, music: 'dusk', rage: 2, legend: 1, skip: 1, winText: 'THE FORD IS OURS',
+    era: 2, fin: { name: 'THE CROSSING', l1: 'ELEVEN STEPS ACROSS A RIVER', l2: 'I NEVER LEARNED TO SWIM', rgb: '120,200,255' }, title: 'THE FORD', sub: 'SINGLE COMBAT FOR THE CROSSING', bg: 'ford', arena: FIELD, music: 'dusk', rage: 2, legend: 1, skip: 1, winText: 'THE FORD IS OURS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 45 }, taunt: { 0: ['WHO TRAINED YOU?', 'YOU FIGHT LIKE A MINER!', 'YIELD, BOY!'] },
     voice: { at: [[1, 'VANT IS THE BEST BLADE IN HOUSE TEAL. HE HAS NEVER ONCE BEEN HUNGRY.'], [11, 'MARA USED TO SAY: AIM IT UP, NOT SIDEWAYS. I AM AIMING, MARA.'], [26, 'EVERY NIGHT I WASH THE GOLD OFF MY HANDS AND CHECK THAT THE SOOT IS STILL THERE.']],
       hurt: 'HE HITS LIKE A PROCTOR. I HAVE BEEN HIT BY PROCTORS.', fury: 'I DO NOT GET ANGRY UP HERE. I WAS ALREADY ANGRY WHEN I ARRIVED.', eleven: 'ONE FOR EVERY SECOND.', half: 'HE IS AFRAID NOW. NOBODY EVER TAUGHT THEM WHAT TO DO WITH THAT.' },
@@ -58,7 +58,7 @@ const FF = {
     ]
   }),
   keep: () => ({
-    boots: 1, title: 'THE KEEP', sub: 'LUCAN AUREL - LAST DAY OF THE ASSAY', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, endAt: 0.3, winText: 'YIELD.',
+    era: 4, newMove: 'NEW: THE BOOTS - HOLD JUMP TO FLY', fin: { name: 'IRON SKY', l1: 'THEY BUILT THE BOOTS TO STAY ABOVE US', l2: 'I BROUGHT THE GROUND WITH ME', rgb: '140,220,255', mode: 'sky' }, boots: 1, title: 'THE KEEP', sub: 'LUCAN AUREL - LAST DAY OF THE ASSAY', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, endAt: 0.3, winText: 'YIELD.',
     hero: { id: 'kael2', hp: 9, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['YOU ARE ANGRY AT SOMEONE.', 'MOTHER WOULD LIKE YOU.', 'WHAT ARE YOU?', 'WHO WAS SHE?'] },
     voice: { at: [[1, 'LUCAN AUREL. HER SON. HER CHIN, HER HANDS, HER WAY OF LOOKING PAST YOU.'], [12, 'HE HAS BEEN BETTER THAN EVERYONE HIS WHOLE LIFE. IT HAS MADE HIM SLOW.'], [20, 'SHE IS WATCHING FROM THE DAIS. SHE DOES NOT KNOW MY FACE. SHE MADE IT.'], [34, 'SHE CALLED SEREN LITTLE EMBER. I WONDER WHAT SHE CALLS HIM.']],
       hurt: 'HE DID NOT LIGHT THE FURNACE. I KNOW. I KNOW.', fury: 'BE TOO MUCH FOR THEM, SHE SAID.', eleven: 'ELEVEN. FOR THE DOORS. FOR THE WASHER ON HER FINGER.', half: 'I COULD KILL HIM. THAT IS NOT WHAT I CAME UP HERE FOR.' },
@@ -77,7 +77,7 @@ const FF = {
   }),
   // the first night: two sealed in, one comes out a cadet
   pairing: () => ({
-    title: 'THE PAIRING', sub: 'TWO GO IN. ONE COMES OUT A CADET.', bg: 'cell', arena: { kind: 'ring', rx: 96, ry: 58 }, music: 'dusk', rage: 0, legend: 1, skip: 1, winText: 'ONE COMES OUT',
+    era: 2, newMove: 'NEW: BREACH - GUARD + JUMP', title: 'THE PAIRING', sub: 'TWO GO IN. ONE COMES OUT A CADET.', bg: 'cell', arena: { kind: 'ring', rx: 96, ry: 58 }, music: 'dusk', rage: 0, legend: 1, skip: 1, winText: 'ONE COMES OUT',
     hero: { id: 'kael2', hp: 8, pow: 1, blade: 1, fury0: 10 }, taunt: { 0: ['I DO NOT WANT TO.', 'PLEASE.', 'WHO IS THIS FOR?'] },
     foes: [{ id: 'teo', name: 'Teo Aldane', kind: 'cadet', hp: 30 }],
     voice: { at: [[1, 'HE SHARED HIS BREAD ON THE LIFT UP. HE ASKED ABOUT MY FAMILY. I LIED WELL.'], [13, 'HE IS NOT BAD AT THIS. SOMEBODY LOVED HIM ENOUGH TO PAY FOR LESSONS.'], [26, 'UP IN THE GALLERY THEY ARE KEEPING SCORE.']],
@@ -85,7 +85,7 @@ const FF = {
     arts: [{ at: .5, name: 'HER NAME', line: 'SHE WALKED INTO THE FURNACE SO FORTY CHILDREN COULD BREATHE. I AM DOING THIS FOR HER. I AM.', panel: 'furnace', kind: 'rise', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }],
     intro: [
       { d: 3.0, cam: [0, 250, 170, 150, .16], to: [0, 150, 66, 150, .3], acts: [{ id: 'kael2', a: [-38, 4], fx: 1, fy: 0, blade: 1 }, { id: 'teo', a: [38, 4], fx: -1, fy: 0, blade: 1 }], big: 'THE PAIRING', cap: 'THE ASSAY. THE FIRST NIGHT. THEY SEAL US IN BY TWOS.' },
-      { d: 2.4, ...cu(38, 4, 1.8, 2.4, 16), acts: [{ id: 'teo', a: [38, 4], blade: 1 }], cap: 'TEO ALDANE. HE SHARED HIS BREAD ON THE LIFT UP. HE IS SIXTEEN.' },
+      { d: 2.4, ...cu(38, 4, 1.8, 2.4, 16), acts: [{ id: 'teo', a: [38, 4], blade: 1 }], cap: 'TEO ALDANE. HE SHARED HIS BREAD ON THE LIFT UP. HE IS THE YOUNGEST ONE HERE.' },
       { d: 2.4, cam: [0, 130, 30, 150, .5], to: [0, 150, 26, 150, .62], acts: [{ id: 'kael2', a: [-38, 4], fx: 1, fy: 0, blade: 1 }, { id: 'teo', a: [38, 4], fx: -1, fy: 0, blade: 1 }], cap: 'A VOICE FROM THE GALLERY: ONE OF YOU LEAVES THIS ROOM A CADET.' },
       { d: 2.0, ...cu(-38, 4, 1.9, 2.7, -14), flash: 1, sfx: 'heart', acts: [{ id: 'kael2', a: [-38, 4], blade: 1, aura: 1 }], cap: 'I DID NOT COME UP HERE TO BE KIND.' }
     ],
@@ -97,7 +97,7 @@ const FF = {
   }),
   // day thirty-one: nobody touches a Proctor
   proctor: () => ({
-    title: 'THE PROCTOR', sub: 'HALDEN VOSS - NOBODY TOUCHES A PROCTOR', bg: 'storm', arena: FIELD, music: 'duel', rage: 3, legend: 1, skip: 1, winText: 'HE BLEEDS',
+    era: 3, newMove: 'NEW: SHAFT DROP - JUMP, THEN JUMP AGAIN', fin: { name: 'THE RECKONING', l1: 'THEY CAME DOWN TO COUNT US', l2: 'I AM STILL COUNTING', rgb: '255,240,200' }, title: 'THE PROCTOR', sub: 'HALDEN VOSS - NOBODY TOUCHES A PROCTOR', bg: 'storm', arena: FIELD, music: 'duel', rage: 3, legend: 1, skip: 1, winText: 'HE BLEEDS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['I GRADE YOU, BOY.', 'YOU WILL BE UNMADE FOR THIS.', 'WHAT ARE YOU?'] },
     foes: [{ id: 'voss', name: 'Proctor Voss', kind: 'warden', hp: 130, sc: 1.28 }],
     voice: { at: [[1, 'THE PROCTORS ARE MEANT TO WATCH. THIS ONE HAS BEEN SELLING OUR POSITIONS TO HOUSE TEAL.'], [14, 'HE FIGHTS LIKE A MAN WHO HAS ONLY EVER HIT PEOPLE WHO WERE NOT ALLOWED TO HIT BACK.'], [30, 'I KNOW THAT KIND OF MAN. I GREW UP UNDER THEIR BOOTS.']],
@@ -116,7 +116,7 @@ const FF = {
   }),
   // nine years on: the war comes down out of the sky
   fall: () => ({
-    boots: 1, lurch: 1, title: 'THE FALL', sub: 'THE SUN SPIRE - HOLD THE DECK UNTIL WE HIT', bg: 'fall', arena: FIELD, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Spire Guard', winText: 'THE DECK IS OURS', endAt: .25,
+    era: 5, newMove: 'NEW FINISHER: EVERY BREATH - IT REACHES THE WHOLE DECK', fin: { name: 'EVERY BREATH', l1: 'EVERY BREATH I TAKE IS HERS', l2: 'I SPEND THEM ALL HERE', rgb: '255,224,138', mode: 'all' }, boots: 1, lurch: 1, title: 'THE FALL', sub: 'THE SUN SPIRE - HOLD THE DECK UNTIL WE HIT', bg: 'fall', arena: FIELD, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Spire Guard', winText: 'THE DECK IS OURS', endAt: .25,
     hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 60 }, allies: V, shouts: ['BELOW!', 'WITH HIM!', 'FOR TIER SIX!'], taunt: { 0: ['HE IS SOOT!', 'CUT THE LINES!', 'BRING IT DOWN!'] },
     waves: [[{ id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }],
       [{ id: 'cade', name: 'Marshal Cade', kind: 'captain', hp: 150, sc: 1.25 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }]],
@@ -140,7 +140,7 @@ const FF = {
   }),
   // the dream of the training years: fought below, the old way
   drill: () => ({
-    title: 'THE DRILL', sub: 'BRAND - THREE YEARS OF THIS', bg: 'pit', arena: { kind: 'ring', rx: 96, ry: 44 }, music: 'work', legend: 1, skip: 1, winText: 'AGAIN TOMORROW',
+    era: 1, newMove: 'NEW: THE RAM (HOOK BUTTON, UP CLOSE) AND WIDE CUT (GUARD + STRIKE)', fin: { name: 'BANKED', l1: 'BRAND SAYS: DO NOT SPEND IT ALL', l2: 'I KEEP SOME BACK', rgb: '255,170,70', mode: 'bank' }, title: 'THE DRILL', sub: 'BRAND - THREE YEARS OF THIS', bg: 'pit', arena: { kind: 'ring', rx: 96, ry: 44 }, music: 'work', legend: 1, skip: 1, winText: 'AGAIN TOMORROW',
     hero: { id: 'kael2', hp: 9, pow: 1, blade: 1, fury0: 20 }, taunt: { 0: ['AGAIN.', 'YOU FIGHT LIKE SOOT.', 'THEY WILL NOT WAIT FOR YOU.', 'STAND UP TALLER.'] },
     foes: [{ id: 'brand', name: 'Brand', kind: 'baton', hp: 44 }],
     voice: { at: [[1, 'BRAND WAS A WARDEN UNTIL THEY ORDERED HIM TO PUT A HALBERD THROUGH A CHILD FOR HUMMING.'], [12, 'HE KNOWS HOW THEY FIGHT BECAUSE HE WAS PAID TO DO IT TO US.'], [24, 'THE NEW LEGS ARE TOO LONG. EVERY STEP LANDS A HAND FURTHER THAN I MEAN IT TO.']],
@@ -182,7 +182,7 @@ if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.d
 { const i = PROLOGUE_B.findIndex(s => s.card === 'SOOTBORN'); if (i >= 0) PROLOGUE_B.splice(i, 0,
   { narr: 'The shift song has no words, because words cost breath. You hum it through your teeth to keep time on a valve wheel, forty people turning as one. It is older than the Authority. It was the one thing down here nobody had thought to ration.' },
   { narr: 'After that night the Authority put it on the tier speakers. Every bell. Slowed down, played on their own bright instruments.' },
-  { narr: 'So that whenever we heard our own song, we would see the doors close. Nobody on Tier Six has hummed it since.' });
+  { narr: 'So that whenever we heard our own song, we would see the doors close. Hardly anybody on Tier Six has dared to hum it since.' });
   const j = PROLOGUE_B.findIndex(s => s.narr && /starts to hum the shift song/.test(s.narr)); if (j >= 0) PROLOGUE_B.splice(j + 1, 0, { narr: 'It is the only goodbye we are allowed. Speaking at a commitment is forbidden. Nobody ever wrote a rule about humming.' }); }
 if (!NOFF) { const i = PROLOGUE_B.findIndex(s => s.card === 'SOOTBORN'); if (i >= 0) PROLOGUE_B.splice(i, 0, { fade: 'out' }, { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The first night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.pairing() }, { card: 'FOUR YEARS EARLIER', sub: 'Cinderwell. The morning after the furnace.', big: 1, min: 1.6, max: 5 }); }
 // ---- the dreams: what happens between the fights, told below, the old way
@@ -196,7 +196,7 @@ const DREAM1 = () => [
   { narr: 'They call it gilding. They do it to their own children at twelve: gold wire run into the long bones so they grow tall, gold in the eye so they can stand the sun.' },
   { narr: 'Done to a grown man it takes nine months on a table, and most of his voice.' },
   { pstage: 2 }, { wait: 1.6 },
-  { narr: 'I went onto the table a valve tech. I came off it a head taller, and had to learn to walk.' },
+  { narr: 'I went onto the table a valve tech. I came off it a head taller, with a face my own mother would walk past, and had to learn to walk.' },
   { pstage: 3 }, { wait: 0.8 },
   { say: 'ilse', t: 'Now the mouth. You sound like Tier Six every time you open it. Tell me you are grateful.' },
   { say: 'kael', t: 'Ta. ...Thanks.' },
@@ -220,7 +220,7 @@ const DREAM1 = () => [
 const DREAM2 = () => [
   { card: 'THAT NIGHT', sub: 'The dream again. It is getting longer.', min: 1.4, max: 4 },
   { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
-  { narr: 'The Assay. Every year the Accredited put their seventeen-year-olds into a walled valley with real steel and no rule that matters, and wait to see who walks out leading the rest.' },
+  { narr: 'The Assay. Every year the Accredited put their heirs, the year they come of age, into a walled valley with real steel and no rule that matters, and wait to see who walks out leading the rest.' },
   { pstage: 1 }, { wait: 2.2 },
   { narr: 'Twelve Houses. Twelve standards. Take another House\'s standard and its cadets are yours. Take the keep on the ridge and it is over.' },
   { pstage: 2 }, { wait: 1.4 },
@@ -229,6 +229,7 @@ const DREAM2 = () => [
   { narr: 'The Proctors watch from the dais and write it all down. The winner is not given a prize. He is given a post: the Spire, the Array, the count of who breathes.' },
   { narr: 'That is why I am up here. I did not come to win their game. I came to be handed the keys.' },
   { narr: 'Lucan Aurel holds the keep. Her son. If I put him on his knees in front of her, she will have to pin the gold on me herself.' },
+  { narr: 'She sat across a white room from me twice a week for half a year. She will look straight at what Ilse made of me and see one of her own.' },
   { fade: 'out' }, { panel: null }
 ];
 const DREAM3 = () => [

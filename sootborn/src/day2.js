@@ -378,7 +378,8 @@ barks = function (id) {
 };
 function D2OBJ() {
   if (G.heist === 2) return "Hang her lantern on the Pillar, unseen";
-  if (F('day2Done')) return "Day 3 isn't built yet — explore freely";
+  if (F('day3Done')) return "Day 4 isn't built yet — explore freely";
+  if (F('day2Done')) return "Day 3 plays from the end of Day 2 (or the Dev menu) — explore freely";
   if (!F('d2Tavi')) return 'Talk to Tavi';
   if (!F('mara2')) return G.mapId === 'bay' ? 'Report to Mara' : 'Report to Mara in Bay 3 (east, through the square)';
   if (!F('fuseDone')) return G.mapId === 'fuse' ? 'Balance the breaker panel' : 'Fuse Room C: the door on the north wall of Bay 3';
@@ -506,7 +507,7 @@ function festB() {
         { narr: 'Sull gets three steps. Then Hollis is in front of him, bad arm and all. Then Bao. Then, after a breath, Marrow. Three people. It is not a wall. It is enough to make him stop.' }]
       : [{ move: 'mara', to: [13, 9], spd: 40, wait: true }, { narr: 'Sull gets three steps before Mara is in front of him. Just Mara. Arms folded. Forty years of forewoman in her face.' }, { say: 'mara', t: "It's a lantern, Proctor. On First Fire. Write that down and see how it reads." }]),
     { narr: 'And from somewhere in the back, low, through closed teeth: the shift song.' },
-    { narr: 'For a year they have played it at us through the speakers at every bell, so it would mean the furnace. Nobody has dared to hum it. Tonight the tier takes it back.' },
+    { narr: 'For forty-two days they have played it at us through the speakers at every bell, so it would mean the furnace. Tonight the tier takes it back.' },
     F('sullTip') ? { say: 'proctor', t: "...One candle-hour. It's licensed for one candle-hour. Then it comes down." } : F('sullWar') || F('beatSull') ? { say: 'proctor', t: "Brennick. I've got your name spelled right. You hear me? I've got it spelled RIGHT." } : { say: 'proctor', t: "It comes down at first bell. I'll scrub the light off the stones if I have to." },
     F('sullTip') ? { narr: 'He says it loudly, for the record. Then he turns his back on it, and stands guard over the wrong side of the square for exactly one hour.' } : { narr: 'He does not climb. Not with four hundred people humming. He stands under her sun with his whistle in his fist and does not blow it. You can see what that costs him. You enjoy it more than you should.' },
     { move: 'kael', to: [11, 7], spd: 26 }, { move: 'tavi', to: [10, 7], spd: 50, wait: true }, { pan: [11, 7], dur: 1 }, { zoom: 2.6 },

@@ -1,5 +1,58 @@
 # SOOTBORN — changelog
 
+## v0.15 · 2026-11-18 — Day 3, moves that grow with the story, cutscenes in the Dev menu
+From play notes: how many more days below, and can the game run longer with new content; put cutscenes in the Dev menu; new moves, finishers and flashbacks as he advances; the 2D fight as gilded Kael looks awkward and Kael's sprite needs work.
+
+**How long is the part below?** Four days, then he leaves. Days 1 and 2 existed. **Day 3 is new.** Day 4 (the months of being "boring", and going out through the old tunnel to Ilse) is the last one and is not built. The years after keep arriving the way they do now: a dream each night, and the fights.
+
+**Day 3 — The Ledger** (new, about 10 minutes, plays from the end of Day 2)
+- Told as an illustrated chapter: panels, dialogue, three choices, one fight, one dream.
+- Vale at first bell with the ledger. Carry it or refuse; either way Kael goes up, because nobody down there is offered a choice.
+- **Lift Zero from the inside.** Nine minutes, nine floors, not six.
+- **Celestine, alone.** She knows it was his hands on the wheel. She knew at the furnace. "Little ember." She wants him twice a week to teach her engineers what a valve is.
+- **The window.** The sky is blue. The surface did not burn, or stopped a long time ago.
+- **Dace, under the floor.** Alive, fed by Sable through the Freight Three grating. The Unlit get a name and members (Hollis, Nell and her cold crates, Sable). A woman who can make him look like them will find him when the watching stops.
+- **Under the Floor** (new 2D fight): a Warden comes down the hatch. Kael and Dace put him on the ground. The first time one of them goes down. Memory Art: THREE STEPS.
+- **Dream:** the day he arrives at the Assay.
+- Two new panels: the upper landing with its window, and the old tunnel with the chalk suns.
+
+**Moves and finishers follow the story**
+- What Kael can do now depends on when the fight is:
+  - Below (the Ember Ring, the Warden): fists, kicks, the boot, guard and parry, hook line, headbutt, roar.
+  - Training (the Drill): adds the ram and Wide Cut.
+  - Early Assay (the Pairing, the Ford): adds Breach.
+  - Late Assay (the Proctor, the Valley): adds Shaft Drop.
+  - Last day (the Keep): adds the boots.
+  - The Fall: everything.
+- Each fight that teaches something says so in its opening tips ("NEW: ...").
+- **Finishers** change too. It is always eleven blows; the name, the lines and the last hit differ:
+  - ELEVEN (below, the Pairing, the Valley)
+  - BANKED (the Drill): he keeps a third of his fury afterwards
+  - THE CROSSING (the Ford)
+  - THE RECKONING (the Proctor)
+  - IRON SKY (the Keep): the last blow throws the enemy into the air and Kael goes up after him
+  - EVERY BREATH (the Fall): the last blow reaches every enemy on the deck
+- Memory Arts were already different in every fight; Day 3 and the Drill add two more.
+
+**2D fights**
+- The moves added in the last two versions had no 2D animation, which is why gilded Kael looked stiff in the Drill. Every one now has its own body motion: a leg that actually kicks, the ram arm with its flash, the hook line as a rope, a low thrust for Breach, a spin for Wide Cut, the guard, the roar with rings, the plunge.
+- Kael's gilded sprite redrawn by hand over the cadet template: pauldrons, brow and jaw, gold eyes, the scar, lit hair, the washer on its cord, the bronze ram on his off hand, cape folds.
+
+**Dev menu**
+- New **Cutscenes** list: opening film, both halves of the prologue, Last Bell, First Fire, all four dreams, Day 3 without its fight, and the intro and outro films of all six Assay fights.
+- Fights list adds Under the Floor; Story beats adds Day 3.
+
+**Lore pass** (read back through everything added today)
+- The festival line said the speakers had played the shift song "for a year". The furnace was forty-two days before the festival; fixed.
+- "Nobody has hummed it since" contradicted Hollis planning to hum; now "hardly anybody has dared".
+- The Assay was described as for seventeen-year-olds while Teo was sixteen and Kael is a grown man; now "their heirs, the year they come of age", and Teo is "the youngest one here".
+- Why Celestine does not know him at the Keep after seeing him twice a week: the gilding gives him "a face my own mother would walk past", and the Assay dream says so outright.
+- Day 3 no longer assumes Kael ran for Seren at the furnace. If he stood still, the Warden fight's narration and its Memory Art (STOOD STILL instead of THREE STEPS) say that instead.
+- Celestine's "granted, not aye" line no longer corrects something he did not say.
+- Lift Zero in Day 3 is now drawn from Kael's side: the open doors with nobody in them, then the inside of the car with a level counter. Celestine is drawn as a figure in her room instead of a glow.
+
+**Not tested by a person:** Day 3's pacing and length, the era gating (a move you had in the Valley is not there in the Pairing, by design), and the new finishers' feel.
+
 ## v0.14 · 2026-11-18 — harder, more moves, boots, dreams, and a look further ahead
 From play notes: fights far too easy; more abilities, especially by the last fight (boots); strong and weak kicks and a special punch; the card after the first fight was confusing; explain more before the first fight; fights beyond the Assay, bigger and off the ground; more 2D fights like the early game, especially the training years; how the Accredited talk; the humming was confusing; the first stealth room does not say where to go; show what happens between the fights, in the game's own 2D style.
 

@@ -1,0 +1,94 @@
+// SOOTBORN — Day 3: The Ledger. Told as an illustrated chapter: panels, choices, one fight under the floor, and a dream.
+// It closes the hooks Day 2 left open (the ledger, what Celestine has seen, Dace) and sets up how Kael gets out.
+FF.under = () => ({
+  title: 'UNDER THE FLOOR', sub: 'A WARDEN AT THE HATCH', bg: 'pit', arena: { kind: 'ring', rx: 92, ry: 42 }, music: 'mystery', legend: 1, skip: 1, winText: 'HE STAYS DOWN',
+  hero: { hp: 8, pow: 1, fury0: 40 }, allies: ['dace'], shouts: ['HIS KNEE!', 'KEEP HIM OFF THE HATCH!'], taunt: { 0: ['UNLOGGED PERSONS.', 'ON YOUR KNEES.', 'YOU ARE OWED TO THE FURNACE.'] },
+  foes: [{ id: 'warden', name: 'Warden', kind: 'baton', hp: 34, sc: 1.1 }],
+  voice: { at: [[1, F('ranForHer') ? 'FORTY-THREE DAYS AGO I HIT ONE OF THESE WITH EVERYTHING I HAD. HE DID NOT MOVE.' : 'FORTY-THREE DAYS AGO ONE OF THESE HELD THE FURNACE DOOR, AND I STOOD STILL.'], [11, 'DACE FIGHTS LIKE SOMEBODY WHO HAS DONE THIS BEFORE. I DID NOT KNOW THAT ABOUT DACE.'], [22, 'HE IS ONLY A MAN IN A MASK. NOBODY EVER LET US FIND THAT OUT.']],
+    hurt: 'IT HURTS LESS THAN THE FIRST TIME. EVERYTHING DOES.', fury: F('ranForHer') ? 'THREE STEPS, LAST TIME. I HAVE MORE THAN THREE STEPS NOW.' : 'I DID NOT MOVE THEN. I AM MOVING NOW.', half: 'HE IS BREATHING THROUGH HIS TEETH. THEY BREATHE. I HAD NOT BEEN SURE.', eleven: 'ONE FOR EVERY SECOND. THIS TIME THEY LAND.' },
+  arts: [{ at: .5, name: F('ranForHer') ? 'THREE STEPS' : 'STOOD STILL', line: F('ranForHer') ? 'I GOT THREE STEPS TOWARD HER BEFORE ONE OF THESE PUT ME ON THE FLOOR. THIS IS THE FOURTH.' : 'MARA HELD MY ARMS AND I LET HER. NOBODY IS HOLDING THEM TONIGHT.', panel: 'furnace', stage: 1, kind: 'rise', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }]
+});
+const DREAM4 = () => [
+  { card: 'THAT NIGHT', sub: 'It shows him the day he arrives.', min: 1.4, max: 4 },
+  { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'Four years from now the lift opens on grass. I have read the word. I stand on it for a full minute before I can make myself walk.' },
+  { pstage: 3 }, { wait: 1.2 },
+  { narr: 'A Proctor reads out a dead boy\'s name. I answer to it. Nobody looks twice. Ilse was right about that: they do not look at each other, only at what the other is worth.' },
+  { narr: 'That night they seal us in by twos. You have seen what I did in that room.' },
+  { pstage: 1 }, { wait: 1 },
+  { narr: 'After that it is forty days of taking the valley one standard at a time. I am good at it. That is the part I did not expect, and do not like.' },
+  { fade: 'out' }, { panel: null }
+];
+function DAY3() {
+  const up = [
+    { fade: 'out' }, { panel: 'lift' }, { pstage: 3 }, { fade: 'in', spd: 0.8 }, { wait: 1.6 },
+    { narr: 'The call light goes white. The doors open for eleven seconds. I have counted that light every day for forty-three days. I have never been on this side of it when it changed.' },
+    { pstage: 4 }, { wait: 0.8 },
+    { narr: 'Inside, the car is white, and there is a bench. I have never sat on anything that soft.' },
+    { narr: 'It climbs for nine minutes. I count. Kit was right. Nine floors, not six. There are three levels above us that are on no map in Cinderwell.' },
+    { fade: 'out' }, { panel: 'ante' }, { fade: 'in', spd: 0.7 }, { wait: 1.4 },
+    { narr: 'The top is a white room with a shuttered frame in the wall. Vale takes the ledger out of my hands at the door and does not come in.' },
+    { pstage: 1 }, { wait: 1.2 },
+    { say: 'celestine', t: 'The valve technician. You hung a lantern where I had forbidden one. Sit.' },
+    { say: 'celestine', t: 'Somebody balanced Bank Seven for three nights with a bleed I could not find on any gauge. I burned a girl for it. The fever ward is still breathing. So it was not her hands on that wheel.' },
+    { choice: [
+      { t: 'It was mine.', fx: () => { G.flags.toldHer = 1; G.flags.fury = (G.flags.fury || 0) + 1; }, then: [say('celestine', 'Yes. Thank you for not making me say it for you.')] },
+      { t: 'She was my wife.', fx: () => { G.flags.fury = (G.flags.fury || 0) + 1; }, then: [say('celestine', 'I know what she was. I am asking what you are.')] },
+      { t: '(Say nothing.)', then: [say('celestine', 'Good. You can hold your tongue. That is rarer down there than talent.')] }
+    ] },
+    { say: 'celestine', t: 'I knew at the furnace. I needed the tier to see a price paid, and she offered herself before you had finished being brave. She was quicker than you. I expect she always was.' },
+    { say: 'celestine', t: 'Little ember. That is what I called her, when she looked at me. I do not usually remember them.' },
+    { narr: 'One. Two. Three. I get to eleven and start again. My hands stay on my knees.' },
+    { say: 'celestine', t: 'I am not telling you this to be cruel. I am telling you because I have a use for you, and I prefer my tools to know what they are.' },
+    { say: 'celestine', t: 'The Array is failing. Not down there. Up here. I have forty engineers who have never touched a valve. You will come up twice a week and show them what a wheel is for.' },
+    { say: 'celestine', t: 'Look out of the window, technician.' },
+    { pstage: 2 }, { sfx: 'door' }, { wait: 2.6 },
+    { narr: 'Not a screen. A window. And in it a light that does not flicker.' },
+    { narr: 'Blue. I had the word. I did not have the thing.' },
+    { narr: 'The surface did not burn. Or it stopped burning a long time ago, and nobody came down to tell us.' },
+    { say: 'celestine', t: 'Now you know what I have seen. You will not say it below. Nobody would believe you, and I should have to burn whoever did.' },
+    { say: 'celestine', t: 'You may go. When I dismiss you the word is "granted," technician. Not "aye." You will learn.' },
+    { fade: 'out' }, { panel: null },
+    { card: 'He came down at second bell', sub: 'with a pass stamped in gold, and four hundred people watching the light to see if he would.', min: 1.8, max: 6 }
+  ];
+  const under = [
+    { music: 'mystery' }, { panel: 'under' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
+    { narr: 'That night the chalk in the old tunnel has changed again. Seren\'s suns, and newer ones in a different hand. Then an arrow.' },
+    { pstage: 1 }, { wait: 1.2 },
+    { say: 'dace', t: 'Don\'t shout. I\'m not a ghost. I\'ve been under your feet for six weeks, eating what Sable drops through the Freight Three grating.' },
+    { say: 'dace', t: 'You went up. Don\'t lie, the whole tier watched that light. What\'s up there?' },
+    { choice: [
+      { t: 'The sky. It never burned.', fx: () => { G.flags.toldDace = 1; }, then: [say('dace', '...Say it again.'), say('kael', 'There\'s a window. It\'s blue, Dace. There\'s grass.'), say('dace', 'Two hundred years. Two hundred years of rationing us air under a sky that works.')] },
+      { t: 'Nothing worth a furnace.', then: [say('dace', 'That\'s her talking, not you. Fine. Keep it. But you\'ll tell me before the end.')] }
+    ] },
+    { say: 'dace', t: 'There are more of us than chalk. Hollis. Nell, with her cold crates. Sable. People on Tier Four you\'ve never met. We call ourselves the Unlit, because we\'re what\'s left in the lantern when they put it out.' },
+    { say: 'dace', t: 'We\'ve been waiting years for someone the Authority would carry up their own lift. Now they\'ve picked one for us.' },
+    { say: 'dace', t: 'There\'s a woman who can make you look like them. Not yet. They\'ll watch you for months. When they stop, she\'ll find you. Until then you fix valves, you go up twice a week, and you are the most boring man on Tier Six.' },
+    { say: 'kael', t: 'I am very bad at boring.' },
+    { say: 'dace', t: 'Seren said. Learn.' },
+    { pstage: 2 }, { sfx: 'door' }, { wait: 1.2 },
+    { narr: 'Light, down through the hatch. A halberd. A mask. One Warden, on a routine sweep, in the wrong tunnel on the wrong night.' },
+    { fade: 'out' }, { panel: null },
+    { brawl: () => FF.under() },
+    { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { narr: F('ranForHer') ? 'A Warden, on the floor, breathing through his teeth. Forty-three days ago one of them did not move when I hit him with everything I had.' : 'A Warden, on the floor, breathing through his teeth. I had not known they could be put there.' },
+    { say: 'dace', t: 'Well. That\'s done it. He\'ll wake with a headache and a story nobody will want to write down. Wardens don\'t lose.' },
+    { say: 'dace', t: 'Go home. You were never here. And Kael. She\'d have liked that.' },
+    { fade: 'out' }, { panel: null }
+  ];
+  return [
+    { music: 'home' }, { card: 'DAY THREE', sub: 'First bell. Forty-three days after the furnace.', big: 1, min: 1.6, max: 5 },
+    { panel: 'kael' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { narr: 'I did not sleep much. Vale\'s offer sat on my chest all night. Carry the Bank Seven ledger up Lift Zero. Nobody from Cinderwell has ever gone up.' },
+    { narr: 'Mara says it is a leash. Ivo says it is a door. They are both right.' },
+    { say: 'vale', t: 'First bell, Brennick. The Auditor is waiting on a ledger.' },
+    { choice: [
+      { t: 'I\'ll carry it.', fx: () => { G.flags.ledgerUp = 1; }, then: [say('vale', 'Noted. Stand up straight. Do not touch anything white.')] },
+      { t: 'Send your clerk.', fx: () => { G.flags.ledgerUp = 0; G.flags.fury = (G.flags.fury || 0) + 1; }, then: [say('vale', 'I was being polite. She asked for the hands that know the bank. You were never being offered a choice. Nobody down here is.'), narr('He holds out the ledger until I take it.')] }
+    ] },
+    ...up, ...under,
+    ...(NOFF ? [] : DREAM4()),
+    { card: 'END OF DAY THREE', sub: 'The Ledger', big: 1, sfx: 'splash', min: 2.2, max: 6 },
+    { fx: () => { G.flags.day3Done = 1; } }
+  ];
+}

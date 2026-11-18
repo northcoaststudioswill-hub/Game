@@ -102,7 +102,7 @@ SOOTBORN ("soot" is the Authority's slur; the title reclaims it). A card game ca
 8. Stealth: hang the lantern on the top hook past Sull's loop and two lamp sentries.
 9. Finale: the Pillar shines through the paper and throws a sun across the square. Sull charges; the tier stands in a row (size depends on rays). Lift Zero opens by itself: empty, clean water, one green leaf. Vale: someone must carry the ledger up. "You have until first bell."
 
-Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at Freight Three; Dace under the floor; Nell and the cold crate; what Celestine has seen.
+Day 3 closes these: the ledger and Lift Zero, Dace under the floor, what Celestine has seen. Sable (Freight Three) and Nell's cold crates are named as Unlit but not yet shown.
 
 ## Combat
 - `src/brawl.js` is the base for all fighting: a pseudo-3D arena. Logic is on a flat plane (x across, y depth); the floor is drawn a scanline at a time from a texture; fighters and props are depth-sorted billboards; `Brawl.cam {x, y, h, f, hor}`.
@@ -123,7 +123,7 @@ Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at F
 
 ### Timeline, and where the slice sits in it (v0.14)
 The game tells two halves at once: the present below, and the years after, seen in dreams and fights.
-- **Present (playable):** the prologue (the wedding, the bleed, the furnace), then Day 1 and Day 2 in Cinderwell, forty-one days after the furnace. Still to write: how Kael gets out.
+- **Present (playable):** the prologue (the wedding, the bleed, the furnace), then Days 1 to 3 in Cinderwell, forty-one to forty-three days after the furnace. **The part below is four days.** Day 3 (The Ledger): Kael carries the ledger up Lift Zero, Celestine tells him she knew and puts him to work, he sees the sky through her window, Dace introduces the Unlit, and a Warden goes down under the floor. Day 4 (not built): months of being boring, going up twice a week, then out through the old tunnel to Ilse.
 - **+6 months:** Ilse Marrin, once Accredited, finds him in the old tunnel. *They only fear what looks like them.*
 - **The Gilding (9 months):** what the Accredited do to their children at twelve (gold wire in the long bones for height, gold in the eye for the sun), done to a grown man.
 - **Training (3 years):** speech with Ilse, the blade and the boots with Brand, a Warden who deserted rather than kill a child for humming.
@@ -138,6 +138,9 @@ The game tells two halves at once: the present below, and the years after, seen 
 
 ### How Kael fights (v0.12.9)
 Nothing clean about it. The Accredited are taught forms; he was taught by a furnace. He kicks, jumps on people, drags them in with the rigging line he used on the valve banks, and parries because he has no patience for blocking. Moves: strike chain, heavy, kick (guard break, launcher), jump with air cuts, dive kick, plunge, dodge, guard and parry, hook line, ELEVEN. Signatures (v0.13): Breach, Shaft Drop (he came up a lift shaft; he comes down like one), Wide Cut, headbutt and throw, the roar, riposte. Assay fights can be lost: one second wind, then the fight restarts slightly easier.
+
+### What he knows, by era (v0.15)
+era 0 below: fists, kicks, boot, guard/parry, hook, headbutt, roar · era 1 training: + ram, Wide Cut · era 2 early Assay: + Breach · era 3 late Assay: + Shaft Drop · era 4 last day: + boots · era 5 the Fall: everything. Finishers: ELEVEN, BANKED, THE CROSSING, THE RECKONING, IRON SKY, EVERY BREATH. New fights should set `era`, `newMove` and `fin`.
 
 ### The five fights (v0.12.8)
 Only the Valley is a mass battle. The rest are single combat, each with an intro and outro film.
@@ -194,5 +197,5 @@ Real devices, sound by ear, and how the heist, the festival stealth and the figh
 ## Next steps
 - Playtest the fights and both stealth scenes with a person and tune from notes.
 - Art pass toward the reference boards: 24–32px characters, hand-made tilesets, more portrait expressions.
-- Day 3: the ledger and Lift Zero, Sable at Freight Three, Dace under the floor.
+- Day 4: the boring months, the twice-weekly trips up, Sable on screen, leaving through the old tunnel.
 - Combat growth toward battles: allies with orders, bigger fields, weapons.

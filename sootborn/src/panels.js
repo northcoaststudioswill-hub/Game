@@ -111,7 +111,8 @@ const PANELS = {
     // door leaves sliding apart, gold trim
     R(g, 92, 0, 68 - w, 148, '#b8bcc8'); R(g, 160 + w, 0, 68 - w, 148, '#b8bcc8'); for (let x = 96; x < 160 - w; x += 8) R(g, x, 0, 2, 148, '#7a7e8a'); for (let x = 224; x > 160 + w; x -= 8) R(g, x, 0, 2, 148, '#7a7e8a'); R(g, 160 - w - 3, 0, 3, 148, '#e8c25a'); R(g, 160 + w, 0, 3, 148, '#e8c25a');
     // three figures, taller than anyone you know
-    if (op > .35) { const a = Math.min(1, (op - .35) * 2.2), sc = 3; g.globalAlpha = a; const cs = World.sheetFor('celestine'), ws = World.sheetFor('warden'); PX.spr(g, ws, 0, 122, 150, sc); PX.spr(g, ws, 0, 198, 150, sc); PX.spr(g, cs, 0, 160, 150, sc + 1); g.globalAlpha = 1; }
+    if (st >= 4) { R(g, 0, 0, 320, 180, '#f2f0ea'); for (let x = 20; x < 320; x += 56) { R(g, x, 0, 1, 150, '#dcd8ce'); R(g, x + 1, 0, 1, 150, '#ffffff'); } R(g, 0, 0, 320, 5, '#e8c25a'); R(g, 0, 150, 320, 30, '#d6d2c8'); R(g, 0, 150, 320, 2, '#e8c25a'); R(g, 96, 112, 128, 8, '#ffffff'); R(g, 96, 120, 128, 4, '#dcd8ce'); R(g, 100, 124, 6, 26, '#dcd8ce'); R(g, 214, 124, 6, 26, '#dcd8ce'); PX.spr(g, World.sheetFor('kael'), 0, 160, 136, 3); const y = (t * 60) % 190; R(g, 6, y - 10, 3, 10, '#e8c25a'); R(g, 311, y - 10, 3, 10, '#e8c25a'); R(g, 6, (y + 95) % 190 - 10, 3, 10, '#e8c25a'); R(g, 311, (y + 95) % 190 - 10, 3, 10, '#e8c25a'); glow(g, 160, 20, 120, '255,250,230', .25); const fl = Math.floor(t / 1.1) % 10; PX.plate(g, 'LEVEL ' + Math.min(9, fl), 160, 14); return; }
+    if (op > .35 && st < 3) { const a = Math.min(1, (op - .35) * 2.2), sc = 3; g.globalAlpha = a; const cs = World.sheetFor('celestine'), ws = World.sheetFor('warden'); PX.spr(g, ws, 0, 122, 150, sc); PX.spr(g, ws, 0, 198, 150, sc); PX.spr(g, cs, 0, 160, 150, sc + 1); g.globalAlpha = 1; }
     for (let i = 0; i < 30; i++) { const x = 100 + hash(i, 7) * 120, y = 148 - ((t * (8 + i % 7) + hash(i, 8) * 150) % 150); R(g, x, y, 1, 1, 'rgba(255,246,214,.9)'); }
     // the tier, kneeling, backs to us
     R(g, 0, 150, 320, 30, '#0a0608'); for (let i = 0; i < 17; i++) { const x = 4 + i * 19 + (i % 2) * 4, y = 150 + (i % 3) * 3; g.fillStyle = '#0a0608'; g.beginPath(); g.arc(x + 8, y, 7, 0, 6.3); g.fill(); R(g, x - 2, y + 2, 20, 30, '#0a0608'); R(g, x + 4, y - 6, 8, 1, 'rgba(255,236,180,.35)'); }
@@ -146,6 +147,38 @@ const PANELS = {
     for (let i = 0; i < 40; i++) { const x = hash(i, 1) * 320 + Math.sin(t * .7 + i) * 8, y = (t * (9 + i % 6) + hash(i, 2) * 180) % 180; R(g, x, y, i % 4 ? 1 : 2, 1, i % 3 ? '#8a8080' : '#c8c0c0'); }
     for (const [x, y] of [[118, 34], [150, 28], [176, 36], [200, 44], [132, 42]]) R(g, x, y, 3, 2, '#c8c0c0');
     if (st >= 1) { const a = Math.min(1, s / 1.2); R(g, 132, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); R(g, 172, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); glow(g, 142, 84, 14, '255,140,50', .5 * a); glow(g, 182, 84, 14, '255,140,50', .5 * a); }
+  },
+  // ---- Day 3: the top of Lift Zero (0: the room · 1: she is there · 2: the window)
+  ante(g, t, st, s) {
+    const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#e9e6de'); for (let x = 0; x < 320; x += 40) { R(g, x, 0, 1, 130, '#d6d2c8'); R(g, x + 1, 0, 1, 130, '#f6f4ee'); } R(g, 0, 0, 320, 6, '#e8c25a'); R(g, 0, 6, 320, 1, '#b8943a');
+    R(g, 0, 130, 320, 50, '#cfcabd'); for (let i = 0; i < 9; i++) { R(g, i * 40 - 10, 130, 1, 50, '#bdb8aa'); } R(g, 0, 130, 320, 2, '#f6f4ee'); R(g, 0, 156, 320, 1, '#bdb8aa');
+    const open = st >= 2 ? Math.min(1, s / 2.2) : 0; // the window
+    R(g, 196, 26, 96, 84, '#b8943a'); R(g, 199, 29, 90, 78, '#8a8478'); const sh = Math.round(78 * (1 - open));
+    const gr = g.createLinearGradient(0, 29, 0, 107); gr.addColorStop(0, '#3a78d8'); gr.addColorStop(.7, '#9ccaf4'); gr.addColorStop(1, '#eef4f8'); g.fillStyle = gr; g.fillRect(199, 29, 90, 78);
+    for (let i = 0; i < 3; i++) { const x = 199 + ((t * (2 + i) + i * 34) % 110) - 16, y = 44 + i * 16; g.save(); g.beginPath(); g.rect(199, 29, 90, 78); g.clip(); R(g, x, y, 26, 5, '#ffffff'); R(g, x + 5, y - 3, 14, 4, '#f6faff'); g.restore(); }
+    R(g, 266, 36, 10, 10, '#fff6c0'); glow(g, 271, 41, 26 * open + 2, '255,244,190', .8 * open); R(g, 199, 96, 90, 11, '#4f9a4c'); R(g, 199, 95, 90, 1, '#7ac06a');
+    for (let y = 0; y < sh; y += 6) { R(g, 199, 29 + y, 90, 5, '#d8d4ca'); R(g, 199, 34 + y, 90, 1, '#a8a498'); } R(g, 243, 29, 2, 78, '#b8943a');
+    if (open > 0) { g.fillStyle = `rgba(255,244,200,${.16 * open})`; g.beginPath(); g.moveTo(199, 29 + sh); g.lineTo(289, 29 + sh); g.lineTo(250, 180); g.lineTo(40, 180); g.closePath(); g.fill(); for (let i = 0; i < 24; i++) { const ph = (t * .1 + hash(i, 9)) % 1; R(g, 80 + hash(i, 3) * 190, 60 + ph * 110, 1, 1, `rgba(255,250,220,${.7 * open})`); } }
+    R(g, 20, 104, 60, 6, '#f6f4ee'); R(g, 20, 110, 60, 3, '#d6d2c8'); R(g, 24, 113, 4, 17, '#d6d2c8'); R(g, 72, 113, 4, 17, '#d6d2c8'); R(g, 20, 88, 4, 16, '#f6f4ee'); // the bench
+    const ks = World.sheetFor('kael'); PX.spr(g, ks, st >= 2 ? 3 : 0, 108, 150, 3); R(g, 96, 150, 26, 2, 'rgba(0,0,0,.18)');
+    if (st >= 1) { const a = Math.min(1, st > 1 ? 1 : s / 1.2), x = 166, b = Math.round(Math.sin(t * 1.2)); g.globalAlpha = a; glow(g, x + 10, 84, 46, '255,236,180', .22); R(g, x - 4, 150, 30, 2, 'rgba(0,0,0,.18)'); R(g, x, 66 + b, 22, 86 - b, '#fbf8f0'); R(g, x + 18, 66 + b, 4, 86 - b, '#e2ddd0'); R(g, x - 3, 96 + b, 4, 56 - b, '#f2ede2'); R(g, x + 21, 100 + b, 3, 52 - b, '#e2ddd0'); R(g, x, 66 + b, 22, 2, '#e8c25a'); R(g, x + 9, 68 + b, 4, 84 - b, '#e8c25a'); R(g, x, 150, 22, 2, '#e8c25a'); R(g, x - 4, 64 + b, 8, 6, '#e8c25a'); R(g, x + 18, 64 + b, 8, 6, '#e8c25a'); R(g, x - 4, 64 + b, 8, 1, '#fff2c0');
+      R(g, x + 4, 44 + b, 14, 20, '#f0e0d4'); R(g, x + 3, 40 + b, 16, 8, '#f4f2ec'); R(g, x + 3, 46 + b, 2, 22, '#f4f2ec'); R(g, x + 17, 46 + b, 2, 22, '#e6e2d8'); R(g, x + 3, 42 + b, 16, 2, '#e8c25a'); R(g, x + 10, 38 + b, 2, 4, '#fff2c0'); R(g, x + 6, 52 + b, 3, 1, '#c89a2a'); R(g, x + 12, 52 + b, 3, 1, '#c89a2a'); R(g, x + 9, 58 + b, 4, 1, '#c8a898'); R(g, x + 6, 50 + b, 3, 1, '#d8c8bc'); R(g, x + 12, 50 + b, 3, 1, '#d8c8bc'); R(g, x - 6, 108 + b, 5, 4, '#f0e0d4'); g.globalAlpha = 1; }
+    if (st === 0) plate(g, 'LIFT ZERO - THE UPPER LANDING', 110, 168);
+  },
+  // ---- Day 3: under the floor (0: the chalk · 1: Dace · 2: the lamp at the hatch)
+  under(g, t, st, s) {
+    const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#0b0809'); PX.rock(g, 0, 40); for (let y = 40; y < 130; y += 10) for (let x = (y / 10 % 2) * 14; x < 320; x += 28) R(g, x, y, 27, 9, (x + y) % 3 ? '#1a1416' : '#1e1719'); R(g, 0, 130, 320, 50, '#120d0e'); R(g, 0, 130, 320, 1, '#2a2022');
+    for (let i = 0; i < 2; i++) { R(g, 0, 56 + i * 44, 320, 5, '#2c2a30'); R(g, 0, 56 + i * 44, 320, 1, '#4a4850'); for (let x = 30; x < 320; x += 70) R(g, x, 54 + i * 44, 5, 9, '#3a3840'); } const dr = (t * .7) % 1; R(g, 104, 61 + dr * 60, 1, 2, '#6a8aa0');
+    for (let x = 0; x < 320; x += 12) R(g, x, 150, 8, 2, '#2a2224'); R(g, 0, 146, 320, 1, '#3a3034'); R(g, 0, 156, 320, 1, '#3a3034');
+    const fl = .8 + Math.sin(t * 10) * .06 + Math.sin(t * 4.3) * .06; R(g, 150, 108, 8, 12, '#3a3020'); R(g, 152, 100, 4, 8, '#ffd26e'); glow(g, 154, 104, 70 * fl, '255,170,80', .22); glow(g, 154, 104, 18, '255,210,120', .7 * fl);
+    // chalk suns: hers, and newer ones
+    const sun = (x, y, r, c) => { g.strokeStyle = c; g.beginPath(); g.arc(x, y, r, 0, 6.3); g.stroke(); for (let k = 0; k < 8; k++) { const a = k / 8 * 6.283; R(g, x + Math.cos(a) * (r + 3), y + Math.sin(a) * (r + 3), 1, 1, c); } };
+    sun(60, 84, 7, '#8a8478'); sun(92, 96, 5, '#a8a294'); sun(214, 82, 8, '#efe6d4'); sun(246, 98, 5, '#efe6d4'); g.strokeStyle = '#efe6d4'; g.beginPath(); g.moveTo(262, 90); g.lineTo(290, 90); g.lineTo(284, 85); g.moveTo(290, 90); g.lineTo(284, 95); g.stroke();
+    R(g, 286, 104, 26, 26, '#1a1416'); R(g, 288, 106, 22, 24, '#070506'); R(g, 286, 104, 26, 2, '#4a4850');
+    const ks = World.sheetFor('kael'); PX.spr(g, ks, 3, 108, 150, 3);
+    if (st >= 1) { const a = Math.min(1, st > 1 ? 1 : s / 1.2); g.globalAlpha = a; PX.spr(g, World.sheetFor('dace'), 2, 204, 150, 3); g.globalAlpha = 1; }
+    if (st >= 2) { const a = Math.min(1, s / 1.4); g.fillStyle = `rgba(255,246,214,${.22 * a})`; g.beginPath(); g.moveTo(292, 0); g.lineTo(312, 0); g.lineTo(330, 180); g.lineTo(230, 180); g.closePath(); g.fill(); glow(g, 302, 8, 30 * a, '255,246,214', .8 * a); PX.spr(g, World.sheetFor('warden'), 2, 296, 152, 3); }
+    if (st === 0) plate(g, 'THE OLD TUNNEL', 60, 168);
   },
   // ---- the dreams: what comes after
   gild(g, t, st, s) {

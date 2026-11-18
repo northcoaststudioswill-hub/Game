@@ -13,9 +13,9 @@ const n = await ev(() => { BTS.Menus.checkpoints(); return document.querySelecto
 const reset = () => ev(() => { BTS.UI.clear(); BTS.Cutscene.active && BTS.Cutscene.skip(true); BTS.Brawl.active = false; BTS.Brawl.cine = null; BTS.G.heist = 0; BTS.Game.toTitle(); BTS.Menus.checkpoints(); });
 const click = l => ev(l => { [...document.querySelectorAll('.mi')].reverse().find(b => b.textContent.startsWith(l)).click(); }, l);
 let k = 0;
-for (const sec of ['Fights', 'Story beats']) {
+for (const sec of ['Fights', 'Story beats', 'Cutscenes']) {
   await reset(); await wait(200); await click(sec); await wait(200); await shot('menu-' + sec.slice(0, 5));
-  const labels = await ev(() => [...document.querySelectorAll('.mi')].map(b => b.textContent).filter(t => /·|Opening|New game from/.test(t) && !/Dev menu/.test(t)));
+  const labels = await ev(() => [...document.querySelectorAll('.mi')].map(b => b.textContent).filter(t => /·|Opening|New game from|Film|Dream|Prologue|Day/.test(t) && !/Dev menu/.test(t)));
   console.log(sec, labels.length);
   for (const l of labels) { await reset(); await wait(200); await click(sec); await wait(150); await click(l); await wait(2600); console.log(k, l, JSON.stringify(await st()), errors.length); await shot('cp' + k++); }
 }
