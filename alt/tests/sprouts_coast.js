@@ -273,7 +273,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   /* four more hidden scenes */
   const clear = async () => { for (let k = 0; k < 8 && (await E('state')) !== 'play'; k++) { const st = await E('state'); if (st === 'c3') await skip3(); else if (st === 'pause' || st === 'hsel') await tap('b'); else await tap('a'); await step(4); } };
   await clear(); await E(`dayT=30;npcs[3].st='active';run.emb=0;run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1,lf:1};buds=[];for(let i=0;i<6;i++)mkBud(0,2,P.x,P.y);void 0`); await tp(17, 20, -1, 0); await step(4);
-  for (let k = 0; k < 24 && (await E('state')) === 'play' && (await E('run.emb')) < 5; k++) { await E(`P.x=16*16+12;P.y=20*16+8;P.dx=-1;P.dy=0;buds.forEach(b=>{release(b);b.st='follow';b.x=P.x+4;b.y=P.y+4});void 0`); await step(2); await throwFor(3); await step(30); }
+  for (let k = 0; k < 40 && (await E('state')) === 'play' && (await E('run.emb')) < 5; k++) { await E(`P.x=16*16+12;P.y=20*16+8;P.dx=-1;P.dy=0;buds.forEach(b=>{release(b);b.st='follow';b.x=P.x+4;b.y=P.y+4});void 0`); await step(2); await throwFor(3); await step(30); }
   await step(6); ok('five Embers thrown in the pond: the hot tub', await E(`state==='c3'&&c3q.key==='hottub'`), [await E('state'), await E('run.emb')]); await clear();
   await E(`openGarden();dayT=DAYLEN*.7;duskSaid=true;void 0`); await step(12); await clear(); await E(`P.x=npcs[0].x;P.y=npcs[0].y+14;P.dx=0;P.dy=-1;buds.forEach(b=>{release(b);b.st='idle';b.x=P.x+40}); LO.x=LO.sx=P.x+50;void 0`); await step(3); await tap('a'); await step(4);
   ok('talking to Erin in her garden at dusk: the moonblooms', await E(`state==='c3'&&c3q.key==='moon'`), await E('state')); await clear();
@@ -326,6 +326,38 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await tap('b'); ok('B leaves the Collection as before', (await E('state')) === 'pause', await E('state')); await E(`state='play';void 0`);
   const long2 = JSON.parse(await E(`JSON.stringify(C3LIST.filter(q=>tw(q[1],2)>118||wrapPx(q[2]+' Press A to watch it again.',228,2).length>3||wrapPx('One of five hidden scenes. '+q[2],228,2).length>3).map(q=>q[0]))`));
   ok('the scene names and lines fit', long2.length === 0, long2);
+
+  /* ---- glimmers: three hidden lights in every place ---- */
+  const gl = JSON.parse(await E(`(()=>{init();live=true;state='play';const per=ZONES.map((z,i)=>GLIM.filter(q=>q.z===i).length);const A=JSON.stringify(GLIM);glimInit();
+    const bad=GLIM.filter(q=>{const tx=q.x>>4,ty=(q.y-2)>>4;return map[ty*MW+tx]!==G||!free(q.x,q.y)}).length;
+    const dup=GLIM.filter((q,i)=>GLIM.some((o,j)=>j<i&&o.x===q.x&&o.y===q.y)).length;return JSON.stringify([GLIM.length,per,bad,dup,A===JSON.stringify(GLIM)])})()`));
+  ok('there are thirty glimmers, three in every place', gl[0] === 30 && gl[1].every(n => n === 3), gl[1]);
+  ok('each sits on open grass Will can walk to, no two together, and in the same spots every game', gl[2] === 0 && gl[3] === 0 && gl[4], gl);
+  await E(`dayT=40;const q=GLIM[0];P.x=q.x-40;P.y=q.y;cam.x=P.x-VW/2;cam.y=P.y-VH/2;LO.x=LO.sx=P.x-20;LO.y=LO.sy=P.y+14;void 0`); await step(4); await shot('glimmer');
+  const g0 = JSON.parse(await E(`JSON.stringify([glimHave(),meta.petals,meta.tix])`));
+  await E(`P.x=GLIM[0].x;P.y=GLIM[0].y;void 0`); await step(3);
+  const g1 = JSON.parse(await E(`JSON.stringify([glimHave(),meta.petals,meta.tix,!!run.gl[0]])`));
+  ok('walking over one picks it up for 2 petals', g0[0] === 0 && g1[0] === 1 && g1[3] && g1[1] === g0[1] + 2, [g0, g1]);
+  await step(5); ok('and it is not picked up twice', (await E('glimHave()')) === 1 && (await E('meta.petals')) === g1[1]);
+  const walk = async i => { await E(`P.x=GLIM[${i}].x;P.y=GLIM[${i}].y;glimTick();void 0`); }; /* straight to the pick-up, so walking into a new place does not start its own events */
+  const zi = await E(`GLIM[0].z`); const mates = JSON.parse(await E(`JSON.stringify(GLIM.map((q,i)=>q.z===${zi}&&i?i:-1).filter(i=>i>0))`));
+  await walk(mates[0]); const pz = await E('meta.petals'); await walk(mates[1]);
+  ok('clearing a place pays 5 more', (await E('meta.petals')) === pz + 7 && (await E(`glimIn(${zi})`)) === 3, [pz, await E('meta.petals')]);
+  const rest = JSON.parse(await E(`JSON.stringify(GLIM.map((q,i)=>run.gl[i]?-1:i).filter(i=>i>=0))`));
+  for (let k = 0; k < 6; k++) await walk(rest[k]); const t9 = await E('meta.tix'); await walk(rest[6]);
+  ok('the tenth pays a ticket', (await E('glimHave()')) === 10 && (await E('meta.tix')) === t9 + 1, [await E('glimHave()'), t9, await E('meta.tix')]);
+  const gkept = await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);live=true;state='play';return glimHave()===10&&!!run.gl[0]})()`);
+  ok('found glimmers are kept in the save', gkept, await E('glimHave()'));
+  for (let k = 7; k < rest.length - 1; k++) await walk(rest[k]); const pl = await E('meta.petals'), tl = await E('meta.tix'); await walk(rest[rest.length - 1]);
+  ok('the last one pays 50 and 2 tickets', (await E('glimHave()')) === 30 && (await E('meta.tix')) >= tl + 2 && (await E('meta.petals')) >= pl + 52, [pl, await E('meta.petals'), tl, await E('meta.tix')]);
+  await E(`state='pause';void 0`); await shot('glimmer-pause'); await E(`state='play';void 0`);
+  const sc = JSON.parse(await E(`(()=>{const n=npcs.find(n=>n.name==='SCOUT'),ids=n.ms.map(m=>m.id);const a=ids.indexOf('s4'),m5=n.ms[a+1],m6=n.ms[a+2];return JSON.stringify([ids.slice(a),m5.get(),m5.goal,m6.goal,wrapPx(m5.say,228,1).length,wrapPx(m6.say,228,1).length,tw(m5.t,1),tw(m6.t,1)])})()`));
+  ok("Scout asks for 10 and then 20 after her bug asks, counted from what Will has found", sc[0].join() === 's4,s5,s6' && sc[1] === 30 && sc[2] === 10 && sc[3] === 20, sc);
+  ok('the marker for her ask points at the nearest glimmer not yet found', await E(`(()=>{init();live=true;state='play';const t=AT.s5();return GLIM.some(q=>q.x===t.x&&q.y===t.y)&&GLIM.filter(q=>q.z===0).some(q=>q.x===t.x&&q.y===t.y)})()`));
+  /* A at someone talks even while Will is still walking */
+  await E(`init();live=true;state='play';run.egg={};ZONES.forEach(z=>run.seen[z[0]]=1);const n=npcs.find(n=>n.name==='SCOUT');P.x=n.x-34;P.y=n.y+4;P.d=1;P.fx=1;P.fy=0;LO.x=LO.sx=P.x-30;LO.y=LO.sy=P.y+20;void 0`);
+  await E(`keys.right=1;void 0`); await step(8); const mvg = await E('P.mv'); await E(`keys.a=1;void 0`); await step(1); await E(`keys.a=0;keys.right=0;void 0`); await step(2);
+  ok('A at someone talks while Will is still walking', !!mvg && (await E('state')) !== 'play', [mvg, await E('state')]);
 
   /* ---- the splash before a cartridge boots ---- */
   await E(`eject();void 0`); await page.waitForTimeout(200); await page.evaluate(() => { window.__splash = 1; }); /* ?dev skips the splash unless asked */

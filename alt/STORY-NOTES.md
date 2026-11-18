@@ -86,3 +86,11 @@ line here is Will's to keep, change or cut. It was written to fit what is alread
 - Derek recurs: Marcus's friend, coworker and business partner.
 - Kiss, Scout, Ranger, Elder are placeholder characters. Don't build big stories on them yet.
 - The lake monster is BESSIE (the rename in code is still to do).
+
+## Nov 18: glimmers (PROPOSED by Claude, not yet Will's)
+
+- Glimmers are motes of the Lantern's light that settled around the valley when it cracked. Three in every place.
+  Nothing else in the story depends on this yet; they could as easily be fireflies or dew.
+- Lines I wrote, Scout: "Seen the little lights lying about? Glimmers. Motes of the Lantern, I think, from when it
+  cracked. Three in every place. Walk over one and it's yours. Find me ten." and "Ten! I'm drawing a map. Some are
+  past the bridge, some out west, and I'd bet the garden has its three. Twenty this time."
