@@ -7,7 +7,7 @@
 const Cutscene = {
   active: false, steps: [], i: 0, actors: [], cam: { x: 0, y: 0 }, block: null, letter: 0, beam: 0, beamT: 0, flash: 0, flashC: '#fff', shake: 0, dark: null, onEnd: null, pillarRed: false, motes: [],
   actor(id) { return this.actors.find(a => a.id === id); },
-  play(steps, onEnd) {
+  play(steps, onEnd) { this.noSkip = false;
     Object.assign(this, { steps, i: 0, onEnd, active: true, actors: [], letter: 1, beam: 0, flash: 0, shake: 0, dark: null, pillarRed: false, motes: [], furnace: 0, zoom: 1, zoomT: 1, heart: 0, heartT: 0, vignette: 0, lift: 0, hung: 0, glowK: 0, sun: 0, sunT: 0, panel: null });
     G.mode = 'cine'; $('#cskip').classList.remove('hidden'); this.next();
   },
@@ -37,6 +37,7 @@ const Cutscene = {
       this.block = { type: 'dlg' }; Dialogue.start(st, () => { if (this.active) this.next(); }); return true;
     }
     if (s.brawl !== undefined) { const d = typeof s.brawl === 'function' ? s.brawl() : s.brawl; if (!d) return false; this.hideCard(); this.block = { type: 'brawl' }; Brawl.start(d, () => { if (!this.active) return; this.next(); if (this.active && Fade.a >= 1 && !Fade.busy) { Fade.dir = -1; Fade.sp = 1.6; Fade.busy = true; } }); return true; }
+    if (s.noskip !== undefined) { this.noSkip = !!s.noskip; HUD.dirty = true; return false; }
     if (s.dlg) { this.block = { type: 'dlg' }; Dialogue.start(s.dlg, () => { if (this.active) this.next(); }); return true; }
     if (s.wait) { this.block = { type: 'wait', t: s.wait }; return true; }
     if (s.pan) { this.pan = { from: { ...this.cam }, to: { x: s.pan[0] * 16 + 8, y: s.pan[1] * 16 }, t: 0, d: s.dur || 2 }; if (s.hold !== false) { this.block = { type: 'pan' }; return true; } return false; }
@@ -82,8 +83,8 @@ const Cutscene = {
     else if (b.type === 'move') { if (b.a.tx === undefined) this.next(); }
     if (Input.p('START')) this.skip();
   },
-  skip() {
-    if (!this.active) return;
+  skip(force) {
+    if (!this.active || (this.noSkip && !force)) return; this.noSkip = false;
     if (Brawl.active) { Brawl.active = false; Brawl.onEnd = null; Brawl.cine = null; }
     Dialogue.stack = []; Dialogue.onEnd = null; if (Dialogue.active) { Dialogue.active = false; $('#dlg').classList.add('hidden'); }
     Fade.a = 0; Fade.dir = 0; Fade.busy = false; Fade.cb = null;

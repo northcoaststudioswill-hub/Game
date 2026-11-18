@@ -35,7 +35,7 @@ const HUD = {
     s.textContent = `Day ${G.day} · ${G.scrip} scrip` + (F('d2Tavi') && !F('day2Done') ? ` · ☀${G.flags.rays | 0}` : '') + (G.newJ ? ` · ✎${G.newJ}` : '');
     const ht = this.hint(); h.classList.toggle('hidden', !ht); h.querySelector('span').textContent = ht;
     document.body.classList.toggle('ctlfade', Dialogue.active || Puzzle.active);
-    document.body.classList.toggle('ingame', world || (Brawl.active && !Brawl.cine)); if (Cutscene.active) $('#cskip').classList.toggle('hidden', Brawl.active);
+    document.body.classList.toggle('ingame', world || (Brawl.active && !Brawl.cine)); if (Cutscene.active) $('#cskip').classList.toggle('hidden', Brawl.active || !!Cutscene.noSkip);
     document.body.classList.toggle('inpuzzle', Puzzle.active);
     document.body.classList.toggle('inpanel', Cutscene.active && !!Cutscene.panel);
     if (this.tt > 0) { this.tt -= dt; if (this.tt <= 0) $('#toast').classList.remove('on'); }
@@ -236,7 +236,7 @@ const Menus = {
   title() {
     const s = Save.latest();
     UI.push(modal({ clear: true, onBack: null, build(b) {
-      b.innerHTML = `<h1 class="logo">SOOTBORN</h1><div class="sub">Book One · The First Shift</div>`;
+      b.innerHTML = `<h1 class="logo">SOOTBORN</h1><div class="sub">Book One</div>`;
       b.parentNode.style.background = 'rgba(16,10,13,.82)'; b.parentNode.style.textAlign = 'center';
     }, items: [
       { label: s ? `Continue — Day ${s.day}, ${MAPS[s.map].name}` : 'Continue', disabled: () => !s, act: () => { UI.clear(); Game.loadSave(Save.latest()); } },
@@ -269,7 +269,7 @@ const Menus = {
       LOOKS.forEach((L, i) => { const c = document.createElement('canvas'); c.width = 48; c.height = 48; portraitTo(c, makeChar(playerLook(i))); if (i === look) c.className = 'on'; c.onclick = () => { look = i; Sound.play('move'); m.refresh(); }; wrap.appendChild(c); });
     }, items: [
       { label: 'Look', value: () => LOOKS[look].label, adj: d => { look = (look + d + LOOKS.length) % LOOKS.length; } },
-      { label: 'Begin first shift', act: () => { const n = (name || '').trim().slice(0, 14) || 'Wren'; UI.clear(); Game.newGame(n, look); } },
+      { label: 'Begin', act: () => { const n = (name || '').trim().slice(0, 14) || 'Wren'; UI.clear(); Game.newGame(n, look); } },
       { label: 'Back', act: () => UI.pop() }
     ] });
     UI.push(m);
@@ -389,7 +389,7 @@ const DayEnd = {
       b.innerHTML = `<p>Far above Cinderwell — above the rock, above the warnings — a crate of cold greens arrives somewhere that doesn't exist.</p>
         <p>Below, Kael Brennick dreams of ${F('sawRiser') ? 'warm air falling from a pipe with no destination' : 'a lift light, green for eleven seconds'} — and of Seren, laughing at him for being right.</p>
         <p><i>"They came down in light. One day, I'm going up in it."</i></p>
-        <h2 style="margin-top:16px">END OF THE FIRST SHIFT</h2><p style="opacity:.7">SOOTBORN · Book One vertical slice · thanks for playing.</p>`;
+        <h2 style="margin-top:16px">END OF DAY ONE</h2><p style="opacity:.7">SOOTBORN · Book One vertical slice · thanks for playing.</p>`;
     }, items: [
       { label: 'Wake up: Day 2 — First Fire', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); if (NOFF) return Game.loadSave(sv); ffScene('THE ASSAY', 'Four years from now. Day nineteen.', () => FF.ford(), () => Game.loadSave(sv)); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }

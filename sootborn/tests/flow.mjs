@@ -11,10 +11,13 @@ for (let i = 0; i < 300 && (await ev(() => BTS.G.mode === 'opening')); i++) awai
 await ev(() => { BTS.UI.clear(); BTS.Game.newGame(); }); await wait(600); console.log('card', JSON.stringify(await st())); await shot('card');
 await wait(3800); console.log('ff1 cine', JSON.stringify(await st()));
 for (let i = 0; i < 4; i++) { await page.keyboard.press('KeyE'); await wait(500); } await wait(1800); console.log('ff1 fight', JSON.stringify(await st()));
-await page.keyboard.press('KeyM'); await wait(300); await shot('pause'); await ev(() => [...document.querySelectorAll('.mi')].find(b => /Skip this fight/.test(b.textContent)).click()); await wait(1500);
+console.log('skip offered:', await ev(() => !!BTS.Brawl.def.skip), 'scene skip hidden:', await ev(() => document.querySelector('#cskip').classList.contains('hidden')), 'noSkip:', await ev(() => BTS.Cutscene.noSkip));
+await ev(() => BTS.Cutscene.skip()); await wait(200); console.log('still fighting after a skip attempt:', await ev(() => BTS.Brawl.active));
+for (let k = 0; k < 40 && (await ev(() => BTS.Brawl.active && !BTS.Brawl.cine && BTS.Brawl.phase === 'fight')); k++) { await ev(() => { const B = BTS.Brawl; for (const f of B.foes.slice()) if (f.st !== 'down' && !f.enter && !B.art && !B.sup) B.hitFoe(f, 999, 1, 0, true); }); await wait(400); }
+for (let k = 0; k < 80 && (await ev(() => BTS.Brawl.active)); k++) { await page.keyboard.press('KeyE'); await wait(400); } await wait(1500);
 console.log('after skip', JSON.stringify(await st())); await shot('world-panel');
 // furnace path
-await ev(() => { BTS.Cutscene.skip(); BTS.G.heist = 0; BTS.UI.clear(); BTS.Game.toTitle(); BTS.Menus.checkpoints(); [...document.querySelectorAll('.mi')].reverse().find(b => /Lift Zero/.test(b.textContent)).click(); }); await wait(500);
+await ev(() => { BTS.Cutscene.skip(true); BTS.G.heist = 0; BTS.UI.clear(); BTS.Game.toTitle(); BTS.Menus.checkpoints(); [...document.querySelectorAll('.mi')].reverse().find(b => /Lift Zero/.test(b.textContent)).click(); }); await wait(500);
 let fought = false;
 for (let i = 0; i < 700; i++) { const s = await st(); if (!s.cine) break;
   if (s.brawl) { if (!fought) { fought = true; console.log('furnace brawl', JSON.stringify(s)); await wait(2500); await shot('furnace'); for (let k = 0; k < 12; k++) { await page.keyboard.press('KeyE'); await wait(120); } } await wait(400); continue; }

@@ -1,5 +1,19 @@
 # SOOTBORN — changelog
 
+## v0.12.7 · 2026-11-18 — readable, calmer, and the first fight is not optional
+From play notes: the fights were chaotic and hard to follow (though they felt smooth), and text and cutscenes went by too fast to read.
+- **The first fight cannot be skipped.** The Valley has no "skip this fight" in its pause menu, and "Skip scene" is locked until that battle is over. (The other two Assay battles can still be skipped; the dev checkpoints still jump anywhere.)
+- **"The First Shift" is gone from the branding.** The page title and artifact are just SOOTBORN; the title screen says "Book One".
+- **Text you can read**
+  - Cutscene captions are twice the size, on a solid band across the bottom.
+  - Every shot now lasts at least as long as its caption takes to read (about two seconds plus time per letter), and all shots run a quarter longer. Tap or press to move on sooner.
+  - Memory Art cut-ins hold for the length of their line (three seconds or more) with the line at double size; the ELEVEN cut-in holds 1.6 seconds instead of 0.95. Both can be pressed through.
+  - Kael's narration in fights stays up about twice as long, and lines no longer queue up behind each other.
+- **Fights you can follow**
+  - Who is who: a gold ring and a gold marker over Kael, violet rings under allies, red rings under enemies (brighter on the one he will hit).
+  - The camera sits higher and further back.
+  - Less glare: weaker glow during fights, a much smaller white flash on ordinary hits, fainter sword ribbons, less camera tilt, far fewer drifting petals, a gentler red tint at full fury, and the background battle moved well back from the arena.
+
 ## v0.12.6 · 2026-11-18 — heavier fights
 - **Heavy attack**: keep strike held. Kael raises the blade, it gathers light, and the blow breaks guards, hits for much more, launches whoever it catches and leaves a scar on the ground.
 - **Knockdowns**: launched enemies now land on their backs, lie there, and push themselves up before they can fight again. Captains, duelists, Wardens and ring bosses keep their feet unless a heavy attack or a Memory Art puts them down.

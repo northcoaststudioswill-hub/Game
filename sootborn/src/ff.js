@@ -13,7 +13,7 @@ const cu = (x, y, s0, s1, dx) => ({ cam: [x + (dx || 0), y + 200 / s0, 54, 200],
 const FIELD = { kind: 'rect', w: 250, h: 120 }, V = ['cadv1', 'cadv2'], TL = ['cadt1', 'cadt2'];
 const FF = {
   valley: () => ({
-    title: 'THE ASSAY', sub: 'HOUSE VIOLET - HOLD THE VALLEY', bg: 'valley', arena: FIELD, music: 'battle', rage: 1, legend: 1, skip: 1, foeName: 'House Teal', winText: 'THE VALLEY HOLDS',
+    title: 'THE ASSAY', sub: 'HOUSE VIOLET - HOLD THE VALLEY', bg: 'valley', arena: FIELD, music: 'battle', rage: 1, legend: 1, foeName: 'House Teal', winText: 'THE VALLEY HOLDS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 40 }, allies: V, shouts: ['FOR VIOLET!', 'WITH HIM!', 'PUSH!'],
     waves: [[{ id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 6 }, { id: 'cadt2', name: 'Teal', kind: 'cadet', hp: 6 }, { id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 6 }, { id: 'cadt2', name: 'Teal', kind: 'lancer', hp: 7 }],
       [{ id: 'cadt2', name: 'Teal', kind: 'lancer', hp: 8 }, { id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 7 }, { id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 7 }, { id: 'cadt2', name: 'Teal', kind: 'lancer', hp: 8 }, { id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 7 }]],
@@ -97,9 +97,9 @@ const OPENING = [
 const Opening = { run(done) { if (NOFF) return done(); G.mode = 'opening'; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => { Fade.a = 1; Fade.dir = -1; Fade.sp = 1.2; Fade.busy = true; done(); }); } };
 
 // ---- weave them into the story
-if (!NOFF) PROLOGUE_A.unshift({ fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { card: 'FOUR YEARS FROM NOW', sub: 'Above the rock. The Assay.', big: 1, min: 1, max: 3.2 }, { brawl: () => FF.valley() });
+if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { card: 'FOUR YEARS FROM NOW', sub: 'Above the rock. The Assay.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.valley() }, { noskip: false });
 // the furnace: if he runs for her, he gets his three steps
 { const i = PROLOGUE_B.findIndex(s => s.choice && s.choice.some(c => /BREAK FREE/.test(c.t))), ch = PROLOGUE_B[i].choice.find(c => /BREAK FREE/.test(c.t)), was = ch.then;
   ch.then = [narr("You tear out of Mara's arms. Three steps. A Warden turns, unhurried, and lowers a halberd the length of a pipe.")];
   PROLOGUE_B.splice(i + 1, 0, { fx: () => { if (F('ranForHer')) Cutscene.steps.splice(Cutscene.i, 0, { brawl: () => NOFF ? null : FF.furnace() }, { dlg: was }); } }); }
-function ffScene(card, sub, def, done) { Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play([{ music: null }, { card, sub, big: 1, min: 1, max: 3.2 }, { brawl: def }], done); }
+function ffScene(card, sub, def, done) { Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play([{ music: null }, { card, sub, big: 1, min: 1.5, max: 4.5 }, { brawl: def }], done); }

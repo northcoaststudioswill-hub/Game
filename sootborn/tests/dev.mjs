@@ -13,12 +13,12 @@ const n = await ev(() => { BTS.Menus.checkpoints(); return document.querySelecto
 const labels = await ev(() => [...document.querySelectorAll('.modal:last-of-type .mi, .mi')].map(b => b.textContent).filter(t => /·|Opening/.test(t)));
 console.log(labels.length, 'checkpoints');
 for (let i = 0; i < labels.length; i++) {
-  await ev(() => { BTS.UI.clear(); BTS.Cutscene.active && BTS.Cutscene.skip(); BTS.Brawl.active = false; BTS.Brawl.cine = null; BTS.G.heist = 0; BTS.Game.toTitle(); BTS.Menus.checkpoints(); }); await wait(200);
+  await ev(() => { BTS.UI.clear(); BTS.Cutscene.active && BTS.Cutscene.skip(true); BTS.Brawl.active = false; BTS.Brawl.cine = null; BTS.G.heist = 0; BTS.Game.toTitle(); BTS.Menus.checkpoints(); }); await wait(200);
   await ev(l => { [...document.querySelectorAll('.mi')].reverse().find(b => b.textContent === l).click(); }, labels[i]); await wait(2600);
   console.log(i, labels[i], JSON.stringify(await st())); await shot('cp' + i);
 }
 // save slots
-await ev(() => { BTS.UI.clear(); BTS.Cutscene.active && BTS.Cutscene.skip(); BTS.Brawl.active = false; BTS.Game.loadSave(BTS.Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.ring)))); }); await wait(800);
+await ev(() => { BTS.UI.clear(); BTS.Cutscene.active && BTS.Cutscene.skip(true); BTS.Brawl.active = false; BTS.Game.loadSave(BTS.Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.ring)))); }); await wait(800);
 await ev(() => { BTS.Menus.pause(); BTS.Menus.slots('save'); }); await wait(200); await shot('slots-save');
 await ev(() => [...document.querySelectorAll('.mi')].reverse().find(b => /^Slot 2/.test(b.textContent)).click()); await wait(300);
 console.log('slot2', await ev(() => BTS.Save.describe(BTS.Save.read('s2'))), 'latest', await ev(() => BTS.Save.latest().map));
