@@ -182,6 +182,26 @@
     if (f) f();
   };
 
+  // What a decision did: a card per effect. Bond changes show the amount, the reason and the heart bar moving;
+  // remembered decisions show a star (green if it was kind, red if it will cost her).
+  H.effects = function (list) {
+    const G = SH.game, box = $('effects');
+    for (const e of list) {
+      const row = document.createElement('div');
+      if (e.mem) { row.className = 'fx-row mem'; row.innerHTML = `<span class="ico" style="color:${e.good === true ? '#7ad88a' : e.good === false ? '#ff7a8a' : 'var(--gold)'}">&#10022;</span><div><b>This will be remembered</b><small>${esc(e.mem)}</small></div>`; }
+      else {
+        if (!G.progress.bonds[e.who]) continue;
+        const pts = G.progress.bonds[e.who].pts, h = G.heartsFor(pts), next = ST.HEARTS_AT[h - 1], prev = h > 1 ? ST.HEARTS_AT[h - 2] : 0;
+        const k1 = next ? Math.max(0, Math.min(1, (pts - prev) / (next - prev))) : 1, k0 = e.heart ? 0 : next ? Math.max(0, Math.min(1, (pts - e.pts - prev) / (next - prev))) : 1;
+        row.className = 'fx-row ' + (e.pts < 0 ? 'down' : 'up');
+        row.innerHTML = `<img src="${SH.art.portraitURL(e.who)}" alt=""><div style="flex:1;min-width:0"><b>${esc(ST.CAST[e.who].name)} <i>${e.pts < 0 ? '&minus;' + (-e.pts) : '+' + e.pts} &hearts;</i>${e.heart ? ' &middot; heart ' + e.heart + ' of 5' : ''}</b><small>${esc(e.why)}</small><div class="hb"><span style="width:${Math.round(k0 * 100)}%"></span></div></div>`;
+        const bar = row.querySelector('.hb span'); requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.width = Math.round(k1 * 100) + '%'; }));
+      }
+      box.appendChild(row); setTimeout(() => row.remove(), 5200);
+    }
+    while (box.children.length > 4) box.firstChild.remove();
+  };
+
   // The bond meter, the Bond Art button, and whispers down the bond.
   let lastArt = '';
   H.art = function (a) {
@@ -241,7 +261,17 @@
   };
   H.navReset = () => { navId = null; document.querySelectorAll('.pad-sel').forEach(b => b.classList.remove('pad-sel')); };
 
-  H.menu = function (show) { $('menu').classList.toggle('show', show); };
+  H.menu = function (show) {
+    $('menu').classList.toggle('show', show);
+    if (!show) return;
+    const G = SH.game, ch = G.chapterDef(), w = G.world, bonds = G.progress.bonds || {};
+    const people = Object.keys(ST.BONDS).filter(id => bonds[id]).map(id => `<span style="white-space:nowrap;margin-right:8px"><img src="${SH.art.portraitURL(id)}" alt="">${'\u2665'.repeat(G.heartsFor(bonds[id].pts))}</span>`).join('');
+    const mem = Object.keys(G.progress.mem || {}).length;
+    $('m-status').innerHTML = `<div class="wide"><b>${esc(ch.label)}: ${esc(ch.name)}</b>${esc(G.goalText() || 'Keep going')}</div>`
+      + `<div><b>Starlight here</b>&#10022; ${w.motes.filter(m => m.got).length} of ${w.motes.length} &middot; ${SH.stars.free()} to spend</div>`
+      + `<div><b>Choices remembered</b>${mem || 'None yet'}</div>`
+      + (people ? `<div class="wide"><b>Bonds</b>${people}</div>` : '');
+  };
 
   // ---------------- journal: what to do now, the story so far, and who's who
   H.journal = function (show) {
@@ -259,6 +289,8 @@
     html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
     const ms = G.progress.motes || {}, sum = Object.values(ms).reduce((a, b) => a + b, 0);
     if (sum) html += `<p><b>Starlight gathered:</b> &#10022; ${sum}. Spend it in the pause menu, under Constellation.</p>`;
+    const mem = Object.values(G.progress.mem || {});
+    if (mem.length) { html += '<h3>What Wren has done</h3><ul class="mem-list">' + mem.map(m => `<li class="${m.good === true ? 'good' : m.good === false ? 'bad' : ''}">${esc(m.text)}</li>`).join('') + '</ul><p><small>Green: someone is better for it. Red: it will cost her. Gold: it could go either way. The story comes back to these.</small></p>'; }
     html += '<h3>Bonds</h3>';
     const bonds = G.progress.bonds, ids = Object.keys(ST.BONDS).filter(id => bonds[id]);
     if (!ids.length) html += '<p>No bonds yet. Hearts grow from evenings together, gifts they love, and the choices you make when you talk.</p>';

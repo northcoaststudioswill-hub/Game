@@ -53,6 +53,8 @@
     bram: { loves: 'Spiced bread, sparring', perk: 'Takes one hit for Wren per mission (later chapters).' },
     iris: { loves: 'Sugared plums, old maps', perk: 'Shows hidden chests on the map (later chapters).' },
     thane: { loves: 'Rare books, good ink', perk: '+20% XP from missions (later chapters).' },
+    nessa: { loves: 'Being told the truth, firewood', perk: 'Her trust opens the chapter where Wren protects her sisters (later).' },
+    lissa: { loves: 'Anything green, your paintings', perk: 'Her trust opens the chapter where Wren protects her sisters (later).' },
   };
 
   // Short version of the story so far, for the journal.
@@ -64,7 +66,7 @@
       abilities: { double: false, dash: false, daggers: false, bow: true },
       card: 'Before the Deep, before the fae. Wren is nineteen, mortal, and the only hunter in a family that is slowly starving.',
       goals: [
-        { id: 'hunt', text: 'Hunt in the woods east of the cottage' },
+        { id: 'hunt', text: 'Check your snares on the east path', count: 3, counter: 'snares' },
         { id: 'stag', text: 'Shoot the white stag in the clearing' },
       ],
       summary: 'Wren killed a white stag sacred to the Spring Court. That night Lord Rowan came for her and took her across the Wall: a life for a life.',
@@ -136,21 +138,80 @@
     woods_lissa: [
       ['lissa', 'Wren? When we have enough again... will you paint something on the wall? Like you used to, before.'],
       { choose: [
-        { text: '"Maybe in spring."', then: [['lissa', 'I\'ll hold you to that. Spring always comes. That\'s the whole point of it.']] },
-        { text: '"Paint doesn\'t feed anyone."', then: [['lissa', 'Neither do I, and you keep me around.'], ['wren', 'Barely.'], ['narr', 'Lissa laughs. It\'s the first time in a week.']] },
+        { text: '"Maybe in spring."', bond: { lissa: 10 }, why: 'A promise she can hold on to.', remember: ['paintPromise', 'Promised Lissa a painting in spring.', true], then: [['lissa', 'I\'ll hold you to that. Spring always comes. That\'s the whole point of it.']] },
+        { text: '"Paint doesn\'t feed anyone."', bond: { lissa: 5 }, why: 'She laughed, for the first time in a week.', remember: ['paintNo', 'Told Lissa that paint doesn\'t feed anyone.', false], then: [['lissa', 'Neither do I, and you keep me around.'], ['wren', 'Barely.'], ['narr', 'Lissa laughs. It\'s the first time in a week.']] },
+        { text: '"I don\'t paint anymore."', bond: { lissa: -5 }, why: 'She went quiet. She misses who you were.', then: [['lissa', 'Oh.'], ['narr', 'Lissa goes back to sorting her seeds, smaller than she was a moment ago.']] },
       ] },
     ],
     woods_nessa: [
       ['narr', 'Nessa is splitting the last of the firewood. She hasn\'t eaten today either. She thinks Wren hasn\'t noticed.'],
-      ['nessa', 'I\'d go with you if I could shoot.'],
+      ['nessa', 'I\'d go with you if I could shoot. If you see any deadfall out there, we\'re down to the chairs.'],
       { choose: [
-        { text: '"You\'d scare everything off with your opinions."', then: [['nessa', 'Someone in this family has to have them.']] },
-        { text: '"Eat something, Ness. I\'ll find more."', then: [['nessa', '...You first.'], ['narr', 'Neither of them moves. They\'ve been having this argument all winter.']] },
+        { text: '"You\'d scare everything off with your opinions."', bond: { nessa: 5 }, why: 'She would rather be teased than pitied.', then: [['nessa', 'Someone in this family has to have them.']] },
+        { text: '"Eat something, Ness. I\'ll find more."', bond: { nessa: 10 }, why: 'Somebody noticed.', remember: ['nessaEat', 'Told Nessa to eat first.', true], then: [['nessa', '...You first.'], ['narr', 'Neither of them moves. They\'ve been having this argument all winter.']] },
+        { text: '"Then learn. I can\'t carry all three of us forever."', bond: { nessa: -10 }, why: 'True, and it landed like a slap.', remember: ['nessaHard', 'Told Nessa she could not be carried forever.', false], then: [['nessa', '...No. I don\'t suppose you can.'], ['narr', 'The axe comes down harder than it needs to.']] },
+      ] },
+    ],
+    woods_wood: [
+      ['narr', 'Three armfuls of deadfall, dry under the snow. Wren ties them to carry home.'],
+      { do: 'remember', key: 'wood', text: 'Carried firewood home for Nessa.', good: true },
+      { do: 'bond', who: 'nessa', pts: 10, why: 'She won\'t have to burn the last chair.' },
+    ],
+    woods_snare1: [
+      ['wren', 'Empty. Sprung by the wind, or by something clever.'],
+      ['narr', 'She resets it anyway. Her fingers know the knot without her.'],
+    ],
+    woods_range: [
+      ['wren', 'Father\'s targets. He hung them the winter before the fever.'],
+      ['wren', 'Three arrows, three rings. "Breathe out, then let go." I can still hear him.'],
+    ],
+    woods_targets: [
+      ['narr', 'Three for three. The last one is still swinging.'],
+      { do: 'remember', key: 'steady', text: 'Three for three at Father\'s targets.', good: true },
+      ['wren', 'Still got it, old man.'],
+    ],
+    woods_snare2: [
+      ['wren', 'Sprung. And chewed through.'],
+      ['narr', 'Wolf prints in the snow, and not old ones. Something has been eating her catches all winter.'],
+    ],
+    woods_herb: [
+      ['wren', 'Wintergreen. Alive, under all this. Lissa asked for anything green.'],
+      ['narr', 'She wraps it in her scarf like something that could break.'],
+    ],
+    woods_wolf_seen: [
+      ['wren', 'There you are.'],
+      ['narr', 'The wolf stands over her last snare. Every rib shows through its coat.'],
+    ],
+    woods_wolf_hurt: [
+      ['narr', 'The arrow takes it in the shoulder. It backs away, and does not run. It looks at the snare, and then at her.'],
+      ['wren', 'You\'re as hungry as we are.'],
+      ['narr', 'She has another arrow on the string. She could loose it. She could also just... not.'],
+    ],
+    woods_wolf_killed: [
+      { do: 'flag', name: 'wolfdone' },
+      ['narr', 'The second arrow is kinder than the winter would have been. A pelt, and a little stringy meat. It is the sensible thing.'],
+      { do: 'remember', key: 'wolfKilled', text: 'Killed the starving wolf for its pelt.', good: null },
+      { do: 'bond', who: 'nessa', pts: 5, why: 'A pelt is a pelt. Nessa approves of sensible.' },
+      { do: 'bond', who: 'lissa', pts: -5, why: 'She won\'t ask where the fur came from. She\'ll know.' },
+    ],
+    woods_wolf_spared: [
+      { do: 'flag', name: 'wolfdone' },
+      ['narr', 'Wren lowers the bow. The wolf watches her a moment longer, then slinks away east, toward the Wall.'],
+      { do: 'remember', key: 'wolfSpared', text: 'Let the starving wolf go.', good: true },
+      { do: 'bond', who: 'lissa', pts: 5, why: 'Lissa would have done the same, and she\'ll hear it in how you tell it.' },
+    ],
+    woods_snare3: [
+      ['narr', 'The last snare holds a rabbit. Thin, but alive. The first meat in nine days.'],
+      { choose: [
+        { text: 'Take it home for the pot', bond: { nessa: 5, lissa: 5 }, why: 'Something in the pot tonight, for all three.', remember: ['rabbitHome', 'Brought the rabbit home for her sisters.', true], then: [['wren', 'Sorry, small one. There are three of us.']] },
+        { text: 'Eat now. You can\'t hunt on nothing', remember: ['rabbitAte', 'Ate the rabbit alone in the woods.', false], then: [['narr', 'It helps. Her hands stop shaking. She hates that it helps.']] },
+        { text: 'Let it go. It\'s not enough to matter', remember: ['rabbitFree', 'Let the rabbit go.', null], then: [['narr', 'It is gone before she has finished deciding. Something bigger, then. It has to be something bigger.']] },
       ] },
     ],
     woods_tracks: [
       ['wren', 'Tracks. Huge ones. Something this size would feed us for a month.'],
       ['wren', '...They glitter. Tracks don\'t glitter.'],
+      { if: 'steady', then: [['wren', 'My hands are steady. Father\'s targets saw to that.']] },
     ],
     woods_stag: [
       { do: 'flag', name: 'stagseen' },
@@ -168,17 +229,22 @@
       ['wren', '...What did I just do?'],
       { do: 'art', id: 'cottage', title: 'That night' },
       ['narr', 'That night there is meat in the pot for the first time in weeks. Lissa laughs. Even Nessa smiles.'],
+      { if: 'green', then: [['lissa', 'You found green! In this! Wren, it\'s alive. I\'m putting it in the window.'], { do: 'bond', who: 'lissa', pts: 10, why: 'Her seeds have company now.' }] },
+      { if: 'wood', then: [['narr', 'The fire is high, and nobody has to look at the chairs.']] },
+      { if: 'wolfKilled', then: [['nessa', 'A wolf pelt. That\'s a winter coat for Lissa. Good.'], ['narr', 'Lissa does not look at it.']] },
+      { if: 'rabbitAte', then: [['nessa', 'There\'s fur on your sleeve. I\'m glad one of us ate today.'], { do: 'bond', who: 'nessa', pts: -5, why: 'She said she was glad. She wasn\'t only glad.' }] },
       { do: 'cue', name: 'door' },
       ['narr', 'Then the door bursts open, and winter comes in with him.'],
       ['rowan', 'Who killed the white stag?'],
       ['narr', 'He is tall and golden, with antlers rising from a crown of leaves, and eyes like a summer field on fire.'],
       { choose: [
-        { text: 'Step forward: "I did."', then: [['rowan', 'Honest, at least. That will make this easier.']] },
+        { text: 'Step forward: "I did."', remember: ['rowanHonest', 'Told Lord Rowan the truth at the door.', true], then: [['rowan', 'Honest, at least. That will make this easier.']] },
         { text: '"It was a deer. We were starving."', then: [['rowan', 'It was the sacred stag of the Spring Court, and its blood is on your hands.']] },
-        { text: 'Reach for your knife', then: [['rowan', 'Put it down, huntress. Mortal steel won\'t touch me, and I didn\'t come here to hurt your family.']] },
+        { text: 'Reach for your knife', remember: ['rowanKnife', 'Reached for a knife against a High Lord.', null], then: [['rowan', 'Put it down, huntress. Mortal steel won\'t touch me, and I didn\'t come here to hurt your family.']] },
       ] },
       ['rowan', 'The Treaty between our peoples is old and simple. A fae life taken by a mortal is paid for with a mortal life.'],
       ['nessa', 'Then take me instead.'],
+      { if: 'nessaHard', then: [['narr', 'An hour ago Wren told her she couldn\'t be carried forever. This is Nessa\'s answer.']] },
       ['wren', 'No. Nessa, no.'],
       ['rowan', 'There is another way. Come with me across the Wall and live the rest of your days in the Spring Court. Your sisters keep their lives, and you keep yours.'],
       ['lissa', 'Wren...'],
@@ -342,6 +408,8 @@
     ],
     ashes_painted: [
       ['wren', 'I\'d forgotten how much I missed this.'],
+      { if: 'paintPromise', then: [['wren', 'I told Lissa "maybe in spring". It isn\'t spring. I painted anyway. She\'d say that counts.']] },
+      { if: 'paintNo', then: [['wren', 'I told Lissa paint doesn\'t feed anyone. I was wrong about what it feeds.']] },
       ['caelum', 'Look. The street is waking up. Every mural you paint brings a little more of Starhaven back.'],
       ['caelum', 'My house is at the end of the street. Climb up to the roof. I\'ll be waiting.'],
       { do: 'goal', id: 'rooftop' },
@@ -651,6 +719,8 @@
       ['narr', 'Then the air turns warm and sweet, like spring, and there are flowers growing out of the snow.'],
       ['rowan', 'Wren.'],
       ['wren', 'Rowan.'],
+      { if: 'rowanHonest', then: [['rowan', 'You told me the truth the night I came for you. Tell it to me now. Are you his prisoner?'], ['wren', 'No.']] },
+      { if: 'rowanKnife', then: [['rowan', 'You reached for a knife the first night. I should have known then that you would not stay where you were put.']] },
       ['rowan', 'I\'ve brought an army to his border because of you. I will burn his city to the river if I have to. Come home, and none of that happens.'],
       { choose: [
         { text: '"I\'m not going back, Rowan."', bond: { caelum: 10 }, then: [['rowan', 'You don\'t know what he is. What he wants with you.'], ['wren', 'I know exactly what he is. He let me choose. You never did.']] },

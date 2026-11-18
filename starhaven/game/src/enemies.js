@@ -201,6 +201,69 @@
     return { landed: true };
   };
 
+  // ---------------- Things to do in the Winter Woods before the stag: firewood and wintergreen to gather,
+  // snares to check, old targets to shoot, and a starving wolf.
+  function Pickup(x, y, what) { Object.assign(this, { kind: 'pickup', what, x, y, got: false }); }
+  Pickup.prototype.reset = function () { };
+  Pickup.prototype.hittable = () => false;
+  Pickup.prototype.update = function (world) {
+    const p = world.player;
+    if (this.got || Math.abs(p.x - this.x) > 16 || Math.abs(p.y - this.y) > 30) return;
+    this.got = true; SH.sfx.play('mote');
+    SH.fx.burst(this.x, this.y - 8, 8, { speed: 1.6, life: 20, gravity: -0.03, colors: this.what === 'herb' ? ['#8fd16b', '#fff6d8'] : ['#c89a5a', '#fff6d8'] });
+    world.onPickup(this.what);
+  };
+  function Snare(x, y, n) { Object.assign(this, { kind: 'snare', n, x, y, checked: false, usable: true, near: false, label: 'CHECK' }); }
+  Snare.prototype.reset = function () { };
+  Snare.prototype.hittable = () => false;
+  Snare.prototype.update = function (world) {
+    const p = world.player;
+    this.near = !this.checked && Math.abs(p.x - this.x) < 26 && Math.abs(p.y - this.y) < 30 && p.grounded;
+    if (this.near && world.input.pressed.up) { this.checked = true; this.near = false; world.onSnare(this.n); }
+  };
+  function Target(x, y) { Object.assign(this, { kind: 'target', x, y, hit: false, arrowOnly: true, wob: 0 }); }
+  Target.prototype.reset = function () { };
+  Target.prototype.hittable = function () { return !this.hit; };
+  Target.prototype.hurtBox = function () { return { l: this.x - 10, r: this.x + 10, t: this.y - 15, b: this.y + 15 }; };
+  Target.prototype.update = function () { if (this.wob > 0) this.wob--; };
+  Target.prototype.takeHit = function (hit, world) {
+    this.hit = true; this.wob = 30; SH.sfx.play('hit');
+    SH.fx.word(this.x, this.y - 22, 'BULLSEYE', '#ffd27a', 50); SH.fx.spark(this.x, this.y, 0, true);
+    world.onTarget(); return { landed: true };
+  };
+  // The wolf is as hungry as the sisters. One arrow and it backs off hurt: then it is Wren's choice,
+  // made with the bow and not a menu. Shoot again, or lower the bow and let it go.
+  function Wolf(x, y) { Object.assign(this, { kind: 'wolf', home: { x, y }, w: 34, h: 20, arrowOnly: true }); this.reset(); }
+  Wolf.prototype.reset = function () { if (this.gone) return; Object.assign(this, { x: this.home.x, y: this.home.y, vx: 0, vy: 0, dir: -1, state: 'prowl', t: 0, hp: 2, flash: 0, dead: false }); };
+  Wolf.prototype.hittable = function () { return !this.gone && !this.dead && this.state !== 'flee'; };
+  Wolf.prototype.hurtBox = function () { return { l: this.x - 18, r: this.x + 18, t: this.y - 32, b: this.y }; };
+  Wolf.prototype.update = function (world) {
+    if (this.gone) return;
+    const p = world.player, dx = p.x - this.x; this.t++; if (this.flash > 0) this.flash--;
+    if (this.dead) { this.vx = 0; return; }
+    switch (this.state) {
+      case 'prowl': this.dir = dx > 0 ? 1 : -1; this.vx = Math.sin(this.t * 0.03) * 0.5;
+        if (Math.abs(dx) < 200 && !this.seen) { this.seen = true; world.onWolf('seen'); }
+        if (Math.abs(dx) < 86 && Math.abs(p.y - this.y) < 40 && !p.dead) { this.state = 'crouch'; this.t = 0; SH.sfx.play('rumble'); SH.fx.word(this.x, this.y - 34, '!', '#ff5a5a', 30); } break;
+      case 'crouch': this.vx = 0; if (this.t > 30) { this.state = 'lunge'; this.t = 0; this.vx = this.dir * 5.2; this.vy = -3; } break;
+      case 'lunge': if (this.t > 22) { this.state = 'back'; this.t = 0; } if (SH.overlap(this.hurtBox(), p.box())) p.hurt(this.x, 1, world); break;
+      case 'back': this.vx = -this.dir * 1.6; if (this.t > 50) { this.state = 'prowl'; this.t = 0; } break;
+      case 'hurt': this.dir = dx > 0 ? 1 : -1; this.vx = Math.abs(dx) < 150 ? -this.dir * 0.8 : 0;
+        if (this.t % 50 === 10) SH.fx.word(this.x, this.y - 30, '...', '#c8d2e2', 40);
+        if (this.t > 260) { this.state = 'flee'; this.t = 0; world.onWolf('spared'); } break;
+      case 'flee': this.dir = 1; this.vx = 4.2; if (this.t > 120) this.gone = true; break;
+    }
+    this.vy = Math.min((this.vy || 0) + 0.5, 9);
+    const res = SH.moveBody(world.room, this); if (res.ground) this.vy = 0;
+  };
+  Wolf.prototype.takeHit = function (hit, world) {
+    if (!hit.arrow) return null;
+    this.hp--; this.flash = 8; SH.sfx.play('hit'); SH.fx.spark(this.x, this.y - 12, 0, false);
+    if (this.hp <= 0) { this.dead = true; SH.fx.kick(4); world.onWolf('killed'); }
+    else { this.state = 'hurt'; this.t = 0; this.vx = -hit.dir * -2; world.onWolf('hurt'); }
+    return { landed: true };
+  };
+
   // ---------------- Wyrms: the mountain wyrmling, and the Old Wyrm (same creature, bigger, from data).
   // Wander -> wind up (armored head, eyes glow) -> charge in a straight line -> dazed (open to hits) -> rest.
   function Wyrm(x, y, kind) {
@@ -393,6 +456,10 @@
     if (s.kind === 'dummy') return new Dummy(x, y);
     if (s.kind === 'stag') return new Stag(x, y, s.spots || [s.x]);
     if (s.kind === 'brazier') return new Brazier(x, y);
+    if (s.kind === 'pickup') return new Pickup(x, y, s.what);
+    if (s.kind === 'snare') return new Snare(x, y, s.n);
+    if (s.kind === 'target') return new Target(x, s.y * T);
+    if (s.kind === 'wolf') return new Wolf(x, y);
     if (s.kind === 'wyrmling' || s.kind === 'oldWyrm') return new Wyrm(x, y, s.kind);
     throw new Error('unknown spawn ' + s.kind);
   };

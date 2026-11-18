@@ -418,6 +418,7 @@
       else if (e.kind === 'stag') drawStag(ctx, e, t);
       else if (e.kind === 'brazier') drawBrazier(ctx, e, t);
       else if (e.kind === 'wyrm') drawWyrm2(ctx, e, t);
+      else if (e.kind === 'pickup' || e.kind === 'snare' || e.kind === 'target' || e.kind === 'wolf') drawWoods(ctx, e, t);
     }
     for (const f of w.fireballs || []) {
       const R = f.big ? 34 : 16;
@@ -803,6 +804,43 @@
     if (glow) { const r = (e.state === 'inhale' ? 12 + e.t * 0.35 : 18) * s; const g = ctx.createRadialGradient(hx, hy, 1, hx, hy, r); g.addColorStop(0, 'rgba(' + glow + ',0.5)'); g.addColorStop(1, 'rgba(' + glow + ',0)'); ctx.fillStyle = g; ctx.fillRect(hx - r, hy - r, r * 2, r * 2); }
     if (e.state === 'stun') for (let i = 0; i < 3; i++) { const a = t * 0.12 + i * 2.1; ctx.fillStyle = '#ffe9a8'; ctx.fillRect(x + e.dir * 20 * s + Math.cos(a) * 10 * s, y - 34 * s + Math.sin(a) * 3, 3, 3); }
     if (!e.boss && e.hp < e.def.hp) { const n = 10; for (let i = 0; i < n; i++) { ctx.fillStyle = i < Math.ceil(e.hp / e.def.hp * n) ? '#c8d2e2' : '#2a2a3a'; ctx.fillRect(x - 25 + i * 5, y - e.h * s - 14, 4, 3); } }
+  }
+  function drawWoods(ctx, e, t) {
+    const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(e.x + x), Math.round(e.y + y), w, h); };
+    if (e.kind === 'pickup') {
+      if (e.got) return;
+      const bob = Math.round(Math.sin(t * 0.08 + e.x) * 1.5);
+      const gl = ctx.createRadialGradient(e.x, e.y - 8, 1, e.x, e.y - 8, 22); gl.addColorStop(0, 'rgba(255,246,216,0.3)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 22, e.y - 30, 44, 44);
+      if (e.what === 'wood') { R(-10, -9 + bob, 20, 9, '#0a0818'); R(-9, -8 + bob, 18, 3, '#7a5636'); R(-9, -5 + bob, 18, 3, '#5e3e28'); R(-9, -2 + bob, 18, 1, '#4a3020'); R(-9, -8 + bob, 2, 6, '#c8a878'); R(-2, -10 + bob, 3, 10, '#c8b890'); R(-9, -8 + bob, 18, 1, '#ffffff'); }
+      else { R(-1, -12 + bob, 2, 12, '#3f6a3f'); R(-6, -12 + bob, 5, 3, '#8fd16b'); R(1, -15 + bob, 5, 3, '#8fd16b'); R(-5, -7 + bob, 4, 3, '#6ab04a'); R(2, -9 + bob, 4, 3, '#6ab04a'); R(-1, -17 + bob, 2, 2, '#ff9ac0'); }
+    } else if (e.kind === 'snare') {
+      R(-10, -2, 20, 2, '#0a0818'); R(-9, -14, 2, 14, '#5e3e28'); R(-9, -15, 12, 2, '#5e3e28');
+      ctx.strokeStyle = e.checked ? '#6a6a7a' : '#c8b890'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(e.x + 2, e.y - 14); ctx.lineTo(e.x + 2, e.y - 8); ctx.stroke(); ctx.beginPath(); ctx.arc(e.x + 2, e.y - 5, 3, 0, 6.3); ctx.stroke();
+      if (!e.checked) { const by = e.y - 34 + Math.round(Math.sin(t * 0.1) * 2); ctx.fillStyle = '#0a0818'; ctx.fillRect(e.x - 5, by - 1, 10, 13); ctx.fillStyle = '#ffd27a'; ctx.fillRect(e.x - 4, by, 8, 11); SH.ptext(ctx, '?', e.x - 1, by + 3, '#1c1430', 1); }
+    } else if (e.kind === 'target') {
+      const wob = Math.round(Math.sin(e.wob * 0.9) * e.wob * 0.12);
+      ctx.strokeStyle = '#5e3e28'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(e.x, e.y - 40); ctx.lineTo(e.x + wob, e.y - 12); ctx.stroke();
+      for (const [r, c] of [[12, '#0a0818'], [11, '#e8e0c8'], [8, '#c8452e'], [5, '#e8e0c8'], [2, '#c8452e']]) { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(e.x + wob, e.y, r, 0, 6.3); ctx.fill(); }
+      if (e.hit) { R(wob - 12, -1, 12, 2, '#6a4a2a'); R(wob - 14, -2, 3, 4, '#e8e0c8'); }
+    } else if (e.kind === 'wolf') {
+      if (e.gone) return;
+      ctx.save(); ctx.translate(Math.round(e.x), Math.round(e.y)); ctx.scale(e.dir, 1);
+      if (e.dead) ctx.rotate(1.45);
+      const run = e.state === 'lunge' || e.state === 'flee' ? Math.sin(t * 0.6) * 3 : e.state === 'prowl' || e.state === 'back' ? Math.sin(t * 0.2) * 1.5 : 0, low = e.state === 'crouch' ? 3 : e.state === 'hurt' ? 2 : 0;
+      for (const ol of ['#0a0818', null]) {
+        const g = ol ? 1.5 : 0, body = ol || (e.flash > 0 ? '#ffffff' : '#7a8296'), dark = ol || '#565e72', lite = ol || '#aab2c6';
+        ctx.strokeStyle = dark; ctx.lineWidth = 3 + g * 2; ctx.lineCap = 'round';
+        for (const [lx, sw] of [[-11, -run], [-7, run], [8, run], [12, -run]]) { ctx.beginPath(); ctx.moveTo(lx, -9 + low); ctx.lineTo(lx + sw, -1); ctx.stroke(); }
+        ctx.fillStyle = body; ctx.beginPath(); ctx.moveTo(-15 - g, -16 + low); ctx.quadraticCurveTo(0, -21 - g + low, 12, -18 + low - g); ctx.lineTo(15 + g, -11 + low); ctx.quadraticCurveTo(0, -5 + g + low, -14, -8 + low + g); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = body; ctx.lineWidth = 4 + g * 2; ctx.beginPath(); ctx.moveTo(-14, -14 + low); ctx.quadraticCurveTo(-22, -12 + low, -24, -5 + low + (e.state === 'hurt' ? 4 : 0)); ctx.stroke();   // tail, tucked when hurt
+        const hx = 15, hy = -19 + low + (e.state === 'hurt' ? 4 : 0);
+        ctx.fillStyle = body; ctx.beginPath(); ctx.moveTo(hx - 5 - g, hy - 5 - g); ctx.lineTo(hx + 4, hy - 4 - g); ctx.lineTo(hx + 12 + g, hy + 1); ctx.lineTo(hx + 11 + g, hy + 4 + g); ctx.lineTo(hx - 4 - g, hy + 5 + g); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(hx - 4, hy - 5); ctx.lineTo(hx - 3, hy - 11 - g); ctx.lineTo(hx + 1, hy - 5); ctx.fill();
+        if (!ol) { ctx.fillStyle = lite; ctx.fillRect(-10, -9 + low, 20, 2); ctx.fillStyle = e.state === 'crouch' || e.state === 'lunge' ? '#ff5a5a' : '#ffd27a'; ctx.fillRect(hx + 2, hy - 2, 2, 2); ctx.fillStyle = '#1a1430'; ctx.fillRect(hx + 10, hy, 2, 2);
+          ctx.fillStyle = dark; for (let i = 0; i < 4; i++) ctx.fillRect(-8 + i * 5, -15 + low, 1, 5); }   // ribs: it is starving too
+      }
+      ctx.restore();
+    }
   }
   // The white stag: slender, long-necked, a crown of antlers, lit from within. Drawn once in the outline colour, once in white.
   function stagBody(ctx, e, t, ol) {

@@ -211,6 +211,16 @@ body[data-input="touch"] #touch { display: block; }
 #film-credit.on, #film-cap.on { opacity: 1; }
 #film-skip { position: absolute; z-index: 2; right: 14px; bottom: 3vh; font: 700 11px var(--body); letter-spacing: .1em; color: rgba(255,255,255,.45); text-transform: uppercase; }
 #film-flash { position: absolute; inset: 0; z-index: 3; background: #fff6d8; opacity: 0; pointer-events: none; }
+#f-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; z-index: -1; opacity: .6; }
+#front::after { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 50% 45%, rgba(6,6,20,.25), rgba(6,6,20,.9) 75%); pointer-events: none; }
+#f-logo h1 { background: linear-gradient(180deg, #fff6d8 30%, #ffd27a 70%, #b9a8ff); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 3px 0 #0a0818) drop-shadow(0 0 18px rgba(255,210,122,.45)); }
+#f-logo h1::before { content: '\2726'; display: block; font-size: .32em; letter-spacing: 0; color: #ffd27a; -webkit-text-fill-color: #ffd27a; margin-bottom: -.2em; animation: pulse 2.4s infinite; }
+.fbtn { border-radius: 4px !important; background: linear-gradient(90deg, rgba(30,26,62,.92), rgba(14,12,34,.82)) !important; border: 1px solid var(--plate-line) !important; box-shadow: 0 0 0 2px #0a0818; transition: transform .12s, border-color .12s; }
+.fbtn.sel { border-color: var(--gold) !important; transform: translateX(6px); box-shadow: 0 0 0 2px #0a0818, -6px 0 0 -2px var(--gold), 0 0 18px rgba(255,210,122,.25); }
+#m-status { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; text-align: left; font-size: 13px; margin: 2px 0 8px; padding: 8px 10px; background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.08); border-radius: 4px; }
+#m-status b { color: var(--gold); display: block; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; } #m-status .wide { grid-column: 1 / -1; }
+#m-status img { width: 20px; height: 20px; image-rendering: pixelated; vertical-align: middle; margin-right: 3px; border: 1px solid rgba(255,255,255,.2); }
+#menu .card { width: min(560px, 94vw); } #menu .btn { display: inline-block; width: calc(50% - 6px); margin: 6px 2px 0; padding: 10px 6px; font-size: 14px; } #menu #m-resume { width: calc(100% - 4px); }
 #f-logo { display: none; }
 #f-logo.show { display: block; }
 #f-logo h1 { font-family: var(--display); font-weight: 800; letter-spacing: .14em; font-size: clamp(34px, 11vh, 76px); margin: 0; color: #fff6d8; text-shadow: 0 0 24px rgba(255,210,122,.55); }
@@ -267,6 +277,19 @@ body[data-input="touch"] #touch { display: block; }
 body[data-mode] #hud, body[data-mode] #pause-btn, body[data-mode] #b-attack, body[data-mode] #b-dash, body[data-mode] #b-down, body[data-mode] #b-gift, body[data-mode] #b-art, body[data-mode] #b-talk, body[data-mode] #whisper, body[data-mode] #dialog { display: none !important; }
 body[data-mode="flight"] #b-jump, body[data-mode="mural"] #b-jump { display: none !important; }
 body.cutin #touch, body.cutin #bossbar, body.cutin #sign, body.cutin #goal, body.cutin #whisper, body.cutin #pause-btn, body.cutin #motes, body.cutin #pips, body.cutin #hearts, body.cutin #art { visibility: hidden; }
+/* ---- what a decision did: who it touched, by how much, and why */
+#effects { position: fixed; z-index: 8; right: max(12px, env(safe-area-inset-right)); top: 56px; width: min(330px, 46vw); display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+.fx-row { display: flex; gap: 8px; align-items: center; padding: 6px 10px 6px 6px; background: var(--plate); border: 1px solid var(--plate-line); border-radius: 4px; box-shadow: 0 0 0 2px #0a0818; animation: fxin .3s ease-out both, fxout .5s ease-in 4.6s both; }
+.fx-row.up { border-color: #7ad88a; } .fx-row.down { border-color: #ff7a8a; } .fx-row.mem { border-color: var(--gold); }
+.fx-row img { width: 34px; height: 34px; image-rendering: pixelated; flex: none; border: 1px solid rgba(255,255,255,.25); }
+.fx-row .ico { width: 34px; height: 34px; flex: none; display: grid; place-items: center; font-size: 20px; color: var(--gold); }
+.fx-row b { display: block; font: 800 13px var(--body); } .fx-row.up b i { color: #7ad88a; font-style: normal; } .fx-row.down b i { color: #ff7a8a; font-style: normal; }
+.fx-row small { display: block; font: 600 12px/1.25 var(--body); color: var(--ink-dim); }
+.fx-row .hb { height: 4px; background: rgba(255,255,255,.12); border-radius: 2px; margin-top: 3px; overflow: hidden; } .fx-row .hb span { display: block; height: 100%; background: #ff9ac0; transition: width .9s ease-out .3s; }
+@keyframes fxin { from { transform: translateX(110%); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes fxout { to { transform: translateX(110%); opacity: 0 } }
+.mem-list { list-style: none; padding: 0; margin: 4px 0; } .mem-list li { padding: 3px 0 3px 18px; position: relative; } .mem-list li::before { content: '\2726'; position: absolute; left: 0; color: var(--gold); }
+.mem-list li.good::before { color: #7ad88a; } .mem-list li.bad::before { color: #ff7a8a; }
 /* ---- HUD layout: one tidy cluster top-left (hearts, moons, bond), Starlight beside MENU, hints clear of both */
 #touch-hint { transition: opacity .8s; } #touch-hint.gone { opacity: 0; }
 .gem { width: 14px; height: 14px; border-radius: 3px; border-width: 2px; }
@@ -275,7 +298,7 @@ body.cutin #touch, body.cutin #bossbar, body.cutin #sign, body.cutin #goal, body
 #art { top: 60px; width: 96px; height: 7px; } #art::after { top: -3px; left: 102px; font-size: 8px; }
 #motes { left: auto; right: calc(max(14px, env(safe-area-inset-right)) + 96px); top: 13px; border-radius: 4px; font-size: 14px; padding: 5px 10px; }
 #sign { width: min(480px, 54vw); top: 54px; font-size: 16px; padding: 8px 14px; }
-#goal { max-width: 46vw; }
+#goal { max-width: 56vw; }
 /* ---- Reimagined skin: every frame is an engraved night-steel plate with a starlight edge (as Sootborn frames its menus in brass). */
 :root { --plate: linear-gradient(180deg, rgba(30,26,62,.96), rgba(14,12,34,.96)); --plate-edge: #b9a8ff; --plate-line: #6a5aa8; }
 #goal, #sign, #toast, #dialog, .card, #motes, #pause-btn, .choice, #d-skip, #saved {
@@ -321,6 +344,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   <div class="tbtn" id="b-jump" data-act="jump">JUMP</div>
 </div>
 
+<div id="effects"></div>
 <div id="whisper"><img id="w-face" alt=""><div><b id="w-name"></b><span id="w-text"></span></div></div>
 
 <div id="dialog" role="dialog" aria-live="polite">
@@ -332,6 +356,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
 <div id="scene"><canvas id="scene-art" width="960" height="450"></canvas><div id="scene-title"></div></div>
 
 <div id="front">
+  <canvas id="f-bg" width="640" height="300"></canvas>
   <div id="splash"></div>
   <div id="film"><canvas id="film-art" width="960" height="450"></canvas><div id="film-credit"></div><div id="film-cap"></div><div id="film-skip">any button skips</div></div>
   <div id="f-logo">
@@ -365,6 +390,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   <div class="card">
     <h2>Paused</h2>
     <div class="pause-wm"></div>
+    <div id="m-status"></div>
     <button class="btn primary" id="m-resume">Resume</button>
     <button class="btn" id="m-journal">Story &amp; goals</button>
     <button class="btn" id="m-stars">Constellation</button>

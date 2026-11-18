@@ -33,6 +33,9 @@ gifts and bond hearts.
 
 ## Latest update (Nov 18, 2026)
 
+- **Decisions that matter, and a fuller hunt:** every choice shows who it touched, by how much and why; some are
+  remembered and the story answers them later. The Winter Woods now has firewood, snares, archery targets,
+  wintergreen and a starving wolf before the stag. New title and pause screens; finer portraits.
 - **Other perspectives:** a flight into the screen on Caelum's wings, the first mural traced face to the wall, and
   the Lamp Square seen from above for choosing your evening. The missions stay side-on.
 - **A camera, weight and memories:** the camera now zooms, frames conversations and goes to the boss; hits punch it;

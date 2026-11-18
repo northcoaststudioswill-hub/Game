@@ -224,8 +224,8 @@
   Player.prototype.tryAttack = function (world, inp) {
     if (this.atkBuf <= 0) return;
     if (!SH.game.can('daggers')) { // the hunting bow: one arrow, straight ahead
-      if (SH.game.can('bow') && this.bowCd <= 0 && this.grounded) {
-        this.atkBuf = 0; this.bowCd = 30; this.bowT = 16; this.vx = 0;
+      if (SH.game.can('bow') && this.bowCd <= 0) {   // from the ground, or from the top of a jump
+        this.atkBuf = 0; this.bowCd = 30; this.bowT = 16; if (this.grounded) this.vx = 0;
         const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
         world.spawnArrow(this.x + this.facing * 12, this.y - 27, this.facing);
         SH.sfx.play('bow');

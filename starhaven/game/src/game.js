@@ -22,7 +22,7 @@
     const pr = G.progress;
     SH.saves.write(G.slot, {
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
     });
     if (show) G.hud.saved();
   };
@@ -41,7 +41,7 @@
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
     G.slot = slot;
-    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars) };
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})) };
     SH.arts.newGame(); SH.arts.said = Object.assign({}, s.said); SH.arts.meter = s.bondMeter || 0;
     const N = ST.CHAPTERS.length, target = s.chapter;
     const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
@@ -101,6 +101,16 @@
       },
       onBossDown() { const b = this.things.find(e => e.boss); if (b) G.look(b.x, b.y - 30, 1.5, 110); fx.slowmo = 70; SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
+      // the Winter Woods
+      onPickup(what) {
+        if (what === 'herb') { G.remember('green', 'Found wintergreen under the snow for Lissa.', true); G.queueScript('woods_herb'); return; }
+        G.flags.n_wood = (G.flags.n_wood || 0) + 1;
+        fx.word(player.x, player.y - 50, 'Firewood ' + G.flags.n_wood + '/3', '#ffd27a', 60);
+        if (G.flags.n_wood === 3) G.queueScript('woods_wood');
+      },
+      onSnare(n) { G.flags.n_snares = (G.flags.n_snares || 0) + 1; if (G.flags.n_snares >= 3) G.flags.snares3 = true; G.hud.goal(true); G.queueScript('woods_snare' + n); },
+      onTarget() { G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
+      onWolf(what) { G.queueScript('woods_wolf_' + what); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
@@ -202,7 +212,7 @@
     if (!g) return '';
     let text = g.text;
     if (g.count && G.world) {
-      const n = G.world.things.filter(e => e.kind === 'thornSprite' && e.dead).length;
+      const n = g.counter ? (G.flags['n_' + g.counter] || 0) : G.world.things.filter(e => e.kind === 'thornSprite' && e.dead).length;
       text += ` (${n}/${g.count})`;
     }
     return text;
@@ -235,6 +245,11 @@
         }
         G.talkWait = 10; // a short pause so a held button doesn't skip the line
         return;
+      }
+      if (st.if) {   // the story comes back to something Wren did
+        const yes = st.if[0] === '!' ? !G.recalls(st.if.slice(1)) : G.recalls(st.if);
+        sc.steps = sc.steps.slice(0, sc.i).concat(yes ? st.then || [] : st.else || [], sc.steps.slice(sc.i));
+        continue;
       }
       if (st.do === 'mode') {   // another way of seeing: the script waits for it, then carries on
         const sc0 = sc;
@@ -270,13 +285,14 @@
     const w = G.world;
     switch (st.do) {
       case 'mode': break;   // skipped along with the scene
+      case 'remember': G.remember(st.key, st.text, st.good); break;
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); break;
       case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
       case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
       case 'meet': G.meet(st.who); break;
       case 'emote': { const n = w.npcs.find(x => x.id === st.npc); if (n) n.emote = { e: st.e, t: 0 }; break; }
-      case 'bond': G.bond(st.who, st.pts); break;
+      case 'bond': G.bond(st.who, st.pts, st.liked, st.why); break;
       case 'art': G.hud.sceneArt(st.id, st.title); break;
       case 'cue': G.hud.sceneCue(st.name); if (st.name === 'door' || st.name === 'end') SH.sfx.play('thud'); if (st.name === 'rise' || st.name === 'caelum') SH.sfx.play('chime'); break;
       case 'goto': { const sc = G.script; sc.steps = sc.steps.slice(0, sc.i).concat(ST.SCRIPTS[st.id], sc.steps.slice(sc.i)); break; }
@@ -294,7 +310,8 @@
     const o = opts[idx];
     G.choosing = null;
     G.hud.choice(null);
-    for (const who in (o.bond || {})) { G.bond(who, o.bond[who], o.liked === who); const n = G.world.npcs.find(x => x.id === who && !x.hidden); if (n && o.liked === who) n.emote = { e: 'heart', t: 0 }; }
+    if (o.remember) G.remember(o.remember[0], o.remember[1], o.remember[2]);
+    for (const who in (o.bond || {})) { G.bond(who, o.bond[who], o.liked === who, o.why && (typeof o.why === 'string' ? o.why : o.why[who])); const n = G.world.npcs.find(x => x.id === who && !x.hidden); if (n && o.liked === who) n.emote = { e: 'heart', t: 0 }; }
     sc.steps = sc.steps.slice(0, sc.i).concat(o.then || [], sc.steps.slice(sc.i));
     G.advance();
   };
@@ -309,16 +326,28 @@
     }
     G.save();
   };
-  G.bond = function (who, pts, liked) {
+  // What a decision did. Effects gather for a moment, then show together as one card.
+  G.effects = []; G.effectT = 0;
+  G.effect = function (e) { G.effects.push(e); G.effectT = 6; };
+  G.effectStep = function () { if (G.effectT > 0 && --G.effectT === 0) { G.hud.effects(G.effects); G.effects = []; } };
+  // A decision the story will come back to. good: true, false, or null for neither.
+  G.remember = function (key, text, good) {
+    const m = G.progress.mem = G.progress.mem || {};
+    if (m[key]) return;
+    m[key] = { text, good: good == null ? null : !!good, ch: G.chapter };
+    G.effect({ mem: text, good: good == null ? null : !!good });
+    G.save();
+  };
+  G.recalls = key => !!(G.progress.mem && G.progress.mem[key]);
+  G.bond = function (who, pts, liked, why) {
     if (!G.progress.bonds[who]) G.progress.bonds[who] = { pts: 0 };
     const b = G.progress.bonds[who], before = G.heartsFor(b.pts);
-    b.pts += pts;
-    const after = G.heartsFor(b.pts), name = ST.CAST[who].name;
-    if (after > before) {
-      G.hud.toast(`\u2665 ${name}: heart ${after} of 5`);
-      G.heartQueue.push(`heart_${who}_${after}`);
-      SH.sfx.play('heart');
-    } else G.hud.toast(liked ? `${name} loved that.` : `${name} will remember that.`);
+    b.pts = Math.max(0, b.pts + pts);
+    const after = G.heartsFor(b.pts);
+    if (after > before) { G.heartQueue.push(`heart_${who}_${after}`); SH.sfx.play('heart'); }
+    else if (pts < 0) SH.sfx.play('back');
+    // every change is shown: who, how much, and why
+    G.effect({ who, pts, why: why || (pts < 0 ? 'That stung.' : liked ? 'That meant a lot.' : 'Noted.'), heart: after > before ? after : 0 });
     G.save();
   };
 
@@ -341,6 +370,7 @@
     input.step();
     if (G.mode) { if (G.state === 'talk' || G.state === 'play') G.progress.playFrames = (G.progress.playFrames || 0) + 1; SH.modes.step(input); return; }
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
+    G.effectStep();
     if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -503,7 +533,8 @@
     const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
     G.hud.prompt(hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Hold {PAINT} to paint the wall.') : null);
-    G.hud.talkButton(talkable ? 'TALK' : canPaint ? 'PAINT' : null);
+    const usable = w.things.find(e => e.usable && e.near);
+    G.hud.talkButton(talkable ? 'TALK' : canPaint ? 'PAINT' : usable ? usable.label : null);
 
     for (const g of w.gates) if (!g.closed && (g.lift || 0) < 1) g.lift = (g.lift || 0) + 0.03;
     w.cityLight += (w.cityLightTarget - w.cityLight) * 0.03;

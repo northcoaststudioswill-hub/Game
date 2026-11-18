@@ -9,7 +9,7 @@
 
   // ---------------------------------------------------------------- Prologue part 1: The Winter Woods (mortal Wren, a bow, no enemies)
   SH.ROOMS.woods = {
-    id: 'woods', width: 100, height: 20, theme: 'winter',
+    id: 'woods', width: 160, height: 20, theme: 'winter',
     start: { x: 10, y: 16 },
     cottage: 2,                          // the sisters' cottage, where it starts
     shapes: [
@@ -17,31 +17,49 @@
       ['ground', 2, 44, 16],
       ['solid', 20, 22, 15, 16],         // a fallen log
       ['ground', 30, 38, 15],            // a snowbank
-      ['ground', 47, 100, 16],           // a frozen creek between 44 and 47
+      ['ground', 47, 160, 16],           // a frozen creek between 44 and 47
       ['solid', 55, 57, 14, 16],         // a boulder
-      ['solid', 98, 100, 0, 20],
+      ['oneway', 81, 87, 12],            // a rock shelf: something green grows up there
+      ['solid', 79, 81, 14, 16],         // the step up to it
+      ['ground', 110, 118, 15],          // the rise before the clearing
+      ['solid', 158, 160, 0, 20],
     ],
     hints: [
       { x0: 9, x1: 17, text: 'Move with {MOVE}. Lissa and Nessa have something to say: walk up to them and use {TALK}.' },
       { x0: 17, x1: 26, text: 'Jump with {JUMP}. Wren is still mortal: one jump, no more.' },
-      { x0: 64, x1: 79, text: 'Shoot with {SHOOT}. Get too close and the stag will bolt.', flag: 'stagseen' },
+      { x0: 47, x1: 53, text: 'A snare. Stand by it and use {TALK} to check it.' },
+      { x0: 59, x1: 72, text: 'Father\'s old targets. Shoot with {SHOOT}: the high one needs a jump: shoot at the top of it.' },
+      { x0: 90, x1: 100, text: 'A wolf. Shoot with {SHOOT} before it springs, or jump its lunge. What happens after the first arrow is up to you.', until: 'wolfdone' },
+      { x0: 112, x1: 120, text: 'There are snares you have not checked behind you.', until: 'snares3' },
+      { x0: 124, x1: 139, text: 'Shoot with {SHOOT}. Get too close and the stag will bolt.', flag: 'stagseen' },
     ],
     triggers: [
       { x: 10, script: 'woods_start' },
-      { x: 40, script: 'woods_tracks' },
-      { x: 63, script: 'woods_stag' },
+      { x: 59, script: 'woods_range' },
+      { x: 113, script: 'woods_tracks' },
+      { x: 123, script: 'woods_stag' },
     ],
-    lanterns: [{ x: 12, lit: true }, { x: 48 }],
+    lanterns: [{ x: 12, lit: true }, { x: 48 }, { x: 89 }, { x: 119 }],
     npcs: [{ id: 'lissa', x: 7, optional: 'woods_lissa' }, { id: 'nessa', x: 15.5, optional: 'woods_nessa' }],
     gates: [],
     props: [
-      { t: 'log', x: 20, w: 2 }, { t: 'boulder', x: 55, w: 2, h: 2 },
-      { t: 'bush', x: 14.5 }, { t: 'bush', x: 27 }, { t: 'bush', x: 40.5 }, { t: 'bush', x: 50 }, { t: 'bush', x: 61 }, { t: 'bush', x: 71 },
-      { t: 'drift', x: 24.5 }, { t: 'drift', x: 34 }, { t: 'drift', x: 49 }, { t: 'drift', x: 66 }, { t: 'drift', x: 76 }, { t: 'drift', x: 91 },
-      { t: 'pine', x: 17.5 }, { t: 'pine', x: 42 }, { t: 'pine', x: 59 }, { t: 'pine', x: 86 }, { t: 'pine', x: 96.5 },
+      { t: 'log', x: 20, w: 2 }, { t: 'boulder', x: 55, w: 2, h: 2 }, { t: 'boulder', x: 79, w: 2, h: 2 },
+      { t: 'bush', x: 14.5 }, { t: 'bush', x: 27 }, { t: 'bush', x: 40.5 }, { t: 'bush', x: 52 }, { t: 'bush', x: 74 }, { t: 'bush', x: 93 }, { t: 'bush', x: 107 }, { t: 'bush', x: 121 }, { t: 'bush', x: 131 },
+      { t: 'drift', x: 24.5 }, { t: 'drift', x: 34 }, { t: 'drift', x: 49 }, { t: 'drift', x: 68 }, { t: 'drift', x: 88 }, { t: 'drift', x: 101 }, { t: 'drift', x: 126 }, { t: 'drift', x: 136 }, { t: 'drift', x: 151 },
+      { t: 'pine', x: 17.5 }, { t: 'pine', x: 42 }, { t: 'pine', x: 59 }, { t: 'pine', x: 77 }, { t: 'pine', x: 98 }, { t: 'pine', x: 122 }, { t: 'pine', x: 146 }, { t: 'pine', x: 156.5 },
+      { t: 'deadtree', x: 63 }, { t: 'deadtree', x: 67 }, { t: 'deadtree', x: 71 }, { t: 'bones', x: 103 }, { t: 'cairn', x: 109 },
     ],
-    motes: [['line', 13, 18, 14.6], ['arc', 18.5, 23.5, 14.4, 2.6], ['line', 31, 37, 13.6], ['arc', 42.5, 48.5, 14.4, 2.8], ['arc', 53, 59, 14.4, 3.6], ['line', 60, 64, 14.6]],
-    spawns: [{ kind: 'stag', x: 80, spots: [80, 88, 94] }],
+    motes: [['line', 13, 18, 14.6], ['arc', 18.5, 23.5, 14.4, 2.6], ['line', 31, 37, 13.6], ['arc', 42.5, 48.5, 14.4, 2.8], ['arc', 53, 59, 14.4, 3.6], ['line', 82, 86, 10.6], ['line', 111, 117, 13.6], ['line', 120, 123, 14.6]],
+    spawns: [
+      { kind: 'pickup', what: 'wood', x: 25 }, { kind: 'pickup', what: 'wood', x: 33, y: 15 }, { kind: 'pickup', what: 'wood', x: 41 },
+      { kind: 'snare', n: 1, x: 50 },
+      { kind: 'target', x: 63, y: 14.9 }, { kind: 'target', x: 67, y: 11.3 }, { kind: 'target', x: 71, y: 14.9 },
+      { kind: 'snare', n: 2, x: 76 },
+      { kind: 'pickup', what: 'herb', x: 84, y: 12 },
+      { kind: 'wolf', x: 99 },
+      { kind: 'snare', n: 3, x: 106 },
+      { kind: 'stag', x: 140, spots: [140, 148, 154] },
+    ],
   };
 
   // ---------------------------------------------------------------- Prologue: The Deep (movement only, no enemies)

@@ -1,5 +1,49 @@
 # Starhaven — Changelog
 
+## Reimagined 5 — decisions that matter, a fuller hunt, menus and faces (Nov 18, 2026)
+Will: we have to know why our decisions matter, whether they help or hurt. The slice needs more content and a slower
+pace, with more to do before the deer is shot. Better menus, better design, updated characters.
+
+**Decisions now show their weight.**
+- Every choice that touches someone slides in a card: their face, **+10 &hearts; or &minus;5 &hearts;**, the reason in a
+  sentence ("True, and it landed like a slap."), and their heart bar moving. Bonds can now go **down**.
+- Choices the story will come back to are marked **"This will be remembered"**, green if someone is better for it, red
+  if it will cost her, gold if it could go either way. They are listed in Story & goals under "What Wren has done", and
+  counted on the pause screen.
+- The story does come back to them. So far: the cottage that night changes with what you did in the woods (the
+  wintergreen, the firewood, the wolf pelt, the rabbit you ate alone); Nessa's "take me instead" lands differently if
+  you told her she couldn't be carried forever; painting the first mural answers what you told Lissa about painting;
+  Rowan on the peak remembers whether you told him the truth or reached for a knife.
+- **Nessa and Lissa have bonds of their own** (the design doc's sisters' track), earned in the prologue.
+
+**The Winter Woods is a real hunt now** (the level is 60% longer; about four to six minutes before the stag):
+- **Firewood for Nessa:** three bundles of deadfall along the path.
+- **Three snares to check** (the goal counts them): one empty, one chewed through, one with a rabbit and a three-way
+  decision.
+- **Father's targets:** three old archery rings. Two are flat shots; the high one needs a shot from the top of a jump
+  (Wren can now shoot in the air).
+- **Wintergreen for Lissa,** up on a rock shelf.
+- **A starving wolf** guarding the last snare. One arrow and it backs off, hurt. Then the decision is made with the
+  bow, not a menu: shoot again for the pelt, or lower the bow and it slinks away. Each sister feels differently about
+  which you chose.
+- New talk options with both sisters, including ones that hurt.
+
+**Menus.** The title sits over a living picture (the rooftop, the city, the observatory) with a new logo treatment and
+buttons that slide when chosen. The pause screen opens with where you stand: chapter and goal, Starlight here and to
+spend, choices remembered, and your bonds as faces and hearts. Its buttons are in two columns.
+
+**Faces.** Every portrait gains lid lines and catch-lights in the eyes, a blush, a two-tone mouth, a softer jaw, a
+chin shadow and a highlight through the hair. The wolf, the snares, the targets and the pickups are drawn in the
+outlined style.
+
+**Honest notes.**
+- Callbacks exist for the prologue decisions only. The choices in Chapters 1 to 3 show their bond effect and reason
+  through the same card, but most are not yet "remembered" by later scenes.
+- Wren's own in-level figure and the thorn sprites and wyrms are still not redrawn.
+- A test bot plays the whole new hunt (firewood, snares, targets, wintergreen, sparing the wolf, the rabbit) and it
+  takes it about two minutes without reading; a person will be slower. Tests: 46 play checks, 18 menu checks, the
+  screenshot run. **Not played by hand or on a phone.**
+
 ## Reimagined 4 — polish and design pass (Nov 18, 2026)
 Will: the game needs more polish and design. Done from a full-resolution tour of every level, fixing what looked wrong.
 

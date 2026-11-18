@@ -211,6 +211,16 @@ body[data-input="touch"] #touch { display: block; }
 #film-credit.on, #film-cap.on { opacity: 1; }
 #film-skip { position: absolute; z-index: 2; right: 14px; bottom: 3vh; font: 700 11px var(--body); letter-spacing: .1em; color: rgba(255,255,255,.45); text-transform: uppercase; }
 #film-flash { position: absolute; inset: 0; z-index: 3; background: #fff6d8; opacity: 0; pointer-events: none; }
+#f-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; z-index: -1; opacity: .6; }
+#front::after { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 50% 45%, rgba(6,6,20,.25), rgba(6,6,20,.9) 75%); pointer-events: none; }
+#f-logo h1 { background: linear-gradient(180deg, #fff6d8 30%, #ffd27a 70%, #b9a8ff); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 3px 0 #0a0818) drop-shadow(0 0 18px rgba(255,210,122,.45)); }
+#f-logo h1::before { content: '\2726'; display: block; font-size: .32em; letter-spacing: 0; color: #ffd27a; -webkit-text-fill-color: #ffd27a; margin-bottom: -.2em; animation: pulse 2.4s infinite; }
+.fbtn { border-radius: 4px !important; background: linear-gradient(90deg, rgba(30,26,62,.92), rgba(14,12,34,.82)) !important; border: 1px solid var(--plate-line) !important; box-shadow: 0 0 0 2px #0a0818; transition: transform .12s, border-color .12s; }
+.fbtn.sel { border-color: var(--gold) !important; transform: translateX(6px); box-shadow: 0 0 0 2px #0a0818, -6px 0 0 -2px var(--gold), 0 0 18px rgba(255,210,122,.25); }
+#m-status { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; text-align: left; font-size: 13px; margin: 2px 0 8px; padding: 8px 10px; background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.08); border-radius: 4px; }
+#m-status b { color: var(--gold); display: block; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; } #m-status .wide { grid-column: 1 / -1; }
+#m-status img { width: 20px; height: 20px; image-rendering: pixelated; vertical-align: middle; margin-right: 3px; border: 1px solid rgba(255,255,255,.2); }
+#menu .card { width: min(560px, 94vw); } #menu .btn { display: inline-block; width: calc(50% - 6px); margin: 6px 2px 0; padding: 10px 6px; font-size: 14px; } #menu #m-resume { width: calc(100% - 4px); }
 #f-logo { display: none; }
 #f-logo.show { display: block; }
 #f-logo h1 { font-family: var(--display); font-weight: 800; letter-spacing: .14em; font-size: clamp(34px, 11vh, 76px); margin: 0; color: #fff6d8; text-shadow: 0 0 24px rgba(255,210,122,.55); }
@@ -267,6 +277,19 @@ body[data-input="touch"] #touch { display: block; }
 body[data-mode] #hud, body[data-mode] #pause-btn, body[data-mode] #b-attack, body[data-mode] #b-dash, body[data-mode] #b-down, body[data-mode] #b-gift, body[data-mode] #b-art, body[data-mode] #b-talk, body[data-mode] #whisper, body[data-mode] #dialog { display: none !important; }
 body[data-mode="flight"] #b-jump, body[data-mode="mural"] #b-jump { display: none !important; }
 body.cutin #touch, body.cutin #bossbar, body.cutin #sign, body.cutin #goal, body.cutin #whisper, body.cutin #pause-btn, body.cutin #motes, body.cutin #pips, body.cutin #hearts, body.cutin #art { visibility: hidden; }
+/* ---- what a decision did: who it touched, by how much, and why */
+#effects { position: fixed; z-index: 8; right: max(12px, env(safe-area-inset-right)); top: 56px; width: min(330px, 46vw); display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+.fx-row { display: flex; gap: 8px; align-items: center; padding: 6px 10px 6px 6px; background: var(--plate); border: 1px solid var(--plate-line); border-radius: 4px; box-shadow: 0 0 0 2px #0a0818; animation: fxin .3s ease-out both, fxout .5s ease-in 4.6s both; }
+.fx-row.up { border-color: #7ad88a; } .fx-row.down { border-color: #ff7a8a; } .fx-row.mem { border-color: var(--gold); }
+.fx-row img { width: 34px; height: 34px; image-rendering: pixelated; flex: none; border: 1px solid rgba(255,255,255,.25); }
+.fx-row .ico { width: 34px; height: 34px; flex: none; display: grid; place-items: center; font-size: 20px; color: var(--gold); }
+.fx-row b { display: block; font: 800 13px var(--body); } .fx-row.up b i { color: #7ad88a; font-style: normal; } .fx-row.down b i { color: #ff7a8a; font-style: normal; }
+.fx-row small { display: block; font: 600 12px/1.25 var(--body); color: var(--ink-dim); }
+.fx-row .hb { height: 4px; background: rgba(255,255,255,.12); border-radius: 2px; margin-top: 3px; overflow: hidden; } .fx-row .hb span { display: block; height: 100%; background: #ff9ac0; transition: width .9s ease-out .3s; }
+@keyframes fxin { from { transform: translateX(110%); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes fxout { to { transform: translateX(110%); opacity: 0 } }
+.mem-list { list-style: none; padding: 0; margin: 4px 0; } .mem-list li { padding: 3px 0 3px 18px; position: relative; } .mem-list li::before { content: '\2726'; position: absolute; left: 0; color: var(--gold); }
+.mem-list li.good::before { color: #7ad88a; } .mem-list li.bad::before { color: #ff7a8a; }
 /* ---- HUD layout: one tidy cluster top-left (hearts, moons, bond), Starlight beside MENU, hints clear of both */
 #touch-hint { transition: opacity .8s; } #touch-hint.gone { opacity: 0; }
 .gem { width: 14px; height: 14px; border-radius: 3px; border-width: 2px; }
@@ -275,7 +298,7 @@ body.cutin #touch, body.cutin #bossbar, body.cutin #sign, body.cutin #goal, body
 #art { top: 60px; width: 96px; height: 7px; } #art::after { top: -3px; left: 102px; font-size: 8px; }
 #motes { left: auto; right: calc(max(14px, env(safe-area-inset-right)) + 96px); top: 13px; border-radius: 4px; font-size: 14px; padding: 5px 10px; }
 #sign { width: min(480px, 54vw); top: 54px; font-size: 16px; padding: 8px 14px; }
-#goal { max-width: 46vw; }
+#goal { max-width: 56vw; }
 /* ---- Reimagined skin: every frame is an engraved night-steel plate with a starlight edge (as Sootborn frames its menus in brass). */
 :root { --plate: linear-gradient(180deg, rgba(30,26,62,.96), rgba(14,12,34,.96)); --plate-edge: #b9a8ff; --plate-line: #6a5aa8; }
 #goal, #sign, #toast, #dialog, .card, #motes, #pause-btn, .choice, #d-skip, #saved {
@@ -321,6 +344,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   <div class="tbtn" id="b-jump" data-act="jump">JUMP</div>
 </div>
 
+<div id="effects"></div>
 <div id="whisper"><img id="w-face" alt=""><div><b id="w-name"></b><span id="w-text"></span></div></div>
 
 <div id="dialog" role="dialog" aria-live="polite">
@@ -332,6 +356,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
 <div id="scene"><canvas id="scene-art" width="960" height="450"></canvas><div id="scene-title"></div></div>
 
 <div id="front">
+  <canvas id="f-bg" width="640" height="300"></canvas>
   <div id="splash"></div>
   <div id="film"><canvas id="film-art" width="960" height="450"></canvas><div id="film-credit"></div><div id="film-cap"></div><div id="film-skip">any button skips</div></div>
   <div id="f-logo">
@@ -365,6 +390,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   <div class="card">
     <h2>Paused</h2>
     <div class="pause-wm"></div>
+    <div id="m-status"></div>
     <button class="btn primary" id="m-resume">Resume</button>
     <button class="btn" id="m-journal">Story &amp; goals</button>
     <button class="btn" id="m-stars">Constellation</button>
@@ -593,6 +619,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     bram: { loves: 'Spiced bread, sparring', perk: 'Takes one hit for Wren per mission (later chapters).' },
     iris: { loves: 'Sugared plums, old maps', perk: 'Shows hidden chests on the map (later chapters).' },
     thane: { loves: 'Rare books, good ink', perk: '+20% XP from missions (later chapters).' },
+    nessa: { loves: 'Being told the truth, firewood', perk: 'Her trust opens the chapter where Wren protects her sisters (later).' },
+    lissa: { loves: 'Anything green, your paintings', perk: 'Her trust opens the chapter where Wren protects her sisters (later).' },
   };
 
   // Short version of the story so far, for the journal.
@@ -604,7 +632,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       abilities: { double: false, dash: false, daggers: false, bow: true },
       card: 'Before the Deep, before the fae. Wren is nineteen, mortal, and the only hunter in a family that is slowly starving.',
       goals: [
-        { id: 'hunt', text: 'Hunt in the woods east of the cottage' },
+        { id: 'hunt', text: 'Check your snares on the east path', count: 3, counter: 'snares' },
         { id: 'stag', text: 'Shoot the white stag in the clearing' },
       ],
       summary: 'Wren killed a white stag sacred to the Spring Court. That night Lord Rowan came for her and took her across the Wall: a life for a life.',
@@ -676,21 +704,80 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     woods_lissa: [
       ['lissa', 'Wren? When we have enough again... will you paint something on the wall? Like you used to, before.'],
       { choose: [
-        { text: '"Maybe in spring."', then: [['lissa', 'I\'ll hold you to that. Spring always comes. That\'s the whole point of it.']] },
-        { text: '"Paint doesn\'t feed anyone."', then: [['lissa', 'Neither do I, and you keep me around.'], ['wren', 'Barely.'], ['narr', 'Lissa laughs. It\'s the first time in a week.']] },
+        { text: '"Maybe in spring."', bond: { lissa: 10 }, why: 'A promise she can hold on to.', remember: ['paintPromise', 'Promised Lissa a painting in spring.', true], then: [['lissa', 'I\'ll hold you to that. Spring always comes. That\'s the whole point of it.']] },
+        { text: '"Paint doesn\'t feed anyone."', bond: { lissa: 5 }, why: 'She laughed, for the first time in a week.', remember: ['paintNo', 'Told Lissa that paint doesn\'t feed anyone.', false], then: [['lissa', 'Neither do I, and you keep me around.'], ['wren', 'Barely.'], ['narr', 'Lissa laughs. It\'s the first time in a week.']] },
+        { text: '"I don\'t paint anymore."', bond: { lissa: -5 }, why: 'She went quiet. She misses who you were.', then: [['lissa', 'Oh.'], ['narr', 'Lissa goes back to sorting her seeds, smaller than she was a moment ago.']] },
       ] },
     ],
     woods_nessa: [
       ['narr', 'Nessa is splitting the last of the firewood. She hasn\'t eaten today either. She thinks Wren hasn\'t noticed.'],
-      ['nessa', 'I\'d go with you if I could shoot.'],
+      ['nessa', 'I\'d go with you if I could shoot. If you see any deadfall out there, we\'re down to the chairs.'],
       { choose: [
-        { text: '"You\'d scare everything off with your opinions."', then: [['nessa', 'Someone in this family has to have them.']] },
-        { text: '"Eat something, Ness. I\'ll find more."', then: [['nessa', '...You first.'], ['narr', 'Neither of them moves. They\'ve been having this argument all winter.']] },
+        { text: '"You\'d scare everything off with your opinions."', bond: { nessa: 5 }, why: 'She would rather be teased than pitied.', then: [['nessa', 'Someone in this family has to have them.']] },
+        { text: '"Eat something, Ness. I\'ll find more."', bond: { nessa: 10 }, why: 'Somebody noticed.', remember: ['nessaEat', 'Told Nessa to eat first.', true], then: [['nessa', '...You first.'], ['narr', 'Neither of them moves. They\'ve been having this argument all winter.']] },
+        { text: '"Then learn. I can\'t carry all three of us forever."', bond: { nessa: -10 }, why: 'True, and it landed like a slap.', remember: ['nessaHard', 'Told Nessa she could not be carried forever.', false], then: [['nessa', '...No. I don\'t suppose you can.'], ['narr', 'The axe comes down harder than it needs to.']] },
+      ] },
+    ],
+    woods_wood: [
+      ['narr', 'Three armfuls of deadfall, dry under the snow. Wren ties them to carry home.'],
+      { do: 'remember', key: 'wood', text: 'Carried firewood home for Nessa.', good: true },
+      { do: 'bond', who: 'nessa', pts: 10, why: 'She won\'t have to burn the last chair.' },
+    ],
+    woods_snare1: [
+      ['wren', 'Empty. Sprung by the wind, or by something clever.'],
+      ['narr', 'She resets it anyway. Her fingers know the knot without her.'],
+    ],
+    woods_range: [
+      ['wren', 'Father\'s targets. He hung them the winter before the fever.'],
+      ['wren', 'Three arrows, three rings. "Breathe out, then let go." I can still hear him.'],
+    ],
+    woods_targets: [
+      ['narr', 'Three for three. The last one is still swinging.'],
+      { do: 'remember', key: 'steady', text: 'Three for three at Father\'s targets.', good: true },
+      ['wren', 'Still got it, old man.'],
+    ],
+    woods_snare2: [
+      ['wren', 'Sprung. And chewed through.'],
+      ['narr', 'Wolf prints in the snow, and not old ones. Something has been eating her catches all winter.'],
+    ],
+    woods_herb: [
+      ['wren', 'Wintergreen. Alive, under all this. Lissa asked for anything green.'],
+      ['narr', 'She wraps it in her scarf like something that could break.'],
+    ],
+    woods_wolf_seen: [
+      ['wren', 'There you are.'],
+      ['narr', 'The wolf stands over her last snare. Every rib shows through its coat.'],
+    ],
+    woods_wolf_hurt: [
+      ['narr', 'The arrow takes it in the shoulder. It backs away, and does not run. It looks at the snare, and then at her.'],
+      ['wren', 'You\'re as hungry as we are.'],
+      ['narr', 'She has another arrow on the string. She could loose it. She could also just... not.'],
+    ],
+    woods_wolf_killed: [
+      { do: 'flag', name: 'wolfdone' },
+      ['narr', 'The second arrow is kinder than the winter would have been. A pelt, and a little stringy meat. It is the sensible thing.'],
+      { do: 'remember', key: 'wolfKilled', text: 'Killed the starving wolf for its pelt.', good: null },
+      { do: 'bond', who: 'nessa', pts: 5, why: 'A pelt is a pelt. Nessa approves of sensible.' },
+      { do: 'bond', who: 'lissa', pts: -5, why: 'She won\'t ask where the fur came from. She\'ll know.' },
+    ],
+    woods_wolf_spared: [
+      { do: 'flag', name: 'wolfdone' },
+      ['narr', 'Wren lowers the bow. The wolf watches her a moment longer, then slinks away east, toward the Wall.'],
+      { do: 'remember', key: 'wolfSpared', text: 'Let the starving wolf go.', good: true },
+      { do: 'bond', who: 'lissa', pts: 5, why: 'Lissa would have done the same, and she\'ll hear it in how you tell it.' },
+    ],
+    woods_snare3: [
+      ['narr', 'The last snare holds a rabbit. Thin, but alive. The first meat in nine days.'],
+      { choose: [
+        { text: 'Take it home for the pot', bond: { nessa: 5, lissa: 5 }, why: 'Something in the pot tonight, for all three.', remember: ['rabbitHome', 'Brought the rabbit home for her sisters.', true], then: [['wren', 'Sorry, small one. There are three of us.']] },
+        { text: 'Eat now. You can\'t hunt on nothing', remember: ['rabbitAte', 'Ate the rabbit alone in the woods.', false], then: [['narr', 'It helps. Her hands stop shaking. She hates that it helps.']] },
+        { text: 'Let it go. It\'s not enough to matter', remember: ['rabbitFree', 'Let the rabbit go.', null], then: [['narr', 'It is gone before she has finished deciding. Something bigger, then. It has to be something bigger.']] },
       ] },
     ],
     woods_tracks: [
       ['wren', 'Tracks. Huge ones. Something this size would feed us for a month.'],
       ['wren', '...They glitter. Tracks don\'t glitter.'],
+      { if: 'steady', then: [['wren', 'My hands are steady. Father\'s targets saw to that.']] },
     ],
     woods_stag: [
       { do: 'flag', name: 'stagseen' },
@@ -708,17 +795,22 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       ['wren', '...What did I just do?'],
       { do: 'art', id: 'cottage', title: 'That night' },
       ['narr', 'That night there is meat in the pot for the first time in weeks. Lissa laughs. Even Nessa smiles.'],
+      { if: 'green', then: [['lissa', 'You found green! In this! Wren, it\'s alive. I\'m putting it in the window.'], { do: 'bond', who: 'lissa', pts: 10, why: 'Her seeds have company now.' }] },
+      { if: 'wood', then: [['narr', 'The fire is high, and nobody has to look at the chairs.']] },
+      { if: 'wolfKilled', then: [['nessa', 'A wolf pelt. That\'s a winter coat for Lissa. Good.'], ['narr', 'Lissa does not look at it.']] },
+      { if: 'rabbitAte', then: [['nessa', 'There\'s fur on your sleeve. I\'m glad one of us ate today.'], { do: 'bond', who: 'nessa', pts: -5, why: 'She said she was glad. She wasn\'t only glad.' }] },
       { do: 'cue', name: 'door' },
       ['narr', 'Then the door bursts open, and winter comes in with him.'],
       ['rowan', 'Who killed the white stag?'],
       ['narr', 'He is tall and golden, with antlers rising from a crown of leaves, and eyes like a summer field on fire.'],
       { choose: [
-        { text: 'Step forward: "I did."', then: [['rowan', 'Honest, at least. That will make this easier.']] },
+        { text: 'Step forward: "I did."', remember: ['rowanHonest', 'Told Lord Rowan the truth at the door.', true], then: [['rowan', 'Honest, at least. That will make this easier.']] },
         { text: '"It was a deer. We were starving."', then: [['rowan', 'It was the sacred stag of the Spring Court, and its blood is on your hands.']] },
-        { text: 'Reach for your knife', then: [['rowan', 'Put it down, huntress. Mortal steel won\'t touch me, and I didn\'t come here to hurt your family.']] },
+        { text: 'Reach for your knife', remember: ['rowanKnife', 'Reached for a knife against a High Lord.', null], then: [['rowan', 'Put it down, huntress. Mortal steel won\'t touch me, and I didn\'t come here to hurt your family.']] },
       ] },
       ['rowan', 'The Treaty between our peoples is old and simple. A fae life taken by a mortal is paid for with a mortal life.'],
       ['nessa', 'Then take me instead.'],
+      { if: 'nessaHard', then: [['narr', 'An hour ago Wren told her she couldn\'t be carried forever. This is Nessa\'s answer.']] },
       ['wren', 'No. Nessa, no.'],
       ['rowan', 'There is another way. Come with me across the Wall and live the rest of your days in the Spring Court. Your sisters keep their lives, and you keep yours.'],
       ['lissa', 'Wren...'],
@@ -882,6 +974,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     ],
     ashes_painted: [
       ['wren', 'I\'d forgotten how much I missed this.'],
+      { if: 'paintPromise', then: [['wren', 'I told Lissa "maybe in spring". It isn\'t spring. I painted anyway. She\'d say that counts.']] },
+      { if: 'paintNo', then: [['wren', 'I told Lissa paint doesn\'t feed anyone. I was wrong about what it feeds.']] },
       ['caelum', 'Look. The street is waking up. Every mural you paint brings a little more of Starhaven back.'],
       ['caelum', 'My house is at the end of the street. Climb up to the roof. I\'ll be waiting.'],
       { do: 'goal', id: 'rooftop' },
@@ -1191,6 +1285,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       ['narr', 'Then the air turns warm and sweet, like spring, and there are flowers growing out of the snow.'],
       ['rowan', 'Wren.'],
       ['wren', 'Rowan.'],
+      { if: 'rowanHonest', then: [['rowan', 'You told me the truth the night I came for you. Tell it to me now. Are you his prisoner?'], ['wren', 'No.']] },
+      { if: 'rowanKnife', then: [['rowan', 'You reached for a knife the first night. I should have known then that you would not stay where you were put.']] },
       ['rowan', 'I\'ve brought an army to his border because of you. I will burn his city to the river if I have to. Come home, and none of that happens.'],
       { choose: [
         { text: '"I\'m not going back, Rowan."', bond: { caelum: 10 }, then: [['rowan', 'You don\'t know what he is. What he wants with you.'], ['wren', 'I know exactly what he is. He let me choose. You never did.']] },
@@ -1291,7 +1387,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
 
   // ---------------------------------------------------------------- Prologue part 1: The Winter Woods (mortal Wren, a bow, no enemies)
   SH.ROOMS.woods = {
-    id: 'woods', width: 100, height: 20, theme: 'winter',
+    id: 'woods', width: 160, height: 20, theme: 'winter',
     start: { x: 10, y: 16 },
     cottage: 2,                          // the sisters' cottage, where it starts
     shapes: [
@@ -1299,31 +1395,49 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       ['ground', 2, 44, 16],
       ['solid', 20, 22, 15, 16],         // a fallen log
       ['ground', 30, 38, 15],            // a snowbank
-      ['ground', 47, 100, 16],           // a frozen creek between 44 and 47
+      ['ground', 47, 160, 16],           // a frozen creek between 44 and 47
       ['solid', 55, 57, 14, 16],         // a boulder
-      ['solid', 98, 100, 0, 20],
+      ['oneway', 81, 87, 12],            // a rock shelf: something green grows up there
+      ['solid', 79, 81, 14, 16],         // the step up to it
+      ['ground', 110, 118, 15],          // the rise before the clearing
+      ['solid', 158, 160, 0, 20],
     ],
     hints: [
       { x0: 9, x1: 17, text: 'Move with {MOVE}. Lissa and Nessa have something to say: walk up to them and use {TALK}.' },
       { x0: 17, x1: 26, text: 'Jump with {JUMP}. Wren is still mortal: one jump, no more.' },
-      { x0: 64, x1: 79, text: 'Shoot with {SHOOT}. Get too close and the stag will bolt.', flag: 'stagseen' },
+      { x0: 47, x1: 53, text: 'A snare. Stand by it and use {TALK} to check it.' },
+      { x0: 59, x1: 72, text: 'Father\'s old targets. Shoot with {SHOOT}: the high one needs a jump: shoot at the top of it.' },
+      { x0: 90, x1: 100, text: 'A wolf. Shoot with {SHOOT} before it springs, or jump its lunge. What happens after the first arrow is up to you.', until: 'wolfdone' },
+      { x0: 112, x1: 120, text: 'There are snares you have not checked behind you.', until: 'snares3' },
+      { x0: 124, x1: 139, text: 'Shoot with {SHOOT}. Get too close and the stag will bolt.', flag: 'stagseen' },
     ],
     triggers: [
       { x: 10, script: 'woods_start' },
-      { x: 40, script: 'woods_tracks' },
-      { x: 63, script: 'woods_stag' },
+      { x: 59, script: 'woods_range' },
+      { x: 113, script: 'woods_tracks' },
+      { x: 123, script: 'woods_stag' },
     ],
-    lanterns: [{ x: 12, lit: true }, { x: 48 }],
+    lanterns: [{ x: 12, lit: true }, { x: 48 }, { x: 89 }, { x: 119 }],
     npcs: [{ id: 'lissa', x: 7, optional: 'woods_lissa' }, { id: 'nessa', x: 15.5, optional: 'woods_nessa' }],
     gates: [],
     props: [
-      { t: 'log', x: 20, w: 2 }, { t: 'boulder', x: 55, w: 2, h: 2 },
-      { t: 'bush', x: 14.5 }, { t: 'bush', x: 27 }, { t: 'bush', x: 40.5 }, { t: 'bush', x: 50 }, { t: 'bush', x: 61 }, { t: 'bush', x: 71 },
-      { t: 'drift', x: 24.5 }, { t: 'drift', x: 34 }, { t: 'drift', x: 49 }, { t: 'drift', x: 66 }, { t: 'drift', x: 76 }, { t: 'drift', x: 91 },
-      { t: 'pine', x: 17.5 }, { t: 'pine', x: 42 }, { t: 'pine', x: 59 }, { t: 'pine', x: 86 }, { t: 'pine', x: 96.5 },
+      { t: 'log', x: 20, w: 2 }, { t: 'boulder', x: 55, w: 2, h: 2 }, { t: 'boulder', x: 79, w: 2, h: 2 },
+      { t: 'bush', x: 14.5 }, { t: 'bush', x: 27 }, { t: 'bush', x: 40.5 }, { t: 'bush', x: 52 }, { t: 'bush', x: 74 }, { t: 'bush', x: 93 }, { t: 'bush', x: 107 }, { t: 'bush', x: 121 }, { t: 'bush', x: 131 },
+      { t: 'drift', x: 24.5 }, { t: 'drift', x: 34 }, { t: 'drift', x: 49 }, { t: 'drift', x: 68 }, { t: 'drift', x: 88 }, { t: 'drift', x: 101 }, { t: 'drift', x: 126 }, { t: 'drift', x: 136 }, { t: 'drift', x: 151 },
+      { t: 'pine', x: 17.5 }, { t: 'pine', x: 42 }, { t: 'pine', x: 59 }, { t: 'pine', x: 77 }, { t: 'pine', x: 98 }, { t: 'pine', x: 122 }, { t: 'pine', x: 146 }, { t: 'pine', x: 156.5 },
+      { t: 'deadtree', x: 63 }, { t: 'deadtree', x: 67 }, { t: 'deadtree', x: 71 }, { t: 'bones', x: 103 }, { t: 'cairn', x: 109 },
     ],
-    motes: [['line', 13, 18, 14.6], ['arc', 18.5, 23.5, 14.4, 2.6], ['line', 31, 37, 13.6], ['arc', 42.5, 48.5, 14.4, 2.8], ['arc', 53, 59, 14.4, 3.6], ['line', 60, 64, 14.6]],
-    spawns: [{ kind: 'stag', x: 80, spots: [80, 88, 94] }],
+    motes: [['line', 13, 18, 14.6], ['arc', 18.5, 23.5, 14.4, 2.6], ['line', 31, 37, 13.6], ['arc', 42.5, 48.5, 14.4, 2.8], ['arc', 53, 59, 14.4, 3.6], ['line', 82, 86, 10.6], ['line', 111, 117, 13.6], ['line', 120, 123, 14.6]],
+    spawns: [
+      { kind: 'pickup', what: 'wood', x: 25 }, { kind: 'pickup', what: 'wood', x: 33, y: 15 }, { kind: 'pickup', what: 'wood', x: 41 },
+      { kind: 'snare', n: 1, x: 50 },
+      { kind: 'target', x: 63, y: 14.9 }, { kind: 'target', x: 67, y: 11.3 }, { kind: 'target', x: 71, y: 14.9 },
+      { kind: 'snare', n: 2, x: 76 },
+      { kind: 'pickup', what: 'herb', x: 84, y: 12 },
+      { kind: 'wolf', x: 99 },
+      { kind: 'snare', n: 3, x: 106 },
+      { kind: 'stag', x: 140, spots: [140, 148, 154] },
+    ],
   };
 
   // ---------------------------------------------------------------- Prologue: The Deep (movement only, no enemies)
@@ -2284,8 +2398,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   Player.prototype.tryAttack = function (world, inp) {
     if (this.atkBuf <= 0) return;
     if (!SH.game.can('daggers')) { // the hunting bow: one arrow, straight ahead
-      if (SH.game.can('bow') && this.bowCd <= 0 && this.grounded) {
-        this.atkBuf = 0; this.bowCd = 30; this.bowT = 16; this.vx = 0;
+      if (SH.game.can('bow') && this.bowCd <= 0) {   // from the ground, or from the top of a jump
+        this.atkBuf = 0; this.bowCd = 30; this.bowT = 16; if (this.grounded) this.vx = 0;
         const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
         world.spawnArrow(this.x + this.facing * 12, this.y - 27, this.facing);
         SH.sfx.play('bow');
@@ -2636,6 +2750,69 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     return { landed: true };
   };
 
+  // ---------------- Things to do in the Winter Woods before the stag: firewood and wintergreen to gather,
+  // snares to check, old targets to shoot, and a starving wolf.
+  function Pickup(x, y, what) { Object.assign(this, { kind: 'pickup', what, x, y, got: false }); }
+  Pickup.prototype.reset = function () { };
+  Pickup.prototype.hittable = () => false;
+  Pickup.prototype.update = function (world) {
+    const p = world.player;
+    if (this.got || Math.abs(p.x - this.x) > 16 || Math.abs(p.y - this.y) > 30) return;
+    this.got = true; SH.sfx.play('mote');
+    SH.fx.burst(this.x, this.y - 8, 8, { speed: 1.6, life: 20, gravity: -0.03, colors: this.what === 'herb' ? ['#8fd16b', '#fff6d8'] : ['#c89a5a', '#fff6d8'] });
+    world.onPickup(this.what);
+  };
+  function Snare(x, y, n) { Object.assign(this, { kind: 'snare', n, x, y, checked: false, usable: true, near: false, label: 'CHECK' }); }
+  Snare.prototype.reset = function () { };
+  Snare.prototype.hittable = () => false;
+  Snare.prototype.update = function (world) {
+    const p = world.player;
+    this.near = !this.checked && Math.abs(p.x - this.x) < 26 && Math.abs(p.y - this.y) < 30 && p.grounded;
+    if (this.near && world.input.pressed.up) { this.checked = true; this.near = false; world.onSnare(this.n); }
+  };
+  function Target(x, y) { Object.assign(this, { kind: 'target', x, y, hit: false, arrowOnly: true, wob: 0 }); }
+  Target.prototype.reset = function () { };
+  Target.prototype.hittable = function () { return !this.hit; };
+  Target.prototype.hurtBox = function () { return { l: this.x - 10, r: this.x + 10, t: this.y - 15, b: this.y + 15 }; };
+  Target.prototype.update = function () { if (this.wob > 0) this.wob--; };
+  Target.prototype.takeHit = function (hit, world) {
+    this.hit = true; this.wob = 30; SH.sfx.play('hit');
+    SH.fx.word(this.x, this.y - 22, 'BULLSEYE', '#ffd27a', 50); SH.fx.spark(this.x, this.y, 0, true);
+    world.onTarget(); return { landed: true };
+  };
+  // The wolf is as hungry as the sisters. One arrow and it backs off hurt: then it is Wren's choice,
+  // made with the bow and not a menu. Shoot again, or lower the bow and let it go.
+  function Wolf(x, y) { Object.assign(this, { kind: 'wolf', home: { x, y }, w: 34, h: 20, arrowOnly: true }); this.reset(); }
+  Wolf.prototype.reset = function () { if (this.gone) return; Object.assign(this, { x: this.home.x, y: this.home.y, vx: 0, vy: 0, dir: -1, state: 'prowl', t: 0, hp: 2, flash: 0, dead: false }); };
+  Wolf.prototype.hittable = function () { return !this.gone && !this.dead && this.state !== 'flee'; };
+  Wolf.prototype.hurtBox = function () { return { l: this.x - 18, r: this.x + 18, t: this.y - 32, b: this.y }; };
+  Wolf.prototype.update = function (world) {
+    if (this.gone) return;
+    const p = world.player, dx = p.x - this.x; this.t++; if (this.flash > 0) this.flash--;
+    if (this.dead) { this.vx = 0; return; }
+    switch (this.state) {
+      case 'prowl': this.dir = dx > 0 ? 1 : -1; this.vx = Math.sin(this.t * 0.03) * 0.5;
+        if (Math.abs(dx) < 200 && !this.seen) { this.seen = true; world.onWolf('seen'); }
+        if (Math.abs(dx) < 86 && Math.abs(p.y - this.y) < 40 && !p.dead) { this.state = 'crouch'; this.t = 0; SH.sfx.play('rumble'); SH.fx.word(this.x, this.y - 34, '!', '#ff5a5a', 30); } break;
+      case 'crouch': this.vx = 0; if (this.t > 30) { this.state = 'lunge'; this.t = 0; this.vx = this.dir * 5.2; this.vy = -3; } break;
+      case 'lunge': if (this.t > 22) { this.state = 'back'; this.t = 0; } if (SH.overlap(this.hurtBox(), p.box())) p.hurt(this.x, 1, world); break;
+      case 'back': this.vx = -this.dir * 1.6; if (this.t > 50) { this.state = 'prowl'; this.t = 0; } break;
+      case 'hurt': this.dir = dx > 0 ? 1 : -1; this.vx = Math.abs(dx) < 150 ? -this.dir * 0.8 : 0;
+        if (this.t % 50 === 10) SH.fx.word(this.x, this.y - 30, '...', '#c8d2e2', 40);
+        if (this.t > 260) { this.state = 'flee'; this.t = 0; world.onWolf('spared'); } break;
+      case 'flee': this.dir = 1; this.vx = 4.2; if (this.t > 120) this.gone = true; break;
+    }
+    this.vy = Math.min((this.vy || 0) + 0.5, 9);
+    const res = SH.moveBody(world.room, this); if (res.ground) this.vy = 0;
+  };
+  Wolf.prototype.takeHit = function (hit, world) {
+    if (!hit.arrow) return null;
+    this.hp--; this.flash = 8; SH.sfx.play('hit'); SH.fx.spark(this.x, this.y - 12, 0, false);
+    if (this.hp <= 0) { this.dead = true; SH.fx.kick(4); world.onWolf('killed'); }
+    else { this.state = 'hurt'; this.t = 0; this.vx = -hit.dir * -2; world.onWolf('hurt'); }
+    return { landed: true };
+  };
+
   // ---------------- Wyrms: the mountain wyrmling, and the Old Wyrm (same creature, bigger, from data).
   // Wander -> wind up (armored head, eyes glow) -> charge in a straight line -> dazed (open to hits) -> rest.
   function Wyrm(x, y, kind) {
@@ -2828,6 +3005,10 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     if (s.kind === 'dummy') return new Dummy(x, y);
     if (s.kind === 'stag') return new Stag(x, y, s.spots || [s.x]);
     if (s.kind === 'brazier') return new Brazier(x, y);
+    if (s.kind === 'pickup') return new Pickup(x, y, s.what);
+    if (s.kind === 'snare') return new Snare(x, y, s.n);
+    if (s.kind === 'target') return new Target(x, s.y * T);
+    if (s.kind === 'wolf') return new Wolf(x, y);
     if (s.kind === 'wyrmling' || s.kind === 'oldWyrm') return new Wyrm(x, y, s.kind);
     throw new Error('unknown spawn ' + s.kind);
   };
@@ -2907,6 +3088,13 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       for (let i = 0; i < 6; i++) { R(14 + i * 4, 4 + (i % 2) * 2, 2, 7 - (i % 2) * 2, '#4a1a2a'); R(14 + i * 4, 4 + (i % 2) * 2, 2, 1, '#ff4a5a'); }
       R(14, 10, 20, 2, '#4a1a2a');
     }
+    // finer features: a lid line and a catch-light in each eye, a blush, a two-tone mouth, a softer jaw,
+    // a shadow under the chin, and a highlight running through the hair
+    if (variant !== 'blink') { R(18, 19, 4, 1, L.hairD); R(26, 19, 4, 1, L.hairD); R(20, 20, 1, 1, '#ffffff'); R(28, 20, 1, 1, '#ffffff'); R(19, 22, 2, 1, SH.shade ? SH.shade(L.eye, 0.6) : L.eye); R(27, 22, 2, 1, SH.shade ? SH.shade(L.eye, 0.6) : L.eye); }
+    if (!L.beard) { g.globalAlpha = 0.22; R(16, 24, 4, 3, '#ff7a8a'); R(28, 24, 4, 3, '#ff7a8a'); g.globalAlpha = 1; R(22, 29, 4, 1, L.shade); R(15, 32, 2, 2, L.shade); R(31, 32, 2, 2, L.shade); R(15, 33, 1, 1, L.cloth); R(32, 33, 1, 1, L.cloth); }
+    R(20, 34, 8, 2, L.shade); g.globalAlpha = 0.35; R(20, 36, 8, 2, '#000000'); g.globalAlpha = 1;
+    g.globalAlpha = 0.5; R(18, 9, 9, 1, '#ffffff'); R(17, 10, 4, 1, '#ffffff'); g.globalAlpha = 0.25; R(24, 15, 1, 8, '#ffffff'); g.globalAlpha = 1;
+    R(sx, 38, sw, 1, L.clothD); g.globalAlpha = 0.3; R(sx + sw - 5, 39, 5, 9, '#ffffff'); g.globalAlpha = 1;
     // rim light on the side away from the viewer
     g.globalAlpha = 0.35; R(32, 13, 1, 20, '#ffffff'); g.globalAlpha = 1;
     return (cache[key] = c);
@@ -4822,6 +5010,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       else if (e.kind === 'stag') drawStag(ctx, e, t);
       else if (e.kind === 'brazier') drawBrazier(ctx, e, t);
       else if (e.kind === 'wyrm') drawWyrm2(ctx, e, t);
+      else if (e.kind === 'pickup' || e.kind === 'snare' || e.kind === 'target' || e.kind === 'wolf') drawWoods(ctx, e, t);
     }
     for (const f of w.fireballs || []) {
       const R = f.big ? 34 : 16;
@@ -5208,6 +5397,43 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     if (e.state === 'stun') for (let i = 0; i < 3; i++) { const a = t * 0.12 + i * 2.1; ctx.fillStyle = '#ffe9a8'; ctx.fillRect(x + e.dir * 20 * s + Math.cos(a) * 10 * s, y - 34 * s + Math.sin(a) * 3, 3, 3); }
     if (!e.boss && e.hp < e.def.hp) { const n = 10; for (let i = 0; i < n; i++) { ctx.fillStyle = i < Math.ceil(e.hp / e.def.hp * n) ? '#c8d2e2' : '#2a2a3a'; ctx.fillRect(x - 25 + i * 5, y - e.h * s - 14, 4, 3); } }
   }
+  function drawWoods(ctx, e, t) {
+    const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(e.x + x), Math.round(e.y + y), w, h); };
+    if (e.kind === 'pickup') {
+      if (e.got) return;
+      const bob = Math.round(Math.sin(t * 0.08 + e.x) * 1.5);
+      const gl = ctx.createRadialGradient(e.x, e.y - 8, 1, e.x, e.y - 8, 22); gl.addColorStop(0, 'rgba(255,246,216,0.3)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 22, e.y - 30, 44, 44);
+      if (e.what === 'wood') { R(-10, -9 + bob, 20, 9, '#0a0818'); R(-9, -8 + bob, 18, 3, '#7a5636'); R(-9, -5 + bob, 18, 3, '#5e3e28'); R(-9, -2 + bob, 18, 1, '#4a3020'); R(-9, -8 + bob, 2, 6, '#c8a878'); R(-2, -10 + bob, 3, 10, '#c8b890'); R(-9, -8 + bob, 18, 1, '#ffffff'); }
+      else { R(-1, -12 + bob, 2, 12, '#3f6a3f'); R(-6, -12 + bob, 5, 3, '#8fd16b'); R(1, -15 + bob, 5, 3, '#8fd16b'); R(-5, -7 + bob, 4, 3, '#6ab04a'); R(2, -9 + bob, 4, 3, '#6ab04a'); R(-1, -17 + bob, 2, 2, '#ff9ac0'); }
+    } else if (e.kind === 'snare') {
+      R(-10, -2, 20, 2, '#0a0818'); R(-9, -14, 2, 14, '#5e3e28'); R(-9, -15, 12, 2, '#5e3e28');
+      ctx.strokeStyle = e.checked ? '#6a6a7a' : '#c8b890'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(e.x + 2, e.y - 14); ctx.lineTo(e.x + 2, e.y - 8); ctx.stroke(); ctx.beginPath(); ctx.arc(e.x + 2, e.y - 5, 3, 0, 6.3); ctx.stroke();
+      if (!e.checked) { const by = e.y - 34 + Math.round(Math.sin(t * 0.1) * 2); ctx.fillStyle = '#0a0818'; ctx.fillRect(e.x - 5, by - 1, 10, 13); ctx.fillStyle = '#ffd27a'; ctx.fillRect(e.x - 4, by, 8, 11); SH.ptext(ctx, '?', e.x - 1, by + 3, '#1c1430', 1); }
+    } else if (e.kind === 'target') {
+      const wob = Math.round(Math.sin(e.wob * 0.9) * e.wob * 0.12);
+      ctx.strokeStyle = '#5e3e28'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(e.x, e.y - 40); ctx.lineTo(e.x + wob, e.y - 12); ctx.stroke();
+      for (const [r, c] of [[12, '#0a0818'], [11, '#e8e0c8'], [8, '#c8452e'], [5, '#e8e0c8'], [2, '#c8452e']]) { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(e.x + wob, e.y, r, 0, 6.3); ctx.fill(); }
+      if (e.hit) { R(wob - 12, -1, 12, 2, '#6a4a2a'); R(wob - 14, -2, 3, 4, '#e8e0c8'); }
+    } else if (e.kind === 'wolf') {
+      if (e.gone) return;
+      ctx.save(); ctx.translate(Math.round(e.x), Math.round(e.y)); ctx.scale(e.dir, 1);
+      if (e.dead) ctx.rotate(1.45);
+      const run = e.state === 'lunge' || e.state === 'flee' ? Math.sin(t * 0.6) * 3 : e.state === 'prowl' || e.state === 'back' ? Math.sin(t * 0.2) * 1.5 : 0, low = e.state === 'crouch' ? 3 : e.state === 'hurt' ? 2 : 0;
+      for (const ol of ['#0a0818', null]) {
+        const g = ol ? 1.5 : 0, body = ol || (e.flash > 0 ? '#ffffff' : '#7a8296'), dark = ol || '#565e72', lite = ol || '#aab2c6';
+        ctx.strokeStyle = dark; ctx.lineWidth = 3 + g * 2; ctx.lineCap = 'round';
+        for (const [lx, sw] of [[-11, -run], [-7, run], [8, run], [12, -run]]) { ctx.beginPath(); ctx.moveTo(lx, -9 + low); ctx.lineTo(lx + sw, -1); ctx.stroke(); }
+        ctx.fillStyle = body; ctx.beginPath(); ctx.moveTo(-15 - g, -16 + low); ctx.quadraticCurveTo(0, -21 - g + low, 12, -18 + low - g); ctx.lineTo(15 + g, -11 + low); ctx.quadraticCurveTo(0, -5 + g + low, -14, -8 + low + g); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = body; ctx.lineWidth = 4 + g * 2; ctx.beginPath(); ctx.moveTo(-14, -14 + low); ctx.quadraticCurveTo(-22, -12 + low, -24, -5 + low + (e.state === 'hurt' ? 4 : 0)); ctx.stroke();   // tail, tucked when hurt
+        const hx = 15, hy = -19 + low + (e.state === 'hurt' ? 4 : 0);
+        ctx.fillStyle = body; ctx.beginPath(); ctx.moveTo(hx - 5 - g, hy - 5 - g); ctx.lineTo(hx + 4, hy - 4 - g); ctx.lineTo(hx + 12 + g, hy + 1); ctx.lineTo(hx + 11 + g, hy + 4 + g); ctx.lineTo(hx - 4 - g, hy + 5 + g); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(hx - 4, hy - 5); ctx.lineTo(hx - 3, hy - 11 - g); ctx.lineTo(hx + 1, hy - 5); ctx.fill();
+        if (!ol) { ctx.fillStyle = lite; ctx.fillRect(-10, -9 + low, 20, 2); ctx.fillStyle = e.state === 'crouch' || e.state === 'lunge' ? '#ff5a5a' : '#ffd27a'; ctx.fillRect(hx + 2, hy - 2, 2, 2); ctx.fillStyle = '#1a1430'; ctx.fillRect(hx + 10, hy, 2, 2);
+          ctx.fillStyle = dark; for (let i = 0; i < 4; i++) ctx.fillRect(-8 + i * 5, -15 + low, 1, 5); }   // ribs: it is starving too
+      }
+      ctx.restore();
+    }
+  }
   // The white stag: slender, long-necked, a crown of antlers, lit from within. Drawn once in the outline colour, once in white.
   function stagBody(ctx, e, t, ol) {
     const g = ol ? 1.5 : 0, W = ol || '#f4f6ff', S = ol || '#c9d2f2', D = ol || '#9aa6d8';
@@ -5306,7 +5532,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const pr = G.progress;
     SH.saves.write(G.slot, {
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
     });
     if (show) G.hud.saved();
   };
@@ -5325,7 +5551,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
     G.slot = slot;
-    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars) };
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})) };
     SH.arts.newGame(); SH.arts.said = Object.assign({}, s.said); SH.arts.meter = s.bondMeter || 0;
     const N = ST.CHAPTERS.length, target = s.chapter;
     const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
@@ -5385,6 +5611,16 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       },
       onBossDown() { const b = this.things.find(e => e.boss); if (b) G.look(b.x, b.y - 30, 1.5, 110); fx.slowmo = 70; SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
+      // the Winter Woods
+      onPickup(what) {
+        if (what === 'herb') { G.remember('green', 'Found wintergreen under the snow for Lissa.', true); G.queueScript('woods_herb'); return; }
+        G.flags.n_wood = (G.flags.n_wood || 0) + 1;
+        fx.word(player.x, player.y - 50, 'Firewood ' + G.flags.n_wood + '/3', '#ffd27a', 60);
+        if (G.flags.n_wood === 3) G.queueScript('woods_wood');
+      },
+      onSnare(n) { G.flags.n_snares = (G.flags.n_snares || 0) + 1; if (G.flags.n_snares >= 3) G.flags.snares3 = true; G.hud.goal(true); G.queueScript('woods_snare' + n); },
+      onTarget() { G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
+      onWolf(what) { G.queueScript('woods_wolf_' + what); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
@@ -5486,7 +5722,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     if (!g) return '';
     let text = g.text;
     if (g.count && G.world) {
-      const n = G.world.things.filter(e => e.kind === 'thornSprite' && e.dead).length;
+      const n = g.counter ? (G.flags['n_' + g.counter] || 0) : G.world.things.filter(e => e.kind === 'thornSprite' && e.dead).length;
       text += ` (${n}/${g.count})`;
     }
     return text;
@@ -5519,6 +5755,11 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
         }
         G.talkWait = 10; // a short pause so a held button doesn't skip the line
         return;
+      }
+      if (st.if) {   // the story comes back to something Wren did
+        const yes = st.if[0] === '!' ? !G.recalls(st.if.slice(1)) : G.recalls(st.if);
+        sc.steps = sc.steps.slice(0, sc.i).concat(yes ? st.then || [] : st.else || [], sc.steps.slice(sc.i));
+        continue;
       }
       if (st.do === 'mode') {   // another way of seeing: the script waits for it, then carries on
         const sc0 = sc;
@@ -5554,13 +5795,14 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const w = G.world;
     switch (st.do) {
       case 'mode': break;   // skipped along with the scene
+      case 'remember': G.remember(st.key, st.text, st.good); break;
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); break;
       case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
       case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
       case 'meet': G.meet(st.who); break;
       case 'emote': { const n = w.npcs.find(x => x.id === st.npc); if (n) n.emote = { e: st.e, t: 0 }; break; }
-      case 'bond': G.bond(st.who, st.pts); break;
+      case 'bond': G.bond(st.who, st.pts, st.liked, st.why); break;
       case 'art': G.hud.sceneArt(st.id, st.title); break;
       case 'cue': G.hud.sceneCue(st.name); if (st.name === 'door' || st.name === 'end') SH.sfx.play('thud'); if (st.name === 'rise' || st.name === 'caelum') SH.sfx.play('chime'); break;
       case 'goto': { const sc = G.script; sc.steps = sc.steps.slice(0, sc.i).concat(ST.SCRIPTS[st.id], sc.steps.slice(sc.i)); break; }
@@ -5578,7 +5820,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const o = opts[idx];
     G.choosing = null;
     G.hud.choice(null);
-    for (const who in (o.bond || {})) { G.bond(who, o.bond[who], o.liked === who); const n = G.world.npcs.find(x => x.id === who && !x.hidden); if (n && o.liked === who) n.emote = { e: 'heart', t: 0 }; }
+    if (o.remember) G.remember(o.remember[0], o.remember[1], o.remember[2]);
+    for (const who in (o.bond || {})) { G.bond(who, o.bond[who], o.liked === who, o.why && (typeof o.why === 'string' ? o.why : o.why[who])); const n = G.world.npcs.find(x => x.id === who && !x.hidden); if (n && o.liked === who) n.emote = { e: 'heart', t: 0 }; }
     sc.steps = sc.steps.slice(0, sc.i).concat(o.then || [], sc.steps.slice(sc.i));
     G.advance();
   };
@@ -5593,16 +5836,28 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     }
     G.save();
   };
-  G.bond = function (who, pts, liked) {
+  // What a decision did. Effects gather for a moment, then show together as one card.
+  G.effects = []; G.effectT = 0;
+  G.effect = function (e) { G.effects.push(e); G.effectT = 6; };
+  G.effectStep = function () { if (G.effectT > 0 && --G.effectT === 0) { G.hud.effects(G.effects); G.effects = []; } };
+  // A decision the story will come back to. good: true, false, or null for neither.
+  G.remember = function (key, text, good) {
+    const m = G.progress.mem = G.progress.mem || {};
+    if (m[key]) return;
+    m[key] = { text, good: good == null ? null : !!good, ch: G.chapter };
+    G.effect({ mem: text, good: good == null ? null : !!good });
+    G.save();
+  };
+  G.recalls = key => !!(G.progress.mem && G.progress.mem[key]);
+  G.bond = function (who, pts, liked, why) {
     if (!G.progress.bonds[who]) G.progress.bonds[who] = { pts: 0 };
     const b = G.progress.bonds[who], before = G.heartsFor(b.pts);
-    b.pts += pts;
-    const after = G.heartsFor(b.pts), name = ST.CAST[who].name;
-    if (after > before) {
-      G.hud.toast(`\u2665 ${name}: heart ${after} of 5`);
-      G.heartQueue.push(`heart_${who}_${after}`);
-      SH.sfx.play('heart');
-    } else G.hud.toast(liked ? `${name} loved that.` : `${name} will remember that.`);
+    b.pts = Math.max(0, b.pts + pts);
+    const after = G.heartsFor(b.pts);
+    if (after > before) { G.heartQueue.push(`heart_${who}_${after}`); SH.sfx.play('heart'); }
+    else if (pts < 0) SH.sfx.play('back');
+    // every change is shown: who, how much, and why
+    G.effect({ who, pts, why: why || (pts < 0 ? 'That stung.' : liked ? 'That meant a lot.' : 'Noted.'), heart: after > before ? after : 0 });
     G.save();
   };
 
@@ -5625,6 +5880,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     input.step();
     if (G.mode) { if (G.state === 'talk' || G.state === 'play') G.progress.playFrames = (G.progress.playFrames || 0) + 1; SH.modes.step(input); return; }
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
+    G.effectStep();
     if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -5787,7 +6043,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
     G.hud.prompt(hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Hold {PAINT} to paint the wall.') : null);
-    G.hud.talkButton(talkable ? 'TALK' : canPaint ? 'PAINT' : null);
+    const usable = w.things.find(e => e.usable && e.near);
+    G.hud.talkButton(talkable ? 'TALK' : canPaint ? 'PAINT' : usable ? usable.label : null);
 
     for (const g of w.gates) if (!g.closed && (g.lift || 0) < 1) g.lift = (g.lift || 0) + 0.03;
     w.cityLight += (w.cityLightTarget - w.cityLight) * 0.03;
@@ -6188,6 +6445,26 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     if (f) f();
   };
 
+  // What a decision did: a card per effect. Bond changes show the amount, the reason and the heart bar moving;
+  // remembered decisions show a star (green if it was kind, red if it will cost her).
+  H.effects = function (list) {
+    const G = SH.game, box = $('effects');
+    for (const e of list) {
+      const row = document.createElement('div');
+      if (e.mem) { row.className = 'fx-row mem'; row.innerHTML = `<span class="ico" style="color:${e.good === true ? '#7ad88a' : e.good === false ? '#ff7a8a' : 'var(--gold)'}">&#10022;</span><div><b>This will be remembered</b><small>${esc(e.mem)}</small></div>`; }
+      else {
+        if (!G.progress.bonds[e.who]) continue;
+        const pts = G.progress.bonds[e.who].pts, h = G.heartsFor(pts), next = ST.HEARTS_AT[h - 1], prev = h > 1 ? ST.HEARTS_AT[h - 2] : 0;
+        const k1 = next ? Math.max(0, Math.min(1, (pts - prev) / (next - prev))) : 1, k0 = e.heart ? 0 : next ? Math.max(0, Math.min(1, (pts - e.pts - prev) / (next - prev))) : 1;
+        row.className = 'fx-row ' + (e.pts < 0 ? 'down' : 'up');
+        row.innerHTML = `<img src="${SH.art.portraitURL(e.who)}" alt=""><div style="flex:1;min-width:0"><b>${esc(ST.CAST[e.who].name)} <i>${e.pts < 0 ? '&minus;' + (-e.pts) : '+' + e.pts} &hearts;</i>${e.heart ? ' &middot; heart ' + e.heart + ' of 5' : ''}</b><small>${esc(e.why)}</small><div class="hb"><span style="width:${Math.round(k0 * 100)}%"></span></div></div>`;
+        const bar = row.querySelector('.hb span'); requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.width = Math.round(k1 * 100) + '%'; }));
+      }
+      box.appendChild(row); setTimeout(() => row.remove(), 5200);
+    }
+    while (box.children.length > 4) box.firstChild.remove();
+  };
+
   // The bond meter, the Bond Art button, and whispers down the bond.
   let lastArt = '';
   H.art = function (a) {
@@ -6247,7 +6524,17 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   };
   H.navReset = () => { navId = null; document.querySelectorAll('.pad-sel').forEach(b => b.classList.remove('pad-sel')); };
 
-  H.menu = function (show) { $('menu').classList.toggle('show', show); };
+  H.menu = function (show) {
+    $('menu').classList.toggle('show', show);
+    if (!show) return;
+    const G = SH.game, ch = G.chapterDef(), w = G.world, bonds = G.progress.bonds || {};
+    const people = Object.keys(ST.BONDS).filter(id => bonds[id]).map(id => `<span style="white-space:nowrap;margin-right:8px"><img src="${SH.art.portraitURL(id)}" alt="">${'\u2665'.repeat(G.heartsFor(bonds[id].pts))}</span>`).join('');
+    const mem = Object.keys(G.progress.mem || {}).length;
+    $('m-status').innerHTML = `<div class="wide"><b>${esc(ch.label)}: ${esc(ch.name)}</b>${esc(G.goalText() || 'Keep going')}</div>`
+      + `<div><b>Starlight here</b>&#10022; ${w.motes.filter(m => m.got).length} of ${w.motes.length} &middot; ${SH.stars.free()} to spend</div>`
+      + `<div><b>Choices remembered</b>${mem || 'None yet'}</div>`
+      + (people ? `<div class="wide"><b>Bonds</b>${people}</div>` : '');
+  };
 
   // ---------------- journal: what to do now, the story so far, and who's who
   H.journal = function (show) {
@@ -6265,6 +6552,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
     const ms = G.progress.motes || {}, sum = Object.values(ms).reduce((a, b) => a + b, 0);
     if (sum) html += `<p><b>Starlight gathered:</b> &#10022; ${sum}. Spend it in the pause menu, under Constellation.</p>`;
+    const mem = Object.values(G.progress.mem || {});
+    if (mem.length) { html += '<h3>What Wren has done</h3><ul class="mem-list">' + mem.map(m => `<li class="${m.good === true ? 'good' : m.good === false ? 'bad' : ''}">${esc(m.text)}</li>`).join('') + '</ul><p><small>Green: someone is better for it. Red: it will cost her. Gold: it could go either way. The story comes back to these.</small></p>'; }
     html += '<h3>Bonds</h3>';
     const bonds = G.progress.bonds, ids = Object.keys(ST.BONDS).filter(id => bonds[id]);
     if (!ids.length) html += '<p>No bonds yet. Hearts grow from evenings together, gifts they love, and the choices you make when you talk.</p>';
@@ -6456,6 +6745,9 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     done();
   };
   F.filmState = () => film ? { shot: film.i, id: F.FILM[film.i].id, t: film.t } : null;
+  // the title sits over a living picture: the rooftop, the city and the mural wall, slowly turning over
+  let bgT = 0;
+  setInterval(() => { if (SH.game.state !== 'front' || phase === 'film' || phase === 'ncs' || phase === 'econ') return; bgT++; const g = $('f-bg').getContext('2d'); g.setTransform(2, 0, 0, 2, 0, 0); g.imageSmoothingEnabled = false; SH.cine.drawStatic(g, ['rooftop', 'city', 'observatory'][Math.floor(bgT / 420) % 3], bgT % 420); g.setTransform(1, 0, 0, 1, 0, 0); }, 1000 / 20);
   F.press = function () {
     phase = 'press';
     $('splash').className = '';

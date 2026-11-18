@@ -69,6 +69,13 @@
       for (let i = 0; i < 6; i++) { R(14 + i * 4, 4 + (i % 2) * 2, 2, 7 - (i % 2) * 2, '#4a1a2a'); R(14 + i * 4, 4 + (i % 2) * 2, 2, 1, '#ff4a5a'); }
       R(14, 10, 20, 2, '#4a1a2a');
     }
+    // finer features: a lid line and a catch-light in each eye, a blush, a two-tone mouth, a softer jaw,
+    // a shadow under the chin, and a highlight running through the hair
+    if (variant !== 'blink') { R(18, 19, 4, 1, L.hairD); R(26, 19, 4, 1, L.hairD); R(20, 20, 1, 1, '#ffffff'); R(28, 20, 1, 1, '#ffffff'); R(19, 22, 2, 1, SH.shade ? SH.shade(L.eye, 0.6) : L.eye); R(27, 22, 2, 1, SH.shade ? SH.shade(L.eye, 0.6) : L.eye); }
+    if (!L.beard) { g.globalAlpha = 0.22; R(16, 24, 4, 3, '#ff7a8a'); R(28, 24, 4, 3, '#ff7a8a'); g.globalAlpha = 1; R(22, 29, 4, 1, L.shade); R(15, 32, 2, 2, L.shade); R(31, 32, 2, 2, L.shade); R(15, 33, 1, 1, L.cloth); R(32, 33, 1, 1, L.cloth); }
+    R(20, 34, 8, 2, L.shade); g.globalAlpha = 0.35; R(20, 36, 8, 2, '#000000'); g.globalAlpha = 1;
+    g.globalAlpha = 0.5; R(18, 9, 9, 1, '#ffffff'); R(17, 10, 4, 1, '#ffffff'); g.globalAlpha = 0.25; R(24, 15, 1, 8, '#ffffff'); g.globalAlpha = 1;
+    R(sx, 38, sw, 1, L.clothD); g.globalAlpha = 0.3; R(sx + sw - 5, 39, 5, 9, '#ffffff'); g.globalAlpha = 1;
     // rim light on the side away from the viewer
     g.globalAlpha = 0.35; R(32, 13, 1, 20, '#ffffff'); g.globalAlpha = 1;
     return (cache[key] = c);

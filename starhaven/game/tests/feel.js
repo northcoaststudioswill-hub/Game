@@ -232,18 +232,36 @@ const path = require('path');
       const x0 = p.x; step({ right: true }, ['dash']); for (let i = 0; i < 6; i++) step({ right: true });
       check('Winter Woods: mortal Wren has one jump and no dash', vy2 >= vy1 && p.x - x0 < 6 * 3.6 + 1, { vy1: +vy1.toFixed(2), vy2: +vy2.toFixed(2), dashDist: +(p.x - x0).toFixed(1) });
       SH.test.load(0);
-      const q = P(), jumps = [18.6, 28.6, 42.9, 53.6];
-      let k = 0, f = 0, shot = false;
+      const q = P(), w0 = G.world, jumps = [18.6, 28.6, 42.9, 53.6, 77.4, 80.2, 108.4];
+      G.progress.bonds = {}; G.progress.mem = {}; SH.test.choice = 0;
+      const snares = w0.things.filter(e => e.kind === 'snare'), targets = w0.things.filter(e => e.kind === 'target'), wolf = w0.things.find(e => e.kind === 'wolf');
+      let k = 0, f = 0, shot = false, jt = -1, effectsSeen = 0;
       const seenHere = new Set();
-      while (f++ < 60 * 120 && G.chapter === 0) {
+      while (f++ < 60 * 200 && G.chapter === 0) {
         const tx = q.x / T; let press = null, held = { right: true, jump: true };
+        effectsSeen = Math.max(effectsSeen, document.querySelectorAll('#effects .fx-row').length);
         if (G.state === 'play') {
-          if (k < jumps.length && tx >= jumps[k] && q.grounded) { press = ['jump']; k++; }
-          if (tx >= 72) { held = {}; if (!shot || f % 40 === 0) { press = ['attack']; shot = true; } }
+          const sn = snares.find(e => !e.checked && tx >= e.x / T - 0.4);
+          const left = targets.filter(e => !e.hit);
+          if (sn) { held = {}; if (sn.near && f % 6 === 0) press = ['up']; else if (!sn.near) held = { left: tx > sn.x / T + 0.3, right: tx < sn.x / T - 0.3 }; }
+          else if (tx >= 60 && tx < 62 && left.length) {   // Father's targets: two flat shots, then a jump shot for the high one
+            held = {}; q.facing = 1;
+            if (left.some(e => e.y > 14.5 * T)) { if (f % 40 === 0) press = ['attack']; }
+            else if (q.grounded && jt < 0 && f % 50 === 0) { press = ['jump']; held = { jump: true }; jt = f; }
+            else if (jt > 0) { held = { jump: true }; if (q.vy > -1.2 || f - jt > 26) { press = ['attack']; jt = -1; } }
+          }
+          else if (tx >= 92 && wolf && !wolf.gone && !wolf.dead) { held = {}; q.facing = 1; if (wolf.state !== 'hurt' && wolf.state !== 'flee' && f % 40 === 0) press = ['attack']; }   // one arrow, then lower the bow
+          else if (tx >= 132) { held = {}; if (!shot || f % 40 === 0) { press = ['attack']; shot = true; } }
+          else if (k < jumps.length && tx >= jumps[k] && q.grounded) { press = ['jump']; k++; }
         }
         if (G.script) seenHere.add(G.script.id);
         talk(held, press);
       }
+      const mem = Object.keys(G.progress.mem || {}), bd = G.progress.bonds;
+      check('Winter Woods, before the stag: firewood, three snares, Father\'s targets, wintergreen, and a wolf that is spared', ['woods_wood', 'woods_snare1', 'woods_snare2', 'woods_snare3', 'woods_targets', 'woods_herb', 'woods_wolf_hurt', 'woods_wolf_spared'].every(x => seenHere.has(x)),
+        { scripts: [...seenHere].filter(x => /wood|snare|target|herb|wolf/.test(x)), seconds: +(f / 60).toFixed(1) });
+      check('Decisions matter: each one shows who it touched and why, is remembered, and the cottage scene answers it', effectsSeen > 0 && ['wood', 'steady', 'green', 'wolfSpared', 'rabbitHome'].every(m => mem.includes(m)) && bd.nessa && bd.nessa.pts >= 15 && bd.lissa && bd.lissa.pts >= 20,
+        { effectsSeen, remembered: mem, nessa: bd.nessa && bd.nessa.pts, lissa: bd.lissa && bd.lissa.pts });
       check('Winter Woods: the hunt, the stag cinematic, Rowan, and Beyond the Wall lead into the Deep', G.chapter === 1 && seenHere.has('woods_kill') && seenHere.has('beyond_wall'),
         { chapter: G.chapter, scripts: [...seenHere], seconds: +(f / 60).toFixed(1) });
     })();
