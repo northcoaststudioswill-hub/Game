@@ -127,8 +127,35 @@
     g.fillStyle = gr; g.fillRect(0, 0, 16, 360);
     out.sky = s;
     out.far = T.far === 'cave' ? makeCave(T) : makeMountains(T);
+    out.near = makeNear(T, name);
     out.mid = T.mid === 'roots' ? makeRoots(T) : T.mid === 'spires' ? makeSpires(T) : T.mid === 'pines' ? makePines(T) : makeTrees(T);
     return out;
+  }
+  // The nearest background layer: things with real detail, just behind where Wren walks.
+  function makeNear(T, name) {
+    if (name === 'city') return null;
+    const w = 1100, h = 300, c = canvas(w, h), g = c.getContext('2d'), r = rng(name.length * 13 + 5);
+    const dark = SH.shade(T.midC, 0.75), lite = SH.shade(T.midC, 1.5);
+    for (let i = 0; i < 9; i++) {
+      const x = 50 + i * 122 + r() * 46;
+      if (name === 'deep') {   // pillars of rock with a lit edge, and roots hanging between them
+        const pw = 16 + r() * 14, top = 30 + r() * 60;
+        g.fillStyle = dark; g.fillRect(x, top, pw, h - top); g.beginPath(); g.moveTo(x - 6, h); g.lineTo(x + 2, top + 30); g.lineTo(x + pw - 2, top + 30); g.lineTo(x + pw + 8, h); g.fill();
+        g.fillStyle = lite; g.fillRect(x, top, 2, h - top); for (let k = 0; k < 6; k++) g.fillRect(x + 3 + r() * (pw - 6), top + 10 + r() * 200, 2, 1);
+        g.strokeStyle = dark; g.lineWidth = 2; g.beginPath(); g.moveTo(x + pw, 0); g.quadraticCurveTo(x + pw + 40, 70 + r() * 40, x + 122, 0); g.stroke();
+      } else if (name === 'thornwood') {   // twisted trunks with thorned branches
+        g.strokeStyle = dark; g.lineCap = 'round'; g.lineWidth = 9; g.beginPath(); g.moveTo(x, h); g.quadraticCurveTo(x + 14, h - 90, x - 6, h - 170); g.stroke();
+        for (let k = 0; k < 4; k++) { const by = h - 70 - k * 30, dir = k % 2 ? 1 : -1; g.lineWidth = 4; g.beginPath(); g.moveTo(x + 4, by); g.quadraticCurveTo(x + dir * 30, by - 20, x + dir * 52, by - 8 - r() * 20); g.stroke(); g.fillStyle = dark; for (let q = 0; q < 3; q++) { const tx = x + dir * (16 + q * 12), ty = by - 12 - q * 2; g.beginPath(); g.moveTo(tx - 2, ty); g.lineTo(tx, ty - 7); g.lineTo(tx + 2, ty); g.fill(); } }
+        g.strokeStyle = lite; g.lineWidth = 1; g.beginPath(); g.moveTo(x - 3, h); g.quadraticCurveTo(x + 10, h - 90, x - 9, h - 168); g.stroke();
+      } else {   // pines with a trunk, tiers of boughs, and snow or moonlight on each tier
+        const th = 150 + r() * 90, base = h;
+        g.fillStyle = SH.shade(T.midC, 0.6); g.fillRect(x - 3, base - th * 0.3, 6, th * 0.3);
+        for (let k = 0; k < 6; k++) { const ty = base - th * 0.22 - k * th * 0.13, tw = (34 - k * 4.6) * (th / 200);
+          g.fillStyle = dark; g.beginPath(); g.moveTo(x, ty - th * 0.2); g.lineTo(x - tw, ty); g.lineTo(x - tw * 0.55, ty - 3); g.lineTo(x, ty + 4); g.lineTo(x + tw * 0.55, ty - 3); g.lineTo(x + tw, ty); g.fill();
+          g.fillStyle = T.snow ? 'rgba(255,255,255,0.6)' : lite; g.beginPath(); g.moveTo(x, ty - th * 0.2); g.lineTo(x - tw * 0.8, ty - 3); g.lineTo(x - tw * 0.3, ty - th * 0.08); g.fill(); }
+      }
+    }
+    return c;
   }
   function makeStars() {
     const r = rng(7), out = [];
@@ -243,7 +270,7 @@
   THEMES.winter.gstyle = 'earth'; THEMES.dusk.gstyle = 'earth'; THEMES.thornwood.gstyle = 'earth'; THEMES.deep.gstyle = 'rock'; THEMES.mountain.gstyle = 'strata'; THEMES.city.gstyle = 'brick';
   function groundTile(g, T, style, x, y, tx, ty, depth, TS) {
     const H = (a, b) => { let h = (tx * 73856093) ^ (ty * 19349663) ^ (a * 83492791) ^ ((b || 0) * 2654435761); h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
-    const lift = [1.9, 1.5, 1.25, 1.1, 1][depth], base = SH.shade(T.speck, lift);
+    const lift = [1.42, 1.24, 1.12, 1.05, 1][depth], base = SH.shade(T.speck, lift);   // the ground stays a step quieter than the people on it
     if (style === 'brick') {   // two courses a tile, joints staggered, each stone lit top-left and dark bottom-right
       for (let row = 0; row < 2; row++) {
         const by = y + row * 12, off = ((ty * 2 + row) % 2) * 12 + ((tx * 7 + ty * 3) % 3) * 2;
@@ -508,8 +535,16 @@
       ctx.globalAlpha = alpha;
     }
     if (w.room.def.cityGlowX != null) drawCity(ctx, w, vw, cx, cy);
+    // Depth by air: each layer further away loses contrast and takes the colour of the sky; nearer layers are
+    // darker, sharper and more detailed, and slide faster. (Atmospheric perspective + detail gradient + parallax.)
+    const haze = (a, y0) => { const hg = ctx.createLinearGradient(0, y0, 0, VH); hg.addColorStop(0, 'rgba(0,0,0,0)'); hg.addColorStop(0.55, T.sky[2]); hg.addColorStop(1, T.sky[3]); ctx.globalAlpha = alpha * a; ctx.fillStyle = hg; ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = alpha; };
     tile(ctx, L.far, cx * 0.12, 10 - cy * 0.08, vw);
-    ctx.globalAlpha = alpha * 0.85; tile(ctx, L.mid, cx * 0.38, 30 - cy * 0.3, vw); ctx.globalAlpha = alpha;
+    haze(0.5, 40);
+    ctx.globalAlpha = alpha * 0.6; tile(ctx, L.mid, cx * 0.2 + 370, 6 - cy * 0.16, vw); ctx.globalAlpha = alpha;   // the same wood again, further off
+    haze(0.42, 90);
+    ctx.globalAlpha = alpha * 0.9; tile(ctx, L.mid, cx * 0.38, 30 - cy * 0.3, vw); ctx.globalAlpha = alpha;
+    haze(0.2, 150);
+    if (L.near) tile(ctx, L.near, cx * 0.62, 78 - cy * 0.55, vw);
     const mist = ctx.createLinearGradient(0, 180 - cy * 0.3, 0, VH);
     mist.addColorStop(0, 'rgba(0,0,0,0)'); mist.addColorStop(1, T.mist);
     ctx.fillStyle = mist; ctx.fillRect(0, 0, vw, VH);

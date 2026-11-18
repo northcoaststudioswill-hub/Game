@@ -1,5 +1,43 @@
 # Starhaven — Changelog
 
+## Reimagined 11 — graphics, from research (Nov 18, 2026)
+Will: the graphics need serious work; do some research and refinement.
+
+**What the research said** (pixel-art and 2D-depth guides; links at the end):
+1. Depth needs at least three of four things working together: things in front hiding things behind, air between
+   layers (far things lose contrast and take the sky's colour), a detail gradient (near things detailed, far things
+   plain), and parallax. Parallax alone "may not be convincing if your scene doesn't already convey depth when static".
+2. Colour ramps should shift hue as well as brightness: shadows cooler, highlights warmer.
+3. Characters read by silhouette and by contrast against a quieter world; shade them with a three or four step ramp.
+
+**What Starhaven was doing wrong:** it had parallax and little else. The far mountains and the trees were the same
+flat darkness with no air between them, nothing in the background had detail, every shadow in the game was just the
+same colour multiplied darker, and the ground was nearly as bright as the people standing on it.
+
+**What changed**
+- **Air between the layers.** Behind every level there are now five depths instead of two: the far ridge, a distant
+  wood, the wood, a detailed near layer, then the level. A haze in the sky's own colour sits between each pair, so
+  each one further away is paler and bluer.
+- **A detail gradient.** The new near layer is the only background layer with real drawing in it: pines with trunks,
+  tiers of boughs and snow on each tier; twisted, thorned trunks in the thornwood; lit rock pillars and hanging roots
+  Under the Mountain.
+- **Hue-shifted colour everywhere.** The one function that makes a colour darker or lighter now also pulls shadows
+  toward cool violet and highlights toward warm cream. The whole cast, the stonework and the ground changed with it.
+- **Form light on characters.** Wren and every person are lit warm from above and shaded cool toward their feet, and
+  Wren has a pale rim on her leading edge.
+- **A quieter ground.** The surface stones are a step darker, so the people on them are the brightest things again.
+
+**Honest notes.** This is light, colour and layering applied to the art that exists. It is not new drawings: Wren's
+figure and the wyrms have the same shapes as before. Tests: 50 play checks, 19 menu checks, the fuzz run, the
+screenshot run. **Not played by hand or on a phone.**
+
+Sources: [Return devlog, creating visual depth in a 2D pixel world](https://jesseeisenbart.itch.io/return-alpha/devlog/384936/return-devlog-02-creating-visual-depth-in-a-2d-pixel-world) ·
+[Pixel art scene depth composition tricks](https://freegamesprites.com/de/news/pixel-art-scene-depth-composition-tricks) ·
+[Slynyrd Pixelblog 23, parallax scrolling](https://www.slynyrd.com/blog/2019/11/12/pixelblog-23-parallax-scrolling) ·
+[Slynyrd Pixelblog 1, colour palettes](https://www.slynyrd.com/blog/2018/1/10/pixelblog-1-color-palettes) ·
+[Pixel Parmesan, anti-aliasing fundamentals](https://pixelparmesan.com/anti-aliasing-fundamentals-for-pixel-artists) ·
+[How to paint in the Hollow Knight style](https://cypaint.com/article/how-to-paint-in-the-hollow-knight-style)
+
 ## Reimagined 10 — Chapter 2 filled out, and a full retest (Nov 18, 2026)
 Will: make the current slice more content rich and developed, and retest for bugs.
 

@@ -5,10 +5,15 @@
   const W = 32, H = 60, FX = 16, FY = 56;   // sheet cell; feet at (FX, FY)
   const cache = {};
   function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+  // A hue-shifted ramp, as pixel artists build them: shadows are pulled toward a cool violet, highlights toward a
+  // warm cream, so a colour never just gets "more black" or "more white".
   function shade(hex, f) {
     const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = n >> 8 & 255, b = n & 255;
-    r = Math.max(0, Math.min(255, Math.round(r * f))); g = Math.max(0, Math.min(255, Math.round(g * f))); b = Math.max(0, Math.min(255, Math.round(b * f)));
-    return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
+    r *= f; g *= f; b *= f;
+    if (f < 1) { const k = Math.min(0.5, (1 - f) * 0.55); r += (38 - r) * k; g += (30 - g) * k; b += (96 - b) * k; }
+    else if (f > 1) { const k = Math.min(0.45, (f - 1) * 0.5); r += (255 - r) * k; g += (238 - g) * k; b += (196 - b) * k; }
+    const c = v => Math.max(0, Math.min(255, Math.round(v)));
+    return '#' + ((1 << 24) | (c(r) << 16) | (c(g) << 8) | c(b)).toString(16).slice(1);
   }
   SH.shade = shade;
 
@@ -106,6 +111,9 @@
     const L = LOOKS[id]; if (!L) return null;
     const c = canvas(W * 3, H), g = c.getContext('2d');
     for (let f = 0; f < 3; f++) { g.save(); g.translate(f * W, 0); drawBody(g, L, f); g.restore(); }
+    g.globalCompositeOperation = 'source-atop';
+    const lg = g.createLinearGradient(0, 4, 0, H); lg.addColorStop(0, 'rgba(255,240,205,0.20)'); lg.addColorStop(0.45, 'rgba(255,240,205,0)'); lg.addColorStop(1, 'rgba(24,16,70,0.30)'); g.fillStyle = lg; g.fillRect(0, 0, c.width, H);
+    g.globalCompositeOperation = 'source-over';
     outline(c, '#0a0818');
     return (cache[id] = c);
   }

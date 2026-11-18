@@ -174,6 +174,12 @@
     if (name === 'cast') o.hand = fireHand(5);
     if (name === 'charge') o.hand = fireHand(3 + Math.min(6, p.chargeT / 6));
     figure(g, p, S, o);
+    if (!gh) {   // form light over the whole figure: warm from above, cool shadow toward her feet, a rim on her leading edge
+      g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-atop';
+      const lg = g.createLinearGradient(0, OY - 46, 0, OY); lg.addColorStop(0, 'rgba(255,240,205,0.22)'); lg.addColorStop(0.5, 'rgba(255,240,205,0)'); lg.addColorStop(1, 'rgba(24,16,70,0.30)'); g.fillStyle = lg; g.fillRect(0, 0, cv.width, cv.height);
+      const rg = g.createLinearGradient(OX - 2, 0, OX + 12, 0); rg.addColorStop(0, 'rgba(200,214,255,0)'); rg.addColorStop(1, 'rgba(200,214,255,0.16)'); g.fillStyle = rg; g.fillRect(0, 0, cv.width, cv.height);
+      g.globalCompositeOperation = 'source-over';
+    }
 
     const m = mask.getContext('2d');
     m.globalCompositeOperation = 'source-over'; m.clearRect(0, 0, mask.width, mask.height); m.drawImage(cv, 0, 0);
