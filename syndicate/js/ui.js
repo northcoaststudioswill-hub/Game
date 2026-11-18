@@ -220,8 +220,8 @@
     on('[data-fight]', el => ui.prefight(G.OPPONENTS[+el.dataset.fight]));
   };
 
-  const CONTROLS = '<div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Mouse</kbd> aim</span><span><kbd>Click</kbd> strike</span><span><kbd>Hold click</kbd>, release: heavy blow</span><span><kbd>Space</kbd> dodge</span><span><kbd>Shift</kbd> or <kbd>Right click</kbd> parry, hold to block</span><span><kbd>T</kbd> call your Second</span><span><kbd>Q</kbd><kbd>E</kbd><kbd>R</kbd> abilities</span><span><kbd>F</kbd> ultimate</span><span><kbd>C</kbd> potion</span><span><kbd>Esc</kbd> pause</span></div>' +
-    '<div class="keys"><span><kbd>Controller</kbd> left stick move · right stick aim · <kbd>X</kbd>/<kbd>RT</kbd> attack · <kbd>A</kbd> dodge · <kbd>LT</kbd> parry · <kbd>D-pad left</kbd> Second · <kbd>LB</kbd><kbd>RB</kbd><kbd>Y</kbd> abilities · <kbd>B</kbd> ultimate · <kbd>D-pad up</kbd> potion · <kbd>Menu</kbd> pause</span></div>' +
+  const CONTROLS = '<div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Mouse</kbd> aim</span><span><kbd>Click</kbd> strike</span><span><kbd>Hold click</kbd>, release: heavy blow</span><span><kbd>Space</kbd> dodge</span><span><kbd>Shift</kbd> or <kbd>Right click</kbd> parry, hold to block</span><span><kbd>T</kbd> call your Second</span><span><kbd>G</kbd> taunt the crowd</span><span><kbd>Q</kbd><kbd>E</kbd><kbd>R</kbd> abilities</span><span><kbd>F</kbd> ultimate</span><span><kbd>C</kbd> potion</span><span><kbd>Esc</kbd> pause</span></div>' +
+    '<div class="keys"><span><kbd>Controller</kbd> left stick move · right stick aim · <kbd>X</kbd>/<kbd>RT</kbd> attack · <kbd>A</kbd> dodge · <kbd>LT</kbd> parry · <kbd>D-pad left</kbd> Second · <kbd>D-pad down</kbd> taunt · <kbd>LB</kbd><kbd>RB</kbd><kbd>Y</kbd> abilities · <kbd>B</kbd> ultimate · <kbd>D-pad up</kbd> potion · <kbd>Menu</kbd> pause</span></div>' +
     '<p class="dim">On a phone: left thumb moves, buttons on the right, and your aim locks to your opponent. Red marks on the floor are incoming attacks. Dodge through them to thrill the crowd.</p>';
   ui.prefight = function (o) {
     const st = G.state, h = st.hero;

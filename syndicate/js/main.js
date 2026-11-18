@@ -32,7 +32,7 @@
   }
 
   // ---------------------------------------------------------------- input
-  const KEYMAP = { Space: 'dodge', ShiftLeft: 'parry', ShiftRight: 'parry', KeyX: 'parry', KeyT: 'assist', KeyQ: 'a0', KeyE: 'a1', KeyR: 'a2', KeyF: 'ult', KeyC: 'potion', Digit1: 'a0', Digit2: 'a1', Digit3: 'a2', Digit4: 'ult' };
+  const KEYMAP = { Space: 'dodge', ShiftLeft: 'parry', ShiftRight: 'parry', KeyX: 'parry', KeyT: 'assist', KeyG: 'taunt', KeyV: 'taunt', KeyQ: 'a0', KeyE: 'a1', KeyR: 'a2', KeyF: 'ult', KeyC: 'potion', Digit1: 'a0', Digit2: 'a1', Digit3: 'a2', Digit4: 'ult' };
   window.addEventListener('keydown', e => {
     if (e.target && e.target.tagName === 'INPUT') return;
     if (G.bootSkip) return;
@@ -96,6 +96,7 @@
   tAtk.addEventListener('touchstart', e => { e.preventDefault(); In.touchAtk = true; }, { passive: false });
   tAtk.addEventListener('touchend', e => { e.preventDefault(); In.touchAtk = false; }); tAtk.addEventListener('touchcancel', () => { In.touchAtk = false; });
   tDodge.addEventListener('touchstart', e => { e.preventDefault(); In.pressed.push('dodge'); }, { passive: false });
+  if ($('tTaunt')) $('tTaunt').addEventListener('touchstart', e => { e.preventDefault(); In.pressed.push('taunt'); }, { passive: false });
   $('tParry').addEventListener('touchstart', e => { e.preventDefault(); In.pressed.push('parry'); In.touchBlk = true; }, { passive: false });
   ['touchend', 'touchcancel'].forEach(ev => $('tParry').addEventListener(ev, () => { In.touchBlk = false; }));
   $('pauseBtn').addEventListener('click', () => G.ui.pause());
@@ -150,7 +151,7 @@
     if (!nx && !ny && (Math.abs(lx) > 0.6 || Math.abs(ly) > 0.6)) { if (navT <= 0) { if (Math.abs(lx) > Math.abs(ly)) nx = Math.sign(lx); else ny = Math.sign(ly); navT = 0.22; } } else if (!lx && !ly) navT = 0;
     if (sc === 'cine') { if (hit(0) || hit(1) || hit(9)) G.cine.skip(); }
     else if (sc === 'fight' && !open && !paused) {
-      if (hit(0)) In.pressed.push('dodge'); if (hit(6)) In.pressed.push('parry'); if (hit(14)) In.pressed.push('assist');
+      if (hit(0)) In.pressed.push('dodge'); if (hit(6)) In.pressed.push('parry'); if (hit(14)) In.pressed.push('assist'); if (hit(13)) In.pressed.push('taunt');
       if (hit(4)) In.pressed.push('a0'); if (hit(5)) In.pressed.push('a1'); if (hit(3)) In.pressed.push('a2');
       if (hit(1)) In.pressed.push('ult'); if (hit(12)) In.pressed.push('potion'); if (hit(9)) G.ui.pause();
     } else if (G.placing && !open) {

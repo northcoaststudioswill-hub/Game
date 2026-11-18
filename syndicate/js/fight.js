@@ -4,7 +4,7 @@
   const G = window.G, A = G.ABILITIES, T = THREE, gfx = G.gfx, S = gfx.S;
   const RAD = G.world.AR * S, ER = 16;
   const F = G.fight = { active: false, paused: false, speed: 1 };
-  let P, E, projs, zones, fx, time, hitstop, phase, phaseT, hype, opp, shake, result, lastAb, stolen, arena, sc, camVh = 12;
+  let P, E, projs, zones, fx, time, hitstop, phase, phaseT, hype, opp, shake, result, lastAb, stolen, tossed = 0, arena, sc, camVh = 12;
 
   const rand = G.rand, clamp = G.clamp;
   function clampArena(o) {
@@ -48,7 +48,7 @@
     P.foe = E; E.foe = P;
     [P, E].forEach(makeVis);
     if (!arena.flash.parent) sc.add(arena.flash);
-    projs = []; zones = []; fx = []; time = 0; hitstop = 0; shake = 0; hype = 20; lastAb = null; stolen = 0;
+    projs = []; zones = []; fx = []; time = 0; hitstop = 0; shake = 0; hype = 20; lastAb = null; stolen = 0; tossed = 0; F.frenzies = 0;
     phase = 'intro'; phaseT = 1.8; result = null; F.said = 0; M = null; clearGibs(); gfx.clearBlood(sc); gfx.cine = null; F.assistUsed = 0; marks.forEach(m => m.visible = false); markN = 0;
     { const tm = (st.tally || [])[st.second]; P.second = tm && !tm.job ? tm : null; }
     if (st.bless) { P.shield += 18; st.bless = 0; }
@@ -87,7 +87,7 @@
       const ab = e.act.ab, melee = ab.type === 'melee' && !ab.spell;
       if (e.state === 'wind') { prog = 1 - e.t / (e.act.total || ab.wind || 0.01); act = melee ? 'swing' : 'cast'; if (melee) prog *= 0.5; glow = ab.color; }
       else { prog = 1 - e.t / (ab.rec || 0.01); act = melee ? 'swing' : 'release'; if (melee) prog = 0.5 + prog * 0.5; }
-      if (ab.type === 'dash') act = 'lunge';
+      if (ab.type === 'dash') act = 'lunge'; if (ab.type === 'taunt') act = 'cheer';
     }
     else if (e.state === 'parry') act = 'parry';
     else if (e.charging > 0.1 && phase === 'fight') { act = e.C.ranged ? 'cast' : 'swing'; prog = e.C.ranged ? Math.min(1, e.charging * 2) : Math.min(0.3, 0.1 + e.charging * 0.5); stepOv = 2; glow = e.charging >= 0.28 ? '#ffe9a0' : null; }
@@ -202,7 +202,22 @@
   // ------------------------------------------------------------------ helpers
   function text(e, s, col, big) { if (G.deeds && phase === 'fight' && !F.ex && !opp.spar) { if (s === 'PARRIED!' && !e.isPlayer) G.deeds.bump('parry'); else if (s === 'PERFECT DODGE' && e.isPlayer) G.deeds.bump('perfect'); else if (!e.isPlayer && String(s).indexOf('WALL ') === 0) G.deeds.bump('wall'); } gfx.floatText(e.x / S, 2.3 + rand(0, 0.3), e.y / S, s, col || '#fff', big); }
   function spark(x, y, z, col, n, sp) { gfx.burst(x / S, (z || 30) / S, y / S, col, n, (sp || 160) / S, 3); }
-  function addHype(v) { const h0 = hype; hype = clamp(hype + v, 0, 100); if (h0 < 80 && hype >= 80) G.sfx('cheer'); }
+  function addHype(v) { const h0 = hype; hype = clamp(hype + v, 0, 100); if (h0 < 80 && hype >= 80) G.sfx('cheer'); if (h0 < 100 && hype >= 100 && phase === 'fight' && P && !P.buffs.frenzy && !F.ex) frenzy(); }
+  // the whole pit on its feet: for a few seconds everything you do is bigger
+  function frenzy() {
+    setBuff(P, 'frenzy', 6, 0); F.frenzies = (F.frenzies || 0) + 1; text(P, 'THE PIT ERUPTS', '#ffd36b', true); G.sfx('cheer'); G.sfx('crowd'); G.sfx('level'); shake = Math.max(shake, 8); hitstop = Math.max(hitstop, 0.08);
+    fx.push({ k: 'ring', x: P.x, y: P.y, r: 260, col: '#ffd36b', t: 0, life: 0.6 }); arena.setHype(1); if (G.rumble) G.rumble(260, 0.8);
+    if (counted() && G.deeds) G.deeds.bump('frenzy');
+  }
+  const TAUNT = { type: 'taunt', rec: 0.9, name: '' };
+  const TAUNTS = ['COME ON, THEN!', 'IS THAT ALL?', 'LOOK AT ME!', 'WHO IS NEXT?', 'LOUDER!'];
+  function taunt(e) {
+    if (phase !== 'fight' || e.state !== 'idle' || e.st.stun || time - (e.tauntT || -9) < 5) { if (e.isPlayer) G.sfx('deny'); return; }
+    const foe = e.foe, big = !!(foe.st.stun || foe.st.broken);
+    e.tauntT = time; e.state = 'recover'; e.t = TAUNT.rec; e.act = { ab: TAUNT, step: 0, aim: e.aim, taunt: 1, pay: big ? 12 : 8 }; e.charging = 0; e.guard = 0;
+    if (e.isPlayer) { text(e, G.pick(TAUNTS), '#ffd36b', true); G.sfx('cheer'); addHype(big ? 14 : 8); } else { text(e, '…', '#ff8a6a', true); addHype(-6); }
+  }
+  F.taunt = () => taunt(P);
   function angDiff(a, b) { let d = a - b; while (d > Math.PI) d -= 6.283; while (d < -Math.PI) d += 6.283; return Math.abs(d); }
   function segDist(px, py, ax, ay, bx, by) {
     const dx = bx - ax, dy = by - ay, l = dx * dx + dy * dy || 1;
@@ -236,8 +251,8 @@
     sc.attach(limb); const a = dir + rand(-0.6, 0.6), v = rand(3, 5.5);
     gibs.push({ m: limb, vx: Math.cos(a) * v, vz: Math.sin(a) * v, vy: rand(5.5, 8.5), rx: rand(-10, 10), rz: rand(-10, 10) });
     blood(tgt.x, tgt.y, 70, dir); blood(tgt.x, tgt.y, 40); if (gore()) for (let i = 0; i < 5; i++) gfx.splat(tgt.x / S + rand(-1.2, 1.2), tgt.y / S + rand(-1.2, 1.2), rand(0.5, 1.2));
-    if (att && att.isPlayer && counted()) G.deeds.bump('sever');
-    text(tgt, part === 'legL' ? 'LEG SEVERED' : 'ARM SEVERED', '#ff3020', true);
+    if (att && att.isPlayer && counted()) G.deeds.bump('sever'); if (att && att.isPlayer) addHype(15);
+    text(tgt, part === 'head' ? 'BEHEADED' : part === 'legL' ? 'LEG SEVERED' : 'ARM SEVERED', '#ff3020', true);
     hitstop = Math.max(hitstop, 0.22); slowT = 0.5; shake = Math.max(shake, 19); camVh -= 0.9; flashLight(tgt.x, tgt.y, '#ff2010', 90);
     G.sfx('crit'); G.sfx('wall'); if (att && att.isPlayer) { addHype(16); G.sfx('cheer'); } if (G.rumble) G.rumble(300, 1);
     if (part === 'legL') tgt.d.speed *= 0.6; else tgt.d.dmgMul = (tgt.d.dmgMul || 1) * 0.85;
@@ -300,7 +315,7 @@
     projs.forEach(p => p.m && sc.remove(p.m)); projs = []; zones.forEach(z => z.m && sc.remove(z.m)); zones = [];
     const a = Math.atan2(e.y - P.y, e.x - P.x); P.x = e.x - Math.cos(a) * 66; P.y = e.y - Math.sin(a) * 66; clampArena(P); P.aim = a;
     const def = G.mortalOf ? G.mortalOf(G.state) : Object.assign({ id: 'base' }, G.MORTAL[P.cls]);
-    M = { t: 0, e, a, f: {}, name: def.name, def, k: def.id };
+    M = { t: 0, e, a, f: {}, name: def.name, def, k: def.lead || def.id };
     phase = 'mortal'; hitstop = 0.3; shake = 10; result = { win: true };
     G.ui.banner('Mortal Blow', M.name, 'win mortal'); G.sfx('bell'); G.sfx('crowd');
   }
@@ -331,6 +346,11 @@
       once('chase', IMP - 0.25, () => { fx.push({ k: 'trail', x1: P.x, y1: P.y, x2: e.x, y2: e.y, col, t: 0, life: 0.3 }); for (let gi = 0; gi < 4; gi++) fx.push({ k: 'ghost', x: G.lerp(P.x, e.x, gi / 4), y: G.lerp(P.y, e.y, gi / 4), col, t: -gi * 0.03, life: 0.34 }); P.x = e.x - Math.cos(m.a) * 66; P.y = e.y - Math.sin(m.a) * 66; clampArena(P); G.sfx('dash'); });
     }
     if (k === 'quake') every('q', 0.3, IMP - 0.1, 0.27, i => { const a = rand(0, 6.28), d = 50 + i * 26; mark(e.x + Math.cos(a) * d, e.y + Math.sin(a) * d, 1.3 + i * 0.3, 'crack'); fx.push({ k: 'dust', x: e.x, y: e.y, r: 90 + i * 40, t: 0, life: 0.5 }); fx.push({ k: 'slash', x: P.x, y: P.y, a: m.a, r: 120, arc: 2, col, t: 0, life: 0.2 }); shake = Math.max(shake, 9 + i * 2); G.sfx('wall'); e.flash = 0.07; blood(e.x, e.y, 5, m.a); });
+    if (k === 'pack') every('p', 0.2, IMP - 0.05, 0.14, i => { const a = i * 2.1 + 0.4, x1 = e.x + Math.cos(a) * 200, y1 = e.y + Math.sin(a) * 200; fx.push({ k: 'ghost', x: G.lerp(x1, e.x, 0.5), y: G.lerp(y1, e.y, 0.5), col, t: 0, life: 0.3 }); fx.push({ k: 'trail', x1, y1, x2: e.x, y2: e.y, col: i % 2 ? col : '#ffffff', t: 0, life: 0.2 }); blood(e.x, e.y, 9, a + Math.PI); e.flash = 0.08; e.x += Math.cos(a + Math.PI) * 7; e.y += Math.sin(a + Math.PI) * 7; G.sfx(i % 2 ? 'hit' : 'swing'); shake = Math.max(shake, 6); });
+    if (k === 'sink') { every('k', 0.2, IMP, 0.22, i => { fx.push({ k: 'ring', x: e.x, y: e.y, r: 200 - i * 34, col, t: 0, life: 0.4 }); fx.push({ k: 'dust', x: e.x, y: e.y, r: 70 + i * 16, t: 0, life: 0.5 }); mark(e.x + rand(-30, 30), e.y + rand(-30, 30), 1.2 + i * 0.3, 'crack'); G.sfx('wall'); shake = Math.max(shake, 6 + i * 2); }); if (m.t > 0.45 && m.t < IMP) { e.z -= dt * 34; e.flash = 0.03; } }
+    if (k === 'lift') { if (m.t > 0.2 && m.t < IMP - 0.12) { e.z = Math.min(95, e.z + dt * 150); e.flash = 0.04; if (Math.random() < 0.7) gfx.emit(e.x / S + rand(-0.3, 0.3), e.z / S + rand(0.2, 1.6), e.y / S + rand(-0.3, 0.3), rand(-1, 1), rand(-2, 0), rand(-1, 1), 0.4, col, 0); } once('lf', 0.2, () => { fx.push({ k: 'ring', x: e.x, y: e.y, r: 120, col, t: 0, life: 0.5 }); G.sfx('holy'); }); once('dr', IMP - 0.12, () => { e.z = 0; G.sfx('wall'); mark(e.x, e.y, 2.6, 'crack'); }); }
+    if (k === 'impale') every('i', 0.25, IMP, 0.16, i => { const a = i * 1.26, ox = Math.cos(a) * 46, oy = Math.sin(a) * 46; fx.push({ k: 'bolt', x1: e.x + ox * 4, y1: e.y + oy * 4 - 260, x2: e.x + ox * 0.3, y2: e.y + oy * 0.3, col: '#e8eef4', t: 0, life: 0.2 }); blood(e.x, e.y, 10, a); e.flash = 0.1; G.sfx('crit'); shake = Math.max(shake, 8); hitstop = Math.max(hitstop, 0.05); text(e, i % 2 ? '' : 'PINNED', col); });
+    if (k === 'spin') every('n', 0.25, IMP - 0.1, 0.22, i => { fx.push({ k: 'slash', x: P.x, y: P.y, a: m.a + (i % 2 ? 0.9 : -0.9), r: 140, arc: 3.0, col, t: 0, life: 0.22 }); blood(e.x, e.y, 12, m.a + i); e.flash = 0.09; G.sfx('swing'); shake = Math.max(shake, 7); });
     once('imp', IMP, () => {
       const ash = !!def.ash;
       if (!cast) fx.push({ k: 'slash', x: P.x, y: P.y, a: m.a, r: 150, arc: 3.4, col, t: 0, life: 0.35 });
@@ -338,8 +358,12 @@
       fx.push({ k: 'ring', x: e.x, y: e.y, r: 240, col, t: 0, life: 0.7 }); fx.push({ k: 'dust', x: e.x, y: e.y, r: 200, t: 0, life: 0.8 });
       if (def.crack) mark(e.x, e.y, 3.4, 'crack'); if (def.fire || ash) mark(e.x, e.y, 3, 'scorch');
       spark(e.x, e.y, 30, col, 40, 420); flashLight(e.x, e.y, col, 170); shake = 22; hitstop = 0.22;
-      if (!ash) { blood(e.x, e.y, 70); blood(e.x, e.y, 40, m.a); }
-      makeGibs(e, ash); e.vis.g.visible = false; if (e.vis.tele) { sc.remove(e.vis.tele); e.vis.tele = null; }
+      if (!ash && !def.swallow) { blood(e.x, e.y, 70); blood(e.x, e.y, 40, m.a); }
+      e.z = 0; const behead = def.behead && gore() && !e.vis.c.beast && !(e.lost && e.lost.head);
+      if (behead) { sever(e, 'head', null, m.a); for (let bi = 0; bi < 26; bi++) gfx.emit(e.x / S + rand(-0.1, 0.1), 1.5, e.y / S + rand(-0.1, 0.1), rand(-1.4, 1.4), rand(4, 8), rand(-1.4, 1.4), rand(0.5, 0.9), '#8a0c0c', 1); }
+      else if (def.swallow) { e.vis.g.visible = false; fx.push({ k: 'dust', x: e.x, y: e.y, r: 260, t: 0, life: 1 }); mark(e.x, e.y, 3.6, 'crack'); }
+      else { makeGibs(e, ash); e.vis.g.visible = false; }
+      if (e.vis.tele) { sc.remove(e.vis.tele); e.vis.tele = null; }
       e.state = 'ko'; e.koT = 9; e.st = {};
       hype = 100; arena.setHype(1); G.sfx('boom'); G.sfx('crit'); G.sfx('cheer'); if (G.rumble) G.rumble(400, 1);
       text(e, def.word, col, true);
@@ -403,6 +427,8 @@
     if (tgt.st.mark) mul *= 1.25;
     if (att.d.tactical && (tgt.st.stun || tgt.st.slow)) mul *= 1.3;
     let tag = null; const real = ab.type !== 'aura' && !o.dot;
+    if (real && tgt.act && tgt.act.taunt && !tgt.act.spoiled) { tgt.act.spoiled = 1; mul *= 1.25; text(tgt, 'SHOWBOAT', '#ff8a6a', true); if (tgt.isPlayer) addHype(-12); else addHype(10); }      // caught playing to the crowd
+    if (att.buffs.frenzy) mul *= 1.15;
     if (real && att.ripT > time) { att.ripT = 0; mul *= 1.3; text(tgt, 'RIPOSTE', '#9fd0ff', true); poiseHit(tgt, 20, att); if (att.isPlayer) addHype(8); }
     if (real && ab.type === 'melee' && tgt.state !== 'ko' && angDiff(Math.atan2(att.y - tgt.y, att.x - tgt.x), tgt.aim) > 2.2) { mul *= 1.2; if (time - (tgt.flankT || -9) > 1.5) { tgt.flankT = time; text(tgt, 'FLANKED', '#c79bff'); if (att.isPlayer) addHype(4); } }
     if (real && tgt.state === 'wind' && tgt.act) { mul *= 1.25; tag = 'COUNTER'; } else if (real && (tgt.state === 'recover' || tgt.state === 'parry')) { mul *= 1.4; tag = 'PUNISH'; }
@@ -432,7 +458,7 @@
     flashLight(tgt.x, tgt.y, ab.color || '#ffffff', crit ? 40 : 18);
     G.sfx(crit ? 'crit' : tgt.isPlayer ? 'hurt' : 'hit');
     if (G.rumble) G.rumble(tgt.isPlayer ? 160 : crit ? 110 : 50, tgt.isPlayer ? 0.8 : crit ? 0.6 : 0.25);
-    if (att.isPlayer) { addHype(crit ? 10 : 5); if (ab.gain) att.res = Math.min(100, att.res + ab.gain); }
+    if (att.isPlayer) { addHype(crit ? 10 : 5); if (ab.gain) att.res = Math.min(100, att.res + ab.gain); if (att.hp < att.maxHp * 0.2 && time - (att.lbT || -9) > 3) { att.lbT = time; addHype(8); text(att, 'LAST BREATH', '#ff8a6a', true); } }
     else addHype(-7);
     const resist = tgt.boss ? 0.6 : 1;
     if (o.brk) { tgt.st.stun = { t: 1.0 * resist }; interrupt(tgt); text(tgt, 'GUARD BREAK', '#ffd23c', true); G.sfx('break'); if (att.isPlayer) addHype(12); }
@@ -500,7 +526,7 @@
     }
     e.state = 'wind'; e.t = act.total;
     if (!ab.basic) {
-      if (e.isPlayer) { if (lastAb !== id) addHype(6); lastAb = id; }
+      if (e.isPlayer) { if (lastAb !== id) addHype(6); lastAb = id; e.recent = (e.recent || []).filter(q => time - q[1] < 8 && q[0] !== id); e.recent.push([id, time]); if (e.recent.length >= 4 && time - (e.showT || -99) > 8) { e.showT = time; e.recent = []; addHype(14); text(e, 'SHOWMAN', '#ffe9a0', true); G.sfx('cheer'); } }
       if (e.d.wild && Math.random() < 0.25) wildSurge(e);
     }
     if (e.buffs.stealth && ab.type !== 'buff' && ab.type !== 'dash') delete e.buffs.stealth;
@@ -599,14 +625,14 @@
     if (e.lost && e.state !== 'ko' && gore()) { if (Math.random() < dt * 6) gfx.emit(e.x / S + rand(-0.2, 0.2), rand(0.6, 1.3), e.y / S + rand(-0.2, 0.2), rand(-0.6, 0.6), rand(-0.5, 1), rand(-0.6, 0.6), 0.5, 0xb01010, 9); if (Math.random() < dt * 2.2) gfx.splat(e.x / S + rand(-0.3, 0.3), e.y / S + rand(-0.3, 0.3), rand(0.2, 0.5)); }
     for (const k in e.cds) if (e.cds[k] > 0) e.cds[k] -= dt * (1 + e.d.cdr);
     if (e.state === 'ko') { e.koT += dt; return; }
-    e.res = Math.min(100, e.res + e.d.regen * dt * (e.guard > 0 || e.charging > 0 ? 0.25 : e.st.winded ? 0.6 : 1));
+    e.res = Math.min(100, e.res + e.d.regen * dt * (e.buffs.frenzy ? 1.6 : 1) * (e.guard > 0 || e.charging > 0 ? 0.25 : e.st.winded ? 0.6 : 1));
     if ((e.poiseT = (e.poiseT || 0) - dt) <= 0 && e.poise < e.maxPoise) e.poise = Math.min(e.maxPoise, e.poise + 24 * dt);
     for (const k in e.st) {
       const s = e.st[k]; s.t -= dt;
       if (s.dice) { s.tick -= dt; if (s.tick <= 0) { s.tick += 0.5; const v = Math.max(1, Math.round(G.roll(s.dice) * (s.by ? s.by.d.dmgMul : 1))); e.hp -= v; if (s.by) s.by.dmgDealt += v; text(e, '' + v, k === 'poison' ? '#9be35a' : '#ff9a3c'); if (e.hp <= 0) { ko(e); return; } } }
       if (s.t <= 0) delete e.st[k];
     }
-    for (const k in e.buffs) { e.buffs[k].t -= dt; if (e.buffs[k].t <= 0) { delete e.buffs[k]; if (k === 'shield') e.shield = 0; if (k === 'form' && G.forms) G.forms.end(e); } }
+    for (const k in e.buffs) { e.buffs[k].t -= dt; if (e.buffs[k].t <= 0) { delete e.buffs[k]; if (k === 'shield') e.shield = 0; if (k === 'frenzy') hype = Math.min(hype, 62); if (k === 'form' && G.forms) G.forms.end(e); } }
     if (e.buffs.aura) {
       e.auraT -= dt;
       if (e.auraT <= 0) {
@@ -648,7 +674,7 @@
       if (e.t <= 0) { e.z = 0; const a0 = e.act; fire(e); if (e.state === 'wind') { e.state = 'recover'; e.t = ab.rec * (a0.fin ? 1.5 : 1) * (a0.missed ? 1.8 : 1); } }
     } else if (e.state === 'recover') {
       e.t -= dt * spd; mv = 0.5;
-      if (e.t <= 0) { if (e.act && e.act.ab.basic) { e.cStep = e.act.missed ? null : e.act.step; e.cEnd = time; } e.state = 'idle'; e.act = null; }
+      if (e.t <= 0) { if (e.act && e.act.ab.basic) { e.cStep = e.act.missed ? null : e.act.step; e.cEnd = time; } if (e.act && e.act.taunt && e.isPlayer && !e.act.spoiled) { addHype(e.act.pay || 8); text(e, 'THEY LOVE IT', '#ffe9a0'); } e.state = 'idle'; e.act = null; }
     }
     // a light blow can be abandoned for a dodge in the first half of its wind-up: a feint, paid for in stamina
     if (e.state === 'idle' || (e.state === 'recover' && e.buf && (e.buf.id === 'dodge' || e.buf.id === 'parry')) || (e.state === 'wind' && e.isPlayer && e.buf && e.buf.id === 'dodge' && e.act && e.act.ab.basic && e.t > (e.act.total || e.act.ab.wind) * 0.5)) {
@@ -793,6 +819,7 @@
       const a = In.pressed.shift();
       if (a === 'dodge' || a === 'potion' || a === 'parry') I.queue.push(a);
       else if (a === 'assist') callSecond();
+      else if (a === 'taunt') taunt(P);
       else if (a === 'ult') { if (P.ult) I.queue.push(P.ult); }
       else { const id = P.kit[+a[1]]; if (id) I.queue.push(id); }
     }
@@ -813,7 +840,11 @@
     else if (phase === 'fight') {
       if (G.debugAuto) { if (!P.ai) P.ai = { react: 0.3, aggro: 0.7, dodge: 0.3, parry: 0.15 }; think(P, dt); } else playerIntent(rdt);
       think(E, dt);
-      hype = Math.max(0, hype - dt * 1.2);
+      hype = Math.max(0, hype - dt * (P.buffs.frenzy ? 0 : 1.2));
+      // a roaring crowd throws coin, and the stands show it
+      if (hype >= 80 && Math.random() < dt * (P.buffs.frenzy ? 2.4 : 0.9)) { const a = rand(0, 6.28), R0 = 9.5, x = Math.cos(a) * R0, z = Math.sin(a) * R0; for (let i = 0; i < 3; i++) gfx.emit(x, 2.6 + rand(0, 0.6), z, -Math.cos(a) * rand(4, 6), rand(2, 4), -Math.sin(a) * rand(4, 6), 1.1, i ? '#ffd36b' : '#fff0c0', 1); tossed += P.buffs.frenzy ? 2 : 1; if (Math.random() < 0.35) G.sfx('coin'); }
+      if (P.buffs.frenzy && Math.random() < 0.6) gfx.emit(P.x / S + rand(-0.5, 0.5), rand(0.2, 2), P.y / S + rand(-0.5, 0.5), 0, rand(1.5, 3), 0, 0.5, '#ffd36b', 0);
+      if (!G.debugAuto && E.state === 'idle' && !E.st.stun && E.hp > E.maxHp * 0.5 && (P.st.broken || (Math.hypot(P.x - E.x, P.y - E.y) > 300 && Math.random() < dt * 0.04))) taunt(E);
     } else { P.intent.mx = P.intent.my = E.intent.mx = E.intent.my = 0; P.intent.attack = E.intent.attack = false; P.intent.queue.length = E.intent.queue.length = 0; }
     updateEntity(P, dt); updateEntity(E, dt);
     if (phase === 'mortal') mortalStep(dt);
@@ -927,7 +958,7 @@
     P = mk(a, pa, true); E = mk(b, pb, false); P.foe = E; E.foe = P;
     P.aim = Math.atan2(E.y - P.y, E.x - P.x); E.aim = P.aim + Math.PI;
     F.ex = true; [P, E].forEach(makeVis); if (!arena.flash.parent) sc.add(arena.flash);
-    time = 0; hitstop = 0; shake = 0; hype = 50; lastAb = null; stolen = 0; phase = 'fight'; result = null;
+    time = 0; hitstop = 0; shake = 0; hype = 50; lastAb = null; stolen = 0; tossed = 0; phase = 'fight'; result = null;
     F.active = true; F.paused = false; F.P = P; F.E = E; initPoise(); sync(0);
     return { A: P, B: E };
   };
@@ -956,8 +987,9 @@
       xp: Math.round(opp.xp * base * P.d.xpMul),
       coin: win ? Math.round(opp.coin * (first ? 1 : 0.6) * P.d.coinMul * (hy >= 80 ? 1.2 : 1)) + stolen : stolen,
       respect: win ? Math.round(opp.respect * (first ? 1 : 0.3) * P.d.respectMul * (1 + hy / 200)) : 0,
-      tips: win && hy >= 80, stolen
+      tips: win && hy >= 80, stolen, tossed: win ? tossed : 0, frenzies: F.frenzies || 0
     };
+    if (win) r.coin += tossed;
     if (result.forfeit) { r.xp = 0; r.coin = 0; }
     if (!win) {                                  // a lost bout is a death: the purse goes, and some of the name with it
       r.lost = st.coin; st.coin = 0; st.deaths = (st.deaths || 0) + 1; st.soulDebt = (st.soulDebt || 0) + 1;

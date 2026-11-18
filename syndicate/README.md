@@ -249,3 +249,11 @@ The renderer caps resolution at 1.5x, redraws the shadow map every other frame, 
 - **Drow** race: +2 Dexterity, +1 Charisma.
 - New kits Moss-Hide Mantle and Robes of the Low Pact, each with a set. Every existing set accepts the new classes' weapons.
 - **Loadout.** You carry three techniques and one ultimate. Everything else you learn stays on your list; the Guildmaster's sheet swaps what is in the three slots. Feats and subclass passives are always on and take no slot.
+
+## The crowd and the arsenal (`js/crowd.js`, fight engine)
+
+- **Taunt** (G, D-pad down, or the TAUNT touch button): 0.9s of showing off for crowd hype, more if the opponent is staggered. Get hit during it and you take 25% more and the crowd turns. Opponents taunt too; hitting them mid-taunt pays you.
+- **Frenzy.** Fill the crowd meter and the pit erupts for 6 seconds: +15% damage, faster resource recovery, coin thrown from the stands. The meter then settles and can be filled again.
+- **More ways to raise it:** severing a limb, four different moves inside eight seconds (Showman), landing blows under 20% health (Last Breath).
+- **Mortal blows:** five per class, earned at ranks 0 to 4. Some behead, some leave nothing.
+- **Weapons:** five per class (30). Fifth weapons cost 480 at Underboss.
