@@ -7,10 +7,25 @@
   const DIR = new T.Vector3(Math.cos(ELEV) * Math.sin(YAW), Math.sin(ELEV), Math.cos(ELEV) * Math.cos(YAW));
   const cam = gfx.cam = { x: 0, z: 0, y: 0.8, vh: 12, fx: 0.5, fy: 0.5, shake: 0 };
   gfx.W = 1; gfx.H = 1;
+  // quality: scale is the share of the screen's own resolution we draw at; shadows are redrawn every `shadowEvery` frames
+  gfx.scale = 1; gfx.shadowEvery = 2; gfx.low = false;
+  let fc = 0, lastSc = null, slow = 0, fast = 0, lastT = 0, avg = 16;
+  const shadowTick = () => { fc++; if (scene !== lastSc || fc % gfx.shadowEvery === 0) renderer.shadowMap.needsUpdate = true; lastSc = scene; };
+  // watch the frame time; if the machine cannot keep up, draw fewer pixels rather than drop frames
+  gfx.pace = function (now) {
+    const d = now - lastT; lastT = now; if (d <= 0 || d > 250) return;             // tab was away, or the very first frame
+    avg += (d - avg) * 0.05;
+    if (gfx.fixed) return;
+    if (avg > 23) { slow += d; fast = 0; } else if (avg < 15) { fast += d; slow = 0; } else { slow = Math.max(0, slow - d); fast = 0; }
+    if (slow > 1500 && gfx.scale > 0.55) { gfx.scale = Math.max(0.55, gfx.scale - 0.15); gfx.shadowEvery = gfx.scale < 0.8 ? 3 : 2; slow = 0; avg = 18; gfx.resize(); document.body.classList.toggle('lowq', gfx.scale < 0.8); }
+    else if (fast > 12000 && gfx.scale < 1 && !gfx.low) { gfx.scale = Math.min(1, gfx.scale + 0.15); fast = 0; avg = 18; gfx.resize(); document.body.classList.toggle('lowq', gfx.scale < 0.8); }
+  };
+  gfx.frameMs = () => avg;
+  gfx.setLow = function (on) { gfx.low = !!on; gfx.fixed = false; gfx.scale = on ? 0.7 : 1; gfx.shadowEvery = on ? 3 : 2; slow = fast = 0; if (renderer) gfx.resize(); document.body.classList.toggle('lowq', !!on); };
 
   gfx.init = function (canvas) {
     renderer = new T.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-    renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = false;
     renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.2;
     camera = new T.OrthographicCamera(-1, 1, 1, -1, 0.1, 300);
     gfx.renderer = renderer; gfx.camera = camera;
@@ -18,7 +33,7 @@
   };
   gfx.resize = function () {
     gfx.W = window.innerWidth; gfx.H = window.innerHeight;
-    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    renderer.setPixelRatio(Math.max(0.6, Math.min(1.5, window.devicePixelRatio || 1) * gfx.scale));
     renderer.setSize(gfx.W, gfx.H, false);
     gfx.portrait = gfx.H > gfx.W;
   };
@@ -36,7 +51,7 @@
       pcam.position.set(k.pos[0] + sx, k.pos[1] + sx * 0.5, k.pos[2] + sz);
       pcam.up.set(Math.sin(k.roll || 0), Math.cos(k.roll || 0), 0);
       pcam.lookAt(k.look[0] + sx * 0.6, k.look[1], k.look[2] + sz * 0.6); pcam.updateMatrixWorld();
-      active = pcam; renderer.render(scene, pcam); return;
+      active = pcam; shadowTick(); renderer.render(scene, pcam); return;
     }
     const vw = cam.vh * gfx.W / gfx.H;
     camera.left = -vw * cam.fx; camera.right = vw * (1 - cam.fx); camera.top = cam.vh * cam.fy; camera.bottom = -cam.vh * (1 - cam.fy);
@@ -44,7 +59,7 @@
     camera.position.set(cam.x + sx + DIR.x * 80, cam.y + DIR.y * 80, cam.z + sz + DIR.z * 80);
     camera.lookAt(cam.x + sx, cam.y, cam.z + sz);
     camera.updateMatrixWorld();
-    active = camera; renderer.render(scene, camera);
+    active = camera; shadowTick(); renderer.render(scene, camera);
   };
   const v3 = new T.Vector3();
   gfx.project = (x, y, z) => { v3.set(x, y, z).project(active || camera); return { x: (v3.x * 0.5 + 0.5) * gfx.W, y: (-v3.y * 0.5 + 0.5) * gfx.H }; };

@@ -187,13 +187,15 @@
 
   // ---------------------------------------------------------------- loop
   let last = performance.now(), lastScene = '';
+  let fno = 0;
   function frame(now) {
     const dt = Math.min(0.033, (now - last) / 1000); last = now; T += dt;
+    gfx.pace(now);
     const sc = G.scene, cam = gfx.cam, port = gfx.portrait;
     if (sc !== lastScene) { leaveSpecial(); lastScene = sc; G.music({ title: 'title', create: 'title', hub: 'hub', hideout: 'home', fight: G.fightTrack || 'fight', cine: 'boss' }[sc]); }
     pollPad(dt);
     let near = null;
-    if (sc === 'fight') { G.fight.update(dt); }
+    if (sc === 'fight') { if (G.talk) G.talkApi.update(dt, T); else G.fight.update(dt); }      // a scene in the pit (the Oracle fetching you back) runs in place of the bout
     else if (sc === 'cine') { G.cine.update(dt, T); }
     else if (sc === 'hub' || sc === 'hideout') {
       near = W.updateWalk(dt, T, G.ui.isOpen() || !!G.placing || !!G.talk);
@@ -217,7 +219,8 @@
     $('decorBtn').textContent = In.usingPad ? '(Y) Decorate' : 'Decorate'; $('decorBtn').className = sc === 'hideout' && !G.placing && !G.ui.isOpen() ? '' : 'hidden';
     $('touch').className = In.touch && (sc === 'fight' || ((sc === 'hub' || sc === 'hideout') && !G.placing && !G.ui.isOpen())) ? (sc === 'fight' ? 'fight' : '') : 'hidden';
     gfx.updateFires(T); gfx.updateParticles(dt); gfx.updateFloats(dt);
-    gfx.render();
+    // behind a full menu the world is only half-seen: draw it every other frame and give the time back
+    { const pn = $('panel'), covered = !pn.classList.contains('hidden') && !G.talk && sc !== 'title' && sc !== 'create' && !/right|cellar|title/.test(pn.className); if (!covered || (fno++ & 1)) gfx.render(); }
     requestAnimationFrame(frame);
   }
 
