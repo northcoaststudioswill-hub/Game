@@ -2,6 +2,15 @@
 
 Kept next to the game so the code and the story stay in step. Newest first. These are Will's decisions; anything marked OPEN is still his to decide.
 
+## Nov 18: easter-egg scenes (Will's ask, Claude's lines)
+
+- Will: hidden 3D scenes of Marcus and Will ripping dabs ("see one, send one" is Marcus's name for it), Marcus and
+  Derek ripping through town to a job, and Louie.
+- Built: SEE ONE SEND ONE and THE JOB (both found at the van), SQUIRREL and ZOOMIES (scratching Louie), DO NOT PRESS
+  (the red button treasure). Every line in them is Claude's.
+- OPEN: "see one, send one" was also Marcus's line about Dews and sprouts in his missions. Here it means the dab. If
+  it should only mean one of those, say which.
+
 ## Nov 18: the pond road and the key (Will's ask, Claude's details)
 
 - Will: reaching Marcus's area should take something you find after Erin's garden missions, not just a Peb.

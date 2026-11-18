@@ -3,6 +3,46 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: five easter-egg scenes (Nov 18 2026)
+
+Will: more easter-egg scenes with Marcus and Will ripping dabs, "seeing one and sending one" (that's what Marcus
+calls it), scenes of Marcus and Derek ripping through town going to a job, and Louie scenes. In the 3D style.
+
+![The five hidden scenes](playtest/sprouts-3d-easter-eggs.png)
+
+Five hidden 3D scenes, 22 shots. Each plays the first time it is found; after that the same action gives a line, and
+the scene can be watched again from the Collection.
+
+- **SEE ONE SEND ONE** (5 shots). A at the van from dusk on. Marcus and Will in the van door, Derek leaning on it.
+  Marcus sees one; Will sends one and regrets its size; then all three on their backs in the grass. "Bro. What if the
+  Lantern is just, like... a really big dab rig." "...Bro."
+- **THE JOB** (5 shots). A at the van by day. A quiet morning at the Lantern, then the van comes through flat out
+  ("FLOW PROS, BABY! WE GOT A JOB!"), sprouts jumping clear, takes the sun door airborne, and is gone. Nobody knows
+  what the job is. Erin: "...They do know the pond is the other way." The van is away until the next morning.
+- **SQUIRREL** (4 shots). The fifth time Louie is scratched. He dreams: a pink sky, berries the size of boulders, a
+  squirrel the size of a house. It turns round.
+- **ZOOMIES** (4 shots). The tenth scratch. No warning, laps of the Lantern, eleven sprouts bowled over, asleep.
+- **DO NOT PRESS** (4 shots). When the RED BUTTON treasure comes home. Louie presses it. Nothing happens; far to the
+  north the mountain's cold light blinks once.
+
+![The van](playtest/sprouts-van.png)
+
+**In the valley:**
+- **The Flow Pros van is parked by the Dew Pond** once Marcus has been met. It can be walked up to (A), it smokes
+  from dusk, and it is gone for the day after a job.
+- **The SCENES page scrolls** (fifteen scenes now). The five hidden ones each show a one-line hint until found.
+- New models: a squirrel at any size, the red button, road dust, dream berries; people can lie down; the van can be
+  placed and tilted anywhere and can seat Marcus and Will.
+
+**Tested:** `tests/sprouts_coast.js` 100 checks (eleven new: each egg's trigger, the van appearing, leaving and
+coming back, the second visit giving a line, the button's card then its scene, finds kept in a save; the every-shot
+checks now cover fifteen scenes, 68 shots). `sprouts_valley.js`, `sprouts_story.js`, soak (two mid-game and two
+late-game seeds), Sproutwild lab 124 of 124, Patch & Plate 119 of 119, console shelf: all pass.
+**Not tested:** by hand, on a phone, or by ear.
+
+**For Will:** all the lines are Claude's; change any of them. The button scene leans on Sproutwild's opening ("Big red
+button. Do not press.") and on the mountain from the relight scene.
+
 ## Sprouts: a Bessling, Derek at the shack, and the first shard in 3D (Nov 18 2026)
 
 Will: keep developing Sprouts.

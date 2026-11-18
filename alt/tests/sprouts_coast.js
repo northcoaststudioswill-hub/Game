@@ -23,7 +23,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
 
   /* ---- the scenes themselves ---- */
   const keys = JSON.parse(await E('JSON.stringify(Object.keys(C3SCN))'));
-  ok('ten 3D scenes', keys.slice().sort().join() === 'arch,blaze,call,coast,dawn,key,marks,relight,thorn,van', keys);
+  ok('fifteen 3D scenes (ten story, five hidden)', keys.slice().sort().join() === 'arch,blaze,button,call,coast,dawn,dream,job,key,marks,relight,sesh,thorn,van,zoomies', keys);
   const long = JSON.parse(await E(`JSON.stringify(Object.entries(C3SCN).flatMap(([k,S])=>S.map((s,i)=>[k,i,wrapPx(s.cap[1],228).length])).filter(q=>q[2]>3))`));
   ok('every caption fits its three lines', long.length === 0, long);
   await E(`init();live=true;void 0`);
@@ -188,6 +188,28 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   const mid = await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);return run.call===1&&!coastGate('sunDoor').alive&&coastGate('northPier').alive&&items.filter(i=>i.alive&&i.sub==='lens').length===1&&sprouts.some(q=>q.x>70*16)})()`);
   ok('saved half way, the lens and the wild coast sprouts are still there', mid);
 
+  /* ---- easter eggs ---- */
+  await E(`init();live=true;state='play';dayT=30;ZONES.forEach(z=>run.seen[z[0]]=1);run.key=1;openGate(gates[1]);openGate(coastGate('jobsite'));void 0`); await step(4);
+  ok('no van by the pond until Marcus has been met', await E('!vanHere()'));
+  await E(`npcs[3].st='active';void 0`); await tp(13, 27, 0, -1); await E(`P.y=VAN.y+16;buds.forEach(b=>b.st='idle');void 0`); await step(3); await shot('egg-1-van'); await tap('a'); await step(3);
+  ok('A at the van by day: Marcus and Derek tear off to a job, in 3D', await E(`state==='c3'&&c3q.key==='job'&&tod.vanGone===1`), await E('state'));
+  await tap('start'); await step(3); ok('and the van is gone for the day', await E(`!vanHere()&&state==='play'`));
+  await E(`newDay();void 0`); await step(3); ok('it is back in the morning', await E('vanHere()'));
+  await tp(13, 27, 0, -1); await E(`P.y=VAN.y+16;buds.forEach(b=>b.st='idle');void 0`); await step(3); await tap('a'); await step(3);
+  ok('the second time it is a line, not the scene', await E(`state==='play'&&/JOB/.test(msg)`), await E('msg'));
+  await E(`newDay();dayT=DAYLEN*.7;duskSaid=true;void 0`); await tp(13, 27, 0, -1); await E(`P.y=VAN.y+16;buds.forEach(b=>b.st='idle');void 0`); await step(3); await tap('a'); await step(3);
+  ok('A at the van after dark: see one, send one', await E(`state==='c3'&&c3q.key==='sesh'&&c3q.S.some(e=>/[Ss]ee one, send one/.test(e.cap[1]))`), await E('state'));
+  await tap('start'); await step(3);
+  await E(`dayT=30;run.pets=4;LO.st='follow';LO.x=LO.sx=P.x+14;LO.y=LO.sy=P.y;P.dx=1;P.dy=0;P.idle=1;P.mv=false;void 0`); await step(2); await tap('a'); await step(4);
+  ok("the fifth scratch plays Louie's dream", await E(`run.pets===5&&state==='c3'&&c3q.key==='dream'`), [await E('run.pets'), await E('state')]);
+  await tap('start'); await step(3); await E(`run.pets=9;LO.st='follow';LO.t=0;LO.x=LO.sx=P.x+14;LO.y=LO.sy=P.y;P.dx=1;P.dy=0;P.idle=1;void 0`); await step(40); await E(`LO.st='follow';LO.x=LO.sx=P.x+14;LO.y=LO.sy=P.y;P.dx=1;P.dy=0;P.idle=1;void 0`); await step(2); await tap('a'); await step(4);
+  ok('the tenth plays the zoomies', await E(`run.pets===10&&state==='c3'&&c3q.key==='zoomies'`), [await E('run.pets'), await E('state')]);
+  await tap('start'); await step(3);
+  await E(`const it=mkItem('trs',HX,HY+12);it.tri=7;it.w=1;const b=mkBud(1,2,HX,HY+14);b.tgt=it;b.st='carry';it.on.push(b);void 0`); await step(30);
+  ok('the red button coming home shows its card', await E(`state==='card'&&/RED BUTTON/.test(card.title)`), await E('state'));
+  await tap('a'); await step(4); ok('and then its scene', await E(`state==='c3'&&c3q.key==='button'`), await E('state')); await tap('start'); await step(3);
+  ok('all five are kept for the Collection, and a save remembers which were found', await E(`['job','sesh','dream','zoomies','button'].every(c3SeenScene)&&(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);return Object.keys(run.egg).length===5})()`));
+
   /* ---- the first shard in 3D ---- */
   await E(`init();live=true;state='play';const it=mkItem('shard',24*16+8-50,18*16+8);it.w=1;for(let i=0;i<6;i++)mkBud(1,2,P.x,P.y);void 0`); await tp(24, 18, -1, 0); await step(3); await throwFor(20); await step(30 * 12);
   ok('the first shard home plays its 3D scene, with Ranger and the marks', await E(`shards===1&&state==='c3'&&c3q.key==='marks'&&c3q.S.some(e=>e.cap[0]==='RANGER')`), [await E('shards'), await E('state')]);
@@ -221,9 +243,9 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok('a scene that has been seen is kept in the Collection', await E(`c3SeenScene('dawn')&&!c3SeenScene('call')&&C3LIST.length===Object.keys(C3SCN).length`));
   await tap('a'); const rep1 = await E(`state==='c3'&&c3q.key==='dawn'`); await tap('start'); await step(2);
   ok('A plays it again and comes back to the Collection', rep1 && (await E('state')) === 'bugs', await E('state'));
-  await E(`csel=3;void 0`); await tap('a'); ok('an unseen scene cannot be played from there', (await E('state')) === 'bugs', await E('state'));
+  await E(`csel=C3LIST.findIndex(q=>q[0]==='call');void 0`); await E('g.setTransform(2,0,0,2,0,0);draw();void 0'); await tap('a'); ok('an unseen scene cannot be played from there', (await E('state')) === 'bugs', await E('state'));
   await tap('b'); ok('B leaves the Collection as before', (await E('state')) === 'pause', await E('state')); await E(`state='play';void 0`);
-  const long2 = JSON.parse(await E(`JSON.stringify(C3LIST.filter(q=>tw(q[1],2)>90||wrapPx(q[2]+' Press A to watch it again.',228,2).length>3).map(q=>q[0]))`));
+  const long2 = JSON.parse(await E(`JSON.stringify(C3LIST.filter(q=>tw(q[1],2)>118||wrapPx(q[2]+' Press A to watch it again.',228,2).length>3||wrapPx('One of five hidden scenes. '+q[2],228,2).length>3).map(q=>q[0]))`));
   ok('the scene names and lines fit', long2.length === 0, long2);
 
   ok('no page errors', errs.length === 0, errs.slice(0, 3));

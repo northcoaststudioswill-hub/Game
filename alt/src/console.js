@@ -633,7 +633,7 @@ function update(dt){
  if(inHome){updRes(dt);if(P.y>RY+104&&my>0){TRN={t:0,fn:exitHome};return}}
  else if(run.spark){const d=d2(P,run.spark.x,run.spark.y);if(d<120*120){sniffT-=dt;if(sniffT<=0){sniffT=7;spSay('SNIFF SNIFF...')}}}
  const push=(x,y,rad)=>{const d=Math.sqrt(d2(P,x,y));if(d<rad&&d>0){P.x=x+(P.x-x)/d*rad;P.y=y+(P.y-y)/d*rad}};
- push(HX,HY-2,9);push(KEEP.x,KEEP.y-4,12);push(NLIGHT.x,NLIGHT.y-4,13);for(const n of npcs)push(n.x,n.y,8);if(run.boss)push(THORN.x,THORN.y-5,13);
+ push(HX,HY-2,9);push(KEEP.x,KEEP.y-4,12);push(NLIGHT.x,NLIGHT.y-4,13);if(vanHere())push(VAN.x,VAN.y-5,13);for(const n of npcs)push(n.x,n.y,8);if(run.boss)push(THORN.x,THORN.y-5,13);
  if(!trail.length||d2(P,trail[0].x,trail[0].y)>16){trail.unshift({x:P.x,y:P.y});if(trail.length>70)trail.pop();}
  if(gard.open&&gard.basket>0&&d2(P,46*16,7*16+8)<15*15){toast('GARDEN BASKET  +'+gard.basket);earn(gard.basket);gard.basket=0;snd(700,.08,1100)}
  // cursor with gentle snap
@@ -697,13 +697,14 @@ function doA(fresh){
  if(fresh&&!P.mv){for(const n of npcs)if(facing(n,24)){talk(n);return}
   if(run.boss&&!inHome&&facing(THORN,28)){say(['THORNBACK: SO WARM. THANK YOU, KEEPER.',"THORNBACK: I'LL KEEP WATCH TONIGHT.",'THORNBACK: THE SMALL ONES TICKLE.'][(day+run.pets)%3],4);snd(110,.25,80,'sine',.3);return}
   if(!inHome&&facing(DOOR,24)){TRN={t:0,fn:enterHome};return}
+  if(!inHome&&vanHere()&&facing(VAN,26)){vanUse();return}
   if(!inHome&&facing(NLIGHT,34)){say(run.lit?['THE NORTH LIGHT. WARM STONE, AND A HUM LIKE THE LANTERN','...ONE TO KEEP THE LIGHT. ONE TO CALL THE KEEPERS.','SUN CALL. THE SAME HAND CARVED THE ARCH AT THE FALLS'][(day+run.pets)%3]:['THE NORTH LIGHT. ITS LAMP ROOM IS DARK AND COLD','CARVED OVER THE DOOR: ...ONE TO KEEP. ONE TO CALL...','SUN CALL. THE SAME HAND CARVED THE ARCH AT THE FALLS'][(day+run.pets)%3],6);snd(196,.2,147,'sine',.2);return}
   if(!inHome&&facing(KEEP,30)){if(!run.keep)playScene('3:arch',()=>{run.keep=1;zone='';persist(true)});else say(['...PROMISED TO SPROUTS AND BUDDIES. KEEP THE...','SUN KEEP. AN ORDER, OR A NAME?','THE STONE IS WARM, LIKE THE LANTERN'][(day+run.pets)%3],5);snd(220,.2,165,'sine',.2);return}
   if(inHome){if(facing(DESK,36)){state='house';hi=0;flashT=0;snd(440,.06,660)}return}
   {const p=PJ.find(p=>pjOpen(p)&&facing({x:p.sx,y:p.sy},22));if(p){bp=p;state='build';flashT=0;snd(440,.06,660);return}}
   {const z=ZONES.find(z=>facing(postXY(z),22));if(z){run.seen=run.seen||{};tlist=ZONES.filter(q=>run.seen[q[0]]&&q!==z);if(!tlist.length)say('NO OTHER PLACES FOUND YET. WALK THERE FIRST, THEN TRAVEL',5);else{state='travel';ti=0;snd(440,.06,660)}return}}
   if(gard.open&&facing(SIGN,24)){const n=seedsOpen();if(n<2)say('MORE SEEDS UNLOCK AS YOU HARVEST',4);else{gard.seed=(Math.min(gard.seed,n-1)+1)%n;const f=FLOWERS[gard.seed];say('NOW PLANTING '+f.pl+':  '+f.v+' PETALS EACH',4);snd(660,.06,880)}return}
-  if(petOK){LO.st='sit';LO.t=1.3;hearts(LO.x,LO.y);run.pets++;meta.life.pets++;bump('pet');if((tod.petxp=(tod.petxp||0)+1)<=4)louXP(2);spSay(LOU_PET[(run.pets+day)%LOU_PET.length]);save();snd(880,.08,1320,'triangle',.07);if(run.pets===5)say('LOUIE DREAMS OF SQUIRRELS',3);return}}
+  if(petOK){LO.st='sit';LO.t=1.3;hearts(LO.x,LO.y);run.pets++;meta.life.pets++;bump('pet');if((tod.petxp=(tod.petxp||0)+1)<=4)louXP(2);spSay(LOU_PET[(run.pets+day)%LOU_PET.length]);save();snd(880,.08,1320,'triangle',.07);if(run.pets===5){say('LOUIE DREAMS OF SQUIRRELS',3);egg('dream')}else if(run.pets===10)egg('zoomies');return}}
  let c=squad.filter(b=>b.type===sel);
  if(!c.length){if(!squad.length){if(fresh)snd(140,.08);return}cycleSel();c=squad.filter(b=>b.type===sel);if(!c.length)return;}
  let b=c[0],d=1e9;for(const q of c){const e=d2(q,P.x,P.y);if(e<d){d=e;b=q}}
@@ -836,7 +837,7 @@ function deliver(it){
  if(it.sub==='key'){run.key=1;card={t:0,title:'FLOW PROS KEY',sub:"Stamped FLOW PROS. It fits the job site on the pond road, out west past the crystal.",art:()=>{g.save();g.translate(120,76);g.scale(3,3);keyArt(0,0);g.restore()}};state='card';earn(10);snd(784,.1);later(()=>snd(1175,.2),100);persist(true);return}
  if(it.sub==='lens'){run.lens=1;earn(60);meta.tix+=2;snd(523,.12);later(()=>snd(784,.12),120);later(()=>snd(1046,.3),240);sceneQ.push(['3:relight',()=>{run.lit=1;toast('THE NORTH LIGHT BURNS!  +60');persist(true)}]);persist(true);return}
  if(it.sub==='trs'){const i=it.tri|0;if(!meta.trs.includes(i))meta.trs.push(i);card={t:0,title:TRS[i][0],sub:TRL[i],art:()=>{g.save();g.translate(120,72);g.scale(4,4);trArt(i,0,0);g.restore()}};
-  state='card';earn(20);spSay('GOOD FIND!',3);snd(784,.1);later(()=>snd(1175,.12),100);later(()=>snd(1568,.25),200);checkAch();persist(true);return}
+  if(i===7)egg('button');state='card';earn(20);spSay('GOOD FIND!',3);snd(784,.1);later(()=>snd(1175,.12),100);later(()=>snd(1568,.25),200);checkAch();persist(true);return}
  if(it.sub!=='husk'){run.delivered++;meta.life.berries++;tod.berries++;bump('berry');earn(lucky?3:1)}
  if(it.sub==='pear'){earn(10);toast('GOLDEN PEAR!  +10')}
  let made=0;for(let i=0;i<it.seeds+(lucky?1:0);i++){if(crewCount()>=capNow())break;const [x,y]=soilSpot();seeds.push({type,tx:x,ty:y,t:-made*.16});made++;}
@@ -994,6 +995,18 @@ function drawJobsite(ga){const X=ga.tiles[0][0]*16-ox,Y=ga.tiles[0][1]*16-oy,cx=
  r(k,cx-15,Y+11,30,23);r('#2a6ad0',cx-14,Y+12,28,21);r('#5a9af0',cx-14,Y+12,28,1);text('FLOW',cx-12,Y+11,1,'#ffffff',null);text('PROS',cx-12,Y+20,1,'#ffffff',null);
  r('#3a2c10',cx-4,Y+35,8,7);r('#f8d858',cx-3,Y+36,6,5);r('#3a2c10',cx-1,Y+37,2,3);r('#686078',cx-2,Y+33,4,2);
  if(run.key&&((time*3)|0)%3)text('!',cx-2,Y-16,3,'#78c8f8')}
+/* EASTER EGGS. The Flow Pros van is parked by the pond once Marcus has been met. A at it by day: they tear off to a
+   job (and the van is gone until morning). A at it from dusk: see one, send one. Scenes play the first time; after
+   that it is a line. Louie has three more: five scratches, ten scratches, and the red button coming home. */
+const VAN={x:13*16+8,y:25*16+12},vanHere=()=>npcBy('MARCUS').st!=='new'&&!(tod&&tod.vanGone);
+function egg(k){const E=run.egg=run.egg||{};if(E[k])return false;E[k]=1;sceneQ.push(['3:'+k,null]);return true}
+function vanUse(){if(dayT/DAYLEN>.6){if(!egg('sesh'))say(['MARCUS: SEE ONE, SEND ONE, BRO.','DEREK: ...BRO.','THE VAN IS FOGGED UP FROM THE INSIDE. AGAIN.'][(day+run.pets)%3],5);snd(330,.06,220,'triangle',.05)}
+ else{tod.vanGone=1;if(!egg('job'))say('FLOW PROS, BABY! THE VAN TEARS OFF TO A JOB. BACK BY MORNING',6);noise(.8,.2,300,'lowpass');snd(150,.4,110,'sawtooth',.06);for(let k=0;k<6;k++)puff(VAN.x-10+k*5,VAN.y,'#c8b898',2,26)}}
+function drawVan2D(){const x=Math.round(VAN.x-ox),y=Math.round(VAN.y-oy),k='#282038';if(x<-40||x>VW+40||y<-20||y>VH+40)return;r('rgba(0,0,0,.28)',x-17,y+1,34,3);
+ r(k,x-18,y-17,30,17);r('#e8ecf4',x-17,y-16,28,15);r('#c8ccd8',x-17,y-4,28,3);r(k,x+12,y-11,7,11);r('#e8ecf4',x+12,y-10,6,9);r('#78b0e0',x+13,y-9,4,4);r('#2a6ad0',x-17,y-9,35,2);
+ r(k,x-9,y-15,11,12);r('#241c30',x-8,y-14,9,10);r('#f8e060',x+17,y-4,1,2);for(const wx of[-12,9]){r(k,x+wx-3,y-3,7,6);r('#686078',x+wx-1,y-1,3,2)}r('#c89050',x-15,y-19,24,2);
+ if(dayT/DAYLEN>.6){for(let i=0;i<3;i++){const q=(time*.5+i*.33)%1;r('rgba(240,240,248,'+(.6*(1-q)).toFixed(2)+')',x-5+Math.round(Math.sin(time*2+i)*2),y-18-Math.round(q*12),3+i,3)}}
+ if(state==='play'&&facing(VAN,26)&&((time*3)|0)%3)text('!',x-2,y-33,3,'#78c8f8')}
 const coastDue=()=>won&&!run.call&&day>=2&&!inHome&&!sceneQ.length;
 const DEREKL=['YO. COLD ONE?','TELL MARCUS NOTHING.','THE VAN IS FINE. PROBABLY.','NINE BURGERS. ONE CUSTOMER.','I DRIVE. THAT IS MY PART.'];let derekT=0;
 function coastTick(){if(state!=='play'||inHome||sceneQ.length)return;
@@ -1324,7 +1337,7 @@ function drawWorld(){
  for(const ga of gates)if(ga.alive&&ga.sub<2){const T=TYPES[ga.sub],x=Math.round(ga.x-ox)-3,y=Math.round(ga.y-oy)-24+Math.round(Math.sin(time*3)*1.5);r('#181020',x-2,y-2,11,11);r('#f8f0d8',x-1,y-1,9,9);r(T.d,x,y,7,7);r(T.c,x+1,y+1,5,5);r('#181020',x+2,y+3,1,2);r('#181020',x+4,y+3,1,2);r('#181020',x+2,y+9,3,1);r('#181020',x+3,y+10,1,1)}
  LO.pet=petOK&&state==='play';
  const L=[],vh=Math.ceil(H/Z),see=(q,m=28)=>q.x>ox-m&&q.x<ox+VW+m&&q.y>oy-m&&q.y<oy+vh+m+16; /* only what is on screen (and a little round it) is drawn */
- for(const s of sprouts)if(see(s,12))L.push([s.y,drawSprout,s]);for(const q of seeds)L.push([q.ty,drawSeed,q]);for(const q of wbuds)if(!q.hid&&see(q))L.push([q.y,drawWbud,q]);if(see(KEEP,40))L.push([KEEP.y,drawKeep]);L.push([NLIGHT.y,drawNLight]);if(run.seen&&run.seen['NORTH COAST'])L.push([BESS.y,drawBessie]);for(const it of items)if(it.alive&&see(it,34))L.push([it.y+1,drawItem,it]);
+ for(const s of sprouts)if(see(s,12))L.push([s.y,drawSprout,s]);for(const q of seeds)L.push([q.ty,drawSeed,q]);for(const q of wbuds)if(!q.hid&&see(q))L.push([q.y,drawWbud,q]);if(see(KEEP,40))L.push([KEEP.y,drawKeep]);L.push([NLIGHT.y,drawNLight]);if(vanHere())L.push([VAN.y,drawVan2D]);if(run.seen&&run.seen['NORTH COAST'])L.push([BESS.y,drawBessie]);for(const it of items)if(it.alive&&see(it,34))L.push([it.y+1,drawItem,it]);
  for(const e of foes)if(e.alive&&see(e,40))L.push([e.y,drawFoe,e]);for(const b of buds)if(see(b,22))L.push([b.y+(b.st==='fight'?4:0),drawBud,b]);
  for(const q of bugs)if(q.alive&&see(q,20))L.push([q.y,drawBug,q]);for(const n of npcs)if(see(n,90))L.push([n.y,drawNPC,n]);
  if(gard.open){noGard=!buds.some(b=>b.gard);if(ox+VW>620&&ox<850&&oy<190){for(const p of plots)L.push([p.y-2,drawBed,p]);L.push([7*16+12,drawBasket]);L.push([SIGN.y,drawSign])}}
@@ -1678,8 +1691,11 @@ function draw(){
   ctext(flashT>0?flash:meta.eq[key]===o?'WEARING THIS NOW':own?'A: WEAR IT':(op[3]===3?'BUILT: FINISH A VALLEY PROJECT':RAR[op[3]][0]+': FOUND IN CAPSULES'),116,2,flashT>0?'#f8a060':own?'#a8f080':RAR[op[3]][1]);
   ctext(ownCount()+' / '+styTotal+' COLLECTED',130,2,'#c8c0d8');ctext('D-PAD: BROWSE AND TRY ON      B: BACK',144,2,'#a098b0');}
  else if(state==='bugs'&&cpage===2){mHead('COLLECTION');rtext('< SCENES '+C3LIST.filter(q=>c3SeenScene(q[0])).length+'/'+C3LIST.length+' >',236,5,1,'#a8f080');
-  C3LIST.forEach((q,i)=>{const x=4+(i%2)*118,y=22+((i/2)|0)*18,has=c3SeenScene(q[0]),on=i===csel;mTile(x,y,114,17,on);r(has?'#2c3050':'#16202a',x+2,y+2,15,13);if(has){r('#f8e060',x+7,y+4,2,8);r('#f8e060',x+9,y+5,2,6);r('#f8e060',x+11,y+7,2,2)}else text('?',x+6,y+2,2,'#607080',null);text(has?q[1]:'? ? ?',x+21,y+2,2,on?'#281c30':has?'#ffffff':'#607080',null)});
-  {const q=C3LIST[csel],k=c3SeenScene(q[0]);mFoot(114);text(k?q[1]:'NOT SEEN YET',6,116,2,'#f8e060',null);wrapPx(k?q[2]+' Press A to watch it again.':'The big moments of the story play as scenes. Each one is kept here once you have seen it.',228,2).slice(0,3).forEach((l,j)=>text(l,6,129+j*12,2,'#e8e4f5',null))}}
+  const rows=Math.ceil(C3LIST.length/2),top=Math.max(0,Math.min(rows-5,((csel/2)|0)-2));
+  C3LIST.forEach((q,i)=>{const rw=((i/2)|0)-top;if(rw<0||rw>4)return;const x=4+(i%2)*118,y=22+rw*18,has=c3SeenScene(q[0]),on=i===csel;mTile(x,y,114,17,on);r(has?'#2c3050':'#16202a',x+2,y+2,15,13);if(has){r('#f8e060',x+7,y+4,2,8);r('#f8e060',x+9,y+5,2,6);r('#f8e060',x+11,y+7,2,2)}else text('?',x+6,y+2,2,'#607080',null);
+   const nm=has?q[1]:'? ? ?',w=tw(nm,2);if(w>90){g.save();g.translate(x+21,0);g.scale(90/w,1);text(nm,0,y+2,2,on?'#281c30':'#ffffff',null);g.restore()}else text(nm,x+21,y+2,2,on?'#281c30':has?'#ffffff':'#607080',null)});
+  if(top>0){r('#f8e060',117,20,6,1);r('#f8e060',119,19,2,1)}if(top+5<rows){r('#f8e060',117,112,6,1);r('#f8e060',119,113,2,1)}
+  {const q=C3LIST[csel],k=c3SeenScene(q[0]);mFoot(114);text(k?q[1]:'NOT SEEN YET',6,116,2,'#f8e060',null);wrapPx(k?q[2]+' Press A to watch it again.':csel>=C3LIST.length-5?'One of five hidden scenes. '+q[2]:'The big moments of the story play as scenes. Each one is kept here once you have seen it.',228,2).slice(0,3).forEach((l,j)=>text(l,6,129+j*12,2,'#e8e4f5',null))}}
  else if(state==='bugs'){mHead('COLLECTION');rtext(cpage?'< TREASURES '+meta.trs.length+'/'+TRS.length+' >':'< BUGS '+kinds()+'/'+BUGS.length+' >',236,5,1,'#a8f080');
   if(!cpage)BUGS.forEach((b,i)=>{const x=4+(i%2)*118,y=22+((i/2)|0)*18,n=meta.bugs[i],on=i===csel;mTile(x,y,114,17,on);r(n?'#58b858':'#16202a',x+2,y+2,15,13);
    if(n){g.save();g.translate(x+9,y+12);g.scale(2,2);bugArt(i,0,0,((time*6)|0)%2);g.restore();text(b.n,x+21,y+2,2,on?'#281c30':'#ffffff',null);rtext('x'+n,x+111,y+4,1,on?'#5a4a28':'#a8f080',null)}
