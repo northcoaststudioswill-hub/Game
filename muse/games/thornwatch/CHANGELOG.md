@@ -1,5 +1,40 @@
 # CLANKAWATCH (was Thornwatch) — Changelog
 
+## v4.0 alpha 3 — Nov 18, 2026 — Save files and new menus
+
+Will: "I can't start a new game and manage saves, also the whole
+menu system needs a rework ... use lore from all the other games."
+Checked with `tests/menus.js` (18 checks, real key presses) and a
+three-night real-press run through the new menus. Headless only.
+
+- **Three save files.** START on the title opens CHOOSE A FILE.
+  A plays a file; an empty one is a new game. SELECT erases a
+  file, and asks first with KEEP IT as the default answer. Each
+  card shows where the file is up to, its stars and gardens
+  held. Your existing save is FILE 1, unchanged.
+- **A new main menu.** Six entries, no scrolling, each with its
+  status on the right and one line saying what it is: CONTINUE
+  (or NEW WATCH), GARDENS, THE LANTERN, THE LONG NIGHT, ALMANAC,
+  OPTIONS. B goes back to the files.
+- **GARDENS** (was NIGHTS) shows one garden at a time with its
+  picture, then mode, then night. It no longer draws over itself.
+- **THE LANTERN** (upgrades) and **OPTIONS** (settings) use the
+  same frame. OPTIONS also has CHANGE FILE and SWAP CARTRIDGE.
+- **ALMANAC** replaces HOW TO PLAY and FIELD GUIDE: how to play,
+  controls, the drone guide, and ten LORE pages. A on the first
+  page replays the intro.
+- **Lore from the other Pocket Lantern games.** Ten pages that
+  open as you hold more nights: the Great Lantern and the four
+  sun shards (Sprouts), the big red button and the Iron Dome
+  (Sproutwild), Old Thornback asleep in his hollow (Sprouts; this
+  game was once named for him), Erin's farm stand (Patch &
+  Plate), the Hearth under the roots (Rootdeep), Bessie in
+  Wending Lake, the luck bug and Derek, and Bottie in the ring
+  (Knockout). Sources are listed in LORE.md.
+- Quitting from pause, winning and losing all return to the main
+  menu, not the title.
+- Two upgrade labels were reworded to fit their boxes.
+
 ## v4.0 alpha 2 — Nov 18, 2026 — Played it, then fixed what playing found
 
 Will: "You need to play this game ... then we need to rework and

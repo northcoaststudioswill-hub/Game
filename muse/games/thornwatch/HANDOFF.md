@@ -57,6 +57,8 @@ Sections 1 to 9 below are the v3.7 handoff and still hold, except where this sec
 | `src/tw-story.js` | The scene player and every story line |
 | `src/tw-controls.js` | Buttons, the PLANT panel, the bottom bar, the rising sprout price and the pace |
 | `src/tw-motes.js` | Loose petals to collect during a night |
+| `src/tw-menus.js` | Save files, the main menu, GARDENS, THE LANTERN, OPTIONS, and the almanac's lore pages |
+| `tests/menus.js` | 18 checks with real key presses: files, new game, erase, every menu opens, text fits |
 | `tests/sim.js` | Balance sim: spam, grower and noob players at full speed |
 | `tests/story.js` | 23 checks: lines fit, Louie stays short, each scene plays once, an old save loads clean |
 | `tests/shots.js`, `tests/sheet.py` | Phone-size screenshots into `shots/latest/` and a contact sheet |
@@ -65,6 +67,7 @@ Sections 1 to 9 below are the v3.7 handoff and still hold, except where this sec
 - **Not checked:** Will's phone. Bottie's old suites (they live in his workdir, not the repo). The Rootdeep and Sproutwild regression tails; their code is byte-for-byte the v3.7 shell, but nobody has run them.
 - **Balance (alpha 2):** two changes from v3.7, both in `src/tw-controls.js`. `TWCROWD=0.1`: each sprout already planted makes the next 10% dearer. `TWPACE=1.4`: 1X runs 40% quicker (a time scale only). Loose petals (`src/tw-motes.js`) pay part of the dawn bonus early. Evidence: `PLAYTEST-v4.0.md`, `node tests/sim.js`.
 - **Controls (alpha 2):** rebuilt after a real playthrough. A = plant panel / grow / train / keeper move. B = back, or speed at night; it never sells. SELECT = uproot inside a panel, powers at night. START = begin night / pause. The card strip and `TWR.focus==='strip'` are gone. This replaces section 4's "Controls" paragraph.
+- **Saves (alpha 3):** three files. Keys `thornwatch-v1` (file 1, the old single save), `thornwatch-v1-b`, `thornwatch-v1-c`; `thornwatch-slot` remembers the last one. Flow: title, files, main menu.
 - **How to playtest:** `tests/sim.js` for balance. For feel, drive real key presses (see the method in `PLAYTEST-v4.0.md`); every real-press session so far found something the checks missed.
 
 ### 3b. The enemy is Bottie's drone swarm (Will, Nov 18)

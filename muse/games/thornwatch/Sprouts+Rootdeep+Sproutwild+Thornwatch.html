@@ -4465,6 +4465,7 @@ const TWCREEPPAL4={};
    and an honest panel title; the Crossroads glows at the gate
    that feeds next; cinematic no longer says "ten nights".
    ================================================================ */
+const TWKEYS=['thornwatch-v1','thornwatch-v1-b','thornwatch-v1-c'];let TWSLOT=0; /* v4: three save files; file 1 is the old single save */
 let TW=null;
 const TWDEF=()=>({best:0,wins:0,plays:0,guideDone:false,introSeen:false,stars:{},drops:0,perks:[],endlessBest:0,seen:{}}); /* v4: seen = story scenes already shown (old saves get an empty one: nothing is granted) */
 try{const s=localStorage.getItem('thornwatch-v1');
@@ -4479,16 +4480,16 @@ try{const s=localStorage.getItem('thornwatch-v1');
    try{localStorage.setItem('thornwatch-v1',JSON.stringify(TW))}catch(e){}}}
  else TW=TWDEF();}
 catch(e){TW=TWDEF()}
-function twSave(){try{localStorage.setItem('thornwatch-v1',JSON.stringify(TW))}catch(e){}}
+function twSave(){try{localStorage.setItem(TWKEYS[TWSLOT],JSON.stringify(TW))}catch(e){}}
 /* ---- v3.5 meta: Sun Drops, Lantern Upgrades, hero training ---- */
 const TWPERKS=[
  {id:'purse',n:'DEEP PURSE',fx:'+20 START PETALS',cost:3},
  {id:'heart',n:'SECOND HEART',fx:'+2 MAX HEART',cost:4},
- {id:'discount',n:"KEEPER'S DISCOUNT",fx:'HEROES -10% PETALS',cost:5},
+ {id:'discount',n:"KEEPER'S DISCOUNT",fx:'KEEPERS COST -10%',cost:5},
  {id:'soil',n:'RICH SOIL',fx:'POP DRIP +50%',cost:4},
  {id:'boof',n:'DOUBLE BOOF',fx:'LOUIE STUNS TWICE',cost:5},
  {id:'eye',n:"GARDENER'S EYE",fx:'+5% ALL RANGES',cost:6},
- {id:'fork',n:'FORKED PATHS',fx:'FORKS -15% PETALS',cost:4},
+ {id:'fork',n:'FORKED PATHS',fx:'GROWING IS -15%',cost:4},
  {id:'warm',n:'WARM LANTERN',fx:'ABILITY TIME -15%',cost:6}];
 function twHasPerk(id){return TW.perks&&TW.perks.indexOf(id)>=0}
 function twHeroCost(i){return Math.round(TWHERO[i].cost*(twHasPerk('discount')?.9:1))}
@@ -5396,55 +5397,9 @@ function twSyncSet(){if(typeof meta!=='undefined'){if(meta.mus!=null)TWSET.mus=m
  if(TW&&TW.set&&TW.set.shake!=null)TWSET.shake=TW.set.shake}
 function twApplySet(){if(typeof meta!=='undefined'){meta.mus=TWSET.mus;meta.sfx=TWSET.sfx}
  TW.set={mus:TWSET.mus,sfx:TWSET.sfx,shake:TWSET.shake};twSave()}
-function twOpenSet(from){TWSETUI={sel:0,from};state='g5set';snd(590,.04)}
-function twSetInput(){const u=TWSETUI;if(!u){state='g5title';return}
- if(pressed('up')){u.sel=(u.sel+2)%3;snd(520,.03)}
- if(pressed('down')){u.sel=(u.sel+1)%3;snd(520,.03)}
- let ch=false;
- if(pressed('left')){if(u.sel===0){TWSET.mus=Math.max(0,TWSET.mus-1);ch=true}else if(u.sel===1){TWSET.sfx=Math.max(0,TWSET.sfx-1);ch=true}else{TWSET.shake=!TWSET.shake;ch=true}}
- if(pressed('right')){if(u.sel===0){TWSET.mus=Math.min(10,TWSET.mus+1);ch=true}else if(u.sel===1){TWSET.sfx=Math.min(10,TWSET.sfx+1);ch=true}else{TWSET.shake=!TWSET.shake;ch=true}}
- if(pressed('a')){if(u.sel===2){TWSET.shake=!TWSET.shake;ch=true}else if(u.sel===0){TWSET.mus=(TWSET.mus+1)%11;ch=true}else{TWSET.sfx=(TWSET.sfx+1)%11;ch=true}}
- if(ch){twApplySet();snd(660,.03)}
- if(pressed('b')||pressed('start')){const f=u.from;TWSETUI=null;snd(330,.05);state=f==='pause'?'g5play':'g5menu'}}
-function twDrawSet(){r('#14101e',0,0,W,H);r('#241b40',0,0,W,24);r('#f8d030',0,24,W,1);
- text('SETTINGS',6,5,2,'#fff8e0'); text('SHARED WITH THE CONSOLE',6,30,1,'#b8b0d8');
- const rows=[['MUSIC VOL',TWSET.mus,0],['SFX VOL',TWSET.sfx,0],['SCREEN SHAKE',TWSET.shake?1:0,1]];
- rows.forEach((rw,i)=>{const y=52+i*26,sel=TWSETUI&&TWSETUI.sel===i;
-  if(sel)r('#2c2450',8,y-3,W-16,20);
-  if(sel)text('\u25b6',12,y,2,'#f8d030');
-  text(rw[0],26,y,2,sel?'#fff8e0':'#c8c0d8');
-  if(rw[2]===0){for(let pp=0;pp<10;pp++)r(pp<rw[1]?'#f8d030':'#3a3454',158+pp*7,y+3,5,8)}
-  else text(rw[1]?'ON':'OFF',158,y,2,rw[1]?'#a8e078':'#ff6a5e')});
- text('\u25c0 \u25b6 ADJUST \u00b7 B: BACK',6,H-13,1,'#b8b0d8')}
+/* v4: files, the main menu, options and the almanac's lore live in tw-menus.js */
 let TWMenuSel=0;
 let TWSTART=null,TWNOTE='';
-const TWMAIN=['PLAY','NIGHTS','LANTERN UPGRADES','THE LONG NIGHT','INTRO','HOW TO PLAY','FIELD GUIDE','SETTINGS','SWAP CARTRIDGE'];
-function twMenuAct(){const it=TWMAIN[TWMenuSel];
- if(it==='PLAY'){snd(660,.06);const f=twFrontier();TWSTART={map:f.map,mode:'s',night:f.night};
-  if(!TW.introSeen)twIntroStart('play');else twNewRun(f.map,'s',f.night)}
- else if(it==='NIGHTS'){TWMAPUI={map:1,mode:'s',night:1,focus:'night'};twMapUiSync();state='g5map';snd(590,.04)}
- else if(it==='LANTERN UPGRADES'){TWUPGUI={sel:0,msg:'',msgT:0};state='g5upg';snd(590,.04)}
- else if(it==='THE LONG NIGHT'){if(twMapCleared(3)){snd(660,.06);twNewRun(1,'e',1)}
-  else{TWNOTE='CLEAR THE CROSSROADS FIRST!';snd(160,.08)}}
- else if(it==='INTRO')twIntroStart('menu');
- else if(it==='HOW TO PLAY'){TWHOW={page:0,from:'menu'};snd(590,.04)}
- else if(it==='FIELD GUIDE'){TWHOW={page:2,from:'menu'};snd(590,.04)}
- else if(it==='SETTINGS')twOpenSet('menu');
- else if(it==='SWAP CARTRIDGE'){snd(330,.06);eject()}}
-function twDrawMainMenu(){const mw=184,mx=Math.round((W-mw)/2),my=74,mh=Math.min(TWMAIN.length,6)*16+26;
- r('rgba(8,6,16,.80)',mx,my,mw,mh);r('#1c1633',mx+2,my+2,mw-4,mh-4);
- r('#f8d030',mx,my,mw,1);r('#f8d030',mx,my+mh-1,mw,1);r('#f8d030',mx,my,1,mh);r('#f8d030',mx+mw-1,my,1,mh);
- const vis=6,vst=Math.max(0,Math.min(TWMAIN.length-vis,TWMenuSel-2));
- if(vst>0)text('▲',mx+mw-14,my+5,1,'#b8b0d8');
- if(vst+vis<TWMAIN.length)text('▼',mx+mw-14,my+mh-24,1,'#b8b0d8');
- for(let i=vst;i<Math.min(TWMAIN.length,vst+vis);i++){const y=my+7+(i-vst)*16,sel=TWMenuSel===i;
-  if(sel)r('#2c2450',mx+5,y-2,mw-10,14);
-  if(sel)text('\u25b6',mx+9,y,2,'#f8d030');
-  text(TWMAIN[i],mx+24,y,2,sel?'#fff8e0':'#c8c0d8');
-  if(i===0){const f=twFrontier(),ft=twClearedCount()>=26?'ALL CLEAR':'MAP '+f.map+' · NIGHT '+f.night;
-   text(ft,mx+mw-10-tw(ft,1),y+4,1,'#f8d030')}
-  if(TWMAIN[i]==='THE LONG NIGHT'&&!twMapCleared(3))text('LOCKED',mx+mw-10-tw('LOCKED',1),y+4,1,'#a49cc0')}
- text(TWNOTE||'A: PICK \u00b7 B: TITLE',mx+8,my+mh-12,1,TWNOTE?'#ff6a5e':'#b8b0d8')}
 /* v4: the story player (twIntroStart, twIntroUpdate, twDrawIntro, twStoryGate) lives in tw-story.js */
 /* ---- pause menu + restart (snapshot taken in twStartRound) ---- */
 function twOpenMenu(){const items=['resume','how','settings','restart','quit'];
@@ -5467,14 +5422,15 @@ function twMenuInput(){const m=TWR.menu;
   else if(it==='how'){TWHOW={page:0,from:'pause'};snd(590,.04)}
   else if(it==='settings'){twOpenSet('pause');snd(590,.04)}
   else if(it==='restart')twRestartNight();
-  else if(it==='quit'){TWR.menu=null;TWR.paused=false;state='g5title';snd(330,.06)}
+  else if(it==='quit'){TWR.menu=null;TWR.paused=false;state='g5menu';snd(330,.06)}
   else if(it==='skip'){TW.guideDone=true;twSave();TWR.guide=0;TWR.menu=null;TWR.paused=false;
    TWR.say='Guide off. Hold the garden!';TWR.sayT=2;snd(440,.05)}}}
 function twHowInput(){
  if(pressed('left')&&TWHOW.page>0){TWHOW.page--;snd(520,.03)}
- if(pressed('right')&&TWHOW.page<3){TWHOW.page++;snd(520,.03)}
+ if(pressed('right')&&TWHOW.page<3+TWLORE.length){TWHOW.page++;snd(520,.03)}
+ if(pressed('a')&&TWHOW.page===0&&TWHOW.from==='menu'){TWHOW=null;twIntroStart('menu');return}
  if(pressed('b')){TWHOW=null;snd(330,.05)}}
-const TWMENULBL={resume:'RESUME',how:'HOW TO PLAY',settings:'SETTINGS',restart:'RESTART NIGHT',quit:'QUIT TO TITLE',skip:'SKIP GUIDE'};
+const TWMENULBL={resume:'RESUME',how:'ALMANAC',settings:'OPTIONS',restart:'RESTART NIGHT',quit:'QUIT TO MENU',skip:'SKIP GUIDE'};
 function twDrawMenu(){const m=TWR.menu,mw=150,mh=m.items.length*13+40,
  mx=Math.round((W-mw)/2),my=Math.max(34,Math.round((H-mh)/2)-4);
  r('rgba(8,6,16,.72)',0,0,W,H);
@@ -5521,31 +5477,6 @@ function twMapInput(){const u=TWMAPUI;if(!u){state='g5menu';return}
   if(u.night>twFrontierIn(u.map,u.mode)){snd(160,.08);TWNOTE='CLEAR THE NIGHTS BEFORE IT!';return}
   const s={map:u.map,mode:u.mode,night:u.night};TWMAPUI=null;snd(660,.06);
   if(!TW.introSeen){TWSTART=s;twIntroStart('sel')}else twNewRun(s.map,s.mode,s.night)}}
-function twDrawMap(){const u=TWMAPUI||{map:1,mode:'s',night:1,focus:'night'};
- r('#0d0a18',0,0,W,H);g.drawImage(twBoardCv(false,u.map),0,twBoardTop());r('rgba(10,8,22,.62)',0,0,W,H);
- ctext('CHOOSE A GARDEN',36,2,'#f8d030');
- for(let m=1;m<=3;m++){const cx=6+(m-1)*79,cw=76,ok=twMapOk(m),sel=u.map===m;
-  r(sel?'#2c2450':'#171226',cx,46,cw,32);if(sel||u.focus==='map')r(sel?'#f8d030':'#4a4270',cx,46,cw,1);
-  text(["ERIN'S GARDEN",'LONG BEDS','CROSSROADS'][m-1],cx+4,49,1,ok?'#fff8e0':'#a49cc0');
-  if(ok){let st=0;for(let n=1;n<=TWMAPS[m-1].nights;n++)st+=TW.stars[m+'s'+n]||0;
-   g.drawImage(TWSTAR,cx+4,60,9,9);text(st+'/'+(TWMAPS[m-1].nights*3),cx+16,61,1,'#f8d030');
-   text(['FIRST WATCH','LONGER DARK','TWO GATES'][m-1],cx+4,70,1,'#a49cc0')}
-  else text('LOCKED',cx+4,62,1,'#a49cc0')}
- const md=TWMODES.find(m2=>m2[0]===u.mode),mdx=W/2-tw('MODE: '+md[1],2)/2;
- if(u.focus==='mode')r('#f8d030',mdx-8,84,tw('MODE: '+md[1],2)+16,1);
- text('MODE: '+md[1],mdx,88,2,'#fff8e0');
- ctext(u.mode==='h'?'+HP DRONES · 40 PETALS · 2X DROPS':u.mode==='a'?'THE NIGHTS, REMIXED':'THE GARDEN AS PLANTED',108,1,'#c8c0d8');
- const N=TWMAPS[u.map-1].nights,fr=twFrontierIn(u.map,u.mode),pw=21,gap=2,tot=N*pw+(N-1)*gap,sx=Math.round((W-tot)/2);
- text('NIGHT',sx,122,1,'#b8b0d8');
- for(let n=1;n<=N;n++){const px=sx+(n-1)*(pw+gap),un=n<=fr,st=TW.stars[u.map+u.mode+n]||0;
-  r(n===u.night?'#2c2450':'#171226',px,132,pw,26);
-  if(n===u.night||u.focus==='night')r(n===u.night?'#f8d030':'#4a4270',px,132,pw,1);
-  text(String(n),px+(n<10?8:5),135,1,un?'#fff8e0':'#8f86c8');
-  if(un)for(let s2=0;s2<3;s2++){if(s2<st)g.drawImage(TWSTAR,px+2+s2*6,148,5,5);else r('#4a4270',px+2+s2*6,148,5,5)}
-  else text('X',px+8,147,1,'#8f86c8')}
- if(TWNOTE)ctext(TWNOTE,H-28,1,'#ff6a5e');
- {const sr='STARS '+twStarPoints()+' · DROPS '+TW.drops;text(sr,W-tw(sr,1)-6,H-16,1,'#f8d030')}
- text('A: PLAY · B: BACK',6,H-16,1,'#b8b0d8')}
 function twUpgInput(){const u=TWUPGUI;if(!u){state='g5menu';return}
  if(pressed('b')){TWUPGUI=null;state='g5menu';snd(330,.05);return}
  if(pressed('down')&&u.sel<6){u.sel+=2;snd(520,.03)}
@@ -5556,19 +5487,6 @@ function twUpgInput(){const u=TWUPGUI;if(!u){state='g5menu';return}
   else if(TW.drops>=pk.cost){TW.drops-=pk.cost;TW.perks.push(pk.id);twSave();
    u.msg=pk.n+' IS YOURS!';snd(784,.12,1175)}
   else{u.msg='NEED '+(pk.cost-TW.drops)+' MORE SUN DROPS.';snd(160,.08)}}}
-function twDrawUpg(){const u=TWUPGUI||{sel:0,msg:''};
- r('#14101e',0,0,W,H);r('#241b40',0,0,W,22);
- text('LANTERN UPGRADES',6,4,2,'#fff8e0');
- g.drawImage(TWSTAR,W-52,4,11,11);text(String(TW.drops),W-38,5,2,'#f8d030');
- text('STARS PAY SUN DROPS. SPEND THEM!',6,26,1,'#b8b0d8');
- for(let i=0;i<8;i++){const pk=TWPERKS[i],cx=6+(i%2)*118,cy=40+((i/2)|0)*33,own=TW.perks.indexOf(pk.id)>=0,sel=u.sel===i;
-  r(sel?'#2c2450':'#1d1830',cx,cy,112,30);
-  if(sel)r('#f8d030',cx,cy,112,1);
-  text(pk.n,cx+5,cy+3,1,own?'#a8e078':'#fff8e0');
-  text(pk.fx,cx+5,cy+12,1,'#c8c0d8');
-  text(own?'OWNED':pk.cost+' DROPS',cx+5,cy+21,1,own?'#a8e078':'#f8d030')}
- if(u.msg)ctext(u.msg,H-26,1,'#ffd94d');
- text('A: BUY · B: BACK',6,H-13,1,'#b8b0d8')}
 function twDrawPow(){const u=TWR.pow,mw=184,mx=Math.round((W-mw)/2),mh=116,my=Math.round((H-mh)/2);
  r('rgba(8,6,16,.6)',0,0,W,H);r('#17122a',mx,my,mw,mh);r('#f8d030',mx,my,mw,1);
  text('POWERS · PAY TO FIRE',mx+8,my+5,1,'#f8d030');
@@ -5589,17 +5507,19 @@ function twDrawTrain(iy0){const t=TWR.train,hd=TWHERO[t.hero],cost=(t.hl||1)===1
  text('A: TRAIN · B: NO',140,iy0+29,1,'#b8b0d8')}
 function twDrawHow(){const p=TWHOW.page;
  r('#14101e',0,0,W,H);r('#241b40',0,0,W,24);r('#f8d030',0,24,W,1);
- text('HOW TO PLAY',6,5,2,'#fff8e0'); text((p+1)+' / 4',W-40,5,2,'#b8b0d8');
+ text('ALMANAC',6,5,2,'#fff8e0');{const pg=(p+1)+' / '+(4+TWLORE.length);text(pg,W-6-tw(pg,2),5,2,'#b8b0d8')}
  if(p===0){ctext('DEFEND THE GARDEN HEART',42,2,'#f8d030');ctext('IN THREE GARDENS.',60,2,'#f8d030');
   text('Drones fly the paths to the Heart.',14,88,1,'#e8e4f8');
   text('Plant sprouts + keepers off the path.',14,102,1,'#e8e4f8');
   text('Clear a garden to open the next one.',14,116,1,'#e8e4f8');
-  text('26 nights. BOTTIE PRIME waits last.',14,130,1,'#e8e4f8')}
+  text('26 nights. BOTTIE PRIME waits last.',14,130,1,'#e8e4f8');
+  if(TWHOW.from==='menu')text('A: WATCH THE INTRO AGAIN',14,150,1,'#f8d030')}
  else if(p===1){ctext('CONTROLS',42,2,'#f8d030');
   const rows=[['D-PAD','MOVE THE CURSOR'],['A','PLANT \u00b7 GROW \u00b7 KEEPER MOVE'],
    ['B','BACK \u00b7 SPEED UP THE NIGHT'],['START','BEGIN THE NIGHT \u00b7 PAUSE'],['SEL','POWERS AT NIGHT \u00b7 UPROOT IN A PANEL']];
   rows.forEach((rw,i)=>{const y=70+i*22;text(rw[0],14,y,2,'#fff8e0');text(rw[1],92,y+4,1,'#c8c0d8')})}
- else{ctext('FIELD GUIDE',42,2,'#f8d030');
+ else if(p>=4)twDrawLore(p-4);
+ else{ctext('DRONE GUIDE',42,2,'#f8d030');
   const grows=TWGUIDE_ROWS.slice(p===2?0:7,p===2?7:14);
   grows.forEach((rw,i)=>{const y=58+i*13,spr=TWCREEP[rw[0]];
    if(spr)g.drawImage(spr,8,y,13,10);
@@ -5674,13 +5594,11 @@ function twWorld(dt){ /* one simulation step; input lives in twUpdate */
  twFxUpdate(dt);
  if(TWR.round&&!TWR.queue.length&&!TWR.creeps.length&&!TWR.cine)twRoundEnd()}
 function twUpdate(dt){switch(state){
- case 'g5title':TWMAP=1;if(pressed('a')||pressed('start')){state='g5menu';TWMenuSel=0;snd(660,.06)}
+ case 'g5title':TWMAP=1;if(pressed('a')||pressed('start')){twFilesOpen();snd(660,.06)}
   else if(pressed('b')||pressed('sel'))eject();return;
  case 'g5menu':TWMAP=1;if(TWHOW){twHowInput();return}
-  if(pressed('up')){TWMenuSel=(TWMenuSel+TWMAIN.length-1)%TWMAIN.length;TWNOTE='';snd(520,.03)}
-  if(pressed('down')){TWMenuSel=(TWMenuSel+1)%TWMAIN.length;TWNOTE='';snd(520,.03)}
-  if(pressed('b')){state='g5title';snd(330,.05);return}
-  if(pressed('a')||pressed('start'))twMenuAct();return;
+  twHubInput();return;
+ case 'g5file':twFilesInput();return;
  case 'g5set':twSetInput();return;
  case 'g5map':twMapInput();return;
  case 'g5upg':twUpgInput();return;
@@ -5737,9 +5655,9 @@ function twUpdate(dt){switch(state){
   const steps=TWR.round?TWR.speed:1;
   for(let i=0;i<steps;i++){if(TWR.cine||state!=='g5play')break;twWorld(dt*TWPACE)}
   return}
- case 'g5win':if(pressed('a')||pressed('start')){state='g5title';snd(660,.06)}return;
+ case 'g5win':if(pressed('a')||pressed('start')){state='g5menu';snd(660,.06)}return;
  case 'g5over':if(pressed('a')||pressed('start')){const m2=TWR.map,md2=TWR.mode;snd(660,.06);twNewRun(m2,md2,1)}
-  else if(pressed('b')){state='g5title';snd(330,.06)}return;
+  else if(pressed('b')){state='g5menu';snd(330,.06)}return;
  }}
 function twHeart(x,y,s){r('#f85888',x-4*s,y-3*s,3*s,3*s);r('#f85888',x+1*s,y-3*s,3*s,3*s);
  r('#f85888',x-4*s,y-1*s,8*s,3*s);r('#f85888',x-2*s,y+2*s,4*s,2*s);r('#f85888',x,y+4*s,1*s,1*s);
@@ -5763,14 +5681,15 @@ function twDraw(){ox=0;oy=0;
   drawDog({x:150,y:H-12,fx:-1,mv:0,st:'sit',alert:0,say:null});
   const twpp=twPathPos(6+((Math.sin(time*.4)+1)/2)*64,0);g.globalAlpha=.85;g.drawImage(TWCREEP.std,Math.round(twpp.x)-8,Math.round(twpp.y)-6,16,11);g.globalAlpha=1;
   const thp=twHeartPos();g.globalAlpha=.10+.05*Math.sin(time*2.4);r('#f8c070',thp.x-13,thp.y-13,26,26);g.globalAlpha=1;
+  if(state==='g5menu'){twDrawHub();if(TWHOW)twDrawHow();return}
   ctext('CLANKAWATCH',34,4,'#7fd4f8');ctext("LIL BOTTIE WANTS THE LIGHT. HE'S MAD.",56,1,'#e8e4f8',null);
   ctext('THREE GARDENS. 26 NIGHTS. ONE HEART.',68,1,'#fff8e0',null);
   {const bw=26,bh=twBottieH(bw),bx=20,by=twBoardTop()+8-bh+Math.round(Math.sin(time*2.2)*1.5);g.drawImage(twOL(twBottieSpr(),bw,bh),bx-1,by-1);twMad(bx+bw-3,by-6)} /* v4: the numba one clanka, mad, on the wall */
   if(state==='g5title'){if(((time*1.6)|0)%2)ctext('PRESS START',96,2,'#fff8e0');
-   ctext('STARS '+twStarPoints()+' · SUN DROPS '+TW.drops+' \u00b7 GARDENS SAVED '+TW.wins,132,1,'#c8b8f8',null)}
-  else twDrawMainMenu();
+   ctext('A NORTH COAST STUDIOS CARTRIDGE',H-52,1,'#8f86c8',null)}
   if(TWHOW)twDrawHow();return}
  if(state==='g5cine'){twDrawIntro();return}
+ if(state==='g5file'){twDrawFiles();return}
  if(state==='g5set'){twDrawSet();return}
  if(state==='g5map'){twDrawMap();return}
  if(state==='g5upg'){twDrawUpg();return}
@@ -5788,7 +5707,7 @@ function twDraw(){ox=0;oy=0;
    if(top&&TWR.mode!=='e'){const row=TWGUIDE_ROWS.find(r=>r[0]===top);
     if(row){let ls='x'+tn+' '+row[1]+' · '+row[2];if(ls.length>39)ls='x'+tn+' '+row[1];
      ctext(ls,H/2+20,1,'#ffd7e8',null)}}}
-  if(((time*2)|0)%2)ctext('A: RETRY \u00b7 B: TITLE',H/2+30,2,'#fff8e0');return}
+  if(((time*2)|0)%2)ctext('A: RETRY \u00b7 B: MENU',H/2+30,2,'#fff8e0');return}
  const night=TWR.round,day=!night;
  r(night?'#1e2c28':'#58b858',0,0,W,H);
  g.drawImage(twBoardCv(night),0,twBoardTop());
@@ -5962,7 +5881,7 @@ const TWF={state:()=>state,start:()=>twStartTitle(),meta:()=>TW,run:()=>TWR,
  speed:()=>TWR.speed,setSpeed:(v)=>{TWR.speed=v},
  actA:()=>twActA(),actB:()=>twActB(),warn:(n)=>TWWARN[1][n],
  menu:()=>TWMENU[TWR.sel],menuLen:()=>TWMENU.length,fork:()=>TWR.fork?{type:TWR.fork.type,sel:TWR.forkSel}:null,
- setForkSel:(v)=>{TWR.forkSel=v},sproutCost:(i)=>twSproutCost(i),setCrowd:(v)=>{TWCROWD=v},crowd:()=>TWCROWD,motes:()=>TWR&&TWR.motes?TWR.motes.map(m=>({x:m.x,y:m.y,t:m.t})):[],build:()=>TWR&&TWR.build?{sel:TWR.build.sel}:null,
+ setForkSel:(v)=>{TWR.forkSel=v},menuAudit:()=>twMenuAudit(),loreOpen:()=>twLoreOpen(),slot:()=>TWSLOT,files:()=>TWFILES?{sel:TWFILES.sel,erase:!!TWFILES.erase}:null,hubSel:()=>TWMenuSel,sproutCost:(i)=>twSproutCost(i),setCrowd:(v)=>{TWCROWD=v},crowd:()=>TWCROWD,motes:()=>TWR&&TWR.motes?TWR.motes.map(m=>({x:m.x,y:m.y,t:m.t})):[],build:()=>TWR&&TWR.build?{sel:TWR.build.sel}:null,
  nightA:()=>{const t=twTowerAt(TWR.cur.x,TWR.cur.y);if(t&&t.hero>=0)twAbilityA(t)},
  cine:()=>TWR.cine?TWR.cine.kind:null,
  skipCine:()=>{if(TWR.cine){const c=TWR.cine;TWR.cine=null;if(c.fire)c.fire()}},
@@ -6484,6 +6403,181 @@ function twDrawMotes(){if(!TWR||!TWR.motes)return;
   const bob=k>=1?Math.round(Math.sin(time*4+m.x)*1.5):0;
   if(k>=1){g.globalAlpha=.22+.1*Math.sin(time*5);r('#ffd7e8',x-7,y-9,14,14);g.globalAlpha=1;r('rgba(0,0,0,.25)',x-4,y+3,8,2)}
   g.drawImage(twOL(TWPETAL,10,10),x-6,y-9+bob)}}
+/* ================================================================
+   CLANKAWATCH v4 — MENUS
+   Will, Nov 18: "I can't start a new game and manage saves, also
+   the whole menu system needs a rework."
+   Title -> FILES -> MAIN MENU. Everything else hangs off the menu.
+     FILES      three save files. A plays one (an empty one is a
+                new game). SELECT erases one, after asking.
+                File 1 is the save the game always had.
+     MAIN MENU  six entries, no scrolling. Each says what it is
+                and shows its own status on the right.
+     OPTIONS    sound, shake, change file, swap cartridge.
+     ALMANAC    how to play, controls, the drone guide, and LORE:
+                pages about the valley, taken from the other
+                Pocket Lantern games. They open as nights are held.
+   One frame for every screen (twFrame) so they look like one game.
+   ================================================================ */
+function twFrame(title,hint,right){r('#14101e',0,0,W,H);r('#241b40',0,0,W,24);r('#f8d030',0,24,W,1);
+ text(title,6,5,2,'#fff8e0');if(right)text(right,W-6-tw(right,2),5,2,'#f8d030');
+ r('#0d0a18',0,H-18,W,18);r('#2c2450',0,H-18,W,1);if(hint)text(hint,6,H-13,1,'#b8b0d8')}
+/* ---------- save files ---------- */
+let TWFILES=null;
+function twSlotRead(i){try{const s=localStorage.getItem(TWKEYS[i]);if(!s)return null;return Object.assign(TWDEF(),JSON.parse(s))}catch(e){return null}}
+function twWith(S,fn){const o=TW;TW=S;try{return fn()}finally{TW=o}}
+function twSlotInfo(i){const S=twSlotRead(i);if(!S||!(S.plays>0||S.made||S.introSeen||twWith(S,twStarPoints)>0))return null;
+ return twWith(S,()=>{const f=twFrontier(),done=twClearedCount()>=26;
+  return{where:done?'ALL THREE GARDENS HELD':TWMAPS[f.map-1].name+' · NIGHT '+f.night,stars:twStarPoints(),drops:TW.drops,held:[1,2,3].filter(m=>twMapCleared(m)).length,perks:TW.perks.length,long:TW.endlessBest||0}})}
+function twFilesOpen(){let cur=0;try{cur=+(localStorage.getItem('thornwatch-slot')||0)||0}catch(e){}
+ TWFILES={sel:Math.max(0,Math.min(2,cur)),erase:null,note:''};state='g5file'}
+function twSlotPick(i){TWSLOT=i;TW=twSlotRead(i)||TWDEF();TW.made=1;try{localStorage.setItem('thornwatch-slot',String(i))}catch(e){}
+ twSave();twSyncSet();TWMenuSel=0;TWNOTE='';state='g5menu'}
+function twFilesInput(){const u=TWFILES;if(!u){state='g5title';return}
+ if(u.erase){if(pressed('left')||pressed('right')){u.erase.yes=!u.erase.yes;snd(520,.03)}
+  if(pressed('b')){u.erase=null;snd(330,.05);return}
+  if(pressed('a')){if(u.erase.yes){try{localStorage.removeItem(TWKEYS[u.sel])}catch(e){}
+    if(TWSLOT===u.sel)TW=TWDEF();u.note='FILE '+(u.sel+1)+' ERASED.';snd(220,.2,110)}else snd(330,.05);
+   u.erase=null}
+  return}
+ if(pressed('up')){u.sel=(u.sel+2)%3;u.note='';snd(520,.03)}
+ if(pressed('down')){u.sel=(u.sel+1)%3;u.note='';snd(520,.03)}
+ if(pressed('b')){TWFILES=null;state='g5title';snd(330,.05);return}
+ if(pressed('sel')){if(twSlotInfo(u.sel)){u.erase={yes:false};snd(160,.08)}else{u.note='THAT FILE IS EMPTY.';snd(160,.06)}return}
+ if(pressed('a')||pressed('start')){snd(660,.06);const i=u.sel;TWFILES=null;twSlotPick(i)}}
+function twDrawFiles(){const u=TWFILES||{sel:0};twFrame('CHOOSE A FILE','A: PLAY · SEL: ERASE · B: TITLE');
+ const ch=Math.min(66,Math.floor((H-24-18-20)/3)),y0=30;
+ for(let i=0;i<3;i++){const y=y0+i*(ch+4),sel=u.sel===i,inf=twSlotInfo(i);
+  r(sel?'#f8d030':'#2c2450',8,y,W-16,ch);r(sel?'#2c2450':'#1b1630',9,y+1,W-18,ch-2);
+  text('FILE '+(i+1),14,y+5,2,sel?'#fff8e0':'#c8c0d8');
+  if(inf){text(inf.where,14,y+19,1,'#7fd4f8');
+   g.drawImage(TWSTAR,14,y+ch-15,9,9);text(String(inf.stars),26,y+ch-14,1,'#f8d030');
+   const s2='GARDENS HELD '+inf.held+'/3'+(inf.long?' · LONG NIGHT '+inf.long:'');text(s2,52,y+ch-14,1,'#c8c0d8');
+   for(let m=0;m<3;m++)r(m<inf.held?'#a8e078':'#3a3454',W-44+m*10,y+7,8,8);
+   if(TWSLOT===i&&TW&&TW.made){const l='LAST PLAYED';text(l,W-50-tw(l,1),y+7,1,'#a8e078')}}
+  else{text('NEW GAME',14,y+19,1,'#a8e078');if(ch>44)text('Night one. One mad clanka.',14,y+ch-14,1,'#8f86c8')}}
+ if(u.note)ctext(u.note,H-32,1,'#ffd94d',null);
+ if(u.erase){r('rgba(8,6,16,.8)',0,0,W,H);const bw=196,bx=(W-bw)/2,by=Math.round(H/2)-34;
+  r('#f8d030',bx,by,bw,68);r('#2a1420',bx+1,by+1,bw-2,66);
+  ctext('ERASE FILE '+(u.sel+1)+'?',by+8,2,'#ff6a5e');ctext('Stars and upgrades: gone.',by+25,1,'#e8e4f8',null);
+  const yes=u.erase.yes;r(!yes?'#f8d030':'#3a3454',bx+22,by+42,66,16);r(yes?'#ff6a5e':'#3a3454',bx+108,by+42,66,16);
+  text('KEEP IT',bx+31,by+45,2,!yes?'#14101e':'#c8c0d8',null);text('ERASE',bx+123,by+45,2,yes?'#14101e':'#c8c0d8',null)}}
+/* ---------- the main menu ---------- */
+function twHubItems(){const f=twFrontier(),done=twClearedCount()>=26,fresh=twStarPoints()===0&&!TW.introSeen,long=twMapCleared(3);
+ return[
+  {n:fresh?'NEW WATCH':'CONTINUE',st:done?'ALL HELD':'G'+f.map+' NIGHT '+f.night,d:fresh?"Night one in Erin's Garden.":TWMAPS[f.map-1].name+', night '+f.night+'.'},
+  {n:'GARDENS',st:twStarPoints()+' STARS',d:'Any garden and night you opened.'},
+  {n:'THE LANTERN',st:TW.drops+' DROPS',d:'Spend Sun Drops on upgrades.'},
+  {n:'THE LONG NIGHT',st:long?(TW.endlessBest?'BEST '+TW.endlessBest:'OPEN'):'LOCKED',lock:!long,d:long?'No dawn. How long can you hold?':'Hold all three gardens first.'},
+  {n:'ALMANAC',st:twLoreOpen()+'/'+TWLORE.length+' LORE',d:'How to play, drones, and lore.'},
+  {n:'OPTIONS',st:'FILE '+(TWSLOT+1),d:'Sound, shake, files, cartridge.'}]}
+function twHubInput(){const n=6;
+ if(pressed('up')){TWMenuSel=(TWMenuSel+n-1)%n;TWNOTE='';snd(520,.03)}
+ if(pressed('down')){TWMenuSel=(TWMenuSel+1)%n;TWNOTE='';snd(520,.03)}
+ if(pressed('b')){twFilesOpen();snd(330,.05);return}
+ if(!(pressed('a')||pressed('start')))return;
+ const i=TWMenuSel;
+ if(i===0){snd(660,.06);const f=twFrontier();TWSTART={map:f.map,mode:'s',night:f.night};
+  if(!TW.introSeen)twIntroStart('play');else twNewRun(f.map,'s',f.night)}
+ else if(i===1){TWMAPUI={map:1,mode:'s',night:1,focus:'night'};twMapUiSync();state='g5map';snd(590,.04)}
+ else if(i===2){TWUPGUI={sel:0,msg:'',msgT:0};state='g5upg';snd(590,.04)}
+ else if(i===3){if(twMapCleared(3)){snd(660,.06);twNewRun(1,'e',1)}else{TWNOTE='LOCKED. HOLD ALL THREE GARDENS.';snd(160,.08)}}
+ else if(i===4){TWHOW={page:0,from:'menu'};snd(590,.04)}
+ else twOpenSet('menu')}
+function twDrawHub(){const its=twHubItems(),rh=H>=260?24:H>=220?20:17,pw=W-24,px=12,ph=its.length*rh+40,py=Math.max(30,Math.round((H-ph)/2)-2);
+ ctext('CLANKAWATCH',py-24<4?4:py-24,3,'#7fd4f8');
+ r('#f8d030',px-1,py-1,pw+2,ph+2);r('#17122a',px,py,pw,ph);
+ for(let i=0;i<its.length;i++){const it=its[i],y=py+5+i*rh,sel=TWMenuSel===i;
+  if(sel){r('#2c2450',px+3,y-2,pw-6,rh-2);r('#f8d030',px+3,y-2,2,rh-2)}
+  text(it.n,px+12,y+Math.round((rh-16)/2),2,it.lock?(sel?'#b8b0d8':'#8f86c8'):(sel?'#fff8e0':'#c8c0d8'));
+  text(it.st,px+pw-8-tw(it.st,1),y+Math.round((rh-14)/2)+1,1,it.lock?'#a49cc0':'#f8d030')}
+ const dy=py+ph-30;r('#2c2450',px+6,dy,pw-12,1);
+ const d=TWNOTE||its[TWMenuSel].d;text(d,px+8,dy+5,1,TWNOTE?'#ff6a5e':'#e8e4f8');
+ text('A: CHOOSE · B: FILES',px+8,dy+17,1,'#8f86c8')}
+/* ---------- options ---------- */
+function twOpenSet(from){TWSETUI={sel:0,from};state='g5set';snd(590,.04)}
+function twSetRows(){const rows=[['MUSIC',TWSET.mus,0],['SOUND',TWSET.sfx,0],['SCREEN SHAKE',TWSET.shake?1:0,1]];
+ if(TWSETUI&&TWSETUI.from==='menu'){rows.push(['CHANGE FILE','FILE '+(TWSLOT+1),2]);rows.push(['SWAP CARTRIDGE','',2])}return rows}
+function twSetInput(){const u=TWSETUI;if(!u){state='g5menu';return}const n=twSetRows().length;
+ if(pressed('up')){u.sel=(u.sel+n-1)%n;snd(520,.03)}
+ if(pressed('down')){u.sel=(u.sel+1)%n;snd(520,.03)}
+ let ch=false;const d=pressed('right')?1:pressed('left')?-1:0;
+ if(d&&u.sel===0){TWSET.mus=Math.max(0,Math.min(10,TWSET.mus+d));ch=true}
+ if(d&&u.sel===1){TWSET.sfx=Math.max(0,Math.min(10,TWSET.sfx+d));ch=true}
+ if(d&&u.sel===2){TWSET.shake=!TWSET.shake;ch=true}
+ if(pressed('a')){if(u.sel===2){TWSET.shake=!TWSET.shake;ch=true}
+  else if(u.sel===3){TWSETUI=null;twFilesOpen();snd(590,.04);return}
+  else if(u.sel===4){TWSETUI=null;snd(330,.06);eject();return}}
+ if(ch){twApplySet();snd(660,.03)}
+ if(pressed('b')||pressed('start')){const f=u.from;TWSETUI=null;snd(330,.05);state=f==='pause'?'g5play':'g5menu'}}
+function twDrawSet(){const u=TWSETUI||{sel:0};twFrame('OPTIONS',u.sel<3?'◀ ▶ CHANGE · B: BACK':'A: GO · B: BACK');
+ twSetRows().forEach((rw,i)=>{const y=40+i*26,sel=u.sel===i;
+  if(sel){r('#2c2450',8,y-4,W-16,22);r('#f8d030',8,y-4,2,22)}
+  text(rw[0],18,y,2,sel?'#fff8e0':'#c8c0d8');
+  if(rw[2]===0){for(let pp=0;pp<10;pp++)r(pp<rw[1]?'#f8d030':'#3a3454',158+pp*7,y+2,5,9)}
+  else if(rw[2]===1)text(rw[1]?'ON':'OFF',158,y,2,rw[1]?'#a8e078':'#ff6a5e');
+  else if(rw[1])text(rw[1],W-14-tw(rw[1],1),y+2,1,'#f8d030')})}
+/* ---------- lore: the valley, as the other Pocket Lantern games tell it ----------
+   Every fact here is from another cartridge's own text (LORE.md lists the sources). `at` is how many
+   nights must be held, on any garden, before the page opens. */
+const TWLORE=[
+ {t:'THE GREAT LANTERN',from:'SPROUTS',at:0,x:'Will keeps the Great Lantern. Once he walked the whole valley for four sun shards to light it again. Erin\'s Garden grows in its shadow, behind the wall.'},
+ {t:'THE BIG RED BUTTON',from:'SPROUTWILD',at:0,x:'Under the Peak hummed the Data Center, the machine that keeps the valley running. It had a big red button. Do not press. Bottie pressed it. The Lantern cracked and went dark.'},
+ {t:'SPROUTS',from:'SPROUTWILD',at:2,x:'When the Lantern cracked, its light fell as seeds, and the seeds grew legs. That is a sprout. Six kinds: EMBER, PEB, DEW, ZIP, LEAF and LUCKY. They carry the light. That is why a drone cannot hold one.'},
+ {t:'THE IRON DOME',from:'SPROUTWILD',at:4,x:'When the light went out King Bibi raised the Iron Dome and shut the roads. Temporarily, he says. It has been temporary for years. It keeps people in. Drones come over the top.'},
+ {t:'OLD THORNBACK',from:'SPROUTS',at:7,x:'Old Thornback has slept in his hollow since before Erin was born. This watch was once named for him. He slept through the whole swarm. Louie checks on him. Do not wake him.'},
+ {t:"ERIN'S FARM STAND",from:'PATCH & PLATE',at:10,x:'What grows in the Long Beds goes to Erin\'s farm stand: plant it, cook it, serve it. The whole valley is hungry. That is why the Scraper went for the rows first.'},
+ {t:'ROOTDEEP',from:'ROOTDEEP',at:13,x:'Under every garden the roots go down, past the grubs and the beetles, to the Hearth. The Drillers are trying to get there. Nothing of Bottie\'s has come back up.'},
+ {t:'BESSIE',from:'SPROUTWILD',at:16,x:'There is something in Wending Lake. The valley calls her Bessie. On a still night you can hear her from the Crossroads. The drones go round the lake. All of them.'},
+ {t:'THE LUCK BUG',from:'SPROUTWILD',at:19,x:'A ladybug is the valley\'s luck bug. LUCKY sprouts grow where one has landed. Marcus says he has a guy who can get you one. Derek. He pulls up. On time. Every time.'},
+ {t:'NUMBA ONE CLANKA',from:'KNOCKOUT',at:26,x:'In the ring they call him LIL BOTTIE: clanker guns, chain stun. He has no context, only fists. He lost the gardens. He is still the numba one clanka. Ask him. He will tell you. At length.'}];
+function twLoreOpen(){const c=twClearedCount();return TWLORE.filter(e=>c>=e.at).length}
+function twDrawLore(i){const e=TWLORE[i],open=twClearedCount()>=e.at;
+ ctext('LORE '+(i+1)+' OF '+TWLORE.length,34,1,'#8f86c8',null);
+ if(!open){ctext('? ? ?',64,3,'#4a4270');ctext('Hold '+e.at+' nights to read this page.',92,1,'#c8c0d8',null);
+  ctext('You have held '+twClearedCount()+'.',106,1,'#8f86c8',null);return}
+ ctext(e.t,48,2,'#f8d030');
+ const tag='FROM '+e.from,twd=tw(tag,1)+10;r('#2a5a6a',Math.round((W-twd)/2),65,twd,12);ctext(tag,67,1,'#e4f6ff',null);
+ const ls=wrapPx(e.x,W-28,1);ls.forEach((l,k)=>text(l,14,86+k*12,1,'#e8e4f8'))}
+
+/* ---------- gardens (was "NIGHTS"): one garden at a time, with its picture ---------- */
+function twDrawMap(){const u=TWMAPUI||{map:1,mode:'s',night:1,focus:'night'};
+ twFrame('GARDENS','A: PLAY · B: BACK',twStarPoints()+' STARS');
+ const tall=H>=250,fy=k=>u.focus===k;
+ let y=30;r(fy('map')?'#2c2450':'#1b1630',8,y,W-16,tall?92:34);if(fy('map'))r('#f8d030',8,y,2,tall?92:34);
+ const nm=TWMAPS[u.map-1].name;ctext(nm,y+4,2,'#fff8e0');text('◀',14,y+4,2,fy('map')?'#f8d030':'#4a4270');text('▶',W-22,y+4,2,fy('map')?'#f8d030':'#4a4270');
+ let st=0;for(let n=1;n<=TWMAPS[u.map-1].nights;n++)st+=TW.stars[u.map+'s'+n]||0;
+ ctext(TWMAPS[u.map-1].sub+' · '+st+'/'+(TWMAPS[u.map-1].nights*3)+' STARS',y+19,1,'#c8c0d8',null);
+ if(tall){const cv=twBoardCv(false,u.map),pw=132;
+  r('#f8d030',Math.round((W-pw)/2)-1,y+33,pw+2,54);g.drawImage(cv,0,Math.round(cv.height*.02),cv.width,Math.round(cv.height*.84),Math.round((W-pw)/2),y+34,pw,52)}
+ y+=tall?98:40;
+ const md=TWMODES.find(m2=>m2[0]===u.mode);r(fy('mode')?'#2c2450':'#1b1630',8,y,W-16,30);if(fy('mode'))r('#f8d030',8,y,2,30);
+ ctext(md[1],y+3,2,'#fff8e0');text('◀',14,y+3,2,fy('mode')?'#f8d030':'#4a4270');text('▶',W-22,y+3,2,fy('mode')?'#f8d030':'#4a4270');
+ ctext(u.mode==='h'?'TOUGHER DRONES · DOUBLE DROPS':u.mode==='a'?'THE NIGHTS, REMIXED':'THE GARDEN AS PLANTED',y+18,1,'#c8c0d8',null);
+ y+=36;
+ const N=TWMAPS[u.map-1].nights,fr=twFrontierIn(u.map,u.mode),pw2=21,gap=2,tot=N*pw2+(N-1)*gap,sx=Math.round((W-tot)/2);
+ r(fy('night')?'#2c2450':'#1b1630',8,y,W-16,44);if(fy('night'))r('#f8d030',8,y,2,44);
+ text('NIGHT '+u.night+(u.night===N?' · BOSS':''),14,y+3,1,'#f8d030');
+ for(let n=1;n<=N;n++){const px=sx+(n-1)*(pw2+gap),un=n<=fr,s3=TW.stars[u.map+u.mode+n]||0,cur=n===u.night;
+  r(cur?'#f8d030':'#3a3454',px,y+15,pw2,24);r(cur?'#3a2f66':'#171226',px+1,y+16,pw2-2,22);
+  text(String(n),px+(n<10?8:5),y+17,1,un?'#fff8e0':'#6a628a');
+  if(un)for(let s2=0;s2<3;s2++)r(s2<s3?'#f8d030':'#4a4270',px+3+s2*6,y+30,4,4);
+  else text('×',px+8,y+27,1,'#6a628a')}
+ if(TWNOTE)ctext(TWNOTE,Math.min(y+50,H-32),1,'#ff6a5e',null)}
+function twDrawUpg(){const u=TWUPGUI||{sel:0,msg:''};twFrame('THE LANTERN','A: BUY · B: BACK',TW.drops+' DROPS');
+ text('Stars pay Sun Drops. Spend them here.',8,29,1,'#b8b0d8');
+ for(let i=0;i<8;i++){const pk=TWPERKS[i],cx=6+(i%2)*116,cy=42+((i/2)|0)*34,own=TW.perks.indexOf(pk.id)>=0,sel=u.sel===i;
+  r(sel?'#f8d030':'#2c2450',cx,cy,112,31);r(sel?'#2c2450':'#1b1630',cx+1,cy+1,110,29);
+  text(pk.n,cx+5,cy+3,1,own?'#a8e078':'#fff8e0');text(pk.fx,cx+5,cy+12,1,'#c8c0d8');
+  text(own?'YOURS':pk.cost+' DROPS',cx+5,cy+21,1,own?'#a8e078':(TW.drops>=pk.cost?'#f8d030':'#ff9a8a'))}
+ if(u.msg)ctext(u.msg,H-32,1,'#ffd94d',null)}
+/* widths of everything the menus print, for tests/menus.js */
+function twMenuAudit(){const bad=[],chk=(s,sc,max,w)=>{if(tw(s,sc)>max)bad.push(w+': '+tw(s,sc)+'>'+max+': '+s)};
+ for(const it of twHubItems()){chk(it.d,1,W-40,'hub desc');if(tw(it.n,2)+tw(it.st,1)>W-24-28)bad.push('hub row: '+it.n+' / '+it.st)}
+ for(const e of TWLORE){chk(e.t,2,W-8,'lore title');if(wrapPx(e.x,W-28,1).length>9)bad.push('lore too long: '+e.t)}
+ for(const pk of TWPERKS){chk(pk.n,1,104,'perk');chk(pk.fx,1,104,'perk fx')}
+ for(const m of TWMAPS){chk(m.name,2,W-56,'garden');chk(m.sub+' · 30/30 STARS',1,W-20,'garden sub')}
+ return bad}
 
 /* ---------- loop ---------- */
 function fit(){const p=cv.parentNode||{};let nh=Math.round(240*p.clientHeight/p.clientWidth/2)*2;nh=Math.max(160,Math.min(304,nh||200));if(nh!==H||cv.height!==nh*2||cv.width!==480){H=nh;cv.width=480;cv.height=H*2}}

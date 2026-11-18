@@ -15,7 +15,7 @@ const file = path.resolve(process.argv[2] || path.join(__dirname, '..', 'Sprouts
   const bad = await T(() => window.__g.TWF().storyAudit());
   ok(bad.length === 0, 'every story line fits in three rows; Louie <= 43 chars' + (bad.length ? '\n     ' + bad.join('\n     ') : ''));
   // fresh save: PLAY -> intro -> the run
-  await key('start'); await p.waitForTimeout(200); await key('a'); await p.waitForTimeout(300);
+  await key('start'); await p.waitForTimeout(200); await key('a'); await p.waitForTimeout(200); await key('a'); await p.waitForTimeout(300);
   ok(await T(() => window.__g.TWF().state()) === 'g5cine', 'first PLAY opens the intro');
   let n = 0; while (await T(() => window.__g.TWF().state()) === 'g5cine' && n < 80) { await key('a'); await p.waitForTimeout(140); n++; }
   ok(await T(() => window.__g.TWF().state()) === 'g5play', 'A walks the intro to the garden (' + n + ' presses)');

@@ -53,3 +53,22 @@ All of this is from Sproutwild's own story (`alt/src/sproutwild/sw-lore.js`, `sw
 3. **CLANKERFALL.** Funniest, and uses Knockout's word for Bottie. Reads more like a joke game.
 
 **Chosen, Nov 18: CLANKAWATCH.** Will asked for something Bottie related. It keeps "watch" and uses the game's own word for him. Applied to the title screen and the cartridge label; the folder, file and save key keep the old name.
+
+## The almanac's lore pages (alpha 3) and where each fact comes from
+
+Text is in `src/tw-menus.js` (`TWLORE`). Each page opens after a number of nights held.
+
+| Page | Opens at | Source |
+|---|---|---|
+| THE GREAT LANTERN | 0 | Sprouts: Will keeps the Lantern and recovers four sun shards (Rootdeep handoff, part 1) |
+| THE BIG RED BUTTON | 0 | Sproutwild intro, `sw-lore.js` |
+| SPROUTS | 2 | Sproutwild intro ("the light fell as seeds, and the seeds grew legs"); the six types are Sprouts canon |
+| THE IRON DOME | 4 | Sproutwild, `sw-lore.js` and the dome sign in `sw-field.js` |
+| OLD THORNBACK | 7 | Sprouts: Erin's line that he "has slept in that hollow since before I was born" |
+| ERIN'S FARM STAND | 10 | Patch & Plate: plant, cook, serve; "the whole valley is hungry" |
+| ROOTDEEP | 13 | Rootdeep: the Hearth hub; grubs and beetles are its creatures |
+| BESSIE | 16 | Sproutwild: the Wending Lake monster, named BESSIE by Will (Nov 17) |
+| THE LUCK BUG | 19 | Sproutwild's ladybug; Derek is Marcus's guy (Will, Nov 17) |
+| NUMBA ONE CLANKA | 26 | Knockout: LIL BOTTIE, "clanker guns, chain stun", "I have no context. Only fists." |
+
+New in these pages, for Will to keep or strike: that the Drillers are heading for the Hearth, that the drones avoid Wending Lake, that LUCKY sprouts grow where a ladybug landed, and that Louie checks on Thornback.

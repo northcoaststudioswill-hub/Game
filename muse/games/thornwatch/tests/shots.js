@@ -21,7 +21,7 @@ require('fs').mkdirSync(out, { recursive: true });
   let n = 0;
   const shot = async l => { n++; await p.locator('#screen').screenshot({ path: out + '/' + String(n).padStart(2, '0') + '_' + l + '.png' }); };
   const T = fn => p.evaluate(fn);
-  await shot('title'); await key('start'); await p.waitForTimeout(300); await shot('menu');
+  await shot('title'); await key('start'); await p.waitForTimeout(300); await shot('files'); await key('a'); await p.waitForTimeout(300); await shot('menu');
   await key('a'); await p.waitForTimeout(600);
   for (let i = 0; i < 12; i++) { const st = await T(() => window.__g.TWF().state()); if (st !== 'g5cine') break; await shot('story' + i); await key('a'); await p.waitForTimeout(350); }
   await p.waitForTimeout(400); await key('a'); await p.waitForTimeout(300); await shot('g1_day_empty');
