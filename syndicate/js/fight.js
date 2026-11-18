@@ -216,7 +216,7 @@
     if (phase !== 'fight' || e.state !== 'idle' || e.st.stun || time - (e.tauntT || -9) < 5) { if (e.isPlayer) G.sfx('deny'); return; }
     const foe = e.foe, big = !!(foe.st.stun || foe.st.broken);
     e.tauntT = time; e.state = 'recover'; e.t = TAUNT.rec; e.act = { ab: TAUNT, step: 0, aim: e.aim, taunt: 1, pay: big ? 12 : 8 }; e.charging = 0; e.guard = 0;
-    if (e.isPlayer) { text(e, G.pick(TAUNTS), '#ffd36b', true); G.sfx('cheer'); addHype(big ? 14 : 8); } else { text(e, '…', '#ff8a6a', true); addHype(-6); }
+    if (e.isPlayer) { text(e, G.pick(TAUNTS), '#ffd36b', true); G.sfx('cheer'); addHype(big ? 14 : 8);  if (G.spirits) G.spirits.onTaunt(e, foe, big); } else { text(e, '…', '#ff8a6a', true); addHype(-6); }
   }
   F.taunt = () => taunt(P);
   function angDiff(a, b) { let d = a - b; while (d > Math.PI) d -= 6.283; while (d < -Math.PI) d += 6.283; return Math.abs(d); }

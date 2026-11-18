@@ -261,3 +261,10 @@ The renderer caps resolution at 1.5x, redraws the shadow map every other frame, 
 ## Balance pass (`js/tune.js`, `docs/BALANCE.md`)
 
 Weapons, classes and level-up choices were simulated and the outliers adjusted; the details are in `docs/BALANCE.md`. Also added: a **third technique to choose from at level 2** for every class, and **signature blows**: at mastery 5 a weapon's heavy blow gains an effect by family (stun, throw, double strike, slow, overcharge). The Armoury shows each one.
+
+## The Long Stair and the ending (`js/ascent.js`)
+
+- With the crown and two challengers turned away (five if you never dealt with David), the gate at the Long Stair opens: the Warden Captain, then Vilhelm van Koheneim IV, then Queen Eerin Koheneim.
+- Four endings depending on soul debt, burned villages and whether you ever signed. You keep playing afterwards.
+- **Tiefling spirits:** taunting calls a hellhound (damage), ember cat (speed and a moment untouchable) or carrion crow (marks the foe). Choose on the Guildmaster's sheet.
+- The Outfitter's set box now has buttons that take you to the missing weapon or charm.

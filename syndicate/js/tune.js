@@ -13,6 +13,7 @@
   (G.ARMS || []).filter(w => w.cls === 'sorcerer' || w.cls === 'warlock').forEach(w => pow(w.id, 1.5));
   G.CLASSES.sorcerer.hitDie = 7; G.CLASSES.warlock.hitDie = 8;
   pow('d_staff', 1.08); pow('d_spear', 1.08); pow('d_axes', 1.08);
+  if (A.wolf_form) { A.wolf_form.cd = 13; A.bear_form.cd = 15; A.spider_form.cd = 14; A.bat_form.cd = 14; }      // shapes come round a little sooner
 
   // ------------------------------------------------------------ a third choice at level 2
   { const third = { fighter: 'war_cry', rogue: 'throwing_knife', sorcerer: 'glyph', cleric: 'toll_dead', druid: 'regrowth', warlock: 'shadow_ward' };

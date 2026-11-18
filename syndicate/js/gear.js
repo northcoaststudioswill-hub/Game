@@ -51,6 +51,8 @@
     G.KITS.forEach(k => { const el = document.getElementById('kp_' + k.id); if (!el) return; const l = G.lookOf(st.hero, st); l.kit = k.id; l.tint = Object.assign({}, k.tint || {}, st.hero.tint || {}); l.gear = { weapon: (st.gear || {}).weapon || 0, armor: Math.max((st.gear || {}).armor || 0, k.vis || 0) }; l.cos = Object.assign({}, l.cos, { dye: null }); el.innerHTML = ''; el.appendChild(G.portrait(l, 84, 'full')); });
     const nm = card.querySelector('.cp-name'); if (nm) nm.innerHTML = pick.name + ' ' + rungTag(pick.id);
     const det = card.querySelector('.arm-detail'); if (det) det.insertAdjacentHTML('afterend', setBlock(st, pick.id));
+    { const z = setState(st, pick.id), sb = card.querySelector('.setbox'); if (z && sb && (!z.okA || !z.okC)) { const row = document.createElement('div'); row.className = 'row'; const mkb = (t, fn) => { const b = document.createElement('button'); b.className = 'mini'; b.textContent = t; b.onclick = () => { G.sfx('ui'); fn(); }; row.appendChild(b); };
+      if (!z.okA) mkb('To the Armoury: ' + G.ARM_BY[z.s.arms[st.hero.cls][0]].name, () => ui.armory(z.s.arms[st.hero.cls][0])); if (!z.okC) mkb('Find the charm', () => (z.s.charm === 'sandglass' ? ui.oracle : ui.charms)()); sb.appendChild(row); } }
     const buy = card.querySelector('#buy');
     if (!own && buy && (pick.wg || (pick.req && !pick.req(st)))) { const s = document.createElement('span'); s.className = 'lock'; s.textContent = pick.src; buy.parentNode.replaceChild(s, buy); }
   };
