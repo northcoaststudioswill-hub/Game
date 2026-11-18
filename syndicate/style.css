@@ -626,3 +626,4 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 /* scene-change veil */
 #veil { position: fixed; inset: 0; background: #050406; opacity: 0; pointer-events: none; z-index: 40; }
 #ui.talking #floaters { display: none !important; }
+#ui:has(#cine) #floaters { display: none !important; }

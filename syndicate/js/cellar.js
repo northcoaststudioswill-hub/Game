@@ -24,6 +24,8 @@
     const gold = new T.MeshPhongMaterial({ color: 0xf0c95a, emissive: 0x5a3c08, shininess: 160, specular: 0xfff0c0, flatShading: true }), dk = new T.MeshPhongMaterial({ color: 0xb8862a, emissive: 0x3a2404, shininess: 60, flatShading: true });
     const brick = (rx, ry) => { const t = gfx.tex('brick').clone(); t.needsUpdate = true; t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(rx, ry); return new T.MeshPhongMaterial({ color: 0xd8a83a, emissive: 0x2a1a04, map: t, shininess: 40, flatShading: true }); };
     for (let x = -5; x <= 5; x++) for (let z = -5; z <= 5; z++) box(0.96, 0.3, 0.96, (x + z) % 2 ? gold : dk, x, -0.15 + R(-0.015, 0.015), z, s).castShadow = false;
+    const cw = new T.Group(); cw.visible = false; s.add(cw);          // the two missing walls, seen only from inside during his scenes
+    { const m1 = new T.Mesh(new T.PlaneGeometry(11.6, 6), brick(4, 2)); m1.position.set(0, 3, 5.6); m1.rotation.y = Math.PI; cw.add(m1); const m2 = new T.Mesh(new T.PlaneGeometry(11.6, 6), brick(4, 2)); m2.position.set(5.6, 3, 0); m2.rotation.y = -Math.PI / 2; cw.add(m2); }
     box(11.6, 6, 0.6, brick(4, 2), 0, 3, -5.8, s); const wl = box(0.6, 6, 11.6, brick(4, 2), -5.8, 3, 0, s);
     [[-5.4, -5.4], [0, -5.5], [5.4, -5.5], [-5.5, 0], [-5.5, 5.4]].forEach(q => { box(0.7, 6, 0.7, dk, q[0], 3, q[1], s); box(0.9, 0.3, 0.9, gold, q[0], 5.9, q[1], s); });
     // the great hourglass
@@ -86,7 +88,7 @@
     const pl = [[0, 3.6, 0, 0xffd080, 30, 16], [TX, 3.0, -3.4, 0xffe0a0, 22, 9], [-3.5, 2.4, -3.5, 0xffb040, 16, 9], [3.6, 2.4, -3.4, 0xffb040, 16, 9]].map(q => { const l = new T.PointLight(q[3], q[4], q[5], 1.5); l.position.set(q[0], q[1], q[2]); s.add(l); return l; });
     let david = null, key = '';
     let hidden = false;
-    return { scene: s, hide: v => { hidden = !!v; if (david) david.root.visible = !hidden; }, update: (t, noCam) => {
+    return { scene: s, cineWall: v => { cw.visible = !!v; }, hide: v => { hidden = !!v; if (david) david.root.visible = !hidden; }, update: (t, noCam) => {
       const lk = (G.state.hero || {}).race || 'human'; if (!david || key !== lk) { if (david) s.remove(david.root); david = G.makeChar(O.look()); david.root.position.set(-0.6, 0, 0.4); david.root.rotation.y = 0.6; s.add(david.root); key = lk; } david.root.visible = !hidden;
       david.pose({ t, act: Math.sin(t * 0.8) > 0.55 ? 'cast' : 'idle', prog: 0.3 });
       clocks.forEach(c => { c.hs[0].rotation.z = t * c.sp + c.ph; c.hs[1].rotation.z = t * c.sp * 0.09 - c.ph; });

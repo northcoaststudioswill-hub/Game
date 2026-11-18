@@ -16,7 +16,7 @@
   FOES.forEach((o, i) => { o.ascent = i; G.BIOS[o.id] = o.bio; o.look = { cls: o.cls, race: o.race, tint: o.tint, arm: o.arm, kit: o.lookKit, cos: o.cos, scale: o.scale, gear: { weapon: 2, armor: 2 } }; });
   const stage = st => st.ascent || 0;
   const open = st => !!(st.wins && st.wins.vexa) && ((tied(st) && G.defended(st) >= 2) || G.defended(st) >= 5);
-  G.ascent = { FOES, open, stage };
+  G.ascent = { FOES, open, stage, begin: () => begin() };
 
   const INTRO = [
     (st, me) => [S('', '', 'The iron gate at the foot of the Long Stair has two seals on it. Tonight one of them is broken, and nobody will say by whom.', 'wide'), S('npc', FOES[0].name, 'Back down, pit-crown. That brass on your head is a joke the Guild tells. It does not open doors.', 'npc'), S('you', me, 'It opened this one.', 'you'), S('npc', FOES[0].name, 'Then I will close it. With you under it.', 'low')].concat(G.FL3 && G.FL3.captain[st.hero.cls] ? [S('npc', FOES[0].name, G.FL3.captain[st.hero.cls], 'npc')] : []),
@@ -25,7 +25,8 @@
   ];
   const lookOf = o => o.look;
   function begin() { const st = G.state, i = stage(st), o = FOES[i]; if (!o) return; ui.close();
-    G.playScene({ place: 'arena', npc: [-1.6, -1.4], you: [1.6, 1.7], spawn: { look: lookOf(o) }, lines: INTRO[i](st, st.hero.name), done: () => { G.ui.hub(); ui.close(); ui.prefight(o); } }); }
+    const hall = i > 0 && G.cine && G.cine.throneStage ? { stage: G.cine.throneStage(), npc: [-0.8, 4.6], you: [1.3, 7.3] } : {};
+    G.playScene(Object.assign({ place: 'arena', npc: [-1.6, -1.4], you: [1.6, 1.7], spawn: { look: lookOf(o) }, lines: INTRO[i](st, st.hero.name), done: () => { G.ui.hub(); ui.close(); ui.prefight(o); } }, hall)); }
 
   // ------------------------------------------------------------ the gate at the Long Stair
   const st0 = ui.stair;

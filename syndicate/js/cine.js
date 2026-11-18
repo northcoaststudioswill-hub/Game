@@ -22,7 +22,7 @@
     if (G.titleChars) G.titleChars.forEach(c => c.root.visible = false);
     if (W.walker.char) W.walker.char.root.visible = false;
   }
-  function toArena(hype) { arena = W.get('arena'); gfx.setScene(arena.scene); hideRegulars(); arena.setHype(hype); }
+  function toArena(hype) { arena = W.get('arena'); gfx.setScene(arena.scene); hideRegulars(); arena.setHype(hype); if (arena.cineWall) arena.cineWall(true); }
   function bout(a, b, pa, pb) { ex = F.exStart(a, b, pa, pb); return ex; }
   function giveCrown(e) {
     crown = new T.Group(); const gold = new T.MeshPhongMaterial({ color: 0xf0c95a, emissive: 0x7a5408, shininess: 90, flatShading: true });
@@ -47,10 +47,15 @@
     queen.root.position.set(-0.95, 0.65, -0.1); king.root.position.set(0.95, 0.65, -0.1); s.add(queen.root, king.root);
     const wing = new T.MeshBasicMaterial({ color: 0xc8b8ff, transparent: true, opacity: 0.26, side: T.DoubleSide, blending: T.AdditiveBlending, depthWrite: false }), wings = [];
     [-1, 1].forEach(sd => [0, 1].forEach(lo => { const g = new T.Group(), w = new T.Mesh(new T.CircleGeometry(lo ? 0.55 : 0.8, 5, 0, Math.PI), wing); w.scale.set(0.8, lo ? 1.1 : 1.6, 1); w.rotation.z = -Math.PI / 2 * sd; w.position.x = sd * 0.05; g.add(w); g.position.set(-0.95 + sd * 0.14, lo ? 1.75 : 2.15, -0.42); g.rotation.z = sd * (lo ? 0.5 : -0.25); s.add(g); wings.push([g, sd]); }));
+    box(44, 0.2, 44, L(0x8f90a8), 0, -0.22, 4, s).castShadow = false; box(44, 16, 0.6, L(0x3a3c5a), 0, 8, 17, s); [-13, 13].forEach(x => box(0.6, 16, 44, L(0x3a3c5a), x, 8, 4, s)); box(44, 16, 0.6, L(0x3a3c5a), 0, 8, -9, s);
+    for (let k = 0; k < 5; k++) [-7.4, 7.4].forEach(x => { const z = 1.5 + k * 3.2; mesh(new T.CylinderGeometry(0.42, 0.5, 9, 8), marble, x, 4.5, z, s); box(1.3, 0.3, 1.3, gold, x, 0.15, z, s); });
+    const hallL = new T.PointLight(0xdfe4ff, 14, 16, 1.4); hallL.position.set(0, 5, 8); s.add(hallL);
     const lq = new T.PointLight(0xc8b8ff, 22, 9, 1.5); lq.position.set(-1.6, 3.4, 1.6); s.add(lq); const lk = new T.PointLight(0xffb070, 18, 9, 1.5); lk.position.set(2.0, 3.0, 1.8); s.add(lk);
-    return royal = { scene: s, update: tt => { queen.pose({ t: tt, act: 'idle' }); king.pose({ t: tt + 1.4, act: 'idle' }); wings.forEach((w, i) => { w[0].rotation.y = w[1] * (0.35 + Math.sin(tt * 2.2 + i) * 0.22); }); if (Math.random() < 0.25) gfx.emit(-0.95 + (Math.random() - 0.5) * 1.6, 1 + Math.random() * 2.4, -0.2, 0, 0.3, 0, 1.6, 0xd8ccff, 0); } };
+    const seated = [queen.root, king.root].concat(wings.map(w => w[0]));
+    return royal = { scene: s, cineWall: v => { seated.forEach(o => { o.visible = !v; }); }, update: tt => { queen.pose({ t: tt, act: 'idle' }); king.pose({ t: tt + 1.4, act: 'idle' }); wings.forEach((w, i) => { w[0].rotation.y = w[1] * (0.35 + Math.sin(tt * 2.2 + i) * 0.22); }); if (Math.random() < 0.25) gfx.emit(-0.95 + (Math.random() - 0.5) * 1.6, 1 + Math.random() * 2.4, -0.2, 0, 0.3, 0, 1.6, 0xd8ccff, 0); } };
   }
 
+  C.throneStage = () => throne();
   function build() {
     const hub = () => W.get('hub'), GM = [20.4, 1.35, -0.2];
     return [
@@ -72,24 +77,24 @@
         setup: () => { gfx.setScene(hub().scene); hideRegulars(); },
         update: (p, dt) => {
           const a = cl(p / 0.42), b = cl((p - 0.42) / 0.58);
-          const pos = p < 0.42 ? V([30, 15, 20], [27, 1.5, 6.5], ease(a)) : V([27, 1.5, 6.5], [7, 1.25, 4.4], easeIn(b) * 0.55 + b * 0.45);
-          const look = p < 0.42 ? V([14, 0, 6], [14, 1.6, 5], ease(a)) : V([14, 1.6, 5], [-3, 1.6, 4.2], ease(b));
+          const pos = p < 0.42 ? V([30, 15, 20], [27, 2.5, 6.5], ease(a)) : V([27, 2.5, 6.5], [10.5, 2.5, 5.4], easeIn(b) * 0.55 + b * 0.45);
+          const look = p < 0.42 ? V([14, 0, 6], [14, 1.6, 5], ease(a)) : V([14, 1.6, 5], [-3, 1.5, 4.2], ease(b));
           shoot(pos, look, lerp(42, 62, b), Math.sin(p * 3.1) * 0.05); hub().update(now, dt);
         }
       },
       // low orbit around the Guildmaster
       {
         dur: 5.2, cut: true, text: 'The Deep Guild writes every debt in the Blood Ledger. The Guild always collects.',
-        update: (p, dt) => { const th = lerp(0.15, 1.35, ease(p)), r = lerp(3.6, 2.3, p); shoot([GM[0] + Math.cos(th) * r, lerp(0.55, 1.5, p), GM[2] + Math.sin(th) * r], [GM[0], lerp(1.5, 1.35, p), GM[2]], lerp(46, 34, p), -0.07); hub().update(now, dt); }
+        update: (p, dt) => { const th = lerp(0.8, 1.5, ease(p)), r = lerp(3.3, 2.4, p); shoot([GM[0] + Math.cos(th) * r, lerp(1.0, 1.55, p), GM[2] + Math.sin(th) * r], [GM[0], lerp(1.5, 1.35, p), GM[2]], lerp(46, 34, p), -0.07); hub().update(now, dt); }
       },
       // the underworld at work: Marc's table, the dice of light, and the Wardens taking the Crown's tenth
       {
         dur: 4.8, cut: true, text: 'Dice. Coin. Unsealed steel. Whatever is forbidden above is for sale beneath one lamp.',
-        update: (p, dt) => { shoot(V([22.2, 1.3, 4.6], [24.9, 1.6, 2.9], ease(p)), V([25.6, 1.5, -0.2], [28.6, 1.5, 4.6], ease(cl((p - 0.45) / 0.55))), lerp(50, 40, p), 0.05 - p * 0.1); hub().update(now, dt); }
+        update: (p, dt) => { shoot(V([22.6, 2.5, 5.2], [24.3, 2.0, 2.9], ease(p)), [25.7, 1.15, -0.1], lerp(48, 36, p), 0.04 - p * 0.06); hub().update(now, dt); }
       },
       {
         dur: 4.4, cut: true, text: 'At the foot of the Long Stair, the throne’s Wardens count their tenth, and look away.',
-        update: (p, dt) => { shoot(V([5.4, 0.8, 12.2], [2.9, 1.5, 13.6], ease(p)), [-0.9, lerp(2.3, 1.9, p), 14.5], lerp(52, 38, p), -0.06 + p * 0.05); hub().update(now, dt); }
+        update: (p, dt) => { shoot(V([5.8, 0.8, 12.0], [3.9, 1.4, 13.0], ease(p)), [-0.9, lerp(2.2, 1.8, p), 14.5], lerp(52, 42, p), -0.06 + p * 0.05); hub().update(now, dt); }
       },
       // smash cut: the crowd, then whip down into the pit
       {
@@ -125,7 +130,7 @@
           at('fb', 1.7, () => F.exCast(A, 'fireball')); at('slow', 2.3, () => { F.speed = 0.14; }); at('norm', 3.35, () => { F.speed = 1; });
           at('chaos', 3.7, () => F.exCast(A, 'chaos_bolt')); at('frost', 4.3, () => F.exCast(A, 'ray_frost')); at('bolt2', 4.9, () => F.exCast(A, 'lightning_bolt'));
           const k = cl(t / 5.4), a = wp(A), b = wp(B), m = ease(cl((t - 0.2) / 2.6));
-          shoot(V([-6.2, 1.0, 3.6], [1.5, 3.4, 7.4], ease(k)), V(a, b, m), lerp(40, 54, k), 0.06 - k * 0.1);
+          shoot(V([-5.6, 1.1, 4.4], [0.4, 3.6, 7.2], ease(k)), V(a, [(a[0] + b[0]) / 2, 1.0, (a[2] + b[2]) / 2], m), lerp(44, 58, k), 0.05 - k * 0.08);
         }
       },
       // ---- FAITH — spiral crane above the dawn-burst
@@ -138,7 +143,7 @@
           at('dawn', 1.15, () => F.exCast(A, 'radiance')); at('slow', 1.5, () => { F.speed = 0.16; }); at('norm', 2.3, () => { F.speed = 1; });
           at('smite', 2.7, () => F.exCast(A, 'holy_strike')); at('flame', 3.6, () => F.exCast(A, 'sacred_flame'));
           const k = cl(t / 4.8), th = 0.5 + ease(k) * 2.0, c = wp(A, 0.6);
-          shoot([c[0] + Math.cos(th) * 3.2, lerp(4.2, 10, ease(k)), c[2] + Math.sin(th) * 3.2], c, lerp(62, 48, k), lerp(-0.3, 0.3, k));
+          shoot([c[0] + Math.cos(th) * 3.6, lerp(3.6, 7.5, ease(k)), c[2] + Math.sin(th) * 3.6], c, lerp(60, 50, k), lerp(-0.18, 0.18, k));
         }
       },
       // ---- BLOOD — close and low: an arm, a leg, and then nothing left to count
@@ -182,7 +187,7 @@
       // rocket crane out over the roaring pit
       {
         dur: 5.2, text: 'Take it from her and your debt is struck. Lose, and you are forgotten by morning.',
-        setup: () => { arena.setHype(1); G.sfx('crowd'); },
+        setup: () => { arena.setHype(1); G.sfx('crowd'); if (arena.cineWall) arena.cineWall(false); },
         update: (p) => {
           const A = ex.A, v = wp(A, 1.2), k = easeIn(cl(p * 1.15));
           at('pose', 1.2, () => F.exCast(A, 'smoke_bomb'));
@@ -193,8 +198,8 @@
       // the quiet beat: pulling back out of the bare house
       {
         dur: 5.6, text: 'The Guild lent you a cave, a rusted blade, and a debt you will never pay in coin.',
-        setup: () => { F.exStop(); arena.setHype(0); savedItems = G.state.items; G.state.items = []; const h = W.get('hideout'); gfx.setScene(h.scene); h.refresh(); hideRegulars(); },
-        update: (p, dt) => { shoot(V([3.2, 1.3, 2.4], [9.5, 3.4, 8.8], ease(p)), V([0.6, 1.4, 0.2], [2.5, 0.8, 1.5], p), lerp(50, 40, p), 0); W.get('hideout').update(now, dt); }
+        setup: () => { F.exStop(); arena.setHype(0); savedItems = G.state.items; G.state.items = []; const h = W.get('hideout'); gfx.setScene(h.scene); h.refresh(); hideRegulars(); if (!caveL) { caveL = new T.PointLight(0xffb070, 26, 14, 1.5); caveL.position.set(3.2, 2.6, 3.0); } h.scene.add(caveL); },
+        update: (p, dt) => { shoot(V([5.2, 2.0, 5.0], [9.8, 4.4, 9.4], ease(p)), V([1.6, 0.5, 1.2], [2.6, 0.3, 2.0], p), lerp(52, 42, p), 0); W.get('hideout').update(now, dt); }
       },
       // the rush: sprint down the street and into the black of the gate
       {
@@ -205,7 +210,8 @@
       { dur: 4.4, black: true, logo: true, cut: true, setup: () => { gfx.cam.shake = 0; G.sfx('boom'); G.sfx('bell'); flash(0.9); } }
     ];
   }
-  function restoreItems() { if (savedItems) { G.state.items = savedItems; savedItems = null; if (W.cache.hideout) W.cache.hideout.refresh(); } }
+  let caveL = null;
+  function restoreItems() { if (caveL && caveL.parent) caveL.parent.remove(caveL); if (savedItems) { G.state.items = savedItems; savedItems = null; if (W.cache.hideout) W.cache.hideout.refresh(); } }
 
   C.play = function (done) {
     G.ui.close(); onDone = done; idx = -1; t = 0; now = 0; lastLine = null; ex = null;
@@ -216,6 +222,7 @@
     document.getElementById('ui').appendChild(el);
     sub = el.querySelector('.c-sub'); fade = el.querySelector('.c-fade'); logo = el.querySelector('.c-logo'); card = el.querySelector('.c-card'); flashEl = el.querySelector('.c-flash');
     el.querySelector('.c-skip').onclick = () => { if (navigator.webdriver || !C.holdSkip) { G.sfx('ui'); C.skip(); } };      // players hold to skip (see below); a plain click only skips for automated tests
+    let seen = 0; try { seen = localStorage.getItem('guttercrown_intro_seen') ? 1 : 0; } catch (er) { } C.first = !seen;       // first viewing: one hold skips the lot. Later viewings: tap through shot by shot.
     shots = build(); next();
   };
   function next() {
@@ -229,25 +236,27 @@
   }
   function finish() {
     if (!C.active) return;
-    C.active = false; F.exStop(); restoreItems(); gfx.cine = null;
-    const a = W.cache.arena; if (a) { a.flash.intensity = 0; a.setHype(0); }
+    C.active = false; F.exStop(); restoreItems(); gfx.cine = null; try { localStorage.setItem('guttercrown_intro_seen', '1'); } catch (er) { }
+    const a = W.cache.arena; if (a) { a.flash.intensity = 0; a.setHype(0); if (a.cineWall) a.cineWall(false); } if (royal) royal.cineWall(false);
     gfx.cam.shake = 0; el.remove(); const d = onDone; onDone = null; if (d) d();
   }
-  C.skip = finish;
+  C.skip = finish; C.where = () => ({ idx, t, n: shots ? shots.length : 0, dur: shots && shots[idx] ? shots[idx].dur : 0 });
   // ------------------------------------------------------------ tap for the next scene, hold to skip the whole film
   C.holdSkip = true; C.nextShot = () => { if (C.active) { G.sfx('page'); next(); } };
-  { let held = 0, t = 0, last = 0, downFor = 0, wasOn = false, fired = false; const NEED = 0.9, TAP = 0.32, keys = {};
+  { let held = 0, t = 0, last = 0, downFor = 0, wasOn = false, fired = false, downAt = 0, padWas = false, padFor = 0; const NEED = 0.9, TAP = 0.32, keys = {};
     const btn = () => document.querySelector('#cine .c-skip');
-    window.addEventListener('keydown', e => { if (G.scene === 'cine' && (e.code === 'Escape' || e.code === 'Enter' || e.code === 'Space')) { keys[e.code] = 1; e.preventDefault(); } });
-    window.addEventListener('keyup', e => { delete keys[e.code]; });
-    const down = e => { if (G.scene === 'cine') { held = 1; if (e.cancelable && e.target && e.target.closest && e.target.closest('.c-skip')) e.preventDefault(); } }, up = () => { held = 0; };
+    window.addEventListener('keydown', e => { if (G.scene === 'cine' && (e.code === 'Escape' || e.code === 'Enter' || e.code === 'Space')) { if (!keys[e.code]) downAt = performance.now(); keys[e.code] = 1; e.preventDefault(); } });
+    const tapUp = () => { if (G.scene === 'cine' && downAt && performance.now() - downAt < 350 && !fired && !C.first && !navigator.webdriver) C.nextShot(); downAt = 0; };
+    window.addEventListener('keyup', e => { if (keys[e.code]) tapUp(); delete keys[e.code]; });
+    const down = e => { if (G.scene === 'cine') { if (!held) downAt = performance.now(); held = 1; if (e.cancelable && e.target && e.target.closest && e.target.closest('.c-skip')) e.preventDefault(); } }, up = () => { if (held) tapUp(); held = 0; };
     document.addEventListener('pointerdown', down); document.addEventListener('touchstart', down, { passive: false }); ['pointerup', 'pointercancel', 'touchend', 'touchcancel'].forEach(ev => document.addEventListener(ev, up));
     setInterval(() => { const now = performance.now(), dt = Math.min(0.5, (now - last) / 1000); last = now; if (G.scene !== 'cine') { t = 0; held = 0; wasOn = false; downFor = 0; return; }
       let padA = false; try { const pads = navigator.getGamepads ? navigator.getGamepads() : []; for (const p of pads) if (p && p.buttons && ((p.buttons[0] && p.buttons[0].pressed) || (p.buttons[9] && p.buttons[9].pressed))) padA = true; } catch (er) { }
       const on = !!(held || padA || Object.keys(keys).length > 0);
-      if (on) { downFor += dt; t = downFor > TAP ? t + dt : t; } else { if (wasOn && !fired && downFor > 0 && downFor <= TAP + 0.08 && !navigator.webdriver) C.nextShot(); downFor = 0; fired = false; t = Math.max(0, t - dt * 3); }
+      if (on) { downFor += dt; t = downFor > TAP ? t + dt : t; } else { downFor = 0; if (!padA) fired = false; t = Math.max(0, t - dt * 3); }
+      if (padA) padFor += dt; else { if (padWas && padFor <= TAP + 0.08 && !fired && !C.first) C.nextShot(); padFor = 0; } padWas = padA;
       wasOn = on;
-      const b = btn(); if (b) { const pad = G.input && G.input.usingPad, touch = G.input && G.input.touch; b.textContent = pad ? '(A) next scene · hold to skip' : touch ? 'Tap: next scene · hold: skip' : 'Space: next scene · hold: skip'; const pc = Math.min(100, t / (NEED - TAP) * 100); b.style.background = pc > 0 ? 'linear-gradient(90deg, rgba(240,201,90,0.85) ' + pc + '%, rgba(20,16,24,0.7) ' + pc + '%)' : ''; b.style.color = pc > 45 ? '#1a1208' : ''; b.style.opacity = on ? 1 : ''; }
+      const b = btn(); if (b) { const pad = G.input && G.input.usingPad, touch = G.input && G.input.touch; b.textContent = C.first ? (pad ? 'Hold (A) to skip intro' : touch ? 'Hold to skip intro' : 'Hold Space to skip intro') : pad ? '(A) next scene · hold to skip' : touch ? 'Tap: next scene · hold: skip' : 'Space: next scene · hold: skip'; const pc = Math.min(100, t / (NEED - TAP) * 100); b.style.background = pc > 0 ? 'linear-gradient(90deg, rgba(240,201,90,0.85) ' + pc + '%, rgba(20,16,24,0.7) ' + pc + '%)' : ''; b.style.color = pc > 45 ? '#1a1208' : ''; b.style.opacity = on ? 1 : ''; }
       if (t >= NEED - TAP) { t = 0; held = 0; fired = true; downFor = 0; for (const kk in keys) delete keys[kk]; G.sfx('ui'); C.skip(); } }, 40); }
   C.update = function (dt, tt) {
     if (!C.active) return;
