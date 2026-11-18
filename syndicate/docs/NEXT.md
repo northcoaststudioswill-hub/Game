@@ -8,6 +8,11 @@ Last pushed build: see `git log` on `claude/wonderful-euler-4hchee`.
 
 ## 1. Decided
 
+Added in the latest round:
+- **Expeditions are turn-based**, not timers. Easier to manage and to test.
+- **The contract is forced past a death threshold.** Past a certain number of deaths the player cannot refuse David. The threshold is hidden; David does not reveal it until later, because he is sneaky about it.
+- **David is greedy and sneaky.** He rubs his hands together and laughs. Keep the greed visible in every scene he is in.
+
 - **Fight to the death.** A lost bout is a death, not a defeat with a fee.
 - **Revival by the Oracle of Time.** Death is not the end. **David Roseinbeirg**, a wizard, wills the fighter back and sends them forward. His goal for you is the realm itself: taking it from the bottom of the pit to the top.
 - **Roseinbeirg's prejudice.** He hates every race except the one you pick. He sees through you whatever your class or race (elf druid, dwarf fighter, tiefling sorcerer, and so on). He is a character and a voice, not a stat.
@@ -96,6 +101,28 @@ Design notes for expeditions (not yet decided):
 - Recovery frames: the fighter should visibly reset after a big swing.
 - Per-weapon idle stances (spear low, axe high, rapier light).
 
+## 5a. Gear: cheap and weak to awesome
+
+A ladder, not just tiers. Each class gets a line of sets from junk to legendary, with a visible step at each rung:
+1. **Junk** (free or near free): rusted, dented, a bad bonus. Bought from the market or dropped by the crowd.
+2. **Common** (the Fence): one clean bonus, a readable look.
+3. **Good** (Armoury and Outfitter): a full three-piece set bonus.
+4. **Fine** (deed or mastery reward): a set bonus that changes how you fight.
+5. **Awesome** (Roseinbeirg's contract, expeditions, or the Crown): a set with a signature effect and its own finisher.
+
+Rule: every rung should look different on the fighter, not just recolour.
+
+## 5b. Gore (more, and readable)
+
+- Limbs, heads and blood trails tied to hit location and damage, not random.
+- Stumps and wounds visible on the fighter as the fight goes on.
+- Gore scales with the blood setting. Blood off means smoke and sparks instead.
+
+## 5c. Finishers and unlockable specials
+
+- Four finishers per class (see section 5), plus at least one per druid and tiefling animal.
+- **Specials** unlock with deeds and mastery: one signature move per weapon family, separate from the mortal blow. A special is a learned trick you choose to carry, not a free button.
+
 ## 6. Progression work
 
 Current issues to fix before adding content:
@@ -107,6 +134,14 @@ Current issues to fix before adding content:
 Earlier ideas kept for later (from the retirement discussion, not active):
 - Gate access by respect and level, not all at once.
 - Codex entries that unlock when a system is first used.
+
+## 6a. Polish, world and intros
+
+- **Text clean-up:** one pass over every panel and label for length, consistency and typos. Keep voice distinct per character (Mark, the Keeper, the Wardens, David).
+- **Looks:** a visual pass on menus and the market at phone and widescreen sizes (see the widescreen text scaling already in place).
+- **World building:** more of the lower levels, the Oracle's cellar, and the expedition targets (villages, tribes, caravans).
+- **Intros:** short intro scenes for Roseinbeirg, the druid, the tiefling and the contract.
+- **Animations:** continue section 5 (idle, anticipation, impact, recovery, stances) and add finisher camera beats.
 
 ## 7. Controller checklist (before any feature is "done")
 
@@ -137,7 +172,9 @@ Note: LT does two jobs (parry and block). That is intended, but test it on a rea
 - Gear sets and the new classes will change the balance tables; re-run the four-class balance bot and the matchup test after each.
 - The fight-to-death rule itself is not yet implemented: current losses still cost a fifth of purse and do not kill the fighter. This is the first build item.
 
-## 9. Build order
+## 9. Build order (updated)
+
+The list below is the order to build; the gear, gore, specials, polish and intro work in 5a to 6a slots in after step 4.
 
 1. **Death and revival** (section 2), with the Oracle scene and Roseinbeirg's dialogue hooks (section 3).
 2. **Progression pass** (section 6): faster early levels, coin sinks, revival keeps the climb.
@@ -150,9 +187,9 @@ Note: LT does two jobs (parry and block). That is intended, but test it on a rea
 
 ## 10. Open questions for you
 
-7. Expeditions: real-time timers or a turn-based menu?
-8. Do raids change the endings, and can the player refuse David at all?
-9. Race effect: dialogue only, or a small mechanic too?
+7. Race effect: dialogue only, or a small mechanic too? (Still open.)
+8. How many deaths is the hidden threshold? (Decide the number; keep it hidden in the game.)
+9. Do raids change the endings? (Still open; the player cannot refuse David past the threshold.)
 
 1. Revival cost: coin, respect, gear, or only time?
 2. Does the fighter keep level, gear and mastery across a death, or only the class and name?
