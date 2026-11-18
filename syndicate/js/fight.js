@@ -209,6 +209,7 @@
     fx.push({ k: 'ring', x: P.x, y: P.y, r: 260, col: '#ffd36b', t: 0, life: 0.6 }); arena.setHype(1); if (G.rumble) G.rumble(260, 0.8);
     if (counted() && G.deeds) G.deeds.bump('frenzy');
   }
+  const heavyId = e => e.mastered && A[e.basic + '_m'] ? e.basic + '_m' : e.basic + '_h';      // a mastered weapon's heavy blow is its signature
   const TAUNT = { type: 'taunt', rec: 0.9, name: '' };
   const TAUNTS = ['COME ON, THEN!', 'IS THAT ALL?', 'LOOK AT ME!', 'WHO IS NEXT?', 'LOUDER!'];
   function taunt(e) {
@@ -811,8 +812,8 @@
     if (held && !P.chgUsed) {
       P.chg = (P.chg || 0) + (rdt || 0.016);
       if (P.state === 'idle' && !P.st.stun) { const was = P.charging || 0; P.charging = P.chg; if (was < 0.28 && P.chg >= 0.28) { G.sfx('ui'); spark(P.x, P.y, 40, '#ffe9a0', 10, 160); } } else P.charging = 0;
-      if (P.chg > 1.3) { I.queue.push(P.basic + '_h'); P.chgUsed = 1; P.charging = 0; }
-    } else if (!held) { if (P.chg > 0 && !P.chgUsed) I.queue.push(P.chg >= 0.28 && P.charging > 0 ? P.basic + '_h' : P.basic); P.chg = 0; P.charging = 0; P.chgUsed = 0; }
+      if (P.chg > 1.3) { I.queue.push(heavyId(P)); P.chgUsed = 1; P.charging = 0; }
+    } else if (!held) { if (P.chg > 0 && !P.chgUsed) I.queue.push(P.chg >= 0.28 && P.charging > 0 ? heavyId(P) : P.basic); P.chg = 0; P.charging = 0; P.chgUsed = 0; }
     const blk = k.ShiftLeft || k.ShiftRight || k.KeyX || In.mouse.rdown || In.touchBlk || !!(pad && pad.blk);
     if (blk && P.state === 'idle' && !P.st.stun && P.res > 0 && !P.charging) { if (!(P.guard > 0)) P.guardHits = 0; P.guard = 0.12; }
     while (In.pressed.length) {

@@ -7,7 +7,7 @@
 
   // ------------------------------------------------------------ a longer ladder
   // the named five are stronger now: you reach them with more levels behind you
-  { const LV = [1, 3, 5, 6, 8], HP = [1.05, 1.08, 1.14, 1.18, 1.24], DM = [1.05, 1.18, 1.26, 1.34, 1.42]; GATES.forEach((o, i) => { o.level = LV[i]; o.hpMul = +(o.hpMul * HP[i]).toFixed(2); o.dmgMul = +(o.dmgMul * DM[i]).toFixed(2); o.respect0 = o.respect; o.respect = Math.round(o.respect * 0.55); }); }   // respect is spread over four times as many bouts
+  { const LV = [1, 3, 5, 6, 8], HP = [1.05, 1.08, 1.14, 1.16, 1.08], DM = [1.05, 1.18, 1.26, 1.28, 1.16]; GATES.forEach((o, i) => { o.level = LV[i]; o.hpMul = +(o.hpMul * HP[i]).toFixed(2); o.dmgMul = +(o.dmgMul * DM[i]).toFixed(2); o.respect0 = o.respect; o.respect = Math.round(o.respect * 0.55); }); }   // respect is spread over four times as many bouts
 
   const rng = seed => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   const FIRST = ['Tam', 'Odger', 'Nell', 'Brisk', 'Hob', 'Cray', 'Wenna', 'Stitch', 'Lodd', 'Marnie', 'Pike', 'Sorrel', 'Duff', 'Ketch', 'Jory', 'Mab', 'Crick', 'Tansy', 'Garl', 'Ibb', 'Roon', 'Hesper'];

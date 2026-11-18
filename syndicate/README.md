@@ -257,3 +257,7 @@ The renderer caps resolution at 1.5x, redraws the shadow map every other frame, 
 - **More ways to raise it:** severing a limb, four different moves inside eight seconds (Showman), landing blows under 20% health (Last Breath).
 - **Mortal blows:** five per class, earned at ranks 0 to 4. Some behead, some leave nothing.
 - **Weapons:** five per class (30). Fifth weapons cost 480 at Underboss.
+
+## Balance pass (`js/tune.js`, `docs/BALANCE.md`)
+
+Weapons, classes and level-up choices were simulated and the outliers adjusted; the details are in `docs/BALANCE.md`. Also added: a **third technique to choose from at level 2** for every class, and **signature blows**: at mastery 5 a weapon's heavy blow gains an effect by family (stun, throw, double strike, slow, overcharge). The Armoury shows each one.
