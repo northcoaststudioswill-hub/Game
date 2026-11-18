@@ -74,8 +74,9 @@
   // ---------------- dialogue box with a portrait
   H.dialog = function (who, text) {
     const el = $('dialog');
-    if (!who) { el.classList.remove('show'); return; }
+    if (!who) { el.classList.remove('show'); SH.game.speaking = null; return; }
     const c = ST.CAST[who], narr = who === 'narr';
+    SH.game.speaking = narr ? null : who;
     el.classList.toggle('narr', narr);
     faceWho = narr ? null : (who === 'wren' && SH.game.mortal ? 'wren_m' : who); faceT = 0;
     if (!narr) $('d-face').src = SH.art.portraitURL(faceWho);

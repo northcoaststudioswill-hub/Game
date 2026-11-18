@@ -269,8 +269,11 @@
       ['wren', 'Look after each other. Lissa, plant your seeds. Nessa... eat something.'],
       ['nessa', 'Come back.'],
       ['wren', 'I will.'],
+      ['narr', 'He lifts her onto a white mare that was not there a moment ago. They ride east, into the oldest part of the wood.'],
+      { do: 'art', id: null },
+      { do: 'mode', name: 'flight', variant: 'wall' },
       { do: 'art', id: 'wall', title: 'The Wall' },
-      ['narr', 'They ride east through the snow until the night itself shimmers like a curtain: the Wall, the old line between the mortal lands and the fae.'],
+      ['narr', 'The night itself shimmers like a curtain: the Wall, the old line between the mortal lands and the fae. The mare does not slow.'],
       ['rowan', 'Nobody will hurt you on the other side. You have my word.'],
       ['wren', 'You just took me from my home.'],
       ['rowan', '...Yes. I did.'],
@@ -353,7 +356,41 @@
       ['caelum', 'Then don\'t jump. Move like a shadow does. Fast, and all at once.'],
     ],
     deep_thorns: [
-      ['queen', 'My thorns remember mortals. They remember how you bleed.'],
+      ['queen', 'My thorns remember mortals. They remember how you bleed. And my gardeners are hungry.'],
+      ['caelum', 'They are only sprites. You have a knife and you have skinned worse. Cut them.'],
+    ],
+    deep_caelum: [
+      { do: 'flag', name: 'd_caelum' },
+      ['caelum', 'Don\'t look straight at me. She watches who I look at.'],
+      ['wren', 'You wear her colours. You stand at her shoulder.'],
+      ['caelum', 'I am her favourite. It is the worst thing I have ever been, and the most useful.'],
+      { choose: [
+        { text: '"Then why help me?"', bond: { caelum: 10 }, why: 'Nobody has asked him why in fifty years.', then: [
+          ['caelum', 'Because you walked in here on purpose. For someone else. I had forgotten people could do that.'],
+        ] },
+        { text: '"I don\'t trust you."', bond: { caelum: 5 }, why: 'He would have thought less of her if she did.', then: [
+          ['caelum', 'Good. Don\'t. Trust the bargain on your wrist: it cannot lie, even when I do.'],
+        ] },
+      ] },
+      ['caelum', 'Fifty years she has held seven courts in this hole. Every High Lord. She makes us watch each other kneel.'],
+      ['caelum', 'She keeps the letter of her word, Wren, and nothing else. Remember that when she smiles. Now go. The wall ahead is taller than it looks.'],
+    ],
+    deep_rowan: [
+      { do: 'flag', name: 'd_rowan' },
+      ['rowan', 'Wren. No. You were supposed to stay behind my walls. I gave orders.'],
+      ['wren', 'You gave a great many orders. I climbed the wall.'],
+      ['narr', 'The cage is woven thorn. Where his hands have gripped it, they are bleeding.'],
+      { choose: [
+        { text: '"I came to get you out."', remember: ['rowanCame', 'Told Rowan, through the bars, that she came for him.', true], then: [
+          ['rowan', 'Nobody comes for a High Lord. We are the ones who come.'],
+          ['wren', 'Then it was past time somebody did.'],
+        ] },
+        { text: '"A life for a life. That\'s your law. I\'m paying it."', remember: ['rowanDebt', 'Told Rowan she came to pay a debt, nothing more.', null], then: [
+          ['rowan', 'You owe me nothing. You never did. I only did not know how else to keep you.'],
+        ] },
+      ] },
+      ['rowan', 'Whatever she offers you at the end, do not take it. Run. Leave me.'],
+      ['wren', 'I am very bad at being told what to do. Ask my sisters.'],
     ],
     deep_chase: [
       { do: 'flag', name: 'maze' },

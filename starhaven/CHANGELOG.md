@@ -1,5 +1,38 @@
 # Starhaven — Changelog
 
+## v0.1.6 — the square in depth, people in the Deep, the ride to the Wall (Nov 18, 2026)
+Will: there is stiffness in certain characters and areas; the place where you pick who to stay with needs to look
+2D in a 3D space, with lore; do the not-done list; deepen the Queen's section and add things between beats; the
+story scenes have to look good; art styles can mix.
+
+- **The Lamp Square is a place now.** The evening where you choose who to spend time with is redrawn as a flat
+  square seen in depth: the ground runs away to lit house fronts, houses come down each side, lantern strings cross
+  overhead, and everyone is drawn larger the nearer they stand. Townsfolk walk through it. You look through an arch.
+- **Three things to look at in the square**, each with Wren's words and its own journal page: the First Lamp, the
+  Stone of Names, the Star Well. Looking is optional; you can still walk straight to someone.
+- **The Deep has people in it.** Caelum stands in the dark near the first lantern, and Rowan is in a cage of woven
+  thorn before the thorns. Both can be spoken to, both have a choice (Caelum's moves his bond; Rowan's is remembered
+  and writes a journal page), and both foreshadow how the Queen keeps her word. Neither is required.
+- **The first fight is in the Deep.** Two of the Queen's thorn sprites wait past the thorns, before the chase, so
+  Wren has cut something before Bram's Ring. The Ring then teaches the harder moves instead of the first swing.
+- **A second scene like the flight: the ride to the Wall.** After the stag, Wren rides behind Rowan on a white mare,
+  into the screen, through winter pines toward a curtain of light. About 28 seconds. Steer round the pines, gather
+  wisps. Rowan explains the Wall, the old war and the seven courts on the way, where a block of narration used to be.
+- **The flight has speed streaks**, and its caption boxes (and the square's) now grow to fit their words.
+- **Characters are less stiff.** Everyone drawn as a sprite breathes, sways a little, shifts their weight now and
+  then, and moves their mouth and nods while their line is being typed.
+
+Not done:
+- The Deep is richer but not longer: I added people and a fight inside the existing layout rather than new rooms.
+- Ashes (Chapter 1) is unchanged: still a walk, a mural and one errand. It is the thinnest chapter now.
+- Iris's vision scene is still the old plain one.
+- Moving the whole combat tutorial under the Queen: I moved the first swing only. Bram still teaches combo, rising
+  strike, dash strike and guard, because by then Wren is fae and the story has a reason for her to be trained.
+- The bow bug from the start of the game is still not found.
+
+Tests: feel 58/58 (two runs), menus 19/19, smoke and a 6,000-frame random-input run with no errors. The square, the
+ride and the cage checked in screenshots. Not yet played by hand or on a phone.
+
 ## v0.1.5 — guard, lessons for every move, sunken thorns, a victory (Nov 18, 2026)
 Will, after playing v0.1.4: needs an up hit, a dash hit and a block; italic text is hard to read; scenes that are
 nothing and blobs; thorns should be recessed; more time after a hit; a success sequence after the wyrm.

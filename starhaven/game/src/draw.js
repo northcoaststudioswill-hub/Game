@@ -394,6 +394,10 @@
 
   // Each prop draws at (x, y) where y is the ground (or the ceiling, for hanging things).
   const PROPS = {
+    cage(g, x, y) {   // a cage of woven thorn, hung from the roof on a chain
+      g.fillStyle = '#1a1c22'; g.fillRect(x - 1, y - 150, 2, 92); g.fillStyle = '#2a0e1a'; g.fillRect(x - 22, y - 60, 44, 4); g.fillRect(x - 22, y - 2, 44, 3);
+      for (let i = 0; i < 6; i++) { g.fillStyle = i % 2 ? '#3a1226' : '#4a1830'; g.fillRect(x - 21 + i * 8, y - 58, 2, 57); g.fillStyle = '#ff4a5a'; if (i % 2) g.fillRect(x - 21 + i * 8, y - 40 + i * 4, 2, 2); }
+      g.fillStyle = '#2a0e1a'; g.beginPath(); g.moveTo(x - 22, y - 60); g.lineTo(x, y - 74); g.lineTo(x + 22, y - 60); g.fill(); },
     log(g, x, y, p) { const w = (p.w || 2) * SH.TILE, h = SH.TILE; g.fillStyle = '#4a3020'; g.fillRect(x, y, w, h); g.fillStyle = '#5e3e28'; for (let i = 3; i < h; i += 6) g.fillRect(x + 4, y + i, w - 8, 2);
       g.fillStyle = '#7a5636'; g.beginPath(); g.ellipse(x + w - 3, y + h / 2, 5, h / 2, 0, 0, Math.PI * 2); g.fill(); g.strokeStyle = '#4a3020'; g.beginPath(); g.ellipse(x + w - 3, y + h / 2, 2.5, h / 4, 0, 0, Math.PI * 2); g.stroke();
       g.fillStyle = '#ffffff'; g.fillRect(x, y, w - 4, 3); g.fillRect(x + 6, y + 3, 10, 2); },

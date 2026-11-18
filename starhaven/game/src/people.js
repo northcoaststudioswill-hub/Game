@@ -135,8 +135,12 @@
       ctx.strokeStyle = '#ffe9a8'; ctx.globalAlpha = 0.7; ctx.beginPath(); ctx.moveTo(x + f * 6, y - 20);
       ctx.bezierCurveTo(x + f * 16, y - 34 + Math.sin(t * 0.05) * 4, x + f * 22, y - 10, x + f * 30, y - 26); ctx.stroke(); ctx.globalAlpha = 1;
     }
-    ctx.save(); ctx.translate(x, y); ctx.scale(f, 1);
-    ctx.drawImage(s, frame * W, 0, W, H, -FX, -FY, W, H);
+    const talking = SH.game && SH.game.speaking === n.id && SH.game.hud && SH.game.hud.typing && SH.game.hud.typing();
+    const breathe = n.still ? 1 : 1 + 0.02 * Math.sin(t * 0.055 + seed), sway = n.still ? 0 : Math.sin(t * 0.021 + seed * 2) * 0.018;
+    const shift = n.still ? 0 : ((t + seed * 5) % 520 < 40 ? Math.round(Math.sin(((t + seed * 5) % 520) / 40 * Math.PI) * 2) : 0);
+    const nod = talking ? Math.round(Math.abs(Math.sin(t * 0.3)) * 1.5) : 0;
+    ctx.save(); ctx.translate(x + shift * f, y); ctx.rotate(sway + (talking ? Math.sin(t * 0.15) * 0.02 : 0)); ctx.scale(f, breathe);
+    ctx.drawImage(s, (talking ? (Math.floor(t / 7) % 2) : frame) * W, 0, W, H, -FX, -FY - nod, W, H);
     ctx.restore();
     // name plate and bubbles
     if (n.near || n.bubble) {

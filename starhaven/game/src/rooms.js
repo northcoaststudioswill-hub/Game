@@ -88,7 +88,10 @@
       { x0: 17, x1: 31, text: 'Jump with {JUMP}. Hold it to jump higher, tap it for a small hop.' },
       { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.' },
       { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.' },
-      { x0: 80, x1: 85, text: 'Thorns hurt. Jump over them.' },
+      { x0: 44, x1: 52, text: 'Someone is standing in the dark. {TALK} if you want to.', until: 'd_caelum' },
+      { x0: 76, x1: 80, text: 'Rowan. {TALK} to him through the bars.', until: 'd_rowan' },
+      { x0: 80, x1: 85, text: 'Thorns hurt. Jump over them. Her gardeners are waiting on the far side.' },
+      { x0: 86, x1: 92, text: 'The Queen\'s gardeners. Cut them with {ATTACK}. They glow before they lunge: step back, then cut.', until: 'maze' },
       { x0: 88, x1: 94, text: 'The last trial is just ahead, and there is no way back. {LEFT} Starlight still behind you.', until: 'maze', motesLeft: true },
       { x0: 94, x1: 104, text: 'RUN. Keep moving right and jump the gaps.' },
     ],
@@ -101,7 +104,9 @@
       { x: 143, script: 'deep_end' },
     ],
     lanterns: [{ x: 4, lit: true }, { x: 47 }, { x: 79 }, { x: 93 }],
+    npcs: [{ id: 'caelum', x: 49, from: 6, optional: 'deep_caelum' }, { id: 'rowan', x: 77.6, from: 6, optional: 'deep_rowan' }],   // from: look for the floor below the roof
     props: [
+      { t: 'cage', x: 77.6, from: 6 },
       { t: 'bones', x: 10 }, { t: 'bones', x: 38 }, { t: 'bones', x: 58 }, { t: 'bones', x: 90 }, { t: 'bones', x: 112 }, { t: 'bones', x: 133 },
       { t: 'shroom', x: 16 }, { t: 'shroom', x: 28 }, { t: 'shroom', x: 47.5 }, { t: 'shroom', x: 63 }, { t: 'shroom', x: 78 }, { t: 'shroom', x: 100 }, { t: 'shroom', x: 122 }, { t: 'shroom', x: 141 },
       { t: 'chain', x: 12, len: 5 }, { t: 'chain', x: 36, len: 3 }, { t: 'chain', x: 70, len: 6 }, { t: 'chain', x: 96, len: 4 }, { t: 'chain', x: 128, len: 3 },
@@ -111,8 +116,9 @@
       ['arc', 84, 89, 14.4, 2.6], ['line', 97, 103, 14.6], ['arc', 103.5, 107.5, 14.4, 2.6], ['line', 109, 116, 14.6], ['arc', 125.5, 130.5, 12.6, 2.2], ['arc', 136, 141, 14.4, 2.6]],
     exitLight: 145,
     chase: { from: 94, wyrmX: 80, speed: 2.7 },
-    npcs: [], gates: [{ id: 'riddlegate', x: 21, top: 6 }],
-    spawns: [{ kind: 'altar', what: 'secret', x: 9, y: 16 }, { kind: 'altar', what: 'seed', x: 13, y: 16 }, { kind: 'altar', what: 'grief', x: 17, y: 16 }],
+    gates: [{ id: 'riddlegate', x: 21, top: 6 }],
+    spawns: [{ kind: 'altar', what: 'secret', x: 9, y: 16 }, { kind: 'altar', what: 'seed', x: 13, y: 16 }, { kind: 'altar', what: 'grief', x: 17, y: 16 },
+      { kind: 'thornSprite', x: 89.6, y: 16, respawn: false }, { kind: 'thornSprite', x: 92.2, y: 16, respawn: false }],   // the Queen's gardeners: the first things Wren ever cuts
   };
 
   // ---------------------------------------------------------------- Chapter 1: Ashes (walk, talk, first mural, no enemies)

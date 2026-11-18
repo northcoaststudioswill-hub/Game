@@ -31,9 +31,13 @@ link Will has. Hold your phone either way up.
 Between chapters there are **evenings**: choose who to spend the night with (Caelum, Bram, Iris or Thane) for scenes,
 gifts and bond hearts.
 
-## Playtest build: v0.1.5 (Nov 18, 2026)
+## Playtest build: v0.1.6 (Nov 18, 2026)
 
-The newest build: [`releases/v0.1.5/`](releases/v0.1.5/RELEASE-NOTES.md), with `starhaven-v0.1.5-share.zip` to send.
+The newest build: [`releases/v0.1.6/`](releases/v0.1.6/RELEASE-NOTES.md), with `starhaven-v0.1.6-share.zip` to send.
+It redraws the Lamp Square in depth with three things to read, puts Caelum, Rowan and a first fight in the Deep,
+adds the ride to the Wall as a second into-the-screen scene, and makes the cast breathe and talk.
+
+Before it, v0.1.5 ([notes](releases/v0.1.5/RELEASE-NOTES.md)):
 It adds a guard and parry, an up-strike button, four lessons in the Ring, thorns sunk into the floor, a victory
 sequence after the Old Wyrm, upright narration and four repainted story scenes.
 

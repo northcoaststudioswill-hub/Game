@@ -68,7 +68,7 @@
     const player = new SH.Player(def.start.x * TS + TS / 2, def.start.y * TS);
     const things = def.spawns.map(s => SH.makeSpawn(s, room));
     const lanterns = def.lanterns.map(l => ({ ...l, px: l.x * TS + TS / 2, py: room.groundY(l.x, 0), lit: !!l.lit }));
-    const npcs = def.npcs.map(n => ({ ...n, x: n.x * TS + TS / 2, y: room.groundY(Math.floor(n.x), 0), facing: -1, near: false }));
+    const npcs = def.npcs.map(n => ({ ...n, x: n.x * TS + TS / 2, y: room.groundY(Math.floor(n.x), n.from || 0), facing: -1, near: false }));
     const gates = def.gates.map(g => ({ ...g, lift: g.open ? 1 : 0 }));
     const w = {
       room, player, things, lanterns, npcs, gates, input, motes: room.motes,
@@ -266,7 +266,8 @@
       if (st.do === 'mode') {   // another way of seeing: the script waits for it, then carries on
         const sc0 = sc;
         SH.modes.start(st.name, st, r => {
-          if (st.name === 'flight' && r) { G.bond('caelum', r.stars >= 14 ? 10 : 5, r.stars >= 14); G.hud.toast('Starlight gathered on the wing: ' + r.stars + (r.stars >= 14 ? '. Caelum noticed.' : '.')); }
+          if (st.name === 'flight' && st.variant === 'wall') { if (r && r.stars) { SH.xp.gain(Math.min(20, r.stars)); G.hud.toast('Wisps gathered on the ride: ' + r.stars + '.'); } }
+          else if (st.name === 'flight' && r) { G.bond('caelum', r.stars >= 14 ? 10 : 5, r.stars >= 14); G.hud.toast('Starlight gathered on the wing: ' + r.stars + (r.stars >= 14 ? '. Caelum noticed.' : '.')); }
           const nx = sc0.steps[sc0.i];
           if (typeof r === 'number' && nx && nx.choose) { sc0.i++; G.choosing = nx.choose; return G.pick(Math.min(r, nx.choose.length - 1)); }
           G.advance();
@@ -378,6 +379,7 @@
     if (w.met) return pr.met.includes(w.met);
     if (w.pts) return !!pr.bonds[w.pts[0]] && pr.bonds[w.pts[0]].pts >= w.pts[1];
     if (w.mem) return !!(pr.mem && pr.mem[w.mem]);
+    if (w.seen) return !!(pr.seen && pr.seen[w.seen]);
     return false;
   };
   G.loreCheck = function (quiet) {

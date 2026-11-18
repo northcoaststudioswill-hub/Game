@@ -515,6 +515,27 @@ const path = require('path');
       check('Thorns are sunk into the floor: you can stand right at the edge unhurt, and are only hurt by going in', sunk && walkedUpSafe && q.hearts === 4, { sunk, walkedUpSafe, hearts: q.hearts });
     })();
 
+    // The square in depth, the ride to the Wall, and the Deep's prisoners
+    (function () {
+      const M = SH.modes;
+      SH.test.load(3, { story: false, modes: true }); let done = null;
+      M.start('city', { spots: [{ who: 'caelum', label: 'a' }, { who: 'bram', label: 'b' }] }, r => { done = r; });
+      let read = false, i = 0;
+      while (M.cur && i++ < 900) { const st = M.cur.s, held = {}; let press = null;
+        if (!st.read.sq_names) { if (st.x > 114) held.left = true; else if (st.x < 108) held.right = true; if (st.y > 232) held.up = true; if (st.lore === 1 && i % 10 === 0) press = ['jump']; }
+        else { read = true; const t = st.spots[0]; if (t.x < st.x - 3) held.left = true; else if (t.x > st.x + 3) held.right = true; if (t.y + 34 < st.y - 3) held.up = true; if (st.near === 0) press = ['jump']; }
+        step(held, press); }
+      G.loreCheck(true);
+      check('The Lamp Square: three things to look at, each writes a journal page; then you walk up to someone', read && done === 0 && !!G.progress.seen.sq_names && !!G.progress.lore.sq_names, { read, done, page: !!G.progress.lore.sq_names });
+      SH.test.load(0, { story: false, modes: true }); let rode = null;
+      M.start('flight', { variant: 'wall' }, r => { rode = r; });
+      const v = M.cur.s.v; let f = 0; while (M.cur && f++ < 2200) step({ left: f % 300 < 80, right: f % 300 > 220 }, null);
+      check('The ride to the Wall: a second into-the-screen scene with its own lines, about 28 seconds', v === 'wall' && rode && f > 1600 && f < 1800, { v, frames: f, wisps: rode && rode.stars });
+      SH.test.load('deep', { story: false }); const w = G.world;
+      const who = w.npcs.map(n => n.id), sprites = w.things.filter(e => e.kind === 'thornSprite').length;
+      check('The Deep: Caelum in the dark and Rowan in his cage can be spoken to, and the Queen\'s gardeners are the first fight', who.includes('caelum') && who.includes('rowan') && sprites === 2 && !!SH.STORY.SCRIPTS.deep_rowan && !!SH.STORY.SCRIPTS.deep_caelum, { who, sprites });
+    })();
+
     // New moves: dash strike, rising strike, flame wave
     (function () {
       SH.test.load('mountain', { story: false }); const p = P(), w = G.world;
