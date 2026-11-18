@@ -21,7 +21,7 @@
   // ============================================================== the Lamp Market
   W.hubLife = function (s, obstacles) {
     const iron = L(0x1c1a1e), woodD = L(0x3a2616), wood = L(0x5a3c24);
-    // ---- the Wisp Table: Mark's dice booth, east side
+    // ---- the Wisp Table: Marc's dice booth, east side
     const BX = 30.9, BZ = 6.2, booth = new T.Group(); booth.position.set(BX, 0, BZ); s.add(booth);
     box(3.6, 0.04, 3.4, L(0x143a2c), -0.3, 0.02, 0, booth).castShadow = false; box(3.2, 0.045, 3.0, L(0x1f5a3a), -0.3, 0.02, 0, booth).castShadow = false;
     box(0.7, 1.0, 2.6, woodD, 0.2, 0.5, 0, booth); box(0.85, 0.08, 2.75, L(0x1f5a3a), 0.2, 1.04, 0, booth); box(0.9, 0.05, 2.8, L(0xd9a93c), 0.2, 0.98, 0, booth);
@@ -84,7 +84,7 @@
     const WARD = ['Seal.', 'Nobody climbs.', 'By order of the throne.', 'Step back from the gate.'];
     let wardT = 8;
     const NOTES = [0xffd36b, 0xc79bff, 0x8ad0ff, 0xff9ac0];
-    const ARG = ['Three to one! On GRUBB!', 'You are robbing me.', 'Mark said it was a sure thing.', 'Mark says everything is a sure thing.', 'I had it. I HAD it.'];
+    const ARG = ['Three to one! On GRUBB!', 'You are robbing me.', 'Marc said it was a sure thing.', 'Marc says everything is a sure thing.', 'I had it. I HAD it.'];
     let argT = 5, last = 0;
     // ---- the rest of the Undercity, falling away below the market: roofs, windows and far lamps in the dark
     { const under = s.children.find(c => c.isMesh && c.geometry.type === 'PlaneGeometry' && c.geometry.parameters.width === 200); if (under) { under.scale.set(38 / 200, 26 / 200, 1); under.position.set(16.5, -0.3, 10.5); } }       // let the dark below the market show
@@ -139,7 +139,7 @@
     const bxL = new T.PointLight(0xc79bff, 9, 9, 1.6); bxL.position.set(0, 3.4, 0.8); bx.add(bxL);
     // ---- eyes behind the gate bars
     const eyes = [[-0.45, 1.3], [0.5, 1.0], [0.1, 1.75]].map(q => { const g = new T.Group(), p = at(0.5, q[0], q[1]); g.position.set(p[0], p[1], p[2]); g.rotation.y = rotY; [-0.07, 0.07].forEach(x => { const e = new T.Mesh(new T.SphereGeometry(0.03, 5, 4), emis(0xff5030)); e.position.x = x; g.add(e); }); s.add(g); return { g, t: R(0, 4) }; });
-    // ---- Mark's odds board on the left wall, and gibbets hung from the vault
+    // ---- Marc's odds board on the left wall, and gibbets hung from the vault
     { const wxn = -1, wmx = -AR, p = [wmx - wxn * 0.56, 2.3, 1.3], g = new T.Group(); g.position.set(p[0], p[1], p[2]); g.rotation.y = Math.PI / 2; s.add(g); box(1.7, 1.3, 0.08, woodD, 0, 0, 0, g); for (let i = 0; i < 4; i++) { box(R(0.7, 1.3), 0.05, 0.02, L(0xdccba3), -0.1, 0.42 - i * 0.24, 0.05, g); box(0.16, 0.08, 0.02, L(i % 2 ? 0x9aff8a : 0xff7a6a), 0.68, 0.42 - i * 0.24, 0.05, g); } box(1.8, 0.1, 0.12, L(0x1f5a3a), 0, 0.7, 0.02, g); }
     const cages = [[-5.2, -2.4, 6.6], [-2.2, -5.4, 7.2], [3.8, -6.4, 6.9]].map((q, i) => {
       const g = new T.Group(); g.position.set(q[0], q[2] + 3.4, q[1]); s.add(g); const c = new T.Group(); c.position.y = -3.4; g.add(c);

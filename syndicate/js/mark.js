@@ -1,4 +1,4 @@
-// Guttercrown — Mark of the Long Odds: the Undercity's bookie. Dice, coin, and a card of undercard bouts
+// Guttercrown — Marc of the Long Odds: the Undercity's bookie. Dice, coin, and a card of undercard bouts
 // that are fought (simulated) while you are in the pit.
 (function () {
   const G = window.G, ui = G.ui, pick = a => a[Math.floor(Math.random() * a.length)], d6 = () => 1 + Math.floor(Math.random() * 6);
@@ -49,7 +49,7 @@
 
   ui.mark = function (line) {
     const st = G.state;
-    show('<div class="card small"><h2>Mark of the Long Odds</h2>' + head(line || (Math.random() < 0.3 ? say('high') : say('hello'))) +
+    show('<div class="card small"><h2>Marc of the Long Odds</h2>' + head(line || (Math.random() < 0.3 ? say('high') : say('hello'))) +
       '<div class="choices"><button id="c1"><b>Tonight’s card</b><small>Bet on the undercard bouts. They are fought while you are in the pit.</small></button>' +
       '<button id="c2"><b>High Bones</b><small>Two dice each. Highest pair of bones takes the pot. You may press your luck once.</small></button>' +
       '<button id="c3"><b>Crown or Skull</b><small>Call the coin. Double it, then decide whether to let it ride.</small></button></div>' +
@@ -69,14 +69,14 @@
     });
     h += '<div class="bout self"><div class="bside sel"><b>Yourself</b><small>against ' + so.opp.name + ' · pays ' + so.odds.toFixed(2) + 'x</small></div>' +
       (c.self ? '<p class="bbet">' + c.self.stake + ' coin on yourself to win your next bout.</p>' : '<div class="row bst">' + stakes(G.mark.funds()).map(v => '<button class="mini" data-self="' + v + '">' + v + ' on me</button>').join('') + '</div>') + '</div>';
-    h += '<p class="dim">Bets are settled when your next bout ends, win or lose. Mark keeps a cut of every payout.</p><div class="row end"><button id="b">Back</button><button class="big" id="x">Done</button></div></div>';
+    h += '<p class="dim">Bets are settled when your next bout ends, win or lose. Marc keeps a cut of every payout.</p><div class="row end"><button id="b">Back</button><button class="big" id="x">Done</button></div></div>';
     show(h); port(); on('#x', leave); on('#b', () => ui.mark());
     on('[data-bet]', el => { const p = el.dataset.bet.split(':'), b = c.bouts[+p[0]], v = +p[2]; if (G.mark.funds() < v) return; G.mark.take(v); b.bet = { pick: p[1], stake: v }; G.save(); G.sfx('coin'); ui.markCard('Locked in. No refunds, bro. I checked, there is a rule.'); ui.topbar(); });
     on('[data-self]', el => { const v = +el.dataset.self; if (G.mark.funds() < v) return; G.mark.take(v); c.self = { stake: v, odds: so.odds }; G.save(); G.sfx('coin'); ui.markCard(say('self')); ui.topbar(); });
   };
   ui.markReport = function () {
     const st = G.state, r = st.markReport; st.markReport = null; G.save();
-    show('<div class="card small"><h2>Mark Settles Up</h2>' + head(r.net > 0 ? say('win') : r.net < 0 ? say('lose') : 'Dead even. Weird. I do not like it.') +
+    show('<div class="card small"><h2>Marc Settles Up</h2>' + head(r.net > 0 ? say('win') : r.net < 0 ? say('lose') : 'Dead even. Weird. I do not like it.') +
       r.lines.map(l => '<div class="ab-row"><div class="ab-tx"><p>' + l.text + '</p>' + (l.res ? '<small class="rew">' + l.res + '</small>' : '') + '</div></div>').join('') +
       '<p class="rankup">' + (r.net >= 0 ? 'Up ' + r.net : 'Down ' + (-r.net)) + ' coin on the night.</p><div class="row end"><button class="big" id="x">Carry on</button></div></div>');
     port(); G.sfx(r.net > 0 ? 'coin' : 'deny'); on('#x', () => { ui.close(); ui.topbar(); ui.afterFight(); });

@@ -242,9 +242,10 @@
   const counted = () => phase === 'fight' && !F.ex && !opp.spar && G.deeds;
   function poiseHit(e, v, by) {
     if (!e.maxPoise || e.st.broken || e.state === 'ko' || e.hp <= 0 || F.ex) return;
-    e.poise -= v; e.poiseT = 1.8;
+    if ((e.braceT || 0) > time) v *= 0.4;                 // just been broken: braced, and much harder to break again
+    e.poise -= v; e.poiseT = v >= 20 ? 1.8 : 0.9;         // a light tap interrupts recovery only briefly
     if (e.poise > 0) return;
-    e.poise = e.maxPoise; e.st.stun = { t: 1.3 }; e.st.broken = { t: 1.7 }; interrupt(e); e.guard = 0; e.charging = 0;
+    e.poise = e.maxPoise; e.braceT = time + 6; e.st.stun = { t: 1.3 }; e.st.broken = { t: 1.7 }; interrupt(e); e.guard = 0; e.charging = 0;
     text(e, 'POSTURE BROKEN', '#ffb070', true); G.sfx('stun'); G.sfx('clang'); shake = Math.max(shake, 12); hitstop = Math.max(hitstop, 0.14); slowT = Math.max(slowT, 0.2);
     fx.push({ k: 'ring', x: e.x, y: e.y, r: 130, col: '#ffb070', t: 0, life: 0.45 });
     if (by && by.isPlayer) { addHype(12); if (counted()) G.deeds.bump('break'); }
@@ -472,7 +473,7 @@
     if (tag && att.isPlayer) { text(tgt, tag, '#ffd23c', true); addHype(6); }
     if (tag === 'COUNTER' && tgt.act && !tgt.act.ab.armor) interrupt(tgt);
     tgt.hurt = 0.28;
-    if (real) { poiseHit(tgt, (ab.heavy ? 60 : ab.basic ? 15 : 28) * (ab.pz || 1) * (crit ? 1.3 : 1), att); if (ab.heavy && att.isPlayer && counted()) G.deeds.bump('heavy'); }
+    if (real) { poiseHit(tgt, (ab.heavy ? 60 : ab.basic ? 9 : 28) * (ab.pz || 1) * (crit ? 1.3 : 1), att); if (ab.heavy && att.isPlayer && counted()) G.deeds.bump('heavy'); }
     const wt = Math.min(1, dmg / Math.max(1, tgt.maxHp) * 5), ha = o.from != null ? o.from : Math.atan2(tgt.y - att.y, tgt.x - att.x);       // weight: how much of them this blow took
     tgt.flash = 0.12; hitstop = Math.max(hitstop, (crit ? 0.13 : 0.065) + wt * 0.07); shake = Math.max(shake, (crit ? 12 : 5) + wt * 6);
     if (real && dmg > 0) {
@@ -787,6 +788,8 @@
       }
     }
     I.mx = mx; I.my = my;
+    // a fighter does not stand and be shot at: close the distance in a rush
+    if (!e.C.ranged && foe.C && foe.C.ranged && !e.crawl && seen && d > 240 && e.state === 'idle' && !e.rest && e.res > 30 && time - (e.rushT || -9) > 4.5 && ai.aggro > 0.6 && Math.random() < dt * (0.3 + ai.aggro * 0.6)) { e.rushT = time; I.mx = ux; I.my = uy; I.queue.push('dodge'); }
     if (seen && foe.state === 'wind' && foe.act && !foe.act.seen) {
       foe.act.seen = 1; const ab = foe.act.ab;
       const threat = ab.type === 'melee' ? d < ab.range + (ab.lunge || 0) + 30 : ab.type === 'line';
@@ -799,24 +802,25 @@
     if (e.res < 22) e.rest = 1; else if (e.res > 55) e.rest = 0;
     if (foe.guard > 0 && d < 140) e.combo = 0;                                            // do not chip at a raised guard: go through it
     if (!e.C.ranged && e.poise < e.maxPoise * 0.3 && d < 150 && foe.state !== 'recover' && !foe.st.stun) { I.mx = -ux; I.my = -uy; }
-    const open = seen && (foe.state === 'recover' || (foe.state === 'parry' && foe.parryT <= 0) || !!foe.st.stun), turtled = foe.state === 'parry' && foe.parryT > 0;
+    const open = seen && (foe.state === 'recover' || (foe.state === 'parry' && foe.parryT <= 0) || !!foe.st.stun || !!foe.st.winded), turtled = foe.state === 'parry' && foe.parryT > 0;
     if (e.rest && !e.C.ranged && d < 150) { I.mx = -ux; I.my = -uy; e.combo = 0; }
     if (turtled) e.combo = 0;
     if (open && !e.rest && e.state === 'idle' && d < A[e.basic].range + 30 && e.punT !== foe.act) { e.punT = foe.act || time; if (Math.random() < ai.aggro * 0.4 + 0.1) { e.combo = Math.max(e.combo, 2); const big = e.kit.find(id => A[id].type === 'melee' && !A[id].heal && canUse(e, id)); if (big && Math.random() < ai.aggro * 0.7) I.queue.push(big); } }
+    if (e.hurt > 0.2 && !e.rest && !turtled && e.state === 'idle' && d < A[e.basic].range + 14 && foe.guard <= 0) e.combo = Math.max(e.combo, 2);      // struck: strike back, do not stand and take it
     e.think -= dt;
     if (e.combo > 0 && !turtled && !e.rest && e.state === 'idle' && d < A[e.basic].range + 14) I.attack = true;
     if (e.think <= 0 && e.state === 'idle') {
-      e.think = ai.react * rand(0.6, 1.4);
+      e.think = ai.react * rand(0.6, 1.4) * (d < 130 && !foe.C.ranged ? 0.72 : 1);      // toe to toe with another brawler, they do not wait their turn
       if (!seen || e.rest || turtled) return;
-      if (ai.guard && (foe.mash || 0) >= 3 && d < 115 && Math.random() < ai.guard) { e.guard = 1.3; e.guardHits = 0; e.combo = 0; return; }
+      if (ai.guard && (foe.mash || 0) >= 3 && d < 115 && Math.random() < Math.min(0.92, ai.guard + 0.35)) { e.guard = 1.3; e.guardHits = 0; e.combo = 0; return; }
       const healId = e.kit.find(id => A[id].heal && canUse(e, id) && inRange(e, A[id], d));
       if (healId) { I.queue.push(healId); return; }
       if (e.ult && canUse(e, e.ult) && (e.hp < e.maxHp * 0.75 || foe.hp < foe.maxHp * 0.6) && inRange(e, A[e.ult], d)) { I.queue.push(e.ult); return; }
       const c = e.kit.filter(id => !A[id].heal && canUse(e, id) && inRange(e, A[id], d));
       if (c.length && Math.random() < ai.aggro) { I.queue.push(G.pick(c)); return; }
-      { const hv = e.basic + '_h', hb = A[hv]; if (hb && canUse(e, hv) && (hb.type === 'melee' ? d < hb.range + 46 : d < 420) && (foe.guard > 0 || foe.st.stun || foe.st.broken || Math.random() < ai.aggro * 0.2)) { I.queue.push(hv); return; } }
+      { const hv = e.basic + '_h', hb = A[hv]; if (hb && canUse(e, hv) && (hb.type === 'melee' ? d < hb.range + 46 : d < 420) && (foe.guard > 0 || foe.st.stun || foe.st.broken || foe.st.winded || Math.random() < ai.aggro * 0.32)) { I.queue.push(hv); return; } }
       const b = A[e.basic];
-      if (b.type === 'melee') { if (d < b.range + 14) e.combo = 1 + Math.floor(Math.random() * 3); }
+      if (b.type === 'melee') { if (d < b.range + 14) e.combo = 1 + Math.floor(Math.random() * 3) + (ai.aggro > 0.6 ? 1 : 0); }
       else if (d < 480 && Math.random() < 0.5 + ai.aggro * 0.5) I.attack = true;
     }
     if (e.state === 'wind' && e.act && e.act.ab.basic && e.combo > 0 && !e.act.counted) { e.act.counted = 1; e.combo--; }

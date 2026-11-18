@@ -21,10 +21,10 @@ phone portrait, phone landscape, or a desktop monitor.
   Undercity, the Deep Guild's Blood Ledger, the champion and your debt. It plays when you start a new fighter and can be
   replayed from the title menu.
 - **Three places you walk around:** the Lamp Market (a 30 by 18 tile plaza around the First Lamp,
-  with the Pit gate, Notice Board, the Fence, the Guildmaster, Mark's gambling table, the Low
+  with the Pit gate, Notice Board, the Fence, the Guildmaster, Marc's gambling table, the Low
   Lamp tavern, your Hideout door, market stalls and townsfolk), the Blood Pit arena, and your
   Hideout.
-- **Mark of the Long Odds:** the Undercity's bookie. Bet on three undercard bouts that are
+- **Marc of the Long Odds:** the Undercity's bookie. Bet on three undercard bouts that are
   simulated while you fight (or back yourself), settled when your bout ends. He also runs High
   Bones (dice, with a press-your-luck re-throw) and Crown or Skull (a double-or-nothing coin
   streak). The house keeps about 8% of card payouts.
@@ -82,9 +82,9 @@ phone portrait, phone landscape, or a desktop monitor.
 - **The Fence:** weapon and armour tiers (which change how your fighter looks) and potions.
 - Progress saves in the browser.
 
-**First meetings and friendly duels.** The first time you walk up to Mark, the Ledger-Keeper or the Fence, and the first time you face Vexa, the game cuts to a letterboxed dialogue scene with its own camera shots (wide, close, over the shoulder). Tap, click, Space or (A) advances; Skip or (B) skips. Mark's scene ends with an offer to duel: a non-lethal bout to the yield, no fee, no mortal blow. Beating him the first time wins Mark's Lucky Laurel. He will duel again for a stake from his menu.
+**First meetings and friendly duels.** The first time you walk up to Marc, the Ledger-Keeper or the Fence, and the first time you face Vexa, the game cuts to a letterboxed dialogue scene with its own camera shots (wide, close, over the shoulder). Tap, click, Space or (A) advances; Skip or (B) skips. Marc's scene ends with an offer to duel: a non-lethal bout to the yield, no fee, no mortal blow. Beating him the first time wins Marc's Lucky Laurel. He will duel again for a stake from his menu.
 
-**More of Mark's table.** The Rat Race (four rats, odds set by hidden speed), Three Cups (faster hands at higher stakes) and High Card (higher or lower, pot grows) join the undercard, High Bones and Crown or Skull.
+**More of Marc's table.** The Rat Race (four rats, odds set by hidden speed), Three Cups (faster hands at higher stakes) and High Card (higher or lower, pot grows) join the undercard, High Bones and Crown or Skull.
 
 **Menus.** A Settings panel (sound, music, blood, screen shake, text size, erase save), an objective line that always says what to do next, "!" badges on places with something new, and a coin change that floats off the purse.
 
@@ -92,11 +92,11 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **Cosmetics.** Fourteen more: four dyes, four hats and crowns, three back pieces, two weapon finishes and three auras.
 
-**Mark's business.** Mark always has a scheme (glowcap futures, a cart that has not fallen yet, commemorative Guild seals). Buy in with coin and he reports back after a bout or two: sometimes it pays, sometimes he pays you in **chits**, his own credit. Chits are spent before coin at every one of his games, and his Chit Rack sells five cosmetics for nothing else.
+**Marc's business.** Marc always has a scheme (glowcap futures, a cart that has not fallen yet, commemorative Guild seals). Buy in with coin and he reports back after a bout or two: sometimes it pays, sometimes he pays you in **chits**, his own credit. Chits are spent before coin at every one of his games, and his Chit Rack sells five cosmetics for nothing else.
 
-**The Wisp Table.** A dice booth on the east side of the market with five floating dice made of light. Three games: Thirteen and Twenty-One (roll one die at a time, stand, then Mark has to chase your total; a dead-on total pays triple) and Poker Bones (five dice, hold and reroll once, best hand wins).
+**The Wisp Table.** A dice booth on the east side of the market with five floating dice made of light. Three games: Thirteen and Twenty-One (roll one die at a time, stand, then Marc has to chase your total; a dead-on total pays triple) and Poker Bones (five dice, hold and reroll once, best hand wins).
 
-**A livelier market and pit.** Rats, bats, washing lines, a busker, a cat, steam grates, puddle ripples, gate guards and two punters arguing about odds in the market. The pit gains a Guild box above the gate, hanging gibbets, eyes behind the bars, Mark's odds board, pennants and torches in the stands, and petals and coin thrown at high crowd hype.
+**A livelier market and pit.** Rats, bats, washing lines, a busker, a cat, steam grates, puddle ripples, gate guards and two punters arguing about odds in the market. The pit gains a Guild box above the gate, hanging gibbets, eyes behind the bars, Marc's odds board, pennants and torches in the stands, and petals and coin thrown at high crowd hype.
 
 **Mortal blows.** Three per class now, the second and third taught as your rank rises (Through the Wall, Earthbreaker, The Quiet Word, Rain of Knives, Meteor Swarm, Chain Lightning, Banishing Smite, Power Word Kill). Pick one on the character sheet or leave it to the crowd.
 
@@ -120,7 +120,7 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **Finer fighting.** A parry opens a riposte: your next blow within a moment hits 30% harder. Two blows of the same weight meeting edge to edge clash, and both fighters recoil. A blow from behind is a flank for 20% more.
 
-**Intro and backdrop.** The intro now shows the market at work (Mark's table, the Wardens at the Long Stair) and a "Blood" sequence in the pit with limbs coming off. The market sits above a lower city of roofs and lit windows instead of a black void, and the whole view has a soft vignette.
+**Intro and backdrop.** The intro now shows the market at work (Marc's table, the Wardens at the Long Stair) and a "Blood" sequence in the pit with limbs coming off. The market sits above a lower city of roofs and lit windows instead of a black void, and the whole view has a soft vignette.
 
 **Readability and record.** Opponents carry their own weapons (flail, frost, warhammer, rapier). An enemy heavy blow is flagged with a red flash and a mark as it starts. A fighter whose posture breaks drops to one knee. The results card lists what happened in the bout (parries, limbs, postures broken), and the Notice Board keeps your running page in the Ledger.
 
@@ -128,9 +128,9 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **Traps.** Caltrops, Bear Trap, Glyph of Warding and Guardian Sigil are laid where you stand, wait up to 18 seconds, and spring when the opponent steps in.
 
-**Moments.** Scenes find you between bouts: the Ledger-Keeper strikes your first line; Ferren Voss, last season's "new name", challenges you to friendly duels; Mark gets leaned on by Guild collectors and you choose whether to pay, fight or walk; later he offers you a tenth of the Long Odds; and after Brakk falls, Vilhelm van Koheneim IV is waiting in the empty pit.
+**Moments.** Scenes find you between bouts: the Ledger-Keeper strikes your first line; Ferren Voss, last season's "new name", challenges you to friendly duels; Marc gets leaned on by Guild collectors and you choose whether to pay, fight or walk; later he offers you a tenth of the Long Odds; and after Brakk falls, Vilhelm van Koheneim IV is waiting in the empty pit.
 
-**Mark's loyalty.** Every stake counts toward a tier (Punter, Regular, High Roller, Friend of the House) that returns 4 to 10% of each stake in chits. Partners are paid a cut after every bout.
+**Marc's loyalty.** Every stake counts toward a tier (Punter, Regular, High Roller, Friend of the House) that returns 4 to 10% of each stake in chits. Partners are paid a cut after every bout.
 
 **Home.** Seven new pieces: a wardrobe (opens the Tailor), an armour stand (opens the Outfitter), a strongbox (coin inside is safe from the stretcher fee), a dice table (play the wispdice at home), a statuette of the Queen, a cave-bear skin and a washtub. The catalogue has a "Useful" page listing everything you can interact with.
 
@@ -144,7 +144,7 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **A short dodge.** The long roll is now a heavy sidestep: about 2 to 3 strides in a quarter of a second, with a shorter untouchable window and a lower stamina cost.
 
-**A bigger market.** The Lamp Market is four tiles wider and deeper, with the stalls, well, cart, fire and Wisp Table spread into the new space. Stall roofs and Mark's awning are lean-tos set behind the keeper, so the people and tables stand in the open. Nothing turns transparent.
+**A bigger market.** The Lamp Market is four tiles wider and deeper, with the stalls, well, cart, fire and Wisp Table spread into the new space. Stall roofs and Marc's awning are lean-tos set behind the keeper, so the people and tables stand in the open. Nothing turns transparent.
 
 ## Next work
 
@@ -188,7 +188,7 @@ and the rest of the game does not change.
 - `js/models.js` character models and animation
 - `js/world.js` the arena; `js/places.js` the street, the hideout, decor pieces, walking
 - `js/fight.js` combat simulation, AI, and its 3D effects
-- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror; `js/arms.js` combat tempo, heavy blows, weapons and the Armoury; `js/realm.js` the Long Stair, proclamations, tithe and throne events; `js/board.js` pit contracts and win streaks; `js/kits.js` kits, mastery, extra weapons and techniques; `js/story.js` story scenes, Mark's loyalty and partnership, the strongbox; `js/home.js` new hideout pieces; `js/market.js` stalls, boons and charms; `js/ledger.js` endless challengers, extra ranks and kit pricing
+- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror; `js/arms.js` combat tempo, heavy blows, weapons and the Armoury; `js/realm.js` the Long Stair, proclamations, tithe and throne events; `js/board.js` pit contracts and win streaks; `js/kits.js` kits, mastery, extra weapons and techniques; `js/story.js` story scenes, Marc's loyalty and partnership, the strongbox; `js/home.js` new hideout pieces; `js/market.js` stalls, boons and charms; `js/ledger.js` endless challengers, extra ranks and kit pricing
 - `js/cine.js` the opening cinematic; `js/lore.js` codex and bios; `js/music.js` the music sequencer
 - `js/ui.js` menus, HUD, level-up and results screens; `js/main.js` input and main loop
 
@@ -206,7 +206,7 @@ multiclassing, recorded music or voice, cloud saves, typing a name with a contro
 
 - **Undercard.** Each of the five named fighters must be earned by winning undercard bouts first: 2, 3, 3, 4 and 4. Undercard fighters are generated, a little weaker than the name they lead to, and can be fought again for smaller purses.
 - **Ten levels.** Levels 1 to 5 as before. Level 6 and 9: two ability points to place. Level 7: a technique. Level 8: a second feat. Level 10: a capstone.
-- **Doors open as you earn them.** First win: Notice Board, Big Hobb's Pot. Scrapper: the Tally, the Apothecary. Bloodied: Mark, the Wisp Table, the Armoury, the Tailor. Enforcer: the Outfitter, charms, Whisper, teachers. Underboss: the Crown's tithe. A shut door says what it needs; the first visit explains the system and writes it into the Codex.
+- **Doors open as you earn them.** First win: Notice Board, Big Hobb's Pot. Scrapper: the Tally, the Apothecary. Bloodied: Marc, the Wisp Table, the Armoury, the Tailor. Enforcer: the Outfitter, charms, Whisper, teachers. Underboss: the Crown's tithe. A shut door says what it needs; the first visit explains the system and writes it into the Codex.
 - **Old saves** keep everything their rank already opens, and pick the ladder up at the undercard of their next unbeaten name.
 
 ## The Oracle's work (`js/raid.js`)
@@ -271,12 +271,12 @@ Weapons, classes and level-up choices were simulated and the outliers adjusted; 
 
 ## Race and class flavour (`js/flavor.js`)
 
-The Fence, Mark, the Apothecary, Big Hobb, the charm seller, Whisper and the Busker each have a line for every race and every class, shown about half the time you visit. The Ledger-Keeper comments on your trade or blood on the character sheet, opponents remark on what you are before a bout (the five named fighters have their own lines for particular classes and races), the crowd's reaction after a win depends on your class, David has a line for each class, and the Queen has extra words for elves, drow and druids.
+The Fence, Marc, the Apothecary, Big Hobb, the charm seller, Whisper and the Busker each have a line for every race and every class, shown about half the time you visit. The Ledger-Keeper comments on your trade or blood on the character sheet, opponents remark on what you are before a bout (the five named fighters have their own lines for particular classes and races), the crowd's reaction after a win depends on your class, David has a line for each class, and the Queen has extra words for elves, drow and druids.
 
 ## World and voice (`js/flavor2.js`)
 
 - **Your page.** Every race and class pairing has an origin written on the character sheet and in the Codex; twelve pairings have an extra line of their own.
-- **First meetings** with the Fence, the Ledger-Keeper and Mark now include an exchange about your class, your reply in your class's voice, and a remark on your race.
+- **First meetings** with the Fence, the Ledger-Keeper and Marc now include an exchange about your class, your reply in your class's voice, and a remark on your race.
 - **Your voice.** A retort by class on the card before each bout.
 - **David** insults your trade or your people when it gets you killed.
 - **Rumours** at the Beggars' Fire start to be about you, and the Wardens at the Long Stair react to your race.
@@ -306,3 +306,9 @@ The Fence, Mark, the Apothecary, Big Hobb, the charm seller, Whisper and the Bus
 
 - **Dismemberment goes further.** Heavy blows take the off-hand arm under half health, one leg under a third, and the other leg under a fifth. With both legs gone an opponent crawls: slow, unable to dodge, hitting for less, leaving a trail. Only opponents can be dismembered.
 - **Five grades of steel and armour** at the Fence, and every opponent is equipped for their place on the Ledger. The pre-fight card compares theirs with yours; fall two grades behind and the top line tells you what to buy.
+
+## Marc, a home that earns, and a third balance pass (`js/tune2.js`)
+
+- **Marc.** The gambler is now Marc; cutscenes give his full name, Marc dé Fleuprau.
+- **Furniture that earns:** Copper Still (12 coin a bout), Lodger's Cot (20 coin a bout), Marc's Rat Cages (10 chits a bout for his table). The results card shows what your home earned.
+- **Mashing no longer works:** see `docs/BALANCE.md`.

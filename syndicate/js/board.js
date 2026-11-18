@@ -11,7 +11,7 @@
     { id: 'wall', name: 'Stonework', by: 'The pit masons', desc: 'Put an opponent into the wall twice.', stat: 'wall', goal: 2, coin: 50, respect: 8 },
     { id: 'perfect', name: 'Ghost Step', by: 'Nobody you can see', desc: 'Land 2 perfect dodges.', stat: 'perfect', goal: 2, coin: 60, respect: 9 },
     { id: 'block', name: 'Shieldwall', by: 'An old watch sergeant', desc: 'Block 6 blows.', stat: 'block', goal: 6, coin: 45, respect: 6 },
-    { id: 'show', name: 'Give Them a Show', by: 'Mark of the Long Odds', desc: 'End a bout with the crowd at full roar.', stat: 'hype100', goal: 1, coin: 65, respect: 12 },
+    { id: 'show', name: 'Give Them a Show', by: 'Marc of the Long Odds', desc: 'End a bout with the crowd at full roar.', stat: 'hype100', goal: 1, coin: 65, respect: 12 },
     { id: 'clean', name: 'Not a Scratch', by: 'A Seal-Warden, unofficially', desc: 'Win a bout without losing any health.', stat: 'flawless', goal: 1, coin: 120, respect: 18 },
     { id: 'wins', name: 'Two in a Row', by: 'The Deep Guild', desc: 'Win 2 bouts.', stat: 'win', goal: 2, coin: 70, respect: 10 }
   ];

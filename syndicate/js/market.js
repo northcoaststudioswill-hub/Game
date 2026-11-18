@@ -20,7 +20,7 @@
     { id: 'button', name: 'Warden’s Button', cost: 140, rank: 1, desc: '+8% respect earned.', fx: d => { d.respectMul += 0.08; } },
     { id: 'bead', name: 'Lamp-Glass Bead', cost: 160, rank: 1, desc: '+10% stamina recovery.', fx: d => { d.regen *= 1.1; } },
     { id: 'knuckle', name: 'Knucklebone of Saint Hob', cost: 180, rank: 2, desc: '+15 posture.', fx: d => { d.poise = (d.poise || 0) + 15; } },
-    { id: 'olddie', name: 'Mark’s Old Die', cost: 200, rank: 2, desc: '+10% coin from bouts. He wants it back.', fx: d => { d.coinMul += 0.1; } }
+    { id: 'olddie', name: 'Marc’s Old Die', cost: 200, rank: 2, desc: '+10% coin from bouts. He wants it back.', fx: d => { d.coinMul += 0.1; } }
   ];
   G.BOONS = BOONS; G.CHARMS = CHARMS;
   const boons = st => st.boons || (st.boons = {});
@@ -63,7 +63,7 @@
     on('[data-charm]', el => { const c = CHARMS.find(q => q.id === el.dataset.charm); if (st.coin < c.cost) return; st.coin -= c.cost; st.charms[c.id] = 1; st.charm = c.id; G.save(); G.sfx('coin'); ui.topbar(); ui.charms('Wear it against the skin. Not that skin.'); });
   };
   const WEAK = { rogue: 'Fast and frail. Block the flurry and answer with something heavy.', cleric: 'Slow hands. Stay on them so they cannot stop to heal.', sorcerer: 'Close the distance behind a raised guard. Up close, their bolts come slow and weak.', fighter: 'You will not out-trade them. Bait the heavy swing, step round it, and hit the back.' };
-  const GOSSIP = ['They say the Queen has never once been seen to blink either.', 'Mark owes money on three levels and is owed it on four.', 'The Ledger-Keeper writes left-handed on the first of the month. Nobody knows why.', 'Ferren Voss sleeps in the pit sand. He says it is training.', 'A Warden was seen buying stew from Big Hobb. In a hood. Twice.', 'Brakk Ironjaw still salutes the Stair when he thinks nobody is looking.'];
+  const GOSSIP = ['They say the Queen has never once been seen to blink either.', 'Marc owes money on three levels and is owed it on four.', 'The Ledger-Keeper writes left-handed on the first of the month. Nobody knows why.', 'Ferren Voss sleeps in the pit sand. He says it is training.', 'A Warden was seen buying stew from Big Hobb. In a hood. Twice.', 'Brakk Ironjaw still salutes the Stair when he thinks nobody is looking.'];
   ui.whisper = function () {
     const st = G.state, b = boons(st), next = G.OPPONENTS.find(o => !st.wins[o.id]) || G.OPPONENTS[G.OPPONENTS.length - 1], scouted = b.scout === next.id;
     const arm = G.ARM_BY && next.arm && G.ARM_BY[next.arm] ? G.ARM_BY[next.arm].name : G.ABILITIES[G.CLASSES[next.cls].basic].name;
@@ -83,7 +83,7 @@
   };
   ui.fireside = function () {
     const st = G.state, n = bouts(st), fresh = st.fireAt !== n; let got = '';
-    if (fresh) { st.fireAt = n; const r = Math.random(); if (r < 0.35) { const c = 5 + Math.floor(Math.random() * 11); st.coin += c; got = 'Somebody presses ' + c + ' coin into your hand “for the last one”. They will not say which one.'; } else if (r < 0.5) { st.chits = (st.chits || 0) + 8; got = 'A man gives you eight of Mark’s chits. “No use to me. He barred me.”'; } else { st.respect += 2; got = 'They make room for you without being asked. That is new.'; } G.save(); ui.topbar(); }
+    if (fresh) { st.fireAt = n; const r = Math.random(); if (r < 0.35) { const c = 5 + Math.floor(Math.random() * 11); st.coin += c; got = 'Somebody presses ' + c + ' coin into your hand “for the last one”. They will not say which one.'; } else if (r < 0.5) { st.chits = (st.chits || 0) + 8; got = 'A man gives you eight of Marc’s chits. “No use to me. He barred me.”'; } else { st.respect += 2; got = 'They make room for you without being asked. That is new.'; } G.save(); ui.topbar(); }
     show('<div class="card small letter event"><h2>The Beggars’ Fire</h2><p>' + (fresh ? 'You warm your hands. ' : 'The same faces, the same fire. ') + 'Someone is telling a story: “' + G.pick(GOSSIP.concat(G.TIPS || [])) + '”</p>' + (got ? '<p class="got">' + got + '</p>' : '<p class="dim">Come back after your next bout.</p>') + '<div class="row end"><button class="big" id="x">Move on</button></div></div>');
     on('#x', () => { ui.close(); ui.topbar(); });
   };

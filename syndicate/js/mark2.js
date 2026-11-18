@@ -1,4 +1,4 @@
-// Guttercrown — more of Mark's table: the Rat Race, Three Cups, High Card, and duels for a stake
+// Guttercrown — more of Marc's table: the Rat Race, Three Cups, High Card, and duels for a stake
 (function () {
   const G = window.G, ui = G.ui, pick = a => a[Math.floor(Math.random() * a.length)];
   const show = (h, c) => ui._show(h, c), on = (s, f) => ui._on(s, f), $ = id => document.getElementById(id);
@@ -13,8 +13,8 @@
   ui.mark = function (line) {
     clearT(); const st = G.state, greet = line || pick(Math.random() < 0.3 ? ['Hang on. …What were we doing? Right. Money.', 'Is the ceiling lower today? No? Cool. Cool cool cool.', 'I am fine. I am extremely fine. Pick a game.'] : ['Bro. BRO. You look like someone who is about to be rich. Probably.', 'Step up, step up. I have got a guy for everything, bro. The guy is me.', 'Real ones bet big. I am just saying what real ones do, bro.', 'You want odds? I have got odds on the odds.']);
     const g = (id, name, sub) => '<button id="' + id + '"><b>' + name + '</b><small>' + sub + '</small></button>';
-    show('<div class="card"><h2>Mark of the Long Odds</h2>' + head(greet) + '<h3>The pit</h3><div class="choices two">' +
-      g('c1', 'Tonight’s card', 'Bet on undercard bouts, fought while you fight.') + g('c7', 'Duel Mark', 'A friendly, to the yield. Winner takes double the stake.') + '</div><h3>The table</h3><div class="choices two">' +
+    show('<div class="card"><h2>Marc of the Long Odds</h2>' + head(greet) + '<h3>The pit</h3><div class="choices two">' +
+      g('c1', 'Tonight’s card', 'Bet on undercard bouts, fought while you fight.') + g('c7', 'Duel Marc', 'A friendly, to the yield. Winner takes double the stake.') + '</div><h3>The table</h3><div class="choices two">' +
       g('c2', 'High Bones', 'Two dice each. Press your luck once.') + g('c3', 'Crown or Skull', 'Call the coin and let it ride.') +
       g('c4', 'The Rat Race', 'Four rats, one finish line, long odds on the slow one.') + g('c5', 'Three Cups', 'Follow the coin. Faster cups at higher stakes.') +
       g('c6', 'High Card', 'Higher or lower? The pot grows each time you are right.') + '</div><div class="row end"><button class="big" id="x">Walk away</button></div></div>');
@@ -24,8 +24,8 @@
 
   ui.duelMark = function () {
     const st = G.state;
-    show('<div class="card small"><h2>Duel Mark</h2>' + head('You and me, bro, in the pit. Nobody dies, I have got customers to rob later. First one to yield pays up.') +
-      '<p class="dim">Mark fights as a Wild Magic sorcerer at your level. A friendly costs nothing to lose.</p><div class="row"><button class="big" data-s="0">Friendly</button>' + stakes(G.mark.funds()).map(v => '<button data-s="' + v + '">Stake ' + v + '</button>').join('') + '</div><div class="row end"><button id="b">Back</button></div></div>');
+    show('<div class="card small"><h2>Duel Marc</h2>' + head('You and me, bro, in the pit. Nobody dies, I have got customers to rob later. First one to yield pays up.') +
+      '<p class="dim">Marc fights as a Wild Magic sorcerer at your level. A friendly costs nothing to lose.</p><div class="row"><button class="big" data-s="0">Friendly</button>' + stakes(G.mark.funds()).map(v => '<button data-s="' + v + '">Stake ' + v + '</button>').join('') + '</div><div class="row end"><button id="b">Back</button></div></div>');
     port(); on('#b', () => ui.mark()); on('[data-s]', el => G.markDuel(+el.dataset.s, false));
   };
 

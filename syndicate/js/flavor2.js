@@ -56,7 +56,7 @@
     if ((st.heat || 0) >= 5) opts.push('“The Wardens were asking after ' + who + '. I said I had never heard of them. Cost me nothing to say.”');
     if (h.cls === 'druid') opts.push('“It was a bear. In the pit. I am not drunk. Well. I am, but it was a bear.”'); if (h.cls === 'warlock') opts.push('“Do not sit downwind of ' + who + '. Something breathes when they do.”');
     if (h.race === 'drow') opts.push('“One of the deep folk is fighting on the Ledger. First time in my life. My gran would have spat.”'); if (h.race === 'dwarf') opts.push('“The Old Seam clans have a fighter up. They are taking bets in the old coin.”');
-    if (G.rankOf(st.respect) >= 2) opts.push('“Put my week on ' + who + '. Mark gave me a look. I do not care.”');
+    if (G.rankOf(st.respect) >= 2) opts.push('“Put my week on ' + who + '. Marc gave me a look. I do not care.”');
     if (opts.length) end.insertAdjacentHTML('beforebegin', '<p class="dim rumour">Further round the fire, somebody else is talking: ' + pick(opts) + '</p>'); return r; };
   // the Wardens at the stair notice too
   const WARD = { human: 'The Wardens do not look at you. There are too many of your kind to look at.', dwarf: 'One Warden mutters something about the Old Seam. The other tells him to shut up.', elf: 'The taller Warden looks at your ears, then away, quickly, as if he had seen something he would have to report.', halforc: 'Both Wardens shift their grip on their halberds as you come up. Neither would admit it.', tiefling: 'A Warden makes a small sign with two fingers. It is meant to ward off your blood. It does not.', drow: 'The Wardens go very still. Their orders about your people are forty years old and have never needed reading before.' };

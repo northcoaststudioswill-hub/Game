@@ -7,7 +7,7 @@
 
   // ------------------------------------------------------------ a longer ladder
   // the named five are stronger now: you reach them with more levels behind you
-  { const LV = [1, 3, 5, 6, 8], HP = [1.34, 1.24, 1.2, 1.14, 1.0], DM = [1.12, 1.16, 1.16, 1.12, 1.0], GD = [0.3, 0.4, 0.3, 0.6, 0.45], PR = [0.06, 0.12, 0.1, 0.2, 0.28], AG = [0.62, 0.66, 0.7, 0.74, 0.82]; GATES.forEach((o, i) => { o.level = LV[i]; o.hpMul = +(o.hpMul * HP[i]).toFixed(2); o.dmgMul = +(o.dmgMul * DM[i]).toFixed(2); o.ai = Object.assign({}, o.ai, { react: +(o.ai.react * 0.82).toFixed(2), aggro: Math.max(o.ai.aggro, AG[i]), guard: GD[i], parry: PR[i] }); o.respect0 = o.respect; o.respect = Math.round(o.respect * 0.55); }); }   // respect is spread over four times as many bouts
+  { const LV = [1, 3, 5, 6, 8], HP = [1.34, 1.24, 1.2, 1.14, 0.94], DM = [1.34, 1.4, 1.44, 1.44, 1.22], GD = [0.3, 0.4, 0.3, 0.6, 0.45], PR = [0.06, 0.12, 0.1, 0.2, 0.28], AG = [0.62, 0.66, 0.7, 0.74, 0.82]; GATES.forEach((o, i) => { o.level = LV[i]; o.hpMul = +(o.hpMul * HP[i]).toFixed(2); o.dmgMul = +(o.dmgMul * DM[i]).toFixed(2); o.ai = Object.assign({}, o.ai, { react: +(o.ai.react * 0.82).toFixed(2), aggro: Math.max(o.ai.aggro, AG[i]), guard: GD[i], parry: PR[i] }); o.respect0 = o.respect; o.respect = Math.round(o.respect * 0.55); }); }   // respect is spread over four times as many bouts
 
   const rng = seed => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   const FIRST = ['Tam', 'Odger', 'Nell', 'Brisk', 'Hob', 'Cray', 'Wenna', 'Stitch', 'Lodd', 'Marnie', 'Pike', 'Sorrel', 'Duff', 'Ketch', 'Jory', 'Mab', 'Crick', 'Tansy', 'Garl', 'Ibb', 'Roon', 'Hesper'];
@@ -69,7 +69,7 @@
       if (u[t] === NEED[t] && !st.wins[GATES[t].id]) setTimeout(() => ui.toast('The Ledger-Keeper writes your name against ' + GATES[t].name + '.'), 900); }
     return res0.apply(this, arguments);
   };
-  // Mark pays on the bout you actually fought: an undercard win is not worth a named fighter's odds
+  // Marc pays on the bout you actually fought: an undercard win is not worth a named fighter's odds
   if (G.mark) {
     const oddsFor = o => Math.max(1.15, Math.round((1.35 + o.level * 0.22 - G.state.hero.level * 0.1) * (o.under != null ? 0.8 : 1) * 20) / 20);
     G.mark.selfOdds = function () { const st = G.state, t = tierNow(st); let o; if (t < 0) { if (G.ensureLedger) G.ensureLedger(); o = G.OPPONENTS.find(q => !st.wins[q.id]) || G.OPPONENTS[G.OPPONENTS.length - 1]; } else o = gateOpen(st, t) ? GATES[t] : make(t, U(st)[t]); return { opp: o, odds: oddsFor(o) }; };
@@ -139,8 +139,8 @@
     cook: { name: 'Big Hobb’s Pot', when: won, need: 'your first win', shut: 'Big Hobb does not look up. “Fighters eat here. You have not fought anybody yet. Come back with a win and an appetite.”', intro: '“Sit. Winners eat.” A meal from the pot lasts for your <b>next bout</b> only. One meal at a time; choose it for the fight you expect.', spot: /Hobb/ },
     tally: { name: 'the Low Lamp and your Tally', when: rk(1), need: rankName(1), shut: 'The Low Lamp is where people with followers go. You do not have any. Nobody follows Fresh Meat.', intro: 'A Scrapper is worth following. The people who owe you are your <b>Tally</b>. Give each one work here; it resolves after your next bout or two. One of them can stand as your <b>Second</b> in the pit.', spot: /Low Lamp/ },
     apoth: { name: 'the Apothecary', when: rk(1), need: rankName(1), shut: 'The apothecary covers the bottles with a cloth. “I do not sell to people the Guild has not ranked. If you die of it they blame me.”', intro: 'Tonics change your <b>next bout</b>: tougher, faster, harder-hitting, steadier. One tonic at a time, used up win or lose.', spot: /Apothecary/ },
-    mark: { name: 'Mark’s table', when: rk(2), need: rankName(2), shut: 'The man at the card table looks you over and goes back to his cards. “No offence, bro. I only take money off people who have some. Come back Bloodied.”', spot: /Mark/ },
-    wisp: { name: 'the Wisp Table', when: rk(2), need: rankName(2), shut: 'A lean-to full of blue light, and a rope across the door. A sign on the rope reads: BLOODIED AND ABOVE. MANAGEMENT IS MARK.', intro: 'Mark’s dice room. The wispdice glow with whatever they land on. Stake <b>coin or chits</b>; the dealer has to chase your total, so it is nearly fair. Nearly.', spot: /Wisp/ },
+    mark: { name: 'Marc’s table', when: rk(2), need: rankName(2), shut: 'The man at the card table looks you over and goes back to his cards. “No offence, bro. I only take money off people who have some. Come back Bloodied.”', spot: /Marc/ },
+    wisp: { name: 'the Wisp Table', when: rk(2), need: rankName(2), shut: 'A lean-to full of blue light, and a rope across the door. A sign on the rope reads: BLOODIED AND ABOVE. MANAGEMENT IS MARK.', intro: 'Marc’s dice room. The wispdice glow with whatever they land on. Stake <b>coin or chits</b>; the dealer has to chase your total, so it is nearly fair. Nearly.', spot: /Wisp/ },
     armory: { name: 'the Armoury', when: rk(2), need: rankName(2), shut: 'The Fence taps a locked rack. “Those are for people who will be alive to pay the second instalment. Bloodied. Then we talk.”', intro: 'Every weapon changes your <b>basic attack</b>: reach, speed, weight and what the heavy blow does. Use one in bouts to raise its <b>mastery</b>.' },
     tailor: { name: 'the Tailor', when: rk(2), need: rankName(2), shut: '“Dress you? As what? Nobody knows who you are yet.” The tailor goes back to her hem. Come back Bloodied.', intro: 'Dyes, hoods, cloaks, weapon finishes and auras. None of it wins a bout. All of it is how the crowd knows you.' },
     outfit: { name: 'the Outfitter', when: rk(3), need: rankName(3), shut: 'Kits are fitted, and fitting costs the Outfitter an afternoon. He spends afternoons on Enforcers.', intro: 'A <b>kit</b> is what you wear into the pit. Each trades one thing for another: weight for speed, protection for breath. There is no best one, only the right one for tonight.' },
@@ -184,7 +184,7 @@
       sp.badge = () => open(k, G.state) && (!(G.state.seen || {})[k] || !!(badge0 && badge0())); });
     return h;
   };
-  // Mark does not come looking for you before he will deal with you
+  // Marc does not come looking for you before he will deal with you
   if (G.story && G.story.pending) { const p0 = G.story.pending; G.story.pending = function (st) { const b = p0.apply(this, arguments); return b && /mark|partner/.test(b.id) && !open('mark', st) ? null : b; }; }
   // tell the player when a door opens
   const uh0 = ui.hub;
@@ -204,7 +204,7 @@
       { sec: 'How Things Work', title: 'A Meal Before', unlock: seen('cook'), body: 'Big Hobb’s pot never empties and is never washed. A bowl lasts one bout. Fighters are superstitious about which bowl.' },
       { sec: 'How Things Work', title: 'Your Tally', unlock: seen('tally'), body: 'Everybody in the Undercity owes somebody. The people who owe you are your Tally. Set them to work at the Low Lamp and they report after your next bout or two, with coin, news or bruises. One may stand as your Second and step into the pit once when you call.' },
       { sec: 'How Things Work', title: 'Tonics', unlock: seen('apoth'), body: 'Ironbark, quickroot, redcap, clear head. One at a time, good for one bout, and used up whether you win or not. The apothecary will not say what is in them and it is better that way.' },
-      { sec: 'How Things Work', title: 'The Wispdice', unlock: seen('wisp'), body: 'Glass dice with a marsh-light sealed inside each. Thirteen, Twenty-One and Poker Bones are all played against a dealer who must chase your total. Mark insists this makes it fair. Mark also owns the dice.' },
+      { sec: 'How Things Work', title: 'The Wispdice', unlock: seen('wisp'), body: 'Glass dice with a marsh-light sealed inside each. Thirteen, Twenty-One and Poker Bones are all played against a dealer who must chase your total. Marc insists this makes it fair. Marc also owns the dice.' },
       { sec: 'How Things Work', title: 'Arms and Mastery', unlock: seen('armory'), body: 'A weapon decides how you strike: reach, tempo, weight, and what a held blow does when you let it go. Fight with one and you learn it; five ranks of mastery, each worth a little more damage and, late on, something else.' },
       { sec: 'How Things Work', title: 'Being Seen', unlock: seen('tailor'), body: 'The crowd cannot tell two fighters apart by their footwork. They can by a red hood. The tailor sells the difference.' },
       { sec: 'How Things Work', title: 'Kits', unlock: seen('outfit'), body: 'Rags to warden’s plate. Every kit gives with one hand and takes with the other. Heavy kit soaks blows and tires you; light kit keeps your breath and none of your blood.' },

@@ -82,7 +82,7 @@
         dur: 5.2, cut: true, text: 'The Deep Guild writes every debt in the Blood Ledger. The Guild always collects.',
         update: (p, dt) => { const th = lerp(0.15, 1.35, ease(p)), r = lerp(3.6, 2.3, p); shoot([GM[0] + Math.cos(th) * r, lerp(0.55, 1.5, p), GM[2] + Math.sin(th) * r], [GM[0], lerp(1.5, 1.35, p), GM[2]], lerp(46, 34, p), -0.07); hub().update(now, dt); }
       },
-      // the underworld at work: Mark's table, the dice of light, and the Wardens taking the Crown's tenth
+      // the underworld at work: Marc's table, the dice of light, and the Wardens taking the Crown's tenth
       {
         dur: 4.8, cut: true, text: 'Dice. Coin. Unsealed steel. Whatever is forbidden above is for sale beneath one lamp.',
         update: (p, dt) => { shoot(V([22.2, 1.3, 4.6], [24.9, 1.6, 2.9], ease(p)), V([25.6, 1.5, -0.2], [28.6, 1.5, 4.6], ease(cl((p - 0.45) / 0.55))), lerp(50, 40, p), 0.05 - p * 0.1); hub().update(now, dt); }

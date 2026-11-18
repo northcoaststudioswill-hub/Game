@@ -49,7 +49,7 @@
     { id: 'wall', name: 'Mason', desc: 'Slam opponents into the wall 8 times.', goal: 8, cur: st => stat(st, 'wall'), reward: 'masonry' },
     { id: 'clean', name: 'Untouched', desc: 'Win a bout without losing any health.', goal: 1, cur: st => stat(st, 'flawless'), reward: 'saintly' },
     { id: 'crowd', name: 'Crowd Favourite', desc: 'End 3 bouts with the crowd at full roar.', goal: 3, cur: st => stat(st, 'hype100'), reward: 'pennants' },
-    { id: 'partner', name: 'Silent Partner', desc: 'See 3 of Mark’s schemes through to the end.', goal: 3, cur: st => stat(st, 'schemes'), reward: 'luckyedge' },
+    { id: 'partner', name: 'Silent Partner', desc: 'See 3 of Marc’s schemes through to the end.', goal: 3, cur: st => stat(st, 'schemes'), reward: 'luckyedge' },
     { id: 'home', name: 'House Proud', desc: 'Raise your hideout’s comfort to 40.', goal: 40, cur: st => G.comfort ? G.comfort(st) : 0, reward: 'hearth' },
     { id: 'breaker', name: 'Posture Breaker', desc: 'Break an opponent’s posture 10 times.', goal: 10, cur: st => stat(st, 'break'), reward: 'obsidian', also: 'a class weapon at the Armoury' },
     { id: 'heavy', name: 'Heavy Hand', desc: 'Land 20 heavy blows.', goal: 20, cur: st => stat(st, 'heavy'), reward: 'bronze', also: 'a class weapon at the Armoury' },

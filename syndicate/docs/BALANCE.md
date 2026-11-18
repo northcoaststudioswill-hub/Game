@@ -45,3 +45,17 @@ Request: a fighter who never upgrades should lose to opponents who did, without 
 - The named fighters' flat health and damage multipliers were cut to make room: health 1.34/1.24/1.2/1.14/1.0, damage 1.12/1.16/1.16/1.12/1.0.
 - Simulated against the five names (even gear / one grade behind / never upgraded), win rates by the bot: Sister Maul 60-100 / 20-100 / 100; Kessa 100 / 100 / 80-100; Brakk 80-100 / 80-100 / 0-100; Vexa 40-80 / 20-60 / 0.
 - The card before a bout shows their steel and armour against yours, and the line at the top warns when you are two grades behind.
+
+## Third pass: mashing
+
+Report after more play: a fighter could still run through bouts by spamming.
+
+A simulated fighter that only attacks (never blocks, dodges or parries) won every bout with most of its health. Causes found, and changes:
+
+- **Posture.** Every light hit took 15 posture and paused its recovery for 1.8s, so a stream of quick strikes broke posture every few seconds (a 1.3s stun and +35% damage each time). Light hits now take 9 and pause recovery for 0.9s; a fighter whose posture has just broken is braced for 6s and takes 60% less posture damage. Breaks now come from heavy blows, techniques and blocked hits.
+- **Stamina.** A landed melee strike returned more stamina than it cost. It now returns about half (fighter and cleric 6, druid 5, rogue 4 against costs of 6 to 13).
+- **Opponents** guard a flurry more reliably, strike back when struck, attack about 28% more often in a brawl, use heavy blows more, treat a winded fighter as open, and (if melee) rush a caster who stands off.
+- **Named fighters** deal about 20% more damage (damage multipliers 1.34 / 1.4 / 1.44 / 1.44 / 1.22).
+- **Fighter:** Second Wind heals 3 per level, down from 4. **Sorcerer and Warlock:** a larger hit die again and stronger basic attacks, since the same changes hit them hardest.
+
+After the changes the all-attack fighter still beats the first four names most of the time, with 55 to 85% health left where it had 70 to 90%, and beats Vexa less than half the time. The bot behind that figure still uses every technique and heal well, so it is a generous stand-in for someone only pressing strike.

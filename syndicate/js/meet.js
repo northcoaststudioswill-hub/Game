@@ -71,7 +71,7 @@
   G.talkApi = talk; G.playScene = play;
 
   // ------------------------------------------------------------ friendly duels: nobody dies, first to yield
-  const MARK_OPP = () => ({ id: 'mark', name: 'Mark', title: 'of the Long Odds', cls: 'sorcerer', race: 'human', level: Math.max(1, G.state.hero.level), sub: 'wild', known: ['chaos_bolt', 'misty_step', 'burning_hands'], hpMul: 0.85, dmgMul: 0.55, ai: { react: 0.45, aggro: 0.6, dodge: 0.2, guard: 0.2, parry: 0.1 }, xp: 0, coin: 0, respect: 0, spar: true, look: G.mark.look, taunt: '' });
+  const MARK_OPP = () => ({ id: 'mark', name: 'Marc', title: 'of the Long Odds', cls: 'sorcerer', race: 'human', level: Math.max(1, G.state.hero.level), sub: 'wild', known: ['chaos_bolt', 'misty_step', 'burning_hands'], hpMul: 0.85, dmgMul: 0.55, ai: { react: 0.45, aggro: 0.6, dodge: 0.2, guard: 0.2, parry: 0.1 }, xp: 0, coin: 0, respect: 0, spar: true, look: G.mark.look, taunt: '' });
   G.spar = function (opp, onDone) { ui.leaveHub(); ui.close(); const pot = G.state.potions; opp.onDone = w => { G.state.potions = pot; onDone(w); }; G.scene = 'fight'; ui.topbar(); G.fight.start(opp); };
   const backToHub = () => { $('hud').className = 'hidden'; ui.hub(); ui.close(); };
   function markDuel(stake, first) {
@@ -79,10 +79,10 @@
     G.spar(MARK_OPP(), win => {
       backToHub(); st.met.markDuel = (st.met.markDuel || 0) + (win ? 1 : 0);
       let line, got = '';
-      if (win) { const pay = stake ? stake * 2 : 60; st.coin += pay; got = '+' + pay + ' coin'; if (first && !st.cos.owned.lucky) { st.cos.owned.lucky = true; got += ' · Mark’s Lucky Laurel (at the Tailor)'; } line = pickLine(['CLUTCH, BRO. I let you have that. Barely trying, by the way.', 'Okay. OKAY. I am going to need a pipe and a sit down.', 'That is my guy! I mean, ow. But that is my guy.']); G.sfx('coin'); }
+      if (win) { const pay = stake ? stake * 2 : 60; st.coin += pay; got = '+' + pay + ' coin'; if (first && !st.cos.owned.lucky) { st.cos.owned.lucky = true; got += ' · Marc’s Lucky Laurel (at the Tailor)'; } line = pickLine(['CLUTCH, BRO. I let you have that. Barely trying, by the way.', 'Okay. OKAY. I am going to need a pipe and a sit down.', 'That is my guy! I mean, ow. But that is my guy.']); G.sfx('coin'); }
       else line = pickLine(['Happens to the best. Happens to you, too. Run it back any time, bro.', 'And THAT is why the house always wins. I am the house.', 'You okay? You look okay. Walk it off. Respect.']);
       G.save(); ui.topbar();
-      ui._show('<div class="card small"><h2>' + (win ? 'Mark Yields' : 'You Yield') + '</h2><div class="mk-top"><span id="mkp"></span><div><p class="quote">“' + line + '”</p></div></div>' + (got ? '<p class="rankup">' + got + '</p>' : '<p class="dim">No fee, no shame. It was a friendly.</p>') + '<div class="row end"><button class="big" id="x">Carry on</button></div></div>');
+      ui._show('<div class="card small"><h2>' + (win ? 'Marc Yields' : 'You Yield') + '</h2><div class="mk-top"><span id="mkp"></span><div><p class="quote">“' + line + '”</p></div></div>' + (got ? '<p class="rankup">' + got + '</p>' : '<p class="dim">No fee, no shame. It was a friendly.</p>') + '<div class="row end"><button class="big" id="x">Carry on</button></div></div>');
       $('mkp').appendChild(G.portrait(G.mark.look, 92)); ui._on('#x', () => { ui.close(); ui.topbar(); });
     });
   }
@@ -93,12 +93,12 @@
   const S = (who, name, text, shot) => ({ who, name, text, shot });
   const MEET = {
     mark: (then) => { const me = G.state.hero.name; return { place: 'hub', npc: [25.6, -0.5], you: [25.6, 2.6], lines: [
-        S('npc', 'Mark', 'Hold up. HOLD up. New face. Bro, come here, let me look at you.', 'wide'),
-        S('npc', 'Mark', 'Mark. The Long Odds. I run the dice, the coin and the undercard. I have got a guy for everything. The guy is me.', 'npc'),
-        S('npc', 'Mark', 'You know why I am rich, bro? Queen Eerin Koheneim and Vilhelm van Koheneim IV. Iron grip. You cannot roll a die up top without a seal. So everybody rolls them down here. Long may they reign. Seriously.', 'npc'),
+        S('npc', 'Marc dé Fleuprau', 'Hold up. HOLD up. New face. Bro, come here, let me look at you.', 'wide'),
+        S('npc', 'Marc dé Fleuprau', 'Marc dé Fleuprau. Marc. The Long Odds. I run the dice, the coin and the undercard. I have got a guy for everything. The guy is me.', 'npc'),
+        S('npc', 'Marc dé Fleuprau', 'You know why I am rich, bro? Queen Eerin Koheneim and Vilhelm van Koheneim IV. Iron grip. You cannot roll a die up top without a seal. So everybody rolls them down here. Long may they reign. Seriously.', 'npc'),
         S('you', me, 'They said you would take a bet on anything.', 'you'),
-        S('npc', 'Mark', 'Anything, bro. Watch this. I bet I can put you on the floor. Friendly. First one to yield buys the other a pipe.', 'ots'),
-        S('npc', 'Mark', '…I have had a pipe already today. Several. It is fine. I fight better loose.', 'npc')],
+        S('npc', 'Marc dé Fleuprau', 'Anything, bro. Watch this. I bet I can put you on the floor. Friendly. First one to yield buys the other a pipe.', 'ots'),
+        S('npc', 'Marc dé Fleuprau', '…I have had a pipe already today. Several. It is fine. I fight better loose.', 'npc')],
       choices: [{ label: 'Duel him', go: () => markDuel(0, true) }, { label: 'Maybe later', go: then }], done: then }; },
     gm: (then) => { const me = G.state.hero.name; return { place: 'hub', npc: [20.4, -0.2], you: [20.4, 2.4], lines: [
         S('npc', 'The Ledger-Keeper', me + '. Yes. I have your page open.', 'wide'),
@@ -114,7 +114,7 @@
         S('npc', 'The Fence', 'They fell off a cart. Different carts. Steel, plate, potions, and round the side a rack of things to wear. Coin only. I do not keep a ledger.', 'ots')], done: then }; },
     vexa: (then) => { const me = G.state.hero.name, o = G.OPPONENTS.find(q => q.id === 'vexa'); return { place: 'arena', npc: [-1.6, -1.6], you: [1.9, 1.9], spawn: { look: { cls: o.cls, race: o.race, tint: o.tint }, crown: true }, lines: [
         S('', '', 'The crowd goes quiet when she walks out. It has done so for seven years.', 'wide'),
-        S('npc', 'Vexa, the Pale Queen', 'So you are the one they have all been betting on. Mark has not shut up about you.', 'npc'),
+        S('npc', 'Vexa, the Pale Queen', 'So you are the one they have all been betting on. Marc has not shut up about you.', 'npc'),
         S('you', me, 'I am here for the crown.', 'you'),
         S('npc', 'Vexa, the Pale Queen', 'This? It is brass. The real crown sits on Eerin Koheneim, and Vilhelm van Koheneim IV holds the sword beside it. They let us keep this one. Remember that when the crowd calls you a monarch.', 'npc'),
         S('npc', 'Vexa, the Pale Queen', 'Everyone is. I have been waiting a long time for someone who might actually take it. Do not make me feel foolish for hoping.', 'low'),
@@ -150,7 +150,7 @@
     const st = G.state; if (!st.hero) return '';
     const h = st.hero, next = G.OPPONENTS.find(o => !st.wins[o.id]);
     if (G.scene === 'hideout') return (st.items || []).length < 3 ? 'Press Decorate and furnish the place' : 'Comfort ' + (G.roomComfort || 0) + ': tap a piece to use or move it';
-    if (st.schemeDone) return 'Mark has news about your scheme';
+    if (st.schemeDone) return 'Marc has news about your scheme';
     if ((st.reports || []).length) return 'Your Tally has news at the Low Lamp';
     if (h.known.some(id => !h.slots.includes(id)) && h.slots.includes(null)) return 'See the Guildmaster to set your loadout';
     if (!next) return 'You hold the Guttercrown. Rematch anyone, or finish your home';

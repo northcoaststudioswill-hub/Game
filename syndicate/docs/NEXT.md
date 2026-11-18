@@ -12,7 +12,7 @@
 
 ## 1. Death and the Oracle of Time
 
-**Every lost bout is a death.** No more stretcher fee. Friendly duels (Mark, Ferren Voss) stay non-lethal.
+**Every lost bout is a death.** No more stretcher fee. Friendly duels (Marc, Ferren Voss) stay non-lethal.
 
 **David Roseinbeirg revives you.** He is the Oracle of Time, a wizard who "does not let the clock run out" on people he has plans for. You keep your fighter: level, gear, mastery, home and cosmetics all survive. What a death costs:
 
@@ -20,7 +20,7 @@
 |---|---|
 | The coin in your purse (not the strongbox) | Level, techniques, weapon mastery |
 | Your win streak | Gear, kits, charms, cosmetics |
-| Some respect (never enough to drop a rank) | Hideout, strongbox, Tally, Mark's loyalty |
+| Some respect (never enough to drop a rank) | Hideout, strongbox, Tally, Marc's loyalty |
 | | One point added to your **soul debt** |
 
 **The contract.**
@@ -74,11 +74,11 @@ You can always go back and fight lower tiers for smaller purses. After the crown
 | Start | The pit, the Fence (potions, basic gear), your hideout |
 | First win | The Notice Board and contracts, Big Hobb's Pot |
 | Rank 1 (Scrapper) | The Tally (your first follower), the Apothecary, the catalogue's second page |
-| Rank 2 (Bloodied) | Mark's table and the Wisp Table, the Armoury, the Tailor |
+| Rank 2 (Bloodied) | Marc's table and the Wisp Table, the Armoury, the Tailor |
 | Rank 3 (Enforcer) | The Outfitter, charms, Whisper, techniques for hire |
 | First death | David's cellar; the contract |
 | Bound by contract | Expeditions |
-| Rank 4 and up | Mark's partnership, high-rung gear, the Long Stair's tithe |
+| Rank 4 and up | Marc's partnership, high-rung gear, the Long Stair's tithe |
 
 ## 5. Gear: junk to awesome
 
@@ -110,7 +110,7 @@ Existing weapons and kits are folded into this ladder, not replaced.
 
 ## 8. Polish and world
 
-- **Text pass:** every panel and label, for length, typos and consistent voices (Mark, the Keeper, the Wardens, David).
+- **Text pass:** every panel and label, for length, typos and consistent voices (Marc, the Keeper, the Wardens, David).
 - **Looks:** menus and market checked at phone and widescreen sizes.
 - **World:** David's cellar, the expedition lands as painted map cards, more of the lower levels.
 - **Intros:** short first-time scenes for each system as it unlocks, plus David, the druid and the contract. The opening cinematic gains a beat for David once he exists.
@@ -124,7 +124,7 @@ Current mapping: left stick move, right stick aim, X or RT strike (hold for heav
 Checklist:
 - [ ] Hold-and-release heavy registers; the charge ring shows.
 - [ ] A short LT press parries; holding it blocks; releasing drops the guard.
-- [ ] Every menu can be opened, navigated and closed without a mouse, including the catalogue grid, Armoury, Outfitter and Mark's games.
+- [ ] Every menu can be opened, navigated and closed without a mouse, including the catalogue grid, Armoury, Outfitter and Marc's games.
 - [ ] Cutscenes advance with A and skip with B.
 - [ ] Furniture placement works with the stick.
 - [ ] Unplugging the pad mid-fight does not leave a button held.

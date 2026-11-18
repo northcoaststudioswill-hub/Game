@@ -84,9 +84,9 @@ down a **Flame Strike**. A loser who is merely beaten is carried out and billed 
 
 ## Chits, schemes and wispdice
 
-**Chits** are Mark's own paper: slips stamped with a long-eared rat. They are worth exactly what Mark says they are worth, at Mark's tables, and nothing anywhere else. He hands them out when one of his **schemes** goes wrong, which is often. A scheme is any plan Mark has that needs somebody else's coin. Half of them pay. Nobody, including Mark, knows which half.
+**Chits** are Marc's own paper: slips stamped with a long-eared rat. They are worth exactly what Marc says they are worth, at Marc's tables, and nothing anywhere else. He hands them out when one of his **schemes** goes wrong, which is often. A scheme is any plan Marc has that needs somebody else's coin. Half of them pay. Nobody, including Marc, knows which half.
 
-**Wispdice** are Guild-work: dice made of captive lamplight that hang in the air over the table and cannot be loaded, shaved or palmed. The Guild made them to settle its own disputes. Mark has five, and has never explained how.
+**Wispdice** are Guild-work: dice made of captive lamplight that hang in the air over the table and cannot be loaded, shaved or palmed. The Guild made them to settle its own disputes. Marc has five, and has never explained how.
 
 ## The Koheneims
 
@@ -106,9 +106,9 @@ down a **Flame Strike**. A loser who is merely beaten is carried out and billed 
 
 The fighter the crowd called "the new name" one season before the player. Battle Master, spear and shield. He fights only friendlies and keeps count. He does not want the player dead; he wants to be the one Vilhelm van Koheneim IV is watching when the champion falls.
 
-## Mark and the house
+## Marc and the house
 
-Mark's debts are real and so is his generosity. If the player covers him when the Guild collectors come, he pays back double. If the player fights for him, he never forgets it. Either way he eventually offers a tenth of the Long Odds, and a partner's name chalked under the awning, spelled wrong.
+Marc's debts are real and so is his generosity. If the player covers him when the Guild collectors come, he pays back double. If the player fights for him, he never forgets it. Either way he eventually offers a tenth of the Long Odds, and a partner's name chalked under the awning, spelled wrong.
 
 ## David Roseinbeirg and the hourglass houses
 

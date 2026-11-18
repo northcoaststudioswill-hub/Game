@@ -74,9 +74,9 @@
     const gm = npc(s, { cls: 'sorcerer', race: 'elf', tint: { cloth: '#4a2a7a', armor: '#3a2060', armor2: '#2a1648', hair: '#e8e2f4', trim: '#d9a93c' } }, 20.4, -0.2, 0.2);
     box(1.8, 0.25, 1.8, m1, 20.4, 0.02, -0.2, s); box(1.0, 1.0, 0.6, woodD(), 21.6, 0.5, -0.6, s); box(0.8, 0.1, 0.5, L(0x5a1f1f), 21.6, 1.05, -0.6, s);
     lantern(s, 19, 0, -0.8, 0xb070ff, 18);
-    // ---- Mark's corner: the Long Odds
+    // ---- Marc's corner: the Long Odds
     const mk = new T.Group(); mk.position.set(25.6, 0, 0.2); s.add(mk);
-    // a lean-to against the wall behind him: Mark, his table and the odds board all stand in the open
+    // a lean-to against the wall behind him: Marc, his table and the odds board all stand in the open
     [-1.9, 1.9].forEach(px => { mesh(new T.CylinderGeometry(0.07, 0.07, 3.3, 5), woodD(), px, 1.65, -1.1, mk); mesh(new T.CylinderGeometry(0.07, 0.07, 1.2, 5), woodD(), px, 0.6, 1.7, mk); mesh(new T.SphereGeometry(0.1, 6, 5), L(0xd9a93c), px, 1.25, 1.7, mk); });
     const aw = box(4.5, 0.1, 1.5, L(0x1f5a3a), 0, 3.2, -0.6, mk); aw.rotation.x = 0.2; box(4.5, 0.34, 0.07, L(0xd9a93c), 0, 2.92, 0.12, mk);
     box(4.6, 0.05, 3.4, L(0x143a2c), 0, 0.02, 0.4, mk).castShadow = false;
@@ -123,7 +123,7 @@
     const TINTS = [{ cloth: '#5a3a2a', armor: '#4a4038' }, { cloth: '#2a4a5a', armor: '#3a4048' }, { cloth: '#5a2a4a', armor: '#3a3040' }, { cloth: '#3a5a3a', armor: '#3a4038' }, { cloth: '#6a5a3a', armor: '#4a4438' }, { cloth: '#3a3a5a', armor: '#30304a' }];
     const walkers = [[[1.5, 5.4], [21.4, 5.2]], [[27.5, 3.8], [8.6, 4.0]], [[2.2, 11.3], [10.4, 10.7]], [[24.6, 19.8], [24.4, 12.2]], [[1.5, 20.3], [14, 20.4]], [[19.5, 3.6], [22.5, 10.8]]]
       .map((pth, i) => ({ c: npc(s, { cls: ['rogue', 'cleric', 'fighter', 'sorcerer', 'rogue', 'cleric'][i], race: Object.keys(G.RACES)[i % 5], tint: TINTS[i] }, pth[0][0], pth[0][1], 0), a: pth[0], b: pth[1], u: Math.random(), dir: 1, wait: Math.random() * 3, sp: 0.03 + i * 0.006 }));
-    const CHAT = ['…heard Vexa has never once blinked.', 'Long live Queen Eerin. From up there.', 'They say Vilhelm the Fourth watches the pit in a plain cloak.', 'No seals down here. That is the whole point.', 'Crown’s tithe went up the stair this morning.', 'Guild raised the rent again.', 'Glowcaps are coming in nicely.', 'Put ten coin on the new one. Ten!', 'Nobody leaves the Ledger.', 'Different carts, he says.', 'My cousin fought Brakk. Once.', 'The Light went ahead to wait.', 'They say the Keeper never sleeps.', 'Highmarch sealed another stair.', 'Mark owes me money. Mark owes everyone money.', 'Meet me by the First Lamp.'];
+    const CHAT = ['…heard Vexa has never once blinked.', 'Long live Queen Eerin. From up there.', 'They say Vilhelm the Fourth watches the pit in a plain cloak.', 'No seals down here. That is the whole point.', 'Crown’s tithe went up the stair this morning.', 'Guild raised the rent again.', 'Glowcaps are coming in nicely.', 'Put ten coin on the new one. Ten!', 'Nobody leaves the Ledger.', 'Different carts, he says.', 'My cousin fought Brakk. Once.', 'The Light went ahead to wait.', 'They say the Keeper never sleeps.', 'Highmarch sealed another stair.', 'Marc owes me money. Marc owes everyone money.', 'Meet me by the First Lamp.'];
     const MARKSAY = ['I have got a guy, bro. The guy is me.', 'Real ones bet big.', 'Odds! Fresh odds!', 'Bro. BRO. Look at this roll.', '…what were we doing?', 'Respect. Respect.'];
     let chatT = 4, markT = 6;
     const npcs = [fence, gm, mark, punter, k1, k2, k3, k4, sit, sit2];
@@ -141,7 +141,7 @@
         { x: 11, z: 0.6, r: 1.5, y: 3.0, label: 'Notice Board', act: 'Read the board', go: () => G.ui.board(), badge: () => !G.state.contract },
         { x: 15.6, z: 1.3, r: 1.9, y: 3.2, label: 'The Fence', act: 'Trade', go: () => G.meet('fence', () => G.ui.shop()), badge: () => !(G.state.met || {}).fence },
         { x: 20.4, z: 1.3, r: 1.9, y: 3.2, label: 'Guildmaster', act: 'Character', go: () => G.meet('gm', () => G.ui.sheet()), badge: () => !(G.state.met || {}).gm || G.state.hero.known.some(id => !G.state.hero.slots.includes(id)) && G.state.hero.slots.includes(null) },
-        { x: 25.6, z: 2.5, r: 1.9, y: 3.6, label: 'Mark · The Long Odds', act: 'Gamble', go: () => G.meet('mark', () => G.ui.mark()), badge: () => !(G.state.met || {}).mark || !!G.state.schemeDone },
+        { x: 25.6, z: 2.5, r: 1.9, y: 3.6, label: 'Marc · The Long Odds', act: 'Gamble', go: () => G.meet('mark', () => G.ui.mark()), badge: () => !(G.state.met || {}).mark || !!G.state.schemeDone },
         { x: 28.3, z: 6.2, r: 1.7, y: 4.4, label: 'The Wisp Table', act: 'Roll the wispdice', go: () => G.ui.wisp() },
         { x: -0.2, z: 3, r: 1.6, y: 3.5, label: 'The Low Lamp', act: 'See your Tally', go: () => G.ui.tally(), badge: () => (G.state.reports || []).length > 0 || (G.state.tally || []).some(t => !t.job) && G.state.second == null },
         { x: -0.2, z: 9, r: 1.9, y: 3.6, label: 'Your Hideout', act: 'Go home', go: () => G.ui.hideout() },
@@ -265,7 +265,7 @@
     let occ = {}, rugs = {}, wocc = {}, fxItems = [], ghost = null, ghostPad = null, crewActors = [], visitors = [], sayT = 5;
     const wallPos = (wl, sl) => wl === 'n' ? [sl, -0.52, 0] : [-0.52, sl, Math.PI / 2];
     const buildWall = (id, wl, sl) => { const g = new T.Group(), lp = WALLB[id](g), q = wallPos(wl, sl); g.position.set(wl === 'n' ? q[0] : q[0], 0, wl === 'n' ? q[1] : q[1]); g.rotation.y = q[2]; g.userData.lp = lp; return g; };
-    const VISIT = [['Mark', () => G.mark.look, ['Bro. BRO. You LIVE here? Respect.', 'I would bet on this room. I would bet on anything, but still.', 'Is that real brass? Do not answer, I am valuing it.']],
+    const VISIT = [['Marc', () => G.mark.look, ['Bro. BRO. You LIVE here? Respect.', 'I would bet on this room. I would bet on anything, but still.', 'Is that real brass? Do not answer, I am valuing it.']],
       ['The Fence', () => ({ cls: 'rogue', race: 'human', tint: { cloth: '#245a44', armor: '#3a4a40' } }), ['I could find you a buyer for that. Any of that.', 'Nice. Fell off a nice cart, did it?', 'You have done well. I take a little credit.']],
       ['A neighbour', () => ({ cls: 'cleric', race: 'dwarf', tint: { cloth: '#5a3a2a', armor: '#4a4038' } }), ['It is ever so cosy.', 'The glow carries right down the tunnel.', 'We never had a room like this on the eighth.']],
       ['A pit fan', () => ({ cls: 'fighter', race: 'halforc', tint: { cloth: '#2a4a5a', armor: '#3a4048' } }), ['I saw the last bout! I SAW it!', 'This is where the champion-to-be sleeps. Wow.', 'Can I touch the trophies? I will not touch the trophies.']]];
