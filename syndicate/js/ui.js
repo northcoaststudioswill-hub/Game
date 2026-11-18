@@ -193,6 +193,7 @@
   };
 
   const CONTROLS = '<div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Mouse</kbd> aim</span><span><kbd>Click</kbd> attack</span><span><kbd>Space</kbd> dodge</span><span><kbd>Q</kbd><kbd>E</kbd><kbd>R</kbd> abilities</span><span><kbd>F</kbd> ultimate</span><span><kbd>C</kbd> potion</span><span><kbd>Esc</kbd> pause</span></div>' +
+    '<div class="keys"><span><kbd>Controller</kbd> left stick move · right stick aim · <kbd>X</kbd>/<kbd>RT</kbd> attack · <kbd>A</kbd> dodge · <kbd>LB</kbd><kbd>RB</kbd><kbd>Y</kbd> abilities · <kbd>B</kbd> ultimate · <kbd>D-pad up</kbd> potion · <kbd>Menu</kbd> pause</span></div>' +
     '<p class="dim">On a phone: left thumb moves, buttons on the right, and your aim locks to your opponent. Red marks on the floor are incoming attacks. Dodge through them to thrill the crowd.</p>';
   ui.prefight = function (o) {
     const st = G.state, h = st.hero;
@@ -214,7 +215,7 @@
     const bar = $('#abar'); bar.innerHTML = '';
     const mk = (act, key, ab, cls) => {
       const b = document.createElement('button'); b.className = 'ab ' + (cls || '');
-      b.innerHTML = (ab ? G.icon(ab) : '') + '<i class="cdv"></i><kbd>' + key + '</kbd><em></em>';
+      b.innerHTML = (ab ? G.icon(ab) : '') + '<i class="cdv"></i><kbd></kbd><em></em>'; b.dataset.act = act;
       b.title = ab && ab !== 'potion' ? ab.name + ': ' + ab.desc : '';
       const fire = ev => { ev.preventDefault(); ev.stopPropagation(); G.input.pressed.push(act); };
       b.addEventListener('touchstart', fire, { passive: false }); b.addEventListener('mousedown', fire);
@@ -225,6 +226,11 @@
     if (P.ult) hudEls.slots.push({ id: P.ult, el: mk('ult', 'F', A[P.ult], 'ult') });
     hudEls.potion = mk('potion', 'C', 'potion', 'pot');
     hudEls.dodge = mk('dodge', 'SPC', { icon: 'dash', color: '#cfd8e0' }, 'dg');
+    ui.refreshKeys();
+  };
+  ui.refreshKeys = function () {
+    const K = G.input.usingPad ? { a0: 'LB', a1: 'RB', a2: 'Y', ult: 'B', potion: '▲', dodge: 'A' } : { a0: 'Q', a1: 'E', a2: 'R', ult: 'F', potion: 'C', dodge: 'SPC' };
+    document.querySelectorAll('#abar .ab').forEach(b => { b.querySelector('kbd').textContent = K[b.dataset.act] || ''; });
   };
   const stStr = e => {
     const o = [];

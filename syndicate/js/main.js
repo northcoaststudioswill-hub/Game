@@ -95,6 +95,70 @@
   $('pauseBtn').addEventListener('click', () => G.ui.pause());
   G.ui.placeInit();
 
+
+  // ---------------------------------------------------------------- gamepad (Xbox layout / any "standard" pad)
+  // Fight: left stick move, right stick aim (auto-aims when centred), X or RT attack, A or LT dodge,
+  // LB / RB / Y abilities, B ultimate, D-pad up potion, Menu pause. Menus: D-pad or stick to move, A select, B back.
+  let prevB = {}, navT = 0, usedPad = false;
+  const setPad = on => { if (In.usingPad !== on) { In.usingPad = on; document.body.classList.toggle('pad', on); G.ui.refreshKeys(); } };
+  window.addEventListener('mousemove', () => setPad(false)); window.addEventListener('keydown', () => setPad(false)); window.addEventListener('touchstart', () => setPad(false), { passive: true });
+  G.rumble = (ms, strong) => { try { const gp = In.gp && navigator.getGamepads()[In.gp]; if (In.usingPad && gp && gp.vibrationActuator) gp.vibrationActuator.playEffect('dual-rumble', { duration: ms, strongMagnitude: strong, weakMagnitude: strong * 0.6 }); } catch (e) { } };
+  function menuButtons() {
+    const roots = G.ui.isOpen() ? [$('panel')] : [$('placebar'), $('prompt'), $('decorBtn'), $('topbar')];
+    const out = [];
+    roots.forEach(r => { if (!r || r.classList.contains('hidden')) return; (r.tagName === 'BUTTON' ? [r] : r.querySelectorAll('button')).forEach(el => { if (!el.disabled && el.offsetParent !== null) out.push(el); }); });
+    return out;
+  }
+  function navigate(dx, dy) {
+    const list = menuButtons(); if (!list.length) return;
+    const cur = list.includes(document.activeElement) ? document.activeElement : null;
+    if (!cur) { (list.find(b => b.classList.contains('big')) || list[0]).focus(); return; }
+    const r = cur.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    let best = null, bs = 1e9;
+    list.forEach(el => {
+      if (el === cur) return; const q = el.getBoundingClientRect(), ex = q.left + q.width / 2 - cx, ey = q.top + q.height / 2 - cy;
+      const along = ex * dx + ey * dy, perp = Math.abs(ex * dy) + Math.abs(ey * dx);
+      if (along > 4) { const sc = along + perp * 2.5; if (sc < bs) { bs = sc; best = el; } }
+    });
+    if (best) { best.focus(); best.scrollIntoView({ block: 'nearest' }); G.sfx('ui'); }
+  }
+  function pollPad(dt) {
+    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    let gp = null; for (const p of pads) if (p && p.connected && p.mapping === 'standard') { gp = p; break; }
+    if (!gp) for (const p of pads) if (p && p.connected) { gp = p; break; }
+    if (!gp) { In.pad = null; return; }
+    In.gp = gp.index;
+    const dz = v => Math.abs(v) < 0.22 ? 0 : v, ax = i => dz(gp.axes[i] || 0);
+    const now = {}; for (let i = 0; i < 17; i++) now[i] = !!(gp.buttons[i] && (gp.buttons[i].pressed || gp.buttons[i].value > 0.5));
+    const hit = i => now[i] && !prevB[i];
+    const lx = ax(0), ly = ax(1), rx = ax(2), ry = ax(3);
+    if (lx || ly || rx || ry || Object.keys(now).some(i => now[i])) { setPad(true); G.audioInit(); }
+    In.pad = { lx, ly, rx, ry, atk: now[2] || now[7] };
+    if (!In.usingPad) { prevB = now; return; }
+    const sc = G.scene, open = G.ui.isOpen(), paused = sc === 'fight' && G.fight.paused;
+    // one step per press for D-pad, repeating for a held stick
+    let nx = (hit(15) ? 1 : 0) - (hit(14) ? 1 : 0), ny = (hit(13) ? 1 : 0) - (hit(12) ? 1 : 0);
+    navT -= dt;
+    if (!nx && !ny && (Math.abs(lx) > 0.6 || Math.abs(ly) > 0.6)) { if (navT <= 0) { if (Math.abs(lx) > Math.abs(ly)) nx = Math.sign(lx); else ny = Math.sign(ly); navT = 0.22; } } else if (!lx && !ly) navT = 0;
+    if (sc === 'fight' && !open && !paused) {
+      if (hit(0) || hit(6)) In.pressed.push('dodge');
+      if (hit(4)) In.pressed.push('a0'); if (hit(5)) In.pressed.push('a1'); if (hit(3)) In.pressed.push('a2');
+      if (hit(1)) In.pressed.push('ult'); if (hit(12)) In.pressed.push('potion'); if (hit(9)) G.ui.pause();
+    } else if (G.placing && !open) {
+      if (nx || ny) { const pl = G.placing; pl.x += nx; pl.z += ny; W.get('hideout').setGhost(pl); G.ui.placeBar(); }
+      if (hit(0)) $('plOk').click(); if (hit(2)) $('plRot').click(); if (hit(1)) $('plCancel').click();
+    } else if (open || sc === 'title' || sc === 'create') {
+      if (nx || ny) navigate(nx, ny);
+      const list = menuButtons(); if (list.length && !list.includes(document.activeElement)) (list.find(b => b.classList.contains('big')) || list[0]).focus();
+      if (hit(0) && list.includes(document.activeElement)) document.activeElement.click();
+      if (hit(1) || (paused && hit(9))) { const back = $('panel').querySelector('#x, #n, #rs'); if (back) back.click(); }
+    } else if (sc === 'hub' || sc === 'hideout') {
+      if (hit(0) && G.near) { G.sfx('ui'); G.near.go(); }
+      if (hit(3)) { G.sfx('ui'); if (sc === 'hideout') G.ui.catalog(); else G.ui.sheet(); }
+    }
+    prevB = now;
+  }
+
   // ---------------------------------------------------------------- floating name tags over doors and stalls
   function tags(place, near) {
     const host = $('tags');
@@ -117,6 +181,7 @@
     const dt = Math.min(0.033, (now - last) / 1000); last = now; T += dt;
     const sc = G.scene, cam = gfx.cam, port = gfx.portrait;
     if (sc !== lastScene) { leaveSpecial(); lastScene = sc; }
+    pollPad(dt);
     let near = null;
     if (sc === 'fight') { G.fight.update(dt); }
     else if (sc === 'hub' || sc === 'hideout') {
@@ -134,8 +199,8 @@
     if (gfx.scene() === (W.cache.arena && W.cache.arena.scene)) W.cache.arena.update(T);
     G.near = (sc === 'hub' || sc === 'hideout') && !G.ui.isOpen() && !G.placing ? near : null;
     tags((sc === 'hub' || sc === 'hideout') ? W.walker.place : null, G.near);
-    const pr = $('prompt'); if (G.near) { pr.textContent = G.near.act; pr.className = 'big'; } else pr.className = 'big hidden';
-    $('decorBtn').className = sc === 'hideout' && !G.placing && !G.ui.isOpen() ? '' : 'hidden';
+    const pr = $('prompt'); if (G.near) { pr.textContent = (In.usingPad ? '(A) ' : '') + G.near.act; pr.className = 'big'; } else pr.className = 'big hidden';
+    $('decorBtn').textContent = In.usingPad ? '(Y) Decorate' : 'Decorate'; $('decorBtn').className = sc === 'hideout' && !G.placing && !G.ui.isOpen() ? '' : 'hidden';
     $('touch').className = In.touch && (sc === 'fight' || ((sc === 'hub' || sc === 'hideout') && !G.placing && !G.ui.isOpen())) ? (sc === 'fight' ? 'fight' : '') : 'hidden';
     gfx.updateFires(T); gfx.updateParticles(dt); gfx.updateFloats(dt);
     gfx.render();

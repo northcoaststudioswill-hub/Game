@@ -230,6 +230,7 @@
     if (!frozen) {
       ix = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0); iy = (k.KeyS || k.ArrowDown ? 1 : 0) - (k.KeyW || k.ArrowUp ? 1 : 0);
       if (In.stick.active) { ix = In.stick.x; iy = In.stick.y; }
+      if (In.usingPad && In.pad && (In.pad.lx || In.pad.ly)) { ix = In.pad.lx; iy = In.pad.ly; }
     }
     let mx = 0, mz = 0;
     if (ix || iy) { const w = gfx.screenToWorld(ix, iy); mx = w.x; mz = w.z; walker.target = null; }

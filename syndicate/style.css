@@ -33,6 +33,8 @@ button.big:hover { background: linear-gradient(#ffd36b, #d09a38); }
 button.danger { border-color: rgba(255, 90, 74, 0.6); color: #ff9a8a; }
 button:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.7); }
 button.mini { font-size: 0.62rem; padding: 0.5em 0.8em; }
+body.pad button:focus { outline: 3px solid var(--gold); outline-offset: 2px; box-shadow: 0 0 1rem rgba(255, 200, 90, 0.6); }
+body.pad #cv { cursor: none; }
 button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 input { font-family: var(--body); font-size: 1.1rem; color: var(--text); background: rgba(0, 0, 0, 0.45); border: 1px solid var(--line); border-radius: 0.3em; padding: 0.55em 0.8em; flex: 1; min-width: 8em; user-select: text; -webkit-user-select: text; }
 .row { display: flex; gap: 0.6em; align-items: center; flex-wrap: wrap; }

@@ -32,17 +32,19 @@ phone portrait, phone landscape, or a desktop monitor.
 
 ## Controls
 
-| Action | Keyboard / mouse | Touch |
-|---|---|---|
-| Move | WASD or arrows (or click the ground outside fights) | left thumb stick, or tap the ground |
-| Interact | E, or the gold button | the gold button, or tap a name tag |
-| Aim | mouse | locks to opponent |
-| Attack | left click (hold) | ATK |
-| Dodge | Space or right click | DODGE |
-| Abilities | Q, E, R | ability buttons |
-| Ultimate | F | ability button |
-| Potion | C | potion button |
-| Pause | Esc | Pause |
+| Action | Keyboard / mouse | Touch | Xbox controller |
+|---|---|---|---|
+| Move | WASD or arrows (or click the ground outside fights) | left thumb stick, or tap the ground | left stick |
+| Interact | E, or the gold button | the gold button, or tap a name tag | A |
+| Aim | mouse | locks to opponent | right stick (auto-aims when centred) |
+| Attack | left click (hold) | ATK | X or RT (hold) |
+| Dodge | Space or right click | DODGE | A or LT |
+| Abilities | Q, E, R | ability buttons | LB, RB, Y |
+| Ultimate | F | ability button | B |
+| Potion | C | potion button | D-pad up |
+| Pause | Esc | Pause | Menu |
+
+With a controller, menus use the D-pad or left stick to move, A to select and B to go back. In the hideout, Y opens Decorate; while placing, the D-pad moves the piece, X rotates, A places and B cancels. Any pad the browser reports with the standard layout works the same way.
 
 ## Art direction
 
@@ -70,4 +72,4 @@ folder, and phone store builds are a web-view wrapper (Capacitor). Not set up ye
 ## Not in the slice yet
 
 Authored character models and animation, more arenas, more classes and levels past 5,
-multiclassing, music, gamepad support, cloud saves.
+multiclassing, music, cloud saves, typing a name with a controller.

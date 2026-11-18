@@ -232,6 +232,7 @@
     spark(tgt.x, tgt.y, 30, '#c01818', 6, 120);
     flashLight(tgt.x, tgt.y, ab.color || '#ffffff', crit ? 40 : 18);
     G.sfx(crit ? 'crit' : tgt.isPlayer ? 'hurt' : 'hit');
+    if (G.rumble) G.rumble(tgt.isPlayer ? 160 : crit ? 110 : 50, tgt.isPlayer ? 0.8 : crit ? 0.6 : 0.25);
     if (att.isPlayer) { addHype(crit ? 10 : 5); if (ab.gain) att.res = Math.min(100, att.res + ab.gain); }
     else addHype(-7);
     const resist = tgt.boss ? 0.6 : 1;
@@ -503,15 +504,19 @@
     const I = P.intent, In = G.input, k = In.keys;
     let ix = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0), iy = (k.KeyS || k.ArrowDown ? 1 : 0) - (k.KeyW || k.ArrowUp ? 1 : 0);
     if (In.stick.active) { ix = In.stick.x; iy = In.stick.y; }
+    const pad = In.usingPad && In.pad;
+    if (pad && (pad.lx || pad.ly)) { ix = pad.lx; iy = pad.ly; }
     const w = gfx.screenToWorld(ix, iy); I.mx = w.x; I.my = w.z;
-    if (In.touch || In.autoAim) {
+    if (pad && Math.hypot(pad.rx, pad.ry) > 0.35) {
+      const a = gfx.screenToWorld(pad.rx, pad.ry); I.aim = Math.atan2(a.z, a.x); I.pt.x = P.x + Math.cos(I.aim) * 220; I.pt.y = P.y + Math.sin(I.aim) * 220;
+    } else if (In.touch || In.autoAim || pad) {
       const t = E.buffs.stealth ? { x: P.x + Math.cos(P.aim) * 100, y: P.y + Math.sin(P.aim) * 100 } : E;
       I.aim = Math.atan2(t.y - P.y, t.x - P.x); I.pt.x = t.x; I.pt.y = t.y;
     } else {
       const g = gfx.groundAt(In.mouse.cx, In.mouse.cy), wx = g.x * S, wy = g.z * S;
       I.aim = Math.atan2(wy - P.y, wx - P.x); I.pt.x = wx; I.pt.y = wy;
     }
-    I.attack = In.mouse.down || In.touchAtk || k.KeyJ;
+    I.attack = In.mouse.down || In.touchAtk || k.KeyJ || !!(pad && pad.atk);
     while (In.pressed.length) {
       const a = In.pressed.shift();
       if (a === 'dodge' || a === 'potion') I.queue.push(a);
