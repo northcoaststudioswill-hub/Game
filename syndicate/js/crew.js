@@ -51,7 +51,7 @@
   };
   G.WSKIN = {
     ember: { color: 0xff9a4a, e: 0xa03808, glow: 0xff7a2a }, frost: { color: 0xbfeaff, e: 0x1a6a90, glow: 0x7ad8ff },
-    gilded: { color: 0xffd36b, e: 0x6a4a08, glow: 0xffd36b }, mirror: { color: 0xf4f8ff, e: 0x5a6a7a, glow: 0xffffff }, luckyedge: { color: 0x8aff9a, e: 0x1a6a2a, glow: 0xf0c95a }, frost: { color: 0xd8f4ff, e: 0x2a6a8a, glow: 0x9adfff }, voidsteel: { color: 0x1a1420, e: 0x3a1a6a, glow: 0xb070ff }, wisp: { color: 0x9af6ff, e: 0x0a6a7a, glow: 0x6af0ff }, blood: { color: 0xc22a22, e: 0x6a0808, glow: 0xff4030 }, toxic: { color: 0x9aff5a, e: 0x2a6a08, glow: 0x8aff5a }, void: { color: 0x7a4ac0, e: 0x3a1470, glow: 0xb070ff }
+    gilded: { color: 0xffd36b, e: 0x6a4a08, glow: 0xffd36b }, obsidian: { color: 0x121016, e: 0x2a0a0a, glow: 0xff5030 }, bronze: { color: 0xc8823a, e: 0x5a3008, glow: 0xffb060 }, mirror: { color: 0xf4f8ff, e: 0x5a6a7a, glow: 0xffffff }, luckyedge: { color: 0x8aff9a, e: 0x1a6a2a, glow: 0xf0c95a }, frost: { color: 0xd8f4ff, e: 0x2a6a8a, glow: 0x9adfff }, voidsteel: { color: 0x1a1420, e: 0x3a1a6a, glow: 0xb070ff }, wisp: { color: 0x9af6ff, e: 0x0a6a7a, glow: 0x6af0ff }, blood: { color: 0xc22a22, e: 0x6a0808, glow: 0xff4030 }, toxic: { color: 0x9aff5a, e: 0x2a6a08, glow: 0x8aff5a }, void: { color: 0x7a4ac0, e: 0x3a1470, glow: 0xb070ff }
   };
   G.COSMETICS = [
     { id: 'crimson', slot: 'dye', name: 'Pit Crimson', cost: 60, rank: 0, desc: 'Deep red cloth, brass trim. Hides the stains.' },
@@ -104,6 +104,8 @@
     { id: 'pennants', slot: 'back', name: 'Crowd’s Pennants', cost: 9999, rank: 9, deed: 'crowd', desc: 'Deed: Crowd Favourite. Two flags they threw down to you.' },
     { id: 'mirror', slot: 'weapon', name: 'Mirror Polish', cost: 9999, rank: 9, deed: 'deflect', desc: 'Deed: Deflector. Bright enough to parry by.' },
     { id: 'luckyedge', slot: 'weapon', name: 'Partner’s Edge', cost: 9999, rank: 9, deed: 'partner', desc: 'Deed: Silent Partner. Green with a gold shine, like Mark’s promises.' },
+    { id: 'obsidian', slot: 'weapon', name: 'Obsidian', cost: 9999, rank: 9, deed: 'breaker', desc: 'Deed: Posture Breaker. Black glass with a red heart.' },
+    { id: 'bronze', slot: 'weapon', name: 'Old Bronze', cost: 9999, rank: 9, deed: 'heavy', desc: 'Deed: Heavy Hand. The metal the first pit fighters used.' },
     { id: 'ember', slot: 'weapon', name: 'Emberforged', cost: 120, rank: 1, desc: 'The edge glows like a coal.' },
     { id: 'frost', slot: 'weapon', name: 'Frostbitten', cost: 120, rank: 1, desc: 'Cold enough to smoke.' },
     { id: 'gilded', slot: 'weapon', name: 'Gilded', cost: 200, rank: 3, desc: 'Gold leaf over good steel.' },
@@ -119,6 +121,7 @@
     { id: 'afterimage', slot: 'aura', name: 'Afterimage', cost: 9999, rank: 9, deed: 'ghost', desc: 'Deed: Not There. Pale echoes of where you just were.', color: 0x9fe8ff },
     { id: 'saintly', slot: 'aura', name: 'Untouched Light', cost: 9999, rank: 9, deed: 'clean', desc: 'Deed: Untouched. Nothing has laid a hand on you.', color: 0xfff6d0 },
     { id: 'hearth', slot: 'aura', name: 'Hearth Glow', cost: 9999, rank: 9, deed: 'home', desc: 'Deed: House Proud. You smell faintly of a good fire.', color: 0xffb060 },
+    { id: 'steam', slot: 'aura', name: 'Forge Steam', cost: 9999, rank: 9, deed: 'wallguard', desc: 'Deed: Immovable. You run hot.', color: 0xd8d8e0 },
     { id: 'gold', slot: 'aura', name: 'Halo of Coin', cost: 280, rank: 4, desc: 'The crowd’s favour, made visible.', color: 0xffd36b }
   ];
   const SLOTS = [['dye', 'Dyes'], ['head', 'Headgear'], ['back', 'Back'], ['weapon', 'Weapon finish'], ['aura', 'Aura']];

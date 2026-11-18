@@ -168,5 +168,5 @@
     const C = G.CLASSES[cls];
     return { name, race, cls, level: 1, xp: 0, stats: G.baseStats(cls, race), sub: null, feats: [], known: C.start.slice(), slots: [C.start[0], C.start[1], null], ult: null };
   };
-  G.lookOf = (h, st) => ({ cls: h.cls, race: h.race, gear: st ? st.gear : { weapon: 0, armor: 0 }, tint: h.tint, skin: h.skin, scale: h.scale || 1, rank: st ? G.rankOf(st.respect) : 0, cos: st ? st.cos : null });
+  G.lookOf = (h, st) => ({ cls: h.cls, race: h.race, gear: st ? st.gear : { weapon: 0, armor: 0 }, tint: h.tint, skin: h.skin, arm: G.armOf ? G.armOf(h) : null, scale: h.scale || 1, rank: st ? G.rankOf(st.respect) : 0, cos: st ? st.cos : null });
 })();

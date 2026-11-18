@@ -20,7 +20,7 @@
       isPlayer, name: h.name, cls: h.cls, C, look, stats: h.stats, level: h.level, d,
       x: isPlayer ? (gfx.portrait ? 105 : -150) : (gfx.portrait ? -105 : 150), y: isPlayer ? (gfx.portrait ? 105 : 150) : (gfx.portrait ? -105 : -150), z: 0, kx: 0, ky: 0, aim: isPlayer ? (gfx.portrait ? -2.36 : -0.78) : (gfx.portrait ? 0.78 : 2.36),
       hp: d.maxHp, maxHp: d.maxHp, res: 100, shield: 0,
-      basic: C.basic, kit: (h.slots || h.known).filter(Boolean), ult: h.ult || null, cds: {}, dodgeT: 0,
+      basic: (h.arm && G.ABILITIES[h.arm] && G.ARM_BY && G.ARM_BY[h.arm] && G.ARM_BY[h.arm].cls === h.cls) ? h.arm : C.basic, kit: (h.slots || h.known).filter(Boolean), ult: h.ult || null, cds: {}, dodgeT: 0,
       state: 'idle', t: 0, act: null, st: {}, buffs: {}, iframe: 0, flash: 0, walk: 0, moving: false, koT: 0,
       intent: { mx: 0, my: 0, aim: 0, pt: { x: 0, y: 0 }, attack: false, queue: [] }, buf: null,
       potions: 0, ai: null, think: 0.6, strafe: 1, strafeT: 1, combo: 0, lastSeen: { x: 0, y: 0 }, auraT: 0, dmgDealt: 0, vis: null
@@ -53,7 +53,7 @@
     { const tm = (st.tally || [])[st.second]; P.second = tm && !tm.job ? tm : null; }
     if (st.bless) { P.shield += 18; st.bless = 0; }
     gfx.cam.x = 0; gfx.cam.z = 0; gfx.cam.y = 0.9; camVh = gfx.cam.vh = gfx.portrait ? 17 : 15;
-    F.active = true; F.paused = false; F.P = P; F.E = E;
+    F.active = true; F.paused = false; F.P = P; F.E = E; initPoise();
     G.ui.buildHud(P, E); G.ui.banner(o.name, o.title);
     G.sfx('bell'); G.sfx('crowd');
     sync(0);
@@ -78,7 +78,7 @@
     const v = e.vis, X = e.x / S, Z = e.y / S;
     v.g.position.set(X, e.z / S, Z);
     { const ry = Math.atan2(Math.cos(e.aim), Math.sin(e.aim)); if (v.ry == null || e.state === 'dodge') v.ry = ry; let d = ry - v.ry; d = Math.atan2(Math.sin(d), Math.cos(d)); v.ry += d * 0.3; v.c.root.rotation.y = v.ry; }       // a body takes a moment to turn
-    let act = 'idle', prog = 0, glow = null;
+    let act = 'idle', prog = 0, glow = null, stepOv = 0;
     if (e.state === 'ko') { act = 'ko'; prog = e.koT; }
     else if (e.down > 0) { act = 'ko'; prog = Math.min(e.downT - e.down, e.down) * 1.7; }
     else if (e.st.stun) act = 'stun';
@@ -90,13 +90,14 @@
       if (ab.type === 'dash') act = 'lunge';
     }
     else if (e.state === 'parry') act = 'parry';
+    else if (e.charging > 0.1 && phase === 'fight') { act = e.C.ranged ? 'cast' : 'swing'; prog = e.C.ranged ? Math.min(1, e.charging * 2) : Math.min(0.3, 0.1 + e.charging * 0.5); stepOv = 2; glow = e.charging >= 0.32 ? '#ffe9a0' : null; }
     else if (phase === 'intro') act = 'salute';
     else if (phase === 'ko' || (phase === 'mortal' && M && e.isPlayer && M.t > (M.def.imp || 1.2) + 0.6)) act = 'cheer';
     const alpha = e.buffs.stealth ? (e.isPlayer ? 0.4 : 0.1) : 1;
     if (act === 'cast' && e.state === 'wind' && glow && Math.random() < 0.6) { const ca = rand(0, 6.28), cr = rand(0.8, 1.5); gfx.emit(X + Math.cos(ca) * cr, 1.2 + rand(-0.4, 0.6), Z + Math.sin(ca) * cr, -Math.cos(ca) * cr * 3, 0, -Math.sin(ca) * cr * 3, 0.3, glow, 0); }
-    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : 0, guard: e.guard > 0, ready: 1, hop: !!(e.lost && e.lost.legL), tired: e.hp < e.maxHp * 0.25, t: time + (e.isPlayer ? 0 : 1.7), glow });
+    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : stepOv, guard: e.guard > 0, ready: 1, hop: !!(e.lost && e.lost.legL), tired: e.hp < e.maxHp * 0.25, t: time + (e.isPlayer ? 0 : 1.7), glow });
     const alive = e.state !== 'ko';
-    v.ring.visible = alive && alpha > 0.3 && !F.ex; v.ring.position.y = 0.03 - e.z / S;
+    v.ring.visible = alive && alpha > 0.3 && !F.ex; v.ring.scale.setScalar(1 + Math.min(1, (e.charging || 0) / 0.32) * 0.45); v.ring.position.y = 0.03 - e.z / S;
     v.ward.visible = alive && e.shield > 0; if (v.ward.visible) v.ward.material.opacity = 0.18 + Math.sin(time * 6) * 0.06;
     v.mark.visible = alive && !!e.st.mark; v.guard.visible = alive && (!!e.buffs.counter || e.guard > 0 || (e.state === 'parry' && e.parryT > 0)); if (v.guard.visible) v.guard.rotation.y = v.c.root.rotation.y - Math.PI / 2;
     v.stars.forEach((s, i) => { s.visible = alive && !!e.st.stun; const a = time * 6 + i * 2.09; s.position.set(Math.cos(a) * 0.4, 2.25, Math.sin(a) * 0.4); });
@@ -212,6 +213,19 @@
 
   // ------------------------------------------------------------------ floor marks: scorches, cracks and holy afterglow
   let marks = [], markN = 0, camKx = 0, camKz = 0, slowT = 0;
+  // posture: every blow wears it down; when it goes, you reel and take the next one clean
+  const POISE = { fighter: 120, cleric: 110, rogue: 85, sorcerer: 75 };
+  function initPoise() { [P, E].forEach(e => { if (!e || e.maxPoise) return; e.maxPoise = POISE[e.cls] * (e.boss ? 1.3 : 1); e.poise = e.maxPoise; e.poiseT = 0; e.d.speed *= 0.92; }); }
+  const counted = () => phase === 'fight' && !F.ex && !opp.spar && G.deeds;
+  function poiseHit(e, v, by) {
+    if (!e.maxPoise || e.st.broken || e.state === 'ko' || e.hp <= 0 || F.ex) return;
+    e.poise -= v; e.poiseT = 1.8;
+    if (e.poise > 0) return;
+    e.poise = e.maxPoise; e.st.stun = { t: 1.3 }; e.st.broken = { t: 1.7 }; interrupt(e); e.guard = 0; e.charging = 0;
+    text(e, 'POSTURE BROKEN', '#ffb070', true); G.sfx('stun'); G.sfx('clang'); shake = Math.max(shake, 12); hitstop = Math.max(hitstop, 0.14); slowT = Math.max(slowT, 0.2);
+    fx.push({ k: 'ring', x: e.x, y: e.y, r: 130, col: '#ffb070', t: 0, life: 0.45 });
+    if (by && by.isPlayer) { addHype(12); if (counted()) G.deeds.bump('break'); }
+  }
   // full-screen punctuation: a red edge when you are hurt, a white pop on a crit, a splash when something comes off
   function screenFx(kind) { const el = document.getElementById('hitfx'); if (!el || F.ex) return; el.className = ''; void el.offsetWidth; el.className = kind; }
   function knockdown(e, t) { if (e.state === 'ko') return; e.st.stun = { t }; interrupt(e); e.down = e.downT = t; e.lastDown = time; e.vx = e.vy = 0; fx.push({ k: 'dust', x: e.x, y: e.y, r: 90, t: 0.12, life: 0.5 }); }
@@ -242,6 +256,7 @@
   function parryWindow(e) { return PARRY[e.cls][0] + (e.d.parry || 0) + Math.max(0, G.mod(e.stats.dex)) * 0.008; }
   // Each class answers a parried blow its own way.
   function parried(att, tgt, ab, o) {
+    poiseHit(att, 40, tgt);
     const cls = tgt.cls, resist = att.boss ? 0.6 : 1, pa = Math.atan2(att.y - tgt.y, att.x - tgt.x), near = Math.hypot(att.x - tgt.x, att.y - tgt.y) < 170;
     text(tgt, PARRY[cls][1] + '!', '#ffe9a0', true); G.sfx('clang'); G.sfx('perfect'); hitstop = Math.max(hitstop, 0.13); shake = Math.max(shake, 7);
     spark(tgt.x, tgt.y, 36, '#ffe9a0', 16, 240); flashLight(tgt.x, tgt.y, '#ffe9a0', 45);
@@ -356,7 +371,9 @@
     if (tgt.guard > 0 && ab.type !== 'aura' && !o.noCounter && !o.dot) {
       if (ab.basic) {
         tgt.guardHits = (tgt.guardHits || 0) + 1; text(tgt, 'BLOCKED', '#cfd8e0'); G.sfx('clang'); spark(tgt.x, tgt.y, 36, '#ffe9a0', 7, 150); tgt.flash = 0.04; if (att.isPlayer) addHype(-4);
-        if (tgt.guardHits >= 2) {
+        poiseHit(tgt, 9, att);
+        if (tgt.isPlayer) { tgt.res = Math.max(0, tgt.res - 9); if (counted()) G.deeds.bump('block'); if (tgt.res <= 0) { tgt.guard = 0; tgt.st.stun = { t: 0.6 }; text(tgt, 'GUARD CRUSHED', '#ff7a6a', true); G.sfx('stun'); return false; } }
+        if (tgt.guardHits >= (tgt.isPlayer ? 3 : 2)) {
           tgt.guard = 0; tgt.think = 0; text(att, 'PARRIED!', '#ff7a6a', true); att.st.stun = { t: 0.65 }; interrupt(att); G.sfx('stun'); shake = Math.max(shake, 6);
           const pa = Math.atan2(att.y - tgt.y, att.x - tgt.x); att.kx = Math.cos(pa) * 150; att.ky = Math.sin(pa) * 150; if (att.isPlayer) addHype(-8);
         }
@@ -370,7 +387,7 @@
     if (att.d.radiantMelee && ab.type === 'melee') dmg += G.roll([1, 6]);
     let crit = Math.random() < att.d.crit, sneak = false;
     if (att.buffs.sneak) { crit = true; sneak = true; dmg += G.roll([att.d.sneakDice, 6]); delete att.buffs.sneak; delete att.buffs.stealth; }
-    let mul = att.d.dmgMul * (1 + (att.buffs.dmg ? att.buffs.dmg.amt : 0)) * (o.power || 1);
+    let mul = att.d.dmgMul * (1 + (att.buffs.dmg ? att.buffs.dmg.amt : 0)) * (o.power || 1) * (ab.pow || 1) * (tgt.st.broken ? 1.35 : 1) * (tgt.st.winded ? 1.15 : 1);
     if (ab.execute && tgt.hp / tgt.maxHp < 0.4) mul *= 2;
     if (crit) mul *= att.d.critMul;
     if (tgt.st.mark) mul *= 1.25;
@@ -387,6 +404,7 @@
     if (tag && att.isPlayer) { text(tgt, tag, '#ffd23c', true); addHype(6); }
     if (tag === 'COUNTER' && tgt.act && !tgt.act.ab.armor) interrupt(tgt);
     tgt.hurt = 0.28;
+    if (real) { poiseHit(tgt, (ab.heavy ? 60 : ab.basic ? 15 : 28) * (ab.pz || 1) * (crit ? 1.3 : 1), att); if (ab.heavy && att.isPlayer && counted()) G.deeds.bump('heavy'); }
     const wt = Math.min(1, dmg / Math.max(1, tgt.maxHp) * 5), ha = o.from != null ? o.from : Math.atan2(tgt.y - att.y, tgt.x - att.x);       // weight: how much of them this blow took
     tgt.flash = 0.12; hitstop = Math.max(hitstop, (crit ? 0.13 : 0.065) + wt * 0.07); shake = Math.max(shake, (crit ? 12 : 5) + wt * 6);
     if (real && dmg > 0) {
@@ -447,6 +465,7 @@
     if (!canUse(e, id)) { if (e.isPlayer && !ab.basic) G.sfx('deny'); if (e.isPlayer && ab.basic && e.res < (ab.cost || 0) && time - (e.windedT || -9) > 1.2) { e.windedT = time; text(e, 'WINDED', '#9aa3ad'); G.sfx('deny'); } return false; }
     const I = e.intent;
     e.res -= (ab.cost || 0);
+    if (e.res < 5 && !e.st.winded) { e.st.winded = { t: 1.8 }; if (time - (e.windedT || -9) > 1.2) { e.windedT = time; text(e, 'WINDED', '#9aa3ad'); } }
     if (ab.cd) e.cds[id] = ab.cd;
     e.aim = I.aim;
     const act = e.act = { ab, id, aim: I.aim, total: ab.wind, pt: null, sx: e.x, sy: e.y, step: 0 };
@@ -454,6 +473,7 @@
       e.mash = Math.min(6, (e.mash || 0) + 1);
       if (ab.type === 'melee') { act.step = (e.cStep != null && time - (e.cEnd || -9) < 0.42) ? (e.cStep + 1) % 3 : 0; if (act.step === 2) { act.fin = 1; act.total = ab.wind * 1.75; } }
     } else e.mash = 0;
+    if (ab.heavy && ab.type === 'melee') act.step = 2;
     if ((ab.type === 'proj' || ab.type === 'line') && Math.hypot(e.foe.x - e.x, e.foe.y - e.y) < 82) { act.dis = 1; act.total *= 1.45; if (time - (e.disT || -9) > 1.6) { e.disT = time; text(e, 'DISADVANTAGE', '#c0a0ff'); } }
     if (ab.type === 'aoe' && ab.at === 'point') {
       let dx = I.pt.x - e.x, dy = I.pt.y - e.y; const d = Math.hypot(dx, dy) || 1;
@@ -467,7 +487,8 @@
     }
     if (e.buffs.stealth && ab.type !== 'buff' && ab.type !== 'dash') delete e.buffs.stealth;
     G.sfx(ab.type === 'melee' && !ab.spell ? 'swing' : ab.type === 'dash' ? 'dash' : 'cast');
-    if (!ab.basic && ab.name) { gfx.floatText(e.x / S, 2.9, e.y / S, ab.name, ab.color || '#fff'); if (ab.ult) { fx.push({ k: 'ring', x: e.x, y: e.y, r: 150, col: ab.color, t: 0, life: 0.5 }); hitstop = Math.max(hitstop, 0.1); flashLight(e.x, e.y, ab.color, 60); camVh += 1.5; } }
+    if (ab.heavy) { fx.push({ k: 'ring', x: e.x, y: e.y, r: 70, col: '#ffe9a0', t: 0, life: 0.3 }); }
+    if (!ab.basic && !ab.heavy && ab.name) { gfx.floatText(e.x / S, 2.9, e.y / S, ab.name, ab.color || '#fff'); if (ab.ult) { fx.push({ k: 'ring', x: e.x, y: e.y, r: 150, col: ab.color, t: 0, life: 0.5 }); hitstop = Math.max(hitstop, 0.1); flashLight(e.x, e.y, ab.color, 60); camVh += 1.5; } }
     return true;
   }
   function wildSurge(e) {
@@ -559,7 +580,8 @@
     if (e.lost && e.state !== 'ko' && gore()) { if (Math.random() < dt * 6) gfx.emit(e.x / S + rand(-0.2, 0.2), rand(0.6, 1.3), e.y / S + rand(-0.2, 0.2), rand(-0.6, 0.6), rand(-0.5, 1), rand(-0.6, 0.6), 0.5, 0xb01010, 9); if (Math.random() < dt * 2.2) gfx.splat(e.x / S + rand(-0.3, 0.3), e.y / S + rand(-0.3, 0.3), rand(0.2, 0.5)); }
     for (const k in e.cds) if (e.cds[k] > 0) e.cds[k] -= dt * (1 + e.d.cdr);
     if (e.state === 'ko') { e.koT += dt; return; }
-    e.res = Math.min(100, e.res + e.d.regen * dt);
+    e.res = Math.min(100, e.res + e.d.regen * dt * (e.guard > 0 || e.charging > 0 ? 0.25 : e.st.winded ? 0.6 : 1));
+    if ((e.poiseT = (e.poiseT || 0) - dt) <= 0 && e.poise < e.maxPoise) e.poise = Math.min(e.maxPoise, e.poise + 24 * dt);
     for (const k in e.st) {
       const s = e.st[k]; s.t -= dt;
       if (s.dice) { s.tick -= dt; if (s.tick <= 0) { s.tick += 0.5; const v = Math.max(1, Math.round(G.roll(s.dice) * (s.by ? s.by.d.dmgMul : 1))); e.hp -= v; if (s.by) s.by.dmgDealt += v; text(e, '' + v, k === 'poison' ? '#9be35a' : '#ff9a3c'); if (e.hp <= 0) { ko(e); return; } } }
@@ -616,10 +638,10 @@
         if ((e.parryCd || 0) <= 0 && e.res >= 8) { e.res -= 8; e.parryT = parryWindow(e); e.parryCd = 0.85; e.state = 'parry'; e.t = e.parryT + 0.34; e.act = null; e.buf = null; mv = 0; G.sfx('swing'); }
         else e.buf = null;
       } else if (b && b.id === 'dodge') {
-        if (e.dodgeT <= 0 && e.res < 10 && e.isPlayer && time - (e.windedT || -9) > 1.2) { e.windedT = time; text(e, 'WINDED', '#9aa3ad'); G.sfx('deny'); e.buf = null; }
-        else if (e.dodgeT <= 0 && e.res >= 10) {
+        if (e.dodgeT <= 0 && e.res < 15 && e.isPlayer && time - (e.windedT || -9) > 1.2) { e.windedT = time; text(e, 'WINDED', '#9aa3ad'); G.sfx('deny'); e.buf = null; }
+        else if (e.dodgeT <= 0 && e.res >= 15) {
           const a = (I.mx || I.my) ? Math.atan2(I.my, I.mx) : I.aim + Math.PI;
-          e.res -= 10; e.dodgeStart = time; e.perfect = 0;
+          e.res -= 15; e.dodgeStart = time; e.perfect = 0;
           e.dSpd = 560 * (!e.C.ranged && Math.cos(a - Math.atan2(e.foe.y - e.y, e.foe.x - e.x)) > 0.5 ? 1.3 : 1);       // melee close the gap faster
           e.state = 'dodge'; e.t = 0.3; e.da = a; e.iframe = 0.22; e.dodgeT = e.d.dodgeCd; e.dodgeCredit = 0; e.act = null; e.buf = null; G.sfx('dodge'); mv = 0;
         }
@@ -634,7 +656,7 @@
       const l = Math.hypot(I.mx, I.my) || 1, m = Math.min(1, l);
       let v = e.d.speed * mv * m * (e.st.slow ? 1 - e.st.slow.amt : 1) * (1 + (e.buffs.speed ? e.buffs.speed.amt : 0));
       { const fd = Math.hypot(e.foe.x - e.x, e.foe.y - e.y) || 1; if (fd < 430 && (I.mx * (e.foe.x - e.x) + I.my * (e.foe.y - e.y)) / (l * fd) < -0.5) v *= 0.8; }       // backpedalling is slow
-      if (e.hurt > 0) v *= 0.55;                                           // a hit takes the legs out of you for a moment
+      if (e.hurt > 0) v *= 0.55; if (e.st.winded) v *= 0.7; if (e.charging > 0 || e.guard > 0) v *= 0.5;                                           // a hit takes the legs out of you for a moment
       tvx = I.mx / l * v; tvy = I.my / l * v;
     }
     { const kk = Math.min(1, dt * (tvx || tvy ? 9 : 13)); e.vx = (e.vx || 0) + (tvx - (e.vx || 0)) * kk; e.vy = (e.vy || 0) + (tvy - (e.vy || 0)) * kk;
@@ -695,7 +717,9 @@
     for (const p of projs) if (p.owner !== e && !p.seen && Math.hypot(p.x - e.x, p.y - e.y) < 170) { p.seen = 1; if (e.res >= 8 && Math.random() < ai.parry) e.react = { t: 0.1, parry: 1 }; else if (Math.random() < ai.dodge) e.react = { t: 0.03, side: 1 }; }
     if (e.react) { e.react.t -= dt; if (e.react.t <= 0) { if (e.react.side) { I.mx = -uy * e.strafe; I.my = ux * e.strafe; } I.queue.push(e.react.parry ? 'parry' : 'dodge'); e.react = null; } }
     // rules the AI plays by: rest when winded, never swing into a raised parry, punish whatever leaves the foe open
-    if (e.res < 14) e.rest = 1; else if (e.res > 45) e.rest = 0;
+    if (e.res < 22) e.rest = 1; else if (e.res > 55) e.rest = 0;
+    if (foe.guard > 0 && d < 140) e.combo = 0;                                            // do not chip at a raised guard: go through it
+    if (!e.C.ranged && e.poise < e.maxPoise * 0.3 && d < 150 && foe.state !== 'recover' && !foe.st.stun) { I.mx = -ux; I.my = -uy; }
     const open = seen && (foe.state === 'recover' || (foe.state === 'parry' && foe.parryT <= 0) || !!foe.st.stun), turtled = foe.state === 'parry' && foe.parryT > 0;
     if (e.rest && !e.C.ranged && d < 150) { I.mx = -ux; I.my = -uy; e.combo = 0; }
     if (turtled) e.combo = 0;
@@ -711,6 +735,7 @@
       if (e.ult && canUse(e, e.ult) && (e.hp < e.maxHp * 0.75 || foe.hp < foe.maxHp * 0.6) && inRange(e, A[e.ult], d)) { I.queue.push(e.ult); return; }
       const c = e.kit.filter(id => !A[id].heal && canUse(e, id) && inRange(e, A[id], d));
       if (c.length && Math.random() < ai.aggro) { I.queue.push(G.pick(c)); return; }
+      { const hv = e.basic + '_h', hb = A[hv]; if (hb && canUse(e, hv) && (hb.type === 'melee' ? d < hb.range + 46 : d < 420) && (foe.guard > 0 || foe.st.stun || foe.st.broken || Math.random() < ai.aggro * 0.2)) { I.queue.push(hv); return; } }
       const b = A[e.basic];
       if (b.type === 'melee') { if (d < b.range + 14) e.combo = 1 + Math.floor(Math.random() * 3); }
       else if (d < 480 && Math.random() < 0.5 + ai.aggro * 0.5) I.attack = true;
@@ -718,7 +743,7 @@
     if (e.state === 'wind' && e.act && e.act.ab.basic && e.combo > 0 && !e.act.counted) { e.act.counted = 1; e.combo--; }
   }
 
-  function playerIntent() {
+  function playerIntent(rdt) {
     const I = P.intent, In = G.input, k = In.keys;
     let ix = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0), iy = (k.KeyS || k.ArrowDown ? 1 : 0) - (k.KeyW || k.ArrowUp ? 1 : 0);
     if (In.stick.active) { ix = In.stick.x; iy = In.stick.y; }
@@ -734,7 +759,15 @@
       const g = gfx.groundAt(In.mouse.cx, In.mouse.cy), wx = g.x * S, wy = g.z * S;
       I.aim = Math.atan2(wy - P.y, wx - P.x); I.pt.x = wx; I.pt.y = wy;
     }
-    I.attack = In.mouse.down || In.touchAtk || k.KeyJ || !!(pad && pad.atk);
+    // tap to strike, hold and release for the heavy blow; holding parry past its window is a block
+    const held = In.mouse.down || In.touchAtk || k.KeyJ || !!(pad && pad.atk); I.attack = false;
+    if (held && !P.chgUsed) {
+      P.chg = (P.chg || 0) + (rdt || 0.016);
+      if (P.state === 'idle' && !P.st.stun) { const was = P.charging || 0; P.charging = P.chg; if (was < 0.32 && P.chg >= 0.32) { G.sfx('ui'); spark(P.x, P.y, 40, '#ffe9a0', 10, 160); } } else P.charging = 0;
+      if (P.chg > 1.3) { I.queue.push(P.basic + '_h'); P.chgUsed = 1; P.charging = 0; }
+    } else if (!held) { if (P.chg > 0 && !P.chgUsed) I.queue.push(P.chg >= 0.32 && P.charging > 0 ? P.basic + '_h' : P.basic); P.chg = 0; P.charging = 0; P.chgUsed = 0; }
+    const blk = k.ShiftLeft || k.ShiftRight || k.KeyX || In.mouse.rdown || In.touchBlk || !!(pad && pad.blk);
+    if (blk && P.state === 'idle' && !P.st.stun && P.res > 0 && !P.charging) { if (!(P.guard > 0)) P.guardHits = 0; P.guard = 0.12; }
     while (In.pressed.length) {
       const a = In.pressed.shift();
       if (a === 'dodge' || a === 'potion' || a === 'parry') I.queue.push(a);
@@ -757,7 +790,7 @@
     if (phase === 'intro') { phaseT -= dt; G.input.pressed.length = 0; if (phaseT <= 0.6 && !F.said) { F.said = 1; G.ui.banner('FIGHT!', '', 'win'); } if (phaseT <= 0) { phase = 'fight'; G.ui.banner(null); } }
     if (phase === 'fight' && F.ex) { exThink(P); exThink(E); }
     else if (phase === 'fight') {
-      if (G.debugAuto) { if (!P.ai) P.ai = { react: 0.3, aggro: 0.7, dodge: 0.3, parry: 0.15 }; think(P, dt); } else playerIntent();
+      if (G.debugAuto) { if (!P.ai) P.ai = { react: 0.3, aggro: 0.7, dodge: 0.3, parry: 0.15 }; think(P, dt); } else playerIntent(rdt);
       think(E, dt);
       hype = Math.max(0, hype - dt * 1.2);
     } else { P.intent.mx = P.intent.my = E.intent.mx = E.intent.my = 0; P.intent.attack = E.intent.attack = false; P.intent.queue.length = E.intent.queue.length = 0; }
@@ -868,7 +901,7 @@
     P.aim = Math.atan2(E.y - P.y, E.x - P.x); E.aim = P.aim + Math.PI;
     F.ex = true; [P, E].forEach(makeVis); if (!arena.flash.parent) sc.add(arena.flash);
     time = 0; hitstop = 0; shake = 0; hype = 50; lastAb = null; stolen = 0; phase = 'fight'; result = null;
-    F.active = true; F.paused = false; F.P = P; F.E = E; sync(0);
+    F.active = true; F.paused = false; F.P = P; F.E = E; initPoise(); sync(0);
     return { A: P, B: E };
   };
   F.exCast = function (e, id, pt) {

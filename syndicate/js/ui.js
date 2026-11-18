@@ -8,10 +8,14 @@
   function show(html, cls) {
     const p = panel(); p.className = cls || ''; p.innerHTML = html; p.scrollTop = 0;
     p.querySelectorAll('button,[data-click]').forEach(b => b.addEventListener('click', () => { G.audioInit(); G.sfx('ui'); }));
+    // every card gets the same furniture: a close button in the header when there is something to close with, and a footer that stays in reach
+    const card = p.querySelector('.card'), h2 = card && card.querySelector(':scope > h2:first-child'), dis = card && (card.querySelector('#x') || card.querySelector('#b'));
+    if (card) { if (p._wasOpen) card.style.animation = 'none'; p._wasOpen = true; const ft = card.querySelector(':scope > .row.end:last-child, :scope > .cat-foot:last-child'); if (ft) ft.classList.add('foot'); }
+    if (h2 && dis) { const xb = document.createElement('button'); xb.className = 'card-x'; xb.setAttribute('aria-label', 'Close'); xb.textContent = '✕'; xb.addEventListener('click', () => dis.click()); h2.appendChild(xb); }
     return p;
   }
   ui._show = (h, c) => show(h, c); ui._on = (s, f) => on(s, f);
-  ui.close = () => { const p = panel(); p.className = 'hidden'; p.innerHTML = ''; };
+  ui.close = () => { const p = panel(); p.className = 'hidden'; p.innerHTML = ''; p._wasOpen = false; };
   ui.isOpen = () => !panel().classList.contains('hidden');
   const on = (sel, fn) => panel().querySelectorAll(sel).forEach(el => el.addEventListener('click', e => fn(el, e)));
   let toastT = 0;
@@ -262,7 +266,8 @@
     const o = [];
     if (e.shield > 0) o.push('WARD ' + Math.ceil(e.shield));
     if (e.guard > 0) o.push('GUARDING');
-    ['stun', 'slow', 'burn', 'poison', 'mark'].forEach(k => { if (e.st[k]) o.push(k.toUpperCase()); });
+    if (e.charging >= 0.32) o.push('HEAVY READY');
+    ['broken', 'stun', 'slow', 'burn', 'poison', 'mark', 'winded'].forEach(k => { if (e.st[k] && !(k === 'stun' && e.st.broken)) o.push(k === 'broken' ? 'POSTURE BROKEN' : k.toUpperCase()); });
     ['haste', 'stealth', 'sneak', 'dmg', 'aura'].forEach(k => { if (e.buffs[k]) o.push({ haste: 'HASTE', stealth: 'HIDDEN', sneak: 'SNEAK READY', dmg: 'SURGE', aura: 'GUARDIANS' }[k]); });
     return o.join(' · ');
   };
@@ -272,6 +277,8 @@
       el.querySelector('.hp b').style.width = Math.min(100, e.shield / e.maxHp * 100) + '%';
       el.querySelector('.hp span').textContent = Math.max(0, Math.ceil(e.hp)) + ' / ' + e.maxHp;
       el.querySelector('.res i').style.width = e.res + '%';
+      let pz = el.querySelector('.pz'); if (!pz) { pz = document.createElement('div'); pz.className = 'bar pz'; pz.innerHTML = '<i></i>'; const rs = el.querySelector('.res'); rs.parentNode.insertBefore(pz, rs.nextSibling); }
+      pz.firstChild.style.width = Math.max(0, (e.poise || 0) / (e.maxPoise || 1) * 100) + '%'; pz.classList.toggle('low', e.poise < e.maxPoise * 0.3); pz.classList.toggle('brk', !!e.st.broken);
       const s = stStr(e), se = el.querySelector('.hud-status'); if (se.textContent !== s) se.textContent = s;
     };
     upd($('#hudP'), P); upd($('#hudE'), E);

@@ -51,6 +51,9 @@
     { id: 'crowd', name: 'Crowd Favourite', desc: 'End 3 bouts with the crowd at full roar.', goal: 3, cur: st => stat(st, 'hype100'), reward: 'pennants' },
     { id: 'partner', name: 'Silent Partner', desc: 'See 3 of Mark’s schemes through to the end.', goal: 3, cur: st => stat(st, 'schemes'), reward: 'luckyedge' },
     { id: 'home', name: 'House Proud', desc: 'Raise your hideout’s comfort to 40.', goal: 40, cur: st => G.comfort ? G.comfort(st) : 0, reward: 'hearth' },
+    { id: 'breaker', name: 'Posture Breaker', desc: 'Break an opponent’s posture 10 times.', goal: 10, cur: st => stat(st, 'break'), reward: 'obsidian', also: 'a class weapon at the Armoury' },
+    { id: 'heavy', name: 'Heavy Hand', desc: 'Land 20 heavy blows.', goal: 20, cur: st => stat(st, 'heavy'), reward: 'bronze', also: 'a class weapon at the Armoury' },
+    { id: 'wallguard', name: 'Immovable', desc: 'Block 30 blows.', goal: 30, cur: st => stat(st, 'block'), reward: 'steam' },
     { id: 'queen', name: 'The Guttercrown', desc: 'Take the crown from Vexa.', goal: 1, cur: st => st.wins.vexa ? 1 : 0, reward: 'palequeen' }
   ];
   const cosName = id => (G.COSMETICS.find(c => c.id === id) || { name: id }).name;
@@ -62,7 +65,7 @@
   ui.deeds = function (back) {
     const st = G.state; G.deeds.check(); const done = G.DEEDS.filter(d => st.deeds[d.id]).length;
     show('<div class="card"><h2>Deeds</h2><p class="dim">The pit remembers. Each deed unlocks something to wear that coin cannot buy. <b>' + done + ' of ' + G.DEEDS.length + '</b> done.</p>' +
-      G.DEEDS.map(d => { const ok = st.deeds[d.id], cur = Math.min(d.goal, d.cur(st)); return '<div class="ab-row' + (ok ? ' deeddone' : '') + '"><div class="ab-ic pas">' + (ok ? '✔' : '✦') + '</div><div class="ab-tx"><b>' + d.name + '</b><small>' + (ok ? 'Done' : cur + ' / ' + d.goal) + '</small><p>' + d.desc + '</p><div class="bar xp"><i style="width:' + (ok ? 100 : cur / d.goal * 100) + '%"></i></div></div><span class="lock">' + cosName(d.reward) + '</span></div>'; }).join('') +
+      G.DEEDS.map(d => { const ok = st.deeds[d.id], cur = Math.min(d.goal, d.cur(st)); return '<div class="ab-row' + (ok ? ' deeddone' : '') + '"><div class="ab-ic pas">' + (ok ? '✔' : '✦') + '</div><div class="ab-tx"><b>' + d.name + '</b><small>' + (ok ? 'Done' : cur + ' / ' + d.goal) + '</small><p>' + d.desc + '</p><div class="bar xp"><i style="width:' + (ok ? 100 : cur / d.goal * 100) + '%"></i></div></div><span class="lock">' + cosName(d.reward) + (d.also ? '<br>+ ' + d.also : '') + '</span></div>'; }).join('') +
       '<div class="row end"><button class="big" id="b">Back</button></div></div>');
     on('#b', () => back ? back() : ui.close());
   };

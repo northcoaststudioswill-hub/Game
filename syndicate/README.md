@@ -110,6 +110,10 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **Weight and gore.** Fighters have momentum, every clean hit shoves and holds the frame, and heavy blows knock the victim flat. A badly hurt opponent can lose an arm (below half health, they hit 15% softer) and then a leg (below about a fifth, they hobble at 60% speed). The limb is thrown, the stump bleeds, time slows for a moment and the crowd roars. The Blood setting turns it off.
 
+**Heavy, tactical combat.** Basic attacks are slower and cost more stamina, and holding the button no longer repeats them. Tap to strike; hold and release for a heavy blow that cannot be knocked out of and breaks a guard. Hold parry past its window to block (it costs stamina per blow). Every fighter has a posture bar: blows, blocks and parries wear it down, and when it breaks they reel, wide open and taking 35% more. Spend your last stamina and you are winded: slower and softer for a moment.
+
+**Weapons.** The Armoury at the Fence sells class weapons that change reach, speed, sweep and posture damage: Pit Spear, Greataxe and Warhammer for the Fighter; Rapier and Hand Axes for the Rogue; Frost Shard and Arc Spark for the Sorcerer; Flail and War Pick for the Cleric. Two per class cost coin and rank, one is earned by a deed.
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |
@@ -142,7 +146,7 @@ and the rest of the game does not change.
 - `js/models.js` character models and animation
 - `js/world.js` the arena; `js/places.js` the street, the hideout, decor pieces, walking
 - `js/fight.js` combat simulation, AI, and its 3D effects
-- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror
+- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror; `js/arms.js` combat tempo, heavy blows, weapons and the Armoury
 - `js/cine.js` the opening cinematic; `js/lore.js` codex and bios; `js/music.js` the music sequencer
 - `js/ui.js` menus, HUD, level-up and results screens; `js/main.js` input and main loop
 

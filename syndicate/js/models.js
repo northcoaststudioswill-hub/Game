@@ -72,20 +72,32 @@
     const hand = (arm) => { const h = new T.Group(); h.position.y = -0.52; arm.add(h); return h; };
     const hR = hand(armR), hL = hand(armL);
     const blade = (h, len) => { box(0.09, 0.04, len, m.weapon, 0, 0, len / 2 + 0.1, h); box(0.3, 0.07, 0.07, m.trim, 0, 0, 0.1, h); if (g.weapon || wsk) glows.push(gfx.glow(wsk ? wsk.glow : WCOL[g.weapon], 0.7, 0, 0, len * 0.6, h, 0.55)); };
-    if (cls === 'fighter') {
+    const arm = look.arm ? String(look.arm).split('_')[1] : '', wglow = (z, hh) => { if (g.weapon || wsk) glows.push(gfx.glow(wsk ? wsk.glow : WCOL[g.weapon], 0.7, 0, 0, z, hh, 0.55)); };
+    const shaft = (hh, len, z0) => { const s = mesh(new T.CylinderGeometry(0.035, 0.035, len, 5), m.dark, 0, 0, (z0 || 0) + len / 2, hh); s.rotation.x = Math.PI / 2; return s; };
+    if (cls === 'fighter' && arm === 'axe') { shaft(hR, 1.25, -0.15); box(0.05, 0.42, 0.34, m.weapon, 0, 0.14, 0.95, hR); box(0.05, 0.2, 0.2, m.weapon, 0, -0.12, 0.95, hR); box(0.08, 0.1, 0.12, m.trim, 0, 0, 0.95, hR); wglow(0.95, hR); }
+    else if (cls === 'fighter' && arm === 'hammer') { shaft(hR, 1.1, -0.1); box(0.24, 0.24, 0.4, m.weapon, 0, 0, 0.95, hR); box(0.27, 0.27, 0.08, m.trim, 0, 0, 0.78, hR); box(0.27, 0.27, 0.08, m.trim, 0, 0, 1.12, hR); wglow(0.95, hR); }
+    else if (cls === 'fighter' && arm === 'spear') {
+      shaft(hR, 1.9, -0.5); const tip = mesh(new T.ConeGeometry(0.08, 0.36, 4), m.weapon, 0, 0, 1.56, hR); tip.rotation.x = Math.PI / 2; box(0.16, 0.05, 0.05, m.trim, 0, 0, 1.36, hR); wglow(1.5, hR);
+      const sh = mesh(new T.CylinderGeometry(0.4, 0.4, 0.07, 6), m.armor2, 0.1, -0.3, 0.12, armL); sh.rotation.z = Math.PI / 2; sh.scale.z = 0.85;
+    }
+    else if (cls === 'fighter') {
       blade(hR, 1.0);
       const sh = mesh(new T.CylinderGeometry(0.4, 0.4, 0.07, 6), m.armor2, 0.1, -0.3, 0.12, armL); sh.rotation.z = Math.PI / 2; sh.scale.z = 0.85;
       const boss = mesh(new T.CylinderGeometry(0.16, 0.16, 0.1, 6), m.trim, 0.14, -0.3, 0.12, armL); boss.rotation.z = Math.PI / 2;
     }
-    if (cls === 'rogue') { blade(hR, 0.5); blade(hL, 0.5); }
-    if (cls === 'cleric') {
+    if (cls === 'rogue' && arm === 'rapier') { box(0.04, 0.03, 1.0, m.weapon, 0, 0, 0.6, hR); const cup = mesh(new T.SphereGeometry(0.1, 7, 5, 0, 6.28, 0, 1.6), m.trim, 0, 0, 0.12, hR); cup.rotation.x = Math.PI / 2; wglow(0.7, hR); blade(hL, 0.32); }
+    else if (cls === 'rogue' && arm === 'axes') [hR, hL].forEach(hh => { shaft(hh, 0.5, -0.05); box(0.04, 0.24, 0.2, m.weapon, 0, 0.1, 0.4, hh); box(0.06, 0.07, 0.1, m.trim, 0, 0, 0.4, hh); wglow(0.4, hh); });
+    else if (cls === 'rogue') { blade(hR, 0.5); blade(hL, 0.5); }
+    if (cls === 'cleric' && arm === 'flail') { shaft(hR, 0.55, 0); [0.62, 0.72, 0.82].forEach((z, i) => box(0.04, 0.04, 0.07, m.dark, 0, -i * 0.05, z, hR)); mesh(new T.IcosahedronGeometry(0.16, 0), M(P.weapon, true, 0x7a5a10), 0, -0.2, 0.95, hR); for (let i = 0; i < 6; i++) { const sp = mesh(new T.ConeGeometry(0.035, 0.12, 4), m.trim, Math.cos(i) * 0.15, -0.2 + Math.sin(i * 2.1) * 0.15, 0.95 + Math.sin(i) * 0.15, hR); sp.rotation.set(i, i * 2, 0); } glows.push(gfx.glow((wsk && wsk.glow) || WCOL[g.weapon] || 0xffd060, 0.9, 0, -0.2, 0.95, hR, 0.55)); }
+    else if (cls === 'cleric' && arm === 'pick') { shaft(hR, 0.95, -0.05); box(0.07, 0.56, 0.08, M(P.weapon, true, 0x7a5a10), 0, 0.06, 0.82, hR); const pt = mesh(new T.ConeGeometry(0.05, 0.22, 4), M(P.weapon, true, 0x7a5a10), 0, 0.44, 0.82, hR); box(0.12, 0.12, 0.12, m.trim, 0, 0, 0.82, hR); glows.push(gfx.glow((wsk && wsk.glow) || WCOL[g.weapon] || 0xffd060, 0.8, 0, 0.2, 0.82, hR, 0.5)); }
+    else if (cls === 'cleric') {
       const hd = mesh(new T.CylinderGeometry(0.035, 0.035, 0.8, 5), m.dark, 0, 0, 0.35, hR); hd.rotation.x = Math.PI / 2;
       mesh(new T.IcosahedronGeometry(0.17, 0), M(P.weapon, true, 0x7a5a10), 0, 0, 0.78, hR);
       glows.push(gfx.glow((wsk && wsk.glow) || WCOL[g.weapon] || 0xffd060, 1.0, 0, 0, 0.78, hR, 0.6));
     }
     let orbs = null;
     if (cls === 'sorcerer') {
-      const oc = (wsk && wsk.glow) || WCOL[g.weapon] || 0xff8a3c;
+      const oc = (wsk && wsk.glow) || WCOL[g.weapon] || (arm === 'frost' ? 0x9fe0ff : arm === 'spark' ? 0xfff070 : 0xff8a3c);
       orbs = [hR, hL].map(h => { const o = new T.Mesh(new T.SphereGeometry(0.1, 8, 6), new T.MeshBasicMaterial({ color: 0xfff0c0 })); o.position.z = 0.08; h.add(o); const gl = gfx.glow(oc, 0.9, 0, 0, 0.08, h, 0.9); glows.push(gl); return gl; });
     }
     const castGlow = gfx.glow(0xffffff, 0.1, 0, 0, 0.2, hR, 0);
@@ -203,8 +215,9 @@
 
   // ------------------------------------------------------------ portraits (rendered once, cached as images)
   let pr = null, pscene, pcam; const pcache = {};
-  G.portrait = function (look, size) {
-    const key = JSON.stringify([look.cls, look.race, look.tint, look.gear, look.cos, look.skin]);
+  G.portrait = function (look, size, full) {
+    full = full === 'full';
+    const key = JSON.stringify([look.cls, look.race, look.tint, look.gear, look.cos, look.skin, look.arm, full]);
     const img = document.createElement('img'); img.className = 'portrait'; img.style.width = img.style.height = (size / 16) + 'rem'; img.alt = '';
     if (!pcache[key]) {
       try {
@@ -215,6 +228,7 @@
           pcam = new T.OrthographicCamera(-0.62, 0.62, 0.62, -0.62, 0.1, 50); pcam.position.set(3, 3.1, 4.2); pcam.lookAt(0, 1.32, 0);
         }
         const c = G.makeChar(Object.assign({}, look, { scale: 1 })); const k = 1 / G.RACES[look.race].scale; c.root.scale.multiplyScalar(k);
+        { const r = full ? 1.02 : 0.62; pcam.left = pcam.bottom = -r; pcam.right = pcam.top = r; pcam.updateProjectionMatrix(); pcam.position.set(full ? 4.4 : 3, full ? 2.9 : 3.1, 4.2); pcam.lookAt(0, full ? 0.98 : 1.32, 0); if (full) c.pose({ t: 0, act: 'idle', ready: 1 }); }
         pscene.add(c.root); pr.render(pscene, pcam); pcache[key] = pr.domElement.toDataURL('image/png'); pscene.remove(c.root);
       } catch (e) { pcache[key] = ''; }
     }

@@ -66,10 +66,10 @@
   cv.addEventListener('mousemove', e => { In.mouse.cx = e.clientX; In.mouse.cy = e.clientY; if (G.scene === 'hideout' && !G.ui.isOpen()) { const g = gfx.groundAt(e.clientX, e.clientY); W.get('hideout').hover(g.x, g.z); } if (G.placing && In.mouse.down2) tapWorld(e.clientX, e.clientY); });
   cv.addEventListener('mousedown', e => {
     G.audioInit(); In.mouse.cx = e.clientX; In.mouse.cy = e.clientY;
-    if (G.scene === 'fight') { if (e.button === 0) In.mouse.down = true; if (e.button === 2) In.pressed.push('parry'); }
+    if (G.scene === 'fight') { if (e.button === 0) In.mouse.down = true; if (e.button === 2) { In.pressed.push('parry'); In.mouse.rdown = true; } }
     else { In.mouse.down2 = true; tapWorld(e.clientX, e.clientY); }
   });
-  window.addEventListener('mouseup', () => { In.mouse.down = false; In.mouse.down2 = false; });
+  window.addEventListener('mouseup', () => { In.mouse.rdown = false; In.mouse.down = false; In.mouse.down2 = false; });
   cv.addEventListener('contextmenu', e => e.preventDefault());
   window.addEventListener('touchstart', setTouch, { passive: true, capture: true });
   cv.addEventListener('touchstart', e => { G.audioInit(); setTouch(); e.preventDefault(); if (G.scene !== 'fight') { const t = e.changedTouches[0]; tapWorld(t.clientX, t.clientY); } }, { passive: false });
@@ -96,7 +96,8 @@
   tAtk.addEventListener('touchstart', e => { e.preventDefault(); In.touchAtk = true; }, { passive: false });
   tAtk.addEventListener('touchend', e => { e.preventDefault(); In.touchAtk = false; }); tAtk.addEventListener('touchcancel', () => { In.touchAtk = false; });
   tDodge.addEventListener('touchstart', e => { e.preventDefault(); In.pressed.push('dodge'); }, { passive: false });
-  $('tParry').addEventListener('touchstart', e => { e.preventDefault(); In.pressed.push('parry'); }, { passive: false });
+  $('tParry').addEventListener('touchstart', e => { e.preventDefault(); In.pressed.push('parry'); In.touchBlk = true; }, { passive: false });
+  ['touchend', 'touchcancel'].forEach(ev => $('tParry').addEventListener(ev, () => { In.touchBlk = false; }));
   $('pauseBtn').addEventListener('click', () => G.ui.pause());
   G.ui.placeInit();
 
@@ -138,7 +139,7 @@
     const hit = i => now[i] && !prevB[i];
     const lx = ax(0), ly = ax(1), rx = ax(2), ry = ax(3);
     if (lx || ly || rx || ry || Object.keys(now).some(i => now[i])) { setPad(true); G.audioInit(); }
-    In.pad = { lx, ly, rx, ry, atk: now[2] || now[7] };
+    In.pad = { lx, ly, rx, ry, atk: now[2] || now[7], blk: now[6] };
     if (G.bootSkip) { if (Object.keys(now).some(i => now[i] && !prevB[i])) G.bootSkip(); prevB = now; return; }
     if (!In.usingPad) { prevB = now; return; }
     if (G.talk) { if (hit(0)) G.talkApi.next(); if (hit(1) || hit(9)) G.talkApi.skip(); prevB = now; return; }
