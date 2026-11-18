@@ -123,6 +123,29 @@
       const m = { 0: 74, 6: 73, 12: 74, 16: 77, 22: 76, 28: 74 }[s]; if (m) note(m, t, sp * 3, 'square', 0.025);
     } },
   };
+  // the opening film: winter, then thorns, then the turn, then the motif arriving home (through-composed, about 26 seconds)
+  TRACKS.film = { bpm: 66, len: 128, fn(s, t, sp) {
+    if (s < 32) {                                     // the hunt, the Wall: cold and thin
+      if (s % 16 === 0) { note(45, t, sp * 15, 'sine', 0.11); note(52, t, sp * 15, 'sine', 0.05); }
+      const m = { 0: 76, 6: 72, 10: 69, 16: 71, 22: 72, 26: 76, 30: 74 }[s]; if (m) note(m, t, sp * 5, 'triangle', 0.07);
+      if (s % 16 === 8) hiss(t, 2.4, 0.03, 900);
+    } else if (s < 64) {                              // the Queen, the trials: low, wrong, a slow heart
+      if (s % 16 === 0) { note(38, t, sp * 15, 'sine', 0.15); note(39, t + 0.5, sp * 10, 'sine', 0.05); note(44, t, sp * 15, 'sawtooth', 0.018); }
+      if (s % 8 === 0) { note(26, t, 0.5, 'sine', 0.22); note(26, t + 0.28, 0.4, 'sine', 0.13); }
+      const m = { 36: 74, 42: 73, 48: 70, 54: 69, 60: 68 }[s]; if (m) note(m, t, sp * 5, 'triangle', 0.05);
+      if (s === 62) hiss(t, 1.6, 0.06, 2000);
+    } else if (s < 96) {                              // his blood, the bond waking: everything rises
+      const k = s - 64, arp = [50, 57, 62, 65, 69, 74, 77, 81][k >> 2];
+      if (k % 4 === 0) { note(arp, t, sp * 10, 'triangle', 0.05 + k * 0.0012); note(arp + 12, t + sp, sp * 6, 'sine', 0.035); }
+      if (k % 16 === 0) { note(38, t, sp * 15, 'sine', 0.12); note(50, t, sp * 15, 'triangle', 0.05); }
+      if (k === 28) { hiss(t, 1.8, 0.05, 3200); note(86, t, sp * 6, 'sine', 0.05); }
+    } else {                                          // Starhaven: the motif, warm, at last
+      const k = s - 96, ch = k < 16 ? [50, 57, 65] : [46, 53, 62];
+      if (k % 16 === 0) { for (const n of ch) note(n + 12, t, sp * 15, 'triangle', 0.055); note(ch[0] - 12, t, sp * 15, 'sine', 0.12); }
+      const m = { 0: 62, 3: 65, 6: 69, 9: 67, 16: 65, 19: 64, 22: 62 }[k]; if (m) { note(m + 12, t, sp * 5, 'sine', 0.09); note(m + 24, t, sp * 4, 'sine', 0.03); }
+      if (k % 4 === 2) note(ch[(k >> 2) % 3] + 24, t, sp * 2, 'sine', 0.025);
+    }
+  } };
   let track = null, trackName = null, step = 0, next = 0;
   A.music = function (name) {
     if (trackName === name) return;

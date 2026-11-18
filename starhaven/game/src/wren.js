@@ -15,13 +15,13 @@
   const mix = (A, B, k) => { const o = {}; for (const key in A) { const a = A[key], b = B[key] !== undefined ? B[key] : a; o[key] = Array.isArray(a) ? [lerp(a[0], b[0], k), lerp(a[1], b[1], k)] : typeof a === 'number' ? lerp(a, b, k) : (k < 0.5 ? a : b); } return o; };
 
   // ---------------------------------------------------------------- poses
-  const BASE = { lean: 0, crouch: 0, ox: 0, legF: [0.06, 0], legB: [-0.08, 0.05], armF: [-0.2, -0.35], armB: [0.28, -0.2], cloak: 0, lift: 0, sx: 1, sy: 1 };
+  const BASE = { grip: 0, lean: 0, crouch: 0, ox: 0, legF: [0.06, 0], legB: [-0.08, 0.05], armF: [-0.2, -0.35], armB: [0.28, -0.2], cloak: 0, lift: 0, sx: 1, sy: 1 };
   const P = (o) => Object.assign({}, BASE, o);
   const POSES = {
     rise: P({ legF: [-0.9, 1.1], legB: [0.35, 0.7], armF: [-2.3, -0.3], armB: [1.0, -0.4], lift: 4, sx: 0.93, sy: 1.08 }),
     apex: P({ legF: [-1.0, 1.4], legB: [-0.3, 1.2], armF: [-1.6, -0.5], armB: [1.2, -0.5] }),
     fall: P({ legF: [0.35, 0.25], legB: [-0.45, 0.6], armF: [-2.7, 0.1], armB: [2.5, -0.1], lift: -7 }),
-    dash: P({ lean: 0.62, legF: [1.0, 0.25], legB: [1.25, 0.35], armF: [1.45, 0.1], armB: [1.7, 0.1], cloak: 1, sx: 1.1, sy: 0.92 }),
+    dash: P({ grip: 1, lean: 0.62, legF: [1.0, 0.25], legB: [1.25, 0.35], armF: [1.45, 0.1], armB: [1.7, 0.1], cloak: 1, sx: 1.1, sy: 0.92 }),
     hurt: P({ lean: -0.4, legF: [-0.6, 0.6], legB: [0.5, 0.4], armF: [-2.4, -0.5], armB: [2.2, 0.4] }),
     cast: P({ lean: 0.08, legF: [-0.35, 0.1], legB: [0.4, 0.1], armF: [-1.5, 0], armB: [0.7, -0.3] }),
     charge: P({ lean: -0.06, crouch: 2, legF: [-0.3, 0.3], legB: [0.45, 0.3], armF: [-1.15, -0.7], armB: [0.2, -1.0] }),
@@ -63,7 +63,8 @@
       // each leg: the thigh swings; the knee folds as the leg comes forward and straightens to meet the ground
       const leg = (sn, cs) => [sn * 0.95 * sw - 0.08, 0.12 + Math.max(0, -cs) * 1.25 * sw + Math.max(0, cs) * 0.25];
       return P({ lean: 0.08 + 0.12 * sp, crouch: 0.4 + Math.abs(c) * 1.5 * sw, legF: leg(s, c), legB: leg(-s, -c),
-        armF: [-s * 0.95 * sw - 0.15, -0.85 - 0.35 * Math.max(0, s)], armB: [s * 0.95 * sw + 0.15, -0.85 - 0.35 * Math.max(0, -s)], cloak: 0.25 + 0.5 * sp, lift: Math.abs(s) * 1.5 * sp });
+        // arms pump close to the body, elbows bent; the blades lie back along her forearms (grip 1) so they do not wave about
+        armF: [-s * 0.5 * sw + 0.1, -1.25 - 0.25 * Math.max(0, s)], armB: [s * 0.5 * sw + 0.25, -1.25 - 0.25 * Math.max(0, -s)], grip: 1, cloak: 0.25 + 0.5 * sp, lift: Math.abs(s) * 1.5 * sp });
     }
     if (name === 'idle') { const b = Math.sin(a.t * 0.06), b2 = Math.sin(a.t * 0.023); return P({ crouch: b * 0.6 + 0.6, lean: b2 * 0.012, armF: [-0.2 + b * 0.05, -0.35 + b2 * 0.04], armB: [0.28 - b * 0.05, -0.2], cloak: 0.06 + b2 * 0.05, sy: 1 + b * 0.008 }); }
     if (name === 'rise' || name === 'apex' || name === 'fall') {   // one continuous arc through the air, by how fast she is rising or falling
@@ -101,7 +102,7 @@
     g.translate(S.ox, 0);
     // back arm and its dagger (behind everything)
     g.save(); g.translate(0, hip); g.rotate(S.lean);
-    limb2(g, -1, -13, S.armB[0], S.armB[1], 6, 6, 3.5, COL.tunicD, '#5a3e2a', gg => { gg.fillStyle = '#d9b89c'; gg.fillRect(-1.5, -1.5, 3, 3); if (o.blades) dagger(gg); });
+    limb2(g, -1, -13, S.armB[0], S.armB[1], 6, 6, 3.5, COL.tunicD, '#5a3e2a', gg => { gg.fillStyle = '#d9b89c'; gg.fillRect(-1.5, -1.5, 3, 3); if (o.blades) { gg.rotate(S.grip * 2.75); dagger(gg); } });
     g.restore();
     // back leg
     limb2(g, -1.5, hip, S.legB[0], S.legB[1], 9, 9, 4.5, COL.legsD, COL.legsD, gg => { gg.fillStyle = '#3a2618'; gg.fillRect(-2.2, -7, 4.4, 5); gg.fillRect(-2.5, -3, 6.5, 3.5); });
@@ -149,7 +150,7 @@
       g.globalAlpha = 0.3; g.fillStyle = '#ff7a8a'; g.fillRect(2.2, hy + 6.6, 2.2, 1.6); g.globalAlpha = 1;                                      // a little colour in the cheek
     }
     // front arm, its dagger, and anything in the hand
-    limb2(g, 1.5, -13, S.armF[0], S.armF[1], 6.5, 6.5, 4, COL.tunic, '#7a5636', gg => { gg.fillStyle = '#c8a878'; gg.fillRect(-2.2, -6.5, 4.4, 1); gg.fillStyle = COL.skin; gg.fillRect(-1.7, -1.6, 3.4, 3.2); const h = o.hand || (o.blades ? dagger : null); if (h) h(gg); });
+    limb2(g, 1.5, -13, S.armF[0], S.armF[1], 6.5, 6.5, 4, COL.tunic, '#7a5636', gg => { gg.fillStyle = '#c8a878'; gg.fillRect(-2.2, -6.5, 4.4, 1); gg.fillStyle = COL.skin; gg.fillRect(-1.7, -1.6, 3.4, 3.2); const h = o.hand || (o.blades ? dagger : null); if (h) { if (!o.hand) gg.rotate(S.grip * 2.75); h(gg); } });
     g.restore();
     g.restore();
   }

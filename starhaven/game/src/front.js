@@ -58,6 +58,7 @@
     $('splash').className = ''; $('f-logo').classList.remove('show'); $('f-press').classList.remove('show'); $('f-menu-wrap').classList.remove('show');
     $('film').classList.add('show');
     film = { i: -1, t: 0, total: 0, done };
+    SH.sfx.music(null); SH.sfx.music('film');
     F.filmShot(0);
     clearInterval(filmTimer); filmTimer = setInterval(F.filmTick, 1000 / 60);
   };
@@ -71,7 +72,7 @@
   F.filmTick = function (n) {
     if (!film) return;
     for (let k = 0; k < (n || 1); k++) {
-      const s = F.FILM[film.i]; film.t++; film.total++;
+      const s = F.FILM[film.i]; film.t++; film.total++; SH.sfx.tick();
       if (film.t === 24) { $('film-cap').classList.add('on'); if (s.credit) $('film-credit').classList.add('on'); }
       if (film.t === s.frames - 26) { $('film-cap').classList.remove('on'); $('film-credit').classList.remove('on'); }
       if (s.cue && film.t === s.cue[1]) SH.sfx.play(s.id === 'hunt' ? 'slash' : 'lantern');
@@ -87,7 +88,8 @@
     if (!film) return;
     clearInterval(filmTimer); const done = film.done; film = null;
     $('film').classList.remove('show'); $('film').style.filter = '';
-    SH.sfx.play('lantern');
+    SH.sfx.play('lantern'); SH.sfx.music('city');   // the city's theme plays under the title
+    clearInterval(F.menuMusic); F.menuMusic = setInterval(() => { if (SH.game.state === 'front') SH.sfx.tick(); else clearInterval(F.menuMusic); }, 50);
     done();
   };
   F.filmState = () => film ? { shot: film.i, id: F.FILM[film.i].id, t: film.t } : null;

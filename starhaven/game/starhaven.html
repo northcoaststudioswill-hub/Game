@@ -498,6 +498,76 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
 #dialog.narr #d-text { font-family: 'IM Fell English', Georgia, serif; font-style: normal; font-size: 18px; letter-spacing: 0; color: #f6f1ff; }
 #film-cap { font-style: normal; }
 #whisper span { font-style: normal; }
+
+/* ============ menus, redrawn: lists of words over the painting, not boxes of buttons ============ */
+/* ---- the title: the scene fills the screen; the game's name and a list of words stand on its dark side */
+#front { background: #05040f !important; align-items: flex-start !important; text-align: left !important; justify-content: center; padding: 14px 16px 30px max(7vw, calc(env(safe-area-inset-left) + 18px)) !important; }
+#f-bg { opacity: 1 !important; object-position: 78% 50%; }
+#front::after { background: linear-gradient(90deg, rgba(5,4,15,.97) 0%, rgba(5,4,15,.9) 28%, rgba(5,4,15,.35) 55%, rgba(5,4,15,0) 74%), linear-gradient(0deg, rgba(5,4,15,.75), rgba(5,4,15,0) 26%), linear-gradient(180deg, rgba(5,4,15,.5), rgba(5,4,15,0) 16%) !important; }
+#f-logo { margin-bottom: 4px; }
+#f-logo h1 { font-size: clamp(30px, 13vh, 66px) !important; letter-spacing: .16em; line-height: 1; }
+#f-logo h1::before { display: inline-block !important; font-size: .3em; margin: 0 .5em .5em 0; vertical-align: middle; }
+#f-logo .sub { font-size: clamp(10px, 2.9vh, 13px) !important; letter-spacing: .34em; color: #b9a8ff; margin: 6px 0 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,210,122,.3); display: inline-block; }
+#f-menu-wrap { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; width: min(440px, 52vw) !important; max-height: calc(100vh - 140px); }
+#f-menu-wrap:has(#f-title:not(:empty)) { max-height: calc(100vh - 64px); }
+@media (max-height: 460px) { #f-title:not(:empty) ~ #f-menu .fbtn { padding-top: 2px !important; padding-bottom: 2px !important; } #f-title:not(:empty) ~ #f-menu .fbtn .lbl { font-size: 14px !important; } #f-title:not(:empty) ~ #f-menu .fbtn .sub { font-size: 12px !important; } }
+#f-menu-wrap::before, #f-menu-wrap::after { display: none !important; }
+.fbtn { border: 0 !important; background: none !important; padding: 4px 6px 4px 28px !important; margin: 0; position: relative; }
+.fbtn::before { content: '\2726' !important; border: 0 !important; background: none !important; box-shadow: none !important; transform: none !important; width: auto !important; height: auto !important; left: 2px !important; top: 5px !important; font-size: 13px; color: transparent; transition: color .12s; }
+.fbtn .lbl { font-family: var(--display); font-size: clamp(14px, 4.4vh, 19px) !important; letter-spacing: .18em; color: #a8a2cf; transition: color .12s, letter-spacing .12s; }
+.fbtn.sel { background: linear-gradient(90deg, rgba(255,210,122,.16), rgba(255,210,122,0) 78%) !important; }
+.fbtn.sel::before { color: var(--gold); text-shadow: 0 0 10px var(--gold); animation: pulse 2s infinite; }
+.fbtn.sel .lbl { color: #fff6d8; letter-spacing: .22em; text-shadow: 0 0 16px rgba(255,210,122,.55); }
+.fbtn.sel::after { content: ''; position: absolute; left: 28px; right: 22%; bottom: 0; height: 1px; background: linear-gradient(90deg, var(--gold), rgba(255,210,122,0)); }
+.fbtn .sub { display: none !important; font-size: 13.5px !important; color: #c9c2ea !important; margin-top: -1px; }
+.fbtn.sel .sub, #f-title:not(:empty) ~ #f-menu .fbtn .sub { display: block !important; }
+.fbtn .val { font-family: var(--display); font-size: 14px; letter-spacing: .08em; }
+.fbtn.off .lbl { color: #5a567a; }
+#f-title { text-align: left !important; font-size: 14px !important; letter-spacing: .34em !important; color: var(--gold); border-bottom: 1px solid rgba(255,210,122,.3); padding: 0 0 6px 2px; margin: 0 0 6px !important; }
+#f-note { text-align: left; font: italic 400 14px/1.4 'IM Fell English', Georgia, serif; color: #c9c2ea; padding-left: 2px; }
+#f-press { align-items: flex-start; font-family: var(--display); letter-spacing: .2em; font-size: 17px; }
+#f-ver { font-family: var(--display); letter-spacing: .12em; font-size: 10px; opacity: .7; }
+body.upright #front { align-items: center !important; justify-content: flex-end; padding: 0 22px 11vh !important; }
+body.upright #f-bg { object-position: 50% 50%; height: 62%; }
+body.upright #front::after { background: linear-gradient(0deg, rgba(5,4,15,1) 0%, rgba(5,4,15,.98) 40%, rgba(5,4,15,.5) 56%, rgba(5,4,15,0) 70%), linear-gradient(180deg, rgba(5,4,15,.55), rgba(5,4,15,0) 14%) !important; }
+body.upright #f-logo { text-align: center; } body.upright #f-logo h1 { font-size: clamp(34px, 12vw, 58px) !important; } body.upright #f-logo h1::before { display: block !important; margin: 0 0 .2em; }
+body.upright #f-menu-wrap { width: min(360px, 88vw) !important; max-height: 52vh; }
+body.upright .fbtn .lbl { font-size: 18px !important; } body.upright .fbtn { padding: 7px 6px 7px 28px !important; } body.upright .fbtn::before { top: 9px !important; }
+
+/* ---- every panel: a dark plate with gold corners, not a rounded box */
+.screen { background: rgba(5,4,15,.72); backdrop-filter: blur(3px) saturate(.75); -webkit-backdrop-filter: blur(3px) saturate(.75); }
+.screen:not(#journal) .card { border: 0 !important; border-radius: 0 !important; box-shadow: 0 0 0 1px rgba(255,210,122,.16), 0 30px 90px rgba(0,0,0,.75) !important; padding: 20px 30px 22px;
+  background:
+    linear-gradient(var(--gold), var(--gold)) 8px 8px / 30px 1px no-repeat, linear-gradient(var(--gold), var(--gold)) 8px 8px / 1px 30px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) calc(100% - 8px) 8px / 30px 1px no-repeat, linear-gradient(var(--gold), var(--gold)) calc(100% - 8px) 8px / 1px 30px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) 8px calc(100% - 8px) / 30px 1px no-repeat, linear-gradient(var(--gold), var(--gold)) 8px calc(100% - 8px) / 1px 30px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) calc(100% - 8px) calc(100% - 8px) / 30px 1px no-repeat, linear-gradient(var(--gold), var(--gold)) calc(100% - 8px) calc(100% - 8px) / 1px 30px no-repeat,
+    radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--court-deep, #2a2058) 55%, transparent), transparent 70%),
+    linear-gradient(180deg, rgba(16,13,38,.97), rgba(6,5,18,.98)) !important; background-attachment: local !important; }
+.screen:not(#journal) .card h2 { font-size: 22px; letter-spacing: .3em; }
+.screen:not(#journal):not(#menu) .btn { background: none !important; border: 1px solid rgba(255,210,122,.35) !important; border-radius: 0 !important; box-shadow: none !important; font-family: var(--display); letter-spacing: .2em; font-size: 13px; color: #fff6d8; padding: 11px; transition: background .12s; }
+.screen:not(#journal):not(#menu) .btn.primary, #card #c-go, #explain #ex-ok { background: linear-gradient(180deg, #ffe9a8, #d9a441 60%, #b8862e) !important; color: #1c1430 !important; border-color: #fff6d8 !important; }
+.screen:not(#journal):not(#menu) .btn.pad-sel, .screen:not(#journal):not(#menu) .btn:active { background: rgba(255,210,122,.16) !important; }
+.star-row, .hw-row { border-bottom: 1px solid rgba(255,210,122,.12); padding: 8px 2px; }
+.hw-row b, .star-row b { font-family: var(--display); letter-spacing: .08em; font-size: 15px; color: #fff6d8; } .hw-row div, .star-row small { font-family: 'IM Fell English', Georgia, serif; font-size: 15px; line-height: 1.4; color: #cfc9ee; }
+
+/* ---- the pause menu: where she is on the left, what you can do on the right */
+#menu .card { width: min(780px, 96vw) !important; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); column-gap: 34px; align-items: start; text-align: left !important; padding: 24px 34px 22px !important; }
+#menu .card::before, #menu .card::after { display: none !important; }
+#menu .card > h2 { grid-column: 1; grid-row: 1; font-size: 30px !important; letter-spacing: .26em !important; margin: 0; } #menu .card > h2::after { margin: 8px 30% 6px 0 !important; background: linear-gradient(90deg, var(--gold), transparent) !important; }
+#menu .motto { grid-column: 1; grid-row: 2; margin: 0 0 8px; font-size: 15px; }
+#menu #m-status { grid-column: 1; grid-row: 3 / span 8; background: none !important; border: 0 !important; padding: 0 !important; display: block; font: 400 15px/1.4 'IM Fell English', Georgia, serif; color: #dcd6f6; }
+#menu #m-status > div { margin: 0 0 9px; } #menu #m-status b { display: block; font: 700 10px/1.5 var(--display); letter-spacing: .26em; color: var(--court, var(--gold)); text-transform: uppercase; }
+#menu #m-status img { width: 26px; height: 26px; vertical-align: middle; margin-right: 3px; }
+#menu .btn { grid-column: 2; width: auto !important; margin: 0 !important; background: none !important; border: 0 !important; border-bottom: 1px solid rgba(255,210,122,.1) !important; border-radius: 0 !important; box-shadow: none !important; text-align: left; padding: 7px 8px 7px 4px !important;
+  font-family: var(--display); font-size: 15px !important; letter-spacing: .16em; color: #a8a2cf !important; transition: color .1s, background .1s, padding .1s; }
+#menu .btn::before { display: inline-block; width: 26px; margin: 0 !important; color: rgba(255,210,122,.55) !important; font-size: 13px !important; }
+#menu .btn.pad-sel, #menu .btn:active, #menu .btn:hover { outline: 0 !important; color: #fff6d8 !important; background: linear-gradient(90deg, rgba(255,210,122,.18), rgba(255,210,122,0) 80%) !important; padding-left: 10px !important; } #menu .btn.pad-sel::before, #menu .btn:active::before { color: var(--gold) !important; }
+#menu #m-resume { grid-row: 1; color: #fff6d8 !important; font-size: 19px !important; letter-spacing: .22em; background: linear-gradient(90deg, rgba(255,210,122,.2), rgba(255,210,122,0) 80%) !important; border-bottom-color: rgba(255,210,122,.4) !important; padding: 9px 8px 9px 4px !important; } #menu #m-resume::before { color: var(--gold) !important; }
+#m-journal { grid-row: 2; } #m-stars { grid-row: 3; } #m-howto { grid-row: 4; } #m-controls { grid-row: 5; } #m-tune { grid-row: 6; } #m-restart { grid-row: 7; } #m-fullscreen { grid-row: 8; } #m-title { grid-row: 9; border-bottom: 0 !important; }
+#menu #controls { grid-column: 1 / -1; grid-row: 11; font: 400 14px/1.4 'IM Fell English', Georgia, serif; }
+body.upright #menu .card { display: block; padding: 22px 26px 18px !important; } body.upright #menu .btn { display: block; width: 100% !important; padding: 9px 8px 9px 4px !important; } body.upright #menu #m-status { margin-bottom: 8px; }
+@media (max-height: 460px) { #menu .card { padding: 14px 30px 12px !important; } #menu .card > h2 { font-size: 22px !important; } #menu .btn { padding: 4px 8px 4px 4px !important; font-size: 13px !important; } #menu #m-resume { font-size: 15px !important; padding: 5px 8px 5px 4px !important; } #menu #m-status { font-size: 13.5px; } #menu #m-status > div { margin-bottom: 5px; } #menu .motto { font-size: 13px; margin-bottom: 4px; } }
 </style>
 </head>
 <body>
@@ -556,7 +626,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.9 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.10 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -1941,7 +2011,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     hints: [
       { x0: 2, x1: 66, text: 'The cells under the Deep. Look around. The way back up is at the far right, past the pillar.', below: 22, until: 'd_up' },
       { x0: 66, x1: 76, text: 'Four ledges up the shaft. Jump straight up through each one.', below: 17 },
-      { x0: 3, x1: 21, text: 'Walk up to an altar and use {TALK} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle', above: 20 },
+      { x0: 3, x1: 21, text: 'Stand at an altar and press {CHOOSE} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle', above: 20 },
       { x0: 21, x1: 31, text: 'Hold {JUMP} to jump higher; tap it for a small hop. Miss a jump here and you land in the cells below, unhurt.', above: 20 },
       { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.', above: 20 },
       { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.', above: 20 },
@@ -2356,9 +2426,9 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
 
   // Button names shown in signs, per input type.
   input.LABELS = {
-    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', SHOOT: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J', GIFT: 'F (or Q)', UPSTRIKE: 'hold W and press J', GUARD: 'hold S' },
-    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'tap the \u25BC button', GIFT: 'the FLAME button', UPSTRIKE: 'the \u25B2 button', GUARD: 'hold the \u25BC button' },
-    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', SHOOT: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X', GIFT: 'LB (left bumper)', UPSTRIKE: 'hold up and press X', GUARD: 'hold down' },
+    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', SHOOT: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J', GIFT: 'F (or Q)', UPSTRIKE: 'hold W and press J', GUARD: 'hold S', CHOOSE: 'W (or J)' },
+    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'tap the \u25BC button', GIFT: 'the FLAME button', UPSTRIKE: 'the \u25B2 button', GUARD: 'hold the \u25BC button', CHOOSE: 'the gold CHOOSE button (or STRIKE)' },
+    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', SHOOT: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X', GIFT: 'LB (left bumper)', UPSTRIKE: 'hold up and press X', GUARD: 'hold down', CHOOSE: 'Y (or X)' },
   };
   input.fill = function (text) {
     const L = input.LABELS[input.source] || input.LABELS.kb;
@@ -2496,6 +2566,29 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       const m = { 0: 74, 6: 73, 12: 74, 16: 77, 22: 76, 28: 74 }[s]; if (m) note(m, t, sp * 3, 'square', 0.025);
     } },
   };
+  // the opening film: winter, then thorns, then the turn, then the motif arriving home (through-composed, about 26 seconds)
+  TRACKS.film = { bpm: 66, len: 128, fn(s, t, sp) {
+    if (s < 32) {                                     // the hunt, the Wall: cold and thin
+      if (s % 16 === 0) { note(45, t, sp * 15, 'sine', 0.11); note(52, t, sp * 15, 'sine', 0.05); }
+      const m = { 0: 76, 6: 72, 10: 69, 16: 71, 22: 72, 26: 76, 30: 74 }[s]; if (m) note(m, t, sp * 5, 'triangle', 0.07);
+      if (s % 16 === 8) hiss(t, 2.4, 0.03, 900);
+    } else if (s < 64) {                              // the Queen, the trials: low, wrong, a slow heart
+      if (s % 16 === 0) { note(38, t, sp * 15, 'sine', 0.15); note(39, t + 0.5, sp * 10, 'sine', 0.05); note(44, t, sp * 15, 'sawtooth', 0.018); }
+      if (s % 8 === 0) { note(26, t, 0.5, 'sine', 0.22); note(26, t + 0.28, 0.4, 'sine', 0.13); }
+      const m = { 36: 74, 42: 73, 48: 70, 54: 69, 60: 68 }[s]; if (m) note(m, t, sp * 5, 'triangle', 0.05);
+      if (s === 62) hiss(t, 1.6, 0.06, 2000);
+    } else if (s < 96) {                              // his blood, the bond waking: everything rises
+      const k = s - 64, arp = [50, 57, 62, 65, 69, 74, 77, 81][k >> 2];
+      if (k % 4 === 0) { note(arp, t, sp * 10, 'triangle', 0.05 + k * 0.0012); note(arp + 12, t + sp, sp * 6, 'sine', 0.035); }
+      if (k % 16 === 0) { note(38, t, sp * 15, 'sine', 0.12); note(50, t, sp * 15, 'triangle', 0.05); }
+      if (k === 28) { hiss(t, 1.8, 0.05, 3200); note(86, t, sp * 6, 'sine', 0.05); }
+    } else {                                          // Starhaven: the motif, warm, at last
+      const k = s - 96, ch = k < 16 ? [50, 57, 65] : [46, 53, 62];
+      if (k % 16 === 0) { for (const n of ch) note(n + 12, t, sp * 15, 'triangle', 0.055); note(ch[0] - 12, t, sp * 15, 'sine', 0.12); }
+      const m = { 0: 62, 3: 65, 6: 69, 9: 67, 16: 65, 19: 64, 22: 62 }[k]; if (m) { note(m + 12, t, sp * 5, 'sine', 0.09); note(m + 24, t, sp * 4, 'sine', 0.03); }
+      if (k % 4 === 2) note(ch[(k >> 2) % 3] + 24, t, sp * 2, 'sine', 0.025);
+    }
+  } };
   let track = null, trackName = null, step = 0, next = 0;
   A.music = function (name) {
     if (trackName === name) return;
@@ -3358,7 +3451,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
   Altar.prototype.update = function (world) {
     const p = world.player;
     this.near = !this.broken && !SH.game.flags.riddle && !!SH.game.flags.asked && Math.abs(p.x - this.x) < 26 && Math.abs(p.y - this.y) < 30 && p.grounded;
-    if (this.near && world.input.pressed.up) { this.near = false; world.onAltar(this); }
+    if (this.near && (world.input.pressed.up || world.input.pressed.attack)) { this.near = false; p.atkBuf = 0; world.onAltar(this); }   // the gold CHOOSE button, or STRIKE
   };
   function Target(x, y, blade) { Object.assign(this, { kind: 'target', x, y, hit: false, arrowOnly: !blade, blade: !!blade, wob: 0 }); }   // blade: Bram's rings, cut with daggers
   Target.prototype.reset = function () { };
@@ -5769,13 +5862,13 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
   const mix = (A, B, k) => { const o = {}; for (const key in A) { const a = A[key], b = B[key] !== undefined ? B[key] : a; o[key] = Array.isArray(a) ? [lerp(a[0], b[0], k), lerp(a[1], b[1], k)] : typeof a === 'number' ? lerp(a, b, k) : (k < 0.5 ? a : b); } return o; };
 
   // ---------------------------------------------------------------- poses
-  const BASE = { lean: 0, crouch: 0, ox: 0, legF: [0.06, 0], legB: [-0.08, 0.05], armF: [-0.2, -0.35], armB: [0.28, -0.2], cloak: 0, lift: 0, sx: 1, sy: 1 };
+  const BASE = { grip: 0, lean: 0, crouch: 0, ox: 0, legF: [0.06, 0], legB: [-0.08, 0.05], armF: [-0.2, -0.35], armB: [0.28, -0.2], cloak: 0, lift: 0, sx: 1, sy: 1 };
   const P = (o) => Object.assign({}, BASE, o);
   const POSES = {
     rise: P({ legF: [-0.9, 1.1], legB: [0.35, 0.7], armF: [-2.3, -0.3], armB: [1.0, -0.4], lift: 4, sx: 0.93, sy: 1.08 }),
     apex: P({ legF: [-1.0, 1.4], legB: [-0.3, 1.2], armF: [-1.6, -0.5], armB: [1.2, -0.5] }),
     fall: P({ legF: [0.35, 0.25], legB: [-0.45, 0.6], armF: [-2.7, 0.1], armB: [2.5, -0.1], lift: -7 }),
-    dash: P({ lean: 0.62, legF: [1.0, 0.25], legB: [1.25, 0.35], armF: [1.45, 0.1], armB: [1.7, 0.1], cloak: 1, sx: 1.1, sy: 0.92 }),
+    dash: P({ grip: 1, lean: 0.62, legF: [1.0, 0.25], legB: [1.25, 0.35], armF: [1.45, 0.1], armB: [1.7, 0.1], cloak: 1, sx: 1.1, sy: 0.92 }),
     hurt: P({ lean: -0.4, legF: [-0.6, 0.6], legB: [0.5, 0.4], armF: [-2.4, -0.5], armB: [2.2, 0.4] }),
     cast: P({ lean: 0.08, legF: [-0.35, 0.1], legB: [0.4, 0.1], armF: [-1.5, 0], armB: [0.7, -0.3] }),
     charge: P({ lean: -0.06, crouch: 2, legF: [-0.3, 0.3], legB: [0.45, 0.3], armF: [-1.15, -0.7], armB: [0.2, -1.0] }),
@@ -5817,7 +5910,8 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       // each leg: the thigh swings; the knee folds as the leg comes forward and straightens to meet the ground
       const leg = (sn, cs) => [sn * 0.95 * sw - 0.08, 0.12 + Math.max(0, -cs) * 1.25 * sw + Math.max(0, cs) * 0.25];
       return P({ lean: 0.08 + 0.12 * sp, crouch: 0.4 + Math.abs(c) * 1.5 * sw, legF: leg(s, c), legB: leg(-s, -c),
-        armF: [-s * 0.95 * sw - 0.15, -0.85 - 0.35 * Math.max(0, s)], armB: [s * 0.95 * sw + 0.15, -0.85 - 0.35 * Math.max(0, -s)], cloak: 0.25 + 0.5 * sp, lift: Math.abs(s) * 1.5 * sp });
+        // arms pump close to the body, elbows bent; the blades lie back along her forearms (grip 1) so they do not wave about
+        armF: [-s * 0.5 * sw + 0.1, -1.25 - 0.25 * Math.max(0, s)], armB: [s * 0.5 * sw + 0.25, -1.25 - 0.25 * Math.max(0, -s)], grip: 1, cloak: 0.25 + 0.5 * sp, lift: Math.abs(s) * 1.5 * sp });
     }
     if (name === 'idle') { const b = Math.sin(a.t * 0.06), b2 = Math.sin(a.t * 0.023); return P({ crouch: b * 0.6 + 0.6, lean: b2 * 0.012, armF: [-0.2 + b * 0.05, -0.35 + b2 * 0.04], armB: [0.28 - b * 0.05, -0.2], cloak: 0.06 + b2 * 0.05, sy: 1 + b * 0.008 }); }
     if (name === 'rise' || name === 'apex' || name === 'fall') {   // one continuous arc through the air, by how fast she is rising or falling
@@ -5855,7 +5949,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     g.translate(S.ox, 0);
     // back arm and its dagger (behind everything)
     g.save(); g.translate(0, hip); g.rotate(S.lean);
-    limb2(g, -1, -13, S.armB[0], S.armB[1], 6, 6, 3.5, COL.tunicD, '#5a3e2a', gg => { gg.fillStyle = '#d9b89c'; gg.fillRect(-1.5, -1.5, 3, 3); if (o.blades) dagger(gg); });
+    limb2(g, -1, -13, S.armB[0], S.armB[1], 6, 6, 3.5, COL.tunicD, '#5a3e2a', gg => { gg.fillStyle = '#d9b89c'; gg.fillRect(-1.5, -1.5, 3, 3); if (o.blades) { gg.rotate(S.grip * 2.75); dagger(gg); } });
     g.restore();
     // back leg
     limb2(g, -1.5, hip, S.legB[0], S.legB[1], 9, 9, 4.5, COL.legsD, COL.legsD, gg => { gg.fillStyle = '#3a2618'; gg.fillRect(-2.2, -7, 4.4, 5); gg.fillRect(-2.5, -3, 6.5, 3.5); });
@@ -5903,7 +5997,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       g.globalAlpha = 0.3; g.fillStyle = '#ff7a8a'; g.fillRect(2.2, hy + 6.6, 2.2, 1.6); g.globalAlpha = 1;                                      // a little colour in the cheek
     }
     // front arm, its dagger, and anything in the hand
-    limb2(g, 1.5, -13, S.armF[0], S.armF[1], 6.5, 6.5, 4, COL.tunic, '#7a5636', gg => { gg.fillStyle = '#c8a878'; gg.fillRect(-2.2, -6.5, 4.4, 1); gg.fillStyle = COL.skin; gg.fillRect(-1.7, -1.6, 3.4, 3.2); const h = o.hand || (o.blades ? dagger : null); if (h) h(gg); });
+    limb2(g, 1.5, -13, S.armF[0], S.armF[1], 6.5, 6.5, 4, COL.tunic, '#7a5636', gg => { gg.fillStyle = '#c8a878'; gg.fillRect(-2.2, -6.5, 4.4, 1); gg.fillStyle = COL.skin; gg.fillRect(-1.7, -1.6, 3.4, 3.2); const h = o.hand || (o.blades ? dagger : null); if (h) { if (!o.hand) gg.rotate(S.grip * 2.75); h(gg); } });
     g.restore();
     g.restore();
   }
@@ -8434,6 +8528,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     $('splash').className = ''; $('f-logo').classList.remove('show'); $('f-press').classList.remove('show'); $('f-menu-wrap').classList.remove('show');
     $('film').classList.add('show');
     film = { i: -1, t: 0, total: 0, done };
+    SH.sfx.music(null); SH.sfx.music('film');
     F.filmShot(0);
     clearInterval(filmTimer); filmTimer = setInterval(F.filmTick, 1000 / 60);
   };
@@ -8447,7 +8542,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
   F.filmTick = function (n) {
     if (!film) return;
     for (let k = 0; k < (n || 1); k++) {
-      const s = F.FILM[film.i]; film.t++; film.total++;
+      const s = F.FILM[film.i]; film.t++; film.total++; SH.sfx.tick();
       if (film.t === 24) { $('film-cap').classList.add('on'); if (s.credit) $('film-credit').classList.add('on'); }
       if (film.t === s.frames - 26) { $('film-cap').classList.remove('on'); $('film-credit').classList.remove('on'); }
       if (s.cue && film.t === s.cue[1]) SH.sfx.play(s.id === 'hunt' ? 'slash' : 'lantern');
@@ -8463,7 +8558,8 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     if (!film) return;
     clearInterval(filmTimer); const done = film.done; film = null;
     $('film').classList.remove('show'); $('film').style.filter = '';
-    SH.sfx.play('lantern');
+    SH.sfx.play('lantern'); SH.sfx.music('city');   // the city's theme plays under the title
+    clearInterval(F.menuMusic); F.menuMusic = setInterval(() => { if (SH.game.state === 'front') SH.sfx.tick(); else clearInterval(F.menuMusic); }, 50);
     done();
   };
   F.filmState = () => film ? { shot: film.i, id: F.FILM[film.i].id, t: film.t } : null;

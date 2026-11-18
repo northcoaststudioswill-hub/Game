@@ -91,7 +91,7 @@
     hints: [
       { x0: 2, x1: 66, text: 'The cells under the Deep. Look around. The way back up is at the far right, past the pillar.', below: 22, until: 'd_up' },
       { x0: 66, x1: 76, text: 'Four ledges up the shaft. Jump straight up through each one.', below: 17 },
-      { x0: 3, x1: 21, text: 'Walk up to an altar and use {TALK} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle', above: 20 },
+      { x0: 3, x1: 21, text: 'Stand at an altar and press {CHOOSE} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle', above: 20 },
       { x0: 21, x1: 31, text: 'Hold {JUMP} to jump higher; tap it for a small hop. Miss a jump here and you land in the cells below, unhurt.', above: 20 },
       { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.', above: 20 },
       { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.', above: 20 },

@@ -243,7 +243,7 @@
   Altar.prototype.update = function (world) {
     const p = world.player;
     this.near = !this.broken && !SH.game.flags.riddle && !!SH.game.flags.asked && Math.abs(p.x - this.x) < 26 && Math.abs(p.y - this.y) < 30 && p.grounded;
-    if (this.near && world.input.pressed.up) { this.near = false; world.onAltar(this); }
+    if (this.near && (world.input.pressed.up || world.input.pressed.attack)) { this.near = false; p.atkBuf = 0; world.onAltar(this); }   // the gold CHOOSE button, or STRIKE
   };
   function Target(x, y, blade) { Object.assign(this, { kind: 'target', x, y, hit: false, arrowOnly: !blade, blade: !!blade, wob: 0 }); }   // blade: Bram's rings, cut with daggers
   Target.prototype.reset = function () { };

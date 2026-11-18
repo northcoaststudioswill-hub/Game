@@ -31,9 +31,13 @@ link Will has. Hold your phone either way up.
 Between chapters there are **evenings**: choose who to spend the night with (Caelum, Bram, Iris or Thane) for scenes,
 gifts and bond hearts.
 
-## Playtest build: v0.1.9 (Nov 18, 2026)
+## Playtest build: v0.1.10 (Nov 18, 2026)
 
-The newest build: [`releases/v0.1.9/`](releases/v0.1.9/RELEASE-NOTES.md), with `starhaven-v0.1.9-share.zip` to send.
+The newest build: [`releases/v0.1.10/`](releases/v0.1.10/RELEASE-NOTES.md), with `starhaven-v0.1.10-share.zip` to send.
+The menus are redrawn (a list of words over the painted scene on the title, a two-column pause menu, gold-cornered
+plates elsewhere), the opening film has music, and Wren's blades stay close when she runs.
+
+Before it, v0.1.9 ([notes](releases/v0.1.9/RELEASE-NOTES.md)):
 A beautification round (ledges drawn as balconies, hung slabs, rock shelves and woven thorn; a thornwood with
 colour) and four things fixed that did not make sense on a walk through every level.
 
