@@ -556,7 +556,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.6 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.7 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -5723,9 +5723,17 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     const a = p.anim;
     if (name === 'run') {
       const ph = a.run * Math.PI, s = Math.sin(ph), c = Math.cos(ph);
-      return P({ lean: 0.16, crouch: Math.abs(c) * 1.2, legF: [s * 0.95, Math.max(0, -c) * 1.0 + 0.1], legB: [-s * 0.95, Math.max(0, c) * 1.0 + 0.1], armF: [-s * 0.9 - 0.2, -0.7], armB: [s * 0.9 + 0.2, -0.7], cloak: 0.7 });
+      const sp = Math.min(1, Math.abs(p.vx) / 3.2), sw = 0.55 + 0.45 * sp;   // a walk at low speed, a full run at speed
+      // each leg: the thigh swings; the knee folds as the leg comes forward and straightens to meet the ground
+      const leg = (sn, cs) => [sn * 0.95 * sw - 0.08, 0.12 + Math.max(0, -cs) * 1.25 * sw + Math.max(0, cs) * 0.25];
+      return P({ lean: 0.08 + 0.12 * sp, crouch: 0.4 + Math.abs(c) * 1.5 * sw, legF: leg(s, c), legB: leg(-s, -c),
+        armF: [-s * 0.95 * sw - 0.15, -0.85 - 0.35 * Math.max(0, s)], armB: [s * 0.95 * sw + 0.15, -0.85 - 0.35 * Math.max(0, -s)], cloak: 0.25 + 0.5 * sp, lift: Math.abs(s) * 1.5 * sp });
     }
-    if (name === 'idle') { const b = Math.sin(a.t * 0.06); return P({ crouch: b * 0.6 + 0.6, armF: [-0.2 + b * 0.03, -0.35], armB: [0.28 - b * 0.03, -0.2] }); }
+    if (name === 'idle') { const b = Math.sin(a.t * 0.06), b2 = Math.sin(a.t * 0.023); return P({ crouch: b * 0.6 + 0.6, lean: b2 * 0.012, armF: [-0.2 + b * 0.05, -0.35 + b2 * 0.04], armB: [0.28 - b * 0.05, -0.2], cloak: 0.06 + b2 * 0.05, sy: 1 + b * 0.008 }); }
+    if (name === 'rise' || name === 'apex' || name === 'fall') {   // one continuous arc through the air, by how fast she is rising or falling
+      const k = Math.max(0, Math.min(1, (p.vy + 5) / 10));
+      return k < 0.5 ? mix(POSES.rise, POSES.apex, k * 2) : mix(POSES.apex, POSES.fall, (k - 0.5) * 2);
+    }
     if (name === 'swing' && !ghost) {
       const s = p.swing, d = s.def, pair = SWINGS[d.arc] || SWINGS.high;
       const k = easeOut((s.f - 0.5) / Math.max(1, d.active[0] + 2));
@@ -5822,11 +5830,21 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     ensure();
     const gh = opt.ghost;
     if (!gh && p.hidden) return;
-    if (!gh && p.invuln > 0 && Math.floor(p.invuln / 3) % 2 === 0 && p.stun <= 0) return;   // flicker after a hit
-    const x = gh ? gh.x : p.x, y = gh ? gh.y : p.y, f = gh ? gh.facing : p.facing;
+    let x = gh ? gh.x : p.x, y = gh ? gh.y : p.y; const f = gh ? gh.facing : p.facing;
     const name = gh ? gh.pose : W.poseOf(p);
-    const S = buildPose(p, name, !!gh);
+    let S = buildPose(p, name, !!gh);
     const a = p.anim;
+    if (!gh) {
+      // ease from the last pose into this one, so she never snaps between standing, running, jumping and striking
+      if (a.pose && a.poseF === f) {
+        if (a.poseT === a.t) S = a.pose;
+        else if (a.t - a.poseT <= 2) S = mix(a.pose, S, name === 'swing' ? 0.75 : name === 'dash' || name === 'hurt' ? 0.6 : name === 'run' ? 0.45 : 0.3);
+      }
+      a.pose = S; a.poseT = a.t; a.poseF = f;
+      // the world is drawn on whole pixels; she is drawn exactly where she is, so she glides instead of ticking
+      const cam = SH.game.world && SH.game.world.cam;
+      if (cam) { x += Math.round(cam.x) - cam.x; y += Math.round(cam.y) - cam.y; }
+    }
 
     if (!gh) {
       // the scarf's tail trails in the world
@@ -5863,14 +5881,17 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     m.fillStyle = gh ? '#8cdcff' : p.hitFlash > 0 ? '#ffffff' : '#0a0818'; m.fillRect(0, 0, mask.width, mask.height);
 
     ctx.save();
-    ctx.translate(Math.round(x), Math.round(y)); ctx.scale(f, 1);
+    if (gh) ctx.translate(Math.round(x), Math.round(y)); else { ctx.translate(x, y); ctx.imageSmoothingEnabled = true; }
+    ctx.scale(f, 1);
+    if (!gh && p.invuln > 0 && p.stun <= 0) ctx.globalAlpha = 0.5 + 0.4 * Math.abs(Math.sin(p.invuln * 0.3));   // safe after a hit: she shimmers, she does not vanish
     if (gh) { ctx.globalAlpha = 0.4 * gh.life / gh.max; ctx.drawImage(mask, -OX, -OY); }
     else {
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) ctx.drawImage(mask, -OX + dx, -OY + dy);
       ctx.drawImage(cv, -OX, -OY);
+      ctx.globalAlpha = 1;
       if (p.swing && p.swing.f <= p.swing.def.frames) slash(ctx, p.swing);
     }
-    ctx.restore();
+    ctx.restore(); ctx.imageSmoothingEnabled = false;
   };
 
   // ---------------------------------------------------------------- slash crescents
