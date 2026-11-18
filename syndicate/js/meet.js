@@ -15,7 +15,7 @@
     const w = W.walker;
     if (opts.place === 'arena') {
       if (!G.fight.active && G.fight.exStop) G.fight.exStop();                  // sweep the pit: no limbs or blood left over from the last bout
-      const a = W.get('arena'); gfx.setScene(a.scene); a.setHype(0.15);
+      const a = opts.stage || W.get('arena'); gfx.setScene(a.scene); if (a.setHype) a.setHype(0.15);
       if (G.titleChars) G.titleChars.forEach(c => c.root.visible = false);
       const F = G.fight; if (F.P && F.P.vis) { F.P.vis.g.visible = false; F.E.vis.g.visible = false; }
       const n = G.makeChar(opts.spawn.look); n.root.position.set(opts.npc[0], 0, opts.npc[1]); a.scene.add(n.root); D.actors.push([n, a.scene]); D.npcC = n;

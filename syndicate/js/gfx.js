@@ -16,9 +16,9 @@
     const d = now - lastT; lastT = now; if (d <= 0 || d > 250) return;             // tab was away, or the very first frame
     avg += (d - avg) * 0.05;
     if (gfx.fixed) return;
-    if (avg > 23) { slow += d; fast = 0; } else if (avg < 15) { fast += d; slow = 0; } else { slow = Math.max(0, slow - d); fast = 0; }
-    if (slow > 1500 && gfx.scale > 0.55) { gfx.scale = Math.max(0.55, gfx.scale - 0.15); gfx.shadowEvery = gfx.scale < 0.8 ? 3 : 2; slow = 0; avg = 18; gfx.resize(); document.body.classList.toggle('lowq', gfx.scale < 0.8); }
-    else if (fast > 12000 && gfx.scale < 1 && !gfx.low) { gfx.scale = Math.min(1, gfx.scale + 0.15); fast = 0; avg = 18; gfx.resize(); document.body.classList.toggle('lowq', gfx.scale < 0.8); }
+    if (avg > 30) { slow += d; fast = 0; } else if (avg < 17.5) { fast += d; slow = 0; } else { slow = Math.max(0, slow - d); fast = 0; }
+    if (slow > 3000 && gfx.scale > (gfx.low ? 0.6 : 0.8)) { gfx.scale = Math.max(gfx.low ? 0.6 : 0.8, gfx.scale - 0.1); gfx.shadowEvery = gfx.scale < 0.8 ? 3 : 2; slow = 0; avg = 18; gfx.resize(); document.body.classList.toggle('lowq', gfx.scale < 0.8); }
+    else if (fast > 6000 && gfx.scale < 1 && !gfx.low) { gfx.scale = Math.min(1, gfx.scale + 0.1); fast = 0; avg = 18; gfx.resize(); document.body.classList.toggle('lowq', gfx.scale < 0.8); }
   };
   gfx.frameMs = () => avg;
   gfx.setLow = function (on) { gfx.low = !!on; gfx.fixed = false; gfx.scale = on ? 0.7 : 1; gfx.shadowEvery = on ? 3 : 2; slow = fast = 0; if (renderer) gfx.resize(); document.body.classList.toggle('lowq', !!on); };
@@ -33,7 +33,7 @@
   };
   gfx.resize = function () {
     gfx.W = window.innerWidth; gfx.H = window.innerHeight;
-    renderer.setPixelRatio(Math.max(0.6, Math.min(1.5, window.devicePixelRatio || 1) * gfx.scale));
+    renderer.setPixelRatio(Math.max(0.6, Math.min(2, window.devicePixelRatio || 1) * gfx.scale));
     renderer.setSize(gfx.W, gfx.H, false);
     gfx.portrait = gfx.H > gfx.W;
   };

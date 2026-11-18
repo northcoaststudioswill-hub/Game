@@ -85,14 +85,15 @@
     for (let k = 0; k < 6; k++) box(1.3, 0.2, 0.42, dk, 4.6, 0.1 + k * 0.2, 5.3 - k * 0.42, s);
     const pl = [[0, 3.6, 0, 0xffd080, 30, 16], [TX, 3.0, -3.4, 0xffe0a0, 22, 9], [-3.5, 2.4, -3.5, 0xffb040, 16, 9], [3.6, 2.4, -3.4, 0xffb040, 16, 9]].map(q => { const l = new T.PointLight(q[3], q[4], q[5], 1.5); l.position.set(q[0], q[1], q[2]); s.add(l); return l; });
     let david = null, key = '';
-    return { scene: s, update: t => {
-      const lk = (G.state.hero || {}).race || 'human'; if (!david || key !== lk) { if (david) s.remove(david.root); david = G.makeChar(O.look()); david.root.position.set(-0.6, 0, 0.4); david.root.rotation.y = 0.6; s.add(david.root); key = lk; }
+    let hidden = false;
+    return { scene: s, hide: v => { hidden = !!v; if (david) david.root.visible = !hidden; }, update: (t, noCam) => {
+      const lk = (G.state.hero || {}).race || 'human'; if (!david || key !== lk) { if (david) s.remove(david.root); david = G.makeChar(O.look()); david.root.position.set(-0.6, 0, 0.4); david.root.rotation.y = 0.6; s.add(david.root); key = lk; } david.root.visible = !hidden;
       david.pose({ t, act: Math.sin(t * 0.8) > 0.55 ? 'cast' : 'idle', prog: 0.3 });
       clocks.forEach(c => { c.hs[0].rotation.z = t * c.sp + c.ph; c.hs[1].rotation.z = t * c.sp * 0.09 - c.ph; });
       sand.scale.y = 0.6 + (t * 0.05 % 1) * 0.8; s1.rotation.z = t * 0.1; s2.rotation.z = -t * 0.05; rays.rotation.z = -t * 0.04; rays.scale.setScalar(1 + Math.sin(t * 0.9) * 0.04); banners.forEach((b, i) => { b.rotation.z = Math.sin(t * 0.7 + i * 1.7) * 0.012; }); pl[0].intensity = 28 + Math.sin(t * 2.3) * 3;
       if (Math.random() < 0.35) gfx.emit(R(-5, 5), R(0.2, 3.5), R(-5, 5), R(-0.1, 0.1), R(0.1, 0.4), R(-0.1, 0.1), 1.6, 0xffd36b, 0);
       const port = gfx.portrait, a = Math.sin(t * 0.25) * 0.12;
-      gfx.cine = port ? { pos: [2.2 + a, 3.4, 10.4], look: [-1.0, -0.6, -2.0], fov: 60, roll: 0 } : { pos: [2.6 + a, 2.8, 9.2], look: [-2.6, 2.3, -2.2], fov: 46, roll: 0 };
+      if (!noCam) gfx.cine = port ? { pos: [2.2 + a, 3.4, 10.4], look: [-1.0, -0.6, -2.0], fov: 60, roll: 0 } : { pos: [2.6 + a, 2.8, 9.2], look: [-2.6, 2.3, -2.2], fov: 46, roll: 0 };
     } };
   }
   // going down: the market gives way to the golden room for as long as his menu is open
@@ -110,20 +111,17 @@
   const hub0 = W.buildHub;
   W.buildHub = function () { const h = hub0.apply(this, arguments), up0 = h.update; h.update = function (t) { up0.apply(this, arguments); if (inside) { if (!ui.isOpen()) leave(); else room.update(t); } }; return h; };
 
-  // ------------------------------------------------------------ how he arrives: a shaft of gold and his seal turning on the sand
+  // ------------------------------------------------------------ where you wake: his room, not the sand
+  let reviving = false;
+  O.stageOpts = () => { if (!room) room = build(); room.hide(true); return { stage: room, npc: [-2.3, -0.2], you: [0.5, 0.9] }; };
   const rev0 = O.revive;
   O.revive = function (then) {
-    let fxg = null;
-    try { const a = W.get('arena'), g = new T.Group(); g.position.set(-1.5, 0, -1.3);
-      const cone = new T.Mesh(new T.ConeGeometry(2.0, 14, 16, 1, true), new T.MeshBasicMaterial({ color: 0xffd880, transparent: true, opacity: 0.16, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide })); cone.position.y = 7; g.add(cone);
-      const core = new T.Mesh(new T.CylinderGeometry(0.5, 0.9, 14, 12, 1, true), new T.MeshBasicMaterial({ color: 0xfff0c8, transparent: true, opacity: 0.12, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide })); core.position.y = 7; g.add(core);
-      const sl = new T.Mesh(new T.PlaneGeometry(5, 5), new T.MeshBasicMaterial({ map: seal(), transparent: true, opacity: 0.75, blending: T.AdditiveBlending, depthWrite: false })); sl.rotation.x = -Math.PI / 2; sl.position.y = 0.04; g.add(sl);
-      const lt = new T.PointLight(0xffd080, 26, 12, 1.5); lt.position.y = 3; g.add(lt); gfx.glow(0xffd080, 5, 0, 2.2, 0, g, 0.35);
-      a.scene.add(g); fxg = [a.scene, g, sl]; G._oracleBeam = fxg; G.sfx('holy'); G.sfx('bell');
-    } catch (e) { fxg = null; }
-    return rev0.call(this, function () { if (fxg) { fxg[0].remove(fxg[1]); G._oracleBeam = null; } then(); });
+    if (!room) room = build(); reviving = true; G.sfx('holy'); G.sfx('bell'); gfx.setScene(room.scene); room.update(performance.now() / 1000);
+    return rev0.call(this, function () { reviving = false; room.hide(false); gfx.cine = null; then(); });
   };
-  // the seal turns while he talks
+  // the room keeps turning while he talks, and stays on screen behind whatever card follows
   const api = G.talkApi, tu0 = api && api.update;
-  if (api) api.update = function (dt, now) { if (G._oracleBeam) G._oracleBeam[2].rotation.z = now * 0.4; return tu0.apply(this, arguments); };
+  if (api) api.update = function (dt, now) { if (reviving && room) room.update(now, true); return tu0.apply(this, arguments); };
+  const fu0 = G.fight.update;
+  G.fight.update = function (dt) { if (reviving && room && !G.fight.active) { if (gfx.scene() !== room.scene) gfx.setScene(room.scene); room.update(performance.now() / 1000); return; } return fu0.apply(this, arguments); };
 })();

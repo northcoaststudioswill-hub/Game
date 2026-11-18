@@ -24,23 +24,38 @@
   };
   const O = G.oracle;
 
+  // what he says when he really gets going
+  const HATE = {
+    human: 'Humans. I have watched them for three hundred years, darling, and I have never once seen one do anything a rat would not do faster. Greedy, short-lived, and they smell of whatever they last ate. If the whole lot drowned in their own canals I would bill the widows for the water.',
+    dwarf: 'Dwarves. Squat, sullen little hoarders. They dig a hole, sit in it, and call the sulking a culture. I have never met one I would not gladly wall up in his own mine. Exactly what I would expect of them.',
+    elf: 'Elves. Vain, bloodless, useless things. A thousand years to live and not one of them has ever had a thought that was not about themselves. I would salt every forest they own, and I would enjoy the afternoon.',
+    halforc: 'Half-orcs. Brutes. Two bloodlines, and they kept the worst of both: the temper of one and the table manners of the other. You do not reason with them, darling. You fence them.',
+    tiefling: 'Tieflings. Hell’s leftovers. Somebody’s great-grandmother lay down with a devil, and now the rest of us are expected to be polite about the horns. I am not polite about the horns. I would see every one of them sent back where the blood came from.'
+  };
   // ------------------------------------------------------------ the scenes
-  function scene(st, lines, opts) { return Object.assign({ place: 'arena', npc: [-1.5, -1.3], you: [1.6, 1.7], spawn: { look: O.look() }, lines }, opts || {}); }
+  function scene(st, lines, opts) { return Object.assign({ place: 'arena', npc: [-1.5, -1.3], you: [1.6, 1.7], spawn: { look: O.look() }, lines }, O.stageOpts ? O.stageOpts() : {}, opts || {}); }
   function revive(then) {
     const st = G.state, h = st.hero, me = h.name, kin = KIN[h.race] || 'your people', n = O.deaths(st);
     const fin = () => { G.save(); then(); };
     if (!G.playScene) return fin();
-    if (n === 1) return G.playScene(scene(st, [
-      S('', '', 'You are dead. You are fairly sure of it. And yet somebody is tutting.', 'wide'),
-      S('npc', NAME, 'No, no, no. Up. Up you get. I did not wind the clock back for you to lie there looking tragic.', 'npc'),
-      S('you', me, 'I was dead.', 'you'),
-      S('npc', NAME, 'You were. I am David Roseinbeirg, Oracle of Time, and I simply did not allow it to continue. One of the ' + kin + ', too! The only sensible people in this realm. I knew it the moment I saw you.', 'low'),
-      S('npc', NAME, sneer(h.race) + ' But you. You, I see. There is something in you that does not belong at the bottom of anything.', 'npc'),
-      S('npc', NAME, 'So. A small arrangement. I keep you from staying dead. I lend you power. One day you sit on the Koheneim throne, and you remember who your friend was. In return you owe me a trifle. A debt of souls. Barely a formality.', 'low')],
+    if (n === 1) { const ot = others(h.race), cap = k => KIN[k].charAt(0).toUpperCase() + KIN[k].slice(1); return G.playScene(scene(st, [
+      S('', '', 'You are dead. You are fairly sure of it. And yet somebody is tutting, and everything is gold.', 'wide'),
+      S('npc', NAME, 'No, no, no. Up. Up you get. I did not wind the clock back for you to bleed on my floor. That floor is worth more than your entire level of the city.', 'npc'),
+      S('you', me, 'I was dead. Where is this?', 'you'),
+      S('npc', NAME, 'Under the pit. Under the sewers. Under everything. I am David Roseinbeirg, Oracle of Time, and this is my cellar. Nobody up there knows it exists. They would only come down and touch things.', 'low'),
+      S('npc', NAME, 'And one of the ' + kin + '! Thank the hours. The only people in this realm worth the candle. I could not have borne it if you had been one of the others.', 'npc'),
+      S('npc', NAME, HATE[ot[0]], 'low'),
+      S('npc', NAME, HATE[ot[1]], 'npc'),
+      S('you', me, 'You hate everyone.', 'you'),
+      S('npc', NAME, 'Everyone, darling. Thoroughly, and I keep notes. Everyone but the ' + kin + '. And of the ' + kin + ', chiefly you.', 'npc'),
+      S('npc', NAME, 'Do you want to know why? Eleven years the Kingdom of United Realms fought Eireania. My house wound the clocks back for both of them. Undid their defeats. Sold them the same victory twice. And when the peace came, both crowns signed one clause without a murmur: the hourglass houses go. All of us. Out. In one week.', 'low'),
+      S('npc', NAME, cap(ot[0]) + ' drew it up. ' + cap(ot[1]) + ' witnessed it. ' + cap(ot[2]) + ' carted our gold away, and ' + KIN[ot[3]] + ' held the gate while we walked out. I have forgotten none of them. I never forget a face I intend to ruin.', 'npc'),
+      S('npc', NAME, 'So. I want a homeland for my people, and I want it cut out of theirs. For that I need somebody on the Koheneim throne who owes me. And here you are: nobody, from nowhere, who will not stay dead. My perfect vessel.', 'low'),
+      S('npc', NAME, 'A small arrangement. I keep fetching you back. I lend you power. You climb, you take the crown, and you remember who your friend was. In return you owe me a trifle. A debt of souls. Barely a formality.', 'npc')],
       { choices: [
         { label: 'Sign it', go: () => { st.signed = true; G.save(); card('The Contract', 'The pen is warm. The ink is gold. Your name looks very small beside his, which takes up most of the page. He rubs his hands together and laughs like a man who has just been handed someone else’s purse.', 'Signed · the Oracle’s cellar is open to you in the market', then); } },
         { label: 'Not yet', go: () => { G.save(); card('An Open Offer', '“Of course, of course. Take your time, darling. I have plenty.” He rolls the contract up, unsigned, and somehow looks more pleased than if you had signed it.', 'The Oracle’s cellar is open to you in the market', then); } }],
-        done: fin }));
+        done: fin })); }
     if (n === BIND) { st.bound = true; return G.playScene(scene(st, [
       S('npc', NAME, 'Three! Oh, that is a lovely number. No reason. I just like it. Up you get.', 'npc'),
       S('you', me, 'You are in a good mood.', 'you'),
@@ -50,8 +65,7 @@
       S('npc', NAME, 'The contract. You remember. Whether you signed it or not is, as it turns out, a matter of very little importance.', 'low'),
       S('you', me, 'What did you do?', 'you'),
       S('npc', NAME, 'I? Nothing! YOU died a third time, and I brought you back a third time, and under a rather old law that is acceptance. Dying is a signature, darling. Yours is on file. Three times.', 'npc'),
-      S('npc', NAME, 'You will have heard of the great conflict. The Kingdom of United Realms against Eireania. Eleven years. When it ended, both crowns agreed on exactly one thing: that people who can turn a clock back are bad for business. My house was expelled. All the hourglass houses were. From both kingdoms, in one week.', 'npc'),
-      S('npc', NAME, 'We have been guests ever since. Everywhere. I am very tired of being a guest, darling.', 'low'),
+      S('npc', NAME, 'I told you about the week they threw us out. I did not tell you how far I mean to go to answer it.', 'npc'),
       S('npc', NAME, 'So now I can tell you the rest. There is a throne. There is a queen with wings and a husband with a sword. And there is a very large, very deserving family called Roseinbeirg who would look wonderful in their lands. You are going to help me make them a homeland. You are the perfect vessel: nobody, from nowhere, with a debt and a talent for not staying dead. It will be marvellous. For me, chiefly.', 'low')],
       { done: () => { G.save(); card('Dying Is a Signature', 'He laughs until he has to hold on to something. You find, to your considerable annoyance, that you are almost laughing too.', 'You are bound to the Oracle · his plan is yours to carry', then); } })); }
     const lines = st.signed || st.bound ? [
@@ -155,8 +169,8 @@
     { sec: 'The World', title: 'Dying Is a Signature', unlock: st => !!st.revealed, body: 'Under a law older than the Koheneim throne, to be raised from death three times by the same hand is to accept that hand’s terms. David Roseinbeirg knew this. He did not mention it. His terms are simple: you will take the throne of Queen Eerin Koheneim and Vilhelm van Koheneim IV, from the bottom of the realm to the top, and when you sit on it the Roseinbeirg family will move into the lands, the titles and the treasury. He has told nobody but you. He rubs his hands together when he says it.' }
   );
   if (G.LORE) G.LORE.push(
-    { sec: 'The World', title: 'The Great Conflict', unlock: st => !!st.revealed, body: 'Eleven years of war between the Kingdom of United Realms, which the Koheneim throne rules from Highmarch, and Eireania across the grey water. Nobody won. The peace that ended it had one clause both crowns signed without argument: the hourglass houses, the old families of time-wizards who had sold their craft to both sides, were to leave. Every one of them, from both kingdoms, within the week.' },
-    { sec: 'The World', title: 'The Hourglass Houses', unlock: st => !!st.revealed, body: 'Wizard families who learned, long ago, to make a moment happen twice. Kings paid them to undo defeats, and feared them for the same reason. Since the expulsion they have lived as guests in other people’s lands, welcome nowhere for long. The Roseinbeirgs are the richest of them and the angriest. David Roseinbeirg means to make his people a homeland out of the Kingdom of United Realms itself, and he has chosen you as his vessel: someone who can be put on the throne, and steered. Whether he grieves for his house or only wants its gold back is not a question he answers the same way twice.' }
+    { sec: 'The World', title: 'The Great Conflict', unlock: st => (st.deaths || 0) >= 1, body: 'Eleven years of war between the Kingdom of United Realms, which the Koheneim throne rules from Highmarch, and Eireania across the grey water. Nobody won. The peace that ended it had one clause both crowns signed without argument: the hourglass houses, the old families of time-wizards who had sold their craft to both sides, were to leave. Every one of them, from both kingdoms, within the week.' },
+    { sec: 'The World', title: 'The Hourglass Houses', unlock: st => (st.deaths || 0) >= 1, body: 'Wizard families who learned, long ago, to make a moment happen twice. Kings paid them to undo defeats, and feared them for the same reason. Since the expulsion they have lived as guests in other people’s lands, welcome nowhere for long. The Roseinbeirgs are the richest of them and the angriest. David Roseinbeirg means to make his people a homeland out of the Kingdom of United Realms itself, and he has chosen you as his vessel: someone who can be put on the throne, and steered. Whether he grieves for his house or only wants its gold back is not a question he answers the same way twice.' }
   );
   if (G.TIPS) G.TIPS.push('A lost bout is a death. The coin in your purse is gone, but a strongbox at home keeps what is in it.', 'Souls owed to the Oracle cost you a share of every purse. Buy them back before they stack up.');
 })();

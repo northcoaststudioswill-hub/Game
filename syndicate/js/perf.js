@@ -17,7 +17,7 @@
   ui.settings = function () {
     set0.apply(this, arguments); const st = G.state, o = st.opt || (st.opt = {}), card = document.querySelector('#panel .card'), end = card && card.querySelector('.row.end'); if (!end) return;
     const row = document.createElement('div'); row.className = 'ab-row';
-    row.innerHTML = '<div class="ab-tx"><b>Performance mode</b><p>Draws at a lower resolution with cheaper shadows and no blur behind menus. The game also lowers detail by itself when frames drop' + (gfx.scale < 1 && !o.perf ? ' (it has: now at ' + Math.round(gfx.scale * 100) + '%)' : '') + '.</p></div><button class="' + (o.perf ? 'big' : '') + '">' + (o.perf ? 'On' : 'Off') + '</button>';
+    row.innerHTML = '<div class="ab-tx"><b>Performance mode</b><p>Draws at a lower resolution with cheaper shadows, for slower machines. Off, the game stays sharp and only softens a little if frames drop badly' + (gfx.scale < 1 && !o.perf ? ' (it has: now at ' + Math.round(gfx.scale * 100) + '%)' : '') + '.</p></div><button class="' + (o.perf ? 'big' : '') + '">' + (o.perf ? 'On' : 'Off') + '</button>';
     row.querySelector('button').onclick = () => { o.perf = !o.perf; G.save(); G.sfx('ui'); G.applyOpts(); ui.settings(); };
     end.parentNode.insertBefore(row, end);
   };
