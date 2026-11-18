@@ -236,7 +236,11 @@ const G3 = {
     if (hero) { // kicks, jumps, the guard, the hook line
       if (st === 'kick') { if (o.t < .06) S({ hr: 1.5, kr: 1.7, lean: -.1, cr: 1, hl: -.1, kl: .3, rp: -.2, re: -1.2, lp: -.8, le: -1.2, tw: -.3 }); else S({ hr: 1.6, kr: .05, lean: -.4, cr: .5, hl: -.25, kl: .25, rp: .5, re: -.5, lp: -1.0, le: -.8, tw: .35, hx: .2 }); rate = 44; zeta = .7; }
       else if (st === 'dive') { S({ hr: 1.25, kr: .05, hl: .3, kl: 1.7, lean: -.55, rp: .7, re: -.3, lp: -1.2, le: -.6, cr: 0, tw: .2 }); rate = 40; }
-      else if (st === 'plunge') { S({ cr: 0, rp: -3.0, re: -.4, tilt: -.3, lean: .25, hl: .9, kl: 1.5, hr: .2, kr: 1.3, lp: -2.7, le: -.3, tw: 0, ry: 0 }); rate = 40; }
+      else if (st === 'bore') { if (o.t < .12) S({ rp: -.9, re: -1.7, tilt: -.3, lz: -4, tw: -.6, cr: 4, lean: .2, hl: .9, kl: 1.3, hr: -.4, kr: .9 }); else S({ rp: -1.5, re: 0, tilt: -.08, ry: .1, lz: 10, lean: .85, tw: .55, cr: 2.2, hr: .9, kr: .7, hl: -.9, kl: .1, lp: -1.5, le: 0, ly: -.2 }); rate = 44; }
+      else if (st === 'lash') { S({ rp: -1.5, ry: 1.3, re: 0, tilt: -.05, lean: .15, cr: 2.6, lp: -.6, ly: -.9, le: -.4, hl: .7, kl: .7, hr: -.6, kr: .3, tw: .6, lz: 6 }); rate = 40; }
+      else if (st === 'butt') { if (o.t < .1) S({ lean: -.35, hx: -.5, rp: -.9, lp: -.9, le: -.6, re: -.6, cr: 1.5 }); else S({ lean: .7, hx: .75, rp: -1.3, ry: -.3, re: -.5, lp: -1.3, ly: .3, le: -.5, cr: 2.5, hl: .8, kl: .7, hr: -.5 }); rate = 44; }
+      else if (st === 'roar') { S({ hx: -.6, lean: -.28, rp: .35, ry: -1.0, re: -.3, tilt: -.6, lp: .35, ly: 1.0, le: -.3, cr: 2, hl: .5, kl: .5, hr: -.5, kr: .4, tw: 0, sq: 1.04 }); rate = 22; }
+      else if (st === 'plunge' || st === 'drop') { S({ cr: 0, rp: -3.0, re: -.4, tilt: -.3, lean: .25, hl: .9, kl: 1.5, hr: .2, kr: 1.3, lp: -2.7, le: -.3, tw: 0, ry: 0 }); rate = 40; }
       else if (st === 'guard') { S({ rp: -1.3, ry: .9, re: -1.2, tilt: -1.9, lp: -1.3, le: -1.3, ly: -.6, cr: 2.8, lean: -.04, tw: -.2, hl: .4, kl: .6, hr: -.35, kr: .5 }); rate = 30; }
       else if (st === 'hook') { S({ lp: -1.5, le: 0, ly: 0, tw: .5, lean: .3, cr: 2, hl: .7, kl: .6, hr: -.5, kr: .3 }); rate = 36; }
       else if ((o.z || 0) > 1 && st !== 'atk') { S(o.vz > 0 ? { cr: 0, hl: .9, kl: 1.5, hr: .5, kr: 1.3, lean: .1, rp: -1.2, re: -.8, lp: -1.0, le: -.9 } : { cr: 0, hl: .3, kl: .5, hr: -.2, kr: .6, lean: .05, rp: -2.0, re: -.5, lp: -1.6, le: -.5 }); rate = 24; }

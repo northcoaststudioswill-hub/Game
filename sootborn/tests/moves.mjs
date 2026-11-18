@@ -20,10 +20,17 @@ await seq('parry', 'cadet', { 0: () => { const B = BTS.Brawl; B.p.st = 'guard'; 
 await seq('block', 'cadet', { 0: () => { const B = BTS.Brawl; B.p.st = 'guard'; B.p.gt = .5; for (let i = 0; i < 3; i++) { B.p.inv = 0; B.hurtPlayer(B.foes[0], 1, -1, 0); } } }, 2);
 await seq('hook', 'cadet', { 0: () => { BTS.Brawl.foes[0].x = 120; BTS.Brawl.hook(); } }, 7);
 await seq('zip', 'captain', { 0: () => { BTS.Brawl.foes[0].x = 120; BTS.Brawl.hook(); } }, 7);
+await seq('breach', 'cadet', { 0: () => { BTS.Brawl.p.x = -40; BTS.Brawl.bore(); } }, 7);
+await seq('drop', 'captain', { 0: () => { BTS.Brawl.p.x = -60; BTS.Brawl.jump(); }, 2: () => BTS.Brawl.drop() }, 14);
+await seq('lash', 'cadet', { 0: () => BTS.Brawl.lash() }, 7);
+await seq('throw', 'cadet', { 0: () => BTS.Brawl.butt(BTS.Brawl.foes[0]) }, 7);
+await seq('headbutt', 'captain', { 0: () => BTS.Brawl.butt(BTS.Brawl.foes[0]) }, 5);
+await seq('roar', 'cadet', { 0: () => BTS.Brawl.roar() }, 6);
+await seq('riposte', 'cadet', { 0: () => { const B = BTS.Brawl; B.p.st = 'guard'; B.p.gt = 0; B.hurtPlayer(B.foes[0], 1, -1, 0); }, 2: () => BTS.Brawl.strike() }, 6);
 // real keys at full speed
 await setup('cadet'); await wait(800);
 for (const k of ['KeyF', 'KeyE', 'KeyE', 'KeyX']) { await page.keyboard.press(k); await wait(130); } await wait(700);
 for (const k of ['KeyC', 'KeyE', 'KeyE', 'KeyC', 'KeyF', 'KeyE', 'KeyC']) { await page.keyboard.press(k); await wait(190); } await wait(900);
-await page.keyboard.down('KeyV'); await wait(300); await page.keyboard.up('KeyV'); await page.keyboard.press('KeyQ'); await wait(600);
+await page.keyboard.down('KeyV'); await wait(200); await page.keyboard.press('KeyE'); await wait(600); await page.keyboard.press('KeyC'); await wait(600); await page.keyboard.press('KeyQ'); await wait(700); await page.keyboard.up('KeyV'); await page.keyboard.down('KeyC'); await wait(500); await page.keyboard.up('KeyC'); await wait(600); await page.keyboard.press('KeyF'); await wait(150); await page.keyboard.press('KeyF'); await wait(1400); await page.keyboard.press('KeyQ'); await wait(600);
 console.log('keys', JSON.stringify(await ev(() => ({ p: BTS.Brawl.p.st, fhp: BTS.Brawl.foes[0].hp, fight: document.body.classList.contains('fight') }))));
 console.log('errors', errors); await browser.close();

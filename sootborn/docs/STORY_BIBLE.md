@@ -122,7 +122,7 @@ Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at F
 - Kael's narration is first person, present tense, short. He counts things. He never says he is angry; he describes what he does with it.
 
 ### How Kael fights (v0.12.9)
-Nothing clean about it. The Accredited are taught forms; he was taught by a furnace. He kicks, jumps on people, drags them in with the rigging line he used on the valve banks, and parries because he has no patience for blocking. Moves: strike chain, heavy, kick (guard break, launcher), jump with air cuts, dive kick, plunge, dodge, guard and parry, hook line, ELEVEN.
+Nothing clean about it. The Accredited are taught forms; he was taught by a furnace. He kicks, jumps on people, drags them in with the rigging line he used on the valve banks, and parries because he has no patience for blocking. Moves: strike chain, heavy, kick (guard break, launcher), jump with air cuts, dive kick, plunge, dodge, guard and parry, hook line, ELEVEN. Signatures (v0.13): Breach, Shaft Drop (he came up a lift shaft; he comes down like one), Wide Cut, headbutt and throw, the roar, riposte. Assay fights can be lost: one second wind, then the fight restarts slightly easier.
 
 ### The five fights (v0.12.8)
 Only the Valley is a mass battle. The rest are single combat, each with an intro and outro film.

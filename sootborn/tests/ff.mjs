@@ -35,7 +35,7 @@ if (mode === 'opening') {
     await wait(45);
   }
   for (const k of [...held]) await page.keyboard.up(k);
-  console.log('fight over t=', await ev(() => [BTS.Brawl.t, BTS.Brawl.p.hp, BTS.Brawl.phase]));
+  console.log('fight over t=', await ev(() => [BTS.Brawl.t, BTS.Brawl.p.hp, BTS.Brawl.phase, 'revived', BTS.Brawl.revived, 'tries', BTS.Brawl.def._tries || 0]));
   const m = await ev(() => BTS.Brawl.cine ? BTS.Brawl.cine.shots.length : 0);
   for (let i = 0; i < m; i++) { await wait(900); await shot(`${mode}-out-${i}`); await ev(() => { BTS.Brawl.cine && BTS.Brawl.nextShot(); }); }
   await wait(500); console.log('result', await ev(() => window.__r), 'active', await ev(() => BTS.Brawl.active));

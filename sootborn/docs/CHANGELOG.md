@@ -1,5 +1,20 @@
 # SOOTBORN — changelog
 
+## v0.13 · 2026-11-18 — signature moves, and fights you can lose
+From play notes: more signature moves; raise the difficulty so you sometimes lose, a fun challenge, not brutal.
+- **Signature moves** (all our own, built from Kael's story):
+  - **Breach** (hold kick): a crouch, then a lunge straight through everyone in the line, breaking guards and launching.
+  - **Shaft Drop** (jump, then jump again in the air): he goes up out of frame and comes down on the nearest enemy; a fire ring, a scar, heavy damage in the middle. Seven-second cooldown.
+  - **Wide Cut** (guard + strike): a full spinning cut that hits and pushes back everything around him.
+  - **Headbutt / throw** (guard + kick, up close): an ordinary fighter is thrown, and hurts whoever he lands on; a big one takes a headbutt and staggers.
+  - **Roar** (guard + hook): ordinary fighters around him reel back, big ones hesitate and drop their wind-up, fury jumps. Nine-second cooldown.
+  - **Riposte**: the first strike after a parry is a heavy, slowed blow.
+  - **No mercy**: hitting a man who is on the ground does extra damage.
+- **Assay fights can now be lost.** Kael gets one second wind per fight ("NOT TODAY", back at half health with full fury). Go down again and it is "GET UP.": the fight restarts without its intro film, with the enemies about 8% weaker each time (up to three times), so nobody gets stuck.
+- **Harder enemies in the Assay**: quicker wind-ups, shorter gaps between attacks, 15% more health; captains, Wardens and duelists can no longer be knocked out of a swing by ordinary hits (a heavy blow, an opening, a kick-broken guard or a parry still does it), and they speed up below 40% health. Kael's safe time after being hit is shorter. He has less health in the final duel.
+- With the test bots (which only strike and dodge): the Ford and the Proctor regularly use the second wind and the Ford was lost outright twice in one run; the Pairing and the Valley are still gentle. The Ember Ring below is unchanged.
+- Not tested by a person: how the new inputs feel, and whether the difficulty lands where you want it.
+
 ## v0.12.9 · 2026-11-18 — kicks, jumps, a guard and a hook line
 From play notes: the fighting is smooth but needs more to do, especially on a controller, and should be a little harder.
 - **New moves.** Kael fights dirty and off the ground:
