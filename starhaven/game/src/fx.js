@@ -30,7 +30,12 @@
     fx.burst(x, y - 2, n || 5, { angle: dir > 0 ? Math.PI : dir < 0 ? 0 : -Math.PI / 2, spread: 1.2, speed: 1.4, gravity: -0.02, life: 20, size: 3, colors: ['#8a86b8', '#6c6a99', '#b3b0d9'], drag: 0.9 });
   };
   fx.ring = function (x, y, color, r1, life, width) { fx.rings.push({ x, y, r: 2, r1: r1 || 26, life: life || 16, max: life || 16, color: color || '#fff', width: width || 2 }); };
-  fx.word = function (x, y, text, color, life) { fx.words.push({ x, y, text, color: color || '#fff', life: life || 50, max: life || 50 }); };
+  // Words that pop up by Wren sit behind her, never over the ground she is heading for.
+  fx.word = function (x, y, text, color, life) {
+    const p = SH.game && SH.game.world && SH.game.world.player;
+    if (p && Math.abs(x - p.x) < 34 && Math.abs(y - p.y) < 110) { x -= p.facing * 40; y -= 6; }
+    fx.words.push({ x, y, text, color: color || '#fff', life: Math.min(life || 50, 70), max: Math.min(life || 50, 70) });
+  };
   fx.ghost = function (snap) { fx.ghosts.push(snap); };
   // Hit sparks: a slash mark across the hit and bright lines flying out of it.
   fx.spark = function (x, y, ang, big) {

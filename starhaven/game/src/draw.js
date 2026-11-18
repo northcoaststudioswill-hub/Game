@@ -712,7 +712,7 @@
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
-    ctx.textAlign = 'center'; ctx.font = 'bold 13px system-ui, sans-serif';
+    ctx.textAlign = 'center'; ctx.font = 'bold 11px system-ui, sans-serif';
     for (const wd of fx.words) {
       ctx.globalAlpha = Math.min(1, wd.life / 15);
       ctx.fillStyle = '#05050d'; ctx.fillText(wd.text, wd.x + 1, wd.y + 1);

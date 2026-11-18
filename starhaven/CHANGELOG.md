@@ -1,5 +1,19 @@
 # Starhaven — Changelog
 
+## Reimagined 12 — pop-ups out of the way (Nov 18, 2026)
+Will: word pop-ups block the direction you're going.
+
+- **Consequence cards** (bond changes, "this will be remembered") slide in on the **left**, under the hearts, and are
+  narrower. They used to cover the right side of the screen, which is where Wren is usually heading. Held upright they
+  sit in the control deck, off the picture.
+- **Words that pop up by Wren** ("Firewood 2/3", "+4 XP", "BULLSEYE") appear **behind** her, are smaller, and never
+  stay longer than about a second.
+- **Level-up and finisher bands** moved from the middle of the screen to the top fifth.
+- **Hints and toasts** are smaller and narrower, and the hint plate is slightly see-through.
+
+Tests: 50 play checks, 19 menu checks. Checked in one screenshot with every kind of pop-up on screen at once: the
+ground ahead of Wren is clear. **Not played by hand or on a phone.**
+
 ## Reimagined 11 — graphics, from research (Nov 18, 2026)
 Will: the graphics need serious work; do some research and refinement.
 

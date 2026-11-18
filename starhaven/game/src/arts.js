@@ -227,13 +227,13 @@
 
   function drawBand(ctx, vw, VH) {
     const b = A.band, inK = Math.min(1, b.t / 6), outK = Math.min(1, (b.life - b.t) / 10), k = Math.min(inK, outK);
-    const h = 44 * k, y = VH * 0.42 - h / 2;
+    const h = 44 * k, y = VH * 0.2 - h / 2;
     ctx.fillStyle = 'rgba(6,5,18,0.86)'; ctx.fillRect(0, y, vw, h);
     ctx.fillStyle = b.color; ctx.fillRect(0, y, vw, 2); ctx.fillRect(0, y + h - 2, vw, 2);
     if (k < 0.8) return;
     const sc = SH.ptextW(b.text, 5) > vw - 30 ? 4 : 5, tw = SH.ptextW(b.text, sc), slide = (1 - Math.min(1, b.t / 10)) * 60;
-    SH.ptext(ctx, b.text, Math.round(vw / 2 - tw / 2 + slide), Math.round(VH * 0.42 - (b.sub ? 16 : 12)), '#fff6d8', sc, '#0a0818');
-    if (b.sub) SH.ptext(ctx, b.sub, Math.round(vw / 2 - SH.ptextW(b.sub, 2) / 2 - slide), Math.round(VH * 0.42 + 12), b.color, 2);
+    SH.ptext(ctx, b.text, Math.round(vw / 2 - tw / 2 + slide), Math.round(VH * 0.2 - (b.sub ? 16 : 12)), '#fff6d8', sc, '#0a0818');
+    if (b.sub) SH.ptext(ctx, b.sub, Math.round(vw / 2 - SH.ptextW(b.sub, 2) / 2 - slide), Math.round(VH * 0.2 + 12), b.color, 2);
   }
 
   // The cut-in: two slanted panels. On the left the memory the art is drawn from; on the right the face.
