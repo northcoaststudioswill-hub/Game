@@ -3,6 +3,56 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Lightswarm v0.2: ten keepers, supers with cutscenes, the Keeper's Trail (Nov 18 2026)
+
+Will: all our favourite characters should be playable (Will, Erin, Marcus, Bottie, Bibi and anyone important or seen
+more than once); Louie stays an item; a deeper unlock track; powers from each character's lore; quips; supers with a
+cutscene like the dab rig and Hasbara ones.
+
+![The keepers](playtest/lightswarm/13-keepers.png)
+
+**Ten keepers.** Each leads with one sprout kind, has a passive, their own A move and a SUPER.
+
+| Keeper | Leads with | Passive | A | SUPER |
+|---|---|---|---|---|
+| WILL | Ember | Sprouts throw 10% sooner | CHARGE | HASBARA: Bibi beams the idea in from the desk; every buddy in sight stops to hear it |
+| ERIN | Leaf | Light mends itself, three times the berries | TOWEL WHIP (all round) | LOUIE AIRLINES: Louie the paper plane loops the field |
+| MARCUS | Peb | 15% brighter, every gift is two picks | DAB CLOUD (slows) | THE DAB RIG: the whole field goes slow for 8 s |
+| DEREK | Zip | 15% faster walk, quick A | PULL UP | DEREK PULLS UP: the Flow Pros truck, three passes |
+| MAMA | Dew | Everything ready 15% sooner | MOM VOICE (stops them dead) | RUBY TEMPER TANTRUM: five stomps |
+| CORBIN | Lucky | Calmed buddies sometimes leave a heart | KISS (goes through everything) | CAN I GET A KISS?: every small buddy in sight goes home |
+| SCOUT | Zip | Sees and reaches further, learns 12% more | BUG NET (sweeps motes) | FIELD NOTES: 10 s of an extra mote per buddy |
+| RANGER | Peb | +40 light, slower, wider Pebs | BOULDER | ROCKSLIDE: fourteen boulders |
+| KING BIBI | Dew | Iron Dome takes a hit every 14 s | IRON DOME (untouchable for 2.6 s) | THE COALITION: six lit buddies walk with him |
+| LIL BOTTIE | Ember | Clanker guns fire by themselves; least light | CLANKERS (fan of seven) | NUKE THE DATA CENTER: resets every small buddy, costs him light |
+
+- **Supers.** A bar under the light fills as buddies are calmed (160, then 70 more each time). When it is full the
+  Select button glows; pressing it plays a Knockout-style cut-in (their Knockout head where there is one), a short
+  scene of their own, and then it lands on the field. A skips the scene.
+- **Quips.** A bubble over the keeper at the start, on a level, when the light runs low, when a big one is calmed,
+  when the Guardian wakes, on a super and on a win. One voice at a time, never over a banner. Lines are theirs from
+  Knockout, Sprouts and Sproutwild where they had some.
+- **The Keeper's Trail** (title menu): 14 things to do, each opening a keeper, a sprout kind or an item. Erin and
+  Louie come with the first run home; Bottie needs the Guardian lit by three keepers. Sprout kinds are no longer
+  bought with seeds. The pick screen says what a locked keeper needs.
+- **Mastery.** Each keeper has five ranks from buddies calmed as them: +10 light, super fills sooner, one more pick
+  at the start, a LV 2 lead sprout.
+- **For testing:** hold Select for two seconds on the Trail screen and everything opens.
+- The Guardian has more light to give (3400) and gets faster the longer it is run from; with it close, the swarm
+  goes for it first.
+- Louie is still an item, as asked.
+
+**New art:** field sprites for Derek, Mama, Corbin and King Bibi in the Sprouts style; Ruby, the rig, the truck, the
+desk. Will, Erin, Marcus, Ranger, Scout and Bottie use the models the other cartridges already have.
+
+**Canon to flag to Will:** Derek has no face in any other cartridge, so his look here (beanie, Flow Pros blue) is new.
+Scout and Ranger are placeholder characters per the story notes; they have light kits and no story. Bibi's super is
+THE COALITION (his Knockout second super), not his first. Corbin is the Knockout name for "Kiss".
+
+**Tested:** `tests/lightswarm_lab.js`, 28 checks: every keeper's move and super is fired and its scene drawn
+(screenshots `20-cutin-*`, `21-scene-*`, `22-after-*`), the trail, the testing unlock, then bot runs. Bots with
+supers win roughly half their runs; the numbers swing a lot from run to run. **Not played by hand or on a phone.**
+
 ## Lightswarm: cartridge 6, vertical slice v0.1 (Nov 18 2026)
 
 Will: a brand new game in the Sprouts universe, not tower defense, on a copy of the latest build, as a vertical slice

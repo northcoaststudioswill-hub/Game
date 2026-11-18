@@ -2,7 +2,11 @@
 
 Updated Nov 17 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Lightswarm (cartridge 6, vertical slice v0.1)
+## Lightswarm (cartridge 6, vertical slice v0.2)
+
+- Ten keepers and their supers are new in v0.2 and balanced only by a bot; some supers (Corbin, Bottie) may be too strong, Scout's too quiet.
+- Keepers other than Will have one facing on the field. Derek's look is new and needs Will's say.
+- The pick screen's text is sized for a phone-height screen; on a short window the last lines are cut.
 
 - Not played by hand or on a phone. Balance comes from a simple bot (about one win in three with no upgrades).
 - One expedition only (Crooked Hollow). No obstacles on the field, no second Guardian, no sounds of its own beyond the console's beeps.

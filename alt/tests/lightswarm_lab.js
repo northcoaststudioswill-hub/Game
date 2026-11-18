@@ -19,7 +19,7 @@ const RUNS = +(process.argv[3] || 3), OUT = path.join(__dirname, '../playtest/li
   await page.evaluate(() => document.querySelector('.cart[data-i="5"]').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })));
   for (let i = 0; i < 40 && (await E('state')) !== 'ls'; i++) { await page.keyboard.press('z'); await page.waitForTimeout(150); }
   ok('the cartridge boots to its title', (await E('state')) === 'ls' && (await L('__g.LS._.G.s')) === 'title');
-  ok('the pad is labelled for it', (await L(`document.querySelector('#bA span').textContent`)) === 'charge');
+  ok('the pad is labelled for it', (await L(`document.querySelector('#bA span').textContent`)) === 'move');
   await page.waitForTimeout(300); await shot('01-title');
   /* from here the game is stepped by hand so results do not depend on the machine */
   await L(`window.__st=(n,k)=>{const g=__g;for(let i=0;i<n;i++){if(k)k(i);g.update(1/30);for(const q in g.keys)g.prev[q]=g.keys[q]}g.draw()};
@@ -27,9 +27,9 @@ const RUNS = +(process.argv[3] || 3), OUT = path.join(__dirname, '../playtest/li
   const tap = k => L(`__tap('${k}')`), G = s => L('(()=>{const X=__g.LS._,G=X.G,N=X.RN,SV=X.SV;return ' + s + '})()');
   await tap('a'); ok('first start shows the story', (await G('G.s')) === 'story'); await page.waitForTimeout(80); await shot('02-story');
   for (let i = 0; i < 5; i++) await tap('a');
-  ok('then asks who leads the swarm', (await G('G.s')) === 'pick'); await shot('03-pick');
-  await tap('right'); await tap('a'); ok('a locked kind cannot lead without seeds', (await G('G.s')) === 'pick' && (await G('G.noteT>0')));
-  await tap('left'); await tap('a'); ok('an Ember-led expedition starts', await G(`G.s==='play'&&N.w[0]===1&&N.sw.length===2`));
+  ok('then asks who carries the light', (await G('G.s')) === 'pick'); await shot('03-pick');
+  await tap('right'); await tap('a'); ok('a keeper still on the trail cannot go', (await G('G.s')) === 'pick' && (await G('G.noteT>0')));
+  await tap('left'); await tap('a'); ok('Will sets out leading Embers, and says something', await G(`G.s==='play'&&N.h.id==='will'&&N.w[0]===1&&N.sw.length===2&&!!N.say`));
   await L('__st(30)'); await shot('04-start');
   /* rules */
   await G(`(X.spawn('CINDERCAP',N.P.x+40,N.P.y),0)`); await L('__st(60)');
@@ -52,28 +52,46 @@ const RUNS = +(process.argv[3] || 3), OUT = path.join(__dirname, '../playtest/li
   await G(`(N.boss.hp=1,N.boss.x=N.P.x+40,N.boss.y=N.P.y,N.wt[0]=0,0)`); await L('__st(40)');
   for (let i = 0; i < 6 && (await G('G.s')) === 'cards'; i++) { await L('__st(16)'); await tap('a'); }
   ok('lighting it wins the expedition', await G('N.won>0'), await G('[N.won,G.s,N.boss&&N.boss.hp]')); await L('__st(60)'); await shot('07-win');
-  await L('__st(400)'); ok('the report pays seeds and counts the win', await G(`G.s==='report'&&G.rep.won&&G.rep.seeds>=30&&SV.wins===1`), await G('G.rep')); await shot('08-report');
+  await L('__st(400)'); ok('the report pays seeds and counts the win', await G(`G.s==='report'&&G.rep.won&&G.rep.seeds>=30&&SV.wins===1`), await G('[G.rep.seeds,G.rep.un.map(q=>q.id)]')); await shot('08-report');
+  ok('the trail opened what that run earned (Erin, Louie, the big one, the Guardian)', await G(`['first','big','wake','win','t3','t4'].every(k=>SV.done[k])&&!SV.done.win3&&['will','erin','derek','mama','bibi'].every(i=>X.HERO.some(h=>h.id===i&&(!h.goal||SV.done[h.goal])))&&!SV.done[X.heroOf('bottie').goal]`), await G('Object.keys(SV.done)'));
   await L('__st(40)'); await tap('b'); ok('B opens Sunkeep', (await G('G.s')) === 'shop'); const s0 = await G('SV.seeds'); await tap('a');
   ok('seeds buy a lasting upgrade', (await G('SV.up.glass')) === 1 && (await G('SV.seeds')) === s0 - 12); await shot('09-sunkeep');
   ok('the save is written under its own key', await L(`JSON.parse(localStorage.getItem('lightswarm-v1')).up.glass===1`));
-  await G(`(X.newRun(0),G.s='play',0)`); ok('the upgrade shows in the next run', (await G('N.max')) === 115);
+  await G(`(X.newRun('will'),G.s='play',0)`); ok('the upgrade shows in the next run', (await G('N.max')) === 115);
   await G(`(N.hp=1,N.P.inv=0,X.hurt(5),0)`); await L('__st(100)'); ok('when the light goes out the run ends with a report', await G(`G.s==='report'&&!G.rep.won`));
+  /* every keeper: their move, their super and its scene, then ten seconds of play */
+  await G(`(G.s='title',G.mi=1,0)`); await tap('a'); ok("the Keeper's Trail opens from the title", (await G('G.s')) === 'trail'); await L('__st(2)'); await shot('12-trail');
+  await L(`__g.keys.sel=1;__st(70);__g.keys.sel=0;__st(2)`); ok('holding SELECT there opens the whole trail (for testing)', await G('X.GOALS.every(q=>SV.done[q.id])&&X.HERO.every(h=>!h.goal||SV.done[h.goal])'));
+  await tap('b'); await G(`(G.mi=0,0)`); await tap('a'); ok('all ten keepers can be picked', await G(`G.s==='pick'&&X.HERO.length===10`)); await L('__st(2)'); await shot('13-keepers');
+  const heroes = await G('X.HERO.map(h=>h.id)'); const bad = [];
+  for (const id of heroes) { try {
+    await G(`(X.newRun('${id}'),G.s='play',0)`); await L('__st(20)'); await G(`(X.ring('CINDERCAP',10,45),X.spawn('BOULDERHOUND',N.P.x+60,N.P.y),N.aCd=0,0)`); const c0 = await G('N.calm'), n0 = await G('N.en.length+N.pr.length+N.pt.length');
+    await L(`__g.keys.a=1;__st(1);__g.keys.a=0;__st(1)`); const used = await G('N.aCd>1'); await L('__st(30)'); if (id === 'will') await shot('14-move-' + id);
+    await G(`(N.sm=N.smNeed,X.ring('ZIPWIG',12,70),0)`); await L(`__st(1)`); const rdy = await L(`document.getElementById('bSel').classList.contains('ready')`);
+    await L(`__g.keys.sel=1;__st(1);__g.keys.sel=0;__st(8)`); const inSu = (await G('G.s')) === 'super'; await L('__st(6)'); await shot('20-cutin-' + id); await L('__st(34)'); await shot('21-scene-' + id);
+    await L('__st(40)'); const back = (await G('G.s')) !== 'super'; for (let i = 0; i < 6 && (await G('G.s')) === 'cards'; i++) { await L('__st(16)'); await tap('a'); } await L('__st(45)'); await shot('22-after-' + id);
+    for (let k = 0; k < 8; k++) { await L('__st(30)'); for (let i = 0; i < 4 && (await G('G.s')) === 'cards'; i++) { await L('__st(16)'); await tap('a'); } }
+    const fine = used && rdy && inSu && back && (await G('N.supers===1&&N.sm<N.smNeed&&N.calm>' + c0)); if (!fine) bad.push([id, used, rdy, inSu, back, await G('[N.supers,N.sm,N.calm,G.s]')]);
+  } catch (e) { bad.push([id, String(e).slice(0, 200)]); } }
+  ok('every keeper: A does their move, SELECT plays their super and it lands', !bad.length, bad);
+  await L(`localStorage.removeItem('lightswarm-v1');void 0`);
   /* the bot: whole expeditions */
   await L(`window.__bot=(st,seedUp)=>{const X=__g.LS._,G=X.G,K=__g.keys;X.newRun(st);G.s='play';const log=[];let fr=0,minHp=1e9;
-   while(fr<30*60*8){const N=X.RN;if(G.s==='report')break;
-    for(const q of['up','down','left','right','a','b'])K[q]=0;
-    if(G.s==='cards'){if(G.lock<=0){const c=G.cards,pr=c.findIndex(q=>q.k==='w');G.ci=pr>=0?pr:0;K.a=1}}
+   while(fr<30*60*11){const N=X.RN;if(G.s==='report')break;
+    for(const q of['up','down','left','right','a','b','sel'])K[q]=0;
+    if(G.s==='super'){if(fr%2)K.a=1}
+    else if(G.s==='cards'){if(G.lock<=0){const c=G.cards,pr=c.findIndex(q=>q.k==='w');G.ci=pr>=0?pr:0;K.a=1}}
     else if(G.s==='play'&&!N.dead&&!N.won){const P=N.P;let ax=0,ay=0,close=0;
      for(const e of N.en){const dx=P.x-e.x,dy=P.y-e.y,d=Math.hypot(dx,dy)||1;if(d<75){const w=(75-d)/75*(e.D.boss?4:1);ax+=dx/d*w;ay+=dy/d*w;if(d<34)close++}}
      for(const q of N.ep){const dx=P.x-q.x,dy=P.y-q.y,d=Math.hypot(dx,dy)||1;if(d<40){ax+=dx/d*2;ay+=dy/d*2}}
      if(Math.hypot(ax,ay)<.6){let b=null,bd=160*160;for(const m of N.mo){const d=(m.x-P.x)**2+(m.y-P.y)**2;if(d<bd){bd=d;b=m}}for(const it of N.it){b=it;break}if(b){ax+=(b.x-P.x)/100;ay+=(b.y-P.y)/100}}
      if(ax>.15)K.right=1;if(ax<-.15)K.left=1;if(ay>.15)K.down=1;if(ay<-.15)K.up=1;
-     if(close>=3&&N.bCd<=0&&fr%2)K.b=1;else if(close>=2&&N.aCd<=0&&fr%2)K.a=1;
+     if(N.sm>=N.smNeed&&close>=2&&fr%2)K.sel=1;else if(close>=3&&N.bCd<=0&&fr%2)K.b=1;else if(close>=2&&N.aCd<=0&&fr%2)K.a=1;
      minHp=Math.min(minHp,N.hp);if(fr%900===0)log.push([N.t|0,N.lv,N.calm,N.en.length,N.hp|0])}
     __g.update(1/30);for(const q in K)__g.prev[q]=K[q];fr++}
-   const N=X.RN,r=G.rep||{};return{won:!!r.won,t:Math.round(N.t),lv:N.lv,calm:N.calm,seeds:r.seeds,w:N.w.join(''),p:Object.values(N.p).join(''),dmg:N.dmgTaken|0,log:log.map(q=>q.join('/')).join(' ')}};void 0`);
+   const N=X.RN,r=G.rep||{};return{h:st,su:N.supers,won:!!r.won,t:Math.round(N.t),lv:N.lv,calm:N.calm,seeds:r.seeds,w:N.w.join(''),p:Object.values(N.p).join(''),dmg:N.dmgTaken|0,log:log.map(q=>q.join('/')).join(' ')}};void 0`);
   const res = [];
-  for (let i = 0; i < RUNS; i++) { const r0 = await L(`__bot(${[0, 2, 3][i % 3]})`); res.push(r0); console.log('bot run ' + (i + 1) + ': ' + JSON.stringify(r0)); }
+  for (let i = 0; i < RUNS; i++) { const r0 = await L(`__bot('${['will', 'mama', 'derek', 'erin', 'marcus', 'bottie'][i % 6]}')`); res.push(r0); console.log('bot run ' + (i + 1) + ': ' + JSON.stringify(r0)); }
   ok('the bot lasts at least a minute every time', res.every(q => q.t >= 60), res.map(q => q.t));
   ok('the bot levels up at least four times every time', res.every(q => q.lv >= 5), res.map(q => q.lv));
   ok('no page errors', !errs.length, errs.slice(0, 5));
