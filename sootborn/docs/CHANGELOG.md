@@ -1,5 +1,13 @@
 # SOOTBORN — changelog
 
+## v0.12.5 · 2026-11-18 — music was inaudible; fixed
+Reported after v0.12.4: no music at all. Measured the mix by rendering it offline and found three likely causes, all fixed:
+- **Far too quiet.** The music sat around -39 dB RMS at the default volume. Music and effects now run through a compressor with make-up gain; the same tracks measure about -21 dB, roughly eight times louder, with no clipping.
+- **All bass.** Drums and bass lines lived between 40 and 150 Hz, which a phone speaker does not reproduce. Low notes now carry quiet partials one and two octaves up, and drums get a click.
+- **Phone audio unlock.** Audio now starts on any kind of touch or key (not only the first press-down), resumes if the browser suspended it, and plays a silent looping clip so an iPhone's ring/silent switch does not mute the game.
+- Settings has a **Sound test** row that says whether audio is running and plays a horn when tapped.
+- `tests/audio.mjs` renders every track and effect through the real chain and prints peak and average level.
+
 ## v0.12.4 · 2026-11-18 — sound, music and better figures
 - **Battle music, generated in the game and built on the shift song** (the crew's hummed tune, D F A G | F E D):
   - *The valley*: war drums and horn chords, with the shift song as a march in the second half.

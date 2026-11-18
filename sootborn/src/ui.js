@@ -171,6 +171,7 @@ const Menus = {
     const S = Settings.d, upd = () => { Settings.save(); Settings.apply(); };
     const cyc = (k, n) => d => { S[k] = (S[k] + d + n) % n; upd(); };
     UI.push(modal({ title: 'Settings', build(b) { b.innerHTML = `<p style="opacity:.7">Saves: ${Store.ok ? 'kept in this browser' : 'this session only (storage blocked) — export from Save data'}. Keyboard: WASD/arrows, E/Enter, Esc, M menu, Q/R tabs, H hint. Controller supported.</p>`; }, items: [
+      { label: 'Sound test', value: () => !Sound.ctx ? 'audio off' : Sound.ctx.state === 'running' ? 'tap to hear' : 'blocked: tap again', act: () => { Sound.unlock(); setTimeout(() => { Sound.play('horn'); Sound.play('win'); }, 60); } },
       { label: 'Music', value: () => S.music * 10 + '%', adj: d => { S.music = clamp(S.music + d, 0, 10); upd(); } },
       { label: 'Sound effects', value: () => S.sfx * 10 + '%', adj: d => { S.sfx = clamp(S.sfx + d, 0, 10); upd(); Sound.play('blip'); } },
       { label: 'Text size', value: () => ['Small', 'Medium', 'Large', 'Huge'][S.text], adj: cyc('text', 4) },

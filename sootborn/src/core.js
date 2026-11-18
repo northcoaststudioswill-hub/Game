@@ -48,6 +48,7 @@ const Input = {
     addEventListener('keyup', e => { const a = this.keymap[e.code]; if (a) this.kb[a] = false; });
     addEventListener('blur', () => { this.kb = {}; this.touch = {}; });
     addEventListener('pointerdown', e => { if (e.pointerType === 'touch') { this.touchSeen = true; this.setDevice('touch'); } Sound.unlock(); }, true);
+    for (const ev of ['pointerup', 'touchend', 'click', 'keydown']) addEventListener(ev, () => Sound.unlock(), true);
     // touch buttons
     const bind = (el, a) => {
       const on = e => { e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch (_) { } this.touch[a] = true; this.queued.add(a); el.classList.add('on'); this.setDevice('touch'); Sound.unlock(); };
@@ -106,18 +107,24 @@ const Input = {
 const mtof = n => 440 * Math.pow(2, (n - 69) / 12);
 const Sound = {
   ctx: null, mus: null, sfx: null, nb: null, track: null, tname: null, step: 0, next: 0,
+  // master chain: music and effects into a compressor, then make-up gain. Without this the mix sat
+  // around -36 dB and was all bass, which a phone speaker simply does not play.
+  graph(c) { const out = c.createGain(); out.gain.value = 1.2; out.connect(c.destination); const comp = c.createDynamicsCompressor(); comp.threshold.value = -24; comp.knee.value = 12; comp.ratio.value = 6; comp.attack.value = 0.004; comp.release.value = 0.2; comp.connect(out);
+    const mus = c.createGain(), sfx = c.createGain(); mus.connect(comp); sfx.connect(comp); const nb = c.createBuffer(1, c.sampleRate, c.sampleRate), d = nb.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; return { mus, sfx, nb }; },
   unlock() {
-    if (this.ctx) { if (this.ctx.state === 'suspended' && !document.hidden) this.ctx.resume().catch(() => { }); return; }
+    // iOS: a looping silent <audio> moves the page to the "playback" audio session, so the ring/silent switch no longer mutes Web Audio
+    if (!this.keep) { try { const a = this.keep = new Audio('data:audio/wav;base64,UklGRvQHAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YdAHAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA=='); a.loop = true; a.preload = 'auto'; a.setAttribute('playsinline', ''); } catch (e) { this.keep = {}; } }
+    if (this.keep.play && this.keep.paused) { try { const pr = this.keep.play(); if (pr && pr.catch) pr.catch(() => { }); } catch (e) { } }
+    if (this.ctx) { if (this.ctx.state !== 'running' && !document.hidden) this.ctx.resume().catch(() => { }); return; }
     try {
       const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
-      const c = this.ctx = new C();
-      const master = c.createGain(); master.gain.value = 0.9; master.connect(c.destination);
-      this.mus = c.createGain(); this.mus.connect(master); this.sfx = c.createGain(); this.sfx.connect(master);
-      const len = c.sampleRate; this.nb = c.createBuffer(1, len, c.sampleRate); const d = this.nb.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-      this.setVol(); this.next = c.currentTime + 0.1;
+      const c = this.ctx = new C(), g = this.graph(c); this.mus = g.mus; this.sfx = g.sfx; this.nb = g.nb;
+      this.setVol(); this.next = c.currentTime + 0.1; if (c.state !== 'running') c.resume().catch(() => { });
+      // one inaudible blip inside the gesture: some browsers only start the clock once a source has played
+      const o = c.createOscillator(), z = c.createGain(); z.gain.value = 0.0001; o.connect(z); z.connect(c.destination); o.start(); o.stop(c.currentTime + 0.03);
     } catch (e) { this.ctx = null; }
   },
-  setVol() { if (!this.ctx) return; this.mus.gain.value = (Settings.d.music / 10) * 0.55; this.sfx.gain.value = (Settings.d.sfx / 10) * 0.7; },
+  setVol() { if (!this.ctx) return; this.mus.gain.value = (Settings.d.music / 10) * 1.5; this.sfx.gain.value = (Settings.d.sfx / 10) * 1.0; },
   suspend() { if (this.ctx) this.ctx.suspend().catch(() => { }); },
   resume() { if (this.ctx) this.ctx.resume().catch(() => { }); },
   tone(n, t, dur, type, vol, dest, slideTo) {
@@ -126,6 +133,7 @@ const Sound = {
     if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     o.connect(g); g.connect(dest || this.sfx); o.start(t); o.stop(t + dur + 0.05);
+    if (dest === this.mus && !this._part) { const hz = n > 127 ? n : mtof(n); if (hz < 190) { this._part = 1; if (slideTo) this.noise(t, 0.035, vol * .5, dest, 1900, 1.5); else { const up = n > 127 ? hz * 2 : n + 12; this.tone(up, t, dur * .8, 'triangle', vol * .55, dest); this.tone(n > 127 ? hz * 4 : n + 24, t, dur * .5, 'triangle', vol * .22, dest); } this._part = 0; } }
   },
   noise(t, dur, vol, dest, freq, q, type) {
     if (!(vol > 0.0005)) return; const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
@@ -134,7 +142,7 @@ const Sound = {
     s.connect(f); f.connect(g); g.connect(dest || this.sfx); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.02);
   },
   // a tone that swells in (horns, pads) instead of being struck
-  pad(n, t, dur, type, vol, dest, att) { if (!(vol > 0.0005)) return; const c = this.ctx, o = c.createOscillator(), g = c.createGain(); o.type = type || 'sawtooth'; o.frequency.setValueAtTime(n > 127 ? n : mtof(n), t); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + (att || dur * .3)); g.gain.setValueAtTime(vol, t + dur * .7); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(dest || this.sfx); o.start(t); o.stop(t + dur + 0.05); },
+  pad(n, t, dur, type, vol, dest, att) { if (!(vol > 0.0005)) return; const c = this.ctx, o = c.createOscillator(), g = c.createGain(); o.type = type || 'sawtooth'; o.frequency.setValueAtTime(n > 127 ? n : mtof(n), t); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + (att || dur * .3)); g.gain.setValueAtTime(vol, t + dur * .7); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(dest || this.sfx); o.start(t); o.stop(t + dur + 0.05); if (dest === this.mus && !this._part) { const hz = n > 127 ? n : mtof(n); if (hz < 190) { this._part = 1; this.pad(n > 127 ? hz * 2 : n + 12, t, dur, 'triangle', vol * .5, dest, att); this._part = 0; } } },
   // filtered noise whose pitch moves: the air a blade pushes aside
   sweep(t, dur, vol, f0, f1, q, dest) { if (!(vol > 0.0005)) return; const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); s.buffer = this.nb; f.type = 'bandpass'; f.Q.value = q || 1.5; f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + dur * .35); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(f); f.connect(g); g.connect(dest || this.sfx); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.02); },
   // struck steel: partials that do not line up, ringing off quickly
