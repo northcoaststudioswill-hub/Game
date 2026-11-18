@@ -67,7 +67,7 @@
     const def = SH.ROOMS[roomId], room = SH.buildRoom(def);
     const player = new SH.Player(def.start.x * TS + TS / 2, def.start.y * TS);
     const things = def.spawns.map(s => SH.makeSpawn(s, room));
-    const lanterns = def.lanterns.map(l => ({ ...l, px: l.x * TS + TS / 2, py: room.groundY(l.x, 0), lit: !!l.lit }));
+    const lanterns = def.lanterns.map(l => ({ ...l, px: l.x * TS + TS / 2, py: room.groundY(l.x, l.from || 0), lit: !!l.lit }));
     const npcs = def.npcs.map(n => ({ ...n, x: n.x * TS + TS / 2, y: room.groundY(Math.floor(n.x), n.from || 0), facing: -1, near: false }));
     const gates = def.gates.map(g => ({ ...g, lift: g.open ? 1 : 0 }));
     const w = {
@@ -107,6 +107,8 @@
         if (what === 'plums') { G.queueScript('ring_plums'); return; }
         if (what === 'cat') { G.queueScript('ashes_cat_found'); return; }
         if (what === 'page') { G.queueScript('mtn_page'); return; }
+        if (what === 'lamp') { G.flags.n_lamps = (G.flags.n_lamps || 0) + 1; SH.xp.gain(5, true); SH.sfx.play('lantern'); fx.word(player.x, player.y - 50, 'Lamp ' + G.flags.n_lamps + '/4', '#ffd27a', 70); fx.ring(player.x, player.y - 30, '#ffd27a', 40, 20, 2); this.cityLightTarget = Math.min(1, (this.cityLightTarget || 0) + 0.08); if (G.flags.n_lamps === 4) { G.flags.lamps4 = true; G.queueScript('ashes_lamps'); } return; }
+        if (what === 'pack' || what === 'tally') { G.progress.seen = G.progress.seen || {}; G.progress.seen['d_' + what] = 1; SH.xp.gain(8, true); G.queueScript('deep_' + what); return; }
         if (what === 'herb') { G.remember('green', 'Found wintergreen under the snow for Lissa.', true); G.queueScript('woods_herb'); return; }
         G.flags.n_wood = (G.flags.n_wood || 0) + 1;
         fx.word(player.x, player.y - 50, 'Firewood ' + G.flags.n_wood + '/3', '#ffd27a', 60);
@@ -569,6 +571,7 @@
       const tr = def.triggers[i];
       if (w.fired[i] || tx < tr.x || (tr.flag && !G.flags[tr.flag])) continue;
       if (tr.above != null && !(p.grounded && p.y <= tr.above * TS + 2)) continue;
+      if (tr.below != null && !(p.grounded && p.y > tr.below * TS)) continue;
       w.fired[i] = true; G.runScript(tr.script); return;
     }
     // optional people you can talk to
@@ -593,7 +596,7 @@
 
     // control hints and the TALK / PAINT button
     const motesLeft = w.motes.filter(m => !m.got && (G.activeGoal === 'report' || m.x < p.x)).length;   // Starlight still behind her
-    const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0));
+    const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0) && (h.above == null || p.y <= h.above * TS) && (h.below == null || p.y > h.below * TS));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
     const bossTell = G.boss && !G.boss.dead ? ({ windup: 'It is about to CHARGE. Jump over it, or {DASH} straight through: nothing can touch you mid-dash.', charge: 'CHARGING. Jump it or {DASH} through it. If it hits the cliff it dazes itself.', crouch: 'It is going to LEAP to the shadow on the ground. Get away from the shadow.', leap: 'Move away from the shadow, then jump the shockwave.', slamrest: 'It is winded. Strike!', inhale: 'It is breathing in. Throw the Flame ({GIFT}) down its throat NOW.', breath: 'Frost along the ground. Jump onto a ledge or get behind it.', stun: 'DAZED. Strike it now: every cut does more.', roar: 'It is getting faster. The bond bar is full: use your Bond Art.' })[G.boss.state] : null;
     { const text = bossTell ? input.fill(bossTell) : hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null;

@@ -556,7 +556,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.7 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.8 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -1130,6 +1130,20 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       ['queen', 'My thorns remember mortals. They remember how you bleed. And my gardeners are hungry.'],
       ['caelum', 'They are only sprites. You have a knife and you have skinned worse. Cut them.'],
     ],
+    deep_under: [
+      ['queen', 'You fell. Of course you fell. Look around, little huntress. This is where I keep the ones who lost.'],
+      ['caelum', 'There is a way back up at the far end, past the cells. And Wren: look at them. Somebody should.'],
+    ],
+    deep_tally: [
+      ['narr', 'Scratches in the stone, in bundles of five. Wren stops counting at four hundred.'],
+      ['narr', 'Under them, in a different hand, cut deep: SHE KEEPS HER WORD. THAT IS THE TRAP.'],
+      ['wren', '...Noted.'],
+    ],
+    deep_pack: [
+      ['narr', 'A hunter\'s pack, the leather gone soft as cloth. Mortal-made. A bone-handled knife, and a ribbon a child might have tied on.'],
+      ['wren', 'Somebody else crossed the Wall. A long time ago. Nobody ever told a story about her.'],
+      ['narr', 'Wren takes the ribbon. It seems wrong to leave all of her down here.'],
+    ],
     deep_caelum: [
       { do: 'flag', name: 'd_caelum' },
       ['caelum', 'Don\'t look straight at me. She watches who I look at.'],
@@ -1235,6 +1249,13 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
         ['mirelle', 'If you are going up the street: my cat, Ember. Black, rude, about so big. She climbs when the dark frightens her, and it is all dark now.'],
         ['wren', 'I\'ll look up as I go.'],
       ] },
+    ],
+    ashes_lamps: [
+      ['narr', 'The fourth lamp catches. All down the street, gold runs from window to window, and somewhere a shutter opens that has been shut for months.'],
+      ['mirelle', 'Forty years I lit those, till my knees gave out before the lamps did. Nobody asked you to. That is the right way to do it.'],
+      { do: 'remember', key: 'lamps', text: 'Lit the four dark lamps on Mirelle\'s street, unasked.', good: true },
+      ['wren', 'It felt wrong, walking past them.'],
+      ['mirelle', 'Then you will do, girl. This city is made of people who could not walk past.'],
     ],
     ashes_cat_found: [
       ['narr', 'A black cat is flattened on the awning, pretending not to be afraid. It considers Wren, then walks onto her shoulder as if that had been the plan.'],
@@ -1483,7 +1504,8 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     ring_rings: [
       { do: 'flag', name: 'rings3' },
       ['bram', 'Low, rising, and one from the air. Who taught you to read a target?'],
-      ['wren', 'My father. With a bow, and worse manners.'],
+      ['wren', 'My father, on straw. I left the bow on the far side of the Wall. The eye came with me.'],
+      ['bram', 'Daggers for now. When you\'ve earned a fae bow, I\'ll string it myself.'],
       { do: 'remember', key: 'rings', text: 'Cut all three of Bram\'s rings.', good: true },
       { do: 'bond', who: 'bram', pts: 10, liked: true, why: 'Three for three. He stopped pretending not to watch.' },
     ],
@@ -1811,8 +1833,11 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     L('c_green', 4, 'Wintergreen', { mem: 'green' }, 'Something to find in the Winter Woods.', 'Growing under the snow where the big pine fell. Lissa cried, which she will deny. One green thing, in that winter.'),
     L('c_paint', 4, 'A painting in spring', { mem: 'paintPromise' }, 'A promise in the Winter Woods.', 'I promised Lissa a painting when the thaw came. I was across the Wall before it did. I still owe it. I intend to pay.'),
     L('c_rowan', 4, 'What I told Rowan', { mem: 'rowanHonest' }, 'A choice at our door.', 'He asked who killed the stag and I stepped forward and said I did. Nessa has not forgiven me for being quicker than her. He called it honest. I think it is the reason he trusts my word now, even across a war.'),
+    L('d_tally', 1, 'The tally in the cells', { seen: 'd_tally' }, 'Something to find under the Deep.', 'More than four hundred marks before I stopped counting, and under them a warning in another hand: she keeps her word, that is the trap. Whoever cut it understood her better than I did. I read it, I said "noted", and I walked upstairs and let her keep her word to me.'),
+    L('d_pack', 0, 'I was not the first', { seen: 'd_pack' }, 'Something to find under the Deep.', 'A mortal hunter\'s pack in the cells, older than my grandmother. A woman\'s, I think, by the knife. She crossed the Wall and went under the mountain and nobody at home ever knew why she did not come back. I took the ribbon off her pack. It is tied round my quiver strap now.'),
     L('c_rowanCame', 4, 'Through the bars', { mem: 'rowanCame' }, 'A choice in the Deep.', 'I told him I came to get him out, and I watched it land. Nobody comes for a High Lord. I think that one sentence is why he cannot let me go now. I meant it as a kindness. It was one. It was also the first bar of a different cage.'),
     L('c_rowanDebt', 4, 'A debt, paid', { mem: 'rowanDebt' }, 'A choice in the Deep.', 'I told him it was the law, a life for a life, and nothing more. He said I never owed him anything. It was the most honest thing he ever said to me, and he said it from inside a cage.'),
+    L('c_lamps', 4, 'Four lamps', { mem: 'lamps' }, 'Something to do on the street in Starhaven.', 'Mirelle was a lamplighter for forty years. When the Thorn Queen fell the guild was half gone and the lamps on her street stayed dark, because nobody had the heart to climb. I climbed. I did not know I was doing anything but climbing. She says that is the only way the First Lamp ever stays lit.'),
     L('c_cat', 4, 'Mirelle\'s cat', { mem: 'cat' }, 'Someone in Starhaven needs help.', 'On an awning, furious, perfectly able to get down. The first thing I did in this city that was not about a war. I think about that more than it deserves.'),
     L('c_page', 4, 'The torn page', { mem: 'page' }, 'Something to find on the mountain.', 'Thane\'s lost page, wedged in the rocks on the mountain road, a long way from any library. He held it by the edges. He did not say how it got up there, and he stopped talking, which he never does.'),
     L('c_bram', 4, 'What I told Bram', { mem: 'bramTruth' }, 'A choice at the Training Ring.', 'He asked why I stay. I said: because nobody here has lied to me yet. He said to give it a week. He also said it was a soldier\'s answer, and from Bram that is a medal.'),
@@ -1888,15 +1913,15 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
 
   // ---------------------------------------------------------------- Prologue: The Deep (movement only, no enemies)
   SH.ROOMS.deep = {
-    id: 'deep', width: 150, height: 20, theme: 'deep',
+    id: 'deep', width: 150, height: 34, theme: 'deep',   // two storeys: the trial road above, the cells below
     start: { x: 5, y: 16 },
     shapes: [
-      ['solid', 0, 2, 0, 20],
+      ['solid', 0, 2, 0, 34],
       ['solid', 0, 150, 0, 4],          // the Deep has a roof
-      ['ground', 2, 24, 16],
-      ['ground', 24, 31, 14],           // step up, then a 3-tile gap
-      ['ground', 34, 41, 14],           // 4-tile gap down
-      ['ground', 45, 66, 16],
+      ['solid', 2, 24, 16, 20],         // the trial road is a shelf of rock; under it, the cells
+      ['solid', 24, 31, 14, 20],        // step up, then a 3-tile gap: fall in and you are in the cells, not dead
+      ['solid', 34, 41, 14, 20],        // 4-tile gap down
+      ['solid', 45, 66, 16, 20],
       ['solid', 54, 61, 11, 16],        // the wall: needs a double jump
       ['ground', 76, 104, 16],          // 10-tile gap before this: jump, jump, dash
       ['thorns', 85, 88, 16],           // first thorns: 3 tiles sunk into the floor, one plain jump
@@ -1904,15 +1929,23 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       ['ground', 118, 126, 14],
       ['ground', 130, 148, 16],
       ['thorns', 137, 140, 16],
-      ['solid', 148, 150, 0, 20],
+      ['solid', 148, 150, 0, 34],
+      // ---- the cells: a long low hall under the road, from the left wall to the rock at x 76
+      ['ground', 2, 76, 30],
+      ['oneway', 11, 16, 26], ['oneway', 47, 53, 26],                 // old galleries
+      ['solid', 22, 24, 28, 30],                                       // a broken pillar to climb over
+      ['oneway', 66, 69, 24], ['oneway', 70, 74, 27],                 // the way back up, in the shaft under the long jump:
+      ['oneway', 71, 75, 21], ['oneway', 72, 75, 18],                 // four ledges, then the road again at x 76
     ],
     hints: [
-      { x0: 3, x1: 21, text: 'Walk up to an altar and use {TALK} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle' },
-      { x0: 3, x1: 17, text: 'Move with {MOVE}.' },
-      { x0: 17, x1: 31, text: 'Jump with {JUMP}. Hold it to jump higher, tap it for a small hop.' },
-      { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.' },
-      { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.' },
-      { x0: 44, x1: 52, text: 'Someone is standing in the dark. {TALK} if you want to.', until: 'd_caelum' },
+      { x0: 2, x1: 66, text: 'The cells under the Deep. Look around. The way back up is at the far right, past the pillar.', below: 22, until: 'd_up' },
+      { x0: 66, x1: 76, text: 'Four ledges up the shaft. Jump straight up through each one.', below: 17 },
+      { x0: 3, x1: 21, text: 'Walk up to an altar and use {TALK} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle', above: 20 },
+      { x0: 3, x1: 17, text: 'Move with {MOVE}.', above: 20 },
+      { x0: 17, x1: 31, text: 'Jump with {JUMP}. Hold it to jump higher, tap it for a small hop.', above: 20 },
+      { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.', above: 20 },
+      { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.', above: 20 },
+      { x0: 44, x1: 52, text: 'Someone is standing in the dark. {TALK} if you want to.', until: 'd_caelum', above: 20 },
       { x0: 76, x1: 80, text: 'Rowan. {TALK} to him through the bars.', until: 'd_rowan' },
       { x0: 80, x1: 85, text: 'Thorns hurt. Jump over them. Her gardeners are waiting on the far side.' },
       { x0: 86, x1: 92, text: 'The Queen\'s gardeners. Cut them with {ATTACK}. They glow before they lunge: step back, then cut.', until: 'maze' },
@@ -1921,28 +1954,33 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     ],
     triggers: [
       { x: 5, script: 'deep_start' },
-      { x: 50, script: 'deep_wall' },
-      { x: 62, script: 'deep_dash' },
+      { x: 50, script: 'deep_wall', above: 17 },
+      { x: 62, script: 'deep_dash', above: 17 },
+      { x: 2, script: 'deep_under', below: 24 },
       { x: 80, script: 'deep_thorns' },
       { x: 94, script: 'deep_chase' },
       { x: 143, script: 'deep_end' },
     ],
-    lanterns: [{ x: 4, lit: true }, { x: 47 }, { x: 79 }, { x: 93 }],
+    lanterns: [{ x: 4, lit: true, from: 6 }, { x: 47, from: 6 }, { x: 79, from: 6 }, { x: 93, from: 6 }, { x: 40, from: 22 }],
     npcs: [{ id: 'caelum', x: 49, from: 6, optional: 'deep_caelum' }, { id: 'rowan', x: 77.6, from: 6, optional: 'deep_rowan' }],   // from: look for the floor below the roof
     props: [
-      { t: 'cage', x: 77.6, from: 6 },
+      { t: 'cage', x: 77.6, from: 6 }, { t: 'cage', x: 9, from: 22 }, { t: 'cage', x: 17, from: 22 }, { t: 'cage', x: 31, from: 22 }, { t: 'cage', x: 56, from: 22 },
+      { t: 'bones', x: 9, from: 22 }, { t: 'bones', x: 31, from: 22 }, { t: 'bones', x: 62, from: 22 }, { t: 'shroom', x: 14, from: 22 }, { t: 'shroom', x: 36, from: 22 }, { t: 'shroom', x: 52, from: 22 }, { t: 'shroom', x: 68, from: 22 },
       { t: 'bones', x: 10 }, { t: 'bones', x: 38 }, { t: 'bones', x: 58 }, { t: 'bones', x: 90 }, { t: 'bones', x: 112 }, { t: 'bones', x: 133 },
       { t: 'shroom', x: 16 }, { t: 'shroom', x: 28 }, { t: 'shroom', x: 47.5 }, { t: 'shroom', x: 63 }, { t: 'shroom', x: 78 }, { t: 'shroom', x: 100 }, { t: 'shroom', x: 122 }, { t: 'shroom', x: 141 },
       { t: 'chain', x: 12, len: 5 }, { t: 'chain', x: 36, len: 3 }, { t: 'chain', x: 70, len: 6 }, { t: 'chain', x: 96, len: 4 }, { t: 'chain', x: 128, len: 3 },
       { t: 'stal', x: 20, len: 3 }, { t: 'stal', x: 44, len: 2 }, { t: 'stal', x: 72, len: 4 }, { t: 'stal', x: 86, len: 2 }, { t: 'stal', x: 110, len: 3 }, { t: 'stal', x: 140, len: 2 },
     ],
     motes: [['line', 9, 20, 14.6], ['arc', 30, 35, 12.4, 2.4], ['arc', 40, 46, 12.6, 2.4], ['col', 52.6, 14.4, 10.6], ['line', 55, 60, 9.6], ['line', 67, 75, 10.6],
-      ['arc', 84, 89, 14.4, 2.6], ['line', 97, 103, 14.6], ['arc', 103.5, 107.5, 14.4, 2.6], ['line', 109, 116, 14.6], ['arc', 125.5, 130.5, 12.6, 2.2], ['arc', 136, 141, 14.4, 2.6]],
+      ['arc', 84, 89, 14.4, 2.6], ['line', 97, 103, 14.6], ['arc', 103.5, 107.5, 14.4, 2.6], ['line', 109, 116, 14.6], ['arc', 125.5, 130.5, 12.6, 2.2], ['arc', 136, 141, 14.4, 2.6],
+      ['line', 4, 8, 28.6], ['line', 11.5, 15.5, 24.6], ['line', 26, 36, 28.6], ['line', 47.5, 52.5, 24.6], ['line', 55, 64, 28.6], ['col', 73.5, 25.6, 16.6]],
     exitLight: 145,
     chase: { from: 94, wyrmX: 80, speed: 2.7 },
     gates: [{ id: 'riddlegate', x: 21, top: 6 }],
     spawns: [{ kind: 'altar', what: 'secret', x: 9, y: 16 }, { kind: 'altar', what: 'seed', x: 13, y: 16 }, { kind: 'altar', what: 'grief', x: 17, y: 16 },
-      { kind: 'thornSprite', x: 89.6, y: 16, respawn: false }, { kind: 'thornSprite', x: 92.2, y: 16, respawn: false }],   // the Queen's gardeners: the first things Wren ever cuts
+      { kind: 'thornSprite', x: 89.6, y: 16, respawn: false }, { kind: 'thornSprite', x: 92.2, y: 16, respawn: false },
+      { kind: 'thornSprite', x: 28, y: 30, respawn: false }, { kind: 'thornSprite', x: 50, y: 30, respawn: false }, { kind: 'thornSprite', x: 60, y: 30, respawn: false },
+      { kind: 'pickup', what: 'pack', x: 4.5, y: 30 }, { kind: 'pickup', what: 'tally', x: 19.5, y: 30 }],   // the Queen's gardeners: the first things Wren ever cuts
   };
 
   // ---------------------------------------------------------------- Chapter 1: Ashes (walk, talk, first mural, no enemies)
@@ -1957,15 +1995,21 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       ['ground', 22, 30, 15],
       ['ground', 30, 46, 14],           // the overlook
       ['ground', 46, 122, 16],
-      ['oneway', 99, 104, 13],          // ledge up to the roof
+      ['oneway', 94, 97, 14],           // stacked crates,
+      ['oneway', 97, 101, 12],          // a balcony,
+      ['oneway', 101, 104, 10],         // and the eave, level with the roof: three easy steps up
       ['oneway', 86, 90, 12],           // an awning: something is sitting on it
+      ['oneway', 57, 60, 13], ['oneway', 63, 66, 11],   // balconies, each with a dark street lamp to light
+      ['oneway', 76, 79, 13], ['oneway', 80, 83, 10],
       ['solid', 104, 118, 10, 16],      // the Rooftop House
       ['solid', 118, 122, 0, 20],
     ],
     hints: [
       { x0: 3, x1: 14, text: 'Move with {MOVE}. Caelum will meet you up the road.' },
       { x0: 19, x1: 31, text: 'Jump with {JUMP}.' },
-      { x0: 94, x1: 104, text: 'Jump up the ledge to reach the roof.', flag: 'painted' },
+      { x0: 90, x1: 104, text: 'Crates, balcony, eave: three jumps up to the roof.', flag: 'painted' },
+      { x0: 54, x1: 68, text: 'The street lamps are dark. Climb the balconies and touch each lamp to light it. Four on this street.', flag: 'arrive', until: 'lamps4' },
+      { x0: 75, x1: 85, text: 'Two more lamps up on these balconies.', flag: 'arrive', until: 'lamps4' },
     ],
     triggers: [
       { x: 4, script: 'ashes_start' },
@@ -1977,13 +2021,14 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       { t: 'bush', x: 6 }, { t: 'bush', x: 15 }, { t: 'bush', x: 27 }, { t: 'pine', x: 12 }, { t: 'pine', x: 20 }, { t: 'pine', x: 35 }, { t: 'pine', x: 44 },
       { t: 'banner', x: 56 }, { t: 'banner', x: 67, c: '#7a2a4a' }, { t: 'banner', x: 88 }, { t: 'crate', x: 60 }, { t: 'crate', x: 84.6 }, { t: 'barrel', x: 63 }, { t: 'barrel', x: 92 },
     ],
-    motes: [['line', 11, 20, 14.6], ['line', 23, 29, 13.6], ['line', 32, 38, 12.6], ['line', 58, 67, 14.6], ['line', 78, 96, 14.6], ['line', 100, 103, 11.6], ['line', 105, 108, 8.6]],
+    motes: [['line', 11, 20, 14.6], ['line', 23, 29, 13.6], ['line', 32, 38, 12.6], ['line', 58, 67, 14.6], ['line', 78, 96, 14.6], ['line', 97.5, 100.5, 10.6], ['line', 105, 108, 8.6]],
     mural: { x: 70, w: 5, needs: 'arrive', flag: 'painted', script: 'ashes_painted', frames: 80 },
     arch: 52,
     house: { x0: 104, x1: 118, top: 10 },
     lanterns: [{ x: 3, lit: true }],
     npcs: [{ id: 'caelum', x: 8 }, { id: 'mirelle', x: 62, optional: 'ashes_mirelle' }],
-    gates: [], spawns: [{ kind: 'pickup', what: 'cat', x: 88, y: 12 }],
+    gates: [], spawns: [{ kind: 'pickup', what: 'cat', x: 88, y: 12 },
+      { kind: 'pickup', what: 'lamp', x: 58.5, y: 13 }, { kind: 'pickup', what: 'lamp', x: 64.5, y: 11 }, { kind: 'pickup', what: 'lamp', x: 77.5, y: 13 }, { kind: 'pickup', what: 'lamp', x: 81.5, y: 10 }],
   };
 
   // ---------------------------------------------------------------- Chapter 2: The Five (daggers, pogo, first enemies)
@@ -2009,7 +2054,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       { x0: 14, x1: 32, text: 'Rising strike: {UPSTRIKE}, next to the dummy.', flag: 'combo1', until: 'rise' },
       { x0: 14, x1: 32, text: 'Dash strike: {DASH} toward the dummy, then {ATTACK} while you are still moving.', flag: 'rise', until: 'lunge' },
       { x0: 14, x1: 32, text: 'Guard: stand beside the dummy, face it, and {GUARD} when it says "swinging".', flag: 'lunge', until: 'guard' },
-      { x0: 26, x1: 36, text: 'Bram\'s rings. Cut all three: the low one from the ground, the middle one with a rising strike ({UPSTRIKE}), the high one from a jump.', until: 'rings3' },
+      { x0: 26, x1: 36, text: 'Bram\'s rings are for your daggers (Wren has no bow here). Cut all three: the low one from the ground, the middle one with a rising strike ({UPSTRIKE}), the high one from a jump.', until: 'rings3' },
       { x0: 36, x1: 60, text: 'Jump onto a bud and it bounces you (strike down with {DOWNSTRIKE} for a higher bounce). Land on the planks between them and take them one at a time.', flag: 'combo', until: 'pit' },
       { x0: 61, x1: 69, text: 'Remember the four: combo, rising strike ({UPSTRIKE}), dash strike ({DASH} then {ATTACK}), and guard ({GUARD}).', flag: 'pit' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
@@ -3323,7 +3368,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
   Target.prototype.update = function () { if (this.wob > 0) this.wob--; };
   Target.prototype.takeHit = function (hit, world) {
     this.hit = true; this.wob = 30; SH.sfx.play('hit');
-    SH.fx.word(this.x, this.y - 22, 'BULLSEYE', '#ffd27a', 50); SH.fx.spark(this.x, this.y, 0, true);
+    SH.fx.word(this.x, this.y - 22, this.blade ? 'CLEAN CUT' : 'BULLSEYE', '#ffd27a', 50); SH.fx.spark(this.x, this.y, 0, true);
     world.onTarget(this); return { landed: true };
   };
   // The wolf is as hungry as the sisters. One arrow and it backs off hurt: then it is Wren's choice,
@@ -5245,6 +5290,52 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     if (strike > 0) { g.fillStyle = 'rgba(0,0,0,' + Math.min(0.85, ease((ct - 230) / 80)) + ')'; g.fillRect(0, 0, W, H); }
   };
 
+  // ---------------------------------------------------------------- Iris's vision: the threads over the sea, and the iron hand closing on two of them
+  C.vision = function (g, t) {
+    const c = cam(t), pull = 0.5 + 0.5 * Math.sin(t * 0.02), grow = ease(t / 260);
+    sky(g, ['#02030c', '#081030', '#142a5a', '#0c2040']);
+    layer(g, c, 0.05, () => { starfield(g, t, 80, 33, 90); moon(g, 54, 26, 9); });
+    layer(g, c, 0.2, () => {   // the far shore: an iron keep, black on the horizon, one red window
+      g.fillStyle = '#05060e'; g.beginPath(); g.moveTo(196, 92); g.lineTo(214, 70); g.lineTo(232, 80); g.lineTo(256, 58); g.lineTo(286, 82); g.lineTo(340, 92); g.fill();
+      for (const [x, h] of [[238, 34], [250, 46], [262, 30], [272, 38]]) { R(g, x, 86 - h, 8, h, '#0a0c16'); g.fillStyle = '#0a0c16'; g.beginPath(); g.moveTo(x - 1, 86 - h); g.lineTo(x + 4, 78 - h); g.lineTo(x + 9, 86 - h); g.fill(); }
+      const pk = 0.6 + 0.4 * Math.sin(t * 0.07); glow(g, 254, 50, 22 * pk, 'rgba(255,60,50,0.7)'); R(g, 252, 47, 4, 6, '#ff4a3a');
+      for (let i = 0; i < 5; i++) { const sm = ((t * 0.006 + i / 5) % 1); g.globalAlpha = 0.3 * (1 - sm); g.fillStyle = '#3a3440'; g.beginPath(); g.arc(246 + i * 6 + Math.sin(sm * 5 + i) * 4, 44 - sm * 34, 3 + sm * 6, 0, 6.3); g.fill(); } g.globalAlpha = 1;   // forge smoke
+    });
+    layer(g, c, 0.5, () => {   // the sea between
+      const sg = g.createLinearGradient(0, 90, 0, 132); sg.addColorStop(0, '#16306a'); sg.addColorStop(1, '#060c22'); g.fillStyle = sg; g.fillRect(-30, 90, W + 60, 44);
+      for (let i = 0; i < 40; i++) { g.globalAlpha = 0.15 + 0.25 * Math.abs(Math.sin(t * 0.04 + i * 1.7)); R(g, rnd(i + 9) * (W + 40) - 20 + Math.sin(t * 0.01 + i) * 4, 92 + rnd(i * 3) * 38, 4 + rnd(i) * 10, 1, i % 4 ? '#8ab0ff' : '#ff8a7a'); } g.globalAlpha = 1;
+      for (let i = 0; i < 3; i++) { const x = 300 - ((t * 0.05 + i * 60) % 190), y = 100 + i * 9; g.fillStyle = '#05060e'; g.beginPath(); g.moveTo(x - 8, y); g.lineTo(x + 8, y); g.lineTo(x + 5, y + 3); g.lineTo(x - 5, y + 3); g.fill(); R(g, x - 1, y - 9, 1, 9, '#05060e'); g.beginPath(); g.moveTo(x, y - 9); g.lineTo(x + 6, y - 3); g.lineTo(x, y - 2); g.fill(); }   // black ships, already on the water
+    });
+    layer(g, c, 1, () => {
+      // the near shore: the cottage, a lit window, and the two of them at the door, not knowing
+      g.fillStyle = '#0a1420'; g.beginPath(); g.moveTo(-30, 150); g.lineTo(-30, 122); g.quadraticCurveTo(60, 112, 132, 132); g.lineTo(150, 150); g.fill(); R(g, -30, 130, 150, 1, '#2a4a5a');
+      g.save(); g.translate(-14, 132); g.scale(1.9, 1.9); g.translate(-14, -128);
+      R(g, 20, 104, 40, 24, '#2a1c16'); g.fillStyle = '#3a2a20'; g.beginPath(); g.moveTo(15, 104); g.lineTo(40, 88); g.lineTo(65, 104); g.fill(); R(g, 48, 90, 5, 9, '#2a1c16');
+      R(g, 26, 110, 8, 8, '#ffd27a'); glow(g, 30, 114, 22, 'rgba(255,210,122,0.5)'); R(g, 40, 112, 9, 16, '#1a100c');
+      for (let k = 0; k < 4; k++) { const sm = ((t * 0.008 + k / 4) % 1); g.globalAlpha = 0.3 * (1 - sm); g.fillStyle = '#8a8a9a'; g.beginPath(); g.arc(50 + Math.sin(sm * 4) * 3, 88 - sm * 20, 2 + sm * 3, 0, 6.3); g.fill(); } g.globalAlpha = 1;
+      g.restore();
+      person(g, 'nessa', 96, 134, 1, t); person(g, 'lissa', 118, 135, 1, t);
+      // every life is a thread. Most are gold and slack. Two of them have gone red and tight.
+      for (let i = 0; i < 11; i++) { const y0 = 14 + i * 9, y1 = 120 - i * 8; g.strokeStyle = 'rgba(255,233,168,' + (0.1 + 0.1 * Math.sin(t * 0.03 + i)) + ')'; g.lineWidth = 1; g.beginPath(); g.moveTo(-20, y0); g.bezierCurveTo(100, y0 + 30 + Math.sin(t * 0.02 + i) * 8, 220, y1 - 30, W + 20, y1); g.stroke(); }
+      for (const [fx, fy, o] of [[98, 110, 0], [120, 112, 6]]) {
+        const ex = fx + (254 - fx) * grow, ey = fy + (52 - fy) * grow - Math.sin(grow * Math.PI) * 30;
+        g.strokeStyle = 'rgba(255,74,60,' + (0.5 + 0.4 * pull) + ')'; g.lineWidth = 1 + pull; g.beginPath(); g.moveTo(fx, fy); g.quadraticCurveTo((fx + ex) / 2, Math.min(fy, ey) - 26 + o + pull * 6, ex, ey); g.stroke();
+        const mk = (t * 0.01 + o) % 1; R(g, fx + (ex - fx) * mk - 1, fy + (ey - fy) * mk - 12 * Math.sin(mk * Math.PI) - 1, 2, 2, '#ffd0c8'); glow(g, fx, fy, 6 + pull * 4, 'rgba(255,74,60,0.5)');
+      }
+      g.lineWidth = 1;
+      // and a third thread, gold, from the cottage to where Wren is standing
+      g.strokeStyle = 'rgba(255,210,122,' + (0.6 + 0.3 * Math.sin(t * 0.05)) + ')'; g.beginPath(); g.moveTo(108, 112); g.bezierCurveTo(140, 70, 220, 150, 292, 122); g.stroke();
+    });
+    layer(g, c, 1.5, () => {   // an iron hand over all of it, closing a little as she watches
+      const hx = 250, hy = 6 + pull * 4; g.fillStyle = 'rgba(5,6,14,0.85)';
+      g.beginPath(); g.moveTo(hx - 34, -10); g.lineTo(hx + 44, -10); g.lineTo(hx + 40, hy + 8); g.lineTo(hx - 30, hy + 10); g.fill();
+      for (let i = 0; i < 4; i++) { const fxx = hx - 26 + i * 18, len = 22 + (i % 2) * 8 + grow * 14 + pull * 4; g.beginPath(); g.moveTo(fxx, hy + 6); g.lineTo(fxx + 10, hy + 6); g.lineTo(fxx + 7 - grow * 6, hy + len); g.lineTo(fxx + 2 - grow * 6, hy + len + 5); g.fill(); }
+      g.strokeStyle = 'rgba(255,74,60,0.35)'; g.beginPath(); g.moveTo(hx - 30, hy + 10); g.lineTo(hx + 40, hy + 8); g.stroke();
+    });
+    drift(g, t, 14, ['#ffe9a8', '#ff8a7a'], true, 44);
+    layer(g, c, 1.2, () => { g.fillStyle = '#05060e'; g.beginPath(); g.moveTo(262, 150); g.quadraticCurveTo(300, 134, 350, 140); g.lineTo(350, 150); g.fill(); person(g, 'wren', 294, 146, -1, t); });   // Wren, on this side of the water, watching it happen
+  };
+
   // every older scene gets the finish too
   for (const id of ['rooftop', 'window', 'spring', 'city', 'peak', 'fire', 'vision', 'garden', 'thorns', 'cell', 'trials']) { const f = C[id]; if (f) C[id] = function (g, t, cue) { f(g, t, cue); C.post(g, t); }; }
   const ds = C.drawStatic; C.drawStatic = function (g, id, t) { ds(g, id, t); C.post(g, t); };
@@ -6846,12 +6937,20 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
   function drawWoods(ctx, e, t) {
     const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(e.x + x), Math.round(e.y + y), w, h); };
     if (e.kind === 'pickup') {
+      if (e.what === 'lamp') {   // a street lamp on a bracket: dark until she touches it
+        R(-1, -30, 2, 30, '#0a0818'); R(-5, -34, 10, 3, '#3a3470'); R(-4, -44, 8, 10, e.got ? '#ffd27a' : '#1c1838'); R(-5, -46, 10, 2, '#3a3470');
+        if (e.got) { const fl = 0.8 + 0.2 * Math.sin(t * 0.2 + e.x); const gl = ctx.createRadialGradient(e.x, e.y - 39, 1, e.x, e.y - 39, 54 * fl); gl.addColorStop(0, 'rgba(255,214,140,0.6)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 56, e.y - 96, 112, 112); R(-2, -42, 4, 6, '#fff6d8'); }
+        else { R(-1, -50 + Math.round(Math.sin(t * 0.1 + e.x) * 2), 2, 2, '#ffd27a'); }
+        return;
+      }
       if (e.got) return;
       const bob = Math.round(Math.sin(t * 0.08 + e.x) * 1.5);
       const gl = ctx.createRadialGradient(e.x, e.y - 8, 1, e.x, e.y - 8, 22); gl.addColorStop(0, 'rgba(255,246,216,0.3)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 22, e.y - 30, 44, 44);
       if (e.what === 'cat') { const tl = Math.sin(t * 0.1) * 2; R(-7, -9, 13, 8, '#0a0818'); R(-6, -8, 11, 7, '#2a2630'); R(3, -13, 7, 7, '#0a0818'); R(4, -12, 5, 5, '#2a2630'); R(4, -14, 2, 2, '#2a2630'); R(7, -14, 2, 2, '#2a2630'); R(5, -10, 1, 1, '#ffd27a'); R(7, -10, 1, 1, '#ffd27a'); R(-9, -10 + tl, 2, 6, '#2a2630'); R(-5, -5, 3, 1, '#f4f0e0'); }
       else if (e.what === 'plums') { R(-7, -9 + bob, 14, 9, '#0a0818'); R(-6, -8 + bob, 12, 7, '#6a4a34'); R(-6, -8 + bob, 12, 1, '#a8743a'); for (let i = 0; i < 3; i++) { R(-5 + i * 4, -12 + bob, 3, 4, '#7a3a8a'); R(-5 + i * 4, -12 + bob, 1, 1, '#ffffff'); } }
       else if (e.what === 'page') { R(-6, -12 + bob, 12, 14, '#0a0818'); R(-5, -11 + bob, 10, 12, '#f4f0e0'); for (let i = 0; i < 4; i++) R(-3, -9 + i * 3 + bob, 6, 1, '#6a5aa8'); R(-5, -11 + bob, 3, 3, '#e8c070'); }
+      else if (e.what === 'pack') { R(-9, -11 + bob, 18, 12, '#0a0818'); R(-8, -10 + bob, 16, 10, '#6a4a34'); R(-8, -10 + bob, 16, 2, '#8a6444'); R(-2, -7 + bob, 4, 4, '#3a2618'); R(6, -13 + bob, 2, 6, '#ff9ac0'); R(8, -12 + bob, 2, 3, '#ff9ac0'); }
+      else if (e.what === 'tally') { for (let i = 0; i < 4; i++) for (let k = 0; k < 4; k++) R(-11 + i * 6 + k, -26 + bob * 0, 1, 6, '#c8ccd0'); for (let i = 0; i < 4; i++) R(-12 + i * 6, -23, 6, 1, '#c8ccd0'); R(-10, -16, 20, 1, '#ff7a8a'); R(-8, -13, 16, 1, '#ff7a8a'); }
       else if (e.what === 'wood') { R(-10, -9 + bob, 20, 9, '#0a0818'); R(-9, -8 + bob, 18, 3, '#7a5636'); R(-9, -5 + bob, 18, 3, '#5e3e28'); R(-9, -2 + bob, 18, 1, '#4a3020'); R(-9, -8 + bob, 2, 6, '#c8a878'); R(-2, -10 + bob, 3, 10, '#c8b890'); R(-9, -8 + bob, 18, 1, '#ffffff'); }
       else { R(-1, -12 + bob, 2, 12, '#3f6a3f'); R(-6, -12 + bob, 5, 3, '#8fd16b'); R(1, -15 + bob, 5, 3, '#8fd16b'); R(-5, -7 + bob, 4, 3, '#6ab04a'); R(2, -9 + bob, 4, 3, '#6ab04a'); R(-1, -17 + bob, 2, 2, '#ff9ac0'); }
     } else if (e.kind === 'snare') {
@@ -6862,7 +6961,8 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       const wob = Math.round(Math.sin(e.wob * 0.9) * e.wob * 0.12);
       ctx.strokeStyle = '#5e3e28'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(e.x, e.y - 40); ctx.lineTo(e.x + wob, e.y - 12); ctx.stroke();
       for (const [r, c] of [[12, '#0a0818'], [11, '#e8e0c8'], [8, '#c8452e'], [5, '#e8e0c8'], [2, '#c8452e']]) { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(e.x + wob, e.y, r, 0, 6.3); ctx.fill(); }
-      if (e.hit) { R(wob - 12, -1, 12, 2, '#6a4a2a'); R(wob - 14, -2, 3, 4, '#e8e0c8'); }
+      if (e.hit && e.blade) { ctx.strokeStyle = '#0a0818'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(e.x + wob - 10, e.y - 9); ctx.lineTo(e.x + wob + 10, e.y + 9); ctx.stroke(); ctx.strokeStyle = '#fffbe8'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(e.x + wob - 10, e.y - 9); ctx.lineTo(e.x + wob + 10, e.y + 9); ctx.stroke(); }   // a clean cut across it
+      else if (e.hit) { R(wob - 12, -1, 12, 2, '#6a4a2a'); R(wob - 14, -2, 3, 4, '#e8e0c8'); }
     } else if (e.kind === 'wolf') {
       if (e.gone) return;
       ctx.save(); ctx.translate(Math.round(e.x), Math.round(e.y)); ctx.scale(e.dir, 1);
@@ -7033,7 +7133,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     const def = SH.ROOMS[roomId], room = SH.buildRoom(def);
     const player = new SH.Player(def.start.x * TS + TS / 2, def.start.y * TS);
     const things = def.spawns.map(s => SH.makeSpawn(s, room));
-    const lanterns = def.lanterns.map(l => ({ ...l, px: l.x * TS + TS / 2, py: room.groundY(l.x, 0), lit: !!l.lit }));
+    const lanterns = def.lanterns.map(l => ({ ...l, px: l.x * TS + TS / 2, py: room.groundY(l.x, l.from || 0), lit: !!l.lit }));
     const npcs = def.npcs.map(n => ({ ...n, x: n.x * TS + TS / 2, y: room.groundY(Math.floor(n.x), n.from || 0), facing: -1, near: false }));
     const gates = def.gates.map(g => ({ ...g, lift: g.open ? 1 : 0 }));
     const w = {
@@ -7073,6 +7173,8 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
         if (what === 'plums') { G.queueScript('ring_plums'); return; }
         if (what === 'cat') { G.queueScript('ashes_cat_found'); return; }
         if (what === 'page') { G.queueScript('mtn_page'); return; }
+        if (what === 'lamp') { G.flags.n_lamps = (G.flags.n_lamps || 0) + 1; SH.xp.gain(5, true); SH.sfx.play('lantern'); fx.word(player.x, player.y - 50, 'Lamp ' + G.flags.n_lamps + '/4', '#ffd27a', 70); fx.ring(player.x, player.y - 30, '#ffd27a', 40, 20, 2); this.cityLightTarget = Math.min(1, (this.cityLightTarget || 0) + 0.08); if (G.flags.n_lamps === 4) { G.flags.lamps4 = true; G.queueScript('ashes_lamps'); } return; }
+        if (what === 'pack' || what === 'tally') { G.progress.seen = G.progress.seen || {}; G.progress.seen['d_' + what] = 1; SH.xp.gain(8, true); G.queueScript('deep_' + what); return; }
         if (what === 'herb') { G.remember('green', 'Found wintergreen under the snow for Lissa.', true); G.queueScript('woods_herb'); return; }
         G.flags.n_wood = (G.flags.n_wood || 0) + 1;
         fx.word(player.x, player.y - 50, 'Firewood ' + G.flags.n_wood + '/3', '#ffd27a', 60);
@@ -7535,6 +7637,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       const tr = def.triggers[i];
       if (w.fired[i] || tx < tr.x || (tr.flag && !G.flags[tr.flag])) continue;
       if (tr.above != null && !(p.grounded && p.y <= tr.above * TS + 2)) continue;
+      if (tr.below != null && !(p.grounded && p.y > tr.below * TS)) continue;
       w.fired[i] = true; G.runScript(tr.script); return;
     }
     // optional people you can talk to
@@ -7559,7 +7662,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
 
     // control hints and the TALK / PAINT button
     const motesLeft = w.motes.filter(m => !m.got && (G.activeGoal === 'report' || m.x < p.x)).length;   // Starlight still behind her
-    const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0));
+    const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0) && (h.above == null || p.y <= h.above * TS) && (h.below == null || p.y > h.below * TS));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
     const bossTell = G.boss && !G.boss.dead ? ({ windup: 'It is about to CHARGE. Jump over it, or {DASH} straight through: nothing can touch you mid-dash.', charge: 'CHARGING. Jump it or {DASH} through it. If it hits the cliff it dazes itself.', crouch: 'It is going to LEAP to the shadow on the ground. Get away from the shadow.', leap: 'Move away from the shadow, then jump the shockwave.', slamrest: 'It is winded. Strike!', inhale: 'It is breathing in. Throw the Flame ({GIFT}) down its throat NOW.', breath: 'Frost along the ground. Jump onto a ledge or get behind it.', stun: 'DAZED. Strike it now: every cut does more.', roar: 'It is getting faster. The bond bar is full: use your Bond Art.' })[G.boss.state] : null;
     { const text = bossTell ? input.fill(bossTell) : hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null;

@@ -252,7 +252,7 @@
   Target.prototype.update = function () { if (this.wob > 0) this.wob--; };
   Target.prototype.takeHit = function (hit, world) {
     this.hit = true; this.wob = 30; SH.sfx.play('hit');
-    SH.fx.word(this.x, this.y - 22, 'BULLSEYE', '#ffd27a', 50); SH.fx.spark(this.x, this.y, 0, true);
+    SH.fx.word(this.x, this.y - 22, this.blade ? 'CLEAN CUT' : 'BULLSEYE', '#ffd27a', 50); SH.fx.spark(this.x, this.y, 0, true);
     world.onTarget(this); return { landed: true };
   };
   // The wolf is as hungry as the sisters. One arrow and it backs off hurt: then it is Wren's choice,

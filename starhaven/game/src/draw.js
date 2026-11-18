@@ -908,12 +908,20 @@
   function drawWoods(ctx, e, t) {
     const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(e.x + x), Math.round(e.y + y), w, h); };
     if (e.kind === 'pickup') {
+      if (e.what === 'lamp') {   // a street lamp on a bracket: dark until she touches it
+        R(-1, -30, 2, 30, '#0a0818'); R(-5, -34, 10, 3, '#3a3470'); R(-4, -44, 8, 10, e.got ? '#ffd27a' : '#1c1838'); R(-5, -46, 10, 2, '#3a3470');
+        if (e.got) { const fl = 0.8 + 0.2 * Math.sin(t * 0.2 + e.x); const gl = ctx.createRadialGradient(e.x, e.y - 39, 1, e.x, e.y - 39, 54 * fl); gl.addColorStop(0, 'rgba(255,214,140,0.6)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 56, e.y - 96, 112, 112); R(-2, -42, 4, 6, '#fff6d8'); }
+        else { R(-1, -50 + Math.round(Math.sin(t * 0.1 + e.x) * 2), 2, 2, '#ffd27a'); }
+        return;
+      }
       if (e.got) return;
       const bob = Math.round(Math.sin(t * 0.08 + e.x) * 1.5);
       const gl = ctx.createRadialGradient(e.x, e.y - 8, 1, e.x, e.y - 8, 22); gl.addColorStop(0, 'rgba(255,246,216,0.3)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 22, e.y - 30, 44, 44);
       if (e.what === 'cat') { const tl = Math.sin(t * 0.1) * 2; R(-7, -9, 13, 8, '#0a0818'); R(-6, -8, 11, 7, '#2a2630'); R(3, -13, 7, 7, '#0a0818'); R(4, -12, 5, 5, '#2a2630'); R(4, -14, 2, 2, '#2a2630'); R(7, -14, 2, 2, '#2a2630'); R(5, -10, 1, 1, '#ffd27a'); R(7, -10, 1, 1, '#ffd27a'); R(-9, -10 + tl, 2, 6, '#2a2630'); R(-5, -5, 3, 1, '#f4f0e0'); }
       else if (e.what === 'plums') { R(-7, -9 + bob, 14, 9, '#0a0818'); R(-6, -8 + bob, 12, 7, '#6a4a34'); R(-6, -8 + bob, 12, 1, '#a8743a'); for (let i = 0; i < 3; i++) { R(-5 + i * 4, -12 + bob, 3, 4, '#7a3a8a'); R(-5 + i * 4, -12 + bob, 1, 1, '#ffffff'); } }
       else if (e.what === 'page') { R(-6, -12 + bob, 12, 14, '#0a0818'); R(-5, -11 + bob, 10, 12, '#f4f0e0'); for (let i = 0; i < 4; i++) R(-3, -9 + i * 3 + bob, 6, 1, '#6a5aa8'); R(-5, -11 + bob, 3, 3, '#e8c070'); }
+      else if (e.what === 'pack') { R(-9, -11 + bob, 18, 12, '#0a0818'); R(-8, -10 + bob, 16, 10, '#6a4a34'); R(-8, -10 + bob, 16, 2, '#8a6444'); R(-2, -7 + bob, 4, 4, '#3a2618'); R(6, -13 + bob, 2, 6, '#ff9ac0'); R(8, -12 + bob, 2, 3, '#ff9ac0'); }
+      else if (e.what === 'tally') { for (let i = 0; i < 4; i++) for (let k = 0; k < 4; k++) R(-11 + i * 6 + k, -26 + bob * 0, 1, 6, '#c8ccd0'); for (let i = 0; i < 4; i++) R(-12 + i * 6, -23, 6, 1, '#c8ccd0'); R(-10, -16, 20, 1, '#ff7a8a'); R(-8, -13, 16, 1, '#ff7a8a'); }
       else if (e.what === 'wood') { R(-10, -9 + bob, 20, 9, '#0a0818'); R(-9, -8 + bob, 18, 3, '#7a5636'); R(-9, -5 + bob, 18, 3, '#5e3e28'); R(-9, -2 + bob, 18, 1, '#4a3020'); R(-9, -8 + bob, 2, 6, '#c8a878'); R(-2, -10 + bob, 3, 10, '#c8b890'); R(-9, -8 + bob, 18, 1, '#ffffff'); }
       else { R(-1, -12 + bob, 2, 12, '#3f6a3f'); R(-6, -12 + bob, 5, 3, '#8fd16b'); R(1, -15 + bob, 5, 3, '#8fd16b'); R(-5, -7 + bob, 4, 3, '#6ab04a'); R(2, -9 + bob, 4, 3, '#6ab04a'); R(-1, -17 + bob, 2, 2, '#ff9ac0'); }
     } else if (e.kind === 'snare') {
@@ -924,7 +932,8 @@
       const wob = Math.round(Math.sin(e.wob * 0.9) * e.wob * 0.12);
       ctx.strokeStyle = '#5e3e28'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(e.x, e.y - 40); ctx.lineTo(e.x + wob, e.y - 12); ctx.stroke();
       for (const [r, c] of [[12, '#0a0818'], [11, '#e8e0c8'], [8, '#c8452e'], [5, '#e8e0c8'], [2, '#c8452e']]) { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(e.x + wob, e.y, r, 0, 6.3); ctx.fill(); }
-      if (e.hit) { R(wob - 12, -1, 12, 2, '#6a4a2a'); R(wob - 14, -2, 3, 4, '#e8e0c8'); }
+      if (e.hit && e.blade) { ctx.strokeStyle = '#0a0818'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(e.x + wob - 10, e.y - 9); ctx.lineTo(e.x + wob + 10, e.y + 9); ctx.stroke(); ctx.strokeStyle = '#fffbe8'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(e.x + wob - 10, e.y - 9); ctx.lineTo(e.x + wob + 10, e.y + 9); ctx.stroke(); }   // a clean cut across it
+      else if (e.hit) { R(wob - 12, -1, 12, 2, '#6a4a2a'); R(wob - 14, -2, 3, 4, '#e8e0c8'); }
     } else if (e.kind === 'wolf') {
       if (e.gone) return;
       ctx.save(); ctx.translate(Math.round(e.x), Math.round(e.y)); ctx.scale(e.dir, 1);

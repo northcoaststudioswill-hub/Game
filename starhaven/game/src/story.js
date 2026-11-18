@@ -359,6 +359,20 @@
       ['queen', 'My thorns remember mortals. They remember how you bleed. And my gardeners are hungry.'],
       ['caelum', 'They are only sprites. You have a knife and you have skinned worse. Cut them.'],
     ],
+    deep_under: [
+      ['queen', 'You fell. Of course you fell. Look around, little huntress. This is where I keep the ones who lost.'],
+      ['caelum', 'There is a way back up at the far end, past the cells. And Wren: look at them. Somebody should.'],
+    ],
+    deep_tally: [
+      ['narr', 'Scratches in the stone, in bundles of five. Wren stops counting at four hundred.'],
+      ['narr', 'Under them, in a different hand, cut deep: SHE KEEPS HER WORD. THAT IS THE TRAP.'],
+      ['wren', '...Noted.'],
+    ],
+    deep_pack: [
+      ['narr', 'A hunter\'s pack, the leather gone soft as cloth. Mortal-made. A bone-handled knife, and a ribbon a child might have tied on.'],
+      ['wren', 'Somebody else crossed the Wall. A long time ago. Nobody ever told a story about her.'],
+      ['narr', 'Wren takes the ribbon. It seems wrong to leave all of her down here.'],
+    ],
     deep_caelum: [
       { do: 'flag', name: 'd_caelum' },
       ['caelum', 'Don\'t look straight at me. She watches who I look at.'],
@@ -464,6 +478,13 @@
         ['mirelle', 'If you are going up the street: my cat, Ember. Black, rude, about so big. She climbs when the dark frightens her, and it is all dark now.'],
         ['wren', 'I\'ll look up as I go.'],
       ] },
+    ],
+    ashes_lamps: [
+      ['narr', 'The fourth lamp catches. All down the street, gold runs from window to window, and somewhere a shutter opens that has been shut for months.'],
+      ['mirelle', 'Forty years I lit those, till my knees gave out before the lamps did. Nobody asked you to. That is the right way to do it.'],
+      { do: 'remember', key: 'lamps', text: 'Lit the four dark lamps on Mirelle\'s street, unasked.', good: true },
+      ['wren', 'It felt wrong, walking past them.'],
+      ['mirelle', 'Then you will do, girl. This city is made of people who could not walk past.'],
     ],
     ashes_cat_found: [
       ['narr', 'A black cat is flattened on the awning, pretending not to be afraid. It considers Wren, then walks onto her shoulder as if that had been the plan.'],
@@ -712,7 +733,8 @@
     ring_rings: [
       { do: 'flag', name: 'rings3' },
       ['bram', 'Low, rising, and one from the air. Who taught you to read a target?'],
-      ['wren', 'My father. With a bow, and worse manners.'],
+      ['wren', 'My father, on straw. I left the bow on the far side of the Wall. The eye came with me.'],
+      ['bram', 'Daggers for now. When you\'ve earned a fae bow, I\'ll string it myself.'],
       { do: 'remember', key: 'rings', text: 'Cut all three of Bram\'s rings.', good: true },
       { do: 'bond', who: 'bram', pts: 10, liked: true, why: 'Three for three. He stopped pretending not to watch.' },
     ],

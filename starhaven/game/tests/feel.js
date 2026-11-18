@@ -49,7 +49,7 @@ const path = require('path');
 
     // --- 2. Jump section: 3-tile gap (31..34) at the same height
     let r = attempt(27, 14, 30.7, []);
-    check('3-tile gap: just running falls in', r.hurt > 0, r);
+    check('3-tile gap: just running falls in, and lands unhurt in the cells below', r.hurt === 0 && r.ty > 20, r);
     r = (function () { fresh(); SH.test.place(27, 14); const p = P(); while (p.x < 30.7 * T) step({ right: true }); step({ right: true, jump: true }, ['jump']); let i = 0; while (i++ < 120) { step({ right: true, jump: true }); if (p.grounded) break; } return { tx: +(p.x / T).toFixed(2), ty: p.y / T, hurt: p.stats.hurt }; })();
     check('3-tile gap: one jump clears it', r.tx > 34 && r.ty === 14 && r.hurt === 0, r);
     r = (function () { fresh(); SH.test.place(37, 14); const p = P(); while (p.x < 40.7 * T) step({ right: true }); step({ right: true, jump: true }, ['jump']); let i = 0; while (i++ < 120) { step({ right: true, jump: true }); if (p.grounded) break; } return { tx: +(p.x / T).toFixed(2), ty: p.y / T, hurt: p.stats.hurt }; })();
@@ -73,8 +73,8 @@ const path = require('path');
     r = wall(true); check('Wall: double jump gets on top', r.topReached, r);
 
     // --- 4. Dash gap: 10 tiles (66..76) at the same height
-    r = attempt(61, 16, 65.6, ['double']); check('10-tile gap: jump + double jump falls short', r.hurt > 0, r);
-    r = attempt(61, 16, 65.6, ['dash']); check('10-tile gap: jump + dash falls short', r.hurt > 0, r);
+    r = attempt(61, 16, 65.6, ['double']); check('10-tile gap: jump + double jump falls short (into the shaft, unhurt)', r.hurt === 0 && r.ty > 16, r);
+    r = attempt(61, 16, 65.6, ['dash']); check('10-tile gap: jump + dash falls short (into the shaft, unhurt)', r.hurt === 0 && r.ty > 16, r);
     r = attempt(61, 16, 65.6, ['double', 'dash']); check('10-tile gap: jump + double + dash clears it', r.hurt === 0 && r.tx > 76, r);
 
     // --- Training Ring: pogo over the thorn pit (42..59): bounce off the buds with down-strikes
@@ -322,13 +322,18 @@ const path = require('path');
     (function () {
       G.progress.bonds = {}; SH.test.choice = 0;
       SH.test.load(2); const p = P(), w = G.world;
-      const jumps = [21.3, 29.3, 98.6, 102.4];
-      let k = 0, f = 0, light0 = w.cityLight, painted = false;
+      const jumps = [21.3, 29.3];
+      let k = 0, f = 0, light0 = w.cityLight, painted = false, climbTo = 0;
       while (f++ < 60 * 120 && G.chapter === 2) {
         const tx = p.x / T; let press = null, held = { right: true, jump: true };
         if (G.flags.arrive && !G.flags.painted && tx > 71.5 && tx < 74) held = { up: true };
         if (G.flags.painted) painted = true;
         if (G.state === 'play' && k < jumps.length && tx >= jumps[k] && p.grounded && (k < 2 || G.flags.painted)) { press = ['jump']; k++; }
+        if (G.state === 'play' && G.flags.painted && tx > 90 && tx < 104.5 && p.y > 10.5 * T) {   // the climb: crates (row 14), balcony (row 12), eave (row 10)
+          const row = Math.round(p.y / T), plan = { 16: [93.0, 95.5], 14: [96.0, 99.0], 12: [100.0, 102.6] };
+          if (p.grounded && plan[row]) { const from = plan[row][0]; held = { right: tx < from - 0.15, left: tx > from + 0.6 }; if (!held.right && !held.left) { held = { right: true, jump: true }; press = ['jump']; climbTo = plan[row][1]; } }
+          else if (!p.grounded) held = { jump: p.vy < 0, right: tx < climbTo - 0.2, left: tx > climbTo + 0.4 };
+        }
         talk(held, press);
       }
       const cb = G.progress.bonds.caelum || { pts: 0 };
@@ -533,7 +538,25 @@ const path = require('path');
       check('The ride to the Wall: a second into-the-screen scene with its own lines, about 28 seconds', v === 'wall' && rode && f > 1600 && f < 1800, { v, frames: f, wisps: rode && rode.stars });
       SH.test.load('deep', { story: false }); const w = G.world;
       const who = w.npcs.map(n => n.id), sprites = w.things.filter(e => e.kind === 'thornSprite').length;
-      check('The Deep: Caelum in the dark and Rowan in his cage can be spoken to, and the Queen\'s gardeners are the first fight', who.includes('caelum') && who.includes('rowan') && sprites === 2 && !!SH.STORY.SCRIPTS.deep_rowan && !!SH.STORY.SCRIPTS.deep_caelum, { who, sprites });
+      // the cells: drop in, find both things, climb the shaft back to the road
+      SH.test.place(32.5, 14); const q = P(); let cf = 0, found = 0, up = false, climbTo = 0;
+      while (cf++ < 60 * 90 && !up) {
+        const tx = q.x / T, row = Math.round(q.y / T); let held = {}, press = null;
+        if (G.state !== 'play') { talk({}, null); continue; }
+        found = (G.progress.seen.d_pack ? 1 : 0) + (G.progress.seen.d_tally ? 1 : 0);
+        if (q.y < 20 * T && found < 2 && tx < 40) held = {};                                             // falling in
+        else if (found < 2) { held = { left: true, jump: true }; if (q.grounded && tx > 24 && tx < 25.2) press = ['jump']; }   // west, over the pillar, to the cages
+        else if (tx < 66 || (row >= 30 && tx < 71.5)) { held = { right: true, jump: true }; if (q.grounded && tx > 20.6 && tx < 21.8) press = ['jump']; const foe = w.things.find(e => e.kind === 'thornSprite' && !e.dead && Math.abs(e.x - q.x) < 44 && Math.abs(e.y - q.y) < 30); if (foe) { held = {}; q.facing = foe.x > q.x ? 1 : -1; if (!q.swing && cf % 5 === 0) press = ['attack']; } }
+        else {   // the shaft: floor -> 27 -> 24 -> 21 -> 18 -> the road
+          const plan = { 30: [72, 72], 27: [70.6, 68], 24: [68.4, 72.5], 21: [73.5, 73.5], 18: [74.2, 76.6] }[row];
+          if (q.grounded && plan) { held = { right: tx < plan[0] - 0.2, left: tx > plan[0] + 0.2 }; if (!held.right && !held.left) { press = ['jump']; climbTo = plan[1]; held = { jump: true }; } }
+          else if (!q.grounded) held = { jump: q.vy < 0, right: tx < climbTo - 0.2, left: tx > climbTo + 0.3 };
+          if (q.grounded && row === 16 && tx > 76) up = true;
+        }
+        q.invuln = 5; step(held, press);
+      }
+      check('Under the Deep: falling from the road lands in the cells; a pack and a tally to find (two journal pages); four ledges lead back up', found === 2 && up && !!SH.STORY.LORE.find(l => l.id === 'd_pack'), { found, up, seconds: +(cf / 60).toFixed(1), at: [+(q.x / T).toFixed(1), Math.round(q.y / T)] });
+      check('The Deep: Caelum in the dark and Rowan in his cage can be spoken to, and the Queen\'s gardeners are the first fight', who.includes('caelum') && who.includes('rowan') && sprites === 5 && !!SH.STORY.SCRIPTS.deep_rowan && !!SH.STORY.SCRIPTS.deep_caelum, { who, sprites });
     })();
 
     // New moves: dash strike, rising strike, flame wave

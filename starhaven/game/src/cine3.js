@@ -341,6 +341,52 @@
     if (strike > 0) { g.fillStyle = 'rgba(0,0,0,' + Math.min(0.85, ease((ct - 230) / 80)) + ')'; g.fillRect(0, 0, W, H); }
   };
 
+  // ---------------------------------------------------------------- Iris's vision: the threads over the sea, and the iron hand closing on two of them
+  C.vision = function (g, t) {
+    const c = cam(t), pull = 0.5 + 0.5 * Math.sin(t * 0.02), grow = ease(t / 260);
+    sky(g, ['#02030c', '#081030', '#142a5a', '#0c2040']);
+    layer(g, c, 0.05, () => { starfield(g, t, 80, 33, 90); moon(g, 54, 26, 9); });
+    layer(g, c, 0.2, () => {   // the far shore: an iron keep, black on the horizon, one red window
+      g.fillStyle = '#05060e'; g.beginPath(); g.moveTo(196, 92); g.lineTo(214, 70); g.lineTo(232, 80); g.lineTo(256, 58); g.lineTo(286, 82); g.lineTo(340, 92); g.fill();
+      for (const [x, h] of [[238, 34], [250, 46], [262, 30], [272, 38]]) { R(g, x, 86 - h, 8, h, '#0a0c16'); g.fillStyle = '#0a0c16'; g.beginPath(); g.moveTo(x - 1, 86 - h); g.lineTo(x + 4, 78 - h); g.lineTo(x + 9, 86 - h); g.fill(); }
+      const pk = 0.6 + 0.4 * Math.sin(t * 0.07); glow(g, 254, 50, 22 * pk, 'rgba(255,60,50,0.7)'); R(g, 252, 47, 4, 6, '#ff4a3a');
+      for (let i = 0; i < 5; i++) { const sm = ((t * 0.006 + i / 5) % 1); g.globalAlpha = 0.3 * (1 - sm); g.fillStyle = '#3a3440'; g.beginPath(); g.arc(246 + i * 6 + Math.sin(sm * 5 + i) * 4, 44 - sm * 34, 3 + sm * 6, 0, 6.3); g.fill(); } g.globalAlpha = 1;   // forge smoke
+    });
+    layer(g, c, 0.5, () => {   // the sea between
+      const sg = g.createLinearGradient(0, 90, 0, 132); sg.addColorStop(0, '#16306a'); sg.addColorStop(1, '#060c22'); g.fillStyle = sg; g.fillRect(-30, 90, W + 60, 44);
+      for (let i = 0; i < 40; i++) { g.globalAlpha = 0.15 + 0.25 * Math.abs(Math.sin(t * 0.04 + i * 1.7)); R(g, rnd(i + 9) * (W + 40) - 20 + Math.sin(t * 0.01 + i) * 4, 92 + rnd(i * 3) * 38, 4 + rnd(i) * 10, 1, i % 4 ? '#8ab0ff' : '#ff8a7a'); } g.globalAlpha = 1;
+      for (let i = 0; i < 3; i++) { const x = 300 - ((t * 0.05 + i * 60) % 190), y = 100 + i * 9; g.fillStyle = '#05060e'; g.beginPath(); g.moveTo(x - 8, y); g.lineTo(x + 8, y); g.lineTo(x + 5, y + 3); g.lineTo(x - 5, y + 3); g.fill(); R(g, x - 1, y - 9, 1, 9, '#05060e'); g.beginPath(); g.moveTo(x, y - 9); g.lineTo(x + 6, y - 3); g.lineTo(x, y - 2); g.fill(); }   // black ships, already on the water
+    });
+    layer(g, c, 1, () => {
+      // the near shore: the cottage, a lit window, and the two of them at the door, not knowing
+      g.fillStyle = '#0a1420'; g.beginPath(); g.moveTo(-30, 150); g.lineTo(-30, 122); g.quadraticCurveTo(60, 112, 132, 132); g.lineTo(150, 150); g.fill(); R(g, -30, 130, 150, 1, '#2a4a5a');
+      g.save(); g.translate(-14, 132); g.scale(1.9, 1.9); g.translate(-14, -128);
+      R(g, 20, 104, 40, 24, '#2a1c16'); g.fillStyle = '#3a2a20'; g.beginPath(); g.moveTo(15, 104); g.lineTo(40, 88); g.lineTo(65, 104); g.fill(); R(g, 48, 90, 5, 9, '#2a1c16');
+      R(g, 26, 110, 8, 8, '#ffd27a'); glow(g, 30, 114, 22, 'rgba(255,210,122,0.5)'); R(g, 40, 112, 9, 16, '#1a100c');
+      for (let k = 0; k < 4; k++) { const sm = ((t * 0.008 + k / 4) % 1); g.globalAlpha = 0.3 * (1 - sm); g.fillStyle = '#8a8a9a'; g.beginPath(); g.arc(50 + Math.sin(sm * 4) * 3, 88 - sm * 20, 2 + sm * 3, 0, 6.3); g.fill(); } g.globalAlpha = 1;
+      g.restore();
+      person(g, 'nessa', 96, 134, 1, t); person(g, 'lissa', 118, 135, 1, t);
+      // every life is a thread. Most are gold and slack. Two of them have gone red and tight.
+      for (let i = 0; i < 11; i++) { const y0 = 14 + i * 9, y1 = 120 - i * 8; g.strokeStyle = 'rgba(255,233,168,' + (0.1 + 0.1 * Math.sin(t * 0.03 + i)) + ')'; g.lineWidth = 1; g.beginPath(); g.moveTo(-20, y0); g.bezierCurveTo(100, y0 + 30 + Math.sin(t * 0.02 + i) * 8, 220, y1 - 30, W + 20, y1); g.stroke(); }
+      for (const [fx, fy, o] of [[98, 110, 0], [120, 112, 6]]) {
+        const ex = fx + (254 - fx) * grow, ey = fy + (52 - fy) * grow - Math.sin(grow * Math.PI) * 30;
+        g.strokeStyle = 'rgba(255,74,60,' + (0.5 + 0.4 * pull) + ')'; g.lineWidth = 1 + pull; g.beginPath(); g.moveTo(fx, fy); g.quadraticCurveTo((fx + ex) / 2, Math.min(fy, ey) - 26 + o + pull * 6, ex, ey); g.stroke();
+        const mk = (t * 0.01 + o) % 1; R(g, fx + (ex - fx) * mk - 1, fy + (ey - fy) * mk - 12 * Math.sin(mk * Math.PI) - 1, 2, 2, '#ffd0c8'); glow(g, fx, fy, 6 + pull * 4, 'rgba(255,74,60,0.5)');
+      }
+      g.lineWidth = 1;
+      // and a third thread, gold, from the cottage to where Wren is standing
+      g.strokeStyle = 'rgba(255,210,122,' + (0.6 + 0.3 * Math.sin(t * 0.05)) + ')'; g.beginPath(); g.moveTo(108, 112); g.bezierCurveTo(140, 70, 220, 150, 292, 122); g.stroke();
+    });
+    layer(g, c, 1.5, () => {   // an iron hand over all of it, closing a little as she watches
+      const hx = 250, hy = 6 + pull * 4; g.fillStyle = 'rgba(5,6,14,0.85)';
+      g.beginPath(); g.moveTo(hx - 34, -10); g.lineTo(hx + 44, -10); g.lineTo(hx + 40, hy + 8); g.lineTo(hx - 30, hy + 10); g.fill();
+      for (let i = 0; i < 4; i++) { const fxx = hx - 26 + i * 18, len = 22 + (i % 2) * 8 + grow * 14 + pull * 4; g.beginPath(); g.moveTo(fxx, hy + 6); g.lineTo(fxx + 10, hy + 6); g.lineTo(fxx + 7 - grow * 6, hy + len); g.lineTo(fxx + 2 - grow * 6, hy + len + 5); g.fill(); }
+      g.strokeStyle = 'rgba(255,74,60,0.35)'; g.beginPath(); g.moveTo(hx - 30, hy + 10); g.lineTo(hx + 40, hy + 8); g.stroke();
+    });
+    drift(g, t, 14, ['#ffe9a8', '#ff8a7a'], true, 44);
+    layer(g, c, 1.2, () => { g.fillStyle = '#05060e'; g.beginPath(); g.moveTo(262, 150); g.quadraticCurveTo(300, 134, 350, 140); g.lineTo(350, 150); g.fill(); person(g, 'wren', 294, 146, -1, t); });   // Wren, on this side of the water, watching it happen
+  };
+
   // every older scene gets the finish too
   for (const id of ['rooftop', 'window', 'spring', 'city', 'peak', 'fire', 'vision', 'garden', 'thorns', 'cell', 'trials']) { const f = C[id]; if (f) C[id] = function (g, t, cue) { f(g, t, cue); C.post(g, t); }; }
   const ds = C.drawStatic; C.drawStatic = function (g, id, t) { ds(g, id, t); C.post(g, t); };

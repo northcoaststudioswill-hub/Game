@@ -64,15 +64,15 @@
 
   // ---------------------------------------------------------------- Prologue: The Deep (movement only, no enemies)
   SH.ROOMS.deep = {
-    id: 'deep', width: 150, height: 20, theme: 'deep',
+    id: 'deep', width: 150, height: 34, theme: 'deep',   // two storeys: the trial road above, the cells below
     start: { x: 5, y: 16 },
     shapes: [
-      ['solid', 0, 2, 0, 20],
+      ['solid', 0, 2, 0, 34],
       ['solid', 0, 150, 0, 4],          // the Deep has a roof
-      ['ground', 2, 24, 16],
-      ['ground', 24, 31, 14],           // step up, then a 3-tile gap
-      ['ground', 34, 41, 14],           // 4-tile gap down
-      ['ground', 45, 66, 16],
+      ['solid', 2, 24, 16, 20],         // the trial road is a shelf of rock; under it, the cells
+      ['solid', 24, 31, 14, 20],        // step up, then a 3-tile gap: fall in and you are in the cells, not dead
+      ['solid', 34, 41, 14, 20],        // 4-tile gap down
+      ['solid', 45, 66, 16, 20],
       ['solid', 54, 61, 11, 16],        // the wall: needs a double jump
       ['ground', 76, 104, 16],          // 10-tile gap before this: jump, jump, dash
       ['thorns', 85, 88, 16],           // first thorns: 3 tiles sunk into the floor, one plain jump
@@ -80,15 +80,23 @@
       ['ground', 118, 126, 14],
       ['ground', 130, 148, 16],
       ['thorns', 137, 140, 16],
-      ['solid', 148, 150, 0, 20],
+      ['solid', 148, 150, 0, 34],
+      // ---- the cells: a long low hall under the road, from the left wall to the rock at x 76
+      ['ground', 2, 76, 30],
+      ['oneway', 11, 16, 26], ['oneway', 47, 53, 26],                 // old galleries
+      ['solid', 22, 24, 28, 30],                                       // a broken pillar to climb over
+      ['oneway', 66, 69, 24], ['oneway', 70, 74, 27],                 // the way back up, in the shaft under the long jump:
+      ['oneway', 71, 75, 21], ['oneway', 72, 75, 18],                 // four ledges, then the road again at x 76
     ],
     hints: [
-      { x0: 3, x1: 21, text: 'Walk up to an altar and use {TALK} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle' },
-      { x0: 3, x1: 17, text: 'Move with {MOVE}.' },
-      { x0: 17, x1: 31, text: 'Jump with {JUMP}. Hold it to jump higher, tap it for a small hop.' },
-      { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.' },
-      { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.' },
-      { x0: 44, x1: 52, text: 'Someone is standing in the dark. {TALK} if you want to.', until: 'd_caelum' },
+      { x0: 2, x1: 66, text: 'The cells under the Deep. Look around. The way back up is at the far right, past the pillar.', below: 22, until: 'd_up' },
+      { x0: 66, x1: 76, text: 'Four ledges up the shaft. Jump straight up through each one.', below: 17 },
+      { x0: 3, x1: 21, text: 'Walk up to an altar and use {TALK} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle', above: 20 },
+      { x0: 3, x1: 17, text: 'Move with {MOVE}.', above: 20 },
+      { x0: 17, x1: 31, text: 'Jump with {JUMP}. Hold it to jump higher, tap it for a small hop.', above: 20 },
+      { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.', above: 20 },
+      { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.', above: 20 },
+      { x0: 44, x1: 52, text: 'Someone is standing in the dark. {TALK} if you want to.', until: 'd_caelum', above: 20 },
       { x0: 76, x1: 80, text: 'Rowan. {TALK} to him through the bars.', until: 'd_rowan' },
       { x0: 80, x1: 85, text: 'Thorns hurt. Jump over them. Her gardeners are waiting on the far side.' },
       { x0: 86, x1: 92, text: 'The Queen\'s gardeners. Cut them with {ATTACK}. They glow before they lunge: step back, then cut.', until: 'maze' },
@@ -97,28 +105,33 @@
     ],
     triggers: [
       { x: 5, script: 'deep_start' },
-      { x: 50, script: 'deep_wall' },
-      { x: 62, script: 'deep_dash' },
+      { x: 50, script: 'deep_wall', above: 17 },
+      { x: 62, script: 'deep_dash', above: 17 },
+      { x: 2, script: 'deep_under', below: 24 },
       { x: 80, script: 'deep_thorns' },
       { x: 94, script: 'deep_chase' },
       { x: 143, script: 'deep_end' },
     ],
-    lanterns: [{ x: 4, lit: true }, { x: 47 }, { x: 79 }, { x: 93 }],
+    lanterns: [{ x: 4, lit: true, from: 6 }, { x: 47, from: 6 }, { x: 79, from: 6 }, { x: 93, from: 6 }, { x: 40, from: 22 }],
     npcs: [{ id: 'caelum', x: 49, from: 6, optional: 'deep_caelum' }, { id: 'rowan', x: 77.6, from: 6, optional: 'deep_rowan' }],   // from: look for the floor below the roof
     props: [
-      { t: 'cage', x: 77.6, from: 6 },
+      { t: 'cage', x: 77.6, from: 6 }, { t: 'cage', x: 9, from: 22 }, { t: 'cage', x: 17, from: 22 }, { t: 'cage', x: 31, from: 22 }, { t: 'cage', x: 56, from: 22 },
+      { t: 'bones', x: 9, from: 22 }, { t: 'bones', x: 31, from: 22 }, { t: 'bones', x: 62, from: 22 }, { t: 'shroom', x: 14, from: 22 }, { t: 'shroom', x: 36, from: 22 }, { t: 'shroom', x: 52, from: 22 }, { t: 'shroom', x: 68, from: 22 },
       { t: 'bones', x: 10 }, { t: 'bones', x: 38 }, { t: 'bones', x: 58 }, { t: 'bones', x: 90 }, { t: 'bones', x: 112 }, { t: 'bones', x: 133 },
       { t: 'shroom', x: 16 }, { t: 'shroom', x: 28 }, { t: 'shroom', x: 47.5 }, { t: 'shroom', x: 63 }, { t: 'shroom', x: 78 }, { t: 'shroom', x: 100 }, { t: 'shroom', x: 122 }, { t: 'shroom', x: 141 },
       { t: 'chain', x: 12, len: 5 }, { t: 'chain', x: 36, len: 3 }, { t: 'chain', x: 70, len: 6 }, { t: 'chain', x: 96, len: 4 }, { t: 'chain', x: 128, len: 3 },
       { t: 'stal', x: 20, len: 3 }, { t: 'stal', x: 44, len: 2 }, { t: 'stal', x: 72, len: 4 }, { t: 'stal', x: 86, len: 2 }, { t: 'stal', x: 110, len: 3 }, { t: 'stal', x: 140, len: 2 },
     ],
     motes: [['line', 9, 20, 14.6], ['arc', 30, 35, 12.4, 2.4], ['arc', 40, 46, 12.6, 2.4], ['col', 52.6, 14.4, 10.6], ['line', 55, 60, 9.6], ['line', 67, 75, 10.6],
-      ['arc', 84, 89, 14.4, 2.6], ['line', 97, 103, 14.6], ['arc', 103.5, 107.5, 14.4, 2.6], ['line', 109, 116, 14.6], ['arc', 125.5, 130.5, 12.6, 2.2], ['arc', 136, 141, 14.4, 2.6]],
+      ['arc', 84, 89, 14.4, 2.6], ['line', 97, 103, 14.6], ['arc', 103.5, 107.5, 14.4, 2.6], ['line', 109, 116, 14.6], ['arc', 125.5, 130.5, 12.6, 2.2], ['arc', 136, 141, 14.4, 2.6],
+      ['line', 4, 8, 28.6], ['line', 11.5, 15.5, 24.6], ['line', 26, 36, 28.6], ['line', 47.5, 52.5, 24.6], ['line', 55, 64, 28.6], ['col', 73.5, 25.6, 16.6]],
     exitLight: 145,
     chase: { from: 94, wyrmX: 80, speed: 2.7 },
     gates: [{ id: 'riddlegate', x: 21, top: 6 }],
     spawns: [{ kind: 'altar', what: 'secret', x: 9, y: 16 }, { kind: 'altar', what: 'seed', x: 13, y: 16 }, { kind: 'altar', what: 'grief', x: 17, y: 16 },
-      { kind: 'thornSprite', x: 89.6, y: 16, respawn: false }, { kind: 'thornSprite', x: 92.2, y: 16, respawn: false }],   // the Queen's gardeners: the first things Wren ever cuts
+      { kind: 'thornSprite', x: 89.6, y: 16, respawn: false }, { kind: 'thornSprite', x: 92.2, y: 16, respawn: false },
+      { kind: 'thornSprite', x: 28, y: 30, respawn: false }, { kind: 'thornSprite', x: 50, y: 30, respawn: false }, { kind: 'thornSprite', x: 60, y: 30, respawn: false },
+      { kind: 'pickup', what: 'pack', x: 4.5, y: 30 }, { kind: 'pickup', what: 'tally', x: 19.5, y: 30 }],   // the Queen's gardeners: the first things Wren ever cuts
   };
 
   // ---------------------------------------------------------------- Chapter 1: Ashes (walk, talk, first mural, no enemies)
@@ -133,15 +146,21 @@
       ['ground', 22, 30, 15],
       ['ground', 30, 46, 14],           // the overlook
       ['ground', 46, 122, 16],
-      ['oneway', 99, 104, 13],          // ledge up to the roof
+      ['oneway', 94, 97, 14],           // stacked crates,
+      ['oneway', 97, 101, 12],          // a balcony,
+      ['oneway', 101, 104, 10],         // and the eave, level with the roof: three easy steps up
       ['oneway', 86, 90, 12],           // an awning: something is sitting on it
+      ['oneway', 57, 60, 13], ['oneway', 63, 66, 11],   // balconies, each with a dark street lamp to light
+      ['oneway', 76, 79, 13], ['oneway', 80, 83, 10],
       ['solid', 104, 118, 10, 16],      // the Rooftop House
       ['solid', 118, 122, 0, 20],
     ],
     hints: [
       { x0: 3, x1: 14, text: 'Move with {MOVE}. Caelum will meet you up the road.' },
       { x0: 19, x1: 31, text: 'Jump with {JUMP}.' },
-      { x0: 94, x1: 104, text: 'Jump up the ledge to reach the roof.', flag: 'painted' },
+      { x0: 90, x1: 104, text: 'Crates, balcony, eave: three jumps up to the roof.', flag: 'painted' },
+      { x0: 54, x1: 68, text: 'The street lamps are dark. Climb the balconies and touch each lamp to light it. Four on this street.', flag: 'arrive', until: 'lamps4' },
+      { x0: 75, x1: 85, text: 'Two more lamps up on these balconies.', flag: 'arrive', until: 'lamps4' },
     ],
     triggers: [
       { x: 4, script: 'ashes_start' },
@@ -153,13 +172,14 @@
       { t: 'bush', x: 6 }, { t: 'bush', x: 15 }, { t: 'bush', x: 27 }, { t: 'pine', x: 12 }, { t: 'pine', x: 20 }, { t: 'pine', x: 35 }, { t: 'pine', x: 44 },
       { t: 'banner', x: 56 }, { t: 'banner', x: 67, c: '#7a2a4a' }, { t: 'banner', x: 88 }, { t: 'crate', x: 60 }, { t: 'crate', x: 84.6 }, { t: 'barrel', x: 63 }, { t: 'barrel', x: 92 },
     ],
-    motes: [['line', 11, 20, 14.6], ['line', 23, 29, 13.6], ['line', 32, 38, 12.6], ['line', 58, 67, 14.6], ['line', 78, 96, 14.6], ['line', 100, 103, 11.6], ['line', 105, 108, 8.6]],
+    motes: [['line', 11, 20, 14.6], ['line', 23, 29, 13.6], ['line', 32, 38, 12.6], ['line', 58, 67, 14.6], ['line', 78, 96, 14.6], ['line', 97.5, 100.5, 10.6], ['line', 105, 108, 8.6]],
     mural: { x: 70, w: 5, needs: 'arrive', flag: 'painted', script: 'ashes_painted', frames: 80 },
     arch: 52,
     house: { x0: 104, x1: 118, top: 10 },
     lanterns: [{ x: 3, lit: true }],
     npcs: [{ id: 'caelum', x: 8 }, { id: 'mirelle', x: 62, optional: 'ashes_mirelle' }],
-    gates: [], spawns: [{ kind: 'pickup', what: 'cat', x: 88, y: 12 }],
+    gates: [], spawns: [{ kind: 'pickup', what: 'cat', x: 88, y: 12 },
+      { kind: 'pickup', what: 'lamp', x: 58.5, y: 13 }, { kind: 'pickup', what: 'lamp', x: 64.5, y: 11 }, { kind: 'pickup', what: 'lamp', x: 77.5, y: 13 }, { kind: 'pickup', what: 'lamp', x: 81.5, y: 10 }],
   };
 
   // ---------------------------------------------------------------- Chapter 2: The Five (daggers, pogo, first enemies)
@@ -185,7 +205,7 @@
       { x0: 14, x1: 32, text: 'Rising strike: {UPSTRIKE}, next to the dummy.', flag: 'combo1', until: 'rise' },
       { x0: 14, x1: 32, text: 'Dash strike: {DASH} toward the dummy, then {ATTACK} while you are still moving.', flag: 'rise', until: 'lunge' },
       { x0: 14, x1: 32, text: 'Guard: stand beside the dummy, face it, and {GUARD} when it says "swinging".', flag: 'lunge', until: 'guard' },
-      { x0: 26, x1: 36, text: 'Bram\'s rings. Cut all three: the low one from the ground, the middle one with a rising strike ({UPSTRIKE}), the high one from a jump.', until: 'rings3' },
+      { x0: 26, x1: 36, text: 'Bram\'s rings are for your daggers (Wren has no bow here). Cut all three: the low one from the ground, the middle one with a rising strike ({UPSTRIKE}), the high one from a jump.', until: 'rings3' },
       { x0: 36, x1: 60, text: 'Jump onto a bud and it bounces you (strike down with {DOWNSTRIKE} for a higher bounce). Land on the planks between them and take them one at a time.', flag: 'combo', until: 'pit' },
       { x0: 61, x1: 69, text: 'Remember the four: combo, rising strike ({UPSTRIKE}), dash strike ({DASH} then {ATTACK}), and guard ({GUARD}).', flag: 'pit' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
