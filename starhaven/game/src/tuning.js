@@ -57,9 +57,9 @@
   SH.PLAYER = {
     w: 14, h: 38,
     hearts: 5,
-    hurtInvuln: 70,   // frames of flicker after a hit
+    hurtInvuln: 115,   // frames of flicker after a hit
     hurtStun: 14,     // frames you can't act after a hit
-    hazardInvuln: 60,
+    hazardInvuln: 95,
   };
 
   // Daggers. active = [first, last] frame the blade can hit.

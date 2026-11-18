@@ -340,12 +340,20 @@ const path = require('path');
     (function () {
       SH.test.load(3); const p = P(), w = G.world;
       const buds = w.things.filter(t => t.kind === 'bulb');
-      let f = 0, swings = 0, waited = 0;
-      while (f++ < 60 * 150 && G.chapter === 3) {
+      let f = 0, swings = 0, waited = 0; const lessons = new Set();
+      while (f++ < 60 * 190 && G.chapter === 3) {
         const tx = p.x / T; let press = null, held = { right: true, jump: true };
         if (G.state === 'play') {
           if (!G.flags.combo) {
-            if (tx >= 22.4) { held = {}; if (!p.swing && f % 9 === 0) press = ['attack']; }
+            const goal = G.activeGoal; lessons.add(goal);
+            if (goal === 'rise') { if (tx >= 22.4) { held = {}; p.facing = 1; if (!p.swing && p.grounded && f % 12 === 0) press = ['upstrike']; } }
+            else if (goal === 'lunge') {   // back off, dash in, strike mid-dash
+              if (p.dashT > 0) { held = { right: true }; press = ['attack']; }
+              else if (tx > 21.2) held = { left: true };
+              else { held = { right: true }; if (p.grounded && p.dashCd <= 0) press = ['dash']; }
+            }
+            else if (goal === 'guard') { if (tx >= 22.4) { held = { down: true }; p.facing = 1; } else held = { right: true }; }
+            else if (tx >= 22.4) { held = {}; if (!p.swing && f % 9 === 0) press = ['attack']; }
           } else if (!G.flags.pit) {
             if (tx >= 40.7 && p.grounded && tx < 42) press = ["jump"];
             if (tx > 40.7 && tx < 60) press = pogoPolicy(p, held, buds, 57) || press;
@@ -366,6 +374,7 @@ const path = require('path');
         }
         talk(held, press);
       }
+      check('Bram teaches four things on the dummy, one at a time: combo, rising strike, dash strike, guard', ['combo', 'rise', 'lunge', 'guard'].every(x => lessons.has(x)), { lessons: [...lessons] });
       check('Chapter 2 + vision + second evening: the level waits (1.5 s here) until you talk to Caelum, then leads into Chapter 3', G.chapter === 4 && seen.has('ev2_caelum') && waited > 90,
         { chapter: G.chapter, seconds: +(f / 60).toFixed(1), hurt: p.stats.hurt, swings });
     })();
@@ -479,6 +488,31 @@ const path = require('path');
       check('Journal pages: written by chapters reached, people met, hearts earned and choices made; blank pages say how; reading clears "new"',
         pages0 > 10 && fresh >= 1 && lore.p_bram2 && lore.p_caelum3 && lore.c_wolfSpared && !lore.c_wolfKilled && shown === Object.keys(lore).length && blank > 0 && unread === 0 && ladders >= 3 && active >= 4,
         { pages0, fresh, total: SH.STORY.LORE.length, shown, blank, unread, ladders, active });
+    })();
+
+    // Guard and parry; thorns are sunk into the floor; longer safety after a hit
+    (function () {
+      SH.test.load('mountain', { story: false }); const p = P(), w = G.world;
+      SH.test.place(100, 14); for (let i = 0; i < 20; i++) step({}, null);
+      p.facing = 1; p.hearts = 5; p.invuln = 0; w.bramUsed = w.caelumUsed = true;   // no bond boons in this check
+      for (let i = 0; i < 30; i++) step({ down: true }, null);   // a held guard
+      const held = p.guard > 14; const r1 = p.hurt(p.x + 30, 1, w); const blocked = r1 === false && p.hearts === 5 && p.guardCd > 0;
+      for (let i = 0; i < 60; i++) step({}, null); p.invuln = 0;
+      for (let i = 0; i < 5; i++) step({ down: true }, null);    // raised just in time
+      const r2 = p.hurt(p.x + 30, 1, w); const parried = r2 === false && p.hearts === 5 && p.parryT > 0;
+      for (let i = 0; i < 60; i++) step({}, null); p.invuln = 0; p.facing = 1;
+      for (let i = 0; i < 20; i++) step({ down: true }, null);
+      p.hurt(p.x - 30, 1, w); const backHits = p.hearts === 4;   // from behind: no guard
+      const safe = p.invuln;
+      check('Guard: holding down stops a blow from the front, raising it at the last moment is a parry, a blow from behind still lands; 115 frames of safety after a hit',
+        held && blocked && parried && backHits && safe >= 110, { held, blocked, parried, backHits, safe });
+      SH.test.load('deep', { story: false }); const q = P(), room = G.world.room;
+      const sunk = room.get(86, 16) === SH.T_THORNS && room.get(86, 15) === SH.T_EMPTY && SH.isSolid(room.get(84, 16)) && SH.isSolid(room.get(88, 16));
+      SH.test.place(83, 16); q.hearts = 5; q.invuln = 0;
+      let lost = false; for (let i = 0; i < 12 && !lost; i++) { step({ right: true }, null); if (q.hearts < 5) lost = true; }
+      const walkedUpSafe = !lost && q.x / T > 83.5;
+      for (let i = 0; i < 60 && q.hearts === 5; i++) step({ right: true }, null);
+      check('Thorns are sunk into the floor: you can stand right at the edge unhurt, and are only hurt by going in', sunk && walkedUpSafe && q.hearts === 4, { sunk, walkedUpSafe, hearts: q.hearts });
     })();
 
     // New moves: dash strike, rising strike, flame wave
@@ -649,7 +683,7 @@ const path = require('path');
       G.explainClose(); const closed = G.state === 'play';
       const m2 = G.world.motes[1]; P().x = m2.x; P().y = m2.y + 20; step({}, null); step({}, null);
       const list = Object.keys(SH.STORY.EXPLAIN).length;
-      check('Explained once, and not at once: the first Starlight opens a card after a pause, it holds the game; the second does not; eight systems are listed', notYet && waited > 300 && shown && title === 'Starlight' && held && closed && G.state === 'play' && list === 8, { shown, title, held, closed, again: G.state, listed: list });
+      check('Explained once, and not at once: the first Starlight opens a card after a pause, it holds the game; the second does not; nine systems are listed', notYet && waited > 300 && shown && title === 'Starlight' && held && closed && G.state === 'play' && list === 9, { shown, title, held, closed, again: G.state, listed: list });
       G.noExplain = true;
     })();
 

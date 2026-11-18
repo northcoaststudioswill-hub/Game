@@ -507,6 +507,17 @@
     }
     for (const g of fx.ghosts) SH.wren.draw(ctx, w.player, { ghost: g });
     SH.wren.draw(ctx, w.player, {});
+    { const p = w.player;   // guard: crossed blades held in front; bright for the first instant (the parry window)
+      if (p.guard > 0) {
+        const gx = Math.round(p.x + p.facing * 13), gy = Math.round(p.y - 25), hot = p.guard <= 14;
+        ctx.save(); ctx.lineCap = 'round';
+        ctx.strokeStyle = '#0a0818'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(gx - 5, gy - 13); ctx.lineTo(gx + 5, gy + 11); ctx.moveTo(gx + 5, gy - 13); ctx.lineTo(gx - 5, gy + 11); ctx.stroke();
+        ctx.strokeStyle = hot ? '#fff6d8' : '#c8d2e2'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(gx - 5, gy - 13); ctx.lineTo(gx + 5, gy + 11); ctx.moveTo(gx + 5, gy - 13); ctx.lineTo(gx - 5, gy + 11); ctx.stroke();
+        ctx.globalAlpha = hot ? 0.9 : 0.45; ctx.strokeStyle = hot ? '#ffd27a' : '#9fc8ff'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(p.x + p.facing * 4, gy, 20, p.facing > 0 ? -1.1 : Math.PI - 1.1, p.facing > 0 ? 1.1 : Math.PI + 1.1); ctx.stroke();
+        ctx.restore();
+      }
+      if (p.parryT > 0 && w.time % 6 < 3) { ctx.fillStyle = '#ffd27a'; ctx.fillRect(Math.round(p.x) - 1, Math.round(p.y) - 52, 2, 2); } }
     if (w.wyrm && w.wyrm.on) drawWyrm(ctx, w.wyrm, cy, t);
     drawParticles(ctx, fx);
     ctx.restore();

@@ -192,6 +192,155 @@
     C.post(g, t);
   };
 
+  // a thorn vine: grows from (x0, base) by `len`, swaying; buds glow at its tip and along it
+  function vine(g, x0, base, len, i, t, col, bud) {
+    g.strokeStyle = col; g.lineWidth = 3; g.beginPath(); g.moveTo(x0, base);
+    let x = x0, y = base;
+    for (let k = 0; k < len; k += 5) { x = x0 + Math.sin(k * 0.07 + i * 1.7) * (8 + k * 0.08) + Math.sin(t * 0.02 + i) * k * 0.03; y = base - k; g.lineTo(x, y); }
+    g.stroke(); g.lineWidth = 1;
+    for (let k = 12; k < len; k += 14) { const tx = x0 + Math.sin(k * 0.07 + i * 1.7) * (8 + k * 0.08), sd = k % 28 ? 1 : -1; g.fillStyle = col; g.beginPath(); g.moveTo(tx, base - k); g.lineTo(tx + sd * 6, base - k - 3); g.lineTo(tx, base - k - 4); g.fill(); }
+    if (len > 16 && bud) { glow(g, x, y, 9, 'rgba(255,74,90,0.5)'); R(g, x - 2, y - 2, 4, 4, bud); R(g, x - 1, y - 3, 2, 1, '#ffb0b8'); }
+  }
+
+  // ---------------------------------------------------------------- The Spring Court garden: she paints again, and he watches from the arch
+  C.garden = function (g, t) {
+    const c = cam(t);
+    sky(g, ['#ffe9c8', '#ffd2d8', '#f6b6cc', '#e89ab8']);
+    layer(g, c, 0.05, () => { glow(g, 232, 30, 80, 'rgba(255,246,216,0.8)'); g.fillStyle = '#fffbe8'; g.beginPath(); g.arc(232, 30, 11, 0, 6.3); g.fill(); });
+    layer(g, c, 0.18, () => {   // the manor, far off, rose-stone and gold
+      R(g, 30, 62, 90, 50, '#e8a8bc'); R(g, 22, 76, 14, 36, '#dc98b0'); R(g, 114, 70, 16, 42, '#dc98b0');
+      g.fillStyle = '#c87a98'; g.beginPath(); g.moveTo(26, 62); g.lineTo(75, 40); g.lineTo(124, 62); g.fill(); g.beginPath(); g.moveTo(20, 76); g.lineTo(29, 60); g.lineTo(38, 76); g.fill(); g.beginPath(); g.moveTo(112, 70); g.lineTo(122, 54); g.lineTo(132, 70); g.fill();
+      for (let i = 0; i < 5; i++) { R(g, 40 + i * 16, 72, 6, 12, '#fff2d8'); g.fillStyle = '#fff2d8'; g.beginPath(); g.arc(43 + i * 16, 72, 3, Math.PI, 0); g.fill(); }
+      g.fillStyle = '#d88aa8'; for (let i = -1; i < 8; i++) { g.beginPath(); g.arc(i * 52 + 14, 114, 30 + rnd(i) * 12, Math.PI, 0); g.fill(); }
+    });
+    layer(g, c, 0.4, () => {   // the garden wall she is never allowed past, with roses over it
+      R(g, -30, 86, W + 60, 30, '#f2dcd0'); R(g, -30, 84, W + 60, 3, '#fff6ea'); for (let i = -1; i < 12; i++) R(g, i * 30 + 6, 86, 1, 30, '#e2c4b8');
+      for (let i = 0; i < 46; i++) { const x = rnd(i + 5) * (W + 40) - 20, y = 84 + rnd(i * 3) * 22; R(g, x, y, 3, 3, i % 3 ? '#e85a84' : '#fff0f4'); R(g, x + 3, y + 1, 2, 2, '#5a9a4a'); }
+      R(g, 258, 60, 36, 56, '#f2dcd0'); g.fillStyle = '#b87a90'; g.beginPath(); g.moveTo(264, 116); g.lineTo(264, 80); g.quadraticCurveTo(276, 64, 288, 80); g.lineTo(288, 116); g.fill();   // the gate, shut
+      for (let i = 0; i < 4; i++) R(g, 266 + i * 6, 76, 1, 40, '#e8c070'); R(g, 264, 96, 24, 1, '#e8c070');
+    });
+    layer(g, c, 0.7, () => {   // cherry trees with real crowns
+      for (const [x, h, s] of [[40, 54, 1], [210, 60, 2], [300, 50, 3]]) {
+        g.strokeStyle = '#6a4234'; g.lineWidth = 5; g.beginPath(); g.moveTo(x, 124); g.quadraticCurveTo(x + 4, 124 - h * 0.5, x - 3, 124 - h); g.stroke();
+        g.lineWidth = 2; g.beginPath(); g.moveTo(x, 124 - h * 0.6); g.lineTo(x + 16, 124 - h * 0.9); g.moveTo(x, 124 - h * 0.7); g.lineTo(x - 15, 124 - h); g.stroke(); g.lineWidth = 1;
+        for (let k = 0; k < 16; k++) { const a = rnd(k + s * 9) * 6.3, r = rnd(k * 3 + s) * 22, sw = Math.sin(t * 0.02 + k + s) * 1.2; g.fillStyle = k % 3 === 0 ? '#ffd6e4' : k % 3 === 1 ? '#f7a4c2' : '#ee88ae'; g.beginPath(); g.arc(x - 2 + Math.cos(a) * r + sw, 124 - h - 6 + Math.sin(a) * r * 0.6, 8 + rnd(k) * 5, 0, 6.3); g.fill(); }
+      }
+    });
+    layer(g, c, 1, () => {
+      const lg = g.createLinearGradient(0, 122, 0, 150); lg.addColorStop(0, '#9ed488'); lg.addColorStop(1, '#5a9a58'); g.fillStyle = lg; g.fillRect(-30, 122, W + 60, 30); R(g, -30, 122, W + 60, 1, '#c8f0b0');
+      for (let i = 0; i < 60; i++) { const x = rnd(i + 70) * (W + 40) - 20; R(g, x, 123 + rnd(i * 2) * 24, 1, 3, '#7ab86a'); if (i % 4 === 0) R(g, x, 124 + rnd(i * 5) * 22, 2, 2, i % 8 ? '#fff0f4' : '#ffd27a'); }
+      // the easel: a night sky full of stars, growing stroke by stroke. She paints what she has never seen.
+      g.strokeStyle = '#7a5a3a'; g.lineWidth = 2; g.beginPath(); g.moveTo(150, 96); g.lineTo(143, 138); g.moveTo(172, 96); g.lineTo(179, 138); g.moveTo(161, 100); g.lineTo(161, 136); g.stroke(); g.lineWidth = 1;
+      R(g, 144, 88, 34, 30, '#5a4028'); R(g, 146, 90, 30, 26, '#fffaf0');
+      const n = Math.min(70, Math.floor(t / 5));
+      for (let i = 0; i < n; i++) { const px = 146 + rnd(i + 3) * 27, py = 90 + rnd(i * 3 + 1) * 24; R(g, px, py, 3 + (i % 2), 2, i < 44 ? (i % 3 ? '#1c1a4a' : '#2f2c6e') : i % 2 ? '#ffd27a' : '#fff6d8'); }
+      R(g, 138, 132, 8, 4, '#8a6a4a'); R(g, 139, 131, 2, 2, '#2f2c6e'); R(g, 142, 131, 2, 2, '#ffd27a'); R(g, 136, 131, 2, 2, '#e85a84');
+      person(g, 'wren', 128, 138, 1, t);
+      const by = Math.sin(t * 0.16) * 3; g.strokeStyle = '#5a4028'; g.lineWidth = 1; g.beginPath(); g.moveTo(136, 118); g.lineTo(145, 104 + by); g.stroke(); R(g, 145, 103 + by, 2, 2, n < 44 ? '#2f2c6e' : '#ffd27a');
+      person(g, 'rowan', 236, 138, -1, t);
+    });
+    drift(g, t, 26, ['#ff9ac0', '#ffffff', '#ffd6e4'], false, 12);
+    layer(g, c, 1.8, () => {   // close to the eye: a bough of blossom, and the bars of the gate she has not noticed yet
+      g.strokeStyle = '#3a1c2a'; g.lineWidth = 4; g.beginPath(); g.moveTo(-40, 6); g.quadraticCurveTo(40, 20, 110, 4); g.stroke(); g.lineWidth = 1;
+      for (let i = 0; i < 14; i++) { g.fillStyle = i % 2 ? '#ffb8d0' : '#ffe0ea'; g.beginPath(); g.arc(-20 + i * 9 + Math.sin(t * 0.02 + i), 12 + rnd(i) * 10, 5 + rnd(i * 3) * 3, 0, 6.3); g.fill(); }
+      for (let i = 0; i < 3; i++) R(g, 316 + i * 12, 0, 4, H, '#3a1c2a');
+    });
+  };
+
+  // ---------------------------------------------------------------- The Blight: her thorns climb the courts, and she watches from the mountain
+  C.thorns = function (g, t) {
+    const c = cam(t), grow = ease(t / 300);
+    sky(g, ['#12040c', '#3a0a18', '#7a1a26', '#c2452e']);
+    layer(g, c, 0.05, () => { glow(g, 160, 96, 110, 'rgba(255,90,70,0.35)'); for (let i = 0; i < 30; i++) { g.globalAlpha = 0.3 + 0.4 * Math.abs(Math.sin(t * 0.02 + i)); R(g, rnd(i + 2) * W, rnd(i * 3) * 60, 1, 1, '#ffb0a0'); } g.globalAlpha = 1; });
+    layer(g, c, 0.2, () => {   // the mountain, hollow, with one lit window near the top: hers
+      g.fillStyle = '#1a060e'; g.beginPath(); g.moveTo(40, 124); g.lineTo(120, 52); g.lineTo(146, 66); g.lineTo(170, 22); g.lineTo(198, 60); g.lineTo(226, 48); g.lineTo(290, 124); g.fill();
+      g.fillStyle = '#2a0a16'; g.beginPath(); g.moveTo(170, 22); g.lineTo(198, 60); g.lineTo(186, 74); g.lineTo(176, 52); g.fill();
+      const pk = 0.6 + 0.4 * Math.sin(t * 0.05); glow(g, 170, 48, 16 * pk, 'rgba(255,74,90,0.7)'); R(g, 168, 44, 4, 7, '#ff4a5a'); R(g, 169, 45, 2, 3, '#ffd0d0');
+      g.fillStyle = '#05020a'; g.beginPath(); g.moveTo(150, 124); g.lineTo(150, 104); g.quadraticCurveTo(170, 84, 190, 104); g.lineTo(190, 124); g.fill();   // the gate into the Deep
+    });
+    layer(g, c, 0.4, () => {   // a court on the plain below, its towers being taken
+      const towers = [[36, 30], [58, 44], [78, 26], [232, 38], [256, 50], [280, 30]];
+      for (const [x, h] of towers) { R(g, x, 122 - h, 12, h, '#2a0e1a'); g.fillStyle = '#2a0e1a'; g.beginPath(); g.moveTo(x - 2, 122 - h); g.lineTo(x + 6, 112 - h); g.lineTo(x + 14, 122 - h); g.fill(); const lit = grow < 0.5 + rnd(x) * 0.4; R(g, x + 4, 128 - h, 3, 4, lit ? '#ffd27a' : '#12040a'); }
+      towers.forEach(([x, h], i) => vine(g, x + 6, 124, grow * (h + 14), i + 20, t, '#4a1226', null));
+    });
+    layer(g, c, 0.75, () => { R(g, -30, 120, W + 60, 34, '#14050c'); for (let i = 0; i < 9; i++) vine(g, 10 + i * 38 + rnd(i) * 14, 126, grow * (34 + rnd(i * 2) * 44), i, t, '#5a1830', '#ff4a5a'); });
+    layer(g, c, 1, () => {
+      R(g, -30, 132, W + 60, 20, '#0a0308'); R(g, -30, 132, W + 60, 1, '#4a1226');
+      for (let i = 0; i < 12; i++) { const x = rnd(i + 31) * W, dead = grow > rnd(i * 7); R(g, x, 126, 1, 6, dead ? '#3a2a22' : '#5a9a4a'); R(g, x - 1, 124, 3, 3, dead ? '#4a3a30' : i % 2 ? '#ff9ac0' : '#fff0f4'); }   // Spring's flowers, dying one by one
+      person(g, 'queen', 160, 138, 1, t);
+      for (let i = 0; i < 6; i++) vine(g, 160 + (i - 2.5) * 16, 138, grow * (14 + rnd(i) * 16), i + 50, t, '#6a1c34', i % 2 ? '#ff4a5a' : null);
+    });
+    drift(g, t, 22, ['#ff7a5a', '#ffb057', '#5a1830'], true, 33);
+    layer(g, c, 1.8, () => { for (const [x0, i] of [[-6, 90], [14, 91], [306, 92], [326, 93]]) { g.globalAlpha = 1; vine(g, x0, 154, 60 + grow * 80, i, t, '#05020a', null); } });
+  };
+
+  // ---------------------------------------------------------------- A cell in the Deep: fever, and then him
+  C.cell = function (g, t, cue) {
+    const c = cam(t), k = cue && cue.name === 'caelum' ? ease(cue.t / 70) : 0;
+    R(g, 0, 0, W, H, '#06070c');
+    layer(g, c, 0.3, () => {   // the back wall: wet stone, one barred slit high up, and the queen's thorns coming through the mortar
+      for (let y = 0; y < 126; y += 12) for (let x = -30 + (y / 12 % 2) * 14; x < W + 30; x += 28) { R(g, x, y, 27, 11, rnd(x * 3 + y) < 0.3 ? '#14171f' : '#10131a'); }
+      for (let i = 0; i < 10; i++) { const x = rnd(i + 8) * W; g.globalAlpha = 0.25; R(g, x, 0, 1, 40 + rnd(i * 2) * 70, '#3a4a5a'); const dy = (t * 0.6 + i * 37) % 120; g.globalAlpha = 0.7; R(g, x, dy, 1, 2, '#8ab0c8'); } g.globalAlpha = 1;
+      R(g, 70, 22, 22, 16, '#03040a'); for (let i = 0; i < 4; i++) R(g, 73 + i * 5, 22, 2, 16, '#1c2028');
+      const mg = g.createLinearGradient(80, 30, 130, 126); mg.addColorStop(0, 'rgba(160,190,230,0.22)'); mg.addColorStop(1, 'rgba(160,190,230,0)'); g.fillStyle = mg; g.beginPath(); g.moveTo(70, 38); g.lineTo(92, 38); g.lineTo(158, 128); g.lineTo(92, 128); g.fill();
+      for (let i = 0; i < 4; i++) vine(g, 250 + i * 18, 0, -0, i, t, '#3a1226', null);
+      g.save(); g.translate(0, 0); for (let i = 0; i < 4; i++) { g.strokeStyle = '#3a1226'; g.lineWidth = 2; g.beginPath(); g.moveTo(244 + i * 20, 0); for (let y = 0; y < 50 + rnd(i) * 40; y += 5) g.lineTo(244 + i * 20 + Math.sin(y * 0.1 + i) * 6, y); g.stroke(); } g.lineWidth = 1; g.restore();
+    });
+    layer(g, c, 1, () => {
+      R(g, -30, 126, W + 60, 26, '#0c0e14'); R(g, -30, 126, W + 60, 1, '#262a36'); for (let i = -1; i < 14; i++) R(g, i * 26 + 8, 127, 1, 24, '#07080c');
+      R(g, 84, 122, 40, 5, '#3a3020'); for (let i = 0; i < 12; i++) R(g, 84 + rnd(i) * 38, 120 + rnd(i * 2) * 3, 4, 1, '#6a5a34');   // straw
+      R(g, 60, 116, 8, 10, '#2a2e3a'); R(g, 61, 114, 6, 2, '#3a4050');                                                             // a cup she cannot reach for
+      g.strokeStyle = '#3a3e4a'; g.lineWidth = 1; g.beginPath(); g.moveTo(128, 60); for (let i = 0; i < 8; i++) g.lineTo(128 - i * 3 + (i % 2), 60 + i * 8); g.stroke();   // a chain
+      // Wren, lying on her side in the straw, breathing fast; the wound in her arm glows the queen's red
+      g.save(); g.translate(104, 124); g.rotate(-Math.PI / 2); person(g, 'wren', 0, 0, 1, 0); g.restore();
+      const fever = 0.5 + 0.5 * Math.sin(t * 0.12); glow(g, 110, 118, 9 + fever * 4, 'rgba(255,74,90,' + (0.35 + fever * 0.3) + ')'); R(g, 109, 117, 3, 2, '#ff4a5a');
+      if (k > 0) {   // he steps out of the dark: night first, then stars, then wings, then the man
+        glow(g, 206, 96, 80 * k, 'rgba(120,100,220,0.4)');
+        for (let i = 0; i < 46; i++) { const a = i / 46 * 6.3 + t * 0.008, r = 30 + rnd(i) * 40; g.globalAlpha = k * (0.4 + 0.6 * Math.abs(Math.sin(t * 0.08 + i))); R(g, 206 + Math.cos(a) * r, 92 + Math.sin(a) * r * 0.7, 1, 1, i % 3 ? '#fff6d8' : '#b9a8ff'); }
+        g.globalAlpha = k; g.fillStyle = '#05040e';
+        for (const sd of [-1, 1]) { const sp = 30 + Math.sin(t * 0.03) * 2; g.beginPath(); g.moveTo(206, 100); g.quadraticCurveTo(206 + sd * sp, 60, 206 + sd * (sp + 8), 112); g.lineTo(206 + sd * sp * 0.7, 104); g.lineTo(206 + sd * sp * 0.4, 116); g.lineTo(206, 110); g.fill(); }
+        person(g, 'caelum', 206, 138, -1, t);
+        g.globalAlpha = k * (0.5 + 0.3 * Math.sin(t * 0.06)); g.strokeStyle = '#ffd27a'; g.beginPath(); g.moveTo(112, 116); g.bezierCurveTo(140, 100, 176, 124, 200, 112); g.stroke();   // the thread, though she cannot feel it yet
+        g.globalAlpha = 1;
+      }
+    });
+    layer(g, c, 1.6, () => { for (const x of [-14, 34, 262, 300, 338]) { R(g, x, 0, 5, H, '#020306'); R(g, x + 5, 0, 1, H, '#1a1e28'); } R(g, -30, 14, W + 60, 4, '#020306'); });   // the bars, between us and her
+  };
+
+  // ---------------------------------------------------------------- The Queen's throne: three trials won, and the last thorn
+  C.trials = function (g, t, cue) {
+    const c = cam(t), ct = cue ? cue.t : 0, strike = cue && cue.name === 'end' ? ease((ct - 150) / 40) : 0;
+    sky(g, ['#0a0308', '#200812', '#4a0e1c', '#200812']);
+    layer(g, c, 0.15, () => {   // the hall: pillars of root going up into the dark, braziers burning red
+      for (let i = -1; i < 8; i++) { const x = i * 48 + 10; R(g, x, 0, 14, 126, '#14050c'); R(g, x + 2, 0, 2, 126, '#2a0a16'); for (let k = 0; k < 5; k++) R(g, x + rnd(i * 5 + k) * 12, rnd(k + i) * 120, 2, 8, '#0a0308'); }
+      for (const x of [58, 262]) { const fl = Math.sin(t * 0.25 + x) * 2; glow(g, x, 84, 36 + fl * 2, 'rgba(255,74,60,0.45)'); R(g, x - 5, 90, 10, 3, '#3a2a2a'); R(g, x - 1, 93, 2, 33, '#2a1c1c'); g.fillStyle = '#ff6a4a'; g.beginPath(); g.moveTo(x - 4, 90); g.lineTo(x, 78 + fl); g.lineTo(x + 4, 90); g.fill(); R(g, x - 1, 85, 2, 4, '#ffd27a'); }
+    });
+    layer(g, c, 0.45, () => {   // the freed High Lords' empty chains, and a crowd of the court as shapes
+      for (let i = 0; i < 16; i++) { const x = 8 + i * 20 + rnd(i) * 6, h = 20 + rnd(i * 3) * 8; if (x > 124 && x < 196) continue; R(g, x, 124 - h, 9, h, '#0e040a'); g.fillStyle = '#0e040a'; g.beginPath(); g.arc(x + 4.5, 122 - h, 4, 0, 6.3); g.fill(); if (i % 3 === 0) { R(g, x + 2, 120 - h, 1, 1, '#ff4a5a'); R(g, x + 6, 120 - h, 1, 1, '#ff4a5a'); } }
+    });
+    layer(g, c, 0.8, () => {   // the throne: woven thorn, taller than it needs to be
+      R(g, 118, 112, 84, 14, '#1a0810'); R(g, 126, 104, 68, 8, '#220a14'); R(g, 134, 96, 52, 8, '#2a0c18');
+      g.fillStyle = '#12040a'; g.beginPath(); g.moveTo(140, 96); g.lineTo(144, 34); g.lineTo(160, 14); g.lineTo(176, 34); g.lineTo(180, 96); g.fill();
+      for (let i = 0; i < 9; i++) { g.strokeStyle = '#3a1024'; g.lineWidth = 2; g.beginPath(); g.moveTo(142 + i * 4.5, 96); g.quadraticCurveTo(160 + (i - 4) * 9, 50, 160 + (i - 4) * 7 + Math.sin(t * 0.02 + i) * 2, 18 + Math.abs(i - 4) * 6); g.stroke(); } g.lineWidth = 1;
+      for (let i = 0; i < 7; i++) { const x = 146 + rnd(i + 3) * 28, y = 30 + rnd(i * 5) * 56; glow(g, x, y, 5, 'rgba(255,74,90,0.5)'); R(g, x - 1, y - 1, 3, 3, '#ff4a5a'); }
+      person(g, 'queen', 160, 96, 1, t);
+    });
+    layer(g, c, 1, () => {
+      R(g, -30, 126, W + 60, 26, '#0a0308'); R(g, -30, 126, W + 60, 1, '#4a1226'); R(g, 100, 126, 120, 26, '#3a0a16'); R(g, 100, 126, 2, 26, '#e8c070'); R(g, 218, 126, 2, 26, '#e8c070');   // the carpet to the throne
+      const fall = strike;
+      g.save(); g.translate(204, 142); g.rotate(fall * 1.45); person(g, 'wren', 0, 0, -1, fall > 0 ? 0 : t); g.restore();
+      if (cue && cue.name === 'end' && ct > 120) {   // the last thorn: from the floor, through her
+        const k = ease((ct - 120) / 30);
+        g.strokeStyle = '#6a1c34'; g.lineWidth = 3; g.beginPath(); g.moveTo(236, 150); g.quadraticCurveTo(230, 140, 236 - 28 * k, 150 - 30 * k); g.stroke(); g.lineWidth = 1;
+        if (k >= 1 && fall < 0.5) { glow(g, 206, 120, 14, 'rgba(255,74,90,0.7)'); R(g, 204, 118, 4, 4, '#ff4a5a'); }
+      }
+      person(g, 'rowan', 60, 142, 1, t);   // free, and too late
+    });
+    drift(g, t, 18, ['#ff7a5a', '#ff4a5a', '#5a1830'], true, 71);
+    layer(g, c, 1.8, () => { vine(g, -4, 154, 110, 3, t, '#05020a', null); vine(g, 324, 154, 120, 5, t, '#05020a', null); vine(g, 20, 154, 60, 8, t, '#05020a', null); });
+    if (strike > 0) { g.fillStyle = 'rgba(0,0,0,' + Math.min(0.85, ease((ct - 230) / 80)) + ')'; g.fillRect(0, 0, W, H); }
+  };
+
   // every older scene gets the finish too
   for (const id of ['rooftop', 'window', 'spring', 'city', 'peak', 'fire', 'vision', 'garden', 'thorns', 'cell', 'trials']) { const f = C[id]; if (f) C[id] = function (g, t, cue) { f(g, t, cue); C.post(g, t); }; }
   const ds = C.drawStatic; C.drawStatic = function (g, id, t) { ds(g, id, t); C.post(g, t); };

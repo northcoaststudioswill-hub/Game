@@ -10,7 +10,7 @@
       facing: 1, grounded: false, wasGrounded: false,
       coyote: 0, jumpBuf: 0, dashBuf: 0, atkBuf: 0,
       airJumps: 1, airDashes: 1, rising: false,
-      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, bowCd: 0, bowT: 0, pips: SH.stars.maxPips(), giftCd: 0, castT: 0, giftBuf: 0, charging: false, chargeT: 0, hitFlash: 0,
+      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, guard: 0, guardCd: 0, parryT: 0, upBuf: 0, bowCd: 0, bowT: 0, pips: SH.stars.maxPips(), giftCd: 0, castT: 0, giftBuf: 0, charging: false, chargeT: 0, hitFlash: 0,
       invuln: 0, stun: 0,
       swing: null, comboStep: 0, comboKind: null, comboGap: 0,
       hearts: SH.stars.maxHearts(), maxHearts: SH.stars.maxHearts(),
@@ -39,7 +39,8 @@
     // ---- buffers
     if (inp.pressed.jump) this.jumpBuf = t.jumpBufferFrames; else if (this.jumpBuf > 0) this.jumpBuf--;
     if (inp.pressed.dash) this.dashBuf = 6; else if (this.dashBuf > 0) this.dashBuf--;
-    if (inp.pressed.attack || inp.pressed.downstrike) this.atkBuf = C.attackBuffer; else if (this.atkBuf > 0) this.atkBuf--;
+    if (inp.pressed.upstrike) this.upBuf = 8; else if (this.upBuf > 0) this.upBuf--;
+    if (inp.pressed.attack || inp.pressed.upstrike || (inp.pressed.downstrike && !this.grounded)) this.atkBuf = C.attackBuffer; else if (this.atkBuf > 0) this.atkBuf--;
     if (this.dashCd > 0) this.dashCd--;
     if (this.bowCd > 0) this.bowCd--;
     if (this.bowT > 0) this.bowT--;
@@ -154,6 +155,13 @@
       this.vy = Math.min(this.vy + t.gravityDown, t.maxFall);
     }
 
+    // ---- guard: hold down on the ground. Blows from the front are stopped; raising it just in time is a parry.
+    if (this.guardCd > 0) this.guardCd--;
+    if (this.parryT > 0) this.parryT--;
+    { const want = SH.game.can('daggers') && this.grounded && !this.swing && this.dashT <= 0 && !stunned && this.guardCd <= 0 && this.groundTile !== SH.T_ONEWAY
+        && (inp.held.downstrike || (inp.held.down && !inp.held.left && !inp.held.right));
+      if (want) { if (!this.guard) { this.autoFace(world, 150); SH.sfx.play('move'); } this.guard = (this.guard || 0) + 1; this.vx = 0; }
+      else this.guard = 0; }
     // ---- attacks
     if (this.hitFlash > 0) this.hitFlash--;
     // Dash strike: attack during a dash
@@ -163,7 +171,7 @@
       this.dashT = Math.max(this.dashT, 7); this.iframes = Math.max(this.iframes, 9);
       SH.sfx.play('slash');
     }
-    if (!stunned && this.dashT <= 0) this.tryAttack(world, inp);
+    if (!stunned && this.dashT <= 0 && !this.guard) this.tryAttack(world, inp);
     if (this.swing) this.updateSwing(world);
 
     // ---- move and collide
@@ -192,7 +200,7 @@
       const TS = SH.TILE, room = world.room, ty = Math.floor(this.y / TS);
       const l = Math.floor((this.x - 10) / TS), r = Math.floor((this.x + 10) / TS);
       let ok = SH.isSolid(room.get(l, ty)) && SH.isSolid(room.get(r, ty));
-      for (let tx = l - 1; tx <= r + 1 && ok; tx++) if (room.get(tx, ty - 1) === SH.T_THORNS) ok = false;
+      for (let tx = l - 1; tx <= r + 1 && ok; tx++) if (room.get(tx, ty - 1) === SH.T_THORNS || room.get(tx, ty) === SH.T_THORNS) ok = false;
       if (ok) { this.lastSafe.x = this.x; this.lastSafe.y = this.y; }
     }
 
@@ -257,8 +265,15 @@
       } else step = (this.comboKind === kind && this.comboGap > 0 && this.comboStep < list.length) ? this.comboStep : 0;
     }
     if (this.swing && kind === 'pogo') return;
-    // Rising strike: up + attack on the ground
-    if (kind === 'ground' && inp.held.up && !this.swing) {
+    // Rising strike: up + attack. From the ground it carries her into the air; in the air it is a cut straight up.
+    if (kind !== 'pogo' && (inp.held.up || this.upBuf > 0) && !this.swing && !this.grounded) {
+      this.atkBuf = 0; this.upBuf = 0; this.comboStep = 0; this.comboKind = 'up';
+      this.swing = { kind: 'up', step: 0, def: C.up, f: 0, hits: new Set() };
+      if (this.vy > -3) this.vy = -3;
+      SH.sfx.play('slash');
+      return;
+    }
+    if (kind === 'ground' && (inp.held.up || this.upBuf > 0) && !this.swing) { this.upBuf = 0;
       this.atkBuf = 0; this.comboStep = 0; this.comboKind = 'up';
       const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
       this.swing = { kind: 'up', step: 0, def: C.up, f: 0, hits: new Set() };
@@ -311,7 +326,7 @@
         if (s.hits.has(tgt) || !tgt.hittable()) continue;
         if (!SH.overlap(hb, tgt.hurtBox())) continue;
         s.hits.add(tgt);
-        const open = SH.arts.opening > 0;
+        const open = SH.arts.opening > 0 || this.parryT > 0;
         const r = tgt.takeHit({ dmg: (d.dmg || C.damage) + (open ? 1 : 0) + (d.finisher ? SH.stars.level('edge') : 0), kb: d.kb, dir: this.facing, finisher: !!d.finisher, pogo: s.kind === 'pogo', launch: d.launch || 0, open, move: s.kind }, world);
         if (!r) continue;
         if (r.deflect) continue;
@@ -354,6 +369,17 @@
     if (this.dead || this.invuln > 0 || SH.arts.cutin || SH.arts.scene) return false;   // nothing touches her mid Bond Art
     if (this.iframes > 0) return false;
     const fx = SH.fx;
+    if (this.guard > 0 && fromX != null && (fromX - this.x) * this.facing >= -6) {   // guarding, and the blow is from the front
+      const parry = this.guard <= 14;
+      this.invuln = parry ? 50 : 28; this.vx = -this.facing * (parry ? 1.5 : 4.5);
+      fx.ring(this.x + this.facing * 12, this.y - 24, parry ? '#fff6d8' : '#9fc8ff', parry ? 40 : 26, 16, 2);
+      fx.burst(this.x + this.facing * 14, this.y - 24, parry ? 16 : 8, { speed: 3, life: 18, colors: ['#ffffff', '#ffd27a', '#9fc8ff'], glow: true });
+      fx.word(this.x, this.y - 64, parry ? 'PARRY' : 'BLOCKED', parry ? '#ffd27a' : '#9fc8ff', 70);
+      SH.sfx.play(parry ? 'chime' : 'thud'); fx.kick(parry ? 4 : 2);
+      if (parry) { this.parryT = 80; fx.stop(6); SH.arts.gain(12); } else { this.guardCd = 36; this.guard = 0; }
+      const gw2 = SH.game.world; if (gw2 && gw2.onGuard) gw2.onGuard(parry);
+      return false;
+    }
     { const gw = SH.game.world;   // Bram, heart 2: his shield takes the first blow in each place
       if (gw && !gw.bramUsed && SH.game.boon('bram')) { gw.bramUsed = true; this.invuln = SH.PLAYER.hurtInvuln; fx.word(this.x, this.y - 64, 'BRAM\'S SHIELD', '#ffd27a', 90); fx.ring(this.x, this.y - 22, '#ffd27a', 34, 16, 2); SH.sfx.play('thud'); return false; } }
     this.hearts = Math.max(0, this.hearts - dmg);

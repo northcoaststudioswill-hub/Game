@@ -100,7 +100,7 @@
       dropRocks(n, at) {
         for (let i = 0; i < n; i++) this.rocks.push({ x: at != null ? at + (i - (n - 1) / 2) * 30 : player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
       },
-      onBossDown() { const b = this.things.find(e => e.boss); if (b) G.look(b.x, b.y - 30, 1.5, 110); fx.slowmo = 70; SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
+      onBossDown() { const b = this.things.find(e => e.boss); if (b) G.look(b.x, b.y - 30, 1.5, 110); fx.slowmo = 90; SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); this.victoryT = 1; this.victoryAt = b ? { x: b.x, y: b.y - 30 } : null; this.rocks = []; this.waves = []; },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       // the Winter Woods
       onPickup(what) {
@@ -117,6 +117,8 @@
       onTarget(tg) { SH.xp.gain(4, true); if (tg && tg.blade) { G.flags.n_rings = (G.flags.n_rings || 0) + 1; if (G.flags.n_rings === 3) G.queueScript('ring_rings'); return; } G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
       onWolf(what) { if (what === 'killed' || what === 'spared') SH.xp.gain(15, true); G.queueScript('woods_wolf_' + what); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
+      onDummyMove(m) { if (G.activeGoal === 'rise' && m === 'up') G.queueScript('ring_rise'); else if (G.activeGoal === 'lunge' && m === 'thrust') G.queueScript('ring_lunge'); },
+      onGuard(parry) { if (G.activeGoal === 'guard') G.queueScript('ring_guard'); },
     };
     G.world = w;
     G.explainWait = Math.max(G.explainWait || 0, 60 * 12);   // let a new place be looked at first
@@ -298,6 +300,7 @@
       case 'remember': G.remember(st.key, st.text, st.good); break;
       case 'starlight': SH.xp.gain(15); G.progress.bonus = (G.progress.bonus || 0) + st.n; G.hud.toast('\u2726 +' + st.n + ' Starlight: ' + st.why); SH.sfx.play('lantern'); G.save(); break;
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
+      case 'explain': G.explain(st.key); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); if (st.name === 'giftgot') G.explain('moons'); break;
       case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
       case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
@@ -423,6 +426,7 @@
     if (G.mode) { if (G.state === 'talk' || G.state === 'play') G.progress.playFrames = (G.progress.playFrames || 0) + 1; SH.modes.step(input); return; }
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
     G.effectStep();
+    if (w.victoryT) G.victoryStep();
     if (w.time % 90 === 45 && G.state === 'play' && !G.noExplain) G.loreCheck();
     if (G.state === 'play' && (G.explainWait || 0) > 0) G.explainWait--;
     if (G.state === 'talk') G.explainWait = Math.max(G.explainWait || 0, 60 * 6);   // and never the moment a conversation ends
@@ -668,6 +672,23 @@
     G.snapCamera();
     w.fade = 0.7;
     fx.word(p.x, p.y - 52, kind === 'thorns' ? 'ouch: thorns' : 'fell', '#ff9aa8', 40);
+  };
+
+  // The Old Wyrm is down. Hold the moment: its light pours into Wren, her hearts fill, the hollow goes quiet. Then the story moves.
+  G.victoryStep = function () {
+    const w = G.world, p = w.player, t = w.victoryT++, at = w.victoryAt || p;
+    p.invuln = 30;
+    if (t === 40) { SH.sfx.play('chime'); G.look(at.x, at.y, 1.25, 150); }
+    if (t > 40 && t < 200 && t % 3 === 0) {   // starlight leaves the beast and finds her
+      const a = Math.random() * 6.28, r = 20 + Math.random() * 50, sx = at.x + Math.cos(a) * r, sy = at.y + Math.sin(a) * r * 0.5, k = 26;
+      fx.parts.push({ x: sx, y: sy, vx: (p.x - sx) / k, vy: (p.y - 26 - sy) / k, g: 0, drag: 1, life: k, max: k, size: 3, color: t % 2 ? '#ffd27a' : '#fff6d8', glow: true, shape: 'sq' });
+    }
+    if (t > 60 && t < 200 && t % 28 === 0) { fx.ring(p.x, p.y - 24, '#ffd27a', 30 + (t % 3) * 8, 22, 2); if (p.hearts < p.maxHearts) { p.hearts++; SH.sfx.play('heart'); } }
+    if (t === 120) { fx.word(p.x, p.y - 70, 'THE HOLLOW IS QUIET', '#fff6d8', 150); SH.arts.whisper('bossWon', true); }
+    if (t === 215) SH.xp.gain(40, true);
+    if (t === 210) { SH.sfx.play('lantern'); fx.burst(p.x, p.y - 24, 40, { speed: 3.4, life: 50, gravity: -0.03, colors: ['#ffd27a', '#fff6d8', '#b9a8ff'], glow: true }); G.look(p.x, p.y - 30, 1.4, 90); }
+    if (t > 270) w.fade = Math.min(1, (t - 270) / 40);
+    if (t >= 315) { w.victoryT = 0; G.queueScript('mtn_peak'); }
   };
 
   G.caught = function () {

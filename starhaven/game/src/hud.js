@@ -97,7 +97,7 @@
   };
   H.typeTick = function () {
     const before = Math.floor(typed);
-    typed = Math.min(full.length, typed + (SPEED[SH.settings.textSpeed] || 1.4));
+    typed = Math.min(full.length, typed + (SPEED[SH.settings.textSpeed] || 1.4) * (typingNarr ? 1.6 : 1));   // narration has no voice to keep pace with
     $('d-text').textContent = full.slice(0, Math.floor(typed));
     if (!typingNarr && Math.floor(typed) > before && Math.floor(typed) % 3 === 0) SH.sfx.play('blip');
     $('dialog').classList.toggle('typing', typed < full.length);
@@ -246,6 +246,7 @@
     const G = SH.game;
     $('b-dash').style.display = G.can('dash') ? '' : 'none';
     $('b-down').style.display = G.can('daggers') ? '' : 'none';
+    $('b-up').style.display = G.can('daggers') ? '' : 'none';
     $('b-attack').textContent = G.can('daggers') ? 'STRIKE' : 'SHOOT';
     $('b-gift').style.display = G.can('flame') ? 'flex' : 'none';
     $('pips').style.display = G.can('flame') ? 'flex' : 'none';

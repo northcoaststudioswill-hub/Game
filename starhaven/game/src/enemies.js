@@ -113,6 +113,20 @@
     this.tiltV += -this.tilt * 0.12; this.tiltV *= 0.86; this.tilt += this.tiltV;
     if (this.flash > 0) this.flash--;
     if (this.comboT > 0) this.comboT--; else this.combo = 0;
+    // Bram's guard lesson: the dummy's arm swings round. Guard it. It never hurts.
+    const G = SH.game, w = G.world, p = w && w.player;
+    if (G.activeGoal === 'guard' && p && G.state === 'play') {
+      this.armT = (this.armT || 0) + 1;
+      if (this.armT === 70) { this.flash = 14; SH.fx.word(this.x, this.y - this.h - 12, 'swinging...', '#ffb057', 40); }
+      if (this.armT >= 110) {
+        this.armT = 0; this.tiltV += (p.x < this.x ? -1 : 1) * 0.3; SH.sfx.play('slash');
+        if (Math.abs(p.x - this.x) < 64 && Math.abs(p.y - this.y) < 40) {
+          const g0 = p.guard > 0; p.invuln = 0;
+          if (g0 && (this.x - p.x) * p.facing >= -6) p.hurt(this.x, 0, w);
+          else { p.vx = (p.x < this.x ? -1 : 1) * 4; SH.fx.word(p.x, p.y - 60, 'bonk', '#ffffff', 40); p.invuln = 20; }
+        }
+      }
+    } else this.armT = 0;
   };
   Dummy.prototype.takeHit = function (hit, world) {
     this.tiltV += hit.dir * (hit.finisher ? 0.22 : 0.1);
@@ -123,6 +137,7 @@
     SH.fx.burst(this.x - hit.dir * 4, this.y - this.h * 0.6, 6, { angle: hit.dir > 0 ? 0 : Math.PI, spread: 1.2, speed: 2, life: 18, colors: ['#e8c77a', '#b8924a', '#fff2c9'] });
     if (hit.finisher) SH.fx.ring(this.x, this.y - this.h * 0.6, '#ffd27a', 24, 14, 2);
     if (hit.finisher && this.combo >= 3 && world && world.onDummyCombo) world.onDummyCombo();
+    if (world && world.onDummyMove && hit.move) world.onDummyMove(hit.move);
     return { landed: true, killed: false };
   };
 

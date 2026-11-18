@@ -274,7 +274,7 @@ body[data-input="touch"] #touch { display: block; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
-body[data-mode] #hud, body[data-mode] #pause-btn, body[data-mode] #b-attack, body[data-mode] #b-dash, body[data-mode] #b-down, body[data-mode] #b-gift, body[data-mode] #b-art, body[data-mode] #b-talk, body[data-mode] #whisper, body[data-mode] #dialog { display: none !important; }
+body[data-mode] #hud, body[data-mode] #pause-btn, body[data-mode] #b-attack, body[data-mode] #b-dash, body[data-mode] #b-down, body[data-mode] #b-up, body[data-mode] #b-gift, body[data-mode] #b-art, body[data-mode] #b-talk, body[data-mode] #whisper, body[data-mode] #dialog { display: none !important; }
 body[data-mode="flight"] #b-jump, body[data-mode="mural"] #b-jump { display: none !important; }
 body.cutin #touch, body.cutin #bossbar, body.cutin #sign, body.cutin #goal, body.cutin #whisper, body.cutin #pause-btn, body.cutin #motes, body.cutin #pips, body.cutin #hearts, body.cutin #art { visibility: hidden; }
 /* ---- held upright: the picture on top, a control deck below (no need to turn the phone) */
@@ -490,6 +490,14 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
 #journal .goals.road li { font-size: 15px; line-height: 22px; }
 #end #e-sum ul { margin: 2px 0 8px; padding-left: 18px; }
 body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   /* nothing floats over the open book */
+
+/* ---- rising strike button, beside the down button; narration reads upright */
+#b-up { width: 58px; height: 58px; right: calc(max(24px, env(safe-area-inset-right)) + 262px); bottom: 33px; font-size: 20px; }
+body.upright #b-up { right: calc(max(24px, env(safe-area-inset-right)) + 194px); bottom: calc(12vh + 72px); }
+body.upright #b-gift { bottom: calc(12vh + 142px); }
+#dialog.narr #d-text { font-family: 'IM Fell English', Georgia, serif; font-style: normal; font-size: 18px; letter-spacing: 0; color: #f6f1ff; }
+#film-cap { font-style: normal; }
+#whisper span { font-style: normal; }
 </style>
 </head>
 <body>
@@ -514,7 +522,8 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
   <div class="tbtn" id="b-talk" data-act="up">TALK</div>
   <div class="tbtn" id="b-gift" data-act="gift">FLAME</div>
   <div class="tbtn" id="b-art" data-act="art">BOND<br>ART</div>
-  <div class="tbtn" id="b-down" data-act="downstrike" aria-label="Strike down">&#9660;</div>
+  <div class="tbtn" id="b-down" data-act="downstrike" aria-label="Strike down in the air, guard on the ground">&#9660;</div>
+  <div class="tbtn" id="b-up" data-act="upstrike" aria-label="Rising strike">&#9650;</div>
   <div class="tbtn" id="b-dash" data-act="dash">DASH</div>
   <div class="tbtn" id="b-attack" data-act="attack">STRIKE</div>
   <div class="tbtn" id="b-jump" data-act="jump">JUMP</div>
@@ -547,7 +556,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.4 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.5 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -710,9 +719,9 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
   SH.PLAYER = {
     w: 14, h: 38,
     hearts: 5,
-    hurtInvuln: 70,   // frames of flicker after a hit
+    hurtInvuln: 115,   // frames of flicker after a hit
     hurtStun: 14,     // frames you can't act after a hit
-    hazardInvuln: 60,
+    hazardInvuln: 95,
   };
 
   // Daggers. active = [first, last] frame the blade can hit.
@@ -793,6 +802,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
     starlight: { icon: '\u2726', title: 'Starlight', text: 'The gold motes in every level. The counter beside MENU shows how many this level holds. Spend Starlight in the pause menu, under Constellation, on more hearts and stronger Bond Arts.' },
     lantern: { icon: '\u2600', title: 'Lanterns', text: 'Lighting a lantern fills your hearts. If Wren is knocked out she comes back at the last one she lit, with nothing lost.' },
     bonds: { icon: '\u2665', title: 'Bonds', text: 'What you say and do moves people toward you or away. A green card means closer, a red card means further, and the card says why. Each person has five hearts. A new heart plays a scene, gives Wren something real in a fight, and writes new pages in her journal. The journal shows what each heart gives and where each bond is heading.' },
+    moves: { icon: '\u2694', title: 'Wren\'s blades', text: 'Strike three times for a combo. Up and strike is a rising strike (and cuts straight up in the air). Strike during a dash is a lunge, her hardest hit. Down and strike in the air bounces her off what is below. Hold down on the ground to guard: blows from the front stop, and a guard raised at the last moment is a parry that leaves the enemy open. She cannot guard a fall or what is behind her.' },
     remember: { icon: '\u2726', title: 'This will be remembered', text: 'Some decisions change scenes later in the story. Green: someone is better for it. Red: it will cost her. Gold: it could go either way. They are listed in Wren\'s journal, under What Wren has done.' },
     bondbar: { icon: '\u263E', title: 'The bond bar and Bond Arts', text: 'The bar under your hearts fills as your hits land, faster for long unbroken strings. When it is full, a BOND ART button appears: a huge attack, with a memory. Nothing can hurt Wren while it plays.' },
     moons: { icon: '\u25CF', title: 'Moons and the Flame', text: 'Each Flame costs one moon. Hold the button and let go for a flame wave that costs two. Moons refill slowly by themselves, and quickly when your daggers land.' },
@@ -813,6 +823,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
     boss3: [['caelum', 'Nearly, Wren. Don\'t get greedy now.']],
     choke: [['caelum', 'Fire down its throat. I\'m stealing that.']],
     // Wren thinks out loud in a fight; it never stops the fight
+    bossWon: [['caelum', 'I felt that from the city. Breathe, Wren. It\'s done.']],
     bossStart: [['wren', 'It is a wyrmling the size of a house. I know what to do with wyrmlings.']],
     hurt: [['wren', 'That one was mine to dodge. Watch the shoulders, not the teeth.']],
     combo10: [['wren', 'Ten in a row. Nessa would say I am showing off. Nessa would be right.']],
@@ -875,7 +886,10 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       id: 'ch2', label: 'Chapter 2', name: 'The Five', room: 'ring',
       card: 'Spring\'s army gathers on Dusk\'s southern border, and the Iron King\'s creatures are testing the north. Caelum\'s inner circle, the Five, want to see what the reborn huntress can do.',
       goals: [
-        { id: 'combo', text: 'Show Bram your daggers on the training dummy' },
+        { id: 'combo', text: 'Three cuts in a row on the training dummy' },
+        { id: 'rise', text: 'Land a rising strike on the dummy' },
+        { id: 'lunge', text: 'Land a dash strike on the dummy' },
+        { id: 'guard', text: 'Stand by the dummy and guard its swing' },
         { id: 'pit', text: 'Cross Bram\'s thorn pit by bouncing on the buds' },
         { id: 'sprites', text: 'Clear the thorn sprites past the north gate', count: 3 },
         { id: 'report', text: 'Talk to Caelum when you are ready to leave' },
@@ -1306,8 +1320,30 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       { do: 'goal', id: 'combo' },
     ],
     ring_combo: [
-      ['bram', 'Not bad. Now my thorn pit.'],
-      ['bram', 'Jump toward the buds and strike down on them. Each bounce gives you your jumps back. Don\'t touch the floor.'],
+      ['bram', 'Not bad. That\'s one cut. A fight wants four.'],
+      ['bram', 'Second: the rising strike. Blade up, and let it carry you off the ground. It reaches what a level cut can\'t.'],
+      { do: 'flag', name: 'combo1' },
+      { do: 'goal', id: 'rise' },
+    ],
+    ring_rise: [
+      ['bram', 'There. Anything above you is no longer safe from you.'],
+      ['bram', 'Third: the lunge. Dash, and strike while you\'re still moving. It hits harder than anything else you have, and nothing can touch you on the way in.'],
+      { do: 'flag', name: 'rise' },
+      { do: 'goal', id: 'lunge' },
+    ],
+    ring_lunge: [
+      ['bram', 'Ha! That one I felt from here.'],
+      ['bram', 'Last, and the one that keeps you alive: your guard. Plant your feet and hold. A blow from the front stops on your blades.'],
+      ['bram', 'Raise it at the last moment and it\'s a parry: they\'re wide open, and your next cut bites deeper. The dummy\'s arm is about to come round. Stand close and stop it.'],
+      { do: 'flag', name: 'lunge' },
+      { do: 'goal', id: 'guard' },
+    ],
+    ring_guard: [
+      { do: 'flag', name: 'guard' },
+      { do: 'explain', key: 'moves' },
+      ['bram', 'Good. You can\'t guard what\'s behind you, and you can\'t guard a fall. Everything else, you can.'],
+      ['bram', 'Now my thorn pit.'],
+      ['bram', 'Jump toward the buds and strike down on them. Each bounce gives you your jumps back. Don\'t fall in.'],
       { do: 'flag', name: 'combo' },
       { do: 'goal', id: 'pit' },
       { do: 'gate', id: 'pitgate' },
@@ -1821,11 +1857,11 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       ['ground', 45, 66, 16],
       ['solid', 54, 61, 11, 16],        // the wall: needs a double jump
       ['ground', 76, 104, 16],          // 10-tile gap before this: jump, jump, dash
-      ['thorns', 85, 88, 15],           // first thorns: 3 tiles, one plain jump
+      ['thorns', 85, 88, 16],           // first thorns: 3 tiles sunk into the floor, one plain jump
       ['ground', 107, 118, 16],         // the chase
       ['ground', 118, 126, 14],
       ['ground', 130, 148, 16],
-      ['thorns', 137, 140, 15],
+      ['thorns', 137, 140, 16],
       ['solid', 148, 150, 0, 20],
     ],
     hints: [
@@ -1913,7 +1949,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       ['solid', 0, 2, 0, 20],
       ['ground', 2, 41, 16],
       ['ground', 41, 60, 16],           // Bram's thorn pit
-      ['thorns', 42, 59, 15],
+      ['thorns', 42, 59, 16],             // sunk into the floor: you fall in, you cannot walk into them
       ['oneway', 47, 49, 14],            // somewhere to land between buds
       ['oneway', 52, 54, 14],
       ['ground', 60, 148, 16],
@@ -1921,10 +1957,13 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       ['solid', 148, 150, 0, 20],
     ],
     hints: [
-      { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
-      { x0: 26, x1: 36, text: 'Bram\'s rings. Cut all three: the low one from the ground, the middle one with a rising strike (hold up and {ATTACK}), the high one from a jump.', until: 'rings3' },
+      { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.', until: 'combo1' },
+      { x0: 14, x1: 32, text: 'Rising strike: {UPSTRIKE}, next to the dummy.', flag: 'combo1', until: 'rise' },
+      { x0: 14, x1: 32, text: 'Dash strike: {DASH} toward the dummy, then {ATTACK} while you are still moving.', flag: 'rise', until: 'lunge' },
+      { x0: 14, x1: 32, text: 'Guard: stand beside the dummy, face it, and {GUARD} when it says "swinging".', flag: 'lunge', until: 'guard' },
+      { x0: 26, x1: 36, text: 'Bram\'s rings. Cut all three: the low one from the ground, the middle one with a rising strike ({UPSTRIKE}), the high one from a jump.', until: 'rings3' },
       { x0: 36, x1: 60, text: 'Jump onto a bud and it bounces you (strike down with {DOWNSTRIKE} for a higher bounce). Land on the planks between them and take them one at a time.', flag: 'combo', until: 'pit' },
-      { x0: 61, x1: 69, text: 'Two more cuts: {ATTACK} during a dash is a lunging dash strike. Hold up and {ATTACK} for a rising strike that carries you into the air.', flag: 'pit' },
+      { x0: 61, x1: 69, text: 'Remember the four: combo, rising strike ({UPSTRIKE}), dash strike ({DASH} then {ATTACK}), and guard ({GUARD}).', flag: 'pit' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
     ],
     triggers: [
@@ -2066,7 +2105,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
 // Starhaven — input. Keyboard, gamepad and touch all feed the same actions.
 // held[a]: is it down right now. pressed[a]: was it pressed since the last game frame.
 (function (SH) {
-  const ACTIONS = ['left', 'right', 'up', 'down', 'jump', 'attack', 'dash', 'pause', 'downstrike', 'gift', 'art'];
+  const ACTIONS = ['left', 'right', 'up', 'down', 'jump', 'attack', 'dash', 'pause', 'downstrike', 'gift', 'art', 'upstrike'];
   const KEYS = {
     ArrowLeft: 'left', KeyA: 'left',
     ArrowRight: 'right', KeyD: 'right',
@@ -2225,9 +2264,9 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
 
   // Button names shown in signs, per input type.
   input.LABELS = {
-    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', SHOOT: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J', GIFT: 'F (or Q)' },
-    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'tap the \u25BC button', GIFT: 'the FLAME button' },
-    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', SHOOT: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X', GIFT: 'LB (left bumper)' },
+    kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', SHOOT: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J', GIFT: 'F (or Q)', UPSTRIKE: 'hold W and press J', GUARD: 'hold S' },
+    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'tap the \u25BC button', GIFT: 'the FLAME button', UPSTRIKE: 'the \u25B2 button', GUARD: 'hold the \u25BC button' },
+    pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', SHOOT: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X', GIFT: 'LB (left bumper)', UPSTRIKE: 'hold up and press X', GUARD: 'hold down' },
   };
   input.fill = function (text) {
     const L = input.LABELS[input.source] || input.LABELS.kb;
@@ -2578,7 +2617,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       facing: 1, grounded: false, wasGrounded: false,
       coyote: 0, jumpBuf: 0, dashBuf: 0, atkBuf: 0,
       airJumps: 1, airDashes: 1, rising: false,
-      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, bowCd: 0, bowT: 0, pips: SH.stars.maxPips(), giftCd: 0, castT: 0, giftBuf: 0, charging: false, chargeT: 0, hitFlash: 0,
+      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, guard: 0, guardCd: 0, parryT: 0, upBuf: 0, bowCd: 0, bowT: 0, pips: SH.stars.maxPips(), giftCd: 0, castT: 0, giftBuf: 0, charging: false, chargeT: 0, hitFlash: 0,
       invuln: 0, stun: 0,
       swing: null, comboStep: 0, comboKind: null, comboGap: 0,
       hearts: SH.stars.maxHearts(), maxHearts: SH.stars.maxHearts(),
@@ -2607,7 +2646,8 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
     // ---- buffers
     if (inp.pressed.jump) this.jumpBuf = t.jumpBufferFrames; else if (this.jumpBuf > 0) this.jumpBuf--;
     if (inp.pressed.dash) this.dashBuf = 6; else if (this.dashBuf > 0) this.dashBuf--;
-    if (inp.pressed.attack || inp.pressed.downstrike) this.atkBuf = C.attackBuffer; else if (this.atkBuf > 0) this.atkBuf--;
+    if (inp.pressed.upstrike) this.upBuf = 8; else if (this.upBuf > 0) this.upBuf--;
+    if (inp.pressed.attack || inp.pressed.upstrike || (inp.pressed.downstrike && !this.grounded)) this.atkBuf = C.attackBuffer; else if (this.atkBuf > 0) this.atkBuf--;
     if (this.dashCd > 0) this.dashCd--;
     if (this.bowCd > 0) this.bowCd--;
     if (this.bowT > 0) this.bowT--;
@@ -2722,6 +2762,13 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       this.vy = Math.min(this.vy + t.gravityDown, t.maxFall);
     }
 
+    // ---- guard: hold down on the ground. Blows from the front are stopped; raising it just in time is a parry.
+    if (this.guardCd > 0) this.guardCd--;
+    if (this.parryT > 0) this.parryT--;
+    { const want = SH.game.can('daggers') && this.grounded && !this.swing && this.dashT <= 0 && !stunned && this.guardCd <= 0 && this.groundTile !== SH.T_ONEWAY
+        && (inp.held.downstrike || (inp.held.down && !inp.held.left && !inp.held.right));
+      if (want) { if (!this.guard) { this.autoFace(world, 150); SH.sfx.play('move'); } this.guard = (this.guard || 0) + 1; this.vx = 0; }
+      else this.guard = 0; }
     // ---- attacks
     if (this.hitFlash > 0) this.hitFlash--;
     // Dash strike: attack during a dash
@@ -2731,7 +2778,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       this.dashT = Math.max(this.dashT, 7); this.iframes = Math.max(this.iframes, 9);
       SH.sfx.play('slash');
     }
-    if (!stunned && this.dashT <= 0) this.tryAttack(world, inp);
+    if (!stunned && this.dashT <= 0 && !this.guard) this.tryAttack(world, inp);
     if (this.swing) this.updateSwing(world);
 
     // ---- move and collide
@@ -2760,7 +2807,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       const TS = SH.TILE, room = world.room, ty = Math.floor(this.y / TS);
       const l = Math.floor((this.x - 10) / TS), r = Math.floor((this.x + 10) / TS);
       let ok = SH.isSolid(room.get(l, ty)) && SH.isSolid(room.get(r, ty));
-      for (let tx = l - 1; tx <= r + 1 && ok; tx++) if (room.get(tx, ty - 1) === SH.T_THORNS) ok = false;
+      for (let tx = l - 1; tx <= r + 1 && ok; tx++) if (room.get(tx, ty - 1) === SH.T_THORNS || room.get(tx, ty) === SH.T_THORNS) ok = false;
       if (ok) { this.lastSafe.x = this.x; this.lastSafe.y = this.y; }
     }
 
@@ -2825,8 +2872,15 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       } else step = (this.comboKind === kind && this.comboGap > 0 && this.comboStep < list.length) ? this.comboStep : 0;
     }
     if (this.swing && kind === 'pogo') return;
-    // Rising strike: up + attack on the ground
-    if (kind === 'ground' && inp.held.up && !this.swing) {
+    // Rising strike: up + attack. From the ground it carries her into the air; in the air it is a cut straight up.
+    if (kind !== 'pogo' && (inp.held.up || this.upBuf > 0) && !this.swing && !this.grounded) {
+      this.atkBuf = 0; this.upBuf = 0; this.comboStep = 0; this.comboKind = 'up';
+      this.swing = { kind: 'up', step: 0, def: C.up, f: 0, hits: new Set() };
+      if (this.vy > -3) this.vy = -3;
+      SH.sfx.play('slash');
+      return;
+    }
+    if (kind === 'ground' && (inp.held.up || this.upBuf > 0) && !this.swing) { this.upBuf = 0;
       this.atkBuf = 0; this.comboStep = 0; this.comboKind = 'up';
       const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
       this.swing = { kind: 'up', step: 0, def: C.up, f: 0, hits: new Set() };
@@ -2879,7 +2933,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
         if (s.hits.has(tgt) || !tgt.hittable()) continue;
         if (!SH.overlap(hb, tgt.hurtBox())) continue;
         s.hits.add(tgt);
-        const open = SH.arts.opening > 0;
+        const open = SH.arts.opening > 0 || this.parryT > 0;
         const r = tgt.takeHit({ dmg: (d.dmg || C.damage) + (open ? 1 : 0) + (d.finisher ? SH.stars.level('edge') : 0), kb: d.kb, dir: this.facing, finisher: !!d.finisher, pogo: s.kind === 'pogo', launch: d.launch || 0, open, move: s.kind }, world);
         if (!r) continue;
         if (r.deflect) continue;
@@ -2922,6 +2976,17 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
     if (this.dead || this.invuln > 0 || SH.arts.cutin || SH.arts.scene) return false;   // nothing touches her mid Bond Art
     if (this.iframes > 0) return false;
     const fx = SH.fx;
+    if (this.guard > 0 && fromX != null && (fromX - this.x) * this.facing >= -6) {   // guarding, and the blow is from the front
+      const parry = this.guard <= 14;
+      this.invuln = parry ? 50 : 28; this.vx = -this.facing * (parry ? 1.5 : 4.5);
+      fx.ring(this.x + this.facing * 12, this.y - 24, parry ? '#fff6d8' : '#9fc8ff', parry ? 40 : 26, 16, 2);
+      fx.burst(this.x + this.facing * 14, this.y - 24, parry ? 16 : 8, { speed: 3, life: 18, colors: ['#ffffff', '#ffd27a', '#9fc8ff'], glow: true });
+      fx.word(this.x, this.y - 64, parry ? 'PARRY' : 'BLOCKED', parry ? '#ffd27a' : '#9fc8ff', 70);
+      SH.sfx.play(parry ? 'chime' : 'thud'); fx.kick(parry ? 4 : 2);
+      if (parry) { this.parryT = 80; fx.stop(6); SH.arts.gain(12); } else { this.guardCd = 36; this.guard = 0; }
+      const gw2 = SH.game.world; if (gw2 && gw2.onGuard) gw2.onGuard(parry);
+      return false;
+    }
     { const gw = SH.game.world;   // Bram, heart 2: his shield takes the first blow in each place
       if (gw && !gw.bramUsed && SH.game.boon('bram')) { gw.bramUsed = true; this.invuln = SH.PLAYER.hurtInvuln; fx.word(this.x, this.y - 64, 'BRAM\'S SHIELD', '#ffd27a', 90); fx.ring(this.x, this.y - 22, '#ffd27a', 34, 16, 2); SH.sfx.play('thud'); return false; } }
     this.hearts = Math.max(0, this.hearts - dmg);
@@ -3071,6 +3136,20 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
     this.tiltV += -this.tilt * 0.12; this.tiltV *= 0.86; this.tilt += this.tiltV;
     if (this.flash > 0) this.flash--;
     if (this.comboT > 0) this.comboT--; else this.combo = 0;
+    // Bram's guard lesson: the dummy's arm swings round. Guard it. It never hurts.
+    const G = SH.game, w = G.world, p = w && w.player;
+    if (G.activeGoal === 'guard' && p && G.state === 'play') {
+      this.armT = (this.armT || 0) + 1;
+      if (this.armT === 70) { this.flash = 14; SH.fx.word(this.x, this.y - this.h - 12, 'swinging...', '#ffb057', 40); }
+      if (this.armT >= 110) {
+        this.armT = 0; this.tiltV += (p.x < this.x ? -1 : 1) * 0.3; SH.sfx.play('slash');
+        if (Math.abs(p.x - this.x) < 64 && Math.abs(p.y - this.y) < 40) {
+          const g0 = p.guard > 0; p.invuln = 0;
+          if (g0 && (this.x - p.x) * p.facing >= -6) p.hurt(this.x, 0, w);
+          else { p.vx = (p.x < this.x ? -1 : 1) * 4; SH.fx.word(p.x, p.y - 60, 'bonk', '#ffffff', 40); p.invuln = 20; }
+        }
+      }
+    } else this.armT = 0;
   };
   Dummy.prototype.takeHit = function (hit, world) {
     this.tiltV += hit.dir * (hit.finisher ? 0.22 : 0.1);
@@ -3081,6 +3160,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
     SH.fx.burst(this.x - hit.dir * 4, this.y - this.h * 0.6, 6, { angle: hit.dir > 0 ? 0 : Math.PI, spread: 1.2, speed: 2, life: 18, colors: ['#e8c77a', '#b8924a', '#fff2c9'] });
     if (hit.finisher) SH.fx.ring(this.x, this.y - this.h * 0.6, '#ffd27a', 24, 14, 2);
     if (hit.finisher && this.combo >= 3 && world && world.onDummyCombo) world.onDummyCombo();
+    if (world && world.onDummyMove && hit.move) world.onDummyMove(hit.move);
     return { landed: true, killed: false };
   };
 
@@ -4964,6 +5044,155 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
     C.post(g, t);
   };
 
+  // a thorn vine: grows from (x0, base) by `len`, swaying; buds glow at its tip and along it
+  function vine(g, x0, base, len, i, t, col, bud) {
+    g.strokeStyle = col; g.lineWidth = 3; g.beginPath(); g.moveTo(x0, base);
+    let x = x0, y = base;
+    for (let k = 0; k < len; k += 5) { x = x0 + Math.sin(k * 0.07 + i * 1.7) * (8 + k * 0.08) + Math.sin(t * 0.02 + i) * k * 0.03; y = base - k; g.lineTo(x, y); }
+    g.stroke(); g.lineWidth = 1;
+    for (let k = 12; k < len; k += 14) { const tx = x0 + Math.sin(k * 0.07 + i * 1.7) * (8 + k * 0.08), sd = k % 28 ? 1 : -1; g.fillStyle = col; g.beginPath(); g.moveTo(tx, base - k); g.lineTo(tx + sd * 6, base - k - 3); g.lineTo(tx, base - k - 4); g.fill(); }
+    if (len > 16 && bud) { glow(g, x, y, 9, 'rgba(255,74,90,0.5)'); R(g, x - 2, y - 2, 4, 4, bud); R(g, x - 1, y - 3, 2, 1, '#ffb0b8'); }
+  }
+
+  // ---------------------------------------------------------------- The Spring Court garden: she paints again, and he watches from the arch
+  C.garden = function (g, t) {
+    const c = cam(t);
+    sky(g, ['#ffe9c8', '#ffd2d8', '#f6b6cc', '#e89ab8']);
+    layer(g, c, 0.05, () => { glow(g, 232, 30, 80, 'rgba(255,246,216,0.8)'); g.fillStyle = '#fffbe8'; g.beginPath(); g.arc(232, 30, 11, 0, 6.3); g.fill(); });
+    layer(g, c, 0.18, () => {   // the manor, far off, rose-stone and gold
+      R(g, 30, 62, 90, 50, '#e8a8bc'); R(g, 22, 76, 14, 36, '#dc98b0'); R(g, 114, 70, 16, 42, '#dc98b0');
+      g.fillStyle = '#c87a98'; g.beginPath(); g.moveTo(26, 62); g.lineTo(75, 40); g.lineTo(124, 62); g.fill(); g.beginPath(); g.moveTo(20, 76); g.lineTo(29, 60); g.lineTo(38, 76); g.fill(); g.beginPath(); g.moveTo(112, 70); g.lineTo(122, 54); g.lineTo(132, 70); g.fill();
+      for (let i = 0; i < 5; i++) { R(g, 40 + i * 16, 72, 6, 12, '#fff2d8'); g.fillStyle = '#fff2d8'; g.beginPath(); g.arc(43 + i * 16, 72, 3, Math.PI, 0); g.fill(); }
+      g.fillStyle = '#d88aa8'; for (let i = -1; i < 8; i++) { g.beginPath(); g.arc(i * 52 + 14, 114, 30 + rnd(i) * 12, Math.PI, 0); g.fill(); }
+    });
+    layer(g, c, 0.4, () => {   // the garden wall she is never allowed past, with roses over it
+      R(g, -30, 86, W + 60, 30, '#f2dcd0'); R(g, -30, 84, W + 60, 3, '#fff6ea'); for (let i = -1; i < 12; i++) R(g, i * 30 + 6, 86, 1, 30, '#e2c4b8');
+      for (let i = 0; i < 46; i++) { const x = rnd(i + 5) * (W + 40) - 20, y = 84 + rnd(i * 3) * 22; R(g, x, y, 3, 3, i % 3 ? '#e85a84' : '#fff0f4'); R(g, x + 3, y + 1, 2, 2, '#5a9a4a'); }
+      R(g, 258, 60, 36, 56, '#f2dcd0'); g.fillStyle = '#b87a90'; g.beginPath(); g.moveTo(264, 116); g.lineTo(264, 80); g.quadraticCurveTo(276, 64, 288, 80); g.lineTo(288, 116); g.fill();   // the gate, shut
+      for (let i = 0; i < 4; i++) R(g, 266 + i * 6, 76, 1, 40, '#e8c070'); R(g, 264, 96, 24, 1, '#e8c070');
+    });
+    layer(g, c, 0.7, () => {   // cherry trees with real crowns
+      for (const [x, h, s] of [[40, 54, 1], [210, 60, 2], [300, 50, 3]]) {
+        g.strokeStyle = '#6a4234'; g.lineWidth = 5; g.beginPath(); g.moveTo(x, 124); g.quadraticCurveTo(x + 4, 124 - h * 0.5, x - 3, 124 - h); g.stroke();
+        g.lineWidth = 2; g.beginPath(); g.moveTo(x, 124 - h * 0.6); g.lineTo(x + 16, 124 - h * 0.9); g.moveTo(x, 124 - h * 0.7); g.lineTo(x - 15, 124 - h); g.stroke(); g.lineWidth = 1;
+        for (let k = 0; k < 16; k++) { const a = rnd(k + s * 9) * 6.3, r = rnd(k * 3 + s) * 22, sw = Math.sin(t * 0.02 + k + s) * 1.2; g.fillStyle = k % 3 === 0 ? '#ffd6e4' : k % 3 === 1 ? '#f7a4c2' : '#ee88ae'; g.beginPath(); g.arc(x - 2 + Math.cos(a) * r + sw, 124 - h - 6 + Math.sin(a) * r * 0.6, 8 + rnd(k) * 5, 0, 6.3); g.fill(); }
+      }
+    });
+    layer(g, c, 1, () => {
+      const lg = g.createLinearGradient(0, 122, 0, 150); lg.addColorStop(0, '#9ed488'); lg.addColorStop(1, '#5a9a58'); g.fillStyle = lg; g.fillRect(-30, 122, W + 60, 30); R(g, -30, 122, W + 60, 1, '#c8f0b0');
+      for (let i = 0; i < 60; i++) { const x = rnd(i + 70) * (W + 40) - 20; R(g, x, 123 + rnd(i * 2) * 24, 1, 3, '#7ab86a'); if (i % 4 === 0) R(g, x, 124 + rnd(i * 5) * 22, 2, 2, i % 8 ? '#fff0f4' : '#ffd27a'); }
+      // the easel: a night sky full of stars, growing stroke by stroke. She paints what she has never seen.
+      g.strokeStyle = '#7a5a3a'; g.lineWidth = 2; g.beginPath(); g.moveTo(150, 96); g.lineTo(143, 138); g.moveTo(172, 96); g.lineTo(179, 138); g.moveTo(161, 100); g.lineTo(161, 136); g.stroke(); g.lineWidth = 1;
+      R(g, 144, 88, 34, 30, '#5a4028'); R(g, 146, 90, 30, 26, '#fffaf0');
+      const n = Math.min(70, Math.floor(t / 5));
+      for (let i = 0; i < n; i++) { const px = 146 + rnd(i + 3) * 27, py = 90 + rnd(i * 3 + 1) * 24; R(g, px, py, 3 + (i % 2), 2, i < 44 ? (i % 3 ? '#1c1a4a' : '#2f2c6e') : i % 2 ? '#ffd27a' : '#fff6d8'); }
+      R(g, 138, 132, 8, 4, '#8a6a4a'); R(g, 139, 131, 2, 2, '#2f2c6e'); R(g, 142, 131, 2, 2, '#ffd27a'); R(g, 136, 131, 2, 2, '#e85a84');
+      person(g, 'wren', 128, 138, 1, t);
+      const by = Math.sin(t * 0.16) * 3; g.strokeStyle = '#5a4028'; g.lineWidth = 1; g.beginPath(); g.moveTo(136, 118); g.lineTo(145, 104 + by); g.stroke(); R(g, 145, 103 + by, 2, 2, n < 44 ? '#2f2c6e' : '#ffd27a');
+      person(g, 'rowan', 236, 138, -1, t);
+    });
+    drift(g, t, 26, ['#ff9ac0', '#ffffff', '#ffd6e4'], false, 12);
+    layer(g, c, 1.8, () => {   // close to the eye: a bough of blossom, and the bars of the gate she has not noticed yet
+      g.strokeStyle = '#3a1c2a'; g.lineWidth = 4; g.beginPath(); g.moveTo(-40, 6); g.quadraticCurveTo(40, 20, 110, 4); g.stroke(); g.lineWidth = 1;
+      for (let i = 0; i < 14; i++) { g.fillStyle = i % 2 ? '#ffb8d0' : '#ffe0ea'; g.beginPath(); g.arc(-20 + i * 9 + Math.sin(t * 0.02 + i), 12 + rnd(i) * 10, 5 + rnd(i * 3) * 3, 0, 6.3); g.fill(); }
+      for (let i = 0; i < 3; i++) R(g, 316 + i * 12, 0, 4, H, '#3a1c2a');
+    });
+  };
+
+  // ---------------------------------------------------------------- The Blight: her thorns climb the courts, and she watches from the mountain
+  C.thorns = function (g, t) {
+    const c = cam(t), grow = ease(t / 300);
+    sky(g, ['#12040c', '#3a0a18', '#7a1a26', '#c2452e']);
+    layer(g, c, 0.05, () => { glow(g, 160, 96, 110, 'rgba(255,90,70,0.35)'); for (let i = 0; i < 30; i++) { g.globalAlpha = 0.3 + 0.4 * Math.abs(Math.sin(t * 0.02 + i)); R(g, rnd(i + 2) * W, rnd(i * 3) * 60, 1, 1, '#ffb0a0'); } g.globalAlpha = 1; });
+    layer(g, c, 0.2, () => {   // the mountain, hollow, with one lit window near the top: hers
+      g.fillStyle = '#1a060e'; g.beginPath(); g.moveTo(40, 124); g.lineTo(120, 52); g.lineTo(146, 66); g.lineTo(170, 22); g.lineTo(198, 60); g.lineTo(226, 48); g.lineTo(290, 124); g.fill();
+      g.fillStyle = '#2a0a16'; g.beginPath(); g.moveTo(170, 22); g.lineTo(198, 60); g.lineTo(186, 74); g.lineTo(176, 52); g.fill();
+      const pk = 0.6 + 0.4 * Math.sin(t * 0.05); glow(g, 170, 48, 16 * pk, 'rgba(255,74,90,0.7)'); R(g, 168, 44, 4, 7, '#ff4a5a'); R(g, 169, 45, 2, 3, '#ffd0d0');
+      g.fillStyle = '#05020a'; g.beginPath(); g.moveTo(150, 124); g.lineTo(150, 104); g.quadraticCurveTo(170, 84, 190, 104); g.lineTo(190, 124); g.fill();   // the gate into the Deep
+    });
+    layer(g, c, 0.4, () => {   // a court on the plain below, its towers being taken
+      const towers = [[36, 30], [58, 44], [78, 26], [232, 38], [256, 50], [280, 30]];
+      for (const [x, h] of towers) { R(g, x, 122 - h, 12, h, '#2a0e1a'); g.fillStyle = '#2a0e1a'; g.beginPath(); g.moveTo(x - 2, 122 - h); g.lineTo(x + 6, 112 - h); g.lineTo(x + 14, 122 - h); g.fill(); const lit = grow < 0.5 + rnd(x) * 0.4; R(g, x + 4, 128 - h, 3, 4, lit ? '#ffd27a' : '#12040a'); }
+      towers.forEach(([x, h], i) => vine(g, x + 6, 124, grow * (h + 14), i + 20, t, '#4a1226', null));
+    });
+    layer(g, c, 0.75, () => { R(g, -30, 120, W + 60, 34, '#14050c'); for (let i = 0; i < 9; i++) vine(g, 10 + i * 38 + rnd(i) * 14, 126, grow * (34 + rnd(i * 2) * 44), i, t, '#5a1830', '#ff4a5a'); });
+    layer(g, c, 1, () => {
+      R(g, -30, 132, W + 60, 20, '#0a0308'); R(g, -30, 132, W + 60, 1, '#4a1226');
+      for (let i = 0; i < 12; i++) { const x = rnd(i + 31) * W, dead = grow > rnd(i * 7); R(g, x, 126, 1, 6, dead ? '#3a2a22' : '#5a9a4a'); R(g, x - 1, 124, 3, 3, dead ? '#4a3a30' : i % 2 ? '#ff9ac0' : '#fff0f4'); }   // Spring's flowers, dying one by one
+      person(g, 'queen', 160, 138, 1, t);
+      for (let i = 0; i < 6; i++) vine(g, 160 + (i - 2.5) * 16, 138, grow * (14 + rnd(i) * 16), i + 50, t, '#6a1c34', i % 2 ? '#ff4a5a' : null);
+    });
+    drift(g, t, 22, ['#ff7a5a', '#ffb057', '#5a1830'], true, 33);
+    layer(g, c, 1.8, () => { for (const [x0, i] of [[-6, 90], [14, 91], [306, 92], [326, 93]]) { g.globalAlpha = 1; vine(g, x0, 154, 60 + grow * 80, i, t, '#05020a', null); } });
+  };
+
+  // ---------------------------------------------------------------- A cell in the Deep: fever, and then him
+  C.cell = function (g, t, cue) {
+    const c = cam(t), k = cue && cue.name === 'caelum' ? ease(cue.t / 70) : 0;
+    R(g, 0, 0, W, H, '#06070c');
+    layer(g, c, 0.3, () => {   // the back wall: wet stone, one barred slit high up, and the queen's thorns coming through the mortar
+      for (let y = 0; y < 126; y += 12) for (let x = -30 + (y / 12 % 2) * 14; x < W + 30; x += 28) { R(g, x, y, 27, 11, rnd(x * 3 + y) < 0.3 ? '#14171f' : '#10131a'); }
+      for (let i = 0; i < 10; i++) { const x = rnd(i + 8) * W; g.globalAlpha = 0.25; R(g, x, 0, 1, 40 + rnd(i * 2) * 70, '#3a4a5a'); const dy = (t * 0.6 + i * 37) % 120; g.globalAlpha = 0.7; R(g, x, dy, 1, 2, '#8ab0c8'); } g.globalAlpha = 1;
+      R(g, 70, 22, 22, 16, '#03040a'); for (let i = 0; i < 4; i++) R(g, 73 + i * 5, 22, 2, 16, '#1c2028');
+      const mg = g.createLinearGradient(80, 30, 130, 126); mg.addColorStop(0, 'rgba(160,190,230,0.22)'); mg.addColorStop(1, 'rgba(160,190,230,0)'); g.fillStyle = mg; g.beginPath(); g.moveTo(70, 38); g.lineTo(92, 38); g.lineTo(158, 128); g.lineTo(92, 128); g.fill();
+      for (let i = 0; i < 4; i++) vine(g, 250 + i * 18, 0, -0, i, t, '#3a1226', null);
+      g.save(); g.translate(0, 0); for (let i = 0; i < 4; i++) { g.strokeStyle = '#3a1226'; g.lineWidth = 2; g.beginPath(); g.moveTo(244 + i * 20, 0); for (let y = 0; y < 50 + rnd(i) * 40; y += 5) g.lineTo(244 + i * 20 + Math.sin(y * 0.1 + i) * 6, y); g.stroke(); } g.lineWidth = 1; g.restore();
+    });
+    layer(g, c, 1, () => {
+      R(g, -30, 126, W + 60, 26, '#0c0e14'); R(g, -30, 126, W + 60, 1, '#262a36'); for (let i = -1; i < 14; i++) R(g, i * 26 + 8, 127, 1, 24, '#07080c');
+      R(g, 84, 122, 40, 5, '#3a3020'); for (let i = 0; i < 12; i++) R(g, 84 + rnd(i) * 38, 120 + rnd(i * 2) * 3, 4, 1, '#6a5a34');   // straw
+      R(g, 60, 116, 8, 10, '#2a2e3a'); R(g, 61, 114, 6, 2, '#3a4050');                                                             // a cup she cannot reach for
+      g.strokeStyle = '#3a3e4a'; g.lineWidth = 1; g.beginPath(); g.moveTo(128, 60); for (let i = 0; i < 8; i++) g.lineTo(128 - i * 3 + (i % 2), 60 + i * 8); g.stroke();   // a chain
+      // Wren, lying on her side in the straw, breathing fast; the wound in her arm glows the queen's red
+      g.save(); g.translate(104, 124); g.rotate(-Math.PI / 2); person(g, 'wren', 0, 0, 1, 0); g.restore();
+      const fever = 0.5 + 0.5 * Math.sin(t * 0.12); glow(g, 110, 118, 9 + fever * 4, 'rgba(255,74,90,' + (0.35 + fever * 0.3) + ')'); R(g, 109, 117, 3, 2, '#ff4a5a');
+      if (k > 0) {   // he steps out of the dark: night first, then stars, then wings, then the man
+        glow(g, 206, 96, 80 * k, 'rgba(120,100,220,0.4)');
+        for (let i = 0; i < 46; i++) { const a = i / 46 * 6.3 + t * 0.008, r = 30 + rnd(i) * 40; g.globalAlpha = k * (0.4 + 0.6 * Math.abs(Math.sin(t * 0.08 + i))); R(g, 206 + Math.cos(a) * r, 92 + Math.sin(a) * r * 0.7, 1, 1, i % 3 ? '#fff6d8' : '#b9a8ff'); }
+        g.globalAlpha = k; g.fillStyle = '#05040e';
+        for (const sd of [-1, 1]) { const sp = 30 + Math.sin(t * 0.03) * 2; g.beginPath(); g.moveTo(206, 100); g.quadraticCurveTo(206 + sd * sp, 60, 206 + sd * (sp + 8), 112); g.lineTo(206 + sd * sp * 0.7, 104); g.lineTo(206 + sd * sp * 0.4, 116); g.lineTo(206, 110); g.fill(); }
+        person(g, 'caelum', 206, 138, -1, t);
+        g.globalAlpha = k * (0.5 + 0.3 * Math.sin(t * 0.06)); g.strokeStyle = '#ffd27a'; g.beginPath(); g.moveTo(112, 116); g.bezierCurveTo(140, 100, 176, 124, 200, 112); g.stroke();   // the thread, though she cannot feel it yet
+        g.globalAlpha = 1;
+      }
+    });
+    layer(g, c, 1.6, () => { for (const x of [-14, 34, 262, 300, 338]) { R(g, x, 0, 5, H, '#020306'); R(g, x + 5, 0, 1, H, '#1a1e28'); } R(g, -30, 14, W + 60, 4, '#020306'); });   // the bars, between us and her
+  };
+
+  // ---------------------------------------------------------------- The Queen's throne: three trials won, and the last thorn
+  C.trials = function (g, t, cue) {
+    const c = cam(t), ct = cue ? cue.t : 0, strike = cue && cue.name === 'end' ? ease((ct - 150) / 40) : 0;
+    sky(g, ['#0a0308', '#200812', '#4a0e1c', '#200812']);
+    layer(g, c, 0.15, () => {   // the hall: pillars of root going up into the dark, braziers burning red
+      for (let i = -1; i < 8; i++) { const x = i * 48 + 10; R(g, x, 0, 14, 126, '#14050c'); R(g, x + 2, 0, 2, 126, '#2a0a16'); for (let k = 0; k < 5; k++) R(g, x + rnd(i * 5 + k) * 12, rnd(k + i) * 120, 2, 8, '#0a0308'); }
+      for (const x of [58, 262]) { const fl = Math.sin(t * 0.25 + x) * 2; glow(g, x, 84, 36 + fl * 2, 'rgba(255,74,60,0.45)'); R(g, x - 5, 90, 10, 3, '#3a2a2a'); R(g, x - 1, 93, 2, 33, '#2a1c1c'); g.fillStyle = '#ff6a4a'; g.beginPath(); g.moveTo(x - 4, 90); g.lineTo(x, 78 + fl); g.lineTo(x + 4, 90); g.fill(); R(g, x - 1, 85, 2, 4, '#ffd27a'); }
+    });
+    layer(g, c, 0.45, () => {   // the freed High Lords' empty chains, and a crowd of the court as shapes
+      for (let i = 0; i < 16; i++) { const x = 8 + i * 20 + rnd(i) * 6, h = 20 + rnd(i * 3) * 8; if (x > 124 && x < 196) continue; R(g, x, 124 - h, 9, h, '#0e040a'); g.fillStyle = '#0e040a'; g.beginPath(); g.arc(x + 4.5, 122 - h, 4, 0, 6.3); g.fill(); if (i % 3 === 0) { R(g, x + 2, 120 - h, 1, 1, '#ff4a5a'); R(g, x + 6, 120 - h, 1, 1, '#ff4a5a'); } }
+    });
+    layer(g, c, 0.8, () => {   // the throne: woven thorn, taller than it needs to be
+      R(g, 118, 112, 84, 14, '#1a0810'); R(g, 126, 104, 68, 8, '#220a14'); R(g, 134, 96, 52, 8, '#2a0c18');
+      g.fillStyle = '#12040a'; g.beginPath(); g.moveTo(140, 96); g.lineTo(144, 34); g.lineTo(160, 14); g.lineTo(176, 34); g.lineTo(180, 96); g.fill();
+      for (let i = 0; i < 9; i++) { g.strokeStyle = '#3a1024'; g.lineWidth = 2; g.beginPath(); g.moveTo(142 + i * 4.5, 96); g.quadraticCurveTo(160 + (i - 4) * 9, 50, 160 + (i - 4) * 7 + Math.sin(t * 0.02 + i) * 2, 18 + Math.abs(i - 4) * 6); g.stroke(); } g.lineWidth = 1;
+      for (let i = 0; i < 7; i++) { const x = 146 + rnd(i + 3) * 28, y = 30 + rnd(i * 5) * 56; glow(g, x, y, 5, 'rgba(255,74,90,0.5)'); R(g, x - 1, y - 1, 3, 3, '#ff4a5a'); }
+      person(g, 'queen', 160, 96, 1, t);
+    });
+    layer(g, c, 1, () => {
+      R(g, -30, 126, W + 60, 26, '#0a0308'); R(g, -30, 126, W + 60, 1, '#4a1226'); R(g, 100, 126, 120, 26, '#3a0a16'); R(g, 100, 126, 2, 26, '#e8c070'); R(g, 218, 126, 2, 26, '#e8c070');   // the carpet to the throne
+      const fall = strike;
+      g.save(); g.translate(204, 142); g.rotate(fall * 1.45); person(g, 'wren', 0, 0, -1, fall > 0 ? 0 : t); g.restore();
+      if (cue && cue.name === 'end' && ct > 120) {   // the last thorn: from the floor, through her
+        const k = ease((ct - 120) / 30);
+        g.strokeStyle = '#6a1c34'; g.lineWidth = 3; g.beginPath(); g.moveTo(236, 150); g.quadraticCurveTo(230, 140, 236 - 28 * k, 150 - 30 * k); g.stroke(); g.lineWidth = 1;
+        if (k >= 1 && fall < 0.5) { glow(g, 206, 120, 14, 'rgba(255,74,90,0.7)'); R(g, 204, 118, 4, 4, '#ff4a5a'); }
+      }
+      person(g, 'rowan', 60, 142, 1, t);   // free, and too late
+    });
+    drift(g, t, 18, ['#ff7a5a', '#ff4a5a', '#5a1830'], true, 71);
+    layer(g, c, 1.8, () => { vine(g, -4, 154, 110, 3, t, '#05020a', null); vine(g, 324, 154, 120, 5, t, '#05020a', null); vine(g, 20, 154, 60, 8, t, '#05020a', null); });
+    if (strike > 0) { g.fillStyle = 'rgba(0,0,0,' + Math.min(0.85, ease((ct - 230) / 80)) + ')'; g.fillRect(0, 0, W, H); }
+  };
+
   // every older scene gets the finish too
   for (const id of ['rooftop', 'window', 'spring', 'city', 'peak', 'fire', 'vision', 'garden', 'thorns', 'cell', 'trials']) { const f = C[id]; if (f) C[id] = function (g, t, cue) { f(g, t, cue); C.post(g, t); }; }
   const ds = C.drawStatic; C.drawStatic = function (g, id, t) { ds(g, id, t); C.post(g, t); };
@@ -6021,6 +6250,17 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
     }
     for (const g of fx.ghosts) SH.wren.draw(ctx, w.player, { ghost: g });
     SH.wren.draw(ctx, w.player, {});
+    { const p = w.player;   // guard: crossed blades held in front; bright for the first instant (the parry window)
+      if (p.guard > 0) {
+        const gx = Math.round(p.x + p.facing * 13), gy = Math.round(p.y - 25), hot = p.guard <= 14;
+        ctx.save(); ctx.lineCap = 'round';
+        ctx.strokeStyle = '#0a0818'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(gx - 5, gy - 13); ctx.lineTo(gx + 5, gy + 11); ctx.moveTo(gx + 5, gy - 13); ctx.lineTo(gx - 5, gy + 11); ctx.stroke();
+        ctx.strokeStyle = hot ? '#fff6d8' : '#c8d2e2'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(gx - 5, gy - 13); ctx.lineTo(gx + 5, gy + 11); ctx.moveTo(gx + 5, gy - 13); ctx.lineTo(gx - 5, gy + 11); ctx.stroke();
+        ctx.globalAlpha = hot ? 0.9 : 0.45; ctx.strokeStyle = hot ? '#ffd27a' : '#9fc8ff'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(p.x + p.facing * 4, gy, 20, p.facing > 0 ? -1.1 : Math.PI - 1.1, p.facing > 0 ? 1.1 : Math.PI + 1.1); ctx.stroke();
+        ctx.restore();
+      }
+      if (p.parryT > 0 && w.time % 6 < 3) { ctx.fillStyle = '#ffd27a'; ctx.fillRect(Math.round(p.x) - 1, Math.round(p.y) - 52, 2, 2); } }
     if (w.wyrm && w.wyrm.on) drawWyrm(ctx, w.wyrm, cy, t);
     drawParticles(ctx, fx);
     ctx.restore();
@@ -6627,7 +6867,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       dropRocks(n, at) {
         for (let i = 0; i < n; i++) this.rocks.push({ x: at != null ? at + (i - (n - 1) / 2) * 30 : player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
       },
-      onBossDown() { const b = this.things.find(e => e.boss); if (b) G.look(b.x, b.y - 30, 1.5, 110); fx.slowmo = 70; SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
+      onBossDown() { const b = this.things.find(e => e.boss); if (b) G.look(b.x, b.y - 30, 1.5, 110); fx.slowmo = 90; SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); this.victoryT = 1; this.victoryAt = b ? { x: b.x, y: b.y - 30 } : null; this.rocks = []; this.waves = []; },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       // the Winter Woods
       onPickup(what) {
@@ -6644,6 +6884,8 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       onTarget(tg) { SH.xp.gain(4, true); if (tg && tg.blade) { G.flags.n_rings = (G.flags.n_rings || 0) + 1; if (G.flags.n_rings === 3) G.queueScript('ring_rings'); return; } G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
       onWolf(what) { if (what === 'killed' || what === 'spared') SH.xp.gain(15, true); G.queueScript('woods_wolf_' + what); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
+      onDummyMove(m) { if (G.activeGoal === 'rise' && m === 'up') G.queueScript('ring_rise'); else if (G.activeGoal === 'lunge' && m === 'thrust') G.queueScript('ring_lunge'); },
+      onGuard(parry) { if (G.activeGoal === 'guard') G.queueScript('ring_guard'); },
     };
     G.world = w;
     G.explainWait = Math.max(G.explainWait || 0, 60 * 12);   // let a new place be looked at first
@@ -6825,6 +7067,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
       case 'remember': G.remember(st.key, st.text, st.good); break;
       case 'starlight': SH.xp.gain(15); G.progress.bonus = (G.progress.bonus || 0) + st.n; G.hud.toast('\u2726 +' + st.n + ' Starlight: ' + st.why); SH.sfx.play('lantern'); G.save(); break;
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
+      case 'explain': G.explain(st.key); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); if (st.name === 'giftgot') G.explain('moons'); break;
       case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
       case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
@@ -6950,6 +7193,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
     if (G.mode) { if (G.state === 'talk' || G.state === 'play') G.progress.playFrames = (G.progress.playFrames || 0) + 1; SH.modes.step(input); return; }
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
     G.effectStep();
+    if (w.victoryT) G.victoryStep();
     if (w.time % 90 === 45 && G.state === 'play' && !G.noExplain) G.loreCheck();
     if (G.state === 'play' && (G.explainWait || 0) > 0) G.explainWait--;
     if (G.state === 'talk') G.explainWait = Math.max(G.explainWait || 0, 60 * 6);   // and never the moment a conversation ends
@@ -7195,6 +7439,23 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
     G.snapCamera();
     w.fade = 0.7;
     fx.word(p.x, p.y - 52, kind === 'thorns' ? 'ouch: thorns' : 'fell', '#ff9aa8', 40);
+  };
+
+  // The Old Wyrm is down. Hold the moment: its light pours into Wren, her hearts fill, the hollow goes quiet. Then the story moves.
+  G.victoryStep = function () {
+    const w = G.world, p = w.player, t = w.victoryT++, at = w.victoryAt || p;
+    p.invuln = 30;
+    if (t === 40) { SH.sfx.play('chime'); G.look(at.x, at.y, 1.25, 150); }
+    if (t > 40 && t < 200 && t % 3 === 0) {   // starlight leaves the beast and finds her
+      const a = Math.random() * 6.28, r = 20 + Math.random() * 50, sx = at.x + Math.cos(a) * r, sy = at.y + Math.sin(a) * r * 0.5, k = 26;
+      fx.parts.push({ x: sx, y: sy, vx: (p.x - sx) / k, vy: (p.y - 26 - sy) / k, g: 0, drag: 1, life: k, max: k, size: 3, color: t % 2 ? '#ffd27a' : '#fff6d8', glow: true, shape: 'sq' });
+    }
+    if (t > 60 && t < 200 && t % 28 === 0) { fx.ring(p.x, p.y - 24, '#ffd27a', 30 + (t % 3) * 8, 22, 2); if (p.hearts < p.maxHearts) { p.hearts++; SH.sfx.play('heart'); } }
+    if (t === 120) { fx.word(p.x, p.y - 70, 'THE HOLLOW IS QUIET', '#fff6d8', 150); SH.arts.whisper('bossWon', true); }
+    if (t === 215) SH.xp.gain(40, true);
+    if (t === 210) { SH.sfx.play('lantern'); fx.burst(p.x, p.y - 24, 40, { speed: 3.4, life: 50, gravity: -0.03, colors: ['#ffd27a', '#fff6d8', '#b9a8ff'], glow: true }); G.look(p.x, p.y - 30, 1.4, 90); }
+    if (t > 270) w.fade = Math.min(1, (t - 270) / 40);
+    if (t >= 315) { w.victoryT = 0; G.queueScript('mtn_peak'); }
   };
 
   G.caught = function () {
@@ -7443,7 +7704,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
   };
   H.typeTick = function () {
     const before = Math.floor(typed);
-    typed = Math.min(full.length, typed + (SPEED[SH.settings.textSpeed] || 1.4));
+    typed = Math.min(full.length, typed + (SPEED[SH.settings.textSpeed] || 1.4) * (typingNarr ? 1.6 : 1));   // narration has no voice to keep pace with
     $('d-text').textContent = full.slice(0, Math.floor(typed));
     if (!typingNarr && Math.floor(typed) > before && Math.floor(typed) % 3 === 0) SH.sfx.play('blip');
     $('dialog').classList.toggle('typing', typed < full.length);
@@ -7592,6 +7853,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
     const G = SH.game;
     $('b-dash').style.display = G.can('dash') ? '' : 'none';
     $('b-down').style.display = G.can('daggers') ? '' : 'none';
+    $('b-up').style.display = G.can('daggers') ? '' : 'none';
     $('b-attack').textContent = G.can('daggers') ? 'STRIKE' : 'SHOOT';
     $('b-gift').style.display = G.can('flame') ? 'flex' : 'none';
     $('pips').style.display = G.can('flame') ? 'flex' : 'none';

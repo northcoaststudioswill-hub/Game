@@ -75,11 +75,11 @@
       ['ground', 45, 66, 16],
       ['solid', 54, 61, 11, 16],        // the wall: needs a double jump
       ['ground', 76, 104, 16],          // 10-tile gap before this: jump, jump, dash
-      ['thorns', 85, 88, 15],           // first thorns: 3 tiles, one plain jump
+      ['thorns', 85, 88, 16],           // first thorns: 3 tiles sunk into the floor, one plain jump
       ['ground', 107, 118, 16],         // the chase
       ['ground', 118, 126, 14],
       ['ground', 130, 148, 16],
-      ['thorns', 137, 140, 15],
+      ['thorns', 137, 140, 16],
       ['solid', 148, 150, 0, 20],
     ],
     hints: [
@@ -167,7 +167,7 @@
       ['solid', 0, 2, 0, 20],
       ['ground', 2, 41, 16],
       ['ground', 41, 60, 16],           // Bram's thorn pit
-      ['thorns', 42, 59, 15],
+      ['thorns', 42, 59, 16],             // sunk into the floor: you fall in, you cannot walk into them
       ['oneway', 47, 49, 14],            // somewhere to land between buds
       ['oneway', 52, 54, 14],
       ['ground', 60, 148, 16],
@@ -175,10 +175,13 @@
       ['solid', 148, 150, 0, 20],
     ],
     hints: [
-      { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
-      { x0: 26, x1: 36, text: 'Bram\'s rings. Cut all three: the low one from the ground, the middle one with a rising strike (hold up and {ATTACK}), the high one from a jump.', until: 'rings3' },
+      { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.', until: 'combo1' },
+      { x0: 14, x1: 32, text: 'Rising strike: {UPSTRIKE}, next to the dummy.', flag: 'combo1', until: 'rise' },
+      { x0: 14, x1: 32, text: 'Dash strike: {DASH} toward the dummy, then {ATTACK} while you are still moving.', flag: 'rise', until: 'lunge' },
+      { x0: 14, x1: 32, text: 'Guard: stand beside the dummy, face it, and {GUARD} when it says "swinging".', flag: 'lunge', until: 'guard' },
+      { x0: 26, x1: 36, text: 'Bram\'s rings. Cut all three: the low one from the ground, the middle one with a rising strike ({UPSTRIKE}), the high one from a jump.', until: 'rings3' },
       { x0: 36, x1: 60, text: 'Jump onto a bud and it bounces you (strike down with {DOWNSTRIKE} for a higher bounce). Land on the planks between them and take them one at a time.', flag: 'combo', until: 'pit' },
-      { x0: 61, x1: 69, text: 'Two more cuts: {ATTACK} during a dash is a lunging dash strike. Hold up and {ATTACK} for a rising strike that carries you into the air.', flag: 'pit' },
+      { x0: 61, x1: 69, text: 'Remember the four: combo, rising strike ({UPSTRIKE}), dash strike ({DASH} then {ATTACK}), and guard ({GUARD}).', flag: 'pit' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
     ],
     triggers: [

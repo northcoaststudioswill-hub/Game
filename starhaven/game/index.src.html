@@ -274,7 +274,7 @@ body[data-input="touch"] #touch { display: block; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
-body[data-mode] #hud, body[data-mode] #pause-btn, body[data-mode] #b-attack, body[data-mode] #b-dash, body[data-mode] #b-down, body[data-mode] #b-gift, body[data-mode] #b-art, body[data-mode] #b-talk, body[data-mode] #whisper, body[data-mode] #dialog { display: none !important; }
+body[data-mode] #hud, body[data-mode] #pause-btn, body[data-mode] #b-attack, body[data-mode] #b-dash, body[data-mode] #b-down, body[data-mode] #b-up, body[data-mode] #b-gift, body[data-mode] #b-art, body[data-mode] #b-talk, body[data-mode] #whisper, body[data-mode] #dialog { display: none !important; }
 body[data-mode="flight"] #b-jump, body[data-mode="mural"] #b-jump { display: none !important; }
 body.cutin #touch, body.cutin #bossbar, body.cutin #sign, body.cutin #goal, body.cutin #whisper, body.cutin #pause-btn, body.cutin #motes, body.cutin #pips, body.cutin #hearts, body.cutin #art { visibility: hidden; }
 /* ---- held upright: the picture on top, a control deck below (no need to turn the phone) */
@@ -490,6 +490,14 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
 #journal .goals.road li { font-size: 15px; line-height: 22px; }
 #end #e-sum ul { margin: 2px 0 8px; padding-left: 18px; }
 body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   /* nothing floats over the open book */
+
+/* ---- rising strike button, beside the down button; narration reads upright */
+#b-up { width: 58px; height: 58px; right: calc(max(24px, env(safe-area-inset-right)) + 262px); bottom: 33px; font-size: 20px; }
+body.upright #b-up { right: calc(max(24px, env(safe-area-inset-right)) + 194px); bottom: calc(12vh + 72px); }
+body.upright #b-gift { bottom: calc(12vh + 142px); }
+#dialog.narr #d-text { font-family: 'IM Fell English', Georgia, serif; font-style: normal; font-size: 18px; letter-spacing: 0; color: #f6f1ff; }
+#film-cap { font-style: normal; }
+#whisper span { font-style: normal; }
 </style>
 </head>
 <body>
@@ -514,7 +522,8 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
   <div class="tbtn" id="b-talk" data-act="up">TALK</div>
   <div class="tbtn" id="b-gift" data-act="gift">FLAME</div>
   <div class="tbtn" id="b-art" data-act="art">BOND<br>ART</div>
-  <div class="tbtn" id="b-down" data-act="downstrike" aria-label="Strike down">&#9660;</div>
+  <div class="tbtn" id="b-down" data-act="downstrike" aria-label="Strike down in the air, guard on the ground">&#9660;</div>
+  <div class="tbtn" id="b-up" data-act="upstrike" aria-label="Rising strike">&#9650;</div>
   <div class="tbtn" id="b-dash" data-act="dash">DASH</div>
   <div class="tbtn" id="b-attack" data-act="attack">STRIKE</div>
   <div class="tbtn" id="b-jump" data-act="jump">JUMP</div>
@@ -547,7 +556,7 @@ body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.4 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.5 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
