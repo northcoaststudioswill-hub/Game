@@ -9,6 +9,9 @@ A pocket game console in one HTML file, by North Coast Studios. Seven game cartr
 > and wish for every game, in one place. Everything new is built in the [`alt/`](alt/README.md) folder. The other
 > folders are frozen older versions, kept on purpose so nothing is ever lost.
 
+> **Sprouts on a television:** [`sprouts-tv/`](sprouts-tv/README.md) is Sprouts on its own, widescreen, with a
+> controller, for a PC browser on a TV. It is a separate copy (Nov 18 2026); the console and its seven games are unchanged.
+
 ![Power on](alt/playtest/console/boot-4-sprouts.png)
 
 ## The seven games (cartridges)

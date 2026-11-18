@@ -23,6 +23,14 @@ at phone size. Will's rule stands: a change is not done until it has been played
 
 ---
 
+## Sprouts TV (standalone, `sprouts-tv/`, Nov 18 2026)
+
+- Not played on a television or with a real controller: the controller in `sprouts-tv/tests/tv.js` is simulated. Not tried in Firefox or Safari. Not listened to.
+- It is a separate copy of Sprouts. Fixes to Sprouts in `alt/` do not reach it unless made twice (and the other way round). OPEN: keep two copies, or move to one source with two builds?
+- No import of a Pocket Lantern save: Sprouts TV starts as a new game.
+- `sprouts-tv/src/game.js` still carries unreached handheld code (shelf, Lantern menu, other cartridges' hooks). Tidy when convenient.
+- OPEN for Will: is 320 pixels of valley across right from the couch, or should it sit closer? Should the studio card say NORTH COAST STUDIOS?
+
 ## The console (Pocket Lantern)
 
 Sources: [`alt/CHANGELOG.md`](alt/CHANGELOG.md), [`KNOWN-ISSUES.md`](KNOWN-ISSUES.md), [`NEEDS_UPDATE.md`](NEEDS_UPDATE.md).

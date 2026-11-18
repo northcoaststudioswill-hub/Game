@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprouts</title>
+<style>
+html,body{height:100%;margin:0;background:#000;overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;-webkit-user-select:none;user-select:none}
+#stage{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+#screen{display:block;image-rendering:pixelated;image-rendering:crisp-edges;background:#07060c}
+body.idle{cursor:none}
+[hidden]{display:none !important}
+/* the handheld's buttons and shelf are kept only so the shared code finds them; nothing here is ever shown */
+#legacy{display:none}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="screen" width="640" height="360" aria-label="Sprouts"></canvas></div>
+<div id="legacy" aria-hidden="true">
+  <div id="console"><div id="slot"></div><span id="led"></span>
+    <div id="shelf"><p id="shelfMsg"></p><button class="cart" data-i="0"><canvas id="cartArt" width="40" height="26"></canvas></button><button id="lanBtn"></button></div>
+    <span id="np" hidden><img id="npArt" alt=""><span id="npBox"><span id="npText"></span></span></span>
+    <div id="dpad"></div>
+    <button id="bX"><span></span></button><button id="bY"><span></span></button><button id="bA"><span></span></button><button id="bB"><span></span></button>
+    <button id="bSel"><small></small></button><button id="bSta"><small></small></button>
+  </div>
+</div>
+<script>
+/* Sprouts TV keeps its own saves: every key gets the "sprouts-tv:" prefix, so it never reads or
+   overwrites a Pocket Lantern save, even in the same browser. */
+(()=>{try{const P='sprouts-tv:',S=Storage.prototype,g=S.getItem,st=S.setItem,rm=S.removeItem;
+S.getItem=function(k){return g.call(this,P+k)};S.setItem=function(k,v){return st.call(this,P+k,v)};
+S.removeItem=function(k){return rm.call(this,P+k)}}catch(e){}})();
+</script>
+<script>/*@MUSIC tracks*/</script>
+<script>/*@MUSIC pp*/</script>
+<script>/*game.js*/</script>
+</body>
+</html>
