@@ -201,7 +201,7 @@ const Store = {
 
 // ---------- settings
 const Settings = {
-  d: { music: 6, sfx: 8, text: 1, speed: 1, highlight: 0, reduce: 0, touch: 'auto', op: 60 },
+  d: { music: 6, sfx: 8, text: 1, speed: 1, highlight: 0, reduce: 0, touch: 'auto', op: 60, diff: 1 },
   load() { try { const s = JSON.parse(Store.get('bts_settings') || 'null'); if (s) Object.assign(this.d, s); } catch (e) { } },
   save() { Store.set('bts_settings', JSON.stringify(this.d)); },
   apply() {
@@ -1064,6 +1064,11 @@ const CAST = {
   cadt1: { name: 'House Teal', look: () => ({ accredited: 1, cadet: 1, skin: '#f0dccc', hair: '#f6eac0', style: 'short', robe: '#dfe6e4', armor: '#dfe6e4', trim: '#e8c25a', sash: '#2aa6a0', shield: 1 }) },
   cadt2: { name: 'House Teal', look: () => ({ accredited: 1, cadet: 1, helm: 1, skin: '#e8ccb4', hair: '#f6eac0', style: 'short', robe: '#cfd8d8', armor: '#cfd8d8', trim: '#e8c25a', sash: '#2aa6a0' }) },
   vant: { name: 'Captain Vant', look: () => ({ accredited: 1, cadet: 1, skin: '#e0c0a8', hair: '#d8d0b0', style: 'short', robe: '#b8c4c4', armor: '#b8c4c4', trim: '#e8c25a', sash: '#2aa6a0', cape: '#1e7a76' }) },
+  sg1: { name: 'Spire Guard', look: () => ({ accredited: 1, cadet: 1, helm: 1, skin: '#e8d8c8', hair: '#e8e4dc', style: 'short', robe: '#f6f2e8', armor: '#f6f2e8', trim: '#e8c25a', sash: '#e8c25a', shield: 1 }) },
+  sg2: { name: 'Spire Guard', look: () => ({ accredited: 1, cadet: 1, helm: 1, skin: '#e8d8c8', hair: '#e8e4dc', style: 'short', robe: '#f6f2e8', armor: '#f6f2e8', trim: '#e8c25a', sash: '#e8c25a' }) },
+  cade: { name: 'Marshal Cade', look: () => ({ accredited: 1, cadet: 1, skin: '#d8b8a0', hair: '#3a3a44', style: 'short', circlet: 1, robe: '#2a2c38', armor: '#2a2c38', trim: '#e8c25a', sash: '#e8c25a', cape: '#8a1c1c' }) },
+  ilse: { name: 'Ilse Marrin', look: () => ({ accredited: 1, skin: '#e0cdbc', hair: '#b8b4ac', style: 'long', robe: '#5a5660', trim: '#8a8478', sash: '#3a3640' }) },
+  brand: { name: 'Brand', look: () => ({ skin: '#b88a6a', hair: '#8a8a8a', style: 'short', beard: 1, shirt: '#4a4e58', pants: '#2a2c34' }) },
   teo: { name: 'Teo Aldane', look: () => ({ accredited: 1, cadet: 1, skin: '#e8c8a8', hair: '#d8b070', style: 'short', robe: '#e8e0cc', armor: '#e8e0cc', trim: '#e8c25a', sash: '#7a5ac8' }) },
   voss: { name: 'Proctor Voss', look: () => ({ accredited: 1, cadet: 1, skin: '#f0e0d4', hair: '#e8e4dc', style: 'short', circlet: 1, crown: 1, robe: '#fbf8f0', armor: '#fbf8f0', trim: '#e8c25a', sash: '#f4f0e6', cape: '#f4f2ec' }) },
   lucan: { name: 'Lucan Aurel', look: () => ({ accredited: 1, cadet: 1, skin: '#f4e6dc', hair: '#f6eac0', style: 'long', long: 1, circlet: 1, crown: 1, robe: '#fbf8f0', armor: '#fbf8f0', trim: '#e8c25a', sash: '#e8c25a', cape: '#f4f2ec' }) },
@@ -1079,7 +1084,7 @@ const CAST = {
   c3: { name: 'Neighbor', look: crowd('#6a4430', '#141014', 'bun', '#6a4a3a') },
   c4: { name: 'Neighbor', look: crowd('#d0a080', '#6a6a6a', 'bald', '#3a4a4a') }
 };
-const MOUTH = { teo: 'flat', voss: 'smirk', kael2: 'frown', lucan: 'smirk', vant: 'frown', cadv1: 'flat', cadv2: 'flat', cadt1: 'flat', cadt2: 'flat', kael: 'smirk', seren: 'smile', tavi: 'smile', mara: 'frown', ivo: 'smile', vale: 'flat', celestine: 'smirk', warden: 'flat', proctor: 'frown', watchman: 'frown', nell: 'flat', orin: 'flat', dace: 'smile', bao: 'smile', pell: 'smile', juno: 'smile', pip: 'smile', mosi: 'smile', ada: 'flat', hollis: 'frown', marrow: 'frown', fen: 'flat', kit: 'smirk' };
+const MOUTH = { ilse: 'flat', brand: 'frown', cade: 'frown', teo: 'flat', voss: 'smirk', kael2: 'frown', lucan: 'smirk', vant: 'frown', cadv1: 'flat', cadv2: 'flat', cadt1: 'flat', cadt2: 'flat', kael: 'smirk', seren: 'smile', tavi: 'smile', mara: 'frown', ivo: 'smile', vale: 'flat', celestine: 'smirk', warden: 'flat', proctor: 'frown', watchman: 'frown', nell: 'flat', orin: 'flat', dace: 'smile', bao: 'smile', pell: 'smile', juno: 'smile', pip: 'smile', mosi: 'smile', ada: 'flat', hollis: 'frown', marrow: 'frown', fen: 'flat', kit: 'smirk' };
 const NPCS = [
   { id: 'tavi', map: 'apt', at: [7, 3], dir: 2 },
   { id: 'mara', map: 'bay', at: [7, 4], dir: 0 },
@@ -1922,6 +1927,7 @@ const World = {
     // interaction prompt
     if (Cutscene.active) { Cutscene.renderFX(g, cx, cy, t); return; }
     const show = (this.target && !Dialogue.active && !UI.stack.length);
+    if (G.heist === 1 && !Dialogue.active && !UI.stack.length) { const cut = G.flags.relayCut, o = cut ? { x: 10.5 * 16, y: 20 } : { x: 21.5 * 16, y: 7 * 16 }, sx = o.x - cx, sy = o.y - cy, on = sx > 8 && sx < W - 8 && sy > 20 && sy < H - 14, px = Math.round(clamp(sx, 12, W - 12)), py = Math.round(clamp(sy - (on ? 18 : 0), 30, H - 20)), lab = cut ? 'BANK 7' : 'RELAY'; g.fillStyle = '#120a0e'; g.fillRect(px - 4, py - 4, 9, 9); g.fillStyle = Math.floor(t * 3) % 2 ? PAL.amber : '#fff2c0'; g.fillRect(px - 3, py - 3, 7, 7); ptext(g, lab, Math.round(clamp(px - ptextW(lab) / 2, 2, W - ptextW(lab) - 2)), py + 7, '#fff2c0'); }
     if (show) { const bx = Math.round(this.target.x - cx), by = Math.round(this.target.y - cy) + (rm ? 0 : Math.round(Math.sin(t * 5))); g.fillStyle = '#120a0e'; g.fillRect(bx - 5, by - 6, 11, 10); g.fillStyle = PAL.amber; g.fillRect(bx - 4, by - 5, 9, 8); g.fillStyle = '#120a0e'; g.fillRect(bx, by + 3, 1, 2); ptext(g, Input.device === 'kb' ? 'E' : 'A', bx - 1, by - 4, '#2a1408'); if (G.heist && (this.target.id === 'pillarFest' || (this.target.id === 'relay' && !G.flags.relayCut)) && !this.work) { g.fillStyle = '#120a0e'; g.fillRect(bx - 10, by + 6, 21, 9); ptext(g, 'HOLD', bx - 7, by + 8, PAL.amber); } }
     if (Settings.d.highlight && !Dialogue.active) { const a = Math.floor(t * 2) % 2 ? PAL.cyan : PAL.amber; g.fillStyle = a;
       for (const h of m.hot) { const [hx, hy] = h.tiles[0]; g.fillRect(hx * 16 + 7 - cx, hy * 16 - cy + (isWall(m.grid[hy][hx]) ? 13 : 1), 2, 2); }
@@ -2179,11 +2185,14 @@ const PROLOGUE_A = [
     { t: "Because I'm better at this than anyone they've got.", fx: () => G.tendency = 'tinkerer', then: [say('seren', "Modest, too. Fine. You are. It's infuriating.")] },
     { t: 'Because one day I want to be the one who decides who breathes.', fx: () => G.tendency = 'seeker', then: [say('seren', "...Careful, Kael. That's how they talk."), say('kael', 'Then somebody had better learn the language.')] }
   ] },
+  { say: 'seren', t: "Listen. The audit relay is on the east wall, straight across the bay from the door: the grey box with the red lamp. Cut that first, or the bank logs every turn you make." },
+  { say: 'seren', t: "Then Valve Bank Seven, on the north wall. Relay, then bank. Say it back." },
+  { say: 'kael', t: "Relay, east wall. Then the bank." },
   { say: 'seren', t: "Fine. I'll keep watch. Night Proctor walks Bay Three every hour with a lantern. If he sees you, you're a thief. If he sees me, I'm lost." },
   { say: 'kael', t: "And if he sees both of us?" },
   { say: 'seren', t: "Then we're newlyweds looking for somewhere private. Try to look embarrassed. Shouldn't be hard." },
   { fade: 'out' },
-  { card: 'Bay Three · Second bell', sub: 'Hold A at the audit relay to cut it. Then reach Valve Bank Seven. The lamps sweep: move when they turn away. Throw bolts to pull a guard off his post.', min: 1, max: 4 }
+  { card: 'Bay Three · Second bell', sub: 'Cross the bay to the audit relay on the far (east) wall and hold A to cut it. Then reach Valve Bank Seven on the north wall. A marker points the way. The lamps sweep: move when they turn away. Throw bolts to pull a guard off his post.', min: 1, max: 4 }
 ];
 
 // ================= PROLOGUE B: the audit, the sentence, the furnace =================
@@ -2336,7 +2345,7 @@ const PROLOGUE_B = [
   { narr: 'They returned the ring. They kept the girl. And they sent you the bill for the fire.' },
   { fade: 'out' }, { panel: null },
   { card: 'SOOTBORN', sub: 'What they call us. What they will remember.', big: 1, sfx: 'splash', min: 2.2, max: 6 },
-  { card: 'FORTY-ONE DAYS LATER', min: 1, max: 3 }
+  { card: 'FORTY-ONE DAYS AFTER THE FURNACE', sub: 'Cinderwell. Tier Six. Kael still fixes valves.', min: 1.4, max: 4 }
 ];
 const PROLOGUE = PROLOGUE_A;
 
@@ -2496,6 +2505,69 @@ const PANELS = {
     for (const [x, y] of [[118, 34], [150, 28], [176, 36], [200, 44], [132, 42]]) R(g, x, y, 3, 2, '#c8c0c0');
     if (st >= 1) { const a = Math.min(1, s / 1.2); R(g, 132, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); R(g, 172, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); glow(g, 142, 84, 14, '255,140,50', .5 * a); glow(g, 182, 84, 14, '255,140,50', .5 * a); }
   },
+  // ---- the dreams: what comes after
+  gild(g, t, st, s) {
+    const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#07060a');
+    for (let y = 0; y < 132; y += 12) for (let x = (y / 12 % 2) * 12; x < 320; x += 24) R(g, x, y, 23, 11, (x * 7 + y * 3) % 5 ? '#0b0a10' : '#0e0d14'); for (let i = 0; i < 9; i++) R(g, 20 + i * 34, 0, 2, 132, '#100e16'); R(g, 0, 132, 320, 48, '#0c0a0e'); R(g, 0, 132, 320, 1, '#22202a'); for (let i = 0; i < 16; i++) R(g, i * 20 + 2, 134 + (i % 3) * 14, 18, 1, '#121018');
+    R(g, 0, 8, 320, 3, '#1a1820'); for (let i = 0; i < 5; i++) { R(g, 30 + i * 64, 11, 1, 6 + (i % 2) * 5, '#2a2630'); } if (st >= 3) { PANELS.lesson(g, t, st, s); return; }
+    const fl = .5 + Math.sin(t * 9) * .03 + Math.sin(t * 23) * .02;
+    if (st < 2) { // the table
+      R(g, 158, 0, 2, 26, '#2a2630'); R(g, 146, 26, 26, 5, '#4a4650'); g.fillStyle = `rgba(255,236,190,${.1 * fl + .04})`; g.beginPath(); g.moveTo(150, 31); g.lineTo(168, 31); g.lineTo(232, 132); g.lineTo(86, 132); g.closePath(); g.fill(); glow(g, 159, 34, 26, '255,240,200', .5 * fl);
+      R(g, 96, 104, 128, 6, '#3a3640'); R(g, 96, 110, 128, 2, '#1c1a20'); R(g, 104, 112, 5, 20, '#2a2630'); R(g, 211, 112, 5, 20, '#2a2630');
+      R(g, 108, 96, 14, 8, '#c8946a'); R(g, 106, 94, 8, 4, '#2a2018'); R(g, 122, 97, 44, 7, '#5a5660'); R(g, 166, 98, 46, 3, '#4a4650'); R(g, 166, 101, 46, 3, '#46424c'); R(g, 126, 92, 30, 3, '#5a5660'); R(g, 124, 104, 3, 3, '#c8946a');
+      for (const [x, y] of [[100, 100], [216, 100], [136, 104], [190, 104]]) R(g, x, y, 4, 2, '#8a8478');
+      for (const [x, h, sw] of [[58, 66, 1], [250, 58, -1], [274, 64, -1]]) { const b = Math.round(Math.sin(t * 1.3 + x) * 1); R(g, x, 132 - h + b, 12, h - b, '#15131c'); R(g, x + 1, 132 - h - 9 + b, 10, 10, '#1c1a24'); R(g, x + 2, 132 - h - 5 + b, 8, 4, '#3a3428'); R(g, x + 3, 132 - h - 4 + b, 2, 1, '#e8c25a'); R(g, x + 7, 132 - h - 4 + b, 2, 1, '#e8c25a'); R(g, x + (sw > 0 ? 12 : -6), 132 - h + 16 + b, 6, 3, '#15131c'); }
+      R(g, 30, 112, 22, 2, '#3a3640'); R(g, 32, 114, 2, 18, '#22202a'); R(g, 48, 114, 2, 18, '#22202a'); for (let i = 0; i < 5; i++) R(g, 32 + i * 4, 108 + (i % 2), 2, 4, i % 2 ? '#c8ccd4' : '#e8c25a');
+      R(g, 232, 40, 1, 60, '#2a2630'); R(g, 228, 40, 9, 12, '#4a4030'); R(g, 229, 42, 7, 8, `rgba(255,210,110,${.6 + Math.sin(t * 2) * .2})`); g.strokeStyle = '#6a5a30'; g.beginPath(); g.moveTo(232, 52); g.quadraticCurveTo(226, 84, 206, 99); g.stroke(); const dr = (t * .9) % 1; R(g, 232, 52 + dr * 30, 1, 2, '#ffd26e');
+      g.fillStyle = 'rgba(255,236,190,.05)'; g.fillRect(96, 134, 128, 10);
+      if (st >= 1) { const a = Math.min(1, s / 2.4); // gold into the long bones
+        R(g, 166, 99, Math.round(46 * a), 1, '#ffd26e'); R(g, 166, 102, Math.round(46 * a), 1, '#ffd26e'); R(g, 126, 93, Math.round(30 * a), 1, '#ffd26e'); R(g, 122, 100, Math.round(44 * a), 1, '#e8c25a');
+        glow(g, 166 + 46 * a, 100, 9, '255,210,110', .7); glow(g, 113, 99, 7 * a, '255,210,110', .6 * a); if (a > .9) { R(g, 110, 98, 2, 1, '#ffe08a'); R(g, 114, 98, 2, 1, '#ffe08a'); }
+        for (let i = 0; i < 10; i++) { const ph = (t * .8 + i * .1) % 1; R(g, 166 + hash(i, 3) * 46 * a, 98 - ph * 18, 1, 1, `rgba(255,220,130,${1 - ph})`); } plate(g, 'GILDING', 160, 150); }
+    } else { // what went onto the table, and what came off it
+      glow(g, 110, 96, 40, '120,110,130', .12); glow(g, 214, 78, 60, '255,214,120', .14 + Math.sin(t * 2) * .02);
+      R(g, 104, 92, 12, 22, '#3a3640'); R(g, 106, 82, 8, 10, '#c8946a'); R(g, 105, 80, 10, 4, '#2a2018'); R(g, 105, 114, 4, 18, '#2a2630'); R(g, 111, 114, 4, 18, '#2a2630');
+      const a = Math.min(1, s / 1.6), h = Math.round(20 * a);
+      R(g, 206, 74 - h, 16, 34 + h, '#efe8d4'); R(g, 208, 60 - h, 12, 14, '#e8c8a8'); R(g, 207, 57 - h, 14, 5, '#e8c070'); R(g, 207, 108, 6, 24, '#d8d0bc'); R(g, 215, 108, 6, 24, '#d8d0bc'); R(g, 204, 74 - h, 20, 3, '#e8c25a'); R(g, 210, 65 - h, 2, 1, '#ffd26e'); R(g, 216, 65 - h, 2, 1, '#ffd26e');
+      R(g, 96, 133, 30, 1, '#1c1820'); R(g, 196, 133, 40, 1, '#3a3020'); R(g, 150, 30, 2, 104, '#3a3020'); R(g, 150, 30, 108, 2, '#3a3020'); R(g, 256, 30, 2, 104, '#3a3020'); R(g, 151, 31, 1, 102, '#e8c25a'); g.fillStyle = 'rgba(255,230,170,.04)'; g.fillRect(152, 32, 104, 100); g.fillStyle = 'rgba(255,255,255,.05)'; g.beginPath(); g.moveTo(160, 32); g.lineTo(176, 32); g.lineTo(156, 132); g.lineTo(152, 132); g.lineTo(152, 80); g.closePath(); g.fill(); for (let i = 0; i < 8; i++) { const ph = (t * .3 + i * .125) % 1; R(g, 200 + Math.sin(i * 2.3) * 22, 110 - ph * 80, 1, 1, `rgba(255,220,130,${(1 - ph) * a})`); } plate(g, 'BEFORE', 110, 150, 1); plate(g, 'AFTER', 214, 150);
+    }
+  },
+  lesson(g, t, st, s) { // a slate, a candle, and two ways of saying the same thing
+    const { R, glow } = PX, fl = .8 + Math.sin(t * 11) * .05 + Math.sin(t * 5) * .05;
+    glow(g, 160, 96, 110, '255,180,90', .1 * fl); R(g, 60, 118, 200, 5, '#3a2a1c'); R(g, 60, 123, 200, 2, '#1c140e'); R(g, 70, 125, 5, 8, '#2a1e14'); R(g, 245, 125, 5, 8, '#2a1e14');
+    R(g, 157, 104, 6, 14, '#e8e0cc'); R(g, 159, 98 + Math.round(Math.sin(t * 9)), 2, 6, '#ffd26e'); glow(g, 160, 100, 16, '255,200,110', .7 * fl);
+    R(g, 40, 70, 16, 48, '#2e2a32'); R(g, 42, 56, 12, 14, '#c8946a'); R(g, 41, 53, 14, 6, '#2a2018'); R(g, 54, 92, 14, 4, '#2e2a32'); // him
+    R(g, 262, 50, 18, 68, '#5a5660'); R(g, 264, 34, 14, 16, '#e0cdbc'); R(g, 263, 31, 16, 7, '#b8b4ac'); R(g, 262, 38, 3, 26, '#b8b4ac'); R(g, 267, 40, 2, 1, '#e8c25a'); R(g, 273, 40, 2, 1, '#e8c25a'); R(g, 248, 84, 16, 4, '#5a5660'); // her
+    R(g, 96, 22, 128, 72, '#3a2a1c'); R(g, 99, 25, 122, 66, '#14181a'); R(g, 99, 25, 122, 1, '#22282a');
+    const P2 = [['THANKS', 'NOTED'], ['AYE', 'GRANTED'], ['MY BREATH', 'MY TIME'], ['WE', 'ONE']], n = Math.min(4, st - 3);
+    ptext(g, 'SOOT', 106, 29, '#8a8478'); ptext(g, 'THEM', 176, 29, '#e8c25a'); R(g, 104, 36, 112, 1, '#3a4044');
+    for (let i = 0; i < n; i++) { const last = i === n - 1, a = last ? Math.min(1, s / .7) : 1, y = 42 + i * 12; g.globalAlpha = a; ptext(g, P2[i][0], 106, y, '#c8c0b0'); R(g, 104, y + 2, Math.round((ptextW(P2[i][0]) + 4) * a), 1, '#a03a3a'); ptext(g, P2[i][1], 176, y, '#ffe08a'); g.globalAlpha = 1; }
+  },
+  assay(g, t, st, s) {
+    const { R, glow, plate } = PX; const gr = g.createLinearGradient(0, 0, 0, 180); gr.addColorStop(0, '#6a9ad8'); gr.addColorStop(.5, '#bcd8f0'); gr.addColorStop(1, '#e8f0d8'); g.fillStyle = gr; g.fillRect(0, 0, 320, 180); glow(g, 250, 26, 46, '255,244,200', .7); R(g, 244, 20, 12, 12, '#fff6d0');
+    for (let i = 0; i < 9; i++) { const x = i * 40 - 10, h = 40 + hash(i, 7) * 34; g.fillStyle = i % 2 ? '#7a86b0' : '#8a94bc'; g.beginPath(); g.moveTo(x - 30, 96); g.lineTo(x + 10, 96 - h); g.lineTo(x + 50, 96); g.closePath(); g.fill(); g.fillStyle = '#f4f4fa'; g.beginPath(); g.moveTo(x + 10, 96 - h); g.lineTo(x + 2, 96 - h * .72); g.lineTo(x + 18, 96 - h * .72); g.closePath(); g.fill(); }
+    for (let i = 0; i < 5; i++) { const x = ((i * 83 + t * (2 + i % 3)) % 400) - 40, y = 14 + (i % 3) * 16; R(g, x, y, 34, 6, 'rgba(255,255,255,.85)'); R(g, x + 6, y - 4, 20, 5, 'rgba(255,255,255,.8)'); R(g, x + 3, y + 6, 28, 2, 'rgba(200,214,240,.6)'); }
+    for (let i = 0; i < 4; i++) { const bx = ((t * 14 + i * 90) % 360) - 20, by = 40 + i * 6 + Math.sin(t * 2 + i) * 3, w = Math.sin(t * 9 + i) > 0 ? 1 : 0; R(g, bx, by, 2, 1, '#2a3040'); R(g, bx - 2, by - w, 2, 1, '#2a3040'); R(g, bx + 2, by - w, 2, 1, '#2a3040'); }
+    R(g, 0, 96, 320, 84, '#3f8a44'); R(g, 0, 96, 320, 2, '#58a85a'); for (let i = 0; i < 26; i++) { const x = hash(i, 11) * 320, y = 100 + hash(i, 12) * 26, c = i % 3 ? '#1f6a34' : '#27803c'; if (Math.abs(x - 160) < 30) continue; g.fillStyle = c; g.beginPath(); g.moveTo(x, y - 12); g.lineTo(x - 5, y); g.lineTo(x + 5, y); g.closePath(); g.fill(); R(g, x - 1, y, 2, 2, '#5a3c26'); }
+    for (let i = 0; i < 60; i++) R(g, hash(i, 1) * 320, 98 + hash(i, 2) * 80, 6 + hash(i, 3) * 10, 2, i % 2 ? '#4a9a4e' : '#357a3c');
+    g.fillStyle = '#5aa8d8'; g.beginPath(); g.moveTo(0, 150); g.quadraticCurveTo(110, 118, 190, 146); g.quadraticCurveTo(250, 166, 320, 138); g.lineTo(320, 148); g.quadraticCurveTo(250, 176, 190, 156); g.quadraticCurveTo(110, 128, 0, 160); g.closePath(); g.fill();
+    for (let i = 0; i < 14; i++) { const u = ((t * .08 + i / 14) % 1), x = u * 320, y = u < .34 ? 150 - Math.sin(u / .34 * 1.57) * 18 : u < .6 ? 132 + (u - .34) / .26 * 22 : 154 - (u - .6) / .4 * 12; R(g, x, y + 4, 4, 1, 'rgba(255,255,255,.7)'); }
+    R(g, 132, 96, 56, 4, '#8a8a82'); R(g, 136, 92, 48, 5, '#9a9a90'); R(g, 142, 70, 36, 28, '#f2ede2'); R(g, 142, 70, 4, 28, '#fbf8f0'); R(g, 174, 70, 4, 28, '#d8d2c4'); R(g, 138, 62, 10, 36, '#e6e0d2'); R(g, 172, 62, 10, 36, '#e6e0d2'); R(g, 154, 56, 12, 42, '#f8f4ea'); R(g, 157, 82, 6, 16, '#3a3040'); for (const x of [138, 144, 172, 178, 154, 160]) R(g, x, 54 + (x > 150 && x < 166 ? 0 : 6), 4, 3, '#f8f4ea'); R(g, 159, 44, 1, 12, '#8a8478'); R(g, 160, 44, 8, 5, '#e8c25a'); plate(g, 'THE KEEP', 160, 34);
+    const HC = ['#7a5ac8', '#2aa6a0', '#c8452e', '#e8c25a', '#3a6ac8', '#58b848', '#c85a9a', '#e88a3a', '#8a8a92', '#40c8e8', '#a03a3a', '#f4f0e6'], pos = [[60, 136], [262, 128], [26, 112], [96, 108], [120, 168], [214, 112], [296, 110], [236, 168], [44, 168], [286, 164], [180, 122], [78, 150]];
+    if (st >= 1) for (let i = 0; i < 12; i++) { const a = Math.min(1, Math.max(0, s * 3 - i * .25)); if (a <= 0) continue; const [x, y] = pos[i], w = Math.sin(t * 3 + i) > 0 ? 1 : 0; if (st >= 2 && i > 1) g.globalAlpha = .35; R(g, x, y - 14, 1, 14, '#3a3028'); R(g, x + 1, y - 14 + w, 8, 6, HC[i]); R(g, x - 3, y, 7, 2, 'rgba(0,0,0,.25)'); g.fillStyle = '#f4f0e6'; g.beginPath(); g.moveTo(x - 9, y); g.lineTo(x - 5, y - 7); g.lineTo(x - 1, y); g.closePath(); g.fill(); R(g, x - 6, y - 2, 2, 2, HC[i]); for (let k = 0; k < 3; k++) { R(g, x + 4 + k * 4, y - 3, 2, 4, HC[i]); R(g, x + 4 + k * 4, y - 5, 2, 2, '#f0d8c0'); } g.globalAlpha = 1; }
+    if (st === 1) plate(g, 'TWELVE HOUSES', 160, 172);
+    if (st >= 2) { const [ax, ay] = pos[0], [bx, by] = pos[1], k = Math.min(1, s / 1.5); g.strokeStyle = '#fff2c0'; g.setLineDash([3, 3]); g.lineDashOffset = -t * 8; g.beginPath(); g.moveTo(ax + 6, ay - 8); g.lineTo(ax + 6 + (bx - ax) * k, ay - 8 + (by - ay) * k); g.stroke(); g.setLineDash([]); plate(g, 'VIOLET', ax + 4, ay + 6); plate(g, 'TEAL', bx + 4, by + 6); }
+    if (st >= 3) { const a = Math.min(1, s / 1.2); g.globalAlpha = a; R(g, 12, 40, 70, 8, '#f2ede2'); R(g, 12, 47, 70, 1, '#e8c25a'); for (let i = 0; i < 5; i++) { R(g, 18 + i * 13, 22, 7, 18, '#f8f6f0'); R(g, 19 + i * 13, 16, 5, 6, '#f0e0d4'); R(g, 18 + i * 13, 14, 7, 2, '#e8c25a'); glow(g, 21 + i * 13, 22, 8, '255,240,200', .3); } plate(g, 'THE PROCTORS', 47, 58); g.globalAlpha = 1; }
+  },
+  spire(g, t, st, s) {
+    const { R, glow, plate } = PX; const gr = g.createLinearGradient(0, 0, 0, 180); gr.addColorStop(0, '#1a2c6a'); gr.addColorStop(.6, '#6a9ad8'); gr.addColorStop(1, '#dce8f8'); g.fillStyle = gr; g.fillRect(0, 0, 320, 180); glow(g, 70, 30, 60, '255,244,200', .8); R(g, 62, 22, 16, 16, '#fff6d0');
+    for (let i = 0; i < 9; i++) { const a = i / 9 * 3.14 + t * .05; g.fillStyle = 'rgba(255,244,200,.05)'; g.beginPath(); g.moveTo(70, 30); g.lineTo(70 + Math.cos(a) * 300, 30 + Math.sin(a) * 300); g.lineTo(70 + Math.cos(a + .1) * 300, 30 + Math.sin(a + .1) * 300); g.closePath(); g.fill(); }
+    for (const [x, h] of [[96, 60], [222, 76], [250, 50]]) { g.fillStyle = '#dfe4f0'; g.beginPath(); g.moveTo(x - 4, 180); g.lineTo(x - 1, 180 - h); g.lineTo(x + 1, 180 - h); g.lineTo(x + 4, 180); g.closePath(); g.fill(); R(g, x, 180 - h - 6, 1, 6, '#e8c25a'); }
+    g.fillStyle = '#d9d6ce'; g.beginPath(); g.moveTo(164, 30); g.lineTo(172, 180); g.lineTo(163, 180); g.lineTo(161, 30); g.closePath();
+    g.fillStyle = '#f6f4ee'; g.beginPath(); g.moveTo(150, 180); g.lineTo(156, 30); g.lineTo(164, 30); g.lineTo(172, 180); g.closePath(); g.fill(); R(g, 159, 8, 2, 24, '#ffe08a'); glow(g, 160, 10, 10, '255,224,140', .8); R(g, 161, 30, 3, 150, '#dcd8ce'); for (let i = 0; i < 6; i++) { R(g, 152 - i, 56 + i * 20, 18 + i * 2, 2, '#e8c25a'); R(g, 152 - i, 58 + i * 20, 18 + i * 2, 1, '#b8943a'); glow(g, 161, 57 + i * 20, 8, '255,214,120', .25 + Math.sin(t * 2 + i) * .08); for (let k = 0; k < 3; k++) R(g, 155 + k * 4, 62 + i * 20, 1, 3, '#8ab0e0'); }
+    for (let i = 0; i < 8; i++) { const x = ((i * 67 + t * (3 + i % 3)) % 380) - 30, y = 130 + (i % 4) * 12; R(g, x, y, 60, 8, '#ffffff'); R(g, x + 10, y - 5, 34, 6, '#f4f8ff'); } R(g, 0, 170, 320, 10, '#f4f8ff'); plate(g, 'THE SUN SPIRE', 160, 100);
+    if (st >= 1) for (let i = 0; i < 26; i++) { const ph = (t * (.12 + (i % 5) * .02) + hash(i, 4)) % 1, x = 20 + hash(i, 5) * 280 - ph * 26, y = -10 + ph * 150; R(g, x, y, 5, 2, '#3a3a44'); R(g, x + 5, y - 3, 6, 1, 'rgba(255,150,60,.9)'); R(g, x + 9, y - 6, 8, 1, 'rgba(255,200,120,.5)'); }
+  },
   // ---- what they send back
   tin(g, t, st, s) {
     const { R, glow } = PX; for (let i = 0; i < 9; i++) { R(g, 0, i * 20, 320, 19, i % 2 ? '#3a2a20' : '#40301f'); R(g, 0, i * 20, 320, 1, '#54402a'); R(g, (hash(i, 1) * 300) | 0, i * 20, 1, 19, '#241a12'); }
@@ -2537,6 +2609,8 @@ const FOE_KINDS = {
   duelist: { poise: 1, spd: 58, wind: 0.44, reach: 36, dmg: 1, rec: 0.7, cd: [0.4, 0.9], sweep: 1, charge: 1, double: 1, blink: 1, blade: 1 },
   warden: { poise: 1, spd: 30, wind: 0.7, reach: 46, dmg: 2, rec: 1.0, cd: [0.9, 1.6], blade: 2, wide: 12 }
 };
+const DIFFS = [{ n: 'Story', hp: 1.15, wind: .9, cd: .7, cap: 2, inv: .6, w2: .3, rev: .5 }, { n: 'Hard', hp: 1.4, wind: .82, cd: .55, cap: 3, inv: .42, w2: .26, rev: .4 }, { n: 'Brutal', hp: 1.85, wind: .72, cd: .4, cap: 4, inv: .32, w2: .22, rev: 0 }];
+const VOICE0 = { drop: 'I CAME UP A LIFT SHAFT. I COME DOWN LIKE ONE.', roar: 'THEY TAUGHT ME TO KNEEL QUIETLY. I UNLEARNED IT.', ram: 'A VALVE RAM. IT WAS BUILT TO MOVE IRON. PEOPLE ARE EASIER.', boots: 'THEY BUILT THESE TO KEEP THEIR FEET OUT OF THE DIRT.' };
 const SUPT = 1.6; // how long the ELEVEN cut-in holds before the rush
 const ELEVEN = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'ELEVEN'];
 const DEV = { fury: 0, quick: 0 }; // dev menu switches: start fights at full fury, skip fight intro films
@@ -2547,21 +2621,21 @@ const Brawl = {
   // ---------------------------------------------------------- setup
   start(def, onEnd) {
     const hero = def.hero || {}, A = def.arena || { kind: 'ring', rx: 118, ry: 64 };
-    Object.assign(this, { def, onEnd, active: true, t: 0, parts: [], rings: [], freeze: 0, slow: 0, shake: 0, punch: 0, impact: 0, phase: 'intro', pt: 0, msg: '', msgT: 0, token: [], sup: null, wave: 0, arena: A, cine: null, tipT: 21, hitsN: 0, hitsT: 0, clang: 0, slashes: [], fin: null, flinched: 0, nums: [], scars: [], vq: [], vcur: null, vdone: {}, ft: 0, art: null, artDone: {}, lines: [], tex: {}, pat: {} });
+    Object.assign(this, { def, onEnd, active: true, t: 0, parts: [], rings: [], freeze: 0, slow: 0, shake: 0, punch: 0, impact: 0, phase: 'intro', pt: 0, msg: '', msgT: 0, token: [], sup: null, wave: 0, arena: A, cine: null, tipT: 24, hitsN: 0, hitsT: 0, clang: 0, slashes: [], fin: null, flinched: 0, nums: [], scars: [], vq: [], vcur: null, vdone: {}, ft: 0, art: null, artDone: {}, lines: [], tex: {}, pat: {} });
     const hw = A.kind === 'ring' ? A.rx : A.w / 2;
-    this.p = { z: 0, vz: 0, gd: 3, gdT: 0, hcd: 0, airN: 0, x: -hw * .5, y: 4, fx: 1, fy: 0, hp: hero.hp || 6, max: hero.hp || 6, pow: hero.pow || 1, blade: hero.blade || 0, sheet: hero.id ? World.sheetFor(hero.id) : P.sheet, st: 'idle', t: 0, combo: 0, comboT: 0, inv: 0, dcd: 0, open: 0, anim: 0, hit: false, kx: 0, ky: 0, hold: 0, trail: [],
+    this.p = { boots: def.boots ? 1 : 0, fu: 1, kn: 0, xh: 0, z: 0, vz: 0, gd: 3, gdT: 0, hcd: 0, airN: 0, x: -hw * .5, y: 4, fx: 1, fy: 0, hp: hero.hp || 6, max: hero.hp || 6, pow: hero.pow || 1, blade: hero.blade || 0, sheet: hero.id ? World.sheetFor(hero.id) : P.sheet, st: 'idle', t: 0, combo: 0, comboT: 0, inv: 0, dcd: 0, open: 0, anim: 0, hit: false, kx: 0, ky: 0, hold: 0, trail: [],
       fury: DEV.fury ? 100 : hero.fury0 !== undefined ? hero.fury0 : Math.min(60, ((G.flags || {}).fury | 0) * 7), rage: def.rage || 0 };
     this.pb = hero.id ? World.bustFor(hero.id) : makeBust(Object.assign(playerLook(), { mouth: 'frown' }));
     this.foes = []; this.spawn(def.waves ? def.waves[0] : def.foes, true); this.tap = false;
     this.allies = (def.allies || []).map((a, i) => ({ id: a, x: -hw * .5 - 14 + (i % 2) * 30, y: -24 + i * 22, fx: 1, fy: 0, st: 'approach', t: 0, cd: .6 + i * .4, anim: 0, kx: 0, ky: 0, sheet: World.sheetFor(a), ally: 1, flash: 0 }));
     this.buildProps(def.bg || 'ring', A); this.cam = { x: -60, y: 380, h: 170, f: 150, hor: Math.round(H * .2), roll: 0 }; this.rollK = 0;
     Sound.music(def.music || (def.bg && def.bg !== 'ring' ? 'battle' : 'work')); Input.consume(); HUD.dirty = true; Fade.a = 0; Fade.dir = 0; Fade.busy = false;
-    this.revived = 0;
-    if (def.intro && !(DEV.quick && !def.cineOnly) && !def._tries) this.playCine(def.intro, () => { if (def.cineOnly) return this.end(true); this.phase = 'intro'; this.pt = 0; });
+    this.revived = 0; this.D = DIFFS[Settings.d.diff === undefined ? 1 : Settings.d.diff] || DIFFS[1]; this._bg0 = def.bg; this.lt = 0;
+    if (def.intro && !(DEV.quick && !def.cineOnly) && !def._tries) this.playCine(def.intro, () => { if (def.cineOnly || def.film) return this.end(true); this.phase = 'intro'; this.pt = 0; });
   },
   spawn(list, first) {
     const A = this.arena, hw = A.kind === 'ring' ? A.rx : A.w / 2, hh = A.kind === 'ring' ? A.ry : A.h / 2, n = list.length, base = this.foes.length;
-    list.forEach((f, i) => { const K = Object.assign({}, FOE_KINDS[f.kind]); const hard = this.def.hero && this.def.hero.id && !this.def.doomed, cs = hard ? .7 : .82; K.wind *= hard ? .9 : .93; K.cd = [K.cd[0] * cs, K.cd[1] * cs]; if (hard) f = Object.assign({}, f, { hp: Math.round(f.hp * 1.15 * (1 - .08 * Math.min(3, this.def._tries || 0))) });
+    list.forEach((f, i) => { const K = Object.assign({}, FOE_KINDS[f.kind]); const D = this.D = DIFFS[Settings.d.diff === undefined ? 1 : Settings.d.diff] || DIFFS[1], hard = this.def.hero && this.def.hero.id && !this.def.doomed, cs = hard ? D.cd : (1 + D.cd) / 2; K.wind *= hard ? D.wind : (1 + D.wind) / 2; K.cd = [K.cd[0] * cs, K.cd[1] * cs]; if (hard && K.poise && D !== DIFFS[0]) { K.double = 1; K.charge = 1; K.triple = 1; } if (!this.def.doomed) f = Object.assign({}, f, { hp: Math.round(f.hp * (hard ? D.hp : 1 + (D.hp - 1) * .4) * (1 - .08 * Math.min(3, this.def._tries || 0))) });
       this.foes.push(Object.assign({ x: first && A.kind === 'ring' ? hw * .5 : (i - (n - 1) / 2) * Math.min(48, (hw * 1.6) / n), y: first && A.kind === 'ring' ? (i - (n - 1) / 2) * 30 : -hh + 6 - (first ? 0 : 40) - (i % 2) * 14,
         fx: -1, fy: 0, max: f.hp, st: 'approach', t: 0, cd: 1 + i * .7, anim: 0, kx: 0, ky: 0, sheet: World.sheetFor(f.id), K, said: 0, flash: 0, sc: f.sc || 1, idx: base + i, enter: !first }, f)); });
   },
@@ -2570,7 +2644,7 @@ const Brawl = {
     if (bg === 'ring') { const ids = ['bao', 'pell', 'juno', 'marrow', 'fen', 'orin', 'kit', 'hollis', 'tavi', 'c2', 'c3', 'c4', 'nell', 'c1'];
       for (let i = 0; i < 15; i++) { const a = Math.PI + (i + .5) / 15 * Math.PI; pr.push({ t: 'crowd', x: Math.cos(a) * (hw + 16), y: Math.sin(a) * (hh + 12), s: World.sheetFor(ids[i % ids.length]), k: i }); }
       for (let i = 0; i < 5; i++) pr.push({ t: 'lamp', x: -hw - 10 + i * (hw * 2 + 20) / 4, y: -hh - 26, k: i });
-    } else if (bg === 'furnace') {
+    } else if (bg === 'furnace' || bg === 'pit') {
       for (let i = 0; i < 6; i++) pr.push({ t: 'lamp', x: -hw - 10 + i * (hw * 2 + 20) / 5, y: -hh - 20, k: i });
       for (let i = 0; i < 4; i++) pr.push({ t: 'rock', x: (i - 1.5) * 60, y: -hh - 10, k: i });
     } else {
@@ -2589,7 +2663,8 @@ const Brawl = {
   },
   end(win) { this.active = false; Sound.rage = 0; if (Cutscene.active) { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } else if (MAPS[G.mapId]) Sound.music(MAPS[G.mapId].music); Input.consume(); HUD.dirty = true; const cb = this.onEnd; this.onEnd = null; cb && cb(win); },
   // Kael narrates. Lines come on a clock and on events, and never stop the fight.
-  voice(key) { const v = this.def.voice; if (!v || !v[key] || this.vdone[key] || this.vq.length > 0) return; this.vdone[key] = 1; this.vq.push(v[key]); },
+  voice(key) { let v = this.def.voice; if (v && !v[key] && VOICE0[key] && this.def.hero && this.def.hero.id) v = VOICE0; if (!v || !v[key] || this.vdone[key] || this.vq.length > 0) return; this.vdone[key] = 1; this.vq.push(v[key]); },
+  lurch(dt) { this.lt += dt; if (this.lt < 7) return; this.lt = 0; const s = Math.random() < .5 ? 1 : -1; this.shake = .7; this.say('THE DECK DROPS', true); Sound.play('rumble'); this.p.kx += s * 130; for (const f of this.foes) if (f.st !== 'down') { f.kx += s * 150; } for (const a of this.allies) a.kx = (a.kx || 0) + s * 120; },
   updVoice(dt) { const v = this.def.voice; if (!v) return; this.ft += dt; (v.at || []).forEach(([at, t], i) => { if (this.ft >= at && !this.vdone['t' + i]) { this.vdone['t' + i] = 1; this.vq.push(t); } });
     if (this.vcur) { this.vcur.life -= dt; if (this.vcur.life <= 0) this.vcur = null; } if (!this.vcur && this.vq.length) { const t = this.vq.shift(); this.vcur = { t, life: 3.2 + t.length * .07, max: 3.2 + t.length * .07 }; } },
   say(t, big) { this.msg = t; this.msgT = big ? 1.6 : 1.1; },
@@ -2608,13 +2683,13 @@ const Brawl = {
       if (p.gt < .2) { f.st = 'hurt'; f.t = -.6; f.flash = .2; f.kx = -ax * 130; f.ky = -ay * 130; this.token = this.token.filter(o => o !== f); p.open = 1.4; p.inv = .35; this.slow = .45; this.freeze = .12; this.shake = .4; this.impact = .14; p.rip = 1.3; this.say('PARRY!'); Sound.play('clash'); this.spark(p.x - ax * 12, p.y - ay * 12, '#fff6dc', 14); this.ring(p.x - ax * 12, p.y - ay * 12, '#fff2c0', 34); this.gain(18); return; }
       if (dmg < 2 && p.gd > 0) { p.gd--; p.gdT = 0; p.inv = .15; p.kx = ax * 90; p.ky = ay * 90; Sound.play('steel'); this.spark(p.x - ax * 10, p.y - ay * 10, '#c8ccd4', 6); this.gain(4); if (p.gd <= 0) { p.st = 'hurt'; p.t = -.5; this.say('GUARD BROKEN'); Sound.play('deny'); } return; }
       dmg = Math.max(1, dmg - 1); this.say('CRUSHED'); }
-    this.voice('hurt'); p.hp -= dmg; p.st = 'hurt'; p.t = 0; p.inv = this.def.legend ? 0.6 : 0.8; p.kx = ax * 160; p.ky = ay * 160; p.combo = 0; this.freeze = 0.1; this.shake = 0.35; this.impact = .12; Sound.play('hit'); if (f && f.K && f.K.blade) Sound.play('slash'); this.spark(p.x, p.y, '#ff5a4a', 9); this.gain(16);
-    if (p.hp <= 0) { if (this.def.legend && !this.revived) { this.revived = 1; p.hp = Math.ceil(p.max * .5); p.fury = 100; p.inv = 1.6; this.say('NOT TODAY.', true); this.ring(p.x, p.y, '#ffe08a', 90); Sound.play('roar'); for (const o of this.foes) if (o.st !== 'down') { const d = Math.hypot(o.x - p.x, o.y - p.y) || 1; if (d < 90) { o.kx = (o.x - p.x) / d * 260; o.ky = (o.y - p.y) / d * 260; o.st = 'hurt'; o.t = 0; } } } else { p.st = 'down'; this.phase = 'lose'; this.pt = 0; } }
+    this.voice('hurt'); p.hp -= dmg; p.st = 'hurt'; p.t = 0; p.inv = this.def.legend ? this.D.inv : 0.7; p.kx = ax * 160; p.ky = ay * 160; p.combo = 0; this.freeze = 0.1; this.shake = 0.35; this.impact = .12; Sound.play('hit'); if (f && f.K && f.K.blade) Sound.play('slash'); this.spark(p.x, p.y, '#ff5a4a', 9); this.gain(16);
+    if (p.hp <= 0) { if (this.def.legend && !this.revived && this.D.rev) { this.revived = 1; p.hp = Math.ceil(p.max * this.D.rev); p.fury = 100; p.inv = 1.6; this.say('NOT TODAY.', true); this.ring(p.x, p.y, '#ffe08a', 90); Sound.play('roar'); for (const o of this.foes) if (o.st !== 'down') { const d = Math.hypot(o.x - p.x, o.y - p.y) || 1; if (d < 90) { o.kx = (o.x - p.x) / d * 260; o.ky = (o.y - p.y) / d * 260; o.st = 'hurt'; o.t = 0; } } } else { p.st = 'down'; this.phase = 'lose'; this.pt = 0; } }
   },
   hitFoe(f, dmg, ax, ay, big) {
     const crit = this.p.open > 0 || !!this.sup || !!this.art || !!this.p.heavy;
     if (this.def.doomed) { f.flash = 0.08; Sound.play('steel'); this.spark(f.x, f.y, '#c8ccd4', 5); this.p.kx = -ax * 150; this.p.ky = -ay * 150; this.clang++; f.bark = { t: ['CLANG', '...', 'CLANG'][this.clang % 3], life: .5 }; this.gain(10); return; }
-    if (f.st === 'wind' && !crit && !f.K.soft && f.mode !== 'charge' && this.p.gapT > .55 && !(f.clashT > this.t) && f.t > (f.second ? .3 : f.K.wind) - .17) { f.clashT = this.t + 3; f.st = 'hurt'; f.t = -.35; f.flash = .2; f.kx = ax * 150; f.ky = ay * 150; f.hp -= dmg; this.token = this.token.filter(o => o !== f); this.freeze = .14; this.slow = .35; this.shake = .4; this.impact = .16; this.punch = .3; this.rollK = .1; this.say('CLASH!'); Sound.play('clash'); this.spark(f.x - ax * 12, f.y - ay * 12, '#fff6dc', 16); this.ring(f.x - ax * 12, f.y - ay * 12, '#fff2c0', 34); this.slashes.push({ x: f.x - ax * 12, y: f.y - ay * 12, a: 1, life: .22, big: 1 }); this.gain(14); this.p.open = Math.max(this.p.open, .8); this.voice('clash'); if (f.hp <= 0) f.hp = 1; return; }
+    if (f.st === 'wind' && !crit && !f.K.soft && f.mode !== 'charge' && this.p.gapT > .55 && !(f.clashT > this.t) && f.t > (f.second ? this.D.w2 : f.K.wind) - .17) { f.clashT = this.t + 3; f.st = 'hurt'; f.t = -.35; f.flash = .2; f.kx = ax * 150; f.ky = ay * 150; f.hp -= dmg; this.token = this.token.filter(o => o !== f); this.freeze = .14; this.slow = .35; this.shake = .4; this.impact = .16; this.punch = .3; this.rollK = .1; this.say('CLASH!'); Sound.play('clash'); this.spark(f.x - ax * 12, f.y - ay * 12, '#fff6dc', 16); this.ring(f.x - ax * 12, f.y - ay * 12, '#fff2c0', 34); this.slashes.push({ x: f.x - ax * 12, y: f.y - ay * 12, a: 1, life: .22, big: 1 }); this.gain(14); this.p.open = Math.max(this.p.open, .8); this.voice('clash'); if (f.hp <= 0) f.hp = 1; return; }
     if (f.guardT > 0 && !crit) { f.flash = 0.06; Sound.play(this.p.blade || f.K.blade ? 'steel' : 'deny'); this.spark(f.x, f.y, '#8a94a4', 4); this.p.kx = -ax * 120; this.p.ky = -ay * 120; if (!f.blk) { f.blk = 1; f.bark = { t: 'BLOCKED', life: .7 }; } return; }
     if (f.st === 'floor' && !this.art && !this.sup) { dmg += 2 * this.p.pow; f.t = Math.min(f.t, .5); if (!f.nm) { f.nm = 1; this.say('NO MERCY'); } }
     this.nums.push({ x: f.x + (Math.random() - .5) * 10, y: f.y, h: 70 + (f.z || 0), v: dmg, big, life: .7 });
@@ -2640,7 +2715,7 @@ const Brawl = {
     if (this.phase === 'intro') { this.pt += dt; this.camFollow(dt); if (this.pt > 1.5 || (this.pt > .5 && Input.p('A'))) { this.phase = 'fight'; this.say('FIGHT!', true); Sound.play(this.def.hero && this.def.hero.id ? 'horn' : 'bell'); Input.consume(); } return; }
     if (this.phase === 'win' || this.phase === 'lose') { this.pt += dt; this.stepParts(dt * .5); this.camFollow(dt * .5); for (const f of this.foes) { f.t += dt * .5; f.x += f.kx * dt * .4; f.y += f.ky * dt * .4; f.kx *= .9; f.ky *= .9; } if (this.pt > 2.1) { if (this.phase === 'win' && this.def.outro) this.playCine(this.def.outro, () => this.end(true)); else if (this.phase === 'lose' && this.def.legend) { const d = this.def, e = this.onEnd; d._tries = (d._tries || 0) + 1; this.start(d, e); this.say('AGAIN.', true); } else this.end(this.phase === 'win'); } return; }
     if (this.def.doomed && this.t > this.def.doomed + 1.6) { const p = this.p; p.st = 'down'; p.t = 0; this.impact = .3; this.shake = .8; Sound.play('hit'); this.phase = 'lose'; this.pt = 0.9; return; }
-    Sound.rage = this.phase === 'fight' ? this.p.fury / 100 : 0; this.updVoice(dt); if (this.p.fury >= 100 && this.phase === 'fight') { this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = .62; if (!Settings.d.reduce) this.spark(this.p.x, this.p.y, '#ff7a30', 3, 2); } }
+    Sound.rage = this.phase === 'fight' ? this.p.fury / 100 : 0; this.updVoice(dt); if (this.def.lurch && this.phase === 'fight' && !this.art && !this.sup) this.lurch(dt); if (this.p.fury >= 100 && this.phase === 'fight') { this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = .62; if (!Settings.d.reduce) this.spark(this.p.x, this.p.y, '#ff7a30', 3, 2); } }
     if (this.freeze > 0) { this.freeze -= dt; return; }
     if (this.art) { this.updArt(dt); this.stepParts(dt); this.camFollow(dt); return; }
     if (this.sup) { this.updSuper(dt); this.stepParts(dt); this.camFollow(dt); return; }
@@ -2660,13 +2735,15 @@ const Brawl = {
     c.x += (wx + sside - c.x) * Math.min(1, k * (sside ? 2.2 : 1)); c.y += (wy - (sside ? 26 : 0) - c.y) * k; c.h += ((this.sup ? 44 : this.g3 ? 88 : 62) - c.h) * k; c.f += (150 * (1 + this.punch * .9) - c.f) * Math.min(1, dt * 12); c.hor += (Math.round(H * (this.g3 && !this.sup ? .22 : .32)) - c.hor) * k;
   },
   updPlayer(dt) {
-    const p = this.p; p.inv = Math.max(0, p.inv - dt); p.dcd = Math.max(0, p.dcd - dt); p.hcd = Math.max(0, p.hcd - dt); for (const k of ['rip', 'bcd', 'lcd', 'rcd', 'gcd', 'scd']) p[k] = Math.max(0, (p[k] || 0) - dt); p.open = Math.max(0, p.open - dt); p.comboT -= dt; if (p.comboT <= 0) p.combo = 0;
+    const p = this.p; p.inv = Math.max(0, p.inv - dt); p.dcd = Math.max(0, p.dcd - dt); p.hcd = Math.max(0, p.hcd - dt); p.xh = Input.h('X') ? p.xh + dt : 0; for (const k of ['rip', 'bcd', 'lcd', 'rcd', 'gcd', 'scd', 'pcd', 'knT']) p[k] = Math.max(0, (p[k] || 0) - dt); p.open = Math.max(0, p.open - dt); p.comboT -= dt; if (p.comboT <= 0) p.combo = 0;
     if (p.gd < 3) { p.gdT += dt; if (p.gdT > 2.2) { p.gd++; p.gdT = 0; } }
     p.x += p.kx * dt; p.y += p.ky * dt; p.kx *= Math.pow(.001, dt); p.ky *= Math.pow(.001, dt);
     if (p.pull) { const q = p.pull, k = Math.min(1, dt * 20); q.t -= dt; p.x += (q.x - p.x) * k; p.y += (q.y - p.y) * k; if (q.t <= 0) p.pull = null; }
     let vx = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), vy = (Input.h('down') ? 1 : 0) - (Input.h('up') ? 1 : 0); if (vx && vy) { vx *= .7071; vy *= .7071; }
     const busy = p.st === 'hurt' || p.st === 'down'; let air = p.z > 0 || p.vz > 0;
-    if (air) { p.z += p.vz * dt; p.vz -= (p.st === 'plunge' ? 1700 : p.st === 'drop' ? (p.vz > 0 ? 900 : 2600) : 640) * dt; if (p.z <= 0) { p.z = 0; p.vz = 0; air = false; this.land(); } }
+    if (air) { p.z += p.vz * dt; p.vz -= (p.st === 'plunge' ? 1700 : p.st === 'drop' ? (p.vz > 0 ? 900 : 2600) : p.boots ? 520 : 640) * dt;
+      if (p.boots && Input.h('Y') && p.fu > 0 && p.st !== 'plunge' && p.st !== 'drop' && p.st !== 'dive' && p.st !== 'hurt') { if (p.vz < 120) p.vz = Math.min(120, p.vz + 1700 * dt); if (p.z > 105) p.vz = Math.min(p.vz, 0); p.fu -= dt / 2.4; p.hov = 1; if (!p.bv) { p.bv = 1; this.voice('boots'); } } else p.hov = 0; if (p.z <= 0) { p.z = 0; p.vz = 0; air = false; this.land(); } }
+    if (!air) p.fu = Math.min(1, p.fu + dt * .7);
     // fury: hold strike (or both shoulders) when the gauge is full
     if (!busy && Input.h('A')) p.hold += dt; else p.hold = 0;
     if (p.fury >= 100 && !busy && !air && (p.hold > 0.42 || (Input.h('L') && Input.h('R')))) { this.startSuper(); return; }
@@ -2680,30 +2757,34 @@ const Brawl = {
     else if (p.st === 'lash') { p.t += dt; const a = p.la0 + p.t / .42 * 7.6; p.fx = Math.cos(a); p.fy = Math.sin(a);
       if (!p.hit && p.t > .14) { p.hit = true; let any = false; for (const f of this.foes.slice()) if (f.st !== 'down' && !f.enter) { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; if (d < 66) { any = true; this.hitFoe(f, (1 + (p.open > 0 ? 1 : 0)) * p.pow, dx / d, dy / d, false); if (f.hp > 0 && f.st !== 'down') { f.kx = dx / d * 240; f.ky = dy / d * 240; if (!f.K.poise) { f.st = 'hurt'; f.t = -.15; this.token = this.token.filter(o => o !== f); } } } } this.ring(p.x, p.y, '#ffe08a', 66); if (any) this.shake = Math.max(this.shake, .3); }
       if (p.t > .42) { p.st = 'idle'; this.aim(0); } }
+    else if (p.st === 'skick') { p.t += dt; if (p.t > .08 && p.t < .2) { p.x += p.ax * 130 * dt; p.y += p.ay * 130 * dt; } if (!p.hit && p.t >= .17) { p.hit = true; this.skickLand(); } if (p.t > .48) p.st = 'idle'; }
+    else if (p.st === 'ram') { p.t += dt; if (p.t > .08 && p.t < .2) { p.x += p.ax * 120 * dt; p.y += p.ay * 120 * dt; } if (!p.hit && p.t >= .17) { p.hit = true; this.ramLand(); } if (p.t > .5) p.st = 'idle'; }
     else if (p.st === 'butt') { p.t += dt; if (p.t < .1) { p.x += p.ax * 90 * dt; p.y += p.ay * 90 * dt; } if (!p.hit && p.t > .1) { p.hit = true; this.buttLand(); } if (p.t > .4) p.st = 'idle'; }
     else if (p.st === 'roar') { p.t += dt; if (p.t > .5) p.st = 'idle'; }
     else if (p.st === 'dive') { p.t += dt; p.x += p.ax * 250 * dt; p.y += p.ay * 250 * dt; if (Math.floor(p.t * 40) % 2 === 0) p.trail.push({ x: p.x, y: p.y, life: .2 });
       if (!p.hit) for (const f of this.foes) if (f.st !== 'down' && !f.enter && Math.hypot(f.x - p.x, f.y - p.y) < 20) { p.hit = true; if (f.guardT > 0) f.guardT = 0; this.hitFoe(f, 2 * p.pow, p.ax, p.ay, true); Sound.play('hit'); this.say('DIVE KICK'); p.vz = 200; p.z = Math.max(p.z, 6); p.st = 'idle'; p.airN = 0; p.kx = -p.ax * 60; p.ky = -p.ay * 60; break; } }
-    else if (p.st === 'hook') { p.t += dt; if (!p.hit && p.t > .13) { p.hit = true; this.hookLand(); } if (p.t > .36) p.st = 'idle'; }
+    else if (p.st === 'hook') { p.t += dt; if (!p.hit && p.t > .13) { p.hit = true; this.hookLand(); } if (p.t > .36) p.st = 'idle'; else if (p.t > .24 && Input.p('L') && p.pcd <= 0) this.ram(); }
     else if (p.st === 'guard') { p.gt += dt; const f = this.nearest(p); if (f) { const d = Math.hypot(f.x - p.x, f.y - p.y) || 1; p.fx = (f.x - p.x) / d; p.fy = (f.y - p.y) / d; }
       if (!Input.h('R')) p.st = 'idle'; else if (this.special()) { } else if (Input.p('A')) this.strike(); else if (Input.p('X')) this.kick(); else if (Input.p('Y')) this.jump(); else if (Input.p('B') && p.dcd <= 0) this.dodge(vx, vy); }
     else if (p.st === 'kick') { p.t += dt; if (p.t < .1) { const v = p.fly ? 240 : 70 + (p.gap || 0) * 12; p.x += p.ax * v * dt; p.y += p.ay * v * dt; }
       if (!p.hit && p.t >= .09) { p.hit = true; this.kickLand(); }
-      if (!p.fly && p.t > .24 && Input.h('X') && p.bcd <= 0) this.bore(); else if (p.t > (p.fly ? .36 : .3)) p.st = 'idle'; else if (p.t > .17 && Input.p('A')) this.strike(); else if (p.t > .17 && Input.p('Y')) this.jump(); else if (p.t > .14 && Input.p('B') && p.dcd <= 0) this.dodge(vx, vy); }
+      if (!p.fly && p.t > .2 && p.xh > .28) this.skick(); else if (p.t > (p.fly || p.kn === 3 ? .38 : .27)) p.st = 'idle'; else if (p.t > .14 && Input.p('X') && !p.fly && p.kn < 3) this.kick(); else if (p.t > .17 && Input.p('A')) this.strike(); else if (p.t > .15 && Input.p('L') && p.pcd <= 0) this.ram(); else if (p.t > .17 && Input.p('Y')) this.jump(); else if (p.t > .14 && Input.p('B') && p.dcd <= 0) this.dodge(vx, vy); }
     else if (p.st === 'dodge') { p.t += dt; p.x += p.dx * 215 * dt; p.y += p.dy * 215 * dt; if (Math.floor(p.t * 40) % 2 === 0) p.trail.push({ x: p.x, y: p.y, life: .22 }); if (p.t > 0.3) p.st = 'idle'; else if (p.t > .09 && Input.p('X')) this.kick(true); else if (p.t > .09 && Input.p('A')) { const tg = this.nearest(p); if (tg) { const d = Math.hypot(tg.x - p.x, tg.y - p.y) || 1; p.fx = (tg.x - p.x) / d; p.fy = (tg.y - p.y) / d; } p.combo = 0; this.strike(); p.gap = Math.max(p.gap || 0, 30); p.dash = 1; Sound.play('move'); this.spark(p.x, p.y, '#c8b8ff', 6, 6); } }
     else if (p.st === 'atk') {
       p.t += dt; const dur = p.combo === 3 ? 0.36 : 0.24; if (p.t < 0.1) { const v = 100 + (p.gap || 0) * 14; p.x += p.ax * v * dt; p.y += p.ay * v * dt; }
       if (!p.hit && p.t >= 0.07) { p.hit = true; const big = p.combo === 3, R = (big ? 36 : 30) + (p.blade ? 8 : 0); let any = false;
         for (const f of this.foes) if (f.st !== 'down') { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy); if (d < R && (d < 10 || (dx * p.ax + dy * p.ay) / d > (p.blade ? -0.1 : 0.2))) { any = true; this.hitFoe(f, ((big ? 2 : 1) + (p.open > 0 ? 1 : 0) + (p.fury >= 100 ? 1 : 0) + (p.dash ? 1 : 0) + (p.heavy ? 2 : 0)) * p.pow, dx / (d || 1), dy / (d || 1), (big && !air) || p.open > 0 || !!p.dash); } } p.dash = 0; if (p.heavy && any) { this.scars.push({ x: p.x + p.ax * 22, y: p.y + p.ay * 22, r: 13, life: 30 }); this.shake = .5; } p.heavy = 0;
         if (air && any) p.vz = Math.max(p.vz, 70); }
-      if (p.t > dur) p.st = 'idle'; else if (p.t > 0.14 && Input.p('A') && p.combo < 3 && (!air || p.airN < 3)) { if (air) p.airN++; this.strike(); }
+      if (p.t > dur) p.st = 'idle'; else if (p.t > 0.14 && Input.p('A') && (p.combo < 3 || (air && p.boots)) && (!air || p.boots || p.airN < 3)) { if (air) p.airN++; if (p.combo >= 3) p.combo = 0; this.strike(); }
+      else if (p.t > .12 && Input.p('L') && p.pcd <= 0 && !air) this.ram();
       else if (p.t > .12 && Input.p('X')) { if (air) this.dive(); else this.kick(); }
-      else if (p.t > .12 && Input.p('Y')) { if (!air) this.jump(); else if (p.scd <= 0 && p.z > 8) this.drop(); }
-      if (Input.p('B') && p.t > 0.1) { if (air) this.plunge(); else if (p.dcd <= 0) this.dodge(vx, vy); }
+      else if (p.t > .12 && Input.p('Y')) { if (!air) this.jump(); else this.airY(); }
+      else if (air && p.boots && Input.p('R')) this.slam();
+      if (Input.p('B') && p.t > 0.1) { if (air) this.airB(vx, vy); else if (p.dcd <= 0) this.dodge(vx, vy); }
     } else {
       if (vx || vy) { p.x += vx * 88 * dt; p.y += vy * 88 * dt; p.anim += dt; p.fx = vx; p.fy = vy; p.st = air ? 'idle' : 'move'; } else { p.st = 'idle'; p.anim = 0; const f = this.nearest(p); if (f) { const d = Math.hypot(f.x - p.x, f.y - p.y) || 1; p.fx = (f.x - p.x) / d; p.fy = (f.y - p.y) / d; } }
-      if (air) { if (Input.p('Y') && p.scd <= 0 && p.z > 8) this.drop(); else if (Input.p('A') && p.airN < 3) { p.airN++; this.strike(); p.vz = Math.max(p.vz, 50); } else if (Input.p('X')) this.dive(); else if (Input.p('B')) this.plunge(); }
-      else if (Input.h('R') && this.special()) { } else if (Input.p('Y')) this.jump(); else if (Input.p('A')) this.strike(); else if (Input.p('X')) this.kick(); else if (Input.p('L') && p.hcd <= 0) this.hook();
+      if (air) { if (Input.p('Y')) this.airY(); else if (p.boots && Input.p('R')) this.slam(); else if (Input.p('A') && (p.boots || p.airN < 3)) { p.airN++; this.strike(); p.vz = Math.max(p.vz, 50); } else if (Input.p('X')) this.dive(); else if (Input.p('B')) this.airB(vx, vy); }
+      else if (Input.h('R') && this.special()) { } else if (Input.p('Y')) this.jump(); else if (Input.p('A')) this.strike(); else if (Input.p('X')) this.kick(); else if (Input.p('L')) { const f = this.nearest(p); if (f && Math.hypot(f.x - p.x, f.y - p.y) < 46 && p.pcd <= 0) this.ram(); else if (p.hcd <= 0) this.hook(); }
       else if (Input.p('B') && p.dcd <= 0) this.dodge(vx, vy); else if (Input.h('R') && p.gd > 0) { p.st = 'guard'; p.gt = Input.p('R') ? 0 : .5; }
     }
     for (const q of p.trail) q.life -= dt; p.trail = p.trail.filter(q => q.life > 0);
@@ -2719,10 +2800,10 @@ const Brawl = {
       this.scars.push({ x: p.x, y: p.y, r: 15, life: 30 }); this.ring(p.x, p.y, '#fff2c0', 56); this.shake = .6; this.punch = .25; Sound.play(any ? 'bigslash' : 'bodyfall'); this.spark(p.x, p.y, '#c8c0a0', 14, 0); this.say('PLUNGE'); p.st = 'atk'; p.combo = 3; p.comboT = .5; p.t = .1; p.hit = true; p.inv = Math.max(p.inv, .15); }
     else { if (p.st === 'dive') { p.st = 'idle'; p.kx = p.ax * 90; p.ky = p.ay * 90; } this.spark(p.x, p.y, '#c8c0a0', 4, 0); } },
   // signatures
-  special() { const p = this.p; if (Input.p('A') && p.lcd <= 0) { this.lash(); return true; } if (Input.p('X') && p.gcd <= 0) { const f = this.nearest(p); if (f && Math.hypot(f.x - p.x, f.y - p.y) < 44) { this.butt(f); return true; } } if (Input.p('L') && p.rcd <= 0 && p.fury < 100) { this.roar(); return true; } return false; },
+  special() { const p = this.p; if (Input.p('Y') && p.bcd <= 0) { this.bore(); return true; } if (Input.p('A') && p.lcd <= 0) { this.lash(); return true; } if (Input.p('X') && p.gcd <= 0) { const f = this.nearest(p); if (f && Math.hypot(f.x - p.x, f.y - p.y) < 44) { this.butt(f); return true; } } if (Input.p('L') && p.rcd <= 0 && p.fury < 100) { this.roar(); return true; } return false; },
   lash() { const p = this.p; p.st = 'lash'; p.t = 0; p.hit = false; p.lcd = 1.3; p.la0 = Math.atan2(p.fy, p.fx) - 1.2; Sound.play('swing2'); Sound.play('swing'); this.say('WIDE CUT'); },
   bore() { const p = this.p; this.aim(0); p.st = 'bore'; p.t = 0; p.bh = []; p.bcd = 3.5; Sound.play('fury'); this.say('BREACH'); },
-  drop() { const p = this.p; p.hk = this.nearest(p); p.st = 'drop'; p.t = 0; p.vz = 520; p.scd = 7; p.inv = Math.max(p.inv, .4); Sound.play('dash'); Sound.play('sweep'); this.spark(p.x, p.y, '#ffb040', 10, 0); },
+  drop() { const p = this.p; p.hk = this.nearest(p); p.st = 'drop'; p.t = 0; p.vz = 520; p.scd = 9; p.inv = Math.max(p.inv, .4); Sound.play('dash'); Sound.play('sweep'); this.spark(p.x, p.y, '#ffb040', 10, 0); },
   butt(f) { const p = this.p, d = Math.hypot(f.x - p.x, f.y - p.y) || 1; p.fx = p.ax = (f.x - p.x) / d; p.fy = p.ay = (f.y - p.y) / d; p.st = 'butt'; p.t = 0; p.hit = false; p.hk = f; p.gcd = 2; p.inv = Math.max(p.inv, .2); Sound.play('dash'); },
   buttLand() { const p = this.p, f = p.hk; if (!f || f.st === 'down' || Math.hypot(f.x - p.x, f.y - p.y) > 40) return; if (f.guardT > 0) f.guardT = 0; this.token = this.token.filter(o => o !== f); Sound.play('hit'); Sound.play('bodyfall'); this.shake = .45; this.impact = .12;
     if (!f.K.poise && !this.def.doomed) { this.hitFoe(f, 2 * p.pow, p.ax, p.ay, true); if (f.hp > 0) { f.kx = p.ax * 420; f.ky = p.ay * 420; f.vz = 150; f.air = 1; f.thrown = .6; } this.say('THROWN'); }
@@ -2732,11 +2813,23 @@ const Brawl = {
     for (const a of this.allies) a.bark = { t: 'WITH HIM!', life: 1 }; },
   dive() { const p = this.p; this.aim(0); p.st = 'dive'; p.t = 0; p.hit = false; p.vz = Math.min(p.vz, -150); Sound.play('dash'); },
   plunge() { const p = this.p; p.st = 'plunge'; p.t = 0; p.vz = Math.min(p.vz, -60); Sound.play('swing2'); },
-  kick(fly) { const p = this.p; p.kc = p.combo; this.aim(24); p.st = 'kick'; p.t = 0; p.hit = false; p.fly = fly ? 1 : 0; Sound.play('dash'); },
-  kickLand() { const p = this.p, R = p.fly ? 40 : 32; let any = false;
+  kick(fly) { const p = this.p; p.kc = p.combo; p.kn = fly ? 0 : p.knT > 0 ? p.kn % 3 + 1 : 1; p.knT = .7; this.aim(24); p.st = 'kick'; p.t = 0; p.hit = false; p.fly = fly ? 1 : 0; Sound.play(p.kn === 3 ? 'swing2' : 'dash'); },
+  skick() { const p = this.p; this.aim(28); p.st = 'skick'; p.t = 0; p.hit = false; p.xh = -9; p.kn = 0; Sound.play('swing2'); },
+  skickLand() { const p = this.p; let any = false;
+    for (const f of this.foes.slice()) if (f.st !== 'down' && !f.enter) { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy); if (!(d < 44 && (d < 10 || (dx * p.ax + dy * p.ay) / d > .2))) continue; any = true; if (f.guardT > 0) { f.guardT = 0; f.blk = 0; } this.token = this.token.filter(o => o !== f);
+      p.heavy = 1; this.hitFoe(f, 3 * p.pow, p.ax, p.ay, true); p.heavy = 0; if (f.hp > 0 && f.st !== 'down') { if (!f.K.poise) { f.kx = p.ax * 480; f.ky = p.ay * 480; f.vz = 140; f.air = 1; f.thrown = .7; } else { f.st = 'hurt'; f.t = -.5; f.kx = p.ax * 330; f.ky = p.ay * 330; } } }
+    if (any) { Sound.play('hit'); Sound.play('bodyfall'); this.shake = .5; this.impact = .12; this.freeze = .07; this.ring(p.x + p.ax * 26, p.y + p.ay * 26, '#fff2c0', 30); this.say('BOOT'); } },
+  ram() { const p = this.p; this.aim(30); p.st = 'ram'; p.t = 0; p.hit = false; p.pcd = 3; Sound.play('fury'); },
+  ramLand() { const p = this.p, hx = p.x + p.ax * 22, hy = p.y + p.ay * 22; let first = null;
+    for (const f of this.foes.slice()) if (f.st !== 'down' && !f.enter) { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy), c = d < 10 ? 1 : (dx * p.ax + dy * p.ay) / d; if (d < 50 && c > .2 && !first) { first = f; if (f.guardT > 0) { f.guardT = 0; f.blk = 0; } this.token = this.token.filter(o => o !== f); p.heavy = 1; this.hitFoe(f, 4 * p.pow, p.ax, p.ay, true); p.heavy = 0; if (f.hp > 0 && f.st !== 'down') { if (!f.K.poise) { f.kx = p.ax * 520; f.ky = p.ay * 520; f.vz = 170; f.air = 1; f.thrown = .8; } else { f.st = 'hurt'; f.t = -.6; f.kx = p.ax * 260; f.ky = p.ay * 260; } } } else if (d < 110 && c > .55) { this.hitFoe(f, 1 * p.pow, p.ax, p.ay, false); if (f.hp > 0) { f.kx = p.ax * 220; f.ky = p.ay * 220; } } }
+    this.ring(hx, hy, '#ffb040', 48); this.ring(hx, hy, '#fff2c0', 26); this.spark(hx, hy, '#ffb040', 18); Sound.play('bigslash'); Sound.play('thud'); this.shake = first ? .7 : .3; if (first) { this.impact = .16; this.freeze = .1; this.punch = .3; this.scars.push({ x: hx, y: hy, r: 10, life: 30 }); } this.say('THE RAM', true); this.voice('ram'); },
+  airY() { const p = this.p; if (p.boots) { if (p.fu > .2) { p.fu -= .22; p.vz = 230; Sound.play('dash'); this.spark(p.x, p.y, '#8ad8ff', 8, 0); } } else if (p.scd <= 0 && p.z > 8) this.drop(); },
+  airB(vx, vy) { const p = this.p; if (!p.boots) return this.plunge(); if (p.dcd > 0 || p.fu < .15) return; p.fu -= .18; this.dodge(vx || p.fx, vy || p.fy); p.vz = Math.max(p.vz, 60); p.dcd = .3; },
+  slam() { const p = this.p; if (p.z > 40 && p.scd <= 0) { this.drop(); p.vz = 200; } else this.plunge(); },
+  kickLand() { const p = this.p, R = p.fly || p.kn === 3 ? 40 : 32; let any = false;
     for (const f of this.foes.slice()) if (f.st !== 'down' && !f.enter) { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy); if (!(d < R && (d < 10 || (dx * p.ax + dy * p.ay) / d > .1))) continue; any = true;
-      const g = f.guardT > 0, wind = f.st === 'wind' && f.mode !== 'charge' && !f.K.poise; if (g) { f.guardT = 0; f.blk = 0; }
-      this.hitFoe(f, (p.fly ? 2 : 1) * p.pow, p.ax, p.ay, !!p.fly || p.kc >= 2 || g);
+      const g = f.guardT > 0, wind = f.st === 'wind' && f.mode !== 'charge' && !f.K.poise, rh = p.kn === 3; if (g) { f.guardT = 0; f.blk = 0; }
+      this.hitFoe(f, (p.fly || rh ? 2 : 1) * p.pow, p.ax, p.ay, !!p.fly || p.kc >= 2 || g || rh); if (rh && !g) this.say('ROUNDHOUSE');
       if (f.hp > 0 && f.st !== 'down') { if (g) { f.st = 'hurt'; f.t = -.55; f.bark = { t: 'GUARD BROKEN', life: .8 }; p.open = Math.max(p.open, 1); this.say('GUARD BREAK'); this.token = this.token.filter(o => o !== f); } else if (wind) { f.st = 'hurt'; f.t = -.2; this.token = this.token.filter(o => o !== f); } f.kx = p.ax * 260; f.ky = p.ay * 260; } }
     if (any) { Sound.play('hit'); this.shake = Math.max(this.shake, .25); } },
   hook() { const p = this.p, f = this.nearest(p); if (!f || Math.hypot(f.x - p.x, f.y - p.y) > 190) { this.say('TOO FAR'); return; } const d = Math.hypot(f.x - p.x, f.y - p.y) || 1; p.fx = p.ax = (f.x - p.x) / d; p.fy = p.ay = (f.y - p.y) / d; p.st = 'hook'; p.t = 0; p.hit = false; p.hk = f; p.hcd = 2.6; Sound.play('swing'); },
@@ -2806,21 +2899,22 @@ const Brawl = {
       let mx = 0, my = 0; if (d > want) { mx = dx / d; my = dy / d; } else if (d < want * 0.55) { mx = -dx / d; my = -dy / d; } else { const s = (f.idx % 2 ? 1 : -1); mx = -dy / d * .6 * s; my = dx / d * .6 * s; }
       for (const o of this.foes) if (o !== f && o.st !== 'down') { const ox = f.x - o.x, oy = f.y - o.y, od = Math.hypot(ox, oy) || 1; if (od < 26) { mx += ox / od; my += oy / od; } }
       f.x += mx * K.spd * dt; f.y += my * K.spd * dt; f.anim += dt;
-      const cap = T === p ? (this.foes.filter(o => o.st !== 'down').length > 1 ? 2 : 1) : 99;
+      const cap = T === p ? Math.min(this.D.cap, this.foes.filter(o => o.st !== 'down').length) : 99;
       if (f.cd <= 0 && (T !== p || this.token.length < cap || this.token.includes(f)) && p.st !== 'down') {
         const far = K.charge && d > 60 && Math.random() < .7;
         if (K.blink && T === p && d > 44 && Math.random() < .5) { this.spark(f.x, f.y, '#fff6dc', 10); f.x = p.x - p.fx * 30; f.y = p.y - p.fy * 30; this.clampA(f); this.spark(f.x, f.y, '#fff6dc', 10); Sound.play('page'); f.cd = .25; return; }
-        if (d < K.reach * 1.25 || far) { if (T === p && !this.token.includes(f)) this.token.push(f); f.st = 'wind'; f.t = 0; f.ax = dx / d; f.ay = dy / d; f.mode = far ? 'charge' : K.sweep && Math.random() < .45 ? 'sweep' : 'strike'; f.second = false; f.hits = 0; if (T === p) Sound.play('huh'); }
+        if (d < K.reach * 1.25 || far) { if (T === p && !this.token.includes(f)) this.token.push(f); f.st = 'wind'; f.t = 0; f.ax = dx / d; f.ay = dy / d; f.mode = far ? 'charge' : K.sweep && Math.random() < .45 ? 'sweep' : 'strike'; f.second = false; f.third = false; f.hits = 0; if (T === p) Sound.play('huh'); }
       }
     } else if (f.st === 'wind') {
-      f.t += dt; const w = f.mode === 'charge' ? K.wind + .15 : f.second ? 0.3 : K.wind;
+      f.t += dt; const w = f.mode === 'charge' ? K.wind + .15 : f.second ? this.D.w2 : K.wind;
       if (f.t >= w) {
         if (f.mode === 'charge') { f.st = 'charge'; f.t = 0; Sound.play('roar'); }
         else { f.st = 'recover'; f.t = 0; Sound.play(K.blade ? (K.dmg > 1 ? 'swing2' : 'swing') : 'move'); f.swing = .18;
           if (f.mode === 'sweep') { if (d < K.reach + 6) this.strikeAt(f, T, K.dmg, dx / d, dy / d); this.ring(f.x, f.y, '#c8ccd4', K.reach + 6); }
           else { const hx = f.x + f.ax * K.reach, hy = f.y + f.ay * K.reach; f.x += f.ax * 10; f.y += f.ay * 10;
             const t = clamp(((T.x - f.x) * f.ax + (T.y - f.y) * f.ay) / K.reach, 0, 1), qx = f.x + (hx - f.x) * t, qy = f.y + (hy - f.y) * t; if (Math.hypot(T.x - qx, T.y - qy) < (K.wide || 12)) this.strikeAt(f, T, K.dmg, f.ax, f.ay); }
-          if (K.double && !f.second && f.hp < f.max * .85) { f.st = 'wind'; f.t = 0; f.second = true; f.ax = dx / d; f.ay = dy / d; } }
+          if (K.double && !f.second && f.hp < f.max * .85) { f.st = 'wind'; f.t = 0; f.second = true; f.ax = dx / d; f.ay = dy / d; }
+          else if (K.triple && f.second && !f.third && f.hp < f.max * .55) { f.st = 'wind'; f.t = 0; f.third = true; f.mode = 'strike'; f.ax = dx / d; f.ay = dy / d; } }
       }
     } else if (f.st === 'charge') {
       f.t += dt; f.x += f.ax * 230 * dt; f.y += f.ay * 230 * dt; f.anim += dt * 2; f.fx = f.ax; f.fy = f.ay;
@@ -2842,7 +2936,7 @@ const Brawl = {
   // ---------------------------------------------------------- cinematics: hard cuts, moving camera, captions that do not wait
   // shot: { d, cam:[x,y,h,f], to:[x,y,h,f], acts:[{id, a:[x,y], b:[x,y], fx, fy, blade, aura, sc, swing}], cap, big, sfx, shake, flash }
   playCine(shots, done) { this.cine = { shots, i: -1, t: 0, done }; this.nextShot(); },
-  nextShot() { const c = this.cine; c.i++; c.t = 0; c.cn = -1; c.ct = 0; if (c.i >= c.shots.length) { this.cine = null; c.done && c.done(); return; } const s = c.shots[c.i]; c.dur = Math.max(s.d * 1.25, s.cap ? 2 + s.cap.length * .062 : 0, s.big ? 2.6 : 0, s.credit ? 3 : 0); if (s.sfx) Sound.play(s.sfx); if (s.music) Sound.music(s.music); if (s.bg) { this.def = Object.assign({}, this.def, { bg: s.bg }); this.buildProps(s.bg, this.arena); } if (s.shake) this.shake = s.shake; this.impact = s.flash ? .22 : .06; this.parts = []; this.rings = []; c.acts = (s.acts || []).map(a => Object.assign({ sheet: World.sheetFor(a.id), anim: Math.random(), x: a.a[0], y: a.a[1] }, a)); },
+  nextShot() { const c = this.cine; c.i++; c.t = 0; c.cn = -1; c.ct = 0; { const nb = (c.shots[c.i] && c.shots[c.i].bg) || this._bg0; if (nb !== this.def.bg) { this.def.bg = nb; this.buildProps(nb || 'ring', this.arena); } } if (c.i >= c.shots.length) { this.cine = null; c.done && c.done(); return; } const s = c.shots[c.i]; c.dur = Math.max(s.d * 1.25, s.cap ? 2 + s.cap.length * .062 : 0, s.big ? 2.6 : 0, s.credit ? 3 : 0); if (s.sfx) Sound.play(s.sfx); if (s.music) Sound.music(s.music); if (s.bg) { this.def = Object.assign({}, this.def, { bg: s.bg }); this.buildProps(s.bg, this.arena); } if (s.shake) this.shake = s.shake; this.impact = s.flash ? .22 : .06; this.parts = []; this.rings = []; c.acts = (s.acts || []).map(a => Object.assign({ sheet: World.sheetFor(a.id), anim: Math.random(), x: a.a[0], y: a.a[1] }, a)); },
   updCine(dt) { const c = this.cine, s = c.shots[c.i]; c.t += dt; this.stepParts(dt);
     const k = Math.min(1, c.t / c.dur), e = s.lin ? k : 1 - Math.pow(1 - k, 2), cam = this.cam, a = s.cam || [cam.x, cam.y, cam.h, cam.f], b = s.to || a; cam.x = a[0] + (b[0] - a[0]) * e; cam.y = a[1] + (b[1] - a[1]) * e; cam.h = a[2] + (b[2] - a[2]) * e; cam.f = a[3] + (b[3] - a[3]) * e; cam.hor = Math.round(H * ((a[4] || .32) + ((b[4] || a[4] || .32) - (a[4] || .32)) * e));
     if (s.count) { const idx = Math.min(s.count - 1, Math.floor(Math.pow(Math.min(1, c.t / (c.dur * .92)), 1.25) * s.count)); if (idx !== c.cn) { c.cn = idx; c.ct = c.t; Sound.play(idx === s.count - 1 ? 'hit' : 'heart'); this.shake = .12; } }
@@ -2854,10 +2948,10 @@ const Brawl = {
 
   // ---------------------------------------------------------- drawing
   proj(x, y, h) { if (this.g3) return G3.proj(x, y, h); const c = this.cam, dz = Math.max(16, c.y - y), s = c.f / dz; return { x: W / 2 + (x - c.x) * s, y: c.hor + c.h * s - (h || 0) * s, s, dz }; },
-  texture(bg) {
+  texture(bg) { if (bg === 'pit') bg = 'ring';
     if (this.tex[bg]) return this.tex[bg];
     const [c, g] = mk(512, 512), R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); }, r = rng(bg.length * 31 + 7), A = this.arena, arx = A.rx || A.w / 2, ary = A.ry || A.h / 2;
-    if (bg === 'ring' || bg === 'furnace') { const fm = { w: 32, h: 32, theme: 'city', seed: 5, grid: Array.from({ length: 32 }, () => Array(32).fill('.')) }; for (let ty = 0; ty < 32; ty++) for (let tx = 0; tx < 32; tx++) drawTile(g, fm, tx, ty);
+    if (bg === 'ring' || bg === 'furnace' || bg === 'pit') { const fm = { w: 32, h: 32, theme: bg === 'pit' ? 'bay' : 'city', seed: 5, grid: Array.from({ length: 32 }, () => Array(32).fill('.')) }; for (let ty = 0; ty < 32; ty++) for (let tx = 0; tx < 32; tx++) drawTile(g, fm, tx, ty);
       if (bg === 'furnace') { g.fillStyle = 'rgba(255,90,30,.16)'; g.fillRect(0, 0, 512, 512); for (let y = 0; y < 512; y += 16) { g.fillStyle = `rgba(255,120,40,${Math.max(0, .3 - Math.abs(y - 180) / 300)})`; g.fillRect(0, y, 512, 16); } }
       else { g.fillStyle = 'rgba(12,6,10,.5)'; g.fillRect(0, 0, 512, 512); g.globalCompositeOperation = 'destination-out'; g.beginPath(); g.ellipse(256, 256, arx, ary, 0, 0, 6.3); g.fill(); g.globalCompositeOperation = 'source-over';
         // punched-out circle shows nothing through a pattern, so lay the lit stones back in underneath
@@ -2907,7 +3001,7 @@ const Brawl = {
       if (!rm) for (let i = 0; i < 5; i++) { const x = (i * 71 + t * 9) % (W + 20) - 10, y = 14 + i * 5 + Math.sin(t * 2 + i) * 3; R(x, y, 2, 1, '#2a2a34'); R(x - 2, y - 1, 2, 1, '#2a2a34'); R(x + 2, y - 1, 2, 1, '#2a2a34'); }
     }
   },
-  floor(g, bg) {
+  floor(g, bg) { if (bg === 'pit') bg = 'ring';
     const c = this.cam, tex = this.texture(bg); if (!this.pat[bg]) this.pat[bg] = g.createPattern(tex, 'repeat');
     g.imageSmoothingEnabled = false; g.fillStyle = this.pat[bg]; const b = g.getTransform();
     for (let sy = Math.ceil(c.hor) + 1; sy < H; sy++) { const s = (sy - c.hor) / c.h, dz = c.f / s, wy = c.y - dz; g.setTransform(b.a * s, 0, 0, b.d, b.e + b.a * (W / 2 - (256 + c.x) * s), b.f + b.d * (sy - (wy + 256))); g.fillRect(256 + c.x - (W / 2) / s - 1, wy + 256, W / s + 2, 1.02); }
@@ -2994,7 +3088,7 @@ const Brawl = {
     else if (q.t === 'merlon') { R(-11, -34, 22, 34, '#d8d2c4'); R(-11, -34, 22, 3, '#f0ece2'); R(8, -31, 3, 31, '#aaa496'); R(-11, -12, 22, 1, '#b8b2a4'); if (q.k % 4 === 1) { R(-1, -70, 2, 36, '#8a8478'); R(1, -70, 16, 9, q.k % 8 === 1 ? '#7a5ac8' : '#2aa6a0'); } }
   },
   scene(g, extra) {
-    const bg = this.def.bg || 'ring', rm = Settings.d.reduce, c = this.cam;
+    const bg = (this.def.bg === 'pit' ? 'ring' : this.def.bg) || 'ring', rm = Settings.d.reduce, c = this.cam;
     const sx = this.shake > 0 && !rm ? Math.round((Math.random() - .5) * 6) : 0, sy = this.shake > 0 && !rm ? Math.round((Math.random() - .5) * 4) : 0;
     const artOn = this.art && this.art.t > this.art.C, rush = ((this.sup && this.sup.t >= SUPT) || artOn) && !this.cine, d3 = this.g3 = G3.want(bg);
     g.save(); g.translate(sx, sy);
@@ -3007,6 +3101,8 @@ const Brawl = {
     const list = (rush || d3 ? [] : this.props.map(q => ({ y: q.y, d: () => this.prop(g, q) }))).concat(extra);
     list.sort((a, b) => a.y - b.y); for (const e of list) e.d();
     if (d3 && this.p.st === 'hook' && this.p.hk) { const p = this.p, f = p.hk, k = Math.min(1, p.t / .13); for (let i = 1; i <= 12; i++) { const u = i / 12 * k; G3.glow(p.x + (f.x - p.x) * u, (30 + Math.sin(u * 3.14) * 6) * G3.HK, p.y + (f.y - p.y) * u, i === 12 ? 4 : 1.8, [1, .85, .5], .95); } }
+    if (d3 && this.p.st === 'ram' && this.p.t > .13 && this.p.t < .36) { const p = this.p, k = (p.t - .13) / .23; for (let i = 0; i < 9; i++) { const a = i / 9 * 6.283 + this.t * 9, r = 3 + k * 16; G3.glow(p.x + p.ax * (20 + k * 14) - p.ay * Math.cos(a) * r * .6, (30 + Math.sin(a) * r) * G3.HK, p.y + p.ay * (20 + k * 14) + p.ax * Math.cos(a) * r * .6, 6 - k * 3, [1, .7, .25], 1 - k * .8); } }
+    if (d3 && this.p.boots && this.p.z > 2 && !this.sup && !this.art) { const p = this.p, zz = p.z * G3.HK * 1.2; for (let i = 0; i < 4; i++) G3.glow(p.x + (i % 2 ? 3 : -3), Math.max(1, zz - 2 - i * 4 * (p.hov ? 1.6 : 1)), p.y, (p.hov ? 5 : 3) - i * .7, [.55, .85, 1], .9 - i * .2); }
     if (d3 && this.p.st === 'lash') { const p = this.p, a = Math.atan2(p.fy, p.fx); for (let j = 0; j < 10; j++) for (let i = 1; i <= 5; i++) { const aa = a - j * .16, r = 16 + i * 10; G3.glow(p.x + Math.cos(aa) * r, 30 * G3.HK, p.y + Math.sin(aa) * r, 3.4 - j * .25, [1, .9 - j * .04, .55], .9 - j * .08); } }
     if (d3 && this.p.st === 'bore' && this.p.t > .1 && this.p.t < .42) { const p = this.p; for (let i = 0; i < 14; i++) { const u = i / 14, a = this.t * 40 + i * .9, r = 3 + u * 9; G3.glow(p.x + p.ax * (22 - u * 46) - p.ay * Math.cos(a) * r * .5, (28 + Math.sin(a) * r) * G3.HK, p.y + p.ay * (22 - u * 46) + p.ax * Math.cos(a) * r * .5, 4.5 - u * 3, [1, .7 - u * .3, .25], 1 - u * .7); } }
     if (d3 && this.p.st === 'roar') { const p = this.p; for (let i = 0; i < 18; i++) { const a = i / 18 * 6.283 + this.t * 3, r = 14 + p.t * 150; G3.glow(p.x + Math.cos(a) * r, (10 + (i % 3) * 16) * G3.HK, p.y + Math.sin(a) * r, 5, [1, .4, .15], Math.max(0, .8 - p.t * 1.6)); } }
@@ -3031,7 +3127,7 @@ const Brawl = {
     const ex = [];
     // ground marks first (far depth in the sorted list, so fighters sit on top)
     ex.push({ y: -1e6, d: () => { for (const q of this.scars) { const a = Math.min(1, q.life / 6); this.poly(g, Array.from({ length: 12 }, (_, k) => [q.x + Math.cos(k / 12 * 6.283) * q.r * (.8 + (k * 7 % 5) * .08), q.y + Math.sin(k / 12 * 6.283) * q.r * .62 * (.8 + (k * 3 % 5) * .08)]), `rgba(22,12,10,${.42 * a})`); this.disc(g, q.x, q.y, q.r * .5, `rgba(255,120,40,${.25 * a * Math.min(1, q.life / 30)})`, 1); }
-      for (const f of this.foes) if (f.st === 'wind') { const w = f.mode === 'charge' ? f.K.wind + .15 : f.second ? .3 : f.K.wind, k = Math.min(1, f.t / w), col = `rgba(255,60,40,${.2 + k * .45})`;
+      for (const f of this.foes) if (f.st === 'wind') { const w = f.mode === 'charge' ? f.K.wind + .15 : f.second ? this.D.w2 : f.K.wind, k = Math.min(1, f.t / w), col = `rgba(255,60,40,${.2 + k * .45})`;
         if (f.mode === 'sweep') this.disc(g, f.x, f.y, (f.K.reach + 6) * k, col); else { const L = (f.mode === 'charge' ? 115 : f.K.reach + 10) * k, wd = (f.K.wide || 12) / 2, nx = -f.ay * wd, ny = f.ax * wd; this.poly(g, [[f.x + nx, f.y + ny], [f.x + f.ax * L + nx, f.y + f.ay * L + ny], [f.x + f.ax * L - nx, f.y + f.ay * L - ny], [f.x - nx, f.y - ny]], col); } }
       if (this.g3 && this.phase === 'fight') { this.disc(g, p.x, p.y, 12, 'rgba(255,214,90,.95)', 2); for (const a of this.allies) this.disc(g, a.x, a.y, 10, 'rgba(150,110,255,.7)', 1.2); const tg = this.nearest(p); for (const f of this.foes) if (f.st !== 'down' && !f.enter) this.disc(g, f.x, f.y, f === tg ? 12 : 10, f === tg ? 'rgba(255,70,50,.95)' : 'rgba(255,90,70,.5)', f === tg ? 1.8 : 1); }
       if (p.open > 0) this.disc(g, p.x, p.y, 16, 'rgba(255,224,138,.9)', 2); if (p.fury >= 100 && !rm) this.disc(g, p.x, p.y, 20 + Math.sin(t * 9) * 2, 'rgba(255,120,40,.55)', 2); } });
@@ -3069,13 +3165,14 @@ const Brawl = {
     const full = p.fury >= 100; bar(27 + 22, 14, bw - 22, p.fury / 100, full ? (Math.floor(t * 8) % 2 ? '#ff5a2a' : '#ffb040') : '#a83a1e', '#ffb080');
     if (full && this.phase === 'fight' && !this.sup) { const s = Input.device === 'kb' ? 'HOLD E: ELEVEN' : Input.device === 'pad' ? 'HOLD X: ELEVEN' : 'HOLD A: ELEVEN'; ptext(g, s, 27, 24, Math.floor(t * 6) % 2 ? '#ffb040' : '#fff0b0'); }
     for (let i = 0; i < 3; i++) { g.fillStyle = i < p.gd ? '#9ac0ff' : '#2a2630'; g.fillRect(27 + 22 + i * 6, 20, 5, 2); }
+    if (p.boots) { g.fillStyle = '#1a2630'; g.fillRect(70, 20, 26, 2); g.fillStyle = '#6ad8ff'; g.fillRect(70, 20, Math.round(26 * Math.max(0, p.fu)), 2); }
     const boss = this.foes.length === 1 ? this.foes[0] : null, tot = this.foes.reduce((a, f) => a + Math.max(0, f.hp), 0) / Math.max(1, this.foes.reduce((a, f) => a + f.max, 0));
     const nm = (boss ? boss.name : live.length ? (this.def.foeName || live[0].name) + (live.length > 1 ? ' x' + live.length : '') : '').toUpperCase();
     if (boss) { if (!boss.bust) boss.bust = World.bustFor(boss.id); g.fillStyle = '#0c0808'; g.fillRect(W - 24, 2, 22, 22); g.drawImage(boss.bust, 4, 4, 24, 24, W - 23, 3, 20, 20); g.strokeStyle = '#c8a050'; g.strokeRect(W - 23.5, 2.5, 21, 21); }
     const rx = boss ? W - 27 - bw : W - 4 - bw; bar(rx, 4, bw, boss ? boss.hp / boss.max : tot, '#c8452e', '#f08a70', true); ptext(g, nm, rx + bw - ptextW(nm), 14, '#ff9a7a');
     if (this.hitsT > 0 && this.hitsN > 1) { const s = this.hitsN + ' HITS'; ptext(g, s, W - 6 - ptextW(s, 2) + 1, 31, '#120a0e', 2); ptext(g, s, W - 6 - ptextW(s, 2), 30, this.hitsN > 7 ? '#ff7a30' : '#ffe08a', 2); }
     if (this.vcur && (this.phase === 'fight' || this.phase === 'win') && !(this.sup && this.sup.t < SUPT) && !this.art) { const v = this.vcur, lines = wrapP(v.t, W - 20), a = Math.min(1, (v.max - v.life) * 5, v.life * 3), y0 = H - 6 - lines.length * 9 - (this.tipT > 0 ? 11 : 0); g.globalAlpha = Math.max(0, a); g.fillStyle = 'rgba(7,5,10,.62)'; g.fillRect(0, y0 - 3, W, lines.length * 9 + 5); g.fillStyle = '#c8a050'; g.fillRect(0, y0 - 3, W, 1); lines.forEach((ln, i) => ptext(g, ln, Math.round(W / 2 - ptextW(ln) / 2), y0 + i * 9, '#fff6dc')); g.globalAlpha = 1; }
-    if (this.tipT > 0 && this.phase === 'fight' && !this.art && !this.sup) { const dv = Input.device, L = dv === 'kb' ? ['E STRIKE  C KICK  F JUMP  X DODGE', 'V GUARD (TAP = PARRY)  Q HOOK LINE', 'KICK BREAKS A GUARD. HOLD KICK: BREACH', 'IN THE AIR: X PLUNGE, C DIVE KICK, F AGAIN: SHAFT DROP', 'GUARD + STRIKE: WIDE CUT   GUARD + KICK: HEADBUTT', 'GUARD + HOOK: ROAR   STRIKE AFTER A PARRY: RIPOSTE'] : dv === 'pad' ? ['X STRIKE  Y KICK  A JUMP  B DODGE', 'RB GUARD (TAP = PARRY)  LB HOOK LINE', 'KICK BREAKS A GUARD. HOLD KICK: BREACH', 'IN THE AIR: B PLUNGE, Y DIVE KICK, A AGAIN: SHAFT DROP', 'RB + X: WIDE CUT   RB + Y: HEADBUTT', 'RB + LB: ROAR   STRIKE AFTER A PARRY: RIPOSTE'] : ['DODGE THROUGH THE RED', 'TAP GUARD AS HE SWINGS = PARRY', 'KICK BREAKS A GUARD. HOLD KICK: BREACH', 'IN THE AIR: B PLUNGE, JUMP AGAIN: SHAFT DROP', 'GUARD + A: WIDE CUT   GUARD + KICK: HEADBUTT', 'GUARD + HOOK: ROAR'], tip = L[Math.floor(this.t / 3.4) % L.length]; g.fillStyle = 'rgba(12,8,10,.8)'; g.fillRect(0, H - 11, W, 11); ptext(g, tip, Math.max(3, Math.round(W / 2 - ptextW(tip) / 2)), H - 8, '#f3e3c3'); }
+    if (this.tipT > 0 && this.phase === 'fight' && !this.art && !this.sup) { const dv = Input.device, bt = this.p.boots, L = dv === 'kb' ? ['E STRIKE  C KICK  F JUMP  X DODGE  V GUARD  Q HOOK', 'TAP KICK x3: ROUNDHOUSE   HOLD KICK: BOOT', 'HOOK UP CLOSE: THE RAM   TAP GUARD AS HE SWINGS: PARRY', bt ? 'BOOTS: HOLD F TO FLY, X AIR DASH, V SLAM' : 'IN THE AIR: X PLUNGE, C DIVE KICK, F AGAIN: SHAFT DROP', 'GUARD + STRIKE: WIDE CUT   GUARD + KICK: HEADBUTT', 'GUARD + JUMP: BREACH   GUARD + HOOK: ROAR'] : dv === 'pad' ? ['X STRIKE  Y KICK  A JUMP  B DODGE  RB GUARD  LB HOOK', 'TAP Y x3: ROUNDHOUSE   HOLD Y: BOOT', 'LB UP CLOSE: THE RAM   TAP RB AS HE SWINGS: PARRY', bt ? 'BOOTS: HOLD A TO FLY, B AIR DASH, RB SLAM' : 'IN THE AIR: B PLUNGE, Y DIVE KICK, A AGAIN: SHAFT DROP', 'RB + X: WIDE CUT   RB + Y: HEADBUTT', 'RB + A: BREACH   RB + LB: ROAR'] : ['TAP KICK x3: ROUNDHOUSE. HOLD KICK: BOOT', 'HOOK UP CLOSE: THE RAM', 'TAP GUARD AS HE SWINGS: PARRY', bt ? 'BOOTS: HOLD JUMP TO FLY, B AIR DASH, GUARD SLAM' : 'IN THE AIR: B PLUNGE, JUMP AGAIN: SHAFT DROP', 'GUARD + A: WIDE CUT   GUARD + KICK: HEADBUTT', 'GUARD + JUMP: BREACH   GUARD + HOOK: ROAR'], tip = L[Math.floor(this.t / 3.4) % L.length]; g.fillStyle = 'rgba(12,8,10,.8)'; g.fillRect(0, H - 11, W, 11); ptext(g, tip, Math.max(3, Math.round(W / 2 - ptextW(tip) / 2)), H - 8, '#f3e3c3'); }
   },
   renderSuper(g, word, rgbw) {
     const s = this.sup, t = s.t;
@@ -3242,6 +3339,7 @@ const G3 = {
     ford: { top: [.2, .14, .42], bot: [1, .6, .36], sun: [-.62, .4, -.3], sunC: [1.2, .7, .4], amb: [.52, .4, .46], sky: [.3, .22, .3], fog: [1, .64, .44], fogR: [330, 1300], sunAt: [-.5, .16, -1] },
     cell: { top: [.02, .02, .04], bot: [.08, .07, .11], sun: [.12, .95, .28], sunC: [1.3, 1.2, 1.0], amb: [.36, .35, .44], sky: [.14, .14, .2], fog: [.04, .04, .07], fogR: [260, 760], sunAt: [0, 1, -.1] },
     storm: { top: [.02, .03, .09], bot: [.13, .15, .26], sun: [-.3, .8, .5], sunC: [.55, .62, .86], amb: [.22, .24, .34], sky: [.1, .12, .2], fog: [.09, .11, .2], fogR: [240, 950], sunAt: [.42, .62, -1] },
+    fall: { top: [.08, .16, .46], bot: [.5, .66, .92], sun: [.5, .7, .3], sunC: [1.05, .96, .8], amb: [.34, .38, .5], sky: [.5, .62, .9], fog: [.7, .8, .96], fogR: [300, 1300], sunAt: [-.5, .5, -1] },
     keep: { top: [.3, .44, .78], bot: [1, .8, .68], sun: [.55, .42, -.72], sunC: [1.2, .92, .7], amb: [.4, .38, .46], sky: [.2, .2, .26], fog: [1, .84, .76], fogR: [380, 1500], sunAt: [.5, .2, -1] }
   },
   env(bg) {
@@ -3255,7 +3353,22 @@ const G3 = {
     const cloud = (x, y, z, s, c) => { for (let i = 0; i < 4; i++) A.box(I, x + (i - 1.5) * 26 * s, y + (i % 2) * 8 * s, z + (i % 3) * 10, (46 - i * 4) * s, 16 * s, 30 * s, c, 1); };
     const tent = (x, z, c) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(.4)); Sh.cyl(m, 0, 0, 0, 30, 0, 44, 6, '#f4f0e6'); Sh.cyl(m, 0, 0, 0, 30.6, 26, 6, 6, c); Sh.cyl(m, 0, 30, 0, 9.8, 0, 14.5, 6, c); Sh.cyl(m, 0, 44, 0, .8, .8, 18, 4, '#8a8478'); Sh.box(m, 5, 58, 0, 10, 6, .6, c); Sh.box(m, 0, 9, 29, 12, 18, 1, '#2a2030'); };
     const merlon = (x, z, rot) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(rot)); Sh.box(m, 0, 13, 0, 26, 26, 12, '#e6e0d2'); Sh.box(m, -8, 31, 0, 9, 10, 12, '#f2ede2'); Sh.box(m, 8, 31, 0, 9, 10, 12, '#f2ede2'); Sh.box(m, 0, 25, 6.3, 26, 1.6, .6, '#e8c25a', 1); };
-    if (bg === 'cell') { // the pairing room: a sealed marble drum, a gallery in the dark, one shaft of light
+    if (bg === 'fall') { // the hull of a lift-barge coming down out of the sky
+      for (let ix = -8; ix < 8; ix++) for (let iz = -4; iz < 4; iz++) { const x = ix * 20, z = iz * 20, j = r() * .05, k = (ix + iz) & 1, c = Math.abs(iz + .5) > 3 ? [.2 + j, .2 + j, .24 + j] : k ? [.46 + j, .46 + j, .5 + j] : [.38 + j, .38 + j, .43 + j]; A.quad(x, z, x + 20, z + 20, 0, c); if (r() < .12) A.quad(x + 3, z + 3, x + 17, z + 17, .15, [.12, .1, .1]); }
+      A.box(I, 0, -6, 0, 330, 12, 170, [.3, .3, .34]); A.box(I, 0, -30, 0, 250, 40, 120, [.22, .22, .26]);
+      for (let i = -8; i <= 8; i++) { A.box(I, i * 20, .3, -80, .8, .4, 2, '#e8c25a', 1); A.box(I, i * 20, .3, 80, .8, .4, 2, '#e8c25a', 1); }
+      for (const sx of [-1, 1]) { Sh.box(M4.chain(M4.t(sx * 150, 0, -70), M4.rz(sx * .25)), 0, 45, 0, 8, 90, 8, [.8, .8, .82]); A.box(M4.chain(M4.t(sx * 150, 0, -70), M4.rz(sx * .25)), 0, 92, 0, 12, 4, 12, '#e8c25a', 1); Sh.box(I, sx * 120, 9, 70, 26, 18, 14, [.5, .5, .55]); Sh.box(I, sx * 60, 6, -78, 30, 12, 10, [.56, .56, .6]); A.box(M4.chain(M4.t(sx * 172, 0, 0), M4.rz(-sx * .5)), 0, 16, 0, 60, 3, 150, [.34, .34, .4]); }
+      Sh.box(M4.chain(M4.t(40, 0, -84), M4.rz(.5)), 0, 30, 0, 6, 70, 6, [.7, .7, .74]); Sh.cyl(M4.t(-96, 0, -74), 0, 0, 0, 12, 10, 26, 8, [.3, .3, .34], 0, 1);
+      for (let i = -8; i <= 8; i++) for (const sz of [-1, 1]) { if ((i * 7 + sz * 3 + 40) % 5 === 0) continue; Sh.box(I, i * 20, 7, sz * 84, 1.6, 14, 1.6, [.2, .2, .24]); A.box(I, i * 20 + 10, 13, sz * 84, 20, 1, 1, [.3, .3, .34]); A.box(I, i * 20 + 10, 7, sz * 84, 20, .7, .7, [.26, .26, .3]); }
+      for (let i = -3; i <= 3; i++) { A.box(I, i * 44, .25, 0, 1.2, .3, 160, '#e8c25a', 1); } A.box(I, 0, .25, -40, 320, .3, 1, [.9, .9, .92]); A.box(I, 0, .25, 40, 320, .3, 1, [.9, .9, .92]);
+      for (const sx of [-1, 1]) for (let k = 0; k < 3; k++) { const m = M4.chain(M4.t(sx * 150, 88, -70), M4.rz(sx * (.9 + k * .2)), M4.ry(k * .5)); A.box(m, 0, -60, 0, .7, 120, .7, [.16, .16, .18]); }
+      { const m = M4.chain(M4.t(-150, 0, -70), M4.rz(-.25)); for (let k = 0; k < 5; k++) Sh.box(m, 8 + k * 5, 78 - k * 2 + Math.sin(k) * 2, 0, 5, 16 - k * 2, .6, k % 2 ? '#7a5ac8' : '#6a4ab8'); }
+      for (let i = 0; i < 9; i++) { const x = R(-140, 140), z = R(-70, 70); if (Math.hypot(x, z) < 50) continue; Sh.box(M4.chain(M4.t(x, 0, z), M4.ry(R(0, 3)), M4.rz(R(-.3, .3))), 0, 1.5, 0, R(4, 10), 3, R(3, 7), [.3, .3, .34]); }
+      // the Sun Spire, far below and ahead, and other barges coming down with us
+      Sh.cyl(M4.t(-260, -900, -1500), 0, 0, 0, 90, 30, 1250, 10, [.96, .95, .92], 0, 1); for (let i = 0; i < 6; i++) A.cyl(M4.t(-260, -900, -1500), 0, 200 + i * 180, 0, 86 - i * 9, 86 - i * 9, 10, 10, '#e8c25a', 1); A.cyl(M4.t(-260, -900, -1500), 0, 1250, 0, 16, 2, 160, 6, [1, .95, .7], 1);
+      for (let i = 0; i < 7; i++) { const x = R(-900, 900), y = R(-260, 220), z = R(-1300, -420), m = M4.chain(M4.t(x, y, z), M4.rz(R(-.4, .4)), M4.ry(R(0, 3))); A.box(m, 0, 0, 0, 110, 14, 60, [.3, .3, .35]); A.box(m, 0, 9, 0, 80, 4, 40, [.7, .7, .72]); A.box(m, R(-30, 30), 14, 0, 10, 8, 10, [1, .5, .15], 1); }
+      for (let i = 0; i < 26; i++) { const x = R(-1500, 1500), z = R(-1700, -300), y = R(-700, -380), w = R(160, 420); A.box(I, x, y, z, w, R(30, 70), w * R(.5, .9), [.94, .95, .99]); A.box(I, x + R(-60, 60), y + 30, z + 20, w * .6, R(30, 60), w * .4, [1, 1, 1]); }
+    } else if (bg === 'cell') { // the pairing room: a sealed marble drum, a gallery in the dark, one shaft of light
       for (let ix = -9; ix < 9; ix++) for (let iz = -9; iz < 9; iz++) { const x = ix * 20, z = iz * 20, d = Math.hypot(x + 10, (z + 10) * 1.5); if (d > 175) continue; const k = (ix + iz) & 1, j = r() * .04, c = d < 60 ? [.86 + j, .83 + j, .78 + j] : k ? [.62 + j, .6 + j, .58 + j] : [.5 + j, .48 + j, .48 + j]; A.quad(x, z, x + 20, z + 20, 0, c); }
       for (let i = 0; i < 44; i++) { const a = i / 44 * 6.2832, m = M4.chain(M4.t(Math.cos(a) * 96, .2, Math.sin(a) * 58), M4.ry(-a + 1.5708)); A.box(m, 0, 0, 0, 13, .3, 1.6, '#e8c25a', 1); }
       for (let i = 0; i < 14; i++) { const a = (i + .5) / 14 * 6.2832, x = Math.cos(a) * 150, z = Math.sin(a) * 104, m = M4.t(x, 0, z); if (z > 30) continue; Sh.cyl(m, 0, 0, 0, 8, 7, 150, 8, '#cfc8ba', 0, 1); Sh.cyl(m, 0, 0, 0, 10, 9, 8, 8, '#b8b2a4', 0, 1); A.cyl(m, 0, 60, 0, 7.6, 7.6, 2, 8, '#e8c25a', 1); A.box(M4.chain(M4.t(x * 1.16, 80, z * 1.16), M4.ry(-a + 1.5708)), 0, 0, 0, 70, 160, 5, [.2, .19, .24]); }
@@ -3372,6 +3485,8 @@ const G3 = {
     if (hero) { // kicks, jumps, the guard, the hook line
       if (st === 'kick') { if (o.t < .06) S({ hr: 1.5, kr: 1.7, lean: -.1, cr: 1, hl: -.1, kl: .3, rp: -.2, re: -1.2, lp: -.8, le: -1.2, tw: -.3 }); else S({ hr: 1.6, kr: .05, lean: -.4, cr: .5, hl: -.25, kl: .25, rp: .5, re: -.5, lp: -1.0, le: -.8, tw: .35, hx: .2 }); rate = 44; zeta = .7; }
       else if (st === 'dive') { S({ hr: 1.25, kr: .05, hl: .3, kl: 1.7, lean: -.55, rp: .7, re: -.3, lp: -1.2, le: -.6, cr: 0, tw: .2 }); rate = 40; }
+      else if (st === 'skick') { if (o.t < .16) S({ hr: 1.3, kr: 2.0, lean: .15, cr: 3, hl: -.1, kl: .5, rp: -.6, re: -1.3, lp: -.9, le: -1.3, tw: -.7 }); else S({ hr: 1.75, kr: 0, lean: -.6, cr: .3, hl: -.4, kl: .15, rp: .9, re: -.3, lp: -1.3, le: -.5, tw: .6, hx: .25, lz: 6 }); rate = 46; zeta = .65; }
+      else if (st === 'ram') { if (o.t < .16) S({ lp: .7, le: -1.7, ly: -.3, tw: .8, lean: -.12, cr: 3, hl: -.4, kl: .5, hr: .5, kr: .6, rp: -.4, re: -1.0 }); else S({ lp: -1.6, le: 0, ly: 0, tw: -.85, lean: .6, cr: 2, hl: .95, kl: .7, hr: -.8, kr: .15, rp: .6, re: -.6, hx: .2, lz: 8 }); rate = 46; zeta = .65; }
       else if (st === 'bore') { if (o.t < .12) S({ rp: -.9, re: -1.7, tilt: -.3, lz: -4, tw: -.6, cr: 4, lean: .2, hl: .9, kl: 1.3, hr: -.4, kr: .9 }); else S({ rp: -1.5, re: 0, tilt: -.08, ry: .1, lz: 10, lean: .85, tw: .55, cr: 2.2, hr: .9, kr: .7, hl: -.9, kl: .1, lp: -1.5, le: 0, ly: -.2 }); rate = 44; }
       else if (st === 'lash') { S({ rp: -1.5, ry: 1.3, re: 0, tilt: -.05, lean: .15, cr: 2.6, lp: -.6, ly: -.9, le: -.4, hl: .7, kl: .7, hr: -.6, kr: .3, tw: .6, lz: 6 }); rate = 40; }
       else if (st === 'butt') { if (o.t < .1) S({ lean: -.35, hx: -.5, rp: -.9, lp: -.9, le: -.6, re: -.6, cr: 1.5 }); else S({ lean: .7, hx: .75, rp: -1.3, ry: -.3, re: -.5, lp: -1.3, ly: .3, le: -.5, cr: 2.5, hl: .8, kl: .7, hr: -.5 }); rate = 44; }
@@ -3467,6 +3582,9 @@ const G3 = {
   life(B) {
     const D = this.dyn, t = this.t, E = this.env(this.bg), hw = E.hw, hh = E.hh, bg = this.bg, I = M4.id();
     const flag = (x, z, c, k) => { const m = M4.t(x, 0, z); D.cyl(m, 0, 0, 0, 1, 1, 78, 5, '#8a8478'); D.box(m, 0, 79, 0, 3, 3, 3, '#e8c25a', 1); let fm = M4.chain(m, M4.t(.8, 62, 0)); for (let i = 0; i < 4; i++) { fm = M4.mul(fm, M4.ry(Math.sin(t * 3.4 + i * .9 + k) * .28)); D.box(fm, 4, 0, 0, 8, 22 - i * 1.5, .6, i % 2 ? shade(c, .88) : c); if (i === 1) D.box(fm, 4, 0, .5, 6, 6, .3, '#e8c25a', 1); fm = M4.mul(fm, M4.t(8, 0, 0)); } };
+    if (bg === 'fall') { if (!Settings.d.reduce) { const c = B.cam; for (let i = 0; i < 46; i++) { const px = c.x + ((i * 97.3) % 700) - 350, pz = c.y - 60 - ((i * 53.9) % 520), sp = 240 + (i % 5) * 70, py = -160 + ((t * sp + i * 83) % 420); this.glow(px, py, pz, i % 6 === 0 ? 22 : 2, i % 6 === 0 ? [1, 1, 1] : [.9, .95, 1], i % 6 === 0 ? .04 : .35); if (i % 6) this.glow(px, py - 9, pz, 1.6, [.9, .95, 1], .3); }
+        for (let i = 0; i < 3; i++) { const sx0 = [-120, 118, 40][i], sz0 = [70, 70, -84][i]; for (let k = 0; k < 7; k++) { const ph = (t * .5 + k / 7 + i * .2) % 1; this.glow(sx0 + Math.sin(t + k) * 6 - ph * 30, 40 + ph * 260, sz0, 14 + ph * 30, [.16, .15, .16], .22 * (1 - ph)); } }
+        for (let i = 0; i < 5; i++) { const fx = [-120, 118, -58, 62, 40][i], fz = [70, 70, -78, -78, -84][i]; for (let k = 0; k < 4; k++) { const ph = (t * 1.4 + k * .25 + i * .13) % 1; this.glow(fx + Math.sin(t * 3 + k + i) * 3, 14 + ph * 46, fz, 9 - ph * 6, [1, .5 - ph * .3, .12], .7 * (1 - ph)); } } } return; }
     if (bg === 'cell') { if (!Settings.d.reduce) { for (let i = 0; i < 10; i++) this.glow(Math.sin(i * 2.1) * 6, 20 + i * 22, Math.cos(i * 1.7) * 5, 34 - i * 1.4, [1, .95, .8], .05); for (let i = 0; i < 26; i++) { const ph = (t * .12 + i * .137) % 1; this.glow(Math.sin(i * 4.1 + t * .3) * 40, 200 - ph * 200, Math.cos(i * 2.3) * 26, 1.2, [1, .96, .84], .5 * Math.sin(ph * 3.14)); } } return; }
     if (bg === 'storm' && !Settings.d.reduce) { const c = B.cam; for (let i = 0; i < 110; i++) { const px = c.x + ((i * 53.7) % 420) - 210 + Math.sin(i) * 8, pz = c.y - 20 - ((i * 37.1) % 300), py = 150 - ((t * (260 + i % 7 * 30) + i * 61) % 150); this.glow(px - py * .12, py, pz, 1.1, [.7, .78, 1], .55); this.glow(px - (py + 5) * .12, py + 5, pz, .9, [.7, .78, 1], .3); }
       const ph = t % 6.3; this.bolt = ph < .1 || (ph > .22 && ph < .3) ? 1 : 0; if (this.bolt && !this._th) Sound.play('rumble'); this._th = ph < .5; } else this.bolt = 0;
@@ -3546,6 +3664,11 @@ const FF = {
       hurt: 'PAIN IS THE BODY KEEPING COUNT. I KNOW ABOUT COUNTING.', clash: 'STEEL ON STEEL. IT RINGS LIKE A VALVE WHEEL LETTING GO.', fury: 'THERE IT IS. THE THING I KEEP UNDER THE GOLD.', eleven: 'ELEVEN SECONDS. I HAVE LIVED INSIDE THEM FOR FOUR YEARS.', wave: 'MORE. GOOD. I HAVE MORE TOO.' },
     arts: [{ on: 'start', after: 5, name: 'TIER SIX', line: 'I LEARNED TO SWING IN A VALVE BAY, ON PIPES THAT HIT BACK.', panel: 'pipe', kind: 'storm', rgb: '255,170,70', hex: '#ffaa46' }, { on: 'wave', name: 'BRASS RING', line: 'SHE WORE A WASHER FOR A WEDDING RING. I WEAR IT UNDER THE ARMOUR.', panel: 'hands', kind: 'rise', rgb: '255,210,110', hex: '#ffd26e' }],
     intro: [
+      { d: 2.6, black: 1, big: 'THE ASSAY', sub2: 'D A Y   F O R T Y', cap: 'MY NAME IS KAEL BRENNICK. UP HERE THEY KNOW ME BY ANOTHER.' },
+      { d: 3.0, cam: [0, 330, 150, 150, .2], to: [0, 250, 110, 150, .24], acts: ffRow(V, 6, -75, 30, 40, { fy: -1 }).concat(ffRow(TL, 7, -90, 30, -70, { fy: 1 })), cap: 'THE ACCREDITED RULE THE AIR. ONCE A YEAR THEY SEND THEIR CHILDREN INTO A VALLEY TO LEARN WHICH OF THEM DESERVE TO.' },
+      { d: 3.0, cam: [-60, 40, 70, 150, .3], to: [40, 30, 60, 150, .3], lin: 1, acts: ffRow(TL, 7, -90, 30, -70, { fy: 1 }), cap: 'TWELVE HOUSES. REAL STEEL. PROCTORS ON THE DAIS WRITE DOWN WHO IS WORTH KEEPING. THEY CALL IT THE ASSAY.' },
+      { d: 3.0, ...cu(0, 30, 1.9, 2.6, 18), acts: [{ id: 'kael2', a: [0, 30], blade: 1, aura: 1 }], cap: 'I WAS NOT BORN ONE OF THEM. I WAS BORN SIX TIERS UNDER THEIR FEET. THEY BURNED MY WIFE FOR A CRIME THAT WAS MINE.' },
+      { d: 3.0, ...cu(0, 30, 2.6, 1.7, -18), acts: [{ id: 'kael2', a: [0, 30], blade: 1, aura: 2 }], cap: 'SO I LET MYSELF BE CUT INTO THEIR SHAPE AND CAME UP THE LIFT TO TAKE THEIR WORLD APART FROM INSIDE IT.' },
       { d: 2.0, cam: [0, 190, 50, 170], to: [0, 150, 52, 190], acts: [{ id: 'kael2', a: [0, 30], blade: 1, aura: 1 }].concat(ffRow(V, 6, -75, 30, 12, { fy: 1 })), cap: 'THEY THINK I AM ONE OF THEM.' },
       { d: 1.5, cam: [70, 110, 46, 150], to: [-70, 110, 46, 150], lin: 1, speed: 1, sfx: 'roar', acts: ffRow(TL, 9, -120, 30, -110, { fy: 1 }, -10), cap: 'HOUSE TEAL. FORTY BLADES.' },
       { d: 1.3, cam: [0, 250, 44, 150], to: [0, 170, 40, 160], speed: 1, shake: .5, flash: 1, acts: [{ id: 'kael2', a: [0, 120], b: [0, 30], fy: -1, blade: 1, aura: 2 }].concat(ffRow(V, 6, -75, 30, 135, { fy: -1 }, 46)), big: 'GOOD.' }
@@ -3577,7 +3700,7 @@ const FF = {
     ]
   }),
   keep: () => ({
-    title: 'THE KEEP', sub: 'LUCAN AUREL - LAST DAY OF THE ASSAY', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, endAt: 0.3, winText: 'YIELD.',
+    boots: 1, title: 'THE KEEP', sub: 'LUCAN AUREL - LAST DAY OF THE ASSAY', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, endAt: 0.3, winText: 'YIELD.',
     hero: { id: 'kael2', hp: 9, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['YOU ARE ANGRY AT SOMEONE.', 'MOTHER WOULD LIKE YOU.', 'WHAT ARE YOU?', 'WHO WAS SHE?'] },
     voice: { at: [[1, 'LUCAN AUREL. HER SON. HER CHIN, HER HANDS, HER WAY OF LOOKING PAST YOU.'], [12, 'HE HAS BEEN BETTER THAN EVERYONE HIS WHOLE LIFE. IT HAS MADE HIM SLOW.'], [20, 'SHE IS WATCHING FROM THE DAIS. SHE DOES NOT KNOW MY FACE. SHE MADE IT.'], [34, 'SHE CALLED SEREN LITTLE EMBER. I WONDER WHAT SHE CALLS HIM.']],
       hurt: 'HE DID NOT LIGHT THE FURNACE. I KNOW. I KNOW.', fury: 'BE TOO MUCH FOR THEM, SHE SAID.', eleven: 'ELEVEN. FOR THE DOORS. FOR THE WASHER ON HER FINGER.', half: 'I COULD KILL HIM. THAT IS NOT WHAT I CAME UP HERE FOR.' },
@@ -3633,6 +3756,39 @@ const FF = {
       { d: 3.2, cam: [40, 150, 60, 150], to: [-30, 215, 110, 150], acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 1 }].concat(ffRow(V, 7, -90, 30, 34, { fy: -1, pose: 'raise' })), cap: 'THAT WAS THE NIGHT THEY STOPPED FOLLOWING THE HOUSE AND STARTED FOLLOWING ME.' }
     ]
   }),
+  // nine years on: the war comes down out of the sky
+  fall: () => ({
+    boots: 1, lurch: 1, title: 'THE FALL', sub: 'THE SUN SPIRE - HOLD THE DECK UNTIL WE HIT', bg: 'fall', arena: FIELD, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Spire Guard', winText: 'THE DECK IS OURS', endAt: .25,
+    hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 60 }, allies: V, shouts: ['BELOW!', 'WITH HIM!', 'FOR TIER SIX!'], taunt: { 0: ['HE IS SOOT!', 'CUT THE LINES!', 'BRING IT DOWN!'] },
+    waves: [[{ id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }],
+      [{ id: 'cade', name: 'Marshal Cade', kind: 'captain', hp: 150, sc: 1.25 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }]],
+    onWave: (w, B) => { B.p.fury = 100; B.say('FURY', true); B.voice('fury'); },
+    voice: { at: [[1, 'NINE YEARS AGO I KNELT WHEN THEY CAME DOWN IN LIGHT. TODAY WE ARE THE ONES COMING DOWN.'], [10, 'FOUR HUNDRED BARGES. EVERY ONE OF THEM FLOWN BY SOMEBODY WHO WAS BORN OWING AIR.'], [20, 'THE SPIRE IS WHERE THEY KEEP THE COUNT. I HAVE COME TO CLOSE THE LEDGER.'], [32, 'MARA IS ON THE NEXT BARGE OVER. SHE SAID SHE WOULD NOT MISS THIS IF IT KILLED HER. IT MIGHT.']],
+      hurt: 'I HAVE BEEN CUT BY BETTER. I MARRIED BETTER.', fury: 'IT NEVER WENT OUT. I ONLY LEARNED TO AIM IT.', wave: 'CADE. HE SIGNED THE FURNACE ORDER FOR TIER FOUR.', half: 'HE KEEPS LOOKING AT THE SPIRE. NOBODY IS COMING OUT OF IT FOR HIM.', eleven: 'ELEVEN SECONDS. I HAVE MADE AN ARMY OUT OF THEM.' },
+    arts: [{ on: 'start', after: 6, name: 'FIRST FIRE', line: 'THEY LIT THEIR FESTIVAL FROM THE FURNACE THAT TOOK HER. I LIT A WAR FROM IT.', panel: 'furnace', stage: 2, kind: 'storm', rgb: '255,120,40', hex: '#ff7828', dark: 'rgba(26,4,2,.8)' }, { on: 'wave', name: 'EVERY BREATH', line: 'EVERY BREATH I TAKE IS HERS. I HAVE TAKEN A GREAT MANY. I INTEND TO SPEND THEM ALL HERE.', panel: 'hands', kind: 'rise', rgb: '255,210,110', hex: '#ffd26e' }, { at: .6, name: 'THE LEDGER', line: 'THEY WROTE DOWN WHAT WE OWED FOR TWO HUNDRED YEARS. NOBODY EVER WROTE DOWN WHAT THEY DID.', panel: 'world', stage: 3, kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }],
+    intro: [
+      { d: 2.8, black: 1, big: 'NINE YEARS FROM NOW', cap: 'THIS IS WHERE IT GOES. I AM SHOWING YOU SO YOU KNOW IT GOES SOMEWHERE.' },
+      { d: 3.2, cam: [0, 330, 170, 150, .3], to: [0, 240, 110, 150, .3], shake: .3, acts: [{ id: 'kael2', a: [0, 20], blade: 1, aura: 2, fy: -1 }].concat(ffRow(V, 6, -75, 30, 44, { fy: -1 })), big: 'THE FALL', cap: 'THE ACCREDITED LIVE ON THE SUN SPIRE, ABOVE THE WEATHER. YOU CANNOT CLIMB TO IT. SO WE ARE FALLING ON IT.' },
+      { d: 3.0, ...cu(0, 20, 1.9, 2.6, 16), acts: [{ id: 'kael2', a: [0, 20], blade: 1, aura: 2, fy: -1 }], cap: 'FOUR HUNDRED STOLEN LIFT-BARGES, CUT LOOSE FROM THE HIGH DOCKS. WE HAVE BOOTS. THE BARGES DO NOT NEED TO LAND WELL.' },
+      { d: 2.6, cam: [70, 60, 50, 150], to: [-70, 60, 50, 150], lin: 1, sfx: 'roar', acts: ffRow(['sg1', 'sg2'], 8, -105, 30, -80, { fy: 1 }, -10), cap: 'THE SPIRE GUARD CAME UP TO MEET US ON THE WAY DOWN.' },
+      { d: 1.6, ...cu(0, 20, 1.9, 2.9, -14), flash: 1, bolt: 1, acts: [{ id: 'kael2', a: [0, 20], blade: 1, aura: 3 }], big: 'GOOD.' }
+    ],
+    outro: [
+      { d: 3.0, ...cu(0, 10, 1.9, 2.6, -24), acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 3 }], cap: 'CADE WENT OVER THE RAIL. I DID NOT WATCH HIM ALL THE WAY DOWN. I HAD SOMEWHERE TO BE.' },
+      { d: 3.2, cam: [40, 150, 60, 150], to: [-30, 240, 130, 150], shake: .4, acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 2 }].concat(ffRow(V, 7, -90, 30, 34, { fy: -1, pose: 'raise' })), cap: 'THE SPIRE CAME UP AT US WHITE AND GOLD AND VERY FAST. SOMEBODY BEHIND ME STARTED THE SHIFT SONG.' },
+      { d: 3.0, cam: [0, 240, 130, 150, .3], to: [0, 250, 140, 150, 1.1], acts: [], cap: 'BUT THAT IS NINE YEARS OFF, AND I HAVE NOT EARNED IT YET.', tint: 'rgba(255,250,230,.3)' },
+      { d: 2.6, black: 1, big: 'SOOTBORN', bigC: '#ffe08a', sub2: 'E V E R Y   B R E A T H   I S   H E R S', cap: 'FIRST I HAVE TO GET OUT OF CINDERWELL.' }
+    ]
+  }),
+  // the dream of the training years: fought below, the old way
+  drill: () => ({
+    title: 'THE DRILL', sub: 'BRAND - THREE YEARS OF THIS', bg: 'pit', arena: { kind: 'ring', rx: 96, ry: 44 }, music: 'work', legend: 1, skip: 1, winText: 'AGAIN TOMORROW',
+    hero: { id: 'kael2', hp: 9, pow: 1, blade: 1, fury0: 20 }, taunt: { 0: ['AGAIN.', 'YOU FIGHT LIKE SOOT.', 'THEY WILL NOT WAIT FOR YOU.', 'STAND UP TALLER.'] },
+    foes: [{ id: 'brand', name: 'Brand', kind: 'baton', hp: 44 }],
+    voice: { at: [[1, 'BRAND WAS A WARDEN UNTIL THEY ORDERED HIM TO PUT A HALBERD THROUGH A CHILD FOR HUMMING.'], [12, 'HE KNOWS HOW THEY FIGHT BECAUSE HE WAS PAID TO DO IT TO US.'], [24, 'THE NEW LEGS ARE TOO LONG. EVERY STEP LANDS A HAND FURTHER THAN I MEAN IT TO.']],
+      hurt: 'HE HITS ME WHERE THE WIRE WENT IN. HE SAYS THEY WILL TOO.', fury: 'HE SAYS: DO NOT SPEND IT. BANK IT. I AM TRYING.', half: 'HE IS SMILING. I HAVE NOT SEEN THAT BEFORE.', eleven: 'ELEVEN. HE COUNTS ALONG WITH ME.' },
+    arts: [{ at: .55, name: 'CLOSED TEETH', line: 'THE SHIFT SONG HAS NO WORDS. YOU HUM IT TO KEEP TIME ON THE WHEEL. I KEEP TIME ON HIM.', panel: 'pipe', kind: 'storm', rgb: '255,170,70', hex: '#ffaa46' }]
+  }),
   furnace: () => ({ title: 'THREE STEPS', sub: 'THE WARDEN', bg: 'furnace', arena: { kind: 'rect', w: 200, h: 80 }, music: 'mystery', doomed: 9, hero: { hp: 4, fury0: 80 }, voice: { at: [[.4, 'THREE STEPS.'], [3, 'IT IS LIKE HITTING THE ARRAY ITSELF.'], [6, 'SHE IS STILL LOOKING AT ME.']], eleven: 'I HIT HIM WITH EVERYTHING I WILL EVER BE. HE DOES NOT MOVE.' }, foes: [{ id: 'warden', name: 'Warden', kind: 'warden', hp: 999, sc: 1.1 }] })
 };
 // ---- the intro before the title: the Assay, start to finish, in thirty seconds
@@ -3660,12 +3816,71 @@ const OPENING = [
 const Opening = { run(done) { if (NOFF) return done(); G.mode = 'opening'; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => { Fade.a = 1; Fade.dir = -1; Fade.sp = 1.2; Fade.busy = true; done(); }); } };
 
 // ---- weave them into the story
-if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { card: 'FOUR YEARS FROM NOW', sub: 'Above the rock. The Assay.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.valley() }, { noskip: false });
+if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { card: 'FOUR YEARS FROM NOW', sub: 'Above the rock. The Assay.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.valley() }, { card: 'FOUR YEARS EARLIER', sub: 'Cinderwell. Six tiers under the rock. Before any of it.', big: 1, min: 1.6, max: 5 }, { noskip: false });
 // the furnace: if he runs for her, he gets his three steps
 { const i = PROLOGUE_B.findIndex(s => s.choice && s.choice.some(c => /BREAK FREE/.test(c.t))), ch = PROLOGUE_B[i].choice.find(c => /BREAK FREE/.test(c.t)), was = ch.then;
   ch.then = [narr("You tear out of Mara's arms. Three steps. A Warden turns, unhurried, and lowers a halberd the length of a pipe.")];
   PROLOGUE_B.splice(i + 1, 0, { fx: () => { if (F('ranForHer')) Cutscene.steps.splice(Cutscene.i, 0, { brawl: () => NOFF ? null : FF.furnace() }, { dlg: was }); } }); }
-if (!NOFF) { const i = PROLOGUE_B.findIndex(s => s.card === 'SOOTBORN'); if (i >= 0) PROLOGUE_B.splice(i, 0, { fade: 'out' }, { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The first night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.pairing() }); }
+{ const i = PROLOGUE_B.findIndex(s => s.card === 'SOOTBORN'); if (i >= 0) PROLOGUE_B.splice(i, 0,
+  { narr: 'The shift song has no words, because words cost breath. You hum it through your teeth to keep time on a valve wheel, forty people turning as one. It is older than the Authority. It was the one thing down here nobody had thought to ration.' },
+  { narr: 'After that night the Authority put it on the tier speakers. Every bell. Slowed down, played on their own bright instruments.' },
+  { narr: 'So that whenever we heard our own song, we would see the doors close. Nobody on Tier Six has hummed it since.' });
+  const j = PROLOGUE_B.findIndex(s => s.narr && /starts to hum the shift song/.test(s.narr)); if (j >= 0) PROLOGUE_B.splice(j + 1, 0, { narr: 'It is the only goodbye we are allowed. Speaking at a commitment is forbidden. Nobody ever wrote a rule about humming.' }); }
+if (!NOFF) { const i = PROLOGUE_B.findIndex(s => s.card === 'SOOTBORN'); if (i >= 0) PROLOGUE_B.splice(i, 0, { fade: 'out' }, { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The first night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.pairing() }, { card: 'FOUR YEARS EARLIER', sub: 'Cinderwell. The morning after the furnace.', big: 1, min: 1.6, max: 5 }); }
+// ---- the dreams: what happens between the fights, told below, the old way
+const DREAM1 = () => [
+  { music: 'mystery' }, { card: 'THAT NIGHT', sub: 'Kael does not dream of the furnace. For once it runs forward.', min: 1.6, max: 5 },
+  { panel: 'gild' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'Half a year from now a woman finds me in the old tunnel. She was Accredited once. She still has the height, and the gold in her eyes, and nothing else they gave her.' },
+  { say: 'ilse', t: 'They do not fear soot. They fear nothing that kneels. They only fear what looks like them.' },
+  { say: 'ilse', t: 'So I am going to make you look like them. It will hurt more than anything that has happened to you. Except one thing.' },
+  { pstage: 1 }, { wait: 2.2 },
+  { narr: 'They call it gilding. They do it to their own children at twelve: gold wire run into the long bones so they grow tall, gold in the eye so they can stand the sun.' },
+  { narr: 'Done to a grown man it takes nine months on a table, and most of his voice.' },
+  { pstage: 2 }, { wait: 1.6 },
+  { narr: 'I went onto the table a valve tech. I came off it a head taller, and had to learn to walk.' },
+  { pstage: 3 }, { wait: 0.8 },
+  { say: 'ilse', t: 'Now the mouth. You sound like Tier Six every time you open it. Tell me you are grateful.' },
+  { say: 'kael', t: 'Ta. ...Thanks.' },
+  { pstage: 4 },
+  { say: 'ilse', t: 'No. Soot thanks. To thank is to admit you were given something. They say: noted.' },
+  { pstage: 5 },
+  { say: 'ilse', t: 'Soot says "aye." They say "granted."' },
+  { pstage: 6 },
+  { say: 'ilse', t: 'Soot says "my breath" when it means "my life," because you have had to count it. They have never counted a breath. They say "my time."' },
+  { pstage: 7 },
+  { say: 'ilse', t: 'And never "we." Soot says "we" about everything. Up there it is "one." One does not kneel. One is not sorry. Try.' },
+  { say: 'kael', t: 'One is... not sorry.' },
+  { say: 'ilse', t: 'Better. Now mean it.' },
+  { narr: 'That part nobody had to teach me.' },
+  { narr: 'Then Brand, in a sealed pump room, every day for three years.' },
+  { fade: 'out' }, { panel: null },
+  { brawl: () => FF.drill() },
+  { card: 'Three years of that.', sub: 'Then they sent him up Lift Zero under a dead boy\'s name, into the Assay.', min: 1.6, max: 5 },
+  { card: 'THE ASSAY', sub: 'Four years from now. Day nineteen.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.ford() }
+];
+const DREAM2 = () => [
+  { card: 'THAT NIGHT', sub: 'The dream again. It is getting longer.', min: 1.4, max: 4 },
+  { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'The Assay. Every year the Accredited put their seventeen-year-olds into a walled valley with real steel and no rule that matters, and wait to see who walks out leading the rest.' },
+  { pstage: 1 }, { wait: 2.2 },
+  { narr: 'Twelve Houses. Twelve standards. Take another House\'s standard and its cadets are yours. Take the keep on the ridge and it is over.' },
+  { pstage: 2 }, { wait: 1.4 },
+  { narr: 'They put me in Violet. Teal holds the river. For forty days we have been taking each other apart.' },
+  { pstage: 3 }, { wait: 1.4 },
+  { narr: 'The Proctors watch from the dais and write it all down. The winner is not given a prize. He is given a post: the Spire, the Array, the count of who breathes.' },
+  { narr: 'That is why I am up here. I did not come to win their game. I came to be handed the keys.' },
+  { narr: 'Lucan Aurel holds the keep. Her son. If I put him on his knees in front of her, she will have to pin the gold on me herself.' },
+  { fade: 'out' }, { panel: null }
+];
+const DREAM3 = () => [
+  { panel: 'spire' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'And once, only once, the dream runs all the way out to the end.' },
+  { narr: 'The Sun Spire. Where they keep the count. Above the weather, where the sky was never poison at all.' },
+  { pstage: 1 }, { wait: 1.6 },
+  { narr: 'Nine years from now, we stop asking to be let up. We come down on it.' },
+  { fade: 'out' }, { panel: null }
+];
 function ffScene(card, sub, def, done) { Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play([{ music: null }, { card, sub, big: 1, min: 1.5, max: 4.5 }, { brawl: def }], done); }
 
 // ---- src/day2.js
@@ -4177,6 +4392,7 @@ function festB() {
         { narr: 'Sull gets three steps. Then Hollis is in front of him, bad arm and all. Then Bao. Then, after a breath, Marrow. Three people. It is not a wall. It is enough to make him stop.' }]
       : [{ move: 'mara', to: [13, 9], spd: 40, wait: true }, { narr: 'Sull gets three steps before Mara is in front of him. Just Mara. Arms folded. Forty years of forewoman in her face.' }, { say: 'mara', t: "It's a lantern, Proctor. On First Fire. Write that down and see how it reads." }]),
     { narr: 'And from somewhere in the back, low, through closed teeth: the shift song.' },
+    { narr: 'For a year they have played it at us through the speakers at every bell, so it would mean the furnace. Nobody has dared to hum it. Tonight the tier takes it back.' },
     F('sullTip') ? { say: 'proctor', t: "...One candle-hour. It's licensed for one candle-hour. Then it comes down." } : F('sullWar') || F('beatSull') ? { say: 'proctor', t: "Brennick. I've got your name spelled right. You hear me? I've got it spelled RIGHT." } : { say: 'proctor', t: "It comes down at first bell. I'll scrub the light off the stones if I have to." },
     F('sullTip') ? { narr: 'He says it loudly, for the record. Then he turns his back on it, and stands guard over the wrong side of the square for exactly one hour.' } : { narr: 'He does not climb. Not with four hundred people humming. He stands under her sun with his whistle in his fist and does not blow it. You can see what that costs him. You enjoy it more than you should.' },
     { move: 'kael', to: [11, 7], spd: 26 }, { move: 'tavi', to: [10, 7], spd: 50, wait: true }, { pan: [11, 7], dur: 1 }, { zoom: 2.6 },
@@ -4201,8 +4417,9 @@ function festB() {
     { say: 'vale', t: 'I can send a clerk. Or I can send a valve tech who knows the bank, and who has just shown four hundred people he cannot be told where to put a light.' },
     { say: 'vale', t: 'Sleep on it. You have until first bell.' },
     { fade: 'out' },
-    { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
-    { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 }
+    ...(NOFF ? [] : DREAM2()), { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
+    { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 },
+    ...(NOFF ? [] : DREAM3()), !NOFF && { brawl: () => FF.fall() }, !NOFF && { card: 'NINE YEARS EARLIER', sub: 'Cinderwell. The morning after the festival.', big: 1, min: 1.6, max: 5 }
   ].filter(Boolean);
 }
 
@@ -4387,6 +4604,7 @@ const Menus = {
     const S = Settings.d, upd = () => { Settings.save(); Settings.apply(); };
     const cyc = (k, n) => d => { S[k] = (S[k] + d + n) % n; upd(); };
     UI.push(modal({ title: 'Settings', build(b) { b.innerHTML = `<p style="opacity:.7">Saves: ${Store.ok ? 'kept in this browser' : 'this session only (storage blocked) — export from Save data'}. Keyboard: WASD/arrows, E/Enter, Esc, M menu, Q/R tabs, H hint. Controller supported.</p>`; }, items: [
+      { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][S.diff === undefined ? 1 : S.diff], act: () => { S.diff = ((S.diff === undefined ? 1 : S.diff) + 1) % 3; upd(); } },
       { label: 'Sound test', value: () => !Sound.ctx ? 'audio off' : Sound.ctx.state === 'running' ? 'tap to hear' : 'blocked: tap again', act: () => { Sound.unlock(); setTimeout(() => { Sound.play('horn'); Sound.play('win'); }, 60); } },
       { label: 'Music', value: () => S.music * 10 + '%', adj: d => { S.music = clamp(S.music + d, 0, 10); upd(); } },
       { label: 'Sound effects', value: () => S.sfx * 10 + '%', adj: d => { S.sfx = clamp(S.sfx + d, 0, 10); upd(); Sound.play('blip'); } },
@@ -4427,7 +4645,9 @@ const Menus = {
         ['The Pairing · duel with Teo Aldane', ff('FOUR YEARS FROM NOW', 'The Assay. The first night.', 'pairing')],
         ['The Ford · duel with Captain Vant', ff('THE ASSAY', 'Four years from now. Day nineteen.', 'ford')],
         ['The Proctor · duel with Halden Voss', ff('FOUR YEARS FROM NOW', 'The Assay. Day thirty-one.', 'proctor')],
-        ['The Keep · duel with Lucan Aurel', ff('FOUR YEARS FROM NOW', 'The Assay. The last day.', 'keep')],
+        ['The Keep · duel with Lucan Aurel (boots)', ff('FOUR YEARS FROM NOW', 'The Assay. The last day.', 'keep')],
+        ['The Fall · nine years on (boots, battle)', ff('NINE YEARS FROM NOW', 'Above the weather.', 'fall')],
+        ['The Drill · Brand (2D, training years)', ff('THE DRILL', 'Two years from now. A sealed pump room.', 'drill')],
         ['The Ember Ring · bouts below', load('ring')]
       ],
       'Story beats': [
@@ -4437,7 +4657,9 @@ const Menus = {
         ['Prologue · the relay heist', () => { fresh(); Game.startHeist(); }],
         ['Prologue · Lift Zero, the furnace, the Pairing', () => { fresh(); Game.onHeistDone(); }],
         ['Day 1 · wake up in Ashgate', () => { fresh(); Game.startPresent(); }],
-        ['End of Day 1 · the Ford, then Day 2', ff('THE ASSAY', 'Four years from now. Day nineteen.', 'ford', load('day2'))],
+        ['End of Day 1 · the dream (gilding, the lesson, the Drill, the Ford)', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1(), load('day2')); }],
+        ['After the ending · the last dream, then the Fall', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM3().concat([{ brawl: () => FF.fall() }]), () => Game.toTitle()); }],
+        ['End of Day 2 · the dream of the Assay, then the Keep', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM2().concat([{ brawl: () => FF.keep() }]), () => Game.toTitle()); }],
         ['Day 2 · morning', load('day2')],
         ['Day 2 · lantern built, festival next', load('fest')],
         ['Day 2 · Last Bell (the Proctor, then the ceremony)', fest('startFestival')],
@@ -4449,6 +4671,7 @@ const Menus = {
     const onoff = v => v ? 'On' : 'Off';
     UI.push(modal({ title: 'Dev menu', build(b) { b.innerHTML = '<p>Jump straight to any fight or story beat. Your save slots are not touched until the game autosaves.</p>'; }, items: [
       { label: 'Fights', act: sub('Fights') }, { label: 'Story beats', act: sub('Story beats') },
+      { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][Settings.d.diff === undefined ? 1 : Settings.d.diff], adj: () => { Settings.d.diff = ((Settings.d.diff === undefined ? 1 : Settings.d.diff) + 1) % 3; Settings.save(); } },
       { label: 'Start fights at full fury', value: () => onoff(DEV.fury), adj: () => { DEV.fury = DEV.fury ? 0 : 1; } },
       { label: 'Skip fight intro films', value: () => onoff(DEV.quick), adj: () => { DEV.quick = DEV.quick ? 0 : 1; } },
       { label: 'Back', act: () => UI.pop() }] }));
@@ -4483,7 +4706,7 @@ const Menus = {
     ] }));
   },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.13): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Signatures.</b> Hold kick: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Assay fights can be lost: one second wind, then he goes down and the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.14): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
@@ -4626,7 +4849,7 @@ const DayEnd = {
         <p><i>"They came down in light. One day, I'm going up in it."</i></p>
         <h2 style="margin-top:16px">END OF DAY ONE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
     }, items: [
-      { label: 'Wake up: Day 2 — First Fire', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); if (NOFF) return Game.loadSave(sv); ffScene('THE ASSAY', 'Four years from now. Day nineteen.', () => FF.ford(), () => Game.loadSave(sv)); } },
+      { label: 'Wake up: Day 2 — First Fire', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); if (NOFF) return Game.loadSave(sv); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1(), () => Game.loadSave(sv)); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }
     ] }));
   }

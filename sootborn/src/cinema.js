@@ -213,11 +213,14 @@ const PROLOGUE_A = [
     { t: "Because I'm better at this than anyone they've got.", fx: () => G.tendency = 'tinkerer', then: [say('seren', "Modest, too. Fine. You are. It's infuriating.")] },
     { t: 'Because one day I want to be the one who decides who breathes.', fx: () => G.tendency = 'seeker', then: [say('seren', "...Careful, Kael. That's how they talk."), say('kael', 'Then somebody had better learn the language.')] }
   ] },
+  { say: 'seren', t: "Listen. The audit relay is on the east wall, straight across the bay from the door: the grey box with the red lamp. Cut that first, or the bank logs every turn you make." },
+  { say: 'seren', t: "Then Valve Bank Seven, on the north wall. Relay, then bank. Say it back." },
+  { say: 'kael', t: "Relay, east wall. Then the bank." },
   { say: 'seren', t: "Fine. I'll keep watch. Night Proctor walks Bay Three every hour with a lantern. If he sees you, you're a thief. If he sees me, I'm lost." },
   { say: 'kael', t: "And if he sees both of us?" },
   { say: 'seren', t: "Then we're newlyweds looking for somewhere private. Try to look embarrassed. Shouldn't be hard." },
   { fade: 'out' },
-  { card: 'Bay Three · Second bell', sub: 'Hold A at the audit relay to cut it. Then reach Valve Bank Seven. The lamps sweep: move when they turn away. Throw bolts to pull a guard off his post.', min: 1, max: 4 }
+  { card: 'Bay Three · Second bell', sub: 'Cross the bay to the audit relay on the far (east) wall and hold A to cut it. Then reach Valve Bank Seven on the north wall. A marker points the way. The lamps sweep: move when they turn away. Throw bolts to pull a guard off his post.', min: 1, max: 4 }
 ];
 
 // ================= PROLOGUE B: the audit, the sentence, the furnace =================
@@ -370,7 +373,7 @@ const PROLOGUE_B = [
   { narr: 'They returned the ring. They kept the girl. And they sent you the bill for the fire.' },
   { fade: 'out' }, { panel: null },
   { card: 'SOOTBORN', sub: 'What they call us. What they will remember.', big: 1, sfx: 'splash', min: 2.2, max: 6 },
-  { card: 'FORTY-ONE DAYS LATER', min: 1, max: 3 }
+  { card: 'FORTY-ONE DAYS AFTER THE FURNACE', sub: 'Cinderwell. Tier Six. Kael still fixes valves.', min: 1.4, max: 4 }
 ];
 const PROLOGUE = PROLOGUE_A;
 

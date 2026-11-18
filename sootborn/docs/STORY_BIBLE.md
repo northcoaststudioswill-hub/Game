@@ -121,6 +121,21 @@ Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at F
 - Placement: opening before the title; The Valley at New Game; The Ford between Day 1 and Day 2; The Keep at the end of Day 2.
 - Kael's narration is first person, present tense, short. He counts things. He never says he is angry; he describes what he does with it.
 
+### Timeline, and where the slice sits in it (v0.14)
+The game tells two halves at once: the present below, and the years after, seen in dreams and fights.
+- **Present (playable):** the prologue (the wedding, the bleed, the furnace), then Day 1 and Day 2 in Cinderwell, forty-one days after the furnace. Still to write: how Kael gets out.
+- **+6 months:** Ilse Marrin, once Accredited, finds him in the old tunnel. *They only fear what looks like them.*
+- **The Gilding (9 months):** what the Accredited do to their children at twelve (gold wire in the long bones for height, gold in the eye for the sun), done to a grown man.
+- **Training (3 years):** speech with Ilse, the blade and the boots with Brand, a Warden who deserted rather than kill a child for humming.
+- **+4 years, the Assay:** sent up Lift Zero under a dead boy's name. Night 1 the Pairing; day 19 the Ford; day 31 the Proctor; day 40 the Valley; last day the Keep. The winner is given a post on the Spire. That is the point.
+- **+9 years, the Fall:** the Belowborn and their allies drop four hundred stolen lift-barges onto the Sun Spire. Marshal Cade. Further fights should live out here: bigger, off the ground.
+
+**How they talk.** Soot: "thanks", "aye", "my breath" (for my life), "we". Accredited: "noted", "granted", "my time", "one". They never thank and never apologise.
+
+**The shift song.** No words, because words cost breath; hummed through the teeth to keep time on a valve wheel. Humming is the only goodbye allowed at a commitment. After Seren, the Authority plays it on the tier speakers at every bell so that it means the furnace. At First Fire the tier hums it again.
+
+**Format rule.** Story between the fights is told below-style: 2D illustrated panels, dialogue, and 2D fights for anything that happens before he goes up. 3D is for the Assay and after.
+
 ### How Kael fights (v0.12.9)
 Nothing clean about it. The Accredited are taught forms; he was taught by a furnace. He kicks, jumps on people, drags them in with the rigging line he used on the valve banks, and parries because he has no patience for blocking. Moves: strike chain, heavy, kick (guard break, launcher), jump with air cuts, dive kick, plunge, dodge, guard and parry, hook line, ELEVEN. Signatures (v0.13): Breach, Shaft Drop (he came up a lift shaft; he comes down like one), Wide Cut, headbutt and throw, the roar, riposte. Assay fights can be lost: one second wind, then the fight restarts slightly easier.
 

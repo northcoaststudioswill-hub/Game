@@ -1,5 +1,48 @@
 # SOOTBORN — changelog
 
+## v0.14 · 2026-11-18 — harder, more moves, boots, dreams, and a look further ahead
+From play notes: fights far too easy; more abilities, especially by the last fight (boots); strong and weak kicks and a special punch; the card after the first fight was confusing; explain more before the first fight; fights beyond the Assay, bigger and off the ground; more 2D fights like the early game, especially the training years; how the Accredited talk; the humming was confusing; the first stealth room does not say where to go; show what happens between the fights, in the game's own 2D style.
+
+**Difficulty**
+- New setting, **Fight difficulty: Story / Hard / Brutal** (Settings, and the Dev menu). Hard is the default and is a large step up from v0.13; Story is roughly what v0.13 was.
+- Hard: Assay enemies have 40% more health, wind up faster, attack nearly twice as often, and up to three come at once. Captains, Wardens and duelists all charge from range, strike twice, and strike three times below about half health. Less safe time after a hit; the second wind brings him back at 40%.
+- Brutal: more of all of that, four at once, and no second wind.
+- The Ember Ring below gets a smaller share of the same changes.
+
+**New moves**
+- **Kick chain**: tap kick up to three times; the third is a roundhouse that launches.
+- **The boot** (hold kick): a strong kick that breaks a guard and sends a man flying into whoever is behind him.
+- **The ram** (hook button, up close): a punch from the valve ram on his off hand. Heavy damage, a shockwave through anyone behind the target. Chains from the hook line: hook a man in, then ram him.
+- **Boots** (the Keep and everything after): hold jump to fly, press jump again in the air to climb, dodge in the air to dash, guard in the air to slam. A fuel bar under the guard pips. Unlimited air cuts while he is up.
+- Breach moved to guard + jump (hold kick is now the boot).
+
+**Story**
+- **Time cards fixed.** After the Valley: "FOUR YEARS EARLIER · Cinderwell. Six tiers under the rock." After the Pairing: "FOUR YEARS EARLIER · the morning after the furnace." The card before Day 1 now reads "FORTY-ONE DAYS AFTER THE FURNACE" instead of "FORTY-ONE DAYS LATER", which read as if it followed the fight.
+- **Before the first fight**: five new shots say who Kael is, what the Assay is, who watches, and why he is in it.
+- **Dreams** (new, 2D, in the style of the game below): when Kael sleeps, the story runs forward.
+  - *End of Day 1*: the Gilding (three new illustrated panels), Ilse Marrin, a woman who was Accredited once; **the language lesson** (soot says "thanks", "aye", "my breath", "we"; the Accredited say "noted", "granted", "my time", "one"); then **the Drill**, a new **2D fight** against Brand, a Warden who deserted. Then the Ford.
+  - *End of Day 2*: what the Assay is, on an illustrated map: twelve Houses, the standards, the keep, the Proctors, and what the winner is actually given. Then the Keep.
+  - *After the ending*: one look all the way forward (the Sun Spire), then the Fall.
+- **The Fall** (new fight, nine years on): a battle on the hull of a lift-barge falling onto the Sun Spire. Boots, two waves, Marshal Cade, a deck that lurches, three Memory Arts. Plays after First Fire and from the Dev menu.
+- **The shift song explained.** At the furnace: humming is the only goodbye allowed, because nobody wrote a rule about it. After the furnace: what the song is, and that the Authority now plays it on the tier speakers at every bell so that it will mean the furnace. At the festival: a year of that, and tonight the tier takes it back. The Drill's Memory Art is about it too.
+- **The first stealth room**: Seren now says where the relay is (east wall, straight across from the door) and makes Kael say the order back; the card says it; and a flashing marker labelled RELAY, then BANK 7, points the way the whole time.
+
+**Art pass on the new scenes**
+- The gilding room: tiled wall, masked figures with gold eyes who shift their weight, an instrument tray, a gold drip line, light pooled on the floor; the before/after is framed in a tall mirror.
+- **The lesson has a slate.** Two columns, SOOT and THEM; each pair is chalked up as Ilse says it, with the soot word struck through.
+- The Assay map: drifting clouds, birds, pines, a tent and three cadets at every standard, light moving down the river, a rock base under the keep.
+- The Sun Spire: sun rays, lesser spires in the cloud, glowing gold rings with windows.
+- The Fall's deck: darker plating so figures read against it, rails with gaps torn out, gold deck lines, mast cables, a torn Violet standard, wreckage, and smoke columns streaming upward past the camera.
+
+**Engine**
+- Film shots can change scenery mid-sequence; a fight definition can be a film only.
+- Dev menu: the Drill, all three dreams (end of Day 1, end of Day 2, after the ending), the Fall, and the difficulty switch.
+
+**Not done / not tested**
+- Nobody has played Hard by hand. A bot that only strikes and dodges clears the Valley and the Pairing on Hard but could not finish the Ford in the time allowed; a bot using the full move set was not measured. If Hard is too much, Story is there, and each loss makes the retry 8% easier.
+- Boots flight has not been tried on a real controller or phone.
+- The Gilding, Ilse Marrin, Brand, Marshal Cade and the Sun Spire are new canon written this round; say if any of it is wrong for the story.
+
 ## v0.13 · 2026-11-18 — signature moves, and fights you can lose
 From play notes: more signature moves; raise the difficulty so you sometimes lose, a fun challenge, not brutal.
 - **Signature moves** (all our own, built from Kael's story):

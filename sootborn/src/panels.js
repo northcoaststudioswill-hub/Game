@@ -147,6 +147,69 @@ const PANELS = {
     for (const [x, y] of [[118, 34], [150, 28], [176, 36], [200, 44], [132, 42]]) R(g, x, y, 3, 2, '#c8c0c0');
     if (st >= 1) { const a = Math.min(1, s / 1.2); R(g, 132, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); R(g, 172, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); glow(g, 142, 84, 14, '255,140,50', .5 * a); glow(g, 182, 84, 14, '255,140,50', .5 * a); }
   },
+  // ---- the dreams: what comes after
+  gild(g, t, st, s) {
+    const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#07060a');
+    for (let y = 0; y < 132; y += 12) for (let x = (y / 12 % 2) * 12; x < 320; x += 24) R(g, x, y, 23, 11, (x * 7 + y * 3) % 5 ? '#0b0a10' : '#0e0d14'); for (let i = 0; i < 9; i++) R(g, 20 + i * 34, 0, 2, 132, '#100e16'); R(g, 0, 132, 320, 48, '#0c0a0e'); R(g, 0, 132, 320, 1, '#22202a'); for (let i = 0; i < 16; i++) R(g, i * 20 + 2, 134 + (i % 3) * 14, 18, 1, '#121018');
+    R(g, 0, 8, 320, 3, '#1a1820'); for (let i = 0; i < 5; i++) { R(g, 30 + i * 64, 11, 1, 6 + (i % 2) * 5, '#2a2630'); } if (st >= 3) { PANELS.lesson(g, t, st, s); return; }
+    const fl = .5 + Math.sin(t * 9) * .03 + Math.sin(t * 23) * .02;
+    if (st < 2) { // the table
+      R(g, 158, 0, 2, 26, '#2a2630'); R(g, 146, 26, 26, 5, '#4a4650'); g.fillStyle = `rgba(255,236,190,${.1 * fl + .04})`; g.beginPath(); g.moveTo(150, 31); g.lineTo(168, 31); g.lineTo(232, 132); g.lineTo(86, 132); g.closePath(); g.fill(); glow(g, 159, 34, 26, '255,240,200', .5 * fl);
+      R(g, 96, 104, 128, 6, '#3a3640'); R(g, 96, 110, 128, 2, '#1c1a20'); R(g, 104, 112, 5, 20, '#2a2630'); R(g, 211, 112, 5, 20, '#2a2630');
+      R(g, 108, 96, 14, 8, '#c8946a'); R(g, 106, 94, 8, 4, '#2a2018'); R(g, 122, 97, 44, 7, '#5a5660'); R(g, 166, 98, 46, 3, '#4a4650'); R(g, 166, 101, 46, 3, '#46424c'); R(g, 126, 92, 30, 3, '#5a5660'); R(g, 124, 104, 3, 3, '#c8946a');
+      for (const [x, y] of [[100, 100], [216, 100], [136, 104], [190, 104]]) R(g, x, y, 4, 2, '#8a8478');
+      for (const [x, h, sw] of [[58, 66, 1], [250, 58, -1], [274, 64, -1]]) { const b = Math.round(Math.sin(t * 1.3 + x) * 1); R(g, x, 132 - h + b, 12, h - b, '#15131c'); R(g, x + 1, 132 - h - 9 + b, 10, 10, '#1c1a24'); R(g, x + 2, 132 - h - 5 + b, 8, 4, '#3a3428'); R(g, x + 3, 132 - h - 4 + b, 2, 1, '#e8c25a'); R(g, x + 7, 132 - h - 4 + b, 2, 1, '#e8c25a'); R(g, x + (sw > 0 ? 12 : -6), 132 - h + 16 + b, 6, 3, '#15131c'); }
+      R(g, 30, 112, 22, 2, '#3a3640'); R(g, 32, 114, 2, 18, '#22202a'); R(g, 48, 114, 2, 18, '#22202a'); for (let i = 0; i < 5; i++) R(g, 32 + i * 4, 108 + (i % 2), 2, 4, i % 2 ? '#c8ccd4' : '#e8c25a');
+      R(g, 232, 40, 1, 60, '#2a2630'); R(g, 228, 40, 9, 12, '#4a4030'); R(g, 229, 42, 7, 8, `rgba(255,210,110,${.6 + Math.sin(t * 2) * .2})`); g.strokeStyle = '#6a5a30'; g.beginPath(); g.moveTo(232, 52); g.quadraticCurveTo(226, 84, 206, 99); g.stroke(); const dr = (t * .9) % 1; R(g, 232, 52 + dr * 30, 1, 2, '#ffd26e');
+      g.fillStyle = 'rgba(255,236,190,.05)'; g.fillRect(96, 134, 128, 10);
+      if (st >= 1) { const a = Math.min(1, s / 2.4); // gold into the long bones
+        R(g, 166, 99, Math.round(46 * a), 1, '#ffd26e'); R(g, 166, 102, Math.round(46 * a), 1, '#ffd26e'); R(g, 126, 93, Math.round(30 * a), 1, '#ffd26e'); R(g, 122, 100, Math.round(44 * a), 1, '#e8c25a');
+        glow(g, 166 + 46 * a, 100, 9, '255,210,110', .7); glow(g, 113, 99, 7 * a, '255,210,110', .6 * a); if (a > .9) { R(g, 110, 98, 2, 1, '#ffe08a'); R(g, 114, 98, 2, 1, '#ffe08a'); }
+        for (let i = 0; i < 10; i++) { const ph = (t * .8 + i * .1) % 1; R(g, 166 + hash(i, 3) * 46 * a, 98 - ph * 18, 1, 1, `rgba(255,220,130,${1 - ph})`); } plate(g, 'GILDING', 160, 150); }
+    } else { // what went onto the table, and what came off it
+      glow(g, 110, 96, 40, '120,110,130', .12); glow(g, 214, 78, 60, '255,214,120', .14 + Math.sin(t * 2) * .02);
+      R(g, 104, 92, 12, 22, '#3a3640'); R(g, 106, 82, 8, 10, '#c8946a'); R(g, 105, 80, 10, 4, '#2a2018'); R(g, 105, 114, 4, 18, '#2a2630'); R(g, 111, 114, 4, 18, '#2a2630');
+      const a = Math.min(1, s / 1.6), h = Math.round(20 * a);
+      R(g, 206, 74 - h, 16, 34 + h, '#efe8d4'); R(g, 208, 60 - h, 12, 14, '#e8c8a8'); R(g, 207, 57 - h, 14, 5, '#e8c070'); R(g, 207, 108, 6, 24, '#d8d0bc'); R(g, 215, 108, 6, 24, '#d8d0bc'); R(g, 204, 74 - h, 20, 3, '#e8c25a'); R(g, 210, 65 - h, 2, 1, '#ffd26e'); R(g, 216, 65 - h, 2, 1, '#ffd26e');
+      R(g, 96, 133, 30, 1, '#1c1820'); R(g, 196, 133, 40, 1, '#3a3020'); R(g, 150, 30, 2, 104, '#3a3020'); R(g, 150, 30, 108, 2, '#3a3020'); R(g, 256, 30, 2, 104, '#3a3020'); R(g, 151, 31, 1, 102, '#e8c25a'); g.fillStyle = 'rgba(255,230,170,.04)'; g.fillRect(152, 32, 104, 100); g.fillStyle = 'rgba(255,255,255,.05)'; g.beginPath(); g.moveTo(160, 32); g.lineTo(176, 32); g.lineTo(156, 132); g.lineTo(152, 132); g.lineTo(152, 80); g.closePath(); g.fill(); for (let i = 0; i < 8; i++) { const ph = (t * .3 + i * .125) % 1; R(g, 200 + Math.sin(i * 2.3) * 22, 110 - ph * 80, 1, 1, `rgba(255,220,130,${(1 - ph) * a})`); } plate(g, 'BEFORE', 110, 150, 1); plate(g, 'AFTER', 214, 150);
+    }
+  },
+  lesson(g, t, st, s) { // a slate, a candle, and two ways of saying the same thing
+    const { R, glow } = PX, fl = .8 + Math.sin(t * 11) * .05 + Math.sin(t * 5) * .05;
+    glow(g, 160, 96, 110, '255,180,90', .1 * fl); R(g, 60, 118, 200, 5, '#3a2a1c'); R(g, 60, 123, 200, 2, '#1c140e'); R(g, 70, 125, 5, 8, '#2a1e14'); R(g, 245, 125, 5, 8, '#2a1e14');
+    R(g, 157, 104, 6, 14, '#e8e0cc'); R(g, 159, 98 + Math.round(Math.sin(t * 9)), 2, 6, '#ffd26e'); glow(g, 160, 100, 16, '255,200,110', .7 * fl);
+    R(g, 40, 70, 16, 48, '#2e2a32'); R(g, 42, 56, 12, 14, '#c8946a'); R(g, 41, 53, 14, 6, '#2a2018'); R(g, 54, 92, 14, 4, '#2e2a32'); // him
+    R(g, 262, 50, 18, 68, '#5a5660'); R(g, 264, 34, 14, 16, '#e0cdbc'); R(g, 263, 31, 16, 7, '#b8b4ac'); R(g, 262, 38, 3, 26, '#b8b4ac'); R(g, 267, 40, 2, 1, '#e8c25a'); R(g, 273, 40, 2, 1, '#e8c25a'); R(g, 248, 84, 16, 4, '#5a5660'); // her
+    R(g, 96, 22, 128, 72, '#3a2a1c'); R(g, 99, 25, 122, 66, '#14181a'); R(g, 99, 25, 122, 1, '#22282a');
+    const P2 = [['THANKS', 'NOTED'], ['AYE', 'GRANTED'], ['MY BREATH', 'MY TIME'], ['WE', 'ONE']], n = Math.min(4, st - 3);
+    ptext(g, 'SOOT', 106, 29, '#8a8478'); ptext(g, 'THEM', 176, 29, '#e8c25a'); R(g, 104, 36, 112, 1, '#3a4044');
+    for (let i = 0; i < n; i++) { const last = i === n - 1, a = last ? Math.min(1, s / .7) : 1, y = 42 + i * 12; g.globalAlpha = a; ptext(g, P2[i][0], 106, y, '#c8c0b0'); R(g, 104, y + 2, Math.round((ptextW(P2[i][0]) + 4) * a), 1, '#a03a3a'); ptext(g, P2[i][1], 176, y, '#ffe08a'); g.globalAlpha = 1; }
+  },
+  assay(g, t, st, s) {
+    const { R, glow, plate } = PX; const gr = g.createLinearGradient(0, 0, 0, 180); gr.addColorStop(0, '#6a9ad8'); gr.addColorStop(.5, '#bcd8f0'); gr.addColorStop(1, '#e8f0d8'); g.fillStyle = gr; g.fillRect(0, 0, 320, 180); glow(g, 250, 26, 46, '255,244,200', .7); R(g, 244, 20, 12, 12, '#fff6d0');
+    for (let i = 0; i < 9; i++) { const x = i * 40 - 10, h = 40 + hash(i, 7) * 34; g.fillStyle = i % 2 ? '#7a86b0' : '#8a94bc'; g.beginPath(); g.moveTo(x - 30, 96); g.lineTo(x + 10, 96 - h); g.lineTo(x + 50, 96); g.closePath(); g.fill(); g.fillStyle = '#f4f4fa'; g.beginPath(); g.moveTo(x + 10, 96 - h); g.lineTo(x + 2, 96 - h * .72); g.lineTo(x + 18, 96 - h * .72); g.closePath(); g.fill(); }
+    for (let i = 0; i < 5; i++) { const x = ((i * 83 + t * (2 + i % 3)) % 400) - 40, y = 14 + (i % 3) * 16; R(g, x, y, 34, 6, 'rgba(255,255,255,.85)'); R(g, x + 6, y - 4, 20, 5, 'rgba(255,255,255,.8)'); R(g, x + 3, y + 6, 28, 2, 'rgba(200,214,240,.6)'); }
+    for (let i = 0; i < 4; i++) { const bx = ((t * 14 + i * 90) % 360) - 20, by = 40 + i * 6 + Math.sin(t * 2 + i) * 3, w = Math.sin(t * 9 + i) > 0 ? 1 : 0; R(g, bx, by, 2, 1, '#2a3040'); R(g, bx - 2, by - w, 2, 1, '#2a3040'); R(g, bx + 2, by - w, 2, 1, '#2a3040'); }
+    R(g, 0, 96, 320, 84, '#3f8a44'); R(g, 0, 96, 320, 2, '#58a85a'); for (let i = 0; i < 26; i++) { const x = hash(i, 11) * 320, y = 100 + hash(i, 12) * 26, c = i % 3 ? '#1f6a34' : '#27803c'; if (Math.abs(x - 160) < 30) continue; g.fillStyle = c; g.beginPath(); g.moveTo(x, y - 12); g.lineTo(x - 5, y); g.lineTo(x + 5, y); g.closePath(); g.fill(); R(g, x - 1, y, 2, 2, '#5a3c26'); }
+    for (let i = 0; i < 60; i++) R(g, hash(i, 1) * 320, 98 + hash(i, 2) * 80, 6 + hash(i, 3) * 10, 2, i % 2 ? '#4a9a4e' : '#357a3c');
+    g.fillStyle = '#5aa8d8'; g.beginPath(); g.moveTo(0, 150); g.quadraticCurveTo(110, 118, 190, 146); g.quadraticCurveTo(250, 166, 320, 138); g.lineTo(320, 148); g.quadraticCurveTo(250, 176, 190, 156); g.quadraticCurveTo(110, 128, 0, 160); g.closePath(); g.fill();
+    for (let i = 0; i < 14; i++) { const u = ((t * .08 + i / 14) % 1), x = u * 320, y = u < .34 ? 150 - Math.sin(u / .34 * 1.57) * 18 : u < .6 ? 132 + (u - .34) / .26 * 22 : 154 - (u - .6) / .4 * 12; R(g, x, y + 4, 4, 1, 'rgba(255,255,255,.7)'); }
+    R(g, 132, 96, 56, 4, '#8a8a82'); R(g, 136, 92, 48, 5, '#9a9a90'); R(g, 142, 70, 36, 28, '#f2ede2'); R(g, 142, 70, 4, 28, '#fbf8f0'); R(g, 174, 70, 4, 28, '#d8d2c4'); R(g, 138, 62, 10, 36, '#e6e0d2'); R(g, 172, 62, 10, 36, '#e6e0d2'); R(g, 154, 56, 12, 42, '#f8f4ea'); R(g, 157, 82, 6, 16, '#3a3040'); for (const x of [138, 144, 172, 178, 154, 160]) R(g, x, 54 + (x > 150 && x < 166 ? 0 : 6), 4, 3, '#f8f4ea'); R(g, 159, 44, 1, 12, '#8a8478'); R(g, 160, 44, 8, 5, '#e8c25a'); plate(g, 'THE KEEP', 160, 34);
+    const HC = ['#7a5ac8', '#2aa6a0', '#c8452e', '#e8c25a', '#3a6ac8', '#58b848', '#c85a9a', '#e88a3a', '#8a8a92', '#40c8e8', '#a03a3a', '#f4f0e6'], pos = [[60, 136], [262, 128], [26, 112], [96, 108], [120, 168], [214, 112], [296, 110], [236, 168], [44, 168], [286, 164], [180, 122], [78, 150]];
+    if (st >= 1) for (let i = 0; i < 12; i++) { const a = Math.min(1, Math.max(0, s * 3 - i * .25)); if (a <= 0) continue; const [x, y] = pos[i], w = Math.sin(t * 3 + i) > 0 ? 1 : 0; if (st >= 2 && i > 1) g.globalAlpha = .35; R(g, x, y - 14, 1, 14, '#3a3028'); R(g, x + 1, y - 14 + w, 8, 6, HC[i]); R(g, x - 3, y, 7, 2, 'rgba(0,0,0,.25)'); g.fillStyle = '#f4f0e6'; g.beginPath(); g.moveTo(x - 9, y); g.lineTo(x - 5, y - 7); g.lineTo(x - 1, y); g.closePath(); g.fill(); R(g, x - 6, y - 2, 2, 2, HC[i]); for (let k = 0; k < 3; k++) { R(g, x + 4 + k * 4, y - 3, 2, 4, HC[i]); R(g, x + 4 + k * 4, y - 5, 2, 2, '#f0d8c0'); } g.globalAlpha = 1; }
+    if (st === 1) plate(g, 'TWELVE HOUSES', 160, 172);
+    if (st >= 2) { const [ax, ay] = pos[0], [bx, by] = pos[1], k = Math.min(1, s / 1.5); g.strokeStyle = '#fff2c0'; g.setLineDash([3, 3]); g.lineDashOffset = -t * 8; g.beginPath(); g.moveTo(ax + 6, ay - 8); g.lineTo(ax + 6 + (bx - ax) * k, ay - 8 + (by - ay) * k); g.stroke(); g.setLineDash([]); plate(g, 'VIOLET', ax + 4, ay + 6); plate(g, 'TEAL', bx + 4, by + 6); }
+    if (st >= 3) { const a = Math.min(1, s / 1.2); g.globalAlpha = a; R(g, 12, 40, 70, 8, '#f2ede2'); R(g, 12, 47, 70, 1, '#e8c25a'); for (let i = 0; i < 5; i++) { R(g, 18 + i * 13, 22, 7, 18, '#f8f6f0'); R(g, 19 + i * 13, 16, 5, 6, '#f0e0d4'); R(g, 18 + i * 13, 14, 7, 2, '#e8c25a'); glow(g, 21 + i * 13, 22, 8, '255,240,200', .3); } plate(g, 'THE PROCTORS', 47, 58); g.globalAlpha = 1; }
+  },
+  spire(g, t, st, s) {
+    const { R, glow, plate } = PX; const gr = g.createLinearGradient(0, 0, 0, 180); gr.addColorStop(0, '#1a2c6a'); gr.addColorStop(.6, '#6a9ad8'); gr.addColorStop(1, '#dce8f8'); g.fillStyle = gr; g.fillRect(0, 0, 320, 180); glow(g, 70, 30, 60, '255,244,200', .8); R(g, 62, 22, 16, 16, '#fff6d0');
+    for (let i = 0; i < 9; i++) { const a = i / 9 * 3.14 + t * .05; g.fillStyle = 'rgba(255,244,200,.05)'; g.beginPath(); g.moveTo(70, 30); g.lineTo(70 + Math.cos(a) * 300, 30 + Math.sin(a) * 300); g.lineTo(70 + Math.cos(a + .1) * 300, 30 + Math.sin(a + .1) * 300); g.closePath(); g.fill(); }
+    for (const [x, h] of [[96, 60], [222, 76], [250, 50]]) { g.fillStyle = '#dfe4f0'; g.beginPath(); g.moveTo(x - 4, 180); g.lineTo(x - 1, 180 - h); g.lineTo(x + 1, 180 - h); g.lineTo(x + 4, 180); g.closePath(); g.fill(); R(g, x, 180 - h - 6, 1, 6, '#e8c25a'); }
+    g.fillStyle = '#d9d6ce'; g.beginPath(); g.moveTo(164, 30); g.lineTo(172, 180); g.lineTo(163, 180); g.lineTo(161, 30); g.closePath();
+    g.fillStyle = '#f6f4ee'; g.beginPath(); g.moveTo(150, 180); g.lineTo(156, 30); g.lineTo(164, 30); g.lineTo(172, 180); g.closePath(); g.fill(); R(g, 159, 8, 2, 24, '#ffe08a'); glow(g, 160, 10, 10, '255,224,140', .8); R(g, 161, 30, 3, 150, '#dcd8ce'); for (let i = 0; i < 6; i++) { R(g, 152 - i, 56 + i * 20, 18 + i * 2, 2, '#e8c25a'); R(g, 152 - i, 58 + i * 20, 18 + i * 2, 1, '#b8943a'); glow(g, 161, 57 + i * 20, 8, '255,214,120', .25 + Math.sin(t * 2 + i) * .08); for (let k = 0; k < 3; k++) R(g, 155 + k * 4, 62 + i * 20, 1, 3, '#8ab0e0'); }
+    for (let i = 0; i < 8; i++) { const x = ((i * 67 + t * (3 + i % 3)) % 380) - 30, y = 130 + (i % 4) * 12; R(g, x, y, 60, 8, '#ffffff'); R(g, x + 10, y - 5, 34, 6, '#f4f8ff'); } R(g, 0, 170, 320, 10, '#f4f8ff'); plate(g, 'THE SUN SPIRE', 160, 100);
+    if (st >= 1) for (let i = 0; i < 26; i++) { const ph = (t * (.12 + (i % 5) * .02) + hash(i, 4)) % 1, x = 20 + hash(i, 5) * 280 - ph * 26, y = -10 + ph * 150; R(g, x, y, 5, 2, '#3a3a44'); R(g, x + 5, y - 3, 6, 1, 'rgba(255,150,60,.9)'); R(g, x + 9, y - 6, 8, 1, 'rgba(255,200,120,.5)'); }
+  },
   // ---- what they send back
   tin(g, t, st, s) {
     const { R, glow } = PX; for (let i = 0; i < 9; i++) { R(g, 0, i * 20, 320, 19, i % 2 ? '#3a2a20' : '#40301f'); R(g, 0, i * 20, 320, 1, '#54402a'); R(g, (hash(i, 1) * 300) | 0, i * 20, 1, 19, '#241a12'); }

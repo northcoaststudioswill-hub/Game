@@ -171,6 +171,7 @@ const Menus = {
     const S = Settings.d, upd = () => { Settings.save(); Settings.apply(); };
     const cyc = (k, n) => d => { S[k] = (S[k] + d + n) % n; upd(); };
     UI.push(modal({ title: 'Settings', build(b) { b.innerHTML = `<p style="opacity:.7">Saves: ${Store.ok ? 'kept in this browser' : 'this session only (storage blocked) — export from Save data'}. Keyboard: WASD/arrows, E/Enter, Esc, M menu, Q/R tabs, H hint. Controller supported.</p>`; }, items: [
+      { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][S.diff === undefined ? 1 : S.diff], act: () => { S.diff = ((S.diff === undefined ? 1 : S.diff) + 1) % 3; upd(); } },
       { label: 'Sound test', value: () => !Sound.ctx ? 'audio off' : Sound.ctx.state === 'running' ? 'tap to hear' : 'blocked: tap again', act: () => { Sound.unlock(); setTimeout(() => { Sound.play('horn'); Sound.play('win'); }, 60); } },
       { label: 'Music', value: () => S.music * 10 + '%', adj: d => { S.music = clamp(S.music + d, 0, 10); upd(); } },
       { label: 'Sound effects', value: () => S.sfx * 10 + '%', adj: d => { S.sfx = clamp(S.sfx + d, 0, 10); upd(); Sound.play('blip'); } },
@@ -211,7 +212,9 @@ const Menus = {
         ['The Pairing · duel with Teo Aldane', ff('FOUR YEARS FROM NOW', 'The Assay. The first night.', 'pairing')],
         ['The Ford · duel with Captain Vant', ff('THE ASSAY', 'Four years from now. Day nineteen.', 'ford')],
         ['The Proctor · duel with Halden Voss', ff('FOUR YEARS FROM NOW', 'The Assay. Day thirty-one.', 'proctor')],
-        ['The Keep · duel with Lucan Aurel', ff('FOUR YEARS FROM NOW', 'The Assay. The last day.', 'keep')],
+        ['The Keep · duel with Lucan Aurel (boots)', ff('FOUR YEARS FROM NOW', 'The Assay. The last day.', 'keep')],
+        ['The Fall · nine years on (boots, battle)', ff('NINE YEARS FROM NOW', 'Above the weather.', 'fall')],
+        ['The Drill · Brand (2D, training years)', ff('THE DRILL', 'Two years from now. A sealed pump room.', 'drill')],
         ['The Ember Ring · bouts below', load('ring')]
       ],
       'Story beats': [
@@ -221,7 +224,9 @@ const Menus = {
         ['Prologue · the relay heist', () => { fresh(); Game.startHeist(); }],
         ['Prologue · Lift Zero, the furnace, the Pairing', () => { fresh(); Game.onHeistDone(); }],
         ['Day 1 · wake up in Ashgate', () => { fresh(); Game.startPresent(); }],
-        ['End of Day 1 · the Ford, then Day 2', ff('THE ASSAY', 'Four years from now. Day nineteen.', 'ford', load('day2'))],
+        ['End of Day 1 · the dream (gilding, the lesson, the Drill, the Ford)', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1(), load('day2')); }],
+        ['After the ending · the last dream, then the Fall', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM3().concat([{ brawl: () => FF.fall() }]), () => Game.toTitle()); }],
+        ['End of Day 2 · the dream of the Assay, then the Keep', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM2().concat([{ brawl: () => FF.keep() }]), () => Game.toTitle()); }],
         ['Day 2 · morning', load('day2')],
         ['Day 2 · lantern built, festival next', load('fest')],
         ['Day 2 · Last Bell (the Proctor, then the ceremony)', fest('startFestival')],
@@ -233,6 +238,7 @@ const Menus = {
     const onoff = v => v ? 'On' : 'Off';
     UI.push(modal({ title: 'Dev menu', build(b) { b.innerHTML = '<p>Jump straight to any fight or story beat. Your save slots are not touched until the game autosaves.</p>'; }, items: [
       { label: 'Fights', act: sub('Fights') }, { label: 'Story beats', act: sub('Story beats') },
+      { label: 'Fight difficulty', value: () => ['Story', 'Hard', 'Brutal'][Settings.d.diff === undefined ? 1 : Settings.d.diff], adj: () => { Settings.d.diff = ((Settings.d.diff === undefined ? 1 : Settings.d.diff) + 1) % 3; Settings.save(); } },
       { label: 'Start fights at full fury', value: () => onoff(DEV.fury), adj: () => { DEV.fury = DEV.fury ? 0 : 1; } },
       { label: 'Skip fight intro films', value: () => onoff(DEV.quick), adj: () => { DEV.quick = DEV.quick ? 0 : 1; } },
       { label: 'Back', act: () => UI.pop() }] }));
@@ -267,7 +273,7 @@ const Menus = {
     ] }));
   },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.13): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Signatures.</b> Hold kick: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Assay fights can be lost: one second wind, then he goes down and the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.14): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
@@ -410,7 +416,7 @@ const DayEnd = {
         <p><i>"They came down in light. One day, I'm going up in it."</i></p>
         <h2 style="margin-top:16px">END OF DAY ONE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
     }, items: [
-      { label: 'Wake up: Day 2 — First Fire', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); if (NOFF) return Game.loadSave(sv); ffScene('THE ASSAY', 'Four years from now. Day nineteen.', () => FF.ford(), () => Game.loadSave(sv)); } },
+      { label: 'Wake up: Day 2 — First Fire', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); if (NOFF) return Game.loadSave(sv); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1(), () => Game.loadSave(sv)); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }
     ] }));
   }

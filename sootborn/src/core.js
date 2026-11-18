@@ -19,7 +19,7 @@ const Store = {
 
 // ---------- settings
 const Settings = {
-  d: { music: 6, sfx: 8, text: 1, speed: 1, highlight: 0, reduce: 0, touch: 'auto', op: 60 },
+  d: { music: 6, sfx: 8, text: 1, speed: 1, highlight: 0, reduce: 0, touch: 'auto', op: 60, diff: 1 },
   load() { try { const s = JSON.parse(Store.get('bts_settings') || 'null'); if (s) Object.assign(this.d, s); } catch (e) { } },
   save() { Store.set('bts_settings', JSON.stringify(this.d)); },
   apply() {

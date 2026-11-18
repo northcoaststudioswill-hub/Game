@@ -506,6 +506,7 @@ function festB() {
         { narr: 'Sull gets three steps. Then Hollis is in front of him, bad arm and all. Then Bao. Then, after a breath, Marrow. Three people. It is not a wall. It is enough to make him stop.' }]
       : [{ move: 'mara', to: [13, 9], spd: 40, wait: true }, { narr: 'Sull gets three steps before Mara is in front of him. Just Mara. Arms folded. Forty years of forewoman in her face.' }, { say: 'mara', t: "It's a lantern, Proctor. On First Fire. Write that down and see how it reads." }]),
     { narr: 'And from somewhere in the back, low, through closed teeth: the shift song.' },
+    { narr: 'For a year they have played it at us through the speakers at every bell, so it would mean the furnace. Nobody has dared to hum it. Tonight the tier takes it back.' },
     F('sullTip') ? { say: 'proctor', t: "...One candle-hour. It's licensed for one candle-hour. Then it comes down." } : F('sullWar') || F('beatSull') ? { say: 'proctor', t: "Brennick. I've got your name spelled right. You hear me? I've got it spelled RIGHT." } : { say: 'proctor', t: "It comes down at first bell. I'll scrub the light off the stones if I have to." },
     F('sullTip') ? { narr: 'He says it loudly, for the record. Then he turns his back on it, and stands guard over the wrong side of the square for exactly one hour.' } : { narr: 'He does not climb. Not with four hundred people humming. He stands under her sun with his whistle in his fist and does not blow it. You can see what that costs him. You enjoy it more than you should.' },
     { move: 'kael', to: [11, 7], spd: 26 }, { move: 'tavi', to: [10, 7], spd: 50, wait: true }, { pan: [11, 7], dur: 1 }, { zoom: 2.6 },
@@ -530,8 +531,9 @@ function festB() {
     { say: 'vale', t: 'I can send a clerk. Or I can send a valve tech who knows the bank, and who has just shown four hundred people he cannot be told where to put a light.' },
     { say: 'vale', t: 'Sleep on it. You have until first bell.' },
     { fade: 'out' },
-    { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
-    { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 }
+    ...(NOFF ? [] : DREAM2()), { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
+    { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 },
+    ...(NOFF ? [] : DREAM3()), !NOFF && { brawl: () => FF.fall() }, !NOFF && { card: 'NINE YEARS EARLIER', sub: 'Cinderwell. The morning after the festival.', big: 1, min: 1.6, max: 5 }
   ].filter(Boolean);
 }
 
