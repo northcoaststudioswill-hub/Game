@@ -57,8 +57,10 @@ Six tracks, the crib, an intro and an ending. The other eight album tracks show 
 - Captions that end in an adlib "(like this)" are lil Bottie's own lyrics, copied word for word from the
   archive. Do not reword them and do not write new ones in his voice; plain UI text is ours.
 - The General and the council are fictional. No real flags, no real officials.
-- Music is chiptune made in code for now (`bt-0-head.js`, `SONGS`). Will can supply the real Suno mp3s later;
-  `music/tracks.json` already knows how to embed them.
+- Music: track 02 plays the real "Overclocked" from `games/music/overclocked.mp3`. Every other track is chiptune
+  made in code (`bt-0-head.js`, `SONGS`) until Will sends its song. To add one: put the mp3 in `games/music/`, add
+  `mp3:'name.mp3'` to the level in `bt-1-levels.js`, and publish the file alongside the page. Opened straight from
+  disk the game cannot fetch songs and falls back to chiptune.
 - Nothing is phone-confirmed. Everything here was checked in headless Chromium at 440x956.
 
 ## Files

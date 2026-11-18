@@ -73,7 +73,24 @@ function musStep(S,st,t){const o=o2=>Object.assign({mus:1,t},o2);
  if(st===30&&MUS.loop%4===1)tone(260,.18,o({f2:900,type:'sine',v:.04}));      /* cartoon boing */
  if(st===14&&MUS.loop%4===2){tone(1568,.05,o({v:.025,type:'sine'}));tone(2093,.09,{mus:1,t:t+.06,v:.025,type:'sine'})} /* notification */
 }
-function music(){const ac=AC();if(!ac)return;const want=musWant();if(want!==MUS.on){MUS.on=want;MUS.step=0;MUS.loop=0;MUS.next=ac.currentTime+.06}
+/* ---------- his real songs ----------
+   A level with mp3:'file.mp3' plays games/music/file.mp3 instead of the chiptune. The song is a separate file next to
+   the page (the published page caps at 16 MB, so songs cannot be embedded). It is fetched when the track starts; if
+   that fails (the html opened straight from disk, or the file is missing) the chiptune plays instead. */
+const REAL={cur:'',src:null,gain:null,bufs:{}};
+function realWant(){return L&&L.def.mp3&&(G.s==='play'||G.s==='card'||G.s==='pause'||G.s==='captcha'||G.s==='clear')?L.def.mp3:''}
+function realStop(){if(REAL.src){try{REAL.src.stop()}catch(e){}REAL.src=null}REAL.cur=''}
+function realTick(ac){const want=realWant();
+ if(want&&!REAL.bufs[want]){const o=REAL.bufs[want]={st:'load',buf:null};
+  if(typeof location!=='undefined'&&location.protocol==='file:')o.st='bad';   /* opened from disk: browsers will not fetch, use the chiptune */
+  else try{fetch('music/'+want).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>new Promise((res,rej)=>{const p=ac.decodeAudioData(b,res,rej);if(p&&p.catch)p.catch(rej)})).then(buf=>{o.buf=buf;o.st='ok'}).catch(()=>{o.st='bad'})}catch(e){o.st='bad'}}
+ const ready=!!want&&REAL.bufs[want].st==='ok';
+ if(REAL.cur&&(!ready||REAL.cur!==want))realStop();
+ if(ready&&!REAL.src){try{if(!REAL.gain){REAL.gain=ac.createGain();REAL.gain.gain.value=0;REAL.gain.connect(ac.destination)}const s=ac.createBufferSource();s.buffer=REAL.bufs[want].buf;s.loop=true;s.connect(REAL.gain);s.start();REAL.src=s;REAL.cur=want;
+   if(L.def.title)toast('NOW PLAYING: '+L.def.title,3)}catch(e){REAL.bufs[want].st='bad'}}
+ if(REAL.gain)try{REAL.gain.gain.setTargetAtTime(REAL.src?vol('mus')*.8*(G.s==='pause'?.35:1):0,ac.currentTime,.05)}catch(e){}
+ return !!REAL.src}
+function music(){const ac=AC();if(!ac)return;const real=realTick(ac),want=real?'':musWant();if(want!==MUS.on){MUS.on=want;MUS.step=0;MUS.loop=0;MUS.next=ac.currentTime+.06}
  const S=SONGS[want];if(!S)return;if(MUS.next<ac.currentTime-.3)MUS.next=ac.currentTime+.05;const sd=60/S.bpm/4;
  while(MUS.next<ac.currentTime+.16){musStep(S,MUS.step,MUS.next);MUS.step++;if(MUS.step>=32){MUS.step=0;MUS.loop++}MUS.next+=sd}}
 function musWant(){if(G.s==='pause')return'';if(G.s==='title'||G.s==='cine'||G.s==='end')return'title';if(!L)return'title';return L.def.song||'a'}

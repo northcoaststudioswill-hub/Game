@@ -1,5 +1,15 @@
 # lil Bottie: Clankin' in the Cloud — changelog
 
+## v0.2 (Nov 18 2026): the real Overclocked song
+
+- Track 02 now plays lil Bottie's own "Overclocked" (the mp3 Will sent) instead of the chiptune. It loops for the
+  whole track, drops in volume on pause, and stops when you leave.
+- Songs are separate files in `games/music/`, not embedded: the published page caps at 16 MB and the game is
+  already 14.7 MB. A level names its song with `mp3:'file.mp3'` in `bt-1-levels.js`.
+- The song is re-encoded to 128 kbps (3.2 MB, from 4.5 MB). If the file cannot be fetched (the html opened
+  straight from disk, or sent to someone without the music folder) the chiptune plays instead.
+- Checked over a local web server: the song loads (197 s) and plays in the track, and stops in the crib.
+
 ## v0.1 (Nov 18 2026): first playable
 
 Will picked "spawn takeover" from four options, asked for it very explicit with Bottie's real lyrics and

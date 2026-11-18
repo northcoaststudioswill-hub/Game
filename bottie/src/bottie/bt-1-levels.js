@@ -51,7 +51,7 @@ const LV={
   '#..B...#',
   '########']},
 
- over:{no:'02',title:'OVERCLOCKED',theme:'hot',song:'b',start:4,cap:30,par:240,fw:18,ambient:2.4,
+ over:{no:'02',title:'OVERCLOCKED',theme:'hot',song:'b',mp3:'overclocked.mp3',start:4,cap:30,par:240,fw:18,ambient:2.4,
   hook:["I'm overclocked, overclocked (hot!)","Hundred degrees in the server, I don't stop (don't stop)"],
   open:"Spit a whole terabyte, bitch, the system locked (locked)",
   legend:{r:{t:'rack'},R:{t:'rack',core:1,need:18,label:'CORE'}},
