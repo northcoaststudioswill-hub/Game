@@ -62,7 +62,7 @@
 
   // ------------------------------------------------------------ what heat does
   // honest stalls charge a known raider more
-  if (G.BOONS) { const v0 = ui.vendor; ui.vendor = function () { const st = G.state, h = heat(st); Object.keys(G.BOONS).forEach(k => { const x = G.BOONS[k]; if (x.cost0 == null) x.cost0 = x.cost; x.cost = Math.round(x.cost0 * (1 + 0.06 * h)); });
+  if (G.BOONS) { const v0 = ui.vendor; ui.vendor = function () { const st = G.state, h = heat(st); Object.keys(G.BOONS).forEach(k => { const x = G.BOONS[k]; if (x.cost0 == null) x.cost0 = x.cost; x.cost = Math.round(x.cost0 * (1 + 0.06 * h) * (G.priceMul ? G.priceMul(k, x) : 1)); });
     const r = v0.apply(this, arguments), p = document.querySelector('#panel .card:not(.locked-card) .mk-top p.dim'); if (p && h >= 1) p.innerHTML += ' <span class="heat">Prices are up ' + Math.round(h * 6) + '% for you. Word travels.</span>'; return r; }; }
   // the Wardens stop you at the Long Stair
   const af0 = ui.afterFight;
@@ -116,7 +116,7 @@
     const r = or0.apply(this, arguments), st = G.state, card = document.querySelector('#panel .card'); if (!card || !tied(st)) return r;
     const end = card.querySelector('.row.end'), wg = st.wgold || 0, d = O.debt(st), mk = h => { const e = document.createElement('div'); e.className = 'ab-row'; e.innerHTML = h; end.parentNode.insertBefore(e, end); return e; };
     const pay = mk('<div class="ab-ic pas">✦</div><div class="ab-tx"><b>Pay in wizard gold</b><small>You hold ' + wg + ' · one piece clears one soul</small><p>The only coin he prefers to coin. Your Tally brings it home from the outlands.</p></div><button class="big"' + (wg < 1 || d < 1 ? ' disabled' : '') + '>Give 1</button>');
-    pay.querySelector('button').onclick = () => { if ((st.wgold || 0) < 1 || O.debt(st) < 1) return; st.wgold--; st.soulDebt = O.debt(st) - 1; G.save(); G.sfx('coin'); ui.oracle(pick(['He holds it to the lamp. He holds it to his ear. He holds it, briefly, to his heart. “One soul lighter, darling.”', '“Wizard gold! Minted by people who threw my family out. I do enjoy spending their money on their furniture.”', 'He bites it, winces, and beams. “Real. Off the books it comes.”'])); };
+    pay.querySelector('button').onclick = () => { if ((st.wgold || 0) < 1 || O.debt(st) < 1) return; st.wgold--; st.soulDebt = O.debt(st) - 1; G.save(); G.sfx('coin'); ui.oracle(pick(['He holds it to the lamp, then licks it. “Theirs. Now mine. Everything ends up mine.”', '“Minted by the swine who threw me out. I am going to buy their graves with it.”', 'He bites it and grins, gold between his teeth. “One soul lighter. Do not get comfortable.”'])); };
     mk('<div class="ab-ic pas">♜</div><div class="ab-tx"><b>The land he wants</b><small>Villages burned: ' + (st.terror || 0) + ' · expeditions: ' + (st.raids || 0) + ' · heat ' + heat(st) + ' of ' + HMAX + '</small><p>' + (O.favour(st) ? '<b>You owe him nothing, and he is pleased:</b> +8% damage and +8% coin from every bout while it stays that way.' : 'Owe him nothing and keep his work going, and he grants his favour: +8% damage and +8% coin.') + (st.burned && st.burned.length ? ' <span class="dim">Empty now: ' + st.burned.join(', ') + '.</span>' : '') + '</p></div>');
     return r;
   };
@@ -128,7 +128,7 @@
     const st = G.state, rs = (st.reports || []).slice(), raid = rs.filter(r => Object.keys(RAIDS).some(k => RAIDS[k].name === r.job));
     const out = rep0.apply(this, arguments);
     if (raid.length) { const end = document.querySelector('#panel .card .row.end'); if (end) { const p = document.createElement('p'); p.className = 'quote'; const ok = raid.some(r => r.ok);
-      p.textContent = '“' + (raid.some(r => r.lost) ? 'A pity about your man. I shall think of him often. What was his name? No, do not tell me.' : ok ? pick(['Marvellous. You see? Everybody has something. One simply has to go and take it.', 'Oh, well done. Well done them, I mean. You only sent them. Like me!', 'That is land with nobody on it, darling. Do you know how rare that is? I am practically weeping.']) : pick(['Nothing? They came back with nothing? I did not bring you back from the dead for nothing.', 'Send better people. Or the same people, but frightened.'])) + '” — ' + NAME; end.parentNode.insertBefore(p, end); } }
+      p.textContent = '“' + (raid.some(r => r.lost) ? 'One of yours did not come back? Good. Fewer mouths. Send another. There are always more of you.' : ok ? pick(['Ha! I can hear them squealing from here. Everybody has something, pet. You only have to go and take it off the body.', 'Burn it, rob it, drag it home. That is what lesser people are FOR.', 'Empty land. No bleating. No smell. Do you know how hard I am smiling? It hurts.']) : pick(['Nothing? You sent men and they brought me NOTHING? I have wiped better soldiers off my heel.', 'Send harder bastards. Or the same ones, with something to be afraid of. Me, for instance.'])) + '” — ' + NAME; end.parentNode.insertBefore(p, end); } }
     return out;
   };
   const obj0 = G.objective;

@@ -572,3 +572,6 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .setbox small { font-family: var(--display); letter-spacing: 0.12em; color: var(--dim); font-size: 0.65rem; } .setbox p { margin: 0.25rem 0 0; font-size: 0.86rem; } .setbox b.ok { color: #7fd68a; } .setbox b.no { color: #d0685a; }
 .setline { font-size: 0.86rem; color: var(--dim); margin: 0.2rem 0 0.5rem; } .setline.on { color: #ffe2a0; } .setname { color: #ffe2a0; }
 .bbtns { display: flex; flex-direction: column; gap: 0.3rem; flex: none; } .arm { border-bottom-width: 3px; }
+
+/* ---------- regulars ---------- */
+.patron { font-size: 0.84rem; color: #c8b890; margin: 0.15rem 0 0.4rem; } .patron b { color: #ffe2a0; }

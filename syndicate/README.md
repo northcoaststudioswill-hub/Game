@@ -226,3 +226,9 @@ The renderer caps resolution at 1.5x, redraws the shadow map every other frame, 
 - **Earned pieces.** Raider's Ashcloak (three expeditions), Hourglass Regalia and the Roseinbeirg Sandglass (wizard gold, from David), Crownbearer's Mail and the Shard of the Guttercrown (after the crown).
 - **Builds.** The Guildmaster's sheet has three pages to save and recall weapon, kit, charm and technique loadout.
 - **Bodies.** Dwarves are short and broad, elves slim, half-orcs wide, tieflings have a tail.
+
+## A home that works (`js/home2.js`)
+
+- **Once between bouts:** sleep in the bed (+4% to +15% XP next bout, by comfort), train on the dummy (+10 weapon mastery), cook on the stove (+6% health next bout). The cauldron gives a free potion every second bout.
+- **Always on:** desk and map table each add +1 to Tally rolls; the trophy case adds +2% respect per named fighter beaten; the Hourglass Shrine takes a quarter off buying back a soul.
+- **Regulars.** The Apothecary and Big Hobb count your purchases: 3 for 10% off, 8 for 20% off, 15 for a free one after every bout.
