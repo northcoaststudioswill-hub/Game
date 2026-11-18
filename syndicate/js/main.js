@@ -37,7 +37,7 @@
     if (e.target && e.target.tagName === 'INPUT') return;
     if (G.bootSkip) return;
     if (G.talk) { if (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyE') { e.preventDefault(); if (!e.repeat) G.talkApi.next(); } else if (e.code === 'Escape') G.talkApi.skip(); return; }
-    if (G.scene === 'cine') { if (e.code === 'Escape' || e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); G.cine.skip(); } return; }
+    if (G.scene === 'cine') { if (e.code === 'Escape' || e.code === 'Enter' || e.code === 'Space') e.preventDefault(); return; }      // the intro is skipped by holding, in cine.js
     G.audioInit();
     if (G.scene === 'fight') {
       if (e.code === 'Escape' || e.code === 'KeyP') { if (G.fight.paused) { G.ui.close(); G.fight.paused = false; } else G.ui.pause(); }
@@ -149,7 +149,7 @@
     let nx = (hit(15) ? 1 : 0) - (hit(14) ? 1 : 0), ny = (hit(13) ? 1 : 0) - (hit(12) ? 1 : 0);
     navT -= dt;
     if (!nx && !ny && (Math.abs(lx) > 0.6 || Math.abs(ly) > 0.6)) { if (navT <= 0) { if (Math.abs(lx) > Math.abs(ly)) nx = Math.sign(lx); else ny = Math.sign(ly); navT = 0.22; } } else if (!lx && !ly) navT = 0;
-    if (sc === 'cine') { if (hit(0) || hit(1) || hit(9)) G.cine.skip(); }
+    if (sc === 'cine') { /* hold (A) to skip: handled in cine.js */ }
     else if (sc === 'fight' && !open && !paused) {
       if (hit(0)) In.pressed.push('dodge'); if (hit(6)) In.pressed.push('parry'); if (hit(14)) In.pressed.push('assist'); if (hit(13)) In.pressed.push('taunt');
       if (hit(4)) In.pressed.push('a0'); if (hit(5)) In.pressed.push('a1'); if (hit(3)) In.pressed.push('a2');

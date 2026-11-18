@@ -225,6 +225,9 @@
       } else if (act === 'cast') {
         snap = 0.6; q.arx = cls === 'cleric' ? mix(-1.4, -2.8, eo(k)) : -1.5 - k * 0.4; q.alx = cls === 'cleric' ? -0.4 : -1.5 - k * 0.4; q.arz = -0.25; q.alz = 0.25; q.bx = -0.1 - k * 0.08; q.by += k * 0.06; q.hx = -0.15 * k; q.cape = 0.3 + k * 0.4;
       } else if (act === 'release') { snap = 0.9; const r = 1 - k; q.arx = mix(-0.45, -1.75, r); q.arz = 0.15 * r; q.alx = mix(restL, -0.2, r); q.ty = -0.5 * r; q.bx = 0.06 + 0.3 * r; q.bpz = 0.18 * r; q.ll = 0.35 * r; q.lr = -0.3 * r; q.cape = 0.3 + 0.5 * r;
+      } else if (act === 'kick') { snap = 1; const kk = Math.sin(Math.min(1, k * 1.25) * Math.PI); q.ll = -1.45 * kk; q.lr = 0.25 * kk; q.bx = -0.38 * kk; q.by = 0.03 * kk; q.arx = 0.5 * kk; q.arz = -0.5 * kk; q.alx = 0.4 * kk; q.alz = 0.5 * kk; q.hx = 0.15 * kk; q.bpz = 0.1 * kk;
+      } else if (act === 'stomp') { snap = 1; const up = k < 0.62 ? Math.sin(k / 0.62 * Math.PI / 2) : 0, dn = k >= 0.62 ? 1 : 0; q.ll = -1.3 * up - 0.15 * dn; q.bx = -0.15 * up + 0.42 * dn; q.by = 0.08 * up - 0.14 * dn; q.arx = -1.2 * up + 0.3 * dn; q.alx = -1.0 * up + 0.3 * dn; q.hx = -0.2 * up + 0.4 * dn;
+      } else if (act === 'hoist') { snap = 0.5; q.arx = -3.05; q.arz = -0.1; q.alx = -2.7; q.alz = 0.35; q.bx = -0.22; q.hx = -0.45; q.ll = 0.25; q.lr = -0.3; q.by = -0.03;
       } else if (act === 'lunge') { snap = 1; q.bx = 0.6; q.arx = -1.6; q.arz = 0.1; q.alx = 0.6; q.ll = 0.9; q.lr = -0.8; q.by = -0.08; q.hx = -0.45; q.cape = 0.9;
       } else if (act === 'parry') { snap = 1; q.arx = -1.9; q.arz = 1.1; q.alx = -1.2; q.alz = -0.6; q.ty = 0.5; q.bx = -0.05; q.by = -0.06; q.ll = 0.25; q.lr = -0.3;
       } else if (act === 'cheer') { snap = 0.4; const b = Math.abs(Math.sin(t * 5)); q.arx = -2.9 + b * 0.3; q.arz = -0.35; q.alx = -2.7 + b * 0.4; q.alz = 0.4; q.by = b * 0.12; q.bx = -0.12; q.hx = -0.3; q.cape = 0.3 + b * 0.3;
@@ -275,6 +278,7 @@
         else if (mv) { eR = 0.35 + Math.max(0, sw) * 0.3; eL = 0.35 + Math.max(0, -sw) * 0.3; }
         if (p.hurt > 0) { eR += 0.3; eL += 0.3; }
         foreR.rotation.x = -J('er', eR, Math.max(0.35, snap)); foreL.rotation.x = -J('el', eL, Math.max(0.35, snap)); }
+      if (act === 'kick') legL.userData.shin.rotation.x = 0.15;
       if (act === 'ko') { legL.userData.shin.rotation.x = 0.25; legR.userData.shin.rotation.x = 0.5; foreR.rotation.x = -0.3; foreL.rotation.x = -0.5; }
       if (act === 'ko') { const f = Math.min(1, (p.prog || 0) * 2.2), e = eo(f); body.rotation.x = -1.5 * e; body.position.y = 0.2 * e + Math.sin(f * Math.PI) * 0.25; legL.rotation.x = 0.3 * e; legR.rotation.x = -0.15 * e; armR.rotation.set(-2.6 * e, 0, -0.5 * e); armL.rotation.set(-2.4 * e, 0, 0.6 * e); head.rotation.x = -0.3 * e; }
       // sorcerer flames + cast glow

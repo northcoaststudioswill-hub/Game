@@ -606,3 +606,6 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 #ablegend kbd { font-size: 0.7rem; }
 .choices button.sel { border-color: var(--gold); }
 #objective { max-width: min(92vw, 60rem); }
+
+/* ---------- hold to skip ---------- */
+.c-skip { min-width: 9.5rem; transition: color 0.1s; touch-action: none; -webkit-user-select: none; user-select: none; }

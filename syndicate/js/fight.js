@@ -92,7 +92,8 @@
     else if (e.state === 'parry') act = 'parry';
     else if (e.charging > 0.1 && phase === 'fight') { act = e.C.ranged ? 'cast' : 'swing'; prog = e.C.ranged ? Math.min(1, e.charging * 2) : Math.min(0.3, 0.1 + e.charging * 0.5); stepOv = 2; glow = e.charging >= 0.28 ? '#ffe9a0' : null; }
     else if (phase === 'intro') act = 'salute';
-    else if (phase === 'ko' || (phase === 'mortal' && M && e.isPlayer && M.t > (M.def.imp || 1.2) + 0.6)) act = 'cheer';
+    else if (phase === 'ko' || (phase === 'mortal' && M && e.isPlayer && M.t > (M.def.cheerAt || (M.def.imp || 1.2) + 0.6))) act = 'cheer';
+    if (e.poseOv) { act = e.poseOv.act; prog = e.poseOv.prog || 0; }
     const alpha = e.buffs.stealth ? (e.isPlayer ? 0.4 : 0.1) : 1;
     if (act === 'cast' && e.state === 'wind' && glow && Math.random() < 0.6) { const ca = rand(0, 6.28), cr = rand(0.8, 1.5); gfx.emit(X + Math.cos(ca) * cr, 1.2 + rand(-0.4, 0.6), Z + Math.sin(ca) * cr, -Math.cos(ca) * cr * 3, 0, -Math.sin(ca) * cr * 3, 0.3, glow, 0); }
     let MF = 1, MS = 0; { const sp = Math.hypot(e.vx || 0, e.vy || 0), fx = e.foe ? e.foe.x - e.x : 0, fy = e.foe ? e.foe.y - e.y : 0, fd = Math.hypot(fx, fy); if (sp > 20 && fd > 1 && fd < 520) { MF = ((e.vx * fx + e.vy * fy) / (sp * fd)); MS = ((e.vx * fy - e.vy * fx) / (sp * fd)); } }
@@ -305,10 +306,13 @@
   // ---- mortal blows: a win is a kill, and each trade has its own way of ending things
   let M = null, gibs = [];
   function clearGibs() { gibs.forEach(g => sc.remove(g.m)); gibs = []; }
+  // cut clean in two: each half goes its own way
+  function halves(e, a) { const col = e.vis.c.mats[0] ? e.vis.c.mats[0].color.getHex() : 0x666666; [-1, 1].forEach(sd => { const g = new T.Group(); g.add(new T.Mesh(new T.BoxGeometry(0.34, 1.5, 0.4), new T.MeshLambertMaterial({ color: col, flatShading: true }))); const cut = new T.Mesh(new T.BoxGeometry(0.02, 1.46, 0.38), new T.MeshBasicMaterial({ color: 0x8a0c0c })); cut.position.x = -sd * 0.17; g.add(cut);
+      g.position.set(e.x / S + Math.cos(a + Math.PI / 2) * sd * 0.2, 0.85, e.y / S + Math.sin(a + Math.PI / 2) * sd * 0.2); g.rotation.y = -a; sc.add(g); gibs.push({ m: g, vx: Math.cos(a + Math.PI / 2) * sd * 2.4, vz: Math.sin(a + Math.PI / 2) * sd * 2.4, vy: 2.6, rx: 0, rz: sd * 2.6 }); }); }
   // bits knocked loose by a blow that really landed
   function chunks(e, n) { for (let i = 0; i < n; i++) { const sz = rand(0.05, 0.11), m = new T.Mesh(new T.BoxGeometry(sz, sz, sz), new T.MeshLambertMaterial({ color: i % 3 ? 0x7a0c0c : 0xe6dcc4, flatShading: true })); m.position.set(e.x / S + rand(-0.2, 0.2), rand(0.9, 1.6), e.y / S + rand(-0.2, 0.2)); sc.add(m); const a = rand(0, 6.28), v = rand(1.5, 4); gibs.push({ m, vx: Math.cos(a) * v, vz: Math.sin(a) * v, vy: rand(3, 6), rx: rand(-12, 12), rz: rand(-12, 12) }); } }
-  function makeGibs(e, ash) {
-    const cols = ash ? [0x3a3a3a, 0x555555, 0x222222] : e.vis.c.mats.slice(0, 5).map(m => m.color.getHex()).concat(gore() ? [0x7a0c0c, 0x5a0808, 0x8a1010] : []);
+  function makeGibs(e, ash, clean) {
+    const cols = ash ? [0x3a3a3a, 0x555555, 0x222222] : e.vis.c.mats.slice(0, 5).map(m => m.color.getHex()).concat(gore() && !clean ? [0x7a0c0c, 0x5a0808, 0x8a1010] : []);
     for (let i = 0; i < (ash ? 26 : 20); i++) {
       const sz = rand(0.1, ash ? 0.2 : 0.32), m = new T.Mesh(new T.BoxGeometry(sz, sz * rand(0.6, 1.4), sz), new T.MeshLambertMaterial({ color: G.pick(cols), flatShading: true }));
       m.position.set(e.x / S + rand(-0.3, 0.3), rand(0.4, 1.7), e.y / S + rand(-0.3, 0.3)); m.castShadow = true; sc.add(m);
@@ -357,6 +361,15 @@
     if (k === 'lift') { if (m.t > 0.2 && m.t < IMP - 0.12) { e.z = Math.min(95, e.z + dt * 150); e.flash = 0.04; if (Math.random() < 0.7) gfx.emit(e.x / S + rand(-0.3, 0.3), e.z / S + rand(0.2, 1.6), e.y / S + rand(-0.3, 0.3), rand(-1, 1), rand(-2, 0), rand(-1, 1), 0.4, col, 0); } once('lf', 0.2, () => { fx.push({ k: 'ring', x: e.x, y: e.y, r: 120, col, t: 0, life: 0.5 }); G.sfx('holy'); }); once('dr', IMP - 0.12, () => { e.z = 0; G.sfx('wall'); mark(e.x, e.y, 2.6, 'crack'); }); }
     if (k === 'impale') every('i', 0.25, IMP, 0.16, i => { const a = i * 1.26, ox = Math.cos(a) * 46, oy = Math.sin(a) * 46; fx.push({ k: 'bolt', x1: e.x + ox * 4, y1: e.y + oy * 4 - 260, x2: e.x + ox * 0.3, y2: e.y + oy * 0.3, col: '#e8eef4', t: 0, life: 0.2 }); blood(e.x, e.y, 10, a); e.flash = 0.1; G.sfx('crit'); shake = Math.max(shake, 8); hitstop = Math.max(hitstop, 0.05); text(e, i % 2 ? '' : 'PINNED', col); });
     if (k === 'spin') every('n', 0.25, IMP - 0.1, 0.22, i => { fx.push({ k: 'slash', x: P.x, y: P.y, a: m.a + (i % 2 ? 0.9 : -0.9), r: 140, arc: 3.0, col, t: 0, life: 0.22 }); blood(e.x, e.y, 12, m.a + i); e.flash = 0.09; G.sfx('swing'); shake = Math.max(shake, 7); });
+    // ---- showier work: the body is part of the act
+    const hold = (act, t0, dur) => { if (m.t >= t0 && m.t < t0 + dur) P.poseOv = { act, prog: (m.t - t0) / dur }; else if (P.poseOv && P.poseOv.act === act && m.t >= t0 + dur) P.poseOv = null; };
+    if (k === 'stomp') { once('trip', 0.25, () => { fx.push({ k: 'slash', x: P.x, y: P.y, a: m.a, r: 120, arc: 2.2, col, t: 0, life: 0.22 }); e.state = 'ko'; e.koT = 0; e.st = {}; blood(e.x, e.y, 14, m.a); G.sfx('hit'); shake = Math.max(shake, 9); text(e, 'DOWN', col, true); });
+      once('walk', 0.55, () => { P.x = e.x - Math.cos(m.a) * 34; P.y = e.y - Math.sin(m.a) * 34; clampArena(P); fx.push({ k: 'dust', x: P.x, y: P.y, r: 50, t: 0, life: 0.4 }); }); hold('stomp', IMP - 0.5, 0.75); }
+    if (k === 'puppet') { if (m.t > 0.15 && m.t < IMP - 0.1) { e.z = Math.min(80, e.z + dt * 130); e.flash = 0.03; } once('p0', 0.15, () => { fx.push({ k: 'ring', x: e.x, y: e.y, r: 110, col, t: 0, life: 0.5 }); G.sfx('holy'); });
+      ['armL', 'armR', 'legL'].forEach((part, i) => once('pp' + i, 0.5 + i * 0.3, () => { if (gore() && !e.vis.c.beast) sever(e, part, null, m.a + (i - 1) * 1.6); else blood(e.x, e.y, 20); fx.push({ k: 'bolt', x1: P.x, y1: P.y, x2: e.x, y2: e.y, col, t: 0, life: 0.14 }); e.flash = 0.12; G.sfx('crit'); shake = Math.max(shake, 9); hitstop = Math.max(hitstop, 0.07); })); }
+    if (k === 'ice') { const ice = new T.Color(0xbfe8ff); every('ic', 0.2, IMP, 0.14, i => { e.vis.c.mats.forEach(mm => mm.color.lerp(ice, 0.3)); fx.push({ k: 'ring', x: e.x, y: e.y, r: 150 - i * 12, col: '#bfe8ff', t: 0, life: 0.3 }); e.flash = 0.05; if (i % 2 === 0) G.sfx('ice'); spark(e.x, e.y, 6, '#dff4ff', 8, 120); }); e.st = { stun: { t: 1 } }; }
+    if (k === 'implode') { if (m.t > 0.25 && m.t < IMP) { const s = Math.max(0.12, 1 - (m.t - 0.25) / (IMP - 0.25)); e.vis.g.scale.setScalar(s); e.flash = 0.04; } every('im', 0.25, IMP, 0.2, i => { fx.push({ k: 'ring', x: e.x, y: e.y, r: 220 - i * 40, col, t: 0, life: 0.3 }); G.sfx('zap'); shake = Math.max(shake, 5 + i); }); }
+    if (def.hoist) hold('hoist', 0.25, IMP - 0.2);
     once('imp', IMP, () => {
       const ash = !!def.ash;
       if (!cast) fx.push({ k: 'slash', x: P.x, y: P.y, a: m.a, r: 150, arc: 3.4, col, t: 0, life: 0.35 });
@@ -364,19 +377,27 @@
       fx.push({ k: 'ring', x: e.x, y: e.y, r: 240, col, t: 0, life: 0.7 }); fx.push({ k: 'dust', x: e.x, y: e.y, r: 200, t: 0, life: 0.8 });
       if (def.crack) mark(e.x, e.y, 3.4, 'crack'); if (def.fire || ash) mark(e.x, e.y, 3, 'scorch');
       spark(e.x, e.y, 30, col, 40, 420); flashLight(e.x, e.y, col, 170); shake = 22; hitstop = 0.22;
-      if (!ash && !def.swallow) { blood(e.x, e.y, 70); blood(e.x, e.y, 40, m.a); }
-      e.z = 0; const behead = def.behead && gore() && !e.vis.c.beast && !(e.lost && e.lost.head);
+      if (!ash && !def.swallow && !def.ice) { blood(e.x, e.y, 70); blood(e.x, e.y, 40, m.a); }
+      screenFx('crit');
+      e.z = 0; e.vis.g.scale.setScalar(1); const behead = def.behead && gore() && !e.vis.c.beast && !(e.lost && e.lost.head); m.f.stand = behead ? 1 : 0;
       if (behead) { sever(e, 'head', null, m.a); for (let bi = 0; bi < 26; bi++) gfx.emit(e.x / S + rand(-0.1, 0.1), 1.5, e.y / S + rand(-0.1, 0.1), rand(-1.4, 1.4), rand(4, 8), rand(-1.4, 1.4), rand(0.5, 0.9), '#8a0c0c', 1); }
       else if (def.swallow) { e.vis.g.visible = false; fx.push({ k: 'dust', x: e.x, y: e.y, r: 260, t: 0, life: 1 }); mark(e.x, e.y, 3.6, 'crack'); }
-      else { makeGibs(e, ash); e.vis.g.visible = false; }
+      else if (def.bisect && gore() && !e.vis.c.beast) { halves(e, m.a); e.vis.g.visible = false; for (let bi = 0; bi < 30; bi++) gfx.emit(e.x / S, rand(0.3, 1.7), e.y / S, rand(-1, 1), rand(1, 5), rand(-1, 1), rand(0.5, 0.9), '#8a0c0c', 1); }
+      else if (def.keep) { chunks(e, 8); mark(e.x, e.y, 2.4, 'crack'); }
+      else { makeGibs(e, ash, !!def.ice); e.vis.g.visible = false; }
       if (e.vis.tele) { sc.remove(e.vis.tele); e.vis.tele = null; }
-      e.state = 'ko'; e.koT = 9; e.st = {};
+      if (m.f.stand) { e.state = 'idle'; e.st = { stun: { t: 9 } }; } else if (def.keep) { if (e.state !== 'ko') { e.state = 'ko'; e.koT = 0; } e.st = {}; } else { e.state = 'ko'; e.koT = 9; e.st = {}; }
       hype = 100; arena.setHype(1); G.sfx('boom'); G.sfx('crit'); G.sfx('cheer'); if (G.rumble) G.rumble(400, 1);
       text(e, def.word, col, true);
     });
+    // a headless body stands a moment; then it falls, or you help it
+    if (m.f.stand) { if (def.kick) { hold('kick', IMP + 0.4, 0.5); once('boot', IMP + 0.66, () => { e.st = {}; e.state = 'ko'; e.koT = 0; G.sfx('hit'); G.sfx('wall'); shake = Math.max(shake, 12); hitstop = Math.max(hitstop, 0.08); blood(e.x, e.y, 20, m.a); text(e, 'AND STAY DOWN', col, true); m.f.slide = 1; }); if (m.f.slide && m.t < IMP + 1.15) { const nx = e.x + Math.cos(m.a) * 420 * dt, ny = e.y + Math.sin(m.a) * 420 * dt; if (inArena(nx, ny, -30)) { e.x = nx; e.y = ny; if (Math.random() < 0.4) fx.push({ k: 'dust', x: e.x, y: e.y, r: 36, t: 0, life: 0.35 }); } } }
+      else once('topple', IMP + 0.6, () => { e.st = {}; e.state = 'ko'; e.koT = 0; G.sfx('wall'); fx.push({ k: 'dust', x: e.x, y: e.y, r: 70, t: 0, life: 0.5 }); }); }
+    if (def.toss) { once('toss', IMP, () => { m.f.toss = 1; G.sfx('swing'); }); if (m.f.toss && m.t < IMP + 0.5) { const nx = e.x + Math.cos(m.a) * 620 * dt, ny = e.y + Math.sin(m.a) * 620 * dt; if (inArena(nx, ny, -30)) { e.x = nx; e.y = ny; if (Math.random() < 0.6) blood(e.x, e.y, 3, m.a); } else if (!m.f.tw) { m.f.tw = 1; G.sfx('wall'); shake = 14; mark(e.x, e.y, 1.8, 'crack'); blood(e.x, e.y, 30); } } }
+    if (m.t > IMP + 2.2) P.poseOv = null;
     once('roar', IMP + 0.55, () => { G.sfx('cheer'); G.sfx('win'); G.ui.banner('Victory', 'The pit erupts', 'win mortal'); });
     once('roar2', IMP + 1.3, () => G.sfx('cheer'));
-    if (m.t > IMP + 2.3) { phase = 'ko'; phaseT = 0.35; }
+    if (m.t > IMP + (def.tail || 2.3)) { P.poseOv = null; phase = 'ko'; phaseT = 0.35; }
   }
 
   // ------------------------------------------------------------------ damage
@@ -908,7 +929,7 @@
     if (phase === 'mortal' && M) {                         // close orbiting camera for the kill
       // camera stands toward the middle of the pit and looks outward, so the wall and crowd are the backdrop
       const e = M.e, k = Math.min(1, M.t / 1.2), ex = e.x / S, ez = e.y / S, cd = Math.hypot(ex, ez);
-      const base = cd > 1.5 ? Math.atan2(-ez, -ex) : M.a + 2.1, th = base + 0.55 - M.t * 0.3, r = G.lerp(7.2, 5.6, k) + Math.max(0, M.t - 1.2) * 1.4;
+      const base = cd > 1.5 ? Math.atan2(-ez, -ex) : M.a + 2.1, th = base + 0.55 - M.t * 0.3, r = G.lerp(6.6, 4.6, k) + Math.max(0, M.t - 1.7) * 1.1;
       const pos = [ex + Math.cos(th) * r, G.lerp(1.6, 2.5, k) + Math.max(0, M.t - 1.2) * 0.8, ez + Math.sin(th) * r];
       const pl = Math.hypot(pos[0], pos[2]); if (pl > 6.6) { pos[0] *= 6.6 / pl; pos[2] *= 6.6 / pl; }
       [P, e].forEach(q => { const dx = pos[0] - q.x / S, dz = pos[2] - q.y / S, d = Math.hypot(dx, dz) || 0.01; if (d < 3.4) { pos[0] = q.x / S + dx / d * 3.4; pos[2] = q.y / S + dz / d * 3.4; } });

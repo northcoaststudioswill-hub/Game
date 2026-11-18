@@ -215,7 +215,7 @@
       '<div class="c-logo"><h1>Gutter<span>crown</span></h1><small>Pit-fighters of the Undercity</small></div><button class="c-skip mini">Skip intro</button>';
     document.getElementById('ui').appendChild(el);
     sub = el.querySelector('.c-sub'); fade = el.querySelector('.c-fade'); logo = el.querySelector('.c-logo'); card = el.querySelector('.c-card'); flashEl = el.querySelector('.c-flash');
-    el.querySelector('.c-skip').onclick = () => { G.sfx('ui'); C.skip(); };
+    el.querySelector('.c-skip').onclick = () => { if (navigator.webdriver || !C.holdSkip) { G.sfx('ui'); C.skip(); } };      // players hold to skip (see below); a plain click only skips for automated tests
     shots = build(); next();
   };
   function next() {
@@ -234,6 +234,19 @@
     gfx.cam.shake = 0; el.remove(); const d = onDone; onDone = null; if (d) d();
   }
   C.skip = finish;
+  // ------------------------------------------------------------ hold to skip: a slip of the thumb should not cost you the film
+  C.holdSkip = true;
+  { let held = 0, t = 0, last = 0; const NEED = 0.9, keys = {};
+    const btn = () => document.querySelector('#cine .c-skip') || document.querySelector('.c-skip');
+    window.addEventListener('keydown', e => { if (G.scene === 'cine' && (e.code === 'Escape' || e.code === 'Enter' || e.code === 'Space')) { keys[e.code] = 1; e.preventDefault(); } });
+    window.addEventListener('keyup', e => { delete keys[e.code]; });
+    const down = e => { if (G.scene === 'cine' && e.target && e.target.closest && e.target.closest('.c-skip')) { held = 1; e.preventDefault(); } }, up = () => { held = 0; };
+    document.addEventListener('pointerdown', down); document.addEventListener('touchstart', down, { passive: false }); ['pointerup', 'pointercancel', 'touchend', 'touchcancel', 'mouseleave'].forEach(ev => document.addEventListener(ev, up));
+    setInterval(() => { const now = performance.now(), dt = Math.min(0.5, (now - last) / 1000); last = now; if (G.scene !== 'cine') { t = 0; held = 0; return; }
+      let padA = false; try { const pads = navigator.getGamepads ? navigator.getGamepads() : []; for (const p of pads) if (p && p.buttons && ((p.buttons[0] && p.buttons[0].pressed) || (p.buttons[9] && p.buttons[9].pressed))) padA = true; } catch (er) { }
+      const on = held || padA || Object.keys(keys).length > 0; t = on ? t + dt : Math.max(0, t - dt * 3);
+      const b = btn(); if (b) { const pad = G.input && G.input.usingPad; b.textContent = pad ? 'Hold (A) to skip' : (G.input && G.input.touch) ? 'Hold to skip' : 'Hold Space to skip'; const pc = Math.min(100, t / NEED * 100); b.style.background = pc > 0 ? 'linear-gradient(90deg, rgba(240,201,90,0.85) ' + pc + '%, rgba(20,16,24,0.7) ' + pc + '%)' : ''; b.style.color = pc > 45 ? '#1a1208' : ''; b.style.opacity = on ? 1 : ''; }
+      if (t >= NEED) { t = 0; held = 0; for (const k in keys) delete keys[k]; G.sfx('ui'); C.skip(); } }, 40); }
   C.update = function (dt, tt) {
     if (!C.active) return;
     now = tt; t += dt;

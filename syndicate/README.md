@@ -295,3 +295,9 @@ The Fence, Mark, the Apothecary, Big Hobb, the charm seller, Whisper and the Bus
 - **What your home does:** tap the Comfort sign in your hideout for a list of every working piece, whether it is ready, and what is worth buying.
 - **Keys and pad:** ability names sit under the buttons, with a legend for strike, heavy blow, taunt and aim. The phone layout is unchanged.
 - **Gore and animation:** wounds appear on a fighter's body as health drops and stay; a badly hurt fighter drips and leaves a trail, holds the wound and limps; heavy critical hits knock chunks loose; each class has its own victory pose.
+
+## Hold to skip, and flashier endings
+
+- **The intro is skipped by holding:** hold the Skip button on a phone, hold (A) or Start on a controller, or hold Space, Enter or Esc, for about a second. A progress bar fills on the button; letting go resets it. A single tap or click no longer skips.
+- **Seven mortal blows per class (42).** The twelve new ones use the fighters' bodies: a beheading where the headless body stands, and you boot it across the sand; a trip and a stomp; a body thrown the width of the pit; cut in two halves; taken apart limb by limb in the air; frozen and shattered; folded down to nothing. New poses: kick, stomp, hoist.
+- Existing beheadings now leave the body standing for a moment before it topples. The finisher camera is closer, with a flash on the killing blow.
