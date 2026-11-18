@@ -459,6 +459,12 @@
   }
   function interrupt(e) { if (e.state === 'wind' || e.state === 'recover') { e.state = 'idle'; e.act = null; e.z = 0; } e.chain = null; }
   function ko(e) {
+    if (e.isPlayer && e.borrow && phase === 'fight' && !opp.spar && !F.ex) {       // Borrowed Time: the Oracle's clock skips back, on account
+      e.borrow = 0; e.hp = Math.round(e.maxHp * 0.33); e.st = {}; e.iframe = 1.1; e.poise = e.maxPoise; text(e, 'TIME TURNS BACK', '#c8a0ff', true);
+      fx.push({ k: 'ring', x: e.x, y: e.y, r: 260, col: '#c8a0ff', t: 0, life: 0.7 }); fx.push({ k: 'ring', x: e.x, y: e.y, r: 140, col: '#ffffff', t: -0.1, life: 0.5 }); flashLight(e.x, e.y, '#c8a0ff', 120); slowT = 0.6; hitstop = Math.max(hitstop, 0.2); G.sfx('holy'); G.sfx('bell');
+      const f = e.foe, a = Math.atan2(f.y - e.y, f.x - e.x); f.kx = Math.cos(a) * 300; f.ky = Math.sin(a) * 300; f.st.stun = { t: 0.8 }; interrupt(f);
+      G.state.soulDebt = (G.state.soulDebt || 0) + 1; G.save(); return;
+    }
     e.hp = 0; if (!e.isPlayer && !F.ex && !opp.spar && phase === 'fight') return startMortal(e);
     e.state = 'ko'; e.koT = 0; e.st = {}; e.buffs = {}; e.act = null; e.z = 0;
     phase = 'ko'; phaseT = 2.4; shake = 16; hitstop = 0.18;
@@ -951,7 +957,10 @@
       tips: win && hy >= 80, stolen
     };
     if (result.forfeit) { r.xp = 0; r.coin = 0; }
-    if (!win) { r.lost = Math.round(st.coin * 0.2); st.coin -= r.lost; }
+    if (!win) {                                  // a lost bout is a death: the purse goes, and some of the name with it
+      r.lost = st.coin; st.coin = 0; st.deaths = (st.deaths || 0) + 1; st.soulDebt = (st.soulDebt || 0) + 1;
+      const floor = G.RANKS[G.rankOf(st.respect)].at; st.respect = Math.max(floor, st.respect - Math.max(4, Math.round((st.respect - floor) * 0.25)));
+    }
     r.mortal = win ? (M ? M.name : G.MORTAL[P.cls].name) : null;
     if (win && G.deeds) { G.deeds.bump('win'); G.deeds.bump('mortal'); if (P.hp >= P.maxHp) G.deeds.bump('flawless'); if (hy >= 100) G.deeds.bump('hype100'); } gfx.cine = null; G.afterFight = true;
     if (G.crew) r.crew = G.crew.tick();

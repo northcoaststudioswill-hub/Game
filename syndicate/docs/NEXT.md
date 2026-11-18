@@ -1,6 +1,6 @@
 # Guttercrown: design for the next round
 
-**Status: plan, not built.** This is the agreed design for the next stretch of work. The current game is described in `README.md`; the story bible is `docs/LORE.md`.
+**Status: in progress.** Step 1 of the build order is done; the rest is planned. This is the agreed design for the next stretch of work. The current game is described in `README.md`; the story bible is `docs/LORE.md`.
 
 ## Goals
 
@@ -130,7 +130,7 @@ Checklist:
 
 ## 10. Build order
 
-1. **Death, revival and David's first scenes.** Soul debt, the hidden threshold, his cellar.
+1. ~~Death, revival and David's first scenes.~~ **Done** (`js/oracle.js`): a lost bout is a death, David revives you, soul debt and his cut, the contract with its hidden third-death binding and later reveal, his cellar in the market, and the first favour (Borrowed Time). Souls are bought back with coin until expeditions exist.
 2. **Spaced progression.** Undercard bouts, levels to 10, the unlock schedule with first-time intros and codex-on-use.
 3. **Expeditions and heat.**
 4. **Gear ladder**, folding in existing weapons and kits.

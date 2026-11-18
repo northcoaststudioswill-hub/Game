@@ -150,6 +150,8 @@ phone portrait, phone landscape, or a desktop monitor.
 
 Planning for the next round (fight-to-death with the Oracle of Time, Druid and Tiefling, more finishers, gear sets, progression, animation, controller testing) is in `docs/NEXT.md`. Nothing in it is built yet.
 
+**Death and the Oracle of Time.** A lost bout is a death: your purse, your streak and some respect go with you, and coin in a strongbox is safe. David Roseinbeirg, the Oracle of Time, brings you back every time and adds a soul to your debt. He offers a contract at your first death, and has not told you everything about it. While you owe him three souls or more he takes a cut of every purse; his cellar in the market sells souls back and grants favours, starting with Borrowed Time (survive one killing blow per bout, on account).
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |
