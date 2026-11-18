@@ -99,7 +99,7 @@ const FF = {
   proctor: () => ({
     era: 3, newMove: 'NEW: SHAFT DROP - JUMP, THEN JUMP AGAIN', fin: { name: 'THE RECKONING', l1: 'THEY CAME DOWN TO COUNT US', l2: 'I AM STILL COUNTING', rgb: '255,240,200' }, title: 'THE PROCTOR', sub: 'HALDEN VOSS - NOBODY TOUCHES A PROCTOR', bg: 'storm', arena: FIELD, music: 'duel', rage: 3, legend: 1, skip: 1, winText: 'HE BLEEDS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['I GRADE YOU, BOY.', 'YOU WILL BE UNMADE FOR THIS.', 'WHAT ARE YOU?'] },
-    foes: [{ id: 'voss', name: 'Proctor Voss', kind: 'warden', hp: 130, sc: 1.28 }],
+    foes: [{ id: 'voss', name: 'Proctor Voss', kind: 'warden', hp: 130, sc: 1.28, k2: { slam: 1 } }],
     voice: { at: [[1, 'THE PROCTORS ARE MEANT TO WATCH. THIS ONE HAS BEEN SELLING OUR POSITIONS TO HOUSE TEAL.'], [14, 'HE FIGHTS LIKE A MAN WHO HAS ONLY EVER HIT PEOPLE WHO WERE NOT ALLOWED TO HIT BACK.'], [30, 'I KNOW THAT KIND OF MAN. I GREW UP UNDER THEIR BOOTS.']],
       hurt: 'A HALBERD. OF COURSE IT IS A HALBERD.', fury: 'ANGER IS FOR EQUALS, SHE TOLD ME. THEN LET US BE EQUALS.', half: 'HE LOOKS AT HIS OWN BLOOD AS IF IT WERE A CLERICAL ERROR.', eleven: 'ONE FOR EVERY SECOND. I HAVE PLENTY TO SPARE.' },
     arts: [{ at: .72, name: 'THE AUDIT', line: 'THEY CAME DOWN IN LIGHT TO COUNT US. TONIGHT I DO THE COUNTING.', panel: 'lift', kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }, { at: .36, name: 'BALANCED', line: 'SHE SAID "BALANCED" WHEN THE DOORS CLOSED. I HAVE CARRIED THE REMAINDER EVER SINCE.', panel: 'furnace', stage: 1, kind: 'rise', rgb: '255,90,30', hex: '#ff5a1e', dark: 'rgba(26,4,2,.82)' }],
@@ -119,7 +119,7 @@ const FF = {
     era: 5, newMove: 'NEW FINISHER: EVERY BREATH - IT REACHES THE WHOLE DECK', fin: { name: 'EVERY BREATH', l1: 'EVERY BREATH I TAKE IS HERS', l2: 'I SPEND THEM ALL HERE', rgb: '255,224,138', mode: 'all' }, boots: 1, lurch: 1, title: 'THE FALL', sub: 'THE SUN SPIRE - HOLD THE DECK UNTIL WE HIT', bg: 'fall', arena: FIELD, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Spire Guard', winText: 'THE DECK IS OURS', endAt: .25,
     hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 60 }, allies: V, shouts: ['BELOW!', 'WITH HIM!', 'FOR TIER SIX!'], taunt: { 0: ['HE IS SOOT!', 'CUT THE LINES!', 'BRING IT DOWN!'] },
     waves: [[{ id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }],
-      [{ id: 'cade', name: 'Marshal Cade', kind: 'captain', hp: 150, sc: 1.25 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }]],
+      [{ id: 'cade', name: 'Marshal Cade', kind: 'captain', hp: 150, sc: 1.25, k2: { line: 1 } }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }]],
     onWave: (w, B) => { B.p.fury = 100; B.say('FURY', true); B.voice('fury'); },
     voice: { at: [[1, 'NINE YEARS AGO I KNELT WHEN THEY CAME DOWN IN LIGHT. TODAY WE ARE THE ONES COMING DOWN.'], [10, 'FOUR HUNDRED BARGES. EVERY ONE OF THEM FLOWN BY SOMEBODY WHO WAS BORN OWING AIR.'], [20, 'THE SPIRE IS WHERE THEY KEEP THE COUNT. I HAVE COME TO CLOSE THE LEDGER.'], [32, 'MARA IS ON THE NEXT BARGE OVER. SHE SAID SHE WOULD NOT MISS THIS IF IT KILLED HER. IT MIGHT.']],
       hurt: 'I HAVE BEEN CUT BY BETTER. I MARRIED BETTER.', fury: 'IT NEVER WENT OUT. I ONLY LEARNED TO AIM IT.', wave: 'CADE. HE SIGNED THE FURNACE ORDER FOR TIER FOUR.', half: 'HE KEEPS LOOKING AT THE SPIRE. NOBODY IS COMING OUT OF IT FOR HIM.', eleven: 'ELEVEN SECONDS. I HAVE MADE AN ARMY OUT OF THEM.' },
@@ -230,6 +230,10 @@ const DREAM2 = () => [
   { narr: 'That is why I am up here. I did not come to win their game. I came to be handed the keys.' },
   { narr: 'Lucan Aurel holds the keep. Her son. If I put him on his knees in front of her, she will have to pin the gold on me herself.' },
   { narr: 'She sat across a white room from me twice a week for half a year. She will look straight at what Ilse made of me and see one of her own.' },
+  { fade: 'out' }, { panel: 'ledger' }, { fade: 'in', spd: 1.2 }, { wait: 0.6 }, { sfx: 'heart' },
+  { narr: 'And for one breath the dream slips further. A book as wide as a table. Columns of names. A pen in my hand, and gold on my cuff.' },
+  { pstage: 1 }, { wait: 1.4 },
+  { narr: 'I do not know yet what the red lines mean. I know my hand is very steady, and that I hate it.' },
   { fade: 'out' }, { panel: null }
 ];
 const DREAM3 = () => [

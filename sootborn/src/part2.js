@@ -1,7 +1,7 @@
 // SOOTBORN — Part Two: ABOVE. Five chapters from the Pinning to the end. Told straight; the memories now run backward.
 const P2F = k => G.flags[k];
 FF.gallery = () => ({
-  era: 5, boots: 1, title: 'THE GALLERY', sub: 'TYR CADE - A MATTER OF HIS UNCLE\'S HONOUR', bg: 'hall', arena: { kind: 'ring', rx: 96, ry: 58 }, music: 'duel', rage: 2, legend: 1, skip: 1, winText: 'NOTED',
+  era: 5, boots: 1, newMove: 'NEW: THE COUNT - ELEVEN HITS ON ONE MAN AND HIS LINE IS STRUCK', title: 'THE GALLERY', sub: 'TYR CADE - A MATTER OF HIS UNCLE\'S HONOUR', bg: 'hall', arena: { kind: 'ring', rx: 96, ry: 58 }, music: 'duel', rage: 2, legend: 1, skip: 1, winText: 'NOTED',
   fin: { name: 'NOTED', l1: 'I HAVE LEARNED THEIR WORD FOR IT', l2: 'IT MEANS: I WILL REMEMBER THIS', rgb: '255,240,200' },
   hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 30 }, taunt: { 0: ['SORREL. WHO ARE THE SORRELS?', 'YOU FIGHT LIKE A LABOURER.', 'MY UNCLE WILL HEAR OF THIS.'] },
   foes: [{ id: 'tyr', name: 'Tyr Cade', kind: 'duelist', hp: 120, sc: 1.1 }],
@@ -35,7 +35,7 @@ FF.son = () => { const friend = !!P2F('lucanFriend'); return {
   era: 5, boots: 1, title: 'THE SON', sub: 'LUCAN AUREL - HIS MOTHER HAS TOLD HIM', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, endAt: friend ? .5 : .2, winText: friend ? 'HE LOWERS IT' : 'HE FALLS',
   fin: { name: 'ONE DOES NOT', l1: 'ONE DOES NOT KNEEL. ONE IS NOT SORRY.', l2: 'I AM SORRY, LUCAN', rgb: '255,240,200' },
   hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 40 }, taunt: { 0: friend ? ['SAY IT IS NOT TRUE.', 'YOU SAT AT MY TABLE.', 'WAS ANY OF IT REAL?'] : ['SOOT. ALL THIS TIME.', 'SHE WAS RIGHT ABOUT YOU.', 'I SHOULD HAVE KNOWN AT THE KEEP.'] },
-  foes: [{ id: 'lucan', name: 'Lucan Aurel', kind: 'duelist', hp: 170, sc: 1.1 }],
+  foes: [{ id: 'lucan', name: 'Lucan Aurel', kind: 'duelist', hp: 170, sc: 1.1, k2: { line: 1 } }],
   voice: { at: [[1, friend ? 'SIX YEARS FROM NOW. HE WAS THE ONLY ONE ON THE SPIRE WHO EVER ASKED ME A QUESTION AND WAITED FOR THE ANSWER.' : 'SIX YEARS FROM NOW. I KEPT HIM AT ARM\'S LENGTH FOR TWO YEARS. IT HAS NOT MADE THIS EASIER.'], [13, 'HE IS BETTER THAN HE WAS AT THE KEEP. HE PRACTISED. BECAUSE OF ME.'], [26, 'HIS MOTHER BURNED MY WIFE. HE WAS FOURTEEN AND HAD NEVER HEARD OF CINDERWELL. I KEEP HAVING TO SAY THAT TO MYSELF.']],
     hurt: 'HE MEANS IT THIS TIME.', fury: 'NOT AT HIM. IT WAS NEVER FOR HIM.', half: friend ? 'HE IS CRYING. I DID NOT KNOW THEY COULD.' : 'HE WANTS ME TO BE A MONSTER. IT WOULD BE SIMPLER FOR BOTH OF US.', eleven: 'ELEVEN. I PULL THE LAST ONE.' },
   arts: [{ at: .75, name: 'HER CHIN', line: 'HER CHIN. HER HANDS. HER WAY OF LOOKING PAST YOU. AND NONE OF WHAT SHE DID WITH THEM.', panel: 'ante', stage: 1, kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }],
@@ -50,7 +50,7 @@ FF.son = () => { const friend = !!P2F('lucanFriend'); return {
     { d: 3.0, cam: [0, 150, 60, 150, .3], to: [0, 250, 170, 150, .16], acts: [{ id: 'kael2', a: [-10, 2], blade: 1 }], cap: 'I HAD A YEAR, PERHAPS, BEFORE HE COULD WALK. I USED IT.' }
   ] }; };
 FF.stair = () => ({
-  era: 5, boots: 1, title: 'THE STAIR', sub: 'THE SUN SPIRE - NINE HUNDRED STEPS TO THE COUNT', bg: 'stair', arena: { kind: 'rect', w: 220, h: 100 }, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Spire Guard', winText: 'UP',
+  era: 6, boots: 1, newMove: 'NEW: THE SHIFT SONG - GUARD + HOOK HEALS YOU AND YOURS', title: 'THE STAIR', sub: 'THE SUN SPIRE - NINE HUNDRED STEPS TO THE COUNT', bg: 'stair', arena: { kind: 'rect', w: 220, h: 100 }, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Spire Guard', winText: 'UP',
   fin: { name: 'EVERY BREATH', l1: 'EVERY BREATH I TAKE IS HERS', l2: 'I HAVE NINE HUNDRED STEPS OF THEM', rgb: '255,224,138', mode: 'all' },
   hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 80 }, allies: V, shouts: ['UP!', 'BELOW!', 'DON\'T STOP!'], taunt: { 0: ['HOLD THE LANDING!', 'HE IS ONE MAN!', 'FOR THE AUDITOR!'] },
   waves: [[{ id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 10 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 10 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 10 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 10 }],
@@ -71,9 +71,10 @@ FF.stair = () => ({
   ]
 });
 FF.ember = () => ({
-  era: 5, boots: 1, title: 'LITTLE EMBER', sub: 'CELESTINE AUREL - THE HIGH AUDITOR', bg: 'crown', arena: { kind: 'rect', w: 220, h: 100 }, music: 'final', rage: 3, legend: 1, skip: 1, endAt: .08, winText: 'BALANCED',
+  era: 6, boots: 1, title: 'LITTLE EMBER', sub: 'CELESTINE AUREL - THE HIGH AUDITOR', bg: 'crown', arena: { kind: 'rect', w: 220, h: 100 }, music: 'final', rage: 3, legend: 1, skip: 1, endAt: .08, winText: 'BALANCED',
   hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 60 }, taunt: { 0: ['THERE YOU ARE, TECHNICIAN.', 'I KEPT THE COUNT. SOMEBODY HAD TO.', 'SHE WAS QUICKER THAN YOU.', 'AND WHO WILL RATION IT WHEN I AM GONE?'] },
-  foes: [{ id: 'celf', name: 'Celestine Aurel', kind: 'duelist', hp: 230, sc: 1.18 }],
+  foes: [{ id: 'celf', name: 'Celestine Aurel', kind: 'duelist', hp: 230, sc: 1.18, k2: { line: 1, slam: 1, triple: 1 } }],
+  newMove: 'SHE STRIKES A LINE ACROSS THE FLOOR: JUMP IT. SHE DROPS FROM ABOVE: MOVE.',
   voice: { at: [[1, 'SHE IS SEVENTY. SHE HAS WORN THE BOOTS SINCE SHE WAS TWELVE. NOBODY TOLD ME SHE COULD FIGHT. NOBODY WHO KNEW WAS STILL ALIVE.'], [14, 'SHE IS NOT ANGRY. THAT IS THE WORST OF IT. SHE HAS NEVER ONCE BEEN ANGRY AT US. WE WERE A COLUMN THAT HAD TO ADD UP.'], [28, 'THE WINDOW IS BEHIND HER. THE REAL SKY. SHE KEPT IT IN ONE ROOM FOR FIFTY YEARS.'], [42, 'SEREN. I AM NEARLY DONE.']],
     hurt: 'SHE CUTS LIKE SHE SIGNS. ONCE, AND NEATLY.', fury: 'THIS IS WHAT YOU LIT. LOOK AT IT.', half: 'SHE HAS STOPPED CALLING ME TECHNICIAN.', eleven: 'ONE FOR EVERY SECOND THE DOORS STOOD OPEN. I HAVE CARRIED THEM NINE YEARS. THEY ARE YOURS.' },
   arts: [{ at: .82, name: 'THE WASHER', line: 'SHE WORE A WASHER FOR A WEDDING RING. THREE WEEKS OF MY LUNCH BREAKS. IT IS UNDER THIS ARMOUR NOW.', panel: 'hands', kind: 'rise', rgb: '255,210,110', hex: '#ffd26e' }, { at: .6, name: 'RATION AIR', line: 'WE BLED YOUR AIR INTO A FEVER WARD. FORTY CHILDREN BREATHED. THAT WAS THE WHOLE CRIME.', panel: 'ward', stage: 1, kind: 'storm', rgb: '160,220,255', hex: '#a0dcff' }, { at: .38, name: 'THE SHIFT SONG', line: 'YOU PUT OUR SONG ON YOUR SPEAKERS SO IT WOULD MEAN THE FURNACE. LISTEN. THEY ARE HUMMING IT ON YOUR STAIR.', panel: 'pipe', kind: 'storm', rgb: '255,170,70', hex: '#ffaa46' }, { at: .18, name: 'ELEVEN SECONDS', line: 'YOU HELD THE DOORS OPEN FOR ELEVEN SECONDS SO THE WHOLE TIER COULD WATCH HER WALK. I COUNTED. I HAVE NEVER STOPPED.', panel: 'furnace', stage: 2, kind: 'rise', rgb: '255,90,30', hex: '#ff5a1e', dark: 'rgba(26,4,2,.85)' }],
@@ -90,8 +91,19 @@ FF.ember = () => ({
   ]
 });
 // the Fall, when it is no longer a dream
-FF.fall2 = () => { const d = FF.fall(); d.intro = d.intro.slice(); d.intro[0] = { d: 2.8, black: 1, big: 'THE FALL', cap: 'NINE YEARS. FOUR HUNDRED BARGES. ONE MORNING.' }; d.intro[1] = Object.assign({}, d.intro[1], { big: '' });
+FF.fall2 = () => { const d = FF.fall(); d.era = 6; d.intro = d.intro.slice(); d.intro[0] = { d: 2.8, black: 1, big: 'THE FALL', cap: 'NINE YEARS. FOUR HUNDRED BARGES. ONE MORNING.' }; d.intro[1] = Object.assign({}, d.intro[1], { big: '' });
   d.outro = d.outro.slice(0, 2).concat([{ d: 3.0, black: 1, big: 'WE HIT.', cap: 'HALF OF US WALKED AWAY FROM IT. THAT WAS BETTER THAN ILSE\'S ARITHMETIC.' }]); d.voice = Object.assign({}, d.voice, { at: [[1, 'NINE YEARS AGO I KNELT WHEN THEY CAME DOWN IN LIGHT. TODAY WE ARE THE ONES COMING DOWN.'], [10, 'FOUR HUNDRED BARGES. EVERY ONE OF THEM FLOWN BY SOMEBODY WHO WAS BORN OWING AIR.'], [20, 'CADE SIGNED TIER FOUR AWAY WITH ONE LINE. I HAVE THE PEN HE USED. I TOOK IT FROM MY OWN DESK.'], [32, 'MARA IS ON THE NEXT BARGE OVER. SHE SAID SHE WOULD NOT MISS THIS IF IT KILLED HER. IT MIGHT.']] }); return d; };
+// meanwhile, six tiers down: you play Mara
+FF.stand = () => ({
+  era: 0, title: 'TIER SIX STANDS', sub: 'MARA VENN - A COMMITMENT AT BAY THREE', bg: 'furnace', arena: { kind: 'rect', w: 200, h: 80 }, music: 'work', legend: 1, skip: 1, foeName: 'Warden', winText: 'NOBODY KNEELS',
+  fin: { name: 'TWO TINS', l1: 'ONE FOR SEREN. ONE FOR KAEL.', l2: 'THERE WILL NOT BE A THIRD', rgb: '255,120,40' },
+  hero: { id: 'mara', name: 'MARA', hp: 11, pow: 2, fury0: 60 }, allies: ['hollis', 'ivo'], shouts: ['UP! ALL OF YOU, UP!', 'WITH MARA!', 'HUM IT!'], taunt: { 0: ['KNEEL.', 'GRATITUDE IS BREATH.', 'YOU ARE OWED TO THE FURNACE.'] },
+  waves: [[{ id: 'warden', name: 'Warden', kind: 'baton', hp: 22, sc: 1.1 }, { id: 'watchman', name: 'Night Watch', kind: 'quick', hp: 9 }], [{ id: 'warden', name: 'Warden', kind: 'baton', hp: 26, sc: 1.1 }, { id: 'warden', name: 'Warden', kind: 'heavy', hp: 30, sc: 1.15 }, { id: 'proctor', name: 'Proctor Sull', kind: 'quick', hp: 14 }]],
+  onWave: (w, B) => { B.p.fury = 100; B.say('THE WHOLE ROW IS STANDING', true); },
+  voice: { at: [[1, 'I AM SIXTY-ONE. I HAVE KNELT AT FORTY-FOUR COMMITMENTS. I COUNTED. HE GETS THAT FROM ME.'], [11, 'THEY WERE GOING TO PUT A BOY OF NINE THROUGH THAT DOOR FOR HIS MOTHER\'S DEBT.'], [22, 'I HAVE TWO TINS ON MY SHELF AND ONE OF THEM IS EMPTY. I AM NOT STARTING A THIRD.']],
+    hurt: 'I HAVE HAD WORSE FROM A VALVE WHEEL.', fury: 'BE TOO MUCH FOR THEM. SHE WAS NOT ONLY TALKING TO HIM.', wave: 'MORE OF THEM. GOOD. LET THEM COUNT US.', half: 'HOLLIS HAS BOTH ARMS UP. I DID NOT KNOW HE COULD.', eleven: 'I KNOW HIS NUMBER. I TAUGHT HIM TO COUNT.' },
+  arts: [{ on: 'start', after: 5, name: 'FORTY-FOUR', line: 'FORTY-FOUR TIMES I KNELT AND WATCHED THE DOORS CLOSE ON SOMEBODY I KNEW. I AM DONE KNEELING.', panel: 'furnace', stage: 2, kind: 'storm', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }, { on: 'wave', name: 'THE SHELF', line: 'A TIN FOR SEREN. A TIN FOR KAEL, WITH NOTHING IN IT. I DUST THEM ON REST DAYS.', panel: 'tin', kind: 'rise', rgb: '255,210,110', hex: '#ffd26e' }]
+});
 // ------------------------------------------------------------------ the chapters
 const P2 = {
   1: () => [
@@ -164,7 +176,11 @@ const P2 = {
     { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'Brand held the dock stair behind us while we cut the last moorings. Alone, for eleven minutes. Somebody timed it. I asked them to.' },
     { narr: 'We hid four hundred barges in the weather for two years. The Unlit came up in ones and twos through Riser Nine and learned to fly them. Valve techs. Welders. A noodle seller.' },
-    { say: 'dace', t: 'Tier Six stopped kneeling in the spring. Mara did it. She stood up at a commitment and the whole row stood up behind her and the Wardens found they did not have enough halberds.' },
+    { say: 'dace', t: 'Tier Six stopped kneeling in the spring. Mara did it. I was not there. I am told it went like this.' },
+    { fade: 'out' }, { panel: null }, { card: 'MEANWHILE', sub: 'Six tiers down. Bay Three. A commitment.', big: 1, min: 1.5, max: 4.5 },
+    { brawl: () => FF.stand() },
+    { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
+    { say: 'dace', t: 'She stood up, and the whole row stood up behind her, and the Wardens found they did not have enough halberds. The boy is on the wheel with Tavi now.' },
     { say: 'dace', t: 'Tavi is coming up. Sixteen. Don\'t give me that look, I am only the messenger. Mara says you were younger when you married.' },
     { fade: 'out' }, { panel: 'gild' }, { pstage: 3 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { say: 'ilse', t: 'When you stand in front of her, soot, you will want to use the words I taught you. Do not. Use your own. That is the only thing she has never heard.' },

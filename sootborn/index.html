@@ -2725,7 +2725,7 @@ const Brawl = {
   },
   spawn(list, first) {
     const A = this.arena, hw = A.kind === 'ring' ? A.rx : A.w / 2, hh = A.kind === 'ring' ? A.ry : A.h / 2, n = list.length, base = this.foes.length;
-    list.forEach((f, i) => { const K = Object.assign({}, FOE_KINDS[f.kind]); const D = this.D = DIFFS[Settings.d.diff === undefined ? 1 : Settings.d.diff] || DIFFS[1], hard = this.def.hero && this.def.hero.id && !this.def.doomed, cs = hard ? D.cd : (1 + D.cd) / 2; K.wind *= hard ? D.wind : (1 + D.wind) / 2; K.cd = [K.cd[0] * cs, K.cd[1] * cs]; if (hard && K.poise && D !== DIFFS[0]) { K.double = 1; K.charge = 1; K.triple = 1; } if (!this.def.doomed) f = Object.assign({}, f, { hp: Math.round(f.hp * (hard ? D.hp : 1 + (D.hp - 1) * .4) * (1 - .08 * Math.min(3, this.def._tries || 0))) });
+    list.forEach((f, i) => { const K = Object.assign({}, FOE_KINDS[f.kind], f.k2 || {}); const D = this.D = DIFFS[Settings.d.diff === undefined ? 1 : Settings.d.diff] || DIFFS[1], hard = this.def.hero && this.def.hero.id && !this.def.doomed, cs = hard ? D.cd : (1 + D.cd) / 2; K.wind *= hard ? D.wind : (1 + D.wind) / 2; K.cd = [K.cd[0] * cs, K.cd[1] * cs]; if (hard && K.poise && D !== DIFFS[0]) { K.double = 1; K.charge = 1; K.triple = 1; } if (!this.def.doomed) f = Object.assign({}, f, { hp: Math.round(f.hp * (hard ? D.hp : 1 + (D.hp - 1) * .4) * (1 - .08 * Math.min(3, this.def._tries || 0))) });
       this.foes.push(Object.assign({ x: first && A.kind === 'ring' ? hw * .5 : (i - (n - 1) / 2) * Math.min(48, (hw * 1.6) / n), y: first && A.kind === 'ring' ? (i - (n - 1) / 2) * 30 : -hh + 6 - (first ? 0 : 40) - (i % 2) * 14,
         fx: -1, fy: 0, max: f.hp, st: 'approach', t: 0, cd: 1 + i * .7, anim: 0, kx: 0, ky: 0, sheet: World.sheetFor(f.id), K, said: 0, flash: 0, sc: f.sc || 1, idx: base + i, enter: !first }, f)); });
   },
@@ -2755,6 +2755,7 @@ const Brawl = {
   // Kael narrates. Lines come on a clock and on events, and never stop the fight.
   voice(key) { let v = this.def.voice; if (v && !v[key] && VOICE0[key] && this.def.hero && this.def.hero.id) v = VOICE0; if (!v || !v[key] || this.vdone[key] || this.vq.length > 0) return; this.vdone[key] = 1; this.vq.push(v[key]); },
   lurch(dt) { this.lt += dt; if (this.lt < 7) return; this.lt = 0; const s = Math.random() < .5 ? 1 : -1; this.shake = .7; this.say('THE DECK DROPS', true); Sound.play('rumble'); this.p.kx += s * 130; for (const f of this.foes) if (f.st !== 'down') { f.kx += s * 150; } for (const a of this.allies) a.kx = (a.kx || 0) + s * 120; },
+  windT(f) { return f.mode === 'slam' ? .95 : f.mode === 'line' ? .8 : f.mode === 'charge' ? f.K.wind + .15 : f.second ? this.D.w2 : f.K.wind; },
   updVoice(dt) { const v = this.def.voice; if (!v) return; this.ft += dt; (v.at || []).forEach(([at, t], i) => { if (this.ft >= at && !this.vdone['t' + i]) { this.vdone['t' + i] = 1; this.vq.push(t); } });
     if (this.vcur) { this.vcur.life -= dt; if (this.vcur.life <= 0) this.vcur = null; } if (!this.vcur && this.vq.length) { const t = this.vq.shift(); this.vcur = { t, life: 3.2 + t.length * .07, max: 3.2 + t.length * .07 }; } },
   say(t, big) { this.msg = t; this.msgT = big ? 1.6 : 1.1; },
@@ -2768,7 +2769,7 @@ const Brawl = {
   hurtPlayer(f, dmg, ax, ay) {
     const p = this.p;
     if (p.inv > 0 || this.sup) { if (p.st === 'dodge' && p.open <= 0.9) { p.open = 1.6; this.slow = 0.5; this.say('OPENING!'); Sound.play('stage'); this.gain(22); } return; }
-    if (p.z > 14 && f && f.mode === 'sweep') { if (!p.overT || this.t - p.overT > 1) { p.overT = this.t; this.say('OVER IT'); this.gain(8); } return; }
+    if (p.z > 14 && f && (f.mode === 'sweep' || f.mode === 'line')) { if (!p.overT || this.t - p.overT > 1) { p.overT = this.t; this.say('OVER IT'); this.gain(8); } return; }
     if (p.st === 'guard' && f && -(ax * p.fx + ay * p.fy) > -.25) {
       if (p.gt < .2) { f.st = 'hurt'; f.t = -.6; f.flash = .2; f.kx = -ax * 130; f.ky = -ay * 130; this.token = this.token.filter(o => o !== f); p.open = 1.4; p.inv = .35; this.slow = .45; this.freeze = .12; this.shake = .4; this.impact = .14; p.rip = 1.3; this.say('PARRY!'); Sound.play('clash'); this.spark(p.x - ax * 12, p.y - ay * 12, '#fff6dc', 14); this.ring(p.x - ax * 12, p.y - ay * 12, '#fff2c0', 34); this.gain(18); return; }
       if (dmg < 2 && p.gd > 0) { p.gd--; p.gdT = 0; p.inv = .15; p.kx = ax * 90; p.ky = ay * 90; Sound.play('steel'); this.spark(p.x - ax * 10, p.y - ay * 10, '#c8ccd4', 6); this.gain(4); if (p.gd <= 0) { p.st = 'hurt'; p.t = -.5; this.say('GUARD BROKEN'); Sound.play('deny'); } return; }
@@ -2782,6 +2783,7 @@ const Brawl = {
     if (f.st === 'wind' && !crit && !f.K.soft && f.mode !== 'charge' && this.p.gapT > .55 && !(f.clashT > this.t) && f.t > (f.second ? this.D.w2 : f.K.wind) - .17) { f.clashT = this.t + 3; f.st = 'hurt'; f.t = -.35; f.flash = .2; f.kx = ax * 150; f.ky = ay * 150; f.hp -= dmg; this.token = this.token.filter(o => o !== f); this.freeze = .14; this.slow = .35; this.shake = .4; this.impact = .16; this.punch = .3; this.rollK = .1; this.say('CLASH!'); Sound.play('clash'); this.spark(f.x - ax * 12, f.y - ay * 12, '#fff6dc', 16); this.ring(f.x - ax * 12, f.y - ay * 12, '#fff2c0', 34); this.slashes.push({ x: f.x - ax * 12, y: f.y - ay * 12, a: 1, life: .22, big: 1 }); this.gain(14); this.p.open = Math.max(this.p.open, .8); this.voice('clash'); if (f.hp <= 0) f.hp = 1; return; }
     if (f.guardT > 0 && !crit) { f.flash = 0.06; Sound.play(this.p.blade || f.K.blade ? 'steel' : 'deny'); this.spark(f.x, f.y, '#8a94a4', 4); this.p.kx = -ax * 120; this.p.ky = -ay * 120; if (!f.blk) { f.blk = 1; f.bark = { t: 'BLOCKED', life: .7 }; } return; }
     if (f.st === 'floor' && !this.art && !this.sup) { dmg += 2 * this.p.pow; f.t = Math.min(f.t, .5); if (!f.nm) { f.nm = 1; this.say('NO MERCY'); } }
+    if (this.era >= 5 && !this.sup && !this.art) { f.cnt = (this.t - (f.cntT || 0) > 3.5 ? 0 : f.cnt || 0) + 1; f.cntT = this.t; if (f.cnt >= 11) { f.cnt = 0; dmg += 6 * this.p.pow; big = true; this.say('BALANCED', true); this.ring(f.x, f.y, '#ffe08a', 56); this.impact = .14; Sound.play('pillar'); if (!this.cntV) { this.cntV = 1; this.vq.push('I KEPT THEIR COUNT FOR THREE YEARS. NOW I KEEP MINE. ELEVEN, AND THE LINE IS STRUCK.'); } } else if (f.cnt >= 3) f.bark = { t: ELEVEN[f.cnt - 1], life: .7 }; }
     this.nums.push({ x: f.x + (Math.random() - .5) * 10, y: f.y, h: 70 + (f.z || 0), v: dmg, big, life: .7 });
     f.hp -= dmg; f.flash = 0.14; f.kx = ax * (big ? 230 : 95); f.ky = ay * (big ? 230 : 95); this.freeze = big ? 0.11 : 0.05; this.shake = big ? 0.32 : 0.12; if (big) { this.impact = .14; this.punch = .22; this.ring(f.x, f.y, '#fff2c0', 40); f.vz = this.p.heavy ? 210 : 150; f.air = !f.K.poise || !!this.p.heavy || !!this.art; this.rollK = (ax >= 0 ? 1 : -1) * .04; }
     if ((f.z || 0) > 3 && !big) f.vz = Math.max(f.vz, 125); // juggle: hits keep a launched man in the air
@@ -2898,7 +2900,7 @@ const Brawl = {
   buttLand() { const p = this.p, f = p.hk; if (!f || f.st === 'down' || Math.hypot(f.x - p.x, f.y - p.y) > 40) return; if (f.guardT > 0) f.guardT = 0; this.token = this.token.filter(o => o !== f); Sound.play('hit'); Sound.play('bodyfall'); this.shake = .45; this.impact = .12;
     if (!f.K.poise && !this.def.doomed) { this.hitFoe(f, 2 * p.pow, p.ax, p.ay, true); if (f.hp > 0) { f.kx = p.ax * 420; f.ky = p.ay * 420; f.vz = 150; f.air = 1; f.thrown = .6; } this.say('THROWN'); }
     else { this.hitFoe(f, 1 * p.pow, p.ax, p.ay, false); if (f.hp > 0 && f.st !== 'down') { f.st = 'hurt'; f.t = -.35; } p.open = Math.max(p.open, .6); this.say('HEADBUTT'); } },
-  roar() { const p = this.p; p.st = 'roar'; p.t = 0; p.rcd = 9; p.inv = Math.max(p.inv, .4); Sound.play('roar'); this.ring(p.x, p.y, '#ff5a2a', 96); this.ring(p.x, p.y, '#ffb040', 60); this.shake = .5; this.gain(20); this.say('HE ROARS', true); this.voice('roar');
+  roar() { const p = this.p; p.st = 'roar'; p.t = 0; p.rcd = 9; p.inv = Math.max(p.inv, .4); Sound.play('roar'); this.ring(p.x, p.y, '#ff5a2a', 96); this.ring(p.x, p.y, '#ffb040', 60); this.shake = .5; this.gain(20); if (this.era >= 6) { p.hp = Math.min(p.max, p.hp + 2); this.say('THE SHIFT SONG', true); Sound.play('bell'); for (const a of this.allies) { a.hp = Math.min(a.max || a.hp, (a.hp || 0) + 3); } } else this.say('HE ROARS', true); this.voice('roar');
     for (const f of this.foes) if (f.st !== 'down' && !f.enter) { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; if (d > 96) continue; this.token = this.token.filter(o => o !== f); if (!f.K.poise) { f.st = 'hurt'; f.t = -.55; f.kx = dx / d * 200; f.ky = dy / d * 200; f.bark = { t: '!!', life: .8 }; } else { f.cd = Math.max(f.cd, 0) + .9; if (f.st === 'wind' && f.mode !== 'charge') { f.st = 'approach'; } f.bark = { t: '...', life: .8 }; } }
     for (const a of this.allies) a.bark = { t: 'WITH HIM!', life: 1 }; },
   dive() { const p = this.p; this.aim(0); p.st = 'dive'; p.t = 0; p.hit = false; p.vz = Math.min(p.vz, -150); Sound.play('dash'); },
@@ -2994,12 +2996,16 @@ const Brawl = {
       if (f.cd <= 0 && (T !== p || this.token.length < cap || this.token.includes(f)) && p.st !== 'down') {
         const far = K.charge && d > 60 && Math.random() < .7;
         if (K.blink && T === p && d > 44 && Math.random() < .5) { this.spark(f.x, f.y, '#fff6dc', 10); f.x = p.x - p.fx * 30; f.y = p.y - p.fy * 30; this.clampA(f); this.spark(f.x, f.y, '#fff6dc', 10); Sound.play('page'); f.cd = .25; return; }
-        if (d < K.reach * 1.25 || far) { if (T === p && !this.token.includes(f)) this.token.push(f); f.st = 'wind'; f.t = 0; f.ax = dx / d; f.ay = dy / d; f.mode = far ? 'charge' : K.sweep && Math.random() < .45 ? 'sweep' : 'strike'; f.second = false; f.third = false; f.hits = 0; if (T === p) Sound.play('huh'); }
+        const sp = T === p && (f.spT || 0) < this.t ? (K.slam && Math.random() < (f.hp < f.max * .5 ? .34 : .18) ? 'slam' : K.line && Math.random() < .26 ? 'line' : null) : null; if (sp) { f.spT = this.t + 4; f.sx = p.x; f.sy = p.y; Sound.play(sp === 'slam' ? 'dash' : 'fury'); f.bark = { t: sp === 'slam' ? (f.id === 'celf' ? 'BALANCED.' : 'DOWN.') : (f.id === 'celf' ? 'STRUCK.' : 'HOLD STILL.'), life: .9 }; }
+        if (d < K.reach * 1.25 || far || sp) { if (T === p && !this.token.includes(f)) this.token.push(f); f.st = 'wind'; f.t = 0; f.ax = dx / d; f.ay = dy / d; f.mode = sp ? sp : far ? 'charge' : K.sweep && Math.random() < .45 ? 'sweep' : 'strike'; f.second = false; f.third = false; f.hits = 0; if (T === p) Sound.play('huh'); }
       }
     } else if (f.st === 'wind') {
-      f.t += dt; const w = f.mode === 'charge' ? K.wind + .15 : f.second ? this.D.w2 : K.wind;
+      f.t += dt; const w = this.windT(f);
+      if (f.mode === 'slam') { f.vz = 0; f.z = Math.min(64, f.t * 170); if (f.t < w * .62) { f.sx = T.x; f.sy = T.y; } const k = Math.min(1, dt * 4); f.x += (f.sx - f.x) * k; f.y += (f.sy - f.y) * k; }
       if (f.t >= w) {
-        if (f.mode === 'charge') { f.st = 'charge'; f.t = 0; Sound.play('roar'); }
+        if (f.mode === 'line') { f.st = 'recover'; f.t = 0; f.swing = .18; Sound.play('bigslash'); this.shake = .4; this.lineFx = { x: f.x, y: f.y, ax: f.ax, ay: f.ay, life: .25 }; const along = (T.x - f.x) * f.ax + (T.y - f.y) * f.ay, off = Math.abs((T.x - f.x) * -f.ay + (T.y - f.y) * f.ax); if (along > -6 && off < 12) this.strikeAt(f, T, 2, f.ax, f.ay); }
+        else if (f.mode === 'slam') { f.st = 'recover'; f.t = -.15; f.x = f.sx; f.y = f.sy; f.z = 0; f.vz = 0; Sound.play('pillar'); this.ring(f.x, f.y, '#fff2c0', 46); this.ring(f.x, f.y, '#ffb040', 30); this.scars.push({ x: f.x, y: f.y, r: 16, life: 30 }); this.shake = .7; this.spark(f.x, f.y, '#fff2c0', 16, 0); if (Math.hypot(T.x - f.x, T.y - f.y) < 40) this.strikeAt(f, T, 2, (T.x - f.x) / (Math.hypot(T.x - f.x, T.y - f.y) || 1), (T.y - f.y) / (Math.hypot(T.x - f.x, T.y - f.y) || 1)); }
+        else if (f.mode === 'charge') { f.st = 'charge'; f.t = 0; Sound.play('roar'); }
         else { f.st = 'recover'; f.t = 0; Sound.play(K.blade ? (K.dmg > 1 ? 'swing2' : 'swing') : 'move'); f.swing = .18;
           if (f.mode === 'sweep') { if (d < K.reach + 6) this.strikeAt(f, T, K.dmg, dx / d, dy / d); this.ring(f.x, f.y, '#c8ccd4', K.reach + 6); }
           else { const hx = f.x + f.ax * K.reach, hy = f.y + f.ay * K.reach; f.x += f.ax * 10; f.y += f.ay * 10;
@@ -3212,6 +3218,7 @@ const Brawl = {
     if (d3 && this.p.st === 'hook' && this.p.hk) { const p = this.p, f = p.hk, k = Math.min(1, p.t / .13); for (let i = 1; i <= 12; i++) { const u = i / 12 * k; G3.glow(p.x + (f.x - p.x) * u, (30 + Math.sin(u * 3.14) * 6) * G3.HK, p.y + (f.y - p.y) * u, i === 12 ? 4 : 1.8, [1, .85, .5], .95); } }
     if (d3 && this.p.st === 'ram' && this.p.t > .13 && this.p.t < .36) { const p = this.p, k = (p.t - .13) / .23; for (let i = 0; i < 9; i++) { const a = i / 9 * 6.283 + this.t * 9, r = 3 + k * 16; G3.glow(p.x + p.ax * (20 + k * 14) - p.ay * Math.cos(a) * r * .6, (30 + Math.sin(a) * r) * G3.HK, p.y + p.ay * (20 + k * 14) + p.ax * Math.cos(a) * r * .6, 6 - k * 3, [1, .7, .25], 1 - k * .8); } }
     if (d3 && this.p.boots && this.p.z > 2 && !this.sup && !this.art) { const p = this.p, zz = p.z * G3.HK * 1.2; for (let i = 0; i < 4; i++) G3.glow(p.x + (i % 2 ? 3 : -3), Math.max(1, zz - 2 - i * 4 * (p.hov ? 1.6 : 1)), p.y, (p.hov ? 5 : 3) - i * .7, [.55, .85, 1], .9 - i * .2); }
+    if (this.lineFx) { const q = this.lineFx; q.life -= 1 / 60; if (d3) for (let i = 0; i < 26; i++) G3.glow(q.x + q.ax * i * 11, 26 * G3.HK, q.y + q.ay * i * 11, 7, [1, .95, .8], q.life * 3.4); if (q.life <= 0) this.lineFx = null; }
     if (d3 && this.p.st === 'lash') { const p = this.p, a = Math.atan2(p.fy, p.fx); for (let j = 0; j < 10; j++) for (let i = 1; i <= 5; i++) { const aa = a - j * .16, r = 16 + i * 10; G3.glow(p.x + Math.cos(aa) * r, 30 * G3.HK, p.y + Math.sin(aa) * r, 3.4 - j * .25, [1, .9 - j * .04, .55], .9 - j * .08); } }
     if (d3 && this.p.st === 'bore' && this.p.t > .1 && this.p.t < .42) { const p = this.p; for (let i = 0; i < 14; i++) { const u = i / 14, a = this.t * 40 + i * .9, r = 3 + u * 9; G3.glow(p.x + p.ax * (22 - u * 46) - p.ay * Math.cos(a) * r * .5, (28 + Math.sin(a) * r) * G3.HK, p.y + p.ay * (22 - u * 46) + p.ax * Math.cos(a) * r * .5, 4.5 - u * 3, [1, .7 - u * .3, .25], 1 - u * .7); } }
     if (d3 && this.p.st === 'roar') { const p = this.p; for (let i = 0; i < 18; i++) { const a = i / 18 * 6.283 + this.t * 3, r = 14 + p.t * 150; G3.glow(p.x + Math.cos(a) * r, (10 + (i % 3) * 16) * G3.HK, p.y + Math.sin(a) * r, 5, [1, .4, .15], Math.max(0, .8 - p.t * 1.6)); } }
@@ -3236,7 +3243,8 @@ const Brawl = {
     const ex = [];
     // ground marks first (far depth in the sorted list, so fighters sit on top)
     ex.push({ y: -1e6, d: () => { for (const q of this.scars) { const a = Math.min(1, q.life / 6); this.poly(g, Array.from({ length: 12 }, (_, k) => [q.x + Math.cos(k / 12 * 6.283) * q.r * (.8 + (k * 7 % 5) * .08), q.y + Math.sin(k / 12 * 6.283) * q.r * .62 * (.8 + (k * 3 % 5) * .08)]), `rgba(22,12,10,${.42 * a})`); this.disc(g, q.x, q.y, q.r * .5, `rgba(255,120,40,${.25 * a * Math.min(1, q.life / 30)})`, 1); }
-      for (const f of this.foes) if (f.st === 'wind') { const w = f.mode === 'charge' ? f.K.wind + .15 : f.second ? this.D.w2 : f.K.wind, k = Math.min(1, f.t / w), col = `rgba(255,60,40,${.2 + k * .45})`;
+      for (const f of this.foes) if (f.st === 'wind') { const w = this.windT(f), k = Math.min(1, f.t / w), col = `rgba(255,60,40,${.2 + k * .45})`;
+        if (f.mode === 'slam') { this.disc(g, f.sx, f.sy, 40, 'rgba(255,60,40,.9)', 1.5); this.disc(g, f.sx, f.sy, 40 * k, col); } else if (f.mode === 'line') { const nx = -f.ay * 12, ny = f.ax * 12, L = 300; this.poly(g, [[f.x + nx, f.y + ny], [f.x + f.ax * L + nx, f.y + f.ay * L + ny], [f.x + f.ax * L - nx, f.y + f.ay * L - ny], [f.x - nx, f.y - ny]], `rgba(255,60,40,${.12 + k * .5})`); } else
         if (f.mode === 'sweep') this.disc(g, f.x, f.y, (f.K.reach + 6) * k, col); else { const L = (f.mode === 'charge' ? 115 : f.K.reach + 10) * k, wd = (f.K.wide || 12) / 2, nx = -f.ay * wd, ny = f.ax * wd; this.poly(g, [[f.x + nx, f.y + ny], [f.x + f.ax * L + nx, f.y + f.ay * L + ny], [f.x + f.ax * L - nx, f.y + f.ay * L - ny], [f.x - nx, f.y - ny]], col); } }
       if (this.g3 && this.phase === 'fight') { this.disc(g, p.x, p.y, 12, 'rgba(255,214,90,.95)', 2); for (const a of this.allies) this.disc(g, a.x, a.y, 10, 'rgba(150,110,255,.7)', 1.2); const tg = this.nearest(p); for (const f of this.foes) if (f.st !== 'down' && !f.enter) this.disc(g, f.x, f.y, f === tg ? 12 : 10, f === tg ? 'rgba(255,70,50,.95)' : 'rgba(255,90,70,.5)', f === tg ? 1.8 : 1); }
       if (p.open > 0) this.disc(g, p.x, p.y, 16, 'rgba(255,224,138,.9)', 2); if (p.fury >= 100 && !rm) this.disc(g, p.x, p.y, 20 + Math.sin(t * 9) * 2, 'rgba(255,120,40,.55)', 2); } });
@@ -3270,7 +3278,7 @@ const Brawl = {
     const p = this.p, t = this.t, bw = Math.min(104, Math.floor(W / 2) - 30), live = this.foes.filter(f => f.st !== 'down');
     const bar = (x, y, w, v, c1, c2, flip) => { g.fillStyle = '#0c0808'; g.fillRect(x - 1, y - 1, w + 2, 7); g.fillStyle = '#3a2a24'; g.fillRect(x, y, w, 5); const vw = Math.round(w * clamp(v, 0, 1)); g.fillStyle = c1; g.fillRect(flip ? x + w - vw : x, y, vw, 5); g.fillStyle = c2; g.fillRect(flip ? x + w - vw : x, y, vw, 1); g.fillStyle = '#c8a050'; g.fillRect(x - 1, y + 6, w + 2, 1); };
     g.fillStyle = '#0c0808'; g.fillRect(2, 2, 22, 22); g.drawImage(this.pb, 4, 4, 24, 24, 3, 3, 20, 20); g.strokeStyle = '#c8a050'; g.lineWidth = 1; g.strokeRect(2.5, 2.5, 21, 21);
-    bar(27, 4, bw, p.hp / p.max, p.hp / p.max < .34 ? '#c8452e' : '#ffb35a', '#ffe0a0'); ptext(g, 'KAEL', 27, 14, PAL.cream);
+    bar(27, 4, bw, p.hp / p.max, p.hp / p.max < .34 ? '#c8452e' : '#ffb35a', '#ffe0a0'); ptext(g, (this.def.hero && this.def.hero.name) || 'KAEL', 27, 14, PAL.cream);
     const full = p.fury >= 100; bar(27 + 22, 14, bw - 22, p.fury / 100, full ? (Math.floor(t * 8) % 2 ? '#ff5a2a' : '#ffb040') : '#a83a1e', '#ffb080');
     if (full && this.phase === 'fight' && !this.sup) { const s = Input.device === 'kb' ? 'HOLD E: ELEVEN' : Input.device === 'pad' ? 'HOLD X: ELEVEN' : 'HOLD A: ELEVEN'; ptext(g, s, 27, 24, Math.floor(t * 6) % 2 ? '#ffb040' : '#fff0b0'); }
     for (let i = 0; i < 3; i++) { g.fillStyle = i < p.gd ? '#9ac0ff' : '#2a2630'; g.fillRect(27 + 22 + i * 6, 20, 5, 2); }
@@ -3861,7 +3869,7 @@ const FF = {
   proctor: () => ({
     era: 3, newMove: 'NEW: SHAFT DROP - JUMP, THEN JUMP AGAIN', fin: { name: 'THE RECKONING', l1: 'THEY CAME DOWN TO COUNT US', l2: 'I AM STILL COUNTING', rgb: '255,240,200' }, title: 'THE PROCTOR', sub: 'HALDEN VOSS - NOBODY TOUCHES A PROCTOR', bg: 'storm', arena: FIELD, music: 'duel', rage: 3, legend: 1, skip: 1, winText: 'HE BLEEDS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['I GRADE YOU, BOY.', 'YOU WILL BE UNMADE FOR THIS.', 'WHAT ARE YOU?'] },
-    foes: [{ id: 'voss', name: 'Proctor Voss', kind: 'warden', hp: 130, sc: 1.28 }],
+    foes: [{ id: 'voss', name: 'Proctor Voss', kind: 'warden', hp: 130, sc: 1.28, k2: { slam: 1 } }],
     voice: { at: [[1, 'THE PROCTORS ARE MEANT TO WATCH. THIS ONE HAS BEEN SELLING OUR POSITIONS TO HOUSE TEAL.'], [14, 'HE FIGHTS LIKE A MAN WHO HAS ONLY EVER HIT PEOPLE WHO WERE NOT ALLOWED TO HIT BACK.'], [30, 'I KNOW THAT KIND OF MAN. I GREW UP UNDER THEIR BOOTS.']],
       hurt: 'A HALBERD. OF COURSE IT IS A HALBERD.', fury: 'ANGER IS FOR EQUALS, SHE TOLD ME. THEN LET US BE EQUALS.', half: 'HE LOOKS AT HIS OWN BLOOD AS IF IT WERE A CLERICAL ERROR.', eleven: 'ONE FOR EVERY SECOND. I HAVE PLENTY TO SPARE.' },
     arts: [{ at: .72, name: 'THE AUDIT', line: 'THEY CAME DOWN IN LIGHT TO COUNT US. TONIGHT I DO THE COUNTING.', panel: 'lift', kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }, { at: .36, name: 'BALANCED', line: 'SHE SAID "BALANCED" WHEN THE DOORS CLOSED. I HAVE CARRIED THE REMAINDER EVER SINCE.', panel: 'furnace', stage: 1, kind: 'rise', rgb: '255,90,30', hex: '#ff5a1e', dark: 'rgba(26,4,2,.82)' }],
@@ -3881,7 +3889,7 @@ const FF = {
     era: 5, newMove: 'NEW FINISHER: EVERY BREATH - IT REACHES THE WHOLE DECK', fin: { name: 'EVERY BREATH', l1: 'EVERY BREATH I TAKE IS HERS', l2: 'I SPEND THEM ALL HERE', rgb: '255,224,138', mode: 'all' }, boots: 1, lurch: 1, title: 'THE FALL', sub: 'THE SUN SPIRE - HOLD THE DECK UNTIL WE HIT', bg: 'fall', arena: FIELD, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Spire Guard', winText: 'THE DECK IS OURS', endAt: .25,
     hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 60 }, allies: V, shouts: ['BELOW!', 'WITH HIM!', 'FOR TIER SIX!'], taunt: { 0: ['HE IS SOOT!', 'CUT THE LINES!', 'BRING IT DOWN!'] },
     waves: [[{ id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }],
-      [{ id: 'cade', name: 'Marshal Cade', kind: 'captain', hp: 150, sc: 1.25 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }]],
+      [{ id: 'cade', name: 'Marshal Cade', kind: 'captain', hp: 150, sc: 1.25, k2: { line: 1 } }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }]],
     onWave: (w, B) => { B.p.fury = 100; B.say('FURY', true); B.voice('fury'); },
     voice: { at: [[1, 'NINE YEARS AGO I KNELT WHEN THEY CAME DOWN IN LIGHT. TODAY WE ARE THE ONES COMING DOWN.'], [10, 'FOUR HUNDRED BARGES. EVERY ONE OF THEM FLOWN BY SOMEBODY WHO WAS BORN OWING AIR.'], [20, 'THE SPIRE IS WHERE THEY KEEP THE COUNT. I HAVE COME TO CLOSE THE LEDGER.'], [32, 'MARA IS ON THE NEXT BARGE OVER. SHE SAID SHE WOULD NOT MISS THIS IF IT KILLED HER. IT MIGHT.']],
       hurt: 'I HAVE BEEN CUT BY BETTER. I MARRIED BETTER.', fury: 'IT NEVER WENT OUT. I ONLY LEARNED TO AIM IT.', wave: 'CADE. HE SIGNED THE FURNACE ORDER FOR TIER FOUR.', half: 'HE KEEPS LOOKING AT THE SPIRE. NOBODY IS COMING OUT OF IT FOR HIM.', eleven: 'ELEVEN SECONDS. I HAVE MADE AN ARMY OUT OF THEM.' },
@@ -3992,6 +4000,10 @@ const DREAM2 = () => [
   { narr: 'That is why I am up here. I did not come to win their game. I came to be handed the keys.' },
   { narr: 'Lucan Aurel holds the keep. Her son. If I put him on his knees in front of her, she will have to pin the gold on me herself.' },
   { narr: 'She sat across a white room from me twice a week for half a year. She will look straight at what Ilse made of me and see one of her own.' },
+  { fade: 'out' }, { panel: 'ledger' }, { fade: 'in', spd: 1.2 }, { wait: 0.6 }, { sfx: 'heart' },
+  { narr: 'And for one breath the dream slips further. A book as wide as a table. Columns of names. A pen in my hand, and gold on my cuff.' },
+  { pstage: 1 }, { wait: 1.4 },
+  { narr: 'I do not know yet what the red lines mean. I know my hand is very steady, and that I hate it.' },
   { fade: 'out' }, { panel: null }
 ];
 const DREAM3 = () => [
@@ -4568,6 +4580,10 @@ const DREAM4 = () => [
   { narr: 'That night they seal us in by twos. You have seen what I did in that room.' },
   { pstage: 1 }, { wait: 1 },
   { narr: 'After that it is forty days of taking the valley one standard at a time. I am good at it. That is the part I did not expect, and do not like.' },
+  { fade: 'out' }, { panel: 'ante' }, { pstage: 5 }, { fade: 'in', spd: 1.2 }, { wait: 0.6 }, { music: 'hum' },
+  { narr: 'Further still. The white room again, years on. A wheel under my hands. I am humming, and I do not know it, and across the room a cup stops halfway to her mouth.' },
+  { music: null }, { sfx: 'heart' }, { wait: 1 },
+  { narr: 'I wake before I see what she does.' }, { music: 'mystery' },
   { fade: 'out' }, { panel: null },
   { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. Day twenty-six.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.twins() },
   { card: 'FOUR YEARS EARLIER', sub: 'Cinderwell. Under the floor.', big: 1, min: 1.4, max: 4 }
@@ -4678,7 +4694,7 @@ FF.blade = () => ({
   era: 4, boots: 1, title: 'THE PINNING', sub: 'THE AUDITOR\'S BLADE - HER OWN CHAMPION', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, winText: 'PIN IT ON HIM',
   newMove: 'THE BOOTS: HOLD JUMP TO FLY. HE HAS THEM TOO.', fin: { name: 'IRON SKY', l1: 'SHE WANTED TO SEE WHAT I WAS', l2: 'I SHOWED HER MOST OF IT', rgb: '140,220,255', mode: 'sky' },
   hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['YOU WERE NOT RAISED TO THIS.', 'I CAN SMELL THE EFFORT.', 'WHO TAUGHT YOU THAT?'] },
-  foes: [{ id: 'voss', name: 'The Auditor\'s Blade', kind: 'duelist', hp: 150, sc: 1.22 }],
+  foes: [{ id: 'voss', name: 'The Auditor\'s Blade', kind: 'duelist', hp: 150, sc: 1.22, k2: { slam: 1 } }],
   voice: { at: [[1, 'I PUT HER SON ON HIS KNEES. SHE SMILED, AND SENT HER OWN CHAMPION DOWN THE STEPS. ONE MORE, SHE SAID. FOR MY CURIOSITY.'], [13, 'HE HAS KILLED FOR HER FOR THIRTY YEARS. HE DOES IT THE WAY I USED TO CHANGE A SEAL.'], [27, 'SHE IS LEANING FORWARD. I HAVE SEEN THAT LOOK. SHE HAD IT AT THE FURNACE.']],
     hurt: 'HE CUTS WHERE THE WIRE WENT IN. HE CAN SEE IT. SHE CANNOT.', fury: 'NOT ALL OF IT. NOT IN FRONT OF HER. ENOUGH.', half: 'HE HAS REALISED I AM NOT WHAT IS WRITTEN ON MY PAPERS. HE CANNOT WORK OUT WHAT I AM INSTEAD.', eleven: 'ELEVEN. SHE COUNTS THEM TOO. SHE DOES NOT KNOW WHY THERE ARE ELEVEN.' },
   arts: [{ at: .68, name: 'LITTLE EMBER', line: 'SHE CALLED SEREN LITTLE EMBER. SHE IS ABOUT TO PIN GOLD ON WHAT THE EMBER LIT.', panel: 'furnace', stage: 0, kind: 'rise', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }, { at: .32, name: 'THE WINDOW', line: 'SHE SHOWED ME THE SKY ONCE TO TEACH ME MY PLACE. I HAVE BEEN STANDING UNDER IT FOR FORTY DAYS.', panel: 'ante', stage: 2, kind: 'storm', rgb: '140,200,255', hex: '#8cc8ff' }],
@@ -4780,7 +4796,7 @@ function afterDay(n, sv) { G.mode = 'dayend'; UI.push(modal({ clear: true, onBac
 // SOOTBORN — Part Two: ABOVE. Five chapters from the Pinning to the end. Told straight; the memories now run backward.
 const P2F = k => G.flags[k];
 FF.gallery = () => ({
-  era: 5, boots: 1, title: 'THE GALLERY', sub: 'TYR CADE - A MATTER OF HIS UNCLE\'S HONOUR', bg: 'hall', arena: { kind: 'ring', rx: 96, ry: 58 }, music: 'duel', rage: 2, legend: 1, skip: 1, winText: 'NOTED',
+  era: 5, boots: 1, newMove: 'NEW: THE COUNT - ELEVEN HITS ON ONE MAN AND HIS LINE IS STRUCK', title: 'THE GALLERY', sub: 'TYR CADE - A MATTER OF HIS UNCLE\'S HONOUR', bg: 'hall', arena: { kind: 'ring', rx: 96, ry: 58 }, music: 'duel', rage: 2, legend: 1, skip: 1, winText: 'NOTED',
   fin: { name: 'NOTED', l1: 'I HAVE LEARNED THEIR WORD FOR IT', l2: 'IT MEANS: I WILL REMEMBER THIS', rgb: '255,240,200' },
   hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 30 }, taunt: { 0: ['SORREL. WHO ARE THE SORRELS?', 'YOU FIGHT LIKE A LABOURER.', 'MY UNCLE WILL HEAR OF THIS.'] },
   foes: [{ id: 'tyr', name: 'Tyr Cade', kind: 'duelist', hp: 120, sc: 1.1 }],
@@ -4814,7 +4830,7 @@ FF.son = () => { const friend = !!P2F('lucanFriend'); return {
   era: 5, boots: 1, title: 'THE SON', sub: 'LUCAN AUREL - HIS MOTHER HAS TOLD HIM', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, endAt: friend ? .5 : .2, winText: friend ? 'HE LOWERS IT' : 'HE FALLS',
   fin: { name: 'ONE DOES NOT', l1: 'ONE DOES NOT KNEEL. ONE IS NOT SORRY.', l2: 'I AM SORRY, LUCAN', rgb: '255,240,200' },
   hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 40 }, taunt: { 0: friend ? ['SAY IT IS NOT TRUE.', 'YOU SAT AT MY TABLE.', 'WAS ANY OF IT REAL?'] : ['SOOT. ALL THIS TIME.', 'SHE WAS RIGHT ABOUT YOU.', 'I SHOULD HAVE KNOWN AT THE KEEP.'] },
-  foes: [{ id: 'lucan', name: 'Lucan Aurel', kind: 'duelist', hp: 170, sc: 1.1 }],
+  foes: [{ id: 'lucan', name: 'Lucan Aurel', kind: 'duelist', hp: 170, sc: 1.1, k2: { line: 1 } }],
   voice: { at: [[1, friend ? 'SIX YEARS FROM NOW. HE WAS THE ONLY ONE ON THE SPIRE WHO EVER ASKED ME A QUESTION AND WAITED FOR THE ANSWER.' : 'SIX YEARS FROM NOW. I KEPT HIM AT ARM\'S LENGTH FOR TWO YEARS. IT HAS NOT MADE THIS EASIER.'], [13, 'HE IS BETTER THAN HE WAS AT THE KEEP. HE PRACTISED. BECAUSE OF ME.'], [26, 'HIS MOTHER BURNED MY WIFE. HE WAS FOURTEEN AND HAD NEVER HEARD OF CINDERWELL. I KEEP HAVING TO SAY THAT TO MYSELF.']],
     hurt: 'HE MEANS IT THIS TIME.', fury: 'NOT AT HIM. IT WAS NEVER FOR HIM.', half: friend ? 'HE IS CRYING. I DID NOT KNOW THEY COULD.' : 'HE WANTS ME TO BE A MONSTER. IT WOULD BE SIMPLER FOR BOTH OF US.', eleven: 'ELEVEN. I PULL THE LAST ONE.' },
   arts: [{ at: .75, name: 'HER CHIN', line: 'HER CHIN. HER HANDS. HER WAY OF LOOKING PAST YOU. AND NONE OF WHAT SHE DID WITH THEM.', panel: 'ante', stage: 1, kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }],
@@ -4829,7 +4845,7 @@ FF.son = () => { const friend = !!P2F('lucanFriend'); return {
     { d: 3.0, cam: [0, 150, 60, 150, .3], to: [0, 250, 170, 150, .16], acts: [{ id: 'kael2', a: [-10, 2], blade: 1 }], cap: 'I HAD A YEAR, PERHAPS, BEFORE HE COULD WALK. I USED IT.' }
   ] }; };
 FF.stair = () => ({
-  era: 5, boots: 1, title: 'THE STAIR', sub: 'THE SUN SPIRE - NINE HUNDRED STEPS TO THE COUNT', bg: 'stair', arena: { kind: 'rect', w: 220, h: 100 }, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Spire Guard', winText: 'UP',
+  era: 6, boots: 1, newMove: 'NEW: THE SHIFT SONG - GUARD + HOOK HEALS YOU AND YOURS', title: 'THE STAIR', sub: 'THE SUN SPIRE - NINE HUNDRED STEPS TO THE COUNT', bg: 'stair', arena: { kind: 'rect', w: 220, h: 100 }, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Spire Guard', winText: 'UP',
   fin: { name: 'EVERY BREATH', l1: 'EVERY BREATH I TAKE IS HERS', l2: 'I HAVE NINE HUNDRED STEPS OF THEM', rgb: '255,224,138', mode: 'all' },
   hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 80 }, allies: V, shouts: ['UP!', 'BELOW!', 'DON\'T STOP!'], taunt: { 0: ['HOLD THE LANDING!', 'HE IS ONE MAN!', 'FOR THE AUDITOR!'] },
   waves: [[{ id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 10 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 10 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 10 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 10 }],
@@ -4850,9 +4866,10 @@ FF.stair = () => ({
   ]
 });
 FF.ember = () => ({
-  era: 5, boots: 1, title: 'LITTLE EMBER', sub: 'CELESTINE AUREL - THE HIGH AUDITOR', bg: 'crown', arena: { kind: 'rect', w: 220, h: 100 }, music: 'final', rage: 3, legend: 1, skip: 1, endAt: .08, winText: 'BALANCED',
+  era: 6, boots: 1, title: 'LITTLE EMBER', sub: 'CELESTINE AUREL - THE HIGH AUDITOR', bg: 'crown', arena: { kind: 'rect', w: 220, h: 100 }, music: 'final', rage: 3, legend: 1, skip: 1, endAt: .08, winText: 'BALANCED',
   hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 60 }, taunt: { 0: ['THERE YOU ARE, TECHNICIAN.', 'I KEPT THE COUNT. SOMEBODY HAD TO.', 'SHE WAS QUICKER THAN YOU.', 'AND WHO WILL RATION IT WHEN I AM GONE?'] },
-  foes: [{ id: 'celf', name: 'Celestine Aurel', kind: 'duelist', hp: 230, sc: 1.18 }],
+  foes: [{ id: 'celf', name: 'Celestine Aurel', kind: 'duelist', hp: 230, sc: 1.18, k2: { line: 1, slam: 1, triple: 1 } }],
+  newMove: 'SHE STRIKES A LINE ACROSS THE FLOOR: JUMP IT. SHE DROPS FROM ABOVE: MOVE.',
   voice: { at: [[1, 'SHE IS SEVENTY. SHE HAS WORN THE BOOTS SINCE SHE WAS TWELVE. NOBODY TOLD ME SHE COULD FIGHT. NOBODY WHO KNEW WAS STILL ALIVE.'], [14, 'SHE IS NOT ANGRY. THAT IS THE WORST OF IT. SHE HAS NEVER ONCE BEEN ANGRY AT US. WE WERE A COLUMN THAT HAD TO ADD UP.'], [28, 'THE WINDOW IS BEHIND HER. THE REAL SKY. SHE KEPT IT IN ONE ROOM FOR FIFTY YEARS.'], [42, 'SEREN. I AM NEARLY DONE.']],
     hurt: 'SHE CUTS LIKE SHE SIGNS. ONCE, AND NEATLY.', fury: 'THIS IS WHAT YOU LIT. LOOK AT IT.', half: 'SHE HAS STOPPED CALLING ME TECHNICIAN.', eleven: 'ONE FOR EVERY SECOND THE DOORS STOOD OPEN. I HAVE CARRIED THEM NINE YEARS. THEY ARE YOURS.' },
   arts: [{ at: .82, name: 'THE WASHER', line: 'SHE WORE A WASHER FOR A WEDDING RING. THREE WEEKS OF MY LUNCH BREAKS. IT IS UNDER THIS ARMOUR NOW.', panel: 'hands', kind: 'rise', rgb: '255,210,110', hex: '#ffd26e' }, { at: .6, name: 'RATION AIR', line: 'WE BLED YOUR AIR INTO A FEVER WARD. FORTY CHILDREN BREATHED. THAT WAS THE WHOLE CRIME.', panel: 'ward', stage: 1, kind: 'storm', rgb: '160,220,255', hex: '#a0dcff' }, { at: .38, name: 'THE SHIFT SONG', line: 'YOU PUT OUR SONG ON YOUR SPEAKERS SO IT WOULD MEAN THE FURNACE. LISTEN. THEY ARE HUMMING IT ON YOUR STAIR.', panel: 'pipe', kind: 'storm', rgb: '255,170,70', hex: '#ffaa46' }, { at: .18, name: 'ELEVEN SECONDS', line: 'YOU HELD THE DOORS OPEN FOR ELEVEN SECONDS SO THE WHOLE TIER COULD WATCH HER WALK. I COUNTED. I HAVE NEVER STOPPED.', panel: 'furnace', stage: 2, kind: 'rise', rgb: '255,90,30', hex: '#ff5a1e', dark: 'rgba(26,4,2,.85)' }],
@@ -4869,8 +4886,19 @@ FF.ember = () => ({
   ]
 });
 // the Fall, when it is no longer a dream
-FF.fall2 = () => { const d = FF.fall(); d.intro = d.intro.slice(); d.intro[0] = { d: 2.8, black: 1, big: 'THE FALL', cap: 'NINE YEARS. FOUR HUNDRED BARGES. ONE MORNING.' }; d.intro[1] = Object.assign({}, d.intro[1], { big: '' });
+FF.fall2 = () => { const d = FF.fall(); d.era = 6; d.intro = d.intro.slice(); d.intro[0] = { d: 2.8, black: 1, big: 'THE FALL', cap: 'NINE YEARS. FOUR HUNDRED BARGES. ONE MORNING.' }; d.intro[1] = Object.assign({}, d.intro[1], { big: '' });
   d.outro = d.outro.slice(0, 2).concat([{ d: 3.0, black: 1, big: 'WE HIT.', cap: 'HALF OF US WALKED AWAY FROM IT. THAT WAS BETTER THAN ILSE\'S ARITHMETIC.' }]); d.voice = Object.assign({}, d.voice, { at: [[1, 'NINE YEARS AGO I KNELT WHEN THEY CAME DOWN IN LIGHT. TODAY WE ARE THE ONES COMING DOWN.'], [10, 'FOUR HUNDRED BARGES. EVERY ONE OF THEM FLOWN BY SOMEBODY WHO WAS BORN OWING AIR.'], [20, 'CADE SIGNED TIER FOUR AWAY WITH ONE LINE. I HAVE THE PEN HE USED. I TOOK IT FROM MY OWN DESK.'], [32, 'MARA IS ON THE NEXT BARGE OVER. SHE SAID SHE WOULD NOT MISS THIS IF IT KILLED HER. IT MIGHT.']] }); return d; };
+// meanwhile, six tiers down: you play Mara
+FF.stand = () => ({
+  era: 0, title: 'TIER SIX STANDS', sub: 'MARA VENN - A COMMITMENT AT BAY THREE', bg: 'furnace', arena: { kind: 'rect', w: 200, h: 80 }, music: 'work', legend: 1, skip: 1, foeName: 'Warden', winText: 'NOBODY KNEELS',
+  fin: { name: 'TWO TINS', l1: 'ONE FOR SEREN. ONE FOR KAEL.', l2: 'THERE WILL NOT BE A THIRD', rgb: '255,120,40' },
+  hero: { id: 'mara', name: 'MARA', hp: 11, pow: 2, fury0: 60 }, allies: ['hollis', 'ivo'], shouts: ['UP! ALL OF YOU, UP!', 'WITH MARA!', 'HUM IT!'], taunt: { 0: ['KNEEL.', 'GRATITUDE IS BREATH.', 'YOU ARE OWED TO THE FURNACE.'] },
+  waves: [[{ id: 'warden', name: 'Warden', kind: 'baton', hp: 22, sc: 1.1 }, { id: 'watchman', name: 'Night Watch', kind: 'quick', hp: 9 }], [{ id: 'warden', name: 'Warden', kind: 'baton', hp: 26, sc: 1.1 }, { id: 'warden', name: 'Warden', kind: 'heavy', hp: 30, sc: 1.15 }, { id: 'proctor', name: 'Proctor Sull', kind: 'quick', hp: 14 }]],
+  onWave: (w, B) => { B.p.fury = 100; B.say('THE WHOLE ROW IS STANDING', true); },
+  voice: { at: [[1, 'I AM SIXTY-ONE. I HAVE KNELT AT FORTY-FOUR COMMITMENTS. I COUNTED. HE GETS THAT FROM ME.'], [11, 'THEY WERE GOING TO PUT A BOY OF NINE THROUGH THAT DOOR FOR HIS MOTHER\'S DEBT.'], [22, 'I HAVE TWO TINS ON MY SHELF AND ONE OF THEM IS EMPTY. I AM NOT STARTING A THIRD.']],
+    hurt: 'I HAVE HAD WORSE FROM A VALVE WHEEL.', fury: 'BE TOO MUCH FOR THEM. SHE WAS NOT ONLY TALKING TO HIM.', wave: 'MORE OF THEM. GOOD. LET THEM COUNT US.', half: 'HOLLIS HAS BOTH ARMS UP. I DID NOT KNOW HE COULD.', eleven: 'I KNOW HIS NUMBER. I TAUGHT HIM TO COUNT.' },
+  arts: [{ on: 'start', after: 5, name: 'FORTY-FOUR', line: 'FORTY-FOUR TIMES I KNELT AND WATCHED THE DOORS CLOSE ON SOMEBODY I KNEW. I AM DONE KNEELING.', panel: 'furnace', stage: 2, kind: 'storm', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }, { on: 'wave', name: 'THE SHELF', line: 'A TIN FOR SEREN. A TIN FOR KAEL, WITH NOTHING IN IT. I DUST THEM ON REST DAYS.', panel: 'tin', kind: 'rise', rgb: '255,210,110', hex: '#ffd26e' }]
+});
 // ------------------------------------------------------------------ the chapters
 const P2 = {
   1: () => [
@@ -4943,7 +4971,11 @@ const P2 = {
     { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'Brand held the dock stair behind us while we cut the last moorings. Alone, for eleven minutes. Somebody timed it. I asked them to.' },
     { narr: 'We hid four hundred barges in the weather for two years. The Unlit came up in ones and twos through Riser Nine and learned to fly them. Valve techs. Welders. A noodle seller.' },
-    { say: 'dace', t: 'Tier Six stopped kneeling in the spring. Mara did it. She stood up at a commitment and the whole row stood up behind her and the Wardens found they did not have enough halberds.' },
+    { say: 'dace', t: 'Tier Six stopped kneeling in the spring. Mara did it. I was not there. I am told it went like this.' },
+    { fade: 'out' }, { panel: null }, { card: 'MEANWHILE', sub: 'Six tiers down. Bay Three. A commitment.', big: 1, min: 1.5, max: 4.5 },
+    { brawl: () => FF.stand() },
+    { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
+    { say: 'dace', t: 'She stood up, and the whole row stood up behind her, and the Wardens found they did not have enough halberds. The boy is on the wheel with Tavi now.' },
     { say: 'dace', t: 'Tavi is coming up. Sixteen. Don\'t give me that look, I am only the messenger. Mara says you were younger when you married.' },
     { fade: 'out' }, { panel: 'gild' }, { pstage: 3 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { say: 'ilse', t: 'When you stand in front of her, soot, you will want to use the words I taught you. Do not. Use your own. That is the only thing she has never heard.' },
@@ -5243,7 +5275,7 @@ const Menus = {
       ['Day 4 · the months, Mara, the way out, Ilse (no fights)', cs(DAY4)], ['Film · The Standard', film('twins')], ['Film · The Pinning', film('blade')], ['Film · The High Docks', film('docks')],
       ['Film · The Valley', film('valley')], ['Film · The Pairing', film('pairing')], ['Film · The Ford', film('ford')], ['Film · The Proctor', film('proctor')], ['Film · The Keep', film('keep')], ['Film · The Fall', film('fall')]
     ];
-    S['Fights'].splice(S['Fights'].length - 1, 0, ['Part Two · The Gallery · Tyr Cade', ff('PART TWO', 'The Sun Spire.', 'gallery')], ['Part Two · Riser Nine · the balancing of Tier Four', ff('PART TWO', 'Five years from now.', 'riser')], ['Part Two · The Son · Lucan Aurel again', ff('PART TWO', 'Six years from now.', 'son')], ['Part Two · The Stair · up the Spire', ff('PART TWO', 'Nine years from now.', 'stair')], ['Part Two · Little Ember · Celestine (final)', ff('PART TWO', 'The top of the Spire.', 'ember')]);
+    S['Fights'].splice(S['Fights'].length - 1, 0, ['Part Two · The Gallery · Tyr Cade', ff('PART TWO', 'The Sun Spire.', 'gallery')], ['Part Two · Riser Nine · the balancing of Tier Four', ff('PART TWO', 'Five years from now.', 'riser')], ['Part Two · The Son · Lucan Aurel again', ff('PART TWO', 'Six years from now.', 'son')], ['Part Two · Tier Six Stands · you play Mara (2D)', ff('MEANWHILE', 'Six tiers down.', 'stand')], ['Part Two · The Stair · up the Spire', ff('PART TWO', 'Nine years from now.', 'stair')], ['Part Two · Little Ember · Celestine (final)', ff('PART TWO', 'The top of the Spire.', 'ember')]);
     for (let n = 1; n <= 5; n++) { S['Story beats'].push([`Part Two · ${n} · ${P2_TITLES[n]}`, () => playPart2(n)]); S['Cutscenes'].push([`Part Two · ${n} · ${P2_TITLES[n]} (no fights)`, cs(P2[n])]); }
     S['Cutscenes'].push(['Film · The Gallery', film('gallery')], ['Film · Riser Nine', film('riser')], ['Film · The Son', film('son')], ['Film · The Stair', film('stair')], ['Film · Little Ember', film('ember')]);
     const sub = k => () => UI.push(modal({ title: k, items: S[k].map(([label, act]) => ({ label, act })).concat([{ label: 'Back', act: () => UI.pop() }]) }));
@@ -5286,7 +5318,7 @@ const Menus = {
     ] }));
   },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.18): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.19): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));

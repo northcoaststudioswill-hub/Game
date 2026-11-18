@@ -1,5 +1,27 @@
 # SOOTBORN — changelog
 
+## v0.19 · 2026-11-18 — bosses with their own moves, the Count, Mara's fight, glimpses ahead
+From play notes: keep adding content, fights, new moves that fit the story, more scenes, and flash-forwards in the first part.
+
+**Boss attacks** (the named enemies no longer all fight the same way)
+- **The long cut**: a red line drawn the whole length of the arena, then a cut along it. Jump it. Used by Marshal Cade, Lucan in Part Two, and Celestine ("STRUCK.").
+- **The drop**: the enemy rises on boots, a red circle follows you and then locks, and they come down on it. Move. Used by Proctor Voss, the Auditor's Blade, and Celestine ("BALANCED."), more often when they are below half health.
+- Celestine has both, the duelist's blink, and strings three cuts together. Her fight opens with a tip saying how to read them.
+
+**New moves, earned in the story**
+- **The Count** (from the Spire onward, when Kael is the Clerk): every hit on the same enemy is tallied above their head, THREE, FOUR, FIVE. Reach ELEVEN without letting three seconds pass and the line is struck: BALANCED, a heavy burst of damage. Guards interrupt it, so kick the guard open.
+- **The shift song** (from the Fall onward, when there is an army to sing it): the roar now also heals Kael and his allies.
+
+**New fight: Tier Six Stands** (Part Two, chapter 4). You play **Mara**, sixty-one, in the Bay Three furnace bay, at a commitment for a nine-year-old. 2D, fists, Hollis and Ivo beside her, two waves ending with a heavy Warden and Proctor Sull. Her own narration, two Memory Arts (FORTY-FOUR, THE SHELF), and her own finisher (TWO TINS).
+
+**Flash-forwards in Part One**
+- End of Day 2: after the Assay is explained, the dream slips further for a moment to a book as wide as a table and a pen in a gilded hand.
+- End of Day 3: the white room years on, a wheel under his hands, humming, a cup stopping halfway. He wakes before he sees what she does.
+
+**Fixes:** the fight HUD can show a hero name other than Kael.
+
+**Checked:** each boss attack hits when ignored and misses when jumped or left; the shift song heals; Mara's fight starts in 2D with her name on the bar. Not played by a person.
+
 ## v0.18 · 2026-11-18 — Part Two quality pass
 From play notes: bring Part Two closer to the first half: looks, story beats, cutscenes, drama, rage, music, emotion, fights.
 

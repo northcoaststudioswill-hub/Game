@@ -148,6 +148,9 @@ The game tells two halves at once: the present below, and the years after, seen 
 ### How Kael fights (v0.12.9)
 Nothing clean about it. The Accredited are taught forms; he was taught by a furnace. He kicks, jumps on people, drags them in with the rigging line he used on the valve banks, and parries because he has no patience for blocking. Moves: strike chain, heavy, kick (guard break, launcher), jump with air cuts, dive kick, plunge, dodge, guard and parry, hook line, ELEVEN. Signatures (v0.13): Breach, Shaft Drop (he came up a lift shaft; he comes down like one), Wide Cut, headbutt and throw, the roar, riposte. Assay fights can be lost: one second wind, then the fight restarts slightly easier.
 
+### Later eras (v0.19)
+era 5 (the Spire onward): + the Count (eleven tallied hits on one enemy strikes their line). era 6 (the Fall onward): the roar becomes the shift song and heals. Boss attacks: the long cut (`k2.line`, jump it) and the drop (`k2.slam`, move). Mara is playable once (Tier Six Stands): 61, has knelt at forty-four commitments, keeps two tins.
+
 ### What he knows, by era (v0.15)
 era 0 below: fists, kicks, boot, guard/parry, hook, headbutt, roar · era 1 training: + ram, Wide Cut · era 2 early Assay: + Breach · era 3 late Assay: + Shaft Drop · era 4 last day: + boots · era 5 the Fall: everything. Finishers: ELEVEN, BANKED, THE CROSSING, THE RECKONING, IRON SKY, EVERY BREATH. New fights should set `era`, `newMove` and `fin`.
 
