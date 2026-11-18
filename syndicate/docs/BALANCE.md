@@ -35,3 +35,13 @@ Report: too easy; early bouts won in seconds by mashing, without being hit.
 - Opponents react about 18% faster and press more.
 - Named fighters: health multipliers 1.4 / 1.32 / 1.3 / 1.28 / 1.16 and damage 1.22 / 1.3 / 1.34 / 1.34 / 1.2 over their base. Undercard fighters scale from those.
 - In simulation a first undercard bout now takes the bot 14 to 27 seconds (it was about 12, and a couple of seconds by hand). Melee classes still win most bouts with half their health or more; casters lose some early bouts, so Sorcerers and Warlocks start with a second potion.
+
+## The gear race
+
+Request: a fighter who never upgrades should lose to opponents who did, without the game becoming unfair to one who keeps pace.
+
+- The Fence now sells **five grades** of steel and of armour (110, 240, 380, 600, 900 coin each). Steel: +2/+4/+5/+6/+7 weapon damage and +6% all damage per grade. Armour: 8/15/22/28/34% less damage taken.
+- **Opponents carry gear for their place on the Ledger**: undercard tiers grades 0 to 4, the five names grades 1 to 5, challengers and the Long Stair grade 5.
+- The named fighters' flat health and damage multipliers were cut to make room: health 1.34/1.24/1.2/1.14/1.0, damage 1.12/1.16/1.16/1.12/1.0.
+- Simulated against the five names (even gear / one grade behind / never upgraded), win rates by the bot: Sister Maul 60-100 / 20-100 / 100; Kessa 100 / 100 / 80-100; Brakk 80-100 / 80-100 / 0-100; Vexa 40-80 / 20-60 / 0.
+- The card before a bout shows their steel and armour against yours, and the line at the top warns when you are two grades behind.

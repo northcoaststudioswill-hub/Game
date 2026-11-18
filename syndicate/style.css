@@ -609,3 +609,8 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 
 /* ---------- hold to skip ---------- */
 .c-skip { min-width: 9.5rem; transition: color 0.1s; touch-action: none; -webkit-user-select: none; user-select: none; }
+
+/* ---------- the arms race: their gear against yours ---------- */
+.gearcmp { display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem 0.8rem; margin: 0.5rem 0; padding: 0.5rem 0.7rem; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.3rem; background: rgba(0, 0, 0, 0.28); }
+.gearcmp small { display: block; font-family: var(--display); font-size: 0.58rem; letter-spacing: 0.1em; color: var(--dim); margin-top: 0.15rem; } .gearcmp b { font-size: 0.86rem; font-weight: 600; color: #e6d8b0; } .gearcmp b.low { color: #ff8a6a; }
+.gearcmp p { grid-column: 1 / -1; margin: 0.3rem 0 0; font-size: 0.82rem; color: var(--dim); } .gearcmp.warn { border-color: #c9a040; } .gearcmp.bad { border-color: #c8372d; background: rgba(90, 16, 12, 0.3); } .gearcmp.bad p { color: #ff9a8a; }

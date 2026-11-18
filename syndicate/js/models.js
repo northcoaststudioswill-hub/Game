@@ -251,6 +251,7 @@
       }
       if (p.tired && (act === 'idle' || act === 'cheer')) { q.bx += 0.2 + Math.sin(t * 5) * 0.04; q.hx = 0.25; q.by -= 0.04 + Math.abs(Math.sin(t * 2.5)) * 0.02; q.arx += 0.3; }
       if (p.wounded && (act === 'idle') && !p.guard) { q.alx = -0.95; q.alz = -0.75; q.bx += 0.14; q.bz += 0.07; q.hx = 0.12; q.by -= 0.03; if (mv) { q.lr *= 0.55; q.by += Math.abs(Math.sin(p.walk)) * 0.05; } }      // a hand pressed to the wound, and a limp
+      if (p.crawl && act !== 'ko') { const c = Math.sin(mv ? p.walk * 1.3 : t * 1.4), reach = act === 'swing' ? Math.sin(k * Math.PI) : 0; q.bx = 1.36; q.by = 0.1; q.bpz = -0.45; q.bz = c * 0.07; q.tz = c * 0.1; q.hx = -1.05; q.arx = -2.55 + c * 0.75 - reach * 0.5; q.alx = -2.55 - c * 0.75; q.arz = 0.25; q.alz = -0.25; q.ll = 0.12; q.lr = -0.08; q.cape = 0.05; snap = 0.5; }      // on the belly, hauling forward on the arms
       if (p.hop) { q.bz += 0.16; q.tz -= 0.1; q.by += mv ? Math.abs(Math.sin(p.walk)) * 0.14 : Math.abs(Math.sin(t * 3)) * 0.02; q.lr = mv ? Math.sin(p.walk * 2) * 0.4 : 0; q.arx -= 0.3; }
       if (p.guard) { q.alx = -1.55; q.alz = -0.55; q.arx = -1.25; q.arz = 0.45; q.bx = 0.14; q.by = -0.05; snap = 0.5; }
       if (p.hurt > 0 && !(prevHurt > 0)) side = -side; prevHurt = p.hurt || 0;

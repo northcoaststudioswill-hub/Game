@@ -301,3 +301,8 @@ The Fence, Mark, the Apothecary, Big Hobb, the charm seller, Whisper and the Bus
 - **The intro is skipped by holding:** hold the Skip button on a phone, hold (A) or Start on a controller, or hold Space, Enter or Esc, for about a second. A progress bar fills on the button; letting go resets it. A single tap or click no longer skips.
 - **Seven mortal blows per class (42).** The twelve new ones use the fighters' bodies: a beheading where the headless body stands, and you boot it across the sand; a trip and a stomp; a body thrown the width of the pit; cut in two halves; taken apart limb by limb in the air; frozen and shattered; folded down to nothing. New poses: kick, stomp, hoist.
 - Existing beheadings now leave the body standing for a moment before it topples. The finisher camera is closer, with a flash on the killing blow.
+
+## Crawling, and the gear race (`js/armsrace.js`, fight engine)
+
+- **Dismemberment goes further.** Heavy blows take the off-hand arm under half health, one leg under a third, and the other leg under a fifth. With both legs gone an opponent crawls: slow, unable to dodge, hitting for less, leaving a trail. Only opponents can be dismembered.
+- **Five grades of steel and armour** at the Fence, and every opponent is equipped for their place on the Ledger. The pre-fight card compares theirs with yours; fall two grades behind and the top line tells you what to buy.

@@ -7,7 +7,7 @@
 
   // ------------------------------------------------------------ a longer ladder
   // the named five are stronger now: you reach them with more levels behind you
-  { const LV = [1, 3, 5, 6, 8], HP = [1.4, 1.32, 1.3, 1.28, 1.16], DM = [1.22, 1.3, 1.34, 1.34, 1.2], GD = [0.3, 0.4, 0.3, 0.6, 0.45], PR = [0.06, 0.12, 0.1, 0.2, 0.28], AG = [0.62, 0.66, 0.7, 0.74, 0.82]; GATES.forEach((o, i) => { o.level = LV[i]; o.hpMul = +(o.hpMul * HP[i]).toFixed(2); o.dmgMul = +(o.dmgMul * DM[i]).toFixed(2); o.ai = Object.assign({}, o.ai, { react: +(o.ai.react * 0.82).toFixed(2), aggro: Math.max(o.ai.aggro, AG[i]), guard: GD[i], parry: PR[i] }); o.respect0 = o.respect; o.respect = Math.round(o.respect * 0.55); }); }   // respect is spread over four times as many bouts
+  { const LV = [1, 3, 5, 6, 8], HP = [1.34, 1.24, 1.2, 1.14, 1.0], DM = [1.12, 1.16, 1.16, 1.12, 1.0], GD = [0.3, 0.4, 0.3, 0.6, 0.45], PR = [0.06, 0.12, 0.1, 0.2, 0.28], AG = [0.62, 0.66, 0.7, 0.74, 0.82]; GATES.forEach((o, i) => { o.level = LV[i]; o.hpMul = +(o.hpMul * HP[i]).toFixed(2); o.dmgMul = +(o.dmgMul * DM[i]).toFixed(2); o.ai = Object.assign({}, o.ai, { react: +(o.ai.react * 0.82).toFixed(2), aggro: Math.max(o.ai.aggro, AG[i]), guard: GD[i], parry: PR[i] }); o.respect0 = o.respect; o.respect = Math.round(o.respect * 0.55); }); }   // respect is spread over four times as many bouts
 
   const rng = seed => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   const FIRST = ['Tam', 'Odger', 'Nell', 'Brisk', 'Hob', 'Cray', 'Wenna', 'Stitch', 'Lodd', 'Marnie', 'Pike', 'Sorrel', 'Duff', 'Ketch', 'Jory', 'Mab', 'Crick', 'Tansy', 'Garl', 'Ibb', 'Roon', 'Hesper'];
