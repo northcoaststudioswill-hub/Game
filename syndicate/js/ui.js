@@ -324,7 +324,7 @@
   };
   ui.champion = function () {
     show('<div class="card small res win"><small class="over">Long live the</small><h1>Guttercrown</h1><p>Vexa’s crown rolls across the stone and stops at your boot. The Deep Guild sends wine, a ledger with your debt struck through, and a new contract.</p>' +
-      '<p class="dim">That is the end of this vertical slice. Your fighter is saved: keep rematching, finish the hideout, or start a different class and see how it plays.</p><div class="row end"><button class="big" id="ok">Back to the Undercity</button></div></div>');
+      '<p class="dim">The crown is yours, and so is everything that comes with it. The Ledger never closes: challengers will keep coming up the page for as long as you can stand.</p><div class="row end"><button class="big" id="ok">Back to the Undercity</button></div></div>');
     G.sfx('level'); on('#ok', () => ui.levelCheck());
   };
   ui.levelCheck = function () {
@@ -360,7 +360,7 @@
   ui.sheet = function (msg) {
     const st = G.state, h = st.hero, C = G.CLASSES[h.cls], d = G.derive(h, st), sub = h.sub ? C.subs[h.sub] : null;
     let s = '<div class="card sheet"><div class="sh-top"><span id="sp"></span><div><h2>' + esc(h.name) + '</h2><p>Level ' + h.level + ' ' + G.RACES[h.race].name + ' ' + (sub ? sub.name + ' ' : '') + C.name + ' · ' + G.RANKS[G.rankOf(st.respect)].name + '</p>' +
-      '<p class="dim">' + (h.level < G.MAX_LEVEL ? h.xp + ' / ' + G.XP_FOR[h.level + 1] + ' XP to level ' + (h.level + 1) : 'Max level for this slice') + '</p></div></div>';
+      '<p class="dim">' + (h.level < G.MAX_LEVEL ? h.xp + ' / ' + G.XP_FOR[h.level + 1] + ' XP to level ' + (h.level + 1) : 'Level ' + G.MAX_LEVEL + ': as far as the pit can take you') + '</p></div></div>';
     if (msg) s += '<p class="note">' + msg + '</p>';
     s += '<div class="stats">' + G.STATS.map(k => '<div class="stat' + (k === C.primary ? ' prim' : '') + '"><small>' + k.toUpperCase() + '</small><b>' + h.stats[k] + '</b><i>' + G.fmtMod(G.mod(h.stats[k])) + '</i><em>' + G.STAT_INFO[k][1] + '</em></div>').join('') + '</div>';
     s += '<div class="derived"><span>HP <b>' + d.maxHp + '</b></span><span>Crit <b>' + Math.round(d.crit * 100) + '%</b></span><span>Damage <b>' + Math.round(d.dmgMul * 100) + '%</b></span><span>Armor <b>-' + Math.round(d.dr * 100) + '%</b></span><span>Speed <b>' + Math.round(d.speed) + '</b></span><span>' + C.res + ' <b>' + d.regen.toFixed(1) + '/s</b></span><span>Coin <b>' + Math.round(d.coinMul * 100) + '%</b></span><span>Respect <b>' + Math.round(d.respectMul * 100) + '%</b></span></div>';

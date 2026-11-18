@@ -11,7 +11,7 @@
   add({ id: 'armourstand', name: 'Armour Stand', cost: 130, rank: 1, zone: 'house', w: 1, d: 1, max: 1, perk: 'Change kit and weapon at home.' },
     g => { const ir = iron(); mesh(new T.CylinderGeometry(0.3, 0.34, 0.08, 8), ir, 0, 0.04, 0, g); mesh(new T.CylinderGeometry(0.04, 0.04, 1.5, 5), ir, 0, 0.8, 0, g); box(0.9, 0.06, 0.06, ir, 0, 1.35, 0, g); box(0.62, 0.7, 0.34, L(0x4a4650), 0, 1.05, 0, g); box(0.66, 0.1, 0.38, gold(), 0, 1.36, 0, g); box(0.5, 0.1, 0.36, gold(), 0, 0.74, 0, g); const hm = mesh(new T.SphereGeometry(0.2, 8, 6, 0, 6.28, 0, 1.7), L(0x5a5660), 0, 1.72, 0, g); box(0.06, 0.26, 0.3, L(0x7a1c22), 0, 1.92, -0.02, g); [-0.42, 0.42].forEach(x => mesh(new T.SphereGeometry(0.15, 6, 5), L(0x4a4650), x, 1.36, 0, g)); },
     ['Change kit', () => ui.outfitter()]);
-  add({ id: 'strongbox', name: 'Strongbox', cost: 150, rank: 1, zone: 'house', w: 1, d: 1, max: 1, perk: 'Coin kept in it is safe from the stretcher fee when you lose.' },
+  add({ id: 'strongbox', name: 'Strongbox', cost: 150, rank: 1, zone: 'house', w: 1, d: 1, max: 1, perk: 'Coin kept in it stays yours when you die in the pit.' },
     g => { const ir = iron(); box(0.8, 0.55, 0.6, L(0x3a3640), 0, 0.3, 0, g); box(0.84, 0.16, 0.64, L(0x2c2932), 0, 0.64, 0, g); [-0.28, 0.28].forEach(x => box(0.07, 0.74, 0.64, ir, x, 0.37, 0, g)); box(0.16, 0.2, 0.04, gold(), 0, 0.46, 0.32, g); [[-0.2, 0.74, 0.1], [0.12, 0.74, -0.08], [0.02, 0.76, 0.14]].forEach(q => mesh(new T.CylinderGeometry(0.06, 0.06, 0.02, 7), gold(), q[0], q[1], q[2], g)); },
     ['Open', () => ui.strongbox()]);
   add({ id: 'dicetable', name: 'Card and Dice Table', cost: 160, rank: 2, zone: 'house', w: 2, d: 2, max: 1, perk: 'Mark lent it. Play the wispdice without leaving home.', light: 0x6af0ff },

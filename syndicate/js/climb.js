@@ -69,6 +69,13 @@
       if (u[t] === NEED[t] && !st.wins[GATES[t].id]) setTimeout(() => ui.toast('The Ledger-Keeper writes your name against ' + GATES[t].name + '.'), 900); }
     return res0.apply(this, arguments);
   };
+  // Mark pays on the bout you actually fought: an undercard win is not worth a named fighter's odds
+  if (G.mark) {
+    const oddsFor = o => Math.max(1.15, Math.round((1.35 + o.level * 0.22 - G.state.hero.level * 0.1) * (o.under != null ? 0.8 : 1) * 20) / 20);
+    G.mark.selfOdds = function () { const st = G.state, t = tierNow(st); let o; if (t < 0) { if (G.ensureLedger) G.ensureLedger(); o = G.OPPONENTS.find(q => !st.wins[q.id]) || G.OPPONENTS[G.OPPONENTS.length - 1]; } else o = gateOpen(st, t) ? GATES[t] : make(t, U(st)[t]); return { opp: o, odds: oddsFor(o) }; };
+    let fought = null; const fs0 = G.fight.start; G.fight.start = function (o) { fought = o && !o.spar ? o : fought; return fs0.apply(this, arguments); };
+    const mr0 = G.mark.resolve; G.mark.resolve = function () { const c = G.state.card; if (c && c.self && fought) c.self.odds = Math.min(c.self.odds, oddsFor(fought)); return mr0.apply(this, arguments); };
+  }
   const obj0 = G.objective;
   G.objective = function () {
     const s = obj0.apply(this, arguments), st = G.state; if (!st || !st.hero || typeof s !== 'string') return s;
@@ -158,6 +165,12 @@
   };
   gate('board', () => 'board'); gate('vendor', w => w === 'cook' ? 'cook' : 'apoth'); gate('tally', () => 'tally'); gate('mark', () => 'mark'); gate('wisp', () => 'wisp');
   gate('armory', () => 'armory'); gate('tailor', () => 'tailor'); gate('outfitter', () => 'outfit'); gate('charms', () => 'charms'); gate('whisper', () => 'whisper'); gate('trainer', () => 'trainer');
+  // the Fence's back rooms show as shut until they are not
+  { const sh0 = ui.shop; ui.shop = function () { const r = sh0.apply(this, arguments), st = G.state; if (!st || !st.hero) return r;
+      const mark = (el, k) => { if (!el || open(k, st)) return; const b = el.tagName === 'BUTTON' ? el : el.querySelector('button'); if (el.classList.contains('ab-row')) el.classList.add('locked'); if (b) b.textContent = b.textContent.replace(/ ·.*$/, '') + ' · ' + UN[k].need; };
+      document.querySelectorAll('#panel .ab-row').forEach(el => { const t = (el.querySelector('b') || {}).textContent || ''; if (/Armoury/.test(t)) mark(el, 'armory'); if (/Outfitter/.test(t)) mark(el, 'outfit'); if (/Tailor/.test(t)) mark(el, 'tailor'); });
+      document.querySelectorAll('#panel .foot button, #panel .row.end button').forEach(b => { if (/Learn techniques/.test(b.textContent)) mark(b, 'trainer'); if (/Tailor/.test(b.textContent)) mark(b, 'tailor'); });
+      return r; }; }
   // the Crown does not ask a tithe of people it has never heard of
   { const s0 = ui.stair; if (s0) ui.stair = function () { const r = s0.apply(this, arguments), b = document.querySelector('#panel #ti'); if (b && G.rankOf(G.state.respect) < 4) { const rowEl = b.closest('.ab-row'); if (rowEl) { rowEl.classList.add('locked'); b.disabled = true; b.textContent = rankName(4) + ' and above'; } } return r; }; }
   // market spots: a shut door says so before any scene plays
