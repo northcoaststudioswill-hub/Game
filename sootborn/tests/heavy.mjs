@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+import { mkdirSync } from 'fs'; mkdirSync('shots', { recursive: true });
+const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
+const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
+const errors = []; page.on('pageerror', e => errors.push(e.message));
+const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a), shot = n => page.screenshot({ path: `shots/heavy-${n}.png` });
+await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await ev(() => { const B = BTS.Brawl; BTS.UI.clear(); const d = BTS.FF.valley(); delete d.intro; delete d.outro; delete d.arts; delete d.voice; d.allies = []; d.waves = [[{ id: 'cadt1', name: 'T', kind: 'cadet', hp: 40 }, { id: 'cadt2', name: 'T', kind: 'lancer', hp: 40 }]]; B.start(d, () => {}); B.phase = 'fight'; B.tipT = 0; B.p.x = -14; B.p.y = 0; B.foes[0].x = 20; B.foes[0].y = 0; B.foes[1].x = 60; B.foes[1].y = -30; for (const f of B.foes) f.cd = 99; B.p.fury = 0; });
+await wait(1800); await shot('0-idle'); await page.keyboard.down('KeyE'); await wait(420); await shot('1-charge'); await wait(260); await shot('2-release'); await page.keyboard.up('KeyE'); await wait(140); await shot('3-launch'); await wait(330); await shot('4-floor');
+console.log(await ev(() => BTS.Brawl.foes.map(f => [f.st, +f.t.toFixed(2), f.hp, f.z | 0]))); await wait(500); await shot('5-getup'); await wait(600); console.log(await ev(() => BTS.Brawl.foes.map(f => [f.st, f.hp])), await ev(() => BTS.Brawl.scars.length));
+console.log('errors', errors); await browser.close();

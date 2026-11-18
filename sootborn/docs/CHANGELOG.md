@@ -1,5 +1,12 @@
 # SOOTBORN — changelog
 
+## v0.12.6 · 2026-11-18 — heavier fights
+- **Heavy attack**: keep strike held. Kael raises the blade, it gathers light, and the blow breaks guards, hits for much more, launches whoever it catches and leaves a scar on the ground.
+- **Knockdowns**: launched enemies now land on their backs, lie there, and push themselves up before they can fight again. Captains, duelists, Wardens and ring bosses keep their feet unless a heavy attack or a Memory Art puts them down.
+- **The ground remembers**: heavy blows, Memory Arts and the last hit of ELEVEN leave scorched marks that stay for the rest of the fight.
+- House Teal's swordsmen carry round shields.
+- Fighting moves, in full: strike chain (three cuts), hold for heavy, dodge, strike out of a dodge for a dash strike, strike into the last instant of a wind-up to clash, hold at full fury for ELEVEN.
+
 ## v0.12.5 · 2026-11-18 — music was inaudible; fixed
 Reported after v0.12.4: no music at all. Measured the mix by rendering it offline and found three likely causes, all fixed:
 - **Far too quiet.** The music sat around -39 dB RMS at the default volume. Music and effects now run through a compressor with make-up gain; the same tracks measure about -21 dB, roughly eight times louder, with no clipping.

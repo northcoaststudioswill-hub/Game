@@ -10,14 +10,14 @@
 const FOE_KINDS = {
   jab: { spd: 36, wind: 0.6, reach: 26, dmg: 1, rec: 0.9, cd: [0.7, 1.5], soft: 1 },
   quick: { spd: 54, wind: 0.42, reach: 24, dmg: 1, rec: 0.65, cd: [0.5, 1.2] },
-  heavy: { spd: 28, wind: 0.85, reach: 38, dmg: 2, rec: 1.2, cd: [0.8, 1.4], armor: 1, wide: 16 },
-  baton: { spd: 40, wind: 0.6, reach: 30, dmg: 1, rec: 0.95, cd: [0.6, 1.2], sweep: 1, charge: 1 },
-  boss: { spd: 46, wind: 0.46, reach: 28, dmg: 1, rec: 0.85, cd: [0.45, 1.0], double: 1 },
+  heavy: { poise: 1, spd: 28, wind: 0.85, reach: 38, dmg: 2, rec: 1.2, cd: [0.8, 1.4], armor: 1, wide: 16 },
+  baton: { poise: 1, spd: 40, wind: 0.6, reach: 30, dmg: 1, rec: 0.95, cd: [0.6, 1.2], sweep: 1, charge: 1 },
+  boss: { poise: 1, spd: 46, wind: 0.46, reach: 28, dmg: 1, rec: 0.85, cd: [0.45, 1.0], double: 1 },
   cadet: { spd: 42, wind: 0.55, reach: 32, dmg: 1, rec: 0.85, cd: [0.8, 1.8], sweep: 1, blade: 1 },
   lancer: { spd: 34, wind: 0.7, reach: 50, dmg: 1, rec: 1.0, cd: [1.0, 2.0], blade: 2, wide: 10 },
-  captain: { spd: 40, wind: 0.6, reach: 40, dmg: 2, rec: 0.9, cd: [0.6, 1.2], sweep: 1, charge: 1, double: 1, blade: 1 },
-  duelist: { spd: 58, wind: 0.44, reach: 36, dmg: 1, rec: 0.7, cd: [0.4, 0.9], sweep: 1, charge: 1, double: 1, blink: 1, blade: 1 },
-  warden: { spd: 30, wind: 0.7, reach: 46, dmg: 2, rec: 1.0, cd: [0.9, 1.6], blade: 2, wide: 12 }
+  captain: { poise: 1, spd: 40, wind: 0.6, reach: 40, dmg: 2, rec: 0.9, cd: [0.6, 1.2], sweep: 1, charge: 1, double: 1, blade: 1 },
+  duelist: { poise: 1, spd: 58, wind: 0.44, reach: 36, dmg: 1, rec: 0.7, cd: [0.4, 0.9], sweep: 1, charge: 1, double: 1, blink: 1, blade: 1 },
+  warden: { poise: 1, spd: 30, wind: 0.7, reach: 46, dmg: 2, rec: 1.0, cd: [0.9, 1.6], blade: 2, wide: 12 }
 };
 const ELEVEN = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'ELEVEN'];
 const Brawl = {
@@ -27,7 +27,7 @@ const Brawl = {
   // ---------------------------------------------------------- setup
   start(def, onEnd) {
     const hero = def.hero || {}, A = def.arena || { kind: 'ring', rx: 118, ry: 64 };
-    Object.assign(this, { def, onEnd, active: true, t: 0, parts: [], rings: [], freeze: 0, slow: 0, shake: 0, punch: 0, impact: 0, phase: 'intro', pt: 0, msg: '', msgT: 0, token: [], sup: null, wave: 0, arena: A, cine: null, tipT: 5, hitsN: 0, hitsT: 0, clang: 0, slashes: [], fin: null, flinched: 0, nums: [], vq: [], vcur: null, vdone: {}, ft: 0, art: null, artDone: {}, lines: [], tex: {}, pat: {} });
+    Object.assign(this, { def, onEnd, active: true, t: 0, parts: [], rings: [], freeze: 0, slow: 0, shake: 0, punch: 0, impact: 0, phase: 'intro', pt: 0, msg: '', msgT: 0, token: [], sup: null, wave: 0, arena: A, cine: null, tipT: 5, hitsN: 0, hitsT: 0, clang: 0, slashes: [], fin: null, flinched: 0, nums: [], scars: [], vq: [], vcur: null, vdone: {}, ft: 0, art: null, artDone: {}, lines: [], tex: {}, pat: {} });
     const hw = A.kind === 'ring' ? A.rx : A.w / 2;
     this.p = { x: -hw * .5, y: 4, fx: 1, fy: 0, hp: hero.hp || 6, max: hero.hp || 6, pow: hero.pow || 1, blade: hero.blade || 0, sheet: hero.id ? World.sheetFor(hero.id) : P.sheet, st: 'idle', t: 0, combo: 0, comboT: 0, inv: 0, dcd: 0, open: 0, anim: 0, hit: false, kx: 0, ky: 0, hold: 0, trail: [],
       fury: hero.fury0 !== undefined ? hero.fury0 : Math.min(60, ((G.flags || {}).fury | 0) * 7), rage: def.rage || 0 };
@@ -86,12 +86,12 @@ const Brawl = {
     if (p.hp <= 0) { if (this.def.legend) { p.hp = p.max; p.fury = 100; p.inv = 1.6; this.say('NOT TODAY.', true); this.ring(p.x, p.y, '#ffe08a', 90); Sound.play('roar'); for (const o of this.foes) if (o.st !== 'down') { const d = Math.hypot(o.x - p.x, o.y - p.y) || 1; if (d < 90) { o.kx = (o.x - p.x) / d * 260; o.ky = (o.y - p.y) / d * 260; o.st = 'hurt'; o.t = 0; } } } else { p.st = 'down'; this.phase = 'lose'; this.pt = 0; } }
   },
   hitFoe(f, dmg, ax, ay, big) {
-    const crit = this.p.open > 0 || !!this.sup || !!this.art;
+    const crit = this.p.open > 0 || !!this.sup || !!this.art || !!this.p.heavy;
     if (this.def.doomed) { f.flash = 0.08; Sound.play('steel'); this.spark(f.x, f.y, '#c8ccd4', 5); this.p.kx = -ax * 150; this.p.ky = -ay * 150; this.clang++; f.bark = { t: ['CLANG', '...', 'CLANG'][this.clang % 3], life: .5 }; this.gain(10); return; }
     if (f.st === 'wind' && !crit && !f.K.soft && f.mode !== 'charge' && this.p.gapT > .55 && !(f.clashT > this.t) && f.t > (f.second ? .3 : f.K.wind) - .17) { f.clashT = this.t + 3; f.st = 'hurt'; f.t = -.35; f.flash = .2; f.kx = ax * 150; f.ky = ay * 150; f.hp -= dmg; this.token = this.token.filter(o => o !== f); this.freeze = .14; this.slow = .35; this.shake = .4; this.impact = .16; this.punch = .3; this.rollK = .1; this.say('CLASH!'); Sound.play('clash'); this.spark(f.x - ax * 12, f.y - ay * 12, '#fff6dc', 16); this.ring(f.x - ax * 12, f.y - ay * 12, '#fff2c0', 34); this.slashes.push({ x: f.x - ax * 12, y: f.y - ay * 12, a: 1, life: .22, big: 1 }); this.gain(14); this.p.open = Math.max(this.p.open, .8); this.voice('clash'); if (f.hp <= 0) f.hp = 1; return; }
     if (f.guardT > 0 && !crit) { f.flash = 0.06; Sound.play(this.p.blade || f.K.blade ? 'steel' : 'deny'); this.spark(f.x, f.y, '#8a94a4', 4); this.p.kx = -ax * 120; this.p.ky = -ay * 120; if (!f.blk) { f.blk = 1; f.bark = { t: 'BLOCKED', life: .7 }; } return; }
     this.nums.push({ x: f.x + (Math.random() - .5) * 10, y: f.y, h: 70 + (f.z || 0), v: dmg, big, life: .7 });
-    f.hp -= dmg; f.flash = 0.14; f.kx = ax * (big ? 230 : 95); f.ky = ay * (big ? 230 : 95); this.freeze = big ? 0.11 : 0.05; this.shake = big ? 0.32 : 0.12; if (big) { this.impact = .14; this.punch = .22; this.ring(f.x, f.y, '#fff2c0', 40); f.vz = 150; this.rollK = (ax >= 0 ? 1 : -1) * .09; }
+    f.hp -= dmg; f.flash = 0.14; f.kx = ax * (big ? 230 : 95); f.ky = ay * (big ? 230 : 95); this.freeze = big ? 0.11 : 0.05; this.shake = big ? 0.32 : 0.12; if (big) { this.impact = .14; this.punch = .22; this.ring(f.x, f.y, '#fff2c0', 40); f.vz = this.p.heavy ? 210 : 150; f.air = !f.K.poise || !!this.p.heavy || !!this.art; this.rollK = (ax >= 0 ? 1 : -1) * .09; }
     this.slashes.push({ x: f.x, y: f.y, a: Math.random() * 3.14, life: .16, big });
     Sound.play(this.p.blade ? (big ? 'bigslash' : 'slash') : big ? 'hit' : 'clink'); this.spark(f.x, f.y, this.p.blade ? '#ffe08a' : big ? '#ffe08a' : '#fff', big ? 12 : 6); this.gain(this.sup || this.art ? 0 : 5); this.hitsN = this.hitsT > 0 ? this.hitsN + 1 : 1; this.hitsT = 1.4;
     if (this.foes.reduce((a, o) => a + Math.max(0, o.hp), 0) < this.foes.reduce((a, o) => a + o.max, 0) * .5) this.voice('half');
@@ -99,7 +99,7 @@ const Brawl = {
     if (f.hp <= 0 || endAt) { Sound.play('bodyfall'); f.st = 'down'; f.t = 0; f.kx = ax * 260; f.ky = ay * 260; f.vz = 190; if (!this.sup && !this.art && this.p.fury >= 60 && !this.def.doomed) { this.slow = Math.max(this.slow, .32); this.punch = Math.max(this.punch, .3); this.rollK = (ax >= 0 ? 1 : -1) * .1; f.vz = 250; this.gain(6); } this.token = this.token.filter(o => o !== f); Sound.play('rumble'); this.ring(f.x, f.y, '#fff', 60);
       if (!this.foes.some(o => o.st !== 'down')) { if (this.def.waves && this.wave < this.def.waves.length - 1) { this.wave++; this.spawn(this.def.waves[this.wave]); this.say('MORE OF THEM', true); this.voice('wave'); if (this.def.onWave) this.def.onWave(this.wave, this); } else { this.phase = 'win'; this.pt = 0; this.slow = 0.9; this.punch = .5; this.sup = null; if (this.def.hero && this.def.hero.id) Sound.play('win'); } }
       return; }
-    if ((f.st !== 'wind' || f.K.soft || big) && f.st !== 'charge') { this.token = this.token.filter(o => o !== f); f.st = 'hurt'; f.t = 0; }
+    if (f.st === 'floor') { f.t = Math.min(f.t, .5); } else if ((f.st !== 'wind' || f.K.soft || big) && f.st !== 'charge') { this.token = this.token.filter(o => o !== f); f.st = 'hurt'; f.t = 0; }
     f.hits = (f.hits | 0) + 1; if (f.hits >= (f.K.soft ? 5 : 3) && !crit) { f.guardT = 1.1; f.cd = 0; f.hits = 0; f.blk = 0; }
     const tl = this.def.taunt && this.def.taunt[f.idx]; if (tl && f.said < tl.length && f.hp <= f.max * (1 - (f.said + 1) / (tl.length + 1))) f.bark = { t: tl[f.said++], life: 2.2 };
   },
@@ -121,7 +121,7 @@ const Brawl = {
     const ts = this.slow > 0 ? 0.3 : 1; this.slow = Math.max(0, this.slow - dt); const pd = dt * (this.slow > 0 ? 0.75 : 1), ed = dt * ts;
     this.updPlayer(pd); if (this.sup) return; for (const f of this.foes) this.updFoe(f, ed); for (const a of this.allies) this.updAlly(a, ed); this.stepParts(dt); this.camFollow(dt);
   },
-  stepParts(dt) { for (const q of this.parts) { q.x += q.vx * dt; q.y += q.vy * dt; q.h += q.vh * dt; q.vh -= 260 * dt; if (q.h < 0) { q.h = 0; q.vh *= -.3; } q.life -= dt; } this.parts = this.parts.filter(q => q.life > 0); for (const r of this.rings) { r.r += (r.max - r.r) * Math.min(1, dt * 9); r.life -= dt * 2.4; } this.rings = this.rings.filter(r => r.life > 0); for (const q of this.slashes) q.life -= dt; this.slashes = this.slashes.filter(q => q.life > 0); for (const q of this.nums) { q.life -= dt; q.h += dt * 34; } this.nums = this.nums.filter(q => q.life > 0); },
+  stepParts(dt) { for (const q of this.parts) { q.x += q.vx * dt; q.y += q.vy * dt; q.h += q.vh * dt; q.vh -= 260 * dt; if (q.h < 0) { q.h = 0; q.vh *= -.3; } q.life -= dt; } this.parts = this.parts.filter(q => q.life > 0); for (const r of this.rings) { r.r += (r.max - r.r) * Math.min(1, dt * 9); r.life -= dt * 2.4; } this.rings = this.rings.filter(r => r.life > 0); for (const q of this.slashes) q.life -= dt; this.slashes = this.slashes.filter(q => q.life > 0); for (const q of this.scars) q.life -= dt; this.scars = this.scars.filter(q => q.life > 0).slice(-10); for (const q of this.nums) { q.life -= dt; q.h += dt * 34; } this.nums = this.nums.filter(q => q.life > 0); },
   camFollow(dt) {
     if (this.phase === 'win') { const p = this.p, c = this.cam, k = Math.min(1, dt * 5); c.roll = (c.roll || 0) + (.06 - (c.roll || 0)) * k; c.x += (p.x + Math.sin(this.pt * 1.1) * 26 - c.x) * k; if (0) c.x += (p.x - c.x) * k; c.y += (p.y + (this.g3 ? 138 : 92) - c.y) * k; c.h += ((this.g3 ? 58 : 52) - c.h) * k; c.f += ((this.g3 ? 165 : 190) - c.f) * k; return; }
     if (this.art && this.art.t > 1.9) { const p = this.p, c = this.cam, f = this.art.tg, rise = this.art.a.kind === 'rise', k = Math.min(1, dt * 7); c.x += ((p.x + f.x) / 2 - c.x) * k; c.y += (Math.max(p.y, f.y) + (rise ? 96 : 118) - c.y) * k; c.h += ((rise ? 30 : 50) - c.h) * k; c.f += (170 * (1 + this.punch * .8) - c.f) * Math.min(1, dt * 12); c.hor += (Math.round(H * (rise && !this.art.done ? .56 : .32)) - c.hor) * k; return; }
@@ -136,13 +136,15 @@ const Brawl = {
     p.x += p.kx * dt; p.y += p.ky * dt; p.kx *= Math.pow(.001, dt); p.ky *= Math.pow(.001, dt);
     let vx = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), vy = (Input.h('down') ? 1 : 0) - (Input.h('up') ? 1 : 0); if (vx && vy) { vx *= .7071; vy *= .7071; }
     // fury: hold A (or press Y / L) when the gauge is full
-    if (p.fury >= 100 && p.st !== 'hurt' && p.st !== 'down') { if (Input.h('A')) p.hold += dt; else p.hold = 0; if (p.hold > 0.42 || Input.p('Y') || Input.p('L')) { this.startSuper(); return; } } else p.hold = 0;
+    if (p.st !== 'hurt' && p.st !== 'down' && Input.h('A')) p.hold += dt; else p.hold = 0;
+    if (p.fury >= 100 && p.st !== 'hurt' && p.st !== 'down' && (p.hold > 0.42 || Input.p('Y') || Input.p('L'))) { this.startSuper(); return; }
+    if (p.fury < 100 && p.hold > 0.55 && (p.st === 'idle' || p.st === 'move')) { p.hold = -0.3; p.combo = 2; this.strike(); p.heavy = 1; p.gap = Math.max(p.gap || 0, 30); Sound.play('swing2'); this.say('HEAVY'); }
     if (p.st === 'hurt') { p.t += dt; if (p.t > 0.28) p.st = 'idle'; }
     else if (p.st === 'dodge') { p.t += dt; p.x += p.dx * 215 * dt; p.y += p.dy * 215 * dt; if (Math.floor(p.t * 40) % 2 === 0) p.trail.push({ x: p.x, y: p.y, life: .22 }); if (p.t > 0.3) p.st = 'idle'; else if (p.t > .09 && Input.p('A')) { const tg = this.nearest(p); if (tg) { const d = Math.hypot(tg.x - p.x, tg.y - p.y) || 1; p.fx = (tg.x - p.x) / d; p.fy = (tg.y - p.y) / d; } p.combo = 0; this.strike(); p.gap = Math.max(p.gap || 0, 30); p.dash = 1; Sound.play('move'); this.spark(p.x, p.y, '#c8b8ff', 6, 6); } }
     else if (p.st === 'atk') {
       p.t += dt; const dur = p.combo === 3 ? 0.36 : 0.24; if (p.t < 0.1) { const v = 100 + (p.gap || 0) * 14; p.x += p.ax * v * dt; p.y += p.ay * v * dt; }
       if (!p.hit && p.t >= 0.07) { p.hit = true; const big = p.combo === 3, R = (big ? 36 : 30) + (p.blade ? 8 : 0); let any = false;
-        for (const f of this.foes) if (f.st !== 'down') { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy); if (d < R && (d < 10 || (dx * p.ax + dy * p.ay) / d > (p.blade ? -0.1 : 0.2))) { any = true; this.hitFoe(f, ((big ? 2 : 1) + (p.open > 0 ? 1 : 0) + (p.fury >= 100 ? 1 : 0) + (p.dash ? 1 : 0)) * p.pow, dx / (d || 1), dy / (d || 1), big || p.open > 0 || !!p.dash); } } p.dash = 0;
+        for (const f of this.foes) if (f.st !== 'down') { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy); if (d < R && (d < 10 || (dx * p.ax + dy * p.ay) / d > (p.blade ? -0.1 : 0.2))) { any = true; this.hitFoe(f, ((big ? 2 : 1) + (p.open > 0 ? 1 : 0) + (p.fury >= 100 ? 1 : 0) + (p.dash ? 1 : 0) + (p.heavy ? 2 : 0)) * p.pow, dx / (d || 1), dy / (d || 1), big || p.open > 0 || !!p.dash); } } p.dash = 0; if (p.heavy && any) { this.scars.push({ x: p.x + p.ax * 22, y: p.y + p.ay * 22, r: 13, life: 30 }); this.shake = .5; } p.heavy = 0;
         }
       if (p.t > dur) p.st = 'idle'; else if (p.t > 0.14 && Input.p('A') && p.combo < 3) this.strike();
       if (Input.p('B') && p.dcd <= 0 && p.t > 0.1) this.dodge(vx, vy);
@@ -153,7 +155,7 @@ const Brawl = {
     for (const q of p.trail) q.life -= dt; p.trail = p.trail.filter(q => q.life > 0);
     this.clampA(p);
   },
-  strike() { const p = this.p, f = this.nearest(p); p.gapT = this.t - (p.lastStrikeT === undefined ? -9 : p.lastStrikeT); p.lastStrikeT = this.t; let ax = p.fx, ay = p.fy; const m = Math.hypot(ax, ay) || 1; ax /= m; ay /= m;
+  strike() { const p = this.p, f = this.nearest(p); p.heavy = 0; p.gapT = this.t - (p.lastStrikeT === undefined ? -9 : p.lastStrikeT); p.lastStrikeT = this.t; let ax = p.fx, ay = p.fy; const m = Math.hypot(ax, ay) || 1; ax /= m; ay /= m;
     if (f) { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy); if (d < 70) { ax = dx / (d || 1); ay = dy / (d || 1); } }
     p.fx = ax; p.fy = ay; p.st = 'atk'; p.t = 0; p.hit = false; p.ax = ax; p.ay = ay; p.combo = p.combo % 3 + 1; p.comboT = 0.7; if (!this.sup && !this.art) Sound.play(p.blade ? (p.combo === 3 ? 'swing2' : 'swing') : 'dash');
     if (f) { const d = Math.hypot(f.x - p.x, f.y - p.y), R = 26 + (p.blade ? 8 : 0); p.gap = d < 70 && d > R ? Math.min(34, d - R + 4) : 0; } else p.gap = 0; },
@@ -164,7 +166,7 @@ const Brawl = {
     const A = this.art, a = A.a, p = this.p, f = A.tg, C = 1.9; A.t += dt; p.inv = .6; if (p.st === 'atk') { p.t += dt; if (p.t > .3) p.st = 'idle'; }
     if (A.t < C) { if (A.t > .5 && (Input.p('A') || Input.p('B'))) A.t = C; return; }
     const tau = A.t - C, cut = (side, big) => { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; p.fx = p.ax = dx / d; p.fy = p.ay = dy / d; p.st = 'atk'; p.t = 0; p.hit = true; p.combo = 1 + A.n % 3; this.slashes.push({ x: f.x, y: f.y, a: A.n * 1.1, life: .18, big: 1, h: 26 + (f.z || 0) }); this.spark(f.x, f.y, '#ffe08a', 7, 22 + (f.z || 0)); f.flash = .12; this.hitsN = this.hitsT > 0 ? this.hitsN + 1 : 1; this.hitsT = 1.6; this.shake = .2; Sound.play(big ? 'hit' : 'clink'); A.n++; };
-    const land = () => { A.done = 1; f.z = 0; p.z = 0; this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#fff2c0', 120); this.ring(f.x, f.y, a.hex || '#ffb040', 80); this.fin = { x: f.x, y: f.y, t: 0 }; Sound.play('pillar'); this.freeze = .3;
+    const land = () => { A.done = 1; f.z = 0; p.z = 0; this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#fff2c0', 120); this.ring(f.x, f.y, a.hex || '#ffb040', 80); this.fin = { x: f.x, y: f.y, t: 0 }; this.scars.push({ x: f.x, y: f.y, r: 22, life: 40 }); Sound.play('pillar'); this.freeze = .3;
       const live = this.foes.filter(o => o.st !== 'down' && !o.enter); for (const o of live) { if (!this.art) break; const main = o === f, d = Math.hypot(o.x - f.x, o.y - f.y); if (main || d < 90) this.hitFoe(o, main ? (a.dmg || Math.max(6, Math.round(o.max * .14))) : 4, main ? p.ax : (o.x - f.x) / (d || 1), main ? p.ay : (o.y - f.y) / (d || 1), true); } };
     if (a.kind === 'rise') { // launch, three cuts in the air, and down
       if (A.n === 0 && tau >= 0) { p.x = f.x - 20; p.y = f.y + 2; this.clampA(p); cut(); this.ring(f.x, f.y, '#fff', 40); }
@@ -193,20 +195,21 @@ const Brawl = {
       p.trail.push({ x: p.x, y: p.y, life: .3 }); p.x = f.x + side * 18; p.y = f.y + (s.n % 3 - 1) * 8; this.clampA(p); const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; p.fx = p.ax = dx / d; p.fy = p.ay = dy / d; p.st = 'atk'; p.t = 0; p.hit = true; p.combo = last ? 3 : 1 + s.n % 2; s.tg = f;
       Sound.play('count', s.n); s.word = ELEVEN[s.n]; s.wt = 0; s.n++; s.next = s.t + (last ? 0 : Math.max(0.085, 0.16 - s.n * 0.008));
       this.hitFoe(f, (last ? 3 : 1) * p.pow, last ? p.ax : 0, last ? p.ay : 0, last); if (!this.sup) return;
-      if (last) { this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#ff7a30', 110); this.ring(f.x, f.y, '#fff2c0', 70); if (!this.def.doomed) this.fin = { x: f.x, y: f.y, t: 0 }; Sound.play('pillar'); f.vz = 230; for (const o of live) if (this.sup && o !== f && o.st !== 'down' && Math.hypot(o.x - f.x, o.y - f.y) < 70) this.hitFoe(o, 2 * p.pow, (o.x - f.x) / 70, (o.y - f.y) / 70, true); }
+      if (last) { this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#ff7a30', 110); this.ring(f.x, f.y, '#fff2c0', 70); if (!this.def.doomed) { this.fin = { x: f.x, y: f.y, t: 0 }; this.scars.push({ x: f.x, y: f.y, r: 26, life: 40 }); } Sound.play('pillar'); f.vz = 230; for (const o of live) if (this.sup && o !== f && o.st !== 'down' && Math.hypot(o.x - f.x, o.y - f.y) < 70) this.hitFoe(o, 2 * p.pow, (o.x - f.x) / 70, (o.y - f.y) / 70, true); }
       this.freeze = last ? 0.34 : 0.03;
     }
   },
   updFoe(f, dt) {
     const p = this.p, K = f.K; f.flash = Math.max(0, f.flash - dt); f.guardT = Math.max(0, (f.guardT || 0) - dt); if (f.bark) { f.bark.life -= dt; if (f.bark.life <= 0) f.bark = null; }
     f.x += f.kx * dt; f.y += f.ky * dt; f.kx *= Math.pow(.002, dt); f.ky *= Math.pow(.002, dt);
-    if (f.vz || f.z > 0) { f.z = (f.z || 0) + f.vz * dt; f.vz -= 560 * dt; if (f.z <= 0) { if (f.vz < -120) this.spark(f.x, f.y, '#c8c0a0', 4, 0); f.z = 0; f.vz = 0; } }
+    if (f.vz || f.z > 0) { f.z = (f.z || 0) + f.vz * dt; f.vz -= 560 * dt; if (f.z <= 0) { if (f.vz < -120) this.spark(f.x, f.y, '#c8c0a0', 4, 0); f.z = 0; f.vz = 0; if (f.air && f.st !== 'down') { f.st = 'floor'; f.t = 0; Sound.play('bodyfall'); this.token = this.token.filter(o => o !== f); } f.air = 0; } }
     if (f.st === 'down') { f.t += dt; return; }
     if (f.enter) { f.y += 80 * dt; f.anim += dt; f.fx = 0; f.fy = 1; const A = this.arena, hh = A.kind === 'ring' ? A.ry : A.h / 2; if (f.y > -hh + 10) f.enter = false; return; }
     // who to go for: Kael mostly, but allies pull some of them off him
     if (!f.tg || f.tgT <= 0) { let best = p, bd = Math.hypot(p.x - f.x, p.y - f.y) * (this.allies.length ? .75 : 0); for (const a of this.allies) { const d = Math.hypot(a.x - f.x, a.y - f.y); if (d < bd) { bd = d; best = a; } } f.tg = best; f.tgT = 2 + Math.random() * 2; } f.tgT -= dt;
     const T = f.tg, dx = T.x - f.x, dy = T.y - f.y, d = Math.hypot(dx, dy) || 1, face = () => { f.fx = dx / d; f.fy = dy / d; };
-    if (f.st === 'hurt') { f.t += dt; if (f.t > 0.24) { f.st = 'approach'; f.cd = Math.min(f.cd, K.soft ? 0.6 : 0.12); } }
+    if (f.st === 'floor') { f.t += dt; if (f.t > 0.95) { f.st = 'approach'; f.cd = 0.5; f.guardT = 0.5; } }
+    else if (f.st === 'hurt') { f.t += dt; if (f.t > 0.24 && !(f.z > 0)) { f.st = 'approach'; f.cd = Math.min(f.cd, K.soft ? 0.6 : 0.12); } }
     else if (f.st === 'approach') {
       const afraid = T === p && p.fury >= 100 && !K.blink && !this.def.doomed; f.cd -= dt * (afraid ? .55 : 1); face(); const want = K.reach * (afraid ? 1.5 : 0.8);
       let mx = 0, my = 0; if (d > want) { mx = dx / d; my = dy / d; } else if (d < want * 0.55) { mx = -dx / d; my = -dy / d; } else { const s = (f.idx % 2 ? 1 : -1); mx = -dy / d * .6 * s; my = dx / d * .6 * s; }
@@ -340,7 +343,7 @@ const Brawl = {
     if (bgN === 'ford' && o.y > -50 && o.y < -6 && !rm) { g.strokeStyle = 'rgba(220,244,255,.7)'; g.lineWidth = 1; for (let i = 0; i < 2; i++) { const ph = (t * 1.3 + i * .5 + (o.idx || 0) * .2) % 1; g.globalAlpha = 1 - ph; g.beginPath(); g.ellipse(pr.x, pr.y, (6 + ph * 12) * sc * .9, (2 + ph * 3.5) * sc * .9, 0, 0, 6.3); g.stroke(); } g.globalAlpha = 1; }
     if (mv && !rm && Math.random() < .12 && bgN !== 'keep' && bgN !== 'ring') this.parts.push({ x: o.x, y: o.y, h: 0, vx: (Math.random() - .5) * 24, vy: 0, vh: 18 + Math.random() * 22, life: .35, c: bgN === 'ford' && o.y > -50 && o.y < -6 ? '#cfeeff' : bgN === 'furnace' ? '#5a4038' : '#9aa860' });
     const zz = (o.z || 0) * pr.s;
-    if (o.st === 'down') { const k = Math.min(1, o.t * 3.5); g.save(); g.translate(pr.x, pr.y - 2 * sc - zz); g.rotate((side || 1) * -(k * 1.5 + (o.z > 0 ? o.t * 9 : 0))); g.globalAlpha = Math.max(.25, 1 - Math.max(0, o.t - 1.2)); g.drawImage(sh, 0, dir * fh, 16, fh, -w / 2, -hgt, w, hgt); g.restore(); g.globalAlpha = 1; return; }
+    if (o.st === 'down' || o.st === 'floor') { const k = o.st === 'floor' ? (o.t < .6 ? Math.min(1, o.t * 6) : Math.max(0, 1 - (o.t - .6) / .35)) : Math.min(1, o.t * 3.5); g.save(); g.translate(pr.x, pr.y - 2 * sc - zz); g.rotate((side || 1) * -(k * 1.5 + (o.z > 0 ? o.t * 9 : 0))); g.globalAlpha = o.st === 'floor' ? 1 : Math.max(.25, 1 - Math.max(0, o.t - 1.2)); g.drawImage(sh, 0, dir * fh, 16, fh, -w / 2, -hgt, w, hgt); g.restore(); g.globalAlpha = 1; return; }
     const aura = opt.aura || 0;
     if (aura > 0 && !rm) { g.globalCompositeOperation = 'lighter'; const n = 6 + aura * 3; for (let i = 0; i < n; i++) { const ph = (t * (1.6 + i * .13) + i * .37) % 1, ax = pr.x + Math.sin(i * 2.4 + t * 3) * w * (.34 + aura * .06), ay = pr.y - ph * hgt * (1.0 + aura * .22), rr = (1 - ph) * w * (.28 + aura * .05); g.fillStyle = opt.auraC || `rgba(255,${90 + ph * 120 | 0},${30 + ph * 40 | 0},${.34 * (1 - ph)})`; g.beginPath(); g.ellipse(ax, ay, rr * .7, rr * 1.5, 0, 0, 6.3); g.fill(); } const gr = g.createRadialGradient(pr.x, pr.y - hgt * .5, 0, pr.x, pr.y - hgt * .5, hgt * (.7 + aura * .15)); gr.addColorStop(0, opt.auraG || `rgba(255,120,40,${.22 + aura * .06})`); gr.addColorStop(1, 'rgba(255,90,30,0)'); g.fillStyle = gr; g.fillRect(pr.x - hgt * 1.3, pr.y - hgt * 1.8, hgt * 2.6, hgt * 2.6); g.globalCompositeOperation = 'source-over'; }
     if (opt.cape && dir !== 0 && !rm && o.st !== 'down') { const wv = Math.sin(t * 7 + (o.idx || 0)) * w * .08, bk = dir === 1 ? 0 : -side, ext = (mv || o.st === 'atk' || o.st === 'dodge' ? .55 : .2) * w, x0 = pr.x + bk * w * .12, y0 = pr.y - hgt * .64 - (o.z || 0) * pr.s; g.fillStyle = opt.cape; g.beginPath(); g.moveTo(x0 - w * .2, y0); g.lineTo(x0 + w * .2, y0); g.lineTo(x0 + w * .26 + bk * ext + wv, y0 + hgt * .5); g.lineTo(x0 + bk * ext * 1.25 - wv, y0 + hgt * .58); g.lineTo(x0 - w * .26 + bk * ext * .8 + wv, y0 + hgt * .5); g.fill(); g.fillStyle = 'rgba(0,0,0,.18)'; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x0 + w * .2, y0); g.lineTo(x0 + w * .26 + bk * ext + wv, y0 + hgt * .5); g.lineTo(x0 + bk * ext * 1.25 - wv, y0 + hgt * .58); g.fill(); }
@@ -432,7 +435,8 @@ const Brawl = {
     if (this.cine) return this.renderCine(g);
     const ex = [];
     // ground marks first (far depth in the sorted list, so fighters sit on top)
-    ex.push({ y: -1e6, d: () => { for (const f of this.foes) if (f.st === 'wind') { const w = f.mode === 'charge' ? f.K.wind + .15 : f.second ? .3 : f.K.wind, k = Math.min(1, f.t / w), col = `rgba(255,60,40,${.2 + k * .45})`;
+    ex.push({ y: -1e6, d: () => { for (const q of this.scars) { const a = Math.min(1, q.life / 6); this.poly(g, Array.from({ length: 12 }, (_, k) => [q.x + Math.cos(k / 12 * 6.283) * q.r * (.8 + (k * 7 % 5) * .08), q.y + Math.sin(k / 12 * 6.283) * q.r * .62 * (.8 + (k * 3 % 5) * .08)]), `rgba(22,12,10,${.42 * a})`); this.disc(g, q.x, q.y, q.r * .5, `rgba(255,120,40,${.25 * a * Math.min(1, q.life / 30)})`, 1); }
+      for (const f of this.foes) if (f.st === 'wind') { const w = f.mode === 'charge' ? f.K.wind + .15 : f.second ? .3 : f.K.wind, k = Math.min(1, f.t / w), col = `rgba(255,60,40,${.2 + k * .45})`;
         if (f.mode === 'sweep') this.disc(g, f.x, f.y, (f.K.reach + 6) * k, col); else { const L = (f.mode === 'charge' ? 115 : f.K.reach + 10) * k, wd = (f.K.wide || 12) / 2, nx = -f.ay * wd, ny = f.ax * wd; this.poly(g, [[f.x + nx, f.y + ny], [f.x + f.ax * L + nx, f.y + f.ay * L + ny], [f.x + f.ax * L - nx, f.y + f.ay * L - ny], [f.x - nx, f.y - ny]], col); } }
       if (this.g3 && this.phase === 'fight') { this.disc(g, p.x, p.y, 11, 'rgba(160,120,255,.75)', 1.4); const tg = this.nearest(p); if (tg && Math.hypot(tg.x - p.x, tg.y - p.y) < 80) this.disc(g, tg.x, tg.y, 12, 'rgba(255,90,70,.7)', 1.2); }
       if (p.open > 0) this.disc(g, p.x, p.y, 16, 'rgba(255,224,138,.9)', 2); if (p.fury >= 100 && !rm) this.disc(g, p.x, p.y, 20 + Math.sin(t * 9) * 2, 'rgba(255,120,40,.55)', 2); } });
@@ -440,7 +444,7 @@ const Brawl = {
     for (const f of this.foes) ex.push({ y: f.y, d: () => this.fighter(g, f, { foe: 1, fear: p.fury >= 100 && !f.K.blink, id: f.id, cape: (CAST[f.id].look().cape) || null, boss: this.foes.length === 1, blade: f.K.blade, aura: f.K.blink ? 1 : 0, auraC: 'rgba(255,244,200,.22)', auraG: 'rgba(255,240,190,.2)' }) });
     for (const a of this.allies) ex.push({ y: a.y, d: () => this.fighter(g, a, { blade: 1, id: a.id, win: this.phase === 'win' && this.pt > .4 ? 2 : 0 }) });
     const furyA = p.fury >= 100 || this.sup ? 2 + p.rage : p.rage > 0 ? p.rage * .6 + p.fury / 100 : p.fury > 60 ? .6 : 0;
-    ex.push({ y: p.y + .1, d: () => this.fighter(g, p, { blade: p.blade, aura: furyA, rage: p.fury / 100, win: this.phase === 'win' && this.pt > .5 ? 1 : 0, id: (this.def.hero && this.def.hero.id) || 'kael', cape: this.def.hero && this.def.hero.id ? '#5a3aa8' : null }) });
+    ex.push({ y: p.y + .1, d: () => this.fighter(g, p, { blade: p.blade, aura: furyA, chg: p.fury < 100 && p.hold > .16 && (p.st === 'idle' || p.st === 'move') ? p.hold : 0, rage: p.fury / 100, win: this.phase === 'win' && this.pt > .5 ? 1 : 0, id: (this.def.hero && this.def.hero.id) || 'kael', cape: this.def.hero && this.def.hero.id ? '#5a3aa8' : null }) });
     this.scene(g, ex);
     // screen FX
     if (this.impact > 0 && !rm) { g.fillStyle = `rgba(255,255,255,${Math.min(.85, this.impact * 5)})`; g.fillRect(0, 0, W, H); const pr = this.proj(p.x, p.y, 20); g.strokeStyle = 'rgba(20,10,10,.55)'; g.lineWidth = 1; for (let i = 0; i < 22; i++) { const a = i / 22 * 6.283 + t, r0 = 40 + (i % 3) * 14; g.beginPath(); g.moveTo(pr.x + Math.cos(a) * r0, pr.y + Math.sin(a) * r0 * .7); g.lineTo(pr.x + Math.cos(a) * 320, pr.y + Math.sin(a) * 320 * .7); g.stroke(); } }
@@ -474,7 +478,7 @@ const Brawl = {
     const rx = boss ? W - 27 - bw : W - 4 - bw; bar(rx, 4, bw, boss ? boss.hp / boss.max : tot, '#c8452e', '#f08a70', true); ptext(g, nm, rx + bw - ptextW(nm), 14, '#ff9a7a');
     if (this.hitsT > 0 && this.hitsN > 1) { const s = this.hitsN + ' HITS'; ptext(g, s, W - 6 - ptextW(s, 2) + 1, 31, '#120a0e', 2); ptext(g, s, W - 6 - ptextW(s, 2), 30, this.hitsN > 7 ? '#ff7a30' : '#ffe08a', 2); }
     if (this.vcur && (this.phase === 'fight' || this.phase === 'win') && !(this.sup && this.sup.t < .95) && !this.art) { const v = this.vcur, lines = wrapP(v.t, W - 20), a = Math.min(1, (v.max - v.life) * 5, v.life * 3), y0 = H - 6 - lines.length * 9 - (this.tipT > 0 ? 11 : 0); g.globalAlpha = Math.max(0, a); g.fillStyle = 'rgba(7,5,10,.62)'; g.fillRect(0, y0 - 3, W, lines.length * 9 + 5); g.fillStyle = '#c8a050'; g.fillRect(0, y0 - 3, W, 1); lines.forEach((ln, i) => ptext(g, ln, Math.round(W / 2 - ptextW(ln) / 2), y0 + i * 9, '#fff6dc')); g.globalAlpha = 1; }
-    if (this.tipT > 0 && this.phase === 'fight' && !this.art && !this.sup) { const k = Input.device === 'kb', tip = W > 300 ? (k ? 'E' : 'A') + ' STRIKE   ' + (k ? 'X' : 'B') + ' DODGE THROUGH THE RED   STRIKE AS THEY SWING: CLASH' : (k ? 'E' : 'A') + ' STRIKE  ' + (k ? 'X' : 'B') + ' DODGE'; g.fillStyle = 'rgba(12,8,10,.8)'; g.fillRect(0, H - 11, W, 11); ptext(g, tip, Math.max(3, Math.round(W / 2 - ptextW(tip) / 2)), H - 8, '#f3e3c3'); }
+    if (this.tipT > 0 && this.phase === 'fight' && !this.art && !this.sup) { const k = Input.device === 'kb', tip = W > 300 ? (k ? 'E' : 'A') + ' STRIKE   ' + (k ? 'X' : 'B') + ' DODGE THROUGH THE RED   HOLD: HEAVY' : (k ? 'E' : 'A') + ' STRIKE  ' + (k ? 'X' : 'B') + ' DODGE'; g.fillStyle = 'rgba(12,8,10,.8)'; g.fillRect(0, H - 11, W, 11); ptext(g, tip, Math.max(3, Math.round(W / 2 - ptextW(tip) / 2)), H - 8, '#f3e3c3'); }
   },
   renderSuper(g) {
     const s = this.sup, t = s.t;

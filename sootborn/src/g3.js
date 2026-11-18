@@ -216,6 +216,8 @@ const G3 = {
     else if (st === 'recover' && swingT < 0) { const k = Math.max(0, 1 - Math.max(0, o.t) / .5); S({ cr: 2.2 + k * 1.2, lean: .2 + k * .25, rp: -.6, re: -.2, tilt: -.7 - k * .3, tw: .4 * k, lp: .4, hx: .25 * k }); rate = 9; } // spent: this is when to hit him
     else if (st === 'hurt') { const yw = Math.atan2(o.fx || 0, o.fy === undefined ? 1 : o.fy), f = clamp(((o.kx || 0) * Math.sin(yw) + (o.ky || 0) * Math.cos(yw)) / 90, -1, 1), sd = clamp(((o.kx || 0) * Math.cos(yw) - (o.ky || 0) * Math.sin(yw)) / 90, -1, 1);
       S({ lean: f < .2 ? -.55 : .5, side: sd * .45, tw: sd * .6 + (idx % 2 ? .3 : -.3), hx: f < .2 ? -.55 : .5, hy: sd * .5, rp: -2.3, ry: -.9, re: -.5, tilt: -1.2, lp: -2.2, ly: .8, le: -.5, cr: 2.8, kl: .7, kr: .6, hl: -.2, hr: .3, sq: .94 }); rate = 34; zeta = .5; }
+    if (opt.chg) { const k = Math.min(1, opt.chg / .55); S({ cr: 2 + k * 3, rp: -2.5 - k * .45 + Math.sin(t * 50) * .02 * k, re: -1.0, tilt: -.5, lean: -.12 - k * .12, lp: -2.2, le: -.9, tw: -.2, hl: .45, kl: .8, hr: -.3, kr: .6, hx: .15 }); rate = 16; }
+    if (st === 'floor') { S({ lean: -.2, rp: -2.4, ry: -1.0, re: -.4, tilt: -1.3, lp: -2.4, ly: 1.0, le: -.4, hl: .5, kl: .9, hr: .1, kr: .5, cr: 0, hx: -.2 }); if (o.t > .6) S({ rp: -.3, re: -1.0, lp: .4, le: -1.2, hl: 1.2, kl: 1.6, hr: -.2, kr: 1.4, cr: 5, lean: .5 }); rate = 18; }
     if (opt.pose === 'raise') opt.win = 2; if (opt.pose === 'kneel') { S({ cr: 9, lean: .35, hl: 1.4, kl: 1.6, hr: -.3, kr: 1.5, rp: -.2, re: -.3, tilt: -.9, lp: .1, le: -.6, hx: .45, tw: 0 }); rate = 8; }
     if (opt.win) { const k = Math.sin(t * 2) * .03; S(opt.win === 2 ? { rp: -3.0 + k, re: -.15, tilt: -.1, ry: 0, lp: -2.8, le: -.3, lean: -.12, cr: 0, tw: 0, hx: -.25, hl: .1, hr: -.1, kl: .1, kr: .1 } : { cr: 2.6, lean: .28 + k, tw: .1, rp: -.35, ry: .1, re: -.1, tilt: -.5, lp: .15, le: -.5, hx: .4, hl: .5, kl: .7, hr: -.4, kr: .5, sp: .2 }); rate = 7; zeta = .8; }
     else if (opt.rage > .9 && (st === 'idle' || st === 'move') && !mv) { const k = Math.sin(t * 5.5) * .5 + .5; S({ cr: 2.8 + k * .8, lean: .3, tw: -.15, rp: .15, ry: -.35, re: -.15, tilt: -.45, lp: .1, ly: .3, le: -1.3, hx: .32, hl: .45, kl: .7, hr: -.4, kr: .55, sp: .22 }); rate = 16; }
@@ -242,7 +244,7 @@ const G3 = {
     else if (fresh || jump) { Object.assign(R.p, T); R.yaw = yawT; }
     R.x = o.x; R.y = o.y; const P = R.p, yaw = R.yaw, spd = Math.hypot(R.vx, R.vy), fwdV = R.vx * Math.sin(yaw) + R.vy * Math.cos(yaw), sideV = R.vx * Math.cos(yaw) - R.vy * Math.sin(yaw);
     let hop = st === 'atk' && o.combo === 3 ? Math.sin(Math.min(1, o.t / .13) * Math.PI) * 10 : 0; if (R.hop > 2 && hop <= .5 && z <= 0) R.land = .14; R.hop = hop + z; R.land = Math.max(0, R.land - dt);
-    const sq = P.sq * (1 - Math.sin(R.land / .14 * Math.PI) * .12), fall = st === 'down' ? Math.min(1, o.t * 3.5) * 1.5 + (z > 0 ? o.t * 9 : 0) : z > 1 ? t * 7 % 6.2832 * .0 - .5 : 0, roll = st === 'dodge' ? o.t / .3 * 6.2832 : 0;
+    const sq = P.sq * (1 - Math.sin(R.land / .14 * Math.PI) * .12), fall = st === 'floor' ? (o.t < .6 ? Math.min(1, o.t * 6) : Math.max(0, 1 - (o.t - .6) / .35)) * 1.5 : st === 'down' ? Math.min(1, o.t * 3.5) * 1.5 + (z > 0 ? o.t * 9 : 0) : z > 1 ? t * 7 % 6.2832 * .0 - .5 : 0, roll = st === 'dodge' ? o.t / .3 * 6.2832 : 0;
     D.flash = o.flash > 0 ? .55 : 0;
     let root = M4.chain(M4.t(o.x, z + hop * this.MS, o.y), M4.ry(yaw), M4.s(sc * this.MS));
     if (fall) root = M4.chain(root, M4.t(0, 4, 0), M4.rx(-fall), M4.t(0, -2, 0));
@@ -278,7 +280,7 @@ const G3 = {
       if (L.smudge) { D.box(hd, 3, 5.6, 4.6, 1.8, 1.4, .3, '#5a4a44'); D.box(hd, -3.4, 4.6, 4.6, 1.2, 1, .3, '#5a4a44'); }
       if (L.circlet) { D.box(hd, 0, 11, 0, 9.8, 1.2, 9.8, trim, 1); D.box(hd, 0, 12.2, 4.9, 1.6, 2, .5, [1, 1, .9], 1); } }
     // off arm: shoulder, elbow, an open hand for balance
-    { const am = M4.chain(up, M4.t(8.8, 13, 0), M4.rz(.14), M4.ry(P.ly), M4.rx(P.lp)), fm = M4.chain(am, M4.t(0, -7, 0), M4.rx(P.le)); D.fr(am, 0, -7.3, 0, 3.6, 4, 4.8, 5.2, 7.4, arm); D.fr(fm, 0, -6.5, 0, 3.2, 3.6, 4.6, 5, 6.6, shade(arm, .92)); D.box(fm, 0, -1, 0, 4.4, 1.2, 4.8, trim, 1); D.box(fm, 0, -7.6, 0, 3.6, 2.6, 3.8, skin); }
+    { const am = M4.chain(up, M4.t(8.8, 13, 0), M4.rz(.14), M4.ry(P.ly), M4.rx(P.lp)), fm = M4.chain(am, M4.t(0, -7, 0), M4.rx(P.le)); D.fr(am, 0, -7.3, 0, 3.6, 4, 4.8, 5.2, 7.4, arm); D.fr(fm, 0, -6.5, 0, 3.2, 3.6, 4.6, 5, 6.6, shade(arm, .92)); D.box(fm, 0, -1, 0, 4.4, 1.2, 4.8, trim, 1); D.box(fm, 0, -7.6, 0, 3.6, 2.6, 3.8, skin); if (L.shield) { const sm2 = M4.chain(fm, M4.t(2.6, -4, 0), M4.rz(Math.PI / 2)); D.cyl(sm2, 0, 0, 0, 8.4, 8.4, 1.2, 8, sash, 0, 1); D.cyl(sm2, 0, 1.2, 0, 8.6, 7.6, .5, 8, trim, 1); D.cyl(sm2, 0, 1.2, 0, 2.4, 1.4, 1.6, 6, trim, 1, 1); D.cyl(sm2, 0, -.2, 0, 8.8, 8.8, .3, 8, shade(sash, .7)); } }
     // sword arm: shoulder, elbow, wrist, steel
     const am = M4.chain(up, M4.t(-8.8, 13, 0), M4.rz(-.14), M4.ry(P.ry), M4.rx(P.rp)), fm = M4.chain(am, M4.t(0, -7, 0), M4.rx(P.re));
     D.fr(am, 0, -7.3, 0, 3.6, 4, 4.8, 5.2, 7.4, arm); if (L.band) D.box(am, 0, -3.4, 0, 4.9, 2.6, 5.3, '#c8281e'); D.fr(fm, 0, -6.5, 0, 3.2, 3.6, 4.6, 5, 6.6, shade(arm, .92)); D.box(fm, 0, -1, 0, 4.4, 1.2, 4.8, trim, 1); D.box(fm, 0, -7.6, 0, 3.6, 2.6, 3.8, skin);
@@ -290,6 +292,7 @@ const G3 = {
       if (!rm) { if (dt > 0) for (const q of R.trail) q.life -= dt; R.trail = R.trail.filter(q => q.life > 0); const swinging = fast && (st === 'atk' || o.swing > 0 || opt.swingFx); if (swinging && dt > 0 && !jump) R.trail.push({ a: base, b: tip, life: .13 }); else if (jump) R.trail = [];
         const col = hot > .5 || (opt.aura || 0) > 1.5 ? [1, .46, .14] : blade === 2 ? [.85, .92, 1] : [1, .92, .66]; let pa = swinging ? { a: base, b: tip, life: .13 } : null;
         for (let i = R.trail.length - 1; i >= 0; i--) { const q = R.trail[i]; if (pa) { const a0 = Math.pow(pa.life / .13, 1.5), a1 = Math.pow(q.life / .13, 1.5); this.tri3(pa.a, pa.b, q.b, col, 0, a0 * .5, a1 * .5); this.tri3(pa.a, q.b, q.a, col, 0, a1 * .5, 0); } pa = q; }
+        if (opt.chg) this.glow(tip[0], tip[1], tip[2], 5 + opt.chg * 22, [1, .8, .4], .5 + opt.chg * .6);
         const sh = Math.sin(t * 3 + idx * 2.1); if (st === 'wind' ? Math.floor(t * 10) % 2 : sh > .9) this.glow(tip[0], tip[1], tip[2], st === 'wind' ? 10 : 6, [1, .96, .8], .9); }
     }
     D.flash = 0;
