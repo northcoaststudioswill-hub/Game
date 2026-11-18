@@ -40,11 +40,15 @@
     venom: { armor: 0x2a3a22, armor2: 0x16200f, cloth: 0x6aa82a, trim: 0xb8ff5a, legs: 0x1a2414 },
     rime: { armor: 0xcfe6f2, armor2: 0x8fb0c4, cloth: 0x9fd6ee, trim: 0xffffff, legs: 0x6a8a9c },
     cinder: { armor: 0x3a2a24, armor2: 0x201612, cloth: 0xd0581a, trim: 0xffb060, legs: 0x241a16 },
+    bonewhite: { armor: 0xe6dcc4, armor2: 0xb8ac90, cloth: 0x1a1618, trim: 0x8a1c1c, legs: 0x2a2428 },
+    royal: { armor: 0x3a2a6a, armor2: 0x241848, cloth: 0x5a2a8a, trim: 0xd8dce6, legs: 0x1c1430 },
+    rust: { armor: 0x8a4a2a, armor2: 0x5a2e1a, cloth: 0x3a3430, trim: 0x2a2428, legs: 0x2a2220 },
+    house: { armor: 0x1f5a3a, armor2: 0x143a2c, cloth: 0x0e2a1e, trim: 0xf0c95a, legs: 0x10241a },
     ashen: { armor: 0x4a4a4e, armor2: 0x2a2a2e, cloth: 0x1c1c20, trim: 0xc22a22, legs: 0x202024 }
   };
   G.WSKIN = {
     ember: { color: 0xff9a4a, e: 0xa03808, glow: 0xff7a2a }, frost: { color: 0xbfeaff, e: 0x1a6a90, glow: 0x7ad8ff },
-    gilded: { color: 0xffd36b, e: 0x6a4a08, glow: 0xffd36b }, blood: { color: 0xc22a22, e: 0x6a0808, glow: 0xff4030 }, toxic: { color: 0x9aff5a, e: 0x2a6a08, glow: 0x8aff5a }, void: { color: 0x7a4ac0, e: 0x3a1470, glow: 0xb070ff }
+    gilded: { color: 0xffd36b, e: 0x6a4a08, glow: 0xffd36b }, frost: { color: 0xd8f4ff, e: 0x2a6a8a, glow: 0x9adfff }, voidsteel: { color: 0x1a1420, e: 0x3a1a6a, glow: 0xb070ff }, wisp: { color: 0x9af6ff, e: 0x0a6a7a, glow: 0x6af0ff }, blood: { color: 0xc22a22, e: 0x6a0808, glow: 0xff4030 }, toxic: { color: 0x9aff5a, e: 0x2a6a08, glow: 0x8aff5a }, void: { color: 0x7a4ac0, e: 0x3a1470, glow: 0xb070ff }
   };
   G.COSMETICS = [
     { id: 'crimson', slot: 'dye', name: 'Pit Crimson', cost: 60, rank: 0, desc: 'Deep red cloth, brass trim. Hides the stains.' },
@@ -62,6 +66,14 @@
     { id: 'antlers', slot: 'head', name: 'Stag Antlers', cost: 170, rank: 2, desc: 'A full rack, lashed to a leather band.' },
     { id: 'thorns', slot: 'head', name: 'Crown of Thorns', cost: 230, rank: 3, desc: 'Black iron briar. It bites the wearer too.' },
     { id: 'lucky', slot: 'head', name: 'Mark’s Lucky Laurel', cost: 9999, rank: 9, desc: 'Won from Mark in a friendly. He says it is lucky. He lost while wearing it.' },
+    { id: 'rust', slot: 'dye', name: 'Old Rust', cost: 70, rank: 0, desc: 'Iron left in the wet. It suits the place.' },
+    { id: 'bonewhite', slot: 'dye', name: 'Bone and Black', cost: 140, rank: 2, desc: 'Ivory plate over black cloth, with a red edge.' },
+    { id: 'royal', slot: 'dye', name: 'Guild Violet', cost: 220, rank: 3, desc: 'The Guild’s own colour. Wearing it is a statement.' },
+    { id: 'house', slot: 'dye', name: 'House Colours', cost: 9999, rank: 9, chit: 120, desc: 'Long Odds green and gold. You are a walking advertisement.' },
+    { id: 'hood', slot: 'head', name: 'Deep Cowl', cost: 70, rank: 0, desc: 'A heavy hood. Nobody sees where you are looking.' },
+    { id: 'mohawk', slot: 'head', name: 'Pit Crest', cost: 100, rank: 1, desc: 'A stiff dyed crest. The crowd can find you from the back row.' },
+    { id: 'candles', slot: 'head', name: 'Lampwright’s Crown', cost: 210, rank: 3, desc: 'A ring of lit candles. Hot wax is part of the look.' },
+    { id: 'dicecrown', slot: 'head', name: 'High Roller’s Crown', cost: 9999, rank: 9, chit: 200, desc: 'Gold band, four wispdice. Mark wore it once and lost a house.' },
     { id: 'horned', slot: 'head', name: 'Horned Helm', cost: 90, rank: 0, desc: 'Two great curved horns.' },
     { id: 'plague', slot: 'head', name: 'Plague Beak', cost: 120, rank: 1, desc: 'A long leather beak and glass eyes.' },
     { id: 'skull', slot: 'head', name: 'Skull Visor', cost: 150, rank: 2, desc: 'Somebody else’s face, worn over yours.' },
@@ -76,6 +88,12 @@
     { id: 'skullrack', slot: 'back', name: 'Trophy Rack', cost: 280, rank: 4, desc: 'Three skulls on iron spikes.' },
     { id: 'blood', slot: 'weapon', name: 'Bloodletter', cost: 180, rank: 2, desc: 'Red to the hilt, and it stays that way.' },
     { id: 'toxic', slot: 'weapon', name: 'Sewer-Quenched', cost: 180, rank: 2, desc: 'A sick green shine.' },
+    { id: 'quiver', slot: 'back', name: 'Javelin Quiver', cost: 120, rank: 1, desc: 'Three short spears you will never throw.' },
+    { id: 'ratcage', slot: 'back', name: 'Mistake’s Cousin', cost: 170, rank: 2, desc: 'A rat in a cage on your back. He is not fast either.' },
+    { id: 'moneybag', slot: 'back', name: 'Sack of Winnings', cost: 9999, rank: 9, chit: 150, desc: 'A fat sack with coin spilling from the neck. Mostly washers.' },
+    { id: 'frost', slot: 'weapon', name: 'Rimed Edge', cost: 180, rank: 2, desc: 'Pale as lake ice.' },
+    { id: 'voidsteel', slot: 'weapon', name: 'Voidsteel', cost: 260, rank: 4, desc: 'Black metal with a violet burn in it.' },
+    { id: 'wisp', slot: 'weapon', name: 'Wisplight Edge', cost: 9999, rank: 9, chit: 180, desc: 'The same light the dice are made of, on a blade.' },
     { id: 'ember', slot: 'weapon', name: 'Emberforged', cost: 120, rank: 1, desc: 'The edge glows like a coal.' },
     { id: 'frost', slot: 'weapon', name: 'Frostbitten', cost: 120, rank: 1, desc: 'Cold enough to smoke.' },
     { id: 'gilded', slot: 'weapon', name: 'Gilded', cost: 200, rank: 3, desc: 'Gold leaf over good steel.' },
@@ -85,6 +103,9 @@
     { id: 'sigils', slot: 'aura', name: 'Violet Sigils', cost: 190, rank: 3, desc: 'Guild-work glyphs that orbit you.', color: 0xb070ff },
     { id: 'snow', slot: 'aura', name: 'Rime Fall', cost: 190, rank: 3, desc: 'A cold white drift that never settles.', color: 0xe8f6ff },
     { id: 'bloodmist', slot: 'aura', name: 'Red Mist', cost: 240, rank: 4, desc: 'It followed you out of the pit.', color: 0xff4030 },
+    { id: 'moths', slot: 'aura', name: 'Lamp Moths', cost: 130, rank: 1, desc: 'They think you are the First Lamp.', color: 0xffe0a0 },
+    { id: 'spores', slot: 'aura', name: 'Glowcap Spores', cost: 170, rank: 2, desc: 'Do not breathe in. Mark does.', color: 0x8aff5a },
+    { id: 'wisps', slot: 'aura', name: 'Loose Wisps', cost: 9999, rank: 9, chit: 160, desc: 'Escaped from the table. They like you.', color: 0x6af0ff },
     { id: 'gold', slot: 'aura', name: 'Halo of Coin', cost: 280, rank: 4, desc: 'The crowd’s favour, made visible.', color: 0xffd36b }
   ];
   const SLOTS = [['dye', 'Dyes'], ['head', 'Headgear'], ['back', 'Back'], ['weapon', 'Weapon finish'], ['aura', 'Aura']];

@@ -74,7 +74,7 @@
   G.spar = function (opp, onDone) { ui.leaveHub(); ui.close(); const pot = G.state.potions; opp.onDone = w => { G.state.potions = pot; onDone(w); }; G.scene = 'fight'; ui.topbar(); G.fight.start(opp); };
   const backToHub = () => { $('hud').className = 'hidden'; ui.hub(); ui.close(); };
   function markDuel(stake, first) {
-    const st = G.state; if (stake) st.coin -= stake;
+    const st = G.state; if (stake) G.mark.take(stake);
     G.spar(MARK_OPP(), win => {
       backToHub(); st.met.markDuel = (st.met.markDuel || 0) + (win ? 1 : 0);
       let line, got = '';
@@ -145,6 +145,7 @@
     const st = G.state; if (!st.hero) return '';
     const h = st.hero, next = G.OPPONENTS.find(o => !st.wins[o.id]);
     if (G.scene === 'hideout') return (st.items || []).length < 3 ? 'Press Decorate and furnish the place' : 'Comfort ' + (G.roomComfort || 0) + ': tap a piece to use or move it';
+    if (st.schemeDone) return 'Mark has news about your scheme';
     if ((st.reports || []).length) return 'Your Tally has news at the Low Lamp';
     if (h.known.some(id => !h.slots.includes(id)) && h.slots.includes(null)) return 'See the Guildmaster to set your loadout';
     if (!next) return 'You hold the Guttercrown. Rematch anyone, or finish your home';

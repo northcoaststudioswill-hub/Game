@@ -115,8 +115,10 @@
     const ph = crowdSpots.map(() => R(0, 6.3)), skins = [0xc9977a, 0x7f9a62, 0xb5564e, 0xd8c3ae, 0x8a6a52];
     crowdSpots.forEach((p, i) => { col.setHSL(R(0, 1), 0.2, R(0.05, 0.12)); bodies.setColorAt(i, col); col.set(G.pick(skins)).multiplyScalar(0.3); heads.setColorAt(i, col); });
     s.add(bodies, heads);
-    let hypeNow = 0;
+    let hypeNow = 0, life = null;
     const update = (t) => {
+      if (!life && W.arenaLife) life = W.arenaLife(s, AR, crowdSpots);
+      if (life) life(t, hypeNow);
       const amp = 0.03 + hypeNow * 0.2;
       for (let i = 0; i < n; i++) {
         const p = crowdSpots[i], y = p[1] + Math.abs(Math.sin(t * (3 + (i % 5) * 0.6) + ph[i])) * amp;

@@ -104,7 +104,7 @@
     mesh(new T.CylinderGeometry(0.4, 0.34, 0.8, 8), iron(), 27, 0.4, 15.4, s); gfx.fire(s, 27, 0.9, 15.4, 0xff8a30, 0.7, 14);
     const sit = npc(s, { cls: 'rogue', race: 'dwarf', tint: { cloth: '#3a3028', armor: '#3a3430' } }, 25.9, 15.8, 1.3), sit2 = npc(s, { cls: 'cleric', race: 'human', tint: { cloth: '#4a4238', armor: '#3a3632' } }, 27.8, 14.4, -2.6);
     { const c = new T.Group(); c.position.set(18.5, 0, 15.6); c.rotation.y = 0.4; s.add(c); box(2.2, 0.14, 1.2, wood(), 0, 0.7, 0, c); box(2.2, 0.5, 0.08, woodD(), 0, 1.0, 0.6, c); box(2.2, 0.5, 0.08, woodD(), 0, 1.0, -0.6, c); [-0.8, 0.8].forEach(x => { const w = mesh(new T.CylinderGeometry(0.5, 0.5, 0.1, 10), woodD(), x, 0.5, 0.7, c); w.rotation.x = Math.PI / 2; const w2 = mesh(new T.CylinderGeometry(0.5, 0.5, 0.1, 10), woodD(), x, 0.5, -0.7, c); w2.rotation.x = Math.PI / 2; }); crate(c, -0.4, 0, 0.6); c.children[c.children.length - 1].position.y = 1.07; c.children[c.children.length - 2].position.y = 1.07; }
-    crate(s, 0.3, 12.4, 0.7); crate(s, 1.0, 12.9, 0.5); barrel(s, 28.2, 4.2); barrel(s, 28.3, 5.1); crate(s, 9.2, -0.6, 0.6); barrel(s, 22.8, -0.7); crate(s, 16.5, 8.2, 0.5);
+    crate(s, 0.3, 12.4, 0.7); crate(s, 1.0, 12.9, 0.5); barrel(s, 28.4, 2.6); barrel(s, 28.5, 8.1); crate(s, 9.2, -0.6, 0.6); barrel(s, 22.8, -0.7); crate(s, 16.5, 8.2, 0.5);
     [[9, 5.5], [19.5, 5.5], [8.5, 16.3], [20, 9.5], [27.6, 11.8], [3, 7.2], [13, 16.6]].forEach((q, i) => lantern(s, q[0], 0, q[1], i % 3 === 2 ? 0xb070ff : 0xffb060, i < 3 ? 15 : 0));
     // strung lamps and puddles
     [[1, 9], [12, 19], [21, 29]].forEach((q, n) => { for (let i = 0; i <= 10; i++) { const u = i / 10, x = q[0] + (q[1] - q[0]) * u, y = 4.4 - Math.sin(u * Math.PI) * 0.7, col = [0xffc070, 0xc080ff, 0x80d0ff, 0x9aff8a][(i + n) % 4]; if (i % 2 === 0) { const b = new T.Mesh(new T.SphereGeometry(0.07, 6, 5), emis(col)); b.position.set(x, y, -0.8); s.add(b); gfx.glow(col, 0.6, x, y, -0.8, s, 0.5); } } });
@@ -112,13 +112,14 @@
 
     // ---- people going about their business (routes kept apart so the square never bunches up)
     const TINTS = [{ cloth: '#5a3a2a', armor: '#4a4038' }, { cloth: '#2a4a5a', armor: '#3a4048' }, { cloth: '#5a2a4a', armor: '#3a3040' }, { cloth: '#3a5a3a', armor: '#3a4038' }, { cloth: '#6a5a3a', armor: '#4a4438' }, { cloth: '#3a3a5a', armor: '#30304a' }];
-    const walkers = [[[1.5, 6.6], [27, 6.2]], [[27.5, 3.4], [9, 3.0]], [[5.5, 16.2], [9.5, 9.2]], [[23.5, 15.6], [18.5, 9.4]], [[2, 15.6], [15.5, 16.6]], [[19.5, 3.6], [22.5, 10.8]]]
+    const walkers = [[[1.5, 6.6], [23.6, 6.4]], [[27.5, 3.5], [11.2, 3.6]], [[5.5, 16.2], [9.5, 9.2]], [[23.5, 15.6], [18.5, 9.4]], [[2, 15.6], [15.5, 16.6]], [[19.5, 3.6], [22.5, 10.8]]]
       .map((pth, i) => ({ c: npc(s, { cls: ['rogue', 'cleric', 'fighter', 'sorcerer', 'rogue', 'cleric'][i], race: Object.keys(G.RACES)[i % 5], tint: TINTS[i] }, pth[0][0], pth[0][1], 0), a: pth[0], b: pth[1], u: Math.random(), dir: 1, wait: Math.random() * 3, sp: 0.03 + i * 0.006 }));
     const CHAT = ['…heard Vexa has never once blinked.', 'Guild raised the rent again.', 'Glowcaps are coming in nicely.', 'Put ten coin on the new one. Ten!', 'Nobody leaves the Ledger.', 'Different carts, he says.', 'My cousin fought Brakk. Once.', 'The Light went ahead to wait.', 'They say the Keeper never sleeps.', 'Highmarch sealed another stair.', 'Mark owes me money. Mark owes everyone money.', 'Meet me by the First Lamp.'];
     const MARKSAY = ['I have got a guy, bro. The guy is me.', 'Real ones bet big.', 'Odds! Fresh odds!', 'Bro. BRO. Look at this roll.', '…what were we doing?', 'Respect. Respect.'];
     let chatT = 4, markT = 6;
     const npcs = [fence, gm, mark, punter, k1, k2, k3, k4, sit, sit2];
     const obstacles = [[14, -1.6, 17.2, 0.7], [19.4, -1, 22.2, 0.7], [23.5, -1.2, 27.7, 1.9], [12.1, -1.3, 13.8, -0.2], [2.4, -1.1, 3.2, -0.2], [6.8, -1.1, 7.6, -0.2], [11.2, 6.2, 16.8, 11.8], [5.4, 11.8, 8.6, 13.8], [9, 13.4, 12.2, 15.4], [19.9, 12.2, 23.1, 14.2], [24.2, 7.9, 26.3, 11.1], [3, 13, 5, 15], [26.5, 14.9, 27.5, 15.9], [17.2, 14.8, 19.8, 16.4], [-0.7, 1, 0.1, 1.8], [-0.1, 4.2, 0.7, 5], [0.1, 1.2, 1.1, 2], [27.8, 3.8, 28.7, 5.5], [-0.1, 12, 1.4, 13.3]];
+    const life = W.hubLife ? W.hubLife(s, obstacles) : null;
     return {
       scene: s, start: { x: 13.5, z: 4.5 }, zoom: [13.5, 22], bounds: [0, 0, 29, 17],
       spots: [
@@ -126,12 +127,14 @@
         { x: 11, z: 0.6, r: 1.5, y: 3.0, label: 'Notice Board', act: 'Read the Codex', go: () => G.ui.codex() },
         { x: 15.6, z: 1.3, r: 1.9, y: 3.2, label: 'The Fence', act: 'Trade', go: () => G.meet('fence', () => G.ui.shop()), badge: () => !(G.state.met || {}).fence },
         { x: 20.4, z: 1.3, r: 1.9, y: 3.2, label: 'Guildmaster', act: 'Character', go: () => G.meet('gm', () => G.ui.sheet()), badge: () => !(G.state.met || {}).gm || G.state.hero.known.some(id => !G.state.hero.slots.includes(id)) && G.state.hero.slots.includes(null) },
-        { x: 25.6, z: 2.5, r: 1.9, y: 3.6, label: 'Mark · The Long Odds', act: 'Gamble', go: () => G.meet('mark', () => G.ui.mark()), badge: () => !(G.state.met || {}).mark },
+        { x: 25.6, z: 2.5, r: 1.9, y: 3.6, label: 'Mark · The Long Odds', act: 'Gamble', go: () => G.meet('mark', () => G.ui.mark()), badge: () => !(G.state.met || {}).mark || !!G.state.schemeDone },
+        { x: 24.9, z: 5.4, r: 1.7, y: 4.4, label: 'The Wisp Table', act: 'Roll the wispdice', go: () => G.ui.wisp() },
         { x: -0.2, z: 3, r: 1.6, y: 3.5, label: 'The Low Lamp', act: 'See your Tally', go: () => G.ui.tally(), badge: () => (G.state.reports || []).length > 0 || (G.state.tally || []).some(t => !t.job) && G.state.second == null },
         { x: -0.2, z: 9, r: 1.9, y: 3.6, label: 'Your Hideout', act: 'Go home', go: () => G.ui.hideout() }
       ],
       blocked: (x, z) => x < -0.55 || x > X1 + 0.9 || z < -0.75 || z > Z1 + 0.9 || obstacles.some(o => x > o[0] - 0.35 && x < o[2] + 0.35 && z > o[1] - 0.35 && z < o[3] + 0.35),
       update: (t) => {
+        if (life) life(t);
         npcs.forEach((c, i) => c.pose({ t: t + i * 2, act: 'idle' }));
         mark.pose({ t, act: Math.sin(t * 0.7) > 0.6 ? 'cast' : 'idle', prog: 0.3 });
         const dt2 = 0.016;

@@ -6,7 +6,7 @@
   const port = () => { const el = $('mkp'); if (el) el.appendChild(G.portrait(G.mark.look, 92)); };
   const stakes = (max) => [10, 25, 50, 100, 250].filter(v => v <= max);
   const leave = () => { ui.close(); ui.topbar(); };
-  const stakeRow = (st) => '<div class="row">' + stakes(st.coin).map(v => '<button class="big" data-s="' + v + '">Stake ' + v + '</button>').join('') + '</div>';
+  const stakeRow = (st) => '<div class="row">' + stakes(G.mark.funds()).map(v => '<button class="big" data-s="' + v + '">Stake ' + v + '</button>').join('') + '</div>';
   const broke = () => ui.mark('Bro. You have no coin. I respect the confidence. Come back with coin.');
   const timers = []; const later = (fn, ms) => timers.push(setTimeout(fn, ms)); const clearT = () => { timers.forEach(clearTimeout); timers.length = 0; };
 
@@ -26,24 +26,24 @@
   ui.duelMark = function () {
     const st = G.state;
     show('<div class="card small"><h2>Duel Mark</h2>' + head('You and me, bro, in the pit. Nobody dies, I have got customers to rob later. First one to yield pays up.') +
-      '<p class="dim">Mark fights as a Wild Magic sorcerer at your level. A friendly costs nothing to lose.</p><div class="row"><button class="big" data-s="0">Friendly</button>' + stakes(st.coin).map(v => '<button data-s="' + v + '">Stake ' + v + '</button>').join('') + '</div><div class="row end"><button id="b">Back</button></div></div>');
+      '<p class="dim">Mark fights as a Wild Magic sorcerer at your level. A friendly costs nothing to lose.</p><div class="row"><button class="big" data-s="0">Friendly</button>' + stakes(G.mark.funds()).map(v => '<button data-s="' + v + '">Stake ' + v + '</button>').join('') + '</div><div class="row end"><button id="b">Back</button></div></div>');
     port(); on('#b', () => ui.mark()); on('[data-s]', el => G.markDuel(+el.dataset.s, false));
   };
 
   // ---- the Rat Race
   const RATS = [['Bishop', '#c79bff'], ['Gravy', '#ffb060'], ['Sir Squeak', '#8ad0ff'], ['Mistake', '#9aff8a']];
   ui.ratRace = function () {
-    const st = G.state; if (st.coin < 10) return broke();
+    const st = G.state; if (G.mark.funds() < 10) return broke();
     const sp = RATS.map(() => 0.7 + Math.random() * 0.6), tot = sp.reduce((a, b) => a + Math.pow(b, 4), 0), odds = sp.map(s => Math.max(1.4, Math.round(0.9 * tot / Math.pow(s, 4) * 10) / 10));
-    let stake = stakes(st.coin)[0];
+    let stake = stakes(G.mark.funds())[0];
     const draw = (line) => {
-      show('<div class="card small"><h2>The Rat Race</h2>' + head(line) + '<div class="chips">' + stakes(st.coin).map(v => '<button class="chip' + (v === stake ? ' sel' : '') + '" data-st="' + v + '">' + v + '</button>').join('') + '</div>' +
+      show('<div class="card small"><h2>The Rat Race</h2>' + head(line) + '<div class="chips">' + stakes(G.mark.funds()).map(v => '<button class="chip' + (v === stake ? ' sel' : '') + '" data-st="' + v + '">' + v + '</button>').join('') + '</div>' +
         RATS.map((r, i) => '<div class="ab-row"><div class="ab-ic pas" style="color:' + r[1] + '">●</div><div class="ab-tx"><b>' + r[0] + '</b><small>pays ' + odds[i].toFixed(1) + 'x</small></div><button class="big" data-rat="' + i + '">Back ' + r[0].split(' ').pop() + '</button></div>').join('') + '<div class="row end"><button id="b">Back</button></div></div>');
       port(); on('#b', () => ui.mark()); on('[data-st]', el => { stake = +el.dataset.st; draw(line); });
       on('[data-rat]', el => run(+el.dataset.rat));
     };
     const run = (mine) => {
-      st.coin -= stake; G.sfx('place'); const pos = [0, 0, 0, 0]; let done = false;
+      G.mark.take(stake); G.sfx('place'); const pos = [0, 0, 0, 0]; let done = false;
       show('<div class="card small"><h2>The Rat Race</h2>' + head('AND THEY ARE OFF. Sort of. Mistake is facing the wrong way.') + '<div class="track">' + RATS.map((r, i) => '<div class="lane' + (i === mine ? ' mine' : '') + '"><small>' + r[0] + '</small><span class="rat" id="rat' + i + '" style="background:' + r[1] + '"></span></div>').join('') + '</div><div class="row end" id="rr"></div></div>');
       port();
       const tick = () => {
@@ -64,11 +64,11 @@
 
   // ---- Three Cups
   ui.cups = function () {
-    const st = G.state; if (st.coin < 10) return broke();
+    const st = G.state; if (G.mark.funds() < 10) return broke();
     show('<div class="card small"><h2>Three Cups</h2>' + head('Coin goes under a cup. Cups go round. You point. Pays two and a half. Bigger stake, faster hands, that is just physics.') + stakeRow(st) + '<div class="row end"><button id="b">Back</button></div></div>');
     port(); on('#b', () => ui.mark());
     on('[data-s]', el => {
-      const stake = +el.dataset.s; st.coin -= stake; G.sfx('place'); ui.topbar();
+      const stake = +el.dataset.s; G.mark.take(stake); G.sfx('place'); ui.topbar();
       let slot = [0, 1, 2], coin = 1, swaps = 5 + Math.min(6, Math.floor(stake / 25)), ms = Math.max(170, 430 - stake * 1.1), locked = true;
       show('<div class="card small"><h2>Three Cups</h2>' + head('Watch the middle one. Watch it. Are you watching it?') + '<div class="cups">' + [0, 1, 2].map(i => '<button class="cup" id="cup' + i + '" data-cup="' + i + '"><i></i></button>').join('') + '</div><p class="dim" id="cmsg">The coin is under the middle cup.</p><div class="row end" id="cr"></div></div>');
       port();
@@ -94,11 +94,11 @@
   // ---- High Card
   const FACE = n => ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'][n];
   ui.highCard = function () {
-    const st = G.state; if (st.coin < 10) return broke();
+    const st = G.state; if (G.mark.funds() < 10) return broke();
     show('<div class="card small"><h2>High Card</h2>' + head('I turn a card. You say higher or lower. Right, and the pot grows. Same card twice is mine, because I said so first.') + stakeRow(st) + '<div class="row end"><button id="b">Back</button></div></div>');
     port(); on('#b', () => ui.mark());
     on('[data-s]', el => {
-      let pot = +el.dataset.s, cur = 2 + Math.floor(Math.random() * 11), streak = 0; st.coin -= pot; G.sfx('place'); ui.topbar();
+      let pot = +el.dataset.s, cur = 2 + Math.floor(Math.random() * 11), streak = 0; G.mark.take(pot); G.sfx('place'); ui.topbar();
       const draw = (line) => {
         // fair-ish multiplier: the unlikelier the call, the better it pays
         const pH = (13 - cur) / 13, pL = (cur - 1) / 13, mH = pH > 0 ? Math.min(6, Math.round(0.92 / pH * 10) / 10) : 0, mL = pL > 0 ? Math.min(6, Math.round(0.92 / pL * 10) / 10) : 0;

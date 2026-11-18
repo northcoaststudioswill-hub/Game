@@ -65,14 +65,14 @@
       const oa = mk.odds(b.ra, b.rb), ob = mk.odds(b.rb, b.ra);
       h += '<div class="bout"><div class="bside' + (b.bet && b.bet.pick === 'a' ? ' sel' : '') + '"><b>' + b.a + '</b><small>pays ' + oa.toFixed(2) + 'x</small></div><span class="bvs">vs</span><div class="bside' + (b.bet && b.bet.pick === 'b' ? ' sel' : '') + '"><b>' + b.b + '</b><small>pays ' + ob.toFixed(2) + 'x</small></div>' +
         (b.bet ? '<p class="bbet">' + b.bet.stake + ' coin on ' + (b.bet.pick === 'a' ? b.a : b.b).split(' ')[0] + '.</p>' :
-          '<div class="row bst">' + ['a', 'b'].map(pk => stakes(st.coin).slice(0, 4).map(v => '<button class="mini" data-bet="' + i + ':' + pk + ':' + v + '">' + v + ' on ' + (pk === 'a' ? b.a : b.b).split(' ')[0] + '</button>').join('')).join('<i></i>') + '</div>') + '</div>';
+          '<div class="row bst">' + ['a', 'b'].map(pk => stakes(G.mark.funds()).slice(0, 4).map(v => '<button class="mini" data-bet="' + i + ':' + pk + ':' + v + '">' + v + ' on ' + (pk === 'a' ? b.a : b.b).split(' ')[0] + '</button>').join('')).join('<i></i>') + '</div>') + '</div>';
     });
     h += '<div class="bout self"><div class="bside sel"><b>Yourself</b><small>against ' + so.opp.name + ' · pays ' + so.odds.toFixed(2) + 'x</small></div>' +
-      (c.self ? '<p class="bbet">' + c.self.stake + ' coin on yourself to win your next bout.</p>' : '<div class="row bst">' + stakes(st.coin).map(v => '<button class="mini" data-self="' + v + '">' + v + ' on me</button>').join('') + '</div>') + '</div>';
+      (c.self ? '<p class="bbet">' + c.self.stake + ' coin on yourself to win your next bout.</p>' : '<div class="row bst">' + stakes(G.mark.funds()).map(v => '<button class="mini" data-self="' + v + '">' + v + ' on me</button>').join('') + '</div>') + '</div>';
     h += '<p class="dim">Bets are settled when your next bout ends, win or lose. Mark keeps a cut of every payout.</p><div class="row end"><button id="b">Back</button><button class="big" id="x">Done</button></div></div>';
     show(h); port(); on('#x', leave); on('#b', () => ui.mark());
-    on('[data-bet]', el => { const p = el.dataset.bet.split(':'), b = c.bouts[+p[0]], v = +p[2]; if (st.coin < v) return; st.coin -= v; b.bet = { pick: p[1], stake: v }; G.save(); G.sfx('coin'); ui.markCard('Locked in. No refunds, bro. I checked, there is a rule.'); ui.topbar(); });
-    on('[data-self]', el => { const v = +el.dataset.self; if (st.coin < v) return; st.coin -= v; c.self = { stake: v, odds: so.odds }; G.save(); G.sfx('coin'); ui.markCard(say('self')); ui.topbar(); });
+    on('[data-bet]', el => { const p = el.dataset.bet.split(':'), b = c.bouts[+p[0]], v = +p[2]; if (G.mark.funds() < v) return; G.mark.take(v); b.bet = { pick: p[1], stake: v }; G.save(); G.sfx('coin'); ui.markCard('Locked in. No refunds, bro. I checked, there is a rule.'); ui.topbar(); });
+    on('[data-self]', el => { const v = +el.dataset.self; if (G.mark.funds() < v) return; G.mark.take(v); c.self = { stake: v, odds: so.odds }; G.save(); G.sfx('coin'); ui.markCard(say('self')); ui.topbar(); });
   };
   ui.markReport = function () {
     const st = G.state, r = st.markReport; st.markReport = null; G.save();
@@ -86,17 +86,17 @@
   const die = (n, cls) => '<span class="bone ' + (cls || '') + '">' + ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][n] + '</span>';
   ui.bones = function () {
     const st = G.state;
-    if (st.coin < 10) return ui.mark(say('broke'));
+    if (G.mark.funds() < 10) return ui.mark(say('broke'));
     show('<div class="card small"><h2>High Bones</h2>' + head('Two bones each, highest total wins. Tie goes to me. You can press once: double the stake, re-throw your worst bone.') +
-      '<div class="row">' + stakes(st.coin).map(v => '<button class="big" data-s="' + v + '">Stake ' + v + '</button>').join('') + '</div><div class="row end"><button id="b">Back</button></div></div>');
+      '<div class="row">' + stakes(G.mark.funds()).map(v => '<button class="big" data-s="' + v + '">Stake ' + v + '</button>').join('') + '</div><div class="row end"><button id="b">Back</button></div></div>');
     port(); on('#b', () => ui.mark());
     on('[data-s]', el => {
-      let stake = +el.dataset.s, you = [d6(), d6()], pressed = false; st.coin -= stake; G.sfx('place');
+      let stake = +el.dataset.s, you = [d6(), d6()], pressed = false; G.mark.take(stake); G.sfx('place');
       const table = (line, done, mine) => {
         show('<div class="card small"><h2>High Bones</h2>' + head(line) + '<div class="table"><div><small>YOU</small>' + die(you[0]) + die(you[1]) + '<b>' + (you[0] + you[1]) + '</b></div><div><small>MARK</small>' + (mine ? die(mine[0], 'm') + die(mine[1], 'm') + '<b>' + (mine[0] + mine[1]) + '</b>' : die(0, 'm hid') + die(0, 'm hid') + '<b>?</b>') + '</div></div><p class="dim">Pot: ' + stake * 2 + ' coin.</p>' +
           '<div class="row end">' + (done ? '<button id="ag">Again</button><button class="big" id="x">Enough</button>' : (!pressed && st.coin >= stake ? '<button id="pr">Press (stake ' + stake * 2 + ')</button>' : '') + '<button class="big" id="st">Stand</button>') + '</div></div>');
         port(); on('#x', leave); on('#ag', () => ui.bones());
-        on('#pr', () => { st.coin -= stake; stake *= 2; pressed = true; const i = you[0] <= you[1] ? 0 : 1; you[i] = d6(); G.sfx('place'); table('Pressing. I respect it. I also hope it goes badly.', false); });
+        on('#pr', () => { G.mark.take(stake); stake *= 2; pressed = true; const i = you[0] <= you[1] ? 0 : 1; you[i] = d6(); G.sfx('place'); table('Pressing. I respect it. I also hope it goes badly.', false); });
         on('#st', () => {
           const m = [d6(), d6()], ys = you[0] + you[1], ms = m[0] + m[1], win = ys > ms;
           if (win) { st.coin += stake * 2; G.sfx('coin'); } else G.sfx('deny');
@@ -110,12 +110,12 @@
   // ---- Crown or Skull
   ui.coinflip = function () {
     const st = G.state;
-    if (st.coin < 10) return ui.mark(say('broke'));
+    if (G.mark.funds() < 10) return ui.mark(say('broke'));
     show('<div class="card small"><h2>Crown or Skull</h2>' + head('One coin. You call it. Win and the pot doubles, and then you have to decide if you are a real one. Five in a row is the record. It is my record.') +
-      '<div class="row">' + stakes(st.coin).map(v => '<button class="big" data-s="' + v + '">Stake ' + v + '</button>').join('') + '</div><div class="row end"><button id="b">Back</button></div></div>');
+      '<div class="row">' + stakes(G.mark.funds()).map(v => '<button class="big" data-s="' + v + '">Stake ' + v + '</button>').join('') + '</div><div class="row end"><button id="b">Back</button></div></div>');
     port(); on('#b', () => ui.mark());
     on('[data-s]', el => {
-      let pot = +el.dataset.s, streak = 0; st.coin -= pot; G.sfx('place');
+      let pot = +el.dataset.s, streak = 0; G.mark.take(pot); G.sfx('place');
       const round = (line, last) => {
         show('<div class="card small"><h2>Crown or Skull</h2>' + head(line) + '<div class="table one"><div>' + (last ? '<span class="flip">' + (last === 'crown' ? '♛' : '☠') + '</span>' : '<span class="flip spin">◉</span>') + '<b>Pot ' + pot + '</b><small>' + streak + ' in a row</small></div></div>' +
           '<div class="row end">' + (streak > 0 ? '<button id="wk">Walk with ' + pot + '</button>' : '') + (streak < 5 ? '<button class="big" data-call="crown">Call Crown</button><button class="big" data-call="skull">Call Skull</button>' : '') + '</div></div>');

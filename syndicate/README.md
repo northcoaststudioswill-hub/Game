@@ -92,6 +92,12 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **Cosmetics.** Fourteen more: four dyes, four hats and crowns, three back pieces, two weapon finishes and three auras.
 
+**Mark's business.** Mark always has a scheme (glowcap futures, a cart that has not fallen yet, commemorative Guild seals). Buy in with coin and he reports back after a bout or two: sometimes it pays, sometimes he pays you in **chits**, his own credit. Chits are spent before coin at every one of his games, and his Chit Rack sells five cosmetics for nothing else.
+
+**The Wisp Table.** A dice booth on the east side of the market with five floating dice made of light. Three games: Thirteen and Twenty-One (roll one die at a time, stand, then Mark has to chase your total; a dead-on total pays triple) and Poker Bones (five dice, hold and reroll once, best hand wins).
+
+**A livelier market and pit.** Rats, bats, washing lines, a busker, a cat, steam grates, puddle ripples, gate guards and two punters arguing about odds in the market. The pit gains a Guild box above the gate, hanging gibbets, eyes behind the bars, Mark's odds board, pennants and torches in the stands, and petals and coin thrown at high crowd hype.
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |
@@ -124,7 +130,7 @@ and the rest of the game does not change.
 - `js/models.js` character models and animation
 - `js/world.js` the arena; `js/places.js` the street, the hideout, decor pieces, walking
 - `js/fight.js` combat simulation, AI, and its 3D effects
-- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js` the bookie and his games
+- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit
 - `js/cine.js` the opening cinematic; `js/lore.js` codex and bios; `js/music.js` the music sequencer
 - `js/ui.js` menus, HUD, level-up and results screens; `js/main.js` input and main loop
 
