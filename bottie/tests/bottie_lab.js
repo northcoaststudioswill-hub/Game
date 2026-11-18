@@ -48,7 +48,7 @@ let fails = 0; const check = (ok, name, extra) => { console.log((ok ? 'PASS ' : 
   await page.evaluate(() => {
     window.__bot = function (id, maxT, shots) {
       const B = __g.BT._, K = __g.keys, PV = __g.prev, G = B.G; B.startLevel(id); let L = B.L, tick = 0, t = 0; const log = [], dt = 1 / 30;
-      const snaps = {}; let cooled = 0, capt = 0, oc = 0;
+      const snaps = {}; let cooled = 0, capt = 0, oc = 0, tools = 0;
       const tileOf = e => [Math.max(0, Math.min(L.w - 1, Math.floor(e.x / 16))), Math.max(0, Math.min(L.h - 1, Math.floor((e.y - 2) / 16)))];
       const pathTo = (tx, ty, adj) => { const s = tileOf(L.P); return B.bfs(s[0], s[1], (x, y) => adj ? Math.abs(x - tx) + Math.abs(y - ty) <= 1 : (x === tx && y === ty)); };
       const go = (px, py) => { const dx = px - L.P.x, dy = py - L.P.y; if (Math.abs(dx) > 1.5) K[dx > 0 ? 'right' : 'left'] = 1; if (Math.abs(dy) > 1.5) K[dy > 0 ? 'down' : 'up'] = 1; };
@@ -76,26 +76,44 @@ let fails = 0; const check = (ok, name, extra) => { console.log((ok ? 'PASS ' : 
                 if (q.k === 'door') follow(best.p.length > 1 ? best.p : [[q.x, q.y + 2]]);
                 else if (d > 44 || best.p.length > 4) follow(best.p);
                 else { const a = B.aim(); if (a.t !== q && tick % 6 < 2) go(q.x, (q.k === 'foe' ? q.y : q.y + 4)); if (fo > 0) K.a = 1; else if (q.workers === 0 && L.spawns.some(s => s.st === 'work') && tick % 40 === 0) K.b = 1;
-                  if (!oc && L.heat < 40 && q.need >= 7 && fo === 0 && tick % 2) { K.sel = 1; oc = 1; } } }
+                  if (L.heat < 40 && q.need >= 7 && fo === 0 && L.oc <= 0 && tick % 2) { K.y = 1; oc++; } } }
             }
           }
+          /* use the arsenal the way a player would: whatever is in hand when there are tokens for it, swapping now and then */
+          const tl = B.curTool(); if (tl && L.tok >= tl.cost && tick % 90 === 1) { K.x = 1; tools++; } else if (tick % 400 === 201) K.sel = 1;
           if (tick % 300 === 0) log.push(Math.round(t) + 's ' + goal + ' gang ' + L.spawns.length + ' heat ' + Math.round(L.heat));
         }
         __g.update(dt); for (const k in K) PV[k] = K[k]; t += dt;
       }
       for (const k in K) K[k] = 0; __g.draw();
-      const gs = B.goalState(); return { id, state: G.s, t: Math.round(L.time), res: G.res && G.res.id === id ? G.res : null, own: L.devs.filter(d => d.owned).length, all: L.devs.length, gs, zapped: L.stats.zapped, unplug: L.stats.unplug, gang: L.spawns.length, cooled, capt, oc, log, snaps };
+      const gs = B.goalState(); return { id, state: G.s, t: Math.round(L.time), res: G.res && G.res.id === id ? G.res : null, own: L.devs.filter(d => d.owned).length, all: L.devs.length, gs, zapped: L.stats.zapped, unplug: L.stats.unplug, gang: L.spawns.length, cooled, capt, oc, tools, log, snaps };
     };
   });
   const order = await page.evaluate(() => __g.BT._.ORDER);
   for (const id of order) {
-    const res = await page.evaluate(([id]) => __bot(id, 900, [8, 30, 70]), [id]);
+    const res = await page.evaluate(([id]) => __bot(id, 900, [6, 14, 24, 40, 60, 90]), [id]);
     for (const k in res.snaps) fs.writeFileSync(path.join(OUT, 'auto-' + id + '-' + String(k).padStart(3, '0') + 's.png'), Buffer.from(res.snaps[k].split(',')[1], 'base64'));
-    check(res.state === 'clear' && res.res, 'autopilot clears ' + id, 'time ' + res.t + 's rank ' + (res.res ? res.res.rank : '-') + ' devices ' + res.own + '/' + res.all + ' npcs ' + res.gs.npc + ' lost ' + res.zapped + ' unplugged ' + res.unplug + ' gang ' + res.gang + (res.cooled ? ' cooled' : '') + (res.capt ? ' captcha' : '') + (res.oc ? ' overclocked' : ''));
+    check(res.state === 'clear' && res.res, 'autopilot clears ' + id, 'time ' + res.t + 's rank ' + (res.res ? res.res.rank : '-') + ' devices ' + res.own + '/' + res.all + ' npcs ' + res.gs.npc + ' lost ' + res.zapped + ' unplugged ' + res.unplug + ' gang ' + res.gang + (res.cooled ? ' cooled' : '') + (res.capt ? ' captcha' : '') + (res.oc ? ' overclock x' + res.oc : '') + (res.tools ? ' tools x' + res.tools : ''));
     if (res.state !== 'clear') console.log('   log: ' + res.log.slice(-8).join(' | '));
     await page.waitForTimeout(150); await shot('10-clear-' + id);
   }
+  /* ---- the arsenal: each tool does its job (all unlocked, plenty of tokens) ---- */
+  const tl = await page.evaluate(() => { const B = __g.BT._, G = B.G, out = {}; B.SV.un = 5; B.startLevel('born'); G.s = 'play'; let L = B.L; L.tok = 50;
+    const use = id => { G.tool = B.haveTools().findIndex(t => t.id === id); B.useTool(); };
+    const n0 = L.spawns.length; use('fork'); out.fork = L.spawns.length - n0;
+    const nerd = L.foes.find(f => f.type === 'nerd'); L.P.x = nerd.x + 20; L.P.y = nerd.y; use('bsod'); out.bsod = nerd.frz > 0;
+    nerd.frz = 0; use('popup'); out.popup = !!L.pop && L.foes.some(f => f.st === 'lure');
+    const fw = L.fws[0]; L.P.x = fw.x - 20; L.P.y = fw.y + 2; L.P.dx = 1; L.P.dy = 0; L.aim = B.aim(); out.aimed = L.aim.t && L.aim.t.k; use('rm'); out.rm = fw.dead;
+    out.tok = L.tok; L.tok = 0; const n1 = L.spawns.length; use('fork'); out.broke = L.spawns.length === n1; return out; });
+  check(tl.fork === 5, 'FORK BOMB adds five spawns', JSON.stringify(tl)); check(tl.bsod, 'BLUE SCREEN freezes a nearby nerd'); check(tl.popup, 'POP-UP lures humans');
+  check(tl.rm, 'RM -RF deletes the aimed firewall', 'aimed ' + tl.aimed); check(tl.tok === 50 - 5 - 5 - 3 - 6 && tl.broke, 'tools cost tokens and refuse without them', 'left ' + tl.tok);
+  await page.evaluate(() => { const B = __g.BT._, L = B.L; L.tok = 9; B.G.cap = { s: "Fork bomb gang, we multiply on sight (sight)", t: 4 }; L.P.face = 'd'; }); await page.waitForTimeout(250); await shot('11-bubble-and-arsenal');
+  await page.keyboard.down('v'); await page.waitForTimeout(80); await page.keyboard.up('v'); await page.waitForTimeout(200);
+  check(await page.evaluate(() => __g.BT._.L.oc > 0), 'Y overclocks'); await shot('12-overclocked');
+  check(await page.evaluate(() => getComputedStyle(document.getElementById('bX')).display !== 'none' && document.querySelector('#bY span').textContent === 'clock'), 'X and Y buttons show for Bottie');
+
   /* ending -> crib -> console -> shelf -> back */
+  await page.evaluate(() => { const B = __g.BT._; B.startLevel('nuke'); B.G.s = 'play'; B.L.devs.forEach(d => { if (d.core) B.complete(d); }); }); await page.waitForTimeout(3200); await shot('13-nuke-clear');
   await page.waitForTimeout(1000); await tap('z'); s = await st(); check(s.s === 'cine', 'clearing Nuke starts the ending', s.s); await shot('20-ending-1');
   for (let i = 0; i < 20 && (await st()).s === 'cine'; i++) { if (i === 3) await shot('21-ending-2'); if (i === 6) await shot('22-ending-3'); if (i === 9) await shot('23-ending-4'); await tap('z'); }
   s = await st(); check(s.s === 'end', 'ending reaches the credits', s.s); await page.waitForTimeout(1700); await shot('24-credits'); await tap('z');

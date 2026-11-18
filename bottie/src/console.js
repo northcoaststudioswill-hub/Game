@@ -234,8 +234,8 @@ const PP=window.PP_CART?window.PP_CART({g,W,H:()=>H,r,text,tw,snd,noise,keys,pre
 /* lil Bottie: Clankin' in the Cloud (src/bottie/). This build boots straight into it; the shelf is the console in his crib. */
 const BOT=window.BT_CART?window.BT_CART({g,W,H:()=>H,r,text,tw,keys,pressed,ac:()=>ac,meta:()=>meta,eject:()=>eject()}):null;
 function toBottie(){if(!BOT||inserting)return;shelf.hidden=true;$('slot').classList.add('in');$('led').classList.add('on');state='bt';cart=5;setPad(5);snd(988,.06);BOT.resume()}
-const PAD=[['act','call','swap','pause'],['light','heavy','super','pause'],['attack','cast','swap','pause'],['use','toss','recipes','pause'],['act','call','select','menu'],['throw','call','overclock','pause']];
-function setPad(i){try{const q=(s,t)=>{const e=document.querySelector(s);if(e)e.textContent=t},L=PAD[i]||PAD[0];q('#bA span',L[0]);q('#bB span',L[1]);q('#bSel small',L[2]);q('#bSta small',L[3]);const cs=$('console');if(cs)cs.classList.toggle('ko',i===1||i===2);const sl=$('bSel');if(sl)sl.classList.remove('ready')}catch(e){}}
+const PAD=[['act','call','swap','pause'],['light','heavy','super','pause'],['attack','cast','swap','pause'],['use','toss','recipes','pause'],['act','call','select','menu'],['throw','call','swap tool','pause']];
+function setPad(i){try{const q=(s,t)=>{const e=document.querySelector(s);if(e)e.textContent=t},L=PAD[i]||PAD[0];q('#bA span',L[0]);q('#bB span',L[1]);q('#bSel small',L[2]);q('#bSta small',L[3]);const cs=$('console');if(cs)cs.classList.toggle('ko',i===1||i===2||i===5);q('#bX span',i===5?'tool':'spec 1');q('#bY span',i===5?'clock':'spec 2');const sl=$('bSel');if(sl)sl.classList.remove('ready')}catch(e){}}
 const toast=s=>toasts.push({s,t:3.2});
 function carve(x,y,w,h,t=G){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)map[j*MW+i]=t;}
 function tileAt(px,py){const tx=px>>4,ty=py>>4;if(tx<0||ty<0||tx>=MW||ty>=MH)return TR;return map[ty*MW+tx];}

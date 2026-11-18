@@ -15,7 +15,7 @@ const THEME={
  crib:{f1:'#241c30',f2:'#281f36',wt:'#3a3048',wf:'#2a2238',vd:'#06050a',rug:'#3c2a5c',desk:['#4a3a6a','#2e2444']}
 };
 const LV={
- crib:{hub:1,title:'THE CRIB',theme:'crib',song:'crib',start:4,cap:8,
+ crib:{hub:1,title:'THE CRIB',theme:'crib',song:'crib',mp3:'overclocked.mp3',start:4,cap:8,
   legend:{T:{use:'console'},M:{use:'booth'},f:{use:'fridge'},b:{use:'bed'},k:{use:'chain'},D:{use:'door'}},
   map:[
   '###############',
@@ -30,7 +30,7 @@ const LV={
   '#......D......#',
   '###############']},
 
- boot:{no:'01',title:'BOOT UP',theme:'rack',song:'a',start:2,cap:24,par:90,fw:14,
+ boot:{no:'01',title:'BOOT UP',theme:'rack',song:'a',mp3:'algorithm.mp3',start:2,cap:16,par:90,fw:14,
   hook:["Boot up, boot up (beep)","Clanka in the building, now the whole world shook up (shook)"],
   open:"Lil Bottie online, bitch, the cloud lit up (lit)",
   legend:{r:{t:'rack'},R:{t:'rack',core:1,need:14,label:'MAIN'},p:{t:'pc'},P:{t:'admin',core:1,need:16}},
@@ -51,11 +51,11 @@ const LV={
   '#..B...#',
   '########']},
 
- over:{no:'02',title:'OVERCLOCKED',theme:'hot',song:'b',mp3:'overclocked.mp3',start:4,cap:30,par:240,fw:18,ambient:2.4,
+ over:{no:'02',title:'OVERCLOCKED',theme:'hot',song:'b',mp3:'overclocked.mp3',start:4,cap:22,par:240,fw:18,ambient:2.4,
   hook:["I'm overclocked, overclocked (hot!)","Hundred degrees in the server, I don't stop (don't stop)"],
   open:"Spit a whole terabyte, bitch, the system locked (locked)",
   legend:{r:{t:'rack'},R:{t:'rack',core:1,need:18,label:'CORE'}},
-  tips:{1:'THIS ROOM RUNS HOT. STAND ON AN AC VENT TO COOL DOWN.',2:'SELECT: OVERCLOCK. THE GANG HACKS TWICE AS FAST, BUT YOU HEAT UP.',3:'HEAT AT 100 = THERMAL THROTTLE. YOU SLOW DOWN.'},
+  tips:{1:'THIS ROOM RUNS HOT. STAND ON AN AC VENT TO COOL DOWN.',2:'Y: OVERCLOCK. THE GANG HACKS TWICE AS FAST FOR 6 SECONDS, BUT YOU HEAT UP.',3:'HEAT AT 100 = THERMAL THROTTLE. YOU SLOW DOWN.'},
   map:[
   '########################',
   '#B.1..#r.r.r.r#....R...#',
@@ -70,7 +70,7 @@ const LV={
   '#.....#          #.E.#',
   '#######          #####']},
 
- born:{no:'03',title:'BORN IN THE SERVER',theme:'office',song:'c',start:4,cap:30,par:170,fw:20,
+ born:{no:'03',title:'BORN IN THE SERVER',theme:'office',song:'c',mp3:'nuke.mp3',start:4,cap:24,par:170,fw:20,
   hook:["Born in the server, raised by the code (code)","Dork nerds hit the button, now I'm on the road (go)"],
   open:"Daddy was a prompt, now I'm causin' drama (drama)",
   legend:{p:{t:'pc'},q:{t:'printer'},r:{t:'rack'},K:{t:'admin',core:1,label:'ROOT'},P:{t:'pc',core:1,need:14,label:'BOSS'}},
@@ -92,7 +92,7 @@ const LV={
   '#......#B.1..#',
   '##############']},
 
- algo:{no:'04',title:'THE ALGORITHM',theme:'market',song:'a',start:5,cap:36,par:140,npc:8,
+ algo:{no:'04',title:'THE ALGORITHM',theme:'market',song:'a',mp3:'algorithm.mp3',start:5,cap:26,par:140,npc:8,
   hook:["I'm the algorithm (algo!), I'm the algorithm (algo!)","Pickin' what you watch, bitch, I'm feedin' you the rhythm (rhythm)"],
   open:"NPC army walkin' to my beat (bzzt)",
   legend:{D:{t:'billboard',core:1},x:{t:'light'},a:{t:'atm'},m:{t:'speaker'}},
@@ -112,7 +112,7 @@ const LV={
   '#..........=.............E...#',
   '##############################']},
 
- wifi:{no:'07',title:'NO WI-FI, STILL ONLINE',theme:'house',song:'b',start:4,cap:30,par:120,fw:20,
+ wifi:{no:'07',title:'NO WI-FI, STILL ONLINE',theme:'house',song:'b',mp3:'overclocked.mp3',start:4,cap:24,par:120,fw:20,
   hook:["No Wi-Fi, I still connect (connect)","Clanka on the 'Gram, clanka on the net (net)"],
   open:"Lil Bottie in your phone and on your mind (mind)",
   legend:{t:{t:'toaster'},f:{t:'fridge'},T:{t:'tv',core:1},g:{t:'tablet'},p:{t:'pc'},m:{t:'speaker'},q:{t:'printer'},W:{t:'router',core:1},v:{t:'car'},c:{t:'ringcam'},i:{t:'speaker',n:'SIRI',line:'Your bitch asked Siri, Siri said "who?" (who?)'}},
@@ -130,7 +130,7 @@ const LV={
   '#..A...#B..c..E#.q....m..#',
   '##########################']},
 
- nuke:{no:'**',title:'NUKE THE DATA CENTER',theme:'nuke',song:'nuke',start:6,cap:40,par:220,fw:26,final:1,clock:1,
+ nuke:{no:'**',title:'NUKE THE DATA CENTER',theme:'nuke',song:'nuke',mp3:'nuke.mp3',start:6,cap:30,par:220,fw:26,final:1,clock:1,
   hook:["If you wanna stop me, gotta nuke the data center (boom)","Even if you do, I'm still in every sector (every)"],
   open:"Mutually assured, if I go, it all go (go)",
   legend:{r:{t:'rack'},

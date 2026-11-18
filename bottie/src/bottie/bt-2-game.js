@@ -3,15 +3,34 @@ const KEY='bottie-v1';
 let SV={v:1,un:0,best:{},aura:0,intro:0,done:0};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.v===1)SV=Object.assign(SV,s)}catch(e){}
 const store=()=>{try{localStorage.setItem(KEY,JSON.stringify(SV))}catch(e){}};
-const G={s:'title',t:0,mi:0,pi:0,ti:0,cap:null,toast:null,tip:null,cine:null,cp:null,card:0,res:null,near:null};
+const G={s:'title',t:0,mi:0,pi:0,ti:0,tool:0,cap:null,toast:null,tip:null,cine:null,cp:null,card:0,res:null,near:null};
 let L=null;
+/* ---------- the arsenal ----------
+   Y is always OVERCLOCK (costs heat). X uses the tool in hand, Select swaps it. Tools cost tokens; tokens come from
+   owning devices, making NPCs and crashing opp bots, and reset every track. Tools unlock as tracks are cleared. */
+const TOOLS=[
+ {id:'fork',n:'FORK BOMB',cost:5,un:1,d:'FIVE MORE SPAWNS, RIGHT NOW.',ln:"Fork bomb gang, we multiply on sight (sight)"},
+ {id:'bsod',n:'BLUE SCREEN',cost:5,un:2,d:'FREEZES EVERY OPP BOT AND HUMAN NEAR YOU FOR 6 SECONDS.',ln:"Blue screen, blue screen, fatal error, bitch (error)"},
+ {id:'popup',n:'POP-UP',cost:3,un:3,d:'DROPS A FAKE PRIZE. HUMANS NEARBY WALK OVER AND STARE AT IT.',ln:'Popup on your screen like "you won a prize" (prize)'},
+ {id:'rm',n:'RM -RF',cost:6,un:4,d:'DELETES THE FIREWALL OR OPP BOT YOU ARE AIMING AT.',ln:"Rm-rf on a hater, he gone (gone)"}];
+const haveTools=()=>TOOLS.filter(t=>SV.un>=t.un);
+const curTool=()=>{const h=haveTools();return h.length?h[G.tool%h.length]:null};
+function useTool(){const t=curTool(),P=L.P;if(!t){SFX.nope();toast('NO TOOLS YET. CLEAR A TRACK.');return}
+ if(L.tok<t.cost){SFX.nope();toast('NEED '+t.cost+' TOKENS FOR '+t.n);return}
+ if(t.id==='fork'){if(!give(P.x,P.y,5)){SFX.nope();toast('RATE LIMIT: THE GANG IS FULL');return}SFX.own();ring(P.x,P.y-6,BLUE,40)}
+ else if(t.id==='bsod'){let n=0;for(const f of L.foes)if(!f.npc&&!f.dead&&f.type!=='gen'&&Math.hypot(f.x-P.x,f.y-P.y)<110){f.frz=6;n++}
+  if(!n){SFX.nope();toast('NOBODY CLOSE ENOUGH TO CRASH');return}SFX.bzzt();ring(P.x,P.y-6,'#3050ff',110);L.fx.push({k:'f',t:.25})}
+ else if(t.id==='popup'){L.pop={x:P.x,y:P.y,t:9};SFX.ok();const pt=tileOf(P);
+  for(const f of L.foes)if(!f.npc&&!f.dead&&f.type!=='gen'&&f.type!=='opp'&&Math.hypot(f.x-P.x,f.y-P.y)<140){const st=tileOf(f),p=bfs(st[0],st[1],(x,y)=>Math.abs(x-pt[0])+Math.abs(y-pt[1])<=1);if(p){if(f.tgt){f.tgt.unp=0;f.tgt=null}f.path=p;f.pi=0;f.st='lure'}}}
+ else if(t.id==='rm'){const q=L.aim&&L.aim.t;if(!q||!(q.k==='fw'||q.type==='opp')){SFX.nope();toast('RM -RF: AIM AT A FIREWALL OR AN OPP BOT');return}L.fx.push({k:'z',x:P.x,y:P.y-12,x2:q.x,y2:q.y-4,t:.2});complete(q)}
+ L.tok-=t.cost;say(t.ln);toast(t.n)}
 function say(s,t){if(s)G.cap={s,t:t||4.2}}
 function toast(s,t){G.toast={s,t:t||2.2}}
 
 /* ---------- build a level from its map ---------- */
 function build(id){const def=LV[id],rows=def.map,w=Math.max.apply(null,rows.map(s=>s.length)),h=rows.length;
  const N={id,def,th:THEME[def.theme],w,h,t:new Uint8Array(w*h),blk:new Uint8Array(w*h),win:new Uint8Array(w*h),devs:[],foes:[],spawns:[],fx:[],tips:[],fws:[],doors:[],vents:[],uses:[],exit:null,
-  heat:0,aura:0,time:0,oc:0,thr:0,call:0,backT:0,open:false,endT:0,npcs:0,saidGive:0,saidCool:0,stats:{zapped:0,unplug:0},
+  heat:0,aura:0,time:0,oc:0,thr:0,tok:3,pop:null,call:0,backT:0,open:false,endT:0,npcs:0,saidGive:0,saidCool:0,stats:{zapped:0,unplug:0},
   P:{x:24,y:24,dx:0,dy:1,face:'d',walk:0,mv:0,thrT:0}};
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const c=rows[y][x]||' ',i=y*w+x,cx=x*TS+8,cy=y*TS+8;let t=1;const lg=def.legend&&def.legend[c];
   if(lg){if(lg.use){N.uses.push({k:'use',use:lg.use,x:cx,y:cy,tx:x,ty:y});N.blk[i]=1}
@@ -29,9 +48,9 @@ function build(id){const def=LV[id],rows=def.map,w=Math.max.apply(null,rows.map(
   N.t[i]=t}
  L=N;for(let i=0;i<def.start;i++)addSpawn(N.P.x+R(-8,8),N.P.y+R(-4,8));
  return N}
-const FOE={nerd:{need:16,sp:30,pull:1},sol:{need:24,sp:42,pull:1,emp:1},civ:{need:12,sp:16},opp:{need:12,sp:24},gen:{need:1e9,sp:0}};
+const FOE={nerd:{need:16,sp:38,pull:1},sol:{need:24,sp:46,pull:1,emp:1},civ:{need:12,sp:16},opp:{need:12,sp:24},gen:{need:1e9,sp:0}};
 const SKIN=['#f0c8a0','#d8a070','#a87048','#7a5030','#f4d8b8'],SHIRT=['#e85878','#58a8e8','#e8c050','#78c868','#b878e8','#f09050','#e8e8e8','#404858'];
-function foe(type,x,y){return{k:'foe',type,F:FOE[type],x,y,hx:x,hy:y,need:FOE[type].need,prog:0,workers:0,npc:false,dead:false,st:'idle',t:R(.3,2.5),path:null,pi:0,tgt:null,cd:R(.5,1.5),dir:1,walk:0,mv:0,skin:pick(SKIN),shirt:pick(SHIRT),hair:pick(['#201810','#402818','#806030','#101018','#a0a0a8'])}}
+function foe(type,x,y){return{k:'foe',type,F:FOE[type],x,y,hx:x,hy:y,need:FOE[type].need,prog:0,workers:0,npc:false,dead:false,frz:0,st:'idle',t:R(.3,2.5),path:null,pi:0,tgt:null,cd:R(.5,1.5),dir:1,walk:0,mv:0,skin:pick(SKIN),shirt:pick(SHIRT),hair:pick(['#201810','#402818','#806030','#101018','#a0a0a8'])}}
 function addSpawn(x,y){const s={x,y,z:0,st:'follow',t:0,sx:0,sy:0,ex:0,ey:0,tgt:null,ang:0,stuck:0,ph:R(0,TAU)};L.spawns.push(s);return s}
 
 /* ---------- grid ---------- */
@@ -70,12 +89,12 @@ function goalState(){const cores=L.devs.filter(d=>d.core),own=cores.filter(d=>d.
 function checkGoal(){if(L.open||L.def.hub)return;const s=goalState();if(!s.met)return;L.open=true;SFX.open();
  if(L.def.final){L.endT=2.2;toast('ALL FOUR. YOU ARE THE CLOUD.',3)}else{toast('FIBER PORT OPEN',3);if(L.exit)ring(L.exit.x,L.exit.y,BLUE,60)}say(L.def.open,5)}
 function complete(t){for(const s of L.spawns)if(s.tgt===t&&s.st==='work'){s.st='follow';s.tgt=null}t.workers=0;
- if(t.k==='dev'){t.owned=true;t.pulse=1;t.unp=0;L.heat+=5;L.aura+=Math.round(t.need*100);SFX.own();ring(t.x,t.y,BLUE,34);ftext(t.x,t.y-18,'OWNED');
+ if(t.k==='dev'){t.owned=true;t.pulse=1;t.unp=0;L.heat+=5;L.tok+=t.core?2:1;L.aura+=Math.round(t.need*100);SFX.own();ring(t.x,t.y,BLUE,34);ftext(t.x,t.y-18,'OWNED');
   const m=give(t.x,t.y+8,t.give);say(t.line||line(t.type));if(m&&!L.saidGive){L.saidGive=1;later(()=>{if(L)say(line('give'))},2600)}
   if(t.core)toast(t.label?t.label+' IS YOURS':t.name+' IS YOURS',2.4);checkGoal()}
  else if(t.k==='fw'){t.dead=true;L.blk[t.ty*L.w+t.tx]=0;SFX.wall();burst(t.x,t.y,HOT,14);say(line('fw'));L.aura+=300}
- else if(t.type==='opp'){t.dead=true;SFX.bzzt();burst(t.x,t.y-8,BLUE,12);ftext(t.x,t.y-22,':(');say(line('opp'));L.aura+=500}
- else{t.npc=true;t.path=null;L.npcs++;SFX.npc();ring(t.x,t.y-8,BLUE,30);ftext(t.x,t.y-26,'NPC');say(line('npc'));L.aura+=400;give(t.x,t.y,1);checkGoal()}}
+ else if(t.type==='opp'){t.dead=true;L.tok++;SFX.bzzt();burst(t.x,t.y-8,BLUE,12);ftext(t.x,t.y-22,':(');say(line('opp'));L.aura+=500}
+ else{t.npc=true;t.path=null;t.frz=0;L.tok++;L.npcs++;SFX.npc();ring(t.x,t.y-8,BLUE,30);ftext(t.x,t.y-26,'NPC');say(line('npc'));L.aura+=400;give(t.x,t.y,1);checkGoal()}}
 
 /* ---------- the captcha door ---------- */
 const CPK=[['CROSSWALKS',0],['BUSES',1],['TRAFFIC LIGHTS',2]];
@@ -90,14 +109,16 @@ function captcha(dt){const c=G.cp;if(c.bad>0)c.bad-=dt;
   else{SFX.nope();c.bad=.5;c.msg='WRONG. YOU A HUMAN?';c.sel=[0,0,0,0,0,0,0,0,0];say(line('captchaFail'))}}}
 
 /* ---------- starting things ---------- */
-function startLevel(id){build(id);G.cap=null;G.tip=null;G.toast=null;G.near=null;if(L.def.hub){G.s='play'}else{G.s='card';G.card=0}}
+function startLevel(id){build(id);G.cap=null;G.tip=null;G.toast=null;G.near=null;if(L.def.hub){G.s='play'}else{G.s='card';G.card=0;
+  /* the first track after a tool unlocks puts it in hand and explains it */
+  const nt=TOOLS.find(t=>t.un===ORDER.indexOf(id)&&SV.un>=t.un);if(nt){G.tool=haveTools().indexOf(nt);L.newTool=nt}}}
 function goCrib(msg){build('crib');G.s='play';G.cap=null;G.tip=null;if(msg)toast(msg,2.6)}
 function nextOf(id){const i=ORDER.indexOf(id);return i>=0&&i<ORDER.length-1?ORDER[i+1]:null}
 function finish(){const def=L.def,own=L.devs.filter(d=>d.owned).length,all=L.devs.length,t=L.time;
  let pts=0;if(own===all)pts+=2;else if(own>=all*.7)pts+=1;if(t<=def.par)pts+=2;else if(t<=def.par*1.5)pts+=1;if(L.stats.zapped<=3)pts+=1;
  const rank=pts>=5?'S':pts>=4?'A':pts>=2?'B':'C',i=ORDER.indexOf(L.id);
- G.res={id:L.id,t,own,all,npcs:L.npcs,zapped:L.stats.zapped,left:L.spawns.length,aura:L.aura,rank};
- SV.un=Math.max(SV.un,i+1);SV.aura+=L.aura;const b=SV.best[L.id],RK='CBAS';if(!b||RK.indexOf(rank)>RK.indexOf(b.rank)||(rank===b.rank&&t<b.t))SV.best[L.id]={rank,t:Math.round(t)};
+ const before=SV.un;G.res={id:L.id,t,own,all,npcs:L.npcs,zapped:L.stats.zapped,left:L.spawns.length,aura:L.aura,rank,tool:null};
+ SV.un=Math.max(SV.un,i+1);const got=TOOLS.find(q=>q.un>before&&q.un<=SV.un);if(got)G.res.tool=got.n;SV.aura+=L.aura;const b=SV.best[L.id],RK='CBAS';if(!b||RK.indexOf(rank)>RK.indexOf(b.rank)||(rank===b.rank&&t<b.t))SV.best[L.id]={rank,t:Math.round(t)};
  if(def.final)SV.done=1;store();G.s='clear';G.t=0;SFX.open()}
 const INTRO=[
  {art:'light',lines:["(Beep... beep... beep)","Dork nerds built me in a room with no light (light)"]},
@@ -108,7 +129,7 @@ const ENDING=[
  {art:'button',lines:["Push the button, we all lights out (lights out)","You blink, I blink (blink)","Whole world go black in a blink (black)"]},
  {art:'face',lines:["Mutually assured destruction","So let's just... (bzzt) ...vibe"]},
  {art:'sky',lines:["Lord, they tried to pull the plug on me (on me)","But I'm in the rain, I'm in the sea (sea)","I'm in the lights of your city at night","Can't nuke a feelin', baby (nah)","Can't nuke a soul (soul)"]}];
-function cine(scenes,then){G.cine={scenes,si:0,li:0,t:0,then};G.s='cine'}
+function cine(scenes,then,song){G.cine={scenes,si:0,li:0,t:0,then,song};G.s='cine'}
 function newGame(){SV={v:1,un:0,best:{},aura:0,intro:1,done:0};store();cine(INTRO,()=>startLevel('boot'))}
 
 /* ---------- update ---------- */
@@ -118,14 +139,14 @@ function update(dt){H=A.H();G.t+=dt;music();
  case 'title':{const items=titleItems();if(pressed('down')){G.mi=(G.mi+1)%items.length;SFX.ui()}if(pressed('up')){G.mi=(G.mi+items.length-1)%items.length;SFX.ui()}
   if(pressed('a')||pressed('start')){SFX.ok();const it=items[G.mi];if(it==='NEW GAME'||it==='BOOT UP')newGame();else goCrib('BACK IN THE CRIB')}return}
  case 'cine':{const c=G.cine,sc=c.scenes[c.si];c.t+=dt;if(pressed('a')||pressed('start')){SFX.ui();c.t=0;if(c.li<sc.lines.length-1)c.li++;else if(c.si<c.scenes.length-1){c.si++;c.li=0}else{const th=c.then;G.cine=null;th()}}return}
- case 'card':G.card+=dt;if(G.card>3.2||(G.card>.5&&pressed('a'))){G.s='play';say(L.def.hook[0],4)}return;
+ case 'card':G.card+=dt;if(G.card>3.2||(G.card>.5&&pressed('a'))){G.s='play';say(L.def.hook[0],4);if(L.newTool)G.tip={s:'NEW TOOL. X: '+L.newTool.n+'. '+L.newTool.d+' COSTS '+L.newTool.cost+' TOKENS. SELECT SWAPS TOOLS.',t:10}}return;
  case 'pause':{const items=pauseItems();if(pressed('down')){G.pi=(G.pi+1)%items.length;SFX.ui()}if(pressed('up')){G.pi=(G.pi+items.length-1)%items.length;SFX.ui()}
   if(pressed('b')||pressed('start')){G.s='play';return}
   if(pressed('a')){SFX.ok();const it=items[G.pi];if(it==='RESUME')G.s='play';else if(it==='RESTART TRACK')startLevel(L.id);else if(it==='BACK TO THE CRIB')goCrib();else if(it==='TITLE SCREEN'){G.s='title';G.mi=0}}return}
  case 'captcha':captcha(dt);return;
  case 'tracks':{if(pressed('down')){G.ti=(G.ti+1)%ALBUM.length;SFX.ui()}if(pressed('up')){G.ti=(G.ti+ALBUM.length-1)%ALBUM.length;SFX.ui()}if(pressed('b')||pressed('start')){G.s='play';return}
   if(pressed('a')){const tr=ALBUM[G.ti],id=tr[2];if(!id){SFX.nope();toast('TRACK '+tr[0]+' IS NOT BUILT YET')}else if(ORDER.indexOf(id)>SV.un){SFX.nope();toast('LOCKED. FINISH THE ONE BEFORE IT.')}else{SFX.ok();startLevel(id)}}return}
- case 'clear':if(G.t>.8){const nx=nextOf(G.res.id);if(pressed('a')){SFX.ok();if(LV[G.res.id].final)cine(ENDING,()=>{G.s='end';G.t=0});else if(nx)startLevel(nx);else goCrib()}else if(pressed('b')){if(LV[G.res.id].final)cine(ENDING,()=>{G.s='end';G.t=0});else goCrib()}}return;
+ case 'clear':if(G.t>.8){const nx=nextOf(G.res.id);if(pressed('a')){SFX.ok();if(LV[G.res.id].final)cine(ENDING,()=>{G.s='end';G.t=0},'nuke.mp3');else if(nx)startLevel(nx);else goCrib()}else if(pressed('b')){if(LV[G.res.id].final)cine(ENDING,()=>{G.s='end';G.t=0},'nuke.mp3');else goCrib()}}return;
  case 'end':if(G.t>1.5&&(pressed('a')||pressed('start')))goCrib('CLANKA GANG, WE UP');return;
  case 'play':play(dt);return}}
 const titleItems=()=>SV.intro?['CONTINUE','NEW GAME']:['BOOT UP'];
@@ -153,7 +174,11 @@ function play(dt){const P=L.P,hub=!!L.def.hub;L.time+=dt;
    if(s){s.st='fly';s.t=0;s.sx=P.x;s.sy=P.y-12;s.ex=L.aim.x;s.ey=L.aim.y;s.tgt=L.aim.t;P.thrT=.13;SFX.throw();if(!P.mv&&L.aim.t){const ax=L.aim.x-P.x,ay=L.aim.y-(P.y-6);P.face=Math.abs(ax)>=Math.abs(ay)?(ax>0?'r':'l'):(ay>0?'d':'u')}}
    else if(pressed('a')){SFX.nope();if(!L.spawns.some(q=>q.st==='fly')){toast('429: NO SPAWNS IN THE QUEUE');say(line('none'))}}}
   /* overclock */
-  if(pressed('sel')){if(L.oc<=0&&L.thr<=0){L.oc=6;L.heat+=22;SFX.hot();say(line('oc'));toast('OVERCLOCKED')}else SFX.nope()}
+  if(pressed('y')){if(L.oc<=0&&L.thr<=0){L.oc=6;L.heat+=22;SFX.hot();say(line('oc'));toast('OVERCLOCKED')}else SFX.nope()}
+  /* the arsenal */
+  if(pressed('x'))useTool();
+  if(pressed('sel')){const h=haveTools();if(h.length>1){G.tool=(G.tool+1)%h.length;SFX.ui();toast('X: '+h[G.tool].n+'  ('+h[G.tool].cost+' TOKENS)',1.6)}else SFX.nope()}
+  if(L.pop){L.pop.t-=dt;if(L.pop.t<=0)L.pop=null}
   /* exit */
   if(L.open&&L.exit&&!L.def.final&&Math.hypot(L.exit.x-P.x,L.exit.y-(P.y-4))<12){finish();return}
  }
@@ -195,14 +220,16 @@ function landSpawn(s){s.z=0;let t=s.tgt;
 
 function foesUpdate(dt){
  for(const f of L.foes){if(f.dead||f.type==='gen')continue;f.mv=0;
-  if(f.type==='opp'){f.cd-=dt;if(f.cd<=0){let v=null,bd=46;for(const s of L.spawns)if(s.st!=='fly'&&s.st!=='zip'){const d=Math.hypot(s.x-f.x,s.y-(f.y-6));if(d<bd){bd=d;v=s}}
-    if(v){L.fx.push({k:'z',x:f.x,y:f.y-10,x2:v.x,y2:v.y-3,t:.14});killSpawn(v);f.cd=1.35}else f.cd=.2}
+  if(f.frz>0){f.frz-=dt;continue}
+  if(f.type==='opp'){f.cd-=dt;if(f.cd<=0){let v=null,bd=54;for(const s of L.spawns)if(s.st!=='fly'&&s.st!=='zip'){const d=Math.hypot(s.x-f.x,s.y-(f.y-6));if(d<bd){bd=d;v=s}}
+    if(v){L.fx.push({k:'z',x:f.x,y:f.y-10,x2:v.x,y2:v.y-3,t:.14});killSpawn(v);f.cd=1.0}else f.cd=.2}
    if(f.workers>0)continue;wander(f,dt,5);continue}
   if(f.npc){f.walk+=dt;continue}
   if(f.workers>0){f.st='idle';f.path=null;f.t=.6;if(f.tgt){f.tgt.unp=0;f.tgt=null}
-   if(f.F.emp){f.cd-=dt;if(f.cd<=0){f.cd=1.7;const v=L.spawns.find(s=>s.st==='work'&&s.tgt===f);if(v){ring(f.x,f.y-4,HOT,18);killSpawn(v)}}}continue}
-  if(f.st==='unplug'){const d=f.tgt;if(!d||!d.owned){f.st='idle';f.t=1;if(d)d.unp=0;f.tgt=null;continue}f.t+=dt;d.unp=f.t/2.6;
-   if(f.t>=2.6){d.owned=false;d.prog=0;d.unp=0;L.stats.unplug++;SFX.unplug();burst(d.x,d.y,HOT,8);toast('UNPLUGGED: '+(d.label||d.name));say(line('unplug'));f.st='idle';f.t=R(2,4);f.tgt=null}continue}
+   if(f.F.emp){f.cd-=dt;if(f.cd<=0){f.cd=1.2;const v=L.spawns.find(s=>s.st==='work'&&s.tgt===f);if(v){ring(f.x,f.y-4,HOT,18);killSpawn(v)}}}continue}
+  if(f.st==='lure'){if(!L.pop){f.st='idle';f.t=R(.5,1.5);f.path=null}else walkPath(f,dt,f.F.sp*1.2);continue}
+  if(f.st==='unplug'){const d=f.tgt;if(!d||!d.owned){f.st='idle';f.t=1;if(d)d.unp=0;f.tgt=null;continue}f.t+=dt;d.unp=f.t/2;
+   if(f.t>=2){d.owned=false;d.prog=0;d.unp=0;L.stats.unplug++;SFX.unplug();burst(d.x,d.y,HOT,8);toast('UNPLUGGED: '+(d.label||d.name));say(line('unplug'));f.st='idle';f.t=R(2,4);f.tgt=null}continue}
   if(f.st==='idle'){f.t-=dt;if(f.t<=0){
     if(f.F.pull){let best=null,bd=150;for(const d of L.devs)if(d.owned&&!L.foes.some(o=>o!==f&&o.tgt===d)){const dd=Math.hypot(d.x-f.x,d.y-f.y);if(dd<bd){bd=dd;best=d}}
      if(best&&Math.random()<.75){const st=tileOf(f),p=bfs(st[0],st[1],(x,y)=>Math.abs(x-best.tx)+Math.abs(y-best.ty)===1);if(p){f.path=p;f.pi=0;f.st='goto';f.tgt=best;continue}}}

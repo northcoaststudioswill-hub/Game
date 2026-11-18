@@ -6,7 +6,7 @@ more spawns. Spawns got spawns.
 
 - **Play it:** `games/pocket-lantern-bottie.html` (one file; it boots straight into the Bottie game)
 - **Build it:** `python3 bottie/build.py` from the repo root
-- **Test it:** `node bottie/tests/bottie_lab.js` (23 checks; screenshots land in `playtest/`)
+- **Test it:** `node bottie/tests/bottie_lab.js` (30 checks; screenshots land in `playtest/`)
 - **What changed:** [`CHANGELOG.md`](CHANGELOG.md)
 - **Lore package from Will:** `lore/artist-archive.pdf` and the five reference photos in `lore/`
 
@@ -26,7 +26,9 @@ and all five cartridges play from there. B on the shelf (or the button) goes bac
 | D-pad | Move |
 | A | Throw a spawn. Hold to keep throwing. It aims at what he is facing, or the nearest thing in reach. |
 | B | Call the gang back (beep beep) |
-| Select | Overclock: the gang hacks twice as fast for 6 seconds, heat goes up |
+| Y | Overclock: the gang hacks twice as fast for 6 seconds, heat goes up |
+| X | Use the tool in hand (costs tokens) |
+| Select | Swap tools |
 | Start | Pause |
 
 - **Devices** (racks, PCs, toasters, fridges, smart TVs, Ring cams, routers, billboards, mainframes) take
@@ -38,8 +40,11 @@ and all five cartridges play from there. B on the shelf (or the button) goes bac
 - **Firewalls** need the whole gang. **Captcha doors** are a small pick-the-squares game.
 - **Heat** rises as you hack and overclock. At 100 you get thermal throttled (slow for 5 seconds). AC vents cool you.
 - You cannot lose the gang for good: at zero spawns, three boot from backup.
+- **Tools** unlock one per track cleared: FORK BOMB, BLUE SCREEN, POP-UP, RM -RF. Tokens pay for them; you earn
+  tokens by owning devices, making NPCs and crashing opp bots.
+- His lines appear in a speech bubble at his head.
 
-## What is built (v0.1)
+## What is built (v0.3)
 
 Six tracks, the crib, an intro and an ending. The other eight album tracks show as NOT BUILT in the tracklist.
 
@@ -57,10 +62,10 @@ Six tracks, the crib, an intro and an ending. The other eight album tracks show 
 - Captions that end in an adlib "(like this)" are lil Bottie's own lyrics, copied word for word from the
   archive. Do not reword them and do not write new ones in his voice; plain UI text is ours.
 - The General and the council are fictional. No real flags, no real officials.
-- Music: track 02 plays the real "Overclocked" from `games/music/overclocked.mp3`. Every other track is chiptune
-  made in code (`bt-0-head.js`, `SONGS`) until Will sends its song. To add one: put the mp3 in `games/music/`, add
-  `mp3:'name.mp3'` to the level in `bt-1-levels.js`, and publish the file alongside the page. Opened straight from
-  disk the game cannot fetch songs and falls back to chiptune.
+- Music: three real songs so far (`games/music/overclocked.mp3`, `algorithm.mp3`, `nuke.mp3`), shared across the
+  game until the rest arrive; the chiptune in `bt-0-head.js` is the fallback. To add a song: put the mp3 in
+  `games/music/`, set `mp3:'name.mp3'` on its level in `bt-1-levels.js`, and publish the file alongside the page.
+  Opened straight from disk the game cannot fetch songs and plays chiptune.
 - Nothing is phone-confirmed. Everything here was checked in headless Chromium at 440x956.
 
 ## Files

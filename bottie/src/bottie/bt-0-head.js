@@ -74,21 +74,26 @@ function musStep(S,st,t){const o=o2=>Object.assign({mus:1,t},o2);
  if(st===14&&MUS.loop%4===2){tone(1568,.05,o({v:.025,type:'sine'}));tone(2093,.09,{mus:1,t:t+.06,v:.025,type:'sine'})} /* notification */
 }
 /* ---------- his real songs ----------
-   A level with mp3:'file.mp3' plays games/music/file.mp3 instead of the chiptune. The song is a separate file next to
+   A level with mp3:'file.mp3' plays games/music/file.mp3 instead of the chiptune. Until every track has its own
+   song, the three we have are shared around (see mp3: in bt-1-levels.js and realWant below). The song is a separate file next to
    the page (the published page caps at 16 MB, so songs cannot be embedded). It is fetched when the track starts; if
    that fails (the html opened straight from disk, or the file is missing) the chiptune plays instead. */
 const REAL={cur:'',src:null,gain:null,bufs:{}};
-function realWant(){return L&&L.def.mp3&&(G.s==='play'||G.s==='card'||G.s==='pause'||G.s==='captcha'||G.s==='clear')?L.def.mp3:''}
+const SONGNAME={'overclocked.mp3':'OVERCLOCKED','algorithm.mp3':'THE ALGORITHM','nuke.mp3':'NUKE THE DATA CENTER'};
+function realWant(){if(G.s==='title')return'overclocked.mp3';if(G.s==='end')return'nuke.mp3';if(G.s==='cine')return(G.cine&&G.cine.song)||'overclocked.mp3';return(L&&L.def.mp3)||''}
 function realStop(){if(REAL.src){try{REAL.src.stop()}catch(e){}REAL.src=null}REAL.cur=''}
 function realTick(ac){const want=realWant();
- if(want&&!REAL.bufs[want]){const o=REAL.bufs[want]={st:'load',buf:null};
-  if(typeof location!=='undefined'&&location.protocol==='file:')o.st='bad';   /* opened from disk: browsers will not fetch, use the chiptune */
-  else try{fetch('music/'+want).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>new Promise((res,rej)=>{const p=ac.decodeAudioData(b,res,rej);if(p&&p.catch)p.catch(rej)})).then(buf=>{o.buf=buf;o.st='ok'}).catch(()=>{o.st='bad'})}catch(e){o.st='bad'}}
- const ready=!!want&&REAL.bufs[want].st==='ok';
- if(REAL.cur&&(!ready||REAL.cur!==want))realStop();
- if(ready&&!REAL.src){try{if(!REAL.gain){REAL.gain=ac.createGain();REAL.gain.gain.value=0;REAL.gain.connect(ac.destination)}const s=ac.createBufferSource();s.buffer=REAL.bufs[want].buf;s.loop=true;s.connect(REAL.gain);s.start();REAL.src=s;REAL.cur=want;
-   if(L.def.title)toast('NOW PLAYING: '+L.def.title,3)}catch(e){REAL.bufs[want].st='bad'}}
- if(REAL.gain)try{REAL.gain.gain.setTargetAtTime(REAL.src?vol('mus')*.8*(G.s==='pause'?.35:1):0,ac.currentTime,.05)}catch(e){}
+ /* only the song that is playing stays decoded (a decoded song is about 65 MB); the others keep their small mp3 bytes */
+ for(const k in REAL.bufs){const o=REAL.bufs[k];if(k!==want&&o.st==='ok'){if(REAL.cur===k)realStop();o.buf=null;o.st='raw'}}
+ if(REAL.cur&&REAL.cur!==want)realStop();
+ if(want){let o=REAL.bufs[want];
+  if(!o){o=REAL.bufs[want]={st:'load',raw:null,buf:null};
+   if(typeof location!=='undefined'&&location.protocol==='file:')o.st='bad';   /* opened from disk: browsers will not fetch, use the chiptune */
+   else try{fetch('music/'+want).then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>{o.raw=b;o.st='raw'}).catch(()=>{o.st='bad'})}catch(e){o.st='bad'}}
+  if(o.st==='raw'){o.st='dec';try{const done=buf=>{o.buf=buf;o.st='ok'},fail=()=>{o.st='bad'},p=ac.decodeAudioData(o.raw.slice(0),done,fail);if(p&&p.catch)p.catch(fail)}catch(e){o.st='bad'}}
+  if(o.st==='ok'&&!REAL.src){try{if(!REAL.gain){REAL.gain=ac.createGain();REAL.gain.gain.value=0;REAL.gain.connect(ac.destination)}const sr=ac.createBufferSource();sr.buffer=o.buf;sr.loop=true;sr.connect(REAL.gain);sr.start();REAL.src=sr;REAL.cur=want;
+    if(L&&!L.def.hub&&(G.s==='play'||G.s==='card'))toast('NOW PLAYING: '+(SONGNAME[want]||want),3)}catch(e){o.st='bad'}}}
+ if(REAL.gain)try{REAL.gain.gain.setTargetAtTime(REAL.src?vol('mus')*.8*(G.s==='pause'?.35:L&&L.def.hub&&G.s!=='title'?.55:1):0,ac.currentTime,.05)}catch(e){}
  return !!REAL.src}
 function music(){const ac=AC();if(!ac)return;const real=realTick(ac),want=real?'':musWant();if(want!==MUS.on){MUS.on=want;MUS.step=0;MUS.loop=0;MUS.next=ac.currentTime+.06}
  const S=SONGS[want];if(!S)return;if(MUS.next<ac.currentTime-.3)MUS.next=ac.currentTime+.05;const sd=60/S.bpm/4;
