@@ -80,6 +80,7 @@
     { const ry = Math.atan2(Math.cos(e.aim), Math.sin(e.aim)); if (v.ry == null || e.state === 'dodge') v.ry = ry; let d = ry - v.ry; d = Math.atan2(Math.sin(d), Math.cos(d)); v.ry += d * 0.3; v.c.root.rotation.y = v.ry; }       // a body takes a moment to turn
     let act = 'idle', prog = 0, glow = null;
     if (e.state === 'ko') { act = 'ko'; prog = e.koT; }
+    else if (e.down > 0) { act = 'ko'; prog = Math.min(e.downT - e.down, e.down) * 1.7; }
     else if (e.st.stun) act = 'stun';
     else if (e.state === 'dodge') { act = 'dodge'; prog = 1 - e.t / 0.3; }
     else if (e.act) {
@@ -93,7 +94,7 @@
     else if (phase === 'ko' || (phase === 'mortal' && M && e.isPlayer && M.t > (M.def.imp || 1.2) + 0.6)) act = 'cheer';
     const alpha = e.buffs.stealth ? (e.isPlayer ? 0.4 : 0.1) : 1;
     if (act === 'cast' && e.state === 'wind' && glow && Math.random() < 0.6) { const ca = rand(0, 6.28), cr = rand(0.8, 1.5); gfx.emit(X + Math.cos(ca) * cr, 1.2 + rand(-0.4, 0.6), Z + Math.sin(ca) * cr, -Math.cos(ca) * cr * 3, 0, -Math.sin(ca) * cr * 3, 0.3, glow, 0); }
-    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : 0, guard: e.guard > 0, ready: 1, tired: e.hp < e.maxHp * 0.25, t: time + (e.isPlayer ? 0 : 1.7), glow });
+    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : 0, guard: e.guard > 0, ready: 1, hop: !!(e.lost && e.lost.legL), tired: e.hp < e.maxHp * 0.25, t: time + (e.isPlayer ? 0 : 1.7), glow });
     const alive = e.state !== 'ko';
     v.ring.visible = alive && alpha > 0.3 && !F.ex; v.ring.position.y = 0.03 - e.z / S;
     v.ward.visible = alive && e.shield > 0; if (v.ward.visible) v.ward.material.opacity = 0.18 + Math.sin(time * 6) * 0.06;
@@ -210,7 +211,22 @@
   function heal(e, v) { v = Math.round(v * e.d.healMul); e.hp = Math.min(e.maxHp, e.hp + v); text(e, '+' + v, '#7dffa0'); fx.push({ k: 'ring', x: e.x, y: e.y, r: 70, col: '#7dffa0', t: 0, life: 0.5 }); for (let hi = 0; hi < 16; hi++) { const ha = hi * 0.8; gfx.emit(e.x / S + Math.cos(ha) * 0.6, 0.2 + hi * 0.05, e.y / S + Math.sin(ha) * 0.6, -Math.sin(ha) * 1.2, rand(2, 3.5), Math.cos(ha) * 1.2, rand(0.6, 1), '#7dffa0', -0.5); } spark(e.x, e.y, 30, '#7dffa0', 14, 90); G.sfx('heal'); }
 
   // ------------------------------------------------------------------ floor marks: scorches, cracks and holy afterglow
-  let marks = [], markN = 0, camKx = 0, camKz = 0;
+  let marks = [], markN = 0, camKx = 0, camKz = 0, slowT = 0;
+  // full-screen punctuation: a red edge when you are hurt, a white pop on a crit, a splash when something comes off
+  function screenFx(kind) { const el = document.getElementById('hitfx'); if (!el || F.ex) return; el.className = ''; void el.offsetWidth; el.className = kind; }
+  function knockdown(e, t) { if (e.state === 'ko') return; e.st.stun = { t }; interrupt(e); e.down = e.downT = t; e.lastDown = time; e.vx = e.vy = 0; fx.push({ k: 'dust', x: e.x, y: e.y, r: 90, t: 0.12, life: 0.5 }); }
+  // a limb comes off: it is thrown as a gib, the stump bleeds, and the fighter is worse for it
+  function sever(tgt, part, att, dir) {
+    const limb = tgt.vis.c.sever(part); if (!limb) return; tgt.lost = tgt.lost || {}; tgt.lost[part] = 1;
+    sc.attach(limb); const a = dir + rand(-0.6, 0.6), v = rand(3, 5.5);
+    gibs.push({ m: limb, vx: Math.cos(a) * v, vz: Math.sin(a) * v, vy: rand(5.5, 8.5), rx: rand(-10, 10), rz: rand(-10, 10) });
+    blood(tgt.x, tgt.y, 70, dir); blood(tgt.x, tgt.y, 40); if (gore()) for (let i = 0; i < 5; i++) gfx.splat(tgt.x / S + rand(-1.2, 1.2), tgt.y / S + rand(-1.2, 1.2), rand(0.5, 1.2));
+    text(tgt, part === 'legL' ? 'LEG SEVERED' : 'ARM SEVERED', '#ff3020', true);
+    hitstop = Math.max(hitstop, 0.22); slowT = 0.5; shake = Math.max(shake, 19); camVh -= 0.9; flashLight(tgt.x, tgt.y, '#ff2010', 90);
+    G.sfx('crit'); G.sfx('wall'); if (att && att.isPlayer) { addHype(16); G.sfx('cheer'); } if (G.rumble) G.rumble(300, 1);
+    if (part === 'legL') tgt.d.speed *= 0.6; else tgt.d.dmgMul = (tgt.d.dmgMul || 1) * 0.85;
+    knockdown(tgt, 0.85); screenFx('gore');
+  }
   function mark(x, y, size, kind) {
     if (!sc) return;
     if (marks.length < 26) { const m = new T.Mesh(new T.PlaneGeometry(1, 1), new T.MeshBasicMaterial({ transparent: true, depthWrite: false })); m.rotation.x = -Math.PI / 2; sc.add(m); marks.push(m); }
@@ -373,6 +389,13 @@
     tgt.hurt = 0.28;
     const wt = Math.min(1, dmg / Math.max(1, tgt.maxHp) * 5), ha = o.from != null ? o.from : Math.atan2(tgt.y - att.y, tgt.x - att.x);       // weight: how much of them this blow took
     tgt.flash = 0.12; hitstop = Math.max(hitstop, (crit ? 0.13 : 0.065) + wt * 0.07); shake = Math.max(shake, (crit ? 12 : 5) + wt * 6);
+    if (real && dmg > 0) {
+      if (tgt.isPlayer && (wt > 0.25 || crit)) screenFx('hurt'); else if (att.isPlayer && crit) screenFx('crit');
+      if (crit && wt > 0.45) slowT = Math.max(slowT, 0.22);
+      const heavy = crit || wt > 0.3 || !ab.basic || (att.act && att.act.fin);
+      if (!tgt.isPlayer && !F.ex && !opp.spar && gore() && tgt.hp > 0 && heavy) { const fr = tgt.hp / tgt.maxHp; tgt.lost = tgt.lost || {}; if (fr < 0.5 && !tgt.lost.armL) sever(tgt, 'armL', att, ha); else if (fr < 0.22 && !tgt.lost.legL) sever(tgt, 'legL', att, ha); }
+      if (tgt.hp > 0 && wt > 0.6 && !(tgt.down > 0) && time - (tgt.lastDown || -9) > 6) knockdown(tgt, 0.6);
+    }
     if (real) { const kk = (crit ? 0.5 : 0.22) + wt * 0.4; camKx += Math.cos(ha) * kk; camKz += Math.sin(ha) * kk; camVh -= crit ? 0.5 : 0.15; if (crit || wt > 0.75) { fx.push({ k: 'dust', x: tgt.x, y: tgt.y, r: 70 + wt * 60, t: 0, life: 0.45 }); if (wt > 0.75) mark(tgt.x, tgt.y, 1.1, 'crack'); } }
     spark(tgt.x, tgt.y, 34, ab.color || '#fff', crit ? 18 : 9, crit ? 260 : 170);
     blood(tgt.x, tgt.y, crit ? 18 : 9, o.from != null ? o.from : Math.atan2(tgt.y - att.y, tgt.x - att.x));
@@ -397,7 +420,7 @@
       text(tgt, ['SCORCH', 'CHILL', 'DAZE', 'HEX'][r], '#ff6ad5');
     }
     if (ab.steal && att.isPlayer) { stolen += ab.steal; text(tgt, '+' + ab.steal + ' coin', '#ffd36b'); G.sfx('coin'); }
-    const kn = ab.knock || o.knock || (real && dmg > 0 ? Math.min(95, 45 + dmg * 2.2) : 0);
+    const finHit = !!(att.act && att.act.fin), kn = ab.knock || o.knock || (real && dmg > 0 ? Math.min(finHit ? 175 : 95, 45 + dmg * 2.2 + (finHit ? 70 : 0)) : 0);
     if (kn) {
       const a = o.from != null ? o.from : Math.atan2(tgt.y - att.y, tgt.x - att.x);
       tgt.kx = Math.cos(a) * kn * resist; tgt.ky = Math.sin(a) * kn * resist; tgt.kBy = att;
@@ -532,7 +555,8 @@
   function updateEntity(e, dt) {
     e.iframe = Math.max(0, e.iframe - dt); e.flash = Math.max(0, e.flash - dt); e.dodgeT = Math.max(0, e.dodgeT - dt);
     e.parryCd = Math.max(0, (e.parryCd || 0) - dt);
-    e.mash = Math.max(0, (e.mash || 0) - dt * 0.9); if (e.guard > 0) e.guard -= dt; e.hurt = Math.max(0, (e.hurt || 0) - dt);
+    e.mash = Math.max(0, (e.mash || 0) - dt * 0.9); if (e.guard > 0) e.guard -= dt; e.hurt = Math.max(0, (e.hurt || 0) - dt); if (e.down > 0) e.down -= dt;
+    if (e.lost && e.state !== 'ko' && gore()) { if (Math.random() < dt * 6) gfx.emit(e.x / S + rand(-0.2, 0.2), rand(0.6, 1.3), e.y / S + rand(-0.2, 0.2), rand(-0.6, 0.6), rand(-0.5, 1), rand(-0.6, 0.6), 0.5, 0xb01010, 9); if (Math.random() < dt * 2.2) gfx.splat(e.x / S + rand(-0.3, 0.3), e.y / S + rand(-0.3, 0.3), rand(0.2, 0.5)); }
     for (const k in e.cds) if (e.cds[k] > 0) e.cds[k] -= dt * (1 + e.d.cdr);
     if (e.state === 'ko') { e.koT += dt; return; }
     e.res = Math.min(100, e.res + e.d.regen * dt);
@@ -726,6 +750,7 @@
     if (F.paused) { sync(0); return; }
     let dt = rdt * F.speed;
     if (hitstop > 0) { hitstop -= dt; dt *= 0.05; }
+    else if (slowT > 0) { slowT -= rdt; dt *= 0.3; }                       // the half-second after something terrible
     if (phase === 'ko') dt *= 0.45;
     if (phase === 'mortal') dt *= 0.8;
     time += dt; shake = Math.max(0, shake - dt * 40);

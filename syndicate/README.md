@@ -108,6 +108,8 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **The catalogue.** The furniture catalogue is laid out like a hotel-builder's: pages down the side, a grid of pictured tiles (each piece rendered from the room's own angle, with price and owned count), and a preview pane with details and the buy button. Double-tap a tile to buy straight away.
 
+**Weight and gore.** Fighters have momentum, every clean hit shoves and holds the frame, and heavy blows knock the victim flat. A badly hurt opponent can lose an arm (below half health, they hit 15% softer) and then a leg (below about a fifth, they hobble at 60% speed). The limb is thrown, the stump bleeds, time slows for a moment and the crowd roars. The Blood setting turns it off.
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |

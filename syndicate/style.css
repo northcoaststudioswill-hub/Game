@@ -463,3 +463,11 @@ button:not(:disabled):hover { filter: brightness(1.12); }
   .cat-prev { display: grid; grid-template-columns: 6.5rem 1fr; column-gap: 0.6rem; } .cp-pic { height: 6.5rem; grid-row: 1 / span 3; align-self: start; } .cp-name { font-size: 1.1rem; } .cp-desc { font-size: 0.85rem; } .cp-buy, .cp-lock { grid-column: 1 / -1; }
   .cat-foot { gap: 0.6rem; } .cat-comf { font-size: 0.72rem; }
 }
+
+/* impact */
+#hitfx { position: absolute; inset: 0; pointer-events: none !important; opacity: 0; z-index: 3; }
+#hitfx.hurt { background: radial-gradient(ellipse at center, transparent 45%, rgba(190, 20, 10, 0.55) 100%); animation: hfx 0.4s ease-out; }
+#hitfx.crit { background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.22), transparent 70%); animation: hfx 0.16s ease-out; }
+#hitfx.gore { background: radial-gradient(ellipse at center, transparent 30%, rgba(150, 0, 0, 0.6) 100%), radial-gradient(circle at 12% 18%, rgba(120, 0, 0, 0.7) 0 5%, transparent 9%), radial-gradient(circle at 86% 74%, rgba(120, 0, 0, 0.7) 0 7%, transparent 11%), radial-gradient(circle at 78% 14%, rgba(120, 0, 0, 0.6) 0 3%, transparent 6%); animation: hfx 0.8s ease-out; }
+@keyframes hfx { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { #hitfx { display: none; } }
