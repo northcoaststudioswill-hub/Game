@@ -15,6 +15,9 @@ phone portrait, phone landscape, or a desktop monitor.
 
 - **True isometric 3D.** A fixed isometric camera over real geometry, with dynamic lights,
   shadows, torch flicker and spell light on the stone. Built on three.js (vendored in `lib/`).
+- **Opening cinematic:** an in-engine intro (skippable) that sets up the Undercity, the Deep Guild's
+  Blood Ledger, the champion and your debt. It plays when you start a new fighter and can be
+  replayed from the title menu.
 - **Three places you walk around:** the Undercity street (the Pit gate, the Fence, the
   Guildmaster, your Hideout door), the Blood Pit arena, and your Hideout.
 - **Character creation:** 5 origins x 4 classes (Fighter, Rogue, Sorcerer, Cleric), six

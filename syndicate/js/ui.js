@@ -68,14 +68,15 @@
     const has = G.hasSave();
     show('<div class="title-wrap"><div class="logo"><svg class="crown" viewBox="0 0 120 70" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset=".5" stop-color="#e2ad3c"/><stop offset="1" stop-color="#8a5a16"/></linearGradient></defs><path d="M8 62 L2 18 L30 40 L44 6 L60 34 L76 6 L90 40 L118 18 L112 62 Z" fill="url(#cg)" stroke="#1a1006" stroke-width="3" stroke-linejoin="round"/><path d="M8 62 h104 v6 H8z" fill="#6f4a12" stroke="#1a1006" stroke-width="3"/><path d="M52 62 l-6 -10 l8 3 l-3 -9 l9 6 l6 -8 l2 9 l7 -4 l-4 13z" fill="#1a1006" opacity=".55"/><circle cx="60" cy="48" r="6" fill="#c22a22" stroke="#1a1006" stroke-width="2.5"/><circle cx="32" cy="52" r="3.5" fill="#6ad0ff" stroke="#1a1006" stroke-width="2"/><circle cx="88" cy="52" r="3.5" fill="#6ad0ff" stroke="#1a1006" stroke-width="2"/></svg><div class="t-over">The Deep Guild presents</div><h1>Gutter<span>crown</span></h1><div class="ribbon"><span>Pit-fighters of the Undercity</span></div></div>' +
       '<div class="menu">' + (has ? '<button class="big" id="bCont">Continue</button>' : '') +
-      '<button class="' + (has ? '' : 'big') + '" id="bNew">New Fighter</button><button id="bHow">How to Play</button></div>' +
+      '<button class="' + (has ? '' : 'big') + '" id="bNew">New Fighter</button><button id="bIntro">Watch the Intro</button><button id="bHow">How to Play</button></div>' +
       '<p class="t-foot">Bleed for coin. Climb the ledger. Take the crown.</p><p class="t-cred">A North Coast Studios game · with E Concepts</p></div>', 'title');
+    on('#bIntro', () => G.cine.play(() => ui.title()));
     on('#bHow', () => { show('<div class="card small"><h2>How to Play</h2><p>Win pit fights for <b>XP</b>, <b>coin</b> and <b>respect</b>. Level up to shape your class. Spend coin on gear and on your hideout.</p>' + CONTROLS + '<div class="row end"><button class="big" id="x">Back</button></div></div>'); on('#x', () => ui.title()); });
     on('#bCont', () => { G.load(); ui.hub(); });
     on('#bNew', () => {
       if (has) show('<div class="card small"><h2>Start over?</h2><p>This replaces your current fighter and hideout.</p><div class="row"><button id="y" class="danger">Start over</button><button id="n">Keep my fighter</button></div></div>');
-      else return ui.create();
-      on('#y', () => { G.wipe(); ui.create(); }); on('#n', () => ui.title());
+      else return G.cine.play(() => ui.create());
+      on('#y', () => { G.wipe(); G.cine.play(() => ui.create()); }); on('#n', () => ui.title());
     });
   };
 

@@ -36,6 +36,7 @@
   window.addEventListener('keydown', e => {
     if (e.target && e.target.tagName === 'INPUT') return;
     if (G.bootSkip) return;
+    if (G.scene === 'cine') { if (e.code === 'Escape' || e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); G.cine.skip(); } return; }
     G.audioInit();
     if (G.scene === 'fight') {
       if (e.code === 'Escape' || e.code === 'KeyP') { if (G.fight.paused) { G.ui.close(); G.fight.paused = false; } else G.ui.pause(); }
@@ -142,7 +143,8 @@
     let nx = (hit(15) ? 1 : 0) - (hit(14) ? 1 : 0), ny = (hit(13) ? 1 : 0) - (hit(12) ? 1 : 0);
     navT -= dt;
     if (!nx && !ny && (Math.abs(lx) > 0.6 || Math.abs(ly) > 0.6)) { if (navT <= 0) { if (Math.abs(lx) > Math.abs(ly)) nx = Math.sign(lx); else ny = Math.sign(ly); navT = 0.22; } } else if (!lx && !ly) navT = 0;
-    if (sc === 'fight' && !open && !paused) {
+    if (sc === 'cine') { if (hit(0) || hit(1) || hit(9)) G.cine.skip(); }
+    else if (sc === 'fight' && !open && !paused) {
       if (hit(0) || hit(6)) In.pressed.push('dodge');
       if (hit(4)) In.pressed.push('a0'); if (hit(5)) In.pressed.push('a1'); if (hit(3)) In.pressed.push('a2');
       if (hit(1)) In.pressed.push('ult'); if (hit(12)) In.pressed.push('potion'); if (hit(9)) G.ui.pause();
@@ -186,6 +188,7 @@
     pollPad(dt);
     let near = null;
     if (sc === 'fight') { G.fight.update(dt); }
+    else if (sc === 'cine') { G.cine.update(dt, T); }
     else if (sc === 'hub' || sc === 'hideout') {
       near = W.updateWalk(dt, T, G.ui.isOpen() || !!G.placing);
       if (G.placing) { const k = Math.min(1, dt * 6); cam.x += (G.placing.x - cam.x) * k; cam.z += (G.placing.z - cam.z) * k; }

@@ -292,3 +292,18 @@ h3 .dim { color: var(--dim); }
 @keyframes bcard { 0% { opacity: 0; transform: translateY(0.6rem) scale(0.98); } 18% { opacity: 1; transform: none; } 82% { opacity: 1; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .b-card { animation: none; } }
 .t-cred { font-family: var(--display); font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: #8a8092; margin: 0.5rem 0 0; }
+
+
+/* opening cinematic */
+#cine { position: absolute; inset: 0; z-index: 50; pointer-events: none !important; }
+.c-fade { position: absolute; inset: 0; background: #050408; opacity: 1; }
+.c-bar { position: absolute; left: 0; right: 0; background: #050408; }
+.c-bar.top { top: 0; height: calc(9vh + var(--st)); } .c-bar.bot { bottom: 0; min-height: calc(21vh + var(--sb)); display: grid; place-items: center; padding: 0.8rem 1.2rem calc(0.8rem + var(--sb)); }
+.c-sub { margin: 0; max-width: 40rem; text-align: center; font-family: var(--body); font-style: italic; font-size: clamp(1.15rem, 4.4vw, 1.6rem); line-height: 1.35; color: #eadfc4; opacity: 0; transform: translateY(0.4rem); transition: opacity 0.6s, transform 0.6s; text-shadow: 0 0 1rem #000; }
+.c-sub.on { opacity: 1; transform: none; }
+.c-logo { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 1.2s; }
+.c-logo.on { opacity: 1; }
+.c-logo h1 { font-size: clamp(3.4rem, 17vw, 7.5rem); line-height: 0.9; background: linear-gradient(#fff3c4 10%, #f0c95a 45%, #a8741f 80%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 2px #1a1006; paint-order: stroke fill; filter: drop-shadow(0 5px 0 #0b0704) drop-shadow(0 0 1.6rem rgba(255, 150, 40, 0.5)); padding: 0.08em 0.05em 0.12em; }
+.c-logo h1 span { background: linear-gradient(#ffd0c0 10%, #d8483a 50%, #7a1410 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.c-logo small { letter-spacing: 0.3em; text-transform: uppercase; color: var(--bronze-hi); font-size: 0.8rem; margin-top: 0.4rem; }
+.c-skip { position: absolute; top: calc(0.7rem + var(--st)); right: calc(0.8rem + var(--sr)); pointer-events: auto !important; opacity: 0.75; }
