@@ -208,3 +208,9 @@ multiclassing, recorded music or voice, cloud saves, typing a name with a contro
 - **Ten levels.** Levels 1 to 5 as before. Level 6 and 9: two ability points to place. Level 7: a technique. Level 8: a second feat. Level 10: a capstone.
 - **Doors open as you earn them.** First win: Notice Board, Big Hobb's Pot. Scrapper: the Tally, the Apothecary. Bloodied: Mark, the Wisp Table, the Armoury, the Tailor. Enforcer: the Outfitter, charms, Whisper, teachers. Underboss: the Crown's tithe. A shut door says what it needs; the first visit explains the system and writes it into the Codex.
 - **Old saves** keep everything their rank already opens, and pick the ladder up at the undercard of their next unbeaten name.
+
+## The Oracle's work (`js/raid.js`)
+
+- **Expeditions.** Once you have signed David's contract (or been bound by your third death), three gold-marked jobs appear at the Low Lamp: rob a wizard-gold caravan, harry the tribes for ransom, burn a village. They resolve like other Tally jobs, by bouts and a d20.
+- **Wizard gold** clears one soul each in his cellar. Owing nothing while his work goes on earns his favour: +8% damage and +8% coin.
+- **Heat** (0 to 10) is the cost. Stalls charge more, the Seal-Wardens fine you on the road home, and somebody you wronged can buy a line on the Ledger: a grudge bout you must answer before the next named fighter. Heat cools by one every three bouts.

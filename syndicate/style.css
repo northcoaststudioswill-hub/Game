@@ -557,3 +557,8 @@ button:disabled { filter: grayscale(0.7) brightness(0.7); }
 .opp.under { margin-left: 0.8rem; } .opp.cur { box-shadow: 0 0 0 1px #6a5230, 0 0 0 3px rgba(255, 211, 107, 0.55), 0 6px 14px rgba(0, 0, 0, 0.5); }
 .locked-card h2 { color: var(--dim); } .ab-row.locked { opacity: 0.55; }
 button.stat { cursor: pointer; font: inherit; color: inherit; } button.stat:disabled { opacity: 0.4; }
+
+/* ---------- the Oracle's work: expeditions and heat ---------- */
+button.mini.raid { border-color: #c9a040; color: #ffe2a0; background: linear-gradient(180deg, rgba(120, 84, 20, 0.55), rgba(60, 40, 8, 0.6)); }
+.raidnote { border-color: #c9a040; } .heat { color: #ff9a6a; }
+.opp.grudge { border-color: #8a1a12; box-shadow: 0 0 0 1px #6a5230, 0 0 0 3px rgba(200, 55, 45, 0.6), 0 6px 14px rgba(0, 0, 0, 0.5); }

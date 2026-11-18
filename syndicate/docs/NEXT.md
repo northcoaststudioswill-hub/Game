@@ -1,6 +1,6 @@
 # Guttercrown: design for the next round
 
-**Status: in progress.** Steps 1 and 2 of the build order are done; the rest is planned. This is the agreed design for the next stretch of work. The current game is described in `README.md`; the story bible is `docs/LORE.md`.
+**Status: in progress.** Steps 1 to 3 of the build order are done; the rest is planned. This is the agreed design for the next stretch of work. The current game is described in `README.md`; the story bible is `docs/LORE.md`.
 
 ## Goals
 
@@ -133,7 +133,7 @@ Checklist:
 
 1. ~~Death, revival and David's first scenes.~~ **Done** (`js/oracle.js`): a lost bout is a death, David revives you, soul debt and his cut, the contract with its hidden third-death binding and later reveal, his cellar in the market, and the first favour (Borrowed Time). Souls are bought back with coin until expeditions exist.
 2. ~~Spaced progression.~~ **Done** (`js/climb.js`): undercard bouts before each named fighter (2, 3, 3, 4, 4), about 21 bouts to the crown; levels to 10 (ability points at 6 and 9, a technique at 7, a second feat at 8, a capstone at 10); the market opens by rank with a shut-door card, a first-time introduction and a codex entry on first use. Still to do from this step: a second ultimate to choose at level 10 (a capstone stands in for it), and first-time intros as short scenes instead of cards.
-3. **Expeditions and heat.**
+3. ~~Expeditions and heat.~~ **Done** (`js/raid.js`): once signed or bound, the Tally can rob wizard-gold caravans, harry the tribes for ransom, or burn a village. Wizard gold clears souls one for one; owing nothing while his work continues earns his favour (+8% damage and coin). Heat runs 0 to 10: honest stalls charge 6% more per point, the Seal-Wardens fine you from 5, and a grudge challenger can come up the Ledger and must be answered before the next named fighter. Heat cools by one every three bouts. Still open: how raids and burned villages change the ending.
 4. **Gear ladder**, folding in existing weapons and kits.
 5. **Druid, then tiefling spirits.**
 6. **Finishers, specials and gore.**

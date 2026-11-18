@@ -159,7 +159,7 @@
       const st = G.state, k = keyOf.apply(null, arguments), self = this, args = arguments; if (!k || !st || !st.hero) return f0.apply(this, arguments);
       if (!open(k, st)) return lockCard(k);
       const seen = st.seen || (st.seen = {});
-      if (!seen[k]) { seen[k] = 1; G.save(); if (UN[k].intro) { G.sfx('page'); show('<div class="card small"><small class="over">New to you</small><h2>' + UN[k].name.charAt(0).toUpperCase() + UN[k].name.slice(1) + '</h2><p>' + UN[k].intro + '</p><p class="dim">Written into your Codex.</p><div class="row end"><button class="big" id="ok">Go on</button></div></div>'); on('#ok', () => f0.apply(self, args)); return; } }
+      if (!seen[k]) { seen[k] = 1; G.save(); if (UN[k].intro) { G.sfx('page'); show('<div class="card small"><small class="over">New to you</small><h2>' + UN[k].name.charAt(0).toUpperCase() + UN[k].name.slice(1) + '</h2><p>' + UN[k].intro + '</p><p class="dim">Written into your Codex.</p><div class="row end"><button class="big" id="ok">Go on</button></div></div>'); on('#ok', () => ui[fn].apply(self, args)); return; } }
       return f0.apply(this, arguments);
     };
   };
@@ -192,7 +192,7 @@
     const now = KEYS.filter(k => open(k, st));
     if (!st.unl) { st.unl = {}; now.forEach(k => { st.unl[k] = 1; }); if (won(st)) { st.seen = st.seen || {}; now.forEach(k => { st.seen[k] = 1; }); } G.save(); return r; }   // a fighter from before this existed already knows the market
     const fresh = now.filter(k => !st.unl[k]);
-    if (fresh.length) { fresh.forEach(k => { st.unl[k] = 1; }); G.save(); setTimeout(() => { if (!G.talk) { G.sfx('page'); ui.toast('Now open to you: ' + fresh.map(k => UN[k].name).join(', ') + '.'); } }, 1400); }
+    if (fresh.length) { fresh.forEach(k => { st.unl[k] = 1; }); G.save(); setTimeout(() => { if (!G.talk) { G.sfx('page'); const nm = fresh.map(k => UN[k].name); ui.toast('Now open to you: ' + (nm.length > 3 ? nm.slice(0, 2).join(', ') + ' and ' + (nm.length - 2) + ' more' : nm.join(', ')) + '.'); } }, 1400); }
     return r;
   };
   if (G.LORE) {
