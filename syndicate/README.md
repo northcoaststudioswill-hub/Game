@@ -286,3 +286,12 @@ The Fence, Mark, the Apothecary, Big Hobb, the charm seller, Whisper and the Bus
 
 - **Removed dead code:** the original ladder, catalogue and placement functions in `ui.js` and the ladder wrapper in `ledger.js`, all fully replaced by later files (about 70 lines). The crowd meter label is looked up once instead of every frame.
 - **More personalised dialogue:** your Tally addresses you by a title for your class; each named fighter has last words (with special ones for some classes and races); the Ledger-Keeper notes your level-ups by class; the Outfitter and Tailor fit you by race; a death gets an epitaph by class or race; the Warden Captain, the King and the Queen each remark on your trade or people.
+
+## Guidance, conversations and readability (`js/guide.js`)
+
+- **The line at the top** now leads with what is new (a stall that has just opened, with where it is and what it is for), then tips (empty hideout, people to talk to, souls owed, what the next rank opens), then the next fight.
+- **Pip Tallow's tour:** offered on first arrival; five stops covering the pit, the Fence and Guildmaster, your hideout and how respect opens the market. Pip stays in the market to ask again.
+- **People to talk to:** Old Marrow Tibb, Sergeant Ysolde Carr, Ilvaren of the Hanging Markets and Pip, each with topics and a greeting that depends on your race or class. David has a **Talk to him** button in his cellar with seven topics.
+- **What your home does:** tap the Comfort sign in your hideout for a list of every working piece, whether it is ready, and what is worth buying.
+- **Keys and pad:** ability names sit under the buttons, with a legend for strike, heavy blow, taunt and aim. The phone layout is unchanged.
+- **Gore and animation:** wounds appear on a fighter's body as health drops and stay; a badly hurt fighter drips and leaves a trail, holds the wound and limps; heavy critical hits knock chunks loose; each class has its own victory pose.

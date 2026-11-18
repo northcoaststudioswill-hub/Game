@@ -7,7 +7,7 @@
 
   // ------------------------------------------------------------ a longer ladder
   // the named five are stronger now: you reach them with more levels behind you
-  { const LV = [1, 3, 5, 6, 8], HP = [1.05, 1.08, 1.14, 1.16, 1.08], DM = [1.05, 1.18, 1.26, 1.28, 1.16]; GATES.forEach((o, i) => { o.level = LV[i]; o.hpMul = +(o.hpMul * HP[i]).toFixed(2); o.dmgMul = +(o.dmgMul * DM[i]).toFixed(2); o.respect0 = o.respect; o.respect = Math.round(o.respect * 0.55); }); }   // respect is spread over four times as many bouts
+  { const LV = [1, 3, 5, 6, 8], HP = [1.4, 1.32, 1.3, 1.28, 1.16], DM = [1.22, 1.3, 1.34, 1.34, 1.2], GD = [0.3, 0.4, 0.3, 0.6, 0.45], PR = [0.06, 0.12, 0.1, 0.2, 0.28], AG = [0.62, 0.66, 0.7, 0.74, 0.82]; GATES.forEach((o, i) => { o.level = LV[i]; o.hpMul = +(o.hpMul * HP[i]).toFixed(2); o.dmgMul = +(o.dmgMul * DM[i]).toFixed(2); o.ai = Object.assign({}, o.ai, { react: +(o.ai.react * 0.82).toFixed(2), aggro: Math.max(o.ai.aggro, AG[i]), guard: GD[i], parry: PR[i] }); o.respect0 = o.respect; o.respect = Math.round(o.respect * 0.55); }); }   // respect is spread over four times as many bouts
 
   const rng = seed => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   const FIRST = ['Tam', 'Odger', 'Nell', 'Brisk', 'Hob', 'Cray', 'Wenna', 'Stitch', 'Lodd', 'Marnie', 'Pike', 'Sorrel', 'Duff', 'Ketch', 'Jory', 'Mab', 'Crick', 'Tansy', 'Garl', 'Ibb', 'Roon', 'Hesper'];
@@ -22,8 +22,8 @@
     const sub = t >= 3 ? pick(Object.keys(C.subs)) : null, known = C.start.slice(0, 2).concat(t >= 1 ? [C.l2[Math.floor(r() * C.l2.length)]] : [], sub ? [C.subs[sub].ability] : []).filter(id => G.ABILITIES[id]);
     const arms = (G.ARMS || []).filter(w => w.cls === cls), pal = pick(PAL), name = pick(FIRST) + ' ' + pick(LAST), pay = extra ? 0.6 : 1;
     const o = { id: 'u' + t + '_' + k, name, title: TITLE[t], cls, race: pick(Object.keys(G.RACES)), level: Math.max(1, g.level - 1, extra && G.state && G.state.hero ? G.state.hero.level - 2 : 0), sub, known, arm: t >= 2 && arms.length ? pick(arms).id : null,
-      hpMul: +(g.hpMul * (0.7 + 0.04 * kk)).toFixed(2), dmgMul: +(g.dmgMul * (0.84 + 0.03 * kk)).toFixed(2),
-      ai: { react: g.ai.react + 0.12, aggro: Math.max(0.35, g.ai.aggro - 0.1), dodge: g.ai.dodge * 0.6 },
+      hpMul: +(g.hpMul * (0.8 + 0.04 * kk)).toFixed(2), dmgMul: +(g.dmgMul * (0.84 + 0.03 * kk)).toFixed(2),
+      ai: { react: g.ai.react + 0.08, aggro: Math.max(0.5, g.ai.aggro - 0.08), dodge: g.ai.dodge * 0.8, guard: Math.max(0.2, g.ai.guard - 0.1), parry: Math.max(0.04, g.ai.parry - 0.04) },
       xp: Math.round(g.xp * 0.45 * pay), coin: Math.round(g.coin * 0.4 * pay), respect: Math.round(g.respect0 * 0.12 * pay), taunt: pick(TAUNT), tint: { cloth: pal[0], armor: pal[1] }, under: t, extra };
     G.BIOS[o.id] = name + ' is on the undercard: the bouts the Guild runs before the names anyone has heard of. Win enough of them and the Ledger-Keeper writes you in against ' + g.name + '.';
     return cache[key] = o;

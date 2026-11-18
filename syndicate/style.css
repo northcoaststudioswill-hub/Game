@@ -596,3 +596,13 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .retort { margin: 0.3rem 0; font-size: 0.9rem; color: #e6d8b0; } .retort b { color: var(--gold); font-weight: 600; } .rumour, .wardline { font-style: italic; }
 
 .tallysay, .fitline { margin: 0.3rem 0 0.5rem; } .lastwords, .epitaph, .lvlnote { font-style: italic; } .lvlnote { margin-top: 0.3rem; }
+
+/* ---------- guidance: names under the buttons on keys and pad, a legend, talk cards ---------- */
+#hud:not(.touch) #abar.named { bottom: calc(2.3rem + var(--sb)); gap: 1.5rem; } #hud:not(.touch) #abar.named .ab { overflow: visible; }
+.abn { position: absolute; left: 50%; top: 100%; transform: translateX(-50%); margin-top: 0.3rem; white-space: nowrap; font-family: var(--display); font-size: 0.6rem; letter-spacing: 0.04em; color: #e6d8b0; text-shadow: 0 1px 3px #000, 0 0 6px #000; pointer-events: none; max-width: 7.5rem; overflow: hidden; text-overflow: ellipsis; }
+#hud.touch .abn { display: none; }
+#hud:not(.touch) #abar .ab kbd { font-size: 0.78rem; padding: 0.1em 0.4em; background: #1a141e; border-color: #c9a040; color: #ffe2a0; }
+#ablegend { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(6.7rem + var(--sb)); white-space: nowrap; text-align: center; font-size: 0.72rem; color: #c8b890; margin-bottom: 0.35rem; text-shadow: 0 1px 3px #000; pointer-events: none; } #ablegend.hidden, #hud.touch #ablegend, #hud.hidden #ablegend { display: none; }
+#ablegend kbd { font-size: 0.7rem; }
+.choices button.sel { border-color: var(--gold); }
+#objective { max-width: min(92vw, 60rem); }

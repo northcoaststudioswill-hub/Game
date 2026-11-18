@@ -96,8 +96,11 @@
     const alpha = e.buffs.stealth ? (e.isPlayer ? 0.4 : 0.1) : 1;
     if (act === 'cast' && e.state === 'wind' && glow && Math.random() < 0.6) { const ca = rand(0, 6.28), cr = rand(0.8, 1.5); gfx.emit(X + Math.cos(ca) * cr, 1.2 + rand(-0.4, 0.6), Z + Math.sin(ca) * cr, -Math.cos(ca) * cr * 3, 0, -Math.sin(ca) * cr * 3, 0.3, glow, 0); }
     let MF = 1, MS = 0; { const sp = Math.hypot(e.vx || 0, e.vy || 0), fx = e.foe ? e.foe.x - e.x : 0, fy = e.foe ? e.foe.y - e.y : 0, fd = Math.hypot(fx, fy); if (sp > 20 && fd > 1 && fd < 520) { MF = ((e.vx * fx + e.vy * fy) / (sp * fd)); MS = ((e.vx * fy - e.vy * fx) / (sp * fd)); } }
-    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : stepOv, guard: e.guard > 0, sty: e.act && e.act.ab.type === 'melee' && !e.act.ab.spell ? (e.act.ab.arc < 60 ? 1 : (e.act.ab.pz || 1) >= 1.4 ? 2 : e.act.ab.arc >= 120 ? 3 : 0) : 0, mf: MF, ms: MS, ready: 1, hop: !!(e.lost && e.lost.legL), tired: e.hp < e.maxHp * 0.25, t: time + (e.isPlayer ? 0 : 1.7), glow });
+    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : stepOv, guard: e.guard > 0, sty: e.act && e.act.ab.type === 'melee' && !e.act.ab.spell ? (e.act.ab.arc < 60 ? 1 : (e.act.ab.pz || 1) >= 1.4 ? 2 : e.act.ab.arc >= 120 ? 3 : 0) : 0, mf: MF, ms: MS, ready: 1, hop: !!(e.lost && e.lost.legL), tired: e.hp < e.maxHp * 0.25, wounded: e.hp < e.maxHp * 0.4 && e.hp > 0, t: time + (e.isPlayer ? 0 : 1.7), glow });
     const alive = e.state !== 'ko';
+    if (alive && !F.ex && gore() && !v.c.beast) { const fr = e.hp / e.maxHp, want = fr < 0.25 ? 3 : fr < 0.45 ? 2 : fr < 0.7 ? 1 : 0; v.wounds = v.wounds || 0;
+      while (v.wounds < want && v.c.body) { const w = new T.Mesh(new T.BoxGeometry(0.05 + Math.random() * 0.05, 0.22 + Math.random() * 0.22, 0.03), new T.MeshBasicMaterial({ color: 0x6a0808 })); w.position.set((Math.random() - 0.5) * 0.4, 1.0 + Math.random() * 0.45, 0.225 * (v.wounds === 1 ? -1 : 1)); w.rotation.z = (Math.random() - 0.5) * 1.6; v.c.body.add(w); v.wounds++; }
+      if (fr < 0.4 && Math.random() < 0.05) { gfx.splat(X + rand(-0.25, 0.25), Z + rand(-0.25, 0.25), rand(0.12, 0.3)); if (Math.random() < 0.5) gfx.emit(X, 1.1, Z, rand(-0.4, 0.4), 0, rand(-0.4, 0.4), 0.6, '#8a0c0c', 1); } }
     v.ring.visible = alive && alpha > 0.3 && !F.ex; v.ring.scale.setScalar(1 + Math.min(1, (e.charging || 0) / 0.28) * 0.45); v.ring.position.y = 0.03 - e.z / S;
     v.ward.visible = alive && e.shield > 0; if (v.ward.visible) v.ward.material.opacity = 0.18 + Math.sin(time * 6) * 0.06;
     v.mark.visible = alive && !!e.st.mark; v.guard.visible = alive && (!!e.buffs.counter || e.guard > 0 || (e.state === 'parry' && e.parryT > 0)); if (v.guard.visible) v.guard.rotation.y = v.c.root.rotation.y - Math.PI / 2;
@@ -302,6 +305,8 @@
   // ---- mortal blows: a win is a kill, and each trade has its own way of ending things
   let M = null, gibs = [];
   function clearGibs() { gibs.forEach(g => sc.remove(g.m)); gibs = []; }
+  // bits knocked loose by a blow that really landed
+  function chunks(e, n) { for (let i = 0; i < n; i++) { const sz = rand(0.05, 0.11), m = new T.Mesh(new T.BoxGeometry(sz, sz, sz), new T.MeshLambertMaterial({ color: i % 3 ? 0x7a0c0c : 0xe6dcc4, flatShading: true })); m.position.set(e.x / S + rand(-0.2, 0.2), rand(0.9, 1.6), e.y / S + rand(-0.2, 0.2)); sc.add(m); const a = rand(0, 6.28), v = rand(1.5, 4); gibs.push({ m, vx: Math.cos(a) * v, vz: Math.sin(a) * v, vy: rand(3, 6), rx: rand(-12, 12), rz: rand(-12, 12) }); } }
   function makeGibs(e, ash) {
     const cols = ash ? [0x3a3a3a, 0x555555, 0x222222] : e.vis.c.mats.slice(0, 5).map(m => m.color.getHex()).concat(gore() ? [0x7a0c0c, 0x5a0808, 0x8a1010] : []);
     for (let i = 0; i < (ash ? 26 : 20); i++) {
@@ -462,6 +467,7 @@
     if (att.isPlayer) { addHype(crit ? 10 : 5); if (ab.gain) att.res = Math.min(100, att.res + ab.gain); if (att.hp < att.maxHp * 0.2 && time - (att.lbT || -9) > 3) { att.lbT = time; addHype(8); text(att, 'LAST BREATH', '#ff8a6a', true); } }
     else addHype(-7);
     const resist = tgt.boss ? 0.6 : 1;
+    if (real && crit && (ab.heavy || !ab.basic) && gore() && tgt.vis && !tgt.vis.c.beast) chunks(tgt, 3 + Math.floor(Math.random() * 3));
     if (o.brk) { tgt.st.stun = { t: 1.0 * resist }; interrupt(tgt); text(tgt, 'GUARD BREAK', '#ffd23c', true); G.sfx('break'); if (att.isPlayer) addHype(12); }
     if (ab.stun) { tgt.st.stun = { t: ab.stun * resist }; interrupt(tgt); G.sfx('stun'); }
     if (ab.slow) tgt.st.slow = { t: ab.slow[1], amt: ab.slow[0] };

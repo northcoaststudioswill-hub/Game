@@ -26,3 +26,12 @@ How the numbers were checked, what was found, and what changed. The simulator is
 - Druid is the weakest class against Vexa (13% in the last run); Rogue the strongest (88%).
 - The bot plays ranged classes worse than melee, so caster numbers may understate them in human hands.
 - Set bonuses, charms, tonics and the Frenzy were not part of these runs.
+
+## After the first controller playtest
+
+Report: too easy; early bouts won in seconds by mashing, without being hit.
+
+- Every opponent now has a guard and a parry chance (early fighters had neither), and answers three quick strikes in a row by raising a guard.
+- Opponents react about 18% faster and press more.
+- Named fighters: health multipliers 1.4 / 1.32 / 1.3 / 1.28 / 1.16 and damage 1.22 / 1.3 / 1.34 / 1.34 / 1.2 over their base. Undercard fighters scale from those.
+- In simulation a first undercard bout now takes the bot 14 to 27 seconds (it was about 12, and a couple of seconds by hand). Melee classes still win most bouts with half their health or more; casters lose some early bouts, so Sorcerers and Warlocks start with a second potion.
