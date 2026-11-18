@@ -35,7 +35,7 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   const sig = `JSON.stringify([sprouts.length+seeds.length,buds.length,items.filter(i=>i.alive).map(i=>i.sub+(i.tri===undefined?'':i.tri)).sort(),gates.map(g=>g.alive)])`;
   const a = await E(sig); await E(`restore(JSON.parse(JSON.stringify(snap())));void 0`); ok('save and load keep the bridge, a treasure in transit and seeds in the air', a === await E(sig));
   ok('a save from before this update still loads', await E(`(()=>{init();const o=JSON.parse(JSON.stringify(snap()));delete o.gates.orchardBridge;o.items=o.items.filter(q=>q[0]==='berry'||q[0]==='big'||q[0]==='shard').map(q=>q.slice(0,6));o.run.spark={x:400,y:300,i:1};restore(o);return gates[5].alive&&run.spark.hp===DIGHP&&DIG.alive})()`));
-  await E(`newDay();void 0`); ok('nectar blossoms open again in the morning', (await E(`items.filter(i=>i.alive&&i.sub==='nectar').length`)) === 7);
+  await E(`newDay();void 0`); ok('nectar blossoms open again in the morning', (await E(`items.filter(i=>i.alive&&i.sub==='nectar').length`)) === 6);
   /* the prequel pass */
   ok('seven wild buddies live in the valley, with Sproutwild art', await E(`wbuds.length===7&&wbuds.every(q=>!!wbSprite(q))`));
   ok('nothing targets a buddy', await E(`(()=>{const q=wbuds[0];return findTarget({x:q.x,y:q.y,type:0},20)===null||findTarget({x:q.x,y:q.y,type:0},20).kind!==undefined})()`));

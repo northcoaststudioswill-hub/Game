@@ -349,7 +349,7 @@ const C3SCN={
     c3Cam(12.5+u*1.2,1.7+u*.5,8.2-u*1.4,C3DR[0],1.7,C3DR[1],56);c3Door(op,gl,t);const p=[C3DR[0]-.3,1.5,C3DR[1]];c3BeamTo(p[0],p[1],p[2],c3Sm(.2,1,t),.5);
     if(op>0&&op<1){c3q.shake=.8;for(let k=0;k<6;k++){const q=(t*1.3+k*.37)%1;c3Disc(C3DR[0]-.6-q*.8,.3+q*.9,C3DR[1]+(k%2?1:-1)*(1.1+q*.4),.3+q*.4,[190,180,160],.3*(1-q))}}
     c3Cue('dr',()=>{later(()=>{snd(784,.15);later(()=>snd(1175,.3),120)},900);later(()=>noise(3.4,.3,160,'lowpass'),2600)})}},
-  {d:8.5,cap:['',"Then it runs the length of the Crooked River, out to a lake too wide to see across."],f(t,u){const e=u*u*(3-2*u),x=c3Lp(5,39,e),z=c3Lp(-5.5,-12.5,e)+Math.sin(e*5)*1.2,y=6.2-e*1.8+Math.sin(e*3.14)*1.4;c3Env('night');c3Moon(.9,.3,-.3,13,'#e8ecff');c3Lamp(0,3.1,0,'#ffd890',7.5,2.6);
+  {d:8.5,cap:['',"Then it runs the length of the Crooked River, out to the Wending Lake."],f(t,u){const e=u*u*(3-2*u),x=c3Lp(5,39,e),z=c3Lp(-5.5,-12.5,e)+Math.sin(e*5)*1.2,y=6.2-e*1.8+Math.sin(e*3.14)*1.4;c3Env('night');c3Moon(.9,.3,-.3,13,'#e8ecff');c3Lamp(0,3.1,0,'#ffd890',7.5,2.6);
     c3Cam(x,y,z,x+11,y-2.4,z-1.8+Math.cos(e*5)*.8,66);c3Lantern(1.9,4);const L=C3LAMP();c3BeamTo(L[0],L[1],L[2],1,1.8);c3Tower(0);c3Pier(0);c3Glow(L[0],L[1],L[2],2.2,'#ffe890',.5);c3Cue('fl',()=>noise(8,.07,500,'lowpass'))}},
   {d:8,cap:['',"On a rock in the lake stands a second lantern, long dark. For one breath, it answers."],f(t,u){const an=Math.max(0,1-Math.abs(t-5.2)/.7);c3Env('night');c3Moon(.6,.5,-.6,13,'#e8ecff');const L=C3LAMP();c3Lamp(L[0],L[1],L[2],'#ffd890',6,1.2+an*2);
     c3Cam(46.5-u*1.2,.7+u*.5,-4.5+u*.8,L[0],L[1]-2.2,L[2],58);c3Tower(an*.9);c3Pier(0);c3BeamTo(L[0],L[1],L[2],1,1.8);c3Glow(L[0],L[1],L[2],2+an*3,'#ffe890',.45+an*.4);c3Wisp(L[0]+Math.cos(t*.9)*1.6,L[1]+.2+Math.sin(t*1.7)*.3,L[2]+Math.sin(t*.9)*1.6,t);
@@ -359,7 +359,7 @@ const C3SCN={
   {d:6,cap:['',"By morning the beam is gone. The door east of the orchard is still open."],f(t,u){c3Env('night','dawn',c3Sm(0,.8,u));c3Cam(-15+u*2,9.5+u*1.5,11,10,1.5,-2,60);c3Lamp(0,3.1,0,'#ffd890',7.5,2*(1-u*.7));c3Lantern(1.6-u*.8,4);c3House(6.2,-5.4,-.5,u<.5);c3Soil();c3Door(1,.6,t);const p=c3Dir(C3A_LAKE,70,5);c3BeamTo(p[0],p[1],p[2],1-c3Sm(.1,.75,u))}}],
  /* the first walk out onto the North Coast */
  coast:[
-  {d:7.5,cap:['',"Past the door the trees stop. Sand. Wind. And water with no far side."],f(t,u){c3Env('day');c3Cam(35.5-u*.6,1.1+u*3.6,-1.2+u*1.2,50,2.6-u*.6,-9,60);c3Tower(0);c3Pier(0);
+  {d:7.5,cap:['',"Past the door the trees stop. Sand. Wind. The Wending Lake, with no far side."],f(t,u){c3Env('day');c3Cam(35.5-u*.6,1.1+u*3.6,-1.2+u*1.2,50,2.6-u*.6,-9,60);c3Tower(0);c3Pier(0);
     const x=37.5+u*4.2;c3Person(x,-3,1.2,Object.assign(c3Look(),{walk:t,up:.1}));c3Dog(x+1.1,-4.1,1.2,{walk:t});for(let k=0;k<9;k++)c3Sprout(x-1-(k%3)*.55-((k/3)|0)*.5,-2.6-(k%3)*.5+((k/3)|0)*.3,k,{ang:1.2,hop:Math.abs(Math.sin(t*9+k))*.08});c3Cue('wv',()=>noise(7,.06,700,'lowpass'))}},
   {d:7.5,cap:['',"On a rock stands the NORTH LIGHT. Its lamp room is dark, and its lens lies cold at its foot."],f(t,u){c3Env('day');const a=2.2-u*.9,L=C3LAMP();c3Cam(C3TW[0]+Math.cos(a)*16,2.4+u*3,C3TW[1]+Math.sin(a)*16,C3TW[0],5,C3TW[1],58);c3Tower(0);c3Pier(0);
     c3Lens(C3TW[0]-1.9,c3G(C3TW[0]-1.9,C3TW[1]+1.5)+.5,C3TW[1]+1.5,.6,0,t);c3Wisp(L[0]+Math.cos(t*1.1)*1.5,L[1]+Math.sin(t*1.9)*.3,L[2]+Math.sin(t*1.1)*1.5,t,.7)}},
@@ -382,7 +382,10 @@ const C3SCN={
     c3Cam(-2.4+u*.5,1.4,9.6,-5.2,3.2-u*.3,-8,52);c3Lantern(1.9,4);c3Soil();c3Thorn(-5.2,3.2,3.05,{t,up:1});c3Peak(hm,t);c3Cue('hu',()=>later(()=>snd(55,2.8,58,'sawtooth',.05),2200))}}]};
 
 /* ---------- 6. playing a scene ---------- */
-function c3Play(key,done){const S=C3SCN[key];if(!S){if(done)done();return}c3q={key,S,i:0,t:0,done:done||null,cue:{},flash:0,tear:0,shake:0,tt:0};state='c3'}
+/* the scenes in the order the story meets them, for the Collection's SCENES page; seen ones are remembered across saves */
+const C3LIST=[['dawn','THE CRACK','The night the Lantern cracked, and the morning after.'],['van','FLOW PROS','Marcus, Derek, a van by the Dew Pond, and a business idea.'],['blaze','THE BLAZE','The fourth shard comes home.'],['call','THE CALL','The night the Lantern stopped skipping and started pointing.'],['coast','THE COAST','The first walk out to the Wending Lake.'],['relight','NORTH LIGHT','The lens comes home, and the second lantern burns.']];
+const c3SeenScene=k=>!!(meta.scn&&meta.scn[k]);
+function c3Play(key,done){const S=C3SCN[key];if(!S){if(done)done();return}if(!c3SeenScene(key)){meta.scn=meta.scn||{};meta.scn[key]=1;try{save()}catch(e){}}c3q={key,S,i:0,t:0,done:done||null,cue:{},flash:0,tear:0,shake:0,tt:0};state='c3'}
 const c3TextLen=s=>s.length/34+2.3;
 function c3End(){const f=c3q&&c3q.done;c3q=null;state='play';if(f)f();if(state==='play')persist()}
 function c3Update(dt){const q=c3q;if(!q){state='play';return}q.t+=dt;q.tt+=dt;const sh=q.S[q.i];if(pressed('start')){snd(330,.06);c3End();return}

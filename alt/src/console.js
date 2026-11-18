@@ -354,7 +354,7 @@ function init(){
  sel=0;day=1;dayT=0;shards=0;wr=0;aT=0;winT=0;duskSaid=false;found=Array(NT).fill(false);
  cam={x:P.x-VW/2,y:P.y-VH/2};cur={x:P.x,y:P.y+56};msg='';msgT=0;inHome=false;parked=[];newSpark();
 }
-function respawn(){for(const s of spawns){if((s.ref&&s.ref.alive)||(s.k==='grub'&&!run.grubs))continue;const x=s.x*16+8,y=s.y*16+8;s.ref=s.k==='grub'?mkFoe(x,y,false):s.k==='bug'?mkBug(s.sp,x,y):mkItem(s.k,x,y);}}
+function respawn(){for(const s of spawns){if((s.ref&&s.ref.alive)||(s.k==='grub'&&!run.grubs)||(s.x>=70&&!coastLive(s)))continue;const x=s.x*16+8,y=s.y*16+8;s.ref=s.k==='grub'?mkFoe(x,y,false):s.k==='bug'?mkBug(s.sp,x,y):mkItem(s.k,x,y);}}
 function openGarden(fx){if(gard.open)return;gard.open=true;if(!gard.order)newOrder();openGate(gates[4],fx);const e=npcs[0];e.x=46*16+8;e.y=5*16+8;}
 
 /* ---------- save / load of the run ---------- */
@@ -535,7 +535,7 @@ function nav(i,n){if(pressed('down')){snd(520,.04);return(i+1)%n}if(pressed('up'
 const menuItems=()=>(live?['CONTINUE','NEW GAME']:['PLAY']).concat(['REWARDS','CAPSULES','STYLE','COLLECTION','SETTINGS','SWAP CARTRIDGE']);
 function update(dt){
  time+=dt;musTick(dt);if(msgT>0&&!toasts.length)msgT-=dt;sndT-=dt;if(flashT>0)flashT-=dt;
- if(toasts.length){toasts[0].t-=dt;if(toasts[0].t<=0)toasts.shift()}
+ if(toasts.length){toasts[0].t-=dt*(toasts.length>2?2:1);if(toasts[0].t<=0)toasts.shift()}
  if(TRN){TRN.t+=dt;if(!TRN.done&&TRN.t>=.3){TRN.done=true;TRN.fn()}if(TRN.t>=.68)TRN=null;return}
  if(state.slice(0,2)==='g3'){g3Update(dt);return}
  if(state.slice(0,2)==='g4'){g4Update(dt);return} /* cartridge 5: Sproutwild */
@@ -582,9 +582,11 @@ function update(dt){
   if(pressed('right')){look[key]=(look[key]+1)%n;applyLook(look);snd(520,.04)}if(pressed('left')){look[key]=(look[key]+n-1)%n;applyLook(look);snd(520,.04)}
   if(pressed('a')){const o=look[key];if(meta.own[key].includes(o)){meta.eq[key]=o;save();snd(660,.08,990)}else{flash='WIN IT FROM A CAPSULE';flashT=2.5;snd(140,.1)}}
   if(pressed('b')||pressed('start')){applyLook(meta.eq);state='menu'}return;}
- case 'bugs':{const n=cpage?TRS.length:BUGS.length,was=csel;if(pressed('down')&&csel+2<n)csel+=2;else if(pressed('up')&&csel>=2)csel-=2;
-  else if(pressed('right')){if(csel%2===0&&csel+1<n)csel++;else{cpage=1-cpage;csel=0}}else if(pressed('left')){if(csel%2===1)csel--;else{cpage=1-cpage;csel=0}}
-  if(csel!==was||pressed('left')||pressed('right'))snd(520,.04);if(pressed('b')||pressed('a')||pressed('start'))state=colFrom;return}
+ case 'bugs':{const n=cpage===2?C3LIST.length:cpage?TRS.length:BUGS.length,was=csel;if(pressed('down')&&csel+2<n)csel+=2;else if(pressed('up')&&csel>=2)csel-=2;
+  else if(pressed('right')){if(csel%2===0&&csel+1<n)csel++;else{cpage=(cpage+1)%3;csel=0}}else if(pressed('left')){if(csel%2===1)csel--;else{cpage=(cpage+2)%3;csel=0}}
+  if(csel!==was||pressed('left')||pressed('right'))snd(520,.04);
+  if(cpage===2&&pressed('a')){const k=C3LIST[csel][0];if(c3SeenScene(k)){snd(660,.08,990);c3Play(k,()=>{state='bugs'})}else snd(140,.08);return}
+  if(pressed('b')||pressed('a')||pressed('start'))state=colFrom;return}
  case 'talk':if(pressed('a')||pressed('b')){dlgPage++;snd(440,.04);if(dlgPage>=dlg.pages.length){state='play';persist()}}return;
  case 'pause':spPauseUpdate();return;
  case 'guide':spGuideUpdate();return;
@@ -839,7 +841,7 @@ function deliver(it){
 }
 function updGate(ga,dt){const n=ga.on.length;if(!n)return;ga.hp-=n*dt;if(sndT<=0){snd(ga.sub===3?300+Math.random()*120:ga.sub?1200:160,.03);sndT=.12}
  ga.on.forEach(b=>{b.fx=ga.x>b.x?1:-1});
- if(ga.hp<=0){openGate(ga,true);snd(300,.3,900,'triangle',.08);say(ga.id==='northPier'?'THE PIER IS BUILT! THE NORTH LIGHT IS IN REACH':ga.sub===3?'THE BRIDGE IS BUILT! WILLOW FALLS IS OPEN':ga.sub?'THE CRYSTAL SHATTERS!':'THE BRAMBLE BURNS AWAY!',4);persist(true);}}
+ if(ga.hp<=0){openGate(ga,true);snd(300,.3,900,'triangle',.08);if(ga.id==='northPier')respawn();say(ga.id==='northPier'?'THE PIER IS BUILT! THE NORTH LIGHT IS IN REACH':ga.sub===3?'THE BRIDGE IS BUILT! WILLOW FALLS IS OPEN':ga.sub?'THE CRYSTAL SHATTERS!':'THE BRAMBLE BURNS AWAY!',4);persist(true);}}
 function endDay(){tod.strays=buds.filter(b=>!b.gard&&b.st!=='follow'&&b.st!=='park'&&d2(b,HX,HY)>150*150).length;if(tod.strays)louXP(Math.min(6,tod.strays));buds.forEach(b=>{if(!b.gard){b.tgt=null;b.z=0}});[...foes,...items,...gates,...bugs,DIG].forEach(o=>o.on.length=0);
  const bonus=5+Math.min(15,tod.berries)+Math.min(15,tod.flowers*2);tod.bonus=bonus;earn(bonus);state='dayend';snd(330,.5,110,'triangle',.08);}
 function newDay(){mkWbuds();inHome=false;parked=[];day++;dayT=0;duskSaid=false;wr=0;tod={berries:0,flowers:0,bugs:0,spooked:0};P.x=HX;P.y=HY+22;P.dx=0;P.dy=1;P.stun=0;P.pluck=0;trail=[];parts=[];
@@ -875,20 +877,20 @@ function spPauseUpdate(){const n=PMENU.length,was=pi;if(pressed('start')||presse
   else if(k==='SETTINGS'){state='settings';setFrom='pause';seti=0}else{persist(true);state='menu';mi=0}}}
 function drawPauseMenu(){mHead(zName(zone)||'THE VALLEY',2);const ds='DAY '+day;rtext(ds,W-44,3,2,'#c8c0d8');for(let i=0;i<4;i++){const x=W-38+i*9;r('#14101e',x,3,7,11);r(i<shards?'#f8d030':'#2a3340',x+1,4,5,9);if(i<shards)r('#fff8a0',x+1,5,1,4)}
  PMENU.forEach(([k,ic],i)=>{const x=4+(i%2)*118,y=23+((i/2)|0)*28,on=i===pi;mTile(x,y,114,26,on);r(on?'#f8e060':'#16202a',x+4,y+4,18,18);mIcon(ic,x+7,y+7,on);text(k,x+26,y+2,2,on?'#281c30':'#ffffff',null);text(pauseSub(k),x+26,y+14,1,on?'#5a4a28':'#8fa0b0',null)});
- mFoot(108);text('MISSIONS',6,110,1,'#f8a060',null);let y=121,any=false;
+ mFoot(108);text('MISSIONS',6,110,1,'#f8a060',null);let y=121,any=false;{const c=coastObj();if(c){any=true;r(c.col,6,y+2,3,8);text(c.text,12,y,2,'#ffffff',null);y+=12}}
  for(const n of npcs)if(n.st==='active'){any=true;const m=n.ms[n.mi],v=Math.min(m.get(),m.goal),dn=v>=m.goal;r(n.col,6,y+2,3,8);text(n.name+': '+m.t,12,y,2,dn?'#a8f080':'#ffffff',null);rtext(v+' / '+m.goal,235,y,2,dn?'#a8f080':'#c8c0d8',null);y+=12}
  if(!any)text(npcs.every(n=>n.st==='done')?'ALL MISSIONS DONE!':'TALK TO ERIN BY THE LANTERN',12,y,2,'#c8c0d8',null)}
 /* ---------- the field guide: sprouts, buddies, people and places, filled in as you meet them ---------- */
 const GPAGES=['SPROUTS','BUDDIES','PEOPLE','PLACES'];
 const GSPR=['Embers fight hardest and burn through bramble. Warm to hold.','Pebs carry double and smash crystal. Nothing spooks a Peb.','Dews swim, and water flowers fastest. The only sprouts that go in the pond.','Zips are the fastest runners and haulers. Never still.','Leafs are the best gardeners. Beds they tend grow quicker.','Luckies bring home bonus seeds and petals. Nobody knows how.'];
 const GBUD={LANTERNWISP:'A pale light that walks the old arch at night. Some say she is waiting for someone.'};
-const GPPL=[['WILL','The new keeper of the Great Lantern. Throws sprouts first, asks questions later.'],['ERIN','Keeper of the garden. Warm, direct, and the only one who knows where everything is.'],['MARCUS','Plumbing boss. All gas, bro. Has a guy for everything. The guy is usually him.'],['RANGER','Watches the paths. Says little. Has strong opinions about boulders.'],['SCOUT','Studies the critters and writes everything down. Has never caught one herself.'],['LOUIE','Evolved shiba, est. 2018. Looks after snacks. Sniffs out berries, strays and buried things.'],['THORNBACK','The guardian of the light, older than the paths. He has forgotten who asked him to guard it.'],['BESSIE','Lives in the lake. Very old, very slow, and fond of a light. Marcus named her, bro.']];
-const GPLC=['Home. The Great Lantern has stood here longer than anyone can remember.','The best berries in the valley. Zips grow wild in the far corner.','Tall grass and wildflowers. Pebs nap up here, and so does something shyer.',"Erin's pride and joy. Flowers for petals, and orders to fill.",'Deep and cold. Only Dews swim it. Marcus has plans for it.','Dark moss and glowing mushrooms. Something very old sleeps in here.','Fruit trees, bees and Luckies. The Crooked River runs along its north edge.','Sand, shells and crabs. The water goes on further than anyone has swum.','The falls feed the Crooked River. An arch of old stone stands behind the willows.','Sand, wind and a lake with no far side. The North Light stands on its rock.'];
+const GPPL=[['WILL','The new keeper of the Great Lantern. Throws sprouts first, asks questions later.'],['ERIN','Keeper of the garden. Warm, direct, and the only one who knows where everything is.'],['MARCUS','Plumbing boss. All gas, bro. Has a guy for everything. The guy is usually him.'],['RANGER','Watches the paths. Says little. Has strong opinions about boulders.'],['SCOUT','Studies the critters and writes everything down. Has never caught one herself.'],['LOUIE','Evolved shiba, est. 2018. Looks after snacks. Sniffs out berries, strays and buried things.'],['THORNBACK','The guardian of the light, older than the paths. He has forgotten who asked him to guard it.'],['BESSIE','Lives in the Wending Lake. Very old, very slow, and fond of a light. Marcus named her, bro.']];
+const GPLC=['Home. The Great Lantern has stood here longer than anyone can remember.','The best berries in the valley. Zips grow wild in the far corner.','Tall grass and wildflowers. Pebs nap up here, and so does something shyer.',"Erin's pride and joy. Flowers for petals, and orders to fill.",'Deep and cold. Only Dews swim it. Marcus has plans for it.','Dark moss and glowing mushrooms. Something very old sleeps in here.','Fruit trees, bees and Luckies. The Crooked River runs along its north edge.','Sand, shells and crabs. The water goes on further than anyone has swum.','The falls feed the Crooked River. An arch of old stone stands behind the willows.','Sand, wind and the Wending Lake, which has no far side. The North Light stands on its rock.'];
 function spGuideList(p){const S=run.wbSeen||{};
  if(p===0)return TYPES.map((T,t)=>({n:T.n,known:found[t],d:GSPR[t],art:(x,y)=>{g.save();g.translate(x,y+14);g.scale(4,4);const sx=ox,sy=oy;ox=oy=0;drawBud({x:0,y:0,type:t,stage:2,z:Math.abs(Math.sin(time*4))*1.5,mv:false,fx:1,st:'follow',a:1});ox=sx;oy=sy;g.restore()}}));
  if(p===1)return WBDEF.map(([id,tx,ty])=>({n:id,known:!!S[id],d:GBUD[id]||(()=>{try{return wSp(id).d}catch(e){return''}})(),sub:'SEEN IN '+zName(ZONES[zoneAt(tx,ty)][0]),art:(x,y)=>{const c=wbSprite({id});if(c){g.imageSmoothingEnabled=true;g.drawImage(c,x-26,y-26,52,52);g.imageSmoothingEnabled=false}}}));
  if(p===2)return GPPL.map(([n,d])=>({n,known:n==='BESSIE'?!!run.lit:n!=='THORNBACK'||!!run.boss,d,art:(x,y)=>{if(n==='BESSIE'){r('#101c40',x-60,y-38,120,48);r('#2c5cb0',x-60,y+10,120,26);r('#78a8f0',x-60,y+10,120,1);g.save();g.translate(x-8,y+10);g.scale(2,2);bessieArt(0,0,1);g.restore()}else if(n==='LOUIE'){g.save();g.translate(x,y+10);g.scale(2,2);const sx=ox,sy=oy;ox=oy=0;drawDog({x:0,y:0,fx:-1,mv:false,st:((time/2)|0)%2?'sit':'follow',alert:0,say:null});ox=sx;oy=sy;g.restore()}else if(n==='THORNBACK')g.drawImage(BO.l,x-32,y-20,64,44);else g.drawImage(n==='WILL'?SP.pd:CH[n],x-18,y-22,36,42)}}));
- return ZONES.map((z,i)=>({n:zName(z[0]),known:!!(run.seen&&run.seen[z[0]])||i===0,d:i===0&&run.keep?'Home. The old stones call it Sun Keep. Somebody kept this light before us.':i===5&&run.boss?'Dark moss and glowing mushrooms. Old Thornback slept here, guarding a light.':i===9&&run.lit?'The lake has no far side. The North Light burns again, and something in the water watches it.':GPLC[i],art:(x,y)=>{if(!BG)return;const k=Math.min(118/(z[3]*16),56/(z[4]*16)),w=z[3]*16*k,h=z[4]*16*k;g.imageSmoothingEnabled=true;g.drawImage(BG[((time*2)|0)%2],z[1]*16,z[2]*16,z[3]*16,z[4]*16,Math.round(x-w/2),Math.round(y-h/2),Math.round(w),Math.round(h));g.imageSmoothingEnabled=false}}))}
+ return ZONES.map((z,i)=>({n:zName(z[0]),known:!!(run.seen&&run.seen[z[0]])||i===0,d:i===0&&run.keep?'Home. The old stones call it Sun Keep. Somebody kept this light before us.':i===5&&run.boss?'Dark moss and glowing mushrooms. Old Thornback slept here, guarding a light.':i===9&&run.lit?'The Wending Lake has no far side. The North Light burns again, and something in the water watches it.':GPLC[i],art:(x,y)=>{if(!BG)return;const k=Math.min(118/(z[3]*16),56/(z[4]*16)),w=z[3]*16*k,h=z[4]*16*k;g.imageSmoothingEnabled=true;g.drawImage(BG[((time*2)|0)%2],z[1]*16,z[2]*16,z[3]*16,z[4]*16,Math.round(x-w/2),Math.round(y-h/2),Math.round(w),Math.round(h));g.imageSmoothingEnabled=false}}))}
 const spGuideCount=()=>[0,1,2,3].reduce((a,p)=>a+spGuideList(p).filter(e=>e.known).length,0);
 function spGuideUpdate(){const L=spGuideList(gpage);if(pressed('right')){gpage=(gpage+1)%4;gsel=0;snd(520,.04)}if(pressed('left')){gpage=(gpage+3)%4;gsel=0;snd(520,.04)}gsel=nav(gsel,L.length);if(pressed('b')||pressed('start'))state='pause'}
 function spDrawGuide(){mHead('FIELD GUIDE');const L=spGuideList(gpage),e=L[Math.min(gsel,L.length-1)],hd='<  '+GPAGES[gpage]+' '+L.filter(q=>q.known).length+' / '+L.length+'  >';rtext(hd,236,5,1,'#a8f080',null);
@@ -910,7 +912,7 @@ function floatAt(x,y,s,c){floats.push({x,y,s,c:c||'#fff8c0',t:1.3})}
    Wild buddies live here but keep to themselves (they are not a system: nothing targets them). At night they come and
    sit at the edge of the lantern light. Sprite art is Sproutwild's (same scope), scaled down. */
 const WBDEF=[['CINDERCAP',22,16],['PEBBLIT',32,6],['DRIZZLET',16,13],['ZIPWIG',50,22],['FERNFANG',22,33],['CLOVERIMP',65,24],['LANTERNWISP',65,8]];
-let wbuds=[],flickT=0;
+let wbuds=[],flickT=0,gdT=0;
 function mkWbuds(){wbuds=WBDEF.map(([id,tx,ty],i)=>({id,hx:tx*16+8,hy:ty*16+8,x:tx*16+8,y:ty*16+8,wx:tx*16+8,wy:ty*16+8,t:R(0,3),fx:1,mv:false,a:i*1.7,path:null,night:false}))}
 function wbSprite(q){if(q.spr===undefined){q.spr=null;try{const s=wSp(q.id),c=s&&s._spr&&(s._spr.ol||s._spr.img);if(c&&c.width){q.spr=c;q.sprF=flip(c)}}catch(e){}}return q.spr}
 function updWbuds(dt){const f=dayT/DAYLEN;
@@ -947,7 +949,7 @@ const TRL=['Far too big for any oak here. What tree dropped this?','No bird in t
  'Look close. A tiny valley inside, with a tiny light.','A crowned face, worn smooth. Nobody here knows any king.','A paw print pressed in stone. Older than the lantern?','Big and red. It says DO NOT PRESS. Louie pressed it. Nothing. Yet.',
  'Ring it, and every sprout turns to face the lantern.','Cold at noon, warm at night. It glows when the lantern dims.',"Marcus says it's his. It is far too small. He insists, bro.",'Flat and shiny, with gold lines. It fell out of the sky.'];
 function loreTick(){if(state!=='play'||inHome)return;const T=run.tips=run.tips||{};
- if(!run.gdone&&((time*3.3)|0)%10===0&&spGuideCount()>=TYPES.length+WBDEF.length+GPPL.length+ZONES.length){run.gdone=1;meta.tix+=2;toast('FIELD GUIDE COMPLETE!  +2 TICKETS');earn(30);snd(784,.1);later(()=>snd(1175,.25),110);save()}
+ if(!run.gdone&&(gdT=(gdT+1)%8)===0&&spGuideCount()>=TYPES.length+WBDEF.length+GPPL.length+ZONES.length){run.gdone=1;meta.tix+=2;toast('FIELD GUIDE COMPLETE!  +2 TICKETS');earn(30);snd(784,.1);later(()=>snd(1175,.25),110);save()}
  if(!T.gd&&gard.open&&inGarden(P.x,P.y)&&gardeners()>=3&&!buds.some(b=>b.st==='follow')){T.gd=1;say('GARDENERS STAY AND WORK. HOLD B NEAR THEM TO CALL THEM BACK',7)}
  {const S=run.wbSeen=run.wbSeen||{};for(const q of wbuds)if(!q.hid&&!S[q.id]&&d2(P,q.x,q.y)<70*70){S[q.id]=1;floatAt(q.x,q.y-22,'IN THE GUIDE: '+q.id,'#a8f080')}}
  if(!T.wb&&wbuds.some(q=>!q.hid&&d2(P,q.x,q.y)<64*64)){T.wb=1;say('A WILD BUDDY. THEY KEEP TO THEMSELVES OUT HERE',6)}
@@ -965,11 +967,11 @@ function coastCarve(){carve(68,11,2,2,WA);carve(70,2,20,8,WA);carve(70,10,20,15)
 function coastGates(){mkGate(4,[[68,20],[69,20]],'sunDoor');const T=[[85,8],[86,8],[85,9],[86,9]];T.forEach(([x,y])=>BR.add(y*MW+x));mkGate(3,T,'northPier');const q=gates[gates.length-1];q.hp=q.max=120}
 function coastSpawns(){[[72,12],[75,17],[79,23],[82,16],[88,12],[74,21]].forEach(([x,y])=>spawns.push({k:'berry',x,y}));[[77,18],[84,23],[89,21],[84,6]].forEach(([x,y])=>spawns.push({k:'big',x,y}));
  spawns.push({k:'nectar',x:80,y:17});spawns.push({k:'grub',x:87,y:22});[[7,73,11],[7,81,11],[7,87,11],[3,79,12],[9,77,11],[2,83,18]].forEach(([sp,x,y])=>spawns.push({k:'bug',sp,x,y}))}
-const coastGate=id=>gates.find(q=>q.id===id);
+const coastGate=id=>gates.find(q=>q.id===id),coastLive=s=>!!run.call&&!(s.y<10&&s.x>=83&&coastGate('northPier').alive);
 function coastOpen(){run.call=1;const dr=coastGate('sunDoor');if(dr&&dr.alive)openGate(dr,false);
  if(!run.lens&&!items.some(i=>i.alive&&i.sub==='lens'))mkItem('lens',88*16+2,6*16+8);
  if(!run.coastSp){run.coastSp=1;[[2,71,10],[2,73,10],[2,75,10],[2,82,10],[1,74,13],[1,75,13],[1,82,14],[5,84,18],[5,86,22],[5,79,21]].forEach(([t,x,y])=>mkSprout(t,x*16+8,y*16+8,0))}
- say('THE DOOR EAST OF THE ORCHARD IS OPEN',7);persist(true)}
+ respawn();say('THE DOOR EAST OF THE ORCHARD IS OPEN',7);persist(true)}
 function coastObj(){if(!run||!run.call||run.lit||run.lens)return null;const pr=coastGate('northPier'),c='#f8e060';
  if(!(run.seen&&run.seen['NORTH COAST']))return{text:'FOLLOW THE BEAM EAST',x:69*16,y:20*16+8,done:false,col:c};
  if(pr&&pr.alive)return{text:'BUILD THE OLD PIER',x:pr.x,y:pr.y,done:false,col:c};
@@ -1535,7 +1537,7 @@ Object.assign(SCN,{
 
 function playScene(k,done){if(k.slice(0,2)==='3:'){c3Play(k.slice(2),done);return}const q=SCN[k];scn=typeof q==='function'?q():q;cineI=0;cineT=0;scnDone=done||null;state='cine';}
 function shardArt(X,Y){const ws=[2,4,6,8,8,6,6,4,4,2,2];ws.forEach((w,i)=>r('#906008',X-w/2-1,Y-12+i,w+2,1));ws.forEach((w,i)=>{r('#f8d030',X-w/2,Y-12+i,w,1);r('#fff8a0',X-w/2,Y-12+i,Math.max(1,w/2-1),1)});}
-function drawCine(){const t=cineT,i=cineI,e=scn[i],art=e[1],sx=ox,sy=oy,hh=H-74,gy=hh-14,night=art==='lantern'||art==='crack'||art==='relight',cave=art==='thorn'||art==='thorn2',gold=art==='party',dark=night||cave;ox=oy=0;
+function drawCine(){const t=cineT,i=cineI,e=scn[i],art=e[1],sx=ox,sy=oy,hh=H-74,gy=hh-14,night=art==='relight',cave=art==='thorn'||art==='thorn2',gold=art==='party',dark=night||cave;ox=oy=0;
  if(cave){r('#181428',0,0,W,hh);g.fillStyle='#241c38';g.beginPath();g.arc(120,hh+40,170,0,7);g.fill();for(let k=0;k<9;k++)r('#2c2444',(k*29+8)%236,0,7,10+(k*7)%22);r('#2a3a30',0,hh-26,W,26);r('#1c2a24',0,hh-26,W,2)}
  else{if(night){r('#101838',0,0,W,hh);for(let k=0;k<30;k++)r(k%5?'#8090c8':'#ffffff',(k*53+17)%240,(k*29+7)%Math.max(20,hh-50),1,1);g.fillStyle='#182848'}
   else{(gold?[['#f89048',0],['#f8b868',.2],['#f8e098',.42]]:[['#f8b878',0],['#f8c890',.2],['#f8dca8',.42]]).forEach(([c,q])=>r(c,0,Math.round(hh*q),W,hh));g.fillStyle=gold?'#a0b858':'#78c078'}
@@ -1546,9 +1548,7 @@ function drawCine(){const t=cineT,i=cineI,e=scn[i],art=e[1],sx=ox,sy=oy,hh=H-74,
  const dog=(x,y,sc,sit,fx)=>{g.save();g.translate(x,y);g.scale(sc,sc);drawDog({x:0,y:0,fx:fx||-1,mv:false,st:sit?'sit':'follow',alert:0,say:null});g.restore()};
  const claw=(x,y)=>{for(let k=0;k<3;k++){r('#3c2a20',x+k*6,y-k,2,9);r('#6a4c38',x+k*6+2,y-k+1,1,7)}};
  const thorn=(x,y,k)=>{r('rgba(0,0,0,.3)',x+3*k,y-2*k,26*k,4*k);g.drawImage(BO.l,x,y-22*k,32*k,22*k)};
- if(art==='lantern')lant(120,2,4);
- else if(art==='crack'){lant(120,2,t<.3?4:0);if(t<.3)r('rgba(255,255,255,'+(1-t/.3).toFixed(2)+')',0,0,W,hh);[[-1,-.9],[1,-.8],[-.8,-.3],[.9,-.4]].forEach(([ax,ay])=>{const d=Math.min(1,Math.max(0,t-.3)/1.8),x=Math.round(120+ax*d*135),y=Math.round(gy-56+ay*d*90+d*d*34);if(d>0&&d<1){r('#906008',x-2,y-3,5,7);r('#f8d030',x-1,y-2,3,5);r('#fff8a0',x-1,y-2,1,2);r('#fff8a0',Math.round(x-ax*7),Math.round(y-ay*7),1,1)}})}
- else if(art==='relight'){lant(120,2);if(t<.4)r('rgba(255,244,190,'+(1-t/.4).toFixed(2)+')',0,0,W,hh);for(let k=0;k<10;k++)r('#fff8a0',Math.round(120+Math.sin(k*2.1+t)*(24+k*5)),Math.round(gy-34-((t*22+k*13)%70)),1,1)}
+ if(art==='relight'){lant(120,2);if(t<.4)r('rgba(255,244,190,'+(1-t/.4).toFixed(2)+')',0,0,W,hh);for(let k=0;k<10;k++)r('#fff8a0',Math.round(120+Math.sin(k*2.1+t)*(24+k*5)),Math.round(gy-34-((t*22+k*13)%70)),1,1)}
  else if(art==='erin'){big(CH.ERIN,70);dog(158,gy,2,t>.8);if(t>1.1&&((t*2)|0)%2)heart(182,gy-34)}
  else if(art==='sprouts'){big(SP.pd,30);r('#8a5a3a',96,gy-6,136,10);r('#6e4428',96,gy-6,136,2);for(let k=0;k<6;k++){const a=t-.3-k*.28;if(a>0){g.save();g.translate(110+k*22,gy-2);g.scale(2,2);if(a<1.3)drawSprout({x:0,y:2,type:k%NT,age:a*28});else drawBud({x:0,y:0,type:k%NT,stage:1,z:Math.abs(Math.sin(t*5+k))*2,mv:true,fx:-1,st:'follow',a:k});g.restore()}}}
  else if(art==='types'){const tips=['BURN','SMASH','SWIM','RUN','GARDEN','BONUS'];for(let k=0;k<NT;k++){const x=22+k*39,a=t-k*.18;if(a>0){g.save();g.translate(x,gy-30);g.scale(3,3);drawBud({x:0,y:0,type:k,stage:2,z:Math.max(0,Math.sin(a*6))*Math.max(0,1-a)*4,mv:false,fx:1,st:'follow',a:k});g.restore();const n=TYPES[k].n;text(n,Math.round(x-tw(n,1)/2),gy-24,1,TYPES[k].l);text(tips[k],Math.round(x-tw(tips[k],1)/2),gy-13,1,'#ffffff')}}}
@@ -1658,6 +1658,9 @@ function draw(){
   drawPreview(166,24,70,86);const key=ROWS[si][1],o=look[key],op=STY[key][o],own=meta.own[key].includes(o);
   ctext(flashT>0?flash:meta.eq[key]===o?'WEARING THIS NOW':own?'A: WEAR IT':(op[3]===3?'BUILT: FINISH A VALLEY PROJECT':RAR[op[3]][0]+': FOUND IN CAPSULES'),116,2,flashT>0?'#f8a060':own?'#a8f080':RAR[op[3]][1]);
   ctext(ownCount()+' / '+styTotal+' COLLECTED',130,2,'#c8c0d8');ctext('D-PAD: BROWSE AND TRY ON      B: BACK',144,2,'#a098b0');}
+ else if(state==='bugs'&&cpage===2){mHead('COLLECTION');rtext('< SCENES '+C3LIST.filter(q=>c3SeenScene(q[0])).length+'/'+C3LIST.length+' >',236,5,1,'#a8f080');
+  C3LIST.forEach((q,i)=>{const x=4+(i%2)*118,y=22+((i/2)|0)*20,has=c3SeenScene(q[0]),on=i===csel;mTile(x,y,114,18,on);r(has?'#2c3050':'#16202a',x+2,y+2,15,14);if(has){r('#f8e060',x+7,y+5,2,8);r('#f8e060',x+9,y+6,2,6);r('#f8e060',x+11,y+8,2,2)}else text('?',x+6,y+3,2,'#607080',null);text(has?q[1]:'? ? ?',x+21,y+3,2,on?'#281c30':has?'#ffffff':'#607080',null)});
+  {const q=C3LIST[csel],k=c3SeenScene(q[0]);mFoot(114);text(k?q[1]:'NOT SEEN YET',6,116,2,'#f8e060',null);wrapPx(k?q[2]+' Press A to watch it again.':'The big moments of the story play as scenes. Each one is kept here once you have seen it.',228,2).slice(0,3).forEach((l,j)=>text(l,6,129+j*12,2,'#e8e4f5',null))}}
  else if(state==='bugs'){mHead('COLLECTION');rtext(cpage?'< TREASURES '+meta.trs.length+'/'+TRS.length+' >':'< BUGS '+kinds()+'/'+BUGS.length+' >',236,5,1,'#a8f080');
   if(!cpage)BUGS.forEach((b,i)=>{const x=4+(i%2)*118,y=22+((i/2)|0)*18,n=meta.bugs[i],on=i===csel;mTile(x,y,114,17,on);r(n?'#58b858':'#16202a',x+2,y+2,15,13);
    if(n){g.save();g.translate(x+9,y+12);g.scale(2,2);bugArt(i,0,0,((time*6)|0)%2);g.restore();text(b.n,x+21,y+2,2,on?'#281c30':'#ffffff',null);rtext('x'+n,x+111,y+4,1,on?'#5a4a28':'#a8f080',null)}

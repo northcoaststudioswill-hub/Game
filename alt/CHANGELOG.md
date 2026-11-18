@@ -3,6 +3,37 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: clean-up (Nov 18 2026)
+
+Will: keep working on cleaning up the game. (The same message had lines about graphics and animation with "ignore
+this please" under them; they were ignored.)
+
+- **Scenes can be watched again.** The Collection has a third page, SCENES: the six 3D scenes, each kept once it has
+  been seen, A to play it again. Seen scenes are remembered across saves. This closes the "no way to watch a scene
+  again" item.
+- **Nothing grows on the North Coast while it is shut away.** Its berries, bugs, grub and nectar blossom used to appear
+  from day 1 behind the closed door. They now arrive when the door opens, and the big berry on the rock when the pier
+  is built.
+- **The lake has its name.** Sproutwild already calls it the Wending Lake, and its Bessling is "the lake monster's
+  pup". Sprouts now uses the same name in the guide, in Bessie's entry and in two captions, so the two games agree.
+- **The pause screen lists the coast step** (FOLLOW THE BEAM EAST and the rest) with the missions.
+- **A long queue of toasts moves twice as fast** (more than two waiting). A busy morning could hold eight of them for
+  about 25 seconds.
+- **The field-guide reward is checked on a plain timer.** It used to wait for a particular slice of the clock and
+  could be missed for a while; that was also why one test check failed now and then.
+- Removed the two 2D opening pictures that the 3D opening replaced. `tests/sprouts_tour.js` is marked retired (it
+  stopped working when the opening changed; the soak test does its job).
+
+**Tested:** `tests/sprouts_coast.js` 56 checks (seven new: the empty coast, its arrival, the rock berry, the SCENES
+page). `sprouts_valley.js` three runs in a row, `sprouts_story.js`, Sproutwild lab 124 of 124, Patch & Plate 119 of
+119, console shelf and Lightswarm lab pass. Soak: two mid-game and two late-game seeds of two days, nothing broke.
+**Not tested:** by hand, or on a phone.
+
+**Known and not solved:** the soak test's first-day bot (it follows the objective marker) sometimes finishes only
+Erin's first ask instead of two or more. Seen twice in about 60 runs of this build and 3 times in 12 runs of the build
+from before any of this work, so it is not new, but it was not caught in the act and its cause is unknown. It could be
+the bot or the game.
+
 ## Sprouts: playtest pass, bug hunt and speed (Nov 18 2026)
 
 Will: playtest the game, make sure the systems work and the game is fun, bug hunt, optimize.

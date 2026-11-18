@@ -1,3 +1,5 @@
+/* RETIRED (Nov 18 2026): this real-time tour stopped working when the opening became a 3D scene.
+   tests/sprouts_soak.js does its job and more. Kept for reference only. */
 /* Sprouts tour for the ALT build: plays from a fresh save by following the objective marker, in real time.
    Run from the repo root:  node alt/tests/sprouts_tour.js [build.html] [seconds]
    Screenshots (one every ~5 s) and a log go to alt/playtest/sprouts/. */
