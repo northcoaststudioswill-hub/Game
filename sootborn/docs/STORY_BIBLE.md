@@ -123,11 +123,14 @@ Day 3 closes these: the ledger and Lift Zero, Dace under the floor, what Celesti
 
 ### Timeline, and where the slice sits in it (v0.14)
 The game tells two halves at once: the present below, and the years after, seen in dreams and fights.
-- **Present (playable):** the prologue (the wedding, the bleed, the furnace), then Days 1 to 3 in Cinderwell, forty-one to forty-three days after the furnace. **The part below is four days.** Day 3 (The Ledger): Kael carries the ledger up Lift Zero, Celestine tells him she knew and puts him to work, he sees the sky through her window, Dace introduces the Unlit, and a Warden goes down under the floor. Day 4 (not built): months of being boring, going up twice a week, then out through the old tunnel to Ilse.
+- **Present (playable):** the prologue (the wedding, the bleed, the furnace), then Days 1 to 3 in Cinderwell, forty-one to forty-three days after the furnace. **The part below is four days.** Day 3 (The Ledger): Kael carries the ledger up Lift Zero, Celestine tells him she knew and puts him to work, he sees the sky through her window, Dace introduces the Unlit, and a Warden goes down under the floor. Day 4 (The Way Out): four months of going up twice a week; Mara guesses; Dace arranges Kael's death on paper (a failed seal on the furnace line, Mara signs, a second tin); Sull and the night watch are beaten at the hatch and Sull writes the report; Kael leaves through the old tunnel and meets Ilse. **End of Part One.**
 - **+6 months:** Ilse Marrin, once Accredited, finds him in the old tunnel. *They only fear what looks like them.*
 - **The Gilding (9 months):** what the Accredited do to their children at twelve (gold wire in the long bones for height, gold in the eye for the sun), done to a grown man.
 - **Training (3 years):** speech with Ilse, the blade and the boots with Brand, a Warden who deserted rather than kill a child for humming.
 - **+4 years, the Assay:** sent up Lift Zero under a dead boy's name. Night 1 the Pairing; day 19 the Ford; day 31 the Proctor; day 40 the Valley; last day the Keep. The winner is given a post on the Spire. That is the point.
+- **The Assay in full:** arrival and the sorting; night 1 the Pairing (Teo); day 19 the Ford (Vant); day 26 the Standard (the Sisters Vey, and thirty Teal cadets come over); day 31 the Proctor (Voss); day 40 the Valley; last day the Keep (Lucan), then the Pinning: Celestine's champion, then she pins the sun on him and gives him a post on the Spire counting who breathes.
+- **+4 to +7 years, on the Spire (Part Two, unwritten):** Kael works inside the Authority with the sun on his collar. He reads the ledger of everyone struck out.
+- **+7 years, the High Docks:** with Ilse, Brand and the Unlit he cuts four hundred lift-barges loose. Vant is Dockmaster. Kael drops the sun over the rail.
 - **+9 years, the Fall:** the Belowborn and their allies drop four hundred stolen lift-barges onto the Sun Spire. Marshal Cade. Further fights should live out here: bigger, off the ground.
 
 **How they talk.** Soot: "thanks", "aye", "my breath" (for my life), "we". Accredited: "noted", "granted", "my time", "one". They never thank and never apologise.
@@ -197,5 +200,5 @@ Real devices, sound by ear, and how the heist, the festival stealth and the figh
 ## Next steps
 - Playtest the fights and both stealth scenes with a person and tune from notes.
 - Art pass toward the reference boards: 24–32px characters, hand-made tilesets, more portrait expressions.
-- Day 4: the boring months, the twice-weekly trips up, Sable on screen, leaving through the old tunnel.
+- Part Two (Above): the three years on the Spire, Lucan after the Keep, what Celestine works out and when, the two years between the Docks and the Fall. Sable has still not appeared on screen.
 - Combat growth toward battles: allies with orders, bigger fields, weapons.

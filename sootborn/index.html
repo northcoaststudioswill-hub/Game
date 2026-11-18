@@ -4327,7 +4327,8 @@ barks = function (id) {
 };
 function D2OBJ() {
   if (G.heist === 2) return "Hang her lantern on the Pillar, unseen";
-  if (F('day3Done')) return "Day 4 isn't built yet — explore freely";
+  if (F('day4Done')) return "Part One is finished — explore freely";
+  if (F('day3Done')) return "Day 4 plays from the end of Day 3 (or the Dev menu) — explore freely";
   if (F('day2Done')) return "Day 3 plays from the end of Day 2 (or the Dev menu) — explore freely";
   if (!F('d2Tavi')) return 'Talk to Tavi';
   if (!F('mara2')) return G.mapId === 'bay' ? 'Report to Mara' : 'Report to Mara in Bay 3 (east, through the square)';
@@ -4482,8 +4483,7 @@ function festB() {
     { say: 'vale', t: 'Sleep on it. You have until first bell.' },
     { fade: 'out' },
     ...(NOFF ? [] : DREAM2()), { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
-    { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 },
-    ...(NOFF ? [] : DREAM3()), !NOFF && { brawl: () => FF.fall() }, !NOFF && { card: 'NINE YEARS EARLIER', sub: 'Cinderwell. The morning after the festival.', big: 1, min: 1.6, max: 5 }
+    { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 }
   ].filter(Boolean);
 }
 
@@ -4510,7 +4510,9 @@ const DREAM4 = () => [
   { narr: 'That night they seal us in by twos. You have seen what I did in that room.' },
   { pstage: 1 }, { wait: 1 },
   { narr: 'After that it is forty days of taking the valley one standard at a time. I am good at it. That is the part I did not expect, and do not like.' },
-  { fade: 'out' }, { panel: null }
+  { fade: 'out' }, { panel: null },
+  { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. Day twenty-six.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.twins() },
+  { card: 'FOUR YEARS EARLIER', sub: 'Cinderwell. Under the floor.', big: 1, min: 1.4, max: 4 }
 ];
 function DAY3() {
   const up = [
@@ -4585,6 +4587,139 @@ function DAY3() {
     { fx: () => { G.flags.day3Done = 1; } }
   ];
 }
+
+// ---------------------------------------------------------------- more of the Assay, and after
+const DUEL_IN = (id, name, big, c1, c2, c3, sc) => [
+  { d: 3.0, cam: [0, 250, 170, 150, .16], to: [0, 150, 66, 150, .3], acts: [{ id: 'kael2', a: [-40, 4], fx: 1, fy: 0, blade: 1, aura: 1 }, { id, a: [40, 4], fx: -1, fy: 0, blade: 1, sc: sc || 1 }], big, cap: c1 },
+  { d: 2.6, ...cu(40, 4, 1.7, 2.3, 16), acts: [{ id, a: [40, 4], blade: 1, sc: sc || 1 }], cap: c2 },
+  { d: 2.2, ...cu(-40, 4, 1.9, 2.7, -14), flash: 1, sfx: 'heart', acts: [{ id: 'kael2', a: [-40, 4], blade: 1, aura: 2 }], cap: c3 }
+];
+const DUEL_OUT = (id, c1, c2, c3, sc) => [
+  { d: 3.0, cam: [30, 150, 56, 170], to: [6, 124, 54, 190], acts: [{ id, a: [22, -2], pose: 'kneel', fx: -1, fy: .2, sc: sc || 1 }, { id: 'kael2', a: [-10, 2], blade: 1, fx: 1, fy: -.1, aura: 2 }], cap: c1 },
+  { d: 3.0, ...cu(-10, 2, 1.9, 2.6, 12), acts: [{ id: 'kael2', a: [-10, 2], blade: 1, aura: 2 }], cap: c2 },
+  { d: 3.0, cam: [0, 150, 60, 150, .3], to: [0, 250, 170, 150, .16], acts: [{ id: 'kael2', a: [-10, 2], blade: 1, aura: 1 }], cap: c3 }
+];
+// day twenty-six: the standard, and the two who guard it
+FF.twins = () => ({
+  era: 3, title: 'THE STANDARD', sub: 'THE SISTERS VEY - TWO BLADES, ONE MIND', bg: 'ford', arena: FIELD, music: 'dusk', rage: 2, legend: 1, skip: 1, winText: 'THE STANDARD IS OURS',
+  fin: { name: 'TWO FOR ONE', l1: 'THEY FIGHT AS ONE PERSON', l2: 'SO I ONLY COUNT ONCE', rgb: '120,220,210' },
+  hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 40 }, taunt: { 0: ['HE IS SLOW ON THE LEFT.', 'I HAVE HIM.', 'TOGETHER.', 'NOW.'] },
+  foes: [{ id: 'cadt1', name: 'Ansa Vey', kind: 'duelist', hp: 56, sc: 1.05 }, { id: 'cadt2', name: 'Oria Vey', kind: 'duelist', hp: 56, sc: 1.05 }],
+  voice: { at: [[1, 'TAKE A HOUSE\'S STANDARD AND ITS CADETS ARE YOURS. TEAL KEEPS THEIRS BETWEEN TWO SISTERS WHO HAVE NEVER LOST A BOUT.'], [12, 'THEY DO NOT TALK TO EACH OTHER. THEY DO NOT NEED TO. I HAD THAT ONCE, WITH ONE PERSON.'], [26, 'CREW THREE TURNED A WHEEL THE SAME WAY. FORTY HANDS, ONE COUNT. THESE TWO WOULD HAVE MADE GOOD VALVE TECHS.']],
+    hurt: 'ONE CUTS WHILE THE OTHER ONE IS STILL SMILING.', fury: 'I DO NOT HAVE A SECOND PAIR OF HANDS. I HAVE THIS.', half: 'THE YOUNGER ONE LOOKED AT HER SISTER BEFORE SHE LOOKED AT ME. THAT IS THE GAP.', eleven: 'ELEVEN. SPLIT TWO WAYS.' },
+  arts: [{ at: .7, name: 'FORTY BEDS', line: 'THE FEVER WARD HAD FORTY BEDS. I COUNTED THEM EVERY NIGHT. I HAVE NOT STOPPED COUNTING THINGS SINCE.', panel: 'ward', kind: 'storm', rgb: '160,220,255', hex: '#a0dcff' }, { at: .3, name: 'ONE COUNT', line: 'FORTY PEOPLE ON ONE WHEEL, HUMMING TO KEEP TIME. NOBODY UP HERE HAS EVER PULLED ON ANYTHING TOGETHER.', panel: 'pipe', kind: 'rise', rgb: '255,170,70', hex: '#ffaa46' }],
+  intro: [
+    { d: 3.0, cam: [0, 250, 170, 150, .16], to: [0, 150, 66, 150, .3], acts: [{ id: 'kael2', a: [-50, 4], fx: 1, fy: 0, blade: 1, aura: 1 }, { id: 'cadt1', a: [36, -12], fx: -1, fy: 0, blade: 1 }, { id: 'cadt2', a: [36, 18], fx: -1, fy: 0, blade: 1 }], big: 'THE STANDARD', cap: 'THE ASSAY. DAY TWENTY-SIX. HOUSE TEAL\'S STANDARD STANDS ON AN ISLAND IN THE RIVER.' },
+    { d: 2.6, ...cu(36, 2, 1.6, 2.2, 18), acts: [{ id: 'cadt1', a: [30, -10], blade: 1 }, { id: 'cadt2', a: [42, 14], blade: 1 }], cap: 'ANSA AND ORIA VEY. THEY MOVE LIKE ONE PERSON WHO HAPPENS TO HAVE FOUR ARMS.' },
+    { d: 2.2, ...cu(-50, 4, 1.9, 2.7, -14), flash: 1, sfx: 'heart', acts: [{ id: 'kael2', a: [-50, 4], blade: 1, aura: 2 }], cap: 'I CAME ALONE. I DID NOT WANT ANYBODY BEHIND ME WHO COULD BE USED.' }
+  ],
+  outro: DUEL_OUT('cadt2', 'THE YOUNGER ONE PUT HER BLADE DOWN FIRST. THE OLDER ONE DID IT A BREATH LATER, AND NOT FOR ME.', 'TEAL\'S STANDARD CAME BACK ACROSS THE RIVER ON MY SHOULDER. THIRTY CADETS CAME WITH IT.', 'I HAD AN ARMY NOW. I HAD NOT ASKED WHAT I WOULD OWE IT.')
+});
+// after the Keep: the last thing she asks of him
+FF.blade = () => ({
+  era: 4, boots: 1, title: 'THE PINNING', sub: 'THE AUDITOR\'S BLADE - HER OWN CHAMPION', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, winText: 'PIN IT ON HIM',
+  newMove: 'THE BOOTS: HOLD JUMP TO FLY. HE HAS THEM TOO.', fin: { name: 'IRON SKY', l1: 'SHE WANTED TO SEE WHAT I WAS', l2: 'I SHOWED HER MOST OF IT', rgb: '140,220,255', mode: 'sky' },
+  hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['YOU WERE NOT RAISED TO THIS.', 'I CAN SMELL THE EFFORT.', 'WHO TAUGHT YOU THAT?'] },
+  foes: [{ id: 'voss', name: 'The Auditor\'s Blade', kind: 'duelist', hp: 150, sc: 1.22 }],
+  voice: { at: [[1, 'I PUT HER SON ON HIS KNEES. SHE SMILED, AND SENT HER OWN CHAMPION DOWN THE STEPS. ONE MORE, SHE SAID. FOR MY CURIOSITY.'], [13, 'HE HAS KILLED FOR HER FOR THIRTY YEARS. HE DOES IT THE WAY I USED TO CHANGE A SEAL.'], [27, 'SHE IS LEANING FORWARD. I HAVE SEEN THAT LOOK. SHE HAD IT AT THE FURNACE.']],
+    hurt: 'HE CUTS WHERE THE WIRE WENT IN. HE CAN SEE IT. SHE CANNOT.', fury: 'NOT ALL OF IT. NOT IN FRONT OF HER. ENOUGH.', half: 'HE HAS REALISED I AM NOT WHAT IS WRITTEN ON MY PAPERS. HE CANNOT WORK OUT WHAT I AM INSTEAD.', eleven: 'ELEVEN. SHE COUNTS THEM TOO. SHE DOES NOT KNOW WHY THERE ARE ELEVEN.' },
+  arts: [{ at: .68, name: 'LITTLE EMBER', line: 'SHE CALLED SEREN LITTLE EMBER. SHE IS ABOUT TO PIN GOLD ON WHAT THE EMBER LIT.', panel: 'furnace', stage: 0, kind: 'rise', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }, { at: .32, name: 'THE WINDOW', line: 'SHE SHOWED ME THE SKY ONCE TO TEACH ME MY PLACE. I HAVE BEEN STANDING UNDER IT FOR FORTY DAYS.', panel: 'ante', stage: 2, kind: 'storm', rgb: '140,200,255', hex: '#8cc8ff' }],
+  intro: DUEL_IN('voss', '', 'THE PINNING', 'THE ASSAY IS OVER. LUCAN AUREL IS ON ONE KNEE. HIS MOTHER HAS NOT STOPPED LOOKING AT ME.', 'SHE SENDS DOWN THE MAN WHO HAS STOOD BEHIND HER CHAIR FOR THIRTY YEARS.', 'ONE MORE. FOR HER CURIOSITY. I HAVE BEEN THE OBJECT OF HER CURIOSITY BEFORE.', 1.22),
+  outro: [
+    { d: 3.0, cam: [30, 150, 56, 170], to: [6, 124, 54, 190], acts: [{ id: 'voss', a: [22, -2], pose: 'kneel', fx: -1, fy: .2, sc: 1.22 }, { id: 'kael2', a: [-10, 2], blade: 1, fx: 1, fy: -.1, aura: 2 }], cap: 'HE YIELDED. I DO NOT THINK HE HAD EVER SAID THE WORD OUT LOUD.' },
+    { d: 3.4, ...cu(-10, 2, 1.8, 2.6, 12), acts: [{ id: 'kael2', a: [-10, 2], blade: 1, pose: 'kneel', aura: 1 }], cap: 'SHE CAME DOWN THE STEPS HERSELF AND PINNED THE GOLD SUN TO MY COLLAR. HER HANDS WERE COLD. SHE LOOKED STRAIGHT INTO THE FACE ILSE MADE.' },
+    { d: 3.4, ...cu(-10, 2, 2.6, 1.8, -12), acts: [{ id: 'kael2', a: [-10, 2], blade: 1, pose: 'kneel', aura: 2 }], cap: 'SHE SAID: YOU REMIND ME OF SOMEONE. THEN: NO. AND SHE GAVE ME A POST ON THE SPIRE, COUNTING WHO BREATHES.' },
+    { d: 3.0, cam: [0, 150, 60, 150, .3], to: [0, 250, 170, 150, .16], acts: [{ id: 'kael2', a: [-10, 2], blade: 1, aura: 1 }], cap: 'THE KEYS. HANDED OVER, IN FRONT OF EVERYONE, BY THE WOMAN WHO BURNED MY WIFE.', tint: 'rgba(255,240,200,.1)' }
+  ]
+});
+// seven years on: you cannot fall on the Spire without something to fall in
+FF.docks = () => ({
+  era: 5, boots: 1, title: 'THE HIGH DOCKS', sub: 'FOUR HUNDRED BARGES - CUT THEM LOOSE', bg: 'fall', arena: FIELD, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Dock Guard', winText: 'CUT THE LINES',
+  fin: { name: 'EVERY BREATH', l1: 'EVERY BREATH I TAKE IS HERS', l2: 'TONIGHT I TAKE FOUR HUNDRED BARGES', rgb: '255,224,138', mode: 'all' },
+  hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 50 }, allies: V, shouts: ['CUT IT!', 'NEXT LINE!', 'FOR TIER SIX!'], taunt: { 0: ['HE WEARS THE SUN!', 'TRAITOR!', 'HOLD THE MOORINGS!'] },
+  waves: [[{ id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Dock Guard', kind: 'lancer', hp: 9 }, { id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 9 }],
+    [{ id: 'sg2', name: 'Dock Guard', kind: 'lancer', hp: 10 }, { id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 10 }, { id: 'sg2', name: 'Dock Guard', kind: 'lancer', hp: 10 }, { id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 10 }],
+    [{ id: 'vant', name: 'Dockmaster Vant', kind: 'captain', hp: 130, sc: 1.2 }, { id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 10 }]],
+  onWave: (w, B) => { B.p.fury = Math.max(B.p.fury, 70); B.voice('wave'); },
+  voice: { at: [[1, 'THREE YEARS ON THE SPIRE, COUNTING WHO BREATHES. I COUNTED OTHER THINGS AS WELL. BARGES. GUARDS. WHO OWED WHOM.'], [12, 'TONIGHT I AM STILL WEARING THEIR SUN ON MY COLLAR. IT GOT ME THROUGH THE GATE. IT COMES OFF AFTER THIS.'], [24, 'ILSE IS ON THE MOORING WINCH. BRAND HAS THE STAIR. DACE SENT WORD FROM BELOW: THE TIERS ARE READY.']],
+    hurt: 'THREE YEARS BEHIND A DESK. I AM SLOWER. I AM NOT KINDER.', fury: 'I HAVE BEEN POLITE FOR THREE YEARS. NOTED. GRANTED. ONE DOES NOT. NO MORE.', wave: 'VANT. HE LOST A RIVER TO ME ONCE. THEY GAVE HIM A DOCK TO MAKE UP FOR IT.', half: 'HE KNOWS MY FOOTWORK. HE HAS HAD SEVEN YEARS TO THINK ABOUT IT.', eleven: 'ELEVEN. I STOPPED SAYING THEM OUT LOUD ON THE SPIRE. I NEVER STOPPED COUNTING.' },
+  arts: [{ on: 'start', after: 6, name: 'THE COUNT', line: 'THEY GAVE ME THE LEDGER OF WHO BREATHES. I READ ALL OF IT. EVERY NAME THEY EVER STRUCK OUT.', panel: 'world', stage: 3, kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }, { on: 'wave', name: 'UNLIT', line: 'WE ARE WHAT IS LEFT IN THE LANTERN WHEN THEY PUT IT OUT. THERE ARE A GREAT MANY OF US.', panel: 'under', stage: 1, kind: 'rise', rgb: '255,170,80', hex: '#ffaa50' }],
+  intro: [
+    { d: 2.8, black: 1, big: 'SEVEN YEARS FROM NOW', cap: 'THREE YEARS AFTER THE PINNING. I HAVE A POST, A SUN ON MY COLLAR, AND A KEY TO THE HIGH DOCKS.' },
+    { d: 3.2, cam: [0, 330, 170, 150, .3], to: [0, 240, 110, 150, .3], acts: [{ id: 'kael2', a: [0, 20], blade: 1, aura: 1, fy: -1 }].concat(ffRow(V, 5, -60, 30, 44, { fy: -1 })), big: 'THE HIGH DOCKS', cap: 'THE LIFT-BARGES MOOR HERE, ABOVE THE WEATHER. FOUR HUNDRED OF THEM. WE NEED EVERY ONE.' },
+    { d: 2.6, cam: [70, 60, 50, 150], to: [-70, 60, 50, 150], lin: 1, sfx: 'roar', acts: ffRow(['sg1', 'sg2'], 7, -90, 30, -80, { fy: 1 }, -10), cap: 'I WALKED IN THROUGH THE FRONT GATE. THE GUARD SALUTED. THEN HE SAW WHO WAS BEHIND ME.' },
+    { d: 1.6, ...cu(0, 20, 1.9, 2.9, -14), flash: 1, acts: [{ id: 'kael2', a: [0, 20], blade: 1, aura: 3 }], big: 'CUT THEM LOOSE.' }
+  ],
+  outro: [
+    { d: 3.0, ...cu(0, 10, 1.9, 2.6, -24), acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 2 }], cap: 'I TOOK THE SUN OFF MY COLLAR AND DROPPED IT OVER THE RAIL. IT FELL FOR A LONG TIME.' },
+    { d: 3.2, cam: [40, 150, 60, 150], to: [-30, 240, 130, 150], acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 1 }].concat(ffRow(V, 7, -90, 30, 34, { fy: -1, pose: 'raise' })), cap: 'FOUR HUNDRED BARGES. EVERY ONE WITH A CREW THAT WAS BORN OWING AIR. IT TOOK US TWO MORE YEARS TO BE READY TO USE THEM.' },
+    { d: 2.6, black: 1, big: 'TWO YEARS LATER', cap: 'AND THEN, ONE MORNING, WE WERE.' }
+  ]
+});
+FF.wayout = () => ({
+  era: 0, title: 'THE WAY OUT', sub: 'PROCTOR SULL AND THE NIGHT WATCH', bg: 'pit', arena: { kind: 'ring', rx: 96, ry: 44 }, music: 'mystery', legend: 1, skip: 1, foeName: 'Night Watch', winText: 'NOBODY SAW',
+  hero: { hp: 9, pow: 1, fury0: 50 }, allies: ['dace'], shouts: ['QUIETLY!', 'NOT HIS FACE, HE HAS TO WRITE!'], taunt: { 0: ['BRENNICK?', 'I KNEW IT. I KNEW IT.', 'YOU ARE OWED TO THE FURNACE.'] },
+  foes: [{ id: 'proctor', name: 'Proctor Sull', kind: 'baton', hp: 40 }, { id: 'watchman', name: 'Night Watch', kind: 'quick', hp: 10 }, { id: 'watchman', name: 'Night Watch', kind: 'quick', hp: 10 }],
+  voice: { at: [[1, 'FOUR MONTHS OF BEING NOBODY. OF LETTING THIS MAN WIN ARGUMENTS ABOUT GAUGES.'], [11, 'HE IS BETTER WITH THE BATON THAN I GAVE HIM CREDIT FOR. HE HAS HAD A LOT OF PRACTICE ON PEOPLE WHO COULD NOT HIT BACK.'], [22, 'IF ONE OF THEM REACHES THE BELL, ROW K BURNS FOR IT. NOBODY REACHES THE BELL.']],
+    hurt: 'GOOD. I HAD ALMOST FORGOTTEN WHAT I WAS KEEPING IN.', fury: 'BE TOO MUCH FOR THEM, SHE SAID. I HAVE BEEN TOO LITTLE FOR FOUR MONTHS.', half: 'HE HAS STOPPED SHOUTING MY NAME. HE HAS STARTED SAYING PLEASE.', eleven: 'ELEVEN. THE LAST TIME I COUNT THEM DOWN HERE.' },
+  arts: [{ at: .55, name: 'TOO MUCH', line: 'BE TOO MUCH FOR THEM. IT WAS THE LAST THING SHE ASKED ME FOR. I AM LATE STARTING.', panel: 'furnace', stage: 0, kind: 'storm', rgb: '255,120,40', hex: '#ff7828', dark: 'rgba(26,4,2,.8)' }]
+});
+function DAY4() {
+  return [
+    { music: 'home' }, { card: 'DAY FOUR', sub: 'Four months later. One hundred and sixty days after the furnace.', big: 1, min: 1.8, max: 5 },
+    { panel: 'ante' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
+    { narr: 'Twice a week, for four months, I ride up in the white car and teach forty engineers what a valve is for. They are not stupid. They have simply never had to keep anything alive.' },
+    { narr: 'I listen. Noted. Granted. One does not. I learn where the nine floors are, and which doors want a gold pass, and who is afraid of whom. I draw none of it. I count it.' },
+    { say: 'celestine', t: 'You have stopped saying "aye," technician.' },
+    { say: 'kael', t: 'Noted.' },
+    { narr: 'She laughed. It is the only time I ever heard it. I added it to the list.' },
+    { fade: 'out' }, { panel: 'kael' }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
+    { narr: 'Below, I am the most boring man on Tier Six. I fix valves. I eat at Ivo\'s. I let Proctor Sull win an argument about a gauge, twice, in front of people.' },
+    { say: 'mara', t: 'You\'ve gone quiet. You were never quiet, not once in your life. You\'re leaving.' },
+    { choice: [
+      { t: 'Yes.', fx: () => { G.flags.toldMara = 1; }, then: [say('mara', 'Don\'t tell me where. If I know, they can ask me.')] },
+      { t: 'I can\'t tell you.', then: [say('mara', 'That\'s a yes. You never could lie to me, you only ever managed it with yourself.')] }
+    ] },
+    { say: 'mara', t: 'Tavi will ask. I\'ll say you went to fix something big. That\'s true, isn\'t it?' },
+    { say: 'kael', t: 'The biggest valve there is.' },
+    { say: 'mara', t: 'Be too much for them. I heard her say it. Go on, then. And Kael. Come back taller.' },
+    { fade: 'out' }, { music: 'mystery' }, { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { say: 'dace', t: 'Tonight. They dropped the watch on you to one Proctor a week ago. Sable sold him a bottle this afternoon.' },
+    { say: 'dace', t: 'A man can\'t just vanish down here. The count wouldn\'t balance, and the count always balances. Kael Brennick has to die on paper.' },
+    { say: 'dace', t: 'A seal fails on the Bay Three furnace line. You went in to fix it. Mara signs as witness. They send her a tin. Nobody looks for a man they have already weighed.' },
+    { say: 'kael', t: 'She\'ll have two tins.' },
+    { say: 'dace', t: 'She knows. She said to tell you she\'s running out of shelf.' },
+    { pstage: 2 }, { sfx: 'door' }, { wait: 1.2 },
+    { narr: 'Light, down through the hatch. Not the Proctor with the bottle. Sull, sober, with the night watch behind him, and four months of wondering why I had stopped arguing.' },
+    { fade: 'out' }, { panel: null },
+    { brawl: () => FF.wayout() },
+    { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { narr: 'Sull, on his back, looking up at me the way a man looks at a gauge that cannot be right.' },
+    { say: 'proctor', t: 'Brennick. They\'ll burn the whole row for this.' },
+    { say: 'dace', t: 'No. Because you are going to write that Kael Brennick went into the furnace line after a failed seal, and that you tried to pull him out. You\'ll get a commendation. Or the Inspector hears who has been selling watch shifts by the bottle.' },
+    { say: 'proctor', t: '...Noted.' },
+    { fade: 'out' }, { panel: 'tin' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { narr: 'Two days later a tin goes to Row K. Authority grey, a little sun stamped on the lid. Mara signs for it. There is nothing in it. She puts it on the shelf beside the other one.' },
+    { fade: 'out' }, { panel: 'under' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { narr: 'I go out through the old tunnel, past Seren\'s suns. I touch every one of them. Then the hatch, and a stair I did not know was there, and at the top of it a tall woman with gold in her eyes.' },
+    { say: 'ilse', t: 'You are shorter than I was told.' },
+    { say: 'kael', t: 'I\'m told that can be fixed.' },
+    { say: 'ilse', t: 'It can. You will wish it could not. Come along, soot. One does not keep the table waiting.' },
+    { fade: 'out' }, { panel: null },
+    { card: 'END OF PART ONE', sub: 'B E L O W', big: 1, sfx: 'splash', min: 2.6, max: 7 },
+    ...(NOFF ? [] : [
+      { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The last day, after the keep.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.blade() },
+      { brawl: () => FF.docks() },
+      ...DREAM3(), { brawl: () => FF.fall() },
+      { card: 'PART TWO', sub: 'A B O V E   ·   not yet written', big: 1, min: 2.2, max: 6 }
+    ]),
+    { fx: () => { G.flags.day4Done = 1; } }
+  ];
+}
+function afterDay(n, sv) { G.mode = 'dayend'; UI.push(modal({ clear: true, onBack: null, build(b) { b.parentNode.style.textAlign = 'center'; b.parentNode.style.background = 'rgba(10,6,9,.9)';
+    b.innerHTML = n === 3 ? '<p>A Warden lies under the floor of Bay Three with a headache nobody will write down. A valve tech has seen the sky, and has been told to be boring about it.</p><h2 style="margin-top:16px">END OF DAY THREE</h2>' : '<p>Kael Brennick is dead on paper. Something taller is going to come up Lift Zero wearing another name.</p><p><i>"Every breath I take now is hers."</i></p><h2 style="margin-top:16px">END OF PART ONE</h2><p style="opacity:.7">SOOTBORN · thanks for playing.</p>'; },
+  items: (n === 3 ? [{ label: 'Wake up: Day 4 — The Way Out', act: () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY4(), () => { if (sv) { sv.flags = Object.assign(sv.flags || {}, { day4Done: 1 }); } afterDay(4, sv); }); } }] : []).concat([
+    { label: 'Keep exploring Cinderwell', act: () => { UI.clear(); if (sv) { Game.loadSave(sv); Game.autosave(); } else Game.toTitle(); } }, { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }]) })); }
 
 // ---- src/checkpoints.js
 // dev checkpoints: saves captured from a scripted playthrough (see Menus.checkpoints)
@@ -4818,7 +4953,7 @@ const Menus = {
         ['Prologue · Lift Zero, the furnace, the Pairing', () => { fresh(); Game.onHeistDone(); }],
         ['Day 1 · wake up in Ashgate', () => { fresh(); Game.startPresent(); }],
         ['End of Day 1 · the dream (gilding, the lesson, the Drill, the Ford)', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM1(), load('day2')); }],
-        ['After the ending · the last dream, then the Fall', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM3().concat([{ brawl: () => FF.fall() }]), () => Game.toTitle()); }],
+        ['End of Part One · the last dream, then the Fall', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM3().concat([{ brawl: () => FF.fall() }]), () => Game.toTitle()); }],
         ['End of Day 2 · the dream of the Assay, then the Keep', () => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DREAM2().concat([{ brawl: () => FF.keep() }]), () => Game.toTitle()); }],
         ['Day 2 · morning', load('day2')],
         ['Day 2 · lantern built, festival next', load('fest')],
@@ -4831,6 +4966,8 @@ const Menus = {
     const cs = (steps, st) => () => { if (st) st(); else UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(steps().filter(s => s && !s.brawl), () => Game.toTitle()); };
     S['Story beats'].push(['Day 3 · The Ledger (whole chapter)', () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.fest)))); setTimeout(() => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY3(), () => Game.toTitle()); }, 60); }]);
     S['Fights'].splice(S['Fights'].length - 1, 0, ['Under the Floor · the Warden (2D, Day 3)', ff('DAY THREE', 'The old tunnel.', 'under')]);
+    S['Fights'].splice(S['Fights'].length - 1, 0, ['The Way Out · Sull and the night watch (2D, Day 4)', ff('DAY FOUR', 'The old tunnel.', 'wayout')], ['The Standard · the Sisters Vey (two duelists)', ff('FOUR YEARS FROM NOW', 'The Assay. Day twenty-six.', 'twins')], ['The Pinning · the Auditor\'s Blade (boots)', ff('FOUR YEARS FROM NOW', 'After the keep.', 'blade')], ['The High Docks · seven years on (battle)', ff('SEVEN YEARS FROM NOW', 'Above the weather.', 'docks')]);
+    S['Story beats'].push(['Day 4 · The Way Out (whole chapter, to the end of Part One)', () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.fest)))); setTimeout(() => { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY4(), () => afterDay(4, null)); }, 60); }]);
     S['Cutscenes'] = [
       ['Opening film', S['Story beats'][0][1]],
       ['Prologue · the world, the wedding, the fever', cs(() => PROLOGUE_A.filter(s => !/^FOUR YEARS/.test(s.card || '')), fresh)],
@@ -4838,6 +4975,7 @@ const Menus = {
       ['Day 2 · Last Bell ceremony', fest('startFestival')], ['Day 2 · First Fire ending', fest('onFestDone')],
       ['Dream · the Gilding and the lesson', cs(DREAM1)], ['Dream · what the Assay is', cs(DREAM2)], ['Dream · the Sun Spire', cs(DREAM3)], ['Dream · the day he arrives', cs(DREAM4)],
       ['Day 3 · Lift Zero and Celestine, under the floor (no fight)', cs(DAY3)],
+      ['Day 4 · the months, Mara, the way out, Ilse (no fights)', cs(DAY4)], ['Film · The Standard', film('twins')], ['Film · The Pinning', film('blade')], ['Film · The High Docks', film('docks')],
       ['Film · The Valley', film('valley')], ['Film · The Pairing', film('pairing')], ['Film · The Ford', film('ford')], ['Film · The Proctor', film('proctor')], ['Film · The Keep', film('keep')], ['Film · The Fall', film('fall')]
     ];
     const sub = k => () => UI.push(modal({ title: k, items: S[k].map(([label, act]) => ({ label, act })).concat([{ label: 'Back', act: () => UI.pop() }]) }));
@@ -4879,7 +5017,7 @@ const Menus = {
     ] }));
   },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.15): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.16): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
@@ -5010,7 +5148,7 @@ const DayEnd = {
         <p><i>"Be too much for them."</i></p>
         <h2 style="margin-top:16px">END OF FIRST FIRE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
     }, items: [
-      { label: 'Wake up: Day 3 — The Ledger', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY3(), () => { sv.flags = Object.assign(sv.flags || {}, { day3Done: 1, ledgerUp: G.flags.ledgerUp, toldHer: G.flags.toldHer, toldDace: G.flags.toldDace, fury: G.flags.fury }); Game.loadSave(sv); Game.autosave(); }); } },
+      { label: 'Wake up: Day 3 — The Ledger', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(DAY3(), () => { sv.flags = Object.assign(sv.flags || {}, { day3Done: 1, ledgerUp: G.flags.ledgerUp, toldHer: G.flags.toldHer, toldDace: G.flags.toldDace, fury: G.flags.fury }); afterDay(3, sv); }); } },
       { label: 'Keep exploring instead', act: () => { UI.clear(); Game.loadSave(Save.read('auto') || Save.snapshot()); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }
     ] }));

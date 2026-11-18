@@ -1,5 +1,29 @@
 # SOOTBORN — changelog
 
+## v0.16 · 2026-11-18 — Day 4, the end of Part One, and four more fights
+From play notes: build the next parts and the fights, beautify later; should this take us near the end?
+
+**Where this leaves the story.** Part One (Below) is now complete from the prologue to the night Kael leaves Cinderwell. The Assay, told in dreams and fights alongside it, is also complete: arrival, the Pairing, the Ford, the Standard, the Proctor, the Valley, the Keep, the Pinning. That is roughly the whole of the first book's shape, in our own story. Two fights look past it (seven and nine years on). Part Two (Above: the years on the Spire, the Unlit above ground, the road to the Fall) is not written.
+
+**Day 4 — The Way Out** (new, plays from the end of Day 3)
+- Four months of going up twice a week, learning how they talk and where the doors are. Celestine laughs, once.
+- Mara works out that he is leaving. "Come back taller."
+- Dace's plan: Kael Brennick has to die on paper, because the count always balances. Mara will get a second tin.
+- **The Way Out** (new 2D fight): Proctor Sull and the night watch at the hatch, with Dace at Kael's side.
+- Sull writes the report he is told to write. The tin goes to Row K. Kael goes out past Seren's chalk suns and meets Ilse. END OF PART ONE.
+- Then the finale: the Pinning, the High Docks, the last dream and the Fall.
+
+**New fights**
+- **The Standard** (day twenty-six; end of Day 3): the Sisters Vey, two duelists at once, on the river island. Finisher TWO FOR ONE. Two Memory Arts.
+- **The Pinning** (after the Keep; end of Day 4): Celestine sends her own champion down the steps. Boots on both sides. She pins the gold on Kael herself, says "you remind me of someone", decides he does not, and gives him the post.
+- **The High Docks** (seven years on): Kael walks in through the front gate with the sun on his collar and the Unlit behind him to cut four hundred barges loose. Three waves, ending with Vant, who lost a river to him once.
+- **The Way Out** (above).
+- **The Fall** now plays last, after the High Docks, instead of after Day 2.
+
+**Dev menu:** the four new fights, Day 4 as a whole chapter, Day 4 without fights under Cutscenes, and three more fight films.
+
+**Not done:** no art pass on any of this (it reuses the upper landing, the tunnel, the ford, the keep and the barge deck). Nobody has played it by hand.
+
 ## v0.15 · 2026-11-18 — Day 3, moves that grow with the story, cutscenes in the Dev menu
 From play notes: how many more days below, and can the game run longer with new content; put cutscenes in the Dev menu; new moves, finishers and flashbacks as he advances; the 2D fight as gilded Kael looks awkward and Kael's sprite needs work.
 

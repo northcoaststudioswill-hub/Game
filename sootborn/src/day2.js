@@ -378,7 +378,8 @@ barks = function (id) {
 };
 function D2OBJ() {
   if (G.heist === 2) return "Hang her lantern on the Pillar, unseen";
-  if (F('day3Done')) return "Day 4 isn't built yet — explore freely";
+  if (F('day4Done')) return "Part One is finished — explore freely";
+  if (F('day3Done')) return "Day 4 plays from the end of Day 3 (or the Dev menu) — explore freely";
   if (F('day2Done')) return "Day 3 plays from the end of Day 2 (or the Dev menu) — explore freely";
   if (!F('d2Tavi')) return 'Talk to Tavi';
   if (!F('mara2')) return G.mapId === 'bay' ? 'Report to Mara' : 'Report to Mara in Bay 3 (east, through the square)';
@@ -533,8 +534,7 @@ function festB() {
     { say: 'vale', t: 'Sleep on it. You have until first bell.' },
     { fade: 'out' },
     ...(NOFF ? [] : DREAM2()), { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
-    { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 },
-    ...(NOFF ? [] : DREAM3()), !NOFF && { brawl: () => FF.fall() }, !NOFF && { card: 'NINE YEARS EARLIER', sub: 'Cinderwell. The morning after the festival.', big: 1, min: 1.6, max: 5 }
+    { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 }
   ].filter(Boolean);
 }
 
