@@ -40,9 +40,10 @@
     const eh = { name: o.name, cls: o.cls, race: o.race, level: o.level, stats: G.baseStats(o.cls, o.race), sub: o.sub || null, feats: [], known: o.known, ult: o.ult || null, tint: o.tint, scale: o.scale };
     const prim = G.CLASSES[o.cls].primary; eh.stats[prim] += Math.floor(o.level / 2); eh.stats.con += Math.floor(o.level / 3);
     const ed = G.derive(eh, null);
-    ed.maxHp = Math.round(ed.maxHp * o.hpMul); ed.dmgMul *= o.dmgMul;
+    ed.maxHp = Math.round(ed.maxHp * o.hpMul); ed.dmgMul *= o.dmgMul * 1.12;
     E = makeEntity(eh, ed, G.lookOf(eh, null), false);
-    E.ai = Object.assign({ react: 0.5, aggro: 0.5, dodge: 0.1 }, o.ai); E.boss = o.boss;
+    E.ai = Object.assign({ react: 0.5, aggro: 0.5, dodge: 0.1, guard: Math.min(0.75, 0.16 + o.level * 0.11) }, o.ai); E.boss = o.boss;
+    G.fightTrack = o.boss ? 'boss' : 'fight';
     P.foe = E; E.foe = P;
     [P, E].forEach(makeVis);
     if (!arena.flash.parent) sc.add(arena.flash);
@@ -80,15 +81,15 @@
     else if (e.state === 'dodge') { act = 'dodge'; prog = 1 - e.t / 0.3; }
     else if (e.act) {
       const ab = e.act.ab, melee = ab.type === 'melee' && !ab.spell;
-      if (e.state === 'wind') { prog = 1 - e.t / (ab.wind || 0.01); act = melee ? 'swing' : 'cast'; if (melee) prog *= 0.5; glow = ab.color; }
+      if (e.state === 'wind') { prog = 1 - e.t / (e.act.total || ab.wind || 0.01); act = melee ? 'swing' : 'cast'; if (melee) prog *= 0.5; glow = ab.color; }
       else { prog = 1 - e.t / (ab.rec || 0.01); act = melee ? 'swing' : 'idle'; if (melee) prog = 0.5 + prog * 0.5; }
     }
     const alpha = e.buffs.stealth ? (e.isPlayer ? 0.4 : 0.1) : 1;
-    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, t: time + (e.isPlayer ? 0 : 1.7), glow });
+    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : 0, guard: e.guard > 0, t: time + (e.isPlayer ? 0 : 1.7), glow });
     const alive = e.state !== 'ko';
     v.ring.visible = alive && alpha > 0.3 && !F.ex; v.ring.position.y = 0.03 - e.z / S;
     v.ward.visible = alive && e.shield > 0; if (v.ward.visible) v.ward.material.opacity = 0.18 + Math.sin(time * 6) * 0.06;
-    v.mark.visible = alive && !!e.st.mark; v.guard.visible = alive && !!e.buffs.counter; if (v.guard.visible) v.guard.rotation.y = v.c.root.rotation.y - Math.PI / 2;
+    v.mark.visible = alive && !!e.st.mark; v.guard.visible = alive && (!!e.buffs.counter || e.guard > 0); if (v.guard.visible) v.guard.rotation.y = v.c.root.rotation.y - Math.PI / 2;
     v.stars.forEach((s, i) => { s.visible = alive && !!e.st.stun; const a = time * 6 + i * 2.09; s.position.set(Math.cos(a) * 0.4, 2.25, Math.sin(a) * 0.4); });
     const au = alive && !!e.buffs.aura, ar = A.spirit_guardians.aura.radius / S;
     v.aura.visible = au; v.aura.scale.setScalar(ar);
@@ -112,7 +113,7 @@
         if (geo) { v.tele = flat(new T.Mesh(geo, basicMat(color, 0.2)), a); v.tele.position.set(px, 0.04, pz); sc.add(v.tele); }
       }
     }
-    if (v.tele) { if (v.follow) v.tele.position.set(X, 0.04, Z); v.tele.material.opacity = 0.12 + (1 - e.t / (e.act.ab.wind || 0.01)) * (e.isPlayer ? 0.12 : 0.3); }
+    if (v.tele) { if (v.follow) v.tele.position.set(X, 0.04, Z); v.tele.material.opacity = 0.12 + (1 - e.t / (e.act.total || e.act.ab.wind || 0.01)) * (e.isPlayer ? 0.12 : 0.3); }
   }
 
   // ------------------------------------------------------------------ transient effects
@@ -184,7 +185,7 @@
   // ------------------------------------------------------------------ helpers
   function text(e, s, col, big) { gfx.floatText(e.x / S, 2.3 + rand(0, 0.3), e.y / S, s, col || '#fff', big); }
   function spark(x, y, z, col, n, sp) { gfx.burst(x / S, (z || 30) / S, y / S, col, n, (sp || 160) / S, 3); }
-  function addHype(v) { hype = clamp(hype + v, 0, 100); }
+  function addHype(v) { const h0 = hype; hype = clamp(hype + v, 0, 100); if (h0 < 80 && hype >= 80) G.sfx('cheer'); }
   function angDiff(a, b) { let d = a - b; while (d > Math.PI) d -= 6.283; while (d < -Math.PI) d += 6.283; return Math.abs(d); }
   function segDist(px, py, ax, ay, bx, by) {
     const dx = bx - ax, dy = by - ay, l = dx * dx + dy * dy || 1;
@@ -199,8 +200,12 @@
     o = o || {};
     if (tgt.state === 'ko' || phase !== 'fight') return false;
     if (tgt.iframe > 0) {
-      text(tgt, 'DODGED', '#9fe8ff');
-      if (tgt.isPlayer && !tgt.dodgeCredit) { addHype(12); tgt.dodgeCredit = 1; }
+      if (o.dot || ab.type === 'aura') return false;
+      if (tgt.dodgeStart != null && time - tgt.dodgeStart < 0.15 && !tgt.perfect) {
+        tgt.perfect = 1; tgt.dodgeT = 0; tgt.res = Math.min(100, tgt.res + 14); setBuff(tgt, 'dmg', 2.5, 0.3); hitstop = Math.max(hitstop, 0.14);
+        text(tgt, 'PERFECT DODGE', '#9fe8ff', true); G.sfx('perfect'); if (tgt.isPlayer) addHype(18); spark(tgt.x, tgt.y, 30, '#9fe8ff', 14, 200);
+      } else text(tgt, 'DODGED', '#9fe8ff');
+      if (tgt.isPlayer && !tgt.dodgeCredit) { addHype(10); tgt.dodgeCredit = 1; }
       return false;
     }
     if (tgt.buffs.counter && !o.noCounter) {
@@ -209,6 +214,17 @@
       if (Math.hypot(att.x - tgt.x, att.y - tgt.y) < 160) hit(tgt, att, A.riposte_hit, { noCounter: 1 });
       if (tgt.isPlayer) addHype(15);
       return false;
+    }
+    if (tgt.guard > 0 && ab.type !== 'aura' && !o.noCounter && !o.dot) {
+      if (ab.basic) {
+        tgt.guardHits = (tgt.guardHits || 0) + 1; text(tgt, 'BLOCKED', '#cfd8e0'); G.sfx('clang'); spark(tgt.x, tgt.y, 36, '#ffe9a0', 7, 150); tgt.flash = 0.04; if (att.isPlayer) addHype(-4);
+        if (tgt.guardHits >= 2) {
+          tgt.guard = 0; tgt.think = 0; text(att, 'PARRIED!', '#ff7a6a', true); att.st.stun = { t: 0.65 }; interrupt(att); G.sfx('stun'); shake = Math.max(shake, 6);
+          const pa = Math.atan2(att.y - tgt.y, att.x - tgt.x); att.kx = Math.cos(pa) * 150; att.ky = Math.sin(pa) * 150; if (att.isPlayer) addHype(-8);
+        }
+        return false;
+      }
+      tgt.guard = 0; o.power = (o.power || 1) * 1.3; o.brk = 1;
     }
     let dmg = G.roll(ab.dmg) + (ab.stat ? G.mod(att.stats[ab.stat]) : 0);
     if (ab.basic || (ab.type === 'melee' && !ab.spell)) dmg += att.d.weapon;
@@ -221,12 +237,17 @@
     if (crit) mul *= att.d.critMul;
     if (tgt.st.mark) mul *= 1.25;
     if (att.d.tactical && (tgt.st.stun || tgt.st.slow)) mul *= 1.3;
+    let tag = null; const real = ab.type !== 'aura' && !o.dot;
+    if (real && tgt.state === 'wind' && tgt.act) { mul *= 1.25; tag = 'COUNTER'; } else if (real && tgt.state === 'recover') { mul *= 1.4; tag = 'PUNISH'; }
     dmg = Math.max(1, Math.round(dmg * mul * (1 - tgt.d.dr)));
     if (tgt.shield > 0) { const a = Math.min(tgt.shield, dmg); tgt.shield -= a; dmg -= a; if (a) text(tgt, 'WARD -' + a, '#ffe9a0'); }
     if (dmg > 0) {
       tgt.hp -= dmg; att.dmgDealt += dmg;
       text(tgt, (sneak ? 'SNEAK ' : '') + dmg + (crit ? '!' : ''), crit ? '#ffd23c' : (tgt.isPlayer ? '#ff7a6a' : '#ffffff'), crit);
     }
+    if (tag && att.isPlayer) { text(tgt, tag, '#ffd23c', true); addHype(6); }
+    if (tag === 'COUNTER' && tgt.act && !tgt.act.ab.armor) interrupt(tgt);
+    tgt.hurt = 0.28;
     tgt.flash = 0.12; hitstop = Math.max(hitstop, crit ? 0.09 : 0.045); shake = Math.max(shake, crit ? 9 : 4);
     spark(tgt.x, tgt.y, 34, ab.color || '#fff', crit ? 18 : 9, crit ? 260 : 170);
     spark(tgt.x, tgt.y, 30, '#c01818', 6, 120);
@@ -236,6 +257,7 @@
     if (att.isPlayer) { addHype(crit ? 10 : 5); if (ab.gain) att.res = Math.min(100, att.res + ab.gain); }
     else addHype(-7);
     const resist = tgt.boss ? 0.6 : 1;
+    if (o.brk) { tgt.st.stun = { t: 1.0 * resist }; interrupt(tgt); text(tgt, 'GUARD BREAK', '#ffd23c', true); G.sfx('break'); if (att.isPlayer) addHype(12); }
     if (ab.stun) { tgt.st.stun = { t: ab.stun * resist }; interrupt(tgt); G.sfx('stun'); }
     if (ab.slow) tgt.st.slow = { t: ab.slow[1], amt: ab.slow[0] };
     if (ab.mark) tgt.st.mark = { t: ab.mark };
@@ -250,9 +272,10 @@
       text(tgt, ['SCORCH', 'CHILL', 'DAZE', 'HEX'][r], '#ff6ad5');
     }
     if (ab.steal && att.isPlayer) { stolen += ab.steal; text(tgt, '+' + ab.steal + ' coin', '#ffd36b'); G.sfx('coin'); }
-    if (ab.knock) {
+    const kn = ab.knock || o.knock;
+    if (kn) {
       const a = o.from != null ? o.from : Math.atan2(tgt.y - att.y, tgt.x - att.x);
-      tgt.kx = Math.cos(a) * ab.knock * resist; tgt.ky = Math.sin(a) * ab.knock * resist;
+      tgt.kx = Math.cos(a) * kn * resist; tgt.ky = Math.sin(a) * kn * resist; tgt.kBy = att;
     }
     if (tgt.hp <= 0) ko(tgt);
     return true;
@@ -272,18 +295,22 @@
   function tryAbility(e, id) {
     const ab = A[id];
     if (e.state !== 'idle' || !ab) return false;
-    if (!canUse(e, id)) { if (e.isPlayer && !ab.basic) G.sfx('deny'); return false; }
+    if (!canUse(e, id)) { if (e.isPlayer && !ab.basic) G.sfx('deny'); if (e.isPlayer && ab.basic && e.res < (ab.cost || 0) && time - (e.windedT || -9) > 1.2) { e.windedT = time; text(e, 'WINDED', '#9aa3ad'); G.sfx('deny'); } return false; }
     const I = e.intent;
     e.res -= (ab.cost || 0);
     if (ab.cd) e.cds[id] = ab.cd;
     e.aim = I.aim;
-    const act = e.act = { ab, id, aim: I.aim, total: ab.wind, pt: null, sx: e.x, sy: e.y };
+    const act = e.act = { ab, id, aim: I.aim, total: ab.wind, pt: null, sx: e.x, sy: e.y, step: 0 };
+    if (ab.basic) {
+      e.mash = Math.min(6, (e.mash || 0) + 1);
+      if (ab.type === 'melee') { act.step = (e.cStep != null && time - (e.cEnd || -9) < 0.42) ? (e.cStep + 1) % 3 : 0; if (act.step === 2) { act.fin = 1; act.total = ab.wind * 1.75; } }
+    } else e.mash = 0;
     if (ab.type === 'aoe' && ab.at === 'point') {
       let dx = I.pt.x - e.x, dy = I.pt.y - e.y; const d = Math.hypot(dx, dy) || 1;
       if (d > ab.castRange) { dx *= ab.castRange / d; dy *= ab.castRange / d; }
       act.pt = { x: e.x + dx, y: e.y + dy }; clampArena(act.pt);
     }
-    e.state = 'wind'; e.t = ab.wind;
+    e.state = 'wind'; e.t = act.total;
     if (!ab.basic) {
       if (e.isPlayer) { if (lastAb !== id) addHype(6); lastAb = id; }
       if (e.d.wild && Math.random() < 0.25) wildSurge(e);
@@ -318,13 +345,16 @@
   function fire(e) {
     const act = e.act, ab = act.ab, foe = e.foe, a = act.aim;
     if (ab.type === 'melee') {
-      const d = Math.hypot(foe.x - e.x, foe.y - e.y), ta = Math.atan2(foe.y - e.y, foe.x - e.x), arc = ab.arc * Math.PI / 180;
+      const fin = act.fin, rng = ab.range * (fin ? 1.2 : 1), d = Math.hypot(foe.x - e.x, foe.y - e.y), ta = Math.atan2(foe.y - e.y, foe.x - e.x), arc = ab.arc * Math.PI / 180 * (fin ? 1.5 : 1);
       if (ab.cone) {
         fx.push({ k: 'cone', x: e.x, y: e.y, a, r: ab.range, arc, col: ab.cone, t: 0, life: 0.38 }); G.sfx(ab.fire ? 'fire' : 'dodge');
         for (let i = 0; i < 26; i++) { const aa = a + rand(-arc / 2, arc / 2), v = rand(0.4, 1) * ab.range / S / 0.35; gfx.emit(e.x / S, 1, e.y / S, Math.cos(aa) * v, rand(-0.5, 1.5), Math.sin(aa) * v, rand(0.25, 0.45), ab.cone, 1); }
         flashLight(e.x + Math.cos(a) * 60, e.y + Math.sin(a) * 60, ab.cone, 35);
-      } else fx.push({ k: 'slash', x: e.x, y: e.y, a, r: ab.range, arc, col: ab.color, t: 0, life: 0.18 });
-      if (d < ab.range + ER && (angDiff(ta, a) < arc / 2 || d < ER * 1.6)) hit(e, foe, ab);
+      } else fx.push({ k: 'slash', x: e.x, y: e.y, a, r: rng, arc, col: fin ? '#ffe9a0' : ab.color, t: 0, life: fin ? 0.26 : 0.18 });
+      let landed = false;
+      if (d < rng + ER && (angDiff(ta, a) < arc / 2 || d < ER * 1.6)) landed = hit(e, foe, ab, fin ? { power: 1.7, knock: 240 } : null);
+      if (!landed && !ab.cone) act.missed = 1;
+      if (fin) { shake = Math.max(shake, 5); if (landed && e.isPlayer) { text(foe, 'FINISHER', '#ffe9a0', true); addHype(8); } }
     } else if (ab.type === 'proj') {
       const n = ab.count || 1;
       for (let i = 0; i < n; i++) {
@@ -363,12 +393,13 @@
   }
   function usePotion(e) {
     if (e.potions <= 0 || e.hp >= e.maxHp || e.state === 'ko' || e.st.stun) { if (e.isPlayer) G.sfx('deny'); return; }
-    e.potions--; heal(e, e.maxHp * 0.35 / e.d.healMul);
+    e.potions--; heal(e, e.maxHp * 0.3 * (e.d.potionMul || 1) / e.d.healMul);
   }
 
   // ------------------------------------------------------------------ entity update
   function updateEntity(e, dt) {
     e.iframe = Math.max(0, e.iframe - dt); e.flash = Math.max(0, e.flash - dt); e.dodgeT = Math.max(0, e.dodgeT - dt);
+    e.mash = Math.max(0, (e.mash || 0) - dt * 0.9); if (e.guard > 0) e.guard -= dt; e.hurt = Math.max(0, (e.hurt || 0) - dt);
     for (const k in e.cds) if (e.cds[k] > 0) e.cds[k] -= dt * (1 + e.d.cdr);
     if (e.state === 'ko') { e.koT += dt; return; }
     e.res = Math.min(100, e.res + e.d.regen * dt);
@@ -385,7 +416,14 @@
         if (Math.hypot(e.foe.x - e.x, e.foe.y - e.y) < au.radius + ER) hit(e, e.foe, { type: 'aura', dmg: au.dmg, stat: au.stat, radiant: 1, color: '#c8f0ff', slow: [au.slow, 0.7] });
       }
     }
-    if (e.kx || e.ky) { e.x += e.kx * dt; e.y += e.ky * dt; const f = Math.pow(0.002, dt); e.kx *= f; e.ky *= f; if (Math.abs(e.kx) + Math.abs(e.ky) < 8) e.kx = e.ky = 0; }
+    if (e.kx || e.ky) { e.x += e.kx * dt; e.y += e.ky * dt; const f = Math.pow(0.002, dt); e.kx *= f; e.ky *= f; if (Math.abs(e.kx) + Math.abs(e.ky) < 8) e.kx = e.ky = 0;
+      const bx = e.x, by = e.y; clampArena(e);
+      if (Math.hypot(e.x - bx, e.y - by) > 0.5 && Math.hypot(e.kx, e.ky) > 110 && phase === 'fight') {       // slammed into the pit wall
+        const wd = 5 + (e.kBy ? e.kBy.level * 2 : 4); e.hp -= wd; e.kx = e.ky = 0; e.st.stun = { t: 0.4 }; interrupt(e); e.flash = 0.12; e.hurt = 0.3;
+        text(e, 'WALL ' + wd, '#ffb070', true); spark(e.x, e.y, 30, '#c8b8a0', 14, 220); shake = Math.max(shake, 9); G.sfx('wall'); if (e.kBy && e.kBy.isPlayer) addHype(10);
+        if (e.hp <= 0) { ko(e); return; }
+      }
+    }
     if (e.chain) { e.chain.t -= dt; if (e.chain.t <= 0) { doDash(e, e.chain.ab); if (--e.chain.n <= 0) e.chain = null; else e.chain.t = 0.17; } }
 
     const I = e.intent, spd = 1 + (e.buffs.haste ? e.buffs.haste.amt : 0);
@@ -408,18 +446,20 @@
       } else if (ab.leap) {
         e.x = G.lerp(e.act.sx, e.act.pt.x, pr); e.y = G.lerp(e.act.sy, e.act.pt.y, pr); e.z = Math.sin(pr * Math.PI) * 70; e.iframe = Math.max(e.iframe, 0.05);
       } else mv = e.C.ranged ? 0.45 : 0.25;
-      if (e.t <= 0) { e.z = 0; fire(e); if (e.state === 'wind') { e.state = 'recover'; e.t = ab.rec; } }
+      if (e.t <= 0) { e.z = 0; const a0 = e.act; fire(e); if (e.state === 'wind') { e.state = 'recover'; e.t = ab.rec * (a0.fin ? 1.5 : 1) * (a0.missed ? 1.8 : 1); } }
     } else if (e.state === 'recover') {
       e.t -= dt * spd; mv = 0.5;
-      if (e.t <= 0) { e.state = 'idle'; e.act = null; }
+      if (e.t <= 0) { if (e.act && e.act.ab.basic) { e.cStep = e.act.missed ? null : e.act.step; e.cEnd = time; } e.state = 'idle'; e.act = null; }
     }
     if (e.state === 'idle' || (e.state === 'recover' && e.buf && e.buf.id === 'dodge')) {
       if (e.state === 'idle') mv = 1;
       const b = e.buf;
       if (b && b.id === 'dodge') {
-        if (e.dodgeT <= 0) {
+        if (e.dodgeT <= 0 && e.res < 10 && e.isPlayer && time - (e.windedT || -9) > 1.2) { e.windedT = time; text(e, 'WINDED', '#9aa3ad'); G.sfx('deny'); e.buf = null; }
+        else if (e.dodgeT <= 0 && e.res >= 10) {
           const a = (I.mx || I.my) ? Math.atan2(I.my, I.mx) : I.aim + Math.PI;
-          e.state = 'dodge'; e.t = 0.3; e.da = a; e.iframe = 0.27; e.dodgeT = e.d.dodgeCd; e.dodgeCredit = 0; e.act = null; e.buf = null; G.sfx('dodge'); mv = 0;
+          e.res -= 10; e.dodgeStart = time; e.perfect = 0;
+          e.state = 'dodge'; e.t = 0.3; e.da = a; e.iframe = 0.22; e.dodgeT = e.d.dodgeCd; e.dodgeCredit = 0; e.act = null; e.buf = null; G.sfx('dodge'); mv = 0;
         }
       } else if (e.state === 'idle') {
         if (b && b.id === 'potion') { usePotion(e); e.buf = null; }
@@ -427,10 +467,11 @@
         else if (I.attack) tryAbility(e, e.basic);
       }
     }
-    if (mv > 0 && (I.mx || I.my)) {
+    if (mv > 0 && (I.mx || I.my) && Math.abs(e.kx) + Math.abs(e.ky) < 60) {       // no walking while being thrown
       const l = Math.hypot(I.mx, I.my) || 1, m = Math.min(1, l);
       const v = e.d.speed * mv * m * (e.st.slow ? 1 - e.st.slow.amt : 1) * (1 + (e.buffs.speed ? e.buffs.speed.amt : 0));
-      e.x += I.mx / l * v * dt; e.y += I.my / l * v * dt; e.walk += dt * 13 * m; e.moving = true;
+      e.x += I.mx / l * v * dt; e.y += I.my / l * v * dt; const w0 = e.walk; e.walk += dt * 13 * m; e.moving = true;
+      if (Math.floor(e.walk / Math.PI) !== Math.floor(w0 / Math.PI)) G.sfx('step');
     }
     if (e.state === 'idle' || e.state === 'recover') e.aim = I.aim;
     const f = e.foe;
@@ -454,6 +495,7 @@
   }
   function think(e, dt) {
     const foe = e.foe, ai = e.ai, I = e.intent;
+    if (e.guard > 0) { I.mx = I.my = 0; I.attack = false; I.aim = Math.atan2(foe.y - e.y, foe.x - e.x); return; }
     const seen = !foe.buffs.stealth || !!foe.buffs.aura;
     if (seen) { e.lastSeen.x = foe.x; e.lastSeen.y = foe.y; }
     const tg = e.lastSeen, dx = tg.x - e.x, dy = tg.y - e.y, d = Math.hypot(dx, dy) || 1;
@@ -488,6 +530,7 @@
     if (e.think <= 0 && e.state === 'idle') {
       e.think = ai.react * rand(0.6, 1.4);
       if (!seen) return;
+      if (ai.guard && (foe.mash || 0) >= 3 && d < 115 && Math.random() < ai.guard) { e.guard = 1.3; e.guardHits = 0; e.combo = 0; return; }
       const healId = e.kit.find(id => A[id].heal && canUse(e, id) && inRange(e, A[id], d));
       if (healId) { I.queue.push(healId); return; }
       if (e.ult && canUse(e, e.ult) && (e.hp < e.maxHp * 0.75 || foe.hp < foe.maxHp * 0.6) && inRange(e, A[e.ult], d)) { I.queue.push(e.ult); return; }

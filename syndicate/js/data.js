@@ -23,28 +23,28 @@
   // Ability types: melee (arc in front), proj, line (instant), aoe (delayed blast), dash, buff
   const A = G.ABILITIES = {
     // ---------------- Fighter ----------------
-    f_basic: { name: 'Longsword', type: 'melee', basic: 1, wind: 0.16, rec: 0.2, range: 66, arc: 110, dmg: [1, 8], stat: 'str', gain: 5, color: '#dfe6ee', desc: 'Slash for 1d8 + STR.' },
-    shield_bash: { name: 'Shield Bash', type: 'melee', cost: 20, cd: 6, wind: 0.22, rec: 0.25, range: 70, arc: 80, lunge: 80, dmg: [1, 6], stat: 'str', stun: 1.1, knock: 160, color: '#c9b27a', icon: 'shield', desc: 'Lunge and slam for 1d6 + STR. Stuns for 1.1s.' },
+    f_basic: { name: 'Longsword', type: 'melee', basic: 1, cost: 6, wind: 0.16, rec: 0.2, range: 66, arc: 110, dmg: [1, 8], stat: 'str', gain: 11, color: '#dfe6ee', desc: 'Slash for 1d8 + STR. Costs 6 Stamina, refunded with interest on a hit. The third hit of a clean combo is a finisher.' },
+    shield_bash: { name: 'Shield Bash', type: 'melee', armor: 1, cost: 20, cd: 6, wind: 0.22, rec: 0.25, range: 70, arc: 80, lunge: 80, dmg: [1, 6], stat: 'str', stun: 1.1, knock: 160, color: '#c9b27a', icon: 'shield', desc: 'Lunge and slam for 1d6 + STR. Stuns for 1.1s.' },
     second_wind: { name: 'Second Wind', type: 'buff', cost: 0, cd: 16, wind: 0.1, rec: 0.15, heal: [1, 10], healLvl: 4, healStat: 'con', color: '#7fd68a', icon: 'cross', desc: 'Catch your breath: heal 1d10 + CON + 4 per level.' },
-    cleave: { name: 'Sweeping Cleave', type: 'melee', cost: 25, cd: 5, wind: 0.3, rec: 0.3, range: 84, arc: 230, dmg: [2, 6], stat: 'str', knock: 260, color: '#e8eef5', icon: 'sword', desc: 'A wide arc for 2d6 + STR that hurls the target back.' },
-    leap_slam: { name: 'Leaping Slam', type: 'aoe', at: 'point', leap: 1, castRange: 250, cost: 30, cd: 8, wind: 0.45, rec: 0.3, radius: 84, dmg: [2, 8], stat: 'str', slow: [0.5, 2], color: '#e0a560', icon: 'burst', desc: 'Leap to a spot and crash down: 2d8 + STR in an area, slowing for 2s.' },
+    cleave: { name: 'Sweeping Cleave', type: 'melee', armor: 1, cost: 25, cd: 5, wind: 0.3, rec: 0.3, range: 84, arc: 230, dmg: [2, 6], stat: 'str', knock: 260, color: '#e8eef5', icon: 'sword', desc: 'A wide arc for 2d6 + STR that hurls the target back.' },
+    leap_slam: { name: 'Leaping Slam', type: 'aoe', armor: 1, at: 'point', leap: 1, castRange: 250, cost: 30, cd: 8, wind: 0.45, rec: 0.3, radius: 84, dmg: [2, 8], stat: 'str', slow: [0.5, 2], color: '#e0a560', icon: 'burst', desc: 'Leap to a spot and crash down: 2d8 + STR in an area, slowing for 2s.' },
     relentless: { name: 'Relentless Assault', type: 'buff', cost: 25, cd: 14, wind: 0.1, rec: 0.1, buff: { haste: [5, 0.5] }, color: '#ff8a5c', icon: 'up', desc: 'Attack 50% faster for 5s.' },
     riposte: { name: 'Riposte', type: 'buff', cost: 20, cd: 8, wind: 0.04, rec: 0.1, buff: { counter: [0.9, 0] }, color: '#9fd0ff', icon: 'shield', desc: 'Guard for 0.9s. The next hit is negated and answered with 3d8 + STR and a stun.' },
     riposte_hit: { name: 'Riposte', type: 'melee', dmg: [3, 8], stat: 'str', stun: 0.9, knock: 200, color: '#9fd0ff' },
     action_surge: { name: 'Action Surge', type: 'buff', ult: 1, cost: 0, cd: 30, wind: 0.15, rec: 0.1, buff: { haste: [5, 0.6], dmg: [5, 0.25] }, refresh: 1, restore: 100, color: '#ffd36b', icon: 'up', desc: 'Reset every cooldown, refill Stamina, then gain +60% attack speed and +25% damage for 5s.' },
 
     // ---------------- Rogue ----------------
-    r_basic: { name: 'Twin Daggers', type: 'melee', basic: 1, wind: 0.1, rec: 0.14, range: 56, arc: 100, dmg: [1, 4], stat: 'dex', gain: 4, color: '#cfd8e0', desc: 'Fast stabs for 1d4 + DEX.' },
+    r_basic: { name: 'Twin Daggers', type: 'melee', basic: 1, cost: 4, wind: 0.1, rec: 0.14, range: 56, arc: 100, dmg: [1, 4], stat: 'dex', gain: 8, color: '#cfd8e0', desc: 'Fast stabs for 1d4 + DEX. Costs 4 Focus, refunded with interest on a hit. The third hit of a clean combo is a finisher.' },
     shadowstep: { name: 'Shadowstep', type: 'dash', cost: 20, cd: 6, wind: 0.04, rec: 0.08, dist: 230, behind: 1, buff: { sneak: [2.5, 0] }, color: '#a070ff', icon: 'dash', desc: 'Vanish and reappear behind your foe. Your next hit within 2.5s is a Sneak Attack (auto-crit, bonus d6s).' },
     fan_knives: { name: 'Fan of Knives', type: 'proj', cost: 20, cd: 5, wind: 0.14, rec: 0.2, count: 5, spread: 0.9, speed: 640, pr: 7, dmg: [1, 4], stat: 'dex', color: '#d9e2ea', icon: 'arrow', shape: 'knife', desc: 'Throw five knives in a fan. Each deals 1d4 + DEX.' },
     poison_blade: { name: 'Poisoned Blade', type: 'melee', cost: 20, cd: 7, wind: 0.14, rec: 0.2, range: 60, arc: 90, lunge: 40, dmg: [1, 6], stat: 'dex', dot: ['poison', 5, [1, 4]], color: '#8fe05a', icon: 'sword', desc: 'Stab for 1d6 + DEX and poison for 1d4 every half second for 5s.' },
     smoke_bomb: { name: 'Smoke Bomb', type: 'buff', cost: 25, cd: 12, wind: 0.08, rec: 0.1, buff: { stealth: [3, 0], sneak: [4, 0], speed: [3, 0.3] }, smoke: 1, color: '#9aa3ad', icon: 'burst', desc: 'Disappear for 3s and move faster. Your next hit is a Sneak Attack.' },
-    death_mark: { name: 'Death Mark', type: 'melee', cost: 30, cd: 10, wind: 0.2, rec: 0.3, range: 62, arc: 80, lunge: 100, dmg: [4, 6], stat: 'dex', execute: 1, color: '#ff4466', icon: 'sword', desc: 'Lunge for 4d6 + DEX. Deals double damage to targets below 40% health.' },
+    death_mark: { name: 'Death Mark', type: 'melee', armor: 1, cost: 30, cd: 10, wind: 0.2, rec: 0.3, range: 62, arc: 80, lunge: 100, dmg: [4, 6], stat: 'dex', execute: 1, color: '#ff4466', icon: 'sword', desc: 'Lunge for 4d6 + DEX. Deals double damage to targets below 40% health.' },
     dirty_trick: { name: 'Dirty Trick', type: 'melee', spell: 1, cost: 20, cd: 9, wind: 0.14, rec: 0.2, range: 130, arc: 60, dmg: [1, 4], stat: 'dex', stun: 1.6, steal: 10, cone: '#c8b48a', color: '#c8b48a', icon: 'burst', desc: 'Pocket sand. 1d4 + DEX, blinds for 1.6s, and lifts 10 coin from their purse.' },
     flurry: { name: 'Flurry of Shadows', type: 'dash', ult: 1, cost: 0, cd: 28, wind: 0.1, rec: 0.2, dist: 210, behind: 1, repeat: 4, pathDmg: 1, dmg: [2, 6], stat: 'dex', color: '#c79bff', icon: 'dash', desc: 'Blink through your foe four times. Each pass deals 2d6 + DEX.' },
 
     // ---------------- Sorcerer ----------------
-    s_basic: { name: 'Fire Bolt', type: 'proj', basic: 1, wind: 0.2, rec: 0.22, speed: 660, pr: 9, dmg: [1, 8], stat: 'cha', fire: 1, gain: 0, color: '#ff8a3c', shape: 'orb', desc: 'Hurl a mote of fire for 1d8 + CHA.' },
+    s_basic: { name: 'Fire Bolt', type: 'proj', basic: 1, cost: 5, wind: 0.2, rec: 0.22, speed: 660, pr: 9, dmg: [1, 8], stat: 'cha', fire: 1, gain: 7, color: '#ff8a3c', shape: 'orb', desc: 'Hurl a mote of fire for 1d8 + CHA. Costs 5 Mana, refunded with interest on a hit.' },
     burning_hands: { name: 'Burning Hands', type: 'melee', spell: 1, cost: 25, cd: 6, wind: 0.25, rec: 0.25, range: 135, arc: 70, dmg: [3, 6], stat: 'cha', fire: 1, dot: ['burn', 3, [1, 4]], cone: '#ff7a2a', color: '#ff7a2a', icon: 'burst', desc: 'A sheet of flame: 3d6 + CHA in a cone, then burning for 3s.' },
     misty_step: { name: 'Misty Step', type: 'dash', cost: 15, cd: 5, wind: 0.03, rec: 0.08, dist: 240, color: '#9fe8ff', icon: 'dash', desc: 'Teleport a short distance in silver mist. Untouchable while you travel.' },
     lightning_bolt: { name: 'Lightning Bolt', type: 'line', cost: 30, cd: 7, wind: 0.4, rec: 0.25, range: 560, width: 24, dmg: [3, 8], stat: 'cha', color: '#8fc8ff', icon: 'arrow', desc: 'After a brief charge, a bolt strikes everything in a line for 3d8 + CHA.' },
@@ -54,12 +54,12 @@
     fireball: { name: 'Fireball', type: 'aoe', ult: 1, at: 'point', castRange: 440, cost: 0, cd: 26, wind: 0.3, rec: 0.3, delay: 0.5, radius: 105, dmg: [6, 6], stat: 'cha', fire: 1, dot: ['burn', 3, [1, 6]], knock: 220, color: '#ff8a2a', icon: 'burst', desc: 'A bead of fire streaks out and detonates: 6d6 + CHA in a huge area.' },
 
     // ---------------- Cleric ----------------
-    c_basic: { name: 'Mace', type: 'melee', basic: 1, wind: 0.18, rec: 0.24, range: 62, arc: 100, dmg: [1, 6], stat: 'str', gain: 5, color: '#f2e2a8', desc: 'Swing for 1d6 + STR.' },
+    c_basic: { name: 'Mace', type: 'melee', basic: 1, cost: 6, wind: 0.18, rec: 0.24, range: 62, arc: 100, dmg: [1, 6], stat: 'str', gain: 11, color: '#f2e2a8', desc: 'Swing for 1d6 + STR. Costs 6 Faith, refunded with interest on a hit. The third hit of a clean combo is a finisher.' },
     sacred_flame: { name: 'Sacred Flame', type: 'aoe', at: 'target', cost: 20, cd: 4, wind: 0.2, rec: 0.2, delay: 0.6, radius: 50, dmg: [2, 8], stat: 'wis', radiant: 1, color: '#ffe27a', icon: 'burst', desc: 'Radiance descends on your foe after a moment: 2d8 + WIS.' },
     cure_wounds: { name: 'Cure Wounds', type: 'buff', cost: 30, cd: 12, wind: 0.35, rec: 0.15, heal: [2, 8], healStat: 'wis', healLvl: 2, color: '#8fffb0', icon: 'cross', desc: 'Heal 2d8 + WIS + 2 per level.' },
     shield_faith: { name: 'Shield of Faith', type: 'buff', cost: 25, cd: 14, wind: 0.15, rec: 0.1, buff: { shield: [6, 22] }, shieldLvl: 5, color: '#ffe9a0', icon: 'shield', desc: 'A shimmering ward absorbs damage for 6s (22 + 5 per level).' },
     guiding_bolt: { name: 'Guiding Bolt', type: 'proj', cost: 25, cd: 7, wind: 0.3, rec: 0.2, speed: 620, pr: 11, dmg: [3, 6], stat: 'wis', radiant: 1, mark: 4, color: '#fff0a0', icon: 'arrow', shape: 'orb', desc: 'A flash of light for 3d6 + WIS. The target takes 25% more damage for 4s.' },
-    holy_strike: { name: 'Holy Strike', type: 'melee', cost: 30, cd: 8, wind: 0.25, rec: 0.3, range: 76, arc: 100, lunge: 110, dmg: [3, 8], stat: 'str', stun: 0.7, knock: 280, color: '#ffd76b', icon: 'sword', desc: 'Charge and smite for 3d8 + STR, stunning and knocking back.' },
+    holy_strike: { name: 'Holy Strike', type: 'melee', armor: 1, cost: 30, cd: 8, wind: 0.25, rec: 0.3, range: 76, arc: 100, lunge: 110, dmg: [3, 8], stat: 'str', stun: 0.7, knock: 280, color: '#ffd76b', icon: 'sword', desc: 'Charge and smite for 3d8 + STR, stunning and knocking back.' },
     radiance: { name: 'Radiance of Dawn', type: 'aoe', at: 'self', cost: 35, cd: 10, wind: 0.4, rec: 0.25, radius: 165, dmg: [3, 8], stat: 'wis', radiant: 1, color: '#fff3b0', icon: 'burst', desc: 'Sunlight erupts around you: 3d8 + WIS to anything nearby.' },
     spirit_guardians: { name: 'Spirit Guardians', type: 'buff', ult: 1, cost: 0, cd: 28, wind: 0.3, rec: 0.1, buff: { aura: [7, 0] }, aura: { radius: 115, dmg: [1, 8], stat: 'wis', slow: 0.35 }, radiant: 1, color: '#c8f0ff', icon: 'up', desc: 'Spectral guardians circle you for 7s, dealing 1d8 + WIS twice a second and slowing foes inside.' }
   };
@@ -138,7 +138,16 @@
     { id: 'fountain', name: 'Moonwater Fountain', cost: 160, rank: 3, zone: 'garden', w: 2, d: 2, max: 1, perk: 'Start each fight with a protective ward.', light: 0x6ad0ff },
     { id: 'cauldron', name: "Alchemist's Cauldron", cost: 180, rank: 3, zone: 'any', w: 1, d: 1, max: 1, perk: 'Brews a free healing potion before every fight.', light: 0x8aff5a },
     { id: 'statues', name: 'Guardian Statue', cost: 200, rank: 4, zone: 'any', w: 1, d: 1, max: 2, perk: 'Stone watchers: take 5% less damage.' },
-    { id: 'crystals', name: 'Starlight Spire', cost: 240, rank: 4, zone: 'garden', w: 1, d: 1, max: 2, perk: 'The cavern glitters: +3% crit chance.', light: 0x8ad0ff }
+    { id: 'crystals', name: 'Starlight Spire', cost: 240, rank: 4, zone: 'garden', w: 1, d: 1, max: 2, perk: 'The cavern glitters: +3% crit chance.', light: 0x8ad0ff },
+    { id: 'fern', name: 'Cave Fern', cost: 20, rank: 0, zone: 'any', w: 1, d: 1, max: 8, perk: 'Green, somehow.' },
+    { id: 'bench', name: 'Stone Bench', cost: 40, rank: 0, zone: 'garden', w: 2, d: 1, max: 3, perk: 'For watching the glowcaps.' },
+    { id: 'weaponrack', name: 'Weapon Rack', cost: 60, rank: 0, zone: 'any', w: 2, d: 1, max: 2, perk: 'Blades on the wall where you can see them.' },
+    { id: 'table', name: 'Long Table', cost: 70, rank: 0, zone: 'house', w: 2, d: 2, max: 1, perk: 'Somewhere to eat that is not the floor.', light: 0xffc070 },
+    { id: 'firebowl', name: 'Fire Bowl', cost: 55, rank: 1, zone: 'any', w: 1, d: 1, max: 4, perk: 'A pit-style brazier of your own.', light: 0xff8a30 },
+    { id: 'bookshelf', name: 'Bookshelf', cost: 80, rank: 1, zone: 'house', w: 2, d: 1, max: 2, perk: 'Old fight manuals: +5% XP earned.' },
+    { id: 'hearth', name: 'Stone Hearth', cost: 130, rank: 1, zone: 'house', w: 2, d: 1, max: 1, perk: 'Warm bones: potions heal 20% more.', light: 0xff9040 },
+    { id: 'dummy', name: 'Training Dummy', cost: 120, rank: 2, zone: 'any', w: 1, d: 1, max: 1, perk: 'Daily drills: +4% damage.' },
+    { id: 'willow', name: 'Glow-Willow', cost: 220, rank: 3, zone: 'garden', w: 2, d: 2, max: 2, perk: 'A tree that makes its own moonlight.', light: 0x7affc0 }
   ];
   G.DECOR_BY = {}; G.DECOR.forEach(d => G.DECOR_BY[d.id] = d);
   G.owned = st => { const o = {}; (st.items || []).forEach(p => o[p.id] = (o[p.id] || 0) + 1); return o; };

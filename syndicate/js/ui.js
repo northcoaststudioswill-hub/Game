@@ -71,7 +71,7 @@
       '<button class="' + (has ? '' : 'big') + '" id="bNew">New Fighter</button><button id="bIntro">Watch the Intro</button><button id="bHow">How to Play</button></div>' +
       '<p class="t-foot">Bleed for coin. Climb the ledger. Take the crown.</p><p class="t-cred">A North Coast Studios game · with E Concepts</p></div>', 'title');
     on('#bIntro', () => G.cine.play(() => ui.title()));
-    on('#bHow', () => { show('<div class="card small"><h2>How to Play</h2><p>Win pit fights for <b>XP</b>, <b>coin</b> and <b>respect</b>. Level up to shape your class. Spend coin on gear and on your hideout.</p>' + CONTROLS + '<div class="row end"><button class="big" id="x">Back</button></div></div>'); on('#x', () => ui.title()); });
+    on('#bHow', () => { show('<div class="card small"><h2>How to Play</h2><p>Win pit fights for <b>XP</b>, <b>coin</b> and <b>respect</b>. Level up to shape your class. Spend coin on gear and on your hideout.</p><h3>Pit wisdom</h3><ul class="perks">' + G.TIPS.map(t => '<li>' + t + '</li>').join('') + '</ul>' + CONTROLS + '<div class="row end"><button class="big" id="x">Back</button></div></div>'); on('#x', () => ui.title()); });
     on('#bCont', () => { G.load(); ui.hub(); });
     on('#bNew', () => {
       if (has) show('<div class="card small"><h2>Start over?</h2><p>This replaces your current fighter and hideout.</p><div class="row"><button id="y" class="danger">Start over</button><button id="n">Keep my fighter</button></div></div>');
@@ -122,13 +122,13 @@
   ui.hideout = function () {
     ui.leaveHub(); ui.close(); G.hubPos = { x: 1.2, z: 5.2 };
     G.scene = 'hideout'; W().enter('hideout'); ui.topbar();
-    if (!G.state.seenHideout) { G.state.seenHideout = true; G.save(); ui.toast('This cave is yours. Press Decorate to furnish the house and plant the garden.'); }
+    if (!G.state.seenHideout) { G.state.seenHideout = true; G.save(); ui.toast('This cave is yours. Press Decorate to buy furniture and plants. Tap anything you own to pick it up and move it.'); }
   };
 
   // The catalog: buy a piece, then place it on the grid.
   ui.catalog = function () {
     const st = G.state, rk = G.rankOf(st.respect), own = G.owned(st);
-    let h = '<div class="card"><h2>The Quartermaster’s Catalogue</h2><p class="dim">Buy a piece, then choose where it stands. Tap anything already placed to move or store it. You have <b>' + st.coin + '</b> coin.</p>';
+    let h = '<div class="card"><h2>The Quartermaster’s Catalogue</h2><p class="dim">Buy a piece, then choose where it stands. Out in the room, tap anything you own to pick it up, move it, turn it or store it. You have <b>' + st.coin + '</b> coin.</p>';
     G.DECOR.forEach(d => {
       const n = own[d.id] || 0, locked = rk < d.rank, full = n >= d.max, poor = st.coin < d.cost;
       h += '<div class="ab-row' + (locked ? ' lockedrow' : '') + '"><div class="ab-ic pas" style="color:' + (d.light ? '#' + d.light.toString(16).padStart(6, '0') : 'var(--gold)') + '">' + (d.zone === 'garden' ? '❀' : d.zone === 'house' ? '⌂' : '✦') + '</div><div class="ab-tx"><b>' + d.name + '</b>' +
@@ -154,9 +154,9 @@
     if (!pl || G.scene !== 'hideout') { bar.className = 'hidden'; return; }
     const it = G.DECOR_BY[pl.id];
     bar.className = '';
-    bar.querySelector('span').innerHTML = '<b>' + it.name + '</b> ' + (pl.ok ? 'Tap a tile to move it.' : '<i class="bad">' + (it.zone === 'house' ? 'Needs a free spot inside the house.' : it.zone === 'garden' ? 'Needs a free spot in the garden.' : 'That spot is taken.') + '</i>');
+    bar.querySelector('span').innerHTML = '<b>' + it.name + '</b> ' + (pl.ok ? 'Drag it, or tap a tile, then place.' : '<i class="bad">' + (it.zone === 'house' ? 'Needs a free spot inside the house.' : it.zone === 'garden' ? 'Needs a free spot in the garden.' : 'That spot is taken.') + '</i>');
     $('#plOk').disabled = !pl.ok; $('#plRot').style.display = it.w === it.d ? 'none' : '';
-    $('#plCancel').textContent = pl.from == null ? 'Cancel' : 'Put back';
+    $('#plCancel').textContent = pl.from == null ? 'Cancel' : 'Put back'; $('#plStore').style.display = pl.from == null ? 'none' : ''; $('#plStore').textContent = 'Store (+' + it.cost + ')';
   };
   ui.placeMove = function (x, z) {
     const pl = G.placing; if (!pl) return;
@@ -172,12 +172,14 @@
       const it = G.DECOR_BY[pl.id];
       if (pl.from == null) { st.coin -= it.cost; st.items.push({ id: pl.id, x: pl.x, z: pl.z, r: pl.r }); G.sfx('coin'); ui.toast(it.name + ' placed. ' + it.perk); }
       else { const p = st.items[pl.from]; p.x = pl.x; p.z = pl.z; p.r = pl.r; delete p.hidden; }
-      G.sfx('buff'); G.gfx.burst(pl.x, 0.6, pl.z, it.light || 0xffd36b, 26, 3, 4); done();
+      G.sfx('place'); G.gfx.burst(pl.x, 0.6, pl.z, it.light || 0xffd36b, 26, 3, 4); done();
     };
     $('#plCancel').onclick = () => { const pl = G.placing; if (!pl) return; G.sfx('ui'); if (pl.from != null) delete G.state.items[pl.from].hidden; done(); };
+    $('#plStore').onclick = () => { const pl = G.placing; if (!pl || pl.from == null) return; const it = G.DECOR_BY[pl.id]; G.state.items.splice(pl.from, 1); G.state.coin += it.cost; G.sfx('coin'); ui.toast(it.name + ' stored. ' + it.cost + ' coin returned.'); done(); };
     $('#decorBtn').onclick = () => { G.audioInit(); G.sfx('ui'); ui.catalog(); };
     $('#prompt').onclick = () => { G.audioInit(); G.sfx('ui'); if (G.near) G.near.go(); };
   };
+  ui.pickUp = function (i) { const p = G.state.items[i]; if (!p) return; G.sfx('ui'); p.hidden = true; W().get('hideout').refresh(); ui.startPlace({ id: p.id, x: p.x, z: p.z, r: p.r, from: i }); };
   ui.itemCard = function (i) {
     const st = G.state, p = st.items[i], it = G.DECOR_BY[p.id];
     show('<div class="card small"><h2>' + it.name + '</h2><p>' + it.perk + '</p><div class="row end"><button id="st">Store (refund ' + it.cost + ')</button><button id="mv" class="big">Move</button><button id="x">Close</button></div></div>');
@@ -216,7 +218,7 @@
     const st = G.state, h = st.hero;
     show('<div class="card vs"><div class="vs-row"><div class="vs-side"><span id="vp"></span><b>' + esc(h.name) + '</b><small>Lv ' + h.level + ' ' + G.CLASSES[h.cls].name + '</small></div><div class="vs-mid">VS</div>' +
       '<div class="vs-side"><span id="ve"></span><b>' + o.name + '</b><small>Lv ' + o.level + ' ' + G.CLASSES[o.cls].name + '</small></div></div>' +
-      '<p class="quote">“' + o.taunt + '”</p>' + CONTROLS +
+      '<p class="quote">“' + o.taunt + '”</p><p class="dim">' + G.BIOS[o.id].split('. ')[0] + '.</p><p class="note"><b>Pit wisdom:</b> ' + G.pick(G.TIPS) + '</p>' + CONTROLS +
       '<div class="row end"><button id="x">Back</button><button class="big" id="go">Enter the pit</button></div></div>');
     $('#vp').appendChild(G.portrait(G.lookOf(h, st), 96, 1.2)); $('#ve').appendChild(G.portrait({ cls: o.cls, race: o.race, tint: o.tint }, 96, 1.2));
     on('#x', () => ui.pit());
@@ -252,6 +254,7 @@
   const stStr = e => {
     const o = [];
     if (e.shield > 0) o.push('WARD ' + Math.ceil(e.shield));
+    if (e.guard > 0) o.push('GUARDING');
     ['stun', 'slow', 'burn', 'poison', 'mark'].forEach(k => { if (e.st[k]) o.push(k.toUpperCase()); });
     ['haste', 'stealth', 'sneak', 'dmg', 'aura'].forEach(k => { if (e.buffs[k]) o.push({ haste: 'HASTE', stealth: 'HIDDEN', sneak: 'SNEAK READY', dmg: 'SURGE', aura: 'GUARDIANS' }[k]); });
     return o.join(' · ');
@@ -353,8 +356,9 @@
     h.feats.forEach(f => s += '<div class="ab-row"><div class="ab-ic pas">✦</div><div class="ab-tx"><b>' + G.FEATS[f].name + '</b><small>Feat</small><p>' + G.FEATS[f].desc + '</p></div></div>');
     const own = G.owned(st), perks = G.DECOR.filter(x => own[x.id] && /[+%]|ward|potion|less/.test(x.perk));
     if (perks.length) s += '<h3>Hideout comforts</h3><ul class="perks">' + perks.map(x => '<li><b>' + x.name + '</b> ' + x.perk + '</li>').join('') + '</ul>';
-    s += '<div class="row end"><button class="big" id="x">Done</button></div></div>';
+    s += '<div class="row end"><button id="cx">Guild Codex</button><button class="big" id="x">Done</button></div></div>';
     show(s);
+    on('#cx', () => ui.codex());
     $('#sp').appendChild(G.portrait(G.lookOf(h, st), 84, 1.2));
     on('#x', () => { ui.close(); ui.topbar(); });
     on('[data-slot]', el => {
@@ -363,6 +367,20 @@
       const prev = h.slots[i]; h.slots[i] = id; if (j >= 0) h.slots[j] = prev;
       G.save(); const sc = panel().scrollTop; ui.sheet(); panel().scrollTop = sc;
     });
+  };
+
+  // ------------------------------------------------------------ the Guild Codex (lore, unlocked by climbing)
+  ui.codex = function () {
+    const st = G.state, open = G.LORE.filter(e => e.unlock(st)).length;
+    let h = '<div class="card codex"><h2>The Guild Codex</h2><p class="dim">' + open + ' of ' + G.LORE.length + ' entries unsealed. Win bouts and rise in rank to unseal the rest.</p>', sec = '';
+    G.LORE.forEach(e => {
+      if (e.sec !== sec) { sec = e.sec; h += '<h3>' + sec + '</h3>'; }
+      h += e.unlock(st) ? '<details class="lore"><summary>' + e.title + '</summary><p>' + e.body + '</p></details>' : '<div class="lore sealed">Sealed entry</div>';
+    });
+    h += '<div class="row end"><button class="big" id="x">Close</button></div></div>';
+    show(h);
+    panel().querySelectorAll('summary').forEach(el => el.addEventListener('click', () => G.sfx('page')));
+    on('#x', () => { ui.close(); ui.topbar(); });
   };
 
   // ------------------------------------------------------------ shop

@@ -57,7 +57,7 @@
     if (G.scene === 'hideout') {
       if (G.placing) return G.ui.placeMove(g.x, g.z);
       const i = W.get('hideout').itemAt(g.x, g.z);
-      if (i >= 0) { G.sfx('ui'); return G.ui.itemCard(i); }
+      if (i >= 0) return G.ui.pickUp(i);
     }
     if (G.scene === 'hub' || G.scene === 'hideout') W.walkTo({ x: g.x, z: g.z, r: 0.3 });
   }
@@ -159,6 +159,7 @@
     } else if (sc === 'hub' || sc === 'hideout') {
       if (hit(0) && G.near) { G.sfx('ui'); G.near.go(); }
       if (hit(3)) { G.sfx('ui'); if (sc === 'hideout') G.ui.catalog(); else G.ui.sheet(); }
+      if (hit(2) && sc === 'hideout') { const w = W.walker, H = W.get('hideout'); let i = H.itemAt(w.x + Math.sin(w.face), w.z + Math.cos(w.face)); if (i < 0) i = H.itemAt(w.x, w.z); if (i >= 0) G.ui.pickUp(i); }
     }
     prevB = now;
   }
@@ -184,7 +185,7 @@
   function frame(now) {
     const dt = Math.min(0.033, (now - last) / 1000); last = now; T += dt;
     const sc = G.scene, cam = gfx.cam, port = gfx.portrait;
-    if (sc !== lastScene) { leaveSpecial(); lastScene = sc; }
+    if (sc !== lastScene) { leaveSpecial(); lastScene = sc; G.music({ title: 'title', create: 'title', hub: 'hub', hideout: 'home', fight: G.fightTrack || 'fight', cine: 'boss' }[sc]); }
     pollPad(dt);
     let near = null;
     if (sc === 'fight') { G.fight.update(dt); }

@@ -2,7 +2,7 @@
 (function () {
   const G = window.G, T = THREE, gfx = G.gfx, box = gfx.box, mesh = gfx.mesh;
   const W = G.world = { cache: {} };
-  const R = (a, b) => a + Math.random() * (b - a);
+  const R = (a, b) => a + Math.random() * (b - a), lerp3 = (a, b, t) => a + (b - a) * t;
   const dummy = new T.Object3D(), col = new T.Color();
 
   // A field of slightly uneven flagstones as one instanced mesh. cells: [{x,z,tint?}]
@@ -90,6 +90,26 @@
         mesh(new T.CylinderGeometry(0.55, 0.3, 0.3, 8), gfx.lambert(0x1c1a1e), x, 5.35, z, s);
       } else { box(1.0, 0.9, 1.0, mat, x, 0.45, z, s); brazier(s, x, 0.9, z, 30); }
     });
+    // chandelier, chains, light shafts, racks and the leavings of earlier bouts
+    const ironM = gfx.lambert(0x1c1a1e), boneM = gfx.lambert(0xcfc6ae), steelM = new T.MeshPhongMaterial({ color: 0xaab2bc, shininess: 60, flatShading: true });
+    const seg = (a, b, r) => { const d = new T.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), m = new T.Mesh(new T.CylinderGeometry(r, r, d.length(), 5), ironM); m.position.set((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2); m.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), d.normalize()); s.add(m); };
+    const chand = new T.Mesh(new T.TorusGeometry(2.2, 0.12, 6, 16), ironM); chand.rotation.x = Math.PI / 2; chand.position.y = 8.6; s.add(chand);
+    for (let i = 0; i < 6; i++) { const a = i * 1.047; gfx.fire(s, Math.cos(a) * 2.2, 8.7, Math.sin(a) * 2.2, 0xffa050, 0.45, 0); seg([Math.cos(a) * 2.2, 8.6, Math.sin(a) * 2.2], [0, 12, 0], 0.03); }
+    const chandL = new T.PointLight(0xffb070, 16, 22, 1.4); chandL.position.set(0, 8, 0); s.add(chandL);
+    [3, 4, 5, 6, 7, 0].forEach(i => { const v = V[i], top = [v[0] * 1.1, 5.2, v[1] * 1.1]; let p0 = top; for (let k = 1; k <= 6; k++) { const u = k / 6, p1 = [lerp3(top[0], 0, u * 0.8), 5.2 + u * 3.4 - Math.sin(u * Math.PI) * 1.6, lerp3(top[2], 0, u * 0.8)]; seg(p0, p1, 0.045); p0 = p1; } });
+    [[-3, -3], [2.5, -4], [-4.5, 1.5]].forEach((q, i) => { const m = new T.Mesh(new T.ConeGeometry(2.4, 13, 12, 1, true), new T.MeshBasicMaterial({ color: 0xffd8a0, transparent: true, opacity: 0.035, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide })); m.position.set(q[0], 6.5, q[1]); m.rotation.z = 0.08 * (i - 1); s.add(m); });
+    for (let i = 0; i < 18; i++) {                         // bones, skulls and a dropped blade or two along the walls
+      const a = R(0, 6.28), r = R(6.6, 7.8), x = Math.cos(a) * r, z = Math.sin(a) * r; if (!inOct(x, z, -0.5)) continue;
+      if (i % 3 === 0) { const sk = mesh(new T.SphereGeometry(0.16, 6, 5), boneM, x, 0.14, z, s); sk.scale.set(1, 0.85, 1.15); sk.rotation.y = R(0, 6); }
+      else if (i % 3 === 1) { const b = box(0.5, 0.06, 0.07, boneM, x, 0.04, z, s); b.rotation.y = R(0, 3); }
+      else { const b = box(0.07, 0.03, R(0.6, 1), steelM, x, 0.03, z, s); b.rotation.y = R(0, 3); }
+    }
+    [[-AR - 0.2, 2.6, 1.57], [-AR - 0.2, -2.6, 1.57], [2.6, -AR - 0.2, 0], [-2.6, -AR - 0.2, 0]].forEach(q => {
+      const g = new T.Group(); g.position.set(q[0] + (q[2] ? 0.72 : 0), 0, q[1] + (q[2] ? 0 : 0.72)); g.rotation.y = q[2]; s.add(g);
+      box(1.5, 0.08, 0.12, ironM, 0, 1.5, 0, g); box(1.5, 0.08, 0.12, ironM, 0, 0.6, 0, g);
+      [-0.5, -0.17, 0.17, 0.5].forEach((x, k) => { box(0.07, 1.3, 0.03, steelM, x, 1.05, 0.05, g); if (k % 2) mesh(new T.ConeGeometry(0.1, 0.25, 4), steelM, x, 1.82, 0.05, g); });
+    });
+    [[5, 0], [-5, 0], [0, 5], [0, -5]].forEach(q => { const gr = box(0.9, 0.02, 0.9, new T.MeshBasicMaterial({ color: 0x08060a }), q[0], 0.012, q[1], s); gr.castShadow = false; for (let k = -1; k <= 1; k++) box(0.9, 0.03, 0.06, ironM, q[0], 0.02, q[1] + k * 0.28, s); });
     // crowd
     const n = crowdSpots.length, bodies = new T.InstancedMesh(new T.CapsuleGeometry(0.2, 0.45, 2, 6), new T.MeshLambertMaterial({ flatShading: true }), n), heads = new T.InstancedMesh(new T.SphereGeometry(0.16, 6, 5), new T.MeshLambertMaterial({ flatShading: true }), n);
     const ph = crowdSpots.map(() => R(0, 6.3)), skins = [0xc9977a, 0x7f9a62, 0xb5564e, 0xd8c3ae, 0x8a6a52];
@@ -106,6 +126,7 @@
       bodies.instanceMatrix.needsUpdate = true; heads.instanceMatrix.needsUpdate = true;
       sig.material.opacity = 0.13 + Math.sin(t * 1.5) * 0.04 + hypeNow * 0.12;
       if (Math.random() < 0.25) gfx.emit(R(-8, 8), R(0.5, 4), R(-8, 8), R(-0.2, 0.2), R(0.1, 0.4), R(-0.2, 0.2), 2.2, 0x3a2a18, 0);
+      if (hypeNow > 0.75 && n && Math.random() < 0.35) { const p = crowdSpots[Math.floor(Math.random() * n)]; gfx.emit(p[0], p[1] + 1, p[2], -p[0] * R(0.25, 0.5), R(2, 4), -p[2] * R(0.25, 0.5), 1.4, 0xffd36b, 9); }
     };
     update(0);
     return { scene: s, update, setHype: h => { hypeNow = h; }, flash: new T.PointLight(0xffffff, 0, 14, 1.4) };

@@ -70,12 +70,14 @@
     crate(s, 6.6, -0.6, 0.8); crate(s, 7.4, -0.8, 0.6);
     barrel(s, 0.2, 8.6); barrel(s, 1.0, 9.0); barrel(s, 16.6, 4.2); crate(s, 0.1, 1.2, 0.7);
     lantern(s, 5.5, 0, 8.8, 0xffb060, 16); lantern(s, 16.8, 0, 2.2, 0xffb060, 0);
+    box(1.7, 1.25, 0.1, woodD(), 7.0, 1.9, -1.5, s); [[-0.45, 0.2, 0.5, 0.6], [0.3, 0.25, 0.55, 0.45], [0.05, -0.3, 0.7, 0.4], [-0.5, -0.32, 0.36, 0.34]].forEach(q => { const m = new T.Mesh(new T.PlaneGeometry(q[2], q[3]), new T.MeshLambertMaterial({ color: 0xdccba3 })); m.position.set(7.0 + q[0], 1.9 + q[1], -1.43); m.rotation.z = q[0] * 0.2; s.add(m); });
     const npcs = [fence, gm, idle1];
     const obstacles = [[8.6, -1.6, 11.8, 0.7], [14.8, -1, 16.4, 0.6], [12.4, 6.6, 15.6, 8.6], [6.1, -1.2, 7.9, -0.1], [1.2, -1.2, 2.0, -0.3], [5.2, -1.2, 6.0, -0.3], [-0.3, 8.2, 1.4, 9.4], [16.2, 3.8, 17, 4.6], [5.2, 8.5, 5.8, 9.1]];
     return {
       scene: s, start: { x: 8, z: 5 }, zoom: [12.5, 21],
       spots: [
         { x: 3.6, z: 0.1, r: 2.1, y: 4.5, label: 'The Blood Pit', act: 'Enter the pit', go: () => G.ui.pit() },
+        { x: 7.0, z: 0.7, r: 1.4, y: 3.0, label: 'Notice Board', act: 'Read the Codex', go: () => G.ui.codex() },
         { x: 10.2, z: 1.3, r: 1.9, y: 3.2, label: 'The Fence', act: 'Trade', go: () => G.ui.shop() },
         { x: 15.6, z: 1.3, r: 1.9, y: 3.2, label: 'Guildmaster', act: 'Character', go: () => G.ui.sheet() },
         { x: -0.2, z: 5.2, r: 1.9, y: 3.6, label: 'Your Hideout', act: 'Go home', go: () => G.ui.hideout() }
@@ -105,6 +107,17 @@
     statues: g => { const st = stoneMat(0x9a968e); box(0.7, 0.4, 0.7, st, 0, 0.2, 0, g); box(0.42, 0.75, 0.3, st, 0, 0.78, 0, g); mesh(new T.SphereGeometry(0.18, 6, 5), st, 0, 1.32, 0, g); box(0.1, 1.2, 0.1, st, 0.3, 1.0, 0.16, g); mesh(new T.ConeGeometry(0.1, 0.28, 4), st, 0.3, 1.72, 0.16, g); box(0.44, 0.5, 0.06, st, -0.12, 0.8, 0.2, g); },
     crystals: g => { [[0, 0, 1.7, 0], [0.22, 0.12, 1.1, 0.35], [-0.2, 0.1, 1.2, 0.35], [0.05, -0.24, 0.8, 0.5], [-0.12, -0.2, 0.6, 0.6]].forEach(q => shard(g, q[0], q[1], q[2], q[2] > 1.5 ? 0xd8f0ff : 0x8ad0ff, q[3])); mesh(new T.DodecahedronGeometry(0.4, 0), stoneMat(0x5a5660), 0, 0.1, 0, g); return [0, 1.0, 0]; }
   };
+  Object.assign(BUILD, {
+    fern: g => { mesh(new T.CylinderGeometry(0.2, 0.15, 0.22, 6), L(0x6a4a34), 0, 0.11, 0, g); for (let i = 0; i < 7; i++) { const a = i * 0.9, m = mesh(new T.ConeGeometry(0.09, 0.75, 4), L(i % 2 ? 0x3f8a4a : 0x2f6e3c), Math.cos(a) * 0.14, 0.52, Math.sin(a) * 0.14, g); m.rotation.set(Math.sin(a) * 0.55, 0, -Math.cos(a) * 0.55); } },
+    bench: g => { const st = stoneMat(0x8a8680); box(1.7, 0.14, 0.5, st, 0, 0.5, 0, g); box(0.25, 0.44, 0.44, st, -0.6, 0.22, 0, g); box(0.25, 0.44, 0.44, st, 0.6, 0.22, 0, g); },
+    weaponrack: g => { box(1.8, 0.1, 0.3, woodD(), 0, 0.08, 0, g); box(0.1, 1.5, 0.12, woodD(), -0.8, 0.75, 0, g); box(0.1, 1.5, 0.12, woodD(), 0.8, 0.75, 0, g); box(1.7, 0.08, 0.1, wood(), 0, 1.3, 0, g); box(1.7, 0.08, 0.1, wood(), 0, 0.55, 0, g); const steel = new T.MeshPhongMaterial({ color: 0xcfd8e0, shininess: 70, flatShading: true }); [-0.5, 0, 0.5].forEach((x, i) => { box(0.08, i === 1 ? 1.35 : 1.1, 0.03, steel, x, 0.85, 0.08, g); box(0.26, 0.06, 0.06, L(0xb09a5a), x, 0.38, 0.08, g); }); },
+    table: g => { box(1.8, 0.1, 1.5, wood(), 0, 0.8, 0, g); [[-0.75, -0.6], [0.75, -0.6], [-0.75, 0.6], [0.75, 0.6]].forEach(q => box(0.12, 0.78, 0.12, woodD(), q[0], 0.39, q[1], g)); mesh(new T.CylinderGeometry(0.2, 0.2, 0.04, 8), L(0xd8c8a0), -0.4, 0.87, 0.2, g); mesh(new T.CylinderGeometry(0.2, 0.2, 0.04, 8), L(0xd8c8a0), 0.45, 0.87, -0.25, g); mesh(new T.CylinderGeometry(0.07, 0.09, 0.22, 6), L(0x8a6a34), 0.1, 0.96, 0.35, g); mesh(new T.CylinderGeometry(0.04, 0.04, 0.26, 5), L(0xe8e0d0), 0, 0.98, 0, g); em(new T.SphereGeometry(0.06, 6, 5), 0xffe0a0, 0, 1.16, 0, g); return [0, 1.2, 0]; },
+    firebowl: g => { brazier(g, 0, 0, 0, 0, 0xff8a30); return [0, 1.2, 0]; },
+    bookshelf: g => { box(1.8, 1.9, 0.42, woodD(), 0, 0.95, 0, g); [0.5, 1.0, 1.5].forEach(y => { box(1.66, 0.05, 0.44, wood(), 0, y, 0.02, g); for (let i = 0; i < 9; i++) box(0.13, 0.3 + (i * 7 % 3) * 0.05, 0.3, L([0x7a1c22, 0x245a44, 0x4a2a7a, 0x8a6a34, 0x2a4a7a][(i + y * 10 | 0) % 5]), -0.72 + i * 0.18, y + 0.2, 0.06, g); }); },
+    hearth: g => { const st = stoneMat(0x7a746e); box(1.9, 1.5, 0.7, st, 0, 0.75, 0, g); box(1.3, 2.2, 0.5, st, 0, 1.1, -0.08, g); box(2.0, 0.14, 0.8, stoneMat(0x57524e), 0, 1.5, 0.02, g); const hole = box(1.1, 0.85, 0.3, new T.MeshBasicMaterial({ color: 0x0a0504 }), 0, 0.5, 0.24, g); hole.castShadow = false; box(0.7, 0.12, 0.2, woodD(), 0, 0.16, 0.3, g); gfx.fire(g, 0, 0.3, 0.32, 0xff8a30, 0.7, 0); return [0, 0.8, 0.5]; },
+    dummy: g => { mesh(new T.CylinderGeometry(0.07, 0.09, 1.3, 6), woodD(), 0, 0.65, 0, g); box(0.5, 0.06, 0.5, woodD(), 0, 0.03, 0, g); mesh(new T.CylinderGeometry(0.26, 0.22, 0.7, 8), L(0xb8a070), 0, 1.15, 0, g); box(1.1, 0.1, 0.1, woodD(), 0, 1.3, 0, g); mesh(new T.SphereGeometry(0.2, 7, 6), L(0xb8a070), 0, 1.72, 0, g); const tg = new T.Mesh(new T.CircleGeometry(0.14, 12), emis(0xc22a22)); tg.position.set(0, 1.18, 0.27); g.add(tg); },
+    willow: g => { mesh(new T.CylinderGeometry(0.18, 0.3, 2.2, 6), L(0x4a3a30), 0, 1.1, 0, g); mesh(new T.DodecahedronGeometry(0.9, 0), L(0x2f6e5a), 0, 2.6, 0, g); for (let i = 0; i < 12; i++) { const a = i * 0.524, r = 0.75 + (i % 3) * 0.12, len = 1.0 + (i % 4) * 0.25; const m = new T.Mesh(new T.CylinderGeometry(0.03, 0.02, len, 4), emis(i % 2 ? 0x7affc0 : 0x5ad8a0)); m.position.set(Math.cos(a) * r, 2.5 - len / 2, Math.sin(a) * r); g.add(m); } gfx.glow(0x7affc0, 4, 0, 2.2, 0, g, 0.3); g.userData.fx = 'willow'; return [0, 2.2, 0]; }
+  });
   const footprint = (it, r) => r % 2 ? [it.d, it.w] : [it.w, it.d];
   function buildItem(id, r) {
     const it = G.DECOR_BY[id], g = new T.Group(), inner = new T.Group(); g.add(inner);
@@ -116,45 +129,46 @@
   }
 
   // ============================================================== HIDEOUT
-  const GW = 12, GD = 11, isHouse = (x, z) => x <= 6 && z <= 4;
+  const GW = 18, GD = 16, HX = 9, HZ = 6, isHouse = (x, z) => x <= HX && z <= HZ;
   W.grid = { GW, GD, isHouse, footprint };
   W.buildHideout = function () {
-    const s = gfx.newScene({ ambient: 1.3, key: 1.15, shadowSize: 14, sky: 0x7a80b8, ground: 0x182018, keyColor: 0xc8d0ff });
-    s.fog = new T.Fog(0x07060a, 74, 108);
-    const key = s.userData.key; key.position.set(12, 16, 14); key.target.position.set(5.5, 0, 5);
-    const house = [], garden = [], pathTint = new T.Color(0.75, 0.72, 0.7);
-    for (let x = 0; x < GW; x++) for (let z = 0; z < GD; z++) (isHouse(x, z) ? house : garden).push({ x, z });
+    const s = gfx.newScene({ ambient: 1.3, key: 1.15, shadowSize: 20, sky: 0x7a80b8, ground: 0x182018, keyColor: 0xc8d0ff });
+    s.fog = new T.Fog(0x07060a, 74, 112);
+    const key = s.userData.key; key.position.set(18, 20, 20); key.target.position.set(8, 0, 7);
+    const house = [], garden = [], pathTint = new T.Color(0.95, 0.9, 0.82);
+    for (let x = 0; x < GW; x++) for (let z = 0; z < GD; z++) (isHouse(x, z) ? house : garden).push({ x, z, tint: !isHouse(x, z) && (x === 13 || x === 14) && z < 9 ? pathTint : null });
     tiles(s, house, 'stone', [0.72, 0.66, 0.6]);
     tiles(s, garden, 'moss', [0.62, 0.78, 0.6]);
     const st = stoneMat(0x857d74), stD = stoneMat(0x645e58), rock = new T.MeshLambertMaterial({ color: 0x4a4650, map: gfx.tex('rock'), flatShading: true });
     // house walls on the two far sides
-    const w1 = wall(s, 7.6, 3.2, 0.6, st); w1.position.set(3.0, 0, -0.85);
-    const w2 = wall(s, 5.6, 3.2, 0.6, st); w2.position.set(-0.85, 0, 2.0); w2.rotation.y = Math.PI / 2;
-    box(0.9, 3.6, 0.9, stD, -0.85, 1.8, -0.85, s); box(0.8, 3.5, 0.8, stD, 6.75, 1.75, -0.85, s); box(0.8, 3.5, 0.8, stD, -0.85, 1.75, 4.75, s);
-    windowLight(s, 1.5, 2.1, -0.52, 0); windowLight(s, 4.6, 2.1, -0.52, 0);
-    // low inner walls with door gaps
-    const low = [[-0.5, 4.5, 2.3, 4.5], [3.7, 4.5, 6.5, 4.5], [6.5, -0.5, 6.5, 1.3], [6.5, 2.7, 6.5, 4.5]];
-    low.forEach(q => { const len = Math.hypot(q[2] - q[0], q[3] - q[1]); const m = box(q[1] === q[3] ? len : 0.3, 0.7, q[1] === q[3] ? 0.3 : len, st, (q[0] + q[2]) / 2, 0.35, (q[1] + q[3]) / 2, s); });
-    [[2.3, 4.5], [3.7, 4.5], [6.5, 1.3], [6.5, 2.7], [6.5, 4.5]].forEach(q => box(0.42, 1.0, 0.42, stD, q[0], 0.5, q[1], s));
+    const w1 = wall(s, HX + 1.7, 3.2, 0.6, st); w1.position.set(HX / 2, 0, -0.85);
+    const w2 = wall(s, HZ + 1.7, 3.2, 0.6, st); w2.position.set(-0.85, 0, HZ / 2); w2.rotation.y = Math.PI / 2;
+    box(0.9, 3.6, 0.9, stD, -0.85, 1.8, -0.85, s); box(0.8, 3.5, 0.8, stD, HX + 0.75, 1.75, -0.85, s); box(0.8, 3.5, 0.8, stD, -0.85, 1.75, HZ + 0.75, s);
+    [1.5, 4.5, 7.5].forEach(x => windowLight(s, x, 2.1, -0.52, 0)); windowLight(s, -0.52, 2.1, 3.5, Math.PI / 2);
+    // low walls: the outer edge of the house, and a partition that makes two rooms. Gaps are doorways.
+    const low = [[-0.5, HZ + 0.5, 3.3, HZ + 0.5], [4.7, HZ + 0.5, HX + 0.5, HZ + 0.5], [HX + 0.5, -0.5, HX + 0.5, 2.3], [HX + 0.5, 3.7, HX + 0.5, HZ + 0.5], [5.5, -0.5, 5.5, 1.3], [5.5, 2.7, 5.5, HZ + 0.5]];
+    low.forEach(q => { const len = Math.hypot(q[2] - q[0], q[3] - q[1]); box(q[1] === q[3] ? len : 0.3, 0.7, q[1] === q[3] ? 0.3 : len, st, (q[0] + q[2]) / 2, 0.35, (q[1] + q[3]) / 2, s); });
+    [[3.3, HZ + 0.5], [4.7, HZ + 0.5], [HX + 0.5, 2.3], [HX + 0.5, 3.7], [HX + 0.5, HZ + 0.5], [5.5, 1.3], [5.5, 2.7]].forEach(q => box(0.42, 1.0, 0.42, stD, q[0], 0.5, q[1], s));
     // cave rock around the garden
     const boulder = (x, y, z, r) => { const m = mesh(new T.DodecahedronGeometry(r, 0), rock, x, y, z, s); m.rotation.set(R(0, 3), R(0, 3), R(0, 3)); m.scale.y = R(0.8, 1.5); };
-    for (let x = 7.6; x < GW + 1; x += 1.3) boulder(x + R(-0.2, 0.2), R(0.6, 1.6), -1.4 + R(-0.3, 0.2), R(1.1, 1.7));
-    for (let z = 5.6; z < GD + 1; z += 1.3) boulder(-1.4 + R(-0.3, 0.2), R(0.6, 1.6), z + R(-0.2, 0.2), R(1.1, 1.7));
+    for (let x = HX + 1.6; x < GW + 1; x += 1.3) boulder(x + R(-0.2, 0.2), R(0.6, 1.8), -1.4 + R(-0.3, 0.2), R(1.1, 1.8));
+    for (let z = HZ + 1.6; z < GD + 1; z += 1.3) boulder(-1.4 + R(-0.3, 0.2), R(0.6, 1.8), z + R(-0.2, 0.2), R(1.1, 1.8));
     for (let x = -1; x < GW + 1; x += 1.5) boulder(x + R(-0.3, 0.3), -0.1, GD + 0.3 + R(-0.1, 0.3), R(0.5, 0.8));
     for (let z = -1; z < GD + 1; z += 1.5) boulder(GW + 0.3 + R(-0.1, 0.3), -0.1, z + R(-0.3, 0.3), R(0.5, 0.8));
-    [[8.2, -1.2, 0x8ad0ff], [-1.2, 8.5, 0xb090ff], [11.8, 10.6, 0x8ad0ff], [-1.1, 6.2, 0x8ad0ff]].forEach(q => { const g = new T.Group(); g.position.set(q[0], 0.9, q[1]); s.add(g); shard(g, 0, 0, 0.7, q[2], 0.3); shard(g, 0.2, 0.1, 0.45, q[2], 0.6); gfx.glow(q[2], 2.2, 0, 0.4, 0, g, 0.35); });
+    // stalactites hanging in the dark above the far rock, and wild crystal in the corners
+    for (let i = 0; i < 14; i++) { const far = i % 2, m = mesh(new T.ConeGeometry(R(0.25, 0.5), R(1.5, 3.2), 5), rock, far ? R(HX + 2, GW) : -1.6 + R(-0.5, 0.3), R(5.2, 6.5), far ? -1.7 + R(-0.5, 0.3) : R(HZ + 2, GD)); m.rotation.x = Math.PI; }
+    [[HX + 2.2, -1.2, 0x8ad0ff], [-1.2, 12.5, 0xb090ff], [17.8, 15.6, 0x8ad0ff], [-1.1, 9.2, 0x8ad0ff], [16.5, -1.2, 0xb090ff], [8, 16.4, 0x7affc0]].forEach(q => { const g = new T.Group(); g.position.set(q[0], 0.9, q[1]); s.add(g); shard(g, 0, 0, 0.7, q[2], 0.3); shard(g, 0.2, 0.1, 0.45, q[2], 0.6); gfx.glow(q[2], 2.2, 0, 0.4, 0, g, 0.35); });
     // exit to the undercity
-    doorway(s, 9.5, -0.95, 0, 0xffa040, 1.5, 2.5);
-    const baseLight = new T.PointLight(0xffb070, 14, 12, 1.6); baseLight.position.set(1.2, 2.6, 0.6); s.add(baseLight);
-    box(0.1, 0.4, 0.1, iron(), 0.2, 2.5, -0.5, s); gfx.fire(s, 0.2, 2.75, -0.4, 0xffa050, 0.45, 0);
-    const exitLight = new T.PointLight(0xffa040, 10, 9, 1.6); exitLight.position.set(9.5, 2, 0.4); s.add(exitLight);
+    doorway(s, 13.5, -0.95, 0, 0xffa040, 1.5, 2.5);
+    [[1.2, 0.6], [7.6, 0.6]].forEach(q => { const l = new T.PointLight(0xffb070, 13, 12, 1.6); l.position.set(q[0], 2.6, q[1]); s.add(l); box(0.1, 0.4, 0.1, iron(), q[0] - 1, 2.5, -0.5, s); gfx.fire(s, q[0] - 1, 2.75, -0.4, 0xffa050, 0.45, 0); });
+    const exitLight = new T.PointLight(0xffa040, 10, 9, 1.6); exitLight.position.set(13.5, 2, 0.4); s.add(exitLight);
 
     const itemsGroup = new T.Group(); s.add(itemsGroup);
-    const lights = []; for (let i = 0; i < 7; i++) { const l = new T.PointLight(0xffffff, 0, 8, 1.5); s.add(l); lights.push(l); }
+    const lights = []; for (let i = 0; i < 9; i++) { const l = new T.PointLight(0xffffff, 0, 8, 1.5); s.add(l); lights.push(l); }
     let occ = {}, fxItems = [], ghost = null, ghostPad = null;
     const H = {
-      scene: s, start: { x: 9.5, z: 1.4 }, zoom: [12.5, 21],
-      spots: [{ x: 9.5, z: 0.2, r: 1.6, y: 3.5, label: 'Undercity', act: 'Leave', go: () => G.ui.hub() }],
+      scene: s, start: { x: 13.5, z: 1.4 }, zoom: [13.5, 23],
+      spots: [{ x: 13.5, z: 0.2, r: 1.6, y: 3.5, label: 'Undercity', act: 'Leave', go: () => G.ui.hub() }],
       itemAt: (x, z) => { const v = occ[Math.round(x) + ',' + Math.round(z)]; return v == null ? -1 : v.i; },
       canPlace: (id, x, z, r, skip) => {
         const it = G.DECOR_BY[id], f = footprint(it, r);
@@ -163,7 +177,7 @@
           if (cx < 0 || cz < 0 || cx >= GW || cz >= GD) return false;
           if (it.zone === 'house' && !isHouse(cx, cz)) return false;
           if (it.zone === 'garden' && isHouse(cx, cz)) return false;
-          if ((cx === 9 || cx === 10) && cz <= 1) return false;                 // keep the exit clear
+          if ((cx === 13 || cx === 14) && cz <= 1) return false;                 // keep the exit clear
           const o = occ[cx + ',' + cz]; if (o && o.i !== skip) return false;
         }
         return true;
@@ -174,7 +188,8 @@
         lights.forEach(l => l.intensity = 0);
         (G.state.items || []).forEach((p, i) => {
           if (p.hidden) return;
-          const it = G.DECOR_BY[p.id], f = footprint(it, p.r), g = buildItem(p.id, p.r);
+          const it = G.DECOR_BY[p.id]; if (!it) return;
+          const f = footprint(it, p.r), g = buildItem(p.id, p.r);
           g.position.set(p.x + (f[0] - 1) / 2, 0, p.z + (f[1] - 1) / 2); itemsGroup.add(g);
           for (let a = 0; a < f[0]; a++) for (let b = 0; b < f[1]; b++) occ[(p.x + a) + ',' + (p.z + b)] = { i, walk: it.walk };
           if (it.light && li < lights.length) { const l = lights[li++]; l.color.set(it.light); l.intensity = 9; l.position.copy(g.position).add(g.userData.lightPos); l.position.y += 0.3; }
@@ -200,9 +215,10 @@
         fxItems.forEach(f => {
           if (f.fx === 'fountain' && Math.random() < 0.6) gfx.emit(f.x + R(-0.1, 0.1), 1.35, f.z + R(-0.1, 0.1), R(-0.9, 0.9), R(1.5, 2.6), R(-0.9, 0.9), 0.7, 0x8ae0ff, 7);
           if (f.fx === 'cauldron' && Math.random() < 0.3) gfx.emit(f.x + R(-0.2, 0.2), 0.7, f.z + R(-0.2, 0.2), 0, R(0.5, 1.2), 0, 0.9, 0x8aff5a, 0);
+          if (f.fx === 'willow' && Math.random() < 0.25) gfx.emit(f.x + R(-1, 1), R(1, 2.4), f.z + R(-1, 1), 0, -0.25, 0, 1.6, 0x7affc0, 0);
         });
         if (ghost) ghost.position.y = 0.1 + Math.sin(t * 5) * 0.04;
-        if (Math.random() < 0.25) gfx.emit(R(0, GW), R(0.3, 2.5), R(5, GD), R(-0.15, 0.15), R(0, 0.15), R(-0.15, 0.15), 3, 0x3a5a6a, 0);
+        if (Math.random() < 0.3) gfx.emit(R(0, GW), R(0.3, 2.5), R(HZ, GD), R(-0.15, 0.15), R(0, 0.15), R(-0.15, 0.15), 3, 0x3a5a6a, 0);
       }
     };
     H.refresh();

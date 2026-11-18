@@ -93,33 +93,45 @@
 
     let lastAlpha = 1;
     const C = { root, body, mats, height: 1.9 * sc };
-    // pose: {moving, walk, act:'idle|swing|cast|stun|dodge|ko', prog, flash, alpha, t, glow(color)}
+    // Joint targets are computed per state, then eased toward, so stances blend instead of snapping.
+    const cur = {}, J = (k, v, s) => (cur[k] = cur[k] == null ? v : cur[k] + (v - cur[k]) * s);
+    const mix = G.lerp, eo = x => 1 - Math.pow(1 - x, 3), ei = x => x * x;
+    const restL = cls === 'fighter' ? -0.9 : cls === 'rogue' || cls === 'sorcerer' ? -0.5 : 0.05;
+    // pose: {moving, walk, act:'idle|swing|cast|stun|dodge|ko', prog, step (combo step), hurt, guard, flash, alpha, t, glow}
     C.pose = function (p) {
-      const t = p.t || 0, mv = p.moving && p.act !== 'ko' && p.act !== 'dodge';
-      const sw = mv ? Math.sin(p.walk) : 0;
-      body.position.y = mv ? Math.abs(Math.cos(p.walk)) * 0.06 : Math.sin(t * 2.4) * 0.015;
-      body.rotation.set(mv ? 0.12 : 0, 0, 0);
-      legL.rotation.x = sw * 0.7; legR.rotation.x = -sw * 0.7;
-      torso.rotation.set(0, 0, 0); head.rotation.set(0, 0, 0);
-      let ar = -0.45 + (mv ? -sw * 0.3 : Math.sin(t * 2.4) * 0.04), al = (cls === 'fighter' ? -0.9 : cls === 'rogue' || cls === 'sorcerer' ? -0.5 : 0.05) + (mv ? sw * 0.3 : 0), arz = 0, alz = 0;
-      if (p.act === 'swing') {
-        const k = Math.min(1, p.prog || 0), e = k < 0.5 ? k * 2 : 1;
-        ar = k < 0.5 ? G.lerp(-0.45, -2.7, Math.min(1, k * 4)) + (k > 0.25 ? (k - 0.25) * 4 * 2.6 : 0) : G.lerp(-0.1, -0.45, (k - 0.5) * 2);
-        torso.rotation.y = G.lerp(0.5, -0.5, e) * (k < 0.5 ? 1 : 1 - (k - 0.5) * 2);
-        body.rotation.x = 0.18; if (cls === 'rogue') al = ar + 0.5;
-      } else if (p.act === 'cast') {
-        const k = Math.min(1, p.prog || 0); ar = -1.5 - k * 0.3; al = cls === 'cleric' ? -0.3 : -1.5 - k * 0.3; arz = -0.25; alz = 0.25; body.rotation.x = -0.05;
-      } else if (p.act === 'stun') { head.rotation.z = Math.sin(t * 9) * 0.3; torso.rotation.z = Math.sin(t * 7) * 0.12; ar = 0.1; al = 0.1; body.rotation.x = 0.25; }
-      armR.rotation.set(ar, 0, arz); armL.rotation.set(al, 0, alz);
-      if (cape) cape.rotation.x = 0.16 + (mv ? 0.35 + sw * 0.1 : Math.sin(t * 2) * 0.04);
+      const t = p.t || 0, act = p.act || 'idle', mv = p.moving && act !== 'ko' && act !== 'dodge';
+      const sw = mv ? Math.sin(p.walk) : 0, k = Math.max(0, Math.min(1, p.prog || 0));
+      const q = { by: Math.sin(t * 2.4) * 0.015, bx: 0.06, bz: Math.sin(t * 1.2) * 0.02, bpz: 0, ll: 0.05, lr: -0.05, ty: Math.sin(t * 1.2) * 0.04, tz: 0, hx: 0, hz: 0,
+        arx: -0.45 + Math.sin(t * 2.4) * 0.04, arz: 0, alx: restL + Math.sin(t * 2.4 + 1) * 0.03, alz: 0, cape: 0.16 + Math.sin(t * 2) * 0.04 };
+      let snap = 0.28;
+      if (mv) { q.by = Math.abs(Math.cos(p.walk)) * 0.075; q.bx = 0.17; q.ll = sw * 0.85; q.lr = -sw * 0.85; q.ty = sw * 0.16; q.arx += -sw * 0.38; q.alx += sw * 0.38; q.cape = 0.52 + sw * 0.1; q.hx = -0.06; snap = 0.5; }
+      if (act === 'swing') {
+        snap = 1; const step = p.step || 0, w = Math.min(1, k / 0.5), r = Math.max(0, (k - 0.5) / 0.5);
+        const cock = eo(Math.min(1, w / 0.6)), hit = ei(Math.max(0, (w - 0.6) / 0.4)), back = r * r * (3 - 2 * r);
+        const seq = (ready, cocked, struck) => k < 0.5 ? mix(mix(ready, cocked, cock), struck, hit) : mix(struck, ready, back);
+        if (step === 0) { q.arx = seq(-0.45, -2.6, 0.3); q.arz = seq(0, -0.5, 0.5); q.ty = seq(0, 0.6, -0.65); q.bx = seq(0.06, -0.06, 0.3); }
+        else if (step === 1) { q.arx = seq(-0.45, -1.35, -1.15); q.arz = seq(0, 1.0, -1.2); q.ty = seq(0, -0.75, 0.8); q.bx = seq(0.06, 0.06, 0.22); }
+        else { q.arx = seq(-0.45, -3.05, 0.5); q.alx = seq(restL, -2.9, 0.4); q.bx = seq(0.06, -0.3, 0.5); q.by = k < 0.5 ? Math.sin(w * Math.PI) * 0.42 : 0; q.ll = q.lr = k < 0.5 ? Math.sin(w * Math.PI) * 0.7 : 0; q.hx = seq(0, -0.3, 0.2); }
+        q.bpz = seq(0, -0.1, 0.24); q.cape = 0.3 + hit * 0.5;
+        if (cls === 'rogue' && step < 2) { q.alx = q.arx + 0.5; q.alz = -q.arz * 0.6; }
+      } else if (act === 'cast') {
+        snap = 0.6; q.arx = cls === 'cleric' ? mix(-1.4, -2.8, eo(k)) : -1.5 - k * 0.4; q.alx = cls === 'cleric' ? -0.4 : -1.5 - k * 0.4; q.arz = -0.25; q.alz = 0.25; q.bx = -0.1 - k * 0.08; q.by += k * 0.06; q.hx = -0.15 * k; q.cape = 0.3 + k * 0.4;
+      } else if (act === 'stun') { q.hz = Math.sin(t * 9) * 0.3; q.tz = Math.sin(t * 7) * 0.12; q.arx = 0.1; q.alx = 0.1; q.bx = 0.28; q.by = -0.04; }
+      if (p.guard) { q.alx = -1.55; q.alz = -0.55; q.arx = -1.25; q.arz = 0.45; q.bx = 0.14; q.by = -0.05; snap = 0.5; }
+      if (p.hurt > 0) { const h = Math.min(1, p.hurt / 0.28); q.bx -= 0.42 * h; q.hx = -0.4 * h; q.arx += 0.55 * h; q.alx += 0.65 * h; q.bpz -= 0.1 * h; snap = Math.max(snap, 0.7); }
+      body.position.y = J('by', q.by, snap); body.position.z = J('bpz', q.bpz, snap); body.rotation.set(J('bx', q.bx, snap), 0, J('bz', q.bz, snap));
+      legL.rotation.x = J('ll', q.ll, snap); legR.rotation.x = J('lr', q.lr, snap);
+      torso.rotation.set(0, J('ty', q.ty, snap), J('tz', q.tz, snap)); head.rotation.set(J('hx', q.hx, snap), -cur.ty * 0.6, J('hz', q.hz, snap));
+      armR.rotation.set(J('arx', q.arx, snap), 0, J('arz', q.arz, snap)); armL.rotation.set(J('alx', q.alx, snap), 0, J('alz', q.alz, snap));
+      if (cape) cape.rotation.x = J('cape', q.cape, 0.2);
       if (robe) robe.rotation.z = mv ? sw * 0.08 : 0;
       root.rotation.z = 0; root.rotation.x = 0; root.position.y = p.y || 0;
-      if (p.act === 'dodge') { body.rotation.x = (p.prog || 0) * Math.PI * 2; body.position.y = 0.5; legL.rotation.x = legR.rotation.x = 1.6; ar = al = -2; armR.rotation.x = armL.rotation.x = -2; }
-      if (p.act === 'ko') { const k = Math.min(1, (p.prog || 0) * 2.2); body.rotation.x = -1.5 * k; body.position.y = 0.2 * k; legL.rotation.x = 0.3 * k; armR.rotation.set(-2.6 * k, 0, -0.5 * k); armL.rotation.set(-2.4 * k, 0, 0.6 * k); }
+      if (act === 'dodge') { body.rotation.x = k * Math.PI * 2; body.position.y = 0.5; legL.rotation.x = legR.rotation.x = 1.6; armR.rotation.x = armL.rotation.x = -2; cur.bx = 0.3; cur.by = 0.2; }
+      if (act === 'ko') { const f = Math.min(1, (p.prog || 0) * 2.2), e = eo(f); body.rotation.x = -1.5 * e; body.position.y = 0.2 * e + Math.sin(f * Math.PI) * 0.25; legL.rotation.x = 0.3 * e; legR.rotation.x = -0.15 * e; armR.rotation.set(-2.6 * e, 0, -0.5 * e); armL.rotation.set(-2.4 * e, 0, 0.6 * e); head.rotation.x = -0.3 * e; }
       // sorcerer flames + cast glow
       const fl = 0.85 + Math.sin(t * 17) * 0.12;
-      if (orbs) orbs.forEach(o => o.scale.setScalar((p.act === 'cast' ? 1.2 + (p.prog || 0) * 0.9 : 0.9) * fl));
-      if (p.act === 'cast' && p.glow) { castGlow.material.color.set(p.glow); castGlow.material.opacity = 0.9; castGlow.scale.setScalar(0.6 + (p.prog || 0) * 1.4); } else castGlow.material.opacity = 0;
+      if (orbs) orbs.forEach(o => o.scale.setScalar((act === 'cast' ? 1.2 + k * 0.9 : 0.9) * fl));
+      if (act === 'cast' && p.glow) { castGlow.material.color.set(p.glow); castGlow.material.opacity = 0.9; castGlow.scale.setScalar(0.6 + k * 1.4); } else castGlow.material.opacity = 0;
       // flash + stealth
       const fl2 = p.flash > 0;
       for (const mt of mats) { if (fl2) mt.emissive.setRGB(0.9, 0.9, 0.9); else mt.emissive.copy(mt.userData.e); }

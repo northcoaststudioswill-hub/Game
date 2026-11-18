@@ -30,6 +30,7 @@
   // ---------- audio (tiny synth, no files) ----------
   let ac = null, master = null;
   G.muted = false;
+  G.audioCtx = () => ac; G.audioOut = () => master;
   G.audioInit = () => {
     if (ac) { if (ac.state === 'suspended') ac.resume(); return; }
     try {
@@ -76,7 +77,15 @@
     win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.3, 'triangle', 0.14, 1, i * 0.13)),
     lose: () => [392, 330, 262, 196].forEach((f, i) => tone(f, 0.35, 'sawtooth', 0.08, 1, i * 0.16)),
     level: () => [392, 523, 659, 784, 1047].forEach((f, i) => tone(f, 0.25, 'sine', 0.14, 1, i * 0.09)),
-    crowd: () => noise(0.9, 0.12, 700, 'bandpass')
+    crowd: () => noise(0.9, 0.12, 700, 'bandpass'),
+    cheer: () => { noise(1.6, 0.2, 900, 'bandpass'); noise(1.2, 0.1, 1800, 'bandpass', 0.15); },
+    clang: () => { tone(1250, 0.18, 'square', 0.07, 0.7); tone(1870, 0.22, 'triangle', 0.07, 0.8); noise(0.06, 0.2, 4000, 'highpass'); },
+    perfect: () => { tone(880, 0.12, 'sine', 0.12); tone(1320, 0.16, 'sine', 0.12, 1, 0.07); tone(1760, 0.3, 'sine', 0.1, 1, 0.14); },
+    'break': () => { noise(0.25, 0.4, 1600); tone(220, 0.25, 'sawtooth', 0.14, 0.4); tone(660, 0.2, 'square', 0.08, 0.5, 0.03); },
+    wall: () => { noise(0.3, 0.45, 300); tone(60, 0.3, 'sine', 0.3, 0.6); },
+    step: () => noise(0.035, 0.035, 500),
+    place: () => { noise(0.08, 0.2, 400); tone(180, 0.1, 'sine', 0.12, 0.7); },
+    page: () => noise(0.12, 0.08, 2600, 'highpass')
   };
   G.sfx = n => { if (SFX[n]) SFX[n](); };
 
@@ -123,6 +132,9 @@
       if (dc.statues) d.dr += 0.05;
       if (dc.crystals) d.crit += 0.03;
       if (dc.desk) d.cdr += 0.06;
+      if (dc.dummy) d.dmgMul += 0.04;
+      if (dc.bookshelf) d.xpMul += 0.05;
+      if (dc.hearth) d.potionMul = 1.2;
       d.weapon = st.gear.weapon * 2;
       d.dr += st.gear.armor * 0.06;
     }

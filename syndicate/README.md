@@ -24,18 +24,27 @@ phone portrait, phone landscape, or a desktop monitor.
   Guildmaster, your Hideout door), the Blood Pit arena, and your Hideout.
 - **Character creation:** 5 origins x 4 classes (Fighter, Rogue, Sorcerer, Cleric), six
   ability scores that each do something in combat.
-- **Real-time combat:** move, aim, attack, dodge with invulnerability frames, three ability
-  slots, an ultimate, potions. Enemy attacks telegraph on the floor in red. Damage is rolled on
-  real dice (1d8 + STR and so on), with crits, stuns, slows, burns, poison, wards, stealth and
-  Sneak Attacks.
+- **Real-time combat built around timing, not mashing:** swings and dodges cost stamina and a
+  whiff leaves you stuck recovering. Three clean hits in rhythm end in a finisher. Hitting a
+  fighter during their wind-up is a COUNTER, hitting them as they recover is a PUNISH. Opponents
+  raise a guard against repeated basic attacks (two blocked swings and you are parried); a real
+  ability breaks the guard and stuns them. A last-instant dodge is a PERFECT DODGE. Knockback into
+  the pit wall does damage. Damage is rolled on real dice (1d8 + STR and so on), with crits, stuns,
+  slows, burns, poison, wards, stealth and Sneak Attacks.
 - **Builds:** level 2 ability choice, level 3 subclass (two per class), level 4 feat, level 5
   ultimate. More abilities than slots, so you choose a loadout.
 - **The ladder:** five opponents ending in the Pit Champion.
 - **Economy:** XP, coin and respect. A crowd-hype meter (land hits, dodge through attacks, vary
   your abilities) raises what you take home. Respect sets your syndicate rank.
-- **Hideout and garden:** buy furniture, lights, plants and trophies and place them yourself on
-  the grid, indoors or in the garden. Move, rotate or store anything. Most pieces give a small
+- **Hideout and garden:** an 18 by 16 tile home with a two-room house and a cave garden. Buy from
+  21 kinds of furniture, lights, plants and trophies and place them yourself. Tap anything you own
+  to pick it up, then drag it, turn it, or store it for a refund. Most pieces give a small
   perk; rank gates the better ones.
+- **Music and sound:** procedural music per area (title, street, home, fight, champion) and synth
+  sound effects, with no audio files.
+- **The Guild Codex:** 21 lore entries on the world, the pit, the trades and the fighters, unsealed
+  as you win and rank up. Read it at the Notice Board or from the character sheet. The same
+  material is in `docs/LORE.md`.
 - **The Fence:** weapon and armour tiers (which change how your fighter looks) and potions.
 - Progress saves in the browser.
 
@@ -71,6 +80,7 @@ and the rest of the game does not change.
 - `js/models.js` character models and animation
 - `js/world.js` the arena; `js/places.js` the street, the hideout, decor pieces, walking
 - `js/fight.js` combat simulation, AI, and its 3D effects
+- `js/cine.js` the opening cinematic; `js/lore.js` codex and bios; `js/music.js` the music sequencer
 - `js/ui.js` menus, HUD, level-up and results screens; `js/main.js` input and main loop
 
 ## Shipping beyond the browser
@@ -81,4 +91,4 @@ folder, and phone store builds are a web-view wrapper (Capacitor). Not set up ye
 ## Not in the slice yet
 
 Authored character models and animation, more arenas, more classes and levels past 5,
-multiclassing, music, cloud saves, typing a name with a controller.
+multiclassing, recorded music or voice, cloud saves, typing a name with a controller.
