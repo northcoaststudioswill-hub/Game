@@ -15,6 +15,11 @@ music video.
   the jets, the fence, the highway at 03:14:22 AM).
 - Game fix found while testing: opp bots could zap spawns through a wall or a standing firewall. They now need a
   clear line of sight.
+- Second cut (Will: titles like a music video, fade out at the last chorus, done by 2:38 because the song has a
+  long ending): the video now ends at 2:38. A title block (lil Bottie / "Overclocked" / Clankin' in the Cloud /
+  Hosted by the cloud) slides in over the intro and again over the highway shot; a BTV bug sits top right; the
+  end card brings the credits in line by line; the song fades out from 2:31.5 and the picture goes to black.
+  The rooftop with the jets moved into hook 2. 45 shots.
 - Timing: tempo, kicks and drum drop-outs are measured; verse 2's line times are measured; the rest is placed from
   the song's structure and may be a bar or two off. See `video/README.md`.
 

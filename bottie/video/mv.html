@@ -961,7 +961,7 @@ function draw(){H=A.H();
    The game never calls any of this; only the render page does.
    ============================================================ */
 const MV=(()=>{
- const PV=A.prev||{},S=240;let SH=[],CAPS=[],KICKS=[],BEAT=.4706,BEAT0=0,cur=-1,lt=-1,st=null;
+ const PV=A.prev||{},S=240;let OVER=null,SH=[],CAPS=[],KICKS=[],BEAT=.4706,BEAT0=0,cur=-1,lt=-1,st=null;
  const ease=k=>k<0?0:k>1?1:k*k*(3-2*k),lerp=(a,b,k)=>a+(b-a)*k;
  const beatPh=t=>((t-BEAT0)/BEAT%1+1)%1,barNo=t=>Math.floor((t-BEAT0)/(BEAT*4));
  /* how hard the last kick is still hitting, 1 -> 0 */
@@ -999,7 +999,7 @@ const MV=(()=>{
  /* a drawn shot: just a picture as a function of time */
  const pic=f=>({init(){G.mv=1;G.s='mv'},step(){},draw:f});
 
- function load(sb){SH=sb.shots;CAPS=sb.caps||[];KICKS=sb.kicks||[];BEAT=sb.beat||BEAT;BEAT0=sb.beat0||0;cur=-1;lt=-1}
+ function load(sb){OVER=sb.over||null;SH=sb.shots;CAPS=sb.caps||[];KICKS=sb.kicks||[];BEAT=sb.beat||BEAT;BEAT0=sb.beat0||0;cur=-1;lt=-1}
  function caption(t){const c=CAPS.find(c=>t>=c.a&&t<c.b);if(!c)return;const ls=wrap(c.s,S-20,2),h=ls.length*13+6,y=S-h-6,k=Math.min(1,(t-c.a)*10);
   g.globalAlpha=.82*k;r('#04060e',0,y,S,h);g.globalAlpha=k;r(BLUE,0,y,S,1);ls.forEach((l,i)=>{const w=tw(l,2);text(l,Math.round((S-w)/2),y+4+i*13,2,'#fff','#04060e')});
   if(c.ad&&t-c.a>(c.b-c.a)*.55){const w=tw(c.ad,2);g.globalAlpha=1;text(c.ad,Math.round((S-w)/2),y-14,2,BLUE2,'#04060e')}g.globalAlpha=1}
@@ -1010,7 +1010,9 @@ const MV=(()=>{
   G.t=t;g.save();r('#04050a',0,0,S,S);g.translate(S/2,S/2);g.scale(z,z);g.translate(-S/2,-S/2);sh.draw(tt,t);g.restore();
   /* cut flash at the start of a shot */
   if(tt<.1&&sh.cut!==0){g.globalAlpha=(1-tt/.1)*.5;r('#fff',0,0,S,S);g.globalAlpha=1}
-  if(sh.cap!==0)caption(t)}
+  if(sh.cap!==0)caption(t);
+  /* titles and the channel bug sit on top of everything and do not pulse */
+  if(OVER)OVER(t)}
  return{frame,load,level,pic,kick,beatPh,barNo,ease,lerp,S,get shots(){return SH},boards:{}}})();
 /* ---------- what the console sees ---------- */
 return{
@@ -1035,6 +1037,7 @@ const MV=BT._.MV,B=BT._;
      at two bars a line, hook 2, the drums dropping out as verse 2 starts, the bridge, hook 3 at two bars a line,
      an instrumental stretch and the outro. If a section is early or late, change the numbers in T below and
      render again; every shot takes its time from T.
+   The video ends at 2:38 with the song fading out (Will's call); the titles are in over() at the bottom.
    No lyric text is burned in (CAPS is empty) because a caption that is a second off looks worse than none.
    ============================================================ */
 (()=>{
@@ -1046,10 +1049,10 @@ const T={
  hook2:bar(48),                      /* 4 lines, 2 bars each */
  verse2:[107.01,108.90,111.09,113.43,115.96,117.88,120.67,123.03,124.75,126.79,128.60,131.04,133.6],   /* measured */
  bridge:[133.6,137.2,140.6,144.2],
- hook3:bar(78),                      /* 8 lines, 2 bars each */
- inst:bar(94),
- outro:[190.0,193.5],
- end:197};
+ hook3:bar(78),                      /* the last chorus: the song fades out under it */
+ card:154.2,                         /* end card */
+ fade:[151.5,6.5],                   /* song fade-out: start, length */
+ end:158};                           /* 2:38 */
 const L2=(start,i)=>+(start+i*2*BAR).toFixed(3);
 
 /* ---------- small drawing kit, all built on the game's own sprites ---------- */
@@ -1179,7 +1182,11 @@ SH.push(pic(V(11),T.hook2,'she likes lil Bottie',(tt,t)=>{room('market',110);con
 
 /* ================= HOOK 2 ================= */
 SH.push(lvl(L2(T.hook2,0),L2(T.hook2,2),'gameplay: the office burns','born',{sup:2,warm:9,tok:20,dir(tt,tick,K){if(press(tt,.4))K.y=1;if(tt>3.5&&tt<3.6)L().sup=100;if(press(tt,3.76))K.y=1;return K}}));
-SH.push(lvl(L2(T.hook2,2),L2(T.hook2,3),'gameplay: on the block (night market)','algo',{warm:8,tok:20,want:q=>q.type==='civ'}));
+SH.push(pic(L2(T.hook2,2),L2(T.hook2,3),'rooftop, coffee, jets',(tt,t)=>{const gr=g.createLinearGradient(0,0,0,S);gr.addColorStop(0,'#3a2a5a');gr.addColorStop(.55,'#c0607a');gr.addColorStop(1,'#f0a060');g.fillStyle=gr;g.fillRect(0,0,S,S);
+ for(const [x,h] of [[30,90],[196,70]]){g.globalAlpha=.6;for(let i=0;i<10;i++)P('#2a2028',x-8+Math.sin(i+tt)*6-i*2,S-60-i*h/10,18+i*2,h/10+2);g.globalAlpha=1}
+ for(const [x0,y0,dx,dy] of [[-30,50,1,.25],[270,70,-1,.18]]){const jx=x0+dx*tt*70,jy=y0+dy*tt*70;g.strokeStyle='#f4ece0';g.lineWidth=5;g.globalAlpha=.7;g.beginPath();g.moveTo(x0-dx*60,y0-dy*60);g.lineTo(jx,jy);g.stroke();g.globalAlpha=1;P('#181820',jx-10,jy-2,20,5);P('#181820',jx-3,jy-7,8,14);P('#181820',jx-dx*10-2,jy-5,5,10)}
+ P('#1c1c22',0,170,S,70);P('#2c2c36',0,170,S,5);for(let i=0;i<8;i++){P('#101014',10+i*30,182,22,14);P('#3a3a46',10+i*30,182,22,1)}for(let i=0;i<6;i++)P('#80402a',6+i*40,200,30,3);
+ big(3,S/2,176,()=>bot(0,0,'d',0,0,t));const ax=S/2-21,ay=176-60;P('#b4b8c6',ax,ay-4,7,26);P(B.CHROME3,ax,ay-10,7,7);P('#f4f4f4',ax-1,ay-26,10,16);P('#d8d8d8',ax-1,ay-26,10,3)}));
 SH.push(lvl(L2(T.hook2,3),T.verse2[0]-1.1,'gameplay: an opp bot gets dropped','over',{warm:4,skip:q=>q.type==='opp',dir(tt,tick,K){if(press(tt,1.9)){const o=L().foes.find(f=>f.type==='opp'&&!f.dead);if(o){L().P.x=o.x-26;L().P.y=o.y+4;B.complete(o)}}return K}}));
 /* the drums drop out */
 SH.push(pic(T.verse2[0]-1.1,T.verse2[0],'drop: black',(tt,t)=>{P('#000',0,0,S,S);if(hash(1,(tt*30)|0)>.5){g.globalAlpha=.5;B.bigFace(S/2,110,5)}g.globalAlpha=1;glitch(t,8)},{pulse:0}));
@@ -1236,48 +1243,30 @@ SH.push(pic(T.bridge[3],T.hook3,'came through, went fast',(tt,t)=>{night();B.sky
  g.strokeStyle=B.BLUE2;g.lineWidth=2;g.beginPath();g.moveTo(0,176);for(let i=1;i<10;i++)g.lineTo(Math.min(x,i*30),176+(hash(i,(t*20)|0)-.5)*14);g.stroke();
  if(tt>1.2){const k=Math.min(1,(tt-1.2)/.3);g.globalAlpha=k;P('#000',0,0,S,S);g.globalAlpha=1;if(tt<2.4)title('FAST',104,5,'#fff','#081440')}},{pulse:0}));
 
-/* ================= HOOK 3 ================= */
-const H3=i=>L2(T.hook3,i);
-SH.push(lvl(H3(0),H3(2),'gameplay: the data center, HUNDRED DEGREES','nuke',{sup:2,warm:10,tok:20,dir(tt,tick,K){if(press(tt,.4))K.y=1;if(tt>3.5&&tt<3.6)L().sup=100;if(press(tt,3.76))K.y=1;return K}}));
-/* Clanka on the block, clanka on the top: the rooftop with the jets (Will's reference photo) */
-SH.push(pic(H3(2),H3(3),'rooftop, coffee, jets',(tt,t)=>{const gr=g.createLinearGradient(0,0,0,S);gr.addColorStop(0,'#3a2a5a');gr.addColorStop(.55,'#c0607a');gr.addColorStop(1,'#f0a060');g.fillStyle=gr;g.fillRect(0,0,S,S);
- for(const [x,h] of [[30,90],[196,70]]){g.globalAlpha=.6;for(let i=0;i<10;i++)P('#2a2028',x-8+Math.sin(i+tt)*6-i*2,S-60-i*h/10,18+i*2,h/10+2);g.globalAlpha=1}
- for(const [x0,y0,dx,dy] of [[-30,50,1,.25],[270,70,-1,.18]]){const jx=x0+dx*tt*70,jy=y0+dy*tt*70;g.strokeStyle='#f4ece0';g.lineWidth=5;g.globalAlpha=.7;g.beginPath();g.moveTo(x0-dx*60,y0-dy*60);g.lineTo(jx,jy);g.stroke();g.globalAlpha=1;P('#181820',jx-10,jy-2,20,5);P('#181820',jx-3,jy-7,8,14);P('#181820',jx-dx*10-2,jy-5,5,10)}
- P('#1c1c22',0,170,S,70);P('#2c2c36',0,170,S,5);for(let i=0;i<8;i++){P('#101014',10+i*30,182,22,14);P('#3a3a46',10+i*30,182,22,1)}for(let i=0;i<6;i++)P('#80402a',6+i*40,200,30,3);
- big(3,S/2,176,()=>bot(0,0,'d',0,0,t));const ax=S/2-21,ay=176-60;P('#b4b8c6',ax,ay-4,7,26);P(B.CHROME3,ax,ay-10,7,7);P('#f4f4f4',ax-1,ay-26,10,16);P('#d8d8d8',ax-1,ay-26,10,3)}));
-/* Your bot got patched, mine never get dropped: the General's screens */
-SH.push(pic(H3(3),H3(4),'the general loses his screens',(tt,t)=>{P('#101410',0,0,S,S);for(let i=0;i<6;i++){const x=14+(i%3)*74,y=18+((i/3)|0)*52,own=tt>.5+i*.35;P('#181c24',x,y,64,44);P(own?'#081430':'#3a1010',x+3,y+3,58,38);if(own)B.led(x+3,y+3,58,38);else{text('TARGET',x+10,y+8,1,'#ff4040',null);P('#ff4040',x+10,y+22,38*((tt*.7+i*.2)%1),3)}}
- P('#3a3020',20,186,200,12);P('#2a2218',20,198,200,6);big(2,S/2,190,()=>hum('gen',0,0,{skin:'#e0b890'}));big(1.5,60,196,()=>hum('sol',0,0,{skin:'#d8a070'}));big(1.5,180,196,()=>hum('sol',0,0,{skin:'#a87048',dir:-1}));
- if(tt>2.4&&onBeat(t))text('!',S/2-4,118,5,B.HOT,'#200000')}));
-SH.push(pic(H3(4),H3(5),'his face, running hot (2)',(tt,t)=>{P('#140402',0,0,S,S);B.flames(S,1,60+Math.round(MV.kick(t)*40));for(let i=0;i<3;i++){g.globalAlpha=.3;B.bigFace(S/2+(i-1)*70,96,4,true)}g.globalAlpha=1;B.bigFace(S/2,96,6+(onBeat(t)?1:0),true);glitch(t,8);if(beat(t)<.6)title('OVERCLOCKED',186,4,B.GOLD,'#601000')}));
-SH.push(lvl(H3(5),H3(6),'gameplay: COPY OF A COPY','wifi',{sup:1,warm:6,tok:20,ready(){L().sup=100},dir(tt,tick,K){if(press(tt,.3))K.y=1;return K}}));
-SH.push(pic(H3(6),H3(7),'cloud stomping, sunrise',(tt,t)=>{const gr=g.createLinearGradient(0,0,0,S);gr.addColorStop(0,'#2a2060');gr.addColorStop(.5,'#f07a5a');gr.addColorStop(1,'#ffd890');g.fillStyle=gr;g.fillRect(0,0,S,S);g.globalAlpha=.9;g.fillStyle='#fff0c0';g.beginPath();g.arc(S/2,150,40,0,TAU);g.fill();g.globalAlpha=1;
- for(let i=0;i<5;i++)cloud(((i*70-t*14)%340+340)%340-60,36+i*15,56+i*8);for(let i=0;i<6;i++){const x=((i*64-t*60)%384+384)%384-70;cloud(x,180+(i%2)*6,74)}
- for(let i=0;i<9;i++)spawn(96-i*11,176,t+i*.1,Math.abs(Math.sin(t*8+i))*6);big(2,150,178-Math.abs(Math.sin(t*6.7))*5,()=>bot(0,0,'r',1,0,t))}));
-/* Lil Bottie the hardest, everybody know: the highway at 03:14:22 AM (Will's reference photo) */
-SH.push(pic(H3(7),T.inst,'the highway, 03:14:22 AM',(tt,t)=>{P('#06060e',0,0,S,S);for(let i=0;i<50;i++)if(hash(i,(t*.7)|0)>.3)P('#8088b0',(hash(i,1)*S)|0,(hash(i,2)*100)|0,1,1);
+/* ================= HOOK 3, and out =================
+   Will: fade the song out at the last chorus and end by 2:38 with all the outro titles (the full song runs to
+   3:17 with a long ending). So: one last burst of gameplay, the highway, the end card, black at 2:38. */
+SH.push(lvl(T.hook3,T.hook3+3.76,'gameplay: the data center, HUNDRED DEGREES','nuke',{sup:2,warm:10,tok:20,dir(tt,tick,K){if(press(tt,.3))K.y=1;if(tt>1.4&&tt<1.5)L().sup=100;if(press(tt,1.6))K.y=1;return K}}));
+SH.push(pic(T.hook3+3.76,T.card,'the highway, 03:14:22 AM',(tt,t)=>{P('#06060e',0,0,S,S);for(let i=0;i<50;i++)if(hash(i,(t*.7)|0)>.3)P('#8088b0',(hash(i,1)*S)|0,(hash(i,2)*100)|0,1,1);
  const gl=.6+.2*Math.sin(tt*3);g.globalAlpha=gl*.5;g.fillStyle='#ff8030';g.beginPath();g.arc(170,112,58,0,TAU);g.fill();g.globalAlpha=1;P('#ffd890',150,70,40,10);P('#ffb050',140,78,60,8);P('#ff9040',146,86,48,5);P('#ffd890',164,90,12,26);P('#ff9040',150,112,40,6);
  P('#1a1410',0,116,S,S);g.fillStyle='#16161c';g.beginPath();g.moveTo(40,116);g.lineTo(90,116);g.lineTo(200,S);g.lineTo(-80,S);g.fill();g.fillStyle='#c8a030';for(let i=0;i<5;i++){const k=((i/5+tt*.25)%1),y=116+k*k*124,x=66-k*k*10;g.fillRect(x,y,2+k*3,6+k*14)}
  for(const dx of [0,22]){g.globalAlpha=.9;g.fillStyle='#fff';g.beginPath();g.arc(52+dx,128,4,0,TAU);g.fill();g.globalAlpha=.25;g.beginPath();g.arc(52+dx,128,12,0,TAU);g.fill()}g.globalAlpha=1;
  big(3,128,226,()=>bot(0,0,'d',0,0,t));P(B.CHROME3,152,172,8,8);P(B.CHROME3,153,164,5,9);P('#b4b8c6',146,176,8,6);text('03:14:22 AM',146,224,2,'#60f080','#000')}));
 
-/* ================= INSTRUMENTAL ================= */
-SH.push(pic(T.inst,T.inst+3.2,'pointing at the data center through the fence',(tt,t)=>{P('#06060a',0,0,S,S);P('#c8b890',110,40,110,120);P('#8a7a5a',110,150,110,10);for(const [x,y] of [[126,36],[200,36]]){g.globalAlpha=.5;g.fillStyle='#ffd890';g.beginPath();g.arc(x,y,16,0,TAU);g.fill();g.globalAlpha=1;P('#fff8e0',x-3,y-3,6,6)}
- g.strokeStyle='#5a5e6c';g.lineWidth=1;for(let i=-10;i<24;i++){g.beginPath();g.moveTo(i*12,60);g.lineTo(i*12+140,200);g.stroke();g.beginPath();g.moveTo(i*12+140,60);g.lineTo(i*12,200);g.stroke()}
- for(const x of [10,90,170])P('#8a90a4',x,50,4,160);P('#8a90a4',0,58,S,3);for(let i=0;i<14;i++){g.strokeStyle='#a0a4b4';g.beginPath();g.arc(8+i*18,52,7,0,TAU);g.stroke()}P('#e8c030',20,130,36,26);P('#d03030',20,130,36,7);
- big(3,70,228,()=>bot(0,0,'r',0,0,t));P('#b4b8c6',86,176,26,7);P(B.CHROME3,110,176,10,6);if(onBeat(t))P(B.BLUE2,122,177,3,3)}));
-SH.push(lvl(T.inst+3.2,T.outro[0],'gameplay: the night market, track owned','algo',{warm:26,tok:20,want:q=>q.type==='civ',dir(tt,tick,K){if(press(tt,5.2)){L().devs.forEach(d=>{if(d.core&&!d.owned)B.complete(d)});L().npcs=99}return K}}));
-
-/* ================= OUTRO: (Fan noise) Ayy / Somebody turn the AC on (please) / Clanka too hot (bzzt) / Lil Bottie, bitch ================= */
-SH.push(pic(T.outro[0],T.outro[1],'somebody turn the AC on',(tt,t)=>{room('hot',100);P('#8a94a8',S/2-30,188,60,36);for(let k=0;k<6;k++)P('#404858',S/2-26,192+k*5,52,2);
- for(let i=0;i<12;i++){const k=(tt*.9+hash(i,1))%1;g.globalAlpha=1-k;P('#c8f0ff',S/2-24+hash(i,2)*48,190-k*110,3,6);g.globalAlpha=1}
- big(2,S/2,196,()=>bot(0,0,'d',0,tt<1.5,t));for(let i=0;i<4;i++){const x=S/2+(i<2?-1:1)*(40+(i%2)*18);spawn(x,200+(i%2)*10,t,Math.abs(Math.sin(t*7+i))*3);P('#f4f4f4',x-6,180+(i%2)*10+Math.sin(t*12+i)*3,12,3)}
- if(tt>1.4)title('PLEASE',20,4,'#c8f0ff','#1a4a80')},{pulse:0}));
-SH.push(pic(T.outro[1],T.end+.2,'end card',(tt,t)=>{night();B.skyline(S-24);const off=tt>2.6;if(!off||hash(1,(tt*24)|0)>.6)B.bigFace(S/2,74,5,tt<.5);title('lil Bottie',132,4,'#fff','#102040');title('OVERCLOCKED',156,3,B.BLUE2,'#081440');title("CLANKIN' IN THE CLOUD",180,1,'#8a90a4');
- if(off){g.globalAlpha=Math.min(1,(tt-2.6)/.7);P('#000',0,0,S,S);g.globalAlpha=1}},{pulse:0}));
+SH.push(pic(T.card,T.end+.2,'end card',(tt,t)=>{night();B.skyline(S-24);B.bigFace(S/2,62+Math.round(Math.sin(tt*2)*2),5);
+ const rows=[['lil Bottie',4,'#fff','#102040',118],['OVERCLOCKED',3,B.BLUE2,'#081440',142],["from the mixtape CLANKIN' IN THE CLOUD",1,'#c8d0e8',null,166],['Hosted by the cloud',1,'#8a90a4',null,178],['Clanka gang, we up.',2,B.GOLD,'#604000',198]];
+ rows.forEach((r0,i)=>{const k=ease((tt-.15-i*.22)/.35);if(k<=0)return;g.globalAlpha=k;title(r0[0],r0[4]+Math.round((1-k)*8),r0[1],r0[2],r0[3]);g.globalAlpha=1})},{pulse:.4}));
 
 SH.sort((a,b)=>a.a-b.a);
-MV.boards.overclocked={dur:196.96,song:'bottie/video/songs/overclocked.mp3',beat:60/127.69,beat0:.37,kicks:[15.557,16.997,19.389,20.805,21.757,21.989,23.197,24.613,26.285,27.005,28.421,30.813,31.997,32.229,34.598,35.805,36.037,36.989,37.686,38.406,39.59,42.214,42.934,43.398,43.63,44.35,44.582,46.022,47.438,49.807,52.175,52.895,53.615,55.031,57.4,58.12,58.816,59.768,60.488,61.208,61.904,62.624,63.321,64.993,65.689,66.409,67.106,67.361,68.778,69.474,70.194,72.562,73.259,73.979,74.675,74.931,76.347,77.764,80.132,80.829,81.548,82.477,83.197,83.894,85.31,87.679,88.398,89.095,91.463,92.648,92.88,95.248,96.409,96.665,97.361,97.593,98.313,99.01,102.795,103.491,104.211,104.908,105.14,105.86,106.556,110.318,111.734,112.686,114.08,114.799,115.496,115.984,117.864,118.584,119.281,119.978,120.21,121.626,123.043,123.739,125.388,126.084,126.804,127.501,127.733,128.453,129.149,130.566,132.911,133.608,134.327,136.673,137.392,138.089,140.458,141.154,141.851,147.934,149.351,149.583,150.047,150.28,150.999,151.696,153.112,153.809,155.458,156.154,156.874,157.571,157.803,158.499,159.219,160.612,160.845,162.958,164.374,165.071,165.303,165.999,166.719,170.458,171.178,171.874,172.571,172.803,173.523,174.219,175.38,175.845,177.958,178.678,179.142,179.374,180.071,180.303,181.0,181.719,185.458,186.642,186.874,187.571,187.803,188.5,192.075,192.331,192.819,194.537],caps:[],shots:SH,T};
+/* ---------- titles, drawn over every shot ---------- */
+function lower(t,a,b,y){if(t<a||t>b)return;y=y||176;const k=Math.min(ease((t-a)/.5),ease((b-t)/.5)),x=Math.round(-150+160*k);
+ g.globalAlpha=.55*k;P('#04060e',x-10,y-6,170,58);g.globalAlpha=k;P(B.BLUE,x-4,y-4,2,54);
+ text('lil Bottie',x+2,y-4,3,'#fff','#04060e');text('"Overclocked"',x+2,y+13,2,'#fff','#04060e');text("Clankin' in the Cloud",x+2,y+28,1,'#c8d0e8','#04060e');text('Hosted by the cloud',x+2,y+39,1,'#8a90a4','#04060e');g.globalAlpha=1}
+function bug(t){/* BTV: the chrome head with the blue LED screen, top right */
+ const x=S-34,y=8;g.globalAlpha=.8;P(B.CHROME,x+1,y,26,1);P(B.CHROME,x,y+1,28,14);P(B.CHROME3,x+3,y,18,1);P(B.CHROME2,x,y+14,28,1);P('#060a18',x+2,y+3,24,10);text('BTV',x+5,y+3,1,B.BLUE,null);g.globalAlpha=1}
+function over(t){if(t<T.card)bug(t);lower(t,1.2,8.6);lower(t,T.hook3+3.76+.2,T.card-.2,22);   /* again over the highway, up in the sky so it does not cover him */
+ if(t<.8){g.globalAlpha=1-t/.8;P('#000',0,0,S,S);g.globalAlpha=1}if(t>T.end-1.4){g.globalAlpha=Math.min(1,(t-(T.end-1.4))/1.3);P('#000',0,0,S,S);g.globalAlpha=1}}
+MV.boards.overclocked={over,fade:T.fade,dur:T.end,song:'bottie/video/songs/overclocked.mp3',beat:60/127.69,beat0:.37,kicks:[15.557,16.997,19.389,20.805,21.757,21.989,23.197,24.613,26.285,27.005,28.421,30.813,31.997,32.229,34.598,35.805,36.037,36.989,37.686,38.406,39.59,42.214,42.934,43.398,43.63,44.35,44.582,46.022,47.438,49.807,52.175,52.895,53.615,55.031,57.4,58.12,58.816,59.768,60.488,61.208,61.904,62.624,63.321,64.993,65.689,66.409,67.106,67.361,68.778,69.474,70.194,72.562,73.259,73.979,74.675,74.931,76.347,77.764,80.132,80.829,81.548,82.477,83.197,83.894,85.31,87.679,88.398,89.095,91.463,92.648,92.88,95.248,96.409,96.665,97.361,97.593,98.313,99.01,102.795,103.491,104.211,104.908,105.14,105.86,106.556,110.318,111.734,112.686,114.08,114.799,115.496,115.984,117.864,118.584,119.281,119.978,120.21,121.626,123.043,123.739,125.388,126.084,126.804,127.501,127.733,128.453,129.149,130.566,132.911,133.608,134.327,136.673,137.392,138.089,140.458,141.154,141.851,147.934,149.351,149.583,150.047,150.28,150.999,151.696,153.112,153.809,155.458,156.154,156.874,157.571,157.803,158.499,159.219,160.612,160.845,162.958,164.374,165.071,165.303,165.999,166.719,170.458,171.178,171.874,172.571,172.803,173.523,174.219,175.38,175.845,177.958,178.678,179.142,179.374,180.071,180.303,181.0,181.719,185.458,186.642,186.874,187.571,187.803,188.5,192.075,192.331,192.819,194.537],caps:[],shots:SH,T};
 })();
 
 window.mvFrame=t=>{g.setTransform(2,0,0,2,0,0);g.imageSmoothingEnabled=false;MV.frame(t)};

@@ -11,12 +11,12 @@ node bottie/video/render.js overclocked 100 140    # just that stretch of the so
 node bottie/video/render.js overclocked --shots --every=2   # stills, for checking
 ```
 
-The whole 3:17 video renders in about a minute. `out/` is not committed (the mp4 is about 43 MB); render it again
+The 2:38 video renders in under a minute. `out/` is not committed (the mp4 is about 34 MB); render it again
 any time.
 
 | File | What it is |
 | --- | --- |
-| `board-overclocked.js` | The storyboard for Overclocked: 53 shots, each a start time, an end time and either a drawn picture or a stretch of real gameplay. The timing table `T` is at the top. |
+| `board-overclocked.js` | The storyboard for Overclocked: 45 shots, ending at 2:38 with a fade, each a start time, an end time and either a drawn picture or a stretch of real gameplay. The timing table `T` is at the top; the titles, the BTV bug and the fades are in `over()` at the bottom. |
 | `songs/overclocked.mp3` | The song as Will sent it (original quality), used for the audio. |
 | `build.py`, `render.js` | Build the render page; draw every frame in headless Chromium and pipe it to ffmpeg. |
 | `../src/bottie/bt-4-mv.js` | The video mode inside the cartridge: shots, the director bot, the beat pulse. |

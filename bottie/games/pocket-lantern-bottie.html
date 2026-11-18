@@ -2587,7 +2587,7 @@ function draw(){H=A.H();
    The game never calls any of this; only the render page does.
    ============================================================ */
 const MV=(()=>{
- const PV=A.prev||{},S=240;let SH=[],CAPS=[],KICKS=[],BEAT=.4706,BEAT0=0,cur=-1,lt=-1,st=null;
+ const PV=A.prev||{},S=240;let OVER=null,SH=[],CAPS=[],KICKS=[],BEAT=.4706,BEAT0=0,cur=-1,lt=-1,st=null;
  const ease=k=>k<0?0:k>1?1:k*k*(3-2*k),lerp=(a,b,k)=>a+(b-a)*k;
  const beatPh=t=>((t-BEAT0)/BEAT%1+1)%1,barNo=t=>Math.floor((t-BEAT0)/(BEAT*4));
  /* how hard the last kick is still hitting, 1 -> 0 */
@@ -2625,7 +2625,7 @@ const MV=(()=>{
  /* a drawn shot: just a picture as a function of time */
  const pic=f=>({init(){G.mv=1;G.s='mv'},step(){},draw:f});
 
- function load(sb){SH=sb.shots;CAPS=sb.caps||[];KICKS=sb.kicks||[];BEAT=sb.beat||BEAT;BEAT0=sb.beat0||0;cur=-1;lt=-1}
+ function load(sb){OVER=sb.over||null;SH=sb.shots;CAPS=sb.caps||[];KICKS=sb.kicks||[];BEAT=sb.beat||BEAT;BEAT0=sb.beat0||0;cur=-1;lt=-1}
  function caption(t){const c=CAPS.find(c=>t>=c.a&&t<c.b);if(!c)return;const ls=wrap(c.s,S-20,2),h=ls.length*13+6,y=S-h-6,k=Math.min(1,(t-c.a)*10);
   g.globalAlpha=.82*k;r('#04060e',0,y,S,h);g.globalAlpha=k;r(BLUE,0,y,S,1);ls.forEach((l,i)=>{const w=tw(l,2);text(l,Math.round((S-w)/2),y+4+i*13,2,'#fff','#04060e')});
   if(c.ad&&t-c.a>(c.b-c.a)*.55){const w=tw(c.ad,2);g.globalAlpha=1;text(c.ad,Math.round((S-w)/2),y-14,2,BLUE2,'#04060e')}g.globalAlpha=1}
@@ -2636,7 +2636,9 @@ const MV=(()=>{
   G.t=t;g.save();r('#04050a',0,0,S,S);g.translate(S/2,S/2);g.scale(z,z);g.translate(-S/2,-S/2);sh.draw(tt,t);g.restore();
   /* cut flash at the start of a shot */
   if(tt<.1&&sh.cut!==0){g.globalAlpha=(1-tt/.1)*.5;r('#fff',0,0,S,S);g.globalAlpha=1}
-  if(sh.cap!==0)caption(t)}
+  if(sh.cap!==0)caption(t);
+  /* titles and the channel bug sit on top of everything and do not pulse */
+  if(OVER)OVER(t)}
  return{frame,load,level,pic,kick,beatPh,barNo,ease,lerp,S,get shots(){return SH},boards:{}}})();
 /* ---------- what the console sees ---------- */
 return{
