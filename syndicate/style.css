@@ -544,3 +544,8 @@ button:disabled { filter: grayscale(0.7) brightness(0.7); }
   .hud-mid { width: min(9rem, 13vw); }
 }
 @media (min-aspect-ratio: 21/9) and (orientation: landscape) { .hud-side { max-width: 16rem; } }
+
+/* the Oracle's cellar: the menu stands to one side so the golden room can be seen */
+#panel.cellar { justify-content: flex-end; padding-right: calc(2rem + var(--sr)); background: linear-gradient(90deg, rgba(4, 3, 8, 0) 35%, rgba(4, 3, 8, 0.78)); -webkit-backdrop-filter: none; backdrop-filter: none; }
+#panel.cellar .card { width: 30rem; }
+@media (orientation: portrait) { #panel.cellar { justify-content: center; padding-right: 0; background: linear-gradient(rgba(4, 3, 8, 0), rgba(4, 3, 8, 0.75) 55%); } #panel.cellar .card { width: 100%; max-height: 62%; } }

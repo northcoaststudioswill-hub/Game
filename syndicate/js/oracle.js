@@ -84,7 +84,7 @@
     cardEl.querySelectorAll('p.dim').forEach(p => { if (/Losing costs you/.test(p.textContent)) p.innerHTML = 'Death takes your purse, your streak and a little of your name. Coin in a strongbox at home is safe. <b>Deaths: ' + O.deaths(st) + '</b>.'; });
     const ok = cardEl.querySelector('#ok'); if (!ok) return;
     const nb = ok.cloneNode(true); nb.textContent = 'Go into the dark'; ok.parentNode.replaceChild(nb, ok);
-    nb.addEventListener('click', () => { G.audioInit(); G.sfx('ui'); ui.close(); revive(() => ui.levelCheck()); });
+    nb.addEventListener('click', () => { G.audioInit(); G.sfx('ui'); ui.close(); O.revive(() => ui.levelCheck()); });
   };
 
   // ------------------------------------------------------------ his cellar
