@@ -461,6 +461,18 @@ body[data-court="mortal"] .motto::before { content: 'In the mortal lands, south 
 .star-row, .hw-row { text-align: left; }
 #journal .card::after { display: none; }
 @media (max-height: 460px) { .card { padding: 8px 20px 12px; } .card::before { width: 30px; height: 30px; margin-bottom: 2px; } .card h2 { font-size: 17px; } .card h2::after { margin: 5px 18%; } .card::after { margin-top: 8px; } }
+/* ---- found by playing it with real taps before the human playtest */
+#effects { z-index: 6; } body:has(.screen.show) #effects, body[data-state="explain"] #effects, body[data-state="pause"] #effects, body[data-state="card"] #effects { display: none; }   /* cards never sit on a menu */
+#ex-icon { font-size: 18px !important; margin-top: -2px; }
+#goal { max-width: 62vw; font-size: 11.5px; }
+#m-status { font-size: 12px; gap: 3px 12px; padding: 6px 9px; margin: 0 0 6px; } #m-status b { font-size: 9px; }
+#menu .card { width: min(620px, 96vw); padding-bottom: 12px; } #menu .btn { padding: 8px 4px; font-size: 11.5px; margin: 5px 2px 0; width: calc(33.33% - 6px); } #menu #m-resume { width: calc(100% - 4px); padding: 10px; font-size: 13px; }
+body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume { width: calc(100% - 4px); }
+@media (max-height: 460px) {
+  #f-logo h1 { font-size: clamp(26px, 9vh, 40px) !important; } #f-logo .sub { font-size: 11px; margin-bottom: 4px; } .fbtn .sub { display: none; } .fbtn { padding: 5px 12px 5px 30px !important; } .fbtn::before { top: 11px; }
+  #f-menu-wrap { max-height: calc(100vh - 118px); padding: 10px 16px 6px; }
+  #m-status { grid-template-columns: repeat(4, 1fr); } #m-status .wide { grid-column: span 2; } #menu .btn { width: calc(25% - 6px); padding: 7px 2px; font-size: 10.5px; letter-spacing: .04em; } #menu .card { padding-top: 6px; } #menu .motto { display: none; } #menu .card::before { display: none; } #menu .card h2 { font-size: 15px; } #menu .card h2::after { margin: 4px 18%; }
+}
 </style>
 </head>
 <body>
@@ -518,7 +530,7 @@ body[data-court="mortal"] .motto::before { content: 'In the mortal lands, south 
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1 <div id="f-ver">Reimagined &middot; Prologue to Chapter 3</div>middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.1 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -761,8 +773,8 @@ body[data-court="mortal"] .motto::before { content: 'In the mortal lands, south 
   S.EXPLAIN = {
     starlight: { icon: '\u2726', title: 'Starlight', text: 'The gold motes in every level. The counter beside MENU shows how many this level holds. Spend Starlight in the pause menu, under Constellation, on more hearts and stronger Bond Arts.' },
     lantern: { icon: '\u2600', title: 'Lanterns', text: 'Lighting a lantern fills your hearts. If Wren is knocked out she comes back at the last one she lit, with nothing lost.' },
-    bonds: { icon: '\u2665', title: 'Bonds', text: 'What you say and do moves people toward you or away. A green card means closer, a red card means further, and the card says why. Each person has five hearts; a new heart plays a scene. See them in Story & goals.' },
-    remember: { icon: '\u2726', title: 'This will be remembered', text: 'Some decisions change scenes later in the story. Green: someone is better for it. Red: it will cost her. Gold: it could go either way. They are listed in Story & goals, under What Wren has done.' },
+    bonds: { icon: '\u2665', title: 'Bonds', text: 'What you say and do moves people toward you or away. A green card means closer, a red card means further, and the card says why. Each person has five hearts; a new heart plays a scene. See them in Wren\'s journal.' },
+    remember: { icon: '\u2726', title: 'This will be remembered', text: 'Some decisions change scenes later in the story. Green: someone is better for it. Red: it will cost her. Gold: it could go either way. They are listed in Wren\'s journal, under What Wren has done.' },
     bondbar: { icon: '\u263E', title: 'The bond bar and Bond Arts', text: 'The bar under your hearts fills as your hits land, faster for long unbroken strings. When it is full, a BOND ART button appears: a huge attack, with a memory. Nothing can hurt Wren while it plays.' },
     moons: { icon: '\u25CF', title: 'Moons and the Flame', text: 'Each Flame costs one moon. Hold the button and let go for a flame wave that costs two. Moons refill slowly by themselves, and quickly when your daggers land.' },
     xp: { icon: '\u2191', title: 'Levels', text: 'Wren earns experience by fighting, hunting, gathering Starlight, helping people and finishing chapters. Each level gives a perk for good; the bar under the Starlight count shows how close the next one is. Levels are earned, the Constellation is where you choose.' },
@@ -810,7 +822,7 @@ body[data-court="mortal"] .motto::before { content: 'In the mortal lands, south 
       abilities: { double: false, dash: false, daggers: false, bow: true },
       card: 'Before the Deep, before the fae. Wren is nineteen, mortal, and the only hunter in a family that is slowly starving.',
       goals: [
-        { id: 'hunt', text: 'Check your snares on the east path', count: 3, counter: 'snares' },
+        { id: 'hunt', text: 'Check your three snares', count: 3, counter: 'snares' },
         { id: 'stag', text: 'Shoot the white stag in the clearing' },
       ],
       summary: 'Wren killed a white stag sacred to the Spring Court. That night Lord Rowan came for her and took her across the Wall: a life for a life.',
@@ -4053,7 +4065,7 @@ body[data-court="mortal"] .motto::before { content: 'In the mortal lands, south 
     if (s.kind === 'starfall') {
       // Caelum lends her the night: she winnows through her target five times, and every cut lands at once.
       if (s.t === 1) {
-        const on = foes(world).filter(e => e.x > cx - 20 && e.x < cx + vw + 20);
+        const on = foes(world).filter(e => e.boss || (e.x > cx - 20 && e.x < cx + vw + 20));   // the boss is always in reach of the stars, even off the edge of the screen
         s.tgt = on.sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x))[0] || null;
         s.home = { x: p.x, y: p.y, facing: p.facing }; s.pass = 0;
         s.focus = s.tgt ? { x: s.tgt.x, y: s.tgt.y - (s.tgt.h || 24) / 2 } : { x: p.x, y: p.y - 30 };
@@ -4075,7 +4087,7 @@ body[data-court="mortal"] .motto::before { content: 'In the mortal lands, south 
       if (s.t === 38) {
         fx.flashScreen(6, 'rgba(230,220,255,0.8)'); fx.stop(10); fx.kick(10); SH.game.punch(0.2); SH.sfx.play('kill');
         for (const e of foes(world)) {
-          if (e.x < cx - 30 || e.x > cx + vw + 30) continue;
+          if (!e.boss && (e.x < cx - 30 || e.x > cx + vw + 30)) continue;
           const cy0 = e.y - (e.h || 20) / 2;
           for (let i = 0; i < 5; i++) fx.spark(e.x + (Math.random() - 0.5) * 20, cy0 + (Math.random() - 0.5) * 16, Math.random() * 6.3, true);
           A.stars.push({ x: e.x + 40, y: cy - 20, vx: -2.6, vy: 10, life: 60, tx: e.x, ty: cy0 });

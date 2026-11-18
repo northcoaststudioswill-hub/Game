@@ -1,5 +1,19 @@
 # Starhaven — Changelog
 
+## v0.1.1 — the playtest build (Nov 18, 2026)
+Will: another playthrough, a big search and fix, and tightening, for tonight's playtest by people.
+
+Played the opening minutes and the boss **with real taps** (not test hooks) on a phone-sized screen, sideways and
+upright, and looked at every screen. Found and fixed:
+- Consequence cards covering explanation cards, the pause menu and the journal (including the "Got it" button).
+- A garbled, doubled version line on the title.
+- The title and pause menus not fitting a sideways phone.
+- STARFALL spending the bond bar and doing nothing when the Old Wyrm was just off-screen.
+- Stale names for the journal in the goal line and two explanation cards.
+
+Release: [`releases/v0.1.1/`](releases/v0.1.1/RELEASE-NOTES.md), with five questions for the people playing.
+`releases/v0.1/` is left as it was. All suites pass; **tonight is the first time a person plays it.**
+
 ## After v0.1 — tighter dialogue, menus of the courts (Nov 18, 2026)
 Will: the Skip button covers too much text and the boxes have too much dead space; redesign the menus to look more
 unique and in the realm of the courts.

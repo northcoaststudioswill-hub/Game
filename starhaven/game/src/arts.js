@@ -97,7 +97,7 @@
     if (s.kind === 'starfall') {
       // Caelum lends her the night: she winnows through her target five times, and every cut lands at once.
       if (s.t === 1) {
-        const on = foes(world).filter(e => e.x > cx - 20 && e.x < cx + vw + 20);
+        const on = foes(world).filter(e => e.boss || (e.x > cx - 20 && e.x < cx + vw + 20));   // the boss is always in reach of the stars, even off the edge of the screen
         s.tgt = on.sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x))[0] || null;
         s.home = { x: p.x, y: p.y, facing: p.facing }; s.pass = 0;
         s.focus = s.tgt ? { x: s.tgt.x, y: s.tgt.y - (s.tgt.h || 24) / 2 } : { x: p.x, y: p.y - 30 };
@@ -119,7 +119,7 @@
       if (s.t === 38) {
         fx.flashScreen(6, 'rgba(230,220,255,0.8)'); fx.stop(10); fx.kick(10); SH.game.punch(0.2); SH.sfx.play('kill');
         for (const e of foes(world)) {
-          if (e.x < cx - 30 || e.x > cx + vw + 30) continue;
+          if (!e.boss && (e.x < cx - 30 || e.x > cx + vw + 30)) continue;
           const cy0 = e.y - (e.h || 20) / 2;
           for (let i = 0; i < 5; i++) fx.spark(e.x + (Math.random() - 0.5) * 20, cy0 + (Math.random() - 0.5) * 16, Math.random() * 6.3, true);
           A.stars.push({ x: e.x + 40, y: cy - 20, vx: -2.6, vy: 10, life: 60, tx: e.x, ty: cy0 });

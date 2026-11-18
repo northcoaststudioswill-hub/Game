@@ -31,6 +31,11 @@ link Will has. Hold your phone either way up.
 Between chapters there are **evenings**: choose who to spend the night with (Caelum, Bram, Iris or Thane) for scenes,
 gifts and bond hearts.
 
+## Playtest build: v0.1.1 (Nov 18, 2026)
+
+The build for the first playtest by people: [`releases/v0.1.1/`](releases/v0.1.1/RELEASE-NOTES.md), with
+`starhaven-v0.1.1-share.zip` to send and five questions for the players.
+
 ## Release: v0.1 (Nov 18, 2026)
 
 The first release of the slice: [`releases/v0.1/`](releases/v0.1/RELEASE-NOTES.md) (frozen game file, notes, and

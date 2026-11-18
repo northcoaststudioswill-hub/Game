@@ -30,8 +30,8 @@
   S.EXPLAIN = {
     starlight: { icon: '\u2726', title: 'Starlight', text: 'The gold motes in every level. The counter beside MENU shows how many this level holds. Spend Starlight in the pause menu, under Constellation, on more hearts and stronger Bond Arts.' },
     lantern: { icon: '\u2600', title: 'Lanterns', text: 'Lighting a lantern fills your hearts. If Wren is knocked out she comes back at the last one she lit, with nothing lost.' },
-    bonds: { icon: '\u2665', title: 'Bonds', text: 'What you say and do moves people toward you or away. A green card means closer, a red card means further, and the card says why. Each person has five hearts; a new heart plays a scene. See them in Story & goals.' },
-    remember: { icon: '\u2726', title: 'This will be remembered', text: 'Some decisions change scenes later in the story. Green: someone is better for it. Red: it will cost her. Gold: it could go either way. They are listed in Story & goals, under What Wren has done.' },
+    bonds: { icon: '\u2665', title: 'Bonds', text: 'What you say and do moves people toward you or away. A green card means closer, a red card means further, and the card says why. Each person has five hearts; a new heart plays a scene. See them in Wren\'s journal.' },
+    remember: { icon: '\u2726', title: 'This will be remembered', text: 'Some decisions change scenes later in the story. Green: someone is better for it. Red: it will cost her. Gold: it could go either way. They are listed in Wren\'s journal, under What Wren has done.' },
     bondbar: { icon: '\u263E', title: 'The bond bar and Bond Arts', text: 'The bar under your hearts fills as your hits land, faster for long unbroken strings. When it is full, a BOND ART button appears: a huge attack, with a memory. Nothing can hurt Wren while it plays.' },
     moons: { icon: '\u25CF', title: 'Moons and the Flame', text: 'Each Flame costs one moon. Hold the button and let go for a flame wave that costs two. Moons refill slowly by themselves, and quickly when your daggers land.' },
     xp: { icon: '\u2191', title: 'Levels', text: 'Wren earns experience by fighting, hunting, gathering Starlight, helping people and finishing chapters. Each level gives a perk for good; the bar under the Starlight count shows how close the next one is. Levels are earned, the Constellation is where you choose.' },
@@ -79,7 +79,7 @@
       abilities: { double: false, dash: false, daggers: false, bow: true },
       card: 'Before the Deep, before the fae. Wren is nineteen, mortal, and the only hunter in a family that is slowly starving.',
       goals: [
-        { id: 'hunt', text: 'Check your snares on the east path', count: 3, counter: 'snares' },
+        { id: 'hunt', text: 'Check your three snares', count: 3, counter: 'snares' },
         { id: 'stag', text: 'Shoot the white stag in the clearing' },
       ],
       summary: 'Wren killed a white stag sacred to the Spring Court. That night Lord Rowan came for her and took her across the Wall: a life for a life.',
