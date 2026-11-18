@@ -33,7 +33,7 @@ level select and banter. Everything else is exactly v0.3.
 | v0.3 | `v0.3/` | The previous main version: Patch & Plate in slot 4. Kept as is. Changelog: [`v0.3/CHANGELOG.md`](v0.3/CHANGELOG.md), send: [`v0.3/share/pocket-lantern-v0.3-share.zip`](v0.3/share/pocket-lantern-v0.3-share.zip) |
 | v0.2.1 | `v0.2/` | Rootdeep in slot 3; still where Rootdeep work happens. Changelog: [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md) |
 | v0.1 | `v0.1/` | Sprouts + Knockout; the rollback. Never edit. |
-| ALT | `alt/` | **The main line.** Began as the experimental fork where v0.35's Knockout was made; now five cartridges with Sproutwild. Separate saves. Not yet a numbered release. |
+| ALT | `alt/` | **The main line.** Began as the experimental fork where v0.35's Knockout was made; now seven cartridges (Sproutwild, Lightswarm and Clankawatch added). Separate saves. Not yet a numbered release. |
 | Sproutwild (standalone) | `muse/` | lil Bottie's Muse files and the standalone Sproutwild through v6.0. Archive; live source moved to `alt/src/sproutwild/`. |
 
 The files at the repo root (`README.md`, `build.py`, `index.html`, `src/`) are the old pre-v0.2 setup.
