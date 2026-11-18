@@ -1238,10 +1238,34 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       ['wren', '...I know. I\'m staying anyway.'],
       { do: 'bond', who: 'caelum', pts: 20 },
     ],
+    // Chapter 2, more to do
+    ring_bram_talk: [
+      ['bram', 'Before you swing at anything: why are you here, huntress? Not "he stole me". Why are you still here?'],
+      { choose: [
+        { text: '"Because nobody here has lied to me yet."', bond: { bram: 10 }, why: 'He respects a reason that small and that true.', remember: ['bramTruth', 'Told Bram she stays because nobody here has lied to her.', true], then: [['bram', 'Hm. Give it a week. But that\'s a soldier\'s answer. I\'ll take it.']] },
+        { text: '"I\'m here to get strong enough to leave."', bond: { bram: 5 }, why: 'Honest. He\'d have said the same at your age.', remember: ['bramLeave', 'Told Bram she is here to get strong enough to leave.', null], then: [['bram', 'Then I\'ll train you well enough that leaving is your choice and not anyone else\'s.']] },
+        { text: '"That\'s between me and your High Lord."', bond: { bram: -5 }, why: 'He has buried people who kept things from him.', then: [['bram', 'Everything in this city is between you and the people who\'ll bleed next to you. Remember that.']] },
+      ] },
+      ['bram', 'There are three rings hung past the dummy. Cut them all and I\'ll believe your feet as well as your mouth.'],
+    ],
+    ring_rings: [
+      { do: 'flag', name: 'rings3' },
+      ['bram', 'Low, rising, and one from the air. Who taught you to read a target?'],
+      ['wren', 'My father. With a bow, and worse manners.'],
+      { do: 'remember', key: 'rings', text: 'Cut all three of Bram\'s rings.', good: true },
+      { do: 'bond', who: 'bram', pts: 10, liked: true, why: 'Three for three. He stopped pretending not to watch.' },
+    ],
+    ring_plums: [
+      ['narr', 'A market crate, burst open in the thornwood. Most of it is ruined. One paper twist of sugared plums is not.'],
+      ['wren', 'Somebody ran from here in a hurry. ...Iris said something about plums.'],
+      { do: 'remember', key: 'plums', text: 'Saved a twist of sugared plums from the thornwood.', good: true },
+    ],
     ev2_bram: [
       { do: 'art', id: 'fire', title: 'Evening with Bram' },
       ['narr', 'The Training Ring after dark. Bram is burning old practice dummies in a fire pit.'],
       ['bram', 'Come to gloat? You broke my best dummy.'],
+      { if: 'rings', then: [['bram', 'And cut my rings. All three. I\'ve had captains who couldn\'t.']] },
+      { if: 'bramTruth', then: [['bram', 'You said nobody here had lied to you yet. Still true?'], ['wren', 'Still true.'], ['bram', 'Good. Keep counting.']] },
       { choose: [
         { text: 'Bring him spiced bread from the market', liked: 'bram', bond: { bram: 15 }, then: [
           ['bram', 'Is that from the Night Market? Sit down, huntress. You\'re officially my favorite. Don\'t tell Iris.'],
@@ -1263,6 +1287,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       { do: 'art', id: 'observatory', title: 'Evening with Iris' },
       ['narr', 'A round tower above the Library, full of maps, candles and threads of starlight hanging in the air.'],
       ['iris', 'You came! Nobody visits the seer. They\'re afraid I\'ll tell them how they die.'],
+      { if: 'plums', then: [['wren', 'I found these in the thornwood. I think they were coming to you.'], ['iris', 'SUGARED PLUMS. I saw these arriving and I didn\'t dare believe it. You are my favourite thread.'], { do: 'bond', who: 'iris', pts: 15, liked: true, why: 'Sugared plums, carried out of a thornwood, for her.' }] },
       { choose: [
         { text: 'Bring her sugared plums', liked: 'iris', bond: { iris: 15 }, then: [
           ['iris', 'Plums! Sugared! Oh, you\'re a good thread, Wren. A very good thread.'],
@@ -1635,6 +1660,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     ],
     hints: [
       { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
+      { x0: 26, x1: 36, text: 'Bram\'s rings. Cut all three: the low one from the ground, the middle one with a rising strike (hold up and {ATTACK}), the high one from a jump.', until: 'rings3' },
       { x0: 36, x1: 44, text: 'Jump toward a bud. When you are above it, {DOWNSTRIKE} to strike down and bounce.', flag: 'combo' },
       { x0: 61, x1: 69, text: 'Two more cuts: {ATTACK} during a dash is a lunging dash strike. Hold up and {ATTACK} for a rising strike that carries you into the air.', flag: 'pit' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
@@ -1645,9 +1671,12 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     ],
     gates: [{ id: 'pitgate', x: 38, top: 6 }, { id: 'northgate', x: 64, top: 6 }],
     lanterns: [{ x: 4, lit: true }, { x: 61 }, { x: 68 }],
-    npcs: [{ id: 'bram', x: 11 }, { id: 'iris', x: 62.5, optional: 'iris' }],
+    npcs: [{ id: 'bram', x: 11, optional: 'ring_bram_talk' }, { id: 'iris', x: 62.5, optional: 'iris' }],
     spawns: [
       { kind: 'dummy', x: 24 },
+      // Bram's three rings: one at chest height, one that wants a rising strike, one that wants a strike from a jump
+      { kind: 'target', blade: true, x: 28, y: 14.9 }, { kind: 'target', blade: true, x: 31, y: 13.2 }, { kind: 'target', blade: true, x: 34.5, y: 11.6 },
+      { kind: 'pickup', what: 'plums', x: 97 },
       { kind: 'bulb', x: 45.5, y: 12.6 },
       { kind: 'bulb', x: 50.5, y: 12.4 },
       { kind: 'bulb', x: 55.5, y: 12.6 },
@@ -2876,7 +2905,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     this.near = !this.checked && Math.abs(p.x - this.x) < 26 && Math.abs(p.y - this.y) < 30 && p.grounded;
     if (this.near && world.input.pressed.up) { this.checked = true; this.near = false; world.onSnare(this.n); }
   };
-  function Target(x, y) { Object.assign(this, { kind: 'target', x, y, hit: false, arrowOnly: true, wob: 0 }); }
+  function Target(x, y, blade) { Object.assign(this, { kind: 'target', x, y, hit: false, arrowOnly: !blade, blade: !!blade, wob: 0 }); }   // blade: Bram's rings, cut with daggers
   Target.prototype.reset = function () { };
   Target.prototype.hittable = function () { return !this.hit; };
   Target.prototype.hurtBox = function () { return { l: this.x - 10, r: this.x + 10, t: this.y - 15, b: this.y + 15 }; };
@@ -2884,7 +2913,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   Target.prototype.takeHit = function (hit, world) {
     this.hit = true; this.wob = 30; SH.sfx.play('hit');
     SH.fx.word(this.x, this.y - 22, 'BULLSEYE', '#ffd27a', 50); SH.fx.spark(this.x, this.y, 0, true);
-    world.onTarget(); return { landed: true };
+    world.onTarget(this); return { landed: true };
   };
   // The wolf is as hungry as the sisters. One arrow and it backs off hurt: then it is Wren's choice,
   // made with the bow and not a menu. Shoot again, or lower the bow and let it go.
@@ -3113,7 +3142,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     if (s.kind === 'brazier') return new Brazier(x, y);
     if (s.kind === 'pickup') return new Pickup(x, y, s.what);
     if (s.kind === 'snare') return new Snare(x, y, s.n);
-    if (s.kind === 'target') return new Target(x, s.y * T);
+    if (s.kind === 'target') return new Target(x, s.y * T, s.blade);
     if (s.kind === 'wolf') return new Wolf(x, y);
     if (s.kind === 'wyrmling' || s.kind === 'oldWyrm') return new Wyrm(x, y, s.kind);
     throw new Error('unknown spawn ' + s.kind);
@@ -5790,6 +5819,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       const bob = Math.round(Math.sin(t * 0.08 + e.x) * 1.5);
       const gl = ctx.createRadialGradient(e.x, e.y - 8, 1, e.x, e.y - 8, 22); gl.addColorStop(0, 'rgba(255,246,216,0.3)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 22, e.y - 30, 44, 44);
       if (e.what === 'cat') { const tl = Math.sin(t * 0.1) * 2; R(-7, -9, 13, 8, '#0a0818'); R(-6, -8, 11, 7, '#2a2630'); R(3, -13, 7, 7, '#0a0818'); R(4, -12, 5, 5, '#2a2630'); R(4, -14, 2, 2, '#2a2630'); R(7, -14, 2, 2, '#2a2630'); R(5, -10, 1, 1, '#ffd27a'); R(7, -10, 1, 1, '#ffd27a'); R(-9, -10 + tl, 2, 6, '#2a2630'); R(-5, -5, 3, 1, '#f4f0e0'); }
+      else if (e.what === 'plums') { R(-7, -9 + bob, 14, 9, '#0a0818'); R(-6, -8 + bob, 12, 7, '#6a4a34'); R(-6, -8 + bob, 12, 1, '#a8743a'); for (let i = 0; i < 3; i++) { R(-5 + i * 4, -12 + bob, 3, 4, '#7a3a8a'); R(-5 + i * 4, -12 + bob, 1, 1, '#ffffff'); } }
       else if (e.what === 'page') { R(-6, -12 + bob, 12, 14, '#0a0818'); R(-5, -11 + bob, 10, 12, '#f4f0e0'); for (let i = 0; i < 4; i++) R(-3, -9 + i * 3 + bob, 6, 1, '#6a5aa8'); R(-5, -11 + bob, 3, 3, '#e8c070'); }
       else if (e.what === 'wood') { R(-10, -9 + bob, 20, 9, '#0a0818'); R(-9, -8 + bob, 18, 3, '#7a5636'); R(-9, -5 + bob, 18, 3, '#5e3e28'); R(-9, -2 + bob, 18, 1, '#4a3020'); R(-9, -8 + bob, 2, 6, '#c8a878'); R(-2, -10 + bob, 3, 10, '#c8b890'); R(-9, -8 + bob, 18, 1, '#ffffff'); }
       else { R(-1, -12 + bob, 2, 12, '#3f6a3f'); R(-6, -12 + bob, 5, 3, '#8fd16b'); R(1, -15 + bob, 5, 3, '#8fd16b'); R(-5, -7 + bob, 4, 3, '#6ab04a'); R(2, -9 + bob, 4, 3, '#6ab04a'); R(-1, -17 + bob, 2, 2, '#ff9ac0'); }
@@ -6003,6 +6033,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       // the Winter Woods
       onPickup(what) {
+        if (what === 'plums') { G.queueScript('ring_plums'); return; }
         if (what === 'cat') { G.queueScript('ashes_cat_found'); return; }
         if (what === 'page') { G.queueScript('mtn_page'); return; }
         if (what === 'herb') { G.remember('green', 'Found wintergreen under the snow for Lissa.', true); G.queueScript('woods_herb'); return; }
@@ -6011,7 +6042,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
         if (G.flags.n_wood === 3) G.queueScript('woods_wood');
       },
       onSnare(n) { SH.xp.gain(3, true); G.flags.n_snares = (G.flags.n_snares || 0) + 1; if (G.flags.n_snares >= 3) G.flags.snares3 = true; G.hud.goal(true); G.queueScript('woods_snare' + n); },
-      onTarget() { SH.xp.gain(4, true); G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
+      onTarget(tg) { SH.xp.gain(4, true); if (tg && tg.blade) { G.flags.n_rings = (G.flags.n_rings || 0) + 1; if (G.flags.n_rings === 3) G.queueScript('ring_rings'); return; } G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
       onWolf(what) { if (what === 'killed' || what === 'spared') SH.xp.gain(15, true); G.queueScript('woods_wolf_' + what); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };

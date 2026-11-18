@@ -15,6 +15,7 @@ const { chromium } = require('playwright'); const path = require('path');
         const G = SH.game, acts = ['jump', 'attack', 'dash', 'up', 'gift', 'art', 'downstrike'], seen = new Set(); let held = { right: true }, far = 0, stuck = 0, lastX = 0;
         try {
           for (let f = 0; f < N; f++) {
+            if (f % 90 === 0) SH.test.choice = (rnd() * 3) | 0;   // vary the answers, or the riddle is asked forever
             if (f % 40 === 0) held = { right: rnd() < 0.72, left: rnd() < 0.12, jump: rnd() < 0.5, up: rnd() < 0.15, down: rnd() < 0.1, gift: rnd() < 0.2 };
             const press = rnd() < 0.2 ? [acts[(rnd() * acts.length) | 0]] : null;
             if (G.state === 'explain') G.explainClose();

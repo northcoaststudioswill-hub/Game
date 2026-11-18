@@ -172,6 +172,7 @@
     ],
     hints: [
       { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
+      { x0: 26, x1: 36, text: 'Bram\'s rings. Cut all three: the low one from the ground, the middle one with a rising strike (hold up and {ATTACK}), the high one from a jump.', until: 'rings3' },
       { x0: 36, x1: 44, text: 'Jump toward a bud. When you are above it, {DOWNSTRIKE} to strike down and bounce.', flag: 'combo' },
       { x0: 61, x1: 69, text: 'Two more cuts: {ATTACK} during a dash is a lunging dash strike. Hold up and {ATTACK} for a rising strike that carries you into the air.', flag: 'pit' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
@@ -182,9 +183,12 @@
     ],
     gates: [{ id: 'pitgate', x: 38, top: 6 }, { id: 'northgate', x: 64, top: 6 }],
     lanterns: [{ x: 4, lit: true }, { x: 61 }, { x: 68 }],
-    npcs: [{ id: 'bram', x: 11 }, { id: 'iris', x: 62.5, optional: 'iris' }],
+    npcs: [{ id: 'bram', x: 11, optional: 'ring_bram_talk' }, { id: 'iris', x: 62.5, optional: 'iris' }],
     spawns: [
       { kind: 'dummy', x: 24 },
+      // Bram's three rings: one at chest height, one that wants a rising strike, one that wants a strike from a jump
+      { kind: 'target', blade: true, x: 28, y: 14.9 }, { kind: 'target', blade: true, x: 31, y: 13.2 }, { kind: 'target', blade: true, x: 34.5, y: 11.6 },
+      { kind: 'pickup', what: 'plums', x: 97 },
       { kind: 'bulb', x: 45.5, y: 12.6 },
       { kind: 'bulb', x: 50.5, y: 12.4 },
       { kind: 'bulb', x: 55.5, y: 12.6 },

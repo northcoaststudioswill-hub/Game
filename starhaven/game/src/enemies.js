@@ -221,7 +221,7 @@
     this.near = !this.checked && Math.abs(p.x - this.x) < 26 && Math.abs(p.y - this.y) < 30 && p.grounded;
     if (this.near && world.input.pressed.up) { this.checked = true; this.near = false; world.onSnare(this.n); }
   };
-  function Target(x, y) { Object.assign(this, { kind: 'target', x, y, hit: false, arrowOnly: true, wob: 0 }); }
+  function Target(x, y, blade) { Object.assign(this, { kind: 'target', x, y, hit: false, arrowOnly: !blade, blade: !!blade, wob: 0 }); }   // blade: Bram's rings, cut with daggers
   Target.prototype.reset = function () { };
   Target.prototype.hittable = function () { return !this.hit; };
   Target.prototype.hurtBox = function () { return { l: this.x - 10, r: this.x + 10, t: this.y - 15, b: this.y + 15 }; };
@@ -229,7 +229,7 @@
   Target.prototype.takeHit = function (hit, world) {
     this.hit = true; this.wob = 30; SH.sfx.play('hit');
     SH.fx.word(this.x, this.y - 22, 'BULLSEYE', '#ffd27a', 50); SH.fx.spark(this.x, this.y, 0, true);
-    world.onTarget(); return { landed: true };
+    world.onTarget(this); return { landed: true };
   };
   // The wolf is as hungry as the sisters. One arrow and it backs off hurt: then it is Wren's choice,
   // made with the bow and not a menu. Shoot again, or lower the bow and let it go.
@@ -458,7 +458,7 @@
     if (s.kind === 'brazier') return new Brazier(x, y);
     if (s.kind === 'pickup') return new Pickup(x, y, s.what);
     if (s.kind === 'snare') return new Snare(x, y, s.n);
-    if (s.kind === 'target') return new Target(x, s.y * T);
+    if (s.kind === 'target') return new Target(x, s.y * T, s.blade);
     if (s.kind === 'wolf') return new Wolf(x, y);
     if (s.kind === 'wyrmling' || s.kind === 'oldWyrm') return new Wyrm(x, y, s.kind);
     throw new Error('unknown spawn ' + s.kind);

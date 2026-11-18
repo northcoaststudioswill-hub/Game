@@ -588,6 +588,24 @@ const path = require('path');
       SH.saves.erase(0);
     })();
 
+    // Chapter 2, more to do: Bram's question, his three rings, plums for Iris
+    (function () {
+      SH.test.load('ring', { story: false }); G.progress.bonds = {}; G.progress.mem = {}; SH.test.choice = 0; const p = P(), w = G.world;
+      const bram = w.npcs.find(n => n.id === 'bram'); SH.test.place(bram.x / T + 1, 16); for (let i = 0; i < 4; i++) step({}, null); step({}, ['up']);
+      const asked = G.script && G.script.id === 'ring_bram_talk'; for (let i = 0; i < 400 && G.state === 'talk'; i++) talk({}, null);
+      const rings = w.things.filter(e => e.kind === 'target');
+      const run = n => { for (let i = 0; i < n; i++) { SH.fx.hitstop = 0; step({}, null); } };
+      SH.test.place(rings[0].x / T - 1.3, 16); p.facing = 1; run(3); step({}, ['attack']); run(20);                         // low: from the ground
+      SH.test.place(rings[1].x / T - 1.2, 16); p.facing = 1; run(30); step({ up: true }, ['attack']); run(30);              // middle: a rising strike
+      SH.test.place(rings[2].x / T - 1.3, 16); p.facing = 1; run(30); step({ jump: true }, ['jump']); let hitAir = false;
+      for (let i = 0; i < 40; i++) { const press = !p.swing && p.vy > -3 && !rings[2].hit ? ['attack'] : null; SH.fx.hitstop = 0; step({ jump: true }, press); }
+      for (let i = 0; i < 400 && (i < 30 || G.state === 'talk'); i++) talk({}, null);
+      const pl = w.things.find(e => e.kind === 'pickup' && e.what === 'plums'); p.x = pl.x; p.y = pl.y; for (let i = 0; i < 300 && (i < 5 || G.state === 'talk'); i++) talk({}, null);
+      const b = G.progress.bonds.bram || { pts: 0 };
+      check('Chapter 2: Bram asks why she stays (remembered); his three rings fall to a cut, a rising strike and an air strike; plums are found for Iris', asked && rings.every(r => r.hit) && G.recalls('bramTruth') && G.recalls('rings') && G.recalls('plums') && b.pts >= 20,
+        { asked, rings: rings.map(r => r.hit), remembered: Object.keys(G.progress.mem), bram: b.pts });
+    })();
+
     // Systems explain themselves the first time, once
     (function () {
       SH.test.load('woods', { story: false, explain: true }); G.progress.seen = {};

@@ -627,10 +627,34 @@
       ['wren', '...I know. I\'m staying anyway.'],
       { do: 'bond', who: 'caelum', pts: 20 },
     ],
+    // Chapter 2, more to do
+    ring_bram_talk: [
+      ['bram', 'Before you swing at anything: why are you here, huntress? Not "he stole me". Why are you still here?'],
+      { choose: [
+        { text: '"Because nobody here has lied to me yet."', bond: { bram: 10 }, why: 'He respects a reason that small and that true.', remember: ['bramTruth', 'Told Bram she stays because nobody here has lied to her.', true], then: [['bram', 'Hm. Give it a week. But that\'s a soldier\'s answer. I\'ll take it.']] },
+        { text: '"I\'m here to get strong enough to leave."', bond: { bram: 5 }, why: 'Honest. He\'d have said the same at your age.', remember: ['bramLeave', 'Told Bram she is here to get strong enough to leave.', null], then: [['bram', 'Then I\'ll train you well enough that leaving is your choice and not anyone else\'s.']] },
+        { text: '"That\'s between me and your High Lord."', bond: { bram: -5 }, why: 'He has buried people who kept things from him.', then: [['bram', 'Everything in this city is between you and the people who\'ll bleed next to you. Remember that.']] },
+      ] },
+      ['bram', 'There are three rings hung past the dummy. Cut them all and I\'ll believe your feet as well as your mouth.'],
+    ],
+    ring_rings: [
+      { do: 'flag', name: 'rings3' },
+      ['bram', 'Low, rising, and one from the air. Who taught you to read a target?'],
+      ['wren', 'My father. With a bow, and worse manners.'],
+      { do: 'remember', key: 'rings', text: 'Cut all three of Bram\'s rings.', good: true },
+      { do: 'bond', who: 'bram', pts: 10, liked: true, why: 'Three for three. He stopped pretending not to watch.' },
+    ],
+    ring_plums: [
+      ['narr', 'A market crate, burst open in the thornwood. Most of it is ruined. One paper twist of sugared plums is not.'],
+      ['wren', 'Somebody ran from here in a hurry. ...Iris said something about plums.'],
+      { do: 'remember', key: 'plums', text: 'Saved a twist of sugared plums from the thornwood.', good: true },
+    ],
     ev2_bram: [
       { do: 'art', id: 'fire', title: 'Evening with Bram' },
       ['narr', 'The Training Ring after dark. Bram is burning old practice dummies in a fire pit.'],
       ['bram', 'Come to gloat? You broke my best dummy.'],
+      { if: 'rings', then: [['bram', 'And cut my rings. All three. I\'ve had captains who couldn\'t.']] },
+      { if: 'bramTruth', then: [['bram', 'You said nobody here had lied to you yet. Still true?'], ['wren', 'Still true.'], ['bram', 'Good. Keep counting.']] },
       { choose: [
         { text: 'Bring him spiced bread from the market', liked: 'bram', bond: { bram: 15 }, then: [
           ['bram', 'Is that from the Night Market? Sit down, huntress. You\'re officially my favorite. Don\'t tell Iris.'],
@@ -652,6 +676,7 @@
       { do: 'art', id: 'observatory', title: 'Evening with Iris' },
       ['narr', 'A round tower above the Library, full of maps, candles and threads of starlight hanging in the air.'],
       ['iris', 'You came! Nobody visits the seer. They\'re afraid I\'ll tell them how they die.'],
+      { if: 'plums', then: [['wren', 'I found these in the thornwood. I think they were coming to you.'], ['iris', 'SUGARED PLUMS. I saw these arriving and I didn\'t dare believe it. You are my favourite thread.'], { do: 'bond', who: 'iris', pts: 15, liked: true, why: 'Sugared plums, carried out of a thornwood, for her.' }] },
       { choose: [
         { text: 'Bring her sugared plums', liked: 'iris', bond: { iris: 15 }, then: [
           ['iris', 'Plums! Sugared! Oh, you\'re a good thread, Wren. A very good thread.'],

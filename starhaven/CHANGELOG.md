@@ -1,5 +1,30 @@
 # Starhaven — Changelog
 
+## Reimagined 10 — Chapter 2 filled out, and a full retest (Nov 18, 2026)
+Will: make the current slice more content rich and developed, and retest for bugs.
+
+**Chapter 2, The Five,** was the one chapter with nothing new since before the reimagining. Now:
+- **Bram asks why she is still here** before she swings at anything (walk up and TALK). Three answers: one he
+  respects, one he understands, one that costs her with him. Two are remembered, and he comes back to the first one at
+  the fire that evening.
+- **Bram's three rings,** hung past the dummy: the low one falls to a cut from the ground, the middle one wants a
+  rising strike, the high one a strike from a jump. Cutting all three is remembered, earns XP and +10 with Bram, and
+  he mentions it that evening.
+- **Sugared plums for Iris:** a burst market crate in the thornwood. Spend the evening with Iris and she gets them
+  (+15: they are the thing she loves).
+
+**Retest.**
+- All suites: 50 play checks, 19 menu checks, the screenshot run.
+- The random-input run at 9,000 frames a chapter, sideways and upright: no errors. It had a blind spot: it gave the
+  same answer to the riddle forever and never left the first room Under the Mountain. It now varies its answers and
+  runs that whole level (to tile 143 of 150).
+- A save and reload carrying every kind of progress at once (level, remembered choices, a bond pushed below zero and
+  held at zero, Starlight from people, a lit star, explanations seen): identical before and after.
+- No new bugs were found in this pass.
+
+**Honest notes.** "No errors" means no crashes and no broken numbers under random play; it does not mean nothing looks
+or feels wrong. **Not played by hand or on a phone.**
+
 ## Reimagined 9 — levels, tighter controls (Nov 18, 2026)
 Will: analyze what matters; refine the gameplay and tighten the controls; add more experience progression and build it
 out; improve the quality overall.
