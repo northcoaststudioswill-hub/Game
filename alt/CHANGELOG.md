@@ -49,8 +49,8 @@ is updated and passes.
 close in front, where the givers stand, the new goals, where a message is drawn, regrowth and its cap, the meadow
 Leafs). `sprouts_valley.js` and `sprouts_story.js` twice each, soak (two mid-game and two late-game seeds, plus the
 first-day bot twelve times), `tests/v02` capsules_reset, saves_onboarding and lantern_menu, console shelf, Sproutwild
-lab 124 of 124, Patch & Plate 119 of 119, Knockout lab: all pass. Lightswarm lab passes two runs in three, as before
-(one of its random bot runs). **Not tested:** by hand, or on a phone.
+lab 124 of 124, Patch & Plate 119 of 119, Knockout lab: all pass. Lightswarm lab fails one check on some runs
+("sprouts keep shoulder room"; it has done so on and off all day, and Lightswarm's code is not touched here). **Not tested:** by hand, or on a phone.
 
 **To watch when playing:** the aim change makes things between Will and the cursor easier to hit; it could also pick
 something nearer than the thing meant when two are in a line. Louie's reach and the new goals are first guesses.
