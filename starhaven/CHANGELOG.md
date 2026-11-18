@@ -1,5 +1,25 @@
 # Starhaven — Changelog
 
+## Reimagined 15 — Wren herself (Nov 18, 2026)
+Will: keep improving the slice, playtesting, and the graphics, animations and character models.
+
+**Wren's in-level figure is redrawn.** She was the oldest drawing in the game: a box head, bare stick forearms, flat
+feet. Same skeleton and the same animation, so every pose and attack still works, but the figure on it is new:
+- **Head:** a soft jaw instead of a box, a full crown of hair swept back with a fringe and one bright strand, a
+  **braid in knots that swings behind her** and is tied in gold, a brow, an eye with an iris (green as a mortal, teal
+  once she is fae) and a catch-light, a nose, a mouth, colour in the cheek, and the pointed ear after the Deep.
+- **Body:** an open collar, a leather strap across the chest, a belt pouch, and the tunic flaring into a skirt with
+  a gold hem.
+- **Arms and legs:** rounded shoulders, elbows, hips and knees (the joints used to show as corners), leather bracers
+  with a pale cuff, real hands, and tall cuffed boots with soles.
+
+**Playtest.** 50 play checks, 19 menu checks, the random-input run at 6,000 frames a chapter in both orientations (no
+errors), and the screenshot run. Checked in close-up frames of standing, running, jumping, both cuts, the finisher and
+the rising strike.
+
+**Honest notes.** The wyrms and the wolf keep their earlier drawings. No new animation frames were added: this is a
+better figure on the existing motion. **Not played by hand or on a phone.**
+
 ## Reimagined 14 — the story's pages: cutscenes, the journal, the title (Nov 18, 2026)
 Will: the animated scenes still look ugly and this is a story game at heart; the journal should look like a journal;
 the menus should live in the world and draw you in; the text boxes should reflect that.
