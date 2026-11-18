@@ -452,6 +452,35 @@ const path = require('path');
         { gateClosed, won, rocksSeen: rocksSeen > 0, fightSeconds: +(f / 60).toFixed(1), peak: seen.has('mtn_peak'), evening: seen.has('evening3'), state: G.state });
     })();
 
+    // Bonds give something real, and the journal fills with pages
+    (function () {
+      SH.test.load(4, { story: false }); const p = P(), w = G.world;
+      G.progress.lore = {}; G.loreCheck(true);
+      const pages0 = Object.keys(G.progress.lore).length;
+      G.meet('bram'); G.meet('thane'); G.meet('caelum');
+      const noBoon = !G.boon('bram') && !G.boon('thane');
+      p.invuln = 0; p.iframes = 0; p.hearts = 5; p.hurt(p.x + 10, 1, w); const hurtBefore = p.hearts === 4;
+      const x0 = SH.xp.total(); SH.xp.gain(10); const plain = SH.xp.total() - x0;
+      G.bond('bram', 40, true, 't'); G.bond('thane', 40, true, 't'); G.bond('caelum', 120, true, 't');
+      SH.test.load(4, { story: false }); const q = P();
+      q.invuln = 0; q.iframes = 0; q.hearts = 5; const blocked = q.hurt(q.x + 10, 1, G.world) === false && q.hearts === 5;
+      q.invuln = 0; q.hurt(q.x + 10, 1, G.world); const onlyOnce = q.hearts === 4;
+      const x1 = SH.xp.total(); SH.xp.gain(10); const read = SH.xp.total() - x1;
+      q.invuln = 0; q.hearts = 2; SH.arts.meter = 0; q.hurt(q.x + 10, 1, G.world); const lastHeart = SH.arts.meter === SH.arts.max;
+      check('Bonds give something real: Bram\'s shield takes the first blow once per place, Thane adds a fifth more XP, Caelum fills the Bond Art at the last heart',
+        noBoon && hurtBefore && blocked && onlyOnce && plain === 10 && read === 12 && lastHeart, { noBoon, hurtBefore, blocked, onlyOnce, plain, read, lastHeart });
+      delete G.progress.lore.c_wolfSpared; if (G.progress.mem) delete G.progress.mem.wolfKilled; delete G.progress.lore.c_wolfKilled;
+      G.remember('wolfSpared', 'Let the starving wolf go.', true);
+      const fresh = G.loreCheck(true), lore = G.progress.lore;
+      G.hud.journal(true, 'pages'); const shown = document.querySelectorAll('#journal .page:not(.blank)').length, blank = document.querySelectorAll('#journal .page.blank').length;
+      const unread = G.loreNew();
+      G.hud.journal(true, 'bonds'); const ladders = document.querySelectorAll('#journal .ladder').length, active = document.querySelectorAll('#journal .ladder li.got').length;
+      G.hud.journal(false);
+      check('Journal pages: written by chapters reached, people met, hearts earned and choices made; blank pages say how; reading clears "new"',
+        pages0 > 10 && fresh >= 1 && lore.p_bram2 && lore.p_caelum3 && lore.c_wolfSpared && !lore.c_wolfKilled && shown === Object.keys(lore).length && blank > 0 && unread === 0 && ladders >= 3 && active >= 4,
+        { pages0, fresh, total: SH.STORY.LORE.length, shown, blank, unread, ladders, active });
+    })();
+
     // New moves: dash strike, rising strike, flame wave
     (function () {
       SH.test.load('mountain', { story: false }); const p = P(), w = G.world;

@@ -22,7 +22,7 @@
     const pr = G.progress;
     SH.saves.write(G.slot, {
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, xp: pr.xp || 0, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, xp: pr.xp || 0, lore: pr.lore || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
     });
     if (show) G.hud.saved();
   };
@@ -41,7 +41,7 @@
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
     G.slot = slot;
-    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen), bonus: s.bonus || 0, xp: s.xp || 0 };
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen), bonus: s.bonus || 0, xp: s.xp || 0, lore: Object.assign({}, s.lore) };
     SH.arts.newGame(); SH.arts.said = Object.assign({}, s.said); SH.arts.meter = s.bondMeter || 0;
     const N = ST.CHAPTERS.length, target = s.chapter;
     const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
@@ -366,13 +366,37 @@
     G.save();
   };
   G.recalls = key => !!(G.progress.mem && G.progress.mem[key]);
+  // A bond's boon is live once that heart is earned (see STORY.BOND_PATH).
+  G.boon = (who, h) => { const b = G.progress.bonds && G.progress.bonds[who]; return !!b && G.heartsFor(b.pts) >= (h || 2); };
+  // Journal pages: written the first time their condition is true. 1 = new, 2 = read.
+  G.loreOpen = function (l) {
+    const pr = G.progress, w = l.when;
+    if (w.ch != null) return Math.max(G.chapter, pr.reached || 0) >= w.ch;
+    if (w.met) return pr.met.includes(w.met);
+    if (w.pts) return !!pr.bonds[w.pts[0]] && pr.bonds[w.pts[0]].pts >= w.pts[1];
+    if (w.mem) return !!(pr.mem && pr.mem[w.mem]);
+    return false;
+  };
+  G.loreCheck = function (quiet) {
+    if (!G.progress.lore && G.chapter > 0) quiet = true;   // an older save: fill the journal without a fanfare
+    const lore = G.progress.lore = G.progress.lore || {}, fresh = [];
+    for (const l of ST.LORE) if (!lore[l.id] && G.loreOpen(l)) { lore[l.id] = 1; fresh.push(l); }
+    if (fresh.length && !quiet) { G.hud.toast(fresh.length === 1 ? `\u270E New page in Wren's journal: ${fresh[0].title}` : `\u270E ${fresh.length} new pages in Wren's journal`); SH.sfx.play('select'); }
+    if (fresh.length) G.save();
+    return fresh.length;
+  };
+  G.loreNew = () => Object.values(G.progress.lore || {}).filter(v => v === 1).length;
   G.bond = function (who, pts, liked, why) {
     if (!G.progress.bonds[who]) G.progress.bonds[who] = { pts: 0 };
     const b = G.progress.bonds[who], before = G.heartsFor(b.pts);
     b.pts = Math.max(0, b.pts + pts);
     G.explain('bonds');
     const after = G.heartsFor(b.pts);
-    if (after > before) { G.heartQueue.push(`heart_${who}_${after}`); SH.sfx.play('heart'); }
+    if (after > before) {
+      G.heartQueue.push(`heart_${who}_${after}`); SH.sfx.play('heart');
+      const step = ((ST.BOND_PATH[who] || {}).steps || []).find(x => x.h === after);
+      if (step) G.hud.toast(`\u2665 ${ST.CAST[who].name}, heart ${after}: ${step.name}. ${step.text}`);
+    }
     else if (pts < 0) SH.sfx.play('back');
     // every change is shown: who, how much, and why
     G.effect({ who, pts, why: why || (pts < 0 ? 'That stung.' : liked ? 'That meant a lot.' : 'Noted.'), heart: after > before ? after : 0 });
@@ -399,6 +423,7 @@
     if (G.mode) { if (G.state === 'talk' || G.state === 'play') G.progress.playFrames = (G.progress.playFrames || 0) + 1; SH.modes.step(input); return; }
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
     G.effectStep();
+    if (w.time % 90 === 45 && G.state === 'play' && !G.noExplain) G.loreCheck();
     if (G.state === 'play' && (G.explainWait || 0) > 0) G.explainWait--;
     if (G.state === 'talk') G.explainWait = Math.max(G.explainWait || 0, 60 * 6);   // and never the moment a conversation ends
     if (G.explainQ && G.explainQ.length && G.state === 'play' && !(G.explainWait > 0) && !G.mode && !SH.arts.cutin && !G.pending) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
@@ -426,7 +451,7 @@
     if (G.boss && G.boss.lastPhase !== w.bossPh) { w.bossPh = G.boss.lastPhase; if (w.bossPh > 1) SH.arts.whisper('boss' + w.bossPh, true); }
     // Starlight motes
     for (const m of w.motes) {
-      if (m.got || Math.abs(m.x - p.x) > SH.xp.reach() || Math.abs(m.y - (p.y - 20)) > SH.xp.reach() + 8) continue;
+      { const rch = SH.xp.reach() * (G.boon('iris') ? 1.8 : 1); if (m.got || Math.abs(m.x - p.x) > rch || Math.abs(m.y - (p.y - 20)) > rch + 8) continue; }
       m.got = true; SH.sfx.play('mote'); G.explain('starlight'); SH.xp.gain(1);
       fx.burst(m.x, m.y, 6, { speed: 1.6, life: 18, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
       G.hud.motes(w.motes.filter(x => x.got).length, w.motes.length, true);

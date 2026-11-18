@@ -475,6 +475,21 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
 }
 /* ---- save slots read as three journals on a shelf */
 @media (max-height: 460px) { #f-menu-wrap.note-first .fbtn .sub, .fbtn .sub.keep { display: block; } }
+
+/* ---- journal: ribbon tabs, bond ladders, lore pages */
+#j-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin: 6px 0 4px; border-bottom: 2px solid rgba(58,42,28,.4); }
+#journal .btn.jtab { font-family: 'Caveat', 'Segoe Script', cursive; font-size: 20px; letter-spacing: 0; text-transform: none; background: rgba(58,42,28,.1); color: #6a5238; box-shadow: none; border-radius: 6px 6px 0 0; padding: 4px 9px 2px; white-space: nowrap; margin: 0; min-height: 40px; width: auto; }
+#journal .btn.jtab.on { background: #7a2a1c; color: #f3e8cd; }
+#journal .btn.jtab.pad-sel { outline: 2px solid #3a2a1c; }
+#journal .toward { font-size: 15px; line-height: 1.35; margin: 6px 0 2px; font-style: italic; }
+#journal .ladder { list-style: none; padding: 0; margin: 4px 0 0; font-size: 14.5px; line-height: 1.35; }
+#journal .ladder li { padding: 2px 0; } #journal .ladder li.got, #journal .ladder li.got b { color: #3f6a22; } #journal .ladder li.far, #journal .ladder li.far b { color: rgba(58,42,28,.55); }
+#journal .ladder li.next { border-left: 3px solid #9a2a1c; padding-left: 6px; margin-left: -9px; } #journal .ladder i { color: #9a2a1c; }
+#journal .page { margin: 8px 0 12px; } #journal .page b { font-family: 'Caveat', 'Segoe Script', cursive; font-size: 22px; } #journal .page i { color: #9a2a1c; font-size: 14px; }
+#journal .page p { font-size: 15.5px; line-height: 1.45; } #journal .page.blank p { color: rgba(58,42,28,.5); font-style: italic; border: 1px dashed rgba(58,42,28,.3); padding: 4px 8px; }
+#journal .goals.road li { font-size: 15px; line-height: 22px; }
+#end #e-sum ul { margin: 2px 0 8px; padding-left: 18px; }
+body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   /* nothing floats over the open book */
 </style>
 </head>
 <body>
@@ -532,7 +547,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.3 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.4 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -577,6 +592,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
 <div class="screen" id="journal">
   <div class="card">
     <h2>Wren's journal</h2>
+    <div id="j-tabs"></div>
     <div id="j-body"></div>
     <button class="btn primary" id="j-back">Back</button>
   </div>
@@ -625,6 +641,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   <div class="card">
     <h2 id="e-head"></h2>
     <p id="e-text"></p>
+    <div id="e-sum" style="text-align:left;font-size:15px;line-height:1.4"></div>
     <button class="btn primary" id="e-again">Play again from the start</button>
     <button class="btn" id="e-home">Title screen</button>
   </div>

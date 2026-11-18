@@ -276,44 +276,85 @@
       + `<div><b>Choices remembered</b>${mem || 'None yet'}</div>`
       + `<div class="wide"><b>Level ${SH.xp.level()}${SH.xp.level() < SH.xp.max() ? ' &middot; ' + SH.xp.span()[0] + ' / ' + SH.xp.span()[1] + ' XP to level ' + (SH.xp.level() + 1) + ': ' + esc(SH.xp.PERKS[SH.xp.level() + 1].name) : ' &middot; highest for now'}</b>${SH.xp.PERKS.slice(2, SH.xp.level() + 1).map(k => esc(k.name)).join(', ') || 'No perks yet. Fight, hunt, gather and help to earn them.'}</div>`
       + (people ? `<div class="wide"><b>Bonds</b>${people}</div>` : '');
+    { const n = G.loreNew(); $('m-journal').textContent = "Wren's journal" + (n ? ` (${n} new ${n === 1 ? 'page' : 'pages'})` : ''); }
   };
 
   // ---------------- journal: what to do now, the story so far, and who's who
-  H.journal = function (show) {
+  let jTab = 'now';
+  H.journal = function (show, tab) {
     $('journal').classList.toggle('show', !!show);
     if (!show) return;
     const G = SH.game, ch = G.chapterDef();
-    let html = `<h3>Now: ${esc(ch.label)}, ${esc(ch.name)}</h3><ul class="goals">`;
-    for (const g of ch.goals) {
-      const done = !!G.flags[g.id];
-      html += `<li class="${done ? 'done' : g.id === G.activeGoal ? 'now' : ''}">${done ? '&#10003;' : g.id === G.activeGoal ? '&#9656;' : '&#9675;'} ${esc(g.text)}</li>`;
+    G.loreCheck(true);
+    if (tab) jTab = tab;
+    const fresh = G.loreNew();
+    const tabs = [['now', 'Today'], ['bonds', 'Bonds'], ['pages', 'Pages' + (fresh ? ` \u2022${fresh}` : '')], ['people', 'People']];
+    $('j-tabs').innerHTML = tabs.map(t => `<button class="btn jtab${t[0] === jTab ? ' on' : ''}" data-tab="${t[0]}">${t[1]}</button>`).join('');
+    $('j-tabs').querySelectorAll('button').forEach(b => { b.onclick = () => { SH.sfx.play('move'); H.journal(true, b.dataset.tab); }; });
+    let html = '';
+    if (jTab === 'now') {
+      html += `<h3>Now: ${esc(ch.label)}, ${esc(ch.name)}</h3><ul class="goals">`;
+      for (const g of ch.goals) {
+        const done = !!G.flags[g.id];
+        html += `<li class="${done ? 'done' : g.id === G.activeGoal ? 'now' : ''}">${done ? '&#10003;' : g.id === G.activeGoal ? '&#9656;' : '&#9675;'} ${esc(g.text)}</li>`;
+      }
+      html += '</ul><h3>What I am working toward</h3>';
+      html += '<p>Keep Starhaven standing through a war between two courts, and be ready for the Iron King when he uses it. I cannot do that alone. Every heart someone gives me is a blade, a shield or a truth I will need before the end. The Bonds tab says exactly what each one gives.</p><ul class="goals road">';
+      ST.CHAPTERS.forEach((c, i) => { html += `<li class="${i < G.chapter ? 'done' : i === G.chapter ? 'now' : ''}">${i < G.chapter ? '&#10003;' : i === G.chapter ? '&#9656;' : '&#9675;'} ${esc(c.label)}: ${esc(c.name)}</li>`; });
+      html += '<li>&#9675; Still ahead: the spy in the Library, Starfall, my sisters, the siege.</li></ul>';
+      html += '<h3>How I got here</h3>';
+      html += `<p>${esc(ST.RECAP)}</p>`;
+      for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
+      html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
+      const ms = G.progress.motes || {}, sum = Object.values(ms).reduce((a, b) => a + b, 0);
+      if (sum) html += `<p><b>Starlight gathered:</b> &#10022; ${sum}. Spend it in the pause menu, under Constellation.</p>`;
+      const mem = Object.values(G.progress.mem || {});
+      if (mem.length) { html += '<h3>Things I did</h3><ul class="mem-list">' + mem.map(m => `<li class="${m.good === true ? 'good' : m.good === false ? 'bad' : ''}">${esc(m.text)}</li>`).join('') + '</ul><p><small>Green: someone is better for it. Red: it will cost her. Gold: it could go either way. The story comes back to these, and some write a page of their own.</small></p>'; }
+    } else if (jTab === 'bonds') {
+      html += '<h3>The people I am tied to</h3>';
+      html += '<p>What I say and do moves people toward me or away. Every heart does three things: it plays a scene, it gives me something real in a fight, and it writes a page here. Further on, the hearts decide who stands with me at the end.</p>';
+      const bonds = G.progress.bonds, ids = Object.keys(ST.BONDS).filter(id => bonds[id]);
+      if (!ids.length) html += '<p>No bonds yet. They grow from the choices I make when I talk, the errands I run, and the evenings I spend.</p>';
+      for (const id of ids) {
+        const pts = bonds[id].pts, h = G.heartsFor(pts), next = ST.HEARTS_AT[h - 1];
+        const prev = h > 1 ? ST.HEARTS_AT[h - 2] : 0, k = next ? Math.min(1, (pts - prev) / (next - prev)) : 1, path = ST.BOND_PATH[id];
+        const nextStep = path.steps.find(x => x.h > h);
+        html += `<div class="person bond"><img src="${SH.art.portraitURL(id)}" alt=""><div><b>${esc(ST.CAST[id].name)}</b> <span class="hearts">${'♥'.repeat(h)}<span class="dim">${'♡'.repeat(5 - h)}</span></span>
+          <div class="bar"><span style="width:${Math.round(k * 100)}%"></span></div>
+          <small>${next ? `${pts} / ${next} to the next heart` : 'Every heart earned'} &middot; Loves: ${esc(ST.BONDS[id].loves)}</small>
+          <p class="toward"><b>Heading toward:</b> ${esc(path.toward)}</p>
+          <ul class="ladder">${path.steps.map(x => `<li class="${h >= x.h ? 'got' : x === nextStep ? 'next' : 'far'}">${h >= x.h ? '&#10003;' : '&#9825;'} <b>Heart ${x.h}: ${esc(x.name)}.</b> ${esc(x.text)}${h >= x.h && x.now ? ' <i>Active now.</i>' : ''}</li>`).join('')}</ul></div></div>`;
+      }
+    } else if (jTab === 'pages') {
+      const lore = G.progress.lore || {}, have = ST.LORE.filter(l => lore[l.id]).length;
+      html += `<h3>What I have learned</h3><p>${have} of ${ST.LORE.length} pages written. Pages are written as I see more of the world, grow closer to people, and make choices that matter.</p>`;
+      ST.LORE_PARTS.forEach((part, pi) => {
+        const list = ST.LORE.filter(l => l.part === pi);
+        const open = list.filter(l => lore[l.id]), shut = list.filter(l => !lore[l.id]);
+        if (pi === 4 && !open.length) return;
+        html += `<h3>${esc(part)}</h3>`;
+        for (const l of open) html += `<div class="page${lore[l.id] === 1 ? ' new' : ''}"><b>${esc(l.title)}</b>${lore[l.id] === 1 ? ' <i>new</i>' : ''}<p>${esc(l.text)}</p></div>`;
+        if (pi === 4) { if (shut.length) html += `<div class="page blank"><p>${shut.length} more ${shut.length === 1 ? 'page' : 'pages'} here for choices I have not made.</p></div>`; }
+        else for (const l of shut) html += `<div class="page blank"><p>A blank page. ${esc(l.hint)}</p></div>`;
+      });
+      for (const k in lore) lore[k] = 2;
+      G.save();
+    } else {
+      html += '<h3>Who is who</h3>';
+      for (const p of G.knownPeople()) html += `<div class="person"><img src="${SH.STORY.CAST[p.id] ? SH.art.portraitURL(p.id) : ''}" alt="" ${SH.STORY.CAST[p.id] ? '' : 'style="visibility:hidden"'}><div><b>${esc(p.name)}</b><br>${esc(p.text)}</div></div>`;
     }
-    html += '</ul><h3>How I got here</h3>';
-    html += `<p>${esc(ST.RECAP)}</p>`;
-    for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
-    html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
-    const ms = G.progress.motes || {}, sum = Object.values(ms).reduce((a, b) => a + b, 0);
-    if (sum) html += `<p><b>Starlight gathered:</b> &#10022; ${sum}. Spend it in the pause menu, under Constellation.</p>`;
-    const mem = Object.values(G.progress.mem || {});
-    if (mem.length) { html += '<h3>Things I did</h3><ul class="mem-list">' + mem.map(m => `<li class="${m.good === true ? 'good' : m.good === false ? 'bad' : ''}">${esc(m.text)}</li>`).join('') + '</ul><p><small>Green: someone is better for it. Red: it will cost her. Gold: it could go either way. The story comes back to these.</small></p>'; }
-    html += '<h3>The people I am tied to</h3>';
-    const bonds = G.progress.bonds, ids = Object.keys(ST.BONDS).filter(id => bonds[id]);
-    if (!ids.length) html += '<p>No bonds yet. Hearts grow from evenings together, gifts they love, and the choices you make when you talk.</p>';
-    for (const id of ids) {
-      const pts = bonds[id].pts, h = G.heartsFor(pts), next = ST.HEARTS_AT[h - 1];
-      const prev = h > 1 ? ST.HEARTS_AT[h - 2] : 0, k = next ? Math.min(1, (pts - prev) / (next - prev)) : 1;
-      html += `<div class="person bond"><img src="${SH.art.portraitURL(id)}" alt=""><div><b>${esc(ST.CAST[id].name)}</b> <span class="hearts">${'\u2665'.repeat(h)}<span class="dim">${'\u2661'.repeat(5 - h)}</span></span>
-        <div class="bar"><span style="width:${Math.round(k * 100)}%"></span></div>
-        <small>${next ? `${pts} / ${next} points to the next heart` : 'Every heart earned'} &middot; Loves: ${esc(ST.BONDS[id].loves)}</small></div></div>`;
-    }
-    html += '<h3>Who is who</h3>';
-    for (const p of G.knownPeople()) html += `<div class="person"><img src="${SH.STORY.CAST[p.id] ? SH.art.portraitURL(p.id) : ''}" alt="" ${SH.STORY.CAST[p.id] ? '' : 'style="visibility:hidden"'}><div><b>${esc(p.name)}</b><br>${esc(p.text)}</div></div>`;
     $('j-body').innerHTML = html;
+    $('journal').querySelector('.card').scrollTop = 0;
   };
 
   H.end = function (show) {
     $('end').classList.toggle('show', show);
-    if (show) { $('e-head').textContent = ST.END.title; $('e-text').textContent = ST.END.text; }
+    if (show) {
+      const G = SH.game, bonds = G.progress.bonds || {}, lore = G.progress.lore || {};
+      $('e-head').textContent = ST.END.title; $('e-text').textContent = ST.END.text;
+      const who = Object.keys(ST.BONDS).filter(id => bonds[id]).map(id => { const h = G.heartsFor(bonds[id].pts), st = ST.BOND_PATH[id].steps.filter(x => x.h <= h && x.now).pop(); return `<li><b>${esc(ST.CAST[id].name)}</b> ${'\u2665'.repeat(h)}${st ? ': ' + esc(st.name) : ''}</li>`; }).join('');
+      $('e-sum').innerHTML = `<p><b>Where Wren stands</b></p><ul>${who}</ul><p>${Object.keys(lore).length} of ${ST.LORE.length} journal pages written &middot; ${Object.keys(G.progress.mem || {}).length} choices remembered. A different Wren fills different pages.</p>`;
+    }
   };
 
   // ---------------- TUNE panel: live sliders for the movement numbers

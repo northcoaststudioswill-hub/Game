@@ -354,7 +354,11 @@
     if (this.dead || this.invuln > 0 || SH.arts.cutin || SH.arts.scene) return false;   // nothing touches her mid Bond Art
     if (this.iframes > 0) return false;
     const fx = SH.fx;
+    { const gw = SH.game.world;   // Bram, heart 2: his shield takes the first blow in each place
+      if (gw && !gw.bramUsed && SH.game.boon('bram')) { gw.bramUsed = true; this.invuln = SH.PLAYER.hurtInvuln; fx.word(this.x, this.y - 64, 'BRAM\'S SHIELD', '#ffd27a', 90); fx.ring(this.x, this.y - 22, '#ffd27a', 34, 16, 2); SH.sfx.play('thud'); return false; } }
     this.hearts = Math.max(0, this.hearts - dmg);
+    { const gw = SH.game.world;   // Caelum, heart 3: at the last heart, the Bond Art is ready
+      if (gw && this.hearts === 1 && !gw.caelumUsed && SH.game.boon('caelum', 3) && SH.arts.max) { gw.caelumUsed = true; SH.arts.meter = SH.arts.max; SH.fx.word(this.x, this.y - 64, 'HE IS WITH YOU', '#b9a8ff', 90); } }
     SH.game.punch(0.07); SH.arts.dropCombo();
     this.stats.hurt++; this.hitFlash = 6; this.charging = false; this.chargeT = 0;
     SH.sfx.play('hurt');

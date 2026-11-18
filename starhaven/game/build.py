@@ -11,6 +11,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 ORDER = [
     'tuning.js',     # every feel number
     'story.js',      # intro, chapters, goals, dialogue, journal
+    'lore.js',       # what bonds give, and the journal's pages
     'rooms.js',      # level data
     'input.js',      # keyboard, gamepad, touch
     'sfx.js',        # synthesized sound effects

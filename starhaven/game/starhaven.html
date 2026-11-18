@@ -475,6 +475,21 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
 }
 /* ---- save slots read as three journals on a shelf */
 @media (max-height: 460px) { #f-menu-wrap.note-first .fbtn .sub, .fbtn .sub.keep { display: block; } }
+
+/* ---- journal: ribbon tabs, bond ladders, lore pages */
+#j-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin: 6px 0 4px; border-bottom: 2px solid rgba(58,42,28,.4); }
+#journal .btn.jtab { font-family: 'Caveat', 'Segoe Script', cursive; font-size: 20px; letter-spacing: 0; text-transform: none; background: rgba(58,42,28,.1); color: #6a5238; box-shadow: none; border-radius: 6px 6px 0 0; padding: 4px 9px 2px; white-space: nowrap; margin: 0; min-height: 40px; width: auto; }
+#journal .btn.jtab.on { background: #7a2a1c; color: #f3e8cd; }
+#journal .btn.jtab.pad-sel { outline: 2px solid #3a2a1c; }
+#journal .toward { font-size: 15px; line-height: 1.35; margin: 6px 0 2px; font-style: italic; }
+#journal .ladder { list-style: none; padding: 0; margin: 4px 0 0; font-size: 14.5px; line-height: 1.35; }
+#journal .ladder li { padding: 2px 0; } #journal .ladder li.got, #journal .ladder li.got b { color: #3f6a22; } #journal .ladder li.far, #journal .ladder li.far b { color: rgba(58,42,28,.55); }
+#journal .ladder li.next { border-left: 3px solid #9a2a1c; padding-left: 6px; margin-left: -9px; } #journal .ladder i { color: #9a2a1c; }
+#journal .page { margin: 8px 0 12px; } #journal .page b { font-family: 'Caveat', 'Segoe Script', cursive; font-size: 22px; } #journal .page i { color: #9a2a1c; font-size: 14px; }
+#journal .page p { font-size: 15.5px; line-height: 1.45; } #journal .page.blank p { color: rgba(58,42,28,.5); font-style: italic; border: 1px dashed rgba(58,42,28,.3); padding: 4px 8px; }
+#journal .goals.road li { font-size: 15px; line-height: 22px; }
+#end #e-sum ul { margin: 2px 0 8px; padding-left: 18px; }
+body:has(#journal.show) #toast, body:has(#end.show) #toast { display: none; }   /* nothing floats over the open book */
 </style>
 </head>
 <body>
@@ -532,7 +547,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.3 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.4 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -577,6 +592,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
 <div class="screen" id="journal">
   <div class="card">
     <h2>Wren's journal</h2>
+    <div id="j-tabs"></div>
     <div id="j-body"></div>
     <button class="btn primary" id="j-back">Back</button>
   </div>
@@ -625,6 +641,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   <div class="card">
     <h2 id="e-head"></h2>
     <p id="e-text"></p>
+    <div id="e-sum" style="text-align:left;font-size:15px;line-height:1.4"></div>
     <button class="btn primary" id="e-again">Play again from the start</button>
     <button class="btn" id="e-home">Title screen</button>
   </div>
@@ -775,7 +792,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   S.EXPLAIN = {
     starlight: { icon: '\u2726', title: 'Starlight', text: 'The gold motes in every level. The counter beside MENU shows how many this level holds. Spend Starlight in the pause menu, under Constellation, on more hearts and stronger Bond Arts.' },
     lantern: { icon: '\u2600', title: 'Lanterns', text: 'Lighting a lantern fills your hearts. If Wren is knocked out she comes back at the last one she lit, with nothing lost.' },
-    bonds: { icon: '\u2665', title: 'Bonds', text: 'What you say and do moves people toward you or away. A green card means closer, a red card means further, and the card says why. Each person has five hearts; a new heart plays a scene. See them in Wren\'s journal.' },
+    bonds: { icon: '\u2665', title: 'Bonds', text: 'What you say and do moves people toward you or away. A green card means closer, a red card means further, and the card says why. Each person has five hearts. A new heart plays a scene, gives Wren something real in a fight, and writes new pages in her journal. The journal shows what each heart gives and where each bond is heading.' },
     remember: { icon: '\u2726', title: 'This will be remembered', text: 'Some decisions change scenes later in the story. Green: someone is better for it. Red: it will cost her. Gold: it could go either way. They are listed in Wren\'s journal, under What Wren has done.' },
     bondbar: { icon: '\u263E', title: 'The bond bar and Bond Arts', text: 'The bar under your hearts fills as your hits land, faster for long unbroken strings. When it is full, a BOND ART button appears: a huge attack, with a memory. Nothing can hurt Wren while it plays.' },
     moons: { icon: '\u25CF', title: 'Moons and the Flame', text: 'Each Flame costs one moon. Hold the button and let go for a flame wave that costs two. Moons refill slowly by themselves, and quickly when your daggers land.' },
@@ -1623,6 +1640,105 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     title: 'End of the concept',
     text: 'That was the Prologue through Chapter 3. Next in the design doc: Chapter 4, The Spy in the Library. Winged spies attack, the city itself becomes the battlefield, and Wren learns the bow.',
   };
+})(window.SH = window.SH || {});
+
+</script>
+<script>
+// ---- src/lore.js
+// Starhaven: what the bonds are for, and the pages that fill Wren's journal as she learns the world.
+// Both are plain data. game.js unlocks pages; hud.js draws them.
+(function (SH) {
+  'use strict';
+  const S = SH.STORY;
+
+  // Each person: where the bond is heading, and what each heart gives. `now` steps work in this slice.
+  S.BOND_PATH = {
+    caelum: { toward: 'The mate bond, said aloud. How much of himself he gives Wren decides how the two of them face the war: as allies, or as one.',
+      steps: [
+        { h: 2, name: 'Starlit', text: 'The Bond Art bar fills a quarter faster.', now: true },
+        { h: 3, name: 'His shadow at your back', text: 'Once in each place, when Wren is down to her last heart, the Bond Art bar fills at once.', now: true },
+        { h: 4, name: 'Wings', text: 'He teaches her to fly beside him. (Chapters to come.)' },
+        { h: 5, name: 'The bond, spoken', text: 'Starfall. He says it, and the ending changes. (Chapters to come.)' },
+      ] },
+    bram: { toward: 'A brother. At the siege of Starhaven, Bram holds whichever gate Wren asks him to, if he trusts her enough to be asked.',
+      steps: [
+        { h: 2, name: 'Shield-brother', text: 'Once in each place, the first blow that would hurt Wren is taken on Bram\'s shield instead.', now: true },
+        { h: 3, name: 'The long count', text: 'One more heart for Wren. (Chapters to come.)' },
+        { h: 4, name: 'Back to back', text: 'A Bond Art fought together. (Chapters to come.)' },
+        { h: 5, name: 'The gate holds', text: 'He stands at the siege. (Chapters to come.)' },
+      ] },
+    iris: { toward: 'The truth of what she saw. Iris has seen how this ends and will not say, until she is sure Wren can bear it.',
+      steps: [
+        { h: 2, name: 'Sharp eyes', text: 'Starlight is drawn to Wren from much further away.', now: true },
+        { h: 3, name: 'A thread pulled', text: 'Hidden Starlight shows on the path. (Chapters to come.)' },
+        { h: 4, name: 'Second sight', text: 'A Bond Art that slows the world. (Chapters to come.)' },
+        { h: 5, name: 'What she saw', text: 'She tells Wren the ending, in time to change it. (Chapters to come.)' },
+      ] },
+    thane: { toward: 'The name of the older thing in Wren\'s blood. Thane is the only one reading for it.',
+      steps: [
+        { h: 2, name: 'Well read', text: 'Wren learns faster: a fifth more experience from everything.', now: true },
+        { h: 3, name: 'Margin notes', text: 'Flame costs less to cast. (Chapters to come.)' },
+        { h: 4, name: 'The second gift', text: 'He finds the way to wake the next court gift. (Chapters to come.)' },
+        { h: 5, name: 'The name of it', text: 'He tells Wren what she is. (Chapters to come.)' },
+      ] },
+    nessa: { toward: 'Whether Nessa follows Wren when the Iron King comes for the sisters, or fights her the whole way.',
+      steps: [
+        { h: 2, name: 'A letter, unsent', text: 'A page in this journal, in her hand.', now: true },
+        { h: 3, name: 'Her word', text: 'She comes when Wren calls. (Chapters to come.)' },
+      ] },
+    lissa: { toward: 'Whether Lissa still believes in spring when Wren finds her again. It changes what she becomes.',
+      steps: [
+        { h: 2, name: 'Pressed flowers', text: 'A page in this journal, in her hand.', now: true },
+        { h: 3, name: 'Her garden', text: 'Something green grows in Starhaven. (Chapters to come.)' },
+      ] },
+  };
+
+  // Journal pages. `when` is the first of: ch (chapter reached), met, pts [who, points], mem (a remembered choice).
+  // `hint` is what a blank page says before it is written.
+  const L = (id, part, title, when, hint, text) => ({ id, part, title, when, hint, text });
+  S.LORE_PARTS = ['The mortal lands', 'The courts', 'The war', 'People', 'Things I chose'];
+  S.LORE = [
+    L('wall', 0, 'The Wall', { ch: 0 }, '', 'North of the village the trees stop at a thing nobody has seen and everybody can point to. The fae are on the other side. The old treaty says they stay there and we stay here, and for five hundred years the only ones who tested it were hunters who had run out of everything else. Like me.'),
+    L('winter', 0, 'This winter', { ch: 0 }, '', 'Three snares, checked at first light. A rabbit is two days. Nothing is two days of Nessa pretending she already ate. Father stopped hunting the year the money went; I learned the bow from a man who took a goat as payment and thought he had the better of it.'),
+    L('stag', 0, 'The white stag', { ch: 1 }, 'Finish the hunt in the Winter Woods.', 'It did not run. I have turned that over more than anything since. A white stag, bigger than a horse, standing in the clearing as if it had been told to wait. The fae do not keep deer. They keep promises, and that one was walking around on four legs.'),
+    L('lifeforlife', 0, 'A life for a life', { ch: 1 }, 'Finish the hunt in the Winter Woods.', 'That is the whole of their law, as far as Lord Rowan explained it at our door. I killed something of Spring\'s. Spring is owed a life. He could have taken it on the spot. He took me across the Wall instead, alive, and I have never decided whether that was mercy.'),
+    L('spring', 1, 'The Spring Court', { ch: 1 }, 'Cross the Wall.', 'Roses that do not die back. A lord who is kind the way a locked door is safe. Rowan gave me a room, a garden and no reason to leave, and I was grateful for all three long past the point I should have been.'),
+    L('queen', 1, 'The Thorn Queen', { ch: 1 }, 'Go Under the Mountain.', 'She took the courts one at a time and their lords with them. She did not want land. She wanted them to watch. She kept her court in the Deep, under the mountain, where nothing grows that she did not plant.'),
+    L('trials', 1, 'Three trials', { ch: 2 }, 'Survive the Deep.', 'A riddle, a maze, a beast. Win all three and Rowan went free; that was her bargain, and she never expected to pay. I answered her riddle. I walked her maze. The beast I beat, and it killed me anyway. I remember the floor being cold, and then I remember nothing.'),
+    L('blood', 1, 'What his blood did', { ch: 2 }, 'Survive the Deep.', 'Mortals do not come back. Caelum opened his wrist over me and I did, and what got up was not what lay down. Faster. Harder to kill. Ears I still catch on my hood. He has never once said I owe him for it, which is how I know he thinks about it.'),
+    L('dusk', 1, 'The Court of Dusk', { ch: 2 }, 'Leave the Spring Court.', 'The other courts call it the court of nightmares, and Caelum lets them. A realm everyone is afraid of is a realm nobody visits. What is actually inside it he has hidden for five hundred years.'),
+    L('starhaven', 1, 'Starhaven', { ch: 2 }, 'Leave the Spring Court.', 'A city on a river under a sky with too many stars, with painted shutters and people who stay up late on purpose. No army has ever found it. It is the thing he is protecting when he plays the villain, and now I have seen it I would play one too.'),
+    L('winnow', 1, 'Winnowing', { met: 'caelum' }, 'Meet Lord Caelum.', 'The fae can fold themselves from one place to another: a step, a smell like rain on stone, and they are across the room or across the realm. Caelum does it without looking. He says it costs him nothing. He is lying about how much.'),
+    L('paint', 1, 'Painting the walls', { ch: 3 }, 'Paint in Starhaven.', 'I had not held a brush since the Deep. The street was dark and the wall was bare and my hands remembered before I did. Where I paint, the lamps come back. Nobody has explained that to me and I have stopped asking, in case it stops.'),
+    L('five', 1, 'The Five', { ch: 3 }, 'Come to the Training Ring.', 'Caelum\'s inner circle. Not a council; closer to a family that argues at dinner. A general, a seer and a scholar I have met. There are two more I have not, and the others change the subject when I count.'),
+    L('matebond', 1, 'The mate bond', { ch: 3 }, 'Come to the Training Ring.', 'Some fae are matched to one other person by something older than the courts. A thread, Iris calls it. He felt it the first day he saw me. A mortal cannot feel it at all. I can now. It is not a leash. It is more like knowing which way is north.'),
+    L('rowanwar', 2, 'Rowan\'s war', { ch: 3 }, 'Come to the Training Ring.', 'Caelum called in our bargain and took me out of Spring in front of Rowan\'s whole court. Rowan has called it theft and declared war on Dusk. He believes he is rescuing me. That is the worst of it: he truly does.'),
+    L('ironking', 2, 'The Iron King', { ch: 3 }, 'Come to the Training Ring.', 'A king across the sea who has been building an army since before my grandmother was born. Two courts at each other\'s throats is exactly what he was waiting for. His creatures are already in our woods, and one of them knew my name.'),
+    L('thornwood', 2, 'What the Queen left', { ch: 3 }, 'Come to the Training Ring.', 'She is dead and her thorns are not. They root wherever she walked, and the little sprites that tend them still think they have a mistress. Bram says cut them at the bud. He is right, and I hate that they look surprised.'),
+    L('flame', 2, 'Fire', { ch: 4 }, 'Climb the mountain.', 'It came out of my palm on the mountain road. Caelum\'s blood is night and starlight; this was neither. Thane went quiet, then went for his books. He says the High Lords each carry one gift and nobody carries two. He says "something older" and will not finish the sentence.'),
+    L('wyrm', 2, 'The Old Wyrm', { ch: 4 }, 'Climb the mountain.', 'It has slept in the hollow under the peak since before the courts drew their borders. Its head is plate; its back is not. It hates fire down its throat. Something woke it, and it was not us.'),
+    L('p_caelum1', 3, 'Caelum, as I found him', { met: 'caelum' }, 'Meet Lord Caelum.', 'High Lord of Dusk. He walked into the Deep wearing the Queen\'s favour like a coat he meant to burn. Everything he says in public is a blade pointed somewhere. I am learning to hear what he says when it is pointed nowhere.'),
+    L('p_caelum2', 3, 'Caelum, on the rooftop', { pts: ['caelum', 40] }, 'Grow closer to Caelum (heart 2).', 'He told me he watched the last trial and could not move. Five hundred years old and useless, he said. He has ruled alone so long that he says "I" when he means the whole city. I do not think anyone has asked him how he is since before I was born.'),
+    L('p_caelum3', 3, 'Caelum, what he keeps', { pts: ['caelum', 120] }, 'Grow closer to Caelum (heart 3).', 'He keeps every sketch I throw away. I found them flattened inside a book of border treaties, in order. He does not know that I know. I have started throwing away better ones.'),
+    L('p_bram1', 3, 'Bram', { met: 'bram' }, 'Meet Bram.', 'General of Dusk\'s armies, and the one who makes the bread. He was born in a war camp and learned to fight before he learned to read, and is touchy about only one of those. He hits the practice dummy as if it owes him money.'),
+    L('p_bram2', 3, 'Bram, by the fire', { pts: ['bram', 40] }, 'Grow closer to Bram (heart 2).', 'He welcomed me to the Five "properly", which I gather he has done for nobody in a century. He lost a company once, following an order he thought was wrong. He follows no order now without saying what he thinks of it first. Caelum calls this insubordination, fondly.'),
+    L('p_iris1', 3, 'Iris', { met: 'iris' }, 'Meet Iris.', 'She sees threads: what might happen, tangled, all at once. She is cheerful about it the way people are cheerful in a storm. She collects old maps of places that have changed, and sugared plums, and she already knew my name.'),
+    L('p_iris2', 3, 'Iris, what she will not say', { pts: ['iris', 40] }, 'Grow closer to Iris (heart 2).', 'I asked her how this ends. She laughed, and then she did not. She said some threads fray if you look at them too hard, and that mine is the only one in the city she cannot see past a certain night. She would not tell me which night.'),
+    L('p_thane1', 3, 'Thane', { met: 'thane' }, 'Meet Thane.', 'Keeper of the Library. He has a theory about everything and tests them on whoever is nearest. Ink on both cuffs. He talks to the books, and I am not completely certain they do not answer.'),
+    L('p_thane2', 3, 'Thane, in the margins', { pts: ['thane', 40] }, 'Grow closer to Thane (heart 2).', 'He showed me a page with seven court sigils and an eighth space, scraped blank on purpose, long ago. He thinks my fire belongs in the gap. He has not told Caelum yet. He asked me not to either, and I have not decided.'),
+    L('p_nessa1', 3, 'Nessa', { pts: ['nessa', 10] }, 'Do right by Nessa.', 'My older sister by a year, and she has never let me forget which of us it is. She gives away her share and then lies about it badly. She has not forgiven Father, or the winter, or me for being the one who can shoot. Tell her the truth and she will carry anything.'),
+    L('p_nessa2', 3, 'Nessa\'s letter, unsent', { pts: ['nessa', 40] }, 'Grow closer to Nessa (heart 2).', '"You went with him so we would eat. I know that. I am angry anyway, and I will be until you walk back through this door and I can be angry at your face." It was folded inside my coat. She must have put it there before I left.'),
+    L('p_lissa1', 3, 'Lissa', { pts: ['lissa', 10] }, 'Be kind to Lissa.', 'The youngest. She keeps a window box alive in a winter that has killed everything else, by what I can only call stubbornness. She believes spring always comes. I used to think that was softness. It is the hardest thing in our house.'),
+    L('p_lissa2', 3, 'Lissa\'s pressed flowers', { pts: ['lissa', 40] }, 'Grow closer to Lissa (heart 2).', 'Wintergreen, a snowdrop, something blue I cannot name. Pressed between two of my old sketches so they would have, she wrote, "company".'),
+    L('c_wolfSpared', 4, 'The wolf I let go', { mem: 'wolfSpared' }, 'A choice in the Winter Woods.', 'It was as thin as we were. I lowered the bow and it looked at me a long moment before it went. I have been told since that nothing in those woods that winter was only a wolf.'),
+    L('c_wolfKilled', 4, 'The wolf I killed', { mem: 'wolfKilled' }, 'A choice in the Winter Woods.', 'A pelt is a month of bread. I would do it again. I have been told since that nothing in those woods that winter was only a wolf, and I would still do it again.'),
+    L('c_green', 4, 'Wintergreen', { mem: 'green' }, 'Something to find in the Winter Woods.', 'Growing under the snow where the big pine fell. Lissa cried, which she will deny. One green thing, in that winter.'),
+    L('c_paint', 4, 'A painting in spring', { mem: 'paintPromise' }, 'A promise in the Winter Woods.', 'I promised Lissa a painting when the thaw came. I was across the Wall before it did. I still owe it. I intend to pay.'),
+    L('c_rowan', 4, 'What I told Rowan', { mem: 'rowanHonest' }, 'A choice at our door.', 'He asked who killed the stag and I stepped forward and said I did. Nessa has not forgiven me for being quicker than her. He called it honest. I think it is the reason he trusts my word now, even across a war.'),
+    L('c_cat', 4, 'Mirelle\'s cat', { mem: 'cat' }, 'Someone in Starhaven needs help.', 'On an awning, furious, perfectly able to get down. The first thing I did in this city that was not about a war. I think about that more than it deserves.'),
+    L('c_page', 4, 'The torn page', { mem: 'page' }, 'Something to find on the mountain.', 'Thane\'s lost page, wedged in the rocks on the mountain road, a long way from any library. He held it by the edges. He did not say how it got up there, and he stopped talking, which he never does.'),
+    L('c_bram', 4, 'What I told Bram', { mem: 'bramTruth' }, 'A choice at the Training Ring.', 'He asked why I stay. I said: because nobody here has lied to me yet. He said to give it a week. He also said it was a soldier\'s answer, and from Bram that is a medal.'),
+  ];
 })(window.SH = window.SH || {});
 
 </script>
@@ -2806,7 +2922,11 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     if (this.dead || this.invuln > 0 || SH.arts.cutin || SH.arts.scene) return false;   // nothing touches her mid Bond Art
     if (this.iframes > 0) return false;
     const fx = SH.fx;
+    { const gw = SH.game.world;   // Bram, heart 2: his shield takes the first blow in each place
+      if (gw && !gw.bramUsed && SH.game.boon('bram')) { gw.bramUsed = true; this.invuln = SH.PLAYER.hurtInvuln; fx.word(this.x, this.y - 64, 'BRAM\'S SHIELD', '#ffd27a', 90); fx.ring(this.x, this.y - 22, '#ffd27a', 34, 16, 2); SH.sfx.play('thud'); return false; } }
     this.hearts = Math.max(0, this.hearts - dmg);
+    { const gw = SH.game.world;   // Caelum, heart 3: at the last heart, the Bond Art is ready
+      if (gw && this.hearts === 1 && !gw.caelumUsed && SH.game.boon('caelum', 3) && SH.arts.max) { gw.caelumUsed = true; SH.arts.meter = SH.arts.max; SH.fx.word(this.x, this.y - 64, 'HE IS WITH YOU', '#b9a8ff', 90); } }
     SH.game.punch(0.07); SH.arts.dropCombo();
     this.stats.hurt++; this.hitFlash = 6; this.charging = false; this.chargeT = 0;
     SH.sfx.play('hurt');
@@ -3935,6 +4055,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   X.span = () => { const l = X.level(); return l >= X.max() ? [1, 1] : [X.total() - X.AT[l - 1], X.AT[l] - X.AT[l - 1]]; };
   X.gain = function (n, why) {
     const G = SH.game; if (!prog() || !n) return;
+    if (n > 0 && G.boon('thane')) n = Math.ceil(n * 1.2);   // Thane, heart 2: Well read
     const before = X.level(); prog().xp = X.total() + n;
     const p = G.world && G.world.player;
     if (p && why) SH.fx.word(p.x, p.y - 76, '+' + n + ' XP', '#9fe8ff', 44);
@@ -4049,7 +4170,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   A.gain = function (n) {
     if (!A.active() || A.scene) return;
     const was = A.meter >= A.max;
-    A.meter = Math.min(A.max, A.meter + n * (1 + 0.15 * SH.stars.level('bond')));
+    A.meter = Math.min(A.max, A.meter + n * (1 + 0.15 * SH.stars.level('bond')) * (SH.game.boon('caelum') ? 1.25 : 1));
     if (A.meter > 20) SH.game.explain('bondbar');
     if (!was && A.meter >= A.max) {
       SH.sfx.play('lantern');
@@ -6428,7 +6549,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     const pr = G.progress;
     SH.saves.write(G.slot, {
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, xp: pr.xp || 0, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, xp: pr.xp || 0, lore: pr.lore || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
     });
     if (show) G.hud.saved();
   };
@@ -6447,7 +6568,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
     G.slot = slot;
-    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen), bonus: s.bonus || 0, xp: s.xp || 0 };
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen), bonus: s.bonus || 0, xp: s.xp || 0, lore: Object.assign({}, s.lore) };
     SH.arts.newGame(); SH.arts.said = Object.assign({}, s.said); SH.arts.meter = s.bondMeter || 0;
     const N = ST.CHAPTERS.length, target = s.chapter;
     const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
@@ -6772,13 +6893,37 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     G.save();
   };
   G.recalls = key => !!(G.progress.mem && G.progress.mem[key]);
+  // A bond's boon is live once that heart is earned (see STORY.BOND_PATH).
+  G.boon = (who, h) => { const b = G.progress.bonds && G.progress.bonds[who]; return !!b && G.heartsFor(b.pts) >= (h || 2); };
+  // Journal pages: written the first time their condition is true. 1 = new, 2 = read.
+  G.loreOpen = function (l) {
+    const pr = G.progress, w = l.when;
+    if (w.ch != null) return Math.max(G.chapter, pr.reached || 0) >= w.ch;
+    if (w.met) return pr.met.includes(w.met);
+    if (w.pts) return !!pr.bonds[w.pts[0]] && pr.bonds[w.pts[0]].pts >= w.pts[1];
+    if (w.mem) return !!(pr.mem && pr.mem[w.mem]);
+    return false;
+  };
+  G.loreCheck = function (quiet) {
+    if (!G.progress.lore && G.chapter > 0) quiet = true;   // an older save: fill the journal without a fanfare
+    const lore = G.progress.lore = G.progress.lore || {}, fresh = [];
+    for (const l of ST.LORE) if (!lore[l.id] && G.loreOpen(l)) { lore[l.id] = 1; fresh.push(l); }
+    if (fresh.length && !quiet) { G.hud.toast(fresh.length === 1 ? `\u270E New page in Wren's journal: ${fresh[0].title}` : `\u270E ${fresh.length} new pages in Wren's journal`); SH.sfx.play('select'); }
+    if (fresh.length) G.save();
+    return fresh.length;
+  };
+  G.loreNew = () => Object.values(G.progress.lore || {}).filter(v => v === 1).length;
   G.bond = function (who, pts, liked, why) {
     if (!G.progress.bonds[who]) G.progress.bonds[who] = { pts: 0 };
     const b = G.progress.bonds[who], before = G.heartsFor(b.pts);
     b.pts = Math.max(0, b.pts + pts);
     G.explain('bonds');
     const after = G.heartsFor(b.pts);
-    if (after > before) { G.heartQueue.push(`heart_${who}_${after}`); SH.sfx.play('heart'); }
+    if (after > before) {
+      G.heartQueue.push(`heart_${who}_${after}`); SH.sfx.play('heart');
+      const step = ((ST.BOND_PATH[who] || {}).steps || []).find(x => x.h === after);
+      if (step) G.hud.toast(`\u2665 ${ST.CAST[who].name}, heart ${after}: ${step.name}. ${step.text}`);
+    }
     else if (pts < 0) SH.sfx.play('back');
     // every change is shown: who, how much, and why
     G.effect({ who, pts, why: why || (pts < 0 ? 'That stung.' : liked ? 'That meant a lot.' : 'Noted.'), heart: after > before ? after : 0 });
@@ -6805,6 +6950,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     if (G.mode) { if (G.state === 'talk' || G.state === 'play') G.progress.playFrames = (G.progress.playFrames || 0) + 1; SH.modes.step(input); return; }
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
     G.effectStep();
+    if (w.time % 90 === 45 && G.state === 'play' && !G.noExplain) G.loreCheck();
     if (G.state === 'play' && (G.explainWait || 0) > 0) G.explainWait--;
     if (G.state === 'talk') G.explainWait = Math.max(G.explainWait || 0, 60 * 6);   // and never the moment a conversation ends
     if (G.explainQ && G.explainQ.length && G.state === 'play' && !(G.explainWait > 0) && !G.mode && !SH.arts.cutin && !G.pending) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
@@ -6832,7 +6978,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     if (G.boss && G.boss.lastPhase !== w.bossPh) { w.bossPh = G.boss.lastPhase; if (w.bossPh > 1) SH.arts.whisper('boss' + w.bossPh, true); }
     // Starlight motes
     for (const m of w.motes) {
-      if (m.got || Math.abs(m.x - p.x) > SH.xp.reach() || Math.abs(m.y - (p.y - 20)) > SH.xp.reach() + 8) continue;
+      { const rch = SH.xp.reach() * (G.boon('iris') ? 1.8 : 1); if (m.got || Math.abs(m.x - p.x) > rch || Math.abs(m.y - (p.y - 20)) > rch + 8) continue; }
       m.got = true; SH.sfx.play('mote'); G.explain('starlight'); SH.xp.gain(1);
       fx.burst(m.x, m.y, 6, { speed: 1.6, life: 18, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
       G.hud.motes(w.motes.filter(x => x.got).length, w.motes.length, true);
@@ -7476,44 +7622,85 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
       + `<div><b>Choices remembered</b>${mem || 'None yet'}</div>`
       + `<div class="wide"><b>Level ${SH.xp.level()}${SH.xp.level() < SH.xp.max() ? ' &middot; ' + SH.xp.span()[0] + ' / ' + SH.xp.span()[1] + ' XP to level ' + (SH.xp.level() + 1) + ': ' + esc(SH.xp.PERKS[SH.xp.level() + 1].name) : ' &middot; highest for now'}</b>${SH.xp.PERKS.slice(2, SH.xp.level() + 1).map(k => esc(k.name)).join(', ') || 'No perks yet. Fight, hunt, gather and help to earn them.'}</div>`
       + (people ? `<div class="wide"><b>Bonds</b>${people}</div>` : '');
+    { const n = G.loreNew(); $('m-journal').textContent = "Wren's journal" + (n ? ` (${n} new ${n === 1 ? 'page' : 'pages'})` : ''); }
   };
 
   // ---------------- journal: what to do now, the story so far, and who's who
-  H.journal = function (show) {
+  let jTab = 'now';
+  H.journal = function (show, tab) {
     $('journal').classList.toggle('show', !!show);
     if (!show) return;
     const G = SH.game, ch = G.chapterDef();
-    let html = `<h3>Now: ${esc(ch.label)}, ${esc(ch.name)}</h3><ul class="goals">`;
-    for (const g of ch.goals) {
-      const done = !!G.flags[g.id];
-      html += `<li class="${done ? 'done' : g.id === G.activeGoal ? 'now' : ''}">${done ? '&#10003;' : g.id === G.activeGoal ? '&#9656;' : '&#9675;'} ${esc(g.text)}</li>`;
+    G.loreCheck(true);
+    if (tab) jTab = tab;
+    const fresh = G.loreNew();
+    const tabs = [['now', 'Today'], ['bonds', 'Bonds'], ['pages', 'Pages' + (fresh ? ` \u2022${fresh}` : '')], ['people', 'People']];
+    $('j-tabs').innerHTML = tabs.map(t => `<button class="btn jtab${t[0] === jTab ? ' on' : ''}" data-tab="${t[0]}">${t[1]}</button>`).join('');
+    $('j-tabs').querySelectorAll('button').forEach(b => { b.onclick = () => { SH.sfx.play('move'); H.journal(true, b.dataset.tab); }; });
+    let html = '';
+    if (jTab === 'now') {
+      html += `<h3>Now: ${esc(ch.label)}, ${esc(ch.name)}</h3><ul class="goals">`;
+      for (const g of ch.goals) {
+        const done = !!G.flags[g.id];
+        html += `<li class="${done ? 'done' : g.id === G.activeGoal ? 'now' : ''}">${done ? '&#10003;' : g.id === G.activeGoal ? '&#9656;' : '&#9675;'} ${esc(g.text)}</li>`;
+      }
+      html += '</ul><h3>What I am working toward</h3>';
+      html += '<p>Keep Starhaven standing through a war between two courts, and be ready for the Iron King when he uses it. I cannot do that alone. Every heart someone gives me is a blade, a shield or a truth I will need before the end. The Bonds tab says exactly what each one gives.</p><ul class="goals road">';
+      ST.CHAPTERS.forEach((c, i) => { html += `<li class="${i < G.chapter ? 'done' : i === G.chapter ? 'now' : ''}">${i < G.chapter ? '&#10003;' : i === G.chapter ? '&#9656;' : '&#9675;'} ${esc(c.label)}: ${esc(c.name)}</li>`; });
+      html += '<li>&#9675; Still ahead: the spy in the Library, Starfall, my sisters, the siege.</li></ul>';
+      html += '<h3>How I got here</h3>';
+      html += `<p>${esc(ST.RECAP)}</p>`;
+      for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
+      html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
+      const ms = G.progress.motes || {}, sum = Object.values(ms).reduce((a, b) => a + b, 0);
+      if (sum) html += `<p><b>Starlight gathered:</b> &#10022; ${sum}. Spend it in the pause menu, under Constellation.</p>`;
+      const mem = Object.values(G.progress.mem || {});
+      if (mem.length) { html += '<h3>Things I did</h3><ul class="mem-list">' + mem.map(m => `<li class="${m.good === true ? 'good' : m.good === false ? 'bad' : ''}">${esc(m.text)}</li>`).join('') + '</ul><p><small>Green: someone is better for it. Red: it will cost her. Gold: it could go either way. The story comes back to these, and some write a page of their own.</small></p>'; }
+    } else if (jTab === 'bonds') {
+      html += '<h3>The people I am tied to</h3>';
+      html += '<p>What I say and do moves people toward me or away. Every heart does three things: it plays a scene, it gives me something real in a fight, and it writes a page here. Further on, the hearts decide who stands with me at the end.</p>';
+      const bonds = G.progress.bonds, ids = Object.keys(ST.BONDS).filter(id => bonds[id]);
+      if (!ids.length) html += '<p>No bonds yet. They grow from the choices I make when I talk, the errands I run, and the evenings I spend.</p>';
+      for (const id of ids) {
+        const pts = bonds[id].pts, h = G.heartsFor(pts), next = ST.HEARTS_AT[h - 1];
+        const prev = h > 1 ? ST.HEARTS_AT[h - 2] : 0, k = next ? Math.min(1, (pts - prev) / (next - prev)) : 1, path = ST.BOND_PATH[id];
+        const nextStep = path.steps.find(x => x.h > h);
+        html += `<div class="person bond"><img src="${SH.art.portraitURL(id)}" alt=""><div><b>${esc(ST.CAST[id].name)}</b> <span class="hearts">${'♥'.repeat(h)}<span class="dim">${'♡'.repeat(5 - h)}</span></span>
+          <div class="bar"><span style="width:${Math.round(k * 100)}%"></span></div>
+          <small>${next ? `${pts} / ${next} to the next heart` : 'Every heart earned'} &middot; Loves: ${esc(ST.BONDS[id].loves)}</small>
+          <p class="toward"><b>Heading toward:</b> ${esc(path.toward)}</p>
+          <ul class="ladder">${path.steps.map(x => `<li class="${h >= x.h ? 'got' : x === nextStep ? 'next' : 'far'}">${h >= x.h ? '&#10003;' : '&#9825;'} <b>Heart ${x.h}: ${esc(x.name)}.</b> ${esc(x.text)}${h >= x.h && x.now ? ' <i>Active now.</i>' : ''}</li>`).join('')}</ul></div></div>`;
+      }
+    } else if (jTab === 'pages') {
+      const lore = G.progress.lore || {}, have = ST.LORE.filter(l => lore[l.id]).length;
+      html += `<h3>What I have learned</h3><p>${have} of ${ST.LORE.length} pages written. Pages are written as I see more of the world, grow closer to people, and make choices that matter.</p>`;
+      ST.LORE_PARTS.forEach((part, pi) => {
+        const list = ST.LORE.filter(l => l.part === pi);
+        const open = list.filter(l => lore[l.id]), shut = list.filter(l => !lore[l.id]);
+        if (pi === 4 && !open.length) return;
+        html += `<h3>${esc(part)}</h3>`;
+        for (const l of open) html += `<div class="page${lore[l.id] === 1 ? ' new' : ''}"><b>${esc(l.title)}</b>${lore[l.id] === 1 ? ' <i>new</i>' : ''}<p>${esc(l.text)}</p></div>`;
+        if (pi === 4) { if (shut.length) html += `<div class="page blank"><p>${shut.length} more ${shut.length === 1 ? 'page' : 'pages'} here for choices I have not made.</p></div>`; }
+        else for (const l of shut) html += `<div class="page blank"><p>A blank page. ${esc(l.hint)}</p></div>`;
+      });
+      for (const k in lore) lore[k] = 2;
+      G.save();
+    } else {
+      html += '<h3>Who is who</h3>';
+      for (const p of G.knownPeople()) html += `<div class="person"><img src="${SH.STORY.CAST[p.id] ? SH.art.portraitURL(p.id) : ''}" alt="" ${SH.STORY.CAST[p.id] ? '' : 'style="visibility:hidden"'}><div><b>${esc(p.name)}</b><br>${esc(p.text)}</div></div>`;
     }
-    html += '</ul><h3>How I got here</h3>';
-    html += `<p>${esc(ST.RECAP)}</p>`;
-    for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
-    html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
-    const ms = G.progress.motes || {}, sum = Object.values(ms).reduce((a, b) => a + b, 0);
-    if (sum) html += `<p><b>Starlight gathered:</b> &#10022; ${sum}. Spend it in the pause menu, under Constellation.</p>`;
-    const mem = Object.values(G.progress.mem || {});
-    if (mem.length) { html += '<h3>Things I did</h3><ul class="mem-list">' + mem.map(m => `<li class="${m.good === true ? 'good' : m.good === false ? 'bad' : ''}">${esc(m.text)}</li>`).join('') + '</ul><p><small>Green: someone is better for it. Red: it will cost her. Gold: it could go either way. The story comes back to these.</small></p>'; }
-    html += '<h3>The people I am tied to</h3>';
-    const bonds = G.progress.bonds, ids = Object.keys(ST.BONDS).filter(id => bonds[id]);
-    if (!ids.length) html += '<p>No bonds yet. Hearts grow from evenings together, gifts they love, and the choices you make when you talk.</p>';
-    for (const id of ids) {
-      const pts = bonds[id].pts, h = G.heartsFor(pts), next = ST.HEARTS_AT[h - 1];
-      const prev = h > 1 ? ST.HEARTS_AT[h - 2] : 0, k = next ? Math.min(1, (pts - prev) / (next - prev)) : 1;
-      html += `<div class="person bond"><img src="${SH.art.portraitURL(id)}" alt=""><div><b>${esc(ST.CAST[id].name)}</b> <span class="hearts">${'\u2665'.repeat(h)}<span class="dim">${'\u2661'.repeat(5 - h)}</span></span>
-        <div class="bar"><span style="width:${Math.round(k * 100)}%"></span></div>
-        <small>${next ? `${pts} / ${next} points to the next heart` : 'Every heart earned'} &middot; Loves: ${esc(ST.BONDS[id].loves)}</small></div></div>`;
-    }
-    html += '<h3>Who is who</h3>';
-    for (const p of G.knownPeople()) html += `<div class="person"><img src="${SH.STORY.CAST[p.id] ? SH.art.portraitURL(p.id) : ''}" alt="" ${SH.STORY.CAST[p.id] ? '' : 'style="visibility:hidden"'}><div><b>${esc(p.name)}</b><br>${esc(p.text)}</div></div>`;
     $('j-body').innerHTML = html;
+    $('journal').querySelector('.card').scrollTop = 0;
   };
 
   H.end = function (show) {
     $('end').classList.toggle('show', show);
-    if (show) { $('e-head').textContent = ST.END.title; $('e-text').textContent = ST.END.text; }
+    if (show) {
+      const G = SH.game, bonds = G.progress.bonds || {}, lore = G.progress.lore || {};
+      $('e-head').textContent = ST.END.title; $('e-text').textContent = ST.END.text;
+      const who = Object.keys(ST.BONDS).filter(id => bonds[id]).map(id => { const h = G.heartsFor(bonds[id].pts), st = ST.BOND_PATH[id].steps.filter(x => x.h <= h && x.now).pop(); return `<li><b>${esc(ST.CAST[id].name)}</b> ${'\u2665'.repeat(h)}${st ? ': ' + esc(st.name) : ''}</li>`; }).join('');
+      $('e-sum').innerHTML = `<p><b>Where Wren stands</b></p><ul>${who}</ul><p>${Object.keys(lore).length} of ${ST.LORE.length} journal pages written &middot; ${Object.keys(G.progress.mem || {}).length} choices remembered. A different Wren fills different pages.</p>`;
+    }
   };
 
   // ---------------- TUNE panel: live sliders for the movement numbers

@@ -17,6 +17,7 @@
   X.span = () => { const l = X.level(); return l >= X.max() ? [1, 1] : [X.total() - X.AT[l - 1], X.AT[l] - X.AT[l - 1]]; };
   X.gain = function (n, why) {
     const G = SH.game; if (!prog() || !n) return;
+    if (n > 0 && G.boon('thane')) n = Math.ceil(n * 1.2);   // Thane, heart 2: Well read
     const before = X.level(); prog().xp = X.total() + n;
     const p = G.world && G.world.player;
     if (p && why) SH.fx.word(p.x, p.y - 76, '+' + n + ' XP', '#9fe8ff', 44);

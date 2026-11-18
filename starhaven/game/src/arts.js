@@ -51,7 +51,7 @@
   A.gain = function (n) {
     if (!A.active() || A.scene) return;
     const was = A.meter >= A.max;
-    A.meter = Math.min(A.max, A.meter + n * (1 + 0.15 * SH.stars.level('bond')));
+    A.meter = Math.min(A.max, A.meter + n * (1 + 0.15 * SH.stars.level('bond')) * (SH.game.boon('caelum') ? 1.25 : 1));
     if (A.meter > 20) SH.game.explain('bondbar');
     if (!was && A.meter >= A.max) {
       SH.sfx.play('lantern');

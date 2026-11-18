@@ -31,10 +31,12 @@ link Will has. Hold your phone either way up.
 Between chapters there are **evenings**: choose who to spend the night with (Caelum, Bram, Iris or Thane) for scenes,
 gifts and bond hearts.
 
-## Playtest build: v0.1.3 (Nov 18, 2026)
+## Playtest build: v0.1.4 (Nov 18, 2026)
 
-The build after the first playtest by people: [`releases/v0.1.3/`](releases/v0.1.3/RELEASE-NOTES.md), with
-`starhaven-v0.1.3-share.zip` to send. It answers that playtest: the first trial is three altars you walk to, the thorn
+The newest build: [`releases/v0.1.4/`](releases/v0.1.4/RELEASE-NOTES.md), with `starhaven-v0.1.4-share.zip` to send.
+It adds what the bonds are for (each heart gives a real boon and the journal shows where each bond is heading) and
+40 journal pages of lore that are written as you play. It includes everything in v0.1.3
+([notes](releases/v0.1.3/RELEASE-NOTES.md)), the build after the first playtest by people. It answers that playtest: the first trial is three altars you walk to, the thorn
 pit has places to land, and the Old Wyrm is weaker, slower, readable and can be down-struck.
 The build that was played is kept in [`releases/v0.1.2/`](releases/v0.1.2/RELEASE-NOTES.md).
 
