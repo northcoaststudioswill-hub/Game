@@ -16,7 +16,7 @@ any time.
 
 | File | What it is |
 | --- | --- |
-| `board-overclocked.js` | The storyboard for Overclocked: 45 shots, ending at 2:38 with a fade, each a start time, an end time and either a drawn picture or a stretch of real gameplay. The timing table `T` is at the top; the titles, the BTV bug and the fades are in `over()` at the bottom. |
+| `board-overclocked.js` | The storyboard for Overclocked: 46 shots, ending at 2:38 with a fade, each a start time, an end time and either a drawn picture or a stretch of real gameplay. The timing table `T` is at the top; the titles, the BTV bug and the fades are in `over()` at the bottom. |
 | `songs/overclocked.mp3` | The song as Will sent it (original quality), used for the audio. |
 | `build.py`, `render.js` | Build the render page; draw every frame in headless Chromium and pipe it to ffmpeg. |
 | `../src/bottie/bt-4-mv.js` | The video mode inside the cartridge: shots, the director bot, the beat pulse. |
@@ -25,9 +25,10 @@ any time.
 
 - Tempo (127.7 BPM), every kick drum, and where the drums drop out are measured from the audio.
 - The twelve line times in verse 2 are measured (a speech aligner locked onto them).
-- Every other line is placed from the song's structure: 8-bar intro, hook 1 and verse 1 at two bars a line, hook 2,
-  bridge, hook 3, an instrumental stretch, the outro. No transcription tool was reachable to confirm these, so a
-  section could be a bar or two off. To fix one, change its number in `T` and render again.
+- Will confirmed by ear that the beat drops at 0:15 into a melody and the chorus starts at 0:30. The rest is placed
+  from that and the song's structure (hook 1 and verse 1 at two bars a line, then verse 2, the bridge, the last
+  chorus). No transcription tool was reachable, so a section could still be off. To fix one, change its number in
+  `T` and render again.
 - No lyric text is burned in, for that reason. `caps` in the storyboard can carry timed captions once the times
   are confirmed.
 

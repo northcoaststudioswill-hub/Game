@@ -20,6 +20,11 @@ music video.
   Hosted by the cloud) slides in over the intro and again over the highway shot; a BTV bug sits top right; the
   end card brings the credits in line by line; the song fades out from 2:31.5 and the picture goes to black.
   The rooftop with the jets moved into hook 2. 45 shots.
+- Third cut (Will, by ear: the beat drops at 0:15 into a melody with no vocal; the chorus starts on the bass hit at
+  0:30): a new four-shot sequence fills 0:15.5 to 0:30.5 (he arrives on a lightning bolt, the fence, the rooftop
+  with the jets, the heat climbing to 100), and the first chorus and verse 1 slide 15 seconds later. With the
+  chorus at 0:30 there is no room for the lyric sheet's 4-line second chorus before verse 2 (measured at 1:47),
+  so its shots are gone. Verse 2, the bridge, the last chorus and the ending did not move. 46 shots.
 - Timing: tempo, kicks and drum drop-outs are measured; verse 2's line times are measured; the rest is placed from
   the song's structure and may be a bar or two off. See `video/README.md`.
 

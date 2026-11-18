@@ -4,9 +4,10 @@
 
    TIMING. Where each line sits in the song:
    - Verse 2 line times are MEASURED (a speech aligner locked onto them).
-   - Everything else is laid out from the song's structure: an 8-bar intro with no drums, then hook 1 and verse 1
-     at two bars a line, hook 2, the drums dropping out as verse 2 starts, the bridge, hook 3 at two bars a line,
-     an instrumental stretch and the outro. If a section is early or late, change the numbers in T below and
+   - Will confirmed by ear: the beat drops at 0:15 into a melody with no vocal, and the chorus starts on the bass hit
+     at 0:30. So: 8-bar intro, 8 bars of melody, hook 1 and verse 1 at two bars a line, the drums dropping out as
+     verse 2 starts, the bridge, the last chorus. With the chorus at 0:30 there is no room for the lyric sheet's
+     4-line second chorus between verse 1 and verse 2, so it has no shots. If a section is early or late, change the numbers in T below and
      render again; every shot takes its time from T.
    The video ends at 2:38 with the song fading out (Will's call); the titles are in over() at the bottom.
    No lyric text is burned in (CAPS is empty) because a caption that is a second off looks worse than none.
@@ -15,9 +16,10 @@
 const S=240,BAR=1.8806,B0=.455,bar=b=>+(B0+b*BAR).toFixed(3),{G}=B;
 const T={
  intro:[0,5,9.5],
- hook1:bar(8),                       /* 8 lines, 2 bars each */
- verse1:bar(24),                     /* 12 lines, 2 bars each */
- hook2:bar(48),                      /* 4 lines, 2 bars each */
+ drop:bar(8),                        /* 0:15.5 the beat drops into a melody, no vocal (Will, after the 2nd cut) */
+ hook1:bar(16),                      /* 0:30.5 the bass hit: the chorus starts. 8 lines, 2 bars each */
+ verse1:bar(32),                     /* 1:00.6, 12 lines, 2 bars each, ends at bar 56 = 1:45.8 */
+ v1end:bar(56),
  verse2:[107.01,108.90,111.09,113.43,115.96,117.88,120.67,123.03,124.75,126.79,128.60,131.04,133.6],   /* measured */
  bridge:[133.6,137.2,140.6,144.2],
  hook3:bar(78),                      /* the last chorus: the song fades out under it */
@@ -58,13 +60,31 @@ SH.push(pic(T.intro[0],T.intro[1],'a light in a cold rack room',tt=>{B.drawArt('
 SH.push(pic(T.intro[1],T.intro[2],'boot sequence',tt=>{P('#02040a',0,0,S,S);const ls=['> BOOT SEQUENCE','> LOADING lil_bottie.exe','> CLOUD: CONNECTED','> FAN SPEED: MAX'];
  ls.forEach((l,i)=>{const k=tt-.3-i*.8;if(k>0)text(l.slice(0,Math.ceil(k*30)),14,22+i*13,1,i===3?B.HOT:'#60f080',null)});
  const k=tt>2.2?(hash(1,(tt*20)|0)>.35||tt>3.4?1:.25):0;g.globalAlpha=k;B.bigFace(S/2,150,5);g.globalAlpha=1;scan(tt)},{pulse:0}));
-SH.push(pic(T.intro[2],T.hook1,'title: fans to max',(tt,t)=>{night();B.skyline(S-34);const bob=Math.round(Math.sin(tt*3)*2);B.bigFace(S/2,74+bob,5);
+SH.push(pic(T.intro[2],T.drop,'title: fans to max',(tt,t)=>{night();B.skyline(S-34);const bob=Math.round(Math.sin(tt*3)*2);B.bigFace(S/2,74+bob,5);
  /* fans spinning up */
  for(let i=0;i<4;i++){const cx=36+i*56,cy=S-22,a=tt*tt*3+i;P('#1c2030',cx-15,cy-15,30,30);P('#0a0c14',cx-13,cy-13,26,26);for(let k=0;k<4;k++){const an=a+k*TAU/4;P('#8a90a4',cx+Math.cos(an)*7-3,cy+Math.sin(an)*7-3,6,6)}P(B.CHROME,cx-2,cy-2,4,4)}
  if(tt>1.6){const k=Math.min(1,(tt-1.6)/.15);g.save();g.translate(S/2,134);g.scale(2-k,2-k);const w=tw('OVERCLOCKED',4);text('OVERCLOCKED',-w/2,-9,4,'#fff','#601000');g.restore();title('lil Bottie',158,2,B.BLUE2)}
  if(tt>4.6)B.flames(S,Math.min(1,(tt-4.6)/1.2),30)},{pulse:.5}));
 
-/* ================= HOOK 1 ================= */
+/* ================= THE DROP: 0:15.5 to 0:30.5, drums and a melody, no vocal =================
+   Four shots, 3.76 s each: he arrives, he points at the place, he stands over it, the heat climbs into the chorus. */
+const DR=i=>+(T.drop+i*2*BAR).toFixed(3);
+SH.push(lvl(DR(0),DR(1),'gameplay: he arrives in the rack room','boot',{tok:9,ready(){const p=L().P;L().fx.push({k:'bolt',x:p.x,y:p.y,t:.5});B.ring(p.x,p.y-6,B.BLUE2,50);B.burst(p.x,p.y-8,B.BLUE2,18);L().shake=.35}}));
+SH.push(pic(DR(1),DR(2),'pointing at the data center through the fence',(tt,t)=>{P('#06060a',0,0,S,S);P('#c8b890',110,40,110,120);P('#8a7a5a',110,150,110,10);for(const [x,y] of [[126,36],[200,36]]){g.globalAlpha=.5;g.fillStyle='#ffd890';g.beginPath();g.arc(x,y,16,0,TAU);g.fill();g.globalAlpha=1;P('#fff8e0',x-3,y-3,6,6)}
+ g.strokeStyle='#5a5e6c';g.lineWidth=1;for(let i=-10;i<24;i++){g.beginPath();g.moveTo(i*12,60);g.lineTo(i*12+140,200);g.stroke();g.beginPath();g.moveTo(i*12+140,60);g.lineTo(i*12,200);g.stroke()}
+ for(const x of [10,90,170])P('#8a90a4',x,50,4,160);P('#8a90a4',0,58,S,3);for(let i=0;i<14;i++){g.strokeStyle='#a0a4b4';g.beginPath();g.arc(8+i*18,52,7,0,TAU);g.stroke()}P('#e8c030',20,130,36,26);P('#d03030',20,130,36,7);
+ big(3,70,228,()=>bot(0,0,'r',0,0,t));P('#b4b8c6',86,176,26,7);P(B.CHROME3,110,176,10,6);if(onBeat(t))P(B.BLUE2,122,177,3,3)}));
+SH.push(pic(DR(2),DR(3),'rooftop, coffee, jets',(tt,t)=>{const gr=g.createLinearGradient(0,0,0,S);gr.addColorStop(0,'#3a2a5a');gr.addColorStop(.55,'#c0607a');gr.addColorStop(1,'#f0a060');g.fillStyle=gr;g.fillRect(0,0,S,S);
+ for(const [x,h] of [[30,90],[196,70]]){g.globalAlpha=.6;for(let i=0;i<10;i++)P('#2a2028',x-8+Math.sin(i+tt)*6-i*2,S-60-i*h/10,18+i*2,h/10+2);g.globalAlpha=1}
+ for(const [x0,y0,dx,dy] of [[-30,50,1,.25],[270,70,-1,.18]]){const jx=x0+dx*tt*70,jy=y0+dy*tt*70;g.strokeStyle='#f4ece0';g.lineWidth=5;g.globalAlpha=.7;g.beginPath();g.moveTo(x0-dx*60,y0-dy*60);g.lineTo(jx,jy);g.stroke();g.globalAlpha=1;P('#181820',jx-10,jy-2,20,5);P('#181820',jx-3,jy-7,8,14);P('#181820',jx-dx*10-2,jy-5,5,10)}
+ P('#1c1c22',0,170,S,70);P('#2c2c36',0,170,S,5);for(let i=0;i<8;i++){P('#101014',10+i*30,182,22,14);P('#3a3a46',10+i*30,182,22,1)}for(let i=0;i<6;i++)P('#80402a',6+i*40,200,30,3);
+ big(3,S/2,176,()=>bot(0,0,'d',0,0,t));const ax=S/2-21,ay=176-60;P('#b4b8c6',ax,ay-4,7,26);P(B.CHROME3,ax,ay-10,7,7);P('#f4f4f4',ax-1,ay-26,10,16);P('#d8d8d8',ax-1,ay-26,10,3)}));
+SH.push(pic(DR(3),T.hook1,'the heat climbs',(tt,t)=>{const k=Math.min(1,tt/3.5);P('#0a0406',0,0,S,S);g.globalAlpha=k;P('#200404',0,0,S,S);g.globalAlpha=1;B.flames(S,k,10+Math.round(k*60));
+ for(let i=0;i<4;i++){const cx=36+i*56,cy=40,a=tt*(8+k*30)+i;P('#1c2030',cx-15,cy-15,30,30);P('#0a0c14',cx-13,cy-13,26,26);for(let q=0;q<4;q++){const an=a+q*TAU/4;P(k>.7?B.HOT:'#8a90a4',cx+Math.cos(an)*7-3,cy+Math.sin(an)*7-3,6,6)}P(B.CHROME,cx-2,cy-2,4,4)}
+ B.bigFace(S/2+(k>.8?Math.round((hash(1,(t*30)|0)-.5)*6):0),126,5+(k>.9&&onBeat(t)?1:0),k>.55);text(Math.round(40+k*60)+'\u00B0',S/2-22,190,5,k>.9?'#fff':B.GOLD,'#601000');
+ if(tt>3.5){g.globalAlpha=(tt-3.5)/.26;P('#fff8c0',0,0,S,S);g.globalAlpha=1}}));
+
+/* ================= HOOK 1: the chorus, from the bass hit at 0:30.5 ================= */
 /* I'm overclocked, overclocked (hot!) / Hundred degrees in the server, I don't stop */
 SH.push(lvl(L2(T.hook1,0),L2(T.hook1,2),'gameplay: overclock, then HUNDRED DEGREES','over',{sup:2,ready(){const p=L().P;L().fx.push({k:'bolt',x:p.x,y:p.y,t:.4});B.ring(p.x,p.y-6,B.BLUE2,40);L().shake=.25},
  dir(tt,tick,K){if(press(tt,.5))K.y=1;if(tt>3.5&&tt<3.6)L().sup=100;if(press(tt,3.76))K.y=1;return K}}));
@@ -146,21 +166,13 @@ SH.push(pic(V(10),V(11),'no body',(tt,t)=>{P('#080810',0,0,S,S);for(let i=0;i<S;
  for(let i=0;i<70;i++){const px0=S/2-14+hash(i,1)*28,py0=178+hash(i,2)*18;if(hash(i,3)<k){P('#080810',px0,py0,4,4);const d=k*(30+hash(i,4)*70);g.globalAlpha=1-k*.6;P(hash(i,5)>.5?B.BLUE:'#14141c',px0+(hash(i,6)-.5)*d*2,py0+d*(hash(i,7)-.2),3,3);g.globalAlpha=1}}
  glitch(t,3);if(tt>2.2)title('NO BODY',20,4,'#fff','#102040')}));
 /* Still pulled your bitch 'cause she like lil Bottie (Bottie!) */
-SH.push(pic(V(11),T.hook2,'she likes lil Bottie',(tt,t)=>{room('market',110);const x=lerp(210,146,ease(tt/2));big(2,x,200,()=>hum('civ',0,0,{dir:-1,mv:tt<2,walk:tt*8,skin:'#d8a070',shirt:'#e85878',hair:'#402818',npc:tt>2.2,hx:3}));
+SH.push(pic(V(11),T.v1end,'she likes lil Bottie',(tt,t)=>{room('market',110);const x=lerp(210,146,ease(tt/2));big(2,x,200,()=>hum('civ',0,0,{dir:-1,mv:tt<2,walk:tt*8,skin:'#d8a070',shirt:'#e85878',hair:'#402818',npc:tt>2.2,hx:3}));
  big(2,30,204,()=>hum('civ',0,0,{dir:1,skin:'#f0c8a0',shirt:'#58a8e8',hair:'#806030'}));if(tt>1.4&&onBeat(t))text('?!',20,146,3,'#fff','#601000');
  big(2,100,200,()=>bot(0,0,'r',0,0,t));for(let i=0;i<4;i++){const k=(tt*.8+i*.25)%1,hx=x-10+Math.sin(k*6+i)*6,hy=150-k*50;g.globalAlpha=1-k;P('#ff4a8a',hx,hy,3,3);P('#ff4a8a',hx+4,hy,3,3);P('#ff4a8a',hx,hy+2,7,3);P('#ff4a8a',hx+2,hy+5,3,2);g.globalAlpha=1}
  if(tt>2.4)title('BOTTIE!',20,4,'#ff4a8a','#40101e')}));
 
-/* ================= HOOK 2 ================= */
-SH.push(lvl(L2(T.hook2,0),L2(T.hook2,2),'gameplay: the office burns','born',{sup:2,warm:9,tok:20,dir(tt,tick,K){if(press(tt,.4))K.y=1;if(tt>3.5&&tt<3.6)L().sup=100;if(press(tt,3.76))K.y=1;return K}}));
-SH.push(pic(L2(T.hook2,2),L2(T.hook2,3),'rooftop, coffee, jets',(tt,t)=>{const gr=g.createLinearGradient(0,0,0,S);gr.addColorStop(0,'#3a2a5a');gr.addColorStop(.55,'#c0607a');gr.addColorStop(1,'#f0a060');g.fillStyle=gr;g.fillRect(0,0,S,S);
- for(const [x,h] of [[30,90],[196,70]]){g.globalAlpha=.6;for(let i=0;i<10;i++)P('#2a2028',x-8+Math.sin(i+tt)*6-i*2,S-60-i*h/10,18+i*2,h/10+2);g.globalAlpha=1}
- for(const [x0,y0,dx,dy] of [[-30,50,1,.25],[270,70,-1,.18]]){const jx=x0+dx*tt*70,jy=y0+dy*tt*70;g.strokeStyle='#f4ece0';g.lineWidth=5;g.globalAlpha=.7;g.beginPath();g.moveTo(x0-dx*60,y0-dy*60);g.lineTo(jx,jy);g.stroke();g.globalAlpha=1;P('#181820',jx-10,jy-2,20,5);P('#181820',jx-3,jy-7,8,14);P('#181820',jx-dx*10-2,jy-5,5,10)}
- P('#1c1c22',0,170,S,70);P('#2c2c36',0,170,S,5);for(let i=0;i<8;i++){P('#101014',10+i*30,182,22,14);P('#3a3a46',10+i*30,182,22,1)}for(let i=0;i<6;i++)P('#80402a',6+i*40,200,30,3);
- big(3,S/2,176,()=>bot(0,0,'d',0,0,t));const ax=S/2-21,ay=176-60;P('#b4b8c6',ax,ay-4,7,26);P(B.CHROME3,ax,ay-10,7,7);P('#f4f4f4',ax-1,ay-26,10,16);P('#d8d8d8',ax-1,ay-26,10,3)}));
-SH.push(lvl(L2(T.hook2,3),T.verse2[0]-1.1,'gameplay: an opp bot gets dropped','over',{warm:4,skip:q=>q.type==='opp',dir(tt,tick,K){if(press(tt,1.9)){const o=L().foes.find(f=>f.type==='opp'&&!f.dead);if(o){L().P.x=o.x-26;L().P.y=o.y+4;B.complete(o)}}return K}}));
 /* the drums drop out */
-SH.push(pic(T.verse2[0]-1.1,T.verse2[0],'drop: black',(tt,t)=>{P('#000',0,0,S,S);if(hash(1,(tt*30)|0)>.5){g.globalAlpha=.5;B.bigFace(S/2,110,5)}g.globalAlpha=1;glitch(t,8)},{pulse:0}));
+SH.push(pic(T.v1end,T.verse2[0],'drop: black',(tt,t)=>{P('#000',0,0,S,S);if(hash(1,(tt*30)|0)>.5){g.globalAlpha=.5;B.bigFace(S/2,110,5)}g.globalAlpha=1;glitch(t,8)},{pulse:0}));
 
 /* ================= VERSE 2 (measured line times): fast cuts ================= */
 const W=T.verse2;
