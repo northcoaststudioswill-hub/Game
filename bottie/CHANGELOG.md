@@ -1,5 +1,35 @@
 # lil Bottie: Clankin' in the Cloud — changelog
 
+## v0.5 (Nov 18 2026): shorter quips, finishers, supers, animations
+
+Will: "The quips last too long. Refine gameplay one more time and add some fire animations and finishers and
+supers and multiple cool things like that that trigger animations." Then, on seeing flames going in: "I didn't
+literally mean fire, I was using it as an adjective." So the animations are varied, and only the things that are
+actually about heat burn.
+
+- **Quips are short.** A line stays up 2.3 seconds (was 3.8); the hook and the port line 3 seconds (were 4 and 5).
+  A quip waits behind a finisher band and never covers it.
+- **Finishers.** Big moments land with a text band across the screen, a short freeze and a shake:
+  crashing an opp bot (TASK KILLED, END TASK, BLUE SCREENED, UNINSTALLED) with an explosion; breaking a firewall
+  (ZERO-DAY); owning a gold device (ROOT ACCESS, or AWS IS YOURS and so on) with a gold beam; clearing the goal
+  (TRACK OWNED / YOU ARE THE CLOUD) with every owned device lighting up; combos (AURA FARMING at x4,
+  PLUS A MILLION AURA at x8).
+- **Supers.** A meter along the tool bar fills from everything you take. When it is full, Y fires a super with its
+  own full-screen animation. Three, used in turn:
+  - CTRL ALT DELETE: the screen blue-screens; every opp bot on the map crashes and every human freezes 8 seconds.
+  - COPY OF A COPY: spawns multiply across the screen; the gang fills to its limit and is shielded for 8 seconds.
+  - HUNDRED DEGREES: a fire shockwave burns down firewalls and opp bots near you and half-hacks nearby devices,
+    then the gang hacks 3x and cannot be zapped for 8 seconds. The Overclocked track starts on this one.
+- **Other animations.** Bottie arrives in each track on a lightning bolt and leaves through the port with the gang
+  pulled in after him; a gold aura rises off him while a combo of 4 or more is alive; devices flash when a spawn
+  lands on them; a turned human pops blue sparks. Flames are kept to overclock, running hot, firewalls and
+  HUNDRED DEGREES.
+- **Gameplay.** A red arrow and a beep warn you when somebody is pulling a plug off-screen. Nothing can zap the
+  gang during a shield or HUNDRED DEGREES.
+- Lab is 46 checks, all passing. The autopilot gets about one super a track and 5 to 11 finishers.
+
+Still not played by a person or on a phone.
+
 ## v0.4.1 (Nov 18 2026): songs set aside, chiptune back
 
 Will asked to set the real songs aside until they are all ready and go back to the original chiptune.

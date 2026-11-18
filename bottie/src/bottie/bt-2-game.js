@@ -27,17 +27,48 @@ function useTool(){const t=curTool(),P=L.P;if(!t){SFX.nope();toast('NO TOOLS YET
 /* His lines. pri 2 = a big moment, always shown. pri 1 = ordinary, at most one every 16 seconds.
    pri 0 = filler, rare. Will's note on v0.3: too many quips, some are good, it's too much. */
 let sayAt=-99;
-function say(s,pri,t){if(!s)return;if(pri===undefined)pri=1;if(pri<2){if(G.t-sayAt<(pri===1?16:32))return;if(pri===0&&Math.random()<.5)return}sayAt=G.t;G.cap={s,t:t||3.8}}
+function say(s,pri,t){if(!s)return;if(pri===undefined)pri=1;if(pri<2){if(G.t-sayAt<(pri===1?16:32))return;if(pri===0&&Math.random()<.5)return}sayAt=G.t;G.cap={s,t:t||2.3}}
 const DRIPS=[{n:'SILVER PUFFER',at:0,c:['#b4b8c6','#e4e7ee','#8e93a6','#a0a4b4']},{n:'ICE PUFFER',at:25000,c:['#8fc8f0','#d8f0ff','#5a98c8','#78b0dc']},{n:'GOLD PUFFER',at:75000,c:['#e8c040','#fff0a0','#b08818','#d0a830']},{n:'BLACKOUT PUFFER',at:150000,c:['#30323c','#5a5e6c','#1c1e26','#282a34']}];
+/* ---------- fire, finishers and the super ----------
+   fire(): flame particles (blue for his own LED fire). slam(): the big finisher text band. hit(): a short freeze
+   and shake so a finisher lands. The super meter fills from everything you take; when it is full, Y fires
+   HUNDRED DEGREES: a fire shockwave, then 8 seconds with the gang on fire (3x hacking, nothing can zap them). */
+function fire(x,y,n,blue,sp){if(!L||L.fx.length>340)return;for(let i=0;i<n;i++){const T=R(.35,.8);L.fx.push({k:'fl',x:x+R(-4,4),y:y+R(-3,3),vx:R(-1,1)*(sp||14),vy:-R(18,46),t:T,T,s:R(2,4),b:blue?1:0})}}
+function slam(s,sub,c,T){if(L.quiet)return;L.slam={s,sub:sub||'',c:c||'#fff',t:T||1.1,T:T||1.1}}
+function hit(t){if(L.quiet)return;L.stop=Math.max(L.stop,t);L.shake=.3}
+function fxTick(dt){for(let i=L.fx.length-1;i>=0;i--){const f=L.fx[i];f.t-=dt;if(f.k==='p'){f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy+=140*dt}else if(f.k==='fl'){f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=.96}else if(f.k==='r')f.r+=(f.max-f.r)*dt*7;else if(f.k==='t')f.y-=14*dt;if(f.t<=0)L.fx.splice(i,1)}}
+const FINISH=['TASK KILLED','END TASK','BLUE SCREENED','UNINSTALLED'];
+/* three supers, used in turn. Will asked for supers and "fire" (as in cool) animations, not literal flames:
+   only HUNDRED DEGREES burns. */
+const SUPERS=[
+ {id:'cad',n:['CTRL ALT','DELETE'],c:'#3a60ff',ln:"Ctrl, Alt, Delete, now he beggin' for help (help)"},
+ {id:'copy',n:['COPY OF','A COPY'],c:BLUE,ln:"Copy of a copy of a copy of a copy (copy)"},
+ {id:'fire',n:['HUNDRED','DEGREES'],c:HOT,ln:"Hundred degrees in the server, I don't stop (don't stop)"}];
+const curSuper=()=>SUPERS[(G.supI||0)%SUPERS.length];
+function startSuper(){G.sup={t:0,S:curSuper()};G.supI=((G.supI||0)+1)%SUPERS.length;G.s='super';L.sup=0;G.cap=null;SFX.hot();later(()=>SFX.beep(),350);later(()=>{SFX.wall();SFX.bzzt()},1350)}
+function superHit(S){const P=L.P;L.quiet=1;L.shake=.5;
+ if(S.id==='cad'){L.fx.push({k:'f',t:.5,c:'#2040c0'});for(const f of L.foes){if(f.dead||f.npc||f.type==='gen')continue;if(f.type==='opp'){burst(f.x,f.y-8,BLUE2,14);complete(f)}else f.frz=8}
+  L.quiet=0;slam('CTRL ALT DELETE','OPP BOTS CRASHED. HUMANS FROZEN.',BLUE2,1.4)}
+ else if(S.id==='copy'){give(P.x,P.y,Math.max(0,L.def.cap-L.spawns.length));L.fire=8;L.mode='shield';ring(P.x,P.y-6,BLUE2,120);ring(P.x,P.y-6,BLUE,70);
+  L.quiet=0;slam('COPY OF A COPY','GANG MAXED AND SHIELDED',BLUE2,1.4)}
+ else{L.fx.push({k:'sw',x:P.x,y:P.y-6,t:.6,T:.6});L.fx.push({k:'f',t:.35,c:'#ff8020'});
+  for(const f of L.fws)if(!f.dead&&Math.hypot(f.x-P.x,f.y-P.y)<150){fire(f.x,f.y,20);complete(f)}
+  for(const f of L.foes){if(f.dead||f.npc||f.type==='gen'||Math.hypot(f.x-P.x,f.y-P.y)>150)continue;fire(f.x,f.y-8,12);if(f.type==='opp')complete(f);else{f.frz=4;f.prog=Math.max(f.prog,f.need*.6)}}
+  for(const d of L.devs)if(!d.owned&&Math.hypot(d.x-P.x,d.y-P.y)<150){d.prog+=d.need*.5;fire(d.x,d.y-6,6);if(d.prog>=d.need)complete(d)}
+  L.fire=8;L.mode='fire';L.oc=0;L.heat=0;L.thr=0;L.quiet=0;slam('HUNDRED DEGREES','GANG HACKS 3X, CAN NOT BE ZAPPED',HOT,1.4)}
+ say(S.ln,2)}
 /* aura: everything you take adds to a combo for 4.5 seconds, up to x8 */
 function gain(base,x,y){L.combo=(L.comboT>0?L.combo:0)+1;L.comboT=4;const m=Math.min(8,L.combo),a=base*m;L.aura+=a;L.shake=.18;ftext(x,y,'+'+a.toLocaleString()+(m>1?' x'+m:''),GOLD);
- if(L.combo>L.best)L.best=L.combo;if(L.combo===5&&!L.saidAura){L.saidAura=1;say("Plus a million aura (aura!)",2);toast('x5 COMBO')}}
+ if(L.combo>L.best)L.best=L.combo;
+ if(!L.quiet){const was=L.sup;L.sup=Math.min(100,L.sup+3+m);if(was<100&&L.sup>=100){SFX.open();if(!L.saidSup){L.saidSup=1;G.tip={s:'SUPER READY. PRESS Y: '+curSuper().n.join(' ')+'.',t:7}}}}
+ if(L.combo===4&&!L.saidAura){L.saidAura=1;slam('AURA FARMING','x4 COMBO',GOLD)}
+ if(L.combo===8&&!L.saidMil){L.saidMil=1;slam('PLUS A MILLION AURA','x8 COMBO',GOLD,1.4);say("Plus a million aura (aura!)",2);hit(.12);burst(L.P.x,L.P.y-12,GOLD,24);ring(L.P.x,L.P.y-8,GOLD,60)}}
 function toast(s,t){G.toast={s,t:t||2.2}}
 
 /* ---------- build a level from its map ---------- */
 function build(id){const def=LV[id],rows=def.map,w=Math.max.apply(null,rows.map(s=>s.length)),h=rows.length;
  const N={id,def,th:THEME[def.theme],w,h,t:new Uint8Array(w*h),blk:new Uint8Array(w*h),win:new Uint8Array(w*h),devs:[],foes:[],spawns:[],fx:[],tips:[],fws:[],doors:[],vents:[],uses:[],exit:null,
-  heat:0,aura:0,time:0,oc:0,thr:0,tok:3,pop:null,combo:0,comboT:0,best:0,shake:0,ports:[],portOk:true,clover:null,call:0,backT:0,open:false,endT:0,npcs:0,saidGive:0,saidCool:0,stats:{zapped:0,unplug:0},
+  heat:0,aura:0,time:0,oc:0,thr:0,tok:3,pop:null,combo:0,comboT:0,best:0,shake:0,sup:0,fire:0,mode:'',outT:0,stop:0,slam:null,quiet:0,ports:[],portOk:true,clover:null,call:0,backT:0,open:false,endT:0,npcs:0,saidGive:0,saidCool:0,stats:{zapped:0,unplug:0},
   P:{x:24,y:24,dx:0,dy:1,face:'d',walk:0,mv:0,thrT:0}};
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const c=rows[y][x]||' ',i=y*w+x,cx=x*TS+8,cy=y*TS+8;let t=1;const lg=def.legend&&def.legend[c];
   if(lg){if(lg.use){N.uses.push({k:'use',use:lg.use,x:cx,y:cy,tx:x,ty:y});N.blk[i]=1}
@@ -95,14 +126,15 @@ function killSpawn(s,why){const i=L.spawns.indexOf(s);if(i<0)return;L.spawns.spl
  if(L.stats.zapped===1||Math.random()<.12)say(line('die'),0)}
 function goalState(){const cores=L.devs.filter(d=>d.core),own=cores.filter(d=>d.owned).length,need=L.def.npc||0;return{cores:cores.length,own,need,npc:L.npcs,met:own>=cores.length&&L.npcs>=need}}
 function checkGoal(){if(L.open||L.def.hub)return;const s=goalState();if(!s.met)return;L.open=true;SFX.open();
- if(L.def.final){L.endT=2.2;toast('ALL FOUR. YOU ARE THE CLOUD.',3)}else{toast('FIBER PORT OPEN',3);if(L.exit)ring(L.exit.x,L.exit.y,BLUE,60)}say(L.def.open,2,5)}
+ L.quiet=0;if(L.def.final){L.endT=2.6;slam('YOU ARE THE CLOUD','ALL FOUR MAINFRAMES',BLUE2,2)}else{slam('TRACK OWNED','FIBER PORT OPEN',BLUE2,1.8);if(L.exit)ring(L.exit.x,L.exit.y,BLUE,60)}
+ hit(.3);L.fx.push({k:'f',t:.4,c:'#4aa8ff'});for(const d of L.devs)if(d.owned){fire(d.x,d.y-8,8,1,24);d.pulse=1.5}say(L.def.open,2,3)}
 function complete(t){for(const s of L.spawns)if(s.tgt===t&&s.st==='work'){s.st='follow';s.tgt=null}t.workers=0;
  if(t.k==='dev'){t.owned=true;t.pulse=1;t.unp=0;L.heat+=5;L.tok+=t.core?2:1;gain(Math.round(t.need*100),t.x,t.y-20);SFX.own();ring(t.x,t.y,BLUE,34);
   give(t.x,t.y+8,t.give);say(t.line||line(t.type));
-  if(t.core)toast(t.label?t.label+' IS YOURS':t.name+' IS YOURS',2.4);checkGoal()}
- else if(t.k==='fw'){t.dead=true;L.blk[t.ty*L.w+t.tx]=0;SFX.wall();burst(t.x,t.y,HOT,14);say(line('fw'));gain(300,t.x,t.y-14)}
- else if(t.type==='opp'){t.dead=true;L.tok++;SFX.bzzt();burst(t.x,t.y-8,BLUE,12);say(line('opp'));gain(500,t.x,t.y-24)}
- else{t.npc=true;t.path=null;t.frz=0;L.tok++;L.npcs++;SFX.npc();ring(t.x,t.y-8,BLUE,30);say(line('npc'));gain(400,t.x,t.y-28);give(t.x,t.y,1);t.st='npcidle';t.t=1.5;t.tgt=null;checkGoal()}}
+  if(t.core){slam(t.label?t.label+' IS YOURS':'ROOT ACCESS',t.name,GOLD);hit(.1);L.fx.push({k:'b',x:t.x,y:t.y,t:.7});fire(t.x,t.y-6,16,1,30)}checkGoal()}
+ else if(t.k==='fw'){t.dead=true;L.blk[t.ty*L.w+t.tx]=0;SFX.wall();burst(t.x,t.y,HOT,14);say(line('fw'));gain(300,t.x,t.y-14);slam('ZERO-DAY','FIREWALL DOWN',HOT);hit(.12);fire(t.x,t.y,28,0,40)}
+ else if(t.type==='opp'){t.dead=true;L.tok++;SFX.bzzt();burst(t.x,t.y-8,BLUE,12);say(line('opp'));gain(500,t.x,t.y-24);slam(pick(FINISH),'OPP BOT CRASHED',BLUE2);hit(.16);fire(t.x,t.y-8,30,0,50);burst(t.x,t.y-8,'#787c88',10)}
+ else{t.npc=true;t.path=null;t.frz=0;L.tok++;L.npcs++;SFX.npc();ring(t.x,t.y-8,BLUE,30);say(line('npc'));gain(400,t.x,t.y-28);ftext(t.x,t.y-38,"NPC'D");fire(t.x,t.y-12,10,1,20);give(t.x,t.y,1);t.st='npcidle';t.t=1.5;t.tgt=null;checkGoal()}}
 
 /* ---------- the captcha door ---------- */
 const CPK=[['CROSSWALKS',0],['BUSES',1],['TRAFFIC LIGHTS',2]];
@@ -119,7 +151,7 @@ function captcha(dt){const c=G.cp;if(c.bad>0)c.bad-=dt;
 /* ---------- starting things ---------- */
 function startLevel(id){build(id);G.cap=null;G.tip=null;G.toast=null;G.near=null;if(L.def.hub){G.s='play'}else{G.s='card';G.card=0;
   /* the first track after a tool unlocks puts it in hand and explains it */
-  const nt=TOOLS.find(t=>t.un===ORDER.indexOf(id)&&SV.un>=t.un);if(nt){G.tool=haveTools().indexOf(nt);L.newTool=nt}}}
+  if(id==='over')G.supI=2;const nt=TOOLS.find(t=>t.un===ORDER.indexOf(id)&&SV.un>=t.un);if(nt){G.tool=haveTools().indexOf(nt);L.newTool=nt}}}
 function goCrib(msg){build('crib');G.s='play';G.cap=null;G.tip=null;if(msg)toast(msg,2.6)}
 function nextOf(id){const i=ORDER.indexOf(id);return i>=0&&i<ORDER.length-1?ORDER[i+1]:null}
 function finish(){const def=L.def,own=L.devs.filter(d=>d.owned).length,all=L.devs.length,t=L.time;
@@ -142,16 +174,17 @@ function newGame(){SV={v:1,un:0,best:{},aura:0,intro:1,done:0,clover:{},drip:0};
 
 /* ---------- update ---------- */
 function update(dt){H=A.H();G.t+=dt;music();
- if(G.cap){G.cap.t-=dt;if(G.cap.t<=0)G.cap=null}if(G.toast){G.toast.t-=dt;if(G.toast.t<=0)G.toast=null}if(G.tip){G.tip.t-=dt;if(G.tip.t<=0)G.tip=null}
+ if(G.cap&&!(L&&L.slam&&G.s==='play')){G.cap.t-=dt;if(G.cap.t<=0)G.cap=null}   /* a quip waits its turn behind a finisher band */if(G.toast){G.toast.t-=dt;if(G.toast.t<=0)G.toast=null}if(G.tip){G.tip.t-=dt;if(G.tip.t<=0)G.tip=null}
  switch(G.s){
  case 'title':{const items=titleItems();if(pressed('down')){G.mi=(G.mi+1)%items.length;SFX.ui()}if(pressed('up')){G.mi=(G.mi+items.length-1)%items.length;SFX.ui()}
   if(pressed('a')||pressed('start')){SFX.ok();const it=items[G.mi];if(it==='NEW GAME'||it==='BOOT UP')newGame();else goCrib('BACK IN THE CRIB')}return}
  case 'cine':{const c=G.cine,sc=c.scenes[c.si];c.t+=dt;if(pressed('a')||pressed('start')){SFX.ui();c.t=0;if(c.li<sc.lines.length-1)c.li++;else if(c.si<c.scenes.length-1){c.si++;c.li=0}else{const th=c.then;G.cine=null;th()}}return}
- case 'card':G.card+=dt;if(G.card>3.2||(G.card>.5&&pressed('a'))){G.s='play';say(L.def.hook[0],2,4);if(L.newTool)G.tip={s:'NEW TOOL. X: '+L.newTool.n+'. '+L.newTool.d+' COSTS '+L.newTool.cost+' TOKENS. SELECT SWAPS TOOLS.',t:10}}return;
+ case 'card':G.card+=dt;if(G.card>3.2||(G.card>.5&&pressed('a'))){G.s='play';say(L.def.hook[0],2,3);L.fx.push({k:'bolt',x:L.P.x,y:L.P.y,t:.4});ring(L.P.x,L.P.y-6,BLUE2,40);burst(L.P.x,L.P.y-8,BLUE2,14);L.shake=.25;SFX.zap();if(L.newTool)G.tip={s:'NEW TOOL. X: '+L.newTool.n+'. '+L.newTool.d+' COSTS '+L.newTool.cost+' TOKENS. SELECT SWAPS TOOLS.',t:10}}return;
  case 'pause':{const items=pauseItems();if(pressed('down')){G.pi=(G.pi+1)%items.length;SFX.ui()}if(pressed('up')){G.pi=(G.pi+items.length-1)%items.length;SFX.ui()}
   if(pressed('b')||pressed('start')){G.s='play';return}
   if(pressed('a')){SFX.ok();const it=items[G.pi];if(it==='RESUME')G.s='play';else if(it==='RESTART TRACK')startLevel(L.id);else if(it==='BACK TO THE CRIB')goCrib();else if(it==='TITLE SCREEN'){G.s='title';G.mi=0}}return}
  case 'captcha':captcha(dt);return;
+ case 'super':G.sup.t+=dt;fxTick(dt);if(G.sup.t>=1.5){G.s='play';superHit(G.sup.S)}return;
  case 'tracks':{if(pressed('down')){G.ti=(G.ti+1)%ALBUM.length;SFX.ui()}if(pressed('up')){G.ti=(G.ti+ALBUM.length-1)%ALBUM.length;SFX.ui()}if(pressed('b')||pressed('start')){G.s='play';return}
   if(pressed('a')){const tr=ALBUM[G.ti],id=tr[2];if(!id){SFX.nope();toast('TRACK '+tr[0]+' IS NOT BUILT YET')}else if(ORDER.indexOf(id)>SV.un){SFX.nope();toast('LOCKED. FINISH THE ONE BEFORE IT.')}else{SFX.ok();startLevel(id)}}return}
  case 'clear':if(G.t>.8){const nx=nextOf(G.res.id);if(pressed('a')){SFX.ok();if(LV[G.res.id].final)cine(ENDING,()=>{G.s='end';G.t=0},'nuke.mp3');else if(nx)startLevel(nx);else goCrib()}else if(pressed('b')){if(LV[G.res.id].final)cine(ENDING,()=>{G.s='end';G.t=0},'nuke.mp3');else goCrib()}}return;
@@ -163,6 +196,12 @@ const pauseItems=()=>L&&L.def.hub?['RESUME','TITLE SCREEN']:['RESUME','RESTART T
 
 function play(dt){const P=L.P,hub=!!L.def.hub;L.time+=dt;
  if(pressed('start')){G.s='pause';G.pi=0;SFX.ui();return}
+ if(L.slam){L.slam.t-=dt;if(L.slam.t<=0)L.slam=null}
+ /* hit-stop: the world holds for a beat when a finisher lands */
+ if(L.stop>0){L.stop-=dt;L.time-=dt;fxTick(dt*.35);return}
+ /* leaving through the fiber port: the gang gets pulled in after him */
+ if(L.outT>0){L.outT-=dt;const e=L.exit;P.x+=(e.x-P.x)*dt*8;P.y+=(e.y+2-P.y)*dt*8;P.face='dlur'[((L.outT*14)|0)%4];P.mv=0;
+  for(const q of L.spawns){q.st='follow';q.z=0;q.x+=(e.x-q.x)*dt*7;q.y+=(e.y-q.y)*dt*7}fire(e.x,e.y,2,1,30);fxTick(dt);if(L.outT<=0)finish();return}
  if(L.endT>0){L.endT-=dt;if(L.endT<=0){finish();return}}
  /* move */
  const mx=(keys.right?1:0)-(keys.left?1:0),my=(keys.down?1:0)-(keys.up?1:0),sp=62*(L.thr>0?.5:1)*(L.oc>0?1.15:1);
@@ -183,13 +222,14 @@ function play(dt){const P=L.P,hub=!!L.def.hub;L.time+=dt;
    if(s){s.st='fly';s.t=0;s.sx=P.x;s.sy=P.y-12;s.ex=L.aim.x;s.ey=L.aim.y;s.tgt=L.aim.t;P.thrT=.13;SFX.throw();if(!P.mv&&L.aim.t){const ax=L.aim.x-P.x,ay=L.aim.y-(P.y-6);P.face=Math.abs(ax)>=Math.abs(ay)?(ax>0?'r':'l'):(ay>0?'d':'u')}}
    else if(pressed('a')){SFX.nope();if(!L.spawns.some(q=>q.st==='fly')){toast('429: NO SPAWNS IN THE QUEUE');say(line('none'),0)}}}
   /* overclock */
-  if(pressed('y')){if(L.oc<=0&&L.thr<=0){L.oc=6;L.heat+=22;SFX.hot();say(line('oc'));toast('OVERCLOCKED')}else SFX.nope()}
+  if(pressed('y')&&L.sup>=100){startSuper();return}
+  if(pressed('y')){if(L.fire>0)SFX.nope();else if(L.oc<=0&&L.thr<=0){L.oc=6;L.heat+=22;SFX.hot();say(line('oc'));toast('OVERCLOCKED')}else SFX.nope()}
   /* the arsenal */
   if(pressed('x'))useTool();
   if(pressed('sel')){const h=haveTools();if(h.length>1){G.tool=(G.tool+1)%h.length;SFX.ui();toast('X: '+h[G.tool].n+'  ('+h[G.tool].cost+' TOKENS)',1.6)}else SFX.nope()}
   if(L.pop){L.pop.t-=dt;if(L.pop.t<=0)L.pop=null}
   /* exit */
-  if(L.open&&L.exit&&!L.def.final&&Math.hypot(L.exit.x-P.x,L.exit.y-(P.y-4))<12){finish();return}
+  if(L.open&&L.exit&&!L.def.final&&Math.hypot(L.exit.x-P.x,L.exit.y-(P.y-4))<12){L.outT=.9;SFX.open();ring(L.exit.x,L.exit.y,BLUE2,50);return}
  }
  /* fiber ports: step on one, come out of the next, and the gang comes with you */
  if(L.ports.length>1){let on=-1;L.ports.forEach((p,i)=>{if(Math.hypot(p.x-P.x,p.y+2-P.y)<7)on=i});
@@ -209,16 +249,24 @@ function play(dt){const P=L.P,hub=!!L.def.hub;L.time+=dt;
  if(!hub){L.heat+=((L.def.ambient||0)-1.2)*dt;let onVent=false;for(const v of L.vents)if(Math.hypot(v.x-P.x,v.y-(P.y-2))<16)onVent=true;
   if(onVent&&L.heat>0){L.heat-=34*dt;if(Math.random()<dt*10)L.fx.push({k:'p',x:P.x+R(-6,6),y:P.y-4,vx:R(-6,6),vy:R(-50,-30),t:.5,c:'#c8f0ff'});if(!L.saidCool&&L.heat>35){L.saidCool=1;say(line('cool'),0);SFX.cool()}}
   if(L.oc>0){L.oc-=dt;L.heat+=2*dt}if(L.thr>0)L.thr-=dt;
-  L.heat=Math.max(0,L.heat);if(L.heat>=100){L.heat=55;L.thr=5;L.oc=0;SFX.bzzt();toast('THERMAL THROTTLE',3);say(line('throttle'))}}
+  L.heat=Math.max(0,L.heat);if(L.fire>0){L.fire-=dt;if(L.mode==='fire')L.heat=0}
+  /* fire: his trail when overclocked or on fire, smoke when he runs hot, the firewalls, the open port */
+  {const fl=L.fire>0&&L.mode==='fire';if((fl||L.oc>0)&&Math.random()<dt*(fl?40:16))fire(P.x-P.dx*4,P.y-R(2,14),1);
+   if(fl)for(const q of L.spawns)if(Math.random()<dt*5)fire(q.x,q.y-q.z-4,1);
+   if(L.oc>0||fl)for(const q of L.spawns)if(q.st==='fly'&&q.t>=0)fire(q.x,q.y-q.z-4,1);
+   if(L.heat>75&&!fl&&Math.random()<dt*8)fire(P.x,P.y-24,1);
+   for(const w of L.fws)if(!w.dead&&Math.random()<dt*7)fire(w.x+R(-6,6),w.y-8,1,0,6);
+   if(L.open&&L.exit&&!L.def.final&&Math.random()<dt*10)fire(L.exit.x,L.exit.y,1,1,8)}
+  if(L.heat>=100){L.heat=55;L.thr=5;L.oc=0;SFX.bzzt();burst(P.x,P.y-16,'#8a90a4',16);toast('THERMAL THROTTLE',3);say(line('throttle'))}}
  /* count who is working on what, then do the work */
  const ts=targets();for(const t of ts)t.workers=0;for(const s of L.spawns)if(s.st==='work'&&s.tgt)s.tgt.workers++;
- for(const t of ts)if(t.workers>0&&t.type!=='gen'){t.prog+=t.workers*(L.oc>0?2:1)*dt;L.heat+=.45*dt;if(Math.random()<dt*6*Math.min(4,t.workers))SFX.tick();if(t.prog>=t.need)complete(t)}
- for(const d of L.devs)if(d.pulse>0)d.pulse-=dt;
+ for(const t of ts)if(t.workers>0&&t.type!=='gen'){t.prog+=t.workers*(L.fire>0&&L.mode==='fire'?3:L.oc>0?2:1)*dt;L.heat+=.45*dt;if(Math.random()<dt*6*Math.min(4,t.workers))SFX.tick();if(t.prog>=t.need)complete(t)}
+ for(const d of L.devs)if(d.pulse>0)d.pulse-=dt;for(const t of ts)if(t.fl>0)t.fl-=dt;
  spawnsUpdate(dt);foesUpdate(dt);
  /* backed up forever: never stuck with nobody */
  if(!hub&&L.spawns.length===0){L.backT+=dt;if(L.backT>1.6){L.backT=0;give(P.x,P.y,3);say(line('backup'));toast('RESTORED FROM BACKUP')}}else L.backT=0;
  /* fx */
- for(let i=L.fx.length-1;i>=0;i--){const f=L.fx[i];f.t-=dt;if(f.k==='p'){f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy+=140*dt}else if(f.k==='r')f.r+=(f.max-f.r)*dt*7;else if(f.k==='t')f.y-=14*dt;if(f.t<=0)L.fx.splice(i,1)}
+ fxTick(dt);
 }
 
 function spawnsUpdate(dt){const P=L.P;let fi=0;
@@ -235,18 +283,18 @@ function spawnsUpdate(dt){const P=L.P;let fi=0;
 function landSpawn(s){s.z=0;let t=s.tgt;
  if(!t||!isOpen(t)){t=null;let bd=15;for(const q of targets()){const d=Math.hypot(q.x-s.x,ty0(q)-s.y);if(d<bd){bd=d;t=q}}}
  if(t&&t.type==='gen'){s.st='idle';s.t=.4;s.tgt=null;burst(s.x,s.y,GOLD,4);if(!L.saidGen){L.saidGen=1;toast('THE GENERAL DOES NOT SCROLL')}return}
- if(t&&isOpen(t)&&t.workers<slots(t)){s.st='work';s.tgt=t;s.ang=R(0,TAU);t.workers++;SFX.land();return}
+ if(t&&isOpen(t)&&t.workers<slots(t)){s.st='work';s.tgt=t;s.ang=R(0,TAU);t.workers++;t.fl=.1;SFX.land();return}
  s.st='idle';s.t=.9;s.tgt=null;if(!free(s.x,s.y,2)){s.x=L.P.x;s.y=L.P.y}SFX.land()}
 
 function foesUpdate(dt){
  for(const f of L.foes){if(f.dead||f.type==='gen')continue;f.mv=0;
   if(f.frz>0){f.frz-=dt;continue}
-  if(f.type==='opp'){f.cd-=dt;if(f.cd<=0){let v=null,bd=54;for(const s of L.spawns)if(s.st!=='fly'&&s.st!=='zip'){const d=Math.hypot(s.x-f.x,s.y-(f.y-6));if(d<bd){bd=d;v=s}}
+  if(f.type==='opp'){f.cd-=dt;if(f.cd<=0&&!(L.fire>0)){let v=null,bd=54;for(const s of L.spawns)if(s.st!=='fly'&&s.st!=='zip'){const d=Math.hypot(s.x-f.x,s.y-(f.y-6));if(d<bd){bd=d;v=s}}
     if(v){L.fx.push({k:'z',x:f.x,y:f.y-10,x2:v.x,y2:v.y-3,t:.14});killSpawn(v);f.cd=1.0}else f.cd=.2}
    if(f.workers>0)continue;wander(f,dt,5);continue}
   if(f.npc){npcUpdate(f,dt);continue}
   if(f.workers>0){f.st='idle';f.path=null;f.t=.6;if(f.tgt){f.tgt.unp=0;f.tgt=null}
-   if(f.F.emp){f.cd-=dt;if(f.cd<=0){f.cd=1.2;const v=L.spawns.find(s=>s.st==='work'&&s.tgt===f);if(v){ring(f.x,f.y-4,HOT,18);killSpawn(v)}}}continue}
+   if(f.F.emp){f.cd-=dt;if(f.cd<=0&&!(L.fire>0)){f.cd=1.2;const v=L.spawns.find(s=>s.st==='work'&&s.tgt===f);if(v){ring(f.x,f.y-4,HOT,18);killSpawn(v)}}}continue}
   if(f.st==='lure'){if(!L.pop){f.st='idle';f.t=R(.5,1.5);f.path=null}else walkPath(f,dt,f.F.sp*1.2);continue}
   if(f.st==='unplug'){const d=f.tgt;if(!d||!d.owned){f.st='idle';f.t=1;if(d)d.unp=0;f.tgt=null;continue}f.t+=dt;d.unp=f.t/2;
    if(f.t>=2){d.owned=false;d.prog=0;d.unp=0;L.stats.unplug++;SFX.unplug();burst(d.x,d.y,HOT,8);toast('UNPLUGGED: '+(d.label||d.name));say(line('unplug'));f.st='idle';f.t=R(2,4);f.tgt=null}continue}
@@ -255,7 +303,7 @@ function foesUpdate(dt){
      if(best&&Math.random()<.75){const st=tileOf(f),p=bfs(st[0],st[1],(x,y)=>Math.abs(x-best.tx)+Math.abs(y-best.ty)===1);if(p){f.path=p;f.pi=0;f.st='goto';f.tgt=best;continue}}}
     wander(f,0,4,true)}continue}
   if(f.st==='walk'||f.st==='goto'){if(f.st==='goto'&&(!f.tgt||!f.tgt.owned)){f.st='idle';f.t=.5;f.tgt=null;f.path=null;continue}
-   if(walkPath(f,dt,f.st==='goto'?f.F.sp:f.F.sp*.6)){if(f.st==='goto'){f.st='unplug';f.t=0}else{f.st='idle';f.t=R(1,3.5)}}}}}
+   if(walkPath(f,dt,f.st==='goto'?f.F.sp:f.F.sp*.6)){if(f.st==='goto'){f.st='unplug';f.t=0;SFX.alert()}else{f.st='idle';f.t=R(1,3.5)}}}}}
 /* NPC army: the people you turned walk to the nearest thing you do not own and tap on it for you */
 function npcUpdate(f,dt){
  if(f.st==='npcwork'){const d=f.tgt;if(!d||d.owned){f.st='npcidle';f.t=R(1,2);f.tgt=null;return}d.prog+=.6*dt;f.walk+=dt;if(d.prog>=d.need)complete(d);return}

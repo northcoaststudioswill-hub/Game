@@ -48,6 +48,7 @@ const SFX={
  cool(){hiss(.25,{f:5000,v:.03})},
  unplug(){tone(500,.25,{f2:70,v:.06,type:'triangle'})},
  ui(){tone(660,.03,{v:.03})},
+ alert(){tone(990,.07,{v:.05});later(()=>tone(990,.07,{v:.05}),120)},
  ok(){tone(880,.05,{v:.04});later(()=>tone(1320,.09,{v:.04}),60)},
  open(){[392,523,659,784,1047,1319].forEach((f,i)=>later(()=>tone(f,.12,{v:.05,type:'triangle'}),i*70))}
 };

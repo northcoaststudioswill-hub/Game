@@ -48,7 +48,7 @@ let fails = 0; const check = (ok, name, extra) => { console.log((ok ? 'PASS ' : 
   await page.evaluate(() => {
     window.__bot = function (id, maxT, shots) {
       const B = __g.BT._, K = __g.keys, PV = __g.prev, G = B.G; B.startLevel(id); let L = B.L, tick = 0, t = 0; const log = [], dt = 1 / 30;
-      const snaps = {}; let cooled = 0, capt = 0, oc = 0, tools = 0, quips = 0, lastCap = null, clover = 0;
+      const snaps = {}; let cooled = 0, capt = 0, oc = 0, tools = 0, quips = 0, lastCap = null, clover = 0, supers = 0, inSup = false, slams = 0, lastSlam = null;
       const tileOf = e => [Math.max(0, Math.min(L.w - 1, Math.floor(e.x / 16))), Math.max(0, Math.min(L.h - 1, Math.floor((e.y - 2) / 16)))];
       const pathTo = (tx, ty, adj) => { const s = tileOf(L.P); return B.bfs(s[0], s[1], (x, y) => adj ? Math.abs(x - tx) + Math.abs(y - ty) <= 1 : (x === tx && y === ty)); };
       const go = (px, py) => { const dx = px - L.P.x, dy = py - L.P.y; if (Math.abs(dx) > 1.5) K[dx > 0 ? 'right' : 'left'] = 1; if (Math.abs(dy) > 1.5) K[dy > 0 ? 'down' : 'up'] = 1; };
@@ -80,20 +80,21 @@ let fails = 0; const check = (ok, name, extra) => { console.log((ok ? 'PASS ' : 
             }
           }
           /* use the arsenal the way a player would: whatever is in hand when there are tokens for it, swapping now and then */
+          if (L.sup >= 100 && tick % 2) { K.y = 1; }
           const tl = B.curTool(); if (tl && L.tok >= tl.cost && tick % 90 === 1) { K.x = 1; tools++; } else if (tick % 400 === 201) K.sel = 1;
           if (tick % 300 === 0) log.push(Math.round(t) + 's ' + goal + ' gang ' + L.spawns.length + ' heat ' + Math.round(L.heat));
         }
-        __g.update(dt); for (const k in K) PV[k] = K[k]; t += dt; if (G.cap && G.cap !== lastCap) { lastCap = G.cap; quips++; }
+        __g.update(dt); for (const k in K) PV[k] = K[k]; t += dt; if (G.cap && G.cap !== lastCap) { lastCap = G.cap; quips++; } if (G.s === 'super' && !inSup) supers++; inSup = G.s === 'super'; if (B.L.slam && B.L.slam !== lastSlam) { lastSlam = B.L.slam; slams++; }
       }
       for (const k in K) K[k] = 0; __g.draw();
-      const gs = B.goalState(); return { id, state: G.s, t: Math.round(L.time), res: G.res && G.res.id === id ? G.res : null, own: L.devs.filter(d => d.owned).length, all: L.devs.length, gs, zapped: L.stats.zapped, unplug: L.stats.unplug, gang: L.spawns.length, cooled, capt, oc, tools, quips, combo: L.best, npcWork: L.foes.filter(f => f.npc && (f.st === 'npcwork' || f.st === 'npcgo')).length, log, snaps };
+      const gs = B.goalState(); return { id, state: G.s, t: Math.round(L.time), res: G.res && G.res.id === id ? G.res : null, own: L.devs.filter(d => d.owned).length, all: L.devs.length, gs, zapped: L.stats.zapped, unplug: L.stats.unplug, gang: L.spawns.length, cooled, capt, oc, tools, supers, slams, quips, combo: L.best, npcWork: L.foes.filter(f => f.npc && (f.st === 'npcwork' || f.st === 'npcgo')).length, log, snaps };
     };
   });
   const order = await page.evaluate(() => __g.BT._.ORDER);
   for (const id of order) {
     const res = await page.evaluate(([id]) => __bot(id, 900, [6, 14, 24, 40, 60, 90]), [id]);
     for (const k in res.snaps) fs.writeFileSync(path.join(OUT, 'auto-' + id + '-' + String(k).padStart(3, '0') + 's.png'), Buffer.from(res.snaps[k].split(',')[1], 'base64'));
-    check(res.state === 'clear' && res.res, 'autopilot clears ' + id, 'time ' + res.t + 's rank ' + (res.res ? res.res.rank : '-') + ' devices ' + res.own + '/' + res.all + ' npcs ' + res.gs.npc + ' lost ' + res.zapped + ' unplugged ' + res.unplug + ' gang ' + res.gang + (res.cooled ? ' cooled' : '') + (res.capt ? ' captcha' : '') + (res.oc ? ' overclock x' + res.oc : '') + (res.tools ? ' tools x' + res.tools : '') + ' quips ' + res.quips + ' (' + (res.quips / Math.max(1, res.t) * 60).toFixed(1) + '/min) best combo x' + res.combo);
+    check(res.state === 'clear' && res.res, 'autopilot clears ' + id, 'time ' + res.t + 's rank ' + (res.res ? res.res.rank : '-') + ' devices ' + res.own + '/' + res.all + ' npcs ' + res.gs.npc + ' lost ' + res.zapped + ' unplugged ' + res.unplug + ' gang ' + res.gang + (res.cooled ? ' cooled' : '') + (res.capt ? ' captcha' : '') + (res.oc ? ' overclock x' + res.oc : '') + (res.tools ? ' tools x' + res.tools : '') + ' supers x' + res.supers + ' finishers x' + res.slams + ' quips ' + res.quips + ' (' + (res.quips / Math.max(1, res.t) * 60).toFixed(1) + '/min) best combo x' + res.combo);
     /* two big-moment lines per track (the hook, the port opening) plus at most one ordinary line every 16 s */
     check(res.quips <= 3 + Math.ceil(res.t / 16), 'quips stay rare on ' + id, res.quips + ' in ' + res.t + ' s');
     if (res.state !== 'clear') console.log('   log: ' + res.log.slice(-8).join(' | '));
@@ -113,6 +114,23 @@ let fails = 0; const check = (ok, name, extra) => { console.log((ok ? 'PASS ' : 
   await page.keyboard.down('v'); await page.waitForTimeout(80); await page.keyboard.up('v'); await page.waitForTimeout(200);
   check(await page.evaluate(() => __g.BT._.L.oc > 0), 'Y overclocks'); await shot('12-overclocked');
   check(await page.evaluate(() => getComputedStyle(document.getElementById('bX')).display !== 'none' && document.querySelector('#bY span').textContent === 'clock'), 'X and Y buttons show for Bottie');
+
+  /* ---- finishers and supers ---- */
+  const fin = await page.evaluate(() => { const B = __g.BT._, G = B.G, K = __g.keys, PV = __g.prev, out = {}; const step = n => { for (let i = 0; i < n; i++) { __g.update(1 / 30); for (const k in K) PV[k] = K[k]; } };
+    for (const k in K) K[k] = 0; B.startLevel('over'); G.s = 'play'; let L = B.L; step(2);
+    const opp = L.foes.find(f => f.type === 'opp'); B.complete(opp); out.slam = L.slam && L.slam.s; out.stop = L.stop > 0; const t0 = L.time; step(3); out.held = Math.abs(L.time - t0) < 1e-6; step(20);
+    B.say('x', 2); out.quipSecs = G.cap.t;
+    out.names = []; out.ok = [];
+    for (let i = 0; i < 3; i++) { B.startLevel('born'); G.s = 'play'; L = B.L; G.supI = i; L.sup = 100; step(2); const fw = L.fws[0]; L.P.x = fw.x - 30; L.P.y = fw.y + 2; const gang0 = L.spawns.length, opps = L.foes.filter(f => f.type === 'opp').length;
+      K.y = 1; step(1); K.y = 0; out.names.push(G.s === 'super' ? G.sup.S.id : 'none'); step(50); const id = B.SUPERS[i].id;
+      out.ok.push(G.s === 'play' && L.sup === 0 && (id === 'cad' ? L.foes.filter(f => f.type === 'opp' && !f.dead).length === 0 && opps > 0 : id === 'copy' ? L.spawns.length === L.def.cap && L.spawns.length > gang0 && L.fire > 0 : fw.dead && L.fire > 0 && L.mode === 'fire')); }
+    return out; });
+  check(!!fin.slam && fin.stop && fin.held, 'crashing an opp bot lands a finisher with a hit-stop', JSON.stringify(fin));
+  check(fin.quipSecs <= 2.5, 'a quip stays up about two seconds', fin.quipSecs + ' s');
+  check(fin.names.join() === 'cad,copy,fire' && fin.ok.every(Boolean), 'all three supers fire from Y and do their job', fin.names.join() + ' ' + fin.ok.join());
+  for (const [i, nm] of [[0, 'cad'], [1, 'copy'], [2, 'fire']]) { await page.evaluate(i => { const B = __g.BT._; B.startLevel('born'); B.G.s = 'play'; B.G.supI = i; B.L.sup = 100; B.L.P.x = B.L.fws[0].x - 30; B.L.P.y = B.L.fws[0].y + 2; }, i); await page.waitForTimeout(120);
+    await page.keyboard.down('v'); await page.waitForTimeout(60); await page.keyboard.up('v'); await page.waitForTimeout(800); await shot('17-super-' + nm); await page.waitForTimeout(1000); await shot('18-after-' + nm); }
+  await page.evaluate(() => { const B = __g.BT._; B.startLevel('over'); B.G.s = 'play'; }); await page.waitForTimeout(150); await page.evaluate(() => { const B = __g.BT._; B.complete(B.L.foes.find(f => f.type === 'opp')); }); await page.waitForTimeout(260); await shot('19-finisher');
 
   /* ---- fun elements ---- */
   const fun = await page.evaluate(() => { const B = __g.BT._, G = B.G, K = __g.keys, PV = __g.prev, out = {}; const step = n => { for (let i = 0; i < n; i++) { __g.update(1 / 30); for (const k in K) PV[k] = K[k]; } };

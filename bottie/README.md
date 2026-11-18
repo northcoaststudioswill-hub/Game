@@ -6,7 +6,7 @@ more spawns. Spawns got spawns.
 
 - **Play it:** `games/pocket-lantern-bottie.html` (one file; it boots straight into the Bottie game)
 - **Build it:** `python3 bottie/build.py` from the repo root
-- **Test it:** `node bottie/tests/bottie_lab.js` (43 checks; screenshots land in `playtest/`)
+- **Test it:** `node bottie/tests/bottie_lab.js` (46 checks; screenshots land in `playtest/`)
 - **What changed:** [`CHANGELOG.md`](CHANGELOG.md)
 - **Lore package from Will:** `lore/artist-archive.pdf` and the five reference photos in `lore/`
 
@@ -26,7 +26,7 @@ and all five cartridges play from there. B on the shelf (or the button) goes bac
 | D-pad | Move |
 | A | Throw a spawn. Hold to keep throwing. It aims at what he is facing, or the nearest thing in reach. |
 | B | Call the gang back (beep beep) |
-| Y | Overclock: the gang hacks twice as fast for 6 seconds, heat goes up |
+| Y | Overclock: the gang hacks twice as fast for 6 seconds, heat goes up. When the super meter is full, Y fires the super instead. |
 | X | Use the tool in hand (costs tokens) |
 | Select | Swap tools |
 | Start | Pause |
@@ -40,6 +40,9 @@ and all five cartridges play from there. B on the shelf (or the button) goes bac
 - **Firewalls** need the whole gang. **Captcha doors** are a small pick-the-squares game.
 - **Heat** rises as you hack and overclock. At 100 you get thermal throttled (slow for 5 seconds). AC vents cool you.
 - You cannot lose the gang for good: at zero spawns, three boot from backup.
+- **Supers** (CTRL ALT DELETE, COPY OF A COPY, HUNDRED DEGREES) fire from Y when the meter on the tool bar is full,
+  and **finishers** land on opp bots, firewalls, gold devices, combos and the goal. See `SUPERS`, `slam` and `hit`
+  in `bt-2-game.js`.
 - **Tools** unlock one per track cleared: FORK BOMB, BLUE SCREEN, POP-UP, RM -RF. Tokens pay for them; you earn
   tokens by owning devices, making NPCs and crashing opp bots.
 - His lines appear in a speech bubble at his head, and are kept rare (see `say` in `bt-2-game.js`).
@@ -47,7 +50,7 @@ and all five cartridges play from there. B on the shelf (or the button) goes bac
   and the gang across a level. Each track hides an **iced clover**. The finale runs on a five-minute **clock**.
   The closet in the crib changes his **drip** once you have the aura.
 
-## What is built (v0.4)
+## What is built (v0.5)
 
 Six tracks, the crib, an intro and an ending. The other eight album tracks show as NOT BUILT in the tracklist.
 
