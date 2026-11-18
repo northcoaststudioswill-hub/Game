@@ -114,6 +114,8 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **Weapons.** The Armoury at the Fence sells class weapons that change reach, speed, sweep and posture damage: Pit Spear, Greataxe and Warhammer for the Fighter; Rapier and Hand Axes for the Rogue; Frost Shard and Arc Spark for the Sorcerer; Flail and War Pick for the Cleric. Two per class cost coin and rank, one is earned by a deed.
 
+**The realm above.** Queen Eerin Koheneim and her husband Vilhelm van Koheneim IV rule from Highmarch with an iron grip, and the Undercity flourishes because they allow it. The intro opens in their throne room. In the market, the Long Stair stands sealed behind two Seal-Wardens: read the throne's latest proclamation there (a new one after every bout) and pay the Crown's tithe in person for respect. Three street events involve the Wardens, the tithe cart and a man in a plain cloak, and a hooded figure watches the champion's bout from the Guild box.
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |
@@ -148,7 +150,7 @@ and the rest of the game does not change.
 - `js/models.js` character models and animation
 - `js/world.js` the arena; `js/places.js` the street, the hideout, decor pieces, walking
 - `js/fight.js` combat simulation, AI, and its 3D effects
-- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror; `js/arms.js` combat tempo, heavy blows, weapons and the Armoury
+- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror; `js/arms.js` combat tempo, heavy blows, weapons and the Armoury; `js/realm.js` the Long Stair, proclamations, tithe and throne events
 - `js/cine.js` the opening cinematic; `js/lore.js` codex and bios; `js/music.js` the music sequencer
 - `js/ui.js` menus, HUD, level-up and results screens; `js/main.js` input and main loop
 

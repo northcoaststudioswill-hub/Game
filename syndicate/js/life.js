@@ -68,6 +68,21 @@
     // ---- steam grates and puddle ripples
     const grates = [[7.2, 6.4], [20.6, 6.9], [5.5, 4.6]]; grates.forEach(q => { box(0.9, 0.03, 0.9, emis(0x060508), q[0], 0.012, q[1], s).castShadow = false; for (let k = -1; k <= 1; k++) box(0.9, 0.04, 0.07, iron, q[0], 0.02, q[1] + k * 0.28, s).castShadow = false; });
     const rip = [[6.5, 6.5], [17, 12.2], [11.5, 3.2], [23, 6.6], [3.5, 10.6]].map(q => { const m = new T.Mesh(new T.RingGeometry(0.85, 1, 20), emis(0x7088b0, { transparent: true, opacity: 0, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.position.set(q[0] + R(-0.4, 0.4), 0.03, q[1] + R(-0.4, 0.4)); s.add(m); return { m, t: R(0, 3), x: q[0], z: q[1] }; });
+    // ---- the Long Stair: the sealed gate to Highmarch, two Seal-Wardens, and the throne's colours
+    { const GZ = 14.5, st = gfx.lambert(0xd8d4e0), goldM = new T.MeshPhongMaterial({ color: 0xf0c95a, emissive: 0x4a3408, shininess: 90, flatShading: true });
+      box(0.3, 3.4, 2.6, emis(0x05060c), -1.5, 1.7, GZ, s).castShadow = false;
+      [-1.5, 1.5].forEach(dz => box(0.7, 3.8, 0.55, st, -1.3, 1.9, GZ + dz, s)); box(0.8, 0.5, 3.7, st, -1.3, 3.95, GZ, s); box(0.5, 0.3, 1.0, goldM, -1.05, 3.95, GZ, s);
+      for (let i = -3; i <= 3; i++) mesh(new T.CylinderGeometry(0.045, 0.045, 3.3, 5), iron, -1.22, 1.65, GZ + i * 0.34, s); [0.8, 1.9, 3.0].forEach(y => box(0.08, 0.1, 2.5, iron, -1.2, y, GZ, s));
+      [[0.25, 0xc8b8ff], [-0.25, 0xf0c95a]].forEach((q, i) => { const sl = mesh(new T.CylinderGeometry(0.17, 0.17, 0.05, 10), new T.MeshPhongMaterial({ color: q[1], emissive: i ? 0x4a3408 : 0x3a2a6a, shininess: 80 }), -1.14, 1.9, GZ + q[0], s); sl.rotation.z = Math.PI / 2; });
+      for (let k = 0; k < 3; k++) box(0.5, 0.18, 2.3 - k * 0.2, st, -0.75 - k * 0.22, 0.09 + k * 0.18, GZ, s);
+      [[-2.3, '#3a2a6a'], [2.3, '#5a1418']].forEach(q => { const bn = new T.Mesh(new T.PlaneGeometry(1.1, 2.6), new T.MeshLambertMaterial({ map: gfx.bannerTex(q[1], '#f0c95a'), transparent: true, alphaTest: 0.5, side: T.DoubleSide })); bn.position.set(-1.42, 3.0, GZ + q[0]); bn.rotation.y = Math.PI / 2; s.add(bn); });
+      const sl2 = new T.PointLight(0xdfe6ff, 12, 9, 1.6); sl2.position.set(-0.4, 2.8, GZ); s.add(sl2); gfx.glow(0xdfe6ff, 2.2, -1.2, 2.6, GZ, s, 0.35);
+      box(0.6, 0.4, 0.42, woodD, -0.55, 0.2, GZ + 1.05, s); box(0.64, 0.08, 0.46, goldM, -0.55, 0.42, GZ + 1.05, s);
+      const wl = { cls: 'fighter', race: 'elf', gear: { weapon: 1, armor: 2 }, tint: { cloth: '#e8e4f8', armor: '#dfe2ec', armor2: '#a8b0c4', trim: '#f0c95a', legs: '#8a90a4' }, arm: 'f_spear' };
+      var wardens = [npc(s, wl, 0.35, GZ - 1.3, Math.PI / 2), npc(s, Object.assign({}, wl, { race: 'human' }), 0.35, GZ + 1.3, Math.PI / 2)];
+      obstacles.push([0.05, GZ - 1.6, 0.65, GZ - 1.0], [0.05, GZ + 1.0, 0.65, GZ + 1.6], [-0.9, GZ + 0.8, -0.2, GZ + 1.3]); }
+    const WARD = ['Seal.', 'Nobody climbs.', 'By order of the throne.', 'Step back from the gate.'];
+    let wardT = 8;
     const NOTES = [0xffd36b, 0xc79bff, 0x8ad0ff, 0xff9ac0];
     const ARG = ['Three to one! On GRUBB!', 'You are robbing me.', 'Mark said it was a sure thing.', 'Mark says everything is a sure thing.', 'I had it. I HAD it.'];
     let argT = 5, last = 0;
@@ -77,6 +92,8 @@
       bl.intensity = 13 + Math.sin(t * 3.1) * 2;
       croup.pose({ t, act: Math.sin(t * 0.5) > 0.7 ? 'cast' : 'idle', prog: 0.3 }); roller.pose({ t: t + 3, act: 'idle' });
       guards.forEach((c, i) => c.pose({ t: t + i * 2.5, act: 'idle' })); arg.forEach((c, i) => c.pose({ t: t + i, act: Math.sin(t * 1.3 + i * 3.14) > 0.5 ? 'cast' : 'idle', prog: 0.25 }));
+      wardens.forEach((c, i) => c.pose({ t: t + i * 3.1, act: 'idle' })); wardT -= dt; if (wardT <= 0 && G.scene === 'hub' && !G.ui.isOpen() && !G.talk) { wardT = R(14, 24); const w = wardens[Math.random() < 0.5 ? 0 : 1].root.position; gfx.floatText(w.x, 2.7, w.z, WARD[Math.floor(Math.random() * WARD.length)], '#e8e4f8'); }
+      if (Math.random() < 0.06) gfx.emit(-1.1, R(0.4, 3), 14.5 + R(-1, 1), R(0.2, 0.6), R(-0.1, 0.2), 0, 1.6, 0xdfe6ff, 0);
       busk.pose({ t, act: 'cast', prog: 0.2 + Math.abs(Math.sin(t * 2.2)) * 0.25 });
       if (Math.random() < 0.05) gfx.emit(17.9 + R(-0.3, 0.3), 1.6, 11.3 + R(-0.3, 0.3), R(-0.3, 0.3), R(0.6, 1.0), R(-0.3, 0.3), 1.6, NOTES[Math.floor(Math.random() * 4)], 0);
       tail.rotation.y = Math.sin(t * 1.4) * 0.7; cat.rotation.y = 0.7 + Math.sin(t * 0.23) * 0.15;
@@ -106,6 +123,7 @@
     const mkBox = (look, x, z, rot) => { const c = G.makeChar(look); c.root.position.set(x, 1.44, z); c.root.rotation.y = rot; bx.add(c.root); return c; };
     const keeper = mkBox({ cls: 'sorcerer', race: 'elf', tint: { cloth: '#4a2a7a', armor: '#3a2060', armor2: '#2a1648', hair: '#e8e2f4', trim: '#d9a93c' } }, 0, 0.25, 0);
     const bg = [mkBox({ cls: 'fighter', race: 'halforc', tint: { cloth: '#5a1f7a', armor: '#2a2428', armor2: '#1a1618' } }, -1.5, 0.3, 0.15), mkBox({ cls: 'fighter', race: 'human', tint: { cloth: '#5a1f7a', armor: '#2a2428', armor2: '#1a1618' } }, 1.5, 0.3, -0.15)];
+    const cloak = mkBox({ cls: 'rogue', race: 'human', tint: { cloth: '#4a4a52', armor: '#33333a', armor2: '#26262c' }, cos: { head: 'hood', back: 'greatcloak' } }, 0.95, -0.45, -0.25);       // they say he comes once a year, for the champion's bout
     const bxL = new T.PointLight(0xc79bff, 9, 9, 1.6); bxL.position.set(0, 3.4, 0.8); bx.add(bxL);
     // ---- eyes behind the gate bars
     const eyes = [[-0.45, 1.3], [0.5, 1.0], [0.1, 1.75]].map(q => { const g = new T.Group(), p = at(0.5, q[0], q[1]); g.position.set(p[0], p[1], p[2]); g.rotation.y = rotY; [-0.07, 0.07].forEach(x => { const e = new T.Mesh(new T.SphereGeometry(0.03, 5, 4), emis(0xff5030)); e.position.x = x; g.add(e); }); s.add(g); return { g, t: R(0, 4) }; });
@@ -127,6 +145,7 @@
     let last = 0;
     return function (t, hype) {
       const dt = Math.min(0.05, Math.max(0.001, t - last)); last = t;
+      cloak.root.visible = !!(G.fight && G.fight.active && G.fight.E && G.fight.E.boss); if (cloak.root.visible) cloak.pose({ t: t + 5, act: 'idle' });
       keeper.pose({ t, act: hype > 0.8 ? 'cast' : 'idle', prog: 0.3 }); bg.forEach((c, i) => c.pose({ t: t + i * 2, act: 'idle' }));
       eyes.forEach(e => { e.t -= dt; if (e.t < -0.15) e.t = R(1.5, 5); e.g.visible = e.t > 0; });
       cages.forEach(c => { c.g.rotation.z = Math.sin(t * 0.7 + c.ph) * (0.04 + hype * 0.05); c.g.rotation.x = Math.cos(t * 0.5 + c.ph) * 0.03; });

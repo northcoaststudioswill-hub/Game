@@ -94,3 +94,10 @@ down a **Flame Strike**. A loser who is merely beaten is carried out and billed 
 - **Vilhelm van Koheneim IV.** Her husband and the hand inside the iron glove. He commands the Seal-Wardens, signs the warrants, and sealed the lower levels himself. Rumour says he watches the champion's bout once a year from the Guild box, in a plain cloak.
 - **The Iron Peace.** Forty years without a riot above, paid for by letting everything forbidden happen below.
 - Names are spelled exactly as above: *Eerin Koheneim*, *Vilhelm van Koheneim IV*.
+
+## The Long Stair, the Wardens and the tithe
+
+- **The Long Stair.** Nine hundred steps from the Lamp Market to the lowest cellar of Highmarch. Vilhelm van Koheneim IV sealed it himself; it opens only for the tithe cart.
+- **The Seal-Wardens.** White plate, gold trim, no names. They do not police the Undercity. They make sure it stays where it is.
+- **The Crown's tithe.** One coin in ten of everything the Deep Guild takes goes up the Stair each month. In return the throne does not look down.
+- **Proclamations.** The throne posts a notice at the gate after every bout. They are dry, exact and occasionally funny on purpose.

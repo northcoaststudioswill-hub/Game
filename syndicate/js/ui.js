@@ -220,7 +220,7 @@
     on('[data-fight]', el => ui.prefight(G.OPPONENTS[+el.dataset.fight]));
   };
 
-  const CONTROLS = '<div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Mouse</kbd> aim</span><span><kbd>Click</kbd> attack</span><span><kbd>Space</kbd> dodge</span><span><kbd>Shift</kbd> or <kbd>Right click</kbd> parry</span><span><kbd>T</kbd> call your Second</span><span><kbd>Q</kbd><kbd>E</kbd><kbd>R</kbd> abilities</span><span><kbd>F</kbd> ultimate</span><span><kbd>C</kbd> potion</span><span><kbd>Esc</kbd> pause</span></div>' +
+  const CONTROLS = '<div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Mouse</kbd> aim</span><span><kbd>Click</kbd> strike</span><span><kbd>Hold click</kbd>, release: heavy blow</span><span><kbd>Space</kbd> dodge</span><span><kbd>Shift</kbd> or <kbd>Right click</kbd> parry, hold to block</span><span><kbd>T</kbd> call your Second</span><span><kbd>Q</kbd><kbd>E</kbd><kbd>R</kbd> abilities</span><span><kbd>F</kbd> ultimate</span><span><kbd>C</kbd> potion</span><span><kbd>Esc</kbd> pause</span></div>' +
     '<div class="keys"><span><kbd>Controller</kbd> left stick move · right stick aim · <kbd>X</kbd>/<kbd>RT</kbd> attack · <kbd>A</kbd> dodge · <kbd>LT</kbd> parry · <kbd>D-pad left</kbd> Second · <kbd>LB</kbd><kbd>RB</kbd><kbd>Y</kbd> abilities · <kbd>B</kbd> ultimate · <kbd>D-pad up</kbd> potion · <kbd>Menu</kbd> pause</span></div>' +
     '<p class="dim">On a phone: left thumb moves, buttons on the right, and your aim locks to your opponent. Red marks on the floor are incoming attacks. Dodge through them to thrill the crowd.</p>';
   ui.prefight = function (o) {
@@ -292,6 +292,7 @@
       s.el.classList.toggle('ready', cd <= 0 && P.res >= (ab.cost || 0));
     });
     hudEls.potion.querySelector('em').textContent = P.potions; hudEls.potion.classList.toggle('off', P.potions <= 0);
+    { const ta = document.getElementById('tAtk'), c = Math.min(1, (P.charging || 0) / 0.32); if (ta._c !== c) { ta._c = c; ta.style.setProperty('--chg', c); ta.classList.toggle('ready', c >= 1); } document.getElementById('tParry').classList.toggle('on', P.guard > 0 || P.state === 'parry'); hudEls.parry.classList.toggle('ready', P.guard > 0); }
     hudEls.dodge.querySelector('.cdv').style.height = (P.dodgeT / P.d.dodgeCd * 100) + '%';
   };
   ui.pause = function () {

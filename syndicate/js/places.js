@@ -39,7 +39,7 @@
     const X1 = 29, Z1 = 17, key = s.userData.key; key.position.set(24, 22, 24); key.target.position.set(14, 0, 8);
     const cells = [], plaza = new T.Color(1.12, 1.06, 0.98), lane = new T.Color(1.34, 1.26, 1.1);
     // worn paths: the promenade along the north row, the west lane to your door, and spokes into the square
-    const onLane = (x, z) => (z >= 2 && z <= 3 && x >= 0 && x <= 28) || (x >= 1 && x <= 2 && z >= 2 && z <= 10) || (x >= 13 && x <= 15 && z >= 3 && z <= 5) || (z >= 8 && z <= 10 && x >= 2 && x <= 9) || (z >= 8 && z <= 10 && x >= 19 && x <= 23) || (x >= 22 && x <= 23 && z >= 3 && z <= 8) || (z >= 5 && z <= 6 && x >= 23 && x <= 25);
+    const onLane = (x, z) => (z >= 2 && z <= 3 && x >= 0 && x <= 28) || (x >= 1 && x <= 2 && z >= 2 && z <= 15) || (x >= 13 && x <= 15 && z >= 3 && z <= 5) || (z >= 8 && z <= 10 && x >= 2 && x <= 9) || (z >= 8 && z <= 10 && x >= 19 && x <= 23) || (x >= 22 && x <= 23 && z >= 3 && z <= 8) || (z >= 5 && z <= 6 && x >= 23 && x <= 25);
     for (let x = -1; x <= X1 + 1; x++) for (let z = -1; z <= Z1 + 1; z++) cells.push({ x, z, tint: Math.hypot(x - 14, z - 9) < 4.6 ? plaza : onLane(x, z) ? lane : null });
     tiles(s, cells, 'cobble', [0.5, 0.5, 0.56]);
     const m1 = stoneMat(0x6f6a72), m2 = stoneMat(0x56525c), m3 = stoneMat(0x625a5a);
@@ -92,7 +92,7 @@
     barrel(s, -0.3, 1.4); barrel(s, 0.3, 4.6); box(0.9, 0.08, 0.6, wood(), 0.6, 0.55, 1.6, s); box(0.1, 0.55, 0.1, woodD(), 0.6, 0.27, 1.6, s);
     doorway(s, -1.45, 9, Math.PI / 2, 0x50b0ff, 1.5, 2.5);
     lantern(s, -0.9, 0, 10.7, 0x60b8ff, 16, 2.0).rotation.y = -Math.PI / 2;
-    box(0.2, 2.4, 1.6, woodD(), -1.45, 1.2, 14.5, s); box(0.25, 0.1, 1.8, iron(), -1.4, 1.2, 14.5, s); box(0.25, 0.1, 1.8, iron(), -1.4, 2.0, 14.5, s);
+    // (the Long Stair gate stands here: see life.js)
     // ---- the First Lamp: the monument in the middle of the market
     const mon = new T.Group(); mon.position.set(14, 0, 9); s.add(mon);
     mesh(new T.CylinderGeometry(2.4, 2.6, 0.35, 10), m1, 0, 0.17, 0, mon); mesh(new T.CylinderGeometry(1.6, 1.8, 0.35, 10), m2, 0, 0.5, 0, mon); mesh(new T.CylinderGeometry(0.4, 0.55, 2.6, 8), m1, 0, 1.95, 0, mon);
@@ -126,7 +126,7 @@
     const npcs = [fence, gm, mark, punter, k1, k2, k3, k4, sit, sit2];
     const obstacles = [[14, -1.6, 17.2, 0.7], [19.4, -1, 22.2, 0.7], [23.5, -1.2, 27.7, 1.9], [12.1, -1.3, 13.8, -0.2], [2.4, -1.1, 3.2, -0.2], [6.8, -1.1, 7.6, -0.2], [11.2, 6.2, 16.8, 11.8], [5.4, 11.8, 8.6, 13.8], [9, 13.4, 12.2, 15.4], [19.9, 12.2, 23.1, 14.2], [24.2, 7.9, 26.3, 11.1], [3, 13, 5, 15], [26.5, 14.9, 27.5, 15.9], [17.2, 14.8, 19.8, 16.4], [-0.7, 1, 0.1, 1.8], [-0.1, 4.2, 0.7, 5], [0.1, 1.2, 1.1, 2], [27.8, 3.8, 28.7, 5.5], [-0.1, 12, 1.4, 13.3]];
     // thresholds: a coloured ring on the ground wherever something can be used, so destinations read from across the square
-    [[5, 0.4, 0xff5030], [11, 0.6, 0xdccba3], [15.6, 1.3, 0x4ad0a0], [20.4, 1.3, 0xb070ff], [25.6, 2.5, 0x8aff5a], [24.9, 5.4, 0x6af0ff], [-0.2, 3, 0xffb060], [-0.2, 9, 0x60b8ff]].forEach(q => { const r = new T.Mesh(new T.RingGeometry(0.62, 0.78, 28), new T.MeshBasicMaterial({ color: q[2], transparent: true, opacity: 0.5, depthWrite: false })); r.rotation.x = -Math.PI / 2; r.position.set(Math.max(0.3, q[0]), 0.03, q[1]); s.add(r); const d = new T.Mesh(new T.CircleGeometry(0.62, 24), new T.MeshBasicMaterial({ color: q[2], transparent: true, opacity: 0.1, depthWrite: false })); d.rotation.x = -Math.PI / 2; d.position.copy(r.position); s.add(d); });
+    [[5, 0.4, 0xff5030], [11, 0.6, 0xdccba3], [15.6, 1.3, 0x4ad0a0], [20.4, 1.3, 0xb070ff], [25.6, 2.5, 0x8aff5a], [24.9, 5.4, 0x6af0ff], [-0.2, 3, 0xffb060], [-0.2, 9, 0x60b8ff], [1.3, 14.5, 0xe8e4f8]].forEach(q => { const r = new T.Mesh(new T.RingGeometry(0.62, 0.78, 28), new T.MeshBasicMaterial({ color: q[2], transparent: true, opacity: 0.5, depthWrite: false })); r.rotation.x = -Math.PI / 2; r.position.set(Math.max(0.3, q[0]), 0.03, q[1]); s.add(r); const d = new T.Mesh(new T.CircleGeometry(0.62, 24), new T.MeshBasicMaterial({ color: q[2], transparent: true, opacity: 0.1, depthWrite: false })); d.rotation.x = -Math.PI / 2; d.position.copy(r.position); s.add(d); });
     // bout posters and damp on the walls
     { const pm = new T.MeshLambertMaterial({ map: gfx.tex('poster') }); [[1.9, 0], [9.6, 0.06], [10.3, -0.05], [13.9, 0.04], [18.2, -0.07], [22.9, 0.05], [28, -0.04]].forEach(q => { const p2 = new T.Mesh(new T.PlaneGeometry(0.62, 0.86), pm); p2.position.set(q[0], 1.75, -1.42); p2.rotation.z = q[1]; s.add(p2); }); [[5.6, 0.05], [7.2, -0.06], [12.2, 0.04], [16.4, -0.05]].forEach(q => { const p2 = new T.Mesh(new T.PlaneGeometry(0.62, 0.86), pm); p2.position.set(-1.42, 1.75, q[0]); p2.rotation.y = Math.PI / 2; p2.rotation.z = q[1]; s.add(p2); });
       for (let i = 0; i < 16; i++) { const d = gfx.decal(gfx.tex('blood'), R(1.2, 2.6), i % 3 ? 0x24301c : 0x101418, R(0.35, 0.6)); if (i < 10) d.position.set(R(0, 29), 0.014 + i * 0.0006, R(-0.3, 0.5)); else d.position.set(R(-0.3, 0.5), 0.014 + i * 0.0006, R(0, 17)); d.rotation.z = R(0, 6); s.add(d); } }
@@ -141,7 +141,8 @@
         { x: 25.6, z: 2.5, r: 1.9, y: 3.6, label: 'Mark · The Long Odds', act: 'Gamble', go: () => G.meet('mark', () => G.ui.mark()), badge: () => !(G.state.met || {}).mark || !!G.state.schemeDone },
         { x: 24.9, z: 5.4, r: 1.7, y: 4.4, label: 'The Wisp Table', act: 'Roll the wispdice', go: () => G.ui.wisp() },
         { x: -0.2, z: 3, r: 1.6, y: 3.5, label: 'The Low Lamp', act: 'See your Tally', go: () => G.ui.tally(), badge: () => (G.state.reports || []).length > 0 || (G.state.tally || []).some(t => !t.job) && G.state.second == null },
-        { x: -0.2, z: 9, r: 1.9, y: 3.6, label: 'Your Hideout', act: 'Go home', go: () => G.ui.hideout() }
+        { x: -0.2, z: 9, r: 1.9, y: 3.6, label: 'Your Hideout', act: 'Go home', go: () => G.ui.hideout() },
+        { x: 1.3, z: 14.5, r: 1.5, y: 4.2, label: 'The Long Stair', act: 'Read the proclamation', go: () => G.ui.stair(), badge: () => G.state.stairSeen !== (Object.keys(G.state.wins).length + (G.state.losses || 0)) }
       ],
       blocked: (x, z) => x < -0.55 || x > X1 + 0.9 || z < -0.75 || z > Z1 + 0.9 || obstacles.some(o => x > o[0] - 0.35 && x < o[2] + 0.35 && z > o[1] - 0.35 && z < o[3] + 0.35),
       update: (t) => {
