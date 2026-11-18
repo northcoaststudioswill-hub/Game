@@ -97,6 +97,16 @@ body:not(.touch) #controls,body:not(.ingame) #controls{display:none}
 .pb.on{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.45)}
 #bA{right:calc(var(--sar) + 16px);bottom:calc(var(--sab) + 62px);background:#c8552e}
 #bB{right:calc(var(--sar) + 100px);bottom:calc(var(--sab) + 18px);background:#4a3a48}
+.fb{width:54px;height:54px;font-size:11px;letter-spacing:.5px;display:none}
+body.fight .fb{display:block}
+#bY{right:calc(var(--sar) + 25px);bottom:calc(var(--sab) + 144px);background:#3a6a8a}
+#bX{right:calc(var(--sar) + 100px);bottom:calc(var(--sab) + 100px);background:#8a5a2a}
+#bR{right:calc(var(--sar) + 182px);bottom:calc(var(--sab) + 22px);background:#4a5a7a}
+#bL{right:calc(var(--sar) + 174px);bottom:calc(var(--sab) + 90px);background:#5a5a4a}
+body.portrait #bY{right:32px;bottom:calc(var(--sab) + 180px)}
+body.portrait #bX{right:122px;bottom:calc(var(--sab) + 124px)}
+body.portrait #bR{right:104px;bottom:calc(var(--sab) + 206px)}
+body.portrait #bL{right:32px;bottom:calc(var(--sab) + 252px)}
 #bM{right:calc(var(--sar) + 12px);top:calc(var(--sat) + 10px);min-height:44px;min-width:64px;border-radius:22px;border:2px solid #5e3a2c;background:rgba(36,23,26,.9);color:var(--cream);font:inherit;font-size:13px}
 body.portrait #controls{opacity:1}
 body.portrait #dpad{width:168px;height:168px;left:calc(var(--sal) + 18px);bottom:calc(var(--sab) + 26px)}
@@ -160,6 +170,10 @@ body.inpanel:not(.portrait) #dlg .tx{min-height:0;line-height:1.4}
   <div id="dpad" aria-label="Direction pad"><i class="h"></i><i class="v"></i><b></b></div>
   <button class="pb" id="bA" aria-label="A: interact / confirm">A</button>
   <button class="pb" id="bB" aria-label="B: cancel / back">B</button>
+  <button class="pb fb" id="bY" aria-label="Jump">JUMP</button>
+  <button class="pb fb" id="bX" aria-label="Kick">KICK</button>
+  <button class="pb fb" id="bR" aria-label="Guard">GUARD</button>
+  <button class="pb fb" id="bL" aria-label="Hook line">HOOK</button>
   <button id="bM" aria-label="Menu">☰ Menu</button>
 </div>
 <div id="dbg" class="hidden"></div>

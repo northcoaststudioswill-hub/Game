@@ -231,7 +231,16 @@ const G3 = {
     if (opt.win) { const k = Math.sin(t * 2) * .03; S(opt.win === 2 ? { rp: -3.0 + k, re: -.15, tilt: -.1, ry: 0, lp: -2.8, le: -.3, lean: -.12, cr: 0, tw: 0, hx: -.25, hl: .1, hr: -.1, kl: .1, kr: .1 } : { cr: 2.6, lean: .28 + k, tw: .1, rp: -.35, ry: .1, re: -.1, tilt: -.5, lp: .15, le: -.5, hx: .4, hl: .5, kl: .7, hr: -.4, kr: .5, sp: .2 }); rate = 7; zeta = .8; }
     else if (opt.rage > .9 && (st === 'idle' || st === 'move') && !mv) { const k = Math.sin(t * 5.5) * .5 + .5; S({ cr: 2.8 + k * .8, lean: .3, tw: -.15, rp: .15, ry: -.35, re: -.15, tilt: -.45, lp: .1, ly: .3, le: -1.3, hx: .32, hl: .45, kl: .7, hr: -.4, kr: .55, sp: .22 }); rate = 16; }
     else if (opt.fear && st === 'approach') { S({ rp: -1.25, ry: .85, re: -1.15, tilt: -1.85, lp: -1.2, le: -1.3, ly: -.5, cr: 2.8, lean: -.2, tw: -.25, hx: -.1 }); if (mv) S({ lean: -.28 }); rate = 18; }
-    if ((o.z || 0) > 1 || st === 'down') { S({ lean: -.7, tw: Math.sin(t * 7 + idx) * .3, rp: -2.7, ry: -1.2, re: -.2, tilt: -1, lp: -2.7, ly: 1.2, le: -.2, hl: .7, kl: 1.0, hr: -.35, kr: .5, cr: 0, hx: -.4, sp: .3 }); rate = 20; }
+    const hero = o === Brawl.p && st !== 'hurt' && st !== 'down';
+    if (((o.z || 0) > 1 && !hero) || st === 'down') { S({ lean: -.7, tw: Math.sin(t * 7 + idx) * .3, rp: -2.7, ry: -1.2, re: -.2, tilt: -1, lp: -2.7, ly: 1.2, le: -.2, hl: .7, kl: 1.0, hr: -.35, kr: .5, cr: 0, hx: -.4, sp: .3 }); rate = 20; }
+    if (hero) { // kicks, jumps, the guard, the hook line
+      if (st === 'kick') { if (o.t < .06) S({ hr: 1.5, kr: 1.7, lean: -.1, cr: 1, hl: -.1, kl: .3, rp: -.2, re: -1.2, lp: -.8, le: -1.2, tw: -.3 }); else S({ hr: 1.6, kr: .05, lean: -.4, cr: .5, hl: -.25, kl: .25, rp: .5, re: -.5, lp: -1.0, le: -.8, tw: .35, hx: .2 }); rate = 44; zeta = .7; }
+      else if (st === 'dive') { S({ hr: 1.25, kr: .05, hl: .3, kl: 1.7, lean: -.55, rp: .7, re: -.3, lp: -1.2, le: -.6, cr: 0, tw: .2 }); rate = 40; }
+      else if (st === 'plunge') { S({ cr: 0, rp: -3.0, re: -.4, tilt: -.3, lean: .25, hl: .9, kl: 1.5, hr: .2, kr: 1.3, lp: -2.7, le: -.3, tw: 0, ry: 0 }); rate = 40; }
+      else if (st === 'guard') { S({ rp: -1.3, ry: .9, re: -1.2, tilt: -1.9, lp: -1.3, le: -1.3, ly: -.6, cr: 2.8, lean: -.04, tw: -.2, hl: .4, kl: .6, hr: -.35, kr: .5 }); rate = 30; }
+      else if (st === 'hook') { S({ lp: -1.5, le: 0, ly: 0, tw: .5, lean: .3, cr: 2, hl: .7, kl: .6, hr: -.5, kr: .3 }); rate = 36; }
+      else if ((o.z || 0) > 1 && st !== 'atk') { S(o.vz > 0 ? { cr: 0, hl: .9, kl: 1.5, hr: .5, kr: 1.3, lean: .1, rp: -1.2, re: -.8, lp: -1.0, le: -.9 } : { cr: 0, hl: .3, kl: .5, hr: -.2, kr: .6, lean: .05, rp: -2.0, re: -.5, lp: -1.6, le: -.5 }); rate = 24; }
+    }
     if (st === 'dodge') { S({ cr: 6.5, lean: 1.0, hl: 1.25, kl: 1.7, hr: 1.25, kr: 1.7, rp: -.6, re: -1.5, tilt: -.6, lp: -.6, le: -1.5, hx: .5, tw: 0 }); rate = 40; }
     if (o.guardT > 0 && st !== 'wind' && st !== 'atk' && swingT < 0 && st !== 'hurt') { S({ rp: -1.3, ry: .9, re: -1.2, tilt: -1.9, lp: -1.3, le: -1.3, ly: -.6, cr: 2.4, lean: -.06, tw: -.2 }); rate = 26; }
     return [P, rate, zeta];

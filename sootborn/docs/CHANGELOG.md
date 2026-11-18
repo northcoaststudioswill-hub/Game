@@ -1,5 +1,21 @@
 # SOOTBORN — changelog
 
+## v0.12.9 · 2026-11-18 — kicks, jumps, a guard and a hook line
+From play notes: the fighting is smooth but needs more to do, especially on a controller, and should be a little harder.
+- **New moves.** Kael fights dirty and off the ground:
+  - **Kick**: fast, shoves a man back, stops a wind-up, and breaks a raised guard (GUARD BREAK, with an opening after). After two strikes it launches. Out of a dodge it is a flying kick.
+  - **Jump**: strike in the air (up to three cuts; hits keep a launched enemy up, so you can launch, jump and keep cutting). Kick in the air to **dive kick** and bounce back up. Dodge button in the air to **plunge**: a slam that hits everything around the landing and scars the ground. Jumping clears ground sweeps.
+  - **Guard**: hold to block from the front. Three blocks, shown as pips under the fury bar, which refill. Heavy blows and charges crush through. Press it just as he swings and it is a **parry**: he staggers, time slows, fury jumps.
+  - **Hook line**: Kael's rigging line from the valve banks. It drags an ordinary fighter to him, or drags him to a big one and gives him the first hit. Short cooldown.
+  - ELEVEN is still hold strike at full fury (or both shoulder buttons).
+- **Controller layout in fights**: X strike, Y kick, A jump, B dodge, RB or RT guard, LB or LT hook. Menus are unchanged.
+- **Keyboard**: E strike, C kick, F jump, X dodge, V guard, Q hook.
+- **Touch**: four more buttons appear during fights (JUMP, KICK, GUARD, HOOK).
+- **A little harder**: enemies wind up slightly faster and attack more often; two can come at Kael at once whenever two are standing; captains and duelists start their double attacks earlier; Assay enemies have about an eighth more health. The Ember Ring results are unchanged for the test bots (a masher still loses the last bout, a dodger wins).
+- The control tips at the start of a fight cycle through the new moves, and About lists them.
+- `tests/moves.mjs` runs every new move in slow motion and with real key presses.
+- Not tested: a physical controller (the mapping follows the standard layout but nobody has held one), and the touch button positions on a real phone.
+
 ## v0.12.8 · 2026-11-18 — single combat, a tagline, and a dev menu
 From play notes: ELEVEN is right but the other cut-ins were not; not every fight should be a gang fight; "Book One" does not fit; keep hitting story beats; above-ground story should be cinematics.
 - **"Book One" is gone.** The title is SOOTBORN and the tagline is "Every breath is hers." (Kael's line about Seren), on the title screen, at the end of the opening film, and in About.

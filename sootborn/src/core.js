@@ -32,10 +32,10 @@ const Settings = {
 };
 
 // ---------- input abstraction: keyboard + touch + gamepad -> actions
-const ACTIONS = ['up', 'down', 'left', 'right', 'A', 'B', 'START', 'L', 'R', 'Y'];
+const ACTIONS = ['up', 'down', 'left', 'right', 'A', 'B', 'START', 'L', 'R', 'Y', 'X'];
 const Input = {
   held: {}, pressed: {}, kb: {}, touch: {}, pad: {}, queued: new Set(), hold: {}, device: 'kb', touchSeen: false,
-  keymap: { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', KeyE: 'A', Enter: 'A', Space: 'A', KeyZ: 'A', Escape: 'B', KeyX: 'B', Backspace: 'B', KeyM: 'START', Tab: 'START', KeyP: 'START', KeyQ: 'L', KeyR: 'R', KeyH: 'Y', KeyJ: 'R' },
+  keymap: { ArrowUp: 'up', KeyW: 'up', ArrowDown: 'down', KeyS: 'down', ArrowLeft: 'left', KeyA: 'left', ArrowRight: 'right', KeyD: 'right', KeyE: 'A', Enter: 'A', Space: 'A', KeyZ: 'A', Escape: 'B', KeyX: 'B', Backspace: 'B', KeyM: 'START', Tab: 'START', KeyP: 'START', KeyQ: 'L', KeyR: 'R', KeyH: 'Y', KeyJ: 'R', KeyC: 'X', KeyF: 'Y', KeyV: 'R', KeyG: 'L' },
   typing(e) { const t = e.target; return t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA'); },
   init() {
     addEventListener('keydown', e => {
@@ -56,6 +56,7 @@ const Input = {
       el.addEventListener('pointerdown', on); el.addEventListener('pointerup', off); el.addEventListener('pointercancel', off); el.addEventListener('lostpointercapture', off);
     };
     bind($('#bA'), 'A'); bind($('#bB'), 'B'); bind($('#bM'), 'START');
+    for (const [id, a] of [['bX', 'X'], ['bY', 'Y'], ['bR', 'R'], ['bL', 'L']]) if ($('#' + id)) bind($('#' + id), a);
     const pad = $('#dpad'), knob = pad.querySelector('b');
     let pid = null;
     const setDir = e => {
@@ -82,11 +83,14 @@ const Input = {
       if (!g || !g.connected) continue;
       const b = i => g.buttons[i] && g.buttons[i].pressed, ax = g.axes[0] || 0, ay = g.axes[1] || 0, P = this.pad;
       if (b(12) || ay < -.5) P.up = 1; if (b(13) || ay > .5) P.down = 1; if (b(14) || ax < -.5) P.left = 1; if (b(15) || ax > .5) P.right = 1;
-      if (b(0)) P.A = 1; if (b(1)) P.B = 1; if (b(9) || b(8)) P.START = 1; if (b(4)) P.L = 1; if (b(5)) P.R = 1; if (b(3) || b(2)) P.Y = 1;
+      if (this.fight) { // in a fight the pad is laid out like an action game: X strike, Y kick, A jump, B dodge, RB/RT guard, LB/LT hook
+        if (b(2)) P.A = 1; if (b(3)) P.X = 1; if (b(0)) P.Y = 1; if (b(1)) P.B = 1; if (b(5) || b(7)) P.R = 1; if (b(4) || b(6)) P.L = 1; if (b(9) || b(8)) P.START = 1;
+      } else { if (b(0)) P.A = 1; if (b(1)) P.B = 1; if (b(9) || b(8)) P.START = 1; if (b(4)) P.L = 1; if (b(5)) P.R = 1; if (b(3) || b(2)) P.Y = 1; }
       if (Object.keys(P).length) this.setDevice('pad');
     }
   },
   update(dt) {
+    const fi = Brawl.active && !Brawl.cine && Brawl.phase === 'fight' && !Brawl.art && !Brawl.sup && !UI.stack.length; if (fi !== this.fight) { this.fight = fi; document.body.classList.toggle('fight', fi); }
     this.pollPad();
     const n = {};
     for (const a of ACTIONS) n[a] = !!(this.kb[a] || this.touch[a] || this.pad[a]);

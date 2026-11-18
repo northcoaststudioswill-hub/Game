@@ -121,6 +121,9 @@ Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at F
 - Placement: opening before the title; The Valley at New Game; The Ford between Day 1 and Day 2; The Keep at the end of Day 2.
 - Kael's narration is first person, present tense, short. He counts things. He never says he is angry; he describes what he does with it.
 
+### How Kael fights (v0.12.9)
+Nothing clean about it. The Accredited are taught forms; he was taught by a furnace. He kicks, jumps on people, drags them in with the rigging line he used on the valve banks, and parries because he has no patience for blocking. Moves: strike chain, heavy, kick (guard break, launcher), jump with air cuts, dive kick, plunge, dodge, guard and parry, hook line, ELEVEN.
+
 ### The five fights (v0.12.8)
 Only the Valley is a mass battle. The rest are single combat, each with an intro and outro film.
 1. **The Valley** (day forty; opens the game) — battle, House Violet against House Teal.
