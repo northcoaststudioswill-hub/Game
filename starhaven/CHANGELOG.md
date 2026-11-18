@@ -1,5 +1,30 @@
 # Starhaven — Changelog
 
+## v0.1 — the first release of the slice (Nov 18, 2026)
+Will: keep running playtests and improving it to be a quality slice, and release.
+
+**Release.** `releases/v0.1/` holds the frozen game file, release notes, a how-to-play sheet and a share zip
+(`starhaven-v0.1-share.zip`). The title screen says v0.1. Notes: [`releases/v0.1/RELEASE-NOTES.md`](releases/v0.1/RELEASE-NOTES.md).
+
+**Found by playtesting for the release: the game was drawing too slowly.** A new speed test (`tests/perf.js`) runs
+the real game loop on a processor slowed fourfold. Fixed:
+- The haze between background layers was painted as a fresh full-screen gradient three times a frame (six in levels
+  that change place). It is now painted once per place and reused. This was the largest single cost.
+- Levels that change place (the Ring into the thornwood, the Library into the mountain) drew two whole backdrops all
+  the time; now only in the stretch where one turns into the other.
+- The darkness-and-light layer is painted at half size and stretched (it is soft anyway).
+- Foreground strips were built on the first frame that needed them, mid-level; they are built when the level loads.
+- Result: 60 pictures a second at full speed, 31 to 38 with the processor slowed fourfold and no graphics chip.
+  (I do not have a like-for-like figure from before the fixes with this test; the earlier, cruder timing showed the
+  thornwood and the boss arena costing about twice what the other levels did, and they are now level with them.)
+
+**Also in this release:** floating words appear over Wren's head and clear of the cards; a toast never covers the
+speaker's name.
+
+**Playtest for the release.** 50 play checks, 19 menu checks, the random-input run at 9,000 frames a chapter in both
+orientations (no errors), the screenshot run, the speed run. **Still not played by hand or on a phone:** that is the
+one test this release has not had, and the release notes say so first.
+
 ## Reimagined 16 — no text over text, three voices, portraits with a world behind them (Nov 18, 2026)
 Will: some text pops up over other text; keep designing the characters; keep beautifying the game and the text and
 give it an identity.

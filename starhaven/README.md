@@ -31,6 +31,11 @@ link Will has. Hold your phone either way up.
 Between chapters there are **evenings**: choose who to spend the night with (Caelum, Bram, Iris or Thane) for scenes,
 gifts and bond hearts.
 
+## Release: v0.1 (Nov 18, 2026)
+
+The first release of the slice: [`releases/v0.1/`](releases/v0.1/RELEASE-NOTES.md) (frozen game file, notes, and
+`starhaven-v0.1-share.zip` to send). Tested by scripts only; not yet played by hand or on a phone.
+
 ## Latest update (Nov 18, 2026)
 
 - **Play it upright or sideways.** Held upright, the picture is on top and the controls and text are below it.

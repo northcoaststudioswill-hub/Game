@@ -57,22 +57,22 @@
   // Deterministic random so the art is the same every time.
   function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
 
-  const D = {};
-  let room, layers = { bg: {}, fg: {} };
+  const D = { off: {} };
+  let room, layers = { bg: {}, fg: {}, haze: {} };
 
   D.init = function (r, viewW) {
     room = r;
     const def = r.def;
     layers.level = makeLevel(r, THEMES[def.theme]);
     const themes = def.zones ? def.zones.map(z => z.theme) : [def.theme];
-    for (const th of themes) if (!layers.bg[th]) layers.bg[th] = makeBackdrop(THEMES[th], th);
+    for (const th of themes) { if (!layers.bg[th]) layers.bg[th] = makeBackdrop(THEMES[th], th); if (!layers.fg[th]) layers.fg[th] = makeForeground(th); }
     if (!layers.stars) layers.stars = makeStars();
     D.resize(viewW);
   };
   D.resize = function (viewW) {
     layers.viewW = viewW;
     layers.vignette = makeVignette(viewW);
-    layers.dark = canvas(viewW, SH.VIEW_H);
+    layers.dark = canvas(Math.ceil(viewW / 2), SH.VIEW_H / 2);
     if (!layers.hole) {   // a soft round light, stamped out of the darkness wherever something glows
       const h = layers.hole = canvas(128, 128), g = h.getContext('2d');
       const gr = g.createRadialGradient(64, 64, 4, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,0.7)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
@@ -87,8 +87,9 @@
   function drawLight(ctx, w, cx, cy, vw, VH, t, themeA, themeB, k) {
     const a = DARK[themeA] || DARK.dusk, b = DARK[themeB] || a, strength = a[1] + (b[1] - a[1]) * k;
     const c = layers.dark, g = c.getContext('2d');
-    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; g.clearRect(0, 0, vw, VH);
-    g.fillStyle = k > 0.5 ? b[0] : a[0]; g.globalAlpha = strength; g.fillRect(0, 0, vw, VH);
+    g.setTransform(0.5, 0, 0, 0.5, 0, 0);
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; g.clearRect(0, 0, vw + 2, VH);
+    g.fillStyle = k > 0.5 ? b[0] : a[0]; g.globalAlpha = strength; g.fillRect(0, 0, vw + 2, VH);
     g.globalCompositeOperation = 'destination-out';
     const warm = [];
     const hole = (x, y, r, al, glow) => { const X = x - cx, Y = y - cy; if (X < -r || X > vw + r) return; g.globalAlpha = al; g.drawImage(layers.hole, X - r, Y - r, r * 2, r * 2); if (glow) warm.push(X, Y, r * glow); };
@@ -110,7 +111,7 @@
     if (def.cottage != null) hole((def.cottage + 3) * TS, 14 * TS, 120, 0.8, 0.6);
     if (def.mural && SH.game.flags[def.mural.flag]) hole((def.mural.x + 2) * TS, 13 * TS, 110, 0.8);
     for (const pt of SH.fx.parts) if (pt.glow && pt.life > 6) hole(pt.x, pt.y, 12, 0.35);
-    ctx.drawImage(c, 0, 0);
+    ctx.drawImage(c, 0, 0, c.width * 2, c.height * 2);
     // a little warm bloom around flames, so fire feels like light and not just a shape
     ctx.globalCompositeOperation = 'lighter';
     for (let i = 0; i < warm.length; i += 3) { const r = warm[i + 2]; ctx.globalAlpha = 0.5; ctx.drawImage(layers.warm, warm[i] - r, warm[i + 1] - r, r * 2, r * 2); }
@@ -431,8 +432,11 @@
     const zoom = cam.zoom || 1, zfx = cam.sx != null ? cam.sx : vw / 2, zfy = cam.sy != null ? cam.sy : VH * 0.6;
     ctx.save();
     if (zoom !== 1) { ctx.translate(zfx, zfy); ctx.scale(zoom, zoom); if (cam.roll) ctx.rotate(cam.roll); ctx.translate(-zfx, -zfy); }
-    drawBackdrop(ctx, w, zones[Math.max(0, zi - 1)].theme, cx, cy, vw, VH, 1);
-    if (zi > 0) { const k = Math.min(1, (mid - (zones[zi].x - 6)) / 12); drawBackdrop(ctx, w, zones[zi].theme, cx, cy, vw, VH, k); }
+    {   // one backdrop, unless the camera is in the stretch where one place turns into the next
+      const k = zi > 0 ? Math.min(1, (mid - (zones[zi].x - 6)) / 12) : 0;
+      if (k < 1) drawBackdrop(ctx, w, zones[Math.max(0, zi - 1)].theme, cx, cy, vw, VH, 1);
+      if (zi > 0) drawBackdrop(ctx, w, zones[zi].theme, cx, cy, vw, VH, k);
+    }
 
     ctx.save();
     ctx.translate(-cx + sx, -cy + sy);
@@ -509,7 +513,7 @@
     // the foreground: dark shapes close to the eye, sliding past faster than the world (depth, as in Hollow Knight)
     { const fgName = zones[zi].theme, fg = layers.fg[fgName] || (layers.fg[fgName] = makeForeground(fgName)), fxo = ((cx * 1.45) % fg.width + fg.width) % fg.width;
       ctx.globalAlpha = 0.9; for (let x0 = -fxo; x0 < vw; x0 += fg.width) ctx.drawImage(fg, Math.round(x0), Math.round(w.room.pxH - cy - fg.height + ((w.room.pxH - VH) - cy) * 0.35)); ctx.globalAlpha = 1; }
-    { const kk = zi > 0 ? Math.min(1, (mid - (zones[zi].x - 6)) / 12) : 0; drawLight(ctx, w, cx - sx, cy - sy, vw, VH, t, zones[Math.max(0, zi - 1)].theme, zones[zi].theme, kk); }
+    if (!D.off.light) { const kk = zi > 0 ? Math.min(1, (mid - (zones[zi].x - 6)) / 12) : 0; drawLight(ctx, w, cx - sx, cy - sy, vw, VH, t, zones[Math.max(0, zi - 1)].theme, zones[zi].theme, kk); }
     ctx.restore();
     SH.arts.draw(ctx, w, vw, VH);
     // cinema bars slide in while people are talking
@@ -537,7 +541,7 @@
     if (w.room.def.cityGlowX != null) drawCity(ctx, w, vw, cx, cy);
     // Depth by air: each layer further away loses contrast and takes the colour of the sky; nearer layers are
     // darker, sharper and more detailed, and slide faster. (Atmospheric perspective + detail gradient + parallax.)
-    const haze = (a, y0) => { const hg = ctx.createLinearGradient(0, y0, 0, VH); hg.addColorStop(0, 'rgba(0,0,0,0)'); hg.addColorStop(0.55, T.sky[2]); hg.addColorStop(1, T.sky[3]); ctx.globalAlpha = alpha * a; ctx.fillStyle = hg; ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = alpha; };
+    const haze = (a, y0) => { if (D.off.haze) return; const key = theme + y0; let hc = layers.haze[key]; if (!hc) { hc = layers.haze[key] = canvas(4, VH); const hx = hc.getContext('2d'), hg = hx.createLinearGradient(0, y0, 0, VH); hg.addColorStop(0, 'rgba(0,0,0,0)'); hg.addColorStop(0.55, T.sky[2]); hg.addColorStop(1, T.sky[3]); hx.fillStyle = hg; hx.fillRect(0, 0, 4, VH); } ctx.globalAlpha = alpha * a; ctx.drawImage(hc, 0, 0, vw, VH); ctx.globalAlpha = alpha; };
     tile(ctx, L.far, cx * 0.12, 10 - cy * 0.08, vw);
     haze(0.5, 40);
     ctx.globalAlpha = alpha * 0.6; tile(ctx, L.mid, cx * 0.2 + 370, 6 - cy * 0.16, vw); ctx.globalAlpha = alpha;   // the same wood again, further off
@@ -550,7 +554,7 @@
     ctx.fillStyle = mist; ctx.fillRect(0, 0, vw, VH);
     // shafts of light slanting down through the air (moonlight outdoors, a rose glow Under the Mountain)
     ctx.globalCompositeOperation = 'lighter';
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < (D.off.shafts ? 0 : 5); i++) {
       const sx0 = ((i * 211 - cx * 0.22) % (vw + 260) + vw + 260) % (vw + 260) - 130, wd = 26 + (i * 17) % 30, a = alpha * (0.035 + 0.02 * Math.sin(t * 0.012 + i * 1.7));
       const sg = ctx.createLinearGradient(0, 0, 0, VH * 0.8); sg.addColorStop(0, 'rgba(' + (theme === 'deep' ? '255,150,180' : theme === 'city' ? '255,214,150' : '200,214,255') + ',' + a * 3 + ')'); sg.addColorStop(1, 'rgba(255,255,255,0)');
       ctx.fillStyle = sg; ctx.beginPath(); ctx.moveTo(sx0, 0); ctx.lineTo(sx0 + wd, 0); ctx.lineTo(sx0 + wd - 90, VH * 0.8); ctx.lineTo(sx0 - 110, VH * 0.8); ctx.fill();
