@@ -1,6 +1,6 @@
 # Pocket Lantern ALT changelog
 
-ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code is untouched.
+ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
 ## Sprouts: the story run (Nov 17 2026)
@@ -126,6 +126,376 @@ Sprouts' own are now `spSay`, `drawBed` and `drawPjBuild`. Sproutwild is untouch
 - Saves: old saves load. The bridge starts unbuilt, new blossoms and fruit appear the next morning, and an old sparkle
   becomes a dig spot. Wild sprouts at the falls only exist in new games.
 - Test: `tests/sprouts_valley.js` (17 checks). Sproutwild's `field-lab.js` still passes 124 of 124.
+## v12.10: a save that stopped the game from starting
+- **Serious, now fixed.** Reopening the game with a file-1 save that held a Buddy Barn or a crop plot crashed at start-up, before the title: the load code checked each building against a list that is only filled in later. The Barn case is old (it is on main too). The crop plot case was new in v12.0, and the tutorial tells every player to build one, so every file-1 player would have been locked out the next time they opened the game.
+- Found by loading saves made with main's build. New test, `alt/tests/sproutwild/old-saves-from-main.js`: makes three v9.9 saves (mid-tutorial, home with crops, one Sigil with a Barn) and continues each in this build. All three load now.
+- New checkpoint, `reload`: a save from this build with a crop plot, a tender, a Buddy Barn, an expedition out and a Sigil home is closed and reopened. Everything is still there.
+- New checkpoint, `walkend`: the end of Erin's walk from a saved point (12 checks). From the end of the battle, Erin's talk starts 19 seconds later and King Bibi's beam 21.
+- During the catch lesson only the lesson buddy is out in the Meadow (others could wander in from further away).
+- An old save that is mid-tutorial showed the goal "Follow Erin: your first battle" at the wrong lesson. It says "Follow Erin" until the battle step.
+
+Checked: field lab; checkpoints castle, barn, plot, walkend, reload; the three old saves.
+
+## v12.9: a fair warning before the first Guardian
+- Fought the stone Guardian for real, every turn, with each starter at the level the game asks for (Lv6) and a Lv3-4 second buddy:
+  - BESSLING (water): wins with 28 of 68 health left. With timed taps: wins.
+  - GRASSKIN (leaf): wins with 29 of 70 left.
+  - CUYAPUP (fire): loses. Both buddies down, the Guardian still at 28 of 88. Fire does 0.625x to stone, water and leaf do 1.6x.
+- The game never told a fire-starter player any of that. Now:
+  - The goal line says "Stone GUARDIAN: lead with DRIZZLET (START, BUDDIES). CUYAPUP is weak to stone", or to catch a DEW or LEAF buddy if you have none.
+  - At the Guardian, the first A press with a weak lead gets Louie: "CUYAPUP barely scratches this one. DEW or LEAF kinds wear it down." and who to lead with. The second press fights anyway.
+- The numbers themselves are unchanged. Whether the fire starter should be able to win at Lv6 is Will's call.
+
+Checked: field lab; the castle checkpoint (18 of 18); the warning and the second press with a fire lead.
+
+## v12.8: the Sigil stones come home
+Will: "when we bring them light the sigil stones go to the lantern".
+- Four sockets are set in the Lantern's steps, two each side of its level plate. Each Sigil you win sits in one, lit in its own colour.
+- The first time you come home with a new Sigil, a short scene sets it in place: "You set the STONE SIGIL into the Lantern's steps. It fits. The Lantern burns a shade brighter." Erin counts what is left.
+- A on the steps reads them: how many are home, how many Guardians are still dark.
+- The plaque moved a little left to make room.
+
+Checked: field lab; the scene and the sockets on screen with one Sigil.
+
+## v12.7: checks from saved points, and the stretch to the first Sigil confirmed
+Will: stop the 20-minute runs; make saves at certain points.
+- New test, `alt/tests/sproutwild/checkpoint.js`. It starts from a saved point and plays one stretch in real time, in under two minutes:
+  - `castle`: Squire's entrance with a Buddy Barn. Travel scene, the reveal, bridge, thorns, pluck the PEB, boulder, the Guardian fight, the Sigil, the Hollow road opening. 18 checks, all pass. This stretch had never been confirmed before.
+  - `barn`: home with no Barn. The goal, the Barn's price, Marcus at the castle reveal, Marcus stopping the fight.
+  - `plot`: home with a cottage and no wood. The free first plot through the menus, then setting a buddy to tend it.
+- Found by `barn`: at home the goal line said "Have 3 buddies" and never mentioned the Buddy Barn. It now says "Build a BUDDY BARN (START, BUILD): 8 stone, 6 wood" until it is built.
+- The lamp pair by the notice board is gone: one lamp stood on top of the board. Pairs remain at Field Lane and Gate Lane.
+- The home status line "carries a load to the Lantern" is "carries a load home" (it was cut off).
+- The long-run autopilot had its castle steps filed under the Meadow, so they never ran. Fixed, though the checkpoint test replaces it for this stretch.
+
+Checked: field lab; all three checkpoints.
+
+## v12.6: followers stop walking through things
+- Louie and your buddies used to walk straight through trees, rocks, walls and shut gates (only water stopped them, since v10.1). They now go round, and hop to your side if they are stuck and left behind. Sent to a job past an obstacle, they hop to the job.
+- Measured in the Meadow, walking a loop through the trees for 15 seconds: nobody was inside anything solid in 73 of 73 samples. In 7 of the 73 one of them was more than 90 pixels behind, catching up.
+
+Checked: field lab; the loop above; Sunkeep at night with the lamps lit.
+
+## v12.5: a free first crop plot, and a tidier build list
+- Your first CROP PLOT is free (the next ones cost 2 wood). The cottage takes 8 wood and the game asks for a plot straight after; a fresh-save run stalled there, one log short. A real player could too.
+- The build list starts with the three things you build first: COTTAGE, CROP PLOT, BUDDY BARN.
+- Gate Lane is shorter: its east end ran into the pond.
+- The waystone at the gate is redrawn as a milestone with an arrow south. It looked like a gravestone.
+
+Checked: field lab; building a plot with 1 wood in hand through the menus.
+
+## v12.4: you choose who tends each crop plot
+- The crop plot's menu has a new row, TENDED BY. A steps through your home buddies (and back to nobody). One buddy, one plot.
+- A tended plot grows faster: +50% for each level of WATERING or PLANTING that buddy has, +25% for any other buddy. A plot with nobody grows at the plain rate.
+- This replaces v12.0's rule, where the single best waterer sped up every plot at once.
+- The plot's label says who: "BERRIES · 40% · DRIZZLET tends it", or "nobody tends it".
+- Field Lane is shorter at both ends: two of Sunkeep's trees stood in it.
+- Test scripts: the autopilot now goes home for the Buddy Barn (gathers stone and wood at Sunkeep, builds it) and knows the castle's three steps, so fresh-save runs can reach the first Guardian.
+
+Checked: field lab; assigning, swapping and clearing a tender on screen, and the growth difference between two plots over 5 seconds.
+
+## v12.3: things found by reading a fresh-save run
+- Text that hung on screen. Speech bubbles, messages and banners only counted down while the world was running, so a scene or a menu froze them in place. One run had a bubble up for 41 seconds and "CROP PLOT dug" for 30, still showing in the Meadow. Each now also expires by the clock, and a message is dropped when a scene starts. Same run after the fix: longest bubble 10 seconds, longest message 6.5.
+- A pile of wild buddies after the first catch. If a message was on screen when Erin began the battle lesson, the game added a new wild buddy every frame until the message cleared: dozens, stacked on one spot. (My bug, from v10.1.) Now exactly one.
+- Erin's "Sunkeep has a roof and a garden" is now "a roof and a crop growing".
+- The new opening-story page is shorter, so it no longer covers Will and Erin in the picture.
+- More "garden" wording changed to "the Lantern's soil".
+- Checked the Buddy Barn's price by the numbers: a rock takes 5 swings by hand and gives 3 stone, so 8 stone is 3 rocks; 6 wood is 2 trees. It is reachable without a mining buddy.
+
+Checked: field lab; the pile-up reproduced and fixed; a real-time fresh-save run to the crop plot with no errors.
+
+## v12.2: the walkthrough ends on the catch and the battle (Will, Nov 17)
+Will: the Bibi scene never came after the first SELECT battle, Erin's lines about it came far too late, some text stayed up too long, and the new Sunkeep items were in the wrong places.
+
+Erin's walk, new order
+1. Sprout kinds (pluck a PEB), the boulder wall, the bridge.
+2. Wood (send a buddy at a tree, sprouts carry the logs), then the ladybug.
+3. LAST: your first catch, then your first battle.
+- Right after that battle Erin says why the buddy is gone, King Bibi's beam plays, and Will says his lines. Then Erin sends you home for the cottage.
+- No wild buddies show in the Meadow until the catch lesson.
+- From a fresh save, real time: battle at 6:15, Erin's talk at 6:41, the beam at 6:59, "head home" at 7:21, home at 7:41.
+- If that first battle does not end with the buddy gone, the talk and the beam still come later, on their own, out in the field (the beam 15 seconds after the talk, not 60).
+
+Text
+- On-screen messages are shorter-lived: reading time is cut by about a quarter and nothing stays past 5.5 seconds.
+- "The garden" is "the Lantern's soil" in the opening lines and goals.
+
+Sunkeep items
+- Lamp posts stand in matched pairs at the three street corners, not staggered along the avenue.
+- The plaque sits on the plaza by the Lantern's steps. The founders' stone is by the fire and benches. The soil sign is at the stepping stones. The waystone is inside the south gate, to the west. Nothing stands in a street.
+
+Checked: field lab; a real-time fresh-save run through the whole new order to the crop plot, no errors; Sunkeep seen top to bottom.
+
+## v12.1: Guardians of the Light, and why they are at Sunkeep (Will, Nov 17)
+- Every "alpha" the player can read is now a GUARDIAN. In story terms they are the Guardians of the Light: every place has one, they went dim when the Lantern did, and a dim Guardian spells peril for the kingdom. (The code still calls them `alpha` inside.)
+- When you bring one the light, its Sigil stone goes home to the Lantern. The Sigil scene, the Elder, Marcus, the guide page and the opening story all say so.
+- The opening story has one new page: three people were called to Sunkeep and none of them knows why. Marcus left a Flow Pros job with Derek. Erin and Will left their wedding plans on the table. Erin: "You got here last, Will, so we will fill you in."
+- Two early lines at Sunkeep from Marcus and Erin about being called, and four new idle lines.
+- New file `alt/STORY-NOTES.md`: Will's story decisions in one place, with what is still open (why Sunkeep exists, who called them, the lamp's name).
+- Also in this build: a street-following fix. Workers walking to a building site restarted their route every frame and never arrived, so a cottage placed away from the avenue was never built. Found by the fresh-save run.
+
+Checked: field lab; the castle label and prompt on screen. The fresh-save run on this build is still going.
+
+## v12.0: Sunkeep, redesigned (Will, Nov 17)
+Will: cluttered, hard to build at, characters ignore the paths, weird plots; grow sprouts in one big bed like Sprouts, then placeable plots, buddies working them, level-gated recipes; keep the furniture; more lore; clean it up.
+
+Layout
+- One avenue from the Lantern to the south gate, and three streets off it: Lantern Row, Field Lane, Gate Lane. The old web of lanes is gone.
+- The land between the streets is open for building.
+
+Building
+- The build screen tints every free spot green, and the cursor starts on the nearest free spot to you.
+- Streets and furniture can't be built on.
+
+People
+- Erin, Marcus and the home workers walk along the avenue and the streets and step off only at the end. Measured: Erin was on a road in 36 of 38 samples while crossing the whole base.
+
+The Lantern's soil
+- One big bed with a stone edge and stepping stones where the avenue crosses it. Sprouts come up in it as before (6 spots, 8 with the cottage, 12 at Sunkeep Lv2). No stakes or little frames.
+- It grows sprouts only now. Old saves: any crop set on a soil plot is cleared.
+
+Crop plots
+- CROP PLOT is a new thing to build (2 wood, needs the cottage). You place it where you like. It starts with BERRIES; A on it changes the crop or harvests.
+- FIBER REEDS need Sunkeep Lv2.
+- 2 plots at Sunkeep Lv1, 4 at Lv2, 6 at Lv3.
+- The best home waterer or planter tends them, and the plot's label names who ("BERRIES · 40% · DRIZZLET tends it"). Picking a buddy per plot by hand is not built yet.
+- The tutorial step "grow berries on a garden plot" is now "build a CROP PLOT". Erin's garden talk and the hints say so.
+
+Recipes
+- Gated by Sunkeep's level: TONIC and ROPE at Lv1, SEED POUCH and LANTERN OIL at Lv2, LUCKY CHARM at Lv3. First guesses.
+
+Lore to read (A)
+- The Lantern plaque, the founders' stone, the sign at the soil, the waystone at the gate. Two lines each.
+
+Pacing (found by the v11 fresh-save run): Erin's "why" talk fired at home while the cottage was going up. It now only plays out in the field.
+
+Checked: field lab (plot checks rewritten for the new rules); real-time at 430x932: the whole base, placing a plot through the menus, growth, a buddy's harvest, the fiber gate, a plaque.
+
+## v11.0: Will's notes after playing to the Bibi scene (Nov 17)
+Pacing
+- Erin's "why" talk now waits until her tutorial is over. It used to land in the middle of it, right after the battle lesson.
+- The King Bibi beam waits for a quiet minute out in the field after that talk. It no longer fires at home, on top of "build the cottage".
+- The lamp scene with Marcus still waits for the cottage and its party.
+
+Kiss
+- He does not appear until the tutorial is done, and he has moved from the Meadow's north gate to the south road, by the way to the castle. His tip is now about LEAF sprouts and the thorn gate.
+
+Travel
+- Going from one area to another plays a short side-on scene (under 3 seconds, A skips): the place you are going, its name, and the keeper walking in with up to four of your sprouts. No buddies in it, on purpose.
+- Landmarks so far: the Lantern tree (Sunkeep), houses (Lantern Town), the castle (Squire's Woods), crooked trees (the Hollow), the pond and tall grass (the Meadow). Other areas get plain trees for now.
+
+Rooms
+- The three houses in Lantern Town open: the baker's, the gym goer's, the sprout lover's. Walk in, look at things with A, leave by the mat or B. They do nothing else yet. This replaces the "KNOCK" one-liners.
+
+Sunkeep
+- The well, notice board, benches, flower beds and pond are solid. You used to walk straight through all of them.
+- The road from the Lantern to the south gate is wider with a paved middle, lamp posts that light at dusk, and stone gate posts where it leaves for the Meadow.
+
+Checked: field lab; real-time at 430x932: five travel scenes, all three rooms, Kiss's new spot, Sunkeep top to bottom.
+Not checked yet: the new pacing from a fresh save (a run is going), and old saves.
+
+## v10.6: King Bibi beams it in (Will, Nov 17)
+The soul story is now two beats, spaced apart, so it no longer lands on top of "build the cottage".
+- Beat 1, right after your first kill and Erin's "why": a cut-in in the style of the HASBARA super in Knockout. Here it is KING BIBI at the desk inside the Iron Dome, and the target on his screen is the keeper. "The little keeper is asking why. Give him an answer. Make it feel like his own." A beam crosses the night into the keeper's head: AN IDEA! Then the keeper: "What if their light isn't lost? What if somebody could keep it?" Erin: "Where did that come from?" "My own head. Obviously." About 7 seconds; START skips it.
+- Beat 2, at home after the cottage is built and its party is over (plus a short quiet gap): the keeper finds the lamp while unpacking and tells Marcus the idea. "Bro. You're J-lighting again. Making up a story and calling it yours. You're way too beholden to King Bibi." "It is MY idea." Erin says keep it. You get the SOUL LAMP.
+- The keeper now speaks these lines under their own name (WILL by default).
+- The v10.5 version (one long scene on your first return home) is gone.
+
+Checked: field lab; both beats played in real time at 430x932, frames looked at.
+
+## v10.5: expeditions and the Soul Lamp (Will's ideas, Nov 17)
+Expeditions
+- New EXPEDITION tile in the pause menu (the grid is now five shorter rows). Open after the cottage.
+- Send a party of 3 sprouts of one kind. They are gone about 3 minutes of play and come home on their own with what their kind finds (PEB stone, LEAF wood, DEW berries, EMBER ore, ZIP fiber, LUCKY petals) and one gratitude heart for the light they carried.
+- One party at a time; a Buddy Barn lets you send two.
+- If you own more sprouts than your pouch holds, one of the party stays out there "to carry the light on". That is the gentle trim on a crowd.
+- All numbers are first guesses, not tuned.
+
+The Soul Lamp
+- After your first defeat and Erin's talk, the next time you are home a word drifts through the keeper's head ("Hasbara"), then an idea that feels like the keeper's own. The game does not say it is King Bibi.
+- The keeper finds a lamp holding the lights of the lost. Erin tells Marcus. Marcus: "Bro. You're J-lighting again. Making up a story and calling it yours. You're way too beholden to King Bibi."
+- From then on a defeat adds "Its light drifts into your SOUL LAMP", and the pause menu shows SOULS next to LIGHT.
+- "SOUL LAMP" is a placeholder name. What the lamp does later is Will's call; this only sets it up and keeps count.
+
+Also: Erin's "castle time" line tells you to build the Buddy Barn first if you have none.
+
+Checked: field lab; real-time at 430x932: the whole soul scene, the menu, sending a party, the second-party refusal, and the return with one sprout staying out.
+
+## v10.4: quieter screen, clearer battle menu
+- Battle menu: the left box now says what the highlighted choice does (FIGHT, SWARM, KEEPER, BUDDY, RUN), not "What will X do?".
+- A plain pickup like "+2 WOOD" is a small float over your head now, not a message box across the screen.
+- Louie barks "SNIFF! A BUDDY!" once per wild buddy, not every 22 seconds while one is near.
+
+Checked: field lab passes, no page errors; battle menu seen at 430x932.
+
+## v10.3: a freeze at the Meadow's Lantern post
+- Old bug, found by the fresh-save run: if any message was on screen when a trainer (Kiss) walked up to you, his dialogue never opened and he spotted you again, forever. Nothing near you worked, the Lantern post included. It hit hardest when your buddy was hurt, because the "rest at a Lantern post" hint is exactly such a message. The challenge now clears the message and always opens.
+
+Checked: reproduced the freeze on the old build, and the same steps pass on this one. Field lab not rerun for this one-line change.
+
+## v10.2: fixes from the first fresh-save run
+- Bug from v10.1: Erin's battle lesson only counted a battle you started with SELECT. A wild that broke free and attacked did not count, so she kept asking. Any wild battle counts now.
+- The Meadow's west lane (the "weird path on the left"): it was two tiles wide going down, one wide going east, and stopped one tile short of the main road. It is two wide all the way and joins the road.
+- Test scripts: the autopilot knows the battle lesson and walks home by the north road (it still used a pre-v9.8 route).
+
+Checked: field lab passes, no page errors. A real-time fresh-save autopilot run plays the whole of Erin's walk, the new battle step included.
+
+## v10.1: the slice refinements (Will's list, Nov 17)
+Tutorial
+- Erin's walk now has a real battle step. After your first catch she points at a second wild one and waits until you press SELECT on it. Before, she told you about SELECT and the game blocked it.
+- After your first defeat Erin explains it: a buddy you can't show the light stays dark, so a battle is sometimes the only way. No blame, no penalty.
+- Defeat wording changed to "The dark breaks. X is gone." (Will: a defeat kills the buddy.) The game quietly counts these for the soul story later.
+
+Castle
+- The castle is a three-step puzzle: sprouts build a bridge over a moat, LEAF clears the thorn gate, PEB cracks a boulder wall inside. A PEB grows in the courtyard so nobody is stuck.
+- Louie's castle reveal names the three steps. If you have no Buddy Barn, Marcus says his line there too.
+- **The Buddy Barn now costs 8 stone and 6 wood, not 2 ingots.** Ingots needed a kiln, ore and smelting time, which is too long a chain in front of the first alpha. Will: say if you want ingots back.
+
+Battles
+- The timed strike is easier to read: a white band shows the window, the closing ring turns green inside it, and a slide bar under it shows the same timing.
+- A miss now says TOO EARLY or TOO LATE, with a low sound.
+
+Field and base
+- Louie and your buddies no longer walk on water. Blocked by a pond, they hop to your side.
+- The bottom bar shows your buddies: face, health line, and a gold dot while one is off working.
+- Pop-ups are calmer: the same pickup merges into one count, they fade out, and at most four show at once.
+- At Sunkeep one line under the goal says what each worker is doing, one at a time.
+
+Buddies
+- Two grades on the Buddies screen: BATTLE (the level) and WORK (from jobs done), with what's left to the next of each.
+- You can release a boxed buddy: START, then START again. The word "release" is a placeholder until Will picks one.
+
+Checked: field lab passes with no page errors. Real-time at 430x932: tutorial fight step, castle puzzle start to end, battle ring, water, party and box screens, crew line.
+Not checked: a full fresh-save playthrough by hand; old-save test could not run (its old builds are not in this checkout).
+
+## v10.0: Buddy Barn before the first alpha
+- Pressing A on the castle alpha with no Buddy Barn and no sigil now stops the fight. Marcus says: "Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do." He then names the cost: 8 stone, 2 ingots, at Sunkeep.
+- The goal line says to build the Buddy Barn first until it's built. After that it's back to "Light the castle ALPHA".
+- Checked in the lab at 430x932: the gate stops the fight without a barn and the battle starts with one, with no page errors. Not yet played by hand from a fresh save.
+## Patch & Plate v0.7: played in real time, scenes spaced out (Nov 17 2026)
+
+Will: one more pass, then I'll try it. Cooking game only (`src/patchplate.js`, `tests/`).
+
+- **Played in real time from a new save** (`tests/pp_realtime.js`, new): the real game loop at real speed, a bot on the
+  buttons, every scene watched to the end, four days, about 7 minutes. No page errors. Seen firing by themselves in play:
+  the opening, taste scenes, sprout scenes, PERFECT DAY!, THE YEAR OF DARK, FIVE IN A ROW! (day 2), CUYAPUP MOVES IN!
+  (6 stars, after day 2), DEREK PULLS UP! (day 4), heart scenes for Marcus and Will, the nights. The bot went 3 stars with
+  no misses on all four days, so nothing about a bad day was seen.
+- **What that run showed, and the fixes:**
+  - PERFECT DAY! played on three of the four days. It now plays for the first perfect day ever, then only on days 7 and
+    later (once each).
+  - A day that already had a streak cut-in does not also get PERFECT DAY!.
+  - After a story chapter, a waiting heart scene keeps for the next day instead of playing straight after it.
+- **Tested:** `tests/pp_test.js` 119/119 on the final build. The real-time run was on the build just before the PERFECT
+  DAY! change; that change was checked by the stepped test only. Screenshots from the real-time run: `playtest/pp-v0.7/`.
+- **Not tested:** days 5 to 13 in real time; BOTTIE IS IN LINE!, EIGHT IN A ROW! and THE VALLEY IS FED! firing in real
+  play; a phone; a person's hands.
+
+## Patch & Plate v0.6: the story so far, a favourite each, heart scenes for everyone (Nov 17 2026)
+
+Will: only the cooking game from here; leave the other games alone. More lore, the characters, their personalities and
+stories. **Only `src/patchplate.js` and `tests/pp_test.js` changed this round** (no other game's file, not `console.js`).
+
+- **The story so far: six short chapters.** The first time a chapter's day is cleared, it plays on the way out of the
+  results screen, with a title card. Start skips it. Each plays once per file.
+  1. THE YEAR OF DARK (after day 1): why lettuce goes first
+  2. MARCUS WATERWORKS (day 4): Marcus's lazy river, Derek's van
+  3. THE ROBOT (day 7): Bottie offers one follow for the Great Lantern
+  4. THE KING'S ORDER (day 10): King Bibi wants a combo meal, to go
+  5. THE FIRST HARVEST (day 12): the Elder, Will, "same job, different apron"
+  6. ONE TABLE (day 13): sprouts, buddies and people eating together
+- **Heart scenes for everyone.** Scout, Ranger, the Elder, Pip, Derek and Bottie each get four (24 new scenes), so all
+  nine characters have a full set. Scout takes field notes; the Ranger still walks the shut roads; the Elder kept one
+  lamp lit through the dark; Pip wants a bug stand next door; Derek's truck needs a part that needs a truck.
+- **Bottie's arc.** His hearts are kept off the FRIENDS page. He admits it was "a very red button", then that nobody feeds
+  him up on the Peak. At four hearts he leaves his first tip, and tips from then on.
+- **A favourite each.** Will: big salad. Marcus: burger. Scout: salad. Ranger: combo. Elder: bread. Pip: smoothie. Derek
+  and Bottie: fries. Serve someone their favourite and they say so on the card, FAVORITE! pops up, and the friendship
+  grows faster (+2). Once found, the FRIENDS page shows "LOVES FRIES".
+- **The rarer faces grow hearts three times as fast** (Elder, Pip, Derek, Bottie), since they come by less often.
+- New save fields `story` and `fav`, with defaults.
+
+**Tested:** `tests/pp_test.js` 119/119, two runs in a row (12 new checks: every new line measured against its box, a text
+audit of all six chapters, a chapter plays once and only once, Derek's favourite, Bottie's tip at four hearts, the friends
+page). Screenshots looked at: `playtest/pp-v0.6/` (four).
+**Not tested:** other games' suites were not run this round (none of their files changed). The 24 new heart scenes were
+checked for fit, not each put on screen. Nothing played by a person in real time or on a phone.
+**All new, flag to Will:** every line and every favourite. King Bibi is mentioned by name once (chapter 4).
+
+## Patch & Plate v0.5: big moments, kitchen buddies, Bottie and Derek (Nov 17 2026)
+
+Will: make sure Will, Marcus, Bottie and Derek all make more appearances; if something really cool happens, trigger scenes
+like in Sproutwild and the fighter; as you level up, up to 3 buddies in your kitchen over time.
+
+- **Big moments.** A cut-in in the fighter's style (slanted band in the speaker's colour, speed lines, the face sliding in,
+  the words slammed on with a flash), then a line or two. A skips a line, Start skips it all. Each plays once per file:
+  - FIVE IN A ROW! (Marcus) and EIGHT IN A ROW! (Will), during the day, the first time you get that streak
+  - PERFECT DAY! (Will or Marcus), after a 3-star day with nobody missed, once per day number
+  - BOTTIE IS IN LINE! and DEREK PULLS UP!, the first time each walks up
+  - <BUDDY> MOVES IN!, when a kitchen buddy arrives
+  - THE VALLEY IS FED! (the Elder, Marcus), the first time LANTERN NIGHT is cleared
+  Scenes earned by a day play before the results screen, one after another.
+- **Kitchen buddies.** The stand's level is its total stars. CUYAPUP moves in at 6 stars (stoves 15% faster), BESSLING at
+  15 (crops grow 15% faster), GRASSKIN at 27 (customers wait 8 longer). Three at most. They are Sproutwild's three
+  starters, drawn with Sproutwild's art, sitting on the counters between the stoves. The stand hub says when the next
+  one comes ("KITCHEN BUDDY 2 OF 3: 15 STARS"). A file that already has the stars gets them after its next finished day.
+- **Bottie and Derek are customers.** DEREK (Flow Pros truck) from BURGER TIME on, BOTTIE from FRY DAY on. Bottie eats and
+  never tips. Derek is on the FRIENDS page. Derek's sprite is new (Marcus's build, Sproutwild's Derek colours).
+- **Will and Marcus come by most**: three in thirteen customers each on a late day (Scout and Ranger two each).
+  More of their lines in the quips, plus four new night scenes with Bottie, Derek, Marcus and Will.
+- New save fields `buds` and `big`, both with defaults; old saves load as before.
+
+**Files:** `src/patchplate.js`, `src/console.js` (Patch & Plate is also handed Sproutwild's buddy sprites, read-only),
+`tests/pp_test.js`.
+**Tested:** `tests/pp_test.js` 107/107 (14 new checks: who joins the line and when, buddy thresholds on a wiped file, a
+text audit of all eight big moments, three buddies in the kitchen with Bottie and Derek at the windows, Bottie's tip is 0,
+the friends page with Derek). Sproutwild lab 124/124. Screenshots looked at: `playtest/pp-v0.5/` (seven).
+**Not tested:** the big moments were put on screen by the test, and the bot's days ran through them, but nobody has watched
+one fire in real time from a real streak. Whether a scene in the middle of a rush feels good or gets in the way is for a
+person to say. Buddy numbers (6/15/27 stars, 15%, +8) are guesses. Not played on a phone.
+**All new, flag to Will:** every line, the buddy perks, and Bottie being allowed to queue for lunch.
+
+## Patch & Plate v0.4: the Sunkeep update (Nov 17 2026)
+
+Will: the cooking game needs an update and testing; bring in the lore from the newest Sproutwild so the games connect.
+Will, during the work: no save link between them. They are separate games in the same universe.
+
+**The canon this assumes (new, flag to Will):** Erin's stand is at Sunkeep, beside the Great Lantern, in Sproutwild's valley.
+Her garden is the "one good patch of soil left" that Sproutwild's opening mentions. The stand feeds the valley while the
+keeper is out bringing the light back ("a fed valley is a calm valley"). It is flavour in the lines only; there is still no
+story to remember, and **neither game reads or writes the other's save.**
+
+- **The Great Lantern is on screen.** On the title (with "AT SUNKEEP, UNDER THE GREAT LANTERN") and behind the stand in every
+  scene, drawn the way Sproutwild draws it.
+- **Two customers from Lantern Town.** The ELDER walks down from BREAD DAY on, PIP (the bug buyer) from BERRY GOOD on, about
+  one customer in ten each. They use their Sproutwild sprites, have their own hellos, thanks and hurry-ups, and sit on the
+  FRIENDS page.
+- **Day 13, LANTERN NIGHT.** A feast under the Lantern at dusk: every recipe, 11 customers, the Elder gives the briefing.
+  A save that had finished all 12 days finds day 13 open.
+- **Valley talk.** New lines in the hellos, thanks, quips and day cards about the Lantern, the Iron Dome, Bottie, the Sigils
+  and calm buddies. Eight new night scenes about the valley; about 4 nights in 10 play one instead of a star night.
+  The opening scene says where you are. MARKET DAY and HARVEST FEST name Lantern Town and "the first since the dark".
+- **A LANTERN awning** in the wardrobe (90 coins).
+- **Sproutwild's side** (`src/sproutwild/`): the Sunkeep notice board has a note for Erin's farm stand, and Erin, Marcus and
+  Will each have a new idle line about it. See v9.10 in `src/sproutwild/CHANGELOG.md`.
+
+**Fixed while testing (both were in v0.3 too):**
+- Long quips were squeezed narrow to fit one row ("I'VE GOT A GUY. THE GUY IS ME. THE GUY IS HUNGRY.", Louie's "wants"
+  lines). A long quip now takes a second row. This is what made the text audit fail at random in earlier runs.
+- Two thank-yous on the order card lost their last words ("TEN OUT OF TEN. LIKE ME." showed two of three rows; "FOR SCIENCE.
+  YUM." the same). Reworded to fit: "TEN OF TEN. LIKE ME.", "YUM. FOR SCIENCE."
+
+**Files:** `src/patchplate.js`; `src/console.js` (one word: Patch & Plate is handed Sproutwild's character sprites);
+`tests/pp_test.js` (17 new checks).
+
+**Tested:** `tests/pp_test.js` 93/93, two runs in a row, at 440x956 in headless Chromium. New checks: every hello, hurry,
+quip, order-card, scene and day-card line is measured against the box it is drawn in; the Elder and Pip only appear once
+their day is open; the bot plays day 13 to the results screen through the real controls; text audits on the day 13 card,
+day 13 with the Elder and Pip at the windows, all eight valley nights, the title, the friends page and a two-row quip.
+Sproutwild `tests/sproutwild/field-lab.js` 124/124, no page errors. Screenshots looked at: `playtest/pp-v0.4/` (six).
+**Not tested:** Knockout and Rootdeep suites were not re-run (their code is untouched). Not played on a phone. The days
+were played by the test bot with the clock stepped by hand, not by a person in real time.
+**Size:** 14.6 MB of the 16 MB limit.
 
 ## Cartridge 5: Sproutwild fused in (Nov 15 2026)
 

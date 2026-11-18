@@ -1,14 +1,14 @@
 /* ================================================================
-   THE FIRST ALPHA LIVES IN THE CASTLE (v9.5). Will: the flow to the
-   first alpha was bad; it should be in Squire's Woods, which should
+   THE FIRST GUARDIAN LIVES IN THE CASTLE (v9.5). Will: the flow to the
+   first guardian was bad; it should be in Squire's Woods, which should
    have a castle.
-   - The Meadow is the training ground: no alpha behind its boulder
+   - The Meadow is the training ground: no guardian behind its boulder
      wall any more (the wall, the ore and the buried PEB stay).
    - Squire's Woods opens once Sunkeep has its cottage and a crop.
      Its walls are drawn as a castle: grey brick, battlements, round
      corner towers with arrow slits, a gatehouse over the thorn gate,
      a flagstone courtyard. STONESQUIRE, the castle's own gatehouse
-     come alive, is the first alpha (Lv7) and gives the first Sigil.
+     come alive, is the first guardian (Lv7) and gives the first Sigil.
    - Crooked Hollow (Lv6 to 9) is the road after the first Sigil.
    - BLOOMBOAR moves to the Ember Wastes, guarding the glassware.
    ================================================================ */
@@ -23,14 +23,14 @@ FMAPS.SQUIRE.key.A.lv=7;
 WSECSUB.SQUIRE='The castle in the woods. Wilds Lv3 to 6.';
 /* which roads are shut, and what the sign says */
 function wBarred(to){return to==='SQUIRE'?SW.quest<5:to==='HOLLOW'?SW.badges.length<1:false}
-function wBarredSay(to){return to==='SQUIRE'?"RANGER'S BARRIER: Squire's Woods is wild. Build Sunkeep a cottage and grow a crop first.":"RANGER'S BARRIER: Crooked Hollow is darker still. Win a Sigil from the castle alpha in Squire's Woods first."}
+function wBarredSay(to){return to==='SQUIRE'?"RANGER'S BARRIER: Squire's Woods is wild. Build Sunkeep a cottage and grow a crop first.":"RANGER'S BARRIER: Crooked Hollow is darker still. Win a Sigil from the castle guardian in Squire's Woods first."}
 /* after the cottage and the first crop: the castle */
 function scGymCheck(){wStoryBeats();if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||!SW.lessons.scDab||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return;SW.lessons.scGym=1;
  const L=FMAPS.SQUIRE.key.A.lv;
- scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Now the real work: the dark out there.'},
-  {who:'MARCUS',txt:"Every place has an ALPHA, bro. Biggest, darkest buddy around. Ours moved into the old castle in Squire's Woods."},
-  {who:'ERIN',txt:"South through the Meadow. Bring the alpha the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome."},
-  {who:'MARCUS',txt:'Castle alpha is Lv'+L+'. Battle wilds with SELECT on the way till your lead is Lv'+(L-1)+'. See one, light one.'},
+ scStart([{who:'ERIN',txt:'Sunkeep has a roof and a crop growing. Now the real work: the dark out there.'},
+  {who:'MARCUS',txt:"Every place has a GUARDIAN OF THE LIGHT, bro. They went dim when the Lantern did. Ours moved into the old castle in Squire's Woods."},
+  {who:'ERIN',txt:"South through the Meadow. Bring the guardian the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome."},
+  {who:'MARCUS',txt:'Castle guardian is Lv'+L+'. Battle wilds with SELECT on the way till your lead is Lv'+(L-1)+'. See one, light one.'},
   {who:'ERIN',txt:'And it is made of stone. Water and leaves wear stone down. A DEW or LEAF buddy from the woods will help.'}],()=>swSave())}
 WSIGOPEN[1]={a:'ROADS',b:'OPEN',sub:'',end:'One Sigil. Crooked Hollow is open, east of the Meadow, and so is the road past Lantern Town.'};
 /* ---- the castle, drawn over the ruin's walls ---- */
@@ -61,8 +61,8 @@ function sqArrive(F){if(!F||F.id!=='SQUIRE'||SW.lessons.squire)return;if((W4.ban
  const gx=23*FT+8,gy=8*FT+6,al=(F.alphas||[])[0],ax=al?al.x:21*FT+8,ay=al?al.y+10:44;
  scStart([{hold:.4},{x:gx,y:gy-20,hold:1.4},
   {x:gx,y:gy-20,who:'',txt:"Squire's castle. Somebody started building it long ago and never finished. The dark moved in instead."},
-  {x:ax,y:ay,hold:1.0},{x:ax,y:ay,who:'LOUIE',txt:'Grrr... the ALPHA. Stone all the way through. Water and leaves wear it down. Woof.'},
-  {x:gx,y:gy,who:'LOUIE',txt:'THORN VINES on the gate. LEAF sprouts clear them: face the gate and press A.'},{hold:.3}],()=>swSave())}
+  {x:ax,y:ay,hold:1.0},{x:ax,y:ay,who:'LOUIE',txt:'Grrr... the GUARDIAN. Stone all the way through. Water and leaves wear it down. Woof.'},
+  {x:gx,y:gy+16,who:'LOUIE',txt:'A MOAT, then THORN VINES, then a BOULDER inside. Sprouts build the bridge. LEAF clears thorns. PEB cracks rock. Woof.'},{hold:.3}].concat(wHasDC()?[]:[{x:gx,y:gy+16,who:'MARCUS',txt:"Bro, are you kidding? We need to go see one, send one, and get you a box made. Because we have lots of purifying to do."},{x:gx,y:gy+16,who:'MARCUS',txt:'A BUDDY BARN, bro. 8 stone, 6 wood, back at Sunkeep. The guardian can wait for that.'}]),()=>{if(!wHasDC())SW.lessons.barnTold=1;swSave()})}
 /* in any wild area: Louie sniffs out the castle road, and points you at the Lantern post the first time you are hurt */
 function sqHint(F){if(!F||W4.scene||state!=='g4world'||(W4.banner&&W4.banner.t>0))return;
  if(F.id==='MEADOW'&&SW.quest>=5&&SW.badges.length<1&&!(SW.visited&&SW.visited.SQUIRE)&&!SW.lessons.sqHint&&P3.y>17*16&&Math.abs(P3.x-(17*16+16))<70){SW.lessons.sqHint=1;louSay('SNIFF! A CASTLE, SOUTH!',2.8);swSnd(600,.05,420)}
@@ -71,7 +71,7 @@ function sqHint(F){if(!F||W4.scene||state!=='g4world'||(W4.banner&&W4.banner.t>0
    {x:F.start.x,y:F.start.y,who:'LOUIE',txt:'Press A there again and it sends you home, or to any post you have lit. Woof.'},{hold:.3}],()=>swSave())}}
 /* road signs in the Meadow, so you always know which way is which: [tile x, tile y, what it says] */
 const FSIGNS={MEADOW:[[4,6,'HOME: SUNKEEP. The garden, the cottage, the Great Lantern.'],[19,2,"NORTH: LANTERN TOWN. The Elder, the Ranger's lodge, the road beyond."],
- [33,11,'EAST: CROOKED HOLLOW. Darker woods. The Ranger lets you in once you hold a Sigil.'],[16,35,"SOUTH: SQUIRE'S WOODS. An old castle, and an alpha awake inside it."]]};
+ [33,11,'EAST: CROOKED HOLLOW. Darker woods. The Ranger lets you in once you hold a Sigil.'],[16,35,"SOUTH: SQUIRE'S WOODS. An old castle, and a guardian awake inside it."]]};
 function fSignsDraw(F){for(const [tx,ty] of FSIGNS[F.id]||[]){const x=tx*FT+8,y=ty*FT+12,K='#14101e';
  r('rgba(0,0,0,.22)',x-5,y+1,10,3);r(K,x-1,y-12,3,13);r('#8a6a48',x,y-11,1,12);
  r(K,x-8,y-17,17,8);r('#c49a62',x-7,y-16,15,6);r('#a87948',x-7,y-12,15,2);r('#5a3d22',x-5,y-14,11,1)}}
@@ -80,5 +80,5 @@ function fSignsDraw(F){for(const [tx,ty] of FSIGNS[F.id]||[]){const x=tx*FT+8,y=
 {const M=FMAPS.MEADOW.rows,set=(x,y,c)=>{M[y]=M[y].slice(0,x)+c+M[y].slice(x+1)};
  set(2,0,'e');set(3,0,'e');set(17,0,'h');set(18,0,'h');set(4,1,'.');set(20,1,'S')}
 FSIGNS.MEADOW=[[19,3,'HOME: SUNKEEP, straight up the road. The garden, the cottage, the Great Lantern.'],[4,6,"LANTERN TOWN: up the west lane. The Elder, the Ranger's lodge, the road beyond."],
- [33,11,'EAST: CROOKED HOLLOW. Darker woods. The Ranger lets you in once you hold a Sigil.'],[16,35,"SOUTH: SQUIRE'S WOODS. An old castle, and an alpha awake inside it."]];
+ [33,11,'EAST: CROOKED HOLLOW. Darker woods. The Ranger lets you in once you hold a Sigil.'],[16,35,"SOUTH: SQUIRE'S WOODS. An old castle, and a guardian awake inside it."]];
 WSECSUB.MEADOW='Wild buddies live in the tall grass.'; /* v9.8: not "wildsprouts" */

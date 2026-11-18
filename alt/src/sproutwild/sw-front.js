@@ -49,6 +49,10 @@ function wHud(){if(W4.scene){scDraw();return}if(W4.sleepFx>0){W4.sleepFx-=1/60;g
    g.save();g.beginPath();g.rect(4,18,W-6,11);g.clip();text(q,x0,20,1,'#ffe8b0',null);text(q,x0+per,20,1,'#ffe8b0',null);g.restore()}}}
  if(ban){const sl=swWrap(W4.banner.sub||'',212).slice(0,3),bh2=24+sl.length*11;g.globalAlpha=Math.min(1,W4.banner.t);r('#0e1a0a',8,30,224,bh2);r(UI.gold,8,30,224,2);r(UI.gold,8,30+bh2-2,224,1);
   {const bt=W4.banner.txt,big=tw(bt,2)<=216;text(big?bt:wFit(bt,216),Math.round(W/2-tw(big?bt:wFit(bt,216),big?2:1)/2),35,big?2:1,'#ffffff',null)}sl.forEach((l,j)=>text(l,Math.round(W/2-tw(l,1)/2),53+j*11,1,'#cfe0b8',null));g.globalAlpha=1}
+ /* v10.1: at home, one calm line says what each worker is doing, one worker at a time */
+ if(atBase&&!ban&&state==='g4world'&&W4.wk&&W4.wk.length&&!(F&&F.dlg)){const n=W4.wk.length,i=((time/2.6)|0)%n,w=W4.wk[i],tk=w.task,bn=tk&&tk.b?((WBUILD.find(d=>d.k===tk.b.k)||{}).n||tk.b.k.toUpperCase()):'',
+   what=!tk?'looks for work':tk.k==='idle'?'takes a break':tk.k==='sleep'?'sleeps':tk.k==='haul'?'carries a load home':tk.k==='chop'?'chops a tree':tk.k==='crop'?'harvests a plot':tk.k==='tend'?'tends the garden':tk.k==='craft'?'crafts at the BENCH':tk.k==='bld'?(tk.b&&tk.b.con?'builds the '+bn:'works the '+bn):'works',
+   ln=wFit('CREW '+(i+1)+'/'+n+' · '+wkName(w)+' '+what,W-12);r('rgba(10,14,8,.55)',0,30,W,10);text(ln,6,31,1,'#b8d0a0',null)}
  /* bottom row: squad on the field, crew and sigils at home */
  r('rgba(10,14,8,.8)',0,H-16,W,16);let x=4;const y=H-13;
  if(F){for(let ty=0;ty<TYPES.length;ty++){const all=F.sq.filter(s=>s.type===ty);if(!all.length)continue;const fl=all.filter(s=>s.st==='follow').length,T=TYPES[ty],on=ty===SW.selType;
@@ -59,7 +63,13 @@ function wHud(){if(W4.scene){scDraw();return}if(W4.sleepFx>0){W4.sleepFx-=1/60;g
  else{for(let ty=0;ty<TYPES.length;ty++){const n=SW.buds[TYPES[ty].n]||0;if(!n)continue;const T=TYPES[ty],lab=''+n;
    r(T.d,x,y+1,7,7);r(T.c,x+1,y+2,5,5);r(T.l,x+1,y+2,2,1);r('#2c6030',x+3,y-1,1,2);text(lab,x+10,y+1,1,'#ffffff',null);x+=19+tw(lab,1)}
   if(x===4&&SW.badges.length)text('SIGILS '+SW.badges.length+'/4',4,H-12,1,SW.badges.length>=4?'#ffd94d':UI.dim,null)}
- {const dph=wDark()<=0?'DAY':wDark()<.6?'DUSK':'NIGHT',dl=dph+' '+(SW.day||1);text(dl,W-5-tw(dl,1),H-12,1,UI.dim,null)}
+ {const dph=wDark()<=0?'DAY':wDark()<.6?'DUSK':'NIGHT',dl=dph+' '+(SW.day||1);text(dl,W-5-tw(dl,1),H-12,1,UI.dim,null);
+  /* v10.1: your buddies sit in the bar too, right of the sprouts: a face, a health line, a dot while one is off working */
+  let bx=W-9-tw(dl,1);const pm=SW.party.slice(0,4);for(let i=pm.length-1;i>=0;i--){const m=pm[i],spr=wSp(m.sp)._spr;if(!spr||!spr.ol)continue;const bw=13;bx-=bw+2;if(bx<x+2)break;
+   const sc=Math.min(11/spr.oh,11/spr.ow),iw=Math.max(1,Math.round(spr.ow*sc)),ih=Math.max(1,Math.round(spr.oh*sc)),pb=F&&F.pf&&F.pf.find(b=>b.m===m),away=pb&&pb.st!=='follow'&&pb.st!=='ret',mx=wStats(m).max;
+   if(m.hp<=0)g.globalAlpha=.35;g.drawImage(spr.ol,bx+Math.round((bw-iw)/2),H-15+Math.round((11-ih)/2),iw,ih);g.globalAlpha=1;
+   r('#14101e',bx+1,H-3,bw-2,2);if(m.hp>0)r(m.hp/mx>.5?UI.leaf:m.hp/mx>.2?'#ffd94d':'#e04838',bx+1,H-3,Math.max(1,Math.round((bw-2)*m.hp/mx)),2);
+   if(away){r('#14101e',bx+bw-4,H-16,5,5);r('#ffd94d',bx+bw-3,H-15,3,3)}}}
  const busy=(F&&F.dlg)||W4.talk||state==='g4place';
  if(W4.near&&!busy)uiPill(W4.near.txt,H-30,'A');else if(F&&F.aimLab&&!busy)uiPill(F.aimLab,H-30,F.aimNeed?null:'A');
  if(W4.msgT>0&&W4.msg&&!busy){const ml=swWrap(W4.msg,W-30).slice(0,5),ex=(ml.length-1)*10,by=H-46-ex-(W4.near?0:0);
@@ -238,9 +248,9 @@ function wBakeGround(){const sec=wSector(W4.sector),wh=W4.wh||360,B=FBIO.MEADOW;
   for(let i=0;i<w;i+=2){R(B.g2,x+i,y-1,2,1+((rnd()*2)|0));R(B.g2,x+i,y+h-((rnd()*2)|0),2,2)}
   for(let i=0;i<h;i+=2){R(B.g2,x-1,y+i,1+((rnd()*2)|0),2);R(B.g2,x+w-((rnd()*2)|0),y+i,2,2)}};
  if(sec.id==='BASE'){
-  path(WW/2-9,88,18,236);path(WW/2-9,392,18,wh-392);     /* lantern to garden, garden to gate */
-  path(84,120,312,14);path(84,134,14,292);path(98,412,134,14); /* the keepers' lanes */
-  path(322,198,14,214);path(248,412,88,14);
+  path(WW/2-13,88,26,236);path(WW/2-13,392,26,wh-392);     /* lantern to garden, garden to gate (v11: wider) */
+  for(let py=118;py<wh-10;py+=9){if(py>322&&py<408)continue;R('#b8a880',WW/2-5+((py/9|0)%2)*2,py,8,6);R('#c8b890',WW/2-5+((py/9|0)%2)*2,py,8,1)} /* a paved middle */
+  for(const S of WSTREETS)path(S.x0,S.y-7,S.x1-S.x0,14); /* v12: three streets off the avenue; the old web of lanes is gone */
   /* plaza */
   for(let px=196;px<284;px+=11)for(let py=92;py<116;py+=8){R('#6e6350',px+((py/8|0)%2)*5,py,11,8);R(((px+py)/4|0)%2?'#a39a86':'#948a76',px+((py/8|0)%2)*5,py,10,7);R('#b8b09c',px+((py/8|0)%2)*5,py,10,1)}
   /* the garden: fenced, tilled, with room to grow (v9.7) */

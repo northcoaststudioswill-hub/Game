@@ -47,13 +47,13 @@ function ewGo(F,E,tx,ty,v,go){const key=Math.round(tx/8)+','+Math.round(ty/8);
 /* ---- after the tour, three things you do yourself (v8.6): chop, carry, catch a bug ---- */
 function ew3Tick(F,dt,E,dp,go){const w3=SW.walk3;E.t=(E.t||0)+dt;
  if(E.rest>0){E.rest-=dt;E.mv=false;E.dir=[P3.x>E.x?1:-1,0];return}
- const talk=(lines,next,rest)=>{E.t=0;fTalk(F,'ERIN',lines,()=>{SW.walk3=next;if(rest)E.rest=rest;if(next>=7)E.leave=1;swSave()})};
+ const talk=(lines,next,rest)=>{E.t=0;fTalk(F,'ERIN',lines,()=>{SW.walk3=next;if(rest)E.rest=rest;if(next>=7){SW.walk2=(SW.quest>=3&&SW.lessons.tutFight)?9:1;E.rest=1}swSave()})};
  const lead=(x,y,lines,next)=>{if(dp>80&&Math.hypot(P3.x-x,P3.y-y)>Math.hypot(E.x-x,E.y-y)+20){E.mv=false;E.wait=1;E.dir=[P3.x>E.x?1:-1,0];return}E.wait=0;
   if(ewGo(F,E,x,y,62,go)<4){E.mv=false;E.dir=[P3.x>E.x?1:-1,0];if(dp<70)talk(lines,next)}};
  const nm=(SW.party[0]&&SW.party[0].sp)||'Your buddy';
  if(w3===1){if(!E.tree||E.tree.got){E.tree=W4.nodes.filter(n=>n.k==='tree'&&!n.got).sort((a,b)=>Math.hypot(a.x-P3.x,a.y-P3.y)-Math.hypot(b.x-P3.x,b.y-P3.y))[0]||null}
   if(!E.tree){SW.walk3=4;return}const p=ewNear(F,E.tree.x+22,E.tree.y+10);
-  lead(p.x,p.y,["ERIN: One more thing before you build a home. Homes need wood, and buddies get it.","ERIN: Face this tree and press A. "+nm+" goes and chops it."],2);return}
+  lead(p.x,p.y,["ERIN: Now, wood. Homes need it, and buddies get it.","ERIN: Face this tree and press A. "+nm+" goes and chops it."],2);return}
  E.mv=false;E.dir=[P3.x>E.x?1:-1,0];
  if(w3===2){if(!E.tree||E.tree.got){talk(["ERIN: Timber! See the logs? Throw sprouts at them. They carry them home to Sunkeep."],3);return}
   if(E.t>45)talk(["ERIN: Stand facing the tree and press A. The ring shows SEND "+nm+"."],2);return}
@@ -67,4 +67,4 @@ function ew3Tick(F,dt,E,dp,go){const w3=SW.walk3;E.t=(E.t||0)+dt;
  if(w3===5){const n=Object.values(SW.bugs||{}).reduce((a,v)=>a+v,0);
   if(n>(E.bugs0||0)){talk(["ERIN: Into your jar! Bugs turn into berries, fiber, even light for the Lantern.","ERIN: The jar is in the START menu, under BUG JAR."],6,2);return}
   if(!E.bug||!(W4.bugs||[]).includes(E.bug)){SW.walk3=4;return}if(E.t>50)talk(["ERIN: Face the ladybug and press A. Quick, before it flies!"],5);return}
- if(w3===6){talk(["ERIN: You're getting the hang of this. Head home when you're ready.","ERIN: Marcus wants to build you a cottage. Don't let him pick the paint."],7);return}}
+ if(w3===6){talk(["ERIN: One last thing, and it's the big one.","ERIN: "+nm+" could use a friend. There is a wild buddy in the grass, just over here. Follow me."],7);return}}

@@ -1,13 +1,35 @@
 # Known issues and what is not done yet
 
-Updated Nov 16 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
+Updated Nov 17 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Sproutwild (cartridge 5, v9.9)
+## Sproutwild (cartridge 5, v12.10)
 
-### Known bugs
-- "BERRIES planted" stayed up 16 s in one run (too long, not too short). Not looked into yet.
-- One real-time bug catch missed during testing in v7.9 (a step-by-step run caught 4 of 4). Not seen since; a wild
-  buddy next to a bug takes the aim, which may be what happened.
+### Not confirmed
+- Nobody has played v10 to v12 by hand on a phone yet. Everything was checked by scripts on a 430 x 932 screen.
+- The first Guardian fight was tested with real turns for three starter teams, but only once each.
+- Sigils 2 to 4, Bottie's tower and the post-game are untouched by this work and still unplayed.
+
+### Waiting on Will
+- The fire starter (CUYAPUP) loses to the stone Guardian at the level the game asks for. The game now warns the player. Should the numbers change too?
+- "SOUL LAMP" and "release" are placeholder words.
+- Is the keeper locked to Will? The menu still lets a player pick Erin or Marcus.
+- Why Sunkeep exists and who called the three of them there (see `alt/STORY-NOTES.md`).
+- Expedition numbers, recipe levels and the Buddy Barn's price (8 stone, 6 wood) are first guesses.
+
+### Known gaps
+- The buddy you set to tend a plot does not walk over and stand at it; the bonus applies wherever it is.
+- A crop plot can't be removed or moved once placed.
+- Old saves lose any crop that was set on a soil plot (crops live on built crop plots now). A building an old save put where a street now runs stays there.
+- The three town houses are rooms to look at only.
+- A buddy sent to a job past a pond or a wall hops straight to it (no walk-around path).
+- The travel scene has its own landmark for five areas; the rest show plain trees.
+- One real-time bug catch missed during testing in v7.9 (a step-by-step run caught 4 of 4). Not seen since.
+
+### Fixed in v10 to v12 (the big ones)
+- v12.10: reopening the game with a file-1 save that held a Buddy Barn or a crop plot crashed before the title.
+- v12.3: text hung on screen for up to 41 seconds through scenes and menus; dozens of wild buddies could pile up after the first catch.
+- v12.1: home workers never reached a building site away from the avenue, so the cottage was never built.
+- v10.3: a trainer walking up while a message showed froze everything near you, the Lantern post included.
 
 ### Fixed in v9.7
 - Garden plots 7 and 8 never worked (plots were only made once; the ground drew 6). The garden now grows to 12, and opens plots as it goes.
@@ -125,6 +147,18 @@ From [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), still open:
   garden; past that it is the bot that stalls (it cannot use the house desk). The mid-game is covered by its chaos runs.
 - All 13 sprouts thrown into the garden become gardeners and stay there. That is how the garden has always worked, but
   it empties the crew quickly; worth a look on the phone.
+## Patch & Plate (cartridge 4, v0.7)
+
+- v0.7 real-time run: days 1 to 4 only, by a bot that never missed. Days 5 to 13, Bottie's first visit and a bad day have not been seen in real time.
+- Since v0.6: the 24 new heart scenes were measured for fit but not each watched; how fast hearts grow for the rarer customers (three times the usual) is a guess.
+- After a first clear you can still get a cut-in before the results and a story chapter plus the night after them (fixed in v0.7: no heart scene on top, and PERFECT DAY! is rarer).
+- Since v0.5: no big-moment scene has been watched firing in real time from real play; the streak scenes pause the day, which may or may not feel right in a rush.
+- Since v0.5: kitchen buddy numbers (6, 15, 27 stars; 15% faster; +8 patience) are untuned.
+- Bottie is not on the FRIENDS page (on purpose; his hearts are hidden).
+- Not played on a phone or by a person in real time since v0.4; the test bot played every day, day 13 included.
+- The lore placement is new (the stand is at Sunkeep, during Sproutwild's story). Will has not confirmed it as canon.
+- LANTERN NIGHT's difficulty (11 customers, every recipe) is a guess; the bot's result is in the test output.
+- The Elder and Pip have hearts on the FRIENDS page but no heart scenes yet.
 
 ## Sprouts and Patch & Plate (cartridges 1 and 4)
 

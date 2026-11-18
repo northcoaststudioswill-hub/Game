@@ -35,7 +35,7 @@ function scIntro(){W4.louBerry={x:316,y:214,held:0};W4.louFetch=0;
   {x:240,y:96,who:'ERIN',txt:'It flickered! Look, it is letting go of something.'},
   {x:240,y:300,hold:1.8,fn:plantFirst},
   {x:240,y:352,hold:2.4},
-  {x:240,y:352,who:'ERIN',txt:'Seeds. They fell in the garden. This is where sprouts grow.'},
+  {x:240,y:352,who:'ERIN',txt:"Seeds. They fell in the Lantern's soil. This is where sprouts grow."},
   {x:240,y:352,who:'MARCUS',txt:'Give them a sec. When one is grown, walk up and press A to pluck it.'},
   {hold:.4}])}
 /* seeds draw as they grow: seed, shoot, sprout */
@@ -53,7 +53,7 @@ function fBudDraw0(o){const x=Math.round(o.x),y=Math.round(o.y),T=TYPES[o.type],
  if(((time*2+o.x)|0)%2)r('#fff3b0',x+5,y-12,1,1)}
 function wNearExtra(px,py){const F=W4.bf;if(!F)return null;for(const b of F.buds)if(Math.hypot(px-b.x,py-b.y)<18)
   return b.g==null||b.g>=1?{k:'fbud',b,txt:'PLUCK'}:{k:'sproutinfo',txt:'GROWING',x:b.x,y:b.y,msg:'Still growing. Give it a moment.'};return null}
-function opGoal0(){const F=W4.bf;if(!SW.louFed)return'Watch Louie';if(F&&F.buds.length&&F.buds.every(b=>b.g!=null&&b.g<1))return'The sprouts are growing in the garden';return'Pluck the sprouts in the garden'}
+function opGoal0(){const F=W4.bf;if(!SW.louFed)return'Watch Louie';if(F&&F.buds.length&&F.buds.every(b=>b.g!=null&&b.g<1))return'The sprouts are growing in the soil';return"Pluck the sprouts in the Lantern's soil"}
 function wBaseArrive(from){const F=W4.bf;P3.x=240;P3.ax=0;P3.ay=-1;P3.y=from==='MEADOW'?(W4.wh||520)-38:SW.lit?152:170;
  lou.x=P3.x-24;lou.y=P3.y+8;W4.part={x:P3.x+16,y:P3.y+6};for(const s of F.sq){s.x=P3.x+(Math.random()*24-12);s.y=P3.y+10+Math.random()*10}
  if(SW.quest<2&&!SW.lit){if(!SW.seeds)SW.seeds=[0,2,4];
@@ -74,7 +74,7 @@ function scWake(){SW.beats=SW.beats||{};SW.beats.lit=1;const pop=()=>{wInitPatch
   {x:240,y:70,who:'MARCUS',txt:'Bet King Bibi saw that from inside his dome. Peek out, your majesty. It is safe-ish.'},
   {x:240,y:352,hold:1.5},
   {x:240,y:352,hold:1.1,fn:pop},
-  {x:240,y:352,who:'ERIN',txt:'Now it is lit, the garden grows sprouts on its own. Pluck them when they are grown.'},
+  {x:240,y:352,who:'ERIN',txt:'Now it is lit, the soil grows sprouts on its own. Pluck them when they are grown.'},
   {who:'MARCUS',txt:'The light reached the wilds too. Three buddies are on their way. Pick one.'}
  ],()=>{W4.choiceT=0;W4.banner={txt:'THE LANTERN STIRS',sub:'Three dim buddies are coming',t:3.5}})}
 /* ---- 4a. Erin walks you to the south road ---- */
@@ -99,25 +99,41 @@ const EW2={
  3:["ERIN: Now, sprouts. They are not all the same. See that one poking out? That's a PEB.","ERIN: Walk up to it and press A to pluck it."],
  5:["ERIN: A boulder wall. Only PEB sprouts can crack rock.","ERIN: Face it and press A. Throw a few if it's tough."],
  7:["ERIN: Sprouts build, too. See the planks out in the water?","ERIN: Face them and press A. A few sprouts make a bridge."],
- 9:["ERIN: That's the Meadow. Every kind of sprout has its own job."]};
-const EWDONE={2:["ERIN: Your first catch! See how the dark broke right off it? That is the whole job, keeper.","ERIN: Buddies can fight, too. Stand next to a wild one and press SELECT to battle it. Battles make them stronger.","ERIN: Not now, though. Come on, there's more to see."],
+ 9:["ERIN: That's the Meadow, keeper. You're getting the hang of this.","ERIN: Head home when you're ready. Marcus wants to build you a cottage. Don't let him pick the paint."]};
+const EWDONE={2:["ERIN: That's a battle. Tap right as the ring closes and the hit lands harder.","ERIN: Battles make your buddies stronger. That is the last of the lessons."],
  4:["ERIN: There. A PEB walks with you now. Over this way!"],6:["ERIN: Ha! The rock never stood a chance. One more thing."],8:["ERIN: A bridge! Whatever's on that island is yours."]};
 function ewTick(F,dt){if(SCOFF||F.id!=='MEADOW'||wOp()<3||W4.scene||F.dlg||F.spot)return;SW.lessons.scMeadow=1;const st=SW.walk2||0;
- if(SW.quest<3&&st<1)W4.wilds=W4.wilds.filter(w=>w.lat&&w.lat.length); /* v9.8: no wild buddies before Erin starts */
- if(SW.quest<3&&st>=1){const tm=W4.wilds.find(w=>w.tame);if(tm)for(const w of W4.wilds)if(w!==tm&&!(w.lat&&w.lat.length)&&Math.hypot(w.x-tm.x,w.y-tm.y)<110)w.gone=1;W4.wilds=W4.wilds.filter(w=>!w.gone)} /* the lesson buddy has the grass to itself */if(st>=10&&!(W4.ew&&W4.ew.leave)&&!(SW.walk3>0&&SW.walk3<7))return;
+ if(SW.quest<3&&st!==1&&st!==2)W4.wilds=W4.wilds.filter(w=>w.lat&&w.lat.length); /* v12.2: no wild buddies until the catch lesson, which is the last one */
+ if(SW.quest<3&&(st===1||st===2)){const tm=W4.wilds.find(w=>w.tame);if(tm)for(const w of W4.wilds)if(w!==tm&&!(w.lat&&w.lat.length))w.gone=1; /* v12.10: only the lesson buddy is out, anywhere in the Meadow */W4.wilds=W4.wilds.filter(w=>!w.gone)} /* the lesson buddy has the grass to itself */if(st>=10&&!(W4.ew&&W4.ew.leave)&&!(SW.walk3>0&&SW.walk3<7))return;
  if(!W4.ew||W4.ewFor!==F){W4.ewFor=F;const p=st===0?{x:19*FT+8,y:21*FT+10}:ewNear(F,P3.x-24,P3.y+10);W4.ew={x:p.x,y:p.y,dir:[-1,0],mv:false,t:0}} /* v9.8: on your first visit she waits at the crossroads */
  const E=W4.ew,go=(x,y,v)=>{const dx=x-E.x,dy=y-E.y,d=Math.hypot(dx,dy);E.mv=d>2;if(d>2){const s=Math.min(d*5,v);E.x+=dx/d*s*dt;E.y+=dy/d*s*dt;E.dir=Math.abs(dx)>Math.abs(dy)?[dx>0?1:-1,0]:[0,dy>0?1:-1]}return d};
  if(E.leave){if(E.fade!=null){E.fade-=dt*1.6;E.mv=false;if(E.fade<=0)W4.ew=null;return}if(ewGo(F,E,F.start.x,F.start.y-14,70,go)<4)E.fade=1;return} /* v9.2: she walks up the road and fades out at the gate, not pops */
  const dp=Math.hypot(P3.x-E.x,P3.y-E.y);if(dp>230&&st>0){const p=ewNear(F,P3.x-30,P3.y);E.x=p.x;E.y=p.y}
  if(st>=10){ew3Tick(F,dt,E,dp,go);return}
- if(st===0){if(SW.quest>=3){SW.walk2=3;return}E.dir=[P3.x>E.x?1:-1,0];if(dp>44)return; /* she waits; you walk to her */fTalk(F,'ERIN',["ERIN: You made it! Welcome to the Meadow.","ERIN: "+((SW.party[0]&&SW.party[0].sp)||"Your buddy")+" could use a friend. There is a wild one in the grass, just over here. Follow me."],()=>{SW.walk2=1;swSave()});return}
+ if(st===0){if(SW.quest>=3){SW.walk2=3;return}E.dir=[P3.x>E.x?1:-1,0];if(dp>44)return; /* she waits; you walk to her */fTalk(F,'ERIN',["ERIN: You made it! Welcome to the Meadow.","ERIN: Walk with me. I'll show you how things work out here. We'll find "+((SW.party[0]&&SW.party[0].sp)||"your buddy")+" a friend at the end."],()=>{SW.walk2=3;swSave()});return}
  if(st%2===1&&E.rest>0){E.rest-=dt;E.mv=false;E.dir=[P3.x>E.x?1:-1,0];return} /* a breath between lessons (v8.5) */
- if(st%2===1){const tg=ewTarget(F,st);if(!tg){SW.walk2=st===9?10:st+2;return}
+ if(st%2===1){const tg=ewTarget(F,st);if(!tg){ewAfter(st===9?9:st+1,E,1);return}
   if(dp>80&&Math.hypot(P3.x-tg.x,P3.y-tg.y)>Math.hypot(E.x-tg.x,E.y-tg.y)+20){E.mv=false;E.wait=1;E.dir=[P3.x>E.x?1:-1,0];return}E.wait=0;
-  if(ewGo(F,E,tg.x,tg.y,62,go)<4){E.mv=false;E.dir=[P3.x>E.x?1:-1,0];if(dp<70)fTalk(F,'ERIN',EW2[st],()=>{SW.walk2=st+1;if(st===9){SW.walk2=10;if(SW.walk3)E.leave=1;else{SW.walk3=1;E.rest=2}}swSave()})}return}
+  if(ewGo(F,E,tg.x,tg.y,62,go)<4){E.mv=false;E.dir=[P3.x>E.x?1:-1,0];if(dp<70)fTalk(F,'ERIN',EW2[st],()=>{SW.walk2=st+1;if(st===9){SW.walk2=10;SW.walk3=7;E.leave=1}swSave()})}return}
  E.mv=false;E.t+=dt;E.dir=[P3.x>E.x?1:-1,0];
  const done=st===2?SW.quest>=3:st===4?!F.buds.some(b=>b.type===1):st===6?!F.gates.some(g2=>g2.type===1&&!g2.open):st===8?!F.sites.some(s=>!s.done):true;
- if(done){if(st===2)for(const w of W4.wilds)w.tame=0;fTalk(F,'ERIN',EWDONE[st],()=>{SW.walk2=st+1;E.rest=3;swSave()});E.t=0;return}
+ if(done&&st===2&&!SW.lessons.tutFight){for(const w of W4.wilds)w.tame=0;if(!W4.wilds.some(w=>w.fightMe))ewFightSetup(F); /* v12.3: one, not one a frame while a message holds the dialogue back */if(F.dlgPend){E.t=0;return}fTalk(F,'ERIN',["ERIN: Your first catch! See how the dark broke right off it? That is the whole job, keeper.","ERIN: Buddies can fight, too. Look, another wild one. Stand next to it and press SELECT to battle it.","ERIN: Go on. I'll watch."],()=>{SW.lessons.tutFight=1;swSave()});E.t=0;return}
+ if(st===2&&SW.lessons.tutFight===1){if(!W4.wilds.some(w=>w.fightMe))ewFightSetup(F);if(E.t>40){E.t=0;fTalk(F,'ERIN',["ERIN: Stand next to the wild one and press SELECT. That starts a battle."],()=>{})}return}
+ if(done){if(st===2)for(const w of W4.wilds)w.tame=0;fTalk(F,'ERIN',EWDONE[st],()=>{ewAfter(st,E);swSave()});E.t=0;return}
  if(E.t>75&&st!==2){E.t=0;fTalk(F,'ERIN',["ERIN: No rush. I'll wait right here."],()=>{})}}
 function ewDraw(){const E=W4.ew;if(!E)return;if(E.fade!=null)g.globalAlpha=Math.max(0,E.fade);fChibi(Math.round(E.x),Math.round(E.y)+3,FLOOK.ERIN,E.dir,E.mv);g.globalAlpha=1;if(E.fade!=null)return;
  const st=SW.walk2||0;if(E.wait||(!E.mv&&!E.leave&&st%2===0&&st<10))if(((time*2)|0)%2)text('!',Math.round(E.x)-1,Math.round(E.y)-30,2,'#ffd94d',null)}
+
+/* v10.1: the battle lesson gets its own wild, close by */
+function ewFightSetup(F){const sec=wSector(F.id);if(!F.grass.length)return;const gr=F.grass.slice().sort((a,b)=>Math.hypot(a[0]*FT+8-P3.x,a[1]*FT+10-P3.y)-Math.hypot(b[0]*FT+8-P3.x,b[1]*FT+10-P3.y)).find(t=>Math.hypot(t[0]*FT+8-P3.x,t[1]*FT+10-P3.y)>30)||F.grass[0];
+ const wd=fSpawnWild(F,sec);wd.x=wd.tx=gr[0]*FT+8;wd.y=wd.ty=gr[1]*FT+10;wd.lv=sec.lv[0];wd.fightMe=1;W4.wilds.push(wd)}
+
+/* v12.2 (Will): the order of Erin's walk. Sprout kinds, the wall, the bridge, wood, a bug... and the catch and
+   the battle LAST. If that first battle ends with the buddy gone, Erin says why right there, and King Bibi's
+   beam follows at once. Then she sends you home. */
+const WWHY=[{who:'ERIN',txt:"That one's gone, keeper. The dark had it too deep."},{who:'ERIN',txt:"A buddy you can't show the light stays dark, and a dark buddy keeps the valley dark. Sometimes a battle is the only way to clear it."},{who:'ERIN',txt:"Nobody blames you for it. But catch them when you can. Showing the light is the real job."}];
+function ewAfter(st,E,skip){const L=SW.lessons;
+ if(st===2){SW.walk2=9;E.rest=1.5;if(L.defeat1===1){L.defeat1=2;scStart(WWHY,()=>{swSave();beamStart()})}return}
+ if(st>=8&&st<9){if((SW.walk3||0)<7){SW.walk2=10;SW.walk3=Math.max(1,SW.walk3||0);E.rest=2}else SW.walk2=(SW.quest>=3&&L.tutFight)?9:1;return}
+ if(st>=9){SW.walk2=10;SW.walk3=7;E.leave=1;return}
+ SW.walk2=st+1;E.rest=skip?0:3}

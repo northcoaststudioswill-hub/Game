@@ -8,8 +8,8 @@
    - The catch cinematic is the reward for the catch, so it does not
      wait; it only clears a stale "Latched on" line.
    ================================================================ */
-function swReadT(s){return 1.4+String(s).length*.055}
-function swSay(s,t){s=String(s);const need=Math.max(t||2.2,swReadT(s));W4.msgQ=W4.msgQ||[];
+function swReadT(s){return 1.1+String(s).length*.042} /* v12.2: messages stayed up too long */
+function swSay(s,t){s=String(s);const rd=swReadT(s),need=Math.min(5.5,Math.max(rd,Math.min(t||0,rd+.8)));W4.msgQ=W4.msgQ||[];
  if(W4.msgT>0&&W4.msg===s){W4.msgT=Math.max(W4.msgT,need*.6);return}            /* already on screen */
  if(W4.msgQ.some(q=>q.s===s))return;                                           /* already waiting */
  if(W4.scene||(W4.fld&&W4.fld.dlg)||W4.talk||(W4.quips&&W4.quips.length)||W4.scPend&&W4.scPend.length||(W4.msgT>0&&time-(W4.msgAt||0)<(W4.msgMin||0))){if(W4.msgQ.length<5)W4.msgQ.push({s,t:need});return}
@@ -44,9 +44,9 @@ function fBarrierDraw(F){fSignsDraw(F);for(const e of F.exits){if(!wBarred(e.to)
 function fTalk(F,who,lines,after){const d={who,lines,i:0,after};if(!SCOFF&&swBusy()&&!F.dlg){F.dlgPend=d;return}F.dlgPend=null;F.dlg=d}
 /* v8.7: after the cottage and the first crop, the game points you at the Ranger's gym */
 function scGymCheck(){if(SCOFF||W4.fld||W4.sector!=='BASE'||SW.quest<5||SW.badges.length||SW.lessons.scGym||state!=='g4world'||!SW.buildings.some(b=>b.k==='cottage'))return; /* v8.9: cottage and a crop are enough (the garden lesson can come after) */ /* queued right away: it plays as soon as the crop line has been read */SW.lessons.scGym=1;
- scStart([{who:'ERIN',txt:'Sunkeep has a roof and a garden. Now the real work: the dark out there.'},
-  {who:'MARCUS',txt:'Every place has an ALPHA, bro. Biggest, darkest buddy around. Ours sleeps behind the boulder wall.'},
-  {who:'ERIN',txt:'Bring an alpha the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome.'},
-  {who:'MARCUS',txt:'Meadow alpha is Lv'+FMAPS.MEADOW.key.A.lv+'. Battle wilds with SELECT till your lead is Lv'+FMAPS.MEADOW.key.A.lv+'. Then throw sprouts. See one, light one.'}],()=>swSave())}
+ scStart([{who:'ERIN',txt:'Sunkeep has a roof and a crop growing. Now the real work: the dark out there.'},
+  {who:'MARCUS',txt:'Every place has a GUARDIAN OF THE LIGHT, bro. They went dim when the Lantern did. Ours sleeps behind the boulder wall.'},
+  {who:'ERIN',txt:'Bring a guardian the light and it gives up a SIGIL. Four Sigils, and King Bibi lowers the dome.'},
+  {who:'MARCUS',txt:'Meadow guardian is Lv'+FMAPS.MEADOW.key.A.lv+'. Battle wilds with SELECT till your lead is Lv'+FMAPS.MEADOW.key.A.lv+'. Then throw sprouts. See one, light one.'}],()=>swSave())}
 function wGymGoal(){if(SW.quest<5||SW.badges.length)return null;const L=Math.max(0,...SW.party.map(m=>m.lv));
  const T=Math.max(...WGYMS[0].team.map(t=>t[1]))+1;return L<T?'Ranger gym, north road: train to Lv'+T+' (SELECT)':"Lantern Town (north road): win the Ranger's Sigil"}

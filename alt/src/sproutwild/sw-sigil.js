@@ -4,10 +4,10 @@
    the roads the Ranger kept shut open: east to Crooked Hollow, south
    to Squire's Woods. About 4.5 s; A skips after 1.2 s.
    ================================================================ */
-/* v9.1: one cinematic for each alpha's Sigil; what it opens depends on how many you hold */
+/* v9.1: one cinematic for each guardian's Sigil; what it opens depends on how many you hold */
 const WSIGOPEN=[null,{a:'ROADS',b:'OPEN',sub:'',end:"The roads are open. Crooked Hollow is east of the Meadow, Squire's Woods south."},
  {a:'SHORE ROAD',b:'OPEN',sub:'Lantern Town, the south-east road',end:'Two Sigils. The Shore road from Lantern Town is open.'},
- {a:'GLOOM HOLLOW',b:'OPEN',sub:'past the Shore',end:'Three Sigils. Gloom Hollow is open, past the Shore. Its alpha waits.'},
+ {a:'GLOOM HOLLOW',b:'OPEN',sub:'past the Shore',end:'Three Sigils. Gloom Hollow is open, past the Shore. Its guardian waits.'},
  {a:'THE KING',b:'WILL SEE YOU',sub:'Gloom Hollow. Bring your Sigils.',end:'Four Sigils. King Bibi will see you in Gloom Hollow.'}];
 function sigilCheck(){if(W4.sigilQ&&SCOFF){W4.sigilQ=0;return}if(!W4.sigilQ||state!=='g4world'||W4.scene||swBusy())return;const Q=typeof W4.sigilQ==='object'?W4.sigilQ:{sp:'BLOOMBOAR',n:1};W4.sigilQ=0;W4.sigQ=Q;
  if(!(typeof KO!=='undefined'&&KO&&KO._)){swSay(WSIGOPEN[Math.min(4,Q.n)].end,3.6);return}
@@ -38,7 +38,7 @@ function drawSigil(){const KC=KO._,C=KC.CH,M=C[C.findIndex(c=>c.id==='marcus')],
   g.fillStyle=SG.d;g.beginPath();g.moveTo(0,-24);g.lineTo(18,0);g.lineTo(0,24);g.lineTo(-18,0);g.closePath();g.fill();
   g.fillStyle=SG.c;g.beginPath();g.ellipse(0,0,6,15,.5,0,7);g.fill();r(SG.d,-1,-12,2,24);g.restore();
   slam(WD[0],cy+40,4,'#ffffff',1.5);slam('SIGIL',cy+72,5,'#f8e060',1.75);
-  if(u>1.4)ctext0(Q.n===1?"The Ranger's barriers are down":'An alpha has the light again',cy+104,1,'#cfe0b8',null);
+  if(u>1.4)ctext0(Q.n===1?"The Ranger's barriers are down":'Its Sigil stone goes home to the Lantern',cy+104,1,'#cfe0b8',null);
   if(u<.14)r('rgba(255,255,255,'+(1-u/.14).toFixed(2)+')',0,0,W,H);return}
  {/* what opens */const u=t-3.0;r('#0c1420',0,0,W,H);lines(W/2,cy,'rgba(248,224,96,.25)',30);
   if(Q.n>1){slam(OP.a,cy-30,tw0(OP.a,5)>W-16?4:5,'#ffffff',3.0);slam(OP.b,cy+8,tw0(OP.b,5)>W-16?4:5,SG.c,3.2);if(u>.6)ctext0(OP.sub,cy+48,1,'#cfe0b8',null);if(u>1.2)ctext0('A  CONTINUE',H-14,1,'#8a86a0',null);if(u<.1)r('rgba(255,255,255,'+(1-u/.1).toFixed(2)+')',0,0,W,H);return}
