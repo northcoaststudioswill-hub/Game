@@ -147,7 +147,8 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok('the lens is carried across the valley to the Lantern', await E('run.lens===1'), secs + ' s, state ' + await E('state'));
   await step(4); ok('and the relight scene plays in 3D', await E(`state==='c3'&&c3q.key==='relight'`), await E('state'));
   await skip3(); await step(12);
-  ok('the North Light is lit, and paid for', await E(`run.lit===1&&state==='play'`), await E('toasts.length&&toasts[0].s'));
+  ok('the North Light is lit, and paid for', await E(`run.lit===1&&(state==='play'||state==='card')`), await E('toasts.length&&toasts[0].s'));
+  for (let i = 0; i < 6 && (await E('state')) === 'card'; i++) await tap('a'); await step(12);
   ok('the marker goes back to the missions', !/LENS|PIER|BEAM/.test(await E('OBJ&&OBJ.text')), await E('OBJ&&OBJ.text'));
   await E(`dayT=DAYLEN*.9;tod.flick=0;void 0`); await tp(28, 22); await step(30);
   ok('the Lantern does not skip any more', await E('!tod.flick&&flickT<=0'));
@@ -155,6 +156,22 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await E(`state='pause';void 0`); await E(`state='guide';gpage=2;gsel=7;void 0`); await shot('coast-7-guide-bessie');
   ok('Bessie is in the field guide once the light is lit', await E(`spGuideList(2).find(e=>e.n==='BESSIE').known&&spGuideList(3).length===10`));
   await E(`state='map';void 0`); await shot('coast-8-map'); await E(`state='play';void 0`);
+
+  /* ---- more to do on the coast: Marcus Lakefront, the second grub, the beam at night ---- */
+  await E(`dayT=30;tod.flick=1;run.pjSeen=run.pjSeen||{};void 0`); await step(20);
+  ok('lighting the North Light opens a sixth valley project', await E(`PJ.length===6&&pjOpen(PJ[5])&&(state==='card'||run.pjSeen.lf===1)`), await E('state'));
+  for (let i = 0; i < 6 && (await E('state')) === 'card'; i++) await tap('a');
+  const stages = await E('PJ[5].st.length'); let built = 0;
+  for (let st = 0; st < stages; st++) { await E(`meta.petals+=300;buds=[];squad=[];const need=PJ[5].st[pjS(PJ[5]).s][1];for(const t in need)for(let i=0;i<need[t];i++)mkBud(+t,2,P.x,P.y+6);pjSend(PJ[5]);void 0`); await step(4);
+    if (await E(`state==='cine'&&/^pj:lf/.test(scn[0][1])`)) built++; await E('g.setTransform(2,0,0,2,0,0);draw();void 0'); for (let i = 0; i < 12 && (await E('state')) === 'cine'; i++) await tap('a'); for (let i = 0; i < 4 && (await E('state')) === 'card'; i++) await tap('a'); }
+  ok('each of its four stages builds and plays its scene', built === stages && await E('pjDone(PJ[5])'), built);
+  ok('it pays out the sailor cap', await E(`meta.own.hat.includes(11)&&STY.hat[11][0]==='SAILOR CAP'`));
+  await tp(75, 13); await E(`cam.x=P.x-VW/2;cam.y=P.y-VH/2-20;dayT=40;void 0`); await step(3); await shot('coast-9-lakefront');
+  await E(`items.forEach(i=>{if(i.sub==='big'&&i.x>70*16)i.alive=false});pjMorning();void 0`);
+  ok('Bessie leaves berries on the beach in the morning', (await E(`items.filter(i=>i.alive&&i.sub==='big'&&i.y<13*16&&i.x>72*16&&i.x<82*16).length`)) >= 3, await E('toasts.map(t=>t.s)'));
+  ok('every valley scene line still fits its four rows', await E(`Object.keys(SCN).every(k=>{const q=typeof SCN[k]==='function'?SCN[k]():SCN[k];return q.every(e=>wrapPx(e[0],214).length<=4)})`));
+  ok('there are two grubs on the coast road now', (await E(`spawns.filter(q=>q.k==='grub'&&q.x>=70).length`)) === 2);
+  ok('at night before the relight a beam is drawn east from the Lantern', await E(`(()=>{const lit=run.lit,probe=c=>{run.lit=0;run.call=c;dayT=DAYLEN*.9;tod.flick=1;P.x=34*16;P.y=20*16+8;cam.x=P.x-VW/2;cam.y=P.y-VH/2;g.setTransform(2,0,0,2,0,0);draw();const y=Math.round((HY-27-Math.round(cam.y))*Z)*2,d=g.getImageData(440,y,1,1).data;return d[0]+d[1]+d[2]};const off=probe(0),on=probe(1);run.lit=lit;run.call=1;dayT=40;return on>off+10})()`));
 
   /* ---- saves ---- */
   const kept = await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);return run.lit===1&&run.call===1&&!coastGate('sunDoor').alive&&!coastGate('northPier').alive&&fieldL[6*MW+86]>0&&!items.some(i=>i.alive&&i.sub==='lens')})()`);

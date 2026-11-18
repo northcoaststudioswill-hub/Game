@@ -3,6 +3,34 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: more to do on the North Coast, and tidying (Nov 18 2026)
+
+Will: keep working on the game and gameplay and bugs and cleaning up the game and making it better.
+
+![Marcus Lakefront](playtest/sprouts-lakefront.png)
+
+- **A sixth valley project: MARCUS LAKEFRONT.** It opens on the North Coast once the North Light is lit, so the coast
+  is no longer finished the moment the lens comes home. Four stages: a fishing dock (Pebs and Leafs), two rowboats
+  (Dews), a snack shack (Embers and Luckies), and a grand opening (Zips and Luckies, 200 petals). Each has its scene
+  with Marcus. Finishing it gives the SAILOR CAP, a ticket, 10 petals a morning like the other projects, and Bessie
+  leaves three big berries on the beach every morning. MASTER BUILDER now reads FINISH EVERY VALLEY PROJECT (six).
+- **A second grub on the coast road.** Nothing threatened the long carry of the lens. Now there is a grub by the road
+  as well as the one in the corner, so the haul wants watching (grubs still only spook sprouts back to the soil).
+- **The beam shows at night.** Between the call and the relight, a soft beam runs east from the Lantern after dark, so
+  the way to the sun door can be seen as well as read off the marker.
+- **The job site's board is drawn over the treetops**, so FLOW PROS can be read; the crowns used to cover half of it.
+- Removed the 2D picture of the old arch, which the 3D scene replaced.
+
+**The first-day autopilot:** the bot that sometimes finished only one of Erin's asks (about 1 run in 10, cause unknown)
+has not done it in 16 logged runs on this build. The likely cause was last pass's bug: a sprout thrown over the bramble
+or the garden fence was stranded behind it, and the crew ran short. That is a guess from timing, not something seen.
+
+**Tested:** `tests/sprouts_coast.js` 84 checks (seven new: the project opening, its four stages and scenes, the cap,
+Bessie's berries, scene lines fitting, two grubs, the beam). `sprouts_valley.js` twice, `sprouts_story.js`, soak (two
+mid-game and two late-game seeds), Sproutwild lab 124 of 124, Patch & Plate 119 of 119, console shelf: all pass.
+**Not tested:** by hand, or on a phone. Whether a second grub makes the haul better or just more annoying is a
+question for a person playing.
+
 ## Sprouts: scene timing, three more 3D scenes, and the key to the pond road (Nov 18 2026)
 
 Will: bug fix timing issues in the new Sprouts. Render more scenes. Make the area with Marcus take something you find
