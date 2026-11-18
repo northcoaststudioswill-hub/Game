@@ -135,7 +135,7 @@
       scene: s, start: { x: 13.5, z: 4.5 }, zoom: [13.5, 22], bounds: [0, 0, 29, 17],
       spots: [
         { x: 5, z: 0.4, r: 2.2, y: 4.7, label: 'The Blood Pit', act: 'Enter the pit', go: () => G.ui.pit(), badge: () => !G.state.wins.grubb },
-        { x: 11, z: 0.6, r: 1.5, y: 3.0, label: 'Notice Board', act: 'Read the Codex', go: () => G.ui.codex() },
+        { x: 11, z: 0.6, r: 1.5, y: 3.0, label: 'Notice Board', act: 'Read the board', go: () => G.ui.board(), badge: () => !G.state.contract },
         { x: 15.6, z: 1.3, r: 1.9, y: 3.2, label: 'The Fence', act: 'Trade', go: () => G.meet('fence', () => G.ui.shop()), badge: () => !(G.state.met || {}).fence },
         { x: 20.4, z: 1.3, r: 1.9, y: 3.2, label: 'Guildmaster', act: 'Character', go: () => G.meet('gm', () => G.ui.sheet()), badge: () => !(G.state.met || {}).gm || G.state.hero.known.some(id => !G.state.hero.slots.includes(id)) && G.state.hero.slots.includes(null) },
         { x: 25.6, z: 2.5, r: 1.9, y: 3.6, label: 'Mark · The Long Odds', act: 'Gamble', go: () => G.meet('mark', () => G.ui.mark()), badge: () => !(G.state.met || {}).mark || !!G.state.schemeDone },

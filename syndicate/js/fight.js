@@ -41,7 +41,7 @@
     const prim = G.CLASSES[o.cls].primary; eh.stats[prim] += Math.floor(o.level / 2); eh.stats.con += Math.floor(o.level / 3);
     const ed = G.derive(eh, null);
     F.sabotaged = !!st.sabotage; if (st.sabotage) { ed.maxHp *= 0.85; st.sabotage = 0; }
-    ed.maxHp = Math.round(ed.maxHp * o.hpMul); ed.dmgMul *= o.dmgMul * 1.02;
+    ed.maxHp = Math.round(ed.maxHp * o.hpMul); ed.dmgMul *= o.dmgMul * (o.level >= 3 ? 1.12 : 1.04);
     E = makeEntity(eh, ed, o.look || G.lookOf(eh, null), false);
     E.ai = Object.assign({ react: 0.5, aggro: 0.5, dodge: 0.1, guard: Math.min(0.6, 0.14 + o.level * 0.09), parry: Math.min(0.26, 0.02 + o.level * 0.045) }, o.ai); E.boss = o.boss;
     G.fightTrack = o.boss ? 'boss' : 'fight';
@@ -214,7 +214,7 @@
   // ------------------------------------------------------------------ floor marks: scorches, cracks and holy afterglow
   let marks = [], markN = 0, camKx = 0, camKz = 0, slowT = 0;
   // posture: every blow wears it down; when it goes, you reel and take the next one clean
-  const POISE = { fighter: 120, cleric: 110, rogue: 85, sorcerer: 75 };
+  const POISE = { fighter: 120, cleric: 110, rogue: 85, sorcerer: 88 };
   function initPoise() { [P, E].forEach(e => { if (!e || e.maxPoise) return; e.maxPoise = POISE[e.cls] * (e.boss ? 1.3 : 1); e.poise = e.maxPoise; e.poiseT = 0; e.d.speed *= 0.92; }); }
   const counted = () => phase === 'fight' && !F.ex && !opp.spar && G.deeds;
   function poiseHit(e, v, by) {
@@ -235,6 +235,7 @@
     sc.attach(limb); const a = dir + rand(-0.6, 0.6), v = rand(3, 5.5);
     gibs.push({ m: limb, vx: Math.cos(a) * v, vz: Math.sin(a) * v, vy: rand(5.5, 8.5), rx: rand(-10, 10), rz: rand(-10, 10) });
     blood(tgt.x, tgt.y, 70, dir); blood(tgt.x, tgt.y, 40); if (gore()) for (let i = 0; i < 5; i++) gfx.splat(tgt.x / S + rand(-1.2, 1.2), tgt.y / S + rand(-1.2, 1.2), rand(0.5, 1.2));
+    if (att && att.isPlayer && counted()) G.deeds.bump('sever');
     text(tgt, part === 'legL' ? 'LEG SEVERED' : 'ARM SEVERED', '#ff3020', true);
     hitstop = Math.max(hitstop, 0.22); slowT = 0.5; shake = Math.max(shake, 19); camVh -= 0.9; flashLight(tgt.x, tgt.y, '#ff2010', 90);
     G.sfx('crit'); G.sfx('wall'); if (att && att.isPlayer) { addHype(16); G.sfx('cheer'); } if (G.rumble) G.rumble(300, 1);
@@ -256,7 +257,7 @@
   function parryWindow(e) { return PARRY[e.cls][0] + (e.d.parry || 0) + Math.max(0, G.mod(e.stats.dex)) * 0.008; }
   // Each class answers a parried blow its own way.
   function parried(att, tgt, ab, o) {
-    poiseHit(att, 40, tgt);
+    poiseHit(att, 40, tgt); tgt.ripT = time + 1.3;       // the opening a parry buys: the next blow is a riposte
     const cls = tgt.cls, resist = att.boss ? 0.6 : 1, pa = Math.atan2(att.y - tgt.y, att.x - tgt.x), near = Math.hypot(att.x - tgt.x, att.y - tgt.y) < 170;
     text(tgt, PARRY[cls][1] + '!', '#ffe9a0', true); G.sfx('clang'); G.sfx('perfect'); hitstop = Math.max(hitstop, 0.13); shake = Math.max(shake, 7);
     spark(tgt.x, tgt.y, 36, '#ffe9a0', 16, 240); flashLight(tgt.x, tgt.y, '#ffe9a0', 45);
@@ -368,6 +369,14 @@
       return false;
     }
     if (tgt.state === 'parry' && tgt.parryT > 0 && ab.type !== 'aura' && !o.noCounter && !o.dot) { parried(att, tgt, ab, o); return false; }
+    if (ab.type === 'melee' && !ab.spell && !o.noCounter && !o.dot && tgt.state === 'wind' && tgt.act && tgt.t < 0.1 && tgt.act.ab.type === 'melee' && !tgt.act.ab.spell && !!tgt.act.ab.heavy === !!ab.heavy && !tgt.act.ab.leap && angDiff(tgt.act.aim, Math.atan2(att.y - tgt.y, att.x - tgt.x)) < 0.9 && Math.hypot(att.x - tgt.x, att.y - tgt.y) < 150) {
+      const ca = Math.atan2(tgt.y - att.y, tgt.x - att.x), mx = (att.x + tgt.x) / 2, my = (att.y + tgt.y) / 2, kv = ab.heavy ? 260 : 170;
+      text({ x: mx, y: my }, 'CLASH', '#ffe9a0', true); G.sfx('clang'); G.sfx('perfect'); spark(mx, my, 44, '#ffe9a0', ab.heavy ? 30 : 18, 300); flashLight(mx, my, '#ffe9a0', 70); fx.push({ k: 'ring', x: mx, y: my, r: 110, col: '#ffe9a0', t: 0, life: 0.35 });
+      hitstop = Math.max(hitstop, ab.heavy ? 0.2 : 0.12); shake = Math.max(shake, ab.heavy ? 14 : 8); if (ab.heavy) slowT = Math.max(slowT, 0.2);
+      interrupt(tgt); tgt.state = 'recover'; tgt.t = 0.28; tgt.act = { ab: tgt.C ? A[tgt.basic] : ab, step: 0, missed: 0, aim: tgt.aim }; tgt.kx = Math.cos(ca) * kv; tgt.ky = Math.sin(ca) * kv; att.kx = -Math.cos(ca) * kv; att.ky = -Math.sin(ca) * kv; att.clashed = 1;
+      poiseHit(tgt, 8, att); poiseHit(att, 8, tgt); if (att.isPlayer || tgt.isPlayer) addHype(8); if (G.rumble) G.rumble(140, 0.7);
+      return false;
+    }
     if (tgt.guard > 0 && ab.type !== 'aura' && !o.noCounter && !o.dot) {
       if (ab.basic) {
         tgt.guardHits = (tgt.guardHits || 0) + 1; text(tgt, 'BLOCKED', '#cfd8e0'); G.sfx('clang'); spark(tgt.x, tgt.y, 36, '#ffe9a0', 7, 150); tgt.flash = 0.04; if (att.isPlayer) addHype(-4);
@@ -393,6 +402,8 @@
     if (tgt.st.mark) mul *= 1.25;
     if (att.d.tactical && (tgt.st.stun || tgt.st.slow)) mul *= 1.3;
     let tag = null; const real = ab.type !== 'aura' && !o.dot;
+    if (real && att.ripT > time) { att.ripT = 0; mul *= 1.3; text(tgt, 'RIPOSTE', '#9fd0ff', true); poiseHit(tgt, 20, att); if (att.isPlayer) addHype(8); }
+    if (real && ab.type === 'melee' && tgt.state !== 'ko' && angDiff(Math.atan2(att.y - tgt.y, att.x - tgt.x), tgt.aim) > 2.2) { mul *= 1.2; if (time - (tgt.flankT || -9) > 1.5) { tgt.flankT = time; text(tgt, 'FLANKED', '#c79bff'); if (att.isPlayer) addHype(4); } }
     if (real && tgt.state === 'wind' && tgt.act) { mul *= 1.25; tag = 'COUNTER'; } else if (real && (tgt.state === 'recover' || tgt.state === 'parry')) { mul *= 1.4; tag = 'PUNISH'; }
     if (o.proj && o.proj.dis) mul *= 0.75;
     dmg = Math.max(1, Math.round(dmg * mul * (1 - tgt.d.dr)));
@@ -528,7 +539,7 @@
         if (fin) fx.push({ k: 'dust', x: e.x + Math.cos(a) * rng * 0.7, y: e.y + Math.sin(a) * rng * 0.7, r: 60, t: 0, life: 0.45 }); }
       let landed = false;
       if (d < rng + ER && (angDiff(ta, a) < arc / 2 || d < ER * 1.6)) landed = hit(e, foe, ab, fin ? { power: 1.7, knock: 240 } : null);
-      if (!landed && !ab.cone) act.missed = 1;
+      if (!landed && !ab.cone && !e.clashed) act.missed = 1; e.clashed = 0;
       if (fin) { shake = Math.max(shake, 5); if (landed && e.isPlayer) { text(foe, 'FINISHER', '#ffe9a0', true); addHype(8); } }
     } else if (ab.type === 'proj') {
       const n = ab.count || 1;
@@ -908,6 +919,9 @@
     e.cds = {}; e.res = 100; if (e.state === 'wind' || e.state === 'recover') interrupt(e); if (e.state === 'dodge') e.state = 'idle';
     e.orderPt = pt ? { x: pt[0] * S, y: pt[1] * S } : null; e.buf = null; e.intent.queue.push(id);
   };
+  // the intro shows what the pit really does to people
+  F.exSever = function (e, part, dir) { sever(e, part, null, dir == null ? Math.atan2(e.y - e.foe.y, e.x - e.foe.x) : dir); };
+  F.exGib = function (e, ash) { const a = Math.atan2(e.y - e.foe.y, e.x - e.foe.x); if (!ash) { blood(e.x, e.y, 90); blood(e.x, e.y, 50, a); } fx.push({ k: 'blast', x: e.x, y: e.y, r: 100, col: '#ff3020', t: 0, life: 0.5 }); fx.push({ k: 'ring', x: e.x, y: e.y, r: 220, col: '#ff5030', t: 0, life: 0.6 }); makeGibs(e, ash); e.vis.g.visible = false; e.state = 'ko'; e.koT = 9; e.act = null; e.st = {}; shake = 20; hitstop = 0.18; G.sfx('boom'); G.sfx('crit'); };
   F.exDown = function (e) { e.state = 'ko'; e.koT = 0; e.act = null; e.st = {}; e.buffs = {}; e.chain = null; };
   F.exDodge = function (e, ang) { e.dodgeT = 0; if (e.state !== 'idle') interrupt(e); e.intent.mx = Math.cos(ang); e.intent.my = Math.sin(ang); e.buf = { id: 'dodge', t: 0.3 }; };
 
@@ -930,7 +944,7 @@
     if (result.forfeit) { r.xp = 0; r.coin = 0; }
     if (!win) { r.lost = Math.round(st.coin * 0.2); st.coin -= r.lost; }
     r.mortal = win ? (M ? M.name : G.MORTAL[P.cls].name) : null;
-    if (win && G.deeds) { G.deeds.bump('mortal'); if (P.hp >= P.maxHp) G.deeds.bump('flawless'); if (hy >= 100) G.deeds.bump('hype100'); } gfx.cine = null; G.afterFight = true;
+    if (win && G.deeds) { G.deeds.bump('win'); G.deeds.bump('mortal'); if (P.hp >= P.maxHp) G.deeds.bump('flawless'); if (hy >= 100) G.deeds.bump('hype100'); } gfx.cine = null; G.afterFight = true;
     if (G.crew) r.crew = G.crew.tick();
     if (G.mark) G.mark.resolve(win);
     if (G.comfort) st.roomTips = (st.roomTips || 0) + Math.floor(G.comfort(st) / 14);

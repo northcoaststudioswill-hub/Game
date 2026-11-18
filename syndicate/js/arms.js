@@ -27,7 +27,7 @@
   const HEAVY = { fighter: 'Overhead Cleave', rogue: 'Gutting Thrust', sorcerer: 'Charged Bolt', cleric: 'Judgement Swing' };
   G.ARMS.forEach(w => {
     const b = A[w.id]; if (!b || b._tempo) return; b._tempo = 1;
-    b.wind = +(b.wind * 1.45).toFixed(3); b.rec = +(b.rec * 1.3).toFixed(3); b.cost = Math.round(b.cost * 1.6); b.pow = 1.2;
+    b.wind = +(b.wind * 1.45).toFixed(3); b.rec = +(b.rec * 1.3).toFixed(3); b.cost = Math.round(b.cost * 1.6); b.pow = w.cls === 'sorcerer' ? 1.32 : 1.2;
     b.desc = (b.type === 'melee' ? 'Tap to strike' : 'Tap to loose') + ' for ' + b.dmg[0] + 'd' + b.dmg[1] + ' + ' + b.stat.toUpperCase() + '. Costs ' + b.cost + ', refunded on a hit. ' + (b.type === 'melee' ? 'The third blow of a clean combo is a finisher. ' : '') + 'Hold, then release, for a heavy blow.';
     A[w.id + '_h'] = Object.assign({}, b, { basic: 0, heavy: 1, armor: 1, name: HEAVY[w.cls], wind: +(b.wind * 2.1).toFixed(3), rec: +(b.rec * 1.5).toFixed(3), cost: b.cost * 2, pow: 2.5, knock: 230, gain: 6, lunge: b.type === 'melee' ? 46 : 0, speed: b.speed ? b.speed * 1.15 : undefined, pr: b.pr ? b.pr * 1.6 : undefined, pz: (b.pz || 1) });
   });

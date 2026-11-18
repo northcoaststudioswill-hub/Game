@@ -86,6 +86,18 @@
     const NOTES = [0xffd36b, 0xc79bff, 0x8ad0ff, 0xff9ac0];
     const ARG = ['Three to one! On GRUBB!', 'You are robbing me.', 'Mark said it was a sure thing.', 'Mark says everything is a sure thing.', 'I had it. I HAD it.'];
     let argT = 5, last = 0;
+    // ---- the rest of the Undercity, falling away below the market: roofs, windows and far lamps in the dark
+    { const under = s.children.find(c => c.isMesh && c.geometry.type === 'PlaneGeometry' && c.geometry.parameters.width === 200); if (under) { under.scale.set(34 / 200, 22 / 200, 1); under.position.set(14.5, -0.3, 8.5); } }       // let the dark below the market show
+    { const N = 90, bm = new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), new T.MeshLambertMaterial({ flatShading: true }), N), wm = new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), new T.MeshBasicMaterial(), N * 3), d = new T.Object3D(), col = new T.Color(); let wi = 0;
+      for (let i = 0; i < N; i++) { const south = i % 2 === 0, out = 2.2 + Math.pow(Math.random(), 0.8) * 20, along = R(-10, 44), w = R(2, 5.5), dp = R(2, 5), top = -1.6 - out * 0.55 - R(0, 2.5), h = 9;
+        const x = south ? along : 31 + out, z = south ? 19 + out : along;
+        d.position.set(x, top - h / 2, z); d.scale.set(south ? w : dp, h, south ? dp : w); d.rotation.set(0, R(-0.08, 0.08), 0); d.updateMatrix(); bm.setMatrixAt(i, d.matrix); col.setHSL(R(0.66, 0.78), 0.2, R(0.09, 0.16)); bm.setColorAt(i, col);
+        for (let k = 0; k < 3; k++) { if (Math.random() < 0.3) continue; const onX = Math.random() < 0.5, wc = [0xffc070, 0xffb060, 0xc080ff, 0x80d0ff, 0x9aff8a, 0xffe0a0][Math.floor(Math.random() * 6)];
+          d.rotation.set(0, 0, 0); d.scale.set(onX ? 0.06 : 0.28, 0.4, onX ? 0.28 : 0.06); d.position.set(x + (onX ? (south ? w : dp) / 2 + 0.03 : R(-1, 1) * (south ? w : dp) * 0.35), top - R(0.5, 2.6), z + (onX ? R(-1, 1) * (south ? dp : w) * 0.35 : (south ? dp : w) / 2 + 0.03)); d.updateMatrix(); wm.setMatrixAt(wi, d.matrix); col.set(wc).multiplyScalar(Math.max(0.25, 1 - out / 26)); wm.setColorAt(wi, col); wi++; } }
+      wm.count = wi; bm.castShadow = false; bm.receiveShadow = false; s.add(bm, wm);
+      for (let i = 0; i < 9; i++) { const south = i % 2 === 0, out = R(4, 18), x = south ? R(-4, 36) : 31 + out, z = south ? 19 + out : R(-4, 22); gfx.glow([0xffb060, 0xc080ff, 0x80d0ff][i % 3], R(2.5, 5), x, -1.5 - out * 0.5, z, s, R(0.12, 0.28)); }
+      // light falling from the First Lamp and the Wisp Table
+      [[14, 9, 0xffd8a0, 3.4, 0.05], [27.5, 5.4, 0x8af0ff, 2.2, 0.04]].forEach(q => { const m = new T.Mesh(new T.ConeGeometry(q[3], 9, 14, 1, true), new T.MeshBasicMaterial({ color: q[2], transparent: true, opacity: q[4], blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide })); m.position.set(q[0], 4.6, q[1]); s.add(m); }); }
     return function (t) {
       const dt = Math.min(0.05, Math.max(0.001, t - last)); last = t;
       dice.forEach((d, i) => { d.rotation.set(t * (0.5 + i * 0.07), t * (0.8 + i * 0.05), 0); if (i < 5) d.position.y = 1.55 + Math.sin(t * 1.6 + i * 1.2) * 0.07; });

@@ -116,6 +116,12 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **The realm above.** Queen Eerin Koheneim and her husband Vilhelm van Koheneim IV rule from Highmarch with an iron grip, and the Undercity flourishes because they allow it. The intro opens in their throne room. In the market, the Long Stair stands sealed behind two Seal-Wardens: read the throne's latest proclamation there (a new one after every bout) and pay the Crown's tithe in person for respect. Three street events involve the Wardens, the tithe cart and a man in a plain cloak, and a hooded figure watches the champion's bout from the Guild box.
 
+**Pit contracts and streaks.** The Notice Board posts three contracts at a time (parry four blows, take two limbs, win without a scratch and so on). Take one, do it in the pit, and it pays coin and respect on the results screen. Every win in a row adds 5% to the purse, up to 25%.
+
+**Finer fighting.** A parry opens a riposte: your next blow within a moment hits 30% harder. Two blows of the same weight meeting edge to edge clash, and both fighters recoil. A blow from behind is a flank for 20% more.
+
+**Intro and backdrop.** The intro now shows the market at work (Mark's table, the Wardens at the Long Stair) and a "Blood" sequence in the pit with limbs coming off. The market sits above a lower city of roofs and lit windows instead of a black void, and the whole view has a soft vignette.
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |
@@ -150,7 +156,7 @@ and the rest of the game does not change.
 - `js/models.js` character models and animation
 - `js/world.js` the arena; `js/places.js` the street, the hideout, decor pieces, walking
 - `js/fight.js` combat simulation, AI, and its 3D effects
-- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror; `js/arms.js` combat tempo, heavy blows, weapons and the Armoury; `js/realm.js` the Long Stair, proclamations, tithe and throne events
+- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror; `js/arms.js` combat tempo, heavy blows, weapons and the Armoury; `js/realm.js` the Long Stair, proclamations, tithe and throne events; `js/board.js` pit contracts and win streaks
 - `js/cine.js` the opening cinematic; `js/lore.js` codex and bios; `js/music.js` the music sequencer
 - `js/ui.js` menus, HUD, level-up and results screens; `js/main.js` input and main loop
 

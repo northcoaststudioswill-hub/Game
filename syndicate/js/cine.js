@@ -82,6 +82,15 @@
         dur: 5.2, cut: true, text: 'The Deep Guild writes every debt in the Blood Ledger. The Guild always collects.',
         update: (p, dt) => { const th = lerp(0.15, 1.35, ease(p)), r = lerp(3.6, 2.3, p); shoot([GM[0] + Math.cos(th) * r, lerp(0.55, 1.5, p), GM[2] + Math.sin(th) * r], [GM[0], lerp(1.5, 1.35, p), GM[2]], lerp(46, 34, p), -0.07); hub().update(now, dt); }
       },
+      // the underworld at work: Mark's table, the dice of light, and the Wardens taking the Crown's tenth
+      {
+        dur: 4.8, cut: true, text: 'Dice. Coin. Unsealed steel. Whatever is forbidden above is for sale beneath one lamp.',
+        update: (p, dt) => { shoot(V([22.2, 1.3, 4.6], [24.9, 1.6, 2.9], ease(p)), V([25.6, 1.5, -0.2], [27.2, 1.5, 4.2], ease(cl((p - 0.45) / 0.55))), lerp(50, 40, p), 0.05 - p * 0.1); hub().update(now, dt); }
+      },
+      {
+        dur: 4.4, cut: true, text: 'At the foot of the Long Stair, the throne’s Wardens count their tenth, and look away.',
+        update: (p, dt) => { shoot(V([5.4, 0.8, 12.2], [2.9, 1.5, 13.6], ease(p)), [-0.9, lerp(2.3, 1.9, p), 14.5], lerp(52, 38, p), -0.06 + p * 0.05); hub().update(now, dt); }
+      },
       // smash cut: the crowd, then whip down into the pit
       {
         dur: 4.2, cut: true, text: 'Cannot pay in coin? You pay in the pit.',
@@ -101,7 +110,7 @@
           const A = ex.A, B = ex.B;
           at('leap', 0.3, () => { F.exCast(A, 'leap_slam'); F.speed = 0.42; });
           at('slow', 1.22, () => { F.speed = 0.1; }); at('norm', 1.85, () => { F.speed = 1; });
-          at('cleave', 2.15, () => F.exCast(A, 'cleave')); at('knives', 2.75, () => F.exCast(B, 'fan_knives')); at('bash', 3.5, () => F.exCast(A, 'shield_bash'));
+          at('cleave', 2.15, () => F.exCast(A, 'cleave')); at('arm', 2.5, () => { F.exSever(B, 'armL'); F.speed = 0.35; }); at('norm2', 3.1, () => { F.speed = 1; }); at('bash', 3.5, () => F.exCast(A, 'shield_bash'));
           const a = wp(A, 1.3), b = wp(B, 1), k = cl(t / 4.8);
           shoot([b[0] + lerp(5.2, 4.4, k), lerp(0.4, 1.5, ease(k)), b[2] + lerp(0.6, 2.4, k)], [(a[0] + b[0] * 2) / 3, (a[1] * 2 + b[1]) / 3, (a[2] + b[2] * 2) / 3], lerp(60, 46, k), -0.09 + k * 0.05);
         }
@@ -130,6 +139,19 @@
           at('smite', 2.7, () => F.exCast(A, 'holy_strike')); at('flame', 3.6, () => F.exCast(A, 'sacred_flame'));
           const k = cl(t / 4.8), th = 0.5 + ease(k) * 2.0, c = wp(A, 0.6);
           shoot([c[0] + Math.cos(th) * 3.2, lerp(4.2, 10, ease(k)), c[2] + Math.sin(th) * 3.2], c, lerp(62, 48, k), lerp(-0.3, 0.3, k));
+        }
+      },
+      // ---- BLOOD — close and low: an arm, a leg, and then nothing left to count
+      {
+        dur: 5.6, cut: true, card: 'Blood',
+        setup: () => { bout(FIGHTER, ROGUE, [-0.9, -0.6], [0.9, 0.7]); arena.setHype(1); G.sfx('crowd'); flash(0.6); },
+        update: () => {
+          const A = ex.A, B = ex.B;
+          at('c1', 0.2, () => F.exCast(A, 'cleave')); at('arm', 0.62, () => { F.exSever(B, 'armL'); F.speed = 0.22; }); at('n1', 1.5, () => { F.speed = 1; });
+          at('c2', 1.7, () => F.exCast(A, 'shield_bash')); at('c3', 2.4, () => F.exCast(A, 'cleave')); at('leg', 2.82, () => { F.exSever(B, 'legL'); F.speed = 0.22; }); at('n2', 3.6, () => { F.speed = 1; });
+          at('end', 4.1, () => F.exCast(A, 'cleave')); at('gib', 4.5, () => { F.exGib(B); F.speed = 0.3; gfx.cam.shake = 0.5; flash(0.5); G.sfx('cheer'); });
+          const k = cl(t / 5.6), th = lerp(2.3, 0.6, ease(k)), c = wp(B, 0.8), r = lerp(3.4, 4.6, k);
+          shoot([c[0] + Math.cos(th) * r, lerp(0.35, 1.3, k), c[2] + Math.sin(th) * r], [c[0], lerp(0.9, 0.5, k), c[2]], lerp(50, 42, k), Math.sin(k * 5) * 0.07);
         }
       },
       // ---- SHADOW — orbit a flurry of shadows in slow motion; the last one standing wears the crown
