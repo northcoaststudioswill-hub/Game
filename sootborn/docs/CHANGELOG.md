@@ -1,5 +1,10 @@
 # SOOTBORN — changelog
 
+## v0.12.2 · 2026-11-18 — more polish above ground
+- **Animation**: Kael stands hunched and breathing hard at full fury, blade low; enemies facing him then raise their guard and back off. On a win he sinks over his sword while his allies raise theirs. The dodge rolls in the direction of travel. Cutscene figures can raise a blade or kneel (the cadets chanting after the valley; Lucan on one knee after the duel).
+- **Fighting**: press strike during a dodge for a dash strike that closes distance and hits hard. Damage numbers pop off every hit. Clash now needs a deliberate, well-timed strike: a mashing bot was triggering it constantly and winning the last Ember Ring bout without taking a hit, which the test run caught.
+- **Look**: the field shades smoothly instead of in flat tiles; broadleaf trees in green and gold (russet at dusk) among the pines; the river moves and carries foam; clouds drift; sparks and the fire pillar are now light in the 3D scene instead of pixels laid over it; the victory camera sits further back.
+
 ## v0.12.1 · 2026-11-18 — 3D animation rebuilt from research
 Read up on how action animation is done in this kind of game before touching it. What I took from it:
 - Wolfire's David Rosen (GDC 2014, "An Indie Approach to Procedural Animation"): author a few strong key poses and let curves and springs do the motion between them; add drag to anything that hangs.

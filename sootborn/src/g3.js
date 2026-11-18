@@ -38,6 +38,8 @@ Batch.prototype = {
       for (const p of r1 > 0 ? [p0, p1, p2, p0, p2, p3] : [p0, p1, p2]) this.v(p[0], p[1], p[2], nx, ny, nz, c);
       if (cap && r1 > 0) { const pc = tp(cx, cy + h, cz), ux = emis ? 0 : m[4], uy = emis ? 0 : m[5], uz = emis ? 0 : m[6]; for (const p of [p3, p2, pc]) this.v(p[0], p[1], p[2], ux, uy, uz, c); } }
   },
+  // ground patch with a colour at each corner, so the field shades smoothly
+  gquad(x0, z0, x1, z1, y, cf) { for (const [x, z] of [[x0, z0], [x1, z0], [x1, z1], [x0, z0], [x1, z1], [x0, z1]]) this.v(x, y, z, 0, 1, 0, cf(x, z)); },
   quad(x0, z0, x1, z1, y, col, emis) { const c = rgb3(col), ny = emis ? 0 : 1; for (const [x, z] of [[x0, z0], [x1, z0], [x1, z1], [x0, z0], [x1, z1], [x0, z1]]) this.v(x, y, z, 0, ny, 0, c); }
 };
 const G3 = {
@@ -86,6 +88,7 @@ const G3 = {
     if (this.envs[bg]) return this.envs[bg];
     const gl = this.gl, A = new Batch(30000), Sh = new Batch(20000), r = rng(bg.length * 131 + 17), I = M4.id(), R = (a, b) => a + r() * (b - a), hw = bg === 'keep' ? 110 : 125, hh = bg === 'keep' ? 50 : 60;
     const pine = (x, z, s) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); Sh.cyl(m, 0, 0, 0, 2.2 * s, 1.6 * s, 10 * s, 5, '#5a3c26'); const g = ['#1f6a34', '#27803c', '#2f9646', '#3aa850']; for (let i = 0; i < 4; i++) Sh.cyl(m, 0, (7 + i * 9) * s, 0, (15 - i * 3.2) * s, 0, 15 * s, 7, bg === 'ford' ? ['#28503a', '#2f5e40', '#386a46', '#427650'][i] : g[i]); };
+    const oak = (x, z, s, c) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); Sh.cyl(m, 0, 0, 0, 2.6 * s, 1.8 * s, 16 * s, 5, '#6a4a30'); Sh.cyl(m, 0, 13 * s, 0, 9 * s, 13 * s, 8 * s, 6, shade(c, .86)); Sh.cyl(m, 0, 21 * s, 0, 13 * s, 10 * s, 8 * s, 6, c, 0, 1); Sh.cyl(m, 2 * s, 28 * s, 1 * s, 9 * s, 0, 9 * s, 6, shade(c, 1.12)); Sh.cyl(m, -7 * s, 17 * s, 4 * s, 6 * s, 0, 9 * s, 5, shade(c, 1.05)); };
     const rock = (x, z, s) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6), M4.rz(R(-.2, .2))); Sh.cyl(m, 0, 0, 0, 7 * s, 4.5 * s, 5 * s, 6, '#8a8a82', 0, 1); Sh.cyl(m, 1, 5 * s, 0, 4.5 * s, 0, 3 * s, 6, '#a4a49a'); };
     const peak = (x, z, rad, h, c0, snow) => { const m = M4.chain(M4.t(x, -4, z), M4.ry(r() * 6)); A.cyl(m, 0, 0, 0, rad, 0, h, 6, c0); if (snow) A.cyl(m, 0, h * .66, 0, rad * .36, 0, h * .36, 6, snow); A.cyl(M4.chain(M4.t(x + rad * .5, -4, z + rad * .3), M4.ry(r() * 6)), 0, 0, 0, rad * .7, 0, h * .55, 5, c0); };
     const cloud = (x, y, z, s, c) => { for (let i = 0; i < 4; i++) A.box(I, x + (i - 1.5) * 26 * s, y + (i % 2) * 8 * s, z + (i % 3) * 10, (46 - i * 4) * s, 16 * s, 30 * s, c, 1); };
@@ -110,7 +113,8 @@ const G3 = {
       for (let i = 0; i < 9; i++) { const a = Math.PI + (i + .5) / 9 * Math.PI; peak(Math.cos(a) * R(900, 1300), Math.sin(a) * R(900, 1300), R(160, 260), R(160, 330), [.5, .52, .74], [1, .95, .92]); }
     } else {
       const ford = bg === 'ford', gcol = () => { const k = r(); return ford ? [.2 + k * .08, .36 + k * .1, .22 + k * .06] : [.24 + k * .1, .52 + k * .14, .22 + k * .08]; };
-      for (let ix = -22; ix < 22; ix++) for (let iz = -24; iz < 12; iz++) { const x = ix * 40, z = iz * 40; if (ford && z >= -80 && z < 0) continue; A.quad(x, z, x + 40, z + 40, 0, gcol()); }
+      const gn = (x, z) => { const k = hash(Math.round(x / 20) + 500, Math.round(z / 20) + 500) * .5 + (Math.sin(x * .013 + 1) * Math.sin(z * .017) * .25 + .25), w = clamp(1 - Math.hypot(x / (hw + 30), z / (hh + 30)), 0, 1) * .08; return ford ? [.2 + k * .1 + w, .36 + k * .12, .22 + k * .06] : [.22 + k * .14 + w * 1.5, .5 + k * .18 + w, .2 + k * .1]; };
+      for (let ix = -44; ix < 44; ix++) for (let iz = -48; iz < 24; iz++) { const x = ix * 20, z = iz * 20; if (ford && z >= -80 && z < 0) continue; if (Math.abs(x) > 460 && (ix & 1 || iz & 1)) continue; const s2 = Math.abs(x) > 460 ? 40 : 20; A.gquad(x, z, x + s2, z + s2, 0, gn); }
       for (let i = 0; i < 46; i++) { const t0 = i / 46, x = (t0 - .5) * 620 + R(-8, 8), z = (ford ? 40 : 4) + Math.sin(t0 * 5) * 22 + R(-5, 5); A.quad(x - R(14, 26), z - R(8, 14), x + R(14, 26), z + R(8, 14), .06, ford ? [.34, .26, .2] : [.5, .38, .24]); }
       if (ford) { // the river
         for (let ix = -22; ix < 22; ix++) for (let k = 0; k < 4; k++) { const x = ix * 40, z = -80 + k * 20, d = Math.abs(k - 1.5) / 1.5; A.quad(x, z, x + 40, z + 20, -.6, [.16 + d * .1 + r() * .03, .4 + d * .1, .62 + d * .08], 1); }
@@ -120,6 +124,7 @@ const G3 = {
       for (let i = 0; i < 420; i++) { const x = R(-420, 420), z = R(-400, 200); if (Math.abs(x) < hw + 6 && Math.abs(z) < hh + 6 && r() < .7) continue; if (ford && z > -84 && z < 2) continue; const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); A.cyl(m, 0, 0, 0, 2.2, 0, R(4, 8), 3, ford ? '#3a6a40' : ['#3f9a3c', '#58b848', '#2f7a30'][i % 3]); if (i % 6 === 0 && !ford) A.box(m, 2, 3, 2, 1.5, 1.5, 1.5, i % 12 ? '#fff6d0' : '#ff9ac0', 1); }
       for (let i = 0; i < 130; i++) { const a = r() * 6.2832, d = R(0, 1), x = Math.cos(a) * (hw + 60 + d * 560), z = Math.sin(a) * (hh + 60 + d * 520) - 60; if ((z > 30 && Math.abs(x) < 260) || z > 260 || (ford && z > -110 && z < 30 && Math.abs(x) < 500)) continue; pine(x, z, R(1.2, 2.4)); }
       for (let i = 0; i < 12; i++) pine((i % 2 ? 1 : -1) * (hw + R(60, 130)), -hh + i * 7 - 30, R(1.3, 2));
+      for (let i = 0; i < 34; i++) { const a = r() * 6.2832, d = R(0, 1), x = Math.cos(a) * (hw + 70 + d * 420), z = Math.sin(a) * (hh + 70 + d * 380) - 50; if ((z > 30 && Math.abs(x) < 260) || z > 240 || (ford && z > -110 && z < 30)) continue; oak(x, z, R(1.4, 2.4), ford ? ['#b8642a', '#c8862e', '#8a4a2a'][i % 3] : ['#58b848', '#7ac850', '#e8c25a', '#48a040'][i % 4]); }
       for (let i = 0; i < 16; i++) rock(R(-hw - 120, hw + 120), -hh - R(14, 90), R(.6, 1.6)); for (let i = 0; i < 6; i++) rock((i % 2 ? 1 : -1) * (hw + R(10, 40)), R(-hh, hh), R(.5, 1));
       // the Assay is graded: a dais of Proctors at the back, and the standards of the twelve Houses
       { const m = M4.t(0, 0, -hh - 150); Sh.box(m, 0, 9, 0, 150, 18, 46, '#e8e2d4'); Sh.box(m, 0, 20, -14, 150, 4, 18, '#d8d2c4'); A.box(m, 0, 18.4, 23.2, 150, 1.4, .6, '#e8c25a', 1); for (let i = -3; i <= 3; i++) { Sh.cyl(m, i * 24, 18, -20, 1.4, 1.4, 44, 5, '#e8c25a'); } Sh.box(m, 0, 64, -12, 160, 3, 30, '#f4f0e6'); A.box(m, 0, 62, 3.4, 160, 2, .6, '#e8c25a', 1);
@@ -189,6 +194,10 @@ const G3 = {
     else if (st === 'recover' && swingT < 0) { const k = Math.max(0, 1 - Math.max(0, o.t) / .5); S({ cr: 2.2 + k * 1.2, lean: .2 + k * .25, rp: -.6, re: -.2, tilt: -.7 - k * .3, tw: .4 * k, lp: .4, hx: .25 * k }); rate = 9; } // spent: this is when to hit him
     else if (st === 'hurt') { const yw = Math.atan2(o.fx || 0, o.fy === undefined ? 1 : o.fy), f = clamp(((o.kx || 0) * Math.sin(yw) + (o.ky || 0) * Math.cos(yw)) / 90, -1, 1), sd = clamp(((o.kx || 0) * Math.cos(yw) - (o.ky || 0) * Math.sin(yw)) / 90, -1, 1);
       S({ lean: f < .2 ? -.55 : .5, side: sd * .45, tw: sd * .6 + (idx % 2 ? .3 : -.3), hx: f < .2 ? -.55 : .5, hy: sd * .5, rp: -2.3, ry: -.9, re: -.5, tilt: -1.2, lp: -2.2, ly: .8, le: -.5, cr: 2.8, kl: .7, kr: .6, hl: -.2, hr: .3, sq: .94 }); rate = 34; zeta = .5; }
+    if (opt.pose === 'raise') opt.win = 2; if (opt.pose === 'kneel') { S({ cr: 9, lean: .35, hl: 1.4, kl: 1.6, hr: -.3, kr: 1.5, rp: -.2, re: -.3, tilt: -.9, lp: .1, le: -.6, hx: .45, tw: 0 }); rate = 8; }
+    if (opt.win) { const k = Math.sin(t * 2) * .03; S(opt.win === 2 ? { rp: -3.0 + k, re: -.15, tilt: -.1, ry: 0, lp: -2.8, le: -.3, lean: -.12, cr: 0, tw: 0, hx: -.25, hl: .1, hr: -.1, kl: .1, kr: .1 } : { cr: 2.6, lean: .28 + k, tw: .1, rp: -.35, ry: .1, re: -.1, tilt: -.5, lp: .15, le: -.5, hx: .4, hl: .5, kl: .7, hr: -.4, kr: .5, sp: .2 }); rate = 7; zeta = .8; }
+    else if (opt.rage > .9 && (st === 'idle' || st === 'move') && !mv) { const k = Math.sin(t * 5.5) * .5 + .5; S({ cr: 2.8 + k * .8, lean: .3, tw: -.15, rp: .15, ry: -.35, re: -.15, tilt: -.45, lp: .1, ly: .3, le: -1.3, hx: .32, hl: .45, kl: .7, hr: -.4, kr: .55, sp: .22 }); rate = 16; }
+    else if (opt.fear && st === 'approach') { S({ rp: -1.25, ry: .85, re: -1.15, tilt: -1.85, lp: -1.2, le: -1.3, ly: -.5, cr: 2.8, lean: -.2, tw: -.25, hx: -.1 }); if (mv) S({ lean: -.28 }); rate = 18; }
     if ((o.z || 0) > 1 || st === 'down') { S({ lean: -.7, tw: Math.sin(t * 7 + idx) * .3, rp: -2.7, ry: -1.2, re: -.2, tilt: -1, lp: -2.7, ly: 1.2, le: -.2, hl: .7, kl: 1.0, hr: -.35, kr: .5, cr: 0, hx: -.4, sp: .3 }); rate = 20; }
     if (st === 'dodge') { S({ cr: 6.5, lean: 1.0, hl: 1.25, kl: 1.7, hr: 1.25, kr: 1.7, rp: -.6, re: -1.5, tilt: -.6, lp: -.6, le: -1.5, hx: .5, tw: 0 }); rate = 40; }
     if (o.guardT > 0 && st !== 'wind' && st !== 'atk' && swingT < 0 && st !== 'hurt') { S({ rp: -1.3, ry: .9, re: -1.2, tilt: -1.9, lp: -1.3, le: -1.3, ly: -.6, cr: 2.4, lean: -.06, tw: -.2 }); rate = 26; }
@@ -215,7 +224,7 @@ const G3 = {
     D.flash = o.flash > 0 ? .55 : 0;
     let root = M4.chain(M4.t(o.x, z + hop * this.MS, o.y), M4.ry(yaw), M4.s(sc * this.MS));
     if (fall) root = M4.chain(root, M4.t(0, 4, 0), M4.rx(-fall), M4.t(0, -2, 0));
-    if (roll) root = M4.chain(root, M4.t(0, 13, 0), M4.rx(roll), M4.t(0, -13, 0));
+    if (roll) { const da = Math.atan2(o.dx || 0, o.dy || 0) - yaw; root = M4.chain(root, M4.ry(da), M4.t(0, 13, 0), M4.rx(roll), M4.t(0, -13, 0), M4.ry(-da)); if (!rm) this.glow(o.x, 16, o.y, 20, [.7, .6, 1], .25); }
     if (Math.abs(sq - 1) > .005) { const m = M4.id(); m[5] = sq; m[0] = m[10] = 1 / Math.sqrt(sq); root = M4.mul(root, m); }
     root = M4.mul(root, M4.t(0, -Math.max(0, P.cr), P.lz));
     // legs: hip, knee, a planted boot
@@ -278,9 +287,12 @@ const G3 = {
       for (const q of this._bgm) { const x = -hw - 30 + q.k * (hw * 2 + 60) / 6 + Math.sin(q.k * 7.1) * 20, z = -hh - 70 - (q.k * 53 % 90), ph = t * 2.2 + q.k * 1.7, lun = Math.max(0, Math.sin(ph)) * 4, sw = (ph % 6.2832) < 1.2 ? .18 - (ph % 6.2832) * .15 : 0;
         this.char({ x: x - 16 + lun, y: z, fx: 1, fy: 0, st: sw > 0 ? 'recover' : 'approach', t: .1, swing: sw, anim: t * .3, idx: q.k, combo: 1 + q.k % 3 }, { id: q.k % 2 ? 'cadv1' : 'cadv2', blade: 1, key: q });
         this.char({ x: x + 16 - lun, y: z + 3, fx: -1, fy: 0, st: Math.sin(ph + 2) > .7 ? 'hurt' : 'approach', t: .1, anim: t * .3 + .5, idx: q.k + 3 }, { id: q.k % 2 ? 'cadt2' : 'cadt1', blade: q.k % 3 ? 1 : 2, key: q.b || (q.b = {}) }); }
+      if (bg === 'ford') { for (let ix = -16; ix < 16; ix++) for (let k = 0; k < 4; k++) { const x = ix * 40, z = -80 + k * 20, w = Math.sin(t * 1.6 + ix * .7 + k * 1.3) * .5 + .5, d = Math.abs(k - 1.5) / 1.5; D.quad(x, z, x + 40, z + 20, -.3, [.14 + d * .12 + w * .1, .36 + d * .12 + w * .12, .6 + d * .1 + w * .12], 1); }
+        for (let i = 0; i < 30; i++) { const x = ((i * 61 + t * 22) % 1200) - 600, z = (i % 2 ? -79 : -3) + Math.sin(t * 2 + i) * 1.2; D.quad(x, z, x + 14 + (i % 3) * 6, z + 1.2, -.2, [.9, .96, 1], 1); } }
       if (bg === 'ford' && !Settings.d.reduce) for (let i = 0; i < 40; i++) { const wx = ((i * 47.3 + t * (16 + i % 4 * 6)) % 700) - 350, wz = -76 + (i * 13) % 70; if (Math.sin(t * 5 + i * 2.1) > .1) this.glow(wx, .4, wz, 3 + i % 3, [1, .86, .7], .5); }
     }
     if (!Settings.d.reduce) for (let i = 0; i < 7; i++) { const bx = ((i * 190 + t * (26 + i * 3)) % 1400) - 700, by = 150 + i * 14 + Math.sin(t * .7 + i) * 10, bz = -420 - i * 40, fl = Math.sin(t * 9 + i * 2) * .7, m = M4.t(bx, by, bz); D.box(m, 0, 0, 0, 2, 1.4, 5, '#2a2a34'); D.box(M4.chain(m, M4.rz(fl)), 4, 0, 0, 8, .5, 3, '#3a3a44'); D.box(M4.chain(m, M4.rz(-fl)), -4, 0, 0, 8, .5, 3, '#3a3a44'); }
+    for (let i = 0; i < 5; i++) { const cx = ((i * 520 + t * (5 + i)) % 2600) - 1300, cy = (bg === 'keep' ? 240 : 360) + i * 28, cz = -900 - i * 90, cc = bg === 'ford' ? [1, .7, .58] : bg === 'keep' ? [1, .9, .86] : [1, 1, 1]; for (let k = 0; k < 4; k++) D.box(I, cx + (k - 1.5) * 60, cy + (k % 2) * 16, cz + (k % 3) * 20, 110 - k * 10, 34, 60, cc, 1); }
     // petals, embers
     if (!Settings.d.reduce) for (let i = 0; i < 46; i++) { const c = B.cam, px = c.x + ((i * 71.3 + t * (8 + i % 5 * 3)) % 400) - 200, pz = c.y - 40 - ((i * 37.7) % 320), up = bg === 'ford', py = ((i * 29.1 + t * (up ? 9 + i % 4 * 4 : -(6 + i % 4 * 3))) % 90 + 90) % 90 + 2; this.glow(px + Math.sin(t + i) * 6, py, pz, up ? 1.6 : 1.3, bg === 'keep' ? [1, 1, 1] : up ? [1, .7, .35] : [[1, .9, .95], [1, .9, .5], [.85, 1, .8]][i % 3], up ? .9 : .7); }
   },

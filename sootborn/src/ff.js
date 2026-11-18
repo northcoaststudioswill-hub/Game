@@ -28,7 +28,7 @@ const FF = {
     ],
     outro: [
       { d: 2.4, ...cu(0, 10, 1.9, 2.6, -24), acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 3 }], cap: 'THE GOLD ON ME SHINES. WHAT IS UNDER IT DOES NOT.' },
-      { d: 2.6, cam: [40, 150, 60, 150], to: [-30, 215, 110, 150], acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 1 }].concat(ffRow(V, 7, -90, 30, 34, { fy: -1 })), cap: 'THEY CHANT A NAME I BOUGHT. NOT THE ONE I WAS BORN WITH.' },
+      { d: 2.6, cam: [40, 150, 60, 150], to: [-30, 215, 110, 150], acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 1 }].concat(ffRow(V, 7, -90, 30, 34, { fy: -1, pose: 'raise' })), cap: 'THEY CHANT A NAME I BOUGHT. NOT THE ONE I WAS BORN WITH.' },
       { d: 2.8, cam: [0, 215, 110, 150, .32], to: [0, 240, 120, 150, .9], acts: [], cap: 'BEFORE THE GOLD, I WAS SOOT.', tint: 'rgba(255,240,200,.08)' },
       { d: 2.2, cam: [0, 240, 120, 150, .9], to: [0, 240, 120, 150, 1.25], acts: [], big: 'FOUR YEARS EARLIER', cap: 'SIX TIERS DOWN.', tint: 'rgba(255,250,230,.35)' }
     ]
@@ -65,7 +65,7 @@ const FF = {
       { d: 1.8, ...cu(-40, 4, 1.9, 2.8, -16), flash: 1, sfx: 'roar', acts: [{ id: 'kael2', a: [-40, 4], blade: 1, aura: 3 }], cap: 'HE HAS HIS MOTHER\'S SMILE.' }
     ],
     outro: [
-      { d: 2.6, cam: [30, 150, 56, 170], to: [10, 124, 54, 190], acts: [{ id: 'lucan', a: [26, -6], st: 'down', t: 2, fx: 1 }, { id: 'kael2', a: [-6, 0], blade: 1, fx: 1, fy: -.2, aura: 3 }], cap: 'HIS CIRCLET RINGS ON THE STONE. NOBODY PICKS IT UP.' },
+      { d: 2.6, cam: [30, 150, 56, 170], to: [10, 124, 54, 190], acts: [{ id: 'lucan', a: [26, -6], pose: 'kneel', fx: -1, fy: .2 }, { id: 'kael2', a: [-6, 0], blade: 1, fx: 1, fy: -.2, aura: 3 }], cap: 'HIS CIRCLET RINGS ON THE STONE. NOBODY PICKS IT UP.' },
       { d: 2.8, cam: [-6, 90, 54, 200, .32], to: [-6, 130, 60, 200, .62], acts: [{ id: 'kael2', a: [-6, 0], blade: 1, fy: -1, aura: 2 }], cap: 'THE SUN IS ROUNDER THAN SHE PAINTED IT. AND NOT HALF AS WARM.' },
       { d: 3.0, cam: [-6, 130, 60, 200, .62], to: [-6, 160, 90, 180, 1.2], acts: [], cap: 'ONE CANDLE-HOUR, SEREN. WATCH HOW LONG I BURN.', tint: 'rgba(255,246,220,.25)' }
     ]
