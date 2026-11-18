@@ -51,19 +51,28 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   const tap = async k => { await E(`keys.${k}=1;void 0`); await step(1); await E(`keys.${k}=0;void 0`); await step(1); };
   await E(`dayT=30;state='play';void 0`); await tap('start'); ok('START opens the pause grid', (await E('state')) === 'pause' && (await E('pi')) === 0);
   await tap('right'); await tap('down'); ok('the d-pad moves round the grid', (await E('PMENU[pi][0]')) === 'COLLECTION'); await E(`__g.draw();void 0`);
-  await tap('a'); await tap('b'); ok('Collection opened from pause comes back to pause', (await E('state')) === 'pause');
+  await tap('a'); await E(`__g.draw();void 0`); await tap('down'); await tap('right'); ok('the Collection has a cursor', (await E('csel')) === 3, await E('csel'));
+  await tap('right'); ok('right at the edge turns to the treasures', (await E('cpage')) === 1 && (await E('csel')) === 0); await E(`__g.draw();void 0`);
+  ok('every bug and treasure has a line that fits', await E(`BUGL.length===BUGS.length&&BUGL.concat(TRL).every(l=>wrapPx(l,228,2).length<=3)&&BUGS.every(b=>tw(b.n,2)<=74)&&TRS.every(q=>tw(q[0],2)<=92)`));
+  await tap('b'); ok('Collection opened from pause comes back to pause', (await E('state')) === 'pause');
   await tap('left'); await tap('a'); ok('the field guide opens', (await E('state')) === 'guide');
   for (let p = 0; p < 4; p++) { for (let i = 0; i < 9; i++) { await E(`__g.draw();void 0`); await tap('down'); } await tap('right'); }
   ok('every guide entry fits its three lines', await E(`[0,1,2,3].every(p=>spGuideList(p).every(e=>e.d&&wrapPx(e.d,228,2).length<=3))`), await E(`[0,1,2,3].map(p=>spGuideList(p).map(e=>wrapPx(e.d,228,2).length).join(''))`));
   ok('pause tile labels fit their tiles', await E(`PMENU.every(([k])=>tw(k,2)<=86&&tw(pauseSub(k),1)<=86)`), await E(`PMENU.map(([k])=>[tw(k,2),tw(pauseSub(k),1)])`));
   await tap('b'); await tap('b'); ok('B backs out to the valley', (await E('state')) === 'play');
   ok('a buddy you have been near is in the guide', await E(`!!(run.wbSeen&&Object.keys(run.wbSeen).length)&&spGuideList(1).some(e=>e.known)`));
-  await E(`msgT=0;toasts.length=0;LO.say=null;barkCD=0;P.x=npcs[0].x+20;P.y=npcs[0].y+8;npcs[0].st='done';npcs.forEach(n=>{n.bt=0;n.say=null});void 0`); await step(30);
+  await E(`msgT=0;toasts.length=0;LO.say=null;barkCD=0;P.x=npcs[0].x+20;P.y=npcs[0].y+8;npcs[0].st='done';npcs.forEach(n=>{n.bt=0;n.say=null});void 0`);
+  for (let i = 0; i < 12 && !(await E(`!!(npcs[0].say&&npcs[0].say.t>0)`)); i++) { await E(`msgT=0;toasts.length=0;LO.say=null;LO.dig=99;barkCD=0;P.x=npcs[0].x+20;P.y=npcs[0].y+8;void 0`); await step(6); } /* Louie or a message may be talking: one voice at a time */
   ok('Erin says a line as you walk past', await E(`!!(npcs[0].say&&npcs[0].say.t>0)`), await E('npcs[0].say&&npcs[0].say.s')); await E(`__g.draw();void 0`);
   ok('small-talk lines fit a bubble', await E(`Object.values(BARKS).flat().concat(['MORNING, WILL!','THEY WATCH THE LIGHT.','LONG DAY, BRO.']).every(s=>tw(s,1)<=150)`), await E(`Object.values(BARKS).flat().filter(s=>tw(s,1)>150)`));
   await E(`for(let i=0;i<10;i++)mkBud(1,2,P.x,P.y);const it=mkItem('shard',18*16+8,33*16+8);it.w=8;buds.slice(-10).forEach(b=>{b.tgt=it;b.st='carry';it.on.push(b)});window.__it=it;void 0`); const sh0 = await E('shards');
   for (t = 0; t < 120; t++) { await step(30); if ((await E('shards')) > sh0 || (await E('state')) !== 'play') break; }
   ok('a shard dropped inside a wall is still walked home', (await E('shards')) > sh0, t + ' s'); await E(`state='play';sceneQ.length=0;void 0`);
+  await E(`npcs.forEach(n=>{n.st='done';n.mi=n.ms.length});run.keep=0;gates[5].alive=true;void 0`); ok('with the missions done the marker asks for the bridge', /BRIDGE/.test(await E('objective().text')));
+  await E(`gates[5].alive=false;void 0`); ok('then for the old arch', /WILLOW FALLS/.test(await E('objective().text'))); await E(`run.keep=1;void 0`);
+  await E(`found=found.map(()=>true);run.wbSeen={};WBDEF.forEach(q=>run.wbSeen[q[0]]=1);run.boss=true;ZONES.forEach(z=>run.seen[z[0]]=1);run.gdone=0;state='play';void 0`); const tx0 = await E('meta.tix'); await step(120);
+  const tx1 = await E('meta.tix'); await step(120); ok('a full field guide pays two tickets, once', tx1 >= tx0 + 2 && (await E('run.gdone')) === 1 && (await E('meta.tix')) === tx1, [tx0, tx1]);
+  await E(`toasts.length=0;buds.slice(0,2).forEach(b=>{release(b);b.gard=false;b.st='idle';b.x=60*16;b.y=18*16});endDay();void 0`); await step(1); ok('the evening report counts the strays Louie brings home', (await E('tod.strays')) === 2 && (await E('state')) === 'dayend'); await E(`__g.draw();newDay();void 0`);
   await E(`dayT=DAYLEN*.95;flickT=.3;void 0`); await E(`__g.draw();void 0`); ok('night draws, with the lantern skipping', true);
   ok('no page errors', !errs.length, errs);
   console.log(fail ? fail + ' FAILED' : 'ALL PASS'); await browser.close(); process.exit(fail ? 1 : 0);

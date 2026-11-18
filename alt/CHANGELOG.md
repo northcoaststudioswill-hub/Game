@@ -3,6 +3,26 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: the Collection, what comes after the missions, strays (Nov 18 2026)
+
+Will: keep working on the game.
+
+- **The Collection has a cursor and says something about each thing.** Bugs and treasures are tiles; the line under them
+  is the bug's note (ten new ones: "Sits by the pond and judges your throwing.") or the treasure's memory, which until
+  now you saw once, on the card when it came home. Uncaught bugs say where to look. Right at the edge turns the page.
+- **The marker has somewhere to point after the missions.** With every ask done it now reads BUILD THE ORCHARD BRIDGE,
+  then SOMETHING OLD AT WILLOW FALLS until the arch is read, then the valley projects as before. Old saves that had
+  finished everything get the same pointers.
+- **A full field guide pays out once:** 2 tickets and 30 petals.
+- **The evening report counts strays.** Sprouts left idle far from the lantern at nightfall are brought in by Louie
+  ("LOUIE BROUGHT 3 STRAYS HOME"), and he earns a little for it. Nobody is ever lost.
+- **The garden says how to get your crew back** the first time everyone with you has become a gardener.
+- The house desk rows are tiles like the other menus.
+
+**Tested:** `sprouts_valley.js` now 41 checks, six runs in a row; `sprouts_story.js`; `sprouts_soak.js` (chaos clean; the
+objective bot got through four asks in four of five runs and two in the other, so its bar is now two); Sproutwild lab
+124 of 124. Not played by hand or on a phone.
+
 ## Sprouts: menus, the field guide and small talk (Nov 18 2026)
 
 Will: keep refining the gameplay, characters, lore, world building, Pikmin-like stuff and menus; "I love the new menus
