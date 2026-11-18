@@ -373,6 +373,16 @@ body.banding #sign, body.banding #toast, body.banding #effects { opacity: 0 !imp
 #effects { top: 104px; }
 body.upright #toast { top: calc(var(--cvh) + env(safe-area-inset-top) + 72px) !important; }
 body[data-state="talk"]:not(.upright) #toast { top: auto !important; bottom: 12px !important; }   /* never over the speaker's name */
+/* ---- dialogue, tightened: the box is only as tall as its words, the words use its whole width, and Skip is a small
+   tab hanging under the corner where it covers nothing */
+#dialog { padding: 12px 16px 12px 12px; gap: 14px; align-items: flex-start; min-height: 0; }
+#d-body { padding-bottom: 0; } #d-face { width: 76px; height: 76px; }
+#d-text { padding-right: 18px; }
+#d-skip, #dialog.narr #d-skip { position: absolute; float: none; right: 14px; top: auto; bottom: -25px; margin: 0; padding: 4px 12px 5px; font: 800 10px var(--display); letter-spacing: .14em; text-transform: uppercase;
+  color: #cfc8ee; background: linear-gradient(180deg, #1c1838, #14112e); border: 1px solid var(--spk); border-top: 0; border-radius: 0 0 6px 6px; box-shadow: 0 0 0 2px #0a0818; }
+#dialog.narr { padding: 10px 18px; } #dialog.narr #d-text { padding: 0; } #dialog.narr #d-text::before { display: inline; margin: 0 8px 0 0; }
+#d-more { right: 10px; bottom: 6px; }
+body.upright #d-face { width: 64px; height: 64px; }
 /* ---- level and experience, under the Starlight count; touch buttons with a larger area than they look */
 #lvl { position: absolute; right: calc(max(14px, env(safe-area-inset-right)) + 96px); top: 44px; display: flex; align-items: center; gap: 6px; font: 800 10px var(--body); letter-spacing: .1em; color: #9fe8ff; }
 #lvl i { display: block; width: 54px; height: 5px; background: rgba(8,8,24,.75); border: 1px solid #4a7a9a; border-radius: 2px; overflow: hidden; } #lvl i span { display: block; height: 100%; background: linear-gradient(90deg, #4ab8e8, #9fe8ff); transition: width .4s; }
@@ -417,6 +427,40 @@ body.cutin #lvl, body[data-mode] #lvl { visibility: hidden; }
 .tbtn { box-shadow: inset 0 2px 0 rgba(255,255,255,.14), inset 0 -3px 0 rgba(0,0,0,.35), 0 0 0 2px rgba(10,8,24,.6); }
 h2 { letter-spacing: .12em; text-transform: uppercase; }
 #stars .card p { margin: 4px 0 6px; font-size: 14px; }
+/* ---- menus of the courts. Every panel is a writ under a court's seal: a crest (crescent over the four-point star), the
+   court's colour in its border and rules, and its motto. Dusk is violet and silver, the Thorn Queen's Deep is blood-red,
+   the mortal lands are grey and frost. */
+body { --court: #b9a8ff; --court-deep: #2c2466; }
+body[data-court="thorn"] { --court: #ff5a78; --court-deep: #4a1426; }
+body[data-court="mortal"] { --court: #c8d6f0; --court-deep: #2a3450; }
+.card { border: 1px solid var(--court); border-radius: 3px; padding: 14px 24px 18px; text-align: center;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--court-deep) 55%, #0e0c22) 0, #0e0c22 46%, #0a0818 100%);
+  box-shadow: 0 0 0 2px #0a0818, 0 0 0 3px rgba(255,210,122,.5), 0 0 0 7px #0a0818, 0 0 0 8px color-mix(in srgb, var(--court) 45%, transparent), 0 18px 50px rgba(0,0,0,.7), inset 0 0 50px rgba(0,0,0,.45); }
+.card::before { content: ''; display: block; position: static; transform: none; width: 46px; height: 46px; margin: 0 auto 4px; border-radius: 50%; box-shadow: 0 0 0 1px var(--gold), 0 0 0 3px #0a0818, 0 0 0 4px var(--court), 0 0 18px color-mix(in srgb, var(--court) 60%, transparent);
+  background: #14112e url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 46'%3E%3Cpath d='M23 7a13 13 0 1 0 12 18 10.5 10.5 0 0 1-12-18z' fill='%23ffd27a'/%3E%3Cpath d='M29 14l1.6 4.4L35 20l-4.4 1.6L29 26l-1.6-4.4L23 20l4.4-1.6z' fill='%23fff6d8'/%3E%3C/svg%3E") center/cover; }
+.card::after { content: ''; display: block; position: static; transform: none; width: auto; height: 1px; margin: 14px 12% 0; background: linear-gradient(90deg, transparent, var(--court), transparent); box-shadow: none; }
+.card h2 { margin: 2px 0 0; font-size: 20px; letter-spacing: .22em; color: #fff6d8; }
+.card h2::after { content: ''; display: block; height: 1px; margin: 8px 18% 8px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+.motto { font: italic 400 14px 'IM Fell English', Georgia, serif; color: var(--court); margin: -4px 0 8px; }
+.motto::before { content: 'By the Court of Dusk, in Starhaven'; }
+body[data-court="thorn"] .motto::before { content: 'Under the Mountain, by the Thorn Queen\'s leave'; }
+body[data-court="mortal"] .motto::before { content: 'In the mortal lands, south of the Wall'; }
+.pause-wm { display: none; }
+#menu .btn, #stars .btn, #howto .btn, #explain .btn, #tune .btn, #end .btn, #card .btn { font-family: var(--display); letter-spacing: .1em; font-size: 13px; border-radius: 2px; border: 1px solid color-mix(in srgb, var(--court) 55%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--court-deep) 70%, #14112e), #14112e); box-shadow: 0 0 0 2px #0a0818, inset 0 1px 0 rgba(255,255,255,.1); color: #f2eeff; }
+#menu .btn::before { margin-right: 8px; color: var(--gold); font-size: 12px; }
+#m-resume::before { content: '\2726'; } #m-journal::before { content: '\270E'; } #m-stars::before { content: '\2605'; } #m-howto::before { content: '?'; } #m-tune::before { content: '\2699'; }
+#m-restart::before { content: '\21BA'; } #m-controls::before { content: '\2756'; } #m-fullscreen::before { content: '\26F6'; } #m-title::before { content: '\263E'; }
+.btn.primary, #menu #m-resume, #card #c-go, #explain #ex-ok { background: linear-gradient(180deg, #ffe9a8, #d9a441 60%, #b8862e); color: #1c1430; border-color: #fff6d8; }
+#menu #m-resume::before { color: #1c1430; }
+.btn.pad-sel { outline: 2px solid var(--gold); outline-offset: 2px; }
+#m-status { background: rgba(0,0,0,.28); border: 1px solid color-mix(in srgb, var(--court) 35%, transparent); border-radius: 2px; text-align: left; }
+#c-label { font-family: var(--display); letter-spacing: .3em; font-size: 11px; color: var(--court); text-transform: uppercase; }
+#c-name { font-family: var(--display); font-size: 26px; letter-spacing: .08em; color: #fff6d8; margin: 2px 0 2px; } #c-name::after { content: ''; display: block; height: 1px; margin: 8px 20% 8px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+#c-goals { list-style: none; padding: 0; margin: 8px 0; font-family: 'IM Fell English', Georgia, serif; font-size: 16px; } #c-goals li::before { content: '\2726  '; color: var(--gold); font-size: 10px; }
+.star-row, .hw-row { text-align: left; }
+#journal .card::after { display: none; }
+@media (max-height: 460px) { .card { padding: 8px 20px 12px; } .card::before { width: 30px; height: 30px; margin-bottom: 2px; } .card h2 { font-size: 17px; } .card h2::after { margin: 5px 18%; } .card::after { margin-top: 8px; } }
 </style>
 </head>
 <body>
@@ -492,17 +536,18 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
 <div class="screen" id="menu">
   <div class="card">
     <h2>Paused</h2>
+    <div class="motto"></div>
     <div class="pause-wm"></div>
     <div id="m-status"></div>
     <button class="btn primary" id="m-resume">Resume</button>
-    <button class="btn" id="m-journal">Story &amp; goals</button>
+    <button class="btn" id="m-journal">Wren's journal</button>
     <button class="btn" id="m-stars">Constellation</button>
     <button class="btn" id="m-howto">How it works</button>
     <button class="btn" id="m-tune">Tune the feel</button>
-    <button class="btn" id="m-restart">Restart this chapter</button>
+    <button class="btn" id="m-restart">Restart chapter</button>
     <button class="btn" id="m-controls">Controls</button>
     <button class="btn" id="m-fullscreen">Fullscreen</button>
-    <button class="btn" id="m-title">Quit to title (restarts this chapter)</button>
+    <button class="btn" id="m-title">Leave for the title</button>
     <div id="controls">
       <p><b>Keyboard:</b> A/D or arrows move, Space jump, J strike, Shift dash, W talk or paint, S + J in the air strikes down, Esc menu.
          (Z / X / C also jump / strike / dash.)</p>
@@ -6420,6 +6465,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     };
     G.world = w;
     SH.arts.reset(); w.lowT = 0;
+    document.body.dataset.court = { woods: 'mortal', deep: 'thorn' }[def.id] || 'dusk';   // whose realm this is: it colours the menus
     if (SH.xp.level() >= 5 && SH.arts.active()) SH.arts.meter = Math.max(SH.arts.meter, 34);
     SH.draw.init(room, w.viewW);   // drawn with gates open, so gates draw on top as objects
     for (const g of gates) room.setGate(g, !g.open);
@@ -6470,6 +6516,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   // ---------------------------------------------------------------- chapters
   G.startChapter = function (i) {
     G.chapter = i;
+    document.body.dataset.court = { woods: 'mortal', deep: 'thorn' }[ST.CHAPTERS[i].room] || 'dusk';
     G.resumeAt = null; G.pending2 = null;
     G.flags = {}; G.activeGoal = null; G.script = null; G.pending = null;
     fx.reset();

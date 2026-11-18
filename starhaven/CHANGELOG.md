@@ -1,5 +1,24 @@
 # Starhaven — Changelog
 
+## After v0.1 — tighter dialogue, menus of the courts (Nov 18, 2026)
+Will: the Skip button covers too much text and the boxes have too much dead space; redesign the menus to look more
+unique and in the realm of the courts.
+
+- **Skip no longer covers anything.** It is a small tab hanging under the corner of the box, in the speaker's colour.
+  The words use the full width.
+- **No dead space.** The box is as tall as its words: a one-line narration is a one-line box. The portrait is a
+  little smaller, and the padding under the text is gone.
+- **Menus are writs under a court's seal.** Every panel (pause, chapter cards, the Constellation, How it works,
+  explanations, the ending) carries a crest medallion (a crescent over the four-point star), a doubled border, gold
+  rules, and buttons like engraved tablets, each with its own mark.
+- **The court changes with where you are.** In Starhaven the panels are Dusk's violet and silver and the pause screen
+  reads "By the Court of Dusk, in Starhaven". Under the Mountain they turn blood-red, "by the Thorn Queen's leave".
+  In the Winter Woods they are grey and frost, "in the mortal lands, south of the Wall".
+- Pause-menu wording: "Wren's journal", "Restart chapter", "Leave for the title".
+
+The frozen v0.1 in `releases/v0.1/` is unchanged; these are in the working copy and the live link. Tests: 50 play
+checks, 19 menu checks, the fuzz run, the screenshot run. **Not played by hand or on a phone.**
+
 ## v0.1 — the first release of the slice (Nov 18, 2026)
 Will: keep running playtests and improving it to be a quality slice, and release.
 

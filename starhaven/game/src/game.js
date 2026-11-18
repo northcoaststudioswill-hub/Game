@@ -119,6 +119,7 @@
     };
     G.world = w;
     SH.arts.reset(); w.lowT = 0;
+    document.body.dataset.court = { woods: 'mortal', deep: 'thorn' }[def.id] || 'dusk';   // whose realm this is: it colours the menus
     if (SH.xp.level() >= 5 && SH.arts.active()) SH.arts.meter = Math.max(SH.arts.meter, 34);
     SH.draw.init(room, w.viewW);   // drawn with gates open, so gates draw on top as objects
     for (const g of gates) room.setGate(g, !g.open);
@@ -169,6 +170,7 @@
   // ---------------------------------------------------------------- chapters
   G.startChapter = function (i) {
     G.chapter = i;
+    document.body.dataset.court = { woods: 'mortal', deep: 'thorn' }[ST.CHAPTERS[i].room] || 'dusk';
     G.resumeAt = null; G.pending2 = null;
     G.flags = {}; G.activeGoal = null; G.script = null; G.pending = null;
     fx.reset();
