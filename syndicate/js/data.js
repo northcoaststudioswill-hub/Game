@@ -125,20 +125,23 @@
     { id: 'vexa', name: 'Vexa', title: 'the Pale Queen, Pit Champion', cls: 'rogue', race: 'elf', level: 5, sub: 'assassin', known: ['shadowstep', 'fan_knives', 'poison_blade', 'smoke_bomb'], ult: 'flurry', hpMul: 1.3, dmgMul: 0.66, ai: { react: 0.28, aggro: 0.8, dodge: 0.34 }, xp: 350, coin: 400, respect: 260, boss: 1, tint: { armor: '#d8d2e6', cloth: '#6a2a8a', trim: '#ffd36b', hair: '#f2eefc' }, taunt: 'You climbed all this way to bleed on my floor. How thoughtful.' }
   ];
 
-  // Hideout pieces. x,y,r are positions on the hideout plate; lights punch through the darkness when owned.
+  // Hideout pieces, placed on the hideout grid. w,d: footprint in tiles. zone: where it may stand.
   G.DECOR = [
-    { id: 'hearth', name: 'Hearth & Lanterns', cost: 30, rank: 0, perk: 'Lights the house. It finally feels like yours.', x: 590, y: 250, lights: [[590, 300, 190], [590, 180, 150]], glow: '#ffb060' },
-    { id: 'bed', name: 'Feather Bed', cost: 60, rank: 0, perk: 'Well rested: +10% max HP.', x: 770, y: 195, lights: [[775, 205, 135]], glow: '#b890ff' },
-    { id: 'glowcaps', name: 'Glowcap Beds', cost: 70, rank: 1, perk: '+10% resource regeneration.', x: 330, y: 385, lights: [[300, 370, 150], [440, 410, 90]], glow: '#7ab8ff' },
-    { id: 'trophies', name: 'Trophy Shelf', cost: 90, rank: 1, perk: '+10% respect earned.', x: 385, y: 122, lights: [[400, 140, 120]], glow: '#ffd36b' },
-    { id: 'desk', name: 'Planning Desk', cost: 100, rank: 2, perk: 'Study your rivals: +6% cooldown recovery.', x: 385, y: 240, lights: [[385, 240, 110]], glow: '#ffb060' },
-    { id: 'banner', name: 'Syndicate Banners', cost: 120, rank: 2, perk: 'Your name carries: +10% coin earned.', x: 590, y: 116, lights: [[583, 105, 110], [590, 290, 90]], glow: '#c79bff' },
-    { id: 'bloom', name: 'Crystal Bloom', cost: 140, rank: 2, perk: 'Meditation garden: +10% XP earned.', x: 615, y: 525, lights: [[615, 525, 140]], glow: '#b0a0ff' },
-    { id: 'fountain', name: 'Moonwater Fountain', cost: 160, rank: 3, perk: 'Start each fight with a protective ward.', x: 292, y: 562, lights: [[292, 562, 135]], glow: '#6ad0ff' },
-    { id: 'cauldron', name: "Alchemist's Cauldron", cost: 180, rank: 3, perk: 'Brews a free healing potion before every fight.', x: 905, y: 515, lights: [[905, 515, 135]], glow: '#8aff5a' },
-    { id: 'statues', name: 'Guardian Statues', cost: 220, rank: 4, perk: 'Stone watchers: take 5% less damage.', x: 540, y: 392, lights: [[592, 405, 130]], glow: '#ffd9a0' },
-    { id: 'crystals', name: 'Starlight Crystals', cost: 260, rank: 4, perk: 'The whole cavern glitters: +3% crit chance.', x: 900, y: 375, lights: [[900, 370, 160], [430, 650, 170], [820, 650, 170], [110, 330, 150], [1060, 250, 150]], glow: '#8ad0ff' }
+    { id: 'lantern', name: 'Iron Lantern', cost: 15, rank: 0, zone: 'any', w: 1, d: 1, max: 6, perk: 'Warm light wherever you want it.', light: 0xffb060 },
+    { id: 'rug', name: 'Guild Rug', cost: 25, rank: 0, zone: 'house', w: 2, d: 2, max: 2, walk: 1, perk: 'Takes the chill off the stone.' },
+    { id: 'glowcaps', name: 'Glowcap Patch', cost: 35, rank: 0, zone: 'garden', w: 1, d: 1, max: 6, perk: '+10% resource regeneration.', light: 0x6aa8ff },
+    { id: 'bed', name: 'Feather Bed', cost: 60, rank: 0, zone: 'house', w: 1, d: 2, max: 1, perk: 'Well rested: +10% max HP.' },
+    { id: 'trophies', name: 'Trophy Shelf', cost: 90, rank: 1, zone: 'house', w: 2, d: 1, max: 1, perk: '+10% respect earned.' },
+    { id: 'desk', name: 'Planning Desk', cost: 100, rank: 1, zone: 'house', w: 2, d: 1, max: 1, perk: 'Study your rivals: +6% cooldown recovery.', light: 0xffb060 },
+    { id: 'banner', name: 'Syndicate Banner', cost: 110, rank: 2, zone: 'any', w: 1, d: 1, max: 4, perk: 'Your name carries: +10% coin earned.' },
+    { id: 'bloom', name: 'Crystal Bloom', cost: 120, rank: 2, zone: 'garden', w: 1, d: 1, max: 4, perk: 'Meditation garden: +10% XP earned.', light: 0xb090ff },
+    { id: 'fountain', name: 'Moonwater Fountain', cost: 160, rank: 3, zone: 'garden', w: 2, d: 2, max: 1, perk: 'Start each fight with a protective ward.', light: 0x6ad0ff },
+    { id: 'cauldron', name: "Alchemist's Cauldron", cost: 180, rank: 3, zone: 'any', w: 1, d: 1, max: 1, perk: 'Brews a free healing potion before every fight.', light: 0x8aff5a },
+    { id: 'statues', name: 'Guardian Statue', cost: 200, rank: 4, zone: 'any', w: 1, d: 1, max: 2, perk: 'Stone watchers: take 5% less damage.' },
+    { id: 'crystals', name: 'Starlight Spire', cost: 240, rank: 4, zone: 'garden', w: 1, d: 1, max: 2, perk: 'The cavern glitters: +3% crit chance.', light: 0x8ad0ff }
   ];
+  G.DECOR_BY = {}; G.DECOR.forEach(d => G.DECOR_BY[d.id] = d);
+  G.owned = st => { const o = {}; (st.items || []).forEach(p => o[p.id] = (o[p.id] || 0) + 1); return o; };
 
   G.GEAR = {
     weapon: { name: 'Weapon', tiers: [null, { name: 'Runed Edge', cost: 110, desc: '+2 damage on weapon hits. Your weapon glows cyan.' }, { name: 'Syndicate Relic', cost: 240, desc: '+4 damage on weapon hits. Your weapon burns gold.' }] },

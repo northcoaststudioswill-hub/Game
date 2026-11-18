@@ -48,13 +48,13 @@
 
   // ------------------------------------------------------------ title
   ui.title = function () {
-    G.scene = 'title'; ui.topbar(); $('#hud').className = 'hidden';
+    G.scene = 'title'; G.enterTitle(); ui.topbar(); $('#hud').className = 'hidden';
     const has = G.hasSave();
     show('<div class="title-wrap"><div class="t-over">DEEP GUILD · SHADOW · COIN · OATH</div><h1>Underground<br>Syndicate</h1>' +
       '<p class="t-sub">One-on-one pit fighting. Build a class. Earn respect. Make the dark your home.</p>' +
       '<div class="t-btns">' + (has ? '<button class="big" id="bCont">Continue</button>' : '') +
       '<button class="' + (has ? '' : 'big') + '" id="bNew">New Fighter</button></div>' +
-      '<p class="t-foot">Vertical slice · 4 classes · 5 opponents · hideout & garden</p></div>', 'title');
+      '<p class="t-foot">Vertical slice · 4 classes · 5 opponents · a hideout to furnish</p></div>', 'title');
     on('#bCont', () => { G.load(); ui.hub(); });
     on('#bNew', () => {
       if (has) show('<div class="card small"><h2>Start over?</h2><p>This replaces your current fighter and hideout.</p><div class="row"><button id="y" class="danger">Start over</button><button id="n">Keep my fighter</button></div></div>');
@@ -65,7 +65,7 @@
 
   // ------------------------------------------------------------ character creation
   ui.create = function () {
-    G.scene = 'create';
+    G.scene = 'create'; G.enterCreate();
     const pick = G.createPick = G.createPick || { race: 'human', cls: 'fighter', name: '' };
     const render = () => {
       const C = G.CLASSES[pick.cls], R = G.RACES[pick.race], stats = G.baseStats(pick.cls, pick.race);
@@ -77,8 +77,8 @@
       h += '<h3>Starting kit <span class="dim">· resource: ' + C.res + '</span></h3>' + withRes(abCard(C.basic) + C.start.map(id => abCard(id)).join(''), pick.cls);
       h += '<p class="dim">Level 2: choose ' + C.l2.map(i => A[i].name).join(' or ') + '. Level 3: choose a subclass, ' + Object.values(C.subs).map(s => s.name).join(' or ') + '. Level 4: a feat. Level 5: ' + A[C.ult].name + '.</p>';
       h += '<div class="row end"><input id="nm" maxlength="16" placeholder="Name your fighter" value="' + esc(pick.name) + '"><button class="big" id="go">Enter the Undercity</button></div></div>';
-      show(h, 'right');
-      panel().querySelectorAll('.cp').forEach(el => el.appendChild(G.portrait({ cls: el.dataset.p, race: pick.race }, 54, 1.2)));
+      show(h, 'right'); G.setPreview({ cls: pick.cls, race: pick.race });
+      panel().querySelectorAll('.cp').forEach(el => el.appendChild(G.portrait({ cls: el.dataset.p, race: pick.race }, 54)));
       const nm = $('#nm'); nm.oninput = () => pick.name = nm.value;
       on('[data-race]', el => { pick.race = el.dataset.race; render(); });
       on('[data-cls]', el => { pick.cls = el.dataset.cls; render(); });
@@ -92,22 +92,85 @@
   };
 
   // ------------------------------------------------------------ hub + hideout
+  const W = () => G.world;
   ui.hub = function (first) {
-    G.scene = 'hub'; ui.close(); $('#hud').className = 'hidden'; ui.topbar();
+    ui.close(); $('#hud').className = 'hidden'; G.placing = null; ui.placeBar();
+    G.scene = 'hub'; W().enter('hub', G.hubPos); ui.topbar();
     if (first) show('<div class="card small"><h2>The Undercity</h2><p>You owe the Deep Guild a debt, and the only currency they respect is blood on the pit floor.</p>' +
-      '<p>Win fights to earn <b>XP</b>, <b>coin</b> and <b>respect</b>. Respect raises your syndicate rank. Coin buys gear and turns the damp hole they gave you into a home.</p>' +
-      '<p class="dim">Tap the glowing markers to visit the Pit, the Fence, your Hideout, or the Guildmaster.</p><div class="row end"><button class="big" id="ok">Let’s go</button></div></div>');
+      '<p>Win fights to earn <b>XP</b>, <b>coin</b> and <b>respect</b>. Respect raises your syndicate rank. Coin buys gear and turns the damp cave they gave you into a home.</p>' +
+      '<p class="dim">Walk with WASD or the thumb stick, or tap where you want to go. Walk up to the Pit gate, the Fence, the Guildmaster or your Hideout door.</p><div class="row end"><button class="big" id="ok">Let’s go</button></div></div>');
     on('#ok', () => ui.close());
   };
-  ui.hideout = function () { G.scene = 'hideout'; ui.close(); ui.topbar(); G.hideoutDirty = true; };
+  ui.leaveHub = () => { const w = W().walker; if (G.scene === 'hub') G.hubPos = { x: w.x, z: Math.max(w.z, 1.2) }; };
+  ui.hideout = function () {
+    ui.leaveHub(); ui.close(); G.hubPos = { x: 1.2, z: 5.2 };
+    G.scene = 'hideout'; W().enter('hideout'); ui.topbar();
+    if (!G.state.seenHideout) { G.state.seenHideout = true; G.save(); ui.toast('This cave is yours. Press Decorate to furnish the house and plant the garden.'); }
+  };
 
-  ui.decor = function (d) {
-    const st = G.state, rk = G.rankOf(st.respect), own = st.decor[d.id], locked = rk < d.rank, poor = st.coin < d.cost;
-    show('<div class="card small"><h2>' + d.name + '</h2><p>' + d.perk + '</p>' +
-      (own ? '<p class="good">Installed.</p>' : locked ? '<p class="bad">Requires rank: ' + G.RANKS[d.rank].name + '</p>' : '<p><span class="coin"></span> <b>' + d.cost + '</b> coin' + (poor ? ' <span class="bad">· you have ' + st.coin + '</span>' : '') + '</p>') +
-      '<div class="row end">' + (!own && !locked ? '<button class="big" id="buy"' + (poor ? ' disabled' : '') + '>Install</button>' : '') + '<button id="x">Close</button></div></div>');
+  // The catalog: buy a piece, then place it on the grid.
+  ui.catalog = function () {
+    const st = G.state, rk = G.rankOf(st.respect), own = G.owned(st);
+    let h = '<div class="card"><h2>Decorate</h2><p class="dim">Buy a piece, then choose where it stands. Tap anything already placed to move or store it. You have <b>' + st.coin + '</b> coin.</p>';
+    G.DECOR.forEach(d => {
+      const n = own[d.id] || 0, locked = rk < d.rank, full = n >= d.max, poor = st.coin < d.cost;
+      h += '<div class="ab-row' + (locked ? ' lockedrow' : '') + '"><div class="ab-ic pas" style="color:' + (d.light ? '#' + d.light.toString(16).padStart(6, '0') : 'var(--gold)') + '">' + (d.zone === 'garden' ? '❀' : d.zone === 'house' ? '⌂' : '✦') + '</div><div class="ab-tx"><b>' + d.name + '</b>' +
+        '<small>' + (d.zone === 'any' ? 'House or garden' : d.zone === 'house' ? 'House' : 'Garden') + ' · ' + d.w + '×' + d.d + (d.max > 1 ? ' · ' + n + '/' + d.max + ' placed' : n ? ' · placed' : '') + '</small><p>' + d.perk + '</p></div>' +
+        (locked ? '<span class="lock">' + G.RANKS[d.rank].name + '</span>' : full ? '<span class="lock">Owned</span>' : '<button class="big" data-buy="' + d.id + '"' + (poor ? ' disabled' : '') + '>' + d.cost + ' coin</button>') + '</div>';
+    });
+    h += '<div class="row end"><button id="x">Close</button></div></div>';
+    show(h);
+    on('#x', () => { ui.close(); ui.topbar(); });
+    on('[data-buy]', el => { const w = W().walker; ui.close(); ui.startPlace({ id: el.dataset.buy, x: Math.round(w.x), z: Math.round(w.z) + 1, r: 0, from: null }); });
+  };
+  ui.startPlace = function (pl) {
+    const H = W().get('hideout'), it = G.DECOR_BY[pl.id];
+    if (pl.from == null && !H.canPlace(pl.id, pl.x, pl.z, pl.r)) {       // find the nearest free spot to start from
+      let best = null, bd = 1e9;
+      for (let x = 0; x < W().grid.GW; x++) for (let z = 0; z < W().grid.GD; z++) if (H.canPlace(pl.id, x, z, 0)) { const d = Math.hypot(x - pl.x, z - pl.z); if (d < bd) { bd = d; best = [x, z]; } }
+      if (best) { pl.x = best[0]; pl.z = best[1]; }
+    }
+    G.placing = pl; H.setGhost(pl); ui.placeBar();
+  };
+  ui.placeBar = function () {
+    const pl = G.placing, bar = $('#placebar');
+    if (!pl || G.scene !== 'hideout') { bar.className = 'hidden'; return; }
+    const it = G.DECOR_BY[pl.id];
+    bar.className = '';
+    bar.querySelector('span').innerHTML = '<b>' + it.name + '</b> ' + (pl.ok ? 'Tap a tile to move it.' : '<i class="bad">' + (it.zone === 'house' ? 'Needs a free spot inside the house.' : it.zone === 'garden' ? 'Needs a free spot in the garden.' : 'That spot is taken.') + '</i>');
+    $('#plOk').disabled = !pl.ok; $('#plRot').style.display = it.w === it.d ? 'none' : '';
+    $('#plCancel').textContent = pl.from == null ? 'Cancel' : 'Put back';
+  };
+  ui.placeMove = function (x, z) {
+    const pl = G.placing; if (!pl) return;
+    const f = W().grid.footprint(G.DECOR_BY[pl.id], pl.r);
+    pl.x = Math.round(x - (f[0] - 1) / 2); pl.z = Math.round(z - (f[1] - 1) / 2);
+    W().get('hideout').setGhost(pl); ui.placeBar();
+  };
+  ui.placeInit = function () {
+    const H = () => W().get('hideout'), done = () => { G.placing = null; H().setGhost(null); H().refresh(); ui.placeBar(); ui.topbar(); G.save(); };
+    $('#plRot').onclick = () => { const pl = G.placing; if (!pl) return; G.sfx('ui'); pl.r = (pl.r + 1) % 2; H().setGhost(pl); ui.placeBar(); };
+    $('#plOk').onclick = () => {
+      const pl = G.placing, st = G.state; if (!pl || !pl.ok) return;
+      const it = G.DECOR_BY[pl.id];
+      if (pl.from == null) { st.coin -= it.cost; st.items.push({ id: pl.id, x: pl.x, z: pl.z, r: pl.r }); G.sfx('coin'); ui.toast(it.name + ' placed. ' + it.perk); }
+      else { const p = st.items[pl.from]; p.x = pl.x; p.z = pl.z; p.r = pl.r; delete p.hidden; }
+      G.sfx('buff'); G.gfx.burst(pl.x, 0.6, pl.z, it.light || 0xffd36b, 26, 3, 4); done();
+    };
+    $('#plCancel').onclick = () => { const pl = G.placing; if (!pl) return; G.sfx('ui'); if (pl.from != null) delete G.state.items[pl.from].hidden; done(); };
+    $('#decorBtn').onclick = () => { G.audioInit(); G.sfx('ui'); ui.catalog(); };
+    $('#prompt').onclick = () => { G.audioInit(); G.sfx('ui'); if (G.near) G.near.go(); };
+  };
+  ui.itemCard = function (i) {
+    const st = G.state, p = st.items[i], it = G.DECOR_BY[p.id];
+    show('<div class="card small"><h2>' + it.name + '</h2><p>' + it.perk + '</p><div class="row end"><button id="st">Store (refund ' + it.cost + ')</button><button id="mv" class="big">Move</button><button id="x">Close</button></div></div>');
     on('#x', () => ui.close());
-    on('#buy', () => { st.coin -= d.cost; st.decor[d.id] = true; G.save(); G.sfx('coin'); G.sfx('buff'); G.hideoutDirty = true; G.decorPop = { id: d.id, t: 0 }; ui.close(); ui.topbar(); ui.toast(d.name + ' installed. ' + d.perk); });
+    on('#mv', () => { ui.close(); p.hidden = true; W().get('hideout').refresh(); ui.startPlace({ id: p.id, x: p.x, z: p.z, r: p.r, from: i }); });
+    on('#st', () => { st.items.splice(i, 1); st.coin += it.cost; G.save(); G.sfx('coin'); W().get('hideout').refresh(); ui.close(); ui.topbar(); });
+  };
+  ui.banner = function (a, b, cls) {
+    const el = $('#banner'); if (!a) { el.className = 'hidden'; return; }
+    el.className = cls || ''; el.querySelector('b').textContent = a; el.querySelector('small').textContent = b || '';
   };
 
   // ------------------------------------------------------------ the pit ladder
@@ -130,7 +193,7 @@
   };
 
   const CONTROLS = '<div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Mouse</kbd> aim</span><span><kbd>Click</kbd> attack</span><span><kbd>Space</kbd> dodge</span><span><kbd>Q</kbd><kbd>E</kbd><kbd>R</kbd> abilities</span><span><kbd>F</kbd> ultimate</span><span><kbd>C</kbd> potion</span><span><kbd>Esc</kbd> pause</span></div>' +
-    '<p class="dim">On touch: left thumb moves, buttons on the right. Aim locks to your opponent. Red marks on the floor are incoming attacks. Dodge through them to thrill the crowd.</p>';
+    '<p class="dim">On a phone: left thumb moves, buttons on the right, and your aim locks to your opponent. Red marks on the floor are incoming attacks. Dodge through them to thrill the crowd.</p>';
   ui.prefight = function (o) {
     const st = G.state, h = st.hero;
     show('<div class="card vs"><div class="vs-row"><div class="vs-side"><span id="vp"></span><b>' + esc(h.name) + '</b><small>Lv ' + h.level + ' ' + G.CLASSES[h.cls].name + '</small></div><div class="vs-mid">VS</div>' +
@@ -139,14 +202,13 @@
       '<div class="row end"><button id="x">Back</button><button class="big" id="go">Enter the pit</button></div></div>');
     $('#vp').appendChild(G.portrait(G.lookOf(h, st), 96, 1.2)); $('#ve').appendChild(G.portrait({ cls: o.cls, race: o.race, tint: o.tint }, 96, 1.2));
     on('#x', () => ui.pit());
-    on('#go', () => { ui.close(); G.scene = 'fight'; ui.topbar(); G.fight.start(o); });
+    on('#go', () => { ui.leaveHub(); ui.close(); G.scene = 'fight'; ui.topbar(); G.fight.start(o); });
   };
 
   // ------------------------------------------------------------ fight HUD
   let hudEls = null;
   ui.buildHud = function (P, E) {
     const hud = $('#hud'); hud.className = G.input.touch ? 'touch' : '';
-    $('#touch').className = G.input.touch ? '' : 'hidden';
     const side = (el, e) => { el.querySelector('.hud-name').textContent = e.name; el.querySelector('.res i').style.background = e.C.resColor; };
     side($('#hudP'), P); side($('#hudE'), E);
     const bar = $('#abar'); bar.innerHTML = '';
@@ -266,7 +328,7 @@
     s += '<h3>Basic attack and passives</h3>' + withRes(abCard(C.basic), h.cls);
     if (sub) s += '<div class="ab-row"><div class="ab-ic pas">★</div><div class="ab-tx"><b>' + sub.passive[0] + '</b><small>' + sub.name + '</small><p>' + sub.passive[1] + '</p></div></div>';
     h.feats.forEach(f => s += '<div class="ab-row"><div class="ab-ic pas">✦</div><div class="ab-tx"><b>' + G.FEATS[f].name + '</b><small>Feat</small><p>' + G.FEATS[f].desc + '</p></div></div>');
-    const perks = G.DECOR.filter(x => st.decor[x.id]);
+    const own = G.owned(st), perks = G.DECOR.filter(x => own[x.id] && /[+%]|ward|potion|less/.test(x.perk));
     if (perks.length) s += '<h3>Hideout comforts</h3><ul class="perks">' + perks.map(x => '<li><b>' + x.name + '</b> ' + x.perk + '</li>').join('') + '</ul>';
     s += '<div class="row end"><button class="big" id="x">Done</button></div></div>';
     show(s);

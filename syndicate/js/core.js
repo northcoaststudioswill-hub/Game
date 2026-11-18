@@ -13,31 +13,19 @@
   G.esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   // ---------- save ----------
-  const KEY = 'underground_syndicate_v1';
-  G.newState = () => ({ v: 1, hero: null, coin: 0, respect: 0, wins: {}, losses: 0, decor: {}, gear: { weapon: 0, armor: 0 }, potions: 1, seenHelp: false });
+  const KEY = 'underground_syndicate_v2';
+  G.newState = () => ({ v: 2, hero: null, coin: 0, respect: 0, wins: {}, losses: 0, items: [], gear: { weapon: 0, armor: 0 }, potions: 1, seenHelp: false });
   G.state = G.newState();
   G.save = () => { try { localStorage.setItem(KEY, JSON.stringify(G.state)); } catch (e) { } };
   G.load = () => {
     try {
       const s = JSON.parse(localStorage.getItem(KEY) || 'null');
-      if (s && s.v === 1 && s.hero) { G.state = Object.assign(G.newState(), s); return true; }
+      if (s && s.v === 2 && s.hero) { G.state = Object.assign(G.newState(), s); return true; }
     } catch (e) { }
     return false;
   };
-  G.hasSave = () => { try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); return !!(s && s.hero); } catch (e) { return false; } };
+  G.hasSave = () => { try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); return !!(s && s.v === 2 && s.hero); } catch (e) { return false; } };
   G.wipe = () => { try { localStorage.removeItem(KEY); } catch (e) { } G.state = G.newState(); };
-
-  // ---------- images ----------
-  G.img = {};
-  G.loadImages = (list, done) => {
-    let left = list.length;
-    list.forEach(n => {
-      const im = new Image();
-      im.onload = im.onerror = () => { if (--left === 0) done(); };
-      im.src = 'assets/' + n + '.jpg';
-      G.img[n] = im;
-    });
-  };
 
   // ---------- audio (tiny synth, no files) ----------
   let ac = null, master = null;
@@ -124,7 +112,7 @@
       if (f === 'focused') d.regen *= 1.35;
     });
     if (st) {
-      const dc = st.decor || {};
+      const dc = G.owned(st);
       if (dc.bed) d.maxHp *= 1.1;
       if (dc.trophies) d.respectMul += 0.1;
       if (dc.banner) d.coinMul += 0.1;

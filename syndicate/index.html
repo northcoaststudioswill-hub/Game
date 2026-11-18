@@ -2,51 +2,60 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Underground Syndicate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="stage">
-  <canvas id="cv"></canvas>
-  <div id="ui">
-    <div id="topbar" class="hidden"></div>
-    <div id="hud" class="hidden">
-      <div class="hud-top">
-        <div class="hud-side" id="hudP">
-          <div class="hud-name"></div>
-          <div class="bar hp"><i></i><b></b><span></span></div>
-          <div class="bar res"><i></i></div>
-          <div class="hud-status"></div>
-        </div>
-        <div class="hud-mid">
-          <div class="hype-label">CROWD</div>
-          <div class="bar hype"><i></i></div>
-        </div>
-        <div class="hud-side right" id="hudE">
-          <div class="hud-name"></div>
-          <div class="bar hp"><i></i><b></b><span></span></div>
-          <div class="bar res"><i></i></div>
-          <div class="hud-status"></div>
-        </div>
+<canvas id="cv"></canvas>
+<div id="ui">
+  <div id="floaters"></div>
+  <div id="tags"></div>
+  <div id="topbar" class="hidden"></div>
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <div class="hud-side" id="hudP">
+        <div class="hud-name"></div>
+        <div class="bar hp"><i></i><b></b><span></span></div>
+        <div class="bar res"><i></i></div>
+        <div class="hud-status"></div>
       </div>
-      <div id="abar"></div>
-      <div id="touch" class="hidden">
-        <div id="stickZone"><div id="stickBase"><div id="stickNub"></div></div></div>
-        <button id="tAtk" class="tbtn">ATK</button>
-        <button id="tDodge" class="tbtn">DODGE</button>
+      <div class="hud-side right" id="hudE">
+        <div class="hud-name"></div>
+        <div class="bar hp"><i></i><b></b><span></span></div>
+        <div class="bar res"><i></i></div>
+        <div class="hud-status"></div>
       </div>
-      <button id="pauseBtn" class="mini">II</button>
     </div>
-    <div id="toast"></div>
-    <div id="panel" class="hidden"></div>
+    <div class="hud-mid">
+      <div class="hype-label">CROWD</div>
+      <div class="bar hype"><i></i></div>
+      <button id="pauseBtn" class="mini">Pause</button>
+    </div>
+    <div id="abar"></div>
   </div>
+  <div id="foeArrow" class="hidden"></div>
+  <div id="banner" class="hidden"><b></b><small></small></div>
+  <div id="touch" class="hidden">
+    <div id="stickZone"><div id="stickBase"><div id="stickNub"></div></div></div>
+    <button id="tAtk" class="tbtn">ATK</button>
+    <button id="tDodge" class="tbtn">DODGE</button>
+  </div>
+  <button id="prompt" class="big hidden"></button>
+  <button id="decorBtn" class="hidden">Decorate</button>
+  <div id="placebar" class="hidden"><span></span><div class="row"><button id="plRot">Rotate</button><button id="plCancel">Cancel</button><button id="plOk" class="big">Place here</button></div></div>
+  <div id="toast"></div>
+  <div id="panel" class="hidden"></div>
 </div>
+<script src="lib/three.min.js"></script>
 <script src="js/core.js"></script>
 <script src="js/data.js"></script>
-<script src="js/draw.js"></script>
+<script src="js/gfx.js"></script>
+<script src="js/models.js"></script>
+<script src="js/world.js"></script>
+<script src="js/places.js"></script>
 <script src="js/fight.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/main.js"></script>

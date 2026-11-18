@@ -1,61 +1,73 @@
 # Underground Syndicate (vertical slice)
 
 An isometric one-on-one pit fighter with D&D-style class builds. Real-time action combat,
-BG3-flavoured levelling, and a hideout and garden you restore with your winnings.
+BG3-flavoured levelling, and a hideout you furnish and plant with your winnings.
 
-**Play:** open `index.html` in a browser (no build step, no dependencies), or serve the folder:
-`python3 -m http.server` and visit `http://localhost:8000`.
+**Play:** open `index.html` in a browser (no build step), or serve the folder with
+`python3 -m http.server` and visit `http://localhost:8000`. It fills whatever window it is given:
+phone portrait, phone landscape, or a desktop monitor.
 
 ## What is in the slice
 
-- **Character creation:** 5 origins (ability bonuses and a different look) x 4 classes
-  (Fighter, Rogue, Sorcerer, Cleric), six ability scores that each do something in combat.
-- **Real-time combat:** move, aim, basic attack, dodge with invulnerability frames, three
-  ability slots, an ultimate, potions. Enemy attacks telegraph on the floor in red.
-  Damage is rolled with real dice (1d8 + STR and so on), with crits, stuns, slows, burns,
-  poison, wards, stealth and Sneak Attacks.
-- **Builds:** level 2 ability choice, level 3 subclass (two per class, each a passive and an
-  ability), level 4 feat, level 5 ultimate. More abilities than slots, so you choose a loadout.
-- **The ladder:** five opponents ending in the Pit Champion, each a different class with its own AI.
-- **Economy:** XP, coin and respect. A crowd-hype meter (land hits, dodge through attacks,
-  vary your abilities) raises the respect and coin you take home. Respect sets your syndicate rank.
-- **Hideout and garden:** 11 pieces to install. Each one lights up part of the pre-rendered
-  plate and gives a small perk. Rank gates the better ones.
+- **True isometric 3D.** A fixed isometric camera over real geometry, with dynamic lights,
+  shadows, torch flicker and spell light on the stone. Built on three.js (vendored in `lib/`).
+- **Three places you walk around:** the Undercity street (the Pit gate, the Fence, the
+  Guildmaster, your Hideout door), the Blood Pit arena, and your Hideout.
+- **Character creation:** 5 origins x 4 classes (Fighter, Rogue, Sorcerer, Cleric), six
+  ability scores that each do something in combat.
+- **Real-time combat:** move, aim, attack, dodge with invulnerability frames, three ability
+  slots, an ultimate, potions. Enemy attacks telegraph on the floor in red. Damage is rolled on
+  real dice (1d8 + STR and so on), with crits, stuns, slows, burns, poison, wards, stealth and
+  Sneak Attacks.
+- **Builds:** level 2 ability choice, level 3 subclass (two per class), level 4 feat, level 5
+  ultimate. More abilities than slots, so you choose a loadout.
+- **The ladder:** five opponents ending in the Pit Champion.
+- **Economy:** XP, coin and respect. A crowd-hype meter (land hits, dodge through attacks, vary
+  your abilities) raises what you take home. Respect sets your syndicate rank.
+- **Hideout and garden:** buy furniture, lights, plants and trophies and place them yourself on
+  the grid, indoors or in the garden. Move, rotate or store anything. Most pieces give a small
+  perk; rank gates the better ones.
 - **The Fence:** weapon and armour tiers (which change how your fighter looks) and potions.
-- Keyboard and mouse, plus touch controls. Progress saves in the browser.
+- Progress saves in the browser.
 
 ## Controls
 
 | Action | Keyboard / mouse | Touch |
 |---|---|---|
-| Move | WASD | left thumb stick |
+| Move | WASD or arrows (or click the ground outside fights) | left thumb stick, or tap the ground |
+| Interact | E, or the gold button | the gold button, or tap a name tag |
 | Aim | mouse | locks to opponent |
 | Attack | left click (hold) | ATK |
 | Dodge | Space or right click | DODGE |
 | Abilities | Q, E, R | ability buttons |
 | Ultimate | F | ability button |
 | Potion | C | potion button |
-| Pause | Esc | pause button |
+| Pause | Esc | Pause |
 
-## How it follows the art direction doc
+## Art direction
 
-`docs/Art_Direction_Handoff.docx` is the source. The three concept plates from it are used
-directly as the pre-rendered backgrounds (`assets/arena.jpg`, `street.jpg`, `hideout.jpg`);
-characters, weapons, spells, hit effects, torch flicker and fog are drawn live on Canvas on top.
-The hideout "upgrade" is a darkness layer over the plate with a light punched through for each
-installed piece. Characters are procedural placeholder art, lit to sit on the plates; they are
-the first thing to replace with real sprite sheets.
+`docs/Art_Direction_Handoff.docx` is the brief and `docs/concept/` holds its concept images
+(mood reference only; the game does not draw them). Characters are chunky low-poly "tabletop
+miniature" models built in code from primitives and animated procedurally. They are the first
+thing a 3D artist would replace: swap `G.makeChar` in `js/models.js` for loaded rigged models
+and the rest of the game does not change.
 
 ## Files
 
 - `js/data.js` classes, abilities, opponents, ranks, decor, gear (all tuning lives here)
 - `js/core.js` dice, save, audio synth, derived stats
-- `js/fight.js` combat simulation, AI, fight rendering
-- `js/draw.js` character renderer
-- `js/ui.js` menus, HUD, level-up and results screens
-- `js/main.js` input, hub and hideout scenes, main loop
+- `js/gfx.js` renderer, isometric camera, procedural textures, particles
+- `js/models.js` character models and animation
+- `js/world.js` the arena; `js/places.js` the street, the hideout, decor pieces, walking
+- `js/fight.js` combat simulation, AI, and its 3D effects
+- `js/ui.js` menus, HUD, level-up and results screens; `js/main.js` input and main loop
+
+## Shipping beyond the browser
+
+It is a plain web app, so a Steam build is a desktop wrapper (Electron or Tauri) around this
+folder, and phone store builds are a web-view wrapper (Capacitor). Not set up yet.
 
 ## Not in the slice yet
 
-Real character sprites and animation, more arenas, walking around the hub and hideout, free
-placement of decorations, more classes and levels past 5, multiclassing, music, gamepad support.
+Authored character models and animation, more arenas, more classes and levels past 5,
+multiclassing, music, gamepad support, cloud saves.
