@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Book One. Current build: v0.11 (the Assay: 3D fights, fury, Memory Arts, film opening, save slots) (see CHANGELOG.md).
+Book One. Current build: v0.12 (the surface in real 3D; v0.11 added the Assay, fury, Memory Arts, the film opening and save slots) (see CHANGELOG.md).
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -120,6 +120,12 @@ Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at F
 - Purpose: show where the rage goes, and give the slow undercity chapters something to fall toward. The two halves should feel like different games: Cinderwell is dark, slow, talk and stealth; the Assay is daylight, fast, almost wordless except for Kael's voice.
 - Placement: opening before the title; The Valley at New Game; The Ford between Day 1 and Day 2; The Keep at the end of Day 2.
 - Kael's narration is first person, present tense, short. He counts things. He never says he is angry; he describes what he does with it.
+
+## Two worlds, two renderers
+- Below (Cinderwell, the Ember Ring, the furnace): 2D pixel art on the 320×180 canvas.
+- Above (the Assay: valley, ford, keep, and the surface half of the opening): real 3D in `src/g3.js`, a small WebGL renderer with no library. Flat-shaded boxes, cones and cylinders; one sun; planar shadows; fog; additive glow sprites. The pixel HUD, captions and cut-ins are still drawn on the 2D canvas, which sits on top and goes transparent.
+- `Brawl` owns the logic and the camera (`cam {x, y, h, f, hor, roll}`); `G3.begin / char / poly / ring / glow / end` draw a frame from it. `G3.proj` gives screen positions back to the 2D layer. `G3.LOOK` holds each place's sky, sun and fog; `G3.env(bg)` builds its scenery once.
+- The style reference is the user's own game Guttercrown (three.js). Three.js itself is not used here because it could not be loaded in the build workspace.
 
 ## Art direction
 - Reference boards from the user show the target look: dense 16-bit pixel art, a cutaway with a pristine ruling settlement above and lamp-lit warrens below, gold-edged sign plates naming every chamber, banners, and framed menu panels with a world map.

@@ -247,7 +247,7 @@ const Menus = {
     ] }));
   },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. Book One vertical slice (v0.11): the prologue, two days in Cinderwell, and three battles from the Assay, four years on. In a fight: A strikes (three-hit chain), B dodges (dodge through the red for an opening), and when the fury bar is full, hold A for ELEVEN.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. Book One vertical slice (v0.12): the prologue, two days in Cinderwell, and three battles from the Assay, four years on. In a fight: A strikes (three-hit chain), B dodges (dodge through the red for an opening), and when the fury bar is full, hold A for ELEVEN.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));

@@ -38,6 +38,7 @@ node build.mjs
 | `src/cinema.js` | Cutscene engine and the prologue scripts |
 | `src/panels.js` | Illustrated story panels that cutscenes cut to |
 | `src/brawl.js` | Pseudo-3D arena fights: fury, ELEVEN, Memory Arts, the shot player used by the opening |
+| `src/g3.js` | Real 3D for the surface: a small WebGL renderer (no library) |
 | `src/ff.js` | The Assay: opening sequence and the three flash-forward battles |
 | `src/checkpoints.js` | Captured saves for the dev checkpoint menu |
 | `src/day2.js` | Day 2 "First Fire": dialogue, hotspots, the Ember Ring, festival cutscenes |

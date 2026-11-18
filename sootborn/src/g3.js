@@ -99,6 +99,12 @@ const G3 = {
       A.box(I, 0, .2, 0, 20, .3, 5, '#e8c25a', 1); A.box(I, 0, .2, 0, 5, .3, 20, '#e8c25a', 1);
       for (let i = -9; i <= 9; i++) merlon(i * 28, -hh - 38, 0); for (let i = -3; i <= 8; i++) { merlon(-256, i * 28 - 20, 1.5708); merlon(256, i * 28 - 20, 1.5708); }
       A.box(I, 0, -60, -hh - 46, 560, 120, 6, '#d4cec0'); A.box(I, -260, -60, 80, 6, 120, 340, '#cac4b6'); A.box(I, 260, -60, 80, 6, 120, 340, '#cac4b6');
+      // she watches from the dais. She does not know his face.
+      { const m = M4.t(0, 0, -hh - 22); Sh.box(m, 0, 7, 0, 90, 14, 26, '#f2ede2'); A.box(m, 0, 13.4, 13.2, 90, 1.2, .5, '#e8c25a', 1); Sh.box(m, 0, 2.5, 17, 60, 5, 8, '#e6e0d2'); Sh.box(m, 0, 30, -8, 16, 34, 6, '#f6f3ec'); A.box(m, 0, 44, -4.8, 10, 10, .5, '#e8c25a', 1); A.box(m, 0, 44, -4.5, 4, 4, .5, '#2a2438', 1);
+        const cm = M4.t(0, 14, -hh - 20); Sh.cyl(cm, 0, 0, 0, 7, 4, 26, 7, '#f4f2ec'); A.cyl(cm, 0, 0, 0, 7.2, 7.2, 1.4, 7, '#e8c25a', 1); Sh.box(cm, 0, 30, 0, 6.4, 7.4, 6.4, '#f4e6dc'); Sh.box(cm, 0, 31, -2.6, 8, 12, 3, '#f6eac0'); A.box(cm, 0, 34.6, 0, 7.4, 1.4, 7.4, '#e8c25a', 1); A.box(cm, -1.6, 30.6, 3.3, 1.2, 1, .3, [1, .8, .3], 1); A.box(cm, 1.6, 30.6, 3.3, 1.2, 1, .3, [1, .8, .3], 1);
+        for (const sx of [-1, 1]) { const wm = M4.t(sx * 26, 14, -hh - 20); Sh.cyl(wm, 0, 0, 0, 6, 4, 24, 6, '#c8ccd8'); Sh.box(wm, 0, 28, 0, 7, 8, 7, '#d8dce4'); A.box(wm, 0, 28.6, 3.6, 5, 1.2, .3, '#1e1e28', 1); Sh.cyl(wm, sx * 7, 0, 2, .7, .7, 52, 4, '#b8bcc8'); Sh.box(wm, sx * 7, 52, 2, 1, 8, 5, '#e8ecf2'); } }
+      const HC = ['#7a5ac8', '#2aa6a0', '#c8452e', '#e8c25a', '#3a6ac8', '#58b848', '#c85a9a', '#e88a3a', '#8a8a92', '#40c8e8', '#a03a3a', '#f4f0e6'];
+      for (let i = 0; i < 12; i++) { const m = M4.t(-240 + i * 43.6, 36, -hh - 38); Sh.cyl(m, 0, 0, 0, 1, 1, 40, 4, '#8a8478'); Sh.box(m, 6, 30, 0, 12, 18, .7, HC[i]); A.box(m, 6, 33, .5, 5, 5, .3, '#e8c25a', 1); }
       for (const sx of [-1, 1]) { const m = M4.t(sx * 256, 0, -hh - 44); Sh.cyl(m, 0, -40, 0, 26, 22, 150, 8, '#ece6d8', 0, 1); Sh.cyl(m, 0, 110, 0, 30, 0, 52, 8, sx < 0 ? '#7a5ac8' : '#2aa6a0'); Sh.cyl(m, 0, 62, 0, 23.4, 23.4, 3, 8, '#e8c25a', 1); Sh.cyl(m, 0, 162, 0, .9, .9, 24, 4, '#8a8478'); Sh.box(m, 9, 180, 0, 18, 10, .8, sx < 0 ? '#7a5ac8' : '#2aa6a0'); }
       for (let i = 0; i < 70; i++) { const a = r() * 6.2832, d = R(330, 1500); cloud(Math.cos(a) * d, R(-150, -60), Math.sin(a) * d, R(1.5, 4), [1, R(.86, .95), R(.82, .92)]); }
       for (let i = 0; i < 9; i++) { const a = Math.PI + (i + .5) / 9 * Math.PI; peak(Math.cos(a) * R(900, 1300), Math.sin(a) * R(900, 1300), R(160, 260), R(160, 330), [.5, .52, .74], [1, .95, .92]); }
@@ -115,6 +121,13 @@ const G3 = {
       for (let i = 0; i < 130; i++) { const a = r() * 6.2832, d = R(0, 1), x = Math.cos(a) * (hw + 60 + d * 560), z = Math.sin(a) * (hh + 60 + d * 520) - 60; if ((z > 30 && Math.abs(x) < 260) || z > 260 || (ford && z > -110 && z < 30 && Math.abs(x) < 500)) continue; pine(x, z, R(1.2, 2.4)); }
       for (let i = 0; i < 12; i++) pine((i % 2 ? 1 : -1) * (hw + R(60, 130)), -hh + i * 7 - 30, R(1.3, 2));
       for (let i = 0; i < 16; i++) rock(R(-hw - 120, hw + 120), -hh - R(14, 90), R(.6, 1.6)); for (let i = 0; i < 6; i++) rock((i % 2 ? 1 : -1) * (hw + R(10, 40)), R(-hh, hh), R(.5, 1));
+      // the Assay is graded: a dais of Proctors at the back, and the standards of the twelve Houses
+      { const m = M4.t(0, 0, -hh - 150); Sh.box(m, 0, 9, 0, 150, 18, 46, '#e8e2d4'); Sh.box(m, 0, 20, -14, 150, 4, 18, '#d8d2c4'); A.box(m, 0, 18.4, 23.2, 150, 1.4, .6, '#e8c25a', 1); for (let i = -3; i <= 3; i++) { Sh.cyl(m, i * 24, 18, -20, 1.4, 1.4, 44, 5, '#e8c25a'); } Sh.box(m, 0, 64, -12, 160, 3, 30, '#f4f0e6'); A.box(m, 0, 62, 3.4, 160, 2, .6, '#e8c25a', 1);
+        for (let i = -2; i <= 2; i++) { const pm = M4.t(i * 22, 18, -hh - 150); Sh.cyl(pm, 0, 0, 0, 5, 3.4, 22, 6, i ? '#b8bcc8' : '#f4f2ec'); Sh.box(pm, 0, 26, 0, 6, 7, 6, '#f0dccc'); Sh.box(pm, 0, 30, -.4, 6.8, 2.4, 6.8, i ? '#c8ccd4' : '#f6eac0'); if (!i) Sh.box(pm, 0, 31.6, 0, 7, 1, 7, '#e8c25a'); A.box(pm, 0, 20, 3.4, 1.4, 14, .5, '#e8c25a', 1); } }
+      const HC = ['#7a5ac8', '#2aa6a0', '#c8452e', '#e8c25a', '#3a6ac8', '#58b848', '#c85a9a', '#e88a3a', '#8a8a92', '#40c8e8', '#a03a3a', '#f4f0e6'];
+      for (let i = 0; i < 12; i++) { const m = M4.t(-286 + i * 52, 0, -hh - 205 - (i % 2) * 14); Sh.cyl(m, 0, 0, 0, 1.2, 1.2, 96, 5, '#8a8478'); Sh.box(m, 7, 80, 0, 14, 26, .8, HC[i]); A.box(m, 7, 84, .6, 6, 6, .3, '#e8c25a', 1); A.box(m, 0, 97, 0, 3, 3, 3, '#e8c25a', 1); }
+      for (let i = 0; i < 9; i++) { const x = R(-hw - 90, hw + 90), z = -hh - R(16, 60), m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6), M4.rx(1.45)); Sh.box(m, 0, 10, 2.4, 13, 22, 6, i % 2 ? '#dfe6e4' : '#e8e0cc'); Sh.box(m, 0, 24, 2.6, 8, 8, 7, '#f0dccc'); Sh.box(m, 0, 8, 5.6, 14, 2.4, .6, i % 2 ? '#2aa6a0' : '#7a5ac8'); const bm = M4.chain(M4.t(x + R(-14, 14), 0, z + R(-8, 8)), M4.ry(r() * 6), M4.rz(R(-.5, .5))); Sh.box(bm, 0, 13, 0, 1.6, 26, .8, '#fff6dc'); Sh.box(bm, 0, 25, 0, 6, 1.4, 1.6, '#e8c25a'); }
+      for (let i = 0; i < 26; i++) { const m = M4.chain(M4.t(R(-hw - 60, hw + 60), 0, R(-hh - 50, hh + 10)), M4.rx(R(-.5, .5)), M4.rz(R(-.4, .4))); if (Math.abs(m[12]) < hw && Math.abs(m[14]) < hh) continue; Sh.cyl(m, 0, 0, 0, .4, .4, 12, 3, '#6a5a44'); Sh.box(m, 0, 12, 0, 2.2, 3, .3, i % 2 ? '#2aa6a0' : '#7a5ac8'); }
       tent(-hw - 44, -hh - 20, '#7a5ac8'); tent(-hw - 96, -hh + 26, '#7a5ac8'); tent(hw + 44, -hh - 20, '#2aa6a0'); tent(hw + 96, -hh + 26, '#2aa6a0');
       const mc = ford ? [[.36, .28, .5], [.26, .2, .42]] : [[.48, .6, .82], [.36, .52, .74]];
       for (let i = 0; i < 12; i++) { const a = Math.PI * 1.02 + (i + .5) / 12 * Math.PI * .96; peak(Math.cos(a) * R(950, 1250), Math.sin(a) * R(900, 1250), R(180, 300), R(220, 420), mc[0], ford ? [1, .78, .66] : [.97, .98, 1]); }
@@ -131,8 +144,8 @@ const G3 = {
   begin(B, voidC, sx, sy) {
     this.fit(); this.used = true; this.bg = B.def.bg; this.voidC = voidC || null; this.dyn.n = 0; this.dyn.flash = 0; this.sprN = 0; this.decN = 0; this.t = B.t;
     const c = B.cam, f = c.f * this.FK, pitch = Math.atan((H / 2 - c.hor) / f), fovy = 2 * Math.atan(H / 2 / f), eye = this.eye = [c.x + (sx || 0) * .25, Math.max(4, c.h * this.HK - (sy || 0) * .25), c.y];
-    const view = M4.mul(M4.rx(pitch), M4.t(-eye[0], -eye[1], -eye[2])); this.vp = M4.mul(M4.persp(fovy, W / H, 3, 4000), view); this.f3 = f; this.pitch = pitch;
-    const cp = Math.cos(pitch), sp = Math.sin(pitch); this.right = [1, 0, 0]; this.up = [0, cp, -sp]; this.fwd = [0, -sp, -cp];
+    const roll = Settings.d.reduce ? 0 : (c.roll || 0), view = M4.chain(M4.rz(roll), M4.rx(pitch), M4.t(-eye[0], -eye[1], -eye[2])); this.rage = B.cine ? 0 : clamp(((B.p ? B.p.fury : 0) - 55) / 45, 0, 1); this.vp = M4.mul(M4.persp(fovy, W / H, 3, 4000), view); this.f3 = f; this.pitch = pitch;
+    const cp = Math.cos(pitch), sp = Math.sin(pitch), cr = Math.cos(roll), sr = Math.sin(roll); this.right = [cr, sr * cp, -sr * sp]; this.up = [-sr, cr * cp, -cr * sp]; this.fwd = [0, -sp, -cp];
   },
   proj(x, y, h) { const m = this.vp, Y = (h || 0) * this.HK, cx = m[0] * x + m[4] * Y + m[8] * y + m[12], cy = m[1] * x + m[5] * Y + m[9] * y + m[13], cw = Math.max(1, m[3] * x + m[7] * Y + m[11] * y + m[15]); return { x: (cx / cw * .5 + .5) * W, y: (.5 - cy / cw * .5) * H, s: this.f3 / cw / this.FK * 1.0, dz: cw }; },
   glow(x, y, z, size, col, a) { if (this.sprN >= 2590) return; const s = this.spr, r = this.right, u = this.up, c = rgb3(col), Q = [[-1, -1], [1, -1], [1, 1], [-1, -1], [1, 1], [-1, 1]]; for (const [qx, qy] of Q) { const i = this.sprN * 9; s[i] = x + (r[0] * qx + u[0] * qy) * size; s[i + 1] = y + (r[1] * qx + u[1] * qy) * size; s[i + 2] = z + (r[2] * qx + u[2] * qy) * size; s[i + 3] = qx; s[i + 4] = qy; s[i + 5] = c[0]; s[i + 6] = c[1]; s[i + 7] = c[2]; s[i + 8] = a; this.sprN++; } },
@@ -151,10 +164,11 @@ const G3 = {
     let leg = mv ? Math.sin(an) * .75 : 0, bob = mv ? Math.abs(Math.sin(an)) * 1.6 : Math.sin(t * 3 + idx * 1.7) * .35, lean = mv ? .22 : 0, twist = 0, ap = -.35 + (mv ? Math.sin(an) * .25 : Math.sin(t * 2 + idx) * .04), ay = 0, tilt = blade === 2 ? -2.75 : -2.0, lp = mv ? -Math.sin(an) * .6 : .1, hop = 0, fall = 0, roll = 0, lunge = 0, crouch = 0;
     let sw = -1, cb = o.combo || 1; if (st === 'atk') sw = Math.min(1, o.t / .13); else if (o.swing > 0) { sw = 1 - o.swing / .18; if (!o.combo) cb = 1 + idx % 2; }
     const pose = e => { if (blade === 2) return [-1.45, 0, -.12]; if (cb === 3) return [-2.95 + 2.45 * e, 0, -.2 - .7 * e]; if (cb === 2) return [-1.45, 1.15 - 2.85 * e, -.12]; return [-1.45, -1.7 + 2.85 * e, -.12]; };
+    if (st === 'atk' && o.t < .035) { crouch = 2.2; lean = -.12; }
     if (sw >= 0) { const e = 1 - Math.pow(1 - sw, 2); [ap, ay, tilt] = pose(e); twist = ay * .45; lean = cb === 3 ? .1 + .4 * e : .3; lunge = blade === 2 ? Math.sin(sw * Math.PI) * 9 : 3 * e; if (cb === 3 && st === 'atk') hop = Math.sin(Math.min(1, o.t / .22) * Math.PI) * 9; lp = .9; leg = .5; }
     else if (st === 'atk') { [ap, ay, tilt] = pose(1); twist = ay * .45; lean = .3; lp = .9; leg = .4; }
     else if (st === 'wind') { ap = -2.75 - Math.min(.3, o.t * .5) + Math.sin(t * 55) * .03; tilt = -.25; lean = -.16; twist = -.3; crouch = 1.5; if (blade === 2) { ap = -1.2; tilt = -.2; lunge = -5; } }
-    else if (st === 'hurt') { lean = -.5; ap = -2.3; ay = .9; lp = -2.0; tilt = -1; }
+    else if (st === 'hurt') { const k = Math.max(0, 1 - (o.t || 0) * 3); lean = -.25 - .4 * k; twist = .5 * k * (idx % 2 ? 1 : -1); ap = -2.3; ay = .9; lp = -2.0; tilt = -1; crouch = 1.5 * k; leg = -.4; }
     else if (st === 'charge') { lean = .55; ap = -1.45; tilt = -.12; }
     else if (st === 'recover' && o.t < .2 && o.t >= 0) { [ap, ay, tilt] = pose(1); lean = .3; }
     if (o.guardT > 0 && st !== 'wind' && sw < 0) { ap = -1.3; ay = 1.2; tilt = -1.7; lp = -1.2; }
@@ -166,31 +180,38 @@ const G3 = {
     if (roll) root = M4.chain(root, M4.t(0, 14, 0), M4.rx(roll), M4.t(0, -14, 0));
     root = M4.mul(root, M4.t(0, bob - crouch, lunge));
     // legs
-    for (const sd of [-1, 1]) { const lm = M4.chain(root, M4.t(sd * 3.6, 18, 0), M4.rx(sd * leg * (st === 'atk' || sw >= 0 ? -1 : 1))); D.box(lm, 0, -7, 0, 5.2, 14, 6, dark); D.box(lm, 0, -4, 3.1, 5.4, 1.6, .5, trim); D.box(lm, 0, -9, 2.7, 5.6, 7, 1.2, arm); D.box(lm, 0, -16, 1, 5.6, 4, 8.4, '#4a3a2a'); }
+    for (const sd of [-1, 1]) { const sg = sd * leg * (st === 'atk' || sw >= 0 ? -1 : 1), stance = (st === 'atk' || sw >= 0 || st === 'wind') ? .18 : .05, lm = M4.chain(root, M4.t(sd * 3.7, 18, 0), M4.rz(sd * stance), M4.rx(-sg - (crouch ? .25 : 0))), knee = Math.max(0, sg) * 1.1 + (crouch ? .5 : 0) + (mv ? .15 : 0), sm = M4.chain(lm, M4.t(0, -8.5, 0), M4.rx(knee));
+      D.box(lm, 0, -4.2, 0, 5.4, 9, 6.2, dark); D.box(lm, 0, -3, 3.2, 5.6, 5, .6, arm); D.box(lm, 0, -8.4, .6, 5.8, 2.2, 6.8, trim);
+      D.box(sm, 0, -4.4, 0, 4.8, 8.8, 5.4, dark); D.box(sm, 0, -4, 2.7, 5, 7, 1.2, arm); D.box(sm, 0, -1.2, 2.9, 5.2, 1.2, 1, trim, 1); D.box(sm, 0, -8.8, 1.2, 5.4, 3.2, 8.6, '#4a3a2a'); D.box(sm, 0, -7.6, 1.2, 5.6, .8, 8.8, '#2e241a'); }
     // cape (hinged at the shoulders, three panels)
     const up = M4.chain(root, M4.t(0, 18, 0), M4.rx(lean), M4.ry(twist));
     if (L.cape) { let cm = M4.chain(up, M4.t(0, 15, -4.4)); const fl = mv || st === 'atk' || st === 'dodge' || st === 'charge' ? .75 : .14; for (let i = 0; i < 3; i++) { cm = M4.mul(cm, M4.rx(-(fl * (i ? .35 : 1)) - Math.sin(t * 6.5 + i * 1.2 + idx) * (.06 + fl * .12))); D.box(cm, 0, -5.5, -.3, 15 - i * .6, 11, .9, i === 1 ? shade(L.cape, .9) : L.cape); cm = M4.mul(cm, M4.t(0, -11, 0)); } }
     // torso, sash, belt, shoulders
-    D.box(up, 0, 7.5, 0, 14, 15, 8, arm); D.box(up, 0, 9, 4.1, 8, 9, .5, shade(arm, 1.08)); D.box(up, 0, .8, 0, 14.6, 2, 8.6, trim); D.box(up, 0, 2.6, 0, 14.4, 1.6, 8.4, sash);
-    D.box(M4.chain(up, M4.t(0, 8, 0), M4.rz(.72)), 0, 0, 0, 19, 2.6, 8.8, sash); D.box(up, 0, 9, 4.5, 3, 3, .6, trim, 1);
-    for (const sd of [-1, 1]) { D.box(up, sd * 8.6, 14, 0, 6, 4, 9.4, trim); D.box(up, sd * 9, 12, 0, 5, 2, 8.4, shade(trim, .8)); }
+    const br = 1 + Math.sin(t * 2.6 + idx) * .025;
+    D.box(up, 0, 3.6, 0, 11.4, 7.2, 7, shade(arm, .9)); D.box(up, 0, 10.6, 0, 14.4 * br, 8.4, 8.4 * br, arm); D.box(up, 0, 11, 4.3 * br, 9, 6, .5, shade(arm, 1.1)); D.box(up, 0, 14.6, 4.3 * br, 12, .9, .5, trim, 1); D.box(up, 0, 7.2, 4.3 * br, 6, .8, .5, trim, 1);
+    D.box(up, 0, .8, 0, 12.4, 2, 7.8, trim); D.box(up, 0, 2.5, 0, 12.2, 1.5, 7.6, sash); D.box(up, 0, 15.6, 0, 5, 2, 5, shade(skin, .86));
+    for (const sd of [-1, 1]) { const tm = M4.chain(up, M4.t(sd * 3, 1.6, -3.9), M4.rx(-.25 - (mv ? .7 : .1) - Math.sin(t * 7 + sd + idx) * (mv ? .25 : .06))); D.box(tm, 0, -5, 0, 2.6, 10, .5, sash); }
+    if (blade === 1) { const sc2 = M4.chain(up, M4.t(6.6, 1, -1), M4.rx(.5)); D.box(sc2, 0, -8, 0, 1.8, 16, 2.6, '#3a2a1e'); D.box(sc2, 0, -15.6, 0, 2.2, 1.6, 3, trim, 1); }
+    D.box(M4.chain(up, M4.t(0, 9.4, 0), M4.rz(.74)), 0, 0, 0, 19, 2.6, 9.2, sash); D.box(up, 0, 10.6, 4.8, 3, 3, .6, trim, 1); D.box(up, 0, 10.6, 5, 1.4, 1.4, .6, [1, 1, .85], 1);
+    for (const sd of [-1, 1]) { const pm = M4.chain(up, M4.t(sd * 8.4, 14.4, 0), M4.rz(-sd * .22)); D.box(pm, 0, 0, 0, 6.6, 3.4, 9.8, trim); D.box(pm, sd * .8, -2.2, 0, 5.4, 2, 8.8, shade(trim, .78)); D.box(pm, 0, 1.9, 0, 5, .6, 8, [1, .95, .7], 1); if (L.cape || opt.boss) D.box(pm, sd * 1.4, 2.6, 0, 3, 2.4, 5, trim); }
     // head
     const hd = M4.chain(up, M4.t(0, 16, 0), M4.rx(-lean * .6 + (st === 'hurt' ? -.3 : 0)), M4.ry(-twist * .5));
     D.box(hd, 0, 1, 0, 4, 2.5, 4, shade(skin, .82));
     if (L.helm) { D.box(hd, 0, 7, 0, 10.4, 10.4, 10.4, '#d8dce4'); D.box(hd, 0, 7.6, 5.3, 8, 1.6, .4, '#1e1e28', 1); D.box(hd, 0, 14, -1, 2, 6, 8, sash); D.box(hd, 0, 12.3, 0, 10.8, 1, 10.8, trim); }
     else { D.box(hd, 0, 7, 0, 9, 9.4, 9, skin); D.box(hd, 0, 12, -.4, 10, 3.4, 10.2, hair); D.box(hd, 0, 7.5, -4.4, 10, 8, 1.8, hair); D.box(hd, -4.7, 8.6, -1, 1, 5.6, 6, hair); D.box(hd, 4.7, 8.6, -1, 1, 5.6, 6, hair);
       if (L.long) D.box(hd, 0, 0, -4.6, 9, 9, 1.6, hair); if (L.spiky) for (let i = 0; i < 4; i++) D.box(M4.chain(hd, M4.t(-3.6 + i * 2.4, 13.4, -1 + (i % 2) * 2), M4.rz((i - 1.5) * .25)), 0, 1, 0, 2, 3.4, 2.4, shade(hair, 1.08));
-      D.box(hd, -2.1, 7.4, 4.6, 1.7, 1.5, .4, [1, .78, .25], 1); D.box(hd, 2.1, 7.4, 4.6, 1.7, 1.5, .4, [1, .78, .25], 1); D.box(hd, -2.1, 9, 4.6, 2.6, .8, .4, shade(hair, .6)); D.box(hd, 2.1, 9, 4.6, 2.6, .8, .4, shade(hair, .6)); D.box(hd, 0, 4.4, 4.6, 2.6, .7, .3, shade(skin, .7));
+      { const me = o === Brawl.p && !Brawl.cine, rg = me ? this.rage : (opt.aura || 0) > 2.5 ? 1 : 0, ec = [1, .78 - rg * .46, .25 - rg * .15], es = 1 + rg * .5; D.box(hd, -2.1, 7.4, 4.6, 1.7 * es, 1.5 * es, .4, ec, 1); D.box(hd, 2.1, 7.4, 4.6, 1.7 * es, 1.5 * es, .4, ec, 1); if (rg > .5 && !Settings.d.reduce) { const e1 = [hd[12] + hd[8] * 5 + hd[4] * 7.4, hd[13] + hd[9] * 5 + hd[5] * 7.4, hd[14] + hd[10] * 5 + hd[6] * 7.4]; this.glow(e1[0], e1[1], e1[2], 5 + rg * 3, [1, .3, .1], .5 * rg); } }
+      D.box(hd, 0, 6, 4.9, 1.4, 2.2, 1, shade(skin, .9)); D.box(hd, -2.1, 9, 4.6, 2.6, .8, .4, shade(hair, .6)); D.box(hd, 2.1, 9, 4.6, 2.6, .8, .4, shade(hair, .6)); D.box(hd, 0, 4.4, 4.6, 2.6, .7, .3, shade(skin, .7));
       if (L.smudge) { D.box(hd, 3, 5.6, 4.6, 1.8, 1.4, .3, '#5a4a44'); D.box(hd, -3.4, 4.6, 4.6, 1.2, 1, .3, '#5a4a44'); }
       if (L.circlet) { D.box(hd, 0, 11, 0, 9.8, 1.2, 9.8, trim, 1); D.box(hd, 0, 12.2, 4.9, 1.6, 2, .5, [1, 1, .9], 1); } }
     // off arm
-    { const am = M4.chain(up, M4.t(8.8, 13, 0), M4.rz(.12), M4.rx(lp)); D.box(am, 0, -6, 0, 4, 12, 4.4, arm); D.box(am, 0, -13, 0, 3.6, 3, 3.8, skin); }
+    { const am = M4.chain(up, M4.t(8.8, 13, 0), M4.rz(.14), M4.rx(lp)), fm = M4.chain(am, M4.t(0, -7, 0), M4.rx(-.35 - Math.abs(lp) * .5)); D.box(am, 0, -3.6, 0, 4.2, 7.4, 4.6, arm); D.box(fm, 0, -3.2, 0, 3.8, 6.6, 4.2, shade(arm, .92)); D.box(fm, 0, -1, 0, 4.4, 1.2, 4.8, trim, 1); D.box(fm, 0, -7.6, 0, 3.6, 2.6, 3.8, skin); }
     // sword arm, sword, and the light it leaves
     const armM = (p, y) => M4.chain(up, M4.t(-8.8, 13, 0), M4.rz(-.12), M4.ry(y), M4.rx(p));
     const am = armM(ap, ay); D.box(am, 0, -6, 0, 4, 12, 4.4, arm); if (L.band) D.box(am, 0, -3.4, 0, 4.5, 2.6, 4.9, '#c8281e'); D.box(am, 0, -13, 0, 3.6, 3, 3.8, skin);
     if (blade) { const BL = blade === 2 ? 58 : 27, hm = M4.chain(am, M4.t(0, -13.5, 0), M4.rx(tilt)), bc = blade === 2 ? [.86, .88, .92] : [1, .97, .86];
       if (blade === 2) { D.box(hm, 0, -BL * .35, 0, 1.6, BL, 1.6, '#6a5a44'); D.cyl(M4.chain(hm, M4.t(0, -BL * .85, 0), M4.rx(Math.PI)), 0, 0, 0, 2.6, 0, 9, 4, bc, 1); D.box(hm, 0, -BL * .82, 0, 5, 1.2, 1.2, trim, 1); }
-      else { D.box(hm, 0, 2.6, 0, 1.6, 5, 1.6, '#4a3020'); D.box(hm, 0, -.4, 0, 8, 1.6, 2.4, trim, 1); D.box(hm, 0, -BL / 2 - 1, 0, 2.8, BL, .9, bc, 1); D.box(hm, 0, -BL / 2 - 1, 0, .8, BL, 1.3, [1, .86, .5], 1); }
+      else { const hot = o === Brawl.p && !Brawl.cine ? this.rage : (opt.aura || 0) > 2.5 ? 1 : 0; D.box(hm, 0, 2.6, 0, 1.6, 5, 1.6, '#4a3020'); D.box(hm, 0, 5.4, 0, 2.4, 1.4, 2.4, trim, 1); D.box(hm, 0, -.4, 0, 8.6, 1.6, 2.4, trim, 1); D.box(hm, 0, -BL / 2 - 1, 0, 2.8, BL, .9, [1, .97 - hot * .4, .86 - hot * .6], 1); D.box(hm, 0, -BL / 2 - 1, 0, .8, BL, 1.3, [1, .86 - hot * .3, .5 - hot * .3], 1); D.cyl(M4.chain(hm, M4.t(0, -BL - 1, 0), M4.rx(Math.PI)), 0, 0, 0, 1.4, 0, 3.4, 4, [1, .97 - hot * .4, .86 - hot * .6], 1); if (hot > .3 && !Settings.d.reduce) this.glow(hm[12] - hm[4] * BL * .5, hm[13] - hm[5] * BL * .5, hm[14] - hm[6] * BL * .5, 10 + hot * 6, [1, .4, .1], .35 * hot); }
       const tip = m => [m[12] - m[4] * BL, m[13] - m[5] * BL, m[14] - m[6] * BL];
       if (!Settings.d.reduce) { const tp = tip(hm), sh = Math.sin(t * 3 + idx * 2.1); if (st === 'wind' ? Math.floor(t * 10) % 2 : sh > .9) this.glow(tp[0], tp[1], tp[2], st === 'wind' ? 9 : 6, [1, .96, .8], .9);
         if (sw >= 0 && sw < 1.01 && blade === 1) { const hot = (opt.aura || 0) > 1.5, col = hot ? [1, .5, .16] : [1, .9, .6]; for (let k = 0; k < 9; k++) { const sk = sw - k * .085; if (sk < 0) break; const e = 1 - Math.pow(1 - sk, 2), [p2, y2, t2] = pose(e), h2 = M4.chain(armM(p2, y2), M4.t(0, -13.5, 0), M4.rx(t2)), q = tip(h2), mid = [h2[12] - h2[4] * BL * .55, h2[13] - h2[5] * BL * .55, h2[14] - h2[6] * BL * .55], a = (1 - k / 9) * (cb === 3 ? .8 : .6); this.glow(q[0], q[1], q[2], 8.5, col, a); this.glow(mid[0], mid[1], mid[2], 6.5, col, a * .7); } } }
@@ -214,21 +235,23 @@ const G3 = {
         this.char({ x: x + 16 - lun, y: z + 3, fx: -1, fy: 0, st: Math.sin(ph + 2) > .7 ? 'hurt' : 'approach', t: .1, anim: t * .3 + .5, idx: q.k + 3 }, { id: q.k % 2 ? 'cadt2' : 'cadt1', blade: q.k % 3 ? 1 : 2 }); }
       if (bg === 'ford' && !Settings.d.reduce) for (let i = 0; i < 40; i++) { const wx = ((i * 47.3 + t * (16 + i % 4 * 6)) % 700) - 350, wz = -76 + (i * 13) % 70; if (Math.sin(t * 5 + i * 2.1) > .1) this.glow(wx, .4, wz, 3 + i % 3, [1, .86, .7], .5); }
     }
+    if (!Settings.d.reduce) for (let i = 0; i < 7; i++) { const bx = ((i * 190 + t * (26 + i * 3)) % 1400) - 700, by = 150 + i * 14 + Math.sin(t * .7 + i) * 10, bz = -420 - i * 40, fl = Math.sin(t * 9 + i * 2) * .7, m = M4.t(bx, by, bz); D.box(m, 0, 0, 0, 2, 1.4, 5, '#2a2a34'); D.box(M4.chain(m, M4.rz(fl)), 4, 0, 0, 8, .5, 3, '#3a3a44'); D.box(M4.chain(m, M4.rz(-fl)), -4, 0, 0, 8, .5, 3, '#3a3a44'); }
     // petals, embers
     if (!Settings.d.reduce) for (let i = 0; i < 46; i++) { const c = B.cam, px = c.x + ((i * 71.3 + t * (8 + i % 5 * 3)) % 400) - 200, pz = c.y - 40 - ((i * 37.7) % 320), up = bg === 'ford', py = ((i * 29.1 + t * (up ? 9 + i % 4 * 4 : -(6 + i % 4 * 3))) % 90 + 90) % 90 + 2; this.glow(px + Math.sin(t + i) * 6, py, pz, up ? 1.6 : 1.3, bg === 'keep' ? [1, 1, 1] : up ? [1, .7, .35] : [[1, .9, .95], [1, .9, .5], [.85, 1, .8]][i % 3], up ? .9 : .7); }
   },
   end(B) {
     const gl = this.gl, cv = this.cv, L = this.LOOK[this.bg], E = this.env(this.bg), P = this.P, vd = this.voidC;
     if (!vd) this.life(B);
+    const rg = this.rage || 0, Lr = rg > 0 && !vd ? { top: L.top.map((v, i) => v * (1 - rg * .55) + [.3, .02, .02][i] * rg * .5), bot: L.bot.map((v, i) => v * (1 - rg * .35) + [1, .3, .12][i] * rg * .35), sunC: L.sunC.map((v, i) => v * (1 - rg * .15) + [.5, .05, 0][i] * rg), amb: L.amb.map((v, i) => v * (1 - rg * .28)), fog: L.fog.map((v, i) => v * (1 - rg * .4) + [.6, .12, .06][i] * rg * .4) } : L;
     gl.viewport(0, 0, cv.width, cv.height); gl.clearColor(vd ? vd[0] : L.fog[0], vd ? vd[1] : L.fog[1], vd ? vd[2] : L.fog[2], 1); gl.clearStencil(0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     const sn = Math.hypot(...L.sun), sun = L.sun.map(v => v / sn);
     if (!vd) { // sky
       const K = this.K; gl.useProgram(K.p); gl.disable(gl.DEPTH_TEST); gl.bindBuffer(gl.ARRAY_BUFFER, this.skyBuf); gl.enableVertexAttribArray(K.aP); gl.vertexAttribPointer(K.aP, 2, gl.FLOAT, false, 0, 0);
       const m = this.vp, e = this.eye, far = 3000, hx = e[0], hz = e[2] - far, hw4 = m[3] * hx + m[7] * e[1] + m[11] * hz + m[15], horY = (m[1] * hx + m[5] * e[1] + m[9] * hz + m[13]) / hw4, sp = [e[0] + L.sunAt[0] * far, e[1] + L.sunAt[1] * far, e[2] + L.sunAt[2] * far], sw4 = m[3] * sp[0] + m[7] * sp[1] + m[11] * sp[2] + m[15];
-      gl.uniform3fv(K.uTop, L.top); gl.uniform3fv(K.uBot, L.bot); gl.uniform3fv(K.uSunC, L.sunC); gl.uniform1f(K.uHor, horY); gl.uniform1f(K.uAsp, W / H);
+      gl.uniform3fv(K.uTop, Lr.top); gl.uniform3fv(K.uBot, Lr.bot); gl.uniform3fv(K.uSunC, Lr.sunC); gl.uniform1f(K.uHor, horY); gl.uniform1f(K.uAsp, W / H);
       gl.uniform3f(K.uSunP, (m[0] * sp[0] + m[4] * sp[1] + m[8] * sp[2] + m[12]) / sw4, (m[1] * sp[0] + m[5] * sp[1] + m[9] * sp[2] + m[13]) / sw4, sw4 > 0 ? 1 : 0); gl.drawArrays(gl.TRIANGLES, 0, 6); gl.disableVertexAttribArray(K.aP); }
     gl.useProgram(P.p); gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL); gl.depthMask(true); gl.disable(gl.BLEND); gl.disable(gl.CULL_FACE);
-    gl.uniformMatrix4fv(P.uVP, false, this.vp); gl.uniform3fv(P.uSun, sun); gl.uniform3fv(P.uSunC, vd ? [1.1, .7, .5] : L.sunC); gl.uniform3fv(P.uAmb, vd ? [.5, .34, .34] : L.amb); gl.uniform3fv(P.uSky, L.sky); gl.uniform3fv(P.uEye, this.eye); gl.uniform3fv(P.uFog, vd || L.fog); gl.uniform2fv(P.uFogR, vd ? [60, 420] : L.fogR); gl.uniform1f(P.uSh, 0);
+    gl.uniformMatrix4fv(P.uVP, false, this.vp); gl.uniform3fv(P.uSun, sun); gl.uniform3fv(P.uSunC, vd ? [1.1, .7, .5] : Lr.sunC); gl.uniform3fv(P.uAmb, vd ? [.5, .34, .34] : Lr.amb); gl.uniform3fv(P.uSky, L.sky); gl.uniform3fv(P.uEye, this.eye); gl.uniform3fv(P.uFog, vd || Lr.fog); gl.uniform2fv(P.uFogR, vd ? [60, 420] : L.fogR); gl.uniform1f(P.uSh, 0);
     const bind = () => { gl.enableVertexAttribArray(P.aP); gl.enableVertexAttribArray(P.aN); gl.enableVertexAttribArray(P.aC); gl.vertexAttribPointer(P.aP, 3, gl.FLOAT, false, 36, 0); gl.vertexAttribPointer(P.aN, 3, gl.FLOAT, false, 36, 12); gl.vertexAttribPointer(P.aC, 3, gl.FLOAT, false, 36, 24); };
     if (!vd) { gl.bindBuffer(gl.ARRAY_BUFFER, E.a.b); bind(); gl.drawArrays(gl.TRIANGLES, 0, E.a.n); gl.bindBuffer(gl.ARRAY_BUFFER, E.s.b); bind(); gl.drawArrays(gl.TRIANGLES, 0, E.s.n); }
     gl.bindBuffer(gl.ARRAY_BUFFER, this.dynBuf); gl.bufferData(gl.ARRAY_BUFFER, this.dyn.a.subarray(0, this.dyn.n * 9), gl.DYNAMIC_DRAW); bind(); gl.drawArrays(gl.TRIANGLES, 0, this.dyn.n);

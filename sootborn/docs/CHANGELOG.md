@@ -1,5 +1,16 @@
 # SOOTBORN — changelog
 
+## v0.12 · 2026-11-18 — the surface in real 3D
+- **Everything above the rock is now real 3D**, in the flat-shaded low-poly look used in Guttercrown: lit by one sun, with shadows on the ground, distance fog, a drawn sky and glow for fire and steel. Cinderwell stays 2D pixel art, so the two halves of the story no longer look like the same game.
+  - Guttercrown uses three.js from a CDN. That could not be loaded or tested in the build workspace, so this renderer is plain WebGL with no library (`src/g3.js`). It needs no download and works offline. Without WebGL, or with `#no3d` in the URL, the game falls back to the earlier 2.5D scenes.
+  - Fighters are built from boxes every frame: jointed legs with knees, a chest and waist, shoulder plates, a two-part off arm, a sword arm that swings from the shoulder, capes and sash tails that stream, hair, helms, circlets. Run, three different cuts, a leaping overhead, wind-up, stagger, roll, fall and tumble are all posed in code.
+  - Places: the valley (pines, pavilions, rocks, the white keep on its ridge, snow peaks), the ford at dusk (a river, reeds, long shadows), the keep at dawn (a marble platform above a sea of cloud, towers, braziers).
+  - **They are being watched.** A dais of Proctors grades the valley; the standards of all twelve Houses fly behind every field; fallen cadets and dropped blades lie where the lines met; a second battle goes on in the background. On the keep, Celestine watches the duel from a dais with two Wardens. Kael says so.
+- **Camera**: flies in at the start of a fight, tilts on heavy hits, cuts from side to side during ELEVEN, looks up for launches, and circles Kael on the last blow.
+- **Fury you can see**: from about half a bar the sky, sun and fog bleed toward red; at full his eyes burn, his blade runs hot, the nearest enemies recoil ("WHAT IS HE?"), and the camera punches in.
+- **Fight readability**: a violet ring marks Kael and a red ring marks who he will hit; strikes close the gap to a target that is just out of reach; a flashing arrow at the screen edge warns of an attack coming from off screen; the fight camera sits a little higher.
+- Checked in a software-rendered test browser only. Frame rate on a real phone GPU is not measured.
+
 ## v0.11 · 2026-11-18 — the Assay: 3D fights, rage, flash-forwards
 - **Fights are rebuilt as a pseudo-3D arena brawler.** A perspective floor, big fighters, and a camera that follows the action, pushes in on heavy hits and drops low for the big moments. Impact frames, speed lines, shockwaves, launches, portrait health bars.
   - Three different cuts in the chain; the third is a leaping overhead. Sword arms swing from the shoulder with a crescent trail; fists jab, cross and uppercut.

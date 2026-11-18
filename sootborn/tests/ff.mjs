@@ -15,7 +15,7 @@ if (mode === 'opening') {
   await ev(() => { BTS.Brawl.tap = true; }); await wait(1200);
   await ev(m => { const d = BTS.FF[m](); if (process && 0) 0; window.__r = null; BTS.Brawl.start(d, w => { window.__r = w; }); }, mode).catch(async () => { await ev(m => { window.__r = null; BTS.Brawl.start(BTS.FF[m](), w => { window.__r = w; }); }, mode); });
   const n = await ev(() => BTS.Brawl.cine ? BTS.Brawl.cine.shots.length : 0);
-  for (let i = 0; i < n; i++) { await wait(800); await shot(`${mode}-in-${i}`); await ev(() => BTS.Brawl.nextShot()); }
+  for (let i = 0; i < n; i++) { await wait(800); await shot(`${mode}-in-${i}`); await ev(() => { BTS.Brawl.cine && BTS.Brawl.nextShot(); }); }
   await wait(1900); await shot(`${mode}-fight-0`);
   // simple bot: chase, strike, dodge on threat, hold for ELEVEN
   const held = new Set(); const hold = async (k, on) => { if (on && !held.has(k)) { held.add(k); await page.keyboard.down(k); } if (!on && held.has(k)) { held.delete(k); await page.keyboard.up(k); } };
@@ -37,7 +37,7 @@ if (mode === 'opening') {
   for (const k of [...held]) await page.keyboard.up(k);
   console.log('fight over t=', await ev(() => [BTS.Brawl.t, BTS.Brawl.p.hp, BTS.Brawl.phase]));
   const m = await ev(() => BTS.Brawl.cine ? BTS.Brawl.cine.shots.length : 0);
-  for (let i = 0; i < m; i++) { await wait(900); await shot(`${mode}-out-${i}`); await ev(() => BTS.Brawl.nextShot()); }
+  for (let i = 0; i < m; i++) { await wait(900); await shot(`${mode}-out-${i}`); await ev(() => { BTS.Brawl.cine && BTS.Brawl.nextShot(); }); }
   await wait(500); console.log('result', await ev(() => window.__r), 'active', await ev(() => BTS.Brawl.active));
 }
 console.log('errors', errors); await browser.close();
