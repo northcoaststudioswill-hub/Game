@@ -109,3 +109,11 @@ The fighter the crowd called "the new name" one season before the player. Battle
 ## Mark and the house
 
 Mark's debts are real and so is his generosity. If the player covers him when the Guild collectors come, he pays back double. If the player fights for him, he never forgets it. Either way he eventually offers a tenth of the Long Odds, and a partner's name chalked under the awning, spelled wrong.
+
+## David Roseinbeirg and the hourglass houses
+
+- **The great conflict.** Eleven years of war between the **Kingdom of United Realms** (ruled by the Koheneim throne from Highmarch) and **Eireania**. Nobody won.
+- **The expulsion.** The peace had one clause both crowns signed gladly: the hourglass houses, wizard families who could turn a moment back and had sold that craft to both sides, were expelled from both kingdoms within a week.
+- **David Roseinbeirg, Oracle of Time.** Head of the richest and angriest of those houses. He lives hidden in a golden cellar under the Lamp Market. He wants a homeland for his people, made out of the Kingdom of United Realms itself, and he wants its treasury at least as much.
+- **The vessel.** He has chosen the player: a nobody with a debt who will not stay dead. Put on the throne, steered from behind it.
+- **How to write him.** His people are defined by their craft and their houses, not by any real-world group. His grievance is real and his methods are monstrous; keep both true. He is greedy, sly, hateful toward everyone who is not the player's kind, and very funny.

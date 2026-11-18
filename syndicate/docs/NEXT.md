@@ -35,6 +35,7 @@
 - **Voice:** theatrical, greedy, sneaky, very funny, easy to like. Rubs his hands together and laughs. Talks like a man reading his own memoir aloud. A bullshitter who is occasionally, alarmingly, right.
 - **Prejudice:** he despises every race but yours. Whatever you are not is "exactly what I'd expect of" them: orcs, elves, dwarves, humans, tieflings, by turn. Yours are "the only sensible people in the realm." It is aimed at fantasy species only and played for how confident and wrong he is.
 - **He sees you.** Whatever your class or race, he says he sees the truth in you, and he may even mean it.
+- **Where he comes from:** after the great conflict between the Kingdom of United Realms and Eireania, both crowns expelled the hourglass houses (time-wizard families). This is his chance to make his people a homeland, and the player is his perfect vessel. In the game he reveals this in the binding scene.
 - **What he wants:** gold, power and status. He needs an ally on the Koheneim throne so the Roseinbeirg family can move into the realm's lands. He shares the full plan with nobody but you.
 - **The discomfort is the point.** He is hateful and your only friend with real power. Scenes should let the player enjoy him and distrust him at once.
 - **Where he lives:** a cellar of clocks beneath the Lamp Market, reached only after the first death. It becomes a spot in the market.
