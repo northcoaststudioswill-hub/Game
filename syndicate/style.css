@@ -588,3 +588,6 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .hype-lab { display: block; text-align: center; font-family: var(--display); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin-top: 0.1rem; }
 .hype-lab.hot { color: #ffd36b; } .hype-lab.frenzy { color: #fff0c0; text-shadow: 0 0 8px #ffb030; animation: frz 0.4s infinite alternate; }
 @keyframes frz { from { transform: scale(1); } to { transform: scale(1.12); } }
+
+/* ---------- flavour ---------- */
+.keeperline { margin: 0.4rem 0; font-size: 0.9rem; } .keeperline small { color: var(--dim); font-style: normal; } .quote.remark { margin-top: 0.3rem; opacity: 0.9; } .chant { font-style: italic; text-align: center; }

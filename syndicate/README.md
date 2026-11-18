@@ -268,3 +268,7 @@ Weapons, classes and level-up choices were simulated and the outliers adjusted; 
 - Four endings depending on soul debt, burned villages and whether you ever signed. You keep playing afterwards.
 - **Tiefling spirits:** taunting calls a hellhound (damage), ember cat (speed and a moment untouchable) or carrion crow (marks the foe). Choose on the Guildmaster's sheet.
 - The Outfitter's set box now has buttons that take you to the missing weapon or charm.
+
+## Race and class flavour (`js/flavor.js`)
+
+The Fence, Mark, the Apothecary, Big Hobb, the charm seller, Whisper and the Busker each have a line for every race and every class, shown about half the time you visit. The Ledger-Keeper comments on your trade or blood on the character sheet, opponents remark on what you are before a bout (the five named fighters have their own lines for particular classes and races), the crowd's reaction after a win depends on your class, David has a line for each class, and the Queen has extra words for elves, drow and druids.
