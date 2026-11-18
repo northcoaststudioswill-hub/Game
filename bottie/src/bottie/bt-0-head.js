@@ -78,11 +78,15 @@ function musStep(S,st,t){const o=o2=>Object.assign({mus:1,t},o2);
    song, the three we have are shared around (see mp3: in bt-1-levels.js and realWant below). The song is a separate file next to
    the page (the published page caps at 16 MB, so songs cannot be embedded). It is fetched when the track starts; if
    that fails (the html opened straight from disk, or the file is missing) the chiptune plays instead. */
+/* SONGS_ON: Will set the real songs aside on Nov 18 2026 until they are all ready. While this is false the game plays
+   the chiptune everywhere and never fetches an mp3. The files stay in games/music/ and each level keeps its mp3: name,
+   so turning this back to true brings them all back. */
+const SONGS_ON=false;
 const REAL={cur:'',src:null,gain:null,bufs:{}};
 const SONGNAME={'overclocked.mp3':'OVERCLOCKED','algorithm.mp3':'THE ALGORITHM','nuke.mp3':'NUKE THE DATA CENTER'};
 function realWant(){if(G.s==='title')return'overclocked.mp3';if(G.s==='end')return'nuke.mp3';if(G.s==='cine')return(G.cine&&G.cine.song)||'overclocked.mp3';return(L&&L.def.mp3)||''}
 function realStop(){if(REAL.src){try{REAL.src.stop()}catch(e){}REAL.src=null}REAL.cur=''}
-function realTick(ac){const want=realWant();
+function realTick(ac){if(!SONGS_ON){if(REAL.src)realStop();return false}const want=realWant();
  /* only the song that is playing stays decoded (a decoded song is about 65 MB); the others keep their small mp3 bytes */
  for(const k in REAL.bufs){const o=REAL.bufs[k];if(k!==want&&o.st==='ok'){if(REAL.cur===k)realStop();o.buf=null;o.st='raw'}}
  if(REAL.cur&&REAL.cur!==want)realStop();

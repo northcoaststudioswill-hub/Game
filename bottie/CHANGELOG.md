@@ -1,5 +1,14 @@
 # lil Bottie: Clankin' in the Cloud — changelog
 
+## v0.4.1 (Nov 18 2026): songs set aside, chiptune back
+
+Will asked to set the real songs aside until they are all ready and go back to the original chiptune.
+
+- One switch, `SONGS_ON=false` in `bt-0-head.js`. The game plays the chiptune everywhere and does not fetch any mp3.
+- Nothing was deleted: the three mp3s are still in `games/music/`, each level still names its song, and the player
+  code is still there. Set `SONGS_ON=true` to bring them back.
+- Nothing outside `bottie/` changed. The other games (`alt/`, `v0.*`, `muse/`, `docs/`) are untouched.
+
 ## v0.4 (Nov 18 2026): fewer quips, more fun, playtest pass
 
 Will: "Too many quips are popping up, some are good but it's too much. Do a playtest and improve the game, add

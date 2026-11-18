@@ -65,6 +65,9 @@ Six tracks, the crib, an intro and an ending. The other eight album tracks show 
 - Captions that end in an adlib "(like this)" are lil Bottie's own lyrics, copied word for word from the
   archive. Do not reword them and do not write new ones in his voice; plain UI text is ours.
 - The General and the council are fictional. No real flags, no real officials.
+- **Songs are switched off for now** (`SONGS_ON=false` in `bt-0-head.js`, Will's call on Nov 18 2026): the game
+  plays the chiptune everywhere until he has all the songs ready. The notes below describe what comes back when
+  the switch is turned on.
 - Music: three real songs so far (`games/music/overclocked.mp3`, `algorithm.mp3`, `nuke.mp3`), shared across the
   game until the rest arrive; the chiptune in `bt-0-head.js` is the fallback. To add a song: put the mp3 in
   `games/music/`, set `mp3:'name.mp3'` on its level in `bt-1-levels.js`, and publish the file alongside the page.
