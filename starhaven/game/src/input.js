@@ -102,6 +102,7 @@
       const ang = Math.atan2(dy, dx), dist = Math.min(MAXR, Math.hypot(dx, dy));
       stickKnob.style.transform = `translate(${Math.cos(ang) * dist}px, ${Math.sin(ang) * dist}px)`;
       const L = dx < -DEAD, R = dx > DEAD, D = dy > DOWN && dy > Math.abs(dx) * 0.35, U = dy < -DOWN && -dy > Math.abs(dx) * 0.5;
+      if ((L || R) && !input.stickUsed) { input.stickUsed = true; const h = document.getElementById('touch-hint'); if (h) h.classList.add('gone'); }
       L ? down('touch', 'left') : up('touch', 'left');
       R ? down('touch', 'right') : up('touch', 'right');
       D ? down('touch', 'down') : up('touch', 'down');

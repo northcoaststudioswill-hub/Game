@@ -18,7 +18,7 @@
     deep: {
       sky: ['#050807', '#0b1411', '#13201b', '#1b2a22'], stars: false, far: 'cave', mid: 'roots',
       farA: '#132019', farB: '#0d1712', midC: '#08100c', mist: 'rgba(150,220,180,0.10)', glow: 'rgba(255,140,170,0.20)',
-      ground: '#060908', speck: '#0d1611', edgeLight: '#d6f0dc', edgeMid: '#4f7a62', grass: '#8ccaa8', grassDark: '#3f6a58', side: '#16261e',
+      ground: '#060908', speck: '#18291f', edgeLight: '#d6f0dc', edgeMid: '#4f7a62', grass: '#8ccaa8', grassDark: '#3f6a58', side: '#16261e',
       motes: ['#cfeedd', '#ffb8c8'],
     },
     dusk: {
@@ -83,7 +83,7 @@
     }
   };
   // How dark each place is away from a light: [colour, strength].
-  const DARK = { deep: ['#020806', 0.6], thornwood: ['#06030c', 0.5], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
+  const DARK = { deep: ['#020806', 0.46], thornwood: ['#06030c', 0.42], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
   function drawLight(ctx, w, cx, cy, vw, VH, t, themeA, themeB, k) {
     const a = DARK[themeA] || DARK.dusk, b = DARK[themeB] || a, strength = a[1] + (b[1] - a[1]) * k;
     const c = layers.dark, g = c.getContext('2d');
@@ -223,6 +223,63 @@
     return c;
   }
 
+  THEMES.winter.gstyle = 'earth'; THEMES.dusk.gstyle = 'earth'; THEMES.thornwood.gstyle = 'earth'; THEMES.deep.gstyle = 'rock'; THEMES.mountain.gstyle = 'strata'; THEMES.city.gstyle = 'brick';
+  function groundTile(g, T, style, x, y, tx, ty, depth, TS) {
+    const H = (a, b) => { let h = (tx * 73856093) ^ (ty * 19349663) ^ (a * 83492791) ^ ((b || 0) * 2654435761); h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+    const lift = [1.9, 1.5, 1.25, 1.1, 1][depth], base = SH.shade(T.speck, lift);
+    if (style === 'brick') {   // two courses a tile, joints staggered, each stone lit top-left and dark bottom-right
+      for (let row = 0; row < 2; row++) {
+        const by = y + row * 12, off = ((ty * 2 + row) % 2) * 12 + ((tx * 7 + ty * 3) % 3) * 2;
+        for (let bx = x - 24 + (off % 24); bx < x + TS; bx += 24) {
+          const x0 = Math.max(x, bx), x1 = Math.min(x + TS, bx + 24); if (x1 <= x0) continue;
+          const tone = 0.86 + ((((bx * 13 + by * 7) % 5) + 5) % 5) * 0.07;
+          g.fillStyle = SH.shade(base, tone); g.fillRect(x0, by, x1 - x0, 12);
+          g.fillStyle = SH.shade(base, tone * 1.3); g.fillRect(x0, by, x1 - x0, 1); if (bx >= x) g.fillRect(bx, by, 1, 11);
+          g.fillStyle = T.ground; g.fillRect(x0, by + 11, x1 - x0, 1); if (bx + 23 < x + TS && bx + 23 >= x) g.fillRect(bx + 23, by, 1, 12);
+        }
+      }
+      if (H(1) < 0.25) { g.fillStyle = T.ground; const cx0 = x + 3 + ((H(2) * 14) | 0), cy0 = y + 2 + ((H(3) * 14) | 0); g.fillRect(cx0, cy0, 1, 4); g.fillRect(cx0 + 1, cy0 + 3, 1, 3); }
+    } else if (style === 'earth') {   // packed soil in soft bands, buried stones, roots near the top
+      g.fillStyle = SH.shade(base, 0.8); g.fillRect(x, y, TS, TS);
+      for (let i = 0; i < 4; i++) { g.fillStyle = SH.shade(base, 0.72 + H(10 + i) * 0.22); g.fillRect(x, y + i * 6 + ((tx + i) % 2), TS, 3); }
+      for (let i = 0; i < 7; i++) { g.fillStyle = SH.shade(base, H(20 + i) < 0.5 ? 1.25 : 0.55); g.fillRect(x + ((H(30 + i) * TS) | 0), y + ((H(40 + i) * TS) | 0), 1 + (H(50 + i) * 2 | 0), 1); }
+      const n = H(60) < 0.55 ? 1 : H(60) < 0.8 ? 2 : 0;
+      for (let i = 0; i < n; i++) {
+        const w = 5 + (H(61 + i) * 8 | 0), h = 4 + (H(63 + i) * 4 | 0), sx = x + 1 + (H(65 + i) * (TS - w - 2) | 0), sy = y + 2 + (H(67 + i) * (TS - h - 4) | 0), tone = 1.05 + H(69 + i) * 0.5;
+        g.fillStyle = T.ground; g.fillRect(sx - 1, sy, w + 2, h + 1); g.fillRect(sx, sy - 1, w, h + 2);
+        g.fillStyle = SH.shade(base, tone); g.fillRect(sx, sy, w, h); g.fillRect(sx + 1, sy - 0, w - 2, h);
+        g.fillStyle = SH.shade(base, tone * 1.4); g.fillRect(sx + 1, sy, w - 3, 1); g.fillRect(sx, sy + 1, 1, h - 2);
+        g.fillStyle = SH.shade(base, tone * 0.6); g.fillRect(sx + 1, sy + h - 1, w - 1, 1);
+      }
+      if (depth <= 1 && H(70) < 0.6) {   // a root working down through the soil
+        g.fillStyle = SH.shade(base, 1.5); let rx = x + 2 + (H(71) * 18 | 0);
+        for (let ry = 0; ry < TS; ry += 2) { rx += H(72, ry) < 0.4 ? -1 : H(72, ry) > 0.7 ? 1 : 0; g.fillRect(rx, y + ry, depth === 0 ? 2 : 1, 2); }
+      }
+    } else if (style === 'rock') {   // boulders: each tile is split into two to four stones of different sizes
+      g.fillStyle = SH.shade(T.ground, 0.8); g.fillRect(x, y, TS, TS);
+      const vx = 8 + (H(1) * 3 | 0) * 4, hy1 = 8 + (H(2) * 3 | 0) * 4, hy2 = 8 + (H(3) * 3 | 0) * 4;
+      const stones = [[0, 0, vx, H(4) < 0.35 ? TS : hy1], [vx, 0, TS - vx, H(5) < 0.35 ? TS : hy2]];
+      if (stones[0][3] < TS) stones.push([0, hy1, vx, TS - hy1]); if (stones[1][3] < TS) stones.push([vx, hy2, TS - vx, TS - hy2]);
+      stones.forEach((st, i) => {
+        const tone = 0.8 + H(6 + i) * 0.5, sx = x + st[0], sy = y + st[1], w = st[2] - 1, h = st[3] - 1;
+        g.fillStyle = SH.shade(base, tone); g.fillRect(sx + 1, sy, w - 1, h); g.fillRect(sx, sy + 1, w + 1 - 1, h - 2);
+        g.fillStyle = SH.shade(base, tone * 1.45); g.fillRect(sx + 1, sy, w - 3, 1); g.fillRect(sx, sy + 1, 1, Math.max(1, h - 4));
+        g.fillStyle = SH.shade(base, tone * 0.6); g.fillRect(sx + 2, sy + h - 1, w - 2, 1); g.fillRect(sx + w - 1, sy + 2, 1, h - 3);
+        if (H(12 + i) < 0.3) { g.fillStyle = SH.shade(base, tone * 0.55); g.fillRect(sx + 2 + (H(14 + i) * (w - 5) | 0), sy + 2, 1, Math.min(h - 3, 4)); }
+      });
+      if (depth <= 1) for (let i = 0; i < 4; i++) if (H(20 + i) < 0.5) { g.fillStyle = H(24 + i) < 0.5 ? T.grassDark : T.edgeMid; g.fillRect(x + (H(28 + i) * 22 | 0), y + (H(32 + i) * (depth ? 22 : 9) | 0), 2, 1); }   // moss
+    } else {   // strata: the mountain's rock lies in tilted layers, with a crack here and there
+      let yy = 0, i = 0;
+      while (yy < TS) {
+        const h = 4 + ((((ty * 4 + i) * 7) % 3 + 3) % 3), tone = 0.7 + ((((ty * 4 + i) * 5) % 4 + 4) % 4) * 0.14, sl = (tx % 3) - 1;
+        g.fillStyle = SH.shade(base, tone); g.fillRect(x, y + yy, TS, h);
+        g.fillStyle = SH.shade(base, tone * 1.35); g.fillRect(x, y + yy + (sl > 0 ? 1 : 0), 12, 1); g.fillRect(x + 12, y + yy + (sl < 0 ? 1 : 0), 12, 1);
+        if (H(40 + i) < 0.3) { g.fillStyle = SH.shade(base, tone * 0.6); g.fillRect(x + (H(44 + i) * 20 | 0), y + yy + 1, 5 + (H(48 + i) * 6 | 0), 1); }
+        yy += h; i++;
+      }
+      if (H(60) < 0.3) { g.fillStyle = T.ground; let cx0 = x + 4 + (H(61) * 14 | 0); for (let cy0 = 0; cy0 < 16; cy0 += 3) { g.fillRect(cx0, y + 3 + cy0, 1, 3); cx0 += H(62, cy0) < 0.5 ? -1 : 1; } }
+    }
+  }
   function makeLevel(r, T) {
     const TS = SH.TILE, c = canvas(r.pxW, r.pxH), g = c.getContext('2d'), rand = rng(21);
     const get = (x, y) => r.get(x, y);
@@ -234,22 +291,13 @@
       T = themeAt(tx);
       if (t === SH.T_SOLID) {
         g.fillStyle = T.ground; g.fillRect(x, y, TS, TS);
-        {   // laid stone: two courses a tile, joints staggered, each stone lit on its top-left and dark on its bottom-right.
-            // Stone near open air is lighter; deep stone sinks into the dark.
+        {   // what the ground is made of depends on where you are: laid brick in the city, earth and stones in the
+            // woods, boulders Under the Mountain, layered rock on the mountain. Near open air it is lighter.
           let depth = 0; while (depth < 4 && solid(tx, ty - depth - 1) && ty - depth - 1 >= 0) depth++;
-          const lift = [1.9, 1.5, 1.25, 1.1, 1][depth], base = SH.shade(T.speck, lift);
-          for (let row = 0; row < 2; row++) {
-            const by = y + row * 12, off = ((ty * 2 + row) % 2) * 12 + ((tx * 7 + ty * 3) % 3) * 2;
-            for (let bx = x - 24 + (off % 24); bx < x + TS; bx += 24) {
-              const x0 = Math.max(x, bx), x1 = Math.min(x + TS, bx + 24); if (x1 <= x0) continue;
-              const tone = 0.86 + ((((bx * 13 + by * 7) % 5) + 5) % 5) * 0.07;
-              g.fillStyle = SH.shade(base, tone); g.fillRect(x0, by, x1 - x0, 12);
-              g.fillStyle = SH.shade(base, tone * 1.3); g.fillRect(x0, by, x1 - x0, 1); if (bx >= x) g.fillRect(bx, by, 1, 11);
-              g.fillStyle = T.ground; g.fillRect(x0, by + 11, x1 - x0, 1); if (bx + 23 < x + TS && bx + 23 >= x) g.fillRect(bx + 23, by, 1, 12);
-            }
-          }
-          if (rand() < 0.3) { g.fillStyle = T.ground; const cx0 = x + 3 + ((rand() * 14) | 0), cy0 = y + 2 + ((rand() * 14) | 0); g.fillRect(cx0, cy0, 1, 4); g.fillRect(cx0 + 1, cy0 + 3, 1, 3); }   // a crack
-          if (depth === 0 && !(ty > 0 && solid(tx, ty - 1))) { g.fillStyle = 'rgba(0,0,0,0.28)'; g.fillRect(x, y + 4, TS, 3); }                                              // shadow under the lip
+          const d = r.def, inCity = d.cityFrom != null && tx >= d.cityFrom - 1 && (d.cityTo == null || tx <= d.cityTo + 1);
+          const style = inCity ? 'brick' : (T.gstyle || 'brick');
+          groundTile(g, T, style, x, y, tx, ty, depth, TS);
+          if (depth === 0 && !(ty > 0 && solid(tx, ty - 1))) { g.fillStyle = 'rgba(0,0,0,0.28)'; g.fillRect(x, y + 4, TS, 3); }   // shadow under the lip
         }
         const openUp = !solid(tx, ty - 1) && ty > 0, openL = !solid(tx - 1, ty), openR = !solid(tx + 1, ty), openDown = !solid(tx, ty + 1) && ty < r.h - 1;
         if (openL) { g.fillStyle = T.side; g.fillRect(x, y, 2, TS); }
@@ -261,6 +309,10 @@
         if (openUp) {
           g.fillStyle = T.edgeMid; g.fillRect(x, y + 2, TS, 2);
           g.fillStyle = T.edgeLight; g.fillRect(x, y, TS, 2);
+          if (T.snow) {   // a real cap of snow: thick, with an uneven underside
+            g.fillStyle = T.edgeLight; g.fillRect(x, y, TS, 4);
+            for (let i = 0; i < TS; i += 3) { const dh = ((tx * 5 + i * 7) % 4); g.fillStyle = T.edgeLight; g.fillRect(x + i, y + 4, 3, dh); g.fillStyle = T.edgeMid; g.fillRect(x + i, y + 4 + dh, 3, 1); }
+          }
           for (let i = 0; i < 5; i++) {
             const gx = x + ((rand() * TS) | 0), gh = 1 + ((rand() * 4) | 0);
             g.fillStyle = rand() < 0.5 ? T.grass : T.grassDark; g.fillRect(gx, y - gh, 1, gh);
@@ -752,19 +804,35 @@
     if (e.state === 'stun') for (let i = 0; i < 3; i++) { const a = t * 0.12 + i * 2.1; ctx.fillStyle = '#ffe9a8'; ctx.fillRect(x + e.dir * 20 * s + Math.cos(a) * 10 * s, y - 34 * s + Math.sin(a) * 3, 3, 3); }
     if (!e.boss && e.hp < e.def.hp) { const n = 10; for (let i = 0; i < n; i++) { ctx.fillStyle = i < Math.ceil(e.hp / e.def.hp * n) ? '#c8d2e2' : '#2a2a3a'; ctx.fillRect(x - 25 + i * 5, y - e.h * s - 14, 4, 3); } }
   }
+  // The white stag: slender, long-necked, a crown of antlers, lit from within. Drawn once in the outline colour, once in white.
+  function stagBody(ctx, e, t, ol) {
+    const g = ol ? 1.5 : 0, W = ol || '#f4f6ff', S = ol || '#c9d2f2', D = ol || '#9aa6d8';
+    const run = e.state === 'flee' ? Math.sin(t * 0.5) : 0, graze = e.state === 'graze' && Math.sin(t * 0.02) > 0.2, breathe = Math.sin(t * 0.06) * 0.6;
+    const leg = (x, sw, back) => { ctx.strokeStyle = back ? D : W; ctx.lineWidth = 3 + g * 2; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x, -17); ctx.lineTo(x + sw * 5, -9); ctx.lineTo(x + sw * 2, -1); ctx.stroke(); if (!ol) { ctx.fillStyle = '#3a4270'; ctx.fillRect(x + sw * 2 - 2, -2, 4, 2); } };
+    leg(-12, -run, true); leg(9, run, true);
+    // body: a deep chest tapering to the haunch
+    ctx.fillStyle = W; ctx.beginPath(); ctx.moveTo(-20 - g, -25 + breathe); ctx.quadraticCurveTo(-8, -33 - g + breathe, 10, -30 - g + breathe); ctx.quadraticCurveTo(18 + g, -26, 16 + g, -19); ctx.quadraticCurveTo(2, -12 + g, -14, -15 + g); ctx.quadraticCurveTo(-23 - g, -17, -20 - g, -25 + breathe); ctx.fill();
+    if (!ol) { ctx.fillStyle = S; ctx.beginPath(); ctx.moveTo(-17, -18); ctx.quadraticCurveTo(0, -12, 15, -19); ctx.quadraticCurveTo(2, -16, -17, -18); ctx.fill(); ctx.fillStyle = W; ctx.fillRect(-23, -26, 4, 5); }   // belly shade, the tail
+    leg(-16, run, false); leg(13, -run, false);
+    // neck and head: up and watchful, or down to graze
+    const hx = graze ? 26 : 22, hy = graze ? -10 : -47 + breathe;
+    ctx.strokeStyle = W; ctx.lineWidth = 7 + g * 2; ctx.beginPath(); ctx.moveTo(11, -26); ctx.quadraticCurveTo(graze ? 22 : 13, graze ? -22 : -38, hx - 3, hy + 3); ctx.stroke();
+    ctx.fillStyle = W; ctx.beginPath(); ctx.moveTo(hx - 6 - g, hy - 3 - g); ctx.lineTo(hx + 2, hy - 4 - g); ctx.lineTo(hx + 9 + g, hy + 2); ctx.lineTo(hx + 8 + g, hy + 5 + g); ctx.lineTo(hx - 4 - g, hy + 5 + g); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(hx - 5, hy - 3); ctx.lineTo(hx - 10 - g, hy - 8 - g); ctx.lineTo(hx - 3, hy - 1); ctx.fill();    // ear
+    if (!ol) { ctx.fillStyle = '#1a1430'; ctx.fillRect(hx, hy - 1, 2, 2); ctx.fillStyle = '#3a4270'; ctx.fillRect(hx + 7, hy + 2, 2, 2); }
+    // antlers: two beams, three tines each
+    ctx.strokeStyle = ol || '#e6ebff'; ctx.lineWidth = 2 + g * 2; ctx.lineCap = 'round';
+    for (const sd of [0, 1]) { const ax = hx - 3 + sd * 4, lean = sd ? 5 : -5; ctx.beginPath(); ctx.moveTo(ax, hy - 4); ctx.quadraticCurveTo(ax + lean * 0.4, hy - 14, ax + lean, hy - 24); ctx.moveTo(ax + lean * 0.3, hy - 11); ctx.lineTo(ax + lean * 0.3 + (sd ? 6 : -6), hy - 16); ctx.moveTo(ax + lean * 0.6, hy - 17); ctx.lineTo(ax + lean * 0.6 + (sd ? 6 : -6), hy - 23); ctx.moveTo(ax + lean, hy - 24); ctx.lineTo(ax + lean + (sd ? -3 : 3), hy - 30); ctx.stroke(); }
+  }
   function drawStag(ctx, e, t) {
     ctx.save(); ctx.translate(e.x, e.y);
-    if (e.state !== 'down') { const gl = ctx.createRadialGradient(0, -20, 2, 0, -20, 46); gl.addColorStop(0, 'rgba(255,246,216,0.25)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(-46, -66, 92, 92); }
+    if (e.state !== 'down') {
+      const gl = ctx.createRadialGradient(0, -24, 2, 0, -24, 60); gl.addColorStop(0, 'rgba(230,236,255,0.34)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(-60, -84, 120, 120);
+      ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.ellipse(0, 0, 20, 3, 0, 0, Math.PI * 2); ctx.fill();
+      if (t % 9 === 0) SH.fx.burst(e.x + (Math.random() - 0.5) * 40, e.y - 10 - Math.random() * 40, 1, { speed: 0.3, life: 40, gravity: -0.02, colors: ['#fff6d8', '#cfd6ff'], glow: true });
+    }
     ctx.rotate(e.fall * 1.4); ctx.scale(e.dir, 1);
-    const run = e.state === 'flee' ? Math.sin(t * 0.5) * 3 : 0, graze = e.state === 'graze' && Math.sin(t * 0.02) > 0.2;
-    ctx.fillStyle = '#f2f4ff'; ctx.fillRect(-18, -28, 32, 13);
-    ctx.fillRect(-16, -16, 4, 16 + run); ctx.fillRect(-9, -16, 4, 16 - run); ctx.fillRect(4, -16, 4, 16 + run); ctx.fillRect(10, -16, 4, 16 - run);
-    const hy = graze ? -20 : -42;
-    ctx.fillRect(10, hy, 7, 16 + (graze ? 0 : 12)); ctx.fillRect(12, hy - 5, 12, 8);
-    ctx.strokeStyle = '#d6dcff'; ctx.lineWidth = 2; ctx.beginPath();
-    ctx.moveTo(15, hy - 5); ctx.lineTo(10, hy - 17); ctx.lineTo(5, hy - 22); ctx.moveTo(10, hy - 17); ctx.lineTo(15, hy - 25);
-    ctx.moveTo(19, hy - 5); ctx.lineTo(24, hy - 17); ctx.lineTo(29, hy - 21); ctx.moveTo(24, hy - 17); ctx.lineTo(21, hy - 26); ctx.stroke();
-    ctx.fillStyle = '#1a1430'; ctx.fillRect(20, hy - 2, 2, 2);
+    stagBody(ctx, e, t, '#0a0818'); stagBody(ctx, e, t, null);
     ctx.restore();
   }
   function drawSprite(ctx, e, t) {

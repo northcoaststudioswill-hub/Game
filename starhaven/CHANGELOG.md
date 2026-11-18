@@ -1,5 +1,22 @@
 # Starhaven — Changelog
 
+## Reimagined 4 — polish and design pass (Nov 18, 2026)
+Will: the game needs more polish and design. Done from a full-resolution tour of every level, fixing what looked wrong.
+
+- **The ground belongs to its place.** It was the same laid brick everywhere, including the snowy woods and the cave.
+  Now: packed earth with buried stones and roots in the Winter Woods, on the mountain road and in the thornwood;
+  boulders with moss Under the Mountain; tilted layers of rock on the mountain; brick only in Starhaven's streets.
+  Snowy places get a thick, uneven cap of snow.
+- **The HUD is one tidy cluster.** Hearts (smaller), moons and the bond bar sit in three clean rows top-left. The
+  Starlight count moved beside MENU. Hints are narrower and no longer run into either.
+- **The "hold and slide to move" hint fades** the first time you use the stick.
+- **Under the Mountain can be read.** Less darkness and lighter rock; it is still the darkest place in the game.
+- **The white stag is redrawn:** slender, long-necked, a crown of antlers, an outline, a glow and drifting motes. It is
+  the image the whole story starts from and it was five rectangles.
+
+**Not done in this pass:** Wren, the thorn sprites and wyrms, the trees and far backdrops, and the touch buttons are as
+they were. Tests: 44 play checks, 18 menu checks, the screenshot run. **Not played by hand or on a phone.**
+
 ## Reimagined 3 — other ways of seeing (Nov 18, 2026)
 Will: we can be a side scroller sometimes and other things other times. Try multiple perspectives; keep the gameplay
 fresh and the look nice; tell the story and the relationships; stick to the source material.
