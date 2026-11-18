@@ -2,7 +2,10 @@
 
 Updated Nov 17 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
-## Lightswarm (cartridge 6, vertical slice v0.2)
+## Lightswarm (cartridge 6, vertical slice v0.3)
+
+- v0.3's finds and second supers are balanced by bot only. THE FINAL BET can cost Marcus light by design.
+- With many items and finds the row under the light bar runs off the right edge (finds past the edge are not drawn).
 
 - Ten keepers and their supers are new in v0.2 and balanced only by a bot; some supers (Corbin, Bottie) may be too strong, Scout's too quiet.
 - Keepers other than Will have one facing on the field. Derek's look is new and needs Will's say.

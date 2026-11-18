@@ -3,6 +3,47 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Lightswarm v0.3: more lore, the radio, finds, second supers, Keeper Rank (Nov 18 2026)
+
+Will: more lore from the latest Sproutwild and Sprouts; pop-up quips and other animations; sprouts were piling up;
+keep refining the rewards and level system; multiple abilities or supers; more power-ups, unlockable ones.
+
+![A find from the valley](playtest/lightswarm/30-find.png)
+
+- **Sprouts no longer pile up.** The swarm keeps shoulder room: no two sprouts stand on the same spot, moving or
+  still, and none stands on the keeper. The crowd is a little wider. (If the pile you saw was something else, say.)
+- **The radio from Sunkeep.** A face and a line slide in above the buttons, from somebody back home and never the
+  keeper you are playing: eight timed lines across a run, plus lines when the first big one is calmed, the wisp is
+  caught, the Soul Lamp saves you, Marcus's bet lands, and "BRO. YOU'RE J-LIGHTING AGAIN." when Will uses Hasbara.
+  Lore used: the dome staying up "temporarily", four Guardians and four Sigils, Pythorn off the circus train in 1944,
+  Bottie wanting the light for his feed, "they are not angry, they just cannot see".
+- **Each keeper thinks out loud** now and then (two lines each from their story: the wedding plans, the Flow Pros
+  job, the lazy river, Thornback, the gatehouse wisp, three thousand years, the big red button).
+- **Finds.** Every fifth level offers one of three one-of-a-kind things, on a gold-edged card: SUN SHARD, DATA
+  CENTER KEY (four cards a level), GOLD COIN, BLUE FEATHER, the three starters CUYAPUP, BESSLING and GRASSKIN (they
+  walk with you), SOUL LAMP (gives your light back once), OLD KEY, STAR CHIP, MOONBLOOM, BESSIE'S SCALE, SIGIL STONE.
+  Five are open from the start; eight are opened on the trail.
+- **Two more items** in the ordinary cards: NECTAR and ACORN CAP.
+- **A second super for every keeper,** at mastery rank 3, chosen with Select on the keeper screen: BIKE LANE,
+  SPROUT STAMPEDE, THE FINAL BET (a coin: it can go against him), BURST PIPE, YUKON, 007, WISP LIGHT, TRAIL POST,
+  IRON DOME, AIR SUPPORT. Each has the cut-in and a scene. Names are their Knockout supers where they had one.
+- **The Keeper's Trail is 22 steps** (was 14): eight new ones open the finds.
+- **Keeper Rank,** as in Sprouts: one rank for the whole save from every buddy calmed; each rank pays seeds. It is on
+  the title and on the report with a bar.
+- **Animations:** a ring and sparks on a level and the swarm hops; cards slide in one after another; "100 HOME",
+  "SUPER READY" and bet results pop at the top; the Soul Lamp flash; water, dome, post, bikes, Yukon and drones on
+  the field.
+- **Balance:** levels come slower late (about 20 to 28 by the Guardian), late hits dim more, the Guardian has 4200,
+  seeds per run are lower. The testing unlock (hold Select on the trail) now also lifts every keeper to rank 3.
+
+**Canon to flag to Will:** the SOUL LAMP here gives light back once (its real name and use are open in the story
+notes). CUYAPUP, BESSLING and GRASSKIN as things you find. The DATA CENTER KEY is new. Radio lines are new wording of
+existing story.
+
+**Tested:** `tests/lightswarm_lab.js`, 38 checks, every keeper's two supers fired and drawn (`23-scene2-*`,
+`24-after2-*`). Bots win about one run in three and mostly fall within a minute or so of the Guardian waking. **Not
+played by hand or on a phone.**
+
 ## Lightswarm v0.2: ten keepers, supers with cutscenes, the Keeper's Trail (Nov 18 2026)
 
 Will: all our favourite characters should be playable (Will, Erin, Marcus, Bottie, Bibi and anyone important or seen
