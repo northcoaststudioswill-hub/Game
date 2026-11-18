@@ -536,3 +536,20 @@ button:disabled { filter: grayscale(0.7) brightness(0.7); }
 .kitmods { margin: 0; font-family: var(--display); font-weight: 700; font-size: 0.8rem; letter-spacing: 0.04em; color: #f6dc8a; line-height: 1.6; }
 .loyal { margin: 0.2rem 0 0.5rem; padding: 0.4rem 0.6rem; background: rgba(0, 0, 0, 0.3); border-radius: 0.3rem; box-shadow: inset 0 0 0 1px var(--line); } .loyal small { display: block; font-family: var(--display); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: #cfc4a8; } .loyal .bar.xp { display: block; height: 0.35rem; margin: 0.2rem 0; }
 #ui.talking #toast { display: none !important; }
+
+/* widescreen: keep the fight HUD in proportion instead of filling the sides */
+@media (min-aspect-ratio: 3/2) and (orientation: landscape) {
+  .hud-top { gap: 1.2rem; }
+  .hud-side { max-width: min(17rem, 21vw); }
+  .hud-mid { width: min(9rem, 13vw); }
+  .hud-name { font-size: 0.9rem; }
+  .bar.hp { height: 1rem; } .bar.hp span { font-size: 0.62rem; line-height: 1rem; }
+  .medal .portrait { width: 2.6rem !important; height: 2.6rem !important; }
+  .ab { width: 3.1rem; height: 3.1rem; }
+  #abar { gap: 0.35rem; }
+}
+@media (min-aspect-ratio: 21/9) and (orientation: landscape) {
+  .hud-side { max-width: 14rem; }
+  .hud-mid { width: 7.5rem; }
+  .ab { width: 2.7rem; height: 2.7rem; }
+}

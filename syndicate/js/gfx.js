@@ -212,7 +212,8 @@
   gfx.floatText = function (x, y, z, str, color, big) {
     const host = document.getElementById('floaters'); if (!host) return;
     const el = document.createElement('div'); el.className = 'ft' + (big ? ' big' : ''); el.textContent = str; el.style.color = color || '#fff'; host.appendChild(el);
-    floats.push({ el, x: x + (Math.random() - 0.5) * 0.5, y, z, t: 0, life: big ? 1.3 : 0.9 });
+    const f = { el, x: x + (Math.random() - 0.5) * 0.5, y, z, t: 0, life: big ? 1.3 : 0.9 }; floats.push(f);
+    const p0 = gfx.project(f.x, f.y, f.z); el.style.transform = 'translate(' + p0.x.toFixed(1) + 'px,' + p0.y.toFixed(1) + 'px) translate(-50%,-50%)';       // start where it belongs, not in the corner
   };
   gfx.updateFloats = function (dt) {
     for (let i = floats.length - 1; i >= 0; i--) {
