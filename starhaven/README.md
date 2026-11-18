@@ -31,7 +31,14 @@ link Will has. Hold your phone sideways.
 Between chapters there are **evenings**: choose who to spend the night with (Caelum, Bram, Iris or Thane) for scenes,
 gifts and bond hearts.
 
-## Latest update (Nov 17, 2026)
+## Latest update (Nov 18, 2026)
+
+- **Reimagined** with the techniques from the studio's newer games (Sootborn, Lightswarm, lil Bottie, Knockout): the
+  cast redrawn as shaded pixel sprites that blink, breathe and react; talking portraits; **Bond Arts** (supers with a
+  cut-in: STARFALL and FIRST LIGHT); finisher bands; openings after a perfect dodge; **whispers down the bond** during
+  play; **Wren's Constellation** (spend Starlight on upgrades); laid-stone ground; plate-framed menus. The table of
+  what came from where is in the changelog.
+- **The previous build is kept:** [`backups/rebuild-8/`](backups/rebuild-8/README.md), frozen.
 
 - **Fighting and light:** Wren redrawn with an outline and proper attack poses; three new moves (dash strike, rising
   strike, charged flame wave); hit sparks; the **Old Wyrm** rebuilt as a three-phase boss (charge, leap slam, frost

@@ -25,6 +25,23 @@
     narr: { name: '', color: '#b9b2dd' },
   };
 
+  // Whispers down the mate bond: short lines that slide in during play and never stop it.
+  // Each is said once per save, in order (the boss lines repeat). [who, text]
+  S.WHISPERS = {
+    ready: [['caelum', 'Now, Wren. Reach down the bond. I\'ll answer.'], ['caelum', 'The bond is singing. Use it.']],
+    dodge: [['caelum', 'Beautiful. Did Bram teach you that, or were you born rude?'], ['caelum', 'I felt that one miss you. Do it again.']],
+    low: [['caelum', 'You\'re hurt. I can feel it. Find a lantern.'], ['caelum', 'Wren. Breathe. Then a lantern.']],
+    kill: [['caelum', 'One less of the Iron King\'s toys.']],
+    motesAll: [['caelum', 'Every scrap of starlight. Starhaven will remember that.']],
+    stars: [['caelum', 'You\'re carrying enough starlight to light a star. Pause, and look at your Constellation.']],
+    boss2: [['caelum', 'It\'s angry. Good. Angry things make mistakes.']],
+    boss3: [['caelum', 'Nearly, Wren. Don\'t get greedy now.']],
+    choke: [['caelum', 'Fire down its throat. I\'m stealing that.']],
+    room_ashes: [['caelum', 'This was the Artists\' Quarter. It was loud, once.']],
+    room_ring: [['bram', 'Feet, huntress. I can hear you dragging them from here.']],
+    room_mountain: [['thane', 'Do try not to set the Library on fire on your way out.']],
+  };
+
   // Bonds (DESIGN.md "Bond pacing"): heart 1 when you meet; then hearts at these point totals.
   S.HEARTS_AT = [40, 120, 240, 400];
   S.BONDS = {

@@ -77,7 +77,8 @@
     if (!who) { el.classList.remove('show'); return; }
     const c = ST.CAST[who], narr = who === 'narr';
     el.classList.toggle('narr', narr);
-    if (!narr) $('d-face').src = SH.art.portraitURL(who === 'wren' && SH.game.mortal ? 'wren_m' : who);
+    faceWho = narr ? null : (who === 'wren' && SH.game.mortal ? 'wren_m' : who); faceT = 0;
+    if (!narr) $('d-face').src = SH.art.portraitURL(faceWho);
     $('d-name').textContent = c.name;
     $('d-name').style.color = c.color;
     el.classList.add('show');
@@ -86,7 +87,9 @@
 
   // Lines type out letter by letter (Settings > Text speed). A tap or button press finishes the line first.
   const SPEED = { slow: 0.6, normal: 1.4, fast: 3, instant: 1e9 };
-  let typed = 0, full = '', typingNarr = false, typeRAF = 0;
+  let typed = 0, full = '', typingNarr = false, typeRAF = 0, faceWho = null, faceT = 0, faceNow = '';
+  // Portraits move their mouths while a line types out, and blink.
+  function faceSet(v) { if (!faceWho || faceNow === faceWho + v) return; faceNow = faceWho + v; $('d-face').src = SH.art.portraitURL(faceWho, v || undefined); }
   H.typeStart = function (text, narr) {
     full = text; typed = 0; typingNarr = narr;
     cancelAnimationFrame(typeRAF);
@@ -98,10 +101,11 @@
     $('d-text').textContent = full.slice(0, Math.floor(typed));
     if (!typingNarr && Math.floor(typed) > before && Math.floor(typed) % 3 === 0) SH.sfx.play('blip');
     $('dialog').classList.toggle('typing', typed < full.length);
+    faceT++; faceSet(typed >= full.length ? '' : faceT % 90 > 84 ? 'blink' : faceT % 12 < 6 && /[a-z]/i.test(full[Math.floor(typed) - 1] || '') ? 'talk' : '');
     if (typed < full.length) typeRAF = requestAnimationFrame(H.typeTick);
   };
   H.typing = () => typed < full.length && $('dialog').classList.contains('show');
-  H.finishTyping = function () { typed = full.length; $('d-text').textContent = full; $('dialog').classList.remove('typing'); cancelAnimationFrame(typeRAF); SH.game.talkWait = 4; };
+  H.finishTyping = function () { faceSet(''); typed = full.length; $('d-text').textContent = full; $('dialog').classList.remove('typing'); cancelAnimationFrame(typeRAF); SH.game.talkWait = 4; };
 
   // A small "Saved" star in the corner when the game autosaves.
   let savedT = 0;
@@ -178,6 +182,40 @@
     if (f) f();
   };
 
+  // The bond meter, the Bond Art button, and whispers down the bond.
+  let lastArt = '';
+  H.art = function (a) {
+    const on = a.active(), ready = a.ready(), key = on + '|' + ready + '|' + Math.round(a.meter) + '|' + a.nextKind();
+    if (key === lastArt) return; lastArt = key;
+    $('art').style.display = on ? 'block' : 'none';
+    $('art').classList.toggle('ready', ready);
+    $('art').firstChild.style.width = Math.round(a.meter / a.max * 100) + '%';
+    $('b-art').style.display = ready ? 'flex' : 'none';
+    $('b-art').innerHTML = a.ARTS[a.nextKind()].name.replace(' ', '<br>');
+  };
+  H.whisper = function (who, text) {
+    const el = $('whisper');
+    if (!who) { el.classList.remove('show'); return; }
+    $('w-face').src = SH.art.portraitURL(who); $('w-name').textContent = ST.CAST[who].name + ', down the bond';
+    $('w-name').style.color = ST.CAST[who].color; $('w-text').textContent = text;
+    el.classList.add('show');
+  };
+  // Wren's Constellation: spend Starlight on stars.
+  H.stars = function (show) {
+    $('stars').classList.toggle('show', !!show);
+    if (!show) return;
+    const S = SH.stars;
+    $('st-have').innerHTML = `&#10022; <b>${S.free()}</b> Starlight to spend (${S.gathered()} gathered). Starlight is the gold motes in every level; replay a chapter to find more.`;
+    let html = '';
+    for (const d of S.DEFS) {
+      const lv = S.level(d.id), max = d.costs.length, locked = S.locked(d);
+      html += `<div class="star-row"><span class="pipsrow">${'&#9733;'.repeat(lv)}${'&#9734;'.repeat(max - lv)}</span><div><b>${esc(d.name)}</b><small>${locked ? 'Sleeping until the Flame wakes.' : esc(d.text)}</small></div>`
+        + (lv >= max ? '<span class="dim">Lit</span>' : `<button class="btn" data-star="${d.id}" ${S.canBuy(d) ? '' : 'disabled'}>&#10022; ${S.cost(d)}</button>`) + '</div>';
+    }
+    $('st-body').innerHTML = html;
+    $('st-body').querySelectorAll('button[data-star]').forEach(b => b.addEventListener('click', () => { if (S.buy(b.dataset.star)) { H.hearts(SH.game.world.player.hearts, SH.game.world.player.maxHearts); H.stars(true); } }));
+  };
+
   // Touch buttons and labels follow what Wren can do this chapter.
   H.abilities = function () {
     const G = SH.game;
@@ -219,7 +257,7 @@
     for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
     html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
     const ms = G.progress.motes || {}, sum = Object.values(ms).reduce((a, b) => a + b, 0);
-    if (sum) html += `<p><b>Starlight gathered:</b> &#10022; ${sum} (kept for rebuilding Starhaven, later)</p>`;
+    if (sum) html += `<p><b>Starlight gathered:</b> &#10022; ${sum}. Spend it in the pause menu, under Constellation.</p>`;
     html += '<h3>Bonds</h3>';
     const bonds = G.progress.bonds, ids = Object.keys(ST.BONDS).filter(id => bonds[id]);
     if (!ids.length) html += '<p>No bonds yet. Hearts grow from evenings together, gifts they love, and the choices you make when you talk.</p>';
@@ -286,6 +324,8 @@
     on('m-resume', () => G.resume());
     on('m-journal', () => { H.menu(false); H.journal(true); });
     on('m-tune', () => { H.menu(false); H.tune(true); });
+    on('m-stars', () => { H.menu(false); H.stars(true); });
+    on('st-back', () => { H.stars(false); H.menu(true); });
     on('m-restart', () => { H.menu(false); G.startChapter(G.chapter); });
     on('m-controls', () => $('controls').classList.toggle('show'));
     on('m-title', () => { H.menu(false); SH.front.toTitle(); });

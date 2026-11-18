@@ -1,5 +1,43 @@
 # Starhaven — Changelog
 
+## Reimagined 1 (Rebuild 9) — the studio's newer techniques, applied to Starhaven (Nov 18, 2026)
+Will: study how the new games in the repo work, save what we have as a duplicate, and reimagine Starhaven with the
+techniques we have been using.
+
+**The duplicate.** Rebuild 8 is frozen in [`backups/rebuild-8/`](backups/rebuild-8/README.md) (the playable file and its
+full source) and is still live, unchanged, at its old link. Nothing in that folder is ever edited.
+
+**What was studied** (source and changelogs, and Sootborn run in a browser): Sootborn v0.10, Lightswarm v0.3, lil Bottie
+v0.5, Knockout, Sproutwild v12.10, Clankawatch v4.0 alpha 3. What they do that Starhaven did not:
+
+| Technique | Where it comes from | In Starhaven now |
+|---|---|---|
+| Characters built from parts, shaded in three tones, outlined, cached as sprite sheets | Sootborn `art.js` | The whole cast redrawn (`src/people.js`): Caelum, Bram, Iris, Thane, Nessa, Lissa, Rowan, the Queen |
+| Blinking, breathing, emote bubbles, turning to the speaker | Sootborn v0.10 | People blink and breathe, turn to whoever is talking, hop on "!", show ! ? ... and a heart when a choice lands |
+| Portraits that move their mouths | Sootborn v0.10 | Portraits talk while a line types, and blink |
+| Supers with a cut-in and a scene | Knockout, Lightswarm | **Bond Arts** (`src/arts.js`): a bond meter fills from hits; STARFALL (Caelum) and FIRST LIGHT (Wren, once the Flame wakes) |
+| Finisher bands with a freeze and a shake | lil Bottie v0.5 | RUN THROUGH, SKYBOUND, FROM ABOVE, ASHES, CHOKED, WYRMSLAYER |
+| An "opening" after dodging through a swing | Sootborn `brawl.js` | A perfect dodge opens the foe for a moment: cuts do 1 more and get past armor |
+| The radio: a face and a line that slide in during play | Lightswarm v0.3 | **Whispers down the bond**: Caelum (and Bram, Thane) comment as you play, once each per save |
+| An unlock track that gives the collectible a use | Lightswarm's Keeper's Trail | **Wren's Constellation** (`src/stars.js`): spend Starlight on a heart, a faster bond, sharper finishers, a fourth moon |
+| A pixel font for anything lettered on the canvas | Sootborn | `SH.ptext` (name plates, bands, cut-ins) |
+| Tiles with a lit top-left edge and dark bottom-right; contact shadows | Sootborn v0.8 | The ground is laid stone, lighter near open air, with a shadow under every ledge; people cast shadows |
+| Menus framed like engraved plates | Sootborn v0.8 | Every frame is a night-steel plate with a starlight edge and gold pins |
+| Cinema framing | Sootborn | Black bars slide in while people talk |
+
+**How to use the new things.** Bond Art: the BOND ART button appears when the bar under your hearts is full (R or V on
+a keyboard, right trigger on a controller). Constellation: pause, then Constellation.
+
+**Honest notes.**
+- This is the same game underneath: the same levels, story, physics and saves. The reimagining so far is the cast, the
+  ground, the frames, and five new systems. Wren herself, the enemies and the backdrops are not yet redrawn to the
+  same standard, and the cutscene panels are unchanged.
+- The bond exists from Chapter 1 on (after Caelum's blood). The two prologue chapters have no bond meter.
+- Balance is a first guess: about 17 hits fill the meter; STARFALL does 9 to everything on screen; FIRST LIGHT does 10
+  nearby and mends a heart. With both, the Old Wyrm is easier than it was in Rebuild 8.
+- Tests: 41 play checks, 16 menu checks, the screenshot run, all passing in headless Chromium. **Not played by hand or
+  on a phone.**
+
 ## Rebuild 8 — Fighting, the Old Wyrm, light (Nov 17, 2026)
 Will: the slice needs polish before moving on. Better fighting animations, the boss is "super basic" (a hit move and a
 fire move), Starlight gets cut off when sections end too fast, dialogue runs over the Skip button, and it should look

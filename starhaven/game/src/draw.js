@@ -234,7 +234,23 @@
       T = themeAt(tx);
       if (t === SH.T_SOLID) {
         g.fillStyle = T.ground; g.fillRect(x, y, TS, TS);
-        for (let i = 0; i < 3; i++) { g.fillStyle = T.speck; g.fillRect(x + ((rand() * TS) | 0), y + ((rand() * TS) | 0), 2, 2); }
+        {   // laid stone: two courses a tile, joints staggered, each stone lit on its top-left and dark on its bottom-right.
+            // Stone near open air is lighter; deep stone sinks into the dark.
+          let depth = 0; while (depth < 4 && solid(tx, ty - depth - 1) && ty - depth - 1 >= 0) depth++;
+          const lift = [1.9, 1.5, 1.25, 1.1, 1][depth], base = SH.shade(T.speck, lift);
+          for (let row = 0; row < 2; row++) {
+            const by = y + row * 12, off = ((ty * 2 + row) % 2) * 12 + ((tx * 7 + ty * 3) % 3) * 2;
+            for (let bx = x - 24 + (off % 24); bx < x + TS; bx += 24) {
+              const x0 = Math.max(x, bx), x1 = Math.min(x + TS, bx + 24); if (x1 <= x0) continue;
+              const tone = 0.86 + ((((bx * 13 + by * 7) % 5) + 5) % 5) * 0.07;
+              g.fillStyle = SH.shade(base, tone); g.fillRect(x0, by, x1 - x0, 12);
+              g.fillStyle = SH.shade(base, tone * 1.3); g.fillRect(x0, by, x1 - x0, 1); if (bx >= x) g.fillRect(bx, by, 1, 11);
+              g.fillStyle = T.ground; g.fillRect(x0, by + 11, x1 - x0, 1); if (bx + 23 < x + TS && bx + 23 >= x) g.fillRect(bx + 23, by, 1, 12);
+            }
+          }
+          if (rand() < 0.3) { g.fillStyle = T.ground; const cx0 = x + 3 + ((rand() * 14) | 0), cy0 = y + 2 + ((rand() * 14) | 0); g.fillRect(cx0, cy0, 1, 4); g.fillRect(cx0 + 1, cy0 + 3, 1, 3); }   // a crack
+          if (depth === 0 && !(ty > 0 && solid(tx, ty - 1))) { g.fillStyle = 'rgba(0,0,0,0.28)'; g.fillRect(x, y + 4, TS, 3); }                                              // shadow under the lip
+        }
         const openUp = !solid(tx, ty - 1) && ty > 0, openL = !solid(tx - 1, ty), openR = !solid(tx + 1, ty), openDown = !solid(tx, ty + 1) && ty < r.h - 1;
         if (openL) { g.fillStyle = T.side; g.fillRect(x, y, 2, TS); }
         if (openR) { g.fillStyle = T.side; g.fillRect(x + TS - 2, y, 2, TS); }
@@ -337,7 +353,7 @@
       ctx.globalAlpha = 1; ctx.fillStyle = '#ffd27a'; ctx.fillRect(m.x - 1, my - 4, 3, 9); ctx.fillRect(m.x - 4, my - 1, 9, 3);
       ctx.fillStyle = '#fff6d8'; ctx.fillRect(m.x - 1, my - 1, 3, 3);
     }
-    for (const n of w.npcs) SH.art.npc(ctx, n, t);
+    for (const n of w.npcs) (SH.people.has(n.id) ? SH.people.draw : SH.art.npc)(ctx, n, t);
     for (const e of w.things) {
       if (e.x < cx - 80 || e.x > cx + vw + 80) continue;
       if (e.kind === 'thornSprite') drawSprite(ctx, e, t);
@@ -390,6 +406,10 @@
     ctx.restore();
 
     { const kk = zi > 0 ? Math.min(1, (mid - (zones[zi].x - 6)) / 12) : 0; drawLight(ctx, w, cx - sx, cy - sy, vw, VH, t, zones[Math.max(0, zi - 1)].theme, zones[zi].theme, kk); }
+    SH.arts.draw(ctx, w, vw, VH);
+    // cinema bars slide in while people are talking
+    w.letter = (w.letter || 0) + ((SH.game.state === 'talk' ? 1 : 0) - (w.letter || 0)) * 0.15;
+    if (w.letter > 0.02) { const lh = Math.round(w.letter * 22); ctx.fillStyle = '#05050d'; ctx.fillRect(0, 0, vw, lh); ctx.fillRect(0, VH - lh, vw, lh); }
     ctx.drawImage(layers.vignette, 0, 0);
     if (fx.flash > 0) { ctx.fillStyle = fx.flashColor; ctx.globalAlpha = Math.min(1, fx.flash / 6); ctx.fillRect(0, 0, vw, VH); ctx.globalAlpha = 1; }
     if (fx.slowmo > 0) { ctx.fillStyle = 'rgba(120,190,255,0.10)'; ctx.fillRect(0, 0, vw, VH); }

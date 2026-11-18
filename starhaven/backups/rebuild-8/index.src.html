@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#090b20">
+<title>Starhaven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #f3eeff; --ink-dim: #b9b2dd; --gold: #ffd27a; --gold-deep: #d9973f;
+  --panel: rgba(12, 12, 34, 0.88); --panel-line: rgba(255, 210, 122, 0.35);
+  --night: #090b20; --danger: #ff6f86;
+  --display: 'Cinzel', Georgia, 'Times New Roman', serif;
+  --body: 'Nunito', system-ui, -apple-system, sans-serif;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--night); overflow: hidden; color: var(--ink);
+  font-family: var(--body); -webkit-user-select: none; user-select: none; touch-action: none; }
+#stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+canvas#game { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+button { font-family: var(--body); }
+button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* HUD */
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 3; }
+#hearts { position: absolute; left: max(14px, env(safe-area-inset-left)); top: 12px; display: flex; gap: 6px; }
+#hearts.hit { animation: shake .35s; }
+@keyframes shake { 0%,100% { transform: none } 25% { transform: translateX(-4px) } 75% { transform: translateX(4px) } }
+.gem { width: 20px; height: 20px; transform: rotate(45deg); border-radius: 4px; border: 2px solid #fff6d8; }
+.gem.full { background: linear-gradient(135deg, #fff6d8, var(--gold) 45%, var(--gold-deep)); box-shadow: 0 0 10px rgba(255, 210, 122, .6); }
+.gem.empty { background: rgba(20, 18, 48, .7); border-color: #4b4680; }
+#goal { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
+  padding: 6px 14px; border-radius: 999px; font-size: 15px; font-weight: 800; white-space: nowrap; max-width: calc(100vw - 300px); overflow: hidden; text-overflow: ellipsis; }
+#goal .ch { color: var(--ink-dim); margin-right: 8px; font-weight: 600; }
+#goal .tag { color: var(--gold); margin-right: 6px; letter-spacing: .08em; }
+#goal.new { animation: glowpulse 1.4s 2; }
+@keyframes glowpulse { 50% { box-shadow: 0 0 22px rgba(255,210,122,.8); border-color: var(--gold); } }
+#pause-btn { pointer-events: auto; position: absolute; right: max(12px, env(safe-area-inset-right)); top: 8px; height: 44px; padding: 0 14px; border-radius: 12px;
+  background: var(--panel); border: 1px solid var(--panel-line); color: var(--ink); font: 800 14px var(--body); letter-spacing: .06em; }
+#sign { position: absolute; left: 50%; top: 56px; transform: translate(-50%, -8px); width: min(620px, 74vw); background: var(--panel);
+  border: 2px solid var(--panel-line); border-radius: 14px; padding: 10px 18px; font-size: 18px; line-height: 1.35; font-weight: 600;
+  opacity: 0; transition: opacity .18s, transform .18s; text-align: center; }
+#sign.show { opacity: 1; transform: translate(-50%, 0); }
+#sign b { color: var(--gold); }
+#toast { position: fixed; z-index: 8; top: auto !important; bottom: 54px; left: 50%; top: 30%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--panel-line);
+  border-radius: 12px; padding: 10px 16px; font-size: 17px; font-weight: 700; opacity: 0; transition: opacity .25s; max-width: 70vw; text-align: center; }
+#toast.show { opacity: 1; }
+body[data-state="talk"] #toast { top: auto; bottom: max(10px, env(safe-area-inset-bottom)); }
+/* In-game controls only show while playing; story screens and conversations get the whole screen. */
+body:not([data-state="play"]) #touch, body:not([data-state="play"]):not([data-state="talk"]) #hud { display: none !important; }
+body[data-state="talk"] #sign, body[data-state="talk"] #pause-btn { display: none; }
+
+/* Dialogue */
+#dialog { position: fixed; left: 50%; top: 56px; transform: translateX(-50%); width: min(760px, 94vw); z-index: 6;
+  display: none; gap: 14px; align-items: flex-start; background: var(--panel); border: 2px solid var(--panel-line); border-radius: 16px; padding: 12px 16px 12px 12px; cursor: pointer; }
+#dialog.show { display: flex; }
+#d-face { width: 96px; height: 96px; image-rendering: pixelated; border-radius: 10px; border: 2px solid rgba(255,255,255,.2); flex: none; }
+#d-body { min-width: 0; flex: 1; padding-bottom: 12px; }
+#d-name { font-family: var(--display); font-weight: 800; font-size: 17px; letter-spacing: .06em; margin: 2px 0 4px; }
+#d-text { font-size: 19px; line-height: 1.4; font-weight: 600; }
+#dialog.narr #d-face, #dialog.narr #d-name { display: none; }
+#dialog.narr #d-text { font-style: italic; color: #e6e0ff; }
+#dialog.choosing #d-more { display: none; }
+#dialog.choosing { cursor: default; }
+#d-choices { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+#d-choices:empty { display: none; }
+.choice { text-align: left; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--panel-line); background: rgba(255,210,122,.08);
+  color: var(--ink); font: 700 16px var(--body); cursor: pointer; }
+.choice.sel { border-color: var(--gold); background: rgba(255,210,122,.22); }
+.choice.sel::before { content: '\25B8  '; color: var(--gold); }
+#scene { position: fixed; inset: 0; z-index: 5; display: none; background: #05050e; }
+#scene.show { display: block; }
+#scene-art { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; display: block; }
+#scene-title { position: absolute; left: 50%; top: 18px; transform: translateX(-50%); font-family: var(--display);
+  color: var(--gold); letter-spacing: .14em; font-size: 15px; text-transform: uppercase; text-shadow: 0 2px 6px #000; white-space: nowrap;
+  background: rgba(8, 8, 24, 0.6); padding: 4px 14px; border-radius: 999px; }
+.bond .hearts { color: #ff8fb8; letter-spacing: 2px; }
+.bond .hearts .dim { color: #5a4a70; }
+.bond .bar { height: 6px; background: #2a2650; border-radius: 3px; margin: 4px 0 2px; overflow: hidden; }
+.bond .bar span { display: block; height: 100%; background: linear-gradient(90deg, #ff8fb8, var(--gold)); }
+.bond small { color: var(--ink-dim); }
+#d-more { position: absolute; right: 14px; bottom: 8px; color: var(--gold); font-size: 13px; font-weight: 800; animation: pulse 1.2s infinite; }
+
+/* Touch controls (landscape phone) */
+#touch { position: fixed; inset: 0; display: none; touch-action: none; z-index: 2; }
+body[data-input="touch"] #touch { display: block; }
+#stick { position: absolute; width: 110px; height: 110px; margin: -55px 0 0 -55px; border-radius: 50%; border: 2px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.06); opacity: 0; pointer-events: none; left: 22%; top: 70%; }
+#stick.on { opacity: 1; }
+#knob { position: absolute; left: 50%; top: 50%; width: 48px; height: 48px; margin: -24px 0 0 -24px; border-radius: 50%; background: rgba(255,246,216,.55); }
+.tbtn { position: absolute; border-radius: 50%; border: 2px solid rgba(255,246,216,.45); background: rgba(20,18,48,.45); color: var(--ink);
+  font: 800 13px var(--body); letter-spacing: .05em; display: flex; align-items: center; justify-content: center; touch-action: none; }
+.tbtn.on { background: rgba(255,210,122,.45); border-color: var(--gold); }
+#b-jump { width: 92px; height: 92px; right: max(24px, env(safe-area-inset-right)); bottom: 28px; font-size: 15px; }
+#b-attack { width: 76px; height: 76px; right: calc(max(24px, env(safe-area-inset-right)) + 104px); bottom: 22px; }
+#b-dash { width: 70px; height: 70px; right: calc(max(24px, env(safe-area-inset-right)) + 40px); bottom: 132px; }
+#b-down { width: 64px; height: 64px; right: calc(max(24px, env(safe-area-inset-right)) + 192px); bottom: 30px; font-size: 22px; }
+#b-gift { width: 64px; height: 64px; right: calc(max(24px, env(safe-area-inset-right)) + 200px); bottom: 112px; display: none;
+  background: rgba(255,120,40,.25); border-color: #ff9a4a; color: #ffd27a; }
+#pips { position: absolute; left: max(14px, env(safe-area-inset-left)); top: 40px; display: flex; gap: 5px; }
+.pip { width: 15px; height: 15px; border-radius: 50%; border: 2px solid #c8c0ff; background: #14123a; position: relative; overflow: hidden; }
+.pip span { position: absolute; left: 0; bottom: 0; width: 100%; background: linear-gradient(#fff6d8, #b9a8ff); }
+#motes { position: absolute; left: max(88px, calc(env(safe-area-inset-left) + 88px)); top: 36px; font-weight: 800; font-size: 15px; color: var(--gold); background: var(--panel); border: 1px solid var(--panel-line); border-radius: 999px; padding: 2px 10px; }
+#motes small { color: var(--ink-dim); font-weight: 700; }
+#motes i { font-style: normal; }
+#motes.pop { animation: motepop .25s; }
+@keyframes motepop { 50% { transform: scale(1.25); } }
+#c-stats { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 2px 0 4px; }
+#c-stats:empty { display: none; }
+#c-stats span { font-size: 14px; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: rgba(255,210,122,.12); color: var(--gold); }
+#bossbar { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); width: min(420px, 60vw); display: none; text-align: center; }
+#bossbar.show { display: block; }
+#bossbar .bn { font-family: var(--display); color: #ffb0a0; letter-spacing: .12em; font-size: 13px; }
+#bossbar .bb { height: 8px; border-radius: 4px; background: #2a1a24; border: 1px solid #ff9a7a; overflow: hidden; margin-top: 3px; }
+#bossbar .bb span { display: block; height: 100%; background: linear-gradient(90deg, #ff5a5a, #ffb057); transition: width .2s; }
+#b-talk { width: 70px; height: 70px; right: calc(max(24px, env(safe-area-inset-right)) + 122px); bottom: 112px; display: none;
+  background: rgba(255,210,122,.25); border-color: var(--gold); color: var(--gold); }
+#b-talk.show { display: flex; }
+#touch-hint { position: absolute; left: 6%; bottom: 18px; color: rgba(255,255,255,.45); font-size: 13px; font-weight: 700; }
+
+/* Screens */
+.screen { position: fixed; inset: 0; z-index: 7; display: none; align-items: center; justify-content: center; background: rgba(6,6,20,.78); }
+.screen.show { display: flex; }
+.card { background: var(--panel); border: 2px solid var(--panel-line); border-radius: 18px; padding: 20px 26px; width: min(600px, 92vw);
+  max-height: 92vh; overflow: auto; text-align: center; touch-action: pan-y; -webkit-user-select: text; user-select: text; }
+.btn { display: block; width: 100%; margin: 10px 0 0; padding: 12px; border-radius: 12px; border: 1px solid var(--panel-line);
+  background: rgba(255,210,122,.10); color: var(--ink); font: 800 17px var(--body); cursor: pointer; }
+.btn.primary { background: var(--gold); color: #1c1430; border-color: var(--gold); }
+.btn.small { font-size: 15px; padding: 9px; margin-top: 6px; }
+@keyframes pulse { 50% { opacity: .45 } }
+
+  color: #fff6d8; text-shadow: 0 0 24px rgba(255,210,122,.55); }
+
+
+#card .card { text-align: left; }
+#c-label { color: var(--gold); font-family: var(--display); letter-spacing: .16em; font-size: 14px; text-transform: uppercase; }
+#c-name { font-family: var(--display); font-weight: 800; font-size: clamp(28px, 7vh, 40px); margin: 2px 0 8px; color: #fff6d8; }
+#c-text { font-size: 18px; line-height: 1.45; margin: 0 0 8px; }
+#c-goals { margin: 0; padding: 0 0 0 20px; font-size: 16px; color: var(--ink); }
+#c-goals .gl { margin: 6px 0 4px -20px; color: var(--gold); font-weight: 800; letter-spacing: .08em; font-size: 13px; }
+#c-goals li { margin: 3px 0; }
+
+#journal .card { text-align: left; width: min(680px, 94vw); }
+#journal h2 { font-family: var(--display); margin: 0 0 4px; }
+#journal h3 { font-family: var(--display); color: var(--gold); font-size: 16px; letter-spacing: .06em; margin: 14px 0 6px; }
+#journal p { margin: 0 0 8px; line-height: 1.45; font-size: 15px; }
+#journal .goals { list-style: none; padding: 0; margin: 0; font-size: 16px; }
+#journal .goals li { padding: 3px 0; color: var(--ink-dim); }
+#journal .goals li.now { color: var(--ink); font-weight: 800; }
+#journal .goals li.done { color: #9be07a; }
+.person { display: flex; gap: 10px; align-items: center; margin: 6px 0; font-size: 14px; line-height: 1.35; }
+.person img { width: 48px; height: 48px; image-rendering: pixelated; border-radius: 8px; flex: none; }
+
+#menu h2, #tune h2, #end h2 { font-family: var(--display); margin: 0 0 6px; letter-spacing: .08em; }
+#controls { display: none; text-align: left; font-size: 15px; margin-top: 10px; color: var(--ink-dim); }
+#controls.show { display: block; }
+#controls b { color: var(--ink); }
+#tune .card { width: min(640px, 94vw); text-align: left; }
+#tune p { margin: 0 0 8px; color: var(--ink-dim); font-size: 14px; }
+.trow { display: grid; grid-template-columns: 1fr 140px 48px; gap: 10px; align-items: center; padding: 5px 0; font-size: 15px; }
+.trow input { width: 100%; }
+.tv { text-align: right; font-weight: 800; }
+.tv.changed { color: var(--gold); }
+.tbtns { display: flex; gap: 8px; }
+.tbtns .btn { margin-top: 12px; }
+#t-out { display: none; width: 100%; height: 120px; margin-top: 8px; background: #0c0c22; color: var(--ink); border: 1px solid var(--panel-line); border-radius: 8px; font: 12px monospace; }
+#end p { font-size: 17px; line-height: 1.5; }
+#rotate { display: none; position: fixed; inset: 0; background: var(--night); align-items: center; justify-content: center; text-align: center; font-size: 22px; font-weight: 800; padding: 30px; z-index: 20; }
+@media (orientation: portrait) and (pointer: coarse) { #rotate { display: flex; } }
+
+/* Boot and menus */
+#front { position: fixed; inset: 0; z-index: 9; display: none; background: radial-gradient(ellipse at 50% 60%, rgba(40,30,70,.88), rgba(6,6,20,.97) 72%);
+  flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 10px max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left)); }
+#front.show { display: flex; }
+#splash { display: none; position: absolute; inset: 0; z-index: 3; background: #04040a; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+#splash.show { display: flex; animation: splash 2.6s ease both; }
+#splash.econ.show { animation-duration: 2.2s; background: #050608; }
+@keyframes splash { 0% { opacity: 0 } 22% { opacity: 1 } 80% { opacity: 1 } 100% { opacity: 0 } }
+#splash .mark { width: min(150px, 26vh); }
+#splash .mark.e { width: min(110px, 22vh); }
+#splash .word { font-family: var(--display); font-weight: 800; letter-spacing: .3em; font-size: clamp(20px, 6vh, 34px); color: #fff6d8; margin-top: 6px; }
+#splash .word2 { font-family: var(--display); letter-spacing: .6em; font-size: clamp(12px, 3vh, 16px); color: #9fd0ff; }
+#splash.econ .word { background: linear-gradient(90deg, #4ad8c8, #9a6aff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+#f-logo { display: none; }
+#f-logo.show { display: block; }
+#f-logo h1 { font-family: var(--display); font-weight: 800; letter-spacing: .14em; font-size: clamp(34px, 11vh, 76px); margin: 0; color: #fff6d8; text-shadow: 0 0 24px rgba(255,210,122,.55); }
+#f-logo .sub { font-family: var(--display); color: var(--gold); letter-spacing: .18em; font-size: 14px; margin: 2px 0 10px; }
+#f-press { display: none; margin-top: 18px; font-weight: 800; color: var(--gold); font-size: 20px; letter-spacing: .06em; animation: pulse 1.6s infinite; }
+#f-press.show { display: flex; flex-direction: column; gap: 4px; }
+#f-press .pad-note { margin-top: 10px; font-size: 12px; opacity: .8; animation: none; }
+#f-press .small { font-size: 13px; color: var(--ink-dim); font-weight: 600; letter-spacing: 0; }
+#f-menu-wrap { display: none; width: min(460px, 92vw); max-height: calc(100vh - 150px); overflow: auto; }
+#f-menu-wrap.show { display: flex; flex-direction: column; }
+#f-menu-wrap.note-first #f-note { order: -1; margin: 0 0 10px; }
+#f-menu-wrap.note-first #f-title { order: -2; }
+#f-title { font-family: var(--display); color: var(--gold); letter-spacing: .1em; font-size: 20px; margin: 0 0 8px; }
+#f-title:empty { display: none; }
+#f-menu { display: flex; flex-direction: column; gap: 6px; }
+.fbtn { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 10px; text-align: left; padding: 9px 14px;
+  border-radius: 12px; border: 1px solid var(--panel-line); background: rgba(12,12,34,.82); color: var(--ink); font: 800 17px var(--body); cursor: pointer; }
+.fbtn .sub { flex-basis: 100%; font-weight: 600; font-size: 13px; color: var(--ink-dim); }
+.fbtn .val { color: var(--gold); font-size: 15px; }
+.fbtn.sel { border-color: var(--gold); background: rgba(255,210,122,.18); box-shadow: 0 0 16px rgba(255,210,122,.25); }
+.fbtn.sel .lbl::before { content: '\25B8  '; color: var(--gold); }
+.fbtn.off { opacity: .4; cursor: default; }
+.fbtn.danger .lbl { color: #ff9aa8; }
+#f-note { margin-top: 10px; font-size: 14px; color: var(--ink-dim); line-height: 1.45; }
+#f-note:empty { display: none; }
+.credits { color: var(--ink); font-size: 15px; }
+.credits .cmark { width: 70px; margin: 0 auto 4px; }
+.credits .dim { color: var(--ink-dim); }
+#f-help { position: absolute; bottom: max(8px, env(safe-area-inset-bottom)); right: max(14px, env(safe-area-inset-right)); display: flex; gap: 14px; font-size: 12px; color: var(--ink-dim); }
+#f-ver { position: absolute; top: 10px; right: max(14px, env(safe-area-inset-right)); font-size: 12px; color: var(--ink-dim); }
+.wm { position: absolute; left: max(14px, env(safe-area-inset-left)); bottom: max(8px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 8px;
+  font-family: var(--display); font-size: 11px; letter-spacing: .2em; color: rgba(255,246,216,.7); pointer-events: none; }
+.wm svg { width: 34px; }
+#saving { position: fixed; z-index: 10; right: max(14px, env(safe-area-inset-right)); bottom: max(10px, env(safe-area-inset-bottom)); padding: 6px 12px; border-radius: 999px;
+  background: var(--panel); border: 1px solid var(--panel-line); color: var(--gold); font-weight: 800; font-size: 13px; opacity: 0; transition: opacity .3s; pointer-events: none; }
+#saving.show { opacity: 1; }
+#dialog.typing #d-more { visibility: hidden; }
+#d-skip { float: right; margin: 0 -4px 6px 14px; padding: 6px 12px; white-space: nowrap; border-radius: 999px; border: 1px solid var(--panel-line); background: rgba(255,255,255,.06); color: var(--ink-dim); font: 700 12px var(--body); cursor: pointer; }
+#dialog.choosing #d-skip { display: none; }
+.pause-wm { display: flex; justify-content: center; align-items: center; gap: 8px; font-family: var(--display); font-size: 10px; letter-spacing: .2em; color: var(--ink-dim); margin: -2px 0 6px; }
+.pause-wm svg { width: 26px; }
+.btn.pad-sel { outline: 2px solid var(--gold); outline-offset: 2px; box-shadow: 0 0 14px rgba(255,210,122,.35); }
+@media (max-height: 460px) {
+  #f-logo h1 { font-size: clamp(28px, 9vh, 40px); }
+  #f-logo .sub { font-size: 11px; margin-bottom: 6px; }
+  #f-menu { gap: 5px; }
+  .fbtn { padding: 6px 12px; font-size: 15px; }
+  .fbtn .sub { font-size: 12px; }
+  #f-title { font-size: 17px; margin-bottom: 6px; }
+  #f-menu-wrap { max-height: calc(100vh - 110px); }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="game" width="640" height="320"></canvas></div>
+
+<div id="hud">
+  <div id="hearts"></div>
+  <div id="pips"></div>
+  <div id="motes"></div>
+  <div id="bossbar"><span class="bn"></span><div class="bb"><span></span></div></div>
+  <div id="goal"></div>
+  <button id="pause-btn" aria-label="Menu">MENU</button>
+  <div id="sign"></div>
+</div>
+<div id="toast"></div>
+
+<div id="touch">
+  <div id="stick"><div id="knob"></div></div>
+  <div id="touch-hint">Hold and slide anywhere on this side to move</div>
+  <div class="tbtn" id="b-talk" data-act="up">TALK</div>
+  <div class="tbtn" id="b-gift" data-act="gift">FLAME</div>
+  <div class="tbtn" id="b-down" data-act="downstrike" aria-label="Strike down">&#9660;</div>
+  <div class="tbtn" id="b-dash" data-act="dash">DASH</div>
+  <div class="tbtn" id="b-attack" data-act="attack">STRIKE</div>
+  <div class="tbtn" id="b-jump" data-act="jump">JUMP</div>
+</div>
+
+<div id="dialog" role="dialog" aria-live="polite">
+  <img id="d-face" alt="">
+  <div id="d-body"><button id="d-skip" aria-label="Skip this scene">Skip &#9656;&#9656;</button><div id="d-name"></div><div id="d-text"></div><div id="d-choices"></div></div>
+  <div id="d-more">tap anywhere &#9656;</div>
+</div>
+
+<div id="scene"><canvas id="scene-art" width="960" height="450"></canvas><div id="scene-title"></div></div>
+
+<div id="front">
+  <div id="splash"></div>
+  <div id="f-logo">
+    <h1>STARHAVEN</h1>
+    <div class="sub">A COURT OF DUSK AND STARLIGHT</div>
+  </div>
+  <div id="f-press">Press any button<span class="small">or tap the screen</span><span class="small pad-note">Controller not responding? Tap the screen once, or open the game in Safari or Chrome.</span></div>
+  <div id="f-menu-wrap">
+    <div id="f-title"></div>
+    <div id="f-menu" role="menu"></div>
+    <div id="f-note"></div>
+  </div>
+  <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
+  <div id="wm" class="wm"></div>
+  <div id="f-ver">Concept build &middot; Prologue to Chapter 3</div>
+</div>
+<div id="saving">&#10022; Saved</div>
+
+<div class="screen" id="card">
+  <div class="card">
+    <div id="c-label"></div>
+    <div id="c-name"></div>
+    <p id="c-text"></p>
+    <ul id="c-goals"></ul>
+    <div id="c-stats"></div>
+    <button class="btn primary" id="c-go">Begin</button>
+  </div>
+</div>
+
+<div class="screen" id="menu">
+  <div class="card">
+    <h2>Paused</h2>
+    <div class="pause-wm"></div>
+    <button class="btn primary" id="m-resume">Resume</button>
+    <button class="btn" id="m-journal">Story &amp; goals</button>
+    <button class="btn" id="m-tune">Tune the feel</button>
+    <button class="btn" id="m-restart">Restart this chapter</button>
+    <button class="btn" id="m-controls">Controls</button>
+    <button class="btn" id="m-fullscreen">Fullscreen</button>
+    <button class="btn" id="m-title">Quit to title (restarts this chapter)</button>
+    <div id="controls">
+      <p><b>Keyboard:</b> A/D or arrows move, Space jump, J strike, Shift dash, W talk or paint, S + J in the air strikes down, Esc menu.
+         (Z / X / C also jump / strike / dash.)</p>
+      <p><b>Gamepad:</b> stick or D-pad move, A jump, X strike, B dash, Y talk or paint, Start menu.</p>
+      <p><b>Touch:</b> hold and slide on the left half to move (slide down to aim a downward strike). JUMP, STRIKE and DASH on the right.
+         A TALK or PAINT button appears when there's someone to talk to or something to paint.</p>
+      <p>In conversations, tap anywhere or press any button to go on. <b>Skip</b> (or Start / Esc) jumps to the end of the scene or the next choice. For choices, tap one, or use up/down and A (Space on a keyboard).</p>
+      <p><b>Bluetooth controller on a phone:</b> pair it in your phone's Bluetooth settings, open the game, and press any button on it. The touch buttons hide while you use it.</p>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="journal">
+  <div class="card">
+    <h2>Story &amp; goals</h2>
+    <div id="j-body"></div>
+    <button class="btn primary" id="j-back">Back</button>
+  </div>
+</div>
+
+<div class="screen" id="tune">
+  <div class="card">
+    <h2>Tune the feel</h2>
+    <p>Changes apply as soon as you close this. Gold numbers are changed from the defaults. "Copy numbers" copies them so you can send them over.</p>
+    <div id="tune-list"></div>
+    <div class="tbtns">
+      <button class="btn primary" id="t-back">Back</button>
+      <button class="btn" id="t-copy">Copy numbers</button>
+      <button class="btn" id="t-reset">Reset all</button>
+    </div>
+    <textarea id="t-out" readonly></textarea>
+  </div>
+</div>
+
+<div class="screen" id="end">
+  <div class="card">
+    <h2 id="e-head"></h2>
+    <p id="e-text"></p>
+    <button class="btn primary" id="e-again">Play again from the start</button>
+    <button class="btn" id="e-home">Title screen</button>
+  </div>
+</div>
+
+<div id="rotate">Turn your phone sideways to play Starhaven.</div>
+
+<!--SCRIPTS-->
+<script>
+(function () {
+  const SH = window.SH, G = SH.game;
+  G.canvas = document.getElementById('game');
+  G.ctx = G.canvas.getContext('2d', { alpha: false });
+  G.hud.bind();
+  SH.input.bindTouch(document.getElementById('touch'), document.getElementById('stick'), document.getElementById('knob'));
+  G.fit();
+  G.build('ashes');          // the menus sit over the road to Starhaven
+  G.world.player.hidden = true;
+  SH.front.bind();
+  document.getElementById('wm').innerHTML = SH.front.NCS_MARK + '<span>NORTH COAST STUDIOS</span>';
+  document.querySelector('.pause-wm').innerHTML = SH.front.NCS_MARK + '<span>NORTH COAST STUDIOS</span>';
+  SH.front.boot();
+  window.addEventListener('resize', G.fit);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) G.pause(); });
+  requestAnimationFrame(G.loop);
+})();
+</script>
+</body>
+</html>

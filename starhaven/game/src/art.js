@@ -19,8 +19,10 @@
     iris: { bg: ['#2a5a7a', '#0c1a2a'], skin: '#f2d9c8', shade: '#dcbca8', hair: '#f4f0ff', hairD: '#c8c0e8', eye: '#8fd8ff', style: 'bun', ears: true, cloth: '#4f88c0', clothD: '#2f5a88', thread: true },
   };
 
-  A.portrait = function (who) {
-    if (cache['p_' + who]) return cache['p_' + who];
+  // variant: undefined (resting), 'talk' (mouth open) or 'blink'
+  A.portrait = function (who, variant) {
+    const key = 'p_' + who + (variant || '');
+    if (cache[key]) return cache[key];
     const L = LOOKS[who], c = canvas(48, 48), g = c.getContext('2d');
     const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
     // backdrop
@@ -58,6 +60,8 @@
     R(18, 18, 4, 1, L.hairD); R(26, 18, 4, 1, L.hairD);
     R(23, 23, 2, 4, L.shade);
     R(21, 28, 6, 1, L.lips || '#a5605a');
+    if (variant === 'talk') { R(22, 28, 4, 3, '#3a1418'); R(22, 28, 4, 1, '#f4f0ff'); }
+    if (variant === 'blink') { R(18, 20, 4, 3, L.skin); R(26, 20, 4, 3, L.skin); R(18, 22, 4, 1, L.shade); R(26, 22, 4, 1, L.shade); }
     if (L.beard) { R(15, 25, 18, 11, L.beard); R(17, 36, 14, 3, L.beard); R(21, 28, 6, 1, '#4a1a10'); R(18, 24, 12, 2, L.beard); }
     if (L.scar) { R(27, 16, 1, 9, '#a85a4a'); }
     if (L.circlet) { R(15, 13, 18, 1, '#cfd6ff'); R(23, 11, 2, 3, '#ffffff'); R(22, 12, 4, 1, '#ffffff'); }
@@ -67,11 +71,12 @@
     }
     // rim light on the side away from the viewer
     g.globalAlpha = 0.35; R(32, 13, 1, 20, '#ffffff'); g.globalAlpha = 1;
-    return (cache['p_' + who] = c);
+    return (cache[key] = c);
   };
-  A.portraitURL = function (who) {
-    if (cache['u_' + who]) return cache['u_' + who];
-    return (cache['u_' + who] = A.portrait(who).toDataURL());
+  A.portraitURL = function (who, variant) {
+    const key = 'u_' + who + (variant || '');
+    if (cache[key]) return cache[key];
+    return (cache[key] = A.portrait(who, variant).toDataURL());
   };
 
   // ---------------------------------------------------------------- intro panels (320 x 150)

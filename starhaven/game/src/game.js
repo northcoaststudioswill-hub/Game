@@ -22,13 +22,14 @@
     const pr = G.progress;
     SH.saves.write(G.slot, {
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {},
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
     });
     if (show) G.hud.saved();
   };
   G.newGame = function (slot) {
     G.slot = slot == null ? null : slot;
-    G.progress = { reached: 0, bonds: {}, met: [], playFrames: 0, motes: {} };
+    G.progress = { reached: 0, bonds: {}, met: [], playFrames: 0, motes: {}, stars: {} };
+    SH.arts.newGame();
     G.startChapter(0);
   };
   G.playChapter = function (i) {   // chapter select: no saving
@@ -40,7 +41,8 @@
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
     G.slot = slot;
-    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes) };
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars) };
+    SH.arts.newGame(); SH.arts.said = Object.assign({}, s.said); SH.arts.meter = s.bondMeter || 0;
     const N = ST.CHAPTERS.length, target = s.chapter;
     const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
     if (s.pending) {           // quit during an evening: play it again, then go on
@@ -78,12 +80,13 @@
       muralProgress: 0,
       wyrm: def.chase ? { on: false, x: def.chase.wyrmX * TS, speed: def.chase.speed } : null,
       camCenterX() { return this.cam.x + this.viewW / 2; },
-      onKill() { G.hud.goal(); },
+      onKill() { G.hud.goal(); SH.arts.whisper('kill'); },
       onDash() { },
       onPerfectDodge() {
         fx.slowmo = 26; player.stats.perfect++;
         player.dashCd = 0; player.airDashes = 1;
         fx.word(player.x, player.y - 52, 'PERFECT DODGE', '#9fe8ff', 60);
+        SH.arts.open(this);
         fx.ring(player.x, player.y - 20, '#9fe8ff', 44, 22, 2);
       },
       onKnockout() { G.knockout(); },
@@ -96,11 +99,12 @@
       dropRocks(n, at) {
         for (let i = 0; i < n; i++) this.rocks.push({ x: at != null ? at + (i - (n - 1) / 2) * 30 : player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
       },
-      onBossDown() { G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
+      onBossDown() { SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
+    SH.arts.reset(); w.lowT = 0;
     SH.draw.init(room, w.viewW);   // drawn with gates open, so gates draw on top as objects
     for (const g of gates) room.setGate(g, !g.open);
     w.thorns = (def.thornWalls || []).map(t => ({ ...t }));
@@ -202,6 +206,12 @@
       const st = sc.steps[sc.i++];
       if (Array.isArray(st)) {
         G.hud.dialog(st[0], st[1]);
+        {   // acting: everyone turns to the speaker; the speaker reacts to their own line
+          const w = G.world, sp = w.npcs.find(n => n.id === st[0] && !n.hidden), px = sp ? sp.x : w.player.x;
+          for (const n of w.npcs) if (n !== sp && !n.hidden && Math.abs(n.x - px) > 4) n.facing = px > n.x ? 1 : -1;
+          if (sp) { sp.facing = w.player.x > sp.x ? 1 : -1; const last = st[1].trim().slice(-1); sp.emote = last === '!' ? { e: '!', t: 0 } : last === '?' ? { e: '?', t: 0 } : /\.\.\.$/.test(st[1].trim()) ? { e: '...', t: 0 } : sp.emote; }
+          else if (st[0] === 'wren') w.player.facing = (() => { const near = w.npcs.filter(n => !n.hidden).sort((a, b) => Math.abs(a.x - w.player.x) - Math.abs(b.x - w.player.x))[0]; return near && Math.abs(near.x - w.player.x) < 200 ? (near.x > w.player.x ? 1 : -1) : w.player.facing; })();
+        }
         G.talkWait = 10; // a short pause so a held button doesn't skip the line
         return;
       }
@@ -233,6 +243,7 @@
       case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
       case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
       case 'meet': G.meet(st.who); break;
+      case 'emote': { const n = w.npcs.find(x => x.id === st.npc); if (n) n.emote = { e: st.e, t: 0 }; break; }
       case 'bond': G.bond(st.who, st.pts); break;
       case 'art': G.hud.sceneArt(st.id, st.title); break;
       case 'cue': G.hud.sceneCue(st.name); if (st.name === 'door' || st.name === 'end') SH.sfx.play('thud'); if (st.name === 'rise' || st.name === 'caelum') SH.sfx.play('chime'); break;
@@ -251,7 +262,7 @@
     const o = opts[idx];
     G.choosing = null;
     G.hud.choice(null);
-    for (const who in (o.bond || {})) G.bond(who, o.bond[who], o.liked === who);
+    for (const who in (o.bond || {})) { G.bond(who, o.bond[who], o.liked === who); const n = G.world.npcs.find(x => x.id === who && !x.hidden); if (n && o.liked === who) n.emote = { e: 'heart', t: 0 }; }
     sc.steps = sc.steps.slice(0, sc.i).concat(o.then || [], sc.steps.slice(sc.i));
     G.advance();
   };
@@ -308,16 +319,24 @@
       if (input.pressed.jump) p.jumpBuf = SH.tune.jumpBufferFrames + 1;
       if (input.pressed.dash) p.dashBuf = 7;
       if (input.pressed.gift) p.giftBuf = 9;
+      if (input.pressed.art) SH.arts.buf = 12;
       return;
     }
+    if (SH.arts.cutinStep(w)) return;
     if (fx.slowmo > 0) fx.slowmo--;
     w.time++; w.frames = (w.frames || 0) + 1;
+    // whispers down the bond
+    if (w.time === 540) SH.arts.whisper('room_' + w.room.def.id);
+    if (w.time === 900 && SH.stars.DEFS.some(d => SH.stars.canBuy(d))) SH.arts.whisper('stars');
+    if (p.hearts <= 2 && !p.dead) { if (++w.lowT === 30) SH.arts.whisper('low'); } else w.lowT = 0;
+    if (G.boss && G.boss.lastPhase !== w.bossPh) { w.bossPh = G.boss.lastPhase; if (w.bossPh > 1) SH.arts.whisper('boss' + w.bossPh, true); }
     // Starlight motes
     for (const m of w.motes) {
       if (m.got || Math.abs(m.x - p.x) > 16 || Math.abs(m.y - (p.y - 20)) > 24) continue;
       m.got = true; SH.sfx.play('mote');
       fx.burst(m.x, m.y, 6, { speed: 1.6, life: 18, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
       G.hud.motes(w.motes.filter(x => x.got).length, w.motes.length, true);
+      if (w.motes.every(x => x.got)) { SH.arts.whisper('motesAll'); SH.fx.word(p.x, p.y - 64, 'ALL STARLIGHT', '#ffd27a', 90); }
     }
 
     const def = w.room.def;
@@ -360,7 +379,7 @@
           if (f.big) {   // a flame wave burns through everything in its path, once each
             if (f.hit.has(e)) continue;
             f.hit.add(e);
-            e.takeHit({ fire: true, dmg: SH.GIFTS.flame.waveDamage, kb: 5, dir: f.dir, finisher: true }, w);
+            { const r = e.takeHit({ fire: true, dmg: SH.GIFTS.flame.waveDamage, kb: 5, dir: f.dir, finisher: true }, w); if (r && r.killed && !e.boss) SH.arts.finisher('ASHES', 'FLAME WAVE', '#ffb057'); }
             fx.burst(f.x, f.y, 22, { speed: 3.2, life: 28, colors: ['#ff8a3a', '#ffd27a', '#ffffff'], glow: true }); fx.stop(5); fx.kick(5);
             continue;
           }
@@ -456,7 +475,8 @@
     for (const g of w.gates) if (!g.closed && (g.lift || 0) < 1) g.lift = (g.lift || 0) + 0.03;
     w.cityLight += (w.cityLightTarget - w.cityLight) * 0.03;
     G.hud.hearts(p.hearts, p.maxHearts);
-    if (G.can('flame')) G.hud.pips(p.pips, SH.GIFTS.pips);
+    if (G.can('flame')) G.hud.pips(p.pips, SH.stars.maxPips());
+    SH.arts.update(w); G.hud.art(SH.arts);
     G.hud.boss(G.boss);
     G.cameraTarget();
     w.cam.x += (w.camT.x - w.cam.x) * 0.14;
@@ -558,7 +578,7 @@
   };
 
   G.pause = function () { if (G.state !== 'play') return; G.state = 'pause'; input.clear(); G.hud.navReset(); G.hud.menu(true); G.hud.nav('menu', 0); };
-  G.resume = function () { G.state = 'play'; input.clear(); G.hud.menu(false); G.hud.tune(false); G.hud.journal(false); };
+  G.resume = function () { G.state = 'play'; input.clear(); G.hud.menu(false); G.hud.tune(false); G.hud.journal(false); G.hud.stars(false); };
 
   // ---------------------------------------------------------------- loop
   let acc = 0, last = 0;
@@ -591,7 +611,7 @@
     if (G.state === 'front') SH.front.menuInput(input);
     else if (G.state === 'card') { if (go()) G.hud.cardGo(); }
     else if (G.state === 'pause' || G.state === 'end') {
-      const id = G.state === 'end' ? 'end' : ['journal', 'tune'].find(x => document.getElementById(x).classList.contains('show')) || 'menu';
+      const id = G.state === 'end' ? 'end' : ['journal', 'tune', 'stars'].find(x => document.getElementById(x).classList.contains('show')) || 'menu';
       if (input.take('up')) G.hud.nav(id, -1);
       else if (input.take('down')) G.hud.nav(id, 1);
       else if (input.take('jump') || input.take('attack')) G.hud.nav(id, 0, true);

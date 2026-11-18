@@ -393,6 +393,7 @@ const path = require('path');
       for (let i = 0; i < 600 && !G.boss; i++) talk({}, null);
       const boss = G.boss, gateClosed = w.gates[0].closed;
       let f = 0, rocksSeen = 0;
+      let inhales = 0, lastSt = '';
       const moves = new Set(), phases = new Set(); let choked = false, wavesSeen = false, hp0 = boss.hp, waveHits = 0;
       const behind = () => { const bx = boss.x - boss.dir * (boss.w / 2 + 14); if (Math.abs(p.x - bx) > 6 || Math.abs(p.y - boss.y) > 4) SH.test.place(bx / T, 14); p.facing = boss.dir; };
       while (f++ < 60 * 150 && G.boss && !boss.dead) {
@@ -405,7 +406,7 @@ const path = require('path');
         if (st === 'stun' || st === 'slamrest' || st === 'breath') { behind(); if (!p.swing && f % 5 === 0) press = ['attack']; }
         else if (st === 'inhale') {   // stand in front and throw fire down its throat
           const fx0 = boss.x + boss.dir * 110; if (Math.abs(p.x - fx0) > 8) SH.test.place(fx0 / T, 14);
-          p.facing = -boss.dir; if (f % 12 === 0) press = ['gift'];
+          p.facing = -boss.dir; if (inhales >= 2 && f % 12 === 0) press = ['gift'];   // let the first breath happen, choke the rest
         }
         else if (st === 'windup' || st === 'charge') {   // stay just behind its tail so it runs on into the cliff
           behind();
@@ -415,7 +416,7 @@ const path = require('path');
           if (p.pips >= 2 && Math.abs(p.x - boss.x) > 60) { p.facing = boss.x > p.x ? 1 : -1; held = { gift: f % 60 < 40 }; if (f % 60 === 0) press = ['gift']; }   // charge a flame wave
           else { behind(); if (!p.swing && f % 5 === 0) press = ['attack']; }
         }
-        const before = boss.hp, st0 = boss.state;
+        const before = boss.hp, st0 = boss.state; if (st0 === 'inhale' && lastSt !== 'inhale') inhales++; lastSt = st0;
         step(held, press);
         if (st0 === 'inhale' && boss.state === 'stun') choked = true;
         if (before - boss.hp >= 8) waveHits++;
@@ -452,6 +453,56 @@ const path = require('path');
       const waveDmg = 10 - wy.hp;
       check('New moves: dash strike (3), rising strike (lifts her, 2+), flame wave (hold: two moons, 8, pierces)', kind1 === 'thrust' && thrustDmg === 3 && kind2 === 'up' && upDmg >= 2 && rose > 30 && charging && big && pipsAfter < 1.2 && waveDmg >= 8 && alive,
         { kind1, thrustDmg, kind2, upDmg, rose: Math.round(rose), charging, big, pipsAfter: +pipsAfter.toFixed(2), waveDmg, pierced: alive });
+    })();
+
+    // Reimagined: the bond meter, Bond Arts, openings, finisher bands, whispers, the Constellation
+    (function () {
+      const A = SH.arts;
+      SH.test.load('woods', { story: false }); A.meter = 100; step({}, ['art']);
+      const mortalNoArt = !A.active() && !A.cutin && document.getElementById('art').style.display === 'none';
+      SH.test.load('ring', { story: false }); const p = P(), w = G.world; A.newGame(); G.progress.stars = {};
+      const sprites = w.things.filter(e => e.kind === 'thornSprite');
+      // hits fill the meter
+      const dummy = w.things.find(e => e.kind === 'dummy'); SH.test.place(dummy.x / T - 1.2, 16); p.facing = 1;
+      let f = 0; while (A.meter < 100 && f++ < 1500) { if (Math.abs(p.x - (dummy.x - 28)) > 6) { SH.test.place((dummy.x - 28) / T - 0.5, 16); p.facing = 1; } step({}, !p.swing && f % 6 === 0 ? ['attack'] : null); }
+      const filledAfter = p.stats.hits, ready = A.ready();
+      step({}, null); const btn = document.getElementById('b-art').style.display !== 'none';
+      // Starfall: a cut-in that freezes the world, then stars hit everything in sight
+      sprites.forEach((e, i) => { e.x = p.x + 90 + i * 30; e.y = 16 * T; e.home.x = e.x; e.hp = 4; });
+      const hp0 = sprites.map(e => e.hp), t0 = w.time;
+      step({}, ['art']); for (let i = 0; i < 12 && !A.cutin; i++) step({}, null); const cut = !!A.cutin && A.cutin.kind === 'starfall';
+      for (let i = 0; i < 30; i++) step({}, null); const frozen = w.time - t0 <= 2 && !!A.cutin;
+      for (let i = 0; i < 140; i++) step({}, null);
+      const dead = sprites.filter(e => e.dead).length, spent = A.meter < 100 && !A.scene;
+      check('Bond Art: no bond while mortal; hits fill the meter; STARFALL cuts in, freezes the world, then clears every sprite in sight', mortalNoArt && ready && btn && cut && frozen && dead === 3 && spent,
+        { mortalNoArt, hitsToFill: filledAfter, ready, touchButton: btn, cutin: cut, frozen, spritesDown: dead, hp0 });
+      // First Light takes turns with Starfall once the Flame is awake: burns, and mends a heart
+      SH.test.load('mountain', { story: false }); const p2 = P(), w2 = G.world; A.newGame(); A.next = 1; A.meter = 100;
+      const wy = w2.things.find(e => e.kind === 'wyrm' && !e.boss); wy.x = p2.x + 80; wy.y = p2.y; wy.state = 'stun'; wy.t = 0; p2.hearts = 3;
+      const kindNext = A.nextKind(); step({}, ['art']); for (let i = 0; i < 130; i++) { wy.vx = 0; step({}, null); }
+      check('Bond Art: FIRST LIGHT (Wren, once the Flame wakes) burns what is near and mends one heart', kindNext === 'firstlight' && wy.dead && p2.hearts === 4, { kindNext, wyrmlingDown: wy.dead, hearts: p2.hearts });
+      // An opening: for a moment every cut bites deeper and gets past the armored head
+      SH.test.load('mountain', { story: false }); const p3 = P(), w3 = G.world; A.newGame();
+      const wz = w3.things.find(e => e.kind === 'wyrm' && !e.boss); const hold = () => { wz.state = 'windup'; wz.t = 0; wz.dir = -1; wz.x = 100 * T; wz.y = 14 * T; wz.vx = 0; };
+      hold(); SH.test.place(98.3, 14); p3.facing = 1; step({}, null); hold(); step({}, ['attack']); for (let i = 0; i < 12; i++) { hold(); p3.invuln = 5; step({}, null); }
+      const clang = wz.hp === 10;
+      w3.onPerfectDodge(); const openOn = A.opening > 0; SH.fx.slowmo = 0;
+      for (let i = 0; i < 20; i++) { hold(); p3.invuln = 5; step({}, null); } hold(); step({}, ['attack']); for (let i = 0; i < 12; i++) { hold(); p3.invuln = 5; step({}, null); }
+      check('Opening: a perfect dodge opens the foe; the next cut gets past the armored head and does 1 more', clang && openOn && wz.hp === 7, { clangBefore: clang, openOn, hpAfter: wz.hp });
+      // finisher band on a dash-strike kill; whispers are queued once each
+      hold(); wz.state = 'stun'; wz.hp = 2; SH.test.place(97, 14); p3.facing = 1; p3.dashCd = 0; A.opening = 0; for (let i = 0; i < 20; i++) { wz.state = 'stun'; wz.t = 0; step({}, null); }
+      step({ right: true }, ['dash']); step({ right: true }, ['attack']); let band = null; for (let i = 0; i < 30; i++) { SH.fx.hitstop = 0; step({}, null); if (A.band) band = A.band.text; }
+      A.said = {}; A.queue.length = 0; A.whisper('dodge'); A.whisper('dodge'); A.whisper('dodge'); const queued = A.queue.length; A.whisperGap = 0; A.whisperT = 0; A.band = null;
+      step({}, null); const shown = document.getElementById('whisper').classList.contains('show'), text = document.getElementById('w-text').textContent;
+      check('Finisher band on a dash-strike kill; a whisper slides in (each line once per save)', band === 'RUN THROUGH' && wz.dead && queued === 2 && shown && text.length > 10, { band, queued, shown, text });
+      // the Constellation: Starlight buys a heart, and it is in the save
+      SH.saves.erase(0); G.newGame(0); G.hud.cardGo(); G.progress.motes = { woods: 29, prologue: 20 };
+      const S = SH.stars, free0 = S.free(), max0 = P().maxHearts, ok = S.buy('heart'), no = S.buy('edge'), max1 = P().maxHearts;
+      const saved = SH.saves.all()[0]; const kept = saved && saved.stars && saved.stars.heart === 1;
+      G.loadSlot(0); G.hud.cardGo && G.hud.cardGo(); const afterLoad = P().maxHearts;
+      check('Constellation: 30 Starlight lights The Huntress (+1 heart), too little is refused, and it survives a reload', free0 === 49 && ok && !no && max1 === max0 + 1 && S.free() === 19 && kept && afterLoad === max0 + 1,
+        { free0, bought: ok, refused: !no, hearts: [max0, max1, afterLoad], left: S.free(), inSave: !!kept });
+      SH.saves.erase(0);
     })();
 
     // Evening 2 choices lead to the right person and add their bond points

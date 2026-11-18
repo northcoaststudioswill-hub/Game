@@ -360,7 +360,7 @@
   Wyrm.prototype.takeHit = function (hit, world) {
     const facingHer = hit.dir === -this.dir;
     if (this.state === 'roar') return null;
-    if (!hit.fire && facingHer && (this.state === 'windup' || this.state === 'charge')) {
+    if (!hit.fire && !hit.open && facingHer && (this.state === 'windup' || this.state === 'charge')) {
       // the armored head: sparks, no damage
       SH.fx.word(this.x + this.dir * this.w / 2, this.y - this.h - 6, 'CLANG', '#c8d2e2', 26);
       SH.fx.burst(this.x + this.dir * this.w / 2, this.y - this.h / 2, 8, { speed: 2.6, life: 14, colors: ['#ffffff', '#ffd27a'] });
@@ -374,7 +374,7 @@
       if (this.state === 'inhale' && facingHer) {
         // fire down its throat while it breathes in: it chokes, and is wide open
         this.state = 'stun'; this.t = -Math.floor(this.def.stun * 0.3); dmg += 2;
-        SH.fx.word(this.x, this.y - this.h - 22, 'CHOKED!', '#ffb057', 60); SH.fx.kick(6); SH.fx.stop(6); SH.sfx.play('thud');
+        SH.arts.finisher('CHOKED', 'FIRE DOWN ITS THROAT', '#ffb057'); SH.arts.whisper('choke');
         SH.fx.burst(this.x + this.dir * this.w / 2, this.y - this.h * 0.5, 22, { speed: 3, life: 30, colors: ['#ff8a3a', '#ffd27a', '#bfe8ff'], glow: true });
       }
     } else if (this.boss && this.state === 'stun') dmg += 1;   // dazed: every cut bites deeper

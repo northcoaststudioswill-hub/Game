@@ -21,6 +21,9 @@ ORDER = [
     'enemies.js',    # thorn sprite, dummy, thorn buds
     'art.js',        # portraits, intro panels, people
     'cine.js',       # animated cinematics
+    'stars.js',      # the Constellation: Starlight upgrades
+    'arts.js',       # Bond Arts, finisher bands, openings, whispers, pixel font
+    'people.js',     # the cast as shaded, outlined pixel sprites with blinks and emotes
     'wren.js',       # Wren's jointed figure, poses and slash crescents
     'draw.js',       # world drawing
     'game.js',       # loop, camera, checkpoints

@@ -10,10 +10,10 @@
       facing: 1, grounded: false, wasGrounded: false,
       coyote: 0, jumpBuf: 0, dashBuf: 0, atkBuf: 0,
       airJumps: 1, airDashes: 1, rising: false,
-      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, bowCd: 0, bowT: 0, pips: SH.GIFTS.pips, giftCd: 0, castT: 0, giftBuf: 0, charging: false, chargeT: 0, hitFlash: 0,
+      dashT: 0, dashCd: 0, dashDir: 1, iframes: 0, bowCd: 0, bowT: 0, pips: SH.stars.maxPips(), giftCd: 0, castT: 0, giftBuf: 0, charging: false, chargeT: 0, hitFlash: 0,
       invuln: 0, stun: 0,
       swing: null, comboStep: 0, comboKind: null, comboGap: 0,
-      hearts: P.hearts, maxHearts: P.hearts,
+      hearts: SH.stars.maxHearts(), maxHearts: SH.stars.maxHearts(),
       lastSafe: { x, y }, dropT: 0,
       anim: { t: 0, run: 0, squash: 0, land: 0 },
       scarf: [], dead: false,
@@ -49,7 +49,7 @@
     // Flame: cast a fireball for one moon pip; pips refill slowly over time
     if (SH.game.can('flame')) {
       const G = SH.GIFTS;
-      this.pips = Math.min(G.pips, this.pips + 1 / G.regenFrames);
+      this.pips = Math.min(SH.stars.maxPips(), this.pips + 1 / G.regenFrames);
       // press to start, release to throw; hold long enough (and have two moons) and it becomes a flame wave
       if (this.giftBuf > 0 && !this.charging && this.giftCd <= 0 && !this.dead && this.stun <= 0) { this.giftBuf = 0; this.charging = true; this.chargeT = 0; }
       if (this.charging) {
@@ -300,12 +300,14 @@
         if (s.hits.has(tgt) || !tgt.hittable()) continue;
         if (!SH.overlap(hb, tgt.hurtBox())) continue;
         s.hits.add(tgt);
-        const r = tgt.takeHit({ dmg: d.dmg || C.damage, kb: d.kb, dir: this.facing, finisher: !!d.finisher, pogo: s.kind === 'pogo', launch: d.launch || 0 }, world);
+        const open = SH.arts.opening > 0;
+        const r = tgt.takeHit({ dmg: (d.dmg || C.damage) + (open ? 1 : 0) + (d.finisher ? SH.stars.level('edge') : 0), kb: d.kb, dir: this.facing, finisher: !!d.finisher, pogo: s.kind === 'pogo', launch: d.launch || 0, open, move: s.kind }, world);
         if (!r) continue;
         if (r.deflect) continue;
-        if (SH.game.can('flame')) this.pips = Math.min(SH.GIFTS.pips, this.pips + SH.GIFTS.perHit); // close-up hits refill the moons
-        this.stats.hits++;
+        if (SH.game.can('flame')) this.pips = Math.min(SH.stars.maxPips(), this.pips + SH.GIFTS.perHit); // close-up hits refill the moons
+        this.stats.hits++; SH.arts.gain(d.finisher ? 9 : 6);
         { const hb2 = tgt.hurtBox(); fx.spark((Math.max(hb.l, hb2.l) + Math.min(hb.r, hb2.r)) / 2, (Math.max(hb.t, hb2.t) + Math.min(hb.b, hb2.b)) / 2, s.kind === 'pogo' ? Math.PI / 2 : s.kind === 'up' ? -Math.PI / 2 : (this.facing > 0 ? 0 : Math.PI), d.finisher || r.killed); }
+        if (r.killed && !tgt.boss && (tgt.kind === 'wyrm' || tgt.kind === 'thornSprite')) { const nm = { thrust: ['RUN THROUGH', 'DASH STRIKE'], up: ['SKYBOUND', 'RISING STRIKE'], pogo: ['FROM ABOVE', 'DOWN STRIKE'] }[s.kind]; if (nm) SH.arts.finisher(nm[0], nm[1], '#9fe8ff'); }
         SH.sfx.play(r.killed ? 'kill' : 'hit');
         fx.stop(r.killed ? C.killStop : d.stop);
         fx.kick(r.killed ? 4 : d.finisher ? 3 : 1.6);
