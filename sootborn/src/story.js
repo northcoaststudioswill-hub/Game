@@ -32,6 +32,8 @@ const CAST = {
   cadt1: { name: 'House Teal', look: () => ({ accredited: 1, cadet: 1, skin: '#f0dccc', hair: '#f6eac0', style: 'short', robe: '#dfe6e4', armor: '#dfe6e4', trim: '#e8c25a', sash: '#2aa6a0', shield: 1 }) },
   cadt2: { name: 'House Teal', look: () => ({ accredited: 1, cadet: 1, helm: 1, skin: '#e8ccb4', hair: '#f6eac0', style: 'short', robe: '#cfd8d8', armor: '#cfd8d8', trim: '#e8c25a', sash: '#2aa6a0' }) },
   vant: { name: 'Captain Vant', look: () => ({ accredited: 1, cadet: 1, skin: '#e0c0a8', hair: '#d8d0b0', style: 'short', robe: '#b8c4c4', armor: '#b8c4c4', trim: '#e8c25a', sash: '#2aa6a0', cape: '#1e7a76' }) },
+  teo: { name: 'Teo Aldane', look: () => ({ accredited: 1, cadet: 1, skin: '#e8c8a8', hair: '#d8b070', style: 'short', robe: '#e8e0cc', armor: '#e8e0cc', trim: '#e8c25a', sash: '#7a5ac8' }) },
+  voss: { name: 'Proctor Voss', look: () => ({ accredited: 1, cadet: 1, skin: '#f0e0d4', hair: '#e8e4dc', style: 'short', circlet: 1, crown: 1, robe: '#fbf8f0', armor: '#fbf8f0', trim: '#e8c25a', sash: '#f4f0e6', cape: '#f4f2ec' }) },
   lucan: { name: 'Lucan Aurel', look: () => ({ accredited: 1, cadet: 1, skin: '#f4e6dc', hair: '#f6eac0', style: 'long', long: 1, circlet: 1, crown: 1, robe: '#fbf8f0', armor: '#fbf8f0', trim: '#e8c25a', sash: '#e8c25a', cape: '#f4f2ec' }) },
   hollis: { name: 'Hollis the welder', look: crowd('#8a5a3e', '#2a1a14', 'short', '#5a4a3a') },
   marrow: { name: 'Marrow', look: crowd('#c08a6a', '#4a3020', 'long', '#4a4a5a') },
@@ -45,7 +47,7 @@ const CAST = {
   c3: { name: 'Neighbor', look: crowd('#6a4430', '#141014', 'bun', '#6a4a3a') },
   c4: { name: 'Neighbor', look: crowd('#d0a080', '#6a6a6a', 'bald', '#3a4a4a') }
 };
-const MOUTH = { kael2: 'frown', lucan: 'smirk', vant: 'frown', cadv1: 'flat', cadv2: 'flat', cadt1: 'flat', cadt2: 'flat', kael: 'smirk', seren: 'smile', tavi: 'smile', mara: 'frown', ivo: 'smile', vale: 'flat', celestine: 'smirk', warden: 'flat', proctor: 'frown', watchman: 'frown', nell: 'flat', orin: 'flat', dace: 'smile', bao: 'smile', pell: 'smile', juno: 'smile', pip: 'smile', mosi: 'smile', ada: 'flat', hollis: 'frown', marrow: 'frown', fen: 'flat', kit: 'smirk' };
+const MOUTH = { teo: 'flat', voss: 'smirk', kael2: 'frown', lucan: 'smirk', vant: 'frown', cadv1: 'flat', cadv2: 'flat', cadt1: 'flat', cadt2: 'flat', kael: 'smirk', seren: 'smile', tavi: 'smile', mara: 'frown', ivo: 'smile', vale: 'flat', celestine: 'smirk', warden: 'flat', proctor: 'frown', watchman: 'frown', nell: 'flat', orin: 'flat', dace: 'smile', bao: 'smile', pell: 'smile', juno: 'smile', pip: 'smile', mosi: 'smile', ada: 'flat', hollis: 'frown', marrow: 'frown', fen: 'flat', kit: 'smirk' };
 const NPCS = [
   { id: 'tavi', map: 'apt', at: [7, 3], dir: 2 },
   { id: 'mara', map: 'bay', at: [7, 4], dir: 0 },

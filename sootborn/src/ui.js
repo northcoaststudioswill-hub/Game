@@ -202,21 +202,40 @@ const Menus = {
   // dev: jump to any point of the slice
   checkpoints() {
     const fresh = () => { UI.clear(); freshState('Kael', 0); World.resetSheets(); World.showPlayer = true; }, load = k => () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS[k])))); };
-    const C = [
-      ['Opening cinematic', () => { UI.clear(); Sound.tname = null; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => Game.toTitle()); G.mode = 'opening'; }],
-      ['Assay 1 · The Valley (battle), then the prologue', () => { UI.clear(); Game.newGame(); }],
-      ['Prologue · story only', () => { fresh(); Cutscene.play(PROLOGUE_A.filter(s => !s.brawl && !/^FOUR YEARS FROM/.test(s.card || '')), () => Game.startHeist()); }],
-      ['Prologue · the relay heist', () => { fresh(); Game.startHeist(); }],
-      ['Prologue · Lift Zero and the furnace', () => { fresh(); Game.onHeistDone(); }],
-      ['Prologue · Three Steps (the Warden fight)', () => { fresh(); G.flags.ranForHer = 1; ffScene('THREE STEPS', 'You make it three steps.', () => FF.furnace(), () => Game.toTitle()); }],
-      ['Day 1 · wake up in Ashgate', () => { fresh(); Game.startPresent(); }],
-      ['Assay 2 · The Ford (battle), then Day 2', () => { UI.clear(); ffScene('THE ASSAY', 'Four years from now. Day nineteen.', () => FF.ford(), load('day2')); }],
-      ['Day 2 · morning', load('day2')],
-      ['Day 2 · the Ember Ring', load('ring')],
-      ['Day 2 · lantern built, festival next', load('fest')],
-      ['Assay 3 · The Keep (duel)', () => { UI.clear(); ffScene('FOUR YEARS FROM NOW', 'The Assay. The last day.', () => FF.keep(), () => Game.toTitle()); }]
-    ];
-    UI.push(modal({ title: 'Checkpoints', build(b) { b.innerHTML = '<p>Dev menu. Jumps straight to a point in the slice. Your save slots are not touched until the game autosaves.</p>'; }, items: C.map(([label, act]) => ({ label, act })).concat([{ label: 'Back', act: () => UI.pop() }]) }));
+    const ff = (card, sub, k, then) => () => { UI.clear(); ffScene(card, sub, () => FF[k](), then || (() => Game.toTitle())); };
+    const fest = k => () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.fest)))); setTimeout(() => { UI.clear(); Game[k](); }, 60); };
+    const S = {
+      'Fights': [
+        ['The Valley · battle (the first fight)', ff('FOUR YEARS FROM NOW', 'The Assay. Day forty.', 'valley')],
+        ['Three Steps · the Warden at the furnace', () => { fresh(); G.flags.ranForHer = 1; ffScene('THREE STEPS', 'You make it three steps.', () => FF.furnace(), () => Game.toTitle()); }],
+        ['The Pairing · duel with Teo Aldane', ff('FOUR YEARS FROM NOW', 'The Assay. The first night.', 'pairing')],
+        ['The Ford · duel with Captain Vant', ff('THE ASSAY', 'Four years from now. Day nineteen.', 'ford')],
+        ['The Proctor · duel with Halden Voss', ff('FOUR YEARS FROM NOW', 'The Assay. Day thirty-one.', 'proctor')],
+        ['The Keep · duel with Lucan Aurel', ff('FOUR YEARS FROM NOW', 'The Assay. The last day.', 'keep')],
+        ['The Ember Ring · bouts below', load('ring')]
+      ],
+      'Story beats': [
+        ['Opening film', () => { UI.clear(); Sound.tname = null; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => Game.toTitle()); G.mode = 'opening'; }],
+        ['New game from the top (Valley, then prologue)', () => { UI.clear(); Game.newGame(); }],
+        ['Prologue · story only', () => { fresh(); Cutscene.play(PROLOGUE_A.filter(s => !s.brawl && !/^FOUR YEARS FROM/.test(s.card || '')), () => Game.startHeist()); }],
+        ['Prologue · the relay heist', () => { fresh(); Game.startHeist(); }],
+        ['Prologue · Lift Zero, the furnace, the Pairing', () => { fresh(); Game.onHeistDone(); }],
+        ['Day 1 · wake up in Ashgate', () => { fresh(); Game.startPresent(); }],
+        ['End of Day 1 · the Ford, then Day 2', ff('THE ASSAY', 'Four years from now. Day nineteen.', 'ford', load('day2'))],
+        ['Day 2 · morning', load('day2')],
+        ['Day 2 · lantern built, festival next', load('fest')],
+        ['Day 2 · Last Bell (the Proctor, then the ceremony)', fest('startFestival')],
+        ['Day 2 · the lantern climb (stealth)', fest('startFestStealth')],
+        ['Day 2 · First Fire (the Keep, then the ending)', fest('onFestDone')]
+      ]
+    };
+    const sub = k => () => UI.push(modal({ title: k, items: S[k].map(([label, act]) => ({ label, act })).concat([{ label: 'Back', act: () => UI.pop() }]) }));
+    const onoff = v => v ? 'On' : 'Off';
+    UI.push(modal({ title: 'Dev menu', build(b) { b.innerHTML = '<p>Jump straight to any fight or story beat. Your save slots are not touched until the game autosaves.</p>'; }, items: [
+      { label: 'Fights', act: sub('Fights') }, { label: 'Story beats', act: sub('Story beats') },
+      { label: 'Start fights at full fury', value: () => onoff(DEV.fury), adj: () => { DEV.fury = DEV.fury ? 0 : 1; } },
+      { label: 'Skip fight intro films', value: () => onoff(DEV.quick), adj: () => { DEV.quick = DEV.quick ? 0 : 1; } },
+      { label: 'Back', act: () => UI.pop() }] }));
   },
   saveData() {
     const inGame = G.mode === 'world';
@@ -236,7 +255,7 @@ const Menus = {
   title() {
     const s = Save.latest();
     UI.push(modal({ clear: true, onBack: null, build(b) {
-      b.innerHTML = `<h1 class="logo">SOOTBORN</h1><div class="sub">Book One</div>`;
+      b.innerHTML = `<h1 class="logo">SOOTBORN</h1><div class="sub">Every breath is hers.</div>`;
       b.parentNode.style.background = 'rgba(16,10,13,.82)'; b.parentNode.style.textAlign = 'center';
     }, items: [
       { label: s ? `Continue — Day ${s.day}, ${MAPS[s.map].name}` : 'Continue', disabled: () => !s, act: () => { UI.clear(); Game.loadSave(Save.latest()); } },
@@ -244,11 +263,11 @@ const Menus = {
       { label: 'Load game', act: () => Menus.slots('load') },
       { label: 'Settings', act: () => Menus.settings() },
       { label: 'About & controls', act: () => Menus.about() },
-      { label: 'Checkpoints (dev)', act: () => Menus.checkpoints() }
+      { label: 'Dev menu · jump to a scene', act: () => Menus.checkpoints() }
     ] }));
   },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. Book One vertical slice (v0.12): the prologue, two days in Cinderwell, and three battles from the Assay, four years on. In a fight: A strikes (three-hit chain), B dodges (dodge through the red for an opening), and when the fury bar is full, hold A for ELEVEN.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.12.8): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. In a fight: A strikes (three-hit chain), B dodges (dodge through the red for an opening), and when the fury bar is full, hold A for ELEVEN.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
@@ -377,7 +396,7 @@ const DayEnd = {
       b.innerHTML = `<p>By first bell the Proctors have taken the lantern down. It does not matter. Four hundred people saw a sun, and you cannot scrub a thing like that off stone.</p>
         <p>In Row K, a child sleeps with a leaf pressed in a worksheet. In Fuse Room C, one bus hums at nineteen, exactly. And at the gate of Lift Zero, a grey Inspector waits with a ledger, to see who comes to carry it up.</p>
         <p><i>"Be too much for them."</i></p>
-        <h2 style="margin-top:16px">END OF FIRST FIRE</h2><p style="opacity:.7">SOOTBORN · Book One vertical slice · thanks for playing.</p>`;
+        <h2 style="margin-top:16px">END OF FIRST FIRE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
     }, items: [
       { label: 'Keep exploring (Day 3)', act: () => { UI.clear(); Game.loadSave(Save.read('auto') || Save.snapshot()); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }
@@ -389,7 +408,7 @@ const DayEnd = {
       b.innerHTML = `<p>Far above Cinderwell — above the rock, above the warnings — a crate of cold greens arrives somewhere that doesn't exist.</p>
         <p>Below, Kael Brennick dreams of ${F('sawRiser') ? 'warm air falling from a pipe with no destination' : 'a lift light, green for eleven seconds'} — and of Seren, laughing at him for being right.</p>
         <p><i>"They came down in light. One day, I'm going up in it."</i></p>
-        <h2 style="margin-top:16px">END OF DAY ONE</h2><p style="opacity:.7">SOOTBORN · Book One vertical slice · thanks for playing.</p>`;
+        <h2 style="margin-top:16px">END OF DAY ONE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
     }, items: [
       { label: 'Wake up: Day 2 — First Fire', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); if (NOFF) return Game.loadSave(sv); ffScene('THE ASSAY', 'Four years from now. Day nineteen.', () => FF.ford(), () => Game.loadSave(sv)); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }

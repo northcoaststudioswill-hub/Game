@@ -86,7 +86,7 @@ const G3 = {
     } catch (e) { console.warn('3D unavailable, using 2D', e); this.ok = false; }
     return this.ok;
   },
-  want(bg) { return (bg === 'valley' || bg === 'ford' || bg === 'keep') && !NO3D && this.init(); },
+  want(bg) { return !!this.LOOK[bg] && !NO3D && this.init(); },
   // keep the GL canvas exactly under the pixel canvas; show it only on frames that drew 3D
   sync() { if (!this.cv) return; if (this.used !== this.shown) { this.shown = this.used; this.cv.style.display = this.used ? 'block' : 'none'; document.body.classList.toggle('g3on', this.used); if (!this.used) this.cv.style.filter = ''; } },
   target0(w, h) { const gl = this.gl; if (this.fb && this.fbW === w && this.fbH === h) return !!this.post; this.fbW = w; this.fbH = h; this.post = false;
@@ -104,11 +104,14 @@ const G3 = {
   LOOK: {
     valley: { top: [.16, .42, .86], bot: [.74, .9, 1], sun: [-.42, .8, .43], sunC: [1.0, .95, .78], amb: [.34, .38, .46], sky: [.16, .2, .26], fog: [.72, .88, 1], fogR: [420, 1500], sunAt: [.55, .6, -1] },
     ford: { top: [.2, .14, .42], bot: [1, .6, .36], sun: [-.62, .4, -.3], sunC: [1.2, .7, .4], amb: [.52, .4, .46], sky: [.3, .22, .3], fog: [1, .64, .44], fogR: [330, 1300], sunAt: [-.5, .16, -1] },
+    cell: { top: [.02, .02, .04], bot: [.08, .07, .11], sun: [.12, .95, .28], sunC: [1.3, 1.2, 1.0], amb: [.36, .35, .44], sky: [.14, .14, .2], fog: [.04, .04, .07], fogR: [260, 760], sunAt: [0, 1, -.1] },
+    storm: { top: [.02, .03, .09], bot: [.13, .15, .26], sun: [-.3, .8, .5], sunC: [.55, .62, .86], amb: [.22, .24, .34], sky: [.1, .12, .2], fog: [.09, .11, .2], fogR: [240, 950], sunAt: [.42, .62, -1] },
     keep: { top: [.3, .44, .78], bot: [1, .8, .68], sun: [.55, .42, -.72], sunC: [1.2, .92, .7], amb: [.4, .38, .46], sky: [.2, .2, .26], fog: [1, .84, .76], fogR: [380, 1500], sunAt: [.5, .2, -1] }
   },
   env(bg) {
     if (this.envs[bg]) return this.envs[bg];
-    const gl = this.gl, A = new Batch(30000), Sh = new Batch(20000), r = rng(bg.length * 131 + 17), I = M4.id(), R = (a, b) => a + r() * (b - a), hw = bg === 'keep' ? 110 : 125, hh = bg === 'keep' ? 50 : 60;
+    const real = bg; if (bg === 'storm') bg = 'valley';
+    const gl = this.gl, A = new Batch(30000), Sh = new Batch(20000), r = rng(bg.length * 131 + 17), I = M4.id(), R = (a, b) => a + r() * (b - a), hw = bg === 'keep' ? 110 : bg === 'cell' ? 96 : 125, hh = bg === 'keep' ? 50 : bg === 'cell' ? 58 : 60;
     const pine = (x, z, s) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); Sh.cyl(m, 0, 0, 0, 2.2 * s, 1.6 * s, 10 * s, 5, '#5a3c26'); const g = ['#1f6a34', '#27803c', '#2f9646', '#3aa850']; for (let i = 0; i < 4; i++) Sh.cyl(m, 0, (7 + i * 9) * s, 0, (15 - i * 3.2) * s, 0, 15 * s, 7, bg === 'ford' ? ['#28503a', '#2f5e40', '#386a46', '#427650'][i] : g[i]); };
     const oak = (x, z, s, c) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); Sh.cyl(m, 0, 0, 0, 2.6 * s, 1.8 * s, 16 * s, 5, '#6a4a30'); Sh.cyl(m, 0, 13 * s, 0, 9 * s, 13 * s, 8 * s, 6, shade(c, .86)); Sh.cyl(m, 0, 21 * s, 0, 13 * s, 10 * s, 8 * s, 6, c, 0, 1); Sh.cyl(m, 2 * s, 28 * s, 1 * s, 9 * s, 0, 9 * s, 6, shade(c, 1.12)); Sh.cyl(m, -7 * s, 17 * s, 4 * s, 6 * s, 0, 9 * s, 5, shade(c, 1.05)); };
     const rock = (x, z, s) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6), M4.rz(R(-.2, .2))); Sh.cyl(m, 0, 0, 0, 7 * s, 4.5 * s, 5 * s, 6, '#8a8a82', 0, 1); Sh.cyl(m, 1, 5 * s, 0, 4.5 * s, 0, 3 * s, 6, '#a4a49a'); };
@@ -116,7 +119,13 @@ const G3 = {
     const cloud = (x, y, z, s, c) => { for (let i = 0; i < 4; i++) A.box(I, x + (i - 1.5) * 26 * s, y + (i % 2) * 8 * s, z + (i % 3) * 10, (46 - i * 4) * s, 16 * s, 30 * s, c, 1); };
     const tent = (x, z, c) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(.4)); Sh.cyl(m, 0, 0, 0, 30, 0, 44, 6, '#f4f0e6'); Sh.cyl(m, 0, 0, 0, 30.6, 26, 6, 6, c); Sh.cyl(m, 0, 30, 0, 9.8, 0, 14.5, 6, c); Sh.cyl(m, 0, 44, 0, .8, .8, 18, 4, '#8a8478'); Sh.box(m, 5, 58, 0, 10, 6, .6, c); Sh.box(m, 0, 9, 29, 12, 18, 1, '#2a2030'); };
     const merlon = (x, z, rot) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(rot)); Sh.box(m, 0, 13, 0, 26, 26, 12, '#e6e0d2'); Sh.box(m, -8, 31, 0, 9, 10, 12, '#f2ede2'); Sh.box(m, 8, 31, 0, 9, 10, 12, '#f2ede2'); Sh.box(m, 0, 25, 6.3, 26, 1.6, .6, '#e8c25a', 1); };
-    if (bg === 'keep') {
+    if (bg === 'cell') { // the pairing room: a sealed marble drum, a gallery in the dark, one shaft of light
+      for (let ix = -9; ix < 9; ix++) for (let iz = -9; iz < 9; iz++) { const x = ix * 20, z = iz * 20, d = Math.hypot(x + 10, (z + 10) * 1.5); if (d > 175) continue; const k = (ix + iz) & 1, j = r() * .04, c = d < 60 ? [.86 + j, .83 + j, .78 + j] : k ? [.62 + j, .6 + j, .58 + j] : [.5 + j, .48 + j, .48 + j]; A.quad(x, z, x + 20, z + 20, 0, c); }
+      for (let i = 0; i < 44; i++) { const a = i / 44 * 6.2832, m = M4.chain(M4.t(Math.cos(a) * 96, .2, Math.sin(a) * 58), M4.ry(-a + 1.5708)); A.box(m, 0, 0, 0, 13, .3, 1.6, '#e8c25a', 1); }
+      for (let i = 0; i < 14; i++) { const a = (i + .5) / 14 * 6.2832, x = Math.cos(a) * 150, z = Math.sin(a) * 104, m = M4.t(x, 0, z); if (z > 30) continue; Sh.cyl(m, 0, 0, 0, 8, 7, 150, 8, '#cfc8ba', 0, 1); Sh.cyl(m, 0, 0, 0, 10, 9, 8, 8, '#b8b2a4', 0, 1); A.cyl(m, 0, 60, 0, 7.6, 7.6, 2, 8, '#e8c25a', 1); A.box(M4.chain(M4.t(x * 1.16, 80, z * 1.16), M4.ry(-a + 1.5708)), 0, 0, 0, 70, 160, 5, [.2, .19, .24]); }
+      for (let i = 0; i < 22; i++) { const a = (i + .3) / 22 * 6.2832; if (Math.sin(a) > .5) continue; const x = Math.cos(a) * 172, z = Math.sin(a) * 120, m = M4.chain(M4.t(x, 62, z), M4.ry(-a - 1.5708)); A.box(m, 0, -3, 0, 26, 6, 12, [.22, .21, .24]); A.cyl(m, 0, 0, 0, 5, 3.4, 20, 6, i % 5 === 2 ? [.9, .88, .84] : [.55, .56, .62]); A.box(m, 0, 24, 0, 5.4, 6, 5.4, [.86, .78, .72]); A.box(m, -1.3, 24.6, 2.8, 1, .9, .3, [1, .8, .3], 1); A.box(m, 1.3, 24.6, 2.8, 1, .9, .3, [1, .8, .3], 1); }
+      for (const sx of [-1, 1]) { const m = M4.chain(M4.t(sx * 150, 0, -30), M4.ry(sx * 1.2)); A.box(m, 0, 30, 0, 34, 60, 4, [.16, .15, .18]); A.box(m, 0, 30, 2.2, 30, 56, .5, [.3, .28, .3]); A.box(m, 0, 61, 2.4, 36, 2, .6, '#e8c25a', 1); }
+    } else if (bg === 'keep') {
       // a white platform above the clouds
       for (let ix = -8; ix < 8; ix++) for (let iz = -6; iz < 8; iz++) { const k = (ix + iz) & 1, c = k ? [.88, .85, .8] : [.8, .77, .72], j = r() * .04; A.quad(ix * 32, iz * 32, ix * 32 + 32, iz * 32 + 32, 0, [c[0] + j, c[1] + j, c[2] + j]); A.quad(ix * 32, iz * 32, ix * 32 + 32, iz * 32 + .8, .05, [.62, .6, .56]); A.quad(ix * 32, iz * 32, ix * 32 + .8, iz * 32 + 32, .05, [.62, .6, .56]); }
       for (let i = 0; i < 40; i++) { const a = i / 40 * 6.2832, m = M4.chain(M4.t(Math.cos(a) * hw * .8, .2, Math.sin(a) * hh * .8), M4.ry(-a)); A.box(m, 0, 0, 0, 1.6, .3, hw * .13, '#e8c25a', 1); }
@@ -167,7 +176,7 @@ const G3 = {
       for (let i = 0; i < 9; i++) cloud(R(-1100, 1100), R(330, 520), R(-1300, -700), R(1.4, 3), ford ? [1, .74, .62] : [1, 1, 1]);
     }
     const mk2 = B => { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, B.a.subarray(0, B.n * 9), gl.STATIC_DRAW); return { b, n: B.n }; };
-    return this.envs[bg] = { a: mk2(A), s: mk2(Sh), hw, hh };
+    return this.envs[real] = { a: mk2(A), s: mk2(Sh), hw, hh };
   },
 
   // ---------------------------------------------------------- a frame
@@ -309,9 +318,12 @@ const G3 = {
   life(B) {
     const D = this.dyn, t = this.t, E = this.env(this.bg), hw = E.hw, hh = E.hh, bg = this.bg, I = M4.id();
     const flag = (x, z, c, k) => { const m = M4.t(x, 0, z); D.cyl(m, 0, 0, 0, 1, 1, 78, 5, '#8a8478'); D.box(m, 0, 79, 0, 3, 3, 3, '#e8c25a', 1); let fm = M4.chain(m, M4.t(.8, 62, 0)); for (let i = 0; i < 4; i++) { fm = M4.mul(fm, M4.ry(Math.sin(t * 3.4 + i * .9 + k) * .28)); D.box(fm, 4, 0, 0, 8, 22 - i * 1.5, .6, i % 2 ? shade(c, .88) : c); if (i === 1) D.box(fm, 4, 0, .5, 6, 6, .3, '#e8c25a', 1); fm = M4.mul(fm, M4.t(8, 0, 0)); } };
+    if (bg === 'cell') { if (!Settings.d.reduce) { for (let i = 0; i < 10; i++) this.glow(Math.sin(i * 2.1) * 6, 20 + i * 22, Math.cos(i * 1.7) * 5, 34 - i * 1.4, [1, .95, .8], .05); for (let i = 0; i < 26; i++) { const ph = (t * .12 + i * .137) % 1; this.glow(Math.sin(i * 4.1 + t * .3) * 40, 200 - ph * 200, Math.cos(i * 2.3) * 26, 1.2, [1, .96, .84], .5 * Math.sin(ph * 3.14)); } } return; }
+    if (bg === 'storm' && !Settings.d.reduce) { const c = B.cam; for (let i = 0; i < 110; i++) { const px = c.x + ((i * 53.7) % 420) - 210 + Math.sin(i) * 8, pz = c.y - 20 - ((i * 37.1) % 300), py = 150 - ((t * (260 + i % 7 * 30) + i * 61) % 150); this.glow(px - py * .12, py, pz, 1.1, [.7, .78, 1], .55); this.glow(px - (py + 5) * .12, py + 5, pz, .9, [.7, .78, 1], .3); }
+      const ph = t % 6.3; this.bolt = ph < .1 || (ph > .22 && ph < .3) ? 1 : 0; if (this.bolt && !this._th) Sound.play('rumble'); this._th = ph < .5; } else this.bolt = 0;
     flag(-hw + 16, -hh - 8, '#7a5ac8', 1); flag(hw - 16, -hh - 8, '#2aa6a0', 2);
     if (bg === 'keep') { for (let i = 0; i < 4; i++) { const x = (i % 2 ? 1 : -1) * (hw + 16), z = i < 2 ? -hh + 4 : hh - 4, m = M4.t(x, 0, z); D.cyl(m, 0, 0, 0, 2.4, 2, 22, 6, '#7a7268'); D.cyl(m, 0, 22, 0, 7, 9, 6, 6, '#3a3430', 0, 1); D.cyl(m, 0, 27, 0, 9.2, 9.2, 1.2, 6, '#e8c25a', 1); for (let k = 0; k < 6; k++) { const ph = (t * (1.3 + k * .17) + k * .31 + i) % 1; this.glow(x + Math.sin(k * 2 + t * 4) * 3, 30 + ph * 22, z, (1 - ph) * 9, [1, .5 + ph * .4, .15], .7); } this.glow(x, 32, z, 30, [1, .6, .25], .22); } }
-    else { // the rest of the war, behind
+    else if (bg !== 'storm') { // the rest of the war, behind
       if (!this._bgm) this._bgm = Array.from({ length: 7 }, (_, i) => ({ k: i }));
       for (const q of this._bgm) { const x = -hw - 30 + q.k * (hw * 2 + 60) / 6 + Math.sin(q.k * 7.1) * 20, z = -hh - (B.cine ? 70 : 150) - (q.k * 53 % 90), ph = t * 2.2 + q.k * 1.7, lun = Math.max(0, Math.sin(ph)) * 4, sw = (ph % 6.2832) < 1.2 ? .18 - (ph % 6.2832) * .15 : 0;
         this.char({ x: x - 16 + lun, y: z, fx: 1, fy: 0, st: sw > 0 ? 'recover' : 'approach', t: .1, swing: sw, anim: t * .3, idx: q.k, combo: 1 + q.k % 3 }, { id: q.k % 2 ? 'cadv1' : 'cadv2', blade: 1, key: q });
@@ -320,14 +332,15 @@ const G3 = {
         for (let i = 0; i < 30; i++) { const x = ((i * 61 + t * 22) % 1200) - 600, z = (i % 2 ? -79 : -3) + Math.sin(t * 2 + i) * 1.2; D.quad(x, z, x + 14 + (i % 3) * 6, z + 1.2, -.2, [.9, .96, 1], 1); } }
       if (bg === 'ford' && !Settings.d.reduce) for (let i = 0; i < 40; i++) { const wx = ((i * 47.3 + t * (16 + i % 4 * 6)) % 700) - 350, wz = -76 + (i * 13) % 70; if (Math.sin(t * 5 + i * 2.1) > .1) this.glow(wx, .4, wz, 3 + i % 3, [1, .86, .7], .5); }
     }
-    if (!Settings.d.reduce) for (let i = 0; i < 7; i++) { const bx = ((i * 190 + t * (26 + i * 3)) % 1400) - 700, by = 150 + i * 14 + Math.sin(t * .7 + i) * 10, bz = -420 - i * 40, fl = Math.sin(t * 9 + i * 2) * .7, m = M4.t(bx, by, bz); D.box(m, 0, 0, 0, 2, 1.4, 5, '#2a2a34'); D.box(M4.chain(m, M4.rz(fl)), 4, 0, 0, 8, .5, 3, '#3a3a44'); D.box(M4.chain(m, M4.rz(-fl)), -4, 0, 0, 8, .5, 3, '#3a3a44'); }
+    if (!Settings.d.reduce && bg !== 'storm') for (let i = 0; i < 7; i++) { const bx = ((i * 190 + t * (26 + i * 3)) % 1400) - 700, by = 150 + i * 14 + Math.sin(t * .7 + i) * 10, bz = -420 - i * 40, fl = Math.sin(t * 9 + i * 2) * .7, m = M4.t(bx, by, bz); D.box(m, 0, 0, 0, 2, 1.4, 5, '#2a2a34'); D.box(M4.chain(m, M4.rz(fl)), 4, 0, 0, 8, .5, 3, '#3a3a44'); D.box(M4.chain(m, M4.rz(-fl)), -4, 0, 0, 8, .5, 3, '#3a3a44'); }
     for (let i = 0; i < 5; i++) { const cx = ((i * 520 + t * (5 + i)) % 2600) - 1300, cy = (bg === 'keep' ? 240 : 360) + i * 28, cz = -900 - i * 90, cc = bg === 'ford' ? [1, .7, .58] : bg === 'keep' ? [1, .9, .86] : [1, 1, 1]; for (let k = 0; k < 4; k++) D.box(I, cx + (k - 1.5) * 60, cy + (k % 2) * 16, cz + (k % 3) * 20, 110 - k * 10, 34, 60, cc, 1); }
     // petals, embers
     if (!Settings.d.reduce) for (let i = 0; i < (B.cine ? 46 : 14); i++) { const c = B.cam, px = c.x + ((i * 71.3 + t * (8 + i % 5 * 3)) % 400) - 200, pz = c.y - 40 - ((i * 37.7) % 320), up = bg === 'ford', py = ((i * 29.1 + t * (up ? 9 + i % 4 * 4 : -(6 + i % 4 * 3))) % 90 + 90) % 90 + 2; this.glow(px + Math.sin(t + i) * 6, py, pz, up ? 1.6 : 1.3, bg === 'keep' ? [1, 1, 1] : up ? [1, .7, .35] : [[1, .9, .95], [1, .9, .5], [.85, 1, .8]][i % 3], up ? .9 : .7); }
   },
   end(B) {
-    const gl = this.gl, cv = this.cv, L = this.LOOK[this.bg], E = this.env(this.bg), P = this.P, vd = this.voidC;
+    const gl = this.gl, cv = this.cv, E = this.env(this.bg), P = this.P, vd = this.voidC; let L = this.LOOK[this.bg];
     if (!vd) this.life(B);
+    const bl = this.bg === 'storm' && this.bolt && !vd; if (bl) L = Object.assign({}, L, { amb: [.9, .95, 1.2], sunC: [1.6, 1.7, 2.1], top: [.3, .34, .5], bot: [.5, .56, .8], fog: [.36, .4, .6] });
     const rg = (this.rage || 0) * .6, Lr = rg > 0 && !vd ? { top: L.top.map((v, i) => v * (1 - rg * .55) + [.3, .02, .02][i] * rg * .5), bot: L.bot.map((v, i) => v * (1 - rg * .35) + [1, .3, .12][i] * rg * .35), sunC: L.sunC.map((v, i) => v * (1 - rg * .15) + [.5, .05, 0][i] * rg), amb: L.amb.map((v, i) => v * (1 - rg * .28)), fog: L.fog.map((v, i) => v * (1 - rg * .4) + [.6, .12, .06][i] * rg * .4) } : L;
     const post = !NOPOST && this.target0(cv.width, cv.height); gl.bindFramebuffer(gl.FRAMEBUFFER, post ? this.fb : null);
     gl.viewport(0, 0, cv.width, cv.height); gl.clearColor(vd ? vd[0] : L.fog[0], vd ? vd[1] : L.fog[1], vd ? vd[2] : L.fog[2], 1); gl.clearStencil(0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);

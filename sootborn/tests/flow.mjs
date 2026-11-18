@@ -17,11 +17,14 @@ for (let k = 0; k < 40 && (await ev(() => BTS.Brawl.active && !BTS.Brawl.cine &&
 for (let k = 0; k < 80 && (await ev(() => BTS.Brawl.active)); k++) { await page.keyboard.press('KeyE'); await wait(400); } await wait(1500);
 console.log('after skip', JSON.stringify(await st())); await shot('world-panel');
 // furnace path
-await ev(() => { BTS.Cutscene.skip(true); BTS.G.heist = 0; BTS.UI.clear(); BTS.Game.toTitle(); BTS.Menus.checkpoints(); [...document.querySelectorAll('.mi')].reverse().find(b => /Lift Zero/.test(b.textContent)).click(); }); await wait(500);
+await ev(() => { BTS.Cutscene.skip(true); BTS.G.heist = 0; BTS.UI.clear(); BTS.Game.toTitle(); BTS.Menus.checkpoints(); [...document.querySelectorAll('.mi')].reverse().find(b => /Story beats/.test(b.textContent)).click(); [...document.querySelectorAll('.mi')].reverse().find(b => /Lift Zero/.test(b.textContent)).click(); }); await wait(500);
+const seen = [];
 let fought = false;
 for (let i = 0; i < 700; i++) { const s = await st(); if (!s.cine) break;
-  if (s.brawl) { if (!fought) { fought = true; console.log('furnace brawl', JSON.stringify(s)); await wait(2500); await shot('furnace'); for (let k = 0; k < 12; k++) { await page.keyboard.press('KeyE'); await wait(120); } } await wait(400); continue; }
+  if (s.brawl) { const ti = await ev(() => BTS.Brawl.def.title); if (!seen.includes(ti)) { seen.push(ti); console.log('brawl', ti, JSON.stringify(s)); await wait(2500); await shot('flow-' + ti.replace(/ /g, '')); fought = true; }
+    if (ti === 'THE PAIRING') await ev(() => { const B = BTS.Brawl; if (B.cine) B.nextShot(); else if (B.phase === 'fight' && !B.art && !B.sup) for (const f of B.foes.slice()) if (f.st !== 'down') B.hitFoe(f, 999, 1, 0, true); });
+    await page.keyboard.press('KeyE'); await wait(400); continue; }
   const ch = await ev(() => { const b = [...document.querySelectorAll('#dlg .ch, #dlg button')].filter(b => b.offsetParent); const t = b.find(x => /BREAK FREE/.test(x.textContent)); if (t) { t.click(); return 'break'; } if (b.length > 1) { b[0].click(); return 'c0'; } return null; });
   if (ch === 'break') console.log('chose BREAK FREE'); if (!ch) await page.keyboard.press('Enter'); await wait(160); }
-console.log('fought', fought, 'end', JSON.stringify(await st()), await ev(() => [BTS.G.mapId, BTS.G.flags.ranForHer]));
+console.log('fights seen', seen, 'fought', fought, 'end', JSON.stringify(await st()), await ev(() => [BTS.G.mapId, BTS.G.flags.ranForHer]));
 console.log('errors', errors); await browser.close();

@@ -1,5 +1,18 @@
 # SOOTBORN — changelog
 
+## v0.12.8 · 2026-11-18 — single combat, a tagline, and a dev menu
+From play notes: ELEVEN is right but the other cut-ins were not; not every fight should be a gang fight; "Book One" does not fit; keep hitting story beats; above-ground story should be cinematics.
+- **"Book One" is gone.** The title is SOOTBORN and the tagline is "Every breath is hers." (Kael's line about Seren), on the title screen, at the end of the opening film, and in About.
+- **Three of the five Assay fights are now one-on-one.**
+  - **The Pairing** (new, end of the prologue, before the title card). The first night of the Assay: two cadets sealed in a marble room, one walks out. Kael against Teo Aldane, sixteen, who shared his bread on the lift. A quiet, dark duel with its own room, film and narration, and the Memory Art HER NAME.
+  - **The Proctor** (new, start of Day 2's festival). Day thirty-one, a storm over the valley, rain and lightning. Proctor Halden Voss comes down from the dais with a halberd; nobody touches a Proctor. Memory Arts THE AUDIT and BALANCED. Ends with the cadets following Kael instead of the House.
+  - **The Ford** is now single combat with Captain Vant (no cadets, no ally; Vant has more health).
+  - The Valley stays the big battle and the Keep stays the final duel.
+- **Memory Art cut-ins rebuilt to match ELEVEN.** The memory fills the screen with its line typed at double size, then a hard cut to Kael's eyes with the art's name, then the name is called out word by word on each strike.
+- **Dev menu** on the title screen ("Dev menu · jump to a scene"): a Fights list (every fight), a Story beats list (opening film, each prologue step, each day, Last Bell, the lantern climb, First Fire), and two switches: start fights at full fury, and skip fight intro films.
+- Above-ground story beats are films (camera shots with captions), not walk-around play: each new fight has an intro and an outro film.
+- Two new 3D places: the pairing room (pillars, a gallery of watchers, one shaft of light) and the valley in a night storm.
+
 ## v0.12.7 · 2026-11-18 — readable, calmer, and the first fight is not optional
 From play notes: the fights were chaotic and hard to follow (though they felt smooth), and text and cutscenes went by too fast to read.
 - **The first fight cannot be skipped.** The Valley has no "skip this fight" in its pause menu, and "Skip scene" is locked until that battle is over. (The other two Assay battles can still be skipped; the dev checkpoints still jump anywhere.)

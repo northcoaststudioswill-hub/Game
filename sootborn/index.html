@@ -1046,6 +1046,8 @@ const CAST = {
   cadt1: { name: 'House Teal', look: () => ({ accredited: 1, cadet: 1, skin: '#f0dccc', hair: '#f6eac0', style: 'short', robe: '#dfe6e4', armor: '#dfe6e4', trim: '#e8c25a', sash: '#2aa6a0', shield: 1 }) },
   cadt2: { name: 'House Teal', look: () => ({ accredited: 1, cadet: 1, helm: 1, skin: '#e8ccb4', hair: '#f6eac0', style: 'short', robe: '#cfd8d8', armor: '#cfd8d8', trim: '#e8c25a', sash: '#2aa6a0' }) },
   vant: { name: 'Captain Vant', look: () => ({ accredited: 1, cadet: 1, skin: '#e0c0a8', hair: '#d8d0b0', style: 'short', robe: '#b8c4c4', armor: '#b8c4c4', trim: '#e8c25a', sash: '#2aa6a0', cape: '#1e7a76' }) },
+  teo: { name: 'Teo Aldane', look: () => ({ accredited: 1, cadet: 1, skin: '#e8c8a8', hair: '#d8b070', style: 'short', robe: '#e8e0cc', armor: '#e8e0cc', trim: '#e8c25a', sash: '#7a5ac8' }) },
+  voss: { name: 'Proctor Voss', look: () => ({ accredited: 1, cadet: 1, skin: '#f0e0d4', hair: '#e8e4dc', style: 'short', circlet: 1, crown: 1, robe: '#fbf8f0', armor: '#fbf8f0', trim: '#e8c25a', sash: '#f4f0e6', cape: '#f4f2ec' }) },
   lucan: { name: 'Lucan Aurel', look: () => ({ accredited: 1, cadet: 1, skin: '#f4e6dc', hair: '#f6eac0', style: 'long', long: 1, circlet: 1, crown: 1, robe: '#fbf8f0', armor: '#fbf8f0', trim: '#e8c25a', sash: '#e8c25a', cape: '#f4f2ec' }) },
   hollis: { name: 'Hollis the welder', look: crowd('#8a5a3e', '#2a1a14', 'short', '#5a4a3a') },
   marrow: { name: 'Marrow', look: crowd('#c08a6a', '#4a3020', 'long', '#4a4a5a') },
@@ -1059,7 +1061,7 @@ const CAST = {
   c3: { name: 'Neighbor', look: crowd('#6a4430', '#141014', 'bun', '#6a4a3a') },
   c4: { name: 'Neighbor', look: crowd('#d0a080', '#6a6a6a', 'bald', '#3a4a4a') }
 };
-const MOUTH = { kael2: 'frown', lucan: 'smirk', vant: 'frown', cadv1: 'flat', cadv2: 'flat', cadt1: 'flat', cadt2: 'flat', kael: 'smirk', seren: 'smile', tavi: 'smile', mara: 'frown', ivo: 'smile', vale: 'flat', celestine: 'smirk', warden: 'flat', proctor: 'frown', watchman: 'frown', nell: 'flat', orin: 'flat', dace: 'smile', bao: 'smile', pell: 'smile', juno: 'smile', pip: 'smile', mosi: 'smile', ada: 'flat', hollis: 'frown', marrow: 'frown', fen: 'flat', kit: 'smirk' };
+const MOUTH = { teo: 'flat', voss: 'smirk', kael2: 'frown', lucan: 'smirk', vant: 'frown', cadv1: 'flat', cadv2: 'flat', cadt1: 'flat', cadt2: 'flat', kael: 'smirk', seren: 'smile', tavi: 'smile', mara: 'frown', ivo: 'smile', vale: 'flat', celestine: 'smirk', warden: 'flat', proctor: 'frown', watchman: 'frown', nell: 'flat', orin: 'flat', dace: 'smile', bao: 'smile', pell: 'smile', juno: 'smile', pip: 'smile', mosi: 'smile', ada: 'flat', hollis: 'frown', marrow: 'frown', fen: 'flat', kit: 'smirk' };
 const NPCS = [
   { id: 'tavi', map: 'apt', at: [7, 3], dir: 2 },
   { id: 'mara', map: 'bay', at: [7, 4], dir: 0 },
@@ -2519,6 +2521,7 @@ const FOE_KINDS = {
 };
 const SUPT = 1.6; // how long the ELEVEN cut-in holds before the rush
 const ELEVEN = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'ELEVEN'];
+const DEV = { fury: 0, quick: 0 }; // dev menu switches: start fights at full fury, skip fight intro films
 const Brawl = {
   active: false, K: 2.4, def: null, onEnd: null, t: 0, p: null, foes: [], allies: [], props: [], parts: [], rings: [], freeze: 0, slow: 0, shake: 0, punch: 0, impact: 0,
   phase: 'intro', pt: 0, msg: '', msgT: 0, cam: { x: 0, y: 170, h: 62, f: 150, hor: 58 }, tex: {}, pat: {}, cine: null, sup: null, wave: 0,
@@ -2529,13 +2532,13 @@ const Brawl = {
     Object.assign(this, { def, onEnd, active: true, t: 0, parts: [], rings: [], freeze: 0, slow: 0, shake: 0, punch: 0, impact: 0, phase: 'intro', pt: 0, msg: '', msgT: 0, token: [], sup: null, wave: 0, arena: A, cine: null, tipT: 5, hitsN: 0, hitsT: 0, clang: 0, slashes: [], fin: null, flinched: 0, nums: [], scars: [], vq: [], vcur: null, vdone: {}, ft: 0, art: null, artDone: {}, lines: [], tex: {}, pat: {} });
     const hw = A.kind === 'ring' ? A.rx : A.w / 2;
     this.p = { x: -hw * .5, y: 4, fx: 1, fy: 0, hp: hero.hp || 6, max: hero.hp || 6, pow: hero.pow || 1, blade: hero.blade || 0, sheet: hero.id ? World.sheetFor(hero.id) : P.sheet, st: 'idle', t: 0, combo: 0, comboT: 0, inv: 0, dcd: 0, open: 0, anim: 0, hit: false, kx: 0, ky: 0, hold: 0, trail: [],
-      fury: hero.fury0 !== undefined ? hero.fury0 : Math.min(60, ((G.flags || {}).fury | 0) * 7), rage: def.rage || 0 };
+      fury: DEV.fury ? 100 : hero.fury0 !== undefined ? hero.fury0 : Math.min(60, ((G.flags || {}).fury | 0) * 7), rage: def.rage || 0 };
     this.pb = hero.id ? World.bustFor(hero.id) : makeBust(Object.assign(playerLook(), { mouth: 'frown' }));
     this.foes = []; this.spawn(def.waves ? def.waves[0] : def.foes, true); this.tap = false;
     this.allies = (def.allies || []).map((a, i) => ({ id: a, x: -hw * .5 - 14 + (i % 2) * 30, y: -24 + i * 22, fx: 1, fy: 0, st: 'approach', t: 0, cd: .6 + i * .4, anim: 0, kx: 0, ky: 0, sheet: World.sheetFor(a), ally: 1, flash: 0 }));
     this.buildProps(def.bg || 'ring', A); this.cam = { x: -60, y: 380, h: 170, f: 150, hor: Math.round(H * .2), roll: 0 }; this.rollK = 0;
     Sound.music(def.music || (def.bg && def.bg !== 'ring' ? 'battle' : 'work')); Input.consume(); HUD.dirty = true; Fade.a = 0; Fade.dir = 0; Fade.busy = false;
-    if (def.intro) this.playCine(def.intro, () => { if (def.cineOnly) return this.end(true); this.phase = 'intro'; this.pt = 0; });
+    if (def.intro && !(DEV.quick && !def.cineOnly)) this.playCine(def.intro, () => { if (def.cineOnly) return this.end(true); this.phase = 'intro'; this.pt = 0; });
   },
   spawn(list, first) {
     const A = this.arena, hw = A.kind === 'ring' ? A.rx : A.w / 2, hh = A.kind === 'ring' ? A.ry : A.h / 2, n = list.length, base = this.foes.length;
@@ -2660,12 +2663,12 @@ const Brawl = {
     if (f) { const d = Math.hypot(f.x - p.x, f.y - p.y), R = 26 + (p.blade ? 8 : 0); p.gap = d < 70 && d > R ? Math.min(34, d - R + 4) : 0; } else p.gap = 0; },
   dodge(vx, vy) { const p = this.p; if (!vx && !vy) { vx = -p.fx; vy = -p.fy; } const d = Math.hypot(vx, vy) || 1; p.st = 'dodge'; p.t = 0; p.dx = vx / d; p.dy = vy / d; p.inv = Math.max(p.inv, 0.26); p.dcd = 0.55; Sound.play('dash'); this.spark(p.x, p.y, '#8a7a6a', 3, 0); },
   // MEMORY ARTS: the big attacks carry the story. A memory cuts in, says its line, and becomes a strike.
-  startArt(a) { const p = this.p, live = this.foes.filter(f => f.st !== 'down' && !f.enter); this.art = { a, t: 0, C: Math.max(3, 1.3 + a.line.length * .05), tg: live.sort((x, y) => y.hp - x.hp)[0], n: 0, done: 0 }; this.token = []; this.slow = 0; this.vcur = null; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1.2; } p.st = 'idle'; p.hold = 0; this.impact = .2; Sound.play('cutin'); },
+  startArt(a) { const p = this.p, live = this.foes.filter(f => f.st !== 'down' && !f.enter); this.art = { a, t: 0, C: Math.max(3.2, 1.5 + a.line.length * .055) + 1.0, words: a.name.split(' '), tg: live.sort((x, y) => y.hp - x.hp)[0], n: 0, done: 0 }; this.token = []; this.slow = 0; this.vcur = null; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1.2; } p.st = 'idle'; p.hold = 0; this.impact = .2; Sound.play('cutin'); },
   updArt(dt) {
     const A = this.art, a = A.a, p = this.p, f = A.tg, C = A.C; A.t += dt; p.inv = .6; if (p.st === 'atk') { p.t += dt; if (p.t > .3) p.st = 'idle'; }
     if (A.t < C) { if (A.t > .8 && (Input.p('A') || Input.p('B'))) { A.t = C; Input.consume(); } return; }
-    const tau = A.t - C, cut = (side, big) => { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; p.fx = p.ax = dx / d; p.fy = p.ay = dy / d; p.st = 'atk'; p.t = 0; p.hit = true; p.combo = 1 + A.n % 3; this.slashes.push({ x: f.x, y: f.y, a: A.n * 1.1, life: .18, big: 1, h: 26 + (f.z || 0) }); this.spark(f.x, f.y, '#ffe08a', 7, 22 + (f.z || 0)); f.flash = .12; this.hitsN = this.hitsT > 0 ? this.hitsN + 1 : 1; this.hitsT = 1.6; this.shake = .2; Sound.play(big ? 'hit' : 'clink'); A.n++; };
-    const land = () => { A.done = 1; f.z = 0; p.z = 0; this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#fff2c0', 120); this.ring(f.x, f.y, a.hex || '#ffb040', 80); this.fin = { x: f.x, y: f.y, t: 0 }; this.scars.push({ x: f.x, y: f.y, r: 22, life: 40 }); Sound.play('pillar'); this.freeze = .3;
+    const tau = A.t - C, cut = (side, big) => { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; p.fx = p.ax = dx / d; p.fy = p.ay = dy / d; p.st = 'atk'; p.t = 0; p.hit = true; p.combo = 1 + A.n % 3; this.slashes.push({ x: f.x, y: f.y, a: A.n * 1.1, life: .18, big: 1, h: 26 + (f.z || 0) }); this.spark(f.x, f.y, '#ffe08a', 7, 22 + (f.z || 0)); f.flash = .12; this.hitsN = this.hitsT > 0 ? this.hitsN + 1 : 1; this.hitsT = 1.6; this.shake = .2; Sound.play(big ? 'bigslash' : 'count', A.n * 2); A.word = A.words[A.n % A.words.length]; A.wt = 0; A.n++; };
+    const land = () => { A.done = 1; A.word = a.name; A.wt = 0; f.z = 0; p.z = 0; this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#fff2c0', 120); this.ring(f.x, f.y, a.hex || '#ffb040', 80); this.fin = { x: f.x, y: f.y, t: 0 }; this.scars.push({ x: f.x, y: f.y, r: 22, life: 40 }); Sound.play('pillar'); this.freeze = .3;
       const live = this.foes.filter(o => o.st !== 'down' && !o.enter); for (const o of live) { if (!this.art) break; const main = o === f, d = Math.hypot(o.x - f.x, o.y - f.y); if (main || d < 90) this.hitFoe(o, main ? (a.dmg || Math.max(6, Math.round(o.max * .14))) : 4, main ? p.ax : (o.x - f.x) / (d || 1), main ? p.ay : (o.y - f.y) / (d || 1), true); } };
     if (a.kind === 'rise') { // launch, three cuts in the air, and down
       if (A.n === 0 && tau >= 0) { p.x = f.x - 20; p.y = f.y + 2; this.clampA(p); cut(); this.ring(f.x, f.y, '#fff', 40); }
@@ -2678,7 +2681,7 @@ const Brawl = {
       if (!A.done && tau >= .95) { for (const l of this.lines) l.life = .25; land(); }
       if (tau > 1.5) { this.art = null; this.lines = []; }
     }
-    for (const l of this.lines) l.life -= dt; this.lines = this.lines.filter(l => l.life > 0);
+    if (A.wt !== undefined) A.wt += dt; for (const l of this.lines) l.life -= dt; this.lines = this.lines.filter(l => l.life > 0);
     if (!this.art) { p.z = 0; if (f.st !== 'down') f.z = 0; this.voice('art'); }
   },
   // ELEVEN: one blow for every second the doors stood open
@@ -2958,7 +2961,7 @@ const Brawl = {
     for (const q of this.nums) { const pr = this.proj(q.x, q.y, q.h); if (pr.dz < 10) continue; const s = String(q.v), sc = q.big ? 2 : 1, x = Math.round(pr.x - ptextW(s, sc) / 2), y = Math.round(pr.y); g.globalAlpha = Math.min(1, q.life * 3); ptext(g, s, x + 1, y + 1, '#120a0e', sc); ptext(g, s, x, y, q.big ? '#ffb040' : '#fff6dc', sc); g.globalAlpha = 1; }
     this.hud(g);
     if (this.sup) this.renderSuper(g);
-    if (this.art && this.art.t < this.art.C) this.renderArt(g);
+    if (this.art && this.art.t < this.art.C) this.renderArt(g); else this.renderArtWords(g);
     const big = (s, c, y, k) => { if (!s) return; const bx = Math.round(W / 2 - ptextW(s, k || 2) / 2); ptext(g, s, bx + 1, y + 1, '#120a0e', k || 2); ptext(g, s, bx, y, c, k || 2); };
     if (this.phase === 'intro') { g.fillStyle = 'rgba(8,4,6,.62)'; g.fillRect(0, H / 2 - 24, W, 44); g.fillStyle = '#c8a050'; g.fillRect(0, H / 2 - 24, W, 1); g.fillRect(0, H / 2 + 19, W, 1); big(def.title, '#ffe08a', H / 2 - 17); if (def.sub) ptext(g, def.sub, Math.round(W / 2 - ptextW(def.sub) / 2), H / 2 + 4, PAL.cream); }
     else if (this.phase === 'win') big(def.winText || 'DOWN!', '#ffe08a', 40, W > 300 && (def.winText || 'DOWN!').length < 14 ? 3 : 2);
@@ -2980,7 +2983,7 @@ const Brawl = {
     if (this.vcur && (this.phase === 'fight' || this.phase === 'win') && !(this.sup && this.sup.t < SUPT) && !this.art) { const v = this.vcur, lines = wrapP(v.t, W - 20), a = Math.min(1, (v.max - v.life) * 5, v.life * 3), y0 = H - 6 - lines.length * 9 - (this.tipT > 0 ? 11 : 0); g.globalAlpha = Math.max(0, a); g.fillStyle = 'rgba(7,5,10,.62)'; g.fillRect(0, y0 - 3, W, lines.length * 9 + 5); g.fillStyle = '#c8a050'; g.fillRect(0, y0 - 3, W, 1); lines.forEach((ln, i) => ptext(g, ln, Math.round(W / 2 - ptextW(ln) / 2), y0 + i * 9, '#fff6dc')); g.globalAlpha = 1; }
     if (this.tipT > 0 && this.phase === 'fight' && !this.art && !this.sup) { const k = Input.device === 'kb', tip = W > 300 ? (k ? 'E' : 'A') + ' STRIKE   ' + (k ? 'X' : 'B') + ' DODGE THROUGH THE RED   HOLD: HEAVY' : (k ? 'E' : 'A') + ' STRIKE  ' + (k ? 'X' : 'B') + ' DODGE'; g.fillStyle = 'rgba(12,8,10,.8)'; g.fillRect(0, H - 11, W, 11); ptext(g, tip, Math.max(3, Math.round(W / 2 - ptextW(tip) / 2)), H - 8, '#f3e3c3'); }
   },
-  renderSuper(g) {
+  renderSuper(g, word, rgbw) {
     const s = this.sup, t = s.t;
     if (t < SUPT) { const k = Math.min(1, t / .18), bh = Math.round(H * .34), y0 = Math.round(H * .3), hh = Math.round(bh * k), yy = y0 + Math.round((bh - hh) / 2);
       g.fillStyle = 'rgba(6,2,4,.72)'; g.fillRect(0, 0, W, H); g.fillStyle = '#1a0606'; g.fillRect(0, yy, W, hh); g.fillStyle = '#ff5a2a'; g.fillRect(0, yy, W, 2); g.fillRect(0, yy + hh - 2, W, 2);
@@ -2992,32 +2995,27 @@ const Brawl = {
           g.restore(); }
         g.fillStyle = 'rgba(200,40,10,.22)'; g.fillRect(0, y0 + 2, W, bh - 4); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,90,30,${.16 + Math.sin(t * 30) * .06})`; g.fillRect(0, y0 + 2, W, bh - 4); g.globalCompositeOperation = 'source-over';
         for (let i = 0; i < 14; i++) { g.fillStyle = 'rgba(255,220,180,.5)'; g.fillRect((i * 47 + t * 900) % (W + 40) - 20, y0 + 4 + (i * 13) % (bh - 8), 26, 1); }
-        const w = 'ELEVEN', sc = W > 300 ? 4 : 3; ptext(g, w, Math.round(W / 2 - ptextW(w, sc) / 2) + 2, Math.round(H * .7) + 2, '#120a0e', sc); ptext(g, w, Math.round(W / 2 - ptextW(w, sc) / 2), Math.round(H * .7), '#ff7a30', sc); const c3 = 'ONE FOR EVERY SECOND', c4 = 'THE DOORS STOOD OPEN', s2 = W > 300 ? 2 : 1; if (t > .4) ptext(g, c3, Math.round(W / 2 - ptextW(c3, s2) / 2), Math.round(H * .7) + sc * 6 + 4, '#f3e3c3', s2); if (t > .85) ptext(g, c4, Math.round(W / 2 - ptextW(c4, s2) / 2), Math.round(H * .7) + sc * 6 + 6 + s2 * 7, '#f3e3c3', s2); } }
+        const w = word || 'ELEVEN', sc = ptextW(w, 4) < W - 10 ? 4 : ptextW(w, 3) < W - 10 ? 3 : 2; ptext(g, w, Math.round(W / 2 - ptextW(w, sc) / 2) + 2, Math.round(H * .7) + 2, '#120a0e', sc); ptext(g, w, Math.round(W / 2 - ptextW(w, sc) / 2), Math.round(H * .7), rgbw ? `rgb(${rgbw})` : '#ff7a30', sc); if (word) return; const c3 = 'ONE FOR EVERY SECOND', c4 = 'THE DOORS STOOD OPEN', s2 = W > 300 ? 2 : 1; if (t > .4) ptext(g, c3, Math.round(W / 2 - ptextW(c3, s2) / 2), Math.round(H * .7) + sc * 6 + 4, '#f3e3c3', s2); if (t > .85) ptext(g, c4, Math.round(W / 2 - ptextW(c4, s2) / 2), Math.round(H * .7) + sc * 6 + 6 + s2 * 7, '#f3e3c3', s2); } }
     else if (s.word) { const fin = s.n >= 11, sc = fin ? (W > 300 ? 5 : 4) : 3, a = Math.max(0, 1 - (s.wt || 0) * (fin ? 1.2 : 4)); if (a > 0) { g.globalAlpha = a; const x = fin ? Math.round(W / 2 - ptextW(s.word, sc) / 2) : (s.n % 2 ? 10 : W - 10 - ptextW(s.word, sc)), y = fin ? Math.round(H * .4) : 52 + (s.n % 3) * 16; ptext(g, s.word, x + 2, y + 2, '#120a0e', sc); ptext(g, s.word, x, y, fin ? '#fff0b0' : '#ff7a30', sc); g.globalAlpha = 1; } }
   },
-  // the cut-in: two slanted panels. One is the memory, one is him. Then the name of the blow and the line it carries.
+  // Memory Art cut-in, in ELEVEN's language: the memory fills the screen and says its line, then a hard cut to his eyes and the name of the blow.
   renderArt(g) {
-    const A = this.art, a = A.a, t = A.t, e = 1 - Math.pow(1 - Math.min(1, t / .22), 3), out = Math.max(0, (t - (A.C - .18)) / .18), wide = W > 300, rgb = a.rgb || '255,200,90', rm = Settings.d.reduce;
-    g.fillStyle = `rgba(6,4,10,${.82 * (1 - out)})`; g.fillRect(0, 0, W, H); if (out > 0) g.globalAlpha = 1 - out;
-    const quad = (pts, draw, edge) => { g.save(); g.beginPath(); pts.forEach((q, i) => i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])); g.closePath(); g.clip(); draw(); g.restore(); g.strokeStyle = '#fff6dc'; g.lineWidth = 2; g.beginPath(); pts.forEach((q, i) => i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])); g.closePath(); g.stroke(); g.strokeStyle = edge; g.lineWidth = 1; g.stroke(); };
-    // memory panel
-    const sl = wide ? 26 : 12, dxA = -(1 - e) * W, dxB = (1 - e) * W, aLines = wrapP(a.line, (W - 16) / 2), txtH = aLines.length * 12 + 4, y0 = 16, y1 = wide ? H - 26 - txtH : Math.round(H * .4), xm = wide ? Math.round(W * .56) : W - 6;
+    const A = this.art, a = A.a, t = A.t, rgb = a.rgb || '255,200,90', rm = Settings.d.reduce, eyeT = t - (A.C - 1.0);
+    if (eyeT >= 0) { const keep = this.sup; this.sup = { t: Math.min(eyeT, SUPT - .01) }; this.renderSuper(g, a.name, rgb); this.sup = keep; if (eyeT < .08 && !rm) { g.fillStyle = `rgba(255,255,255,${1 - eyeT * 12})`; g.fillRect(0, 0, W, H); } return; }
+    const e = 1 - Math.pow(1 - Math.min(1, t / .3), 3), aLines = wrapP(a.line, (W - 16) / 2), txtH = aLines.length * 12 + 6;
     if (!Panels.c) [Panels.c, Panels.g] = mk(320, 180);
     const pg = Panels.g; pg.globalAlpha = 1; pg.globalCompositeOperation = 'source-over'; pg.fillStyle = '#07050a'; pg.fillRect(0, 0, 320, 180); Panels.narrow = false; if (PANELS[a.panel]) PANELS[a.panel](pg, 6 + t, a.stage || 0, 6 + t);
-    quad([[6 + dxA, y0], [xm + sl + dxA, y0], [xm - sl + dxA, y1], [6 + dxA, y1]], () => { const sc = Math.max((xm + sl) / 320, (y1 - y0) / 180) * 1.12, pw = 320 * sc, ph = 180 * sc; g.imageSmoothingEnabled = false; g.drawImage(Panels.c, 6 + dxA + (xm - pw) / 2 - (rm ? 0 : t * 5), y0 + (y1 - y0 - ph) / 2, pw, ph); g.fillStyle = `rgba(${rgb},.14)`; g.fillRect(0, 0, W, H); for (let i = 0; i < 5; i++) { g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(0, y0 + i * 2 + ((t * 40) % 8), W, 1); } }, `rgb(${rgb})`);
-    // him
-    const bx0 = wide ? xm + sl + 6 : 6, by0 = wide ? y0 : y1 + 6, by1 = wide ? y1 : H - 28 - txtH;
-    quad([[bx0 + dxB, by0], [W - 6 + dxB, by0], [W - 6 + dxB, by1], [bx0 - (wide ? sl * 2 : 0) + dxB, by1]], () => { const gr = g.createLinearGradient(0, by0, 0, by1); gr.addColorStop(0, `rgba(${rgb},1)`); gr.addColorStop(1, '#1a0606'); g.fillStyle = gr; g.fillRect(0, 0, W * 2, H);
-      if (!rm) for (let i = 0; i < 18; i++) { g.fillStyle = i % 3 ? 'rgba(255,255,255,.35)' : 'rgba(20,6,6,.4)'; g.fillRect(((i * 53 - t * 700) % (W + 60) + W + 60) % (W + 60) - 30 + dxB, by0 + (i * 17) % (by1 - by0), 30 + i % 4 * 12, i % 4 ? 1 : 2); }
-      const k = Math.max(3, Math.ceil((by1 - by0) / 26)), cx = (bx0 + W - 6) / 2 + dxB - (wide ? sl * .4 : 0) + (rm ? 0 : (1 - Math.min(1, t / .5)) * 14); g.imageSmoothingEnabled = false; g.drawImage(this.pb, 3, 3, 26, 29, Math.round(cx - 13 * k), Math.round(by1 - 27 * k), 26 * k, 29 * k);
-      g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,90,30,${.16 + (rm ? 0 : Math.sin(t * 26) * .05)})`; g.fillRect(0, by0, W * 2, by1 - by0); g.globalCompositeOperation = 'source-over'; }, '#ff7a30');
-    // words
-    const nsc = 2, ny = H - 22 - txtH, nx = Math.round(8 - (1 - e) * 60);
-    g.save(); g.translate(0, ny); g.rotate(wide ? -0.035 : 0); g.fillStyle = '#07050a'; g.fillRect(-10, -4, W + 20, nsc * 5 + 8); g.fillStyle = `rgb(${rgb})`; g.fillRect(-10, -4, W + 20, 1); g.fillRect(-10, nsc * 5 + 3, W + 20, 1);
-    ptext(g, a.name, nx + 2, 2, '#07050a', nsc); ptext(g, a.name, nx, 0, '#fff6dc', nsc); const tag = 'MEMORY'; ptext(g, tag, W - 8 - ptextW(tag), wide ? 6 : 2, `rgb(${rgb})`); g.restore();
-    if (t > .3) { const ch = Math.floor((t - .3) * 60); let used = 0; g.fillStyle = 'rgba(6,4,10,.86)'; g.fillRect(0, H - txtH - 4, W, txtH + 4); aLines.forEach((ln, i) => { const part = ln.slice(0, Math.max(0, ch - used)); used += ln.length; ptext(g, part, Math.round(W / 2 - ptextW(ln, 2) / 2), H - txtH + i * 12, '#f3e3c3', 2); }); if (ch > a.line.length + 20 && Math.floor(t * 2) % 2) ptext(g, Input.device === 'kb' ? 'E' : 'A', W - 10, H - 9, `rgb(${rgb})`); }
-    g.globalAlpha = 1; if (t < .1 && !rm) { g.fillStyle = `rgba(255,255,255,${1 - t * 10})`; g.fillRect(0, 0, W, H); }
+    g.fillStyle = '#07050a'; g.fillRect(0, 0, W, H);
+    const zoom = Math.max(W / 320, (H - 28) / 180) * (1.04 + (rm ? 0 : t * .03)), pw = 320 * zoom, ph = 180 * zoom, slide = (1 - e) * W * .5;
+    g.save(); g.beginPath(); g.rect(0, 14, W, H - 28); g.clip(); g.imageSmoothingEnabled = false; g.globalAlpha = e; g.drawImage(Panels.c, Math.round((W - pw) / 2 + slide - (rm ? 0 : t * 3)), Math.round(14 + (H - 28 - ph) / 2), Math.round(pw), Math.round(ph)); g.globalAlpha = 1;
+    g.fillStyle = `rgba(${rgb},.12)`; g.fillRect(0, 14, W, H - 28); if (!rm) for (let y = 14 + ((t * 30) % 4 | 0); y < H - 14; y += 4) { g.fillStyle = 'rgba(0,0,0,.14)'; g.fillRect(0, y, W, 1); }
+    const vg = g.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, W * .7); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.7)'); g.fillStyle = vg; g.fillRect(0, 14, W, H - 28); g.restore();
+    const tag = 'M E M O R Y'; g.fillStyle = `rgb(${rgb})`; g.fillRect(8, 20, Math.round((ptextW(tag) + 8) * e), 11); ptext(g, tag, 12, 23, '#07050a');
+    if (t > .35) { const ch = Math.floor((t - .35) * 46), y0 = H - 14 - txtH; let used = 0; g.fillStyle = 'rgba(6,4,10,.84)'; g.fillRect(0, y0, W, txtH); g.fillStyle = `rgb(${rgb})`; g.fillRect(0, y0, W, 1); aLines.forEach((ln, i) => { const part = ln.slice(0, Math.max(0, ch - used)); used += ln.length; ptext(g, part, Math.round(W / 2 - ptextW(ln, 2) / 2), y0 + 5 + i * 12, '#fff6dc', 2); }); }
+    if (t < .12 && !rm) { g.fillStyle = `rgba(255,255,255,${1 - t * 8})`; g.fillRect(0, 0, W, H); }
   },
+  // the words of the blow, called out hit by hit the way ELEVEN counts
+  renderArtWords(g) { const A = this.art; if (!A || !A.word) return; const fin = A.done, rgb = A.a.rgb || '255,200,90', w = A.word, sc = fin ? (ptextW(w, 4) < W - 10 ? 4 : ptextW(w, 3) < W - 10 ? 3 : 2) : 3, al = Math.max(0, 1 - (A.wt || 0) * (fin ? 1.1 : 3.2)); if (al <= 0) return; g.globalAlpha = al; const x = fin ? Math.round(W / 2 - ptextW(w, sc) / 2) : (A.n % 2 ? 10 : W - 10 - ptextW(w, sc)), y = fin ? Math.round(H * .4) : 50 + (A.n % 3) * 16; ptext(g, w, x + 2, y + 2, '#120a0e', sc); ptext(g, w, x, y, fin ? '#fff0b0' : `rgb(${rgb})`, sc); g.globalAlpha = 1; },
   renderCine(g) {
     const c = this.cine, s = c.shots[c.i], rm = Settings.d.reduce; if (s.black) { g.fillStyle = '#050307'; g.fillRect(0, 0, W, H); }
     const ex = c.acts.map(o => ({ y: o.y, d: () => this.fighter(g, { x: o.x, y: o.y, fx: o.fx || 0, fy: o.fy === undefined ? 1 : o.fy, sheet: o.sheet, anim: o.anim, sc: o.sc, st: o.st || 'idle', t: o.t || 0, idx: o.k || 0, swing: o.swing ? (c.t % .5 < .18 ? .18 - (c.t % .5) : 0) : 0, ax: o.fx || 0, ay: o.fy || 0, combo: 1 + (Math.floor(c.t / .5 + (o.k || 0)) % 3) }, { run: !!o.b, key: o, pose: o.pose, swingFx: !!o.swing, id: o.id, blade: o.blade, aura: o.aura || 0, cape: CAST[o.id].look().cape || null }) }));
@@ -3130,7 +3128,7 @@ const G3 = {
     } catch (e) { console.warn('3D unavailable, using 2D', e); this.ok = false; }
     return this.ok;
   },
-  want(bg) { return (bg === 'valley' || bg === 'ford' || bg === 'keep') && !NO3D && this.init(); },
+  want(bg) { return !!this.LOOK[bg] && !NO3D && this.init(); },
   // keep the GL canvas exactly under the pixel canvas; show it only on frames that drew 3D
   sync() { if (!this.cv) return; if (this.used !== this.shown) { this.shown = this.used; this.cv.style.display = this.used ? 'block' : 'none'; document.body.classList.toggle('g3on', this.used); if (!this.used) this.cv.style.filter = ''; } },
   target0(w, h) { const gl = this.gl; if (this.fb && this.fbW === w && this.fbH === h) return !!this.post; this.fbW = w; this.fbH = h; this.post = false;
@@ -3148,11 +3146,14 @@ const G3 = {
   LOOK: {
     valley: { top: [.16, .42, .86], bot: [.74, .9, 1], sun: [-.42, .8, .43], sunC: [1.0, .95, .78], amb: [.34, .38, .46], sky: [.16, .2, .26], fog: [.72, .88, 1], fogR: [420, 1500], sunAt: [.55, .6, -1] },
     ford: { top: [.2, .14, .42], bot: [1, .6, .36], sun: [-.62, .4, -.3], sunC: [1.2, .7, .4], amb: [.52, .4, .46], sky: [.3, .22, .3], fog: [1, .64, .44], fogR: [330, 1300], sunAt: [-.5, .16, -1] },
+    cell: { top: [.02, .02, .04], bot: [.08, .07, .11], sun: [.12, .95, .28], sunC: [1.3, 1.2, 1.0], amb: [.36, .35, .44], sky: [.14, .14, .2], fog: [.04, .04, .07], fogR: [260, 760], sunAt: [0, 1, -.1] },
+    storm: { top: [.02, .03, .09], bot: [.13, .15, .26], sun: [-.3, .8, .5], sunC: [.55, .62, .86], amb: [.22, .24, .34], sky: [.1, .12, .2], fog: [.09, .11, .2], fogR: [240, 950], sunAt: [.42, .62, -1] },
     keep: { top: [.3, .44, .78], bot: [1, .8, .68], sun: [.55, .42, -.72], sunC: [1.2, .92, .7], amb: [.4, .38, .46], sky: [.2, .2, .26], fog: [1, .84, .76], fogR: [380, 1500], sunAt: [.5, .2, -1] }
   },
   env(bg) {
     if (this.envs[bg]) return this.envs[bg];
-    const gl = this.gl, A = new Batch(30000), Sh = new Batch(20000), r = rng(bg.length * 131 + 17), I = M4.id(), R = (a, b) => a + r() * (b - a), hw = bg === 'keep' ? 110 : 125, hh = bg === 'keep' ? 50 : 60;
+    const real = bg; if (bg === 'storm') bg = 'valley';
+    const gl = this.gl, A = new Batch(30000), Sh = new Batch(20000), r = rng(bg.length * 131 + 17), I = M4.id(), R = (a, b) => a + r() * (b - a), hw = bg === 'keep' ? 110 : bg === 'cell' ? 96 : 125, hh = bg === 'keep' ? 50 : bg === 'cell' ? 58 : 60;
     const pine = (x, z, s) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); Sh.cyl(m, 0, 0, 0, 2.2 * s, 1.6 * s, 10 * s, 5, '#5a3c26'); const g = ['#1f6a34', '#27803c', '#2f9646', '#3aa850']; for (let i = 0; i < 4; i++) Sh.cyl(m, 0, (7 + i * 9) * s, 0, (15 - i * 3.2) * s, 0, 15 * s, 7, bg === 'ford' ? ['#28503a', '#2f5e40', '#386a46', '#427650'][i] : g[i]); };
     const oak = (x, z, s, c) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); Sh.cyl(m, 0, 0, 0, 2.6 * s, 1.8 * s, 16 * s, 5, '#6a4a30'); Sh.cyl(m, 0, 13 * s, 0, 9 * s, 13 * s, 8 * s, 6, shade(c, .86)); Sh.cyl(m, 0, 21 * s, 0, 13 * s, 10 * s, 8 * s, 6, c, 0, 1); Sh.cyl(m, 2 * s, 28 * s, 1 * s, 9 * s, 0, 9 * s, 6, shade(c, 1.12)); Sh.cyl(m, -7 * s, 17 * s, 4 * s, 6 * s, 0, 9 * s, 5, shade(c, 1.05)); };
     const rock = (x, z, s) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6), M4.rz(R(-.2, .2))); Sh.cyl(m, 0, 0, 0, 7 * s, 4.5 * s, 5 * s, 6, '#8a8a82', 0, 1); Sh.cyl(m, 1, 5 * s, 0, 4.5 * s, 0, 3 * s, 6, '#a4a49a'); };
@@ -3160,7 +3161,13 @@ const G3 = {
     const cloud = (x, y, z, s, c) => { for (let i = 0; i < 4; i++) A.box(I, x + (i - 1.5) * 26 * s, y + (i % 2) * 8 * s, z + (i % 3) * 10, (46 - i * 4) * s, 16 * s, 30 * s, c, 1); };
     const tent = (x, z, c) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(.4)); Sh.cyl(m, 0, 0, 0, 30, 0, 44, 6, '#f4f0e6'); Sh.cyl(m, 0, 0, 0, 30.6, 26, 6, 6, c); Sh.cyl(m, 0, 30, 0, 9.8, 0, 14.5, 6, c); Sh.cyl(m, 0, 44, 0, .8, .8, 18, 4, '#8a8478'); Sh.box(m, 5, 58, 0, 10, 6, .6, c); Sh.box(m, 0, 9, 29, 12, 18, 1, '#2a2030'); };
     const merlon = (x, z, rot) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(rot)); Sh.box(m, 0, 13, 0, 26, 26, 12, '#e6e0d2'); Sh.box(m, -8, 31, 0, 9, 10, 12, '#f2ede2'); Sh.box(m, 8, 31, 0, 9, 10, 12, '#f2ede2'); Sh.box(m, 0, 25, 6.3, 26, 1.6, .6, '#e8c25a', 1); };
-    if (bg === 'keep') {
+    if (bg === 'cell') { // the pairing room: a sealed marble drum, a gallery in the dark, one shaft of light
+      for (let ix = -9; ix < 9; ix++) for (let iz = -9; iz < 9; iz++) { const x = ix * 20, z = iz * 20, d = Math.hypot(x + 10, (z + 10) * 1.5); if (d > 175) continue; const k = (ix + iz) & 1, j = r() * .04, c = d < 60 ? [.86 + j, .83 + j, .78 + j] : k ? [.62 + j, .6 + j, .58 + j] : [.5 + j, .48 + j, .48 + j]; A.quad(x, z, x + 20, z + 20, 0, c); }
+      for (let i = 0; i < 44; i++) { const a = i / 44 * 6.2832, m = M4.chain(M4.t(Math.cos(a) * 96, .2, Math.sin(a) * 58), M4.ry(-a + 1.5708)); A.box(m, 0, 0, 0, 13, .3, 1.6, '#e8c25a', 1); }
+      for (let i = 0; i < 14; i++) { const a = (i + .5) / 14 * 6.2832, x = Math.cos(a) * 150, z = Math.sin(a) * 104, m = M4.t(x, 0, z); if (z > 30) continue; Sh.cyl(m, 0, 0, 0, 8, 7, 150, 8, '#cfc8ba', 0, 1); Sh.cyl(m, 0, 0, 0, 10, 9, 8, 8, '#b8b2a4', 0, 1); A.cyl(m, 0, 60, 0, 7.6, 7.6, 2, 8, '#e8c25a', 1); A.box(M4.chain(M4.t(x * 1.16, 80, z * 1.16), M4.ry(-a + 1.5708)), 0, 0, 0, 70, 160, 5, [.2, .19, .24]); }
+      for (let i = 0; i < 22; i++) { const a = (i + .3) / 22 * 6.2832; if (Math.sin(a) > .5) continue; const x = Math.cos(a) * 172, z = Math.sin(a) * 120, m = M4.chain(M4.t(x, 62, z), M4.ry(-a - 1.5708)); A.box(m, 0, -3, 0, 26, 6, 12, [.22, .21, .24]); A.cyl(m, 0, 0, 0, 5, 3.4, 20, 6, i % 5 === 2 ? [.9, .88, .84] : [.55, .56, .62]); A.box(m, 0, 24, 0, 5.4, 6, 5.4, [.86, .78, .72]); A.box(m, -1.3, 24.6, 2.8, 1, .9, .3, [1, .8, .3], 1); A.box(m, 1.3, 24.6, 2.8, 1, .9, .3, [1, .8, .3], 1); }
+      for (const sx of [-1, 1]) { const m = M4.chain(M4.t(sx * 150, 0, -30), M4.ry(sx * 1.2)); A.box(m, 0, 30, 0, 34, 60, 4, [.16, .15, .18]); A.box(m, 0, 30, 2.2, 30, 56, .5, [.3, .28, .3]); A.box(m, 0, 61, 2.4, 36, 2, .6, '#e8c25a', 1); }
+    } else if (bg === 'keep') {
       // a white platform above the clouds
       for (let ix = -8; ix < 8; ix++) for (let iz = -6; iz < 8; iz++) { const k = (ix + iz) & 1, c = k ? [.88, .85, .8] : [.8, .77, .72], j = r() * .04; A.quad(ix * 32, iz * 32, ix * 32 + 32, iz * 32 + 32, 0, [c[0] + j, c[1] + j, c[2] + j]); A.quad(ix * 32, iz * 32, ix * 32 + 32, iz * 32 + .8, .05, [.62, .6, .56]); A.quad(ix * 32, iz * 32, ix * 32 + .8, iz * 32 + 32, .05, [.62, .6, .56]); }
       for (let i = 0; i < 40; i++) { const a = i / 40 * 6.2832, m = M4.chain(M4.t(Math.cos(a) * hw * .8, .2, Math.sin(a) * hh * .8), M4.ry(-a)); A.box(m, 0, 0, 0, 1.6, .3, hw * .13, '#e8c25a', 1); }
@@ -3211,7 +3218,7 @@ const G3 = {
       for (let i = 0; i < 9; i++) cloud(R(-1100, 1100), R(330, 520), R(-1300, -700), R(1.4, 3), ford ? [1, .74, .62] : [1, 1, 1]);
     }
     const mk2 = B => { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, B.a.subarray(0, B.n * 9), gl.STATIC_DRAW); return { b, n: B.n }; };
-    return this.envs[bg] = { a: mk2(A), s: mk2(Sh), hw, hh };
+    return this.envs[real] = { a: mk2(A), s: mk2(Sh), hw, hh };
   },
 
   // ---------------------------------------------------------- a frame
@@ -3353,9 +3360,12 @@ const G3 = {
   life(B) {
     const D = this.dyn, t = this.t, E = this.env(this.bg), hw = E.hw, hh = E.hh, bg = this.bg, I = M4.id();
     const flag = (x, z, c, k) => { const m = M4.t(x, 0, z); D.cyl(m, 0, 0, 0, 1, 1, 78, 5, '#8a8478'); D.box(m, 0, 79, 0, 3, 3, 3, '#e8c25a', 1); let fm = M4.chain(m, M4.t(.8, 62, 0)); for (let i = 0; i < 4; i++) { fm = M4.mul(fm, M4.ry(Math.sin(t * 3.4 + i * .9 + k) * .28)); D.box(fm, 4, 0, 0, 8, 22 - i * 1.5, .6, i % 2 ? shade(c, .88) : c); if (i === 1) D.box(fm, 4, 0, .5, 6, 6, .3, '#e8c25a', 1); fm = M4.mul(fm, M4.t(8, 0, 0)); } };
+    if (bg === 'cell') { if (!Settings.d.reduce) { for (let i = 0; i < 10; i++) this.glow(Math.sin(i * 2.1) * 6, 20 + i * 22, Math.cos(i * 1.7) * 5, 34 - i * 1.4, [1, .95, .8], .05); for (let i = 0; i < 26; i++) { const ph = (t * .12 + i * .137) % 1; this.glow(Math.sin(i * 4.1 + t * .3) * 40, 200 - ph * 200, Math.cos(i * 2.3) * 26, 1.2, [1, .96, .84], .5 * Math.sin(ph * 3.14)); } } return; }
+    if (bg === 'storm' && !Settings.d.reduce) { const c = B.cam; for (let i = 0; i < 110; i++) { const px = c.x + ((i * 53.7) % 420) - 210 + Math.sin(i) * 8, pz = c.y - 20 - ((i * 37.1) % 300), py = 150 - ((t * (260 + i % 7 * 30) + i * 61) % 150); this.glow(px - py * .12, py, pz, 1.1, [.7, .78, 1], .55); this.glow(px - (py + 5) * .12, py + 5, pz, .9, [.7, .78, 1], .3); }
+      const ph = t % 6.3; this.bolt = ph < .1 || (ph > .22 && ph < .3) ? 1 : 0; if (this.bolt && !this._th) Sound.play('rumble'); this._th = ph < .5; } else this.bolt = 0;
     flag(-hw + 16, -hh - 8, '#7a5ac8', 1); flag(hw - 16, -hh - 8, '#2aa6a0', 2);
     if (bg === 'keep') { for (let i = 0; i < 4; i++) { const x = (i % 2 ? 1 : -1) * (hw + 16), z = i < 2 ? -hh + 4 : hh - 4, m = M4.t(x, 0, z); D.cyl(m, 0, 0, 0, 2.4, 2, 22, 6, '#7a7268'); D.cyl(m, 0, 22, 0, 7, 9, 6, 6, '#3a3430', 0, 1); D.cyl(m, 0, 27, 0, 9.2, 9.2, 1.2, 6, '#e8c25a', 1); for (let k = 0; k < 6; k++) { const ph = (t * (1.3 + k * .17) + k * .31 + i) % 1; this.glow(x + Math.sin(k * 2 + t * 4) * 3, 30 + ph * 22, z, (1 - ph) * 9, [1, .5 + ph * .4, .15], .7); } this.glow(x, 32, z, 30, [1, .6, .25], .22); } }
-    else { // the rest of the war, behind
+    else if (bg !== 'storm') { // the rest of the war, behind
       if (!this._bgm) this._bgm = Array.from({ length: 7 }, (_, i) => ({ k: i }));
       for (const q of this._bgm) { const x = -hw - 30 + q.k * (hw * 2 + 60) / 6 + Math.sin(q.k * 7.1) * 20, z = -hh - (B.cine ? 70 : 150) - (q.k * 53 % 90), ph = t * 2.2 + q.k * 1.7, lun = Math.max(0, Math.sin(ph)) * 4, sw = (ph % 6.2832) < 1.2 ? .18 - (ph % 6.2832) * .15 : 0;
         this.char({ x: x - 16 + lun, y: z, fx: 1, fy: 0, st: sw > 0 ? 'recover' : 'approach', t: .1, swing: sw, anim: t * .3, idx: q.k, combo: 1 + q.k % 3 }, { id: q.k % 2 ? 'cadv1' : 'cadv2', blade: 1, key: q });
@@ -3364,14 +3374,15 @@ const G3 = {
         for (let i = 0; i < 30; i++) { const x = ((i * 61 + t * 22) % 1200) - 600, z = (i % 2 ? -79 : -3) + Math.sin(t * 2 + i) * 1.2; D.quad(x, z, x + 14 + (i % 3) * 6, z + 1.2, -.2, [.9, .96, 1], 1); } }
       if (bg === 'ford' && !Settings.d.reduce) for (let i = 0; i < 40; i++) { const wx = ((i * 47.3 + t * (16 + i % 4 * 6)) % 700) - 350, wz = -76 + (i * 13) % 70; if (Math.sin(t * 5 + i * 2.1) > .1) this.glow(wx, .4, wz, 3 + i % 3, [1, .86, .7], .5); }
     }
-    if (!Settings.d.reduce) for (let i = 0; i < 7; i++) { const bx = ((i * 190 + t * (26 + i * 3)) % 1400) - 700, by = 150 + i * 14 + Math.sin(t * .7 + i) * 10, bz = -420 - i * 40, fl = Math.sin(t * 9 + i * 2) * .7, m = M4.t(bx, by, bz); D.box(m, 0, 0, 0, 2, 1.4, 5, '#2a2a34'); D.box(M4.chain(m, M4.rz(fl)), 4, 0, 0, 8, .5, 3, '#3a3a44'); D.box(M4.chain(m, M4.rz(-fl)), -4, 0, 0, 8, .5, 3, '#3a3a44'); }
+    if (!Settings.d.reduce && bg !== 'storm') for (let i = 0; i < 7; i++) { const bx = ((i * 190 + t * (26 + i * 3)) % 1400) - 700, by = 150 + i * 14 + Math.sin(t * .7 + i) * 10, bz = -420 - i * 40, fl = Math.sin(t * 9 + i * 2) * .7, m = M4.t(bx, by, bz); D.box(m, 0, 0, 0, 2, 1.4, 5, '#2a2a34'); D.box(M4.chain(m, M4.rz(fl)), 4, 0, 0, 8, .5, 3, '#3a3a44'); D.box(M4.chain(m, M4.rz(-fl)), -4, 0, 0, 8, .5, 3, '#3a3a44'); }
     for (let i = 0; i < 5; i++) { const cx = ((i * 520 + t * (5 + i)) % 2600) - 1300, cy = (bg === 'keep' ? 240 : 360) + i * 28, cz = -900 - i * 90, cc = bg === 'ford' ? [1, .7, .58] : bg === 'keep' ? [1, .9, .86] : [1, 1, 1]; for (let k = 0; k < 4; k++) D.box(I, cx + (k - 1.5) * 60, cy + (k % 2) * 16, cz + (k % 3) * 20, 110 - k * 10, 34, 60, cc, 1); }
     // petals, embers
     if (!Settings.d.reduce) for (let i = 0; i < (B.cine ? 46 : 14); i++) { const c = B.cam, px = c.x + ((i * 71.3 + t * (8 + i % 5 * 3)) % 400) - 200, pz = c.y - 40 - ((i * 37.7) % 320), up = bg === 'ford', py = ((i * 29.1 + t * (up ? 9 + i % 4 * 4 : -(6 + i % 4 * 3))) % 90 + 90) % 90 + 2; this.glow(px + Math.sin(t + i) * 6, py, pz, up ? 1.6 : 1.3, bg === 'keep' ? [1, 1, 1] : up ? [1, .7, .35] : [[1, .9, .95], [1, .9, .5], [.85, 1, .8]][i % 3], up ? .9 : .7); }
   },
   end(B) {
-    const gl = this.gl, cv = this.cv, L = this.LOOK[this.bg], E = this.env(this.bg), P = this.P, vd = this.voidC;
+    const gl = this.gl, cv = this.cv, E = this.env(this.bg), P = this.P, vd = this.voidC; let L = this.LOOK[this.bg];
     if (!vd) this.life(B);
+    const bl = this.bg === 'storm' && this.bolt && !vd; if (bl) L = Object.assign({}, L, { amb: [.9, .95, 1.2], sunC: [1.6, 1.7, 2.1], top: [.3, .34, .5], bot: [.5, .56, .8], fog: [.36, .4, .6] });
     const rg = (this.rage || 0) * .6, Lr = rg > 0 && !vd ? { top: L.top.map((v, i) => v * (1 - rg * .55) + [.3, .02, .02][i] * rg * .5), bot: L.bot.map((v, i) => v * (1 - rg * .35) + [1, .3, .12][i] * rg * .35), sunC: L.sunC.map((v, i) => v * (1 - rg * .15) + [.5, .05, 0][i] * rg), amb: L.amb.map((v, i) => v * (1 - rg * .28)), fog: L.fog.map((v, i) => v * (1 - rg * .4) + [.6, .12, .06][i] * rg * .4) } : L;
     const post = !NOPOST && this.target0(cv.width, cv.height); gl.bindFramebuffer(gl.FRAMEBUFFER, post ? this.fb : null);
     gl.viewport(0, 0, cv.width, cv.height); gl.clearColor(vd ? vd[0] : L.fog[0], vd ? vd[1] : L.fog[1], vd ? vd[2] : L.fog[2], 1); gl.clearStencil(0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
@@ -3440,16 +3451,16 @@ const FF = {
     ]
   }),
   ford: () => ({
-    title: 'THE FORD', sub: 'CAPTAIN VANT HOLDS THE CROSSING', bg: 'ford', arena: FIELD, music: 'dusk', rage: 2, legend: 1, skip: 1, winText: 'THE FORD IS OURS',
-    hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 45 }, allies: ['cadv2'], shouts: ['HE IS MAD!', 'WITH HIM!'], taunt: { 0: ['WHO TRAINED YOU?', 'YOU FIGHT LIKE A MINER!', 'YIELD, BOY!'] },
+    title: 'THE FORD', sub: 'SINGLE COMBAT FOR THE CROSSING', bg: 'ford', arena: FIELD, music: 'dusk', rage: 2, legend: 1, skip: 1, winText: 'THE FORD IS OURS',
+    hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 45 }, taunt: { 0: ['WHO TRAINED YOU?', 'YOU FIGHT LIKE A MINER!', 'YIELD, BOY!'] },
     voice: { at: [[1, 'VANT IS THE BEST BLADE IN HOUSE TEAL. HE HAS NEVER ONCE BEEN HUNGRY.'], [11, 'MARA USED TO SAY: AIM IT UP, NOT SIDEWAYS. I AM AIMING, MARA.'], [26, 'EVERY NIGHT I WASH THE GOLD OFF MY HANDS AND CHECK THAT THE SOOT IS STILL THERE.']],
       hurt: 'HE HITS LIKE A PROCTOR. I HAVE BEEN HIT BY PROCTORS.', fury: 'I DO NOT GET ANGRY UP HERE. I WAS ALREADY ANGRY WHEN I ARRIVED.', eleven: 'ONE FOR EVERY SECOND.', half: 'HE IS AFRAID NOW. NOBODY EVER TAUGHT THEM WHAT TO DO WITH THAT.' },
     arts: [{ at: .7, name: 'RATION AIR', line: 'WE BLED THEIR AIR INTO A FEVER WARD. THAT WAS THE WHOLE CRIME.', panel: 'ward', stage: 1, kind: 'storm', rgb: '120,220,200', hex: '#78dcc8' }, { at: .36, name: 'LITTLE EMBER', line: 'THEY CALLED HER LITTLE EMBER. THEN THEY LIT THE FURNACE.', panel: 'furnace', kind: 'rise', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }],
-    foes: [{ id: 'vant', name: 'Captain Vant', kind: 'captain', hp: 84, sc: 1.12 }, { id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 7 }, { id: 'cadt2', name: 'Teal', kind: 'lancer', hp: 7 }],
+    foes: [{ id: 'vant', name: 'Captain Vant', kind: 'captain', hp: 120, sc: 1.12 }],
     intro: [
       { d: 2.2, cam: [-90, 230, 130, 150, .2], to: [30, 150, 64, 150, .32], acts: ffRow(TL, 7, -90, 30, -40, { fy: 1 }).concat([{ id: 'vant', a: [0, -22], blade: 1, sc: 1.12 }]), big: 'THE FORD', cap: 'THE ASSAY. DAY NINETEEN.' },
-      { d: 1.7, ...cu(0, -22, 1.8, 2.3, 22), acts: [{ id: 'vant', a: [0, -22], blade: 1, sc: 1.12 }], cap: 'CAPTAIN VANT HOLDS THE CROSSING WITH SIXTY.' },
-      { d: 1.6, ...cu(0, 40, 1.9, 2.7, -18), flash: 1, sfx: 'roar', acts: [{ id: 'kael2', a: [0, 40], blade: 1, aura: 2 }], cap: 'I BROUGHT ELEVEN.' }
+      { d: 1.7, ...cu(0, -22, 1.8, 2.3, 22), acts: [{ id: 'vant', a: [0, -22], blade: 1, sc: 1.12 }], cap: 'CAPTAIN VANT OFFERED SINGLE COMBAT FOR THE CROSSING. HE HAS NEVER LOST ONE.' },
+      { d: 1.6, ...cu(0, 40, 1.9, 2.7, -18), flash: 1, sfx: 'roar', acts: [{ id: 'kael2', a: [0, 40], blade: 1, aura: 2 }], cap: 'NEITHER HAVE I. I HAVE ONLY EVER LOST ONE THING.' }
     ],
     outro: [
       { d: 2.4, ...cu(0, -8, 1.9, 2.6, 20), acts: [{ id: 'kael2', a: [0, -8], blade: 1, aura: 3 }], cap: 'THEY ALL HAVE HER EYES. I CHECK. EVERY TIME.' },
@@ -3476,6 +3487,45 @@ const FF = {
       { d: 3.0, cam: [-6, 130, 60, 200, .62], to: [-6, 160, 90, 180, 1.2], acts: [], cap: 'ONE CANDLE-HOUR, SEREN. WATCH HOW LONG I BURN.', tint: 'rgba(255,246,220,.25)' }
     ]
   }),
+  // the first night: two sealed in, one comes out a cadet
+  pairing: () => ({
+    title: 'THE PAIRING', sub: 'TWO GO IN. ONE COMES OUT A CADET.', bg: 'cell', arena: { kind: 'ring', rx: 96, ry: 58 }, music: 'dusk', rage: 0, legend: 1, skip: 1, winText: 'ONE COMES OUT',
+    hero: { id: 'kael2', hp: 8, pow: 1, blade: 1, fury0: 10 }, taunt: { 0: ['I DO NOT WANT TO.', 'PLEASE.', 'WHO IS THIS FOR?'] },
+    foes: [{ id: 'teo', name: 'Teo Aldane', kind: 'cadet', hp: 30 }],
+    voice: { at: [[1, 'HE SHARED HIS BREAD ON THE LIFT UP. HE ASKED ABOUT MY FAMILY. I LIED WELL.'], [13, 'HE IS NOT BAD AT THIS. SOMEBODY LOVED HIM ENOUGH TO PAY FOR LESSONS.'], [26, 'UP IN THE GALLERY THEY ARE KEEPING SCORE.']],
+      hurt: 'GOOD. MAKE IT EASIER FOR ME.', fury: 'I SAID HER NAME UNTIL IT WAS THE ONLY THING IN THE ROOM.', half: 'HE HAS STOPPED TRYING TO WIN. HE IS ONLY TRYING TO LAST.', eleven: 'ELEVEN. HE DID NOTHING TO EARN ANY OF THEM.' },
+    arts: [{ at: .5, name: 'HER NAME', line: 'SHE WALKED INTO THE FURNACE SO FORTY CHILDREN COULD BREATHE. I AM DOING THIS FOR HER. I AM.', panel: 'furnace', kind: 'rise', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }],
+    intro: [
+      { d: 3.0, cam: [0, 250, 170, 150, .16], to: [0, 150, 66, 150, .3], acts: [{ id: 'kael2', a: [-38, 4], fx: 1, fy: 0, blade: 1 }, { id: 'teo', a: [38, 4], fx: -1, fy: 0, blade: 1 }], big: 'THE PAIRING', cap: 'THE ASSAY. THE FIRST NIGHT. THEY SEAL US IN BY TWOS.' },
+      { d: 2.4, ...cu(38, 4, 1.8, 2.4, 16), acts: [{ id: 'teo', a: [38, 4], blade: 1 }], cap: 'TEO ALDANE. HE SHARED HIS BREAD ON THE LIFT UP. HE IS SIXTEEN.' },
+      { d: 2.4, cam: [0, 130, 30, 150, .5], to: [0, 150, 26, 150, .62], acts: [{ id: 'kael2', a: [-38, 4], fx: 1, fy: 0, blade: 1 }, { id: 'teo', a: [38, 4], fx: -1, fy: 0, blade: 1 }], cap: 'A VOICE FROM THE GALLERY: ONE OF YOU LEAVES THIS ROOM A CADET.' },
+      { d: 2.0, ...cu(-38, 4, 1.9, 2.7, -14), flash: 1, sfx: 'heart', acts: [{ id: 'kael2', a: [-38, 4], blade: 1, aura: 1 }], cap: 'I DID NOT COME UP HERE TO BE KIND.' }
+    ],
+    outro: [
+      { d: 3.0, cam: [30, 150, 56, 170], to: [6, 124, 54, 190], acts: [{ id: 'teo', a: [22, -2], pose: 'kneel', fx: -1, fy: .2 }, { id: 'kael2', a: [-10, 2], blade: 1, fx: 1, fy: -.1 }], cap: 'HE SAID: I HOPE SHE WAS WORTH IT. I HAD NOT TOLD HIM THERE WAS A SHE.' },
+      { d: 3.0, cam: [0, 150, 60, 150, .3], to: [0, 250, 170, 150, .16], acts: [{ id: 'kael2', a: [-10, 2], blade: 1, fx: 1, fy: -.1 }], cap: 'THEY CARRIED HIM OUT BY THE OTHER DOOR. NOBODY SAYS WHERE IT GOES.' },
+      { d: 3.0, ...cu(-10, 2, 1.9, 2.8, 12), acts: [{ id: 'kael2', a: [-10, 2], blade: 1, aura: 1 }], cap: 'SEREN WOULD NOT HAVE KNOWN ME. THAT WAS THE PRICE OF THE DOOR.', tint: 'rgba(10,4,16,.3)' }
+    ]
+  }),
+  // day thirty-one: nobody touches a Proctor
+  proctor: () => ({
+    title: 'THE PROCTOR', sub: 'HALDEN VOSS - NOBODY TOUCHES A PROCTOR', bg: 'storm', arena: FIELD, music: 'duel', rage: 3, legend: 1, skip: 1, winText: 'HE BLEEDS',
+    hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['I GRADE YOU, BOY.', 'YOU WILL BE UNMADE FOR THIS.', 'WHAT ARE YOU?'] },
+    foes: [{ id: 'voss', name: 'Proctor Voss', kind: 'warden', hp: 130, sc: 1.28 }],
+    voice: { at: [[1, 'THE PROCTORS ARE MEANT TO WATCH. THIS ONE HAS BEEN SELLING OUR POSITIONS TO HOUSE TEAL.'], [14, 'HE FIGHTS LIKE A MAN WHO HAS ONLY EVER HIT PEOPLE WHO WERE NOT ALLOWED TO HIT BACK.'], [30, 'I KNOW THAT KIND OF MAN. I GREW UP UNDER THEIR BOOTS.']],
+      hurt: 'A HALBERD. OF COURSE IT IS A HALBERD.', fury: 'ANGER IS FOR EQUALS, SHE TOLD ME. THEN LET US BE EQUALS.', half: 'HE LOOKS AT HIS OWN BLOOD AS IF IT WERE A CLERICAL ERROR.', eleven: 'ONE FOR EVERY SECOND. I HAVE PLENTY TO SPARE.' },
+    arts: [{ at: .72, name: 'THE AUDIT', line: 'THEY CAME DOWN IN LIGHT TO COUNT US. TONIGHT I DO THE COUNTING.', panel: 'lift', kind: 'storm', rgb: '255,240,200', hex: '#fff0c8' }, { at: .36, name: 'BALANCED', line: 'SHE SAID "BALANCED" WHEN THE DOORS CLOSED. I HAVE CARRIED THE REMAINDER EVER SINCE.', panel: 'furnace', stage: 1, kind: 'rise', rgb: '255,90,30', hex: '#ff5a1e', dark: 'rgba(26,4,2,.82)' }],
+    intro: [
+      { d: 3.0, cam: [-60, 250, 150, 150, .18], to: [0, 150, 62, 150, .32], acts: [{ id: 'voss', a: [34, -8], blade: 2, sc: 1.28, fx: -1, fy: .3 }, { id: 'cadv1', a: [-6, 14], pose: 'kneel', fx: 1, fy: -.3 }, { id: 'cadv2', a: [8, -30], pose: 'kneel', fx: 1, fy: .4 }, { id: 'kael2', a: [-70, 6], b: [-44, 4], fx: 1, fy: 0, blade: 1 }], big: 'THE PROCTOR', cap: 'THE ASSAY. DAY THIRTY-ONE. A STORM OVER THE VALLEY.' },
+      { d: 2.6, ...cu(34, -8, 1.5, 2.0, 18), acts: [{ id: 'voss', a: [34, -8], blade: 2, sc: 1.28 }], cap: 'PROCTOR VOSS CAME DOWN FROM THE DAIS TO FINISH HOUSE VIOLET HIMSELF.' },
+      { d: 2.4, ...cu(-44, 4, 1.9, 2.8, -14), flash: 1, bolt: 1, sfx: 'roar', acts: [{ id: 'kael2', a: [-44, 4], blade: 1, aura: 3 }], cap: 'NOBODY TOUCHES A PROCTOR. IT IS THE FIRST RULE THEY TEACH YOU.' }
+    ],
+    outro: [
+      { d: 3.0, cam: [34, 150, 56, 170], to: [10, 124, 54, 190], acts: [{ id: 'voss', a: [26, -6], pose: 'kneel', sc: 1.28, fx: -1, fy: .2 }, { id: 'kael2', a: [-10, 2], blade: 1, fx: 1, fy: -.1, aura: 2 }], cap: 'HE BLEEDS. THE WHOLE VALLEY SEES IT. NOBODY KNEW THEY COULD.' },
+      { d: 3.0, ...cu(-10, 2, 1.8, 2.5, 14), acts: [{ id: 'kael2', a: [-10, 2], blade: 1, aura: 2 }], cap: 'I TOOK HIS WHITE CLOAK OFF HIM AND WORE IT BACK TO CAMP.' },
+      { d: 3.2, cam: [40, 150, 60, 150], to: [-30, 215, 110, 150], acts: [{ id: 'kael2', a: [0, 10], blade: 1, aura: 1 }].concat(ffRow(V, 7, -90, 30, 34, { fy: -1, pose: 'raise' })), cap: 'THAT WAS THE NIGHT THEY STOPPED FOLLOWING THE HOUSE AND STARTED FOLLOWING ME.' }
+    ]
+  }),
   furnace: () => ({ title: 'THREE STEPS', sub: 'THE WARDEN', bg: 'furnace', arena: { kind: 'rect', w: 200, h: 80 }, music: 'mystery', doomed: 9, hero: { hp: 4, fury0: 80 }, voice: { at: [[.4, 'THREE STEPS.'], [3, 'IT IS LIKE HITTING THE ARRAY ITSELF.'], [6, 'SHE IS STILL LOOKING AT ME.']], eleven: 'I HIT HIM WITH EVERYTHING I WILL EVER BE. HE DOES NOT MOVE.' }, foes: [{ id: 'warden', name: 'Warden', kind: 'warden', hp: 999, sc: 1.1 }] })
 };
 // ---- the intro before the title: the Assay, start to finish, in thirty seconds
@@ -3498,7 +3548,7 @@ const OPENING = [
   { d: 2.4, bg: 'keep', cam: [0, 250, 140, 150, .2], to: [0, 140, 56, 170, .32], flash: 1, acts: [{ id: 'lucan', a: [30, -6], fx: -1, fy: .2, blade: 1, sc: 1.08, swing: 1 }, { id: 'kael2', a: [-26, 4], fx: 1, fy: -.2, blade: 1, aura: 3, swing: 1 }], cap: 'HE CAME FOR ONE OF THEM IN PARTICULAR.' },
   { d: 2.2, ...cu(-26, 4, 1.9, 3.0, -14), sfx: 'roar', flash: 1, bolt: 2, shake: .5, tint: 'rgba(160,20,0,.16)', acts: [{ id: 'kael2', a: [-26, 4], blade: 1, aura: 4 }], cap: 'AND HE HAS BEEN COUNTING TO ELEVEN EVER SINCE.' },
   { d: 0.5, black: 1, flash: 1, sfx: 'hit', shake: .6 },
-  { d: 3.6, black: 1, bolt: 1, sfx: 'choir', big: 'SOOTBORN', bigC: '#ffe08a', sub2: 'B O O K   O N E', credit: 'NORTH COAST STUDIOS  x  E CONCEPTS' }
+  { d: 3.6, black: 1, bolt: 1, sfx: 'choir', big: 'SOOTBORN', bigC: '#ffe08a', sub2: 'E V E R Y   B R E A T H   I S   H E R S', credit: 'NORTH COAST STUDIOS  x  E CONCEPTS' }
 ];
 const Opening = { run(done) { if (NOFF) return done(); G.mode = 'opening'; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => { Fade.a = 1; Fade.dir = -1; Fade.sp = 1.2; Fade.busy = true; done(); }); } };
 
@@ -3508,6 +3558,7 @@ if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.d
 { const i = PROLOGUE_B.findIndex(s => s.choice && s.choice.some(c => /BREAK FREE/.test(c.t))), ch = PROLOGUE_B[i].choice.find(c => /BREAK FREE/.test(c.t)), was = ch.then;
   ch.then = [narr("You tear out of Mara's arms. Three steps. A Warden turns, unhurried, and lowers a halberd the length of a pipe.")];
   PROLOGUE_B.splice(i + 1, 0, { fx: () => { if (F('ranForHer')) Cutscene.steps.splice(Cutscene.i, 0, { brawl: () => NOFF ? null : FF.furnace() }, { dlg: was }); } }); }
+if (!NOFF) { const i = PROLOGUE_B.findIndex(s => s.card === 'SOOTBORN'); if (i >= 0) PROLOGUE_B.splice(i, 0, { fade: 'out' }, { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The first night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.pairing() }); }
 function ffScene(card, sub, def, done) { Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play([{ music: null }, { card, sub, big: 1, min: 1.5, max: 4.5 }, { brawl: def }], done); }
 
 // ---- src/day2.js
@@ -4048,6 +4099,9 @@ function festB() {
   ].filter(Boolean);
 }
 
+// the Proctor duel plays before the ceremony: the night Kael learns what the Authority takes, cut against the night he takes something back
+{ const f0 = festA; festA = function () { return (NOFF ? [] : [{ card: 'FOUR YEARS FROM NOW', sub: 'The Assay. Day thirty-one.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.proctor() }]).concat(f0()); }; }
+
 // ---- src/checkpoints.js
 // dev checkpoints: saves captured from a scripted playthrough (see Menus.checkpoints)
 const CHECKPOINTS = {"day2":{"v":2,"t":0,"name":"Kael","look":0,"tendency":"caretaker","day":2,"map":"apt","x":56,"y":76,"dir":0,"flags":{"talkedTavi":1,"talkedMara1":1,"tookOrder":1,"puzzleDone":1,"maraDebrief":1,"crateA":1,"crateB":1,"crateC":1,"clockedOut":1,"day1Done":1,"proctorDone":1,"interacted":1,"journalHint":1,"metVale":1,"charmedProctor":1,"reportedCrate":1,"fury":3},"trust":{},"scrip":20,"journal":["p_seren","p_tavi","e_aux9","e_crate"],"log":[],"play":0,"talkCount":{}},"ring":{"v":2,"t":0,"name":"Kael","look":0,"tendency":"caretaker","day":2,"map":"square","x":312,"y":124,"dir":1,"flags":{"talkedTavi":1,"talkedMara1":1,"tookOrder":1,"puzzleDone":1,"maraDebrief":1,"crateA":1,"crateB":1,"crateC":1,"clockedOut":1,"day1Done":1,"proctorDone":1,"interacted":1,"journalHint":1,"fury":3,"metVale":1,"charmedProctor":1,"reportedCrate":1,"d2Tavi":1,"sun18":1,"sullTip":1,"sull2Done":1,"mara2":1,"fuseOrder":1,"sawLockerS":1,"fuseDone":1,"spareOn":1,"vale2Done":1,"tookBlood":1,"lockerD":1,"ray_mara":1,"rays":9,"clock2":1,"knowsFire":1,"daceNote":1,"gotWire":1,"ray_ivo":1,"ivoWatch":1,"ivoTalk2":1,"gotGold":1,"metOrin":1,"ray_bao":1,"ray_baoSeen":1,"ray_marrow":1,"ray_marrowSeen":1,"ray_fen":1,"sableHook":1,"ray_kit":1,"ray_kitSeen":1,"ray_pell":1,"ray_pellSeen":1,"ray_juno":1,"ray_junoSeen":1,"gotWick":1,"metNell":1,"visitedWard":1,"nellAsk":1,"ray_kids":1,"kidRay":1},"trust":{"mara":0,"ivo":1,"tavi":2,"orin":0,"nell":0},"trust0":{},"scrip":83,"journal":["p_seren","p_tavi","e_aux9","e_crate","q_list","p_sull","e_l0","pl_fuse","e_remit","p_dace","e_dacenote","e_lift","p_orin","e_ticket","p_nell"],"log":[],"play":0,"talkCount":{}},"fest":{"v":2,"t":0,"name":"Kael","look":0,"tendency":"caretaker","day":2,"map":"apt","x":104,"y":44,"dir":1,"flags":{"talkedTavi":1,"talkedMara1":1,"tookOrder":1,"puzzleDone":1,"maraDebrief":1,"crateA":1,"crateB":1,"crateC":1,"clockedOut":1,"day1Done":1,"proctorDone":1,"interacted":1,"journalHint":1,"fury":3,"metVale":1,"charmedProctor":1,"reportedCrate":1,"d2Tavi":1,"sun18":1,"sullTip":1,"sull2Done":1,"mara2":1,"fuseOrder":1,"sawLockerS":1,"fuseDone":1,"spareOn":1,"vale2Done":1,"tookBlood":1,"lockerD":1,"ray_mara":1,"rays":10,"clock2":1,"knowsFire":1,"daceNote":1,"gotWire":1,"ray_ivo":1,"ivoWatch":1,"ivoTalk2":1,"gotGold":1,"metOrin":1,"ray_bao":1,"ray_baoSeen":1,"ray_marrow":1,"ray_marrowSeen":1,"ray_fen":1,"sableHook":1,"ray_kit":1,"ray_kitSeen":1,"ray_pell":1,"ray_pellSeen":1,"ray_juno":1,"ray_junoSeen":1,"gotWick":1,"metNell":1,"visitedWard":1,"nellAsk":1,"ray_kids":1,"kidRay":1,"ray_hollis":1,"ringIntro":1,"ring":3,"ringMercy":1,"ringChamp":1,"washerOn":1,"openedTin":1,"lanternBuilt":1},"trust":{"mara":1,"ivo":1,"tavi":2,"orin":0,"nell":0},"trust0":{},"scrip":95,"journal":["p_seren","p_tavi","e_aux9","e_crate","q_list","p_sull","e_l0","pl_fuse","e_remit","p_dace","e_dacenote","e_lift","p_orin","e_ticket","p_nell","e_belt","e_tin"],"log":[],"play":0,"talkCount":{}}};
@@ -4257,21 +4311,40 @@ const Menus = {
   // dev: jump to any point of the slice
   checkpoints() {
     const fresh = () => { UI.clear(); freshState('Kael', 0); World.resetSheets(); World.showPlayer = true; }, load = k => () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS[k])))); };
-    const C = [
-      ['Opening cinematic', () => { UI.clear(); Sound.tname = null; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => Game.toTitle()); G.mode = 'opening'; }],
-      ['Assay 1 · The Valley (battle), then the prologue', () => { UI.clear(); Game.newGame(); }],
-      ['Prologue · story only', () => { fresh(); Cutscene.play(PROLOGUE_A.filter(s => !s.brawl && !/^FOUR YEARS FROM/.test(s.card || '')), () => Game.startHeist()); }],
-      ['Prologue · the relay heist', () => { fresh(); Game.startHeist(); }],
-      ['Prologue · Lift Zero and the furnace', () => { fresh(); Game.onHeistDone(); }],
-      ['Prologue · Three Steps (the Warden fight)', () => { fresh(); G.flags.ranForHer = 1; ffScene('THREE STEPS', 'You make it three steps.', () => FF.furnace(), () => Game.toTitle()); }],
-      ['Day 1 · wake up in Ashgate', () => { fresh(); Game.startPresent(); }],
-      ['Assay 2 · The Ford (battle), then Day 2', () => { UI.clear(); ffScene('THE ASSAY', 'Four years from now. Day nineteen.', () => FF.ford(), load('day2')); }],
-      ['Day 2 · morning', load('day2')],
-      ['Day 2 · the Ember Ring', load('ring')],
-      ['Day 2 · lantern built, festival next', load('fest')],
-      ['Assay 3 · The Keep (duel)', () => { UI.clear(); ffScene('FOUR YEARS FROM NOW', 'The Assay. The last day.', () => FF.keep(), () => Game.toTitle()); }]
-    ];
-    UI.push(modal({ title: 'Checkpoints', build(b) { b.innerHTML = '<p>Dev menu. Jumps straight to a point in the slice. Your save slots are not touched until the game autosaves.</p>'; }, items: C.map(([label, act]) => ({ label, act })).concat([{ label: 'Back', act: () => UI.pop() }]) }));
+    const ff = (card, sub, k, then) => () => { UI.clear(); ffScene(card, sub, () => FF[k](), then || (() => Game.toTitle())); };
+    const fest = k => () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.fest)))); setTimeout(() => { UI.clear(); Game[k](); }, 60); };
+    const S = {
+      'Fights': [
+        ['The Valley · battle (the first fight)', ff('FOUR YEARS FROM NOW', 'The Assay. Day forty.', 'valley')],
+        ['Three Steps · the Warden at the furnace', () => { fresh(); G.flags.ranForHer = 1; ffScene('THREE STEPS', 'You make it three steps.', () => FF.furnace(), () => Game.toTitle()); }],
+        ['The Pairing · duel with Teo Aldane', ff('FOUR YEARS FROM NOW', 'The Assay. The first night.', 'pairing')],
+        ['The Ford · duel with Captain Vant', ff('THE ASSAY', 'Four years from now. Day nineteen.', 'ford')],
+        ['The Proctor · duel with Halden Voss', ff('FOUR YEARS FROM NOW', 'The Assay. Day thirty-one.', 'proctor')],
+        ['The Keep · duel with Lucan Aurel', ff('FOUR YEARS FROM NOW', 'The Assay. The last day.', 'keep')],
+        ['The Ember Ring · bouts below', load('ring')]
+      ],
+      'Story beats': [
+        ['Opening film', () => { UI.clear(); Sound.tname = null; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => Game.toTitle()); G.mode = 'opening'; }],
+        ['New game from the top (Valley, then prologue)', () => { UI.clear(); Game.newGame(); }],
+        ['Prologue · story only', () => { fresh(); Cutscene.play(PROLOGUE_A.filter(s => !s.brawl && !/^FOUR YEARS FROM/.test(s.card || '')), () => Game.startHeist()); }],
+        ['Prologue · the relay heist', () => { fresh(); Game.startHeist(); }],
+        ['Prologue · Lift Zero, the furnace, the Pairing', () => { fresh(); Game.onHeistDone(); }],
+        ['Day 1 · wake up in Ashgate', () => { fresh(); Game.startPresent(); }],
+        ['End of Day 1 · the Ford, then Day 2', ff('THE ASSAY', 'Four years from now. Day nineteen.', 'ford', load('day2'))],
+        ['Day 2 · morning', load('day2')],
+        ['Day 2 · lantern built, festival next', load('fest')],
+        ['Day 2 · Last Bell (the Proctor, then the ceremony)', fest('startFestival')],
+        ['Day 2 · the lantern climb (stealth)', fest('startFestStealth')],
+        ['Day 2 · First Fire (the Keep, then the ending)', fest('onFestDone')]
+      ]
+    };
+    const sub = k => () => UI.push(modal({ title: k, items: S[k].map(([label, act]) => ({ label, act })).concat([{ label: 'Back', act: () => UI.pop() }]) }));
+    const onoff = v => v ? 'On' : 'Off';
+    UI.push(modal({ title: 'Dev menu', build(b) { b.innerHTML = '<p>Jump straight to any fight or story beat. Your save slots are not touched until the game autosaves.</p>'; }, items: [
+      { label: 'Fights', act: sub('Fights') }, { label: 'Story beats', act: sub('Story beats') },
+      { label: 'Start fights at full fury', value: () => onoff(DEV.fury), adj: () => { DEV.fury = DEV.fury ? 0 : 1; } },
+      { label: 'Skip fight intro films', value: () => onoff(DEV.quick), adj: () => { DEV.quick = DEV.quick ? 0 : 1; } },
+      { label: 'Back', act: () => UI.pop() }] }));
   },
   saveData() {
     const inGame = G.mode === 'world';
@@ -4291,7 +4364,7 @@ const Menus = {
   title() {
     const s = Save.latest();
     UI.push(modal({ clear: true, onBack: null, build(b) {
-      b.innerHTML = `<h1 class="logo">SOOTBORN</h1><div class="sub">Book One</div>`;
+      b.innerHTML = `<h1 class="logo">SOOTBORN</h1><div class="sub">Every breath is hers.</div>`;
       b.parentNode.style.background = 'rgba(16,10,13,.82)'; b.parentNode.style.textAlign = 'center';
     }, items: [
       { label: s ? `Continue — Day ${s.day}, ${MAPS[s.map].name}` : 'Continue', disabled: () => !s, act: () => { UI.clear(); Game.loadSave(Save.latest()); } },
@@ -4299,11 +4372,11 @@ const Menus = {
       { label: 'Load game', act: () => Menus.slots('load') },
       { label: 'Settings', act: () => Menus.settings() },
       { label: 'About & controls', act: () => Menus.about() },
-      { label: 'Checkpoints (dev)', act: () => Menus.checkpoints() }
+      { label: 'Dev menu · jump to a scene', act: () => Menus.checkpoints() }
     ] }));
   },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. Book One vertical slice (v0.12): the prologue, two days in Cinderwell, and three battles from the Assay, four years on. In a fight: A strikes (three-hit chain), B dodges (dodge through the red for an opening), and when the fury bar is full, hold A for ELEVEN.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.12.8): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. In a fight: A strikes (three-hit chain), B dodges (dodge through the red for an opening), and when the fury bar is full, hold A for ELEVEN.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
@@ -4432,7 +4505,7 @@ const DayEnd = {
       b.innerHTML = `<p>By first bell the Proctors have taken the lantern down. It does not matter. Four hundred people saw a sun, and you cannot scrub a thing like that off stone.</p>
         <p>In Row K, a child sleeps with a leaf pressed in a worksheet. In Fuse Room C, one bus hums at nineteen, exactly. And at the gate of Lift Zero, a grey Inspector waits with a ledger, to see who comes to carry it up.</p>
         <p><i>"Be too much for them."</i></p>
-        <h2 style="margin-top:16px">END OF FIRST FIRE</h2><p style="opacity:.7">SOOTBORN · Book One vertical slice · thanks for playing.</p>`;
+        <h2 style="margin-top:16px">END OF FIRST FIRE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
     }, items: [
       { label: 'Keep exploring (Day 3)', act: () => { UI.clear(); Game.loadSave(Save.read('auto') || Save.snapshot()); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }
@@ -4444,7 +4517,7 @@ const DayEnd = {
       b.innerHTML = `<p>Far above Cinderwell — above the rock, above the warnings — a crate of cold greens arrives somewhere that doesn't exist.</p>
         <p>Below, Kael Brennick dreams of ${F('sawRiser') ? 'warm air falling from a pipe with no destination' : 'a lift light, green for eleven seconds'} — and of Seren, laughing at him for being right.</p>
         <p><i>"They came down in light. One day, I'm going up in it."</i></p>
-        <h2 style="margin-top:16px">END OF DAY ONE</h2><p style="opacity:.7">SOOTBORN · Book One vertical slice · thanks for playing.</p>`;
+        <h2 style="margin-top:16px">END OF DAY ONE</h2><p style="opacity:.7">SOOTBORN · Every breath is hers · vertical slice · thanks for playing.</p>`;
     }, items: [
       { label: 'Wake up: Day 2 — First Fire', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); if (NOFF) return Game.loadSave(sv); ffScene('THE ASSAY', 'Four years from now. Day nineteen.', () => FF.ford(), () => Game.loadSave(sv)); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }

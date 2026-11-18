@@ -21,6 +21,7 @@ const FOE_KINDS = {
 };
 const SUPT = 1.6; // how long the ELEVEN cut-in holds before the rush
 const ELEVEN = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'ELEVEN'];
+const DEV = { fury: 0, quick: 0 }; // dev menu switches: start fights at full fury, skip fight intro films
 const Brawl = {
   active: false, K: 2.4, def: null, onEnd: null, t: 0, p: null, foes: [], allies: [], props: [], parts: [], rings: [], freeze: 0, slow: 0, shake: 0, punch: 0, impact: 0,
   phase: 'intro', pt: 0, msg: '', msgT: 0, cam: { x: 0, y: 170, h: 62, f: 150, hor: 58 }, tex: {}, pat: {}, cine: null, sup: null, wave: 0,
@@ -31,13 +32,13 @@ const Brawl = {
     Object.assign(this, { def, onEnd, active: true, t: 0, parts: [], rings: [], freeze: 0, slow: 0, shake: 0, punch: 0, impact: 0, phase: 'intro', pt: 0, msg: '', msgT: 0, token: [], sup: null, wave: 0, arena: A, cine: null, tipT: 5, hitsN: 0, hitsT: 0, clang: 0, slashes: [], fin: null, flinched: 0, nums: [], scars: [], vq: [], vcur: null, vdone: {}, ft: 0, art: null, artDone: {}, lines: [], tex: {}, pat: {} });
     const hw = A.kind === 'ring' ? A.rx : A.w / 2;
     this.p = { x: -hw * .5, y: 4, fx: 1, fy: 0, hp: hero.hp || 6, max: hero.hp || 6, pow: hero.pow || 1, blade: hero.blade || 0, sheet: hero.id ? World.sheetFor(hero.id) : P.sheet, st: 'idle', t: 0, combo: 0, comboT: 0, inv: 0, dcd: 0, open: 0, anim: 0, hit: false, kx: 0, ky: 0, hold: 0, trail: [],
-      fury: hero.fury0 !== undefined ? hero.fury0 : Math.min(60, ((G.flags || {}).fury | 0) * 7), rage: def.rage || 0 };
+      fury: DEV.fury ? 100 : hero.fury0 !== undefined ? hero.fury0 : Math.min(60, ((G.flags || {}).fury | 0) * 7), rage: def.rage || 0 };
     this.pb = hero.id ? World.bustFor(hero.id) : makeBust(Object.assign(playerLook(), { mouth: 'frown' }));
     this.foes = []; this.spawn(def.waves ? def.waves[0] : def.foes, true); this.tap = false;
     this.allies = (def.allies || []).map((a, i) => ({ id: a, x: -hw * .5 - 14 + (i % 2) * 30, y: -24 + i * 22, fx: 1, fy: 0, st: 'approach', t: 0, cd: .6 + i * .4, anim: 0, kx: 0, ky: 0, sheet: World.sheetFor(a), ally: 1, flash: 0 }));
     this.buildProps(def.bg || 'ring', A); this.cam = { x: -60, y: 380, h: 170, f: 150, hor: Math.round(H * .2), roll: 0 }; this.rollK = 0;
     Sound.music(def.music || (def.bg && def.bg !== 'ring' ? 'battle' : 'work')); Input.consume(); HUD.dirty = true; Fade.a = 0; Fade.dir = 0; Fade.busy = false;
-    if (def.intro) this.playCine(def.intro, () => { if (def.cineOnly) return this.end(true); this.phase = 'intro'; this.pt = 0; });
+    if (def.intro && !(DEV.quick && !def.cineOnly)) this.playCine(def.intro, () => { if (def.cineOnly) return this.end(true); this.phase = 'intro'; this.pt = 0; });
   },
   spawn(list, first) {
     const A = this.arena, hw = A.kind === 'ring' ? A.rx : A.w / 2, hh = A.kind === 'ring' ? A.ry : A.h / 2, n = list.length, base = this.foes.length;
@@ -162,12 +163,12 @@ const Brawl = {
     if (f) { const d = Math.hypot(f.x - p.x, f.y - p.y), R = 26 + (p.blade ? 8 : 0); p.gap = d < 70 && d > R ? Math.min(34, d - R + 4) : 0; } else p.gap = 0; },
   dodge(vx, vy) { const p = this.p; if (!vx && !vy) { vx = -p.fx; vy = -p.fy; } const d = Math.hypot(vx, vy) || 1; p.st = 'dodge'; p.t = 0; p.dx = vx / d; p.dy = vy / d; p.inv = Math.max(p.inv, 0.26); p.dcd = 0.55; Sound.play('dash'); this.spark(p.x, p.y, '#8a7a6a', 3, 0); },
   // MEMORY ARTS: the big attacks carry the story. A memory cuts in, says its line, and becomes a strike.
-  startArt(a) { const p = this.p, live = this.foes.filter(f => f.st !== 'down' && !f.enter); this.art = { a, t: 0, C: Math.max(3, 1.3 + a.line.length * .05), tg: live.sort((x, y) => y.hp - x.hp)[0], n: 0, done: 0 }; this.token = []; this.slow = 0; this.vcur = null; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1.2; } p.st = 'idle'; p.hold = 0; this.impact = .2; Sound.play('cutin'); },
+  startArt(a) { const p = this.p, live = this.foes.filter(f => f.st !== 'down' && !f.enter); this.art = { a, t: 0, C: Math.max(3.2, 1.5 + a.line.length * .055) + 1.0, words: a.name.split(' '), tg: live.sort((x, y) => y.hp - x.hp)[0], n: 0, done: 0 }; this.token = []; this.slow = 0; this.vcur = null; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1.2; } p.st = 'idle'; p.hold = 0; this.impact = .2; Sound.play('cutin'); },
   updArt(dt) {
     const A = this.art, a = A.a, p = this.p, f = A.tg, C = A.C; A.t += dt; p.inv = .6; if (p.st === 'atk') { p.t += dt; if (p.t > .3) p.st = 'idle'; }
     if (A.t < C) { if (A.t > .8 && (Input.p('A') || Input.p('B'))) { A.t = C; Input.consume(); } return; }
-    const tau = A.t - C, cut = (side, big) => { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; p.fx = p.ax = dx / d; p.fy = p.ay = dy / d; p.st = 'atk'; p.t = 0; p.hit = true; p.combo = 1 + A.n % 3; this.slashes.push({ x: f.x, y: f.y, a: A.n * 1.1, life: .18, big: 1, h: 26 + (f.z || 0) }); this.spark(f.x, f.y, '#ffe08a', 7, 22 + (f.z || 0)); f.flash = .12; this.hitsN = this.hitsT > 0 ? this.hitsN + 1 : 1; this.hitsT = 1.6; this.shake = .2; Sound.play(big ? 'hit' : 'clink'); A.n++; };
-    const land = () => { A.done = 1; f.z = 0; p.z = 0; this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#fff2c0', 120); this.ring(f.x, f.y, a.hex || '#ffb040', 80); this.fin = { x: f.x, y: f.y, t: 0 }; this.scars.push({ x: f.x, y: f.y, r: 22, life: 40 }); Sound.play('pillar'); this.freeze = .3;
+    const tau = A.t - C, cut = (side, big) => { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; p.fx = p.ax = dx / d; p.fy = p.ay = dy / d; p.st = 'atk'; p.t = 0; p.hit = true; p.combo = 1 + A.n % 3; this.slashes.push({ x: f.x, y: f.y, a: A.n * 1.1, life: .18, big: 1, h: 26 + (f.z || 0) }); this.spark(f.x, f.y, '#ffe08a', 7, 22 + (f.z || 0)); f.flash = .12; this.hitsN = this.hitsT > 0 ? this.hitsN + 1 : 1; this.hitsT = 1.6; this.shake = .2; Sound.play(big ? 'bigslash' : 'count', A.n * 2); A.word = A.words[A.n % A.words.length]; A.wt = 0; A.n++; };
+    const land = () => { A.done = 1; A.word = a.name; A.wt = 0; f.z = 0; p.z = 0; this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#fff2c0', 120); this.ring(f.x, f.y, a.hex || '#ffb040', 80); this.fin = { x: f.x, y: f.y, t: 0 }; this.scars.push({ x: f.x, y: f.y, r: 22, life: 40 }); Sound.play('pillar'); this.freeze = .3;
       const live = this.foes.filter(o => o.st !== 'down' && !o.enter); for (const o of live) { if (!this.art) break; const main = o === f, d = Math.hypot(o.x - f.x, o.y - f.y); if (main || d < 90) this.hitFoe(o, main ? (a.dmg || Math.max(6, Math.round(o.max * .14))) : 4, main ? p.ax : (o.x - f.x) / (d || 1), main ? p.ay : (o.y - f.y) / (d || 1), true); } };
     if (a.kind === 'rise') { // launch, three cuts in the air, and down
       if (A.n === 0 && tau >= 0) { p.x = f.x - 20; p.y = f.y + 2; this.clampA(p); cut(); this.ring(f.x, f.y, '#fff', 40); }
@@ -180,7 +181,7 @@ const Brawl = {
       if (!A.done && tau >= .95) { for (const l of this.lines) l.life = .25; land(); }
       if (tau > 1.5) { this.art = null; this.lines = []; }
     }
-    for (const l of this.lines) l.life -= dt; this.lines = this.lines.filter(l => l.life > 0);
+    if (A.wt !== undefined) A.wt += dt; for (const l of this.lines) l.life -= dt; this.lines = this.lines.filter(l => l.life > 0);
     if (!this.art) { p.z = 0; if (f.st !== 'down') f.z = 0; this.voice('art'); }
   },
   // ELEVEN: one blow for every second the doors stood open
@@ -460,7 +461,7 @@ const Brawl = {
     for (const q of this.nums) { const pr = this.proj(q.x, q.y, q.h); if (pr.dz < 10) continue; const s = String(q.v), sc = q.big ? 2 : 1, x = Math.round(pr.x - ptextW(s, sc) / 2), y = Math.round(pr.y); g.globalAlpha = Math.min(1, q.life * 3); ptext(g, s, x + 1, y + 1, '#120a0e', sc); ptext(g, s, x, y, q.big ? '#ffb040' : '#fff6dc', sc); g.globalAlpha = 1; }
     this.hud(g);
     if (this.sup) this.renderSuper(g);
-    if (this.art && this.art.t < this.art.C) this.renderArt(g);
+    if (this.art && this.art.t < this.art.C) this.renderArt(g); else this.renderArtWords(g);
     const big = (s, c, y, k) => { if (!s) return; const bx = Math.round(W / 2 - ptextW(s, k || 2) / 2); ptext(g, s, bx + 1, y + 1, '#120a0e', k || 2); ptext(g, s, bx, y, c, k || 2); };
     if (this.phase === 'intro') { g.fillStyle = 'rgba(8,4,6,.62)'; g.fillRect(0, H / 2 - 24, W, 44); g.fillStyle = '#c8a050'; g.fillRect(0, H / 2 - 24, W, 1); g.fillRect(0, H / 2 + 19, W, 1); big(def.title, '#ffe08a', H / 2 - 17); if (def.sub) ptext(g, def.sub, Math.round(W / 2 - ptextW(def.sub) / 2), H / 2 + 4, PAL.cream); }
     else if (this.phase === 'win') big(def.winText || 'DOWN!', '#ffe08a', 40, W > 300 && (def.winText || 'DOWN!').length < 14 ? 3 : 2);
@@ -482,7 +483,7 @@ const Brawl = {
     if (this.vcur && (this.phase === 'fight' || this.phase === 'win') && !(this.sup && this.sup.t < SUPT) && !this.art) { const v = this.vcur, lines = wrapP(v.t, W - 20), a = Math.min(1, (v.max - v.life) * 5, v.life * 3), y0 = H - 6 - lines.length * 9 - (this.tipT > 0 ? 11 : 0); g.globalAlpha = Math.max(0, a); g.fillStyle = 'rgba(7,5,10,.62)'; g.fillRect(0, y0 - 3, W, lines.length * 9 + 5); g.fillStyle = '#c8a050'; g.fillRect(0, y0 - 3, W, 1); lines.forEach((ln, i) => ptext(g, ln, Math.round(W / 2 - ptextW(ln) / 2), y0 + i * 9, '#fff6dc')); g.globalAlpha = 1; }
     if (this.tipT > 0 && this.phase === 'fight' && !this.art && !this.sup) { const k = Input.device === 'kb', tip = W > 300 ? (k ? 'E' : 'A') + ' STRIKE   ' + (k ? 'X' : 'B') + ' DODGE THROUGH THE RED   HOLD: HEAVY' : (k ? 'E' : 'A') + ' STRIKE  ' + (k ? 'X' : 'B') + ' DODGE'; g.fillStyle = 'rgba(12,8,10,.8)'; g.fillRect(0, H - 11, W, 11); ptext(g, tip, Math.max(3, Math.round(W / 2 - ptextW(tip) / 2)), H - 8, '#f3e3c3'); }
   },
-  renderSuper(g) {
+  renderSuper(g, word, rgbw) {
     const s = this.sup, t = s.t;
     if (t < SUPT) { const k = Math.min(1, t / .18), bh = Math.round(H * .34), y0 = Math.round(H * .3), hh = Math.round(bh * k), yy = y0 + Math.round((bh - hh) / 2);
       g.fillStyle = 'rgba(6,2,4,.72)'; g.fillRect(0, 0, W, H); g.fillStyle = '#1a0606'; g.fillRect(0, yy, W, hh); g.fillStyle = '#ff5a2a'; g.fillRect(0, yy, W, 2); g.fillRect(0, yy + hh - 2, W, 2);
@@ -494,32 +495,27 @@ const Brawl = {
           g.restore(); }
         g.fillStyle = 'rgba(200,40,10,.22)'; g.fillRect(0, y0 + 2, W, bh - 4); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,90,30,${.16 + Math.sin(t * 30) * .06})`; g.fillRect(0, y0 + 2, W, bh - 4); g.globalCompositeOperation = 'source-over';
         for (let i = 0; i < 14; i++) { g.fillStyle = 'rgba(255,220,180,.5)'; g.fillRect((i * 47 + t * 900) % (W + 40) - 20, y0 + 4 + (i * 13) % (bh - 8), 26, 1); }
-        const w = 'ELEVEN', sc = W > 300 ? 4 : 3; ptext(g, w, Math.round(W / 2 - ptextW(w, sc) / 2) + 2, Math.round(H * .7) + 2, '#120a0e', sc); ptext(g, w, Math.round(W / 2 - ptextW(w, sc) / 2), Math.round(H * .7), '#ff7a30', sc); const c3 = 'ONE FOR EVERY SECOND', c4 = 'THE DOORS STOOD OPEN', s2 = W > 300 ? 2 : 1; if (t > .4) ptext(g, c3, Math.round(W / 2 - ptextW(c3, s2) / 2), Math.round(H * .7) + sc * 6 + 4, '#f3e3c3', s2); if (t > .85) ptext(g, c4, Math.round(W / 2 - ptextW(c4, s2) / 2), Math.round(H * .7) + sc * 6 + 6 + s2 * 7, '#f3e3c3', s2); } }
+        const w = word || 'ELEVEN', sc = ptextW(w, 4) < W - 10 ? 4 : ptextW(w, 3) < W - 10 ? 3 : 2; ptext(g, w, Math.round(W / 2 - ptextW(w, sc) / 2) + 2, Math.round(H * .7) + 2, '#120a0e', sc); ptext(g, w, Math.round(W / 2 - ptextW(w, sc) / 2), Math.round(H * .7), rgbw ? `rgb(${rgbw})` : '#ff7a30', sc); if (word) return; const c3 = 'ONE FOR EVERY SECOND', c4 = 'THE DOORS STOOD OPEN', s2 = W > 300 ? 2 : 1; if (t > .4) ptext(g, c3, Math.round(W / 2 - ptextW(c3, s2) / 2), Math.round(H * .7) + sc * 6 + 4, '#f3e3c3', s2); if (t > .85) ptext(g, c4, Math.round(W / 2 - ptextW(c4, s2) / 2), Math.round(H * .7) + sc * 6 + 6 + s2 * 7, '#f3e3c3', s2); } }
     else if (s.word) { const fin = s.n >= 11, sc = fin ? (W > 300 ? 5 : 4) : 3, a = Math.max(0, 1 - (s.wt || 0) * (fin ? 1.2 : 4)); if (a > 0) { g.globalAlpha = a; const x = fin ? Math.round(W / 2 - ptextW(s.word, sc) / 2) : (s.n % 2 ? 10 : W - 10 - ptextW(s.word, sc)), y = fin ? Math.round(H * .4) : 52 + (s.n % 3) * 16; ptext(g, s.word, x + 2, y + 2, '#120a0e', sc); ptext(g, s.word, x, y, fin ? '#fff0b0' : '#ff7a30', sc); g.globalAlpha = 1; } }
   },
-  // the cut-in: two slanted panels. One is the memory, one is him. Then the name of the blow and the line it carries.
+  // Memory Art cut-in, in ELEVEN's language: the memory fills the screen and says its line, then a hard cut to his eyes and the name of the blow.
   renderArt(g) {
-    const A = this.art, a = A.a, t = A.t, e = 1 - Math.pow(1 - Math.min(1, t / .22), 3), out = Math.max(0, (t - (A.C - .18)) / .18), wide = W > 300, rgb = a.rgb || '255,200,90', rm = Settings.d.reduce;
-    g.fillStyle = `rgba(6,4,10,${.82 * (1 - out)})`; g.fillRect(0, 0, W, H); if (out > 0) g.globalAlpha = 1 - out;
-    const quad = (pts, draw, edge) => { g.save(); g.beginPath(); pts.forEach((q, i) => i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])); g.closePath(); g.clip(); draw(); g.restore(); g.strokeStyle = '#fff6dc'; g.lineWidth = 2; g.beginPath(); pts.forEach((q, i) => i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])); g.closePath(); g.stroke(); g.strokeStyle = edge; g.lineWidth = 1; g.stroke(); };
-    // memory panel
-    const sl = wide ? 26 : 12, dxA = -(1 - e) * W, dxB = (1 - e) * W, aLines = wrapP(a.line, (W - 16) / 2), txtH = aLines.length * 12 + 4, y0 = 16, y1 = wide ? H - 26 - txtH : Math.round(H * .4), xm = wide ? Math.round(W * .56) : W - 6;
+    const A = this.art, a = A.a, t = A.t, rgb = a.rgb || '255,200,90', rm = Settings.d.reduce, eyeT = t - (A.C - 1.0);
+    if (eyeT >= 0) { const keep = this.sup; this.sup = { t: Math.min(eyeT, SUPT - .01) }; this.renderSuper(g, a.name, rgb); this.sup = keep; if (eyeT < .08 && !rm) { g.fillStyle = `rgba(255,255,255,${1 - eyeT * 12})`; g.fillRect(0, 0, W, H); } return; }
+    const e = 1 - Math.pow(1 - Math.min(1, t / .3), 3), aLines = wrapP(a.line, (W - 16) / 2), txtH = aLines.length * 12 + 6;
     if (!Panels.c) [Panels.c, Panels.g] = mk(320, 180);
     const pg = Panels.g; pg.globalAlpha = 1; pg.globalCompositeOperation = 'source-over'; pg.fillStyle = '#07050a'; pg.fillRect(0, 0, 320, 180); Panels.narrow = false; if (PANELS[a.panel]) PANELS[a.panel](pg, 6 + t, a.stage || 0, 6 + t);
-    quad([[6 + dxA, y0], [xm + sl + dxA, y0], [xm - sl + dxA, y1], [6 + dxA, y1]], () => { const sc = Math.max((xm + sl) / 320, (y1 - y0) / 180) * 1.12, pw = 320 * sc, ph = 180 * sc; g.imageSmoothingEnabled = false; g.drawImage(Panels.c, 6 + dxA + (xm - pw) / 2 - (rm ? 0 : t * 5), y0 + (y1 - y0 - ph) / 2, pw, ph); g.fillStyle = `rgba(${rgb},.14)`; g.fillRect(0, 0, W, H); for (let i = 0; i < 5; i++) { g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(0, y0 + i * 2 + ((t * 40) % 8), W, 1); } }, `rgb(${rgb})`);
-    // him
-    const bx0 = wide ? xm + sl + 6 : 6, by0 = wide ? y0 : y1 + 6, by1 = wide ? y1 : H - 28 - txtH;
-    quad([[bx0 + dxB, by0], [W - 6 + dxB, by0], [W - 6 + dxB, by1], [bx0 - (wide ? sl * 2 : 0) + dxB, by1]], () => { const gr = g.createLinearGradient(0, by0, 0, by1); gr.addColorStop(0, `rgba(${rgb},1)`); gr.addColorStop(1, '#1a0606'); g.fillStyle = gr; g.fillRect(0, 0, W * 2, H);
-      if (!rm) for (let i = 0; i < 18; i++) { g.fillStyle = i % 3 ? 'rgba(255,255,255,.35)' : 'rgba(20,6,6,.4)'; g.fillRect(((i * 53 - t * 700) % (W + 60) + W + 60) % (W + 60) - 30 + dxB, by0 + (i * 17) % (by1 - by0), 30 + i % 4 * 12, i % 4 ? 1 : 2); }
-      const k = Math.max(3, Math.ceil((by1 - by0) / 26)), cx = (bx0 + W - 6) / 2 + dxB - (wide ? sl * .4 : 0) + (rm ? 0 : (1 - Math.min(1, t / .5)) * 14); g.imageSmoothingEnabled = false; g.drawImage(this.pb, 3, 3, 26, 29, Math.round(cx - 13 * k), Math.round(by1 - 27 * k), 26 * k, 29 * k);
-      g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,90,30,${.16 + (rm ? 0 : Math.sin(t * 26) * .05)})`; g.fillRect(0, by0, W * 2, by1 - by0); g.globalCompositeOperation = 'source-over'; }, '#ff7a30');
-    // words
-    const nsc = 2, ny = H - 22 - txtH, nx = Math.round(8 - (1 - e) * 60);
-    g.save(); g.translate(0, ny); g.rotate(wide ? -0.035 : 0); g.fillStyle = '#07050a'; g.fillRect(-10, -4, W + 20, nsc * 5 + 8); g.fillStyle = `rgb(${rgb})`; g.fillRect(-10, -4, W + 20, 1); g.fillRect(-10, nsc * 5 + 3, W + 20, 1);
-    ptext(g, a.name, nx + 2, 2, '#07050a', nsc); ptext(g, a.name, nx, 0, '#fff6dc', nsc); const tag = 'MEMORY'; ptext(g, tag, W - 8 - ptextW(tag), wide ? 6 : 2, `rgb(${rgb})`); g.restore();
-    if (t > .3) { const ch = Math.floor((t - .3) * 60); let used = 0; g.fillStyle = 'rgba(6,4,10,.86)'; g.fillRect(0, H - txtH - 4, W, txtH + 4); aLines.forEach((ln, i) => { const part = ln.slice(0, Math.max(0, ch - used)); used += ln.length; ptext(g, part, Math.round(W / 2 - ptextW(ln, 2) / 2), H - txtH + i * 12, '#f3e3c3', 2); }); if (ch > a.line.length + 20 && Math.floor(t * 2) % 2) ptext(g, Input.device === 'kb' ? 'E' : 'A', W - 10, H - 9, `rgb(${rgb})`); }
-    g.globalAlpha = 1; if (t < .1 && !rm) { g.fillStyle = `rgba(255,255,255,${1 - t * 10})`; g.fillRect(0, 0, W, H); }
+    g.fillStyle = '#07050a'; g.fillRect(0, 0, W, H);
+    const zoom = Math.max(W / 320, (H - 28) / 180) * (1.04 + (rm ? 0 : t * .03)), pw = 320 * zoom, ph = 180 * zoom, slide = (1 - e) * W * .5;
+    g.save(); g.beginPath(); g.rect(0, 14, W, H - 28); g.clip(); g.imageSmoothingEnabled = false; g.globalAlpha = e; g.drawImage(Panels.c, Math.round((W - pw) / 2 + slide - (rm ? 0 : t * 3)), Math.round(14 + (H - 28 - ph) / 2), Math.round(pw), Math.round(ph)); g.globalAlpha = 1;
+    g.fillStyle = `rgba(${rgb},.12)`; g.fillRect(0, 14, W, H - 28); if (!rm) for (let y = 14 + ((t * 30) % 4 | 0); y < H - 14; y += 4) { g.fillStyle = 'rgba(0,0,0,.14)'; g.fillRect(0, y, W, 1); }
+    const vg = g.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, W * .7); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.7)'); g.fillStyle = vg; g.fillRect(0, 14, W, H - 28); g.restore();
+    const tag = 'M E M O R Y'; g.fillStyle = `rgb(${rgb})`; g.fillRect(8, 20, Math.round((ptextW(tag) + 8) * e), 11); ptext(g, tag, 12, 23, '#07050a');
+    if (t > .35) { const ch = Math.floor((t - .35) * 46), y0 = H - 14 - txtH; let used = 0; g.fillStyle = 'rgba(6,4,10,.84)'; g.fillRect(0, y0, W, txtH); g.fillStyle = `rgb(${rgb})`; g.fillRect(0, y0, W, 1); aLines.forEach((ln, i) => { const part = ln.slice(0, Math.max(0, ch - used)); used += ln.length; ptext(g, part, Math.round(W / 2 - ptextW(ln, 2) / 2), y0 + 5 + i * 12, '#fff6dc', 2); }); }
+    if (t < .12 && !rm) { g.fillStyle = `rgba(255,255,255,${1 - t * 8})`; g.fillRect(0, 0, W, H); }
   },
+  // the words of the blow, called out hit by hit the way ELEVEN counts
+  renderArtWords(g) { const A = this.art; if (!A || !A.word) return; const fin = A.done, rgb = A.a.rgb || '255,200,90', w = A.word, sc = fin ? (ptextW(w, 4) < W - 10 ? 4 : ptextW(w, 3) < W - 10 ? 3 : 2) : 3, al = Math.max(0, 1 - (A.wt || 0) * (fin ? 1.1 : 3.2)); if (al <= 0) return; g.globalAlpha = al; const x = fin ? Math.round(W / 2 - ptextW(w, sc) / 2) : (A.n % 2 ? 10 : W - 10 - ptextW(w, sc)), y = fin ? Math.round(H * .4) : 50 + (A.n % 3) * 16; ptext(g, w, x + 2, y + 2, '#120a0e', sc); ptext(g, w, x, y, fin ? '#fff0b0' : `rgb(${rgb})`, sc); g.globalAlpha = 1; },
   renderCine(g) {
     const c = this.cine, s = c.shots[c.i], rm = Settings.d.reduce; if (s.black) { g.fillStyle = '#050307'; g.fillRect(0, 0, W, H); }
     const ex = c.acts.map(o => ({ y: o.y, d: () => this.fighter(g, { x: o.x, y: o.y, fx: o.fx || 0, fy: o.fy === undefined ? 1 : o.fy, sheet: o.sheet, anim: o.anim, sc: o.sc, st: o.st || 'idle', t: o.t || 0, idx: o.k || 0, swing: o.swing ? (c.t % .5 < .18 ? .18 - (c.t % .5) : 0) : 0, ax: o.fx || 0, ay: o.fy || 0, combo: 1 + (Math.floor(c.t / .5 + (o.k || 0)) % 3) }, { run: !!o.b, key: o, pose: o.pose, swingFx: !!o.swing, id: o.id, blade: o.blade, aura: o.aura || 0, cape: CAST[o.id].look().cape || null }) }));

@@ -534,3 +534,6 @@ function festB() {
     { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 }
   ].filter(Boolean);
 }
+
+// the Proctor duel plays before the ceremony: the night Kael learns what the Authority takes, cut against the night he takes something back
+{ const f0 = festA; festA = function () { return (NOFF ? [] : [{ card: 'FOUR YEARS FROM NOW', sub: 'The Assay. Day thirty-one.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.proctor() }]).concat(f0()); }; }

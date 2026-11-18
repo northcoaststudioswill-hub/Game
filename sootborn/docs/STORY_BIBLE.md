@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Book One. Current build: v0.12 (the surface in real 3D; v0.11 added the Assay, fury, Memory Arts, the film opening and save slots) (see CHANGELOG.md).
+Tagline: "Every breath is hers." Current build: v0.12.8 (the surface in real 3D; v0.11 added the Assay, fury, Memory Arts, the film opening and save slots) (see CHANGELOG.md).
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -120,6 +120,16 @@ Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at F
 - Purpose: show where the rage goes, and give the slow undercity chapters something to fall toward. The two halves should feel like different games: Cinderwell is dark, slow, talk and stealth; the Assay is daylight, fast, almost wordless except for Kael's voice.
 - Placement: opening before the title; The Valley at New Game; The Ford between Day 1 and Day 2; The Keep at the end of Day 2.
 - Kael's narration is first person, present tense, short. He counts things. He never says he is angry; he describes what he does with it.
+
+### The five fights (v0.12.8)
+Only the Valley is a mass battle. The rest are single combat, each with an intro and outro film.
+1. **The Valley** (day forty; opens the game) — battle, House Violet against House Teal.
+2. **The Pairing** (first night; end of the prologue) — Kael vs Teo Aldane, 16, who shared his bread on the lift. Two sealed in, one comes out a cadet; the loser leaves "by the other door". Teo's last line: "I hope she was worth it." Kael never told him there was a she.
+3. **The Ford** (day nineteen; end of Day 1) — single combat with Captain Vant for the crossing.
+4. **The Proctor** (day thirty-one; before Last Bell on Day 2) — Proctor Halden Voss has been selling Violet's positions to Teal and comes down to finish them himself. Kael makes a Proctor bleed and wears his white cloak back to camp; the cadets follow Kael, not the House, from that night.
+5. **The Keep** (last day; before First Fire) — Lucan Aurel, with Celestine watching.
+
+Rule going forward: above-ground story that is not a fight is told as a film (shot list with captions), never as walk-around play.
 
 ## Sound and music
 - All audio is synthesised in the browser (`Sound` in `src/core.js`): `tone` (struck), `pad` (swelling), `noise`, `sweep` (moving filtered noise), `ring` (struck steel). No audio files.

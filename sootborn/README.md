@@ -1,4 +1,6 @@
-# SOOTBORN — Book One
+# SOOTBORN
+
+*Every breath is hers.*
 
 A North Coast Studios × E Concepts game. A 16-bit story RPG set in Cinderwell, an undercity
 that runs the air for a gleaming upper world it is told does not exist.

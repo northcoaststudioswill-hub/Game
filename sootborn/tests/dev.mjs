@@ -10,13 +10,18 @@ for (let i = 0; i < 100 && !(await ev(() => BTS.G.mode === 'opening')); i++) awa
 console.log('opening', await st()); await wait(1500); await shot('opening');
 if (P) await page.touchscreen.tap(195, 300); else await page.keyboard.press('Space'); await wait(1800); console.log('title', await st()); await shot('title');
 const n = await ev(() => { BTS.Menus.checkpoints(); return document.querySelectorAll('.mi').length; }); await wait(300); await shot('menu');
-const labels = await ev(() => [...document.querySelectorAll('.modal:last-of-type .mi, .mi')].map(b => b.textContent).filter(t => /·|Opening/.test(t)));
-console.log(labels.length, 'checkpoints');
-for (let i = 0; i < labels.length; i++) {
-  await ev(() => { BTS.UI.clear(); BTS.Cutscene.active && BTS.Cutscene.skip(true); BTS.Brawl.active = false; BTS.Brawl.cine = null; BTS.G.heist = 0; BTS.Game.toTitle(); BTS.Menus.checkpoints(); }); await wait(200);
-  await ev(l => { [...document.querySelectorAll('.mi')].reverse().find(b => b.textContent === l).click(); }, labels[i]); await wait(2600);
-  console.log(i, labels[i], JSON.stringify(await st())); await shot('cp' + i);
+const reset = () => ev(() => { BTS.UI.clear(); BTS.Cutscene.active && BTS.Cutscene.skip(true); BTS.Brawl.active = false; BTS.Brawl.cine = null; BTS.G.heist = 0; BTS.Game.toTitle(); BTS.Menus.checkpoints(); });
+const click = l => ev(l => { [...document.querySelectorAll('.mi')].reverse().find(b => b.textContent.startsWith(l)).click(); }, l);
+let k = 0;
+for (const sec of ['Fights', 'Story beats']) {
+  await reset(); await wait(200); await click(sec); await wait(200); await shot('menu-' + sec.slice(0, 5));
+  const labels = await ev(() => [...document.querySelectorAll('.mi')].map(b => b.textContent).filter(t => /·|Opening|New game from/.test(t) && !/Dev menu/.test(t)));
+  console.log(sec, labels.length);
+  for (const l of labels) { await reset(); await wait(200); await click(sec); await wait(150); await click(l); await wait(2600); console.log(k, l, JSON.stringify(await st()), errors.length); await shot('cp' + k++); }
 }
+await reset(); await wait(150); await click('Start fights at full fury'); await click('Skip fight intro films'); await click('Fights'); await wait(100); await click('The Proctor'); await wait(5200);
+console.log('switches', await ev(() => ({ fury: BTS.Brawl.p.fury, cine: !!BTS.Brawl.cine, ph: BTS.Brawl.phase, bg: BTS.Brawl.def.bg }))); await shot('quick');
+await ev(() => { DEV.fury = 0; DEV.quick = 0; });
 // save slots
 await ev(() => { BTS.UI.clear(); BTS.Cutscene.active && BTS.Cutscene.skip(true); BTS.Brawl.active = false; BTS.Game.loadSave(BTS.Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.ring)))); }); await wait(800);
 await ev(() => { BTS.Menus.pause(); BTS.Menus.slots('save'); }); await wait(200); await shot('slots-save');
