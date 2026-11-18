@@ -68,7 +68,7 @@
     el.textContent = text;
     el.classList.add('show'); document.body.classList.add('toasting');   // a toast takes the hint's place while it is up
     clearTimeout(toastT);
-    toastT = setTimeout(() => { el.classList.remove('show'); document.body.classList.remove('toasting'); }, 3400);
+    toastT = setTimeout(() => { el.classList.remove('show'); document.body.classList.remove('toasting'); }, 4800);
   };
 
   // ---------------- dialogue box with a portrait
@@ -86,7 +86,7 @@
   };
 
   // Lines type out letter by letter (Settings > Text speed). A tap or button press finishes the line first.
-  const SPEED = { slow: 0.6, normal: 1.4, fast: 3, instant: 1e9 };
+  const SPEED = { slow: 0.5, normal: 0.9, fast: 2.2, instant: 1e9 };   // letters a frame: 'normal' is a reading pace, not a race
   let typed = 0, full = '', typingNarr = false, typeRAF = 0, faceWho = null, faceT = 0, faceNow = '';
   // Portraits move their mouths while a line types out, and blink.
   function faceSet(v) { if (!faceWho || faceNow === faceWho + v) return; faceNow = faceWho + v; $('d-face').src = SH.art.portraitURL(faceWho, v || undefined); }
@@ -197,7 +197,7 @@
         row.innerHTML = `<img src="${SH.art.portraitURL(e.who)}" alt=""><div style="flex:1;min-width:0"><b>${esc(ST.CAST[e.who].name)} <i>${e.pts < 0 ? '&minus;' + (-e.pts) : '+' + e.pts} &hearts;</i>${e.heart ? ' &middot; heart ' + e.heart + ' of 5' : ''}</b><small>${esc(e.why)}</small><div class="hb"><span style="width:${Math.round(k0 * 100)}%"></span></div></div>`;
         const bar = row.querySelector('.hb span'); requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.width = Math.round(k1 * 100) + '%'; }));
       }
-      box.appendChild(row); setTimeout(() => row.remove(), 5200);
+      box.appendChild(row); setTimeout(() => row.remove(), 7600);
     }
     while (box.children.length > 4) box.firstChild.remove();
   };

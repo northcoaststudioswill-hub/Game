@@ -1,0 +1,10 @@
+STARHAVEN v0.1.2
+Open starhaven-v0.1.2.html in any browser. On a phone, hold it either way up.
+
+Touch: slide a thumb on the left half to move. Buttons on the right: JUMP, STRIKE (or SHOOT), DASH, the down arrow,
+FLAME, BOND ART when it appears, TALK when someone has something to say.
+Controller: A jump, X strike, B dash, Y talk, left bumper flame, right trigger Bond Art, Start pause.
+Keyboard: A/D or arrows move, Space jump, J strike, Shift dash, W talk, F flame, R Bond Art, Esc pause.
+
+The pause menu has "How it works" (every system explained) and Wren's journal.
+Saves stay on this device, in this browser.

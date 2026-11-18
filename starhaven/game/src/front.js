@@ -173,7 +173,7 @@
     const S = SH.saves, slots = S.all();
     const items = slots.map((s, i) => {
       const d = S.describe(s);
-      const sub = d ? `${esc(d.title)} &middot; ${d.time} played${d.caelum ? ` &middot; Caelum ${'&#9829;'.repeat(d.caelum)}` : ''}${d.when ? ` &middot; ${esc(d.when)}` : ''}` : 'Empty';
+      const sub = d ? `${esc(d.title)} &middot; Level ${d.level} &middot; &#10022; ${d.stars}${d.choices ? ` &middot; ${d.choices} choice${d.choices > 1 ? 's' : ''} remembered` : ''}${d.caelum ? ` &middot; Caelum ${'&#9829;'.repeat(d.caelum)}` : ''} &middot; ${d.time} played${d.when ? `, ${esc(d.when)}` : ''}` : 'An empty journal';
       return {
         label: `Slot ${i + 1}`, sub, disabled: mode === 'load' && !s,
         action: () => {

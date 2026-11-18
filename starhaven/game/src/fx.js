@@ -35,7 +35,7 @@
     const p = SH.game && SH.game.world && SH.game.world.player;
     if (p && Math.abs(x - p.x) < 34 && Math.abs(y - p.y) < 110) { x -= p.facing * 12; y = Math.min(y, p.y - 62); }   // over her head and a little behind: clear of the path and of the cards
     for (let k = 0; k < 6 && fx.words.some(o => Math.abs(o.x - x) < 70 && Math.abs(o.y - y) < 12); k++) y -= 13;   // never one word on top of another
-    fx.words.push({ x, y, text, color: color || '#fff', life: Math.min(life || 50, 70), max: Math.min(life || 50, 70) });
+    fx.words.push({ x, y, text, color: color || '#fff', life: Math.max(80, Math.min(life || 80, 110)), max: Math.max(80, Math.min(life || 80, 110)) });   // long enough to read
   };
   fx.ghost = function (snap) { fx.ghosts.push(snap); };
   // Hit sparks: a slash mark across the hit and bright lines flying out of it.

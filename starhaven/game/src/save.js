@@ -37,6 +37,7 @@
     const c = s.bonds && s.bonds.caelum ? SH.game.heartsFor(s.bonds.caelum.pts) : 0;
     let when = '';
     try { when = new Date(s.savedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); } catch (e) { /* fine */ }
-    return { title: done ? 'Concept complete' : `${ch.label}: ${ch.name}`, time, caelum: c, when };
+    const xp = s.xp || 0, lv = 1 + [30, 80, 150, 240, 350].filter(v => xp >= v).length, stars = Object.values(s.motes || {}).reduce((a, b) => a + b, 0) + (s.bonus || 0), choices = Object.keys(s.mem || {}).length;
+    return { title: done ? 'Concept complete' : `${ch.label}: ${ch.name}`, time, caelum: c, when, level: lv, stars, choices };
   };
 })(window.SH = window.SH || {});

@@ -118,6 +118,7 @@
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
+    G.explainWait = Math.max(G.explainWait || 0, 60 * 12);   // let a new place be looked at first
     SH.arts.reset(); w.lowT = 0;
     document.body.dataset.court = { woods: 'mortal', deep: 'thorn' }[def.id] || 'dusk';   // whose realm this is: it colours the menus
     if (SH.xp.level() >= 5 && SH.arts.active()) SH.arts.meter = Math.max(SH.arts.meter, 34);
@@ -251,7 +252,7 @@
           if (sp) { sp.facing = w.player.x > sp.x ? 1 : -1; const last = st[1].trim().slice(-1); sp.emote = last === '!' ? { e: '!', t: 0 } : last === '?' ? { e: '?', t: 0 } : /\.\.\.$/.test(st[1].trim()) ? { e: '...', t: 0 } : sp.emote; }
           else if (st[0] === 'wren') w.player.facing = (() => { const near = w.npcs.filter(n => !n.hidden).sort((a, b) => Math.abs(a.x - w.player.x) - Math.abs(b.x - w.player.x))[0]; return near && Math.abs(near.x - w.player.x) < 200 ? (near.x > w.player.x ? 1 : -1) : w.player.facing; })();
         }
-        G.talkWait = 10; // a short pause so a held button doesn't skip the line
+        G.talkWait = 16; // a pause so a held or hurried tap doesn't skip a line unread
         return;
       }
       if (st.if) {   // the story comes back to something Wren did
@@ -339,7 +340,7 @@
   G.explain = function (key) {
     const seen = G.progress.seen = G.progress.seen || {};
     if (G.noExplain || seen[key] || !ST.EXPLAIN[key] || G.explaining) return;
-    if (G.state !== 'play') { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for the scene to end
+    if (G.state !== 'play' || (G.explainWait || 0) > 0) { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for a quiet moment
     seen[key] = 1; G.explaining = key; G.state = 'explain'; input.clear(true);
     const e = ST.EXPLAIN[key];
     document.getElementById('ex-icon').textContent = e.icon; document.getElementById('ex-title').textContent = e.title; document.getElementById('ex-text').textContent = e.text;
@@ -348,6 +349,7 @@
   G.explainClose = function () {
     if (!G.explaining) return;
     G.explaining = null; document.getElementById('explain').classList.remove('show'); G.state = 'play'; input.clear(true); G.save();
+    G.explainWait = 60 * 40;   // at least forty seconds of play before the next one
   };
   // What a decision did. Effects gather for a moment, then show together as one card.
   G.effects = []; G.effectT = 0;
@@ -396,7 +398,9 @@
     if (G.mode) { if (G.state === 'talk' || G.state === 'play') G.progress.playFrames = (G.progress.playFrames || 0) + 1; SH.modes.step(input); return; }
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
     G.effectStep();
-    if (G.explainQ && G.explainQ.length && G.state === 'play' && !G.mode && !SH.arts.cutin && !G.pending) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
+    if (G.state === 'play' && (G.explainWait || 0) > 0) G.explainWait--;
+    if (G.state === 'talk') G.explainWait = Math.max(G.explainWait || 0, 60 * 6);   // and never the moment a conversation ends
+    if (G.explainQ && G.explainQ.length && G.state === 'play' && !(G.explainWait > 0) && !G.mode && !SH.arts.cutin && !G.pending) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
     if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -559,7 +563,9 @@
     const motesLeft = w.motes.filter(m => !m.got && (G.activeGoal === 'report' || m.x < p.x)).length;   // Starlight still behind her
     const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
-    G.hud.prompt(hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null);
+    { const text = hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null;
+      if (text !== w.hintNow && (w.hintHold || 0) > 0 && w.hintNow) w.hintHold--;          // the hint on screen gets its time
+      else { if (text !== w.hintNow) { w.hintNow = text; w.hintHold = text ? 60 * 5 : 60; } G.hud.prompt(text); } }
     const usable = w.things.find(e => e.usable && e.near);
     G.hud.talkButton(talkable ? 'TALK' : canPaint ? 'PAINT' : usable ? usable.label : null);
 
@@ -740,7 +746,7 @@
     // load('roomId', { story: false }): a bare room, every gate open, no story scripts.
     load(chapterOrRoom, opts) {
       opts = opts || {};
-      G.frozen = true; input.forced = { held: {}, pressed: {} }; SH.modes.auto = !opts.modes; G.noExplain = !opts.explain; G.explaining = null; G.explainQ = []; G.mode = null; SH.modes.cur = null; delete document.body.dataset.mode;
+      G.frozen = true; input.forced = { held: {}, pressed: {} }; SH.modes.auto = !opts.modes; G.noExplain = !opts.explain; G.explaining = null; G.explainQ = []; G.explainWait = 0; G.mode = null; SH.modes.cur = null; delete document.body.dataset.mode;
       document.getElementById('front').classList.remove('show'); G.slot = null;
       if (typeof chapterOrRoom === 'number') { G.startChapter(chapterOrRoom); G.hud.cardGo(); }
       else {

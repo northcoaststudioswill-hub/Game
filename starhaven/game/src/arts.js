@@ -161,7 +161,7 @@
 
   // ---- finisher bands: a strip of text across the screen, a short freeze and a shake
   A.finisher = function (text, sub, color) {
-    A.band = { text, sub: sub || '', color: color || '#ffd27a', t: 0, life: 64 };
+    A.band = { text, sub: sub || '', color: color || '#ffd27a', t: 0, life: 96 };
     SH.fx.stop(12); SH.fx.kick(8); SH.sfx.play('thud');
   };
 
@@ -187,7 +187,7 @@
     if (A.whisperGap > 0) { A.whisperGap--; return; }
     if (!A.queue.length || A.band || A.cutin) return;
     const [who, text] = A.queue.shift();
-    A.whisperT = 150 + text.length * 2;
+    A.whisperT = 230 + text.length * 3;
     SH.game.hud.whisper(who, text); SH.sfx.play('blip');
   };
 

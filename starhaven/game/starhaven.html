@@ -390,7 +390,7 @@ body.cutin #lvl, body[data-mode] #lvl { visibility: hidden; }
 .tbtn::after { content: ''; position: absolute; inset: -12px; border-radius: 50%; }
 /* ---- what a decision did: who it touched, by how much, and why */
 #effects { position: fixed; z-index: 8; left: max(12px, env(safe-area-inset-left)); top: 84px; width: min(290px, 38vw); display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
-.fx-row { display: flex; gap: 8px; align-items: center; padding: 6px 10px 6px 6px; background: var(--plate); border: 1px solid var(--plate-line); border-radius: 4px; box-shadow: 0 0 0 2px #0a0818; animation: fxin .3s ease-out both, fxout .5s ease-in 4.6s both; }
+.fx-row { display: flex; gap: 8px; align-items: center; padding: 6px 10px 6px 6px; background: var(--plate); border: 1px solid var(--plate-line); border-radius: 4px; box-shadow: 0 0 0 2px #0a0818; animation: fxin .3s ease-out both, fxout .5s ease-in 7s both; }
 .fx-row.up { border-color: #7ad88a; } .fx-row.down { border-color: #ff7a8a; } .fx-row.mem { border-color: var(--gold); }
 .fx-row img { width: 34px; height: 34px; image-rendering: pixelated; flex: none; border: 1px solid rgba(255,255,255,.25); }
 .fx-row .ico { width: 34px; height: 34px; flex: none; display: grid; place-items: center; font-size: 20px; color: var(--gold); }
@@ -473,6 +473,8 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   #f-menu-wrap { max-height: calc(100vh - 118px); padding: 10px 16px 6px; }
   #m-status { grid-template-columns: repeat(4, 1fr); } #m-status .wide { grid-column: span 2; } #menu .btn { width: calc(25% - 6px); padding: 7px 2px; font-size: 10.5px; letter-spacing: .04em; } #menu .card { padding-top: 6px; } #menu .motto { display: none; } #menu .card::before { display: none; } #menu .card h2 { font-size: 15px; } #menu .card h2::after { margin: 4px 18%; }
 }
+/* ---- save slots read as three journals on a shelf */
+@media (max-height: 460px) { #f-menu-wrap.note-first .fbtn .sub, .fbtn .sub.keep { display: block; } }
 </style>
 </head>
 <body>
@@ -530,7 +532,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.1 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.2 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -2292,7 +2294,8 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     const c = s.bonds && s.bonds.caelum ? SH.game.heartsFor(s.bonds.caelum.pts) : 0;
     let when = '';
     try { when = new Date(s.savedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); } catch (e) { /* fine */ }
-    return { title: done ? 'Concept complete' : `${ch.label}: ${ch.name}`, time, caelum: c, when };
+    const xp = s.xp || 0, lv = 1 + [30, 80, 150, 240, 350].filter(v => xp >= v).length, stars = Object.values(s.motes || {}).reduce((a, b) => a + b, 0) + (s.bonus || 0), choices = Object.keys(s.mem || {}).length;
+    return { title: done ? 'Concept complete' : `${ch.label}: ${ch.name}`, time, caelum: c, when, level: lv, stars, choices };
   };
 })(window.SH = window.SH || {});
 
@@ -2402,7 +2405,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     const p = SH.game && SH.game.world && SH.game.world.player;
     if (p && Math.abs(x - p.x) < 34 && Math.abs(y - p.y) < 110) { x -= p.facing * 12; y = Math.min(y, p.y - 62); }   // over her head and a little behind: clear of the path and of the cards
     for (let k = 0; k < 6 && fx.words.some(o => Math.abs(o.x - x) < 70 && Math.abs(o.y - y) < 12); k++) y -= 13;   // never one word on top of another
-    fx.words.push({ x, y, text, color: color || '#fff', life: Math.min(life || 50, 70), max: Math.min(life || 50, 70) });
+    fx.words.push({ x, y, text, color: color || '#fff', life: Math.max(80, Math.min(life || 80, 110)), max: Math.max(80, Math.min(life || 80, 110)) });   // long enough to read
   };
   fx.ghost = function (snap) { fx.ghosts.push(snap); };
   // Hit sparks: a slash mark across the hit and bright lines flying out of it.
@@ -4129,7 +4132,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
 
   // ---- finisher bands: a strip of text across the screen, a short freeze and a shake
   A.finisher = function (text, sub, color) {
-    A.band = { text, sub: sub || '', color: color || '#ffd27a', t: 0, life: 64 };
+    A.band = { text, sub: sub || '', color: color || '#ffd27a', t: 0, life: 96 };
     SH.fx.stop(12); SH.fx.kick(8); SH.sfx.play('thud');
   };
 
@@ -4155,7 +4158,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     if (A.whisperGap > 0) { A.whisperGap--; return; }
     if (!A.queue.length || A.band || A.cutin) return;
     const [who, text] = A.queue.shift();
-    A.whisperT = 150 + text.length * 2;
+    A.whisperT = 230 + text.length * 3;
     SH.game.hud.whisper(who, text); SH.sfx.play('blip');
   };
 
@@ -6200,6 +6203,10 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
       ctx.fillStyle = plate;
       for (let i = 0; i < 5; i++) { const bx = -22 + i * 9, by = -19 + Math.sin(i * 0.9 + t * 0.08) * wave; ctx.beginPath(); ctx.moveTo(bx - 4, by + 2); ctx.lineTo(bx - 1, by - 5); ctx.lineTo(bx + 4, by + 2); ctx.fill(); }
       ctx.fillStyle = dark; for (let i = 0; i < 4; i++) ctx.fillRect(-18 + i * 9, -13, 1, 6);
+      // scales: overlapping arcs down each segment, lighter where the light catches them; spines along the tail; pale claws
+      for (let i = 0; i < 5; i++) { const bx = -22 + i * 9, by = -12 + Math.sin(i * 0.9 + t * 0.08) * wave; ctx.strokeStyle = dark; ctx.lineWidth = 1; for (let k = 0; k < 2; k++) { ctx.beginPath(); ctx.arc(bx - 2 + k * 4, by - 1 + k * 3, 3, 0.2, Math.PI - 0.2); ctx.stroke(); } ctx.fillStyle = 'rgba(255,255,255,0.14)'; ctx.fillRect(bx - 4, by - 7, 5, 1); }
+      ctx.fillStyle = plate; for (let i = 0; i < 3; i++) { const tx = -28 - i * 5, ty = -13 + i * 3 + wave * (0.5 + i * 0.4); ctx.beginPath(); ctx.moveTo(tx - 2, ty + 2); ctx.lineTo(tx, ty - 3); ctx.lineTo(tx + 2, ty + 2); ctx.fill(); }
+      ctx.fillStyle = '#e8eef8'; for (let i = 0; i < 4; i++) ctx.fillRect(-17 + i * 10, -1, 3, 1);
     }
     // head
     ctx.save(); ctx.translate(14, -14 + headUp); ctx.rotate(headUp * -0.03);
@@ -6476,6 +6483,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
+    G.explainWait = Math.max(G.explainWait || 0, 60 * 12);   // let a new place be looked at first
     SH.arts.reset(); w.lowT = 0;
     document.body.dataset.court = { woods: 'mortal', deep: 'thorn' }[def.id] || 'dusk';   // whose realm this is: it colours the menus
     if (SH.xp.level() >= 5 && SH.arts.active()) SH.arts.meter = Math.max(SH.arts.meter, 34);
@@ -6609,7 +6617,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
           if (sp) { sp.facing = w.player.x > sp.x ? 1 : -1; const last = st[1].trim().slice(-1); sp.emote = last === '!' ? { e: '!', t: 0 } : last === '?' ? { e: '?', t: 0 } : /\.\.\.$/.test(st[1].trim()) ? { e: '...', t: 0 } : sp.emote; }
           else if (st[0] === 'wren') w.player.facing = (() => { const near = w.npcs.filter(n => !n.hidden).sort((a, b) => Math.abs(a.x - w.player.x) - Math.abs(b.x - w.player.x))[0]; return near && Math.abs(near.x - w.player.x) < 200 ? (near.x > w.player.x ? 1 : -1) : w.player.facing; })();
         }
-        G.talkWait = 10; // a short pause so a held button doesn't skip the line
+        G.talkWait = 16; // a pause so a held or hurried tap doesn't skip a line unread
         return;
       }
       if (st.if) {   // the story comes back to something Wren did
@@ -6697,7 +6705,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   G.explain = function (key) {
     const seen = G.progress.seen = G.progress.seen || {};
     if (G.noExplain || seen[key] || !ST.EXPLAIN[key] || G.explaining) return;
-    if (G.state !== 'play') { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for the scene to end
+    if (G.state !== 'play' || (G.explainWait || 0) > 0) { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for a quiet moment
     seen[key] = 1; G.explaining = key; G.state = 'explain'; input.clear(true);
     const e = ST.EXPLAIN[key];
     document.getElementById('ex-icon').textContent = e.icon; document.getElementById('ex-title').textContent = e.title; document.getElementById('ex-text').textContent = e.text;
@@ -6706,6 +6714,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   G.explainClose = function () {
     if (!G.explaining) return;
     G.explaining = null; document.getElementById('explain').classList.remove('show'); G.state = 'play'; input.clear(true); G.save();
+    G.explainWait = 60 * 40;   // at least forty seconds of play before the next one
   };
   // What a decision did. Effects gather for a moment, then show together as one card.
   G.effects = []; G.effectT = 0;
@@ -6754,7 +6763,9 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     if (G.mode) { if (G.state === 'talk' || G.state === 'play') G.progress.playFrames = (G.progress.playFrames || 0) + 1; SH.modes.step(input); return; }
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
     G.effectStep();
-    if (G.explainQ && G.explainQ.length && G.state === 'play' && !G.mode && !SH.arts.cutin && !G.pending) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
+    if (G.state === 'play' && (G.explainWait || 0) > 0) G.explainWait--;
+    if (G.state === 'talk') G.explainWait = Math.max(G.explainWait || 0, 60 * 6);   // and never the moment a conversation ends
+    if (G.explainQ && G.explainQ.length && G.state === 'play' && !(G.explainWait > 0) && !G.mode && !SH.arts.cutin && !G.pending) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
     if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -6917,7 +6928,9 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     const motesLeft = w.motes.filter(m => !m.got && (G.activeGoal === 'report' || m.x < p.x)).length;   // Starlight still behind her
     const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
-    G.hud.prompt(hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null);
+    { const text = hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null;
+      if (text !== w.hintNow && (w.hintHold || 0) > 0 && w.hintNow) w.hintHold--;          // the hint on screen gets its time
+      else { if (text !== w.hintNow) { w.hintNow = text; w.hintHold = text ? 60 * 5 : 60; } G.hud.prompt(text); } }
     const usable = w.things.find(e => e.usable && e.near);
     G.hud.talkButton(talkable ? 'TALK' : canPaint ? 'PAINT' : usable ? usable.label : null);
 
@@ -7098,7 +7111,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     // load('roomId', { story: false }): a bare room, every gate open, no story scripts.
     load(chapterOrRoom, opts) {
       opts = opts || {};
-      G.frozen = true; input.forced = { held: {}, pressed: {} }; SH.modes.auto = !opts.modes; G.noExplain = !opts.explain; G.explaining = null; G.explainQ = []; G.mode = null; SH.modes.cur = null; delete document.body.dataset.mode;
+      G.frozen = true; input.forced = { held: {}, pressed: {} }; SH.modes.auto = !opts.modes; G.noExplain = !opts.explain; G.explaining = null; G.explainQ = []; G.explainWait = 0; G.mode = null; SH.modes.cur = null; delete document.body.dataset.mode;
       document.getElementById('front').classList.remove('show'); G.slot = null;
       if (typeof chapterOrRoom === 'number') { G.startChapter(chapterOrRoom); G.hud.cardGo(); }
       else {
@@ -7211,7 +7224,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     el.textContent = text;
     el.classList.add('show'); document.body.classList.add('toasting');   // a toast takes the hint's place while it is up
     clearTimeout(toastT);
-    toastT = setTimeout(() => { el.classList.remove('show'); document.body.classList.remove('toasting'); }, 3400);
+    toastT = setTimeout(() => { el.classList.remove('show'); document.body.classList.remove('toasting'); }, 4800);
   };
 
   // ---------------- dialogue box with a portrait
@@ -7229,7 +7242,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   };
 
   // Lines type out letter by letter (Settings > Text speed). A tap or button press finishes the line first.
-  const SPEED = { slow: 0.6, normal: 1.4, fast: 3, instant: 1e9 };
+  const SPEED = { slow: 0.5, normal: 0.9, fast: 2.2, instant: 1e9 };   // letters a frame: 'normal' is a reading pace, not a race
   let typed = 0, full = '', typingNarr = false, typeRAF = 0, faceWho = null, faceT = 0, faceNow = '';
   // Portraits move their mouths while a line types out, and blink.
   function faceSet(v) { if (!faceWho || faceNow === faceWho + v) return; faceNow = faceWho + v; $('d-face').src = SH.art.portraitURL(faceWho, v || undefined); }
@@ -7340,7 +7353,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
         row.innerHTML = `<img src="${SH.art.portraitURL(e.who)}" alt=""><div style="flex:1;min-width:0"><b>${esc(ST.CAST[e.who].name)} <i>${e.pts < 0 ? '&minus;' + (-e.pts) : '+' + e.pts} &hearts;</i>${e.heart ? ' &middot; heart ' + e.heart + ' of 5' : ''}</b><small>${esc(e.why)}</small><div class="hb"><span style="width:${Math.round(k0 * 100)}%"></span></div></div>`;
         const bar = row.querySelector('.hb span'); requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.width = Math.round(k1 * 100) + '%'; }));
       }
-      box.appendChild(row); setTimeout(() => row.remove(), 5200);
+      box.appendChild(row); setTimeout(() => row.remove(), 7600);
     }
     while (box.children.length > 4) box.firstChild.remove();
   };
@@ -7715,7 +7728,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     const S = SH.saves, slots = S.all();
     const items = slots.map((s, i) => {
       const d = S.describe(s);
-      const sub = d ? `${esc(d.title)} &middot; ${d.time} played${d.caelum ? ` &middot; Caelum ${'&#9829;'.repeat(d.caelum)}` : ''}${d.when ? ` &middot; ${esc(d.when)}` : ''}` : 'Empty';
+      const sub = d ? `${esc(d.title)} &middot; Level ${d.level} &middot; &#10022; ${d.stars}${d.choices ? ` &middot; ${d.choices} choice${d.choices > 1 ? 's' : ''} remembered` : ''}${d.caelum ? ` &middot; Caelum ${'&#9829;'.repeat(d.caelum)}` : ''} &middot; ${d.time} played${d.when ? `, ${esc(d.when)}` : ''}` : 'An empty journal';
       return {
         label: `Slot ${i + 1}`, sub, disabled: mode === 'load' && !s,
         action: () => {

@@ -1,5 +1,24 @@
 # Starhaven — Changelog
 
+## v0.1.2 — slower pacing (Nov 18, 2026)
+Will: the pacing of the text prompts is too fast; space out some of the first location; keep improving the graphics
+and the menus.
+
+- **Explanation cards are spaced out:** none in the first twelve seconds of a new place, none straight after a
+  conversation, at least forty seconds of play between cards. In the Winter Woods that turns three cards in the first
+  minute into one every forty seconds or so. They wait in a queue, so none is lost.
+- **Text types at a reading pace** (normal is about two thirds of what it was), and a hurried tap cannot skip a line
+  the instant it appears.
+- **Things read on the move stay up longer:** floating words (at least a second and a third), toasts, whispers,
+  consequence cards, level-up and finisher bands.
+- **Hints hold** for five seconds before another can replace them, so walking briskly no longer flips through them.
+- **Save slots** read like journals on a shelf: chapter, level, Starlight, choices remembered, hearts with Caelum,
+  time played.
+- **Wyrms** have overlapping scales, spines down the tail and pale claws.
+
+Release: [`releases/v0.1.2/`](releases/v0.1.2/RELEASE-NOTES.md). This is the build for tonight. Tests: 50 play checks,
+19 menu checks, the fuzz run, the screenshot run. **Not yet played by a person.**
+
 ## v0.1.1 — the playtest build (Nov 18, 2026)
 Will: another playthrough, a big search and fix, and tightening, for tonight's playtest by people.
 

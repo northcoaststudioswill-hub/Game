@@ -837,6 +837,10 @@
       ctx.fillStyle = plate;
       for (let i = 0; i < 5; i++) { const bx = -22 + i * 9, by = -19 + Math.sin(i * 0.9 + t * 0.08) * wave; ctx.beginPath(); ctx.moveTo(bx - 4, by + 2); ctx.lineTo(bx - 1, by - 5); ctx.lineTo(bx + 4, by + 2); ctx.fill(); }
       ctx.fillStyle = dark; for (let i = 0; i < 4; i++) ctx.fillRect(-18 + i * 9, -13, 1, 6);
+      // scales: overlapping arcs down each segment, lighter where the light catches them; spines along the tail; pale claws
+      for (let i = 0; i < 5; i++) { const bx = -22 + i * 9, by = -12 + Math.sin(i * 0.9 + t * 0.08) * wave; ctx.strokeStyle = dark; ctx.lineWidth = 1; for (let k = 0; k < 2; k++) { ctx.beginPath(); ctx.arc(bx - 2 + k * 4, by - 1 + k * 3, 3, 0.2, Math.PI - 0.2); ctx.stroke(); } ctx.fillStyle = 'rgba(255,255,255,0.14)'; ctx.fillRect(bx - 4, by - 7, 5, 1); }
+      ctx.fillStyle = plate; for (let i = 0; i < 3; i++) { const tx = -28 - i * 5, ty = -13 + i * 3 + wave * (0.5 + i * 0.4); ctx.beginPath(); ctx.moveTo(tx - 2, ty + 2); ctx.lineTo(tx, ty - 3); ctx.lineTo(tx + 2, ty + 2); ctx.fill(); }
+      ctx.fillStyle = '#e8eef8'; for (let i = 0; i < 4; i++) ctx.fillRect(-17 + i * 10, -1, 3, 1);
     }
     // head
     ctx.save(); ctx.translate(14, -14 + headUp); ctx.rotate(headUp * -0.03);

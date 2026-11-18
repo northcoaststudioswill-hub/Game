@@ -610,12 +610,13 @@ const path = require('path');
     (function () {
       SH.test.load('woods', { story: false, explain: true }); G.progress.seen = {};
       const m = G.world.motes[0]; SH.test.place(m.x / T - 0.5, 16); P().x = m.x; P().y = m.y + 20; step({}, null); step({}, null);
+      const notYet = G.state === 'play'; let waited = 0; while (G.state === 'play' && waited++ < 900) step({}, null);   // it waits for a quiet moment (twelve seconds into a new place)
       const shown = G.state === 'explain' && document.getElementById('explain').classList.contains('show'), title = document.getElementById('ex-title').textContent;
       const t0 = G.world.time; for (let i = 0; i < 20; i++) step({}, null); const held = G.world.time === t0;
       G.explainClose(); const closed = G.state === 'play';
       const m2 = G.world.motes[1]; P().x = m2.x; P().y = m2.y + 20; step({}, null); step({}, null);
       const list = Object.keys(SH.STORY.EXPLAIN).length;
-      check('Explained once: the first Starlight opens a card that holds the game; the second does not; eight systems are listed', shown && title === 'Starlight' && held && closed && G.state === 'play' && list === 8, { shown, title, held, closed, again: G.state, listed: list });
+      check('Explained once, and not at once: the first Starlight opens a card after a pause, it holds the game; the second does not; eight systems are listed', notYet && waited > 300 && shown && title === 'Starlight' && held && closed && G.state === 'play' && list === 8, { shown, title, held, closed, again: G.state, listed: list });
       G.noExplain = true;
     })();
 
