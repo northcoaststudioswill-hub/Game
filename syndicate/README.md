@@ -146,6 +146,10 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **A bigger market.** The Lamp Market is four tiles wider and deeper, with the stalls, well, cart, fire and Wisp Table spread into the new space. Stall roofs and Mark's awning are lean-tos set behind the keeper, so the people and tables stand in the open. Nothing turns transparent.
 
+## Next work
+
+Planning for the next round (fight-to-death with the Oracle of Time, Druid and Tiefling, more finishers, gear sets, progression, animation, controller testing) is in `docs/NEXT.md`. Nothing in it is built yet.
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |
