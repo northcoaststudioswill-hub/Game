@@ -22,7 +22,7 @@
     const pr = G.progress;
     SH.saves.write(G.slot, {
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, xp: pr.xp || 0, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
     });
     if (show) G.hud.saved();
   };
@@ -41,7 +41,7 @@
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
     G.slot = slot;
-    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen), bonus: s.bonus || 0 };
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen), bonus: s.bonus || 0, xp: s.xp || 0 };
     SH.arts.newGame(); SH.arts.said = Object.assign({}, s.said); SH.arts.meter = s.bondMeter || 0;
     const N = ST.CHAPTERS.length, target = s.chapter;
     const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
@@ -80,12 +80,12 @@
       muralProgress: 0,
       wyrm: def.chase ? { on: false, x: def.chase.wyrmX * TS, speed: def.chase.speed } : null,
       camCenterX() { return this.cam.x + this.viewW / 2; },
-      onKill() { G.hud.goal(); SH.arts.whisper('kill'); },
+      onKill(e) { G.hud.goal(); SH.arts.whisper('kill'); SH.xp.gain(e && e.boss ? 80 : e && e.kind === 'wyrm' ? 25 : 10, true); },
       onDash() { },
       onPerfectDodge() {
         fx.slowmo = 26; player.stats.perfect++;
         player.dashCd = 0; player.airDashes = 1;
-        fx.word(player.x, player.y - 52, 'PERFECT DODGE', '#9fe8ff', 60); G.explain('opening');
+        fx.word(player.x, player.y - 52, 'PERFECT DODGE', '#9fe8ff', 60); G.explain('opening'); SH.xp.gain(3);
         SH.arts.open(this);
         fx.ring(player.x, player.y - 20, '#9fe8ff', 44, 22, 2);
       },
@@ -110,13 +110,14 @@
         fx.word(player.x, player.y - 50, 'Firewood ' + G.flags.n_wood + '/3', '#ffd27a', 60);
         if (G.flags.n_wood === 3) G.queueScript('woods_wood');
       },
-      onSnare(n) { G.flags.n_snares = (G.flags.n_snares || 0) + 1; if (G.flags.n_snares >= 3) G.flags.snares3 = true; G.hud.goal(true); G.queueScript('woods_snare' + n); },
-      onTarget() { G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
-      onWolf(what) { G.queueScript('woods_wolf_' + what); },
+      onSnare(n) { SH.xp.gain(3, true); G.flags.n_snares = (G.flags.n_snares || 0) + 1; if (G.flags.n_snares >= 3) G.flags.snares3 = true; G.hud.goal(true); G.queueScript('woods_snare' + n); },
+      onTarget() { SH.xp.gain(4, true); G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
+      onWolf(what) { if (what === 'killed' || what === 'spared') SH.xp.gain(15, true); G.queueScript('woods_wolf_' + what); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
     SH.arts.reset(); w.lowT = 0;
+    if (SH.xp.level() >= 5 && SH.arts.active()) SH.arts.meter = Math.max(SH.arts.meter, 34);
     SH.draw.init(room, w.viewW);   // drawn with gates open, so gates draw on top as objects
     for (const g of gates) room.setGate(g, !g.open);
     w.thorns = (def.thornWalls || []).map(t => ({ ...t }));
@@ -125,7 +126,7 @@
     G.snapCamera();
     G.hud.hearts(player.hearts, player.maxHearts);
     G.hud.prompt(null); G.hud.talkButton(null);
-    G.hud.abilities(); G.hud.boss(null); G.hud.motes(0, room.motes.length);
+    G.hud.xp(); G.hud.abilities(); G.hud.boss(null); G.hud.motes(0, room.motes.length);
     G.roomMusic = def.music || { winter: 'woods', deep: 'deep', mountain: 'mountain' }[def.theme] || 'city';
     SH.sfx.music(G.roomMusic);
     return w;
@@ -182,6 +183,7 @@
   G.completeChapter = function () {
     const ch = G.chapterDef(), next = G.chapter + 1;
     G.progress.reached = Math.max(G.progress.reached, next);
+    SH.xp.gain(20);
     G.resumeAt = next; G.pending2 = ch.after || null;
     G.save(true);
     G.state = 'card';
@@ -288,7 +290,7 @@
     switch (st.do) {
       case 'mode': break;   // skipped along with the scene
       case 'remember': G.remember(st.key, st.text, st.good); break;
-      case 'starlight': G.progress.bonus = (G.progress.bonus || 0) + st.n; G.hud.toast('\u2726 +' + st.n + ' Starlight: ' + st.why); SH.sfx.play('lantern'); G.save(); break;
+      case 'starlight': SH.xp.gain(15); G.progress.bonus = (G.progress.bonus || 0) + st.n; G.hud.toast('\u2726 +' + st.n + ' Starlight: ' + st.why); SH.sfx.play('lantern'); G.save(); break;
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); if (st.name === 'giftgot') G.explain('moons'); break;
       case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
@@ -415,8 +417,8 @@
     if (G.boss && G.boss.lastPhase !== w.bossPh) { w.bossPh = G.boss.lastPhase; if (w.bossPh > 1) SH.arts.whisper('boss' + w.bossPh, true); }
     // Starlight motes
     for (const m of w.motes) {
-      if (m.got || Math.abs(m.x - p.x) > 16 || Math.abs(m.y - (p.y - 20)) > 24) continue;
-      m.got = true; SH.sfx.play('mote'); G.explain('starlight');
+      if (m.got || Math.abs(m.x - p.x) > SH.xp.reach() || Math.abs(m.y - (p.y - 20)) > SH.xp.reach() + 8) continue;
+      m.got = true; SH.sfx.play('mote'); G.explain('starlight'); SH.xp.gain(1);
       fx.burst(m.x, m.y, 6, { speed: 1.6, life: 18, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
       G.hud.motes(w.motes.filter(x => x.got).length, w.motes.length, true);
       if (w.motes.every(x => x.got)) { SH.arts.whisper('motesAll'); SH.fx.word(p.x, p.y - 64, 'ALL STARLIGHT', '#ffd27a', 90); }

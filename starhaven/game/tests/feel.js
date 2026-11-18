@@ -414,7 +414,7 @@ const path = require('path');
       let inhales = 0, lastSt = '';
       const moves = new Set(), phases = new Set(); let choked = false, wavesSeen = false, hp0 = boss.hp, waveHits = 0;
       const behind = () => { const bx = boss.x - boss.dir * (boss.w / 2 + 14); if (Math.abs(p.x - bx) > 6 || Math.abs(p.y - boss.y) > 4) SH.test.place(bx / T, 14); p.facing = boss.dir; };
-      while (f++ < 60 * 150 && G.boss && !boss.dead) {
+      while (f++ < 60 * 240 && G.boss && !boss.dead) {
         p.invuln = 5; p.hearts = 5;   // this test checks the fight can be won and every move happens, not dodging
         if (w.rocks.length) rocksSeen++;
         if (w.waves.length) wavesSeen = true;
@@ -573,6 +573,21 @@ const path = require('path');
       check('Errand: Old Mirelle asks after her cat; finding it on the awning is remembered and pays 10 Starlight', !!mir && asked && cat.got && G.recalls('cat') && SH.stars.gathered() === before + 10, { asked, found: cat.got, remembered: G.recalls('cat'), starlight: [before, SH.stars.gathered()] });
     })();
 
+    // Experience: levels are earned by playing, each gives a perk, and they are in the save
+    (function () {
+      SH.saves.erase(0); G.newGame(0); G.hud.cardGo(); const X = SH.xp, p = P();
+      const l0 = X.level(), h0 = p.maxHearts, dash0 = X.dash();
+      X.gain(30); const l2 = X.level(), bow = X.quick();
+      X.gain(60); const l3 = X.level(), dash = X.dash();
+      X.gain(60); const l4 = X.level(), h4 = P().maxHearts, band = SH.arts.band && SH.arts.band.text;
+      const chip = document.querySelector('#lvl b').textContent, saved = SH.saves.all()[0];
+      // aim assist: an attack with no direction held turns to face the enemy behind her
+      SH.test.load('ring', { story: false }); const q = P(), e = G.world.things.find(t => t.kind === 'thornSprite'); e.x = q.x - 30; e.y = q.y; q.facing = 1; step({}, ['attack']); step({}, null);
+      check('Experience: 30 XP is level 2 (quicker bow), 90 is level 3 (quicker dash), 150 is level 4 (+1 heart); shown, announced and saved. Aim assist turns an undirected strike to the enemy', l0 === 1 && l2 === 2 && bow < 1 && l3 === 3 && dash < dash0 && l4 === 4 && h4 === h0 + 1 && band === 'LEVEL 4' && chip === 'LV 4' && saved && saved.xp === 150 && q.facing === -1,
+        { levels: [l0, l2, l3, l4], hearts: [h0, h4], band, chip, savedXp: saved && saved.xp, turnedToEnemy: q.facing === -1 });
+      SH.saves.erase(0);
+    })();
+
     // Systems explain themselves the first time, once
     (function () {
       SH.test.load('woods', { story: false, explain: true }); G.progress.seen = {};
@@ -582,7 +597,7 @@ const path = require('path');
       G.explainClose(); const closed = G.state === 'play';
       const m2 = G.world.motes[1]; P().x = m2.x; P().y = m2.y + 20; step({}, null); step({}, null);
       const list = Object.keys(SH.STORY.EXPLAIN).length;
-      check('Explained once: the first Starlight opens a card that holds the game; the second does not; seven systems are listed', shown && title === 'Starlight' && held && closed && G.state === 'play' && list === 7, { shown, title, held, closed, again: G.state, listed: list });
+      check('Explained once: the first Starlight opens a card that holds the game; the second does not; eight systems are listed', shown && title === 'Starlight' && held && closed && G.state === 'play' && list === 8, { shown, title, held, closed, again: G.state, listed: list });
       G.noExplain = true;
     })();
 

@@ -132,7 +132,15 @@
       }
     });
     layer.addEventListener('pointermove', e => {
-      if (e.pointerId === stickId) { e.preventDefault(); stickSet(e.clientX - ox, e.clientY - oy); }
+      if (e.pointerId === stickId) {
+        e.preventDefault();
+        let dx = e.clientX - ox, dy = e.clientY - oy; const dist = Math.hypot(dx, dy), LIM = MAXR + 10;
+        if (dist > LIM) {   // the base is dragged along behind the thumb
+          ox += dx * (1 - LIM / dist); oy += dy * (1 - LIM / dist); dx = e.clientX - ox; dy = e.clientY - oy;
+          const r = layer.getBoundingClientRect(); stickBase.style.left = (ox - r.left) + 'px'; stickBase.style.top = (oy - r.top) + 'px';
+        }
+        stickSet(dx, dy);
+      }
     });
     const end = e => {
       const btn = e.target.closest && e.target.closest('[data-act]');

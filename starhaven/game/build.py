@@ -21,6 +21,7 @@ ORDER = [
     'enemies.js',    # thorn sprite, dummy, thorn buds
     'art.js',        # portraits, intro panels, people
     'cine.js',       # animated cinematics
+    'xp.js',         # experience, levels and their perks
     'stars.js',      # the Constellation: Starlight upgrades
     'arts.js',       # Bond Arts, finisher bands, openings, whispers, pixel font
     'people.js',     # the cast as shaded, outlined pixel sprites with blinks and emotes

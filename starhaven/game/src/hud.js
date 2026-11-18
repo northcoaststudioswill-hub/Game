@@ -202,6 +202,10 @@
     while (box.children.length > 4) box.firstChild.remove();
   };
 
+  H.xp = function () {
+    const X = SH.xp, s = X.span(), el = $('lvl');
+    el.firstChild.textContent = 'LV ' + X.level(); el.lastChild.firstChild.style.width = Math.round(s[0] / s[1] * 100) + '%';
+  };
   // The bond meter, the Bond Art button, and whispers down the bond.
   let lastArt = '';
   H.art = function (a) {
@@ -270,6 +274,7 @@
     $('m-status').innerHTML = `<div class="wide"><b>${esc(ch.label)}: ${esc(ch.name)}</b>${esc(G.goalText() || 'Keep going')}</div>`
       + `<div><b>Starlight here</b>&#10022; ${w.motes.filter(m => m.got).length} of ${w.motes.length} &middot; ${SH.stars.free()} to spend</div>`
       + `<div><b>Choices remembered</b>${mem || 'None yet'}</div>`
+      + `<div class="wide"><b>Level ${SH.xp.level()}${SH.xp.level() < SH.xp.max() ? ' &middot; ' + SH.xp.span()[0] + ' / ' + SH.xp.span()[1] + ' XP to level ' + (SH.xp.level() + 1) + ': ' + esc(SH.xp.PERKS[SH.xp.level() + 1].name) : ' &middot; highest for now'}</b>${SH.xp.PERKS.slice(2, SH.xp.level() + 1).map(k => esc(k.name)).join(', ') || 'No perks yet. Fight, hunt, gather and help to earn them.'}</div>`
       + (people ? `<div class="wide"><b>Bonds</b>${people}</div>` : '');
   };
 

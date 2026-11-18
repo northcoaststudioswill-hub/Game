@@ -299,6 +299,11 @@ body.upright #b-gift { bottom: calc(12vh + 84px); } body.upright #b-art { bottom
 body.upright #touch-hint { bottom: 5vh; left: 0; right: 0; text-align: center; }
 body.upright #bossbar { top: calc(var(--cvh) + env(safe-area-inset-top) - 26px); bottom: auto; }
 body.upright #f-logo h1 { font-size: clamp(30px, 11vw, 60px); }
+/* ---- level and experience, under the Starlight count; touch buttons with a larger area than they look */
+#lvl { position: absolute; right: calc(max(14px, env(safe-area-inset-right)) + 96px); top: 44px; display: flex; align-items: center; gap: 6px; font: 800 10px var(--body); letter-spacing: .1em; color: #9fe8ff; }
+#lvl i { display: block; width: 54px; height: 5px; background: rgba(8,8,24,.75); border: 1px solid #4a7a9a; border-radius: 2px; overflow: hidden; } #lvl i span { display: block; height: 100%; background: linear-gradient(90deg, #4ab8e8, #9fe8ff); transition: width .4s; }
+body.cutin #lvl, body[data-mode] #lvl { visibility: hidden; }
+.tbtn::after { content: ''; position: absolute; inset: -12px; border-radius: 50%; }
 /* ---- what a decision did: who it touched, by how much, and why */
 #effects { position: fixed; z-index: 8; right: max(12px, env(safe-area-inset-right)); top: 56px; width: min(330px, 46vw); display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
 .fx-row { display: flex; gap: 8px; align-items: center; padding: 6px 10px 6px 6px; background: var(--plate); border: 1px solid var(--plate-line); border-radius: 4px; box-shadow: 0 0 0 2px #0a0818; animation: fxin .3s ease-out both, fxout .5s ease-in 4.6s both; }
@@ -346,6 +351,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   <div id="hearts"></div>
   <div id="pips"></div>
   <div id="art"><span></span></div>
+  <div id="lvl"><b></b><i><span></span></i></div>
   <div id="motes"></div>
   <div id="bossbar"><span class="bn"></span><div class="bb"><span></span></div></div>
   <div id="goal"></div>

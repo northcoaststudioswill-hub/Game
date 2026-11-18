@@ -23,7 +23,7 @@
     S.apply(); SH.game.save(true); SH.sfx.play('lantern');
     return true;
   };
-  S.maxHearts = () => SH.PLAYER.hearts + S.level('heart');
+  S.maxHearts = () => SH.PLAYER.hearts + S.level('heart') + (SH.xp.level() >= 4 ? 1 : 0);
   S.maxPips = () => SH.GIFTS.pips + S.level('moon');
   // Put what's been bought onto Wren as she stands now.
   S.apply = function () {

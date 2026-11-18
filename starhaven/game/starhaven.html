@@ -299,6 +299,11 @@ body.upright #b-gift { bottom: calc(12vh + 84px); } body.upright #b-art { bottom
 body.upright #touch-hint { bottom: 5vh; left: 0; right: 0; text-align: center; }
 body.upright #bossbar { top: calc(var(--cvh) + env(safe-area-inset-top) - 26px); bottom: auto; }
 body.upright #f-logo h1 { font-size: clamp(30px, 11vw, 60px); }
+/* ---- level and experience, under the Starlight count; touch buttons with a larger area than they look */
+#lvl { position: absolute; right: calc(max(14px, env(safe-area-inset-right)) + 96px); top: 44px; display: flex; align-items: center; gap: 6px; font: 800 10px var(--body); letter-spacing: .1em; color: #9fe8ff; }
+#lvl i { display: block; width: 54px; height: 5px; background: rgba(8,8,24,.75); border: 1px solid #4a7a9a; border-radius: 2px; overflow: hidden; } #lvl i span { display: block; height: 100%; background: linear-gradient(90deg, #4ab8e8, #9fe8ff); transition: width .4s; }
+body.cutin #lvl, body[data-mode] #lvl { visibility: hidden; }
+.tbtn::after { content: ''; position: absolute; inset: -12px; border-radius: 50%; }
 /* ---- what a decision did: who it touched, by how much, and why */
 #effects { position: fixed; z-index: 8; right: max(12px, env(safe-area-inset-right)); top: 56px; width: min(330px, 46vw); display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
 .fx-row { display: flex; gap: 8px; align-items: center; padding: 6px 10px 6px 6px; background: var(--plate); border: 1px solid var(--plate-line); border-radius: 4px; box-shadow: 0 0 0 2px #0a0818; animation: fxin .3s ease-out both, fxout .5s ease-in 4.6s both; }
@@ -346,6 +351,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   <div id="hearts"></div>
   <div id="pips"></div>
   <div id="art"><span></span></div>
+  <div id="lvl"><b></b><i><span></span></i></div>
   <div id="motes"></div>
   <div id="bossbar"><span class="bn"></span><div class="bb"><span></span></div></div>
   <div id="goal"></div>
@@ -639,6 +645,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     remember: { icon: '\u2726', title: 'This will be remembered', text: 'Some decisions change scenes later in the story. Green: someone is better for it. Red: it will cost her. Gold: it could go either way. They are listed in Story & goals, under What Wren has done.' },
     bondbar: { icon: '\u263E', title: 'The bond bar and Bond Arts', text: 'The bar under your hearts fills as your hits land, faster for long unbroken strings. When it is full, a BOND ART button appears: a huge attack, with a memory. Nothing can hurt Wren while it plays.' },
     moons: { icon: '\u25CF', title: 'Moons and the Flame', text: 'Each Flame costs one moon. Hold the button and let go for a flame wave that costs two. Moons refill slowly by themselves, and quickly when your daggers land.' },
+    xp: { icon: '\u2191', title: 'Levels', text: 'Wren earns experience by fighting, hunting, gathering Starlight, helping people and finishing chapters. Each level gives a perk for good; the bar under the Starlight count shows how close the next one is. Levels are earned, the Constellation is where you choose.' },
     opening: { icon: '\u2727', title: 'Perfect dodge', text: 'Dash through an attack at the last moment and time slows: an opening. For a moment every cut does more and gets past armor.' },
   };
 
@@ -1898,7 +1905,15 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       }
     });
     layer.addEventListener('pointermove', e => {
-      if (e.pointerId === stickId) { e.preventDefault(); stickSet(e.clientX - ox, e.clientY - oy); }
+      if (e.pointerId === stickId) {
+        e.preventDefault();
+        let dx = e.clientX - ox, dy = e.clientY - oy; const dist = Math.hypot(dx, dy), LIM = MAXR + 10;
+        if (dist > LIM) {   // the base is dragged along behind the thumb
+          ox += dx * (1 - LIM / dist); oy += dy * (1 - LIM / dist); dx = e.clientX - ox; dy = e.clientY - oy;
+          const r = layer.getBoundingClientRect(); stickBase.style.left = (ox - r.left) + 'px'; stickBase.style.top = (oy - r.top) + 'px';
+        }
+        stickSet(dx, dy);
+      }
     });
     const end = e => {
       const btn = e.target.closest && e.target.closest('[data-act]');
@@ -2315,11 +2330,11 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
           const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
           if (this.stun > 0 || this.dead) { /* knocked out of it */ }
           else if (ready) {
-            this.pips -= G.flame.waveCost; this.giftCd = G.flame.cooldown + 8; this.castT = 18;
+            this.pips -= G.flame.waveCost; this.giftCd = Math.round((G.flame.cooldown + 8) * SH.xp.quick()); this.castT = 18;
             world.spawnFireball(this.x + this.facing * 16, this.y - 22, this.facing, true);
             this.vx -= this.facing * 2.4; SH.fx.kick(3); SH.sfx.play('kill');
           } else if (this.pips >= G.flame.cost) {
-            this.pips -= G.flame.cost; this.giftCd = G.flame.cooldown; this.castT = 14;
+            this.pips -= G.flame.cost; this.giftCd = Math.round(G.flame.cooldown * SH.xp.quick()); this.castT = 14;
             world.spawnFireball(this.x + this.facing * 14, this.y - 22, this.facing, false);
             SH.sfx.play('dash');
           } else { SH.fx.word(this.x, this.y - 52, 'no moons left', '#b9b2dd', 34); this.giftCd = 20; }
@@ -2364,10 +2379,10 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       if (a.t % 2 === 0) fx.ghost({ x: this.x, y: this.y, facing: this.facing, pose: 'dash', life: 12, max: 12 });
       // Jumping out of a ground dash keeps some of its speed.
       if (this.jumpBuf > 0 && (this.grounded || this.coyote > 0)) {
-        this.dashT = 0; this.dashCd = t.dashCooldown; this.doJump(false);
+        this.dashT = 0; this.dashCd = Math.round(t.dashCooldown * SH.xp.dash()); this.doJump(false);
         this.vx = this.dashDir * Math.max(t.runSpeed, t.dashSpeed * 0.7);
       } else if (this.dashT === 0) {
-        this.dashCd = t.dashCooldown;
+        this.dashCd = Math.round(t.dashCooldown * SH.xp.dash());
         this.vx = this.dashDir * t.runSpeed * (dir === this.dashDir ? 1 : 0.3);
       }
     } else if (!stunned) {
@@ -2475,12 +2490,23 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     } else fx.dust(this.x, this.y, 0, 4);
   };
 
+  // Aim assist: with no direction held, an attack turns to the nearest thing worth hitting (so a thumb on STRIKE alone
+  // never swings at empty air with an enemy at her back).
+  Player.prototype.autoFace = function (world, range, bow) {
+    let best = null, bd = range;
+    for (const e of world.things) {
+      if (!e.hittable || !e.hittable() || (bow ? !e.arrowOnly : e.arrowOnly) || e.kind === 'brazier' || e.kind === 'bulb') continue;
+      const dx = e.x - this.x, dy = Math.abs(e.y - this.y);
+      if (Math.abs(dx) < bd && dy < (bow ? 130 : 46)) { bd = Math.abs(dx); best = e; }
+    }
+    if (best && Math.abs(best.x - this.x) > 6) this.facing = best.x > this.x ? 1 : -1;
+  };
   Player.prototype.tryAttack = function (world, inp) {
     if (this.atkBuf <= 0) return;
     if (!SH.game.can('daggers')) { // the hunting bow: one arrow, straight ahead
       if (SH.game.can('bow') && this.bowCd <= 0) {   // from the ground, or from the top of a jump
-        this.atkBuf = 0; this.bowCd = 30; this.bowT = 16; if (this.grounded) this.vx = 0;
-        const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
+        this.atkBuf = 0; this.bowCd = Math.round(30 * SH.xp.quick()); this.bowT = 16; if (this.grounded) this.vx = 0;
+        const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d; else this.autoFace(world, 320, true);
         world.spawnArrow(this.x + this.facing * 12, this.y - 27, this.facing);
         SH.sfx.play('bow');
       }
@@ -2513,7 +2539,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     this.atkBuf = 0;
     this.comboKind = kind;
     this.comboStep = step + 1;
-    if (kind !== 'pogo') { const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d; }
+    if (kind !== 'pogo') { const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d; else this.autoFace(world, 64, false); }
     this.swing = { kind, step, def, f: 0, hits: new Set() };
     SH.sfx.play('slash');
     if (def.lunge && this.grounded) this.vx = this.facing * Math.max(Math.abs(this.vx) * 0.5, def.lunge * 1.6);
@@ -3675,6 +3701,47 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
 
 </script>
 <script>
+// ---- src/xp.js
+// Starhaven — experience. Wren levels up by doing things: fighting, hunting, gathering, helping, finishing chapters.
+// Each level gives one fixed perk (the Constellation is where you choose; levels are what you earn by playing).
+(function (SH) {
+  const X = {};
+  X.AT = [0, 30, 80, 150, 240, 350];                 // total XP needed for level 1, 2, 3...
+  X.PERKS = [null, null,
+    { name: 'Quick hands', text: 'The bow draws faster, and the Flame recovers faster.' },
+    { name: 'Light feet', text: 'The dash is ready again sooner.' },
+    { name: 'Hard to kill', text: 'One more heart.' },
+    { name: 'Bonded', text: 'Every level starts with the bond bar a third full.' },
+    { name: 'Hunter\'s patience', text: 'Starlight drifts to you from further away.' },
+  ];
+  const prog = () => SH.game.progress;
+  X.total = () => (prog() && prog().xp) || 0;
+  X.level = () => { const t = X.total(); let l = 1; while (l < X.AT.length && t >= X.AT[l]) l++; return l; };
+  X.max = () => X.AT.length;
+  X.span = () => { const l = X.level(); return l >= X.max() ? [1, 1] : [X.total() - X.AT[l - 1], X.AT[l] - X.AT[l - 1]]; };
+  X.gain = function (n, why) {
+    const G = SH.game; if (!prog() || !n) return;
+    const before = X.level(); prog().xp = X.total() + n;
+    const p = G.world && G.world.player;
+    if (p && why) SH.fx.word(p.x, p.y - 76, '+' + n + ' XP', '#9fe8ff', 44);
+    const after = X.level();
+    if (after > before) {
+      const perk = X.PERKS[after];
+      SH.arts.finisher('LEVEL ' + after, perk.name.toUpperCase(), '#9fe8ff'); SH.sfx.play('heart');
+      G.hud.toast('Level ' + after + ': ' + perk.name + '. ' + perk.text);
+      if (after === 4 && p) { p.maxHearts = SH.stars.maxHearts(); p.hearts = p.maxHearts; }
+      G.explain('xp'); G.save();
+    }
+    G.hud.xp();
+  };
+  X.quick = () => X.level() >= 2 ? 0.75 : 1;
+  X.dash = () => X.level() >= 3 ? 0.78 : 1;
+  X.reach = () => X.level() >= 6 ? 46 : 16;
+  SH.xp = X;
+})(window.SH = window.SH || {});
+
+</script>
+<script>
 // ---- src/stars.js
 // Starhaven — Wren's Constellation: Starlight you gather lights stars that make her stronger.
 // (An unlock track that gives the collectible a use, as the Keeper's Trail does in Lightswarm.)
@@ -3701,7 +3768,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     S.apply(); SH.game.save(true); SH.sfx.play('lantern');
     return true;
   };
-  S.maxHearts = () => SH.PLAYER.hearts + S.level('heart');
+  S.maxHearts = () => SH.PLAYER.hearts + S.level('heart') + (SH.xp.level() >= 4 ? 1 : 0);
   S.maxPips = () => SH.GIFTS.pips + S.level('moon');
   // Put what's been bought onto Wren as she stands now.
   S.apply = function () {
@@ -5855,7 +5922,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const pr = G.progress;
     SH.saves.write(G.slot, {
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, xp: pr.xp || 0, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
     });
     if (show) G.hud.saved();
   };
@@ -5874,7 +5941,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
     G.slot = slot;
-    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen), bonus: s.bonus || 0 };
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen), bonus: s.bonus || 0, xp: s.xp || 0 };
     SH.arts.newGame(); SH.arts.said = Object.assign({}, s.said); SH.arts.meter = s.bondMeter || 0;
     const N = ST.CHAPTERS.length, target = s.chapter;
     const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
@@ -5913,12 +5980,12 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       muralProgress: 0,
       wyrm: def.chase ? { on: false, x: def.chase.wyrmX * TS, speed: def.chase.speed } : null,
       camCenterX() { return this.cam.x + this.viewW / 2; },
-      onKill() { G.hud.goal(); SH.arts.whisper('kill'); },
+      onKill(e) { G.hud.goal(); SH.arts.whisper('kill'); SH.xp.gain(e && e.boss ? 80 : e && e.kind === 'wyrm' ? 25 : 10, true); },
       onDash() { },
       onPerfectDodge() {
         fx.slowmo = 26; player.stats.perfect++;
         player.dashCd = 0; player.airDashes = 1;
-        fx.word(player.x, player.y - 52, 'PERFECT DODGE', '#9fe8ff', 60); G.explain('opening');
+        fx.word(player.x, player.y - 52, 'PERFECT DODGE', '#9fe8ff', 60); G.explain('opening'); SH.xp.gain(3);
         SH.arts.open(this);
         fx.ring(player.x, player.y - 20, '#9fe8ff', 44, 22, 2);
       },
@@ -5943,13 +6010,14 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
         fx.word(player.x, player.y - 50, 'Firewood ' + G.flags.n_wood + '/3', '#ffd27a', 60);
         if (G.flags.n_wood === 3) G.queueScript('woods_wood');
       },
-      onSnare(n) { G.flags.n_snares = (G.flags.n_snares || 0) + 1; if (G.flags.n_snares >= 3) G.flags.snares3 = true; G.hud.goal(true); G.queueScript('woods_snare' + n); },
-      onTarget() { G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
-      onWolf(what) { G.queueScript('woods_wolf_' + what); },
+      onSnare(n) { SH.xp.gain(3, true); G.flags.n_snares = (G.flags.n_snares || 0) + 1; if (G.flags.n_snares >= 3) G.flags.snares3 = true; G.hud.goal(true); G.queueScript('woods_snare' + n); },
+      onTarget() { SH.xp.gain(4, true); G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
+      onWolf(what) { if (what === 'killed' || what === 'spared') SH.xp.gain(15, true); G.queueScript('woods_wolf_' + what); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
     G.world = w;
     SH.arts.reset(); w.lowT = 0;
+    if (SH.xp.level() >= 5 && SH.arts.active()) SH.arts.meter = Math.max(SH.arts.meter, 34);
     SH.draw.init(room, w.viewW);   // drawn with gates open, so gates draw on top as objects
     for (const g of gates) room.setGate(g, !g.open);
     w.thorns = (def.thornWalls || []).map(t => ({ ...t }));
@@ -5958,7 +6026,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     G.snapCamera();
     G.hud.hearts(player.hearts, player.maxHearts);
     G.hud.prompt(null); G.hud.talkButton(null);
-    G.hud.abilities(); G.hud.boss(null); G.hud.motes(0, room.motes.length);
+    G.hud.xp(); G.hud.abilities(); G.hud.boss(null); G.hud.motes(0, room.motes.length);
     G.roomMusic = def.music || { winter: 'woods', deep: 'deep', mountain: 'mountain' }[def.theme] || 'city';
     SH.sfx.music(G.roomMusic);
     return w;
@@ -6015,6 +6083,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   G.completeChapter = function () {
     const ch = G.chapterDef(), next = G.chapter + 1;
     G.progress.reached = Math.max(G.progress.reached, next);
+    SH.xp.gain(20);
     G.resumeAt = next; G.pending2 = ch.after || null;
     G.save(true);
     G.state = 'card';
@@ -6121,7 +6190,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     switch (st.do) {
       case 'mode': break;   // skipped along with the scene
       case 'remember': G.remember(st.key, st.text, st.good); break;
-      case 'starlight': G.progress.bonus = (G.progress.bonus || 0) + st.n; G.hud.toast('\u2726 +' + st.n + ' Starlight: ' + st.why); SH.sfx.play('lantern'); G.save(); break;
+      case 'starlight': SH.xp.gain(15); G.progress.bonus = (G.progress.bonus || 0) + st.n; G.hud.toast('\u2726 +' + st.n + ' Starlight: ' + st.why); SH.sfx.play('lantern'); G.save(); break;
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); if (st.name === 'giftgot') G.explain('moons'); break;
       case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
@@ -6248,8 +6317,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     if (G.boss && G.boss.lastPhase !== w.bossPh) { w.bossPh = G.boss.lastPhase; if (w.bossPh > 1) SH.arts.whisper('boss' + w.bossPh, true); }
     // Starlight motes
     for (const m of w.motes) {
-      if (m.got || Math.abs(m.x - p.x) > 16 || Math.abs(m.y - (p.y - 20)) > 24) continue;
-      m.got = true; SH.sfx.play('mote'); G.explain('starlight');
+      if (m.got || Math.abs(m.x - p.x) > SH.xp.reach() || Math.abs(m.y - (p.y - 20)) > SH.xp.reach() + 8) continue;
+      m.got = true; SH.sfx.play('mote'); G.explain('starlight'); SH.xp.gain(1);
       fx.burst(m.x, m.y, 6, { speed: 1.6, life: 18, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
       G.hud.motes(w.motes.filter(x => x.got).length, w.motes.length, true);
       if (w.motes.every(x => x.got)) { SH.arts.whisper('motesAll'); SH.fx.word(p.x, p.y - 64, 'ALL STARLIGHT', '#ffd27a', 90); }
@@ -6814,6 +6883,10 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     while (box.children.length > 4) box.firstChild.remove();
   };
 
+  H.xp = function () {
+    const X = SH.xp, s = X.span(), el = $('lvl');
+    el.firstChild.textContent = 'LV ' + X.level(); el.lastChild.firstChild.style.width = Math.round(s[0] / s[1] * 100) + '%';
+  };
   // The bond meter, the Bond Art button, and whispers down the bond.
   let lastArt = '';
   H.art = function (a) {
@@ -6882,6 +6955,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     $('m-status').innerHTML = `<div class="wide"><b>${esc(ch.label)}: ${esc(ch.name)}</b>${esc(G.goalText() || 'Keep going')}</div>`
       + `<div><b>Starlight here</b>&#10022; ${w.motes.filter(m => m.got).length} of ${w.motes.length} &middot; ${SH.stars.free()} to spend</div>`
       + `<div><b>Choices remembered</b>${mem || 'None yet'}</div>`
+      + `<div class="wide"><b>Level ${SH.xp.level()}${SH.xp.level() < SH.xp.max() ? ' &middot; ' + SH.xp.span()[0] + ' / ' + SH.xp.span()[1] + ' XP to level ' + (SH.xp.level() + 1) + ': ' + esc(SH.xp.PERKS[SH.xp.level() + 1].name) : ' &middot; highest for now'}</b>${SH.xp.PERKS.slice(2, SH.xp.level() + 1).map(k => esc(k.name)).join(', ') || 'No perks yet. Fight, hunt, gather and help to earn them.'}</div>`
       + (people ? `<div class="wide"><b>Bonds</b>${people}</div>` : '');
   };
 

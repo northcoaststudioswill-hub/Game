@@ -61,11 +61,11 @@
           const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
           if (this.stun > 0 || this.dead) { /* knocked out of it */ }
           else if (ready) {
-            this.pips -= G.flame.waveCost; this.giftCd = G.flame.cooldown + 8; this.castT = 18;
+            this.pips -= G.flame.waveCost; this.giftCd = Math.round((G.flame.cooldown + 8) * SH.xp.quick()); this.castT = 18;
             world.spawnFireball(this.x + this.facing * 16, this.y - 22, this.facing, true);
             this.vx -= this.facing * 2.4; SH.fx.kick(3); SH.sfx.play('kill');
           } else if (this.pips >= G.flame.cost) {
-            this.pips -= G.flame.cost; this.giftCd = G.flame.cooldown; this.castT = 14;
+            this.pips -= G.flame.cost; this.giftCd = Math.round(G.flame.cooldown * SH.xp.quick()); this.castT = 14;
             world.spawnFireball(this.x + this.facing * 14, this.y - 22, this.facing, false);
             SH.sfx.play('dash');
           } else { SH.fx.word(this.x, this.y - 52, 'no moons left', '#b9b2dd', 34); this.giftCd = 20; }
@@ -110,10 +110,10 @@
       if (a.t % 2 === 0) fx.ghost({ x: this.x, y: this.y, facing: this.facing, pose: 'dash', life: 12, max: 12 });
       // Jumping out of a ground dash keeps some of its speed.
       if (this.jumpBuf > 0 && (this.grounded || this.coyote > 0)) {
-        this.dashT = 0; this.dashCd = t.dashCooldown; this.doJump(false);
+        this.dashT = 0; this.dashCd = Math.round(t.dashCooldown * SH.xp.dash()); this.doJump(false);
         this.vx = this.dashDir * Math.max(t.runSpeed, t.dashSpeed * 0.7);
       } else if (this.dashT === 0) {
-        this.dashCd = t.dashCooldown;
+        this.dashCd = Math.round(t.dashCooldown * SH.xp.dash());
         this.vx = this.dashDir * t.runSpeed * (dir === this.dashDir ? 1 : 0.3);
       }
     } else if (!stunned) {
@@ -221,12 +221,23 @@
     } else fx.dust(this.x, this.y, 0, 4);
   };
 
+  // Aim assist: with no direction held, an attack turns to the nearest thing worth hitting (so a thumb on STRIKE alone
+  // never swings at empty air with an enemy at her back).
+  Player.prototype.autoFace = function (world, range, bow) {
+    let best = null, bd = range;
+    for (const e of world.things) {
+      if (!e.hittable || !e.hittable() || (bow ? !e.arrowOnly : e.arrowOnly) || e.kind === 'brazier' || e.kind === 'bulb') continue;
+      const dx = e.x - this.x, dy = Math.abs(e.y - this.y);
+      if (Math.abs(dx) < bd && dy < (bow ? 130 : 46)) { bd = Math.abs(dx); best = e; }
+    }
+    if (best && Math.abs(best.x - this.x) > 6) this.facing = best.x > this.x ? 1 : -1;
+  };
   Player.prototype.tryAttack = function (world, inp) {
     if (this.atkBuf <= 0) return;
     if (!SH.game.can('daggers')) { // the hunting bow: one arrow, straight ahead
       if (SH.game.can('bow') && this.bowCd <= 0) {   // from the ground, or from the top of a jump
-        this.atkBuf = 0; this.bowCd = 30; this.bowT = 16; if (this.grounded) this.vx = 0;
-        const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d;
+        this.atkBuf = 0; this.bowCd = Math.round(30 * SH.xp.quick()); this.bowT = 16; if (this.grounded) this.vx = 0;
+        const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d; else this.autoFace(world, 320, true);
         world.spawnArrow(this.x + this.facing * 12, this.y - 27, this.facing);
         SH.sfx.play('bow');
       }
@@ -259,7 +270,7 @@
     this.atkBuf = 0;
     this.comboKind = kind;
     this.comboStep = step + 1;
-    if (kind !== 'pogo') { const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d; }
+    if (kind !== 'pogo') { const d = (inp.held.right ? 1 : 0) - (inp.held.left ? 1 : 0); if (d) this.facing = d; else this.autoFace(world, 64, false); }
     this.swing = { kind, step, def, f: 0, hits: new Set() };
     SH.sfx.play('slash');
     if (def.lunge && this.grounded) this.vx = this.facing * Math.max(Math.abs(this.vx) * 0.5, def.lunge * 1.6);

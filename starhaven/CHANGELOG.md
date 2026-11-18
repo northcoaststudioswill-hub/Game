@@ -1,5 +1,42 @@
 # Starhaven — Changelog
 
+## Reimagined 9 — levels, tighter controls (Nov 18, 2026)
+Will: analyze what matters; refine the gameplay and tighten the controls; add more experience progression and build it
+out; improve the quality overall.
+
+**What matters, in order** (my reading of where this slice stands):
+1. *It has never been played by a person.* Every number in it (jump, dash, damage, how long the Old Wyrm takes) is a
+   guess checked by bots. Ten minutes of Will's thumbs is worth more than any further change.
+2. *The controls on a phone.* It is an action game on a touch screen: if the stick and buttons fight the player,
+   nothing else is seen. This pass is mostly here.
+3. *Reasons to keep going.* Starlight buys things and bonds grow, but nothing rewarded simply playing well. Levels do.
+4. *Wren herself* is still the oldest drawing in the game. Not done in this pass.
+
+**Controls**
+- **The touch stick follows your thumb.** Drag past its edge and the base comes with you, so reversing direction is a
+  small movement back, not a long drag across the screen.
+- **Aim assist.** Strike (or shoot) without holding a direction and Wren turns to the nearest enemy in reach, so a
+  thumb on STRIKE alone never cuts empty air with something at her back.
+- **Touch buttons have a larger touch area** than they look (12 px all round).
+
+**Experience and levels** (`src/xp.js`)
+- XP from: every enemy (10, 25 for a wyrmling, 80 for the Old Wyrm), targets, snares, the wolf either way, each
+  Starlight mote, perfect dodges, residents' errands, and finishing a chapter. Bigger gains pop a "+N XP".
+- Six levels so far, each with one perk for good: **2 Quick hands** (bow and Flame recover faster), **3 Light feet**
+  (dash ready sooner), **4 Hard to kill** (+1 heart), **5 Bonded** (the bond bar starts a third full),
+  **6 Hunter's patience** (Starlight drifts to you from further away).
+- A level chip and bar sit under the Starlight count. Levelling up gets a band across the screen, a line saying what
+  you got, and (the first time) an explanation card. The pause screen shows your level, XP to the next and its perk,
+  and the perks you hold. Levels are in the save.
+- Levels are earned; the Constellation is where you choose. The explanation says so.
+
+**Honest notes.**
+- The Old Wyrm test showed the fight is long for a bot that only cuts in the openings and never uses a Bond Art: about
+  114 seconds, and once it ran past the old 150-second limit (the test now allows 240). That is a balance question for
+  a human to feel, not something I have tuned.
+- Aim assist has only been checked by a test (an enemy placed behind her), not felt.
+- Tests: 49 play checks, 19 menu checks, the fuzz run, the screenshot run. **Not played by hand or on a phone.**
+
 ## Reimagined 8 — seven cutscenes rebuilt in layers (Nov 18, 2026)
 Will: make the graphics even better; more pretty animated cutscenes and depth in the existing slice.
 
