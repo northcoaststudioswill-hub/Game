@@ -3,6 +3,38 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: four more hidden scenes, a berry rush, a best day (Nov 18 2026)
+
+Will: one more round of development, refining the game and the fun factor, and Easter eggs. Then push.
+
+![Four more hidden scenes](playtest/sprouts-3d-easter-eggs-2.png)
+
+**Four more hidden 3D scenes** (nine hidden now, nineteen scenes in all, 81 shots):
+- **HOT TUB** (3 shots). Throw five Embers into the pond after meeting Marcus. They hop straight back out, steaming,
+  and Marcus is a plumber. "Hot tub's open. Don't tell Erin. ...Erin's right behind me, isn't she."
+- **MOONBLOOMS** (3 shots). Talk to Erin in her garden from dusk. "Stay a minute, Will. They only do this at dusk."
+  The flowers open one by one and light the garden. No jokes in this one.
+- **THE SLIDE** (3 shots). Bother Old Thornback five times. The sprouts have noticed he is shaped like a boulder.
+  "...I am awake, you know. Go again."
+- **HELLO** (4 shots). Stand on the North Light's rock after dark once it burns. Louie meets Bessie at the end of the
+  pier. She only wanted to say hello.
+- Each shows a one-line hint on the Collection's SCENES page until it is found, like the first five.
+
+**Fun:**
+- **Berry rush.** Berries brought home in quick succession ring a chime that climbs with each one. Five in a row
+  pays 3 extra petals (BERRY RUSH), ten pays 8 (BERRY FRENZY). It rewards sending the whole crew out at once.
+- **A best day.** The most berries brought home in one day is remembered; beating it (six or more) is called out in
+  the evening report and adds 5 to the day bonus.
+
+**Tested:** `tests/sprouts_coast.js` 144 checks (six new: each of the four triggers, the hints fitting, the rush, the
+best day; the every-shot checks now cover nineteen scenes). `sprouts_valley.js` and `sprouts_story.js` twice each,
+soak (two mid-game and two late-game seeds), `tests/v02` capsules_reset, saves_onboarding and lantern_menu, console
+shelf, Sproutwild lab 124 of 124, Patch & Plate 119 of 119, Knockout lab: all pass. **Not tested:** by hand, on a
+phone, or by ear.
+
+**For Will:** every line in the four scenes is Claude's. The moonbloom scene is deliberately quiet; nothing in it says
+more about Will and Erin than that they stood and watched.
+
 ## Sprouts: from Will's second playtest - Louie, pacing, messages, greens and Pebs, and an aim bug (Nov 18 2026)
 
 Will: the pet-Louie mission is too hard because he moves. Missions come quickly and finish fast; maybe more of a

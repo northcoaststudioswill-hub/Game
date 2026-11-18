@@ -23,7 +23,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
 
   /* ---- the scenes themselves ---- */
   const keys = JSON.parse(await E('JSON.stringify(Object.keys(C3SCN))'));
-  ok('fifteen 3D scenes (ten story, five hidden)', keys.slice().sort().join() === 'arch,blaze,button,call,coast,dawn,dream,job,key,marks,relight,sesh,thorn,van,zoomies', keys);
+  ok('nineteen 3D scenes (ten story, nine hidden)', keys.slice().sort().join() === 'arch,bessie,blaze,button,call,coast,dawn,dream,hottub,job,key,marks,moon,relight,sesh,slide,thorn,van,zoomies', keys);
   const long = JSON.parse(await E(`JSON.stringify(Object.entries(C3SCN).flatMap(([k,S])=>S.map((s,i)=>[k,i,wrapPx(s.cap[1],228).length])).filter(q=>q[2]>3))`));
   ok('every caption fits its three lines', long.length === 0, long);
   await E(`init();live=true;void 0`);
@@ -270,6 +270,23 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await E(`const it=mkItem('trs',HX,HY+12);it.tri=7;it.w=1;const b=mkBud(1,2,HX,HY+14);b.tgt=it;b.st='carry';it.on.push(b);void 0`); await step(30);
   ok('the red button coming home shows its card', await E(`state==='card'&&/RED BUTTON/.test(card.title)`), await E('state'));
   await tap('a'); await step(4); ok('and then its scene', await E(`state==='c3'&&c3q.key==='button'`), await E('state')); await tap('start'); await step(3);
+  /* four more hidden scenes */
+  const clear = async () => { for (let k = 0; k < 8 && (await E('state')) !== 'play'; k++) { const st = await E('state'); if (st === 'c3') await skip3(); else if (st === 'pause' || st === 'hsel') await tap('b'); else await tap('a'); await step(4); } };
+  await clear(); await E(`dayT=30;npcs[3].st='active';run.emb=0;run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1,lf:1};buds=[];for(let i=0;i<6;i++)mkBud(0,2,P.x,P.y);void 0`); await tp(17, 20, -1, 0); await step(4);
+  for (let k = 0; k < 24 && (await E('state')) === 'play' && (await E('run.emb')) < 5; k++) { await E(`P.x=16*16+12;P.y=20*16+8;P.dx=-1;P.dy=0;buds.forEach(b=>{release(b);b.st='follow';b.x=P.x+4;b.y=P.y+4});void 0`); await step(2); await throwFor(3); await step(30); }
+  await step(6); ok('five Embers thrown in the pond: the hot tub', await E(`state==='c3'&&c3q.key==='hottub'`), [await E('state'), await E('run.emb')]); await clear();
+  await E(`openGarden();dayT=DAYLEN*.7;duskSaid=true;void 0`); await step(12); await clear(); await E(`P.x=npcs[0].x;P.y=npcs[0].y+14;P.dx=0;P.dy=-1;buds.forEach(b=>{release(b);b.st='idle';b.x=P.x+40}); LO.x=LO.sx=P.x+50;void 0`); await step(3); await tap('a'); await step(4);
+  ok('talking to Erin in her garden at dusk: the moonblooms', await E(`state==='c3'&&c3q.key==='moon'`), await E('state')); await clear();
+  await E(`dayT=30;run.boss=true;run.thk=0;P.x=THORN.x;P.y=THORN.y+18;P.dx=0;P.dy=-1;buds.forEach(b=>{release(b);b.st='idle';b.x=P.x+60});LO.x=LO.sx=P.x+50;void 0`); await step(3);
+  for (let k = 0; k < 5 && (await E('state')) === 'play'; k++) { await E(`P.x=THORN.x;P.y=THORN.y+18;P.dx=0;P.dy=-1;P.idle=0;void 0`); await tap('a'); await step(6); }
+  ok('bothering Thornback five times: the slide', await E(`state==='c3'&&c3q.key==='slide'`), [await E('state'), await E('run.thk')]); await clear();
+  await E(`run.call=1;run.lit=1;run.coastScn=1;run.seen['NORTH COAST']=1;if(coastGate('sunDoor').alive)openGate(coastGate('sunDoor'));if(coastGate('northPier').alive)openGate(coastGate('northPier'));dayT=DAYLEN*.7;void 0`); await step(12); await clear(); await tp(86, 7); await step(14);
+  ok('the rock by the North Light after dark: Bessie says hello', await E(`state==='c3'&&c3q.key==='bessie'`), await E('state')); await clear();
+  ok('nine hidden scenes in the Collection, each with a hint that fits', await E(`C3LIST.length-C3HID===9&&C3LIST.slice(C3HID).every(q=>wrapPx('A hidden scene (9 in all). '+q[2],228,2).length<=3)`));
+  await E(`init();live=true;state='play';dayT=30;rushN=0;rushT=-99;const p0=meta.petals;window.__p0=p0;for(let k=0;k<5;k++){const it=mkItem('berry',HX,HY+6);deliver(it)}void 0`);
+  ok('five berries home in a row is a berry rush', await E(`rushN===5&&toasts.some(t=>/BERRY RUSH/.test(t.s))&&meta.petals>=__p0+8`), await E('[rushN,meta.petals-__p0]'));
+  ok('a best day for berries is remembered and shown in the evening report', await E(`(()=>{meta.best=0;tod.berries=9;endDay();const a=tod.best===1&&meta.best===9;state='play';tod.best=0;tod.berries=3;endDay();const b=!tod.best&&meta.best===9;state='play';return a&&b})()`));
+  await E(`run.egg={job:1,sesh:1,dream:1,zoomies:1,button:1};void 0`);
   ok('all five are kept for the Collection, and a save remembers which were found', await E(`['job','sesh','dream','zoomies','button'].every(c3SeenScene)&&(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);return Object.keys(run.egg).length===5})()`));
 
   /* ---- the first shard in 3D ---- */

@@ -4,9 +4,10 @@
 (v12.10), Lightswarm (slice v0.3) and Clankawatch (v4.0 alpha 3), with a power-on sequence and a shelf in rows of three.
 Front page: [`README.md`](README.md). Everything open, per game: [`OPEN-ITEMS.md`](OPEN-ITEMS.md).
 
-**Sprouts since then (Nov 18):** nine cutscenes drawn live in 3D (N64 style), a tenth place (the North Coast, the North
-Light and the Wending Lake), a key from Erin's garden that opens the pond road to Marcus, a SCENES page in the
-Collection, and a playtest pass (bugs, speed). Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md). Checked by script only;
+**Sprouts since then (Nov 18):** nineteen scenes drawn live in 3D (N64 style; nine are hidden), the house inside in 3D
+with four things to do in it, a tenth place (the North Coast, the North Light and the Wending Lake), a key from Erin's
+garden that opens the pond road to Marcus, Sprouts' own capsules and an Erase Everything, and changes from two of Will's
+playtests. **The console:** a splash screen with a screenshot before each cartridge boots. Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md). Checked by script only;
 not yet played by hand or on a phone.
 
 **Build on this:** [`alt/`](alt/README.md). Play `alt/games/pocket-lantern-alt.html`; rebuild with `python3 alt/build.py`.

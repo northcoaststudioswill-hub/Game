@@ -503,7 +503,7 @@ function zoneTick(dt){if(zoneT>0)zoneT-=dt;const tx=P.x>>4,ty=P.y>>4;for(const z
 
 /* ---------- talking ---------- */
 function wakeGrubs(){if(run.grubs)return;run.grubs=true;respawn();}
-function talk(n,met){if(n.name==='ERIN'&&n.st==='active'&&n.ms[n.mi].id==='e6'&&n.ms[n.mi].get()>=n.ms[n.mi].goal&&!run.keyScn&&!inHome){run.keyScn=1;c3Play('key',()=>talk(n));return}if(n.name==='MARCUS'&&n.st==='new'&&!met&&!inHome){c3Play('van',()=>talk(n,1));return}const L=[],M=n.ms,offer=m=>{L.push(m.say);if(m.wake)wakeGrubs();if(m.garden)openGarden(true);if(m.key)keySpawn()};
+function talk(n,met){if(n.name==='ERIN'&&gard.open&&inGarden(P.x,P.y)&&dayT/DAYLEN>.62&&!inHome&&egg('moon'))return;if(n.name==='ERIN'&&n.st==='active'&&n.ms[n.mi].id==='e6'&&n.ms[n.mi].get()>=n.ms[n.mi].goal&&!run.keyScn&&!inHome){run.keyScn=1;c3Play('key',()=>talk(n));return}if(n.name==='MARCUS'&&n.st==='new'&&!met&&!inHome){c3Play('van',()=>talk(n,1));return}const L=[],M=n.ms,offer=m=>{L.push(m.say);if(m.wake)wakeGrubs();if(m.garden)openGarden(true);if(m.key)keySpawn()};
  if(n.st==='new'){L.push(met?"So. Marcus Waterworks. You're in, bro. I already told Derek you're in.":n.intro);offer(M[0]);n.st='active';}
  else if(n.st==='active'){const m=M[n.mi],v=m.get();
   if(v>=m.goal){meta.life.missions++;if(m.tk)meta.tix++;earn(m.rw);L.push(n.name==='MARCUS'?["AYYY! See one, send one! That's my guy. Bring it in, bro.","BROOO. Told you. Never doubted you once. Dap me up.","LET'S GOOO! Waterworks is officially happening. Come here, bro."][n.mi%3]+' *DAP* Here, take '+m.rw+' petals'+(m.tk?' and a capsule ticket.':'.'):['Nicely done','You did it','Perfect','Lovely work'][n.mi%4]+(n.name==='ERIN'?', Will':'')+'! Here, take '+m.rw+' petals'+(m.tk?' and a capsule ticket.':'.'));if(n.name==='MARCUS')dap(n);n.mi++;snd(660,.08);later(()=>snd(990,.2),90);
@@ -737,7 +737,7 @@ function update(dt){
  const tx=P.x+P.dx*22-VW/2,ty=P.y+P.dy*16-VH/2,kk=Math.min(1,dt*5);cam.x+=(tx-cam.x)*kk;cam.y+=(ty-cam.y)*kk;
  cam.x=Math.max(0,Math.min(MW*16-VW,cam.x));cam.y=Math.max(0,Math.min(MH*16-VH,cam.y));
 }
-let seeds=[],aN=0,ambS=4;
+let seeds=[],aN=0,ambS=4,rushN=0,rushT=-99;
 /* the lantern spits each new seed out in an arc; it plants itself where it lands */
 function updSeeds(dt){for(const q of seeds){q.t+=dt/.75;if(q.t>=1){q.done=true;mkSprout(q.type,q.tx,q.ty,0);puff(q.tx,q.ty,'#a87850',3,18);snd(1100+Math.random()*300,.04,700,'triangle',.04)}}if(seeds.length)seeds=seeds.filter(q=>!q.done)}
 function sip(b,it){it.alive=false;const got=buds.filter(q=>!q.dead&&!q.gard&&q.stage<2&&(q===b||((q.st==='follow'||q.st==='idle')&&d2(q,it.x,it.y)<80*80))).sort((p,q)=>d2(p,it.x,it.y)-d2(q,it.x,it.y)).slice(0,12);
@@ -761,7 +761,7 @@ function doA(fresh){
  if(s){P.pluck=.2;P.pl=s;return;}
  if(fresh&&!inHome&&facing(DOOR,24)){TRN={t:0,fn:enterHome};return}
  if(fresh&&!P.mv){for(const n of npcs)if(facing(n,24)){talk(n);return}
-  if(run.boss&&!inHome&&facing(THORN,28)){say(['THORNBACK: SO WARM. THANK YOU, KEEPER.',"THORNBACK: I'LL KEEP WATCH TONIGHT.",'THORNBACK: THE SMALL ONES TICKLE.'][(day+run.pets)%3],4);snd(110,.25,80,'sine',.3);return}
+  if(run.boss&&!inHome&&facing(THORN,28)){if((run.thk=(run.thk||0)+1)===5)egg('slide');say(['THORNBACK: SO WARM. THANK YOU, KEEPER.',"THORNBACK: I'LL KEEP WATCH TONIGHT.",'THORNBACK: THE SMALL ONES TICKLE.'][(day+run.pets)%3],4);snd(110,.25,80,'sine',.3);return}
   if(!inHome&&vanHere()&&facing(VAN,26)){vanUse();return}
   if(!inHome&&facing(NLIGHT,34)){say(run.lit?['THE NORTH LIGHT. WARM STONE, AND A HUM LIKE THE LANTERN','...ONE TO KEEP THE LIGHT. ONE TO CALL THE KEEPERS.','SUN CALL. THE SAME HAND CARVED THE ARCH AT THE FALLS'][(day+run.pets)%3]:['THE NORTH LIGHT. ITS LAMP ROOM IS DARK AND COLD','CARVED OVER THE DOOR: ...ONE TO KEEP. ONE TO CALL...','SUN CALL. THE SAME HAND CARVED THE ARCH AT THE FALLS'][(day+run.pets)%3],6);snd(196,.2,147,'sine',.2);return}
   if(!inHome&&facing(KEEP,30)){if(!run.keep)playScene('3:arch',()=>{run.keep=1;zone='';persist(true)});else say(['...PROMISED TO SPROUTS AND BUDDIES. KEEP THE...','SUN KEEP. AN ORDER, OR A NAME?','THE STONE IS WARM, LIKE THE LANTERN'][(day+run.pets)%3],5);snd(220,.2,165,'sine',.2);return}
@@ -798,7 +798,7 @@ function updBud(b,dt){
    if(t>=1){b.z=0;if(b.ret){b.st='follow';break}
     if(tileAt(b.x,b.y)===GT){const tg=findTarget(b,30);if(tg&&tg.kind==='ga'){b.tgt=tg;b.st='seek';b.t=0;break}}
     {const f=swim?fieldW:fieldL;if(free(b.x,b.y,swim)&&f[(b.y>>4)*MW+(b.x>>4)]<0&&f[(P.y>>4)*MW+(P.x>>4)]>=0){b.ret=true;b.sx=b.x;b.sy=b.y;b.tx=P.x;b.ty=P.y;b.t=0;b.st='fly';snd(240,.08,160);break}} /* thrown clean over a shut gate: it comes back, or it would be stranded */
-    if(!free(b.x,b.y,swim)){if(tileAt(b.x,b.y)===WA)puff(b.x,b.y,'#a8d8ff',5,30);b.ret=true;b.sx=b.x;b.sy=b.y;b.tx=P.x;b.ty=P.y;b.t=0;b.st='fly';snd(240,.08,160);break;}
+    if(!free(b.x,b.y,swim)){if(tileAt(b.x,b.y)===WA){puff(b.x,b.y,'#a8d8ff',5,30);if(b.type===0&&npcBy('MARCUS').st!=='new'&&(run.emb=(run.emb||0)+1)>=5)egg('hottub')}b.ret=true;b.sx=b.x;b.sy=b.y;b.tx=P.x;b.ty=P.y;b.t=0;b.st='fly';snd(240,.08,160);break;}
     const tg=findTarget(b,tileAt(b.x,b.y)===WA?64:44);
     if(tg){b.tgt=tg;b.st='seek';b.t=0;if(tg.kind==='plot'){b.gard=true;tg.claim=time+4}}else if(inGarden(b.x,b.y)){b.gard=true;b.st='tend';b.t=.5}else b.st='idle';}
    break;}
@@ -905,7 +905,9 @@ function deliver(it){
  if(it.sub==='lens'){run.lens=1;earn(60);meta.tix+=2;snd(523,.12);later(()=>snd(784,.12),120);later(()=>snd(1046,.3),240);sceneQ.push(['3:relight',()=>{run.lit=1;toast('THE NORTH LIGHT BURNS!  +60');persist(true)}]);persist(true);return}
  if(it.sub==='trs'){const i=it.tri|0;if(!meta.trs.includes(i))meta.trs.push(i);card={t:0,title:TRS[i][0],sub:TRL[i],art:()=>{g.save();g.translate(120,72);g.scale(4,4);trArt(i,0,0);g.restore()}};
   if(i===7)egg('button');state='card';earn(20);spSay('GOOD FIND!',3);snd(784,.1);later(()=>snd(1175,.12),100);later(()=>snd(1568,.25),200);checkAch();persist(true);return}
- if(it.sub!=='husk'){run.delivered++;meta.life.berries++;tod.berries++;bump('berry');earn(lucky?3:1)}
+ if(it.sub!=='husk'){run.delivered++;meta.life.berries++;tod.berries++;bump('berry');earn(lucky?3:1);
+  /* berries home in quick succession: the chime climbs, and five or ten in a row pay a little extra */
+  rushN=time-rushT<8?rushN+1:1;rushT=time;if(rushN>1)later(()=>snd(700+Math.min(12,rushN)*70,.09,1000+Math.min(12,rushN)*80,'triangle',.06),200);if(rushN===5){earn(3);toast('BERRY RUSH!  5 IN A ROW  +3')}else if(rushN===10){earn(8);toast('BERRY FRENZY!  10 IN A ROW  +8')}}
  if(it.sub==='pear'){earn(10);toast('GOLDEN PEAR!  +10')}
  let made=0;for(let i=0;i<it.seeds+(lucky?1:0);i++){if(crewCount()>=capNow())break;const [x,y]=soilSpot();seeds.push({type,tx:x,ty:y,t:-made*.16});made++;}
  snd(700,.08,1000);later(()=>snd(900,.1,1300),90);
@@ -916,7 +918,8 @@ function updGate(ga,dt){const n=ga.on.length;if(!n)return;ga.hp-=n*dt;if(sndT<=0
  ga.on.forEach(b=>{b.fx=ga.x>b.x?1:-1});
  if(ga.hp<=0){openGate(ga,true);snd(300,.3,900,'triangle',.08);if(ga.id==='northPier')respawn();say(ga.id==='northPier'?'THE PIER IS BUILT! THE NORTH LIGHT IS IN REACH':ga.sub===3?'THE BRIDGE IS BUILT! WILLOW FALLS IS OPEN':ga.sub?'THE CRYSTAL SHATTERS!':'THE BRAMBLE BURNS AWAY!',4);persist(true);}}
 function endDay(){tod.strays=buds.filter(b=>!b.gard&&b.st!=='follow'&&b.st!=='park'&&d2(b,HX,HY)>150*150).length;if(tod.strays)louXP(Math.min(6,tod.strays));buds.forEach(b=>{if(!b.gard){b.tgt=null;b.z=0}});[...foes,...items,...gates,...bugs,DIG].forEach(o=>o.on.length=0);
- const bonus=5+Math.min(15,tod.berries)+Math.min(15,tod.flowers*2);tod.bonus=bonus;earn(bonus);state='dayend';snd(330,.5,110,'triangle',.08);}
+ if(tod.berries>=6&&tod.berries>(meta.best||0)){meta.best=tod.berries;tod.best=1}
+ const bonus=5+Math.min(15,tod.berries)+Math.min(15,tod.flowers*2)+(tod.best?5:0);tod.bonus=bonus;earn(bonus);state='dayend';snd(330,.5,110,'triangle',.08);}
 function newDay(){mkWbuds();inHome=false;parked=[];day++;dayT=0;duskSaid=false;wr=0;tod={berries:0,flowers:0,bugs:0,spooked:0};P.x=HX;P.y=HY+22;P.dx=0;P.dy=1;P.stun=0;P.pluck=0;trail=[];parts=[];
  LO.x=LO.sx=P.x-22;LO.y=LO.sy=P.y+4;LO.st='follow';
  let k=0;buds.forEach(b=>{if(b.gard)return;b.st='follow';b.x=P.x+((k%7)-3)*6;b.y=P.y+8+((k/7)|0)*5;k++});
@@ -1082,6 +1085,7 @@ const DEREKL=['YO. COLD ONE?','TELL MARCUS NOTHING.','THE VAN IS FINE. PROBABLY.
 function coastTick(){if(state!=='play'||inHome||sceneQ.length)return;
  if(run.pj&&run.pj.lf&&run.pj.lf.s>=3&&time>derekT&&d2(P,71*16+42,15*16)<44*44&&msgT<=0&&!toasts.length){derekT=time+22;floatAt(71*16+42,15*16-18,'DEREK: '+DEREKL[(day+((time/22)|0))%DEREKL.length],'#5a9af0');snd(300,.04,0,'triangle',.03)}
  if(coastDue()&&dayT>DAYLEN*.78){sceneQ.push(['3:call',coastOpen]);return}
+ if(run.lit&&dayT/DAYLEN>.66&&P.y<10*16&&P.x>82*16)egg('bessie');
  if(!run.call)return;const T=run.tips=run.tips||{},pr=coastGate('northPier');
  if(!run.coastScn&&zone==='NORTH COAST'){run.coastScn=1;sceneQ.push(['3:coast',()=>{zoneT=2.2;persist(true)}]);return}
  if(!T.pr&&pr&&pr.alive&&d2(P,pr.x,pr.y)<60*60){T.pr=1;say('AN OLD PIER. THROW SPROUTS AT THE STAKES TO BUILD IT',7)}
@@ -1749,7 +1753,7 @@ function draw(){
   C3LIST.forEach((q,i)=>{const rw=((i/2)|0)-top;if(rw<0||rw>4)return;const x=4+(i%2)*118,y=22+rw*18,has=c3SeenScene(q[0]),on=i===csel;mTile(x,y,114,17,on);r(has?'#2c3050':'#16202a',x+2,y+2,15,13);if(has){r('#f8e060',x+7,y+4,2,8);r('#f8e060',x+9,y+5,2,6);r('#f8e060',x+11,y+7,2,2)}else text('?',x+6,y+2,2,'#607080',null);
    const nm=has?q[1]:'? ? ?',w=tw(nm,2);if(w>90){g.save();g.translate(x+21,0);g.scale(90/w,1);text(nm,0,y+2,2,on?'#281c30':'#ffffff',null);g.restore()}else text(nm,x+21,y+2,2,on?'#281c30':has?'#ffffff':'#607080',null)});
   if(top>0){r('#f8e060',117,20,6,1);r('#f8e060',119,19,2,1)}if(top+5<rows){r('#f8e060',117,112,6,1);r('#f8e060',119,113,2,1)}
-  {const q=C3LIST[csel],k=c3SeenScene(q[0]);mFoot(114);text(k?q[1]:'NOT SEEN YET',6,116,2,'#f8e060',null);wrapPx(k?q[2]+' Press A to watch it again.':csel>=C3LIST.length-5?'One of five hidden scenes. '+q[2]:'The big moments of the story play as scenes. Each one is kept here once you have seen it.',228,2).slice(0,3).forEach((l,j)=>text(l,6,129+j*12,2,'#e8e4f5',null))}}
+  {const q=C3LIST[csel],k=c3SeenScene(q[0]);mFoot(114);text(k?q[1]:'NOT SEEN YET',6,116,2,'#f8e060',null);wrapPx(k?q[2]+' Press A to watch it again.':csel>=C3HID?'A hidden scene ('+(C3LIST.length-C3HID)+' in all). '+q[2]:'The big moments of the story play as scenes. Each one is kept here once you have seen it.',228,2).slice(0,3).forEach((l,j)=>text(l,6,129+j*12,2,'#e8e4f5',null))}}
  else if(state==='bugs'){mHead('COLLECTION');rtext(cpage?'< TREASURES '+meta.trs.length+'/'+TRS.length+' >':'< BUGS '+kinds()+'/'+BUGS.length+' >',236,5,1,'#a8f080');
   if(!cpage)BUGS.forEach((b,i)=>{const x=4+(i%2)*118,y=22+((i/2)|0)*18,n=meta.bugs[i],on=i===csel;mTile(x,y,114,17,on);r(n?'#58b858':'#16202a',x+2,y+2,15,13);
    if(n){g.save();g.translate(x+9,y+12);g.scale(2,2);bugArt(i,0,0,((time*6)|0)%2);g.restore();text(b.n,x+21,y+2,2,on?'#281c30':'#ffffff',null);rtext('x'+n,x+111,y+4,1,on?'#5a4a28':'#a8f080',null)}
@@ -1802,7 +1806,7 @@ function draw(){
   ctext(tod.strays?'LOUIE BROUGHT '+tod.strays+(tod.strays===1?' STRAY':' STRAYS')+' HOME.  CREW OF '+buds.length:'EVERYONE IS HOME SAFE.  CREW OF '+buds.length,86,2,'#a8f080');
   {const cnt=TYPES.map((q,t)=>buds.filter(b=>b.type===t).length),sh=cnt.map((n,t)=>t).filter(t=>cnt[t]>0),ws=sh.map(t=>14+tw(String(cnt[t]))+7);let x=Math.round((W-ws.reduce((a,b)=>a+b,0)+7)/2);sh.forEach((t,i)=>{const T=TYPES[t],y=100-Math.round(Math.max(0,Math.sin(time*5+i*1.1))*2);r(T.d,x,y+3,7,7);r(T.c,x+1,y+4,5,5);r(T.l,x+1,y+4,2,1);r('#181020',x+2,y+6,1,2);r('#181020',x+4,y+6,1,2);r('#2c6030',x+3,y+1,1,2);r('#f8a0c8',x+2,y-1,3,2);text(String(cnt[t]),x+10,99,2,T.l);x+=ws[i]})}
   ctext('DAY BONUS:  +'+tod.bonus+' PETALS',115,2,'#f8c8e0');
-  ctext(tod.berries+tod.flowers>12?'"What a day, Will!"':tod.berries+tod.flowers>3?'"Nice and steady, Will."':'"A slow day is still a good day."',129,2,'#c8a8f8');if(((time*2)|0)%2)ctext('A: SLEEP',145,2,'#a8f080');}
+  ctext(tod.best?'A NEW BEST DAY FOR BERRIES!  +5':tod.berries+tod.flowers>12?'"What a day, Will!"':tod.berries+tod.flowers>3?'"Nice and steady, Will."':'"A slow day is still a good day."',129,2,'#c8a8f8');if(((time*2)|0)%2)ctext('A: SLEEP',145,2,'#a8f080');}
  else if(state==='win'){r('rgba(40,20,20,.6)',0,24,W,112);ctext('THE LANTERN SHINES!',34,4,'#f8e060','#783010');ctext('WILL, ERIN AND LOUIE DID IT',62,2);ctext('RELIT IN '+day+(day===1?' DAY':' DAYS'),78,2,'#a8f080');ctext('THE GARDEN IS STILL GROWING...',94,2,'#c8a8f8');if(((time*2)|0)%2)ctext('A: KEEP PLAYING',116,2,'#b0e0f8');}
  g.restore();
  if(TRN){const k=TRN.t<.3?1-TRN.t/.3:Math.max(0,(TRN.t-.36)/.32);g.fillStyle='#0c0a12';g.beginPath();g.rect(0,0,W,H);g.arc(W/2,H/2,k*Math.hypot(W,H)/2,0,7,true);g.fill()}
