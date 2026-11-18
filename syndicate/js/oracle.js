@@ -5,13 +5,14 @@
   const S = (who, name, text, shot) => ({ who, name, text, shot }), pick = a => a[Math.floor(Math.random() * a.length)];
   const NAME = 'David Roseinbeirg', BIND = 3;
   // what he thinks of everyone who is not you
-  const KIN = { human: 'humans', dwarf: 'dwarves', elf: 'elves', halforc: 'half-orcs', tiefling: 'tieflings' };
+  const KIN = { human: 'humans', dwarf: 'dwarves', elf: 'elves', halforc: 'half-orcs', tiefling: 'tieflings', drow: 'drow' };
   const SNEER = {
     human: 'Humans. Rats that learned to count. I would not piss on one to put him out.',
     dwarf: 'Dwarves. Hairy little shit-shovellers, squatting on gold they are too stupid to spend.',
     elf: 'Elves. Preening corpses that forgot to lie down. I have passed wind with more spine.',
     halforc: 'Half-orcs. Somebody bred a pig with a wall and taught the result to grunt.',
-    tiefling: 'Tieflings. Devil’s bastards. A great deal of horn and not one working thought.'
+    tiefling: 'Tieflings. Devil’s bastards. A great deal of horn and not one working thought.',
+    drow: 'Drow. Spider-kissing cellar elves. Pale hair, red eyes, and a knife for every friend they ever had.'
   };
   const others = r => Object.keys(KIN).filter(k => k !== r);
   const sneer = r => SNEER[pick(others(r))];
@@ -31,7 +32,8 @@
     dwarf: 'Dwarves. Squat, stinking misers who dig a hole, shit in it, and call that a kingdom. I am going to seal every mine they own with the lot of them still inside, and sell tickets to the noise.',
     elf: 'Elves. A thousand years apiece, and every one of them spent admiring their own arses. Bloodless, simpering things. I am going to burn their forests for the light to read by.',
     halforc: 'Half-orcs. Dumb meat that bleeds when you point at it. Good for holding a door or stopping an arrow. I shall use them for both, and I will not be learning their names.',
-    tiefling: 'Tieflings. Some slattern of a great-grandmother lay down under a devil, and now the whole litter walks about expecting pity. They will get the knife, the same as everyone else. Only sooner.'
+    tiefling: 'Tieflings. Some slattern of a great-grandmother lay down under a devil, and now the whole litter walks about expecting pity. They will get the knife, the same as everyone else. Only sooner.',
+    drow: 'Drow. The elves even the elves threw out. They pray to a spider, they sell their own mothers by the pound, and they think living in the dark makes them deep. I will drown their tunnels and salt the water.'
   };
   // ------------------------------------------------------------ the scenes
   function scene(st, lines, opts) { return Object.assign({ place: 'arena', npc: [-1.5, -1.3], you: [1.6, 1.7], spawn: { look: O.look() }, lines }, O.stageOpts ? O.stageOpts() : {}, opts || {}); }

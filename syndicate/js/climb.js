@@ -18,7 +18,7 @@
   const cache = {};
   function make(t, k) {
     const key = t + '_' + k + (k >= NEED[t] && G.state && G.state.hero ? '_' + G.state.hero.level : ''); if (cache[key]) return cache[key];
-    const g = GATES[t], r = rng(t * 4099 + k * 131 + 7), pick = a => a[Math.floor(r() * a.length)], cls = pick(['fighter', 'rogue', 'sorcerer', 'cleric']), C = G.CLASSES[cls], extra = k >= NEED[t], kk = Math.min(k, 4);
+    const g = GATES[t], r = rng(t * 4099 + k * 131 + 7), pick = a => a[Math.floor(r() * a.length)], cls = pick(G.FOE_CLASSES || ['fighter', 'rogue', 'sorcerer', 'cleric']), C = G.CLASSES[cls], extra = k >= NEED[t], kk = Math.min(k, 4);
     const sub = t >= 3 ? pick(Object.keys(C.subs)) : null, known = C.start.slice(0, 2).concat(t >= 1 ? [C.l2[Math.floor(r() * C.l2.length)]] : [], sub ? [C.subs[sub].ability] : []).filter(id => G.ABILITIES[id]);
     const arms = (G.ARMS || []).filter(w => w.cls === cls), pal = pick(PAL), name = pick(FIRST) + ' ' + pick(LAST), pay = extra ? 0.6 : 1;
     const o = { id: 'u' + t + '_' + k, name, title: TITLE[t], cls, race: pick(Object.keys(G.RACES)), level: Math.max(1, g.level - 1, extra && G.state && G.state.hero ? G.state.hero.level - 2 : 0), sub, known, arm: t >= 2 && arms.length ? pick(arms).id : null,

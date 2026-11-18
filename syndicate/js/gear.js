@@ -13,7 +13,7 @@
   K('crownguard', 'Crownbearer’s Mail', 900, 5, { dr: 0.1, poise: 25, respect: 0.1, hp: 0.05 }, { armor: '#5a4a2a', armor2: '#2e2616', cloth: '#6a1220', trim: '#ffd36b', legs: '#2a2420' }, 2,
     'Made for whoever holds the Guttercrown, and re-cut for each of them. The fur is real. So are the dents.', { req: st => !!st.wins.vexa, src: 'Win the crown' });
   const RUNG = { issue: 0, rags: 0, leathers: 1, silks: 2, wraps: 2, chain: 2, plate: 3, warden: 3, ashcloak: 3, gilded: 4, crownguard: 4 }, RN = ['Junk', 'Common', 'Good', 'Fine', 'Awesome'], RC = ['#8a8478', '#c9c9d4', '#7fd68a', '#6ab8ff', '#f0c95a'];
-  G.kitRung = id => RUNG[id] || 0;
+  G.KIT_RUNG = RUNG; G.kitRung = id => RUNG[id] || 0;
   const rungTag = id => '<span class="rung" style="color:' + RC[G.kitRung(id)] + ';border-color:' + RC[G.kitRung(id)] + '">' + RN[G.kitRung(id)] + '</span>';
   // two charms you cannot simply buy
   const XCH = { sandglass: { name: 'Roseinbeirg Sandglass', desc: 'Abilities recover 8% faster.', fx: d => { d.cdr += 0.08; } }, crownshard: { name: 'Shard of the Guttercrown', desc: '+5% damage with everything.', fx: d => { d.dmgMul += 0.05; } } };

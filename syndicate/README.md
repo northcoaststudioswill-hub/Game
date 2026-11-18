@@ -241,3 +241,11 @@ The renderer caps resolution at 1.5x, redraws the shadow map every other frame, 
 - **Wizard gold** also buys Gilded Edge (+4% damage for good, three times) and takes three heat off your name.
 - **If you never die,** David sends for you at Enforcer: a clock starts ticking over the hatch, and he makes his offer in person.
 - The five named fighters hit harder and last longer than their undercards; they are meant to be met prepared.
+
+## Druid, Warlock and Drow (`js/classes.js`)
+
+- **Druid** (Wisdom, resource Wild). Shapes are abilities: Tunnel Wolf to start; Cave Bear or Pit Spider at level 2; Great Bat with Circle of the Fang; The Old Bear Wakes as the ultimate. A shape replaces your model and basic attack for 8 to 12 seconds, then you change back winded. Weapons: Thornwood Staff, Stalactite Spear, Thorn Whip, Root Maul.
+- **Warlock** (Charisma, resource Pact). Hex, Step Through the Dark, Arms of the Deep, Cause Fear; Pact of the Fiend or of the Deep Dweller; The Bargain Called In. Weapons: Eldritch Blast, Grave Chill, Gnawing Dark, Witch Bolt.
+- **Drow** race: +2 Dexterity, +1 Charisma.
+- New kits Moss-Hide Mantle and Robes of the Low Pact, each with a set. Every existing set accepts the new classes' weapons.
+- **Loadout.** You carry three techniques and one ultimate. Everything else you learn stays on your list; the Guildmaster's sheet swaps what is in the three slots. Feats and subclass passives are always on and take no slot.

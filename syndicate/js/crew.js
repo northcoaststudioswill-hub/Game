@@ -144,7 +144,7 @@
       const st = G.state, out = []; if (!st.hero) return out; st.tally = st.tally || [];
       while (st.tally.length < crew.slots(st)) {
         const used = st.tally.map(t => t.name), tr = pick(TRAITS);
-        const t = { name: pick(FIRST.filter(n => !used.includes(n))), cls: pick(['fighter', 'rogue', 'sorcerer', 'cleric']), race: pick(Object.keys(G.RACES)), skill: 2, trait: tr[0], good: tr[1], job: null };
+        const t = { name: pick(FIRST.filter(n => !used.includes(n))), cls: pick(G.FOE_CLASSES || ['fighter', 'rogue', 'sorcerer', 'cleric']), race: pick(Object.keys(G.RACES)), skill: 2, trait: tr[0], good: tr[1], job: null };
         st.tally.push(t); out.push(t);
       }
       return out;

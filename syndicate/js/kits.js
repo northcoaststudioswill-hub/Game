@@ -20,7 +20,7 @@
   ui.trainer = function (line) {
     const st = G.state, h = st.hero, C = G.CLASSES[h.cls], rk = G.rankOf(st.respect);
     // the technique you passed over at level 2 can be bought back, alongside the class's extras
-    const list = (h.level >= 2 ? C.l2.filter(id => !h.known.includes(id)).map(id => [id, 260, 2]) : []).concat(G.EXTRA[h.cls].map(id => [id].concat(TEACH[id])));
+    const list = (h.level >= 2 ? C.l2.filter(id => !h.known.includes(id)).map(id => [id, 260, 2]) : []).concat((G.EXTRA[h.cls] || []).map(id => [id].concat(TEACH[id] || [240, 3])));
     show('<div class="card"><h2>Techniques for Hire</h2><p class="dim">The Ledger-Keeper knows who teaches what, and adds a finder’s fee. You have <b>' + st.coin + '</b> coin. Learn as many as you like: you still carry three into the pit.</p>' + (line ? '<p class="rankup">' + line + '</p>' : '') +
       list.map(q => { const ab = A[q[0]], known = h.known.includes(q[0]), locked = rk < q[2]; return '<div class="ab-row' + (locked && !known ? ' lockedrow' : '') + '"><div class="ab-ic">' + G.icon(ab) + '</div><div class="ab-tx"><b>' + ab.name + '</b>' + (ab.trap ? '<span class="tagk">Trap</span>' : ab.cd <= 3.5 ? '<span class="tagk">Cantrip</span>' : '') + '<small>' + (ab.cost || 0) + ' ' + C.res + ' · ' + ab.cd + 's cooldown</small><p>' + ab.desc + '</p></div>' + (known ? '<span class="lock">Known</span>' : locked ? '<span class="lock">' + G.RANKS[q[2]].name + '</span>' : '<button class="big" data-learn="' + q[0] + ':' + q[1] + '"' + (st.coin < q[1] ? ' disabled' : '') + '>' + q[1] + ' coin</button>') + '</div>'; }).join('') +
       '<div class="row end"><button class="big" id="b">Back to your sheet</button></div></div>');

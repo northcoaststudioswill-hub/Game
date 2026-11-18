@@ -15,10 +15,10 @@
   const ELITE = ['the Stair-Breaker', 'Last of the Old Watch', 'the Warden Who Stayed', 'Queen’s Mistake', 'the Ninth Level’s Answer', 'Who Beat Vexa Once, in Practice'];
   const PAL = [['#5a3a2a', '#4a4038'], ['#2a4a5a', '#3a4048'], ['#5a2a4a', '#3a3040'], ['#3a5a3a', '#3a4038'], ['#6a5a3a', '#4a4438'], ['#3a3a5a', '#30304a'], ['#6a1a2a', '#3a2028'], ['#1a5a6a', '#2a3a44']];
   function make(n) {
-    const r = rng(n * 7919 + 13), pick = a => a[Math.floor(r() * a.length)], cls = pick(['fighter', 'rogue', 'sorcerer', 'cleric']), C = G.CLASSES[cls], elite = n % 5 === 0;
+    const r = rng(n * 7919 + 13), pick = a => a[Math.floor(r() * a.length)], cls = pick(G.FOE_CLASSES || ['fighter', 'rogue', 'sorcerer', 'cleric']), C = G.CLASSES[cls], elite = n % 5 === 0;
     const sub = pick(Object.keys(C.subs)), pool = C.start.concat(C.l2, [C.subs[sub].ability], (G.EXTRA || {})[cls] || []).filter(id => G.ABILITIES[id]).sort(() => r() - 0.5);
     const arms = (G.ARMS || []).filter(w => w.cls === cls), pal = pick(PAL), name = pick(FIRST) + ' ' + (elite ? pick(ELITE) : pick(LAST));
-    const o = { id: 'ch' + n, name, title: elite ? 'a name the whole level knows' : pick(TITLE[cls]), cls, race: pick(Object.keys(G.RACES)), level: 5, sub, known: pool.slice(0, n > 4 ? 4 : 3), ult: n >= 2 ? C.ult : null, arm: arms.length ? pick(arms).id : null,
+    const o = { id: 'ch' + n, name, title: elite ? 'a name the whole level knows' : pick(TITLE[cls] || TITLE.fighter), cls, race: pick(Object.keys(G.RACES)), level: 5, sub, known: pool.slice(0, n > 4 ? 4 : 3), ult: n >= 2 ? C.ult : null, arm: arms.length ? pick(arms).id : null,
       hpMul: +((1 + 0.1 * n) * (elite ? 1.25 : 1)).toFixed(2), dmgMul: +Math.min(1.7, 0.8 + 0.04 * n).toFixed(2),
       ai: { react: Math.max(0.22, 0.42 - 0.012 * n), aggro: Math.min(0.85, 0.55 + 0.02 * n), dodge: Math.min(0.4, 0.18 + 0.015 * n), guard: Math.min(0.6, 0.3 + 0.02 * n), parry: Math.min(0.3, 0.12 + 0.012 * n) },
       xp: 0, coin: 140 + 22 * n + (elite ? 120 : 0), respect: 60 + 9 * n + (elite ? 60 : 0), taunt: pick(TAUNT), tint: { cloth: pal[0], armor: pal[1] }, challenger: n, elite };

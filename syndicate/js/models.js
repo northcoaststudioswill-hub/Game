@@ -6,14 +6,16 @@
     fighter: { armor: 0x8a909c, armor2: 0x4a4e58, trim: 0xb09a5a, cloth: 0x8a1c22, legs: 0x565a66, hair: 0x3a2a20, weapon: 0xdfe6ee },
     rogue: { armor: 0x4a4454, armor2: 0x2c2834, trim: 0x8a7240, cloth: 0x3a3048, legs: 0x3a3642, hair: 0x1a1a1a, weapon: 0xd0d8e2 },
     sorcerer: { armor: 0x8a1c24, armor2: 0x4f1016, trim: 0xe0a844, cloth: 0xa0222a, legs: 0x3a1216, hair: 0x5a1418, weapon: 0xff8a3c },
-    cleric: { armor: 0x777480, armor2: 0x45424c, trim: 0xe8c860, cloth: 0xe2dcc8, legs: 0x34323a, hair: 0xd8d2c2, weapon: 0xf0d880 }
+    cleric: { armor: 0x777480, armor2: 0x45424c, trim: 0xe8c860, cloth: 0xe2dcc8, legs: 0x34323a, hair: 0xd8d2c2, weapon: 0xf0d880 },
+    druid: { armor: 0x4a5a34, armor2: 0x2e3a22, trim: 0xc8b070, cloth: 0x5a6e3a, legs: 0x3a3226, hair: 0x6a5a3a, weapon: 0x8a6a3a },
+    warlock: { armor: 0x2a1e3a, armor2: 0x181024, trim: 0x8aff9a, cloth: 0x32204a, legs: 0x1a1422, hair: 0x1a1420, weapon: 0xb070ff }
   };
   const TRIM = [null, 0xd0d8e4, 0xffd36b], WGLOW = [0x000000, 0x2a9ab8, 0xb8862a], WCOL = [null, 0x8fe8ff, 0xffd36b];
   const hex = v => typeof v === 'string' ? parseInt(v.slice(1), 16) : v;
 
   G.makeChar = function (look) {
-    const cls = look.cls, race = G.RACES[look.race], g = look.gear || {};
-    const P = Object.assign({}, BASE[cls]);
+    const rcls = look.cls, cls = ({ druid: 'cleric', warlock: 'sorcerer' })[rcls] || rcls, race = G.RACES[look.race], g = look.gear || {};      // new callings wear an older one's frame
+    const P = Object.assign({}, BASE[rcls]); if (look.race === 'drow') P.hair = 0xe8e8f0;
     if (look.tint) Object.keys(look.tint).forEach(k => P[k] = hex(look.tint[k]));
     const cos = look.cos || {}, wsk = cos.weapon && G.WSKIN && G.WSKIN[cos.weapon];
     if (cos.dye && G.DYES && G.DYES[cos.dye]) Object.assign(P, G.DYES[cos.dye]);
@@ -60,7 +62,7 @@
     // head
     const head = new T.Group(); head.position.set(0, 0.92, 0); torso.add(head);
     mesh(new T.SphereGeometry(0.26, 9, 7), m.skin, 0, 0, 0, head);
-    { const white = new T.MeshLambertMaterial({ color: 0xe9e4d8 }), eyeC = { elf: 0x3aa06a, tiefling: 0xffb020, halforc: 0x8a2a1a, dwarf: 0x4a3a2a }[look.race] || 0x2a3a5a, iris = new T.MeshBasicMaterial({ color: look.race === 'tiefling' ? eyeC : 0x15131a });
+    { const white = new T.MeshLambertMaterial({ color: 0xe9e4d8 }), eyeC = { elf: 0x3aa06a, tiefling: 0xffb020, halforc: 0x8a2a1a, dwarf: 0x4a3a2a, drow: 0xff3a4a }[look.race] || 0x2a3a5a, iris = new T.MeshBasicMaterial({ color: look.race === 'tiefling' || look.race === 'drow' ? eyeC : 0x15131a });
       [-1, 1].forEach(sd => { box(0.085, 0.062, 0.03, white, sd * 0.1, 0.035, 0.232, head).castShadow = false; box(0.042, 0.052, 0.02, iris, sd * 0.095, 0.033, 0.25, head).castShadow = false;
         const br = box(0.11, 0.028, 0.04, m.hair, sd * 0.1, 0.09, 0.238, head); br.rotation.z = -sd * 0.16; br.castShadow = false;
         mesh(new T.SphereGeometry(0.055, 5, 4), m.skin, sd * 0.255, 0.0, 0.0, head).scale.set(0.5, 1, 0.8); });                        // ears
@@ -70,13 +72,17 @@
     const cap = (mat, r) => mesh(new T.SphereGeometry(r || 0.3, 9, 5, 0, Math.PI * 2, 0, Math.PI * 0.55), mat, 0, 0.01, 0, head);
     if (cls === 'fighter') { cap(m.armor, 0.31); box(0.06, 0.26, 0.06, m.armor, 0, 0, 0.28, head); box(0.07, 0.24, 0.36, m.cloth, 0, 0.38, -0.04, head); }
     if (cls === 'rogue') { cap(m.cloth, 0.31); box(0.46, 0.44, 0.14, m.cloth, 0, -0.08, -0.22, head); box(0.4, 0.15, 0.1, m.armor2, 0, -0.12, 0.2, head); const tip = mesh(new T.ConeGeometry(0.12, 0.3, 5), m.cloth, 0, 0.3, -0.12, head); tip.rotation.x = -0.9; }
-    if (cls === 'sorcerer') { cap(m.hair, 0.29); box(0.42, 0.55, 0.12, m.hair, 0, -0.2, -0.22, head); for (let i = 0; i < 5; i++) { const a = -1 + i * 0.5; mesh(new T.ConeGeometry(0.045, i === 2 ? 0.26 : 0.18, 4), m.trim, Math.sin(a) * 0.24, 0.3, Math.cos(a) * 0.2, head); } }
+    if (rcls === 'warlock') { mesh(new T.SphereGeometry(0.34, 9, 6, 0, Math.PI * 2, 0, Math.PI * 0.62), m.cloth, 0, 0.02, -0.04, head).rotation.x = -0.3; box(0.5, 0.5, 0.14, m.cloth, 0, -0.12, -0.24, head); mesh(new T.ConeGeometry(0.1, 0.3, 5), m.cloth, 0, 0.3, -0.2, head).rotation.x = -1.1; [-1, 1].forEach(sd => { const e = new T.Mesh(new T.SphereGeometry(0.03, 5, 4), new T.MeshBasicMaterial({ color: 0x8aff9a })); e.position.set(sd * 0.095, 0.033, 0.262); head.add(e); }); }
+    else if (cls === 'sorcerer') { cap(m.hair, 0.29); box(0.42, 0.55, 0.12, m.hair, 0, -0.2, -0.22, head); for (let i = 0; i < 5; i++) { const a = -1 + i * 0.5; mesh(new T.ConeGeometry(0.045, i === 2 ? 0.26 : 0.18, 4), m.trim, Math.sin(a) * 0.24, 0.3, Math.cos(a) * 0.2, head); } }
     if (cls === 'cleric') {
       cap(m.cloth, 0.31); box(0.46, 0.46, 0.14, m.cloth, 0, -0.1, -0.22, head);
+      if (rcls === 'druid') { [-1, 1].forEach(sd => { const a = new T.Group(); a.position.set(sd * 0.16, 0.26, 0); a.rotation.z = -sd * 0.5; head.add(a); const horn = new T.MeshLambertMaterial({ color: 0xd8c8a0, flatShading: true }); mesh(new T.CylinderGeometry(0.022, 0.035, 0.34, 5), horn, 0, 0.16, 0, a); const t1 = mesh(new T.CylinderGeometry(0.015, 0.022, 0.18, 4), horn, sd * 0.06, 0.24, 0, a); t1.rotation.z = -sd * 0.8; const t2 = mesh(new T.CylinderGeometry(0.015, 0.02, 0.14, 4), horn, -sd * 0.04, 0.3, 0.03, a); t2.rotation.z = sd * 0.6; }); const leaf = new T.MeshLambertMaterial({ color: 0x4f7a34, flatShading: true }); [-1, 1].forEach(sd => [0, 1, 2].forEach(k => { const l = mesh(new T.ConeGeometry(0.11, 0.26, 4), leaf, sd * (w / 2 + 0.02 + k * 0.05), 0.68 - k * 0.05, (k - 1) * 0.12, torso); l.rotation.z = sd * (1.2 + k * 0.2); })); }
+      else {
       const halo = new T.Mesh(new T.TorusGeometry(0.27, 0.03, 6, 18), new T.MeshBasicMaterial({ color: 0xffe08a })); halo.rotation.x = Math.PI / 2; halo.position.y = 0.48; head.add(halo);
       glows.push(gfx.glow(0xffc860, 1.1, 0, 0.48, 0, head, 0.45));
+      }
     }
-    if (look.race === 'elf') [-1, 1].forEach(sd => { const e = mesh(new T.ConeGeometry(0.06, 0.26, 4), m.skin, sd * 0.27, 0.06, -0.02, head); e.rotation.z = -sd * 0.9; });
+    if (look.race === 'elf' || look.race === 'drow') [-1, 1].forEach(sd => { const e = mesh(new T.ConeGeometry(0.06, 0.26, 4), m.skin, sd * 0.27, 0.06, -0.02, head); e.rotation.z = -sd * 0.9; });
     if (look.race === 'tiefling') [-1, 1].forEach(sd => { const e = mesh(new T.ConeGeometry(0.07, 0.38, 5), m.dark, sd * 0.17, 0.3, 0.06, head); e.rotation.x = -0.6; e.rotation.z = -sd * 0.35; });
     if (look.race === 'halforc') [-1, 1].forEach(sd => mesh(new T.ConeGeometry(0.035, 0.12, 4), new T.MeshLambertMaterial({ color: 0xf2ead8 }), sd * 0.09, -0.12, 0.23, head));
     if (look.race === 'dwarf') box(0.34, 0.32, 0.16, m.hair, 0, -0.24, 0.17, head);
@@ -175,7 +181,7 @@
     // what you wear changes your outline, not only your colours
     if (G.kitModel && look.kit) G.kitModel(look.kit, { torso, head, armL, armR, foreL, foreR, legL, legR, m, w, cls, box, mesh, M, robed });
     if (look.race === 'tiefling' && look.kit !== 'ashcloak') { let par = torso, y = 0.02, z = -0.22; for (let i = 0; i < 5; i++) { const sg = new T.Group(); sg.position.set(0, y, z); sg.rotation.x = i ? 0.42 : 0.9; par.add(sg); box(0.09 - i * 0.012, 0.09 - i * 0.012, 0.24, m.skin, 0, 0, -0.1, sg); par = sg; y = 0; z = -0.22; } mesh(new T.ConeGeometry(0.07, 0.16, 4), m.dark, 0, 0, -0.26, par).rotation.x = -Math.PI / 2; }
-    const sc = (look.scale || 1) * race.scale, wide = { dwarf: 1.16, halforc: 1.09, elf: 0.93 }[look.race] || 1;
+    const sc = (look.scale || 1) * race.scale, wide = { dwarf: 1.16, halforc: 1.09, elf: 0.93, drow: 0.94 }[look.race] || 1;
     root.scale.set(sc * wide, sc, sc * (look.race === 'elf' ? 0.96 : wide));
     root.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; } });
 

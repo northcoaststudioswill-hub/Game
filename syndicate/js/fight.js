@@ -215,7 +215,7 @@
   // ------------------------------------------------------------------ floor marks: scorches, cracks and holy afterglow
   let marks = [], markN = 0, camKx = 0, camKz = 0, slowT = 0;
   // posture: every blow wears it down; when it goes, you reel and take the next one clean
-  const POISE = { fighter: 120, cleric: 110, rogue: 85, sorcerer: 88 };
+  const POISE = { fighter: 120, cleric: 110, rogue: 85, sorcerer: 88, druid: 104, warlock: 86 };
   function initPoise() { [P, E].forEach(e => { if (!e || e.maxPoise) return; e.maxPoise = POISE[e.cls] * (e.boss ? 1.3 : 1) + (e.d.poise || 0); e.poise = e.maxPoise; e.poiseT = 0; e.d.speed *= 0.92; }); }
   const counted = () => phase === 'fight' && !F.ex && !opp.spar && G.deeds;
   function poiseHit(e, v, by) {
@@ -254,7 +254,7 @@
   // ------------------------------------------------------------------ blood, parries, mortal blows, the Second
   const gore = () => !G.state || G.state.gore !== false;
   function blood(x, y, n, dir) { if (!gore()) return spark(x, y, 30, '#c01818', Math.ceil(n / 3), 120); gfx.blood(x / S, 1.0, y / S, n, 4.6, dir); }
-  const PARRY = { fighter: [0.30, 'SHIELD BLOCK'], rogue: [0.20, 'RIPOSTE'], sorcerer: [0.27, 'SHIELD'], cleric: [0.26, 'WARDING FLARE'] };
+  const PARRY = { fighter: [0.30, 'SHIELD BLOCK'], rogue: [0.20, 'RIPOSTE'], sorcerer: [0.27, 'SHIELD'], cleric: [0.26, 'WARDING FLARE'], druid: [0.26, 'WARDING FLARE'], warlock: [0.27, 'SHIELD'] };
   function parryWindow(e) { return PARRY[e.cls][0] + (e.d.parry || 0) + Math.max(0, G.mod(e.stats.dex)) * 0.008; }
   // Each class answers a parried blow its own way.
   function parried(att, tgt, ab, o) {
@@ -308,7 +308,7 @@
     const m = M, e = m.e, cls = P.cls, def = m.def, k = m.k, IMP = def.imp || 1.2, cast = def.cast != null ? def.cast : (cls === 'sorcerer' || cls === 'cleric'); m.t += dt;
     const once = (key, tt, fn) => { if (m.t >= tt && !m.f[key]) { m.f[key] = 1; fn(); } };
     const every = (key, t0, t1, step, fn) => { for (let i = 0, tt = t0; tt < t1; i++, tt += step) once(key + i, tt, () => fn(i)); };
-    const col = def.col || { fighter: '#ffd36b', rogue: '#c79bff', sorcerer: '#8aff5a', cleric: '#fff0a0' }[cls];
+    const col = def.col || { fighter: '#ffd36b', rogue: '#c79bff', sorcerer: '#8aff5a', cleric: '#fff0a0', druid: '#8fe07a', warlock: '#b070ff' }[cls];
     if (m.t < IMP) { P.state = 'wind'; P.act = { ab: cast ? { type: 'aoe', at: 'target', color: col, wind: IMP } : A[P.basic], step: 2, fin: 1, total: IMP, aim: m.a }; P.t = IMP - m.t; P.aim = m.a; }
     else if (m.t < IMP + 0.45 && !cast) { P.state = 'recover'; P.t = Math.max(0.01, IMP + 0.45 - m.t); }
     else { P.state = 'idle'; P.act = null; }
@@ -577,6 +577,7 @@
         if (k === 'shield') { e.shield = b[1] + (ab.shieldLvl || 0) * e.level; e.buffs.shield = { t: b[0] }; }
         else setBuff(e, k, b[0], b[1]);
       });
+      if (ab.form && G.forms) G.forms.start(e, ab.form, ab);
       if (ab.heal) heal(e, G.roll(ab.heal) + G.mod(e.stats[ab.healStat]) + (ab.healLvl || 0) * e.level);
       else if (ab.type === 'buff') { G.sfx(ab.radiant ? 'holy' : 'buff'); spark(e.x, e.y, 30, ab.color, 16, 150); }
       if (ab.refresh) { e.cds = {}; e.cds[act.id] = ab.cd; }
@@ -605,7 +606,7 @@
       if (s.dice) { s.tick -= dt; if (s.tick <= 0) { s.tick += 0.5; const v = Math.max(1, Math.round(G.roll(s.dice) * (s.by ? s.by.d.dmgMul : 1))); e.hp -= v; if (s.by) s.by.dmgDealt += v; text(e, '' + v, k === 'poison' ? '#9be35a' : '#ff9a3c'); if (e.hp <= 0) { ko(e); return; } } }
       if (s.t <= 0) delete e.st[k];
     }
-    for (const k in e.buffs) { e.buffs[k].t -= dt; if (e.buffs[k].t <= 0) { delete e.buffs[k]; if (k === 'shield') e.shield = 0; } }
+    for (const k in e.buffs) { e.buffs[k].t -= dt; if (e.buffs[k].t <= 0) { delete e.buffs[k]; if (k === 'shield') e.shield = 0; if (k === 'form' && G.forms) G.forms.end(e); } }
     if (e.buffs.aura) {
       e.auraT -= dt;
       if (e.auraT <= 0) {
