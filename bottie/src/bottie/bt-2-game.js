@@ -289,7 +289,7 @@ function landSpawn(s){s.z=0;let t=s.tgt;
 function foesUpdate(dt){
  for(const f of L.foes){if(f.dead||f.type==='gen')continue;f.mv=0;
   if(f.frz>0){f.frz-=dt;continue}
-  if(f.type==='opp'){f.cd-=dt;if(f.cd<=0&&!(L.fire>0)){let v=null,bd=54;for(const s of L.spawns)if(s.st!=='fly'&&s.st!=='zip'){const d=Math.hypot(s.x-f.x,s.y-(f.y-6));if(d<bd){bd=d;v=s}}
+  if(f.type==='opp'){f.cd-=dt;if(f.cd<=0&&!(L.fire>0)){let v=null,bd=54;for(const s of L.spawns)if(s.st!=='fly'&&s.st!=='zip'){const d=Math.hypot(s.x-f.x,s.y-(f.y-6));if(d<bd&&sees(f.x,f.y-6,s.x,s.y-3)){bd=d;v=s}}
     if(v){L.fx.push({k:'z',x:f.x,y:f.y-10,x2:v.x,y2:v.y-3,t:.14});killSpawn(v);f.cd=1.0}else f.cd=.2}
    if(f.workers>0)continue;wander(f,dt,5);continue}
   if(f.npc){npcUpdate(f,dt);continue}
@@ -311,6 +311,8 @@ function npcUpdate(f,dt){
  f.walk+=dt;f.t-=dt;if(f.t>0)return;f.t=R(2,4);let best=null,bd=240;
  for(const d of L.devs)if(!d.owned&&!L.foes.some(o=>o!==f&&o.npc&&o.tgt===d)){const dd=Math.hypot(d.x-f.x,d.y-f.y);if(dd<bd){bd=dd;best=d}}
  if(best){const st=tileOf(f),p=bfs(st[0],st[1],(x,y)=>Math.abs(x-best.tx)+Math.abs(y-best.ty)===1);if(p){f.path=p;f.pi=0;f.st='npcgo';f.tgt=best;if(!L.saidArmy){L.saidArmy=1;toast('YOUR NPCS WORK FOR YOU NOW',3)}}}}
+/* opp bots cannot zap through walls or a standing firewall */
+function sees(x1,y1,x2,y2){const n=Math.ceil(Math.hypot(x2-x1,y2-y1)/6);for(let i=1;i<n;i++){const tx=Math.floor((x1+(x2-x1)*i/n)/TS),ty=Math.floor((y1+(y2-y1)*i/n)/TS);if(tx<0||ty<0||tx>=L.w||ty>=L.h)return false;if(L.t[ty*L.w+tx]===2||L.fws.some(w=>!w.dead&&w.tx===tx&&w.ty===ty))return false}return true}
 function walkPath(f,dt,sp){if(!f.path||f.pi>=f.path.length)return true;const p=f.path[f.pi],dx=p[0]-f.x,dy=p[1]-f.y,d=Math.hypot(dx,dy);if(d<1.5){f.pi++;return f.pi>=f.path.length}
  const st=Math.min(d,sp*dt);f.x+=dx/d*st;f.y+=dy/d*st;if(Math.abs(dx)>.5)f.dir=dx>0?1:-1;f.walk+=dt*8;f.mv=1;return false}
 function wander(f,dt,rng,startOnly){if(startOnly||!f.path||f.pi>=f.path.length){if(!startOnly){f.t-=dt;if(f.t>0)return}

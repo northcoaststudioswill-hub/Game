@@ -13,6 +13,8 @@ music video.
 - Shots follow the lyrics: the boot sequence, HUNDRED DEGREES, the rooftop, cloud stomping, the chain, six
   continents, 24/7, the captcha, data rain, CTRL ALT DELETE, and three of Will's reference photos (the rooftop with
   the jets, the fence, the highway at 03:14:22 AM).
+- Game fix found while testing: opp bots could zap spawns through a wall or a standing firewall. They now need a
+  clear line of sight.
 - Timing: tempo, kicks and drum drop-outs are measured; verse 2's line times are measured; the rest is placed from
   the song's structure and may be a bar or two off. See `video/README.md`.
 
