@@ -22,7 +22,7 @@
   W.hubLife = function (s, obstacles) {
     const iron = L(0x1c1a1e), woodD = L(0x3a2616), wood = L(0x5a3c24);
     // ---- the Wisp Table: Mark's dice booth, east side
-    const BX = 27.5, BZ = 5.4, booth = new T.Group(); booth.position.set(BX, 0, BZ); s.add(booth);
+    const BX = 30.9, BZ = 6.2, booth = new T.Group(); booth.position.set(BX, 0, BZ); s.add(booth);
     box(3.6, 0.04, 3.4, L(0x143a2c), -0.3, 0.02, 0, booth).castShadow = false; box(3.2, 0.045, 3.0, L(0x1f5a3a), -0.3, 0.02, 0, booth).castShadow = false;
     box(0.7, 1.0, 2.6, woodD, 0.2, 0.5, 0, booth); box(0.85, 0.08, 2.75, L(0x1f5a3a), 0.2, 1.04, 0, booth); box(0.9, 0.05, 2.8, L(0xd9a93c), 0.2, 0.98, 0, booth);
     box(1.0, 1.0, 0.5, woodD, -0.3, 0.5, -1.3, booth); box(1.0, 1.0, 0.5, woodD, -0.3, 0.5, 1.3, booth); box(1.1, 0.08, 0.6, L(0x1f5a3a), -0.3, 1.04, -1.3, booth); box(1.1, 0.08, 0.6, L(0x1f5a3a), -0.3, 1.04, 1.3, booth);
@@ -44,9 +44,9 @@
     const arg = [npc(s, { cls: 'rogue', race: 'human', tint: { cloth: '#6a5a3a', armor: '#4a4438' } }, 22.9, 0.3, 0.3), npc(s, { cls: 'sorcerer', race: 'dwarf', tint: { cloth: '#3a5a3a', armor: '#3a4038' } }, 23.2, 1.3, -2.8)];
     obstacles.push([2.9, 0.2, 3.5, 0.8], [6.5, 0.2, 7.1, 0.8], [22.6, 0, 23.5, 1.6]);
     // ---- a busker by the First Lamp, hat on the ground
-    const busk = npc(s, { cls: 'rogue', race: 'elf', tint: { cloth: '#7a3a5a', armor: '#4a2a40', hair: '#f0c95a' } }, 17.9, 11.3, 2.2);
-    mesh(new T.CylinderGeometry(0.22, 0.16, 0.12, 8), L(0x2a2228), 18.5, 0.06, 12.0, s); for (let i = 0; i < 4; i++) mesh(new T.CylinderGeometry(0.05, 0.05, 0.02, 6), new T.MeshPhongMaterial({ color: 0xf0c95a, shininess: 90 }), 18.45 + i * 0.04, 0.13, 11.97 + (i % 2) * 0.06, s).castShadow = false;
-    obstacles.push([17.6, 11.0, 18.2, 11.6]);
+    const busk = npc(s, { cls: 'rogue', race: 'elf', tint: { cloth: '#7a3a5a', armor: '#4a2a40', hair: '#f0c95a' } }, 18.4, 12.6, 2.2);
+    mesh(new T.CylinderGeometry(0.22, 0.16, 0.12, 8), L(0x2a2228), 19.0, 0.06, 13.3, s); for (let i = 0; i < 4; i++) mesh(new T.CylinderGeometry(0.05, 0.05, 0.02, 6), new T.MeshPhongMaterial({ color: 0xf0c95a, shininess: 90 }), 18.95 + i * 0.04, 0.13, 13.27 + (i % 2) * 0.06, s).castShadow = false;
+    obstacles.push([18.1, 12.3, 18.7, 12.9]);
     // ---- a cat on the crates by the notice board
     const cat = new T.Group(); cat.position.set(12.6, 0.85, -0.7); cat.rotation.y = 0.7; s.add(cat);
     const fur = L(0x1a1618); box(0.34, 0.2, 0.18, fur, 0, 0.1, 0, cat); box(0.16, 0.16, 0.16, fur, 0.22, 0.2, 0, cat); [-0.05, 0.05].forEach(z => mesh(new T.ConeGeometry(0.035, 0.08, 3), fur, 0.24, 0.32, z, cat));
@@ -58,7 +58,7 @@
       for (let i = 0; i < n; i++) { if (Math.random() < 0.2) continue; const u = (i + 0.5) / n, g = new T.Group(); g.position.set(x1 + dx * u, y, z1 + dz * u); g.rotation.y = -Math.atan2(dz, dx); s.add(g); const h = R(0.5, 0.95), c = new T.Mesh(new T.PlaneGeometry(len / n * 0.8, h), new T.MeshLambertMaterial({ color: G.pick([0x8a7a6a, 0x6a4a4a, 0x4a5a6a, 0x9a9080, 0x5a4a6a, 0x6a6a4a]), side: T.DoubleSide })); c.position.y = -h / 2; g.add(c); cloths.push([g, R(0, 6)]); } };
     line(-1.3, 4.6, -1.3, 7.6, 4.7); line(-1.3, 11, -1.3, 13.6, 4.5); line(8.8, -1.3, 11.6, -1.3, 4.7); line(26.6, -1.3, 28.8, -1.3, 5.0);
     // ---- rats along the walls
-    const ratM = L(0x3a3436), rats = [[[1, -0.5], [9, -0.45]], [[18, -0.55], [23, -0.5]], [[-0.4, 5.5], [-0.35, 8]], [[-0.4, 11], [-0.35, 16.5]], [[20, 17.3], [28, 17.3]]].map(p => {
+    const ratM = L(0x3a3436), rats = [[[1, -0.5], [9, -0.45]], [[18, -0.55], [23, -0.5]], [[-0.4, 5.5], [-0.35, 8]], [[-0.4, 11], [-0.35, 16.5]], [[20, 21.3], [31, 21.3]]].map(p => {
       const g = new T.Group(); mesh(new T.SphereGeometry(0.09, 6, 4), ratM, 0, 0.07, 0, g).scale.set(1, 0.8, 1.7); mesh(new T.SphereGeometry(0.05, 5, 4), ratM, 0, 0.08, 0.15, g); const t = box(0.015, 0.015, 0.2, L(0x8a6a6a), 0, 0.05, -0.22, g); t.castShadow = false; s.add(g);
       return { g, a: p[0], b: p[1], u: Math.random(), dir: 1, wait: R(0, 5) };
     });
@@ -87,17 +87,17 @@
     const ARG = ['Three to one! On GRUBB!', 'You are robbing me.', 'Mark said it was a sure thing.', 'Mark says everything is a sure thing.', 'I had it. I HAD it.'];
     let argT = 5, last = 0;
     // ---- the rest of the Undercity, falling away below the market: roofs, windows and far lamps in the dark
-    { const under = s.children.find(c => c.isMesh && c.geometry.type === 'PlaneGeometry' && c.geometry.parameters.width === 200); if (under) { under.scale.set(34 / 200, 22 / 200, 1); under.position.set(14.5, -0.3, 8.5); } }       // let the dark below the market show
+    { const under = s.children.find(c => c.isMesh && c.geometry.type === 'PlaneGeometry' && c.geometry.parameters.width === 200); if (under) { under.scale.set(38 / 200, 26 / 200, 1); under.position.set(16.5, -0.3, 10.5); } }       // let the dark below the market show
     { const N = 90, bm = new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), new T.MeshLambertMaterial({ flatShading: true }), N), wm = new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), new T.MeshBasicMaterial(), N * 3), d = new T.Object3D(), col = new T.Color(); let wi = 0;
-      for (let i = 0; i < N; i++) { const south = i % 2 === 0, out = 2.2 + Math.pow(Math.random(), 0.8) * 20, along = R(-10, 44), w = R(2, 5.5), dp = R(2, 5), top = -1.6 - out * 0.55 - R(0, 2.5), h = 9;
-        const x = south ? along : 31 + out, z = south ? 19 + out : along;
+      for (let i = 0; i < N; i++) { const south = i % 2 === 0, out = 2.2 + Math.pow(Math.random(), 0.8) * 20, along = R(-10, 48), w = R(2, 5.5), dp = R(2, 5), top = -1.6 - out * 0.55 - R(0, 2.5), h = 9;
+        const x = south ? along : 35 + out, z = south ? 23 + out : along;
         d.position.set(x, top - h / 2, z); d.scale.set(south ? w : dp, h, south ? dp : w); d.rotation.set(0, R(-0.08, 0.08), 0); d.updateMatrix(); bm.setMatrixAt(i, d.matrix); col.setHSL(R(0.66, 0.78), 0.2, R(0.09, 0.16)); bm.setColorAt(i, col);
         for (let k = 0; k < 3; k++) { if (Math.random() < 0.3) continue; const onX = Math.random() < 0.5, wc = [0xffc070, 0xffb060, 0xc080ff, 0x80d0ff, 0x9aff8a, 0xffe0a0][Math.floor(Math.random() * 6)];
           d.rotation.set(0, 0, 0); d.scale.set(onX ? 0.06 : 0.28, 0.4, onX ? 0.28 : 0.06); d.position.set(x + (onX ? (south ? w : dp) / 2 + 0.03 : R(-1, 1) * (south ? w : dp) * 0.35), top - R(0.5, 2.6), z + (onX ? R(-1, 1) * (south ? dp : w) * 0.35 : (south ? dp : w) / 2 + 0.03)); d.updateMatrix(); wm.setMatrixAt(wi, d.matrix); col.set(wc).multiplyScalar(Math.max(0.25, 1 - out / 26)); wm.setColorAt(wi, col); wi++; } }
       wm.count = wi; bm.castShadow = false; bm.receiveShadow = false; s.add(bm, wm);
-      for (let i = 0; i < 9; i++) { const south = i % 2 === 0, out = R(4, 18), x = south ? R(-4, 36) : 31 + out, z = south ? 19 + out : R(-4, 22); gfx.glow([0xffb060, 0xc080ff, 0x80d0ff][i % 3], R(2.5, 5), x, -1.5 - out * 0.5, z, s, R(0.12, 0.28)); }
+      for (let i = 0; i < 9; i++) { const south = i % 2 === 0, out = R(4, 18), x = south ? R(-4, 40) : 35 + out, z = south ? 23 + out : R(-4, 26); gfx.glow([0xffb060, 0xc080ff, 0x80d0ff][i % 3], R(2.5, 5), x, -1.5 - out * 0.5, z, s, R(0.12, 0.28)); }
       // light falling from the First Lamp and the Wisp Table
-      [[14, 9, 0xffd8a0, 3.4, 0.05], [27.5, 5.4, 0x8af0ff, 2.2, 0.04]].forEach(q => { const m = new T.Mesh(new T.ConeGeometry(q[3], 9, 14, 1, true), new T.MeshBasicMaterial({ color: q[2], transparent: true, opacity: q[4], blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide })); m.position.set(q[0], 4.6, q[1]); s.add(m); }); }
+      [[14, 9, 0xffd8a0, 3.4, 0.05], [30.9, 6.2, 0x8af0ff, 2.2, 0.04]].forEach(q => { const m = new T.Mesh(new T.ConeGeometry(q[3], 9, 14, 1, true), new T.MeshBasicMaterial({ color: q[2], transparent: true, opacity: q[4], blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide })); m.position.set(q[0], 4.6, q[1]); s.add(m); }); }
     return function (t) {
       const dt = Math.min(0.05, Math.max(0.001, t - last)); last = t;
       dice.forEach((d, i) => { d.rotation.set(t * (0.5 + i * 0.07), t * (0.8 + i * 0.05), 0); if (i < 5) d.position.y = 1.55 + Math.sin(t * 1.6 + i * 1.2) * 0.07; });
@@ -107,7 +107,7 @@
       wardens.forEach((c, i) => c.pose({ t: t + i * 3.1, act: 'idle' })); wardT -= dt; if (wardT <= 0 && G.scene === 'hub' && !G.ui.isOpen() && !G.talk) { wardT = R(14, 24); const w = wardens[Math.random() < 0.5 ? 0 : 1].root.position; gfx.floatText(w.x, 2.7, w.z, WARD[Math.floor(Math.random() * WARD.length)], '#e8e4f8'); }
       if (Math.random() < 0.06) gfx.emit(-1.1, R(0.4, 3), 14.5 + R(-1, 1), R(0.2, 0.6), R(-0.1, 0.2), 0, 1.6, 0xdfe6ff, 0);
       busk.pose({ t, act: 'cast', prog: 0.2 + Math.abs(Math.sin(t * 2.2)) * 0.25 });
-      if (Math.random() < 0.05) gfx.emit(17.9 + R(-0.3, 0.3), 1.6, 11.3 + R(-0.3, 0.3), R(-0.3, 0.3), R(0.6, 1.0), R(-0.3, 0.3), 1.6, NOTES[Math.floor(Math.random() * 4)], 0);
+      if (Math.random() < 0.05) gfx.emit(18.4 + R(-0.3, 0.3), 1.6, 12.6 + R(-0.3, 0.3), R(-0.3, 0.3), R(0.6, 1.0), R(-0.3, 0.3), 1.6, NOTES[Math.floor(Math.random() * 4)], 0);
       tail.rotation.y = Math.sin(t * 1.4) * 0.7; cat.rotation.y = 0.7 + Math.sin(t * 0.23) * 0.15;
       cloths.forEach(c => { c[0].rotation.x = Math.sin(t * 1.1 + c[1]) * 0.12; });
       rats.forEach(r => { if (r.wait > 0) { r.wait -= dt; return; } r.u += r.dir * dt * 0.35; if (r.u > 1 || r.u < 0) { r.u = Math.max(0, Math.min(1, r.u)); r.dir *= -1; r.wait = R(1, 7); } r.g.position.set(r.a[0] + (r.b[0] - r.a[0]) * r.u, 0, r.a[1] + (r.b[1] - r.a[1]) * r.u); r.g.rotation.y = Math.atan2((r.b[0] - r.a[0]) * r.dir, (r.b[1] - r.a[1]) * r.dir); });

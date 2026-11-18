@@ -82,7 +82,7 @@
     if (e.state === 'ko') { act = 'ko'; prog = e.koT; }
     else if (e.down > 0) { act = 'ko'; prog = Math.min(e.downT - e.down, e.down) * 1.7; }
     else if (e.st.stun) act = e.st.broken ? 'kneel' : 'stun';
-    else if (e.state === 'dodge') { act = 'dodge'; prog = 1 - e.t / 0.3; }
+    else if (e.state === 'dodge') { act = 'dodge'; prog = 1 - e.t / 0.22; }
     else if (e.act) {
       const ab = e.act.ab, melee = ab.type === 'melee' && !ab.spell;
       if (e.state === 'wind') { prog = 1 - e.t / (e.act.total || ab.wind || 0.01); act = melee ? 'swing' : 'cast'; if (melee) prog *= 0.5; glow = ab.color; }
@@ -627,7 +627,7 @@
     else if (e.state === 'dodge') {
       e.t -= dt; e.x += Math.cos(e.da) * (e.dSpd || 560) * dt; e.y += Math.sin(e.da) * (e.dSpd || 560) * dt;
       if (Math.random() < 0.5) gfx.emit(e.x / S, 0.1, e.y / S, 0, 0.5, 0, 0.3, 0x4a4038, 0);
-      if (e.t <= 0) { e.state = 'idle'; e.vx = Math.cos(e.da) * 200; e.vy = Math.sin(e.da) * 200; G.sfx('step'); fx.push({ k: 'dust', x: e.x, y: e.y, r: 46, t: 0, life: 0.35 }); }       // land, and carry some of it
+      if (e.t <= 0) { e.state = 'idle'; e.vx = Math.cos(e.da) * 110; e.vy = Math.sin(e.da) * 110; G.sfx('step'); fx.push({ k: 'dust', x: e.x, y: e.y, r: 46, t: 0, life: 0.35 }); }       // land, and carry some of it
     } else if (e.state === 'wind') {
       const ab = e.act.ab; e.t -= dt * spd;
       const pr = 1 - Math.max(0, e.t) / (ab.wind || 0.01);
@@ -650,12 +650,12 @@
         if ((e.parryCd || 0) <= 0 && e.res >= 8) { e.res -= 8; e.parryT = parryWindow(e); e.parryCd = 0.85; e.state = 'parry'; e.t = e.parryT + 0.34; e.act = null; e.buf = null; mv = 0; G.sfx('swing'); }
         else e.buf = null;
       } else if (b && b.id === 'dodge') {
-        if (e.dodgeT <= 0 && e.res < 15 && e.isPlayer && time - (e.windedT || -9) > 1.2) { e.windedT = time; text(e, 'WINDED', '#9aa3ad'); G.sfx('deny'); e.buf = null; }
-        else if (e.dodgeT <= 0 && e.res >= 15) {
+        if (e.dodgeT <= 0 && e.res < 12 && e.isPlayer && time - (e.windedT || -9) > 1.2) { e.windedT = time; text(e, 'WINDED', '#9aa3ad'); G.sfx('deny'); e.buf = null; }
+        else if (e.dodgeT <= 0 && e.res >= 12) {
           const a = (I.mx || I.my) ? Math.atan2(I.my, I.mx) : I.aim + Math.PI;
-          e.res -= 15; e.dodgeStart = time; e.perfect = 0;
-          e.dSpd = 560 * (!e.C.ranged && Math.cos(a - Math.atan2(e.foe.y - e.y, e.foe.x - e.x)) > 0.5 ? 1.3 : 1);       // melee close the gap faster
-          e.state = 'dodge'; e.t = 0.3; e.da = a; e.iframe = 0.22; e.dodgeT = e.d.dodgeCd; e.dodgeCredit = 0; e.act = null; e.buf = null; G.sfx('dodge'); mv = 0;
+          e.res -= 12; e.dodgeStart = time; e.perfect = 0;
+          e.dSpd = 430 * (!e.C.ranged && Math.cos(a - Math.atan2(e.foe.y - e.y, e.foe.x - e.x)) > 0.5 ? 1.25 : 1);       // a sidestep, not a tumble       // melee close the gap faster
+          e.state = 'dodge'; e.t = 0.22; e.da = a; e.iframe = 0.17; e.dodgeT = e.d.dodgeCd; e.dodgeCredit = 0; e.act = null; e.buf = null; G.sfx('dodge'); mv = 0;
         }
       } else if (e.state === 'idle') {
         if (b && b.id === 'potion') { usePotion(e); e.buf = null; }

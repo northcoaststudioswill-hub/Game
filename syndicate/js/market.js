@@ -1,5 +1,4 @@
-// Guttercrown — the market works for a living: the stalls sell things for the next bout, the busker and the beggars' fire do something,
-// and awnings fade when you walk up so you can see who is under them
+// Guttercrown — the market works for a living: the stalls sell things for the next bout, and the busker and the beggars' fire do something
 (function () {
   const G = window.G, T = THREE, gfx = G.gfx, W = G.world, ui = G.ui, show = (h, c) => ui._show(h, c), on = (s, f) => ui._on(s, f);
   const bouts = st => Object.keys(st.wins).reduce((n, k) => n + st.wins[k], 0) + (st.losses || 0);
@@ -96,24 +95,19 @@
     const p = document.createElement('p'); p.className = 'dim'; p.innerHTML = l.length ? 'Going in with: <b>' + l.join(', ') + '</b>.' : 'Nothing eaten, nothing drunk. The stalls in the market sell an edge for the next bout.'; end.parentNode.insertBefore(p, end);
   };
 
-  // ------------------------------------------------------------ put them on the map, and let awnings fade when you are under them
+  // ------------------------------------------------------------ put them on the map
   const hub0 = W.buildHub;
   W.buildHub = function () {
     const h = hub0.apply(this, arguments), s = h.scene;
     const spots = [
-      { x: 7, z: 11.1, r: 1.3, y: 3.2, label: 'Apothecary', act: 'Buy a tonic', go: () => ui.vendor('apoth'), col: 0xc080ff },
-      { x: 10.6, z: 12.7, r: 1.3, y: 3.2, label: 'Big Hobb’s Pot', act: 'Eat', go: () => ui.vendor('cook'), col: 0xffb060 },
-      { x: 21.5, z: 11.5, r: 1.3, y: 3.2, label: 'Charms', act: 'Browse charms', go: () => ui.charms(), col: 0x80d0ff },
-      { x: 23.5, z: 9.5, r: 1.3, y: 3.2, label: 'Whisper', act: 'Buy a rumour', go: () => ui.whisper(), col: 0xff7a7a },
-      { x: 18.9, z: 12.4, r: 1.2, y: 3.0, label: 'Busker', act: 'Request a song', go: () => ui.busker(), col: 0xffd36b },
-      { x: 25.6, z: 14.6, r: 1.3, y: 2.6, label: 'Beggars’ Fire', act: 'Warm your hands', go: () => ui.fireside(), col: 0xff8a30, badge: () => G.state.fireAt !== bouts(G.state) }
+      { x: 6.5, z: 13.9, r: 1.3, y: 3.2, label: 'Apothecary', act: 'Buy a tonic', go: () => ui.vendor('apoth'), col: 0xc080ff },
+      { x: 11.8, z: 16.1, r: 1.3, y: 3.2, label: 'Big Hobb’s Pot', act: 'Eat', go: () => ui.vendor('cook'), col: 0xffb060 },
+      { x: 21.5, z: 15.3, r: 1.3, y: 3.2, label: 'Charms', act: 'Browse charms', go: () => ui.charms(), col: 0x80d0ff },
+      { x: 27.3, z: 12.2, r: 1.3, y: 3.2, label: 'Whisper', act: 'Buy a rumour', go: () => ui.whisper(), col: 0xff7a7a },
+      { x: 19.5, z: 13.8, r: 1.2, y: 3.0, label: 'Busker', act: 'Request a song', go: () => ui.busker(), col: 0xffd36b },
+      { x: 29.2, z: 17.6, r: 1.3, y: 2.6, label: 'Beggars’ Fire', act: 'Warm your hands', go: () => ui.fireside(), col: 0xff8a30, badge: () => G.state.fireAt !== bouts(G.state) }
     ].filter(q => !h.blocked(q.x, q.z));
     spots.forEach(q => { h.spots.push(q); const r = new T.Mesh(new T.RingGeometry(0.5, 0.62, 24), new T.MeshBasicMaterial({ color: q.col, transparent: true, opacity: 0.45, depthWrite: false })); r.rotation.x = -Math.PI / 2; r.position.set(q.x, 0.03, q.z); s.add(r); });
-    // awnings: every flat canopy becomes see-through when you stand near it
-    const roofs = [];
-    s.traverse(o => { if (!o.isMesh || !o.geometry || o.geometry.type !== 'BoxGeometry') return; const p = o.geometry.parameters; if (p.height > 0.12 || p.width < 2.7 || p.depth < 1.6 || o.position.y < 2.2) return; o.material = o.material.clone(); o.material.transparent = true; o.castShadow = false; const wp = new T.Vector3(); o.getWorldPosition(wp); roofs.push({ m: o.material, x: wp.x, z: wp.z, a: 1 }); });
-    const up0 = h.update;
-    h.update = function (t) { up0.apply(this, arguments); const w = W.walker; for (const r of roofs) { const near = Math.hypot(w.x - r.x, w.z - r.z) < 4.2 || (G.talk && Math.hypot(G.talk.o.npc[0] - r.x, G.talk.o.npc[1] - r.z) < 3); r.a += ((near ? 0.14 : 0.92) - r.a) * 0.12; r.m.opacity = r.a; } };
     return h;
   };
   // sorcerers come with their close-range answer now, old saves included

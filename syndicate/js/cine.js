@@ -85,7 +85,7 @@
       // the underworld at work: Mark's table, the dice of light, and the Wardens taking the Crown's tenth
       {
         dur: 4.8, cut: true, text: 'Dice. Coin. Unsealed steel. Whatever is forbidden above is for sale beneath one lamp.',
-        update: (p, dt) => { shoot(V([22.2, 1.3, 4.6], [24.9, 1.6, 2.9], ease(p)), V([25.6, 1.5, -0.2], [27.2, 1.5, 4.2], ease(cl((p - 0.45) / 0.55))), lerp(50, 40, p), 0.05 - p * 0.1); hub().update(now, dt); }
+        update: (p, dt) => { shoot(V([22.2, 1.3, 4.6], [24.9, 1.6, 2.9], ease(p)), V([25.6, 1.5, -0.2], [28.6, 1.5, 4.6], ease(cl((p - 0.45) / 0.55))), lerp(50, 40, p), 0.05 - p * 0.1); hub().update(now, dt); }
       },
       {
         dur: 4.4, cut: true, text: 'At the foot of the Long Stair, the throne’s Wardens count their tenth, and look away.',

@@ -202,7 +202,7 @@
       if (cape) cape.rotation.x = J('cape', q.cape, 0.2);
       if (robe) robe.rotation.z = mv ? sw * 0.08 : 0;
       root.rotation.z = 0; root.rotation.x = 0; root.position.y = p.y || 0;
-      if (act === 'dodge') { body.rotation.x = k * Math.PI * 2; body.position.y = 0.5; legL.rotation.x = legR.rotation.x = 1.6; armR.rotation.x = armL.rotation.x = -2; cur.bx = 0.3; cur.by = 0.2; }
+      if (act === 'dodge') { const s2 = Math.sin(k * Math.PI); body.rotation.x = 0.5 * s2; body.rotation.z = 0.18 * s2; body.position.y = -0.18 * s2; legL.rotation.x = 0.95 * s2; legR.rotation.x = -0.75 * s2; armR.rotation.x = -0.9 - 0.4 * s2; armL.rotation.x = 0.4 * s2; cur.bx = 0.3; cur.by = -0.1; }       // weight drops, one long step, no tumbling
       if (act === 'ko') { const f = Math.min(1, (p.prog || 0) * 2.2), e = eo(f); body.rotation.x = -1.5 * e; body.position.y = 0.2 * e + Math.sin(f * Math.PI) * 0.25; legL.rotation.x = 0.3 * e; legR.rotation.x = -0.15 * e; armR.rotation.set(-2.6 * e, 0, -0.5 * e); armL.rotation.set(-2.4 * e, 0, 0.6 * e); head.rotation.x = -0.3 * e; }
       // sorcerer flames + cast glow
       const fl = 0.85 + Math.sin(t * 17) * 0.12;
