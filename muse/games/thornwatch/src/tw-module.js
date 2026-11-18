@@ -145,8 +145,8 @@ for(let i=0;i<6;i++)TWMENU.push({k:'s',i});
 for(let i=0;i<6;i++)TWMENU.push({k:'h',i});
 for(let i=0;i<4;i++)TWMENU.push({k:'x',i});
 /* v3.3 guide missions (info bar, Louie's voice, <=43 chars) */
-const TWGUIDE={1:'Pick a sprout!',2:'Plant by the bend!',3:'One more sprout!',
- 4:'Press START \u2014 night\'s coming!',6:'Petals earned! Grow a sprout: A'};
+const TWGUIDE={1:'Go to the gold corners. Press A!',2:'Go to the gold corners. Press A!',3:'One more! Gold corners, then A!',
+ 4:'Ready! Press START for night!',6:'Petals! Stand on a sprout, press A!'};
 let TWTitleSel=0,TWHOW=null;
 const TWWARN={1:['',
  'WOOF! Slow drones! Plant by the bends!',
@@ -770,31 +770,7 @@ function twDrip(d,x,y){ /* money from pops: every 20 damage dealt pays 1 petal *
 /* ---- building: one cursor, one shop strip, anytime ---- */
 function twSelRange(){const e=TWMENU[TWR.sel];
  if(e.k==='s')return TWT[e.i].rng; if(e.k==='h')return TWHERO[e.i].rng*(twHasPerk('eye')?1.05:1);return 0}
-function twActA(){const t=twTowerAt(TWR.cur.x,TWR.cur.y);
- if(t){if(t.hero>=0){if(TWR.round)twAbilityA(t);
-   else if((t.hl||1)>=3)twPlantMsg(TWHERO[t.hero].name+' is FULLY TRAINED!');
-   else{TWR.train=t;TWR.trainT=0;snd(590,.05)}return}
-  if(t.lv>=3){twPlantMsg(twGrandN(t)+' - a legend!');snd(440,.06);return}
-  TWR.fork=t;TWR.forkSel=0;TWR.forkT=0;snd(590,.05);return}
- const e=TWMENU[TWR.sel];
- if(e.k==='x'){twPlantMsg(TWLOCK[e.i].name+' has not joined the watch. Yet.');snd(160,.07);return}
- if(e.k==='h'&&TWR.towers.some(x=>x.hero===e.i)){twPlantMsg(TWHERO[e.i].name+' is already in the garden!');snd(160,.07);return}
- if(!twSpotOK(TWR.cur.x,TWR.cur.y)){twPlantMsg("WOOF! Can't plant there!");TWR.shake=Math.max(TWR.shake,1.5);snd(160,.07);return}
- if(e.k==='h'){const hd=TWHERO[e.i];
-  if(TWR.petals<twHeroCost(e.i)){twPlantMsg('Not enough petals for '+hd.name+'!');snd(160,.07);return}
-  TWR.petals-=twHeroCost(e.i);
-  TWR.towers.push({hero:e.i,type:-1,lv:1,variant:0,cdT:0,abT:0,hl:1,x:TWR.cur.x,y:TWR.cur.y,a:Math.random()*7});twPlanted();
-  twPlantMsg(e.i===1?'WOOF! Erin! Save the STAMPEDE for the ring!':hd.line);snd(784,.09,1175);return}
- const def=TWT[e.i];if(TWR.petals<def.cost){twPlantMsg('Not enough petals for '+TYPES[e.i].n+'!');snd(160,.07);return}
- TWR.petals-=def.cost;
- TWR.towers.push({hero:-1,type:e.i,lv:1,variant:0,cdT:0,abT:0,x:TWR.cur.x,y:TWR.cur.y,a:Math.random()*7});twPlanted();
- snd(660,.07,990)}
-function twActB(){const t=twTowerAt(TWR.cur.x,TWR.cur.y);
- if(t){const back=twRefund(t);TWR.petals+=back;TWR.towers.splice(TWR.towers.indexOf(t),1);
-  twPlantMsg('Uprooted. +'+back+' petals back.');snd(330,.07,220);return}
- if(TWR.round){TWR.speed=TWR.speed%3+1;
-  twFloat(TWR.cur.x,TWR.cur.y-14,TWR.speed===1?'1X':TWR.speed===2?'>> 2X FAST':'>>> 3X FAST','#fff8e0');
-  snd(440+TWR.speed*180,.06)}}
+/* v4: twActA / twActB / the build panel live in tw-controls.js */
 /* ---- creeps: one roster, tuned for the long path ---- */
 const TWCOMP={
  1:{1:{std:6},2:{std:9,dart:3},3:{std:10,dart:4,regrow:2},4:{std:12,bulk:4,dart:4},
@@ -853,12 +829,12 @@ function twBuildQueue(){const map=TWR.map,mode=TWR.mode,n=TWR.night,B=twCreepBas
  if(TWMAPS[map-1].paths.length>1)q.forEach((cr,i)=>{cr.pi=i%2});
  return q}
 function twSpawnGap(){return Math.max(.32,.88-.05*(TWR.night-1))*(0.9+Math.random()*.2)}
-function twStartRound(){if(TWR.round||TWR.cine||TWR.fork)return;
+function twStartRound(){if(TWR.round||TWR.cine||TWR.fork||TWR.build)return;
  if(twStoryGate('b'+TWR.map,TWR.mode!=='e'&&TWR.night===TWMAPS[TWR.map-1].nights,()=>{state='g5play';twStartRound()}))return; /* v4: the boss night opens with its scene, once */
  TWR.snap={petals:TWR.petals,heart:TWR.heart,kills:TWR.kills,earned:TWR.earned,leaks:TWR.leaks,nl:TWR.nl,
   towers:TWR.towers.map(t=>({hero:t.hero,type:t.type,lv:t.lv,variant:t.variant,hl:t.hl||1,x:t.x,y:t.y,a:t.a,farmMade:t.farmMade||0}))};
  if(TWR.guide===4){TWR.guide=5;TWR.g5t=0;TWR.g5shown=false}
- TWR.queue=twBuildQueue();TWR.spawnT=0;TWR.round=true;TWR.paused=false;TWR.boofUsed=false;TWR.boofN=0;TWR.nl=0;TWR.leakK={};
+ TWR.queue=twBuildQueue();twMoteReset();TWR.spawnT=0;TWR.round=true;TWR.paused=false;TWR.boofUsed=false;TWR.boofN=0;TWR.nl=0;TWR.leakK={};
  TWR.say=twWarnFor();TWR.sayT=3.2;snd(392,.12,196);
  if(TWR.towers.length&&!TWR.towers.some(t=>t.hero>=0||twDef(t).dmg>=4)){TWR.say='WOOF! TOO WEAK! PLANT SHOOTERS!';TWR.sayT=3.2}
  if(TWR.night===1&&TWR.map===1&&TWR.mode==='s'&&!TWR.openCine){TWR.openCine=true;twStartCine({kind:'open',dur:1.0,fire:null})}}
@@ -943,7 +919,8 @@ function twDawnCard(st){const sn=TWR.snap||{earned:0,kills:0};
  TWR.card={t:2.6,dawn:true,stars:st||0,title:'NIGHT '+TWR.night+' CLEAR!',sub:TWMAPS[TWR.map-1].name,go:'A: TO DAWN',
  lines:['+'+(TWR.earned-sn.earned)+' PETALS · '+(TWR.kills-sn.kills)+' POPS',
   TWR.nl===0?'NO LEAKS! THE HEART IS WHOLE':'LEAKS '+TWR.nl+' · HEART '+TWR.heart]}}
-function twRoundEnd(){TWR.round=false;const bonus=14+3*TWR.night;let leaf=0;
+function twRoundEnd(){TWR.round=false;const bonus=14+3*TWR.night-(TWR.moteFace||0);TWR.motes=[]; /* v4: loose petals already paid part of it */
+ let leaf=0;
  for(const t of TWR.towers)if(t.hero<0&&t.type===4){const d=twDef(t);leaf+=d.dawn}
  TWR.petals+=bonus+leaf;TWR.earned+=bonus+leaf;
  const hp=twHeartPos();
@@ -993,16 +970,10 @@ function twCellStep(dx,dy){const c=TWR.cur;
   if(ny===null)return false;c.y=ny;return true}
  return false}
 function twNavStep(d){
- if(TWR.focus==='strip'){
-  if(d==='left'){TWR.sel=(TWR.sel+TWMENU.length-1)%TWMENU.length;snd(590,.03);if(TWR.guide===1)TWR.guide=2}
-  else if(d==='right'){TWR.sel=(TWR.sel+1)%TWMENU.length;snd(590,.03);if(TWR.guide===1)TWR.guide=2}
-  else if(d==='up'){TWR.focus='field';snd(440,.04)}
-  return}
- if(d==='down'&&!twCellStep(0,1)){TWR.focus='strip';snd(440,.04);return}
  if(d==='left'&&twCellStep(-1,0))snd(520,.02,0,'square',.012);
  if(d==='right'&&twCellStep(1,0))snd(520,.02,0,'square',.012);
  if(d==='up'&&twCellStep(0,-1))snd(520,.02,0,'square',.012);
- if(d==='down')snd(520,.02,0,'square',.012)}
+ if(d==='down'&&twCellStep(0,1))snd(520,.02,0,'square',.012)}
 function twNav(dt){const dirs=['left','right','up','down'];let pd=null;
  for(const d of dirs)if(pressed(d))pd=d;
  if(pd){TWR.repD=pd;TWR.repT=0;TWR.repN=0;twNavStep(pd)}
@@ -1076,7 +1047,7 @@ function twRestartNight(){const s=TWR.snap;TWR.menu=null;TWR.paused=false;
  if(!s){TWR.round=false;return}
  TWR.petals=s.petals;TWR.heart=s.heart;TWR.kills=s.kills;TWR.earned=s.earned;TWR.leaks=s.leaks;TWR.nl=s.nl||0;
  TWR.towers=s.towers.map(t=>Object.assign({},t,{cdT:0,abT:0}));
- TWR.creeps=[];TWR.queue=[];TWR.shots=[];TWR.parts=[];TWR.beams=[];TWR.fx=[];TWR.pending=[];TWR.flies=[];TWR.leakK={};
+ TWR.creeps=[];TWR.queue=[];TWR.motes=[];TWR.shots=[];TWR.parts=[];TWR.beams=[];TWR.fx=[];TWR.pending=[];TWR.flies=[];TWR.leakK={};
  TWR.round=false;TWR.cine=null;TWR.fork=null;TWR.train=null;TWR.pow=null;TWR.flareT=0;TWR.rainT=0;TWR.boofUsed=false;TWR.boofN=0;TWR.drip=0;
  if(TWR.night===1&&TWR.guide===5){TWR.guide=4;TWR.g5shown=false}
  TWR.say=twWarnFor();TWR.sayT=99;snd(392,.08)}
@@ -1202,6 +1173,8 @@ function twDrawPow(){const u=TWR.pow,mw=184,mx=Math.round((W-mw)/2),mh=116,my=Ma
  text('A: FIRE · B: CLOSE',mx+8,my+mh-11,1,'#b8b0d8')}
 function twDrawTrain(iy0){const t=TWR.train,hd=TWHERO[t.hero],cost=(t.hl||1)===1?120:220;
  r('#14101e',0,iy0,W,42);r('#f8d030',0,iy0,W,1);
+ twUprootHint(t,iy0);
+ if((t.hl||1)>=3){text(hd.name,4,iy0+3,1,'#f8d030');text('FULLY TRAINED',6,iy0+15,2,'#fff8e0');text('A / B: BACK',6,iy0+29,1,'#b8b0d8');return}
  text('TRAIN '+hd.name+'?',4,iy0+3,1,'#c8c0d8');
  text('LV'+(t.hl||1)+' → LV'+((t.hl||1)+1),6,iy0+15,2,'#fff8e0');
  text(cost+'P',110,iy0+15,2,'#f8d030');
@@ -1309,11 +1282,15 @@ function twUpdate(dt){switch(state){
   if(TWR.cine){TWR.cine.t+=dt;
    if(pressed('a')||TWR.cine.t>=TWR.cine.dur){const c=TWR.cine;TWR.cine=null;if(c.fire)c.fire()}
    return}
+  if(TWR.build){twBuildInput(dt);return}
+  if(TWR.fork&&pressed('sel')){twUproot(TWR.fork);TWR.fork=null;return}
+  if(TWR.train&&pressed('sel')){twUproot(TWR.train);TWR.train=null;return}
   if(TWR.fork){TWR.forkT=(TWR.forkT||0)+dt;if(pressed('left')){TWR.forkSel=0;snd(520,.03)}
    if(pressed('right')){TWR.forkSel=1;snd(520,.03)}
    if(pressed('b')){TWR.fork=null;snd(330,.05)}
    if(pressed('a')&&(TWR.forkT||0)>=.13){const t=TWR.fork;
-    if(t.lv>=2){const gc=TWGRANDC[t.type];
+    if(t.lv>=3){TWR.fork=null;snd(330,.05)}
+    else if(t.lv>=2){const gc=TWGRANDC[t.type];
      if(TWR.petals<gc){twPlantMsg('Not enough petals!');snd(160,.07)}
      else{TWR.petals-=gc;t.lv=3;t.cdT=0;TWR.fork=null;
       twPlantMsg(twGrandN(t)+' RISES!');snd(784,.12,1568);twBurst(t.x,t.y-10,'#f8d030',14)}}
@@ -1323,8 +1300,7 @@ function twUpdate(dt){switch(state){
       twPlantMsg(TYPES[t.type].n+' became '+v.n+'!');snd(880,.08,1320);TWR.grew=true;if(TWR.guide===6)twGuideDone()}}}
    return}
   if(TWR.card){TWR.card.t-=dt;
-   if(pressed('a')||pressed('start')||TWR.card.t<=0){const cdDawn=TWR.card.dawn;TWR.card=null;
-    if(cdDawn&&pressed('start')&&!TWR.round)twStartRound()}
+   if(pressed('a')||pressed('start')||TWR.card.t<=0){TWR.card=null}
    return}
   if(TWR.pow){if(pressed('up')){TWR.pow.sel=(TWR.pow.sel+2)%3;snd(520,.03)}
    if(pressed('down')){TWR.pow.sel=(TWR.pow.sel+1)%3;snd(520,.03)}
@@ -1336,23 +1312,23 @@ function twUpdate(dt){switch(state){
   if(TWR.train){const t=TWR.train;TWR.trainT=(TWR.trainT||0)+dt;
    if(pressed('b')){TWR.train=null;snd(330,.05)}
    if(pressed('a')&&(TWR.trainT||0)>=.13){const cost=(t.hl||1)===1?120:220;
-    if(TWR.petals<cost){twPlantMsg('Not enough petals!');snd(160,.07)}
+    if((t.hl||1)>=3){TWR.train=null;snd(330,.05)}
+    else if(TWR.petals<cost){twPlantMsg('Not enough petals!');snd(160,.07)}
     else{TWR.petals-=cost;t.hl=(t.hl||1)+1;TWR.train=null;
      twPlantMsg(TWHERO[t.hero].name+' trained to LV'+t.hl+'!');snd(880,.08,1320);twBurst(t.x,t.y-14,'#f8d030',8)}}
    return}
   if(TWHOW){twHowInput();return}
   if(TWR.menu){twMenuInput();return}
-  twNav(dt);
-  if(pressed('sel')){if(TWR.round&&!TWR.fork&&!TWR.train){TWR.pow={sel:0};snd(590,.04)}
-   else{TWR.sel=(TWR.sel+1)%TWMENU.length;snd(590,.04);if(TWR.guide===1)TWR.guide=2}}
-  if(pressed('a')){if(TWR.focus==='strip'){TWR.focus='field';snd(660,.04)}else twActA()}
-  if(pressed('b')){if(TWR.focus==='strip'){TWR.focus='field';snd(330,.04)}else twActB()}
-  if(pressed('start')){if(TWR.round)twOpenMenu();else{TWR.focus='field';twStartRound()}}
+  twNav(dt);twMotes(dt);
+  if(pressed('sel')){if(TWR.round){TWR.pow={sel:0};snd(590,.04)}}
+  if(pressed('a'))twActA();
+  if(pressed('b'))twActB();
+  if(pressed('start')){if(TWR.round)twOpenMenu();else if(TWR.guide>0&&TWR.guide<4){twPlantMsg('WOOF! Two sprouts first!');snd(160,.07)}else{TWR.focus='field';twStartRound()}}
   if(TWR.guide===5&&TWR.round&&TWR.night===1){TWR.g5t+=dt;
    if(TWR.g5t>=5&&!TWR.g5shown){TWR.g5shown=true;TWR.say='B speeds time up! Try it!';TWR.sayT=2.6;snd(660,.06)}}
-  if(TWR.fork||TWR.train||TWR.pow||TWR.cine)return;
+  if(TWR.fork||TWR.train||TWR.pow||TWR.cine||TWR.build)return;
   const steps=TWR.round?TWR.speed:1;
-  for(let i=0;i<steps;i++){if(TWR.cine||state!=='g5play')break;twWorld(dt)}
+  for(let i=0;i<steps;i++){if(TWR.cine||state!=='g5play')break;twWorld(dt*TWPACE)}
   return}
  case 'g5win':if(pressed('a')||pressed('start')){state='g5title';snd(660,.06)}return;
  case 'g5over':if(pressed('a')||pressed('start')){const m2=TWR.map,md2=TWR.mode;snd(660,.06);twNewRun(m2,md2,1)}
@@ -1481,6 +1457,7 @@ function twDraw(){ox=0;oy=0;
   for(let i=1;i<=steps;i++){r(s.col,Math.round(s.x1+dx*i/steps),Math.round(s.y1+dy*i/steps),s.crit?2:1,s.crit?2:1)}}}
  /* particles + floaters */
  if(TWR){for(const p of TWR.parts)r(p.col,p.x,p.y,p.s,p.s);
+  twDrawMotes();
   for(const f of TWR.flies)g.drawImage(TWPETAL,Math.round(f.x)-3,Math.round(f.y)-3,6,6);
   for(const f of TWR.floats){const fx2=Math.max(2,Math.min(Math.round(f.x-f.txt.length*2.5),W-f.txt.length*6-2)),fy2=Math.round(f.y);
    text(f.txt,fx2+1,fy2+1,1,'#1c1428');text(f.txt,fx2,fy2,1,f.col)}}
@@ -1488,7 +1465,7 @@ function twDraw(){ox=0;oy=0;
  if(TWR){const lp=twLouiePos();drawDog({x:lp.x,y:lp.y,fx:-1,mv:0,st:'sit',alert:night?1:0,say:null})}
  /* range circle + cursor */
  if(TWR){const ct=twTowerAt(TWR.cur.x,TWR.cur.y);
-  if((TWR.guide===2||TWR.guide===3)&&TWR.focus==='field'){const gs=TWR.guide===2?[192,72]:[128,72];
+  if((TWR.guide>=1&&TWR.guide<=3)&&!TWR.build){const gs=twGuideSpot();
    const ge=TWMENU[TWR.sel];g.globalAlpha=.5;
    if(ge.k==='s')g.drawImage(TWTOW[ge.i][0],gs[0]-8,gs[1]-16,16,20);
    else if(ge.k==='h'){const hs=twHeroSpr(ge.i);if(hs)g.drawImage(hs,gs[0]-10,gs[1]-21,20,23)}
@@ -1497,12 +1474,10 @@ function twDraw(){ox=0;oy=0;
    r(gc,gs[0]-gp,gs[1]+gp-2,5,2);r(gc,gs[0]-gp,gs[1]+gp-5,2,5);r(gc,gs[0]+gp-5,gs[1]+gp-2,5,2);r(gc,gs[0]+gp-2,gs[1]+gp-5,2,5)}
   if(ct){const rr=ct.hero>=0?TWHERO[ct.hero].rng*(twHasPerk('eye')?1.05:1):twDef(ct).rng;twRangeDash(ct.x,ct.y,rr,'#fff8e0')}
   const cx=TWR.cur.x,cy=TWR.cur.y,bl=((time*4)|0)%2;
-  if(TWR.focus==='field')r('rgba(255,248,224,.10)',cx-8,cy-8,16,16);
-  if(TWR.focus==='strip')g.globalAlpha=.4;
+  r('rgba(255,248,224,.10)',cx-8,cy-8,16,16);
   const cc=(!ct&&twSelRange()>0&&!twSpotOK(cx,cy))?'#e8384f':(bl?'#fff8e0':'#f8d030');
   r(cc,cx-9,cy-10,5,2);r(cc,cx-9,cy-10,2,5);r(cc,cx+4,cy-10,5,2);r(cc,cx+7,cy-10,2,5);
   r(cc,cx-9,cy+8,5,2);r(cc,cx-9,cy+5,2,5);r(cc,cx+4,cy+8,5,2);r(cc,cx+7,cy+5,2,5);
-  if(TWR.focus==='strip')g.globalAlpha=1;
   if(ct){const cl=ct.hero>=0?TWHERO[ct.hero].name:(ct.lv>=3?twGrandN(ct):'LV'+ct.lv+' '+TYPES[ct.type].n);
    const clw=tw(cl,1),clx=Math.max(2,Math.min(cx-14,W-clw-4));
    r('rgba(20,8,16,.45)',clx-2,cy-15,clw+4,9);text(cl,clx,cy-14,1,'#fff8e0')}}
@@ -1544,78 +1519,21 @@ function twDraw(){ox=0;oy=0;
  const iy0=H-42;
  if(TWR&&TWR.fork){const t=TWR.fork,fk=TWFORK[t.type];
   r('#14101e',0,iy0,W,42);r('#f8d030',0,iy0,W,1);
-  if(t.lv>=2){text('GROW '+TYPES[t.type].n+' ONE MORE TIME?',4,iy0+3,1,'#c8c0d8');
+  twUprootHint(t,iy0);
+  if(t.lv>=3){text(twGrandN(t),4,iy0+3,1,'#f8d030');r('#2c2450',2,iy0+14,236,26);text('FULLY GROWN. A LEGEND.',6,iy0+17,2,'#fff8e0');text('A / B: BACK',6,iy0+30,1,'#b8b0d8')}
+  else if(t.lv>=2){text('GROW IT ONE MORE TIME?',4,iy0+3,1,'#c8c0d8');
    r('#2c2450',2,iy0+14,236,26);r('#f8d030',2,iy0+14,236,1);
    text(twGrandN(t),6,iy0+17,2,'#fff8e0');
    text(TWGRANDC[t.type]+'P',236-tw(TWGRANDC[t.type]+'P',2),iy0+17,2,'#f8d030');
    text(twDef(t).farmAmt>0?'MADE +'+Math.round(t.farmMade||0)+'P SO FAR':'A LEGEND OF THE GARDEN',6,iy0+30,1,'#f8d030')}
-  else{text('GROW '+TYPES[t.type].n+'? PICK A PATH',4,iy0+3,1,'#c8c0d8');
+  else{text('GROW IT? \u25c0 \u25b6 A',4,iy0+3,1,'#c8c0d8');
    for(let s=0;s<2;s++){const v=fk[s],fx0=s*120,sel=TWR.forkSel===s,fc=twForkCost(t.type,s+1);
     if(sel){r('#2c2450',fx0+2,iy0+14,116,26);r('#f8d030',fx0+2,iy0+14,116,1)}
     text(v.n,fx0+6,iy0+17,2,sel?'#fff8e0':'#c8c0d8');
     text(fc+'P',fx0+114-tw(fc+'P',2),iy0+17,2,'#f8d030');
     text(v.fx,fx0+6,iy0+30,1,sel?'#f8d030':'#a49cc0')}}}
- else if(TWR){r('#14101e',0,iy0,W,15);r('#2c2450',0,iy0,W,1);
-  let infoEnd=999;const ct2=twTowerAt(TWR.cur.x,TWR.cur.y);
-  if(TWR.paused)text('PAUSED',4,iy0+3,1,'#fff8e0');
-  else if(TWR.guide>0&&TWR.focus==='field'&&TWGUIDE[TWR.guide]){const ms=TWGUIDE[TWR.guide];
-   text(ms,4,iy0+3,1,'#f8d030');infoEnd=4+tw(ms,1)}
-  else if(TWR.focus==='strip'){const e=TWMENU[TWR.sel];let ex=4;
-   if(e.k==='s'){g.drawImage(TWTOW[e.i][0],4,iy0+1,11,13);
-    text(TYPES[e.i].n,19,iy0+2,2,TYPES[e.i].c);ex=19+tw(TYPES[e.i].n,2)+6;
-    text(TWT[e.i].cost+'P',ex,iy0+2,2,'#f8d030');ex+=tw(TWT[e.i].cost+'P',2)+6}
-   else if(e.k==='h'){const spr=twHeroSpr(e.i);if(spr)g.drawImage(spr,4,iy0+1,11,13);
-    text(TWHERO[e.i].name,19,iy0+2,2,'#ffd94d');ex=19+tw(TWHERO[e.i].name,2)+6;
-    text(twHeroCost(e.i)+'P',ex,iy0+2,2,'#f8d030');ex+=tw(twHeroCost(e.i)+'P',2)+6}
-   else{const spr=twLockSpr(e.i);if(spr){g.globalAlpha=.6;g.drawImage(spr,4,iy0+1,11,13);g.globalAlpha=1}
-    text(TWLOCK[e.i].name,19,iy0+2,2,'#b8b0d8');ex=19+tw(TWLOCK[e.i].name,2)+6}
-   text('A: PICK \u00b7 B: BACK',ex,iy0+3,1,'#a8e078');infoEnd=ex+tw('A: PICK \u00b7 B: BACK',1)}
-  else if(ct2){if(ct2.hero>=0){const hd=TWHERO[ct2.hero];
-    const s=hd.name+' LV'+(ct2.hl||1)+' \u00b7 '+(TWR.round?(ct2.abT>0?hd.abS+' '+Math.ceil(ct2.abT)+'S':'A: '+hd.abS):((ct2.hl||1)>=3?hd.abS+' MAX':'A: TRAIN'))+' \u00b7 B: UPROOT +'+twRefund(ct2)+'P';
-    infoEnd=4+tw(s,1);text(s,4,iy0+3,1,TWR.round&&ct2.abT<=0?'#f8d030':'#c8c0d8')}
-   else{const nm=ct2.lv>=3?twGrandN(ct2):ct2.lv>1?(ct2.variant?TWFORK[ct2.type][ct2.variant-1].n:'LV2 '+TYPES[ct2.type].n):'LV1 '+TYPES[ct2.type].n;
-    const dfl=twDef(ct2);let mid=ct2.lv<2?'A: GROW '+Math.min(twForkCost(ct2.type,1),twForkCost(ct2.type,2))+'P':ct2.lv===2?'A: GRAND '+TWGRANDC[ct2.type]+'P':(dfl.farmAmt>0?'MADE '+Math.round(ct2.farmMade||0)+'P':'');
-    const bF=['B: UPROOT +','B: UP +','B: +'];let bi=0,s='';do{s=nm+' \u00b7 '+(mid?mid+' \u00b7 ':'')+bF[bi]+twRefund(ct2)+'P';bi++}while(tw(s,1)>234&&bi<3);
-    infoEnd=4+tw(s,1);text(s,4,iy0+3,1,'#c8c0d8')}}
-  else{const e=TWMENU[TWR.sel];
-    const hint=TWR.round?'SEL: POWERS':'A: PLANT';
-   if(e.k==='s'){g.drawImage(TWTOW[e.i][0],4,iy0+1,11,13);
-    text(TYPES[e.i].n,19,iy0+2,2,TYPES[e.i].c);
-    const nx=19+tw(TYPES[e.i].n,2)+6;text(TWT[e.i].cost+'P',nx,iy0+2,2,'#f8d030');
-    let ex=nx+tw(TWT[e.i].cost+'P',2)+6;
-    if(ex+tw(TWROLE[e.i],1)+6+tw(hint,1)<W-4){text(TWROLE[e.i],ex,iy0+3,1,'#c8c0d8');ex+=tw(TWROLE[e.i],1)+6}
-    text(hint,ex,iy0+3,1,'#a8e078');infoEnd=ex+tw(hint,1)}
-   else if(e.k==='h'){const spr=twHeroSpr(e.i);if(spr)g.drawImage(spr,4,iy0+1,11,13);
-    text(TWHERO[e.i].name,19,iy0+2,2,'#ffd94d');
-    const nx=19+tw(TWHERO[e.i].name,2)+6;text(twHeroCost(e.i)+'P',nx,iy0+2,2,'#f8d030');
-    let ex=nx+tw(twHeroCost(e.i)+'P',2)+6;
-    if(ex+tw(TWHERO[e.i].ab,1)+6+tw(hint,1)<W-4){text(TWHERO[e.i].ab,ex,iy0+3,1,'#c8c0d8');ex+=tw(TWHERO[e.i].ab,1)+6}
-    text(hint,ex,iy0+3,1,'#a8e078');infoEnd=ex+tw(hint,1)}
-   else{const spr=twLockSpr(e.i);if(spr){g.globalAlpha=.6;g.drawImage(spr,4,iy0+1,11,13);g.globalAlpha=1}
-    text(TWLOCK[e.i].name,19,iy0+2,2,'#b8b0d8');
-    const lx=19+tw(TWLOCK[e.i].name,2)+6,lr=TWLOCK[e.i].lore[0];
-    if(lx+tw(lr,1)<W-4){text(lr,lx,iy0+3,1,'#a49cc0');infoEnd=lx+tw(lr,1)}
-    else{text('NOT YET',lx,iy0+3,1,'#a49cc0');infoEnd=lx+tw('NOT YET',1)}}}
-  if(!TWR.round&&infoEnd<W-tw('START!',2)-12&&((time*2)|0)%2)text('START!',W-tw('START!',2)-4,iy0+2,2,'#f8d030');
-  if(TWR.round){const ls='LEFT '+(TWR.creeps.length+TWR.queue.length);
-   if(infoEnd<W-tw(ls,1)-10)text(ls,W-tw(ls,1)-4,iy0+3,1,'#c8c0d8')}}
- /* shop strip: icon-first cards, sprite big, price under it */
- const sy0=H-27;
- if(TWR&&!TWR.fork){r('#100d18',0,sy0,W,27);
-  if(TWR.guide===1&&((time*2)|0)%2)r('#f8d030',0,sy0-1,W,1);
-  for(let i=0;i<TWMENU.length;i++){const e=TWMENU[i],cx=i*15,sel=TWR.sel===i;
-   if(sel){r(TWR.focus==='strip'?'#3a2f66':'#2c2450',cx,sy0,15,27);r('#f8d030',cx,sy0,15,1);r('#f8d030',cx,sy0+26,15,1);
-    if(TWR.focus==='strip')r('#fff8e0',cx,sy0,15,1)}
-   let cost=0;
-   if(e.k==='s'){cost=TWT[e.i].cost;g.drawImage(TWTOW[e.i][0],cx+1,sy0+1,13,15)}
-   else if(e.k==='h'){cost=twHeroCost(e.i);const spr=twHeroSpr(e.i);
-    if(spr)g.drawImage(spr,cx+2,sy0+2,11,14);else r('#ffd94d',cx+3,sy0+4,9,12);
-    if(TWR.towers.some(t=>t.hero===e.i))r('#f8d030',cx+11,sy0+3,3,3)}
-   else{const spr=twLockSpr(e.i);g.globalAlpha=.55;if(spr)g.drawImage(spr,cx+2,sy0+2,11,14);g.globalAlpha=1}
-   if(cost&&e.k==='s')text(String(cost),Math.round(cx+7.5-tw(String(cost),1)/2),sy0+17,1,sel?'#fff8e0':(TWR.petals>=cost?'#c8c0d8':'#ff6a5e'));
-   else if(cost&&!sel){r('#181020',cx+5,sy0+19,5,5);r(TWR.petals>=cost?'#f8d030':'#8a3040',cx+6,sy0+20,3,3)}}
-  {const e=TWMENU[TWR.sel];if(e.k==='h'){const cs=String(twHeroCost(e.i)),cw=tw(cs,1),px=Math.max(1,Math.min(W-cw-1,Math.round(TWR.sel*15+7.5-cw/2)));
-    r('#2c2450',px-1,sy0+17,cw+2,9);text(cs,px,sy0+17,1,TWR.petals>=twHeroCost(e.i)?'#fff8e0':'#ff6a5e')}}}
+ else if(TWR&&TWR.build)twDrawBuild(iy0);
+ else if(TWR)twDrawBar(iy0);
  if(TWR&&TWR.card){r('rgba(8,6,16,.55)',0,0,W,H);
   ctext(TWR.card.title,H/2-26,3,'#f8d030',null);ctext(TWR.card.sub,H/2,2,'#fff8e0',null);
   if(TWR.card.stars)for(let si=0;si<3;si++){if(si<TWR.card.stars)g.drawImage(TWSTAR,W/2-26+si*20,H/2+12,14,14);
@@ -1637,7 +1555,7 @@ const TWF={state:()=>state,start:()=>twStartTitle(),meta:()=>TW,run:()=>TWR,
  speed:()=>TWR.speed,setSpeed:(v)=>{TWR.speed=v},
  actA:()=>twActA(),actB:()=>twActB(),warn:(n)=>TWWARN[1][n],
  menu:()=>TWMENU[TWR.sel],menuLen:()=>TWMENU.length,fork:()=>TWR.fork?{type:TWR.fork.type,sel:TWR.forkSel}:null,
- setForkSel:(v)=>{TWR.forkSel=v},
+ setForkSel:(v)=>{TWR.forkSel=v},motes:()=>TWR&&TWR.motes?TWR.motes.map(m=>({x:m.x,y:m.y,t:m.t})):[],build:()=>TWR&&TWR.build?{sel:TWR.build.sel}:null,
  nightA:()=>{const t=twTowerAt(TWR.cur.x,TWR.cur.y);if(t&&t.hero>=0)twAbilityA(t)},
  cine:()=>TWR.cine?TWR.cine.kind:null,
  skipCine:()=>{if(TWR.cine){const c=TWR.cine;TWR.cine=null;if(c.fire)c.fire()}},

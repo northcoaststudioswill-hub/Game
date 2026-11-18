@@ -18,7 +18,7 @@ import hashlib, pathlib, re, sys
 here = pathlib.Path(__file__).resolve().parent
 SHELL = here / 'backups/Sprouts+Rootdeep+Sproutwild+Thornwatch-v3.7_2026-11-16_BACKUP.html'
 OUT = here / 'Sprouts+Rootdeep+Sproutwild+Thornwatch.html'
-PARTS = ['tw-creeps.js', 'tw-module.js', 'tw-look.js', 'tw-story.js', 'tw-motes.js']
+PARTS = ['tw-creeps.js', 'tw-module.js', 'tw-look.js', 'tw-story.js', 'tw-controls.js', 'tw-motes.js']
 START = '/* ================================================================\n   CARTRIDGE 4: THORNWATCH'
 END = '/* ---------- loop ---------- */'
 V37_MD5 = '9b879390975751c7426542bee1b1e11f'
