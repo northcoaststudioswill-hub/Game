@@ -9,6 +9,7 @@ Nothing outside alt/ is ever written. The code lives here as plain files:
   alt/src/knockout.js    the fighter (cartridge 2)
   alt/src/patchplate.js  the farm stand (cartridge 4)
   alt/src/sproutwild/    Sproutwild (cartridge 5), eleven files spliced into console.js
+  alt/src/lightswarm.js  Lightswarm (cartridge 6), its own script like Patch & Plate
 
 The music is big (13 MB of embedded mp3), so it is not copied: the build reads the
 two music <script> blocks from the shipped v0.3 build, read-only.
@@ -94,6 +95,7 @@ parts = {
     '@MUSIC alt': alt_music(),
     'knockout.js': code('knockout.js'),
     'patchplate.js': code('patchplate.js'),
+    'lightswarm.js': code('lightswarm.js'),
     'console.js': console,
 }
 html = (SRC / 'shell.html').read_text(encoding='utf8')

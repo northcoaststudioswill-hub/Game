@@ -1,6 +1,6 @@
 # Pocket Lantern
 
-A pocket game console in one HTML file, by North Coast Studios. Five game cartridges on one shelf.
+A pocket game console in one HTML file, by North Coast Studios. Six game cartridges on one shelf.
 
 **Play the newest build:** [`alt/games/pocket-lantern-alt.html`](alt/games/pocket-lantern-alt.html)
 (download it and open it in a browser, or use the shared Claude link Will has).
@@ -19,7 +19,11 @@ A pocket game console in one HTML file, by North Coast Studios. Five game cartri
 | 4 | **Patch & Plate** | Erin's cooking and garden life game, set at Sunkeep in Sproutwild's valley | v0.7 (Nov 17 2026) | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (v0.4), before that [`v0.3/CHANGELOG.md`](v0.3/CHANGELOG.md) |
 | 5 | **Sproutwild** | Creature collector: Pikmin + Palworld + Pokemon, set in an Ohio-lore valley | **In active development (v8.0)** | [`alt/src/sproutwild/CHANGELOG.md`](alt/src/sproutwild/CHANGELOG.md) |
 
+| 6 | **Lightswarm** | Survivors-style roguelite: walk into the dark, the sprout swarm throws the light, pick 1 of 3 upgrades, light the Guardian | **Vertical slice v0.1, for evaluation** | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (Lightswarm section) |
+
 ## Latest updates
+
+- **Lightswarm, cartridge 6 (Nov 18 2026):** a new game as a vertical slice. One expedition (Crooked Hollow), six sprout weapons, the Pythorn Guardian, Sunkeep upgrades. Source: [`alt/src/lightswarm.js`](alt/src/lightswarm.js).
 
 - **Sprouts: menus, field guide, small talk (Nov 18 2026):** Sproutwild-style menus with a tile pause screen, a field
   guide of sprouts, buddies, people and places, people who talk as you pass, and a fix for a shard that could get stuck

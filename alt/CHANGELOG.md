@@ -3,6 +3,47 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Lightswarm: cartridge 6, vertical slice v0.1 (Nov 18 2026)
+
+Will: a brand new game in the Sprouts universe, not tower defense, on a copy of the latest build, as a vertical slice
+to evaluate; fun, sellable, unique, addicting. (A first idea, a Louie platformer, was turned down before it was built.)
+Will picked Lightswarm from four pitches.
+
+![Lightswarm mid-run](playtest/lightswarm/hero-midrun.png)
+
+**What it is.** A survivors-style roguelite. Will walks into the dark with a swarm of sprouts and only steers; the
+sprouts throw the light by themselves. Dimmed buddies close in from every side. A lit buddy remembers, goes home calm
+and leaves a mote. Motes level you up: pick one of three cards. At 5:00 the Guardian of the Light wakes, dim. Light it
+and the expedition is won. A run is five to six minutes; dying early takes two or three.
+
+- **You steer, plus two buttons.** A is CHARGE (the swarm surges the way you face, 7 s), B is WHISTLE (calls every
+  mote on the field and shoves the dark back, 12 s).
+- **Six sprout kinds, six weapons, five levels each:** EMBER TOSS, PEB DROP, DEW RING, ZIP LINE, LEAF PATCH, LUCKY
+  STAR. At most four kinds in a swarm, so a build takes shape. The swarm you see grows with every level.
+- **Seven things from home:** Louie (he fetches far motes), Lantern Oil, Trail Boots, Tiny Bell, Marcus's Wrench,
+  Erin's Tea, Moon Pebble.
+- **Your light is your life,** and the lit circle shrinks as it dims. Dim buddies show as eyes in the dark.
+- **The dark:** seven kinds of buddy with their own ways of coming at you (Zipwigs weave, Fernfangs wind up and
+  charge, Cloverimps come in packs, Drizzlets ring you), two big ones (Boulderhound at 2:00, Bloomboar at 4:00) that
+  walk with you once calmed, a Lanternwisp that runs and leaves a gift, and PYTHORN at 5:00 (line charge, thorn
+  rings, calls Melonkins).
+- **Seeds come home either way** and buy lasting upgrades at Sunkeep (five, three levels each) or unlock PEB, LEAF and
+  LUCKY as the kind that leads. Records are kept. A: GO AGAIN on the report starts the next run at once.
+- Title, a five-page opening, how-it-works page, pause with your build, expedition report.
+
+**Files.** `src/lightswarm.js` (one file, built in like Patch & Plate), six small hooks in `src/console.js`, a sixth
+cartridge and narrower shelf labels in `src/shell.html`, one line in `build.py`. Save key `lightswarm-v1`; it reads and
+writes nothing else. Buddy art is Sproutwild's own, dimmed in code. Music is the console's game list.
+
+**Canon this leans on (nothing new invented, flag anything wrong to Will):** expeditions carry the light to far
+places; sprouts carry the light that calms buddies; nothing is hurt; Guardians and Sigil stones; Pythorn is Crooked
+Hollow's Guardian on a circus trunk. New names only for game things: CHARGE, WHISTLE, the weapon names, SEEDS.
+
+**Tested:** `tests/lightswarm_lab.js`, 23 checks (rules stepped; then a simple bot plays whole expeditions). The bot
+with no upgrades wins about one run in three and otherwise falls between 2:00 and 3:30. 60 frames a second with 100
+buddies on screen in headless Chromium (2.3 ms a frame). Patch & Plate 119, Sproutwild lab 124 and the Sprouts story
+run still pass; the Patch & Plate shelf check now expects six cartridges. **Not played by hand or on a phone.**
+
 ## Sprouts: nature's balance (Nov 18 2026)
 
 Will: maybe buddies should eat sprouts. It keeps them alive, like the light in the other game; nature's balance. Not
