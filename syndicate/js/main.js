@@ -56,12 +56,13 @@
     const g = gfx.groundAt(cx, cy);
     if (G.scene === 'hideout') {
       if (G.placing) return G.ui.placeMove(g.x, g.z);
+      const j = W.get('hideout').wallAt(g.x, g.z); if (j >= 0) { G.sfx('ui'); return G.ui.wallMenu(j); }
       const i = W.get('hideout').itemAt(g.x, g.z);
-      if (i >= 0) return G.ui.pickUp(i);
+      if (i >= 0) { G.sfx('ui'); return G.ui.pickUp(i); }
     }
     if (G.scene === 'hub' || G.scene === 'hideout') W.walkTo({ x: g.x, z: g.z, r: 0.3 });
   }
-  cv.addEventListener('mousemove', e => { In.mouse.cx = e.clientX; In.mouse.cy = e.clientY; if (G.placing && In.mouse.down2) tapWorld(e.clientX, e.clientY); });
+  cv.addEventListener('mousemove', e => { In.mouse.cx = e.clientX; In.mouse.cy = e.clientY; if (G.scene === 'hideout' && !G.ui.isOpen()) { const g = gfx.groundAt(e.clientX, e.clientY); W.get('hideout').hover(g.x, g.z); } if (G.placing && In.mouse.down2) tapWorld(e.clientX, e.clientY); });
   cv.addEventListener('mousedown', e => {
     G.audioInit(); In.mouse.cx = e.clientX; In.mouse.cy = e.clientY;
     if (G.scene === 'fight') { if (e.button === 0) In.mouse.down = true; if (e.button === 2) In.pressed.push('parry'); }
@@ -207,6 +208,7 @@
     G.near = (sc === 'hub' || sc === 'hideout') && !G.ui.isOpen() && !G.placing ? near : null;
     tags((sc === 'hub' || sc === 'hideout') ? W.walker.place : null, G.near);
     const pr = $('prompt'); if (G.near) { pr.textContent = (In.usingPad ? '(A) ' : '') + G.near.act; pr.className = 'big'; } else pr.className = 'big hidden';
+    { const rc = $('roomchip'), on = sc === 'hideout' && !G.placing && !G.ui.isOpen(); rc.className = on ? '' : 'hidden'; if (on) { const t2 = 'Comfort ' + (G.roomComfort || 0) + ' · ' + G.comfortName(G.roomComfort || 0); if (rc.textContent !== t2) rc.textContent = t2; } }
     $('decorBtn').textContent = In.usingPad ? '(Y) Decorate' : 'Decorate'; $('decorBtn').className = sc === 'hideout' && !G.placing && !G.ui.isOpen() ? '' : 'hidden';
     $('touch').className = In.touch && (sc === 'fight' || ((sc === 'hub' || sc === 'hideout') && !G.placing && !G.ui.isOpen())) ? (sc === 'fight' ? 'fight' : '') : 'hidden';
     gfx.updateFires(T); gfx.updateParticles(dt); gfx.updateFloats(dt);

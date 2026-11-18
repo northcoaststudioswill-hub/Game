@@ -55,9 +55,16 @@ phone portrait, phone landscape, or a desktop monitor.
 - **The ladder:** five opponents ending in the Pit Champion.
 - **Economy:** XP, coin and respect. A crowd-hype meter (land hits, dodge through attacks, vary
   your abilities) raises what you take home. Respect sets your syndicate rank.
-- **Hideout and garden:** an 18 by 16 tile home with a two-room house and a cave garden. Buy from
-  21 kinds of furniture, lights, plants and trophies and place them yourself. Tap anything you own
-  to pick it up, then drag it, turn it, or store it for a refund. Most pieces give a small
+- **Hideout room builder:** an 18 by 16 tile home with a two-room house and a cave garden.
+  - A tabbed catalogue: furniture, garden, lights, wall pieces, and floors and walls.
+  - 21 floor pieces that rotate four ways; rugs sit on their own layer so furniture can stand on them.
+  - 7 wall-hung pieces (posters, sconces, crossed blades, a tapestry, your own portrait).
+  - 5 house floors, 5 wall finishes and 3 garden grounds.
+  - Tap a tile to walk there (pathfinding goes round furniture and through doorways); tap a piece
+    to use, move, turn or store it. Beds, benches and tables can be sat or slept on, lamps and the
+    fountain switch on and off, the dummy can be trained on, the bookshelf opens the Codex.
+  - A comfort rating. Comfortable rooms draw visitors who wander about, comment, and leave coin
+    after each of your bouts. Most pieces give a small
   perk; rank gates the better ones.
 - **Music and sound:** procedural music per area (title, street, home, fight, champion) and synth
   sound effects, with no audio files.

@@ -367,3 +367,6 @@ h3 .dim { color: var(--dim); }
 .flip { display: block; font-size: 3.6rem; line-height: 1.1; color: #ffd36b; text-shadow: 0 3px 0 #000; } .flip.spin { animation: fspin 0.5s linear infinite; }
 @keyframes fspin { from { transform: rotateY(0); } to { transform: rotateY(360deg); } }
 @media (prefers-reduced-motion: reduce) { .flip.spin { animation: none; } }
+
+#roomchip { position: absolute; left: calc(0.8rem + var(--sl)); bottom: calc(1rem + var(--sb)); font-family: var(--display); font-weight: 700; font-size: 0.8rem; letter-spacing: 0.06em; color: #f0dca0; background: var(--noise), linear-gradient(var(--wood-1), var(--wood-2)); border: 2px solid #0b090d; box-shadow: 0 0 0 1px var(--bronze); border-radius: 0.25rem; padding: 0.45rem 0.8rem; pointer-events: none !important; z-index: 5; }
+@media (orientation: portrait) { #roomchip { bottom: auto; top: calc(7.2rem + var(--st)); } }
