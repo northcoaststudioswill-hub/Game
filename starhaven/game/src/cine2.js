@@ -201,4 +201,5 @@
     drift(g, t, 18, ['#ffe9a8', '#9fd8ff'], true, 41);
     const vg = g.createRadialGradient(W / 2, H / 2, 50, W / 2, H / 2, 190); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(120,200,255,0.16)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
   };
+  C._h = { W, H, rnd, R, sky, glow, cam, layer, starfield, shooting, moon, skyline, drift, person, lantern };
 })(window.SH = window.SH || {});

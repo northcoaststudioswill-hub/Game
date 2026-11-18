@@ -1,5 +1,42 @@
 # Starhaven — Changelog
 
+## Reimagined 14 — the story's pages: cutscenes, the journal, the title (Nov 18, 2026)
+Will: the animated scenes still look ugly and this is a story game at heart; the journal should look like a journal;
+the menus should live in the world and draw you in; the text boxes should reflect that.
+
+**Cutscenes.** The ugliest scenes were the ones the game opens on: the prologue was still drawn with stick figures
+and a stag made of rectangles. Rebuilt in layers with the real cast (`src/cine3.js`):
+- **The white stag:** dawn over three depths of snowy pines with haze between them, glittering tracks, the stag's
+  breath on the air, Wren at full draw behind a snow-laden bough. The arrow flies; the stag falls; light pours out
+  of it in rays.
+- **That night:** the cottage by firelight, the pot steaming, herbs drying, snow at the window, all three sisters
+  at the table. Then the door: cold blue light across the floor, snow blowing in, the candle flame bending, and
+  Rowan in the doorway.
+- **Beyond the Wall:** the Wall as a standing curtain of coloured light with a bright door in it, the cottage one
+  small lamp far behind, two sets of footprints going one way. Wren looks back once.
+- **Under the Mountain:** his blood falling a drop at a time; then she rises upright in a bloom of light, the thorns
+  burn back, and the bond pulls taut between them.
+- **The Library:** three depths of shelves, ladders, a round window with moonlight and dust in it, floating candles.
+- **Iris's tower:** the dome's slit open to the stars, a brass telescope, star maps, threads of starlight hanging and
+  swaying.
+- **Every scene** (these, the seven from before, and the remaining stills) now gets the same finish: a vignette,
+  darkened top and bottom, and a little film grain.
+
+**The journal is a journal.** A leather-bound book open on ruled parchment, written in ink: handwritten headings in
+Wren's voice ("How I got here", "Things I did", "The people I am tied to"), goals struck through as they are done,
+faces taped in at an angle like small photographs, a ribbon bookmark to close it.
+
+**The title menu is an object in the world:** a night-stone plaque with a crescent crest, engraved rows divided by
+gold rules, a diamond that lights on the row you are on, and a line under each in the book's italic ("Begin Wren's
+story, in the winter woods", "Three journals are kept on the shelf").
+
+**Honest notes.** The fonts for the journal and menu (a handwriting face and an old book face) come from Google
+Fonts; without a connection they fall back to plainer ones. The garden, thorns, cell and trials scenes, and the
+stills for the mountain, the ships and the morning-after, are not rebuilt (they do get the finish). The pause, save
+slot and settings screens are restyled only as far as they share the title menu's rows. Checked as single frames,
+not in motion. Tests: 50 play checks, 19 menu checks, the fuzz run, the screenshot run. **Not played by hand or on a
+phone.**
+
 ## Reimagined 13 — dialogue with character, and two graphics glitches (Nov 18, 2026)
 Will: some goofy stuff happens with the graphics; the text boxes and the picture frames for the characters need more
 character and design; keep making the slice better.

@@ -288,15 +288,15 @@
       const done = !!G.flags[g.id];
       html += `<li class="${done ? 'done' : g.id === G.activeGoal ? 'now' : ''}">${done ? '&#10003;' : g.id === G.activeGoal ? '&#9656;' : '&#9675;'} ${esc(g.text)}</li>`;
     }
-    html += '</ul><h3>The story so far</h3>';
+    html += '</ul><h3>How I got here</h3>';
     html += `<p>${esc(ST.RECAP)}</p>`;
     for (let i = 0; i < G.chapter; i++) html += `<p><b>${esc(ST.CHAPTERS[i].label)}, ${esc(ST.CHAPTERS[i].name)}.</b> ${esc(ST.CHAPTERS[i].summary)}</p>`;
     html += `<p><b>${esc(ch.label)}, ${esc(ch.name)}.</b> ${esc(ch.card)}</p>`;
     const ms = G.progress.motes || {}, sum = Object.values(ms).reduce((a, b) => a + b, 0);
     if (sum) html += `<p><b>Starlight gathered:</b> &#10022; ${sum}. Spend it in the pause menu, under Constellation.</p>`;
     const mem = Object.values(G.progress.mem || {});
-    if (mem.length) { html += '<h3>What Wren has done</h3><ul class="mem-list">' + mem.map(m => `<li class="${m.good === true ? 'good' : m.good === false ? 'bad' : ''}">${esc(m.text)}</li>`).join('') + '</ul><p><small>Green: someone is better for it. Red: it will cost her. Gold: it could go either way. The story comes back to these.</small></p>'; }
-    html += '<h3>Bonds</h3>';
+    if (mem.length) { html += '<h3>Things I did</h3><ul class="mem-list">' + mem.map(m => `<li class="${m.good === true ? 'good' : m.good === false ? 'bad' : ''}">${esc(m.text)}</li>`).join('') + '</ul><p><small>Green: someone is better for it. Red: it will cost her. Gold: it could go either way. The story comes back to these.</small></p>'; }
+    html += '<h3>The people I am tied to</h3>';
     const bonds = G.progress.bonds, ids = Object.keys(ST.BONDS).filter(id => bonds[id]);
     if (!ids.length) html += '<p>No bonds yet. Hearts grow from evenings together, gifts they love, and the choices you make when you talk.</p>';
     for (const id of ids) {
@@ -306,7 +306,7 @@
         <div class="bar"><span style="width:${Math.round(k * 100)}%"></span></div>
         <small>${next ? `${pts} / ${next} points to the next heart` : 'Every heart earned'} &middot; Loves: ${esc(ST.BONDS[id].loves)}</small></div></div>`;
     }
-    html += '<h3>People</h3>';
+    html += '<h3>Who is who</h3>';
     for (const p of G.knownPeople()) html += `<div class="person"><img src="${SH.STORY.CAST[p.id] ? SH.art.portraitURL(p.id) : ''}" alt="" ${SH.STORY.CAST[p.id] ? '' : 'style="visibility:hidden"'}><div><b>${esc(p.name)}</b><br>${esc(p.text)}</div></div>`;
     $('j-body').innerHTML = html;
   };

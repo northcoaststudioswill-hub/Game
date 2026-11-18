@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#090b20">
 <title>Starhaven</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Nunito:wght@600;800&family=Caveat:wght@600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 <style>
 :root {
   --ink: #f3eeff; --ink-dim: #b9b2dd; --gold: #ffd27a; --gold-deep: #d9973f;
@@ -327,6 +327,35 @@ body.upright #f-logo h1 { font-size: clamp(30px, 11vw, 60px); }
 #whisper img, .fx-row img { padding: 2px; background: linear-gradient(135deg, #ffe9a8, #b8862e 50%, #8a5a1c); border: 0; box-shadow: 0 0 0 1px #0a0818; border-radius: 3px; }
 .person img, #m-status img { padding: 2px; background: linear-gradient(135deg, #ffe9a8, #b8862e 50%, #8a5a1c); border: 0 !important; box-shadow: 0 0 0 1px #0a0818; border-radius: 3px; }
 body.upright #d-face { width: 70px; height: 70px; } body.upright #dialog { margin-top: 14px; }
+/* ---- Wren's journal is a journal: a leather-bound book open on parchment, ruled, written in ink, with faces taped in */
+#journal { background: radial-gradient(ellipse at 50% 40%, rgba(40,26,16,.82), rgba(4,3,10,.95)); }
+#journal .card { --ink: #3a2a1c; --ink-dim: #6a5238; color: #3a2a1c; font-family: 'IM Fell English', Georgia, serif; border-radius: 3px 8px 8px 3px; padding: 22px 26px 18px 44px; max-height: 90vh;
+  background: radial-gradient(ellipse at 18% 12%, rgba(150,110,60,.16), transparent 34%), radial-gradient(ellipse at 86% 82%, rgba(150,110,60,.2), transparent 40%),
+    repeating-linear-gradient(180deg, transparent 0 25px, rgba(90,110,150,.16) 25px 26px), linear-gradient(90deg, #d9c69a 0, #efe2c4 7%, #f3e8cd 50%, #eadbb6 100%);
+  border: 0; box-shadow: inset 30px 0 0 -8px #5a3320, inset 31px 0 0 -8px #2a160c, inset 36px 0 14px -10px rgba(0,0,0,.35), 0 0 0 2px #2a160c, 6px 8px 0 #c8b488, 7px 9px 0 #2a160c, 12px 16px 30px rgba(0,0,0,.6); }
+#journal .card::before, #journal .card::after { display: none; }
+#journal h2 { font-family: 'Caveat', 'Segoe Script', cursive; text-transform: none; letter-spacing: 0; font-size: 34px; color: #3a2a1c; margin: 0 0 2px; transform: rotate(-1deg); }
+#journal h3 { font-family: 'Caveat', 'Segoe Script', cursive; color: #7a2a1c; font-size: 24px; letter-spacing: 0; margin: 14px 0 4px; border-bottom: 1px solid rgba(58,42,28,.35); display: inline-block; padding-right: 18px; }
+#journal p, #journal li, #journal small, #journal b { color: #3a2a1c; } #journal p { font-size: 16px; line-height: 26px; margin: 0 0 0; }
+#journal .goals li { color: #6a5238; font-size: 17px; line-height: 26px; padding: 0; } #journal .goals li.now { color: #3a2a1c; } #journal .goals li.done { color: #4a6a2a; text-decoration: line-through; text-decoration-color: rgba(58,42,28,.5); }
+#journal .mem-list li { line-height: 26px; padding-top: 0; padding-bottom: 0; font-style: italic; } #journal .mem-list li::before { color: #8a6a2a; } #journal .mem-list li.good::before { color: #4a6a2a; } #journal .mem-list li.bad::before { color: #9a2a1c; }
+#journal .person { margin: 10px 0; align-items: flex-start; font-size: 15px; line-height: 1.35; } #journal .person small { color: #6a5238; font-style: italic; }
+#journal .person img { width: 54px; height: 54px; padding: 3px 3px 9px; background: #fbf6e6; border-radius: 1px; box-shadow: 1px 2px 4px rgba(0,0,0,.4) !important; transform: rotate(-3deg); position: relative; }
+#journal .person:nth-child(even) img { transform: rotate(2.5deg); }
+#journal .hearts { color: #9a2a1c; } #journal .hearts .dim { color: rgba(58,42,28,.35); } #journal .bar { background: rgba(58,42,28,.18); } #journal .bar span { background: #9a2a1c; }
+#journal .btn { font-family: var(--display); background: linear-gradient(180deg, #7a2a1c, #5a1c12); color: #f3e8cd; border: 0; border-radius: 2px; box-shadow: 0 2px 0 #2a160c; width: auto; padding: 9px 26px; margin: 14px 0 0 auto; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%); padding-bottom: 16px; }
+/* ---- the title menu is a night-stone plaque lit by a lantern: engraved rows, gold rules, a crescent crest */
+#f-menu-wrap { padding: 16px 18px 10px; background: linear-gradient(180deg, rgba(26,22,56,.9), rgba(10,8,26,.92)); border: 1px solid #b8862e; border-radius: 6px 6px 3px 3px; position: relative;
+  box-shadow: 0 0 0 2px #0a0818, 0 0 0 3px rgba(255,210,122,.35), 0 14px 40px rgba(0,0,0,.6), inset 0 0 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.1); }
+#f-menu-wrap::before { content: '\2726  \263E  \2726'; display: block; text-align: center; color: var(--gold); font-size: 13px; letter-spacing: .4em; margin: -8px 0 6px; opacity: .85; }
+#f-menu { gap: 0; }
+.fbtn { background: transparent !important; border: 0 !important; border-bottom: 1px solid rgba(255,210,122,.16) !important; border-radius: 0 !important; box-shadow: none !important; padding: 6px 12px 6px 30px; position: relative; transform: none; }
+.fbtn:last-child { border-bottom: 0 !important; }
+.fbtn .lbl { font-family: var(--display); letter-spacing: .1em; font-size: 16px; } .fbtn .sub { font-family: 'IM Fell English', Georgia, serif; font-style: italic; font-weight: 400; font-size: 13.5px; color: #a9a6cc; }
+.fbtn::before { content: ''; position: absolute; left: 10px; top: 16px; width: 7px; height: 7px; transform: rotate(45deg); border: 1px solid rgba(255,210,122,.5); }
+.fbtn.sel { background: linear-gradient(90deg, rgba(255,210,122,.20), rgba(255,210,122,0)) !important; transform: none; box-shadow: none !important; }
+.fbtn.sel::before { background: var(--gold); box-shadow: 0 0 10px var(--gold); } .fbtn.sel .lbl { color: #fff6d8; } .fbtn.sel .lbl::before { content: ''; }
+#f-title { text-align: center; font-size: 17px; letter-spacing: .2em; text-transform: uppercase; }
 /* ---- level and experience, under the Starlight count; touch buttons with a larger area than they look */
 #lvl { position: absolute; right: calc(max(14px, env(safe-area-inset-right)) + 96px); top: 44px; display: flex; align-items: center; gap: 6px; font: 800 10px var(--body); letter-spacing: .1em; color: #9fe8ff; }
 #lvl i { display: block; width: 54px; height: 5px; background: rgba(8,8,24,.75); border: 1px solid #4a7a9a; border-radius: 2px; overflow: hidden; } #lvl i span { display: block; height: 100%; background: linear-gradient(90deg, #4ab8e8, #9fe8ff); transition: width .4s; }
@@ -471,7 +500,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
 
 <div class="screen" id="journal">
   <div class="card">
-    <h2>Story &amp; goals</h2>
+    <h2>Wren's journal</h2>
     <div id="j-body"></div>
     <button class="btn primary" id="j-back">Back</button>
   </div>

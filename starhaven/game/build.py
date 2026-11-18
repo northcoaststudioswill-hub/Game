@@ -26,6 +26,7 @@ ORDER = [
     'arts.js',       # Bond Arts, finisher bands, openings, whispers, pixel font
     'people.js',     # the cast as shaded, outlined pixel sprites with blinks and emotes
     'cine2.js',      # more animated cinematics, in parallax layers
+    'cine3.js',      # the prologue's cinematics rebuilt, the Library and the observatory, and the film finish
     'modes.js',      # other perspectives: flight (into the screen), mural (face-on), city (from above)
     'wren.js',       # Wren's jointed figure, poses and slash crescents
     'draw.js',       # world drawing

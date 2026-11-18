@@ -161,11 +161,11 @@
     const S = SH.saves, latest = S.latest(), slots = S.all(), any = slots.some(Boolean);
     const items = [];
     if (latest >= 0) { const d = S.describe(slots[latest]); items.push({ label: 'Continue', sub: `Slot ${latest + 1} &middot; ${esc(d.title)}`, action: () => F.go(() => SH.game.loadSlot(latest)) }); }
-    items.push({ label: 'New game', action: () => F.slots('new') });
-    items.push({ label: 'Load game', disabled: !any, action: () => F.slots('load') });
+    items.push({ label: 'New game', sub: 'Begin Wren\'s story, in the winter woods', action: () => F.slots('new') });
+    items.push({ label: 'Load game', sub: 'Three journals are kept on the shelf', disabled: !any, action: () => F.slots('load') });
     items.push({ label: 'Chapter select', sub: 'Any chapter, without saving (concept build)', action: F.chapters });
-    items.push({ label: 'Settings', action: () => F.settings(F.main) });
-    items.push({ label: 'Watch the opening', action: () => F.film(() => { phase = 'menu'; $('f-logo').classList.add('show'); F.main(); }) });
+    items.push({ label: 'Settings', sub: 'Sound, text speed, how she fights', action: () => F.settings(F.main) });
+    items.push({ label: 'Watch the opening', sub: 'How it began', action: () => F.film(() => { phase = 'menu'; $('f-logo').classList.add('show'); F.main(); }) });
     items.push({ label: 'Credits', action: F.credits });
     F.show(null, items, null);
   };
