@@ -80,7 +80,8 @@
       muralProgress: 0,
       wyrm: def.chase ? { on: false, x: def.chase.wyrmX * TS, speed: def.chase.speed } : null,
       camCenterX() { return this.cam.x + this.viewW / 2; },
-      onKill(e) { G.hud.goal(); SH.arts.whisper('kill'); SH.xp.gain(e && e.boss ? 80 : e && e.kind === 'wyrm' ? 25 : 10, true); },
+      onKill(e) { G.hud.goal(); SH.arts.whisper('kill');
+        if (e && e.kind === 'thornSprite') { fx.burst(e.x, e.y - 12, 26, { speed: 3.2, life: 46, gravity: 0.1, drag: 0.95, size: 3, colors: ['#2f5c2b', '#8fd16b', '#5a1d3e', '#ff5a78'] }); fx.ring(e.x, e.y - 12, '#8fd16b', 34, 16, 2); } SH.xp.gain(e && e.boss ? 80 : e && e.kind === 'wyrm' ? 25 : 10, true); },
       onDash() { },
       onPerfectDodge() {
         fx.slowmo = 26; player.stats.perfect++;

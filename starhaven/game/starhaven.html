@@ -299,6 +299,34 @@ body.upright #b-gift { bottom: calc(12vh + 84px); } body.upright #b-art { bottom
 body.upright #touch-hint { bottom: 5vh; left: 0; right: 0; text-align: center; }
 body.upright #bossbar { top: calc(var(--cvh) + env(safe-area-inset-top) - 26px); bottom: auto; }
 body.upright #f-logo h1 { font-size: clamp(30px, 11vw, 60px); }
+/* ---- dialogue with character: the speaker's colour runs through the box, the name sits on a ribbon over its top
+   edge, the portrait hangs in a gilded frame with a crest, and narration is set apart like a line from a book */
+#effects { transition: top .2s; } body[data-state="talk"]:not(.upright) #effects { top: 206px; }
+#lvl { top: 50px; }
+#dialog { --spk: #b9a8ff; padding: 16px 18px 14px 14px; gap: 16px; align-items: center; border-radius: 6px;
+  background: linear-gradient(180deg, rgba(34,28,70,.97), rgba(14,12,34,.97)), repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 2px, transparent 2px 6px);
+  border: 1px solid var(--spk); box-shadow: 0 0 0 2px #0a0818, 0 0 0 3px rgba(255,210,122,.45), 0 8px 22px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12), inset 0 0 26px rgba(0,0,0,.35), inset 4px 0 0 var(--spk); overflow: visible; }
+#dialog::before, #dialog::after { top: auto; bottom: 5px; width: 6px; height: 6px; transform: rotate(45deg); background: var(--gold); }
+#d-face { width: 92px; height: 92px; padding: 3px; background: linear-gradient(135deg, #ffe9a8, #b8862e 45%, #ffe9a8 60%, #8a5a1c); border: 0; border-radius: 4px;
+  box-shadow: 0 0 0 2px #0a0818, 0 0 0 3px var(--spk), 3px 4px 0 rgba(0,0,0,.45), inset 0 0 0 1px rgba(10,8,24,.55); position: relative; transform: rotate(-1.5deg); }
+#d-body { position: relative; }
+#d-name { position: absolute; left: -6px; top: -34px; margin: 0; padding: 3px 14px 3px 12px; font-size: 13px; letter-spacing: .16em; color: #0a0818 !important; background: var(--spk);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 50%, 100% 100%, 0 100%); box-shadow: 0 2px 0 rgba(0,0,0,.4); }
+#d-name::before { content: '\2726'; margin-right: 6px; font-size: 10px; }
+#d-text { font-size: 18px; line-height: 1.42; text-shadow: 0 1px 0 rgba(0,0,0,.5); }
+#dialog.narr { justify-content: center; text-align: center; border-color: var(--plate-line); box-shadow: 0 0 0 2px #0a0818, 0 0 0 3px rgba(185,168,255,.3), 0 8px 22px rgba(0,0,0,.55), inset 0 0 26px rgba(0,0,0,.35); }
+#dialog.narr #d-text { font-family: var(--display); font-style: italic; font-size: 17px; letter-spacing: .01em; color: #efe9ff; padding: 0 14px; }
+#dialog.narr #d-text::before { content: '\2726'; display: block; color: var(--gold); font-size: 10px; font-style: normal; margin-bottom: 3px; opacity: .8; }
+#dialog.narr #d-skip { position: absolute; right: 10px; top: 8px; float: none; margin: 0; }
+#d-more { font-size: 0; right: 16px; bottom: 9px; } #d-more::after { content: '\25BC'; font-size: 12px; color: var(--gold); display: inline-block; animation: nudge .9s ease-in-out infinite; }
+@keyframes nudge { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(4px) } }
+.choice { border-radius: 4px; border: 1px solid var(--plate-line); background: linear-gradient(90deg, rgba(255,210,122,.10), rgba(255,210,122,.02)); padding: 9px 12px 9px 30px; position: relative; font-size: 15px; }
+.choice::before { content: '' !important; position: absolute; left: 11px; top: 50%; width: 8px; height: 8px; margin-top: -4px; transform: rotate(45deg); border: 1px solid var(--gold); }
+.choice.sel { border-color: var(--gold); background: linear-gradient(90deg, rgba(255,210,122,.30), rgba(255,210,122,.06)); transform: translateX(4px); }
+.choice.sel::before { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+#whisper img, .fx-row img { padding: 2px; background: linear-gradient(135deg, #ffe9a8, #b8862e 50%, #8a5a1c); border: 0; box-shadow: 0 0 0 1px #0a0818; border-radius: 3px; }
+.person img, #m-status img { padding: 2px; background: linear-gradient(135deg, #ffe9a8, #b8862e 50%, #8a5a1c); border: 0 !important; box-shadow: 0 0 0 1px #0a0818; border-radius: 3px; }
+body.upright #d-face { width: 70px; height: 70px; } body.upright #dialog { margin-top: 14px; }
 /* ---- level and experience, under the Starlight count; touch buttons with a larger area than they look */
 #lvl { position: absolute; right: calc(max(14px, env(safe-area-inset-right)) + 96px); top: 44px; display: flex; align-items: center; gap: 6px; font: 800 10px var(--body); letter-spacing: .1em; color: #9fe8ff; }
 #lvl i { display: block; width: 54px; height: 5px; background: rgba(8,8,24,.75); border: 1px solid #4a7a9a; border-radius: 2px; overflow: hidden; } #lvl i span { display: block; height: 100%; background: linear-gradient(90deg, #4ab8e8, #9fe8ff); transition: width .4s; }
@@ -5507,7 +5535,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
 
     // the foreground: dark shapes close to the eye, sliding past faster than the world (depth, as in Hollow Knight)
     { const fgName = zones[zi].theme, fg = layers.fg[fgName] || (layers.fg[fgName] = makeForeground(fgName)), fxo = ((cx * 1.45) % fg.width + fg.width) % fg.width;
-      ctx.globalAlpha = 0.9; for (let x0 = -fxo; x0 < vw; x0 += fg.width) ctx.drawImage(fg, Math.round(x0), VH - fg.height + Math.round((cy - (w.room.pxH - VH)) * 0.2)); ctx.globalAlpha = 1; }
+      ctx.globalAlpha = 0.9; for (let x0 = -fxo; x0 < vw; x0 += fg.width) ctx.drawImage(fg, Math.round(x0), Math.round(w.room.pxH - cy - fg.height + ((w.room.pxH - VH) - cy) * 0.35)); ctx.globalAlpha = 1; }
     { const kk = zi > 0 ? Math.min(1, (mid - (zones[zi].x - 6)) / 12) : 0; drawLight(ctx, w, cx - sx, cy - sy, vw, VH, t, zones[Math.max(0, zi - 1)].theme, zones[zi].theme, kk); }
     ctx.restore();
     SH.arts.draw(ctx, w, vw, VH);
@@ -5950,7 +5978,12 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       g.addColorStop(0, `rgba(255,150,60,${0.55 * k})`); g.addColorStop(1, 'rgba(255,150,60,0)');
       ctx.fillStyle = g; ctx.fillRect(x - 30, cy - 30, 60, 60);
     }
-    const spikes = 10, rot = e.wobble * 0.2 * (e.dir || 1);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.ellipse(x, e.y, 12, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#0a0818'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    for (let i = 0; i < 4; i++) { const lx = x - 9 + i * 6, sw = (e.state === 'wander' || e.state === 'lunge') ? Math.sin(t * 0.4 + i * 1.6) * 3 : 0; ctx.beginPath(); ctx.moveTo(lx, cy + 6); ctx.lineTo(lx + sw, e.y - 1); ctx.stroke(); }
+    ctx.strokeStyle = angry ? PAL.spriteAngry : PAL.spriteRim; ctx.lineWidth = 1;
+    for (let i = 0; i < 4; i++) { const lx = x - 9 + i * 6, sw = (e.state === 'wander' || e.state === 'lunge') ? Math.sin(t * 0.4 + i * 1.6) * 3 : 0; ctx.beginPath(); ctx.moveTo(lx, cy + 6); ctx.lineTo(lx + sw, e.y - 1); ctx.stroke(); }
+    const spikes = 10, rot = e.wobble * 0.2 * (e.dir || 1) + (e.state === 'windup' ? e.t * 0.12 : Math.sin(t * 0.03 + x) * 0.08);
     const body = e.flash > 0 ? '#ffffff' : angry ? '#6a4a1c' : PAL.sprite;
     const rim = e.flash > 0 ? '#ffffff' : angry ? PAL.spriteAngry : PAL.spriteRim;
     ctx.fillStyle = '#0a0818'; star(ctx, x, cy, 16, 10.5, spikes, rot);
@@ -6065,7 +6098,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       muralProgress: 0,
       wyrm: def.chase ? { on: false, x: def.chase.wyrmX * TS, speed: def.chase.speed } : null,
       camCenterX() { return this.cam.x + this.viewW / 2; },
-      onKill(e) { G.hud.goal(); SH.arts.whisper('kill'); SH.xp.gain(e && e.boss ? 80 : e && e.kind === 'wyrm' ? 25 : 10, true); },
+      onKill(e) { G.hud.goal(); SH.arts.whisper('kill');
+        if (e && e.kind === 'thornSprite') { fx.burst(e.x, e.y - 12, 26, { speed: 3.2, life: 46, gravity: 0.1, drag: 0.95, size: 3, colors: ['#2f5c2b', '#8fd16b', '#5a1d3e', '#ff5a78'] }); fx.ring(e.x, e.y - 12, '#8fd16b', 34, 16, 2); } SH.xp.gain(e && e.boss ? 80 : e && e.kind === 'wyrm' ? 25 : 10, true); },
       onDash() { },
       onPerfectDodge() {
         fx.slowmo = 26; player.stats.perfect++;
@@ -6847,7 +6881,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     faceWho = narr ? null : (who === 'wren' && SH.game.mortal ? 'wren_m' : who); faceT = 0;
     if (!narr) $('d-face').src = SH.art.portraitURL(faceWho);
     $('d-name').textContent = c.name;
-    $('d-name').style.color = c.color;
+    $('d-name').style.color = c.color; el.style.setProperty('--spk', c.color);
     el.classList.add('show');
     H.typeStart(text, narr);
   };

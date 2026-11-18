@@ -299,6 +299,34 @@ body.upright #b-gift { bottom: calc(12vh + 84px); } body.upright #b-art { bottom
 body.upright #touch-hint { bottom: 5vh; left: 0; right: 0; text-align: center; }
 body.upright #bossbar { top: calc(var(--cvh) + env(safe-area-inset-top) - 26px); bottom: auto; }
 body.upright #f-logo h1 { font-size: clamp(30px, 11vw, 60px); }
+/* ---- dialogue with character: the speaker's colour runs through the box, the name sits on a ribbon over its top
+   edge, the portrait hangs in a gilded frame with a crest, and narration is set apart like a line from a book */
+#effects { transition: top .2s; } body[data-state="talk"]:not(.upright) #effects { top: 206px; }
+#lvl { top: 50px; }
+#dialog { --spk: #b9a8ff; padding: 16px 18px 14px 14px; gap: 16px; align-items: center; border-radius: 6px;
+  background: linear-gradient(180deg, rgba(34,28,70,.97), rgba(14,12,34,.97)), repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 2px, transparent 2px 6px);
+  border: 1px solid var(--spk); box-shadow: 0 0 0 2px #0a0818, 0 0 0 3px rgba(255,210,122,.45), 0 8px 22px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.12), inset 0 0 26px rgba(0,0,0,.35), inset 4px 0 0 var(--spk); overflow: visible; }
+#dialog::before, #dialog::after { top: auto; bottom: 5px; width: 6px; height: 6px; transform: rotate(45deg); background: var(--gold); }
+#d-face { width: 92px; height: 92px; padding: 3px; background: linear-gradient(135deg, #ffe9a8, #b8862e 45%, #ffe9a8 60%, #8a5a1c); border: 0; border-radius: 4px;
+  box-shadow: 0 0 0 2px #0a0818, 0 0 0 3px var(--spk), 3px 4px 0 rgba(0,0,0,.45), inset 0 0 0 1px rgba(10,8,24,.55); position: relative; transform: rotate(-1.5deg); }
+#d-body { position: relative; }
+#d-name { position: absolute; left: -6px; top: -34px; margin: 0; padding: 3px 14px 3px 12px; font-size: 13px; letter-spacing: .16em; color: #0a0818 !important; background: var(--spk);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 50%, 100% 100%, 0 100%); box-shadow: 0 2px 0 rgba(0,0,0,.4); }
+#d-name::before { content: '\2726'; margin-right: 6px; font-size: 10px; }
+#d-text { font-size: 18px; line-height: 1.42; text-shadow: 0 1px 0 rgba(0,0,0,.5); }
+#dialog.narr { justify-content: center; text-align: center; border-color: var(--plate-line); box-shadow: 0 0 0 2px #0a0818, 0 0 0 3px rgba(185,168,255,.3), 0 8px 22px rgba(0,0,0,.55), inset 0 0 26px rgba(0,0,0,.35); }
+#dialog.narr #d-text { font-family: var(--display); font-style: italic; font-size: 17px; letter-spacing: .01em; color: #efe9ff; padding: 0 14px; }
+#dialog.narr #d-text::before { content: '\2726'; display: block; color: var(--gold); font-size: 10px; font-style: normal; margin-bottom: 3px; opacity: .8; }
+#dialog.narr #d-skip { position: absolute; right: 10px; top: 8px; float: none; margin: 0; }
+#d-more { font-size: 0; right: 16px; bottom: 9px; } #d-more::after { content: '\25BC'; font-size: 12px; color: var(--gold); display: inline-block; animation: nudge .9s ease-in-out infinite; }
+@keyframes nudge { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(4px) } }
+.choice { border-radius: 4px; border: 1px solid var(--plate-line); background: linear-gradient(90deg, rgba(255,210,122,.10), rgba(255,210,122,.02)); padding: 9px 12px 9px 30px; position: relative; font-size: 15px; }
+.choice::before { content: '' !important; position: absolute; left: 11px; top: 50%; width: 8px; height: 8px; margin-top: -4px; transform: rotate(45deg); border: 1px solid var(--gold); }
+.choice.sel { border-color: var(--gold); background: linear-gradient(90deg, rgba(255,210,122,.30), rgba(255,210,122,.06)); transform: translateX(4px); }
+.choice.sel::before { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+#whisper img, .fx-row img { padding: 2px; background: linear-gradient(135deg, #ffe9a8, #b8862e 50%, #8a5a1c); border: 0; box-shadow: 0 0 0 1px #0a0818; border-radius: 3px; }
+.person img, #m-status img { padding: 2px; background: linear-gradient(135deg, #ffe9a8, #b8862e 50%, #8a5a1c); border: 0 !important; box-shadow: 0 0 0 1px #0a0818; border-radius: 3px; }
+body.upright #d-face { width: 70px; height: 70px; } body.upright #dialog { margin-top: 14px; }
 /* ---- level and experience, under the Starlight count; touch buttons with a larger area than they look */
 #lvl { position: absolute; right: calc(max(14px, env(safe-area-inset-right)) + 96px); top: 44px; display: flex; align-items: center; gap: 6px; font: 800 10px var(--body); letter-spacing: .1em; color: #9fe8ff; }
 #lvl i { display: block; width: 54px; height: 5px; background: rgba(8,8,24,.75); border: 1px solid #4a7a9a; border-radius: 2px; overflow: hidden; } #lvl i span { display: block; height: 100%; background: linear-gradient(90deg, #4ab8e8, #9fe8ff); transition: width .4s; }

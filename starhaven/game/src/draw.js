@@ -508,7 +508,7 @@
 
     // the foreground: dark shapes close to the eye, sliding past faster than the world (depth, as in Hollow Knight)
     { const fgName = zones[zi].theme, fg = layers.fg[fgName] || (layers.fg[fgName] = makeForeground(fgName)), fxo = ((cx * 1.45) % fg.width + fg.width) % fg.width;
-      ctx.globalAlpha = 0.9; for (let x0 = -fxo; x0 < vw; x0 += fg.width) ctx.drawImage(fg, Math.round(x0), VH - fg.height + Math.round((cy - (w.room.pxH - VH)) * 0.2)); ctx.globalAlpha = 1; }
+      ctx.globalAlpha = 0.9; for (let x0 = -fxo; x0 < vw; x0 += fg.width) ctx.drawImage(fg, Math.round(x0), Math.round(w.room.pxH - cy - fg.height + ((w.room.pxH - VH) - cy) * 0.35)); ctx.globalAlpha = 1; }
     { const kk = zi > 0 ? Math.min(1, (mid - (zones[zi].x - 6)) / 12) : 0; drawLight(ctx, w, cx - sx, cy - sy, vw, VH, t, zones[Math.max(0, zi - 1)].theme, zones[zi].theme, kk); }
     ctx.restore();
     SH.arts.draw(ctx, w, vw, VH);
@@ -951,7 +951,12 @@
       g.addColorStop(0, `rgba(255,150,60,${0.55 * k})`); g.addColorStop(1, 'rgba(255,150,60,0)');
       ctx.fillStyle = g; ctx.fillRect(x - 30, cy - 30, 60, 60);
     }
-    const spikes = 10, rot = e.wobble * 0.2 * (e.dir || 1);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.ellipse(x, e.y, 12, 3, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#0a0818'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    for (let i = 0; i < 4; i++) { const lx = x - 9 + i * 6, sw = (e.state === 'wander' || e.state === 'lunge') ? Math.sin(t * 0.4 + i * 1.6) * 3 : 0; ctx.beginPath(); ctx.moveTo(lx, cy + 6); ctx.lineTo(lx + sw, e.y - 1); ctx.stroke(); }
+    ctx.strokeStyle = angry ? PAL.spriteAngry : PAL.spriteRim; ctx.lineWidth = 1;
+    for (let i = 0; i < 4; i++) { const lx = x - 9 + i * 6, sw = (e.state === 'wander' || e.state === 'lunge') ? Math.sin(t * 0.4 + i * 1.6) * 3 : 0; ctx.beginPath(); ctx.moveTo(lx, cy + 6); ctx.lineTo(lx + sw, e.y - 1); ctx.stroke(); }
+    const spikes = 10, rot = e.wobble * 0.2 * (e.dir || 1) + (e.state === 'windup' ? e.t * 0.12 : Math.sin(t * 0.03 + x) * 0.08);
     const body = e.flash > 0 ? '#ffffff' : angry ? '#6a4a1c' : PAL.sprite;
     const rim = e.flash > 0 ? '#ffffff' : angry ? PAL.spriteAngry : PAL.spriteRim;
     ctx.fillStyle = '#0a0818'; star(ctx, x, cy, 16, 10.5, spikes, rot);

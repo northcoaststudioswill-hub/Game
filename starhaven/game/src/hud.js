@@ -80,7 +80,7 @@
     faceWho = narr ? null : (who === 'wren' && SH.game.mortal ? 'wren_m' : who); faceT = 0;
     if (!narr) $('d-face').src = SH.art.portraitURL(faceWho);
     $('d-name').textContent = c.name;
-    $('d-name').style.color = c.color;
+    $('d-name').style.color = c.color; el.style.setProperty('--spk', c.color);
     el.classList.add('show');
     H.typeStart(text, narr);
   };

@@ -1,5 +1,34 @@
 # Starhaven — Changelog
 
+## Reimagined 13 — dialogue with character, and two graphics glitches (Nov 18, 2026)
+Will: some goofy stuff happens with the graphics; the text boxes and the picture frames for the characters need more
+character and design; keep making the slice better.
+
+**Glitches found by looking at frames mid-jump in every level, and fixed**
+- **Grass and trees floating in mid-air.** The dark foreground strip was pinned to the bottom of the screen, so when
+  the camera rose (a jump onto a ledge, a high platform) it hung in the sky with no ground under it. It now belongs to
+  the bottom of the world and drops out of sight as the camera rises.
+- **Consequence cards covering the speaker.** After moving them to the left last round, they landed exactly on top of
+  the dialogue box's portrait and first words. While someone is talking they now sit below the box.
+- The level chip no longer tucks under the Starlight count.
+
+**Dialogue redesigned**
+- The **speaker's colour** runs through the box: its border, a stripe down the left edge, and the name.
+- The **name sits on a ribbon** over the top edge of the box, with a small star.
+- The **portrait hangs in a gilded frame**, slightly tilted, with a drop shadow and the speaker's colour round it. The
+  same frame is used wherever a face appears (whispers, consequence cards, the journal, the pause screen).
+- **Narration is set apart** like a line from a book: centred, in the serif face, under a small star, with no portrait.
+- **Choices** are plates with a diamond marker that fills and glows on the one you are on, and slides a little.
+- The "tap anywhere" text is now a small bouncing arrow.
+
+**Enemies.** Thorn sprites have a shadow, root-legs that scuttle when they move, spines that spin up as they wind
+up, and they burst into leaves and thorns when they die.
+
+**Honest notes.** I could not tell which "goofy" things Will saw, so I went looking; the two above are what I found.
+If it was something else, a word about where (which level, what was on screen) will find it. The portraits inside the
+new frames are the same drawings. Wren's figure and the wyrms are unchanged. Tests: 50 play checks, 19 menu checks,
+the fuzz run, the screenshot run. **Not played by hand or on a phone.**
+
 ## Reimagined 12 — pop-ups out of the way (Nov 18, 2026)
 Will: word pop-ups block the direction you're going.
 
