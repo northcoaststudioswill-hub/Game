@@ -56,8 +56,8 @@ Sources: [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (the Sprouts sections, Nov 17 an
 - Nature's balance (a wild buddy quietly eats a stranded sprout) is rare by design. Two three-day autopilot runs saw none. Whether a player ever notices it is unknown.
 - The objective-marker bot got through four asks in four of five runs and two in the other.
 
-- The 3D cutscenes and the North Coast (Nov 18) were stepped by script only (`sprouts_coast.js`, 129 checks). Not played by hand, not seen on a phone, no sound listened to. Frame time on a real phone is unknown.
-- The soak test's first-day bot used to finish only one of Erin's asks about 1 run in 10. Not seen in 16 runs since sprouts stopped being thrown over shut gates; probably that, not proven.
+- The 3D cutscenes and the North Coast (Nov 18) were stepped by script only (`sprouts_coast.js`, 138 checks). Not played by hand, not seen on a phone, no sound listened to. Frame time on a real phone is unknown.
+- The soak test's first-day bot stall is explained and fixed (Nov 18): things close in front of Will could not be aimed at. Twelve runs clean since.
 - Speed was measured in headless Chromium slowed four times, never on a phone. The 3D scenes have a slow-device mode that has only been triggered by a test.
 
 - Will played the build on Nov 18: "it's fun". His three notes (trail posts, the house lock-out, the house in 3D) are in the changelog. The lock-out was not reproduced; the door was changed on a best guess.

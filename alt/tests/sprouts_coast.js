@@ -205,6 +205,22 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await E(`P.x=RX+88;P.y=RY+30;P.dx=0;P.dy=-1;void 0`); await step(3); await tap('a'); ok('the desk still opens the house menu', (await E('state')) === 'house', await E('state')); await tap('b');
   await E(`exitHome();void 0`); await step(3);
 
+  /* ---- from Will's second playtest: Louie, pacing, messages, greens and Pebs ---- */
+  await E(`init();live=true;state='play';dayT=30;npcs[0].st='active';npcs[0].mi=2;items.forEach(i=>i.alive=false);bugs.forEach(q=>q.alive=false);P.x=24*16;P.y=18*16;LO.x=LO.sx=P.x-40;LO.y=LO.sy=P.y-30;P.dx=1;P.dy=0;void 0`);
+  let pets = 0; for (let k = 0; k < 3; k++) { await step(45); await tap('a'); if (await E(`run.pets===${k + 1}`)) pets++; await step(60); }
+  ok("during Erin's pet-Louie ask he comes round and waits when Will stands still: three scratches without chasing him", pets === 3, [pets, await E('[LO.st,Math.hypot(LO.x-P.x,LO.y-P.y)|0]')]);
+  await E(`npcs[0].mi=1;LO.st='follow';LO.x=LO.sx=P.x+40;LO.y=LO.sy=P.y+30;P.dx=1;P.dy=0;P.idle=0;const it=mkItem('berry',P.x+60,P.y);window.__it=it;buds=[];for(let i=0;i<3;i++)mkBud(0,2,P.x-6,P.y+6);void 0`); await step(50); const p0 = await E('run.pets'); await tap('a'); await step(40);
+  ok('outside that ask he does not come round, and A at a berry throws (no petting by accident)', await E(`run.pets===${p0}&&(__it.on.length>0||buds.some(b=>b.tgt===__it||b.st==='fly'||b.st==='seek'||b.st==='carry')||!__it.alive)`), await E(`[run.pets,__it.on.length,buds.map(b=>b.st).join()]`));
+  await E(`init();live=true;state='play';dayT=30;npcs.forEach(n=>n.st='active');P.x=24*16;P.y=18*16;P.dx=1;P.dy=0;LO.x=LO.sx=P.x+16;LO.y=LO.sy=P.y-12;items.forEach(i=>i.alive=false);const it=mkItem('berry',P.x+20,P.y+2);window.__it=it;for(let i=0;i<3;i++)mkBud(0,2,P.x-8,P.y+6);void 0`); await step(20); const p1 = await E('run.pets'); await tap('a'); await step(30);
+  ok('a berry lying right in front of Will can be thrown at (the aim used to reach past it)', await E(`run.pets===${p1}&&(__it.on.length>0||!__it.alive||buds.some(b=>b.tgt===__it))`), await E(`[run.pets,__it.on.length,buds.map(b=>b.st).join()]`));
+  ok('the mission givers stand apart (Ranger by the bramble, Scout across the berry field)', await E(`(()=>{const d=(a,b)=>Math.hypot(npcs[a].x-npcs[b].x,npcs[a].y-npcs[b].y)/16;return d(0,1)>=4.5&&d(0,2)>=14&&d(1,2)>=14})()`), await E(`npcs.map(n=>[n.name,n.x>>4,n.y>>4])`));
+  ok('the quick asks want a little more', await E(`(()=>{const g=id=>{for(const n of npcs)for(const m of n.ms)if(m.id===id)return m.goal};return g('e2')===5&&g('e5')===5&&g('s2')===3&&g('s3')===3})()`));
+  ok('a passing message is drawn low on the screen, not over the marker or the middle', await E(`(()=>{toasts=[];say('ONE TWO THREE FOUR FIVE SIX SEVEN EIGHT NINE TEN ELEVEN TWELVE THIRTEEN FOURTEEN',9);__g.tb.on(1);TBX=[];g.setTransform(2,0,0,2,0,0);draw();const L=TBX.filter(b=>/ONE TWO|THIRTEEN/.test(b.s));__g.tb.on(0);TBX=null;return L.length>=2&&L.every(b=>b.y>H*.6&&b.y<H-20)})()`), await E('H'));
+  await E(`msgT=0;sprouts=sprouts.filter(q=>q.type!==1&&q.type!==4);void 0`);
+  ok('Pebs and Leafs grow back in the wild each morning (two a patch)', await E(`(()=>{const c=t=>sprouts.filter(q=>q.type===t).length;const a=[c(1),c(4)];wildRegrow();const b=[c(1),c(4)];wildRegrow();const d=[c(1),c(4)];return a[0]===0&&b[0]===2&&d[0]===4&&b[1]===2&&d[1]>=3})()`), await E(`[1,4].map(t=>sprouts.filter(q=>q.type===t).length)`));
+  ok('a full patch does not overgrow', await E(`(()=>{for(let i=0;i<9;i++)wildRegrow();return sprouts.filter(q=>q.type===1).length===5})()`), await E(`sprouts.filter(q=>q.type===1).length`));
+  ok('there are Leafs in the North Meadow from the start, before the garden opens', await E(`(()=>{init();return sprouts.filter(q=>q.type===4&&q.y<10*16&&q.x<40*16).length===3})()`));
+
   /* ---- what the house is for ---- */
   await E(`init();live=true;state='play';dayT=30;home.res=[6,0,0,0,0,0];home.jobs=[3,1,0];for(let i=0;i<8;i++)mkBud(0,0,P.x,P.y);enterHome();mkRes();void 0`); await step(3);
   ok('four places inside: desk, beds, pantry, fire', await E(`HST.map(h=>h.id).join()==='desk,bed,pantry,fire'&&!homeAt()`));

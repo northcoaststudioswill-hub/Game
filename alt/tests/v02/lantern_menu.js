@@ -16,7 +16,10 @@ const D = require('path').join(__dirname, 'out', 'lantern_menu') + '/'; require(
   const cv = await page.$('canvas'); const shot = async nm => { await page.waitForTimeout(150); await cv.screenshot({ path: D + nm + '.png' }) };
   await E(`localStorage.removeItem('lantern-v1');LAN.ach={};LAN.played={};LAN.ko={w:0,cl:0};LAN.tixEarned=0;LAN.capTut=1;meta.ltix=5`);
   await page.screenshot({ path: D + 'shelf.png' });
-  await hit('ArrowDown', 150); ok(await page.evaluate(() => document.getElementById('lanBtn').classList.contains('sel')), 'down on the shelf highlights the Lantern menu');
+  /* Nov 18 2026: the page opens on the power-on sequence and the shelf is rows of three, so: skip the sequence, then go down until the Lantern button is reached */
+  for (let k = 0; k < 6 && (await E('state')) === 'pwr'; k++) await hit('KeyX', 200);
+  for (let k = 0; k < 5 && !(await page.evaluate(() => document.getElementById('lanBtn').classList.contains('sel'))); k++) await hit('ArrowDown', 150);
+  ok(await page.evaluate(() => document.getElementById('lanBtn').classList.contains('sel')), 'down on the shelf reaches the Lantern menu');
   await hit('KeyZ', 300); ok((await E('state')) === 'lan', 'A opens the Lantern menu'); await shot('menu');
   await hit('KeyZ', 200); ok((await E('state')) === 'lancaps', 'CAPSULES: the unified machine'); const t0 = await E('meta.ltix');
   await hit('KeyZ', 1500); ok((await E('capR.ph')) === 'show' && (await E('meta.ltix')) === t0 - 1, 'a pull from the console spends a ticket'); await shot('caps_reveal');

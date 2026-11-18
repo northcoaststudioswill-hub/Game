@@ -3,6 +3,58 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: from Will's second playtest - Louie, pacing, messages, greens and Pebs, and an aim bug (Nov 18 2026)
+
+Will: the pet-Louie mission is too hard because he moves. Missions come quickly and finish fast; maybe more of a
+collectathon, with the mission givers spread out. Some text blocks the missions and the game. It's hard to get more
+greens and Pebs. If the shared rewards broke anything in the other games, patch it.
+
+**A real bug found on the way: things close in front of Will could not be aimed at.** The aim only snapped to things
+near the cursor, which sits about three and a half tiles ahead. A berry one tile in front of Will was never picked, so
+A did something else (walk back a step and it worked). The aim now takes whatever is nearest the line from just ahead
+of Will out to the cursor. This was also what stalled the soak test's first-day bot about one run in six, on every
+build back to before this branch: in the run that finally got caught, it stood at a berry it could not target and
+petted Louie 1,629 times. Twelve logged runs since the fix, no stalls.
+
+**Louie and the pet ask:**
+- While Erin's PET LOUIE ask is the one in hand, Louie comes round to Will's front and waits whenever Will stops.
+- Always: the reach for a scratch is wider (34 pixels, and a much wider angle; touching distance needs no facing at
+  all), and he sits a little longer afterwards. A throw at something aimed at still comes first.
+
+**Pacing:**
+- **The mission givers stand apart.** Ranger is up the north path by the bramble he asks about; Scout is across the
+  Berry Field. (They were both within a few steps of Erin.)
+- **The quick asks want a little more:** BRING HOME 5 BERRIES (was 3), HARVEST 5 FLOWERS (3), CATCH 3 BUGS (1),
+  BEAT 3 GRUBS (2). The asks that depend on finding a kind of sprout are unchanged.
+
+**Messages out of the way.** The passing hints ("A NECTAR BLOSSOM! ...") used to sit as a big box under the mission
+marker, over the middle of the screen. They are now a smaller strip low on the screen, above the sprout bar. Rewards
+(toasts) stay at the top.
+
+**Greens and Pebs:**
+- **Wild sprouts grow back.** Every morning each wild patch that has been picked grows back up to two, so no kind can
+  be used up: Pebs in the North Meadow, Dews at the pond, the beach and the falls, Luckies in the orchard, Zips in the
+  Berry Field, Leafs in the garden.
+- **Leafs in the North Meadow too** (three, growing back), so greens no longer wait on Erin's garden.
+- **A hint the first time a Peb or Leaf joins:** new seeds take after whoever carries the berry home, so send Pebs to
+  get Pebs.
+
+**The other games, after the rewards split:** audited every cartridge for the old shared tickets. Rootdeep, Patch &
+Plate and the Lantern menu were already moved to Lantern tickets last pass; Knockout, Sproutwild, Lightswarm and
+Clankawatch never used them. Nothing was found broken. `tests/v02/lantern_menu.js`, which had eight failing checks,
+turned out to be out of date (it predated the power-on sequence and the three-row shelf), not a fault in the game; it
+is updated and passes.
+
+**Tested:** `tests/sprouts_coast.js` 138 checks (nine new: the scratches, no petting by accident, aiming at a berry
+close in front, where the givers stand, the new goals, where a message is drawn, regrowth and its cap, the meadow
+Leafs). `sprouts_valley.js` and `sprouts_story.js` twice each, soak (two mid-game and two late-game seeds, plus the
+first-day bot twelve times), `tests/v02` capsules_reset, saves_onboarding and lantern_menu, console shelf, Sproutwild
+lab 124 of 124, Patch & Plate 119 of 119, Knockout lab: all pass. Lightswarm lab passes two runs in three, as before
+(one of its random bot runs). **Not tested:** by hand, or on a phone.
+
+**To watch when playing:** the aim change makes things between Will and the cursor easier to hit; it could also pick
+something nearer than the thing meant when two are in a line. Louie's reach and the new goals are first guesses.
+
 ## What the house is for, a full restart, Sprouts' own capsules, and a splash for every cartridge (Nov 18 2026)
 
 Will: I like the 3D house, but consider the gameplay: the functions it serves, what you can do there, how it feeds the

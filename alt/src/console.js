@@ -224,6 +224,7 @@ const homeTotal=()=>home.res.reduce((a,b)=>a+b,0),homeLv=()=>Math.min(10,(homeTo
 const inSoil=q=>q.x>=400&&q.x<512&&q.y>=352&&q.y<400,crewCount=()=>buds.filter(b=>!b.gard).length+sprouts.filter(inSoil).length+seeds.length;
 const HCAP=[10,20,35,50],UPCOST=[200,600,1400],homeCap=()=>HCAP[home.up|0];
 const LOU_AT=[0,15,40,80,140,220],LOU_AB=['FETCHES LOST SPROUTS','SHARP NOSE: MORE BERRIES','PACK LEADER: FETCHES GROUPS','DOGGY PADDLE: FETCHES FROM WATER','GUARD DOG: SCARES GRUBS','TREASURE HOUND: FINDS TICKETS'];
+const petAsk=()=>{const e=npcs&&npcs[0];return !!e&&e.st==='active'&&e.ms[e.mi]&&e.ms[e.mi].id==='e3'&&e.ms[e.mi].get()<e.ms[e.mi].goal};
 const louLv=()=>{let k=1;for(let i=1;i<LOU_AT.length;i++)if(meta.dog.xp>=LOU_AT[i])k=i+1;return k};
 function louXP(n){const a=louLv();meta.dog.xp+=n;const b=louLv();if(b>a){toast('LOUIE REACHED LEVEL '+b+'!');spSay('NEW TRICK!',3);say('LOUIE LEARNED '+LOU_AB[b-1],6);snd(784,.1);later(()=>snd(1175,.25),110);save()}}
 let state='off',bootT=0,bootDing=false,mi=0,ri=0,si=0,pi=0,look=null,dlg=null,dlgPage=0,toasts=[],flash='',flashT=0,cartSel=0,capS={ph:'idle',t:0,it:null},eraseArm=0,resetArm=0,seti=0,setFrom='menu';
@@ -279,11 +280,11 @@ function mkNPCs(){
    "Right then, Will. Let's start small.",
    "Look at it all, Will. The lantern's lit and the garden's blooming. Not bad for the three of us.",[
    {id:'e1',t:'PLUCK 6 SPROUTS',say:"See the sprouts in the soil below the lantern? Walk up to one and press A to pluck it. They'll follow you anywhere.",get:()=>run.plucked,goal:6,rw:10},
-   {id:'e2',t:'BRING HOME 3 BERRIES',say:"Face a berry and press A to throw a sprout at it. They carry it home, and the lantern turns berries into new sprouts. Hold B to call everyone back.",get:()=>run.delivered,goal:3,rw:10},
+   {id:'e2',t:'BRING HOME 5 BERRIES',say:"Face a berry and press A to throw a sprout at it. They carry it home, and the lantern turns berries into new sprouts. Hold B to call everyone back.",get:()=>run.delivered,goal:5,rw:12},
    {id:'e3',t:'PET LOUIE 3 TIMES',say:"Louie sniffs out berries and rounds up strays. Stand still facing him and press A when the heart pops up.",get:()=>run.pets,goal:3,rw:10},
    {id:'e4',t:'PLUCK 3 BLOOMED',say:"Leave sprouts in the soil a while. Leaf, then bud, then bloom. Bloomed sprouts are faster and stronger.",get:()=>run.bloom,goal:3,rw:15,tk:1},
-   {id:'e5',t:'HARVEST 3 FLOWERS',garden:1,say:"You're a natural, Will. I've unlocked my garden for you! Go east through the berry field, then north past the fence. I'll meet you there.",
-    hint:"Throw sprouts at the soil beds. They plant, water and pick the flowers all on their own, and they keep at it for as long as you leave them here. Dews water fastest.",get:()=>gard.harv,goal:3,rw:20},
+   {id:'e5',t:'HARVEST 5 FLOWERS',garden:1,say:"You're a natural, Will. I've unlocked my garden for you! Go east through the berry field, then north past the fence. I'll meet you there.",
+    hint:"Throw sprouts at the soil beds. They plant, water and pick the flowers all on their own, and they keep at it for as long as you leave them here. Dews water fastest.",get:()=>gard.harv,goal:5,rw:20},
    {id:'e6',t:'STATION 5 GARDENERS',say:"Picked flowers land in the basket by the path. Walk over it to collect your petals. The sign beside it picks which seeds get planted. Leave five sprouts here as gardeners and we'll never run short.",get:()=>gardeners(),goal:5,rw:20,tk:1},
    {id:'e12',t:'BRING HOME THE KEY',key:1,say:"That key the gardeners dug up says FLOW PROS. It's Marcus's. He closed the pond road out west for a 'job' and lost it here. Have the crew carry it home, then take it to his gate.",get:()=>run.key?1:0,goal:1,rw:15},
    {id:'e11',t:'SEND 5 SPROUTS HOME',say:"Crew getting crowded? Our house is in the corner of the Lantern Field. Walk in the front door and use the desk. Sprouts that move in live there and take a job: picking berries, making petals or training Louie. You choose who does what.",get:()=>homeTotal(),goal:5,rw:25},
@@ -291,18 +292,18 @@ function mkNPCs(){
    {id:'e8',t:'BRING HOME 4 SHARDS',say:"Four sun shards: one east, one north, one on the island out west, and one down south with Old Thornback. Ranger, Scout and Marcus know the way.",get:()=>shards,goal:4,rw:50,tk:1},
    {id:'e9',t:'HARVEST 30 FLOWERS',say:"Honestly, Will, the lantern needs you less than my garden does now. More flowers open more beds. Let's fill this place.",get:()=>gard.harv,goal:30,rw:60,tk:1},
    {id:'e10',t:'FILL 5 FLOWER ORDERS',say:"I've started taking flower orders, Will. The banner at the top of the garden shows what I need. Bigger flowers take longer but pay better, and every third order earns a capsule ticket.",get:()=>gard.orders,goal:5,rw:60,tk:1}]),
-  N('RANGER',30,16,'#f8a070',['#c03030','#f07060','#805838','#b08860'],
+  N('RANGER',29,14,'#f8a070',['#c03030','#f07060','#805838','#b08860'],
    "I watch the paths around here. Two of them are blocked.","Paths are clear. Nice work, Will.",[
    {id:'r1',t:'BURN THE BRAMBLE',say:"Bramble blocks the north path. Only orange Embers can burn it. Throw them right at it.",get:()=>gates[0].alive?0:1,goal:1,rw:15},
    {id:'r2',t:'FIND A PEB',say:"Grey Pebs sleep up north. They carry double, and grubs can't budge them.",get:()=>found[1]?1:0,goal:1,rw:10},
    {id:'r3',t:'SMASH THE WEST CRYSTAL',say:"The west path is sealed with crystal. Only Pebs can smash it.",get:()=>gates[1].alive?0:1,goal:1,rw:15},
    {id:'r5',t:'BUILD THE ORCHARD BRIDGE',say:"One more path. A river cuts off the north end of the orchard, past Scout. That's the Crooked River. Throw a crowd of sprouts at the stakes and they'll build a bridge. Any kind will do. Willow Falls is on the other side.",get:()=>gates[5].alive?0:1,goal:1,rw:25},
    {id:'r4',t:'WAKE OLD THORNBACK',say:"Those marks lead south, to Old Thornback's hollow. The old folk called him the guardian of the light. He sleeps like a boulder. It takes a whole crowd of sprouts climbing on him to wake him.",get:()=>run.boss?1:0,goal:1,rw:50,tk:1}]),
-  N('SCOUT',40,22,'#a8f080',['#3c8840','#78c870','#b89858','#e0c888'],
+  N('SCOUT',47,22,'#a8f080',['#3c8840','#78c870','#b89858','#e0c888'],
    "I study the critters out here. Want to help?","My notebook is full. Check your Collection in the main menu!",[
    {id:'s1',t:'FIND A ZIP',say:"Yellow Zip sprouts grow in the far corner of this field. Zips are the fastest sprouts there are.",get:()=>found[3]?1:0,goal:1,rw:10},
-   {id:'s2',t:'CATCH A BUG',say:"Throw a sprout at a bug to catch it. Ladybugs are slow. Butterflies need someone quick, like a Zip.",get:()=>run.bugs,goal:1,rw:10},
-   {id:'s3',t:'BEAT 2 GRUBS',wake:1,say:"Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. Embers shoo them off fastest.",get:()=>run.foes,goal:2,rw:20},
+   {id:'s2',t:'CATCH 3 BUGS',say:"Throw a sprout at a bug to catch it. Ladybugs are slow. Butterflies need someone quick, like a Zip.",get:()=>run.bugs,goal:3,rw:15},
+   {id:'s3',t:'BEAT 3 GRUBS',wake:1,say:"Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. Embers shoo them off fastest.",get:()=>run.foes,goal:3,rw:20},
    {id:'s4',t:'CATCH 4 KINDS OF BUGS',say:"Some bugs only come out at dusk, and one lives over water. Catch 4 different kinds.",get:()=>kinds(),goal:4,rw:30,tk:1}]),
   N('MARCUS',17,23,'#78c8f8',['#284878','#5080b8','#e88020','#f8c060'],
    "Bro. BRO. Will! Perfect timing. I've got the best idea anyone has ever had. A lazy river. Around the WHOLE valley. Dews as lifeguards. Waterslide off the lantern. Marcus Waterworks, bro.","Waterworks is basically done, bro. In my head. Go enjoy that lantern.",[
@@ -350,12 +351,15 @@ function init(){
  for(let i=0;i<5;i++)mkSprout(1,(21+i)*16+8,4*16+8,0);
  for(let i=0;i<5;i++)mkSprout(2,(6+i*2)*16+8,12*16+10,0);
  for(let i=0;i<3;i++)mkSprout(2,(6+i*3)*16+8,34*16+10,0);for(let i=0;i<4;i++)mkSprout(5,(58+i*2)*16+8,15*16+4,0);for(let i=0;i<4;i++)mkSprout(4,(45+i)*16+8,3*16+6,0);
- [[51,24],[52,24],[51,25],[52,25]].forEach(([x,y])=>mkSprout(3,x*16+8,y*16+6,0));
+ [[51,24],[52,24],[51,25],[52,25]].forEach(([x,y])=>mkSprout(3,x*16+8,y*16+6,0));for(let i=0;i<3;i++)mkSprout(4,(33+i)*16+8,4*16+8,0); /* a few Leafs in the North Meadow, so greens do not wait on the garden */
  for(let i=0;i<3;i++)mkSprout(2,(62+i)*16+8,2*16+10,0);for(let i=0;i<2;i++)mkSprout(5,(66+i)*16+4,9*16+8,0);
  mkNPCs();syncBeds();
  sel=0;day=1;dayT=0;shards=0;wr=0;aT=0;winT=0;duskSaid=false;found=Array(NT).fill(false);
  cam={x:P.x-VW/2,y:P.y-VH/2};cur={x:P.x,y:P.y+56};msg='';msgT=0;inHome=false;parked=[];newSpark();
 }
+/* where each kind grows wild. Every morning a patch that has been picked grows back up to two, so a kind is never used up */
+const WILDP=[[1,[[21,4],[22,4],[23,4],[24,4],[25,4]],8,8],[2,[[6,12],[8,12],[10,12],[12,12],[14,12]],8,10],[2,[[6,34],[9,34],[12,34]],8,10],[2,[[62,2],[63,2],[64,2]],8,10],[5,[[58,15],[60,15],[62,15],[64,15]],8,4],[5,[[66,9],[67,9]],4,8],[4,[[45,3],[46,3],[47,3],[48,3]],8,6],[4,[[33,4],[34,4],[35,4]],8,8],[3,[[51,24],[52,24],[51,25],[52,25]],8,6]];
+function wildRegrow(first){let n=0;for(const [t,pts,ox2,oy2] of WILDP){if(t===4&&pts[0][0]>=45&&!gard.open)continue;let k=0;for(const [tx,ty] of pts){if(k>=(first?9:2))break;const x=tx*16+ox2,y=ty*16+oy2;if(!sprouts.some(q=>Math.abs(q.x-x)<5&&Math.abs(q.y-y)<5)){mkSprout(t,x,y,0);k++;n++}}}return n}
 function respawn(){for(const s of spawns){if((s.ref&&s.ref.alive)||(s.k==='grub'&&!run.grubs)||(s.x>=70&&!coastLive(s)))continue;const x=s.x*16+8,y=s.y*16+8;s.ref=s.k==='grub'?mkFoe(x,y,false):s.k==='bug'?mkBug(s.sp,x,y):mkItem(s.k,x,y);}}
 function openGarden(fx){if(gard.open)return;gard.open=true;if(!gard.order)newOrder();openGate(gates[4],fx);const e=npcs[0];e.x=46*16+8;e.y=5*16+8;}
 
@@ -696,12 +700,15 @@ function update(dt){
  if(gard.open&&gard.basket>0&&d2(P,46*16,7*16+8)<15*15){toast('GARDEN BASKET  +'+gard.basket);earn(gard.basket);gard.basket=0;snd(700,.08,1100)}
  // cursor with gentle snap
  let cx=P.x+P.dx*56,cy=P.y+P.dy*56,sb=26*26,sn=null;
- const tryS=(x,y,o)=>{const d=(x-cx)*(x-cx)+(y-cy)*(y-cy);if(d<sb&&d2(P,x,y)<70*70){sb=d;sn={x,y,o}}};
+ /* the aim snaps to whatever is nearest the line from just ahead of Will out to the cursor, not only to things at the cursor itself:
+    something lying close in front of him used to be impossible to pick */
+ const sax=P.x+P.dx*10,say2=P.y+P.dy*10,svx=cx-sax,svy=cy-say2,svl=svx*svx+svy*svy||1;
+ const tryS=(x,y,o)=>{const t=Math.max(0,Math.min(1,((x-sax)*svx+(y-say2)*svy)/svl)),qx=sax+svx*t,qy=say2+svy*t,d=(x-qx)*(x-qx)+(y-qy)*(y-qy)+t*.01;if(d<sb&&d2(P,x,y)<70*70&&(x-P.x)*P.dx+(y-P.y)*P.dy>2){sb=d;sn={x,y,o}}}; /* in front of him only */
  foes.forEach(e=>e.alive&&tryS(e.x,e.y,e));items.forEach(i=>i.alive&&tryS(i.x,i.y,i));gates.forEach(ga=>ga.alive&&ga.sub!==2&&ga.sub<4&&tryS(ga.x,ga.y,ga));if(DIG.alive)tryS(DIG.x,DIG.y,DIG);bugs.forEach(q=>q.alive&&!q.hid&&tryS(q.x,q.y,q));
  if(gard.open)plots.forEach(p=>needs(p)&&!p.on.length&&tryS(p.x,p.y,p));
  const signNear=gard.open&&facing(SIGN,24);
  if(sn){cx=sn.x;cy=sn.y}cur.x=cx;cur.y=cy;
- petOK=LO.st==='follow'&&P.idle>.3&&!sn&&!signNear&&facing(LO,26);
+ {const dx=LO.x-P.x,dy=LO.y-P.y,d=Math.hypot(dx,dy)||1;petOK=(LO.st==='follow'||LO.st==='sit')&&P.idle>.2&&!sn&&!signNear&&(d<14||(d<34&&(dx*P.dx+dy*P.dy)/d>.3))} /* a wider reach and a wider angle than before; a throw at something still comes first */
  squad=buds.filter(b=>b.st==='follow');
  if(pressed('sel')){cycleSel();manT=4}
  // the right sprout steps up on its own, unless Select was pressed a moment ago
@@ -762,7 +769,7 @@ function doA(fresh){
   {const p=PJ.find(p=>pjOpen(p)&&facing({x:p.sx,y:p.sy},22));if(p){bp=p;state='build';flashT=0;snd(440,.06,660);return}}
   {const z=PZ.find(z=>facing(postXY(z),22));if(z){run.seen=run.seen||{};tlist=PZ.filter(q=>(run.seen[q[0]]||q[0]==='LANTERN FIELD')&&q!==z);if(!tlist.length)say('NO OTHER PLACES FOUND YET. WALK THERE FIRST, THEN TRAVEL',5);else{state='travel';ti=0;snd(440,.06,660)}return}}
   if(gard.open&&facing(SIGN,24)){const n=seedsOpen();if(n<2)say('MORE SEEDS UNLOCK AS YOU HARVEST',4);else{gard.seed=(Math.min(gard.seed,n-1)+1)%n;const f=FLOWERS[gard.seed];say('NOW PLANTING '+f.pl+':  '+f.v+' PETALS EACH',4);snd(660,.06,880)}return}
-  if(petOK){LO.st='sit';LO.t=1.3;hearts(LO.x,LO.y);run.pets++;meta.life.pets++;bump('pet');if((tod.petxp=(tod.petxp||0)+1)<=4)louXP(2);spSay(LOU_PET[(run.pets+day)%LOU_PET.length]);save();snd(880,.08,1320,'triangle',.07);if(run.pets===5){say('LOUIE DREAMS OF SQUIRRELS',3);egg('dream')}else if(run.pets===10)egg('zoomies');return}}
+  if(petOK){LO.st='sit';LO.t=1.6;hearts(LO.x,LO.y);run.pets++;meta.life.pets++;bump('pet');if((tod.petxp=(tod.petxp||0)+1)<=4)louXP(2);spSay(LOU_PET[(run.pets+day)%LOU_PET.length]);save();snd(880,.08,1320,'triangle',.07);if(run.pets===5){say('LOUIE DREAMS OF SQUIRRELS',3);egg('dream')}else if(run.pets===10)egg('zoomies');return}}
  let c=squad.filter(b=>b.type===sel);
  if(!c.length){if(!squad.length){if(fresh)snd(140,.08);return}cycleSel();c=squad.filter(b=>b.type===sel);if(!c.length)return;}
  let b=c[0],d=1e9;for(const q of c){const e=d2(q,P.x,P.y);if(e<d){d=e;b=q}}
@@ -843,9 +850,11 @@ function updLouie(dt){const l=LO,lv=louLv();if(l.say)l.say.t-=dt;l.mv=false;l.cd
   else{l.dt-=dt;l.mv=true;if(Math.random()<dt*10)puff(l.x,l.y,'#a87850',1,30);if(l.dt<=0){mkItem(lv>=2&&Math.random()<.25?'big':'berry',l.x,l.y+2);spSay('BERRY!');bark();louXP(2);
    if(lv>=6&&!tod.tix&&Math.random()<.3){tod.tix=1;meta.tix++;toast('LOUIE FOUND A CAPSULE TICKET!');save()}l.st='follow';l.dig=R(40,60)*(lv>=2?.55:1)}}return}
  // keep to Will's side, clear of the crew trailing behind him; hold still when Will does
+ if(l.bark<=0)for(const e of foes)if(e.alive&&d2(e,P.x,P.y)<82*82){l.bark=8;l.alert=1.3;bark();louXP(1);spSay('GRR! GRUB!',1.8);if(lv>=5&&!e.boss){e.scare=2.5;e.st='wander'}break}
+ if(!P.mv&&P.idle>.45&&d2(l,P.x,P.y)<130*130&&!inHome&&petAsk()){ /* while Erin's PET LOUIE ask is the one in hand: when Will stops, Louie comes round to his front and waits */
+  const fx=P.x+P.dx*17,fy=P.y+P.dy*13+3;if(free(fx,fy,false)){l.sx=fx;l.sy=fy}else{l.sx=P.x-P.dx*17;l.sy=P.y-P.dy*13+3}const dd=Math.hypot(l.sx-l.x,l.sy-l.y);if(dd>3)go(l,l.sx,l.sy,dd>30?118:70,dt,false,2);l.dig=Math.max(l.dig,1.5);l.cd=Math.max(l.cd,.4);return}
  if(P.mv&&!facing(l,30)){const px=-P.dy,py=P.dx;let sx=P.x-P.dx*4+px*24,sy=P.y-P.dy*4+py*24;if(!free(sx,sy,false)){sx=P.x-P.dx*4-px*24;sy=P.y-P.dy*4-py*24}if(!free(sx,sy,false)){sx=P.x+P.dx*20;sy=P.y+P.dy*20}if(free(sx,sy,false)){l.sx=sx;l.sy=sy}}
  const d=Math.hypot(l.sx-l.x,l.sy-l.y);if(d>4)go(l,l.sx,l.sy,d>50?118:84,dt,false,3);avoid(l);
- if(l.bark<=0)for(const e of foes)if(e.alive&&d2(e,P.x,P.y)<82*82){l.bark=8;l.alert=1.3;bark();louXP(1);spSay('GRR! GRUB!',1.8);if(lv>=5&&!e.boss){e.scare=2.5;e.st='wander'}break}
  if(l.cd<=0){l.cd=.7;let best=null,bd=1e12;for(const b of buds)if(b.st==='idle'&&!b.gard&&b.nh<time&&d2(b,P.x,P.y)>30*30){if(tileAt(b.x,b.y)===WA&&lv<4)continue;const q=d2(b,l.x,l.y);if(q<bd){bd=q;best=b}}
   if(best){const p=pathTo(l.x,l.y,best.x,best.y,lv>=4);if(p){l.st='fetch';l.tg=best;l.path=p;return}best.nh=time+25}}
  l.dig-=dt;if(l.dig<=0){const a=R(0,6.28),rr=R(30,48),x=P.x+Math.cos(a)*rr,y=P.y+Math.sin(a)*rr,t=tileAt(x,y);
@@ -916,6 +925,7 @@ function newDay(){mkWbuds();inHome=false;parked=[];day++;dayT=0;duskSaid=false;w
   {const rest=homeTotal()-J[0]-J[1]-J[2];let n=rest>>1,k2=0;for(const b of buds){if(k2>=n)break;if(!b.gard&&b.stage<2){b.stage=2;k2++}}if(k2)toast('HOME:  '+k2+' OF THE CREW WOKE BLOOMED')}
   if(J[2])louXP(J[2]*2);if(made||J[1]){toast('HOME:'+(made?'  +'+made+' SPROUTS':'')+(J[1]?'  +'+J[1]*2+' PETALS':''));if(J[1])earn(J[1]*2)}}
  if(!buds.length&&!sprouts.length){for(let i=0;i<3;i++){const [x,y]=soilSpot();mkSprout(0,x,y,8)}}
+ {const n=wildRegrow();const T=run.tips=run.tips||{};if(n&&!T.wr){T.wr=1;toast('WILD SPROUTS GROW BACK WHERE YOU FOUND THEM')}}
  newSpark();pjMorning();say('DAY '+day+'. GOOD MORNING, WILL!',4);
  cam.x=P.x-VW/2;cam.y=P.y-VH/2;state='play';snd(440,.1,880);persist(true);}
 
@@ -1017,7 +1027,8 @@ function loreTick(){if(state!=='play'||inHome)return;const T=run.tips=run.tips||
  if(!run.gdone&&(gdT=(gdT+1)%8)===0&&spGuideCount()>=TYPES.length+WBDEF.length+GPPL.length+ZONES.length){run.gdone=1;meta.tix+=2;toast('FIELD GUIDE COMPLETE!  +2 TICKETS');earn(30);snd(784,.1);later(()=>snd(1175,.25),110);save()}
  if(!T.gd&&gard.open&&inGarden(P.x,P.y)&&gardeners()>=3&&!buds.some(b=>b.st==='follow')){T.gd=1;say('GARDENERS STAY AND WORK. HOLD B NEAR THEM TO CALL THEM BACK',7)}
  {const S=run.wbSeen=run.wbSeen||{};for(const q of wbuds)if(!q.hid&&!S[q.id]&&d2(P,q.x,q.y)<70*70){S[q.id]=1;floatAt(q.x,q.y-22,'IN THE GUIDE: '+q.id,'#a8f080')}}
- if(!T.wb&&wbuds.some(q=>!q.hid&&d2(P,q.x,q.y)<64*64)){T.wb=1;say('A WILD BUDDY. THEY KEEP TO THEMSELVES OUT HERE',6)}
+ if(!T.sd&&(found[1]||found[4])&&msgT<=0&&!toasts.length){T.sd=1;say('NEW SEEDS TAKE AFTER WHOEVER CARRIES THE BERRY HOME. SEND PEBS FOR PEBS, LEAFS FOR LEAFS',9)}
+ else if(!T.wb&&wbuds.some(q=>!q.hid&&d2(P,q.x,q.y)<64*64)){T.wb=1;say('A WILD BUDDY. THEY KEEP TO THEMSELVES OUT HERE',6)}
  else if(!T.wn&&dayT/DAYLEN>.8&&d2(P,HX,HY)<90*90&&wbuds.some(q=>q.night&&q.path&&!q.path.length)){T.wn=1;say('THE BUDDIES COME AND SIT BY THE LIGHT AT NIGHT. NOBODY KNOWS WHY',7)}
  if(!tod.flick&&!run.lit&&dayT>DAYLEN*.88&&day>=2&&d2(P,HX,HY)<140*140){tod.flick=1;flickT=.45;snd(90,.3,60,'sawtooth',.05);spSay('GRR?',2);if(!T.fl){T.fl=1;say('THE LANTERN SKIPPED, LIKE A PICTURE JUMPING. THEN IT WAS FINE',7)}}}
 
@@ -1414,7 +1425,7 @@ function drawHUD(){
     g.save();g.translate(Math.round(cx+Math.cos(a)*(k+p)),Math.round(cy+6+Math.sin(a)*(k+p)));g.rotate(a);g.fillStyle='#181020';g.beginPath();g.moveTo(9,0);g.lineTo(-6,-8);g.lineTo(-6,8);g.fill();g.fillStyle=col;g.beginPath();g.moveTo(6,0);g.lineTo(-4,-5);g.lineTo(-4,5);g.fill();g.restore()}
    else if(d2(P,OBJ.x,OBJ.y)>34*34){const by=Math.round(ty-30+Math.sin(time*6)*2),bx=Math.round(tx);r('#181020',bx-4,by-1,9,5);r('#181020',bx-2,by+4,5,2);r('#181020',bx-1,by+6,3,1);r(col,bx-3,by,7,3);r(col,bx-1,by+3,3,2);r(col,bx,by+5,1,1)}}}
  if(toasts.length){const s=toasts[0].s,w=tw(s)+20;r('#f8e060',Math.round((W-w)/2),my,w,17);r('#281c30',Math.round((W-w)/2)+1,my+1,w-2,15);petalIcon(Math.round((W-w)/2)+5,my+6);text(s,Math.round((W-w)/2)+14,my+2,2,'#f8e060')}
- else if(msgT>0&&msg){const ls=wrapPx(msg,222),w=Math.max(...ls.map(l=>tw(l)))+10;box(Math.round((W-w)/2),my,w,4+ls.length*13,'rgba(24,16,32,.88)');ls.forEach((l,i)=>ctext(l,my+2+i*13,2,'#ffffff'))}
+ else if(msgT>0&&msg){const ls=wrapPx(msg,222,1),w=Math.max(...ls.map(l=>tw(l,1)))+10,bh=5+ls.length*10,by=inHome?my:H-20-bh;box(Math.round((W-w)/2),by,w,bh,'rgba(24,16,32,.86)');r('#f8e060',Math.round((W-w)/2),by,w,1);ls.forEach((l,i)=>ctext(l,by+3+i*10,1,'#ffffff'))}
  else if(inGarden(P.x,P.y)){const o=gard.order,s=(o?'ERIN WANTS '+o.have+' / '+o.need+' '+FLOWERS[o.k].pl+'   ':'')+'GARDENERS '+gardeners();const w=tw(s)+8;box(Math.round((W-w)/2),my,w,15,'rgba(40,90,50,.85)');ctext(s,my+1,2,'#e0ffd0')}
 }
 function npCard(){if(MUS.np>0&&MUS.cur>=0&&state==='play'){const t=TRACKS[MUS.cur],w=Math.max(tw(t.title,2),tw(t.artist,1),tw('NOW PLAYING',1))+42,k=Math.min(1,(5.5-MUS.np)*4,MUS.np*3),cx=Math.round(-w+(w+3)*k),cy=H-60;

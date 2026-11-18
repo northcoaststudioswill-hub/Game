@@ -34,7 +34,7 @@ const SEEDS = +(process.argv[3] || 2), DAYS = +(process.argv[4] || 2), LATE = +(
      for(const q of wbuds)if(!isFinite(q.x)||(!free(q.x,q.y,false)&&!q.path))bad('buddy in wall '+q.id)};
    for(let f=0;f<${secs}*30;f++){for(const k in K)K[k]=0;
     if(!B.seen[state]){B.seen[state]=1;B.log.push('d'+day+' '+Math.round(dayT)+'s state '+state)}
-    if(['cine','talk','card','dayend','win','hop'].includes(state)){if(f%8===0)press('a')}
+    if(['cine','talk','card','dayend','win','hop','c3','pan','hsel'].includes(state)){if(f%8===0)press('a')}
     else if(state==='travel'||state==='house'||state==='build'||state==='pause'||state==='map'){if(f%8===0)press('b')}
     else if(state==='play'){let o=objective();if(o&&/BLOOMED/.test(o.text)&&sprouts.filter(inSoil).length<3){const q=nearBerry();o={text:'FETCH BERRIES FIRST',x:q.x,y:q.y}}
       if(o){const key=o.text.replace(/\\d+ \\/ \\d+/,'');if(B.cur!==key){B.cur=key;B.log.push('d'+day+' '+Math.round(dayT)+'s '+o.text+' (crew '+buds.length+')')}
