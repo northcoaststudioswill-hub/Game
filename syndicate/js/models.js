@@ -24,7 +24,7 @@
       const m = shiny ? new T.MeshPhongMaterial({ color, flatShading: true, shininess: 60, specular: 0x666666 }) : new T.MeshLambertMaterial({ color, flatShading: true });
       m.emissive = new T.Color(emissive || 0); m.userData.e = m.emissive.clone(); mats.push(m); return m;
     };
-    const m = { skin: M(hex(race.skin)), armor: M(P.armor, true), armor2: M(P.armor2, true), trim: M(P.trim, true), cloth: M(P.cloth), legs: M(P.legs), hair: M(P.hair), dark: M(0x15131a), weapon: M(P.weapon, true, wsk ? wsk.e : WGLOW[g.weapon || 0]) };
+    const m = { skin: M(hex(look.skin || race.skin)), armor: M(P.armor, true), armor2: M(P.armor2, true), trim: M(P.trim, true), cloth: M(P.cloth), legs: M(P.legs), hair: M(P.hair), dark: M(0x15131a), weapon: M(P.weapon, true, wsk ? wsk.e : WGLOW[g.weapon || 0]) };
     const box = gfx.box, mesh = gfx.mesh;
     const root = new T.Group(), body = new T.Group(); root.add(body);
     const robed = cls === 'sorcerer' || cls === 'cleric';
@@ -122,6 +122,8 @@
     if (cos.back === 'greatsword') { const gs = new T.Group(); gs.position.set(0, 0.5, -0.3); gs.rotation.z = 0.6; torso.add(gs); box(0.13, 1.5, 0.04, M(0xcfd8e0, true), 0, 0.2, 0, gs); box(0.46, 0.08, 0.08, m.trim, 0, -0.52, 0, gs); box(0.08, 0.3, 0.07, m.dark, 0, -0.7, 0, gs); }
     if (cos.back === 'lanternpole') { mesh(new T.CylinderGeometry(0.03, 0.03, 2.1, 5), m.dark, -0.2, 1.2, -0.28, torso); box(0.4, 0.04, 0.04, m.dark, 0, 2.2, -0.28, torso); const lb = new T.Mesh(new T.BoxGeometry(0.2, 0.26, 0.2), new T.MeshBasicMaterial({ color: 0xfff0c8 })); lb.position.set(0.2, 2.02, -0.28); torso.add(lb); glows.push(gfx.glow(0xffb060, 1.6, 0.2, 2.0, -0.28, torso, 0.7)); }
     if (cos.back === 'skullrack') [-0.28, 0, 0.28].forEach((x, i) => { mesh(new T.CylinderGeometry(0.025, 0.025, 0.9 + (i === 1 ? 0.25 : 0), 4), m.dark, x, 1.0 + (i === 1 ? 0.12 : 0), -0.28, torso); const sk = mesh(new T.SphereGeometry(0.13, 7, 5), bone(), x, 1.5 + (i === 1 ? 0.25 : 0), -0.28, torso); sk.scale.set(1, 0.9, 1.1); box(0.05, 0.05, 0.03, m.dark, x - 0.05, 1.52 + (i === 1 ? 0.25 : 0), -0.16, torso); box(0.05, 0.05, 0.03, m.dark, x + 0.05, 1.52 + (i === 1 ? 0.25 : 0), -0.16, torso); });
+    if (cos.head === 'exechood') { const hm = M(0x0c0a0c); hm.side = T.DoubleSide; const hd = mesh(new T.SphereGeometry(0.37, 9, 7, Math.PI / 2 + 0.3, Math.PI * 2 - 0.6, 0, 2.2), hm, 0, 0.02, -0.02, head); hd.scale.set(1, 1.1, 1.1); const tp = mesh(new T.ConeGeometry(0.2, 0.5, 5), hm, 0, 0.5, -0.05, head); tp.rotation.x = -0.25; [-0.09, 0.09].forEach(x => { const ey = new T.Mesh(new T.SphereGeometry(0.035, 5, 4), new T.MeshBasicMaterial({ color: 0xff4030 })); ey.position.set(x, 0.03, 0.3); head.add(ey); }); }
+    if (cos.back === 'pennants') [-0.22, 0.22].forEach((x, i) => { mesh(new T.CylinderGeometry(0.02, 0.02, 1.6, 4), m.dark, x, 1.1, -0.28, torso); const fl = new T.Mesh(new T.PlaneGeometry(0.5, 0.32), new T.MeshLambertMaterial({ color: i ? 0xd9a93c : 0x7a1c22, side: T.DoubleSide })); fl.position.set(x + (i ? 0.25 : -0.25), 1.72, -0.28); torso.add(fl); });
     if (cos.head === 'hood') { const hm = M(0x2a2428); hm.side = T.DoubleSide; const hd = mesh(new T.SphereGeometry(0.37, 9, 7, Math.PI / 2 + 0.75, Math.PI * 2 - 1.5, 0, 2.0), hm, 0, 0.02, -0.03, head); hd.scale.set(1, 1.08, 1.12); const tp = mesh(new T.ConeGeometry(0.16, 0.36, 5), hm, 0, 0.26, -0.3, head); tp.rotation.x = -1.9; }
     if (cos.head === 'mohawk') for (let i = -3; i <= 3; i++) { const a = Math.abs(i), sp = box(0.07, 0.3 - a * 0.045, 0.1, M(0xff3a8a, false, 0x5a0a2a), 0, 0.36 - a * a * 0.022, i * 0.09 - 0.02, head); sp.rotation.x = i * 0.16; }
     if (cos.head === 'candles') { const rg = mesh(new T.TorusGeometry(0.3, 0.03, 5, 12), M(0x1c1a20, true), 0, 0.2, 0, head); rg.rotation.x = Math.PI / 2; for (let i = 0; i < 6; i++) { const a = i * 1.047 + 0.5, cx = Math.cos(a) * 0.3, cz = Math.sin(a) * 0.3, ch = 0.12 + (i % 3) * 0.04; mesh(new T.CylinderGeometry(0.03, 0.035, ch, 5), M(0xefe6cc), cx, 0.22 + ch / 2, cz, head); const fl = new T.Mesh(new T.SphereGeometry(0.03, 5, 4), new T.MeshBasicMaterial({ color: 0xffd080 })); fl.position.set(cx, 0.26 + ch, cz); fl.scale.y = 1.6; head.add(fl); } glows.push(gfx.glow(0xffb060, 1.1, 0, 0.42, 0, head, 0.45)); }
@@ -160,8 +162,15 @@
         if (cls === 'rogue' && step < 2) { q.alx = q.arx + 0.5; q.alz = -q.arz * 0.6; }
       } else if (act === 'cast') {
         snap = 0.6; q.arx = cls === 'cleric' ? mix(-1.4, -2.8, eo(k)) : -1.5 - k * 0.4; q.alx = cls === 'cleric' ? -0.4 : -1.5 - k * 0.4; q.arz = -0.25; q.alz = 0.25; q.bx = -0.1 - k * 0.08; q.by += k * 0.06; q.hx = -0.15 * k; q.cape = 0.3 + k * 0.4;
+      } else if (act === 'release') { snap = 0.9; const r = 1 - k; q.arx = mix(-0.45, -1.75, r); q.arz = 0.15 * r; q.alx = mix(restL, -0.2, r); q.ty = -0.5 * r; q.bx = 0.06 + 0.3 * r; q.bpz = 0.18 * r; q.ll = 0.35 * r; q.lr = -0.3 * r; q.cape = 0.3 + 0.5 * r;
+      } else if (act === 'lunge') { snap = 1; q.bx = 0.6; q.arx = -1.6; q.arz = 0.1; q.alx = 0.6; q.ll = 0.9; q.lr = -0.8; q.by = -0.08; q.hx = -0.45; q.cape = 0.9;
+      } else if (act === 'parry') { snap = 1; q.arx = -1.9; q.arz = 1.1; q.alx = -1.2; q.alz = -0.6; q.ty = 0.5; q.bx = -0.05; q.by = -0.06; q.ll = 0.25; q.lr = -0.3;
+      } else if (act === 'cheer') { snap = 0.4; const b = Math.abs(Math.sin(t * 5)); q.arx = -2.9 + b * 0.3; q.arz = -0.35; q.alx = -2.7 + b * 0.4; q.alz = 0.4; q.by = b * 0.12; q.bx = -0.12; q.hx = -0.3; q.cape = 0.3 + b * 0.3;
+      } else if (act === 'salute') { snap = 0.3; q.arx = -2.2 + Math.sin(t * 3) * 0.08; q.arz = -0.2; q.ty = -0.2; q.bx = 0; q.hx = -0.1;
       } else if (act === 'sit') { q.ll = q.lr = -1.5; q.by = -0.3; q.bx = -0.06; q.arx = -0.75; q.alx = -0.75; snap = 0.4;
       } else if (act === 'stun') { q.hz = Math.sin(t * 9) * 0.3; q.tz = Math.sin(t * 7) * 0.12; q.arx = 0.1; q.alx = 0.1; q.bx = 0.28; q.by = -0.04; }
+      if (p.ready && act === 'idle') { q.by -= 0.05; q.bx = 0.14; q.arx = -0.95 + Math.sin(t * 2.4) * 0.05; q.arz = 0.2; q.alx = (cls === 'fighter' ? -1.2 : restL - 0.45) + Math.sin(t * 2.4 + 1) * 0.04; q.ty = 0.25; if (!mv) { q.ll = 0.18; q.lr = -0.22; } }
+      if (p.tired && (act === 'idle' || act === 'cheer')) { q.bx += 0.2 + Math.sin(t * 5) * 0.04; q.hx = 0.25; q.by -= 0.04 + Math.abs(Math.sin(t * 2.5)) * 0.02; q.arx += 0.3; }
       if (p.guard) { q.alx = -1.55; q.alz = -0.55; q.arx = -1.25; q.arz = 0.45; q.bx = 0.14; q.by = -0.05; snap = 0.5; }
       if (p.hurt > 0) { const h = Math.min(1, p.hurt / 0.28); q.bx -= 0.42 * h; q.hx = -0.4 * h; q.arx += 0.55 * h; q.alx += 0.65 * h; q.bpz -= 0.1 * h; snap = Math.max(snap, 0.7); }
       body.position.y = J('by', q.by, snap); body.position.z = J('bpz', q.bpz, snap); body.rotation.set(J('bx', q.bx, snap), 0, J('bz', q.bz, snap));
@@ -191,7 +200,7 @@
   // ------------------------------------------------------------ portraits (rendered once, cached as images)
   let pr = null, pscene, pcam; const pcache = {};
   G.portrait = function (look, size) {
-    const key = JSON.stringify([look.cls, look.race, look.tint, look.gear, look.cos]);
+    const key = JSON.stringify([look.cls, look.race, look.tint, look.gear, look.cos, look.skin]);
     const img = document.createElement('img'); img.className = 'portrait'; img.style.width = img.style.height = (size / 16) + 'rem'; img.alt = '';
     if (!pcache[key]) {
       try {

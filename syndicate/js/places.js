@@ -4,7 +4,10 @@
   const { wall, brazier, lantern, stoneMat, tiles } = W.props;
   const R = (a, b) => a + Math.random() * (b - a);
   const L = c => gfx.lambert(c);
-  const iron = () => L(0x1c1a1e), wood = () => L(0x5a3c24), woodD = () => L(0x3a2616);
+  const iron = () => L(0x1c1a1e);
+  let _w1 = null, _w2 = null;
+  const wood = () => _w1 || (_w1 = new T.MeshLambertMaterial({ color: 0x8a5c38, map: gfx.tex('wood'), flatShading: true })), woodD = () => _w2 || (_w2 = new T.MeshLambertMaterial({ color: 0x5c3c24, map: gfx.tex('wood'), flatShading: true }));
+  const brickMat = (c, rx, ry) => { const t = gfx.tex('brick').clone(); t.needsUpdate = true; t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(rx, ry); return new T.MeshLambertMaterial({ color: c, map: t, flatShading: true }); };
   const emis = c => new T.MeshBasicMaterial({ color: c });
   const em = (geo, c, x, y, z, g) => { const m = new T.Mesh(geo, emis(c)); m.position.set(x, y, z); g.add(m); return m; };
 
@@ -34,15 +37,18 @@
     const s = gfx.newScene({ ambient: 1.5, key: 1.35, shadowSize: 24, sky: 0x8a88c0, ground: 0x241c1a, keyColor: 0xd8d0ff });
     s.fog = new T.Fog(0x07060a, 74, 116);
     const X1 = 29, Z1 = 17, key = s.userData.key; key.position.set(24, 22, 24); key.target.position.set(14, 0, 8);
-    const cells = [], plaza = new T.Color(1.12, 1.06, 0.98);
-    for (let x = -1; x <= X1 + 1; x++) for (let z = -1; z <= Z1 + 1; z++) cells.push({ x, z, tint: Math.hypot(x - 14, z - 9) < 4.6 ? plaza : null });
+    const cells = [], plaza = new T.Color(1.12, 1.06, 0.98), lane = new T.Color(1.34, 1.26, 1.1);
+    // worn paths: the promenade along the north row, the west lane to your door, and spokes into the square
+    const onLane = (x, z) => (z >= 2 && z <= 3 && x >= 0 && x <= 28) || (x >= 1 && x <= 2 && z >= 2 && z <= 10) || (x >= 13 && x <= 15 && z >= 3 && z <= 5) || (z >= 8 && z <= 10 && x >= 2 && x <= 9) || (z >= 8 && z <= 10 && x >= 19 && x <= 23) || (x >= 22 && x <= 23 && z >= 3 && z <= 8) || (z >= 5 && z <= 6 && x >= 23 && x <= 25);
+    for (let x = -1; x <= X1 + 1; x++) for (let z = -1; z <= Z1 + 1; z++) cells.push({ x, z, tint: Math.hypot(x - 14, z - 9) < 4.6 ? plaza : onLane(x, z) ? lane : null });
     tiles(s, cells, 'cobble', [0.5, 0.5, 0.56]);
     const m1 = stoneMat(0x6f6a72), m2 = stoneMat(0x56525c), m3 = stoneMat(0x625a5a);
     // building line on the two far sides, broken into houses of different heights
-    const bw = wall(s, X1 + 5, 5.2, 1, m1); bw.position.set(X1 / 2, 0, -2.05);
-    const lw = wall(s, Z1 + 5, 5.2, 1, m2); lw.position.set(-2.05, 0, Z1 / 2); lw.rotation.y = Math.PI / 2;
-    [[2, 7.5, 6.6, m3], [12, 6, 7.4, m2], [18, 5, 6.2, m3], [23, 6.5, 7.8, m2], [28.5, 4, 6.4, m3]].forEach(q => { box(q[1], q[2] - 5.2, 1.6, q[3], q[0], 5.2 + (q[2] - 5.2) / 2, -2.5, s); box(q[1] + 0.5, 0.35, 2.3, m2, q[0], q[2] + 0.15, -2.5, s); });
-    [[3, 6, 6.8, m3], [10, 5, 6.2, m1], [15.5, 4, 7.2, m3]].forEach(q => { box(1.6, q[2] - 5.2, q[1], q[3], -2.5, 5.2 + (q[2] - 5.2) / 2, q[0], s); box(2.3, 0.35, q[1] + 0.5, m2, -2.5, q[2] + 0.15, q[0], s); });
+    const b1 = brickMat(0x8a8088, 11, 2), b2 = brickMat(0x74707c, 8, 2), bh1 = brickMat(0x8a7a78, 2.2, 0.7), bh2 = brickMat(0x726c7a, 2.2, 0.7);
+    const bw = wall(s, X1 + 5, 5.2, 1, b1); bw.position.set(X1 / 2, 0, -2.05);
+    const lw = wall(s, Z1 + 5, 5.2, 1, b2); lw.position.set(-2.05, 0, Z1 / 2); lw.rotation.y = Math.PI / 2;
+    [[2, 7.5, 6.6, bh1], [12, 6, 7.4, bh2], [18, 5, 6.2, bh1], [23, 6.5, 7.8, bh2], [28.5, 4, 6.4, bh1]].forEach(q => { box(q[1], q[2] - 5.2, 1.6, q[3], q[0], 5.2 + (q[2] - 5.2) / 2, -2.5, s); box(q[1] + 0.5, 0.35, 2.3, m2, q[0], q[2] + 0.15, -2.5, s); });
+    [[3, 6, 6.8, bh1], [10, 5, 6.2, bh2], [15.5, 4, 7.2, bh1]].forEach(q => { box(1.6, q[2] - 5.2, q[1], q[3], -2.5, 5.2 + (q[2] - 5.2) / 2, q[0], s); box(2.3, 0.35, q[1] + 0.5, m2, -2.5, q[2] + 0.15, q[0], s); });
     for (let i = 0; i < 10; i++) { windowLight(s, 1 + i * 3.1, 3.9, -1.5, 0); if (i % 3 === 0) windowLight(s, 1.6 + i * 3.1, 6.1, -1.65, 0); if (i < 6) windowLight(s, -1.5, 3.9, 1.2 + i * 3.2, Math.PI / 2); }
     [[-1.6, -1.6], [8.3, -1.7], [17.2, -1.7], [22.6, -1.7], [28.6, -1.7], [-1.7, 6], [-1.7, 12.4]].forEach(p => box(1.1, 6, 1.1, m2, p[0], 3, p[1], s));
     box(X1 + 3.4, 0.4, 0.5, m2, X1 / 2, 0.1, Z1 + 1.65, s); box(0.5, 0.4, Z1 + 3.4, m2, X1 + 1.65, 0.1, Z1 / 2, s);
@@ -112,13 +118,18 @@
 
     // ---- people going about their business (routes kept apart so the square never bunches up)
     const TINTS = [{ cloth: '#5a3a2a', armor: '#4a4038' }, { cloth: '#2a4a5a', armor: '#3a4048' }, { cloth: '#5a2a4a', armor: '#3a3040' }, { cloth: '#3a5a3a', armor: '#3a4038' }, { cloth: '#6a5a3a', armor: '#4a4438' }, { cloth: '#3a3a5a', armor: '#30304a' }];
-    const walkers = [[[1.5, 6.6], [23.6, 6.4]], [[27.5, 3.5], [11.2, 3.6]], [[5.5, 16.2], [9.5, 9.2]], [[23.5, 15.6], [18.5, 9.4]], [[2, 15.6], [15.5, 16.6]], [[19.5, 3.6], [22.5, 10.8]]]
+    const walkers = [[[1.5, 5.4], [21.4, 5.2]], [[27.5, 3.8], [8.6, 4.0]], [[2.2, 11.3], [10.4, 10.7]], [[23.65, 16.4], [23.65, 11.6]], [[2, 15.6], [15.5, 16.6]], [[19.5, 3.6], [22.5, 10.8]]]
       .map((pth, i) => ({ c: npc(s, { cls: ['rogue', 'cleric', 'fighter', 'sorcerer', 'rogue', 'cleric'][i], race: Object.keys(G.RACES)[i % 5], tint: TINTS[i] }, pth[0][0], pth[0][1], 0), a: pth[0], b: pth[1], u: Math.random(), dir: 1, wait: Math.random() * 3, sp: 0.03 + i * 0.006 }));
     const CHAT = ['…heard Vexa has never once blinked.', 'Guild raised the rent again.', 'Glowcaps are coming in nicely.', 'Put ten coin on the new one. Ten!', 'Nobody leaves the Ledger.', 'Different carts, he says.', 'My cousin fought Brakk. Once.', 'The Light went ahead to wait.', 'They say the Keeper never sleeps.', 'Highmarch sealed another stair.', 'Mark owes me money. Mark owes everyone money.', 'Meet me by the First Lamp.'];
     const MARKSAY = ['I have got a guy, bro. The guy is me.', 'Real ones bet big.', 'Odds! Fresh odds!', 'Bro. BRO. Look at this roll.', '…what were we doing?', 'Respect. Respect.'];
     let chatT = 4, markT = 6;
     const npcs = [fence, gm, mark, punter, k1, k2, k3, k4, sit, sit2];
     const obstacles = [[14, -1.6, 17.2, 0.7], [19.4, -1, 22.2, 0.7], [23.5, -1.2, 27.7, 1.9], [12.1, -1.3, 13.8, -0.2], [2.4, -1.1, 3.2, -0.2], [6.8, -1.1, 7.6, -0.2], [11.2, 6.2, 16.8, 11.8], [5.4, 11.8, 8.6, 13.8], [9, 13.4, 12.2, 15.4], [19.9, 12.2, 23.1, 14.2], [24.2, 7.9, 26.3, 11.1], [3, 13, 5, 15], [26.5, 14.9, 27.5, 15.9], [17.2, 14.8, 19.8, 16.4], [-0.7, 1, 0.1, 1.8], [-0.1, 4.2, 0.7, 5], [0.1, 1.2, 1.1, 2], [27.8, 3.8, 28.7, 5.5], [-0.1, 12, 1.4, 13.3]];
+    // thresholds: a coloured ring on the ground wherever something can be used, so destinations read from across the square
+    [[5, 0.4, 0xff5030], [11, 0.6, 0xdccba3], [15.6, 1.3, 0x4ad0a0], [20.4, 1.3, 0xb070ff], [25.6, 2.5, 0x8aff5a], [24.9, 5.4, 0x6af0ff], [-0.2, 3, 0xffb060], [-0.2, 9, 0x60b8ff]].forEach(q => { const r = new T.Mesh(new T.RingGeometry(0.62, 0.78, 28), new T.MeshBasicMaterial({ color: q[2], transparent: true, opacity: 0.5, depthWrite: false })); r.rotation.x = -Math.PI / 2; r.position.set(Math.max(0.3, q[0]), 0.03, q[1]); s.add(r); const d = new T.Mesh(new T.CircleGeometry(0.62, 24), new T.MeshBasicMaterial({ color: q[2], transparent: true, opacity: 0.1, depthWrite: false })); d.rotation.x = -Math.PI / 2; d.position.copy(r.position); s.add(d); });
+    // bout posters and damp on the walls
+    { const pm = new T.MeshLambertMaterial({ map: gfx.tex('poster') }); [[1.9, 0], [9.6, 0.06], [10.3, -0.05], [13.9, 0.04], [18.2, -0.07], [22.9, 0.05], [28, -0.04]].forEach(q => { const p2 = new T.Mesh(new T.PlaneGeometry(0.62, 0.86), pm); p2.position.set(q[0], 1.75, -1.42); p2.rotation.z = q[1]; s.add(p2); }); [[5.6, 0.05], [7.2, -0.06], [12.2, 0.04], [16.4, -0.05]].forEach(q => { const p2 = new T.Mesh(new T.PlaneGeometry(0.62, 0.86), pm); p2.position.set(-1.42, 1.75, q[0]); p2.rotation.y = Math.PI / 2; p2.rotation.z = q[1]; s.add(p2); });
+      for (let i = 0; i < 16; i++) { const d = gfx.decal(gfx.tex('blood'), R(1.2, 2.6), i % 3 ? 0x24301c : 0x101418, R(0.35, 0.6)); if (i < 10) d.position.set(R(0, 29), 0.014 + i * 0.0006, R(-0.3, 0.5)); else d.position.set(R(-0.3, 0.5), 0.014 + i * 0.0006, R(0, 17)); d.rotation.z = R(0, 6); s.add(d); } }
     const life = W.hubLife ? W.hubLife(s, obstacles) : null;
     return {
       scene: s, start: { x: 13.5, z: 4.5 }, zoom: [13.5, 22], bounds: [0, 0, 29, 17],

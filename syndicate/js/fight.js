@@ -85,11 +85,15 @@
     else if (e.act) {
       const ab = e.act.ab, melee = ab.type === 'melee' && !ab.spell;
       if (e.state === 'wind') { prog = 1 - e.t / (e.act.total || ab.wind || 0.01); act = melee ? 'swing' : 'cast'; if (melee) prog *= 0.5; glow = ab.color; }
-      else { prog = 1 - e.t / (ab.rec || 0.01); act = melee ? 'swing' : 'idle'; if (melee) prog = 0.5 + prog * 0.5; }
+      else { prog = 1 - e.t / (ab.rec || 0.01); act = melee ? 'swing' : 'release'; if (melee) prog = 0.5 + prog * 0.5; }
+      if (ab.type === 'dash') act = 'lunge';
     }
+    else if (e.state === 'parry') act = 'parry';
+    else if (phase === 'intro') act = 'salute';
+    else if (phase === 'ko' || (phase === 'mortal' && M && e.isPlayer && M.t > (M.def.imp || 1.2) + 0.6)) act = 'cheer';
     const alpha = e.buffs.stealth ? (e.isPlayer ? 0.4 : 0.1) : 1;
     if (act === 'cast' && e.state === 'wind' && glow && Math.random() < 0.6) { const ca = rand(0, 6.28), cr = rand(0.8, 1.5); gfx.emit(X + Math.cos(ca) * cr, 1.2 + rand(-0.4, 0.6), Z + Math.sin(ca) * cr, -Math.cos(ca) * cr * 3, 0, -Math.sin(ca) * cr * 3, 0.3, glow, 0); }
-    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : 0, guard: e.guard > 0 || e.state === 'parry', t: time + (e.isPlayer ? 0 : 1.7), glow });
+    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : 0, guard: e.guard > 0, ready: 1, tired: e.hp < e.maxHp * 0.25, t: time + (e.isPlayer ? 0 : 1.7), glow });
     const alive = e.state !== 'ko';
     v.ring.visible = alive && alpha > 0.3 && !F.ex; v.ring.position.y = 0.03 - e.z / S;
     v.ward.visible = alive && e.shield > 0; if (v.ward.visible) v.ward.material.opacity = 0.18 + Math.sin(time * 6) * 0.06;
@@ -193,7 +197,7 @@
   }
 
   // ------------------------------------------------------------------ helpers
-  function text(e, s, col, big) { gfx.floatText(e.x / S, 2.3 + rand(0, 0.3), e.y / S, s, col || '#fff', big); }
+  function text(e, s, col, big) { if (G.deeds && phase === 'fight' && !F.ex && !opp.spar) { if (s === 'PARRIED!' && !e.isPlayer) G.deeds.bump('parry'); else if (s === 'PERFECT DODGE' && e.isPlayer) G.deeds.bump('perfect'); else if (!e.isPlayer && String(s).indexOf('WALL ') === 0) G.deeds.bump('wall'); } gfx.floatText(e.x / S, 2.3 + rand(0, 0.3), e.y / S, s, col || '#fff', big); }
   function spark(x, y, z, col, n, sp) { gfx.burst(x / S, (z || 30) / S, y / S, col, n, (sp || 160) / S, 3); }
   function addHype(v) { const h0 = hype; hype = clamp(hype + v, 0, 100); if (h0 < 80 && hype >= 80) G.sfx('cheer'); }
   function angDiff(a, b) { let d = a - b; while (d > Math.PI) d -= 6.283; while (d < -Math.PI) d += 6.283; return Math.abs(d); }
@@ -262,31 +266,50 @@
     P.st = {}; delete P.buffs.stealth; interrupt(P); P.state = 'idle'; P.kx = P.ky = 0; P.iframe = 9;
     projs.forEach(p => p.m && sc.remove(p.m)); projs = []; zones.forEach(z => z.m && sc.remove(z.m)); zones = [];
     const a = Math.atan2(e.y - P.y, e.x - P.x); P.x = e.x - Math.cos(a) * 66; P.y = e.y - Math.sin(a) * 66; clampArena(P); P.aim = a;
-    M = { t: 0, e, a, f: {}, name: G.MORTAL[P.cls].name };
+    const def = G.mortalOf ? G.mortalOf(G.state) : Object.assign({ id: 'base' }, G.MORTAL[P.cls]);
+    M = { t: 0, e, a, f: {}, name: def.name, def, k: def.id };
     phase = 'mortal'; hitstop = 0.3; shake = 10; result = { win: true };
     G.ui.banner('Mortal Blow', M.name, 'win mortal'); G.sfx('bell'); G.sfx('crowd');
   }
   function mortalStep(dt) {
-    const m = M, e = m.e, cls = P.cls, IMP = 1.2, cast = cls === 'sorcerer' || cls === 'cleric'; m.t += dt;
-    const once = (k, tt, fn) => { if (m.t >= tt && !m.f[k]) { m.f[k] = 1; fn(); } };
-    const col = { fighter: '#ffd36b', rogue: '#c79bff', sorcerer: '#8aff5a', cleric: '#fff0a0' }[cls];
-    if (m.t < IMP) { P.state = 'wind'; P.act = { ab: cast ? { type: 'aoe', color: col, wind: IMP } : A[P.basic], step: 2, fin: 1, total: IMP, aim: m.a }; P.t = IMP - m.t; P.aim = m.a; }
+    const m = M, e = m.e, cls = P.cls, def = m.def, k = m.k, IMP = def.imp || 1.2, cast = def.cast != null ? def.cast : (cls === 'sorcerer' || cls === 'cleric'); m.t += dt;
+    const once = (key, tt, fn) => { if (m.t >= tt && !m.f[key]) { m.f[key] = 1; fn(); } };
+    const every = (key, t0, t1, step, fn) => { for (let i = 0, tt = t0; tt < t1; i++, tt += step) once(key + i, tt, () => fn(i)); };
+    const col = def.col || { fighter: '#ffd36b', rogue: '#c79bff', sorcerer: '#8aff5a', cleric: '#fff0a0' }[cls];
+    if (m.t < IMP) { P.state = 'wind'; P.act = { ab: cast ? { type: 'aoe', at: 'target', color: col, wind: IMP } : A[P.basic], step: 2, fin: 1, total: IMP, aim: m.a }; P.t = IMP - m.t; P.aim = m.a; }
     else if (m.t < IMP + 0.45 && !cast) { P.state = 'recover'; P.t = Math.max(0.01, IMP + 0.45 - m.t); }
     else { P.state = 'idle'; P.act = null; }
-    if (cls === 'rogue') for (let i = 0; i < 7; i++) once('c' + i, 0.3 + i * 0.12, () => { const a = rand(0, 6.28); fx.push({ k: 'trail', x1: e.x + Math.cos(a) * 110, y1: e.y + Math.sin(a) * 110, x2: e.x - Math.cos(a) * 110, y2: e.y - Math.sin(a) * 110, col, t: 0, life: 0.22 }); blood(e.x, e.y, 7, a); e.flash = 0.08; G.sfx('swing'); shake = Math.max(shake, 4); });
-    if (cls === 'sorcerer') { once('beam', 0.45, () => { fx.push({ k: 'bolt', x1: P.x, y1: P.y, x2: e.x, y2: e.y, col, t: 0, life: IMP - 0.45 }); G.sfx('zap'); }); if (m.t > 0.45 && m.t < IMP) { e.flash = 0.05; gfx.emit(e.x / S + rand(-0.4, 0.4), rand(0.3, 1.8), e.y / S + rand(-0.4, 0.4), 0, 3, 0, 0.4, col, 0); } }
-    if (cls === 'cleric') once('sky', 0.4, () => { zones.push({ x: e.x, y: e.y, r: 78, delay: IMP - 0.4, t: 0, owner: P, ab: { type: 'aoe', dmg: [1, 1], radiant: 1, color: col } }); G.sfx('holy'); });
+    // ---- the lead-in, one per blow
+    if (k === 'cuts') every('c', 0.3, 1.1, 0.12, () => { const a = rand(0, 6.28); fx.push({ k: 'trail', x1: e.x + Math.cos(a) * 110, y1: e.y + Math.sin(a) * 110, x2: e.x - Math.cos(a) * 110, y2: e.y - Math.sin(a) * 110, col, t: 0, life: 0.22 }); blood(e.x, e.y, 7, a); e.flash = 0.08; G.sfx('swing'); shake = Math.max(shake, 4); });
+    if (k === 'quiet') {
+      once('van', 0.2, () => { fx.push({ k: 'ghost', x: P.x, y: P.y, col, t: 0, life: 0.5 }); spark(P.x, P.y, 12, col, 10, 160); P.x = e.x + Math.cos(m.a) * 66; P.y = e.y + Math.sin(m.a) * 66; clampArena(P); m.a = Math.atan2(e.y - P.y, e.x - P.x); P.aim = m.a; G.sfx('dash'); });
+      once('stab', 0.62, () => { fx.push({ k: 'trail', x1: P.x, y1: P.y, x2: e.x + Math.cos(m.a) * 90, y2: e.y + Math.sin(m.a) * 90, col: '#ffffff', t: 0, life: 0.3 }); blood(e.x, e.y, 10, m.a); e.flash = 0.12; G.sfx('swing'); hitstop = Math.max(hitstop, 0.14); text(e, '…', col, true); });
+    }
+    if (k === 'rain') every('r', 0.25, IMP, 0.07, i => { const a = i * 2.4; fx.push({ k: 'bolt', x1: e.x + Math.cos(a) * 280, y1: e.y + Math.sin(a) * 280, x2: e.x, y2: e.y, col: i % 3 ? col : '#ffffff', t: 0, life: 0.16 }); blood(e.x, e.y, 3, a + Math.PI); e.flash = 0.05; if (i % 2) G.sfx('swing'); shake = Math.max(shake, 3); });
+    if (k === 'disint') { once('beam', 0.45, () => { fx.push({ k: 'bolt', x1: P.x, y1: P.y, x2: e.x, y2: e.y, col, t: 0, life: IMP - 0.45 }); G.sfx('zap'); }); if (m.t > 0.45 && m.t < IMP) { e.flash = 0.05; gfx.emit(e.x / S + rand(-0.4, 0.4), rand(0.3, 1.8), e.y / S + rand(-0.4, 0.4), 0, 3, 0, 0.4, col, 0); } }
+    if (k === 'meteor') every('m', 0.3, IMP - 0.1, 0.27, () => { const a = rand(0, 6.28), d = rand(40, 120), x = e.x + Math.cos(a) * d, y = e.y + Math.sin(a) * d; fx.push({ k: 'blast', x, y, r: 70, col, t: 0, life: 0.45 }); fx.push({ k: 'dust', x, y, r: 110, t: 0, life: 0.6 }); mark(x, y, 2.2, 'scorch'); flashLight(x, y, col, 80); G.sfx('boom'); shake = Math.max(shake, 11); e.flash = 0.08; for (let fi = 0; fi < 10; fi++) gfx.emit(x / S + rand(-0.8, 0.8), 0.2, y / S + rand(-0.8, 0.8), 0, rand(3, 7), 0, rand(0.5, 1), fi % 2 ? '#ff8a2a' : '#ffd060', -1); });
+    if (k === 'storm') every('s', 0.3, IMP, 0.09, i => { const a = rand(0, 6.28), d = rand(250, 380); fx.push({ k: 'bolt', x1: e.x + Math.cos(a) * d, y1: e.y + Math.sin(a) * d, x2: e.x, y2: e.y, col: i % 2 ? col : '#ffffff', t: 0, life: 0.18 }); e.flash = 0.06; flashLight(e.x, e.y, col, 50); if (i % 2 === 0) G.sfx('zap'); shake = Math.max(shake, 5); });
+    if (k === 'strike') once('sky', 0.4, () => { zones.push({ x: e.x, y: e.y, r: 78, delay: IMP - 0.4, t: 0, owner: P, ab: { type: 'aoe', dmg: [1, 1], radiant: 1, color: col } }); G.sfx('holy'); });
+    if (k === 'smite') every('g', 0.2, IMP - 0.1, 0.28, i => { fx.push({ k: 'ring', x: e.x, y: e.y, r: 230 - i * 55, col, t: 0, life: 0.45 }); e.flash = 0.06; G.sfx('holy'); });
+    if (k === 'word') { once('w', 0.3, () => { fx.push({ k: 'ring', x: P.x, y: P.y, r: 420, col, t: 0, life: 0.9 }); G.sfx('holy'); text(P, '“Die.”', col, true); }); once('hush', IMP - 0.5, () => { hitstop = Math.max(hitstop, 0.32); flashLight(e.x, e.y, '#ffffff', 130); e.flash = 0.4; }); }
+    if (k === 'wall') {
+      once('h1', 0.35, () => { fx.push({ k: 'slash', x: P.x, y: P.y, a: m.a, r: 130, arc: 2.4, col, t: 0, life: 0.25 }); blood(e.x, e.y, 14, m.a); e.flash = 0.1; G.sfx('crit'); shake = 12; hitstop = Math.max(hitstop, 0.1); text(e, 'LAUNCHED', col, true); });
+      if (m.t > 0.42 && m.t < IMP - 0.2 && !m.f.wl) { const nx = e.x + Math.cos(m.a) * 1100 * dt, ny = e.y + Math.sin(m.a) * 1100 * dt; if (inArena(nx, ny, -34)) { e.x = nx; e.y = ny; if (Math.random() < 0.5) fx.push({ k: 'dust', x: e.x, y: e.y, r: 44, t: 0, life: 0.4 }); } else { m.f.wl = 1; G.sfx('wall'); shake = 15; mark(e.x, e.y, 1.8, 'crack'); spark(e.x, e.y, 16, '#d8ccb0', 20, 260); blood(e.x, e.y, 12); } }
+      once('chase', IMP - 0.25, () => { fx.push({ k: 'trail', x1: P.x, y1: P.y, x2: e.x, y2: e.y, col, t: 0, life: 0.3 }); for (let gi = 0; gi < 4; gi++) fx.push({ k: 'ghost', x: G.lerp(P.x, e.x, gi / 4), y: G.lerp(P.y, e.y, gi / 4), col, t: -gi * 0.03, life: 0.34 }); P.x = e.x - Math.cos(m.a) * 66; P.y = e.y - Math.sin(m.a) * 66; clampArena(P); G.sfx('dash'); });
+    }
+    if (k === 'quake') every('q', 0.3, IMP - 0.1, 0.27, i => { const a = rand(0, 6.28), d = 50 + i * 26; mark(e.x + Math.cos(a) * d, e.y + Math.sin(a) * d, 1.3 + i * 0.3, 'crack'); fx.push({ k: 'dust', x: e.x, y: e.y, r: 90 + i * 40, t: 0, life: 0.5 }); fx.push({ k: 'slash', x: P.x, y: P.y, a: m.a, r: 120, arc: 2, col, t: 0, life: 0.2 }); shake = Math.max(shake, 9 + i * 2); G.sfx('wall'); e.flash = 0.07; blood(e.x, e.y, 5, m.a); });
     once('imp', IMP, () => {
-      const ash = cls === 'sorcerer';
+      const ash = !!def.ash;
       if (!cast) fx.push({ k: 'slash', x: P.x, y: P.y, a: m.a, r: 150, arc: 3.4, col, t: 0, life: 0.35 });
-      fx.push({ k: 'blast', x: e.x, y: e.y, r: 100, col, t: 0, life: 0.6, pillar: cls === 'cleric' });
-      fx.push({ k: 'ring', x: e.x, y: e.y, r: 240, col, t: 0, life: 0.7 });
+      fx.push({ k: 'blast', x: e.x, y: e.y, r: def.fire ? 150 : 100, col, t: 0, life: 0.6, pillar: !!def.pillar });
+      fx.push({ k: 'ring', x: e.x, y: e.y, r: 240, col, t: 0, life: 0.7 }); fx.push({ k: 'dust', x: e.x, y: e.y, r: 200, t: 0, life: 0.8 });
+      if (def.crack) mark(e.x, e.y, 3.4, 'crack'); if (def.fire || ash) mark(e.x, e.y, 3, 'scorch');
       spark(e.x, e.y, 30, col, 40, 420); flashLight(e.x, e.y, col, 170); shake = 22; hitstop = 0.22;
       if (!ash) { blood(e.x, e.y, 70); blood(e.x, e.y, 40, m.a); }
       makeGibs(e, ash); e.vis.g.visible = false; if (e.vis.tele) { sc.remove(e.vis.tele); e.vis.tele = null; }
       e.state = 'ko'; e.koT = 9; e.st = {};
       hype = 100; arena.setHype(1); G.sfx('boom'); G.sfx('crit'); G.sfx('cheer'); if (G.rumble) G.rumble(400, 1);
-      text(e, G.MORTAL[cls].word, col, true);
+      text(e, def.word, col, true);
     });
     once('roar', IMP + 0.55, () => { G.sfx('cheer'); G.sfx('win'); G.ui.banner('Victory', 'The pit erupts', 'win mortal'); });
     once('roar2', IMP + 1.3, () => G.sfx('cheer'));
@@ -840,7 +863,8 @@
     };
     if (result.forfeit) { r.xp = 0; r.coin = 0; }
     if (!win) { r.lost = Math.round(st.coin * 0.2); st.coin -= r.lost; }
-    r.mortal = win ? G.MORTAL[P.cls].name : null; gfx.cine = null; G.afterFight = true;
+    r.mortal = win ? (M ? M.name : G.MORTAL[P.cls].name) : null;
+    if (win && G.deeds) { G.deeds.bump('mortal'); if (P.hp >= P.maxHp) G.deeds.bump('flawless'); if (hy >= 100) G.deeds.bump('hype100'); } gfx.cine = null; G.afterFight = true;
     if (G.crew) r.crew = G.crew.tick();
     if (G.mark) G.mark.resolve(win);
     if (G.comfort) st.roomTips = (st.roomTips || 0) + Math.floor(G.comfort(st) / 14);

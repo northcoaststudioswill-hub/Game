@@ -41,8 +41,8 @@
 
     // ---- pit gate guards, and a pair arguing about the odds
     const guards = [npc(s, { cls: 'fighter', race: 'halforc', tint: { cloth: '#5a1418', armor: '#2a2428', armor2: '#1a1618' } }, 3.2, 0.5, 0.2), npc(s, { cls: 'fighter', race: 'human', tint: { cloth: '#5a1418', armor: '#2a2428', armor2: '#1a1618' } }, 6.8, 0.5, -0.2)];
-    const arg = [npc(s, { cls: 'rogue', race: 'human', tint: { cloth: '#6a5a3a', armor: '#4a4438' } }, 8.6, 2.4, 1.2), npc(s, { cls: 'sorcerer', race: 'dwarf', tint: { cloth: '#3a5a3a', armor: '#3a4038' } }, 9.7, 2.8, -1.9)];
-    obstacles.push([2.9, 0.2, 3.5, 0.8], [6.5, 0.2, 7.1, 0.8], [8.3, 2.1, 10, 3.1]);
+    const arg = [npc(s, { cls: 'rogue', race: 'human', tint: { cloth: '#6a5a3a', armor: '#4a4438' } }, 22.9, 0.3, 0.3), npc(s, { cls: 'sorcerer', race: 'dwarf', tint: { cloth: '#3a5a3a', armor: '#3a4038' } }, 23.2, 1.3, -2.8)];
+    obstacles.push([2.9, 0.2, 3.5, 0.8], [6.5, 0.2, 7.1, 0.8], [22.6, 0, 23.5, 1.6]);
     // ---- a busker by the First Lamp, hat on the ground
     const busk = npc(s, { cls: 'rogue', race: 'elf', tint: { cloth: '#7a3a5a', armor: '#4a2a40', hair: '#f0c95a' } }, 17.9, 11.3, 2.2);
     mesh(new T.CylinderGeometry(0.22, 0.16, 0.12, 8), L(0x2a2228), 18.5, 0.06, 12.0, s); for (let i = 0; i < 4; i++) mesh(new T.CylinderGeometry(0.05, 0.05, 0.02, 6), new T.MeshPhongMaterial({ color: 0xf0c95a, shininess: 90 }), 18.45 + i * 0.04, 0.13, 11.97 + (i % 2) * 0.06, s).castShadow = false;
@@ -66,7 +66,7 @@
     const batM = emis(0x0a080c, { side: T.DoubleSide }), bats = [];
     for (let i = 0; i < 6; i++) { const g = new T.Group(); const wl = new T.Mesh(new T.PlaneGeometry(0.28, 0.14), batM); wl.rotation.x = -Math.PI / 2; const wr = wl.clone(); wl.position.x = -0.14; wr.position.x = 0.14; const pl = new T.Group(), pr = new T.Group(); pl.add(wl); pr.add(wr); g.add(pl, pr); s.add(g); bats.push({ g, pl, pr, cx: R(5, 24), cz: R(3, 14), r: R(2.5, 6), y: R(6, 8.5), sp: R(0.5, 1.1) * (i % 2 ? 1 : -1), ph: R(0, 6) }); }
     // ---- steam grates and puddle ripples
-    const grates = [[8.2, 9.2], [21.2, 7.2], [5.5, 4.2]]; grates.forEach(q => { box(0.9, 0.03, 0.9, emis(0x060508), q[0], 0.012, q[1], s).castShadow = false; for (let k = -1; k <= 1; k++) box(0.9, 0.04, 0.07, iron, q[0], 0.02, q[1] + k * 0.28, s).castShadow = false; });
+    const grates = [[7.2, 6.4], [20.6, 6.9], [5.5, 4.6]]; grates.forEach(q => { box(0.9, 0.03, 0.9, emis(0x060508), q[0], 0.012, q[1], s).castShadow = false; for (let k = -1; k <= 1; k++) box(0.9, 0.04, 0.07, iron, q[0], 0.02, q[1] + k * 0.28, s).castShadow = false; });
     const rip = [[6.5, 6.5], [17, 12.2], [11.5, 3.2], [23, 6.6], [3.5, 10.6]].map(q => { const m = new T.Mesh(new T.RingGeometry(0.85, 1, 20), emis(0x7088b0, { transparent: true, opacity: 0, depthWrite: false })); m.rotation.x = -Math.PI / 2; m.position.set(q[0] + R(-0.4, 0.4), 0.03, q[1] + R(-0.4, 0.4)); s.add(m); return { m, t: R(0, 3), x: q[0], z: q[1] }; });
     const NOTES = [0xffd36b, 0xc79bff, 0x8ad0ff, 0xff9ac0];
     const ARG = ['Three to one! On GRUBB!', 'You are robbing me.', 'Mark said it was a sure thing.', 'Mark says everything is a sure thing.', 'I had it. I HAD it.'];

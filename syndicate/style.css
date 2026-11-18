@@ -425,3 +425,11 @@ button:not(:disabled):hover { filter: brightness(1.12); }
 .wtable b { font-family: var(--title); font-size: 1.5rem; color: #f6dc8a; } .wtable b.bad { color: #ff7a6a; } .wtable b.good { color: #9aff8a; } .wtable small { display: block; font-family: var(--display); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.65rem; color: var(--bronze-hi); }
 @media (orientation: portrait) { .wd { width: 2.3rem; height: 2.3rem; padding: 0.22rem; } .wd i { width: 0.36rem; height: 0.36rem; } }
 @media (prefers-reduced-motion: reduce) { .wd.float, .wd.pop { animation: none; } }
+
+/* deeds and the mirror */
+.ab-row.deeddone { box-shadow: inset 3px 0 0 var(--gold); } .ab-row.deeddone .ab-ic { color: #9aff8a; }
+.ab-row .bar.xp { margin-top: 0.3rem; height: 0.35rem; }
+.swatches { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0.3rem 0 0.6rem; }
+.sw { width: 2.3rem; height: 2.3rem; padding: 0; border-radius: 50%; border: 2px solid #0b090d; box-shadow: 0 0 0 1px var(--bronze); } .sw.sel { box-shadow: 0 0 0 2px var(--gold), 0 0 0.8rem rgba(240, 201, 90, 0.6); transform: scale(1.1); }
+.fld { display: block; margin-top: 0.4rem; } .fld small { display: block; font-family: var(--display); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--bronze-hi); }
+.fld input { width: 100%; max-width: 14rem; font: inherit; font-size: 1.1rem; color: #efe4c8; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--bronze); border-radius: 0.3rem; padding: 0.35rem 0.6rem; }

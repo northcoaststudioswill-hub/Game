@@ -45,7 +45,7 @@
     return r;
   };
   ui.schemeNews = function () {
-    const st = G.state, o = st.schemeDone, s = SBY[o.id] || SCHEMES[0]; st.schemeDone = null;
+    const st = G.state, o = st.schemeDone, s = SBY[o.id] || SCHEMES[0]; st.schemeDone = null; if (G.deeds) G.deeds.bump('schemes');
     st.coin += o.coin; st.chits = mk.chits() + o.chits; G.save(); G.sfx(o.coin > o.stake ? 'coin' : 'deny'); ui.topbar();
     const good = o.coin > o.stake;
     const line = good ? s.win + ' Here is your end, bro.' : s.lose + (o.coin ? ' I got most of your stake back out. And have some chits, for the stress.' : ' Look. Your coin is gone. But I am a man of honour, so here: chits. Good as coin. At my tables. Only at my tables.');

@@ -44,11 +44,14 @@
     royal: { armor: 0x3a2a6a, armor2: 0x241848, cloth: 0x5a2a8a, trim: 0xd8dce6, legs: 0x1c1430 },
     rust: { armor: 0x8a4a2a, armor2: 0x5a2e1a, cloth: 0x3a3430, trim: 0x2a2428, legs: 0x2a2220 },
     house: { armor: 0x1f5a3a, armor2: 0x143a2c, cloth: 0x0e2a1e, trim: 0xf0c95a, legs: 0x10241a },
+    bloodied: { armor: 0x3a1416, armor2: 0x200a0c, cloth: 0x7a1418, trim: 0x1a1618, legs: 0x1c0c0e },
+    masonry: { armor: 0x8a8680, armor2: 0x5e5a56, cloth: 0x4a4644, trim: 0xcfc8b8, legs: 0x3a3836 },
+    palequeen: { armor: 0xefeaf4, armor2: 0xbfb4d0, cloth: 0x5a1f7a, trim: 0xf0c95a, legs: 0x2a1438 },
     ashen: { armor: 0x4a4a4e, armor2: 0x2a2a2e, cloth: 0x1c1c20, trim: 0xc22a22, legs: 0x202024 }
   };
   G.WSKIN = {
     ember: { color: 0xff9a4a, e: 0xa03808, glow: 0xff7a2a }, frost: { color: 0xbfeaff, e: 0x1a6a90, glow: 0x7ad8ff },
-    gilded: { color: 0xffd36b, e: 0x6a4a08, glow: 0xffd36b }, frost: { color: 0xd8f4ff, e: 0x2a6a8a, glow: 0x9adfff }, voidsteel: { color: 0x1a1420, e: 0x3a1a6a, glow: 0xb070ff }, wisp: { color: 0x9af6ff, e: 0x0a6a7a, glow: 0x6af0ff }, blood: { color: 0xc22a22, e: 0x6a0808, glow: 0xff4030 }, toxic: { color: 0x9aff5a, e: 0x2a6a08, glow: 0x8aff5a }, void: { color: 0x7a4ac0, e: 0x3a1470, glow: 0xb070ff }
+    gilded: { color: 0xffd36b, e: 0x6a4a08, glow: 0xffd36b }, mirror: { color: 0xf4f8ff, e: 0x5a6a7a, glow: 0xffffff }, luckyedge: { color: 0x8aff9a, e: 0x1a6a2a, glow: 0xf0c95a }, frost: { color: 0xd8f4ff, e: 0x2a6a8a, glow: 0x9adfff }, voidsteel: { color: 0x1a1420, e: 0x3a1a6a, glow: 0xb070ff }, wisp: { color: 0x9af6ff, e: 0x0a6a7a, glow: 0x6af0ff }, blood: { color: 0xc22a22, e: 0x6a0808, glow: 0xff4030 }, toxic: { color: 0x9aff5a, e: 0x2a6a08, glow: 0x8aff5a }, void: { color: 0x7a4ac0, e: 0x3a1470, glow: 0xb070ff }
   };
   G.COSMETICS = [
     { id: 'crimson', slot: 'dye', name: 'Pit Crimson', cost: 60, rank: 0, desc: 'Deep red cloth, brass trim. Hides the stains.' },
@@ -74,6 +77,10 @@
     { id: 'mohawk', slot: 'head', name: 'Pit Crest', cost: 100, rank: 1, desc: 'A stiff dyed crest. The crowd can find you from the back row.' },
     { id: 'candles', slot: 'head', name: 'Lampwright’s Crown', cost: 210, rank: 3, desc: 'A ring of lit candles. Hot wax is part of the look.' },
     { id: 'dicecrown', slot: 'head', name: 'High Roller’s Crown', cost: 9999, rank: 9, chit: 200, desc: 'Gold band, four wispdice. Mark wore it once and lost a house.' },
+    { id: 'bloodied', slot: 'dye', name: 'First Blood', cost: 9999, rank: 9, deed: 'first', desc: 'Deed: First Blood. Dried red over black.' },
+    { id: 'masonry', slot: 'dye', name: 'Pit Stone', cost: 9999, rank: 9, deed: 'wall', desc: 'Deed: Mason. The colour of the wall you keep putting people into.' },
+    { id: 'palequeen', slot: 'dye', name: 'The Pale Queen’s Colours', cost: 9999, rank: 9, deed: 'queen', desc: 'Deed: The Guttercrown. White, violet and gold. Hers, until you.' },
+    { id: 'exechood', slot: 'head', name: 'Executioner’s Hood', cost: 9999, rank: 9, deed: 'exec', desc: 'Deed: Executioner. Black, pointed, two red eyes.' },
     { id: 'horned', slot: 'head', name: 'Horned Helm', cost: 90, rank: 0, desc: 'Two great curved horns.' },
     { id: 'plague', slot: 'head', name: 'Plague Beak', cost: 120, rank: 1, desc: 'A long leather beak and glass eyes.' },
     { id: 'skull', slot: 'head', name: 'Skull Visor', cost: 150, rank: 2, desc: 'Somebody else’s face, worn over yours.' },
@@ -94,6 +101,9 @@
     { id: 'frost', slot: 'weapon', name: 'Rimed Edge', cost: 180, rank: 2, desc: 'Pale as lake ice.' },
     { id: 'voidsteel', slot: 'weapon', name: 'Voidsteel', cost: 260, rank: 4, desc: 'Black metal with a violet burn in it.' },
     { id: 'wisp', slot: 'weapon', name: 'Wisplight Edge', cost: 9999, rank: 9, chit: 180, desc: 'The same light the dice are made of, on a blade.' },
+    { id: 'pennants', slot: 'back', name: 'Crowd’s Pennants', cost: 9999, rank: 9, deed: 'crowd', desc: 'Deed: Crowd Favourite. Two flags they threw down to you.' },
+    { id: 'mirror', slot: 'weapon', name: 'Mirror Polish', cost: 9999, rank: 9, deed: 'deflect', desc: 'Deed: Deflector. Bright enough to parry by.' },
+    { id: 'luckyedge', slot: 'weapon', name: 'Partner’s Edge', cost: 9999, rank: 9, deed: 'partner', desc: 'Deed: Silent Partner. Green with a gold shine, like Mark’s promises.' },
     { id: 'ember', slot: 'weapon', name: 'Emberforged', cost: 120, rank: 1, desc: 'The edge glows like a coal.' },
     { id: 'frost', slot: 'weapon', name: 'Frostbitten', cost: 120, rank: 1, desc: 'Cold enough to smoke.' },
     { id: 'gilded', slot: 'weapon', name: 'Gilded', cost: 200, rank: 3, desc: 'Gold leaf over good steel.' },
@@ -106,6 +116,9 @@
     { id: 'moths', slot: 'aura', name: 'Lamp Moths', cost: 130, rank: 1, desc: 'They think you are the First Lamp.', color: 0xffe0a0 },
     { id: 'spores', slot: 'aura', name: 'Glowcap Spores', cost: 170, rank: 2, desc: 'Do not breathe in. Mark does.', color: 0x8aff5a },
     { id: 'wisps', slot: 'aura', name: 'Loose Wisps', cost: 9999, rank: 9, chit: 160, desc: 'Escaped from the table. They like you.', color: 0x6af0ff },
+    { id: 'afterimage', slot: 'aura', name: 'Afterimage', cost: 9999, rank: 9, deed: 'ghost', desc: 'Deed: Not There. Pale echoes of where you just were.', color: 0x9fe8ff },
+    { id: 'saintly', slot: 'aura', name: 'Untouched Light', cost: 9999, rank: 9, deed: 'clean', desc: 'Deed: Untouched. Nothing has laid a hand on you.', color: 0xfff6d0 },
+    { id: 'hearth', slot: 'aura', name: 'Hearth Glow', cost: 9999, rank: 9, deed: 'home', desc: 'Deed: House Proud. You smell faintly of a good fire.', color: 0xffb060 },
     { id: 'gold', slot: 'aura', name: 'Halo of Coin', cost: 280, rank: 4, desc: 'The crowd’s favour, made visible.', color: 0xffd36b }
   ];
   const SLOTS = [['dye', 'Dyes'], ['head', 'Headgear'], ['back', 'Back'], ['weapon', 'Weapon finish'], ['aura', 'Aura']];

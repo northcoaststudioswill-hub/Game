@@ -98,6 +98,14 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **A livelier market and pit.** Rats, bats, washing lines, a busker, a cat, steam grates, puddle ripples, gate guards and two punters arguing about odds in the market. The pit gains a Guild box above the gate, hanging gibbets, eyes behind the bars, Mark's odds board, pennants and torches in the stands, and petals and coin thrown at high crowd hype.
 
+**Mortal blows.** Three per class now, the second and third taught as your rank rises (Through the Wall, Earthbreaker, The Quiet Word, Rain of Knives, Meteor Swarm, Chain Lightning, Banishing Smite, Power Word Kill). Pick one on the character sheet or leave it to the crowd.
+
+**Deeds and the Mirror.** Ten deeds (parries, perfect dodges, wall slams, flawless wins, taking the crown and so on) each unlock a cosmetic that coin cannot buy. The Mirror, behind the Tailor's rack, changes hair, skin, build and name for free.
+
+**Fight animation.** A combat stance, a salute before the bell, a real parry pose, a thrown release on spells, a lunge on dashes, heavy breathing at low health and a cheer when the other fighter is down.
+
+**Market layout.** Brick walls, wood grain, bout posters and damp. Worn paths mark the main routes, every usable spot has a coloured ring on the ground, and bystanders were moved out of the lanes.
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |
@@ -130,7 +138,7 @@ and the rest of the game does not change.
 - `js/models.js` character models and animation
 - `js/world.js` the arena; `js/places.js` the street, the hideout, decor pieces, walking
 - `js/fight.js` combat simulation, AI, and its 3D effects
-- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit
+- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror
 - `js/cine.js` the opening cinematic; `js/lore.js` codex and bios; `js/music.js` the music sequencer
 - `js/ui.js` menus, HUD, level-up and results screens; `js/main.js` input and main loop
 
