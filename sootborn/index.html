@@ -289,21 +289,41 @@ const Sound = {
   suspend() { if (this.ctx) this.ctx.suspend().catch(() => { }); },
   resume() { if (this.ctx) this.ctx.resume().catch(() => { }); },
   tone(n, t, dur, type, vol, dest, slideTo) {
-    const c = this.ctx, o = c.createOscillator(), g = c.createGain();
+    if (!(vol > 0.0005)) return; const c = this.ctx, o = c.createOscillator(), g = c.createGain();
     o.type = type || 'square'; o.frequency.setValueAtTime(n > 127 ? n : mtof(n), t); // >127 = Hz, else MIDI note
     if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     o.connect(g); g.connect(dest || this.sfx); o.start(t); o.stop(t + dur + 0.05);
   },
   noise(t, dur, vol, dest, freq, q, type) {
-    const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    if (!(vol > 0.0005)) return; const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
     s.buffer = this.nb; f.type = type || 'bandpass'; f.frequency.value = freq || 1500; f.Q.value = q || 1;
     g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     s.connect(f); f.connect(g); g.connect(dest || this.sfx); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.02);
   },
-  play(name) {
+  // a tone that swells in (horns, pads) instead of being struck
+  pad(n, t, dur, type, vol, dest, att) { if (!(vol > 0.0005)) return; const c = this.ctx, o = c.createOscillator(), g = c.createGain(); o.type = type || 'sawtooth'; o.frequency.setValueAtTime(n > 127 ? n : mtof(n), t); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + (att || dur * .3)); g.gain.setValueAtTime(vol, t + dur * .7); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(dest || this.sfx); o.start(t); o.stop(t + dur + 0.05); },
+  // filtered noise whose pitch moves: the air a blade pushes aside
+  sweep(t, dur, vol, f0, f1, q, dest) { if (!(vol > 0.0005)) return; const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); s.buffer = this.nb; f.type = 'bandpass'; f.Q.value = q || 1.5; f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + dur * .35); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(f); f.connect(g); g.connect(dest || this.sfx); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.02); },
+  // struck steel: partials that do not line up, ringing off quickly
+  ring(t, vol, len, base) { for (const [m, v] of [[1, 1], [1.47, .7], [2.09, .55], [2.56, .4], [3.4, .25]]) this.tone((base || 1900) * m * (1 + (Math.random() - .5) * .02), t, (len || .35) / Math.sqrt(m), 'sine', vol * v); this.noise(t, 0.03, vol * 3, null, 6000, 2, 'highpass'); },
+  play(name, k) {
     if (!this.ctx || this.ctx.state !== 'running') return; const t = this.ctx.currentTime + 0.005;
     switch (name) {
+      case 'swing': this.sweep(t, 0.14, 0.7, 900 + Math.random() * 300, 3600, 1.2); break;
+      case 'swing2': this.sweep(t, 0.2, 0.85, 500, 2600, 1); this.sweep(t + 0.02, 0.16, 0.45, 1800, 5200, 2); break;
+      case 'steel': this.ring(t, 0.11, 0.4, 1700 + Math.random() * 500); break;
+      case 'slash': this.noise(t, 0.09, 0.8, null, 1700, 1.2); this.noise(t, 0.12, 0.6, null, 300, 1, 'lowpass'); this.ring(t, 0.045, 0.18, 2400 + Math.random() * 600); this.tone(110, t, 0.1, 'triangle', 0.3, null, 60); break;
+      case 'bigslash': this.noise(t, 0.16, 0.5, null, 1200, 1); this.noise(t, 0.3, 0.45, null, 180, 1, 'lowpass'); this.tone(90, t, 0.32, 'sine', 0.4, null, 34); this.ring(t, 0.04, 0.45, 1500); break;
+      case 'clash': this.ring(t, 0.08, 0.7, 1500); this.ring(t + 0.03, 0.05, 0.5, 2300); this.noise(t, 0.1, 0.45, null, 3000, 1); this.tone(70, t, 0.25, 'sine', 0.3, null, 40); break;
+      case 'dash': this.sweep(t, 0.16, 0.7, 400, 2400, 2.5); break;
+      case 'fury': this.pad(38, t, 1.3, 'sawtooth', 0.09, null, 0.5); this.pad(38.12, t, 1.3, 'sawtooth', 0.07, null, 0.5); this.sweep(t, 1.0, 0.3, 200, 3000, 1); this.tone(50, t + 0.9, 0.5, 'sine', 0.4, null, 30); this.noise(t + 0.9, 0.5, 0.35, null, 400, 0.8, 'lowpass'); break;
+      case 'cutin': this.sweep(t, 0.5, 0.3, 300, 5000, 1.5); this.tone(50, t + 0.42, 1.4, 'sine', 0.3); this.tone(86, t + 0.42, 1.6, 'triangle', 0.06); this.tone(93, t + 0.42, 1.6, 'sine', 0.04); this.noise(t + 0.42, 0.25, 0.3, null, 300, 0.8, 'lowpass'); break;
+      case 'count': { const n = k || 0; this.tone(50 + n * 2, t, 0.12, 'square', 0.07); this.tone(38 + n, t, 0.2, 'sine', 0.3, null, 40); this.noise(t, 0.07, 0.35, null, 1400 + n * 180, 1.2); this.ring(t, 0.02, 0.15, 2000 + n * 150); break; }
+      case 'pillar': this.tone(80, t, 1.3, 'sine', 0.55, null, 26); this.noise(t, 1.4, 0.55, null, 260, 0.6, 'lowpass'); this.noise(t, 0.5, 0.3, null, 2400, 0.8); this.sweep(t + 0.1, 1.2, 0.2, 4000, 500, 1); this.ring(t, 0.04, 0.9, 900); break;
+      case 'horn': for (const [n, d] of [[38, 0], [45, 0], [50, 0.02], [38, 1.5], [45, 1.5], [53, 1.52]]) { this.pad(n, t + d, 1.4, 'sawtooth', 0.05, null, 0.35); this.pad(n + 0.08, t + d, 1.4, 'square', 0.02, null, 0.4); } this.noise(t, 2.8, 0.05, null, 500, 0.5, 'lowpass'); break;
+      case 'win': [[62, 0], [66, 0.14], [69, 0.28], [74, 0.42], [69, 0.7], [74, 0.84]].forEach(([n, d], i) => { this.pad(n, t + d, i > 3 ? 1.2 : 0.3, 'sawtooth', 0.045, null, 0.03); this.tone(n + 12, t + d, i > 3 ? 1.0 : 0.25, 'triangle', 0.05); }); this.tone(38, t + 0.42, 1.6, 'sine', 0.2); break;
+      case 'bodyfall': this.noise(t, 0.18, 0.55, null, 220, 1, 'lowpass'); this.tone(60, t, 0.14, 'sine', 0.2, null, 36); this.ring(t + 0.04, 0.012, 0.2, 1200); break;
       case 'blip': this.tone(84, t, 0.03, 'square', 0.025); break;
       case 'move': this.tone(76, t, 0.03, 'square', 0.03); break;
       case 'ok': this.tone(79, t, 0.06, 'square', 0.05); this.tone(86, t + 0.06, 0.08, 'square', 0.05); break;
@@ -364,15 +384,32 @@ const TRACKS = {
     const b = ({ 6: 74, 19: 77, 27: 81 })[s]; if (b) S.tone(b, t, 2.5, 'sine', 0.035, S.mus);
     if (s === 12) S.noise(t, 1.2, 0.02, S.mus, 400, 4);
   } },
-  battle: { bpm: 152, len: 64, fn(s, t, sp, S) {
-    const q = s % 16, bar = s >> 4, root = [38, 38, 34, 36][bar];
-    if (q % 4 === 0) S.tone(130, t, 0.16, 'sine', 0.26, S.mus, 42);
-    if (q === 4 || q === 12) S.noise(t, 0.14, 0.14, S.mus, 2200, 6);
-    if (q % 2 === 1) S.noise(t, 0.03, 0.03, S.mus, 7000, 2, 'highpass');
-    S.tone(root + (q % 4 === 3 ? 12 : q % 8 === 6 ? 7 : 0), t, sp * 0.9, 'sawtooth', 0.045, S.mus);
-    if (q === 0) { S.tone(root + 12, t, sp * 14, 'triangle', 0.05, S.mus); S.tone(root + 19, t, sp * 14, 'triangle', 0.035, S.mus); }
-    const lead = [[74, 0, 0, 77, 0, 0, 81, 0, 79, 0, 77, 0, 74, 0, 72, 0], [74, 0, 0, 77, 0, 0, 81, 0, 84, 0, 0, 82, 81, 0, 0, 0], [70, 0, 0, 74, 0, 0, 77, 0, 82, 0, 81, 0, 77, 0, 74, 0], [72, 0, 76, 0, 79, 0, 84, 0, 86, 0, 0, 0, 85, 0, 0, 0]][bar][q];
-    if (lead) { S.tone(lead, t, sp * 1.8, 'square', 0.03, S.mus); S.tone(lead - 12, t, sp * 1.8, 'triangle', 0.03, S.mus); }
+  // rage layer shared by the Assay tracks: S.rage (0..1) comes from the fury bar
+  _rage(s, t, sp, S, root) { const r = S.rage || 0; if (r < .5) return; const k = (r - .5) * 2, q = s % 16; S.tone(root - 12, t, sp * .9, 'sawtooth', 0.05 * k, S.mus); if (q % 4 === 2) S.tone(130, t, 0.12, 'sine', 0.2 * k, S.mus, 40); if (r >= 1 && q % 2 === 0) S.tone(root + 25 + (q % 4 ? 0 : 1), t, sp * .8, 'square', 0.012, S.mus); if (r >= 1 && q === 0) S.noise(t, sp * 14, 0.05, S.mus, 300, 0.6, 'lowpass'); },
+  dusk: { bpm: 126, len: 128, fn(s, t, sp, S) { // the ford: low, modal, hand drums, the shift song in the cellos
+    const q = s % 16, bar = s >> 4, root = [38, 38, 39, 38, 36, 36, 39, 38][bar]; TRACKS._rage(s, t, sp, S, root);
+    if (q === 0 || q === 6 || q === 10) S.tone(110, t, 0.22, 'sine', 0.22, S.mus, 48); if (q === 3 || q === 8 || q === 13 || q === 14) S.noise(t, 0.06, 0.07, S.mus, 900, 3); if (q % 2 === 1) S.noise(t, 0.02, 0.02, S.mus, 5000, 2, 'highpass');
+    if (q === 0) { S.pad(root, t, sp * 16, 'sawtooth', 0.03, S.mus, sp * 4); S.pad(root + 7, t, sp * 16, 'triangle', 0.035, S.mus, sp * 6); S.pad(root + 12 + (bar % 4 === 2 ? 1 : 3), t, sp * 16, 'sine', 0.03, S.mus, sp * 8); }
+    if (q % 4 === 0) S.tone(root + 12 + [0, 7, 12, 7][q >> 2], t, sp * 3, 'triangle', 0.035, S.mus);
+    if (bar >= 4) { const m = MOTIF[(s - 64) >> 1]; if (m && !(s & 1)) { S.pad(m - 12, t, sp * 7, 'sawtooth', 0.035, S.mus, sp); S.tone(m, t, sp * 6, 'triangle', 0.03, S.mus); } }
+    if (q === 0 && bar % 2 === 0) S.noise(t, sp * 30, 0.03, S.mus, 420, 0.5, 'lowpass');
+  } },
+  duel: { bpm: 168, len: 128, fn(s, t, sp, S) { // the keep: a clock, a blade, and her tune high above his
+    const q = s % 16, bar = s >> 4, root = [38, 38, 41, 40, 38, 38, 43, 45][bar]; TRACKS._rage(s, t, sp, S, root);
+    S.tone(root + [0, 0, 12, 0, 7, 0, 12, 0, 0, 12, 0, 7, 0, 3, 7, 12][q], t, sp * .8, 'sawtooth', 0.028, S.mus); if (q % 2 === 0) S.noise(t, 0.02, 0.035, S.mus, 7000, 3, 'highpass');
+    if (q % 4 === 0) S.tone(130, t, 0.14, 'sine', 0.24, S.mus, 44); if (q === 4 || q === 12) S.noise(t, 0.1, 0.12, S.mus, 2000, 4); if (q === 14 && bar % 2) S.noise(t, 0.08, 0.1, S.mus, 2000, 4);
+    if (q === 0) { S.pad(root + 12, t, sp * 15, 'sawtooth', 0.022, S.mus, sp * 2); S.pad(root + 19, t, sp * 15, 'square', 0.012, S.mus, sp * 2); }
+    if (bar < 4) { const m = MOTIF[s >> 1]; if (m && !(s & 1)) S.tone(m + 24, t, sp * 6, 'sine', 0.05, S.mus); } // Seren, high and clean
+    else { const m = MOTIF[(s - 64) >> 1]; if (m && !(s & 1)) { S.pad(m, t, sp * 5, 'sawtooth', 0.04, S.mus, 0.02); S.pad(m - 12, t, sp * 5, 'square', 0.02, S.mus, 0.02); } } // Kael, the same notes, an octave of iron under them
+    if (bar === 7 && q >= 8) S.tone(root + 24 + (q - 8), t, sp * .9, 'square', 0.015, S.mus);
+  } },
+  battle: { bpm: 152, len: 128, fn(s, t, sp, S) { // the valley: war drums, horns, and the shift song as a march
+    const q = s % 16, bar = s >> 4, root = [38, 38, 34, 36, 38, 41, 34, 33][bar], third = [3, 3, 4, 4, 3, 4, 4, 4][bar]; TRACKS._rage(s, t, sp, S, root);
+    if (q === 0 || q === 6 || q === 8) S.tone(120, t, 0.2, 'sine', 0.28, S.mus, 40); if (q === 4 || q === 12) { S.noise(t, 0.13, 0.13, S.mus, 1800, 3); S.tone(180, t, 0.08, 'triangle', 0.06, S.mus, 120); } if (q === 10 || q === 14 || q === 15) S.tone(90 + (q - 10) * 6, t, 0.12, 'sine', 0.16, S.mus, 60); if (q % 2 === 1) S.noise(t, 0.025, 0.028, S.mus, 7000, 2, 'highpass');
+    S.tone(root + (q % 4 === 3 ? 12 : q % 8 === 6 ? 7 : 0), t, sp * 0.9, 'sawtooth', 0.04, S.mus); S.tone(root + 12 + [0, 7, third, 7][q % 4], t, sp * .7, 'triangle', 0.022, S.mus);
+    if (q === 0) { S.pad(root + 12, t, sp * 14, 'sawtooth', 0.028, S.mus, sp * 2); S.pad(root + 12 + third, t, sp * 14, 'sawtooth', 0.02, S.mus, sp * 2); S.pad(root + 19, t, sp * 14, 'triangle', 0.03, S.mus, sp * 2); }
+    if (bar >= 4) { const m = MOTIF[(s - 64) >> 1]; if (m && !(s & 1)) { S.pad(m + 12, t, sp * 6, 'sawtooth', 0.04, S.mus, 0.03); S.pad(m + 12.06, t, sp * 6, 'square', 0.018, S.mus, 0.03); S.tone(m, t, sp * 5, 'triangle', 0.04, S.mus); } }
+    else { const lead = [[74, 0, 0, 77, 0, 0, 81, 0, 79, 0, 77, 0, 74, 0, 72, 0], [74, 0, 0, 77, 0, 0, 81, 0, 84, 0, 0, 82, 81, 0, 0, 0], [70, 0, 0, 74, 0, 0, 77, 0, 82, 0, 81, 0, 77, 0, 74, 0], [72, 0, 76, 0, 79, 0, 84, 0, 86, 0, 0, 0, 85, 0, 0, 0]][bar][q]; if (lead) { S.tone(lead, t, sp * 1.8, 'square', 0.026, S.mus); S.tone(lead - 12, t, sp * 1.8, 'triangle', 0.03, S.mus); } }
   } },
   hum: { bpm: 56, len: 32, fn(s, t, sp, S) { const m = MOTIF[s]; if (m) { S.tone(m - 12, t, sp * 3.8, 'triangle', 0.07, S.mus); S.tone(m - 5, t, sp * 3.8, 'sine', 0.03, S.mus); } if (s === 0) S.tone(38, t, sp * 32, 'sine', 0.05, S.mus); } },
   surface: { bpm: 70, len: 32, fn(s, t, sp, S) { const m = MOTIF[s]; if (m) { S.tone(m + 24, t, 2, 'sine', 0.03, S.mus); S.tone(m + 31, t, 2, 'sine', 0.015, S.mus); } } }
@@ -2518,7 +2555,7 @@ const Brawl = {
     }
     this.props = pr;
   },
-  end(win) { this.active = false; if (Cutscene.active) { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } else if (MAPS[G.mapId]) Sound.music(MAPS[G.mapId].music); Input.consume(); HUD.dirty = true; const cb = this.onEnd; this.onEnd = null; cb && cb(win); },
+  end(win) { this.active = false; Sound.rage = 0; if (Cutscene.active) { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } else if (MAPS[G.mapId]) Sound.music(MAPS[G.mapId].music); Input.consume(); HUD.dirty = true; const cb = this.onEnd; this.onEnd = null; cb && cb(win); },
   // Kael narrates. Lines come on a clock and on events, and never stop the fight.
   voice(key) { const v = this.def.voice; if (!v || !v[key] || this.vdone[key]) return; this.vdone[key] = 1; this.vq.push(v[key]); },
   updVoice(dt) { const v = this.def.voice; if (!v) return; this.ft += dt; (v.at || []).forEach(([at, t], i) => { if (this.ft >= at && !this.vdone['t' + i]) { this.vdone['t' + i] = 1; this.vq.push(t); } });
@@ -2528,28 +2565,28 @@ const Brawl = {
   spark(x, y, c, n, h) { for (let i = 0; i < (n || 6); i++) { const a = Math.random() * 6.28, v = 30 + Math.random() * 80; this.parts.push({ x, y, h: h === undefined ? 22 : h, vx: Math.cos(a) * v, vy: Math.sin(a) * v * .5, vh: 30 + Math.random() * 70, life: .3 + Math.random() * .25, c }); } },
   ring(x, y, c, r) { this.rings.push({ x, y, c, r: 4, max: r || 46, life: 1 }); },
   nearest(o, list) { let b = null, bd = 1e9; for (const f of list || this.foes) if (f.st !== 'down' && !f.enter) { const d = Math.hypot(f.x - o.x, f.y - o.y); if (d < bd) { bd = d; b = f; } } return b; },
-  gain(v) { const p = this.p, was = p.fury; p.fury = Math.min(100, p.fury + v); if (was < 100 && p.fury >= 100) { this.voice('fury'); this.punch = .4; this.rollK = .12; for (const f of this.foes) if (f.st === 'approach' && Math.hypot(f.x - p.x, f.y - p.y) < 90) { f.cd = Math.max(f.cd, 1.1); f.kx = (f.x - p.x) * 1.6; f.ky = (f.y - p.y) * 1.6; if (!this.flinched) { this.flinched = 1; f.bark = { t: 'WHAT IS HE?', life: 1.6 }; } } this.say('FURY', true); Sound.play('roar'); this.ring(p.x, p.y, '#ff7a30', 60); } },
+  gain(v) { const p = this.p, was = p.fury; p.fury = Math.min(100, p.fury + v); if (was < 100 && p.fury >= 100) { this.voice('fury'); Sound.play('fury'); this.punch = .4; this.rollK = .12; for (const f of this.foes) if (f.st === 'approach' && Math.hypot(f.x - p.x, f.y - p.y) < 90) { f.cd = Math.max(f.cd, 1.1); f.kx = (f.x - p.x) * 1.6; f.ky = (f.y - p.y) * 1.6; if (!this.flinched) { this.flinched = 1; f.bark = { t: 'WHAT IS HE?', life: 1.6 }; } } this.say('FURY', true); Sound.play('roar'); this.ring(p.x, p.y, '#ff7a30', 60); } },
 
   // ---------------------------------------------------------- hits
   hurtPlayer(f, dmg, ax, ay) {
     const p = this.p;
     if (p.inv > 0 || this.sup) { if (p.st === 'dodge' && p.open <= 0.9) { p.open = 1.6; this.slow = 0.5; this.say('OPENING!'); Sound.play('stage'); this.gain(22); } return; }
-    this.voice('hurt'); p.hp -= dmg; p.st = 'hurt'; p.t = 0; p.inv = 0.8; p.kx = ax * 160; p.ky = ay * 160; p.combo = 0; this.freeze = 0.1; this.shake = 0.35; this.impact = .12; Sound.play('hit'); this.spark(p.x, p.y, '#ff5a4a', 9); this.gain(16);
+    this.voice('hurt'); p.hp -= dmg; p.st = 'hurt'; p.t = 0; p.inv = 0.8; p.kx = ax * 160; p.ky = ay * 160; p.combo = 0; this.freeze = 0.1; this.shake = 0.35; this.impact = .12; Sound.play('hit'); if (f && f.K && f.K.blade) Sound.play('slash'); this.spark(p.x, p.y, '#ff5a4a', 9); this.gain(16);
     if (p.hp <= 0) { if (this.def.legend) { p.hp = p.max; p.fury = 100; p.inv = 1.6; this.say('NOT TODAY.', true); this.ring(p.x, p.y, '#ffe08a', 90); Sound.play('roar'); for (const o of this.foes) if (o.st !== 'down') { const d = Math.hypot(o.x - p.x, o.y - p.y) || 1; if (d < 90) { o.kx = (o.x - p.x) / d * 260; o.ky = (o.y - p.y) / d * 260; o.st = 'hurt'; o.t = 0; } } } else { p.st = 'down'; this.phase = 'lose'; this.pt = 0; } }
   },
   hitFoe(f, dmg, ax, ay, big) {
     const crit = this.p.open > 0 || !!this.sup || !!this.art;
-    if (this.def.doomed) { f.flash = 0.08; Sound.play('deny'); this.spark(f.x, f.y, '#c8ccd4', 5); this.p.kx = -ax * 150; this.p.ky = -ay * 150; this.clang++; f.bark = { t: ['CLANG', '...', 'CLANG'][this.clang % 3], life: .5 }; this.gain(10); return; }
-    if (f.st === 'wind' && !crit && !f.K.soft && f.mode !== 'charge' && this.p.gapT > .55 && !(f.clashT > this.t) && f.t > (f.second ? .3 : f.K.wind) - .17) { f.clashT = this.t + 3; f.st = 'hurt'; f.t = -.35; f.flash = .2; f.kx = ax * 150; f.ky = ay * 150; f.hp -= dmg; this.token = this.token.filter(o => o !== f); this.freeze = .14; this.slow = .35; this.shake = .4; this.impact = .16; this.punch = .3; this.rollK = .1; this.say('CLASH!'); Sound.play('clink'); Sound.play('hit'); this.spark(f.x - ax * 12, f.y - ay * 12, '#fff6dc', 16); this.ring(f.x - ax * 12, f.y - ay * 12, '#fff2c0', 34); this.slashes.push({ x: f.x - ax * 12, y: f.y - ay * 12, a: 1, life: .22, big: 1 }); this.gain(14); this.p.open = Math.max(this.p.open, .8); this.voice('clash'); if (f.hp <= 0) f.hp = 1; return; }
-    if (f.guardT > 0 && !crit) { f.flash = 0.06; Sound.play('deny'); this.spark(f.x, f.y, '#8a94a4', 4); this.p.kx = -ax * 120; this.p.ky = -ay * 120; if (!f.blk) { f.blk = 1; f.bark = { t: 'BLOCKED', life: .7 }; } return; }
+    if (this.def.doomed) { f.flash = 0.08; Sound.play('steel'); this.spark(f.x, f.y, '#c8ccd4', 5); this.p.kx = -ax * 150; this.p.ky = -ay * 150; this.clang++; f.bark = { t: ['CLANG', '...', 'CLANG'][this.clang % 3], life: .5 }; this.gain(10); return; }
+    if (f.st === 'wind' && !crit && !f.K.soft && f.mode !== 'charge' && this.p.gapT > .55 && !(f.clashT > this.t) && f.t > (f.second ? .3 : f.K.wind) - .17) { f.clashT = this.t + 3; f.st = 'hurt'; f.t = -.35; f.flash = .2; f.kx = ax * 150; f.ky = ay * 150; f.hp -= dmg; this.token = this.token.filter(o => o !== f); this.freeze = .14; this.slow = .35; this.shake = .4; this.impact = .16; this.punch = .3; this.rollK = .1; this.say('CLASH!'); Sound.play('clash'); this.spark(f.x - ax * 12, f.y - ay * 12, '#fff6dc', 16); this.ring(f.x - ax * 12, f.y - ay * 12, '#fff2c0', 34); this.slashes.push({ x: f.x - ax * 12, y: f.y - ay * 12, a: 1, life: .22, big: 1 }); this.gain(14); this.p.open = Math.max(this.p.open, .8); this.voice('clash'); if (f.hp <= 0) f.hp = 1; return; }
+    if (f.guardT > 0 && !crit) { f.flash = 0.06; Sound.play(this.p.blade || f.K.blade ? 'steel' : 'deny'); this.spark(f.x, f.y, '#8a94a4', 4); this.p.kx = -ax * 120; this.p.ky = -ay * 120; if (!f.blk) { f.blk = 1; f.bark = { t: 'BLOCKED', life: .7 }; } return; }
     this.nums.push({ x: f.x + (Math.random() - .5) * 10, y: f.y, h: 70 + (f.z || 0), v: dmg, big, life: .7 });
     f.hp -= dmg; f.flash = 0.14; f.kx = ax * (big ? 230 : 95); f.ky = ay * (big ? 230 : 95); this.freeze = big ? 0.11 : 0.05; this.shake = big ? 0.32 : 0.12; if (big) { this.impact = .14; this.punch = .22; this.ring(f.x, f.y, '#fff2c0', 40); f.vz = 150; this.rollK = (ax >= 0 ? 1 : -1) * .09; }
     this.slashes.push({ x: f.x, y: f.y, a: Math.random() * 3.14, life: .16, big });
-    Sound.play(big ? 'hit' : 'clink'); this.spark(f.x, f.y, this.p.blade ? '#ffe08a' : big ? '#ffe08a' : '#fff', big ? 12 : 6); this.gain(this.sup || this.art ? 0 : 5); this.hitsN = this.hitsT > 0 ? this.hitsN + 1 : 1; this.hitsT = 1.4;
+    Sound.play(this.p.blade ? (big ? 'bigslash' : 'slash') : big ? 'hit' : 'clink'); this.spark(f.x, f.y, this.p.blade ? '#ffe08a' : big ? '#ffe08a' : '#fff', big ? 12 : 6); this.gain(this.sup || this.art ? 0 : 5); this.hitsN = this.hitsT > 0 ? this.hitsN + 1 : 1; this.hitsT = 1.4;
     if (this.foes.reduce((a, o) => a + Math.max(0, o.hp), 0) < this.foes.reduce((a, o) => a + o.max, 0) * .5) this.voice('half');
     const endAt = this.def.endAt && f.hp <= f.max * this.def.endAt;
-    if (f.hp <= 0 || endAt) { f.st = 'down'; f.t = 0; f.kx = ax * 260; f.ky = ay * 260; f.vz = 190; if (!this.sup && !this.art && this.p.fury >= 60 && !this.def.doomed) { this.slow = Math.max(this.slow, .32); this.punch = Math.max(this.punch, .3); this.rollK = (ax >= 0 ? 1 : -1) * .1; f.vz = 250; this.gain(6); } this.token = this.token.filter(o => o !== f); Sound.play('rumble'); this.ring(f.x, f.y, '#fff', 60);
-      if (!this.foes.some(o => o.st !== 'down')) { if (this.def.waves && this.wave < this.def.waves.length - 1) { this.wave++; this.spawn(this.def.waves[this.wave]); this.say('MORE OF THEM', true); this.voice('wave'); if (this.def.onWave) this.def.onWave(this.wave, this); } else { this.phase = 'win'; this.pt = 0; this.slow = 0.9; this.punch = .5; this.sup = null; } }
+    if (f.hp <= 0 || endAt) { Sound.play('bodyfall'); f.st = 'down'; f.t = 0; f.kx = ax * 260; f.ky = ay * 260; f.vz = 190; if (!this.sup && !this.art && this.p.fury >= 60 && !this.def.doomed) { this.slow = Math.max(this.slow, .32); this.punch = Math.max(this.punch, .3); this.rollK = (ax >= 0 ? 1 : -1) * .1; f.vz = 250; this.gain(6); } this.token = this.token.filter(o => o !== f); Sound.play('rumble'); this.ring(f.x, f.y, '#fff', 60);
+      if (!this.foes.some(o => o.st !== 'down')) { if (this.def.waves && this.wave < this.def.waves.length - 1) { this.wave++; this.spawn(this.def.waves[this.wave]); this.say('MORE OF THEM', true); this.voice('wave'); if (this.def.onWave) this.def.onWave(this.wave, this); } else { this.phase = 'win'; this.pt = 0; this.slow = 0.9; this.punch = .5; this.sup = null; if (this.def.hero && this.def.hero.id) Sound.play('win'); } }
       return; }
     if ((f.st !== 'wind' || f.K.soft || big) && f.st !== 'charge') { this.token = this.token.filter(o => o !== f); f.st = 'hurt'; f.t = 0; }
     f.hits = (f.hits | 0) + 1; if (f.hits >= (f.K.soft ? 5 : 3) && !crit) { f.guardT = 1.1; f.cd = 0; f.hits = 0; f.blk = 0; }
@@ -2561,10 +2598,10 @@ const Brawl = {
     this.t += dt; if (this.fin) { this.fin.t += dt; if (this.fin.t > 1.1) this.fin = null; } this.msgT = Math.max(0, this.msgT - dt); this.shake = Math.max(0, this.shake - dt); this.punch = Math.max(0, this.punch - dt); this.impact = Math.max(0, this.impact - dt); this.hitsT -= dt; this.tipT -= dt;
     if (this.cine) return this.updCine(dt);
     if (Input.p('START')) { this.pauseMenu(); return; }
-    if (this.phase === 'intro') { this.pt += dt; this.camFollow(dt); if (this.pt > 1.5 || (this.pt > .5 && Input.p('A'))) { this.phase = 'fight'; this.say('FIGHT!', true); Sound.play('bell'); Input.consume(); } return; }
+    if (this.phase === 'intro') { this.pt += dt; this.camFollow(dt); if (this.pt > 1.5 || (this.pt > .5 && Input.p('A'))) { this.phase = 'fight'; this.say('FIGHT!', true); Sound.play(this.def.hero && this.def.hero.id ? 'horn' : 'bell'); Input.consume(); } return; }
     if (this.phase === 'win' || this.phase === 'lose') { this.pt += dt; this.stepParts(dt * .5); this.camFollow(dt * .5); for (const f of this.foes) { f.t += dt * .5; f.x += f.kx * dt * .4; f.y += f.ky * dt * .4; f.kx *= .9; f.ky *= .9; } if (this.pt > 2.1) { if (this.phase === 'win' && this.def.outro) this.playCine(this.def.outro, () => this.end(true)); else this.end(this.phase === 'win'); } return; }
     if (this.def.doomed && this.t > this.def.doomed + 1.6) { const p = this.p; p.st = 'down'; p.t = 0; this.impact = .3; this.shake = .8; Sound.play('hit'); this.phase = 'lose'; this.pt = 0.9; return; }
-    this.updVoice(dt); if (this.p.fury >= 100 && this.phase === 'fight') { this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = .62; if (!Settings.d.reduce) this.spark(this.p.x, this.p.y, '#ff7a30', 3, 2); } }
+    Sound.rage = this.phase === 'fight' ? this.p.fury / 100 : 0; this.updVoice(dt); if (this.p.fury >= 100 && this.phase === 'fight') { this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = .62; if (!Settings.d.reduce) this.spark(this.p.x, this.p.y, '#ff7a30', 3, 2); } }
     if (this.freeze > 0) { this.freeze -= dt; return; }
     if (this.art) { this.updArt(dt); this.stepParts(dt); this.camFollow(dt); return; }
     if (this.sup) { this.updSuper(dt); this.stepParts(dt); this.camFollow(dt); return; }
@@ -2595,7 +2632,7 @@ const Brawl = {
       p.t += dt; const dur = p.combo === 3 ? 0.36 : 0.24; if (p.t < 0.1) { const v = 100 + (p.gap || 0) * 14; p.x += p.ax * v * dt; p.y += p.ay * v * dt; }
       if (!p.hit && p.t >= 0.07) { p.hit = true; const big = p.combo === 3, R = (big ? 36 : 30) + (p.blade ? 8 : 0); let any = false;
         for (const f of this.foes) if (f.st !== 'down') { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy); if (d < R && (d < 10 || (dx * p.ax + dy * p.ay) / d > (p.blade ? -0.1 : 0.2))) { any = true; this.hitFoe(f, ((big ? 2 : 1) + (p.open > 0 ? 1 : 0) + (p.fury >= 100 ? 1 : 0) + (p.dash ? 1 : 0)) * p.pow, dx / (d || 1), dy / (d || 1), big || p.open > 0 || !!p.dash); } } p.dash = 0;
-        if (!any) Sound.play('move'); }
+        }
       if (p.t > dur) p.st = 'idle'; else if (p.t > 0.14 && Input.p('A') && p.combo < 3) this.strike();
       if (Input.p('B') && p.dcd <= 0 && p.t > 0.1) this.dodge(vx, vy);
     } else {
@@ -2607,16 +2644,16 @@ const Brawl = {
   },
   strike() { const p = this.p, f = this.nearest(p); p.gapT = this.t - (p.lastStrikeT === undefined ? -9 : p.lastStrikeT); p.lastStrikeT = this.t; let ax = p.fx, ay = p.fy; const m = Math.hypot(ax, ay) || 1; ax /= m; ay /= m;
     if (f) { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy); if (d < 70) { ax = dx / (d || 1); ay = dy / (d || 1); } }
-    p.fx = ax; p.fy = ay; p.st = 'atk'; p.t = 0; p.hit = false; p.ax = ax; p.ay = ay; p.combo = p.combo % 3 + 1; p.comboT = 0.7;
+    p.fx = ax; p.fy = ay; p.st = 'atk'; p.t = 0; p.hit = false; p.ax = ax; p.ay = ay; p.combo = p.combo % 3 + 1; p.comboT = 0.7; if (!this.sup && !this.art) Sound.play(p.blade ? (p.combo === 3 ? 'swing2' : 'swing') : 'dash');
     if (f) { const d = Math.hypot(f.x - p.x, f.y - p.y), R = 26 + (p.blade ? 8 : 0); p.gap = d < 70 && d > R ? Math.min(34, d - R + 4) : 0; } else p.gap = 0; },
-  dodge(vx, vy) { const p = this.p; if (!vx && !vy) { vx = -p.fx; vy = -p.fy; } const d = Math.hypot(vx, vy) || 1; p.st = 'dodge'; p.t = 0; p.dx = vx / d; p.dy = vy / d; p.inv = Math.max(p.inv, 0.26); p.dcd = 0.55; Sound.play('step'); this.spark(p.x, p.y, '#8a7a6a', 3, 0); },
+  dodge(vx, vy) { const p = this.p; if (!vx && !vy) { vx = -p.fx; vy = -p.fy; } const d = Math.hypot(vx, vy) || 1; p.st = 'dodge'; p.t = 0; p.dx = vx / d; p.dy = vy / d; p.inv = Math.max(p.inv, 0.26); p.dcd = 0.55; Sound.play('dash'); this.spark(p.x, p.y, '#8a7a6a', 3, 0); },
   // MEMORY ARTS: the big attacks carry the story. A memory cuts in, says its line, and becomes a strike.
-  startArt(a) { const p = this.p, live = this.foes.filter(f => f.st !== 'down' && !f.enter); this.art = { a, t: 0, tg: live.sort((x, y) => y.hp - x.hp)[0], n: 0, done: 0 }; this.token = []; this.slow = 0; this.vcur = null; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1.2; } p.st = 'idle'; p.hold = 0; this.impact = .2; Sound.play('choir'); Sound.play('stage'); },
+  startArt(a) { const p = this.p, live = this.foes.filter(f => f.st !== 'down' && !f.enter); this.art = { a, t: 0, tg: live.sort((x, y) => y.hp - x.hp)[0], n: 0, done: 0 }; this.token = []; this.slow = 0; this.vcur = null; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1.2; } p.st = 'idle'; p.hold = 0; this.impact = .2; Sound.play('cutin'); },
   updArt(dt) {
     const A = this.art, a = A.a, p = this.p, f = A.tg, C = 1.9; A.t += dt; p.inv = .6; if (p.st === 'atk') { p.t += dt; if (p.t > .3) p.st = 'idle'; }
     if (A.t < C) { if (A.t > .5 && (Input.p('A') || Input.p('B'))) A.t = C; return; }
     const tau = A.t - C, cut = (side, big) => { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; p.fx = p.ax = dx / d; p.fy = p.ay = dy / d; p.st = 'atk'; p.t = 0; p.hit = true; p.combo = 1 + A.n % 3; this.slashes.push({ x: f.x, y: f.y, a: A.n * 1.1, life: .18, big: 1, h: 26 + (f.z || 0) }); this.spark(f.x, f.y, '#ffe08a', 7, 22 + (f.z || 0)); f.flash = .12; this.hitsN = this.hitsT > 0 ? this.hitsN + 1 : 1; this.hitsT = 1.6; this.shake = .2; Sound.play(big ? 'hit' : 'clink'); A.n++; };
-    const land = () => { A.done = 1; f.z = 0; p.z = 0; this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#fff2c0', 120); this.ring(f.x, f.y, a.hex || '#ffb040', 80); this.fin = { x: f.x, y: f.y, t: 0 }; Sound.play('roar'); Sound.play('rumble'); this.freeze = .3;
+    const land = () => { A.done = 1; f.z = 0; p.z = 0; this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#fff2c0', 120); this.ring(f.x, f.y, a.hex || '#ffb040', 80); this.fin = { x: f.x, y: f.y, t: 0 }; Sound.play('pillar'); this.freeze = .3;
       const live = this.foes.filter(o => o.st !== 'down' && !o.enter); for (const o of live) { if (!this.art) break; const main = o === f, d = Math.hypot(o.x - f.x, o.y - f.y); if (main || d < 90) this.hitFoe(o, main ? (a.dmg || Math.max(6, Math.round(o.max * .14))) : 4, main ? p.ax : (o.x - f.x) / (d || 1), main ? p.ay : (o.y - f.y) / (d || 1), true); } };
     if (a.kind === 'rise') { // launch, three cuts in the air, and down
       if (A.n === 0 && tau >= 0) { p.x = f.x - 20; p.y = f.y + 2; this.clampA(p); cut(); this.ring(f.x, f.y, '#fff', 40); }
@@ -2633,7 +2670,7 @@ const Brawl = {
     if (!this.art) { p.z = 0; if (f.st !== 'down') f.z = 0; this.voice('art'); }
   },
   // ELEVEN: one blow for every second the doors stood open
-  startSuper() { this.voice('eleven'); const p = this.p; p.hold = 0; p.st = 'idle'; p.fury = 0; this.sup = { t: 0, n: 0, next: 0.95, tg: this.nearest(p) }; this.slow = 0; Sound.play('roar'); Sound.play('choir'); this.shake = .4; this.token = []; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1; } },
+  startSuper() { this.voice('eleven'); const p = this.p; p.hold = 0; p.st = 'idle'; p.fury = 0; this.sup = { t: 0, n: 0, next: 0.95, tg: this.nearest(p) }; this.slow = 0; Sound.play('cutin'); Sound.play('roar'); this.shake = .4; this.token = []; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1; } },
   updSuper(dt) {
     const s = this.sup, p = this.p; s.t += dt; p.inv = .5;
     if (s.t < 0.95) return;
@@ -2643,9 +2680,9 @@ const Brawl = {
       const live = this.foes.filter(f => f.st !== 'down' && !f.enter); if (!live.length) { this.sup = null; return; }
       const f = live.sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[live.length > 1 ? s.n % Math.min(3, live.length) : 0], side = s.n % 2 ? 1 : -1, last = s.n === 10;
       p.trail.push({ x: p.x, y: p.y, life: .3 }); p.x = f.x + side * 18; p.y = f.y + (s.n % 3 - 1) * 8; this.clampA(p); const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; p.fx = p.ax = dx / d; p.fy = p.ay = dy / d; p.st = 'atk'; p.t = 0; p.hit = true; p.combo = last ? 3 : 1 + s.n % 2; s.tg = f;
-      s.word = ELEVEN[s.n]; s.wt = 0; s.n++; s.next = s.t + (last ? 0 : Math.max(0.085, 0.16 - s.n * 0.008));
+      Sound.play('count', s.n); s.word = ELEVEN[s.n]; s.wt = 0; s.n++; s.next = s.t + (last ? 0 : Math.max(0.085, 0.16 - s.n * 0.008));
       this.hitFoe(f, (last ? 3 : 1) * p.pow, last ? p.ax : 0, last ? p.ay : 0, last); if (!this.sup) return;
-      if (last) { this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#ff7a30', 110); this.ring(f.x, f.y, '#fff2c0', 70); if (!this.def.doomed) this.fin = { x: f.x, y: f.y, t: 0 }; Sound.play('roar'); Sound.play('rumble'); f.vz = 230; for (const o of live) if (this.sup && o !== f && o.st !== 'down' && Math.hypot(o.x - f.x, o.y - f.y) < 70) this.hitFoe(o, 2 * p.pow, (o.x - f.x) / 70, (o.y - f.y) / 70, true); }
+      if (last) { this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#ff7a30', 110); this.ring(f.x, f.y, '#fff2c0', 70); if (!this.def.doomed) this.fin = { x: f.x, y: f.y, t: 0 }; Sound.play('pillar'); f.vz = 230; for (const o of live) if (this.sup && o !== f && o.st !== 'down' && Math.hypot(o.x - f.x, o.y - f.y) < 70) this.hitFoe(o, 2 * p.pow, (o.x - f.x) / 70, (o.y - f.y) / 70, true); }
       this.freeze = last ? 0.34 : 0.03;
     }
   },
@@ -2674,7 +2711,7 @@ const Brawl = {
       f.t += dt; const w = f.mode === 'charge' ? K.wind + .15 : f.second ? 0.3 : K.wind;
       if (f.t >= w) {
         if (f.mode === 'charge') { f.st = 'charge'; f.t = 0; Sound.play('roar'); }
-        else { f.st = 'recover'; f.t = 0; Sound.play('move'); f.swing = .18;
+        else { f.st = 'recover'; f.t = 0; Sound.play(K.blade ? (K.dmg > 1 ? 'swing2' : 'swing') : 'move'); f.swing = .18;
           if (f.mode === 'sweep') { if (d < K.reach + 6) this.strikeAt(f, T, K.dmg, dx / d, dy / d); this.ring(f.x, f.y, '#c8ccd4', K.reach + 6); }
           else { const hx = f.x + f.ax * K.reach, hy = f.y + f.ay * K.reach; f.x += f.ax * 10; f.y += f.ay * 10;
             const t = clamp(((T.x - f.x) * f.ax + (T.y - f.y) * f.ay) / K.reach, 0, 1), qx = f.x + (hx - f.x) * t, qy = f.y + (hy - f.y) * t; if (Math.hypot(T.x - qx, T.y - qy) < (K.wide || 12)) this.strikeAt(f, T, K.dmg, f.ax, f.ay); }
@@ -3021,6 +3058,13 @@ Batch.prototype = {
     const F = [[1, 3, 7, 5, 0, 1], [0, 4, 6, 2, 0, -1], [2, 6, 7, 3, 1, 1], [0, 1, 5, 4, 1, -1], [4, 5, 7, 6, 2, 1], [0, 2, 3, 1, 2, -1]];
     for (const [a, b, d, e, ax, sg] of F) { const nx = emis ? 0 : m[ax * 4] * sg, ny = emis ? 0 : m[ax * 4 + 1] * sg, nz = emis ? 0 : m[ax * 4 + 2] * sg; for (const k of [a, b, d, a, d, e]) this.v(P[k * 3], P[k * 3 + 1], P[k * 3 + 2], nx, ny, nz, c); }
   },
+  // tapered box: w0 x d0 at the bottom (y = cy), w1 x d1 at the top (y = cy + h). Limbs and torsos are these, not bricks.
+  fr(m, cx, cy, cz, w0, d0, w1, d1, h, col) {
+    const c = rgb3(col), P = [], tp = (x, y, z) => [m[0] * x + m[4] * y + m[8] * z + m[12], m[1] * x + m[5] * y + m[9] * z + m[13], m[2] * x + m[6] * y + m[10] * z + m[14]], tn = (x, y, z) => [m[0] * x + m[4] * y + m[8] * z, m[1] * x + m[5] * y + m[9] * z, m[2] * x + m[6] * y + m[10] * z];
+    for (let i = 0; i < 8; i++) { const top = i & 2, w = top ? w1 : w0, d = top ? d1 : d0; P.push(tp(cx + (i & 1 ? w / 2 : -w / 2), cy + (top ? h : 0), cz + (i & 4 ? d / 2 : -d / 2))); }
+    const sx = (w0 - w1) / 2, sz = (d0 - d1) / 2, F = [[1, 3, 7, 5, tn(h, sx, 0)], [0, 4, 6, 2, tn(-h, sx, 0)], [2, 6, 7, 3, tn(0, 1, 0)], [0, 1, 5, 4, tn(0, -1, 0)], [4, 5, 7, 6, tn(0, sz, h)], [0, 2, 3, 1, tn(0, sz, -h)]];
+    for (const [a, b, d, e, n] of F) for (const k of [a, b, d, a, d, e]) this.v(P[k][0], P[k][1], P[k][2], n[0], n[1], n[2], c);
+  },
   // cylinder or cone standing on y = cy (r1 = 0 makes a cone)
   cyl(m, cx, cy, cz, r0, r1, h, sides, col, emis, cap) {
     const c = rgb3(col), tp = (x, y, z) => [m[0] * x + m[4] * y + m[8] * z + m[12], m[1] * x + m[5] * y + m[9] * z + m[13], m[2] * x + m[6] * y + m[10] * z + m[14]], sl = (r0 - r1) / h;
@@ -3236,13 +3280,14 @@ const G3 = {
     root = M4.mul(root, M4.t(0, -Math.max(0, P.cr), P.lz));
     // legs: hip, knee, a planted boot
     for (const sd of [-1, 1]) { const hip = sd < 0 ? P.hl : P.hr, knee = Math.max(0, sd < 0 ? P.kl : P.kr), lm = M4.chain(root, M4.t(sd * 3.7, 18, 0), M4.rz(sd * P.sp), M4.rx(-hip)), sm = M4.chain(lm, M4.t(0, -8.5, 0), M4.rx(knee)), fm = M4.chain(sm, M4.t(0, -8.8, 0), M4.rx(Math.max(-.6, hip - knee) * .6));
-      D.box(lm, 0, -4.2, 0, 5.4, 9, 6.2, dark); D.box(lm, 0, -3, 3.2, 5.6, 5, .6, arm); D.box(lm, 0, -8.4, .6, 5.8, 2.2, 6.8, trim);
-      D.box(sm, 0, -4.4, 0, 4.8, 8.8, 5.4, dark); D.box(sm, 0, -4, 2.7, 5, 7, 1.2, arm); D.box(sm, 0, -1.2, 2.9, 5.2, 1.2, 1, trim, 1); D.box(fm, 0, .6, 1.4, 5.4, 3.2, 8.8, '#4a3a2a'); D.box(fm, 0, -.7, 1.4, 5.6, .8, 9, '#2e241a'); }
+      D.fr(lm, 0, -8.7, 0, 4.6, 5.2, 6, 6.8, 9, dark); D.box(lm, 0, -3, 3.3, 5.2, 5, .6, arm); D.box(lm, 0, -8.4, .6, 5.8, 2.2, 6.8, trim);
+      D.fr(sm, 0, -8.8, 0, 3.8, 4.4, 5.2, 5.8, 8.8, dark); D.fr(sm, 0, -7.6, 2.5, 3.6, 1, 5, 1.4, 7, arm); D.box(sm, 0, -1.2, 2.9, 5.2, 1.2, 1, trim, 1); D.box(fm, 0, .6, 1.4, 5.4, 3.2, 8.8, '#4a3a2a'); D.box(fm, 0, -.7, 1.4, 5.6, .8, 9, '#2e241a'); }
     const up = M4.chain(root, M4.t(0, 18, 0), M4.rx(P.lean + clamp(fwdV / 300, -.25, .25)), M4.rz(P.side - clamp(sideV / 260, -.3, .3)), M4.ry(P.tw));
     // cape: three panels on springs, dragged by how fast he is really moving
     if (L.cape) { let cm = M4.chain(up, M4.t(0, 15, -4.4)); for (let i = 0; i < 3; i++) { const want = .12 + clamp(fwdV / 110, -.2, 1.1) * (i ? .4 : 1) + clamp(spd / 200, 0, .4) + Math.sin(t * (5 + i) + i * 1.3 + idx) * (.05 + spd / 900) - P.lean * (i ? 0 : .7), k = 90, dd = 9; if (dt > 0) { R.cv[i] += ((want - R.cape[i]) * k - R.cv[i] * dd) * dt; R.cape[i] += R.cv[i] * dt; } else R.cape[i] = want; cm = M4.mul(cm, M4.rx(-clamp(R.cape[i], -.5, 1.7))); D.box(cm, 0, -5.5, -.3, 15 - i * .6, 11, .9, i === 1 ? shade(L.cape, .9) : L.cape); { const rgc = o === Brawl.p && !Brawl.cine ? this.rage : 0; if (i === 2 && rgc > .4) { D.box(cm, 0, -10.6, -.3, 15 - i * .6, 1.6, 1.1, [1, .5 - rgc * .1, .12], 1); if (!rm) this.glow(cm[12] - cm[4] * 11, cm[13] - cm[5] * 11, cm[14] - cm[6] * 11, 9 + Math.sin(t * 20) * 2, [1, .4, .1], .5 * rgc); } else D.box(cm, 0, -10.6, -.3, 15 - i * .6, .8, 1, trim); } cm = M4.mul(cm, M4.t(0, -11, 0)); } }
     const br = 1 + Math.sin(t * 2.6 + idx) * .025;
-    D.box(up, 0, 3.6, 0, 11.4, 7.2, 7, shade(arm, .9)); D.box(up, 0, 10.6, 0, 14.4 * br, 8.4, 8.4 * br, arm); D.box(up, 0, 11, 4.3 * br, 9, 6, .5, shade(arm, 1.1)); D.box(up, 0, 14.6, 4.3 * br, 12, .9, .5, trim, 1); D.box(up, 0, 7.2, 4.3 * br, 6, .8, .5, trim, 1);
+    D.fr(up, 0, 0, 0, 11.8, 7.4, 10, 6.4, 7, shade(arm, .88)); D.fr(up, 0, 6.6, 0, 10.2, 6.6, 15.2 * br, 9 * br, 8.2, arm); D.fr(up, 0, 14.6, 0, 8.4, 7, 6, 5.2, 2.4, trim);
+    for (const sd of [-1, 1]) { const hipA = sd < 0 ? P.hl : P.hr, tm = M4.chain(up, M4.t(sd * 4.4, .6, 2.9), M4.rz(sd * .1), M4.rx(-.18 - Math.max(0, hipA) * .55)); D.fr(tm, 0, -7, 0, 4.4, .9, 5.6, .9, 7, arm); D.box(tm, 0, -6.8, .2, 4.6, .9, 1, trim, 1); const bm = M4.chain(up, M4.t(sd * 4.4, .6, -3), M4.rx(.2 + Math.max(0, -hipA) * .5)); D.fr(bm, 0, -6, 0, 4.4, .9, 5.4, .9, 6, shade(arm, .86)); } D.box(up, 0, 11, 4.3 * br, 9, 6, .5, shade(arm, 1.1)); D.box(up, 0, 14.6, 4.3 * br, 12, .9, .5, trim, 1); D.box(up, 0, 7.2, 4.3 * br, 6, .8, .5, trim, 1);
     D.box(up, 0, .8, 0, 12.4, 2, 7.8, trim); D.box(up, 0, 2.5, 0, 12.2, 1.5, 7.6, sash); D.box(up, 0, 15.6, 0, 5, 2, 5, shade(skin, .86));
     for (const sd of [-1, 1]) { const tm = M4.chain(up, M4.t(sd * 3, 1.6, -3.9), M4.rx(-.2 - clamp(fwdV / 90, -.2, 1.2) - Math.sin(t * 7 + sd + idx) * (.05 + spd / 500)), M4.rz(sd * .1 - clamp(sideV / 200, -.4, .4))); D.box(tm, 0, -5, 0, 2.6, 10, .5, sash); D.box(tm, 0, -10.4, 0, 2.6, .8, .6, trim); }
     if (blade === 1) { const sc2 = M4.chain(up, M4.t(6.6, 1, -1), M4.rx(.5 + clamp(fwdV / 300, 0, .3))); D.box(sc2, 0, -8, 0, 1.8, 16, 2.6, '#3a2a1e'); D.box(sc2, 0, -15.6, 0, 2.2, 1.6, 3, trim, 1); }
@@ -3253,7 +3298,7 @@ const G3 = {
     const hd = M4.chain(up, M4.t(0, 16, 0), M4.rx(-P.lean * .65 + P.hx), M4.ry(-P.tw * .7 + P.hy));
     D.box(hd, 0, 1, 0, 4, 2.5, 4, shade(skin, .82));
     if (L.helm) { D.box(hd, 0, 7, 0, 10.4, 10.4, 10.4, '#d8dce4'); D.box(hd, 0, 7.6, 5.3, 8, 1.6, .4, '#1e1e28', 1); D.box(hd, 0, 12.3, 0, 10.8, 1, 10.8, trim); const pl = M4.chain(hd, M4.t(0, 12.6, -1), M4.rx(-clamp(fwdV / 160, -.2, .7) - Math.sin(t * 6 + idx) * .06)); D.box(pl, 0, 3, -1, 2, 6.5, 9, sash); }
-    else { D.box(hd, 0, 7, 0, 9, 9.4, 9, skin); D.box(hd, 0, 12, -.4, 10, 3.4, 10.2, hair); D.box(hd, 0, 7.5, -4.4, 10, 8, 1.8, hair); D.box(hd, -4.7, 8.6, -1, 1, 5.6, 6, hair); D.box(hd, 4.7, 8.6, -1, 1, 5.6, 6, hair);
+    else { D.fr(hd, 0, 2.3, 0, 7.2, 7.6, 9.2, 9.2, 9.4, skin); D.box(hd, 0, 12, -.4, 10, 3.4, 10.2, hair); D.box(hd, 0, 5, 3.9, 5, 1, .4, shade(skin, .92)); D.box(hd, 0, 7.5, -4.4, 10, 8, 1.8, hair); D.box(hd, -4.7, 8.6, -1, 1, 5.6, 6, hair); D.box(hd, 4.7, 8.6, -1, 1, 5.6, 6, hair);
       if (L.long) { let hm2 = M4.chain(hd, M4.t(0, 4, -4.6)); for (let i = 0; i < 2; i++) { hm2 = M4.mul(hm2, M4.rx(-.08 - clamp(fwdV / 150, -.2, .9) * (i ? .5 : 1) - Math.sin(t * 5 + i + idx) * .05)); D.box(hm2, 0, -3, 0, 9 - i, 6, 1.6, i ? shade(hair, .92) : hair); hm2 = M4.mul(hm2, M4.t(0, -6, 0)); } }
       if (L.spiky) for (let i = 0; i < 4; i++) D.box(M4.chain(hd, M4.t(-3.6 + i * 2.4, 13.4, -1 + (i % 2) * 2), M4.rz((i - 1.5) * .25), M4.rx(-clamp(fwdV / 300, 0, .4))), 0, 1, 0, 2, 3.4, 2.4, shade(hair, 1.08));
       { const me = o === Brawl.p && !Brawl.cine, rg = me ? this.rage : (opt.aura || 0) > 2.5 ? 1 : 0, ec = [1, .78 - rg * .46, .25 - rg * .15], es = 1 + rg * .5, ang = st === 'atk' || st === 'wind' || rg > .5 ? .5 : 0; D.box(hd, -2.1, 7.4, 4.6, 1.7 * es, 1.5 * es, .4, ec, 1); D.box(hd, 2.1, 7.4, 4.6, 1.7 * es, 1.5 * es, .4, ec, 1); if (rg > .5 && !rm) { const e1 = [hd[12] + hd[8] * 5 + hd[4] * 7.4, hd[13] + hd[9] * 5 + hd[5] * 7.4, hd[14] + hd[10] * 5 + hd[6] * 7.4]; this.glow(e1[0], e1[1], e1[2], 5 + rg * 3, [1, .3, .1], .5 * rg); }
@@ -3262,13 +3307,13 @@ const G3 = {
       if (L.smudge) { D.box(hd, 3, 5.6, 4.6, 1.8, 1.4, .3, '#5a4a44'); D.box(hd, -3.4, 4.6, 4.6, 1.2, 1, .3, '#5a4a44'); }
       if (L.circlet) { D.box(hd, 0, 11, 0, 9.8, 1.2, 9.8, trim, 1); D.box(hd, 0, 12.2, 4.9, 1.6, 2, .5, [1, 1, .9], 1); } }
     // off arm: shoulder, elbow, an open hand for balance
-    { const am = M4.chain(up, M4.t(8.8, 13, 0), M4.rz(.14), M4.ry(P.ly), M4.rx(P.lp)), fm = M4.chain(am, M4.t(0, -7, 0), M4.rx(P.le)); D.box(am, 0, -3.6, 0, 4.2, 7.4, 4.6, arm); D.box(fm, 0, -3.2, 0, 3.8, 6.6, 4.2, shade(arm, .92)); D.box(fm, 0, -1, 0, 4.4, 1.2, 4.8, trim, 1); D.box(fm, 0, -7.6, 0, 3.6, 2.6, 3.8, skin); }
+    { const am = M4.chain(up, M4.t(8.8, 13, 0), M4.rz(.14), M4.ry(P.ly), M4.rx(P.lp)), fm = M4.chain(am, M4.t(0, -7, 0), M4.rx(P.le)); D.fr(am, 0, -7.3, 0, 3.6, 4, 4.8, 5.2, 7.4, arm); D.fr(fm, 0, -6.5, 0, 3.2, 3.6, 4.6, 5, 6.6, shade(arm, .92)); D.box(fm, 0, -1, 0, 4.4, 1.2, 4.8, trim, 1); D.box(fm, 0, -7.6, 0, 3.6, 2.6, 3.8, skin); }
     // sword arm: shoulder, elbow, wrist, steel
     const am = M4.chain(up, M4.t(-8.8, 13, 0), M4.rz(-.14), M4.ry(P.ry), M4.rx(P.rp)), fm = M4.chain(am, M4.t(0, -7, 0), M4.rx(P.re));
-    D.box(am, 0, -3.6, 0, 4.2, 7.4, 4.6, arm); if (L.band) D.box(am, 0, -3.4, 0, 4.7, 2.6, 5.1, '#c8281e'); D.box(fm, 0, -3.2, 0, 3.8, 6.6, 4.2, shade(arm, .92)); D.box(fm, 0, -1, 0, 4.4, 1.2, 4.8, trim, 1); D.box(fm, 0, -7.6, 0, 3.6, 2.6, 3.8, skin);
+    D.fr(am, 0, -7.3, 0, 3.6, 4, 4.8, 5.2, 7.4, arm); if (L.band) D.box(am, 0, -3.4, 0, 4.9, 2.6, 5.3, '#c8281e'); D.fr(fm, 0, -6.5, 0, 3.2, 3.6, 4.6, 5, 6.6, shade(arm, .92)); D.box(fm, 0, -1, 0, 4.4, 1.2, 4.8, trim, 1); D.box(fm, 0, -7.6, 0, 3.6, 2.6, 3.8, skin);
     if (blade) { const hm = M4.chain(fm, M4.t(0, -7.8, 0), M4.rx(P.tilt)), av = Math.abs(R.v.ry || 0) + Math.abs(R.v.rp || 0) + Math.abs(R.v.tw || 0) * .6, fast = av > 9, BL = (blade === 2 ? 58 : 27) * (1 + (rm ? 0 : clamp((av - 9) / 60, 0, .45))), hot = o === Brawl.p && !Brawl.cine ? this.rage : (opt.aura || 0) > 2.5 ? 1 : 0, bc = blade === 2 ? [.86, .88, .92] : [1, .97 - hot * .4, .86 - hot * .6];
       if (blade === 2) { D.box(hm, 0, -BL * .35, 0, 1.6, BL, 1.6, '#6a5a44'); D.cyl(M4.chain(hm, M4.t(0, -BL * .85, 0), M4.rx(Math.PI)), 0, 0, 0, 2.6, 0, 9, 4, bc, 1); D.box(hm, 0, -BL * .82, 0, 5, 1.2, 1.2, trim, 1); }
-      else { D.box(hm, 0, 2.6, 0, 1.6, 5, 1.6, '#4a3020'); D.box(hm, 0, 5.4, 0, 2.4, 1.4, 2.4, trim, 1); D.box(hm, 0, -.4, 0, 8.6, 1.6, 2.4, trim, 1); D.box(hm, 0, -BL / 2 - 1, 0, 2.8, BL, .9, bc, 1); D.box(hm, 0, -BL / 2 - 1, 0, .8, BL, 1.3, [1, .86 - hot * .3, .5 - hot * .3], 1); D.cyl(M4.chain(hm, M4.t(0, -BL - 1, 0), M4.rx(Math.PI)), 0, 0, 0, 1.4, 0, 3.4, 4, bc, 1); if (hot > .3 && !rm) this.glow(hm[12] - hm[4] * BL * .5, hm[13] - hm[5] * BL * .5, hm[14] - hm[6] * BL * .5, 10 + hot * 6, [1, .4, .1], .35 * hot); }
+      else { D.box(hm, 0, 2.6, 0, 1.6, 5, 1.6, '#4a3020'); D.box(hm, 0, 5.4, 0, 2.4, 1.4, 2.4, trim, 1); D.box(hm, 0, -.4, 0, 7, 1.6, 2.4, trim, 1); for (const sd of [-1, 1]) D.box(M4.chain(hm, M4.t(sd * 4.4, -1.1, 0), M4.rz(sd * .55)), 0, 0, 0, 3, 1.4, 2, trim, 1); D.box(hm, 0, 5.4, 0, 1.3, 1.3, 2.9, sash, 1); D.box(hm, 0, -BL / 2 - 1, 0, 2.8, BL, .9, bc, 1); D.box(hm, 0, -BL / 2 - 1, 0, .8, BL, 1.3, [1, .86 - hot * .3, .5 - hot * .3], 1); D.cyl(M4.chain(hm, M4.t(0, -BL - 1, 0), M4.rx(Math.PI)), 0, 0, 0, 1.4, 0, 3.4, 4, bc, 1); if (hot > .3 && !rm) this.glow(hm[12] - hm[4] * BL * .5, hm[13] - hm[5] * BL * .5, hm[14] - hm[6] * BL * .5, 10 + hot * 6, [1, .4, .1], .35 * hot); }
       // the ribbon: every frame of a fast swing leaves a strip of light from guard to tip
       const scm = sc * this.MS, tip = [hm[12] - hm[4] * BL, hm[13] - hm[5] * BL, hm[14] - hm[6] * BL], base = [hm[12] - hm[4] * BL * .5, hm[13] - hm[5] * BL * .5, hm[14] - hm[6] * BL * .5];
       if (!rm) { if (dt > 0) for (const q of R.trail) q.life -= dt; R.trail = R.trail.filter(q => q.life > 0); const swinging = fast && (st === 'atk' || o.swing > 0 || opt.swingFx); if (swinging && dt > 0 && !jump) R.trail.push({ a: base, b: tip, life: .13 }); else if (jump) R.trail = [];
@@ -3377,7 +3422,7 @@ const FF = {
     ]
   }),
   ford: () => ({
-    title: 'THE FORD', sub: 'CAPTAIN VANT HOLDS THE CROSSING', bg: 'ford', arena: FIELD, music: 'battle', rage: 2, legend: 1, skip: 1, winText: 'THE FORD IS OURS',
+    title: 'THE FORD', sub: 'CAPTAIN VANT HOLDS THE CROSSING', bg: 'ford', arena: FIELD, music: 'dusk', rage: 2, legend: 1, skip: 1, winText: 'THE FORD IS OURS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 45 }, allies: ['cadv2'], shouts: ['HE IS MAD!', 'WITH HIM!'], taunt: { 0: ['WHO TRAINED YOU?', 'YOU FIGHT LIKE A MINER!', 'YIELD, BOY!'] },
     voice: { at: [[1, 'VANT IS THE BEST BLADE IN HOUSE TEAL. HE HAS NEVER ONCE BEEN HUNGRY.'], [11, 'MARA USED TO SAY: AIM IT UP, NOT SIDEWAYS. I AM AIMING, MARA.'], [26, 'EVERY NIGHT I WASH THE GOLD OFF MY HANDS AND CHECK THAT THE SOOT IS STILL THERE.']],
       hurt: 'HE HITS LIKE A PROCTOR. I HAVE BEEN HIT BY PROCTORS.', fury: 'I DO NOT GET ANGRY UP HERE. I WAS ALREADY ANGRY WHEN I ARRIVED.', eleven: 'ONE FOR EVERY SECOND.', half: 'HE IS AFRAID NOW. NOBODY EVER TAUGHT THEM WHAT TO DO WITH THAT.' },
@@ -3396,7 +3441,7 @@ const FF = {
     ]
   }),
   keep: () => ({
-    title: 'THE KEEP', sub: 'LUCAN AUREL - LAST DAY OF THE ASSAY', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'battle', rage: 3, legend: 1, skip: 1, endAt: 0.3, winText: 'YIELD.',
+    title: 'THE KEEP', sub: 'LUCAN AUREL - LAST DAY OF THE ASSAY', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, endAt: 0.3, winText: 'YIELD.',
     hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['YOU ARE ANGRY AT SOMEONE.', 'MOTHER WOULD LIKE YOU.', 'WHAT ARE YOU?', 'WHO WAS SHE?'] },
     voice: { at: [[1, 'LUCAN AUREL. HER SON. HER CHIN, HER HANDS, HER WAY OF LOOKING PAST YOU.'], [12, 'HE HAS BEEN BETTER THAN EVERYONE HIS WHOLE LIFE. IT HAS MADE HIM SLOW.'], [20, 'SHE IS WATCHING FROM THE DAIS. SHE DOES NOT KNOW MY FACE. SHE MADE IT.'], [34, 'SHE CALLED SEREN LITTLE EMBER. I WONDER WHAT SHE CALLS HIM.']],
       hurt: 'HE DID NOT LIGHT THE FURNACE. I KNOW. I KNOW.', fury: 'BE TOO MUCH FOR THEM, SHE SAID.', eleven: 'ELEVEN. FOR THE DOORS. FOR THE WASHER ON HER FINGER.', half: 'I COULD KILL HIM. THAT IS NOT WHAT I CAME UP HERE FOR.' },
@@ -3425,7 +3470,7 @@ const OPENING = [
   { d: 1.7, black: 1, sfx: 'rumble', shake: .8, big: 'THE DOORS CLOSED.' },
   { d: 1.9, black: 1, bolt: 2, sfx: 'roar', music: 'battle', flash: 1, big: 'SO I WENT UP.', bigC: '#ff7a30' },
   // above: four years on. Fast, bright, loud.
-  { d: 3.0, bg: 'valley', flash: 1, cam: [0, 330, 200, 150, .14], to: [0, 170, 70, 150, .32], credit: 'A STORY OF CINDERWELL', acts: ffRow(V, 8, -105, 30, 60, { fy: -1 }).concat(ffRow(TL, 8, -105, 30, -70, { fy: 1 })), cap: 'ABOVE THE ROCK, THE ACCREDITED SEND THEIR CHILDREN TO WAR.' },
+  { d: 3.0, bg: 'valley', flash: 1, sfx: 'horn', cam: [0, 330, 200, 150, .14], to: [0, 170, 70, 150, .32], credit: 'A STORY OF CINDERWELL', acts: ffRow(V, 8, -105, 30, 60, { fy: -1 }).concat(ffRow(TL, 8, -105, 30, -70, { fy: 1 })), cap: 'ABOVE THE ROCK, THE ACCREDITED SEND THEIR CHILDREN TO WAR.' },
   { d: 2.3, cam: [-120, 112, 44, 170], to: [110, 112, 44, 170], lin: 1, acts: ffRow(V, 9, -120, 30, 30, { fy: 1 }), cap: 'ONE VALLEY. TWELVE HOUSES. ONE YEAR. THEY CALL IT THE ASSAY.' },
   { d: 1.4, cam: [70, 110, 46, 150], to: [-70, 110, 46, 150], lin: 1, speed: 1, sfx: 'roar', acts: ffRow(TL, 9, -120, 30, -110, { fy: 1 }, -10) },
   { d: 1.4, cam: [0, 270, 46, 150], to: [0, 180, 40, 160], speed: 1, shake: .4, acts: [{ id: 'kael2', a: [0, 124], b: [0, 30], fy: -1, blade: 1, aura: 2 }].concat(ffRow(V, 8, -105, 30, 140, { fy: -1 }, 48)) },
@@ -3503,7 +3548,7 @@ const RING = [
   },
   () => ({ pre: [say('hollis', "Last bout. A belt-holder's second stands for her when she can't. Seren's second was —"), say('mara', 'Me.'), narr("Mara steps over the chalk, rolling her sleeves. Forty years of hauling valve wheels in those forearms."), say('mara', "You've wanted to hit me for forty-two days, boy. In here it's legal."),
       { choice: [{ t: "I don't want to hit you, Mara.", then: [say('mara', 'Liar. Hands up.')] }, { t: 'Yes. I have.', fx: () => setF('ringHonest'), then: [say('mara', 'Good. Honest. Hands up.')] }] }],
-    def: { title: 'FINAL BOUT', sub: "MARA VENN - FOREWOMAN'S PRIVILEGE", winText: 'THE BELT IS YOURS', foes: [{ id: 'mara', name: 'Mara', kind: 'boss', hp: 36 }], taunt: { 0: ['I HELD YOU DOWN. HIT ME!', 'SHE BOUGHT YOUR LIFE!', 'THERE HE IS.'] } },
+    def: { title: 'FINAL BOUT', sub: "MARA VENN - FOREWOMAN'S PRIVILEGE", winText: 'THE BELT IS YOURS', foes: [{ id: 'mara', name: 'Mara', kind: 'boss', hp: 39 }], taunt: { 0: ['I HELD YOU DOWN. HIT ME!', 'SHE BOUGHT YOUR LIFE!', 'THERE HE IS.'] } },
     win: [narr('Mara sits down hard in the chalk. And laughs. A real one, rusty from forty-two days of not being used.'), say('mara', "There he is. There's the one she married."), say('mara', '...She had a better left.'),
       { choice: [{ t: '(Help her up.)', fx: () => { trust('mara', 1); setF('ringMercy'); }, then: [say('mara', "I'm sorry, Kael. I'd do it again, and I'm sorry. Both. Every day.")] }, { t: "I'm still angry.", fx: () => fury(1), then: [say('mara', "Good. Aim it up, not sideways. I'll hold the bag until you can reach them.")] }] },
       narr('Hollis lifts the belt off his good shoulder: a strip of conveyor belting with two notches cut in it. He cuts a third.'), say('hollis', "Brennick. Belt-holder. She'd have been unbearable about it."), fx(() => { setF('ringChamp'); addJ('e_belt'); Sound.play('clue'); })] })

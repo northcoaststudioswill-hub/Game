@@ -1,5 +1,15 @@
 # SOOTBORN — changelog
 
+## v0.12.4 · 2026-11-18 — sound, music and better figures
+- **Battle music, generated in the game and built on the shift song** (the crew's hummed tune, D F A G | F E D):
+  - *The valley*: war drums and horn chords, with the shift song as a march in the second half.
+  - *The ford*: lower and slower, hand drums over a drone, the tune in the cellos.
+  - *The keep*: a ticking ostinato; the tune first high and clean (Seren), then the same notes an octave down in iron (Kael).
+  - **Rage layer**: as the fury bar passes half, a low sawing pedal and an extra drum come in under whichever track is playing; at full, a high dissonant shimmer and a roar of air.
+- **Combat sounds**: blade swings (a heavier one for the overhead and for big enemies), steel on steel for blocks, cuts and heavy cuts, a clash ring, a dash, bodies hitting the ground, fury igniting, the memory cut-in, a rising hit for each count of ELEVEN, the fire pillar, a war horn at the start of each Assay battle and in the opening, and a short fanfare on a win.
+- **Figures**: limbs and torsos are tapered instead of brick-shaped (shoulders wider than the waist, thighs and shins that narrow, a jaw), with hip plates that move with the legs, a neck guard, curved crossguards and a pommel stone in House colour.
+- Sound was checked by rendering every track and effect offline for errors and clipping. Nobody has listened to it yet.
+
 ## v0.12.3 · 2026-11-18 — light, and more rage
 - **Bloom**: the 3D scenes now render through a glow pass. Anything that gives off light (blades, gold trim, fire, the sun, sword ribbons, sparks) bleeds into the picture around it, with a soft vignette at the edges. Rendered slightly above screen resolution to keep edges clean. `#nopost` in the URL turns it off.
 - **Rage you can see on the ground**: from about half fury the earth under Kael scorches and splits into glowing cracks that grow with the bar; the hem of his cape catches; the whole picture tints red and the vignette closes in.
@@ -58,7 +68,7 @@ What changed:
 - **Checkpoints (dev)** on the title menu: twelve jump points across the slice.
 - Assay scenery: pavilions, swaying grass and reeds, cloud shadows crossing the field, a background melee behind every battle, glints on the river and ripples round anyone standing in it, braziers and reflections on the keep's stone, petals and embers in the air, capes that stream when fighters move.
 - New music track for battles. New 16×28 armoured cadet sprites.
-- The final Ember Ring bout has more health (36) because the new attacks hit harder; a mashing bot still loses it and a dodging bot wins.
+- The final Ember Ring bout has more health (now 39) because the new attacks hit harder; a mashing bot still loses it and a dodging bot wins.
 - Tests: `ff.mjs` (plays each battle with a bot), `sup.mjs` (the super), `flow.mjs` (opening, new game, furnace fight), `dev.mjs` (every checkpoint, save slots), `arts.mjs` (the Memory Arts). Add `#noff` to the URL to skip the opening and flash-forwards.
 
 ## v0.10 · 2026-11-17 — playtest round: bugs, the heist, animation

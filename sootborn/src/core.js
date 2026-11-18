@@ -121,21 +121,41 @@ const Sound = {
   suspend() { if (this.ctx) this.ctx.suspend().catch(() => { }); },
   resume() { if (this.ctx) this.ctx.resume().catch(() => { }); },
   tone(n, t, dur, type, vol, dest, slideTo) {
-    const c = this.ctx, o = c.createOscillator(), g = c.createGain();
+    if (!(vol > 0.0005)) return; const c = this.ctx, o = c.createOscillator(), g = c.createGain();
     o.type = type || 'square'; o.frequency.setValueAtTime(n > 127 ? n : mtof(n), t); // >127 = Hz, else MIDI note
     if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     o.connect(g); g.connect(dest || this.sfx); o.start(t); o.stop(t + dur + 0.05);
   },
   noise(t, dur, vol, dest, freq, q, type) {
-    const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    if (!(vol > 0.0005)) return; const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
     s.buffer = this.nb; f.type = type || 'bandpass'; f.frequency.value = freq || 1500; f.Q.value = q || 1;
     g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     s.connect(f); f.connect(g); g.connect(dest || this.sfx); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.02);
   },
-  play(name) {
+  // a tone that swells in (horns, pads) instead of being struck
+  pad(n, t, dur, type, vol, dest, att) { if (!(vol > 0.0005)) return; const c = this.ctx, o = c.createOscillator(), g = c.createGain(); o.type = type || 'sawtooth'; o.frequency.setValueAtTime(n > 127 ? n : mtof(n), t); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + (att || dur * .3)); g.gain.setValueAtTime(vol, t + dur * .7); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(dest || this.sfx); o.start(t); o.stop(t + dur + 0.05); },
+  // filtered noise whose pitch moves: the air a blade pushes aside
+  sweep(t, dur, vol, f0, f1, q, dest) { if (!(vol > 0.0005)) return; const c = this.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); s.buffer = this.nb; f.type = 'bandpass'; f.Q.value = q || 1.5; f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + dur * .35); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(f); f.connect(g); g.connect(dest || this.sfx); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.02); },
+  // struck steel: partials that do not line up, ringing off quickly
+  ring(t, vol, len, base) { for (const [m, v] of [[1, 1], [1.47, .7], [2.09, .55], [2.56, .4], [3.4, .25]]) this.tone((base || 1900) * m * (1 + (Math.random() - .5) * .02), t, (len || .35) / Math.sqrt(m), 'sine', vol * v); this.noise(t, 0.03, vol * 3, null, 6000, 2, 'highpass'); },
+  play(name, k) {
     if (!this.ctx || this.ctx.state !== 'running') return; const t = this.ctx.currentTime + 0.005;
     switch (name) {
+      case 'swing': this.sweep(t, 0.14, 0.7, 900 + Math.random() * 300, 3600, 1.2); break;
+      case 'swing2': this.sweep(t, 0.2, 0.85, 500, 2600, 1); this.sweep(t + 0.02, 0.16, 0.45, 1800, 5200, 2); break;
+      case 'steel': this.ring(t, 0.11, 0.4, 1700 + Math.random() * 500); break;
+      case 'slash': this.noise(t, 0.09, 0.8, null, 1700, 1.2); this.noise(t, 0.12, 0.6, null, 300, 1, 'lowpass'); this.ring(t, 0.045, 0.18, 2400 + Math.random() * 600); this.tone(110, t, 0.1, 'triangle', 0.3, null, 60); break;
+      case 'bigslash': this.noise(t, 0.16, 0.5, null, 1200, 1); this.noise(t, 0.3, 0.45, null, 180, 1, 'lowpass'); this.tone(90, t, 0.32, 'sine', 0.4, null, 34); this.ring(t, 0.04, 0.45, 1500); break;
+      case 'clash': this.ring(t, 0.08, 0.7, 1500); this.ring(t + 0.03, 0.05, 0.5, 2300); this.noise(t, 0.1, 0.45, null, 3000, 1); this.tone(70, t, 0.25, 'sine', 0.3, null, 40); break;
+      case 'dash': this.sweep(t, 0.16, 0.7, 400, 2400, 2.5); break;
+      case 'fury': this.pad(38, t, 1.3, 'sawtooth', 0.09, null, 0.5); this.pad(38.12, t, 1.3, 'sawtooth', 0.07, null, 0.5); this.sweep(t, 1.0, 0.3, 200, 3000, 1); this.tone(50, t + 0.9, 0.5, 'sine', 0.4, null, 30); this.noise(t + 0.9, 0.5, 0.35, null, 400, 0.8, 'lowpass'); break;
+      case 'cutin': this.sweep(t, 0.5, 0.3, 300, 5000, 1.5); this.tone(50, t + 0.42, 1.4, 'sine', 0.3); this.tone(86, t + 0.42, 1.6, 'triangle', 0.06); this.tone(93, t + 0.42, 1.6, 'sine', 0.04); this.noise(t + 0.42, 0.25, 0.3, null, 300, 0.8, 'lowpass'); break;
+      case 'count': { const n = k || 0; this.tone(50 + n * 2, t, 0.12, 'square', 0.07); this.tone(38 + n, t, 0.2, 'sine', 0.3, null, 40); this.noise(t, 0.07, 0.35, null, 1400 + n * 180, 1.2); this.ring(t, 0.02, 0.15, 2000 + n * 150); break; }
+      case 'pillar': this.tone(80, t, 1.3, 'sine', 0.55, null, 26); this.noise(t, 1.4, 0.55, null, 260, 0.6, 'lowpass'); this.noise(t, 0.5, 0.3, null, 2400, 0.8); this.sweep(t + 0.1, 1.2, 0.2, 4000, 500, 1); this.ring(t, 0.04, 0.9, 900); break;
+      case 'horn': for (const [n, d] of [[38, 0], [45, 0], [50, 0.02], [38, 1.5], [45, 1.5], [53, 1.52]]) { this.pad(n, t + d, 1.4, 'sawtooth', 0.05, null, 0.35); this.pad(n + 0.08, t + d, 1.4, 'square', 0.02, null, 0.4); } this.noise(t, 2.8, 0.05, null, 500, 0.5, 'lowpass'); break;
+      case 'win': [[62, 0], [66, 0.14], [69, 0.28], [74, 0.42], [69, 0.7], [74, 0.84]].forEach(([n, d], i) => { this.pad(n, t + d, i > 3 ? 1.2 : 0.3, 'sawtooth', 0.045, null, 0.03); this.tone(n + 12, t + d, i > 3 ? 1.0 : 0.25, 'triangle', 0.05); }); this.tone(38, t + 0.42, 1.6, 'sine', 0.2); break;
+      case 'bodyfall': this.noise(t, 0.18, 0.55, null, 220, 1, 'lowpass'); this.tone(60, t, 0.14, 'sine', 0.2, null, 36); this.ring(t + 0.04, 0.012, 0.2, 1200); break;
       case 'blip': this.tone(84, t, 0.03, 'square', 0.025); break;
       case 'move': this.tone(76, t, 0.03, 'square', 0.03); break;
       case 'ok': this.tone(79, t, 0.06, 'square', 0.05); this.tone(86, t + 0.06, 0.08, 'square', 0.05); break;
@@ -196,15 +216,32 @@ const TRACKS = {
     const b = ({ 6: 74, 19: 77, 27: 81 })[s]; if (b) S.tone(b, t, 2.5, 'sine', 0.035, S.mus);
     if (s === 12) S.noise(t, 1.2, 0.02, S.mus, 400, 4);
   } },
-  battle: { bpm: 152, len: 64, fn(s, t, sp, S) {
-    const q = s % 16, bar = s >> 4, root = [38, 38, 34, 36][bar];
-    if (q % 4 === 0) S.tone(130, t, 0.16, 'sine', 0.26, S.mus, 42);
-    if (q === 4 || q === 12) S.noise(t, 0.14, 0.14, S.mus, 2200, 6);
-    if (q % 2 === 1) S.noise(t, 0.03, 0.03, S.mus, 7000, 2, 'highpass');
-    S.tone(root + (q % 4 === 3 ? 12 : q % 8 === 6 ? 7 : 0), t, sp * 0.9, 'sawtooth', 0.045, S.mus);
-    if (q === 0) { S.tone(root + 12, t, sp * 14, 'triangle', 0.05, S.mus); S.tone(root + 19, t, sp * 14, 'triangle', 0.035, S.mus); }
-    const lead = [[74, 0, 0, 77, 0, 0, 81, 0, 79, 0, 77, 0, 74, 0, 72, 0], [74, 0, 0, 77, 0, 0, 81, 0, 84, 0, 0, 82, 81, 0, 0, 0], [70, 0, 0, 74, 0, 0, 77, 0, 82, 0, 81, 0, 77, 0, 74, 0], [72, 0, 76, 0, 79, 0, 84, 0, 86, 0, 0, 0, 85, 0, 0, 0]][bar][q];
-    if (lead) { S.tone(lead, t, sp * 1.8, 'square', 0.03, S.mus); S.tone(lead - 12, t, sp * 1.8, 'triangle', 0.03, S.mus); }
+  // rage layer shared by the Assay tracks: S.rage (0..1) comes from the fury bar
+  _rage(s, t, sp, S, root) { const r = S.rage || 0; if (r < .5) return; const k = (r - .5) * 2, q = s % 16; S.tone(root - 12, t, sp * .9, 'sawtooth', 0.05 * k, S.mus); if (q % 4 === 2) S.tone(130, t, 0.12, 'sine', 0.2 * k, S.mus, 40); if (r >= 1 && q % 2 === 0) S.tone(root + 25 + (q % 4 ? 0 : 1), t, sp * .8, 'square', 0.012, S.mus); if (r >= 1 && q === 0) S.noise(t, sp * 14, 0.05, S.mus, 300, 0.6, 'lowpass'); },
+  dusk: { bpm: 126, len: 128, fn(s, t, sp, S) { // the ford: low, modal, hand drums, the shift song in the cellos
+    const q = s % 16, bar = s >> 4, root = [38, 38, 39, 38, 36, 36, 39, 38][bar]; TRACKS._rage(s, t, sp, S, root);
+    if (q === 0 || q === 6 || q === 10) S.tone(110, t, 0.22, 'sine', 0.22, S.mus, 48); if (q === 3 || q === 8 || q === 13 || q === 14) S.noise(t, 0.06, 0.07, S.mus, 900, 3); if (q % 2 === 1) S.noise(t, 0.02, 0.02, S.mus, 5000, 2, 'highpass');
+    if (q === 0) { S.pad(root, t, sp * 16, 'sawtooth', 0.03, S.mus, sp * 4); S.pad(root + 7, t, sp * 16, 'triangle', 0.035, S.mus, sp * 6); S.pad(root + 12 + (bar % 4 === 2 ? 1 : 3), t, sp * 16, 'sine', 0.03, S.mus, sp * 8); }
+    if (q % 4 === 0) S.tone(root + 12 + [0, 7, 12, 7][q >> 2], t, sp * 3, 'triangle', 0.035, S.mus);
+    if (bar >= 4) { const m = MOTIF[(s - 64) >> 1]; if (m && !(s & 1)) { S.pad(m - 12, t, sp * 7, 'sawtooth', 0.035, S.mus, sp); S.tone(m, t, sp * 6, 'triangle', 0.03, S.mus); } }
+    if (q === 0 && bar % 2 === 0) S.noise(t, sp * 30, 0.03, S.mus, 420, 0.5, 'lowpass');
+  } },
+  duel: { bpm: 168, len: 128, fn(s, t, sp, S) { // the keep: a clock, a blade, and her tune high above his
+    const q = s % 16, bar = s >> 4, root = [38, 38, 41, 40, 38, 38, 43, 45][bar]; TRACKS._rage(s, t, sp, S, root);
+    S.tone(root + [0, 0, 12, 0, 7, 0, 12, 0, 0, 12, 0, 7, 0, 3, 7, 12][q], t, sp * .8, 'sawtooth', 0.028, S.mus); if (q % 2 === 0) S.noise(t, 0.02, 0.035, S.mus, 7000, 3, 'highpass');
+    if (q % 4 === 0) S.tone(130, t, 0.14, 'sine', 0.24, S.mus, 44); if (q === 4 || q === 12) S.noise(t, 0.1, 0.12, S.mus, 2000, 4); if (q === 14 && bar % 2) S.noise(t, 0.08, 0.1, S.mus, 2000, 4);
+    if (q === 0) { S.pad(root + 12, t, sp * 15, 'sawtooth', 0.022, S.mus, sp * 2); S.pad(root + 19, t, sp * 15, 'square', 0.012, S.mus, sp * 2); }
+    if (bar < 4) { const m = MOTIF[s >> 1]; if (m && !(s & 1)) S.tone(m + 24, t, sp * 6, 'sine', 0.05, S.mus); } // Seren, high and clean
+    else { const m = MOTIF[(s - 64) >> 1]; if (m && !(s & 1)) { S.pad(m, t, sp * 5, 'sawtooth', 0.04, S.mus, 0.02); S.pad(m - 12, t, sp * 5, 'square', 0.02, S.mus, 0.02); } } // Kael, the same notes, an octave of iron under them
+    if (bar === 7 && q >= 8) S.tone(root + 24 + (q - 8), t, sp * .9, 'square', 0.015, S.mus);
+  } },
+  battle: { bpm: 152, len: 128, fn(s, t, sp, S) { // the valley: war drums, horns, and the shift song as a march
+    const q = s % 16, bar = s >> 4, root = [38, 38, 34, 36, 38, 41, 34, 33][bar], third = [3, 3, 4, 4, 3, 4, 4, 4][bar]; TRACKS._rage(s, t, sp, S, root);
+    if (q === 0 || q === 6 || q === 8) S.tone(120, t, 0.2, 'sine', 0.28, S.mus, 40); if (q === 4 || q === 12) { S.noise(t, 0.13, 0.13, S.mus, 1800, 3); S.tone(180, t, 0.08, 'triangle', 0.06, S.mus, 120); } if (q === 10 || q === 14 || q === 15) S.tone(90 + (q - 10) * 6, t, 0.12, 'sine', 0.16, S.mus, 60); if (q % 2 === 1) S.noise(t, 0.025, 0.028, S.mus, 7000, 2, 'highpass');
+    S.tone(root + (q % 4 === 3 ? 12 : q % 8 === 6 ? 7 : 0), t, sp * 0.9, 'sawtooth', 0.04, S.mus); S.tone(root + 12 + [0, 7, third, 7][q % 4], t, sp * .7, 'triangle', 0.022, S.mus);
+    if (q === 0) { S.pad(root + 12, t, sp * 14, 'sawtooth', 0.028, S.mus, sp * 2); S.pad(root + 12 + third, t, sp * 14, 'sawtooth', 0.02, S.mus, sp * 2); S.pad(root + 19, t, sp * 14, 'triangle', 0.03, S.mus, sp * 2); }
+    if (bar >= 4) { const m = MOTIF[(s - 64) >> 1]; if (m && !(s & 1)) { S.pad(m + 12, t, sp * 6, 'sawtooth', 0.04, S.mus, 0.03); S.pad(m + 12.06, t, sp * 6, 'square', 0.018, S.mus, 0.03); S.tone(m, t, sp * 5, 'triangle', 0.04, S.mus); } }
+    else { const lead = [[74, 0, 0, 77, 0, 0, 81, 0, 79, 0, 77, 0, 74, 0, 72, 0], [74, 0, 0, 77, 0, 0, 81, 0, 84, 0, 0, 82, 81, 0, 0, 0], [70, 0, 0, 74, 0, 0, 77, 0, 82, 0, 81, 0, 77, 0, 74, 0], [72, 0, 76, 0, 79, 0, 84, 0, 86, 0, 0, 0, 85, 0, 0, 0]][bar][q]; if (lead) { S.tone(lead, t, sp * 1.8, 'square', 0.026, S.mus); S.tone(lead - 12, t, sp * 1.8, 'triangle', 0.03, S.mus); } }
   } },
   hum: { bpm: 56, len: 32, fn(s, t, sp, S) { const m = MOTIF[s]; if (m) { S.tone(m - 12, t, sp * 3.8, 'triangle', 0.07, S.mus); S.tone(m - 5, t, sp * 3.8, 'sine', 0.03, S.mus); } if (s === 0) S.tone(38, t, sp * 32, 'sine', 0.05, S.mus); } },
   surface: { bpm: 70, len: 32, fn(s, t, sp, S) { const m = MOTIF[s]; if (m) { S.tone(m + 24, t, 2, 'sine', 0.03, S.mus); S.tone(m + 31, t, 2, 'sine', 0.015, S.mus); } } }

@@ -121,6 +121,11 @@ Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at F
 - Placement: opening before the title; The Valley at New Game; The Ford between Day 1 and Day 2; The Keep at the end of Day 2.
 - Kael's narration is first person, present tense, short. He counts things. He never says he is angry; he describes what he does with it.
 
+## Sound and music
+- All audio is synthesised in the browser (`Sound` in `src/core.js`): `tone` (struck), `pad` (swelling), `noise`, `sweep` (moving filtered noise), `ring` (struck steel). No audio files.
+- The shift song (`MOTIF`: D F A G | F E D) is the game's theme. It is hummed at the furnace, plays in the home and work tracks, and is the melody of all three Assay battle tracks (`battle`, `dusk`, `duel`). Keep new music on it.
+- `Sound.rage` (0 to 1, from the fury bar) drives a shared layer (`TRACKS._rage`) under the Assay tracks.
+
 ## Two worlds, two renderers
 - Below (Cinderwell, the Ember Ring, the furnace): 2D pixel art on the 320×180 canvas.
 - Above (the Assay: valley, ford, keep, and the surface half of the opening): real 3D in `src/g3.js`, a small WebGL renderer with no library. Flat-shaded boxes, cones and cylinders; one sun; planar shadows; fog; additive glow sprites. The pixel HUD, captions and cut-ins are still drawn on the 2D canvas, which sits on top and goes transparent.

@@ -66,7 +66,7 @@ const Brawl = {
     }
     this.props = pr;
   },
-  end(win) { this.active = false; if (Cutscene.active) { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } else if (MAPS[G.mapId]) Sound.music(MAPS[G.mapId].music); Input.consume(); HUD.dirty = true; const cb = this.onEnd; this.onEnd = null; cb && cb(win); },
+  end(win) { this.active = false; Sound.rage = 0; if (Cutscene.active) { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } else if (MAPS[G.mapId]) Sound.music(MAPS[G.mapId].music); Input.consume(); HUD.dirty = true; const cb = this.onEnd; this.onEnd = null; cb && cb(win); },
   // Kael narrates. Lines come on a clock and on events, and never stop the fight.
   voice(key) { const v = this.def.voice; if (!v || !v[key] || this.vdone[key]) return; this.vdone[key] = 1; this.vq.push(v[key]); },
   updVoice(dt) { const v = this.def.voice; if (!v) return; this.ft += dt; (v.at || []).forEach(([at, t], i) => { if (this.ft >= at && !this.vdone['t' + i]) { this.vdone['t' + i] = 1; this.vq.push(t); } });
@@ -76,28 +76,28 @@ const Brawl = {
   spark(x, y, c, n, h) { for (let i = 0; i < (n || 6); i++) { const a = Math.random() * 6.28, v = 30 + Math.random() * 80; this.parts.push({ x, y, h: h === undefined ? 22 : h, vx: Math.cos(a) * v, vy: Math.sin(a) * v * .5, vh: 30 + Math.random() * 70, life: .3 + Math.random() * .25, c }); } },
   ring(x, y, c, r) { this.rings.push({ x, y, c, r: 4, max: r || 46, life: 1 }); },
   nearest(o, list) { let b = null, bd = 1e9; for (const f of list || this.foes) if (f.st !== 'down' && !f.enter) { const d = Math.hypot(f.x - o.x, f.y - o.y); if (d < bd) { bd = d; b = f; } } return b; },
-  gain(v) { const p = this.p, was = p.fury; p.fury = Math.min(100, p.fury + v); if (was < 100 && p.fury >= 100) { this.voice('fury'); this.punch = .4; this.rollK = .12; for (const f of this.foes) if (f.st === 'approach' && Math.hypot(f.x - p.x, f.y - p.y) < 90) { f.cd = Math.max(f.cd, 1.1); f.kx = (f.x - p.x) * 1.6; f.ky = (f.y - p.y) * 1.6; if (!this.flinched) { this.flinched = 1; f.bark = { t: 'WHAT IS HE?', life: 1.6 }; } } this.say('FURY', true); Sound.play('roar'); this.ring(p.x, p.y, '#ff7a30', 60); } },
+  gain(v) { const p = this.p, was = p.fury; p.fury = Math.min(100, p.fury + v); if (was < 100 && p.fury >= 100) { this.voice('fury'); Sound.play('fury'); this.punch = .4; this.rollK = .12; for (const f of this.foes) if (f.st === 'approach' && Math.hypot(f.x - p.x, f.y - p.y) < 90) { f.cd = Math.max(f.cd, 1.1); f.kx = (f.x - p.x) * 1.6; f.ky = (f.y - p.y) * 1.6; if (!this.flinched) { this.flinched = 1; f.bark = { t: 'WHAT IS HE?', life: 1.6 }; } } this.say('FURY', true); Sound.play('roar'); this.ring(p.x, p.y, '#ff7a30', 60); } },
 
   // ---------------------------------------------------------- hits
   hurtPlayer(f, dmg, ax, ay) {
     const p = this.p;
     if (p.inv > 0 || this.sup) { if (p.st === 'dodge' && p.open <= 0.9) { p.open = 1.6; this.slow = 0.5; this.say('OPENING!'); Sound.play('stage'); this.gain(22); } return; }
-    this.voice('hurt'); p.hp -= dmg; p.st = 'hurt'; p.t = 0; p.inv = 0.8; p.kx = ax * 160; p.ky = ay * 160; p.combo = 0; this.freeze = 0.1; this.shake = 0.35; this.impact = .12; Sound.play('hit'); this.spark(p.x, p.y, '#ff5a4a', 9); this.gain(16);
+    this.voice('hurt'); p.hp -= dmg; p.st = 'hurt'; p.t = 0; p.inv = 0.8; p.kx = ax * 160; p.ky = ay * 160; p.combo = 0; this.freeze = 0.1; this.shake = 0.35; this.impact = .12; Sound.play('hit'); if (f && f.K && f.K.blade) Sound.play('slash'); this.spark(p.x, p.y, '#ff5a4a', 9); this.gain(16);
     if (p.hp <= 0) { if (this.def.legend) { p.hp = p.max; p.fury = 100; p.inv = 1.6; this.say('NOT TODAY.', true); this.ring(p.x, p.y, '#ffe08a', 90); Sound.play('roar'); for (const o of this.foes) if (o.st !== 'down') { const d = Math.hypot(o.x - p.x, o.y - p.y) || 1; if (d < 90) { o.kx = (o.x - p.x) / d * 260; o.ky = (o.y - p.y) / d * 260; o.st = 'hurt'; o.t = 0; } } } else { p.st = 'down'; this.phase = 'lose'; this.pt = 0; } }
   },
   hitFoe(f, dmg, ax, ay, big) {
     const crit = this.p.open > 0 || !!this.sup || !!this.art;
-    if (this.def.doomed) { f.flash = 0.08; Sound.play('deny'); this.spark(f.x, f.y, '#c8ccd4', 5); this.p.kx = -ax * 150; this.p.ky = -ay * 150; this.clang++; f.bark = { t: ['CLANG', '...', 'CLANG'][this.clang % 3], life: .5 }; this.gain(10); return; }
-    if (f.st === 'wind' && !crit && !f.K.soft && f.mode !== 'charge' && this.p.gapT > .55 && !(f.clashT > this.t) && f.t > (f.second ? .3 : f.K.wind) - .17) { f.clashT = this.t + 3; f.st = 'hurt'; f.t = -.35; f.flash = .2; f.kx = ax * 150; f.ky = ay * 150; f.hp -= dmg; this.token = this.token.filter(o => o !== f); this.freeze = .14; this.slow = .35; this.shake = .4; this.impact = .16; this.punch = .3; this.rollK = .1; this.say('CLASH!'); Sound.play('clink'); Sound.play('hit'); this.spark(f.x - ax * 12, f.y - ay * 12, '#fff6dc', 16); this.ring(f.x - ax * 12, f.y - ay * 12, '#fff2c0', 34); this.slashes.push({ x: f.x - ax * 12, y: f.y - ay * 12, a: 1, life: .22, big: 1 }); this.gain(14); this.p.open = Math.max(this.p.open, .8); this.voice('clash'); if (f.hp <= 0) f.hp = 1; return; }
-    if (f.guardT > 0 && !crit) { f.flash = 0.06; Sound.play('deny'); this.spark(f.x, f.y, '#8a94a4', 4); this.p.kx = -ax * 120; this.p.ky = -ay * 120; if (!f.blk) { f.blk = 1; f.bark = { t: 'BLOCKED', life: .7 }; } return; }
+    if (this.def.doomed) { f.flash = 0.08; Sound.play('steel'); this.spark(f.x, f.y, '#c8ccd4', 5); this.p.kx = -ax * 150; this.p.ky = -ay * 150; this.clang++; f.bark = { t: ['CLANG', '...', 'CLANG'][this.clang % 3], life: .5 }; this.gain(10); return; }
+    if (f.st === 'wind' && !crit && !f.K.soft && f.mode !== 'charge' && this.p.gapT > .55 && !(f.clashT > this.t) && f.t > (f.second ? .3 : f.K.wind) - .17) { f.clashT = this.t + 3; f.st = 'hurt'; f.t = -.35; f.flash = .2; f.kx = ax * 150; f.ky = ay * 150; f.hp -= dmg; this.token = this.token.filter(o => o !== f); this.freeze = .14; this.slow = .35; this.shake = .4; this.impact = .16; this.punch = .3; this.rollK = .1; this.say('CLASH!'); Sound.play('clash'); this.spark(f.x - ax * 12, f.y - ay * 12, '#fff6dc', 16); this.ring(f.x - ax * 12, f.y - ay * 12, '#fff2c0', 34); this.slashes.push({ x: f.x - ax * 12, y: f.y - ay * 12, a: 1, life: .22, big: 1 }); this.gain(14); this.p.open = Math.max(this.p.open, .8); this.voice('clash'); if (f.hp <= 0) f.hp = 1; return; }
+    if (f.guardT > 0 && !crit) { f.flash = 0.06; Sound.play(this.p.blade || f.K.blade ? 'steel' : 'deny'); this.spark(f.x, f.y, '#8a94a4', 4); this.p.kx = -ax * 120; this.p.ky = -ay * 120; if (!f.blk) { f.blk = 1; f.bark = { t: 'BLOCKED', life: .7 }; } return; }
     this.nums.push({ x: f.x + (Math.random() - .5) * 10, y: f.y, h: 70 + (f.z || 0), v: dmg, big, life: .7 });
     f.hp -= dmg; f.flash = 0.14; f.kx = ax * (big ? 230 : 95); f.ky = ay * (big ? 230 : 95); this.freeze = big ? 0.11 : 0.05; this.shake = big ? 0.32 : 0.12; if (big) { this.impact = .14; this.punch = .22; this.ring(f.x, f.y, '#fff2c0', 40); f.vz = 150; this.rollK = (ax >= 0 ? 1 : -1) * .09; }
     this.slashes.push({ x: f.x, y: f.y, a: Math.random() * 3.14, life: .16, big });
-    Sound.play(big ? 'hit' : 'clink'); this.spark(f.x, f.y, this.p.blade ? '#ffe08a' : big ? '#ffe08a' : '#fff', big ? 12 : 6); this.gain(this.sup || this.art ? 0 : 5); this.hitsN = this.hitsT > 0 ? this.hitsN + 1 : 1; this.hitsT = 1.4;
+    Sound.play(this.p.blade ? (big ? 'bigslash' : 'slash') : big ? 'hit' : 'clink'); this.spark(f.x, f.y, this.p.blade ? '#ffe08a' : big ? '#ffe08a' : '#fff', big ? 12 : 6); this.gain(this.sup || this.art ? 0 : 5); this.hitsN = this.hitsT > 0 ? this.hitsN + 1 : 1; this.hitsT = 1.4;
     if (this.foes.reduce((a, o) => a + Math.max(0, o.hp), 0) < this.foes.reduce((a, o) => a + o.max, 0) * .5) this.voice('half');
     const endAt = this.def.endAt && f.hp <= f.max * this.def.endAt;
-    if (f.hp <= 0 || endAt) { f.st = 'down'; f.t = 0; f.kx = ax * 260; f.ky = ay * 260; f.vz = 190; if (!this.sup && !this.art && this.p.fury >= 60 && !this.def.doomed) { this.slow = Math.max(this.slow, .32); this.punch = Math.max(this.punch, .3); this.rollK = (ax >= 0 ? 1 : -1) * .1; f.vz = 250; this.gain(6); } this.token = this.token.filter(o => o !== f); Sound.play('rumble'); this.ring(f.x, f.y, '#fff', 60);
-      if (!this.foes.some(o => o.st !== 'down')) { if (this.def.waves && this.wave < this.def.waves.length - 1) { this.wave++; this.spawn(this.def.waves[this.wave]); this.say('MORE OF THEM', true); this.voice('wave'); if (this.def.onWave) this.def.onWave(this.wave, this); } else { this.phase = 'win'; this.pt = 0; this.slow = 0.9; this.punch = .5; this.sup = null; } }
+    if (f.hp <= 0 || endAt) { Sound.play('bodyfall'); f.st = 'down'; f.t = 0; f.kx = ax * 260; f.ky = ay * 260; f.vz = 190; if (!this.sup && !this.art && this.p.fury >= 60 && !this.def.doomed) { this.slow = Math.max(this.slow, .32); this.punch = Math.max(this.punch, .3); this.rollK = (ax >= 0 ? 1 : -1) * .1; f.vz = 250; this.gain(6); } this.token = this.token.filter(o => o !== f); Sound.play('rumble'); this.ring(f.x, f.y, '#fff', 60);
+      if (!this.foes.some(o => o.st !== 'down')) { if (this.def.waves && this.wave < this.def.waves.length - 1) { this.wave++; this.spawn(this.def.waves[this.wave]); this.say('MORE OF THEM', true); this.voice('wave'); if (this.def.onWave) this.def.onWave(this.wave, this); } else { this.phase = 'win'; this.pt = 0; this.slow = 0.9; this.punch = .5; this.sup = null; if (this.def.hero && this.def.hero.id) Sound.play('win'); } }
       return; }
     if ((f.st !== 'wind' || f.K.soft || big) && f.st !== 'charge') { this.token = this.token.filter(o => o !== f); f.st = 'hurt'; f.t = 0; }
     f.hits = (f.hits | 0) + 1; if (f.hits >= (f.K.soft ? 5 : 3) && !crit) { f.guardT = 1.1; f.cd = 0; f.hits = 0; f.blk = 0; }
@@ -109,10 +109,10 @@ const Brawl = {
     this.t += dt; if (this.fin) { this.fin.t += dt; if (this.fin.t > 1.1) this.fin = null; } this.msgT = Math.max(0, this.msgT - dt); this.shake = Math.max(0, this.shake - dt); this.punch = Math.max(0, this.punch - dt); this.impact = Math.max(0, this.impact - dt); this.hitsT -= dt; this.tipT -= dt;
     if (this.cine) return this.updCine(dt);
     if (Input.p('START')) { this.pauseMenu(); return; }
-    if (this.phase === 'intro') { this.pt += dt; this.camFollow(dt); if (this.pt > 1.5 || (this.pt > .5 && Input.p('A'))) { this.phase = 'fight'; this.say('FIGHT!', true); Sound.play('bell'); Input.consume(); } return; }
+    if (this.phase === 'intro') { this.pt += dt; this.camFollow(dt); if (this.pt > 1.5 || (this.pt > .5 && Input.p('A'))) { this.phase = 'fight'; this.say('FIGHT!', true); Sound.play(this.def.hero && this.def.hero.id ? 'horn' : 'bell'); Input.consume(); } return; }
     if (this.phase === 'win' || this.phase === 'lose') { this.pt += dt; this.stepParts(dt * .5); this.camFollow(dt * .5); for (const f of this.foes) { f.t += dt * .5; f.x += f.kx * dt * .4; f.y += f.ky * dt * .4; f.kx *= .9; f.ky *= .9; } if (this.pt > 2.1) { if (this.phase === 'win' && this.def.outro) this.playCine(this.def.outro, () => this.end(true)); else this.end(this.phase === 'win'); } return; }
     if (this.def.doomed && this.t > this.def.doomed + 1.6) { const p = this.p; p.st = 'down'; p.t = 0; this.impact = .3; this.shake = .8; Sound.play('hit'); this.phase = 'lose'; this.pt = 0.9; return; }
-    this.updVoice(dt); if (this.p.fury >= 100 && this.phase === 'fight') { this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = .62; if (!Settings.d.reduce) this.spark(this.p.x, this.p.y, '#ff7a30', 3, 2); } }
+    Sound.rage = this.phase === 'fight' ? this.p.fury / 100 : 0; this.updVoice(dt); if (this.p.fury >= 100 && this.phase === 'fight') { this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = .62; if (!Settings.d.reduce) this.spark(this.p.x, this.p.y, '#ff7a30', 3, 2); } }
     if (this.freeze > 0) { this.freeze -= dt; return; }
     if (this.art) { this.updArt(dt); this.stepParts(dt); this.camFollow(dt); return; }
     if (this.sup) { this.updSuper(dt); this.stepParts(dt); this.camFollow(dt); return; }
@@ -143,7 +143,7 @@ const Brawl = {
       p.t += dt; const dur = p.combo === 3 ? 0.36 : 0.24; if (p.t < 0.1) { const v = 100 + (p.gap || 0) * 14; p.x += p.ax * v * dt; p.y += p.ay * v * dt; }
       if (!p.hit && p.t >= 0.07) { p.hit = true; const big = p.combo === 3, R = (big ? 36 : 30) + (p.blade ? 8 : 0); let any = false;
         for (const f of this.foes) if (f.st !== 'down') { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy); if (d < R && (d < 10 || (dx * p.ax + dy * p.ay) / d > (p.blade ? -0.1 : 0.2))) { any = true; this.hitFoe(f, ((big ? 2 : 1) + (p.open > 0 ? 1 : 0) + (p.fury >= 100 ? 1 : 0) + (p.dash ? 1 : 0)) * p.pow, dx / (d || 1), dy / (d || 1), big || p.open > 0 || !!p.dash); } } p.dash = 0;
-        if (!any) Sound.play('move'); }
+        }
       if (p.t > dur) p.st = 'idle'; else if (p.t > 0.14 && Input.p('A') && p.combo < 3) this.strike();
       if (Input.p('B') && p.dcd <= 0 && p.t > 0.1) this.dodge(vx, vy);
     } else {
@@ -155,16 +155,16 @@ const Brawl = {
   },
   strike() { const p = this.p, f = this.nearest(p); p.gapT = this.t - (p.lastStrikeT === undefined ? -9 : p.lastStrikeT); p.lastStrikeT = this.t; let ax = p.fx, ay = p.fy; const m = Math.hypot(ax, ay) || 1; ax /= m; ay /= m;
     if (f) { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy); if (d < 70) { ax = dx / (d || 1); ay = dy / (d || 1); } }
-    p.fx = ax; p.fy = ay; p.st = 'atk'; p.t = 0; p.hit = false; p.ax = ax; p.ay = ay; p.combo = p.combo % 3 + 1; p.comboT = 0.7;
+    p.fx = ax; p.fy = ay; p.st = 'atk'; p.t = 0; p.hit = false; p.ax = ax; p.ay = ay; p.combo = p.combo % 3 + 1; p.comboT = 0.7; if (!this.sup && !this.art) Sound.play(p.blade ? (p.combo === 3 ? 'swing2' : 'swing') : 'dash');
     if (f) { const d = Math.hypot(f.x - p.x, f.y - p.y), R = 26 + (p.blade ? 8 : 0); p.gap = d < 70 && d > R ? Math.min(34, d - R + 4) : 0; } else p.gap = 0; },
-  dodge(vx, vy) { const p = this.p; if (!vx && !vy) { vx = -p.fx; vy = -p.fy; } const d = Math.hypot(vx, vy) || 1; p.st = 'dodge'; p.t = 0; p.dx = vx / d; p.dy = vy / d; p.inv = Math.max(p.inv, 0.26); p.dcd = 0.55; Sound.play('step'); this.spark(p.x, p.y, '#8a7a6a', 3, 0); },
+  dodge(vx, vy) { const p = this.p; if (!vx && !vy) { vx = -p.fx; vy = -p.fy; } const d = Math.hypot(vx, vy) || 1; p.st = 'dodge'; p.t = 0; p.dx = vx / d; p.dy = vy / d; p.inv = Math.max(p.inv, 0.26); p.dcd = 0.55; Sound.play('dash'); this.spark(p.x, p.y, '#8a7a6a', 3, 0); },
   // MEMORY ARTS: the big attacks carry the story. A memory cuts in, says its line, and becomes a strike.
-  startArt(a) { const p = this.p, live = this.foes.filter(f => f.st !== 'down' && !f.enter); this.art = { a, t: 0, tg: live.sort((x, y) => y.hp - x.hp)[0], n: 0, done: 0 }; this.token = []; this.slow = 0; this.vcur = null; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1.2; } p.st = 'idle'; p.hold = 0; this.impact = .2; Sound.play('choir'); Sound.play('stage'); },
+  startArt(a) { const p = this.p, live = this.foes.filter(f => f.st !== 'down' && !f.enter); this.art = { a, t: 0, tg: live.sort((x, y) => y.hp - x.hp)[0], n: 0, done: 0 }; this.token = []; this.slow = 0; this.vcur = null; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1.2; } p.st = 'idle'; p.hold = 0; this.impact = .2; Sound.play('cutin'); },
   updArt(dt) {
     const A = this.art, a = A.a, p = this.p, f = A.tg, C = 1.9; A.t += dt; p.inv = .6; if (p.st === 'atk') { p.t += dt; if (p.t > .3) p.st = 'idle'; }
     if (A.t < C) { if (A.t > .5 && (Input.p('A') || Input.p('B'))) A.t = C; return; }
     const tau = A.t - C, cut = (side, big) => { const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; p.fx = p.ax = dx / d; p.fy = p.ay = dy / d; p.st = 'atk'; p.t = 0; p.hit = true; p.combo = 1 + A.n % 3; this.slashes.push({ x: f.x, y: f.y, a: A.n * 1.1, life: .18, big: 1, h: 26 + (f.z || 0) }); this.spark(f.x, f.y, '#ffe08a', 7, 22 + (f.z || 0)); f.flash = .12; this.hitsN = this.hitsT > 0 ? this.hitsN + 1 : 1; this.hitsT = 1.6; this.shake = .2; Sound.play(big ? 'hit' : 'clink'); A.n++; };
-    const land = () => { A.done = 1; f.z = 0; p.z = 0; this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#fff2c0', 120); this.ring(f.x, f.y, a.hex || '#ffb040', 80); this.fin = { x: f.x, y: f.y, t: 0 }; Sound.play('roar'); Sound.play('rumble'); this.freeze = .3;
+    const land = () => { A.done = 1; f.z = 0; p.z = 0; this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#fff2c0', 120); this.ring(f.x, f.y, a.hex || '#ffb040', 80); this.fin = { x: f.x, y: f.y, t: 0 }; Sound.play('pillar'); this.freeze = .3;
       const live = this.foes.filter(o => o.st !== 'down' && !o.enter); for (const o of live) { if (!this.art) break; const main = o === f, d = Math.hypot(o.x - f.x, o.y - f.y); if (main || d < 90) this.hitFoe(o, main ? (a.dmg || Math.max(6, Math.round(o.max * .14))) : 4, main ? p.ax : (o.x - f.x) / (d || 1), main ? p.ay : (o.y - f.y) / (d || 1), true); } };
     if (a.kind === 'rise') { // launch, three cuts in the air, and down
       if (A.n === 0 && tau >= 0) { p.x = f.x - 20; p.y = f.y + 2; this.clampA(p); cut(); this.ring(f.x, f.y, '#fff', 40); }
@@ -181,7 +181,7 @@ const Brawl = {
     if (!this.art) { p.z = 0; if (f.st !== 'down') f.z = 0; this.voice('art'); }
   },
   // ELEVEN: one blow for every second the doors stood open
-  startSuper() { this.voice('eleven'); const p = this.p; p.hold = 0; p.st = 'idle'; p.fury = 0; this.sup = { t: 0, n: 0, next: 0.95, tg: this.nearest(p) }; this.slow = 0; Sound.play('roar'); Sound.play('choir'); this.shake = .4; this.token = []; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1; } },
+  startSuper() { this.voice('eleven'); const p = this.p; p.hold = 0; p.st = 'idle'; p.fury = 0; this.sup = { t: 0, n: 0, next: 0.95, tg: this.nearest(p) }; this.slow = 0; Sound.play('cutin'); Sound.play('roar'); this.shake = .4; this.token = []; for (const f of this.foes) if (f.st === 'wind' || f.st === 'charge') { f.st = 'approach'; f.cd = 1; } },
   updSuper(dt) {
     const s = this.sup, p = this.p; s.t += dt; p.inv = .5;
     if (s.t < 0.95) return;
@@ -191,9 +191,9 @@ const Brawl = {
       const live = this.foes.filter(f => f.st !== 'down' && !f.enter); if (!live.length) { this.sup = null; return; }
       const f = live.sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[live.length > 1 ? s.n % Math.min(3, live.length) : 0], side = s.n % 2 ? 1 : -1, last = s.n === 10;
       p.trail.push({ x: p.x, y: p.y, life: .3 }); p.x = f.x + side * 18; p.y = f.y + (s.n % 3 - 1) * 8; this.clampA(p); const dx = f.x - p.x, dy = f.y - p.y, d = Math.hypot(dx, dy) || 1; p.fx = p.ax = dx / d; p.fy = p.ay = dy / d; p.st = 'atk'; p.t = 0; p.hit = true; p.combo = last ? 3 : 1 + s.n % 2; s.tg = f;
-      s.word = ELEVEN[s.n]; s.wt = 0; s.n++; s.next = s.t + (last ? 0 : Math.max(0.085, 0.16 - s.n * 0.008));
+      Sound.play('count', s.n); s.word = ELEVEN[s.n]; s.wt = 0; s.n++; s.next = s.t + (last ? 0 : Math.max(0.085, 0.16 - s.n * 0.008));
       this.hitFoe(f, (last ? 3 : 1) * p.pow, last ? p.ax : 0, last ? p.ay : 0, last); if (!this.sup) return;
-      if (last) { this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#ff7a30', 110); this.ring(f.x, f.y, '#fff2c0', 70); if (!this.def.doomed) this.fin = { x: f.x, y: f.y, t: 0 }; Sound.play('roar'); Sound.play('rumble'); f.vz = 230; for (const o of live) if (this.sup && o !== f && o.st !== 'down' && Math.hypot(o.x - f.x, o.y - f.y) < 70) this.hitFoe(o, 2 * p.pow, (o.x - f.x) / 70, (o.y - f.y) / 70, true); }
+      if (last) { this.impact = .3; this.shake = .9; this.punch = .6; this.ring(f.x, f.y, '#ff7a30', 110); this.ring(f.x, f.y, '#fff2c0', 70); if (!this.def.doomed) this.fin = { x: f.x, y: f.y, t: 0 }; Sound.play('pillar'); f.vz = 230; for (const o of live) if (this.sup && o !== f && o.st !== 'down' && Math.hypot(o.x - f.x, o.y - f.y) < 70) this.hitFoe(o, 2 * p.pow, (o.x - f.x) / 70, (o.y - f.y) / 70, true); }
       this.freeze = last ? 0.34 : 0.03;
     }
   },
@@ -222,7 +222,7 @@ const Brawl = {
       f.t += dt; const w = f.mode === 'charge' ? K.wind + .15 : f.second ? 0.3 : K.wind;
       if (f.t >= w) {
         if (f.mode === 'charge') { f.st = 'charge'; f.t = 0; Sound.play('roar'); }
-        else { f.st = 'recover'; f.t = 0; Sound.play('move'); f.swing = .18;
+        else { f.st = 'recover'; f.t = 0; Sound.play(K.blade ? (K.dmg > 1 ? 'swing2' : 'swing') : 'move'); f.swing = .18;
           if (f.mode === 'sweep') { if (d < K.reach + 6) this.strikeAt(f, T, K.dmg, dx / d, dy / d); this.ring(f.x, f.y, '#c8ccd4', K.reach + 6); }
           else { const hx = f.x + f.ax * K.reach, hy = f.y + f.ay * K.reach; f.x += f.ax * 10; f.y += f.ay * 10;
             const t = clamp(((T.x - f.x) * f.ax + (T.y - f.y) * f.ay) / K.reach, 0, 1), qx = f.x + (hx - f.x) * t, qy = f.y + (hy - f.y) * t; if (Math.hypot(T.x - qx, T.y - qy) < (K.wide || 12)) this.strikeAt(f, T, K.dmg, f.ax, f.ay); }

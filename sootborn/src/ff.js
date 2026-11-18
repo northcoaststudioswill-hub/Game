@@ -34,7 +34,7 @@ const FF = {
     ]
   }),
   ford: () => ({
-    title: 'THE FORD', sub: 'CAPTAIN VANT HOLDS THE CROSSING', bg: 'ford', arena: FIELD, music: 'battle', rage: 2, legend: 1, skip: 1, winText: 'THE FORD IS OURS',
+    title: 'THE FORD', sub: 'CAPTAIN VANT HOLDS THE CROSSING', bg: 'ford', arena: FIELD, music: 'dusk', rage: 2, legend: 1, skip: 1, winText: 'THE FORD IS OURS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 45 }, allies: ['cadv2'], shouts: ['HE IS MAD!', 'WITH HIM!'], taunt: { 0: ['WHO TRAINED YOU?', 'YOU FIGHT LIKE A MINER!', 'YIELD, BOY!'] },
     voice: { at: [[1, 'VANT IS THE BEST BLADE IN HOUSE TEAL. HE HAS NEVER ONCE BEEN HUNGRY.'], [11, 'MARA USED TO SAY: AIM IT UP, NOT SIDEWAYS. I AM AIMING, MARA.'], [26, 'EVERY NIGHT I WASH THE GOLD OFF MY HANDS AND CHECK THAT THE SOOT IS STILL THERE.']],
       hurt: 'HE HITS LIKE A PROCTOR. I HAVE BEEN HIT BY PROCTORS.', fury: 'I DO NOT GET ANGRY UP HERE. I WAS ALREADY ANGRY WHEN I ARRIVED.', eleven: 'ONE FOR EVERY SECOND.', half: 'HE IS AFRAID NOW. NOBODY EVER TAUGHT THEM WHAT TO DO WITH THAT.' },
@@ -53,7 +53,7 @@ const FF = {
     ]
   }),
   keep: () => ({
-    title: 'THE KEEP', sub: 'LUCAN AUREL - LAST DAY OF THE ASSAY', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'battle', rage: 3, legend: 1, skip: 1, endAt: 0.3, winText: 'YIELD.',
+    title: 'THE KEEP', sub: 'LUCAN AUREL - LAST DAY OF THE ASSAY', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, endAt: 0.3, winText: 'YIELD.',
     hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['YOU ARE ANGRY AT SOMEONE.', 'MOTHER WOULD LIKE YOU.', 'WHAT ARE YOU?', 'WHO WAS SHE?'] },
     voice: { at: [[1, 'LUCAN AUREL. HER SON. HER CHIN, HER HANDS, HER WAY OF LOOKING PAST YOU.'], [12, 'HE HAS BEEN BETTER THAN EVERYONE HIS WHOLE LIFE. IT HAS MADE HIM SLOW.'], [20, 'SHE IS WATCHING FROM THE DAIS. SHE DOES NOT KNOW MY FACE. SHE MADE IT.'], [34, 'SHE CALLED SEREN LITTLE EMBER. I WONDER WHAT SHE CALLS HIM.']],
       hurt: 'HE DID NOT LIGHT THE FURNACE. I KNOW. I KNOW.', fury: 'BE TOO MUCH FOR THEM, SHE SAID.', eleven: 'ELEVEN. FOR THE DOORS. FOR THE WASHER ON HER FINGER.', half: 'I COULD KILL HIM. THAT IS NOT WHAT I CAME UP HERE FOR.' },
@@ -82,7 +82,7 @@ const OPENING = [
   { d: 1.7, black: 1, sfx: 'rumble', shake: .8, big: 'THE DOORS CLOSED.' },
   { d: 1.9, black: 1, bolt: 2, sfx: 'roar', music: 'battle', flash: 1, big: 'SO I WENT UP.', bigC: '#ff7a30' },
   // above: four years on. Fast, bright, loud.
-  { d: 3.0, bg: 'valley', flash: 1, cam: [0, 330, 200, 150, .14], to: [0, 170, 70, 150, .32], credit: 'A STORY OF CINDERWELL', acts: ffRow(V, 8, -105, 30, 60, { fy: -1 }).concat(ffRow(TL, 8, -105, 30, -70, { fy: 1 })), cap: 'ABOVE THE ROCK, THE ACCREDITED SEND THEIR CHILDREN TO WAR.' },
+  { d: 3.0, bg: 'valley', flash: 1, sfx: 'horn', cam: [0, 330, 200, 150, .14], to: [0, 170, 70, 150, .32], credit: 'A STORY OF CINDERWELL', acts: ffRow(V, 8, -105, 30, 60, { fy: -1 }).concat(ffRow(TL, 8, -105, 30, -70, { fy: 1 })), cap: 'ABOVE THE ROCK, THE ACCREDITED SEND THEIR CHILDREN TO WAR.' },
   { d: 2.3, cam: [-120, 112, 44, 170], to: [110, 112, 44, 170], lin: 1, acts: ffRow(V, 9, -120, 30, 30, { fy: 1 }), cap: 'ONE VALLEY. TWELVE HOUSES. ONE YEAR. THEY CALL IT THE ASSAY.' },
   { d: 1.4, cam: [70, 110, 46, 150], to: [-70, 110, 46, 150], lin: 1, speed: 1, sfx: 'roar', acts: ffRow(TL, 9, -120, 30, -110, { fy: 1 }, -10) },
   { d: 1.4, cam: [0, 270, 46, 150], to: [0, 180, 40, 160], speed: 1, shake: .4, acts: [{ id: 'kael2', a: [0, 124], b: [0, 30], fy: -1, blade: 1, aura: 2 }].concat(ffRow(V, 8, -105, 30, 140, { fy: -1 }, 48)) },
