@@ -99,7 +99,7 @@
     const alpha = e.buffs.stealth ? (e.isPlayer ? 0.4 : 0.1) : 1;
     if (act === 'cast' && e.state === 'wind' && glow && Math.random() < 0.6) { const ca = rand(0, 6.28), cr = rand(0.8, 1.5); gfx.emit(X + Math.cos(ca) * cr, 1.2 + rand(-0.4, 0.6), Z + Math.sin(ca) * cr, -Math.cos(ca) * cr * 3, 0, -Math.sin(ca) * cr * 3, 0.3, glow, 0); }
     let MF = 1, MS = 0; { const sp = Math.hypot(e.vx || 0, e.vy || 0), fx = e.foe ? e.foe.x - e.x : 0, fy = e.foe ? e.foe.y - e.y : 0, fd = Math.hypot(fx, fy); if (sp > 20 && fd > 1 && fd < 520) { MF = ((e.vx * fx + e.vy * fy) / (sp * fd)); MS = ((e.vx * fy - e.vy * fx) / (sp * fd)); } }
-    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : stepOv, guard: e.guard > 0, sty: e.act && e.act.ab.type === 'melee' && !e.act.ab.spell ? (e.act.ab.arc < 60 ? 1 : (e.act.ab.pz || 1) >= 1.4 ? 2 : e.act.ab.arc >= 120 ? 3 : 0) : 0, mf: MF, ms: MS, ready: 1, hop: !!(e.lost && e.lost.legL), tired: e.hp < e.maxHp * 0.25, crawl: !!e.crawl, wounded: e.hp < e.maxHp * 0.4 && e.hp > 0, t: time + (e.isPlayer ? 0 : 1.7), glow });
+    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : stepOv, guard: e.guard > 0, sty: e.act && e.act.ab.type === 'melee' && !e.act.ab.spell ? (e.act.ab.arc < 60 ? 1 : (e.act.ab.pz || 1) >= 1.4 ? 2 : e.act.ab.arc >= 120 ? 3 : 0) : 0, mf: MF, ms: MS, ready: 1, hop: !!(e.lost && e.lost.legL), mv: e.act ? e.act.ab.mv : null, cs: e.act ? e.act.ab.cs : null, tired: e.hp < e.maxHp * 0.25, crawl: !!e.crawl, wounded: e.hp < e.maxHp * 0.4 && e.hp > 0, t: time + (e.isPlayer ? 0 : 1.7), glow });
     const alive = e.state !== 'ko';
     if (alive && !F.ex && gore() && !v.c.beast) { const fr = e.hp / e.maxHp, want = fr < 0.25 ? 3 : fr < 0.45 ? 2 : fr < 0.7 ? 1 : 0; v.wounds = v.wounds || 0;
       while (v.wounds < want && v.c.body) { const w = new T.Mesh(new T.BoxGeometry(0.05 + Math.random() * 0.05, 0.22 + Math.random() * 0.22, 0.03), new T.MeshBasicMaterial({ color: 0x6a0808 })); w.position.set((Math.random() - 0.5) * 0.4, 1.0 + Math.random() * 0.45, 0.225 * (v.wounds === 1 ? -1 : 1)); w.rotation.z = (Math.random() - 0.5) * 1.6; v.c.body.add(w); v.wounds++; }
@@ -140,8 +140,21 @@
     const g = f.obj = new T.Group(); sc.add(g);
     const k = f.k, col = f.col;
     if (k === 'slash') {
-      const m = flat(new T.Mesh(new T.RingGeometry(f.r / S * 0.5, f.r / S, 22, 1, -f.arc / 2, f.arc), basicMat(col, 0.9, true)), f.a); g.add(m); g.position.set(f.x / S, 1.0, f.y / S);
-      f.upd = p => { m.material.opacity = 0.9 * (1 - p); g.scale.setScalar(0.85 + p * 0.25); };
+      // a blade's wake: a tapered crescent that is drawn along the path of the cut, bright at the edge and gone behind it
+      const N = 26, pos = [], colr = [], c = new T.Color(col), R1 = f.r / S, a0 = f.a0 != null ? f.a0 : -f.arc / 2, a1 = f.a1 != null ? f.a1 : f.arc / 2, dir = f.dir || 1;
+      const P = u => { const uu = dir > 0 ? u : 1 - u, an = a0 + (a1 - a0) * uu, th = Math.pow(Math.sin(Math.min(1, u * 1.05) * Math.PI), 0.6), ri = R1 * (1 - 0.3 * th), b = 0.3 + 0.7 * Math.pow(u, 1.4); return [Math.cos(an) * ri, Math.sin(an) * ri, Math.cos(an) * R1, Math.sin(an) * R1, b]; };
+      for (let i = 0; i < N; i++) { const A = P(i / N), B = P((i + 1) / N); pos.push(A[0], 0, A[1], A[2], 0, A[3], B[2], 0, B[3], A[0], 0, A[1], B[2], 0, B[3], B[0], 0, B[1]); [A[4] * 0.35, A[4], B[4], A[4] * 0.35, B[4], B[4] * 0.35].forEach(v => colr.push(c.r * v, c.g * v, c.b * v)); }
+      const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); geo.setAttribute('color', new T.Float32BufferAttribute(colr, 3));
+      const mat = new T.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 1, depthWrite: false, side: T.DoubleSide, blending: T.AdditiveBlending }), m = new T.Mesh(geo, mat), tg = new T.Group();
+      tg.rotation.x = f.tilt || 0; tg.add(m); g.add(tg); g.rotation.y = -f.a; g.position.set(f.x / S, f.h || 1.0, f.y / S); 
+      f.upd = p => { mat.opacity = 0.8 * (p < 0.25 ? 1 : Math.max(0, 1 - (p - 0.25) / 0.75)); g.scale.setScalar(0.96 + p * 0.1); };
+    } else if (k === 'lance') {
+      // a thrust: one hard line out to the point
+      const L = f.r / S, geo = new T.BufferGeometry(), c = new T.Color(col), w = f.w || 0.16, pos = [], colr = [];
+      [[0, 1], [1, 0]].forEach(ax => { const o = [0.25 * L, 0, 0], t = [L, 0, 0], l = [0.55 * L, ax[0] * w, ax[1] * w], rr = [0.55 * L, -ax[0] * w, -ax[1] * w]; [o, l, t, o, t, rr].forEach((v, i) => { pos.push(v[0], v[1], v[2]); const b = i === 2 || i === 4 ? 1 : i === 0 || i === 3 ? 0.05 : 0.6; colr.push(c.r * b, c.g * b, c.b * b); }); });
+      geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); geo.setAttribute('color', new T.Float32BufferAttribute(colr, 3));
+      const mat = new T.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 1, depthWrite: false, side: T.DoubleSide, blending: T.AdditiveBlending }), m = new T.Mesh(geo, mat); g.add(m); g.rotation.y = -f.a; g.position.set(f.x / S, f.h || 1.15, f.y / S);
+      f.upd = p => { m.scale.set(0.35 + Math.min(1, p / 0.3) * 0.75, 1 + p, 1 + p); mat.opacity = Math.max(0, 1 - p * p); };
     } else if (k === 'cone') {
       const m = flat(new T.Mesh(new T.CircleGeometry(f.r / S, 18, -f.arc / 2, f.arc), basicMat(col, 0.7, true)), f.a); g.add(m); g.position.set(f.x / S, 0.7, f.y / S);
       const m2 = flat(new T.Mesh(new T.CircleGeometry(f.r / S * 0.6, 14, -f.arc / 2, f.arc), basicMat(0xfff0c0, 0.7, true)), f.a); m2.position.y = 0.2; g.add(m2);
@@ -599,7 +612,15 @@
         fx.push({ k: 'cone', x: e.x, y: e.y, a, r: ab.range, arc, col: ab.cone, t: 0, life: 0.38 }); G.sfx(ab.fire ? 'fire' : 'dodge');
         for (let i = 0; i < 26; i++) { const aa = a + rand(-arc / 2, arc / 2), v = rand(0.4, 1) * ab.range / S / 0.35; gfx.emit(e.x / S, 1, e.y / S, Math.cos(aa) * v, rand(-0.5, 1.5), Math.sin(aa) * v, rand(0.25, 0.45), ab.cone, 1); }
         flashLight(e.x + Math.cos(a) * 60, e.y + Math.sin(a) * 60, ab.cone, 35);
-      } else { fx.push({ k: 'slash', x: e.x, y: e.y, a, r: rng, arc, col: fin ? '#ffe9a0' : ab.color, t: 0, life: fin ? 0.26 : 0.18 }); fx.push({ k: 'slash', x: e.x, y: e.y, a, r: rng * 0.72, arc: arc * 0.8, col: '#ffffff', t: -0.02, life: 0.14 });
+      } else { const mvn = ab.mv, st = act.step || 0, colS = fin ? '#ffe9a0' : ab.color, lifeS = fin ? 0.3 : 0.22, over = mvn === 'smite' || mvn === 'chop' || (!mvn && (ab.pz || 1) >= 1.4) || st === 2;
+        const cut = o => { fx.push(Object.assign({ k: 'slash', x: e.x, y: e.y, a, r: rng, arc, col: colS, t: 0, life: lifeS }, o)); fx.push(Object.assign({ k: 'slash', x: e.x, y: e.y, a, r: rng * 0.8, arc: arc * 0.8, col: '#ffffff', t: -0.02, life: lifeS * 0.75 }, o, o.a0 != null ? { a0: o.a0 * 0.9, a1: o.a1 * 0.9 } : null)); };
+        if (mvn === 'drive' || mvn === 'riposte' || mvn === 'backstab' || (!mvn && ab.arc < 60)) { fx.push({ k: 'lance', x: e.x, y: e.y, a, r: rng * 1.15, col: colS, t: 0, life: 0.2, h: mvn === 'backstab' ? 0.9 : 1.2 }); fx.push({ k: 'lance', x: e.x, y: e.y, a, r: rng, col: '#ffffff', w: 0.07, t: -0.02, life: 0.16, h: mvn === 'backstab' ? 0.9 : 1.2 }); }
+        else if (mvn === 'spin') { cut({ a0: -2.6, a1: 3.4, h: 1.05, life: 0.3 }); for (let gi = 0; gi < 3; gi++) fx.push({ k: 'ghost', x: e.x, y: e.y, col: colS, t: -gi * 0.04, life: 0.28 }); }
+        else if (mvn === 'bash') { fx.push({ k: 'ring', x: e.x + Math.cos(a) * rng * 0.7, y: e.y + Math.sin(a) * rng * 0.7, r: 70, col: colS, t: 0, life: 0.22 }); fx.push({ k: 'lance', x: e.x, y: e.y, a, r: rng * 0.9, col: '#ffffff', w: 0.3, t: 0, life: 0.14, h: 1.1 }); }
+        else if (mvn === 'lowcut') cut({ h: 0.45, tilt: 0.12 });
+        else if (mvn === 'rise') cut({ tilt: -Math.PI / 2, a0: -0.7, a1: 1.7, dir: 1, h: 0.9 });
+        else if (over) cut({ tilt: -Math.PI / 2, a0: -0.55, a1: 1.95, dir: -1, h: 0.75 });
+        else cut(st === 1 ? { tilt: -0.42, dir: -1 } : { tilt: 0.42, dir: 1 });
         for (let si = 0; si < (fin ? 9 : 4); si++) { const sa = a + rand(-arc / 2, arc / 2); gfx.emit(e.x / S + Math.cos(sa) * rng / S, 1.0, e.y / S + Math.sin(sa) * rng / S, Math.cos(sa) * 3, rand(0, 2), Math.sin(sa) * 3, 0.22, fin ? '#ffe9a0' : '#ffffff', 4); }
         if (fin) fx.push({ k: 'dust', x: e.x + Math.cos(a) * rng * 0.7, y: e.y + Math.sin(a) * rng * 0.7, r: 60, t: 0, life: 0.45 }); }
       let landed = false;

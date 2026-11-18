@@ -210,7 +210,7 @@
         if (Math.abs(ms) > 0.35) { const a = Math.min(1, Math.abs(ms)); q.bz += ms * 0.13; q.tz -= ms * 0.08; q.ll *= mix(1, 0.62, a); q.lr *= mix(1, 0.62, a); q.by -= 0.03 * a; q.bx = mix(q.bx, 0.12, a); }       // circling: a crouched side-step
       }
       if (act === 'swing') {
-        snap = 1; const step = p.sty === 2 ? 2 : (p.step || 0), w = Math.min(1, k / 0.5), r = Math.max(0, (k - 0.5) / 0.5);
+        snap = 1; const step = p.sty === 2 || p.mv === 'smite' || p.mv === 'chop' ? 2 : (p.step || 0), w = Math.min(1, k / 0.5), r = Math.max(0, (k - 0.5) / 0.5);
         const cock = eo(Math.min(1, w / 0.6)), hit = ei(Math.max(0, (w - 0.6) / 0.4)), back = r * r * (3 - 2 * r);
         const seq = (ready, cocked, struck) => k < 0.5 ? mix(mix(ready, cocked, cock), struck, hit) : mix(struck, ready, back);
         if (step === 0) { q.arx = seq(-0.45, -2.6, 0.3); q.arz = seq(0, -0.5, 0.5); q.ty = seq(0, 0.6, -0.65); q.bx = seq(0.06, -0.06, 0.3); }
@@ -222,9 +222,37 @@
         if (k >= 0.5) { const sg = Math.sin(r * Math.PI); q.by -= sg * 0.05; q.bx += sg * 0.08; q.hx += sg * 0.1; }      // the blow lands and the weight has to come back
         q.bpz = seq(0, -0.1, 0.24); q.cape = 0.3 + hit * 0.5;
         if (cls === 'rogue' && step < 2) { q.alx = q.arx + 0.5; q.alz = -q.arz * 0.6; }
+        // ---- signature moves: each named technique has its own shape
+        const m = p.mv, ld = k < 0.5 ? cock : 1 - back;
+        if (m === 'bash') { q.alx = seq(restL, -0.5, -1.6); q.alz = seq(0, 0.6, -0.45); q.arx = seq(-0.45, 0.1, 0.2); q.arz = seq(0, -0.2, -0.3); q.ty = seq(0, -0.7, 0.85); q.bx = seq(0.06, -0.08, 0.42); q.bpz = seq(0, -0.14, 0.36); q.ll = seq(0.05, -0.3, 0.75); q.lr = seq(-0.05, 0.3, -0.65); q.by = -0.1 * ld; q.hx = seq(0, 0.1, 0.2); }
+        else if (m === 'spin') { q.spin = k < 0.5 ? mix(mix(0, -1.0, cock), 5.0, hit) : mix(5.0, 6.2832, back); q.arx = -1.5; q.arz = seq(0, 0.5, -0.2); q.alx = cls === 'rogue' ? -1.5 : seq(restL, -1.2, -1.3); q.alz = cls === 'rogue' ? 0.9 : 0; q.ty = seq(0, -0.5, 0.3); q.by = -0.14 * ld; q.bx = seq(0.06, 0.1, 0.2); q.ll = seq(0.05, 0.4, 0.45); q.lr = seq(-0.05, -0.4, -0.5); q.hx = 0; q.cape = 0.9; }
+        else if (m === 'smite') { if (k < 0.5) q.by = Math.sin(w * Math.PI) * 0.6; else { const hold = 1 - back; q.by = -0.3 * hold; q.ll = -1.2 * hold; q.lr = 0.5 * hold; q.bx = 0.06 + 0.5 * hold; } }
+        else if (m === 'backstab') { q.arx = seq(-0.45, -2.95, -0.55); q.arz = seq(0, -0.35, 0.25); q.alx = seq(restL, -1.5, -0.8); q.alz = seq(0, 0.4, -0.6); q.ty = seq(0, 0.55, -0.5); q.bx = seq(0.06, -0.12, 0.6); q.by = seq(0, 0.08, -0.18); q.ll = seq(0.05, -0.35, 0.85); q.lr = seq(-0.05, 0.3, -0.7); q.hx = seq(0, -0.2, 0.25); q.bpz = seq(0, -0.1, 0.3); }
+        else if (m === 'lowcut') { q.by = seq(0, -0.2, -0.26); q.bx = seq(0.06, 0.3, 0.5); q.arx = seq(-0.45, -0.55, -0.95); q.arz = seq(0, 1.35, -1.35); q.ty = seq(0, -0.95, 0.95); q.ll = seq(0.05, 0.5, 0.6); q.lr = seq(-0.05, -0.5, -0.6); q.hx = seq(0, -0.3, -0.35); if (cls === 'rogue') { q.alx = q.arx + 0.3; q.alz = -q.arz * 0.7; } }
+        else if (m === 'riposte') { q.arx = seq(-0.45, -0.9, -1.62); q.arz = 0; q.alx = seq(restL, -2.3, -2.5); q.alz = seq(0, 0.5, 0.6); q.ty = seq(0, 0.9, -0.75); q.bx = seq(0.06, -0.1, 0.25); q.ll = seq(0.05, -0.1, 0.7); q.lr = seq(-0.05, 0.1, -0.6); q.by = seq(0, 0, -0.12); q.bpz = seq(0, -0.05, 0.3); q.hx = 0; }
+        else if (m === 'drive') { q.arx = seq(-0.45, -0.2, -1.6); q.arz = 0; q.alx = seq(restL, -0.6, -1.45); q.alz = seq(0, -0.3, -0.25); q.ty = seq(0, 0.85, -0.55); q.bx = seq(0.06, -0.1, 0.62); q.by = seq(0, -0.05, -0.2); q.ll = seq(0.05, -0.4, 1.0); q.lr = seq(-0.05, 0.35, -0.85); q.bpz = seq(0, -0.2, 0.42); q.hx = seq(0, 0, -0.45); }
+        else if (m === 'rise') { q.arx = seq(-0.45, 0.5, -2.9); q.arz = seq(0, 0.7, -0.2); q.ty = seq(0, -0.8, 0.7); q.bx = seq(0.06, 0.45, -0.25); q.by = k < 0.5 ? mix(-0.22 * cock, 0.3, hit) : 0.3 * (1 - back); q.ll = seq(0.05, 0.5, -0.3); q.lr = seq(-0.05, -0.5, 0.2); q.hx = seq(0, 0.2, -0.35); q.alx = seq(restL, -0.3, -1.0); }
       } else if (act === 'cast') {
         snap = 0.6; q.arx = cls === 'cleric' ? mix(-1.4, -2.8, eo(k)) : -1.5 - k * 0.4; q.alx = cls === 'cleric' ? -0.4 : -1.5 - k * 0.4; q.arz = -0.25; q.alz = 0.25; q.bx = -0.1 - k * 0.08; q.by += k * 0.06; q.hx = -0.15 * k; q.cape = 0.3 + k * 0.4;
+        const cs = p.cs;
+        if (cs === 'nova') { q.by = -0.2 * k; q.arx = -1.25; q.arz = 0.95 * k; q.alx = -1.25; q.alz = -0.95 * k; q.hx = 0.35 * k; q.bx = 0.2 * k; }
+        else if (cs === 'call') { q.arx = mix(-1.4, -3.05, eo(k)); q.arz = -0.12; q.alx = restL; q.alz = 0; q.hx = -0.4 * k; q.bx = -0.14 * k; q.by += 0.05 * k; }
+        else if (cs === 'bless') { q.arx = -0.75; q.arz = -0.8 * k; q.alx = -0.75; q.alz = 0.8 * k; q.hx = -0.45 * k; q.bx = -0.12 * k; q.by += 0.05 * k; }
+        else if (cs === 'cone') { q.arx = -0.7; q.arz = 0.55; q.alx = -0.95; q.alz = -0.75; q.ty = 0.55 * k; q.bx = 0.1; q.by -= 0.06 * k; }
+        else if (cs === 'breath') { q.bx = -0.42 * k; q.arx = 0.55 * k; q.alx = 0.55 * k; q.arz = -0.3 * k; q.alz = 0.3 * k; q.hx = -0.5 * k; }
+        else if (cs === 'plant') { q.by = -0.3 * k; q.bx = 0.5 * k; q.ll = -1.2 * k; q.lr = 0.45 * k; q.arx = mix(-0.45, -2.4, k); q.arz = 0; q.alx = 0.2; q.alz = 0; q.hx = 0.2 * k; }
+        else if (cs === 'throw') { q.arx = mix(-0.45, -1.9, k); q.arz = 1.2 * k; q.ty = -0.8 * k; q.alx = -1.1; q.alz = -0.3; q.bx = -0.05; }
+        else if (cs === 'steel') { q.arx = -1.9; q.arz = 0.8 * k; q.alx = -1.9; q.alz = -0.8 * k; q.by -= 0.1 * k; q.hx = 0.3 * k; q.bx = 0.12 * k; }
       } else if (act === 'release') { snap = 0.9; const r = 1 - k; q.arx = mix(-0.45, -1.75, r); q.arz = 0.15 * r; q.alx = mix(restL, -0.2, r); q.ty = -0.5 * r; q.bx = 0.06 + 0.3 * r; q.bpz = 0.18 * r; q.ll = 0.35 * r; q.lr = -0.3 * r; q.cape = 0.3 + 0.5 * r;
+        const cs = p.cs;
+        if (cs === 'nova') { q.arx = mix(-0.45, -2.3, r); q.arz = -1.25 * r; q.alx = mix(restL, -2.3, r); q.alz = 1.25 * r; q.by = 0.14 * r; q.bx = 0.06 - 0.3 * r; q.hx = -0.45 * r; q.ty = 0; q.ll = 0.3 * r; q.lr = -0.3 * r; q.bpz = 0; }
+        else if (cs === 'call') { q.arx = mix(-0.45, -1.0, r); q.arz = 0; q.bx = 0.06 + 0.4 * r; q.by = -0.08 * r; q.ll = 0.45 * r; q.lr = -0.35 * r; q.hx = 0.2 * r; q.ty = -0.3 * r; }
+        else if (cs === 'bless') { q.arx = mix(-0.45, -1.3, r); q.arz = -1.0 * r; q.alx = mix(restL, -1.3, r); q.alz = 1.0 * r; q.by = 0.1 * r; q.hx = -0.5 * r; q.bx = -0.1 * r; q.ty = 0; q.ll = 0.05; q.lr = -0.05; q.bpz = 0; }
+        else if (cs === 'cone') { q.arx = mix(-0.45, -1.55, r); q.alx = mix(restL, -1.55, r); q.arz = 0.22 * r; q.alz = -0.22 * r; q.ty = -0.1 * r; q.bx = 0.06 + 0.3 * r; q.bpz = 0.16 * r; q.ll = 0.5 * r; q.lr = -0.45 * r; }
+        else if (cs === 'breath') { q.bx = 0.06 + 0.55 * r; q.hx = 0.3 * r; q.arx = mix(-0.45, 0.8, r); q.alx = mix(restL, 0.8, r); q.arz = -0.4 * r; q.alz = 0.4 * r; q.ll = 0.45 * r; q.lr = -0.4 * r; q.ty = 0; }
+        else if (cs === 'plant') { q.by = -0.32 * r; q.bx = 0.06 + 0.55 * r; q.ll = mix(0.05, -1.25, r); q.lr = mix(-0.05, 0.5, r); q.arx = mix(-0.45, -0.6, r); q.arz = 0; q.ty = 0; q.hx = 0.3 * r; q.bpz = 0; }
+        else if (cs === 'throw') { q.arx = mix(-0.45, -1.5, r); q.arz = -1.1 * r; q.ty = 0.8 * r; q.bx = 0.06 + 0.25 * r; q.ll = 0.4 * r; q.lr = -0.35 * r; }
+        else if (cs === 'steel') { q.arx = mix(-0.45, -1.6, r); q.arz = -1.3 * r; q.alx = mix(restL, -1.6, r); q.alz = 1.3 * r; q.by = 0.05 * r; q.hx = -0.3 * r; q.bx = -0.15 * r; q.ty = 0; q.bpz = 0; q.ll = 0.3 * r; q.lr = -0.3 * r; }
       } else if (act === 'kick') { snap = 1; const kk = Math.sin(Math.min(1, k * 1.25) * Math.PI); q.ll = -1.45 * kk; q.lr = 0.25 * kk; q.bx = -0.38 * kk; q.by = 0.03 * kk; q.arx = 0.5 * kk; q.arz = -0.5 * kk; q.alx = 0.4 * kk; q.alz = 0.5 * kk; q.hx = 0.15 * kk; q.bpz = 0.1 * kk;
       } else if (act === 'stomp') { snap = 1; const up = k < 0.62 ? Math.sin(k / 0.62 * Math.PI / 2) : 0, dn = k >= 0.62 ? 1 : 0; q.ll = -1.3 * up - 0.15 * dn; q.bx = -0.15 * up + 0.42 * dn; q.by = 0.08 * up - 0.14 * dn; q.arx = -1.2 * up + 0.3 * dn; q.alx = -1.0 * up + 0.3 * dn; q.hx = -0.2 * up + 0.4 * dn;
       } else if (act === 'hoist') { snap = 0.5; q.arx = -3.05; q.arz = -0.1; q.alx = -2.7; q.alz = 0.35; q.bx = -0.22; q.hx = -0.45; q.ll = 0.25; q.lr = -0.3; q.by = -0.03;
@@ -257,7 +285,7 @@
       if (p.hurt > 0 && !(prevHurt > 0)) side = -side; prevHurt = p.hurt || 0;
       if (p.hurt > 0 && p.guard) { const h = Math.min(1, p.hurt / 0.28); q.bx -= 0.16 * h; q.by -= 0.1 * h; q.bpz -= 0.16 * h; q.alx += 0.3 * h; q.arx += 0.2 * h; q.tz += 0.08 * h * side; q.ll = 0.3; q.lr = -0.4; snap = Math.max(snap, 0.7); }      // caught on the guard: driven back, not opened up
       else if (p.hurt > 0) { const h = Math.min(1, p.hurt / 0.28); q.tz += (side - 1) * 0.28 * h; q.hz = side * 0.25 * h; q.ll += 0.2 * h; q.lr -= 0.3 * h; q.bx -= 0.6 * h; q.tz += 0.28 * h; q.hx = -0.5 * h; q.by -= 0.05 * h; q.arx += 0.55 * h; q.alx += 0.65 * h; q.bpz -= 0.1 * h; snap = Math.max(snap, 0.7); }
-      body.position.y = J('by', q.by, snap); body.position.z = J('bpz', q.bpz, snap); body.rotation.set(J('bx', q.bx, snap), 0, J('bz', q.bz, snap));
+      body.position.y = J('by', q.by, snap); body.position.z = J('bpz', q.bpz, snap); body.rotation.set(J('bx', q.bx, snap), q.spin || 0, J('bz', q.bz, snap));
       legL.rotation.x = J('ll', q.ll, snap); legR.rotation.x = J('lr', q.lr, snap);
       torso.rotation.set(0, J('ty', q.ty, snap), J('tz', q.tz, snap)); head.rotation.set(J('hx', q.hx, snap), -cur.ty * 0.6, J('hz', q.hz, snap));
       armR.rotation.set(J('arx', q.arx, snap), 0, J('arz', q.arz, snap)); armL.rotation.set(J('alx', q.alx, snap), 0, J('alz', q.alz, snap));

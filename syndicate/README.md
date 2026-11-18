@@ -320,3 +320,10 @@ The Fence, Marc, the Apothecary, Big Hobb, the charm seller, Whisper and the Bus
 - Pip Tallow runs up to you the moment you arrive and starts the tour himself. The objective no longer sends you to the pit first.
 - Opening film: tap (A / Space / touch) for the next shot, hold to skip the whole film.
 - Dialogue scenes: cameras keep clear of shoulders and helmets, the pit has a proper wall behind you in close-ups, and scene changes dip through black instead of popping.
+
+## Latest pass: moves with their own shape
+
+- Named techniques no longer share one swing. Shield Bash drives in shield-first, Sweeping Cleave is a full-body spin, Holy Strike is a leaping smite that lands on one knee, Death Mark is a reverse-grip stab, Poisoned Blade is a low crouching cut, Riposte is a fencer's thrust.
+- Heavy blows are overhead chops (or a deep driving lunge for pointed weapons); signature blows are a rising uppercut, a spin or a drive depending on the weapon.
+- Castings have eight stances: a burst from the chest, a call from above, a blessing, a two-handed cone, a breath, a planted trap, a throw, and a bracing flex.
+- Blade wakes follow the cut: diagonal for combo strokes, vertical for chops and smites, a full ring for spins, low for low cuts, a hard line for thrusts.
