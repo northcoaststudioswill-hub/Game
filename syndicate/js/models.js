@@ -162,6 +162,8 @@
     const cur = {}, J = (k, v, s) => (cur[k] = cur[k] == null ? v : cur[k] + (v - cur[k]) * s);
     const mix = G.lerp, eo = x => 1 - Math.pow(1 - x, 3), ei = x => x * x;
     const restL = cls === 'fighter' ? -0.9 : cls === 'rogue' || cls === 'sorcerer' ? -0.5 : 0.05;
+    const FAM = { axe: 'heavy', hammer: 'heavy', pick: 'heavy', spear: 'pole', halberd: 'pole', staff: 'pole', rapier: 'fence', axes: 'dual', chain: 'swing', flail: 'swing', frost: 'orb', spark: 'orb', acid: 'orb' }[arm] || (cls === 'rogue' ? 'dual' : cls === 'sorcerer' ? 'orb' : '');
+    let side = 1, prevHurt = 0;
     // pose: {moving, walk, act:'idle|swing|cast|stun|dodge|ko', prog, step (combo step), hurt, guard, flash, alpha, t, glow}
     C.pose = function (p) {
       const t = p.t || 0, act = p.act || 'idle', mv = p.moving && act !== 'ko' && act !== 'dodge';
@@ -169,7 +171,11 @@
       const q = { by: Math.sin(t * 2.4) * 0.015, bx: 0.06, bz: Math.sin(t * 1.2) * 0.02, bpz: 0, ll: 0.05, lr: -0.05, ty: Math.sin(t * 1.2) * 0.04, tz: 0, hx: 0, hz: 0,
         arx: -0.45 + Math.sin(t * 2.4) * 0.04, arz: 0, alx: restL + Math.sin(t * 2.4 + 1) * 0.03, alz: 0, cape: 0.16 + Math.sin(t * 2) * 0.04 };
       let snap = 0.28;
-      if (mv) { q.by = Math.abs(Math.cos(p.walk)) * 0.1 - 0.02; q.bx = 0.2; q.ll = sw * 0.85; q.lr = -sw * 0.85; q.ty = sw * 0.16; q.arx += -sw * 0.38; q.alx += sw * 0.38; q.cape = 0.52 + sw * 0.1; q.hx = -0.06; snap = 0.5; }
+      if (mv) { q.by = Math.abs(Math.cos(p.walk)) * 0.1 - 0.02; q.bx = 0.2; q.ll = sw * 0.85; q.lr = -sw * 0.85; q.ty = sw * 0.16; q.arx += -sw * 0.38; q.alx += sw * 0.38; q.cape = 0.52 + sw * 0.1; q.hx = -0.06; snap = 0.5;
+        const mf = p.mf == null ? 1 : p.mf, ms = p.ms || 0;
+        if (mf < -0.3) { const b = Math.min(1, -mf); q.bx = mix(0.2, -0.04, b); q.ll *= mix(1, 0.5, b); q.lr *= mix(1, 0.5, b); q.by = Math.abs(Math.cos(p.walk)) * 0.05 - 0.05; q.hx = 0.04; q.cape = 0.2; }       // giving ground: short steps, weight back
+        if (Math.abs(ms) > 0.35) { const a = Math.min(1, Math.abs(ms)); q.bz += ms * 0.13; q.tz -= ms * 0.08; q.ll *= mix(1, 0.62, a); q.lr *= mix(1, 0.62, a); q.by -= 0.03 * a; q.bx = mix(q.bx, 0.12, a); }       // circling: a crouched side-step
+      }
       if (act === 'swing') {
         snap = 1; const step = p.sty === 2 ? 2 : (p.step || 0), w = Math.min(1, k / 0.5), r = Math.max(0, (k - 0.5) / 0.5);
         const cock = eo(Math.min(1, w / 0.6)), hit = ei(Math.max(0, (w - 0.6) / 0.4)), back = r * r * (3 - 2 * r);
@@ -178,6 +184,9 @@
         else if (step === 1) { q.arx = seq(-0.45, -1.35, -1.15); q.arz = seq(0, 1.0, -1.2); q.ty = seq(0, -0.75, 0.8); q.bx = seq(0.06, 0.06, 0.22); }
         else { q.arx = seq(-0.45, -3.05, 0.5); q.alx = seq(restL, -2.9, 0.4); q.bx = seq(0.06, -0.3, 0.5); q.by = k < 0.5 ? Math.sin(w * Math.PI) * 0.42 : 0; q.ll = q.lr = k < 0.5 ? Math.sin(w * Math.PI) * 0.7 : 0; q.hx = seq(0, -0.3, 0.2); }
         if (p.sty === 1 && step < 2) { q.arx = seq(-0.45, 0.35, -1.62); q.arz = seq(0, 0.25, 0); q.ty = seq(0, 0.7, -0.45); q.bx = seq(0.06, -0.05, 0.34); q.ll = seq(0.05, -0.2, 0.55); q.lr = seq(-0.05, 0.2, -0.45); }       // a thrust, for anything with a point
+        if (step < 2 && p.sty !== 1) { q.ll = seq(0.05, -0.28, 0.5); q.lr = seq(-0.05, 0.3, -0.42); q.by = -0.07 * (k < 0.5 ? cock : 1 - back); q.hx = seq(0, -0.12, 0.16); }      // weight goes back, then through the lead leg
+        if (p.sty === 3) { q.arx = seq(-0.45, -1.5, -1.42); q.arz = seq(0, 1.5, -1.6); q.alx = seq(restL, -1.3, -1.15); q.alz = seq(0, 0.9, -0.9); q.ty = seq(0, -1.15, 1.25); q.bx = seq(0.06, 0.12, 0.32); q.by = -0.12 * (k < 0.5 ? cock : 1 - back); q.ll = seq(0.05, 0.38, -0.3); q.lr = seq(-0.05, -0.42, 0.52); q.hx = seq(0, 0.1, 0.05); }      // a full sweep: the whole body turns through it
+        if (k >= 0.5) { const sg = Math.sin(r * Math.PI); q.by -= sg * 0.05; q.bx += sg * 0.08; q.hx += sg * 0.1; }      // the blow lands and the weight has to come back
         q.bpz = seq(0, -0.1, 0.24); q.cape = 0.3 + hit * 0.5;
         if (cls === 'rogue' && step < 2) { q.alx = q.arx + 0.5; q.alz = -q.arz * 0.6; }
       } else if (act === 'cast') {
@@ -191,10 +200,20 @@
       } else if (act === 'sit') { q.ll = q.lr = -1.5; q.by = -0.3; q.bx = -0.06; q.arx = -0.75; q.alx = -0.75; snap = 0.4;
       } else if (act === 'stun') { q.hz = Math.sin(t * 9) * 0.3; q.tz = Math.sin(t * 7) * 0.12; q.arx = 0.1; q.alx = 0.1; q.bx = 0.28; q.by = -0.04; }
       if (p.ready && act === 'idle') { q.by -= 0.05; q.bx = 0.14; q.arx = -0.95 + Math.sin(t * 2.4) * 0.05; q.arz = 0.2; q.alx = (cls === 'fighter' ? -1.2 : restL - 0.45) + Math.sin(t * 2.4 + 1) * 0.04; q.ty = 0.25; if (!mv) { q.ll = 0.18; q.lr = -0.22; } }
+      if (p.ready && act === 'idle' && !p.guard) { const br = Math.sin(t * 2.4) * 0.04;
+        if (FAM === 'heavy') { q.arx = -2.05 + br; q.arz = -0.3; q.alx = -1.45 + br; q.alz = 0.5; q.ty = 0.45; q.bx = 0.1; }                         // carried high on the shoulder
+        else if (FAM === 'pole') { q.arx = -1.15 + br; q.arz = 0.1; q.alx = -1.0 + br; q.alz = -0.5; q.ty = 0.55; q.bx = 0.2; q.by -= 0.03; }        // point low and forward
+        else if (FAM === 'fence') { q.arx = -1.5 + br * 0.5; q.arz = 0; q.alx = 0.75; q.alz = 0.2; q.ty = 0.75; q.bx = 0.05; q.by -= 0.04; if (!mv) { q.ll = 0.32; q.lr = -0.36; } }      // side-on, off hand behind
+        else if (FAM === 'dual') { q.arx = -1.1 + br; q.arz = 0.35; q.alx = -1.1 - br; q.alz = -0.35; q.bx = 0.24; q.by -= 0.04; }
+        else if (FAM === 'swing') { q.arx = -0.55 + Math.sin(t * 3.4) * 0.28; q.arz = 0.3 + Math.cos(t * 3.4) * 0.12; q.ty = 0.3; }               // the head never stops moving
+        else if (FAM === 'orb') { q.arx = -1.05 + br; q.arz = -0.3; q.alx = -1.05 - br; q.alz = 0.3; q.by += Math.sin(t * 1.6) * 0.012; }
+      }
       if (p.tired && (act === 'idle' || act === 'cheer')) { q.bx += 0.2 + Math.sin(t * 5) * 0.04; q.hx = 0.25; q.by -= 0.04 + Math.abs(Math.sin(t * 2.5)) * 0.02; q.arx += 0.3; }
       if (p.hop) { q.bz += 0.16; q.tz -= 0.1; q.by += mv ? Math.abs(Math.sin(p.walk)) * 0.14 : Math.abs(Math.sin(t * 3)) * 0.02; q.lr = mv ? Math.sin(p.walk * 2) * 0.4 : 0; q.arx -= 0.3; }
       if (p.guard) { q.alx = -1.55; q.alz = -0.55; q.arx = -1.25; q.arz = 0.45; q.bx = 0.14; q.by = -0.05; snap = 0.5; }
-      if (p.hurt > 0) { const h = Math.min(1, p.hurt / 0.28); q.bx -= 0.6 * h; q.tz += 0.28 * h; q.hx = -0.5 * h; q.by -= 0.05 * h; q.arx += 0.55 * h; q.alx += 0.65 * h; q.bpz -= 0.1 * h; snap = Math.max(snap, 0.7); }
+      if (p.hurt > 0 && !(prevHurt > 0)) side = -side; prevHurt = p.hurt || 0;
+      if (p.hurt > 0 && p.guard) { const h = Math.min(1, p.hurt / 0.28); q.bx -= 0.16 * h; q.by -= 0.1 * h; q.bpz -= 0.16 * h; q.alx += 0.3 * h; q.arx += 0.2 * h; q.tz += 0.08 * h * side; q.ll = 0.3; q.lr = -0.4; snap = Math.max(snap, 0.7); }      // caught on the guard: driven back, not opened up
+      else if (p.hurt > 0) { const h = Math.min(1, p.hurt / 0.28); q.tz += (side - 1) * 0.28 * h; q.hz = side * 0.25 * h; q.ll += 0.2 * h; q.lr -= 0.3 * h; q.bx -= 0.6 * h; q.tz += 0.28 * h; q.hx = -0.5 * h; q.by -= 0.05 * h; q.arx += 0.55 * h; q.alx += 0.65 * h; q.bpz -= 0.1 * h; snap = Math.max(snap, 0.7); }
       body.position.y = J('by', q.by, snap); body.position.z = J('bpz', q.bpz, snap); body.rotation.set(J('bx', q.bx, snap), 0, J('bz', q.bz, snap));
       legL.rotation.x = J('ll', q.ll, snap); legR.rotation.x = J('lr', q.lr, snap);
       torso.rotation.set(0, J('ty', q.ty, snap), J('tz', q.tz, snap)); head.rotation.set(J('hx', q.hx, snap), -cur.ty * 0.6, J('hz', q.hz, snap));

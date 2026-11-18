@@ -95,7 +95,8 @@
     else if (phase === 'ko' || (phase === 'mortal' && M && e.isPlayer && M.t > (M.def.imp || 1.2) + 0.6)) act = 'cheer';
     const alpha = e.buffs.stealth ? (e.isPlayer ? 0.4 : 0.1) : 1;
     if (act === 'cast' && e.state === 'wind' && glow && Math.random() < 0.6) { const ca = rand(0, 6.28), cr = rand(0.8, 1.5); gfx.emit(X + Math.cos(ca) * cr, 1.2 + rand(-0.4, 0.6), Z + Math.sin(ca) * cr, -Math.cos(ca) * cr * 3, 0, -Math.sin(ca) * cr * 3, 0.3, glow, 0); }
-    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : stepOv, guard: e.guard > 0, sty: e.act && e.act.ab.type === 'melee' && !e.act.ab.spell ? (e.act.ab.arc < 60 ? 1 : (e.act.ab.pz || 1) >= 1.4 ? 2 : 0) : 0, ready: 1, hop: !!(e.lost && e.lost.legL), tired: e.hp < e.maxHp * 0.25, t: time + (e.isPlayer ? 0 : 1.7), glow });
+    let MF = 1, MS = 0; { const sp = Math.hypot(e.vx || 0, e.vy || 0), fx = e.foe ? e.foe.x - e.x : 0, fy = e.foe ? e.foe.y - e.y : 0, fd = Math.hypot(fx, fy); if (sp > 20 && fd > 1 && fd < 520) { MF = ((e.vx * fx + e.vy * fy) / (sp * fd)); MS = ((e.vx * fy - e.vy * fx) / (sp * fd)); } }
+    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : stepOv, guard: e.guard > 0, sty: e.act && e.act.ab.type === 'melee' && !e.act.ab.spell ? (e.act.ab.arc < 60 ? 1 : (e.act.ab.pz || 1) >= 1.4 ? 2 : e.act.ab.arc >= 120 ? 3 : 0) : 0, mf: MF, ms: MS, ready: 1, hop: !!(e.lost && e.lost.legL), tired: e.hp < e.maxHp * 0.25, t: time + (e.isPlayer ? 0 : 1.7), glow });
     const alive = e.state !== 'ko';
     v.ring.visible = alive && alpha > 0.3 && !F.ex; v.ring.scale.setScalar(1 + Math.min(1, (e.charging || 0) / 0.28) * 0.45); v.ring.position.y = 0.03 - e.z / S;
     v.ward.visible = alive && e.shield > 0; if (v.ward.visible) v.ward.material.opacity = 0.18 + Math.sin(time * 6) * 0.06;

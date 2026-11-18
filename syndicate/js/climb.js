@@ -17,11 +17,11 @@
   const PAL = [['#5b4a2a', '#4a4031'], ['#3a4a3a', '#3a3a30'], ['#4a3a4a', '#35303a'], ['#5a3a2a', '#40342c'], ['#2f4450', '#333a40'], ['#55452f', '#3d362c']];
   const cache = {};
   function make(t, k) {
-    const key = t + '_' + k; if (cache[key]) return cache[key];
+    const key = t + '_' + k + (k >= NEED[t] && G.state && G.state.hero ? '_' + G.state.hero.level : ''); if (cache[key]) return cache[key];
     const g = GATES[t], r = rng(t * 4099 + k * 131 + 7), pick = a => a[Math.floor(r() * a.length)], cls = pick(['fighter', 'rogue', 'sorcerer', 'cleric']), C = G.CLASSES[cls], extra = k >= NEED[t], kk = Math.min(k, 4);
     const sub = t >= 3 ? pick(Object.keys(C.subs)) : null, known = C.start.slice(0, 2).concat(t >= 1 ? [C.l2[Math.floor(r() * C.l2.length)]] : [], sub ? [C.subs[sub].ability] : []).filter(id => G.ABILITIES[id]);
     const arms = (G.ARMS || []).filter(w => w.cls === cls), pal = pick(PAL), name = pick(FIRST) + ' ' + pick(LAST), pay = extra ? 0.6 : 1;
-    const o = { id: 'u' + key, name, title: TITLE[t], cls, race: pick(Object.keys(G.RACES)), level: Math.max(1, g.level - 1), sub, known, arm: t >= 2 && arms.length ? pick(arms).id : null,
+    const o = { id: 'u' + t + '_' + k, name, title: TITLE[t], cls, race: pick(Object.keys(G.RACES)), level: Math.max(1, g.level - 1, extra && G.state && G.state.hero ? G.state.hero.level - 2 : 0), sub, known, arm: t >= 2 && arms.length ? pick(arms).id : null,
       hpMul: +(g.hpMul * (0.7 + 0.04 * kk)).toFixed(2), dmgMul: +(g.dmgMul * (0.84 + 0.03 * kk)).toFixed(2),
       ai: { react: g.ai.react + 0.12, aggro: Math.max(0.35, g.ai.aggro - 0.1), dodge: g.ai.dodge * 0.6 },
       xp: Math.round(g.xp * 0.45 * pay), coin: Math.round(g.coin * 0.4 * pay), respect: Math.round(g.respect0 * 0.12 * pay), taunt: pick(TAUNT), tint: { cloth: pal[0], armor: pal[1] }, under: t, extra };
@@ -60,7 +60,7 @@
     const cur = document.querySelectorAll('#panel .opp.cur'), last = cur[cur.length - 1]; if (last && last.scrollIntoView) last.scrollIntoView({ block: 'center' });
   };
   // challengers after the crown teach you something too
-  if (G.ensureLedger) { const e0 = G.ensureLedger; G.ensureLedger = function () { e0.apply(this, arguments); G.OPPONENTS.forEach(o => { if (o.challenger) { if (!o.xp) o.xp = 110 + 10 * o.challenger; o.level = 9; } }); }; }
+  if (G.ensureLedger) { const e0 = G.ensureLedger; G.ensureLedger = function () { e0.apply(this, arguments); G.OPPONENTS.forEach(o => { if (o.challenger && !o._scaled) { const n = o.challenger; o._scaled = 1; o.xp = 110 + 10 * n; o.level = 7; o.hpMul = +((1 + 0.06 * n) * (o.elite ? 1.2 : 1)).toFixed(2); o.dmgMul = +Math.min(1.9, 0.84 + 0.05 * n).toFixed(2); } }); }; }      // later challengers hit harder and think faster; they do not just take longer to cut down
 
   const res0 = ui.results;
   ui.results = function (r) {
@@ -94,6 +94,7 @@
   const der0 = G.derive;
   G.derive = function (h, st) {
     const d = der0.apply(this, arguments);
+    if (h && h.xp != null && h.level > 5) d.dmgMul += 0.03 * (h.level - 5);      // past the fifth level you are learning to hurt people, not just to last
     if (h && h.cap === 'unbroken') { d.maxHp = Math.round(d.maxHp * 1.15); d.poise = (d.poise || 0) + 20; }
     if (h && h.cap === 'executioner') { d.dmgMul += 0.1; d.crit += 0.05; }
     if (h && h.cap === 'well') { d.regen *= 1.3; d.cdr += 0.1; }
@@ -210,7 +211,7 @@
       { sec: 'How Things Work', title: 'Charms', unlock: seen('charms'), body: 'Small, odd, mostly bone. Each bends one rule slightly. Wear one. The others get jealous.' },
       { sec: 'How Things Work', title: 'Rumours', unlock: seen('whisper'), body: 'Whisper sells the habits of whoever is next on your page. A scouted opponent gives more away before they swing.' },
       { sec: 'How Things Work', title: 'Teachers', unlock: seen('trainer'), body: 'Retired fighters with one good trick each and a landlord. They will teach it for coin. You still only carry three techniques into the pit.' },
-      { sec: 'How Things Work', title: 'Ten Levels', unlock: st => st.hero && st.hero.level >= 6, body: 'The first five levels make you a fighter: a technique, a calling, a feat, the move they will remember you for. The next five are yours to shape: ability points placed where you choose, another technique, a second feat, and at the tenth a capstone.' }
+      { sec: 'How Things Work', title: 'Ten Levels', unlock: st => st.hero && st.hero.level >= 6, body: 'The first five levels make you a fighter: a technique, a calling, a feat, the move they will remember you for. The next five are yours to shape: ability points placed where you choose, another technique, a second feat, and at the tenth a capstone. Each level past the fifth also adds 3% to everything you hit with.' }
     );
   }
 })();

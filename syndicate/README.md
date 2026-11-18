@@ -214,3 +214,7 @@ multiclassing, recorded music or voice, cloud saves, typing a name with a contro
 - **Expeditions.** Once you have signed David's contract (or been bound by your third death), three gold-marked jobs appear at the Low Lamp: rob a wizard-gold caravan, harry the tribes for ransom, burn a village. They resolve like other Tally jobs, by bouts and a d20.
 - **Wizard gold** clears one soul each in his cellar. Owing nothing while his work goes on earns his favour: +8% damage and +8% coin.
 - **Heat** (0 to 10) is the cost. Stalls charge more, the Seal-Wardens fine you on the road home, and somebody you wronged can buy a line on the Ledger: a grudge bout you must answer before the next named fighter. Heat cools by one every three bouts.
+
+## Frame rate (`js/gfx.js`, `js/perf.js`)
+
+The renderer caps resolution at 1.5x, redraws the shadow map every other frame, and lowers its resolution by itself if frames stay slow (and raises it again if they recover). Small props do not cast shadows, menus have no backdrop blur, and the world behind a full menu is drawn at half rate. Settings has a **Performance mode** that forces the low tier.

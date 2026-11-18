@@ -137,7 +137,7 @@ Checklist:
 4. **Gear ladder**, folding in existing weapons and kits.
 5. **Druid, then tiefling spirits.**
 6. **Finishers, specials and gore.**
-7. **Animation and smoothing pass.**
+7. **Animation and smoothing pass.** Started: weapon-family ready stances (shoulder carry, low point, en garde, dual, swinging head, orbs), footwork and a settle in every basic swing, a true sweep for wide arcs, back-pedal and side-step when moving relative to the opponent, and a guarded hit reaction. Still to do: per-weapon anticipation timing, turn blending, input-buffer and hit-stop review.
 8. **Text, looks and world pass.**
 9. **Controller pass on hardware, then balance and a full playtest.**
 
