@@ -56,7 +56,7 @@ Sources: [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (the Sprouts sections, Nov 17 an
 - Nature's balance (a wild buddy quietly eats a stranded sprout) is rare by design. Two three-day autopilot runs saw none. Whether a player ever notices it is unknown.
 - The objective-marker bot got through four asks in four of five runs and two in the other.
 
-- The 3D cutscenes and the North Coast (Nov 18) were stepped by script only (`sprouts_coast.js`, 38 checks). Not played by hand, not seen on a phone, no sound listened to. Frame time on a real phone is unknown.
+- The 3D cutscenes and the North Coast (Nov 18) were stepped by script only (`sprouts_coast.js`, 41 checks). Not played by hand, not seen on a phone, no sound listened to. Frame time on a real phone is unknown.
 - There is no way to watch a 3D scene again after it has played.
 
 **Waiting on Will (canon these updates assumed)**

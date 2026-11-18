@@ -23,7 +23,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
 
   /* ---- the scenes themselves ---- */
   const keys = JSON.parse(await E('JSON.stringify(Object.keys(C3SCN))'));
-  ok('five 3D scenes', keys.join() === 'dawn,blaze,call,coast,relight', keys);
+  ok('six 3D scenes', keys.join() === 'van,dawn,blaze,call,coast,relight', keys);
   const long = JSON.parse(await E(`JSON.stringify(Object.entries(C3SCN).flatMap(([k,S])=>S.map((s,i)=>[k,i,wrapPx(s.cap[1],228).length])).filter(q=>q[2]>3))`));
   ok('every caption fits its three lines', long.length === 0, long);
   await E(`init();live=true;void 0`);
@@ -51,6 +51,14 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await E(`c3Play('dawn');void 0`); await step(30 * 30);
   ok('left alone, a scene plays itself to the end', (await E('state')) === 'play', await E('state'));
   await E(`c3Play('dawn');void 0`); await tap('start'); ok('START skips a scene', (await E('state')) === 'play');
+
+  /* ---- meeting Marcus: the van ---- */
+  await E(`init();live=true;state='play';dayT=30;ZONES.forEach(z=>run.seen[z[0]]=1);void 0`); await tp(17, 24, 0, -1); await E(`buds.forEach(b=>b.st='idle');void 0`); await step(4); await tap('a');
+  ok('talking to Marcus the first time cuts to the van in 3D', await E(`state==='c3'&&c3q.key==='van'`), await E('state'));
+  await tap('start'); await step(2);
+  ok('then he gives his first ask, without saying the idea twice', await E(`state==='talk'&&dlg.name==='MARCUS'&&npcs[3].st==='active'&&!/lazy river/i.test(dlg.pages.flat().join(' '))&&/Dew/.test(dlg.pages.flat().join(' '))`), await E('state'));
+  for (let i = 0; i < 12 && (await E('state')) === 'talk'; i++) await tap('a');
+  await step(4); await tap('a'); ok('the second talk is an ordinary one', (await E('state')) === 'talk', await E('state')); for (let i = 0; i < 12 && (await E('state')) === 'talk'; i++) await tap('a');
 
   /* ---- before the call ---- */
   await E(`init();live=true;state='play';ZONES.forEach(z=>{if(z[0]!=='NORTH COAST')run.seen[z[0]]=1});run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1};run.tips={br:1,ne:1,dg:1,wb:1,wn:1,fl:1};found=found.map(()=>true);

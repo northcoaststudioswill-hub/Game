@@ -3,6 +3,32 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: meeting Marcus, in 3D (Nov 18 2026)
+
+Will: when you meet Marcus for the first time it should cut to a 3D cutscene of you and Louie walking up to him and
+Derek in his van ripping dabs, and then he tells Will about his business idea.
+
+![The van](playtest/sprouts-3d-van.png)
+
+- **A sixth 3D scene, `van`, six shots.** Pressing A on Marcus the first time cuts to it: Will and Louie walk down
+  from the Lantern to the Dew Pond, where the Flow Pros van is parked with the side door open. Derek takes the hit
+  and the cloud rolls out. Marcus spots Will, hops down, and pitches the lazy river and the waterslide off the
+  Lantern. Derek is in ("I drive the van. That's my whole part."). Louie sneezes.
+- Then the ordinary talk opens with a new short line and his first ask (find a Dew), so the idea is not told twice.
+  Skipping the scene with Start lands in the same place. It plays once per save; a save that has already met Marcus
+  never sees it.
+- New models: the van (blue stripe, ladder rack, copper pipe), Derek (blue cap, red shirt, beard, from his Sproutwild
+  colours), people who can sit, a rig, and see-through puffs of cloud. The 3D valley now has the Dew Pond.
+- Derek has a name tag colour in scenes. He is only in this scene; he does not stand in the valley afterwards.
+
+**Tested:** three new checks in `tests/sprouts_coast.js` (41 in all, pass): the first talk cuts to the scene, the talk
+that follows gives the Dew ask without the lazy-river line, the second talk is ordinary. All six shots drawn and looked
+at. `sprouts_valley.js`, `sprouts_story.js`, `sprouts_soak.js` pass. **Not tested:** by hand, or on a phone.
+
+**For Will:** Sprouts is the prequel, so this puts Derek and the Flow Pros van in the valley before the Night of the
+Clank. The story notes say Marcus was on a Flow Pros job with Derek when he was called, which fits, but it is yours to
+confirm.
+
 ## Sprouts: cutscenes in 3D, and the North Coast (Nov 18 2026)
 
 Will: develop Sprouts more. Lore wise, how do we introduce the next area? Actual cutscenes, 3D rendered occasionally,

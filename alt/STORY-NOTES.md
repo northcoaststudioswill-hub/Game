@@ -2,6 +2,14 @@
 
 Kept next to the game so the code and the story stay in step. Newest first. These are Will's decisions; anything marked OPEN is still his to decide.
 
+## Nov 18: meeting Marcus (Will)
+
+- The first time Will meets Marcus it cuts to a 3D scene: Will and Louie walk up to Marcus and **Derek in the van,
+  ripping dabs**, and Marcus tells Will his business idea.
+- In the game: the `van` scene. The lines are Claude's; the setup is Will's.
+- OPEN: this puts Derek and the Flow Pros van in the Sprouts valley, before Sproutwild. Assumed fine (Marcus was on a
+  Flow Pros job with Derek when the three were called).
+
 ## Nov 18: the North Coast and the second light (PROPOSED by Claude, not yet Will's)
 
 Will asked how, lore wise, to introduce the next area in Sprouts. This is what was built. None of it is decided; every

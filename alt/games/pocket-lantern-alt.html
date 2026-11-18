@@ -3983,8 +3983,8 @@ function zoneTick(dt){if(zoneT>0)zoneT-=dt;const tx=P.x>>4,ty=P.y>>4;for(const z
 
 /* ---------- talking ---------- */
 function wakeGrubs(){if(run.grubs)return;run.grubs=true;respawn();}
-function talk(n){const L=[],M=n.ms,offer=m=>{L.push(m.say);if(m.wake)wakeGrubs();if(m.garden)openGarden(true)};
- if(n.st==='new'){L.push(n.intro);offer(M[0]);n.st='active';}
+function talk(n,met){if(n.name==='MARCUS'&&n.st==='new'&&!met&&!inHome){c3Play('van',()=>talk(n,1));return}const L=[],M=n.ms,offer=m=>{L.push(m.say);if(m.wake)wakeGrubs();if(m.garden)openGarden(true)};
+ if(n.st==='new'){L.push(met?"So. Marcus Waterworks. You're in, bro. I already told Derek you're in.":n.intro);offer(M[0]);n.st='active';}
  else if(n.st==='active'){const m=M[n.mi],v=m.get();
   if(v>=m.goal){meta.life.missions++;if(m.tk)meta.tix++;earn(m.rw);L.push(n.name==='MARCUS'?["AYYY! See one, send one! That's my guy. Bring it in, bro.","BROOO. Told you. Never doubted you once. Dap me up.","LET'S GOOO! Waterworks is officially happening. Come here, bro."][n.mi%3]+' *DAP* Here, take '+m.rw+' petals'+(m.tk?' and a capsule ticket.':'.'):['Nicely done','You did it','Perfect','Lovely work'][n.mi%4]+(n.name==='ERIN'?', Will':'')+'! Here, take '+m.rw+' petals'+(m.tk?' and a capsule ticket.':'.'));if(n.name==='MARCUS')dap(n);n.mi++;snd(660,.08);later(()=>snd(990,.2),90);
    if(n.mi<M.length)offer(M[n.mi]);else{n.st='done';L.push(n.bye)}checkAch();}
@@ -4847,7 +4847,7 @@ function drawPreview(x,y,w,h){r('#181020',x,y,w,h);g.save();g.beginPath();g.rect
  g.translate(x,y);g.scale(2,2);g.drawImage(SP.pd,5,4);const sx=ox,sy=oy;ox=oy=0;
  drawBud({x:w/2-10,y:17,type:(time|0)%NT,stage:2,z:0,mv:false,fx:-1,st:'follow',a:(time|0),hat:(look||meta.eq).hat});drawDog({x:w/4,y:h/2-5,fx:-1,mv:((time/2)|0)%2===0,st:'follow',alert:0});ox=sx;oy=sy;g.restore();
  const tr=STY.trail[(look||meta.eq).trail];if(tr[1]){for(let i=0;i<4;i++){const px=x+10+i*13,py=y+h-6-((time*20+i*9)%14);r(tr[1],px,py,3,3)}}}
-const WHO={ERIN:'#c8a8f8',RANGER:'#f8a070',MARCUS:'#78c8f8',THORNBACK:'#f07878',LOUIE:'#e89040'};
+const WHO={DEREK:'#5a9af0',ERIN:'#c8a8f8',RANGER:'#f8a070',MARCUS:'#78c8f8',THORNBACK:'#f07878',LOUIE:'#e89040'};
 const SCN={
  open:[["Hi, Will! I'm Erin. I look after the lantern and the garden. This is Louie. He looks after snacks.",'erin','ERIN'],
   ["You're the new keeper. These little ones are sprouts. They grow in the lantern's soil and follow whoever plucks them.",'sprouts','ERIN'],
@@ -5358,6 +5358,7 @@ function c3ValH(x,z){const r=Math.hypot(x,z*1.1),hill=c3Sm(15,30,r)*(1-c3Sm(25,3
  if(x>32)h+=c3Sm(32,38,x)*(.3+c3Nz(x*1.1,z*1.1)*.22); /* dunes */
  const d=c3RivD(x,z);h*=c3Sm(1.2,7,d);if(d<2.2)h=Math.min(h,-.75*(1-d/2.2)+.02);
  h=c3Lp(h,-1.1,c3Sm(45,50,x));
+ {const dp=Math.hypot(x+14,z-6);if(dp<5)h=Math.min(h,.1-.8*(1-(dp/5)*(dp/5)))} /* the Dew Pond */
  const dl=Math.hypot(x-C3TW[0],z-C3TW[1]);if(dl<4.6)h=Math.max(h,1.25*(1-(dl/4.6)*(dl/4.6))-.3);
  return h}
 let C3VAL=null,C3TREES=[],C3GR=null;const C3GX=-36,C3GZ=-40,C3GC=2,C3GW=53,C3GH=36;
@@ -5376,13 +5377,13 @@ function c3BuildValley(){const M=c3M=c3New(),X0=C3GX,X1=68,Z0=C3GZ,Z1=30,cs=C3GC
  strip(-15,0,C3DR[0]-.5,C3DR[1]*.9,.8,'#d8b878');strip(0,-14,0,-1.6,.8,'#d8b878');strip(0,1.6,0,15,.8,'#d8b878');
  c3Box(-2.6,.02,2.2,2.6,.16,4.6,'#6e4428','#8a5a3a');
  /* trees: thick on the hills, a few in the bowl, none on the paths, the river or the sand */
- C3TREES=[];for(let k=0;k<420&&C3TREES.length<150;k++){const x=X0+2+c3Hs(k,1,21)*(X1-X0-4),z=Z0+2+c3Hs(k,2,22)*(Z1-Z0-4),r=Math.hypot(x,z);if(r<7.5||x>35||c3RivD(x,z)<3.4||(Math.abs(z)<1.8&&x>-16&&x<22)||(Math.abs(x)<1.8&&Math.abs(z)<16)||Math.hypot(x-C3DR[0],z-C3DR[1])<4)continue;
+ C3TREES=[];for(let k=0;k<420&&C3TREES.length<150;k++){const x=X0+2+c3Hs(k,1,21)*(X1-X0-4),z=Z0+2+c3Hs(k,2,22)*(Z1-Z0-4),r=Math.hypot(x,z);if(r<7.5||x>35||c3RivD(x,z)<3.4||(Math.abs(z)<1.8&&x>-16&&x<22)||(Math.abs(x)<1.8&&Math.abs(z)<16)||Math.hypot(x-C3DR[0],z-C3DR[1])<4||Math.hypot(x+11,z-5)<8)continue;
   if(r<15&&c3Hs(k,3,23)>.22)continue;const h=2.6+c3Hs(k,4,24)*2.2;C3TREES.push([x,z,h]);c3Tree(x,z,h,k)}
  /* rocks on the lighthouse island and along the river */
  for(let k=0;k<26;k++){const a=c3Hs(k,5,31)*6.28,rr=1.5+c3Hs(k,6,32)*2.6,x=k<12?C3TW[0]+Math.cos(a)*rr:C3RIV[1+k%3][0]+(c3Hs(k,7,33)-.5)*9,z=k<12?C3TW[1]+Math.sin(a)*rr:C3RIV[1+k%3][1]+(c3Hs(k,8,34)-.5)*5,s=.25+c3Hs(k,9,35)*.4;c3Push();c3T(x,c3G(x,z)+s*.3,z);c3RY(a);c3Ball(s*1.3,s,s,'#484058','#8088a0',5,3);c3Pop()}
  C3VAL={p:new Float32Array(M.p),n:new Float32Array(M.n),c:new Float32Array(M.c),e:new Float32Array(M.e),t:M.t};c3M=c3New();return C3VAL}
 /* the river and the lake: one sheet of water whose colour shifts corner by corner */
-function c3Water(t,night){const cs=6,X0=-6,X1=74,Z0=-42,Z1=30,nx=Math.ceil((X1-X0)/cs),nz=Math.ceil((Z1-Z0)/cs),I=[],a=c3C(night?'#12244e':'#2c74cc'),b=c3C(night?'#28488a':'#78b8f8');
+function c3Water(t,night){const cs=6,X0=-24,X1=74,Z0=-42,Z1=30,nx=Math.ceil((X1-X0)/cs),nz=Math.ceil((Z1-Z0)/cs),I=[],a=c3C(night?'#12244e':'#2c74cc'),b=c3C(night?'#28488a':'#78b8f8');
  for(let j=0;j<=nz;j++){const row=[];for(let i=0;i<=nx;i++){const x=X0+i*cs,z=Z0+j*cs,k=.5+.5*Math.sin(t*1.3+x*.9+z*1.7)*Math.sin(t*.8+z*.6-x*.4);row.push(c3V(x,C3WL+Math.sin(t*1.1+x+z)*.02,z,0,1,0,[a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k,a[2]+(b[2]-a[2])*k],.25))}I.push(row)}
  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++)c3Q(I[j][i],I[j+1][i],I[j+1][i+1],I[j][i+1],2,.82)}
 
@@ -5390,18 +5391,18 @@ function c3Water(t,night){const cs=6,X0=-6,X1=74,Z0=-42,Z1=30,nx=Math.ceil((X1-X
 const C3K=[40,32,56];
 function c3Shadow(x,y,z,rad){c3Disc(x,y+.04,z,rad,[0,0,0],.3)}
 /* a person: big head, small body, the way the sprites are. o: cap, capL, coat, coatL, kind, walk, up, arm */
-function c3Person(x,z,ang,o){const y=o.y!==undefined?o.y:c3G(x,z),wk=o.walk?1:0,sw=Math.sin((o.walk||0)*9)*.6*wk,bob=Math.abs(Math.sin((o.walk||0)*9))*.05*wk,sk=c3C('#f8dcb0'),bt='#583828';
- c3Shadow(x,y,z,.44);c3Push();c3T(x,y+bob,z);c3RY(ang);
- for(const s of[-1,1]){c3Push();c3T(s*.13,.36,0);c3RX(s*sw);c3Box(-.1,-.36,-.11,.1,0,.13,bt,o.coat);c3Pop()}
+function c3Person(x,z,ang,o){const y=o.y!==undefined?o.y:c3G(x,z),wk=o.walk?1:0,sw=Math.sin((o.walk||0)*9)*.6*wk,bob=Math.abs(Math.sin((o.walk||0)*9))*.05*wk,sk=c3C(o.skin||'#f8dcb0'),bt='#583828';
+ if(!o.sit)c3Shadow(x,y,z,.44);c3Push();c3T(x,y+bob,z);c3RY(ang);
+ for(const s of[-1,1]){c3Push();c3T(s*.13,.36,0);c3RX(o.sit?-1.25+s*.08:s*sw);c3Box(-.1,-.36,-.11,.1,0,.13,bt,o.legs||o.coat);c3Pop()}
  if(o.kind==='erin')c3Cyl(6,.36,.2,.24,.84,o.coat,o.coatL);else c3Cyl(6,.27,.21,.3,.84,o.coat,o.coatL);
- for(const s of[-1,1]){c3Push();c3T(s*.3,.78,0);c3RZ(s*.2);c3RX(-s*sw+(o.arm&&s>0?-o.arm:0));c3Box(-.07,-.4,-.07,.07,0,.07,o.coat,o.coatL);c3Box(-.065,-.5,-.065,.065,-.4,.065,sk);c3Pop()}
+ for(const s of[-1,1]){c3Push();c3T(s*.3,.78,0);c3RZ(s*.2);c3RX(-s*sw+(o.arm&&s>0?-o.arm:0)+(o.arms?-o.arms:0));c3Box(-.07,-.4,-.07,.07,0,.07,o.coat,o.coatL);c3Box(-.065,-.5,-.065,.065,-.4,.065,sk);c3Pop()}
  c3T(0,1.12,0);c3RX(-(o.up||0));c3Ball(.3,.28,.29,c3Mix(sk,'#d8a880',.5),sk,8,5);
  c3Box(-.17,-.04,.255,-.09,.07,.295,C3K);c3Box(.09,-.04,.255,.17,.07,.295,C3K);
  if(o.kind==='erin'){c3Ball(.33,.3,.32,o.cap,o.capL,8,3,0,.52,1);c3Push();c3T(0,-.04,-.14);c3Ball(.32,.34,.24,o.cap,o.capL,7,4);c3Pop();c3Box(-.33,-.2,-.1,-.25,.12,.14,o.cap);c3Box(.25,-.2,-.1,.33,.12,.14,o.cap)}
  else{c3Ball(.325,.3,.315,o.cap,o.capL,8,3,0,.5,1);c3Box(-.24,.02,.18,.24,.07,.5,o.cap,o.capL);if(o.kind==='marcus'){c3Box(-.2,-.24,.16,.2,-.1,.3,'#704828');c3Box(-.26,-.22,-.05,-.19,-.02,.26,'#704828');c3Box(.19,-.22,-.05,.26,-.02,.26,'#704828')}else c3Box(-.3,-.12,-.26,.3,.04,-.1,'#583828')}
  c3Pop()}
 const c3Look=()=>{const c=STY.cap[meta.eq.cap],t=STY.coat[meta.eq.coat];return{cap:c[1],capL:c[2],coat:t[1],coatL:t[2],kind:'will'}};
-const C3ERIN={cap:'#b84828',capL:'#e87848',coat:'#9070d0',coatL:'#c0a8f0',kind:'erin'},C3MARC={cap:'#284878',capL:'#5080b8',coat:'#e88020',coatL:'#f8c060',kind:'marcus'};
+const C3ERIN={cap:'#b84828',capL:'#e87848',coat:'#9070d0',coatL:'#c0a8f0',kind:'erin'},C3MARC={cap:'#284878',capL:'#5080b8',coat:'#e88020',coatL:'#f8c060',kind:'marcus'},C3DEREK={cap:'#1c4a98',capL:'#2a6ad0',coat:'#7a2a20',coatL:'#a03a2e',legs:'#3c4a66',skin:'#e8b088',kind:'marcus'};
 /* a sprout: a round body in its own colours, two eyes, a stem with a leaf, a bud or a flower */
 function c3Sprout(x,z,type,o){o=o||{};const T=TYPES[type%TYPES.length],y=(o.y!==undefined?o.y:c3G(x,z))+(o.hop||0),st=o.stage===undefined?2:o.stage;
  if(!o.noSh)c3Shadow(x,y-(o.hop||0),z,.2);c3Push();c3T(x,y,z);c3RY(o.ang||0);if(o.s)c3S(o.s,o.s,o.s);
@@ -5478,6 +5479,24 @@ function c3Bessie(x,z,ang,rise,t){c3Push();c3T(x,C3WL,z);c3RY(ang);const D='#143
  if(rise>0){let px=0,py=-.5,pz=0,a=1.25;for(let k=0;k<7;k++){const r=.42-k*.035,len=.62*rise;c3Push();c3T(px,py,pz);c3RX(1.5708-a);c3Cyl(6,r,r-.035,0,len+.05,D,L2);c3Pop();py+=Math.sin(a)*len;pz+=Math.cos(a)*len;a+=(k<3?.06:-.3)}
   c3T(px,py+.1,pz+.2);c3RX(.25-rise*.5);c3Ball(.42,.34,.6,D,L2,7,4);c3Box(-.33,.06,.2,-.25,.18,.34,'#f8f0a0','#f8f0a0',.9);c3Box(.25,.06,.2,.33,.18,.34,'#f8f0a0','#f8f0a0',.9);}
  c3Pop()}
+/* a puff of cloud: see-through, soft */
+function c3Puff(x,y,z,rad,al){c3Push();c3T(x,y,z);c3Ball(rad,rad*.8,rad,[214,222,230],[255,255,255],6,3,.55,0,1,2,al);c3Pop()}
+/* the Flow Pros van, side door open toward local +z. who: draw Marcus and Derek sitting in the door (1 both, 2 Derek only).
+   rip 0 to 1: how big the cloud is */
+const C3VAN=[-8.5,6.2,2.55];
+function c3Van(who,rip,t,o){o=o||{};const x=C3VAN[0],z=C3VAN[1],y=c3G(x,z),W1='#c8ccd8',W2='#f4f6fa',K='#181420';c3Shadow(x,y,z,2.3);c3Push();c3T(x,y,z);c3RY(C3VAN[2]);
+ c3Box(-2,.45,-.9,1.1,2.1,.9,W1,W2);c3Box(1.1,.45,-.86,2,1.3,.86,W1,W2);c3Box(1.1,1.3,-.82,1.55,2,.82,'#5888b8','#a8d0f0');c3Box(1.98,.8,-.7,2.03,1,.7,'#f8e060','#fff8a0',.6);c3Box(1.95,.45,-.9,2.06,.62,.9,'#383048');
+ for(const s of[-1,1]){c3Box(-2.01,1,s*.9-.012,1.11,1.22,s*.9+.012,'#1c4a98','#2a6ad0');c3Box(1.2,1.38,s*.86-.01,1.5,1.9,s*.86+.01,'#5888b8','#a8d0f0')}
+ c3Box(-1.25,.55,.5,.25,1.95,.915,K,'#241c30');c3Box(-1.25,.5,.9,.25,.58,1.12,'#383048','#686078');c3Box(-2.35,.55,.92,-1.25,1.95,.99,W1,W2);c3Box(-2.3,1,.99,-1.3,1.22,1.0,'#1c4a98','#2a6ad0');
+ for(const wx of[-1.35,1.25])for(const s of[-1,1]){c3Push();c3T(wx,.42,s*.82);c3RX(s*1.5708);c3Cyl(8,.42,.42,-.1,.14,K,'#383048',0,1);c3Cyl(6,.2,.2,.14,.16,'#888098','#b0a8c0',0,1);c3Pop()}
+ c3Box(-1.8,2.1,-.55,.9,2.2,-.4,'#a87040','#c89050');c3Box(-1.8,2.1,.1,.9,2.2,.25,'#a87040','#c89050');for(let k=0;k<5;k++)c3Box(-1.7+k*.62,2.1,-.55,-1.62+k*.62,2.17,.25,'#a87040');c3Box(-1.9,2.2,-.3,1,2.34,-.14,'#b86838','#e89860');
+ if(who){const hit=o.hit||0;if(who===1)c3Person(-.12,.72,o.mturn||0,Object.assign({},C3MARC,{y:.3,sit:1,arm:o.marm||0,up:.05}));
+  c3Person(-.88,.72,.15,Object.assign({},C3DEREK,{y:.3,sit:1,arms:1.1+hit*.5,up:-.1+hit*.25}));
+  c3Push();c3T(-.86,1.02+hit*.12,1.08);c3Cyl(6,.09,.06,0,.12,'#70c8b0','#c0fff0',.5,1);c3Cyl(6,.035,.035,.12,.36,'#a8e8d8','#e8fff8',.5,1);c3Pop();if(hit>.2&&hit<.95)c3Glow(-.74,1.1,1.14,.22,'#ff9040',.8)}
+ c3Pop();
+ if(rip>0){const n=[Math.sin(C3VAN[2]),Math.cos(C3VAN[2])],ax=[Math.cos(C3VAN[2]),-Math.sin(C3VAN[2])];for(let k=0;k<9;k++){const q=(t*.22+k*.111)%1,r0=(.35+q*1.3)*rip,sx=-.6+Math.sin(k*2.4)*.7;
+   c3Puff(x+ax[0]*sx+n[0]*(1+q*1.6)+Math.sin(t+k)*.2,y+1.3+q*2.6,z+ax[1]*sx+n[1]*(1+q*1.6)+Math.cos(t*.8+k)*.2,r0,.42*(1-q)*Math.min(1,rip))}}}
+const c3VanAt=(side,along,h)=>{const a=C3VAN[2];return[C3VAN[0]+Math.sin(a)*side+Math.cos(a)*along,h,C3VAN[1]+Math.cos(a)*side-Math.sin(a)*along]};
 /* a far mountain, north of everything. hum: a cold light at its foot */
 function c3Peak(hum,t){c3Push();c3T(-8,0,-74);c3Cyl(7,24,6.5,0,34,'#0c1024','#2c3466',.55,1,.3);c3Cyl(7,6.5,0,34,46,'#5860a0','#c8d0f0',.6,1,.3);c3T(15,0,6);c3Cyl(6,15,0,0,22,'#0c1024','#20284c',.55,1);c3Pop();if(hum>0){c3Glow(-8,27,-62,7+Math.sin(t*9)*.8,'#60c8ff',.45*hum);c3Glow(-8,27,-62,2.4,'#d0f0ff',.7*hum)}}
 
@@ -5497,6 +5516,20 @@ function c3BeamTo(x,y,z,k,w){c3Beam(C3LT[0],C3LT[1],C3LT[2],x,y,z,.28,w||1.5,'#f
 const c3Dir=(a,len,up)=>[C3LT[0]+Math.cos(a)*len,C3LT[1]+(up||0),C3LT[2]+Math.sin(a)*len];
 const C3A_LAKE=Math.atan2(C3TW[1],C3TW[0]),C3A_DOOR=Math.atan2(C3DR[1],C3DR[0]);
 const C3SCN={
+ /* the first time Will meets Marcus: the Flow Pros van by the Dew Pond */
+ van:[
+  {d:6.5,cap:['',"By the Dew Pond sits a van. FLOW PROS. The windows are fogged from the inside."],f(t,u){c3Env('day');c3Cam(1.5-u*1.5,2.6,-5.5+u*1.5,-8,1.2,5.5,56);c3Lantern(.4,0,{force:1});c3Van(0,.55,t);
+    const x=-.5-u*4.6,z=-.2+u*2.2;c3Person(x,z,-1.15,Object.assign(c3Look(),{walk:t}));c3Dog(x+.2,z-1.1,-1.15,{walk:t})}},
+  {d:6.5,cap:['DEREK',"*kkhhh* ...Hoo. Okay. That's the one, Marcus."],f(t,u){const hit=c3Sm(.4,1.8,t)*(1-c3Sm(2.4,3,t)),rip=c3Sm(2.3,3.4,t);c3Env('day');const e=c3VanAt(4.4-u*.5,-.9,1.5),g2=c3VanAt(0,-.6,1.25);c3Cam(e[0],e[1],e[2],g2[0],g2[1],g2[2],52);
+    c3Van(1,.25+rip*1.1,t,{hit});c3Cue('rp',()=>{later(()=>noise(1.3,.12,1800,'bandpass'),500);later(()=>{noise(.12,.3,900);later(()=>noise(.1,.25,800),160);later(()=>noise(.14,.3,1000),330)},2400)})}},
+  {d:6.5,cap:['MARCUS',"Bro. BRO. Will! Perfect timing. Derek. Derek. It's Will."],f(t,u){c3Env('day');const e=c3VanAt(6.4,2.6,1.9),g2=c3VanAt(.6,-.3,1.2),w=c3VanAt(3.1+Math.max(0,1-t)*1.5,.5,0),l=c3VanAt(3.4+Math.max(0,1-t)*1.5,1.5,0);c3Cam(e[0],e[1],e[2],g2[0],g2[1],g2[2],54);
+    c3Van(1,.7,t,{marm:2.3+Math.sin(t*9)*.3,mturn:-.2});c3Person(w[0],w[2],C3VAN[2]+Math.PI,Object.assign(c3Look(),{walk:t<1?t:0}));c3Dog(l[0],l[2],C3VAN[2]+Math.PI,{walk:t<1?t:0,sit:t>=1.4});c3Cue('dp',()=>later(()=>{snd(330,.06);later(()=>snd(440,.08),80)},300))}},
+  {d:7,cap:['MARCUS',"Business idea. A lazy river. Around the WHOLE valley. Dews as lifeguards."],f(t,u){c3Env('day');const m=c3VanAt(2.2,.2,0),w=c3VanAt(4.2,2.2,0),l=c3VanAt(3.3,2.6,0),e=c3VanAt(5.3,-.5,1.2);c3Cam(e[0]+u*.3,e[1],e[2],m[0],1.05,m[2],50);
+    c3Van(2,.6,t);c3Person(m[0],m[2],C3VAN[2]+.25,Object.assign({},C3MARC,{arm:2.6+Math.sin(t*5)*.3,arms:Math.max(0,Math.sin(t*2.5))*1.2}));c3Person(w[0],w[2],C3VAN[2]+Math.PI+.4,c3Look());c3Dog(l[0],l[2],C3VAN[2]+Math.PI+.2,{sit:1})}},
+  {d:7,cap:['MARCUS',"Waterslide off the Lantern. Marcus Waterworks, bro. Derek's in. Derek?"],f(t,u){c3Env('day');c3Cam(-9.4+u*.4,2.4,4.9,0,2.1,0,52);c3Lantern(.4,0,{force:1});c3House(6.2,-5.4,-.5,0);
+    c3Van(2,.6,t);c3Person(-5.6,2.6,2.05,Object.assign({},C3MARC,{arm:2.2+Math.sin(t*4)*.15}));c3Person(-5.3,4.2,2.05,Object.assign(c3Look(),{up:.2}));c3Dog(-4.2,4.6,2.05,{sit:1,up:.2})}},
+  {d:6.5,cap:['DEREK',"I'm in. I drive the van. That's my whole part."],f(t,u){const hit=c3Sm(3,4.2,t);c3Env('day');const e=c3VanAt(3.6,-1.2,1.35),g2=c3VanAt(0,-.85,1.3),l=c3VanAt(1.9,-1.9,0);c3Cam(e[0],e[1],e[2],g2[0],g2[1],g2[2],46);
+    c3Van(2,.5+hit*.8,t,{hit});c3Dog(l[0],l[2],C3VAN[2]+2.4,{sit:1,up:t>4.6&&t<5?-.3:.15});c3Cue('ac',()=>later(()=>{noise(.1,.3,3000);spSay('ACHOO!',2)},4600))}}],
  /* a new game: the Lantern whole, the crack, the morning after */
  dawn:[
   {d:7,cap:['',"For as long as anyone can remember, the Great Lantern has kept this valley warm and bright."],f(t,u){const a=.9+u*.8;c3Cam(Math.cos(a)*11,3.4+u*1.2,Math.sin(a)*11,0,2.5,0,58);c3Night(t,1,{alone:1});c3Ring(t,8)}},

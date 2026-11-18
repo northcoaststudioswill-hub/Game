@@ -471,8 +471,8 @@ function zoneTick(dt){if(zoneT>0)zoneT-=dt;const tx=P.x>>4,ty=P.y>>4;for(const z
 
 /* ---------- talking ---------- */
 function wakeGrubs(){if(run.grubs)return;run.grubs=true;respawn();}
-function talk(n){const L=[],M=n.ms,offer=m=>{L.push(m.say);if(m.wake)wakeGrubs();if(m.garden)openGarden(true)};
- if(n.st==='new'){L.push(n.intro);offer(M[0]);n.st='active';}
+function talk(n,met){if(n.name==='MARCUS'&&n.st==='new'&&!met&&!inHome){c3Play('van',()=>talk(n,1));return}const L=[],M=n.ms,offer=m=>{L.push(m.say);if(m.wake)wakeGrubs();if(m.garden)openGarden(true)};
+ if(n.st==='new'){L.push(met?"So. Marcus Waterworks. You're in, bro. I already told Derek you're in.":n.intro);offer(M[0]);n.st='active';}
  else if(n.st==='active'){const m=M[n.mi],v=m.get();
   if(v>=m.goal){meta.life.missions++;if(m.tk)meta.tix++;earn(m.rw);L.push(n.name==='MARCUS'?["AYYY! See one, send one! That's my guy. Bring it in, bro.","BROOO. Told you. Never doubted you once. Dap me up.","LET'S GOOO! Waterworks is officially happening. Come here, bro."][n.mi%3]+' *DAP* Here, take '+m.rw+' petals'+(m.tk?' and a capsule ticket.':'.'):['Nicely done','You did it','Perfect','Lovely work'][n.mi%4]+(n.name==='ERIN'?', Will':'')+'! Here, take '+m.rw+' petals'+(m.tk?' and a capsule ticket.':'.'));if(n.name==='MARCUS')dap(n);n.mi++;snd(660,.08);later(()=>snd(990,.2),90);
    if(n.mi<M.length)offer(M[n.mi]);else{n.st='done';L.push(n.bye)}checkAch();}
@@ -1335,7 +1335,7 @@ function drawPreview(x,y,w,h){r('#181020',x,y,w,h);g.save();g.beginPath();g.rect
  g.translate(x,y);g.scale(2,2);g.drawImage(SP.pd,5,4);const sx=ox,sy=oy;ox=oy=0;
  drawBud({x:w/2-10,y:17,type:(time|0)%NT,stage:2,z:0,mv:false,fx:-1,st:'follow',a:(time|0),hat:(look||meta.eq).hat});drawDog({x:w/4,y:h/2-5,fx:-1,mv:((time/2)|0)%2===0,st:'follow',alert:0});ox=sx;oy=sy;g.restore();
  const tr=STY.trail[(look||meta.eq).trail];if(tr[1]){for(let i=0;i<4;i++){const px=x+10+i*13,py=y+h-6-((time*20+i*9)%14);r(tr[1],px,py,3,3)}}}
-const WHO={ERIN:'#c8a8f8',RANGER:'#f8a070',MARCUS:'#78c8f8',THORNBACK:'#f07878',LOUIE:'#e89040'};
+const WHO={DEREK:'#5a9af0',ERIN:'#c8a8f8',RANGER:'#f8a070',MARCUS:'#78c8f8',THORNBACK:'#f07878',LOUIE:'#e89040'};
 const SCN={
  open:[["Hi, Will! I'm Erin. I look after the lantern and the garden. This is Louie. He looks after snacks.",'erin','ERIN'],
   ["You're the new keeper. These little ones are sprouts. They grow in the lantern's soil and follow whoever plucks them.",'sprouts','ERIN'],
