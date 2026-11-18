@@ -232,3 +232,12 @@ The renderer caps resolution at 1.5x, redraws the shadow map every other frame, 
 - **Once between bouts:** sleep in the bed (+4% to +15% XP next bout, by comfort), train on the dummy (+10 weapon mastery), cook on the stove (+6% health next bout). The cauldron gives a free potion every second bout.
 - **Always on:** desk and map table each add +1 to Tally rolls; the trophy case adds +2% respect per named fighter beaten; the Hourglass Shrine takes a quarter off buying back a soul.
 - **Regulars.** The Apothecary and Big Hobb count your purchases: 3 for 10% off, 8 for 20% off, 15 for a free one after every bout.
+
+## Preparation (`js/prep.js`)
+
+- **The card before a bout** lists what you are walking in with: tonic, meal, song, scouted, rested, set, charm, contract, Second, potions, Borrowed Time. Empty lines name the stall or room that fills them. The controls reminder drops off the card after three bouts.
+- **Whisper** scouts whoever you will actually meet next (undercard, named fighter or challenger). Five purchases and a scouted fighter takes 15% more from you instead of 10%.
+- **The Busker:** five requests and your song starts the crowd hotter.
+- **Wizard gold** also buys Gilded Edge (+4% damage for good, three times) and takes three heat off your name.
+- **If you never die,** David sends for you at Enforcer: a clock starts ticking over the hatch, and he makes his offer in person.
+- The five named fighters hit harder and last longer than their undercards; they are meant to be met prepared.

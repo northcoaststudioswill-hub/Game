@@ -7,7 +7,7 @@
 
   // ------------------------------------------------------------ a longer ladder
   // the named five are stronger now: you reach them with more levels behind you
-  { const LV = [1, 3, 5, 6, 8], HP = [1, 1, 1.05, 1.08, 1.1], DM = [1, 1.1, 1.14, 1.2, 1.24]; GATES.forEach((o, i) => { o.level = LV[i]; o.hpMul = +(o.hpMul * HP[i]).toFixed(2); o.dmgMul = +(o.dmgMul * DM[i]).toFixed(2); o.respect0 = o.respect; o.respect = Math.round(o.respect * 0.55); }); }   // respect is spread over four times as many bouts
+  { const LV = [1, 3, 5, 6, 8], HP = [1.05, 1.08, 1.14, 1.18, 1.24], DM = [1.05, 1.18, 1.26, 1.34, 1.42]; GATES.forEach((o, i) => { o.level = LV[i]; o.hpMul = +(o.hpMul * HP[i]).toFixed(2); o.dmgMul = +(o.dmgMul * DM[i]).toFixed(2); o.respect0 = o.respect; o.respect = Math.round(o.respect * 0.55); }); }   // respect is spread over four times as many bouts
 
   const rng = seed => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   const FIRST = ['Tam', 'Odger', 'Nell', 'Brisk', 'Hob', 'Cray', 'Wenna', 'Stitch', 'Lodd', 'Marnie', 'Pike', 'Sorrel', 'Duff', 'Ketch', 'Jory', 'Mab', 'Crick', 'Tansy', 'Garl', 'Ibb', 'Roon', 'Hesper'];
@@ -30,7 +30,7 @@
   }
   const gateOpen = (st, t) => (t === 0 || !!st.wins[GATES[t - 1].id]) && (U(st)[t] >= NEED[t] || !!st.wins[GATES[t].id]);
   const tierNow = st => GATES.findIndex(o => !st.wins[o.id]);
-  G.climb = { NEED, make, gateOpen, tierNow, left: st => { const t = tierNow(st); return t < 0 ? 0 : Math.max(0, NEED[t] - U(st)[t]); } };
+  G.climb = { NEED, make, gateOpen, tierNow, next: st => { const t = tierNow(st); if (t < 0) { if (G.ensureLedger) G.ensureLedger(); return G.OPPONENTS.find(o => !st.wins[o.id]) || G.OPPONENTS[G.OPPONENTS.length - 1]; } return gateOpen(st, t) ? GATES[t] : make(t, U(st)[t]); }, left: st => { const t = tierNow(st); return t < 0 ? 0 : Math.max(0, NEED[t] - U(st)[t]); } };
 
   const row = (o, cls, body, btn) => '<div class="opp ' + cls + '"><span class="op" data-o="' + o.id + '"></span><div class="opp-tx"><b>' + o.name + '</b> <small>' + o.title + '</small>' + body + '</div>' + btn + '</div>';
   const rew = (o, wins) => '<small class="rew">' + (wins ? Math.round(o.xp * .6) : o.xp) + ' XP · ' + (wins ? Math.round(o.coin * .6) : o.coin) + ' coin · ' + (wins ? Math.round(o.respect * .3) : o.respect) + ' respect</small>';

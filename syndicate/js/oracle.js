@@ -23,6 +23,7 @@
     price: st => 120 + 30 * Math.max(0, (st.soulsPaid || 0))
   };
   const O = G.oracle;
+  O.known = st => (st.deaths || 0) >= 1 || !!st.davidCall;      // he can also send for you, if you insist on staying alive
 
   // what he says when he really gets going
   const HATE = {
@@ -38,7 +39,27 @@
     const st = G.state, h = st.hero, me = h.name, kin = KIN[h.race] || 'your people', n = O.deaths(st);
     const fin = () => { G.save(); then(); };
     if (!G.playScene) return fin();
-    if (n === 1) { const ot = others(h.race), cap = k => KIN[k].charAt(0).toUpperCase() + KIN[k].slice(1); return G.playScene(scene(st, [
+    const ot = others(h.race), cap = k => KIN[k].charAt(0).toUpperCase() + KIN[k].slice(1);
+    const TAIL = [
+      S('npc', NAME, 'Hate? I am ABOVE them. There is me. Then there is a very long drop. And at the bottom there is everybody else, squirming. Hating them is only good manners. Your lot I can tolerate. You, I can use.', 'low'),
+      S('npc', NAME, 'Eleven years the Kingdom of United Realms and Eireania butchered each other, and for eleven years my house turned the clocks back for both of the ungrateful bastards. Unmade their defeats. Sold them the same victory twice. And when they were done, the two crowns signed one clause between them: the hourglass houses go. Out. In a week. Like dogs.', 'npc'),
+      S('npc', NAME, cap(ot[0]) + ' drew it up. ' + cap(ot[1]) + ' witnessed it. ' + cap(ot[2]) + ' carted my gold away, and ' + KIN[ot[3]] + ' held the gate and laughed. I have every name. I am going to hang them from that gate by their own guts, and I am going to stand underneath and applaud.', 'low'),
+      S('npc', NAME, 'I tell the family it is a homeland for our people. And it will be. MINE. The throne, the treasury, the queen’s pretty wings nailed over my fireplace. It is mine by right, because I am better than every living thing in this realm, and I am sick to my back teeth of pretending otherwise.', 'npc'),
+      S('npc', NAME, 'But a throne wants an arse the rabble will stomach, and they will not stomach mine. Not yet. So: you. Nobody, from nowhere, too stupid to stay dead. My vessel. You wear the crown. I wear you.', 'low'),
+      S('npc', NAME, 'Sign. I keep hauling your carcass back, I lend you power you could not earn in ten lifetimes, and you climb until you are sitting exactly where I point. In return you owe me souls. Do not ask how many. More.', 'npc')];
+    const OFFER = { choices: [
+        { label: 'Sign it', go: () => { st.signed = true; G.save(); card('The Contract', 'The pen is warm. The ink is gold. Your name looks very small beside his, which takes up most of the page. “Good dog,” he says, and rubs his hands together, and laughs like a man watching a hanging he paid for.', 'Signed · the Oracle’s cellar is open to you in the market', then); } },
+        { label: 'Not yet', go: () => { G.save(); card('An Open Offer', '“Not yet?” He leans in until you can smell the gold on him. “Take your time, meat. I have all of it. You will be back, and you will be deader, and I will be exactly this pleased.” He rolls the contract up, unsigned.', 'The Oracle’s cellar is open to you in the market', then); } }],
+        done: fin };
+    if (n === 0) { st.davidMet = 1; return G.playScene(scene(st, [
+      S('', '', 'The hatch opens on gold. A great deal of gold, and a man in the middle of it, looking at you the way a butcher looks at a calf.', 'wide'),
+      S('npc', NAME, 'Still alive. How bloody tedious. I had a whole entrance planned around your corpse.', 'npc'),
+      S('you', me, 'Who are you?', 'you'),
+      S('npc', NAME, 'David Roseinbeirg. Oracle of Time. The only thing under this city worth getting on your knees for. I have been watching you not die, and I am sick of waiting for it.', 'low'),
+      S('npc', NAME, 'One of the ' + kin + ', at least. The only breed I can bear in the room. ' + SNEER[ot[0]], 'npc'),
+      S('npc', NAME, HATE[ot[1]], 'low'),
+      S('you', me, 'You hate everyone.', 'you')].concat(TAIL), OFFER)); }
+    if (n === 1 && !st.davidMet) { st.davidMet = 1; return G.playScene(scene(st, [
       S('', '', 'You are dead. You are fairly sure of it. And yet somebody is swearing at you, and everything is gold.', 'wide'),
       S('npc', NAME, 'Up. UP, you sack of offal. I did not drag you back across the clock so you could leak on my floor. That floor is worth more than you, your mother, and the whole stinking level you crawled out of.', 'npc'),
       S('you', me, 'I was dead. Where is this?', 'you'),
@@ -46,17 +67,8 @@
       S('npc', NAME, 'One of the ' + kin + ', at least. Good. The only breed in this realm I can bear to have in the room. The rest I would not scrape off my boot.', 'npc'),
       S('npc', NAME, HATE[ot[0]], 'low'),
       S('npc', NAME, HATE[ot[1]], 'npc'),
-      S('you', me, 'You hate everyone.', 'you'),
-      S('npc', NAME, 'Hate? I am ABOVE them. There is me. Then there is a very long drop. And at the bottom there is everybody else, squirming. Hating them is only good manners. Your lot I can tolerate. You, I can use.', 'low'),
-      S('npc', NAME, 'Eleven years the Kingdom of United Realms and Eireania butchered each other, and for eleven years my house turned the clocks back for both of the ungrateful bastards. Unmade their defeats. Sold them the same victory twice. And when they were done, the two crowns signed one clause between them: the hourglass houses go. Out. In a week. Like dogs.', 'npc'),
-      S('npc', NAME, cap(ot[0]) + ' drew it up. ' + cap(ot[1]) + ' witnessed it. ' + cap(ot[2]) + ' carted my gold away, and ' + KIN[ot[3]] + ' held the gate and laughed. I have every name. I am going to hang them from that gate by their own guts, and I am going to stand underneath and applaud.', 'low'),
-      S('npc', NAME, 'I tell the family it is a homeland for our people. And it will be. MINE. The throne, the treasury, the queen’s pretty wings nailed over my fireplace. It is mine by right, because I am better than every living thing in this realm, and I am sick to my back teeth of pretending otherwise.', 'npc'),
-      S('npc', NAME, 'But a throne wants an arse the rabble will stomach, and they will not stomach mine. Not yet. So: you. Nobody, from nowhere, too stupid to stay dead. My vessel. You wear the crown. I wear you.', 'low'),
-      S('npc', NAME, 'Sign. I keep hauling your carcass back, I lend you power you could not earn in ten lifetimes, and you climb until you are sitting exactly where I point. In return you owe me souls. Do not ask how many. More.', 'npc')],
-      { choices: [
-        { label: 'Sign it', go: () => { st.signed = true; G.save(); card('The Contract', 'The pen is warm. The ink is gold. Your name looks very small beside his, which takes up most of the page. “Good dog,” he says, and rubs his hands together, and laughs like a man watching a hanging he paid for.', 'Signed · the Oracle’s cellar is open to you in the market', then); } },
-        { label: 'Not yet', go: () => { G.save(); card('An Open Offer', '“Not yet?” He leans in until you can smell the gold on him. “Take your time, meat. I have all of it. You will be back, and you will be deader, and I will be exactly this pleased.” He rolls the contract up, unsigned.', 'The Oracle’s cellar is open to you in the market', then); } }],
-        done: fin })); }
+      S('you', me, 'You hate everyone.', 'you')].concat(TAIL), OFFER)); }
+
     if (n === BIND) { st.bound = true; return G.playScene(scene(st, [
       S('npc', NAME, 'Three! Three times dead in the dirt, you clumsy bastard. Up. Oh, I do love a three.', 'npc'),
       S('you', me, 'You are in a good mood.', 'you'),
@@ -146,7 +158,7 @@
     let mt = 10;
     h.update = function (t) {
       up0.apply(this, arguments);
-      const st = G.state, open = !!(st.hero && O.deaths(st) >= 1);
+      const st = G.state, open = !!(st.hero && O.known(st));
       g.visible = open; lt.intensity = open ? 9 + Math.sin(t * 2) * 2 : 0;
       spot.x = open ? X : -99; spot.z = open ? Z + 1.6 : -99;
       hands[0].rotation.z = -t * 0.9; hands[1].rotation.z = t * 0.13;
@@ -156,13 +168,13 @@
       else if (david) david.root.visible = false;
     };
     const blocked0 = h.blocked;
-    h.blocked = (x, z) => blocked0(x, z) || (!!(G.state.hero && O.deaths(G.state) >= 1) && ((x > X - 1.5 && x < X + 1.5 && z > Z - 1.5 && z < Z + 0.9) || (Math.abs(x - (X + 1.7)) < 0.5 && Math.abs(z - (Z - 0.2)) < 0.5)));
+    h.blocked = (x, z) => blocked0(x, z) || (!!(G.state.hero && O.known(G.state)) && ((x > X - 1.5 && x < X + 1.5 && z > Z - 1.5 && z < Z + 0.9) || (Math.abs(x - (X + 1.7)) < 0.5 && Math.abs(z - (Z - 0.2)) < 0.5)));
     return h;
   };
   const or0 = ui.oracle;
   ui.oracle = function () { G.state.cellarSeen = 1; return or0.apply(this, arguments); };
   const obj0 = G.objective;
-  G.objective = function () { const st = G.state, base = obj0.apply(this, arguments); return st.hero && G.scene === 'hub' && O.deaths(st) >= 1 && !st.cellarSeen ? 'A clock is ticking over a hatch on the south side of the market' : base; };
+  G.objective = function () { const st = G.state, base = obj0.apply(this, arguments); return st.hero && G.scene === 'hub' && O.known(st) && !st.cellarSeen ? 'A clock is ticking over a hatch on the south side of the market' : base; };
 
   if (G.LORE) G.LORE.push(
     { sec: 'Faces', title: 'David Roseinbeirg', unlock: st => (st.deaths || 0) >= 1, body: 'He calls himself the Oracle of Time, and the clocks in his cellar do run backwards when he looks at them. A wizard of the Roseinbeirg family: old gold, older grudges, and a great many cousins. He holds himself supreme: above the crowns, above every people in the realm, above his own family, and certainly above you. He says so, often, in language that would get a docker thrown out of a tavern. He wants the realm, he wants it for himself, and he talks about what he will do to everyone in his way with real appetite. Your kind he can tolerate. You he can use. He brought you back from the dead, and he has not yet said everything he wants for it.' },
