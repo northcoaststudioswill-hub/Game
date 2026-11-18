@@ -39,7 +39,7 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   await E(`state='play';exitHome();void 0`); await step(3); ok('the crew is waiting outside', await E(`buds.length>0&&buds.every(b=>b.st==='follow')`));
   await E(`npcs[3].st='done';bp=PJ[0];state='build';void 0`); await tap('a'); ok('Pebs move out to build the Waterworks', (await E('pjS(PJ[0]).got[1]')) > 0, await E('flash'));
   await E(`state='play';endDay();void 0`); await step(2); ok('the evening report shows', (await E('state')) === 'dayend'); await tap('a'); await step(5);
-  ok('morning comes: day 2, home pays out, the buddies are back', await E(`day===2&&state==='play'&&wbuds.length===7&&toasts.some(t=>/^HOME:/.test(t.s))`));
+  ok('morning comes: day 2, home pays out, the buddies are back', await E(`day===2&&state==='play'&&wbuds.length===8&&toasts.some(t=>/^HOME:/.test(t.s))`));
   ok('no page errors', !errs.length, errs);
   console.log(fail ? fail + ' FAILED' : 'ALL PASS'); await browser.close(); process.exit(fail ? 1 : 0);
 })();

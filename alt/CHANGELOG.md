@@ -3,6 +3,33 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: a Bessling, Derek at the shack, and the first shard in 3D (Nov 18 2026)
+
+Will: keep developing Sprouts.
+
+![The marks](playtest/sprouts-3d-marks.png)
+
+- **A tenth 3D scene, `marks` (4 shots):** the first shard coming home. The shard clicks in, the Lantern coughs and
+  brightens, and Ranger shows Will and Erin the gouges by the plinth. It replaces the 2D version of that scene, and it
+  is the first story beat most players reach after the opening. Ranger has a model now (wide hat, red band).
+- **A Bessling on the North Coast.** Sproutwild's "lake monster's pup" keeps to the beach by the tide pool once the
+  coast is open. It behaves like the other wild buddies (wanders, backs away) but stays at the lake at night instead
+  of walking to the Lantern. It is the eighth entry on the guide's BUDDIES page, with a line of its own.
+- **Derek minds the snack shack.** Once Marcus Lakefront has its shack, Derek stands beside it and says a line when
+  Will walks by ("YO. COLD ONE?", "TELL MARCUS NOTHING."). He is in the guide under PEOPLE once Marcus has been met.
+- Removed the 2D claw-marks picture the new scene replaced.
+
+**Bug hunt:** eight random runs of three days each (four mid-game, four late-game through the call, the coast and the
+pier), checking for broken states every second: nothing found.
+
+**Tested:** `tests/sprouts_coast.js` 89 checks (five new: the Bessling shown and hidden, Derek, the marks scene and
+play going on after it; the every-shot checks now cover ten scenes, 46 shots). `sprouts_valley.js` twice,
+`sprouts_story.js` (both updated for eight buddies), soak, Sproutwild lab 124 of 124, Patch & Plate 119 of 119,
+console shelf: all pass. **Not tested:** by hand, or on a phone.
+
+**For Will:** Ranger is one of the placeholder characters; this scene only gives the existing lines a model, it adds
+nothing to the character. The Bessling being on the coast in Sprouts is new (Sproutwild already has the species).
+
 ## Sprouts: more to do on the North Coast, and tidying (Nov 18 2026)
 
 Will: keep working on the game and gameplay and bugs and cleaning up the game and making it better.

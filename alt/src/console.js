@@ -189,7 +189,7 @@ const CHR={
  MARCUS:[['....kkkk....','..kkcccckk..','.kcCCcccccc.','kkkkkkkkkkkk','.kffffffffk.','.kfkffffkfk.','.krrffffrrk.','.krrrrrrrrk.','..kkkkkkkk..','.ksttttttsk.','.kstTttTtsk.','..kttttttk..','..kbbkkbbk..','..kkk..kkk..'],{k:'#282038',c:'#284878',C:'#5080b8',f:'#f8dcb0',r:'#704828',s:'#e8e0d0',t:'#e88020',T:'#f8c060',b:'#583828'}],
  RANGER:[['....kkkk....','...khhhhk...','...khHHhk...','kkkkbbbbkkkk','khhhhhhhhhhk','.kkffffffkk.','.kfkffffkfk.','.kffffffffk.','..kkkkkkkk..','.kttttttttk.','.ktTttttTtk.','..kttttttk..','..kooKKook..','..kkk..kkk..'],{k:'#282038',h:'#c8a060',H:'#e8c888',b:'#c03030',f:'#e8c098',t:'#506838',T:'#88a060',o:'#583828',K:'#282038'}],
  SCOUT:[['....kkkk....','...kcccck...','..kcCCccck..','.kccccccccc.','.kcffffffck.','.kwwkffkwwk.','.kcffffffck.','.kkcffffckk.','..kkkkkkkk..','.kttttttttk.','.ktTttttTtk.','..kttttttk..','..kbbkkbbk..','..kkk..kkk..'],{k:'#282038',c:'#3c8840',C:'#78c870',f:'#f8dcb0',w:'#e0f8ff',t:'#b89858',T:'#e0c888',b:'#583828'}]};
-const CH={};for(const k in CHR)CH[k]=mk(CHR[k][0],CHR[k][1]);
+const CH={};for(const k in CHR)CH[k]=mk(CHR[k][0],CHR[k][1]);CH.DEREK=mk(CHR.MARCUS[0],{k:'#282038',c:'#1c4a98',C:'#2a6ad0',f:'#e8b088',r:'#8a5f30',s:'#e8b088',t:'#a03a2e',T:'#c85848',b:'#583828'});
 const louieTop=['..kk....kk..........','.kook..kook....kkk..','.koeokkoeok...kooek.','.kooooooook..koeeok.','kokoooookok..koeok..','koeeokoeeokkkkook...','keeeeeeeeoooooook...','.keeekeeeoooooooook.','..kkeeeeoooooooooek.','....keeeooooooooeek.','....keekkkkkkkkkeek.'];
 const louieA=[...louieTop,'....kek.kek..kek.kek','....kkk.kkk..kkk.kkk'],louieB=[...louieTop,'...kek..kek.kek..kek','...kkk..kkk.kkk..kkk'];
 const LP={k:'#30201c',o:'#e89040',e:'#fff0d8'},LW={k:'#ffffff',o:'#ffffff',e:'#ffffff'};
@@ -832,7 +832,7 @@ function deliver(it){
  it.on.slice().forEach((b,i)=>{b.tgt=null;b.z=0;b.st=near?'follow':'idle';b.cheer=.8+i*.07;const a=i*1.3;b.x=HX+Math.cos(a)*16;b.y=HY+10+Math.sin(a)*6;});it.on.length=0;
  puff(HX,HY-22,'#f8e060',12,45);
  if(it.sub==='shard'){shards++;if(it.isle)run.isle=true;earn(10);snd(523,.12);later(()=>snd(659,.12),120);later(()=>snd(784,.12),240);later(()=>snd(1046,.3),360);
-  sceneQ.push(shards>=4?['3:blaze',()=>playScene('end',()=>{won=true;state='win'})]:['s'+shards,null]);checkAch();persist(true);return;}
+  sceneQ.push(shards>=4?['3:blaze',()=>playScene('end',()=>{won=true;state='win'})]:[shards===1?'3:marks':'s'+shards,null]);checkAch();persist(true);return;}
  if(it.sub==='key'){run.key=1;card={t:0,title:'FLOW PROS KEY',sub:"Stamped FLOW PROS. It fits the job site on the pond road, out west past the crystal.",art:()=>{g.save();g.translate(120,76);g.scale(3,3);keyArt(0,0);g.restore()}};state='card';earn(10);snd(784,.1);later(()=>snd(1175,.2),100);persist(true);return}
  if(it.sub==='lens'){run.lens=1;earn(60);meta.tix+=2;snd(523,.12);later(()=>snd(784,.12),120);later(()=>snd(1046,.3),240);sceneQ.push(['3:relight',()=>{run.lit=1;toast('THE NORTH LIGHT BURNS!  +60');persist(true)}]);persist(true);return}
  if(it.sub==='trs'){const i=it.tri|0;if(!meta.trs.includes(i))meta.trs.push(i);card={t:0,title:TRS[i][0],sub:TRL[i],art:()=>{g.save();g.translate(120,72);g.scale(4,4);trArt(i,0,0);g.restore()}};
@@ -888,13 +888,13 @@ function drawPauseMenu(){mHead(zName(zone)||'THE VALLEY',2);const ds='DAY '+day;
 /* ---------- the field guide: sprouts, buddies, people and places, filled in as you meet them ---------- */
 const GPAGES=['SPROUTS','BUDDIES','PEOPLE','PLACES'];
 const GSPR=['Embers fight hardest and burn through bramble. Warm to hold.','Pebs carry double and smash crystal. Nothing spooks a Peb.','Dews swim, and water flowers fastest. The only sprouts that go in the pond.','Zips are the fastest runners and haulers. Never still.','Leafs are the best gardeners. Beds they tend grow quicker.','Luckies bring home bonus seeds and petals. Nobody knows how.'];
-const GBUD={LANTERNWISP:'A pale light that walks the old arch at night. Some say she is waiting for someone.'};
-const GPPL=[['WILL','The new keeper of the Great Lantern. Throws sprouts first, asks questions later.'],['ERIN','Keeper of the garden. Warm, direct, and the only one who knows where everything is.'],['MARCUS','Plumbing boss. All gas, bro. Has a guy for everything. The guy is usually him.'],['RANGER','Watches the paths. Says little. Has strong opinions about boulders.'],['SCOUT','Studies the critters and writes everything down. Has never caught one herself.'],['LOUIE','Evolved shiba, est. 2018. Looks after snacks. Sniffs out berries, strays and buried things.'],['THORNBACK','The guardian of the light, older than the paths. He has forgotten who asked him to guard it.'],['BESSIE','Lives in the Wending Lake. Very old, very slow, and fond of a light. Marcus named her, bro.']];
+const GBUD={LANTERNWISP:'A pale light that walks the old arch at night. Some say she is waiting for someone.',BESSLING:'A lake serpent pup that keeps to the tide pool on the North Coast. Its mother is never far.'};
+const GPPL=[['WILL','The new keeper of the Great Lantern. Throws sprouts first, asks questions later.'],['ERIN','Keeper of the garden. Warm, direct, and the only one who knows where everything is.'],['MARCUS','Plumbing boss. All gas, bro. Has a guy for everything. The guy is usually him.'],['RANGER','Watches the paths. Says little. Has strong opinions about boulders.'],['SCOUT','Studies the critters and writes everything down. Has never caught one herself.'],['LOUIE','Evolved shiba, est. 2018. Looks after snacks. Sniffs out berries, strays and buried things.'],['THORNBACK','The guardian of the light, older than the paths. He has forgotten who asked him to guard it.'],['DEREK',"Marcus's partner at Flow Pros. Drives the van. That is his whole part, he says."],['BESSIE','Lives in the Wending Lake. Very old, very slow, and fond of a light. Marcus named her, bro.']];
 const GPLC=['Home. The Great Lantern has stood here longer than anyone can remember.','The best berries in the valley. Zips grow wild in the far corner.','Tall grass and wildflowers. Pebs nap up here, and so does something shyer.',"Erin's pride and joy. Flowers for petals, and orders to fill.",'Deep and cold. Only Dews swim it. Marcus has plans for it.','Dark moss and glowing mushrooms. Something very old sleeps in here.','Fruit trees, bees and Luckies. The Crooked River runs along its north edge.','Sand, shells and crabs. The water goes on further than anyone has swum.','The falls feed the Crooked River. An arch of old stone stands behind the willows.','Sand, wind and the Wending Lake, which has no far side. The North Light stands on its rock.'];
 function spGuideList(p){const S=run.wbSeen||{};
  if(p===0)return TYPES.map((T,t)=>({n:T.n,known:found[t],d:GSPR[t],art:(x,y)=>{g.save();g.translate(x,y+14);g.scale(4,4);const sx=ox,sy=oy;ox=oy=0;drawBud({x:0,y:0,type:t,stage:2,z:Math.abs(Math.sin(time*4))*1.5,mv:false,fx:1,st:'follow',a:1});ox=sx;oy=sy;g.restore()}}));
  if(p===1)return WBDEF.map(([id,tx,ty])=>({n:id,known:!!S[id],d:GBUD[id]||(()=>{try{return wSp(id).d}catch(e){return''}})(),sub:'SEEN IN '+zName(ZONES[zoneAt(tx,ty)][0]),art:(x,y)=>{const c=wbSprite({id});if(c){g.imageSmoothingEnabled=true;g.drawImage(c,x-26,y-26,52,52);g.imageSmoothingEnabled=false}}}));
- if(p===2)return GPPL.map(([n,d])=>({n,known:n==='BESSIE'?!!run.lit:n!=='THORNBACK'||!!run.boss,d,art:(x,y)=>{if(n==='BESSIE'){r('#101c40',x-60,y-38,120,48);r('#2c5cb0',x-60,y+10,120,26);r('#78a8f0',x-60,y+10,120,1);g.save();g.translate(x-8,y+10);g.scale(2,2);bessieArt(0,0,1);g.restore()}else if(n==='LOUIE'){g.save();g.translate(x,y+10);g.scale(2,2);const sx=ox,sy=oy;ox=oy=0;drawDog({x:0,y:0,fx:-1,mv:false,st:((time/2)|0)%2?'sit':'follow',alert:0,say:null});ox=sx;oy=sy;g.restore()}else if(n==='THORNBACK')g.drawImage(BO.l,x-32,y-20,64,44);else g.drawImage(n==='WILL'?SP.pd:CH[n],x-18,y-22,36,42)}}));
+ if(p===2)return GPPL.map(([n,d])=>({n,known:n==='BESSIE'?!!run.lit:n==='DEREK'?npcBy('MARCUS').st!=='new':n!=='THORNBACK'||!!run.boss,d,art:(x,y)=>{if(n==='BESSIE'){r('#101c40',x-60,y-38,120,48);r('#2c5cb0',x-60,y+10,120,26);r('#78a8f0',x-60,y+10,120,1);g.save();g.translate(x-8,y+10);g.scale(2,2);bessieArt(0,0,1);g.restore()}else if(n==='LOUIE'){g.save();g.translate(x,y+10);g.scale(2,2);const sx=ox,sy=oy;ox=oy=0;drawDog({x:0,y:0,fx:-1,mv:false,st:((time/2)|0)%2?'sit':'follow',alert:0,say:null});ox=sx;oy=sy;g.restore()}else if(n==='THORNBACK')g.drawImage(BO.l,x-32,y-20,64,44);else g.drawImage(n==='WILL'?SP.pd:CH[n],x-18,y-22,36,42)}}));
  return ZONES.map((z,i)=>({n:zName(z[0]),known:!!(run.seen&&run.seen[z[0]])||i===0,d:i===0&&run.keep?'Home. The old stones call it Sun Keep. Somebody kept this light before us.':i===5&&run.boss?'Dark moss and glowing mushrooms. Old Thornback slept here, guarding a light.':i===9&&run.lit?'The Wending Lake has no far side. The North Light burns again, and something in the water watches it.':GPLC[i],art:(x,y)=>{if(!BG)return;const k=Math.min(118/(z[3]*16),56/(z[4]*16)),w=z[3]*16*k,h=z[4]*16*k;g.imageSmoothingEnabled=true;g.drawImage(BG[((time*2)|0)%2],z[1]*16,z[2]*16,z[3]*16,z[4]*16,Math.round(x-w/2),Math.round(y-h/2),Math.round(w),Math.round(h));g.imageSmoothingEnabled=false}}))}
 const spGuideCount=()=>[0,1,2,3].reduce((a,p)=>a+spGuideList(p).filter(e=>e.known).length,0);
 function spGuideUpdate(){const L=spGuideList(gpage);if(pressed('right')){gpage=(gpage+1)%4;gsel=0;snd(520,.04)}if(pressed('left')){gpage=(gpage+3)%4;gsel=0;snd(520,.04)}gsel=nav(gsel,L.length);if(pressed('b')||pressed('start'))state='pause'}
@@ -916,12 +916,12 @@ function floatAt(x,y,s,c){floats.push({x,y,s,c:c||'#fff8c0',t:1.3})}
 /* ---------- the prequel pass: this valley before it was called Sunkeep ----------
    Wild buddies live here but keep to themselves (they are not a system: nothing targets them). At night they come and
    sit at the edge of the lantern light. Sprite art is Sproutwild's (same scope), scaled down. */
-const WBDEF=[['CINDERCAP',22,16],['PEBBLIT',32,6],['DRIZZLET',16,13],['ZIPWIG',50,22],['FERNFANG',22,33],['CLOVERIMP',65,24],['LANTERNWISP',65,8]];
+const WBDEF=[['CINDERCAP',22,16],['PEBBLIT',32,6],['DRIZZLET',16,13],['ZIPWIG',50,22],['FERNFANG',22,33],['CLOVERIMP',65,24],['LANTERNWISP',65,8],['BESSLING',76,12]];
 let wbuds=[],flickT=0,gdT=0;
 function mkWbuds(){wbuds=WBDEF.map(([id,tx,ty],i)=>({id,hx:tx*16+8,hy:ty*16+8,x:tx*16+8,y:ty*16+8,wx:tx*16+8,wy:ty*16+8,t:R(0,3),fx:1,mv:false,a:i*1.7,path:null,night:false}))}
 function wbSprite(q){if(q.spr===undefined){q.spr=null;try{const s=wSp(q.id),c=s&&s._spr&&(s._spr.ol||s._spr.img);if(c&&c.width){q.spr=c;q.sprF=flip(c)}}catch(e){}}return q.spr}
 function updWbuds(dt){const f=dayT/DAYLEN;
- for(const q of wbuds){q.mv=false;const wisp=q.id==='LANTERNWISP';if(wisp&&(f<.6||(run.lit&&run.wbSeen&&run.wbSeen.LANTERNWISP))){q.hid=true;continue}q.hid=false;
+ for(const q of wbuds){q.mv=false;const wisp=q.id==='LANTERNWISP'||q.id==='BESSLING';if(q.id==='BESSLING'){if(!run.call){q.hid=true;continue}q.hid=false}else if(q.id==='LANTERNWISP'){if(f<.6||(run.lit&&run.wbSeen&&run.wbSeen.LANTERNWISP)){q.hid=true;continue}q.hid=false}
   if(f>.74&&!q.night){q.night=true;const a=q.a*2.3,tx=HX+Math.cos(a)*50,ty=HY+8+Math.abs(Math.sin(a))*34;q.path=free(tx,ty,false)&&!wisp?pathTo(q.x,q.y,tx,ty,false):null}
   if(q.path&&q.path.length){const p=q.path[0],dx=p.x-q.x,dy=p.y-q.y,d=Math.hypot(dx,dy),m=46*dt;if(d<=m+1){q.x=p.x;q.y=p.y;q.path.shift()}else{q.x+=dx/d*m;q.y+=dy/d*m}q.mv=true;if(Math.abs(dx)>1)q.fx=dx>0?1:-1;continue}
   if(q.night&&q.path){q.fx=HX>q.x?1:-1;continue} /* sitting at the light */
@@ -940,7 +940,7 @@ function updWbuds(dt){const f=dayT/DAYLEN;
 function drawWbud(q){const c=wbSprite(q),x=Math.round(q.x-ox),y=Math.round(q.y-oy),hop=q.mv?((time*8+q.a)|0)%2:0;r('rgba(0,0,0,.26)',x-6,y+1,12,3);
  if(c){g.imageSmoothingEnabled=true;g.drawImage(q.fx>0?q.sprF:c,x-10,y-17-hop,20,20);g.imageSmoothingEnabled=false}else{r('#383048',x-5,y-9-hop,10,10);r('#98a0b0',x-4,y-8-hop,8,8)}
  if(q.fed>0&&((time*4)|0)%2){r('#fff8a0',x+6,y-20,1,3);r('#fff8a0',x+5,y-19,3,1)}
- if(q.id==='LANTERNWISP'){g.fillStyle='rgba(248,232,150,'+(.16+.08*Math.sin(time*4)).toFixed(2)+')';g.beginPath();g.arc(x,y-8,12,0,7);g.fill()}}
+ if(q.id==='LANTERNWISP'&&!q.hid){g.fillStyle='rgba(248,232,150,'+(.16+.08*Math.sin(time*4)).toFixed(2)+')';g.beginPath();g.arc(x,y-8,12,0,7);g.fill()}}
 /* the old stone arch behind the willows */
 const KEEP={x:66*16+8,y:2*16+12};
 function drawKeep(){const x=Math.round(KEEP.x-ox),y=Math.round(KEEP.y-oy),k='#383048';r('rgba(0,0,0,.25)',x-13,y+1,26,3);
@@ -995,7 +995,9 @@ function drawJobsite(ga){const X=ga.tiles[0][0]*16-ox,Y=ga.tiles[0][1]*16-oy,cx=
  r('#3a2c10',cx-4,Y+35,8,7);r('#f8d858',cx-3,Y+36,6,5);r('#3a2c10',cx-1,Y+37,2,3);r('#686078',cx-2,Y+33,4,2);
  if(run.key&&((time*3)|0)%3)text('!',cx-2,Y-16,3,'#78c8f8')}
 const coastDue=()=>won&&!run.call&&day>=2&&!inHome&&!sceneQ.length;
+const DEREKL=['YO. COLD ONE?','TELL MARCUS NOTHING.','THE VAN IS FINE. PROBABLY.','NINE BURGERS. ONE CUSTOMER.','I DRIVE. THAT IS MY PART.'];let derekT=0;
 function coastTick(){if(state!=='play'||inHome||sceneQ.length)return;
+ if(run.pj&&run.pj.lf&&run.pj.lf.s>=3&&time>derekT&&d2(P,71*16+42,15*16)<44*44&&msgT<=0&&!toasts.length){derekT=time+22;floatAt(71*16+42,15*16-18,'DEREK: '+DEREKL[(day+((time/22)|0))%DEREKL.length],'#5a9af0');snd(300,.04,0,'triangle',.03)}
  if(coastDue()&&dayT>DAYLEN*.78){sceneQ.push(['3:call',coastOpen]);return}
  if(!run.call)return;const T=run.tips=run.tips||{},pr=coastGate('northPier');
  if(!run.coastScn&&zone==='NORTH COAST'){run.coastScn=1;sceneQ.push(['3:coast',()=>{zoneT=2.2;persist(true)}]);return}
@@ -1377,10 +1379,6 @@ const SCN={
   ["You're the new keeper. These little ones are sprouts. They grow in the lantern's soil and follow whoever plucks them.",'sprouts','ERIN'],
   ["Each kind is good at something. Aim at a thing and the right sprout steps up by itself.",'types','ERIN'],
   ["Throw them with A. Call them back with B. Bring the shards home, and make yourself at home too. Ready?",'home','ERIN']],
- s1:[["The shard clicks back into place. The Great Lantern coughs, flickers, and glows a little brighter.",'relight'],
-  ["One down, Will! Feel that? The soil's warming up already.",'erin','ERIN'],
-  ["Before you celebrate, come look at this. Something left marks by the lantern. Big ones.",'claws','RANGER'],
-  ["So it didn't just crack. Something cracked it. Keep your eyes open out there.",'claws','ERIN']],
  s2:()=>[["Two shards home. The lantern's light reaches the edge of the field now.",'relight'],
   ["Bro. Found more of those marks by my pond. Something huge was dragging something warm. I could take it. Probably.",'trail','MARCUS'],
   [run.boss?"Trail went south, into the hollow. Which explains our big new neighbor. I would've handled it, bro.":"Trail heads south, into the hollow. Nobody goes in the hollow. ...You first though, bro.",'trail','MARCUS'],
@@ -1518,6 +1516,7 @@ PJ[5].draw=s=>{const x=pX(74*16),y=pY(10*16);
    drawBud({x:bx+ox,y:by+oy+1,type:2,stage:2,z:0,mv:false,fx:k?-1:1,st:'follow',a:k,hat:meta.eq.hat})}
  if(s>=3){const hx=pX(71*16+4),hy=pY(15*16);r('rgba(0,0,0,.25)',hx-2,hy,34,3);r('#181020',hx,hy-22,30,22);r('#e8d8b8',hx+1,hy-21,28,20);r('#181020',hx+4,hy-13,22,8);r('#3c2a20',hx+5,hy-12,20,6);r('#c89050',hx+3,hy-6,24,2);
   for(let k=0;k<6;k++)r(k%2?'#f4f6fa':'#e83040',hx-2+k*6,hy-28,6,7);r('#181020',hx-2,hy-29,36,1);r('#383048',hx+24,hy-36,3,8);for(let k=0;k<2;k++)r('rgba(225,225,235,.7)',hx+24+Math.round(Math.sin(time*2+k)*2),hy-40-((time*8+k*7)%14),3,3);
+  {const dx=hx+38,dy=hy+2;r('rgba(0,0,0,.28)',dx-4,dy+3,8,2);g.drawImage(CH.DEREK,dx-6,dy-10-(((time*1.5)|0)%2))}
   r(((time*6)|0)%2?'#f8a040':'#f8d030',hx+8,hy-11,4,2);drawBud({x:71*16+20,y:15*16+7,type:0,stage:2,z:0,mv:false,fx:1,st:'follow',a:2,hat:meta.eq.hat})}
  if(s>=4){const a=x-18,b=x+50,t=y-48;r('#583018',a,t,2,50);r('#583018',b,t,2,40);for(let k=0;k<=12;k++){const lx=Math.round(a+(b-a)*k/12),ly=t+2+Math.round(Math.sin(k/12*3.14)*5);r('#383048',lx,ly,2,1);if(k<12&&k!==5&&k!==6)r(RAINBOW[k%6],lx+1,ly+1,3,3)}
   const w=tw('LAKEFRONT',1)+6,cx=Math.round((a+b)/2);r('#181020',cx-w/2-1,t+8,w+2,10);r('#2a6ad0',cx-w/2,t+9,w,8);text('LAKEFRONT',cx-w/2+3,t+9,1,'#ffffff',null)}};
@@ -1581,7 +1580,6 @@ function drawCine(){const t=cineT,i=cineI,e=scn[i],art=e[1],sx=ox,sy=oy,hh=H-74,
  else if(art==='sprouts'){big(SP.pd,30);r('#8a5a3a',96,gy-6,136,10);r('#6e4428',96,gy-6,136,2);for(let k=0;k<6;k++){const a=t-.3-k*.28;if(a>0){g.save();g.translate(110+k*22,gy-2);g.scale(2,2);if(a<1.3)drawSprout({x:0,y:2,type:k%NT,age:a*28});else drawBud({x:0,y:0,type:k%NT,stage:1,z:Math.abs(Math.sin(t*5+k))*2,mv:true,fx:-1,st:'follow',a:k});g.restore()}}}
  else if(art==='types'){const tips=['BURN','SMASH','SWIM','RUN','GARDEN','BONUS'];for(let k=0;k<NT;k++){const x=22+k*39,a=t-k*.18;if(a>0){g.save();g.translate(x,gy-30);g.scale(3,3);drawBud({x:0,y:0,type:k,stage:2,z:Math.max(0,Math.sin(a*6))*Math.max(0,1-a)*4,mv:false,fx:1,st:'follow',a:k});g.restore();const n=TYPES[k].n;text(n,Math.round(x-tw(n,1)/2),gy-24,1,TYPES[k].l);text(tips[k],Math.round(x-tw(tips[k],1)/2),gy-13,1,'#ffffff')}}}
  else if(art==='home'){ox=32*16-24;oy=14*16+2-(gy-46);drawHouse();ox=oy=0;lant(196,1);r('rgba(0,0,0,.28)',112,gy+3,8,2);g.drawImage(SP.pd,110,gy-10);r('rgba(0,0,0,.28)',128,gy+3,8,2);g.drawImage(CH.ERIN,126,gy-10);dog(154,gy+3,1,true)}
- else if(art==='claws'){big(CH.RANGER,30);lant(204,1);[[104,gy-4],[136,gy+4],[168,gy-2]].forEach(([x,y],k)=>{if(t>.3+k*.35)claw(x,y)})}
  else if(art==='trail'){big(CH.MARCUS,26);g.fillStyle='#3888e0';g.save();g.translate(196,gy-4);g.scale(1,.3);g.beginPath();g.arc(0,0,40,0,7);g.fill();g.restore();r('#a8d8ff',180,gy-7,12,1);r('#a8d8ff',200,gy-2,8,1);for(let k=0;k<4;k++)if(t>.3+k*.3)claw(90+k*22,gy+2-(k%2)*7)}
  else if(art.slice(0,3)==='pj:'){const p=PJ.find(q=>q.id===art.slice(3)),cx=cam.x,cy=cam.y,vh=Math.ceil(H/Z);cam.x=Math.max(0,Math.min(MW*16-VW,p.foc[0]-VW/2));cam.y=Math.max(0,Math.min(MH*16-vh,p.foc[1]-(vh-50)/2));drawWorld();cam.x=cx;cam.y=cy;ox=oy=0;
   if(t<3)for(let k=0;k<16;k++)r(RAINBOW[k%6],Math.round((k*37+Math.sin(t*2+k)*10)%236),Math.round((t*50+k*23)%Math.max(30,hh-20)),2,2)}

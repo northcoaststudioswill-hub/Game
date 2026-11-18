@@ -37,7 +37,7 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   ok('a save from before this update still loads', await E(`(()=>{init();const o=JSON.parse(JSON.stringify(snap()));delete o.gates.orchardBridge;o.items=o.items.filter(q=>q[0]==='berry'||q[0]==='big'||q[0]==='shard').map(q=>q.slice(0,6));o.run.spark={x:400,y:300,i:1};restore(o);return gates[5].alive&&run.spark.hp===DIGHP&&DIG.alive})()`));
   await E(`newDay();void 0`); ok('nectar blossoms open again in the morning', (await E(`items.filter(i=>i.alive&&i.sub==='nectar').length`)) === 6);
   /* the prequel pass */
-  ok('seven wild buddies live in the valley, with Sproutwild art', await E(`wbuds.length===7&&wbuds.every(q=>!!wbSprite(q))`));
+  ok('eight wild buddies (seven in the valley, a Bessling on the coast), with Sproutwild art', await E(`wbuds.length===8&&wbuds.every(q=>!!wbSprite(q))`));
   ok('nothing targets a buddy', await E(`(()=>{const q=wbuds[0];return findTarget({x:q.x,y:q.y,type:0},20)===null||findTarget({x:q.x,y:q.y,type:0},20).kind!==undefined})()`));
   await E(`P.x=wbuds[0].x+12;P.y=wbuds[0].y;void 0`); const bx = await E('wbuds[0].x'); await step(30); ok('a buddy backs away from Will', (await E('wbuds[0].x')) < bx - 8, await E('msg'));
   await E(`P.x=HX;P.y=HY+30;dayT=DAYLEN*.76;duskSaid=true;void 0`); await step(30 * 25); ok('at night buddies sit by the lantern', (await E(`wbuds.filter(q=>q.night&&q.path&&!q.path.length&&d2(q,HX,HY)<80*80).length`)) >= 1, await E(`wbuds.map(q=>[q.id,Math.round(Math.sqrt(d2(q,HX,HY)))])`));

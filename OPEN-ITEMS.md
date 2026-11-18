@@ -56,7 +56,7 @@ Sources: [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (the Sprouts sections, Nov 17 an
 - Nature's balance (a wild buddy quietly eats a stranded sprout) is rare by design. Two three-day autopilot runs saw none. Whether a player ever notices it is unknown.
 - The objective-marker bot got through four asks in four of five runs and two in the other.
 
-- The 3D cutscenes and the North Coast (Nov 18) were stepped by script only (`sprouts_coast.js`, 84 checks). Not played by hand, not seen on a phone, no sound listened to. Frame time on a real phone is unknown.
+- The 3D cutscenes and the North Coast (Nov 18) were stepped by script only (`sprouts_coast.js`, 89 checks). Not played by hand, not seen on a phone, no sound listened to. Frame time on a real phone is unknown.
 - The soak test's first-day bot used to finish only one of Erin's asks about 1 run in 10. Not seen in 16 runs since sprouts stopped being thrown over shut gates; probably that, not proven.
 - Speed was measured in headless Chromium slowed four times, never on a phone. The 3D scenes have a slow-device mode that has only been triggered by a test.
 
@@ -71,7 +71,7 @@ Sources: [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (the Sprouts sections, Nov 17 an
 **Wanted (Will, Nov 18: "keep working on the game")**
 - More refining of gameplay, characters, lore, world building, the Pikmin-like play and the menus.
 - The lake monster renamed BESSIE in Sproutwild's code (story notes: still to do). Sprouts now has her as BESSIE.
-- More on the North Coast: it now has the pier, the lens and the Marcus Lakefront project. Still no person living there and no buddy of its own.
+- More on the North Coast: it now has the pier, the lens and the Marcus Lakefront project. A Bessling lives there and Derek minds the shack; neither has anything to ask of you yet.
 
 ---
 

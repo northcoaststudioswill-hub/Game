@@ -194,10 +194,11 @@ function c3Person(x,z,ang,o){const y=o.y!==undefined?o.y:c3G(x,z),wk=o.walk?1:0,
  c3T(0,1.12,0);c3RX(-(o.up||0));c3Ball(.3,.28,.29,c3Mix(sk,'#d8a880',.5),sk,8,5);
  c3Box(-.17,-.04,.255,-.09,.07,.295,C3K);c3Box(.09,-.04,.255,.17,.07,.295,C3K);
  if(o.kind==='erin'){c3Ball(.33,.3,.32,o.cap,o.capL,8,3,0,.52,1);c3Push();c3T(0,-.04,-.14);c3Ball(.32,.34,.24,o.cap,o.capL,7,4);c3Pop();c3Box(-.33,-.2,-.1,-.25,.12,.14,o.cap);c3Box(.25,-.2,-.1,.33,.12,.14,o.cap)}
+ else if(o.kind==='ranger'){c3Ball(.3,.3,.3,o.cap,o.capL,8,3,0,.55,1);c3Cyl(8,.52,.5,.06,.1,o.cap,o.capL);c3Cyl(8,.31,.3,.1,.17,'#c03030','#e05050');c3Box(-.3,-.12,-.26,.3,.04,-.1,'#583828')}
  else{c3Ball(.325,.3,.315,o.cap,o.capL,8,3,0,.5,1);c3Box(-.24,.02,.18,.24,.07,.5,o.cap,o.capL);if(o.kind==='marcus'){c3Box(-.2,-.24,.16,.2,-.1,.3,'#704828');c3Box(-.26,-.22,-.05,-.19,-.02,.26,'#704828');c3Box(.19,-.22,-.05,.26,-.02,.26,'#704828')}else c3Box(-.3,-.12,-.26,.3,.04,-.1,'#583828')}
  c3Pop()}
 const c3Look=()=>{const c=STY.cap[meta.eq.cap],t=STY.coat[meta.eq.coat];return{cap:c[1],capL:c[2],coat:t[1],coatL:t[2],kind:'will'}};
-const C3ERIN={cap:'#b84828',capL:'#e87848',coat:'#9070d0',coatL:'#c0a8f0',kind:'erin'},C3MARC={cap:'#284878',capL:'#5080b8',coat:'#e88020',coatL:'#f8c060',kind:'marcus'},C3DEREK={cap:'#1c4a98',capL:'#2a6ad0',coat:'#7a2a20',coatL:'#a03a2e',legs:'#3c4a66',skin:'#e8b088',kind:'marcus'};
+const C3ERIN={cap:'#b84828',capL:'#e87848',coat:'#9070d0',coatL:'#c0a8f0',kind:'erin'},C3MARC={cap:'#284878',capL:'#5080b8',coat:'#e88020',coatL:'#f8c060',kind:'marcus'},C3RANG={cap:'#a88040',capL:'#e8c888',coat:'#506838',coatL:'#88a060',skin:'#e8c098',kind:'ranger'},C3DEREK={cap:'#1c4a98',capL:'#2a6ad0',coat:'#7a2a20',coatL:'#a03a2e',legs:'#3c4a66',skin:'#e8b088',kind:'marcus'};
 /* a sprout: a round body in its own colours, two eyes, a stem with a leaf, a bud or a flower */
 function c3Sprout(x,z,type,o){o=o||{};const T=TYPES[type%TYPES.length],y=(o.y!==undefined?o.y:c3G(x,z))+(o.hop||0),st=o.stage===undefined?2:o.stage;
  if(!o.noSh)c3Shadow(x,y-(o.hop||0),z,.2);c3Push();c3T(x,y,z);c3RY(o.ang||0);if(o.s)c3S(o.s,o.s,o.s);
@@ -292,6 +293,9 @@ function c3Van(who,rip,t,o){o=o||{};const x=C3VAN[0],z=C3VAN[1],y=c3G(x,z),W1='#
  if(rip>0){const n=[Math.sin(C3VAN[2]),Math.cos(C3VAN[2])],ax=[Math.cos(C3VAN[2]),-Math.sin(C3VAN[2])];for(let k=0;k<9;k++){const q=(t*.22+k*.111)%1,r0=(.35+q*1.3)*rip,sx=-.6+Math.sin(k*2.4)*.7;
    c3Puff(x+ax[0]*sx+n[0]*(1+q*1.6)+Math.sin(t+k)*.2,y+1.3+q*2.6,z+ax[1]*sx+n[1]*(1+q*1.6)+Math.cos(t*.8+k)*.2,r0,.42*(1-q)*Math.min(1,rip))}}}
 const c3VanAt=(side,along,h)=>{const a=C3VAN[2];return[C3VAN[0]+Math.sin(a)*side+Math.cos(a)*along,h,C3VAN[1]+Math.cos(a)*side-Math.sin(a)*along]};
+/* three long gouges in the ground by the Lantern, and one across its plinth. k: how much of them shows */
+function c3Marks(k){for(let i=0;i<3;i++){const x0=-2.5+i*.42,z0=-1.9+i*.12,len=1.7*k;c3Push();c3T(x0,c3G(x0,z0)+.03,z0);c3RY(-.5);c3Box(-.09,0,0,.09,.03,len,'#241810','#3c2a20');c3Box(-.14,0,len*.1,-.09,.05,len*.9,'#6a4c38');c3Pop()}
+ if(k>.6){c3Push();c3T(-1.05,.3,-.75);c3RY(-.95);c3RZ(.5);c3Box(-.03,0,0,.03,.5*(k-.6)/.4,.02,'#2a2238');c3Pop()}}
 /* the Flow Pros key: a brass ring, a shaft and two teeth */
 function c3Key(x,y,z,s,t,lay){c3Push();c3T(x,y,z);c3RY(t);if(lay)c3RZ(1.45);c3S(s,s,s);const a='#a87818',b='#f8d858';c3Push();c3T(0,.42,0);c3RX(1.5708);c3Cyl(8,.26,.26,-.05,.05,a,b,.35);c3Cyl(8,.13,.13,-.06,.06,'#3a2c10','#3a2c10');c3Pop();c3Box(-.05,-.5,-.04,.05,.2,.04,a,b,.35);c3Box(.05,-.5,-.04,.24,-.4,.04,a,b,.35);c3Box(.05,-.3,-.04,.18,-.22,.04,a,b,.35);c3Pop();c3Glow(x,y,z,s*.9,'#ffd860',.35+.15*Math.sin(t*3))}
 /* Erin's garden: a fence, three beds, flowers. dug: the far bed is turned over */
@@ -350,6 +354,14 @@ function c3Hollow(t){c3Env('night');c3EN.fog=c3C('#081818');c3EN.amb=[.26,.4,.36
  for(let k=0;k<11;k++){if(k===1||k===2)continue;const a=k*.571+.2,rr=6.2+(k%3)*1.3;c3Tree(C3HO[0]+Math.cos(a)*rr,C3HO[1]+Math.sin(a)*rr,4+(k%4)*.7,k*3+1)}}
 const C3A_LAKE=Math.atan2(C3TW[1],C3TW[0]),C3A_DOOR=Math.atan2(C3DR[1],C3DR[0]);
 const C3SCN={
+ /* the first shard comes home, and something left marks by the Lantern */
+ marks:[
+  {d:7,k:3.2,cap:['',"The shard clicks back into place. The Lantern coughs, flickers, and glows a little brighter."],f(t,u){const q=c3Sm(.3,2,t),k=c3Sm(2,2.3,t),fl=k&&t<3.4?.45+.4*Math.sin(t*31):k?.62:.25;c3Env('dusk');c3Lamp(0,3.1,0,'#ffd890',6.5,1.2*fl+.2);c3Cam(3.4-u*.6,1.5+u*.5,5-u*.5,0,1.5+u*.7,0,58);c3Lantern(fl,k>=1?1:0,{force:1});c3Soil();
+    const sx=Math.cos(.785)*1.02,sz=Math.sin(.785)*1.02,x=c3Lp(3,sx,q),z=c3Lp(4.4,sz,q);if(q<1){c3Shard(x,.9+Math.sin(q*3.14)*1.1,z,.5,t,1);for(let i=0;i<4;i++){const b=i*1.57+t*2;c3Sprout(x+Math.cos(b)*.5,z+Math.sin(b)*.5,i,{y:c3G(x,z),hop:Math.abs(Math.sin(t*8+i))*.12})}}else c3Ring(t,6,1);
+    if(t>2&&t<2.5)c3q.flash=(1-(t-2)/.5)*.7;c3Cue('cl',()=>c3At(()=>{snd(523,.12);c3At(()=>snd(659,.12),120);c3At(()=>snd(784,.3),240)},2000))}},
+  {d:6,cap:['ERIN',"One down, Will! Feel that? The soil's warming up already."],f(t,u){c3Env('dusk');c3Lamp(0,3.1,0,'#ffd890',6.5,1);c3Cam(-3.4+u*.4,1.5,3.2,-1.2,1.25,6.1,48);c3Lantern(.62,1);c3Soil();c3Person(-1.5,6.1,2.7,Object.assign({},C3ERIN,{arm:2.4+Math.sin(t*8)*.3}));c3Dog(.3,6.9,2.5,{walk:t});c3Person(1.7,5.9,Math.PI+.25,c3Look());c3Ring(t,6,1)}},
+  {d:7,k:2.4,cap:['RANGER',"Before you celebrate, come look at this. Something left marks by the lantern. Big ones."],f(t,u){c3Env('dusk');c3Lamp(0,3.1,0,'#ffd890',6.5,1);c3Cam(-6.2+u*.6,1.7,-4.6,-1.9,.5,-1.1,50);c3Lantern(.62,1);c3Marks(c3Sm(.4,2.2,t));c3Person(-3.9,-1.3,1.5,Object.assign({},C3RANG,{arm:1.3,up:-.2}));c3Cue('mk',()=>c3At(()=>snd(150,.5,90,'sawtooth',.06),600))}},
+  {d:6.5,cap:['ERIN',"So it didn't just crack. Something cracked it. Keep your eyes open out there."],f(t,u){c3Env('dusk','night',u*.5);c3Lamp(0,3.1,0,'#ffd890',6.5,1);c3Cam(1.5,3.4+u*.6,-7.5-u,-1.4,.6,-1,54);c3Lantern(.62,1);c3House(6.2,-5.4,-.5,1);c3Marks(1);c3Person(-3.3,-2.4,1.2,Object.assign({},C3RANG,{}));c3Person(-2.6,-3.6,.5,Object.assign({},C3ERIN,{up:-.15}));c3Person(-1.2,-3.9,-.1,Object.assign(c3Look(),{up:-.15}));c3Dog(-.2,-3.2,-.6,{up:-.3})}}],
  /* Erin's garden has its five gardeners, and the far bed gives something up */
  key:[
   {d:6.5,cap:['',"Five gardeners at work, and the far bed is turned over for the first time in years."],f(t,u){c3Env('day');const a=.9+u*.5;c3Cam(C3GA[0]+Math.cos(a)*9,3.6-u*.8,C3GA[1]+Math.sin(a)*9,C3GA[0],.8,C3GA[1],56);c3Garden(t,1);
@@ -456,7 +468,7 @@ const C3SCN={
 
 /* ---------- 6. playing a scene ---------- */
 /* the scenes in the order the story meets them, for the Collection's SCENES page; seen ones are remembered across saves */
-const C3LIST=[['dawn','THE CRACK','The night the Lantern cracked, and the morning after.'],['key','THE KEY','What the gardeners turned up in the far bed.'],['van','FLOW PROS','Marcus, Derek, a van by the Dew Pond, and a business idea.'],['thorn','THORNBACK','A crowd of sprouts wakes the guardian of the light.'],['blaze','THE BLAZE','The fourth shard comes home.'],['arch','SUN KEEP','The old arch behind the willows.'],['call','THE CALL','The night the Lantern stopped skipping and started pointing.'],['coast','THE COAST','The first walk out to the Wending Lake.'],['relight','NORTH LIGHT','The lens comes home, and the second lantern burns.']];
+const C3LIST=[['dawn','THE CRACK','The night the Lantern cracked, and the morning after.'],['marks','THE MARKS','The first shard comes home, and Ranger finds something.'],['key','THE KEY','What the gardeners turned up in the far bed.'],['van','FLOW PROS','Marcus, Derek, a van by the Dew Pond, and a business idea.'],['thorn','THORNBACK','A crowd of sprouts wakes the guardian of the light.'],['blaze','THE BLAZE','The fourth shard comes home.'],['arch','SUN KEEP','The old arch behind the willows.'],['call','THE CALL','The night the Lantern stopped skipping and started pointing.'],['coast','THE COAST','The first walk out to the Wending Lake.'],['relight','NORTH LIGHT','The lens comes home, and the second lantern burns.']];
 const c3SeenScene=k=>!!(meta.scn&&meta.scn[k]);
 function c3Play(key,done){const S=C3SCN[key];if(!S){if(done)done();return}if(!c3SeenScene(key)){meta.scn=meta.scn||{};meta.scn[key]=1;try{save()}catch(e){}}c3q={key,S,i:0,t:0,done:done||null,cue:{},sched:[],ff:0,go:0,label:null,flash:0,tear:0,shake:0,tt:0};state='c3'}
 const c3TextLen=s=>s.length/34+2.8;

@@ -23,7 +23,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
 
   /* ---- the scenes themselves ---- */
   const keys = JSON.parse(await E('JSON.stringify(Object.keys(C3SCN))'));
-  ok('nine 3D scenes', keys.slice().sort().join() === 'arch,blaze,call,coast,dawn,key,relight,thorn,van', keys);
+  ok('ten 3D scenes', keys.slice().sort().join() === 'arch,blaze,call,coast,dawn,key,marks,relight,thorn,van', keys);
   const long = JSON.parse(await E(`JSON.stringify(Object.entries(C3SCN).flatMap(([k,S])=>S.map((s,i)=>[k,i,wrapPx(s.cap[1],228).length])).filter(q=>q[2]>3))`));
   ok('every caption fits its three lines', long.length === 0, long);
   await E(`init();live=true;void 0`);
@@ -173,6 +173,11 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok('there are two grubs on the coast road now', (await E(`spawns.filter(q=>q.k==='grub'&&q.x>=70).length`)) === 2);
   ok('at night before the relight a beam is drawn east from the Lantern', await E(`(()=>{const lit=run.lit,probe=c=>{run.lit=0;run.call=c;dayT=DAYLEN*.9;tod.flick=1;P.x=34*16;P.y=20*16+8;cam.x=P.x-VW/2;cam.y=P.y-VH/2;g.setTransform(2,0,0,2,0,0);draw();const y=Math.round((HY-27-Math.round(cam.y))*Z)*2,d=g.getImageData(440,y,1,1).data;return d[0]+d[1]+d[2]};const off=probe(0),on=probe(1);run.lit=lit;run.call=1;dayT=40;return on>off+10})()`));
 
+  ok('a Bessling lives on the coast once it is open, and goes in the guide', await E(`(()=>{mkWbuds();updWbuds(.03);const q=wbuds.find(w=>w.id==='BESSLING');return !!q&&!q.hid&&q.x>70*16&&!!wbSprite(q)&&spGuideList(1).length===8&&spGuideList(1)[7].d.length>20})()`));
+  ok('it stays hidden while the coast is shut', await E(`(()=>{const c=run.call;run.call=0;updWbuds(.03);const h=wbuds.find(w=>w.id==='BESSLING').hid;run.call=c;updWbuds(.03);return h===true})()`));
+  await E(`time+=30;msgT=0;toasts=[];floats=[];dayT=40;void 0`); await tp(73, 16); await step(14);
+  ok('Derek minds the snack shack and has something to say', await E(`floats.some(f=>/^DEREK: /.test(f.s))&&spGuideList(2).some(e=>e.n==='DEREK')`), await E('floats.map(f=>f.s)'));
+
   /* ---- saves ---- */
   const kept = await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);return run.lit===1&&run.call===1&&!coastGate('sunDoor').alive&&!coastGate('northPier').alive&&fieldL[6*MW+86]>0&&!items.some(i=>i.alive&&i.sub==='lens')})()`);
   ok('a save keeps the door, the pier and the light', kept);
@@ -182,6 +187,11 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await E(`dayT=DAYLEN*.8;void 0`); await step(30); ok('and that save gets the call on its next night', await E(`state==='c3'&&c3q.key==='call'`), await E('state')); await skip3();
   const mid = await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);return run.call===1&&!coastGate('sunDoor').alive&&coastGate('northPier').alive&&items.filter(i=>i.alive&&i.sub==='lens').length===1&&sprouts.some(q=>q.x>70*16)})()`);
   ok('saved half way, the lens and the wild coast sprouts are still there', mid);
+
+  /* ---- the first shard in 3D ---- */
+  await E(`init();live=true;state='play';const it=mkItem('shard',24*16+8-50,18*16+8);it.w=1;for(let i=0;i<6;i++)mkBud(1,2,P.x,P.y);void 0`); await tp(24, 18, -1, 0); await step(3); await throwFor(20); await step(30 * 12);
+  ok('the first shard home plays its 3D scene, with Ranger and the marks', await E(`shards===1&&state==='c3'&&c3q.key==='marks'&&c3q.S.some(e=>e.cap[0]==='RANGER')`), [await E('shards'), await E('state')]);
+  await skip3(); ok('and play goes on', (await E('state')) === 'play', await E('state'));
 
   /* ---- the ending in 3D ---- */
   await E(`init();live=true;state='play';shards=3;const it=mkItem('shard',24*16+8-50,18*16+8);it.w=1;for(let i=0;i<6;i++)mkBud(1,2,P.x,P.y);void 0`); await tp(24, 18, -1, 0); await step(3); await throwFor(20); await step(30 * 12);
