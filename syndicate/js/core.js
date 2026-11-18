@@ -55,9 +55,9 @@
     s.connect(f); f.connect(g); g.connect(master); s.start(t);
   }
   const SFX = {
-    swing: () => noise(0.09, 0.14, 2600, 'highpass'),
-    hit: () => { noise(0.12, 0.3, 900); tone(140, 0.1, 'square', 0.12, 0.5); },
-    crit: () => { noise(0.18, 0.4, 1400); tone(180, 0.16, 'square', 0.16, 0.4); tone(990, 0.2, 'triangle', 0.1, 1.5); },
+    swing: () => { noise(0.12, 0.16, 1500, 'highpass'); tone(110, 0.1, 'sine', 0.08, 0.5); },
+    hit: () => { noise(0.14, 0.34, 700); tone(140, 0.1, 'square', 0.12, 0.5); tone(64, 0.16, 'sine', 0.34, 0.5); },
+    crit: () => { noise(0.2, 0.44, 1000); tone(48, 0.26, 'sine', 0.42, 0.5); tone(180, 0.16, 'square', 0.16, 0.4); tone(990, 0.2, 'triangle', 0.1, 1.5); },
     hurt: () => { noise(0.14, 0.3, 600); tone(110, 0.14, 'sawtooth', 0.12, 0.6); },
     cast: () => tone(420, 0.18, 'sine', 0.12, 2),
     fire: () => { noise(0.3, 0.22, 800); tone(200, 0.25, 'sawtooth', 0.06, 0.5); },
@@ -83,7 +83,7 @@
     perfect: () => { tone(880, 0.12, 'sine', 0.12); tone(1320, 0.16, 'sine', 0.12, 1, 0.07); tone(1760, 0.3, 'sine', 0.1, 1, 0.14); },
     'break': () => { noise(0.25, 0.4, 1600); tone(220, 0.25, 'sawtooth', 0.14, 0.4); tone(660, 0.2, 'square', 0.08, 0.5, 0.03); },
     wall: () => { noise(0.3, 0.45, 300); tone(60, 0.3, 'sine', 0.3, 0.6); },
-    step: () => noise(0.035, 0.035, 500),
+    step: () => { noise(0.05, 0.06, 240); tone(72, 0.05, 'sine', 0.07, 0.6); },
     place: () => { noise(0.08, 0.2, 400); tone(180, 0.1, 'sine', 0.12, 0.7); },
     page: () => noise(0.12, 0.08, 2600, 'highpass')
   };

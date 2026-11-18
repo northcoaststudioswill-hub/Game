@@ -424,13 +424,14 @@
     }
     const l = Math.hypot(mx, mz); walker.moving = l > 0.1;
     if (walker.moving) {
-      const sp = 5.2 * Math.min(1, l) * dt, nx = walker.x + mx / l * sp, nz = walker.z + mz / l * sp, ox = walker.x, oz = walker.z;
+      walker.v = (walker.v || 0) + (1 - (walker.v || 0)) * Math.min(1, dt * 6);
+      const sp = 4.9 * walker.v * Math.min(1, l) * dt, nx = walker.x + mx / l * sp, nz = walker.z + mz / l * sp, ox = walker.x, oz = walker.z;
       if (!pl.blocked(nx, walker.z)) walker.x = nx;
       if (!pl.blocked(walker.x, nz)) walker.z = nz;
       if (walker.target && Math.hypot(walker.x - ox, walker.z - oz) < sp * 0.2) { walker.stuckT = (walker.stuckT || 0) + dt; if (walker.stuckT > 0.5) { walker.target = null; walker.stuckT = 0; } } else walker.stuckT = 0;
-      walker.face = Math.atan2(mx, mz); walker.walk += dt * 12;
+      walker.face = Math.atan2(mx, mz); { const w0 = walker.walk; walker.walk += dt * (3 + 8 * walker.v); if (Math.floor(walker.walk / Math.PI) !== Math.floor(w0 / Math.PI) && !frozen) G.sfx('step'); }
     }
-    if (walker.moving) { walker.emote = null; walker.lift = 0; }
+    if (walker.moving) { walker.emote = null; walker.lift = 0; } else walker.v = 0;
     const c = walker.char; c.root.position.set(walker.x, walker.lift || 0, walker.z);
     let d = walker.face - c.root.rotation.y; while (d > Math.PI) d -= 6.283; while (d < -Math.PI) d += 6.283; c.root.rotation.y += d * Math.min(1, dt * 14);
     const em = walker.emote;

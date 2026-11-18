@@ -150,7 +150,7 @@
       const q = { by: Math.sin(t * 2.4) * 0.015, bx: 0.06, bz: Math.sin(t * 1.2) * 0.02, bpz: 0, ll: 0.05, lr: -0.05, ty: Math.sin(t * 1.2) * 0.04, tz: 0, hx: 0, hz: 0,
         arx: -0.45 + Math.sin(t * 2.4) * 0.04, arz: 0, alx: restL + Math.sin(t * 2.4 + 1) * 0.03, alz: 0, cape: 0.16 + Math.sin(t * 2) * 0.04 };
       let snap = 0.28;
-      if (mv) { q.by = Math.abs(Math.cos(p.walk)) * 0.075; q.bx = 0.17; q.ll = sw * 0.85; q.lr = -sw * 0.85; q.ty = sw * 0.16; q.arx += -sw * 0.38; q.alx += sw * 0.38; q.cape = 0.52 + sw * 0.1; q.hx = -0.06; snap = 0.5; }
+      if (mv) { q.by = Math.abs(Math.cos(p.walk)) * 0.1 - 0.02; q.bx = 0.2; q.ll = sw * 0.85; q.lr = -sw * 0.85; q.ty = sw * 0.16; q.arx += -sw * 0.38; q.alx += sw * 0.38; q.cape = 0.52 + sw * 0.1; q.hx = -0.06; snap = 0.5; }
       if (act === 'swing') {
         snap = 1; const step = p.step || 0, w = Math.min(1, k / 0.5), r = Math.max(0, (k - 0.5) / 0.5);
         const cock = eo(Math.min(1, w / 0.6)), hit = ei(Math.max(0, (w - 0.6) / 0.4)), back = r * r * (3 - 2 * r);
