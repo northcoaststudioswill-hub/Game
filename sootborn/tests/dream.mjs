@@ -30,5 +30,6 @@ if (W === 'd2') await run('Story beats', 'End of Day 2', 'd2', 200);
 if (W === 'fall') await run('Fights', 'The Fall', 'fall', 120);
 if (W === 'd3') await run('Story beats', 'Day 3', 'd3', 320);
 if (W === 'd4') await run('Story beats', 'Day 4', 'd4', 700);
+if (/^p[1-5]$/.test(W)) await run('Story beats', 'Part Two · ' + W[1], W, 700);
 if (W === 'valley') await run('Fights', 'The Valley', 'val', 120);
 await browser.close();

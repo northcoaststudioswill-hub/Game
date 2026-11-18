@@ -107,11 +107,12 @@ const G3 = {
     cell: { top: [.02, .02, .04], bot: [.08, .07, .11], sun: [.12, .95, .28], sunC: [1.3, 1.2, 1.0], amb: [.36, .35, .44], sky: [.14, .14, .2], fog: [.04, .04, .07], fogR: [260, 760], sunAt: [0, 1, -.1] },
     storm: { top: [.02, .03, .09], bot: [.13, .15, .26], sun: [-.3, .8, .5], sunC: [.55, .62, .86], amb: [.22, .24, .34], sky: [.1, .12, .2], fog: [.09, .11, .2], fogR: [240, 950], sunAt: [.42, .62, -1] },
     fall: { top: [.08, .16, .46], bot: [.5, .66, .92], sun: [.5, .7, .3], sunC: [1.05, .96, .8], amb: [.34, .38, .5], sky: [.5, .62, .9], fog: [.7, .8, .96], fogR: [300, 1300], sunAt: [-.5, .5, -1] },
+    crown: { top: [.06, .08, .3], bot: [.98, .62, .34], sun: [.2, .35, -.9], sunC: [1.3, .95, .6], amb: [.34, .32, .46], sky: [.5, .4, .5], fog: [.86, .6, .46], fogR: [300, 1300], sunAt: [0, .16, -1] },
     keep: { top: [.3, .44, .78], bot: [1, .8, .68], sun: [.55, .42, -.72], sunC: [1.2, .92, .7], amb: [.4, .38, .46], sky: [.2, .2, .26], fog: [1, .84, .76], fogR: [380, 1500], sunAt: [.5, .2, -1] }
   },
   env(bg) {
     if (this.envs[bg]) return this.envs[bg];
-    const real = bg; if (bg === 'storm') bg = 'valley';
+    const real = bg; if (bg === 'storm') bg = 'valley'; if (bg === 'crown') bg = 'keep';
     const gl = this.gl, A = new Batch(30000), Sh = new Batch(20000), r = rng(bg.length * 131 + 17), I = M4.id(), R = (a, b) => a + r() * (b - a), hw = bg === 'keep' ? 110 : bg === 'cell' ? 96 : 125, hh = bg === 'keep' ? 50 : bg === 'cell' ? 58 : 60;
     const pine = (x, z, s) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); Sh.cyl(m, 0, 0, 0, 2.2 * s, 1.6 * s, 10 * s, 5, '#5a3c26'); const g = ['#1f6a34', '#27803c', '#2f9646', '#3aa850']; for (let i = 0; i < 4; i++) Sh.cyl(m, 0, (7 + i * 9) * s, 0, (15 - i * 3.2) * s, 0, 15 * s, 7, bg === 'ford' ? ['#28503a', '#2f5e40', '#386a46', '#427650'][i] : g[i]); };
     const oak = (x, z, s, c) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); Sh.cyl(m, 0, 0, 0, 2.6 * s, 1.8 * s, 16 * s, 5, '#6a4a30'); Sh.cyl(m, 0, 13 * s, 0, 9 * s, 13 * s, 8 * s, 6, shade(c, .86)); Sh.cyl(m, 0, 21 * s, 0, 13 * s, 10 * s, 8 * s, 6, c, 0, 1); Sh.cyl(m, 2 * s, 28 * s, 1 * s, 9 * s, 0, 9 * s, 6, shade(c, 1.12)); Sh.cyl(m, -7 * s, 17 * s, 4 * s, 6 * s, 0, 9 * s, 5, shade(c, 1.05)); };
@@ -150,7 +151,7 @@ const G3 = {
       for (let i = -9; i <= 9; i++) merlon(i * 28, -hh - 38, 0); for (let i = -3; i <= 8; i++) { merlon(-256, i * 28 - 20, 1.5708); merlon(256, i * 28 - 20, 1.5708); }
       A.box(I, 0, -60, -hh - 46, 560, 120, 6, '#d4cec0'); A.box(I, -260, -60, 80, 6, 120, 340, '#cac4b6'); A.box(I, 260, -60, 80, 6, 120, 340, '#cac4b6');
       // she watches from the dais. She does not know his face.
-      { const m = M4.t(0, 0, -hh - 22); Sh.box(m, 0, 7, 0, 90, 14, 26, '#f2ede2'); A.box(m, 0, 13.4, 13.2, 90, 1.2, .5, '#e8c25a', 1); Sh.box(m, 0, 2.5, 17, 60, 5, 8, '#e6e0d2'); Sh.box(m, 0, 30, -8, 16, 34, 6, '#f6f3ec'); A.box(m, 0, 44, -4.8, 10, 10, .5, '#e8c25a', 1); A.box(m, 0, 44, -4.5, 4, 4, .5, '#2a2438', 1);
+      if (real !== 'crown') { const m = M4.t(0, 0, -hh - 22); Sh.box(m, 0, 7, 0, 90, 14, 26, '#f2ede2'); A.box(m, 0, 13.4, 13.2, 90, 1.2, .5, '#e8c25a', 1); Sh.box(m, 0, 2.5, 17, 60, 5, 8, '#e6e0d2'); Sh.box(m, 0, 30, -8, 16, 34, 6, '#f6f3ec'); A.box(m, 0, 44, -4.8, 10, 10, .5, '#e8c25a', 1); A.box(m, 0, 44, -4.5, 4, 4, .5, '#2a2438', 1);
         const cm = M4.t(0, 14, -hh - 20); Sh.cyl(cm, 0, 0, 0, 7, 4, 26, 7, '#f4f2ec'); A.cyl(cm, 0, 0, 0, 7.2, 7.2, 1.4, 7, '#e8c25a', 1); Sh.box(cm, 0, 30, 0, 6.4, 7.4, 6.4, '#f4e6dc'); Sh.box(cm, 0, 31, -2.6, 8, 12, 3, '#f6eac0'); A.box(cm, 0, 34.6, 0, 7.4, 1.4, 7.4, '#e8c25a', 1); A.box(cm, -1.6, 30.6, 3.3, 1.2, 1, .3, [1, .8, .3], 1); A.box(cm, 1.6, 30.6, 3.3, 1.2, 1, .3, [1, .8, .3], 1);
         for (const sx of [-1, 1]) { const wm = M4.t(sx * 26, 14, -hh - 20); Sh.cyl(wm, 0, 0, 0, 6, 4, 24, 6, '#c8ccd8'); Sh.box(wm, 0, 28, 0, 7, 8, 7, '#d8dce4'); A.box(wm, 0, 28.6, 3.6, 5, 1.2, .3, '#1e1e28', 1); Sh.cyl(wm, sx * 7, 0, 2, .7, .7, 52, 4, '#b8bcc8'); Sh.box(wm, sx * 7, 52, 2, 1, 8, 5, '#e8ecf2'); } }
       const HC = ['#7a5ac8', '#2aa6a0', '#c8452e', '#e8c25a', '#3a6ac8', '#58b848', '#c85a9a', '#e88a3a', '#8a8a92', '#40c8e8', '#a03a3a', '#f4f0e6'];

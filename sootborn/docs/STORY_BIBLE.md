@@ -129,7 +129,13 @@ The game tells two halves at once: the present below, and the years after, seen 
 - **Training (3 years):** speech with Ilse, the blade and the boots with Brand, a Warden who deserted rather than kill a child for humming.
 - **+4 years, the Assay:** sent up Lift Zero under a dead boy's name. Night 1 the Pairing; day 19 the Ford; day 31 the Proctor; day 40 the Valley; last day the Keep. The winner is given a post on the Spire. That is the point.
 - **The Assay in full:** arrival and the sorting; night 1 the Pairing (Teo); day 19 the Ford (Vant); day 26 the Standard (the Sisters Vey, and thirty Teal cadets come over); day 31 the Proctor (Voss); day 40 the Valley; last day the Keep (Lucan), then the Pinning: Celestine's champion, then she pins the sun on him and gives him a post on the Spire counting who breathes.
-- **+4 to +7 years, on the Spire (Part Two, unwritten):** Kael works inside the Authority with the sun on his collar. He reads the ledger of everyone struck out.
+- **Part Two, Above (written, v0.17):**
+  - +4: Kael is **Edric Sorrel** (a boy of a minor House, dead of fever at eleven; Ilse bought his papers), Clerk of the Count, fourth ring of the Spire. The Count is a book: a line per person below, air breathed and air owed; a struck line means a furnace. He finds "Holloway, S." Lucan asks to be taught (flag `lucanFriend`). Duel with Tyr Cade, the Marshal's nephew.
+  - +5: Marshal Cade's balancing of Tier Four (1,100 people). Kael signs or delays (flag `signedFour`), then holds the top of Riser Nine, which comes up in the Assay valley, and gets forty out.
+  - +6: Celestine hears him hum the shift song and knows. She offers him the Count after her: she is seventy, the Array has about ten years, her son is "kind, which is the same as useless". Lucan duels him at the keep; friend: yields and gives the dock key; otherwise goes over the parapet and survives.
+  - +7: the High Docks.
+  - +7 to +9: Brand dies holding the dock stair (eleven minutes). Mara gets Tier Six to stop kneeling. Tavi comes up at sixteen.
+  - +9: the Fall; the Stair; the duel with Celestine. Ending choice (flag `ending`): strike her line in the Count, or send her down Lift Zero to a bunk on Row K. Kael leaves Lift Zero open. The Array does not hold; people die the first winter and are counted aloud by name. He goes down to Seren's chalk sun.
 - **+7 years, the High Docks:** with Ilse, Brand and the Unlit he cuts four hundred lift-barges loose. Vant is Dockmaster. Kael drops the sun over the rail.
 - **+9 years, the Fall:** the Belowborn and their allies drop four hundred stolen lift-barges onto the Sun Spire. Marshal Cade. Further fights should live out here: bigger, off the ground.
 
@@ -200,5 +206,5 @@ Real devices, sound by ear, and how the heist, the festival stealth and the figh
 ## Next steps
 - Playtest the fights and both stealth scenes with a person and tune from notes.
 - Art pass toward the reference boards: 24–32px characters, hand-made tilesets, more portrait expressions.
-- Part Two (Above): the three years on the Spire, Lucan after the Keep, what Celestine works out and when, the two years between the Docks and the Fall. Sable has still not appeared on screen.
+- Art and staging pass on all of Part Two; its own places (the Count room, the gallery, Riser Nine, the Spire stair); saving progress through Part Two; optional 2D Assay play to lengthen the middle. Sable has still not appeared on screen.
 - Combat growth toward battles: allies with orders, bigger fields, weapons.

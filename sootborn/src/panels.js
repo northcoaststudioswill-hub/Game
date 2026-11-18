@@ -148,6 +148,26 @@ const PANELS = {
     for (const [x, y] of [[118, 34], [150, 28], [176, 36], [200, 44], [132, 42]]) R(g, x, y, 3, 2, '#c8c0c0');
     if (st >= 1) { const a = Math.min(1, s / 1.2); R(g, 132, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); R(g, 172, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); glow(g, 142, 84, 14, '255,140,50', .5 * a); glow(g, 182, 84, 14, '255,140,50', .5 * a); }
   },
+  // ---- Part Two: the ledger of who breathes (0: the book · 1: struck names · 2: hers)
+  ledger(g, t, st, s) {
+    const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#14110e'); glow(g, 160, 60, 150, '255,200,120', .12 + Math.sin(t * 5) * .01); R(g, 0, 150, 320, 30, '#2a1e14'); R(g, 0, 150, 320, 2, '#4a3624');
+    R(g, 30, 22, 260, 132, '#3a2a1c'); R(g, 34, 26, 124, 124, '#efe6d0'); R(g, 162, 26, 124, 124, '#e8dec6'); R(g, 158, 26, 4, 124, '#b8a888'); R(g, 34, 26, 252, 1, '#fff8e8');
+    for (const x0 of [40, 168]) { R(g, x0, 32, 112, 1, '#b8943a'); R(g, x0 + 70, 32, 1, 112, '#d8c8a0'); R(g, x0 + 92, 32, 1, 112, '#d8c8a0'); ptext(g, 'NAME', x0 + 2, 34, '#8a6a2a'); ptext(g, 'AIR', x0 + 73, 34, '#8a6a2a'); ptext(g, 'DUE', x0 + 95, 34, '#8a6a2a'); }
+    const N = ['MORROW D', 'VENN M', 'HOLLIS', 'FEN', 'MARROW', 'TAVI B', 'ORIN', 'NELL', 'BAO', 'PELL', 'JUNO', 'KIT', 'SABLE', 'ADA', 'MOSI', 'PIP'], struck = [0, 3, 6, 9, 12, 14];
+    for (let i = 0; i < 16; i++) { const x0 = i < 8 ? 40 : 168, y = 44 + (i % 8) * 12, hit = st >= 1 && struck.includes(i), a = hit ? Math.min(1, Math.max(0, s * 2 - struck.indexOf(i) * .5)) : 0; ptext(g, N[i], x0 + 2, y, '#3a2e22'); R(g, x0 + 73, y + 1, 14 - (i * 5) % 8, 3, '#6a8aa0'); ptext(g, String(3 + (i * 7) % 9), x0 + 96, y, '#8a2a1a'); if (a > 0) { R(g, x0, y + 2, Math.round(68 * a), 1, '#a02a1a'); if (a >= 1 && st < 2) ptext(g, 'BALANCED', x0 + 30, y + 6, '#a02a1a'); } }
+    if (st >= 2) { const a = Math.min(1, s / 1.4); g.globalAlpha = a; R(g, 60, 70, 200, 44, '#efe6d0'); R(g, 60, 70, 200, 1, '#b8943a'); R(g, 60, 113, 200, 1, '#b8943a'); ptext(g, 'HOLLOWAY S', 72, 78, '#3a2e22', 2); R(g, 70, 84, Math.round(128 * a), 2, '#a02a1a'); ptext(g, 'COMMITTED - TIER 6 - BALANCED', 72, 98, '#a02a1a'); g.globalAlpha = 1; glow(g, 160, 92, 90, '255,120,60', .12 * a); }
+    R(g, 250, 120, 3, 34, '#e8e0cc'); R(g, 251, 114 + Math.round(Math.sin(t * 8)), 1, 6, '#ffd26e'); glow(g, 251, 116, 12, '255,200,110', .7); if (st === 0) plate(g, 'THE COUNT', 160, 168);
+  },
+  // ---- the end: Ashgate Square with the lift standing open (0: the light · 1: they look up · 2: her sun)
+  dawn(g, t, st, s) {
+    const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#120c10'); PX.rock(g, 0, 60); for (let y = 60; y < 150; y += 10) for (let x = (y / 10 % 2) * 16; x < 320; x += 32) R(g, x, y, 31, 9, (x + y) % 3 ? '#2a2026' : '#30262c'); R(g, 0, 150, 320, 30, '#3a3036'); for (let x = 0; x < 320; x += 20) R(g, x, 150, 1, 30, '#2a2228'); R(g, 0, 150, 320, 1, '#5a4c54');
+    const a = Math.min(1, t / 3); R(g, 132, 30, 56, 120, '#e4e2dc'); R(g, 138, 30, 44, 120, '#fff8e0'); R(g, 132, 30, 56, 3, '#e8c25a'); g.fillStyle = `rgba(255,244,200,${.2 * a})`; g.beginPath(); g.moveTo(138, 30); g.lineTo(182, 30); g.lineTo(300, 180); g.lineTo(20, 180); g.closePath(); g.fill(); glow(g, 160, 60, 140 * a, '255,240,190', .35 * a); g.fillStyle = `rgba(255,236,170,${.1 * a})`; g.fillRect(0, 150, 320, 30);
+    for (let i = 0; i < 40; i++) { const ph = (t * .08 + hash(i, 2)) % 1; R(g, 60 + hash(i, 1) * 200, 40 + ph * 130, 1, 1, `rgba(255,250,220,${.8 * a})`); }
+    const ids = ['mara', 'tavi', 'ivo', 'orin', 'nell', 'hollis', 'dace', 'bao', 'pell', 'juno', 'kit', 'marrow'];
+    for (let i = 0; i < 12; i++) { const x = 14 + i * 26 + (i % 2) * 6, y = 160 + (i % 3) * 6; if (Math.abs(x - 160) < 24) continue; PX.spr(g, World.sheetFor(ids[i]), st >= 1 ? 1 : (x < 160 ? 3 : 2), x, y, 2); }
+    if (st >= 2) { const b = Math.min(1, s / 1.6); g.strokeStyle = `rgba(255,236,170,${b})`; g.lineWidth = 2; g.beginPath(); g.arc(160, 100, 12, 0, 6.3); g.stroke(); for (let k = 0; k < 8; k++) { const an = k / 8 * 6.283; R(g, 160 + Math.cos(an) * 18, 100 + Math.sin(an) * 18, 2, 2, `rgba(255,236,170,${b})`); } g.lineWidth = 1; PX.spr(g, World.sheetFor('kael'), 1, 160, 152, 3); }
+    if (st === 0) plate(g, 'ASHGATE SQUARE', 60, 20);
+  },
   // ---- Day 3: the top of Lift Zero (0: the room · 1: she is there · 2: the window)
   ante(g, t, st, s) {
     const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#e9e6de'); for (let x = 0; x < 320; x += 40) { R(g, x, 0, 1, 130, '#d6d2c8'); R(g, x + 1, 0, 1, 130, '#f6f4ee'); } R(g, 0, 0, 320, 6, '#e8c25a'); R(g, 0, 6, 320, 1, '#b8943a');

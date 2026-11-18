@@ -1,5 +1,29 @@
 # SOOTBORN — changelog
 
+## v0.17 · 2026-11-18 — Part Two: Above. The story now has an ending.
+From play notes: finish out the story and the fights; set it all up, then flesh it out.
+
+**The whole story is now playable from the opening film to THE END.** Part Two is five chapters, each an illustrated chapter with choices and one or two fights. It is a first full draft: written and wired, reusing existing places, with two new panels. No art pass yet.
+
+**Part Two — Above** (starts from the end of Part One, or the Dev menu)
+1. **The Post** (+4 years). Kael is Edric Sorrel, Clerk of the Count on the Sun Spire. The Count is a book with a line for everyone below; he finds Seren's. Lucan Aurel asks to be taught (befriend him or not: it changes chapter 3). Fight: **The Gallery**, a duel with Tyr Cade.
+2. **The Balancing** (+5). The order to strike all of Tier Four crosses his desk (sign it, or lose it for a day). A letter from Dace: Tavi is twelve and on the wheel. Fight: **Riser Nine**, holding the top of a stair in a mask while forty people come up it.
+3. **What She Knows** (+6). He hums the shift song at a valve in Celestine's room without noticing. She knows who he is, and offers him the Count after her. Fight: **The Son**, Lucan at the keep again; if they were friends he lowers his blade and gives Kael the dock key, if not he goes over the parapet. Then **The High Docks**.
+4. **Two Years** (+7 to +9). Brand held the dock stair for eleven minutes. The Unlit learn to fly barges. Mara gets Tier Six off its knees. Tavi comes up at sixteen. Ilse gets her one joke. Then **The Fall**, now told as it happens.
+5. **The Count** (+9). Fights: **The Stair** (three waves up the Spire, ending with the Auditor's Blade) and **Little Ember**, the last duel, against Celestine herself, with four Memory Arts and plain ELEVEN as the finisher. Then a last choice (strike her line, or send her down Lift Zero to live on Row K), Lift Zero left open all the way down, the square in real light, and Seren's chalk sun.
+
+**Also**
+- Day 4 now ends on the Pinning and offers "Begin Part Two". The High Docks and the Fall moved into Part Two where they belong.
+- New panels: the Count (the ledger, names struck, hers) and Ashgate Square at the end.
+- New place: the top of the Spire at sunset (the keep's geometry, relit, without the dais).
+- New cast: Tyr Cade; Celestine as a fighter.
+- Dev menu: all five chapters under Story beats, the same without fights under Cutscenes, five new fights, five new fight films.
+
+**Known gaps**
+- Part Two does not save its place; leave mid-chapter and you restart that chapter (each chapter is in the Dev menu).
+- The Gallery reuses the pairing room, Riser Nine the storm valley, the Son and the Stair the keep.
+- Kael's Spire name (Edric Sorrel), Tyr Cade, Brand's death, both endings and the cost of opening the doors are new canon. Nothing here has been played by a person.
+
 ## v0.16 · 2026-11-18 — Day 4, the end of Part One, and four more fights
 From play notes: build the next parts and the fights, beautify later; should this take us near the end?
 
