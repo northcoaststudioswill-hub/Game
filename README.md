@@ -1,3 +1,5 @@
+> **This is the old pre-v0.2 setup, kept for history.** For the current game and every version, start at [`LATEST.md`](LATEST.md).
+
 # Pocket Lantern
 
 A pocket console in one HTML file, with swappable game cartridges.
