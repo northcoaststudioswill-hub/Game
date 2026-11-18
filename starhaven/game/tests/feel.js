@@ -562,6 +562,17 @@ const path = require('path');
       SH.modes.auto = true;
     })();
 
+    // A resident's request: Old Mirelle's cat
+    (function () {
+      SH.test.load('ashes', { story: false }); G.progress.mem = {}; G.progress.bonus = 0; G.progress.motes = {};
+      const cat = G.world.things.find(e => e.kind === 'pickup' && e.what === 'cat'), mir = G.world.npcs.find(n => n.id === 'mirelle');
+      const before = SH.stars.gathered();
+      SH.test.place(mir.x / T - 0.5, 16); for (let i = 0; i < 5; i++) step({}, null); step({}, ['up']); const asked = G.script && G.script.id === 'ashes_mirelle';
+      for (let i = 0; i < 300 && G.state === 'talk'; i++) talk({}, null);
+      P().x = cat.x; P().y = cat.y; for (let i = 0; i < 400 && (i < 5 || G.state === 'talk'); i++) talk({}, null);
+      check('Errand: Old Mirelle asks after her cat; finding it on the awning is remembered and pays 10 Starlight', !!mir && asked && cat.got && G.recalls('cat') && SH.stars.gathered() === before + 10, { asked, found: cat.got, remembered: G.recalls('cat'), starlight: [before, SH.stars.gathered()] });
+    })();
+
     // Systems explain themselves the first time, once
     (function () {
       SH.test.load('woods', { story: false, explain: true }); G.progress.seen = {};

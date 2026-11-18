@@ -10,7 +10,7 @@
   ];
   const prog = () => SH.game.progress;
   S.level = id => (prog() && prog().stars && prog().stars[id]) || 0;
-  S.gathered = () => Object.values((prog() && prog().motes) || {}).reduce((a, b) => a + b, 0);
+  S.gathered = () => Object.values((prog() && prog().motes) || {}).reduce((a, b) => a + b, 0) + ((prog() && prog().bonus) || 0);   // motes, plus what people give her for helping
   S.spent = () => S.DEFS.reduce((n, d) => n + d.costs.slice(0, S.level(d.id)).reduce((a, b) => a + b, 0), 0);
   S.free = () => S.gathered() - S.spent();
   S.cost = d => d.costs[S.level(d.id)];

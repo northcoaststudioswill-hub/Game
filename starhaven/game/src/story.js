@@ -22,6 +22,7 @@
     lissa: { name: 'Lissa', color: '#b8e8a0' },
     rowan: { name: 'Lord Rowan', color: '#e8c070' },
     thane: { name: 'Thane', color: '#e0a0b0' },
+    mirelle: { name: 'Old Mirelle', color: '#e8c8a8' },
     narr: { name: '', color: '#b9b2dd' },
   };
 
@@ -402,6 +403,29 @@
       { do: 'goal', id: 'arrive' },
       { do: 'winnow', npc: 'caelum', to: 41 },
     ],
+    // A resident's request (DESIGN.md: small errands for the people of Starhaven, paid in Starlight)
+    ashes_mirelle: [
+      { if: 'cat', then: [
+        ['mirelle', 'She came home with soot on her nose and no apology. That was you, on the awning? Bless you, girl.'],
+        ['mirelle', 'We have not had a stranger do a kindness on this street since the lamps went out.'],
+      ], else: [
+        ['mirelle', 'You are the one he brought back. Hm. Thinner than I expected.'],
+        ['mirelle', 'If you are going up the street: my cat, Ember. Black, rude, about so big. She climbs when the dark frightens her, and it is all dark now.'],
+        ['wren', 'I\'ll look up as I go.'],
+      ] },
+    ],
+    ashes_cat_found: [
+      ['narr', 'A black cat is flattened on the awning, pretending not to be afraid. It considers Wren, then walks onto her shoulder as if that had been the plan.'],
+      ['narr', 'At the street it jumps down and trots home, tail up.'],
+      { do: 'remember', key: 'cat', text: 'Brought Old Mirelle\'s cat down from the awning.', good: true },
+      { do: 'starlight', n: 10, why: 'the first kindness on this street in a long while' },
+    ],
+    mtn_page: [
+      ['narr', 'A page, frozen to the rock. The hand is small and exact, and the margin says: "wyrms sleep facing the wind. T."'],
+      ['wren', 'Thane\'s. He must have lost it up here years ago.'],
+      { do: 'remember', key: 'page', text: 'Found Thane\'s lost page on the mountain.', good: true },
+      { do: 'starlight', n: 5, why: 'a page for the Library' },
+    ],
     ashes_overlook: [
       ['caelum', 'That glow ahead is Starhaven. Hidden from every other court for a thousand years.'],
       ['wren', 'Why show it to me?'],
@@ -474,15 +498,15 @@
       ['wren', 'I don\'t sleep much. The Deep follows me.'],
       ['caelum', 'Mine too. Here. Starlit wine. It tastes like the first warm night of summer.'],
       { choose: [
-        { text: 'Show him your sketchbook', liked: 'caelum', bond: { caelum: 15 }, then: [
+        { text: 'Show him your sketchbook', liked: 'caelum', bond: { caelum: 15 }, why: 'You let him see the worst thing you carry.', remember: ['sketchbook', 'Showed Caelum the sketchbook of the Deep.', true], then: [
           ['caelum', '...These are the Deep. You drew it from memory?'],
           ['wren', 'So I could stop seeing it. It doesn\'t work.'],
           ['caelum', 'It might, one day. Draw Starhaven next. Give the Deep some competition.'],
         ] },
-        { text: 'Toast to the bargain', bond: { caelum: 5 }, then: [
+        { text: 'Toast to the bargain', bond: { caelum: 5 }, why: 'Easy company, and nothing risked.', then: [
           ['caelum', 'To the bargain. The best one I ever made, and I\'ve made some very good ones.'],
         ] },
-        { text: 'Ask what he sees in his nightmares', bond: { caelum: 10 }, then: [
+        { text: 'Ask what he sees in his nightmares', bond: { caelum: 10 }, why: 'Nobody asks him. You did.', remember: ['nightmares', 'Asked Caelum about his nightmares.', true], then: [
           ['caelum', 'The Thorn Queen\'s court. Smiling at her while she held my people hostage.'],
           ['caelum', 'I\'d do it again to keep them safe. I hate that I\'d do it again.'],
         ] },
@@ -774,6 +798,7 @@
     ev3_thane: [
       { do: 'art', id: 'library', title: 'Evening with Thane' },
       ['thane', 'Oh, good. I have forty-one questions about your hand. Sit down. Tea?'],
+      { if: 'page', then: [['wren', 'First: this is yours. It was frozen to the mountain.'], ['thane', '...Wyrms sleep facing the wind. I wrote that at nineteen, and lost it the same afternoon. Forty years.'], { do: 'bond', who: 'thane', pts: 10, liked: true, why: 'You carried a scrap of paper down a mountain for him.' }] },
       { choose: [
         { text: 'Bring him a rare book from the Night Market', liked: 'thane', bond: { thane: 15 }, then: [['thane', 'Is this... a first copy of the Tide Court star charts? Where did you... no, don\'t tell me. I\'ll cry on it.']] },
         { text: '"Ask your forty-one questions."', bond: { thane: 10 }, then: [['narr', 'He asks all forty-one. Then he asks nine more. By the end, you both understand the fire a little better.']] },
@@ -792,6 +817,9 @@
     finale: [
       { do: 'art', id: 'city', title: 'Next: Chapter 4, The Spy in the Library' },
       ['narr', 'Three nights later, Starhaven sleeps under a sky full of stars.'],
+      { if: 'sketchbook', then: [['narr', 'On the sill of the Rooftop House a sketchbook lies open. The newest page is not the Deep. It is a street, with every lamp lit.']] },
+      { if: 'cat', then: [['narr', 'On Mirelle\'s step, a black cat watches the Library roof and does not blink.']] },
+      { if: 'nightmares', then: [['narr', 'Caelum is asleep. That is new.']] },
       ['narr', 'On the Library roof, something with wings lands without a sound, folds itself into the shadows, and waits.'],
       { do: 'end' },
     ],

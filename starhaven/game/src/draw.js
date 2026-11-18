@@ -839,7 +839,9 @@
       if (e.got) return;
       const bob = Math.round(Math.sin(t * 0.08 + e.x) * 1.5);
       const gl = ctx.createRadialGradient(e.x, e.y - 8, 1, e.x, e.y - 8, 22); gl.addColorStop(0, 'rgba(255,246,216,0.3)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 22, e.y - 30, 44, 44);
-      if (e.what === 'wood') { R(-10, -9 + bob, 20, 9, '#0a0818'); R(-9, -8 + bob, 18, 3, '#7a5636'); R(-9, -5 + bob, 18, 3, '#5e3e28'); R(-9, -2 + bob, 18, 1, '#4a3020'); R(-9, -8 + bob, 2, 6, '#c8a878'); R(-2, -10 + bob, 3, 10, '#c8b890'); R(-9, -8 + bob, 18, 1, '#ffffff'); }
+      if (e.what === 'cat') { const tl = Math.sin(t * 0.1) * 2; R(-7, -9, 13, 8, '#0a0818'); R(-6, -8, 11, 7, '#2a2630'); R(3, -13, 7, 7, '#0a0818'); R(4, -12, 5, 5, '#2a2630'); R(4, -14, 2, 2, '#2a2630'); R(7, -14, 2, 2, '#2a2630'); R(5, -10, 1, 1, '#ffd27a'); R(7, -10, 1, 1, '#ffd27a'); R(-9, -10 + tl, 2, 6, '#2a2630'); R(-5, -5, 3, 1, '#f4f0e0'); }
+      else if (e.what === 'page') { R(-6, -12 + bob, 12, 14, '#0a0818'); R(-5, -11 + bob, 10, 12, '#f4f0e0'); for (let i = 0; i < 4; i++) R(-3, -9 + i * 3 + bob, 6, 1, '#6a5aa8'); R(-5, -11 + bob, 3, 3, '#e8c070'); }
+      else if (e.what === 'wood') { R(-10, -9 + bob, 20, 9, '#0a0818'); R(-9, -8 + bob, 18, 3, '#7a5636'); R(-9, -5 + bob, 18, 3, '#5e3e28'); R(-9, -2 + bob, 18, 1, '#4a3020'); R(-9, -8 + bob, 2, 6, '#c8a878'); R(-2, -10 + bob, 3, 10, '#c8b890'); R(-9, -8 + bob, 18, 1, '#ffffff'); }
       else { R(-1, -12 + bob, 2, 12, '#3f6a3f'); R(-6, -12 + bob, 5, 3, '#8fd16b'); R(1, -15 + bob, 5, 3, '#8fd16b'); R(-5, -7 + bob, 4, 3, '#6ab04a'); R(2, -9 + bob, 4, 3, '#6ab04a'); R(-1, -17 + bob, 2, 2, '#ff9ac0'); }
     } else if (e.kind === 'snare') {
       R(-10, -2, 20, 2, '#0a0818'); R(-9, -14, 2, 14, '#5e3e28'); R(-9, -15, 12, 2, '#5e3e28');
@@ -916,10 +918,12 @@
     const spikes = 10, rot = e.wobble * 0.2 * (e.dir || 1);
     const body = e.flash > 0 ? '#ffffff' : angry ? '#6a4a1c' : PAL.sprite;
     const rim = e.flash > 0 ? '#ffffff' : angry ? PAL.spriteAngry : PAL.spriteRim;
+    ctx.fillStyle = '#0a0818'; star(ctx, x, cy, 16, 10.5, spikes, rot);
     ctx.fillStyle = rim;
     star(ctx, x, cy, 14, 9, spikes, rot);
     ctx.fillStyle = body;
     star(ctx, x, cy + 1, 11.5, 7.5, spikes, rot);
+    ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.fillRect(Math.round(x - 5), Math.round(cy - 5), 4, 2);   // a glint
     // eyes look toward where it's going
     ctx.fillStyle = angry ? '#ffe0a0' : PAL.spriteEye;
     const ex = (e.dir || 1) * 3;

@@ -15,6 +15,7 @@
     nessa: { bg: ['#4a4a5a', '#16161e'], skin: '#f0d4c0', shade: '#d4b49e', hair: '#2a1a14', hairD: '#140c08', eye: '#5a6a7a', style: 'braid', ears: false, cloth: '#5a5a6a', clothD: '#3a3a48' },
     lissa: { bg: ['#4a6a3a', '#141e10'], skin: '#f6dcc6', shade: '#dcbca8', hair: '#b8864a', hairD: '#8a5a2a', eye: '#6a9a5a', style: 'long', ears: false, cloth: '#4a7a4a', clothD: '#2f5a2f', flower: true },
     rowan: { bg: ['#6a8a3a', '#1a2410'], skin: '#f2d8b8', shade: '#d4b490', hair: '#e8c070', hairD: '#b8903a', eye: '#4ac06a', style: 'swept', ears: true, cloth: '#3a5a2a', clothD: '#24381a', trim: '#e8c070', antlers: true },
+    mirelle: { bg: ['#6a4a34', '#1c120c'], skin: '#e8c8a8', shade: '#c8a484', hair: '#d8d4e0', hairD: '#a8a4b8', eye: '#3a2a1a', style: 'bun', ears: true, cloth: '#8a5a3a', clothD: '#6a4a34', trim: '#f4f0e0' },
     thane: { bg: ['#5a2a3a', '#1a0c12'], skin: '#8a5a3c', shade: '#6e4630', hair: '#2a2a2a', hairD: '#9a9a9a', eye: '#3a2a1a', style: 'shaved', ears: true, cloth: '#6a2a3a', clothD: '#4a1a26', trim: '#e8c070', glasses: true },
     iris: { bg: ['#2a5a7a', '#0c1a2a'], skin: '#f2d9c8', shade: '#dcbca8', hair: '#f4f0ff', hairD: '#c8c0e8', eye: '#8fd8ff', style: 'bun', ears: true, cloth: '#4f88c0', clothD: '#2f5a88', thread: true },
   };

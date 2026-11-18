@@ -15,6 +15,7 @@
   // Everyone faces right in the sheet. build: 0 slight, 1 broad. robe: a long garment instead of legs.
   const LOOKS = {
     wren: { skin: '#f6dcc6', hair: '#e0703f', style: 'braid', top: '#2f8f7a', trim: '#ffd27a', legs: '#3b3150', boots: '#6a4430', eye: '#3a8a6a', coat: true },
+    mirelle: { skin: '#e8c8a8', hair: '#d8d4e0', style: 'bun', top: '#8a5a3a', trim: '#f4f0e0', robe: '#6a4a34', eye: '#3a2a1a', basket: true, small: 1 },
     caelum: { skin: '#ecd5c8', hair: '#1a1530', style: 'swept', top: '#241f48', trim: '#cfd6ff', legs: '#14122a', boots: '#0c0a1c', wings: true, eye: '#a58bff', tall: 2, coat: true },
     bram: { skin: '#d9a77f', hair: '#3a2a20', style: 'shaved', top: '#a8743a', trim: '#5a3a1c', legs: '#3a2a20', boots: '#241710', build: 1, beard: '#8a4426', eye: '#2a1a10', bare: true },
     iris: { skin: '#f2d9c8', hair: '#f4f0ff', style: 'bun', top: '#4f88c0', trim: '#ffe9a8', robe: '#3f72a8', eye: '#8fd8ff', thread: true },

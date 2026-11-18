@@ -22,7 +22,7 @@
     const pr = G.progress;
     SH.saves.write(G.slot, {
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
     });
     if (show) G.hud.saved();
   };
@@ -41,7 +41,7 @@
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
     G.slot = slot;
-    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen) };
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen), bonus: s.bonus || 0 };
     SH.arts.newGame(); SH.arts.said = Object.assign({}, s.said); SH.arts.meter = s.bondMeter || 0;
     const N = ST.CHAPTERS.length, target = s.chapter;
     const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
@@ -103,6 +103,8 @@
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       // the Winter Woods
       onPickup(what) {
+        if (what === 'cat') { G.queueScript('ashes_cat_found'); return; }
+        if (what === 'page') { G.queueScript('mtn_page'); return; }
         if (what === 'herb') { G.remember('green', 'Found wintergreen under the snow for Lissa.', true); G.queueScript('woods_herb'); return; }
         G.flags.n_wood = (G.flags.n_wood || 0) + 1;
         fx.word(player.x, player.y - 50, 'Firewood ' + G.flags.n_wood + '/3', '#ffd27a', 60);
@@ -286,6 +288,7 @@
     switch (st.do) {
       case 'mode': break;   // skipped along with the scene
       case 'remember': G.remember(st.key, st.text, st.good); break;
+      case 'starlight': G.progress.bonus = (G.progress.bonus || 0) + st.n; G.hud.toast('\u2726 +' + st.n + ' Starlight: ' + st.why); SH.sfx.play('lantern'); G.save(); break;
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); if (st.name === 'giftgot') G.explain('moons'); break;
       case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
@@ -330,7 +333,7 @@
   G.explain = function (key) {
     const seen = G.progress.seen = G.progress.seen || {};
     if (G.noExplain || seen[key] || !ST.EXPLAIN[key] || G.explaining) return;
-    if (G.state !== 'play') { G.explainNext = key; return; }        // wait for the scene to end
+    if (G.state !== 'play') { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for the scene to end
     seen[key] = 1; G.explaining = key; G.state = 'explain'; input.clear(true);
     const e = ST.EXPLAIN[key];
     document.getElementById('ex-icon').textContent = e.icon; document.getElementById('ex-title').textContent = e.title; document.getElementById('ex-text').textContent = e.text;
@@ -387,7 +390,7 @@
     if (G.mode) { if (G.state === 'talk' || G.state === 'play') G.progress.playFrames = (G.progress.playFrames || 0) + 1; SH.modes.step(input); return; }
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
     G.effectStep();
-    if (G.explainNext && G.state === 'play' && !G.mode && !SH.arts.cutin) { const k = G.explainNext; G.explainNext = null; G.explain(k); if (G.state !== 'play') return; }
+    if (G.explainQ && G.explainQ.length && G.state === 'play' && !G.mode && !SH.arts.cutin && !G.pending) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
     if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -731,7 +734,7 @@
     // load('roomId', { story: false }): a bare room, every gate open, no story scripts.
     load(chapterOrRoom, opts) {
       opts = opts || {};
-      G.frozen = true; input.forced = { held: {}, pressed: {} }; SH.modes.auto = !opts.modes; G.noExplain = !opts.explain; G.explaining = null; G.explainNext = null; G.mode = null; SH.modes.cur = null; delete document.body.dataset.mode;
+      G.frozen = true; input.forced = { held: {}, pressed: {} }; SH.modes.auto = !opts.modes; G.noExplain = !opts.explain; G.explaining = null; G.explainQ = []; G.mode = null; SH.modes.cur = null; delete document.body.dataset.mode;
       document.getElementById('front').classList.remove('show'); G.slot = null;
       if (typeof chapterOrRoom === 'number') { G.startChapter(chapterOrRoom); G.hud.cardGo(); }
       else {

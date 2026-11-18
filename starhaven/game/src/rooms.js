@@ -126,6 +126,7 @@
       ['ground', 30, 46, 14],           // the overlook
       ['ground', 46, 122, 16],
       ['oneway', 99, 104, 13],          // ledge up to the roof
+      ['oneway', 86, 90, 12],           // an awning: something is sitting on it
       ['solid', 104, 118, 10, 16],      // the Rooftop House
       ['solid', 118, 122, 0, 20],
     ],
@@ -149,8 +150,8 @@
     arch: 52,
     house: { x0: 104, x1: 118, top: 10 },
     lanterns: [{ x: 3, lit: true }],
-    npcs: [{ id: 'caelum', x: 8 }],
-    gates: [], spawns: [],
+    npcs: [{ id: 'caelum', x: 8 }, { id: 'mirelle', x: 62, optional: 'ashes_mirelle' }],
+    gates: [], spawns: [{ kind: 'pickup', what: 'cat', x: 88, y: 12 }],
   };
 
   // ---------------------------------------------------------------- Chapter 2: The Five (daggers, pogo, first enemies)
@@ -244,6 +245,7 @@
     lanterns: [{ x: 4, lit: true }, { x: 46 }, { x: 69 }, { x: 119 }],   // the last one is inside the hollow, so a knockout keeps you in the fight
     npcs: [{ id: 'thane', x: 8 }, { id: 'caelum', x: 11 }],
     spawns: [
+      { kind: 'pickup', what: 'page', x: 60, y: 12 },
       { kind: 'brazier', x: 13 },
       { kind: 'brazier', x: 17 },
       { kind: 'brazier', x: 22, y: 12 },

@@ -627,6 +627,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     lissa: { name: 'Lissa', color: '#b8e8a0' },
     rowan: { name: 'Lord Rowan', color: '#e8c070' },
     thane: { name: 'Thane', color: '#e0a0b0' },
+    mirelle: { name: 'Old Mirelle', color: '#e8c8a8' },
     narr: { name: '', color: '#b9b2dd' },
   };
 
@@ -1007,6 +1008,29 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       { do: 'goal', id: 'arrive' },
       { do: 'winnow', npc: 'caelum', to: 41 },
     ],
+    // A resident's request (DESIGN.md: small errands for the people of Starhaven, paid in Starlight)
+    ashes_mirelle: [
+      { if: 'cat', then: [
+        ['mirelle', 'She came home with soot on her nose and no apology. That was you, on the awning? Bless you, girl.'],
+        ['mirelle', 'We have not had a stranger do a kindness on this street since the lamps went out.'],
+      ], else: [
+        ['mirelle', 'You are the one he brought back. Hm. Thinner than I expected.'],
+        ['mirelle', 'If you are going up the street: my cat, Ember. Black, rude, about so big. She climbs when the dark frightens her, and it is all dark now.'],
+        ['wren', 'I\'ll look up as I go.'],
+      ] },
+    ],
+    ashes_cat_found: [
+      ['narr', 'A black cat is flattened on the awning, pretending not to be afraid. It considers Wren, then walks onto her shoulder as if that had been the plan.'],
+      ['narr', 'At the street it jumps down and trots home, tail up.'],
+      { do: 'remember', key: 'cat', text: 'Brought Old Mirelle\'s cat down from the awning.', good: true },
+      { do: 'starlight', n: 10, why: 'the first kindness on this street in a long while' },
+    ],
+    mtn_page: [
+      ['narr', 'A page, frozen to the rock. The hand is small and exact, and the margin says: "wyrms sleep facing the wind. T."'],
+      ['wren', 'Thane\'s. He must have lost it up here years ago.'],
+      { do: 'remember', key: 'page', text: 'Found Thane\'s lost page on the mountain.', good: true },
+      { do: 'starlight', n: 5, why: 'a page for the Library' },
+    ],
     ashes_overlook: [
       ['caelum', 'That glow ahead is Starhaven. Hidden from every other court for a thousand years.'],
       ['wren', 'Why show it to me?'],
@@ -1079,15 +1103,15 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       ['wren', 'I don\'t sleep much. The Deep follows me.'],
       ['caelum', 'Mine too. Here. Starlit wine. It tastes like the first warm night of summer.'],
       { choose: [
-        { text: 'Show him your sketchbook', liked: 'caelum', bond: { caelum: 15 }, then: [
+        { text: 'Show him your sketchbook', liked: 'caelum', bond: { caelum: 15 }, why: 'You let him see the worst thing you carry.', remember: ['sketchbook', 'Showed Caelum the sketchbook of the Deep.', true], then: [
           ['caelum', '...These are the Deep. You drew it from memory?'],
           ['wren', 'So I could stop seeing it. It doesn\'t work.'],
           ['caelum', 'It might, one day. Draw Starhaven next. Give the Deep some competition.'],
         ] },
-        { text: 'Toast to the bargain', bond: { caelum: 5 }, then: [
+        { text: 'Toast to the bargain', bond: { caelum: 5 }, why: 'Easy company, and nothing risked.', then: [
           ['caelum', 'To the bargain. The best one I ever made, and I\'ve made some very good ones.'],
         ] },
-        { text: 'Ask what he sees in his nightmares', bond: { caelum: 10 }, then: [
+        { text: 'Ask what he sees in his nightmares', bond: { caelum: 10 }, why: 'Nobody asks him. You did.', remember: ['nightmares', 'Asked Caelum about his nightmares.', true], then: [
           ['caelum', 'The Thorn Queen\'s court. Smiling at her while she held my people hostage.'],
           ['caelum', 'I\'d do it again to keep them safe. I hate that I\'d do it again.'],
         ] },
@@ -1379,6 +1403,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     ev3_thane: [
       { do: 'art', id: 'library', title: 'Evening with Thane' },
       ['thane', 'Oh, good. I have forty-one questions about your hand. Sit down. Tea?'],
+      { if: 'page', then: [['wren', 'First: this is yours. It was frozen to the mountain.'], ['thane', '...Wyrms sleep facing the wind. I wrote that at nineteen, and lost it the same afternoon. Forty years.'], { do: 'bond', who: 'thane', pts: 10, liked: true, why: 'You carried a scrap of paper down a mountain for him.' }] },
       { choose: [
         { text: 'Bring him a rare book from the Night Market', liked: 'thane', bond: { thane: 15 }, then: [['thane', 'Is this... a first copy of the Tide Court star charts? Where did you... no, don\'t tell me. I\'ll cry on it.']] },
         { text: '"Ask your forty-one questions."', bond: { thane: 10 }, then: [['narr', 'He asks all forty-one. Then he asks nine more. By the end, you both understand the fire a little better.']] },
@@ -1397,6 +1422,9 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     finale: [
       { do: 'art', id: 'city', title: 'Next: Chapter 4, The Spy in the Library' },
       ['narr', 'Three nights later, Starhaven sleeps under a sky full of stars.'],
+      { if: 'sketchbook', then: [['narr', 'On the sill of the Rooftop House a sketchbook lies open. The newest page is not the Deep. It is a street, with every lamp lit.']] },
+      { if: 'cat', then: [['narr', 'On Mirelle\'s step, a black cat watches the Library roof and does not blink.']] },
+      { if: 'nightmares', then: [['narr', 'Caelum is asleep. That is new.']] },
       ['narr', 'On the Library roof, something with wings lands without a sound, folds itself into the shadows, and waits.'],
       { do: 'end' },
     ],
@@ -1554,6 +1582,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       ['ground', 30, 46, 14],           // the overlook
       ['ground', 46, 122, 16],
       ['oneway', 99, 104, 13],          // ledge up to the roof
+      ['oneway', 86, 90, 12],           // an awning: something is sitting on it
       ['solid', 104, 118, 10, 16],      // the Rooftop House
       ['solid', 118, 122, 0, 20],
     ],
@@ -1577,8 +1606,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     arch: 52,
     house: { x0: 104, x1: 118, top: 10 },
     lanterns: [{ x: 3, lit: true }],
-    npcs: [{ id: 'caelum', x: 8 }],
-    gates: [], spawns: [],
+    npcs: [{ id: 'caelum', x: 8 }, { id: 'mirelle', x: 62, optional: 'ashes_mirelle' }],
+    gates: [], spawns: [{ kind: 'pickup', what: 'cat', x: 88, y: 12 }],
   };
 
   // ---------------------------------------------------------------- Chapter 2: The Five (daggers, pogo, first enemies)
@@ -1672,6 +1701,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     lanterns: [{ x: 4, lit: true }, { x: 46 }, { x: 69 }, { x: 119 }],   // the last one is inside the hollow, so a knockout keeps you in the fight
     npcs: [{ id: 'thane', x: 8 }, { id: 'caelum', x: 11 }],
     spawns: [
+      { kind: 'pickup', what: 'page', x: 60, y: 12 },
       { kind: 'brazier', x: 13 },
       { kind: 'brazier', x: 17 },
       { kind: 'brazier', x: 22, y: 12 },
@@ -3084,6 +3114,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     nessa: { bg: ['#4a4a5a', '#16161e'], skin: '#f0d4c0', shade: '#d4b49e', hair: '#2a1a14', hairD: '#140c08', eye: '#5a6a7a', style: 'braid', ears: false, cloth: '#5a5a6a', clothD: '#3a3a48' },
     lissa: { bg: ['#4a6a3a', '#141e10'], skin: '#f6dcc6', shade: '#dcbca8', hair: '#b8864a', hairD: '#8a5a2a', eye: '#6a9a5a', style: 'long', ears: false, cloth: '#4a7a4a', clothD: '#2f5a2f', flower: true },
     rowan: { bg: ['#6a8a3a', '#1a2410'], skin: '#f2d8b8', shade: '#d4b490', hair: '#e8c070', hairD: '#b8903a', eye: '#4ac06a', style: 'swept', ears: true, cloth: '#3a5a2a', clothD: '#24381a', trim: '#e8c070', antlers: true },
+    mirelle: { bg: ['#6a4a34', '#1c120c'], skin: '#e8c8a8', shade: '#c8a484', hair: '#d8d4e0', hairD: '#a8a4b8', eye: '#3a2a1a', style: 'bun', ears: true, cloth: '#8a5a3a', clothD: '#6a4a34', trim: '#f4f0e0' },
     thane: { bg: ['#5a2a3a', '#1a0c12'], skin: '#8a5a3c', shade: '#6e4630', hair: '#2a2a2a', hairD: '#9a9a9a', eye: '#3a2a1a', style: 'shaved', ears: true, cloth: '#6a2a3a', clothD: '#4a1a26', trim: '#e8c070', glasses: true },
     iris: { bg: ['#2a5a7a', '#0c1a2a'], skin: '#f2d9c8', shade: '#dcbca8', hair: '#f4f0ff', hairD: '#c8c0e8', eye: '#8fd8ff', style: 'bun', ears: true, cloth: '#4f88c0', clothD: '#2f5a88', thread: true },
   };
@@ -3657,7 +3688,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   ];
   const prog = () => SH.game.progress;
   S.level = id => (prog() && prog().stars && prog().stars[id]) || 0;
-  S.gathered = () => Object.values((prog() && prog().motes) || {}).reduce((a, b) => a + b, 0);
+  S.gathered = () => Object.values((prog() && prog().motes) || {}).reduce((a, b) => a + b, 0) + ((prog() && prog().bonus) || 0);   // motes, plus what people give her for helping
   S.spent = () => S.DEFS.reduce((n, d) => n + d.costs.slice(0, S.level(d.id)).reduce((a, b) => a + b, 0), 0);
   S.free = () => S.gathered() - S.spent();
   S.cost = d => d.costs[S.level(d.id)];
@@ -3981,6 +4012,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   // Everyone faces right in the sheet. build: 0 slight, 1 broad. robe: a long garment instead of legs.
   const LOOKS = {
     wren: { skin: '#f6dcc6', hair: '#e0703f', style: 'braid', top: '#2f8f7a', trim: '#ffd27a', legs: '#3b3150', boots: '#6a4430', eye: '#3a8a6a', coat: true },
+    mirelle: { skin: '#e8c8a8', hair: '#d8d4e0', style: 'bun', top: '#8a5a3a', trim: '#f4f0e0', robe: '#6a4a34', eye: '#3a2a1a', basket: true, small: 1 },
     caelum: { skin: '#ecd5c8', hair: '#1a1530', style: 'swept', top: '#241f48', trim: '#cfd6ff', legs: '#14122a', boots: '#0c0a1c', wings: true, eye: '#a58bff', tall: 2, coat: true },
     bram: { skin: '#d9a77f', hair: '#3a2a20', style: 'shaved', top: '#a8743a', trim: '#5a3a1c', legs: '#3a2a20', boots: '#241710', build: 1, beard: '#8a4426', eye: '#2a1a10', bare: true },
     iris: { skin: '#f2d9c8', hair: '#f4f0ff', style: 'bun', top: '#4f88c0', trim: '#ffe9a8', robe: '#3f72a8', eye: '#8fd8ff', thread: true },
@@ -5482,7 +5514,9 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       if (e.got) return;
       const bob = Math.round(Math.sin(t * 0.08 + e.x) * 1.5);
       const gl = ctx.createRadialGradient(e.x, e.y - 8, 1, e.x, e.y - 8, 22); gl.addColorStop(0, 'rgba(255,246,216,0.3)'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 22, e.y - 30, 44, 44);
-      if (e.what === 'wood') { R(-10, -9 + bob, 20, 9, '#0a0818'); R(-9, -8 + bob, 18, 3, '#7a5636'); R(-9, -5 + bob, 18, 3, '#5e3e28'); R(-9, -2 + bob, 18, 1, '#4a3020'); R(-9, -8 + bob, 2, 6, '#c8a878'); R(-2, -10 + bob, 3, 10, '#c8b890'); R(-9, -8 + bob, 18, 1, '#ffffff'); }
+      if (e.what === 'cat') { const tl = Math.sin(t * 0.1) * 2; R(-7, -9, 13, 8, '#0a0818'); R(-6, -8, 11, 7, '#2a2630'); R(3, -13, 7, 7, '#0a0818'); R(4, -12, 5, 5, '#2a2630'); R(4, -14, 2, 2, '#2a2630'); R(7, -14, 2, 2, '#2a2630'); R(5, -10, 1, 1, '#ffd27a'); R(7, -10, 1, 1, '#ffd27a'); R(-9, -10 + tl, 2, 6, '#2a2630'); R(-5, -5, 3, 1, '#f4f0e0'); }
+      else if (e.what === 'page') { R(-6, -12 + bob, 12, 14, '#0a0818'); R(-5, -11 + bob, 10, 12, '#f4f0e0'); for (let i = 0; i < 4; i++) R(-3, -9 + i * 3 + bob, 6, 1, '#6a5aa8'); R(-5, -11 + bob, 3, 3, '#e8c070'); }
+      else if (e.what === 'wood') { R(-10, -9 + bob, 20, 9, '#0a0818'); R(-9, -8 + bob, 18, 3, '#7a5636'); R(-9, -5 + bob, 18, 3, '#5e3e28'); R(-9, -2 + bob, 18, 1, '#4a3020'); R(-9, -8 + bob, 2, 6, '#c8a878'); R(-2, -10 + bob, 3, 10, '#c8b890'); R(-9, -8 + bob, 18, 1, '#ffffff'); }
       else { R(-1, -12 + bob, 2, 12, '#3f6a3f'); R(-6, -12 + bob, 5, 3, '#8fd16b'); R(1, -15 + bob, 5, 3, '#8fd16b'); R(-5, -7 + bob, 4, 3, '#6ab04a'); R(2, -9 + bob, 4, 3, '#6ab04a'); R(-1, -17 + bob, 2, 2, '#ff9ac0'); }
     } else if (e.kind === 'snare') {
       R(-10, -2, 20, 2, '#0a0818'); R(-9, -14, 2, 14, '#5e3e28'); R(-9, -15, 12, 2, '#5e3e28');
@@ -5559,10 +5593,12 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const spikes = 10, rot = e.wobble * 0.2 * (e.dir || 1);
     const body = e.flash > 0 ? '#ffffff' : angry ? '#6a4a1c' : PAL.sprite;
     const rim = e.flash > 0 ? '#ffffff' : angry ? PAL.spriteAngry : PAL.spriteRim;
+    ctx.fillStyle = '#0a0818'; star(ctx, x, cy, 16, 10.5, spikes, rot);
     ctx.fillStyle = rim;
     star(ctx, x, cy, 14, 9, spikes, rot);
     ctx.fillStyle = body;
     star(ctx, x, cy + 1, 11.5, 7.5, spikes, rot);
+    ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.fillRect(Math.round(x - 5), Math.round(cy - 5), 4, 2);   // a glint
     // eyes look toward where it's going
     ctx.fillStyle = angry ? '#ffe0a0' : PAL.spriteEye;
     const ex = (e.dir || 1) * 3;
@@ -5611,7 +5647,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const pr = G.progress;
     SH.saves.write(G.slot, {
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, bonus: pr.bonus || 0, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
     });
     if (show) G.hud.saved();
   };
@@ -5630,7 +5666,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
     G.slot = slot;
-    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen) };
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen), bonus: s.bonus || 0 };
     SH.arts.newGame(); SH.arts.said = Object.assign({}, s.said); SH.arts.meter = s.bondMeter || 0;
     const N = ST.CHAPTERS.length, target = s.chapter;
     const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
@@ -5692,6 +5728,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       // the Winter Woods
       onPickup(what) {
+        if (what === 'cat') { G.queueScript('ashes_cat_found'); return; }
+        if (what === 'page') { G.queueScript('mtn_page'); return; }
         if (what === 'herb') { G.remember('green', 'Found wintergreen under the snow for Lissa.', true); G.queueScript('woods_herb'); return; }
         G.flags.n_wood = (G.flags.n_wood || 0) + 1;
         fx.word(player.x, player.y - 50, 'Firewood ' + G.flags.n_wood + '/3', '#ffd27a', 60);
@@ -5875,6 +5913,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     switch (st.do) {
       case 'mode': break;   // skipped along with the scene
       case 'remember': G.remember(st.key, st.text, st.good); break;
+      case 'starlight': G.progress.bonus = (G.progress.bonus || 0) + st.n; G.hud.toast('\u2726 +' + st.n + ' Starlight: ' + st.why); SH.sfx.play('lantern'); G.save(); break;
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); if (st.name === 'giftgot') G.explain('moons'); break;
       case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
@@ -5919,7 +5958,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   G.explain = function (key) {
     const seen = G.progress.seen = G.progress.seen || {};
     if (G.noExplain || seen[key] || !ST.EXPLAIN[key] || G.explaining) return;
-    if (G.state !== 'play') { G.explainNext = key; return; }        // wait for the scene to end
+    if (G.state !== 'play') { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for the scene to end
     seen[key] = 1; G.explaining = key; G.state = 'explain'; input.clear(true);
     const e = ST.EXPLAIN[key];
     document.getElementById('ex-icon').textContent = e.icon; document.getElementById('ex-title').textContent = e.title; document.getElementById('ex-text').textContent = e.text;
@@ -5976,7 +6015,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     if (G.mode) { if (G.state === 'talk' || G.state === 'play') G.progress.playFrames = (G.progress.playFrames || 0) + 1; SH.modes.step(input); return; }
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
     G.effectStep();
-    if (G.explainNext && G.state === 'play' && !G.mode && !SH.arts.cutin) { const k = G.explainNext; G.explainNext = null; G.explain(k); if (G.state !== 'play') return; }
+    if (G.explainQ && G.explainQ.length && G.state === 'play' && !G.mode && !SH.arts.cutin && !G.pending) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
     if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -6320,7 +6359,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     // load('roomId', { story: false }): a bare room, every gate open, no story scripts.
     load(chapterOrRoom, opts) {
       opts = opts || {};
-      G.frozen = true; input.forced = { held: {}, pressed: {} }; SH.modes.auto = !opts.modes; G.noExplain = !opts.explain; G.explaining = null; G.explainNext = null; G.mode = null; SH.modes.cur = null; delete document.body.dataset.mode;
+      G.frozen = true; input.forced = { held: {}, pressed: {} }; SH.modes.auto = !opts.modes; G.noExplain = !opts.explain; G.explaining = null; G.explainQ = []; G.mode = null; SH.modes.cur = null; delete document.body.dataset.mode;
       document.getElementById('front').classList.remove('show'); G.slot = null;
       if (typeof chapterOrRoom === 'number') { G.startChapter(chapterOrRoom); G.hud.cardGo(); }
       else {

@@ -1,5 +1,27 @@
 # Starhaven — Changelog
 
+## Reimagined 7 — errands, callbacks, a bug hunt (Nov 18, 2026)
+Will: keep improving the graphics, the systems and the content; make it more content rich; fix bugs.
+
+- **Bug hunt.** New `tests/fuzz.js` plays all five chapters with random inputs, sideways and upright, with the story,
+  the other perspectives and the explanation cards all on, and reports any error. It found no crashes. Reading the
+  code alongside it found and fixed one real bug: when two systems needed explaining in the same moment (a bond change
+  and a remembered decision from one choice), only the last card was ever shown. They now queue.
+- **Residents' requests** (the design doc's small errands, paid in Starlight):
+  - **Chapter 1: Old Mirelle's cat.** A new resident at the top of the dark street asks after her cat, Ember. It is on
+    an awning further up. Bringing it down is remembered, pays 10 Starlight, changes what Mirelle says, and earns a
+    line in the last scene.
+  - **Chapter 3: Thane's lost page,** frozen to the mountain. Pays 5 Starlight; give it to him that evening and he is
+    moved (+10 with Thane).
+  - Starlight earned from people counts toward the Constellation along with the motes.
+- **More decisions are remembered.** The first evening with Caelum now says why each choice landed, and two of them
+  come back in the final scene (the sketchbook; the nightmares).
+- **Thorn sprites** have the dark outline and a glint, like the rest of the redrawn creatures.
+
+**Honest notes.** The fuzz test catches crashes and broken numbers, not things that merely look or feel wrong. Wren's
+own figure and the wyrms are still not redrawn. Chapter 2 has had no new content since Rebuild 8. Tests: 48 play
+checks, 19 menu checks, the fuzz run, the screenshot run. **Not played by hand or on a phone.**
+
 ## Reimagined 6 — play it upright, depth in the picture, systems that explain themselves (Nov 18, 2026)
 Will: keep beautifying (characters, animation, menus, graphics); you shouldn't have to turn your phone to play, Sootborn
 works upright; make the systems more understandable.
