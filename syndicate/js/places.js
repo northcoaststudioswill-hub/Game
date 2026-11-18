@@ -194,7 +194,7 @@
     willow: g => { mesh(new T.CylinderGeometry(0.18, 0.3, 2.2, 6), L(0x4a3a30), 0, 1.1, 0, g); mesh(new T.DodecahedronGeometry(0.9, 0), L(0x2f6e5a), 0, 2.6, 0, g); for (let i = 0; i < 12; i++) { const a = i * 0.524, r = 0.75 + (i % 3) * 0.12, len = 1.0 + (i % 4) * 0.25; const m = new T.Mesh(new T.CylinderGeometry(0.03, 0.02, len, 4), emis(i % 2 ? 0x7affc0 : 0x5ad8a0)); m.position.set(Math.cos(a) * r, 2.5 - len / 2, Math.sin(a) * r); g.add(m); } gfx.glow(0x7affc0, 4, 0, 2.2, 0, g, 0.3); g.userData.fx = 'willow'; return [0, 2.2, 0]; }
   });
   const footprint = (it, r) => r % 2 ? [it.d, it.w] : [it.w, it.d];
-  W.buildItem = (id, r, off) => buildItem(id, r, off); W.wallBuilders = () => WALLB;
+  W.buildItem = (id, r, off) => buildItem(id, r, off); W.wallBuilders = () => WALLB; W.BUILD = BUILD;
   function buildItem(id, r, off) {
     const it = G.DECOR_BY[id], g = new T.Group(), inner = new T.Group(); g.add(inner);
     const lp = BUILD[id](inner); inner.rotation.y = -(r || 0) * Math.PI / 2;

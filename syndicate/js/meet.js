@@ -14,6 +14,7 @@
     D = G.talk = { o: opts, i: -1, t: 0, shown: 0, el, actors: [], you: null, npcC: null };
     const w = W.walker;
     if (opts.place === 'arena') {
+      if (!G.fight.active && G.fight.exStop) G.fight.exStop();                  // sweep the pit: no limbs or blood left over from the last bout
       const a = W.get('arena'); gfx.setScene(a.scene); a.setHype(0.15);
       if (G.titleChars) G.titleChars.forEach(c => c.root.visible = false);
       const F = G.fight; if (F.P && F.P.vis) { F.P.vis.g.visible = false; F.E.vis.g.visible = false; }
@@ -67,7 +68,7 @@
     if (D.npcC) D.npcC.pose({ t: now, act: speaking && ln.who === 'npc' ? 'cast' : 'idle', prog: 0.2 });
     if (D.you) D.you.pose({ t: now + 1, act: 'idle' });
   };
-  G.talkApi = talk;
+  G.talkApi = talk; G.playScene = play;
 
   // ------------------------------------------------------------ friendly duels: nobody dies, first to yield
   const MARK_OPP = () => ({ id: 'mark', name: 'Mark', title: 'of the Long Odds', cls: 'sorcerer', race: 'human', level: Math.max(1, G.state.hero.level), sub: 'wild', known: ['chaos_bolt', 'misty_step', 'burning_hands'], hpMul: 0.85, dmgMul: 0.55, ai: { react: 0.45, aggro: 0.6, dodge: 0.2, guard: 0.2, parry: 0.1 }, xp: 0, coin: 0, respect: 0, spar: true, look: G.mark.look, taunt: '' });

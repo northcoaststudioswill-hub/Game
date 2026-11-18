@@ -75,6 +75,7 @@
     const arm = look.arm ? String(look.arm).split('_')[1] : '', wglow = (z, hh) => { if (g.weapon || wsk) glows.push(gfx.glow(wsk ? wsk.glow : WCOL[g.weapon], 0.7, 0, 0, z, hh, 0.55)); };
     const shaft = (hh, len, z0) => { const s = mesh(new T.CylinderGeometry(0.035, 0.035, len, 5), m.dark, 0, 0, (z0 || 0) + len / 2, hh); s.rotation.x = Math.PI / 2; return s; };
     if (cls === 'fighter' && arm === 'axe') { shaft(hR, 1.25, -0.15); box(0.05, 0.42, 0.34, m.weapon, 0, 0.14, 0.95, hR); box(0.05, 0.2, 0.2, m.weapon, 0, -0.12, 0.95, hR); box(0.08, 0.1, 0.12, m.trim, 0, 0, 0.95, hR); wglow(0.95, hR); }
+    else if (cls === 'fighter' && arm === 'halberd') { shaft(hR, 2.0, -0.55); box(0.05, 0.42, 0.3, m.weapon, 0, 0.15, 1.22, hR); box(0.05, 0.14, 0.18, m.weapon, 0, -0.1, 1.2, hR); const tp = mesh(new T.ConeGeometry(0.06, 0.34, 4), m.weapon, 0, 0, 1.6, hR); tp.rotation.x = Math.PI / 2; box(0.1, 0.1, 0.12, m.trim, 0, 0, 1.2, hR); wglow(1.3, hR); }
     else if (cls === 'fighter' && arm === 'hammer') { shaft(hR, 1.1, -0.1); box(0.24, 0.24, 0.4, m.weapon, 0, 0, 0.95, hR); box(0.27, 0.27, 0.08, m.trim, 0, 0, 0.78, hR); box(0.27, 0.27, 0.08, m.trim, 0, 0, 1.12, hR); wglow(0.95, hR); }
     else if (cls === 'fighter' && arm === 'spear') {
       shaft(hR, 1.9, -0.5); const tip = mesh(new T.ConeGeometry(0.08, 0.36, 4), m.weapon, 0, 0, 1.56, hR); tip.rotation.x = Math.PI / 2; box(0.16, 0.05, 0.05, m.trim, 0, 0, 1.36, hR); wglow(1.5, hR);
@@ -86,9 +87,11 @@
       const boss = mesh(new T.CylinderGeometry(0.16, 0.16, 0.1, 6), m.trim, 0.14, -0.3, 0.12, armL); boss.rotation.z = Math.PI / 2;
     }
     if (cls === 'rogue' && arm === 'rapier') { box(0.04, 0.03, 1.0, m.weapon, 0, 0, 0.6, hR); const cup = mesh(new T.SphereGeometry(0.1, 7, 5, 0, 6.28, 0, 1.6), m.trim, 0, 0, 0.12, hR); cup.rotation.x = Math.PI / 2; wglow(0.7, hR); blade(hL, 0.32); }
+    else if (cls === 'rogue' && arm === 'chain') { for (let i = 0; i < 8; i++) box(0.05, 0.05, 0.09, m.dark, Math.sin(i * 1.3) * 0.04, -i * 0.02, 0.15 + i * 0.13, hR); mesh(new T.IcosahedronGeometry(0.12, 0), m.weapon, 0, -0.16, 1.22, hR); wglow(1.2, hR); blade(hL, 0.32); }
     else if (cls === 'rogue' && arm === 'axes') [hR, hL].forEach(hh => { shaft(hh, 0.5, -0.05); box(0.04, 0.24, 0.2, m.weapon, 0, 0.1, 0.4, hh); box(0.06, 0.07, 0.1, m.trim, 0, 0, 0.4, hh); wglow(0.4, hh); });
     else if (cls === 'rogue') { blade(hR, 0.5); blade(hL, 0.5); }
     if (cls === 'cleric' && arm === 'flail') { shaft(hR, 0.55, 0); [0.62, 0.72, 0.82].forEach((z, i) => box(0.04, 0.04, 0.07, m.dark, 0, -i * 0.05, z, hR)); mesh(new T.IcosahedronGeometry(0.16, 0), M(P.weapon, true, 0x7a5a10), 0, -0.2, 0.95, hR); for (let i = 0; i < 6; i++) { const sp = mesh(new T.ConeGeometry(0.035, 0.12, 4), m.trim, Math.cos(i) * 0.15, -0.2 + Math.sin(i * 2.1) * 0.15, 0.95 + Math.sin(i) * 0.15, hR); sp.rotation.set(i, i * 2, 0); } glows.push(gfx.glow((wsk && wsk.glow) || WCOL[g.weapon] || 0xffd060, 0.9, 0, -0.2, 0.95, hR, 0.55)); }
+    else if (cls === 'cleric' && arm === 'staff') { shaft(hR, 1.9, -0.7); const rg = mesh(new T.TorusGeometry(0.1, 0.025, 5, 10), m.trim, 0, 0, 1.12, hR); mesh(new T.OctahedronGeometry(0.13, 0), M(P.weapon, true, 0x7a5a10), 0, 0, 1.3, hR); glows.push(gfx.glow((wsk && wsk.glow) || WCOL[g.weapon] || 0xffd060, 0.9, 0, 0, 1.3, hR, 0.55)); }
     else if (cls === 'cleric' && arm === 'pick') { shaft(hR, 0.95, -0.05); box(0.07, 0.56, 0.08, M(P.weapon, true, 0x7a5a10), 0, 0.06, 0.82, hR); const pt = mesh(new T.ConeGeometry(0.05, 0.22, 4), M(P.weapon, true, 0x7a5a10), 0, 0.44, 0.82, hR); box(0.12, 0.12, 0.12, m.trim, 0, 0, 0.82, hR); glows.push(gfx.glow((wsk && wsk.glow) || WCOL[g.weapon] || 0xffd060, 0.8, 0, 0.2, 0.82, hR, 0.5)); }
     else if (cls === 'cleric') {
       const hd = mesh(new T.CylinderGeometry(0.035, 0.035, 0.8, 5), m.dark, 0, 0, 0.35, hR); hd.rotation.x = Math.PI / 2;
@@ -97,7 +100,7 @@
     }
     let orbs = null;
     if (cls === 'sorcerer') {
-      const oc = (wsk && wsk.glow) || WCOL[g.weapon] || (arm === 'frost' ? 0x9fe0ff : arm === 'spark' ? 0xfff070 : 0xff8a3c);
+      const oc = (wsk && wsk.glow) || WCOL[g.weapon] || (arm === 'frost' ? 0x9fe0ff : arm === 'spark' ? 0xfff070 : arm === 'acid' ? 0x9be35a : 0xff8a3c);
       orbs = [hR, hL].map(h => { const o = new T.Mesh(new T.SphereGeometry(0.1, 8, 6), new T.MeshBasicMaterial({ color: 0xfff0c0 })); o.position.z = 0.08; h.add(o); const gl = gfx.glow(oc, 0.9, 0, 0, 0.08, h, 0.9); glows.push(gl); return gl; });
     }
     const castGlow = gfx.glow(0xffffff, 0.1, 0, 0, 0.2, hR, 0);
@@ -136,6 +139,7 @@
     if (cos.back === 'skullrack') [-0.28, 0, 0.28].forEach((x, i) => { mesh(new T.CylinderGeometry(0.025, 0.025, 0.9 + (i === 1 ? 0.25 : 0), 4), m.dark, x, 1.0 + (i === 1 ? 0.12 : 0), -0.28, torso); const sk = mesh(new T.SphereGeometry(0.13, 7, 5), bone(), x, 1.5 + (i === 1 ? 0.25 : 0), -0.28, torso); sk.scale.set(1, 0.9, 1.1); box(0.05, 0.05, 0.03, m.dark, x - 0.05, 1.52 + (i === 1 ? 0.25 : 0), -0.16, torso); box(0.05, 0.05, 0.03, m.dark, x + 0.05, 1.52 + (i === 1 ? 0.25 : 0), -0.16, torso); });
     if (cos.head === 'exechood') { const hm = M(0x0c0a0c); hm.side = T.DoubleSide; const hd = mesh(new T.SphereGeometry(0.37, 9, 7, Math.PI / 2 + 0.3, Math.PI * 2 - 0.6, 0, 2.2), hm, 0, 0.02, -0.02, head); hd.scale.set(1, 1.1, 1.1); const tp = mesh(new T.ConeGeometry(0.2, 0.5, 5), hm, 0, 0.5, -0.05, head); tp.rotation.x = -0.25; [-0.09, 0.09].forEach(x => { const ey = new T.Mesh(new T.SphereGeometry(0.035, 5, 4), new T.MeshBasicMaterial({ color: 0xff4030 })); ey.position.set(x, 0.03, 0.3); head.add(ey); }); }
     if (cos.back === 'pennants') [-0.22, 0.22].forEach((x, i) => { mesh(new T.CylinderGeometry(0.02, 0.02, 1.6, 4), m.dark, x, 1.1, -0.28, torso); const fl = new T.Mesh(new T.PlaneGeometry(0.5, 0.32), new T.MeshLambertMaterial({ color: i ? 0xd9a93c : 0x7a1c22, side: T.DoubleSide })); fl.position.set(x + (i ? 0.25 : -0.25), 1.72, -0.28); torso.add(fl); });
+    if (cos.head === 'vossband') { const bd = mesh(new T.CylinderGeometry(0.3, 0.3, 0.1, 10, 1, true), M(0x1a8a9a), 0, 0.12, 0, head); bd.material.side = T.DoubleSide; mesh(new T.TorusGeometry(0.07, 0.02, 4, 8), M(0xf0c95a, true), 0, 0.12, 0.31, head); box(0.08, 0.3, 0.02, M(0x1a8a9a), -0.1, -0.02, -0.3, head).rotation.z = 0.2; }
     if (cos.head === 'hood') { const hm = M(0x2a2428); hm.side = T.DoubleSide; const hd = mesh(new T.SphereGeometry(0.37, 9, 7, Math.PI / 2 + 0.75, Math.PI * 2 - 1.5, 0, 2.0), hm, 0, 0.02, -0.03, head); hd.scale.set(1, 1.08, 1.12); const tp = mesh(new T.ConeGeometry(0.16, 0.36, 5), hm, 0, 0.26, -0.3, head); tp.rotation.x = -1.9; }
     if (cos.head === 'mohawk') for (let i = -3; i <= 3; i++) { const a = Math.abs(i), sp = box(0.07, 0.3 - a * 0.045, 0.1, M(0xff3a8a, false, 0x5a0a2a), 0, 0.36 - a * a * 0.022, i * 0.09 - 0.02, head); sp.rotation.x = i * 0.16; }
     if (cos.head === 'candles') { const rg = mesh(new T.TorusGeometry(0.3, 0.03, 5, 12), M(0x1c1a20, true), 0, 0.2, 0, head); rg.rotation.x = Math.PI / 2; for (let i = 0; i < 6; i++) { const a = i * 1.047 + 0.5, cx = Math.cos(a) * 0.3, cz = Math.sin(a) * 0.3, ch = 0.12 + (i % 3) * 0.04; mesh(new T.CylinderGeometry(0.03, 0.035, ch, 5), M(0xefe6cc), cx, 0.22 + ch / 2, cz, head); const fl = new T.Mesh(new T.SphereGeometry(0.03, 5, 4), new T.MeshBasicMaterial({ color: 0xffd080 })); fl.position.set(cx, 0.26 + ch, cz); fl.scale.y = 1.6; head.add(fl); } glows.push(gfx.glow(0xffb060, 1.1, 0, 0.42, 0, head, 0.45)); }
@@ -167,12 +171,13 @@
       let snap = 0.28;
       if (mv) { q.by = Math.abs(Math.cos(p.walk)) * 0.1 - 0.02; q.bx = 0.2; q.ll = sw * 0.85; q.lr = -sw * 0.85; q.ty = sw * 0.16; q.arx += -sw * 0.38; q.alx += sw * 0.38; q.cape = 0.52 + sw * 0.1; q.hx = -0.06; snap = 0.5; }
       if (act === 'swing') {
-        snap = 1; const step = p.step || 0, w = Math.min(1, k / 0.5), r = Math.max(0, (k - 0.5) / 0.5);
+        snap = 1; const step = p.sty === 2 ? 2 : (p.step || 0), w = Math.min(1, k / 0.5), r = Math.max(0, (k - 0.5) / 0.5);
         const cock = eo(Math.min(1, w / 0.6)), hit = ei(Math.max(0, (w - 0.6) / 0.4)), back = r * r * (3 - 2 * r);
         const seq = (ready, cocked, struck) => k < 0.5 ? mix(mix(ready, cocked, cock), struck, hit) : mix(struck, ready, back);
         if (step === 0) { q.arx = seq(-0.45, -2.6, 0.3); q.arz = seq(0, -0.5, 0.5); q.ty = seq(0, 0.6, -0.65); q.bx = seq(0.06, -0.06, 0.3); }
         else if (step === 1) { q.arx = seq(-0.45, -1.35, -1.15); q.arz = seq(0, 1.0, -1.2); q.ty = seq(0, -0.75, 0.8); q.bx = seq(0.06, 0.06, 0.22); }
         else { q.arx = seq(-0.45, -3.05, 0.5); q.alx = seq(restL, -2.9, 0.4); q.bx = seq(0.06, -0.3, 0.5); q.by = k < 0.5 ? Math.sin(w * Math.PI) * 0.42 : 0; q.ll = q.lr = k < 0.5 ? Math.sin(w * Math.PI) * 0.7 : 0; q.hx = seq(0, -0.3, 0.2); }
+        if (p.sty === 1 && step < 2) { q.arx = seq(-0.45, 0.35, -1.62); q.arz = seq(0, 0.25, 0); q.ty = seq(0, 0.7, -0.45); q.bx = seq(0.06, -0.05, 0.34); q.ll = seq(0.05, -0.2, 0.55); q.lr = seq(-0.05, 0.2, -0.45); }       // a thrust, for anything with a point
         q.bpz = seq(0, -0.1, 0.24); q.cape = 0.3 + hit * 0.5;
         if (cls === 'rogue' && step < 2) { q.alx = q.arx + 0.5; q.alz = -q.arz * 0.6; }
       } else if (act === 'cast') {

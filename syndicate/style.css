@@ -530,3 +530,9 @@ button:disabled { filter: grayscale(0.7) brightness(0.7); }
 .acct span { font-size: 0.82rem; padding: 0.2rem 0.55rem; border-radius: 2rem; background: rgba(0, 0, 0, 0.4); box-shadow: inset 0 0 0 1px var(--line); color: #e6dcc0; } .acct b { color: #f6dc8a; font-family: var(--title); font-size: 1.05rem; }
 .pagegrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin: 0.6rem 0; } .pagegrid .stat { text-align: center; } .pagegrid .stat small { display: block; font-family: var(--display); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #cfc4a8; margin-top: 0.2rem; }
 .bar.res.low i { animation: tkb 0.45s linear infinite; filter: saturate(0.5) brightness(1.3); }
+
+/* mastery, kits, loyalty */
+.mast { margin-top: 0.5rem; } .mast small { display: block; font-family: var(--display); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #cfc4a8; } .mast .bar.xp { height: 0.4rem; margin: 0.2rem 0; display: block; } .mast .need { color: #ffb070; margin-top: 0.2rem; }
+.kitmods { margin: 0; font-family: var(--display); font-weight: 700; font-size: 0.8rem; letter-spacing: 0.04em; color: #f6dc8a; line-height: 1.6; }
+.loyal { margin: 0.2rem 0 0.5rem; padding: 0.4rem 0.6rem; background: rgba(0, 0, 0, 0.3); border-radius: 0.3rem; box-shadow: inset 0 0 0 1px var(--line); } .loyal small { display: block; font-family: var(--display); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: #cfc4a8; } .loyal .bar.xp { display: block; height: 0.35rem; margin: 0.2rem 0; }
+#ui.talking #toast { display: none !important; }

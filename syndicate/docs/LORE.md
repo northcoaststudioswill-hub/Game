@@ -101,3 +101,11 @@ down a **Flame Strike**. A loser who is merely beaten is carried out and billed 
 - **The Seal-Wardens.** White plate, gold trim, no names. They do not police the Undercity. They make sure it stays where it is.
 - **The Crown's tithe.** One coin in ten of everything the Deep Guild takes goes up the Stair each month. In return the throne does not look down.
 - **Proclamations.** The throne posts a notice at the gate after every bout. They are dry, exact and occasionally funny on purpose.
+
+## Ferren Voss
+
+The fighter the crowd called "the new name" one season before the player. Battle Master, spear and shield. He fights only friendlies and keeps count. He does not want the player dead; he wants to be the one Vilhelm van Koheneim IV is watching when the champion falls.
+
+## Mark and the house
+
+Mark's debts are real and so is his generosity. If the player covers him when the Guild collectors come, he pays back double. If the player fights for him, he never forgets it. Either way he eventually offers a tenth of the Long Odds, and a partner's name chalked under the awning, spelled wrong.

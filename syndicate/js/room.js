@@ -57,6 +57,7 @@
     willow: ['Rest beneath', (p, c) => pose(null, 'sit', 0, 'Light falls through the leaves like slow rain.')], crystals: ['Listen', () => ui.toast('The crystal hums. It sounds content.')], bloom: ['Listen', () => ui.toast('A low, pleased hum.')],
     glowcaps: ['Tend', () => ui.toast('You pinch off a dead cap. The rest glow a little brighter, or you imagine it.')], banner: ['Straighten', () => ui.toast('Perfect. It was already perfect.')]
   };
+  G.ROOM_USE = USE;
   function pose(c, emote, lift, msg) { const w = W.walker; if (c) { w.back = { x: w.x, z: w.z }; w.x = c.x; w.z = c.z; } w.emote = emote; w.lift = lift || 0; w.target = null; w.path = null; if (msg) ui.toast(msg); }
   function toggle(p) { p.off = !p.off; G.save(); G.sfx('place'); H().refresh(); }
   const centre = p => { const f = W.grid.footprint(G.DECOR_BY[p.id], p.r); return { x: p.x + (f[0] - 1) / 2, z: p.z + (f[1] - 1) / 2, f }; };
@@ -94,7 +95,7 @@
 
   // ------------------------------------------------------------ the catalogue
   // Pages down the left, a grid of pictured tiles in the middle, and a preview of whatever is selected.
-  const TABS = [['furn', 'Furniture', '⌂', 'Beds, tables, shelves and the things that make a cellar a home. Many give a small edge in the pit.'], ['garden', 'Garden', '❀', 'For the cavern outside your door. Most of it glows.'], ['light', 'Lights', '✦', 'Lamps and fires. Each one lights the room around it.'], ['wall', 'Wall pieces', '▣', 'These hang on the two house walls. Buy one, then tap along a wall to choose its place.'], ['style', 'Floors & walls', '■', 'Relay the floor, redo the walls, or change the garden ground. Bought once, yours to swap for good.']];
+  const TABS = [['furn', 'Furniture', '⌂', 'Beds, tables, shelves and the things that make a cellar a home. Many give a small edge in the pit.'], ['garden', 'Garden', '❀', 'For the cavern outside your door. Most of it glows.'], ['light', 'Lights', '✦', 'Lamps and fires. Each one lights the room around it.'], ['wall', 'Wall pieces', '▣', 'These hang on the two house walls. Buy one, then tap along a wall to choose its place.'], ['use', 'Useful', '☼', 'Pieces that do something: sleep, sit, train, change kit, bank your coin, roll dice.'], ['style', 'Floors & walls', '■', 'Relay the floor, redo the walls, or change the garden ground. Bought once, yours to swap for good.']];
   const tabOf = d => d.light && d.zone !== 'garden' && ['lantern', 'firebowl', 'hearth'].includes(d.id) ? 'light' : d.zone === 'garden' ? 'garden' : 'furn';
   // thumbnails: each piece rendered once from the same angle the room is seen from
   let tr = null, tsc, tcam; const tcache = {};
@@ -122,7 +123,7 @@
     if (tab === 'style') [['floor', 'Floor', G.FLOORS], ['wall', 'Walls', G.WALLS], ['garden', 'Garden ground', G.GARDENS]].forEach(g => g[2].forEach(x => { const have = r.owned[x.id], inuse = r[g[0]] === x.id;
       items.push({ key: g[0] + ':' + x.id, kind: 'style', name: x.name, cost: x.cost, rank: x.rank, desc: x.desc, col: hexc(x.sw || x.color), meta: [g[1], inuse ? 'In use' : have ? 'Owned' : 'Not owned'], locked: rk < x.rank && !have, badge: inuse ? '✔' : have ? '•' : '', act: inuse ? null : have ? ['Lay it', 'use'] : ['Buy · ' + x.cost, 'sty'], have: have }); }));
     else if (tab === 'wall') G.WALLITEMS.forEach(d => { const n = (st.wallItems || []).filter(q => q.id === d.id).length; items.push({ key: 'w:' + d.id, id: d.id, kind: 'wall', name: d.name, cost: d.cost, rank: d.rank, desc: d.desc, light: d.light, meta: ['Wall piece', n ? n + ' hung' : 'None hung'], locked: rk < d.rank, badge: n ? '×' + n : '', act: ['Buy and hang · ' + d.cost, 'wbuy'] }); });
-    else G.DECOR.filter(d => tabOf(d) === tab).forEach(d => { const n = own[d.id] || 0, full = n >= d.max;
+    else G.DECOR.filter(d => tab === 'use' ? !!USE[d.id] : tabOf(d) === tab).forEach(d => { const n = own[d.id] || 0, full = n >= d.max;
       items.push({ key: 'f:' + d.id, id: d.id, kind: 'furn', name: d.name, cost: d.cost, rank: d.rank, desc: d.perk, light: d.light, meta: [d.zone === 'any' ? 'House or garden' : d.zone === 'house' ? 'House only' : 'Garden only', d.w + ' × ' + d.d + ' tiles', 'Own ' + n + ' of ' + d.max].concat(USE[d.id] ? ['You can ' + USE[d.id][0].toLowerCase()] : []), locked: rk < d.rank, full, badge: n ? (d.max > 1 ? n + '/' + d.max : '✔') : '', act: full ? null : ['Buy and place · ' + d.cost, 'buy'] }); });
     sel = sel || G.catSel; let cur = items.find(x => x.key === sel) || items.find(x => !x.locked && x.act) || items[0];
     const thumb = (x, big) => x.kind === 'style' ? '<span class="iso' + (big ? ' big' : '') + '" style="--c:' + x.col + '"></span>' : (() => { const u = G.furniThumb(x.kind, x.id); return u ? '<img src="' + u + '" alt="">' : '<span class="iso" style="--c:#6a5a4a"></span>'; })();

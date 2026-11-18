@@ -124,6 +124,18 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **Readability and record.** Opponents carry their own weapons (flail, frost, warhammer, rapier). An enemy heavy blow is flagged with a red flash and a mark as it starts. A fighter whose posture breaks drops to one knee. The results card lists what happened in the bout (parries, limbs, postures broken), and the Notice Board keeps your running page in the Ledger.
 
+**Kits, mastery and techniques.** The Outfitter (at the Fence) sells eight armour kits with real trade-offs, from Beggar's Rags (frail, but the crowd pays more) to Guild Plate (hard to hurt, hard to move). Every weapon gains mastery from use: five ranks, +3% damage each, and reaching rank 3 with any weapon unlocks a fourth weapon for your class (halberd, weighted chain, Acid Splash, pilgrim's staff). On your sheet, "Learn techniques" sells extra abilities: a cantrip and a trap for each class, plus the level-2 choice you passed over.
+
+**Traps.** Caltrops, Bear Trap, Glyph of Warding and Guardian Sigil are laid where you stand, wait up to 18 seconds, and spring when the opponent steps in.
+
+**Moments.** Scenes find you between bouts: the Ledger-Keeper strikes your first line; Ferren Voss, last season's "new name", challenges you to friendly duels; Mark gets leaned on by Guild collectors and you choose whether to pay, fight or walk; later he offers you a tenth of the Long Odds; and after Brakk falls, Vilhelm van Koheneim IV is waiting in the empty pit.
+
+**Mark's loyalty.** Every stake counts toward a tier (Punter, Regular, High Roller, Friend of the House) that returns 4 to 10% of each stake in chits. Partners are paid a cut after every bout.
+
+**Home.** Seven new pieces: a wardrobe (opens the Tailor), an armour stand (opens the Outfitter), a strongbox (coin inside is safe from the stretcher fee), a dice table (play the wispdice at home), a statuette of the Queen, a cave-bear skin and a washtub. The catalogue has a "Useful" page listing everything you can interact with.
+
+**Tighter controls.** Quicker player acceleration, a shorter heavy charge (0.28s), a light blow can be cancelled into a dodge during the first half of its wind-up, and the mouse aim snaps to a close opponent on a near miss. Thrusting weapons thrust; heavy weapons swing overhead.
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |
@@ -158,7 +170,7 @@ and the rest of the game does not change.
 - `js/models.js` character models and animation
 - `js/world.js` the arena; `js/places.js` the street, the hideout, decor pieces, walking
 - `js/fight.js` combat simulation, AI, and its 3D effects
-- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror; `js/arms.js` combat tempo, heavy blows, weapons and the Armoury; `js/realm.js` the Long Stair, proclamations, tithe and throne events; `js/board.js` pit contracts and win streaks
+- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror; `js/arms.js` combat tempo, heavy blows, weapons and the Armoury; `js/realm.js` the Long Stair, proclamations, tithe and throne events; `js/board.js` pit contracts and win streaks; `js/kits.js` kits, mastery, extra weapons and techniques; `js/story.js` story scenes, Mark's loyalty and partnership, the strongbox; `js/home.js` new hideout pieces
 - `js/cine.js` the opening cinematic; `js/lore.js` codex and bios; `js/music.js` the music sequencer
 - `js/ui.js` menus, HUD, level-up and results screens; `js/main.js` input and main loop
 

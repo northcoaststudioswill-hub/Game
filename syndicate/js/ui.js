@@ -266,7 +266,7 @@
     const o = [];
     if (e.shield > 0) o.push('WARD ' + Math.ceil(e.shield));
     if (e.guard > 0) o.push('GUARDING');
-    if (e.charging >= 0.32) o.push('HEAVY READY');
+    if (e.charging >= 0.28) o.push('HEAVY READY');
     ['broken', 'stun', 'slow', 'burn', 'poison', 'mark', 'winded'].forEach(k => { if (e.st[k] && !(k === 'stun' && e.st.broken)) o.push(k === 'broken' ? 'POSTURE BROKEN' : k.toUpperCase()); });
     ['haste', 'stealth', 'sneak', 'dmg', 'aura'].forEach(k => { if (e.buffs[k]) o.push({ haste: 'HASTE', stealth: 'HIDDEN', sneak: 'SNEAK READY', dmg: 'SURGE', aura: 'GUARDIANS' }[k]); });
     return o.join(' · ');
@@ -292,7 +292,7 @@
       s.el.classList.toggle('ready', cd <= 0 && P.res >= (ab.cost || 0));
     });
     hudEls.potion.querySelector('em').textContent = P.potions; hudEls.potion.classList.toggle('off', P.potions <= 0);
-    { const ta = document.getElementById('tAtk'), c = Math.min(1, (P.charging || 0) / 0.32); if (ta._c !== c) { ta._c = c; ta.style.setProperty('--chg', c); ta.classList.toggle('ready', c >= 1); } document.getElementById('tParry').classList.toggle('on', P.guard > 0 || P.state === 'parry'); hudEls.parry.classList.toggle('ready', P.guard > 0); }
+    { const ta = document.getElementById('tAtk'), c = Math.min(1, (P.charging || 0) / 0.28); if (ta._c !== c) { ta._c = c; ta.style.setProperty('--chg', c); ta.classList.toggle('ready', c >= 1); } document.getElementById('tParry').classList.toggle('on', P.guard > 0 || P.state === 'parry'); hudEls.parry.classList.toggle('ready', P.guard > 0); }
     hudEls.dodge.querySelector('.cdv').style.height = (P.dodgeT / P.d.dodgeCd * 100) + '%';
   };
   ui.pause = function () {
