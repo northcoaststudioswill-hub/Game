@@ -15,7 +15,7 @@
     W('r_rapier', 'rogue', 'Duellist’s Rapier', 'rapier', 140, 1, null, 'r_basic', { range: 84, arc: 40, wind: 0.11, rec: 0.15, dmg: [1, 6] }, 'A long thin point. Reach without weight.'),
     W('r_axes', 'rogue', 'Hand Axes', 'axes', 0, 0, 'heavy', 'r_basic', { range: 58, arc: 130, wind: 0.13, rec: 0.18, cost: 5, dmg: [1, 6], pz: 1.4 }, 'Two hatchets. Slower than knives and far ruder.'),
     { id: 's_basic', cls: 'sorcerer', name: 'Fire Bolt', model: 'fire', cost: 0, rank: 0, blurb: 'A mote of fire. Reliable.' },
-    W('s_frost', 'sorcerer', 'Frost Shard', 'frost', 140, 1, null, 's_basic', { speed: 580, dmg: [1, 6], slow: [0.3, 1.2], fire: 0, color: '#9fe0ff', shape: 'shard' }, 'Slower in the air, but whatever it hits slows down too.'),
+    W('s_frost', 'sorcerer', 'Frost Shard', 'frost', 140, 1, null, 's_basic', { speed: 580, dmg: [1, 6], slow: [0.2, 0.9], fire: 0, color: '#9fe0ff', shape: 'shard' }, 'Slower in the air, but whatever it hits slows down too.'),
     W('s_spark', 'sorcerer', 'Arc Spark', 'spark', 0, 0, 'heavy', 's_basic', { speed: 940, pr: 7, wind: 0.15, rec: 0.18, dmg: [1, 6], fire: 0, color: '#fff070' }, 'Small, quick and very hard to sidestep.'),
     { id: 'c_basic', cls: 'cleric', name: 'Mace', model: 'mace', cost: 0, rank: 0, blurb: 'A blessed weight on a stick.' },
     W('c_flail', 'cleric', 'Penitent’s Flail', 'flail', 140, 1, null, 'c_basic', { range: 82, arc: 150, wind: 0.2, rec: 0.26, dmg: [1, 8] }, 'A wide, wandering arc. Hard to step inside.'),

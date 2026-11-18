@@ -253,7 +253,7 @@
   // ------------------------------------------------------------------ blood, parries, mortal blows, the Second
   const gore = () => !G.state || G.state.gore !== false;
   function blood(x, y, n, dir) { if (!gore()) return spark(x, y, 30, '#c01818', Math.ceil(n / 3), 120); gfx.blood(x / S, 1.0, y / S, n, 4.6, dir); }
-  const PARRY = { fighter: [0.30, 'SHIELD BLOCK'], rogue: [0.20, 'RIPOSTE'], sorcerer: [0.24, 'SHIELD'], cleric: [0.26, 'WARDING FLARE'] };
+  const PARRY = { fighter: [0.30, 'SHIELD BLOCK'], rogue: [0.20, 'RIPOSTE'], sorcerer: [0.27, 'SHIELD'], cleric: [0.26, 'WARDING FLARE'] };
   function parryWindow(e) { return PARRY[e.cls][0] + (e.d.parry || 0) + Math.max(0, G.mod(e.stats.dex)) * 0.008; }
   // Each class answers a parried blow its own way.
   function parried(att, tgt, ab, o) {
@@ -380,8 +380,8 @@
     if (tgt.guard > 0 && ab.type !== 'aura' && !o.noCounter && !o.dot) {
       if (ab.basic) {
         tgt.guardHits = (tgt.guardHits || 0) + 1; text(tgt, 'BLOCKED', '#cfd8e0'); G.sfx('clang'); spark(tgt.x, tgt.y, 36, '#ffe9a0', 7, 150); tgt.flash = 0.04; if (att.isPlayer) addHype(-4);
-        poiseHit(tgt, 9, att);
-        if (tgt.isPlayer) { tgt.res = Math.max(0, tgt.res - 9); if (counted()) G.deeds.bump('block'); if (tgt.res <= 0) { tgt.guard = 0; tgt.st.stun = { t: 0.6 }; text(tgt, 'GUARD CRUSHED', '#ff7a6a', true); G.sfx('stun'); return false; } }
+        poiseHit(tgt, o.proj ? 0 : 9, att);                  // a bolt on the shield costs little; a blade on it costs more
+        if (tgt.isPlayer) { tgt.res = Math.max(0, tgt.res - (o.proj ? 3 : 9)); if (counted()) G.deeds.bump('block'); if (tgt.res <= 0) { tgt.guard = 0; tgt.st.stun = { t: 0.6 }; text(tgt, 'GUARD CRUSHED', '#ff7a6a', true); G.sfx('stun'); return false; } }
         if (tgt.guardHits >= (tgt.isPlayer ? 3 : 2)) {
           tgt.guard = 0; tgt.think = 0; text(att, 'PARRIED!', '#ff7a6a', true); att.st.stun = { t: 0.65 }; interrupt(att); G.sfx('stun'); shake = Math.max(shake, 6);
           const pa = Math.atan2(att.y - tgt.y, att.x - tgt.x); att.kx = Math.cos(pa) * 150; att.ky = Math.sin(pa) * 150; if (att.isPlayer) addHype(-8);
@@ -485,7 +485,7 @@
       if (ab.type === 'melee') { act.step = (e.cStep != null && time - (e.cEnd || -9) < 0.42) ? (e.cStep + 1) % 3 : 0; if (act.step === 2) { act.fin = 1; act.total = ab.wind * 1.75; } }
     } else e.mash = 0;
     if (ab.heavy && ab.type === 'melee') act.step = 2;
-    if ((ab.type === 'proj' || ab.type === 'line') && Math.hypot(e.foe.x - e.x, e.foe.y - e.y) < 82) { act.dis = 1; act.total *= 1.45; if (time - (e.disT || -9) > 1.6) { e.disT = time; text(e, 'DISADVANTAGE', '#c0a0ff'); } }
+    if ((ab.type === 'proj' || ab.type === 'line') && Math.hypot(e.foe.x - e.x, e.foe.y - e.y) < (e.isPlayer ? 82 : 104)) { act.dis = 1; act.total *= 1.45; if (time - (e.disT || -9) > 1.6) { e.disT = time; text(e, 'DISADVANTAGE', '#c0a0ff'); } }
     if (ab.type === 'aoe' && ab.at === 'point') {
       let dx = I.pt.x - e.x, dy = I.pt.y - e.y; const d = Math.hypot(dx, dy) || 1;
       if (d > ab.castRange) { dx *= ab.castRange / d; dy *= ab.castRange / d; }
@@ -668,7 +668,7 @@
       const l = Math.hypot(I.mx, I.my) || 1, m = Math.min(1, l);
       let v = e.d.speed * mv * m * (e.st.slow ? 1 - e.st.slow.amt : 1) * (1 + (e.buffs.speed ? e.buffs.speed.amt : 0));
       { const fd = Math.hypot(e.foe.x - e.x, e.foe.y - e.y) || 1; if (fd < 430 && (I.mx * (e.foe.x - e.x) + I.my * (e.foe.y - e.y)) / (l * fd) < -0.5) v *= 0.8; }       // backpedalling is slow
-      if (e.hurt > 0) v *= 0.55; if (e.st.winded) v *= 0.7; if (e.charging > 0 || e.guard > 0) v *= 0.5;                                           // a hit takes the legs out of you for a moment
+      if (e.hurt > 0) v *= 0.55; if (e.st.winded) v *= 0.7; if (e.charging > 0) v *= 0.5; else if (e.guard > 0) v *= e.cls === 'fighter' ? 0.88 : 0.55;       // a fighter can walk a caster down behind the shield                                           // a hit takes the legs out of you for a moment
       tvx = I.mx / l * v; tvy = I.my / l * v;
     }
     { const kk = Math.min(1, dt * (tvx || tvy ? (e.isPlayer ? 12 : 9) : 13)); e.vx = (e.vx || 0) + (tvx - (e.vx || 0)) * kk; e.vy = (e.vy || 0) + (tvy - (e.vy || 0)) * kk;
@@ -708,7 +708,7 @@
     e.strafeT -= dt; if (e.strafeT <= 0) { e.strafeT = rand(0.8, 2.4); e.strafe = Math.random() < 0.5 ? -1 : 1; }
     const ux = dx / d, uy = dy / d;
     if (d > pref + 16) { mx += ux; my += uy; }
-    else if (e.C.ranged && d < pref - 60) { mx -= ux; my -= uy; }
+    else if (e.C.ranged && d < pref - 110 && e.res > 30) { mx -= ux * 0.7; my -= uy * 0.7; }       // casters give ground, but not forever and not when they are spent
     const sf = e.C.ranged ? 0.8 : (d < pref + 40 ? 0.35 : 0.15);
     mx += -uy * e.strafe * sf; my += ux * e.strafe * sf;
     if (e.C.ranged && (Math.abs(e.x) + Math.abs(e.y)) / RAD > 1.25) { mx -= e.x / RAD; my -= e.y / RAD; }
@@ -930,6 +930,7 @@
   // the intro shows what the pit really does to people
   F.exSever = function (e, part, dir) { sever(e, part, null, dir == null ? Math.atan2(e.y - e.foe.y, e.x - e.foe.x) : dir); };
   F.exGib = function (e, ash) { const a = Math.atan2(e.y - e.foe.y, e.x - e.foe.x); if (!ash) { blood(e.x, e.y, 90); blood(e.x, e.y, 50, a); } fx.push({ k: 'blast', x: e.x, y: e.y, r: 100, col: '#ff3020', t: 0, life: 0.5 }); fx.push({ k: 'ring', x: e.x, y: e.y, r: 220, col: '#ff5030', t: 0, life: 0.6 }); makeGibs(e, ash); e.vis.g.visible = false; e.state = 'ko'; e.koT = 9; e.act = null; e.st = {}; shake = 20; hitstop = 0.18; G.sfx('boom'); G.sfx('crit'); };
+  F.addHype = v => addHype(v);
   F.exDown = function (e) { e.state = 'ko'; e.koT = 0; e.act = null; e.st = {}; e.buffs = {}; e.chain = null; };
   F.exDodge = function (e, ang) { e.dodgeT = 0; if (e.state !== 'idle') interrupt(e); e.intent.mx = Math.cos(ang); e.intent.my = Math.sin(ang); e.buf = { id: 'dodge', t: 0.3 }; };
 

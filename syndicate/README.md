@@ -136,6 +136,10 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **Tighter controls.** Quicker player acceleration, a shorter heavy charge (0.28s), a light blow can be cancelled into a dodge during the first half of its wind-up, and the mouse aim snaps to a close opponent on a near miss. Thrusting weapons thrust; heavy weapons swing overhead.
 
+**A working market.** The stalls sell an edge for your next bout: Ysolde Quill's tonics (less damage, more speed, more damage, more posture), Big Hobb's meals (health, stamina, stronger potions), Maelis Vane's charms (permanent, wear one), and Whisper, who scouts your next opponent for 10% more damage against them. The busker puts your name in a song so the crowd starts warm, and the beggars' fire gives a small gift once per bout. Awnings fade when you stand under them, so you can see into Mark's booth and the stalls.
+
+**Casters against steel.** A Fighter moves at near full speed behind a raised shield, and a bolt on the shield costs little stamina and no posture. Enemy casters give ground more slowly, stop retreating when spent, and are at a disadvantage from further out. Sorcerers start with Shocking Grasp and have a wider parry.
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |
@@ -170,7 +174,7 @@ and the rest of the game does not change.
 - `js/models.js` character models and animation
 - `js/world.js` the arena; `js/places.js` the street, the hideout, decor pieces, walking
 - `js/fight.js` combat simulation, AI, and its 3D effects
-- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror; `js/arms.js` combat tempo, heavy blows, weapons and the Armoury; `js/realm.js` the Long Stair, proclamations, tithe and throne events; `js/board.js` pit contracts and win streaks; `js/kits.js` kits, mastery, extra weapons and techniques; `js/story.js` story scenes, Mark's loyalty and partnership, the strongbox; `js/home.js` new hideout pieces
+- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js`, `js/mark2.js`, `js/mark3.js` the bookie, his games, schemes, chits and the Wisp Table; `js/meet.js` cutscenes and duels; `js/life.js` ambient detail for the market and pit; `js/deeds.js` extra mortal blows, deeds and the Mirror; `js/arms.js` combat tempo, heavy blows, weapons and the Armoury; `js/realm.js` the Long Stair, proclamations, tithe and throne events; `js/board.js` pit contracts and win streaks; `js/kits.js` kits, mastery, extra weapons and techniques; `js/story.js` story scenes, Mark's loyalty and partnership, the strongbox; `js/home.js` new hideout pieces; `js/market.js` stalls, boons, charms and fading awnings
 - `js/cine.js` the opening cinematic; `js/lore.js` codex and bios; `js/music.js` the music sequencer
 - `js/ui.js` menus, HUD, level-up and results screens; `js/main.js` input and main loop
 
