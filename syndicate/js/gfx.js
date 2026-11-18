@@ -25,19 +25,29 @@
   gfx.setScene = s => { scene = s; };
   gfx.scene = () => scene;
 
+  // gfx.cine = {pos:[x,y,z], look:[x,y,z], fov, roll} switches to a free perspective camera (used by the cinematic)
+  let pcam = null, active = null;
   gfx.render = function () {
     if (!scene) return;
+    const sx = cam.shake ? (Math.random() - 0.5) * cam.shake : 0, sz = cam.shake ? (Math.random() - 0.5) * cam.shake : 0;
+    if (gfx.cine) {
+      const k = gfx.cine; if (!pcam) pcam = new T.PerspectiveCamera(50, 1, 0.1, 400);
+      pcam.fov = k.fov || 50; pcam.aspect = gfx.W / gfx.H; pcam.updateProjectionMatrix();
+      pcam.position.set(k.pos[0] + sx, k.pos[1] + sx * 0.5, k.pos[2] + sz);
+      pcam.up.set(Math.sin(k.roll || 0), Math.cos(k.roll || 0), 0);
+      pcam.lookAt(k.look[0] + sx * 0.6, k.look[1], k.look[2] + sz * 0.6); pcam.updateMatrixWorld();
+      active = pcam; renderer.render(scene, pcam); return;
+    }
     const vw = cam.vh * gfx.W / gfx.H;
     camera.left = -vw * cam.fx; camera.right = vw * (1 - cam.fx); camera.top = cam.vh * cam.fy; camera.bottom = -cam.vh * (1 - cam.fy);
     camera.updateProjectionMatrix();
-    const sx = cam.shake ? (Math.random() - 0.5) * cam.shake : 0, sz = cam.shake ? (Math.random() - 0.5) * cam.shake : 0;
     camera.position.set(cam.x + sx + DIR.x * 80, cam.y + DIR.y * 80, cam.z + sz + DIR.z * 80);
     camera.lookAt(cam.x + sx, cam.y, cam.z + sz);
     camera.updateMatrixWorld();
-    renderer.render(scene, camera);
+    active = camera; renderer.render(scene, camera);
   };
   const v3 = new T.Vector3();
-  gfx.project = (x, y, z) => { v3.set(x, y, z).project(camera); return { x: (v3.x * 0.5 + 0.5) * gfx.W, y: (-v3.y * 0.5 + 0.5) * gfx.H }; };
+  gfx.project = (x, y, z) => { v3.set(x, y, z).project(active || camera); return { x: (v3.x * 0.5 + 0.5) * gfx.W, y: (-v3.y * 0.5 + 0.5) * gfx.H }; };
   const ray = new T.Raycaster(), ndc = new T.Vector2(), plane = new T.Plane(new T.Vector3(0, 1, 0), 0), hitP = new T.Vector3();
   gfx.groundAt = (cx, cy) => {
     ndc.set(cx / gfx.W * 2 - 1, -(cy / gfx.H) * 2 + 1); ray.setFromCamera(ndc, camera);
@@ -45,7 +55,7 @@
   };
   // screen-space input (right, down) to world ground direction
   gfx.screenToWorld = (ix, iy) => ({ x: (ix + iy) * 0.7071, z: (-ix + iy) * 0.7071 });
-  gfx.pxPerUnit = () => gfx.H / cam.vh;
+  gfx.pxPerUnit = () => gfx.cine ? gfx.H / 11 : gfx.H / cam.vh;
 
   // ------------------------------------------------------------ procedural textures
   function canvasTex(w, h, fn, repeat) {

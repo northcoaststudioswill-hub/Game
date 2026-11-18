@@ -15,8 +15,10 @@ phone portrait, phone landscape, or a desktop monitor.
 
 - **True isometric 3D.** A fixed isometric camera over real geometry, with dynamic lights,
   shadows, torch flicker and spell light on the stone. Built on three.js (vendored in `lib/`).
-- **Opening cinematic:** an in-engine intro (skippable) that sets up the Undercity, the Deep Guild's
-  Blood Ledger, the champion and your debt. It plays when you start a new fighter and can be
+- **Opening cinematic:** an in-engine intro (skippable) shot with a free camera: crane, orbit,
+  whip-pan and dolly-zoom shots, plus a slow-motion montage of scripted bouts that use the real
+  abilities (leaping slam, lightning and fireball, radiance, flurry of shadows). It sets up the
+  Undercity, the Deep Guild's Blood Ledger, the champion and your debt. It plays when you start a new fighter and can be
   replayed from the title menu.
 - **Three places you walk around:** the Undercity street (the Pit gate, the Fence, the
   Guildmaster, your Hideout door), the Blood Pit arena, and your Hideout.

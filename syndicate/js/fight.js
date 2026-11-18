@@ -86,7 +86,7 @@
     const alpha = e.buffs.stealth ? (e.isPlayer ? 0.4 : 0.1) : 1;
     v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, t: time + (e.isPlayer ? 0 : 1.7), glow });
     const alive = e.state !== 'ko';
-    v.ring.visible = alive && alpha > 0.3; v.ring.position.y = 0.03 - e.z / S;
+    v.ring.visible = alive && alpha > 0.3 && !F.ex; v.ring.position.y = 0.03 - e.z / S;
     v.ward.visible = alive && e.shield > 0; if (v.ward.visible) v.ward.material.opacity = 0.18 + Math.sin(time * 6) * 0.06;
     v.mark.visible = alive && !!e.st.mark; v.guard.visible = alive && !!e.buffs.counter; if (v.guard.visible) v.guard.rotation.y = v.c.root.rotation.y - Math.PI / 2;
     v.stars.forEach((s, i) => { s.visible = alive && !!e.st.stun; const a = time * 6 + i * 2.09; s.position.set(Math.cos(a) * 0.4, 2.25, Math.sin(a) * 0.4); });
@@ -534,7 +534,8 @@
     if (phase === 'ko') dt *= 0.45;
     time += dt; shake = Math.max(0, shake - dt * 40);
     if (phase === 'intro') { phaseT -= dt; G.input.pressed.length = 0; if (phaseT <= 0.6 && !F.said) { F.said = 1; G.ui.banner('FIGHT!', '', 'win'); } if (phaseT <= 0) { phase = 'fight'; G.ui.banner(null); } }
-    if (phase === 'fight') {
+    if (phase === 'fight' && F.ex) { exThink(P); exThink(E); }
+    else if (phase === 'fight') {
       if (G.debugAuto) { if (!P.ai) P.ai = { react: 0.3, aggro: 0.7, dodge: 0.3 }; think(P, dt); } else playerIntent();
       think(E, dt);
       hype = Math.max(0, hype - dt * 1.2);
@@ -566,7 +567,7 @@
     }
     if (phase === 'ko') { phaseT -= dt / 0.45; if (phaseT <= 0) { F.active = false; G.ui.banner(null); finish(); return; } }
     sync(dt);
-    G.ui.updateHud(P, E, hype);
+    if (!F.ex) G.ui.updateHud(P, E, hype);
   };
 
   function sync(dt) {
@@ -574,6 +575,7 @@
     projs.forEach(syncProj); zones.forEach(syncZone);
     for (let i = fx.length - 1; i >= 0; i--) { const f = fx[i]; f.t += dt; if (!f.obj) buildFx(f); if (f.t >= f.life) { killFx(f); fx.splice(i, 1); } else f.upd(f.t / f.life); }
     arena.flash.intensity *= Math.pow(0.0005, dt); if (arena.flash.intensity < 0.3) arena.flash.intensity = 0;
+    if (F.ex) { gfx.cam.shake = shake / 45; return; }
     arena.setHype(hype / 100);
     // camera frames both fighters
     const c = gfx.cam, dx = (P.x - E.x) / S, dz = (P.y - E.y) / S, port = gfx.portrait;
@@ -595,6 +597,44 @@
       ar.className = ''; ar.style.transform = 'translate(' + ax + 'px,' + ay + 'px) translate(-50%,-50%) rotate(' + Math.atan2(ep.y - ay, ep.x - ax) + 'rad)';
     } else ar.className = 'hidden';
   }
+
+
+  // ------------------------------------------------------------------ exhibition bouts (scripted, for the cinematic)
+  function exThink(e) {
+    const I = e.intent, f = e.foe, tg = e.faceAt || f;
+    I.aim = Math.atan2(tg.y - e.y, tg.x - e.x); I.pt.x = e.orderPt ? e.orderPt.x : f.x; I.pt.y = e.orderPt ? e.orderPt.y : f.y; I.attack = !!e.exAttack;
+    if (!(e.buf && e.buf.id === 'dodge')) I.mx = I.my = 0;
+    if (e.goto) { const dx = e.goto.x - e.x, dy = e.goto.y - e.y, d = Math.hypot(dx, dy); if (d > 14) { I.mx = dx / d; I.my = dy / d; } else e.goto = null; }
+    delete e.st.stun;
+  }
+  F.exStop = function () {
+    if (F.P) [F.P, F.E].forEach(e => { if (e.vis) { sc.remove(e.vis.g); if (e.vis.tele) sc.remove(e.vis.tele); e.vis = null; } });
+    (fx || []).forEach(killFx); (projs || []).forEach(p => p.m && sc.remove(p.m)); (zones || []).forEach(z => z.m && sc.remove(z.m));
+    fx = []; projs = []; zones = []; gfx.clearFloats(); F.ex = null; F.active = false; F.speed = 1; hitstop = 0; shake = 0; gfx.cam.shake = 0;
+    if (arena) arena.flash.intensity = 0;
+  };
+  F.exStart = function (a, b, pa, pb) {
+    arena = G.world.get('arena'); sc = arena.scene;
+    F.exStop();
+    const mk = (h, pos, pl) => {
+      const hh = { name: h.name || '', cls: h.cls, race: h.race, level: 5, stats: G.baseStats(h.cls, h.race), sub: h.sub || null, feats: [], known: [], slots: [], ult: null };
+      const d = G.derive(hh, null); d.maxHp = 1e6;
+      const e = makeEntity(hh, d, { cls: h.cls, race: h.race, gear: h.gear || { weapon: 0, armor: 0 }, tint: h.tint, scale: h.scale || 1, rank: 0 }, pl);
+      e.x = pos[0] * S; e.y = pos[1] * S; e.hp = e.maxHp = 1e6; return e;
+    };
+    P = mk(a, pa, true); E = mk(b, pb, false); P.foe = E; E.foe = P;
+    P.aim = Math.atan2(E.y - P.y, E.x - P.x); E.aim = P.aim + Math.PI;
+    F.ex = true; [P, E].forEach(makeVis); if (!arena.flash.parent) sc.add(arena.flash);
+    time = 0; hitstop = 0; shake = 0; hype = 50; lastAb = null; stolen = 0; phase = 'fight'; result = null;
+    F.active = true; F.paused = false; F.P = P; F.E = E; sync(0);
+    return { A: P, B: E };
+  };
+  F.exCast = function (e, id, pt) {
+    e.cds = {}; e.res = 100; if (e.state === 'wind' || e.state === 'recover') interrupt(e); if (e.state === 'dodge') e.state = 'idle';
+    e.orderPt = pt ? { x: pt[0] * S, y: pt[1] * S } : null; e.buf = null; e.intent.queue.push(id);
+  };
+  F.exDown = function (e) { e.state = 'ko'; e.koT = 0; e.act = null; e.st = {}; e.buffs = {}; e.chain = null; };
+  F.exDodge = function (e, ang) { e.dodgeT = 0; if (e.state !== 'idle') interrupt(e); e.intent.mx = Math.cos(ang); e.intent.my = Math.sin(ang); e.buf = { id: 'dodge', t: 0.3 }; };
 
   F.forfeit = function () { if (!F.active) return; result = { win: false, forfeit: true }; F.active = false; F.paused = false; G.ui.banner(null); finish(); };
 
