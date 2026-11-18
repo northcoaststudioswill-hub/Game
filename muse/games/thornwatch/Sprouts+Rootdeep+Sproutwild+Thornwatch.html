@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Sprouts + Rootdeep + Sproutwild + Thornwatch — Pocket Lantern</title>
+<title>Sprouts + Rootdeep + Sproutwild + Clankawatch — Pocket Lantern</title>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -86,7 +86,7 @@ button:focus-visible{ outline:3px solid #fff; outline-offset:2px }
           <button class="cart sel" data-i="0"><canvas class="art" id="cartArt" width="40" height="26"></canvas>Sprouts</button>
           <button class="cart" data-i="1"><canvas class="art" id="cartArt2" width="40" height="26"></canvas>Rootdeep</button>
           <button class="cart" data-i="2"><canvas class="art" id="cartArt3" width="40" height="26"></canvas>Sproutwild</button>
-          <button class="cart" data-i="3"><canvas class="art" id="cartArt4" width="40" height="26"></canvas>Thornwatch</button>
+          <button class="cart" data-i="3"><canvas class="art" id="cartArt4" width="40" height="26"></canvas>Clankawatch</button>
         </div>
       </div>
     </div>
@@ -5787,7 +5787,7 @@ function twDraw(){ox=0;oy=0;
   drawDog({x:150,y:H-12,fx:-1,mv:0,st:'sit',alert:0,say:null});
   const twpp=twPathPos(6+((Math.sin(time*.4)+1)/2)*64,0);g.globalAlpha=.85;g.drawImage(TWCREEP.std,Math.round(twpp.x)-8,Math.round(twpp.y)-6,16,11);g.globalAlpha=1;
   const thp=twHeartPos();g.globalAlpha=.10+.05*Math.sin(time*2.4);r('#f8c070',thp.x-13,thp.y-13,26,26);g.globalAlpha=1;
-  ctext('THORNWATCH',34,4,'#a8e078');ctext("LIL BOTTIE WANTS THE LIGHT. HE'S MAD.",56,1,'#e8e4f8',null);
+  ctext('CLANKAWATCH',34,4,'#7fd4f8');ctext("LIL BOTTIE WANTS THE LIGHT. HE'S MAD.",56,1,'#e8e4f8',null);
   ctext('THREE GARDENS. 26 NIGHTS. ONE HEART.',68,1,'#fff8e0',null);
   {const bw=26,bh=twBottieH(bw),bx=20,by=twBoardTop()+8-bh+Math.round(Math.sin(time*2.2)*1.5);g.drawImage(twOL(twBottieSpr(),bw,bh),bx-1,by-1);twMad(bx+bw-3,by-6)} /* v4: the numba one clanka, mad, on the wall */
   if(state==='g5title'){if(((time*1.6)|0)%2)ctext('PRESS START',96,2,'#fff8e0');

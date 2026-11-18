@@ -84,7 +84,7 @@ Will: "What if it was lil Bottie sending AI data drone swarms instead of creeps 
 
 **Will's call, not settled:**
 1. The drone and boss names above. They are placeholders.
-2. The title. "Thornwatch" was named for the bramble and Old Thornback, and neither is in the game now.
+2. ~~The title.~~ **Answered Nov 18: CLANKAWATCH.** Title screen and cartridge label changed (build.py patches the label). Folder, file name and save key still say thornwatch on purpose.
 3. The story lines in `src/tw-story.js`. They follow the voices in UNIVERSE-v4.md, but every line of his characters is his to change. Bottie's reason ("training data") is new.
 4. The new art breaks rule 12 (ported, not drawn new) on purpose, because the brief asked for a full rework. Towers and keepers are still the ported sprites.
 5. Louie's lookout and Will's ability line still say what they said; only the enemy words changed.

@@ -1380,7 +1380,7 @@ function twDraw(){ox=0;oy=0;
   drawDog({x:150,y:H-12,fx:-1,mv:0,st:'sit',alert:0,say:null});
   const twpp=twPathPos(6+((Math.sin(time*.4)+1)/2)*64,0);g.globalAlpha=.85;g.drawImage(TWCREEP.std,Math.round(twpp.x)-8,Math.round(twpp.y)-6,16,11);g.globalAlpha=1;
   const thp=twHeartPos();g.globalAlpha=.10+.05*Math.sin(time*2.4);r('#f8c070',thp.x-13,thp.y-13,26,26);g.globalAlpha=1;
-  ctext('THORNWATCH',34,4,'#a8e078');ctext("LIL BOTTIE WANTS THE LIGHT. HE'S MAD.",56,1,'#e8e4f8',null);
+  ctext('CLANKAWATCH',34,4,'#7fd4f8');ctext("LIL BOTTIE WANTS THE LIGHT. HE'S MAD.",56,1,'#e8e4f8',null);
   ctext('THREE GARDENS. 26 NIGHTS. ONE HEART.',68,1,'#fff8e0',null);
   {const bw=26,bh=twBottieH(bw),bx=20,by=twBoardTop()+8-bh+Math.round(Math.sin(time*2.2)*1.5);g.drawImage(twOL(twBottieSpr(),bw,bh),bx-1,by-1);twMad(bx+bw-3,by-6)} /* v4: the numba one clanka, mad, on the wall */
   if(state==='g5title'){if(((time*1.6)|0)%2)ctext('PRESS START',96,2,'#fff8e0');

@@ -62,6 +62,12 @@ game looks like, what the enemy is, and adds the story.
   greyed-out keeper slot in the shop is now a plain "???",
   since he is the villain here.
 
+- **The game is called CLANKAWATCH** (Will, Nov 18: "call it
+  something Bottie related"). The title screen and the
+  cartridge label say so. The folder, the file name and the
+  save key (`thornwatch-v1`) keep the old name so nothing
+  breaks; old saves load as before.
+
 Not in this version (next, in the brief's order): two upgrade
 paths per sprout, calling the next night early, petals to
 collect during a night, the menu pass, replay goals.

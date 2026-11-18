@@ -52,4 +52,4 @@ All of this is from Sproutwild's own story (`alt/src/sproutwild/sw-lore.js`, `sw
 2. **LIGHTKEEP.** Names what you protect; echoes Sunkeep. Softer, less about the fight.
 3. **CLANKERFALL.** Funniest, and uses Knockout's word for Bottie. Reads more like a joke game.
 
-Not applied yet. The title, the cartridge label and the docs all change in one pass once Will picks.
+**Chosen, Nov 18: CLANKAWATCH.** Will asked for something Bottie related. It keeps "watch" and uses the game's own word for him. Applied to the title screen and the cartridge label; the folder, file and save key keep the old name.

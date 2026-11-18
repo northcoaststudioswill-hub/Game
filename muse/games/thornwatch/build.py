@@ -59,5 +59,11 @@ clash = sorted(n for n in set(names) if re.search(r'^function\s+' + re.escape(n)
 if clash:
     die('names already used by another cartridge: ' + ', '.join(clash))
 html = shell[:a] + module + shell[b:]
+# v4: the game is called CLANKAWATCH now (Will, Nov 18). The folder, file and save key keep the old name.
+for old, new in [('></canvas>Thornwatch</button>', '></canvas>Clankawatch</button>'),
+                 ('<title>Sprouts + Rootdeep + Sproutwild + Thornwatch', '<title>Sprouts + Rootdeep + Sproutwild + Clankawatch')]:
+    if html.count(old) != 1:
+        die('rename: expected one of ' + old)
+    html = html.replace(old, new)
 OUT.write_text(html, encoding='utf8')
 print(OUT.name, len(html.encode('utf8')), 'bytes', hashlib.md5(html.encode('utf8')).hexdigest())
