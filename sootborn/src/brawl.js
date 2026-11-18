@@ -254,7 +254,7 @@ const Brawl = {
   },
 
   // ---------------------------------------------------------- drawing
-  proj(x, y, h) { const c = this.cam, dz = Math.max(16, c.y - y), s = c.f / dz; return { x: W / 2 + (x - c.x) * s, y: c.hor + c.h * s - (h || 0) * s, s, dz }; },
+  proj(x, y, h) { if (this.g3) return G3.proj(x, y, h); const c = this.cam, dz = Math.max(16, c.y - y), s = c.f / dz; return { x: W / 2 + (x - c.x) * s, y: c.hor + c.h * s - (h || 0) * s, s, dz }; },
   texture(bg) {
     if (this.tex[bg]) return this.tex[bg];
     const [c, g] = mk(512, 512), R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); }, r = rng(bg.length * 31 + 7), A = this.arena, arx = A.rx || A.w / 2, ary = A.ry || A.h / 2;
@@ -315,10 +315,16 @@ const Brawl = {
     g.setTransform(b);
     const haze = bg === 'ring' ? '20,12,16' : bg === 'furnace' ? '255,110,40' : bg === 'ford' ? '255,170,120' : bg === 'keep' ? '255,214,190' : '200,230,255'; const gr = g.createLinearGradient(0, c.hor, 0, c.hor + 46); gr.addColorStop(0, `rgba(${haze},.85)`); gr.addColorStop(1, `rgba(${haze},0)`); g.fillStyle = gr; g.fillRect(0, c.hor, W, 47);
   },
-  poly(g, pts, col) { g.fillStyle = col; g.beginPath(); pts.forEach((q, i) => { const pr = this.proj(q[0], q[1]); if (i) g.lineTo(pr.x, pr.y); else g.moveTo(pr.x, pr.y); }); g.closePath(); g.fill(); },
-  disc(g, x, y, r, col, stroke) { const pts = []; for (let i = 0; i < 18; i++) pts.push([x + Math.cos(i / 18 * 6.283) * r, y + Math.sin(i / 18 * 6.283) * r]); if (stroke) { g.strokeStyle = col; g.lineWidth = stroke; g.beginPath(); pts.forEach((q, i) => { const pr = this.proj(q[0], q[1]); if (i) g.lineTo(pr.x, pr.y); else g.moveTo(pr.x, pr.y); }); g.closePath(); g.stroke(); } else this.poly(g, pts, col); },
+  poly(g, pts, col) { if (this.g3) return G3.poly(pts, col); g.fillStyle = col; g.beginPath(); pts.forEach((q, i) => { const pr = this.proj(q[0], q[1]); if (i) g.lineTo(pr.x, pr.y); else g.moveTo(pr.x, pr.y); }); g.closePath(); g.fill(); },
+  disc(g, x, y, r, col, stroke) { if (this.g3 && stroke) return G3.ring(x, y, r, col, stroke * .9); const pts = []; for (let i = 0; i < 18; i++) pts.push([x + Math.cos(i / 18 * 6.283) * r, y + Math.sin(i / 18 * 6.283) * r]); if (stroke) { g.strokeStyle = col; g.lineWidth = stroke; g.beginPath(); pts.forEach((q, i) => { const pr = this.proj(q[0], q[1]); if (i) g.lineTo(pr.x, pr.y); else g.moveTo(pr.x, pr.y); }); g.closePath(); g.stroke(); } else this.poly(g, pts, col); },
   // one fighter: billboard, lean, shine, aura, weapon
   fighter(g, o, opt) {
+    if (this.g3) { // above the rock the fighter is a 3D figure; only the pixel HUD is drawn here
+      G3.char(o, opt); if (o.st === 'down') return; const hp = this.proj(o.x, o.y, 76 + (o.z || 0) * 1.2); if (hp.dz < 10) return; const cx = hp.x, top = Math.round(hp.y);
+      if (opt.foe && o.st === 'wind') ptext(g, '!', Math.round(cx) - 2, top - 10, '#ff5a4a', 2);
+      if (opt.foe && !opt.boss && o.hp < o.max) { const bw = clamp(Math.round(30 * hp.s), 14, 34), hx = Math.round(cx - bw / 2); g.fillStyle = '#120a0e'; g.fillRect(hx - 1, top - 5, bw + 2, 4); g.fillStyle = '#c8452e'; g.fillRect(hx, top - 4, Math.max(0, Math.round(bw * o.hp / o.max)), 2); }
+      if (o.bark) { const tw = ptextW(o.bark.t), bx = clamp(Math.round(cx - tw / 2 - 3), 2, W - tw - 8), by = Math.max(28, top - 20); g.fillStyle = '#120a0e'; g.fillRect(bx - 1, by - 1, tw + 8, 11); g.fillStyle = '#f3e3c3'; g.fillRect(bx, by, tw + 6, 9); ptext(g, o.bark.t, bx + 3, by + 2, '#2a1408'); }
+      return; }
     const pr = this.proj(o.x, o.y), sh = o.sheet, fh = sh.fh || 16, sc = this.K * pr.s * (o.sc || 1), w = 16 * sc, hgt = fh * sc, t = this.t, rm = Settings.d.reduce;
     if (pr.dz < 24 || pr.x < -60 || pr.x > W + 60) return;
     const nfr = Math.round(sh.width / 16), fx = o.fx || 0, fy = o.fy || 0, dir = Math.abs(fx) > Math.abs(fy) * .7 ? (fx < 0 ? 2 : 3) : fy > 0 ? 0 : 1, side = dir === 2 ? -1 : dir === 3 ? 1 : 0;
@@ -391,15 +397,17 @@ const Brawl = {
   scene(g, extra) {
     const bg = this.def.bg || 'ring', rm = Settings.d.reduce, c = this.cam;
     const sx = this.shake > 0 && !rm ? Math.round((Math.random() - .5) * 6) : 0, sy = this.shake > 0 && !rm ? Math.round((Math.random() - .5) * 4) : 0;
-    g.save(); g.translate(sx, sy); this.backdrop(g, bg, c.hor, this.t); this.floor(g, bg);
-    if (!rm && (bg === 'valley' || bg === 'ford')) { const t = this.t; for (let i = 0; i < 3; i++) { const cx0 = ((i * 190 + t * 9) % 620) - 310, cy0 = -90 + i * 70; this.poly(g, Array.from({ length: 14 }, (_, k) => [cx0 + Math.cos(k / 14 * 6.283) * (70 + i * 14), cy0 + Math.sin(k / 14 * 6.283) * 30]), 'rgba(10,30,40,.13)'); }
+    const artOn = this.art && this.art.t > 1.9, rush = ((this.sup && this.sup.t >= .95) || artOn) && !this.cine, d3 = this.g3 = G3.want(bg);
+    g.save(); g.translate(sx, sy);
+    if (d3) { g.clearRect(-8, -8, W + 16, H + 16); G3.begin(this, rush && !rm ? (artOn ? [.04, .025, .09] : [.1, .01, .02]) : null, sx, sy); } else { this.backdrop(g, bg, c.hor, this.t); this.floor(g, bg); }
+    if (!rm && !d3 && (bg === 'valley' || bg === 'ford')) { const t = this.t; for (let i = 0; i < 3; i++) { const cx0 = ((i * 190 + t * 9) % 620) - 310, cy0 = -90 + i * 70; this.poly(g, Array.from({ length: 14 }, (_, k) => [cx0 + Math.cos(k / 14 * 6.283) * (70 + i * 14), cy0 + Math.sin(k / 14 * 6.283) * 30]), 'rgba(10,30,40,.13)'); }
       if (bg === 'ford') for (let i = 0; i < 26; i++) { const wx = ((i * 47.3 + t * (14 + i % 4 * 5)) % 420) - 210, wy = -48 + (i * 13) % 40, pr = this.proj(wx, wy); if (Math.sin(t * 5 + i * 2.1) > .2) { g.fillStyle = i % 3 ? 'rgba(255,230,190,.8)' : 'rgba(255,255,255,.9)'; g.fillRect(Math.round(pr.x), Math.round(pr.y), Math.max(2, Math.round(5 * pr.s)), 1); } } }
-    if (!rm && bg === 'keep') { const A = this.arena; for (let i = 0; i < 4; i++) { const x0 = -A.w / 2 - 40 + i * 90 + Math.sin(this.t * .2 + i) * 6; this.poly(g, [[x0, -A.h / 2 - 20], [x0 + 26, -A.h / 2 - 20], [x0 + 86, A.h / 2 + 60], [x0 + 40, A.h / 2 + 60]], 'rgba(255,236,200,.10)'); } }
+    if (!rm && !d3 && bg === 'keep') { const A = this.arena; for (let i = 0; i < 4; i++) { const x0 = -A.w / 2 - 40 + i * 90 + Math.sin(this.t * .2 + i) * 6; this.poly(g, [[x0, -A.h / 2 - 20], [x0 + 26, -A.h / 2 - 20], [x0 + 86, A.h / 2 + 60], [x0 + 40, A.h / 2 + 60]], 'rgba(255,236,200,.10)'); } }
     for (const r of this.rings) this.disc(g, r.x, r.y, r.r, r.c === '#fff' ? `rgba(255,255,255,${r.life * .8})` : r.c + (Math.round(clamp(r.life, 0, 1) * 200).toString(16).padStart(2, '0')), 2);
-    const artOn = this.art && this.art.t > 1.9, rush = ((this.sup && this.sup.t >= .95) || artOn) && !this.cine;
-    if (rush && !rm) { const tg = artOn ? this.art.tg : this.sup.tg || this.p, pr = this.proj(tg.x, tg.y, 24), t = this.t; g.fillStyle = artOn ? (this.art.a.dark || 'rgba(10,6,22,.8)') : 'rgba(26,2,4,.78)'; g.fillRect(-8, -8, W + 16, H + 16); g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 40; i++) { const a = i / 40 * 6.283 + (i % 5) * .13, r0 = 26 + (i * 37 + t * 520) % 150, r1 = r0 + 30 + (i % 4) * 16; g.strokeStyle = i % 3 ? (artOn ? `rgba(${this.art.a.rgb || '255,200,90'},.5)` : 'rgba(255,90,30,.5)') : 'rgba(255,220,160,.6)'; g.lineWidth = i % 4 === 0 ? 2 : 1; g.beginPath(); g.moveTo(pr.x + Math.cos(a) * r0, pr.y + Math.sin(a) * r0 * .7); g.lineTo(pr.x + Math.cos(a) * r1, pr.y + Math.sin(a) * r1 * .7); g.stroke(); } g.globalCompositeOperation = 'source-over'; }
-    const list = (rush ? [] : this.props.map(q => ({ y: q.y, d: () => this.prop(g, q) }))).concat(extra);
+    if (rush && !rm) { const tg = artOn ? this.art.tg : this.sup.tg || this.p, pr = this.proj(tg.x, tg.y, 24), t = this.t; if (!d3) { g.fillStyle = artOn ? (this.art.a.dark || 'rgba(10,6,22,.8)') : 'rgba(26,2,4,.78)'; g.fillRect(-8, -8, W + 16, H + 16); } g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 40; i++) { const a = i / 40 * 6.283 + (i % 5) * .13, r0 = 26 + (i * 37 + t * 520) % 150, r1 = r0 + 30 + (i % 4) * 16; g.strokeStyle = i % 3 ? (artOn ? `rgba(${this.art.a.rgb || '255,200,90'},.5)` : 'rgba(255,90,30,.5)') : 'rgba(255,220,160,.6)'; g.lineWidth = i % 4 === 0 ? 2 : 1; g.beginPath(); g.moveTo(pr.x + Math.cos(a) * r0, pr.y + Math.sin(a) * r0 * .7); g.lineTo(pr.x + Math.cos(a) * r1, pr.y + Math.sin(a) * r1 * .7); g.stroke(); } g.globalCompositeOperation = 'source-over'; }
+    const list = (rush || d3 ? [] : this.props.map(q => ({ y: q.y, d: () => this.prop(g, q) }))).concat(extra);
     list.sort((a, b) => a.y - b.y); for (const e of list) e.d();
+    if (d3) G3.end(this);
     g.globalCompositeOperation = 'lighter'; for (const q of this.slashes) { const pr = this.proj(q.x, q.y, q.h || 26), L = (q.big ? 46 : 28) * pr.s * (1.2 - q.life * 2), cx = Math.cos(q.a), cy = Math.sin(q.a) * .6; g.strokeStyle = `rgba(255,246,214,${Math.min(1, q.life * 8)})`; g.lineWidth = q.big ? 3 : 2; g.beginPath(); g.moveTo(pr.x - cx * L, pr.y - cy * L); g.lineTo(pr.x + cx * L, pr.y + cy * L); g.stroke(); g.lineWidth = 1; g.strokeStyle = '#fff'; g.stroke(); } g.globalCompositeOperation = 'source-over';
     if (this.lines.length) { g.globalCompositeOperation = 'lighter'; for (const l of this.lines) { const a0 = this.proj(l.x0, l.y0, 24), a1 = this.proj(l.x1, l.y1, 24), al = Math.min(1, l.life * 4); g.strokeStyle = `rgba(${this.art ? this.art.a.rgb || '255,200,90' : '255,200,90'},${al * .6})`; g.lineWidth = 5; g.beginPath(); g.moveTo(a0.x, a0.y); g.lineTo(a1.x, a1.y); g.stroke(); g.strokeStyle = `rgba(255,255,255,${al})`; g.lineWidth = 1.5; g.stroke(); } g.globalCompositeOperation = 'source-over'; }
     if (this.fin && !rm) { const F0 = this.fin, pr = this.proj(F0.x, F0.y), k = Math.min(1, F0.t / .12), fade = Math.max(0, 1 - F0.t / 1.1), wd = (16 + 26 * k) * pr.s * fade; g.globalCompositeOperation = 'lighter';
@@ -420,16 +428,16 @@ const Brawl = {
     ex.push({ y: -1e6, d: () => { for (const f of this.foes) if (f.st === 'wind') { const w = f.mode === 'charge' ? f.K.wind + .15 : f.second ? .3 : f.K.wind, k = Math.min(1, f.t / w), col = `rgba(255,60,40,${.2 + k * .45})`;
         if (f.mode === 'sweep') this.disc(g, f.x, f.y, (f.K.reach + 6) * k, col); else { const L = (f.mode === 'charge' ? 115 : f.K.reach + 10) * k, wd = (f.K.wide || 12) / 2, nx = -f.ay * wd, ny = f.ax * wd; this.poly(g, [[f.x + nx, f.y + ny], [f.x + f.ax * L + nx, f.y + f.ay * L + ny], [f.x + f.ax * L - nx, f.y + f.ay * L - ny], [f.x - nx, f.y - ny]], col); } }
       if (p.open > 0) this.disc(g, p.x, p.y, 16, 'rgba(255,224,138,.9)', 2); if (p.fury >= 100 && !rm) this.disc(g, p.x, p.y, 20 + Math.sin(t * 9) * 2, 'rgba(255,120,40,.55)', 2); } });
-    for (const q of p.trail) ex.push({ y: q.y - .1, d: () => { const pr = this.proj(q.x, q.y), sh = p.sheet, fh = sh.fh || 16, sc = this.K * pr.s; g.globalAlpha = Math.min(1, q.life * 2.2) * .5; g.globalCompositeOperation = 'lighter'; g.drawImage(sh, 0, 3 * fh, 16, fh, pr.x - 8 * sc, pr.y - fh * sc, 16 * sc, fh * sc); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; } });
-    for (const f of this.foes) ex.push({ y: f.y, d: () => this.fighter(g, f, { foe: 1, cape: (CAST[f.id].look().cape) || null, boss: this.foes.length === 1, blade: f.K.blade, aura: f.K.blink ? 1 : 0, auraC: 'rgba(255,244,200,.22)', auraG: 'rgba(255,240,190,.2)' }) });
-    for (const a of this.allies) ex.push({ y: a.y, d: () => this.fighter(g, a, { blade: 1 }) });
+    for (const q of p.trail) ex.push({ y: q.y - .1, d: () => { if (this.g3) return G3.glow(q.x, 24, q.y, 22, [1, .8, .5], q.life * 1.6); const pr = this.proj(q.x, q.y), sh = p.sheet, fh = sh.fh || 16, sc = this.K * pr.s; g.globalAlpha = Math.min(1, q.life * 2.2) * .5; g.globalCompositeOperation = 'lighter'; g.drawImage(sh, 0, 3 * fh, 16, fh, pr.x - 8 * sc, pr.y - fh * sc, 16 * sc, fh * sc); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; } });
+    for (const f of this.foes) ex.push({ y: f.y, d: () => this.fighter(g, f, { foe: 1, id: f.id, cape: (CAST[f.id].look().cape) || null, boss: this.foes.length === 1, blade: f.K.blade, aura: f.K.blink ? 1 : 0, auraC: 'rgba(255,244,200,.22)', auraG: 'rgba(255,240,190,.2)' }) });
+    for (const a of this.allies) ex.push({ y: a.y, d: () => this.fighter(g, a, { blade: 1, id: a.id }) });
     const furyA = p.fury >= 100 || this.sup ? 2 + p.rage : p.rage > 0 ? p.rage * .6 + p.fury / 100 : p.fury > 60 ? .6 : 0;
-    ex.push({ y: p.y + .1, d: () => this.fighter(g, p, { blade: p.blade, aura: furyA, cape: this.def.hero && this.def.hero.id ? '#5a3aa8' : null }) });
+    ex.push({ y: p.y + .1, d: () => this.fighter(g, p, { blade: p.blade, aura: furyA, id: (this.def.hero && this.def.hero.id) || 'kael', cape: this.def.hero && this.def.hero.id ? '#5a3aa8' : null }) });
     this.scene(g, ex);
     // screen FX
     if (this.impact > 0 && !rm) { g.fillStyle = `rgba(255,255,255,${Math.min(.85, this.impact * 5)})`; g.fillRect(0, 0, W, H); const pr = this.proj(p.x, p.y, 20); g.strokeStyle = 'rgba(20,10,10,.55)'; g.lineWidth = 1; for (let i = 0; i < 22; i++) { const a = i / 22 * 6.283 + t, r0 = 40 + (i % 3) * 14; g.beginPath(); g.moveTo(pr.x + Math.cos(a) * r0, pr.y + Math.sin(a) * r0 * .7); g.lineTo(pr.x + Math.cos(a) * 320, pr.y + Math.sin(a) * 320 * .7); g.stroke(); } }
     if (this.slow > 0) { g.fillStyle = 'rgba(255,224,138,.10)'; g.fillRect(0, 0, W, H); }
-    if (this.fin && this.fin.t < .1 && !rm) { g.globalCompositeOperation = 'difference'; g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over'; }
+    if (this.fin && this.fin.t < .1 && !rm && !this.g3) { g.globalCompositeOperation = 'difference'; g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over'; }
     if ((this.sup && this.sup.t >= .95) || (this.art && this.art.t > 1.9)) { g.fillStyle = '#07050a'; g.fillRect(0, 0, W, 10); g.fillRect(0, H - 10, W, 10); }
     if (p.fury > 40 && !rm) { const fk = Math.pow((p.fury - 40) / 60, 2), full = p.fury >= 100, gr = g.createRadialGradient(W / 2, H / 2, H * (.42 - fk * .1), W / 2, H / 2, W * .72); gr.addColorStop(0, 'rgba(160,20,10,0)'); gr.addColorStop(1, `rgba(170,24,10,${fk * (.32 + (full ? Math.sin(t * 8.5) * .1 : 0))})`); g.fillStyle = gr; g.fillRect(0, 0, W, H);
       if (full) { g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 16; i++) { const side = i % 2, ph = (t * (.5 + (i % 5) * .13) + i * .31) % 1, x = side ? W - 2 - (i * 7 % 22) : 2 + (i * 7 % 22), y = H - ph * H; g.fillStyle = `rgba(255,${110 + (i % 3) * 40},40,${.5 * (1 - ph)})`; g.fillRect(x, y, 2, 3 + (i % 3)); } g.globalCompositeOperation = 'source-over'; } }
@@ -498,8 +506,8 @@ const Brawl = {
   },
   renderCine(g) {
     const c = this.cine, s = c.shots[c.i], rm = Settings.d.reduce; if (s.black) { g.fillStyle = '#050307'; g.fillRect(0, 0, W, H); }
-    const ex = c.acts.map(o => ({ y: o.y, d: () => this.fighter(g, { x: o.x, y: o.y, fx: o.fx || 0, fy: o.fy === undefined ? 1 : o.fy, sheet: o.sheet, anim: o.anim, sc: o.sc, st: o.st || 'idle', t: o.t || 0, idx: o.k || 0, swing: o.swing ? (c.t % .5 < .18 ? .18 - (c.t % .5) : 0) : 0, ax: o.fx || 0, ay: o.fy || 0, combo: 1 + (Math.floor(c.t / .5 + (o.k || 0)) % 3) }, { run: !!o.b, blade: o.blade, aura: o.aura || 0, cape: CAST[o.id].look().cape || null }) }));
-    if (!s.black) this.scene(g, ex);
+    const ex = c.acts.map(o => ({ y: o.y, d: () => this.fighter(g, { x: o.x, y: o.y, fx: o.fx || 0, fy: o.fy === undefined ? 1 : o.fy, sheet: o.sheet, anim: o.anim, sc: o.sc, st: o.st || 'idle', t: o.t || 0, idx: o.k || 0, swing: o.swing ? (c.t % .5 < .18 ? .18 - (c.t % .5) : 0) : 0, ax: o.fx || 0, ay: o.fy || 0, combo: 1 + (Math.floor(c.t / .5 + (o.k || 0)) % 3) }, { run: !!o.b, id: o.id, blade: o.blade, aura: o.aura || 0, cape: CAST[o.id].look().cape || null }) }));
+    if (!s.black) this.scene(g, ex); else this.g3 = false;
     if (s.bolt && !rm) { // rage as weather: red-gold lightning
       const sd = rng(Math.floor(c.t * 14) * 97 + c.i * 13 + 5), on = sd() < .75; if (on) { g.globalCompositeOperation = 'lighter'; for (let b = 0; b < (s.bolt > 1 ? 4 : 2); b++) { let x = sd() * W, y = 12; const pts = [[x, y]]; while (y < H - 14 - sd() * 60) { y += 8 + sd() * 16; x += (sd() - .5) * 44; pts.push([x, y]); if (sd() < .2) { g.strokeStyle = 'rgba(255,150,60,.5)'; g.lineWidth = 1; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (sd() - .5) * 60, y + 10 + sd() * 26); g.stroke(); } }
           for (const [wd, col] of [[5, 'rgba(255,70,20,.35)'], [2.5, 'rgba(255,170,80,.7)'], [1, '#fff6dc']]) { g.strokeStyle = col; g.lineWidth = wd; g.beginPath(); pts.forEach((q, i) => i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1])); g.stroke(); } }

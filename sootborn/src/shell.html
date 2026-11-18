@@ -12,6 +12,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:#0b0709;color:var(--cream);overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;overscroll-behavior:none;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace}
 #game{position:absolute;image-rendering:pixelated;image-rendering:crisp-edges;background:#0b0709}
+body.g3on #game{background:transparent}
 #ui{position:absolute;inset:0;pointer-events:none}
 .hud{position:absolute;pointer-events:none;font-size:calc(11px*var(--ts));line-height:1.3;transition:opacity .3s}
 #obj{left:calc(var(--cx) + 6px);top:calc(var(--cy) + 6px);max-width:calc(var(--cw)*.62);background:rgba(20,12,16,.82);border-left:3px solid var(--amber);padding:4px 8px;border-radius:2px}

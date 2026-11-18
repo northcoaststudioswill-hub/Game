@@ -224,7 +224,8 @@ function step(dt) {
   if (G.mode === 'title') { P.x = 13 * 16 + 8 + Math.sin(G.time * 0.08) * 110; P.y = 8 * 16 + Math.sin(G.time * 0.05) * 20; World.updateNPCs(dt); }
   Fade.update(dt); HUD.update(dt);
 }
-function render() {
+function render() { G3.used = false; render0(); G3.sync(); }
+function render0() {
   const g = ctx;
   if (Brawl.active && !Puzzle.active && G.mode !== 'boot' && G.mode !== 'splash') { Brawl.render(g); if (Fade.a > 0) { g.fillStyle = `rgba(7,5,10,${Fade.a})`; g.fillRect(0, 0, W, H); } return; }
   if (G.mode === 'boot' || G.mode === 'splash' || !World.map || (Cutscene.active && !$('#card').classList.contains('hidden') && Fade.a >= 1)) { g.fillStyle = '#07090d'; g.fillRect(0, 0, W, H); return; }
