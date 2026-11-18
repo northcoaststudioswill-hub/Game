@@ -10,7 +10,6 @@
   const broke = () => ui.mark('Bro. You have no coin. I respect the confidence. Come back with coin.');
   const timers = []; const later = (fn, ms) => timers.push(setTimeout(fn, ms)); const clearT = () => { timers.forEach(clearTimeout); timers.length = 0; };
 
-  const menu = ui.mark;                       // keep the original three, add the rest
   ui.mark = function (line) {
     clearT(); const st = G.state, greet = line || pick(Math.random() < 0.3 ? ['Hang on. …What were we doing? Right. Money.', 'Is the ceiling lower today? No? Cool. Cool cool cool.', 'I am fine. I am extremely fine. Pick a game.'] : ['Bro. BRO. You look like someone who is about to be rich. Probably.', 'Step up, step up. I have got a guy for everything, bro. The guy is me.', 'Real ones bet big. I am just saying what real ones do, bro.', 'You want odds? I have got odds on the odds.']);
     const g = (id, name, sub) => '<button id="' + id + '"><b>' + name + '</b><small>' + sub + '</small></button>';

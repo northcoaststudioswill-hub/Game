@@ -281,3 +281,8 @@ The Fence, Mark, the Apothecary, Big Hobb, the charm seller, Whisper and the Bus
 - **David** insults your trade or your people when it gets you killed.
 - **Rumours** at the Beggars' Fire start to be about you, and the Wardens at the Long Stair react to your race.
 - **Codex:** a new section, The Nine Levels, with where each people lives and where each trade comes from, plus Eireania, the Seal-Wardens and the First Lamp.
+
+## Cleanup and more voice (`js/flavor3.js`)
+
+- **Removed dead code:** the original ladder, catalogue and placement functions in `ui.js` and the ladder wrapper in `ledger.js`, all fully replaced by later files (about 70 lines). The crowd meter label is looked up once instead of every frame.
+- **More personalised dialogue:** your Tally addresses you by a title for your class; each named fighter has last words (with special ones for some classes and races); the Ledger-Keeper notes your level-ups by class; the Outfitter and Tailor fit you by race; a death gets an epitaph by class or race; the Warden Captain, the King and the Queen each remark on your trade or people.

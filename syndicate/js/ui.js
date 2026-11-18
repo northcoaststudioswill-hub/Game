@@ -135,44 +135,6 @@
   };
 
   // The catalog: buy a piece, then place it on the grid.
-  ui.catalog = function () {
-    const st = G.state, rk = G.rankOf(st.respect), own = G.owned(st);
-    let h = '<div class="card"><h2>The Quartermaster’s Catalogue</h2><p class="dim">Buy a piece, then choose where it stands. Out in the room, tap anything you own to pick it up, move it, turn it or store it. You have <b>' + st.coin + '</b> coin.</p>';
-    G.DECOR.forEach(d => {
-      const n = own[d.id] || 0, locked = rk < d.rank, full = n >= d.max, poor = st.coin < d.cost;
-      h += '<div class="ab-row' + (locked ? ' lockedrow' : '') + '"><div class="ab-ic pas" style="color:' + (d.light ? '#' + d.light.toString(16).padStart(6, '0') : 'var(--gold)') + '">' + (d.zone === 'garden' ? '❀' : d.zone === 'house' ? '⌂' : '✦') + '</div><div class="ab-tx"><b>' + d.name + '</b>' +
-        '<small>' + (d.zone === 'any' ? 'House or garden' : d.zone === 'house' ? 'House' : 'Garden') + ' · ' + d.w + '×' + d.d + (d.max > 1 ? ' · ' + n + '/' + d.max + ' placed' : n ? ' · placed' : '') + '</small><p>' + d.perk + '</p></div>' +
-        (locked ? '<span class="lock">' + G.RANKS[d.rank].name + '</span>' : full ? '<span class="lock">Owned</span>' : '<button class="big" data-buy="' + d.id + '"' + (poor ? ' disabled' : '') + '>' + d.cost + ' coin</button>') + '</div>';
-    });
-    h += '<div class="row end"><button id="x">Close</button></div></div>';
-    show(h);
-    on('#x', () => { ui.close(); ui.topbar(); });
-    on('[data-buy]', el => { const w = W().walker; ui.close(); ui.startPlace({ id: el.dataset.buy, x: Math.round(w.x), z: Math.round(w.z) + 1, r: 0, from: null }); });
-  };
-  ui.startPlace = function (pl) {
-    const H = W().get('hideout'), it = G.DECOR_BY[pl.id];
-    if (pl.from == null && !H.canPlace(pl.id, pl.x, pl.z, pl.r)) {       // find the nearest free spot to start from
-      let best = null, bd = 1e9;
-      for (let x = 0; x < W().grid.GW; x++) for (let z = 0; z < W().grid.GD; z++) if (H.canPlace(pl.id, x, z, 0)) { const d = Math.hypot(x - pl.x, z - pl.z); if (d < bd) { bd = d; best = [x, z]; } }
-      if (best) { pl.x = best[0]; pl.z = best[1]; }
-    }
-    G.placing = pl; H.setGhost(pl); ui.placeBar();
-  };
-  ui.placeBar = function () {
-    const pl = G.placing, bar = $('#placebar');
-    if (!pl || G.scene !== 'hideout') { bar.className = 'hidden'; return; }
-    const it = G.DECOR_BY[pl.id];
-    bar.className = '';
-    bar.querySelector('span').innerHTML = '<b>' + it.name + '</b> ' + (pl.ok ? 'Drag it, or tap a tile, then place.' : '<i class="bad">' + (it.zone === 'house' ? 'Needs a free spot inside the house.' : it.zone === 'garden' ? 'Needs a free spot in the garden.' : 'That spot is taken.') + '</i>');
-    $('#plOk').disabled = !pl.ok; $('#plRot').style.display = it.w === it.d ? 'none' : '';
-    $('#plCancel').textContent = pl.from == null ? 'Cancel' : 'Put back'; $('#plStore').style.display = pl.from == null ? 'none' : ''; $('#plStore').textContent = 'Store (+' + it.cost + ')';
-  };
-  ui.placeMove = function (x, z) {
-    const pl = G.placing; if (!pl) return;
-    const f = W().grid.footprint(G.DECOR_BY[pl.id], pl.r);
-    pl.x = Math.round(x - (f[0] - 1) / 2); pl.z = Math.round(z - (f[1] - 1) / 2);
-    W().get('hideout').setGhost(pl); ui.placeBar();
-  };
   ui.placeInit = function () {
     const H = () => W().get('hideout'), done = () => { G.placing = null; H().setGhost(null); H().refresh(); ui.placeBar(); ui.topbar(); G.save(); };
     $('#plRot').onclick = () => { const pl = G.placing; if (!pl) return; G.sfx('ui'); pl.r = (pl.r + 1) % 2; H().setGhost(pl); ui.placeBar(); };
@@ -189,36 +151,12 @@
     $('#prompt').onclick = () => { G.audioInit(); G.sfx('ui'); if (G.near) G.near.go(); };
   };
   ui.pickUp = function (i) { const p = G.state.items[i]; if (!p) return; G.sfx('ui'); p.hidden = true; W().get('hideout').refresh(); ui.startPlace({ id: p.id, x: p.x, z: p.z, r: p.r, from: i }); };
-  ui.itemCard = function (i) {
-    const st = G.state, p = st.items[i], it = G.DECOR_BY[p.id];
-    show('<div class="card small"><h2>' + it.name + '</h2><p>' + it.perk + '</p><div class="row end"><button id="st">Store (refund ' + it.cost + ')</button><button id="mv" class="big">Move</button><button id="x">Close</button></div></div>');
-    on('#x', () => ui.close());
-    on('#mv', () => { ui.close(); p.hidden = true; W().get('hideout').refresh(); ui.startPlace({ id: p.id, x: p.x, z: p.z, r: p.r, from: i }); });
-    on('#st', () => { st.items.splice(i, 1); st.coin += it.cost; G.save(); G.sfx('coin'); W().get('hideout').refresh(); ui.close(); ui.topbar(); });
-  };
   ui.banner = function (a, b, cls) {
     const el = $('#banner'); if (!a) { el.className = 'hidden'; return; }
     el.className = cls || ''; el.querySelector('b').textContent = a; el.querySelector('small').textContent = b || '';
   };
 
   // ------------------------------------------------------------ the pit ladder
-  ui.pit = function () {
-    const st = G.state;
-    let unlocked = true, h = '<div class="card"><h2>The Blood Ledger</h2><p class="dim">Five names stand between you and the crown. Beat one to unlock the next. Rematches pay less, but the crowd still tips.</p><div class="ladder">';
-    G.OPPONENTS.forEach((o, i) => {
-      const wins = st.wins[o.id] || 0, open = unlocked;
-      h += '<div class="opp' + (open ? '' : ' locked') + (o.boss ? ' boss' : '') + (wins ? ' beaten' : '') + '"><span class="op" data-i="' + i + '"></span><div class="opp-tx"><b>' + o.name + '</b> <small>' + o.title + '</small>' +
-        '<small>Level ' + o.level + ' ' + G.RACES[o.race].name + ' ' + G.CLASSES[o.cls].name + (wins ? ' · beaten ' + wins + 'x' : '') + '</small>' +
-        (open ? '<em class="taunt">“' + o.taunt + '”</em>' : '') + '<small class="rew">' + (wins ? Math.round(o.xp * .6) : o.xp) + ' XP · ' + (wins ? Math.round(o.coin * .6) : o.coin) + ' coin · ' + (wins ? Math.round(o.respect * .3) : o.respect) + ' respect</small></div>' +
-        (open ? '<button class="' + (wins ? '' : 'big') + '" data-fight="' + i + '">' + (wins ? 'Rematch' : 'Fight') + '</button>' : '<span class="lock">Sealed</span>') + '</div>';
-      if (!wins) unlocked = false;
-    });
-    h += '</div><div class="row end"><button id="x">Back</button></div></div>';
-    show(h);
-    panel().querySelectorAll('.op').forEach(el => { const o = G.OPPONENTS[+el.dataset.i]; el.appendChild(G.portrait({ cls: o.cls, race: o.race, tint: o.tint }, 56, 1.2)); });
-    on('#x', () => ui.close());
-    on('[data-fight]', el => ui.prefight(G.OPPONENTS[+el.dataset.fight]));
-  };
 
   const CONTROLS = '<div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Mouse</kbd> aim</span><span><kbd>Click</kbd> strike</span><span><kbd>Hold click</kbd>, release: heavy blow</span><span><kbd>Space</kbd> dodge</span><span><kbd>Shift</kbd> or <kbd>Right click</kbd> parry, hold to block</span><span><kbd>T</kbd> call your Second</span><span><kbd>G</kbd> taunt the crowd</span><span><kbd>Q</kbd><kbd>E</kbd><kbd>R</kbd> abilities</span><span><kbd>F</kbd> ultimate</span><span><kbd>C</kbd> potion</span><span><kbd>Esc</kbd> pause</span></div>' +
     '<div class="keys"><span><kbd>Controller</kbd> left stick move · right stick aim · <kbd>X</kbd>/<kbd>RT</kbd> attack · <kbd>A</kbd> dodge · <kbd>LT</kbd> parry · <kbd>D-pad left</kbd> Second · <kbd>D-pad down</kbd> taunt · <kbd>LB</kbd><kbd>RB</kbd><kbd>Y</kbd> abilities · <kbd>B</kbd> ultimate · <kbd>D-pad up</kbd> potion · <kbd>Menu</kbd> pause</span></div>' +

@@ -40,10 +40,10 @@
   }
 
   // ------------------------------------------------------------ the meter says what the stands think
-  const hud0 = ui.updateHud;
+  const hud0 = ui.updateHud; let lab = null;
   ui.updateHud = function (P, E, hype) {
-    const r = hud0.apply(this, arguments), bar = document.querySelector('#hud .hype'); if (!bar) return r;
-    let lab = bar.parentNode.querySelector('.hype-lab'); if (!lab) { lab = document.createElement('span'); lab.className = 'hype-lab'; bar.parentNode.insertBefore(lab, bar.nextSibling); }
+    const r = hud0.apply(this, arguments);
+    if (!lab || !lab.isConnected) { const bar = document.querySelector('#hud .hype'); if (!bar) return r; lab = bar.parentNode.querySelector('.hype-lab'); if (!lab) { lab = document.createElement('span'); lab.className = 'hype-lab'; bar.parentNode.insertBefore(lab, bar.nextSibling); } }      // found once, not every frame
     const fz = P && P.buffs && P.buffs.frenzy, t = fz ? 'FRENZY' : hype >= 80 ? 'Roaring' : hype >= 45 ? 'Loud' : hype >= 20 ? 'Watching' : 'Restless', c = 'hype-lab' + (fz ? ' frenzy' : hype >= 80 ? ' hot' : '');
     if (lab.textContent !== t) lab.textContent = t; if (lab.className !== c) lab.className = c; return r;
   };

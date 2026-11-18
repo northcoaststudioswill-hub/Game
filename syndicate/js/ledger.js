@@ -31,14 +31,6 @@
     const st = G.state; if (!st || !st.wins || !st.wins.vexa) { G.OPPONENTS.length = BASE; return; }
     const want = BASE + G.defended(st) + 1; while (G.OPPONENTS.length < want) G.OPPONENTS.push(make(G.OPPONENTS.length - BASE + 1)); G.OPPONENTS.length = want;
   };
-  const pit0 = ui.pit;
-  ui.pit = function () {
-    G.ensureLedger(); pit0.apply(this, arguments);
-    const st = G.state; if (!st.wins.vexa) return;
-    const n = G.defended(st), p = document.querySelector('#panel .card > p.dim'); if (p) p.innerHTML = 'You hold the Guttercrown, and the Ledger never closes. <b>' + n + '</b> challenger' + (n === 1 ? '' : 's') + ' turned away. Each one is a little worse than the last.';
-    const rows = document.querySelectorAll('#panel .ladder .opp'); rows.forEach((el, i) => { if (i >= BASE && i < G.OPPONENTS.length - 3) el.style.display = 'none'; if (i >= BASE) { const o = G.OPPONENTS[i]; el.classList.toggle('boss', !!o.elite); } });
-    const lad = document.querySelector('#panel .ladder'); if (lad && rows.length) { const last = rows[rows.length - 1]; if (last.scrollIntoView) last.scrollIntoView({ block: 'nearest' }); }
-  };
   const hub0 = ui.hub;
   ui.hub = function () { G.ensureLedger(); return hub0.apply(this, arguments); };
   const obj0 = G.objective;
