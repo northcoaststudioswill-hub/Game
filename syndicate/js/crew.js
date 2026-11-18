@@ -36,11 +36,15 @@
     bone: { armor: 0xd8d2c0, armor2: 0x9a9484, cloth: 0xefe8d6, trim: 0x8a6a34, legs: 0x6a6458 },
     emerald: { armor: 0x2a5a44, armor2: 0x183828, cloth: 0x2f8a5a, trim: 0xd8c060, legs: 0x1c3024 },
     royal: { armor: 0x4a2a7a, armor2: 0x2c1848, cloth: 0x6a3aa8, trim: 0xffd36b, legs: 0x2a1a44 },
+    gilt: { armor: 0x1c1a1e, armor2: 0x0e0d10, cloth: 0x2a2428, trim: 0xffd36b, legs: 0x141216 },
+    venom: { armor: 0x2a3a22, armor2: 0x16200f, cloth: 0x6aa82a, trim: 0xb8ff5a, legs: 0x1a2414 },
+    rime: { armor: 0xcfe6f2, armor2: 0x8fb0c4, cloth: 0x9fd6ee, trim: 0xffffff, legs: 0x6a8a9c },
+    cinder: { armor: 0x3a2a24, armor2: 0x201612, cloth: 0xd0581a, trim: 0xffb060, legs: 0x241a16 },
     ashen: { armor: 0x4a4a4e, armor2: 0x2a2a2e, cloth: 0x1c1c20, trim: 0xc22a22, legs: 0x202024 }
   };
   G.WSKIN = {
     ember: { color: 0xff9a4a, e: 0xa03808, glow: 0xff7a2a }, frost: { color: 0xbfeaff, e: 0x1a6a90, glow: 0x7ad8ff },
-    gilded: { color: 0xffd36b, e: 0x6a4a08, glow: 0xffd36b }, void: { color: 0x7a4ac0, e: 0x3a1470, glow: 0xb070ff }
+    gilded: { color: 0xffd36b, e: 0x6a4a08, glow: 0xffd36b }, blood: { color: 0xc22a22, e: 0x6a0808, glow: 0xff4030 }, toxic: { color: 0x9aff5a, e: 0x2a6a08, glow: 0x8aff5a }, void: { color: 0x7a4ac0, e: 0x3a1470, glow: 0xb070ff }
   };
   G.COSMETICS = [
     { id: 'crimson', slot: 'dye', name: 'Pit Crimson', cost: 60, rank: 0, desc: 'Deep red cloth, brass trim. Hides the stains.' },
@@ -49,6 +53,15 @@
     { id: 'bone', slot: 'dye', name: 'Bone White', cost: 110, rank: 2, desc: 'Pale armour. Brave, down here.' },
     { id: 'ashen', slot: 'dye', name: 'Ash and Blood', cost: 140, rank: 3, desc: 'Charcoal plate with red edging.' },
     { id: 'royal', slot: 'dye', name: 'Royal Violet', cost: 220, rank: 4, desc: 'Guild purple and gold. You have to earn the nerve.' },
+    { id: 'cinder', slot: 'dye', name: 'Cinder', cost: 90, rank: 1, desc: 'Charcoal and furnace orange.' },
+    { id: 'venom', slot: 'dye', name: 'Sewer Venom', cost: 120, rank: 2, desc: 'Black-green plate with acid edging.' },
+    { id: 'rime', slot: 'dye', name: 'Rime', cost: 160, rank: 3, desc: 'Ice-blue and white. Shows every drop.' },
+    { id: 'gilt', slot: 'dye', name: 'Black and Gilt', cost: 260, rank: 4, desc: 'Lamp-black armour with gold at every edge.' },
+    { id: 'widehat', slot: 'head', name: 'Gambler’s Brim', cost: 80, rank: 0, desc: 'A wide hat with a long feather.' },
+    { id: 'jester', slot: 'head', name: 'Fool’s Cap', cost: 110, rank: 1, desc: 'Three points, three bells. They never see it coming.' },
+    { id: 'antlers', slot: 'head', name: 'Stag Antlers', cost: 170, rank: 2, desc: 'A full rack, lashed to a leather band.' },
+    { id: 'thorns', slot: 'head', name: 'Crown of Thorns', cost: 230, rank: 3, desc: 'Black iron briar. It bites the wearer too.' },
+    { id: 'lucky', slot: 'head', name: 'Mark’s Lucky Laurel', cost: 9999, rank: 9, desc: 'Won from Mark in a friendly. He says it is lucky. He lost while wearing it.' },
     { id: 'horned', slot: 'head', name: 'Horned Helm', cost: 90, rank: 0, desc: 'Two great curved horns.' },
     { id: 'plague', slot: 'head', name: 'Plague Beak', cost: 120, rank: 1, desc: 'A long leather beak and glass eyes.' },
     { id: 'skull', slot: 'head', name: 'Skull Visor', cost: 150, rank: 2, desc: 'Somebody else’s face, worn over yours.' },
@@ -58,12 +71,20 @@
     { id: 'greatcloak', slot: 'back', name: 'Fur Greatcloak', cost: 130, rank: 1, desc: 'Heavy, long, and collared in fur.' },
     { id: 'banner', slot: 'back', name: 'Back Banner', cost: 180, rank: 2, desc: 'Your colours flying behind you.' },
     { id: 'wings', slot: 'back', name: 'Raven Wings', cost: 300, rank: 4, desc: 'Black feathers on an iron frame.' },
+    { id: 'greatsword', slot: 'back', name: 'Spare Greatsword', cost: 150, rank: 1, desc: 'A second blade across your back, for the look of it.' },
+    { id: 'lanternpole', slot: 'back', name: 'Lantern Pole', cost: 190, rank: 2, desc: 'Your own lamp, carried high. Down here that means something.' },
+    { id: 'skullrack', slot: 'back', name: 'Trophy Rack', cost: 280, rank: 4, desc: 'Three skulls on iron spikes.' },
+    { id: 'blood', slot: 'weapon', name: 'Bloodletter', cost: 180, rank: 2, desc: 'Red to the hilt, and it stays that way.' },
+    { id: 'toxic', slot: 'weapon', name: 'Sewer-Quenched', cost: 180, rank: 2, desc: 'A sick green shine.' },
     { id: 'ember', slot: 'weapon', name: 'Emberforged', cost: 120, rank: 1, desc: 'The edge glows like a coal.' },
     { id: 'frost', slot: 'weapon', name: 'Frostbitten', cost: 120, rank: 1, desc: 'Cold enough to smoke.' },
     { id: 'gilded', slot: 'weapon', name: 'Gilded', cost: 200, rank: 3, desc: 'Gold leaf over good steel.' },
     { id: 'void', slot: 'weapon', name: 'Voidglass', cost: 260, rank: 4, desc: 'Purple-black and faintly humming.' },
     { id: 'embers', slot: 'aura', name: 'Ember Motes', cost: 150, rank: 2, desc: 'Sparks that follow you around.', color: 0xff8a30 },
     { id: 'mist', slot: 'aura', name: 'Grave Mist', cost: 150, rank: 2, desc: 'A cold blue haze at your feet.', color: 0x6ad0ff },
+    { id: 'sigils', slot: 'aura', name: 'Violet Sigils', cost: 190, rank: 3, desc: 'Guild-work glyphs that orbit you.', color: 0xb070ff },
+    { id: 'snow', slot: 'aura', name: 'Rime Fall', cost: 190, rank: 3, desc: 'A cold white drift that never settles.', color: 0xe8f6ff },
+    { id: 'bloodmist', slot: 'aura', name: 'Red Mist', cost: 240, rank: 4, desc: 'It followed you out of the pit.', color: 0xff4030 },
     { id: 'gold', slot: 'aura', name: 'Halo of Coin', cost: 280, rank: 4, desc: 'The crowd’s favour, made visible.', color: 0xffd36b }
   ];
   const SLOTS = [['dye', 'Dyes'], ['head', 'Headgear'], ['back', 'Back'], ['weapon', 'Weapon finish'], ['aura', 'Aura']];
@@ -105,7 +126,7 @@
         else if (job.id === 'sabotage') { st.sabotage = 1; r.text = 'got to the wine. Your next opponent starts weakened.'; }
         else if (job.id === 'train') { t.skill = Math.min(7, t.skill + 1); r.text = 'drilled all day. Skill is now ' + t.skill + '.'; }
         else {
-          const rk = G.rankOf(st.respect), c = cosOf(st), pool = G.COSMETICS.filter(x => !c.owned[x.id] && x.rank <= rk + 1);
+          const rk = G.rankOf(st.respect), c = cosOf(st), pool = G.COSMETICS.filter(x => !c.owned[x.id] && x.rank <= rk + 1 && x.rank < 6);
           if (pool.length && Math.random() < 0.55) { const x = pick(pool); c.owned[x.id] = true; r.text = 'dug up something for you: ' + x.name + '. It is on the Tailor’s rack, paid for.'; }
           else if (st.potions < G.POTION_MAX) { st.potions++; r.text = 'found a sealed healing potion.'; }
           else { const c2 = 50 + Math.floor(Math.random() * 40); st.coin += c2; r.text = 'found old coin in a dead man’s boot: ' + c2 + '.'; }
@@ -214,7 +235,7 @@
       SLOTS.map(s => '<button class="chip' + (s[0] === tab ? ' sel' : '') + '" data-tab="' + s[0] + '">' + s[1] + '</button>').join('') + '</div></div></div>';
     h += '<div class="ab-row"><div class="ab-ic pas">∅</div><div class="ab-tx"><b>Plain</b><p>As the Guild issued it.</p></div>' + (c[tab] ? '<button data-eq="">Wear</button>' : '<span class="lock">Worn</span>') + '</div>';
     G.COSMETICS.filter(x => x.slot === tab).forEach(x => {
-      const own = c.owned[x.id], worn = c[tab] === x.id, locked = rk < x.rank;
+      const own = c.owned[x.id], worn = c[tab] === x.id, locked = rk < x.rank; if (x.rank > 5 && !own) return;       // prizes only show once won
       h += '<div class="ab-row' + (locked && !own ? ' lockedrow' : '') + '"><div class="ab-ic pas" style="color:' + (tab === 'dye' ? '#' + G.DYES[x.id].cloth.toString(16).padStart(6, '0') : tab === 'weapon' ? '#' + G.WSKIN[x.id].glow.toString(16).padStart(6, '0') : x.color ? '#' + x.color.toString(16).padStart(6, '0') : 'var(--gold)') + '">' + ({ dye: '●', head: '♛', back: '❖', weapon: '⚔', aura: '✺' })[tab] + '</div><div class="ab-tx"><b>' + x.name + '</b><p>' + x.desc + '</p></div>' +
         (worn ? '<span class="lock">Worn</span>' : own ? '<button class="big" data-eq="' + x.id + '">Wear</button>' : locked ? '<span class="lock">' + G.RANKS[x.rank].name + '</span>' : '<button class="big" data-buy="' + x.id + '"' + (st.coin < x.cost ? ' disabled' : '') + '>' + x.cost + ' coin</button>') + '</div>';
     });

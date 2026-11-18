@@ -42,10 +42,12 @@
       '<div class="tb-box tb-rank"><small>GUILD RANK</small><b style="color:' + R.color + '">' + R.name + '</b>' +
       '<div class="bar rep"><i style="width:' + rPct + '%"></i></div><small>' + st.respect + (next ? ' / ' + next.at : '') + ' respect</small></div>' +
       '<div class="tb-box tb-coin"><span class="coin"></span><b>' + st.coin + '</b><small>coin</small><span class="pot">' + G.icon('potion') + '</span><b>' + st.potions + '</b></div>' +
-      '<button class="mini" id="tbMute">' + (G.muted ? 'Sound off' : 'Sound on') + '</button>';
+      '<button class="mini" id="tbMute">Settings</button>';
+    if (ui._coin != null && st.coin !== ui._coin) { const dlt = st.coin - ui._coin, fl = document.createElement('i'); fl.className = 'cdelta ' + (dlt > 0 ? 'up' : 'dn'); fl.textContent = (dlt > 0 ? '+' : '') + dlt; tb.querySelector('.tb-coin').appendChild(fl); }
+    ui._coin = st.coin;
     tb.querySelector('.tb-port').appendChild(G.portrait(G.lookOf(h, st), 46, 1.25));
     tb.querySelector('.tb-hero').onclick = () => ui.sheet();
-    $('#tbMute').onclick = () => { G.muted = !G.muted; ui.topbar(); };
+    $('#tbMute').onclick = () => { G.audioInit(); G.sfx('ui'); ui.settings(); };
   };
 
 
@@ -74,7 +76,7 @@
       '<p class="t-foot">Bleed for coin. Climb the ledger. Take the crown.</p><p class="t-cred">A North Coast Studios game · with E Concepts</p></div>', 'title');
     on('#bIntro', () => G.cine.play(() => ui.title()));
     on('#bHow', () => { show('<div class="card small"><h2>How to Play</h2><p>Win pit fights for <b>XP</b>, <b>coin</b> and <b>respect</b>. Level up to shape your class. Spend coin on gear and on your hideout.</p><h3>Pit wisdom</h3><ul class="perks">' + G.TIPS.map(t => '<li>' + t + '</li>').join('') + '</ul>' + CONTROLS + '<div class="row end"><button class="big" id="x">Back</button></div></div>'); on('#x', () => ui.title()); });
-    on('#bCont', () => { G.load(); ui.hub(); });
+    on('#bCont', () => { G.load(); G.applyOpts(); ui._coin = G.state.coin; ui.hub(); });
     on('#bNew', () => {
       if (has) show('<div class="card small"><h2>Start over?</h2><p>This replaces your current fighter and hideout.</p><div class="row"><button id="y" class="danger">Start over</button><button id="n">Keep my fighter</button></div></div>');
       else return G.cine.play(() => ui.create());
@@ -225,7 +227,7 @@
       '<div class="row end"><button id="x">Back</button><button class="big" id="go">Enter the pit</button></div></div>');
     $('#vp').appendChild(G.portrait(G.lookOf(h, st), 96, 1.2)); $('#ve').appendChild(G.portrait({ cls: o.cls, race: o.race, tint: o.tint }, 96, 1.2));
     on('#x', () => ui.pit());
-    on('#go', () => { ui.leaveHub(); ui.close(); G.scene = 'fight'; ui.topbar(); G.fight.start(o); });
+    on('#go', () => { const go = () => { ui.leaveHub(); ui.close(); G.scene = 'fight'; ui.topbar(); G.fight.start(o); }; if (o.boss) { ui.close(); G.meet('vexa', go); } else go(); });
   };
 
   // ------------------------------------------------------------ fight HUD

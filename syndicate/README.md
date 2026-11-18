@@ -82,6 +82,16 @@ phone portrait, phone landscape, or a desktop monitor.
 - **The Fence:** weapon and armour tiers (which change how your fighter looks) and potions.
 - Progress saves in the browser.
 
+**First meetings and friendly duels.** The first time you walk up to Mark, the Ledger-Keeper or the Fence, and the first time you face Vexa, the game cuts to a letterboxed dialogue scene with its own camera shots (wide, close, over the shoulder). Tap, click, Space or (A) advances; Skip or (B) skips. Mark's scene ends with an offer to duel: a non-lethal bout to the yield, no fee, no mortal blow. Beating him the first time wins Mark's Lucky Laurel. He will duel again for a stake from his menu.
+
+**More of Mark's table.** The Rat Race (four rats, odds set by hidden speed), Three Cups (faster hands at higher stakes) and High Card (higher or lower, pot grows) join the undercard, High Bones and Crown or Skull.
+
+**Menus.** A Settings panel (sound, music, blood, screen shake, text size, erase save), an objective line that always says what to do next, "!" badges on places with something new, and a coin change that floats off the purse.
+
+**Fight effects.** Named moves call themselves out, blasts leave scorch marks and cracks on the floor, dashes leave afterimages, casts pull motes into the hands, heals spiral, and ultimates kick the camera.
+
+**Cosmetics.** Fourteen more: four dyes, four hats and crowns, three back pieces, two weapon finishes and three auras.
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |

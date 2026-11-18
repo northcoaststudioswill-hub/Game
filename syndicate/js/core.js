@@ -14,7 +14,7 @@
 
   // ---------- save ----------
   const KEY = 'underground_syndicate_v2';
-  G.newState = () => ({ v: 2, hero: null, coin: 0, respect: 0, wins: {}, losses: 0, items: [], tally: [], second: null, cos: { owned: {}, dye: null, head: null, back: null, weapon: null, aura: null }, reports: [], gore: true, gear: { weapon: 0, armor: 0 }, potions: 1, seenHelp: false });
+  G.newState = () => ({ v: 2, hero: null, coin: 0, respect: 0, wins: {}, losses: 0, items: [], tally: [], second: null, cos: { owned: {}, dye: null, head: null, back: null, weapon: null, aura: null }, reports: [], gore: true, met: {}, opt: {}, wallItems: [], gear: { weapon: 0, armor: 0 }, potions: 1, seenHelp: false });
   G.state = G.newState();
   G.save = () => { try { localStorage.setItem(KEY, JSON.stringify(G.state)); } catch (e) { } };
   G.load = () => {

@@ -38,7 +38,7 @@
   function tick() {
     if (!ac) { ac = G.audioCtx && G.audioCtx(); if (!ac) return; out = ac.createGain(); out.gain.value = 0; out.connect(G.audioOut()); nextT = ac.currentTime + 0.1; }
     if (want !== cur) { cur = want; step = 0; seed = 7; nextT = ac.currentTime + 0.15; }
-    out.gain.setTargetAtTime(G.muted || !cur ? 0 : 0.55, ac.currentTime, 0.4);
+    out.gain.setTargetAtTime(G.musicOff || !cur ? 0 : 0.55, ac.currentTime, 0.4);
     if (!cur || ac.state !== 'running') { nextT = ac.currentTime + 0.1; return; }
     const tr = TRACKS[cur], spb = 60 / tr.bpm / 4;
     if (nextT < ac.currentTime) nextT = ac.currentTime + 0.05;

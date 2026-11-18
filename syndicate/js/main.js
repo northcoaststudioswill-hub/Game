@@ -36,6 +36,7 @@
   window.addEventListener('keydown', e => {
     if (e.target && e.target.tagName === 'INPUT') return;
     if (G.bootSkip) return;
+    if (G.talk) { if (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyE') { e.preventDefault(); if (!e.repeat) G.talkApi.next(); } else if (e.code === 'Escape') G.talkApi.skip(); return; }
     if (G.scene === 'cine') { if (e.code === 'Escape' || e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); G.cine.skip(); } return; }
     G.audioInit();
     if (G.scene === 'fight') {
@@ -43,7 +44,7 @@
       if (KEYMAP[e.code] && !e.repeat) In.pressed.push(KEYMAP[e.code]);
     } else if (G.scene === 'hub' || G.scene === 'hideout') {
       if (e.code === 'Escape' && G.ui.isOpen()) { G.ui.close(); G.ui.topbar(); }
-      else if ((e.code === 'KeyE' || e.code === 'Enter' || e.code === 'Space') && !G.ui.isOpen() && !G.placing && G.near && !e.repeat) G.near.go();
+      else if ((e.code === 'KeyE' || e.code === 'Enter' || e.code === 'Space') && !G.ui.isOpen() && !G.placing && !G.talk && G.near && !e.repeat) G.near.go();
     }
     if (e.code === 'Space' || e.code.startsWith('Arrow')) e.preventDefault();
     In.keys[e.code] = true;
@@ -140,6 +141,7 @@
     In.pad = { lx, ly, rx, ry, atk: now[2] || now[7] };
     if (G.bootSkip) { if (Object.keys(now).some(i => now[i] && !prevB[i])) G.bootSkip(); prevB = now; return; }
     if (!In.usingPad) { prevB = now; return; }
+    if (G.talk) { if (hit(0)) G.talkApi.next(); if (hit(1) || hit(9)) G.talkApi.skip(); prevB = now; return; }
     const sc = G.scene, open = G.ui.isOpen(), paused = sc === 'fight' && G.fight.paused;
     // one step per press for D-pad, repeating for a held stick
     let nx = (hit(15) ? 1 : 0) - (hit(14) ? 1 : 0), ny = (hit(13) ? 1 : 0) - (hit(12) ? 1 : 0);
@@ -171,14 +173,14 @@
     const host = $('tags');
     if (tagPlace !== place) {
       host.innerHTML = ''; tagEls = []; tagPlace = place;
-      if (place) place.spots.forEach(sp => { const el = document.createElement('button'); el.className = 'tag'; el.textContent = sp.label; el.onclick = () => { G.audioInit(); G.sfx('ui'); if (!G.ui.isOpen() && !G.placing) W.walkTo(sp); }; host.appendChild(el); tagEls.push(el); });
+      if (place) place.spots.forEach(sp => { const el = document.createElement('button'); el.className = 'tag'; el.textContent = sp.label; el.onclick = () => { G.audioInit(); G.sfx('ui'); if (!G.ui.isOpen() && !G.placing && !G.talk) W.walkTo(sp); }; host.appendChild(el); tagEls.push(el); });
     }
     if (!place) return;
-    const hide = G.ui.isOpen() || !!G.placing;
+    const hide = G.ui.isOpen() || !!G.placing || !!G.talk;
     place.spots.forEach((sp, i) => {
       const p = gfx.project(sp.x, sp.y, sp.z), el = tagEls[i];
       el.style.transform = 'translate(' + p.x.toFixed(0) + 'px,' + p.y.toFixed(0) + 'px) translate(-50%,-50%)';
-      el.classList.toggle('near', sp === near); el.style.display = hide ? 'none' : '';
+      el.classList.toggle('near', sp === near); el.style.display = hide ? 'none' : ''; el.classList.toggle('badge', !!(sp.badge && sp.badge()));
     });
   }
 
@@ -193,7 +195,8 @@
     if (sc === 'fight') { G.fight.update(dt); }
     else if (sc === 'cine') { G.cine.update(dt, T); }
     else if (sc === 'hub' || sc === 'hideout') {
-      near = W.updateWalk(dt, T, G.ui.isOpen() || !!G.placing);
+      near = W.updateWalk(dt, T, G.ui.isOpen() || !!G.placing || !!G.talk);
+      if (G.talk) G.talkApi.update(dt, T);
       if (G.placing) { const k = Math.min(1, dt * 6); cam.x += (G.placing.x - cam.x) * k; cam.z += (G.placing.z - cam.z) * k; }
     } else if (sc === 'title') {
       cam.x = Math.sin(T * 0.12) * 1.2; cam.z = Math.cos(T * 0.1) * 1.2; cam.y = 0.9; cam.vh = port ? 23 : 16; cam.fx = 0.5; cam.fy = port ? 0.6 : 0.58; cam.shake = 0;
@@ -205,10 +208,11 @@
       W.get('hub').update(T, dt);
     }
     if (gfx.scene() === (W.cache.arena && W.cache.arena.scene)) W.cache.arena.update(T);
-    G.near = (sc === 'hub' || sc === 'hideout') && !G.ui.isOpen() && !G.placing ? near : null;
+    G.near = (sc === 'hub' || sc === 'hideout') && !G.ui.isOpen() && !G.placing && !G.talk ? near : null;
     tags((sc === 'hub' || sc === 'hideout') ? W.walker.place : null, G.near);
     const pr = $('prompt'); if (G.near) { pr.textContent = (In.usingPad ? '(A) ' : '') + G.near.act; pr.className = 'big'; } else pr.className = 'big hidden';
     { const rc = $('roomchip'), on = sc === 'hideout' && !G.placing && !G.ui.isOpen(); rc.className = on ? '' : 'hidden'; if (on) { const t2 = 'Comfort ' + (G.roomComfort || 0) + ' · ' + G.comfortName(G.roomComfort || 0); if (rc.textContent !== t2) rc.textContent = t2; } }
+    { const ob = $('objective'), on = (sc === 'hub' || sc === 'hideout') && !G.ui.isOpen() && !G.placing && !G.talk; ob.className = on ? '' : 'hidden'; if (on && (T * 2 | 0) !== ob._t) { ob._t = T * 2 | 0; const tx = G.objective(); if (ob.textContent !== tx) ob.textContent = tx; } }
     $('decorBtn').textContent = In.usingPad ? '(Y) Decorate' : 'Decorate'; $('decorBtn').className = sc === 'hideout' && !G.placing && !G.ui.isOpen() ? '' : 'hidden';
     $('touch').className = In.touch && (sc === 'fight' || ((sc === 'hub' || sc === 'hideout') && !G.placing && !G.ui.isOpen())) ? (sc === 'fight' ? 'fight' : '') : 'hidden';
     gfx.updateFires(T); gfx.updateParticles(dt); gfx.updateFloats(dt);
@@ -216,6 +220,7 @@
     requestAnimationFrame(frame);
   }
 
+  G.applyOpts();
   G.ui.title();
   G.ui.boot();
   requestAnimationFrame(frame);

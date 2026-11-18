@@ -122,12 +122,12 @@
     return {
       scene: s, start: { x: 13.5, z: 4.5 }, zoom: [13.5, 22], bounds: [0, 0, 29, 17],
       spots: [
-        { x: 5, z: 0.4, r: 2.2, y: 4.7, label: 'The Blood Pit', act: 'Enter the pit', go: () => G.ui.pit() },
+        { x: 5, z: 0.4, r: 2.2, y: 4.7, label: 'The Blood Pit', act: 'Enter the pit', go: () => G.ui.pit(), badge: () => !G.state.wins.grubb },
         { x: 11, z: 0.6, r: 1.5, y: 3.0, label: 'Notice Board', act: 'Read the Codex', go: () => G.ui.codex() },
-        { x: 15.6, z: 1.3, r: 1.9, y: 3.2, label: 'The Fence', act: 'Trade', go: () => G.ui.shop() },
-        { x: 20.4, z: 1.3, r: 1.9, y: 3.2, label: 'Guildmaster', act: 'Character', go: () => G.ui.sheet() },
-        { x: 25.6, z: 2.5, r: 1.9, y: 3.6, label: 'Mark · The Long Odds', act: 'Gamble', go: () => G.ui.mark() },
-        { x: -0.2, z: 3, r: 1.6, y: 3.5, label: 'The Low Lamp', act: 'See your Tally', go: () => G.ui.tally() },
+        { x: 15.6, z: 1.3, r: 1.9, y: 3.2, label: 'The Fence', act: 'Trade', go: () => G.meet('fence', () => G.ui.shop()), badge: () => !(G.state.met || {}).fence },
+        { x: 20.4, z: 1.3, r: 1.9, y: 3.2, label: 'Guildmaster', act: 'Character', go: () => G.meet('gm', () => G.ui.sheet()), badge: () => !(G.state.met || {}).gm || G.state.hero.known.some(id => !G.state.hero.slots.includes(id)) && G.state.hero.slots.includes(null) },
+        { x: 25.6, z: 2.5, r: 1.9, y: 3.6, label: 'Mark · The Long Odds', act: 'Gamble', go: () => G.meet('mark', () => G.ui.mark()), badge: () => !(G.state.met || {}).mark },
+        { x: -0.2, z: 3, r: 1.6, y: 3.5, label: 'The Low Lamp', act: 'See your Tally', go: () => G.ui.tally(), badge: () => (G.state.reports || []).length > 0 || (G.state.tally || []).some(t => !t.job) && G.state.second == null },
         { x: -0.2, z: 9, r: 1.9, y: 3.6, label: 'Your Hideout', act: 'Go home', go: () => G.ui.hideout() }
       ],
       blocked: (x, z) => x < -0.55 || x > X1 + 0.9 || z < -0.75 || z > Z1 + 0.9 || obstacles.some(o => x > o[0] - 0.35 && x < o[2] + 0.35 && z > o[1] - 0.35 && z < o[3] + 0.35),
