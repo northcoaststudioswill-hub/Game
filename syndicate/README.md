@@ -121,8 +121,10 @@ phone portrait, phone landscape, or a desktop monitor.
 | Move | WASD or arrows (or click the ground outside fights) | left thumb stick, or tap the ground | left stick |
 | Interact | E, or the gold button | the gold button, or tap a name tag | A |
 | Aim | mouse | locks to opponent | right stick (auto-aims when centred) |
-| Attack | left click (hold) | ATK | X or RT (hold) |
-| Dodge | Space or right click | DODGE | A or LT |
+| Strike | left click (tap) | ATK (tap) | X or RT (tap) |
+| Heavy blow | hold left click, release | hold ATK, release | hold X or RT, release |
+| Parry, then block | Shift, X or right click (hold to keep blocking) | PARRY (hold) | LT (hold) |
+| Dodge | Space | DODGE | A |
 | Abilities | Q, E, R | ability buttons | LB, RB, Y |
 | Ultimate | F | ability button | B |
 | Potion | C | potion button | D-pad up |
