@@ -4,12 +4,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Pocket Lantern ALT</title>
+<title>lil Bottie</title>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --page:#e7e2d6; --shell:#f2b632; --shell-lo:#d99a1c; --shell-hi:#ffd166;
-  --bezel:#2a2238; --btn:#3a3050; --btn-lo:#231c33; --berry:#e23b5e; --berry-lo:#9c1f3c;
+  --page:#0b0c14; --shell:#b9bdcc; --shell-lo:#8a8fa3; --shell-hi:#f1f3f8;
+  --bezel:#2a2238; --btn:#3a3050; --btn-lo:#231c33; --berry:#2f7fe8; --berry-lo:#1a4a94;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -95,7 +95,7 @@ button:focus-visible{ outline:3px solid #fff; outline-offset:2px }
     <div class="scr">
       <canvas id="screen" width="480" height="400" aria-label="Game screen"></canvas>
       <div class="shelf" id="shelf">
-        <p id="shelfMsg">Pick a cartridge</p>
+        <p id="shelfMsg">Bottie's Pocket Lantern. Pick a game.</p>
         <div class="carts">
           <button class="cart sel" data-i="0"><canvas class="art" id="cartArt" width="40" height="26"></canvas>Sprouts</button>
           <button class="cart" data-i="1"><canvas class="art" id="cartArt2" width="40" height="26"></canvas>Knockout</button>
@@ -104,9 +104,10 @@ button:focus-visible{ outline:3px solid #fff; outline-offset:2px }
           <button class="cart" data-i="4"><canvas class="art" id="cartArt5" width="40" height="26"></canvas>Sproutwild</button>
         </div>
         <button class="lbtn" id="lanBtn">✦ Lantern menu</button>
+        <button class="lbtn" id="btBack" style="color:#9ad0ff">◀ Back to the crib (B)</button>
       </div>
     </div>
-    <div class="brand"><span><span class="led" id="led"></span>Power</span><span class="np" id="np" hidden aria-live="polite"><img id="npArt" alt=""><span class="npt" id="npBox"><span id="npText"></span></span></span><span>Pocket Lantern</span></div>
+    <div class="brand"><span><span class="led" id="led"></span>Power</span><span class="np" id="np" hidden aria-live="polite"><img id="npArt" alt=""><span class="npt" id="npBox"><span id="npText"></span></span></span><span>lil Bottie</span></div>
   </div>
   <div class="controls">
     <div class="dpad" id="dpad" aria-label="Direction pad"><i></i><i></i><b></b></div>
@@ -133,6 +134,7 @@ S.removeItem=function(k){return rm.call(this,P+k)}}catch(e){}})();
 <script>/*@MUSIC pp*/</script>
 <script>/*@MUSIC alt*/</script>
 <script>/*knockout.js*/</script>
+<script>/*bottie.js*/</script>
 <script>/*patchplate.js*/</script>
 <script>/*console.js*/</script>
 </body>

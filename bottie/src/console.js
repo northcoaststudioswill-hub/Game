@@ -96,7 +96,7 @@ const TRACKS=(window.SPROUT_TRACKS||[]).map(t=>Object.assign({},t,{img:null}));
 TRACKS.forEach(t=>{try{const im=new Image();im.src=t.art;t.img=im}catch(e){}});
 const MUS={pending:-1,from:'',list:'',src:null,gain:null,buf:null,bi:-1,cur:-1,last:-1,loading:false,tok:0,gap:0,fade:1,np:0,shown:-1};
 const MENU_ST={intro:1,menu:1,rewards:1,caps:1,style:1,bugs:1};
-function musWant(){if(state==='off'||state.slice(0,2)==='g3'||state.slice(0,3)==='lan')return'';if(state==='ko')return KO.mus();if(state==='pp')return PP.mus();if(state==='boot')return cart?'':bootT>.35?'menu':'';if(state==='settings')return setFrom==='pause'?'game':'menu';return MENU_ST[state]?'menu':'game';}
+function musWant(){if(state==='bt')return'';if(state==='off'||state.slice(0,2)==='g3'||state.slice(0,3)==='lan')return'';if(state==='ko')return KO.mus();if(state==='pp')return PP.mus();if(state==='boot')return cart?'':bootT>.35?'menu':'';if(state==='settings')return setFrom==='pause'?'game':'menu';return MENU_ST[state]?'menu':'game';}
 const musLevel=()=>Math.pow(meta.mus/10,2)*.85*(state==='pause'||(state==='ko'&&KO&&KO.paused())||(state==='pp'&&PP&&PP.paused())||(state==='settings'&&setFrom==='pause')?.55:1);
 function musGain(){if(!MUS.gain&&ac){MUS.gain=ac.createGain();MUS.gain.gain.value=0;MUS.gain.connect(ac.destination)}return MUS.gain;}
 function getBuf(i){if(MUS.bi===i&&MUS.buf)return Promise.resolve(MUS.buf);
@@ -231,7 +231,10 @@ const say=(s,t=4)=>{msg=s;msgT=t};
 let cart=0;
 const KO=window.KO_CART?window.KO_CART({g,W,H:()=>H,r,text,ctext,tw,snd,noise,keys,pressed,mk,flip,ac:()=>ac,meta:()=>meta,eject:()=>eject(),hasTracks:n=>TRACKS.some(t=>t.use.includes(n))}):null;
 const PP=window.PP_CART?window.PP_CART({g,W,H:()=>H,r,text,tw,snd,noise,keys,pressed,mk,flip,CH,LOU,TL,will:()=>SP,meta:()=>meta,persist:()=>persist(true),eject:()=>eject(),active:()=>state==='pp',hasTracks:n=>TRACKS.some(t=>t.use.includes(n))}):null;
-const PAD=[['act','call','swap','pause'],['light','heavy','super','pause'],['attack','cast','swap','pause'],['use','toss','recipes','pause'],['act','call','select','menu']];
+/* lil Bottie: Clankin' in the Cloud (src/bottie/). This build boots straight into it; the shelf is the console in his crib. */
+const BOT=window.BT_CART?window.BT_CART({g,W,H:()=>H,r,text,tw,keys,pressed,ac:()=>ac,meta:()=>meta,eject:()=>eject()}):null;
+function toBottie(){if(!BOT||inserting)return;shelf.hidden=true;$('slot').classList.add('in');$('led').classList.add('on');state='bt';cart=5;setPad(5);snd(988,.06);BOT.resume()}
+const PAD=[['act','call','swap','pause'],['light','heavy','super','pause'],['attack','cast','swap','pause'],['use','toss','recipes','pause'],['act','call','select','menu'],['throw','call','overclock','pause']];
 function setPad(i){try{const q=(s,t)=>{const e=document.querySelector(s);if(e)e.textContent=t},L=PAD[i]||PAD[0];q('#bA span',L[0]);q('#bB span',L[1]);q('#bSel small',L[2]);q('#bSta small',L[3]);const cs=$('console');if(cs)cs.classList.toggle('ko',i===1||i===2);const sl=$('bSel');if(sl)sl.classList.remove('ready')}catch(e){}}
 const toast=s=>toasts.push({s,t:3.2});
 function carve(x,y,w,h,t=G){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)map[j*MW+i]=t;}
@@ -476,7 +479,7 @@ function cartPick(i){if(inserting)return;cartHi(i);const c=carts[i];
  const done=()=>{inserting=false;shelf.hidden=true;$('slot').classList.add('in');$('led').classList.add('on');cart=i;setPad(i);bootT=0;bootDing=false;state='boot';};
  if(c.animate){cartAnim=c.animate([{transform:'translate(0,-4px)',clipPath:'inset(0 0 0 0)'},{transform:`translate(${dx}px,${-d}px)`,clipPath:'inset(0 0 0 0)',offset:.55},{transform:`translate(${dx}px,${-d-a.height}px)`,clipPath:'inset(100% 0 0 0)'}],{duration:950,easing:'ease-in-out',fill:'forwards'});
   noise(.5,.07,900,'lowpass');later(()=>noise(.025,.2,3000),500);later(cartSnap,880);cartAnim.onfinish=done;}else{cartSnap();done()}}
-function eject(){persist(true);if(cartAnim){cartAnim.cancel();cartAnim=null}$('slot').classList.remove('in');$('led').classList.remove('on');$('shelfMsg').textContent='Pick a cartridge';shelf.hidden=false;state='off';cart=0;setPad(0);snd(200,.1,90);try{lanCheck(true)}catch(e){}}
+function eject(){persist(true);if(cartAnim){cartAnim.cancel();cartAnim=null}$('slot').classList.remove('in');$('led').classList.remove('on');$('shelfMsg').textContent="Bottie's Pocket Lantern. Pick a game.";shelf.hidden=false;state='off';cart=0;setPad(0);snd(200,.1,90);try{lanCheck(true)}catch(e){}}
 carts.forEach((c,i)=>c.addEventListener('pointerdown',e=>{e.preventDefault();unlock();cartPick(i)}));
 let lanHi=0;{const lb=$('lanBtn');if(lb)lb.addEventListener('pointerdown',e=>{e.preventDefault();unlock();lanHi=0;lb.classList.remove('sel');lanOpen('off')})}
 (()=>{const a=$('cartArt');if(!a||!a.getContext)return;const x=a.getContext('2d'),p=(c,X,Y,w,h)=>{x.fillStyle=c;x.fillRect(X,Y,w,h)};
@@ -490,11 +493,12 @@ function update(dt){
  time+=dt;musTick(dt);if(msgT>0&&!toasts.length)msgT-=dt;sndT-=dt;if(flashT>0)flashT-=dt;
  if(toasts.length){toasts[0].t-=dt;if(toasts[0].t<=0)toasts.shift()}
  if(TRN){TRN.t+=dt;if(!TRN.done&&TRN.t>=.3){TRN.done=true;TRN.fn()}if(TRN.t>=.68)TRN=null;return}
+ if(state==='bt'){BOT.update(dt);return}
  if(state.slice(0,2)==='g3'){g3Update(dt);return}
  if(state.slice(0,2)==='g4'){g4Update(dt);return} /* cartridge 5: Sproutwild */
  if(state.slice(0,3)==='lan'){lanUpdate(dt);return}
  switch(state){
- case 'off':{const lb=$('lanBtn');if(pressed('down')){lanHi=1;if(lb)lb.classList.add('sel');carts.forEach(c=>c.classList.remove('sel'))}if(pressed('up')&&lanHi){lanHi=0;if(lb)lb.classList.remove('sel');cartHi(cartSel)}
+ case 'off':{const lb=$('lanBtn');if(BOT&&pressed('b')){toBottie();return}if(pressed('down')){lanHi=1;if(lb)lb.classList.add('sel');carts.forEach(c=>c.classList.remove('sel'))}if(pressed('up')&&lanHi){lanHi=0;if(lb)lb.classList.remove('sel');cartHi(cartSel)}
   if(!lanHi){if(pressed('right'))cartHi((cartSel+1)%5);if(pressed('left'))cartHi((cartSel+4)%5)}if(pressed('a')||pressed('start')){if(lanHi){lanHi=0;if(lb)lb.classList.remove('sel');cartHi(cartSel);lanOpen('off')}else cartPick(cartSel)}return;}
  case 'boot':bootT+=dt;if(bootT>1.15&&!bootDing){bootDing=true;snd(988,.1);later(()=>snd(1319,.4),100)}if(bootT>2.7||(bootT>.6&&pressed('a'))){if(cart===1){state='ko';KO.start()}else if(cart===2){g3StartTitle()}else if(cart===3){state='pp';PP.start()}else if(cart===4){g4StartTitle()}else{state='intro';introT=0}}return;
  case 'ko':KO.update(dt);return;
@@ -1208,6 +1212,7 @@ function draw(){
  const OY=(H-160)/2;
  if(state==='boot'){r('#0c0a12',0,0,W,H);const t=bootT;if(t>.25){const y=Math.round(Math.min(OY+46,-30+(t-.25)*(OY+76))),c=bootDing?'#f8e060':['#f07830','#48a0f0','#f0d020','#98a0b0'][((t*8)|0)%4];
    ctext('POCKET',y,5,c,'#403010');ctext('LANTERN',y+28,5,c,'#403010');if(bootDing){r('#f8e060',117,y+62,6,8);r('#fff8c0',119,y+64,2,4);r('#c04848',115,y+59,10,3);ctext('LIGHTS ON',y+78,2,'#c8c0d8',null)}}return;}
+ if(state==='bt'){BOT.draw();return}
  if(state==='ko'){KO.draw();return}
  if(state==='pp'){PP.draw();return}
  if(state==='intro'){drawIntro();return}
@@ -1312,12 +1317,13 @@ function draw(){
 function fit(){const p=cv.parentNode||{};let nh=Math.round(240*p.clientHeight/p.clientWidth/2)*2;nh=Math.max(160,Math.min(304,nh||200));if(nh!==H||cv.height!==nh*2||cv.width!==480){H=nh;cv.width=480;cv.height=H*2}VH=Math.ceil(H/Z);}
 fit();addEventListener('resize',fit);try{new ResizeObserver(fit).observe(cv.parentNode)}catch(e){}
 loadWorld();cloudInit();
+if(BOT){shelf.hidden=true;$('slot').classList.add('in');$('led').classList.add('on');state='bt';cart=5;setPad(5);BOT.start();const bb=$('btBack');if(bb)bb.addEventListener('pointerdown',e=>{e.preventDefault();unlock();toBottie()})}
 let last=0;
 function frame(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;
  try{update(dt);g.setTransform(2,0,0,2,0,0);g.imageSmoothingEnabled=false;if(TBON)TBX=[];draw();if(TBON){TBL=TBX;TBX=null}}catch(err){console.error(err)}
  for(const k in keys)prev[k]=keys[k];
  requestAnimationFrame(frame);}
 if(typeof requestAnimationFrame!=='undefined')requestAnimationFrame(frame);
-window.__g={KO,PP,RD:()=>RD,RDF:()=>RDF,SW:()=>SW,SWF:()=>SWF,tb:{on:v=>{TBON=!!v},last:()=>TBL},
+window.__g={BT:BOT,KO,PP,RD:()=>RD,RDF:()=>RDF,SW:()=>SW,SWF:()=>SWF,tb:{on:v=>{TBON=!!v},last:()=>TBL},
  ev:/[?&]dev\b/.test(location.search)?(s=>eval(s)):undefined,unlock,MUS,update,draw,keys,prev,snap,restore,persist,get s(){return{state,P,LO,buds,sprouts,items,foes,gates,bugs,npcs,plots,gard,shards,day,run,meta,live,SAVE}}};
 })();

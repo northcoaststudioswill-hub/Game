@@ -21,6 +21,9 @@ A pocket game console in one HTML file, by North Coast Studios. Five game cartri
 
 ## Latest updates
 
+- **lil Bottie: Clankin' in the Cloud v0.1 (Nov 18 2026):** a separate game about lil Bottie, built on a copy of
+  the main line in [`bottie/`](bottie/README.md). Play `bottie/games/pocket-lantern-bottie.html`.
+  Changelog: [`bottie/CHANGELOG.md`](bottie/CHANGELOG.md).
 - **Sproutwild v8.0 (Nov 16 2026):** an opening you earn (Louie's berry lights the Lantern, seeds grow in the
   garden), Erin walks you out and guides your first catch, Ohio-lore starters with a reveal, garden plot crops,
   Data Center, bug collecting, Crooked Hollow, cottage party cinematic.
