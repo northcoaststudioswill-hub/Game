@@ -5,52 +5,35 @@ A pocket game console in one HTML file, by North Coast Studios. Seven game cartr
 **Play the newest build:** [`alt/games/pocket-lantern-alt.html`](alt/games/pocket-lantern-alt.html)
 (download it and open it in a browser, or use the shared Claude link Will has).
 
-> **New here? Start with this page, then [`KNOWN-ISSUES.md`](KNOWN-ISSUES.md).**
-> Everything new is built in the [`alt/`](alt/README.md) folder. The other folders are frozen older versions,
-> kept on purpose so nothing is ever lost.
+> **New here?** Read this page, then [`OPEN-ITEMS.md`](OPEN-ITEMS.md): every known bug, untested thing, open question
+> and wish for every game, in one place. Everything new is built in the [`alt/`](alt/README.md) folder. The other
+> folders are frozen older versions, kept on purpose so nothing is ever lost.
 
-## The five games (cartridges)
+![Power on](alt/playtest/console/boot-4-sprouts.png)
+
+## The seven games (cartridges)
 
 | # | Game | What it is | Status | Changelog |
 |---|------|-----------|--------|-----------|
-| 1 | **Sprouts** | Pikmin-style garden game: throw sprouts, grow the garden, build a bridge, dig up treasure, Louie the dog helps | **Updated Nov 17 2026 (the valley update)** | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (Sprouts section) and [`v0.35/CHANGELOG.md`](v0.35/CHANGELOG.md) |
-| 2 | **North Coast Knockout** | 2D fighter with Will, Marcus, Erin, King Bibi and friends; supers, cinematics, arcade tower | Paused (between Fable passes) | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) |
-| 3 | **Rootdeep** | Roguelite dungeon crawler | Stable | [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md) |
-| 4 | **Patch & Plate** | Erin's cooking and garden life game, set at Sunkeep in Sproutwild's valley | v0.7 (Nov 17 2026) | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (v0.4), before that [`v0.3/CHANGELOG.md`](v0.3/CHANGELOG.md) |
-| 5 | **Sproutwild** | Creature collector: Pikmin + Palworld + Pokemon, set in an Ohio-lore valley | **In active development (v8.0)** | [`alt/src/sproutwild/CHANGELOG.md`](alt/src/sproutwild/CHANGELOG.md) |
-
-| 6 | **Lightswarm** | Survivors-style roguelite: walk into the dark, the sprout swarm throws the light, pick 1 of 3 upgrades, light the Guardian | **Vertical slice v0.3, for evaluation** (ten keepers, two supers each, finds, Keeper's Trail) | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (Lightswarm section) |
-| 7 | **Clankawatch** | Garden tower defense: plant sprout towers by day, hold the track against Lil Bottie's drones by night | v4.0 alpha 3 (copied in from its own branch) | [`alt/src/clankawatch/CHANGELOG.md`](alt/src/clankawatch/CHANGELOG.md) |
+| 1 | **Sprouts** | Pikmin-style garden game. Will throws sprouts, grows the garden and brings home four sun shards to relight the Great Lantern. Louie the dog fetches strays. | Stable; the valley update (Nov 18) | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (Sprouts sections) |
+| 2 | **North Coast Knockout** | 2D fighter with Will, Erin, Marcus, Louie, Lil Bottie, King Bibi, Corbin and Mama. Supers with cut-ins, an arcade tower, Survival, Training, Trials. | Paused between passes | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (Knockout sections) |
+| 3 | **Rootdeep** | Roguelite dungeon crawler under the valley. Short rooms, a new run every time. | Finished (v0.2.1) | [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md) |
+| 4 | **Patch & Plate** | Erin's farm stand at Sunkeep: plant it, cook it, serve it. Each day is a level of a minute or two. | Stable (v0.7) | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (Patch & Plate sections) |
+| 5 | **Sproutwild** | Creature collector. The Lantern is dark and the buddies have gone wild; show them the light, build Sunkeep, light four Guardians, face Bottie. | In active development (v12.10) | [`alt/src/sproutwild/CHANGELOG.md`](alt/src/sproutwild/CHANGELOG.md) |
+| 6 | **Lightswarm** | Survivors-style roguelite. Walk into the dark with a sprout swarm that throws the light by itself, pick one of three upgrades each level, light the Guardian. Ten keepers, two supers each. | Vertical slice v0.3, for evaluation | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (Lightswarm sections) |
+| 7 | **Clankawatch** | Garden tower defense. Plant sprout towers by day and hold the track against Lil Bottie's drone swarms by night. Three gardens, 26 nights. | v4.0 alpha 3 (copied in from its own branch) | [`alt/src/clankawatch/CHANGELOG.md`](alt/src/clankawatch/CHANGELOG.md) |
 
 ## Latest updates
 
-- **The console (Nov 18 2026):** a power-on sequence before the shelf, the shelf in rows of three, Clankawatch folded in as cartridge 7. See [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
-
-- **Lightswarm, cartridge 6 (Nov 18 2026):** a new game as a vertical slice. One expedition (Crooked Hollow), six sprout weapons, the Pythorn Guardian, Sunkeep upgrades. Source: [`alt/src/lightswarm.js`](alt/src/lightswarm.js).
-
-- **Sprouts: menus, field guide, small talk (Nov 18 2026):** Sproutwild-style menus with a tile pause screen, a field
-  guide of sprouts, buddies, people and places, people who talk as you pass, and a fix for a shard that could get stuck
-  in a wall. Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
-- **Sprouts, the prequel pass (Nov 17 2026):** Sprouts is now set before Sproutwild. Wild buddies keep their distance and
-  sit by the Lantern at night, an old arch names the place Sunkeep, Thornback is the guardian of the light, and each
-  treasure carries a memory. Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
-- **Sprouts, the valley update (Nov 17 2026):** the valley repainted with real nights, a bridge the sprouts build to a new
-  place (Willow Falls), nectar, treasure that is dug up and carried home, and three fixes for things Sproutwild had broken
-  in Sprouts (garden beds, Louie's bubbles, the project screen). Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
-- **Patch & Plate v0.6 (Nov 17 2026):** six story chapters between days, four heart scenes for every character
-  (Bottie has a small arc and finally tips), and a favourite dish each. Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
-- **Patch & Plate v0.5 (Nov 17 2026):** fighter-style cut-in scenes for big moments, up to three kitchen buddies
-  (Cuyapup, Bessling, Grasskin) as the stand earns stars, Bottie and Derek as customers, more Will and Marcus.
-  Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
-- **Patch & Plate v0.4, the Sunkeep update (Nov 17 2026):** the stand is in Sproutwild's valley now (same universe,
-  separate saves): the Great Lantern on screen, the Elder and Pip as customers, a 13th day (LANTERN NIGHT), valley talk in
-  the lines. Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
-- **Sproutwild v8.0 (Nov 16 2026):** an opening you earn (Louie's berry lights the Lantern, seeds grow in the
-  garden), Erin walks you out and guides your first catch, Ohio-lore starters with a reveal, garden plot crops,
-  Data Center, bug collecting, Crooked Hollow, cottage party cinematic.
-  Full history: [`alt/src/sproutwild/CHANGELOG.md`](alt/src/sproutwild/CHANGELOG.md).
-  Handoff for the next work session: [`alt/src/sproutwild/HANDOFF.md`](alt/src/sproutwild/HANDOFF.md).
-- **Sproutwild joined the console as cartridge 5 (Nov 15 2026):** [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
+- **The console (Nov 18 2026):** a power-on sequence before the shelf, the shelf in rows of three with bigger
+  cartridges, Clankawatch folded in as cartridge 7.
+- **Lightswarm, cartridge 6 (Nov 18 2026):** a new game, built as a vertical slice and grown to v0.3: ten playable
+  keepers, supers with cutscenes, finds, the Keeper's Trail. Source: [`alt/src/lightswarm.js`](alt/src/lightswarm.js).
+- **Sprouts (Nov 17 and 18 2026):** the valley update, the prequel pass, new menus and a field guide, the Collection,
+  nature's balance.
+- **Sproutwild v10 to v12 (Nov 17 2026):** Guardians of the Light, Sunkeep redesigned, expeditions and the Soul Lamp,
+  the stretch to the first Sigil confirmed by script.
+- **Patch & Plate v0.4 to v0.7 (Nov 17 2026):** the stand moved to Sunkeep, big moments, kitchen buddies, heart scenes.
 - **Last numbered release: v0.35 (Nov 15 2026),** four cartridges with the reworked Knockout. See [`LATEST.md`](LATEST.md).
 
 ## Where things are
@@ -58,25 +41,27 @@ A pocket game console in one HTML file, by North Coast Studios. Seven game cartr
 | You want... | Go to |
 |---|---|
 | The newest playable game | [`alt/games/pocket-lantern-alt.html`](alt/games/pocket-lantern-alt.html) |
+| Everything that is open, for every game | [`OPEN-ITEMS.md`](OPEN-ITEMS.md) |
 | What changed, game by game | the Changelog column above |
-| Bugs we know about and what is not done yet | [`KNOWN-ISSUES.md`](KNOWN-ISSUES.md) |
+| Fix history | [`KNOWN-ISSUES.md`](KNOWN-ISSUES.md) |
+| Will's story decisions | [`alt/STORY-NOTES.md`](alt/STORY-NOTES.md) |
+| How the build is put together, and the tests | [`alt/README.md`](alt/README.md) |
 | Sproutwild design notes and research | [`alt/src/sproutwild/DESIGN-v7.md`](alt/src/sproutwild/DESIGN-v7.md) |
-| Sproutwild playtest notes | [`alt/src/sproutwild/PLAYTEST-NOTES-v7.md`](alt/src/sproutwild/PLAYTEST-NOTES-v7.md) |
-| Screenshots of each Sproutwild version | [`alt/src/sproutwild/shots/`](alt/src/sproutwild/shots/) |
+| Screenshots from the test runs | [`alt/playtest/`](alt/playtest/) |
 | The dev board (visual timeline for the team) | [`dev-board/README.md`](dev-board/README.md) |
 | Every older version (frozen, never edited) | [`LATEST.md`](LATEST.md) has the table: `v0.1/`, `v0.2/`, `v0.3/`, `v0.35/` |
-| The public web copy (GitHub Pages) | [`docs/`](docs/) (still the 4-cartridge build; updated only when Will says so) |
-| The old front page from before v0.2 | [`README-old-pre-v0.2.md`](README-old-pre-v0.2.md) |
+| The public web copy (GitHub Pages) | [`docs/`](docs/) (still the old four-cartridge build; updated only when Will says so) |
 
-## A note on GitHub branches (why things can look out of date)
+## Branches
 
-GitHub keeps work on **branches**, like separate copies of the project. The page you see first on GitHub shows the
-**`main`** branch. Recent work happens on a working branch (right now `claude/festive-knuth-f30w4u`) and only
-shows on the front page after it is **merged** into `main`. If this page looks old, use the branch dropdown near the
-top left of the GitHub page and pick the working branch, or merge it into `main`.
+`main` holds this seven-cartridge build as of Nov 18 2026. Work in progress happens on working branches and shows here
+after it is merged. Clankawatch is still being built on `claude/tender-darwin-0r4toe`; the copy in the console is
+refreshed by hand. Other North Coast games (lil Bottie, Starhaven, Sootborn, Underground Syndicate) live on their own
+branches and are listed at the end of [`OPEN-ITEMS.md`](OPEN-ITEMS.md).
 
 ## For developers
 
-- Build the newest version: `python3 alt/build.py` (writes `alt/games/pocket-lantern-alt.html`).
-- Sproutwild tests: `node alt/tests/sproutwild/field-lab.js alt/games/pocket-lantern-alt.html`.
-- Rules: never edit or delete the frozen version folders or `backups/`; every change gets a changelog entry.
+- Build: `python3 alt/build.py` (writes `alt/games/pocket-lantern-alt.html`).
+- Tests, from the repo root after building: see the table in [`alt/README.md`](alt/README.md).
+- Rules: never edit or delete the frozen version folders or `backups/`; every change gets a changelog entry; say
+  plainly what was and was not tested.

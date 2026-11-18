@@ -3,6 +3,17 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Docs: one list of everything open, front pages brought up to date, pushed to main (Nov 18 2026)
+
+Will: push this build to main; one big doc of every known bug, issue, want and wish per project from the latest notes
+and changelogs; update the main page and the pages that describe the games.
+
+- New [`OPEN-ITEMS.md`](../OPEN-ITEMS.md) at the repo root: the console, the seven cartridges, the open story
+  questions, and the four games on other branches. Each section names the files it was pulled from.
+- `README.md` rewritten for seven cartridges. `LATEST.md` and `alt/README.md` describe every game. `KNOWN-ISSUES.md`
+  points to the new list and keeps the fix history.
+- No game code changed.
+
 ## The console: a power-on sequence, a bigger shelf, and Clankawatch as cartridge 7 (Nov 18 2026)
 
 Will: does this have the latest versions of everything; fold Clankawatch in; reorganise the cartridges to fit more of

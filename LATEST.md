@@ -1,16 +1,16 @@
-# Main line: `alt/` — five cartridges (updated Nov 16 2026)
+# Main line: `alt/` — seven cartridges (updated Nov 18 2026)
 
-**Newest:** Sproutwild v8.0. Front page with every game, its changelog and status: [`README.md`](README.md). Known bugs: [`KNOWN-ISSUES.md`](KNOWN-ISSUES.md).
+**Newest:** the seven-cartridge console on `main`: Sprouts, North Coast Knockout, Rootdeep, Patch & Plate, Sproutwild
+(v12.10), Lightswarm (slice v0.3) and Clankawatch (v4.0 alpha 3), with a power-on sequence and a shelf in rows of three.
+Front page: [`README.md`](README.md). Everything open, per game: [`OPEN-ITEMS.md`](OPEN-ITEMS.md).
 
-**Build on this:** [`alt/`](alt/README.md). Sprouts, North Coast Knockout (with the later Fable passes), Rootdeep,
-Patch & Plate and **Sproutwild** in one console. Play `alt/games/pocket-lantern-alt.html`; rebuild with `python3 alt/build.py`.
+**Build on this:** [`alt/`](alt/README.md). Play `alt/games/pocket-lantern-alt.html`; rebuild with `python3 alt/build.py`.
 
-- **What changed:** [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (console and Knockout), [`alt/src/sproutwild/CHANGELOG.md`](alt/src/sproutwild/CHANGELOG.md) (Sproutwild)
+- **What changed:** [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (console, Sprouts, Knockout, Patch & Plate, Lightswarm), [`alt/src/sproutwild/CHANGELOG.md`](alt/src/sproutwild/CHANGELOG.md), [`alt/src/clankawatch/CHANGELOG.md`](alt/src/clankawatch/CHANGELOG.md)
 - **Saved before Sproutwild went in:** `alt/backups/pocket-lantern-alt_2026-11-15_4-carts_pre-sproutwild_BACKUP.html`
 - **Saved standalone Sproutwild v6.0:** `muse/games/Sprouts+Rootdeep+Sproutwild-v6.0_2026-11-15_BACKUP.html`
-- **For the dev board team:** [`dev-board/updates/2026-11-15_sproutwild-rebuild-and-fusion/`](dev-board/updates/2026-11-15_sproutwild-rebuild-and-fusion/README.md)
 
-![Five cartridges](alt/playtest/five-cartridges-fused.png)
+![The shelf](alt/playtest/console/shelf.png)
 
 It has not been cut as a numbered release yet (no `share/` zip). The last numbered release is still v0.35, below.
 

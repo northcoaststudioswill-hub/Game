@@ -1,17 +1,28 @@
-# Pocket Lantern ALT — the main line (five cartridges)
+# Pocket Lantern: the main line (seven cartridges)
 
-> **As of Nov 15 2026 this folder is the main version of the game to build on.** It started as an experimental fork of
-> v0.3, became where Knockout was reworked, and now also holds Sproutwild as cartridge 5. Shelf: Sprouts, Knockout,
-> Rootdeep, Patch & Plate, Sproutwild. The paragraphs below about being a fork are still true of how it is built and saved.
-
-An alternate version of the whole console for trying bigger changes **without touching anything outside `alt/`**.
-v0.1, v0.2 and v0.3 are not edited, rebuilt, or overwritten by anything in here. Keep what works, throw away what doesn't,
-or lift single changes back into the main line (each one is listed in `CHANGELOG.md`).
+This folder is the game. One console, seven cartridges, one HTML file. It began as an experimental fork of v0.3
+("ALT"), became where Knockout was reworked, and is now where everything is built. Nothing outside `alt/` is written
+by anything in here; v0.1 to v0.35 stay frozen.
 
 - **Play it:** `games/pocket-lantern-alt.html` (one file, open it in a browser).
-- **What's different:** [`CHANGELOG.md`](CHANGELOG.md)
-- **Starting point:** v0.3 exactly. Before any ALT change, `build.py` produced a file byte-for-byte identical to
-  `v0.3/games/pocket-lantern_2026-11-14_v21_wip.html`.
+- **What changed:** [`CHANGELOG.md`](CHANGELOG.md)
+- **Everything open, per game:** [`../OPEN-ITEMS.md`](../OPEN-ITEMS.md)
+
+## The games
+
+| # | Cartridge | In one line | How you play | Source |
+|---|---|---|---|---|
+| 1 | **Sprouts** | Relight the Great Lantern. Will throws sprouts at berries, gates, grubs and four sun shards; the crew carries things home; Louie fetches strays. Days and nights, a garden, a house, valley projects, a field guide. | D-pad walk, A throw or act, B call, Select swap kind | `src/console.js` |
+| 2 | **North Coast Knockout** | A 2D fighter with the cast: Will, Erin, Marcus, Louie, Lil Bottie, King Bibi, Corbin, Mama. Two supers each with cut-ins, parry, wall bounce, an arcade tower, Survival, Training and Trials. | D-pad, A light, B heavy, X and Y specials, Select super | `src/knockout.js` |
+| 3 | **Rootdeep** | A roguelite crawl under the valley. Short rooms, relics, a new run every time. Also holds the Lantern menu (stats, achievements, tickets). | D-pad, A attack, B cast, Select swap | `src/rootdeep.js` |
+| 4 | **Patch & Plate** | Erin's farm stand beside the Great Lantern. Plant, cook and serve; each day is a level of a minute or two; the valley's people have favourites and heart scenes. | D-pad, A use, B toss, Select recipes | `src/patchplate.js` |
+| 5 | **Sproutwild** | The Lantern is dark and the buddies went wild. Throw sprouts to show them the light, bring them home to work at Sunkeep, light four Guardians for their Sigil stones, then face Bottie. | D-pad, A act, B call, Select, Start menu | `src/sproutwild/` |
+| 6 | **Lightswarm** | An expedition from Sunkeep, survivors style. You only steer; the swarm throws the light. Ten keepers with their own move and two supers, level-up cards, finds, the Keeper's Trail, Sunkeep upgrades. | D-pad walk, A your move, B whistle, Select super | `src/lightswarm.js` |
+| 7 | **Clankawatch** | Garden tower defense. Plant sprout towers and keepers by day; by night Lil Bottie's drone swarms follow the track to the Garden Heart. Three gardens, 26 nights, three save files. | D-pad cursor, A plant or grow, B back or speed, Start begin or pause | `src/clankawatch/` |
+
+**The console itself:** opening the page plays a power-on sequence (a match, the lantern, the name, one sprout per
+cartridge), then the shelf in rows of three with the Lantern menu below. Each game has its own boot when its cartridge
+goes in. Start pauses; quitting a game returns to the shelf.
 
 ## Its saves are separate
 
@@ -30,7 +41,7 @@ real game can't read or overwrite Erin's Patch & Plate days, Rootdeep runs, or a
 | `src/clankawatch/` | Clankawatch (cartridge 7), copied from `muse/games/thornwatch/src` on its own branch; with its changelog, handoff and lore. |
 | `tests/console_shelf.js` | The power-on sequence, the shelf, and Clankawatch booting and playing. |
 | `src/lightswarm.js` | Lightswarm (cartridge 6), vertical slice v0.1: a survivors-style expedition. Test: `tests/lightswarm_lab.js`. |
-| `src/sproutwild/` | Sproutwild (cartridge 5): eleven files, see its own `README.md` and `CHANGELOG.md`. |
+| `src/sproutwild/` | Sproutwild (cartridge 5): its files are listed in `build.py` in build order; see its own `README.md` and `CHANGELOG.md`. |
 | `backups/` | Frozen builds. Never edit. |
 | `STORY-NOTES.md` | Will's story decisions for Pocket Lantern, and what is still open. |
 | `tests/sproutwild/` | Sproutwild's checks. `field-lab.js` (step-by-step rules, about 90 s). `checkpoint.js <html> <out> <point>` plays one stretch in real time from a saved point: `walkend`, `plot`, `barn`, `castle`, `reload` (30 to 100 s each). `old-saves-from-main.js` makes saves with main's build and continues them here. `autopilot.js` is a full fresh-save run (slow; use the checkpoints first). |

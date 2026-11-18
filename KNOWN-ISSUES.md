@@ -1,5 +1,7 @@
 # Known issues and what is not done yet
 
+> **Everything open for every game is now in one place: [`OPEN-ITEMS.md`](OPEN-ITEMS.md).** This file keeps the fix history.
+
 Updated Nov 17 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
 ## Lightswarm (cartridge 6, vertical slice v0.3)
