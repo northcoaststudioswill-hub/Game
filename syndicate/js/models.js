@@ -249,7 +249,7 @@
         else if (cs === 'call') { q.arx = mix(-0.45, -1.0, r); q.arz = 0; q.bx = 0.06 + 0.4 * r; q.by = -0.08 * r; q.ll = 0.45 * r; q.lr = -0.35 * r; q.hx = 0.2 * r; q.ty = -0.3 * r; }
         else if (cs === 'bless') { q.arx = mix(-0.45, -1.3, r); q.arz = -1.0 * r; q.alx = mix(restL, -1.3, r); q.alz = 1.0 * r; q.by = 0.1 * r; q.hx = -0.5 * r; q.bx = -0.1 * r; q.ty = 0; q.ll = 0.05; q.lr = -0.05; q.bpz = 0; }
         else if (cs === 'cone') { q.arx = mix(-0.45, -1.55, r); q.alx = mix(restL, -1.55, r); q.arz = 0.22 * r; q.alz = -0.22 * r; q.ty = -0.1 * r; q.bx = 0.06 + 0.3 * r; q.bpz = 0.16 * r; q.ll = 0.5 * r; q.lr = -0.45 * r; }
-        else if (cs === 'breath') { q.bx = 0.06 + 0.55 * r; q.hx = 0.3 * r; q.arx = mix(-0.45, 0.8, r); q.alx = mix(restL, 0.8, r); q.arz = -0.4 * r; q.alz = 0.4 * r; q.ll = 0.45 * r; q.lr = -0.4 * r; q.ty = 0; }
+        else if (cs === 'breath') { q.bx = 0.06 + 0.36 * r; q.hx = 0.12 * r; q.bpz = 0.14 * r; q.arx = mix(-0.45, 0.8, r); q.alx = mix(restL, 0.8, r); q.arz = -0.4 * r; q.alz = 0.4 * r; q.ll = 0.45 * r; q.lr = -0.4 * r; q.ty = 0; }
         else if (cs === 'plant') { q.by = -0.32 * r; q.bx = 0.06 + 0.55 * r; q.ll = mix(0.05, -1.25, r); q.lr = mix(-0.05, 0.5, r); q.arx = mix(-0.45, -0.6, r); q.arz = 0; q.ty = 0; q.hx = 0.3 * r; q.bpz = 0; }
         else if (cs === 'throw') { q.arx = mix(-0.45, -1.5, r); q.arz = -1.1 * r; q.ty = 0.8 * r; q.bx = 0.06 + 0.25 * r; q.ll = 0.4 * r; q.lr = -0.35 * r; }
         else if (cs === 'steel') { q.arx = mix(-0.45, -1.6, r); q.arz = -1.3 * r; q.alx = mix(restL, -1.6, r); q.alz = 1.3 * r; q.by = 0.05 * r; q.hx = -0.3 * r; q.bx = -0.15 * r; q.ty = 0; q.bpz = 0; q.ll = 0.3 * r; q.lr = -0.3 * r; }

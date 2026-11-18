@@ -142,12 +142,12 @@
     if (k === 'slash') {
       // a blade's wake: a tapered crescent that is drawn along the path of the cut, bright at the edge and gone behind it
       const N = 26, pos = [], colr = [], c = new T.Color(col), R1 = f.r / S, a0 = f.a0 != null ? f.a0 : -f.arc / 2, a1 = f.a1 != null ? f.a1 : f.arc / 2, dir = f.dir || 1;
-      const P = u => { const uu = dir > 0 ? u : 1 - u, an = a0 + (a1 - a0) * uu, th = Math.pow(Math.sin(Math.min(1, u * 1.05) * Math.PI), 0.6), ri = R1 * (1 - 0.3 * th), b = 0.3 + 0.7 * Math.pow(u, 1.4); return [Math.cos(an) * ri, Math.sin(an) * ri, Math.cos(an) * R1, Math.sin(an) * R1, b]; };
-      for (let i = 0; i < N; i++) { const A = P(i / N), B = P((i + 1) / N); pos.push(A[0], 0, A[1], A[2], 0, A[3], B[2], 0, B[3], A[0], 0, A[1], B[2], 0, B[3], B[0], 0, B[1]); [A[4] * 0.35, A[4], B[4], A[4] * 0.35, B[4], B[4] * 0.35].forEach(v => colr.push(c.r * v, c.g * v, c.b * v)); }
+      const P = u => { const uu = dir > 0 ? u : 1 - u, an = a0 + (a1 - a0) * uu, th = Math.pow(Math.sin(Math.min(1, u * 1.05) * Math.PI), 0.6), ri = R1 * (1 - (f.thin || 0.24) * th), b = 0.12 + 0.88 * Math.pow(u, 1.8); return [Math.cos(an) * ri, Math.sin(an) * ri, Math.cos(an) * R1, Math.sin(an) * R1, b]; };
+      for (let i = 0; i < N; i++) { const A = P(i / N), B = P((i + 1) / N); pos.push(A[0], 0, A[1], A[2], 0, A[3], B[2], 0, B[3], A[0], 0, A[1], B[2], 0, B[3], B[0], 0, B[1]); [A[4] * 0.1, A[4], B[4], A[4] * 0.1, B[4], B[4] * 0.1].forEach(v => colr.push(c.r * v, c.g * v, c.b * v)); }
       const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); geo.setAttribute('color', new T.Float32BufferAttribute(colr, 3));
       const mat = new T.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 1, depthWrite: false, side: T.DoubleSide, blending: T.AdditiveBlending }), m = new T.Mesh(geo, mat), tg = new T.Group();
       tg.rotation.x = f.tilt || 0; tg.add(m); g.add(tg); g.rotation.y = -f.a; g.position.set(f.x / S, f.h || 1.0, f.y / S); 
-      f.upd = p => { mat.opacity = 0.8 * (p < 0.25 ? 1 : Math.max(0, 1 - (p - 0.25) / 0.75)); g.scale.setScalar(0.96 + p * 0.1); };
+      f.upd = p => { mat.opacity = (f.op || 0.85) * Math.pow(Math.max(0, 1 - p), 1.4); g.scale.setScalar(0.97 + p * 0.08); };
     } else if (k === 'lance') {
       // a thrust: one hard line out to the point
       const L = f.r / S, geo = new T.BufferGeometry(), c = new T.Color(col), w = f.w || 0.16, pos = [], colr = [];
@@ -176,10 +176,10 @@
     } else if (k === 'blast') {
       g.position.set(f.x / S, 0, f.y / S); const r = f.r / S;
       const ring = flat(new T.Mesh(new T.RingGeometry(0.82, 1, 40), basicMat(col, 0.9, true))); ring.position.y = 0.06; g.add(ring);
-      const ball = new T.Mesh(new T.SphereGeometry(1, 14, 10), basicMat(col, 0.7, true)); ball.position.y = 0.4; g.add(ball);
-      const gl = gfx.glow(0xffffff, r * 3, 0, 0.8, 0, g, 0.9);
+      const ball = new T.Mesh(new T.SphereGeometry(1, 14, 10), basicMat(col, 0.45, true)); ball.position.y = 0.4; g.add(ball);
+      const gl = gfx.glow(0xffffff, r * 2.2, 0, 0.8, 0, g, 0.5);
       let pil = null; if (f.pillar) { pil = new T.Mesh(new T.CylinderGeometry(r * 0.5, r * 0.6, 9, 14, 1, true), basicMat(col, 0.6, true)); pil.position.y = 4.5; g.add(pil); }
-      f.upd = p => { ring.scale.setScalar(r * (0.5 + p * 0.7)); ring.material.opacity = 0.9 * (1 - p); ball.scale.set(r * (0.4 + p * 0.5), r * (0.3 + p * 0.5), r * (0.4 + p * 0.5)); ball.material.opacity = 0.7 * (1 - p) * (1 - p); gl.material.opacity = 0.9 * (1 - p); if (pil) { pil.material.opacity = 0.6 * (1 - p); pil.scale.set(1 - p * 0.5, 1, 1 - p * 0.5); } };
+      f.upd = p => { ring.scale.setScalar(r * (0.5 + p * 0.7)); ring.material.opacity = 0.9 * (1 - p); ball.scale.set(r * (0.4 + p * 0.5), r * (0.3 + p * 0.5), r * (0.4 + p * 0.5)); ball.material.opacity = 0.45 * (1 - p) * (1 - p); gl.material.opacity = 0.5 * (1 - p) * (1 - p); if (pil) { pil.material.opacity = 0.6 * (1 - p); pil.scale.set(1 - p * 0.5, 1, 1 - p * 0.5); } };
     } else if (k === 'dust') {
       const ring = flat(new T.Mesh(new T.RingGeometry(0.7, 1, 30), basicMat(0x9a8a78, 0.5))); g.add(ring); g.position.set(f.x / S, 0.07, f.y / S);
       f.upd = p => { ring.scale.setScalar(0.3 + f.r / S * p); ring.material.opacity = 0.5 * (1 - p); };
@@ -613,9 +613,9 @@
         for (let i = 0; i < 26; i++) { const aa = a + rand(-arc / 2, arc / 2), v = rand(0.4, 1) * ab.range / S / 0.35; gfx.emit(e.x / S, 1, e.y / S, Math.cos(aa) * v, rand(-0.5, 1.5), Math.sin(aa) * v, rand(0.25, 0.45), ab.cone, 1); }
         flashLight(e.x + Math.cos(a) * 60, e.y + Math.sin(a) * 60, ab.cone, 35);
       } else { const mvn = ab.mv, st = act.step || 0, colS = fin ? '#ffe9a0' : ab.color, lifeS = fin ? 0.3 : 0.22, over = mvn === 'smite' || mvn === 'chop' || (!mvn && (ab.pz || 1) >= 1.4) || st === 2;
-        const cut = o => { fx.push(Object.assign({ k: 'slash', x: e.x, y: e.y, a, r: rng, arc, col: colS, t: 0, life: lifeS }, o)); fx.push(Object.assign({ k: 'slash', x: e.x, y: e.y, a, r: rng * 0.8, arc: arc * 0.8, col: '#ffffff', t: -0.02, life: lifeS * 0.75 }, o, o.a0 != null ? { a0: o.a0 * 0.9, a1: o.a1 * 0.9 } : null)); };
-        if (mvn === 'drive' || mvn === 'riposte' || mvn === 'backstab' || (!mvn && ab.arc < 60)) { fx.push({ k: 'lance', x: e.x, y: e.y, a, r: rng * 1.15, col: colS, t: 0, life: 0.2, h: mvn === 'backstab' ? 0.9 : 1.2 }); fx.push({ k: 'lance', x: e.x, y: e.y, a, r: rng, col: '#ffffff', w: 0.07, t: -0.02, life: 0.16, h: mvn === 'backstab' ? 0.9 : 1.2 }); }
-        else if (mvn === 'spin') { cut({ a0: -2.6, a1: 3.4, h: 1.05, life: 0.3 }); for (let gi = 0; gi < 3; gi++) fx.push({ k: 'ghost', x: e.x, y: e.y, col: colS, t: -gi * 0.04, life: 0.28 }); }
+        const cut = o => { fx.push(Object.assign({ k: 'slash', x: e.x, y: e.y, a, r: rng, arc, col: colS, t: 0, life: lifeS }, o)); fx.push(Object.assign({ k: 'slash', x: e.x, y: e.y, a, r: rng * 1.01, arc, col: '#ffffff', t: 0, thin: 0.07, op: 0.9 }, o, { life: (o.life || lifeS) * 0.7 })); };
+        if (mvn === 'drive' || mvn === 'riposte' || mvn === 'backstab' || (!mvn && ab.arc < 60)) { fx.push({ k: 'lance', x: e.x, y: e.y, a, r: rng * 1.25, col: colS, w: 0.22, t: 0, life: 0.26, h: mvn === 'backstab' ? 0.9 : 1.2 }); fx.push({ k: 'lance', x: e.x, y: e.y, a, r: rng * 1.1, col: '#ffffff', w: 0.09, t: 0, life: 0.2, h: mvn === 'backstab' ? 0.9 : 1.2 }); }
+        else if (mvn === 'spin') { cut({ a0: -2.6, a1: 3.4, h: 1.05, life: 0.3 }); }
         else if (mvn === 'bash') { fx.push({ k: 'ring', x: e.x + Math.cos(a) * rng * 0.7, y: e.y + Math.sin(a) * rng * 0.7, r: 70, col: colS, t: 0, life: 0.22 }); fx.push({ k: 'lance', x: e.x, y: e.y, a, r: rng * 0.9, col: '#ffffff', w: 0.3, t: 0, life: 0.14, h: 1.1 }); }
         else if (mvn === 'lowcut') cut({ h: 0.45, tilt: 0.12 });
         else if (mvn === 'rise') cut({ tilt: -Math.PI / 2, a0: -0.7, a1: 1.7, dir: 1, h: 0.9 });
@@ -884,10 +884,12 @@
   }
 
   // ------------------------------------------------------------------ main update
+  let dtFx = 0;
   F.update = function (rdt) {
     if (!F.active) return;
-    if (F.paused) { sync(0); return; }
+    if (F.paused) { dtFx = 0; sync(0); return; }
     let dt = rdt * F.speed;
+    dtFx = dt;       // blade wakes fade in real time, even while a hit holds the frame
     if (hitstop > 0) { hitstop -= dt; dt *= 0.05; }
     else if (slowT > 0) { slowT -= rdt; dt *= 0.3; }                       // the half-second after something terrible
     if (phase === 'ko') dt *= 0.45;
@@ -950,7 +952,7 @@
   function sync(dt) {
     syncEntity(P); syncEntity(E);
     projs.forEach(syncProj); zones.forEach(syncZone);
-    for (let i = fx.length - 1; i >= 0; i--) { const f = fx[i]; f.t += dt; if (f.t < 0) continue; if (!f.obj) buildFx(f); if (f.t >= f.life) { killFx(f); fx.splice(i, 1); } else f.upd(f.t / f.life); }
+    for (let i = fx.length - 1; i >= 0; i--) { const f = fx[i]; f.t += (f.k === 'slash' || f.k === 'lance' || f.k === 'blast') ? dtFx : dt; if (f.t < 0) continue; if (!f.obj) buildFx(f); if (f.t >= f.life) { killFx(f); fx.splice(i, 1); } else f.upd(f.t / f.life); }
     arena.flash.intensity *= Math.pow(0.0005, dt); if (arena.flash.intensity < 0.3) arena.flash.intensity = 0;
     if (F.ex) { gfx.cam.shake = shake / 45; return; }
     arena.setHype(hype / 100);
