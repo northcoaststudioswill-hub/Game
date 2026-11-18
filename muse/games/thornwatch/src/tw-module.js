@@ -1189,8 +1189,8 @@ function twDrawHow(){const p=TWHOW.page;
   text('Clear a garden to open the next one.',14,116,1,'#e8e4f8');
   text('26 nights. BOTTIE PRIME waits last.',14,130,1,'#e8e4f8')}
  else if(p===1){ctext('CONTROLS',42,2,'#f8d030');
-  const rows=[['D-PAD','MOVE \u00b7 PICK CARDS BELOW'],['A','PLANT \u00b7 GROW \u00b7 FIRE'],
-   ['B','UPROOT \u00b7 SPEED UP TIME'],['START','START NIGHT \u00b7 PAUSE'],['SEL','POWERS, MID-ROUND']];
+  const rows=[['D-PAD','MOVE THE CURSOR'],['A','PLANT \u00b7 GROW \u00b7 KEEPER MOVE'],
+   ['B','BACK \u00b7 SPEED UP THE NIGHT'],['START','BEGIN THE NIGHT \u00b7 PAUSE'],['SEL','POWERS AT NIGHT \u00b7 UPROOT IN A PANEL']];
   rows.forEach((rw,i)=>{const y=70+i*22;text(rw[0],14,y,2,'#fff8e0');text(rw[1],92,y+4,1,'#c8c0d8')})}
  else{ctext('FIELD GUIDE',42,2,'#f8d030');
   const grows=TWGUIDE_ROWS.slice(p===2?0:7,p===2?7:14);
