@@ -153,8 +153,8 @@
   G.owned = st => { const o = {}; (st.items || []).forEach(p => o[p.id] = (o[p.id] || 0) + 1); return o; };
 
   G.GEAR = {
-    weapon: { name: 'Weapon', tiers: [null, { name: 'Runed Edge', cost: 110, desc: '+2 damage on weapon hits. Your weapon glows cyan.' }, { name: 'Syndicate Relic', cost: 240, desc: '+4 damage on weapon hits. Your weapon burns gold.' }] },
-    armor: { name: 'Armor', tiers: [null, { name: 'Reinforced Kit', cost: 110, desc: 'Take 6% less damage. Silver trim.' }, { name: 'Champion Regalia', cost: 240, desc: 'Take 12% less damage. Gold trim.' }] }
+    weapon: { name: 'Weapon', tiers: [null, { name: 'Runed Edge', cost: 110, desc: '+2 damage on weapon hits and a wider parry window. A proper crossguard and a cyan edge.' }, { name: 'Syndicate Relic', cost: 240, desc: '+4 damage on weapon hits and a wider parry window still. Gold edge, set with a blue stone.' }] },
+    armor: { name: 'Armor', tiers: [null, { name: 'Reinforced Kit', cost: 110, desc: 'Take 6% less damage; parry window widens. Adds bracers, knee plates and chest bands in silver.' }, { name: 'Champion Regalia', cost: 240, desc: 'Take 12% less damage; parry window widens again. Gold plate, shoulder spikes, a tasset and a blood-red gem.' }] }
   };
   G.POTION_COST = 25; G.POTION_MAX = 3;
 
@@ -168,5 +168,5 @@
     const C = G.CLASSES[cls];
     return { name, race, cls, level: 1, xp: 0, stats: G.baseStats(cls, race), sub: null, feats: [], known: C.start.slice(), slots: [C.start[0], C.start[1], null], ult: null };
   };
-  G.lookOf = (h, st) => ({ cls: h.cls, race: h.race, gear: st ? st.gear : { weapon: 0, armor: 0 }, tint: h.tint, scale: h.scale || 1, rank: st ? G.rankOf(st.respect) : 0 });
+  G.lookOf = (h, st) => ({ cls: h.cls, race: h.race, gear: st ? st.gear : { weapon: 0, armor: 0 }, tint: h.tint, scale: h.scale || 1, rank: st ? G.rankOf(st.respect) : 0, cos: st ? st.cos : null });
 })();

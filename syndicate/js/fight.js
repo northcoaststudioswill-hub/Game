@@ -40,15 +40,18 @@
     const eh = { name: o.name, cls: o.cls, race: o.race, level: o.level, stats: G.baseStats(o.cls, o.race), sub: o.sub || null, feats: [], known: o.known, ult: o.ult || null, tint: o.tint, scale: o.scale };
     const prim = G.CLASSES[o.cls].primary; eh.stats[prim] += Math.floor(o.level / 2); eh.stats.con += Math.floor(o.level / 3);
     const ed = G.derive(eh, null);
-    ed.maxHp = Math.round(ed.maxHp * o.hpMul); ed.dmgMul *= o.dmgMul * 1.12;
+    F.sabotaged = !!st.sabotage; if (st.sabotage) { ed.maxHp *= 0.85; st.sabotage = 0; }
+    ed.maxHp = Math.round(ed.maxHp * o.hpMul); ed.dmgMul *= o.dmgMul * 1.02;
     E = makeEntity(eh, ed, G.lookOf(eh, null), false);
-    E.ai = Object.assign({ react: 0.5, aggro: 0.5, dodge: 0.1, guard: Math.min(0.75, 0.16 + o.level * 0.11) }, o.ai); E.boss = o.boss;
+    E.ai = Object.assign({ react: 0.5, aggro: 0.5, dodge: 0.1, guard: Math.min(0.6, 0.14 + o.level * 0.09), parry: Math.min(0.26, 0.02 + o.level * 0.045) }, o.ai); E.boss = o.boss;
     G.fightTrack = o.boss ? 'boss' : 'fight';
     P.foe = E; E.foe = P;
     [P, E].forEach(makeVis);
     if (!arena.flash.parent) sc.add(arena.flash);
     projs = []; zones = []; fx = []; time = 0; hitstop = 0; shake = 0; hype = 20; lastAb = null; stolen = 0;
-    phase = 'intro'; phaseT = 1.8; result = null; F.said = 0;
+    phase = 'intro'; phaseT = 1.8; result = null; F.said = 0; M = null; clearGibs(); gfx.clearBlood(sc); gfx.cine = null; F.assistUsed = 0;
+    { const tm = (st.tally || [])[st.second]; P.second = tm && !tm.job ? tm : null; }
+    if (st.bless) { P.shield += 18; st.bless = 0; }
     gfx.cam.x = 0; gfx.cam.z = 0; gfx.cam.y = 0.9; camVh = gfx.cam.vh = gfx.portrait ? 17 : 15;
     F.active = true; F.paused = false; F.P = P; F.E = E;
     G.ui.buildHud(P, E); G.ui.banner(o.name, o.title);
@@ -85,11 +88,11 @@
       else { prog = 1 - e.t / (ab.rec || 0.01); act = melee ? 'swing' : 'idle'; if (melee) prog = 0.5 + prog * 0.5; }
     }
     const alpha = e.buffs.stealth ? (e.isPlayer ? 0.4 : 0.1) : 1;
-    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : 0, guard: e.guard > 0, t: time + (e.isPlayer ? 0 : 1.7), glow });
+    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : 0, guard: e.guard > 0 || e.state === 'parry', t: time + (e.isPlayer ? 0 : 1.7), glow });
     const alive = e.state !== 'ko';
     v.ring.visible = alive && alpha > 0.3 && !F.ex; v.ring.position.y = 0.03 - e.z / S;
     v.ward.visible = alive && e.shield > 0; if (v.ward.visible) v.ward.material.opacity = 0.18 + Math.sin(time * 6) * 0.06;
-    v.mark.visible = alive && !!e.st.mark; v.guard.visible = alive && (!!e.buffs.counter || e.guard > 0); if (v.guard.visible) v.guard.rotation.y = v.c.root.rotation.y - Math.PI / 2;
+    v.mark.visible = alive && !!e.st.mark; v.guard.visible = alive && (!!e.buffs.counter || e.guard > 0 || (e.state === 'parry' && e.parryT > 0)); if (v.guard.visible) v.guard.rotation.y = v.c.root.rotation.y - Math.PI / 2;
     v.stars.forEach((s, i) => { s.visible = alive && !!e.st.stun; const a = time * 6 + i * 2.09; s.position.set(Math.cos(a) * 0.4, 2.25, Math.sin(a) * 0.4); });
     const au = alive && !!e.buffs.aura, ar = A.spirit_guardians.aura.radius / S;
     v.aura.visible = au; v.aura.scale.setScalar(ar);
@@ -195,6 +198,84 @@
   function setBuff(e, k, dur, amt) { e.buffs[k] = { t: dur, amt: amt || 0 }; }
   function heal(e, v) { v = Math.round(v * e.d.healMul); e.hp = Math.min(e.maxHp, e.hp + v); text(e, '+' + v, '#7dffa0'); spark(e.x, e.y, 30, '#7dffa0', 14, 90); G.sfx('heal'); }
 
+  // ------------------------------------------------------------------ blood, parries, mortal blows, the Second
+  const gore = () => !G.state || G.state.gore !== false;
+  function blood(x, y, n, dir) { if (!gore()) return spark(x, y, 30, '#c01818', Math.ceil(n / 3), 120); gfx.blood(x / S, 1.0, y / S, n, 4.6, dir); }
+  const PARRY = { fighter: [0.30, 'SHIELD BLOCK'], rogue: [0.20, 'RIPOSTE'], sorcerer: [0.24, 'SHIELD'], cleric: [0.26, 'WARDING FLARE'] };
+  function parryWindow(e) { return PARRY[e.cls][0] + (e.d.parry || 0) + Math.max(0, G.mod(e.stats.dex)) * 0.008; }
+  // Each class answers a parried blow its own way.
+  function parried(att, tgt, ab, o) {
+    const cls = tgt.cls, resist = att.boss ? 0.6 : 1, pa = Math.atan2(att.y - tgt.y, att.x - tgt.x), near = Math.hypot(att.x - tgt.x, att.y - tgt.y) < 170;
+    text(tgt, PARRY[cls][1] + '!', '#ffe9a0', true); G.sfx('clang'); G.sfx('perfect'); hitstop = Math.max(hitstop, 0.13); shake = Math.max(shake, 7);
+    spark(tgt.x, tgt.y, 36, '#ffe9a0', 16, 240); flashLight(tgt.x, tgt.y, '#ffe9a0', 45);
+    fx.push({ k: 'ring', x: tgt.x, y: tgt.y, r: 70, col: '#ffe9a0', t: 0, life: 0.3 });
+    tgt.state = 'idle'; tgt.parryT = 0; tgt.parryCd = 0.25; tgt.res = Math.min(100, tgt.res + 14); tgt.act = null;
+    if (tgt.isPlayer) addHype(14); else addHype(-6);
+    if (o.proj) { if (cls === 'fighter' || cls === 'sorcerer') o.proj.reflect = 1; }
+    else if (near) { att.st.stun = { t: (cls === 'fighter' ? 0.9 : 0.5) * resist }; interrupt(att); }
+    if (cls === 'fighter' && near) { att.kx = Math.cos(pa) * 150; att.ky = Math.sin(pa) * 150; att.kBy = tgt; }
+    if (cls === 'rogue' && near) { fx.push({ k: 'slash', x: tgt.x, y: tgt.y, a: pa, r: 70, arc: 1.4, col: '#cfd8e0', t: 0, life: 0.18 }); hit(tgt, att, { type: 'melee', dmg: [2, 6], stat: 'dex', color: '#cfd8e0' }, { noCounter: 1, power: 1.5 }); }
+    if (cls === 'sorcerer' && near) { att.kx = Math.cos(pa) * 340 * resist; att.ky = Math.sin(pa) * 340 * resist; att.kBy = tgt; att.st.slow = { t: 1.5, amt: 0.4 }; }
+    if (cls === 'cleric') { heal(tgt, G.roll([1, 6]) + G.mod(tgt.stats.wis)); if (near) att.st.slow = { t: 2.2, amt: 0.45 }; }
+  }
+  // The Second: one of your Tallymen in your corner. One call per bout.
+  function callSecond() {
+    const s2 = P.second; if (!s2 || F.assistUsed || phase !== 'fight' || P.state === 'ko') { G.sfx('deny'); return; }
+    F.assistUsed = 1; const nm = s2.name.split(' ')[0];
+    text(P, nm.toUpperCase() + '!', '#ffd36b', true); G.sfx('buff'); addHype(8);
+    const a = Math.atan2(E.y - P.y, E.x - P.x) + 1.9, ex = { x: E.x + Math.cos(a) * 250, y: E.y + Math.sin(a) * 250 }; clampArena(ex);
+    if (s2.cls === 'cleric') { heal(P, P.maxHp * 0.25); P.shield = Math.max(P.shield, 22); P.buffs.shield = { t: 6 }; fx.push({ k: 'blast', x: P.x, y: P.y, r: 60, col: '#fff0a0', t: 0, life: 0.5, pillar: 1 }); }
+    else if (s2.cls === 'fighter') { fx.push({ k: 'trail', x1: ex.x, y1: ex.y, x2: E.x, y2: E.y, col: '#ffd36b', t: 0, life: 0.4 }); hit(P, E, { type: 'melee', dmg: [2, 8], stat: 'str', stun: 1.3, knock: 230, color: '#ffd36b' }, { noCounter: 1, from: a + Math.PI }); }
+    else if (s2.cls === 'rogue') { for (let i = 0; i < 5; i++) { const aa = Math.atan2(E.y - ex.y, E.x - ex.x) + (i - 2) * 0.09; projs.push({ x: ex.x, y: ex.y, vx: Math.cos(aa) * 700, vy: Math.sin(aa) * 700, a: aa, r: 7, owner: P, ab: Object.assign({}, A.fan_knives, { dot: ['poison', 4, [1, 4]] }), t: 0 }); } G.sfx('swing'); }
+    else { zones.push({ x: E.x, y: E.y, r: 85, delay: 0.6, t: 0, owner: P, ab: { type: 'aoe', dmg: [4, 6], stat: 'cha', fire: 1, color: '#ff8a2a', knock: 180, dot: ['burn', 3, [1, 4]] } }); fx.push({ k: 'lob', x1: ex.x, y1: ex.y, x2: E.x, y2: E.y, col: '#ff8a2a', t: 0, life: 0.6 }); G.sfx('fire'); }
+  }
+  // ---- mortal blows: a win is a kill, and each trade has its own way of ending things
+  let M = null, gibs = [];
+  function clearGibs() { gibs.forEach(g => sc.remove(g.m)); gibs = []; }
+  function makeGibs(e, ash) {
+    const cols = ash ? [0x3a3a3a, 0x555555, 0x222222] : e.vis.c.mats.slice(0, 5).map(m => m.color.getHex()).concat(gore() ? [0x7a0c0c, 0x5a0808, 0x8a1010] : []);
+    for (let i = 0; i < (ash ? 26 : 20); i++) {
+      const sz = rand(0.1, ash ? 0.2 : 0.32), m = new T.Mesh(new T.BoxGeometry(sz, sz * rand(0.6, 1.4), sz), new T.MeshLambertMaterial({ color: G.pick(cols), flatShading: true }));
+      m.position.set(e.x / S + rand(-0.3, 0.3), rand(0.4, 1.7), e.y / S + rand(-0.3, 0.3)); m.castShadow = true; sc.add(m);
+      const a = rand(0, 6.28), v = rand(1.5, ash ? 4 : 7); gibs.push({ m, vx: Math.cos(a) * v, vz: Math.sin(a) * v, vy: rand(3, 9), rx: rand(-9, 9), rz: rand(-9, 9), ash });
+    }
+  }
+  function startMortal(e) {
+    e.st = { stun: { t: 99 } }; e.buffs = {}; interrupt(e); e.kx = e.ky = 0; e.guard = 0; e.state = 'idle';
+    P.st = {}; delete P.buffs.stealth; interrupt(P); P.state = 'idle'; P.kx = P.ky = 0; P.iframe = 9;
+    projs.forEach(p => p.m && sc.remove(p.m)); projs = []; zones.forEach(z => z.m && sc.remove(z.m)); zones = [];
+    const a = Math.atan2(e.y - P.y, e.x - P.x); P.x = e.x - Math.cos(a) * 66; P.y = e.y - Math.sin(a) * 66; clampArena(P); P.aim = a;
+    M = { t: 0, e, a, f: {}, name: G.MORTAL[P.cls].name };
+    phase = 'mortal'; hitstop = 0.3; shake = 10; result = { win: true };
+    G.ui.banner('Mortal Blow', M.name, 'win mortal'); G.sfx('bell'); G.sfx('crowd');
+  }
+  function mortalStep(dt) {
+    const m = M, e = m.e, cls = P.cls, IMP = 1.2, cast = cls === 'sorcerer' || cls === 'cleric'; m.t += dt;
+    const once = (k, tt, fn) => { if (m.t >= tt && !m.f[k]) { m.f[k] = 1; fn(); } };
+    const col = { fighter: '#ffd36b', rogue: '#c79bff', sorcerer: '#8aff5a', cleric: '#fff0a0' }[cls];
+    if (m.t < IMP) { P.state = 'wind'; P.act = { ab: cast ? { type: 'aoe', color: col, wind: IMP } : A[P.basic], step: 2, fin: 1, total: IMP, aim: m.a }; P.t = IMP - m.t; P.aim = m.a; }
+    else if (m.t < IMP + 0.45 && !cast) { P.state = 'recover'; P.t = Math.max(0.01, IMP + 0.45 - m.t); }
+    else { P.state = 'idle'; P.act = null; }
+    if (cls === 'rogue') for (let i = 0; i < 7; i++) once('c' + i, 0.3 + i * 0.12, () => { const a = rand(0, 6.28); fx.push({ k: 'trail', x1: e.x + Math.cos(a) * 110, y1: e.y + Math.sin(a) * 110, x2: e.x - Math.cos(a) * 110, y2: e.y - Math.sin(a) * 110, col, t: 0, life: 0.22 }); blood(e.x, e.y, 7, a); e.flash = 0.08; G.sfx('swing'); shake = Math.max(shake, 4); });
+    if (cls === 'sorcerer') { once('beam', 0.45, () => { fx.push({ k: 'bolt', x1: P.x, y1: P.y, x2: e.x, y2: e.y, col, t: 0, life: IMP - 0.45 }); G.sfx('zap'); }); if (m.t > 0.45 && m.t < IMP) { e.flash = 0.05; gfx.emit(e.x / S + rand(-0.4, 0.4), rand(0.3, 1.8), e.y / S + rand(-0.4, 0.4), 0, 3, 0, 0.4, col, 0); } }
+    if (cls === 'cleric') once('sky', 0.4, () => { zones.push({ x: e.x, y: e.y, r: 78, delay: IMP - 0.4, t: 0, owner: P, ab: { type: 'aoe', dmg: [1, 1], radiant: 1, color: col } }); G.sfx('holy'); });
+    once('imp', IMP, () => {
+      const ash = cls === 'sorcerer';
+      if (!cast) fx.push({ k: 'slash', x: P.x, y: P.y, a: m.a, r: 150, arc: 3.4, col, t: 0, life: 0.35 });
+      fx.push({ k: 'blast', x: e.x, y: e.y, r: 100, col, t: 0, life: 0.6, pillar: cls === 'cleric' });
+      fx.push({ k: 'ring', x: e.x, y: e.y, r: 240, col, t: 0, life: 0.7 });
+      spark(e.x, e.y, 30, col, 40, 420); flashLight(e.x, e.y, col, 170); shake = 22; hitstop = 0.22;
+      if (!ash) { blood(e.x, e.y, 70); blood(e.x, e.y, 40, m.a); }
+      makeGibs(e, ash); e.vis.g.visible = false; if (e.vis.tele) { sc.remove(e.vis.tele); e.vis.tele = null; }
+      e.state = 'ko'; e.koT = 9; e.st = {};
+      hype = 100; arena.setHype(1); G.sfx('boom'); G.sfx('crit'); G.sfx('cheer'); if (G.rumble) G.rumble(400, 1);
+      text(e, G.MORTAL[cls].word, col, true);
+    });
+    once('roar', IMP + 0.55, () => { G.sfx('cheer'); G.sfx('win'); G.ui.banner('Victory', 'The pit erupts', 'win mortal'); });
+    once('roar2', IMP + 1.3, () => G.sfx('cheer'));
+    if (m.t > IMP + 2.3) { phase = 'ko'; phaseT = 0.35; }
+  }
+
   // ------------------------------------------------------------------ damage
   function hit(att, tgt, ab, o) {
     o = o || {};
@@ -215,6 +296,7 @@
       if (tgt.isPlayer) addHype(15);
       return false;
     }
+    if (tgt.state === 'parry' && tgt.parryT > 0 && ab.type !== 'aura' && !o.noCounter && !o.dot) { parried(att, tgt, ab, o); return false; }
     if (tgt.guard > 0 && ab.type !== 'aura' && !o.noCounter && !o.dot) {
       if (ab.basic) {
         tgt.guardHits = (tgt.guardHits || 0) + 1; text(tgt, 'BLOCKED', '#cfd8e0'); G.sfx('clang'); spark(tgt.x, tgt.y, 36, '#ffe9a0', 7, 150); tgt.flash = 0.04; if (att.isPlayer) addHype(-4);
@@ -238,7 +320,8 @@
     if (tgt.st.mark) mul *= 1.25;
     if (att.d.tactical && (tgt.st.stun || tgt.st.slow)) mul *= 1.3;
     let tag = null; const real = ab.type !== 'aura' && !o.dot;
-    if (real && tgt.state === 'wind' && tgt.act) { mul *= 1.25; tag = 'COUNTER'; } else if (real && tgt.state === 'recover') { mul *= 1.4; tag = 'PUNISH'; }
+    if (real && tgt.state === 'wind' && tgt.act) { mul *= 1.25; tag = 'COUNTER'; } else if (real && (tgt.state === 'recover' || tgt.state === 'parry')) { mul *= 1.4; tag = 'PUNISH'; }
+    if (o.proj && o.proj.dis) mul *= 0.75;
     dmg = Math.max(1, Math.round(dmg * mul * (1 - tgt.d.dr)));
     if (tgt.shield > 0) { const a = Math.min(tgt.shield, dmg); tgt.shield -= a; dmg -= a; if (a) text(tgt, 'WARD -' + a, '#ffe9a0'); }
     if (dmg > 0) {
@@ -250,7 +333,7 @@
     tgt.hurt = 0.28;
     tgt.flash = 0.12; hitstop = Math.max(hitstop, crit ? 0.09 : 0.045); shake = Math.max(shake, crit ? 9 : 4);
     spark(tgt.x, tgt.y, 34, ab.color || '#fff', crit ? 18 : 9, crit ? 260 : 170);
-    spark(tgt.x, tgt.y, 30, '#c01818', 6, 120);
+    blood(tgt.x, tgt.y, crit ? 18 : 9, o.from != null ? o.from : Math.atan2(tgt.y - att.y, tgt.x - att.x));
     flashLight(tgt.x, tgt.y, ab.color || '#ffffff', crit ? 40 : 18);
     G.sfx(crit ? 'crit' : tgt.isPlayer ? 'hurt' : 'hit');
     if (G.rumble) G.rumble(tgt.isPlayer ? 160 : crit ? 110 : 50, tgt.isPlayer ? 0.8 : crit ? 0.6 : 0.25);
@@ -282,7 +365,8 @@
   }
   function interrupt(e) { if (e.state === 'wind' || e.state === 'recover') { e.state = 'idle'; e.act = null; e.z = 0; } e.chain = null; }
   function ko(e) {
-    e.hp = 0; e.state = 'ko'; e.koT = 0; e.st = {}; e.buffs = {}; e.act = null; e.z = 0;
+    e.hp = 0; if (!e.isPlayer && !F.ex && phase === 'fight') return startMortal(e);
+    e.state = 'ko'; e.koT = 0; e.st = {}; e.buffs = {}; e.act = null; e.z = 0;
     phase = 'ko'; phaseT = 2.4; shake = 16; hitstop = 0.18;
     result = { win: !e.isPlayer };
     G.ui.banner(result.win ? 'KNOCKOUT' : 'DEFEATED', '', result.win ? 'win' : 'loss');
@@ -305,6 +389,7 @@
       e.mash = Math.min(6, (e.mash || 0) + 1);
       if (ab.type === 'melee') { act.step = (e.cStep != null && time - (e.cEnd || -9) < 0.42) ? (e.cStep + 1) % 3 : 0; if (act.step === 2) { act.fin = 1; act.total = ab.wind * 1.75; } }
     } else e.mash = 0;
+    if ((ab.type === 'proj' || ab.type === 'line') && Math.hypot(e.foe.x - e.x, e.foe.y - e.y) < 82) { act.dis = 1; act.total *= 1.45; if (time - (e.disT || -9) > 1.6) { e.disT = time; text(e, 'DISADVANTAGE', '#c0a0ff'); } }
     if (ab.type === 'aoe' && ab.at === 'point') {
       let dx = I.pt.x - e.x, dy = I.pt.y - e.y; const d = Math.hypot(dx, dy) || 1;
       if (d > ab.castRange) { dx *= ab.castRange / d; dy *= ab.castRange / d; }
@@ -359,14 +444,14 @@
       const n = ab.count || 1;
       for (let i = 0; i < n; i++) {
         const aa = a + (n > 1 ? (i / (n - 1) - 0.5) * ab.spread : 0);
-        projs.push({ x: e.x + Math.cos(aa) * 20, y: e.y + Math.sin(aa) * 20, vx: Math.cos(aa) * ab.speed, vy: Math.sin(aa) * ab.speed, a: aa, r: ab.pr, owner: e, ab, t: 0 });
+        projs.push({ x: e.x + Math.cos(aa) * 20, y: e.y + Math.sin(aa) * 20, vx: Math.cos(aa) * ab.speed, vy: Math.sin(aa) * ab.speed, a: aa, r: ab.pr, owner: e, ab, t: 0, dis: act.dis });
       }
       if (!ab.basic) G.sfx(ab.fire ? 'fire' : ab.slow ? 'ice' : ab.radiant ? 'holy' : 'swing');
     } else if (ab.type === 'line') {
       const x2 = e.x + Math.cos(a) * ab.range, y2 = e.y + Math.sin(a) * ab.range;
       fx.push({ k: 'bolt', x1: e.x, y1: e.y, x2, y2, col: ab.color, t: 0, life: 0.3 });
       G.sfx('zap'); shake = Math.max(shake, 6); flashLight(e.x + Math.cos(a) * 120, e.y + Math.sin(a) * 120, ab.color, 60);
-      if (segDist(foe.x, foe.y, e.x, e.y, x2, y2) < ab.width + ER) hit(e, foe, ab, { from: a });
+      if (segDist(foe.x, foe.y, e.x, e.y, x2, y2) < ab.width + ER) hit(e, foe, ab, { from: a, power: act.dis ? 0.75 : 1 });
     } else if (ab.type === 'aoe') {
       let x = e.x, y = e.y;
       if (ab.at === 'point' && !ab.leap) { x = act.pt.x; y = act.pt.y; }
@@ -399,6 +484,7 @@
   // ------------------------------------------------------------------ entity update
   function updateEntity(e, dt) {
     e.iframe = Math.max(0, e.iframe - dt); e.flash = Math.max(0, e.flash - dt); e.dodgeT = Math.max(0, e.dodgeT - dt);
+    e.parryCd = Math.max(0, (e.parryCd || 0) - dt);
     e.mash = Math.max(0, (e.mash || 0) - dt * 0.9); if (e.guard > 0) e.guard -= dt; e.hurt = Math.max(0, (e.hurt || 0) - dt);
     for (const k in e.cds) if (e.cds[k] > 0) e.cds[k] -= dt * (1 + e.d.cdr);
     if (e.state === 'ko') { e.koT += dt; return; }
@@ -424,7 +510,7 @@
         if (e.hp <= 0) { ko(e); return; }
       }
     }
-    if (e.chain) { e.chain.t -= dt; if (e.chain.t <= 0) { doDash(e, e.chain.ab); if (--e.chain.n <= 0) e.chain = null; else e.chain.t = 0.17; } }
+    if (e.chain) { e.chain.t -= dt; if (e.chain.t <= 0) { doDash(e, e.chain.ab); if (!e.chain || --e.chain.n <= 0) e.chain = null; else e.chain.t = 0.17; } }
 
     const I = e.intent, spd = 1 + (e.buffs.haste ? e.buffs.haste.amt : 0);
     let mv = 0;
@@ -433,8 +519,9 @@
     if (I.queue.length) { e.buf = { id: I.queue.shift(), t: 0.3 }; I.queue.length = 0; }
     if (e.buf) { e.buf.t -= dt; if (e.buf.t <= 0) e.buf = null; }
 
-    if (e.state === 'dodge') {
-      e.t -= dt; e.x += Math.cos(e.da) * 560 * dt; e.y += Math.sin(e.da) * 560 * dt;
+    if (e.state === 'parry') { e.t -= dt; e.parryT -= dt; if (e.t <= 0) e.state = 'idle'; }
+    else if (e.state === 'dodge') {
+      e.t -= dt; e.x += Math.cos(e.da) * (e.dSpd || 560) * dt; e.y += Math.sin(e.da) * (e.dSpd || 560) * dt;
       if (Math.random() < 0.5) gfx.emit(e.x / S, 0.1, e.y / S, 0, 0.5, 0, 0.3, 0x4a4038, 0);
       if (e.t <= 0) e.state = 'idle';
     } else if (e.state === 'wind') {
@@ -451,14 +538,18 @@
       e.t -= dt * spd; mv = 0.5;
       if (e.t <= 0) { if (e.act && e.act.ab.basic) { e.cStep = e.act.missed ? null : e.act.step; e.cEnd = time; } e.state = 'idle'; e.act = null; }
     }
-    if (e.state === 'idle' || (e.state === 'recover' && e.buf && e.buf.id === 'dodge')) {
+    if (e.state === 'idle' || (e.state === 'recover' && e.buf && (e.buf.id === 'dodge' || e.buf.id === 'parry'))) {
       if (e.state === 'idle') mv = 1;
       const b = e.buf;
-      if (b && b.id === 'dodge') {
+      if (b && b.id === 'parry') {
+        if ((e.parryCd || 0) <= 0 && e.res >= 8) { e.res -= 8; e.parryT = parryWindow(e); e.parryCd = 0.85; e.state = 'parry'; e.t = e.parryT + 0.34; e.act = null; e.buf = null; mv = 0; G.sfx('swing'); }
+        else e.buf = null;
+      } else if (b && b.id === 'dodge') {
         if (e.dodgeT <= 0 && e.res < 10 && e.isPlayer && time - (e.windedT || -9) > 1.2) { e.windedT = time; text(e, 'WINDED', '#9aa3ad'); G.sfx('deny'); e.buf = null; }
         else if (e.dodgeT <= 0 && e.res >= 10) {
           const a = (I.mx || I.my) ? Math.atan2(I.my, I.mx) : I.aim + Math.PI;
           e.res -= 10; e.dodgeStart = time; e.perfect = 0;
+          e.dSpd = 560 * (!e.C.ranged && Math.cos(a - Math.atan2(e.foe.y - e.y, e.foe.x - e.x)) > 0.5 ? 1.3 : 1);       // melee close the gap faster
           e.state = 'dodge'; e.t = 0.3; e.da = a; e.iframe = 0.22; e.dodgeT = e.d.dodgeCd; e.dodgeCredit = 0; e.act = null; e.buf = null; G.sfx('dodge'); mv = 0;
         }
       } else if (e.state === 'idle') {
@@ -469,7 +560,8 @@
     }
     if (mv > 0 && (I.mx || I.my) && Math.abs(e.kx) + Math.abs(e.ky) < 60) {       // no walking while being thrown
       const l = Math.hypot(I.mx, I.my) || 1, m = Math.min(1, l);
-      const v = e.d.speed * mv * m * (e.st.slow ? 1 - e.st.slow.amt : 1) * (1 + (e.buffs.speed ? e.buffs.speed.amt : 0));
+      let v = e.d.speed * mv * m * (e.st.slow ? 1 - e.st.slow.amt : 1) * (1 + (e.buffs.speed ? e.buffs.speed.amt : 0));
+      { const fd = Math.hypot(e.foe.x - e.x, e.foe.y - e.y) || 1; if (fd < 430 && (I.mx * (e.foe.x - e.x) + I.my * (e.foe.y - e.y)) / (l * fd) < -0.5) v *= 0.8; }       // backpedalling is slow
       e.x += I.mx / l * v * dt; e.y += I.my / l * v * dt; const w0 = e.walk; e.walk += dt * 13 * m; e.moving = true;
       if (Math.floor(e.walk / Math.PI) !== Math.floor(w0 / Math.PI)) G.sfx('step');
     }
@@ -521,15 +613,22 @@
     if (seen && foe.state === 'wind' && foe.act && !foe.act.seen) {
       foe.act.seen = 1; const ab = foe.act.ab;
       const threat = ab.type === 'melee' ? d < ab.range + (ab.lunge || 0) + 30 : ab.type === 'line';
-      if (threat && Math.random() < ai.dodge) e.react = { t: Math.min(ab.wind * 0.6, ai.react * 0.4) };
+      if (threat && e.res >= 8 && Math.random() < ai.parry) e.react = { t: Math.max(0, foe.t - parryWindow(e) * 0.55), parry: 1 };
+      else if (threat && Math.random() < ai.dodge * (foe.act.fin ? 2 : 1)) e.react = { t: Math.min(ab.wind * 0.6, ai.react * 0.4) };
     }
-    for (const p of projs) if (p.owner !== e && !p.seen && Math.hypot(p.x - e.x, p.y - e.y) < 170) { p.seen = 1; if (Math.random() < ai.dodge) e.react = { t: 0.03, side: 1 }; }
-    if (e.react) { e.react.t -= dt; if (e.react.t <= 0) { if (e.react.side) { I.mx = -uy * e.strafe; I.my = ux * e.strafe; } I.queue.push('dodge'); e.react = null; } }
+    for (const p of projs) if (p.owner !== e && !p.seen && Math.hypot(p.x - e.x, p.y - e.y) < 170) { p.seen = 1; if (e.res >= 8 && Math.random() < ai.parry) e.react = { t: 0.1, parry: 1 }; else if (Math.random() < ai.dodge) e.react = { t: 0.03, side: 1 }; }
+    if (e.react) { e.react.t -= dt; if (e.react.t <= 0) { if (e.react.side) { I.mx = -uy * e.strafe; I.my = ux * e.strafe; } I.queue.push(e.react.parry ? 'parry' : 'dodge'); e.react = null; } }
+    // rules the AI plays by: rest when winded, never swing into a raised parry, punish whatever leaves the foe open
+    if (e.res < 14) e.rest = 1; else if (e.res > 45) e.rest = 0;
+    const open = seen && (foe.state === 'recover' || (foe.state === 'parry' && foe.parryT <= 0) || !!foe.st.stun), turtled = foe.state === 'parry' && foe.parryT > 0;
+    if (e.rest && !e.C.ranged && d < 150) { I.mx = -ux; I.my = -uy; e.combo = 0; }
+    if (turtled) e.combo = 0;
+    if (open && !e.rest && e.state === 'idle' && d < A[e.basic].range + 30 && e.punT !== foe.act) { e.punT = foe.act || time; if (Math.random() < ai.aggro * 0.4 + 0.1) { e.combo = Math.max(e.combo, 2); const big = e.kit.find(id => A[id].type === 'melee' && !A[id].heal && canUse(e, id)); if (big && Math.random() < ai.aggro * 0.7) I.queue.push(big); } }
     e.think -= dt;
-    if (e.combo > 0 && e.state === 'idle' && d < A[e.basic].range + 14) I.attack = true;
+    if (e.combo > 0 && !turtled && !e.rest && e.state === 'idle' && d < A[e.basic].range + 14) I.attack = true;
     if (e.think <= 0 && e.state === 'idle') {
       e.think = ai.react * rand(0.6, 1.4);
-      if (!seen) return;
+      if (!seen || e.rest || turtled) return;
       if (ai.guard && (foe.mash || 0) >= 3 && d < 115 && Math.random() < ai.guard) { e.guard = 1.3; e.guardHits = 0; e.combo = 0; return; }
       const healId = e.kit.find(id => A[id].heal && canUse(e, id) && inRange(e, A[id], d));
       if (healId) { I.queue.push(healId); return; }
@@ -562,7 +661,8 @@
     I.attack = In.mouse.down || In.touchAtk || k.KeyJ || !!(pad && pad.atk);
     while (In.pressed.length) {
       const a = In.pressed.shift();
-      if (a === 'dodge' || a === 'potion') I.queue.push(a);
+      if (a === 'dodge' || a === 'potion' || a === 'parry') I.queue.push(a);
+      else if (a === 'assist') callSecond();
       else if (a === 'ult') { if (P.ult) I.queue.push(P.ult); }
       else { const id = P.kit[+a[1]]; if (id) I.queue.push(id); }
     }
@@ -575,36 +675,41 @@
     let dt = rdt * F.speed;
     if (hitstop > 0) { hitstop -= dt; dt *= 0.05; }
     if (phase === 'ko') dt *= 0.45;
+    if (phase === 'mortal') dt *= 0.8;
     time += dt; shake = Math.max(0, shake - dt * 40);
     if (phase === 'intro') { phaseT -= dt; G.input.pressed.length = 0; if (phaseT <= 0.6 && !F.said) { F.said = 1; G.ui.banner('FIGHT!', '', 'win'); } if (phaseT <= 0) { phase = 'fight'; G.ui.banner(null); } }
     if (phase === 'fight' && F.ex) { exThink(P); exThink(E); }
     else if (phase === 'fight') {
-      if (G.debugAuto) { if (!P.ai) P.ai = { react: 0.3, aggro: 0.7, dodge: 0.3 }; think(P, dt); } else playerIntent();
+      if (G.debugAuto) { if (!P.ai) P.ai = { react: 0.3, aggro: 0.7, dodge: 0.3, parry: 0.15 }; think(P, dt); } else playerIntent();
       think(E, dt);
       hype = Math.max(0, hype - dt * 1.2);
     } else { P.intent.mx = P.intent.my = E.intent.mx = E.intent.my = 0; P.intent.attack = E.intent.attack = false; P.intent.queue.length = E.intent.queue.length = 0; }
     updateEntity(P, dt); updateEntity(E, dt);
+    if (phase === 'mortal') mortalStep(dt);
 
     for (let i = projs.length - 1; i >= 0; i--) {
-      const p = projs[i]; p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt;
+      const p = projs[i]; if (!p) break; p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt;
       const f = p.owner.foe; let dead = false;
       if (Math.random() < 0.7) gfx.emit(p.x / S, 1.05, p.y / S, rand(-0.6, 0.6), rand(-0.3, 0.6), rand(-0.6, 0.6), 0.25, p.ab.color, 0);
       if (!p.passed && f.state !== 'ko' && f.z < 30 && Math.hypot(p.x - f.x, p.y - f.y) < p.r + ER) {
         const dodged = f.iframe > 0;
-        hit(p.owner, f, p.ab, { from: p.a });
-        if (dodged) p.passed = 1; else dead = true;
+        hit(p.owner, f, p.ab, { from: p.a, proj: p });
+        if (p.reflect) { p.reflect = 0; p.owner = f; p.vx *= -1.2; p.vy *= -1.2; p.a += Math.PI; p.t = 0; p.dis = 0; if (p.m) p.m.rotation.y = -p.a; }
+        else if (dodged) p.passed = 1; else dead = true;
       }
       if (!dead && (!inArena(p.x, p.y, 30) || p.t > 2)) { spark(p.x, p.y, 30, p.ab.color, 6, 80); dead = true; }
+      if (projs[i] !== p) break;                 // the list was cleared mid-loop (a killing blow)
       if (dead) { if (p.m) sc.remove(p.m); projs.splice(i, 1); }
     }
     for (let i = zones.length - 1; i >= 0; i--) {
-      const z = zones[i]; z.t += dt;
+      const z = zones[i]; if (!z) break; z.t += dt;
       if (z.t >= z.delay) {
         const f = z.owner.foe, ab = z.ab;
         fx.push({ k: 'blast', x: z.x, y: z.y, r: z.r, col: ab.color, t: 0, life: 0.5, pillar: ab.radiant });
         spark(z.x, z.y, 20, ab.color, 26, z.r * 2.6); flashLight(z.x, z.y, ab.color, z.r > 80 ? 120 : 50);
         shake = Math.max(shake, z.r > 80 ? 12 : 5); G.sfx(ab.radiant ? 'holy' : 'boom');
         if (f.z < 30 && Math.hypot(f.x - z.x, f.y - z.y) < z.r + ER * 0.6) hit(z.owner, f, ab, { from: Math.atan2(f.y - z.y, f.x - z.x) });
+        if (zones[i] !== z) break;
         if (z.m) sc.remove(z.m); zones.splice(i, 1);
       }
     }
@@ -620,6 +725,19 @@
     arena.flash.intensity *= Math.pow(0.0005, dt); if (arena.flash.intensity < 0.3) arena.flash.intensity = 0;
     if (F.ex) { gfx.cam.shake = shake / 45; return; }
     arena.setHype(hype / 100);
+    for (const g of gibs) { if (g.rest) continue; g.vy -= 20 * dt; g.m.position.x += g.vx * dt; g.m.position.y += g.vy * dt; g.m.position.z += g.vz * dt; g.m.rotation.x += g.rx * dt; g.m.rotation.z += g.rz * dt;
+      if (g.m.position.y < 0.08) { g.m.position.y = 0.08; if (Math.abs(g.vy) < 2) { g.rest = 1; if (!g.ash && gore()) gfx.splat(g.m.position.x, g.m.position.z, rand(0.5, 1.1)); } else { g.vy *= -0.35; g.vx *= 0.6; g.vz *= 0.6; if (!g.ash && gore() && Math.random() < 0.5) gfx.splat(g.m.position.x, g.m.position.z, rand(0.3, 0.7)); } } }
+    if (phase === 'mortal' && M) {                         // close orbiting camera for the kill
+      // camera stands toward the middle of the pit and looks outward, so the wall and crowd are the backdrop
+      const e = M.e, k = Math.min(1, M.t / 1.2), ex = e.x / S, ez = e.y / S, cd = Math.hypot(ex, ez);
+      const base = cd > 1.5 ? Math.atan2(-ez, -ex) : M.a + 2.1, th = base + 0.55 - M.t * 0.3, r = G.lerp(7.2, 5.6, k) + Math.max(0, M.t - 1.2) * 1.4;
+      const pos = [ex + Math.cos(th) * r, G.lerp(1.6, 2.5, k) + Math.max(0, M.t - 1.2) * 0.8, ez + Math.sin(th) * r];
+      const pl = Math.hypot(pos[0], pos[2]); if (pl > 6.6) { pos[0] *= 6.6 / pl; pos[2] *= 6.6 / pl; }
+      [P, e].forEach(q => { const dx = pos[0] - q.x / S, dz = pos[2] - q.y / S, d = Math.hypot(dx, dz) || 0.01; if (d < 3.4) { pos[0] = q.x / S + dx / d * 3.4; pos[2] = q.y / S + dz / d * 3.4; } });
+      gfx.cine = { pos, look: [(e.x * 2 + P.x) / 3 / S, 1.0, (e.y * 2 + P.y) / 3 / S], fov: gfx.portrait ? 82 : 54, roll: 0.04 };
+      gfx.cam.shake = shake / 45; document.getElementById('foeArrow').className = 'hidden'; return;
+    }
+    if (gfx.cine && !F.ex) gfx.cine = null;
     // camera frames both fighters
     const c = gfx.cam, dx = (P.x - E.x) / S, dz = (P.y - E.y) / S, port = gfx.portrait;
     const sw = Math.abs(dx - dz) * 0.7071, sh = Math.abs(dx + dz) * 0.7071 * 0.5;
@@ -653,7 +771,7 @@
   F.exStop = function () {
     if (F.P) [F.P, F.E].forEach(e => { if (e.vis) { sc.remove(e.vis.g); if (e.vis.tele) sc.remove(e.vis.tele); e.vis = null; } });
     (fx || []).forEach(killFx); (projs || []).forEach(p => p.m && sc.remove(p.m)); (zones || []).forEach(z => z.m && sc.remove(z.m));
-    fx = []; projs = []; zones = []; gfx.clearFloats(); F.ex = null; F.active = false; F.speed = 1; hitstop = 0; shake = 0; gfx.cam.shake = 0;
+    fx = []; projs = []; zones = []; clearGibs(); if (sc) gfx.clearBlood(sc); gfx.clearFloats(); F.ex = null; F.active = false; F.speed = 1; hitstop = 0; shake = 0; gfx.cam.shake = 0;
     if (arena) arena.flash.intensity = 0;
   };
   F.exStart = function (a, b, pa, pb) {
@@ -692,6 +810,9 @@
       tips: win && hy >= 80, stolen
     };
     if (result.forfeit) { r.xp = 0; r.coin = 0; }
+    if (!win) { r.lost = Math.round(st.coin * 0.2); st.coin -= r.lost; }
+    r.mortal = win ? G.MORTAL[P.cls].name : null; gfx.cine = null; G.afterFight = true;
+    if (G.crew) r.crew = G.crew.tick();
     st.potions = Math.max(0, Math.min(P.startPotions, P.potions));
     if (win) st.wins[opp.id] = (st.wins[opp.id] || 0) + 1; else st.losses++;
     const rank0 = G.rankOf(st.respect);

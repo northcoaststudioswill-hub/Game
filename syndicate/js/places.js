@@ -71,7 +71,21 @@
     barrel(s, 0.2, 8.6); barrel(s, 1.0, 9.0); barrel(s, 16.6, 4.2); crate(s, 0.1, 1.2, 0.7);
     lantern(s, 5.5, 0, 8.8, 0xffb060, 16); lantern(s, 16.8, 0, 2.2, 0xffb060, 0);
     box(1.7, 1.25, 0.1, woodD(), 7.0, 1.9, -1.5, s); [[-0.45, 0.2, 0.5, 0.6], [0.3, 0.25, 0.55, 0.45], [0.05, -0.3, 0.7, 0.4], [-0.5, -0.32, 0.36, 0.34]].forEach(q => { const m = new T.Mesh(new T.PlaneGeometry(q[2], q[3]), new T.MeshLambertMaterial({ color: 0xdccba3 })); m.position.set(7.0 + q[0], 1.9 + q[1], -1.43); m.rotation.z = q[0] * 0.2; s.add(m); });
-    const npcs = [fence, gm, idle1];
+    // the Low Lamp tavern, where your Tally drinks
+    doorway(s, -1.45, 1.7, Math.PI / 2, 0xffb060, 1.4, 2.4);
+    box(0.08, 0.5, 0.9, woodD(), -1.0, 3.1, 1.7, s); { const lm = new T.Mesh(new T.BoxGeometry(0.2, 0.26, 0.2), emis(0xffe0a0)); lm.position.set(-0.8, 2.7, 1.7); s.add(lm); gfx.fire(s, -0.8, 2.5, 1.7, 0xffb060, 0.4, 12); }
+    barrel(s, -0.3, 0.4); box(0.9, 0.08, 0.6, wood(), 0.3, 0.55, 3.0, s); box(0.1, 0.55, 0.1, woodD(), 0.3, 0.27, 3.0, s);
+    // a beggars' fire, strung lamps, puddles
+    mesh(new T.CylinderGeometry(0.4, 0.34, 0.8, 8), iron(), 16.4, 0.4, 8.6, s); gfx.fire(s, 16.4, 0.9, 8.6, 0xff8a30, 0.7, 14);
+    const sit = npc(s, { cls: 'rogue', race: 'dwarf', tint: { cloth: '#3a3028', armor: '#3a3430' } }, 15.3, 8.9, 1.2), sit2 = npc(s, { cls: 'cleric', race: 'human', tint: { cloth: '#4a4238', armor: '#3a3632' } }, 16.9, 7.6, -2.6);
+    [[2, 8], [9, 13], [13.5, 17]].forEach((q, n) => { for (let i = 0; i <= 8; i++) { const u = i / 8, x = q[0] + (q[1] - q[0]) * u, y = 4.3 - Math.sin(u * Math.PI) * 0.7, z = -1.2 + u * 0.0 + n * 0.0; if (i % 2 === 0) { const b = new T.Mesh(new T.SphereGeometry(0.07, 6, 5), emis([0xffc070, 0xc080ff, 0x80d0ff][(i / 2 + n) % 3])); b.position.set(x, y, z + 0.4); s.add(b); gfx.glow([0xffc070, 0xc080ff, 0x80d0ff][(i / 2 + n) % 3], 0.6, x, y, z + 0.4, s, 0.5); } } });
+    [[4.5, 5.5, 1.6], [11, 6.8, 1.1], [7.5, 2.5, 0.9], [13.8, 3.6, 1.3]].forEach(q => { const d = new T.Mesh(new T.CircleGeometry(q[2], 14), new T.MeshBasicMaterial({ color: 0x1a2030, transparent: true, opacity: 0.55, depthWrite: false })); d.rotation.x = -Math.PI / 2; d.position.set(q[0], 0.012, q[1]); d.scale.z = 0.6; s.add(d); });
+    // people going about their business
+    const TINTS = [{ cloth: '#5a3a2a', armor: '#4a4038' }, { cloth: '#2a4a5a', armor: '#3a4048' }, { cloth: '#5a2a4a', armor: '#3a3040' }, { cloth: '#3a5a3a', armor: '#3a4038' }, { cloth: '#6a5a3a', armor: '#4a4438' }];
+    const walkers = [[[1, 6.5], [16, 6.2]], [[15.5, 4.6], [2.5, 4.2]], [[5, 8.4], [12, 2.6]], [[13, 8.6], [8.5, 3.4]], [[2, 2.6], [6.5, 7.6]]].map((pth, i) => ({ c: npc(s, { cls: ['rogue', 'cleric', 'fighter', 'sorcerer', 'rogue'][i], race: Object.keys(G.RACES)[i % 5], tint: TINTS[i] }, pth[0][0], pth[0][1], 0), a: pth[0], b: pth[1], u: Math.random(), dir: 1, wait: 0, sp: 0.045 + i * 0.008 }));
+    const CHAT = ['…heard Vexa has never once blinked.', 'Guild raised the rent again.', 'Glowcaps are coming in nicely.', 'Put ten coin on the new one. Ten!', 'Nobody leaves the Ledger.', 'Different carts, he says.', 'My cousin fought Brakk. Once.', 'The Light went ahead to wait.', 'They say the Keeper never sleeps.', 'Highmarch sealed another stair.'];
+    let chatT = 4;
+    const npcs = [fence, gm, idle1, sit, sit2];
     const obstacles = [[8.6, -1.6, 11.8, 0.7], [14.8, -1, 16.4, 0.6], [12.4, 6.6, 15.6, 8.6], [6.1, -1.2, 7.9, -0.1], [1.2, -1.2, 2.0, -0.3], [5.2, -1.2, 6.0, -0.3], [-0.3, 8.2, 1.4, 9.4], [16.2, 3.8, 17, 4.6], [5.2, 8.5, 5.8, 9.1]];
     return {
       scene: s, start: { x: 8, z: 5 }, zoom: [12.5, 21],
@@ -80,11 +94,20 @@
         { x: 7.0, z: 0.7, r: 1.4, y: 3.0, label: 'Notice Board', act: 'Read the Codex', go: () => G.ui.codex() },
         { x: 10.2, z: 1.3, r: 1.9, y: 3.2, label: 'The Fence', act: 'Trade', go: () => G.ui.shop() },
         { x: 15.6, z: 1.3, r: 1.9, y: 3.2, label: 'Guildmaster', act: 'Character', go: () => G.ui.sheet() },
-        { x: -0.2, z: 5.2, r: 1.9, y: 3.6, label: 'Your Hideout', act: 'Go home', go: () => G.ui.hideout() }
+        { x: -0.2, z: 5.2, r: 1.9, y: 3.6, label: 'Your Hideout', act: 'Go home', go: () => G.ui.hideout() },
+        { x: -0.2, z: 1.7, r: 1.5, y: 3.5, label: 'The Low Lamp', act: 'See your Tally', go: () => G.ui.tally() }
       ],
       blocked: (x, z) => x < -0.55 || x > X1 + 0.9 || z < -0.75 || z > Z1 + 0.9 || obstacles.some(o => x > o[0] - 0.35 && x < o[2] + 0.35 && z > o[1] - 0.35 && z < o[3] + 0.35),
       update: (t) => {
         npcs.forEach((c, i) => c.pose({ t: t + i * 2, act: 'idle' }));
+        const dt2 = 0.016;
+        walkers.forEach(w => {
+          if (w.wait > 0) { w.wait -= dt2; w.c.pose({ t, act: 'idle' }); return; }
+          w.u += w.dir * w.sp * dt2 * 4; if (w.u > 1 || w.u < 0) { w.u = Math.max(0, Math.min(1, w.u)); w.dir *= -1; w.wait = 1.5 + Math.random() * 3; }
+          const x = w.a[0] + (w.b[0] - w.a[0]) * w.u, z = w.a[1] + (w.b[1] - w.a[1]) * w.u; w.c.root.position.set(x, 0, z);
+          w.c.root.rotation.y = Math.atan2((w.b[0] - w.a[0]) * w.dir, (w.b[1] - w.a[1]) * w.dir); w.c.pose({ t, act: 'idle', moving: true, walk: t * 7 + w.sp * 99 });
+        });
+        chatT -= dt2; if (chatT <= 0 && G.scene === 'hub' && !G.ui.isOpen()) { chatT = 5 + Math.random() * 5; const w = walkers[Math.floor(Math.random() * walkers.length)], p = w.c.root.position; gfx.floatText(p.x, 2.6, p.z, CHAT[Math.floor(Math.random() * CHAT.length)], '#d8ccb0'); }
         if (Math.random() < 0.3) gfx.emit(R(0, X1), R(0.2, 3), R(0, Z1), R(-0.3, 0.3), R(0, 0.2), R(-0.3, 0.3), 2.5, 0x2a2a44, 0);
       }
     };
@@ -165,7 +188,7 @@
 
     const itemsGroup = new T.Group(); s.add(itemsGroup);
     const lights = []; for (let i = 0; i < 9; i++) { const l = new T.PointLight(0xffffff, 0, 8, 1.5); s.add(l); lights.push(l); }
-    let occ = {}, fxItems = [], ghost = null, ghostPad = null;
+    let occ = {}, fxItems = [], ghost = null, ghostPad = null, crewActors = [];
     const H = {
       scene: s, start: { x: 13.5, z: 1.4 }, zoom: [13.5, 23],
       spots: [{ x: 13.5, z: 0.2, r: 1.6, y: 3.5, label: 'Undercity', act: 'Leave', go: () => G.ui.hub() }],
@@ -186,6 +209,8 @@
         while (itemsGroup.children.length) itemsGroup.remove(itemsGroup.children[0]);
         occ = {}; fxItems = []; let li = 0;
         lights.forEach(l => l.intensity = 0);
+        crewActors.forEach(c => s.remove(c.root)); crewActors = [];
+        (G.state.tally || []).filter(t => !t.job).slice(0, 5).forEach((t, i) => { const q = [[12, 3.2, 2.4], [15.6, 3.6, -1.2], [11.6, 6.6, 0.8], [16, 7.6, -2], [12.4, 10.2, 1.6]][i], c = G.makeChar(G.crew.look(t)); c.root.position.set(q[0], 0, q[1]); c.root.rotation.y = q[2]; s.add(c.root); crewActors.push(c); });
         (G.state.items || []).forEach((p, i) => {
           if (p.hidden) return;
           const it = G.DECOR_BY[p.id]; if (!it) return;
@@ -218,6 +243,7 @@
           if (f.fx === 'willow' && Math.random() < 0.25) gfx.emit(f.x + R(-1, 1), R(1, 2.4), f.z + R(-1, 1), 0, -0.25, 0, 1.6, 0x7affc0, 0);
         });
         if (ghost) ghost.position.y = 0.1 + Math.sin(t * 5) * 0.04;
+        crewActors.forEach((c, i) => c.pose({ t: t + i * 1.7, act: 'idle' }));
         if (Math.random() < 0.3) gfx.emit(R(0, GW), R(0.3, 2.5), R(HZ, GD), R(-0.15, 0.15), R(0, 0.15), R(-0.15, 0.15), 3, 0x3a5a6a, 0);
       }
     };

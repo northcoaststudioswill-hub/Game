@@ -322,3 +322,32 @@ h3 .dim { color: var(--dim); }
 .lore p { padding: 0.5rem 0.9rem 0.8rem; margin: 0; color: #d8ccb0; font-size: 1.08rem; line-height: 1.45; }
 .lore.sealed { padding: 0.6rem 0.8rem; color: #6a6272; font-family: var(--display); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; }
 .lore.sealed::before { content: '⛓  '; }
+
+
+/* build tags, path, crew, tailor, events */
+.tagk, .tagr { display: inline-block; font-family: var(--display); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.15em 0.5em; border-radius: 0.2rem; margin-left: 0.45rem; vertical-align: 0.12em; border: 1px solid #0b090d; }
+.tagk { background: #3a2f1c; color: #f0dca0; } .tagr { background: #2a2f3a; color: #cfe0ff; }
+.r-Damage { background: #5a1f1c; color: #ffc8c0; } .r-Control { background: #1f3a5a; color: #c0e0ff; } .r-Heal { background: #1f4a2c; color: #c0ffd0; } .r-Defense { background: #4a431c; color: #fff0b0; } .r-Mobility { background: #3a1f5a; color: #e0c8ff; } .r-Burst, .r-Finisher { background: #5a3a12; color: #ffe0a0; }
+.path { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.3rem; margin: 0.4rem 0 0.6rem; }
+.pstep { position: relative; background: rgba(0, 0, 0, 0.35); border: 1px solid #0b090d; border-radius: 0.3rem; padding: 1.25rem 0.35rem 0.4rem; text-align: center; opacity: 0.6; min-width: 0; }
+.pstep.done { opacity: 1; box-shadow: 0 0 0 1px var(--bronze-hi); background: linear-gradient(rgba(120, 92, 30, 0.35), rgba(0, 0, 0, 0.3)); }
+.pstep span { position: absolute; top: -0.5rem; left: 50%; transform: translateX(-50%); width: 1.5rem; height: 1.5rem; border-radius: 50%; background: #241c2a; border: 1px solid var(--bronze-hi); font-family: var(--display); font-weight: 900; font-size: 0.8rem; line-height: 1.45rem; color: var(--gold); }
+.pstep.done span { background: linear-gradient(#f6d874, #a8741f); color: #20140a; }
+.pstep b { display: block; font-size: 0.78rem; } .pstep small { font-family: var(--body); letter-spacing: 0; font-size: 0.82rem; line-height: 1.15; color: #cfc4ab; }
+.tm { display: flex; gap: 0.8rem; align-items: flex-start; padding: 0.6rem; margin: 0.45rem 0; background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)); border: 1px solid #0b090d; border-radius: 0.35rem; box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6); }
+.tm .row { gap: 0.35rem; margin-top: 0.4rem; } .tm button i { display: block; font-style: normal; font-family: var(--body); text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 0.78rem; color: #b8ad98; }
+.tm button.sel { background: linear-gradient(#7a5c22, #4a3612); }
+.tl-top { display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem; }
+.choices { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.8rem; }
+.choices button { text-align: left; text-transform: none; letter-spacing: 0.02em; font-size: 1rem; padding: 0.6em 0.9em; } .choices small { color: #b8ad98; font-size: 0.68rem; margin-top: 0.15rem; }
+.roll { display: flex; align-items: center; gap: 0.8rem; margin: 0.4rem 0 0.7rem; } .roll small { color: inherit; font-size: 0.8rem; }
+.die { display: grid; place-items: center; width: 3.2rem; height: 3.2rem; flex: none; font-family: var(--title); font-weight: 900; font-size: 1.9rem; color: #fff; background: linear-gradient(135deg, #3a2f4a, #17121c); clip-path: polygon(50% 0, 100% 27%, 100% 73%, 50% 100%, 0 73%, 0 27%); }
+.roll.ok .die { background: linear-gradient(135deg, #2f8a4a, #124a22); } .roll.no .die { background: linear-gradient(135deg, #a3231d, #4a0e0c); }
+.roll.ok b { color: #1f6a34; } .roll.no b { color: #8a1410; } .roll.mini .die { width: 2.4rem; height: 2.4rem; font-size: 1.3rem; } .roll.mini { margin: 0; }
+.card.event .got { font-family: var(--display); font-weight: 900; color: #5e120f; letter-spacing: 0.06em; }
+.card.letter.event h2 { font-size: 1.7rem; }
+#tParry { right: calc(8.2rem + var(--sr)); bottom: calc(6.4rem + var(--sb)); width: 4.4rem; height: 4.4rem; border-color: #ffe9a0; color: #ffe9a0; }
+#hud.touch .ab.py { display: none; } .ab.as { border-color: var(--gold); }
+@media (orientation: portrait) { .path { grid-template-columns: repeat(5, 1fr); } .pstep small { font-size: 0.7rem; } .tm { flex-wrap: wrap; } #hud.touch #abar { right: calc(0.8rem + var(--sr)); max-width: 9rem; } }
+
+#banner.mortal { top: 17%; padding: 0.4rem 0.5rem; } #banner.mortal b { font-size: clamp(1.8rem, 7.5vw, 3.2rem); }

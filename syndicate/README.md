@@ -31,6 +31,19 @@ phone portrait, phone landscape, or a desktop monitor.
   ability breaks the guard and stuns them. A last-instant dodge is a PERFECT DODGE. Knockback into
   the pit wall does damage. Damage is rolled on real dice (1d8 + STR and so on), with crits, stuns,
   slows, burns, poison, wards, stealth and Sneak Attacks.
+- **Parries, one per class:** Fighter Shield Block (widest window, staggers, reflects projectiles),
+  Rogue Riposte (tightest, counter-stabs), Sorcerer Shield (hurls attackers away, reflects),
+  Cleric Warding Flare (heals you, slows them). Better weapons and armour widen the window; a
+  missed parry leaves you open.
+- **Mortal Blows:** a win is a kill. Each class has a finishing move with its own close-up camera
+  (Headsman's Verdict, Death of a Thousand Cuts, Disintegrate, Flame Strike), followed by gore,
+  applause and coins from the crowd. Losing costs a fifth of your purse and nothing else.
+- **Melee against ranged:** ranged attacks made with a foe in your face are at Disadvantage
+  (slower, weaker), backing away is slow, melee dodges toward the foe travel further, and
+  parries deflect or reflect projectiles.
+- **Opponents play by the same rules:** they parry, guard, rest when winded, punish whiffs and
+  failed parries, and will not swing into a raised parry.
+- **Blood:** dark droplets, floor splats and gibs. Toggle it from the pause menu.
 - **Builds:** level 2 ability choice, level 3 subclass (two per class), level 4 feat, level 5
   ultimate. More abilities than slots, so you choose a loadout.
 - **The ladder:** five opponents ending in the Pit Champion.
@@ -45,6 +58,14 @@ phone portrait, phone landscape, or a desktop monitor.
 - **The Guild Codex:** 21 lore entries on the world, the pit, the trades and the fighters, unsealed
   as you win and rank up. Read it at the Notice Board or from the character sheet. The same
   material is in `docs/LORE.md`.
+- **The Tally:** each rank you hold brings one Tallyman, up to five. Send them on jobs that take
+  a number of your bouts and resolve on a d20 roll (shakedowns, smuggling, grave-picking, rumour,
+  sabotage, drilling). One can stand in your corner as your Second, called once per bout. Idle
+  Tallymen hang around your hideout. Manage them at the Low Lamp.
+- **Street events:** after a bout something may happen in the street, resolved with a d20 plus
+  your ability modifier against a DC.
+- **The Tailor's Rack:** 22 cosmetics across dyes, headgear, back pieces, weapon finishes and
+  auras, and armour and weapon tiers that add real plates, spikes and gems to the model.
 - **The Fence:** weapon and armour tiers (which change how your fighter looks) and potions.
 - Progress saves in the browser.
 
@@ -80,6 +101,7 @@ and the rest of the game does not change.
 - `js/models.js` character models and animation
 - `js/world.js` the arena; `js/places.js` the street, the hideout, decor pieces, walking
 - `js/fight.js` combat simulation, AI, and its 3D effects
+- `js/crew.js` mortal blows, cosmetics, events and the Tally
 - `js/cine.js` the opening cinematic; `js/lore.js` codex and bios; `js/music.js` the music sequencer
 - `js/ui.js` menus, HUD, level-up and results screens; `js/main.js` input and main loop
 

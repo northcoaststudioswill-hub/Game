@@ -163,7 +163,44 @@
       P.col[i * 3] = p.r * k; P.col[i * 3 + 1] = p.gc * k; P.col[i * 3 + 2] = p.b * k;
     }
     P.pts.geometry.attributes.position.needsUpdate = true; P.pts.geometry.attributes.color.needsUpdate = true;
+    updateBlood(dt);
   };
+
+  // ------------------------------------------------------------ blood: dark droplets that leave splats on the floor
+  const BN = 260, SN = 70;
+  function bloodSys(sc) {
+    if (sc.userData.blood) return sc.userData.blood;
+    const geo = new T.BufferGeometry(), pos = new Float32Array(BN * 3); for (let i = 0; i < BN; i++) pos[i * 3 + 1] = -999;
+    geo.setAttribute('position', new T.BufferAttribute(pos, 3));
+    const pts = new T.Points(geo, new T.PointsMaterial({ size: 8, map: gfx.tex('glow'), color: 0x8a0d0d, transparent: true, opacity: 0.95, depthWrite: false, sizeAttenuation: false })); pts.frustumCulled = false; sc.add(pts);
+    const splats = []; const mat = () => new T.MeshBasicMaterial({ map: gfx.tex('blood'), transparent: true, opacity: 0.85, depthWrite: false });
+    for (let i = 0; i < SN; i++) { const m = new T.Mesh(new T.PlaneGeometry(1, 1), mat()); m.rotation.x = -Math.PI / 2; m.visible = false; sc.add(m); splats.push(m); }
+    return sc.userData.blood = { pts, pos, list: Array.from({ length: BN }, () => ({ life: 0 })), next: 0, splats, sn: 0 };
+  }
+  gfx.blood = function (x, y, z, n, speed, dir) {
+    if (!scene) return; const B = bloodSys(scene);
+    for (let k = 0; k < n; k++) {
+      const p = B.list[B.next]; B.next = (B.next + 1) % BN;
+      const a = dir == null ? Math.random() * 6.283 : dir + (Math.random() - 0.5) * 1.6, v = (0.25 + Math.random() * 0.75) * speed;
+      p.x = x; p.y = y + Math.random() * 0.4; p.z = z; p.vx = Math.cos(a) * v; p.vz = Math.sin(a) * v; p.vy = 1.5 + Math.random() * 4; p.life = 1.6;
+    }
+  };
+  gfx.splat = function (x, z, size) {
+    if (!scene) return; const B = bloodSys(scene), m = B.splats[B.sn % SN]; B.sn++;
+    m.position.set(x, 0.014 + (B.sn % SN) * 0.0004, z); m.scale.setScalar(size); m.rotation.z = Math.random() * 6.283; m.material.opacity = 0.55 + Math.random() * 0.35; m.visible = true;
+  };
+  gfx.clearBlood = function (sc) { const B = sc && sc.userData.blood; if (!B) return; B.splats.forEach(m => m.visible = false); B.sn = 0; B.list.forEach((p, i) => { p.life = 0; B.pos[i * 3 + 1] = -999; }); B.pts.geometry.attributes.position.needsUpdate = true; };
+  function updateBlood(dt) {
+    const B = scene && scene.userData.blood; if (!B) return;
+    B.pts.material.size = Math.max(3, 0.16 * gfx.pxPerUnit() * renderer.getPixelRatio());
+    for (let i = 0; i < BN; i++) {
+      const p = B.list[i]; if (p.life <= 0) continue;
+      p.life -= dt; p.vy -= 16 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt;
+      if (p.y <= 0.03 || p.life <= 0) { if (p.y <= 0.03 && Math.random() < 0.55) gfx.splat(p.x, p.z, 0.35 + Math.random() * 0.75); p.life = 0; B.pos[i * 3 + 1] = -999; continue; }
+      B.pos[i * 3] = p.x; B.pos[i * 3 + 1] = p.y; B.pos[i * 3 + 2] = p.z;
+    }
+    B.pts.geometry.attributes.position.needsUpdate = true;
+  }
 
   // ------------------------------------------------------------ floating text (DOM, projected)
   const floats = [];

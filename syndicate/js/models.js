@@ -15,13 +15,16 @@
     const cls = look.cls, race = G.RACES[look.race], g = look.gear || {};
     const P = Object.assign({}, BASE[cls]);
     if (look.tint) Object.keys(look.tint).forEach(k => P[k] = hex(look.tint[k]));
+    const cos = look.cos || {}, wsk = cos.weapon && G.WSKIN && G.WSKIN[cos.weapon];
+    if (cos.dye && G.DYES && G.DYES[cos.dye]) Object.assign(P, G.DYES[cos.dye]);
+    if (wsk) P.weapon = wsk.color;
     if (TRIM[g.armor]) P.trim = TRIM[g.armor];
     const mats = [];
     const M = (color, shiny, emissive) => {
       const m = shiny ? new T.MeshPhongMaterial({ color, flatShading: true, shininess: 60, specular: 0x666666 }) : new T.MeshLambertMaterial({ color, flatShading: true });
       m.emissive = new T.Color(emissive || 0); m.userData.e = m.emissive.clone(); mats.push(m); return m;
     };
-    const m = { skin: M(hex(race.skin)), armor: M(P.armor, true), armor2: M(P.armor2, true), trim: M(P.trim, true), cloth: M(P.cloth), legs: M(P.legs), hair: M(P.hair), dark: M(0x15131a), weapon: M(P.weapon, true, WGLOW[g.weapon || 0]) };
+    const m = { skin: M(hex(race.skin)), armor: M(P.armor, true), armor2: M(P.armor2, true), trim: M(P.trim, true), cloth: M(P.cloth), legs: M(P.legs), hair: M(P.hair), dark: M(0x15131a), weapon: M(P.weapon, true, wsk ? wsk.e : WGLOW[g.weapon || 0]) };
     const box = gfx.box, mesh = gfx.mesh;
     const root = new T.Group(), body = new T.Group(); root.add(body);
     const robed = cls === 'sorcerer' || cls === 'cleric';
@@ -42,7 +45,7 @@
     if (cls === 'cleric') { box(0.28, 0.95, 0.46, m.cloth, 0, 0.16, 0.005, torso); const sun = mesh(new T.SphereGeometry(0.09, 8, 6), m.trim, 0, 0.42, 0.23, torso); sun.scale.z = 0.4; }
     if (cls === 'fighter' || cls === 'cleric') [-1, 1].forEach(sd => { const p = mesh(new T.SphereGeometry(0.21, 7, 5), m.trim, sd * (w / 2 + 0.04), 0.64, 0, torso); p.scale.y = 0.7; });
     // cape / cloak
-    let cape = null;
+    let cape = null;  
     if (cls === 'fighter' || cls === 'rogue') { cape = new T.Group(); cape.position.set(0, 0.62, -0.23); torso.add(cape); box(w * 0.86, cls === 'fighter' ? 0.95 : 0.6, 0.05, m.cloth, 0, cls === 'fighter' ? -0.47 : -0.3, 0, cape); cape.rotation.x = 0.16; }
     // head
     const head = new T.Group(); head.position.set(0, 0.92, 0); torso.add(head);
@@ -68,7 +71,7 @@
     [armR, armL].forEach(a => { box(0.2, 0.5, 0.22, sleeve, 0, -0.22, 0, a); mesh(new T.SphereGeometry(0.11, 6, 5), m.skin, 0, -0.52, 0, a); });
     const hand = (arm) => { const h = new T.Group(); h.position.y = -0.52; arm.add(h); return h; };
     const hR = hand(armR), hL = hand(armL);
-    const blade = (h, len) => { box(0.09, 0.04, len, m.weapon, 0, 0, len / 2 + 0.1, h); box(0.3, 0.07, 0.07, m.trim, 0, 0, 0.1, h); if (g.weapon) glows.push(gfx.glow(WCOL[g.weapon], 0.7, 0, 0, len * 0.6, h, 0.55)); };
+    const blade = (h, len) => { box(0.09, 0.04, len, m.weapon, 0, 0, len / 2 + 0.1, h); box(0.3, 0.07, 0.07, m.trim, 0, 0, 0.1, h); if (g.weapon || wsk) glows.push(gfx.glow(wsk ? wsk.glow : WCOL[g.weapon], 0.7, 0, 0, len * 0.6, h, 0.55)); };
     if (cls === 'fighter') {
       blade(hR, 1.0);
       const sh = mesh(new T.CylinderGeometry(0.4, 0.4, 0.07, 6), m.armor2, 0.1, -0.3, 0.12, armL); sh.rotation.z = Math.PI / 2; sh.scale.z = 0.85;
@@ -78,15 +81,41 @@
     if (cls === 'cleric') {
       const hd = mesh(new T.CylinderGeometry(0.035, 0.035, 0.8, 5), m.dark, 0, 0, 0.35, hR); hd.rotation.x = Math.PI / 2;
       mesh(new T.IcosahedronGeometry(0.17, 0), M(P.weapon, true, 0x7a5a10), 0, 0, 0.78, hR);
-      glows.push(gfx.glow(WCOL[g.weapon] || 0xffd060, 1.0, 0, 0, 0.78, hR, 0.6));
+      glows.push(gfx.glow((wsk && wsk.glow) || WCOL[g.weapon] || 0xffd060, 1.0, 0, 0, 0.78, hR, 0.6));
     }
     let orbs = null;
     if (cls === 'sorcerer') {
-      const oc = WCOL[g.weapon] || 0xff8a3c;
+      const oc = (wsk && wsk.glow) || WCOL[g.weapon] || 0xff8a3c;
       orbs = [hR, hL].map(h => { const o = new T.Mesh(new T.SphereGeometry(0.1, 8, 6), new T.MeshBasicMaterial({ color: 0xfff0c0 })); o.position.z = 0.08; h.add(o); const gl = gfx.glow(oc, 0.9, 0, 0, 0.08, h, 0.9); glows.push(gl); return gl; });
     }
     const castGlow = gfx.glow(0xffffff, 0.1, 0, 0, 0.2, hR, 0);
 
+    // ---- outfit upgrades: armour tiers add real plates, not just a trim colour
+    if (g.armor >= 1) {
+      [armR, armL].forEach(a => { box(0.25, 0.2, 0.27, m.trim, 0, -0.34, 0, a); box(0.27, 0.05, 0.29, m.armor, 0, -0.22, 0, a); });
+      [legL, legR].forEach(l => { box(0.28, 0.17, 0.33, m.trim, 0, -0.2, 0.02, l); box(0.3, 0.05, 0.4, m.trim, 0, -0.45, 0.05, l); });
+      box(w * 0.74, 0.07, 0.05, m.trim, 0, 0.56, 0.22, torso); box(w * 0.5, 0.07, 0.05, m.trim, 0, 0.22, 0.22, torso); box(w * 0.74, 0.07, 0.05, m.trim, 0, 0.4, -0.22, torso);
+    }
+    if (g.armor >= 2) {
+      [-1, 1].forEach(sd => { const sp = mesh(new T.ConeGeometry(0.07, 0.32, 4), m.trim, sd * (w / 2 + 0.1), 0.88, 0, torso); sp.rotation.z = -sd * 0.5; box(0.06, 0.5, 0.05, m.trim, sd * w * 0.3, 0.34, 0.225, torso); });
+      const gem = new T.Mesh(new T.OctahedronGeometry(0.09), new T.MeshBasicMaterial({ color: 0xff5a4a })); gem.position.set(0, 0.44, 0.26); torso.add(gem); glows.push(gfx.glow(0xff5a4a, 0.5, 0, 0.44, 0.3, torso, 0.6));
+      box(0.22, 0.5, 0.04, m.trim, 0, -0.2, 0.24, torso); box(w + 0.08, 0.06, 0.48, m.trim, 0, 0.0, 0, torso);
+    }
+    if (g.weapon >= 1 && (cls === 'fighter' || cls === 'rogue')) { box(0.36, 0.05, 0.1, m.trim, 0, 0, 0.14, hR); mesh(new T.SphereGeometry(0.06, 6, 5), m.trim, 0, 0, -0.06, hR); }
+    if (g.weapon >= 2) { const gm = new T.Mesh(new T.OctahedronGeometry(0.075), new T.MeshBasicMaterial({ color: 0x6ad0ff })); gm.position.set(0, 0.03, cls === 'cleric' ? 0.56 : 0.1); hR.add(gm); glows.push(gfx.glow(0x6ad0ff, 0.45, 0, 0.03, cls === 'cleric' ? 0.56 : 0.1, hR, 0.7)); }
+    // ---- cosmetics bought from the Tailor
+    const bone = () => M(0xe8dfc8), gold = () => M(0xf0c95a, true, 0x4a3406);
+    if (cos.head === 'horned') [-1, 1].forEach(sd => { const a = mesh(new T.ConeGeometry(0.09, 0.42, 5), bone(), sd * 0.3, 0.2, 0, head); a.rotation.z = -sd * 1.0; const b = mesh(new T.ConeGeometry(0.06, 0.34, 5), bone(), sd * 0.5, 0.42, 0, head); b.rotation.z = -sd * 0.25; });
+    if (cos.head === 'plague') { const bk = mesh(new T.ConeGeometry(0.11, 0.5, 5), M(0x2a2420), 0, -0.06, 0.42, head); bk.rotation.x = Math.PI / 2; [-1, 1].forEach(sd => { const e = new T.Mesh(new T.SphereGeometry(0.065, 8, 6), new T.MeshBasicMaterial({ color: 0x9fe8ff })); e.position.set(sd * 0.11, 0.05, 0.23); head.add(e); }); mesh(new T.CylinderGeometry(0.36, 0.36, 0.04, 10), M(0x1c1814), 0, 0.2, 0, head); mesh(new T.CylinderGeometry(0.2, 0.22, 0.2, 8), M(0x1c1814), 0, 0.3, 0, head); }
+    if (cos.head === 'skull') { const sk = mesh(new T.SphereGeometry(0.29, 9, 7, 0, Math.PI), bone(), 0, 0.02, 0.02, head); box(0.09, 0.09, 0.05, m.dark, 0.1, 0.05, 0.27, head); box(0.09, 0.09, 0.05, m.dark, -0.1, 0.05, 0.27, head); for (let i = -2; i <= 2; i++) box(0.035, 0.07, 0.03, bone(), i * 0.05, -0.2, 0.24, head); }
+    if (cos.head === 'laurel') { const gm = gold(); for (let i = 0; i < 12; i++) { const a = 0.5 + i * 0.47; if (a > 2.6 && a < 3.7) continue; const lf = mesh(new T.ConeGeometry(0.05, 0.16, 3), gm, Math.sin(a) * 0.3, 0.14, Math.cos(a) * 0.3, head); lf.rotation.set(0.6 * Math.cos(a), 0, -0.6 * Math.sin(a)); } }
+    if (cos.head === 'crown') { const gm = gold(); mesh(new T.CylinderGeometry(0.27, 0.25, 0.12, 8, 1, true), gm, 0, 0.3, 0, head).material.side = T.DoubleSide; for (let i = 0; i < 6; i++) mesh(new T.ConeGeometry(0.05, 0.18, 4), gm, Math.cos(i * 1.047) * 0.26, 0.44, Math.sin(i * 1.047) * 0.26, head); const j = new T.Mesh(new T.OctahedronGeometry(0.05), new T.MeshBasicMaterial({ color: 0xc22a22 })); j.position.set(0, 0.31, 0.27); head.add(j); }
+    if (cos.back === 'pack') { const br = mesh(new T.CylinderGeometry(0.14, 0.14, 0.6, 7), M(0x6a5a40), 0, 0.5, -0.32, torso); br.rotation.z = Math.PI / 2; box(0.16, 0.5, 0.14, M(0x4a3020), 0.2, 0.3, -0.3, torso).rotation.z = -0.3; for (let i = 0; i < 3; i++) mesh(new T.CylinderGeometry(0.012, 0.012, 0.3, 3), bone(), 0.26 + i * 0.03, 0.62, -0.3, torso).rotation.z = -0.3; }
+    if (cos.back === 'greatcloak') { const gcl = new T.Group(); gcl.position.set(0, 0.64, -0.24); torso.add(gcl); box(w * 1.25, 1.25, 0.07, m.cloth, 0, -0.6, 0, gcl); box(w * 1.35, 0.2, 0.3, M(0x8a7a66), 0, 0.0, 0.1, gcl); gcl.rotation.x = 0.14; if (!cape) cape = gcl; else cape.visible = false, cape = gcl; }
+    if (cos.back === 'banner') { mesh(new T.CylinderGeometry(0.03, 0.03, 1.9, 5), m.dark, 0, 1.1, -0.28, torso); box(0.5, 0.04, 0.04, m.dark, 0.2, 2.0, -0.28, torso); const bn = new T.Mesh(new T.PlaneGeometry(0.5, 0.95), new T.MeshLambertMaterial({ map: gfx.bannerTex('#' + P.cloth.toString(16).padStart(6, '0'), '#d9a93c'), transparent: true, alphaTest: 0.5, side: T.DoubleSide })); bn.position.set(0.22, 1.5, -0.28); torso.add(bn); }
+    if (cos.back === 'wings') [-1, 1].forEach(sd => { const wg = new T.Group(); wg.position.set(sd * 0.12, 0.5, -0.24); wg.rotation.y = sd * 0.5; torso.add(wg); for (let i = 0; i < 5; i++) { const f = box(0.16, 0.75 - i * 0.07, 0.03, M(0x16141c), sd * (0.16 + i * 0.15), 0.12 - i * 0.05, -i * 0.02, wg); f.rotation.z = -sd * (0.5 + i * 0.22); } });
+    let auraM = null;
+    if (cos.aura) { const ac = (G.COSMETICS.find(x => x.id === cos.aura) || {}).color || 0xffffff; glows.push(gfx.glow(ac, 2.4, 0, 0.15, 0, root, 0.3)); auraM = [0, 1, 2, 3].map(() => { const s = gfx.glow(ac, 0.3, 0, 0.5, 0, root, 0.9); glows.push(s); return s; }); }
     const sc = (look.scale || 1) * race.scale;
     root.scale.set(sc * (look.race === 'dwarf' ? 1.16 : 1), sc, sc * (look.race === 'dwarf' ? 1.16 : 1));
     root.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; } });
@@ -132,6 +161,7 @@
       const fl = 0.85 + Math.sin(t * 17) * 0.12;
       if (orbs) orbs.forEach(o => o.scale.setScalar((act === 'cast' ? 1.2 + k * 0.9 : 0.9) * fl));
       if (act === 'cast' && p.glow) { castGlow.material.color.set(p.glow); castGlow.material.opacity = 0.9; castGlow.scale.setScalar(0.6 + k * 1.4); } else castGlow.material.opacity = 0;
+      if (auraM) auraM.forEach((s, i) => { const a = t * 1.5 + i * 1.57; s.position.set(Math.cos(a) * 0.6, 0.35 + i * 0.38 + Math.sin(t * 2 + i) * 0.15, Math.sin(a) * 0.6); });
       // flash + stealth
       const fl2 = p.flash > 0;
       for (const mt of mats) { if (fl2) mt.emissive.setRGB(0.9, 0.9, 0.9); else mt.emissive.copy(mt.userData.e); }
@@ -145,7 +175,7 @@
   // ------------------------------------------------------------ portraits (rendered once, cached as images)
   let pr = null, pscene, pcam; const pcache = {};
   G.portrait = function (look, size) {
-    const key = JSON.stringify([look.cls, look.race, look.tint, look.gear]);
+    const key = JSON.stringify([look.cls, look.race, look.tint, look.gear, look.cos]);
     const img = document.createElement('img'); img.className = 'portrait'; img.style.width = img.style.height = (size / 16) + 'rem'; img.alt = '';
     if (!pcache[key]) {
       try {

@@ -10,6 +10,7 @@
     p.querySelectorAll('button,[data-click]').forEach(b => b.addEventListener('click', () => { G.audioInit(); G.sfx('ui'); }));
     return p;
   }
+  ui._show = (h, c) => show(h, c); ui._on = (s, f) => on(s, f);
   ui.close = () => { const p = panel(); p.className = 'hidden'; p.innerHTML = ''; };
   ui.isOpen = () => !panel().classList.contains('hidden');
   const on = (sel, fn) => panel().querySelectorAll(sel).forEach(el => el.addEventListener('click', e => fn(el, e)));
@@ -19,6 +20,7 @@
   const abCard = (id, extra) => {
     const ab = A[id];
     return '<div class="ab-row"><div class="ab-ic">' + G.icon(ab) + '</div><div class="ab-tx"><b>' + ab.name + '</b>' +
+      (ab.kind ? '<span class="tagk">' + ab.kind + '</span><span class="tagr r-' + ab.role + '">' + ab.role + '</span>' : '') +
       '<small>' + (ab.ult ? 'Ultimate · ' : '') + (ab.cost ? ab.cost + ' ' : '') + (ab.cost ? '{RES} · ' : '') + (ab.cd ? ab.cd + 's cooldown' : 'No cooldown') + '</small>' +
       '<p>' + ab.desc + '</p></div>' + (extra || '') + '</div>';
   };
@@ -89,7 +91,7 @@
       let h = '<div class="card create"><h2>Who walks into the pit?</h2>';
       h += '<h3>Origin</h3><div class="chips">' + Object.keys(G.RACES).map(k => '<button class="chip' + (k === pick.race ? ' sel' : '') + '" data-race="' + k + '">' + G.RACES[k].name + '</button>').join('') + '</div><p class="dim">' + R.desc + '</p>';
       h += '<h3>Class</h3><div class="cls-grid">' + Object.keys(G.CLASSES).map(k => '<button class="cls' + (k === pick.cls ? ' sel' : '') + '" data-cls="' + k + '"><span class="cp" data-p="' + k + '"></span><b>' + G.CLASSES[k].name + '</b><small>' + G.CLASSES[k].role + '</small></button>').join('') + '</div>';
-      h += '<p class="quote">“' + C.tag + '”</p>';
+      h += '<p class="quote">“' + C.tag + '”</p><p><b>How it plays:</b> ' + G.PLAY[pick.cls] + '</p>';
       h += '<div class="stats">' + G.STATS.map(s => '<div class="stat' + (s === C.primary ? ' prim' : '') + '" title="' + G.STAT_INFO[s][1] + '"><small>' + s.toUpperCase() + '</small><b>' + stats[s] + '</b><i>' + G.fmtMod(G.mod(stats[s])) + '</i></div>').join('') + '</div>';
       h += '<h3>Starting kit <span class="dim">· resource: ' + C.res + '</span></h3>' + withRes(abCard(C.basic) + C.start.map(id => abCard(id)).join(''), pick.cls);
       h += '<p class="dim">Level 2: choose ' + C.l2.map(i => A[i].name).join(' or ') + '. Level 3: choose a subclass, ' + Object.values(C.subs).map(s => s.name).join(' or ') + '. Level 4: a feat. Level 5: ' + A[C.ult].name + '.</p>';
@@ -117,6 +119,7 @@
       '<p>Win fights to earn <b>XP</b>, <b>coin</b> and <b>respect</b>. Respect raises your rank in the Guild. Coin buys gear, and turns the damp cave we have lent you into a home.</p><p class="sig">Signed and sealed, the Ledger-Keeper</p><span class="seal"></span>' +
       '<p class="dim">Walk with WASD or the thumb stick, or tap where you want to go. Walk up to the Pit gate, the Fence, the Guildmaster or your Hideout door.</p><div class="row end"><button class="big" id="ok">Make my mark</button></div></div>');
     on('#ok', () => ui.close());
+    if (!first) ui.afterFight();
   };
   ui.leaveHub = () => { const w = W().walker; if (G.scene === 'hub') G.hubPos = { x: w.x, z: Math.max(w.z, 1.2) }; };
   ui.hideout = function () {
@@ -211,8 +214,8 @@
     on('[data-fight]', el => ui.prefight(G.OPPONENTS[+el.dataset.fight]));
   };
 
-  const CONTROLS = '<div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Mouse</kbd> aim</span><span><kbd>Click</kbd> attack</span><span><kbd>Space</kbd> dodge</span><span><kbd>Q</kbd><kbd>E</kbd><kbd>R</kbd> abilities</span><span><kbd>F</kbd> ultimate</span><span><kbd>C</kbd> potion</span><span><kbd>Esc</kbd> pause</span></div>' +
-    '<div class="keys"><span><kbd>Controller</kbd> left stick move · right stick aim · <kbd>X</kbd>/<kbd>RT</kbd> attack · <kbd>A</kbd> dodge · <kbd>LB</kbd><kbd>RB</kbd><kbd>Y</kbd> abilities · <kbd>B</kbd> ultimate · <kbd>D-pad up</kbd> potion · <kbd>Menu</kbd> pause</span></div>' +
+  const CONTROLS = '<div class="keys"><span><kbd>WASD</kbd> move</span><span><kbd>Mouse</kbd> aim</span><span><kbd>Click</kbd> attack</span><span><kbd>Space</kbd> dodge</span><span><kbd>Shift</kbd> or <kbd>Right click</kbd> parry</span><span><kbd>T</kbd> call your Second</span><span><kbd>Q</kbd><kbd>E</kbd><kbd>R</kbd> abilities</span><span><kbd>F</kbd> ultimate</span><span><kbd>C</kbd> potion</span><span><kbd>Esc</kbd> pause</span></div>' +
+    '<div class="keys"><span><kbd>Controller</kbd> left stick move · right stick aim · <kbd>X</kbd>/<kbd>RT</kbd> attack · <kbd>A</kbd> dodge · <kbd>LT</kbd> parry · <kbd>D-pad left</kbd> Second · <kbd>LB</kbd><kbd>RB</kbd><kbd>Y</kbd> abilities · <kbd>B</kbd> ultimate · <kbd>D-pad up</kbd> potion · <kbd>Menu</kbd> pause</span></div>' +
     '<p class="dim">On a phone: left thumb moves, buttons on the right, and your aim locks to your opponent. Red marks on the floor are incoming attacks. Dodge through them to thrill the crowd.</p>';
   ui.prefight = function (o) {
     const st = G.state, h = st.hero;
@@ -245,10 +248,12 @@
     if (P.ult) hudEls.slots.push({ id: P.ult, el: mk('ult', 'F', A[P.ult], 'ult') });
     hudEls.potion = mk('potion', 'C', 'potion', 'pot');
     hudEls.dodge = mk('dodge', 'SPC', { icon: 'dash', color: '#cfd8e0' }, 'dg');
+    hudEls.parry = mk('parry', 'SHF', { icon: 'shield', color: '#ffe9a0' }, 'py'); hudEls.parry.title = G.PARRY_INFO[P.cls][0] + ': ' + G.PARRY_INFO[P.cls][1];
+    hudEls.assist = P.second ? mk('assist', 'T', { icon: 'up', color: '#ffd36b' }, 'as') : null; if (hudEls.assist) hudEls.assist.title = 'Call ' + P.second.name + ', your Second';
     ui.refreshKeys();
   };
   ui.refreshKeys = function () {
-    const K = G.input.usingPad ? { a0: 'LB', a1: 'RB', a2: 'Y', ult: 'B', potion: '▲', dodge: 'A' } : { a0: 'Q', a1: 'E', a2: 'R', ult: 'F', potion: 'C', dodge: 'SPC' };
+    const K = G.input.usingPad ? { a0: 'LB', a1: 'RB', a2: 'Y', ult: 'B', potion: '▲', dodge: 'A', parry: 'LT', assist: '◀' } : { a0: 'Q', a1: 'E', a2: 'R', ult: 'F', potion: 'C', dodge: 'SPC', parry: 'SHF', assist: 'T' };
     document.querySelectorAll('#abar .ab').forEach(b => { b.querySelector('kbd').textContent = K[b.dataset.act] || ''; });
   };
   const stStr = e => {
@@ -283,7 +288,8 @@
   ui.pause = function () {
     const F = G.fight; if (!F.active) return;
     F.paused = true;
-    show('<div class="card small"><h2>Catch Your Breath</h2>' + CONTROLS + '<div class="row end"><button id="ff" class="danger">Forfeit</button><button class="big" id="rs">Resume</button></div></div>');
+    show('<div class="card small"><h2>Catch Your Breath</h2>' + CONTROLS + '<div class="row end"><button id="gr">Blood: ' + (G.state.gore === false ? 'off' : 'on') + '</button><button id="ff" class="danger">Forfeit</button><button class="big" id="rs">Resume</button></div></div>');
+    on('#gr', () => { G.state.gore = G.state.gore === false; G.save(); ui.pause(); });
     on('#rs', () => { ui.close(); F.paused = false; });
     on('#ff', () => { ui.close(); F.forfeit(); });
   };
@@ -293,11 +299,11 @@
     $('#hud').className = 'hidden';
     const st = G.state;
     let h = '<div class="card small res ' + (r.win ? 'win' : 'loss') + '"><small class="over">' + (r.win ? 'The pit has spoken' : 'The pit is patient') + '</small><h1>' + (r.win ? 'Victory' : r.forfeit ? 'Forfeit' : 'Defeat') + '</h1>';
-    h += '<p class="quote">' + (r.win ? 'The crowd chants your name as they drag ' + r.opp.name + ' out.' : 'You wake up in the gutter. The pit never runs out of tomorrow.') + '</p><div class="rewards">';
-    h += '<div><small>XP</small><b>+' + r.xp + '</b></div><div><small>COIN</small><b>+' + r.coin + '</b>' + (r.tips ? '<i>crowd tips +20%</i>' : '') + (r.stolen ? '<i>' + r.stolen + ' lifted</i>' : '') + '</div>';
+    h += '<p class="quote">' + (r.win ? (r.mortal ? r.mortal + '. What is left of ' + r.opp.name + ' is swept up to thunderous applause.' : 'The crowd chants your name.') : 'You wake up in the gutter, lighter in the purse. The Guild charges for the stretcher.') + '</p><div class="rewards">';
+    h += '<div><small>XP</small><b>+' + r.xp + '</b></div><div><small>COIN</small><b>' + (r.lost ? '−' + r.lost : '+' + r.coin) + '</b>' + (r.lost ? '<i>stretcher fee</i>' : '') + (r.tips ? '<i>crowd tips +20%</i>' : '') + (r.stolen ? '<i>' + r.stolen + ' lifted</i>' : '') + '</div>';
     h += '<div><small>RESPECT</small><b>+' + r.respect + '</b>' + (r.win ? '<i>crowd hype ' + r.hype + '%</i>' : '') + '</div></div>';
     if (r.rankUp != null) h += '<p class="rankup">Rank up: <b style="color:' + G.RANKS[r.rankUp].color + '">' + G.RANKS[r.rankUp].name + '</b>. New hideout pieces are available.</p>';
-    if (!r.win) h += '<p class="dim">Tip: spend coin at the Fence, re-slot abilities with the Guildmaster, or rematch an earlier fighter.</p>';
+    if (!r.win) h += '<p class="dim">Losing costs you a fifth of your purse and nothing else. ' + G.pick(G.TIPS) + '</p>';
     h += '<div class="row end"><button class="big" id="ok">Continue</button></div></div>';
     show(h);
     if (r.rankUp != null) G.sfx('level');
@@ -323,13 +329,13 @@
     const learn = id => { h.known.push(id); const i = h.slots.indexOf(null); if (i >= 0) h.slots[i] = id; else h._newAb = 1; };
     let body = '', done;
     if (L === 2) {
-      body = '<h3>Choose a new ability</h3>' + C.l2.map(id => withRes(abCard(id, '<button class="big" data-pick="' + id + '">Learn</button>'), h.cls)).join('');
+      body = '<h3>Level 2 · learn one new technique</h3><p class="dim">You keep both of your starting moves. Pick the one that fills a gap: the coloured tag says what each is for.</p>' + C.l2.map(id => withRes(abCard(id, '<button class="big" data-pick="' + id + '">Learn</button>'), h.cls)).join('');
       done = k => learn(k);
     } else if (L === 3) {
-      body = '<h3>Choose your subclass</h3>' + Object.keys(C.subs).map(k => { const s = C.subs[k]; return '<div class="sub"><div class="sub-h"><b>' + s.name + '</b><small>' + s.desc + '</small><button class="big" data-pick="' + k + '">Choose</button></div><div class="ab-row"><div class="ab-ic pas">★</div><div class="ab-tx"><b>' + s.passive[0] + '</b><small>Passive</small><p>' + s.passive[1] + '</p></div></div>' + withRes(abCard(s.ability), h.cls) + '</div>'; }).join('');
+      body = '<h3>Level 3 · choose your subclass</h3><p class="dim">Permanent. Each gives one passive that is always on and one new move.</p>' + Object.keys(C.subs).map(k => { const s = C.subs[k]; return '<div class="sub"><div class="sub-h"><b>' + s.name + '</b><small>' + s.desc + '</small><button class="big" data-pick="' + k + '">Choose</button></div><div class="ab-row"><div class="ab-ic pas">★</div><div class="ab-tx"><b>' + s.passive[0] + '</b><small>Passive</small><p>' + s.passive[1] + '</p></div></div>' + withRes(abCard(s.ability), h.cls) + '</div>'; }).join('');
       done = k => { h.sub = k; learn(C.subs[k].ability); };
     } else if (L === 4) {
-      body = '<h3>Choose a feat</h3>' + Object.keys(G.FEATS).map(k => '<div class="ab-row"><div class="ab-ic pas">✦</div><div class="ab-tx"><b>' + G.FEATS[k].name + '</b><p>' + G.FEATS[k].desc + (k === 'asi' ? ' (' + G.STAT_INFO[C.primary][0] + ' ' + h.stats[C.primary] + ' → ' + (h.stats[C.primary] + 2) + ')' : '') + '</p></div><button class="big" data-pick="' + k + '">Take</button></div>').join('');
+      body = '<h3>Level 4 · choose one feat</h3><p class="dim">A flat, permanent bonus. If unsure, Ability Improvement is never wrong.</p>' + Object.keys(G.FEATS).map(k => '<div class="ab-row"><div class="ab-ic pas">✦</div><div class="ab-tx"><b>' + G.FEATS[k].name + '</b><p>' + G.FEATS[k].desc + (k === 'asi' ? ' (' + G.STAT_INFO[C.primary][0] + ' ' + h.stats[C.primary] + ' → ' + (h.stats[C.primary] + 2) + ')' : '') + '</p></div><button class="big" data-pick="' + k + '">Take</button></div>').join('');
       done = k => { if (k === 'asi') h.stats[C.primary] += 2; else h.feats.push(k); };
     } else {
       body = '<h3>Ultimate unlocked</h3>' + withRes(abCard(C.ult, '<button class="big" data-pick="ult">Claim</button>'), h.cls) + '<p class="dim">Your ultimate has its own slot: press F.</p>';
@@ -348,10 +354,19 @@
     if (msg) s += '<p class="note">' + msg + '</p>';
     s += '<div class="stats">' + G.STATS.map(k => '<div class="stat' + (k === C.primary ? ' prim' : '') + '"><small>' + k.toUpperCase() + '</small><b>' + h.stats[k] + '</b><i>' + G.fmtMod(G.mod(h.stats[k])) + '</i><em>' + G.STAT_INFO[k][1] + '</em></div>').join('') + '</div>';
     s += '<div class="derived"><span>HP <b>' + d.maxHp + '</b></span><span>Crit <b>' + Math.round(d.crit * 100) + '%</b></span><span>Damage <b>' + Math.round(d.dmgMul * 100) + '%</b></span><span>Armor <b>-' + Math.round(d.dr * 100) + '%</b></span><span>Speed <b>' + Math.round(d.speed) + '</b></span><span>' + C.res + ' <b>' + d.regen.toFixed(1) + '/s</b></span><span>Coin <b>' + Math.round(d.coinMul * 100) + '%</b></span><span>Respect <b>' + Math.round(d.respectMul * 100) + '%</b></span></div>';
+    // the build path: one glance shows what you chose and what is coming
+    const step = (n, title, got, todo) => '<div class="pstep' + (h.level >= n ? ' done' : '') + '"><span>' + n + '</span><b>' + title + '</b><small>' + (h.level >= n ? got : todo) + '</small></div>';
+    s += '<h3>Your build</h3><div class="path">' + step(1, C.name, C.start.map(i => A[i].name).join(', '), '') +
+      step(2, 'Technique', (C.l2.filter(i => h.known.includes(i)).map(i => A[i].name)[0] || 'chosen'), 'Choose ' + C.l2.map(i => A[i].name).join(' or ')) +
+      step(3, 'Subclass', sub ? sub.name : '', Object.values(C.subs).map(x => x.name).join(' or ')) +
+      step(4, 'Feat', h.feats.length ? G.FEATS[h.feats[0]].name : 'Ability Improvement', 'Choose a feat') +
+      step(5, 'Ultimate', A[C.ult].name, A[C.ult].name) + '</div><p class="dim"><b>How it plays:</b> ' + G.PLAY[h.cls] + '</p>';
     s += '<h3>Loadout <span class="dim">· assign abilities to Q, E, R</span></h3>';
     s += withRes(h.known.map(id => abCard(id, '<div class="slots">' + ['Q', 'E', 'R'].map((k, i) => '<button class="slot' + (h.slots[i] === id ? ' sel' : '') + '" data-slot="' + i + '" data-id="' + id + '">' + k + '</button>').join('') + '</div>')).join(''), h.cls);
     if (h.ult) s += withRes(abCard(h.ult, '<div class="slots"><span class="slot sel">F</span></div>'), h.cls);
-    s += '<h3>Basic attack and passives</h3>' + withRes(abCard(C.basic), h.cls);
+    s += '<h3>Always available</h3>' + withRes(abCard(C.basic), h.cls) +
+      '<div class="ab-row"><div class="ab-ic">' + G.icon({ icon: 'shield', color: '#ffe9a0' }) + '</div><div class="ab-tx"><b>' + G.PARRY_INFO[h.cls][0] + '</b><span class="tagk">Parry</span><span class="tagr r-Defense">Defense</span><small>8 ' + C.res + ' · ' + Math.round((({ fighter: 0.30, rogue: 0.20, sorcerer: 0.24, cleric: 0.26 })[h.cls] + (d.parry || 0) + Math.max(0, G.mod(h.stats.dex)) * 0.008) * 1000) + ' ms window</small><p>' + G.PARRY_INFO[h.cls][1] + ' Better weapons and armour widen the window. Miss it and you are open.</p></div></div>' +
+      '<div class="ab-row"><div class="ab-ic pas">☠</div><div class="ab-tx"><b>' + G.MORTAL[h.cls].name + '</b><span class="tagk">Mortal Blow</span><span class="tagr r-Finisher">Finisher</span><p>' + G.MORTAL[h.cls].desc + ' Delivered automatically when your opponent has nothing left.</p></div></div>';
     if (sub) s += '<div class="ab-row"><div class="ab-ic pas">★</div><div class="ab-tx"><b>' + sub.passive[0] + '</b><small>' + sub.name + '</small><p>' + sub.passive[1] + '</p></div></div>';
     h.feats.forEach(f => s += '<div class="ab-row"><div class="ab-ic pas">✦</div><div class="ab-tx"><b>' + G.FEATS[f].name + '</b><small>Feat</small><p>' + G.FEATS[f].desc + '</p></div></div>');
     const own = G.owned(st), perks = G.DECOR.filter(x => own[x.id] && /[+%]|ward|potion|less/.test(x.perk));
@@ -386,7 +401,8 @@
   // ------------------------------------------------------------ shop
   ui.shop = function () {
     const st = G.state;
-    let s = '<div class="card"><h2>The Fence</h2><p class="quote">“Everything fell off a cart. Different carts.”</p><p class="dim"> · You have <b>' + st.coin + '</b> coin.</p>';
+    let s = '<div class="card"><h2>The Fence</h2><p class="quote">“Everything fell off a cart. Different carts.”</p><p class="dim">You have <b>' + st.coin + '</b> coin.</p>';
+    s += '<div class="ab-row"><div class="ab-ic pas">✂</div><div class="ab-tx"><b>The Tailor’s Rack</b><small>Cosmetic</small><p>Dyes, headgear, cloaks, weapon finishes and auras. ' + Object.keys((st.cos || {}).owned || {}).length + ' of ' + G.COSMETICS.length + ' owned.</p></div><button class="big" id="tl">Browse</button></div>';
     ['weapon', 'armor'].forEach(k => {
       const g = G.GEAR[k], t = st.gear[k], nx = g.tiers[t + 1];
       s += '<div class="ab-row"><div class="ab-ic pas">' + (k === 'weapon' ? '⚔' : '⛨') + '</div><div class="ab-tx"><b>' + (nx ? nx.name : g.tiers[t].name) + '</b><small>' + g.name + ' tier ' + (nx ? t + 1 : t) + ' of 2</small><p>' + (nx ? nx.desc : 'Fully upgraded.') + '</p></div>' +
@@ -397,6 +413,7 @@
     s += '<div class="row end"><button id="x">Back</button></div></div>';
     show(s);
     on('#x', () => { ui.close(); ui.topbar(); });
+    on('#tl', () => ui.tailor());
     on('[data-gear]', el => { const k = el.dataset.gear, nx = G.GEAR[k].tiers[st.gear[k] + 1]; st.coin -= nx.cost; st.gear[k]++; G.save(); G.sfx('coin'); ui.shop(); ui.topbar(); });
     on('#pot', () => { st.coin -= G.POTION_COST; st.potions++; G.save(); G.sfx('coin'); ui.shop(); ui.topbar(); });
   };

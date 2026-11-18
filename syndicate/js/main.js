@@ -32,7 +32,7 @@
   }
 
   // ---------------------------------------------------------------- input
-  const KEYMAP = { Space: 'dodge', ShiftLeft: 'dodge', KeyQ: 'a0', KeyE: 'a1', KeyR: 'a2', KeyF: 'ult', KeyC: 'potion', Digit1: 'a0', Digit2: 'a1', Digit3: 'a2', Digit4: 'ult' };
+  const KEYMAP = { Space: 'dodge', ShiftLeft: 'parry', ShiftRight: 'parry', KeyX: 'parry', KeyT: 'assist', KeyQ: 'a0', KeyE: 'a1', KeyR: 'a2', KeyF: 'ult', KeyC: 'potion', Digit1: 'a0', Digit2: 'a1', Digit3: 'a2', Digit4: 'ult' };
   window.addEventListener('keydown', e => {
     if (e.target && e.target.tagName === 'INPUT') return;
     if (G.bootSkip) return;
@@ -64,7 +64,7 @@
   cv.addEventListener('mousemove', e => { In.mouse.cx = e.clientX; In.mouse.cy = e.clientY; if (G.placing && In.mouse.down2) tapWorld(e.clientX, e.clientY); });
   cv.addEventListener('mousedown', e => {
     G.audioInit(); In.mouse.cx = e.clientX; In.mouse.cy = e.clientY;
-    if (G.scene === 'fight') { if (e.button === 0) In.mouse.down = true; if (e.button === 2) In.pressed.push('dodge'); }
+    if (G.scene === 'fight') { if (e.button === 0) In.mouse.down = true; if (e.button === 2) In.pressed.push('parry'); }
     else { In.mouse.down2 = true; tapWorld(e.clientX, e.clientY); }
   });
   window.addEventListener('mouseup', () => { In.mouse.down = false; In.mouse.down2 = false; });
@@ -94,6 +94,7 @@
   tAtk.addEventListener('touchstart', e => { e.preventDefault(); In.touchAtk = true; }, { passive: false });
   tAtk.addEventListener('touchend', e => { e.preventDefault(); In.touchAtk = false; }); tAtk.addEventListener('touchcancel', () => { In.touchAtk = false; });
   tDodge.addEventListener('touchstart', e => { e.preventDefault(); In.pressed.push('dodge'); }, { passive: false });
+  $('tParry').addEventListener('touchstart', e => { e.preventDefault(); In.pressed.push('parry'); }, { passive: false });
   $('pauseBtn').addEventListener('click', () => G.ui.pause());
   G.ui.placeInit();
 
@@ -145,7 +146,7 @@
     if (!nx && !ny && (Math.abs(lx) > 0.6 || Math.abs(ly) > 0.6)) { if (navT <= 0) { if (Math.abs(lx) > Math.abs(ly)) nx = Math.sign(lx); else ny = Math.sign(ly); navT = 0.22; } } else if (!lx && !ly) navT = 0;
     if (sc === 'cine') { if (hit(0) || hit(1) || hit(9)) G.cine.skip(); }
     else if (sc === 'fight' && !open && !paused) {
-      if (hit(0) || hit(6)) In.pressed.push('dodge');
+      if (hit(0)) In.pressed.push('dodge'); if (hit(6)) In.pressed.push('parry'); if (hit(14)) In.pressed.push('assist');
       if (hit(4)) In.pressed.push('a0'); if (hit(5)) In.pressed.push('a1'); if (hit(3)) In.pressed.push('a2');
       if (hit(1)) In.pressed.push('ult'); if (hit(12)) In.pressed.push('potion'); if (hit(9)) G.ui.pause();
     } else if (G.placing && !open) {

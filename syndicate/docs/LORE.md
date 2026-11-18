@@ -61,6 +61,18 @@ bed of glowcaps are how you tell people you intend to stay alive. Glowcaps give 
 Cave-bloom crystal grows a finger a year and hums when content. Moonwater is water that sat a season under
 starlight crystal.
 
+## The Tally
+
+Down here a debt is a leash, and as your name grows people start owing *you*. They are your **Tallymen**:
+the names in your own small ledger. They work off what they owe by doing what you would rather not be seen
+doing, and they drink at the Low Lamp. One of them can stand in your corner as your **Second**.
+
+## Mortal blows
+
+Pit bouts are to the death, and the crowd expects a finish worth the gate. Fighters end it with the
+**Headsman's Verdict**; rogues with the **Death of a Thousand Cuts**; sorcerers **Disintegrate**; clerics call
+down a **Flame Strike**. A loser who is merely beaten is carried out and billed for the stretcher.
+
 ## Open threads (not yet in the game)
 
 - Why Vexa stayed, and what she does if you beat her.

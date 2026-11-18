@@ -14,7 +14,7 @@
 
   // ---------- save ----------
   const KEY = 'underground_syndicate_v2';
-  G.newState = () => ({ v: 2, hero: null, coin: 0, respect: 0, wins: {}, losses: 0, items: [], gear: { weapon: 0, armor: 0 }, potions: 1, seenHelp: false });
+  G.newState = () => ({ v: 2, hero: null, coin: 0, respect: 0, wins: {}, losses: 0, items: [], tally: [], second: null, cos: { owned: {}, dye: null, head: null, back: null, weapon: null, aura: null }, reports: [], gore: true, gear: { weapon: 0, armor: 0 }, potions: 1, seenHelp: false });
   G.state = G.newState();
   G.save = () => { try { localStorage.setItem(KEY, JSON.stringify(G.state)); } catch (e) { } };
   G.load = () => {
@@ -135,7 +135,7 @@
       if (dc.dummy) d.dmgMul += 0.04;
       if (dc.bookshelf) d.xpMul += 0.05;
       if (dc.hearth) d.potionMul = 1.2;
-      d.weapon = st.gear.weapon * 2;
+      d.weapon = st.gear.weapon * 2; d.parry = st.gear.weapon * 0.015 + st.gear.armor * 0.012;
       d.dr += st.gear.armor * 0.06;
     }
     d.maxHp = Math.round(d.maxHp);
