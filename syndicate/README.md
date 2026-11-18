@@ -201,3 +201,10 @@ folder, and phone store builds are a web-view wrapper (Capacitor). Not set up ye
 
 Authored character models and animation, more arenas, more classes and levels past 5,
 multiclassing, recorded music or voice, cloud saves, typing a name with a controller.
+
+## The long climb (`js/climb.js`)
+
+- **Undercard.** Each of the five named fighters must be earned by winning undercard bouts first: 2, 3, 3, 4 and 4. Undercard fighters are generated, a little weaker than the name they lead to, and can be fought again for smaller purses.
+- **Ten levels.** Levels 1 to 5 as before. Level 6 and 9: two ability points to place. Level 7: a technique. Level 8: a second feat. Level 10: a capstone.
+- **Doors open as you earn them.** First win: Notice Board, Big Hobb's Pot. Scrapper: the Tally, the Apothecary. Bloodied: Mark, the Wisp Table, the Armoury, the Tailor. Enforcer: the Outfitter, charms, Whisper, teachers. Underboss: the Crown's tithe. A shut door says what it needs; the first visit explains the system and writes it into the Codex.
+- **Old saves** keep everything their rank already opens, and pick the ladder up at the undercard of their next unbeaten name.
