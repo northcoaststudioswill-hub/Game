@@ -108,7 +108,8 @@ function c3Draw(M,pass){const n=M.p.length/3;if(!n)return;let S=M._s;if(!S||S.le
    for(const v of o){const w=1/v[2];v[6]=hw+v[0]*fl*w;v[7]=hh-v[1]*fl*w;v[2]=w}
    for(let i=1;i+1<o.length;i++){const p=o[0],q=o[i],s=o[i+1];if(!(md&8)&&(q[6]-p[6])*(s[7]-p[7])-(s[6]-p[6])*(q[7]-p[7])>=0)continue;c3Ras(p[6],p[7],p[2],p[3],p[4],p[5],q[6],q[7],q[2],q[3],q[4],q[5],s[6],s[7],s[2],s[3],s[4],s[5],mode,al)}}}}
 /* is a ball of this size anywhere in the picture? (generous: it only has to rule out what is plainly off screen) */
-function c3Seen(c,R){const dx=c[0]-c3CE[0],dy=c[1]-c3CE[1],dz=c[2]-c3CE[2],zc=dx*c3CF[0]+dy*c3CF[1]+dz*c3CF[2];if(zc<-R)return false;const xc=dx*c3CR[0]+dz*c3CR[2],yc=dx*c3CU[0]+dy*c3CU[1]+dz*c3CU[2],k=(zc+R)/c3FL;
+function c3Seen(c,R){const dx=c[0]-c3CE[0],dy=c[1]-c3CE[1],dz=c[2]-c3CE[2],zc=dx*c3CF[0]+dy*c3CF[1]+dz*c3CF[2];if(zc<-R)return false;if(zc<R*1.2)return true; /* it reaches the camera: always in */
+ const xc=dx*c3CR[0]+dz*c3CR[2],yc=dx*c3CU[0]+dy*c3CU[1]+dz*c3CU[2],k=(zc+R)/c3FL;
  return Math.abs(xc)<=k*c3W/2+R*1.5&&Math.abs(yc)<=k*c3H/2+R*1.5}
 function c3Show(solid,clear){for(const m of solid)if(!m.bc||c3Seen(m.bc,m.br)){m._lit=0;c3Draw(m,0)}for(const m of clear){m._lit=0;c3Draw(m,0)}for(const m of clear)c3Draw(m,1)}
 
@@ -149,6 +150,7 @@ function c3ValH(x,z){const r=Math.hypot(x,z*1.1),hill=c3Sm(15,30,r)*(1-c3Sm(25,3
  if(x>32)h+=c3Sm(32,38,x)*(.3+c3Nz(x*1.1,z*1.1)*.22); /* dunes */
  const d=c3RivD(x,z);h*=c3Sm(1.2,7,d);if(d<2.2)h=Math.min(h,-.75*(1-d/2.2)+.02);
  h=c3Lp(h,-1.1,c3Sm(45,50,x));
+ h=c3Lp(.45,h,c3Sm(4.5,8.5,Math.hypot(x-10,z+18))); /* level ground for the old arch */
  {const dp=Math.hypot(x+14,z-6);if(dp<5)h=Math.min(h,.1-.8*(1-(dp/5)*(dp/5)))} /* the Dew Pond */
  const dl=Math.hypot(x-C3TW[0],z-C3TW[1]);if(dl<4.6)h=Math.max(h,1.25*(1-(dl/4.6)*(dl/4.6))-.3);
  return h}
@@ -169,7 +171,7 @@ function c3BuildValley(){const CH={},CS=13,pick=(x,z)=>{const k=Math.floor((x-C3
  strip(-15,0,C3DR[0]-.5,C3DR[1]*.9,.8,'#d8b878');strip(0,-14,0,-1.6,.8,'#d8b878');strip(0,1.6,0,15,.8,'#d8b878');
  pick(0,3);c3Box(-2.6,.02,2.2,2.6,.16,4.6,'#6e4428','#8a5a3a');
  /* trees: thick on the hills, a few in the bowl, none on the paths, the river or the sand */
- C3TREES=[];for(let k=0;k<420&&C3TREES.length<150;k++){const x=X0+2+c3Hs(k,1,21)*(X1-X0-4),z=Z0+2+c3Hs(k,2,22)*(Z1-Z0-4),r=Math.hypot(x,z);if(r<7.5||x>35||c3RivD(x,z)<3.4||(Math.abs(z)<1.8&&x>-16&&x<22)||(Math.abs(x)<1.8&&Math.abs(z)<16)||Math.hypot(x-C3DR[0],z-C3DR[1])<4||Math.hypot(x+11,z-5)<8)continue;
+ C3TREES=[];for(let k=0;k<420&&C3TREES.length<150;k++){const x=X0+2+c3Hs(k,1,21)*(X1-X0-4),z=Z0+2+c3Hs(k,2,22)*(Z1-Z0-4),r=Math.hypot(x,z);if(r<7.5||x>35||c3RivD(x,z)<3.4||(Math.abs(z)<1.8&&x>-16&&x<22)||(Math.abs(x)<1.8&&Math.abs(z)<16)||Math.hypot(x-C3DR[0],z-C3DR[1])<4||Math.hypot(x+11,z-5)<8||Math.hypot(x-10,z+8)<5.5||Math.hypot(x-10,z+18)<4.5||Math.hypot(x+6,z-11)<4.6||(Math.abs(z)<2&&x<-3&&x>-9))continue;
   if(r<15&&c3Hs(k,3,23)>.22)continue;const h=2.6+c3Hs(k,4,24)*2.2;C3TREES.push([x,z,h]);pick(x,z);c3Tree(x,z,h,k)}
  /* rocks on the lighthouse island and along the river */
  for(let k=0;k<26;k++){const a=c3Hs(k,5,31)*6.28,rr=1.5+c3Hs(k,6,32)*2.6,x=k<12?C3TW[0]+Math.cos(a)*rr:C3RIV[1+k%3][0]+(c3Hs(k,7,33)-.5)*9,z=k<12?C3TW[1]+Math.sin(a)*rr:C3RIV[1+k%3][1]+(c3Hs(k,8,34)-.5)*5,s=.25+c3Hs(k,9,35)*.4;pick(x,z);c3Push();c3T(x,c3G(x,z)+s*.3,z);c3RY(a);c3Ball(s*1.3,s,s,'#484058','#8088a0',5,3);c3Pop()}
@@ -290,6 +292,41 @@ function c3Van(who,rip,t,o){o=o||{};const x=C3VAN[0],z=C3VAN[1],y=c3G(x,z),W1='#
  if(rip>0){const n=[Math.sin(C3VAN[2]),Math.cos(C3VAN[2])],ax=[Math.cos(C3VAN[2]),-Math.sin(C3VAN[2])];for(let k=0;k<9;k++){const q=(t*.22+k*.111)%1,r0=(.35+q*1.3)*rip,sx=-.6+Math.sin(k*2.4)*.7;
    c3Puff(x+ax[0]*sx+n[0]*(1+q*1.6)+Math.sin(t+k)*.2,y+1.3+q*2.6,z+ax[1]*sx+n[1]*(1+q*1.6)+Math.cos(t*.8+k)*.2,r0,.42*(1-q)*Math.min(1,rip))}}}
 const c3VanAt=(side,along,h)=>{const a=C3VAN[2];return[C3VAN[0]+Math.sin(a)*side+Math.cos(a)*along,h,C3VAN[1]+Math.cos(a)*side-Math.sin(a)*along]};
+/* the Flow Pros key: a brass ring, a shaft and two teeth */
+function c3Key(x,y,z,s,t,lay){c3Push();c3T(x,y,z);c3RY(t);if(lay)c3RZ(1.45);c3S(s,s,s);const a='#a87818',b='#f8d858';c3Push();c3T(0,.42,0);c3RX(1.5708);c3Cyl(8,.26,.26,-.05,.05,a,b,.35);c3Cyl(8,.13,.13,-.06,.06,'#3a2c10','#3a2c10');c3Pop();c3Box(-.05,-.5,-.04,.05,.2,.04,a,b,.35);c3Box(.05,-.5,-.04,.24,-.4,.04,a,b,.35);c3Box(.05,-.3,-.04,.18,-.22,.04,a,b,.35);c3Pop();c3Glow(x,y,z,s*.9,'#ffd860',.35+.15*Math.sin(t*3))}
+/* Erin's garden: a fence, three beds, flowers. dug: the far bed is turned over */
+const C3GA=[10,-8];
+function c3Garden(t,dug){const gx=C3GA[0],gz=C3GA[1],y=c3G(gx,gz);c3Push();c3T(gx,y,gz);
+ for(let k=0;k<22;k++){const u=k/22*4,sd=u|0,f=u-sd,px=sd===0?-4+f*8:sd===1?4:sd===2?4-f*8:-4,pz=sd===0?-3:sd===1?-3+f*6:sd===2?3:3-f*6;if(sd===2&&f>.38&&f<.62)continue;c3Box(px-.07,0,pz-.07,px+.07,.75,pz+.07,'#6a4428','#c89050')}
+ c3Box(-4,.5,-3.04,4,.58,-2.96,'#a87040','#c89050');c3Box(-4.04,.5,-3,-3.96,.58,3,'#a87040','#c89050');c3Box(3.96,.5,-3,4.04,.58,3,'#a87040','#c89050');
+ for(let b=0;b<3;b++){const bx=-2.6+b*2.6;c3Box(bx-1,.0,-1.9,bx+1,.14,1.3,'#5a3820','#8a5a3a');if(b===2&&dug){for(let k=0;k<5;k++){c3Push();c3T(bx-.6+k*.3,.14,-1.2+((k*7)%4)*.5);c3Ball(.22,.12,.2,'#5a3820','#a87850',5,2);c3Pop()}continue}
+  for(let k=0;k<6;k++){const fx=bx-.6+(k%2)*1.2,fz=-1.5+((k/2)|0)*1.1,sw=Math.sin(t*2+k+b)*.05,C=[['#ffffff','#f8d040'],['#f85888','#f8a0c8'],['#f8c020','#f8e060']][(k+b)%3];c3Box(fx-.02+sw,.14,fz-.02,fx+.02+sw,.6,fz+.02,'#2c8030');c3Push();c3T(fx+sw*2,.66,fz);c3Ball(.13,.09,.13,C[0],C[1],6,3);c3Pop()}}
+ c3Box(2.9,0,2.2,3.5,.4,2.8,'#a87040','#e8c888');c3Pop()}
+/* the job site across the pond road: sawhorses, a board, a padlock. open 0 to 1 swings it aside */
+const C3JS=[-6,0];
+function c3Jobsite(open,t){const x=C3JS[0],z=C3JS[1],y=c3G(x,z);c3Push();c3T(x,y,z+1.6);c3RY(-open*1.5);c3T(0,0,-1.6);
+ for(const s of[-1,1]){c3Box(-.08,0,s*1.5-.08,.08,.95,s*1.5+.08,'#583018','#a87040');c3Box(-.3,0,s*1.5-.06,.3,.08,s*1.5+.06,'#583018')}
+ for(let k=0;k<6;k++)c3Box(-.05,.55,-1.5+k*.5,.05,.85,-1+k*.5,k%2?'#f4f6fa':'#e86820',k%2?'#ffffff':'#f89040');
+ c3Box(-.07,.95,-.7,.07,1.5,.7,'#1c4a98','#2a6ad0');c3Box(-.09,1.1,-.5,.09,1.18,.5,'#f4f6fa','#ffffff');c3Box(-.09,1.26,-.35,.09,1.34,.35,'#f4f6fa','#ffffff');
+ if(open<.05){c3Box(-.12,.36,-.1,.12,.56,.1,'#a87818','#f8d858',.3);c3Box(-.1,.56,-.07,.1,.66,.07,'#686078')}c3Pop()}
+/* the old arch at Willow Falls, the cliff and the water behind it. lit: the lantern cut into it glows */
+const C3AR=[10,-18];
+function c3Arch(lit,t){const x=C3AR[0],z=C3AR[1],y=c3G(x,z)-.1,S1='#585c70',S2='#a0a8bc';
+ c3Box(3,-.5,-27.5,19,8.5,-25.5,'#383048','#585068');c3Box(3,8.5,-27.7,19,9,-25.3,'#28705c','#38907c');
+ for(let k=0;k<5;k++){const q=(t*.9+k*.2)%1,fx=11.4+k*.75;c3Box(fx,-.4,-25.45,fx+.6,8.4,-25.4,'#5898e8','#c8e8ff',.5);c3Box(fx+.1,8.2-q*8.4,-25.38,fx+.45,8.2-q*8.4+1.1,-25.34,'#e0f8ff','#ffffff',.9)}
+ for(let k=0;k<4;k++)c3Puff(11.6+k*.9+Math.sin(t+k),.1+((t*.5+k*.3)%1)*.8,-24.9,.5,.3);
+ c3Push();c3T(x,y,z);c3RY(.35);
+ c3Box(-2.3,0,-.5,-1.3,4,.5,S1,S2);c3Box(1.3,0,-.5,2.3,4,.5,S1,S2);c3Box(-2.6,4,-.6,2.6,4.9,.6,S1,S2);c3Box(-1.3,3.4,-.45,-.7,4,.45,S1,S2);c3Box(.7,3.4,-.45,1.3,4,.45,S1,S2);c3Box(-1.3,0,-.5,1.3,3.9,-.3,'#2c2840','#3c3854');
+ c3Box(-2.6,4.9,-.62,-.8,5.05,.62,'#2c7848','#3c9858');c3Box(1.5,2.2,.5,2.32,2.35,.56,'#3c9858');
+ const sc=c3Mix('#c8a040','#ffe070',lit);c3Box(-.3,4.2,.6,.3,4.75,.66,sc,sc,.4+lit*.6);for(let i=0;i<8;i++){const a=i*.7854;c3Box(Math.cos(a)*.5-.06,4.47+Math.sin(a)*.34-.05,.6,Math.cos(a)*.5+.06,4.47+Math.sin(a)*.34+.05,.65,sc,sc,.4+lit*.6)}
+ /* the carving: a lantern in the middle, sprouts to the left, buddies to the right */
+ const C='#8890a8',C2='#c0c8dc',lg=c3Mix('#585070','#f8e060',lit);c3Box(-.1,.4,-.3,.1,1.9,-.2,C,C2);c3Box(-.34,1.9,-.3,.34,2.6,-.18,C,C2);c3Box(-.24,2,-.18,.24,2.5,-.14,lg,lg,lit);c3Box(-.46,2.6,-.3,.46,2.76,-.18,C,C2);
+ for(let i=0;i<3;i++){const sx=-1.08+i*.34,sy=.4+(i%2)*.25;c3Box(sx-.13,sy,-.3,sx+.13,sy+.3,-.2,C,C2);c3Box(sx-.025,sy+.3,-.3,sx+.025,sy+.52,-.22,C2);c3Box(sx-.02,sy+.5,-.3,sx+.12,sy+.56,-.22,C2)}
+ c3Box(.5,.4,-.3,1.18,1.3,-.18,C,C2);c3Box(.58,1.3,-.3,.8,1.62,-.18,C,C2);c3Box(.94,1.3,-.3,1.12,1.55,-.18,C,C2);c3Box(.62,.95,-.18,.7,1.05,-.15,'#2c2840');c3Box(.9,.95,-.18,.98,1.05,-.15,'#2c2840');
+ c3Pop();if(lit>0)c3Glow(x+Math.sin(.35)*.2,y+2.25,z+.3,.7+lit*.9,'#ffe890',.5*lit)}
+const c3ArchAt=(side,front,h)=>{const a=.35;return[C3AR[0]+Math.cos(a)*side+Math.sin(a)*front,h,C3AR[1]-Math.sin(a)*side+Math.cos(a)*front]};
+/* glowing mushrooms for the hollow */
+function c3Shrooms(x,z,t){for(let k=0;k<9;k++){const a=k*2.1,rr=2.6+(k%4)*1.1,mx=x+Math.cos(a)*rr,mz=z+Math.sin(a)*rr*.8,my=c3G(mx,mz);c3Push();c3T(mx,my,mz);c3Cyl(5,.05,.04,0,.22,'#d0f8ff','#d0f8ff',.6);c3T(0,.22,0);c3Ball(.17,.1,.17,'#2890a8','#90f0f8',6,2,.7,.5,1);c3Pop();c3Glow(mx,my+.25,mz,.5+.08*Math.sin(t*2+k),'#60d8e8',.3)}}
 /* a far mountain, north of everything. hum: a cold light at its foot */
 function c3Peak(hum,t){c3Push();c3T(-8,0,-74);c3Cyl(7,24,6.5,0,34,'#0c1024','#2c3466',.55,1,.3);c3Cyl(7,6.5,0,34,46,'#5860a0','#c8d0f0',.6,1,.3);c3T(15,0,6);c3Cyl(6,15,0,0,22,'#0c1024','#20284c',.55,1);c3Pop();if(hum>0){c3Glow(-8,27,-62,7+Math.sin(t*9)*.8,'#60c8ff',.45*hum);c3Glow(-8,27,-62,2.4,'#d0f0ff',.7*hum)}}
 
@@ -307,93 +344,138 @@ function c3Night(t,L,o){o=o||{};c3Env('night');const fl=L*(1+Math.sin(t*9)*.04);
 const C3LT=[0,3.08,0];
 function c3BeamTo(x,y,z,k,w){c3Beam(C3LT[0],C3LT[1],C3LT[2],x,y,z,.28,w||1.5,'#ffe9a0',.5*k);c3Beam(C3LT[0],C3LT[1],C3LT[2],x,y,z,.1,(w||1.5)*.4,'#fff8d8',.5*k)}
 const c3Dir=(a,len,up)=>[C3LT[0]+Math.cos(a)*len,C3LT[1]+(up||0),C3LT[2]+Math.sin(a)*len];
+/* Thornback's hollow: dark, green, lit by mushrooms and the shard under his chin */
+const C3HO=[-6,11],c3HoAt=(dx,dz)=>[C3HO[0]+dx,C3HO[1]+dz];
+function c3Hollow(t){c3Env('night');c3EN.fog=c3C('#081818');c3EN.amb=[.26,.4,.36];c3EN.fn=5;c3EN.ff=24;c3EN.sky=[c3C('#040c10'),c3C('#0a2020')];c3EN.stars=0;c3Lamp(C3HO[0]+1.2,1,C3HO[1]+1.6,'#ffd860',4.5,1.7+Math.sin(t*3)*.1);c3Shrooms(C3HO[0],C3HO[1],t);
+ for(let k=0;k<11;k++){if(k===1||k===2)continue;const a=k*.571+.2,rr=6.2+(k%3)*1.3;c3Tree(C3HO[0]+Math.cos(a)*rr,C3HO[1]+Math.sin(a)*rr,4+(k%4)*.7,k*3+1)}}
 const C3A_LAKE=Math.atan2(C3TW[1],C3TW[0]),C3A_DOOR=Math.atan2(C3DR[1],C3DR[0]);
 const C3SCN={
+ /* Erin's garden has its five gardeners, and the far bed gives something up */
+ key:[
+  {d:6.5,cap:['',"Five gardeners at work, and the far bed is turned over for the first time in years."],f(t,u){c3Env('day');const a=.9+u*.5;c3Cam(C3GA[0]+Math.cos(a)*9,3.6-u*.8,C3GA[1]+Math.sin(a)*9,C3GA[0],.8,C3GA[1],56);c3Garden(t,1);
+    c3Person(C3GA[0]-1.2,C3GA[1]+1.6,.9,Object.assign({},C3ERIN,{}));c3Person(C3GA[0]+.2,C3GA[1]+4.6-u*1.6,Math.PI,Object.assign(c3Look(),{walk:u<1?t:0}));c3Dog(C3GA[0]+1.2,C3GA[1]+5-u*1.4,Math.PI,{walk:u<1?t:0});
+    for(let k=0;k<5;k++)c3Sprout(C3GA[0]-2.9+k*1.25,C3GA[1]-.4+(k%2)*.7,[4,2,4,0,5][k],{ang:k,hop:Math.abs(Math.sin(t*7+k*1.4))*.14})}},
+  {d:6.5,k:3.6,cap:['ERIN',"That is not a bulb."],f(t,u){const out=c3Sm(2.2,3,t),bx=C3GA[0]+2.6,bz=C3GA[1]-.6,y0=c3G(bx,bz);c3Env('day');c3Cam(bx+2.6-u*.4,1.25,bz+3.2,bx,.45+out*.5,bz,50);c3Garden(t,1);
+    for(let k=0;k<3;k++){const a=2.3+k*.9;c3Sprout(bx+Math.cos(a)*.55,bz+Math.sin(a)*.55,[4,2,4][k],{ang:-a+1.57,hop:out<1?Math.abs(Math.sin(t*12+k))*.1:Math.abs(Math.sin(t*6+k))*.25})}
+    c3Key(bx,y0+.1+out*.95+(out>=1?Math.sin(t*3)*.04:0),bz,.8,out>=1?t*1.5:.6,out<.3);if(out>0&&out<1)for(let k=0;k<5;k++)c3Puff(bx+Math.cos(k*1.3)*.4*out,y0+.2+out*.4,bz+Math.sin(k*1.3)*.4*out,.16,.5*(1-out));
+    c3Cue('pk',()=>{c3At(()=>{snd(300,.08,200);c3At(()=>snd(784,.1),350);c3At(()=>snd(1175,.25),470)},2200)})}},
+  {d:7,cap:['ERIN',"FLOW PROS. That's Marcus's. He closed the pond road for a job, then lost the key."],f(t,u){const ex=C3GA[0]-.6,ez=C3GA[1]+1.2;c3Env('day');c3Cam(ex+1.5+u*.3,1.45,ez+2.9,ex-.1,1.3,ez,46);c3Garden(t,1);
+    c3Person(ex,ez,.5,Object.assign({},C3ERIN,{arm:2.5}));c3Key(ex+.42,c3G(ex,ez)+1.6,ez+.25,.42,t*1.2);c3Person(ex+1.7,ez+.4,-1.2,Object.assign(c3Look(),{up:.15}));c3Dog(ex+1.4,ez+1.6,-2.2,{sit:1,up:.2})}},
+  {d:6.5,cap:['',"Out west, past the crystal, a job site has been 'in progress' for a week."],f(t,u){c3Env('day');c3Cam(-.5-u*1.2,1.5+u*.5,-2.6,-8,1.1,3.5,54);c3Lantern(.4,0,{force:1});c3Jobsite(0,t);c3Van(0,.5,t)}}],
+ /* a crowd of sprouts wakes Old Thornback */
+ thorn:[
+  {d:7.5,k:4,cap:['',"Old Thornback blinks awake. Tucked under his chin, glowing softly, is the last sun shard."],f(t,u){const up=c3Sm(2.2,4,t)*.7,H=C3HO;c3Cam(H[0]+6.8-u*1.5,2.4-u*.5,H[1]+6.2-u,H[0]+.5,1.2,H[1]+.5,54);c3Hollow(t);c3Thorn(H[0],H[1],.9,{t,up});
+    for(let k=0;k<12;k++){const a=k*.9,on=k<7,q=Math.max(0,up-.3)*1.6,fall=Math.max(0,1-q*1.4);c3Sprout(H[0]+Math.cos(a)*(on?.9+q*3:3)+(on?0:.0),H[1]+Math.sin(a)*(on?1.1+q*3:2.8),k,{y:on?c3G(H[0],H[1])+(1.9-.5*Math.cos(a)*Math.cos(a))*fall:undefined,hop:Math.abs(Math.sin(t*8+k))*.15,noSh:on&&fall>.3,ang:a})}
+    c3Cue('wk',()=>c3At(()=>snd(90,.9,140,'sine',.2),2200))}},
+  {d:7,cap:['THORNBACK',"...Oh. Oh no. Is this yours? The nights got so cold. I only wanted the warm."],f(t,u){const H=C3HO;c3Cam(H[0]+3.6+u*.3,1.3,H[1]+4.2,H[0]+1.3,1.25,H[1]+1.5,46);c3Hollow(t);c3Thorn(H[0],H[1],.9,{t,up:.7+Math.sin(t*1.5)*.05});c3Shard(H[0]+1.45,c3G(H[0],H[1])+.45,H[1]+1.55,.5,t,1)}},
+  {d:7,cap:['THORNBACK',"I must have squeezed too tight. I heard a crack, and I ran. I'm sorry, little keeper."],f(t,u){const H=C3HO;c3Cam(H[0]+5.2-u*.5,2.8,H[1]+8.2,H[0]+1.2,1,H[1]+1.4,52);c3Hollow(t);c3Thorn(H[0],H[1],.9,{t,up:.7-c3Sm(.5,3,t)*.5});c3Person(H[0]+3.6,H[1]+4.4,-2.4,Object.assign(c3Look(),{up:.2}));c3Dog(H[0]+4.7,H[1]+3.8,-2.3,{sit:1,up:.2});for(let k=0;k<6;k++)c3Sprout(H[0]+2.6+(k%3)*.5,H[1]+5.2+((k/3)|0)*.5,k,{ang:-2.4})}},
+  {d:7,cap:['THORNBACK',"I was set to guard that light, long ago. I have forgotten who asked me. Or why."],f(t,u){const H=C3HO;c3Cam(H[0]+4.4-u*.4,.9,H[1]+4.6-u*.3,H[0]+.8,1.9,H[1]+.8,50);c3Hollow(t);c3Thorn(H[0],H[1],.9,{t,up:.3+c3Sm(.5,3,t)*.7})}},
+  {d:6.5,cap:['ERIN',"A guardian. So the old stories were true. I wish I remembered the rest of them."],f(t,u){c3Env('dusk');c3Lamp(0,3.1,0,'#ffd890',6,1.2);c3Cam(-3.6+u*.4,1.5,3.4,-1.2,1.25,6.2,48);c3Lantern(.75,3);c3House(6.2,-5.4,-.5,1);c3Soil();c3Person(-1.5,6.1,2.6,Object.assign({},C3ERIN,{up:.1}));c3Dog(.3,6.9,2.4,{sit:1});c3Thorn(-2,15-u*4,Math.PI,{t,up:.6})}},
+  {d:6.5,cap:['ERIN',"He wasn't stealing it. He was freezing. Will... there's room by the lantern, isn't there?"],f(t,u){c3Env('dusk');c3Lamp(0,3.1,0,'#ffd890',6,1.2);c3Cam(6.5,2.6,9.5-u,-2.5,1.2,4.5,54);c3Lantern(.75,3);c3Soil();c3Person(-1.5,6.1,3.4,Object.assign({},C3ERIN,{arm:u>.4?2.2:0}));c3Dog(.3,6.9,3.6,{sit:1});c3Thorn(-6,11-c3Sm(0,1,u)*7.6,Math.PI-.2,{t,up:.5})}},
+  {d:6,cap:['',"Thornback pads off toward the Lantern Field. Carry the shard home."],f(t,u){const H=C3HO,sx=H[0]+.6,sz=H[1]+1.2;c3Cam(H[0]+5+u,2.4+u,H[1]+6.5,sx,.6,sz,54);c3Hollow(t);c3Shard(sx,c3G(sx,sz)+.7+Math.sin(t*2)*.08,sz,.8,t,1);for(let k=0;k<8;k++){const a=k*.785+t*.3;c3Sprout(sx+Math.cos(a)*1.3,sz+Math.sin(a)*1.1,k,{ang:-a-1.57,hop:Math.abs(Math.sin(t*6+k))*.16})}c3Person(H[0]+3.4,H[1]+3.2,-2.3,c3Look());c3Dog(H[0]+4.4,H[1]+2.6,-2.2,{})}}],
+ /* the old arch behind the willows */
+ arch:[
+  {d:7.5,cap:['',"Behind the willows stands an arch of old stone, older than any path in the valley."],f(t,u){const e=c3ArchAt(-7+u*3,10-u*2,2.2+u*.6);c3Env('dusk','day',.5);c3Cam(e[0],e[1],e[2],C3AR[0],2.6,C3AR[1],56);c3Arch(0,t);const w=c3ArchAt(-.8,6.5-u*2.4,0),l=c3ArchAt(.9,7-u*2.4,0);c3Person(w[0],w[2],Math.PI+.35,Object.assign(c3Look(),{walk:u<1?t:0,up:.2}));c3Person(w[0]-1.3,w[2]+.4,Math.PI+.35,Object.assign({},C3ERIN,{walk:u<1?t:0,up:.2}));c3Dog(l[0],l[2],Math.PI+.35,{walk:u<1?t:0})}},
+  {d:7,cap:['ERIN',"Look at the carving, Will. A lantern. Sprouts. And big creatures beside them. Buddies."],f(t,u){const e=c3ArchAt(-1.4+u*2.6,3.4,1.5),g2=c3ArchAt(-.6+u*1.2,0,1.3);c3Env('dusk','day',.5);c3Cam(e[0],e[1],e[2],g2[0],g2[1],g2[2],44);c3Arch(0,t)}},
+  {d:7,cap:['ERIN',"There are words. '...promised to sprouts and buddies. Keep the...' The rest is worn away."],f(t,u){const e=c3ArchAt(2.6,4.6,1.6),g2=c3ArchAt(-.4,0,1.7),w=c3ArchAt(-.2,2.2,0),r2=c3ArchAt(.9,2.4,0);c3Env('dusk','day',.5);c3Cam(e[0],e[1],e[2],g2[0],g2[1],g2[2],50);c3Arch(0,t);c3Person(w[0],w[2],Math.PI+.35,Object.assign({},C3ERIN,{arm:2.2,up:.25}));c3Person(r2[0],r2[2],Math.PI+.2,Object.assign(c3Look(),{up:.3}))}},
+  {d:7,k:3,cap:['ERIN',"And here, under the sun: SUN KEEP. Is that an order, or a name?"],f(t,u){const lit=c3Sm(1,2.6,t),e=c3ArchAt(.3,5.2-u*.5,3.2),g2=c3ArchAt(0,0,4.1),L=c3ArchAt(0,.7,3.72);c3Env('dusk','day',.5);c3Cam(e[0],e[1],e[2],g2[0],g2[1],g2[2],40);c3Arch(lit,t);c3q.label=[L[0],L[1],L[2],'SUN KEEP','#f8e060',c3Sm(1.6,2.8,t)];c3Cue('sk',()=>c3At(()=>snd(220,.9,330,'sine',.12),1100))}},
+  {d:7,cap:['ERIN',"Our house sits on stones just like these. Somebody kept this light before us."],f(t,u){c3Env('dusk');c3Lamp(0,3.1,0,'#ffd890',6,1.3);c3Cam(13.5-u,2.4,2.5,5.6,.9,-4.6,50);c3House(6.2,-5.4,-.5,1);c3Lantern(.9,4);for(let k=0;k<7;k++)c3Box(4.4+k*.55,c3G(4.4+k*.55,-3.9)-.05,-3.95-(k%2)*.1,4.9+k*.55,c3G(4.4+k*.55,-3.9)+.2+(k%3)*.05,-3.6,'#585c70','#a0a8bc')}},
+  {d:5.5,cap:['LOUIE',"Woof."],f(t,u){const d=c3ArchAt(.6,3,0),e=c3ArchAt(3.6,7,1.3);c3Env('dusk');c3Cam(e[0],e[1],e[2],d[0],.9,d[2],40);c3Arch(1,t);c3Dog(d[0],d[2],Math.PI+.8,{sit:1,up:.35});c3Cue('wf',()=>c3At(()=>bark(),700))}},
+  {d:7,cap:['',"Erin starts calling the Lantern Field 'Sunkeep'. It sticks."],f(t,u){const e=c3ArchAt(-5-u*2,9+u*2,3+u*1.5),wp=c3ArchAt(1.5+Math.cos(t*.6)*1.2,1.5,2.4+Math.sin(t*1.1)*.4);c3Env('dusk','night',u*.8);c3Cam(e[0],e[1],e[2],C3AR[0],2.4,C3AR[1],56);c3Arch(1,t);c3Lamp(C3AR[0],2.4,C3AR[1]+1,'#ffd890',4,1);if(u>.35)c3Wisp(wp[0],wp[1],wp[2],t,c3Sm(.35,.7,u))}}],
  /* the first time Will meets Marcus: the Flow Pros van by the Dew Pond */
  van:[
-  {d:6.5,cap:['',"By the Dew Pond sits a van. FLOW PROS. The windows are fogged from the inside."],f(t,u){c3Env('day');c3Cam(1.5-u*1.5,2.6,-5.5+u*1.5,-8,1.2,5.5,56);c3Lantern(.4,0,{force:1});c3Van(0,.55,t);
+  {d:6.5,cap:['',"By the Dew Pond sits a van. FLOW PROS. The windows are fogged from the inside."],f(t,u){c3Env('day');c3Cam(1.5-u*1.5,2.6,-5.5+u*1.5,-8,1.2,5.5,56);c3Lantern(.4,0,{force:1});c3Jobsite(1,t);c3Van(0,.55,t);
     const x=-.5-u*4.6,z=-.2+u*2.2;c3Person(x,z,-1.15,Object.assign(c3Look(),{walk:t}));c3Dog(x+.2,z-1.1,-1.15,{walk:t})}},
-  {d:6.5,cap:['DEREK',"*kkhhh* ...Hoo. Okay. That's the one, Marcus."],f(t,u){const hit=c3Sm(.4,1.8,t)*(1-c3Sm(2.4,3,t)),rip=c3Sm(2.3,3.4,t);c3Env('day');const e=c3VanAt(4.4-u*.5,-.9,1.5),g2=c3VanAt(0,-.6,1.25);c3Cam(e[0],e[1],e[2],g2[0],g2[1],g2[2],52);
-    c3Van(1,.25+rip*1.1,t,{hit});c3Cue('rp',()=>{later(()=>noise(1.3,.12,1800,'bandpass'),500);later(()=>{noise(.12,.3,900);later(()=>noise(.1,.25,800),160);later(()=>noise(.14,.3,1000),330)},2400)})}},
+  {d:6.5,k:3.5,cap:['DEREK',"*kkhhh* ...Hoo. Okay. That's the one, Marcus."],f(t,u){const hit=c3Sm(.4,1.8,t)*(1-c3Sm(2.4,3,t)),rip=c3Sm(2.3,3.4,t);c3Env('day');const e=c3VanAt(4.4-u*.5,-.9,1.5),g2=c3VanAt(0,-.6,1.25);c3Cam(e[0],e[1],e[2],g2[0],g2[1],g2[2],52);
+    c3Van(1,.25+rip*1.1,t,{hit});c3Cue('rp',()=>{c3At(()=>noise(1.3,.12,1800,'bandpass'),500);c3At(()=>{noise(.12,.3,900);c3At(()=>noise(.1,.25,800),160);c3At(()=>noise(.14,.3,1000),330)},2400)})}},
   {d:6.5,cap:['MARCUS',"Bro. BRO. Will! Perfect timing. Derek. Derek. It's Will."],f(t,u){c3Env('day');const e=c3VanAt(6.4,2.6,1.9),g2=c3VanAt(.6,-.3,1.2),w=c3VanAt(3.1+Math.max(0,1-t)*1.5,.5,0),l=c3VanAt(3.4+Math.max(0,1-t)*1.5,1.5,0);c3Cam(e[0],e[1],e[2],g2[0],g2[1],g2[2],54);
-    c3Van(1,.7,t,{marm:2.3+Math.sin(t*9)*.3,mturn:-.2});c3Person(w[0],w[2],C3VAN[2]+Math.PI,Object.assign(c3Look(),{walk:t<1?t:0}));c3Dog(l[0],l[2],C3VAN[2]+Math.PI,{walk:t<1?t:0,sit:t>=1.4});c3Cue('dp',()=>later(()=>{snd(330,.06);later(()=>snd(440,.08),80)},300))}},
+    c3Van(1,.7,t,{marm:2.3+Math.sin(t*9)*.3,mturn:-.2});c3Person(w[0],w[2],C3VAN[2]+Math.PI,Object.assign(c3Look(),{walk:t<1?t:0}));c3Dog(l[0],l[2],C3VAN[2]+Math.PI,{walk:t<1?t:0,sit:t>=1.4});c3Cue('dp',()=>c3At(()=>{snd(330,.06);c3At(()=>snd(440,.08),80)},300))}},
   {d:7,cap:['MARCUS',"Business idea. A lazy river. Around the WHOLE valley. Dews as lifeguards."],f(t,u){c3Env('day');const m=c3VanAt(2.2,.2,0),w=c3VanAt(4.2,2.2,0),l=c3VanAt(3.3,2.6,0),e=c3VanAt(5.3,-.5,1.2);c3Cam(e[0]+u*.3,e[1],e[2],m[0],1.05,m[2],50);
     c3Van(2,.6,t);c3Person(m[0],m[2],C3VAN[2]+.25,Object.assign({},C3MARC,{arm:2.6+Math.sin(t*5)*.3,arms:Math.max(0,Math.sin(t*2.5))*1.2}));c3Person(w[0],w[2],C3VAN[2]+Math.PI+.4,c3Look());c3Dog(l[0],l[2],C3VAN[2]+Math.PI+.2,{sit:1})}},
   {d:7,cap:['MARCUS',"Waterslide off the Lantern. Marcus Waterworks, bro. Derek's in. Derek?"],f(t,u){c3Env('day');c3Cam(-9.4+u*.4,2.4,4.9,0,2.1,0,52);c3Lantern(.4,0,{force:1});c3House(6.2,-5.4,-.5,0);
     c3Van(2,.6,t);c3Person(-5.6,2.6,2.05,Object.assign({},C3MARC,{arm:2.2+Math.sin(t*4)*.15}));c3Person(-5.3,4.2,2.05,Object.assign(c3Look(),{up:.2}));c3Dog(-4.2,4.6,2.05,{sit:1,up:.2})}},
-  {d:6.5,cap:['DEREK',"I'm in. I drive the van. That's my whole part."],f(t,u){const hit=c3Sm(3,4.2,t);c3Env('day');const e=c3VanAt(3.6,-1.2,1.35),g2=c3VanAt(0,-.85,1.3),l=c3VanAt(1.9,-1.9,0);c3Cam(e[0],e[1],e[2],g2[0],g2[1],g2[2],46);
-    c3Van(2,.5+hit*.8,t,{hit});c3Dog(l[0],l[2],C3VAN[2]+2.4,{sit:1,up:t>4.6&&t<5?-.3:.15});c3Cue('ac',()=>later(()=>{noise(.1,.3,3000);spSay('ACHOO!',2)},4600))}}],
+  {d:6.5,k:5,cap:['DEREK',"I'm in. I drive the van. That's my whole part."],f(t,u){const hit=c3Sm(3,4.2,t);c3Env('day');const e=c3VanAt(3.6,-1.2,1.35),g2=c3VanAt(0,-.85,1.3),l=c3VanAt(1.9,-1.9,0);c3Cam(e[0],e[1],e[2],g2[0],g2[1],g2[2],46);
+    c3Van(2,.5+hit*.8,t,{hit});c3Dog(l[0],l[2],C3VAN[2]+2.4,{sit:1,up:t>4.6&&t<5?-.3:.15});c3Cue('ac',()=>c3At(()=>{noise(.1,.3,3000);spSay('ACHOO!',2)},4600))}}],
  /* a new game: the Lantern whole, the crack, the morning after */
  dawn:[
   {d:7,cap:['',"For as long as anyone can remember, the Great Lantern has kept this valley warm and bright."],f(t,u){const a=.9+u*.8;c3Cam(Math.cos(a)*11,3.4+u*1.2,Math.sin(a)*11,0,2.5,0,58);c3Night(t,1,{alone:1});c3Ring(t,8)}},
-  {d:7,cap:['',"Last night it cracked. Four sun shards flew off into the wild, and the nights are getting longer."],f(t,u){const k=c3Sm(1.1,1.25,t),L=1-k*.82;c3Cam(4.5-u*1.5,2.4+u*2.6,9+u*5,0,3+u*1.5,0,62);c3Night(t,L,{alone:1,n:k?0:4});if(k<1)c3Ring(t,8);
-    c3Cue('ck',()=>later(()=>{noise(.5,.35,900,'lowpass');snd(1400,.5,90,'sawtooth',.08)},1100));if(t>1.1&&t<1.5)c3q.flash=1-(t-1.1)/.4;
+  {d:7,k:2.4,cap:['',"Last night it cracked. Four sun shards flew off into the wild, and the nights are getting longer."],f(t,u){const k=c3Sm(1.1,1.25,t),L=1-k*.82;c3Cam(4.5-u*1.5,2.4+u*2.6,9+u*5,0,3+u*1.5,0,62);c3Night(t,L,{alone:1,n:k?0:4});if(k<1)c3Ring(t,8);
+    c3Cue('ck',()=>c3At(()=>{noise(.5,.35,900,'lowpass');snd(1400,.5,90,'sawtooth',.08)},1100));if(t>1.1&&t<1.5)c3q.flash=1-(t-1.1)/.4;
     if(t>1.1)[[1,-.25],[-.1,-1],[-1,.2],[.2,1]].forEach(([dx,dz],i)=>{const q=Math.min(1,(t-1.1)/(3.4+i*.5)),d=q*46;if(q<1){const sy=v=>3.1+Math.sin(v*3.14)*13-v*2;c3Shard(dx*d,sy(q),dz*d,1,t+i,1);for(let j=1;j<5;j++){const v=Math.max(0,q-j*.02);c3Glow(dx*v*46,sy(v),dz*v*46,.9-j*.15,'#ffd860',.4-j*.07)}}})}},
   {d:5.5,cap:['',"This morning the new keeper walked in from the south road."],f(t,u){c3Env('dawn');c3Cam(-7.5+u*1.5,3.2,14.5-u,0,1.7,5,56);c3Lamp(0,3.1,0,'#ffd890',5,.5);c3Lantern(.25,0,{force:1});c3House(6.2,-5.4,-.5,0);c3Soil();
     const z=15-u*7.4;c3Person(.2,z,Math.PI,Object.assign(c3Look(),{walk:u<1?t:0}));c3Person(-1.5,5.6,.2,Object.assign({},C3ERIN,{arm:u>.5?2.4+Math.sin(t*9)*.4:0}));c3Dog(1.4,c3Lp(5.8,6.6,c3Sm(.5,1,u)),.1,{sit:u<.5,walk:u>=.5&&u<1?t:0})}}],
  /* the fourth shard comes home */
  blaze:[
-  {d:5.5,cap:['',"The last shard slides home."],f(t,u){const k=c3Sm(2.6,3,t);c3Env('night','gold',k*.35);const L=.8+k*1.6;c3Lamp(0,3.1,0,'#ffd890',7.5+k*6,2.2*L);c3Moon(-.5,.42,-.75,13,'#e8ecff');c3Cam(3.6-u*.8,1.5+u*.7,5.2-u*.6,0,1.6+u*.8,0,60);c3Lantern(L,k>=1?4:3);c3Soil();
+  {d:5.5,k:3.3,cap:['',"The last shard slides home."],f(t,u){const k=c3Sm(2.6,3,t);c3Env('night','gold',k*.35);const L=.8+k*1.6;c3Lamp(0,3.1,0,'#ffd890',7.5+k*6,2.2*L);c3Moon(-.5,.42,-.75,13,'#e8ecff');c3Cam(3.6-u*.8,1.5+u*.7,5.2-u*.6,0,1.6+u*.8,0,60);c3Lantern(L,k>=1?4:3);c3Soil();
     const sx=Math.cos(.785+3*1.5708)*1.02,sz=Math.sin(.785+3*1.5708)*1.02,q=c3Sm(.4,2.6,t),x=c3Lp(3.2,sx,q),z=c3Lp(4.6,sz,q),y=.9+Math.sin(q*3.14)*1.1+(1-q)*.0;if(q<1){c3Shard(x,y,z,.5,t,1);for(let i=0;i<5;i++){const b=i*1.256+t*2;c3Sprout(x+Math.cos(b)*.5,z+Math.sin(b)*.5,i*2,{y:c3G(x,z),hop:Math.abs(Math.sin(t*8+i))*.12})}}
-    else{c3q.flash=Math.max(0,1-(t-2.6)/.7);c3Ring(t,10,1)}c3Cue('bl',()=>later(()=>{snd(523,.12);later(()=>snd(784,.12),120);later(()=>snd(1046,.4),240)},2600))}},
+    else{c3q.flash=Math.max(0,1-(t-2.6)/.7);c3Ring(t,10,1)}c3Cue('bl',()=>c3At(()=>{snd(523,.12);c3At(()=>snd(784,.12),120);c3At(()=>snd(1046,.4),240)},2600))}},
   {d:7.5,cap:['',"The Great Lantern blazes, and the whole valley turns gold."],f(t,u){c3Env('night','gold',.35+u*.65);const a=2.2-u*1.5,rr=9+u*9;c3Cam(Math.cos(a)*rr,3+u*8,Math.sin(a)*rr,0,2.6,0,60);c3Lamp(0,3.1,0,'#ffd890',16,3.2);c3Lantern(2.4,4);c3House(6.2,-5.4,-.5,1);c3Soil();
     c3Person(1.7,5.9,Math.PI+.25,Object.assign(c3Look(),{up:.3,arm:2.6+Math.sin(t*8)*.3}));c3Person(-1.5,6.1,Math.PI-.25,Object.assign({},C3ERIN,{up:.3,arm:2.6+Math.cos(t*8)*.3}));c3Person(-3.6,5.2,Math.PI-.6,Object.assign({},C3MARC,{up:.3,arm:2.8}));c3Dog(.3,6.9+Math.sin(t*3)*.3,Math.PI,{walk:t,up:.3});c3Thorn(-6.5,2,1.7,{t,up:1});c3Ring(t,12,1);
     for(let k=0;k<8;k++){const b=k*.785+t*.4;c3Glow(Math.cos(b)*(3+k*.6),3+((t*1.3+k*.7)%5),Math.sin(b)*(3+k*.6),.35,'#fff0a0',.5)}}}],
  /* the Lantern is whole and the arch has been read: the skip turns out to be a call */
  call:[
   {d:7,cap:['',"Night. The Great Lantern is whole again. And still, once a night, it skips."],f(t,u){const a=1.05+u*.75;c3Cam(Math.cos(a)*12.5,3.2+u*.8,Math.sin(a)*12.5,0,2.3,0,58);c3Night(t,1)}},
-  {d:5.5,cap:['LOUIE',"Grr...?"],f(t,u){const dip=t>1.2&&t<2?.12+.1*Math.sin(t*70):1,L=dip*(1+c3Sm(2.3,3.6,t)*.9);c3Cam(3.8-u*.6,2.2,6.4-u*1.2,0,2.9,0,54);c3Night(t,L,{up:.4});if(t>1.2&&t<2)c3q.tear=1;
-    c3Cue('sk',()=>later(()=>{snd(90,.5,60,'sawtooth',.06);noise(.3,.2,2400)},1200));c3Cue('hm',()=>later(()=>snd(220,1.6,440,'sine',.05),2300))}},
-  {d:8,cap:['',"This time the light does not settle. It gathers. It turns, slowly, like something looking."],f(t,u){const k=c3Sm(0,1.2,t),a=c3Lp(1.5,C3A_DOOR,c3Sm(.8,7,t));c3Cam(-8.5+u*1.5,7.5,6.5,9,2.2,-1,60);c3Night(t,1.9,{up:.5});const p=c3Dir(a,70,4);c3BeamTo(p[0],p[1],p[2],k);c3Cue('bm',()=>snd(330,2.5,660,'sine',.04))}},
-  {d:7.5,cap:['',"East of the orchard the beam crosses old stone. A carved sun wakes. A hidden door grinds open."],f(t,u){const gl=c3Sm(.8,2,t),op=c3Sm(2.6,6.2,t);c3Env('night');c3Lamp(C3DR[0]-1.5,2,C3DR[1],'#ffd890',5,1.6*gl);c3Moon(-.5,.42,-.75,13,'#e8ecff');
+  {d:5.5,k:3.6,cap:['LOUIE',"Grr...?"],f(t,u){const dip=t>1.2&&t<2?.12+.1*Math.sin(t*70):1,L=dip*(1+c3Sm(2.3,3.6,t)*.9);c3Cam(3.8-u*.6,2.2,6.4-u*1.2,0,2.9,0,54);c3Night(t,L,{up:.4});if(t>1.2&&t<2)c3q.tear=1;
+    c3Cue('sk',()=>c3At(()=>{snd(90,.5,60,'sawtooth',.06);noise(.3,.2,2400)},1200));c3Cue('hm',()=>c3At(()=>snd(220,1.6,440,'sine',.05),2300))}},
+  {d:8,k:7,cap:['',"This time the light does not settle. It gathers. It turns, slowly, like something looking."],f(t,u){const k=c3Sm(0,1.2,t),a=c3Lp(1.5,C3A_DOOR,c3Sm(.8,7,t));c3Cam(-8.5+u*1.5,7.5,6.5,9,2.2,-1,60);c3Night(t,1.9,{up:.5});const p=c3Dir(a,70,4);c3BeamTo(p[0],p[1],p[2],k);c3Cue('bm',()=>snd(330,2.5,660,'sine',.04))}},
+  {d:7.5,k:6.3,cap:['',"East of the orchard the beam crosses old stone. A carved sun wakes. A hidden door grinds open."],f(t,u){const gl=c3Sm(.8,2,t),op=c3Sm(2.6,6.2,t);c3Env('night');c3Lamp(C3DR[0]-1.5,2,C3DR[1],'#ffd890',5,1.6*gl);c3Moon(-.5,.42,-.75,13,'#e8ecff');
     c3Cam(12.5+u*1.2,1.7+u*.5,8.2-u*1.4,C3DR[0],1.7,C3DR[1],56);c3Door(op,gl,t);const p=[C3DR[0]-.3,1.5,C3DR[1]];c3BeamTo(p[0],p[1],p[2],c3Sm(.2,1,t),.5);
     if(op>0&&op<1){c3q.shake=.8;for(let k=0;k<6;k++){const q=(t*1.3+k*.37)%1;c3Disc(C3DR[0]-.6-q*.8,.3+q*.9,C3DR[1]+(k%2?1:-1)*(1.1+q*.4),.3+q*.4,[190,180,160],.3*(1-q))}}
-    c3Cue('dr',()=>{later(()=>{snd(784,.15);later(()=>snd(1175,.3),120)},900);later(()=>noise(3.4,.3,160,'lowpass'),2600)})}},
-  {d:8.5,cap:['',"Then it runs the length of the Crooked River, out to the Wending Lake."],f(t,u){const e=u*u*(3-2*u),x=c3Lp(5,39,e),z=c3Lp(-5.5,-12.5,e)+Math.sin(e*5)*1.2,y=6.2-e*1.8+Math.sin(e*3.14)*1.4;c3Env('night');c3Moon(.9,.3,-.3,13,'#e8ecff');c3Lamp(0,3.1,0,'#ffd890',7.5,2.6);
-    c3Cam(x,y,z,x+11,y-2.4,z-1.8+Math.cos(e*5)*.8,66);c3Lantern(1.9,4);const L=C3LAMP();c3BeamTo(L[0],L[1],L[2],1,1.8);c3Tower(0);c3Pier(0);c3Glow(L[0],L[1],L[2],2.2,'#ffe890',.5);c3Cue('fl',()=>noise(8,.07,500,'lowpass'))}},
-  {d:8,cap:['',"On a rock in the lake stands a second lantern, long dark. For one breath, it answers."],f(t,u){const an=Math.max(0,1-Math.abs(t-5.2)/.7);c3Env('night');c3Moon(.6,.5,-.6,13,'#e8ecff');const L=C3LAMP();c3Lamp(L[0],L[1],L[2],'#ffd890',6,1.2+an*2);
+    c3Cue('dr',()=>{c3At(()=>{snd(784,.15);c3At(()=>snd(1175,.3),120)},900);[0,1,2].forEach(k=>c3At(()=>noise(1.3,.3,160,'lowpass'),2600+k*1100))})}},
+  {d:8.5,k:7.5,cap:['',"Then it runs the length of the Crooked River, out to the Wending Lake."],f(t,u){const e=u*u*(3-2*u),x=c3Lp(5,39,e),z=c3Lp(-5.5,-12.5,e)+Math.sin(e*5)*1.2,y=6.2-e*1.8+Math.sin(e*3.14)*1.4;c3Env('night');c3Moon(.9,.3,-.3,13,'#e8ecff');c3Lamp(0,3.1,0,'#ffd890',7.5,2.6);
+    c3Cam(x,y,z,x+11,y-2.4,z-1.8+Math.cos(e*5)*.8,66);c3Lantern(1.9,4);const L=C3LAMP();c3BeamTo(L[0],L[1],L[2],1,1.8);c3Tower(0);c3Pier(0);c3Glow(L[0],L[1],L[2],2.2,'#ffe890',.5);c3Cue('fl',()=>{for(let k=0;k<8;k++)c3At(()=>noise(1.2,.07,500,'lowpass'),k*1000)})}},
+  {d:8,k:6,cap:['',"On a rock in the lake stands a second lantern, long dark. For one breath, it answers."],f(t,u){const an=Math.max(0,1-Math.abs(t-5.2)/.7);c3Env('night');c3Moon(.6,.5,-.6,13,'#e8ecff');const L=C3LAMP();c3Lamp(L[0],L[1],L[2],'#ffd890',6,1.2+an*2);
     c3Cam(46.5-u*1.2,.7+u*.5,-4.5+u*.8,L[0],L[1]-2.2,L[2],58);c3Tower(an*.9);c3Pier(0);c3BeamTo(L[0],L[1],L[2],1,1.8);c3Glow(L[0],L[1],L[2],2+an*3,'#ffe890',.45+an*.4);c3Wisp(L[0]+Math.cos(t*.9)*1.6,L[1]+.2+Math.sin(t*1.7)*.3,L[2]+Math.sin(t*.9)*1.6,t);
-    c3Bessie(50,-3.5-u*3,.2,0,t);c3Cue('an',()=>later(()=>{snd(660,.5,990,'sine',.07);later(()=>snd(990,.9,660,'sine',.05),200)},4700))}},
+    c3Bessie(50,-3.5-u*3,.2,0,t);c3Cue('an',()=>c3At(()=>{snd(660,.5,990,'sine',.07);c3At(()=>snd(990,.9,660,'sine',.05),200)},4700))}},
   {d:6.5,cap:['THORNBACK',"Two lights. I remember now. One to keep. One to call."],f(t,u){c3Cam(.6-u*.5,1.3,2.2+u*.3,-5.4,1.5,3.3,50);c3Night(t,1.9,{thorn:c3Sm(0,1.4,t),up:.45});const p=c3Dir(C3A_LAKE,70,5);c3BeamTo(p[0],p[1],p[2],1);c3Cue('th',()=>snd(110,.5,80,'sine',.25))}},
   {d:6.5,cap:['ERIN',"So that's the skip. It has been calling every night, and nobody ever answered."],f(t,u){c3Cam(-3.1+u*.4,1.5,2.6,-1.2,1.2,6.2,50);c3Night(t,1.9,{thorn:1,up:.45});const p=c3Dir(C3A_LAKE,70,5);c3BeamTo(p[0],p[1],p[2],1)}},
   {d:6,cap:['',"By morning the beam is gone. The door east of the orchard is still open."],f(t,u){c3Env('night','dawn',c3Sm(0,.8,u));c3Cam(-15+u*2,9.5+u*1.5,11,10,1.5,-2,60);c3Lamp(0,3.1,0,'#ffd890',7.5,2*(1-u*.7));c3Lantern(1.6-u*.8,4);c3House(6.2,-5.4,-.5,u<.5);c3Soil();c3Door(1,.6,t);const p=c3Dir(C3A_LAKE,70,5);c3BeamTo(p[0],p[1],p[2],1-c3Sm(.1,.75,u))}}],
  /* the first walk out onto the North Coast */
  coast:[
   {d:7.5,cap:['',"Past the door the trees stop. Sand. Wind. The Wending Lake, with no far side."],f(t,u){c3Env('day');c3Cam(35.5-u*.6,1.1+u*3.6,-1.2+u*1.2,50,2.6-u*.6,-9,60);c3Tower(0);c3Pier(0);
-    const x=37.5+u*4.2;c3Person(x,-3,1.2,Object.assign(c3Look(),{walk:t,up:.1}));c3Dog(x+1.1,-4.1,1.2,{walk:t});for(let k=0;k<9;k++)c3Sprout(x-1-(k%3)*.55-((k/3)|0)*.5,-2.6-(k%3)*.5+((k/3)|0)*.3,k,{ang:1.2,hop:Math.abs(Math.sin(t*9+k))*.08});c3Cue('wv',()=>noise(7,.06,700,'lowpass'))}},
+    const x=37.5+u*4.2;c3Person(x,-3,1.2,Object.assign(c3Look(),{walk:t,up:.1}));c3Dog(x+1.1,-4.1,1.2,{walk:t});for(let k=0;k<9;k++)c3Sprout(x-1-(k%3)*.55-((k/3)|0)*.5,-2.6-(k%3)*.5+((k/3)|0)*.3,k,{ang:1.2,hop:Math.abs(Math.sin(t*9+k))*.08});c3Cue('wv',()=>{for(let k=0;k<7;k++)c3At(()=>noise(1.2,.06,700,'lowpass'),k*1000)})}},
   {d:7.5,cap:['',"On a rock stands the NORTH LIGHT. Its lamp room is dark, and its lens lies cold at its foot."],f(t,u){c3Env('day');const a=2.2-u*.9,L=C3LAMP();c3Cam(C3TW[0]+Math.cos(a)*16,2.4+u*3,C3TW[1]+Math.sin(a)*16,C3TW[0],5,C3TW[1],58);c3Tower(0);c3Pier(0);
     c3Lens(C3TW[0]-1.9,c3G(C3TW[0]-1.9,C3TW[1]+1.5)+.5,C3TW[1]+1.5,.6,0,t);c3Wisp(L[0]+Math.cos(t*1.1)*1.5,L[1]+Math.sin(t*1.9)*.3,L[2]+Math.sin(t*1.1)*1.5,t,.7)}},
-  {d:6.5,cap:['LOUIE',"...Woof?"],f(t,u){c3Env('day');c3Cam(40.6,1.5,1.2,50,.2,-5.2,54);c3Tower(0);c3Pier(0);c3Dog(44.4,-2.6,2.2,{sit:1,up:.1});c3Person(43.3,-1.2,2.2,Object.assign(c3Look(),{}));c3Bessie(56-u*7,-4.5-u*1.5,-1.9,0,t);c3Cue('bs',()=>later(()=>{snd(70,1.4,50,'sine',.2);bark()},1500))}},
+  {d:6.5,cap:['LOUIE',"...Woof?"],f(t,u){c3Env('day');c3Cam(40.6,1.5,1.2,50,.2,-5.2,54);c3Tower(0);c3Pier(0);c3Dog(44.4,-2.6,2.2,{sit:1,up:.1});c3Person(43.3,-1.2,2.2,Object.assign(c3Look(),{}));c3Bessie(56-u*7,-4.5-u*1.5,-1.9,0,t);c3Cue('bs',()=>c3At(()=>{snd(70,1.4,50,'sine',.2);bark()},1500))}},
   {d:6.5,cap:['',"The pier is out. But sprouts can build, and a lens can be carried home to a light that still burns."],f(t,u){c3Env('day','dusk',u*.5);c3Cam(41-u,2.4,3.5,49.5,2.6,-9,56);c3Tower(0);c3Pier(0);c3Person(43.6,-2.2,2.1,Object.assign(c3Look(),{up:.2}));c3Dog(44.5,-1.5,2.1,{sit:1});for(let k=0;k<9;k++)c3Sprout(42.4+(k%3)*.6,-.8-((k/3)|0)*.6,k,{ang:2.1,hop:Math.abs(Math.sin(t*5+k*1.7))*.1});
     c3Lens(C3TW[0]-1.9,c3G(C3TW[0]-1.9,C3TW[1]+1.5)+.5,C3TW[1]+1.5,.6,0,t)}}],
  /* the lens comes home to the Lantern */
  relight:[
-  {d:7.5,cap:['',"That night the Lantern warms the cold lens until it holds a light of its own. The wisp steps inside."],f(t,u){const lit=c3Sm(1,4.6,t),wy=c3Lp(6,1.25,c3Sm(1.5,5,t));c3Cam(3.2-u*.7,1.5,5.4-u*.8,.2,1.5,1.4,56);c3Night(t,1.5,{up:.1});c3Lens(.2,1.25+Math.sin(t*2)*.05,1.9,.5,lit,t);if(t<5.1)c3Wisp(.2+Math.cos(t*2)*(1-lit)*1.2,wy,1.9+Math.sin(t*2)*(1-lit)*1.2,t);c3Cue('wm',()=>later(()=>snd(440,1.5,880,'sine',.05),1500))}},
-  {d:7,cap:['',"She was the North Light's last flame, waiting for a keeper to carry her home."],f(t,u){const e=c3Sm(1,6.2,t),L=C3LAMP(),x=c3Lp(.2,L[0],e),y=c3Lp(1.3,L[1],e)+Math.sin(e*3.14)*5,z=c3Lp(1.9,L[2],e);c3Cam(-7,6.5,7,12,3.5,-3,60);c3Night(t,1.9,{up:.5,thorn:1});c3BeamTo(L[0],L[1],L[2],1,1.8);c3Lens(x,y,z,.5,1,t);c3Cue('go',()=>later(()=>snd(520,2.2,1560,'triangle',.05),1000))}},
-  {d:8,cap:['',"The North Light opens its eye. Out in the water, something very old lifts its head to look."],f(t,u){const lit=c3Sm(.6,2.2,t),L=C3LAMP(),a=3.3-u*1.1,ba=t*.7;c3Env('night');c3Moon(.6,.5,-.6,13,'#e8ecff');c3Lamp(L[0],L[1],L[2],'#ffd890',9,3*lit);
+  {d:7.5,k:5.1,cap:['',"That night the Lantern warms the cold lens until it holds a light of its own. The wisp steps inside."],f(t,u){const lit=c3Sm(1,4.6,t),wy=c3Lp(6,1.25,c3Sm(1.5,5,t));c3Cam(3.2-u*.7,1.5,5.4-u*.8,.2,1.5,1.4,56);c3Night(t,1.5,{up:.1});c3Lens(.2,1.25+Math.sin(t*2)*.05,1.9,.5,lit,t);if(t<5.1)c3Wisp(.2+Math.cos(t*2)*(1-lit)*1.2,wy,1.9+Math.sin(t*2)*(1-lit)*1.2,t);c3Cue('wm',()=>c3At(()=>snd(440,1.5,880,'sine',.05),1500))}},
+  {d:7,k:6.3,cap:['',"She was the North Light's last flame, waiting for a keeper to carry her home."],f(t,u){const e=c3Sm(1,6.2,t),L=C3LAMP(),x=c3Lp(.2,L[0],e),y=c3Lp(1.3,L[1],e)+Math.sin(e*3.14)*5,z=c3Lp(1.9,L[2],e);c3Cam(-7,6.5,7,12,3.5,-3,60);c3Night(t,1.9,{up:.5,thorn:1});c3BeamTo(L[0],L[1],L[2],1,1.8);c3Lens(x,y,z,.5,1,t);c3Cue('go',()=>c3At(()=>snd(520,2.2,1560,'triangle',.05),1000))}},
+  {d:8,k:6.5,cap:['',"The North Light opens its eye. Out in the water, something very old lifts its head to look."],f(t,u){const lit=c3Sm(.6,2.2,t),L=C3LAMP(),a=3.3-u*1.1,ba=t*.7;c3Env('night');c3Moon(.6,.5,-.6,13,'#e8ecff');c3Lamp(L[0],L[1],L[2],'#ffd890',9,3*lit);
     c3Cam(C3TW[0]+Math.cos(a)*14,1.6+u*2.2,C3TW[1]+Math.sin(a)*14,C3TW[0]-1,5,C3TW[1]+1,60);c3Tower(lit*1.4);c3Pier(7);if(lit>.2)c3Beam(L[0],L[1],L[2],L[0]+Math.cos(ba)*60,L[1]-1,L[2]+Math.sin(ba)*60,.3,2.2,'#ffe9a0',.5*lit);
-    c3Bessie(C3TW[0]-7,C3TW[1]+7.5,2.4,c3Sm(3,6.5,t),t);if(t>.6&&t<1.2)c3q.flash=(1-(t-.6)/.6)*.8;c3Cue('nl',()=>{later(()=>{snd(392,.2);later(()=>snd(587,.2),150);later(()=>snd(784,.6),300)},600);later(()=>snd(60,2.2,45,'sine',.25),3200)})}},
+    c3Bessie(C3TW[0]-7,C3TW[1]+7.5,2.4,c3Sm(3,6.5,t),t);if(t>.6&&t<1.2)c3q.flash=(1-(t-.6)/.6)*.8;c3Cue('nl',()=>{c3At(()=>{snd(392,.2);c3At(()=>snd(587,.2),150);c3At(()=>snd(784,.6),300)},600);c3At(()=>snd(60,2.2,45,'sine',.25),3200)})}},
   {d:6.5,cap:['MARCUS',"BRO. There is a lake monster. Nobody else name her. She's Bessie. I called it."],f(t,u){const L=C3LAMP();c3Env('night');c3Moon(.6,.5,-.6,13,'#e8ecff');c3Lamp(L[0],L[1],L[2],'#ffd890',12,3);c3Lamp(44.5,1.6,-3,'#ffd890',3,1);
     c3Cam(42.6+u*.4,1.35,-.4,48.5,2.2,-5.5,52);c3Tower(1.4);c3Pier(7);c3Person(44.2,-2.6,2.3,Object.assign({},C3MARC,{arm:2.2+Math.sin(t*10)*.25,up:.3}));c3Person(45.4,-1.5,2.2,Object.assign(c3Look(),{up:.3}));c3Dog(43.4,-3.5,2.3,{sit:1,up:.3});
     c3Bessie(C3TW[0]-7,C3TW[1]+7.5,2.4,1,t);const ba=t*.7+5.6;c3Beam(L[0],L[1],L[2],L[0]+Math.cos(ba)*60,L[1]-1,L[2]+Math.sin(ba)*60,.3,2.2,'#ffe9a0',.5)}},
   {d:8,cap:['',"Two lights, talking across the valley. The Lantern does not skip that night."],f(t,u){const L=C3LAMP();c3Env('night');c3Moon(.3,.5,-.8,13,'#e8ecff');c3Lamp(0,3.1,0,'#ffd890',7.5,2.6);c3Lamp(L[0],L[1],L[2],'#ffd890',9,3);
     c3Cam(-17+u*4,13+u*2,15,22,1,-6,62);c3Lantern(1.9,4);c3House(6.2,-5.4,-.5,1);c3Soil();c3Tower(1.4);c3Door(1,.5,t);c3BeamTo(L[0],L[1],L[2],1,1.6);c3Beam(L[0],L[1],L[2],C3LT[0],C3LT[1]+.5,C3LT[2],.3,1.6,'#ffe9a0',.5)}},
-  {d:7.5,cap:['THORNBACK',"Keep. Call. And a third thing, under the mountain. It hummed. I did not like it."],f(t,u){const hm=c3Sm(2.2,3.4,t)*(1-c3Sm(5.6,6.8,t));c3Env('night');c3EN.ff=150;c3EN.fn=30;c3Moon(-.75,.4,-.5,13,'#e8ecff');c3Lamp(0,3.1,0,'#ffd890',7.5,2.6);
-    c3Cam(-2.4+u*.5,1.4,9.6,-5.2,3.2-u*.3,-8,52);c3Lantern(1.9,4);c3Soil();c3Thorn(-5.2,3.2,3.05,{t,up:1});c3Peak(hm,t);c3Cue('hu',()=>later(()=>snd(55,2.8,58,'sawtooth',.05),2200))}}]};
+  {d:7.5,k:4,cap:['THORNBACK',"Keep. Call. And a third thing, under the mountain. It hummed. I did not like it."],f(t,u){const hm=c3Sm(2.2,3.4,t)*(1-c3Sm(5.6,6.8,t));c3Env('night');c3EN.ff=150;c3EN.fn=30;c3Moon(-.75,.4,-.5,13,'#e8ecff');c3Lamp(0,3.1,0,'#ffd890',7.5,2.6);
+    c3Cam(-2.4+u*.5,1.4,9.6,-5.2,3.2-u*.3,-8,52);c3Lantern(1.9,4);c3Soil();c3Thorn(-5.2,3.2,3.05,{t,up:1});c3Peak(hm,t);c3Cue('hu',()=>c3At(()=>snd(55,2.8,58,'sawtooth',.05),2200))}}]};
 
 /* ---------- 6. playing a scene ---------- */
 /* the scenes in the order the story meets them, for the Collection's SCENES page; seen ones are remembered across saves */
-const C3LIST=[['dawn','THE CRACK','The night the Lantern cracked, and the morning after.'],['van','FLOW PROS','Marcus, Derek, a van by the Dew Pond, and a business idea.'],['blaze','THE BLAZE','The fourth shard comes home.'],['call','THE CALL','The night the Lantern stopped skipping and started pointing.'],['coast','THE COAST','The first walk out to the Wending Lake.'],['relight','NORTH LIGHT','The lens comes home, and the second lantern burns.']];
+const C3LIST=[['dawn','THE CRACK','The night the Lantern cracked, and the morning after.'],['key','THE KEY','What the gardeners turned up in the far bed.'],['van','FLOW PROS','Marcus, Derek, a van by the Dew Pond, and a business idea.'],['thorn','THORNBACK','A crowd of sprouts wakes the guardian of the light.'],['blaze','THE BLAZE','The fourth shard comes home.'],['arch','SUN KEEP','The old arch behind the willows.'],['call','THE CALL','The night the Lantern stopped skipping and started pointing.'],['coast','THE COAST','The first walk out to the Wending Lake.'],['relight','NORTH LIGHT','The lens comes home, and the second lantern burns.']];
 const c3SeenScene=k=>!!(meta.scn&&meta.scn[k]);
-function c3Play(key,done){const S=C3SCN[key];if(!S){if(done)done();return}if(!c3SeenScene(key)){meta.scn=meta.scn||{};meta.scn[key]=1;try{save()}catch(e){}}c3q={key,S,i:0,t:0,done:done||null,cue:{},flash:0,tear:0,shake:0,tt:0};state='c3'}
-const c3TextLen=s=>s.length/34+2.3;
+function c3Play(key,done){const S=C3SCN[key];if(!S){if(done)done();return}if(!c3SeenScene(key)){meta.scn=meta.scn||{};meta.scn[key]=1;try{save()}catch(e){}}c3q={key,S,i:0,t:0,done:done||null,cue:{},sched:[],ff:0,go:0,label:null,flash:0,tear:0,shake:0,tt:0};state='c3'}
+const c3TextLen=s=>s.length/34+2.8;
+/* sounds inside a shot run on the shot's own clock, so they stay with the picture and die with the shot */
+function c3At(fn,ms){if(c3q)c3q.sched.push([c3q.t+ms/1000,fn])}
 function c3End(){const f=c3q&&c3q.done;c3q=null;state='play';if(f)f();if(state==='play')persist()}
-function c3Update(dt){const q=c3q;if(!q){state='play';return}q.t+=dt;q.tt+=dt;const sh=q.S[q.i];if(pressed('start')){snd(330,.06);c3End();return}
- const typed=q.t*34>=sh.cap[1].length,nxt=()=>{q.i++;q.t=0;q.cue={};if(q.i>=q.S.length)c3End()};
- if(pressed('a')||pressed('b')){if(!typed)q.t=Math.max(q.t,sh.cap[1].length/34);else{snd(440,.04);nxt()}return}
- if(q.t>=Math.max(sh.d,c3TextLen(sh.cap[1])))nxt()}
+function c3Next(q){q.i++;q.t=0;q.cue={};q.sched=[];q.ff=0;q.go=0;if(q.i>=q.S.length)c3End()}
+/* A: if the words or the shot's key moment (k) are still to come, the shot runs forward five times as fast to that
+   point, holds a beat, and moves on. A again goes straight on. Start leaves the scene. Left alone it plays itself. */
+function c3Update(dt){const q=c3q;if(!q){state='play';return}if(pressed('start')){snd(330,.06);c3End();return}
+ const sh=q.S[q.i],need=Math.max(sh.cap[1].length/34,sh.k||0);
+ if(pressed('a')||pressed('b')){if(q.ff||q.go>0||q.t>=need){snd(440,.04);c3Next(q);return}q.ff=1}
+ const k=q.ff?5:1;q.t+=dt*k;q.tt+=dt*k;
+ if(q.ff&&q.t>=need){q.ff=0;q.go=.45}
+ if(q.sched.length){const due=q.sched.filter(e=>e[0]<=q.t);if(due.length){q.sched=q.sched.filter(e=>e[0]>q.t);for(const e of due)try{e[1]()}catch(err){}}}
+ if(q.go>0){q.go-=dt;if(q.go<=0){c3Next(q);return}}
+ if(q.t>=Math.max(sh.d,c3TextLen(sh.cap[1])))c3Next(q)}
 /* hold: a shot's own clock stops at its length, so a scene that has finished moving waits there for its words */
-function c3Frame(q,top,h){const sh=q.S[q.i],t=q.t;c3Size(h);if(!C3VAL)c3BuildValley();q.flash=0;q.tear=0;q.shake=0;c3D=c3M=c3New();c3X=[1,0,0,0,0,1,0,0,0,0,1,0];c3XS=[];c3stat.tris=0;
+function c3Frame(q,top,h){const sh=q.S[q.i],t=q.t;c3Size(h);if(!C3VAL)c3BuildValley();q.flash=0;q.tear=0;q.shake=0;q.label=null;c3D=c3M=c3New();c3X=[1,0,0,0,0,1,0,0,0,0,1,0];c3XS=[];c3stat.tris=0;
  let pre=[];const sky=c3Sky,moon=c3Moon;c3Moon=(...a)=>pre.push(a); /* the moon is painted on the sky, so it waits for the sky */
  try{sh.f(t,Math.min(1,t/sh.d))}finally{c3Moon=moon}
  if(q.shake){const k=q.shake*.06;c3CE[0]+=Math.sin(q.tt*71)*k;c3CE[1]+=Math.sin(q.tt*93)*k}
@@ -406,9 +488,10 @@ function c3DrawScene(){const q=c3q;r('#06050c',0,0,W,H);if(!q)return;const top=1
  if(!q.half||q.fn%2||q.shot!==q.i||c3H!==h){const t0=typeof performance!=='undefined'?performance.now():0;c3Frame(q,top,h);q.shot=q.i;if(t0){const ms=performance.now()-t0;q.ms=q.ms===undefined||q.fn<3?ms:q.ms*.9+ms*.1;if(q.fn>8){if(q.ms>26)q.half=1;else if(q.ms<11)q.half=0}}}
  g.imageSmoothingEnabled=true;g.drawImage(c3cv,0,0,c3W,h,0,top,W,h);g.imageSmoothingEnabled=false;
  if(q.flash>0)r('rgba(255,248,220,'+Math.min(1,q.flash).toFixed(2)+')',0,top,W,h);
+ if(q.label){const L=q.label,dx=L[0]-c3CE[0],dy=L[1]-c3CE[1],dz=L[2]-c3CE[2],zc=dx*c3CF[0]+dy*c3CF[1]+dz*c3CF[2];if(zc>.5){const sx=c3W/2+(dx*c3CR[0]+dz*c3CR[2])*c3FL/zc,sy=c3H/2-(dx*c3CU[0]+dy*c3CU[1]+dz*c3CU[2])*c3FL/zc;g.globalAlpha=Math.max(0,Math.min(1,L[5]===undefined?1:L[5]));text(L[3],Math.round(sx-tw(L[3],2)/2),Math.round(top+sy-5),2,L[4]||'#f8e060','#181020');g.globalAlpha=1}}
  const fi=q.i===0?Math.max(0,1-q.t/.6):0;if(fi>0)r('rgba(6,5,12,'+fi.toFixed(2)+')',0,top,W,h);
  const who=sh.cap[0],s=sh.cap[1],ls=wrapPx(s,228),n=Math.floor(q.t*34);let c=0,y=H-bot+5;
  if(who){const w=tw(who)+10;r(WHO[who]||'#c8c0d8',6,H-bot-9,w,13);text(who,11,H-bot-9,2,'#181020',null)}
  ls.slice(0,3).forEach((l,k)=>{text(l.slice(0,Math.max(0,n-c)),6,y+k*13,2,who?'#fff8e0':'#d8d4e8',null);c+=l.length+1});
  text((q.i+1)+' / '+q.S.length,4,0,1,'#585070',null);rtext('START: SKIP',236,0,1,'#585070',null);
- if(n>=s.length&&((time*3)|0)%2){r('#f8e060',229,H-9,5,3);r('#f8e060',230,H-6,3,1);r('#f8e060',231,H-5,1,1)}}
+ if(q.ff){text('>>',224,H-13,1,'#f8e060',null)}else if(n>=s.length&&((time*3)|0)%2){r('#f8e060',229,H-9,5,3);r('#f8e060',230,H-6,3,1);r('#f8e060',231,H-5,1,1)}}

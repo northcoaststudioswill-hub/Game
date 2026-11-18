@@ -3,6 +3,67 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: scene timing, three more 3D scenes, and the key to the pond road (Nov 18 2026)
+
+Will: bug fix timing issues in the new Sprouts. Render more scenes. Make the area with Marcus take something you find
+after Erin's garden missions to get to, not just a Peb. I love the design of the animation cutscenes.
+
+![Three more scenes](playtest/sprouts-3d-more-scenes.png)
+
+**Timing (3D scenes):**
+- **Sounds stay with the picture.** Scene sounds used to be set off on real-time timers when a shot began. Press A and
+  the door's rumble or the tower's answer would play seconds later over the wrong shot, or over the game after the
+  scene had ended. They now run on the shot's own clock and are dropped when the shot is left. The long wind and wave
+  sounds are short pieces chained on that clock, so they stop too.
+- **A no longer cuts a shot off before its moment.** Pressing A as soon as the words were up could skip the door
+  opening, the crack, the tower answering. Now, if the words or the shot's key moment are still to come, A runs the
+  shot forward five times as fast to that point (">>" shows), holds a beat and moves on. A again goes straight on.
+  Start still leaves the scene.
+- **Captions hold half a second longer** before a scene moves on by itself.
+- **Glows were aimed with the previous shot's camera** in any shot that built its lights before setting its camera
+  (the new hollow shots did). Found by a new check that draws every shot twice and compares.
+- **A piece of ground beside the camera could be skipped** by last pass's "only work out what is in view" test. The
+  test is now sure to keep anything that reaches the camera. (It had shown up as a handful of wrong pixels.)
+
+**Three more scenes** (nine now, 42 shots), all kept on the Collection's SCENES page:
+- `key` (4 shots): Erin's gardeners turn up a brass key in the far bed. "That is not a bulb."
+- `thorn` (7 shots): the crowd of sprouts wakes Old Thornback, in a dark green hollow lit by mushrooms and the shard
+  under his chin; then Thornback arriving at the Lantern at dusk. This replaces the 2D version of the scene.
+- `arch` (7 shots): the old arch behind the willows, with the cliff and the falls behind it, the carving close up, and
+  SUN KEEP lighting. Replaces the 2D version. The wisp drifts through the last shot.
+- New models: the garden (fence, beds, flowers), the key, the job site, the arch with its carving, the falls, glowing
+  mushrooms. Lines that were too long for three caption rows were trimmed; nothing was added to what they say.
+
+**The pond road** (reaching Marcus):
+
+![The pond road](playtest/sprouts-pond-road.png)
+
+- Past the west crystal the road is now shut by a **Flow Pros job site**, padlocked. Pebs still smash the crystal;
+  they cannot open the job site. Marcus closed the road for a "job" and lost the key in Erin's garden.
+- **Erin's new ask, BRING HOME THE KEY**, comes straight after STATION 5 GARDENERS. Turning in the gardeners plays the
+  `key` scene; then the key lies in the corner of the garden and the crew carries it home (2 strength). A card names
+  it. Walk up to the job site with it and the road opens; the marker reads UNLOCK THE POND ROAD until then.
+- So meeting Marcus, the Dews on the north shore and the island shard now sit behind Erin's garden missions.
+- **Old saves:** a save from before this update that has met Marcus, smashed the west crystal, or is past the
+  gardeners already has the key, and its road is open. A fresh old save gets the new errand.
+
+**Also fixed:** sprouts could be **thrown clean over a shut gate** and left stranded on the far side (the job site,
+and the sun door before the call, where they landed on the North Coast). A sprout that lands somewhere with no way
+home, when Will is somewhere that has one, now comes back. This also means non-swimmers thrown onto the pond island
+come back instead of standing there.
+
+**Tested:** `tests/sprouts_coast.js` 77 checks: every shot of nine scenes draws and draws the same twice; sounds wait
+for their moment and die with their shot; A runs a shot forward to its key moment; the job site, the key scene, the
+errand, the carry, the unlock, and four kinds of save; nothing thrown over a gate. `sprouts_valley.js` and
+`sprouts_story.js` (both updated for the 3D arch and Thornback scenes), soak with two mid-game and two late-game
+seeds, Sproutwild lab 124 of 124, Patch & Plate 119 of 119, console shelf: all pass.
+**Not tested:** by hand, on a phone, or by ear; the sound timing was checked by counting calls, not by listening.
+`tests/lightswarm_lab.js` failed one of its random bot runs in one go out of three, with and without these changes
+(Lightswarm's code is not touched here).
+
+**For Will (canon this assumes):** Flow Pros had a "job" on the pond road in the Sprouts valley, and Marcus lost the
+key in Erin's garden. The 2D pictures for the old arch and Thornback scenes are no longer used.
+
 ## Sprouts: clean-up (Nov 18 2026)
 
 Will: keep working on cleaning up the game. (The same message had lines about graphics and animation with "ignore

@@ -59,7 +59,7 @@ const SEEDS = +(process.argv[3] || 2), DAYS = +(process.argv[4] || 2), LATE = +(
     ok("Erin's day: nothing broke", !B.bad.length && !errs.length, B.bad.concat(errs)); await page.close(); }
   /* seeds past SEEDS are late-game runs: the Lantern is whole, so the call comes on the first night and the North Coast opens */
   for (let seed = 1; seed <= SEEDS + LATE; seed++) { const late = seed > SEEDS; const { page, E, errs } = await open();
-  await E(`init();live=true;state='play';npcs.forEach(n=>{n.st='active'});wakeGrubs();openGarden();[0,1,2,3].forEach(i=>openGate(gates[i]));ZONES.forEach(z=>run.seen[z[0]]=1);run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1};found=found.map(()=>true);
+  await E(`init();live=true;state='play';npcs.forEach(n=>{n.st='active'});wakeGrubs();openGarden();[0,1,2,3].forEach(i=>openGate(gates[i]));run.key=1;openGate(coastGate('jobsite'));ZONES.forEach(z=>run.seen[z[0]]=1);run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1};found=found.map(()=>true);
    for(let i=0;i<24;i++)mkBud(i%6,i%3,P.x,P.y);window.__bot={bad:[],ev:{},s:${seed},t:0,tg:null};void 0`);
   if (late) await E(`won=true;shards=4;day=2;run.boss=true;run.keep=1;openGate(gates[5]);items.forEach(i=>{if(i.sub==='shard')i.alive=false});foes.forEach(e=>{if(e.boss)e.alive=false});for(let i=0;i<16;i++)mkBud(i%6,2,P.x,P.y);void 0`);
   const runB = secs => E(`(()=>{const B=window.__bot,K=__g.keys,PR=__g.prev,dt=1/30;const rnd=()=>{B.s=(B.s*1664525+1013904223)>>>0;return B.s/4294967296};const press=k=>{K[k]=1};const ev=k=>{B.ev[k]=(B.ev[k]||0)+1};

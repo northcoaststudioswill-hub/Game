@@ -42,7 +42,7 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   await E(`P.x=wbuds[0].x+12;P.y=wbuds[0].y;void 0`); const bx = await E('wbuds[0].x'); await step(30); ok('a buddy backs away from Will', (await E('wbuds[0].x')) < bx - 8, await E('msg'));
   await E(`P.x=HX;P.y=HY+30;dayT=DAYLEN*.76;duskSaid=true;void 0`); await step(30 * 25); ok('at night buddies sit by the lantern', (await E(`wbuds.filter(q=>q.night&&q.path&&!q.path.length&&d2(q,HX,HY)<80*80).length`)) >= 1, await E(`wbuds.map(q=>[q.id,Math.round(Math.sqrt(d2(q,HX,HY)))])`));
   await E(`dayT=1;gates.forEach(q=>q.alive&&openGate(q));ZONES.forEach(z=>run.seen[z[0]]=1);run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1};state='play';P.x=KEEP.x;P.y=KEEP.y+14;P.dx=0;P.dy=-1;keys.a=0;void 0`); await step(3); await E(`keys.a=1;void 0`); await step(1); await E(`keys.a=0;void 0`);
-  ok('the old arch plays its scene', (await E('state')) === 'cine' && (await E('scn.length')) === 7); await E(`__g.draw();void 0`);
+  ok('the old arch plays its scene (3D now)', await E(`state==='c3'&&c3q.key==='arch'&&c3q.S.length===7`)); await E(`__g.draw();void 0`);
   await E(`keys.start=1;void 0`); await step(1); await E(`keys.start=0;void 0`); await step(2);
   ok('afterwards the Lantern Field is called Sunkeep', await E(`run.keep===1&&zName('LANTERN FIELD')==='SUNKEEP'`));
   ok('every treasure has a memory that fits its card', await E(`TRL.length===TRS.length&&TRL.every((l,i)=>wrapPx(l,168,2).length<=3)`));

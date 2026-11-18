@@ -2,6 +2,13 @@
 
 Kept next to the game so the code and the story stay in step. Newest first. These are Will's decisions; anything marked OPEN is still his to decide.
 
+## Nov 18: the pond road and the key (Will's ask, Claude's details)
+
+- Will: reaching Marcus's area should take something you find after Erin's garden missions, not just a Peb.
+- Built as: Flow Pros shut the pond road for a "job" (a padlocked job site past the west crystal). Marcus lost the key
+  in Erin's garden; her gardeners dig it up; the crew carries it home; it opens the road.
+- OPEN: the details (a Flow Pros job, a lost key) are Claude's. Will to confirm or swap for another object.
+
 ## Nov 18: meeting Marcus (Will)
 
 - The first time Will meets Marcus it cuts to a 3D scene: Will and Louie walk up to Marcus and **Derek in the van,

@@ -23,7 +23,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
 
   /* ---- the scenes themselves ---- */
   const keys = JSON.parse(await E('JSON.stringify(Object.keys(C3SCN))'));
-  ok('six 3D scenes', keys.join() === 'van,dawn,blaze,call,coast,relight', keys);
+  ok('nine 3D scenes', keys.slice().sort().join() === 'arch,blaze,call,coast,dawn,key,relight,thorn,van', keys);
   const long = JSON.parse(await E(`JSON.stringify(Object.entries(C3SCN).flatMap(([k,S])=>S.map((s,i)=>[k,i,wrapPx(s.cap[1],228).length])).filter(q=>q[2]>3))`));
   ok('every caption fits its three lines', long.length === 0, long);
   await E(`init();live=true;void 0`);
@@ -49,11 +49,52 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok("then Erin's scene, which now starts on her hello", await E(`state==='cine'&&/^Hi, Will/.test(scn[0][0])`), await E('state'));
   for (let i = 0; i < 40 && (await E('state')) !== 'play'; i++) await tap('a');
   await E(`c3Play('dawn');void 0`); await step(30 * 30);
-  ok('left alone, a scene plays itself to the end', (await E('state')) === 'play', await E('state'));
+  ok('left alone, a scene plays itself to the end', (await E('state')) !== 'c3', await E('state'));
   await E(`c3Play('dawn');void 0`); await tap('start'); ok('START skips a scene', (await E('state')) === 'play');
 
+  /* ---- scene timing ---- */
+  const twice = JSON.parse(await E(`(()=>{let bad=[];for(const k of Object.keys(C3SCN))for(let i=0;i<C3SCN[k].length;i++){const go=()=>{c3Play(k);c3q.i=i;c3q.t=C3SCN[k][i].d*.5;c3q.tt=i*7+c3q.t;time=50;g.setTransform(2,0,0,2,0,0);draw();const a=c3px.slice();c3q=null;state='play';return a};const A=go(),B=go();for(let q=0;q<A.length;q++)if(A[q]!==B[q]){bad.push(k+(i+1));break}}return JSON.stringify(bad)})()`));
+  ok('every shot draws the same picture twice running (nothing depends on the shot before it)', twice.length === 0, twice);
+  await E(`window.__snd=[];const s0=snd,n0=noise;snd=(...a)=>{__snd.push(['s',c3q?c3q.i:-1,c3q?+c3q.t.toFixed(2):-1]);};noise=(...a)=>{__snd.push(['n',c3q?c3q.i:-1,c3q?+c3q.t.toFixed(2):-1]);};window.__unsnd=()=>{snd=s0;noise=n0};c3Play('dawn');c3q.i=1;c3q.t=0;c3q.cue={};void 0`);
+  await E(`g.setTransform(2,0,0,2,0,0);draw();void 0`); await step(20); await E(`draw();void 0`);
+  ok('a sound due later in a shot has not played yet', await E(`!__snd.some(q=>q[2]>.2)&&c3q.sched.length>0`), await E('JSON.stringify(__snd)'));
+  await step(30); ok('it plays when the shot reaches it', await E(`__snd.some(q=>q[1]===1&&q[2]>=1.05&&q[2]<1.3)`), await E('JSON.stringify(__snd)'));
+  await E(`__snd=[];c3Play('call');c3q.i=5;g.setTransform(2,0,0,2,0,0);draw();void 0`); await step(6); const had = await E('c3q.sched.length'); await tap('a'); await tap('a');
+  const moved = await E('c3q.i'); await E(`draw();void 0`); await step(170);
+  ok('leaving a shot drops the sounds it had not reached', had > 0 && moved === 6 && await E(`!__snd.some(q=>q[1]===6&&q[2]>1)`), [moved, await E('JSON.stringify(__snd.slice(0,6))')]);
+  await E(`__unsnd();c3Play('call');c3q.i=3;c3q.t=0;void 0`); await step(6); await tap('a');
+  ok('A before the key moment runs the shot forward instead of cutting it', await E(`c3q.i===3&&c3q.ff===1`), await E('[c3q.i,c3q.ff]'));
+  let fr = 0; for (; fr < 200 && await E('c3q&&c3q.i===3'); fr++) await step(1);
+  ok('it reaches the door opening, holds a beat, and moves on by itself', await E(`c3q&&c3q.i===4`) && fr > 25 && fr < 80, fr + ' frames');
+  await E(`c3q=null;state='play';void 0`);
+
+  /* ---- the pond road, the key, and Erin's errand ---- */
+  await E(`init();live=true;state='play';dayT=30;ZONES.forEach(z=>run.seen[z[0]]=1);found=found.map(()=>true);openGate(gates[1]);for(let i=0;i<10;i++)mkBud(1,2,P.x,P.y);void 0`); await step(6);
+  ok('with the crystal smashed the pond road is still shut', await E(`coastGate('jobsite').alive&&fieldL[20*MW+17]<0&&!run.key`));
+  await tp(20, 20, -1, 0); await step(10); ok('walking up without the key says whose it is', /FLOW PROS/.test(await E('msg')), await E('msg'));
+  await throwFor(20); await step(20); ok('sprouts cannot open it', await E(`coastGate('jobsite').alive&&coastGate('jobsite').on.length===0`));
+  ok('and none are left stranded on the far side', await E(`!buds.some(b=>b.x<18*16)`), await E(`buds.filter(b=>b.x<18*16).length`));
+  await shot('key-1-jobsite');
+  await E(`openGarden();npcs[0].st='active';npcs[0].mi=npcs[0].ms.findIndex(m=>m.id==='e6');void 0`); await tp(46, 6, 0, -1); await E(`buds.forEach(b=>{b.st='idle'});for(let i=0;i<5;i++){const b=mkBud(4,2,46*16,6*16);b.gard=true;b.st='tend'}P.dx=0;P.dy=-1;void 0`); await step(4);
+  await E(`talk(npcs[0]);void 0`);
+  ok("turning in Erin's gardeners cuts to the key scene", await E(`state==='c3'&&c3q.key==='key'`), await E('state'));
+  await tap('start'); await step(2);
+  ok('then she asks for the key, and it is lying in the garden', await E(`state==='talk'&&npcs[0].ms[npcs[0].mi].id==='e12'&&items.some(i=>i.alive&&i.sub==='key')`), await E('npcs[0].ms[npcs[0].mi].id'));
+  for (let i = 0; i < 20 && (await E('state')) === 'talk'; i++) await tap('a');
+  await step(12); ok('the marker points at the key', /KEY/.test(await E('OBJ&&OBJ.text')), await E('OBJ&&OBJ.text'));
+  await E(`buds.forEach(b=>{release(b);b.gard=false;b.st='follow'});void 0`); await tp(43, 9, -1, 0); await step(6); await shot('key-2-in-the-garden'); await throwFor(30);
+  let ks = 0; for (; ks < 90 && !(await E('run.key')); ks++) await step(30);
+  ok('the crew carries the key home', await E(`run.key===1&&state==='card'`), ks + ' s, ' + await E('state'));
+  await tap('a'); await step(12); ok('then the marker says to unlock the pond road', /POND ROAD/.test(await E('OBJ&&OBJ.text')), await E('OBJ&&OBJ.text'));
+  await tp(20, 20, -1, 0); await step(12);
+  ok('walking up with the key opens it', await E(`!coastGate('jobsite').alive&&fieldL[20*MW+17]>0`), await E('msg'));
+  ok('a save keeps the key and the open road', await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);return run.key===1&&!coastGate('jobsite').alive})()`));
+  ok('a save from before this update that has met Marcus is not locked out', await E(`(()=>{init();live=true;state='play';openGate(gates[1]);npcs[3].st='active';const o=JSON.parse(JSON.stringify(snap()));delete o.gates.jobsite;restore(o);return run.key===1&&!coastGate('jobsite').alive&&fieldL[20*MW+17]>0})()`));
+  ok('a fresh old save keeps the new errand', await E(`(()=>{init();live=true;state='play';const o=JSON.parse(JSON.stringify(snap()));delete o.gates.jobsite;restore(o);return !run.key&&coastGate('jobsite').alive})()`));
+  ok('a save made in the middle of the errand still has the key to carry', await E(`(()=>{init();live=true;state='play';openGarden();npcs[0].st='active';npcs[0].mi=npcs[0].ms.findIndex(m=>m.id==='e12');keySpawn();const o=JSON.parse(JSON.stringify(snap()));o.items=o.items.filter(q=>q[0]!=='key');restore(o);return items.filter(i=>i.alive&&i.sub==='key').length===1})()`));
+
   /* ---- meeting Marcus: the van ---- */
-  await E(`init();live=true;state='play';dayT=30;ZONES.forEach(z=>run.seen[z[0]]=1);void 0`); await tp(17, 24, 0, -1); await E(`buds.forEach(b=>b.st='idle');void 0`); await step(4); await tap('a');
+  await E(`init();live=true;state='play';dayT=30;ZONES.forEach(z=>run.seen[z[0]]=1);run.key=1;void 0`); await tp(17, 24, 0, -1); await E(`buds.forEach(b=>b.st='idle');void 0`); await step(4); await tap('a');
   ok('talking to Marcus the first time cuts to the van in 3D', await E(`state==='c3'&&c3q.key==='van'`), await E('state'));
   await tap('start'); await step(2);
   ok('then he gives his first ask, without saying the idea twice', await E(`state==='talk'&&dlg.name==='MARCUS'&&npcs[3].st==='active'&&!/lazy river/i.test(dlg.pages.flat().join(' '))&&/Dew/.test(dlg.pages.flat().join(' '))`), await E('state'));
@@ -68,6 +109,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok('the sun door is shut and the coast cut off', await E(`coastGate('sunDoor').alive&&fieldL[20*MW+72]<0&&!coastObj()`));
   await tp(66, 20, 1, 0); await throwFor(20); await step(30);
   ok('sprouts cannot open the sun door', await E(`coastGate('sunDoor').alive&&coastGate('sunDoor').on.length===0`), await E('msg'));
+  ok('and none land beyond it', await E(`!buds.some(b=>b.x>=70*16)`), await E(`buds.filter(b=>b.x>=70*16).length`));
   await shot('coast-1-door-shut');
   await E(`dayT=DAYLEN*.8;void 0`); await step(30);
   ok('nothing happens at night before the Lantern is whole', (await E('state')) === 'play' && !(await E('run.call')));

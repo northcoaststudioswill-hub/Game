@@ -56,7 +56,7 @@ Sources: [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (the Sprouts sections, Nov 17 an
 - Nature's balance (a wild buddy quietly eats a stranded sprout) is rare by design. Two three-day autopilot runs saw none. Whether a player ever notices it is unknown.
 - The objective-marker bot got through four asks in four of five runs and two in the other.
 
-- The 3D cutscenes and the North Coast (Nov 18) were stepped by script only (`sprouts_coast.js`, 56 checks). Not played by hand, not seen on a phone, no sound listened to. Frame time on a real phone is unknown.
+- The 3D cutscenes and the North Coast (Nov 18) were stepped by script only (`sprouts_coast.js`, 77 checks). Not played by hand, not seen on a phone, no sound listened to. Frame time on a real phone is unknown.
 - The soak test's first-day bot sometimes finishes only one of Erin's asks (about 1 run in 10 to 30; also on the build from before Nov 18). Cause unknown: bot or game.
 - Speed was measured in headless Chromium slowed four times, never on a phone. The 3D scenes have a slow-device mode that has only been triggered by a test.
 
