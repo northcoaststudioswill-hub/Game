@@ -51,9 +51,10 @@ real game can't read or overwrite Erin's Patch & Plate days, Rootdeep runs, or a
 | `tests/fable_lab.js` | Fable pass 1: parry, wall bounce, K.O. frame, stances, rules and Trials (20 pass/fail checks, sheets in `playtest/fable/`). |
 | `tests/sprouts_valley.js` | Sprouts, the valley update: bridge, nectar, pear, treasure, saves, and the prequel pass (25 checks). |
 | `src/sprouts3d.js` | Sprouts' 3D cutscenes: a small software renderer (triangles, depth buffer, fog, lamps, dither), the models, and the nineteen scenes. Built into `console.js`'s scope by `build.py`; every name starts `c3`. |
-| `tests/sprouts_coast.js` | Sprouts, the 3D scenes and the North Coast: every shot draws, captions fit, the call, door, pier, lens, relight, saves, the ending (154 checks). Optional second argument: a folder for screenshots. |
+| `tests/sprouts_coast.js` | Sprouts, the 3D scenes and the North Coast: every shot draws, captions fit, the call, door, pier, lens, relight, saves, the ending (172 checks). Optional second argument: a folder for screenshots. |
 | `tests/sprouts_story.js` | Sprouts story run: four shards, Thornback, the ending, the house, a project, the next morning (17 checks). |
 | `tests/sprouts_soak.js` | Sprouts autopilots: Erin's first day by the objective marker, seeded chaos runs of the mid-game, and late-game runs (the call, the North Coast), with invariant checks. Arguments: build, seeds, days, late-game seeds. |
+| `tests/sprouts_playthrough.js` | Sprouts story run: a new game to the relit North Light, printing every story beat in the order the game fires it. Read it to check the story is in order; `(helped: ...)` lines are the script. Last run: `playtest/sprouts-story-run.txt`. |
 | `tests/sprouts_tour.js` | Plays Sprouts in real time from a fresh save by following the objective marker. |
 | `tests/lantern_shots.js` | The Lantern menu's stats, achievements and ticket pages with sample saves. |
 | `tests/pp_test.js` | Patch & Plate test (119 checks): v0.3's 76 plus the v0.4 to v0.6 checks. |

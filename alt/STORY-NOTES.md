@@ -94,3 +94,22 @@ line here is Will's to keep, change or cut. It was written to fit what is alread
 - Lines I wrote, Scout: "Seen the little lights lying about? Glimmers. Motes of the Lantern, I think, from when it
   cracked. Three in every place. Walk over one and it's yours. Find me ten." and "Ten! I'm drawing a map. Some are
   past the bridge, some out west, and I'd bet the garden has its three. Twenty this time."
+
+## Nov 18: lines added by the story run (Claude's, not yet Will's)
+
+- Ranger, at two shards, when Will has not met Marcus: "More of those marks, out west by the pond. Something huge was
+  dragging something warm." / "The trail heads south, into the hollow. Nobody goes in the hollow." (after Thornback:
+  "The trail went south, into the hollow. Which explains our big new neighbour.")
+- Already-done lines. Ranger: "Bramble blocked the north path. I see you burned it already. Saves me asking." /
+  "The west path was sealed with crystal. Was. Your Pebs got there before I did." / "I was going to ask you to bridge
+  the Crooked River, past Scout. You already have. Willow Falls is on the other side." / "Those marks led south, to Old
+  Thornback's hollow. And you had already been to see him. The old folk called him the guardian of the light. Looks
+  like they were right." Erin: "Four sun shards, I was going to say. And you've brought every one of them home
+  already. Will!" Marcus: "See that island, bro? Future VIP section. There WAS a shard on it. You already got it. See
+  one, send one. Respect."
+- "LOUIE YAWNS. HE WILL SLEEP WELL TONIGHT" / "THE LENS IS HOME. TONIGHT THE LANTERN WILL WARM IT" /
+  "TONIGHT THE LANTERN WARMS THE LENS".
+- Relight caption now: "That night the Lantern warms the lens until it glows. The wisp who visits each night steps inside."
+- Order of the story as the game now tells it: the crack, the new keeper, marks at the first shard, more marks at
+  two, Thornback at the last, the ending, (a night passes), the call, the coast, the lens, (nightfall) the relight.
+

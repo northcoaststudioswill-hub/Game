@@ -3,6 +3,60 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: a full story run, and what it turned up (Nov 18 2026)
+
+Will: do a playthrough and lore check, make sure the story adds up and is in order. The arrow pointed at Erin the
+whole time instead of more exploring. Louie's dream should only play after night comes, before that menu.
+
+**How it was checked.** New script `tests/sprouts_playthrough.js` starts a new game and prints every scene, line,
+arrow, card and toast in the order the game fires them, with the day and time of day. The autopilot plays through the
+real controls; where it cannot finish an ask the script helps and says so. The last run is saved in
+`playtest/sprouts-story-run.txt`. I read five of these runs end to end. This is a script's run, not a hand's.
+
+**The arrow.** It was Erin's until all twelve of her asks were done, so it never named anyone else. Now:
+- Erin for her first three asks (pluck, berries, Louie), which teach the controls.
+- After each hand-in it points at someone Will has not met and can walk to: Ranger, then Scout, then Marcus once the
+  pond road is open. In the runs Will has met Ranger and Scout by a quarter of the way through day one.
+- Any ask that is finished calls him back to whoever gave it.
+- Otherwise it stays on whoever Will last spoke to, so talking to someone is how you choose. The pause list marks
+  that ask with a small yellow arrow.
+- Erin's garden and key steps keep the arrow, so the story beats are not talked over.
+- The garden asks now point at a bed that needs a sprout, not at Erin herself.
+
+**Out of order, fixed:**
+- **Louie's dream** played the moment of the fifth scratch, in the middle of the day. Now Louie yawns, and the dream
+  plays once night has fallen, before the evening report.
+- **The relight** ("That night the Lantern warms the lens...") played the moment the lens came home, usually in the
+  morning. Now the lens waits by the Lantern and the scene plays at nightfall; from the afternoon the arrow says so.
+- **The call** could come on the same evening as the ending. Now the earliest is the night after.
+- **Marcus spoke before Will had met him.** At two shards he reported marks "by my pond" even with the pond road
+  still locked. If Will has not met him, Ranger brings that news instead.
+- **The pond road lock opened through the crystal.** The job site gate is one tile behind the west crystal, and
+  standing on the near side with the key opened it. It now needs the crystal gone first.
+- **Asks that were already done.** Ranger said Thornback "sleeps like a boulder" after Thornback had moved in, and
+  Marcus pointed at a shard that was already home. Six asks (bramble, crystal, bridge, Thornback, four shards, island
+  shard) have a second line for when the thing is already done.
+- **"A quiet morning at the Lantern"** (the job scene) could play in the afternoon. It now needs the morning; later
+  in the day the van still leaves, with a line.
+- **Moonblooms** could cut in when handing Erin a finished ask in the garden at dusk. It waits for a plain chat.
+- **A at a person with something to throw at behind them** talked instead of throwing (Ranger stands in front of
+  his own bramble, and the autopilot lost two whole days there). If the aim has snapped onto a target, A throws unless
+  Will is right up against the person.
+
+**Lore read, no change made:** the rest holds together in order: crack, new keeper, marks at the first shard,
+Thornback and why he took it, the ending, the skip, the call, the coast, the lens, the relight, Bessie. Two soft spots
+for Will: Erin's house line says "Lantern Field" even after she has renamed it Sunkeep, and the relight leans on the
+night wisp, which a player may never have noticed (the caption now says "the wisp who visits each night").
+
+**Lines I wrote this pass** (in STORY-NOTES): Ranger's two lines at two shards, the six already-done lines, "LOUIE
+YAWNS. HE WILL SLEEP WELL TONIGHT", "THE LENS IS HOME. TONIGHT THE LANTERN WILL WARM IT", the relight caption edit.
+
+**Tested:** `tests/sprouts_coast.js` 172 checks (eighteen new or changed, covering each item above).
+`sprouts_valley.js`, `sprouts_story.js`, `sprouts_soak.js`, the three `tests/v02` scripts, `console_shelf.js`, the
+Sproutwild field lab (124) and `pp_test.js` (119) pass. **Not tested:** by hand, on a phone, or by ear. The story run
+needed the script's help for the asks the autopilot cannot do (grubs, bugs, shards, the pier), so how long those
+take a person, and whether the new arrow feels like freedom or like being passed around, needs Will's playtest.
+
 ## Sprouts: glimmers, and talking on the move (Nov 18 2026)
 
 Will: continue development on Sprouts. Built on his earlier note that the game might be "more of a collectathon".
