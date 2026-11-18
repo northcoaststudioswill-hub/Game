@@ -188,5 +188,9 @@ From [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), still open:
 
 ## The whole console
 
+- The Lantern menu (stats, achievements, played count) only knows the first four or five cartridges; Lightswarm and Clankawatch are not counted.
+- Clankawatch here is a copy of its branch; changes there do not arrive by themselves. Its old standalone saves do not carry over.
+- The power-on chime is silent until the page has been touched (browser rule).
+
 - `docs/index.html` (the public GitHub Pages copy) still has the 4-cartridge build. It is updated only when Will says so.
 - The five-cartridge build has not been cut as a numbered release (no share zip yet).

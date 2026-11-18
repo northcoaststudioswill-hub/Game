@@ -3,6 +3,39 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## The console: a power-on sequence, a bigger shelf, and Clankawatch as cartridge 7 (Nov 18 2026)
+
+Will: does this have the latest versions of everything; fold Clankawatch in; reorganise the cartridges to fit more of
+the screen; a boot sequence when the Lantern starts, before the cartridges, not the same as the games' boot.
+
+![Power on and the shelf](playtest/console/boot-4-sprouts.png)
+
+- **Power on.** Opening the page now plays the console's own start-up before the shelf: a match is struck in the
+  dark, the lantern takes, the light spreads over POCKET LANTERN, one sprout hops in for each cartridge, NORTH COAST
+  STUDIOS, a four-note chime. About 3.6 seconds; any button skips it. The games keep their own boot (the name
+  dropping in, LIGHTS ON) when a cartridge goes in. Sound only plays if the page has been touched first (browsers
+  block it otherwise). `?noboot` in the address skips it.
+- **The shelf is rows of three,** with cartridges about twice the size (117 wide on a phone, was 62) and bigger
+  labels, so it fills the screen. The D-pad moves up and down the rows; below the last row is the Lantern menu.
+  There is room for two more cartridges before a fourth row.
+- **Clankawatch is cartridge 7.** Its source (v4.0 alpha 3, from `claude/tender-darwin-0r4toe`, folder
+  `muse/games/thornwatch/`) is copied to `src/clankawatch/` and built into the console's own scope, the way it was
+  in its own console. Nothing in it was changed. Its saves keep the `thornwatch` keys (with ALT's `pl-alt:` prefix,
+  so saves from its old standalone file do not carry over). No name in it clashed with the other cartridges.
+- The page title is "Pocket Lantern".
+
+**Latest versions, checked against every branch on GitHub (Nov 18):** Sprouts, Knockout, Rootdeep, Patch & Plate and
+Sproutwild here are the newest there is (the Sprouts valley branch; no other branch has newer code for them).
+Clankawatch is its newest. **Not in this console:** lil Bottie v0.4.1 (`claude/modest-ride-rgjg4r`, its own console
+fork in `bottie/`), Starhaven, Sootborn and Underground Syndicate (separate games in their own folders).
+
+**Keeping Clankawatch in step:** it is a copy. When the Clankawatch branch moves on, copy its `src/tw-*.js` over
+`alt/src/clankawatch/` and rebuild.
+
+**Tested:** new `tests/console_shelf.js` (11 checks: the start-up, skip, shelf layout and D-pad, Clankawatch to its
+title, files, menu, story and thirty seconds of a night, no errors). Lightswarm 38, Patch & Plate 119, Sproutwild lab
+124, Sprouts story run all pass. Clankawatch's own tests were not run against this build. **Not played on a phone.**
+
 ## Lightswarm v0.3: more lore, the radio, finds, second supers, Keeper Rank (Nov 18 2026)
 
 Will: more lore from the latest Sproutwild and Sprouts; pop-up quips and other animations; sprouts were piling up;

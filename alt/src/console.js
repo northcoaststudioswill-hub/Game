@@ -96,7 +96,7 @@ const TRACKS=(window.SPROUT_TRACKS||[]).map(t=>Object.assign({},t,{img:null}));
 TRACKS.forEach(t=>{try{const im=new Image();im.src=t.art;t.img=im}catch(e){}});
 const MUS={pending:-1,from:'',list:'',src:null,gain:null,buf:null,bi:-1,cur:-1,last:-1,loading:false,tok:0,gap:0,fade:1,np:0,shown:-1};
 const MENU_ST={intro:1,menu:1,rewards:1,caps:1,style:1,bugs:1};
-function musWant(){if(state==='off'||state.slice(0,2)==='g3'||state.slice(0,3)==='lan')return'';if(state==='ko')return KO.mus();if(state==='pp')return PP.mus();if(state==='boot')return cart?'':bootT>.35?'menu':'';if(state==='settings')return setFrom==='pause'?'game':'menu';return MENU_ST[state]&&!(state==='bugs'&&colFrom==='pause')?'menu':'game';}
+function musWant(){if(state==='off'||state==='pwr'||state.slice(0,2)==='g3'||state.slice(0,3)==='lan')return'';if(state==='ko')return KO.mus();if(state==='pp')return PP.mus();if(state==='boot')return cart?'':bootT>.35?'menu':'';if(state==='settings')return setFrom==='pause'?'game':'menu';return MENU_ST[state]&&!(state==='bugs'&&colFrom==='pause')?'menu':'game';}
 const musLevel=()=>Math.pow(meta.mus/10,2)*.85*(state==='pause'||(state==='ko'&&KO&&KO.paused())||(state==='pp'&&PP&&PP.paused())||(state==='ls'&&LS&&LS.paused())||(state==='settings'&&setFrom==='pause')?.55:1);
 function musGain(){if(!MUS.gain&&ac){MUS.gain=ac.createGain();MUS.gain.gain.value=0;MUS.gain.connect(ac.destination)}return MUS.gain;}
 function getBuf(i){if(MUS.bi===i&&MUS.buf)return Promise.resolve(MUS.buf);
@@ -232,7 +232,7 @@ let cart=0;
 const KO=window.KO_CART?window.KO_CART({g,W,H:()=>H,r,text,ctext,tw,snd,noise,keys,pressed,mk,flip,ac:()=>ac,meta:()=>meta,eject:()=>eject(),hasTracks:n=>TRACKS.some(t=>t.use.includes(n))}):null;
 const PP=window.PP_CART?window.PP_CART({g,W,H:()=>H,r,text,tw,snd,noise,keys,pressed,mk,flip,CH,LOU,TL,sw:()=>({chr:SWCHR,bud:id=>wSp(id)._spr}),will:()=>SP,meta:()=>meta,persist:()=>persist(true),eject:()=>eject(),active:()=>state==='pp',hasTracks:n=>TRACKS.some(t=>t.use.includes(n))}):null;
 const LS=window.LS_CART?window.LS_CART({g,W,H:()=>H,r,text,tw,snd,noise,keys,pressed,mk,flip,TYPES,LOU,will:()=>SP,CHS:CH,swchr:()=>SWCHR,ko:()=>KO&&KO._,bud:id=>wSp(id)._spr,meta:()=>meta,eject:()=>eject(),active:()=>state==='ls'}):null;
-const PAD=[['act','call','swap','pause'],['light','heavy','super','pause'],['attack','cast','swap','pause'],['use','toss','recipes','pause'],['act','call','select','menu'],['move','whistle','super','pause']];
+const PAD=[['act','call','swap','pause'],['light','heavy','super','pause'],['attack','cast','swap','pause'],['use','toss','recipes','pause'],['act','call','select','menu'],['move','whistle','super','pause'],['act','back','cycle','pause']];
 function setPad(i){try{const q=(s,t)=>{const e=document.querySelector(s);if(e)e.textContent=t},L=PAD[i]||PAD[0];q('#bA span',L[0]);q('#bB span',L[1]);q('#bSel small',L[2]);q('#bSta small',L[3]);const cs=$('console');if(cs)cs.classList.toggle('ko',i===1||i===2);const sl=$('bSel');if(sl)sl.classList.remove('ready')}catch(e){}}
 const toast=s=>toasts.push({s,t:3.2});
 function carve(x,y,w,h,t=G){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)map[j*MW+i]=t;}
@@ -484,13 +484,42 @@ const npcMark=n=>n.st==='new'?1:n.st==='active'&&n.ms[n.mi].get()>=n.ms[n.mi].go
 /* ---------- cartridge shelf (DOM) ---------- */
 const shelf=$('shelf'),carts=[...shelf.querySelectorAll('.cart')];let cartAnim=null,inserting=false;
 function cartHi(i){cartSel=i;carts.forEach((c,n)=>c.classList.toggle('sel',n===i));}
-function cartPick(i){if(inserting)return;cartHi(i);const c=carts[i];
+function cartPick(i){if(inserting)return;if(state==='pwr')pwrDone();cartHi(i);const c=carts[i];
  try{lanPlayed(i)}catch(e){}
- if(i>5||(i===1&&!KO)||(i===3&&!PP)||(i===5&&!LS)){$('shelfMsg').textContent='That one is not out yet';c.classList.remove('nope');void c.offsetWidth;c.classList.add('nope');snd(140,.1);return;}
+ if(i>6||(i===1&&!KO)||(i===3&&!PP)||(i===5&&!LS)){$('shelfMsg').textContent='That one is not out yet';c.classList.remove('nope');void c.offsetWidth;c.classList.add('nope');snd(140,.1);return;}
  inserting=true;const a=c.getBoundingClientRect(),s=$('slot').getBoundingClientRect(),d=a.top-s.bottom,dx=(s.left+s.width/2)-(a.left+a.width/2);
  const done=()=>{inserting=false;shelf.hidden=true;$('slot').classList.add('in');$('led').classList.add('on');cart=i;setPad(i);bootT=0;bootDing=false;state='boot';};
  if(c.animate){cartAnim=c.animate([{transform:'translate(0,-4px)',clipPath:'inset(0 0 0 0)'},{transform:`translate(${dx}px,${-d}px)`,clipPath:'inset(0 0 0 0)',offset:.55},{transform:`translate(${dx}px,${-d-a.height}px)`,clipPath:'inset(100% 0 0 0)'}],{duration:950,easing:'ease-in-out',fill:'forwards'});
   noise(.5,.07,900,'lowpass');later(()=>noise(.025,.2,3000),500);later(cartSnap,880);cartAnim.onfinish=done;}else{cartSnap();done()}}
+/* ---------- power on: the console's own start-up, before the shelf (the games keep their own boot) ----------
+   A match is struck in the dark, the lantern takes, the light spreads over the name, and one sprout for each
+   cartridge hops in. Any button skips it. It plays once each time the page is opened. */
+let pwrT=0,pwrS=0;const PWR_LEN=3.6,PWR_COL=['#f07830','#e23b5e','#8858c8','#f8a0c8','#58c048','#f8e060','#48a0f0'];
+function pwrDone(){if(state!=='pwr')return;state='off';shelf.hidden=false;shelf.classList.add('wake');later(()=>shelf.classList.remove('wake'),700)}
+function pwrUpdate(dt){pwrT+=dt;const any=Object.keys(keys).some(k=>pressed(k));
+ if(pwrT>.5&&!(pwrS&1)){pwrS|=1;noise(.06,.5,3200);noise(.25,.12,1200,'bandpass')}
+ if(pwrT>.95&&!(pwrS&2)){pwrS|=2;snd(196,.5,392,'sine',.05)}
+ if(pwrT>2.05&&!(pwrS&4)){pwrS|=4;snd(659,.1,0,'triangle',.05);later(()=>snd(784,.1,0,'triangle',.05),110);later(()=>snd(1047,.1,0,'triangle',.05),220);later(()=>snd(1319,.45,0,'triangle',.05),330)}
+ if(pwrT>PWR_LEN||(pwrT>.3&&any))pwrDone()}
+function pwrDraw(){const t=pwrT,cx=120,cy=Math.round(H*.36),k=Math.max(0,Math.min(1,(t-.95)/.9)),e=k*k*(3-2*k);r('#07060c',0,0,W,H);
+ /* the light, spreading */
+ if(t>.95&&g.createRadialGradient){const rad=20+e*190,gr=g.createRadialGradient(cx,cy,2,cx,cy,rad);gr.addColorStop(0,'rgba(255,214,110,'+(.55*Math.min(1,k*3)).toFixed(2)+')');gr.addColorStop(.35,'rgba(240,150,50,'+(.28*e).toFixed(2)+')');gr.addColorStop(1,'rgba(240,120,40,0)');g.fillStyle=gr;g.fillRect(0,0,W,H)}
+ /* the match: a streak, then a spark */
+ if(t>.3&&t<.62){const u=(t-.3)/.32;r('#b89858',Math.round(cx-50+u*44),cy+10-Math.round(u*8),14,2);r('#c04848',Math.round(cx-36+u*44),cy+9-Math.round(u*8),3,3)}
+ if(t>.5&&t<1){const u=(t-.5)/.5;for(let i=0;i<9;i++){const a=i*.7+1,d=u*(10+i*3);r(i%2?'#fff8c0':'#f8a030',Math.round(cx+Math.cos(a)*d),Math.round(cy+4+Math.sin(a)*d-u*6),u<.6?2:1,u<.6?2:1)}}
+ /* the lantern, three times life size */
+ const L=(c,x,y,w,h)=>r(c,cx+x*3,cy+y*3,w*3,h*3),lit=t>.62,fl=lit?Math.sin(t*22)*.5+.5:0,dimc=t>.2?'#2a2238':'#07060c';
+ L(lit?'#c04848':dimc,-5,-9,10,2);L(lit?'#802828':dimc,-3,-11,6,2);L(lit?'#f8d040':dimc,-1,-13,2,2);L(dimc,-4,-7,8,10);L(lit?'#3a2a1c':'#141020',-3,-6,6,8);L(lit?'#c04848':dimc,-5,3,10,2);L(lit?'#802828':dimc,-4,5,8,1);
+ if(lit){const h=Math.min(6,Math.round((t-.62)*14));L('#f8a030',-2,2-h,4,h);L('#f8e060',-1,3-h+Math.round(fl),2,Math.max(1,h-1));if(h>3)L('#fff8c0',-1,-1,1,2)}
+ /* the name, lit from the middle outward */
+ if(t>1.25){const a=Math.min(1,(t-1.25)/.5),y=cy+38;g.globalAlpha=a;ctext('POCKET',y,5,'#f8e060','#403010');ctext('LANTERN',y+28,5,'#f8e060','#403010');g.globalAlpha=1;
+  const sw=Math.round((1-a)*96);if(sw>0){r('#07060c',0,y-2,120-96+sw-24,60);r('#07060c',W-(120-96+sw-24),y-2,120,60)}}
+ /* one sprout for each cartridge */
+ if(t>1.7){const n=PWR_COL.length,y0=cy+120;for(let i=0;i<n;i++){const u=(t-1.7-i*.09)/.3;if(u<0)continue;const x=Math.round(120+(i-(n-1)/2)*20),hop=u<1?Math.round(Math.sin(u*Math.PI)*10):Math.round(Math.abs(Math.sin((t+i*.3)*5))*2),y=Math.min(y0,H-30)-hop;
+   r('rgba(0,0,0,.4)',x-4,Math.min(y0,H-30)+1,9,2);r('#282038',x-4,y-8,9,9);r(PWR_COL[i],x-3,y-7,7,7);r('rgba(255,255,255,.45)',x-3,y-7,3,1);r('#181020',x-2,y-4,1,2);r('#181020',x+1,y-4,1,2);r('#2c6030',x,y-11,1,3);r('#70d850',x,y-12,3,1)}}
+ if(t>2.3){g.globalAlpha=Math.min(1,(t-2.3)/.4);ctext('NORTH COAST STUDIOS',Math.min(cy+142,H-16),1,'#c8c0d8',null);g.globalAlpha=1}
+ if(t>PWR_LEN-.4)r('rgba(12,10,18,'+Math.min(1,(t-(PWR_LEN-.4))/.4).toFixed(2)+')',0,0,W,H)}
+if(!/[?&]noboot\b/.test(location.search)){state='pwr';shelf.hidden=true}
 function eject(){persist(true);if(cartAnim){cartAnim.cancel();cartAnim=null}$('slot').classList.remove('in');$('led').classList.remove('on');$('shelfMsg').textContent='Pick a cartridge';shelf.hidden=false;state='off';cart=0;setPad(0);snd(200,.1,90);try{lanCheck(true)}catch(e){}}
 carts.forEach((c,i)=>c.addEventListener('pointerdown',e=>{e.preventDefault();unlock();cartPick(i)}));
 let lanHi=0;{const lb=$('lanBtn');if(lb)lb.addEventListener('pointerdown',e=>{e.preventDefault();unlock();lanHi=0;lb.classList.remove('sel');lanOpen('off')})}
@@ -507,11 +536,15 @@ function update(dt){
  if(TRN){TRN.t+=dt;if(!TRN.done&&TRN.t>=.3){TRN.done=true;TRN.fn()}if(TRN.t>=.68)TRN=null;return}
  if(state.slice(0,2)==='g3'){g3Update(dt);return}
  if(state.slice(0,2)==='g4'){g4Update(dt);return} /* cartridge 5: Sproutwild */
+ if(state.slice(0,2)==='g5'){twUpdate(dt);return} /* cartridge 7: Clankawatch */
+ if(state==='pwr'){pwrUpdate(dt);return}
  if(state.slice(0,3)==='lan'){lanUpdate(dt);return}
  switch(state){
- case 'off':{const lb=$('lanBtn');if(pressed('down')){lanHi=1;if(lb)lb.classList.add('sel');carts.forEach(c=>c.classList.remove('sel'))}if(pressed('up')&&lanHi){lanHi=0;if(lb)lb.classList.remove('sel');cartHi(cartSel)}
+ case 'off':{const lb=$('lanBtn'),COLS=3,n=carts.length; /* the shelf is rows of three; below the last row is the Lantern menu */
+  if(pressed('down')){if(!lanHi&&cartSel+COLS<n){cartHi(cartSel+COLS);snd(520,.04)}else if(!lanHi&&((cartSel/COLS)|0)<(((n-1)/COLS)|0)){cartHi(n-1);snd(520,.04)}else{lanHi=1;if(lb)lb.classList.add('sel');carts.forEach(c=>c.classList.remove('sel'))}}
+  else if(pressed('up')){if(lanHi){lanHi=0;if(lb)lb.classList.remove('sel');cartHi(cartSel)}else if(cartSel-COLS>=0){cartHi(cartSel-COLS);snd(520,.04)}}
   if(!lanHi){if(pressed('right'))cartHi((cartSel+1)%carts.length);if(pressed('left'))cartHi((cartSel+carts.length-1)%carts.length)}if(pressed('a')||pressed('start')){if(lanHi){lanHi=0;if(lb)lb.classList.remove('sel');cartHi(cartSel);lanOpen('off')}else cartPick(cartSel)}return;}
- case 'boot':bootT+=dt;if(bootT>1.15&&!bootDing){bootDing=true;snd(988,.1);later(()=>snd(1319,.4),100)}if(bootT>2.7||(bootT>.6&&pressed('a'))){if(cart===1){state='ko';KO.start()}else if(cart===2){g3StartTitle()}else if(cart===3){state='pp';PP.start()}else if(cart===4){g4StartTitle()}else if(cart===5){state='ls';LS.start()}else{state='intro';introT=0}}return;
+ case 'boot':bootT+=dt;if(bootT>1.15&&!bootDing){bootDing=true;snd(988,.1);later(()=>snd(1319,.4),100)}if(bootT>2.7||(bootT>.6&&pressed('a'))){if(cart===1){state='ko';KO.start()}else if(cart===2){g3StartTitle()}else if(cart===3){state='pp';PP.start()}else if(cart===4){g4StartTitle()}else if(cart===5){state='ls';LS.start()}else if(cart===6){twStartTitle()}else{state='intro';introT=0}}return;
  case 'ko':KO.update(dt);return;
  case 'pp':PP.update(dt);return;
  case 'ls':LS.update(dt);return;
@@ -1506,6 +1539,8 @@ function drawIntro(){const t=introT,gy=Math.round(H*.6),sx=ox,sy=oy;ox=oy=0;
 function draw(){
  if(state.slice(0,2)==='g3'){g3Draw();return;}
  if(state.slice(0,2)==='g4'){g4Draw();return;}
+ if(state.slice(0,2)==='g5'){twDraw();return;}
+ if(state==='pwr'){pwrDraw();return}
  if(state.slice(0,3)==='lan'){lanDraw();return;}
  if(state==='off'){r('#0c0a12',0,0,W,H);return;}
  const OY=(H-160)/2;

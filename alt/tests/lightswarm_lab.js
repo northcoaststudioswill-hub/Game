@@ -13,7 +13,7 @@ const RUNS = +(process.argv[3] || 3), OUT = path.join(__dirname, '../playtest/li
   let fail = 0; const ok = (name, cond, info) => { if (!cond) fail++; console.log((cond ? 'PASS ' : 'FAIL ') + name + (info !== undefined ? '  ' + JSON.stringify(info) : '')); };
   const E = s => page.evaluate(s => __g.ev(s), s), L = s => page.evaluate(s => eval(s), s);
   const shot = n => page.screenshot({ path: path.join(OUT, n + '.png') });
-  ok('six cartridges on the shelf', (await L(`document.querySelectorAll('.cart').length`)) === 6);
+  ok('seven cartridges on the shelf', (await L(`document.querySelectorAll('.cart').length`)) === 7);
   await shot('00-shelf');
   await L(`localStorage.removeItem('lightswarm-v1');void 0`);
   await page.evaluate(() => document.querySelector('.cart[data-i="5"]').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })));

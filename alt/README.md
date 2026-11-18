@@ -27,6 +27,8 @@ real game can't read or overwrite Erin's Patch & Plate days, Rootdeep runs, or a
 | `src/knockout.js` | North Coast Knockout (cartridge 2). Most of the ALT work is here. |
 | `src/rootdeep.js` | Rootdeep (cartridge 3), plus the Lantern menu (stats, achievements). |
 | `src/patchplate.js` | Patch & Plate (cartridge 4). v0.5 since Nov 17 2026 (v0.4 the Sunkeep update, v0.5 big moments and kitchen buddies); v0.3's copy is untouched. |
+| `src/clankawatch/` | Clankawatch (cartridge 7), copied from `muse/games/thornwatch/src` on its own branch; with its changelog, handoff and lore. |
+| `tests/console_shelf.js` | The power-on sequence, the shelf, and Clankawatch booting and playing. |
 | `src/lightswarm.js` | Lightswarm (cartridge 6), vertical slice v0.1: a survivors-style expedition. Test: `tests/lightswarm_lab.js`. |
 | `src/sproutwild/` | Sproutwild (cartridge 5): eleven files, see its own `README.md` and `CHANGELOG.md`. |
 | `backups/` | Frozen builds. Never edit. |

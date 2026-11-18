@@ -1,6 +1,6 @@
 # Pocket Lantern
 
-A pocket game console in one HTML file, by North Coast Studios. Six game cartridges on one shelf.
+A pocket game console in one HTML file, by North Coast Studios. Seven game cartridges on one shelf.
 
 **Play the newest build:** [`alt/games/pocket-lantern-alt.html`](alt/games/pocket-lantern-alt.html)
 (download it and open it in a browser, or use the shared Claude link Will has).
@@ -20,8 +20,11 @@ A pocket game console in one HTML file, by North Coast Studios. Six game cartrid
 | 5 | **Sproutwild** | Creature collector: Pikmin + Palworld + Pokemon, set in an Ohio-lore valley | **In active development (v8.0)** | [`alt/src/sproutwild/CHANGELOG.md`](alt/src/sproutwild/CHANGELOG.md) |
 
 | 6 | **Lightswarm** | Survivors-style roguelite: walk into the dark, the sprout swarm throws the light, pick 1 of 3 upgrades, light the Guardian | **Vertical slice v0.3, for evaluation** (ten keepers, two supers each, finds, Keeper's Trail) | [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (Lightswarm section) |
+| 7 | **Clankawatch** | Garden tower defense: plant sprout towers by day, hold the track against Lil Bottie's drones by night | v4.0 alpha 3 (copied in from its own branch) | [`alt/src/clankawatch/CHANGELOG.md`](alt/src/clankawatch/CHANGELOG.md) |
 
 ## Latest updates
+
+- **The console (Nov 18 2026):** a power-on sequence before the shelf, the shelf in rows of three, Clankawatch folded in as cartridge 7. See [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
 
 - **Lightswarm, cartridge 6 (Nov 18 2026):** a new game as a vertical slice. One expedition (Crooked Hollow), six sprout weapons, the Pythorn Guardian, Sunkeep upgrades. Source: [`alt/src/lightswarm.js`](alt/src/lightswarm.js).
 

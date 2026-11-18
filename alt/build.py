@@ -10,6 +10,7 @@ Nothing outside alt/ is ever written. The code lives here as plain files:
   alt/src/patchplate.js  the farm stand (cartridge 4)
   alt/src/sproutwild/    Sproutwild (cartridge 5), eleven files spliced into console.js
   alt/src/lightswarm.js  Lightswarm (cartridge 6), its own script like Patch & Plate
+  alt/src/clankawatch/   Clankawatch (cartridge 7), eight files spliced into console.js
 
 The music is big (13 MB of embedded mp3), so it is not copied: the build reads the
 two music <script> blocks from the shipped v0.3 build, read-only.
@@ -88,6 +89,12 @@ if swmod.count(SWMARK) != 1:
 # the later files replace functions the module's dispatch block calls, so they go in just ahead of it
 swmod = swmod.replace(SWMARK, '\n'.join(code('sproutwild/' + f + '.js').rstrip() for f in SPROUTWILD[2:]) + '\n' + SWMARK)
 console = console.replace('/*@include sproutwild*/', code('sproutwild/sw-cartart.js').rstrip() + '\n' + swmod.rstrip() + '\n')
+# cartridge 7, Clankawatch (the garden tower defense; folder and save key still say thornwatch): shares the console's scope
+CLANKA = ['tw-cartart', 'tw-creeps', 'tw-module', 'tw-look', 'tw-story', 'tw-controls', 'tw-motes', 'tw-menus']
+LOOP = '/* ---------- loop ---------- */'
+if console.count(LOOP) != 1:
+    die('console.js: loop marker not found')
+console = console.replace(LOOP, '\n'.join(code('clankawatch/' + f + '.js').rstrip() for f in CLANKA) + '\n' + LOOP)
 
 parts = {
     '@MUSIC tracks': music['tracks'],
