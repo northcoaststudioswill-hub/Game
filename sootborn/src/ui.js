@@ -35,7 +35,7 @@ const HUD = {
     s.textContent = `Day ${G.day} · ${G.scrip} scrip` + (F('d2Tavi') && !F('day2Done') ? ` · ☀${G.flags.rays | 0}` : '') + (G.newJ ? ` · ✎${G.newJ}` : '');
     const ht = this.hint(); h.classList.toggle('hidden', !ht); h.querySelector('span').textContent = ht;
     document.body.classList.toggle('ctlfade', Dialogue.active || Puzzle.active);
-    document.body.classList.toggle('ingame', world);
+    document.body.classList.toggle('ingame', world || (Brawl.active && !Brawl.cine)); if (Cutscene.active) $('#cskip').classList.toggle('hidden', Brawl.active);
     document.body.classList.toggle('inpuzzle', Puzzle.active);
     document.body.classList.toggle('inpanel', Cutscene.active && !!Cutscene.panel);
     if (this.tt > 0) { this.tt -= dt; if (this.tt <= 0) $('#toast').classList.remove('on'); }
@@ -99,7 +99,8 @@ const Menus = {
       { label: 'Resume', act: () => UI.pop() },
       { label: () => 'Journal' + (G.newJ ? ` (${G.newJ} new)` : ''), act: () => Menus.journal() },
       { label: 'Map of Cinderwell', act: () => Menus.map() },
-      { label: 'Save game', act: () => { if (G.heist) { HUD.toast('Not now — finish this first'); Sound.play('deny'); return; } const ok = Save.write('manual'); HUD.toast(ok ? 'Game saved' : 'Saved for this session — use Save data to keep it'); Sound.play('coin'); } },
+      { label: 'Save game', act: () => { if (G.heist) { HUD.toast('Not now — finish this first'); Sound.play('deny'); return; } Menus.slots('save'); } },
+      { label: 'Load game', act: () => Menus.slots('load') },
       { label: 'Settings', act: () => Menus.settings() },
       { label: 'Dialogue history', act: () => Menus.log() },
       { label: 'Save data (export / import)', act: () => Menus.saveData() },
@@ -184,6 +185,38 @@ const Menus = {
   log() {
     UI.push(modal({ title: 'Dialogue history', build(b) { b.innerHTML = (G.log.slice(-60).map(l => `<p>${esc(l)}</p>`).join('') || '<p>Nothing yet.</p>'); setTimeout(() => { b.parentNode.scrollTop = 1e6; }, 0); }, items: [{ label: 'Close', act: () => UI.pop() }] }));
   },
+  // save slots: one autosave (written at every story beat) and three you choose
+  slots(mode) {
+    const items = [];
+    for (const [k, nm] of Save.SLOTS) { if (mode === 'save' && k === 'auto') continue; const s = Save.read(k);
+      items.push({ label: `${nm} — ${Save.describe(s)}`, disabled: () => mode !== 'save' && !s, act: () => {
+        if (mode === 'save') { const go = () => { const ok = Save.write(k); HUD.toast(ok ? `Saved to ${nm}` : `Saved to ${nm} for this session only`); Sound.play('coin'); UI.pop(); };
+          if (s) UI.push(modal({ title: `Overwrite ${nm}?`, build(b) { b.innerHTML = `<p>${esc(Save.describe(s))}</p>`; }, items: [{ label: 'Overwrite', act: () => { UI.pop(); go(); } }, { label: 'Cancel', act: () => UI.pop() }] })); else go(); }
+        else if (mode === 'delete') { Save.del(k); Sound.play('deny'); UI.pop(); UI.pop(); Menus.slots('load'); }
+        else { UI.clear(); Game.loadSave(s); } } }); }
+    if (mode === 'load') { items.push({ label: 'Delete a save', act: () => Menus.slots('delete') }); items.push({ label: 'Export / import save text', act: () => Menus.saveData() }); }
+    items.push({ label: 'Back', act: () => UI.pop() });
+    UI.push(modal({ title: mode === 'save' ? 'Save game' : mode === 'delete' ? 'Delete which save?' : 'Load game', build(b) { b.innerHTML = Store.ok ? '<p>The game autosaves at every story beat. Slots are yours.</p>' : '<p>This view cannot keep saves after you close it. Use <b>Export</b> on the Load screen to copy your save text somewhere safe.</p>'; }, items }));
+  },
+  // dev: jump to any point of the slice
+  checkpoints() {
+    const fresh = () => { UI.clear(); freshState('Kael', 0); World.resetSheets(); World.showPlayer = true; }, load = k => () => { UI.clear(); Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS[k])))); };
+    const C = [
+      ['Opening cinematic', () => { UI.clear(); Sound.tname = null; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => Game.toTitle()); G.mode = 'opening'; }],
+      ['Assay 1 · The Valley (battle), then the prologue', () => { UI.clear(); Game.newGame(); }],
+      ['Prologue · story only', () => { fresh(); Cutscene.play(PROLOGUE_A.filter(s => !s.brawl && !/^FOUR YEARS FROM/.test(s.card || '')), () => Game.startHeist()); }],
+      ['Prologue · the relay heist', () => { fresh(); Game.startHeist(); }],
+      ['Prologue · Lift Zero and the furnace', () => { fresh(); Game.onHeistDone(); }],
+      ['Prologue · Three Steps (the Warden fight)', () => { fresh(); G.flags.ranForHer = 1; ffScene('THREE STEPS', 'You make it three steps.', () => FF.furnace(), () => Game.toTitle()); }],
+      ['Day 1 · wake up in Ashgate', () => { fresh(); Game.startPresent(); }],
+      ['Assay 2 · The Ford (battle), then Day 2', () => { UI.clear(); ffScene('THE ASSAY', 'Four years from now. Day nineteen.', () => FF.ford(), load('day2')); }],
+      ['Day 2 · morning', load('day2')],
+      ['Day 2 · the Ember Ring', load('ring')],
+      ['Day 2 · lantern built, festival next', load('fest')],
+      ['Assay 3 · The Keep (duel)', () => { UI.clear(); ffScene('FOUR YEARS FROM NOW', 'The Assay. The last day.', () => FF.keep(), () => Game.toTitle()); }]
+    ];
+    UI.push(modal({ title: 'Checkpoints', build(b) { b.innerHTML = '<p>Dev menu. Jumps straight to a point in the slice. Your save slots are not touched until the game autosaves.</p>'; }, items: C.map(([label, act]) => ({ label, act })).concat([{ label: 'Back', act: () => UI.pop() }]) }));
+  },
   saveData() {
     const inGame = G.mode === 'world';
     UI.push(modal({ title: 'Save data', build(b, m) {
@@ -207,13 +240,14 @@ const Menus = {
     }, items: [
       { label: s ? `Continue — Day ${s.day}, ${MAPS[s.map].name}` : 'Continue', disabled: () => !s, act: () => { UI.clear(); Game.loadSave(Save.latest()); } },
       { label: 'New game', act: () => Menus.newGame() },
-      { label: 'Load / import save', act: () => Menus.saveData() },
+      { label: 'Load game', act: () => Menus.slots('load') },
       { label: 'Settings', act: () => Menus.settings() },
-      { label: 'About & controls', act: () => Menus.about() }
+      { label: 'About & controls', act: () => Menus.about() },
+      { label: 'Checkpoints (dev)', act: () => Menus.checkpoints() }
     ] }));
   },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. Book One vertical slice (v0.7): the prologue and two days in Cinderwell.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. Book One vertical slice (v0.11): the prologue, two days in Cinderwell, and three battles from the Assay, four years on. In a fight: A strikes (three-hit chain), B dodges (dodge through the red for an opening), and when the fury bar is full, hold A for ELEVEN.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
@@ -356,7 +390,7 @@ const DayEnd = {
         <p><i>"They came down in light. One day, I'm going up in it."</i></p>
         <h2 style="margin-top:16px">END OF THE FIRST SHIFT</h2><p style="opacity:.7">SOOTBORN · Book One vertical slice · thanks for playing.</p>`;
     }, items: [
-      { label: 'Wake up: Day 2 — First Fire', act: () => { UI.clear(); Game.loadSave(Save.read('auto') || Save.snapshot()); } },
+      { label: 'Wake up: Day 2 — First Fire', act: () => { UI.clear(); const sv = Save.read('auto') || Save.snapshot(); if (NOFF) return Game.loadSave(sv); ffScene('THE ASSAY', 'Four years from now. Day nineteen.', () => FF.ford(), () => Game.loadSave(sv)); } },
       { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }
     ] }));
   }

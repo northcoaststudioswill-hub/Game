@@ -1,6 +1,6 @@
 import { mkdirSync } from 'fs'; mkdirSync('shots', { recursive: true });
 import { chromium } from 'playwright';
-const url = new URL('../index.html', import.meta.url).href;
+const url = new URL('../index.html', import.meta.url).href + '#noff';
 const errors = [];
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined, args: ['--autoplay-policy=no-user-gesture-required'] });
 const ctx = await browser.newContext({ viewport: { width: 844, height: 390 }, hasTouch: false });

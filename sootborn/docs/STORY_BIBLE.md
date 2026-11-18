@@ -105,12 +105,21 @@ SOOTBORN ("soot" is the Authority's slur; the title reclaims it). A card game ca
 Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at Freight Three; Dace under the floor; Nell and the cold crate; what Celestine has seen.
 
 ## Combat
-- `src/brawl.js` is the base for all fighting. Top-down, real time, inside an arena.
-- Player: move, strike (three-hit chain, third hit knocks back), dodge with invulnerability frames.
-- Foes telegraph each attack as a red shape on the ground, then commit. Dodging through a committed swing gives an "opening": slow time and stronger, guard-breaking hits.
-- Foes guard after taking a full chain and counter at once, so the rhythm is chain, dodge the counter, punish.
-- Any number of foes; only one winds up at a time.
-- Where it goes next for large battles: allies fighting beside Kael with simple orders, more foes on larger fields, weapons, and Accredited opponents who break these rules.
+- `src/brawl.js` is the base for all fighting: a pseudo-3D arena. Logic is on a flat plane (x across, y depth); the floor is drawn a scanline at a time from a texture; fighters and props are depth-sorted billboards; `Brawl.cam {x, y, h, f, hor}`.
+- Player: move, strike (three-hit chain: cut, reverse cut, leaping overhead), dodge with invulnerability frames.
+- Foes telegraph each attack as a red shape on the ground, then commit. Dodging through a committed swing gives an "opening". Foes guard after a full chain.
+- **Fury and ELEVEN**: the bar fills on hits given and taken. Full bar, hold A: eleven blows, one for each second the furnace doors stood open. This is the mechanical form of Kael's rage and should stay tied to that image.
+- **Memory Arts** (`def.arts`): `{at: hpFraction | on:'wave'|'start', name, line, panel, stage, kind:'rise'|'storm', rgb, hex}`. A story panel and Kael's portrait cut in, the line types out, then the attack plays. Use them to put story beats inside fights: one memory, one sentence, one blow.
+- A fight definition can carry `waves`, `allies`, `hero` (sprite, hp, power, blade), `rage` (aura size), `legend` (cannot lose), `doomed` (cannot win), `endAt`, `skip`, `voice` (Kael's narration: timed lines plus `hurt`, `fury`, `eleven`, `wave`, `half`), and `intro` / `outro` shot lists.
+- Shots (`Brawl.playCine`): `{d, cam, to, acts, cap, big, bg, sfx, shake, flash, speed, tint}`. Hard cuts, camera moves, captions that advance by themselves. `cu(x, y, s0, s1, dx)` in `src/ff.js` frames a close-up.
+- Cutscene step `{brawl: def}` runs a fight inside a cutscene; `{dlg: steps}` runs a dialogue list.
+
+## The Assay (flash-forwards)
+- Four years on. The Accredited send their children to a year-long proving war in a valley above the rock: twelve Houses, one winner. Kael, gilded and under a bought name, fights for House Violet.
+- It is this game's own invention and uses only our names: the Assay, House Violet, House Teal, Captain Vant, Lucan Aurel (Celestine's son).
+- Purpose: show where the rage goes, and give the slow undercity chapters something to fall toward. The two halves should feel like different games: Cinderwell is dark, slow, talk and stealth; the Assay is daylight, fast, almost wordless except for Kael's voice.
+- Placement: opening before the title; The Valley at New Game; The Ford between Day 1 and Day 2; The Keep at the end of Day 2.
+- Kael's narration is first person, present tense, short. He counts things. He never says he is angry; he describes what he does with it.
 
 ## Art direction
 - Reference boards from the user show the target look: dense 16-bit pixel art, a cutaway with a pristine ruling settlement above and lamp-lit warrens below, gold-edged sign plates naming every chamber, banners, and framed menu panels with a world map.
@@ -125,15 +134,20 @@ Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at F
 - Cutscene step types include `{zoom}`, `{heart}`, `{vignette}`.
 - Heist: `World.throwBolt` / `boltLand` / investigate logic in `updateNPCs`.
 - Maps carry `overhead` and `screens` arrays.
-- Saves are schema v2; v1 saves migrate. No saving during the prologue, the heist or the festival stealth.
+- Saves are schema v2; v1 saves migrate. Slots: `auto`, `s1`–`s3` (the old `manual` slot reads as Slot 1). No saving during the prologue, the heist or the festival stealth.
+- Dev checkpoints: `Menus.checkpoints()`; captured saves live in `src/checkpoints.js` (regenerate with `DUMP=1 node tests/day2.mjs`).
+- `#noff` in the URL skips the opening and flash-forwards (tests use it).
 - Day 2 lives in `src/day2.js`: `D2T` (talk) and `D2H` (hotspots) wrap the day-1 tables once `day1Done` is set; `D3` holds epilogue lines.
 - `phase()` picks the Pillar color from day flags. Exits take `when` and `deny`.
 - Story panels live in `src/panels.js`. A cutscene step `{panel:'id', stage}` cuts to one, `{pstage:n}` advances it, `{panel:null}` cuts back. Keep each panel's focus in the top two thirds: the caption strip covers the bottom.
 - Cutscenes: `Cutscene.anim(dt)` runs every frame, including under dialogue. Steps `{kneel}` and `{emote}` give actors simple acting. In landscape the cutscene camera sits low so the action clears the dialogue box.
 - Stealth: guards have a facing angle `n.ang` that eases toward their direction; `World.alert` is the detection meter; `World.work` is hold-to-work progress (`WORK_T` seconds).
 
+## Opening sequence
+Logos (DOM splash), then `OPENING` in `src/ff.js`, played by `Opening.run()` through the fight camera with no fight: below first (black, the furnace, the count to eleven, the doors), then above (the Assay montage), then the title. Shot options used only here: `black`, `credit`, `count`, `bolt`, `sub2`.
+
 ## Not yet tested
-Real devices, sound by ear, and how the heist, the festival stealth and the fights feel with a human player (fight balance so far comes from two bots: one mashes, one dodges).
+Real devices, sound by ear, and how the heist, the festival stealth and the fights feel with a human player. Fight balance comes from bots: one mashes, one dodges. The dodging bot clears each Assay battle in about 20 seconds without losing health, so a person will find them generous; that is intended for now, since they cannot be lost.
 
 ## Next steps
 - Playtest the fights and both stealth scenes with a person and tune from notes.

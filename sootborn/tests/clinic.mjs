@@ -2,7 +2,7 @@ import { mkdirSync } from 'fs'; mkdirSync('shots', { recursive: true });
 import { chromium } from 'playwright';
 const b = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined }); const errs = [];
 const p = await (await b.newContext({ viewport: { width: 844, height: 390 } })).newPage(); p.on('pageerror', e => errs.push(e.message));
-await p.goto(new URL('../index.html', import.meta.url).href); await p.waitForTimeout(300);
+await p.goto(new URL('../index.html', import.meta.url).href + '#noff'); await p.waitForTimeout(300);
 await p.keyboard.press('Enter'); await p.waitForTimeout(5200);
 await p.locator('.mi', { hasText: 'New game' }).click(); await p.waitForTimeout(500); await p.locator('#cskip').click(); await p.waitForTimeout(800);
 console.log(await p.evaluate(() => [BTS.G.mode, BTS.G.heist]));

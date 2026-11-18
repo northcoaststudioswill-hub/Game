@@ -4,7 +4,7 @@ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH 
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
 await ev(() => { const s = { v: 2, t: 1, name: 'Kael', look: 0, tendency: 'caretaker', day: 2, map: 'apt', x: 56, y: 76, dir: 0, flags: { day1Done: 1, d2Tavi: 1, lanternBuilt: 1 }, trust: {}, scrip: 0, journal: [], log: [], play: 0, talkCount: {} }; BTS.UI.clear(); BTS.Game.loadSave(s); BTS.Game.startFestStealth(); });
 await wait(1500);
 const st = () => ev(() => ({ p: [BTS.P.x, BTS.P.y], g: BTS.World.npcs.filter(n => n.patrol).map(n => ({ id: n.id, x: n.x, y: n.y, dir: n.dir, wait: n.wait, wi: n.wi })), caught: BTS.G.flags.caught2 | 0, dlg: BTS.Dialogue.active, heist: BTS.G.heist, cine: BTS.Cutscene.active }));

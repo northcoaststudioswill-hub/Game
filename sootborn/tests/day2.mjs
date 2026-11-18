@@ -1,6 +1,6 @@
-import { mkdirSync } from 'fs'; mkdirSync('shots', { recursive: true });
 import { chromium } from 'playwright';
-const url = new URL('../index.html', import.meta.url).href;
+import { mkdirSync } from 'fs'; mkdirSync('shots', { recursive: true });
+const url = new URL('../index.html', import.meta.url).href + '#noff';
 const VP = process.env.PORTRAIT ? { width: 390, height: 844 } : { width: 844, height: 390 };
 const errors = [];
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined, args: ['--autoplay-policy=no-user-gesture-required'] });
@@ -61,7 +61,7 @@ for (const id of ['bao', 'marrow', 'fen', 'kit', 'pell', 'juno']) { await ev(i =
 await goTo('clinic', 7, 4, 1); await use(0); await goTo('clinic', 5, 5, 1); await use(); await goTo('clinic', 3, 5, 1); await use(); await goTo('clinic', 11, 6, 1); await use();
 console.log('parts/rays', await ev(() => [BTS.G.flags.gotWire, BTS.G.flags.gotGold, BTS.G.flags.gotWick, BTS.G.flags.rays]), await ev(() => BTS.HUD.objective()));
 // ring
-await goTo('square', 19, 7, 1); await wait(200); await shot('07-ring-square');
+await goTo('square', 19, 7, 1); if (process.env.DUMP) (await import('fs')).writeFileSync('/tmp/cp-ring.json', await ev(() => JSON.stringify(BTS.Save.snapshot()))); await wait(200); await shot('07-ring-square');
 async function bout(tagn, cheat) {
   await ev(() => { const n = BTS.World.npcs.find(n => n.id === 'hollis'); BTS.P.x = n.x; BTS.P.y = n.y + 16; BTS.P.dir = 1; }); await wait(150);
   await key('KeyE', 1, 250); await talkThrough(0); await wait(300);
@@ -80,7 +80,7 @@ console.log('champ', (await flags()).filter(k => /ring|beatSull/.test(k)));
 // perfect dodge check
 // build
 await goTo('apt', 6, 2, 1); await use(0); console.log('built', (await flags()).includes('lanternBuilt'), await ev(() => BTS.HUD.objective()));
-await shot('09-apt-built');
+await shot('09-apt-built'); if (process.env.DUMP) (await import('fs')).writeFileSync('/tmp/cp-fest.json', await ev(() => JSON.stringify(BTS.Save.snapshot())));
 await goTo('apt', 6, 3, 3); await key('KeyE', 1, 250); await talkThrough(0); await wait(2500);
 console.log('fest cine', await ev(() => [BTS.Cutscene.active, BTS.G.mode]));
 await runCine('fa', 8);

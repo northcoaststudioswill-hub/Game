@@ -36,6 +36,8 @@ const Cutscene = {
       const st = s.choice ? [{ choice: s.choice }] : s.narr ? [narr(s.narr)] : [say(s.say, s.t)];
       this.block = { type: 'dlg' }; Dialogue.start(st, () => { if (this.active) this.next(); }); return true;
     }
+    if (s.brawl !== undefined) { const d = typeof s.brawl === 'function' ? s.brawl() : s.brawl; if (!d) return false; this.hideCard(); this.block = { type: 'brawl' }; Brawl.start(d, () => { if (!this.active) return; this.next(); if (this.active && Fade.a >= 1 && !Fade.busy) { Fade.dir = -1; Fade.sp = 1.6; Fade.busy = true; } }); return true; }
+    if (s.dlg) { this.block = { type: 'dlg' }; Dialogue.start(s.dlg, () => { if (this.active) this.next(); }); return true; }
     if (s.wait) { this.block = { type: 'wait', t: s.wait }; return true; }
     if (s.pan) { this.pan = { from: { ...this.cam }, to: { x: s.pan[0] * 16 + 8, y: s.pan[1] * 16 }, t: 0, d: s.dur || 2 }; if (s.hold !== false) { this.block = { type: 'pan' }; return true; } return false; }
     if (s.fade === 'out') { this.block = { type: 'fade' }; Fade.go(() => { if (this.active) this.next(); }, s.spd || 1.4, true); return true; }
@@ -82,6 +84,7 @@ const Cutscene = {
   },
   skip() {
     if (!this.active) return;
+    if (Brawl.active) { Brawl.active = false; Brawl.onEnd = null; Brawl.cine = null; }
     Dialogue.stack = []; Dialogue.onEnd = null; if (Dialogue.active) { Dialogue.active = false; $('#dlg').classList.add('hidden'); }
     Fade.a = 0; Fade.dir = 0; Fade.busy = false; Fade.cb = null;
     this.end();

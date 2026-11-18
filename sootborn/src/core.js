@@ -196,6 +196,16 @@ const TRACKS = {
     const b = ({ 6: 74, 19: 77, 27: 81 })[s]; if (b) S.tone(b, t, 2.5, 'sine', 0.035, S.mus);
     if (s === 12) S.noise(t, 1.2, 0.02, S.mus, 400, 4);
   } },
+  battle: { bpm: 152, len: 64, fn(s, t, sp, S) {
+    const q = s % 16, bar = s >> 4, root = [38, 38, 34, 36][bar];
+    if (q % 4 === 0) S.tone(130, t, 0.16, 'sine', 0.26, S.mus, 42);
+    if (q === 4 || q === 12) S.noise(t, 0.14, 0.14, S.mus, 2200, 6);
+    if (q % 2 === 1) S.noise(t, 0.03, 0.03, S.mus, 7000, 2, 'highpass');
+    S.tone(root + (q % 4 === 3 ? 12 : q % 8 === 6 ? 7 : 0), t, sp * 0.9, 'sawtooth', 0.045, S.mus);
+    if (q === 0) { S.tone(root + 12, t, sp * 14, 'triangle', 0.05, S.mus); S.tone(root + 19, t, sp * 14, 'triangle', 0.035, S.mus); }
+    const lead = [[74, 0, 0, 77, 0, 0, 81, 0, 79, 0, 77, 0, 74, 0, 72, 0], [74, 0, 0, 77, 0, 0, 81, 0, 84, 0, 0, 82, 81, 0, 0, 0], [70, 0, 0, 74, 0, 0, 77, 0, 82, 0, 81, 0, 77, 0, 74, 0], [72, 0, 76, 0, 79, 0, 84, 0, 86, 0, 0, 0, 85, 0, 0, 0]][bar][q];
+    if (lead) { S.tone(lead, t, sp * 1.8, 'square', 0.03, S.mus); S.tone(lead - 12, t, sp * 1.8, 'triangle', 0.03, S.mus); }
+  } },
   hum: { bpm: 56, len: 32, fn(s, t, sp, S) { const m = MOTIF[s]; if (m) { S.tone(m - 12, t, sp * 3.8, 'triangle', 0.07, S.mus); S.tone(m - 5, t, sp * 3.8, 'sine', 0.03, S.mus); } if (s === 0) S.tone(38, t, sp * 32, 'sine', 0.05, S.mus); } },
   surface: { bpm: 70, len: 32, fn(s, t, sp, S) { const m = MOTIF[s]; if (m) { S.tone(m + 24, t, 2, 'sine', 0.03, S.mus); S.tone(m + 31, t, 2, 'sine', 0.015, S.mus); } } }
 };

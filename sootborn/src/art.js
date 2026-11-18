@@ -153,6 +153,29 @@ function makeAccredited(o) {
   outline(c, '#3a2e1a', 16, AH);
   c.fh = AH; c.glow = 1; return c;
 }
+// ---- Assay cadets: 16x28, armour not robes. o = {skin, hair, armor, trim, sash, cape, long, spiky, circlet, band, smudge, helm}
+function makeCadet(o) {
+  const AH = 28, [c, g] = mk(48, AH * 4), arm = o.armor || '#efe8d4', trim = o.trim || '#e8c25a', sash = o.sash || '#7a5ac8', sk = o.skin, hair = o.hair, dk = shade(arm, .72), boot = '#4a3a2a', eye = '#c89a2a';
+  for (let d = 0; d < 3; d++) for (let f = 0; f < 3; f++) {
+    const ox = f * 16, oy = d * AH, R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(ox + x, oy + y, w, h); }, st = f === 1 ? 1 : f === 2 ? -1 : 0;
+    if (o.cape) { if (d === 1) R(4, 10, 8, 14 + (st ? 1 : 0), o.cape); else if (d === 0) { R(3, 10, 1, 13, o.cape); R(12, 10, 1, 13, o.cape); } else R(9, 10, 3 + (st ? 1 : 0), 13, o.cape); }
+    if (d < 2) { const l = st > 0 ? 1 : 0, r = st < 0 ? 1 : 0; R(5, 18, 2, 8 - l, dk); R(9, 18, 2, 8 - r, dk); R(5, 20, 2, 1, trim); R(9, 20, 2, 1, trim); R(5, 21, 1, 3, shade(arm, .95)); R(9, 21, 1, 3, shade(arm, .95)); R(5, 25 - l, 2, 2, boot); R(9, 25 - r, 2, 2, boot); }
+    else { R(6 - st, 18, 2, 8, dk); R(8 + st, 18, 2, 8, shade(dk, .88)); R(5 - st, 25, 3, 2, boot); R(8 + st, 25, 3, 2, shade(boot, .85)); }
+    if (d === 2) { R(5, 9, 6, 9, arm); R(9, 9, 2, 9, shade(arm, .86)); R(5, 9, 6, 1, trim); R(6, 8, 4, 2, trim); R(5, 16, 6, 1, sash); R(5, 17, 6, 1, trim); R(7, 11, 2, 6, shade(arm, .92)); R(7, 17, 2, 1, sk); if (o.band) R(7, 12, 2, 2, '#c8281e'); }
+    else { R(4, 9, 8, 9, arm); R(11, 9, 1, 9, shade(arm, .86)); R(4, 9, 8, 1, trim); R(3, 8, 2, 3, trim); R(11, 8, 2, 3, trim); R(3, 8, 2, 1, shade(trim, 1.25));
+      R(4, 10, 1, 7, shade(arm, 1.1)); R(5, 13, 6, 1, shade(arm, .9));
+      if (d === 0) { for (let i = 0; i < 6; i++) R(5 + i, 10 + i, 2, 1, sash); R(7, 12, 2, 2, trim); R(7, 12, 1, 1, '#fff6c8'); } else { for (let i = 0; i < 6; i++) R(10 - i, 10 + i, 2, 1, sash); R(7, 10, 2, 6, shade(arm, .9)); R(4, 14, 8, 1, shade(arm, .82)); }
+      R(4, 16, 8, 1, sash); R(4, 17, 8, 1, trim); R(3, 11, 1, 6, arm); R(12, 11, 1, 6, arm); R(3, 17, 1, 1, sk); R(12, 17, 1, 1, sk); if (o.band) R(d === 0 ? 12 : 3, 12, 1, 2, '#c8281e'); }
+    if (o.helm) { R(5, 2, 6, 7, '#d8dce4'); R(5, 2, 6, 1, '#f4f6fa'); R(7, 0, 2, 2, sash); if (d === 0) { R(6, 5, 4, 1, '#1e1e28'); R(7, 6, 2, 3, sk); } else if (d === 2) { R(5, 5, 3, 1, '#1e1e28'); } }
+    else if (d === 1) { R(5, 2, 6, 7, hair); R(5, 2, 6, 1, shade(hair, 1.12)); R(6, 5, 1, 3, shade(hair, .85)); R(9, 4, 1, 4, shade(hair, .85)); R(6, 9, 4, 1, sk); if (o.long) R(5, 9, 6, 4, hair); if (o.spiky) { R(5, 1, 1, 1, hair); R(8, 1, 1, 1, hair); R(10, 1, 1, 1, hair); } if (o.circlet) R(5, 3, 6, 1, trim); }
+    else if (d === 0) { R(5, 3, 6, 6, sk); R(4, 2, 8, 2, hair); R(4, 4, 1, o.long ? 8 : 3, hair); R(11, 4, 1, o.long ? 8 : 3, hair); if (o.spiky) { R(5, 1, 1, 1, hair); R(8, 1, 1, 1, hair); R(10, 1, 1, 1, hair); }
+      R(6, 5, 1, 1, eye); R(9, 5, 1, 1, eye); R(7, 7, 2, 1, shade(sk, .82)); if (o.smudge) { R(10, 6, 1, 1, '#5a4a44'); R(5, 7, 1, 1, '#5a4a44'); } if (o.circlet) { R(4, 2, 8, 1, trim); R(7, 1, 2, 1, '#fff'); } }
+    else { R(5, 3, 6, 6, sk); R(5, 2, 6, 2, hair); R(8, 3, 3, o.long ? 9 : 4, hair); if (o.spiky) { R(6, 1, 1, 1, hair); R(9, 1, 1, 1, hair); } R(6, 5, 1, 1, eye); if (o.smudge) R(6, 7, 1, 1, '#5a4a44'); if (o.circlet) R(5, 2, 6, 1, trim); }
+  }
+  for (let f = 0; f < 3; f++) { g.save(); g.translate(f * 16 + 16, AH * 3); g.scale(-1, 1); g.drawImage(c, f * 16, AH * 2, 16, AH, 0, 0, 16, AH); g.restore(); }
+  outline(c, '#3a2e1a', 16, AH);
+  c.fh = AH; c.glow = 1; return c;
+}
 // ---- dialogue portraits: 32x32 busts built from the same look data
 function makeBust(o) {
   const [c, g] = mk(32, 32), [f, h] = mk(32, 32);

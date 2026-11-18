@@ -1,5 +1,27 @@
 # SOOTBORN — changelog
 
+## v0.11 · 2026-11-18 — the Assay: 3D fights, rage, flash-forwards
+- **Fights are rebuilt as a pseudo-3D arena brawler.** A perspective floor, big fighters, and a camera that follows the action, pushes in on heavy hits and drops low for the big moments. Impact frames, speed lines, shockwaves, launches, portrait health bars.
+  - Three different cuts in the chain; the third is a leaping overhead. Sword arms swing from the shoulder with a crescent trail; fists jab, cross and uppercut.
+  - **Fury.** Kael's fury bar fills as he hits and is hit. When it is full, hold A: **ELEVEN**, an eleven-hit rush, one for every second the furnace doors stood open. Cut-in on his eyes, a rage-red void with the count called out, an inverted impact frame and a pillar of fire on the last blow.
+  - Foes: cadets, lancers, a captain, a duelist who blinks behind you, Wardens. Allies fight beside you. Waves.
+  - **Memory Arts.** At set points in a fight (an enemy's health, a new wave) a memory cuts in as two slanted panels: the memory itself, drawn from the story panels (the washer, the fever ward, Lift Zero, the furnace), and Kael's face. It names the blow, says its line, and becomes a choreographed attack: a launch with three cuts in the air and a slam, or six passes straight through the enemy that all go off at once. This is how the fights carry the story.
+  - Fury shows on screen as it builds: the edges of the picture redden from 40 percent, and at full there is a heartbeat, embers up both sides, and every strike hits harder.
+  - **Kael narrates during fights**, on a clock and on events (first hit taken, fury, ELEVEN, the enemy at half). It never pauses the fight.
+- **The Assay** (our own proving war, four years on: Kael gilded and passing as an Accredited cadet). Told the opposite way from Cinderwell: daylight, hard cuts, a moving camera, captions that do not wait.
+  - **Opening**: a film-style sequence before the title menu, after the two studio logos. Credits over picture (North Coast Studios presents, in association with E Concepts). It starts below, in the dark: Seren walked to the furnace, the eleven seconds counted out loud, the doors closing. Then "SO I WENT UP", lightning, and the Assay in daylight at full speed, ending on the title. About 40 seconds; any button skips.
+  - **The Valley**: New Game now opens on a playable battle with two allies and two waves, then cuts four years back to the world panel.
+  - **The Ford**: plays between Day 1 and Day 2. Captain Vant; first sight of Lucan Aurel, the High Auditor's son.
+  - **The Keep**: plays at the end of Day 2. The duel with Lucan.
+  - His aura grows from one battle to the next. These fights cannot be lost and can be skipped from the pause menu.
+- **Present day**: the Ember Ring bouts use the new fights. If Kael runs for Seren at the furnace he now gets his three steps: a short fight against a Warden that cannot be won.
+- **Saves**: an autosave plus three slots with day, place, play time and date; overwrite confirmation, delete, and the existing text export and import. The game says so plainly when the browser cannot keep saves.
+- **Checkpoints (dev)** on the title menu: twelve jump points across the slice.
+- Assay scenery: pavilions, swaying grass and reeds, cloud shadows crossing the field, a background melee behind every battle, glints on the river and ripples round anyone standing in it, braziers and reflections on the keep's stone, petals and embers in the air, capes that stream when fighters move.
+- New music track for battles. New 16×28 armoured cadet sprites.
+- The final Ember Ring bout has more health (36) because the new attacks hit harder; a mashing bot still loses it and a dodging bot wins.
+- Tests: `ff.mjs` (plays each battle with a bot), `sup.mjs` (the super), `flow.mjs` (opening, new game, furnace fight), `dev.mjs` (every checkpoint, save slots), `arts.mjs` (the Memory Arts). Add `#noff` to the URL to skip the opening and flash-forwards.
+
 ## v0.10 · 2026-11-17 — playtest round: bugs, the heist, animation
 Found by stepping through every cutscene frame, walking the heist with a bot on real inputs, and profiling on a throttled CPU.
 - **Bugs fixed**

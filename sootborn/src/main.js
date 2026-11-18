@@ -174,6 +174,7 @@ canvas.addEventListener('pointerdown', e => {
   else if (Cutscene.active) Cutscene.tapped = true;
 });
 $('#card').addEventListener('pointerdown', () => { Cutscene.tapped = true; });
+window.addEventListener('pointerdown', () => { if (Brawl.active && Brawl.cine) Brawl.tap = true; }); window.addEventListener('keydown', e => { if (Brawl.active && Brawl.cine && Brawl.def.cineOnly && !e.repeat) Brawl.tap = true; });
 $('#cskip').addEventListener('click', e => { e.stopPropagation(); Cutscene.skip(); });
 
 const ZC = { c: null, g: null };
@@ -193,7 +194,7 @@ function boot() {
   // press-to-start (also unlocks audio as a user gesture)
   const el = document.createElement('div'); el.className = 'splash'; el.style.background = '#07090d';
   el.innerHTML = '<div class="press">▶ Tap or press any key</div>'; $('#layer').appendChild(el);
-  const go = () => { if (booted) return; booted = true; Sound.unlock(); el.remove(); Input.consume(); window.removeEventListener('keydown', go); G.mode = 'splash'; Splash.run(() => Game.toTitle()); };
+  const go = () => { if (booted) return; booted = true; Sound.unlock(); el.remove(); Input.consume(); window.removeEventListener('keydown', go); G.mode = 'splash'; Splash.run(() => { if (!P.sheet) World.resetSheets(); Opening.run(() => Game.toTitle()); }); };
   el.addEventListener('pointerdown', go); window.addEventListener('keydown', go);
   Boot.go = go;
   requestAnimationFrame(frame);
@@ -225,6 +226,7 @@ function step(dt) {
 }
 function render() {
   const g = ctx;
+  if (Brawl.active && !Puzzle.active && G.mode !== 'boot' && G.mode !== 'splash') { Brawl.render(g); if (Fade.a > 0) { g.fillStyle = `rgba(7,5,10,${Fade.a})`; g.fillRect(0, 0, W, H); } return; }
   if (G.mode === 'boot' || G.mode === 'splash' || !World.map || (Cutscene.active && !$('#card').classList.contains('hidden') && Fade.a >= 1)) { g.fillStyle = '#07090d'; g.fillRect(0, 0, W, H); return; }
   if (Brawl.active && !Puzzle.active) Brawl.render(g);
   else if (Puzzle.active) Puzzle.render(g);
@@ -241,5 +243,5 @@ function render() {
   Fade.draw(g);
 }
 // test/QA hook (harmless in release)
-window.BTS = { G, P, World, Puzzle, Dialogue, Game, Save, UI, Input, HUD, Menus, Cutscene, Brawl, Fade };
+window.BTS = { G, P, World, Puzzle, Dialogue, Game, Save, UI, Input, HUD, Menus, Cutscene, Brawl, Fade, FF, Opening };
 boot();

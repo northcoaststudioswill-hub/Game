@@ -37,7 +37,9 @@ node build.mjs
 | `src/systems.js` | State, saves, dialogue runner, pipe puzzle, world, heist stealth, lighting, fades |
 | `src/cinema.js` | Cutscene engine and the prologue scripts |
 | `src/panels.js` | Illustrated story panels that cutscenes cut to |
-| `src/brawl.js` | Real-time melee: the base for every fight |
+| `src/brawl.js` | Pseudo-3D arena fights: fury, ELEVEN, Memory Arts, the shot player used by the opening |
+| `src/ff.js` | The Assay: opening sequence and the three flash-forward battles |
+| `src/checkpoints.js` | Captured saves for the dev checkpoint menu |
 | `src/day2.js` | Day 2 "First Fire": dialogue, hotspots, the Ember Ring, festival cutscenes |
 | `src/ui.js` | HUD, menus, cutaway map, splash, title, day-end |
 | `src/main.js` | Game flow and the fixed-timestep loop |
@@ -57,6 +59,10 @@ node day2.mjs     # all of Day 2 from a synthetic Day 1 save (VAR=b for the othe
 node fight.mjs    # every bout against a mashing bot and a dodging bot
 node sneak.mjs    # walks the festival stealth for real
 node heist.mjs    # walks the prologue heist with a cautious bot (ROUTE=north or south for other routes)
+node ff.mjs       # opening shots; M=valley|ford|keep plays that battle with a bot
+node arts.mjs     # Memory Art cut-ins and attacks
+node flow.mjs     # opening, New Game battle, furnace fight
+node dev.mjs      # every dev checkpoint, save slots
 ```
 
 Screenshots go to `tests/shots/`.

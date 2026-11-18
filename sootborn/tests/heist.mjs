@@ -4,7 +4,7 @@ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH 
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
 await ev(() => { BTS.UI.clear(); BTS.Game.newGame(); BTS.Cutscene.skip(); }); await wait(1500);
 console.log('heist', await ev(() => [BTS.G.heist, BTS.G.mapId]));
 const held = new Set(); const hold = async (k, on) => { if (on && !held.has(k)) { held.add(k); await page.keyboard.down(k); } if (!on && held.has(k)) { held.delete(k); await page.keyboard.up(k); } };

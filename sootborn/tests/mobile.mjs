@@ -6,7 +6,7 @@ for (const [name, vp] of [['portrait', { width: 390, height: 844 }], ['landscape
   const touch = name !== 'deck';
   const c = await b.newContext({ viewport: vp, hasTouch: touch, isMobile: touch, deviceScaleFactor: touch ? 2 : 1 });
   const p = await c.newPage(); p.on('pageerror', e => errs.push(name + ': ' + e.message));
-  await p.goto(new URL('../index.html', import.meta.url).href); await p.waitForTimeout(300);
+  await p.goto(new URL('../index.html', import.meta.url).href + '#noff'); await p.waitForTimeout(300);
   if (touch) await p.tap('.press'); else await p.keyboard.press('Enter');
   await p.waitForTimeout(5600); await p.screenshot({ path: `shots/m-${name}-title.png` });
   await p.locator('.mi', { hasText: 'New game' }).click(); await p.waitForTimeout(400);

@@ -21,8 +21,11 @@ const SAVE_V = 2;
 const Save = {
   snapshot() { return { v: SAVE_V, t: Date.now(), name: G.name, look: G.look, tendency: G.tendency, day: G.day, map: G.mapId, x: Math.round(P.x), y: Math.round(P.y), dir: P.dir, flags: { ...G.flags }, trust: { ...G.trust }, trust0: { ...G.trust0 }, scrip: G.scrip, journal: G.journal.slice(), log: G.log.slice(-80), play: Math.round(G.play), talkCount: { ...G.talkCount } }; },
   write(slot) { const s = this.snapshot(); s.slot = slot; return Store.set('bts_save_' + slot, JSON.stringify(s)); },
-  read(slot) { try { return this.migrate(JSON.parse(Store.get('bts_save_' + slot))); } catch (e) { return null; } },
-  latest() { const a = this.read('auto'), m = this.read('manual'); if (a && m) return a.t >= m.t ? a : m; return a || m; },
+  read(slot) { try { return this.migrate(JSON.parse(Store.get('bts_save_' + slot) || (slot === 's1' ? Store.get('bts_save_manual') : null))); } catch (e) { return null; } },
+  del(slot) { Store.set('bts_save_' + slot, ''); if (slot === 's1') Store.set('bts_save_manual', ''); },
+  SLOTS: [['auto', 'Autosave'], ['s1', 'Slot 1'], ['s2', 'Slot 2'], ['s3', 'Slot 3']],
+  latest() { let b = null; for (const [k] of this.SLOTS) { const s = this.read(k); if (s && (!b || s.t > b.t)) b = s; } return b; },
+  describe(s) { if (!s) return 'Empty'; const d = new Date(s.t), m = Math.floor((s.play || 0) / 60); let when = ''; try { when = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); } catch (e) { } return `Day ${s.day} · ${MAPS[s.map].name} · ${m < 60 ? m + ' min' : Math.floor(m / 60) + 'h ' + (m % 60) + 'm'}${when ? ' · ' + when : ''}`; },
   migrate(s) {
     if (!s || typeof s !== 'object') return null;
     if (!s.v) { s.v = 1; s.trust = s.trust || {}; s.journal = s.journal || []; s.flags = s.flags || {}; }
@@ -215,7 +218,7 @@ $('#pLeave').onclick = () => { Puzzle.close(); };
 // ---------- world: map, player, NPCs, interaction, rendering
 const World = {
   map: null, layer: null, npcs: [], sheets: {}, cam: { x: 0, y: 0 }, target: null, exitArmed: true, parts: [],
-  sheetFor(id) { if (!this.sheets[id]) { const L = CAST[id].look(); this.sheets[id] = L.accredited ? makeAccredited(L) : makeChar(L); } return this.sheets[id]; },
+  sheetFor(id) { if (!this.sheets[id]) { const L = CAST[id].look(); this.sheets[id] = L.cadet ? makeCadet(L) : L.accredited ? makeAccredited(L) : makeChar(L); } return this.sheets[id]; },
   resetSheets() { this.sheets = {}; this.busts = {}; P.sheet = makeChar(playerLook()); },
   busts: {},
   bustFor(id) { if (id === 'kael') return makeBust(Object.assign(playerLook(), { mouth: MOUTH.kael, scar: G.mode === 'world' && (F('ranForHer') || F('spatAtHer')) })); if (!this.busts[id]) this.busts[id] = makeBust(Object.assign({}, CAST[id].look(), { mouth: MOUTH[id] })); return this.busts[id]; },

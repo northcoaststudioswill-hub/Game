@@ -53,13 +53,17 @@ const RING = [
   },
   () => ({ pre: [say('hollis', "Last bout. A belt-holder's second stands for her when she can't. Seren's second was —"), say('mara', 'Me.'), narr("Mara steps over the chalk, rolling her sleeves. Forty years of hauling valve wheels in those forearms."), say('mara', "You've wanted to hit me for forty-two days, boy. In here it's legal."),
       { choice: [{ t: "I don't want to hit you, Mara.", then: [say('mara', 'Liar. Hands up.')] }, { t: 'Yes. I have.', fx: () => setF('ringHonest'), then: [say('mara', 'Good. Honest. Hands up.')] }] }],
-    def: { title: 'FINAL BOUT', sub: "MARA VENN - FOREWOMAN'S PRIVILEGE", winText: 'THE BELT IS YOURS', foes: [{ id: 'mara', name: 'Mara', kind: 'boss', hp: 28 }], taunt: { 0: ['I HELD YOU DOWN. HIT ME!', 'SHE BOUGHT YOUR LIFE!', 'THERE HE IS.'] } },
+    def: { title: 'FINAL BOUT', sub: "MARA VENN - FOREWOMAN'S PRIVILEGE", winText: 'THE BELT IS YOURS', foes: [{ id: 'mara', name: 'Mara', kind: 'boss', hp: 36 }], taunt: { 0: ['I HELD YOU DOWN. HIT ME!', 'SHE BOUGHT YOUR LIFE!', 'THERE HE IS.'] } },
     win: [narr('Mara sits down hard in the chalk. And laughs. A real one, rusty from forty-two days of not being used.'), say('mara', "There he is. There's the one she married."), say('mara', '...She had a better left.'),
       { choice: [{ t: '(Help her up.)', fx: () => { trust('mara', 1); setF('ringMercy'); }, then: [say('mara', "I'm sorry, Kael. I'd do it again, and I'm sorry. Both. Every day.")] }, { t: "I'm still angry.", fx: () => fury(1), then: [say('mara', "Good. Aim it up, not sideways. I'll hold the bag until you can reach them.")] }] },
       narr('Hollis lifts the belt off his good shoulder: a strip of conveyor belting with two notches cut in it. He cuts a third.'), say('hollis', "Brennick. Belt-holder. She'd have been unbearable about it."), fx(() => { setF('ringChamp'); addJ('e_belt'); Sound.play('clue'); })] })
 ];
 function ringBout() {
   const i = G.flags.ring | 0, B = RING[i]();
+  if (i === 2) B.def.arts = [{ at: .5, name: 'FORTY-TWO DAYS', line: 'SHE HELD ME DOWN WHILE THE DOORS CLOSED. SHE HAS NOT SLEPT SINCE EITHER.', panel: 'furnace', stage: 1, kind: 'rise', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }];
+  B.def.voice = [{ at: [[1, 'THE CHALK CIRCLE. SEREN HELD THE BELT HERE. I HELD HER COAT.'], [9, 'IVO FIGHTS THE WAY HE SELLS. FAST, AND HOPING YOU WILL NOT LOOK TOO CLOSELY.']], fury: 'FORTY-TWO DAYS OF THIS IN MY HANDS, AND NOWHERE TO PUT IT.' },
+    { at: [[1, 'NOTHING GETS WRITTEN DOWN IN THE RING. THAT IS THE WHOLE POINT OF THE RING.'], [12, 'WATCH THE GROUND, NOT THE FISTS. SHE TAUGHT ME THAT. I WAS A BAD STUDENT.']], hurt: 'GOOD. SOMETHING I CAN FEEL.', fury: 'THERE IT IS.', eleven: 'ELEVEN SECONDS. THAT IS HOW LONG THE DOORS STOOD OPEN.' },
+    { at: [[1, 'MARA HELD ME DOWN WHILE THE DOORS CLOSED. NOW SHE IS ASKING ME TO HIT HER FOR IT.'], [12, 'EVERY ONE I LAND, SHE NODS.']], hurt: 'FORTY YEARS OF VALVE WHEELS IN THAT ARM.', half: 'I THOUGHT THIS WOULD FEEL LIKE SOMETHING.', eleven: 'ONE FOR EVERY SECOND. SHE COUNTS THEM WITH ME.' }][i];
   return B.pre.concat([fx(() => Brawl.start(B.def, win => {
     if (win) { G.flags.ring = i + 1; Game.autosave(); Dialogue.start(B.win, () => { World.afterBeat(); Game.autosave(); }); }
     else Dialogue.start([say('hollis', ["Up you get. Chalk's still wet. Go again when your ears stop ringing.", 'Watch the ground, not the fists. The red tells you where it lands. Step THROUGH it.', 'She lost her first six, you know. Never told you that, did she.'][Math.min(3, G.flags.ringLoss = (G.flags.ringLoss | 0) + 1) - 1])], () => World.afterBeat());
@@ -526,6 +530,7 @@ function festB() {
     { say: 'vale', t: 'I can send a clerk. Or I can send a valve tech who knows the bank, and who has just shown four hundred people he cannot be told where to put a light.' },
     { say: 'vale', t: 'Sleep on it. You have until first bell.' },
     { fade: 'out' },
+    { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
     { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 }
   ].filter(Boolean);
 }
