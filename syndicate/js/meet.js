@@ -94,6 +94,7 @@
     mark: (then) => { const me = G.state.hero.name; return { place: 'hub', npc: [25.6, -0.5], you: [25.6, 2.6], lines: [
         S('npc', 'Mark', 'Hold up. HOLD up. New face. Bro, come here, let me look at you.', 'wide'),
         S('npc', 'Mark', 'Mark. The Long Odds. I run the dice, the coin and the undercard. I have got a guy for everything. The guy is me.', 'npc'),
+        S('npc', 'Mark', 'You know why I am rich, bro? Queen Eerin Koheneim and Vilhelm van Koheneim IV. Iron grip. You cannot roll a die up top without a seal. So everybody rolls them down here. Long may they reign. Seriously.', 'npc'),
         S('you', me, 'They said you would take a bet on anything.', 'you'),
         S('npc', 'Mark', 'Anything, bro. Watch this. I bet I can put you on the floor. Friendly. First one to yield buys the other a pipe.', 'ots'),
         S('npc', 'Mark', '…I have had a pipe already today. Several. It is fine. I fight better loose.', 'npc')],
@@ -101,17 +102,20 @@
     gm: (then) => { const me = G.state.hero.name; return { place: 'hub', npc: [20.4, -0.2], you: [20.4, 2.4], lines: [
         S('npc', 'The Ledger-Keeper', me + '. Yes. I have your page open.', 'wide'),
         S('npc', 'The Ledger-Keeper', 'Your debt is written in the first column. Beside it, in the second, the Guild has written the number of bouts it expects in payment.', 'npc'),
+        S('npc', 'The Ledger-Keeper', 'Above us, Queen Eerin Koheneim and her husband, Vilhelm van Koheneim IV, hold the realm in an iron grip. Down here they ask two things only: their tithe, and that nobody climbs the stair. Everything else, they permit.', 'ots'),
         S('you', me, 'And if I win them?', 'you'),
         S('npc', 'The Ledger-Keeper', 'Then I strike the line through, with my own hand, and you may wear a brass hat and call yourself a monarch. The Guild keeps its word exactly.', 'ots'),
         S('npc', 'The Ledger-Keeper', 'Come to me when you grow. I keep the record of what you have become.', 'npc')], done: then }; },
     fence: (then) => { const me = G.state.hero.name; return { place: 'hub', npc: [15.6, -1.0], you: [15.6, 1.9], lines: [
         S('npc', 'The Fence', 'Ah. The new one. You have the look of someone who needs things and does not ask where they came from.', 'npc'),
         S('you', me, 'Where do they come from?', 'you'),
+        S('npc', 'The Fence', 'Highmarch. Whatever Queen Eerin Koheneim and Vilhelm van Koheneim IV forbid up there, somebody still wants. So it comes down the stair, and it finds me.', 'npc'),
         S('npc', 'The Fence', 'They fell off a cart. Different carts. Steel, plate, potions, and round the side a rack of things to wear. Coin only. I do not keep a ledger.', 'ots')], done: then }; },
     vexa: (then) => { const me = G.state.hero.name, o = G.OPPONENTS.find(q => q.id === 'vexa'); return { place: 'arena', npc: [-1.6, -1.6], you: [1.9, 1.9], spawn: { look: { cls: o.cls, race: o.race, tint: o.tint }, crown: true }, lines: [
         S('', '', 'The crowd goes quiet when she walks out. It has done so for seven years.', 'wide'),
         S('npc', 'Vexa, the Pale Queen', 'So you are the one they have all been betting on. Mark has not shut up about you.', 'npc'),
         S('you', me, 'I am here for the crown.', 'you'),
+        S('npc', 'Vexa, the Pale Queen', 'This? It is brass. The real crown sits on Eerin Koheneim, and Vilhelm van Koheneim IV holds the sword beside it. They let us keep this one. Remember that when the crowd calls you a monarch.', 'npc'),
         S('npc', 'Vexa, the Pale Queen', 'Everyone is. I have been waiting a long time for someone who might actually take it. Do not make me feel foolish for hoping.', 'low'),
         S('npc', 'Vexa, the Pale Queen', 'To the death, then. Those are the rules. I did not write them.', 'npc')], done: then }; }
   };

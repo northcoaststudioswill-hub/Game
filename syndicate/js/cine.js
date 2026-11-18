@@ -32,14 +32,43 @@
   }
   const FIGHTER = Object.assign(opp('brakk'), {}), ROGUE = opp('grubb'), SORC = opp('kessa'), CLERIC = opp('maul'), QUEEN = opp('vexa');
 
+  // The throne room of Highmarch: Queen Eerin Koheneim and Vilhelm van Koheneim IV, seen once, from below.
+  let royal = null;
+  function throne() {
+    if (royal) return royal;
+    const s = gfx.newScene({ bg: 0x0a0c16, ambient: 0.75, key: 2.0, shadowSize: 10, sky: 0xcfd8ff, ground: 0x1a1830, keyColor: 0xfff2e0 }), L = c => gfx.lambert(c), box = gfx.box, mesh = gfx.mesh;
+    const gold = new T.MeshPhongMaterial({ color: 0xf0c95a, emissive: 0x5a3c08, shininess: 90, flatShading: true }), marble = L(0xe6e4f0);
+    mesh(new T.CylinderGeometry(9, 9, 0.2, 28), L(0xbfc0d4), 0, -0.1, 0, s); mesh(new T.CylinderGeometry(3.4, 3.8, 0.35, 16), marble, 0, 0.17, -0.4, s); mesh(new T.CylinderGeometry(2.6, 3.0, 0.3, 16), marble, 0, 0.5, -0.6, s);
+    [[-0.95, 0x3a2a6a], [0.95, 0x5a1418]].forEach(q => { box(1.1, 2.9, 0.3, L(q[1]), q[0], 2.1, -1.5, s); box(1.25, 0.2, 0.4, gold, q[0], 3.6, -1.5, s); mesh(new T.ConeGeometry(0.2, 0.5, 4), gold, q[0], 3.95, -1.5, s); box(1.1, 0.25, 0.9, L(q[1]), q[0], 0.9, -1.0, s); });
+    for (let i = 0; i < 8; i++) { const a = -0.5 + i * 0.6, x = Math.sin(a) * 7.2 * (i % 2 ? 1 : -1), z = -3 - Math.abs(Math.cos(a)) * 2.5 - (i >> 1) * 0.9; mesh(new T.CylinderGeometry(0.42, 0.5, 9, 8), marble, x, 4.5, z, s); box(1.3, 0.3, 1.3, gold, x, 0.15, z, s); }
+    [-3.3, 3.3].forEach((x, i) => { const m = new T.Mesh(new T.PlaneGeometry(1.5, 5), new T.MeshLambertMaterial({ map: gfx.bannerTex(i ? '#5a1418' : '#3a2a6a', '#f0c95a'), transparent: true, alphaTest: 0.5, side: T.DoubleSide })); m.position.set(x, 3.6, -2.4); s.add(m); });
+    const queen = G.makeChar({ cls: 'sorcerer', race: 'elf', tint: { cloth: '#e8e4f8', armor: '#b8a8e8', armor2: '#8a78c8', hair: '#f4f0ff', trim: '#f0c95a' }, cos: { head: 'crown', aura: 'sigils' } });
+    const king = G.makeChar({ cls: 'fighter', race: 'human', tint: { cloth: '#5a1418', armor: '#2a2428', armor2: '#16121a', trim: '#f0c95a', hair: '#8a8a90' }, gear: { weapon: 2, armor: 2 }, cos: { head: 'crown', back: 'greatcloak' } });
+    queen.root.position.set(-0.95, 0.65, -0.1); king.root.position.set(0.95, 0.65, -0.1); s.add(queen.root, king.root);
+    const wing = new T.MeshBasicMaterial({ color: 0xc8b8ff, transparent: true, opacity: 0.26, side: T.DoubleSide, blending: T.AdditiveBlending, depthWrite: false }), wings = [];
+    [-1, 1].forEach(sd => [0, 1].forEach(lo => { const g = new T.Group(), w = new T.Mesh(new T.CircleGeometry(lo ? 0.55 : 0.8, 5, 0, Math.PI), wing); w.scale.set(0.8, lo ? 1.1 : 1.6, 1); w.rotation.z = -Math.PI / 2 * sd; w.position.x = sd * 0.05; g.add(w); g.position.set(-0.95 + sd * 0.14, lo ? 1.75 : 2.15, -0.42); g.rotation.z = sd * (lo ? 0.5 : -0.25); s.add(g); wings.push([g, sd]); }));
+    const lq = new T.PointLight(0xc8b8ff, 22, 9, 1.5); lq.position.set(-1.6, 3.4, 1.6); s.add(lq); const lk = new T.PointLight(0xffb070, 18, 9, 1.5); lk.position.set(2.0, 3.0, 1.8); s.add(lk);
+    return royal = { scene: s, update: tt => { queen.pose({ t: tt, act: 'idle' }); king.pose({ t: tt + 1.4, act: 'idle' }); wings.forEach((w, i) => { w[0].rotation.y = w[1] * (0.35 + Math.sin(tt * 2.2 + i) * 0.22); }); if (Math.random() < 0.25) gfx.emit(-0.95 + (Math.random() - 0.5) * 1.6, 1 + Math.random() * 2.4, -0.2, 0, 0.3, 0, 1.6, 0xd8ccff, 0); } };
+  }
+
   function build() {
     const hub = () => W.get('hub'), GM = [20.4, 1.35, -0.2];
     return [
-      { dur: 2.8, black: true, text: 'Highmarch. The city above sleeps soundly.' },
+      { dur: 2.6, black: true, text: 'Highmarch. The city above sleeps soundly.' },
+      // the throne: a slow push in from the foot of the dais
+      {
+        dur: 6.4, text: 'It sleeps because the faerie queen Eerin Koheneim and her husband, Vilhelm van Koheneim IV, hold the realm in an iron grip.',
+        setup: () => { gfx.setScene(throne().scene); },
+        update: (p) => { shoot(V([0.6, 0.7, 10.5], [-0.2, 1.3, 6.2], ease(p)), V([0, 1.9, -0.4], [0, 1.75, -0.4], p), lerp(40, 32, p), 0.02 - p * 0.04); throne().update(now); }
+      },
+      {
+        dur: 5.4, cut: true, text: 'Nothing is done above without their seal. So everything they forbid is done below. And they allow it.',
+        update: (p) => { const th = lerp(-0.5, 0.5, ease(p)); shoot([Math.sin(th) * 5.6, lerp(2.6, 2.0, p), Math.cos(th) * 5.6 + 0.2], [0, 1.7, -0.2], lerp(34, 29, p), 0.03); throne().update(now); }
+      },
 
       // crane down out of the dark, then a fast low dolly along the street
       {
-        dur: 7, text: 'Beneath it lies the Undercity. No sun. No law. Only what you owe.',
+        dur: 7, cut: true, text: 'Beneath them lies the Undercity. No sun. No law but theirs, and theirs looks away. Only what you owe.',
         setup: () => { gfx.setScene(hub().scene); hideRegulars(); },
         update: (p, dt) => {
           const a = cl(p / 0.42), b = cl((p - 0.42) / 0.58);

@@ -4,9 +4,11 @@ The in-game Codex (`js/lore.js`) is the source of truth. This file is the same m
 
 ## The premise
 
-**Highmarch** is the city above: white stone, clean water, a council that meets in daylight. It grew rich on the
+**Highmarch** is the city above and the seat of the throne: white stone, clean water, a council that meets in daylight and votes as it is told. It grew rich on the
 mines beneath it. When the seams ran dry it sealed the lower levels and stopped asking what became of the people
 left inside.
+
+**The Koheneim throne** rules the realm from Highmarch: the faerie elven queen **Eerin Koheneim** and her husband **Vilhelm van Koheneim IV**. Their grip is iron. Above ground there is a seal for everything, and breaking one means not being seen again. The Undercity is the one place where the seals are not asked for, and that is deliberate: every vice forbidden above is permitted below, so long as it stays below and the Deep Guild sends the Crown's tithe up the long stair. The shady quarter flourishes because the throne has decided that it may.
 
 **The Undercity** is what was left: nine levels of dead workings, cisterns and forgotten foundations. No sun
 reaches it, so its people plant what glows. No law reaches it either. What it has instead is the Ledger.
@@ -85,3 +87,10 @@ down a **Flame Strike**. A loser who is merely beaten is carried out and billed 
 **Chits** are Mark's own paper: slips stamped with a long-eared rat. They are worth exactly what Mark says they are worth, at Mark's tables, and nothing anywhere else. He hands them out when one of his **schemes** goes wrong, which is often. A scheme is any plan Mark has that needs somebody else's coin. Half of them pay. Nobody, including Mark, knows which half.
 
 **Wispdice** are Guild-work: dice made of captive lamplight that hang in the air over the table and cannot be loaded, shaved or palmed. The Guild made them to settle its own disputes. Mark has five, and has never explained how.
+
+## The Koheneims
+
+- **Queen Eerin Koheneim.** Faerie-born and elven, older than most family names. She is the law, and never raises her voice. The Ledger-Keeper's monthly account is said to be the only document she reads to the end. She allows the Guttercrown to exist because it amuses her that the cellar has a monarch too.
+- **Vilhelm van Koheneim IV.** Her husband and the hand inside the iron glove. He commands the Seal-Wardens, signs the warrants, and sealed the lower levels himself. Rumour says he watches the champion's bout once a year from the Guild box, in a plain cloak.
+- **The Iron Peace.** Forty years without a riot above, paid for by letting everything forbidden happen below.
+- Names are spelled exactly as above: *Eerin Koheneim*, *Vilhelm van Koheneim IV*.
