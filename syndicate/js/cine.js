@@ -33,7 +33,7 @@
   const FIGHTER = Object.assign(opp('brakk'), {}), ROGUE = opp('grubb'), SORC = opp('kessa'), CLERIC = opp('maul'), QUEEN = opp('vexa');
 
   function build() {
-    const hub = () => W.get('hub'), GM = [15.6, 1.35, -0.2];
+    const hub = () => W.get('hub'), GM = [20.4, 1.35, -0.2];
     return [
       { dur: 2.8, black: true, text: 'Highmarch. The city above sleeps soundly.' },
 
@@ -43,8 +43,8 @@
         setup: () => { gfx.setScene(hub().scene); hideRegulars(); },
         update: (p, dt) => {
           const a = cl(p / 0.42), b = cl((p - 0.42) / 0.58);
-          const pos = p < 0.42 ? V([18, 13, 14], [16.5, 1.5, 5.2], ease(a)) : V([16.5, 1.5, 5.2], [4.5, 1.25, 4.4], easeIn(b) * 0.55 + b * 0.45);
-          const look = p < 0.42 ? V([9, 0, 1], [8, 1.3, 3.2], ease(a)) : V([8, 1.3, 3.2], [-3, 1.6, 4.6], ease(b));
+          const pos = p < 0.42 ? V([30, 15, 20], [27, 1.5, 6.5], ease(a)) : V([27, 1.5, 6.5], [7, 1.25, 4.4], easeIn(b) * 0.55 + b * 0.45);
+          const look = p < 0.42 ? V([14, 0, 6], [14, 1.6, 5], ease(a)) : V([14, 1.6, 5], [-3, 1.6, 4.2], ease(b));
           shoot(pos, look, lerp(42, 62, b), Math.sin(p * 3.1) * 0.05); hub().update(now, dt);
         }
       },
@@ -149,7 +149,7 @@
       {
         dur: 4.3, cut: true, text: 'Tonight, your name was entered.',
         setup: () => { restoreItems(); gfx.setScene(hub().scene); hideRegulars(); },
-        update: (p, dt) => { const k = easeIn(p); shoot(V([9.5, 1.5, 8.2], [3.6, 1.45, -0.7], k), [3.6, lerp(1.9, 1.5, p), -1.6], lerp(38, 86, k), Math.sin(p * 9) * 0.02 * (1 - p)); gfx.cam.shake = k * 0.12; hub().update(now, dt); }
+        update: (p, dt) => { const k = easeIn(p); shoot(V([13, 1.5, 9.5], [5, 1.45, -0.7], k), [5, lerp(1.9, 1.5, p), -1.6], lerp(38, 86, k), Math.sin(p * 9) * 0.02 * (1 - p)); gfx.cam.shake = k * 0.12; hub().update(now, dt); }
       },
       { dur: 4.4, black: true, logo: true, cut: true, setup: () => { gfx.cam.shake = 0; G.sfx('boom'); G.sfx('bell'); flash(0.9); } }
     ];

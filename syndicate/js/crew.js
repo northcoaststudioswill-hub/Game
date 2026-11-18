@@ -185,6 +185,7 @@
     const st = G.state; if (!st.hero) return;
     const fresh = crew.sync();
     if (fresh.length) { G.save(); ui.toast(fresh.map(t => t.name).join(' and ') + ' swore to your Tally. Find them at the Low Lamp.'); }
+    if (st.markReport) return ui.markReport();
     if ((st.reports || []).length) return ui.reports();
     if (G.afterFight && Math.random() < 0.6) return ui.event();
     G.afterFight = false;

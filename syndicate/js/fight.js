@@ -813,6 +813,7 @@
     if (!win) { r.lost = Math.round(st.coin * 0.2); st.coin -= r.lost; }
     r.mortal = win ? G.MORTAL[P.cls].name : null; gfx.cine = null; G.afterFight = true;
     if (G.crew) r.crew = G.crew.tick();
+    if (G.mark) G.mark.resolve(win);
     st.potions = Math.max(0, Math.min(P.startPotions, P.potions));
     if (win) st.wins[opp.id] = (st.wins[opp.id] || 0) + 1; else st.losses++;
     const rank0 = G.rankOf(st.respect);

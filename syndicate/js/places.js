@@ -29,85 +29,122 @@
   }
   function windowLight(p, x, y, z, rot) { const m = new T.Mesh(new T.PlaneGeometry(0.5, 0.8), emis(0xffc070)); m.position.set(x, y, z); m.rotation.y = rot; p.add(m); gfx.glow(0xffa040, 1.6, x, y, z, p, 0.3); }
 
-  // ============================================================== UNDERCITY STREET
+  // ============================================================== UNDERCITY: the Lamp Market, a plaza under the Pit
   W.buildHub = function () {
-    const s = gfx.newScene({ ambient: 1.5, key: 1.35, shadowSize: 16, sky: 0x8a88c0, ground: 0x241c1a, keyColor: 0xd8d0ff });
-    s.fog = new T.Fog(0x07060a, 74, 110);
-    const key = s.userData.key; key.position.set(14, 16, 16); key.target.position.set(8.5, 0, 4.5);
-    const X1 = 17, Z1 = 9, cells = [];
-    for (let x = -1; x <= X1 + 1; x++) for (let z = -1; z <= Z1 + 1; z++) cells.push({ x, z });
+    const s = gfx.newScene({ ambient: 1.5, key: 1.35, shadowSize: 24, sky: 0x8a88c0, ground: 0x241c1a, keyColor: 0xd8d0ff });
+    s.fog = new T.Fog(0x07060a, 74, 116);
+    const X1 = 29, Z1 = 17, key = s.userData.key; key.position.set(24, 22, 24); key.target.position.set(14, 0, 8);
+    const cells = [], plaza = new T.Color(1.12, 1.06, 0.98);
+    for (let x = -1; x <= X1 + 1; x++) for (let z = -1; z <= Z1 + 1; z++) cells.push({ x, z, tint: Math.hypot(x - 14, z - 9) < 4.6 ? plaza : null });
     tiles(s, cells, 'cobble', [0.5, 0.5, 0.56]);
-    const m1 = stoneMat(0x6f6a72), m2 = stoneMat(0x56525c);
-    // far building line (along z = -2) and left building line (along x = -2)
+    const m1 = stoneMat(0x6f6a72), m2 = stoneMat(0x56525c), m3 = stoneMat(0x625a5a);
+    // building line on the two far sides, broken into houses of different heights
     const bw = wall(s, X1 + 5, 5.2, 1, m1); bw.position.set(X1 / 2, 0, -2.05);
     const lw = wall(s, Z1 + 5, 5.2, 1, m2); lw.position.set(-2.05, 0, Z1 / 2); lw.rotation.y = Math.PI / 2;
-    box(X1 + 6, 0.5, 2.2, m2, X1 / 2, 5.6, -2.6, s); box(2.2, 0.5, Z1 + 6, m2, -2.6, 5.6, Z1 / 2, s);
-    for (let i = 0; i < 6; i++) { windowLight(s, 1 + i * 3.2, 3.9, -1.5, 0); if (i < 3) windowLight(s, -1.5, 3.9, 1.2 + i * 3.4, Math.PI / 2); }
-    [[-1.6, -1.6], [7, -1.7], [14.6, -1.7], [-1.7, 8]].forEach(p => box(1.1, 6, 1.1, m2, p[0], 3, p[1], s));
-    // curb on the near edges
+    [[2, 7.5, 6.6, m3], [12, 6, 7.4, m2], [18, 5, 6.2, m3], [23, 6.5, 7.8, m2], [28.5, 4, 6.4, m3]].forEach(q => { box(q[1], q[2] - 5.2, 1.6, q[3], q[0], 5.2 + (q[2] - 5.2) / 2, -2.5, s); box(q[1] + 0.5, 0.35, 2.3, m2, q[0], q[2] + 0.15, -2.5, s); });
+    [[3, 6, 6.8, m3], [10, 5, 6.2, m1], [15.5, 4, 7.2, m3]].forEach(q => { box(1.6, q[2] - 5.2, q[1], q[3], -2.5, 5.2 + (q[2] - 5.2) / 2, q[0], s); box(2.3, 0.35, q[1] + 0.5, m2, -2.5, q[2] + 0.15, q[0], s); });
+    for (let i = 0; i < 10; i++) { windowLight(s, 1 + i * 3.1, 3.9, -1.5, 0); if (i % 3 === 0) windowLight(s, 1.6 + i * 3.1, 6.1, -1.65, 0); if (i < 6) windowLight(s, -1.5, 3.9, 1.2 + i * 3.2, Math.PI / 2); }
+    [[-1.6, -1.6], [8.3, -1.7], [17.2, -1.7], [22.6, -1.7], [28.6, -1.7], [-1.7, 6], [-1.7, 12.4]].forEach(p => box(1.1, 6, 1.1, m2, p[0], 3, p[1], s));
     box(X1 + 3.4, 0.4, 0.5, m2, X1 / 2, 0.1, Z1 + 1.65, s); box(0.5, 0.4, Z1 + 3.4, m2, X1 + 1.65, 0.1, Z1 / 2, s);
-
-    // The Blood Pit gate
-    doorway(s, 3.6, -1.45, 0, 0xff4020, 2.6, 3.2);
-    brazier(s, 1.6, 0, -0.7, 28, 0xff7030); brazier(s, 5.6, 0, -0.7, 28, 0xff7030);
+    for (let x = 1; x < X1; x += 4) box(0.4, 0.9, 0.4, m2, x, 0.45, Z1 + 1.65, s);
+    for (let z = 1; z < Z1; z += 4) box(0.4, 0.9, 0.4, m2, X1 + 1.65, 0.45, z, s);
     const ban = (x, y, z, rot, bg) => { const m = new T.Mesh(new T.PlaneGeometry(1.1, 2.2), new T.MeshLambertMaterial({ map: gfx.bannerTex(bg, '#d9a93c'), transparent: true, alphaTest: 0.5, side: T.DoubleSide })); m.position.set(x, y, z); m.rotation.y = rot; s.add(m); };
-    ban(0.3, 3.2, -1.5, 0, '#7a1c22'); ban(6.9, 3.2, -1.5, 0, '#7a1c22');
-    // The Fence
-    stall(s, 10.2, -0.3, 0x245a44, [0x7ad0ff, 0xffd36b, 0xff7a7a, 0x9aff8a]);
-    const fence = npc(s, { cls: 'rogue', race: 'human', tint: { cloth: '#245a44', armor: '#3a4a40' } }, 10.2, -1.0, 0);
-    lantern(s, 12.1, 0, -0.9, 0xffb060, 16);
-    // Guildmaster
-    ban(15.6, 3.1, -1.5, 0, '#5a1f7a');
-    const gm = npc(s, { cls: 'sorcerer', race: 'elf', tint: { cloth: '#4a2a7a', armor: '#3a2060', armor2: '#2a1648', hair: '#e8e2f4', trim: '#d9a93c' } }, 15.6, -0.2, 0.2);
-    box(1.6, 0.25, 1.6, m1, 15.6, 0.02, -0.2, s);
-    lantern(s, 16.9, 0, -0.8, 0xb070ff, 18);
-    // Hideout door
-    doorway(s, -1.45, 5.2, Math.PI / 2, 0x50b0ff, 1.5, 2.5);
-    lantern(s, -0.9, 0, 6.9, 0x60b8ff, 16, 2.0).rotation.y = -Math.PI / 2;
-    // dressing
-    stall(s, 14.3, 7.6, 0x4a2a6a, [0xc080ff, 0x80ffd0, 0xff80c0]).rotation.y = -Math.PI / 2;
-    const idle1 = npc(s, { cls: 'cleric', race: 'dwarf', tint: { cloth: '#3a3038', armor: '#4a4048' } }, 13.2, 7.6, Math.PI / 2);
-    crate(s, 6.6, -0.6, 0.8); crate(s, 7.4, -0.8, 0.6);
-    barrel(s, 0.2, 8.6); barrel(s, 1.0, 9.0); barrel(s, 16.6, 4.2); crate(s, 0.1, 1.2, 0.7);
-    lantern(s, 5.5, 0, 8.8, 0xffb060, 16); lantern(s, 16.8, 0, 2.2, 0xffb060, 0);
-    box(1.7, 1.25, 0.1, woodD(), 7.0, 1.9, -1.5, s); [[-0.45, 0.2, 0.5, 0.6], [0.3, 0.25, 0.55, 0.45], [0.05, -0.3, 0.7, 0.4], [-0.5, -0.32, 0.36, 0.34]].forEach(q => { const m = new T.Mesh(new T.PlaneGeometry(q[2], q[3]), new T.MeshLambertMaterial({ color: 0xdccba3 })); m.position.set(7.0 + q[0], 1.9 + q[1], -1.43); m.rotation.z = q[0] * 0.2; s.add(m); });
-    // the Low Lamp tavern, where your Tally drinks
-    doorway(s, -1.45, 1.7, Math.PI / 2, 0xffb060, 1.4, 2.4);
-    box(0.08, 0.5, 0.9, woodD(), -1.0, 3.1, 1.7, s); { const lm = new T.Mesh(new T.BoxGeometry(0.2, 0.26, 0.2), emis(0xffe0a0)); lm.position.set(-0.8, 2.7, 1.7); s.add(lm); gfx.fire(s, -0.8, 2.5, 1.7, 0xffb060, 0.4, 12); }
-    barrel(s, -0.3, 0.4); box(0.9, 0.08, 0.6, wood(), 0.3, 0.55, 3.0, s); box(0.1, 0.55, 0.1, woodD(), 0.3, 0.27, 3.0, s);
-    // a beggars' fire, strung lamps, puddles
-    mesh(new T.CylinderGeometry(0.4, 0.34, 0.8, 8), iron(), 16.4, 0.4, 8.6, s); gfx.fire(s, 16.4, 0.9, 8.6, 0xff8a30, 0.7, 14);
-    const sit = npc(s, { cls: 'rogue', race: 'dwarf', tint: { cloth: '#3a3028', armor: '#3a3430' } }, 15.3, 8.9, 1.2), sit2 = npc(s, { cls: 'cleric', race: 'human', tint: { cloth: '#4a4238', armor: '#3a3632' } }, 16.9, 7.6, -2.6);
-    [[2, 8], [9, 13], [13.5, 17]].forEach((q, n) => { for (let i = 0; i <= 8; i++) { const u = i / 8, x = q[0] + (q[1] - q[0]) * u, y = 4.3 - Math.sin(u * Math.PI) * 0.7, z = -1.2 + u * 0.0 + n * 0.0; if (i % 2 === 0) { const b = new T.Mesh(new T.SphereGeometry(0.07, 6, 5), emis([0xffc070, 0xc080ff, 0x80d0ff][(i / 2 + n) % 3])); b.position.set(x, y, z + 0.4); s.add(b); gfx.glow([0xffc070, 0xc080ff, 0x80d0ff][(i / 2 + n) % 3], 0.6, x, y, z + 0.4, s, 0.5); } } });
-    [[4.5, 5.5, 1.6], [11, 6.8, 1.1], [7.5, 2.5, 0.9], [13.8, 3.6, 1.3]].forEach(q => { const d = new T.Mesh(new T.CircleGeometry(q[2], 14), new T.MeshBasicMaterial({ color: 0x1a2030, transparent: true, opacity: 0.55, depthWrite: false })); d.rotation.x = -Math.PI / 2; d.position.set(q[0], 0.012, q[1]); d.scale.z = 0.6; s.add(d); });
-    // people going about their business
-    const TINTS = [{ cloth: '#5a3a2a', armor: '#4a4038' }, { cloth: '#2a4a5a', armor: '#3a4048' }, { cloth: '#5a2a4a', armor: '#3a3040' }, { cloth: '#3a5a3a', armor: '#3a4038' }, { cloth: '#6a5a3a', armor: '#4a4438' }];
-    const walkers = [[[1, 6.5], [16, 6.2]], [[15.5, 4.6], [2.5, 4.2]], [[5, 8.4], [12, 2.6]], [[13, 8.6], [8.5, 3.4]], [[2, 2.6], [6.5, 7.6]]].map((pth, i) => ({ c: npc(s, { cls: ['rogue', 'cleric', 'fighter', 'sorcerer', 'rogue'][i], race: Object.keys(G.RACES)[i % 5], tint: TINTS[i] }, pth[0][0], pth[0][1], 0), a: pth[0], b: pth[1], u: Math.random(), dir: 1, wait: 0, sp: 0.045 + i * 0.008 }));
-    const CHAT = ['…heard Vexa has never once blinked.', 'Guild raised the rent again.', 'Glowcaps are coming in nicely.', 'Put ten coin on the new one. Ten!', 'Nobody leaves the Ledger.', 'Different carts, he says.', 'My cousin fought Brakk. Once.', 'The Light went ahead to wait.', 'They say the Keeper never sleeps.', 'Highmarch sealed another stair.'];
-    let chatT = 4;
-    const npcs = [fence, gm, idle1, sit, sit2];
-    const obstacles = [[8.6, -1.6, 11.8, 0.7], [14.8, -1, 16.4, 0.6], [12.4, 6.6, 15.6, 8.6], [6.1, -1.2, 7.9, -0.1], [1.2, -1.2, 2.0, -0.3], [5.2, -1.2, 6.0, -0.3], [-0.3, 8.2, 1.4, 9.4], [16.2, 3.8, 17, 4.6], [5.2, 8.5, 5.8, 9.1]];
+
+    // ---- the Blood Pit gate
+    doorway(s, 5, -1.45, 0, 0xff4020, 2.8, 3.4);
+    brazier(s, 2.8, 0, -0.6, 28, 0xff7030); brazier(s, 7.2, 0, -0.6, 28, 0xff7030);
+    ban(1.4, 3.3, -1.5, 0, '#7a1c22'); ban(8.6, 3.3, -1.5, 0, '#7a1c22');
+    box(3.6, 0.12, 2.2, stoneMat(0x4a2a2a), 5, 0.02, 0.2, s);
+    // ---- notice board
+    box(1.7, 1.25, 0.1, woodD(), 11, 1.9, -1.5, s); [[-0.45, 0.2, 0.5, 0.6], [0.3, 0.25, 0.55, 0.45], [0.05, -0.3, 0.7, 0.4], [-0.5, -0.32, 0.36, 0.34]].forEach(q => { const m = new T.Mesh(new T.PlaneGeometry(q[2], q[3]), new T.MeshLambertMaterial({ color: 0xdccba3 })); m.position.set(11 + q[0], 1.9 + q[1], -1.43); m.rotation.z = q[0] * 0.2; s.add(m); });
+    crate(s, 12.6, -0.7, 0.8); crate(s, 13.3, -0.9, 0.6);
+    // ---- the Fence
+    stall(s, 15.6, -0.3, 0x245a44, [0x7ad0ff, 0xffd36b, 0xff7a7a, 0x9aff8a]);
+    const fence = npc(s, { cls: 'rogue', race: 'human', tint: { cloth: '#245a44', armor: '#3a4a40' } }, 15.6, -1.0, 0);
+    lantern(s, 17.6, 0, -0.9, 0xffb060, 16);
+    // ---- the Guildmaster
+    ban(20.4, 3.1, -1.5, 0, '#5a1f7a');
+    const gm = npc(s, { cls: 'sorcerer', race: 'elf', tint: { cloth: '#4a2a7a', armor: '#3a2060', armor2: '#2a1648', hair: '#e8e2f4', trim: '#d9a93c' } }, 20.4, -0.2, 0.2);
+    box(1.8, 0.25, 1.8, m1, 20.4, 0.02, -0.2, s); box(1.0, 1.0, 0.6, woodD(), 21.6, 0.5, -0.6, s); box(0.8, 0.1, 0.5, L(0x5a1f1f), 21.6, 1.05, -0.6, s);
+    lantern(s, 19, 0, -0.8, 0xb070ff, 18);
+    // ---- Mark's corner: the Long Odds
+    const mk = new T.Group(); mk.position.set(25.6, 0, 0.2); s.add(mk);
+    [[-1.9, -1.1], [1.9, -1.1], [-1.9, 1.3], [1.9, 1.3]].forEach(q => mesh(new T.CylinderGeometry(0.07, 0.07, 2.7, 5), woodD(), q[0], 1.35, q[1], mk));
+    const aw = box(4.3, 0.1, 2.9, L(0x1f5a3a), 0, 2.78, 0.1, mk); aw.rotation.x = 0.1; box(4.3, 0.34, 0.07, L(0xd9a93c), 0, 2.5, 1.5, mk);
+    mesh(new T.CylinderGeometry(1.15, 1.15, 0.12, 12), L(0x1f5a3a), 0, 0.92, 0.5, mk); mesh(new T.CylinderGeometry(1.2, 1.2, 0.08, 12), woodD(), 0, 0.86, 0.5, mk); mesh(new T.CylinderGeometry(0.16, 0.3, 0.86, 6), woodD(), 0, 0.43, 0.5, mk);
+    [[-0.3, 0.4], [0.1, 0.7], [0.35, 0.3]].forEach((q, i) => { const d = box(0.13, 0.13, 0.13, L(0xefe8d6), q[0], 1.05, q[1], mk); d.rotation.y = i; });
+    for (let i = 0; i < 9; i++) { const c = mesh(new T.CylinderGeometry(0.07, 0.07, 0.02, 8), new T.MeshPhongMaterial({ color: 0xf0c95a, shininess: 90 }), -0.6 + (i % 3) * 0.09, 1.0 + Math.floor(i / 3) * 0.022, 0.75 + (i % 2) * 0.05, mk); c.castShadow = false; }
+    [-1.2, 1.2].forEach(x => { mesh(new T.CylinderGeometry(0.2, 0.2, 0.5, 7), wood(), x, 0.25, 1.5, mk); });
+    box(1.5, 1.0, 0.1, woodD(), 0, 1.9, -1.55, mk); for (let i = 0; i < 3; i++) box(1.3, 0.04, 0.12, L(0xdccba3), 0, 2.15 - i * 0.25, -1.48, mk);
+    gfx.fire(mk, -1.7, 2.2, 1.2, 0x8aff5a, 0.4, 0); gfx.fire(mk, 1.7, 2.2, 1.2, 0xffd36b, 0.4, 0);
+    const mkL = new T.PointLight(0xa0ffb0, 16, 11, 1.6); mkL.position.set(0, 2.2, 0.8); mk.add(mkL);
+    const mark = npc(s, G.mark.look, 25.6, -0.5, 0);
+    const punter = npc(s, { cls: 'fighter', race: 'dwarf', tint: { cloth: '#5a3a2a', armor: '#4a4038' } }, 24.4, 1.4, 1.2);
+    // ---- west side: the Low Lamp, your door, a shuttered chandler's
+    doorway(s, -1.45, 3, Math.PI / 2, 0xffb060, 1.4, 2.4);
+    box(0.08, 0.5, 0.9, woodD(), -1.0, 3.1, 3, s); { const lm = new T.Mesh(new T.BoxGeometry(0.2, 0.26, 0.2), emis(0xffe0a0)); lm.position.set(-0.8, 2.7, 3); s.add(lm); gfx.fire(s, -0.8, 2.5, 3, 0xffb060, 0.4, 12); }
+    barrel(s, -0.3, 1.4); barrel(s, 0.3, 4.6); box(0.9, 0.08, 0.6, wood(), 0.6, 0.55, 1.6, s); box(0.1, 0.55, 0.1, woodD(), 0.6, 0.27, 1.6, s);
+    doorway(s, -1.45, 9, Math.PI / 2, 0x50b0ff, 1.5, 2.5);
+    lantern(s, -0.9, 0, 10.7, 0x60b8ff, 16, 2.0).rotation.y = -Math.PI / 2;
+    box(0.2, 2.4, 1.6, woodD(), -1.45, 1.2, 14.5, s); box(0.25, 0.1, 1.8, iron(), -1.4, 1.2, 14.5, s); box(0.25, 0.1, 1.8, iron(), -1.4, 2.0, 14.5, s);
+    // ---- the First Lamp: the monument in the middle of the market
+    const mon = new T.Group(); mon.position.set(14, 0, 9); s.add(mon);
+    mesh(new T.CylinderGeometry(2.4, 2.6, 0.35, 10), m1, 0, 0.17, 0, mon); mesh(new T.CylinderGeometry(1.6, 1.8, 0.35, 10), m2, 0, 0.5, 0, mon); mesh(new T.CylinderGeometry(0.4, 0.55, 2.6, 8), m1, 0, 1.95, 0, mon);
+    mesh(new T.CylinderGeometry(0.75, 0.4, 0.3, 8), iron(), 0, 3.4, 0, mon); const fl = new T.Mesh(new T.BoxGeometry(0.5, 0.7, 0.5), emis(0xfff0c8)); fl.position.y = 3.95; mon.add(fl); mesh(new T.ConeGeometry(0.6, 0.5, 4), iron(), 0, 4.55, 0, mon).rotation.y = 0.78;
+    gfx.fire(mon, 0, 3.7, 0, 0xffc060, 1.0, 34);
+    [0, 1.57, 3.14, 4.71].forEach(a => box(1.2, 0.5, 0.4, m2, Math.cos(a) * 2.9, 0.25, Math.sin(a) * 2.9, mon).rotation.y = -a + 1.57);
+    // ---- market stalls, kept in two clusters so the middle stays open
+    stall(s, 7, 12.6, 0x4a2a6a, [0xc080ff, 0x80ffd0, 0xff80c0]).rotation.y = Math.PI;
+    stall(s, 10.6, 14.2, 0x6a3a1a, [0xffc070, 0xff9050, 0xffe0a0]).rotation.y = Math.PI;
+    stall(s, 21.5, 13, 0x1a4a6a, [0x80d0ff, 0xa0ffe0, 0xd0f0ff]).rotation.y = Math.PI;
+    stall(s, 25, 9.5, 0x6a1a2a, [0xff7a7a, 0xffb0a0, 0xffd36b]).rotation.y = -Math.PI / 2;
+    const k1 = npc(s, { cls: 'cleric', race: 'dwarf', tint: { cloth: '#3a3038', armor: '#4a4048' } }, 7, 13.4, Math.PI), k2 = npc(s, { cls: 'rogue', race: 'halforc', tint: { cloth: '#6a3a1a', armor: '#4a3a30' } }, 10.6, 15, Math.PI), k3 = npc(s, { cls: 'sorcerer', race: 'human', tint: { cloth: '#1a4a6a', armor: '#203a50', hair: '#2a2a2a' } }, 21.5, 13.8, Math.PI), k4 = npc(s, { cls: 'cleric', race: 'tiefling', tint: { cloth: '#6a1a2a', armor: '#4a2028' } }, 25.9, 9.5, -Math.PI / 2);
+    // ---- a well, a beggars' fire, carts and clutter
+    mesh(new T.CylinderGeometry(0.9, 1.0, 0.8, 10), m2, 4, 0.4, 14, s); const wt = new T.Mesh(new T.CylinderGeometry(0.72, 0.72, 0.05, 10), emis(0x162838)); wt.position.set(4, 0.72, 14); s.add(wt); [-0.85, 0.85].forEach(x => box(0.12, 1.6, 0.12, woodD(), 4 + x, 1.4, 14, s)); box(2.0, 0.12, 0.3, woodD(), 4, 2.2, 14, s);
+    mesh(new T.CylinderGeometry(0.4, 0.34, 0.8, 8), iron(), 27, 0.4, 15.4, s); gfx.fire(s, 27, 0.9, 15.4, 0xff8a30, 0.7, 14);
+    const sit = npc(s, { cls: 'rogue', race: 'dwarf', tint: { cloth: '#3a3028', armor: '#3a3430' } }, 25.9, 15.8, 1.3), sit2 = npc(s, { cls: 'cleric', race: 'human', tint: { cloth: '#4a4238', armor: '#3a3632' } }, 27.8, 14.4, -2.6);
+    { const c = new T.Group(); c.position.set(18.5, 0, 15.6); c.rotation.y = 0.4; s.add(c); box(2.2, 0.14, 1.2, wood(), 0, 0.7, 0, c); box(2.2, 0.5, 0.08, woodD(), 0, 1.0, 0.6, c); box(2.2, 0.5, 0.08, woodD(), 0, 1.0, -0.6, c); [-0.8, 0.8].forEach(x => { const w = mesh(new T.CylinderGeometry(0.5, 0.5, 0.1, 10), woodD(), x, 0.5, 0.7, c); w.rotation.x = Math.PI / 2; const w2 = mesh(new T.CylinderGeometry(0.5, 0.5, 0.1, 10), woodD(), x, 0.5, -0.7, c); w2.rotation.x = Math.PI / 2; }); crate(c, -0.4, 0, 0.6); c.children[c.children.length - 1].position.y = 1.07; c.children[c.children.length - 2].position.y = 1.07; }
+    crate(s, 0.3, 12.4, 0.7); crate(s, 1.0, 12.9, 0.5); barrel(s, 28.2, 4.2); barrel(s, 28.3, 5.1); crate(s, 9.2, -0.6, 0.6); barrel(s, 22.8, -0.7); crate(s, 16.5, 8.2, 0.5);
+    [[9, 5.5], [19.5, 5.5], [8.5, 16.3], [20, 9.5], [27.6, 11.8], [3, 7.2], [13, 16.6]].forEach((q, i) => lantern(s, q[0], 0, q[1], i % 3 === 2 ? 0xb070ff : 0xffb060, i < 3 ? 15 : 0));
+    // strung lamps and puddles
+    [[1, 9], [12, 19], [21, 29]].forEach((q, n) => { for (let i = 0; i <= 10; i++) { const u = i / 10, x = q[0] + (q[1] - q[0]) * u, y = 4.4 - Math.sin(u * Math.PI) * 0.7, col = [0xffc070, 0xc080ff, 0x80d0ff, 0x9aff8a][(i + n) % 4]; if (i % 2 === 0) { const b = new T.Mesh(new T.SphereGeometry(0.07, 6, 5), emis(col)); b.position.set(x, y, -0.8); s.add(b); gfx.glow(col, 0.6, x, y, -0.8, s, 0.5); } } });
+    [[6.5, 6.5, 1.6], [17, 12.2, 1.2], [11.5, 3.2, 0.9], [23, 6.6, 1.4], [3.5, 10.6, 1.1], [20.5, 16.2, 1.0]].forEach(q => { const d = new T.Mesh(new T.CircleGeometry(q[2], 14), new T.MeshBasicMaterial({ color: 0x1a2030, transparent: true, opacity: 0.55, depthWrite: false })); d.rotation.x = -Math.PI / 2; d.position.set(q[0], 0.012, q[1]); d.scale.y = 0.6; s.add(d); });
+
+    // ---- people going about their business (routes kept apart so the square never bunches up)
+    const TINTS = [{ cloth: '#5a3a2a', armor: '#4a4038' }, { cloth: '#2a4a5a', armor: '#3a4048' }, { cloth: '#5a2a4a', armor: '#3a3040' }, { cloth: '#3a5a3a', armor: '#3a4038' }, { cloth: '#6a5a3a', armor: '#4a4438' }, { cloth: '#3a3a5a', armor: '#30304a' }];
+    const walkers = [[[1.5, 6.6], [27, 6.2]], [[27.5, 3.4], [9, 3.0]], [[5.5, 16.2], [9.5, 9.2]], [[23.5, 15.6], [18.5, 9.4]], [[2, 15.6], [15.5, 16.6]], [[19.5, 3.6], [22.5, 10.8]]]
+      .map((pth, i) => ({ c: npc(s, { cls: ['rogue', 'cleric', 'fighter', 'sorcerer', 'rogue', 'cleric'][i], race: Object.keys(G.RACES)[i % 5], tint: TINTS[i] }, pth[0][0], pth[0][1], 0), a: pth[0], b: pth[1], u: Math.random(), dir: 1, wait: Math.random() * 3, sp: 0.03 + i * 0.006 }));
+    const CHAT = ['…heard Vexa has never once blinked.', 'Guild raised the rent again.', 'Glowcaps are coming in nicely.', 'Put ten coin on the new one. Ten!', 'Nobody leaves the Ledger.', 'Different carts, he says.', 'My cousin fought Brakk. Once.', 'The Light went ahead to wait.', 'They say the Keeper never sleeps.', 'Highmarch sealed another stair.', 'Mark owes me money. Mark owes everyone money.', 'Meet me by the First Lamp.'];
+    const MARKSAY = ['I have got a guy, bro. The guy is me.', 'Real ones bet big.', 'Odds! Fresh odds!', 'Bro. BRO. Look at this roll.', '…what were we doing?', 'Respect. Respect.'];
+    let chatT = 4, markT = 6;
+    const npcs = [fence, gm, mark, punter, k1, k2, k3, k4, sit, sit2];
+    const obstacles = [[14, -1.6, 17.2, 0.7], [19.4, -1, 22.2, 0.7], [23.5, -1.2, 27.7, 1.9], [12.1, -1.3, 13.8, -0.2], [2.4, -1.1, 3.2, -0.2], [6.8, -1.1, 7.6, -0.2], [11.2, 6.2, 16.8, 11.8], [5.4, 11.8, 8.6, 13.8], [9, 13.4, 12.2, 15.4], [19.9, 12.2, 23.1, 14.2], [24.2, 7.9, 26.3, 11.1], [3, 13, 5, 15], [26.5, 14.9, 27.5, 15.9], [17.2, 14.8, 19.8, 16.4], [-0.7, 1, 0.1, 1.8], [-0.1, 4.2, 0.7, 5], [0.1, 1.2, 1.1, 2], [27.8, 3.8, 28.7, 5.5], [-0.1, 12, 1.4, 13.3]];
     return {
-      scene: s, start: { x: 8, z: 5 }, zoom: [12.5, 21],
+      scene: s, start: { x: 13.5, z: 4.5 }, zoom: [13.5, 22],
       spots: [
-        { x: 3.6, z: 0.1, r: 2.1, y: 4.5, label: 'The Blood Pit', act: 'Enter the pit', go: () => G.ui.pit() },
-        { x: 7.0, z: 0.7, r: 1.4, y: 3.0, label: 'Notice Board', act: 'Read the Codex', go: () => G.ui.codex() },
-        { x: 10.2, z: 1.3, r: 1.9, y: 3.2, label: 'The Fence', act: 'Trade', go: () => G.ui.shop() },
-        { x: 15.6, z: 1.3, r: 1.9, y: 3.2, label: 'Guildmaster', act: 'Character', go: () => G.ui.sheet() },
-        { x: -0.2, z: 5.2, r: 1.9, y: 3.6, label: 'Your Hideout', act: 'Go home', go: () => G.ui.hideout() },
-        { x: -0.2, z: 1.7, r: 1.5, y: 3.5, label: 'The Low Lamp', act: 'See your Tally', go: () => G.ui.tally() }
+        { x: 5, z: 0.4, r: 2.2, y: 4.7, label: 'The Blood Pit', act: 'Enter the pit', go: () => G.ui.pit() },
+        { x: 11, z: 0.6, r: 1.5, y: 3.0, label: 'Notice Board', act: 'Read the Codex', go: () => G.ui.codex() },
+        { x: 15.6, z: 1.3, r: 1.9, y: 3.2, label: 'The Fence', act: 'Trade', go: () => G.ui.shop() },
+        { x: 20.4, z: 1.3, r: 1.9, y: 3.2, label: 'Guildmaster', act: 'Character', go: () => G.ui.sheet() },
+        { x: 25.6, z: 2.5, r: 1.9, y: 3.6, label: 'Mark · The Long Odds', act: 'Gamble', go: () => G.ui.mark() },
+        { x: -0.2, z: 3, r: 1.6, y: 3.5, label: 'The Low Lamp', act: 'See your Tally', go: () => G.ui.tally() },
+        { x: -0.2, z: 9, r: 1.9, y: 3.6, label: 'Your Hideout', act: 'Go home', go: () => G.ui.hideout() }
       ],
       blocked: (x, z) => x < -0.55 || x > X1 + 0.9 || z < -0.75 || z > Z1 + 0.9 || obstacles.some(o => x > o[0] - 0.35 && x < o[2] + 0.35 && z > o[1] - 0.35 && z < o[3] + 0.35),
       update: (t) => {
         npcs.forEach((c, i) => c.pose({ t: t + i * 2, act: 'idle' }));
+        mark.pose({ t, act: Math.sin(t * 0.7) > 0.6 ? 'cast' : 'idle', prog: 0.3 });
         const dt2 = 0.016;
         walkers.forEach(w => {
           if (w.wait > 0) { w.wait -= dt2; w.c.pose({ t, act: 'idle' }); return; }
-          w.u += w.dir * w.sp * dt2 * 4; if (w.u > 1 || w.u < 0) { w.u = Math.max(0, Math.min(1, w.u)); w.dir *= -1; w.wait = 1.5 + Math.random() * 3; }
+          w.u += w.dir * w.sp * dt2 * 4; if (w.u > 1 || w.u < 0) { w.u = Math.max(0, Math.min(1, w.u)); w.dir *= -1; w.wait = 2 + Math.random() * 4; }
           const x = w.a[0] + (w.b[0] - w.a[0]) * w.u, z = w.a[1] + (w.b[1] - w.a[1]) * w.u; w.c.root.position.set(x, 0, z);
           w.c.root.rotation.y = Math.atan2((w.b[0] - w.a[0]) * w.dir, (w.b[1] - w.a[1]) * w.dir); w.c.pose({ t, act: 'idle', moving: true, walk: t * 7 + w.sp * 99 });
         });
-        chatT -= dt2; if (chatT <= 0 && G.scene === 'hub' && !G.ui.isOpen()) { chatT = 5 + Math.random() * 5; const w = walkers[Math.floor(Math.random() * walkers.length)], p = w.c.root.position; gfx.floatText(p.x, 2.6, p.z, CHAT[Math.floor(Math.random() * CHAT.length)], '#d8ccb0'); }
+        const quiet = G.scene === 'hub' && !G.ui.isOpen();
+        chatT -= dt2; if (chatT <= 0 && quiet) { chatT = 6 + Math.random() * 6; const w = walkers[Math.floor(Math.random() * walkers.length)], p = w.c.root.position; gfx.floatText(p.x, 2.6, p.z, CHAT[Math.floor(Math.random() * CHAT.length)], '#d8ccb0'); }
+        markT -= dt2; if (markT <= 0 && quiet) { markT = 9 + Math.random() * 8; gfx.floatText(25.6, 2.9, -0.5, MARKSAY[Math.floor(Math.random() * MARKSAY.length)], '#a0ffb0'); }
+        if (Math.random() < 0.12) gfx.emit(25.6 + R(-0.15, 0.15), 1.9, -0.3, R(-0.1, 0.1), R(0.4, 0.8), R(-0.1, 0.1), 1.8, 0x3a7a5a, 0);       // glowcap pipe smoke
         if (Math.random() < 0.3) gfx.emit(R(0, X1), R(0.2, 3), R(0, Z1), R(-0.3, 0.3), R(0, 0.2), R(-0.3, 0.3), 2.5, 0x2a2a44, 0);
       }
     };

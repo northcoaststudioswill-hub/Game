@@ -20,8 +20,14 @@ phone portrait, phone landscape, or a desktop monitor.
   abilities (leaping slam, lightning and fireball, radiance, flurry of shadows). It sets up the
   Undercity, the Deep Guild's Blood Ledger, the champion and your debt. It plays when you start a new fighter and can be
   replayed from the title menu.
-- **Three places you walk around:** the Undercity street (the Pit gate, the Fence, the
-  Guildmaster, your Hideout door), the Blood Pit arena, and your Hideout.
+- **Three places you walk around:** the Lamp Market (a 30 by 18 tile plaza around the First Lamp,
+  with the Pit gate, Notice Board, the Fence, the Guildmaster, Mark's gambling table, the Low
+  Lamp tavern, your Hideout door, market stalls and townsfolk), the Blood Pit arena, and your
+  Hideout.
+- **Mark of the Long Odds:** the Undercity's bookie. Bet on three undercard bouts that are
+  simulated while you fight (or back yourself), settled when your bout ends. He also runs High
+  Bones (dice, with a press-your-luck re-throw) and Crown or Skull (a double-or-nothing coin
+  streak). The house keeps about 8% of card payouts.
 - **Character creation:** 5 origins x 4 classes (Fighter, Rogue, Sorcerer, Cleric), six
   ability scores that each do something in combat.
 - **Real-time combat built around timing, not mashing:** swings and dodges cost stamina and a
@@ -101,7 +107,7 @@ and the rest of the game does not change.
 - `js/models.js` character models and animation
 - `js/world.js` the arena; `js/places.js` the street, the hideout, decor pieces, walking
 - `js/fight.js` combat simulation, AI, and its 3D effects
-- `js/crew.js` mortal blows, cosmetics, events and the Tally
+- `js/crew.js` mortal blows, cosmetics, events and the Tally; `js/mark.js` the bookie and his games
 - `js/cine.js` the opening cinematic; `js/lore.js` codex and bios; `js/music.js` the music sequencer
 - `js/ui.js` menus, HUD, level-up and results screens; `js/main.js` input and main loop
 

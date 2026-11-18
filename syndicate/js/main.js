@@ -23,7 +23,7 @@
   G.setPreview = function (look) {
     const h = W.get('hub');
     if (preview) h.scene.remove(preview.root);
-    preview = G.makeChar(look); preview.root.position.set(8, 0, 5); h.scene.add(preview.root);
+    preview = G.makeChar(look); preview.root.position.set(21, 0, 15.5); h.scene.add(preview.root);
   };
   function leaveSpecial() {
     if (G.titleChars && G.scene !== 'title') G.titleChars.forEach(c => c.root.visible = false);
@@ -198,7 +198,7 @@
       cam.x = Math.sin(T * 0.12) * 1.2; cam.z = Math.cos(T * 0.1) * 1.2; cam.y = 0.9; cam.vh = port ? 23 : 16; cam.fx = 0.5; cam.fy = port ? 0.6 : 0.58; cam.shake = 0;
       if (G.titleChars) G.titleChars.forEach((c, i) => c.pose({ t: T + i * 1.3, act: 'idle' }));
     } else if (sc === 'create') {
-      cam.x = 8; cam.z = 5; cam.y = 1.0; cam.shake = 0;
+      cam.x = 21; cam.z = 15.5; cam.y = 1.0; cam.shake = 0;
       if (port) { cam.vh = 9; cam.fx = 0.5; cam.fy = 0.2; } else { cam.vh = 5.2; cam.fx = 0.24; cam.fy = 0.52; }
       if (preview) { preview.root.rotation.y = 0.75 + Math.sin(T * 0.7) * 0.7; preview.pose({ t: T, act: 'idle' }); }
       W.get('hub').update(T, dt);
