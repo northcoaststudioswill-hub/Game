@@ -139,9 +139,9 @@
     if (this.closed > 0) this.closed--;
     // Touch assist: buds are springy. Falling onto an open bud bounces you, strike or no strike.
     const p = world && world.player;
-    if (p && this.closed <= 0 && SH.input.source === 'touch' && SH.settings.autoDown && p.vy > 0 && !p.grounded) {
+    if (p && this.closed <= 0 && SH.settings.autoDown && p.vy > 0 && !p.grounded) {
       const y = this.y + Math.sin(this.t) * 3;
-      if (Math.abs(p.x - this.x) < this.r + 10 && p.y > y - this.r - 6 && p.y < y + 4) {
+      if (Math.abs(p.x - this.x) < this.r + 18 && p.y > y - this.r - 8 && p.y < y + 8) {
         this.closed = SH.ENEMY_DEFS.bulb.regrow;
         SH.fx.burst(this.x, y, 10, { speed: 2.2, life: 22, colors: ['#ff8fb8', '#ffd27a', '#ffffff'], glow: true });
         p.bounce();
@@ -221,6 +221,15 @@
     this.near = !this.checked && Math.abs(p.x - this.x) < 26 && Math.abs(p.y - this.y) < 30 && p.grounded;
     if (this.near && world.input.pressed.up) { this.checked = true; this.near = false; world.onSnare(this.n); }
   };
+  // The first trial: three altars in the dark, each an answer. Wren answers by standing before one.
+  function Altar(x, y, what) { Object.assign(this, { kind: 'altar', what, x, y, usable: true, near: false, broken: false, label: 'CHOOSE' }); }
+  Altar.prototype.reset = function () { };
+  Altar.prototype.hittable = () => false;
+  Altar.prototype.update = function (world) {
+    const p = world.player;
+    this.near = !this.broken && !SH.game.flags.riddle && !!SH.game.flags.asked && Math.abs(p.x - this.x) < 26 && Math.abs(p.y - this.y) < 30 && p.grounded;
+    if (this.near && world.input.pressed.up) { this.near = false; world.onAltar(this); }
+  };
   function Target(x, y, blade) { Object.assign(this, { kind: 'target', x, y, hit: false, arrowOnly: !blade, blade: !!blade, wob: 0 }); }   // blade: Bram's rings, cut with daggers
   Target.prototype.reset = function () { };
   Target.prototype.hittable = function () { return !this.hit; };
@@ -294,7 +303,7 @@
     if (m === 'breath' && p.y < this.y - 50) m = 'slam';              // she's up on a ledge: frost can't reach
     if (m === 'breath' && Math.abs(dx) > d.breathReach + 60) m = 'charge';
     if (m === 'charge') { this.state = 'windup'; this.again = ph === 3 ? 1 : 0; SH.sfx.play('rumble'); }
-    else if (m === 'slam') { this.state = 'crouch'; }
+    else if (m === 'slam') { this.state = 'crouch'; const ar = world.room.arena; this.leapX = Math.max(ar ? ar[0] : -1e9, Math.min(ar ? ar[1] : 1e9, p.x)); }   // it picks its landing spot NOW: move, and it misses
     else { this.state = 'inhale'; SH.sfx.play('rumble'); }
   };
   Wyrm.prototype.update = function (world) {
@@ -309,7 +318,7 @@
     // a new phase: it roars as soon as it has its feet under it
     if (this.boss && this.roarDue && this.grounded && this.state !== 'charge' && this.state !== 'leap') {
       this.roarDue = false; this.state = 'roar'; this.t = 0; this.vx = 0;
-      SH.game.look(this.x + this.dir * 20, this.y - this.h * 0.6, 1.4, 50); if (SH.arts.active() && !SH.arts.scene) { SH.arts.meter = Math.max(SH.arts.meter, SH.arts.max - 0.5); SH.arts.gain(1); }   // the bond answers its rage
+      SH.game.look(this.x + this.dir * 20, this.y - this.h * 0.6, 1.4, 50); if (p.hearts < p.maxHearts) { p.hearts++; fx.word(p.x, p.y - 70, '+1 heart: the bond steadies her', '#ff9ac0', 100); } if (SH.arts.active() && !SH.arts.scene) { SH.arts.meter = Math.max(SH.arts.meter, SH.arts.max - 0.5); SH.arts.gain(1); }   // the bond answers its rage
       fx.kick(8); SH.sfx.play('rumble'); SH.sfx.play('thud');
       fx.ring(this.x + this.dir * this.w / 2, this.y - this.h * 0.7, '#c8d2e2', 90, 30, 3);
       fx.word(this.x, this.y - this.h - 34, ph === 3 ? 'It is furious!' : 'It is angry now!', '#ff8a8a', 80);
@@ -341,6 +350,7 @@
             if (d.rocks) world.dropRocks(d.rocks);
             this.state = 'stun'; this.t = 0; this.again = 0;
           } else if (this.again > 0) { this.again--; this.state = 'windup'; this.t = Math.floor(d.windup * quick * 0.4); this.dir = p.x > this.x ? 1 : -1; SH.sfx.play('rumble'); }
+          else if (this.boss) { this.state = 'slamrest'; this.t = 0; SH.fx.dust(this.x, this.y, -this.dir, 8); }   // a charge that misses leaves it winded: every dodge earns an opening
           else { this.state = edge ? 'stun' : 'rest'; this.t = edge ? Math.floor(d.stun / 2) : 0; }
         }
         break;
@@ -349,8 +359,8 @@
       case 'crouch':
         this.vx = 0;
         if (this.t % 5 === 0) fx.dust(this.x, this.y, 0, 2);
-        if (this.t >= 26 * quick) {
-          const air = 36, tx = Math.max(world.room.arena ? world.room.arena[0] : -1e9, Math.min(world.room.arena ? world.room.arena[1] : 1e9, p.x));
+        if (this.t >= 44 * quick) {
+          const air = 36, tx = this.leapX != null ? this.leapX : p.x;
           this.state = 'leap'; this.t = 0; this.vy = -9; this.grounded = false;
           this.leapVx = Math.max(-7.5, Math.min(7.5, (tx - this.x) / air)); this.dir = this.leapVx >= 0 ? 1 : -1;
           SH.sfx.play('dash'); fx.dust(this.x, this.y, 0, 8);
@@ -369,7 +379,7 @@
         break;
       case 'slamrest':
         this.vx = 0;
-        if (this.t >= 58 * quick) { this.state = 'rest'; this.t = Math.floor(d.rest * quick * 0.5); }
+        if (this.t >= 80 * quick) { this.state = 'rest'; this.t = Math.floor(d.rest * quick * 0.5); }
         break;
       // ---- frost breath: a long breath in (fire down its throat chokes it), then a cone of frost along the ground
       case 'inhale':
@@ -406,7 +416,9 @@
     const res = SH.moveBody(world.room, this);
     this.grounded = res.ground; this.hitWall = res.wall !== 0;
     const hard = this.state === 'charge' || this.state === 'leap';
-    if (SH.overlap(this.bodyBox(), p.box()) && !(p.dashT > 0 && p.iframes > 0)) p.hurt(this.x, hard ? d.damage : 1, world);
+    const fromAbove = p.swing && p.swing.kind === 'pogo';                                   // a down strike lands on its back, it doesn't run into it
+    const leaping = this.state === 'leap' && this.vy < 2;                                  // it only hurts where it comes down
+    if (SH.overlap(this.bodyBox(), p.box()) && !(p.dashT > 0 && p.iframes > 0) && !fromAbove && !leaping && this.state !== 'stun') p.hurt(this.x, hard ? d.damage : 1, world);
   };
   Wyrm.prototype.damage = function (n, world) {
     this.hp -= n; this.flash = 8;
@@ -424,9 +436,10 @@
   Wyrm.prototype.takeHit = function (hit, world) {
     const facingHer = hit.dir === -this.dir;
     if (this.state === 'roar') return null;
-    if (!hit.fire && !hit.open && facingHer && (this.state === 'windup' || this.state === 'charge')) {
-      // the armored head: sparks, no damage
-      SH.fx.word(this.x + this.dir * this.w / 2, this.y - this.h - 6, 'CLANG', '#c8d2e2', 26);
+    if (!hit.fire && !hit.open && !hit.pogo && facingHer && (this.state === 'windup' || this.state === 'charge')) {
+      // the armored head turns a blade: but it still feels it (1), and the words say where to hit instead
+      this.damage(1, world);
+      SH.fx.word(this.x + this.dir * this.w / 2, this.y - this.h - 6, this.boss ? 'ARMORED HEAD: hit its back' : 'ARMORED: hit its back', '#c8d2e2', 70);
       SH.fx.burst(this.x + this.dir * this.w / 2, this.y - this.h / 2, 8, { speed: 2.6, life: 14, colors: ['#ffffff', '#ffd27a'] });
       SH.sfx.play('hit');
       world.player.vx = hit.dir * -3;
@@ -457,6 +470,7 @@
     if (s.kind === 'stag') return new Stag(x, y, s.spots || [s.x]);
     if (s.kind === 'brazier') return new Brazier(x, y);
     if (s.kind === 'pickup') return new Pickup(x, y, s.what);
+    if (s.kind === 'altar') return new Altar(x, y, s.what);
     if (s.kind === 'snare') return new Snare(x, y, s.n);
     if (s.kind === 'target') return new Target(x, s.y * T, s.blade);
     if (s.kind === 'wolf') return new Wolf(x, y);

@@ -532,7 +532,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.2 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.3 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -734,8 +734,8 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
       chargeSpeed: 6.2, chargeFrames: 70, stun: 80, rest: 40, damage: 1, gravity: 0.5, scale: 1 },
     // The Old Wyrm: the same creature, bigger, with three phases (see Wyrm in enemies.js): charge, leap slam, frost breath.
     // Charging into a wall brings rocks down and dazes it; fire down its throat while it breathes in chokes it.
-    oldWyrm: { name: 'The Old Wyrm', hp: 46, breathReach: 170, w: 80, h: 44, wander: 0.4, sight: 1200, sightY: 160, windup: 30,
-      chargeSpeed: 7.2, chargeFrames: 90, stun: 95, rest: 30, damage: 2, gravity: 0.5, scale: 1.7, rocks: 5, boss: true },
+    oldWyrm: { name: 'The Old Wyrm', hp: 32, breathReach: 170, w: 80, h: 44, wander: 0.4, sight: 1200, sightY: 160, windup: 44,
+      chargeSpeed: 6.4, chargeFrames: 90, stun: 130, rest: 50, damage: 1, gravity: 0.5, scale: 1.7, rocks: 5, boss: true },
     bulb: { name: 'Thorn bud', r: 13, regrow: 40 },
   };
 })(window.SH = window.SH || {});
@@ -835,7 +835,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
       id: 'prologue', label: 'Prologue, part 2', name: 'Under the Mountain', room: 'deep', mortal: true,
       card: 'The Thorn Queen\'s three trials: a riddle, a maze, and a beast. Win them all and Rowan goes free. Lose one, and Wren stays in the Deep forever. The stars of Caelum\'s bargain glow on her wrist.',
       goals: [
-        { id: 'riddle', text: 'Trial 1: answer the queen\'s riddle' },
+        { id: 'riddle', text: 'Trial 1: stand before the altar that answers her riddle' },
         { id: 'maze', text: 'Trial 2: get through the maze (keep going right)' },
         { id: 'beast', text: 'Trial 3: outrun the Wyrm to the light' },
       ],
@@ -1058,23 +1058,31 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
 
     // ======================================================== Prologue part 2: Under the Mountain, the three trials
     deep_start: [
-      ['queen', 'The first trial. Answer my riddle and you may walk my maze. Answer wrong, and I\'ll ask again until you break.'],
-      { do: 'goto', id: 'deep_riddle' },
-    ],
-    deep_riddle: [
+      ['queen', 'The first trial, little huntress. Three altars. Three answers. Only one of them is true.'],
       ['queen', 'What is buried in the dark, and grows anyway?'],
-      { choose: [
-        { text: '"A secret."', then: [['queen', 'Wrong. Secrets rot in the dark. Try again, little huntress.'], { do: 'goto', id: 'deep_riddle' }] },
-        { text: '"A seed."', then: [
-          ['wren', '...A seed. Lissa\'s seeds, waiting for spring. The answer is a seed.'],
-          ['queen', 'Correct. How very dull. Go on, then. My maze is waiting.'],
-          { do: 'flag', name: 'riddle' },
-          ['caelum', 'Well done, huntress. Can you hear me? The bargain lets me speak to you. And lend you a little of what I have.'],
-          ['narr', 'The stars on Wren\'s wrist burn bright. Her legs feel lighter than they have ever felt.'],
-          { do: 'goal', id: 'maze' },
-        ] },
-        { text: '"Grief."', then: [['queen', 'Wrong. Grief doesn\'t grow. It just gets heavier. Again.'], { do: 'goto', id: 'deep_riddle' }] },
-      ] },
+      { do: 'flag', name: 'asked' },
+      ['narr', 'Something wakes above each altar: a locked box, a green shoot, a single tear.'],
+      ['wren', 'Buried in the dark, and grows anyway...'],
+      { do: 'goal', id: 'riddle' },
+    ],
+    deep_altar_secret: [
+      ['queen', 'A secret? Wrong. Secrets rot in the dark. They do not grow.'],
+      ['narr', 'Thorns burst through the altar and it cracks in two. The Queen is enjoying this.'],
+    ],
+    deep_altar_grief: [
+      ['queen', 'Grief? Wrong. Grief does not grow. It only gets heavier.'],
+      ['narr', 'Thorns burst through the altar and it cracks in two.'],
+      ['wren', 'She would know.'],
+    ],
+    deep_altar_seed: [
+      ['wren', '...A seed. Lissa\'s seeds, in Mother\'s trunk, waiting for spring. The answer is a seed.'],
+      ['queen', 'Correct. How very dull. Go on, then. My maze is waiting.'],
+      { do: 'flag', name: 'riddle' },
+      { do: 'open', id: 'riddlegate' },
+      { if: 'green', then: [['narr', 'In the window of a cottage far away, a sprig of wintergreen is still alive.']] },
+      ['caelum', 'Well done, huntress. Can you hear me? The bargain lets me speak to you. And lend you a little of what I have.'],
+      ['narr', 'The stars on Wren\'s wrist burn bright. Her legs feel lighter than they have ever felt.'],
+      { do: 'goal', id: 'maze' },
     ],
     deep_wall: [
       ['queen', 'A wall you can\'t climb. Mortals always hit a wall.'],
@@ -1705,6 +1713,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
       ['solid', 148, 150, 0, 20],
     ],
     hints: [
+      { x0: 3, x1: 21, text: 'Walk up to an altar and use {TALK} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle' },
       { x0: 3, x1: 17, text: 'Move with {MOVE}.' },
       { x0: 17, x1: 31, text: 'Jump with {JUMP}. Hold it to jump higher, tap it for a small hop.' },
       { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.' },
@@ -1732,7 +1741,8 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
       ['arc', 84, 89, 14.4, 2.6], ['line', 97, 103, 14.6], ['arc', 103.5, 107.5, 14.4, 2.6], ['line', 109, 116, 14.6], ['arc', 125.5, 130.5, 12.6, 2.2], ['arc', 136, 141, 14.4, 2.6]],
     exitLight: 145,
     chase: { from: 94, wyrmX: 80, speed: 2.7 },
-    npcs: [], gates: [], spawns: [],
+    npcs: [], gates: [{ id: 'riddlegate', x: 21, top: 6 }],
+    spawns: [{ kind: 'altar', what: 'secret', x: 9, y: 16 }, { kind: 'altar', what: 'seed', x: 13, y: 16 }, { kind: 'altar', what: 'grief', x: 17, y: 16 }],
   };
 
   // ---------------------------------------------------------------- Chapter 1: Ashes (walk, talk, first mural, no enemies)
@@ -1788,6 +1798,8 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
       ['ground', 2, 41, 16],
       ['ground', 41, 60, 16],           // Bram's thorn pit
       ['thorns', 42, 59, 15],
+      ['oneway', 47, 49, 14],            // somewhere to land between buds
+      ['oneway', 52, 54, 14],
       ['ground', 60, 148, 16],
       ['oneway', 88, 94, 12],
       ['solid', 148, 150, 0, 20],
@@ -1795,7 +1807,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     hints: [
       { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
       { x0: 26, x1: 36, text: 'Bram\'s rings. Cut all three: the low one from the ground, the middle one with a rising strike (hold up and {ATTACK}), the high one from a jump.', until: 'rings3' },
-      { x0: 36, x1: 44, text: 'Jump toward a bud. When you are above it, {DOWNSTRIKE} to strike down and bounce.', flag: 'combo' },
+      { x0: 36, x1: 60, text: 'Jump onto a bud and it bounces you (strike down with {DOWNSTRIKE} for a higher bounce). Land on the planks between them and take them one at a time.', flag: 'combo', until: 'pit' },
       { x0: 61, x1: 69, text: 'Two more cuts: {ATTACK} during a dash is a lunging dash strike. Hold up and {ATTACK} for a rising strike that carries you into the air.', flag: 'pit' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
     ],
@@ -1872,6 +1884,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     npcs: [{ id: 'thane', x: 8 }, { id: 'caelum', x: 11 }],
     spawns: [
       { kind: 'pickup', what: 'page', x: 60, y: 12 },
+      { kind: 'thornSprite', x: 43, respawn: false }, { kind: 'thornSprite', x: 52, y: 14, respawn: false }, { kind: 'thornSprite', x: 74, y: 12, respawn: false }, { kind: 'thornSprite', x: 88, respawn: false },
       { kind: 'brazier', x: 13 },
       { kind: 'brazier', x: 17 },
       { kind: 'brazier', x: 22, y: 12 },
@@ -2964,9 +2977,9 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     if (this.closed > 0) this.closed--;
     // Touch assist: buds are springy. Falling onto an open bud bounces you, strike or no strike.
     const p = world && world.player;
-    if (p && this.closed <= 0 && SH.input.source === 'touch' && SH.settings.autoDown && p.vy > 0 && !p.grounded) {
+    if (p && this.closed <= 0 && SH.settings.autoDown && p.vy > 0 && !p.grounded) {
       const y = this.y + Math.sin(this.t) * 3;
-      if (Math.abs(p.x - this.x) < this.r + 10 && p.y > y - this.r - 6 && p.y < y + 4) {
+      if (Math.abs(p.x - this.x) < this.r + 18 && p.y > y - this.r - 8 && p.y < y + 8) {
         this.closed = SH.ENEMY_DEFS.bulb.regrow;
         SH.fx.burst(this.x, y, 10, { speed: 2.2, life: 22, colors: ['#ff8fb8', '#ffd27a', '#ffffff'], glow: true });
         p.bounce();
@@ -3046,6 +3059,15 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     this.near = !this.checked && Math.abs(p.x - this.x) < 26 && Math.abs(p.y - this.y) < 30 && p.grounded;
     if (this.near && world.input.pressed.up) { this.checked = true; this.near = false; world.onSnare(this.n); }
   };
+  // The first trial: three altars in the dark, each an answer. Wren answers by standing before one.
+  function Altar(x, y, what) { Object.assign(this, { kind: 'altar', what, x, y, usable: true, near: false, broken: false, label: 'CHOOSE' }); }
+  Altar.prototype.reset = function () { };
+  Altar.prototype.hittable = () => false;
+  Altar.prototype.update = function (world) {
+    const p = world.player;
+    this.near = !this.broken && !SH.game.flags.riddle && !!SH.game.flags.asked && Math.abs(p.x - this.x) < 26 && Math.abs(p.y - this.y) < 30 && p.grounded;
+    if (this.near && world.input.pressed.up) { this.near = false; world.onAltar(this); }
+  };
   function Target(x, y, blade) { Object.assign(this, { kind: 'target', x, y, hit: false, arrowOnly: !blade, blade: !!blade, wob: 0 }); }   // blade: Bram's rings, cut with daggers
   Target.prototype.reset = function () { };
   Target.prototype.hittable = function () { return !this.hit; };
@@ -3119,7 +3141,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     if (m === 'breath' && p.y < this.y - 50) m = 'slam';              // she's up on a ledge: frost can't reach
     if (m === 'breath' && Math.abs(dx) > d.breathReach + 60) m = 'charge';
     if (m === 'charge') { this.state = 'windup'; this.again = ph === 3 ? 1 : 0; SH.sfx.play('rumble'); }
-    else if (m === 'slam') { this.state = 'crouch'; }
+    else if (m === 'slam') { this.state = 'crouch'; const ar = world.room.arena; this.leapX = Math.max(ar ? ar[0] : -1e9, Math.min(ar ? ar[1] : 1e9, p.x)); }   // it picks its landing spot NOW: move, and it misses
     else { this.state = 'inhale'; SH.sfx.play('rumble'); }
   };
   Wyrm.prototype.update = function (world) {
@@ -3134,7 +3156,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     // a new phase: it roars as soon as it has its feet under it
     if (this.boss && this.roarDue && this.grounded && this.state !== 'charge' && this.state !== 'leap') {
       this.roarDue = false; this.state = 'roar'; this.t = 0; this.vx = 0;
-      SH.game.look(this.x + this.dir * 20, this.y - this.h * 0.6, 1.4, 50); if (SH.arts.active() && !SH.arts.scene) { SH.arts.meter = Math.max(SH.arts.meter, SH.arts.max - 0.5); SH.arts.gain(1); }   // the bond answers its rage
+      SH.game.look(this.x + this.dir * 20, this.y - this.h * 0.6, 1.4, 50); if (p.hearts < p.maxHearts) { p.hearts++; fx.word(p.x, p.y - 70, '+1 heart: the bond steadies her', '#ff9ac0', 100); } if (SH.arts.active() && !SH.arts.scene) { SH.arts.meter = Math.max(SH.arts.meter, SH.arts.max - 0.5); SH.arts.gain(1); }   // the bond answers its rage
       fx.kick(8); SH.sfx.play('rumble'); SH.sfx.play('thud');
       fx.ring(this.x + this.dir * this.w / 2, this.y - this.h * 0.7, '#c8d2e2', 90, 30, 3);
       fx.word(this.x, this.y - this.h - 34, ph === 3 ? 'It is furious!' : 'It is angry now!', '#ff8a8a', 80);
@@ -3166,6 +3188,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
             if (d.rocks) world.dropRocks(d.rocks);
             this.state = 'stun'; this.t = 0; this.again = 0;
           } else if (this.again > 0) { this.again--; this.state = 'windup'; this.t = Math.floor(d.windup * quick * 0.4); this.dir = p.x > this.x ? 1 : -1; SH.sfx.play('rumble'); }
+          else if (this.boss) { this.state = 'slamrest'; this.t = 0; SH.fx.dust(this.x, this.y, -this.dir, 8); }   // a charge that misses leaves it winded: every dodge earns an opening
           else { this.state = edge ? 'stun' : 'rest'; this.t = edge ? Math.floor(d.stun / 2) : 0; }
         }
         break;
@@ -3174,8 +3197,8 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
       case 'crouch':
         this.vx = 0;
         if (this.t % 5 === 0) fx.dust(this.x, this.y, 0, 2);
-        if (this.t >= 26 * quick) {
-          const air = 36, tx = Math.max(world.room.arena ? world.room.arena[0] : -1e9, Math.min(world.room.arena ? world.room.arena[1] : 1e9, p.x));
+        if (this.t >= 44 * quick) {
+          const air = 36, tx = this.leapX != null ? this.leapX : p.x;
           this.state = 'leap'; this.t = 0; this.vy = -9; this.grounded = false;
           this.leapVx = Math.max(-7.5, Math.min(7.5, (tx - this.x) / air)); this.dir = this.leapVx >= 0 ? 1 : -1;
           SH.sfx.play('dash'); fx.dust(this.x, this.y, 0, 8);
@@ -3194,7 +3217,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
         break;
       case 'slamrest':
         this.vx = 0;
-        if (this.t >= 58 * quick) { this.state = 'rest'; this.t = Math.floor(d.rest * quick * 0.5); }
+        if (this.t >= 80 * quick) { this.state = 'rest'; this.t = Math.floor(d.rest * quick * 0.5); }
         break;
       // ---- frost breath: a long breath in (fire down its throat chokes it), then a cone of frost along the ground
       case 'inhale':
@@ -3231,7 +3254,9 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     const res = SH.moveBody(world.room, this);
     this.grounded = res.ground; this.hitWall = res.wall !== 0;
     const hard = this.state === 'charge' || this.state === 'leap';
-    if (SH.overlap(this.bodyBox(), p.box()) && !(p.dashT > 0 && p.iframes > 0)) p.hurt(this.x, hard ? d.damage : 1, world);
+    const fromAbove = p.swing && p.swing.kind === 'pogo';                                   // a down strike lands on its back, it doesn't run into it
+    const leaping = this.state === 'leap' && this.vy < 2;                                  // it only hurts where it comes down
+    if (SH.overlap(this.bodyBox(), p.box()) && !(p.dashT > 0 && p.iframes > 0) && !fromAbove && !leaping && this.state !== 'stun') p.hurt(this.x, hard ? d.damage : 1, world);
   };
   Wyrm.prototype.damage = function (n, world) {
     this.hp -= n; this.flash = 8;
@@ -3249,9 +3274,10 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
   Wyrm.prototype.takeHit = function (hit, world) {
     const facingHer = hit.dir === -this.dir;
     if (this.state === 'roar') return null;
-    if (!hit.fire && !hit.open && facingHer && (this.state === 'windup' || this.state === 'charge')) {
-      // the armored head: sparks, no damage
-      SH.fx.word(this.x + this.dir * this.w / 2, this.y - this.h - 6, 'CLANG', '#c8d2e2', 26);
+    if (!hit.fire && !hit.open && !hit.pogo && facingHer && (this.state === 'windup' || this.state === 'charge')) {
+      // the armored head turns a blade: but it still feels it (1), and the words say where to hit instead
+      this.damage(1, world);
+      SH.fx.word(this.x + this.dir * this.w / 2, this.y - this.h - 6, this.boss ? 'ARMORED HEAD: hit its back' : 'ARMORED: hit its back', '#c8d2e2', 70);
       SH.fx.burst(this.x + this.dir * this.w / 2, this.y - this.h / 2, 8, { speed: 2.6, life: 14, colors: ['#ffffff', '#ffd27a'] });
       SH.sfx.play('hit');
       world.player.vx = hit.dir * -3;
@@ -3282,6 +3308,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     if (s.kind === 'stag') return new Stag(x, y, s.spots || [s.x]);
     if (s.kind === 'brazier') return new Brazier(x, y);
     if (s.kind === 'pickup') return new Pickup(x, y, s.what);
+    if (s.kind === 'altar') return new Altar(x, y, s.what);
     if (s.kind === 'snare') return new Snare(x, y, s.n);
     if (s.kind === 'target') return new Target(x, s.y * T, s.blade);
     if (s.kind === 'wolf') return new Wolf(x, y);
@@ -5833,6 +5860,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
       else if (e.kind === 'brazier') drawBrazier(ctx, e, t);
       else if (e.kind === 'wyrm') drawWyrm2(ctx, e, t);
       else if (e.kind === 'pickup' || e.kind === 'snare' || e.kind === 'target' || e.kind === 'wolf') drawWoods(ctx, e, t);
+      else if (e.kind === 'altar') drawAltar(ctx, e, t);
     }
     for (const f of w.fireballs || []) {
       const R = f.big ? 34 : 16;
@@ -6227,7 +6255,8 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     const s = e.def.scale, x = e.x, y = e.y;
     const shakeX = (e.state === 'windup' || e.state === 'roar') ? Math.sin(e.t * 1.6) * 1.5 : 0;
     const sq = e.state === 'crouch' ? 1 - Math.min(0.22, e.t * 0.012) : e.state === 'slamrest' && e.t < 8 ? 0.8 + e.t * 0.025 : e.state === 'leap' ? 1.08 : 1;
-    if (e.state === 'leap') { const gy = e.shadowY || y; ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(x, e.home.y, 34, 5, 0, 0, Math.PI * 2); ctx.fill(); }
+    if ((e.state === 'leap' || e.state === 'crouch') && e.leapX != null) {   // where it will come down: a shadow that pulses, drawn the moment it decides
+      const pk = 0.45 + 0.25 * Math.sin(t * 0.4); ctx.fillStyle = 'rgba(0,0,0,' + pk + ')'; ctx.beginPath(); ctx.ellipse(e.leapX, e.home.y, 40, 6, 0, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = 'rgba(255,90,90,' + pk + ')'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(e.leapX, e.home.y, 44, 7, 0, 0, Math.PI * 2); ctx.stroke(); }
     if (e.state === 'breath') {   // the frost cone
       const hb = e.breathBox(), hx = x + e.dir * e.w / 2, k = Math.min(1, e.t / 8) * (0.5 + Math.sin(t * 0.6) * 0.08);
       const g = ctx.createLinearGradient(hx, 0, hx + e.dir * e.def.breathReach, 0); g.addColorStop(0, 'rgba(200,236,255,' + k + ')'); g.addColorStop(1, 'rgba(200,236,255,0)');
@@ -6241,6 +6270,18 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     if (glow) { const r = (e.state === 'inhale' ? 12 + e.t * 0.35 : 18) * s; const g = ctx.createRadialGradient(hx, hy, 1, hx, hy, r); g.addColorStop(0, 'rgba(' + glow + ',0.5)'); g.addColorStop(1, 'rgba(' + glow + ',0)'); ctx.fillStyle = g; ctx.fillRect(hx - r, hy - r, r * 2, r * 2); }
     if (e.state === 'stun') for (let i = 0; i < 3; i++) { const a = t * 0.12 + i * 2.1; ctx.fillStyle = '#ffe9a8'; ctx.fillRect(x + e.dir * 20 * s + Math.cos(a) * 10 * s, y - 34 * s + Math.sin(a) * 3, 3, 3); }
     if (!e.boss && e.hp < e.def.hp) { const n = 10; for (let i = 0; i < n; i++) { ctx.fillStyle = i < Math.ceil(e.hp / e.def.hp * n) ? '#c8d2e2' : '#2a2a3a'; ctx.fillRect(x - 25 + i * 5, y - e.h * s - 14, 4, 3); } }
+  }
+  function drawAltar(ctx, e, t) {
+    const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(e.x + x), Math.round(e.y + y), w, h); };
+    const col = { secret: '#b9a8ff', seed: '#8fd16b', grief: '#7ac8ff' }[e.what], asked = !!SH.game.flags.asked;
+    R(-13, -4, 26, 4, '#0a0818'); R(-12, -3, 24, 3, '#2a3a32'); R(-9, -22, 18, 19, '#0a0818'); R(-8, -21, 16, 18, '#1c2a22'); R(-8, -21, 16, 2, '#4f7a62'); R(-12, -25, 24, 4, '#0a0818'); R(-11, -24, 22, 3, '#2f4a3c');
+    if (e.broken) { R(-6, -24, 3, 14, '#0a0818'); R(2, -22, 2, 10, '#0a0818'); return; }
+    if (!asked) return;
+    const by = -40 + Math.round(Math.sin(t * 0.07 + e.x) * 2), gl = ctx.createRadialGradient(e.x, e.y + by, 1, e.x, e.y + by, 26); gl.addColorStop(0, col + '88'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 26, e.y + by - 26, 52, 52);
+    if (e.what === 'seed') { R(-1, by - 2, 2, 9, '#4a8a3a'); R(-6, by - 4, 5, 3, col); R(1, by - 7, 5, 3, col); R(-3, by + 6, 6, 4, '#8a5a3a'); }
+    else if (e.what === 'secret') { R(-6, by - 1, 12, 9, col); R(-4, by - 6, 8, 6, '#0a0818'); R(-3, by - 5, 6, 5, col); R(-2, by - 4, 4, 4, '#1c2a22'); R(-1, by + 2, 2, 4, '#0a0818'); }
+    else { ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(e.x, e.y + by - 8); ctx.quadraticCurveTo(e.x + 8, e.y + by + 4, e.x, e.y + by + 8); ctx.quadraticCurveTo(e.x - 8, e.y + by + 4, e.x, e.y + by - 8); ctx.fill(); R(-2, by + 1, 2, 2, '#ffffff'); }
+    if (e.near) { const nm = { secret: 'A SECRET', seed: 'A SEED', grief: 'GRIEF' }[e.what], tw = SH.ptextW(nm, 1) + 8; R(-tw / 2, by - 24, tw, 9, '#0a0818'); SH.ptext(ctx, nm, Math.round(e.x - tw / 2 + 4), Math.round(e.y + by - 22), col, 1); }
   }
   function drawWoods(ctx, e, t) {
     const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(e.x + x), Math.round(e.y + y), w, h); };
@@ -6477,6 +6518,7 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
         fx.word(player.x, player.y - 50, 'Firewood ' + G.flags.n_wood + '/3', '#ffd27a', 60);
         if (G.flags.n_wood === 3) G.queueScript('woods_wood');
       },
+      onAltar(a) { if (a.what !== 'seed') { a.broken = true; fx.kick(5); SH.sfx.play('thud'); fx.burst(a.x, a.y - 20, 24, { speed: 3, life: 40, colors: ['#5a1d3e', '#ff5a78', '#2a1024'] }); } G.queueScript('deep_altar_' + a.what); },
       onSnare(n) { SH.xp.gain(3, true); G.flags.n_snares = (G.flags.n_snares || 0) + 1; if (G.flags.n_snares >= 3) G.flags.snares3 = true; G.hud.goal(true); G.queueScript('woods_snare' + n); },
       onTarget(tg) { SH.xp.gain(4, true); if (tg && tg.blade) { G.flags.n_rings = (G.flags.n_rings || 0) + 1; if (G.flags.n_rings === 3) G.queueScript('ring_rings'); return; } G.flags.n_targets = (G.flags.n_targets || 0) + 1; if (G.flags.n_targets === 3) G.queueScript('woods_targets'); },
       onWolf(what) { if (what === 'killed' || what === 'spared') SH.xp.gain(15, true); G.queueScript('woods_wolf_' + what); },
@@ -6928,8 +6970,10 @@ body.upright #menu .btn { width: calc(50% - 6px); } body.upright #menu #m-resume
     const motesLeft = w.motes.filter(m => !m.got && (G.activeGoal === 'report' || m.x < p.x)).length;   // Starlight still behind her
     const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
-    { const text = hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null;
-      if (text !== w.hintNow && (w.hintHold || 0) > 0 && w.hintNow) w.hintHold--;          // the hint on screen gets its time
+    const bossTell = G.boss && !G.boss.dead ? ({ windup: 'It is about to CHARGE. Jump over it, or {DASH} straight through: nothing can touch you mid-dash.', charge: 'CHARGING. Jump it or {DASH} through it. If it hits the cliff it dazes itself.', crouch: 'It is going to LEAP to the shadow on the ground. Get away from the shadow.', leap: 'Move away from the shadow, then jump the shockwave.', slamrest: 'It is winded. Strike!', inhale: 'It is breathing in. Throw the Flame ({GIFT}) down its throat NOW.', breath: 'Frost along the ground. Jump onto a ledge or get behind it.', stun: 'DAZED. Strike it now: every cut does more.', roar: 'It is getting faster. The bond bar is full: use your Bond Art.' })[G.boss.state] : null;
+    { const text = bossTell ? input.fill(bossTell) : hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null;
+      if (bossTell) { w.hintNow = text; w.hintHold = 0; G.hud.prompt(text); }
+      else if (text !== w.hintNow && (w.hintHold || 0) > 0 && w.hintNow) w.hintHold--;          // the hint on screen gets its time
       else { if (text !== w.hintNow) { w.hintNow = text; w.hintHold = text ? 60 * 5 : 60; } G.hud.prompt(text); } }
     const usable = w.things.find(e => e.usable && e.near);
     G.hud.talkButton(talkable ? 'TALK' : canPaint ? 'PAINT' : usable ? usable.label : null);

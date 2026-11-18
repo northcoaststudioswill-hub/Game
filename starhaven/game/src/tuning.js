@@ -98,8 +98,8 @@
       chargeSpeed: 6.2, chargeFrames: 70, stun: 80, rest: 40, damage: 1, gravity: 0.5, scale: 1 },
     // The Old Wyrm: the same creature, bigger, with three phases (see Wyrm in enemies.js): charge, leap slam, frost breath.
     // Charging into a wall brings rocks down and dazes it; fire down its throat while it breathes in chokes it.
-    oldWyrm: { name: 'The Old Wyrm', hp: 46, breathReach: 170, w: 80, h: 44, wander: 0.4, sight: 1200, sightY: 160, windup: 30,
-      chargeSpeed: 7.2, chargeFrames: 90, stun: 95, rest: 30, damage: 2, gravity: 0.5, scale: 1.7, rocks: 5, boss: true },
+    oldWyrm: { name: 'The Old Wyrm', hp: 32, breathReach: 170, w: 80, h: 44, wander: 0.4, sight: 1200, sightY: 160, windup: 44,
+      chargeSpeed: 6.4, chargeFrames: 90, stun: 130, rest: 50, damage: 1, gravity: 0.5, scale: 1.7, rocks: 5, boss: true },
     bulb: { name: 'Thorn bud', r: 13, regrow: 40 },
   };
 })(window.SH = window.SH || {});

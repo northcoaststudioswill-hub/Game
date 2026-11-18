@@ -467,6 +467,7 @@
       else if (e.kind === 'brazier') drawBrazier(ctx, e, t);
       else if (e.kind === 'wyrm') drawWyrm2(ctx, e, t);
       else if (e.kind === 'pickup' || e.kind === 'snare' || e.kind === 'target' || e.kind === 'wolf') drawWoods(ctx, e, t);
+      else if (e.kind === 'altar') drawAltar(ctx, e, t);
     }
     for (const f of w.fireballs || []) {
       const R = f.big ? 34 : 16;
@@ -861,7 +862,8 @@
     const s = e.def.scale, x = e.x, y = e.y;
     const shakeX = (e.state === 'windup' || e.state === 'roar') ? Math.sin(e.t * 1.6) * 1.5 : 0;
     const sq = e.state === 'crouch' ? 1 - Math.min(0.22, e.t * 0.012) : e.state === 'slamrest' && e.t < 8 ? 0.8 + e.t * 0.025 : e.state === 'leap' ? 1.08 : 1;
-    if (e.state === 'leap') { const gy = e.shadowY || y; ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(x, e.home.y, 34, 5, 0, 0, Math.PI * 2); ctx.fill(); }
+    if ((e.state === 'leap' || e.state === 'crouch') && e.leapX != null) {   // where it will come down: a shadow that pulses, drawn the moment it decides
+      const pk = 0.45 + 0.25 * Math.sin(t * 0.4); ctx.fillStyle = 'rgba(0,0,0,' + pk + ')'; ctx.beginPath(); ctx.ellipse(e.leapX, e.home.y, 40, 6, 0, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = 'rgba(255,90,90,' + pk + ')'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(e.leapX, e.home.y, 44, 7, 0, 0, Math.PI * 2); ctx.stroke(); }
     if (e.state === 'breath') {   // the frost cone
       const hb = e.breathBox(), hx = x + e.dir * e.w / 2, k = Math.min(1, e.t / 8) * (0.5 + Math.sin(t * 0.6) * 0.08);
       const g = ctx.createLinearGradient(hx, 0, hx + e.dir * e.def.breathReach, 0); g.addColorStop(0, 'rgba(200,236,255,' + k + ')'); g.addColorStop(1, 'rgba(200,236,255,0)');
@@ -875,6 +877,18 @@
     if (glow) { const r = (e.state === 'inhale' ? 12 + e.t * 0.35 : 18) * s; const g = ctx.createRadialGradient(hx, hy, 1, hx, hy, r); g.addColorStop(0, 'rgba(' + glow + ',0.5)'); g.addColorStop(1, 'rgba(' + glow + ',0)'); ctx.fillStyle = g; ctx.fillRect(hx - r, hy - r, r * 2, r * 2); }
     if (e.state === 'stun') for (let i = 0; i < 3; i++) { const a = t * 0.12 + i * 2.1; ctx.fillStyle = '#ffe9a8'; ctx.fillRect(x + e.dir * 20 * s + Math.cos(a) * 10 * s, y - 34 * s + Math.sin(a) * 3, 3, 3); }
     if (!e.boss && e.hp < e.def.hp) { const n = 10; for (let i = 0; i < n; i++) { ctx.fillStyle = i < Math.ceil(e.hp / e.def.hp * n) ? '#c8d2e2' : '#2a2a3a'; ctx.fillRect(x - 25 + i * 5, y - e.h * s - 14, 4, 3); } }
+  }
+  function drawAltar(ctx, e, t) {
+    const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(e.x + x), Math.round(e.y + y), w, h); };
+    const col = { secret: '#b9a8ff', seed: '#8fd16b', grief: '#7ac8ff' }[e.what], asked = !!SH.game.flags.asked;
+    R(-13, -4, 26, 4, '#0a0818'); R(-12, -3, 24, 3, '#2a3a32'); R(-9, -22, 18, 19, '#0a0818'); R(-8, -21, 16, 18, '#1c2a22'); R(-8, -21, 16, 2, '#4f7a62'); R(-12, -25, 24, 4, '#0a0818'); R(-11, -24, 22, 3, '#2f4a3c');
+    if (e.broken) { R(-6, -24, 3, 14, '#0a0818'); R(2, -22, 2, 10, '#0a0818'); return; }
+    if (!asked) return;
+    const by = -40 + Math.round(Math.sin(t * 0.07 + e.x) * 2), gl = ctx.createRadialGradient(e.x, e.y + by, 1, e.x, e.y + by, 26); gl.addColorStop(0, col + '88'); gl.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gl; ctx.fillRect(e.x - 26, e.y + by - 26, 52, 52);
+    if (e.what === 'seed') { R(-1, by - 2, 2, 9, '#4a8a3a'); R(-6, by - 4, 5, 3, col); R(1, by - 7, 5, 3, col); R(-3, by + 6, 6, 4, '#8a5a3a'); }
+    else if (e.what === 'secret') { R(-6, by - 1, 12, 9, col); R(-4, by - 6, 8, 6, '#0a0818'); R(-3, by - 5, 6, 5, col); R(-2, by - 4, 4, 4, '#1c2a22'); R(-1, by + 2, 2, 4, '#0a0818'); }
+    else { ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(e.x, e.y + by - 8); ctx.quadraticCurveTo(e.x + 8, e.y + by + 4, e.x, e.y + by + 8); ctx.quadraticCurveTo(e.x - 8, e.y + by + 4, e.x, e.y + by - 8); ctx.fill(); R(-2, by + 1, 2, 2, '#ffffff'); }
+    if (e.near) { const nm = { secret: 'A SECRET', seed: 'A SEED', grief: 'GRIEF' }[e.what], tw = SH.ptextW(nm, 1) + 8; R(-tw / 2, by - 24, tw, 9, '#0a0818'); SH.ptext(ctx, nm, Math.round(e.x - tw / 2 + 4), Math.round(e.y + by - 22), col, 1); }
   }
   function drawWoods(ctx, e, t) {
     const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(e.x + x), Math.round(e.y + y), w, h); };

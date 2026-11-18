@@ -83,6 +83,7 @@
       ['solid', 148, 150, 0, 20],
     ],
     hints: [
+      { x0: 3, x1: 21, text: 'Walk up to an altar and use {TALK} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle' },
       { x0: 3, x1: 17, text: 'Move with {MOVE}.' },
       { x0: 17, x1: 31, text: 'Jump with {JUMP}. Hold it to jump higher, tap it for a small hop.' },
       { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.' },
@@ -110,7 +111,8 @@
       ['arc', 84, 89, 14.4, 2.6], ['line', 97, 103, 14.6], ['arc', 103.5, 107.5, 14.4, 2.6], ['line', 109, 116, 14.6], ['arc', 125.5, 130.5, 12.6, 2.2], ['arc', 136, 141, 14.4, 2.6]],
     exitLight: 145,
     chase: { from: 94, wyrmX: 80, speed: 2.7 },
-    npcs: [], gates: [], spawns: [],
+    npcs: [], gates: [{ id: 'riddlegate', x: 21, top: 6 }],
+    spawns: [{ kind: 'altar', what: 'secret', x: 9, y: 16 }, { kind: 'altar', what: 'seed', x: 13, y: 16 }, { kind: 'altar', what: 'grief', x: 17, y: 16 }],
   };
 
   // ---------------------------------------------------------------- Chapter 1: Ashes (walk, talk, first mural, no enemies)
@@ -166,6 +168,8 @@
       ['ground', 2, 41, 16],
       ['ground', 41, 60, 16],           // Bram's thorn pit
       ['thorns', 42, 59, 15],
+      ['oneway', 47, 49, 14],            // somewhere to land between buds
+      ['oneway', 52, 54, 14],
       ['ground', 60, 148, 16],
       ['oneway', 88, 94, 12],
       ['solid', 148, 150, 0, 20],
@@ -173,7 +177,7 @@
     hints: [
       { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.' },
       { x0: 26, x1: 36, text: 'Bram\'s rings. Cut all three: the low one from the ground, the middle one with a rising strike (hold up and {ATTACK}), the high one from a jump.', until: 'rings3' },
-      { x0: 36, x1: 44, text: 'Jump toward a bud. When you are above it, {DOWNSTRIKE} to strike down and bounce.', flag: 'combo' },
+      { x0: 36, x1: 60, text: 'Jump onto a bud and it bounces you (strike down with {DOWNSTRIKE} for a higher bounce). Land on the planks between them and take them one at a time.', flag: 'combo', until: 'pit' },
       { x0: 61, x1: 69, text: 'Two more cuts: {ATTACK} during a dash is a lunging dash strike. Hold up and {ATTACK} for a rising strike that carries you into the air.', flag: 'pit' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
     ],
@@ -250,6 +254,7 @@
     npcs: [{ id: 'thane', x: 8 }, { id: 'caelum', x: 11 }],
     spawns: [
       { kind: 'pickup', what: 'page', x: 60, y: 12 },
+      { kind: 'thornSprite', x: 43, respawn: false }, { kind: 'thornSprite', x: 52, y: 14, respawn: false }, { kind: 'thornSprite', x: 74, y: 12, respawn: false }, { kind: 'thornSprite', x: 88, respawn: false },
       { kind: 'brazier', x: 13 },
       { kind: 'brazier', x: 17 },
       { kind: 'brazier', x: 22, y: 12 },

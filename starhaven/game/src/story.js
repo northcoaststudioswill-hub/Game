@@ -90,7 +90,7 @@
       id: 'prologue', label: 'Prologue, part 2', name: 'Under the Mountain', room: 'deep', mortal: true,
       card: 'The Thorn Queen\'s three trials: a riddle, a maze, and a beast. Win them all and Rowan goes free. Lose one, and Wren stays in the Deep forever. The stars of Caelum\'s bargain glow on her wrist.',
       goals: [
-        { id: 'riddle', text: 'Trial 1: answer the queen\'s riddle' },
+        { id: 'riddle', text: 'Trial 1: stand before the altar that answers her riddle' },
         { id: 'maze', text: 'Trial 2: get through the maze (keep going right)' },
         { id: 'beast', text: 'Trial 3: outrun the Wyrm to the light' },
       ],
@@ -313,23 +313,31 @@
 
     // ======================================================== Prologue part 2: Under the Mountain, the three trials
     deep_start: [
-      ['queen', 'The first trial. Answer my riddle and you may walk my maze. Answer wrong, and I\'ll ask again until you break.'],
-      { do: 'goto', id: 'deep_riddle' },
-    ],
-    deep_riddle: [
+      ['queen', 'The first trial, little huntress. Three altars. Three answers. Only one of them is true.'],
       ['queen', 'What is buried in the dark, and grows anyway?'],
-      { choose: [
-        { text: '"A secret."', then: [['queen', 'Wrong. Secrets rot in the dark. Try again, little huntress.'], { do: 'goto', id: 'deep_riddle' }] },
-        { text: '"A seed."', then: [
-          ['wren', '...A seed. Lissa\'s seeds, waiting for spring. The answer is a seed.'],
-          ['queen', 'Correct. How very dull. Go on, then. My maze is waiting.'],
-          { do: 'flag', name: 'riddle' },
-          ['caelum', 'Well done, huntress. Can you hear me? The bargain lets me speak to you. And lend you a little of what I have.'],
-          ['narr', 'The stars on Wren\'s wrist burn bright. Her legs feel lighter than they have ever felt.'],
-          { do: 'goal', id: 'maze' },
-        ] },
-        { text: '"Grief."', then: [['queen', 'Wrong. Grief doesn\'t grow. It just gets heavier. Again.'], { do: 'goto', id: 'deep_riddle' }] },
-      ] },
+      { do: 'flag', name: 'asked' },
+      ['narr', 'Something wakes above each altar: a locked box, a green shoot, a single tear.'],
+      ['wren', 'Buried in the dark, and grows anyway...'],
+      { do: 'goal', id: 'riddle' },
+    ],
+    deep_altar_secret: [
+      ['queen', 'A secret? Wrong. Secrets rot in the dark. They do not grow.'],
+      ['narr', 'Thorns burst through the altar and it cracks in two. The Queen is enjoying this.'],
+    ],
+    deep_altar_grief: [
+      ['queen', 'Grief? Wrong. Grief does not grow. It only gets heavier.'],
+      ['narr', 'Thorns burst through the altar and it cracks in two.'],
+      ['wren', 'She would know.'],
+    ],
+    deep_altar_seed: [
+      ['wren', '...A seed. Lissa\'s seeds, in Mother\'s trunk, waiting for spring. The answer is a seed.'],
+      ['queen', 'Correct. How very dull. Go on, then. My maze is waiting.'],
+      { do: 'flag', name: 'riddle' },
+      { do: 'open', id: 'riddlegate' },
+      { if: 'green', then: [['narr', 'In the window of a cottage far away, a sprig of wintergreen is still alive.']] },
+      ['caelum', 'Well done, huntress. Can you hear me? The bargain lets me speak to you. And lend you a little of what I have.'],
+      ['narr', 'The stars on Wren\'s wrist burn bright. Her legs feel lighter than they have ever felt.'],
+      { do: 'goal', id: 'maze' },
     ],
     deep_wall: [
       ['queen', 'A wall you can\'t climb. Mortals always hit a wall.'],

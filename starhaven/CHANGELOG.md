@@ -1,5 +1,32 @@
 # Starhaven — Changelog
 
+## v0.1.3 — after the first playtest by people (Nov 18, 2026)
+Will, after playing with a second tester: the Queen's first trial is lame; three down hits in a row is too big a
+move too early; the boss is too strong with too little combat before it, a hit that did nothing, the down hit did not
+bounce off it, and its jump could not be escaped.
+
+- **The Queen's first trial is a thing you do, not a menu.** She asks her riddle, then three stone altars stand in
+  the Deep: a secret, a grief, a seed. Walk to one and press up. A wrong altar cracks and she mocks you; the seed
+  opens the gate to the maze. (It used to be a three-button dialogue choice.)
+- **The thorn pit in the Ring no longer needs three perfect down strikes.** Two wooden planks sit between the buds,
+  so each bounce has somewhere to land and rest. Buds bounce you on any input, with a wider catch.
+- **The Old Wyrm is fairer.** Health 46 to 32. Every hit takes one heart, never two. Longer wind-ups. Longer daze when
+  it hits the cliff, and a missed charge now leaves it winded and open.
+- **Its leap can be read and escaped.** The landing spot is fixed the moment it crouches and marked with a shadow on
+  the ground; it no longer tracks you in the air. It cannot hurt you on the way up, only where it lands.
+- **The down strike works on it.** Striking down onto its back bounces you off, hurts it, and it cannot hurt you
+  while you do. Touching it while it is dazed no longer hurts either.
+- **No more "hit that did nothing".** A blade on its armoured head still does 1 damage and the words say
+  "ARMORED HEAD: hit its back". Before, a front hit did nothing and said so only with a clink.
+- **The fight tells you what is coming.** The hint line names each move as it starts and what to do: jump or dash
+  through the charge (nothing can touch you mid-dash), leave the shadow, throw fire while it breathes in.
+- **Its roar gives Wren one heart back**, so each new phase starts with a breath.
+- **More fighting before the boss.** Four more thorn sprites on the mountain road, so the blade, the dash and the
+  flame get used before the hollow.
+
+Tests: feel 50/50 (three runs), menus 19/19, smoke and an 8,000-frame random-input run with no errors. Not yet played
+by hand or on a phone.
+
 ## v0.1.2 — slower pacing (Nov 18, 2026)
 Will: the pacing of the text prompts is too fast; space out some of the first location; keep improving the graphics
 and the menus.
