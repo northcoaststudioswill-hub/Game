@@ -92,7 +92,7 @@ function c3Draw(M,pass){const n=M.p.length/3;if(!n)return;let S=M._s;if(!S||S.le
  const E=c3EN,P=M.p,N=M.n,C=M.c,EM=M.e,ce=c3CE,R=c3CR,U=c3CU,F=c3CF,fl=c3FL,hw=c3W/2,hh=c3H/2,amb=E.amb,sun=E.sun,sd=E.sd,fog=E.fog,fn=E.fn,fr=1/(E.ff-E.fn),L=E.lamps;
  if(pass!==1||!M._lit){M._lit=1;for(let i=0;i<n;i++){const x=P[i*3],y=P[i*3+1],z=P[i*3+2],dx=x-ce[0],dy=y-ce[1],dz=z-ce[2],xc=dx*R[0]+dz*R[2],yc=dx*U[0]+dy*U[1]+dz*U[2],zc=dx*F[0]+dy*F[1]+dz*F[2],o=i*8;
   const nx=N[i*3],ny=N[i*3+1],nz=N[i*3+2],e0=EM[i],e=e0>1?1:e0;let lr=amb[0],lg=amb[1],lb=amb[2],d=nx*sd[0]+ny*sd[1]+nz*sd[2];if(d>0){lr+=sun[0]*d;lg+=sun[1]*d;lb+=sun[2]*d}
-  for(let k=0;k<L.length;k++){const l=L[k],ax=l[0]-x,ay=l[1]-y,az=l[2]-z,q=ax*ax+ay*ay+az*az;let nd=(nx*ax+ny*ay+nz*az)/Math.sqrt(q+.001);if(nd<.25)nd=.25;const a=nd/(1+q/l[6]);lr+=l[3]*a;lg+=l[4]*a;lb+=l[5]*a}
+  for(let k=0;k<L.length;k++){const l=L[k],ax=l[0]-x,ay=l[1]-y,az=l[2]-z,q=ax*ax+ay*ay+az*az;if(q>l[6]*90)continue;let nd=(nx*ax+ny*ay+nz*az)/Math.sqrt(q+.001);if(nd<.25)nd=.25;const a=nd/(1+q/l[6]);lr+=l[3]*a;lg+=l[4]*a;lb+=l[5]*a}
   let r=C[i*3]*(e+(1-e)*lr),g=C[i*3+1]*(e+(1-e)*lg),b=C[i*3+2]*(e+(1-e)*lb),f=(zc-fn)*fr;f=f<0?0:f>1?1:f;if(e0>1)f=0;else if(e>0)f*=1-e*.6;
   r+=(fog[0]-r)*f;g+=(fog[1]-g)*f;b+=(fog[2]-b)*f;
   S[o]=xc;S[o+1]=yc;S[o+2]=zc;S[o+3]=r>255?255:r;S[o+4]=g>255?255:g;S[o+5]=b>255?255:b;if(zc>c3NEAR){const w=1/zc;S[o+6]=hw+xc*fl*w;S[o+7]=hh-yc*fl*w}}}
@@ -107,7 +107,10 @@ function c3Draw(M,pass){const n=M.p.length/3;if(!n)return;let S=M._s;if(!S||S.le
     if((zp>c3NEAR)!==(zq>c3NEAR)){const u=(c3NEAR-zp)/(zq-zp);o.push([S[p]+(S[q]-S[p])*u,S[p+1]+(S[q+1]-S[p+1])*u,c3NEAR,S[p+3]+(S[q+3]-S[p+3])*u,S[p+4]+(S[q+4]-S[p+4])*u,S[p+5]+(S[q+5]-S[p+5])*u])}}
    for(const v of o){const w=1/v[2];v[6]=hw+v[0]*fl*w;v[7]=hh-v[1]*fl*w;v[2]=w}
    for(let i=1;i+1<o.length;i++){const p=o[0],q=o[i],s=o[i+1];if(!(md&8)&&(q[6]-p[6])*(s[7]-p[7])-(s[6]-p[6])*(q[7]-p[7])>=0)continue;c3Ras(p[6],p[7],p[2],p[3],p[4],p[5],q[6],q[7],q[2],q[3],q[4],q[5],s[6],s[7],s[2],s[3],s[4],s[5],mode,al)}}}}
-function c3Show(solid,clear){for(const m of solid.concat(clear)){m._lit=0;c3Draw(m,0)}for(const m of clear)c3Draw(m,1)}
+/* is a ball of this size anywhere in the picture? (generous: it only has to rule out what is plainly off screen) */
+function c3Seen(c,R){const dx=c[0]-c3CE[0],dy=c[1]-c3CE[1],dz=c[2]-c3CE[2],zc=dx*c3CF[0]+dy*c3CF[1]+dz*c3CF[2];if(zc<-R)return false;const xc=dx*c3CR[0]+dz*c3CR[2],yc=dx*c3CU[0]+dy*c3CU[1]+dz*c3CU[2],k=(zc+R)/c3FL;
+ return Math.abs(xc)<=k*c3W/2+R*1.5&&Math.abs(yc)<=k*c3H/2+R*1.5}
+function c3Show(solid,clear){for(const m of solid)if(!m.bc||c3Seen(m.bc,m.br)){m._lit=0;c3Draw(m,0)}for(const m of clear){m._lit=0;c3Draw(m,0)}for(const m of clear)c3Draw(m,1)}
 
 /* ---------- 2. shapes ---------- */
 function c3Box(x0,y0,z0,x1,y1,z1,c,c2,e,mode,al){c=c3C(c);c2=c2?c3C(c2):c;const f=(nx,ny,nz,P)=>{const i=P.map(p=>c3V(p[0],p[1],p[2],nx,ny,nz,p[1]===y1?c2:c,e));c3Q(i[0],i[1],i[2],i[3],mode,al)};
@@ -154,22 +157,24 @@ function c3G(x,z){if(!C3GR)return Math.max(C3WL,c3ValH(x,z));let fx=(x-C3GX)/C3G
  const a=C3GR[j*C3GW+i],b=C3GR[j*C3GW+i+1],c=C3GR[(j+1)*C3GW+i],d=C3GR[(j+1)*C3GW+i+1];let h;if((i+j)&1)h=fx+fz<=1?a+(b-a)*fx+(c-a)*fz:d+(c-d)*(1-fx)+(b-d)*(1-fz);else h=fx>=fz?a+(b-a)*fx+(d-b)*fz:a+(d-c)*fx+(c-a)*fz;return Math.max(C3WL,h)}
 function c3Tree(x,z,h,k){const y=c3G(x,z),d=['#1c5038','#184838','#285020','#122c28'][k%4],l=['#3c9858','#38907c','#58a040','#285c44'][k%4];c3Push();c3T(x,y-.1,z);c3Cyl(5,.2*h/3,.13*h/3,0,h*.42,'#3c2414','#6a4428');
  if(k%3===0){c3Cyl(6,h*.34,0,h*.3,h*.72,d,l);c3Cyl(6,h*.25,0,h*.58,h*1.05,d,l)}else{c3T(0,h*.68,0);c3Ball(h*.34,h*.36,h*.34,d,l,6,4)}c3Pop()}
-function c3BuildValley(){const M=c3M=c3New(),X0=C3GX,X1=68,Z0=C3GZ,Z1=30,cs=C3GC,nx=(X1-X0)/cs,nz=(Z1-Z0)/cs,I=[],GR=new Float32Array(C3GW*C3GH);c3X=[1,0,0,0,0,1,0,0,0,0,1,0];C3GR=null;
+function c3BuildValley(){const CH={},CS=13,pick=(x,z)=>{const k=Math.floor((x-C3GX)/CS)+','+Math.floor((z-C3GZ)/CS);c3M=CH[k]||(CH[k]=c3New());return c3M};c3M=c3New();const X0=C3GX,X1=68,Z0=C3GZ,Z1=30,cs=C3GC,nx=(X1-X0)/cs,nz=(Z1-Z0)/cs,I=[],GR=new Float32Array(C3GW*C3GH);c3X=[1,0,0,0,0,1,0,0,0,0,1,0];C3GR=null;
  for(let j=0;j<=nz;j++){const row=[];for(let i=0;i<=nx;i++){const x=X0+i*cs,z=Z0+j*cs,h=c3ValH(x,z),e=.5,hx=c3ValH(x+e,z)-c3ValH(x-e,z),hz=c3ValH(x,z+e)-c3ValH(x,z-e),d=c3RivD(x,z);
    let c=c3Mix('#4cb050','#2c7848',c3Sm(.5,5,h));c=c3Mix(c,'#285c44',c3Sm(4,7.5,h));const sand=Math.max(c3Sm(3.4,1.4,d)*(h<.8?1:0),c3Sm(36,42,x));c=c3Mix(c,'#d8c088',sand);if(h<C3WL-.1)c=c3Mix(c,'#3a6890',.7);
-   GR[j*C3GW+i]=h;const v=.9+c3Hs(i,j,9)*.2;row.push(c3V(x,h,z,-hx,2*e,-hz,[c[0]*v,c[1]*v,c[2]*v],0))}I.push(row)}
- for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){if((i+j)&1){c3F(I[j][i],I[j+1][i],I[j][i+1]);c3F(I[j][i+1],I[j+1][i],I[j+1][i+1])}else{c3F(I[j][i],I[j+1][i],I[j+1][i+1]);c3F(I[j][i],I[j+1][i+1],I[j][i+1])}}
+   GR[j*C3GW+i]=h;const v=.9+c3Hs(i,j,9)*.2;row.push([x,h,z,-hx,2*e,-hz,[c[0]*v,c[1]*v,c[2]*v]])}I.push(row)}
+ for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const M=pick(X0+i*cs+1,Z0+j*cs+1),vc=M._vc||(M._vc={}),V=(a,b)=>{const k=b*C3GW+a;if(vc[k]===undefined){const q=I[b][a];vc[k]=c3V(q[0],q[1],q[2],q[3],q[4],q[5],q[6],0)}return vc[k]},a=V(i,j),b=V(i+1,j),c=V(i,j+1),d=V(i+1,j+1);
+  if((i+j)&1){c3F(a,c,b);c3F(b,c,d)}else{c3F(a,c,d);c3F(a,d,b)}}
  C3GR=GR;
  /* the paths that cross at the Lantern, and the soil below it */
- const strip=(ax,az,bx,bz,w,col)=>{const n=Math.ceil(Math.hypot(bx-ax,bz-az)/1.5),dx=bx-ax,dz=bz-az,l=Math.hypot(dx,dz),px=-dz/l*w,pz=dx/l*w;let pa=null,pb=null;for(let k=0;k<=n;k++){const x=ax+dx*k/n,z=az+dz*k/n,c=c3C(col),v=.92+c3Hs(k,ax,4)*.16,cc=[c[0]*v,c[1]*v,c[2]*v],a=c3V(x+px,c3G(x+px,z+pz)+.05,z+pz,0,1,0,cc,0),b=c3V(x-px,c3G(x-px,z-pz)+.05,z-pz,0,1,0,cc,0);if(pa!==null)c3Q(pa,pb,b,a);pa=a;pb=b}};
+ const strip=(ax,az,bx,bz,w,col)=>{const n=Math.ceil(Math.hypot(bx-ax,bz-az)/1.5),dx=bx-ax,dz=bz-az,l=Math.hypot(dx,dz),px=-dz/l*w,pz=dx/l*w;let pa=null;for(let k=0;k<=n;k++){const x=ax+dx*k/n,z=az+dz*k/n,c=c3C(col),v=.92+c3Hs(k,ax,4)*.16,cc=[c[0]*v,c[1]*v,c[2]*v],A=[x+px,c3G(x+px,z+pz)+.05,z+pz],B=[x-px,c3G(x-px,z-pz)+.05,z-pz];if(pa){pick(x,z);const i0=c3V(...pa[0],0,1,0,pa[2],0),i1=c3V(...pa[1],0,1,0,pa[2],0),i2=c3V(...B,0,1,0,cc,0),i3=c3V(...A,0,1,0,cc,0);c3Q(i0,i1,i2,i3)}pa=[A,B,cc]}};
  strip(-15,0,C3DR[0]-.5,C3DR[1]*.9,.8,'#d8b878');strip(0,-14,0,-1.6,.8,'#d8b878');strip(0,1.6,0,15,.8,'#d8b878');
- c3Box(-2.6,.02,2.2,2.6,.16,4.6,'#6e4428','#8a5a3a');
+ pick(0,3);c3Box(-2.6,.02,2.2,2.6,.16,4.6,'#6e4428','#8a5a3a');
  /* trees: thick on the hills, a few in the bowl, none on the paths, the river or the sand */
  C3TREES=[];for(let k=0;k<420&&C3TREES.length<150;k++){const x=X0+2+c3Hs(k,1,21)*(X1-X0-4),z=Z0+2+c3Hs(k,2,22)*(Z1-Z0-4),r=Math.hypot(x,z);if(r<7.5||x>35||c3RivD(x,z)<3.4||(Math.abs(z)<1.8&&x>-16&&x<22)||(Math.abs(x)<1.8&&Math.abs(z)<16)||Math.hypot(x-C3DR[0],z-C3DR[1])<4||Math.hypot(x+11,z-5)<8)continue;
-  if(r<15&&c3Hs(k,3,23)>.22)continue;const h=2.6+c3Hs(k,4,24)*2.2;C3TREES.push([x,z,h]);c3Tree(x,z,h,k)}
+  if(r<15&&c3Hs(k,3,23)>.22)continue;const h=2.6+c3Hs(k,4,24)*2.2;C3TREES.push([x,z,h]);pick(x,z);c3Tree(x,z,h,k)}
  /* rocks on the lighthouse island and along the river */
- for(let k=0;k<26;k++){const a=c3Hs(k,5,31)*6.28,rr=1.5+c3Hs(k,6,32)*2.6,x=k<12?C3TW[0]+Math.cos(a)*rr:C3RIV[1+k%3][0]+(c3Hs(k,7,33)-.5)*9,z=k<12?C3TW[1]+Math.sin(a)*rr:C3RIV[1+k%3][1]+(c3Hs(k,8,34)-.5)*5,s=.25+c3Hs(k,9,35)*.4;c3Push();c3T(x,c3G(x,z)+s*.3,z);c3RY(a);c3Ball(s*1.3,s,s,'#484058','#8088a0',5,3);c3Pop()}
- C3VAL={p:new Float32Array(M.p),n:new Float32Array(M.n),c:new Float32Array(M.c),e:new Float32Array(M.e),t:M.t};c3M=c3New();return C3VAL}
+ for(let k=0;k<26;k++){const a=c3Hs(k,5,31)*6.28,rr=1.5+c3Hs(k,6,32)*2.6,x=k<12?C3TW[0]+Math.cos(a)*rr:C3RIV[1+k%3][0]+(c3Hs(k,7,33)-.5)*9,z=k<12?C3TW[1]+Math.sin(a)*rr:C3RIV[1+k%3][1]+(c3Hs(k,8,34)-.5)*5,s=.25+c3Hs(k,9,35)*.4;pick(x,z);c3Push();c3T(x,c3G(x,z)+s*.3,z);c3RY(a);c3Ball(s*1.3,s,s,'#484058','#8088a0',5,3);c3Pop()}
+ C3VAL=Object.values(CH).filter(M=>M.t.length).map(M=>{const n=M.p.length/3;let cx=0,cy=0,cz=0,R=0;for(let i=0;i<n;i++){cx+=M.p[i*3];cy+=M.p[i*3+1];cz+=M.p[i*3+2]}cx/=n;cy/=n;cz/=n;for(let i=0;i<n;i++)R=Math.max(R,Math.hypot(M.p[i*3]-cx,M.p[i*3+1]-cy,M.p[i*3+2]-cz));
+  return{p:new Float32Array(M.p),n:new Float32Array(M.n),c:new Float32Array(M.c),e:new Float32Array(M.e),t:M.t,bc:[cx,cy,cz],br:R}});c3M=c3New();return C3VAL}
 /* the river and the lake: one sheet of water whose colour shifts corner by corner */
 function c3Water(t,night){const cs=6,X0=-24,X1=74,Z0=-42,Z1=30,nx=Math.ceil((X1-X0)/cs),nz=Math.ceil((Z1-Z0)/cs),I=[],a=c3C(night?'#12244e':'#2c74cc'),b=c3C(night?'#28488a':'#78b8f8');
  for(let j=0;j<=nz;j++){const row=[];for(let i=0;i<=nx;i++){const x=X0+i*cs,z=Z0+j*cs,k=.5+.5*Math.sin(t*1.3+x*.9+z*1.7)*Math.sin(t*.8+z*.6-x*.4);row.push(c3V(x,C3WL+Math.sin(t*1.1+x+z)*.02,z,0,1,0,[a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k,a[2]+(b[2]-a[2])*k],.25))}I.push(row)}
@@ -389,10 +394,13 @@ function c3Frame(q,top,h){const sh=q.S[q.i],t=q.t;c3Size(h);if(!C3VAL)c3BuildVal
  let pre=[];const sky=c3Sky,moon=c3Moon;c3Moon=(...a)=>pre.push(a); /* the moon is painted on the sky, so it waits for the sky */
  try{sh.f(t,Math.min(1,t/sh.d))}finally{c3Moon=moon}
  if(q.shake){const k=q.shake*.06;c3CE[0]+=Math.sin(q.tt*71)*k;c3CE[1]+=Math.sin(q.tt*93)*k}
- sky(q.tt);for(const a of pre)moon(...a);const night=c3EN.sky[0][2]<60,WM=c3M=c3New();c3Water(q.tt,night);c3M=c3D;c3Show([C3VAL],[WM,c3D]);
+ sky(q.tt);for(const a of pre)moon(...a);const night=c3EN.sky[0][2]<60,WM=c3M=c3New();c3Water(q.tt,night);c3M=c3D;c3Show(C3VAL,[WM,c3D]);
  const px=c3px;if(q.tear){for(let k=0;k<5;k++){const y0=((q.tt*97+k*53)|0)%(h-8),hh=3+k*2,dx=((k%2?1:-1)*(4+k*3));for(let y=y0;y<y0+hh&&y<h;y++){const o=y*c3W;if(dx>0)px.copyWithin(o+dx,o,o+c3W-dx);else px.copyWithin(o,o-dx,o+c3W)}}}
  if(c3cx)c3cx.putImageData(c3im,0,0)}
-function c3DrawScene(){const q=c3q;r('#06050c',0,0,W,H);if(!q)return;const top=10,bot=50,h=Math.max(60,H-top-bot),sh=q.S[q.i];c3Frame(q,top,h);
+/* On a slow device the picture is worked out every other frame (the last one is shown again in between); words and
+   input still run every frame. It switches on above about 26 ms a frame and off again below 11. */
+function c3DrawScene(){const q=c3q;r('#06050c',0,0,W,H);if(!q)return;const top=10,bot=50,h=Math.max(60,H-top-bot),sh=q.S[q.i];q.fn=(q.fn||0)+1;
+ if(!q.half||q.fn%2||q.shot!==q.i||c3H!==h){const t0=typeof performance!=='undefined'?performance.now():0;c3Frame(q,top,h);q.shot=q.i;if(t0){const ms=performance.now()-t0;q.ms=q.ms===undefined||q.fn<3?ms:q.ms*.9+ms*.1;if(q.fn>8){if(q.ms>26)q.half=1;else if(q.ms<11)q.half=0}}}
  g.imageSmoothingEnabled=true;g.drawImage(c3cv,0,0,c3W,h,0,top,W,h);g.imageSmoothingEnabled=false;
  if(q.flash>0)r('rgba(255,248,220,'+Math.min(1,q.flash).toFixed(2)+')',0,top,W,h);
  const fi=q.i===0?Math.max(0,1-q.t/.6):0;if(fi>0)r('rgba(6,5,12,'+fi.toFixed(2)+')',0,top,W,h);

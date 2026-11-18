@@ -129,6 +129,23 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   for (let i = 0; i < 30 && (await E('state')) === 'cine'; i++) await tap('a');
   ok('and the win screen', await E(`state==='win'&&won`), await E('state'));
 
+  /* ---- found in the playtest pass ---- */
+  await E(`init();live=true;state='play';won=true;shards=4;day=3;ZONES.forEach(z=>run.seen[z[0]]=1);dayT=DAYLEN-.01;void 0`); await step(6);
+  ok('going to bed early does not sleep through the call', await E(`state==='c3'&&c3q.key==='call'`), await E('state'));
+  await skip3(); await step(30); ok('and the evening report follows it', await E(`run.call===1&&state==='dayend'`), await E('state'));
+  ok('a save made during the ending or the relight scene still counts', await E(`(()=>{init();live=true;state='play';const o=JSON.parse(JSON.stringify(snap()));o.shards=4;o.won=false;o.run.lens=1;o.run.call=1;restore(o);return won===true&&run.lit===1})()`));
+  await E(`init();live=true;state='play';ZONES.forEach(z=>run.seen[z[0]]=1);dayT=30;const b=mkBud(0,2,6*16+8,27*16+8);b.st='idle';window.__b=b;void 0`); await step(3);
+  ok('a sprout set down inside a tree steps out', await E(`free(__b.x,__b.y,false)`), await E(`[__b.x|0,__b.y|0]`));
+  const patch = JSON.parse(await E(`(()=>{init();live=true;state='play';drawWorld();const grab=()=>[BG[0],BG[1],OVR].map(c=>c.getContext('2d').getImageData(0,0,c.width,c.height).data),out=[];
+    for(const f of [()=>openGate(gates[0],false),()=>openGate(coastGate('sunDoor'),false),()=>openGate(coastGate('northPier'),false),()=>{gard.harv=30;syncBeds()}]){f();const part=bakeDirty!==true;drawWorld();const A=grab();bakeDirty=true;drawWorld();const B=grab();let d=0;for(let k=0;k<3;k++)for(let i=0;i<A[k].length;i+=4)if(A[k][i]!==B[k][i]||A[k][i+1]!==B[k][i+1]||A[k][i+2]!==B[k][i+2]||A[k][i+3]!==B[k][i+3])d++;out.push([part,d])}return JSON.stringify(out)})()`));
+  ok('repainting only the changed patch of ground gives the same picture as repainting it all', patch.every(q => q[0] && q[1] === 0), patch);
+  const cull = JSON.parse(await E(`(()=>{const seen=c3Seen;let bad=0,n=0,drawn=0,all=0;for(const k of Object.keys(C3SCN))for(let i=0;i<C3SCN[k].length;i++)for(const f of [.2,.8]){const go=()=>{c3Play(k);c3q.i=i;c3q.t=C3SCN[k][i].d*f;c3q.tt=i*7+c3q.t;time=50;g.setTransform(2,0,0,2,0,0);draw();const a=Array.from(c3px);c3q=null;state='play';return a};
+    c3Seen=seen;const A=go();drawn+=C3VAL.filter(m=>seen(m.bc,m.br)).length;all+=C3VAL.length;c3Seen=()=>true;const B=go();for(let q=0;q<A.length;q++)if(A[q]!==B[q]){bad++;break}n++}c3Seen=seen;return JSON.stringify([n,bad,Math.round(drawn/all*100)])})()`));
+  ok('leaving out the parts of the 3D valley that are off screen never changes the picture', cull[1] === 0 && cull[2] < 70, cull[0] + ' frames, ' + cull[2] + '% of the valley worked out');
+  const off = JSON.parse(await E(`(()=>{init();live=true;state='play';ZONES.forEach(z=>run.seen[z[0]]=1);dayT=40;drawWorld();const o=g.fillRect.bind(g);let n=0,out=0;g.fillRect=(x,y,w,h)=>{n++;const m=g.getTransform(),X=m.a*x+m.e,Y=m.d*y+m.f;if(X>cv.width||Y>cv.height||X+w*m.a<0||Y+h*m.d<0)out++;o(x,y,w,h)};g.setTransform(2,0,0,2,0,0);drawWorld();g.fillRect=o;return JSON.stringify([n,out])})()`));
+  ok('far less is drawn off screen (it was over half)', off[1] < off[0] * 0.35, off);
+  ok('on a slow device a 3D scene works the picture out every other frame', await E(`(()=>{c3Play('dawn');g.setTransform(2,0,0,2,0,0);for(let i=0;i<4;i++){c3q.t+=.03;c3q.tt+=.03;draw()}c3q.half=1;c3q.ms=200;c3q.fn=10;c3q.t+=.2;c3q.tt+=.2;draw();const a=c3px.slice();c3q.t+=.2;c3q.tt+=.2;draw();let same=1;for(let i=0;i<a.length;i++)if(a[i]!==c3px[i]){same=0;break}c3q.t+=.2;c3q.tt+=.2;draw();let moved=0;for(let i=0;i<a.length;i++)if(a[i]!==c3px[i]){moved=1;break}c3q=null;state='play';return same&&moved})()`));
+
   ok('no page errors', errs.length === 0, errs.slice(0, 3));
   console.log(fail ? fail + ' FAILED' : 'ALL PASS'); await browser.close(); process.exit(fail ? 1 : 0);
 })();

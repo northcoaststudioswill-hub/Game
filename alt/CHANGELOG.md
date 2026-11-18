@@ -3,6 +3,57 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: playtest pass, bug hunt and speed (Nov 18 2026)
+
+Will: playtest the game, make sure the systems work and the game is fun, bug hunt, optimize.
+
+How it was done: the browser's CPU profiler at four times slower than this machine (a rough phone), a count of every
+draw call and where it lands, random play-throughs of the late game that check for broken states every second, and
+frame-by-frame comparisons against the build before this pass. All by script; nobody held a controller.
+
+**Bugs found and fixed:**
+- **Going to bed early slept through the Lantern's call.** GO TO BED at the house desk jumps straight to nightfall, so
+  a player who always ends the day that way would never have seen the call and never reached the North Coast. The call
+  now plays before the evening report whichever way the day ends.
+- **Closing the page during the ending or the relight scene lost the result.** The fourth shard was saved but the win
+  was not, and the lens was saved as delivered but the North Light stayed dark for good. Loading such a save now puts
+  both right.
+- **A sprout could be set down inside a tree.** A wide load (a big berry, the pear, the lens) carried through the
+  two-tile path to Pebble Beach put the outer carriers inside the trees; if the day ended there they were left
+  standing in one. Older than this update. They now step out to the nearest open tile.
+
+**Faster:**
+- **Half the drawing was off screen.** Every berry, bug, sprout and signpost in the valley was drawn every frame.
+  Only what is on screen (and a little round it) is drawn now: 1,914 fills a frame down to 939 in the Lantern Field,
+  and a frame about a quarter cheaper (9.0 to 6.4 ms at phone-like speed).
+- **Opening a gate no longer repaints the whole valley.** The bramble, the crystals, the bridge, the pier, the sun
+  door and every new garden bed used to repaint all the ground (about 75 to 95 ms here, a visible hitch; more on a
+  phone, and a third more since the map got wider). Only the changed patch is repainted now: 1 to 12 ms. Checked
+  pixel for pixel against a full repaint.
+- **Night lights** are stamped from one soft circle, not built as a new gradient for each light each frame.
+- **The 3D scenes** work out only the parts of the valley in view (44% of it on average; checked on 300 frames to
+  give exactly the same picture), and a lamp skips corners far outside its reach. About 10 to 20% faster, and the
+  worst frame went from 59 ms to 44.
+- **A slow-device mode for the 3D scenes.** If a scene is averaging over about 26 ms a frame it works the picture out
+  every other frame until it is fast again. Words and buttons still run every frame.
+- The once-a-second "can Will reach this berry" search uses numbers, not strings.
+
+**What still looks the same:** day frames at 14 places are identical to the build before this pass, pixel for pixel.
+Night frames differ only by the softness of the light circles. 3D frames differ by under half a percent of pixels (the
+lamp change).
+
+**On fun (what the numbers can and cannot say):** the pier takes a full crew under fifteen seconds and the lens about
+half a minute from the rock to the Lantern, so neither drags. Nothing threatens the haul, and the North Coast still
+has only that one job; whether that feels thin is for a person holding the controller to say.
+
+**Tested:** `tests/sprouts_coast.js` now 49 checks (eight new: the bed, the two saves, the tree, the ground patch,
+the 3D culling, off-screen drawing, the slow-device mode). `tests/sprouts_soak.js` has a new late-game mode (the
+Lantern whole, so the call and the coast happen): three seeds of three days, clean after the tree fix; it runs one by
+default. `sprouts_valley.js`, `sprouts_story.js`, Sproutwild lab 124 of 124, Patch & Plate 119 of 119 and the console
+shelf pass. **Not tested:** by hand, or on a phone. The speed figures are from headless Chromium slowed four times, not
+from a real phone. The random bot built the pier in two runs of three and never brought the lens home (that is covered
+by the scripted run, not by chance).
+
 ## Sprouts: meeting Marcus, in 3D (Nov 18 2026)
 
 Will: when you meet Marcus for the first time it should cut to a 3D cutscene of you and Louie walking up to him and

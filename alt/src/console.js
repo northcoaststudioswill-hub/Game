@@ -248,7 +248,7 @@ function pathTo(sx,sy,tx,ty,swim){const s0=(sy>>4)*MW+(sx>>4),t0=(ty>>4)*MW+(tx>
 function fields(){fieldL=bfs(false);fieldW=bfs(true);}
 function mkGate(sub,tiles,id){tiles.forEach(([x,y])=>map[y*MW+x]=GT);const cx=tiles.reduce((a,t)=>a+t[0],0)/tiles.length*16+8,cy=tiles.reduce((a,t)=>a+t[1],0)/tiles.length*16+8;
  const hp=[30,45,45,80,1e9][sub];gates.push({kind:'ga',id,sub,tiles,hp,max:hp,alive:true,on:[],x:cx,y:cy});}
-function openGate(ga,fx){ga.alive=false;ga.tiles.forEach(([x,y])=>{map[y*MW+x]=(ga.sub===3||x===28||y===20)?D:G;if(fx)puff(x*16+8,y*16+8,['#f08030','#90f0f8','#c89050','#e8c888','#b0a8c0'][ga.sub],8,45)});bakeDirty=true;
+function openGate(ga,fx){ga.alive=false;ga.tiles.forEach(([x,y])=>{map[y*MW+x]=(ga.sub===3||x===28||y===20)?D:G;if(fx)puff(x*16+8,y*16+8,['#f08030','#90f0f8','#c89050','#e8c888','#b0a8c0'][ga.sub],8,45)});ga.tiles.forEach(([x,y])=>bakeMark(x,y));
  ga.on.slice().forEach(b=>{b.tgt=null;b.z=0;b.st=d2(b,P.x,P.y)<80*80?'follow':'idle'});ga.on.length=0;fields();}
 function mkItem(sub,x,y){const def={lens:{w:10,seeds:0,r:7},berry:{w:1,seeds:1,r:4},big:{w:3,seeds:3,r:7},husk:{w:2,seeds:2,r:5},shard:{w:4,seeds:0,r:6},nectar:{w:1,seeds:0,r:5},pear:{w:8,seeds:4,r:8},trs:{w:3,seeds:0,r:5}}[sub];const it={kind:'it',sub,x,y,alive:true,on:[],...def};items.push(it);return it;}
 function mkFoe(x,y,boss){const e={kind:'en',x,y,hx:x,hy:y,boss,r:boss?13:7,hp:boss?150:20,max:boss?150:20,alive:true,on:[],st:'wander',t:0,cd:0,cdP:0,shake:0,face:1,wx:x,wy:y,wt:0};foes.push(e);return e;}
@@ -264,7 +264,7 @@ const inGarden=(x,y)=>gard.open&&x>=640&&x<832&&y>=48&&y<160;
 /* garden beds */
 const BEDS=[[44,8],[48,8],[42,8],[50,8],[44,6],[48,6],[42,6],[50,6],[44,4],[48,4],[42,4],[50,4]];
 const bedCount=()=>gard.harv<8?4:gard.harv<25?8:12;
-function syncBeds(){const n=bedCount();while(plots.length<n){const [tx,ty]=BEDS[plots.length];map[ty*MW+tx]=S;bakeDirty=true;plots.push({kind:'plot',x:tx*16+8,y:ty*16+9,r:5,alive:true,on:[],st:0,dry:true,t:0,flower:0,prog:0,claim:0});}}
+function syncBeds(){const n=bedCount();while(plots.length<n){const [tx,ty]=BEDS[plots.length];map[ty*MW+tx]=S;bakeMark(tx,ty);plots.push({kind:'plot',x:tx*16+8,y:ty*16+9,r:5,alive:true,on:[],st:0,dry:true,t:0,flower:0,prog:0,claim:0});}}
 const needs=p=>p.st===0||p.st===4||p.dry;
 const FLOWERS=[{n:'DAISY',pl:'DAISIES',v:3,g:15,at:0},{n:'TULIP',pl:'TULIPS',v:5,g:22,at:10},{n:'SUNFLOWER',pl:'SUNFLOWERS',v:8,g:32,at:30},{n:'MOONBLOOM',pl:'MOONBLOOMS',v:12,g:45,at:60}];
 const seedsOpen=()=>FLOWERS.filter(f=>gard.harv>=f.at).length;
@@ -385,6 +385,7 @@ function restore(o){init();o=upgradeSave(o);day=o.day;dayT=o.dayT;shards=o.shard
  o.foes.forEach(q=>{const e=mkFoe(q[0],q[1],!!q[2]);e.hp=q[3];const sp=spawns.find(k=>k.id===q[4]);if(sp)sp.ref=e});
  plots=[];syncBeds();(o.plots||[]).forEach((q,i)=>{const p=plots[i];if(p){p.st=q[0];p.dry=!!q[1];p.t=q[2];p.flower=Math.min(FLOWERS.length-1,q[3]|0)}});
  if(gard.open&&!gard.order)newOrder();
+ if(shards>=4)won=true;if(run.lens&&!run.lit)run.lit=1; /* the page was closed during the ending or the relight scene */
  fields();digSync();cam.x=P.x-VW/2;cam.y=P.y-VH/2;}
 let awayMsg=0;
 function awayGrowth(){if(!live||!gard.open||!SAVE.t)return;const hrs=Math.min(8,(Date.now()-SAVE.t)/36e5);if(hrs<.17)return;const n=Math.min(gardeners(),plots.length);if(!n)return;
@@ -444,9 +445,9 @@ const near=(list,ok)=>{let b=null,bd=1e12;for(const o of list)if(ok(o)){const d=
 /* ALT: the objective marker points at a berry you can reach right now (not one behind a gate that's still shut).
    Walkable tiles are flood-filled from the player about once a second; a berry within 2 tiles of them counts (sprouts are thrown). */
 let reachC=null,reachT=-9;
-function reachable(o){if(!reachC||time-reachT>1){reachT=time;const S=new Set(),k=(x,y)=>x+','+y,q=[[P.x>>4,P.y>>4]];S.add(k(q[0][0],q[0][1]));
-  while(q.length){const[x,y]=q.shift();for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,kk=k(nx,ny);if(S.has(kk)||nx<0||ny<0||nx>=MW||ny>=MH||!free(nx*16+8,ny*16+8,false))continue;S.add(kk);q.push([nx,ny])}}reachC=S}
- const tx=o.x>>4,ty=o.y>>4;for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++)if(reachC.has((tx+dx)+','+(ty+dy)))return true;return false}
+function reachable(o){if(!reachC||time-reachT>1){reachT=time;const S=reachC&&reachC.length===MW*MH?reachC.fill(0):new Uint8Array(MW*MH),q=[(P.y>>4)*MW+(P.x>>4)];S[q[0]]=1;
+  for(let h=0;h<q.length;h++){const c=q[h],x=c%MW,y=(c/MW)|0;for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,n=ny*MW+nx;if(nx<0||ny<0||nx>=MW||ny>=MH||S[n]||!free(nx*16+8,ny*16+8,false))continue;S[n]=1;q.push(n)}}reachC=S}
+ const tx=o.x>>4,ty=o.y>>4;for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++){const x=tx+dx,y=ty+dy;if(x>=0&&y>=0&&x<MW&&y<MH&&reachC[y*MW+x])return true}return false}
 const isBerry=i=>i.alive&&(i.sub==='berry'||i.sub==='big');
 const nearBerry=()=>near(items,i=>isBerry(i)&&reachable(i))||near(items,isBerry)||SOIL;
 const nearShard=()=>near(items,i=>i.alive&&i.sub==='shard')||near(foes,e=>e.alive&&e.boss)||{x:HX,y:HY};
@@ -613,7 +614,8 @@ function update(dt){
  if(sceneQ.length){const q=sceneQ.shift();playScene(q[0],q[1]);return}
  dayT+=dt;saveT+=dt;if(saveT>6){saveT=0;persist()}
  if(!duskSaid&&dayT>DAYLEN*.82){duskSaid=true;say(won&&!run.call?"SUN'S GOING DOWN. THE LANTERN IS RESTLESS TONIGHT":"SUN'S GOING DOWN. NO RUSH.",5);snd(440,.3,220,'triangle',.08)}
- if(dayT>=DAYLEN){endDay();return;}
+ if(dayT>=DAYLEN){if(coastDue()){dayT=DAYLEN-.3;sceneQ.push(['3:call',coastOpen]);return} /* going to bed early must not sleep through the call */
+  endDay();return;}
  achT-=dt;if(achT<=0){achT=.5;checkAch()}
  objT-=dt;if(objT<=0){objT=.3;OBJ=objective();pjTick();tipTick();loreTick();coastTick();barkTick()}zoneTick(dt);ambSound(dt);
  // player
@@ -712,6 +714,8 @@ function updBud(b,dt){
  const T=TYPES[b.type],sp=T.sp*(b.stage===2?1.25:1),swim=b.type===2;b.mv=false;if(b.cheer>0)b.cheer-=dt;b.it=b.st==='idle'?(b.it||0)+dt:0;
  if(b.st==='carry'||b.st==='fight'||b.st==='work'){b.xp+=dt;if(!b.star&&b.xp>=40){b.star=true;puff(b.x,b.y-8,'#f8e060',6,30);snd(1175,.08,1568);if(!run.starSaid){run.starSaid=1;say('A SPROUT EARNED A GOLD STAR! STARS CAN MOVE INTO YOUR HOUSE',7)}}}
  if(!swim&&(b.st==='follow'||b.st==='idle')&&tileAt(b.x,b.y)===WA){puff(b.x,b.y,'#a8d8ff',5,30);b.st='fly';b.ret=true;b.sx=b.x;b.sy=b.y;b.tx=P.x;b.ty=P.y;b.t=0;snd(240,.08,160)}
+ if(b.st==='follow'||b.st==='idle'){const tl=tileAt(b.x,b.y);if(tl===TR||tl===6){ /* set down inside a tree (a wide load in a narrow path): step out to the nearest open tile */
+  for(const [ax,ay] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]){const nx=(b.x>>4)+ax,ny=(b.y>>4)+ay;if(free(nx*16+8,ny*16+8,false)){b.x=nx*16+8-ax*5;b.y=ny*16+8-ay*5;break}}}}
  switch(b.st){
  case 'follow':{const i=b.si||0,p=trail[Math.min(trail.length-1,2+((i/3)|0)*2)]||P;
    const tx=p.x+((i%3)-1)*6,ty=p.y+(((i*7)%5)-2)*2,d=Math.hypot(tx-b.x,ty-b.y);go(b,tx,ty,Math.min(sp,80)*(d>40?1.5:1),dt,swim,3);
@@ -970,8 +974,9 @@ function coastObj(){if(!run||!run.call||run.lit||run.lens)return null;const pr=c
  if(!(run.seen&&run.seen['NORTH COAST']))return{text:'FOLLOW THE BEAM EAST',x:69*16,y:20*16+8,done:false,col:c};
  if(pr&&pr.alive)return{text:'BUILD THE OLD PIER',x:pr.x,y:pr.y,done:false,col:c};
  const it=items.find(i=>i.alive&&i.sub==='lens');return it?{text:'CARRY THE LENS TO THE LANTERN',x:it.x,y:it.y,done:false,col:'#a8c8ff'}:null}
+const coastDue=()=>won&&!run.call&&day>=2&&!inHome&&!sceneQ.length;
 function coastTick(){if(state!=='play'||inHome||sceneQ.length)return;
- if(won&&!run.call&&day>=2&&dayT>DAYLEN*.78&&dayT<DAYLEN*.97){sceneQ.push(['3:call',coastOpen]);return}
+ if(coastDue()&&dayT>DAYLEN*.78){sceneQ.push(['3:call',coastOpen]);return}
  if(!run.call)return;const T=run.tips=run.tips||{},pr=coastGate('northPier');
  if(!run.coastScn&&zone==='NORTH COAST'){run.coastScn=1;sceneQ.push(['3:coast',()=>{zoneT=2.2;persist(true)}]);return}
  if(!T.pr&&pr&&pr.alive&&d2(P,pr.x,pr.y)<60*60){T.pr=1;say('AN OLD PIER. THROW SPROUTS AT THE STAKES TO BUILD IT',7)}
@@ -1013,6 +1018,8 @@ const THEME=[ /* same order as ZONES */
  {g:'#50b880',gd:'#349868',gl:'#80d8a0',tr:['#184838','#28705c','#38907c','#68c0a0'],fl:['#60b8f8','#ffffff','#f8e060'],reed:1,willow:1,pr:[['flower',.16],['tall',.10],['glow',.03],['rock',.03]]},
  {g:'#e4d4a0',gd:'#c8b47c',gl:'#f8ecc0',tr:['#1c4840','#286858','#3c8870','#70b898'],fl:['#ffffff','#f8e060'],sand:1,pr:[['pebble',.10],['shell',.05],['rock',.04],['star',.02]]}];
 let BG=null,OVR=null,bakeDirty=true,GLOW=[],ZC=null;
+/* a changed tile: the next frame repaints just that patch of ground (true = repaint everything) */
+function bakeMark(tx,ty){if(bakeDirty===true)return;const q=bakeDirty||(bakeDirty=[tx,ty,tx,ty]);q[0]=Math.min(q[0],tx);q[1]=Math.min(q[1],ty);q[2]=Math.max(q[2],tx);q[3]=Math.max(q[3],ty)}
 const BR=new Set(); /* bridge tiles: water underneath, planks on top once it is built */
 function zoneAt(tx,ty){if(!ZC){ZC=new Uint8Array(MW*MH);for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){let best=0,bd=1e9;for(let i=0;i<ZONES.length;i++){const z=ZONES[i],d=Math.max(z[1]-x,0,x-(z[1]+z[3]-1),z[2]-y,y-(z[2]+z[4]-1));if(d<bd){bd=d;best=i}}ZC[y*MW+x]=best}}
  return ZC[Math.max(0,Math.min(MH-1,ty))*MW+Math.max(0,Math.min(MW-1,tx))];}
@@ -1020,10 +1027,14 @@ function bridgeArt(p,X,Y,n,done){
  for(let i=0;i<n;i++){const y=Y+28-i*4;p('#583018',X+2,y,28,4);p(i%2?'#c89050':'#b88040',X+3,y,26,3);p('#e8b878',X+4+((i*5)%14),y,5,1)}
  if(done){p('#583018',X+1,Y,2,32);p('#583018',X+29,Y,2,32);p('#a87040',X+1,Y,1,32);p('#a87040',X+29,Y,1,32)}
  [[1,0],[28,0],[1,29],[28,29]].forEach(([a,b])=>{p('#3c2414',X+a,Y+b-4,3,7);p('#c89050',X+a+1,Y+b-4,1,5)});}
-function bake(){
+function bake(R){
  const Wp=MW*16,Hp=MH*16,mkc=()=>{const c=document.createElement('canvas');c.width=Wp;c.height=Hp;return c};
  if(!BG){BG=[mkc(),mkc()];OVR=mkc()}
- const c0=BG[0].getContext('2d'),c1=BG[1].getContext('2d'),co=OVR.getContext('2d');co.clearRect(0,0,Wp,Hp);GLOW=[];
+ const c0=BG[0].getContext('2d'),c1=BG[1].getContext('2d'),co=OVR.getContext('2d');let ix0=0,iy0=0,ix1=MW-1,iy1=MH-1;
+ if(R){ /* a patch: paint is clipped to the changed tiles and one tile round them; tiles one further out are walked too, since crowns and banks reach across */
+  const x0=Math.max(0,R[0]-1)*16,y0=Math.max(0,R[1]-1)*16,x1=Math.min(MW,R[2]+2)*16,y1=Math.min(MH,R[3]+2)*16;ix0=Math.max(0,R[0]-2);iy0=Math.max(0,R[1]-2);ix1=Math.min(MW-1,R[2]+2);iy1=Math.min(MH-1,R[3]+2);
+  for(const c of[c0,c1,co]){c.save();c.beginPath();c.rect(x0,y0,x1-x0,y1-y0);c.clip()}co.clearRect(x0,y0,x1-x0,y1-y0);GLOW=GLOW.filter(q=>q.x<ix0*16||q.x>=ix1*16+16||q.y<iy0*16||q.y>=iy1*16+16)}
+ else{co.clearRect(0,0,Wp,Hp);GLOW=[]}
  let cx=c0;const an=[],s=(c,x,y,w,h)=>{cx.fillStyle=c;cx.fillRect(x,y,w,h)},a=(c,x,y,w,h,f)=>an.push([c,x,y,w,h,f]);
  const T=(tx,ty)=>(tx<0||ty<0||tx>=MW||ty>=MH)?TR:map[ty*MW+tx],tree=(tx,ty)=>{const t=T(tx,ty);return t===TR||t===7},
   wat=(tx,ty)=>T(tx,ty)===WA||BR.has(ty*MW+tx),th=(tx,ty)=>THEME[zoneAt(tx,ty)]||THEME[0],
@@ -1044,7 +1055,7 @@ function bake(){
   shell(X,Y,tx,ty){const [x,y]=at(X,Y,tx,ty,104);s('#d890a8',x,y+1,4,2);s('#f8c8d8',x,y,4,2);s('#ffffff',x+1,y,1,1);s('#d890a8',x+2,y,1,2)},
   star(X,Y,tx,ty){const [x,y]=at(X,Y,tx,ty,106);s('#c85830',x+1,y,1,5);s('#c85830',x-1,y+2,5,1);s('#f08860',x+1,y+1,1,3);s('#f08860',x,y+2,3,1)}};
  /* ground */
- for(let ty=0;ty<MH;ty++)for(let tx=0;tx<MW;tx++){const X=tx*16,Y=ty*16,k=kind(tx,ty),t=th(tx,ty);
+ for(let ty=iy0;ty<=iy1;ty++)for(let tx=ix0;tx<=ix1;tx++){const X=tx*16,Y=ty*16,k=kind(tx,ty),t=th(tx,ty);
   if(k==='t'){s(t.tr[0],X,Y,16,16);continue}
   if(k==='w'){let deep=true;for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++)if(!wat(tx+i,ty+j))deep=false;const base=deep?(t.sand?'#2c74cc':'#3080d8'):'#3c8ce0';
    s(base,X,Y,16,16);
@@ -1080,7 +1091,7 @@ function bake(){
   q(C[3],x-4,y-6,3,1);q(C[3],x-5,y-5,2,1);q(C[3],x-2,y-7,2,1);q(C[0],x+3,y+2,2,1);q(C[0],x-1,y+4,2,1);q(C[2],x+4,y-3,2,1);q(C[2],x+2,y+5,2,1);
   if(t.fruit&&hsh(tx,ty,22)<.6){q('#a01828',x-4,y,3,3);q('#e04050',x-4,y,2,2);q('#a01828',x+3,y-3,3,3);q('#e04050',x+3,y-3,2,2);if(hsh(tx,ty,23)<.5){q('#f8a0c8',x,y-5,2,1);q('#ffd0e4',x+1,y+3,1,1)}}
   if(t.willow)for(let i=0;i<4;i++){const wx=x-6+i*4,wl=4+((hsh(tx,ty,24+i)*4)|0);q(C[3],wx,y-1,1,wl);q(C[2],wx+1,y,1,wl-1)}};
- for(let ty=0;ty<MH;ty++)for(let tx=0;tx<MW;tx++)if(tree(tx,ty)){const X=tx*16,Y=ty*16,t=th(tx,ty),C=t.tr,front=ty+1<MH&&!tree(tx,ty+1),north=ty>0&&!tree(tx,ty-1);
+ for(let ty=iy0;ty<=iy1;ty++)for(let tx=ix0;tx<=ix1;tx++)if(tree(tx,ty)){const X=tx*16,Y=ty*16,t=th(tx,ty),C=t.tr,front=ty+1<MH&&!tree(tx,ty+1),north=ty>0&&!tree(tx,ty-1);
   const px=X+8+((hsh(tx,ty,20)*3)|0)-1;let cy=Y+7+((hsh(tx,ty,21)*3)|0)-1,rad=9;
   if(front){const kS=kind(tx,ty+1);s(kS==='w'?'#3070b8':kS==='d'?'#b89858':kS==='s'?'#6e4428':th(tx,ty+1).gd,X,Y+11,16,5);s('rgba(10,30,20,.3)',X,Y+11,16,5);s('#3c2414',px-2,Y+9,4,7);s('#6a4428',px-1,Y+9,2,7);cy=Y+3;rad=8}
   else if(north)cy=Y+6;
@@ -1093,7 +1104,8 @@ function bake(){
   for(let i=0;i<8;i++)for(const f of[0,1]){const lx=fx+3+i*5+(i%2),ly=3+((i*11+f*6)%14);a('#e0f8ff',lx,ly,1,7,f);a('#e0f8ff',lx+2,ly+13,1,6,f);a('#ffffff',lx+1,3+(ly+19)%27,1,2,f)}
   for(let i=0;i<10;i++)for(const f of[0,1]){a('#ffffff',fx-3+i*5+f*2,31+((i+f)%2),4,3,f);a('#e0f8ff',fx-1+i*5-f*2,35,3,1,f)}}
  if(gates)for(const br of gates)if(br.sub===3&&!br.alive)bridgeArt(s,br.tiles[0][0]*16,br.tiles[0][1]*16,8,true);coastBake(s,a);
- c1.drawImage(BG[0],0,0);for(const [c,x,y,w,h,f] of an){const k=f?c1:c0;k.fillStyle=c;k.fillRect(x,y,w,h)}}
+ c1.drawImage(BG[0],0,0);for(const [c,x,y,w,h,f] of an){const k=f?c1:c0;k.fillStyle=c;k.fillRect(x,y,w,h)}
+ if(R)for(const c of[c0,c1,co])c.restore()}
 /* things that drift on the air: pollen by day, petals in the orchard, spores in the hollow, fireflies at night */
 let AMB=[],ambAt=0,NFLY=[];
 function drawAmb(){const dt=Math.min(.1,Math.max(0,time-ambAt));ambAt=time;const vh=Math.ceil(H/Z);
@@ -1112,11 +1124,12 @@ function drawAmb(){const dt=Math.min(.1,Math.max(0,time-ambAt));ambAt=time;const
 function drawClouds(){if(dayT/DAYLEN>.8)return;g.fillStyle='rgba(10,40,50,.07)';const vh=Math.ceil(H/Z);
  for(let k=0;k<4;k++){const x=((time*5+k*430)%(MW*16+400))-200-ox,y=90+k*150+Math.sin(k*2.3)*40-oy;if(x<-150||x>VW+110||y<-60||y>vh+60)continue;g.beginPath();g.ellipse(x,y,90,34,0,0,7);g.ellipse(x+50,y+14,60,26,0,0,7);g.fill()}}
 /* night: real dark, with pools of light round the lantern, the windows, the trail lamps and the fireflies */
-let LT=null;
+let LT=null,LTS=null;
 function drawNight(){const f=dayT/DAYLEN;if(f<.12){r('rgba(255,190,140,'+((1-f/.12)*.10).toFixed(3)+')',0,0,W,H);return}if(f<=.6)return;const a=Math.min(1,(f-.6)/.4);
  r('rgba(240,120,40,'+(a*.12).toFixed(3)+')',0,0,W,H);
  if(!LT){LT=document.createElement('canvas');LT.width=W;LT.height=304}const c=LT.getContext('2d');c.globalCompositeOperation='source-over';c.clearRect(0,0,W,304);c.fillStyle='rgba(14,12,58,'+(a*a*.62).toFixed(3)+')';c.fillRect(0,0,W,H);c.globalCompositeOperation='destination-out';
- const L=(wx,wy,rad,k=1)=>{const x=(wx-ox)*Z,y=(wy-oy)*Z,rr=rad*Z;if(x<-rr||y<-rr||x>W+rr||y>H+rr)return;const gr=c.createRadialGradient(x,y,0,x,y,rr);gr.addColorStop(0,'rgba(0,0,0,'+k+')');gr.addColorStop(.5,'rgba(0,0,0,'+(k*.6).toFixed(2)+')');gr.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=gr;c.fillRect(x-rr,y-rr,rr*2,rr*2)};
+ if(!LTS){LTS=document.createElement('canvas');LTS.width=LTS.height=64;const q=LTS.getContext('2d'),gr=q.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(.5,'rgba(0,0,0,.6)');gr.addColorStop(1,'rgba(0,0,0,0)');q.fillStyle=gr;q.fillRect(0,0,64,64)}
+ const L=(wx,wy,rad,k=1)=>{const x=(wx-ox)*Z,y=(wy-oy)*Z,rr=rad*Z;if(x<-rr||y<-rr||x>W+rr||y>H+rr)return;c.globalAlpha=k;c.drawImage(LTS,x-rr,y-rr,rr*2,rr*2)};
  L(HX,HY-22,(36+shards*13+Math.sin(time*9))*(flickT>0?.35:1),.95);L(32*16+11,14*16+32,15,.8);L(32*16+38,14*16+32,15,.8);L(P.x,P.y-4,24,.45);
  for(const z of ZONES)if(!run.seen||run.seen[z[0]]||z[0]==='LANTERN FIELD'){const p=postXY(z);L(p.x+5,p.y-8,17,.8)}
  for(const q of GLOW)L(q.x,q.y,9,.7);for(const q of bugs)if(q.alive&&!q.hid&&q.sp===4)L(q.x,q.y-7,11,.8);
@@ -1124,7 +1137,7 @@ function drawNight(){const f=dayT/DAYLEN;if(f<.12){r('rgba(255,190,140,'+((1-f/.
  for(const it of items)if(it.alive&&(it.sub==='shard'||it.sub==='nectar'||it.sub==='trs'||it.sub==='lens'))L(it.x,it.y-6,13,.7);if(run.lit)L(NLIGHT.x,NLIGHT.y-40,46+Math.sin(time*2)*3,.95);
  if(run.spark)L(run.spark.x,run.spark.y-6,12,.7);
  if(pjDone(PJ[2]))L(520,534,34,.8);if(pjDone(PJ[4]))L(1072,400,24,.8);if(pjS(PJ[1]).s>=3)L(656,96,22,.8);if(pjDone(PJ[0]))L(164,206,30,.7);
- g.imageSmoothingEnabled=true;g.drawImage(LT,0,0,W,H,0,0,W,H);g.imageSmoothingEnabled=false;
+ c.globalAlpha=1;g.imageSmoothingEnabled=true;g.drawImage(LT,0,0,W,H,0,0,W,H);g.imageSmoothingEnabled=false;
  if(flickT>0)for(let k=0;k<4;k++){const y=((time*90+k*61)|0)%(H-12),h=4+k*2,dx=(k%2?1:-1)*(3+k*2);try{g.drawImage(cv,0,y*2,480,h*2,dx,y,240,h)}catch(e){}}
  const x=(HX-ox)*Z,y=(HY-22-oy)*Z,rr=(30+shards*10)*Z;if(x>-rr&&y>-rr&&x<W+rr&&y<H+rr){const gr=g.createRadialGradient(x,y,0,x,y,rr);gr.addColorStop(0,'rgba(255,214,120,'+(a*.30).toFixed(3)+')');gr.addColorStop(1,'rgba(255,214,120,0)');g.fillStyle=gr;g.fillRect(x-rr,y-rr,rr*2,rr*2)}}
 
@@ -1276,7 +1289,7 @@ function drawHearth(){const x=Math.round(HX-ox),y=Math.round(HY-oy),lit=shards/4
  r('#782828',x-9,y-35,18,3);r('#c04848',x-9,y-35,18,2);r('#c04848',x-5,y-38,10,3);r('#f07070',x-4,y-38,3,1);}
 function drawWorld(){
  ox=Math.round(cam.x);oy=Math.round(cam.y);if(inHome){drawHome();return}g.save();g.scale(Z,Z);SCW=VW;const wf=((time*2)|0)%2;
- if(bakeDirty||!BG){bake();bakeDirty=false}
+ if(bakeDirty||!BG){bake(bakeDirty===true||!BG?null:bakeDirty);bakeDirty=false}
  const bsx=Math.max(0,ox),bsy=Math.max(0,oy),bsw=Math.min(VW+1,MW*16-bsx),bsh=Math.min(Math.ceil(H/Z)+1,MH*16-bsy);
  g.drawImage(BG[wf],bsx,bsy,bsw,bsh,bsx-ox,bsy-oy,bsw,bsh);drawClouds();
  {const mx=894-ox,my=30-oy;if(mx>-60&&mx<VW+10&&my>-20&&my<VH+10)for(let k=0;k<7;k++){const u=(time*.9+k*.37)%1;r('rgba(255,255,255,'+(.55*(1-u)).toFixed(2)+')',Math.round(mx+((k*17)%44)+Math.sin(time*2+k)*2),Math.round(my+2-u*9),2,2)}}
@@ -1285,12 +1298,12 @@ function drawWorld(){
   if(ga.hp<ga.max){const x=Math.round(ga.x-ox),y=Math.round(ga.y-oy)-14;r('#181020',x-11,y-1,22,4);r('#f8d030',x-10,y,Math.round(20*ga.hp/ga.max),2)}}
  for(const ga of gates)if(ga.alive&&ga.sub<2){const T=TYPES[ga.sub],x=Math.round(ga.x-ox)-3,y=Math.round(ga.y-oy)-24+Math.round(Math.sin(time*3)*1.5);r('#181020',x-2,y-2,11,11);r('#f8f0d8',x-1,y-1,9,9);r(T.d,x,y,7,7);r(T.c,x+1,y+1,5,5);r('#181020',x+2,y+3,1,2);r('#181020',x+4,y+3,1,2);r('#181020',x+2,y+9,3,1);r('#181020',x+3,y+10,1,1)}
  LO.pet=petOK&&state==='play';
- const L=[];
- for(const s of sprouts)L.push([s.y,drawSprout,s]);for(const q of seeds)L.push([q.ty,drawSeed,q]);for(const q of wbuds)if(!q.hid)L.push([q.y,drawWbud,q]);L.push([KEEP.y,drawKeep]);L.push([NLIGHT.y,drawNLight]);if(run.seen&&run.seen['NORTH COAST'])L.push([BESS.y,drawBessie]);for(const it of items)if(it.alive)L.push([it.y+1,drawItem,it]);
- for(const e of foes)if(e.alive)L.push([e.y,drawFoe,e]);for(const b of buds)L.push([b.y+(b.st==='fight'?4:0),drawBud,b]);
- for(const q of bugs)if(q.alive)L.push([q.y,drawBug,q]);for(const n of npcs)L.push([n.y,drawNPC,n]);
- if(gard.open){noGard=!buds.some(b=>b.gard);for(const p of plots)L.push([p.y-2,drawBed,p]);L.push([7*16+12,drawBasket]);L.push([SIGN.y,drawSign])}
- if(run.boss)L.push([THORN.y,drawThorn]);pjDrawList(L);if(run.spark)L.push([run.spark.y,drawSpark]);L.push([17*16-3,drawHouse]);for(const z of ZONES)L.push([postXY(z).y,drawPost,z]);L.push([LO.y+12,drawDog,LO]);L.push([P.y,drawPlayer]);L.push([HY,drawHearth]);
+ const L=[],vh=Math.ceil(H/Z),see=(q,m=28)=>q.x>ox-m&&q.x<ox+VW+m&&q.y>oy-m&&q.y<oy+vh+m+16; /* only what is on screen (and a little round it) is drawn */
+ for(const s of sprouts)if(see(s,12))L.push([s.y,drawSprout,s]);for(const q of seeds)L.push([q.ty,drawSeed,q]);for(const q of wbuds)if(!q.hid&&see(q))L.push([q.y,drawWbud,q]);if(see(KEEP,40))L.push([KEEP.y,drawKeep]);L.push([NLIGHT.y,drawNLight]);if(run.seen&&run.seen['NORTH COAST'])L.push([BESS.y,drawBessie]);for(const it of items)if(it.alive&&see(it,34))L.push([it.y+1,drawItem,it]);
+ for(const e of foes)if(e.alive&&see(e,40))L.push([e.y,drawFoe,e]);for(const b of buds)if(see(b,22))L.push([b.y+(b.st==='fight'?4:0),drawBud,b]);
+ for(const q of bugs)if(q.alive&&see(q,20))L.push([q.y,drawBug,q]);for(const n of npcs)if(see(n,90))L.push([n.y,drawNPC,n]);
+ if(gard.open){noGard=!buds.some(b=>b.gard);if(ox+VW>620&&ox<850&&oy<190){for(const p of plots)L.push([p.y-2,drawBed,p]);L.push([7*16+12,drawBasket]);L.push([SIGN.y,drawSign])}}
+ if(run.boss&&see(THORN,60))L.push([THORN.y,drawThorn]);pjDrawList(L);if(run.spark)L.push([run.spark.y,drawSpark]);if(see({x:33*16,y:16*16},110))L.push([17*16-3,drawHouse]);for(const z of ZONES){const q=postXY(z);if(see(q,30))L.push([q.y,drawPost,z])}L.push([LO.y+12,drawDog,LO]);L.push([P.y,drawPlayer]);if(see({x:HX,y:HY},90))L.push([HY,drawHearth]);
  L.sort((a,b)=>a[0]-b[0]);for(const d of L)d[1](d[2]);
  g.drawImage(OVR,bsx,bsy,bsw,bsh,bsx-ox,bsy-oy,bsw,bsh);
  for(const p of parts){const x=Math.round(p.x-ox),y=Math.round(p.y-oy);
