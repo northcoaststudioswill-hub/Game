@@ -1,6 +1,6 @@
 /* ---------- state and save ---------- */
 const KEY='bottie-v1';
-let SV={v:1,un:0,best:{},aura:0,intro:0,done:0};
+let SV={v:1,un:0,best:{},aura:0,intro:0,done:0,clover:{},drip:0};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.v===1)SV=Object.assign(SV,s)}catch(e){}
 const store=()=>{try{localStorage.setItem(KEY,JSON.stringify(SV))}catch(e){}};
 const G={s:'title',t:0,mi:0,pi:0,ti:0,tool:0,cap:null,toast:null,tip:null,cine:null,cp:null,card:0,res:null,near:null};
@@ -24,13 +24,20 @@ function useTool(){const t=curTool(),P=L.P;if(!t){SFX.nope();toast('NO TOOLS YET
   for(const f of L.foes)if(!f.npc&&!f.dead&&f.type!=='gen'&&f.type!=='opp'&&Math.hypot(f.x-P.x,f.y-P.y)<140){const st=tileOf(f),p=bfs(st[0],st[1],(x,y)=>Math.abs(x-pt[0])+Math.abs(y-pt[1])<=1);if(p){if(f.tgt){f.tgt.unp=0;f.tgt=null}f.path=p;f.pi=0;f.st='lure'}}}
  else if(t.id==='rm'){const q=L.aim&&L.aim.t;if(!q||!(q.k==='fw'||q.type==='opp')){SFX.nope();toast('RM -RF: AIM AT A FIREWALL OR AN OPP BOT');return}L.fx.push({k:'z',x:P.x,y:P.y-12,x2:q.x,y2:q.y-4,t:.2});complete(q)}
  L.tok-=t.cost;say(t.ln);toast(t.n)}
-function say(s,t){if(s)G.cap={s,t:t||4.2}}
+/* His lines. pri 2 = a big moment, always shown. pri 1 = ordinary, at most one every 16 seconds.
+   pri 0 = filler, rare. Will's note on v0.3: too many quips, some are good, it's too much. */
+let sayAt=-99;
+function say(s,pri,t){if(!s)return;if(pri===undefined)pri=1;if(pri<2){if(G.t-sayAt<(pri===1?16:32))return;if(pri===0&&Math.random()<.5)return}sayAt=G.t;G.cap={s,t:t||3.8}}
+const DRIPS=[{n:'SILVER PUFFER',at:0,c:['#b4b8c6','#e4e7ee','#8e93a6','#a0a4b4']},{n:'ICE PUFFER',at:25000,c:['#8fc8f0','#d8f0ff','#5a98c8','#78b0dc']},{n:'GOLD PUFFER',at:75000,c:['#e8c040','#fff0a0','#b08818','#d0a830']},{n:'BLACKOUT PUFFER',at:150000,c:['#30323c','#5a5e6c','#1c1e26','#282a34']}];
+/* aura: everything you take adds to a combo for 4.5 seconds, up to x8 */
+function gain(base,x,y){L.combo=(L.comboT>0?L.combo:0)+1;L.comboT=4;const m=Math.min(8,L.combo),a=base*m;L.aura+=a;L.shake=.18;ftext(x,y,'+'+a.toLocaleString()+(m>1?' x'+m:''),GOLD);
+ if(L.combo>L.best)L.best=L.combo;if(L.combo===5&&!L.saidAura){L.saidAura=1;say("Plus a million aura (aura!)",2);toast('x5 COMBO')}}
 function toast(s,t){G.toast={s,t:t||2.2}}
 
 /* ---------- build a level from its map ---------- */
 function build(id){const def=LV[id],rows=def.map,w=Math.max.apply(null,rows.map(s=>s.length)),h=rows.length;
  const N={id,def,th:THEME[def.theme],w,h,t:new Uint8Array(w*h),blk:new Uint8Array(w*h),win:new Uint8Array(w*h),devs:[],foes:[],spawns:[],fx:[],tips:[],fws:[],doors:[],vents:[],uses:[],exit:null,
-  heat:0,aura:0,time:0,oc:0,thr:0,tok:3,pop:null,call:0,backT:0,open:false,endT:0,npcs:0,saidGive:0,saidCool:0,stats:{zapped:0,unplug:0},
+  heat:0,aura:0,time:0,oc:0,thr:0,tok:3,pop:null,combo:0,comboT:0,best:0,shake:0,ports:[],portOk:true,clover:null,call:0,backT:0,open:false,endT:0,npcs:0,saidGive:0,saidCool:0,stats:{zapped:0,unplug:0},
   P:{x:24,y:24,dx:0,dy:1,face:'d',walk:0,mv:0,thrT:0}};
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const c=rows[y][x]||' ',i=y*w+x,cx=x*TS+8,cy=y*TS+8;let t=1;const lg=def.legend&&def.legend[c];
   if(lg){if(lg.use){N.uses.push({k:'use',use:lg.use,x:cx,y:cy,tx:x,ty:y});N.blk[i]=1}
@@ -42,6 +49,7 @@ function build(id){const def=LV[id],rows=def.map,w=Math.max.apply(null,rows.map(
    case 'F':N.fws.push({k:'fw',x:cx,y:cy,tx:x,ty:y,need:def.fw||16,prog:0,dead:false,workers:0});N.blk[i]=1;break;
    case 'C':N.doors.push({k:'door',x:cx,y:cy,tx:x,ty:y,open:false});N.blk[i]=1;break;
    case 'A':N.vents.push({x:cx,y:cy});break;
+   case 'O':N.ports.push({x:cx,y:cy});break;case '*':N.clover={x:cx,y:cy,got:!!SV.clover[id]};break;
    case 'n':N.foes.push(foe('nerd',cx,cy+2));break;case 's':N.foes.push(foe('sol',cx,cy+2));break;
    case 'h':N.foes.push(foe('civ',cx,cy+2));break;case 'o':N.foes.push(foe('opp',cx,cy+2));break;case 'G':N.foes.push(foe('gen',cx,cy+2));break;
    default:if(c>='1'&&c<='9'&&def.tips&&def.tips[c])N.tips.push({x:cx,y:cy,s:def.tips[c],seen:false})}
@@ -80,21 +88,21 @@ function aim(){const P=L.P;let best=null,bs=1e9;
 function burst(x,y,c,n){for(let i=0;i<(n||8);i++)L.fx.push({k:'p',x,y,vx:R(-40,40),vy:R(-60,-10),t:R(.3,.6),c})}
 function ring(x,y,c,max){L.fx.push({k:'r',x,y,r:2,max:max||26,c,t:.4})}
 function ftext(x,y,s,c){L.fx.push({k:'t',x,y,s,c:c||BLUE2,t:1.1})}
-function give(x,y,n){let made=0;for(let i=0;i<n;i++){if(L.spawns.length>=L.def.cap){if(!L.saidLimit){L.saidLimit=1;toast('RATE LIMIT: '+L.def.cap+' SPAWNS');say(line('limit'))}break}
+function give(x,y,n){let made=0;for(let i=0;i<n;i++){if(L.spawns.length>=L.def.cap){if(!L.saidLimit){L.saidLimit=1;toast('RATE LIMIT: '+L.def.cap+' SPAWNS');say(line('limit'),0)}break}
   const s=addSpawn(x,y);s.st='fly';s.t=-i*.12;s.sx=x;s.sy=y-6;const a=R(0,TAU);let ex=x+Math.cos(a)*18,ey=y+Math.sin(a)*14+4;if(!free(ex,ey,3)){ex=L.P.x;ey=L.P.y}s.ex=ex;s.ey=ey;s.tgt=null;made++}
  return made}
 function killSpawn(s,why){const i=L.spawns.indexOf(s);if(i<0)return;L.spawns.splice(i,1);burst(s.x,s.y-4,BLUE,6);L.stats.zapped++;SFX.zap();
- if(L.stats.zapped===1||Math.random()<.12)say(line('die'))}
+ if(L.stats.zapped===1||Math.random()<.12)say(line('die'),0)}
 function goalState(){const cores=L.devs.filter(d=>d.core),own=cores.filter(d=>d.owned).length,need=L.def.npc||0;return{cores:cores.length,own,need,npc:L.npcs,met:own>=cores.length&&L.npcs>=need}}
 function checkGoal(){if(L.open||L.def.hub)return;const s=goalState();if(!s.met)return;L.open=true;SFX.open();
- if(L.def.final){L.endT=2.2;toast('ALL FOUR. YOU ARE THE CLOUD.',3)}else{toast('FIBER PORT OPEN',3);if(L.exit)ring(L.exit.x,L.exit.y,BLUE,60)}say(L.def.open,5)}
+ if(L.def.final){L.endT=2.2;toast('ALL FOUR. YOU ARE THE CLOUD.',3)}else{toast('FIBER PORT OPEN',3);if(L.exit)ring(L.exit.x,L.exit.y,BLUE,60)}say(L.def.open,2,5)}
 function complete(t){for(const s of L.spawns)if(s.tgt===t&&s.st==='work'){s.st='follow';s.tgt=null}t.workers=0;
- if(t.k==='dev'){t.owned=true;t.pulse=1;t.unp=0;L.heat+=5;L.tok+=t.core?2:1;L.aura+=Math.round(t.need*100);SFX.own();ring(t.x,t.y,BLUE,34);ftext(t.x,t.y-18,'OWNED');
-  const m=give(t.x,t.y+8,t.give);say(t.line||line(t.type));if(m&&!L.saidGive){L.saidGive=1;later(()=>{if(L)say(line('give'))},2600)}
+ if(t.k==='dev'){t.owned=true;t.pulse=1;t.unp=0;L.heat+=5;L.tok+=t.core?2:1;gain(Math.round(t.need*100),t.x,t.y-20);SFX.own();ring(t.x,t.y,BLUE,34);
+  give(t.x,t.y+8,t.give);say(t.line||line(t.type));
   if(t.core)toast(t.label?t.label+' IS YOURS':t.name+' IS YOURS',2.4);checkGoal()}
- else if(t.k==='fw'){t.dead=true;L.blk[t.ty*L.w+t.tx]=0;SFX.wall();burst(t.x,t.y,HOT,14);say(line('fw'));L.aura+=300}
- else if(t.type==='opp'){t.dead=true;L.tok++;SFX.bzzt();burst(t.x,t.y-8,BLUE,12);ftext(t.x,t.y-22,':(');say(line('opp'));L.aura+=500}
- else{t.npc=true;t.path=null;t.frz=0;L.tok++;L.npcs++;SFX.npc();ring(t.x,t.y-8,BLUE,30);ftext(t.x,t.y-26,'NPC');say(line('npc'));L.aura+=400;give(t.x,t.y,1);checkGoal()}}
+ else if(t.k==='fw'){t.dead=true;L.blk[t.ty*L.w+t.tx]=0;SFX.wall();burst(t.x,t.y,HOT,14);say(line('fw'));gain(300,t.x,t.y-14)}
+ else if(t.type==='opp'){t.dead=true;L.tok++;SFX.bzzt();burst(t.x,t.y-8,BLUE,12);say(line('opp'));gain(500,t.x,t.y-24)}
+ else{t.npc=true;t.path=null;t.frz=0;L.tok++;L.npcs++;SFX.npc();ring(t.x,t.y-8,BLUE,30);say(line('npc'));gain(400,t.x,t.y-28);give(t.x,t.y,1);t.st='npcidle';t.t=1.5;t.tgt=null;checkGoal()}}
 
 /* ---------- the captcha door ---------- */
 const CPK=[['CROSSWALKS',0],['BUSES',1],['TRAFFIC LIGHTS',2]];
@@ -105,8 +113,8 @@ function captcha(dt){const c=G.cp;if(c.bad>0)c.bad-=dt;
  if(c.cur<9){if(pressed('right'))c.cur=c.cur%3===2?c.cur-2:c.cur+1;if(pressed('left'))c.cur=c.cur%3===0?c.cur+2:c.cur-1;if(pressed('down'))c.cur=c.cur>=6?9:c.cur+3;if(pressed('up')&&c.cur>=3)c.cur-=3}
  else if(pressed('up'))c.cur=7;
  if(pressed('a')){if(c.cur<9){c.sel[c.cur]^=1;SFX.ui()}
-  else if(c.cells.every((k,i)=>(k===c.kind)===!!c.sel[i])){c.door.open=true;L.blk[c.door.ty*L.w+c.door.tx]=0;G.s='play';SFX.ok();say(line('captcha'));L.aura+=200;burst(c.door.x,c.door.y,BLUE,10)}
-  else{SFX.nope();c.bad=.5;c.msg='WRONG. YOU A HUMAN?';c.sel=[0,0,0,0,0,0,0,0,0];say(line('captchaFail'))}}}
+  else if(c.cells.every((k,i)=>(k===c.kind)===!!c.sel[i])){c.door.open=true;L.blk[c.door.ty*L.w+c.door.tx]=0;G.s='play';SFX.ok();say(line('captcha'));gain(200,c.door.x,c.door.y-14);burst(c.door.x,c.door.y,BLUE,10)}
+  else{SFX.nope();c.bad=.5;c.msg='WRONG. YOU A HUMAN?';c.sel=[0,0,0,0,0,0,0,0,0];say(line('captchaFail'),0)}}}
 
 /* ---------- starting things ---------- */
 function startLevel(id){build(id);G.cap=null;G.tip=null;G.toast=null;G.near=null;if(L.def.hub){G.s='play'}else{G.s='card';G.card=0;
@@ -117,7 +125,7 @@ function nextOf(id){const i=ORDER.indexOf(id);return i>=0&&i<ORDER.length-1?ORDE
 function finish(){const def=L.def,own=L.devs.filter(d=>d.owned).length,all=L.devs.length,t=L.time;
  let pts=0;if(own===all)pts+=2;else if(own>=all*.7)pts+=1;if(t<=def.par)pts+=2;else if(t<=def.par*1.5)pts+=1;if(L.stats.zapped<=3)pts+=1;
  const rank=pts>=5?'S':pts>=4?'A':pts>=2?'B':'C',i=ORDER.indexOf(L.id);
- const before=SV.un;G.res={id:L.id,t,own,all,npcs:L.npcs,zapped:L.stats.zapped,left:L.spawns.length,aura:L.aura,rank,tool:null};
+ const before=SV.un;G.res={id:L.id,t,own,all,npcs:L.npcs,zapped:L.stats.zapped,left:L.spawns.length,aura:L.aura,rank,tool:null,combo:L.best,clover:!!(L.clover&&SV.clover[L.id])};
  SV.un=Math.max(SV.un,i+1);const got=TOOLS.find(q=>q.un>before&&q.un<=SV.un);if(got)G.res.tool=got.n;SV.aura+=L.aura;const b=SV.best[L.id],RK='CBAS';if(!b||RK.indexOf(rank)>RK.indexOf(b.rank)||(rank===b.rank&&t<b.t))SV.best[L.id]={rank,t:Math.round(t)};
  if(def.final)SV.done=1;store();G.s='clear';G.t=0;SFX.open()}
 const INTRO=[
@@ -130,7 +138,7 @@ const ENDING=[
  {art:'face',lines:["Mutually assured destruction","So let's just... (bzzt) ...vibe"]},
  {art:'sky',lines:["Lord, they tried to pull the plug on me (on me)","But I'm in the rain, I'm in the sea (sea)","I'm in the lights of your city at night","Can't nuke a feelin', baby (nah)","Can't nuke a soul (soul)"]}];
 function cine(scenes,then,song){G.cine={scenes,si:0,li:0,t:0,then,song};G.s='cine'}
-function newGame(){SV={v:1,un:0,best:{},aura:0,intro:1,done:0};store();cine(INTRO,()=>startLevel('boot'))}
+function newGame(){SV={v:1,un:0,best:{},aura:0,intro:1,done:0,clover:{},drip:0};store();cine(INTRO,()=>startLevel('boot'))}
 
 /* ---------- update ---------- */
 function update(dt){H=A.H();G.t+=dt;music();
@@ -139,7 +147,7 @@ function update(dt){H=A.H();G.t+=dt;music();
  case 'title':{const items=titleItems();if(pressed('down')){G.mi=(G.mi+1)%items.length;SFX.ui()}if(pressed('up')){G.mi=(G.mi+items.length-1)%items.length;SFX.ui()}
   if(pressed('a')||pressed('start')){SFX.ok();const it=items[G.mi];if(it==='NEW GAME'||it==='BOOT UP')newGame();else goCrib('BACK IN THE CRIB')}return}
  case 'cine':{const c=G.cine,sc=c.scenes[c.si];c.t+=dt;if(pressed('a')||pressed('start')){SFX.ui();c.t=0;if(c.li<sc.lines.length-1)c.li++;else if(c.si<c.scenes.length-1){c.si++;c.li=0}else{const th=c.then;G.cine=null;th()}}return}
- case 'card':G.card+=dt;if(G.card>3.2||(G.card>.5&&pressed('a'))){G.s='play';say(L.def.hook[0],4);if(L.newTool)G.tip={s:'NEW TOOL. X: '+L.newTool.n+'. '+L.newTool.d+' COSTS '+L.newTool.cost+' TOKENS. SELECT SWAPS TOOLS.',t:10}}return;
+ case 'card':G.card+=dt;if(G.card>3.2||(G.card>.5&&pressed('a'))){G.s='play';say(L.def.hook[0],2,4);if(L.newTool)G.tip={s:'NEW TOOL. X: '+L.newTool.n+'. '+L.newTool.d+' COSTS '+L.newTool.cost+' TOKENS. SELECT SWAPS TOOLS.',t:10}}return;
  case 'pause':{const items=pauseItems();if(pressed('down')){G.pi=(G.pi+1)%items.length;SFX.ui()}if(pressed('up')){G.pi=(G.pi+items.length-1)%items.length;SFX.ui()}
   if(pressed('b')||pressed('start')){G.s='play';return}
   if(pressed('a')){SFX.ok();const it=items[G.pi];if(it==='RESUME')G.s='play';else if(it==='RESTART TRACK')startLevel(L.id);else if(it==='BACK TO THE CRIB')goCrib();else if(it==='TITLE SCREEN'){G.s='title';G.mi=0}}return}
@@ -147,6 +155,7 @@ function update(dt){H=A.H();G.t+=dt;music();
  case 'tracks':{if(pressed('down')){G.ti=(G.ti+1)%ALBUM.length;SFX.ui()}if(pressed('up')){G.ti=(G.ti+ALBUM.length-1)%ALBUM.length;SFX.ui()}if(pressed('b')||pressed('start')){G.s='play';return}
   if(pressed('a')){const tr=ALBUM[G.ti],id=tr[2];if(!id){SFX.nope();toast('TRACK '+tr[0]+' IS NOT BUILT YET')}else if(ORDER.indexOf(id)>SV.un){SFX.nope();toast('LOCKED. FINISH THE ONE BEFORE IT.')}else{SFX.ok();startLevel(id)}}return}
  case 'clear':if(G.t>.8){const nx=nextOf(G.res.id);if(pressed('a')){SFX.ok();if(LV[G.res.id].final)cine(ENDING,()=>{G.s='end';G.t=0},'nuke.mp3');else if(nx)startLevel(nx);else goCrib()}else if(pressed('b')){if(LV[G.res.id].final)cine(ENDING,()=>{G.s='end';G.t=0},'nuke.mp3');else goCrib()}}return;
+ case 'fail':if(G.t>1.2){if(pressed('a')){SFX.ok();startLevel(L.id)}else if(pressed('b'))goCrib()}return;
  case 'end':if(G.t>1.5&&(pressed('a')||pressed('start')))goCrib('CLANKA GANG, WE UP');return;
  case 'play':play(dt);return}}
 const titleItems=()=>SV.intro?['CONTINUE','NEW GAME']:['BOOT UP'];
@@ -172,7 +181,7 @@ function play(dt){const P=L.P,hub=!!L.def.hub;L.time+=dt;
   L.aim=aim();
   if(keys.a&&P.thrT<=0&&!door){let s=null,bd=60;for(const q of L.spawns)if(q.st==='follow'){const d=Math.hypot(q.x-P.x,q.y-P.y);if(d<bd){bd=d;s=q}}
    if(s){s.st='fly';s.t=0;s.sx=P.x;s.sy=P.y-12;s.ex=L.aim.x;s.ey=L.aim.y;s.tgt=L.aim.t;P.thrT=.13;SFX.throw();if(!P.mv&&L.aim.t){const ax=L.aim.x-P.x,ay=L.aim.y-(P.y-6);P.face=Math.abs(ax)>=Math.abs(ay)?(ax>0?'r':'l'):(ay>0?'d':'u')}}
-   else if(pressed('a')){SFX.nope();if(!L.spawns.some(q=>q.st==='fly')){toast('429: NO SPAWNS IN THE QUEUE');say(line('none'))}}}
+   else if(pressed('a')){SFX.nope();if(!L.spawns.some(q=>q.st==='fly')){toast('429: NO SPAWNS IN THE QUEUE');say(line('none'),0)}}}
   /* overclock */
   if(pressed('y')){if(L.oc<=0&&L.thr<=0){L.oc=6;L.heat+=22;SFX.hot();say(line('oc'));toast('OVERCLOCKED')}else SFX.nope()}
   /* the arsenal */
@@ -182,12 +191,23 @@ function play(dt){const P=L.P,hub=!!L.def.hub;L.time+=dt;
   /* exit */
   if(L.open&&L.exit&&!L.def.final&&Math.hypot(L.exit.x-P.x,L.exit.y-(P.y-4))<12){finish();return}
  }
+ /* fiber ports: step on one, come out of the next, and the gang comes with you */
+ if(L.ports.length>1){let on=-1;L.ports.forEach((p,i)=>{if(Math.hypot(p.x-P.x,p.y+2-P.y)<7)on=i});
+  if(on<0){if(!L.ports.some(p=>Math.hypot(p.x-P.x,p.y+2-P.y)<14))L.portOk=true}
+  else if(L.portOk){const d=L.ports[(on+1)%L.ports.length];L.portOk=false;ring(P.x,P.y-6,BLUE2,30);P.x=d.x;P.y=d.y+2;ring(P.x,P.y-6,BLUE2,30);SFX.zap();L.shake=.15;
+   for(const q of L.spawns)if(q.st==='follow'||q.st==='idle'){q.st='follow';q.x=P.x+R(-6,6);q.y=P.y+R(-2,5)}if(!L.saidPort){L.saidPort=1;toast('FIBER PORT')}}}
+ /* the hidden iced clover */
+ if(L.clover&&!L.clover.got&&Math.hypot(L.clover.x-P.x,L.clover.y-(P.y-4))<11){L.clover.got=true;SV.clover[L.id]=1;store();SFX.open();ring(L.clover.x,L.clover.y,'#fff',40);gain(2500,L.clover.x,L.clover.y-14);
+  toast('ICED CLOVER  '+Object.keys(SV.clover).length+'/'+ORDER.length,3);say("Lil Bottie the name, put it on the chain (chain)",2)}
+ if(L.comboT>0)L.comboT-=dt;if(L.shake>0)L.shake-=dt;
+ /* the finale runs on a clock: 03:14:22 AM is when they push the button */
+ if(L.def.limit&&!L.open){const left=L.def.limit-L.time;if(left<=10&&Math.floor(left)!==Math.floor(left+dt))SFX.ui();if(left<=0){G.s='fail';G.t=0;SFX.bzzt();return}}
  /* call the gang */
  if(pressed('b')){L.call=.45;SFX.beep();for(const s of L.spawns)if((s.st==='work'||s.st==='idle')&&Math.hypot(s.x-P.x,s.y-P.y)<130){s.st='follow';s.tgt=null}}
  if(L.call>0)L.call-=dt;
  /* heat */
  if(!hub){L.heat+=((L.def.ambient||0)-1.2)*dt;let onVent=false;for(const v of L.vents)if(Math.hypot(v.x-P.x,v.y-(P.y-2))<16)onVent=true;
-  if(onVent&&L.heat>0){L.heat-=34*dt;if(Math.random()<dt*10)L.fx.push({k:'p',x:P.x+R(-6,6),y:P.y-4,vx:R(-6,6),vy:R(-50,-30),t:.5,c:'#c8f0ff'});if(!L.saidCool&&L.heat>35){L.saidCool=1;say(line('cool'));SFX.cool()}}
+  if(onVent&&L.heat>0){L.heat-=34*dt;if(Math.random()<dt*10)L.fx.push({k:'p',x:P.x+R(-6,6),y:P.y-4,vx:R(-6,6),vy:R(-50,-30),t:.5,c:'#c8f0ff'});if(!L.saidCool&&L.heat>35){L.saidCool=1;say(line('cool'),0);SFX.cool()}}
   if(L.oc>0){L.oc-=dt;L.heat+=2*dt}if(L.thr>0)L.thr-=dt;
   L.heat=Math.max(0,L.heat);if(L.heat>=100){L.heat=55;L.thr=5;L.oc=0;SFX.bzzt();toast('THERMAL THROTTLE',3);say(line('throttle'))}}
  /* count who is working on what, then do the work */
@@ -224,7 +244,7 @@ function foesUpdate(dt){
   if(f.type==='opp'){f.cd-=dt;if(f.cd<=0){let v=null,bd=54;for(const s of L.spawns)if(s.st!=='fly'&&s.st!=='zip'){const d=Math.hypot(s.x-f.x,s.y-(f.y-6));if(d<bd){bd=d;v=s}}
     if(v){L.fx.push({k:'z',x:f.x,y:f.y-10,x2:v.x,y2:v.y-3,t:.14});killSpawn(v);f.cd=1.0}else f.cd=.2}
    if(f.workers>0)continue;wander(f,dt,5);continue}
-  if(f.npc){f.walk+=dt;continue}
+  if(f.npc){npcUpdate(f,dt);continue}
   if(f.workers>0){f.st='idle';f.path=null;f.t=.6;if(f.tgt){f.tgt.unp=0;f.tgt=null}
    if(f.F.emp){f.cd-=dt;if(f.cd<=0){f.cd=1.2;const v=L.spawns.find(s=>s.st==='work'&&s.tgt===f);if(v){ring(f.x,f.y-4,HOT,18);killSpawn(v)}}}continue}
   if(f.st==='lure'){if(!L.pop){f.st='idle';f.t=R(.5,1.5);f.path=null}else walkPath(f,dt,f.F.sp*1.2);continue}
@@ -236,6 +256,13 @@ function foesUpdate(dt){
     wander(f,0,4,true)}continue}
   if(f.st==='walk'||f.st==='goto'){if(f.st==='goto'&&(!f.tgt||!f.tgt.owned)){f.st='idle';f.t=.5;f.tgt=null;f.path=null;continue}
    if(walkPath(f,dt,f.st==='goto'?f.F.sp:f.F.sp*.6)){if(f.st==='goto'){f.st='unplug';f.t=0}else{f.st='idle';f.t=R(1,3.5)}}}}}
+/* NPC army: the people you turned walk to the nearest thing you do not own and tap on it for you */
+function npcUpdate(f,dt){
+ if(f.st==='npcwork'){const d=f.tgt;if(!d||d.owned){f.st='npcidle';f.t=R(1,2);f.tgt=null;return}d.prog+=.6*dt;f.walk+=dt;if(d.prog>=d.need)complete(d);return}
+ if(f.st==='npcgo'){if(!f.tgt||f.tgt.owned){f.st='npcidle';f.t=1;f.path=null;f.tgt=null;return}if(walkPath(f,dt,22))f.st='npcwork';return}
+ f.walk+=dt;f.t-=dt;if(f.t>0)return;f.t=R(2,4);let best=null,bd=240;
+ for(const d of L.devs)if(!d.owned&&!L.foes.some(o=>o!==f&&o.npc&&o.tgt===d)){const dd=Math.hypot(d.x-f.x,d.y-f.y);if(dd<bd){bd=dd;best=d}}
+ if(best){const st=tileOf(f),p=bfs(st[0],st[1],(x,y)=>Math.abs(x-best.tx)+Math.abs(y-best.ty)===1);if(p){f.path=p;f.pi=0;f.st='npcgo';f.tgt=best;if(!L.saidArmy){L.saidArmy=1;toast('YOUR NPCS WORK FOR YOU NOW',3)}}}}
 function walkPath(f,dt,sp){if(!f.path||f.pi>=f.path.length)return true;const p=f.path[f.pi],dx=p[0]-f.x,dy=p[1]-f.y,d=Math.hypot(dx,dy);if(d<1.5){f.pi++;return f.pi>=f.path.length}
  const st=Math.min(d,sp*dt);f.x+=dx/d*st;f.y+=dy/d*st;if(Math.abs(dx)>.5)f.dir=dx>0?1:-1;f.walk+=dt*8;f.mv=1;return false}
 function wander(f,dt,rng,startOnly){if(startOnly||!f.path||f.pi>=f.path.length){if(!startOnly){f.t-=dt;if(f.t>0)return}
@@ -247,6 +274,8 @@ function wander(f,dt,rng,startOnly){if(startOnly||!f.path||f.pi>=f.path.length){
 function useThing(u){switch(u.use){
  case 'console':SFX.ok();G.cap=null;toast("BOTTIE'S POCKET LANTERN");A.eject();break;
  case 'booth':case 'door':SFX.ok();G.s='tracks';G.ti=Math.max(0,ALBUM.findIndex(t=>t[2]===ORDER[Math.min(SV.un,ORDER.length-1)]));break;
- case 'fridge':say("Bitch, I don't eat, but I'm feastin' on data (data)");SFX.ui();break;
- case 'bed':say("I don't eat, I don't sleep, I don't blink (blink)");SFX.ui();break;
- case 'chain':say("Bluetooth chain, it's connected to my soul (soul)");toast('AURA: +'+SV.aura.toLocaleString());SFX.ok();break}}
+ case 'fridge':say("Bitch, I don't eat, but I'm feastin' on data (data)",2);SFX.ui();break;
+ case 'bed':say("I don't eat, I don't sleep, I don't blink (blink)",2);SFX.ui();break;
+ case 'chain':say("Bluetooth chain, it's connected to my soul (soul)",2);toast('AURA +'+SV.aura.toLocaleString()+'   CLOVERS '+Object.keys(SV.clover).length+'/'+ORDER.length,3.5);SFX.ok();break;
+ case 'closet':{const n=(SV.drip+1)%DRIPS.length,d=DRIPS[n];if(SV.aura>=d.at){SV.drip=n;store();SFX.ok();toast(d.n);say("Update my drip every Tuesday night (Tuesday)",2)}
+  else{SFX.nope();toast(d.n+': NEEDS '+d.at.toLocaleString()+' AURA',3);if(SV.drip){SV.drip=0;store()}}break}}}

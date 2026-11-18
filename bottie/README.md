@@ -6,7 +6,7 @@ more spawns. Spawns got spawns.
 
 - **Play it:** `games/pocket-lantern-bottie.html` (one file; it boots straight into the Bottie game)
 - **Build it:** `python3 bottie/build.py` from the repo root
-- **Test it:** `node bottie/tests/bottie_lab.js` (30 checks; screenshots land in `playtest/`)
+- **Test it:** `node bottie/tests/bottie_lab.js` (43 checks; screenshots land in `playtest/`)
 - **What changed:** [`CHANGELOG.md`](CHANGELOG.md)
 - **Lore package from Will:** `lore/artist-archive.pdf` and the five reference photos in `lore/`
 
@@ -42,9 +42,12 @@ and all five cartridges play from there. B on the shelf (or the button) goes bac
 - You cannot lose the gang for good: at zero spawns, three boot from backup.
 - **Tools** unlock one per track cleared: FORK BOMB, BLUE SCREEN, POP-UP, RM -RF. Tokens pay for them; you earn
   tokens by owning devices, making NPCs and crashing opp bots.
-- His lines appear in a speech bubble at his head.
+- His lines appear in a speech bubble at his head, and are kept rare (see `say` in `bt-2-game.js`).
+- Takes in a row build an **aura combo** up to x8. **NPCs** you make go and hack for you. **Fiber ports** carry you
+  and the gang across a level. Each track hides an **iced clover**. The finale runs on a five-minute **clock**.
+  The closet in the crib changes his **drip** once you have the aura.
 
-## What is built (v0.3)
+## What is built (v0.4)
 
 Six tracks, the crib, an intro and an ending. The other eight album tracks show as NOT BUILT in the tracklist.
 

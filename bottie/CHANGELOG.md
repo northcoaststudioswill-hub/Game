@@ -1,5 +1,30 @@
 # lil Bottie: Clankin' in the Cloud — changelog
 
+## v0.4 (Nov 18 2026): fewer quips, more fun, playtest pass
+
+Will: "Too many quips are popping up, some are good but it's too much. Do a playtest and improve the game, add
+more fun elements."
+
+- **Quips cut down.** Lines now have a priority. Big moments always speak (the track's hook, the port opening,
+  finding a clover, things you press A on in the crib). Ordinary lines (owning a device, a firewall, an NPC, a tool)
+  share one slot every 16 seconds. Filler (a spawn dying, a wrong captcha, cooling off) is rare. The second
+  "spawns got spawns" line after every first own is gone. Measured on the autopilot: 3 to 8 lines a track.
+- **Aura combo.** Each thing you take within 4 seconds of the last multiplies the aura, up to x8, with the number
+  popping out of the thing, a small screen shake, and the combo shown above the tool bar.
+- **NPC army.** People you turn into NPCs now walk to the nearest device you do not own and tap on it for you.
+- **Fiber ports.** Blue pads in Born in the Server, The Algorithm and Nuke: step on one, come out of the other,
+  and the gang comes with you.
+- **Iced clovers.** One hidden in every track. They show in the tracklist and on the chain in the crib.
+- **The finale has a clock.** It counts from 03:09:22 AM to 03:14:22 AM (five minutes). Run out and they push
+  the button; A runs it back. It is the only track you can fail.
+- **Drip.** A closet in the crib swaps the puffer: silver, then ice at 25,000 aura, gold at 75,000, blackout at 150,000.
+- Results screen adds best combo and whether the clover was found.
+- **Playtest pass** (autopilot through all six tracks plus frames read by eye): the combo label sat on top of
+  toasts, so it moved down above the tool bar. The finale now takes the autopilot 127 s of its 300 s.
+- Lab is 43 checks, all passing.
+
+Still not played by a person or on a phone.
+
 ## v0.3 (Nov 18 2026): two more songs, quips at his head, the arsenal, playtest pass
 
 Will sent The Algorithm and Nuke the Data Center, asked for the songs to be reused through the game until the

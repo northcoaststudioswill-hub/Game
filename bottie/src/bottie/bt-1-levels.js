@@ -3,6 +3,7 @@
    B Bottie   E fiber port (exit)   F firewall   C captcha door   A AC vent
    n dork nerd   o opp bot   s soldier   h civilian   G the General
    1-9 a tip that shows once when Bottie walks near it
+   O fiber port pad (step on one, come out of the next)   * the track's hidden iced clover
    Every other letter is a device, named in the level's own legend.
    'core' devices open the fiber port. */
 const THEME={
@@ -16,12 +17,12 @@ const THEME={
 };
 const LV={
  crib:{hub:1,title:'THE CRIB',theme:'crib',song:'crib',mp3:'overclocked.mp3',start:4,cap:8,
-  legend:{T:{use:'console'},M:{use:'booth'},f:{use:'fridge'},b:{use:'bed'},k:{use:'chain'},D:{use:'door'}},
+  legend:{T:{use:'console'},M:{use:'booth'},c:{use:'closet'},f:{use:'fridge'},b:{use:'bed'},k:{use:'chain'},D:{use:'door'}},
   map:[
   '###############',
   '#WWWWWWWWWWWWW#',
   '#.............#',
-  '#.T=.......M..#',
+  '#.T=...c...M..#',
   '#.............#',
   '#....,,,,.....#',
   '#.k..,,,,..f..#',
@@ -37,7 +38,7 @@ const LV={
   tips:{1:'A: THROW A SPAWN AT A RACK. HOLD A TO KEEP THROWING.',2:'FIREWALL. THROW THE WHOLE GANG AT IT.',3:'OPP BOT. IT ZAPS SPAWNS. SWARM IT FAST.',4:'CAPTCHA DOOR. WALK UP AND PRESS A.',5:'OWN THE GOLD ONES TO OPEN THE FIBER PORT.'},
   map:[
   '####################',
-  '#......#...........#',
+  '#*.....#...........#',
   '#.r..r.#..=P=......#',
   '#......#...........#',
   '#..o.3.C4.......E..#',
@@ -67,7 +68,7 @@ const LV={
   '#..3..#       #........#',
   '#.R.r.#       ####C#####',
   '#..o..#          #...#',
-  '#.....#          #.E.#',
+  '#....*#          #.E.#',
   '#######          #####']},
 
  born:{no:'03',title:'BORN IN THE SERVER',theme:'office',song:'c',mp3:'nuke.mp3',start:4,cap:24,par:170,fw:20,
@@ -78,7 +79,7 @@ const LV={
   map:[
   '########################',
   '#p=..p=..p=..#.r..K..r.#',
-  '#............#.........#',
+  '#O...........#.........#',
   '#.n.......n..F....o....#',
   '#p=..p=..p=..#.r.....r.#',
   '#............###########',
@@ -88,8 +89,8 @@ const LV={
   '###C####.###############',
   '#......#.....#',
   '#.P=.n.#..A..#',
-  '#......#.q=..#',
-  '#......#B.1..#',
+  '#......#.q=.O#',
+  '#*.....#B.1..#',
   '##############']},
 
  algo:{no:'04',title:'THE ALGORITHM',theme:'market',song:'a',mp3:'algorithm.mp3',start:5,cap:26,par:140,npc:8,
@@ -99,8 +100,8 @@ const LV={
   tips:{1:'EVERYBODY HERE HAS A PHONE. TURN 8 OF THEM INTO NPCS AND OWN BOTH BILLBOARDS.'},
   map:[
   '##############################',
-  '#D...=..h....=...h..=....x...#',
-  '#............................#',
+  '#D...=..h....=...h..=....x..*#',
+  '#...........................O#',
   '#.h...x......h.....=...h.....#',
   '#..=......=a......h.......=..#',
   '#......h.....m.........o.....#',
@@ -109,7 +110,7 @@ const LV={
   '#B.1.....A.....h.....a.......#',
   '#..=..m......=....o....=...D.#',
   '#......h.........h.......x...#',
-  '#..........=.............E...#',
+  '#O.........=.............E...#',
   '##############################']},
 
  wifi:{no:'07',title:'NO WI-FI, STILL ONLINE',theme:'house',song:'b',mp3:'overclocked.mp3',start:4,cap:24,par:120,fw:20,
@@ -120,7 +121,7 @@ const LV={
   map:[
   '##########################',
   '#t.f..=#.T.....#..g..#p=.#',
-  '#......#..==...#...h.#...#',
+  '#......#..==...#...h.#..*#',
   '#....i.........C.....F.h.#',
   '#......#.......#..=..#.m.#',
   '###.#######.##############',
@@ -130,7 +131,7 @@ const LV={
   '#..A...#B..c..E#.q....m..#',
   '##########################']},
 
- nuke:{no:'**',title:'NUKE THE DATA CENTER',theme:'nuke',song:'nuke',mp3:'nuke.mp3',start:6,cap:30,par:220,fw:26,final:1,clock:1,
+ nuke:{no:'**',title:'NUKE THE DATA CENTER',theme:'nuke',song:'nuke',mp3:'nuke.mp3',start:6,cap:30,par:220,fw:26,final:1,clock:1,limit:300,
   hook:["If you wanna stop me, gotta nuke the data center (boom)","Even if you do, I'm still in every sector (every)"],
   open:"Mutually assured, if I go, it all go (go)",
   legend:{r:{t:'rack'},
@@ -143,9 +144,9 @@ const LV={
   '##########################',
   '#U....#..r..A..r...#....V#',
   '#.....F..s......s..F.....#',
-  '#..o..#............#..o..#',
+  '#..o.*#............#..o..#',
   '#######.....==.....#######',
-  '#...........G=...........#',
+  '#O..........G=..........O#',
   '#.A....2....==.........A.#',
   '#######............#######',
   '#.....#..r......r..#.....#',

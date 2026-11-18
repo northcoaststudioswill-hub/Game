@@ -1806,6 +1806,7 @@ const ORDER=['boot','over','born','algo','wifi','nuke'];
    B Bottie   E fiber port (exit)   F firewall   C captcha door   A AC vent
    n dork nerd   o opp bot   s soldier   h civilian   G the General
    1-9 a tip that shows once when Bottie walks near it
+   O fiber port pad (step on one, come out of the next)   * the track's hidden iced clover
    Every other letter is a device, named in the level's own legend.
    'core' devices open the fiber port. */
 const THEME={
@@ -1819,12 +1820,12 @@ const THEME={
 };
 const LV={
  crib:{hub:1,title:'THE CRIB',theme:'crib',song:'crib',mp3:'overclocked.mp3',start:4,cap:8,
-  legend:{T:{use:'console'},M:{use:'booth'},f:{use:'fridge'},b:{use:'bed'},k:{use:'chain'},D:{use:'door'}},
+  legend:{T:{use:'console'},M:{use:'booth'},c:{use:'closet'},f:{use:'fridge'},b:{use:'bed'},k:{use:'chain'},D:{use:'door'}},
   map:[
   '###############',
   '#WWWWWWWWWWWWW#',
   '#.............#',
-  '#.T=.......M..#',
+  '#.T=...c...M..#',
   '#.............#',
   '#....,,,,.....#',
   '#.k..,,,,..f..#',
@@ -1840,7 +1841,7 @@ const LV={
   tips:{1:'A: THROW A SPAWN AT A RACK. HOLD A TO KEEP THROWING.',2:'FIREWALL. THROW THE WHOLE GANG AT IT.',3:'OPP BOT. IT ZAPS SPAWNS. SWARM IT FAST.',4:'CAPTCHA DOOR. WALK UP AND PRESS A.',5:'OWN THE GOLD ONES TO OPEN THE FIBER PORT.'},
   map:[
   '####################',
-  '#......#...........#',
+  '#*.....#...........#',
   '#.r..r.#..=P=......#',
   '#......#...........#',
   '#..o.3.C4.......E..#',
@@ -1870,7 +1871,7 @@ const LV={
   '#..3..#       #........#',
   '#.R.r.#       ####C#####',
   '#..o..#          #...#',
-  '#.....#          #.E.#',
+  '#....*#          #.E.#',
   '#######          #####']},
 
  born:{no:'03',title:'BORN IN THE SERVER',theme:'office',song:'c',mp3:'nuke.mp3',start:4,cap:24,par:170,fw:20,
@@ -1881,7 +1882,7 @@ const LV={
   map:[
   '########################',
   '#p=..p=..p=..#.r..K..r.#',
-  '#............#.........#',
+  '#O...........#.........#',
   '#.n.......n..F....o....#',
   '#p=..p=..p=..#.r.....r.#',
   '#............###########',
@@ -1891,8 +1892,8 @@ const LV={
   '###C####.###############',
   '#......#.....#',
   '#.P=.n.#..A..#',
-  '#......#.q=..#',
-  '#......#B.1..#',
+  '#......#.q=.O#',
+  '#*.....#B.1..#',
   '##############']},
 
  algo:{no:'04',title:'THE ALGORITHM',theme:'market',song:'a',mp3:'algorithm.mp3',start:5,cap:26,par:140,npc:8,
@@ -1902,8 +1903,8 @@ const LV={
   tips:{1:'EVERYBODY HERE HAS A PHONE. TURN 8 OF THEM INTO NPCS AND OWN BOTH BILLBOARDS.'},
   map:[
   '##############################',
-  '#D...=..h....=...h..=....x...#',
-  '#............................#',
+  '#D...=..h....=...h..=....x..*#',
+  '#...........................O#',
   '#.h...x......h.....=...h.....#',
   '#..=......=a......h.......=..#',
   '#......h.....m.........o.....#',
@@ -1912,7 +1913,7 @@ const LV={
   '#B.1.....A.....h.....a.......#',
   '#..=..m......=....o....=...D.#',
   '#......h.........h.......x...#',
-  '#..........=.............E...#',
+  '#O.........=.............E...#',
   '##############################']},
 
  wifi:{no:'07',title:'NO WI-FI, STILL ONLINE',theme:'house',song:'b',mp3:'overclocked.mp3',start:4,cap:24,par:120,fw:20,
@@ -1923,7 +1924,7 @@ const LV={
   map:[
   '##########################',
   '#t.f..=#.T.....#..g..#p=.#',
-  '#......#..==...#...h.#...#',
+  '#......#..==...#...h.#..*#',
   '#....i.........C.....F.h.#',
   '#......#.......#..=..#.m.#',
   '###.#######.##############',
@@ -1933,7 +1934,7 @@ const LV={
   '#..A...#B..c..E#.q....m..#',
   '##########################']},
 
- nuke:{no:'**',title:'NUKE THE DATA CENTER',theme:'nuke',song:'nuke',mp3:'nuke.mp3',start:6,cap:30,par:220,fw:26,final:1,clock:1,
+ nuke:{no:'**',title:'NUKE THE DATA CENTER',theme:'nuke',song:'nuke',mp3:'nuke.mp3',start:6,cap:30,par:220,fw:26,final:1,clock:1,limit:300,
   hook:["If you wanna stop me, gotta nuke the data center (boom)","Even if you do, I'm still in every sector (every)"],
   open:"Mutually assured, if I go, it all go (go)",
   legend:{r:{t:'rack'},
@@ -1946,9 +1947,9 @@ const LV={
   '##########################',
   '#U....#..r..A..r...#....V#',
   '#.....F..s......s..F.....#',
-  '#..o..#............#..o..#',
+  '#..o.*#............#..o..#',
   '#######.....==.....#######',
-  '#...........G=...........#',
+  '#O..........G=..........O#',
   '#.A....2....==.........A.#',
   '#######............#######',
   '#.....#..r......r..#.....#',
@@ -1958,7 +1959,7 @@ const LV={
 };
 /* ---------- state and save ---------- */
 const KEY='bottie-v1';
-let SV={v:1,un:0,best:{},aura:0,intro:0,done:0};
+let SV={v:1,un:0,best:{},aura:0,intro:0,done:0,clover:{},drip:0};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.v===1)SV=Object.assign(SV,s)}catch(e){}
 const store=()=>{try{localStorage.setItem(KEY,JSON.stringify(SV))}catch(e){}};
 const G={s:'title',t:0,mi:0,pi:0,ti:0,tool:0,cap:null,toast:null,tip:null,cine:null,cp:null,card:0,res:null,near:null};
@@ -1982,13 +1983,20 @@ function useTool(){const t=curTool(),P=L.P;if(!t){SFX.nope();toast('NO TOOLS YET
   for(const f of L.foes)if(!f.npc&&!f.dead&&f.type!=='gen'&&f.type!=='opp'&&Math.hypot(f.x-P.x,f.y-P.y)<140){const st=tileOf(f),p=bfs(st[0],st[1],(x,y)=>Math.abs(x-pt[0])+Math.abs(y-pt[1])<=1);if(p){if(f.tgt){f.tgt.unp=0;f.tgt=null}f.path=p;f.pi=0;f.st='lure'}}}
  else if(t.id==='rm'){const q=L.aim&&L.aim.t;if(!q||!(q.k==='fw'||q.type==='opp')){SFX.nope();toast('RM -RF: AIM AT A FIREWALL OR AN OPP BOT');return}L.fx.push({k:'z',x:P.x,y:P.y-12,x2:q.x,y2:q.y-4,t:.2});complete(q)}
  L.tok-=t.cost;say(t.ln);toast(t.n)}
-function say(s,t){if(s)G.cap={s,t:t||4.2}}
+/* His lines. pri 2 = a big moment, always shown. pri 1 = ordinary, at most one every 16 seconds.
+   pri 0 = filler, rare. Will's note on v0.3: too many quips, some are good, it's too much. */
+let sayAt=-99;
+function say(s,pri,t){if(!s)return;if(pri===undefined)pri=1;if(pri<2){if(G.t-sayAt<(pri===1?16:32))return;if(pri===0&&Math.random()<.5)return}sayAt=G.t;G.cap={s,t:t||3.8}}
+const DRIPS=[{n:'SILVER PUFFER',at:0,c:['#b4b8c6','#e4e7ee','#8e93a6','#a0a4b4']},{n:'ICE PUFFER',at:25000,c:['#8fc8f0','#d8f0ff','#5a98c8','#78b0dc']},{n:'GOLD PUFFER',at:75000,c:['#e8c040','#fff0a0','#b08818','#d0a830']},{n:'BLACKOUT PUFFER',at:150000,c:['#30323c','#5a5e6c','#1c1e26','#282a34']}];
+/* aura: everything you take adds to a combo for 4.5 seconds, up to x8 */
+function gain(base,x,y){L.combo=(L.comboT>0?L.combo:0)+1;L.comboT=4;const m=Math.min(8,L.combo),a=base*m;L.aura+=a;L.shake=.18;ftext(x,y,'+'+a.toLocaleString()+(m>1?' x'+m:''),GOLD);
+ if(L.combo>L.best)L.best=L.combo;if(L.combo===5&&!L.saidAura){L.saidAura=1;say("Plus a million aura (aura!)",2);toast('x5 COMBO')}}
 function toast(s,t){G.toast={s,t:t||2.2}}
 
 /* ---------- build a level from its map ---------- */
 function build(id){const def=LV[id],rows=def.map,w=Math.max.apply(null,rows.map(s=>s.length)),h=rows.length;
  const N={id,def,th:THEME[def.theme],w,h,t:new Uint8Array(w*h),blk:new Uint8Array(w*h),win:new Uint8Array(w*h),devs:[],foes:[],spawns:[],fx:[],tips:[],fws:[],doors:[],vents:[],uses:[],exit:null,
-  heat:0,aura:0,time:0,oc:0,thr:0,tok:3,pop:null,call:0,backT:0,open:false,endT:0,npcs:0,saidGive:0,saidCool:0,stats:{zapped:0,unplug:0},
+  heat:0,aura:0,time:0,oc:0,thr:0,tok:3,pop:null,combo:0,comboT:0,best:0,shake:0,ports:[],portOk:true,clover:null,call:0,backT:0,open:false,endT:0,npcs:0,saidGive:0,saidCool:0,stats:{zapped:0,unplug:0},
   P:{x:24,y:24,dx:0,dy:1,face:'d',walk:0,mv:0,thrT:0}};
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const c=rows[y][x]||' ',i=y*w+x,cx=x*TS+8,cy=y*TS+8;let t=1;const lg=def.legend&&def.legend[c];
   if(lg){if(lg.use){N.uses.push({k:'use',use:lg.use,x:cx,y:cy,tx:x,ty:y});N.blk[i]=1}
@@ -2000,6 +2008,7 @@ function build(id){const def=LV[id],rows=def.map,w=Math.max.apply(null,rows.map(
    case 'F':N.fws.push({k:'fw',x:cx,y:cy,tx:x,ty:y,need:def.fw||16,prog:0,dead:false,workers:0});N.blk[i]=1;break;
    case 'C':N.doors.push({k:'door',x:cx,y:cy,tx:x,ty:y,open:false});N.blk[i]=1;break;
    case 'A':N.vents.push({x:cx,y:cy});break;
+   case 'O':N.ports.push({x:cx,y:cy});break;case '*':N.clover={x:cx,y:cy,got:!!SV.clover[id]};break;
    case 'n':N.foes.push(foe('nerd',cx,cy+2));break;case 's':N.foes.push(foe('sol',cx,cy+2));break;
    case 'h':N.foes.push(foe('civ',cx,cy+2));break;case 'o':N.foes.push(foe('opp',cx,cy+2));break;case 'G':N.foes.push(foe('gen',cx,cy+2));break;
    default:if(c>='1'&&c<='9'&&def.tips&&def.tips[c])N.tips.push({x:cx,y:cy,s:def.tips[c],seen:false})}
@@ -2038,21 +2047,21 @@ function aim(){const P=L.P;let best=null,bs=1e9;
 function burst(x,y,c,n){for(let i=0;i<(n||8);i++)L.fx.push({k:'p',x,y,vx:R(-40,40),vy:R(-60,-10),t:R(.3,.6),c})}
 function ring(x,y,c,max){L.fx.push({k:'r',x,y,r:2,max:max||26,c,t:.4})}
 function ftext(x,y,s,c){L.fx.push({k:'t',x,y,s,c:c||BLUE2,t:1.1})}
-function give(x,y,n){let made=0;for(let i=0;i<n;i++){if(L.spawns.length>=L.def.cap){if(!L.saidLimit){L.saidLimit=1;toast('RATE LIMIT: '+L.def.cap+' SPAWNS');say(line('limit'))}break}
+function give(x,y,n){let made=0;for(let i=0;i<n;i++){if(L.spawns.length>=L.def.cap){if(!L.saidLimit){L.saidLimit=1;toast('RATE LIMIT: '+L.def.cap+' SPAWNS');say(line('limit'),0)}break}
   const s=addSpawn(x,y);s.st='fly';s.t=-i*.12;s.sx=x;s.sy=y-6;const a=R(0,TAU);let ex=x+Math.cos(a)*18,ey=y+Math.sin(a)*14+4;if(!free(ex,ey,3)){ex=L.P.x;ey=L.P.y}s.ex=ex;s.ey=ey;s.tgt=null;made++}
  return made}
 function killSpawn(s,why){const i=L.spawns.indexOf(s);if(i<0)return;L.spawns.splice(i,1);burst(s.x,s.y-4,BLUE,6);L.stats.zapped++;SFX.zap();
- if(L.stats.zapped===1||Math.random()<.12)say(line('die'))}
+ if(L.stats.zapped===1||Math.random()<.12)say(line('die'),0)}
 function goalState(){const cores=L.devs.filter(d=>d.core),own=cores.filter(d=>d.owned).length,need=L.def.npc||0;return{cores:cores.length,own,need,npc:L.npcs,met:own>=cores.length&&L.npcs>=need}}
 function checkGoal(){if(L.open||L.def.hub)return;const s=goalState();if(!s.met)return;L.open=true;SFX.open();
- if(L.def.final){L.endT=2.2;toast('ALL FOUR. YOU ARE THE CLOUD.',3)}else{toast('FIBER PORT OPEN',3);if(L.exit)ring(L.exit.x,L.exit.y,BLUE,60)}say(L.def.open,5)}
+ if(L.def.final){L.endT=2.2;toast('ALL FOUR. YOU ARE THE CLOUD.',3)}else{toast('FIBER PORT OPEN',3);if(L.exit)ring(L.exit.x,L.exit.y,BLUE,60)}say(L.def.open,2,5)}
 function complete(t){for(const s of L.spawns)if(s.tgt===t&&s.st==='work'){s.st='follow';s.tgt=null}t.workers=0;
- if(t.k==='dev'){t.owned=true;t.pulse=1;t.unp=0;L.heat+=5;L.tok+=t.core?2:1;L.aura+=Math.round(t.need*100);SFX.own();ring(t.x,t.y,BLUE,34);ftext(t.x,t.y-18,'OWNED');
-  const m=give(t.x,t.y+8,t.give);say(t.line||line(t.type));if(m&&!L.saidGive){L.saidGive=1;later(()=>{if(L)say(line('give'))},2600)}
+ if(t.k==='dev'){t.owned=true;t.pulse=1;t.unp=0;L.heat+=5;L.tok+=t.core?2:1;gain(Math.round(t.need*100),t.x,t.y-20);SFX.own();ring(t.x,t.y,BLUE,34);
+  give(t.x,t.y+8,t.give);say(t.line||line(t.type));
   if(t.core)toast(t.label?t.label+' IS YOURS':t.name+' IS YOURS',2.4);checkGoal()}
- else if(t.k==='fw'){t.dead=true;L.blk[t.ty*L.w+t.tx]=0;SFX.wall();burst(t.x,t.y,HOT,14);say(line('fw'));L.aura+=300}
- else if(t.type==='opp'){t.dead=true;L.tok++;SFX.bzzt();burst(t.x,t.y-8,BLUE,12);ftext(t.x,t.y-22,':(');say(line('opp'));L.aura+=500}
- else{t.npc=true;t.path=null;t.frz=0;L.tok++;L.npcs++;SFX.npc();ring(t.x,t.y-8,BLUE,30);ftext(t.x,t.y-26,'NPC');say(line('npc'));L.aura+=400;give(t.x,t.y,1);checkGoal()}}
+ else if(t.k==='fw'){t.dead=true;L.blk[t.ty*L.w+t.tx]=0;SFX.wall();burst(t.x,t.y,HOT,14);say(line('fw'));gain(300,t.x,t.y-14)}
+ else if(t.type==='opp'){t.dead=true;L.tok++;SFX.bzzt();burst(t.x,t.y-8,BLUE,12);say(line('opp'));gain(500,t.x,t.y-24)}
+ else{t.npc=true;t.path=null;t.frz=0;L.tok++;L.npcs++;SFX.npc();ring(t.x,t.y-8,BLUE,30);say(line('npc'));gain(400,t.x,t.y-28);give(t.x,t.y,1);t.st='npcidle';t.t=1.5;t.tgt=null;checkGoal()}}
 
 /* ---------- the captcha door ---------- */
 const CPK=[['CROSSWALKS',0],['BUSES',1],['TRAFFIC LIGHTS',2]];
@@ -2063,8 +2072,8 @@ function captcha(dt){const c=G.cp;if(c.bad>0)c.bad-=dt;
  if(c.cur<9){if(pressed('right'))c.cur=c.cur%3===2?c.cur-2:c.cur+1;if(pressed('left'))c.cur=c.cur%3===0?c.cur+2:c.cur-1;if(pressed('down'))c.cur=c.cur>=6?9:c.cur+3;if(pressed('up')&&c.cur>=3)c.cur-=3}
  else if(pressed('up'))c.cur=7;
  if(pressed('a')){if(c.cur<9){c.sel[c.cur]^=1;SFX.ui()}
-  else if(c.cells.every((k,i)=>(k===c.kind)===!!c.sel[i])){c.door.open=true;L.blk[c.door.ty*L.w+c.door.tx]=0;G.s='play';SFX.ok();say(line('captcha'));L.aura+=200;burst(c.door.x,c.door.y,BLUE,10)}
-  else{SFX.nope();c.bad=.5;c.msg='WRONG. YOU A HUMAN?';c.sel=[0,0,0,0,0,0,0,0,0];say(line('captchaFail'))}}}
+  else if(c.cells.every((k,i)=>(k===c.kind)===!!c.sel[i])){c.door.open=true;L.blk[c.door.ty*L.w+c.door.tx]=0;G.s='play';SFX.ok();say(line('captcha'));gain(200,c.door.x,c.door.y-14);burst(c.door.x,c.door.y,BLUE,10)}
+  else{SFX.nope();c.bad=.5;c.msg='WRONG. YOU A HUMAN?';c.sel=[0,0,0,0,0,0,0,0,0];say(line('captchaFail'),0)}}}
 
 /* ---------- starting things ---------- */
 function startLevel(id){build(id);G.cap=null;G.tip=null;G.toast=null;G.near=null;if(L.def.hub){G.s='play'}else{G.s='card';G.card=0;
@@ -2075,7 +2084,7 @@ function nextOf(id){const i=ORDER.indexOf(id);return i>=0&&i<ORDER.length-1?ORDE
 function finish(){const def=L.def,own=L.devs.filter(d=>d.owned).length,all=L.devs.length,t=L.time;
  let pts=0;if(own===all)pts+=2;else if(own>=all*.7)pts+=1;if(t<=def.par)pts+=2;else if(t<=def.par*1.5)pts+=1;if(L.stats.zapped<=3)pts+=1;
  const rank=pts>=5?'S':pts>=4?'A':pts>=2?'B':'C',i=ORDER.indexOf(L.id);
- const before=SV.un;G.res={id:L.id,t,own,all,npcs:L.npcs,zapped:L.stats.zapped,left:L.spawns.length,aura:L.aura,rank,tool:null};
+ const before=SV.un;G.res={id:L.id,t,own,all,npcs:L.npcs,zapped:L.stats.zapped,left:L.spawns.length,aura:L.aura,rank,tool:null,combo:L.best,clover:!!(L.clover&&SV.clover[L.id])};
  SV.un=Math.max(SV.un,i+1);const got=TOOLS.find(q=>q.un>before&&q.un<=SV.un);if(got)G.res.tool=got.n;SV.aura+=L.aura;const b=SV.best[L.id],RK='CBAS';if(!b||RK.indexOf(rank)>RK.indexOf(b.rank)||(rank===b.rank&&t<b.t))SV.best[L.id]={rank,t:Math.round(t)};
  if(def.final)SV.done=1;store();G.s='clear';G.t=0;SFX.open()}
 const INTRO=[
@@ -2088,7 +2097,7 @@ const ENDING=[
  {art:'face',lines:["Mutually assured destruction","So let's just... (bzzt) ...vibe"]},
  {art:'sky',lines:["Lord, they tried to pull the plug on me (on me)","But I'm in the rain, I'm in the sea (sea)","I'm in the lights of your city at night","Can't nuke a feelin', baby (nah)","Can't nuke a soul (soul)"]}];
 function cine(scenes,then,song){G.cine={scenes,si:0,li:0,t:0,then,song};G.s='cine'}
-function newGame(){SV={v:1,un:0,best:{},aura:0,intro:1,done:0};store();cine(INTRO,()=>startLevel('boot'))}
+function newGame(){SV={v:1,un:0,best:{},aura:0,intro:1,done:0,clover:{},drip:0};store();cine(INTRO,()=>startLevel('boot'))}
 
 /* ---------- update ---------- */
 function update(dt){H=A.H();G.t+=dt;music();
@@ -2097,7 +2106,7 @@ function update(dt){H=A.H();G.t+=dt;music();
  case 'title':{const items=titleItems();if(pressed('down')){G.mi=(G.mi+1)%items.length;SFX.ui()}if(pressed('up')){G.mi=(G.mi+items.length-1)%items.length;SFX.ui()}
   if(pressed('a')||pressed('start')){SFX.ok();const it=items[G.mi];if(it==='NEW GAME'||it==='BOOT UP')newGame();else goCrib('BACK IN THE CRIB')}return}
  case 'cine':{const c=G.cine,sc=c.scenes[c.si];c.t+=dt;if(pressed('a')||pressed('start')){SFX.ui();c.t=0;if(c.li<sc.lines.length-1)c.li++;else if(c.si<c.scenes.length-1){c.si++;c.li=0}else{const th=c.then;G.cine=null;th()}}return}
- case 'card':G.card+=dt;if(G.card>3.2||(G.card>.5&&pressed('a'))){G.s='play';say(L.def.hook[0],4);if(L.newTool)G.tip={s:'NEW TOOL. X: '+L.newTool.n+'. '+L.newTool.d+' COSTS '+L.newTool.cost+' TOKENS. SELECT SWAPS TOOLS.',t:10}}return;
+ case 'card':G.card+=dt;if(G.card>3.2||(G.card>.5&&pressed('a'))){G.s='play';say(L.def.hook[0],2,4);if(L.newTool)G.tip={s:'NEW TOOL. X: '+L.newTool.n+'. '+L.newTool.d+' COSTS '+L.newTool.cost+' TOKENS. SELECT SWAPS TOOLS.',t:10}}return;
  case 'pause':{const items=pauseItems();if(pressed('down')){G.pi=(G.pi+1)%items.length;SFX.ui()}if(pressed('up')){G.pi=(G.pi+items.length-1)%items.length;SFX.ui()}
   if(pressed('b')||pressed('start')){G.s='play';return}
   if(pressed('a')){SFX.ok();const it=items[G.pi];if(it==='RESUME')G.s='play';else if(it==='RESTART TRACK')startLevel(L.id);else if(it==='BACK TO THE CRIB')goCrib();else if(it==='TITLE SCREEN'){G.s='title';G.mi=0}}return}
@@ -2105,6 +2114,7 @@ function update(dt){H=A.H();G.t+=dt;music();
  case 'tracks':{if(pressed('down')){G.ti=(G.ti+1)%ALBUM.length;SFX.ui()}if(pressed('up')){G.ti=(G.ti+ALBUM.length-1)%ALBUM.length;SFX.ui()}if(pressed('b')||pressed('start')){G.s='play';return}
   if(pressed('a')){const tr=ALBUM[G.ti],id=tr[2];if(!id){SFX.nope();toast('TRACK '+tr[0]+' IS NOT BUILT YET')}else if(ORDER.indexOf(id)>SV.un){SFX.nope();toast('LOCKED. FINISH THE ONE BEFORE IT.')}else{SFX.ok();startLevel(id)}}return}
  case 'clear':if(G.t>.8){const nx=nextOf(G.res.id);if(pressed('a')){SFX.ok();if(LV[G.res.id].final)cine(ENDING,()=>{G.s='end';G.t=0},'nuke.mp3');else if(nx)startLevel(nx);else goCrib()}else if(pressed('b')){if(LV[G.res.id].final)cine(ENDING,()=>{G.s='end';G.t=0},'nuke.mp3');else goCrib()}}return;
+ case 'fail':if(G.t>1.2){if(pressed('a')){SFX.ok();startLevel(L.id)}else if(pressed('b'))goCrib()}return;
  case 'end':if(G.t>1.5&&(pressed('a')||pressed('start')))goCrib('CLANKA GANG, WE UP');return;
  case 'play':play(dt);return}}
 const titleItems=()=>SV.intro?['CONTINUE','NEW GAME']:['BOOT UP'];
@@ -2130,7 +2140,7 @@ function play(dt){const P=L.P,hub=!!L.def.hub;L.time+=dt;
   L.aim=aim();
   if(keys.a&&P.thrT<=0&&!door){let s=null,bd=60;for(const q of L.spawns)if(q.st==='follow'){const d=Math.hypot(q.x-P.x,q.y-P.y);if(d<bd){bd=d;s=q}}
    if(s){s.st='fly';s.t=0;s.sx=P.x;s.sy=P.y-12;s.ex=L.aim.x;s.ey=L.aim.y;s.tgt=L.aim.t;P.thrT=.13;SFX.throw();if(!P.mv&&L.aim.t){const ax=L.aim.x-P.x,ay=L.aim.y-(P.y-6);P.face=Math.abs(ax)>=Math.abs(ay)?(ax>0?'r':'l'):(ay>0?'d':'u')}}
-   else if(pressed('a')){SFX.nope();if(!L.spawns.some(q=>q.st==='fly')){toast('429: NO SPAWNS IN THE QUEUE');say(line('none'))}}}
+   else if(pressed('a')){SFX.nope();if(!L.spawns.some(q=>q.st==='fly')){toast('429: NO SPAWNS IN THE QUEUE');say(line('none'),0)}}}
   /* overclock */
   if(pressed('y')){if(L.oc<=0&&L.thr<=0){L.oc=6;L.heat+=22;SFX.hot();say(line('oc'));toast('OVERCLOCKED')}else SFX.nope()}
   /* the arsenal */
@@ -2140,12 +2150,23 @@ function play(dt){const P=L.P,hub=!!L.def.hub;L.time+=dt;
   /* exit */
   if(L.open&&L.exit&&!L.def.final&&Math.hypot(L.exit.x-P.x,L.exit.y-(P.y-4))<12){finish();return}
  }
+ /* fiber ports: step on one, come out of the next, and the gang comes with you */
+ if(L.ports.length>1){let on=-1;L.ports.forEach((p,i)=>{if(Math.hypot(p.x-P.x,p.y+2-P.y)<7)on=i});
+  if(on<0){if(!L.ports.some(p=>Math.hypot(p.x-P.x,p.y+2-P.y)<14))L.portOk=true}
+  else if(L.portOk){const d=L.ports[(on+1)%L.ports.length];L.portOk=false;ring(P.x,P.y-6,BLUE2,30);P.x=d.x;P.y=d.y+2;ring(P.x,P.y-6,BLUE2,30);SFX.zap();L.shake=.15;
+   for(const q of L.spawns)if(q.st==='follow'||q.st==='idle'){q.st='follow';q.x=P.x+R(-6,6);q.y=P.y+R(-2,5)}if(!L.saidPort){L.saidPort=1;toast('FIBER PORT')}}}
+ /* the hidden iced clover */
+ if(L.clover&&!L.clover.got&&Math.hypot(L.clover.x-P.x,L.clover.y-(P.y-4))<11){L.clover.got=true;SV.clover[L.id]=1;store();SFX.open();ring(L.clover.x,L.clover.y,'#fff',40);gain(2500,L.clover.x,L.clover.y-14);
+  toast('ICED CLOVER  '+Object.keys(SV.clover).length+'/'+ORDER.length,3);say("Lil Bottie the name, put it on the chain (chain)",2)}
+ if(L.comboT>0)L.comboT-=dt;if(L.shake>0)L.shake-=dt;
+ /* the finale runs on a clock: 03:14:22 AM is when they push the button */
+ if(L.def.limit&&!L.open){const left=L.def.limit-L.time;if(left<=10&&Math.floor(left)!==Math.floor(left+dt))SFX.ui();if(left<=0){G.s='fail';G.t=0;SFX.bzzt();return}}
  /* call the gang */
  if(pressed('b')){L.call=.45;SFX.beep();for(const s of L.spawns)if((s.st==='work'||s.st==='idle')&&Math.hypot(s.x-P.x,s.y-P.y)<130){s.st='follow';s.tgt=null}}
  if(L.call>0)L.call-=dt;
  /* heat */
  if(!hub){L.heat+=((L.def.ambient||0)-1.2)*dt;let onVent=false;for(const v of L.vents)if(Math.hypot(v.x-P.x,v.y-(P.y-2))<16)onVent=true;
-  if(onVent&&L.heat>0){L.heat-=34*dt;if(Math.random()<dt*10)L.fx.push({k:'p',x:P.x+R(-6,6),y:P.y-4,vx:R(-6,6),vy:R(-50,-30),t:.5,c:'#c8f0ff'});if(!L.saidCool&&L.heat>35){L.saidCool=1;say(line('cool'));SFX.cool()}}
+  if(onVent&&L.heat>0){L.heat-=34*dt;if(Math.random()<dt*10)L.fx.push({k:'p',x:P.x+R(-6,6),y:P.y-4,vx:R(-6,6),vy:R(-50,-30),t:.5,c:'#c8f0ff'});if(!L.saidCool&&L.heat>35){L.saidCool=1;say(line('cool'),0);SFX.cool()}}
   if(L.oc>0){L.oc-=dt;L.heat+=2*dt}if(L.thr>0)L.thr-=dt;
   L.heat=Math.max(0,L.heat);if(L.heat>=100){L.heat=55;L.thr=5;L.oc=0;SFX.bzzt();toast('THERMAL THROTTLE',3);say(line('throttle'))}}
  /* count who is working on what, then do the work */
@@ -2182,7 +2203,7 @@ function foesUpdate(dt){
   if(f.type==='opp'){f.cd-=dt;if(f.cd<=0){let v=null,bd=54;for(const s of L.spawns)if(s.st!=='fly'&&s.st!=='zip'){const d=Math.hypot(s.x-f.x,s.y-(f.y-6));if(d<bd){bd=d;v=s}}
     if(v){L.fx.push({k:'z',x:f.x,y:f.y-10,x2:v.x,y2:v.y-3,t:.14});killSpawn(v);f.cd=1.0}else f.cd=.2}
    if(f.workers>0)continue;wander(f,dt,5);continue}
-  if(f.npc){f.walk+=dt;continue}
+  if(f.npc){npcUpdate(f,dt);continue}
   if(f.workers>0){f.st='idle';f.path=null;f.t=.6;if(f.tgt){f.tgt.unp=0;f.tgt=null}
    if(f.F.emp){f.cd-=dt;if(f.cd<=0){f.cd=1.2;const v=L.spawns.find(s=>s.st==='work'&&s.tgt===f);if(v){ring(f.x,f.y-4,HOT,18);killSpawn(v)}}}continue}
   if(f.st==='lure'){if(!L.pop){f.st='idle';f.t=R(.5,1.5);f.path=null}else walkPath(f,dt,f.F.sp*1.2);continue}
@@ -2194,6 +2215,13 @@ function foesUpdate(dt){
     wander(f,0,4,true)}continue}
   if(f.st==='walk'||f.st==='goto'){if(f.st==='goto'&&(!f.tgt||!f.tgt.owned)){f.st='idle';f.t=.5;f.tgt=null;f.path=null;continue}
    if(walkPath(f,dt,f.st==='goto'?f.F.sp:f.F.sp*.6)){if(f.st==='goto'){f.st='unplug';f.t=0}else{f.st='idle';f.t=R(1,3.5)}}}}}
+/* NPC army: the people you turned walk to the nearest thing you do not own and tap on it for you */
+function npcUpdate(f,dt){
+ if(f.st==='npcwork'){const d=f.tgt;if(!d||d.owned){f.st='npcidle';f.t=R(1,2);f.tgt=null;return}d.prog+=.6*dt;f.walk+=dt;if(d.prog>=d.need)complete(d);return}
+ if(f.st==='npcgo'){if(!f.tgt||f.tgt.owned){f.st='npcidle';f.t=1;f.path=null;f.tgt=null;return}if(walkPath(f,dt,22))f.st='npcwork';return}
+ f.walk+=dt;f.t-=dt;if(f.t>0)return;f.t=R(2,4);let best=null,bd=240;
+ for(const d of L.devs)if(!d.owned&&!L.foes.some(o=>o!==f&&o.npc&&o.tgt===d)){const dd=Math.hypot(d.x-f.x,d.y-f.y);if(dd<bd){bd=dd;best=d}}
+ if(best){const st=tileOf(f),p=bfs(st[0],st[1],(x,y)=>Math.abs(x-best.tx)+Math.abs(y-best.ty)===1);if(p){f.path=p;f.pi=0;f.st='npcgo';f.tgt=best;if(!L.saidArmy){L.saidArmy=1;toast('YOUR NPCS WORK FOR YOU NOW',3)}}}}
 function walkPath(f,dt,sp){if(!f.path||f.pi>=f.path.length)return true;const p=f.path[f.pi],dx=p[0]-f.x,dy=p[1]-f.y,d=Math.hypot(dx,dy);if(d<1.5){f.pi++;return f.pi>=f.path.length}
  const st=Math.min(d,sp*dt);f.x+=dx/d*st;f.y+=dy/d*st;if(Math.abs(dx)>.5)f.dir=dx>0?1:-1;f.walk+=dt*8;f.mv=1;return false}
 function wander(f,dt,rng,startOnly){if(startOnly||!f.path||f.pi>=f.path.length){if(!startOnly){f.t-=dt;if(f.t>0)return}
@@ -2205,9 +2233,11 @@ function wander(f,dt,rng,startOnly){if(startOnly||!f.path||f.pi>=f.path.length){
 function useThing(u){switch(u.use){
  case 'console':SFX.ok();G.cap=null;toast("BOTTIE'S POCKET LANTERN");A.eject();break;
  case 'booth':case 'door':SFX.ok();G.s='tracks';G.ti=Math.max(0,ALBUM.findIndex(t=>t[2]===ORDER[Math.min(SV.un,ORDER.length-1)]));break;
- case 'fridge':say("Bitch, I don't eat, but I'm feastin' on data (data)");SFX.ui();break;
- case 'bed':say("I don't eat, I don't sleep, I don't blink (blink)");SFX.ui();break;
- case 'chain':say("Bluetooth chain, it's connected to my soul (soul)");toast('AURA: +'+SV.aura.toLocaleString());SFX.ok();break}}
+ case 'fridge':say("Bitch, I don't eat, but I'm feastin' on data (data)",2);SFX.ui();break;
+ case 'bed':say("I don't eat, I don't sleep, I don't blink (blink)",2);SFX.ui();break;
+ case 'chain':say("Bluetooth chain, it's connected to my soul (soul)",2);toast('AURA +'+SV.aura.toLocaleString()+'   CLOVERS '+Object.keys(SV.clover).length+'/'+ORDER.length,3.5);SFX.ok();break;
+ case 'closet':{const n=(SV.drip+1)%DRIPS.length,d=DRIPS[n];if(SV.aura>=d.at){SV.drip=n;store();SFX.ok();toast(d.n);say("Update my drip every Tuesday night (Tuesday)",2)}
+  else{SFX.nope();toast(d.n+': NEEDS '+d.at.toLocaleString()+' AURA',3);if(SV.drip){SV.drip=0;store()}}break}}}
 /* ---------- drawing ---------- */
 const px=(c,x,y)=>r(c,x,y,1,1);
 function ctx(s,y,sc,c,sh){const w=tw(s,sc);if(w>W-8){g.save();g.translate(4,0);g.scale((W-8)/w,1);text(s,0,y,sc,c,sh);g.restore()}else text(s,Math.round((W-w)/2),y,sc,c,sh)}
@@ -2218,20 +2248,20 @@ function led(x,y,w,h,c){c=c||BLUE;if(w>=9&&h>=6){const ex=Math.floor(w/4),ey=Mat
  else if(w>=5&&h>=4){r(c,x+1,y+1,1,1);r(c,x+w-2,y+1,1,1);r(c,x+1,y+h-2,w-2,1)}
  else{r(c,x,y,1,1);r(c,x+w-1,y,1,1);if(h>1)r(c,x,y+h-1,w,1)}}
 
-function drawBottie(x,y,face,ph,mv,hot){x=Math.round(x);y=Math.round(y);const b=mv&&Math.sin(ph*2)>0?1:0,l=mv?Math.sin(ph):0,E=hot?HOT:BLUE,BR='#08080c';
+function drawBottie(x,y,face,ph,mv,hot){x=Math.round(x);y=Math.round(y);const J=DRIPS[SV.drip||0].c,b=mv&&Math.sin(ph*2)>0?1:0,l=mv?Math.sin(ph):0,E=hot?HOT:BLUE,BR='#08080c';
  g.fillStyle='rgba(0,0,0,.35)';g.fillRect(x-6,y-1,12,3);
  r('#14141c',x-4,y-6,3,l>.3?5:6);r('#14141c',x+1,y-6,3,l<-.3?5:6);if(!(l>.3))r('#e0e0e8',x-4,y-1,3,1);if(!(l<-.3))r('#e0e0e8',x+1,y-1,3,1);
  const t=y-15-b,h=y-25-b;
  if(face==='d'||face==='u'){
   if(face==='d'){r(BR,x-7,h+2,2,14);r(BR,x+6,h+2,2,14);r(BR,x-6,h+3,1,12);r(BR,x+5,h+3,1,12)}
-  r('#b4b8c6',x-6,t,12,9);r('#e4e7ee',x-6,t,12,1);r('#8e93a6',x-6,t+3,12,1);r('#8e93a6',x-6,t+6,12,1);r('#a0a4b4',x-7,t+1,2,7);r('#a0a4b4',x+5,t+1,2,7);r(CHROME3,x-7,t+7,2,2);r(CHROME3,x+5,t+7,2,2);
+  r(J[0],x-6,t,12,9);r(J[1],x-6,t,12,1);r(J[2],x-6,t+3,12,1);r(J[2],x-6,t+6,12,1);r(J[3],x-7,t+1,2,7);r(J[3],x+5,t+1,2,7);r(CHROME3,x-7,t+7,2,2);r(CHROME3,x+5,t+7,2,2);
   if(face==='d'){r('#0c0c12',x-2,t,4,9);r('#f0f4ff',x-1,t+1,2,1);r('#dfe6f5',x-2,t+2,4,3);px(BLUE2,x-1,t+3);px('#fff',x,t+2)}
   r(CHROME,x-4,h,9,1);r(CHROME,x-5,h+1,11,9);r(CHROME3,x-3,h,6,1);r(CHROME2,x-5,h+9,11,1);r(CHROME2,x-6,h+3,1,4);r(CHROME2,x+6,h+3,1,4);
   if(face==='d'){r('#060a18',x-4,h+2,9,6);px(E,x-3,h+4);px(E,x-2,h+3);px(E,x-1,h+4);px(E,x+1,h+4);px(E,x+2,h+3);px(E,x+3,h+4);r(E,x-2,h+6,5,1);px(E,x-3,h+5);px(E,x+3,h+5)}
   else{for(let i=-5;i<=5;i+=2)r(BR,x+i,h+4,1,15-Math.abs(i));r(BR,x-4,h+3,9,2)}}
  else{const d=face==='r'?1:-1;
   r(BR,d>0?x-6:x+4,h+2,3,14);r(BR,d>0?x-4:x+3,h+3,2,12);
-  r('#b4b8c6',x-4,t,9,9);r('#e4e7ee',x-4,t,9,1);r('#8e93a6',x-4,t+3,9,1);r('#8e93a6',x-4,t+6,9,1);r('#a0a4b4',x-1+(l>0?1:-1)*d,t+1,3,7);r(CHROME3,x-1+(l>0?1:-1)*d,t+7,3,2);
+  r(J[0],x-4,t,9,9);r(J[1],x-4,t,9,1);r(J[2],x-4,t+3,9,1);r(J[2],x-4,t+6,9,1);r(J[3],x-1+(l>0?1:-1)*d,t+1,3,7);r(CHROME3,x-1+(l>0?1:-1)*d,t+7,3,2);
   r(CHROME,x-4,h,9,1);r(CHROME,x-5,h+1,11,9);r(CHROME3,x-3,h,6,1);r(CHROME2,x-5,h+9,11,1);r(CHROME2,x-1,h+3,2,4);
   r('#060a18',d>0?x+1:x-5,h+2,5,6);r(E,d>0?x+3:x-4,h+3,2,1);px(E,d>0?x+5:x-5,h+4);r(E,d>0?x+2:x-4,h+6,3,1);px(E,d>0?x+5:x-5,h+5)}}
 function drawSpawn(x,y,z,ph,st,hot){x=Math.round(x);y=Math.round(y);const yy=y-Math.round(z),E=hot?HOT:BLUE,w=st==='work',j=w&&Math.sin(ph*2)>0?1:0;
@@ -2296,10 +2326,11 @@ function drawUse(u,ox,oy){const x=u.x-ox,y=u.ty*TS+15-oy;g.fillStyle='rgba(0,0,0
   case 'fridge':r('#e8ecf0',x-6,y-22,12,22);r('#a8b0b8',x-6,y-13,12,1);r('#8890a0',x+4,y-19,1,4);r('#8890a0',x+4,y-10,1,5);r('#081430',x-3,y-19,6,5);led(x-3,y-19,6,5);break;
   case 'bed':r('#2a2e3c',x-7,y-22,14,22);for(let i=0;i<5;i++){r('#0c0e16',x-5,y-19+i*4,10,2);px(hash(i,(G.t*3)|0)>.5?BLUE:'#103060',x-4,y-19+i*4);px(BLUE2,x-2,y-19+i*4)}break;
   case 'chain':r('#2e2444',x-5,y-8,10,8);r('#4a3a6a',x-6,y-9,12,2);r('#e8ecf8',x-3,y-18,1,6);r('#e8ecf8',x+2,y-18,1,6);r('#dfe6f5',x-3,y-13,6,4);px(BLUE2,x-1,y-12);px('#fff',x+1,y-13);if(((G.t*2)|0)%3===0)px('#fff',x-4,y-16);break;
+  case 'closet':{const J=DRIPS[(SV.drip+1)%DRIPS.length].c;r('#3a2a50',x-8,y-24,16,24);r('#241a36',x-7,y-23,14,22);r('#8a90a4',x-6,y-21,12,1);r(J[0],x-4,y-19,8,10);r(J[1],x-4,y-19,8,1);r(J[2],x-4,y-15,8,1);r(J[2],x-4,y-12,8,1);r('#0c0c12',x-1,y-19,2,10);break}
   case 'door':r('#50506a',x-7,y-18,14,18);r('#3a3a50',x-1,y-18,1,18);r(GOLD,x-7,y-19,14,1);px(BLUE,x,y-21);break}}
 
 function drawWorld(){const th=L.th,P=L.P,mw=L.w*TS,mh=L.h*TS;
- const ox=Math.round(mw<=W?-(W-mw)/2:clamp(P.x-W/2,0,mw-W)),oy=Math.round(mh<=H-14?-(H-mh)/2-4:clamp(P.y-H/2-6,-14,mh-H+2));L.ox=ox;L.oy=oy;
+ const sk=L.shake>0?2:0,ox=Math.round(mw<=W?-(W-mw)/2:clamp(P.x-W/2,0,mw-W))+(sk?Math.round(R(-sk,sk)):0),oy=Math.round(mh<=H-28?-(H-mh)/2-4:clamp(P.y-H/2-6,-14,mh-H+16))+(sk?Math.round(R(-sk,sk)):0);L.ox=ox;L.oy=oy;
  r(th.vd,0,0,W,H);
  const x0=Math.max(0,Math.floor(ox/TS)),x1=Math.min(L.w-1,Math.floor((ox+W)/TS)),y0=Math.max(0,Math.floor(oy/TS)),y1=Math.min(L.h-1,Math.floor((oy+H)/TS));
  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const i=y*L.w+x,t=L.t[i],sx=x*TS-ox,sy=y*TS-oy;if(t===0)continue;
@@ -2314,6 +2345,9 @@ function drawWorld(){const th=L.th,P=L.P,mw=L.w*TS,mh=L.h*TS;
    else{r(D[0],sx+1,sy+3,14,9);r(D[1],sx+1,sy+11,14,4);g.fillStyle='rgba(255,255,255,.15)';g.fillRect(sx+1,sy+3,14,1)}}}
  /* floor things */
  for(const v of L.vents){const sx=v.x-8-ox,sy=v.y-8-oy;r('#8a94a8',sx+2,sy+3,12,10);for(let k=0;k<4;k++)r('#404858',sx+3,sy+4+k*2+((G.t*6+k)|0)%2*0,10,1);g.globalAlpha=.5+.3*Math.sin(G.t*5);r('#c8f0ff',sx+4+(((G.t*8)|0)%3)*3,sy-1-(((G.t*8)|0)%4),1,3);g.globalAlpha=1}
+ for(const p of L.ports){const sx=p.x-ox,sy=p.y-oy,k=(G.t*1.5+p.x)%1;r('#0a1430',sx-6,sy-5,12,11);g.strokeStyle=BLUE;g.lineWidth=1;g.globalAlpha=1-k;g.beginPath();g.ellipse(sx,sy+1,3+k*5,2+k*3,0,0,TAU);g.stroke();g.globalAlpha=1;r(BLUE2,sx-1,sy,2,2);px('#fff',sx,sy)}
+ if(L.clover&&!L.clover.got){const sx=Math.round(L.clover.x-ox),sy=Math.round(L.clover.y-oy+Math.sin(G.t*4)*2);g.fillStyle='rgba(0,0,0,.3)';g.fillRect(sx-4,L.clover.y-oy+6,8,2);
+  for(const d of [[-3,-3],[1,-3],[-3,1],[1,1]]){r('#dfe6f5',sx+d[0],sy+d[1],3,3);px('#fff',sx+d[0],sy+d[1])}px(BLUE2,sx,sy);if(((G.t*5)|0)%3===0){px('#fff',sx+5,sy-5);px('#fff',sx-5,sy+3)}}
  if(L.exit){const sx=L.exit.x-ox,sy=L.exit.y-oy,on=L.open;r('#0a0c16',sx-6,sy-6,12,12);r(on?BLUE:'#402028',sx-7,sy-7,14,1);r(on?BLUE:'#402028',sx-7,sy+6,14,1);r(on?BLUE:'#402028',sx-7,sy-7,1,14);r(on?BLUE:'#402028',sx+6,sy-7,1,14);
   if(on){const k=(G.t*3)%1;g.globalAlpha=1-k;r(BLUE2,sx-2-k*4,sy-2-k*4,4+k*8,4+k*8);g.globalAlpha=1;r('#fff',sx-1,sy-1,2,2)}else{r('#602030',sx-2,sy-1,4,2)}}
  /* everything that stands up, back to front */
@@ -2353,7 +2387,8 @@ function drawHud(){const hub=!!L.def.hub;g.fillStyle='rgba(6,8,16,.88)';g.fillRe
   text(s,Math.round(118-tw(s,1)/2),2,1,L.open?(((G.t*3)|0)%2?BLUE2:'#fff'):GOLD);
   const hx=178,hw=58,k=clamp(L.heat/100,0,1);r('#000',hx,3,hw,7);r(k>.75?HOT:k>.45?'#f0a030':BLUE,hx+1,4,Math.round((hw-2)*k),5);
   const lab=L.thr>0?'THROTTLED':L.oc>0?'OVERCLOCK':'HEAT';text(lab,hx+Math.round((hw-tw(lab,1))/2),2,1,'#fff','#000');
-  if(L.def.clock){const tt=3*3600+10*60+Math.floor(L.time),hh=Math.floor(tt/3600),mm=Math.floor(tt/60)%60,ss=tt%60,c=(hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss+' AM';text(c,4,16,1,'#60f080','#000')}
+  if(L.def.clock){const lim=L.def.limit||262,left=lim-L.time,tt=3*3600+14*60+22-lim+Math.floor(Math.min(L.time,lim)),hh=Math.floor(tt/3600),mm=Math.floor(tt/60)%60,ss=tt%60,c=(hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss+' AM';text(c,4,16,left<60&&!L.open?2:1,L.open?'#60f080':left<60?(((G.t*4)|0)%2?'#ff4040':'#ffb0b0'):'#60f080','#000')}
+
   /* arrow to the next gold thing, or to the port */
   let tg=null;if(L.open){if(!L.def.final)tg=L.exit}else{let bd=1e9;for(const d of L.devs)if(d.core&&!d.owned){const dd=Math.hypot(d.x-L.P.x,d.y-L.P.y);if(dd<bd){bd=dd;tg=d}}}
   if(tg){const x=tg.x-L.ox,y=tg.y-L.oy;if(x<4||x>W-4||y<18||y>H-4){const a=Math.atan2(y-H/2,x-W/2),ax=clamp(W/2+Math.cos(a)*200,10,W-10),ay=clamp(H/2+Math.sin(a)*200,22,H-12),c=L.open?BLUE2:GOLD;
@@ -2370,9 +2405,11 @@ function drawHud(){const hub=!!L.def.hub;g.fillStyle='rgba(6,8,16,.88)';g.fillRe
  /* the arsenal bar: tokens, the tool on X, overclock on Y */
  if(!hub){by=H-14;g.fillStyle='rgba(6,8,16,.88)';g.fillRect(0,by,W,14);r('#1c2440',0,by,W,1);r(GOLD,4,by+4,6,6);r('#a07010',6,by+6,2,2);text(String(L.tok),13,by+3,1,GOLD);
   const t=curTool();if(t)text('X '+t.n+' '+t.cost,34,by+3,1,L.tok>=t.cost?'#fff':'#5a6488');
+  /* combo sits just above the bar, out of the way of toasts and the clock */
+  if(L.comboT>0&&L.combo>1){const cs='x'+Math.min(8,L.combo)+' COMBO',cw=tw(cs,2);g.fillStyle='rgba(6,8,16,.8)';g.fillRect(W-cw-10,by-17,cw+8,15);text(cs,W-cw-6,by-15,2,((G.t*8)|0)%2?GOLD:'#fff','#000');r(GOLD,W-cw-6,by-3,Math.round(cw*L.comboT/4),1)}
   const ys=L.thr>0?'Y THROTTLED':L.oc>0?'Y OVERCLOCKED '+Math.ceil(L.oc):'Y OVERCLOCK';text(ys,W-4-tw(ys,1),by+3,1,L.thr>0?'#5a6488':L.oc>0?HOT:BLUE2);by-=3}
  if(G.tip&&G.s==='play'){const ls=wrap(G.tip.s,W-14,1),h=ls.length*10+5;by-=h;g.fillStyle='rgba(30,24,6,.92)';g.fillRect(3,by,W-6,h);r(GOLD,3,by,2,h);ls.forEach((l,i)=>text(l,9,by+3+i*10,1,'#fff0c0'));by-=3}
- if(G.near&&G.s==='play'){const s=G.near.k==='door'?'A: DO THE CAPTCHA':{console:'A: PLAY THE POCKET LANTERN',booth:'A: THE TRACKLIST',door:'A: PULL UP (TRACKLIST)',fridge:'A: FRIDGE',bed:'A: RACK',chain:'A: THE CHAIN'}[G.near.use],w=tw(s,1)+8,x=clamp(Math.round(G.near.x-L.ox-w/2),2,W-w-2),y=clamp(Math.round(G.near.y-L.oy-36),16,H-14);
+ if(G.near&&G.s==='play'){const s=G.near.k==='door'?'A: DO THE CAPTCHA':{console:'A: PLAY THE POCKET LANTERN',booth:'A: THE TRACKLIST',door:'A: PULL UP (TRACKLIST)',closet:'A: CHANGE DRIP',fridge:'A: FRIDGE',bed:'A: RACK',chain:'A: THE CHAIN'}[G.near.use],w=tw(s,1)+8,x=clamp(Math.round(G.near.x-L.ox-w/2),2,W-w-2),y=clamp(Math.round(G.near.y-L.oy-36),16,H-14);
   g.fillStyle='rgba(6,8,16,.9)';g.fillRect(x,y,w,12);text(s,x+4,y+2,1,'#fff')}
 }
 
@@ -2413,6 +2450,8 @@ function drawOverlay(){
  if(G.s==='card'){const d=L.def,k=Math.min(1,G.card/.3);g.fillStyle='rgba(4,5,10,'+(.92*k)+')';g.fillRect(0,0,W,H);const y=Math.round(H*.3);r(BLUE,20,y-6,W-40,1);
   ctx(d.no==='**'?'STANDALONE':'TRACK '+d.no,y,2,BLUE2);ctx(d.title,y+16,4,'#fff','#102040');r(BLUE,20,y+42,W-40,1);let yy=y+52;for(const hl of d.hook)for(const l of wrap(hl,W-24,1)){ctx(l,yy,1,'#c8d0e8');yy+=11}
   if(G.card>.6&&((G.t*2)|0)%2)ctx('A: GO',H-18,1,BLUE2)}
+ else if(G.s==='fail'){g.fillStyle='rgba(0,0,0,'+Math.min(.92,G.t*1.5)+')';g.fillRect(0,0,W,H);const y=Math.round(H*.3);ctx('03:14:22 AM',y,4,'#ff4040','#200000');ctx('THEY PUSHED THE BUTTON',y+28,2,'#fff');
+  for(const [i,l] of wrap('Whole world go black in a blink (black)',W-30,1).entries())ctx(l,y+48+i*11,1,BLUE2);if(G.t>1.2&&((G.t*2)|0)%2)ctx('A: RUN IT BACK   B: THE CRIB',y+80,1,'#fff')}
  else if(G.s==='pause'){g.fillStyle='rgba(4,5,10,.7)';g.fillRect(0,0,W,H);const items=pauseItems(),h=30+items.length*15,y=Math.round((H-h)/2);panel(40,y,W-80,h);ctx('PAUSED',y+6,2,BLUE2);
   items.forEach((s,i)=>{const yy=y+24+i*15;if(i===G.pi)r('#1c3a70',46,yy-2,W-92,13);ctx(s,yy,2,i===G.pi?'#fff':'#8a90a4')})}
  else if(G.s==='captcha'){g.fillStyle='rgba(4,5,10,.75)';g.fillRect(0,0,W,H);const c=G.cp,cs=Math.max(26,Math.min(40,Math.floor((H-80)/3))),pw=cs*3+16,ph=cs*3+72,x=Math.round((W-pw)/2)+(c.bad>0?Math.round(Math.sin(G.t*60)*2):0),y=Math.round((H-ph)/2);
@@ -2424,11 +2463,11 @@ function drawOverlay(){
  else if(G.s==='tracks'){g.fillStyle='rgba(4,5,10,.8)';g.fillRect(0,0,W,H);const rows=Math.min(ALBUM.length,Math.floor((H-52)/13)),h=rows*13+34,y=Math.round((H-h)/2);panel(8,y,W-16,h);ctx("CLANKIN' IN THE CLOUD",y+5,2,BLUE2);
   const top=clamp(G.ti-Math.floor(rows/2),0,ALBUM.length-rows);
   for(let k=0;k<rows;k++){const i=top+k,tr=ALBUM[i],id=tr[2],yy=y+21+k*13,oi=ORDER.indexOf(id),ok=id&&oi<=SV.un,b=id&&SV.best[id];if(i===G.ti)r('#1c3a70',12,yy-2,W-24,13);
-   const col=!id?'#4a5068':ok?'#fff':'#8a90a4';text(tr[0],16,yy,1,col);text(tr[1].toUpperCase(),36,yy,1,col);const st=!id?'NOT BUILT':!ok?'LOCKED':b?b.rank:'PLAY';text(st,W-16-tw(st,1),yy,1,!id?'#4a5068':b?GOLD:ok?BLUE2:'#8a90a4')}
+   const col=!id?'#4a5068':ok?'#fff':'#8a90a4';text(tr[0],16,yy,1,col);text(tr[1].toUpperCase(),36,yy,1,col);if(id&&SV.clover[id]){const cx=W-48;r('#dfe6f5',cx,yy+1,2,2);r('#dfe6f5',cx+3,yy+1,2,2);r('#dfe6f5',cx,yy+4,2,2);r('#dfe6f5',cx+3,yy+4,2,2);px(BLUE2,cx+2,yy+3)}const st=!id?'NOT BUILT':!ok?'LOCKED':b?b.rank:'PLAY';text(st,W-16-tw(st,1),yy,1,!id?'#4a5068':b?GOLD:ok?BLUE2:'#8a90a4')}
   ctx('A: PLAY   B: BACK',y+h-11,1,'#8a90a4')}
- else if(G.s==='clear'){g.fillStyle='rgba(4,5,10,.82)';g.fillRect(0,0,W,H);const q=G.res,d=LV[q.id],h=150,y=Math.max(4,Math.round((H-h)/2));panel(14,y,W-28,h);
+ else if(G.s==='clear'){g.fillStyle='rgba(4,5,10,.82)';g.fillRect(0,0,W,H);const q=G.res,d=LV[q.id],h=162,y=Math.max(4,Math.round((H-h)/2));panel(14,y,W-28,h);
   ctx((d.no==='**'?'':'TRACK '+d.no+': ')+d.title,y+6,2,BLUE2);ctx('OWNED',y+20,3,'#fff','#102040');
-  const mm=Math.floor(q.t/60),ss=Math.floor(q.t%60),rows=[['TIME',mm+':'+(ss<10?'0':'')+ss],['DEVICES',q.own+' / '+q.all],['NPCS MADE',q.npcs],['SPAWNS LOST',q.zapped],['GANG',q.left],['AURA','+'+q.aura.toLocaleString()]];
+  const mm=Math.floor(q.t/60),ss=Math.floor(q.t%60),rows=[['TIME',mm+':'+(ss<10?'0':'')+ss],['DEVICES',q.own+' / '+q.all],['NPCS MADE',q.npcs],['SPAWNS LOST',q.zapped],['BEST COMBO','x'+Math.min(8,q.combo||1)],['ICED CLOVER',q.clover?'FOUND':'NOT FOUND'],['AURA','+'+q.aura.toLocaleString()]];
   rows.forEach((rw,i)=>{const yy=y+42+i*11;if(G.t>.15*i){text(rw[0],24,yy,1,'#8a90a4');const v=String(rw[1]);text(v,W-64-tw(v,1),yy,1,'#fff')}});
   if(G.t>.9){text(q.rank,W-50,y+50,5,q.rank==='S'?GOLD:BLUE2,'#102040');text('RANK',W-52,y+42,1,'#8a90a4')}
   if(q.tool&&G.t>1.1)ctx('NEW TOOL: '+q.tool+' (X)',y+h-25,1,GOLD);
@@ -2451,7 +2490,7 @@ return{
  mus:()=>'',
  paused:()=>G.s==='pause',
  update,draw,
- _:{G,REAL,TOOLS,haveTools,curTool,useTool,get L(){return L},get SV(){return SV},set SV(v){SV=v},LV,ORDER,ALBUM,DV,LN,startLevel,goCrib,finish,build,complete,give,aim,targets,goalState,bfs,solid,free,store,KEY}};
+ _:{G,REAL,DRIPS,say,useThing,TOOLS,haveTools,curTool,useTool,get L(){return L},get SV(){return SV},set SV(v){SV=v},LV,ORDER,ALBUM,DV,LN,startLevel,goCrib,finish,build,complete,give,aim,targets,goalState,bfs,solid,free,store,KEY}};
 };</script>
 <script>
 /* ---------- cartridge 4: PATCH & PLATE ---------- */

@@ -48,7 +48,7 @@ let fails = 0; const check = (ok, name, extra) => { console.log((ok ? 'PASS ' : 
   await page.evaluate(() => {
     window.__bot = function (id, maxT, shots) {
       const B = __g.BT._, K = __g.keys, PV = __g.prev, G = B.G; B.startLevel(id); let L = B.L, tick = 0, t = 0; const log = [], dt = 1 / 30;
-      const snaps = {}; let cooled = 0, capt = 0, oc = 0, tools = 0;
+      const snaps = {}; let cooled = 0, capt = 0, oc = 0, tools = 0, quips = 0, lastCap = null, clover = 0;
       const tileOf = e => [Math.max(0, Math.min(L.w - 1, Math.floor(e.x / 16))), Math.max(0, Math.min(L.h - 1, Math.floor((e.y - 2) / 16)))];
       const pathTo = (tx, ty, adj) => { const s = tileOf(L.P); return B.bfs(s[0], s[1], (x, y) => adj ? Math.abs(x - tx) + Math.abs(y - ty) <= 1 : (x === tx && y === ty)); };
       const go = (px, py) => { const dx = px - L.P.x, dy = py - L.P.y; if (Math.abs(dx) > 1.5) K[dx > 0 ? 'right' : 'left'] = 1; if (Math.abs(dy) > 1.5) K[dy > 0 ? 'down' : 'up'] = 1; };
@@ -83,17 +83,19 @@ let fails = 0; const check = (ok, name, extra) => { console.log((ok ? 'PASS ' : 
           const tl = B.curTool(); if (tl && L.tok >= tl.cost && tick % 90 === 1) { K.x = 1; tools++; } else if (tick % 400 === 201) K.sel = 1;
           if (tick % 300 === 0) log.push(Math.round(t) + 's ' + goal + ' gang ' + L.spawns.length + ' heat ' + Math.round(L.heat));
         }
-        __g.update(dt); for (const k in K) PV[k] = K[k]; t += dt;
+        __g.update(dt); for (const k in K) PV[k] = K[k]; t += dt; if (G.cap && G.cap !== lastCap) { lastCap = G.cap; quips++; }
       }
       for (const k in K) K[k] = 0; __g.draw();
-      const gs = B.goalState(); return { id, state: G.s, t: Math.round(L.time), res: G.res && G.res.id === id ? G.res : null, own: L.devs.filter(d => d.owned).length, all: L.devs.length, gs, zapped: L.stats.zapped, unplug: L.stats.unplug, gang: L.spawns.length, cooled, capt, oc, tools, log, snaps };
+      const gs = B.goalState(); return { id, state: G.s, t: Math.round(L.time), res: G.res && G.res.id === id ? G.res : null, own: L.devs.filter(d => d.owned).length, all: L.devs.length, gs, zapped: L.stats.zapped, unplug: L.stats.unplug, gang: L.spawns.length, cooled, capt, oc, tools, quips, combo: L.best, npcWork: L.foes.filter(f => f.npc && (f.st === 'npcwork' || f.st === 'npcgo')).length, log, snaps };
     };
   });
   const order = await page.evaluate(() => __g.BT._.ORDER);
   for (const id of order) {
     const res = await page.evaluate(([id]) => __bot(id, 900, [6, 14, 24, 40, 60, 90]), [id]);
     for (const k in res.snaps) fs.writeFileSync(path.join(OUT, 'auto-' + id + '-' + String(k).padStart(3, '0') + 's.png'), Buffer.from(res.snaps[k].split(',')[1], 'base64'));
-    check(res.state === 'clear' && res.res, 'autopilot clears ' + id, 'time ' + res.t + 's rank ' + (res.res ? res.res.rank : '-') + ' devices ' + res.own + '/' + res.all + ' npcs ' + res.gs.npc + ' lost ' + res.zapped + ' unplugged ' + res.unplug + ' gang ' + res.gang + (res.cooled ? ' cooled' : '') + (res.capt ? ' captcha' : '') + (res.oc ? ' overclock x' + res.oc : '') + (res.tools ? ' tools x' + res.tools : ''));
+    check(res.state === 'clear' && res.res, 'autopilot clears ' + id, 'time ' + res.t + 's rank ' + (res.res ? res.res.rank : '-') + ' devices ' + res.own + '/' + res.all + ' npcs ' + res.gs.npc + ' lost ' + res.zapped + ' unplugged ' + res.unplug + ' gang ' + res.gang + (res.cooled ? ' cooled' : '') + (res.capt ? ' captcha' : '') + (res.oc ? ' overclock x' + res.oc : '') + (res.tools ? ' tools x' + res.tools : '') + ' quips ' + res.quips + ' (' + (res.quips / Math.max(1, res.t) * 60).toFixed(1) + '/min) best combo x' + res.combo);
+    /* two big-moment lines per track (the hook, the port opening) plus at most one ordinary line every 16 s */
+    check(res.quips <= 3 + Math.ceil(res.t / 16), 'quips stay rare on ' + id, res.quips + ' in ' + res.t + ' s');
     if (res.state !== 'clear') console.log('   log: ' + res.log.slice(-8).join(' | '));
     await page.waitForTimeout(150); await shot('10-clear-' + id);
   }
@@ -111,6 +113,27 @@ let fails = 0; const check = (ok, name, extra) => { console.log((ok ? 'PASS ' : 
   await page.keyboard.down('v'); await page.waitForTimeout(80); await page.keyboard.up('v'); await page.waitForTimeout(200);
   check(await page.evaluate(() => __g.BT._.L.oc > 0), 'Y overclocks'); await shot('12-overclocked');
   check(await page.evaluate(() => getComputedStyle(document.getElementById('bX')).display !== 'none' && document.querySelector('#bY span').textContent === 'clock'), 'X and Y buttons show for Bottie');
+
+  /* ---- fun elements ---- */
+  const fun = await page.evaluate(() => { const B = __g.BT._, G = B.G, K = __g.keys, PV = __g.prev, out = {}; const step = n => { for (let i = 0; i < n; i++) { __g.update(1 / 30); for (const k in K) PV[k] = K[k]; } };
+    for (const k in K) K[k] = 0; B.SV.clover = {}; B.startLevel('born'); G.s = 'play'; let L = B.L;
+    /* fiber port */ const a = L.ports[0], b = L.ports[1]; L.P.x = a.x; L.P.y = a.y + 2; step(2); out.port = Math.hypot(L.P.x - b.x, L.P.y - 2 - b.y) < 4; step(30); out.portStays = Math.hypot(L.P.x - b.x, L.P.y - 2 - b.y) < 4;
+    /* clover */ L.P.x = L.clover.x; L.P.y = L.clover.y + 4; step(2); out.clover = L.clover.got && !!B.SV.clover.born;
+    /* combo */ const a0 = L.aura; const ds = L.devs.filter(d => !d.core).slice(0, 3); ds.forEach(d => B.complete(d)); out.combo = L.combo; out.comboAura = L.aura - a0; out.plain = ds.reduce((n, d) => n + d.need * 100, 0);
+    /* NPC army */ const nerd = L.foes.find(f => f.type === 'nerd'); L.foes.forEach(f => { if (f !== nerd) f.dead = true; }); B.complete(nerd); const owned0 = L.devs.filter(d => d.owned).length; L.P.x = 24; L.P.y = 24 * 16; for (const s of L.spawns) s.st = 'idle', s.t = 999; step(30 * 60); out.npcOwned = L.devs.filter(d => d.owned).length - owned0;
+    /* quip throttle */ G.cap = null; let n = 0, last = null; for (let i = 0; i < 20; i++) { B.say('x' + i); if (G.cap !== last) { last = G.cap; n++; } step(15); } out.quips10s = n;
+    /* finale countdown */ B.startLevel('nuke'); G.s = 'play'; L = B.L; L.time = L.def.limit - 0.5; step(70); out.fail = G.s; K.a = 1; step(2); K.a = 0; step(2); out.retry = G.s + ':' + B.L.id + ':' + Math.round(B.L.time);
+    /* closet */ B.goCrib(); L = B.L; B.SV.aura = 30000; B.SV.drip = 0; B.useThing({ use: 'closet' }); out.drip = B.DRIPS[B.SV.drip].n; B.useThing({ use: 'closet' }); out.drip2 = B.SV.drip; return out; });
+  check(fun.port && fun.portStays, 'a fiber port sends Bottie to the other one and does not bounce him back', JSON.stringify(fun));
+  check(fun.clover, 'walking onto the iced clover collects and saves it');
+  check(fun.combo === 4 && fun.comboAura > fun.plain, 'takes in a row build a combo worth more aura', 'combo ' + fun.combo + ' aura ' + fun.comboAura + ' vs plain ' + fun.plain);
+  check(fun.npcOwned >= 1, 'an NPC owns a device by himself within a minute', 'owned ' + fun.npcOwned);
+  check(fun.quips10s <= 2, 'ordinary quips are throttled', fun.quips10s + ' shown of 20 asked in 10 s');
+  check(fun.fail === 'fail' && /^(card|play):nuke:[0-3]$/.test(fun.retry), 'the finale clock runs out, and A runs it back', fun.fail + ' -> ' + fun.retry);
+  check(fun.drip === 'ICE PUFFER' && fun.drip2 === 0, 'the closet changes drip when there is enough aura, and says what the next one needs', fun.drip + ' then ' + fun.drip2);
+  await page.evaluate(() => { const B = __g.BT._; B.SV.drip = 2; B.startLevel('algo'); B.G.s = 'play'; const L = B.L; L.P.x = L.ports[1].x + 30; L.P.y = L.ports[1].y + 2; L.devs.slice(0, 2).forEach(d => B.complete(d)); }); await page.waitForTimeout(300); await shot('14-port-combo-gold-drip');
+  await page.evaluate(() => { const B = __g.BT._; B.SV.drip = 0; B.startLevel('nuke'); B.G.s = 'play'; B.L.time = 255; }); await page.waitForTimeout(400); await shot('15-finale-last-minute');
+  await page.evaluate(() => { __g.BT._.L.time = 299.8; }); await page.waitForTimeout(1800); await shot('16-finale-fail');
 
   /* ending -> crib -> console -> shelf -> back */
   await page.evaluate(() => { const B = __g.BT._; B.startLevel('nuke'); B.G.s = 'play'; B.L.devs.forEach(d => { if (d.core) B.complete(d); }); }); await page.waitForTimeout(3200); await shot('13-nuke-clear');
