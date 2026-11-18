@@ -1,5 +1,34 @@
 # Starhaven — Changelog
 
+## Reimagined 16 — no text over text, three voices, portraits with a world behind them (Nov 18, 2026)
+Will: some text pops up over other text; keep designing the characters; keep beautifying the game and the text and
+give it an identity.
+
+**Text over text, cleaned up.** Found by putting every kind of message on screen at once:
+- Floating words stacked on the same spot ("+4 XP" on "BULLSEYE" on "Firewood 2/3"). Each new one now sits above the
+  last, over Wren's head.
+- The speaker's name ribbon sat on top of the goal line. The goal hides while someone is talking.
+- Toasts and hints shared the top of the screen. A toast now takes the hint's place while it is up, and during
+  conversation it drops to the bottom so it never covers the speaker's name.
+- Level-up and finisher bands ran across hints and consequence cards. Those fade while a band is up.
+- Consequence cards overlapped the corner of the hint plate; they start lower.
+
+**An identity for the text: three voices.**
+- *The story* (what people say, narration, choices, whispers, the reasons on consequence cards, the journal): an old
+  book face (IM Fell English).
+- *The world's own lettering* (names, the goal, toasts, buttons, counts, plaques): Cinzel capitals, in gold, with the
+  four-point star as the mark.
+- *How to play* (hints): plain Nunito, so instructions never look like story.
+
+**Portraits.** Every face now has something of its world behind it: stars and a crescent for Caelum, forge-light and
+racked blades for Bram, threads of fate for Iris, shelves for Thane and Mirelle, cottage boards for the sisters (and
+Lissa's sprig), blossom for Rowan, thorns for the Queen, snow and pines for mortal Wren, starlight once she is fae.
+Each bust is lit from the upper left with a cool shadow, and the corners are darkened.
+
+**Honest notes.** The three faces come from Google Fonts and fall back to plainer ones offline. The faces themselves
+(the drawing of eyes, hair and so on) are as they were last round; this adds setting and light. Tests: 50 play
+checks, 19 menu checks, the fuzz run, the screenshot run. **Not played by hand or on a phone.**
+
 ## Reimagined 15 — Wren herself (Nov 18, 2026)
 Will: keep improving the slice, playtesting, and the graphics, animations and character models.
 

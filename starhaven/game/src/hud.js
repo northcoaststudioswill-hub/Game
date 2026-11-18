@@ -66,9 +66,9 @@
   H.toast = function (text) {
     const el = $('toast');
     el.textContent = text;
-    el.classList.add('show');
+    el.classList.add('show'); document.body.classList.add('toasting');   // a toast takes the hint's place while it is up
     clearTimeout(toastT);
-    toastT = setTimeout(() => el.classList.remove('show'), 3400);
+    toastT = setTimeout(() => { el.classList.remove('show'); document.body.classList.remove('toasting'); }, 3400);
   };
 
   // ---------------- dialogue box with a portrait
@@ -209,9 +209,9 @@
   // The bond meter, the Bond Art button, and whispers down the bond.
   let lastArt = '';
   H.art = function (a) {
-    const on = a.active(), ready = a.ready(), key = on + '|' + ready + '|' + Math.round(a.meter) + '|' + a.nextKind() + '|' + !!a.cutin;
+    const on = a.active(), ready = a.ready(), key = on + '|' + ready + '|' + Math.round(a.meter) + '|' + a.nextKind() + '|' + !!a.cutin + '|' + !!a.band;
     if (key === lastArt) return; lastArt = key;
-    document.body.classList.toggle('cutin', !!a.cutin);
+    document.body.classList.toggle('cutin', !!a.cutin); document.body.classList.toggle('banding', !!a.band);
     $('art').style.display = on ? 'block' : 'none';
     $('art').classList.toggle('ready', ready);
     $('art').firstChild.style.width = Math.round(a.meter / a.max * 100) + '%';

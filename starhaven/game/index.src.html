@@ -356,6 +356,23 @@ body.upright #d-face { width: 70px; height: 70px; } body.upright #dialog { margi
 .fbtn.sel { background: linear-gradient(90deg, rgba(255,210,122,.20), rgba(255,210,122,0)) !important; transform: none; box-shadow: none !important; }
 .fbtn.sel::before { background: var(--gold); box-shadow: 0 0 10px var(--gold); } .fbtn.sel .lbl { color: #fff6d8; } .fbtn.sel .lbl::before { content: ''; }
 #f-title { text-align: center; font-size: 17px; letter-spacing: .2em; text-transform: uppercase; }
+/* ---- one voice for the story, one for the world, one for the controls.
+   Story (what people say, what Wren writes): the old book face. The world's own lettering (names, titles, plaques): Cinzel
+   capitals in gold. How to play (hints, buttons): plain Nunito. And never two messages in the same place. */
+#d-text { font-family: 'IM Fell English', Georgia, serif; font-weight: 400; font-size: 20px; line-height: 1.36; letter-spacing: .005em; }
+#dialog.narr #d-text { font-family: 'IM Fell English', Georgia, serif; font-size: 19px; }
+.choice { font-family: 'IM Fell English', Georgia, serif; font-size: 17px; }
+#whisper span, .fx-row small, #ex-text, #c-text, .card p { font-family: 'IM Fell English', Georgia, serif; }
+#whisper span { font-size: 15px; } .fx-row small { font-size: 13.5px; font-style: italic; }
+#goal { font-family: var(--display); letter-spacing: .06em; font-size: 12.5px; } #goal .tag { font-size: 10px; letter-spacing: .2em; } #goal .tag::before { content: '\2726  '; }
+#toast { font-family: var(--display); letter-spacing: .05em; } #toast::before { content: '\2726  '; color: var(--gold); }
+#motes, #lvl, #art::after, .tbtn, #pause-btn { font-family: var(--display); }
+body[data-state="talk"] #goal { display: none; }                         /* the name ribbon sits where the goal was */
+#toast { bottom: auto !important; top: 50px !important; z-index: 8; } body.toasting #sign { opacity: 0 !important; }
+body.banding #sign, body.banding #toast, body.banding #effects { opacity: 0 !important; transition: opacity .15s; }
+#effects { top: 104px; }
+body.upright #toast { top: calc(var(--cvh) + env(safe-area-inset-top) + 72px) !important; }
+body[data-state="talk"]:not(.upright) #toast { top: auto !important; bottom: 12px !important; }   /* never over the speaker's name */
 /* ---- level and experience, under the Starlight count; touch buttons with a larger area than they look */
 #lvl { position: absolute; right: calc(max(14px, env(safe-area-inset-right)) + 96px); top: 44px; display: flex; align-items: center; gap: 6px; font: 800 10px var(--body); letter-spacing: .1em; color: #9fe8ff; }
 #lvl i { display: block; width: 54px; height: 5px; background: rgba(8,8,24,.75); border: 1px solid #4a7a9a; border-radius: 2px; overflow: hidden; } #lvl i span { display: block; height: 100%; background: linear-gradient(90deg, #4ab8e8, #9fe8ff); transition: width .4s; }

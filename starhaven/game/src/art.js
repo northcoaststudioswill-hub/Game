@@ -29,6 +29,18 @@
     // backdrop
     const gr = g.createRadialGradient(24, 20, 2, 24, 24, 34); gr.addColorStop(0, L.bg[0]); gr.addColorStop(1, L.bg[1]);
     g.fillStyle = gr; g.fillRect(0, 0, 48, 48);
+    {   // behind each face, something of where they belong
+      const h = i => { const x = Math.sin(i * 127.1 + who.length * 31.7) * 43758.5453; return x - Math.floor(x); };
+      const k = who.replace('_m', '');
+      if (k === 'caelum') { for (let i = 0; i < 16; i++) R(h(i) * 48, h(i + 40) * 30, 1, 1, i % 4 ? '#cfd6ff' : '#fff6d8'); g.fillStyle = 'rgba(255,246,216,0.5)'; g.beginPath(); g.arc(38, 9, 4, 0, 6.3); g.fill(); g.fillStyle = L.bg[0]; g.beginPath(); g.arc(40, 8, 3.6, 0, 6.3); g.fill(); }
+      else if (k === 'wren') { if (who === 'wren_m') { g.fillStyle = 'rgba(255,255,255,0.14)'; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(4 + i * 13, 48); g.lineTo(10 + i * 13, 14 + h(i) * 10); g.lineTo(16 + i * 13, 48); g.fill(); } for (let i = 0; i < 10; i++) R(h(i) * 48, h(i + 9) * 40, 1, 1, '#ffffff'); } else for (let i = 0; i < 12; i++) R(h(i) * 48, h(i + 20) * 34, 1, 1, i % 2 ? '#ffd27a' : '#fff6d8'); }
+      else if (k === 'bram') { const fg = g.createRadialGradient(24, 50, 2, 24, 50, 34); fg.addColorStop(0, 'rgba(255,150,70,0.6)'); fg.addColorStop(1, 'rgba(255,150,70,0)'); g.fillStyle = fg; g.fillRect(0, 0, 48, 48); for (let i = 0; i < 4; i++) { R(4 + i * 3, 4, 1, 16, 'rgba(200,210,226,0.5)'); } }
+      else if (k === 'iris') { g.strokeStyle = 'rgba(255,233,168,0.5)'; for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(0, 8 + i * 9); g.bezierCurveTo(16, 2 + i * 12, 30, 20 + i * 4, 48, 6 + i * 10); g.stroke(); } for (let i = 0; i < 8; i++) R(h(i) * 48, h(i + 3) * 26, 1, 1, '#fff6d8'); }
+      else if (k === 'thane' || k === 'mirelle') { for (let y = 2; y < 34; y += 9) for (let x = 0; x < 48; x += 3) { const bh = 5 + h(x + y) * 3; g.globalAlpha = 0.45; R(x, y + 8 - bh, 2, bh, ['#7a2a3a', '#2c3d74', '#8a6a2a', '#3a5a2a'][(x + y) % 4]); } g.globalAlpha = 1; }
+      else if (k === 'nessa' || k === 'lissa') { for (let x = 0; x < 48; x += 7) { g.globalAlpha = 0.25; R(x, 0, 6, 48, '#4a3020'); g.globalAlpha = 1; } if (k === 'lissa') { R(38, 6, 1, 8, '#4a7a4a'); R(36, 5, 3, 2, '#8fd16b'); R(39, 8, 3, 2, '#8fd16b'); } }
+      else if (k === 'rowan') { for (let i = 0; i < 12; i++) { g.fillStyle = i % 2 ? 'rgba(255,154,192,0.7)' : 'rgba(255,255,255,0.7)'; g.fillRect(h(i) * 48, h(i + 7) * 36, 2, 2); } }
+      else if (k === 'queen') { g.strokeStyle = 'rgba(255,74,90,0.5)'; g.lineWidth = 2; for (let i = 0; i < 4; i++) { g.beginPath(); g.moveTo(i * 14, 48); g.quadraticCurveTo(i * 14 + 10, 20, i * 14 - 4, 0); g.stroke(); } g.lineWidth = 1; }
+    }
     if (L.wings) { R(2, 14, 8, 30, '#0a0818'); R(38, 14, 8, 30, '#0a0818'); R(4, 10, 6, 6, '#0a0818'); R(38, 10, 6, 6, '#0a0818'); R(3, 14, 1, 26, '#6a5aa8'); R(44, 14, 1, 26, '#6a5aa8'); }
     if (L.thread) { g.strokeStyle = '#ffe9a8'; g.globalAlpha = 0.8; g.beginPath(); g.moveTo(0, 40); g.bezierCurveTo(14, 24, 30, 46, 48, 30); g.stroke(); g.globalAlpha = 1; }
     // long hair behind
@@ -77,6 +89,11 @@
     R(20, 34, 8, 2, L.shade); g.globalAlpha = 0.35; R(20, 36, 8, 2, '#000000'); g.globalAlpha = 1;
     g.globalAlpha = 0.5; R(18, 9, 9, 1, '#ffffff'); R(17, 10, 4, 1, '#ffffff'); g.globalAlpha = 0.25; R(24, 15, 1, 8, '#ffffff'); g.globalAlpha = 1;
     R(sx, 38, sw, 1, L.clothD); g.globalAlpha = 0.3; R(sx + sw - 5, 39, 5, 9, '#ffffff'); g.globalAlpha = 1;
+    // light the whole bust: warm from the upper left, cool shadow lower right, and darken the corners
+    g.globalCompositeOperation = 'source-atop';
+    const pl = g.createLinearGradient(8, 6, 40, 46); pl.addColorStop(0, 'rgba(255,240,205,0.16)'); pl.addColorStop(0.5, 'rgba(255,240,205,0)'); pl.addColorStop(1, 'rgba(24,16,70,0.26)'); g.fillStyle = pl; g.fillRect(0, 0, 48, 48);
+    const pv = g.createRadialGradient(24, 22, 14, 24, 24, 36); pv.addColorStop(0, 'rgba(0,0,0,0)'); pv.addColorStop(1, 'rgba(6,4,18,0.5)'); g.fillStyle = pv; g.fillRect(0, 0, 48, 48);
+    g.globalCompositeOperation = 'source-over';
     // rim light on the side away from the viewer
     g.globalAlpha = 0.35; R(32, 13, 1, 20, '#ffffff'); g.globalAlpha = 1;
     return (cache[key] = c);
