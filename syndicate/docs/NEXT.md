@@ -1,199 +1,151 @@
-# Guttercrown: next work
+# Guttercrown: design for the next round
 
-Status of this note: **planning only.** Nothing in this file has been built yet. It records what was decided in conversation, what is still open, and the order to build it in. Current game state is in `README.md`; the story bible is in `docs/LORE.md`.
+**Status: plan, not built.** This is the agreed design for the next stretch of work. The current game is described in `README.md`; the story bible is `docs/LORE.md`.
 
-Last pushed build: see `git log` on `claude/wonderful-euler-4hchee`.
+## Goals
+
+1. **Space out progression.** The climb to the crown currently takes five bouts. It should take an evening or more, with something new to spend coin on at every step.
+2. **Attachment.** One fighter, kept through death, with a story that tightens around them.
+3. **A spine for the story.** The pit, the Guild and the throne stay. A new figure, David Roseinbeirg, ties them to one long goal: take the realm from the bottom to the top.
 
 ---
 
-## 1. Decided
+## 1. Death and the Oracle of Time
 
-Added in the latest round:
-- **Expeditions are turn-based**, not timers. Easier to manage and to test.
-- **The contract is forced past a death threshold.** Past a certain number of deaths the player cannot refuse David. The threshold is hidden; David does not reveal it until later, because he is sneaky about it.
-- **David is greedy and sneaky.** He rubs his hands together and laughs. Keep the greed visible in every scene he is in.
+**Every lost bout is a death.** No more stretcher fee. Friendly duels (Mark, Ferren Voss) stay non-lethal.
 
-- **Fight to the death.** A lost bout is a death, not a defeat with a fee.
-- **Revival by the Oracle of Time.** Death is not the end. **David Roseinbeirg**, a wizard, wills the fighter back and sends them forward. His goal for you is the realm itself: taking it from the bottom of the pit to the top.
-- **Roseinbeirg's prejudice.** He hates every race except the one you pick. He sees through you whatever your class or race (elf druid, dwarf fighter, tiefling sorcerer, and so on). He is a character and a voice, not a stat.
-- **New classes: Druid and Tiefling.** Druid for animal forms and companions. Tiefling for infernal animal abilities (a familiar, a beast spirit). They should give the game a set of animal abilities it does not have yet.
-- **More finishers.** Current state: one mortal blow per class plus two more per class by rank (12 total). Add more and make them read as distinct.
-- **Gear sets.** Armour and weapon sets that pair, with set bonuses. Not just tiers.
-- **Progression work.** Needs a pass (see section 6).
-- **Animation.** More than the overhead heavy: smoothing, transitions between poses, idle and anticipation poses per weapon, impact reactions, recovery and stagger. Overhead is currently the strongest visible pose; the rest should match it.
-- **Controller must work.** It has not been tested on hardware. Test before calling any feature done (section 7).
+**David Roseinbeirg revives you.** He is the Oracle of Time, a wizard who "does not let the clock run out" on people he has plans for. You keep your fighter: level, gear, mastery, home and cosmetics all survive. What a death costs:
 
-## 2. The death and revival loop (to design)
+| Lost on death | Kept |
+|---|---|
+| The coin in your purse (not the strongbox) | Level, techniques, weapon mastery |
+| Your win streak | Gear, kits, charms, cosmetics |
+| Some respect (never enough to drop a rank) | Hideout, strongbox, Tally, Mark's loyalty |
+| | One point added to your **soul debt** |
 
-Questions to settle first, then build:
+**The contract.**
+- **First death:** David appears, revives you, and offers a contract: power to usurp the throne one day, in exchange for a debt of souls. You may sign or decline.
+- **Hidden threshold:** the third death binds you whether you signed or not. He does not say so at the time. He reveals it later, pleased with himself: dying was the signature.
+- **After binding:** he cannot be refused. His plan comes out in pieces as you rise.
 
-1. **Revival cost.** Options: lose coin (a fraction of purse), lose respect (a fraction of current rank progress), lose a gear piece (not the set), or lose nothing but time. Recommendation: lose coin and some respect, never gear or the Ledger record.
-2. **What survives a death.** Recommended: the fighter's level and rank stay, but the body is new. Gear, kit and mastery stay with the fighter. Cosmetics stay. (This is the closest to what was said; confirm.)
-3. **Roseinbeirg's contract.** Does the Oracle charge a higher price for each revival, or give a free one after a gap? A "soul debt" that rises per death is a good tension mechanic.
-4. **Yield.** Still a question: does yielding at low health avoid death at a cost, or does death only happen when the fight is lost? Simplest: knockout is death; a yield costs coin and streak but keeps the fighter.
-5. **Where he appears.** Scene at the first death, then a permanent presence at the Long Stair or a shrine in the market. He speaks differently to each race.
+**Soul debt.** Each death adds to it; each favour he grants adds more. It is paid down by expeditions (section 3). While it is high, he takes a cut of every purse. Paid down, he grants boons. The debt is the long-term pressure that replaces the old loss fee.
 
-## 3. David Roseinbeirg, the Oracle of Time (character brief)
+## 2. David Roseinbeirg
 
-**Who he is.** A wizard of the Roseinbeirg family, old money and older grudges. Addicted to gold, power and status, in roughly that order. He is a bullshitter, grandiose and hateful, and also very funny and easy to like, which is what makes the player's position uncomfortable. He is not Mark. Mark is a gambler who talks in short bursts; David talks like a man reading his own memoir aloud, with a cellar full of clocks.
+- **Voice:** theatrical, greedy, sneaky, very funny, easy to like. Rubs his hands together and laughs. Talks like a man reading his own memoir aloud. A bullshitter who is occasionally, alarmingly, right.
+- **Prejudice:** he despises every race but yours. Whatever you are not is "exactly what I'd expect of" them: orcs, elves, dwarves, humans, tieflings, by turn. Yours are "the only sensible people in the realm." It is aimed at fantasy species only and played for how confident and wrong he is.
+- **He sees you.** Whatever your class or race, he says he sees the truth in you, and he may even mean it.
+- **What he wants:** gold, power and status. He needs an ally on the Koheneim throne so the Roseinbeirg family can move into the realm's lands. He shares the full plan with nobody but you.
+- **The discomfort is the point.** He is hateful and your only friend with real power. Scenes should let the player enjoy him and distrust him at once.
+- **Where he lives:** a cellar of clocks beneath the Lamp Market, reached only after the first death. It becomes a spot in the market.
+- **Needs:** model and portrait (long coat, hourglass, too many rings), the first-death scene, the binding reveal, revival lines for each player race, expedition report lines, codex entries that unlock as the plan is revealed.
 
-**His prejudice, in his own words.** He is "exactly what you'd expect" of whatever race you are not: orcs are brutes, elves are vain, dwarves are stubborn, humans breed like rats, tieflings are a bad bargain. He calls the race you picked "the only sensible ones." Keep this in the dialogue and in his voice, and always aim it at the species, never at real groups of people. The laugh should come from how confident and wrong he is.
+## 3. Expeditions (turn-based)
 
-**What he wants.** The realm. He will not take the throne himself; he needs an ally on it. He has picked you. His family plans to move into the lands once the ally rules, so the plan is to take the throne (Eerin and Vilhelm Koheneim) and then settle the Roseinbeirgs in.
+Built on the existing Tally jobs: you assign crew, and they resolve after your next bout or two with a d20 roll.
 
-**The contract.** After your first death he offers a contract. Signing it is the moment the story turns. Terms (draft):
-- He revives you (the Oracle of Time, "I simply don't let the clock run out on you").
-- You owe him a **debt of souls**: a price he collects in exchange for the power he gives. Mechanically: a soul-debt meter that grows with each revival and each favour he asks.
-- In return he gives you the power to usurp the king one day.
+- **Unlocked by the contract.** Before it, the Tally only does Guild work.
+- **Targets:** wizard-gold caravans, tribal lands, outlying villages. Outcomes are rare wizard gold (pays soul debt), captives for ransom (coin), and burned villages (terror, which David values for clearing land).
+- **Tone:** villainous and treated as such. Captives are prisoners held for ransom. No sexual content.
+- **Consequences:** the folk remember. Raids raise **heat**: more Seal-Warden events at the Long Stair, villagers who come up the Ledger as grudge challengers, prices rising at honest stalls. Heat is the cost of serving David quickly.
+- **Open:** exactly how heat and raids change the ending.
 
-**The expeditions (short term, the money engine).** To pay the debt and fund the family, you send out expeditions:
-- **Rare wizard gold** from raided caravans and vaults.
-- **Captives** taken from outlying villages and tribes. Write these as prisoners taken and sold or ransomed; keep it clearly villainous and non-sexual. Do not frame it as abuse.
-- **Harassed tribes and burned villages.** Each raid lowers the local folk's standing with you and raises the Seal-Wardens' attention.
+## 4. Spaced progression
 
-Design notes for expeditions (not yet decided):
-- **Time or turns?** A real-time timer (come back later) suits the endless ladder; a turn-based menu is simpler to test.
-- **Underlings, not the fighter.** The fighter is in the pit. Expeditions use the Tally crew, which is already in the game.
-- **Consequences that feed back:** Highmarch heat, the Wardens' inspections at the Long Stair, the Guild's tithe, and villagers who might send a challenger to the pit to settle a grudge (new challengers for the Ledger).
-- **Moral weight:** the game lets the player do this. Decide whether the raids affect the endings and whether there is a way to refuse David (the contract says no after the first death; a refusal means staying dead).
+**A longer ladder.** Named opponents stay as gates. Between them the Guild feeds you generated undercard fighters at your level:
 
-**He only shares his plan with you.** The full plan is revealed in pieces through deaths, ranks and signing, so the player learns what the family wants at the same pace David trusts them. Keep each reveal a little worse than the last.
+| Tier | Undercard bouts to earn the gate | Gate |
+|---|---|---|
+| 1 | 2 | Grubb |
+| 2 | 3 | Sister Maul |
+| 3 | 3 | Kessa Cinderhand |
+| 4 | 4 | Brakk Ironjaw |
+| 5 | 4 | Vexa |
 
-**Race effect (to decide).** Two options:
-- Dialogue only: he insults other races; the player's race is praised.
-- Light mechanic: fighting your own race gives a small bonus, and rivals of other races cost more at his shrine. Keep it small and make it a joke he is proud of.
+You can always go back and fight lower tiers for smaller purses. After the crown, the endless Ledger continues as now.
 
-**Voice guide.** Theatrical, self-important, quick with insults and compliments in the same breath. Uses the word "darling" for the player only. Never explains a joke. Gets quiet, once, when money is not mentioned.
+**Levels to 10.** Slower XP, with alternating rewards: techniques, a subclass, feats, a second ultimate choice, and stat points you place yourself.
 
-**Assets needed.** Portrait (long coat, hourglass, too many rings), a short intro scene, the contract scene, 6 to 8 revival lines per race, expedition result lines (about 20), and a codex entry that unlocks as his plan is revealed.
+**Nothing all at once.** Each system opens when you earn it, with a short introduction the first time, and its codex entry unlocks when you first use it:
 
-## 4. Druids and Tieflings
+| Opens at | System |
+|---|---|
+| Start | The pit, the Fence (potions, basic gear), your hideout |
+| First win | The Notice Board and contracts, Big Hobb's Pot |
+| Rank 1 (Scrapper) | The Tally (your first follower), the Apothecary, the catalogue's second page |
+| Rank 2 (Bloodied) | Mark's table and the Wisp Table, the Armoury, the Tailor |
+| Rank 3 (Enforcer) | The Outfitter, charms, Whisper, techniques for hire |
+| First death | David's cellar; the contract |
+| Bound by contract | Expeditions |
+| Rank 4 and up | Mark's partnership, high-rung gear, the Long Stair's tithe |
 
-**Druid** (new class)
-- Primary stat: Wisdom. Resource: a nature pool that refills in the open (the pit or the market).
-- Basic attack: a claw or staff, with animal-shift options.
-- Technique ideas: Wolf Stride (fast dash, bite), Bear Stance (heavy, high posture, slow), Hawk Dive (aerial leap-slam), Thorn Wall (trap), Animal Companion (summoned pet that fights beside you for a short time).
-- Subclasses: Circle of the Moon (shapes), Circle of the Grove (traps and roots).
+## 5. Gear: junk to awesome
 
-**Tiefling** (race, with class-agnostic animal abilities)
-- Gets an infernal beast spirit: a hellhound, a cat, or a crow. Gives one active ability per fighter.
-- Fire resistance is already partly in the Sorcerer kit; keep the tiefling identity as the animal tie-in, not just a stat bonus.
-- Roseinbeirg dislikes tieflings more than most. Make his lines about it.
+Each class gets a ladder of sets. A set is weapon, armour and a trinket; wearing all three gives a set bonus. Every rung must look different on the fighter.
 
-**Balance rule for animals:** a summoned or shifted form should never be a free second fighter. It takes stamina or nature pool, lasts a few seconds, and ends with a clear recovery.
+| Rung | Source | Feel |
+|---|---|---|
+| Junk | Start, crowd scraps | Rusted, dented, a drawback with a small upside |
+| Common | The Fence | One clean bonus |
+| Good | Armoury and Outfitter | A real set bonus |
+| Fine | Deeds, mastery | A bonus that changes how you fight |
+| Awesome | David, expeditions, the crown | A signature effect and its own finisher |
 
-## 5. Finishers, gear sets, animation
+Existing weapons and kits are folded into this ladder, not replaced.
 
-**Finishers** (target: about 4 per class, each with its own move and camera)
-- Current: Headsman's Verdict, Through the Wall, Earthbreaker (fighter); Death of a Thousand Cuts, The Quiet Word, Rain of Knives (rogue); Disintegrate, Meteor Swarm, Chain Lightning (sorcerer); Flame Strike, Banishing Smite, Power Word Kill (cleric).
-- Add: at least one for druid, one for each tiefling animal, and one more per existing class.
-- Each finisher needs a readable pose, a camera beat and a sound. The set is what makes the mortal blow feel earned.
+## 6. Classes and races
 
-**Gear sets**
-- Sets of 3 pieces (weapon, armour, one accessory). Full set gives a bonus that changes how you fight, not just a stat bump.
-- Examples to start: *Pit Scavenger* (speed, parry window), *Warden's Watch* (posture, damage taken), *Lampwright's Set* (fire, light radius), *Sunless Vigil* (healing, regen).
-- Sets are chosen from the Outfitter and Armoury, and some drop from deeds.
+- **Druid (new class):** Wisdom, staff or claws. Animal forms as stances that change your basic attacks: Wolf (fast, bleeding bites), Bear (slow, high posture, heavy), Hawk (leaping strikes). Thorn traps and a short-lived animal companion. Subclasses: Circle of the Moon (forms), Circle of the Grove (roots and traps).
+- **Tiefling (already a race):** gains an infernal beast spirit, chosen at creation: hellhound, cat or crow. One active ability each.
+- **Rule:** a companion or form is never a free second fighter. It costs resource, lasts seconds, and ends in a recovery.
 
-**Animation** (the largest feel change)
-- Idle breathing and weight shift per class; anticipation pose before each basic.
-- Smooth transitions between poses (currently poses snap at some joints).
-- Impact reactions: flinch on light hits, stagger on heavy, knockdown on finisher.
-- Recovery frames: the fighter should visibly reset after a big swing.
-- Per-weapon idle stances (spear low, axe high, rapier light).
+## 7. Combat feel
 
-## 5a. Gear: cheap and weak to awesome
+- **Finishers:** at least four per class, plus one per druid form and tiefling spirit. Each gets its own pose, camera beat and sound.
+- **Unlockable specials:** one signature move per weapon family, earned through mastery and deeds, carried by choice.
+- **Gore:** tied to where and how hard the blow landed. Wounds and stumps stay visible through the bout. Heads can come off in finishers. The Blood setting still turns it all to sparks.
+- **Animation:** the overhead heavy is the best pose in the game; bring the rest up to it. Per-weapon idle stances, anticipation before every attack, distinct light, thrust and sweep swings, flinch and stagger reactions, recovery frames, walk and turn blending.
+- **Smoothing:** review input buffering, hit-stop lengths and camera kick together once the new animations are in.
 
-A ladder, not just tiers. Each class gets a line of sets from junk to legendary, with a visible step at each rung:
-1. **Junk** (free or near free): rusted, dented, a bad bonus. Bought from the market or dropped by the crowd.
-2. **Common** (the Fence): one clean bonus, a readable look.
-3. **Good** (Armoury and Outfitter): a full three-piece set bonus.
-4. **Fine** (deed or mastery reward): a set bonus that changes how you fight.
-5. **Awesome** (Roseinbeirg's contract, expeditions, or the Crown): a set with a signature effect and its own finisher.
+## 8. Polish and world
 
-Rule: every rung should look different on the fighter, not just recolour.
+- **Text pass:** every panel and label, for length, typos and consistent voices (Mark, the Keeper, the Wardens, David).
+- **Looks:** menus and market checked at phone and widescreen sizes.
+- **World:** David's cellar, the expedition lands as painted map cards, more of the lower levels.
+- **Intros:** short first-time scenes for each system as it unlocks, plus David, the druid and the contract. The opening cinematic gains a beat for David once he exists.
 
-## 5b. Gore (more, and readable)
+## 9. Controller
 
-- Limbs, heads and blood trails tied to hit location and damage, not random.
-- Stumps and wounds visible on the fighter as the fight goes on.
-- Gore scales with the blood setting. Blood off means smoke and sparks instead.
+To be tested on a real pad before any step is called done.
 
-## 5c. Finishers and unlockable specials
+Current mapping: left stick move, right stick aim, X or RT strike (hold for heavy), LT parry (hold to block), A dodge, LB/RB/Y abilities, B ultimate, D-pad up potion, D-pad left call your Second, Start pause. In menus: D-pad or stick to move, A confirm, B back.
 
-- Four finishers per class (see section 5), plus at least one per druid and tiefling animal.
-- **Specials** unlock with deeds and mastery: one signature move per weapon family, separate from the mortal blow. A special is a learned trick you choose to carry, not a free button.
+Checklist:
+- [ ] Hold-and-release heavy registers; the charge ring shows.
+- [ ] A short LT press parries; holding it blocks; releasing drops the guard.
+- [ ] Every menu can be opened, navigated and closed without a mouse, including the catalogue grid, Armoury, Outfitter and Mark's games.
+- [ ] Cutscenes advance with A and skip with B.
+- [ ] Furniture placement works with the stick.
+- [ ] Unplugging the pad mid-fight does not leave a button held.
 
-## 6. Progression work
+## 10. Build order
 
-Current issues to fix before adding content:
-- The early curve is slow to reward. Levels 1 to 3 need to arrive faster.
-- Coin has few meaningful sinks until mid-game. Each rank should open one.
-- Revival needs a progression rule too: a fighter who dies should feel like they keep most of the climb, not that the game reset.
-- The endless Ledger (challengers past the crown) needs a difficulty ramp check.
+1. **Death, revival and David's first scenes.** Soul debt, the hidden threshold, his cellar.
+2. **Spaced progression.** Undercard bouts, levels to 10, the unlock schedule with first-time intros and codex-on-use.
+3. **Expeditions and heat.**
+4. **Gear ladder**, folding in existing weapons and kits.
+5. **Druid, then tiefling spirits.**
+6. **Finishers, specials and gore.**
+7. **Animation and smoothing pass.**
+8. **Text, looks and world pass.**
+9. **Controller pass on hardware, then balance and a full playtest.**
 
-Earlier ideas kept for later (from the retirement discussion, not active):
-- Gate access by respect and level, not all at once.
-- Codex entries that unlock when a system is first used.
+Old saves must keep working at every step.
 
-## 6a. Polish, world and intros
+## 11. Defaults I will use unless told otherwise
 
-- **Text clean-up:** one pass over every panel and label for length, consistency and typos. Keep voice distinct per character (Mark, the Keeper, the Wardens, David).
-- **Looks:** a visual pass on menus and the market at phone and widescreen sizes (see the widescreen text scaling already in place).
-- **World building:** more of the lower levels, the Oracle's cellar, and the expedition targets (villages, tribes, caravans).
-- **Intros:** short intro scenes for Roseinbeirg, the druid, the tiefling and the contract.
-- **Animations:** continue section 5 (idle, anticipation, impact, recovery, stances) and add finisher camera beats.
-
-## 7. Controller checklist (before any feature is "done")
-
-Current mapping (standard layout, from `js/main.js`):
-- Left stick: move; right stick: aim.
-- A: dodge (menu: confirm). B: ultimate (menu: back).
-- X or RT (button 2 / 7): strike. Hold for heavy.
-- LT (button 6): parry on press, block on hold.
-- LB, RB, Y: abilities (Q, E, R). D-pad up: potion. D-pad left: call the Second.
-- Start / Menu: pause.
-
-Things to verify on hardware:
-- [ ] Heavy blow: hold strike, release, and confirm the charge ring and "HEAVY READY" show.
-- [ ] Parry-then-block: press LT for the window, then hold LT past it, and confirm the guard holds and costs stamina.
-- [ ] Menus: D-pad moves, A confirms, B backs out, nothing stays stuck open.
-- [ ] Market walk: left stick walks and stops cleanly at a spot; A opens it.
-- [ ] Ledger and Armoury lists scroll with the stick.
-- [ ] Cutscenes: A advances, B skips.
-- [ ] Controller disconnect and reconnect mid-fight pauses and resumes.
-- [ ] D-pad left is used for both "call the Second" (fight) and menu navigation; confirm they never collide.
-
-Note: LT does two jobs (parry and block). That is intended, but test it on a real pad first; a short press must not accidentally hold the block.
-
-## 8. Known issues to check
-
-- Balance drifted after the last rounds. The bot clears the ladder in 5 to 11 bouts per class, and Sorcerer versus Vexa is still the hardest matchup. Re-check after any change to death or revival.
-- The tap, hold and block inputs feel are only tested by script. Playtest on keyboard and controller.
-- Gear sets and the new classes will change the balance tables; re-run the four-class balance bot and the matchup test after each.
-- The fight-to-death rule itself is not yet implemented: current losses still cost a fifth of purse and do not kill the fighter. This is the first build item.
-
-## 9. Build order (updated)
-
-The list below is the order to build; the gear, gore, specials, polish and intro work in 5a to 6a slots in after step 4.
-
-1. **Death and revival** (section 2), with the Oracle scene and Roseinbeirg's dialogue hooks (section 3).
-2. **Progression pass** (section 6): faster early levels, coin sinks, revival keeps the climb.
-3. **Druid and Tiefling** (section 4), with their first two abilities each.
-4. **Gear sets** (section 5), starting with three sets.
-5. **Finishers**, filling each class to four.
-6. **Animation pass** (section 5), starting with idle, anticipation and impact reactions.
-7. **Controller pass** (section 7) on hardware, before calling any of the above done.
-8. **Balance pass** (section 8) and the playtest.
-
-## 10. Open questions for you
-
-7. Race effect: dialogue only, or a small mechanic too? (Still open.)
-8. How many deaths is the hidden threshold? (Decide the number; keep it hidden in the game.)
-9. Do raids change the endings? (Still open; the player cannot refuse David past the threshold.)
-
-1. Revival cost: coin, respect, gear, or only time?
-2. Does the fighter keep level, gear and mastery across a death, or only the class and name?
-3. Does Roseinbeirg's price rise per revival, or is revival free after a gap?
-4. Does yielding exist, or is every knockout a death?
-5. Should his race prejudice affect the game mechanically (price and bonus), or only his dialogue?
-6. Druid: are the animal forms separate abilities, or one shapeshift state that changes all moves?
+- The hidden threshold is the **third** death.
+- There is **no yield**; a lost bout is a death.
+- David's prejudice is **dialogue only**, with no stat effects.
+- Raids **do** shape the ending, decided when we write it.
+- Existing saves are treated as fighters who have not yet died.
