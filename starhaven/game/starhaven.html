@@ -556,7 +556,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.8 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.9 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -1252,6 +1252,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     ],
     ashes_lamps: [
       ['narr', 'The fourth lamp catches. All down the street, gold runs from window to window, and somewhere a shutter opens that has been shut for months.'],
+      ['narr', 'Old Mirelle has come out onto her step to look up at them.'],
       ['mirelle', 'Forty years I lit those, till my knees gave out before the lamps did. Nobody asked you to. That is the right way to do it.'],
       { do: 'remember', key: 'lamps', text: 'Lit the four dark lamps on Mirelle\'s street, unasked.', good: true },
       ['wren', 'It felt wrong, walking past them.'],
@@ -1941,8 +1942,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       { x0: 2, x1: 66, text: 'The cells under the Deep. Look around. The way back up is at the far right, past the pillar.', below: 22, until: 'd_up' },
       { x0: 66, x1: 76, text: 'Four ledges up the shaft. Jump straight up through each one.', below: 17 },
       { x0: 3, x1: 21, text: 'Walk up to an altar and use {TALK} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle', above: 20 },
-      { x0: 3, x1: 17, text: 'Move with {MOVE}.', above: 20 },
-      { x0: 17, x1: 31, text: 'Jump with {JUMP}. Hold it to jump higher, tap it for a small hop.', above: 20 },
+      { x0: 21, x1: 31, text: 'Hold {JUMP} to jump higher; tap it for a small hop. Miss a jump here and you land in the cells below, unhurt.', above: 20 },
       { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.', above: 20 },
       { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.', above: 20 },
       { x0: 44, x1: 52, text: 'Someone is standing in the dark. {TALK} if you want to.', until: 'd_caelum', above: 20 },
@@ -2005,8 +2005,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       ['solid', 118, 122, 0, 20],
     ],
     hints: [
-      { x0: 3, x1: 14, text: 'Move with {MOVE}. Caelum will meet you up the road.' },
-      { x0: 19, x1: 31, text: 'Jump with {JUMP}.' },
+      { x0: 3, x1: 14, text: 'Caelum will meet you up the road.' },
       { x0: 90, x1: 104, text: 'Crates, balcony, eave: three jumps up to the roof.', flag: 'painted' },
       { x0: 54, x1: 68, text: 'The street lamps are dark. Climb the balconies and touch each lamp to light it. Four on this street.', flag: 'arrive', until: 'lamps4' },
       { x0: 75, x1: 85, text: 'Two more lamps up on these balconies.', flag: 'arrive', until: 'lamps4' },
@@ -2033,7 +2032,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
 
   // ---------------------------------------------------------------- Chapter 2: The Five (daggers, pogo, first enemies)
   SH.ROOMS.ring = {
-    id: 'ring', width: 150, height: 20, theme: 'city',
+    id: 'ring', width: 118, height: 20, theme: 'city',
     zones: [{ x: 0, theme: 'city' }, { x: 66, theme: 'thornwood' }],
     start: { x: 5, y: 16 },
     cityGlowX: 30,
@@ -2045,9 +2044,9 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       ['thorns', 42, 59, 16],             // sunk into the floor: you fall in, you cannot walk into them
       ['oneway', 47, 49, 14],            // somewhere to land between buds
       ['oneway', 52, 54, 14],
-      ['ground', 60, 148, 16],
+      ['ground', 60, 118, 16],
       ['oneway', 88, 94, 12],
-      ['solid', 148, 150, 0, 20],
+      ['solid', 116, 118, 0, 20],        // the thornwood closes in: nothing past here
     ],
     hints: [
       { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.', until: 'combo1' },
@@ -2080,7 +2079,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     ],
     props: [
       { t: 'fence', x: 13, w: 18 }, { t: 'rack', x: 7 }, { t: 'rack', x: 33 }, { t: 'banner', x: 3.5 }, { t: 'banner', x: 36, c: '#7a2a4a' }, { t: 'crate', x: 9.5 }, { t: 'barrel', x: 30 },
-      { t: 'bush', x: 70 }, { t: 'bush', x: 85 }, { t: 'bush', x: 99 }, { t: 'bush', x: 113 }, { t: 'deadtree', x: 76 }, { t: 'deadtree', x: 109 }, { t: 'deadtree', x: 127 }, { t: 'cairn', x: 121 },
+      { t: 'bush', x: 70 }, { t: 'bush', x: 85 }, { t: 'bush', x: 99 }, { t: 'bush', x: 110 }, { t: 'deadtree', x: 76 }, { t: 'deadtree', x: 87 }, { t: 'deadtree', x: 102 }, { t: 'deadtree', x: 112 }, { t: 'cairn', x: 107 }, { t: 'bones', x: 82 }, { t: 'bones', x: 95 }, { t: 'boulder', x: 113.5, w: 2, h: 2 },
     ],
     motes: [['line', 14, 20, 14.6], ['pt', 45.5, 10.6], ['pt', 50.5, 10.4], ['pt', 55.5, 10.6], ['line', 70, 76, 14.6], ['line', 89, 93, 10.6], ['line', 96, 101, 14.6]],
     dummyCombo: 'ring_combo',          // landing a full 3-hit combo on the dummy runs this
@@ -6075,8 +6074,8 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
       motes: ['#ffffff', '#dfe8f8'],
     },
     thornwood: {
-      sky: ['#090b20', '#191a45', '#33295c', '#4d3a72'], stars: true, far: 'mountains', mid: 'trees',
-      farA: '#23275a', farB: '#181b42', midC: '#11132e', mist: 'rgba(110,100,190,0.18)',
+      sky: ['#0c0b24', '#221a4c', '#4a2c64', '#864674'], stars: true, far: 'mountains', mid: 'trees',
+      farA: '#3a2c68', farB: '#281f52', midC: '#1a1538', mist: 'rgba(210,110,170,0.16)', glow: 'rgba(255,90,140,0.18)',
       ground: '#0a0b17', speck: '#121430', edgeLight: '#c3cdff', edgeMid: '#56609c', grass: '#5ba39a', grassDark: '#2f6a66', side: '#20264d',
       motes: ['#cfe0ff', '#ffe9a8'],
     },
@@ -6112,7 +6111,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     }
   };
   // How dark each place is away from a light: [colour, strength].
-  const DARK = { deep: ['#020806', 0.46], thornwood: ['#06030c', 0.42], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
+  const DARK = { deep: ['#020806', 0.46], thornwood: ['#0a0414', 0.3], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
   function drawLight(ctx, w, cx, cy, vw, VH, t, themeA, themeB, k) {
     const a = DARK[themeA] || DARK.dusk, b = DARK[themeB] || a, strength = a[1] + (b[1] - a[1]) * k;
     const c = layers.dark, g = c.getContext('2d');
@@ -6397,9 +6396,33 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
           if (pitR) { g.fillStyle = PAL.gold; g.fillRect(x + TS - 5, y, 5, 2); g.fillRect(x + TS - 2, y, 2, 6); }
         }
       } else if (t === SH.T_ONEWAY) {
-        g.fillStyle = PAL.plank; g.fillRect(x, y, TS, 7);
-        g.fillStyle = PAL.plankTop; g.fillRect(x, y, TS, 2);
-        g.fillStyle = '#17132a'; g.fillRect(x + 2, y + 7, 2, 4); g.fillRect(x + TS - 4, y + 7, 2, 4);
+        // a ledge is a thing in its place: a balcony in the city, a hung slab in the Deep, a shelf of rock outdoors, woven thorn in the thornwood
+        const d = r.def, inCity = d.cityFrom != null && tx >= d.cityFrom - 1 && (d.cityTo == null || tx <= d.cityTo + 1);
+        const endL = get(tx - 1, ty) !== SH.T_ONEWAY, endR = get(tx + 1, ty) !== SH.T_ONEWAY, hsh = (tx * 7 + ty * 13) % 5;
+        if (T === THEMES.thornwood && !inCity) {
+          g.fillStyle = '#0a0818'; g.fillRect(x, y - 1, TS, 9); g.fillStyle = '#3a2430'; g.fillRect(x, y, TS, 7); g.fillStyle = '#5a3444'; g.fillRect(x, y, TS, 2);
+          g.fillStyle = '#2a1622'; for (let i = 0; i < 4; i++) g.fillRect(x + i * 6 + (hsh % 3), y + 3, 4, 1);
+          g.fillStyle = '#3a2430'; for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(x + 2 + i * 8, y + 7); g.lineTo(x + 5 + i * 8, y + 12 + (i + hsh) % 3); g.lineTo(x + 7 + i * 8, y + 7); g.fill(); }
+          if (hsh === 0) { g.fillStyle = '#ff5a78'; g.fillRect(x + 10, y + 9, 2, 2); }
+        } else if (T === THEMES.deep) {
+          g.fillStyle = '#0a0f0c'; g.fillRect(x, y - 1, TS, 10); g.fillStyle = '#34463c'; g.fillRect(x, y, TS, 8); g.fillStyle = '#56705e'; g.fillRect(x, y, TS, 2); g.fillStyle = '#243228'; g.fillRect(x, y + 6, TS, 2);
+          g.fillStyle = '#1c2a22'; g.fillRect(x + 11 + hsh, y + 2, 1, 4); g.fillStyle = '#6f9a5c'; g.fillRect(x + (hsh * 4) % 18, y - 1, 5, 2);
+          for (const [e, ex] of [[endL, x + 3], [endR, x + TS - 4]]) if (e) { for (let cy2 = y - 4; cy2 > y - 96; cy2 -= 5) { g.fillStyle = (cy2 / 5 | 0) % 2 ? '#3a4640' : '#252e2a'; g.fillRect(ex, cy2, 2, 4); } g.fillStyle = '#56705e'; g.fillRect(ex - 1, y - 3, 4, 3); }
+          if (hsh === 2) { g.fillStyle = '#243228'; g.fillRect(x + 8, y + 8, 2, 4); g.fillRect(x + 8, y + 13, 1, 2); }
+        } else if (inCity || T.gstyle === 'brick' || !T.gstyle) {
+          g.fillStyle = '#0a0818'; g.fillRect(x, y - 1, TS, 9); g.fillStyle = '#4a4478'; g.fillRect(x, y, TS, 7); g.fillStyle = '#7a72b0'; g.fillRect(x, y, TS, 2); g.fillStyle = '#322c58'; g.fillRect(x, y + 5, TS, 2);
+          g.fillStyle = '#2a2450'; g.fillRect(x + 11, y + 2, 1, 3);
+          // a striped awning valance hangs under it, scalloped
+          for (let i = 0; i < 4; i++) { g.fillStyle = (tx * 4 + i) % 2 ? '#8a3a5a' : '#e8d8c0'; g.fillRect(x + i * 6, y + 7, 6, 5); g.beginPath(); g.arc(x + i * 6 + 3, y + 12, 3, 0, Math.PI); g.fill(); }
+          g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(x, y + 7, TS, 1);
+          for (const [e, sd, ex] of [[endL, 1, x], [endR, -1, x + TS]]) if (e) { g.fillStyle = '#17132a'; g.beginPath(); g.moveTo(ex, y + 7); g.lineTo(ex + sd * 9, y + 7); g.lineTo(ex, y + 20); g.fill(); g.fillStyle = '#e8c070'; g.fillRect(ex + (sd > 0 ? 0 : -2), y + 18, 2, 3); }
+        } else {
+          const snowy = T === THEMES.mountain || d.theme === 'woods';
+          g.fillStyle = '#0a0818'; g.fillRect(x, y - 1, TS, 8); g.fillStyle = SH.shade(T.ground, 1.25); g.fillRect(x, y, TS, 6);
+          g.fillStyle = SH.shade(T.ground, 0.8); g.beginPath(); g.moveTo(x, y + 6); g.lineTo(x + TS, y + 6); g.lineTo(x + TS - (endR ? 8 : 0), y + 10 + hsh); g.lineTo(x + 12, y + 13 + (hsh % 3)); g.lineTo(x + (endL ? 8 : 0), y + 9 + (hsh % 2) * 2); g.fill();
+          g.fillStyle = snowy ? '#f2f6ff' : SH.shade(T.grass || T.ground, 1.2); g.fillRect(x, y - 1, TS, 3); if (snowy) { g.fillRect(x + 3 + hsh, y + 2, 6, 1); g.fillStyle = '#c8d4f0'; g.fillRect(x, y + 1, TS, 1); }
+          if (snowy && hsh === 1) { g.fillStyle = '#dfe8ff'; g.fillRect(x + 6, y + 9, 2, 6); g.fillRect(x + 7, y + 15, 1, 2); }   // an icicle
+        }
       } else if (t === SH.T_THORNS) {
         const glow = g.createLinearGradient(0, y - 8, 0, y + TS); glow.addColorStop(0, 'rgba(255,60,100,0)'); glow.addColorStop(1, 'rgba(255,60,100,0.22)');
         g.fillStyle = glow; g.fillRect(x, y - 8, TS, TS + 8);
@@ -8208,7 +8231,7 @@ body.upright #b-gift { bottom: calc(12vh + 142px); }
     if (jTab === 'now') {
       html += `<h3>Now: ${esc(ch.label)}, ${esc(ch.name)}</h3><ul class="goals">`;
       for (const g of ch.goals) {
-        const done = !!G.flags[g.id];
+        const done = !!G.flags[g.id] || (ch.goals.findIndex(x => x.id === G.activeGoal) > ch.goals.indexOf(g));   // anything before the goal she is on is done
         html += `<li class="${done ? 'done' : g.id === G.activeGoal ? 'now' : ''}">${done ? '&#10003;' : g.id === G.activeGoal ? '&#9656;' : '&#9675;'} ${esc(g.text)}</li>`;
       }
       html += '</ul><h3>What I am working toward</h3>';

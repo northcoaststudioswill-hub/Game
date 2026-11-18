@@ -297,7 +297,7 @@
     if (jTab === 'now') {
       html += `<h3>Now: ${esc(ch.label)}, ${esc(ch.name)}</h3><ul class="goals">`;
       for (const g of ch.goals) {
-        const done = !!G.flags[g.id];
+        const done = !!G.flags[g.id] || (ch.goals.findIndex(x => x.id === G.activeGoal) > ch.goals.indexOf(g));   // anything before the goal she is on is done
         html += `<li class="${done ? 'done' : g.id === G.activeGoal ? 'now' : ''}">${done ? '&#10003;' : g.id === G.activeGoal ? '&#9656;' : '&#9675;'} ${esc(g.text)}</li>`;
       }
       html += '</ul><h3>What I am working toward</h3>';

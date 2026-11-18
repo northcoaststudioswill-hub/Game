@@ -1,5 +1,31 @@
 # Starhaven — Changelog
 
+## v0.1.9 — a round of beautification and a sense check (Nov 18, 2026)
+Will: do a round of beautification, play through and look for anything that does not make sense, then push.
+
+Beautification:
+- **Ledges are things now, not lines.** Every thin platform used to be the same flat plank. In the city they are
+  stone balconies with striped awnings and brackets; in the Deep, mossy slabs hung on chains; in the woods and on
+  the mountain, shelves of rock capped with snow and the odd icicle; in the thornwood, woven thorn.
+- **The thornwood has colour.** It was close to black. The sky now ends in a sick rose, the mist is the Queen's
+  pink, and the dark away from a light is less heavy, so the ground and the enemies read.
+- More in the thornwood to look at: dead trees, bones, a boulder at the end.
+
+What a walk through every level found that did not make sense, and the fix:
+- **A long empty walk at the end of Bram's Ring.** After the last thorn sprite there were about forty tiles of
+  nothing. The level now ends there, at a wall where the thornwood closes in.
+- **The journal showed finished lessons as not done.** While Bram taught the rising strike, "three cuts on the
+  dummy" still looked unfinished. Anything before the goal you are on is now ticked.
+- **The Deep and Ashes re-taught walking and jumping**, which the Winter Woods already teaches. Those hints are gone.
+  The Deep's jump hint now says what is actually new there: miss a jump and you land in the cells, unhurt.
+- **Mirelle spoke about the lamps from nowhere.** She now comes out onto her step first.
+
+How the playthrough was done: 49 screenshots across all five levels, the pause menu, How it works and a
+conversation, read one by one. It is not a person playing: it cannot tell me how anything feels.
+
+Tests: feel 59/59 (two runs), menus 19/19, smoke and a 6,000-frame random-input run with no errors. Not yet played
+by hand or on a phone.
+
 ## v0.1.8 — the Deep goes down, lamps to light, the Ring's bow (Nov 18, 2026)
 Will: the Deep could go down and be explored like a dungeon, with verticality; the rooftop jump has been weird since
 the first build; do everything on the not-done list; at the training rings a bow went into the targets but there is

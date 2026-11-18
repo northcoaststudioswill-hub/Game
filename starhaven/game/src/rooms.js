@@ -92,8 +92,7 @@
       { x0: 2, x1: 66, text: 'The cells under the Deep. Look around. The way back up is at the far right, past the pillar.', below: 22, until: 'd_up' },
       { x0: 66, x1: 76, text: 'Four ledges up the shaft. Jump straight up through each one.', below: 17 },
       { x0: 3, x1: 21, text: 'Walk up to an altar and use {TALK} to give that answer. A wrong answer only costs you the altar.', flag: 'asked', until: 'riddle', above: 20 },
-      { x0: 3, x1: 17, text: 'Move with {MOVE}.', above: 20 },
-      { x0: 17, x1: 31, text: 'Jump with {JUMP}. Hold it to jump higher, tap it for a small hop.', above: 20 },
+      { x0: 21, x1: 31, text: 'Hold {JUMP} to jump higher; tap it for a small hop. Miss a jump here and you land in the cells below, unhurt.', above: 20 },
       { x0: 47, x1: 55, text: 'Press {JUMP} again in the air to jump a second time.', above: 20 },
       { x0: 61, x1: 67, text: 'Dash with {DASH}. Jump, jump again at the top, then dash across.', above: 20 },
       { x0: 44, x1: 52, text: 'Someone is standing in the dark. {TALK} if you want to.', until: 'd_caelum', above: 20 },
@@ -156,8 +155,7 @@
       ['solid', 118, 122, 0, 20],
     ],
     hints: [
-      { x0: 3, x1: 14, text: 'Move with {MOVE}. Caelum will meet you up the road.' },
-      { x0: 19, x1: 31, text: 'Jump with {JUMP}.' },
+      { x0: 3, x1: 14, text: 'Caelum will meet you up the road.' },
       { x0: 90, x1: 104, text: 'Crates, balcony, eave: three jumps up to the roof.', flag: 'painted' },
       { x0: 54, x1: 68, text: 'The street lamps are dark. Climb the balconies and touch each lamp to light it. Four on this street.', flag: 'arrive', until: 'lamps4' },
       { x0: 75, x1: 85, text: 'Two more lamps up on these balconies.', flag: 'arrive', until: 'lamps4' },
@@ -184,7 +182,7 @@
 
   // ---------------------------------------------------------------- Chapter 2: The Five (daggers, pogo, first enemies)
   SH.ROOMS.ring = {
-    id: 'ring', width: 150, height: 20, theme: 'city',
+    id: 'ring', width: 118, height: 20, theme: 'city',
     zones: [{ x: 0, theme: 'city' }, { x: 66, theme: 'thornwood' }],
     start: { x: 5, y: 16 },
     cityGlowX: 30,
@@ -196,9 +194,9 @@
       ['thorns', 42, 59, 16],             // sunk into the floor: you fall in, you cannot walk into them
       ['oneway', 47, 49, 14],            // somewhere to land between buds
       ['oneway', 52, 54, 14],
-      ['ground', 60, 148, 16],
+      ['ground', 60, 118, 16],
       ['oneway', 88, 94, 12],
-      ['solid', 148, 150, 0, 20],
+      ['solid', 116, 118, 0, 20],        // the thornwood closes in: nothing past here
     ],
     hints: [
       { x0: 14, x1: 32, text: 'Daggers: {ATTACK}. Press it three times in a row for a combo. The third cut knocks back.', until: 'combo1' },
@@ -231,7 +229,7 @@
     ],
     props: [
       { t: 'fence', x: 13, w: 18 }, { t: 'rack', x: 7 }, { t: 'rack', x: 33 }, { t: 'banner', x: 3.5 }, { t: 'banner', x: 36, c: '#7a2a4a' }, { t: 'crate', x: 9.5 }, { t: 'barrel', x: 30 },
-      { t: 'bush', x: 70 }, { t: 'bush', x: 85 }, { t: 'bush', x: 99 }, { t: 'bush', x: 113 }, { t: 'deadtree', x: 76 }, { t: 'deadtree', x: 109 }, { t: 'deadtree', x: 127 }, { t: 'cairn', x: 121 },
+      { t: 'bush', x: 70 }, { t: 'bush', x: 85 }, { t: 'bush', x: 99 }, { t: 'bush', x: 110 }, { t: 'deadtree', x: 76 }, { t: 'deadtree', x: 87 }, { t: 'deadtree', x: 102 }, { t: 'deadtree', x: 112 }, { t: 'cairn', x: 107 }, { t: 'bones', x: 82 }, { t: 'bones', x: 95 }, { t: 'boulder', x: 113.5, w: 2, h: 2 },
     ],
     motes: [['line', 14, 20, 14.6], ['pt', 45.5, 10.6], ['pt', 50.5, 10.4], ['pt', 55.5, 10.6], ['line', 70, 76, 14.6], ['line', 89, 93, 10.6], ['line', 96, 101, 14.6]],
     dummyCombo: 'ring_combo',          // landing a full 3-hit combo on the dummy runs this

@@ -31,9 +31,13 @@ link Will has. Hold your phone either way up.
 Between chapters there are **evenings**: choose who to spend the night with (Caelum, Bram, Iris or Thane) for scenes,
 gifts and bond hearts.
 
-## Playtest build: v0.1.8 (Nov 18, 2026)
+## Playtest build: v0.1.9 (Nov 18, 2026)
 
-The newest build: [`releases/v0.1.8/`](releases/v0.1.8/RELEASE-NOTES.md), with `starhaven-v0.1.8-share.zip` to send.
+The newest build: [`releases/v0.1.9/`](releases/v0.1.9/RELEASE-NOTES.md), with `starhaven-v0.1.9-share.zip` to send.
+A beautification round (ledges drawn as balconies, hung slabs, rock shelves and woven thorn; a thornwood with
+colour) and four things fixed that did not make sense on a walk through every level.
+
+Before it, v0.1.8 ([notes](releases/v0.1.8/RELEASE-NOTES.md)):
 The Deep is two storeys with cells to explore below the trial road; Ashes has four street lamps to light and a
 proper climb to the roof; Bram's rings no longer look like bow targets; Iris's vision is repainted.
 

@@ -46,8 +46,8 @@
       motes: ['#ffffff', '#dfe8f8'],
     },
     thornwood: {
-      sky: ['#090b20', '#191a45', '#33295c', '#4d3a72'], stars: true, far: 'mountains', mid: 'trees',
-      farA: '#23275a', farB: '#181b42', midC: '#11132e', mist: 'rgba(110,100,190,0.18)',
+      sky: ['#0c0b24', '#221a4c', '#4a2c64', '#864674'], stars: true, far: 'mountains', mid: 'trees',
+      farA: '#3a2c68', farB: '#281f52', midC: '#1a1538', mist: 'rgba(210,110,170,0.16)', glow: 'rgba(255,90,140,0.18)',
       ground: '#0a0b17', speck: '#121430', edgeLight: '#c3cdff', edgeMid: '#56609c', grass: '#5ba39a', grassDark: '#2f6a66', side: '#20264d',
       motes: ['#cfe0ff', '#ffe9a8'],
     },
@@ -83,7 +83,7 @@
     }
   };
   // How dark each place is away from a light: [colour, strength].
-  const DARK = { deep: ['#020806', 0.46], thornwood: ['#06030c', 0.42], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
+  const DARK = { deep: ['#020806', 0.46], thornwood: ['#0a0414', 0.3], winter: ['#04061a', 0.34], dusk: ['#06041a', 0.34], city: ['#06041a', 0.26], mountain: ['#040818', 0.36] };
   function drawLight(ctx, w, cx, cy, vw, VH, t, themeA, themeB, k) {
     const a = DARK[themeA] || DARK.dusk, b = DARK[themeB] || a, strength = a[1] + (b[1] - a[1]) * k;
     const c = layers.dark, g = c.getContext('2d');
@@ -368,9 +368,33 @@
           if (pitR) { g.fillStyle = PAL.gold; g.fillRect(x + TS - 5, y, 5, 2); g.fillRect(x + TS - 2, y, 2, 6); }
         }
       } else if (t === SH.T_ONEWAY) {
-        g.fillStyle = PAL.plank; g.fillRect(x, y, TS, 7);
-        g.fillStyle = PAL.plankTop; g.fillRect(x, y, TS, 2);
-        g.fillStyle = '#17132a'; g.fillRect(x + 2, y + 7, 2, 4); g.fillRect(x + TS - 4, y + 7, 2, 4);
+        // a ledge is a thing in its place: a balcony in the city, a hung slab in the Deep, a shelf of rock outdoors, woven thorn in the thornwood
+        const d = r.def, inCity = d.cityFrom != null && tx >= d.cityFrom - 1 && (d.cityTo == null || tx <= d.cityTo + 1);
+        const endL = get(tx - 1, ty) !== SH.T_ONEWAY, endR = get(tx + 1, ty) !== SH.T_ONEWAY, hsh = (tx * 7 + ty * 13) % 5;
+        if (T === THEMES.thornwood && !inCity) {
+          g.fillStyle = '#0a0818'; g.fillRect(x, y - 1, TS, 9); g.fillStyle = '#3a2430'; g.fillRect(x, y, TS, 7); g.fillStyle = '#5a3444'; g.fillRect(x, y, TS, 2);
+          g.fillStyle = '#2a1622'; for (let i = 0; i < 4; i++) g.fillRect(x + i * 6 + (hsh % 3), y + 3, 4, 1);
+          g.fillStyle = '#3a2430'; for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(x + 2 + i * 8, y + 7); g.lineTo(x + 5 + i * 8, y + 12 + (i + hsh) % 3); g.lineTo(x + 7 + i * 8, y + 7); g.fill(); }
+          if (hsh === 0) { g.fillStyle = '#ff5a78'; g.fillRect(x + 10, y + 9, 2, 2); }
+        } else if (T === THEMES.deep) {
+          g.fillStyle = '#0a0f0c'; g.fillRect(x, y - 1, TS, 10); g.fillStyle = '#34463c'; g.fillRect(x, y, TS, 8); g.fillStyle = '#56705e'; g.fillRect(x, y, TS, 2); g.fillStyle = '#243228'; g.fillRect(x, y + 6, TS, 2);
+          g.fillStyle = '#1c2a22'; g.fillRect(x + 11 + hsh, y + 2, 1, 4); g.fillStyle = '#6f9a5c'; g.fillRect(x + (hsh * 4) % 18, y - 1, 5, 2);
+          for (const [e, ex] of [[endL, x + 3], [endR, x + TS - 4]]) if (e) { for (let cy2 = y - 4; cy2 > y - 96; cy2 -= 5) { g.fillStyle = (cy2 / 5 | 0) % 2 ? '#3a4640' : '#252e2a'; g.fillRect(ex, cy2, 2, 4); } g.fillStyle = '#56705e'; g.fillRect(ex - 1, y - 3, 4, 3); }
+          if (hsh === 2) { g.fillStyle = '#243228'; g.fillRect(x + 8, y + 8, 2, 4); g.fillRect(x + 8, y + 13, 1, 2); }
+        } else if (inCity || T.gstyle === 'brick' || !T.gstyle) {
+          g.fillStyle = '#0a0818'; g.fillRect(x, y - 1, TS, 9); g.fillStyle = '#4a4478'; g.fillRect(x, y, TS, 7); g.fillStyle = '#7a72b0'; g.fillRect(x, y, TS, 2); g.fillStyle = '#322c58'; g.fillRect(x, y + 5, TS, 2);
+          g.fillStyle = '#2a2450'; g.fillRect(x + 11, y + 2, 1, 3);
+          // a striped awning valance hangs under it, scalloped
+          for (let i = 0; i < 4; i++) { g.fillStyle = (tx * 4 + i) % 2 ? '#8a3a5a' : '#e8d8c0'; g.fillRect(x + i * 6, y + 7, 6, 5); g.beginPath(); g.arc(x + i * 6 + 3, y + 12, 3, 0, Math.PI); g.fill(); }
+          g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(x, y + 7, TS, 1);
+          for (const [e, sd, ex] of [[endL, 1, x], [endR, -1, x + TS]]) if (e) { g.fillStyle = '#17132a'; g.beginPath(); g.moveTo(ex, y + 7); g.lineTo(ex + sd * 9, y + 7); g.lineTo(ex, y + 20); g.fill(); g.fillStyle = '#e8c070'; g.fillRect(ex + (sd > 0 ? 0 : -2), y + 18, 2, 3); }
+        } else {
+          const snowy = T === THEMES.mountain || d.theme === 'woods';
+          g.fillStyle = '#0a0818'; g.fillRect(x, y - 1, TS, 8); g.fillStyle = SH.shade(T.ground, 1.25); g.fillRect(x, y, TS, 6);
+          g.fillStyle = SH.shade(T.ground, 0.8); g.beginPath(); g.moveTo(x, y + 6); g.lineTo(x + TS, y + 6); g.lineTo(x + TS - (endR ? 8 : 0), y + 10 + hsh); g.lineTo(x + 12, y + 13 + (hsh % 3)); g.lineTo(x + (endL ? 8 : 0), y + 9 + (hsh % 2) * 2); g.fill();
+          g.fillStyle = snowy ? '#f2f6ff' : SH.shade(T.grass || T.ground, 1.2); g.fillRect(x, y - 1, TS, 3); if (snowy) { g.fillRect(x + 3 + hsh, y + 2, 6, 1); g.fillStyle = '#c8d4f0'; g.fillRect(x, y + 1, TS, 1); }
+          if (snowy && hsh === 1) { g.fillStyle = '#dfe8ff'; g.fillRect(x + 6, y + 9, 2, 6); g.fillRect(x + 7, y + 15, 1, 2); }   // an icicle
+        }
       } else if (t === SH.T_THORNS) {
         const glow = g.createLinearGradient(0, y - 8, 0, y + TS); glow.addColorStop(0, 'rgba(255,60,100,0)'); glow.addColorStop(1, 'rgba(255,60,100,0.22)');
         g.fillStyle = glow; g.fillRect(x, y - 8, TS, TS + 8);

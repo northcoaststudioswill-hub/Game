@@ -481,6 +481,7 @@
     ],
     ashes_lamps: [
       ['narr', 'The fourth lamp catches. All down the street, gold runs from window to window, and somewhere a shutter opens that has been shut for months.'],
+      ['narr', 'Old Mirelle has come out onto her step to look up at them.'],
       ['mirelle', 'Forty years I lit those, till my knees gave out before the lamps did. Nobody asked you to. That is the right way to do it.'],
       { do: 'remember', key: 'lamps', text: 'Lit the four dark lamps on Mirelle\'s street, unasked.', good: true },
       ['wren', 'It felt wrong, walking past them.'],
