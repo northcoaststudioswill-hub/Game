@@ -1,5 +1,33 @@
 # SOOTBORN — changelog
 
+## v0.18 · 2026-11-18 — Part Two quality pass
+From play notes: bring Part Two closer to the first half: looks, story beats, cutscenes, drama, rage, music, emotion, fights.
+
+**Places of its own** (Part Two no longer plays in borrowed rooms)
+- **The Gallery**: the duelling hall, warm gold under three chandeliers.
+- **Riser Nine**: the valley at night in rain and lightning, with the riser's hatch glowing orange and a line of small lights (the forty) moving away from it.
+- **The Stair**: the Spire's lower terrace at a smoky sunset, a wrecked barge burning to one side, steps climbing to the white door, embers in the air.
+- **The top of the Spire**: a gold arch framing the setting sun, light rays across the floor, her desk with the Count on it. The Assay's House standards are gone from the Spire scenes.
+
+**Music** (three new generated tracks, all built on the shift song)
+- **Spire**: cold glass and distance for the chapters above; her tune only arrives in the second half of the loop.
+- **Final**: the last duel. The keep's ticking duel music with the whole tier humming the shift song underneath.
+- **Dawn**: the shift song in a major key for the first time, for the ending.
+
+**Cutscenes and staging**
+- Kael is drawn gilded in every Part Two scene (he was still the soot sprite in the Spire rooms and at the end).
+- **The Clerk's desk** (new panel): the Tier Four order, the seal, the pen moving, the signature.
+- **The hum** (new staging): Kael at a valve wheel in Celestine's room, the wheel turning, the notes of the shift song rising from him, her cup on the table. The music cuts out when she puts it down.
+- Lucan now appears in his own scene (it was showing Celestine).
+- Celestine kneels in the last room.
+- Heartbeats and held silences on the counting beats: finding Seren's line, the pen over the order, being recognised.
+- A bell when the light reaches the square.
+
+**Saving**
+- Part Two remembers the chapter you reached. The title screen shows "Continue Part Two" with the chapter name.
+
+**Checked:** all five chapters walk through to THE END with no errors; every Dev menu entry loads; the three new tracks render without errors. Not checked by a person: how any of it plays, sounds or reads.
+
 ## v0.17 · 2026-11-18 — Part Two: Above. The story now has an ending.
 From play notes: finish out the story and the fights; set it all up, then flesh it out.
 

@@ -255,6 +255,16 @@ const TRACKS = {
     if (bar >= 4) { const m = MOTIF[(s - 64) >> 1]; if (m && !(s & 1)) { S.pad(m + 12, t, sp * 6, 'sawtooth', 0.04, S.mus, 0.03); S.pad(m + 12.06, t, sp * 6, 'square', 0.018, S.mus, 0.03); S.tone(m, t, sp * 5, 'triangle', 0.04, S.mus); } }
     else { const lead = [[74, 0, 0, 77, 0, 0, 81, 0, 79, 0, 77, 0, 74, 0, 72, 0], [74, 0, 0, 77, 0, 0, 81, 0, 84, 0, 0, 82, 81, 0, 0, 0], [70, 0, 0, 74, 0, 0, 77, 0, 82, 0, 81, 0, 77, 0, 74, 0], [72, 0, 76, 0, 79, 0, 84, 0, 86, 0, 0, 0, 85, 0, 0, 0]][bar][q]; if (lead) { S.tone(lead, t, sp * 1.8, 'square', 0.026, S.mus); S.tone(lead - 12, t, sp * 1.8, 'triangle', 0.03, S.mus); } }
   } },
+  spire: { bpm: 84, len: 64, fn(s, t, sp, S) { // above the weather: glass and distance, her tune only in the second half
+    const bar = s >> 4, q = s % 16, root = [50, 50, 46, 48][bar]; if (q === 0) { S.pad(root, t, sp * 15, 'sine', 0.05, S.mus, sp * 3); S.pad(root + 7, t, sp * 15, 'triangle', 0.025, S.mus, sp * 3); S.pad(root + 15, t, sp * 15, 'sine', 0.018, S.mus, sp * 3); }
+    if (q % 4 === 2) S.tone(root + 24 + [0, 3, 7, 10][(s >> 2) % 4], t, sp * 3, 'sine', 0.03, S.mus); if (q % 8 === 0) S.noise(t, 0.03, 0.02, S.mus, 9000, 4, 'highpass');
+    const m = MOTIF[s >> 1]; if (m && !(s & 1) && bar >= 2) S.tone(m + 24, t, sp * 5, 'triangle', 0.028, S.mus); } },
+  final: { bpm: 150, len: 128, fn(s, t, sp, S) { // the last duel: the keep's clock with the whole tier humming under it
+    TRACKS.duel.fn(s, t, sp, S); const m = MOTIF[(s >> 2) % 32]; if (m && s % 4 === 0) { S.tone(m - 12, t, sp * 7, 'triangle', 0.06, S.mus); S.tone(m, t, sp * 7, 'sine', 0.035, S.mus); S.tone(m - 5, t, sp * 7, 'sine', 0.02, S.mus); }
+    if (s % 16 === 0) S.tone(98, t, 0.3, 'sine', 0.3, S.mus, 36); if (s % 16 === 8) S.noise(t, 0.16, 0.14, S.mus, 1400, 3); } },
+  dawn: { bpm: 60, len: 32, fn(s, t, sp, S) { // the shift song, for the first time in a major key
+    const MJ = { 0: 62, 4: 66, 8: 69, 12: 67, 16: 66, 20: 64, 24: 62 }, m = MJ[s]; if (m) { S.tone(m, t, sp * 3.8, 'triangle', 0.07, S.mus); S.tone(m + 12, t, sp * 3.8, 'sine', 0.03, S.mus); S.tone(m - 12, t, sp * 3.8, 'sine', 0.04, S.mus); }
+    if (s % 8 === 0) { const r = [50, 45, 43, 50][s >> 3]; S.pad(r, t, sp * 8, 'sine', 0.06, S.mus, sp * 2); S.pad(r + 7, t, sp * 8, 'triangle', 0.03, S.mus, sp * 2); S.pad(r + 16, t, sp * 8, 'sine', 0.02, S.mus, sp * 2); } } },
   hum: { bpm: 56, len: 32, fn(s, t, sp, S) { const m = MOTIF[s]; if (m) { S.tone(m - 12, t, sp * 3.8, 'triangle', 0.07, S.mus); S.tone(m - 5, t, sp * 3.8, 'sine', 0.03, S.mus); } if (s === 0) S.tone(38, t, sp * 32, 'sine', 0.05, S.mus); } },
   surface: { bpm: 70, len: 32, fn(s, t, sp, S) { const m = MOTIF[s]; if (m) { S.tone(m + 24, t, 2, 'sine', 0.03, S.mus); S.tone(m + 31, t, 2, 'sine', 0.015, S.mus); } } }
 };

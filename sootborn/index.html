@@ -437,6 +437,16 @@ const TRACKS = {
     if (bar >= 4) { const m = MOTIF[(s - 64) >> 1]; if (m && !(s & 1)) { S.pad(m + 12, t, sp * 6, 'sawtooth', 0.04, S.mus, 0.03); S.pad(m + 12.06, t, sp * 6, 'square', 0.018, S.mus, 0.03); S.tone(m, t, sp * 5, 'triangle', 0.04, S.mus); } }
     else { const lead = [[74, 0, 0, 77, 0, 0, 81, 0, 79, 0, 77, 0, 74, 0, 72, 0], [74, 0, 0, 77, 0, 0, 81, 0, 84, 0, 0, 82, 81, 0, 0, 0], [70, 0, 0, 74, 0, 0, 77, 0, 82, 0, 81, 0, 77, 0, 74, 0], [72, 0, 76, 0, 79, 0, 84, 0, 86, 0, 0, 0, 85, 0, 0, 0]][bar][q]; if (lead) { S.tone(lead, t, sp * 1.8, 'square', 0.026, S.mus); S.tone(lead - 12, t, sp * 1.8, 'triangle', 0.03, S.mus); } }
   } },
+  spire: { bpm: 84, len: 64, fn(s, t, sp, S) { // above the weather: glass and distance, her tune only in the second half
+    const bar = s >> 4, q = s % 16, root = [50, 50, 46, 48][bar]; if (q === 0) { S.pad(root, t, sp * 15, 'sine', 0.05, S.mus, sp * 3); S.pad(root + 7, t, sp * 15, 'triangle', 0.025, S.mus, sp * 3); S.pad(root + 15, t, sp * 15, 'sine', 0.018, S.mus, sp * 3); }
+    if (q % 4 === 2) S.tone(root + 24 + [0, 3, 7, 10][(s >> 2) % 4], t, sp * 3, 'sine', 0.03, S.mus); if (q % 8 === 0) S.noise(t, 0.03, 0.02, S.mus, 9000, 4, 'highpass');
+    const m = MOTIF[s >> 1]; if (m && !(s & 1) && bar >= 2) S.tone(m + 24, t, sp * 5, 'triangle', 0.028, S.mus); } },
+  final: { bpm: 150, len: 128, fn(s, t, sp, S) { // the last duel: the keep's clock with the whole tier humming under it
+    TRACKS.duel.fn(s, t, sp, S); const m = MOTIF[(s >> 2) % 32]; if (m && s % 4 === 0) { S.tone(m - 12, t, sp * 7, 'triangle', 0.06, S.mus); S.tone(m, t, sp * 7, 'sine', 0.035, S.mus); S.tone(m - 5, t, sp * 7, 'sine', 0.02, S.mus); }
+    if (s % 16 === 0) S.tone(98, t, 0.3, 'sine', 0.3, S.mus, 36); if (s % 16 === 8) S.noise(t, 0.16, 0.14, S.mus, 1400, 3); } },
+  dawn: { bpm: 60, len: 32, fn(s, t, sp, S) { // the shift song, for the first time in a major key
+    const MJ = { 0: 62, 4: 66, 8: 69, 12: 67, 16: 66, 20: 64, 24: 62 }, m = MJ[s]; if (m) { S.tone(m, t, sp * 3.8, 'triangle', 0.07, S.mus); S.tone(m + 12, t, sp * 3.8, 'sine', 0.03, S.mus); S.tone(m - 12, t, sp * 3.8, 'sine', 0.04, S.mus); }
+    if (s % 8 === 0) { const r = [50, 45, 43, 50][s >> 3]; S.pad(r, t, sp * 8, 'sine', 0.06, S.mus, sp * 2); S.pad(r + 7, t, sp * 8, 'triangle', 0.03, S.mus, sp * 2); S.pad(r + 16, t, sp * 8, 'sine', 0.02, S.mus, sp * 2); } } },
   hum: { bpm: 56, len: 32, fn(s, t, sp, S) { const m = MOTIF[s]; if (m) { S.tone(m - 12, t, sp * 3.8, 'triangle', 0.07, S.mus); S.tone(m - 5, t, sp * 3.8, 'sine', 0.03, S.mus); } if (s === 0) S.tone(38, t, sp * 32, 'sine', 0.05, S.mus); } },
   surface: { bpm: 70, len: 32, fn(s, t, sp, S) { const m = MOTIF[s]; if (m) { S.tone(m + 24, t, 2, 'sine', 0.03, S.mus); S.tone(m + 31, t, 2, 'sine', 0.015, S.mus); } } }
 };
@@ -2517,6 +2527,17 @@ const PANELS = {
     for (const [x, y] of [[118, 34], [150, 28], [176, 36], [200, 44], [132, 42]]) R(g, x, y, 3, 2, '#c8c0c0');
     if (st >= 1) { const a = Math.min(1, s / 1.2); R(g, 132, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); R(g, 172, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); glow(g, 142, 84, 14, '255,140,50', .5 * a); glow(g, 182, 84, 14, '255,140,50', .5 * a); }
   },
+  // ---- Part Two: the Clerk's desk (0: the order · 1: the pen · 2: done)
+  desk(g, t, st, s) {
+    const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#e9e6de'); for (let x = 0; x < 320; x += 40) { R(g, x, 0, 1, 110, '#d6d2c8'); } R(g, 0, 0, 320, 5, '#e8c25a');
+    R(g, 206, 16, 96, 74, '#b8943a'); const gr = g.createLinearGradient(0, 19, 0, 87); gr.addColorStop(0, '#3a78d8'); gr.addColorStop(1, '#dcecf8'); g.fillStyle = gr; g.fillRect(209, 19, 90, 68); for (let i = 0; i < 3; i++) { const x = 209 + ((t * (2 + i) + i * 34) % 110) - 16; g.save(); g.beginPath(); g.rect(209, 19, 90, 68); g.clip(); R(g, x, 34 + i * 14, 26, 5, '#ffffff'); g.restore(); } R(g, 253, 19, 2, 68, '#b8943a'); g.fillStyle = 'rgba(255,244,200,.14)'; g.beginPath(); g.moveTo(209, 87); g.lineTo(299, 87); g.lineTo(230, 180); g.lineTo(60, 180); g.closePath(); g.fill();
+    R(g, 0, 110, 320, 70, '#cfcabd'); R(g, 0, 110, 320, 2, '#f6f4ee'); R(g, 30, 118, 230, 10, '#5a4030'); R(g, 30, 128, 230, 4, '#3a2a1c'); R(g, 40, 132, 8, 48, '#3a2a1c'); R(g, 242, 132, 8, 48, '#3a2a1c'); R(g, 30, 118, 230, 1, '#7a5a40');
+    PX.spr(g, World.sheetFor('kael2'), 0, 86, 122, 3); R(g, 66, 118, 40, 10, '#5a4030');
+    R(g, 120, 96, 86, 24, '#f4eedc'); R(g, 120, 96, 86, 1, '#fff8e8'); R(g, 120, 119, 86, 1, '#c8bca0'); ptext(g, 'TIER 4', 126, 100, '#3a2e22'); R(g, 126, 108, 60, 1, '#8a7a5a'); R(g, 126, 111, 48, 1, '#8a7a5a'); R(g, 126, 114, 54, 1, '#8a7a5a'); ptext(g, '1100', 176, 100, '#a02a1a'); R(g, 190, 108, 10, 10, '#a02a1a'); R(g, 192, 110, 6, 6, '#e8c25a');
+    R(g, 214, 108, 10, 10, '#2a2630'); R(g, 216, 104, 6, 5, '#14121a');
+    if (st >= 1) { const a = Math.min(1, s / 1.5), px = 150 + a * 30, py = 112 - Math.sin(a * 3.14) * 6; g.save(); g.translate(px, py); g.rotate(-.7); R(g, 0, -1, 20, 2, '#e8c25a'); R(g, -3, -1, 3, 2, '#2a2630'); g.restore(); if (st >= 2) { R(g, 126, 117, Math.round(40 * Math.min(1, s / .8)), 1, '#1a2a6a'); glow(g, 160, 108, 50, '255,90,40', .12); } }
+    if (st === 0) plate(g, 'THE CLERK OF THE COUNT', 160, 168);
+  },
   // ---- Part Two: the ledger of who breathes (0: the book · 1: struck names · 2: hers)
   ledger(g, t, st, s) {
     const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#14110e'); glow(g, 160, 60, 150, '255,200,120', .12 + Math.sin(t * 5) * .01); R(g, 0, 150, 320, 30, '#2a1e14'); R(g, 0, 150, 320, 2, '#4a3624');
@@ -2534,14 +2555,14 @@ const PANELS = {
     for (let i = 0; i < 40; i++) { const ph = (t * .08 + hash(i, 2)) % 1; R(g, 60 + hash(i, 1) * 200, 40 + ph * 130, 1, 1, `rgba(255,250,220,${.8 * a})`); }
     const ids = ['mara', 'tavi', 'ivo', 'orin', 'nell', 'hollis', 'dace', 'bao', 'pell', 'juno', 'kit', 'marrow'];
     for (let i = 0; i < 12; i++) { const x = 14 + i * 26 + (i % 2) * 6, y = 160 + (i % 3) * 6; if (Math.abs(x - 160) < 24) continue; PX.spr(g, World.sheetFor(ids[i]), st >= 1 ? 1 : (x < 160 ? 3 : 2), x, y, 2); }
-    if (st >= 2) { const b = Math.min(1, s / 1.6); g.strokeStyle = `rgba(255,236,170,${b})`; g.lineWidth = 2; g.beginPath(); g.arc(160, 100, 12, 0, 6.3); g.stroke(); for (let k = 0; k < 8; k++) { const an = k / 8 * 6.283; R(g, 160 + Math.cos(an) * 18, 100 + Math.sin(an) * 18, 2, 2, `rgba(255,236,170,${b})`); } g.lineWidth = 1; PX.spr(g, World.sheetFor('kael'), 1, 160, 152, 3); }
+    if (st >= 2) { const b = Math.min(1, s / 1.6); g.strokeStyle = `rgba(255,236,170,${b})`; g.lineWidth = 2; g.beginPath(); g.arc(160, 100, 12, 0, 6.3); g.stroke(); for (let k = 0; k < 8; k++) { const an = k / 8 * 6.283; R(g, 160 + Math.cos(an) * 18, 100 + Math.sin(an) * 18, 2, 2, `rgba(255,236,170,${b})`); } g.lineWidth = 1; PX.spr(g, World.sheetFor('kael2'), 1, 160, 152, 2.5); }
     if (st === 0) plate(g, 'ASHGATE SQUARE', 60, 20);
   },
   // ---- Day 3: the top of Lift Zero (0: the room · 1: she is there · 2: the window)
   ante(g, t, st, s) {
     const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#e9e6de'); for (let x = 0; x < 320; x += 40) { R(g, x, 0, 1, 130, '#d6d2c8'); R(g, x + 1, 0, 1, 130, '#f6f4ee'); } R(g, 0, 0, 320, 6, '#e8c25a'); R(g, 0, 6, 320, 1, '#b8943a');
     R(g, 0, 130, 320, 50, '#cfcabd'); for (let i = 0; i < 9; i++) { R(g, i * 40 - 10, 130, 1, 50, '#bdb8aa'); } R(g, 0, 130, 320, 2, '#f6f4ee'); R(g, 0, 156, 320, 1, '#bdb8aa');
-    const open = st >= 2 ? Math.min(1, s / 2.2) : 0; // the window
+    const open = st > 2 ? 1 : st === 2 ? Math.min(1, s / 2.2) : 0; // the window
     R(g, 196, 26, 96, 84, '#b8943a'); R(g, 199, 29, 90, 78, '#8a8478'); const sh = Math.round(78 * (1 - open));
     const gr = g.createLinearGradient(0, 29, 0, 107); gr.addColorStop(0, '#3a78d8'); gr.addColorStop(.7, '#9ccaf4'); gr.addColorStop(1, '#eef4f8'); g.fillStyle = gr; g.fillRect(199, 29, 90, 78);
     for (let i = 0; i < 3; i++) { const x = 199 + ((t * (2 + i) + i * 34) % 110) - 16, y = 44 + i * 16; g.save(); g.beginPath(); g.rect(199, 29, 90, 78); g.clip(); R(g, x, y, 26, 5, '#ffffff'); R(g, x + 5, y - 3, 14, 4, '#f6faff'); g.restore(); }
@@ -2549,9 +2570,13 @@ const PANELS = {
     for (let y = 0; y < sh; y += 6) { R(g, 199, 29 + y, 90, 5, '#d8d4ca'); R(g, 199, 34 + y, 90, 1, '#a8a498'); } R(g, 243, 29, 2, 78, '#b8943a');
     if (open > 0) { g.fillStyle = `rgba(255,244,200,${.16 * open})`; g.beginPath(); g.moveTo(199, 29 + sh); g.lineTo(289, 29 + sh); g.lineTo(250, 180); g.lineTo(40, 180); g.closePath(); g.fill(); for (let i = 0; i < 24; i++) { const ph = (t * .1 + hash(i, 9)) % 1; R(g, 80 + hash(i, 3) * 190, 60 + ph * 110, 1, 1, `rgba(255,250,220,${.7 * open})`); } }
     R(g, 20, 104, 60, 6, '#f6f4ee'); R(g, 20, 110, 60, 3, '#d6d2c8'); R(g, 24, 113, 4, 17, '#d6d2c8'); R(g, 72, 113, 4, 17, '#d6d2c8'); R(g, 20, 88, 4, 16, '#f6f4ee'); // the bench
-    const ks = World.sheetFor('kael'); PX.spr(g, ks, st >= 2 ? 3 : 0, 108, 150, 3); R(g, 96, 150, 26, 2, 'rgba(0,0,0,.18)');
-    if (st >= 1) { const a = Math.min(1, st > 1 ? 1 : s / 1.2), x = 166, b = Math.round(Math.sin(t * 1.2)); g.globalAlpha = a; glow(g, x + 10, 84, 46, '255,236,180', .22); R(g, x - 4, 150, 30, 2, 'rgba(0,0,0,.18)'); R(g, x, 66 + b, 22, 86 - b, '#fbf8f0'); R(g, x + 18, 66 + b, 4, 86 - b, '#e2ddd0'); R(g, x - 3, 96 + b, 4, 56 - b, '#f2ede2'); R(g, x + 21, 100 + b, 3, 52 - b, '#e2ddd0'); R(g, x, 66 + b, 22, 2, '#e8c25a'); R(g, x + 9, 68 + b, 4, 84 - b, '#e8c25a'); R(g, x, 150, 22, 2, '#e8c25a'); R(g, x - 4, 64 + b, 8, 6, '#e8c25a'); R(g, x + 18, 64 + b, 8, 6, '#e8c25a'); R(g, x - 4, 64 + b, 8, 1, '#fff2c0');
+    const gold = st >= 4; if (st === 5) { const a = t * .8; R(g, 60, 84, 28, 28, '#8a8478'); R(g, 62, 86, 24, 24, '#3a3e46'); g.strokeStyle = '#c8ccd4'; g.lineWidth = 2; g.beginPath(); g.arc(74, 98, 9, 0, 6.3); for (let k = 0; k < 4; k++) { g.moveTo(74, 98); g.lineTo(74 + Math.cos(a + k * 1.57) * 9, 98 + Math.sin(a + k * 1.57) * 9); } g.stroke(); g.lineWidth = 1; R(g, 40, 96, 22, 4, '#8a8478'); const NT = [0, 3, 7, 5, 3, 2, 0]; for (let i = 0; i < 7; i++) { const ph = (t * .22 + i / 7) % 1, x = 92 + ph * 60 + Math.sin(ph * 9 + i) * 3, y = 84 - NT[i] * 2 - ph * 34; g.globalAlpha = Math.sin(ph * 3.14); R(g, x, y, 3, 2, '#3a2e22'); R(g, x + 2, y - 6, 1, 7, '#3a2e22'); g.globalAlpha = 1; } }
+    const ks = World.sheetFor(gold ? 'kael2' : 'kael'); PX.spr(g, ks, st === 5 ? 2 : st >= 2 ? 3 : 0, st === 5 ? 96 : 108, 150, 3); R(g, 96, 150, 26, 2, 'rgba(0,0,0,.18)');
+    if (st === 4) { PX.spr(g, World.sheetFor('lucan'), 2, 170, 150, 3); R(g, 158, 150, 26, 2, 'rgba(0,0,0,.18)'); return; }
+    if (st === 6) { g.save(); g.translate(0, 62); g.scale(1, .6); } if (st === 5) { R(g, 150, 118, 44, 4, '#f6f4ee'); R(g, 150, 122, 44, 2, '#d6d2c8'); R(g, 154, 124, 3, 26, '#d6d2c8'); R(g, 187, 124, 3, 26, '#d6d2c8'); R(g, 160, 112, 6, 6, '#ffffff'); R(g, 160, 112, 6, 1, '#e8c25a'); }
+    if (st >= 1) { const a = Math.min(1, st > 1 ? 1 : s / 1.2), x = st === 6 ? 176 : st === 5 ? 192 : 166, b = Math.round(Math.sin(t * 1.2)); g.globalAlpha = a; glow(g, x + 10, 84, 46, '255,236,180', .22); R(g, x - 4, 150, 30, 2, 'rgba(0,0,0,.18)'); R(g, x, 66 + b, 22, 86 - b, '#fbf8f0'); R(g, x + 18, 66 + b, 4, 86 - b, '#e2ddd0'); R(g, x - 3, 96 + b, 4, 56 - b, '#f2ede2'); R(g, x + 21, 100 + b, 3, 52 - b, '#e2ddd0'); R(g, x, 66 + b, 22, 2, '#e8c25a'); R(g, x + 9, 68 + b, 4, 84 - b, '#e8c25a'); R(g, x, 150, 22, 2, '#e8c25a'); R(g, x - 4, 64 + b, 8, 6, '#e8c25a'); R(g, x + 18, 64 + b, 8, 6, '#e8c25a'); R(g, x - 4, 64 + b, 8, 1, '#fff2c0');
       R(g, x + 4, 44 + b, 14, 20, '#f0e0d4'); R(g, x + 3, 40 + b, 16, 8, '#f4f2ec'); R(g, x + 3, 46 + b, 2, 22, '#f4f2ec'); R(g, x + 17, 46 + b, 2, 22, '#e6e2d8'); R(g, x + 3, 42 + b, 16, 2, '#e8c25a'); R(g, x + 10, 38 + b, 2, 4, '#fff2c0'); R(g, x + 6, 52 + b, 3, 1, '#c89a2a'); R(g, x + 12, 52 + b, 3, 1, '#c89a2a'); R(g, x + 9, 58 + b, 4, 1, '#c8a898'); R(g, x + 6, 50 + b, 3, 1, '#d8c8bc'); R(g, x + 12, 50 + b, 3, 1, '#d8c8bc'); R(g, x - 6, 108 + b, 5, 4, '#f0e0d4'); g.globalAlpha = 1; }
+    if (st === 6) g.restore();
     if (st === 0) plate(g, 'LIFT ZERO - THE UPPER LANDING', 110, 168);
   },
   // ---- Day 3: under the floor (0: the chalk · 1: Dace · 2: the lamp at the hatch)
@@ -3424,12 +3449,15 @@ const G3 = {
     cell: { top: [.02, .02, .04], bot: [.08, .07, .11], sun: [.12, .95, .28], sunC: [1.3, 1.2, 1.0], amb: [.36, .35, .44], sky: [.14, .14, .2], fog: [.04, .04, .07], fogR: [260, 760], sunAt: [0, 1, -.1] },
     storm: { top: [.02, .03, .09], bot: [.13, .15, .26], sun: [-.3, .8, .5], sunC: [.55, .62, .86], amb: [.22, .24, .34], sky: [.1, .12, .2], fog: [.09, .11, .2], fogR: [240, 950], sunAt: [.42, .62, -1] },
     fall: { top: [.08, .16, .46], bot: [.5, .66, .92], sun: [.5, .7, .3], sunC: [1.05, .96, .8], amb: [.34, .38, .5], sky: [.5, .62, .9], fog: [.7, .8, .96], fogR: [300, 1300], sunAt: [-.5, .5, -1] },
+    hall: { top: [.06, .04, .05], bot: [.2, .14, .1], sun: [.1, .95, .3], sunC: [1.35, 1.1, .8], amb: [.42, .36, .34], sky: [.2, .15, .12], fog: [.1, .07, .06], fogR: [300, 800], sunAt: [0, 1, -.1] },
+    riser: { top: [.02, .03, .09], bot: [.16, .13, .2], sun: [-.3, .8, .5], sunC: [.6, .6, .8], amb: [.26, .24, .32], sky: [.12, .12, .2], fog: [.12, .1, .16], fogR: [240, 950], sunAt: [.42, .62, -1] },
+    stair: { top: [.1, .08, .16], bot: [.7, .4, .26], sun: [.4, .5, .6], sunC: [1.2, .8, .55], amb: [.34, .28, .32], sky: [.4, .3, .34], fog: [.5, .34, .28], fogR: [260, 1100], sunAt: [-.4, .3, -1] },
     crown: { top: [.06, .08, .3], bot: [.98, .62, .34], sun: [.2, .35, -.9], sunC: [1.3, .95, .6], amb: [.34, .32, .46], sky: [.5, .4, .5], fog: [.86, .6, .46], fogR: [300, 1300], sunAt: [0, .16, -1] },
     keep: { top: [.3, .44, .78], bot: [1, .8, .68], sun: [.55, .42, -.72], sunC: [1.2, .92, .7], amb: [.4, .38, .46], sky: [.2, .2, .26], fog: [1, .84, .76], fogR: [380, 1500], sunAt: [.5, .2, -1] }
   },
   env(bg) {
     if (this.envs[bg]) return this.envs[bg];
-    const real = bg; if (bg === 'storm') bg = 'valley'; if (bg === 'crown') bg = 'keep';
+    const real = bg; if (bg === 'storm' || bg === 'riser') bg = 'valley'; if (bg === 'crown' || bg === 'stair') bg = 'keep'; if (bg === 'hall') bg = 'cell';
     const gl = this.gl, A = new Batch(30000), Sh = new Batch(20000), r = rng(bg.length * 131 + 17), I = M4.id(), R = (a, b) => a + r() * (b - a), hw = bg === 'keep' ? 110 : bg === 'cell' ? 96 : 125, hh = bg === 'keep' ? 50 : bg === 'cell' ? 58 : 60;
     const pine = (x, z, s) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); Sh.cyl(m, 0, 0, 0, 2.2 * s, 1.6 * s, 10 * s, 5, '#5a3c26'); const g = ['#1f6a34', '#27803c', '#2f9646', '#3aa850']; for (let i = 0; i < 4; i++) Sh.cyl(m, 0, (7 + i * 9) * s, 0, (15 - i * 3.2) * s, 0, 15 * s, 7, bg === 'ford' ? ['#28503a', '#2f5e40', '#386a46', '#427650'][i] : g[i]); };
     const oak = (x, z, s, c) => { const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); Sh.cyl(m, 0, 0, 0, 2.6 * s, 1.8 * s, 16 * s, 5, '#6a4a30'); Sh.cyl(m, 0, 13 * s, 0, 9 * s, 13 * s, 8 * s, 6, shade(c, .86)); Sh.cyl(m, 0, 21 * s, 0, 13 * s, 10 * s, 8 * s, 6, c, 0, 1); Sh.cyl(m, 2 * s, 28 * s, 1 * s, 9 * s, 0, 9 * s, 6, shade(c, 1.12)); Sh.cyl(m, -7 * s, 17 * s, 4 * s, 6 * s, 0, 9 * s, 5, shade(c, 1.05)); };
@@ -3472,7 +3500,9 @@ const G3 = {
         const cm = M4.t(0, 14, -hh - 20); Sh.cyl(cm, 0, 0, 0, 7, 4, 26, 7, '#f4f2ec'); A.cyl(cm, 0, 0, 0, 7.2, 7.2, 1.4, 7, '#e8c25a', 1); Sh.box(cm, 0, 30, 0, 6.4, 7.4, 6.4, '#f4e6dc'); Sh.box(cm, 0, 31, -2.6, 8, 12, 3, '#f6eac0'); A.box(cm, 0, 34.6, 0, 7.4, 1.4, 7.4, '#e8c25a', 1); A.box(cm, -1.6, 30.6, 3.3, 1.2, 1, .3, [1, .8, .3], 1); A.box(cm, 1.6, 30.6, 3.3, 1.2, 1, .3, [1, .8, .3], 1);
         for (const sx of [-1, 1]) { const wm = M4.t(sx * 26, 14, -hh - 20); Sh.cyl(wm, 0, 0, 0, 6, 4, 24, 6, '#c8ccd8'); Sh.box(wm, 0, 28, 0, 7, 8, 7, '#d8dce4'); A.box(wm, 0, 28.6, 3.6, 5, 1.2, .3, '#1e1e28', 1); Sh.cyl(wm, sx * 7, 0, 2, .7, .7, 52, 4, '#b8bcc8'); Sh.box(wm, sx * 7, 52, 2, 1, 8, 5, '#e8ecf2'); } }
       const HC = ['#7a5ac8', '#2aa6a0', '#c8452e', '#e8c25a', '#3a6ac8', '#58b848', '#c85a9a', '#e88a3a', '#8a8a92', '#40c8e8', '#a03a3a', '#f4f0e6'];
-      for (let i = 0; i < 12; i++) { const m = M4.t(-240 + i * 43.6, 36, -hh - 38); Sh.cyl(m, 0, 0, 0, 1, 1, 40, 4, '#8a8478'); Sh.box(m, 6, 30, 0, 12, 18, .7, HC[i]); A.box(m, 6, 33, .5, 5, 5, .3, '#e8c25a', 1); }
+      if (real === 'keep') for (let i = 0; i < 12; i++) { const m = M4.t(-240 + i * 43.6, 36, -hh - 38); Sh.cyl(m, 0, 0, 0, 1, 1, 40, 4, '#8a8478'); Sh.box(m, 6, 30, 0, 12, 18, .7, HC[i]); A.box(m, 6, 33, .5, 5, 5, .3, '#e8c25a', 1); }
+      if (real === 'crown') { for (const sx of [-1, 1]) { Sh.box(I, sx * 70, 70, -hh - 40, 12, 140, 12, '#f2ede2'); A.box(I, sx * 70, 140, -hh - 40, 16, 4, 16, '#e8c25a', 1); A.box(I, sx * 70, 3, -hh - 40, 16, 6, 16, '#e8c25a', 1); Sh.box(I, sx * 150, 40, -hh - 40, 10, 80, 10, '#e6e0d2'); } A.box(I, 0, 146, -hh - 40, 156, 8, 12, '#e8c25a', 1); A.box(I, 0, 152, -hh - 40, 150, 3, 10, '#fff2c0', 1); Sh.box(I, 30, 9, -hh - 20, 26, 18, 14, '#f2ede2'); A.box(I, 30, 19, -hh - 20, 20, 2, 12, [.9, .86, .7]); A.box(I, 30, 21, -hh - 20, 16, 1, 10, '#e8c25a', 1); }
+      if (real === 'stair') { for (let k = 0; k < 9; k++) { Sh.box(I, 0, -6 + k * 7, -hh - 30 - k * 16, 120 - k * 4, 7, 16, k % 2 ? '#e6e0d2' : '#dcd6c8'); A.box(I, 0, -2.4 + k * 7, -hh - 22.4 - k * 16, 120 - k * 4, .8, .6, '#e8c25a', 1); } Sh.box(I, 0, 110, -hh - 190, 60, 100, 8, '#f2ede2'); A.box(I, 0, 100, -hh - 185, 30, 70, 2, [1, .95, .8], 1); const bm = M4.chain(M4.t(210, 0, 100), M4.rz(.3), M4.ry(.6)); Sh.box(bm, 0, 10, 0, 150, 20, 70, [.25, .25, .3]); Sh.box(bm, 0, 22, 0, 110, 6, 50, [.5, .5, .54]); }
       for (const sx of [-1, 1]) { const m = M4.t(sx * 256, 0, -hh - 44); Sh.cyl(m, 0, -40, 0, 26, 22, 150, 8, '#ece6d8', 0, 1); Sh.cyl(m, 0, 110, 0, 30, 0, 52, 8, sx < 0 ? '#7a5ac8' : '#2aa6a0'); Sh.cyl(m, 0, 62, 0, 23.4, 23.4, 3, 8, '#e8c25a', 1); Sh.cyl(m, 0, 162, 0, .9, .9, 24, 4, '#8a8478'); Sh.box(m, 9, 180, 0, 18, 10, .8, sx < 0 ? '#7a5ac8' : '#2aa6a0'); }
       for (let i = 0; i < 70; i++) { const a = r() * 6.2832, d = R(330, 1500); cloud(Math.cos(a) * d, R(-150, -60), Math.sin(a) * d, R(1.5, 4), [1, R(.86, .95), R(.82, .92)]); }
       for (let i = 0; i < 9; i++) { const a = Math.PI + (i + .5) / 9 * Math.PI; peak(Math.cos(a) * R(900, 1300), Math.sin(a) * R(900, 1300), R(160, 260), R(160, 330), [.5, .52, .74], [1, .95, .92]); }
@@ -3670,12 +3700,17 @@ const G3 = {
     if (bg === 'fall') { if (!Settings.d.reduce) { const c = B.cam; for (let i = 0; i < 46; i++) { const px = c.x + ((i * 97.3) % 700) - 350, pz = c.y - 60 - ((i * 53.9) % 520), sp = 240 + (i % 5) * 70, py = -160 + ((t * sp + i * 83) % 420); this.glow(px, py, pz, i % 6 === 0 ? 22 : 2, i % 6 === 0 ? [1, 1, 1] : [.9, .95, 1], i % 6 === 0 ? .04 : .35); if (i % 6) this.glow(px, py - 9, pz, 1.6, [.9, .95, 1], .3); }
         for (let i = 0; i < 3; i++) { const sx0 = [-120, 118, 40][i], sz0 = [70, 70, -84][i]; for (let k = 0; k < 7; k++) { const ph = (t * .5 + k / 7 + i * .2) % 1; this.glow(sx0 + Math.sin(t + k) * 6 - ph * 30, 40 + ph * 260, sz0, 14 + ph * 30, [.16, .15, .16], .22 * (1 - ph)); } }
         for (let i = 0; i < 5; i++) { const fx = [-120, 118, -58, 62, 40][i], fz = [70, 70, -78, -78, -84][i]; for (let k = 0; k < 4; k++) { const ph = (t * 1.4 + k * .25 + i * .13) % 1; this.glow(fx + Math.sin(t * 3 + k + i) * 3, 14 + ph * 46, fz, 9 - ph * 6, [1, .5 - ph * .3, .12], .7 * (1 - ph)); } } } return; }
+    if (bg === 'hall') { if (!Settings.d.reduce) { for (const cx of [-70, 0, 70]) { for (let k = 0; k < 8; k++) { const a = k / 8 * 6.283 + t * .2; this.glow(cx + Math.cos(a) * 12, 120 + Math.sin(t * 2 + k) * 1.5, -20 + Math.sin(a) * 8, 5, [1, .85, .5], .8); } this.glow(cx, 118, -20, 40, [1, .8, .45], .16); } for (let i = 0; i < 30; i++) { const ph = (t * .08 + i * .137) % 1; this.glow(Math.sin(i * 4.1 + t * .3) * 90, 140 - ph * 140, Math.cos(i * 2.3) * 50, 1.1, [1, .9, .7], .45 * Math.sin(ph * 3.14)); } } return; }
     if (bg === 'cell') { if (!Settings.d.reduce) { for (let i = 0; i < 10; i++) this.glow(Math.sin(i * 2.1) * 6, 20 + i * 22, Math.cos(i * 1.7) * 5, 34 - i * 1.4, [1, .95, .8], .05); for (let i = 0; i < 26; i++) { const ph = (t * .12 + i * .137) % 1; this.glow(Math.sin(i * 4.1 + t * .3) * 40, 200 - ph * 200, Math.cos(i * 2.3) * 26, 1.2, [1, .96, .84], .5 * Math.sin(ph * 3.14)); } } return; }
-    if (bg === 'storm' && !Settings.d.reduce) { const c = B.cam; for (let i = 0; i < 110; i++) { const px = c.x + ((i * 53.7) % 420) - 210 + Math.sin(i) * 8, pz = c.y - 20 - ((i * 37.1) % 300), py = 150 - ((t * (260 + i % 7 * 30) + i * 61) % 150); this.glow(px - py * .12, py, pz, 1.1, [.7, .78, 1], .55); this.glow(px - (py + 5) * .12, py + 5, pz, .9, [.7, .78, 1], .3); }
+    const wet = bg === 'storm' || bg === 'riser';
+    if (bg === 'riser' && !Settings.d.reduce) { const hx = -150, hz = -40; this.glow(hx, 8, hz, 46, [1, .55, .2], .5); for (let i = 0; i < 9; i++) { const ph = (t * .5 + i / 9) % 1; this.glow(hx + Math.sin(i * 2.1 + t) * 6, 6 + ph * 90, hz, 10 - ph * 6, [1, .6 - ph * .3, .2], .5 * (1 - ph)); } for (let i = 0; i < 12; i++) { const ph = (t * .16 + i / 12) % 1; this.glow(hx - ph * 260, 9 + Math.abs(Math.sin(ph * 40 + i)) * 2, hz + 30 + (i % 4) * 16 + ph * 40, 3.2, [1, .85, .6], .7 * Math.sin(ph * 3.14)); } }
+    if (bg === 'stair' && !Settings.d.reduce) { for (let i = 0; i < 3; i++) { const sx0 = [-190, 200, 60][i], sz0 = [90, 70, 130][i]; this.glow(sx0, 14, sz0, 40, [1, .5, .15], .45 + Math.sin(t * 7 + i) * .1); for (let k = 0; k < 7; k++) { const ph = (t * .3 + k / 7 + i * .2) % 1; this.glow(sx0 + ph * 60, 30 + ph * 240, sz0 - ph * 40, 18 + ph * 40, [.13, .11, .12], .3 * (1 - ph)); } } for (let i = 0; i < 30; i++) { const ph = (t * .2 + i * .033) % 1; this.glow(Math.sin(i * 3.7) * 220, ph * 160, Math.cos(i * 2.3) * 90, 1.4, [1, .6, .2], .8 * (1 - ph)); } }
+    if (bg === 'crown' && !Settings.d.reduce) { for (let i = 0; i < 7; i++) this.glow(0, 60 + i * 4, -hh - 180 - i * 10, 120 - i * 12, [1, .7 - i * .04, .3], .1); this.glow(0, 64, -hh - 200, 34, [1, .92, .7], .9); for (let i = 0; i < 9; i++) { const a = -1.2 + i * .3 + Math.sin(t * .2 + i) * .03; for (let k = 1; k < 6; k++) this.glow(Math.sin(a) * k * 40, 64 + Math.abs(Math.cos(a)) * k * 6, -hh - 200 + k * 46, 16, [1, .8, .5], .05); } for (let i = 0; i < 24; i++) { const ph = (t * .12 + i * .041) % 1; this.glow(Math.sin(i * 3.1) * 130, 4 + ph * 90, Math.cos(i * 1.9) * 60, 1.3, [1, .8, .4], .7 * (1 - ph)); } }
+    if (wet && !Settings.d.reduce) { const c = B.cam; for (let i = 0; i < 110; i++) { const px = c.x + ((i * 53.7) % 420) - 210 + Math.sin(i) * 8, pz = c.y - 20 - ((i * 37.1) % 300), py = 150 - ((t * (260 + i % 7 * 30) + i * 61) % 150); this.glow(px - py * .12, py, pz, 1.1, [.7, .78, 1], .55); this.glow(px - (py + 5) * .12, py + 5, pz, .9, [.7, .78, 1], .3); }
       const ph = t % 6.3; this.bolt = ph < .1 || (ph > .22 && ph < .3) ? 1 : 0; if (this.bolt && !this._th) Sound.play('rumble'); this._th = ph < .5; } else this.bolt = 0;
-    flag(-hw + 16, -hh - 8, '#7a5ac8', 1); flag(hw - 16, -hh - 8, '#2aa6a0', 2);
-    if (bg === 'keep') { for (let i = 0; i < 4; i++) { const x = (i % 2 ? 1 : -1) * (hw + 16), z = i < 2 ? -hh + 4 : hh - 4, m = M4.t(x, 0, z); D.cyl(m, 0, 0, 0, 2.4, 2, 22, 6, '#7a7268'); D.cyl(m, 0, 22, 0, 7, 9, 6, 6, '#3a3430', 0, 1); D.cyl(m, 0, 27, 0, 9.2, 9.2, 1.2, 6, '#e8c25a', 1); for (let k = 0; k < 6; k++) { const ph = (t * (1.3 + k * .17) + k * .31 + i) % 1; this.glow(x + Math.sin(k * 2 + t * 4) * 3, 30 + ph * 22, z, (1 - ph) * 9, [1, .5 + ph * .4, .15], .7); } this.glow(x, 32, z, 30, [1, .6, .25], .22); } }
-    else if (bg !== 'storm') { // the rest of the war, behind
+    if (bg !== 'crown' && bg !== 'stair' && bg !== 'riser') { flag(-hw + 16, -hh - 8, '#7a5ac8', 1); flag(hw - 16, -hh - 8, '#2aa6a0', 2); }
+    if (bg === 'keep' || bg === 'crown' || bg === 'stair') { for (let i = 0; i < 4; i++) { const x = (i % 2 ? 1 : -1) * (hw + 16), z = i < 2 ? -hh + 4 : hh - 4, m = M4.t(x, 0, z); D.cyl(m, 0, 0, 0, 2.4, 2, 22, 6, '#7a7268'); D.cyl(m, 0, 22, 0, 7, 9, 6, 6, '#3a3430', 0, 1); D.cyl(m, 0, 27, 0, 9.2, 9.2, 1.2, 6, '#e8c25a', 1); for (let k = 0; k < 6; k++) { const ph = (t * (1.3 + k * .17) + k * .31 + i) % 1; this.glow(x + Math.sin(k * 2 + t * 4) * 3, 30 + ph * 22, z, (1 - ph) * 9, [1, .5 + ph * .4, .15], .7); } this.glow(x, 32, z, 30, [1, .6, .25], .22); } }
+    else if (!wet && bg !== 'crown') { // the rest of the war, behind
       if (!this._bgm) this._bgm = Array.from({ length: 7 }, (_, i) => ({ k: i }));
       for (const q of this._bgm) { const x = -hw - 30 + q.k * (hw * 2 + 60) / 6 + Math.sin(q.k * 7.1) * 20, z = -hh - (B.cine ? 70 : 150) - (q.k * 53 % 90), ph = t * 2.2 + q.k * 1.7, lun = Math.max(0, Math.sin(ph)) * 4, sw = (ph % 6.2832) < 1.2 ? .18 - (ph % 6.2832) * .15 : 0;
         this.char({ x: x - 16 + lun, y: z, fx: 1, fy: 0, st: sw > 0 ? 'recover' : 'approach', t: .1, swing: sw, anim: t * .3, idx: q.k, combo: 1 + q.k % 3 }, { id: q.k % 2 ? 'cadv1' : 'cadv2', blade: 1, key: q });
@@ -3684,7 +3719,7 @@ const G3 = {
         for (let i = 0; i < 30; i++) { const x = ((i * 61 + t * 22) % 1200) - 600, z = (i % 2 ? -79 : -3) + Math.sin(t * 2 + i) * 1.2; D.quad(x, z, x + 14 + (i % 3) * 6, z + 1.2, -.2, [.9, .96, 1], 1); } }
       if (bg === 'ford' && !Settings.d.reduce) for (let i = 0; i < 40; i++) { const wx = ((i * 47.3 + t * (16 + i % 4 * 6)) % 700) - 350, wz = -76 + (i * 13) % 70; if (Math.sin(t * 5 + i * 2.1) > .1) this.glow(wx, .4, wz, 3 + i % 3, [1, .86, .7], .5); }
     }
-    if (!Settings.d.reduce && bg !== 'storm') for (let i = 0; i < 7; i++) { const bx = ((i * 190 + t * (26 + i * 3)) % 1400) - 700, by = 150 + i * 14 + Math.sin(t * .7 + i) * 10, bz = -420 - i * 40, fl = Math.sin(t * 9 + i * 2) * .7, m = M4.t(bx, by, bz); D.box(m, 0, 0, 0, 2, 1.4, 5, '#2a2a34'); D.box(M4.chain(m, M4.rz(fl)), 4, 0, 0, 8, .5, 3, '#3a3a44'); D.box(M4.chain(m, M4.rz(-fl)), -4, 0, 0, 8, .5, 3, '#3a3a44'); }
+    if (!Settings.d.reduce && !wet && bg !== 'stair') for (let i = 0; i < 7; i++) { const bx = ((i * 190 + t * (26 + i * 3)) % 1400) - 700, by = 150 + i * 14 + Math.sin(t * .7 + i) * 10, bz = -420 - i * 40, fl = Math.sin(t * 9 + i * 2) * .7, m = M4.t(bx, by, bz); D.box(m, 0, 0, 0, 2, 1.4, 5, '#2a2a34'); D.box(M4.chain(m, M4.rz(fl)), 4, 0, 0, 8, .5, 3, '#3a3a44'); D.box(M4.chain(m, M4.rz(-fl)), -4, 0, 0, 8, .5, 3, '#3a3a44'); }
     for (let i = 0; i < 5; i++) { const cx = ((i * 520 + t * (5 + i)) % 2600) - 1300, cy = (bg === 'keep' ? 240 : 360) + i * 28, cz = -900 - i * 90, cc = bg === 'ford' ? [1, .7, .58] : bg === 'keep' ? [1, .9, .86] : [1, 1, 1]; for (let k = 0; k < 4; k++) D.box(I, cx + (k - 1.5) * 60, cy + (k % 2) * 16, cz + (k % 3) * 20, 110 - k * 10, 34, 60, cc, 1); }
     // petals, embers
     if (!Settings.d.reduce) for (let i = 0; i < (B.cine ? 46 : 14); i++) { const c = B.cam, px = c.x + ((i * 71.3 + t * (8 + i % 5 * 3)) % 400) - 200, pz = c.y - 40 - ((i * 37.7) % 320), up = bg === 'ford', py = ((i * 29.1 + t * (up ? 9 + i % 4 * 4 : -(6 + i % 4 * 3))) % 90 + 90) % 90 + 2; this.glow(px + Math.sin(t + i) * 6, py, pz, up ? 1.6 : 1.3, bg === 'keep' ? [1, 1, 1] : up ? [1, .7, .35] : [[1, .9, .95], [1, .9, .5], [.85, 1, .8]][i % 3], up ? .9 : .7); }
@@ -3692,7 +3727,7 @@ const G3 = {
   end(B) {
     const gl = this.gl, cv = this.cv, E = this.env(this.bg), P = this.P, vd = this.voidC; let L = this.LOOK[this.bg];
     if (!vd) this.life(B);
-    const bl = this.bg === 'storm' && this.bolt && !vd; if (bl) L = Object.assign({}, L, { amb: [.9, .95, 1.2], sunC: [1.6, 1.7, 2.1], top: [.3, .34, .5], bot: [.5, .56, .8], fog: [.36, .4, .6] });
+    const bl = (this.bg === 'storm' || this.bg === 'riser') && this.bolt && !vd; if (bl) L = Object.assign({}, L, { amb: [.9, .95, 1.2], sunC: [1.6, 1.7, 2.1], top: [.3, .34, .5], bot: [.5, .56, .8], fog: [.36, .4, .6] });
     const rg = (this.rage || 0) * .6, Lr = rg > 0 && !vd ? { top: L.top.map((v, i) => v * (1 - rg * .55) + [.3, .02, .02][i] * rg * .5), bot: L.bot.map((v, i) => v * (1 - rg * .35) + [1, .3, .12][i] * rg * .35), sunC: L.sunC.map((v, i) => v * (1 - rg * .15) + [.5, .05, 0][i] * rg), amb: L.amb.map((v, i) => v * (1 - rg * .28)), fog: L.fog.map((v, i) => v * (1 - rg * .4) + [.6, .12, .06][i] * rg * .4) } : L;
     const post = !NOPOST && this.target0(cv.width, cv.height); gl.bindFramebuffer(gl.FRAMEBUFFER, post ? this.fb : null);
     gl.viewport(0, 0, cv.width, cv.height); gl.clearColor(vd ? vd[0] : L.fog[0], vd ? vd[1] : L.fog[1], vd ? vd[2] : L.fog[2], 1); gl.clearStencil(0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
@@ -4745,7 +4780,7 @@ function afterDay(n, sv) { G.mode = 'dayend'; UI.push(modal({ clear: true, onBac
 // SOOTBORN — Part Two: ABOVE. Five chapters from the Pinning to the end. Told straight; the memories now run backward.
 const P2F = k => G.flags[k];
 FF.gallery = () => ({
-  era: 5, boots: 1, title: 'THE GALLERY', sub: 'TYR CADE - A MATTER OF HIS UNCLE\'S HONOUR', bg: 'cell', arena: { kind: 'ring', rx: 96, ry: 58 }, music: 'duel', rage: 2, legend: 1, skip: 1, winText: 'NOTED',
+  era: 5, boots: 1, title: 'THE GALLERY', sub: 'TYR CADE - A MATTER OF HIS UNCLE\'S HONOUR', bg: 'hall', arena: { kind: 'ring', rx: 96, ry: 58 }, music: 'duel', rage: 2, legend: 1, skip: 1, winText: 'NOTED',
   fin: { name: 'NOTED', l1: 'I HAVE LEARNED THEIR WORD FOR IT', l2: 'IT MEANS: I WILL REMEMBER THIS', rgb: '255,240,200' },
   hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 30 }, taunt: { 0: ['SORREL. WHO ARE THE SORRELS?', 'YOU FIGHT LIKE A LABOURER.', 'MY UNCLE WILL HEAR OF THIS.'] },
   foes: [{ id: 'tyr', name: 'Tyr Cade', kind: 'duelist', hp: 120, sc: 1.1 }],
@@ -4756,7 +4791,7 @@ FF.gallery = () => ({
   outro: DUEL_OUT('tyr', 'HE YIELDED WITH HIS WHOLE FAMILY WATCHING. I HELPED HIM UP. THAT WAS THE PART THEY NEVER FORGAVE.', 'LUCAN AUREL WAS IN THE GALLERY. HE WAS THE ONLY ONE WHO CLAPPED.', 'A NAME TRAVELS FAST UP HERE. BY MORNING EDRIC SORREL HAD ONE.', 1.1)
 });
 FF.riser = () => ({
-  era: 5, boots: 1, title: 'RISER NINE', sub: 'THE BALANCING OF TIER FOUR - FORTY PEOPLE, ONE STAIR', bg: 'storm', arena: FIELD, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Warden', winText: 'FORTY OUT',
+  era: 5, boots: 1, title: 'RISER NINE', sub: 'THE BALANCING OF TIER FOUR - FORTY PEOPLE, ONE STAIR', bg: 'riser', arena: FIELD, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Warden', winText: 'FORTY OUT',
   fin: { name: 'NINE FLOORS', l1: 'THEY TOLD US THERE WERE SIX', l2: 'I HAVE WALKED ALL NINE', rgb: '255,170,80', mode: 'all' },
   hero: { id: 'kael2', hp: 11, pow: 2, blade: 1, fury0: 70 }, allies: ['cadv1'], shouts: ['MOVE THEM!', 'THE STAIR IS CLEAR!'], taunt: { 0: ['UNLOGGED PERSONS.', 'YOU ARE OWED TO THE FURNACE.', 'WHO IS UNDER THAT MASK?'] },
   waves: [[{ id: 'warden', name: 'Warden', kind: 'warden', hp: 26, sc: 1.1 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 9 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 9 }],
@@ -4794,7 +4829,7 @@ FF.son = () => { const friend = !!P2F('lucanFriend'); return {
     { d: 3.0, cam: [0, 150, 60, 150, .3], to: [0, 250, 170, 150, .16], acts: [{ id: 'kael2', a: [-10, 2], blade: 1 }], cap: 'I HAD A YEAR, PERHAPS, BEFORE HE COULD WALK. I USED IT.' }
   ] }; };
 FF.stair = () => ({
-  era: 5, boots: 1, title: 'THE STAIR', sub: 'THE SUN SPIRE - NINE HUNDRED STEPS TO THE COUNT', bg: 'keep', arena: { kind: 'rect', w: 220, h: 100 }, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Spire Guard', winText: 'UP',
+  era: 5, boots: 1, title: 'THE STAIR', sub: 'THE SUN SPIRE - NINE HUNDRED STEPS TO THE COUNT', bg: 'stair', arena: { kind: 'rect', w: 220, h: 100 }, music: 'battle', rage: 3, legend: 1, skip: 1, foeName: 'Spire Guard', winText: 'UP',
   fin: { name: 'EVERY BREATH', l1: 'EVERY BREATH I TAKE IS HERS', l2: 'I HAVE NINE HUNDRED STEPS OF THEM', rgb: '255,224,138', mode: 'all' },
   hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 80 }, allies: V, shouts: ['UP!', 'BELOW!', 'DON\'T STOP!'], taunt: { 0: ['HOLD THE LANDING!', 'HE IS ONE MAN!', 'FOR THE AUDITOR!'] },
   waves: [[{ id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 10 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 10 }, { id: 'sg1', name: 'Spire Guard', kind: 'cadet', hp: 10 }, { id: 'sg2', name: 'Spire Guard', kind: 'lancer', hp: 10 }],
@@ -4815,7 +4850,7 @@ FF.stair = () => ({
   ]
 });
 FF.ember = () => ({
-  era: 5, boots: 1, title: 'LITTLE EMBER', sub: 'CELESTINE AUREL - THE HIGH AUDITOR', bg: 'crown', arena: { kind: 'rect', w: 220, h: 100 }, music: 'duel', rage: 3, legend: 1, skip: 1, endAt: .08, winText: 'BALANCED',
+  era: 5, boots: 1, title: 'LITTLE EMBER', sub: 'CELESTINE AUREL - THE HIGH AUDITOR', bg: 'crown', arena: { kind: 'rect', w: 220, h: 100 }, music: 'final', rage: 3, legend: 1, skip: 1, endAt: .08, winText: 'BALANCED',
   hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 60 }, taunt: { 0: ['THERE YOU ARE, TECHNICIAN.', 'I KEPT THE COUNT. SOMEBODY HAD TO.', 'SHE WAS QUICKER THAN YOU.', 'AND WHO WILL RATION IT WHEN I AM GONE?'] },
   foes: [{ id: 'celf', name: 'Celestine Aurel', kind: 'duelist', hp: 230, sc: 1.18 }],
   voice: { at: [[1, 'SHE IS SEVENTY. SHE HAS WORN THE BOOTS SINCE SHE WAS TWELVE. NOBODY TOLD ME SHE COULD FIGHT. NOBODY WHO KNEW WAS STILL ALIVE.'], [14, 'SHE IS NOT ANGRY. THAT IS THE WORST OF IT. SHE HAS NEVER ONCE BEEN ANGRY AT US. WE WERE A COLUMN THAT HAD TO ADD UP.'], [28, 'THE WINDOW IS BEHIND HER. THE REAL SKY. SHE KEPT IT IN ONE ROOM FOR FIFTY YEARS.'], [42, 'SEREN. I AM NEARLY DONE.']],
@@ -4839,7 +4874,7 @@ FF.fall2 = () => { const d = FF.fall(); d.intro = d.intro.slice(); d.intro[0] = 
 // ------------------------------------------------------------------ the chapters
 const P2 = {
   1: () => [
-    { music: 'mystery' }, { card: 'PART TWO', sub: 'A B O V E', big: 1, sfx: 'splash', min: 2.2, max: 6 },
+    { music: 'spire' }, { card: 'PART TWO', sub: 'A B O V E', big: 1, sfx: 'splash', min: 2.2, max: 6 },
     { card: 'THE POST', sub: 'The Sun Spire. Four years and a season from now.', big: 1, min: 1.6, max: 5 },
     { panel: 'spire' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'My name up here is Edric Sorrel. The real one died of a fever at eleven, in a minor House with no money to bury him loudly. Ilse bought his papers.' },
@@ -4850,9 +4885,10 @@ const P2 = {
     { narr: 'When a line costs more than it earns, somebody on the Spire strikes it, and writes one word after. Then, six tiers down, a furnace door opens.' },
     { narr: 'It is my job to keep the columns adding up. I am good at it. I was always good with gauges.' },
     { pstage: 2 }, { wait: 2.2 },
-    { narr: 'I found her on my third day. I had told myself I would not look.' },
+    { sfx: 'heart' }, { narr: 'I found her on my third day. I had told myself I would not look.' },
     { narr: 'Holloway, S. They had not even written her whole name.' },
-    { fade: 'out' }, { panel: 'ante' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { sfx: 'heart' }, { wait: 1.2 }, { narr: 'One. Two. Three. I closed the book at eleven and went on with the morning\'s columns. My hand was steady. I was learning what that cost.' },
+    { fade: 'out' }, { panel: 'ante' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { say: 'lucan', t: 'Sorrel. You are the one who put me on my knees in front of my mother. I have been wanting to meet you properly.' },
     { say: 'lucan', t: 'Nobody had ever beaten me. I found I did not mind as much as I was supposed to. Would you teach me how you did it?' },
     { choice: [
@@ -4863,15 +4899,16 @@ const P2 = {
     { brawl: () => FF.gallery() }
   ],
   2: () => [
-    { music: 'mystery' }, { card: 'THE BALANCING', sub: 'Five years from now.', big: 1, min: 1.6, max: 5 },
-    { panel: 'ledger' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
+    { music: 'spire' }, { card: 'THE BALANCING', sub: 'Five years from now.', big: 1, min: 1.6, max: 5 },
+    { panel: 'desk' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'In my second year the order for Tier Four came across my desk. Eleven hundred lines, to be struck at once. Marshal Cade called it a balancing.' },
+    { pstage: 1 }, { sfx: 'heart' }, { wait: 1 },
     { narr: 'It needed the Clerk\'s signature. Mine.' },
     { choice: [
       { t: 'Sign it. Stay hidden.', fx: () => { G.flags.signedFour = 1; G.flags.fury = (G.flags.fury || 0) + 2; }, then: [narr('I signed. If I had not, another clerk would have by noon, and I would have been a line in the book myself by evening. I have told myself that every day since.')] },
       { t: 'Lose it. Buy a day.', fx: () => { G.flags.signedFour = 0; }, then: [narr('I let it fall behind a cabinet and found it again the next morning, with apologies. One day. Dace used all of it.'), narr('Cade signed it himself in the end, and looked at me for a long time while he did.')] }
     ] },
-    { fade: 'out' }, { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { pstage: 2 }, { wait: 1.4 }, { fade: 'out' }, { music: 'mystery' }, { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'A letter came up through Sable the same week, in Dace\'s chalk-fingered hand.' },
     { say: 'dace', t: 'Tavi is on the wheel now. Twelve. She hums while she turns it and nobody has the heart to stop her. Mara says to tell you the shelf is holding.' },
     { say: 'dace', t: 'There is a riser under Tier Four that comes up in your valley. Nine floors, Kael. If somebody held the top of it for an hour.' },
@@ -4879,17 +4916,18 @@ const P2 = {
     { brawl: () => FF.riser() }
   ],
   3: () => [
-    { music: 'mystery' }, { card: 'WHAT SHE KNOWS', sub: 'Six years from now.', big: 1, min: 1.6, max: 5 },
-    { panel: 'ante' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
+    { music: 'spire' }, { card: 'WHAT SHE KNOWS', sub: 'Six years from now.', big: 1, min: 1.6, max: 5 },
+    { panel: 'ante' }, { pstage: 5 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'She sent for me to look at a valve in her own room. The Array was failing faster. She did not trust her engineers with anything she could hear.' },
     { narr: 'It was a simple seat. I had my hands on the wheel, and I was thinking about nothing at all.' },
     { music: 'hum' }, { wait: 1.6 },
     { narr: 'I did not know I was doing it until she put down her cup.' },
+    { music: null }, { sfx: 'heart' }, { wait: 1.4 },
     { say: 'celestine', t: 'I had that put on the speakers of Tier Six for a year. I know it better than my own House anthem.' },
     { say: 'celestine', t: 'There is nobody on this Spire who could hum it without thinking. Nobody who was not taught it before they could talk.' },
     { say: 'celestine', t: 'Little ember had a husband. I remember now. A valve technician. I had him brought up here to teach my engineers, and then he fell in a furnace, and I was briefly annoyed.' },
-    { narr: 'One. Two. Three.' },
-    { say: 'celestine', t: 'Sit down, Brennick. If I meant to call the Wardens I should not have sent them out of the room first.' },
+    { sfx: 'heart' }, { narr: 'One. Two. Three.' }, { sfx: 'heart' }, { narr: 'Nine years of counting, and it had never once been this hard to stop at eleven.' },
+    { music: 'spire' }, { say: 'celestine', t: 'Sit down, Brennick. If I meant to call the Wardens I should not have sent them out of the room first.' },
     { say: 'celestine', t: 'I am seventy. The Array has perhaps ten years. My son is kind, which is the same as useless. I need somebody to keep the Count after me who knows what a valve is and what a furnace is for.' },
     { say: 'celestine', t: 'You could make it gentler. Fewer lines struck. You would be very good at it. You already are.' },
     { choice: [
@@ -4921,17 +4959,17 @@ const P2 = {
     { music: 'mystery' }, { card: 'THE COUNT', sub: 'Nine years from now. The Sun Spire.', big: 1, min: 1.6, max: 5 },
     { brawl: () => FF.stair() },
     { brawl: () => FF.ember() },
-    { panel: 'ante' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
+    { music: 'hum' }, { panel: 'ante' }, { pstage: 6 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'She knelt on her own floor with the sun going down behind her, and she looked, for the first time since I had known her, like somebody waiting to be told a number.' },
     { choice: [
       { t: 'Strike her line.', fx: () => { G.flags.ending = 'struck'; }, then: [narr('I opened the book on her desk and found her line. Aurel, C. I struck it, and wrote one word after, in my own hand.'), narr('Balanced.'), narr('Then I put down the pen and never picked that one up again.')] },
       { t: 'Send her down Lift Zero.', fx: () => { G.flags.ending = 'below'; }, then: [narr('I walked her to the white car myself. Nine minutes down. I told Mara to give her a bunk on Row K and a ration book.'), say('celestine', 'This is crueller than the furnace.'), say('kael', 'No. It\'s Tuesday. You\'ll get used to it. We did.')] }
     ] },
-    { fade: 'out' }, { music: 'hum' }, { panel: 'dawn' }, { fade: 'in', spd: 0.6 }, { wait: 2.4 },
+    { fade: 'out' }, { music: 'dawn' }, { panel: 'dawn' }, { fade: 'in', spd: 0.6 }, { wait: 2.4 },
     { narr: 'I unlocked Lift Zero from the top and left it running, doors open, all the way down.' },
     { narr: 'It took nine minutes for the light to reach Ashgate Square. It had never been allowed to before.' },
     { pstage: 1 }, { wait: 2.2 },
-    { narr: 'They did not cheer. They stood and looked up. Somebody in the back started the shift song, and nobody put a halberd in it.' },
+    { sfx: 'bell' }, { narr: 'They did not cheer. They stood and looked up. Somebody in the back started the shift song, and nobody put a halberd in it.' },
     { narr: 'She had been right about one thing. The Array did not hold. We lost people that first winter, with every door open and nobody rationing. We counted them out loud, by name, all of us. That was the difference. It was all the difference.' },
     { pstage: 2 }, { wait: 2.4 },
     { narr: 'I went down on the first car. Past the square, past Bay Three, into the old tunnel, to a chalk sun that somebody had been keeping fresh for nine years.' },
@@ -4943,8 +4981,8 @@ const P2 = {
   ]
 };
 const P2_TITLES = { 1: 'The Post', 2: 'The Balancing', 3: 'What She Knows', 4: 'Two Years', 5: 'The Count' };
-function playPart2(n) { UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(P2[n](), () => afterPart2(n)); }
-function afterPart2(n) { G.mode = 'dayend'; Sound.music('mystery'); UI.push(modal({ clear: true, onBack: null, build(b) { b.parentNode.style.textAlign = 'center'; b.parentNode.style.background = 'rgba(10,6,9,.9)';
+function playPart2(n) { Store.set('sootborn_p2', String(n)); UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(P2[n](), () => afterPart2(n)); }
+function afterPart2(n) { Store.set('sootborn_p2', n >= 5 ? '' : String(n + 1)); G.mode = 'dayend'; Sound.music('mystery'); UI.push(modal({ clear: true, onBack: null, build(b) { b.parentNode.style.textAlign = 'center'; b.parentNode.style.background = 'rgba(10,6,9,.9)';
     b.innerHTML = n >= 5 ? '<h2>THE END</h2><p>' + (G.flags.ending === 'below' ? 'Celestine Aurel has a bunk on Row K and a ration book. She is learning the shift song. She is not good at it.' : 'There is one line in the Count struck in a valve tech\'s hand. Nobody has struck another.') + '</p><p style="opacity:.7">SOOTBORN · thanks for playing.</p>' : `<h2>Part Two · ${n} of 5</h2><p>${P2_TITLES[n]} is done. Next: ${P2_TITLES[n + 1]}.</p>`; },
   items: (n < 5 ? [{ label: 'Continue: ' + P2_TITLES[n + 1], act: () => playPart2(n + 1) }] : []).concat([{ label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }]) })); }
 
@@ -5239,6 +5277,7 @@ const Menus = {
       b.parentNode.style.background = 'rgba(16,10,13,.82)'; b.parentNode.style.textAlign = 'center';
     }, items: [
       { label: s ? `Continue — Day ${s.day}, ${MAPS[s.map].name}` : 'Continue', disabled: () => !s, act: () => { UI.clear(); Game.loadSave(Save.latest()); } },
+      ...(+Store.get('sootborn_p2') >= 1 ? [{ label: `Continue Part Two — ${+Store.get('sootborn_p2')} · ${P2_TITLES[+Store.get('sootborn_p2')]}`, act: () => playPart2(+Store.get('sootborn_p2')) }] : []),
       { label: 'New game', act: () => Menus.newGame() },
       { label: 'Load game', act: () => Menus.slots('load') },
       { label: 'Settings', act: () => Menus.settings() },
@@ -5247,7 +5286,7 @@ const Menus = {
     ] }));
   },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.17): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.18): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
