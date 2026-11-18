@@ -37,7 +37,7 @@
       '<div class="tb-box tb-hero" data-go="sheet"><div class="tb-port"></div><div><b>' + esc(h.name) + '</b>' +
       '<small>Level ' + h.level + ' ' + (h.sub ? C.subs[h.sub].name + ' ' : '') + C.name + '</small>' +
       '<div class="bar xp"><i style="width:' + xpPct + '%"></i></div></div></div>' +
-      '<div class="tb-box tb-rank"><small>SYNDICATE RANK</small><b style="color:' + R.color + '">' + R.name + '</b>' +
+      '<div class="tb-box tb-rank"><small>GUILD RANK</small><b style="color:' + R.color + '">' + R.name + '</b>' +
       '<div class="bar rep"><i style="width:' + rPct + '%"></i></div><small>' + st.respect + (next ? ' / ' + next.at : '') + ' respect</small></div>' +
       '<div class="tb-box tb-coin"><span class="coin"></span><b>' + st.coin + '</b><small>coin</small><span class="pot">' + G.icon('potion') + '</span><b>' + st.potions + '</b></div>' +
       '<button class="mini" id="tbMute">' + (G.muted ? 'Sound off' : 'Sound on') + '</button>';
@@ -50,11 +50,11 @@
   ui.title = function () {
     G.scene = 'title'; G.enterTitle(); ui.topbar(); $('#hud').className = 'hidden';
     const has = G.hasSave();
-    show('<div class="title-wrap"><div class="t-over">DEEP GUILD · SHADOW · COIN · OATH</div><h1>Underground<br>Syndicate</h1>' +
-      '<p class="t-sub">One-on-one pit fighting. Build a class. Earn respect. Make the dark your home.</p>' +
-      '<div class="t-btns">' + (has ? '<button class="big" id="bCont">Continue</button>' : '') +
-      '<button class="' + (has ? '' : 'big') + '" id="bNew">New Fighter</button></div>' +
-      '<p class="t-foot">Vertical slice · 4 classes · 5 opponents · a hideout to furnish</p></div>', 'title');
+    show('<div class="title-wrap"><div class="logo"><svg class="crown" viewBox="0 0 120 70" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset=".5" stop-color="#e2ad3c"/><stop offset="1" stop-color="#8a5a16"/></linearGradient></defs><path d="M8 62 L2 18 L30 40 L44 6 L60 34 L76 6 L90 40 L118 18 L112 62 Z" fill="url(#cg)" stroke="#1a1006" stroke-width="3" stroke-linejoin="round"/><path d="M8 62 h104 v6 H8z" fill="#6f4a12" stroke="#1a1006" stroke-width="3"/><path d="M52 62 l-6 -10 l8 3 l-3 -9 l9 6 l6 -8 l2 9 l7 -4 l-4 13z" fill="#1a1006" opacity=".55"/><circle cx="60" cy="48" r="6" fill="#c22a22" stroke="#1a1006" stroke-width="2.5"/><circle cx="32" cy="52" r="3.5" fill="#6ad0ff" stroke="#1a1006" stroke-width="2"/><circle cx="88" cy="52" r="3.5" fill="#6ad0ff" stroke="#1a1006" stroke-width="2"/></svg><div class="t-over">The Deep Guild presents</div><h1>Gutter<span>crown</span></h1><div class="ribbon"><span>Pit-fighters of the Undercity</span></div></div>' +
+      '<div class="menu">' + (has ? '<button class="big" id="bCont">Continue</button>' : '') +
+      '<button class="' + (has ? '' : 'big') + '" id="bNew">New Fighter</button><button id="bHow">How to Play</button></div>' +
+      '<p class="t-foot">Bleed for coin. Climb the ledger. Take the crown.</p></div>', 'title');
+    on('#bHow', () => { show('<div class="card small"><h2>How to Play</h2><p>Win pit fights for <b>XP</b>, <b>coin</b> and <b>respect</b>. Level up to shape your class. Spend coin on gear and on your hideout.</p>' + CONTROLS + '<div class="row end"><button class="big" id="x">Back</button></div></div>'); on('#x', () => ui.title()); });
     on('#bCont', () => { G.load(); ui.hub(); });
     on('#bNew', () => {
       if (has) show('<div class="card small"><h2>Start over?</h2><p>This replaces your current fighter and hideout.</p><div class="row"><button id="y" class="danger">Start over</button><button id="n">Keep my fighter</button></div></div>');
@@ -96,9 +96,9 @@
   ui.hub = function (first) {
     ui.close(); $('#hud').className = 'hidden'; G.placing = null; ui.placeBar();
     G.scene = 'hub'; W().enter('hub', G.hubPos); ui.topbar();
-    if (first) show('<div class="card small"><h2>The Undercity</h2><p>You owe the Deep Guild a debt, and the only currency they respect is blood on the pit floor.</p>' +
-      '<p>Win fights to earn <b>XP</b>, <b>coin</b> and <b>respect</b>. Respect raises your syndicate rank. Coin buys gear and turns the damp cave they gave you into a home.</p>' +
-      '<p class="dim">Walk with WASD or the thumb stick, or tap where you want to go. Walk up to the Pit gate, the Fence, the Guildmaster or your Hideout door.</p><div class="row end"><button class="big" id="ok">Let’s go</button></div></div>');
+    if (first) show('<div class="card small letter"><h2>Notice of Debt</h2><p><i>To the bearer, ' + esc(G.state.hero.name) + ':</i></p><p>You owe the Deep Guild a debt, and the only currency we respect is blood on the pit floor.</p>' +
+      '<p>Win fights to earn <b>XP</b>, <b>coin</b> and <b>respect</b>. Respect raises your rank in the Guild. Coin buys gear, and turns the damp cave we have lent you into a home.</p><p class="sig">Signed and sealed, the Ledger-Keeper</p><span class="seal"></span>' +
+      '<p class="dim">Walk with WASD or the thumb stick, or tap where you want to go. Walk up to the Pit gate, the Fence, the Guildmaster or your Hideout door.</p><div class="row end"><button class="big" id="ok">Make my mark</button></div></div>');
     on('#ok', () => ui.close());
   };
   ui.leaveHub = () => { const w = W().walker; if (G.scene === 'hub') G.hubPos = { x: w.x, z: Math.max(w.z, 1.2) }; };
@@ -111,7 +111,7 @@
   // The catalog: buy a piece, then place it on the grid.
   ui.catalog = function () {
     const st = G.state, rk = G.rankOf(st.respect), own = G.owned(st);
-    let h = '<div class="card"><h2>Decorate</h2><p class="dim">Buy a piece, then choose where it stands. Tap anything already placed to move or store it. You have <b>' + st.coin + '</b> coin.</p>';
+    let h = '<div class="card"><h2>The Quartermaster’s Catalogue</h2><p class="dim">Buy a piece, then choose where it stands. Tap anything already placed to move or store it. You have <b>' + st.coin + '</b> coin.</p>';
     G.DECOR.forEach(d => {
       const n = own[d.id] || 0, locked = rk < d.rank, full = n >= d.max, poor = st.coin < d.cost;
       h += '<div class="ab-row' + (locked ? ' lockedrow' : '') + '"><div class="ab-ic pas" style="color:' + (d.light ? '#' + d.light.toString(16).padStart(6, '0') : 'var(--gold)') + '">' + (d.zone === 'garden' ? '❀' : d.zone === 'house' ? '⌂' : '✦') + '</div><div class="ab-tx"><b>' + d.name + '</b>' +
@@ -176,13 +176,13 @@
   // ------------------------------------------------------------ the pit ladder
   ui.pit = function () {
     const st = G.state;
-    let unlocked = true, h = '<div class="card"><h2>The Blood Pit</h2><p class="dim">Beat a fighter to unlock the next. Rematches pay less, but the crowd still tips.</p><div class="ladder">';
+    let unlocked = true, h = '<div class="card"><h2>The Blood Ledger</h2><p class="dim">Five names stand between you and the crown. Beat one to unlock the next. Rematches pay less, but the crowd still tips.</p><div class="ladder">';
     G.OPPONENTS.forEach((o, i) => {
       const wins = st.wins[o.id] || 0, open = unlocked;
-      h += '<div class="opp' + (open ? '' : ' locked') + (o.boss ? ' boss' : '') + '"><span class="op" data-i="' + i + '"></span><div class="opp-tx"><b>' + o.name + '</b> <small>' + o.title + '</small>' +
+      h += '<div class="opp' + (open ? '' : ' locked') + (o.boss ? ' boss' : '') + (wins ? ' beaten' : '') + '"><span class="op" data-i="' + i + '"></span><div class="opp-tx"><b>' + o.name + '</b> <small>' + o.title + '</small>' +
         '<small>Level ' + o.level + ' ' + G.RACES[o.race].name + ' ' + G.CLASSES[o.cls].name + (wins ? ' · beaten ' + wins + 'x' : '') + '</small>' +
-        '<small class="rew">' + (wins ? Math.round(o.xp * .6) : o.xp) + ' XP · ' + (wins ? Math.round(o.coin * .6) : o.coin) + ' coin · ' + (wins ? Math.round(o.respect * .3) : o.respect) + ' respect</small></div>' +
-        (open ? '<button class="' + (wins ? '' : 'big') + '" data-fight="' + i + '">' + (wins ? 'Rematch' : 'Fight') + '</button>' : '<span class="lock">Locked</span>') + '</div>';
+        (open ? '<em class="taunt">“' + o.taunt + '”</em>' : '') + '<small class="rew">' + (wins ? Math.round(o.xp * .6) : o.xp) + ' XP · ' + (wins ? Math.round(o.coin * .6) : o.coin) + ' coin · ' + (wins ? Math.round(o.respect * .3) : o.respect) + ' respect</small></div>' +
+        (open ? '<button class="' + (wins ? '' : 'big') + '" data-fight="' + i + '">' + (wins ? 'Rematch' : 'Fight') + '</button>' : '<span class="lock">Sealed</span>') + '</div>';
       if (!wins) unlocked = false;
     });
     h += '</div><div class="row end"><button id="x">Back</button></div></div>';
@@ -210,7 +210,7 @@
   let hudEls = null;
   ui.buildHud = function (P, E) {
     const hud = $('#hud'); hud.className = G.input.touch ? 'touch' : '';
-    const side = (el, e) => { el.querySelector('.hud-name').textContent = e.name; el.querySelector('.res i').style.background = e.C.resColor; };
+    const side = (el, e) => { el.querySelector('.hud-name').textContent = e.name; el.querySelector('.res i').style.background = e.C.resColor; let m = el.querySelector('.medal'); if (!m) { m = document.createElement('div'); m.className = 'medal'; el.insertBefore(m, el.firstChild); } m.innerHTML = ''; m.appendChild(G.portrait(e.look, 44)); };
     side($('#hudP'), P); side($('#hudE'), E);
     const bar = $('#abar'); bar.innerHTML = '';
     const mk = (act, key, ab, cls) => {
@@ -263,7 +263,7 @@
   ui.pause = function () {
     const F = G.fight; if (!F.active) return;
     F.paused = true;
-    show('<div class="card small"><h2>Paused</h2>' + CONTROLS + '<div class="row end"><button id="ff" class="danger">Forfeit</button><button class="big" id="rs">Resume</button></div></div>');
+    show('<div class="card small"><h2>Catch Your Breath</h2>' + CONTROLS + '<div class="row end"><button id="ff" class="danger">Forfeit</button><button class="big" id="rs">Resume</button></div></div>');
     on('#rs', () => { ui.close(); F.paused = false; });
     on('#ff', () => { ui.close(); F.forfeit(); });
   };
@@ -272,7 +272,7 @@
   ui.results = function (r) {
     $('#hud').className = 'hidden';
     const st = G.state;
-    let h = '<div class="card small res ' + (r.win ? 'win' : 'loss') + '"><h1>' + (r.win ? 'Victory' : r.forfeit ? 'Forfeit' : 'Defeat') + '</h1>';
+    let h = '<div class="card small res ' + (r.win ? 'win' : 'loss') + '"><small class="over">' + (r.win ? 'The pit has spoken' : 'The pit is patient') + '</small><h1>' + (r.win ? 'Victory' : r.forfeit ? 'Forfeit' : 'Defeat') + '</h1>';
     h += '<p class="quote">' + (r.win ? 'The crowd chants your name as they drag ' + r.opp.name + ' out.' : 'You wake up in the gutter. The pit never runs out of tomorrow.') + '</p><div class="rewards">';
     h += '<div><small>XP</small><b>+' + r.xp + '</b></div><div><small>COIN</small><b>+' + r.coin + '</b>' + (r.tips ? '<i>crowd tips +20%</i>' : '') + (r.stolen ? '<i>' + r.stolen + ' lifted</i>' : '') + '</div>';
     h += '<div><small>RESPECT</small><b>+' + r.respect + '</b>' + (r.win ? '<i>crowd hype ' + r.hype + '%</i>' : '') + '</div></div>';
@@ -287,7 +287,7 @@
     });
   };
   ui.champion = function () {
-    show('<div class="card small res win"><h1>Pit Champion</h1><p>Vexa’s crown rolls across the stone and stops at your boot. The Deep Guild sends wine, a ledger with your debt struck through, and a new contract.</p>' +
+    show('<div class="card small res win"><small class="over">Long live the</small><h1>Guttercrown</h1><p>Vexa’s crown rolls across the stone and stops at your boot. The Deep Guild sends wine, a ledger with your debt struck through, and a new contract.</p>' +
       '<p class="dim">That is the end of this vertical slice. Your fighter is saved: keep rematching, finish the hideout, or start a different class and see how it plays.</p><div class="row end"><button class="big" id="ok">Back to the Undercity</button></div></div>');
     G.sfx('level'); on('#ok', () => ui.levelCheck());
   };
@@ -316,7 +316,7 @@
       done = () => { h.ult = C.ult; };
     }
     const d0 = G.derive(Object.assign({}, h, { level: L - 1 }), st), d1 = G.derive(h, st);
-    show('<div class="card lvl"><div class="lvl-h"><small>LEVEL UP</small><h1>Level ' + L + '</h1><p>Max HP ' + d0.maxHp + ' → <b>' + d1.maxHp + '</b></p></div>' + body + '</div>');
+    show('<div class="card lvl"><div class="lvl-h"><small>THE GUILD TAKES NOTICE</small><h1>Level ' + L + '</h1><p>Max HP ' + d0.maxHp + ' → <b>' + d1.maxHp + '</b></p></div>' + body + '</div>');
     on('[data-pick]', el => { done(el.dataset.pick); G.save(); ui.levelCheck(); });
   };
 
@@ -351,7 +351,7 @@
   // ------------------------------------------------------------ shop
   ui.shop = function () {
     const st = G.state;
-    let s = '<div class="card"><h2>The Fence</h2><p class="dim">“Everything fell off a cart. Different carts.” · You have <b>' + st.coin + '</b> coin.</p>';
+    let s = '<div class="card"><h2>The Fence</h2><p class="quote">“Everything fell off a cart. Different carts.”</p><p class="dim"> · You have <b>' + st.coin + '</b> coin.</p>';
     ['weapon', 'armor'].forEach(k => {
       const g = G.GEAR[k], t = st.gear[k], nx = g.tiers[t + 1];
       s += '<div class="ab-row"><div class="ab-ic pas">' + (k === 'weapon' ? '⚔' : '⛨') + '</div><div class="ab-tx"><b>' + (nx ? nx.name : g.tiers[t].name) + '</b><small>' + g.name + ' tier ' + (nx ? t + 1 : t) + ' of 2</small><p>' + (nx ? nx.desc : 'Fully upgraded.') + '</p></div>' +

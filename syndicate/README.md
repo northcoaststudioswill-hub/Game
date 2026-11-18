@@ -1,4 +1,6 @@
-# Underground Syndicate (vertical slice)
+# Guttercrown (vertical slice)
+
+*Working title was "Underground Syndicate"; the folder keeps the old name.*
 
 An isometric one-on-one pit fighter with D&D-style class builds. Real-time action combat,
 BG3-flavoured levelling, and a hideout you furnish and plant with your winnings.

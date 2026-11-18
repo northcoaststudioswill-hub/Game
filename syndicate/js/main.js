@@ -26,7 +26,7 @@
     preview = G.makeChar(look); preview.root.position.set(8, 0, 5); h.scene.add(preview.root);
   };
   function leaveSpecial() {
-    if (G.titleChars) G.titleChars.forEach(c => c.root.visible = false);
+    if (G.titleChars && G.scene !== 'title') G.titleChars.forEach(c => c.root.visible = false);
     if (preview && G.scene !== 'create') { preview.root.parent && preview.root.parent.remove(preview.root); preview = null; }
     if (W.walker.char) W.walker.char.root.visible = true;
   }

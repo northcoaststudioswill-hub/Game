@@ -191,3 +191,90 @@ kbd { font-size: 0.72rem; background: #241c2a; border: 1px solid var(--line); bo
   #decorBtn { bottom: calc(1.4rem + var(--sb)); }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+
+/* ================================================================== SKIN: carved stone, bronze trim, wood plaques, parchment */
+:root { --title: 'Grenze Gotisch', 'Cinzel', Georgia, serif; --bronze: #8a6a34; --bronze-hi: #c9a25a; --stone-1: #2a2431; --stone-2: #17131c; --wood-1: #40291a; --wood-2: #22150c; --parch: #dccba3; --parch-2: #c4ae7e; --ink-brown: #2a1c10; --blood: #a3231d; --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"); --cpx: 1.4rem; --cpy: 1.2rem; }
+h1 { font-family: var(--title); font-weight: 900; letter-spacing: 0.02em; }
+
+button { background: linear-gradient(#3b3442, #221d28); border: 1px solid #0b090d; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -3px 0 rgba(0, 0, 0, 0.4), 0 0 0 1px var(--bronze), 0 2px 5px rgba(0, 0, 0, 0.6); text-shadow: 0 1px 0 #000; }
+button:hover { background: linear-gradient(#4a4254, #2a2431); }
+button:active { transform: translateY(2px); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--bronze); }
+button.big { background: linear-gradient(#f6d874, #d9a53a 48%, #a8741f); color: #20140a; border-color: #20140a; text-shadow: 0 1px 0 rgba(255, 240, 190, 0.6); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -3px 0 rgba(90, 50, 0, 0.45), 0 0 0 1px #f0c95a, 0 3px 8px rgba(0, 0, 0, 0.7); }
+button.big:hover { background: linear-gradient(#ffe590, #e8b548 48%, #b88228); }
+button.danger { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -3px 0 rgba(0, 0, 0, 0.4), 0 0 0 1px var(--blood); }
+.chip.sel, .cls.sel, .slot.sel { background: linear-gradient(#7a5c22, #4a3612); box-shadow: inset 0 1px 0 rgba(255, 230, 150, 0.35), 0 0 0 1px #f0c95a, 0 0 0.8rem rgba(240, 201, 90, 0.35); color: #fff3cf; }
+
+.card { --r: radial-gradient(circle at 35% 35%, #f3d98a 0 22%, #8a6a34 23% 55%, #1a120a 56% 70%, transparent 71%);
+  background: var(--r) 0.45rem 0.45rem / 0.7rem 0.7rem no-repeat, var(--r) calc(100% - 0.45rem) 0.45rem / 0.7rem 0.7rem no-repeat, var(--r) 0.45rem calc(100% - 0.45rem) / 0.7rem 0.7rem no-repeat, var(--r) calc(100% - 0.45rem) calc(100% - 0.45rem) / 0.7rem 0.7rem no-repeat, var(--noise), linear-gradient(var(--stone-1), var(--stone-2));
+  border: 2px solid #0b090d; border-radius: 0.3rem; padding: var(--cpy) var(--cpx);
+  box-shadow: 0 0 0 2px var(--bronze), 0 0 0 4px #0b090d, inset 0 0 0 1px rgba(255, 220, 140, 0.14), inset 0 0 3rem rgba(0, 0, 0, 0.55), 0 1.2rem 3.5rem rgba(0, 0, 0, 0.85); }
+.card > h2:first-child { font-family: var(--title); font-weight: 800; font-size: 2rem; letter-spacing: 0.03em; line-height: 1.1; margin: calc(var(--cpy) * -1) calc(var(--cpx) * -1) 0.9rem; padding: 0.55rem var(--cpx) 0.6rem 2.2rem;
+  color: #f6dc8a; text-shadow: 0 2px 0 #000, 0 0 1rem rgba(255, 170, 60, 0.35);
+  background: var(--noise), linear-gradient(var(--wood-1), var(--wood-2)); border-bottom: 2px solid #0b090d; box-shadow: 0 2px 0 var(--bronze), inset 0 1px 0 rgba(255, 220, 160, 0.18); position: sticky; top: calc(var(--cpy) * -1); z-index: 2; }
+h3 { display: flex; align-items: center; gap: 0.55rem; border: 0; padding: 0; color: var(--bronze-hi); }
+h3::before { content: '✦'; color: var(--bronze-hi); } h3::after { content: ''; flex: 1; height: 2px; background: linear-gradient(90deg, var(--bronze), transparent); }
+h3 .dim { color: var(--dim); }
+.quote { border-left: 3px solid var(--bronze); padding-left: 0.7rem; }
+.ab-row, .rewards > div, .stat { background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)); border: 1px solid #0b090d; box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.07); }
+.stat.prim { box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 0 0 1px #f0c95a; } .stat b { font-family: var(--title); font-size: 1.7rem; }
+.ab-ic { border: 1px solid #0b090d; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #5a4a66, #1a1420 70%); box-shadow: 0 0 0 2px var(--bronze), inset 0 0 0.5rem rgba(0, 0, 0, 0.7); }
+.portrait { border: 2px solid #0b090d; box-shadow: 0 0 0 2px var(--bronze); border-radius: 0.25rem; }
+.sub { background: linear-gradient(rgba(90, 60, 20, 0.25), rgba(0, 0, 0, 0.2)); border: 1px solid #0b090d; box-shadow: 0 0 0 1px var(--bronze); } .sub-h b { font-family: var(--title); font-size: 1.6rem; }
+.over { letter-spacing: 0.35em; text-transform: uppercase; color: var(--bronze-hi); }
+.res h1 { font-size: 4rem; line-height: 1; } .lvl-h h1 { font-size: 3.4rem; line-height: 1; } .rewards b { font-family: var(--title); font-size: 2.2rem; }
+.vs-mid { font-family: var(--title); font-size: 3.4rem; }
+
+/* title screen */
+#panel.title { background: radial-gradient(ellipse at 50% 30%, rgba(7, 6, 10, 0.1), rgba(7, 6, 10, 0.75) 75%), linear-gradient(rgba(7, 6, 10, 0.55), rgba(7, 6, 10, 0) 30%, rgba(7, 6, 10, 0) 55%, rgba(7, 6, 10, 0.92)); }
+.title-wrap { padding: 1.2rem 1rem 1.6rem; }
+.logo { display: flex; flex-direction: column; align-items: center; }
+.crown { width: clamp(4.5rem, 16vw, 7rem); filter: drop-shadow(0 0 1.2rem rgba(255, 180, 60, 0.55)) drop-shadow(0 4px 0 #000); margin-bottom: -0.3rem; }
+.t-over { letter-spacing: 0.34em; font-size: 0.7rem; color: var(--bronze-hi); margin: 0.5rem 0 0; text-transform: uppercase; }
+.title-wrap h1 { font-size: clamp(3.4rem, 17vw, 7.5rem); line-height: 0.9; letter-spacing: 0.01em; background: linear-gradient(#fff3c4 10%, #f0c95a 45%, #a8741f 80%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 2px #1a1006; paint-order: stroke fill; text-shadow: none; filter: drop-shadow(0 5px 0 #0b0704) drop-shadow(0 0 1.6rem rgba(255, 150, 40, 0.5)); padding: 0.08em 0.05em 0.12em; }
+.title-wrap h1 span { background: linear-gradient(#ffd0c0 10%, #d8483a 50%, #7a1410 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ribbon { position: relative; margin-top: 0.2rem; filter: drop-shadow(0 3px 0 #000); }
+.ribbon span { display: block; font-family: var(--display); font-weight: 700; font-size: clamp(0.72rem, 2.6vw, 0.95rem); letter-spacing: 0.22em; text-transform: uppercase; color: #f6e2b0; background: linear-gradient(#8f1f1a, #5e120f); padding: 0.5em 2.2em; clip-path: polygon(0 0, 100% 0, calc(100% - 0.9em) 50%, 100% 100%, 0 100%, 0.9em 50%); }
+.menu { margin-top: auto; display: flex; flex-direction: column; gap: 0.7rem; width: min(19rem, 82%); pointer-events: auto; }
+.menu button { font-family: var(--display); font-weight: 900; font-size: 1.15rem; letter-spacing: 0.14em; padding: 0.75em 1em; }
+.t-foot { font-family: var(--display); letter-spacing: 0.2em; text-transform: uppercase; font-size: 0.68rem; color: var(--bronze-hi); margin-top: 1.1rem; }
+
+/* parchment: the debt letter and the bounty posters */
+.card.letter { background: var(--noise), radial-gradient(ellipse at 50% 40%, var(--parch), var(--parch-2)); color: var(--ink-brown); box-shadow: 0 0 0 2px #6a5230, 0 0 0 4px #0b090d, inset 0 0 2.5rem rgba(90, 60, 20, 0.45), 0 1.2rem 3.5rem rgba(0, 0, 0, 0.85); position: relative; }
+.card.letter > h2:first-child { background: none; box-shadow: none; border-bottom: 2px solid rgba(60, 40, 15, 0.5); color: #5e120f; text-shadow: none; text-align: center; padding-left: var(--cpx); position: static; margin-top: 0; }
+.card.letter p { color: var(--ink-brown); font-size: 1.12rem; } .card.letter .dim { color: #6a5230; font-style: italic; } .card.letter b { color: #5e120f; }
+.sig { text-align: right; font-style: italic; margin-top: 0.8rem; }
+.seal { position: absolute; left: 1.4rem; bottom: 1.2rem; width: 3.2rem; height: 3.2rem; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #d8483a, #7a1410 70%); box-shadow: inset 0 0 0 0.35rem rgba(0, 0, 0, 0.18), 0 2px 4px rgba(0, 0, 0, 0.5); }
+.seal::after { content: '♛'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 1.5rem; color: rgba(40, 5, 5, 0.7); }
+.ladder { gap: 0.7rem; }
+.opp { background: var(--noise), linear-gradient(100deg, var(--parch), var(--parch-2)); color: var(--ink-brown); border: 1px solid #0b090d; border-radius: 0.15rem; box-shadow: 0 0 0 1px #6a5230, inset 0 0 1.4rem rgba(90, 60, 20, 0.4), 0 3px 8px rgba(0, 0, 0, 0.6); padding: 0.6rem 0.7rem; position: relative; }
+.opp:nth-child(odd) { transform: rotate(-0.4deg); } .opp:nth-child(even) { transform: rotate(0.35deg); }
+.opp-tx b { font-family: var(--display); font-weight: 900; font-size: 1.2rem; line-height: 1.1; color: #3a1208; } .opp-tx small { color: #6a5230; } .opp .rew { color: #5e120f !important; font-weight: 700; }
+.taunt { display: block; font-family: var(--body); font-style: italic; font-size: 0.98rem; margin: 0.2rem 0; color: #3a2a18; }
+.opp.boss { box-shadow: 0 0 0 2px #7a2a9a, inset 0 0 1.4rem rgba(90, 30, 110, 0.35), 0 3px 8px rgba(0, 0, 0, 0.6); }
+.opp.locked { opacity: 0.6; filter: grayscale(0.6); } .opp .lock { color: #5e120f; border: 2px solid #5e120f; padding: 0.3em 0.6em; transform: rotate(-8deg); font-weight: 700; }
+.opp.beaten::after { content: 'BEATEN'; position: absolute; left: 0.3rem; bottom: 0.45rem; background: rgba(220, 203, 163, 0.85); font-family: var(--display); font-weight: 900; font-size: 0.8rem; letter-spacing: 0.15em; color: rgba(140, 20, 16, 0.75); border: 2px solid rgba(140, 20, 16, 0.75); padding: 0.15em 0.5em; transform: rotate(-10deg); pointer-events: none; }
+
+/* plaques, HUD */
+.tb-box { background: var(--noise), linear-gradient(var(--wood-1), var(--wood-2)); border: 2px solid #0b090d; box-shadow: 0 0 0 1px var(--bronze), inset 0 1px 0 rgba(255, 220, 160, 0.16), 0 3px 8px rgba(0, 0, 0, 0.6); border-radius: 0.25rem; }
+.tb-coin b { font-family: var(--title); font-size: 1.35rem; line-height: 1; } .tb-hero b { font-weight: 900; }
+.bar { border: 1px solid #0b090d; box-shadow: 0 0 0 1px var(--bronze); border-radius: 0.1rem; }
+.hud-side { display: grid; grid-template-columns: auto 1fr; column-gap: 0.55rem; align-items: start; } .hud-side > :not(.medal) { grid-column: 2; }
+.hud-side.right { grid-template-columns: 1fr auto; } .hud-side.right > :not(.medal) { grid-column: 1; } .hud-side.right .medal { grid-column: 2; }
+.medal { grid-row: 1 / span 4; } .medal .portrait { border-radius: 50%; width: 3.3rem !important; height: 3.3rem !important; box-shadow: 0 0 0 2px var(--bronze-hi), 0 0 0 4px #0b090d, 0 3px 8px #000; }
+.hud-name { font-weight: 900; font-size: 1.05rem; letter-spacing: 0.04em; margin-bottom: 0.2rem; }
+.bar.hp { height: 1.3rem; } .bar.hp i { background: linear-gradient(#f0584a, #b8281f 55%, #7a1410); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+.ab { border-radius: 0.3rem; border: 2px solid #0b090d; background: radial-gradient(circle at 35% 30%, #5a4a66, #17121c 75%); box-shadow: 0 0 0 1px var(--bronze), inset 0 0 0.6rem rgba(0, 0, 0, 0.7), 0 3px 6px rgba(0, 0, 0, 0.7); }
+.ab.ready { box-shadow: 0 0 0 1px #f0c95a, inset 0 0 0.6rem rgba(0, 0, 0, 0.6), 0 0 0.7rem rgba(240, 201, 90, 0.35); } .ab.ult { box-shadow: 0 0 0 2px #f0c95a, 0 0 1rem rgba(255, 200, 90, 0.5); }
+.tbtn { box-shadow: 0 0 0 2px var(--bronze), inset 0 0 1rem rgba(0, 0, 0, 0.6); font-weight: 900; }
+#banner { background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.8) 20%, rgba(0, 0, 0, 0.8) 80%, transparent); border-top: 2px solid var(--bronze); border-bottom: 2px solid var(--bronze); }
+#banner b { font-family: var(--title); font-size: clamp(2.6rem, 12vw, 5rem); }
+.tag { font-weight: 900; font-size: 0.78rem; padding: 0.5em 0.9em; background: var(--noise), linear-gradient(var(--wood-1), var(--wood-2)); }
+#prompt { font-weight: 900; font-size: 1.05rem; letter-spacing: 0.12em; }
+#decorBtn { font-weight: 900; }
+#placebar, #toast { background: var(--noise), linear-gradient(var(--wood-1), var(--wood-2)); border: 2px solid #0b090d; box-shadow: 0 0 0 1px var(--bronze-hi), 0 4px 12px rgba(0, 0, 0, 0.7); }
+@media (orientation: portrait) {
+  .card { --cpx: 1rem; --cpy: 1.1rem; box-shadow: 0 -2px 0 var(--bronze), 0 -4px 0 #0b090d, inset 0 0 3rem rgba(0, 0, 0, 0.55); border-radius: 0.6rem 0.6rem 0 0; }
+  .card.letter { margin: 0 0.6rem 12vh; width: auto; border-radius: 0.2rem; border-width: 2px; box-shadow: 0 0 0 2px #6a5230, 0 0 0 4px #0b090d, inset 0 0 2.5rem rgba(90, 60, 20, 0.45); }
+  .medal .portrait { width: 2.7rem !important; height: 2.7rem !important; }
+}
