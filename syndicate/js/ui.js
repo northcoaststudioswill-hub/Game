@@ -46,6 +46,22 @@
     $('#tbMute').onclick = () => { G.muted = !G.muted; ui.topbar(); };
   };
 
+
+  // ------------------------------------------------------------ boot-up studio cards (tap, key or any pad button skips)
+  ui.boot = function () {
+    const el = document.createElement('div'); el.id = 'boot'; document.getElementById('ui').appendChild(el);
+    const cards = [
+      '<svg viewBox="0 0 120 120" class="b-mark" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="3"/><path d="M60 14 L70 56 L60 50 L50 56 Z" fill="currentColor"/><path d="M60 106 L52 64 L60 70 L68 64 Z" fill="currentColor" opacity=".45"/><path d="M22 78 q9.5 -9 19 0 t19 0 t19 0 t19 0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M30 90 q7.5 -7 15 0 t15 0 t15 0 t15 0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".6"/></svg><small>A game by</small><b>North Coast Studios</b>',
+      '<span class="b-e" aria-hidden="true">E</span><small>with</small><b>E Concepts</b>'
+    ];
+    let i = -1, timer = 0, done = false;
+    const finish = () => { if (done) return; done = true; clearTimeout(timer); G.bootSkip = null; el.classList.add('out'); setTimeout(() => el.remove(), 700); window.removeEventListener('keydown', skip, true); };
+    const next = () => { i++; if (i >= cards.length) return finish(); el.innerHTML = '<div class="b-card">' + cards[i] + '</div><span class="b-skip">Tap to skip</span>'; timer = setTimeout(next, 2700); };
+    const skip = e => { if (e && e.preventDefault && e.type !== 'keydown') e.preventDefault(); G.audioInit(); clearTimeout(timer); next(); };
+    el.addEventListener('pointerdown', skip); window.addEventListener('keydown', skip, true); G.bootSkip = skip;
+    next();
+  };
+
   // ------------------------------------------------------------ title
   ui.title = function () {
     G.scene = 'title'; G.enterTitle(); ui.topbar(); $('#hud').className = 'hidden';
@@ -53,7 +69,7 @@
     show('<div class="title-wrap"><div class="logo"><svg class="crown" viewBox="0 0 120 70" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset=".5" stop-color="#e2ad3c"/><stop offset="1" stop-color="#8a5a16"/></linearGradient></defs><path d="M8 62 L2 18 L30 40 L44 6 L60 34 L76 6 L90 40 L118 18 L112 62 Z" fill="url(#cg)" stroke="#1a1006" stroke-width="3" stroke-linejoin="round"/><path d="M8 62 h104 v6 H8z" fill="#6f4a12" stroke="#1a1006" stroke-width="3"/><path d="M52 62 l-6 -10 l8 3 l-3 -9 l9 6 l6 -8 l2 9 l7 -4 l-4 13z" fill="#1a1006" opacity=".55"/><circle cx="60" cy="48" r="6" fill="#c22a22" stroke="#1a1006" stroke-width="2.5"/><circle cx="32" cy="52" r="3.5" fill="#6ad0ff" stroke="#1a1006" stroke-width="2"/><circle cx="88" cy="52" r="3.5" fill="#6ad0ff" stroke="#1a1006" stroke-width="2"/></svg><div class="t-over">The Deep Guild presents</div><h1>Gutter<span>crown</span></h1><div class="ribbon"><span>Pit-fighters of the Undercity</span></div></div>' +
       '<div class="menu">' + (has ? '<button class="big" id="bCont">Continue</button>' : '') +
       '<button class="' + (has ? '' : 'big') + '" id="bNew">New Fighter</button><button id="bHow">How to Play</button></div>' +
-      '<p class="t-foot">Bleed for coin. Climb the ledger. Take the crown.</p></div>', 'title');
+      '<p class="t-foot">Bleed for coin. Climb the ledger. Take the crown.</p><p class="t-cred">A North Coast Studios game · with E Concepts</p></div>', 'title');
     on('#bHow', () => { show('<div class="card small"><h2>How to Play</h2><p>Win pit fights for <b>XP</b>, <b>coin</b> and <b>respect</b>. Level up to shape your class. Spend coin on gear and on your hideout.</p>' + CONTROLS + '<div class="row end"><button class="big" id="x">Back</button></div></div>'); on('#x', () => ui.title()); });
     on('#bCont', () => { G.load(); ui.hub(); });
     on('#bNew', () => {

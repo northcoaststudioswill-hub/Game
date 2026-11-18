@@ -278,3 +278,17 @@ h3 .dim { color: var(--dim); }
   .card.letter { margin: 0 0.6rem 12vh; width: auto; border-radius: 0.2rem; border-width: 2px; box-shadow: 0 0 0 2px #6a5230, 0 0 0 4px #0b090d, inset 0 0 2.5rem rgba(90, 60, 20, 0.45); }
   .medal .portrait { width: 2.7rem !important; height: 2.7rem !important; }
 }
+
+
+/* boot-up studio cards */
+#boot { position: absolute; inset: 0; z-index: 100; background: #050408; display: grid; place-items: center; transition: opacity 0.7s; cursor: pointer; }
+#boot.out { opacity: 0; pointer-events: none !important; }
+.b-card { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: #e8dcc0; text-align: center; padding: 1rem; animation: bcard 2.7s ease both; }
+.b-card small { font-size: 0.8rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--bronze-hi); }
+.b-card b { font-family: var(--display); font-weight: 900; font-size: clamp(1.7rem, 7.5vw, 3.2rem); letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.1; }
+.b-mark { width: clamp(5.5rem, 22vw, 8.5rem); color: #cfe6f2; margin-bottom: 0.8rem; filter: drop-shadow(0 0 1.2rem rgba(120, 190, 230, 0.45)); }
+.b-e { display: grid; place-items: center; width: clamp(5rem, 20vw, 7.5rem); aspect-ratio: 1; border: 3px solid var(--bronze-hi); font-family: var(--display); font-weight: 900; font-size: clamp(3.2rem, 13vw, 5rem); color: #f0c95a; margin-bottom: 0.8rem; box-shadow: 0 0 2rem rgba(240, 201, 90, 0.3), inset 0 0 1.2rem rgba(240, 201, 90, 0.18); }
+.b-skip { position: absolute; bottom: calc(1.4rem + var(--sb)); left: 0; right: 0; text-align: center; font-family: var(--display); font-size: 0.68rem; letter-spacing: 0.3em; text-transform: uppercase; color: #5a5262; }
+@keyframes bcard { 0% { opacity: 0; transform: translateY(0.6rem) scale(0.98); } 18% { opacity: 1; transform: none; } 82% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .b-card { animation: none; } }
+.t-cred { font-family: var(--display); font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: #8a8092; margin: 0.5rem 0 0; }

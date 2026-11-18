@@ -35,6 +35,7 @@
   const KEYMAP = { Space: 'dodge', ShiftLeft: 'dodge', KeyQ: 'a0', KeyE: 'a1', KeyR: 'a2', KeyF: 'ult', KeyC: 'potion', Digit1: 'a0', Digit2: 'a1', Digit3: 'a2', Digit4: 'ult' };
   window.addEventListener('keydown', e => {
     if (e.target && e.target.tagName === 'INPUT') return;
+    if (G.bootSkip) return;
     G.audioInit();
     if (G.scene === 'fight') {
       if (e.code === 'Escape' || e.code === 'KeyP') { if (G.fight.paused) { G.ui.close(); G.fight.paused = false; } else G.ui.pause(); }
@@ -134,6 +135,7 @@
     const lx = ax(0), ly = ax(1), rx = ax(2), ry = ax(3);
     if (lx || ly || rx || ry || Object.keys(now).some(i => now[i])) { setPad(true); G.audioInit(); }
     In.pad = { lx, ly, rx, ry, atk: now[2] || now[7] };
+    if (G.bootSkip) { if (Object.keys(now).some(i => now[i] && !prevB[i])) G.bootSkip(); prevB = now; return; }
     if (!In.usingPad) { prevB = now; return; }
     const sc = G.scene, open = G.ui.isOpen(), paused = sc === 'fight' && G.fight.paused;
     // one step per press for D-pad, repeating for a held stick
@@ -208,5 +210,6 @@
   }
 
   G.ui.title();
+  G.ui.boot();
   requestAnimationFrame(frame);
 })();

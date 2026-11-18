@@ -1,5 +1,7 @@
 # Guttercrown (vertical slice)
 
+A North Coast Studios game, with E Concepts.
+
 *Working title was "Underground Syndicate"; the folder keeps the old name.*
 
 An isometric one-on-one pit fighter with D&D-style class builds. Real-time action combat,
