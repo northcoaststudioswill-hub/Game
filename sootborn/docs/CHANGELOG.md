@@ -1,5 +1,22 @@
 # SOOTBORN — changelog
 
+## v0.12.1 · 2026-11-18 — 3D animation rebuilt from research
+Read up on how action animation is done in this kind of game before touching it. What I took from it:
+- Wolfire's David Rosen (GDC 2014, "An Indie Approach to Procedural Animation"): author a few strong key poses and let curves and springs do the motion between them; add drag to anything that hangs.
+- Fighting-game and melee animation practice: every attack has three beats (anticipation, a very fast strike, a held follow-through); speed up the strike and slow the wind-up and recovery; stretch at speed and squash on contact; freeze briefly on a hit; match the victim's reaction to the direction of the blow.
+
+What changed:
+- **Pose to pose on springs.** Each state names a key pose (twenty joint values). Every joint chases its target on a spring, so states blend into each other instead of popping, and swings overshoot and settle.
+- **Attacks in three beats.** Forehand: wound back with the torso turned away, cut through with a lunging step, hold past the target. Backhand mirrors it. The third is a crouch, a leap with the blade behind the head, and a slam into a deep crouch with a squash on landing. Lancers pull back and thrust.
+- **Enemy tells are poses**, not just a red shape: a sweep winds the whole body round, an overhead raises the blade and sinks, a charge drops into a sprinter's crouch. After a swing they slump, spent, which is the moment to hit them.
+- **Hit reactions follow the blow**: the body folds away from where it was struck, the head snaps, arms fling; launched fighters go limp and tumble.
+- **Secondary motion**: capes, sash tails, long hair and helmet plumes are driven by how fast the fighter is really moving; the body leans into its own acceleration and turns smoothly; the run cycle only plays when the feet are actually covering ground; boots kick up dust on landings.
+- **The blade** stretches at speed and leaves a ribbon of light from mid-blade to tip.
+- **Clash** (new move): strike an enemy in the last instant of his wind-up and the blades meet. He staggers, time slows, fury jumps.
+- Rim lighting on every figure, visible arena bounds (stakes and ribbon in House colours), light bursts at each impact, slightly richer colour.
+- Figures are a little smaller relative to the field so fighters no longer stand inside each other.
+- `tests/anim.mjs` captures any move frame by frame in slow motion (A=combo|foe|run|hurt|lance).
+
 ## v0.12 · 2026-11-18 — the surface in real 3D
 - **Everything above the rock is now real 3D**, in the flat-shaded low-poly look used in Guttercrown: lit by one sun, with shadows on the ground, distance fog, a drawn sky and glow for fire and steel. Cinderwell stays 2D pixel art, so the two halves of the story no longer look like the same game.
   - Guttercrown uses three.js from a CDN. That could not be loaded or tested in the build workspace, so this renderer is plain WebGL with no library (`src/g3.js`). It needs no download and works offline. Without WebGL, or with `#no3d` in the URL, the game falls back to the earlier 2.5D scenes.

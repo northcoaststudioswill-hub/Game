@@ -125,6 +125,8 @@ Hooks left open for Day 3: carry the ledger up Lift Zero (or refuse); Sable at F
 - Below (Cinderwell, the Ember Ring, the furnace): 2D pixel art on the 320×180 canvas.
 - Above (the Assay: valley, ford, keep, and the surface half of the opening): real 3D in `src/g3.js`, a small WebGL renderer with no library. Flat-shaded boxes, cones and cylinders; one sun; planar shadows; fog; additive glow sprites. The pixel HUD, captions and cut-ins are still drawn on the 2D canvas, which sits on top and goes transparent.
 - `Brawl` owns the logic and the camera (`cam {x, y, h, f, hor, roll}`); `G3.begin / char / poly / ring / glow / end` draw a frame from it. `G3.proj` gives screen positions back to the 2D layer. `G3.LOOK` holds each place's sky, sun and fog; `G3.env(bg)` builds its scenery once.
+- 3D animation is pose to pose: `G3.target()` returns a key pose (joint angles), a spring rate and damping for the fighter's state; `G3.char()` keeps a rig per fighter and springs every joint toward it. Add a move by adding a pose. Attacks are three beats (wind back, cut, hold). Cloth and hair are driven by real velocity.
+- Clash: a strike landed in the last 0.17s of an enemy wind-up staggers him.
 - The style reference is the user's own game Guttercrown (three.js). Three.js itself is not used here because it could not be loaded in the build workspace.
 
 ## Art direction
