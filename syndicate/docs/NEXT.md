@@ -28,14 +28,39 @@ Questions to settle first, then build:
 4. **Yield.** Still a question: does yielding at low health avoid death at a cost, or does death only happen when the fight is lost? Simplest: knockout is death; a yield costs coin and streak but keeps the fighter.
 5. **Where he appears.** Scene at the first death, then a permanent presence at the Long Stair or a shrine in the market. He speaks differently to each race.
 
-## 3. Roseinbeirg, the Oracle of Time (character brief)
+## 3. David Roseinbeirg, the Oracle of Time (character brief)
 
-- Ageless wizard, speaks in time metaphors, never answers a question directly.
-- Hates other races, openly. His contempt is a running joke until it stops being funny (lean into it lightly; the game is dark and funny, not cruel to real groups).
-- Sees the fighter's worth regardless of class or race. Says so.
-- His race is the one you picked, and he is the only figure in the game who treats it as a point of pride. Possibly a gameplay effect: a small bonus while fighting your own race, and rivals cost more at his shrine.
-- His goal line: "from the bottom to the top." Every death is a step. Use this as the spine of the revival dialogue and the codex.
-- Needs: portrait (wizard, long coat, hourglass), a short intro scene, 6 to 8 revival lines per race, and a codex entry.
+**Who he is.** A wizard of the Roseinbeirg family, old money and older grudges. Addicted to gold, power and status, in roughly that order. He is a bullshitter, grandiose and hateful, and also very funny and easy to like, which is what makes the player's position uncomfortable. He is not Mark. Mark is a gambler who talks in short bursts; David talks like a man reading his own memoir aloud, with a cellar full of clocks.
+
+**His prejudice, in his own words.** He is "exactly what you'd expect" of whatever race you are not: orcs are brutes, elves are vain, dwarves are stubborn, humans breed like rats, tieflings are a bad bargain. He calls the race you picked "the only sensible ones." Keep this in the dialogue and in his voice, and always aim it at the species, never at real groups of people. The laugh should come from how confident and wrong he is.
+
+**What he wants.** The realm. He will not take the throne himself; he needs an ally on it. He has picked you. His family plans to move into the lands once the ally rules, so the plan is to take the throne (Eerin and Vilhelm Koheneim) and then settle the Roseinbeirgs in.
+
+**The contract.** After your first death he offers a contract. Signing it is the moment the story turns. Terms (draft):
+- He revives you (the Oracle of Time, "I simply don't let the clock run out on you").
+- You owe him a **debt of souls**: a price he collects in exchange for the power he gives. Mechanically: a soul-debt meter that grows with each revival and each favour he asks.
+- In return he gives you the power to usurp the king one day.
+
+**The expeditions (short term, the money engine).** To pay the debt and fund the family, you send out expeditions:
+- **Rare wizard gold** from raided caravans and vaults.
+- **Captives** taken from outlying villages and tribes. Write these as prisoners taken and sold or ransomed; keep it clearly villainous and non-sexual. Do not frame it as abuse.
+- **Harassed tribes and burned villages.** Each raid lowers the local folk's standing with you and raises the Seal-Wardens' attention.
+
+Design notes for expeditions (not yet decided):
+- **Time or turns?** A real-time timer (come back later) suits the endless ladder; a turn-based menu is simpler to test.
+- **Underlings, not the fighter.** The fighter is in the pit. Expeditions use the Tally crew, which is already in the game.
+- **Consequences that feed back:** Highmarch heat, the Wardens' inspections at the Long Stair, the Guild's tithe, and villagers who might send a challenger to the pit to settle a grudge (new challengers for the Ledger).
+- **Moral weight:** the game lets the player do this. Decide whether the raids affect the endings and whether there is a way to refuse David (the contract says no after the first death; a refusal means staying dead).
+
+**He only shares his plan with you.** The full plan is revealed in pieces through deaths, ranks and signing, so the player learns what the family wants at the same pace David trusts them. Keep each reveal a little worse than the last.
+
+**Race effect (to decide).** Two options:
+- Dialogue only: he insults other races; the player's race is praised.
+- Light mechanic: fighting your own race gives a small bonus, and rivals of other races cost more at his shrine. Keep it small and make it a joke he is proud of.
+
+**Voice guide.** Theatrical, self-important, quick with insults and compliments in the same breath. Uses the word "darling" for the player only. Never explains a joke. Gets quiet, once, when money is not mentioned.
+
+**Assets needed.** Portrait (long coat, hourglass, too many rings), a short intro scene, the contract scene, 6 to 8 revival lines per race, expedition result lines (about 20), and a codex entry that unlocks as his plan is revealed.
 
 ## 4. Druids and Tieflings
 
@@ -124,6 +149,10 @@ Note: LT does two jobs (parry and block). That is intended, but test it on a rea
 8. **Balance pass** (section 8) and the playtest.
 
 ## 10. Open questions for you
+
+7. Expeditions: real-time timers or a turn-based menu?
+8. Do raids change the endings, and can the player refuse David at all?
+9. Race effect: dialogue only, or a small mechanic too?
 
 1. Revival cost: coin, respect, gear, or only time?
 2. Does the fighter keep level, gear and mastery across a death, or only the class and name?
