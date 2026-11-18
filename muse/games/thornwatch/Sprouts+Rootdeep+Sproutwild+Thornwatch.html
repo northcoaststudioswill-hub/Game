@@ -5596,8 +5596,8 @@ function twDrawHow(){const p=TWHOW.page;
   text('Clear a garden to open the next one.',14,116,1,'#e8e4f8');
   text('26 nights. BOTTIE PRIME waits last.',14,130,1,'#e8e4f8')}
  else if(p===1){ctext('CONTROLS',42,2,'#f8d030');
-  const rows=[['D-PAD','MOVE \u00b7 PICK CARDS BELOW'],['A','PLANT \u00b7 GROW \u00b7 FIRE'],
-   ['B','UPROOT \u00b7 SPEED UP TIME'],['START','START NIGHT \u00b7 PAUSE'],['SEL','POWERS, MID-ROUND']];
+  const rows=[['D-PAD','MOVE THE CURSOR'],['A','PLANT \u00b7 GROW \u00b7 KEEPER MOVE'],
+   ['B','BACK \u00b7 SPEED UP THE NIGHT'],['START','BEGIN THE NIGHT \u00b7 PAUSE'],['SEL','POWERS AT NIGHT \u00b7 UPROOT IN A PANEL']];
   rows.forEach((rw,i)=>{const y=70+i*22;text(rw[0],14,y,2,'#fff8e0');text(rw[1],92,y+4,1,'#c8c0d8')})}
  else{ctext('FIELD GUIDE',42,2,'#f8d030');
   const grows=TWGUIDE_ROWS.slice(p===2?0:7,p===2?7:14);
@@ -5962,7 +5962,7 @@ const TWF={state:()=>state,start:()=>twStartTitle(),meta:()=>TW,run:()=>TWR,
  speed:()=>TWR.speed,setSpeed:(v)=>{TWR.speed=v},
  actA:()=>twActA(),actB:()=>twActB(),warn:(n)=>TWWARN[1][n],
  menu:()=>TWMENU[TWR.sel],menuLen:()=>TWMENU.length,fork:()=>TWR.fork?{type:TWR.fork.type,sel:TWR.forkSel}:null,
- setForkSel:(v)=>{TWR.forkSel=v},motes:()=>TWR&&TWR.motes?TWR.motes.map(m=>({x:m.x,y:m.y,t:m.t})):[],build:()=>TWR&&TWR.build?{sel:TWR.build.sel}:null,
+ setForkSel:(v)=>{TWR.forkSel=v},sproutCost:(i)=>twSproutCost(i),setCrowd:(v)=>{TWCROWD=v},crowd:()=>TWCROWD,motes:()=>TWR&&TWR.motes?TWR.motes.map(m=>({x:m.x,y:m.y,t:m.t})):[],build:()=>TWR&&TWR.build?{sel:TWR.build.sel}:null,
  nightA:()=>{const t=twTowerAt(TWR.cur.x,TWR.cur.y);if(t&&t.hero>=0)twAbilityA(t)},
  cine:()=>TWR.cine?TWR.cine.kind:null,
  skipCine:()=>{if(TWR.cine){const c=TWR.cine;TWR.cine=null;if(c.fire)c.fire()}},
@@ -6375,6 +6375,8 @@ function twDrawIntro(){if(!TWCINE){r('#14101e',0,0,W,H);return}
    The game is paused while any panel is open.
    ================================================================ */
 const TWPACE=1.4; /* 1X runs 40% quicker than v3.7's: a pure time scale, so no balance ratio moves */
+let TWCROWD=0.1; /* each sprout already planted makes the next one 10% dearer: sim in PLAYTEST-v4.0.md */
+function twSproutCost(i){const n=TWR?TWR.towers.filter(t=>t.hero<0).length:0;return Math.round(TWT[i].cost*(1+TWCROWD*n))}
 function twUproot(t){const i=TWR.towers.indexOf(t);if(i<0)return;const back=twRefund(t);
  TWR.petals+=back;TWR.towers.splice(i,1);twPlantMsg('Uprooted. +'+back+' petals back.');snd(330,.07,220)}
 function twUprootHint(t,iy0){const s='SEL: UPROOT +'+twRefund(t)+'P';text(s,W-4-tw(s,1),iy0+3,1,'#ff9a8a')}
@@ -6402,8 +6404,9 @@ function twPlantSel(){const e=TWMENU[TWR.sel],x=TWR.cur.x,y=TWR.cur.y;
   TWR.towers.push({hero:e.i,type:-1,lv:1,variant:0,cdT:0,abT:0,hl:1,x,y,a:Math.random()*7});twPlanted();
   twPlantMsg(hd.line);snd(784,.09,1175)}
  else{const def=TWT[e.i];
-  if(TWR.petals<def.cost){twPlantMsg('Not enough petals for '+TYPES[e.i].n+'!');snd(160,.07);return}
-  TWR.petals-=def.cost;
+  const sc=twSproutCost(e.i);
+  if(TWR.petals<sc){twPlantMsg('Not enough petals for '+TYPES[e.i].n+'!');snd(160,.07);return}
+  TWR.petals-=sc;
   TWR.towers.push({hero:-1,type:e.i,lv:1,variant:0,cdT:0,abT:0,x,y,a:Math.random()*7});twPlanted();
   snd(660,.07,990);twBurst(x,y-6,TYPES[e.i].c,6)}
  TWR.build=null}
@@ -6421,7 +6424,7 @@ function twDrawBuild(iy0){r('#14101e',0,iy0,W,42);r('#f8d030',0,iy0,W,1);
   else{const spr=twHeroSpr(e.i),got=TWR.towers.some(q=>q.hero===e.i);if(got)g.globalAlpha=.3;
    if(spr)g.drawImage(spr,x+4,iy0+3,12,14);g.globalAlpha=1}}
  r('#2c2450',119,iy0+3,1,14);
- const e=TWMENU[TWR.sel],hero=e.k==='h',cost=hero?twHeroCost(e.i):TWT[e.i].cost,nm=hero?TWHERO[e.i].name:TYPES[e.i].n;
+ const e=TWMENU[TWR.sel],hero=e.k==='h',cost=hero?twHeroCost(e.i):twSproutCost(e.i),nm=hero?TWHERO[e.i].name:TYPES[e.i].n;
  const got=hero&&TWR.towers.some(q=>q.hero===e.i),can=TWR.petals>=cost&&!got;
  text(nm,4,iy0+20,2,hero?'#ffd94d':TYPES[e.i].c);
  const cx2=4+tw(nm,2)+6;text(cost+'P',cx2,iy0+20,2,TWR.petals>=cost?'#f8d030':'#ff6a5e');

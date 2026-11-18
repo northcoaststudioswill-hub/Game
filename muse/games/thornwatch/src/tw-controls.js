@@ -18,6 +18,8 @@
    The game is paused while any panel is open.
    ================================================================ */
 const TWPACE=1.4; /* 1X runs 40% quicker than v3.7's: a pure time scale, so no balance ratio moves */
+let TWCROWD=0.1; /* each sprout already planted makes the next one 10% dearer: sim in PLAYTEST-v4.0.md */
+function twSproutCost(i){const n=TWR?TWR.towers.filter(t=>t.hero<0).length:0;return Math.round(TWT[i].cost*(1+TWCROWD*n))}
 function twUproot(t){const i=TWR.towers.indexOf(t);if(i<0)return;const back=twRefund(t);
  TWR.petals+=back;TWR.towers.splice(i,1);twPlantMsg('Uprooted. +'+back+' petals back.');snd(330,.07,220)}
 function twUprootHint(t,iy0){const s='SEL: UPROOT +'+twRefund(t)+'P';text(s,W-4-tw(s,1),iy0+3,1,'#ff9a8a')}
@@ -45,8 +47,9 @@ function twPlantSel(){const e=TWMENU[TWR.sel],x=TWR.cur.x,y=TWR.cur.y;
   TWR.towers.push({hero:e.i,type:-1,lv:1,variant:0,cdT:0,abT:0,hl:1,x,y,a:Math.random()*7});twPlanted();
   twPlantMsg(hd.line);snd(784,.09,1175)}
  else{const def=TWT[e.i];
-  if(TWR.petals<def.cost){twPlantMsg('Not enough petals for '+TYPES[e.i].n+'!');snd(160,.07);return}
-  TWR.petals-=def.cost;
+  const sc=twSproutCost(e.i);
+  if(TWR.petals<sc){twPlantMsg('Not enough petals for '+TYPES[e.i].n+'!');snd(160,.07);return}
+  TWR.petals-=sc;
   TWR.towers.push({hero:-1,type:e.i,lv:1,variant:0,cdT:0,abT:0,x,y,a:Math.random()*7});twPlanted();
   snd(660,.07,990);twBurst(x,y-6,TYPES[e.i].c,6)}
  TWR.build=null}
@@ -64,7 +67,7 @@ function twDrawBuild(iy0){r('#14101e',0,iy0,W,42);r('#f8d030',0,iy0,W,1);
   else{const spr=twHeroSpr(e.i),got=TWR.towers.some(q=>q.hero===e.i);if(got)g.globalAlpha=.3;
    if(spr)g.drawImage(spr,x+4,iy0+3,12,14);g.globalAlpha=1}}
  r('#2c2450',119,iy0+3,1,14);
- const e=TWMENU[TWR.sel],hero=e.k==='h',cost=hero?twHeroCost(e.i):TWT[e.i].cost,nm=hero?TWHERO[e.i].name:TYPES[e.i].n;
+ const e=TWMENU[TWR.sel],hero=e.k==='h',cost=hero?twHeroCost(e.i):twSproutCost(e.i),nm=hero?TWHERO[e.i].name:TYPES[e.i].n;
  const got=hero&&TWR.towers.some(q=>q.hero===e.i),can=TWR.petals>=cost&&!got;
  text(nm,4,iy0+20,2,hero?'#ffd94d':TYPES[e.i].c);
  const cx2=4+tw(nm,2)+6;text(cost+'P',cx2,iy0+20,2,TWR.petals>=cost?'#f8d030':'#ff6a5e');
