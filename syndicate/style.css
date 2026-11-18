@@ -591,3 +591,6 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 
 /* ---------- flavour ---------- */
 .keeperline { margin: 0.4rem 0; font-size: 0.9rem; } .keeperline small { color: var(--dim); font-style: normal; } .quote.remark { margin-top: 0.3rem; opacity: 0.9; } .chant { font-style: italic; text-align: center; }
+
+.origin { font-size: 0.86rem; color: #c8b890; margin: 0.3rem 0 0.5rem; line-height: 1.35; } .origin small { font-family: var(--display); letter-spacing: 0.12em; font-size: 0.6rem; color: var(--dim); margin-right: 0.3em; }
+.retort { margin: 0.3rem 0; font-size: 0.9rem; color: #e6d8b0; } .retort b { color: var(--gold); font-weight: 600; } .rumour, .wardline { font-style: italic; }

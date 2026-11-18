@@ -272,3 +272,12 @@ Weapons, classes and level-up choices were simulated and the outliers adjusted; 
 ## Race and class flavour (`js/flavor.js`)
 
 The Fence, Mark, the Apothecary, Big Hobb, the charm seller, Whisper and the Busker each have a line for every race and every class, shown about half the time you visit. The Ledger-Keeper comments on your trade or blood on the character sheet, opponents remark on what you are before a bout (the five named fighters have their own lines for particular classes and races), the crowd's reaction after a win depends on your class, David has a line for each class, and the Queen has extra words for elves, drow and druids.
+
+## World and voice (`js/flavor2.js`)
+
+- **Your page.** Every race and class pairing has an origin written on the character sheet and in the Codex; twelve pairings have an extra line of their own.
+- **First meetings** with the Fence, the Ledger-Keeper and Mark now include an exchange about your class, your reply in your class's voice, and a remark on your race.
+- **Your voice.** A retort by class on the card before each bout.
+- **David** insults your trade or your people when it gets you killed.
+- **Rumours** at the Beggars' Fire start to be about you, and the Wardens at the Long Stair react to your race.
+- **Codex:** a new section, The Nine Levels, with where each people lives and where each trade comes from, plus Eireania, the Seal-Wardens and the First Lamp.

@@ -124,7 +124,7 @@
   G.meet = function (id, then) {
     const st = G.state; st.met = st.met || {};
     if (st.met[id] || !MEET[id]) return then();
-    st.met[id] = 1; G.save(); play(MEET[id](then));
+    st.met[id] = 1; G.save(); play(G.sceneHook ? G.sceneHook(id, MEET[id](then)) : MEET[id](then));
   };
 
   // ------------------------------------------------------------ settings + the objective line

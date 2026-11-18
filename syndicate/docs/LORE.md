@@ -121,3 +121,13 @@ Mark's debts are real and so is his generosity. If the player covers him when th
 - **Where and when he tells it.** Every revival happens in his golden room under the sewers, never in the pit. At the first death he tells the player the history himself: the great conflict, the expulsion, the homeland he means to cut out of the realm, and that the player is his vessel. He also unloads, at length, on every race the player is not. The one thing he holds back is that a third death binds the contract whether it was signed or not.
 
 - **His voice (current).** Crass, vulgar and gleeful about it. He holds himself supreme: above every race, above both crowns, above the player, and above his own family, whose "homeland" is a banner for taking the realm for himself. Bloodthirsty in what he promises, wicked in how he says it, with no regard for anyone's feelings. He calls the player meat, pet and vessel. His contempt is aimed at the fantasy races and at everyone who is not him; keep it there.
+
+## The nine levels
+
+1. The Stair Landing (Seal-Wardens). 2. The Lamp Market, under the Blood Pit. 3. The Rookeries (humans). 4. The Old Seam (dwarf clans). 5. The Ember Rows (tieflings). 6. The Flooded Gallery. 7. The Wet Galleries (the druid circles: the Fang, the Deep Root, and a third that went below). 8. The Counting Vaults of the Deep Guild. 9. The bottom, by the Guild's count. Below that: the drow cities (Vael Ushar, Third Silence, the Hanging Markets).
+
+- **Elves** below the stair all came down from Highmarch under other names.
+- **Half-orcs** descend from the haulage gangs.
+- **Warlock patrons:** the Fiend in the sealed smelter; the Deep Dweller under everything.
+- **The Sunless Chapel** runs the only infirmary and orphanage below the stair.
+- **Eireania:** across the grey water; fought the Kingdom of United Realms for eleven years over three islands and a strait.
