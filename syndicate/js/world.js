@@ -58,11 +58,15 @@
     const sig = gfx.decal(gfx.tex('sigil'), 7.5, 0xff6a30, 0.16, true); sig.position.y = 0.03; s.add(sig);
 
     const V = [[AR, -AR / 2], [AR, AR / 2], [AR / 2, AR], [-AR / 2, AR], [-AR, AR / 2], [-AR, -AR / 2], [-AR / 2, -AR], [AR / 2, -AR]];
-    const mat = stoneMat(0x7a746e), matDark = stoneMat(0x57524e), crowdSpots = [];
+    const mat = stoneMat(0x7a746e), matDark = stoneMat(0x57524e), crowdSpots = [], cineG = new T.Group(); cineG.visible = false; s.add(cineG);
     for (let i = 0; i < 8; i++) {
       const a = V[i], b = V[(i + 1) % 8], mx = (a[0] + b[0]) / 2, mz = (a[1] + b[1]) / 2, dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz);
       const nl = Math.hypot(mx, mz), nx = mx / nl, nz = mz / nl, rot = -Math.atan2(dz, dx), near = nx + nz > 0.5;
-      if (near) { const w = wall(s, L + 0.5, 0.42, 0.7, mat); w.position.set(mx + nx * 0.95, 0, mz + nz * 0.95); w.rotation.y = rot; continue; }
+      if (near) { const w = wall(s, L + 0.5, 0.42, 0.7, mat); w.position.set(mx + nx * 0.95, 0, mz + nz * 0.95); w.rotation.y = rot;
+        const cw = wall(cineG, L + 1.1, 3.4, 1, mat); cw.position.set(mx + nx * 1.6, 0, mz + nz * 1.6); cw.rotation.y = rot; const cb = wall(cineG, L + 5.4, 5.2, 1, matDark); cb.position.set(mx + nx * 5.2, 3.4, mz + nz * 5.2); cb.rotation.y = rot;
+        const tx = dx / L, tz = dz / L; [-2.2, 2.2].forEach(u => { const m = new T.Mesh(new T.PlaneGeometry(1.25, 2.5), new T.MeshLambertMaterial({ map: gfx.bannerTex('#7a1c22', '#d9a93c'), transparent: true, alphaTest: 0.5, side: T.DoubleSide })); m.position.set(mx + nx * 1.05 + tx * u, 2.05, mz + nz * 1.05 + tz * u); m.rotation.y = Math.atan2(-nx, -nz); cineG.add(m); });
+        [0, -3.6, 3.6].forEach(u => { const fx = mx + nx * 1.0 + tx * u, fz = mz + nz * 1.0 + tz * u; box(0.1, 0.5, 0.1, gfx.lambert(0x1c1a1e), fx, 1.7, fz, cineG); const fl = new T.Mesh(new T.ConeGeometry(0.11, 0.34, 5), new T.MeshBasicMaterial({ color: 0xffa040 })); fl.position.set(fx, 2.12, fz); cineG.add(fl); });
+        const cl = new T.PointLight(0xff9a50, 5, 9, 1.6); cl.position.set(mx + nx * 0.2, 2.2, mz + nz * 0.2); cineG.add(cl); continue; }
       const H = 3.4;
       const w = wall(s, L + 1.1, H, 1, mat); w.position.set(mx + nx * 1.1, 0, mz + nz * 1.1); w.rotation.y = rot;
       const walk = box(L + 3.2, 0.36, 3.4, matDark, mx + nx * 3.2, H + 0.1, mz + nz * 3.2, s); walk.rotation.y = rot;
@@ -131,7 +135,7 @@
       if (hypeNow > 0.75 && n && Math.random() < 0.35) { const p = crowdSpots[Math.floor(Math.random() * n)]; gfx.emit(p[0], p[1] + 1, p[2], -p[0] * R(0.25, 0.5), R(2, 4), -p[2] * R(0.25, 0.5), 1.4, 0xffd36b, 9); }
     };
     update(0);
-    return { scene: s, update, setHype: h => { hypeNow = h; }, flash: new T.PointLight(0xffffff, 0, 14, 1.4) };
+    return { scene: s, update, cineWall: v => { cineG.visible = !!v; }, setHype: h => { hypeNow = h; }, flash: new T.PointLight(0xffffff, 0, 14, 1.4) };
   }
 
   W.get = function (name) {

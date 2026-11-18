@@ -312,3 +312,11 @@ The Fence, Marc, the Apothecary, Big Hobb, the charm seller, Whisper and the Bus
 - **Marc.** The gambler is now Marc; cutscenes give his full name, Marc dé Fleuprau.
 - **Furniture that earns:** Copper Still (12 coin a bout), Lodger's Cot (20 coin a bout), Marc's Rat Cages (10 chits a bout for his table). The results card shows what your home earned.
 - **Mashing no longer works:** see `docs/BALANCE.md`.
+
+## Latest pass: a tidier market and cleaner scenes
+
+- Market names only appear when you walk near something. Far-off places show a small marker only if they need you, and the place your objective points at pulses.
+- Locked places show nothing until you earn them.
+- Pip Tallow runs up to you the moment you arrive and starts the tour himself. The objective no longer sends you to the pit first.
+- Opening film: tap (A / Space / touch) for the next shot, hold to skip the whole film.
+- Dialogue scenes: cameras keep clear of shoulders and helmets, the pit has a proper wall behind you in close-ups, and scene changes dip through black instead of popping.

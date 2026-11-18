@@ -180,6 +180,7 @@
     const h = hub0.apply(this, arguments);
     h.spots.forEach(sp => { const k = KEYS.find(q => UN[q].spot && UN[q].spot.test(sp.label)); if (!k) return; const go0 = sp.go, act0 = sp.act, badge0 = sp.badge;
       sp.go = () => open(k, G.state) ? go0() : lockCard(k);
+      sp.isLocked = () => !open(k, G.state);
       Object.defineProperty(sp, 'act', { get: () => open(k, G.state) ? act0 : 'Not open to you yet' });
       sp.badge = () => open(k, G.state) && (!(G.state.seen || {})[k] || !!(badge0 && badge0())); });
     return h;

@@ -182,7 +182,10 @@
     place.spots.forEach((sp, i) => {
       const p = gfx.project(sp.x, sp.y, sp.z), el = tagEls[i];
       el.style.transform = 'translate(' + p.x.toFixed(0) + 'px,' + p.y.toFixed(0) + 'px) translate(-50%,-50%)';
-      el.classList.toggle('near', sp === near); el.style.display = hide ? 'none' : ''; el.classList.toggle('badge', !!(sp.badge && sp.badge()));
+      // a name only when you are close to it; a small marker from further off, and only where there is a reason to go
+      const locked = sp.x < -50 || !!(sp.isLocked && sp.isLocked()), wk = W.walker, close = sp === near || Math.hypot(sp.x - wk.x, sp.z - wk.z) < 4.4, badge = !!(sp.badge && sp.badge()), goal = !!(G.goalSpot && G.goalSpot() === sp);
+      el.classList.toggle('near', sp === near); el.classList.toggle('far', !close); el.classList.toggle('goal', goal); el.classList.toggle('badge', badge);
+      el.style.display = hide || locked || (!close && !badge && !goal) ? 'none' : '';
     });
   }
 

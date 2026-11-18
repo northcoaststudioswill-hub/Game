@@ -37,7 +37,10 @@
     renderer.setSize(gfx.W, gfx.H, false);
     gfx.portrait = gfx.H > gfx.W;
   };
-  gfx.setScene = s => { scene = s; };
+  // a short dip to black hides the frame where a scene is swapped and its actors are still settling
+  let veilEl = null;
+  gfx.veil = sec => { if (!veilEl) { veilEl = document.createElement('div'); veilEl.id = 'veil'; document.body.appendChild(veilEl); } veilEl.style.transition = 'none'; veilEl.style.opacity = 1; void veilEl.offsetWidth; veilEl.style.transition = 'opacity ' + (sec || 0.35) + 's ease-out'; veilEl.style.opacity = 0; };
+  gfx.setScene = s => { if (scene && s !== scene) gfx.veil(0.35); scene = s; };
   gfx.scene = () => scene;
 
   // gfx.cine = {pos:[x,y,z], look:[x,y,z], fov, roll} switches to a free perspective camera (used by the cinematic)

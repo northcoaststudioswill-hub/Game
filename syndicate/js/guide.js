@@ -15,19 +15,30 @@
   const obj0 = G.objective;
   G.objective = function () {
     const s = obj0.apply(this, arguments), st = G.state; if (!st || !st.hero || typeof s !== 'string' || G.scene !== 'hub') return s;
+    if (!bouts(st) && (coming || (!st.toured && !st.tourAsked))) return 'Somebody is calling you over';
     if (/grudge|clock|has news|loadout|Long Stair is open|New in the market/.test(s) && !/New in the market/.test(s)) return s;
     const base = s.replace(/\s*·\s*New in the market:.*$/, ''), short = base.replace(/^Blood Pit: /, '').replace(/^Next on the Ledger: /, 'fight ').replace(/^Go to the Blood Pit gate and face /, 'fight ');
     const fresh = KEYS.filter(k => open(k) && !(st.seen || {})[k] && WHAT[k]);
     if (fresh.length) { const w = WHAT[fresh[0]]; return 'NEW · ' + w[0] + ' (' + w[2] + '): ' + w[1] + (fresh.length > 1 ? ' · and ' + (fresh.length - 1) + ' more' : '') + ' · then ' + short; }
     const tips = [];
     if (bouts(st) >= 1 && !(st.items || []).length) tips.push('Your hideout (west door) is empty: a bed there gives bonus XP');
-    if (bouts(st) >= 2 && !st.talked) tips.push('People in the market will talk: try the old miner by the lamp');
+    if (bouts(st) >= 2 && !st.talked) tips.push('People in the market will talk: try the old miner east of the lamp');
     if (open('apoth') && (st.seen || {}).apoth && st.coin >= 60 && !(st.boons || {}).tonic && bouts(st) % 2 === 0) tips.push('You can afford a tonic before your next bout');
     if ((st.deaths || 0) >= 1 && (st.signed || st.bound) && (st.soulDebt || 0) >= 3) tips.push('You owe David ' + st.soulDebt + ' souls: he is taking a cut. Pay some down in his cellar');
     if (has(st, 'bed') && G.homeReady && G.homeReady(st)) tips.push('Things at home are ready before your next bout');
     const nr = nextRankLine(st); if (nr && (Math.floor(performance.now() / 9000) % 2)) tips.push(nr);
     return tips.length ? tips[Math.floor(performance.now() / 9000) % tips.length] + ' · then ' + short : base;
   };
+
+  // where the marker in the market should sit: whatever the line at the top is pointing at
+  let goalAt = 0, goalSp = null;
+  G.goalSpot = function () { const now = performance.now(); if (now - goalAt < 600) return goalSp; goalAt = now; goalSp = null; const st = G.state; if (!st || !st.hero || G.scene !== 'hub' || coming) return null;
+    const s = G.objective(), hub = W.cache.hub; if (!hub || typeof s !== 'string') return null; let re = null;
+    if (/^NEW · /.test(s)) { const k = KEYS.find(q => open(q) && !(st.seen || {})[q] && WHAT[q]); re = k && UN[k].spot ? UN[k].spot : /Fence|Guildmaster/.test(s) ? /Fence/ : (k === 'trainer' ? /Guildmaster/ : /Fence/); }
+    else { const head = s.split(' · then ')[0], tail = s.split(' · then ').pop();
+      if (/the Fence has/.test(head)) re = /Fence/; else if (/^Your hideout/.test(head)) re = /Hideout/; else if (/old miner/.test(head)) re = /Tibb/; else if (/You owe David|clock is ticking/.test(head)) re = /Oracle/; else if (/afford a tonic/.test(head)) re = /Apothecary/;
+      else if (/Tally has news|Give your Tally work/.test(tail)) re = /Low Lamp/; else if (/Marc has news/.test(tail)) re = /Marc/; else if (/loadout/.test(tail)) re = /Guildmaster/; else if (/Long Stair is open/.test(tail)) re = /Long Stair/; else re = /Blood Pit/; }
+    goalSp = re ? hub.spots.find(sp => re.test(sp.label) && !(sp.isLocked && sp.isLocked())) || null : null; return goalSp; };
 
   // ------------------------------------------------------------ Pip shows you round
   const PIP = 'Pip Tallow', pipLook = { cls: 'rogue', race: 'human', tint: { cloth: '#7a5a2a', armor: '#5a4630', armor2: '#3a2c1e', trim: '#c8a060', legs: '#3a3024', hair: '#8a5a2a' }, scale: 0.86 };
@@ -38,18 +49,23 @@
     { npc: [6.3, 2.2], you: [4.6, 3.2], lines: [S('npc', PIP, 'The Blood Pit. You do not get a named fighter just for turning up: win your undercard bouts first and the Keeper writes you in against the next name.', 'npc'), S('npc', PIP, 'Lose in there and you are dead. Proper dead. Your purse goes with you. So do not carry what you cannot lose.', 'low'), S('npc', PIP, 'And do not just swing. They block a flurry now and hit you while you are still flapping. Hold your strike for a heavy blow, hold parry to block, sidestep the red marks.', 'npc')] },
     { npc: [16.9, 3.0], you: [15.4, 3.6], lines: [S('npc', PIP, 'The Fence. Potions, better steel, better armour. Later the Armoury, the Tailor and the Outfitter are through the back, once you have a name.', 'npc'), S('npc', PIP, 'Next door, the Guildmaster keeps your page: your three techniques, your feats, your finishers. Learn more than three moves and you choose which you carry, right there.', 'low')] },
     { npc: [1.4, 8.2], you: [1.6, 9.8], lines: [S('npc', PIP, 'Your hideout. Guild housing. Looks like nothing. But furniture in there WORKS: a bed gives you more from your next bout, a strongbox keeps coin safe when you die, a dummy sharpens your weapon hand.', 'npc'), S('npc', PIP, 'Tap the Comfort sign inside and it lists what every piece is doing for you.', 'low')] },
-    { npc: [12.6, 8.0], you: [14.4, 8.6], lines: [S('npc', PIP, 'Now. See all these shut stalls? They open as you earn RESPECT. Win a bout: the Notice Board and Big Hobb. Make Scrapper: the Low Lamp and the Apothecary. Bloodied: Marc’s table, the Armoury, the Tailor. Enforcer: the Outfitter, charms, Whisper.', 'npc'), S('you', me, 'And until then?', 'you'), S('npc', PIP, 'Until then, fight, and talk to people. The old miner by the lamp, the sergeant, the deep trader. I am usually about. That is the tour. Try not to die before Thursday.', 'low')] }
+    { npc: [12.6, 8.0], you: [14.4, 8.6], lines: [S('npc', PIP, 'Now. See all these shut stalls? They open as you earn RESPECT. Win a bout: the Notice Board and Big Hobb. Make Scrapper: the Low Lamp and the Apothecary. Bloodied: Marc’s table, the Armoury, the Tailor. Enforcer: the Outfitter, charms, Whisper.', 'npc'), S('you', me, 'And until then?', 'you'), S('npc', PIP, 'Until then, fight, and talk to people. The old miner by the lamp, the sergeant, the deep trader. I am usually by the pit gate. That is the tour. Try not to die before Thursday.', 'low')] }
   ]; };
-  function tour(i) { const st = G.state, stops = STOPS(st); if (i >= stops.length) { if (pip) pip.root.visible = false; st.toured = 1; G.save(); ui.toast('Tour over. Pip is by the lamp if you want it again.'); return; }
-    const sp = stops[i]; placePip(sp.npc[0], sp.npc[1], sp.you[0], sp.you[1]); G.playScene({ place: 'hub', npc: sp.npc, you: sp.you, lines: sp.lines, done: skipped => { if (skipped) { if (pip) pip.root.visible = false; st.toured = 1; G.save(); return; } tour(i + 1); } }); }
-  G.tour = () => { ui.close(); tour(0); };
+  function tour(i) { const st = G.state, stops = STOPS(st); if (i >= stops.length) { if (pip) pip.root.visible = false; st.toured = 1; G.save(); ui.toast('Tour over. Pip is by the pit gate if you want it again.'); return; }
+    const sp = stops[i]; if (i === 0 && G.scene === 'hub') { const w = W.walker, live = pip && pip.root.visible, qx = live ? pip.root.position.x - w.x : -0.8, qz = live ? pip.root.position.z - w.z : -0.6, qd = Math.hypot(qx, qz) || 1; sp.you = [w.x, w.z]; sp.npc = [w.x + qx / qd * 2.4, w.z + qz / qd * 2.4]; } placePip(sp.npc[0], sp.npc[1], sp.you[0], sp.you[1]); G.playScene({ place: 'hub', npc: sp.npc, you: sp.you, npcH: 1.24, lines: sp.lines, done: skipped => { if (skipped) { if (pip) pip.root.visible = false; st.toured = 1; G.save(); return; } tour(i + 1); } }); }
+  G.tour = () => { ui.close(); coming = null; tour(0); };
+  // he sees a new face and comes straight over
+  let coming = null, lastT = 0;
+  const stepPip = t => { const dt = Math.min(0.1, Math.max(0, t - lastT)); lastT = t; if (!coming || !pip) return; if (G.talk || ui.isOpen() || G.scene !== 'hub') return;
+    const w = W.walker, dx = w.x - pip.root.position.x, dz = w.z - pip.root.position.z, d = Math.hypot(dx, dz);
+    if (!coming.said) { coming.said = 1; ui.toast('“Oi! Fresh meat! Hold up!” Somebody is running over.'); G.sfx('ui'); }
+    if (d > 2.3) { const v = 4.2 * dt; pip.root.position.x += dx / d * v; pip.root.position.z += dz / d * v; pip.root.rotation.y = Math.atan2(dx, dz); coming.walk = (coming.walk || 0) + dt * 9; pip.pose({ t, act: 'idle', moving: 1, walk: coming.walk }); }
+    else { coming = null; tour(0); } };
+  G.pipComing = () => !!coming;
   const hub0 = ui.hub;
   ui.hub = function (first) { const r = hub0.apply(this, arguments), st = G.state; if (!st || !st.hero) return r;
     if (!st.casterKit && !bouts(st) && (st.hero.cls === 'sorcerer' || st.hero.cls === 'warlock')) { st.casterKit = 1; st.potions = Math.max(st.potions || 0, 2); G.save(); }      // casters start with a second potion: their first bouts are the hardest
-    if (!st.tourAsked && !bouts(st) && !(st.deaths > 0)) { st.tourAsked = 1; G.save(); setTimeout(() => { if (G.talk || ui.isOpen() || G.scene !== 'hub') return;
-      show('<div class="card small"><h2>A voice at your elbow</h2><div class="mk-top"><span id="pp"></span><div><p class="quote">“New, are you? You have the look. Pip Tallow. I show people round. Takes a minute and it might keep you alive.”</p></div></div><div class="row end"><button id="x">I will manage</button><button class="big" id="go">Show me round</button></div></div>');
-      const el = document.getElementById('pp'); if (el) el.appendChild(G.portrait(pipLook, 92)); on('#x', () => { ui.close(); ui.toast('“Suit yourself.” Pip is by the lamp if you change your mind.'); }); on('#go', () => G.tour()); }, 900); }
-    else if (st.tourAsked && !st.seenTourHint && bouts(st) === 0) st.seenTourHint = 1;
+    if (!st.tourAsked && !bouts(st) && !(st.deaths > 0)) { st.tourAsked = 1; G.save(); const w = W.walker; placePip(Math.max(1.5, w.x - 7), Math.max(3, w.z + 3.5), w.x, w.z); coming = { said: 0, t0: 0 }; }
     return r; };
 
   // ------------------------------------------------------------ what your home is doing for you
@@ -72,19 +88,19 @@
   // ------------------------------------------------------------ people to talk to
   const rn = () => (G.RACES[G.state.hero.race] || {}).name.toLowerCase(), cn = () => (G.CLASSES[G.state.hero.cls] || {}).name.toLowerCase();
   const FOLK = {
-    tibb: { name: 'Old Marrow Tibb', sub: 'forty years a miner', look: { cls: 'cleric', race: 'dwarf', tint: { cloth: '#5a4a3a', armor: '#4a4038', armor2: '#2e2822', trim: '#8a7a5a', hair: '#c8c0b0' } }, at: [16.4, 10.6],
+    tibb: { name: 'Old Marrow Tibb', sub: 'forty years a miner', look: { cls: 'cleric', race: 'dwarf', tint: { cloth: '#5a4a3a', armor: '#4a4038', armor2: '#2e2822', trim: '#8a7a5a', hair: '#c8c0b0' } }, at: [20.6, 8.0],
       hi: () => ({ dwarf: '“Old Seam? I can hear it in your boots. Sit, cousin.”', drow: '“Deep folk. Hm. We broke into one of your halls in ’forty. Nobody talks about what we found.”', druid: '“You have the wet galleries on you. Good. Somebody should still go down there.”' })[G.state.hero.race] || ({ druid: '“You have the wet galleries on you. Good. Somebody should still go down there.”' })[G.state.hero.cls] || '“Sit down, sit down. Nobody under sixty ever sits down.”',
       topics: [['The mine', 'It was the richest seam in the realm, and Highmarch was built with it. Then the ore ran thin, the lifts stopped, and the people who owned it walked up the stair and sealed it behind them. Nobody told us to leave. Nobody told us anything.'], ['The Deep Guild', 'They were our lending-house. Miners paying into a pot for the lean weeks. When the owners went, the pot was the only money left below the stair. So the pot became the law. Funny thing, a pot.'], ['The nine levels', 'Landing, Market, Rookeries, Old Seam, Ember Rows, the Flooded Gallery, the Wet Galleries, the Counting Vaults, and the bottom. I have worked seven of them. The eighth you need a debt to enter. The ninth you need a reason.'],
         ['The First Lamp', 'I was there when they lit it. Well. I was nine. I held the ladder. It has not gone out since, and the oil has not got cheaper either.']] },
-    carr: { name: 'Sergeant Ysolde Carr', sub: 'used to wear the white', look: { cls: 'fighter', race: 'human', tint: { armor: '#8a8a94', armor2: '#5a5a66', cloth: '#4a4a56', trim: '#a89868', legs: '#44464e', hair: '#5a3a2a' } }, at: [9.2, 8.2],
+    carr: { name: 'Sergeant Ysolde Carr', sub: 'used to wear the white', look: { cls: 'fighter', race: 'human', tint: { armor: '#8a8a94', armor2: '#5a5a66', cloth: '#4a4a56', trim: '#a89868', legs: '#44464e', hair: '#5a3a2a' } }, at: [6.4, 6.6],
       hi: () => ({ fighter: '“You carry that like you were drilled. Lower garrison? Thought so. They left you too.”', rogue: '“Hands. Where I can see them. Old habit. Yours and mine both.”', warlock: '“There was a standing order about your sort. I never liked it. I never questioned it either.”' })[G.state.hero.cls] || ({ elf: '“An elf below the stair. I will not ask. I was a Warden; I know better than to ask.”', drow: '“The orders about your people were forty years old when I learned them. Never thought I would meet one.”' })[G.state.hero.race] || '“You want something, or are you just standing in my light?”',
       topics: [['The Seal-Wardens', 'White plate, gold trim, two to a post. We answer to the gauntlet seal. One rule going down, one coming up: nobody passes. I held the Landing eleven years and never once drew steel. That is the job done right.'], ['Why she left', 'A woman came to the gate with a sick child and the wrong papers. Orders said no. I said no. I heard about the child later. Next morning I walked down the stair instead of up it. They do not come looking. Deserters below the Landing are not their problem.'],
         ['The King', 'Vilhelm van Koheneim IV. He inspected us twice a year. Never raised his voice. Never needed to. He fights like he is doing sums. If you ever stand across from him, do not wait for a mistake.'], ['The Queen', 'I saw her once, at a distance, at a window. She did not move for an hour. Faerie blood. They say she hears every word spoken in the realm. I have been careful what I say for twenty years, just in case.'], ['Fighting', 'Free advice. Stop swinging when they raise a guard: go heavy, or go round. Block more than you parry until you know their timing. And when the crowd is roaring, that is when you are most likely to do something stupid.']] },
-    ilva: { name: 'Ilvaren of the Hanging Markets', sub: 'a trader from below', look: { cls: 'rogue', race: 'drow', tint: { cloth: '#2a2a44', armor: '#22222e', armor2: '#14141c', trim: '#8a8aff', legs: '#1a1a24' } }, at: [24.6, 10.4],
+    ilva: { name: 'Ilvaren of the Hanging Markets', sub: 'a trader from below', look: { cls: 'rogue', race: 'drow', tint: { cloth: '#2a2a44', armor: '#22222e', armor2: '#14141c', trim: '#8a8aff', legs: '#1a1a24' } }, at: [30.4, 14.2],
       hi: () => ({ drow: '“Vael’shen. You are a long way up, deep-kin. Whose house? No. Do not answer. That is how it starts.”', elf: '“A sun-cousin. Your people sent mine below. I do not hold it against you personally. I hold it against you generally.”', tiefling: '“Ember-blood. We trade with the Rows. You pay your debts, which is more than I can say for most up here.”' })[G.state.hero.race] || '“You may look. Touching is a transaction.”',
       topics: [['Below the ninth', 'Your Guild thinks it found the bottom. Under its ninth level there are three cities, and under those, the places we do not build. Vael Ushar has more people in it than Highmarch. We simply do not light it for visitors.'], ['The drow and the Guild', 'We traded with the first miners. Glass for iron. Then they dug into the wrong hall, and after that we sealed our gates. The Guild bought our old ledgers. They cannot read them. I have seen them try.'],
         ['The pit', 'We have pits. Ours are quieter. Nobody cheers. You fight until one of you is not interesting any more. I come up for yours when I am homesick for noise.'], ['What answers from below', 'The warlocks think they found something. They found two of the small ones. There are others, further down, that do not bargain, because there is nothing they want. Be glad of the ones that want things.'], ['The Oracle', 'The clock-wizard? We know him. He tried to buy a city once. We said no. He is still down there under your market, counting. Do not owe him. If you already owe him, pay it quickly, and in his own gold.']] },
-    pip: { name: PIP, sub: 'Guild runner, penny a head', look: pipLook, at: [12.2, 10.8],
+    pip: { name: PIP, sub: 'Guild runner, penny a head', look: pipLook, at: [8.2, 3.8],
       hi: () => '“Still alive, then. Good. That is my reputation, that is.”',
       topics: [['How things open', () => { const st = G.state, nr = nextRankLine(st); return 'It is all respect. Win a bout: the Notice Board and Big Hobb. Scrapper: the Low Lamp and the Apothecary. Bloodied: Marc, the dice room, the Armoury, the Tailor. Enforcer: the Outfitter, charms, Whisper. Underboss: the Crown’s tithe at the Stair.' + (nr ? ' For you, next: ' + nr + '.' : ' You have the lot open, far as I know.'); }],
         ['Getting ready for a bout', 'Tonic from the Apothecary, a meal from Hobb or your own stove, a song off the busker, a word with Whisper, a night in your own bed. The card before the bout shows what you have and what you skipped. None of it is needed. All of it adds up.'], ['Dying', 'You lose in the pit, you are dead. Purse gone. Unless you have a strongbox at home: what is in the box stays in the box. And they say some come back. I have seen one or two walking about who should not be. I do not ask.'],
@@ -98,10 +114,11 @@
     const el = document.getElementById('fp'); if (el) el.appendChild(G.portrait(f.look, 92)); on('#x', () => { ui.close(); ui.topbar(); }); on('[data-t]', el2 => { G.sfx('page'); ui.talkTo(id, +el2.dataset.t); });
   };
   const bh0 = W.buildHub;
+  let pipFolk = null;
   W.buildHub = function () { const h = bh0.apply(this, arguments), folk = [];
     Object.keys(FOLK).forEach(id => { const f = FOLK[id]; let x = f.at[0], z = f.at[1]; for (let k = 0; k < 12 && h.blocked(x, z); k++) { x += 0.5; z += k % 2 ? 0.4 : -0.3; } const c = G.makeChar(f.look); c.root.position.set(x, 0, z); c.root.rotation.y = Math.atan2(14 - x, 9 - z); h.scene.add(c.root); folk.push(c);
-      h.spots.push({ x, z: z + 0.9, r: 1.3, y: 2.6, label: f.name.split(' of ')[0], act: 'Talk', go: () => ui.talkTo(id), badge: () => !G.state.talked && id === 'pip' }); });
-    const up0 = h.update; h.update = function (t) { up0.apply(this, arguments); folk.forEach((c, i) => c.pose({ t: t + i * 1.7, act: 'idle' })); if (pip && pip.root.visible) pip.pose({ t, act: 'idle' }); };
+      const sp = { x, z: z + 0.9, r: 1.3, y: 2.6, label: f.name.split(' of ')[0], act: 'Talk', go: () => ui.talkTo(id) }; if (id === 'pip') { pipFolk = c; sp.isLocked = () => !G.state.toured || !!(pip && pip.root.visible); } h.spots.push(sp); });
+    const up0 = h.update; h.update = function (t) { up0.apply(this, arguments); folk.forEach((c, i) => c.pose({ t: t + i * 1.7, act: 'idle' })); if (pipFolk) pipFolk.root.visible = !!G.state.toured && !(pip && pip.root.visible); if (coming) stepPip(t); else if (pip && pip.root.visible) pip.pose({ t, act: 'idle' }); };
     pip = null; return h; };
 
   // ------------------------------------------------------------ and David, who will talk for as long as you will listen

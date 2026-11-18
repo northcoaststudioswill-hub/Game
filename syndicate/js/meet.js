@@ -15,17 +15,18 @@
     const w = W.walker;
     if (opts.place === 'arena') {
       if (!G.fight.active && G.fight.exStop) G.fight.exStop();                  // sweep the pit: no limbs or blood left over from the last bout
-      const a = opts.stage || W.get('arena'); gfx.setScene(a.scene); if (a.setHype) a.setHype(0.15);
+      const a = opts.stage || W.get('arena'); gfx.setScene(a.scene); if (a.cineWall) { a.cineWall(true); D.wall = a; } if (a.setHype) a.setHype(0.15);
       if (G.titleChars) G.titleChars.forEach(c => c.root.visible = false);
       const F = G.fight; if (F.P && F.P.vis) { F.P.vis.g.visible = false; F.E.vis.g.visible = false; }
       const n = G.makeChar(opts.spawn.look); n.root.position.set(opts.npc[0], 0, opts.npc[1]); a.scene.add(n.root); D.actors.push([n, a.scene]); D.npcC = n;
       if (opts.spawn.crown) { const gold = new T.MeshPhongMaterial({ color: 0xf0c95a, emissive: 0x7a5408, shininess: 90, flatShading: true }), cr = new T.Group(); cr.add(new T.Mesh(new T.CylinderGeometry(0.25, 0.23, 0.12, 8, 1, true), gold)); for (let i = 0; i < 6; i++) { const s = new T.Mesh(new T.ConeGeometry(0.055, 0.2, 4), gold); s.position.set(Math.cos(i * 1.047) * 0.24, 0.14, Math.sin(i * 1.047) * 0.24); cr.add(s); } cr.position.y = 1.86; n.root.add(cr); }
       const y = G.makeChar(G.lookOf(G.state.hero, G.state)); y.root.position.set(opts.you[0], 0, opts.you[1]); a.scene.add(y.root); D.actors.push([y, a.scene]); D.you = y;
       n.root.rotation.y = Math.atan2(opts.you[0] - opts.npc[0], opts.you[1] - opts.npc[1]); y.root.rotation.y = n.root.rotation.y + Math.PI;
-    } else { w.x = opts.you[0]; w.z = opts.you[1]; w.target = null; w.path = null; w.emote = null; w.face = Math.atan2(opts.npc[0] - w.x, opts.npc[1] - w.z); }
+    } else { const ex = opts.you[0] - opts.npc[0], ez = opts.you[1] - opts.npc[1], ed = Math.hypot(ex, ez) || 1; if (ed < 2.3) opts.you = [opts.npc[0] + ex / ed * 2.3, opts.npc[1] + ez / ed * 2.3];       // never film two people standing on each other's toes
+      w.x = opts.you[0]; w.z = opts.you[1]; w.target = null; w.path = null; w.emote = null; w.face = Math.atan2(opts.npc[0] - w.x, opts.npc[1] - w.z); }
     el.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; G.audioInit(); advance(); });
     el.querySelector('.c-skip').onclick = () => finish(true);
-    advance();
+    advance(); talk.update(0, lastNow); if (gfx.veil) gfx.veil(0.4);
   }
   function advance() {
     if (!D) return; const o = D.o, ln = o.lines[D.i];
@@ -46,21 +47,24 @@
   }
   function finish(skipped, then) {
     if (!D) return; const o = D.o;
-    D.actors.forEach(a => a[1].remove(a[0].root)); D.el.remove(); $('ui').classList.remove('talking'); D = G.talk = null; gfx.cine = null;
+    D.actors.forEach(a => a[1].remove(a[0].root)); if (D.wall) D.wall.cineWall(false); if (gfx.veil) gfx.veil(0.3); D.el.remove(); $('ui').classList.remove('talking'); D = G.talk = null; gfx.cine = null;
     if (o.place === 'arena' && !then && G.scene === 'hub') gfx.setScene(W.get('hub').scene);
     if (then) then(); else if (o.done) o.done(skipped);
   }
   const talk = { next: advance, skip: () => finish(true) };
+  let lastNow = 0;
   talk.update = function (dt, now) {
-    if (!D) return; const o = D.o, ln = o.lines[D.i]; D.t += dt;
+    lastNow = now; if (!D) return; const o = D.o, ln = o.lines[D.i]; D.t += dt;
     if (ln && D.shown < ln.text.length) { D.shown = Math.min(ln.text.length, D.shown + dt * 48); render(); }
-    const n = o.npc, y = o.you, mx = (n[0] + y[0]) / 2, mz = (n[1] + y[1]) / 2, dx = y[0] - n[0], dz = y[1] - n[1], d = Math.hypot(dx, dz) || 1, ux = dx / d, uz = dz / d, px = -uz, pz = ux;
+    const n = o.npc, y = o.place === 'arena' ? o.you : [W.walker.x, W.walker.z], nh = (o.npcH || 1.42), mx = (n[0] + y[0]) / 2, mz = (n[1] + y[1]) / 2, dx = y[0] - n[0], dz = y[1] - n[1], d = Math.hypot(dx, dz) || 1, ux = dx / d, uz = dz / d, px = -uz, pz = ux;
     const side = (px + pz) >= 0 ? 1 : -1, k = Math.min(1, D.t / 6), port = gfx.portrait, shot = (ln && ln.shot) || 'two';
     let pos, look, fov;
-    if (shot === 'npc') { pos = [n[0] + ux * lerp(3.5, 3.1, k) + px * side * 0.9, 1.5, n[1] + uz * lerp(3.5, 3.1, k) + pz * side * 0.9]; look = [n[0], 1.42, n[1]]; fov = 32; }
-    else if (shot === 'you') { pos = [y[0] - ux * lerp(3.0, 2.6, k) + px * side * 0.9, 1.5, y[1] - uz * lerp(3.0, 2.6, k) + pz * side * 0.9]; look = [y[0], 1.4, y[1]]; fov = 32; }
-    else if (shot === 'low') { pos = [n[0] + ux * 2.2 + px * side * 0.5, 0.45, n[1] + uz * 2.2 + pz * side * 0.5]; look = [n[0], 1.5, n[1]]; fov = lerp(34, 46, k); }
-    else if (shot === 'ots') { pos = [y[0] + ux * 1.3 + px * side * 0.9, 2.0, y[1] + uz * 1.3 + pz * side * 0.9]; look = [n[0], 1.35, n[1]]; fov = lerp(40, 36, k); }
+    // keep the lens between the two when they stand close, so nobody's shoulder or back fills the frame
+    const fit = c => Math.min(c, Math.max(1.75, d - 0.55)), fv = (c, c0) => Math.min(44, 32 * c0 / c);
+    if (shot === 'npc') { const c0 = lerp(3.5, 3.1, k), c = fit(c0); pos = [n[0] + ux * c + px * side * 0.9, nh + 0.1, n[1] + uz * c + pz * side * 0.9]; look = [n[0], nh - 0.08, n[1]]; fov = fv(c, c0); }
+    else if (shot === 'you') { const c0 = lerp(3.0, 2.6, k), c = fit(c0); pos = [y[0] - ux * c + px * side * 1.0, 1.55, y[1] - uz * c + pz * side * 1.0]; look = [y[0], 1.12, y[1]]; fov = fv(c, c0); }
+    else if (shot === 'low') { const c = fit(2.2); pos = [n[0] + ux * c + px * side * 0.5, 0.45, n[1] + uz * c + pz * side * 0.5]; look = [n[0], nh - 0.12, n[1]]; fov = lerp(34, 44, k) * (c < 2.2 ? 1.2 : 1); }
+    else if (shot === 'ots') { pos = [y[0] + ux * 1.7 + px * side * 1.25, 2.1, y[1] + uz * 1.7 + pz * side * 1.25]; look = [n[0], nh - 0.15, n[1]]; fov = lerp(40, 36, k); }
     else if (shot === 'wide') { pos = [mx + px * side * 7.5 + ux * 1, lerp(3.4, 4.0, k), mz + pz * side * 7.5 + uz * 1]; look = [mx, 0.9, mz]; fov = 44; }
     else { pos = [mx + px * side * lerp(5.2, 4.7, k), 1.7, mz + pz * side * lerp(5.2, 4.7, k)]; look = [mx, 1.2, mz]; fov = 40; }
     const j = 0.03; gfx.cine = { pos, look: [look[0] + Math.sin(now * 1.3) * j, look[1] + Math.sin(now * 1.9) * j, look[2]], fov: port ? Math.min(92, fov * 1.55) : fov, roll: shot === 'low' ? 0.05 : 0 };

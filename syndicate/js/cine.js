@@ -234,19 +234,21 @@
     gfx.cam.shake = 0; el.remove(); const d = onDone; onDone = null; if (d) d();
   }
   C.skip = finish;
-  // ------------------------------------------------------------ hold to skip: a slip of the thumb should not cost you the film
-  C.holdSkip = true;
-  { let held = 0, t = 0, last = 0; const NEED = 0.9, keys = {};
-    const btn = () => document.querySelector('#cine .c-skip') || document.querySelector('.c-skip');
+  // ------------------------------------------------------------ tap for the next scene, hold to skip the whole film
+  C.holdSkip = true; C.nextShot = () => { if (C.active) { G.sfx('page'); next(); } };
+  { let held = 0, t = 0, last = 0, downFor = 0, wasOn = false, fired = false; const NEED = 0.9, TAP = 0.32, keys = {};
+    const btn = () => document.querySelector('#cine .c-skip');
     window.addEventListener('keydown', e => { if (G.scene === 'cine' && (e.code === 'Escape' || e.code === 'Enter' || e.code === 'Space')) { keys[e.code] = 1; e.preventDefault(); } });
     window.addEventListener('keyup', e => { delete keys[e.code]; });
-    const down = e => { if (G.scene === 'cine' && e.target && e.target.closest && e.target.closest('.c-skip')) { held = 1; e.preventDefault(); } }, up = () => { held = 0; };
-    document.addEventListener('pointerdown', down); document.addEventListener('touchstart', down, { passive: false }); ['pointerup', 'pointercancel', 'touchend', 'touchcancel', 'mouseleave'].forEach(ev => document.addEventListener(ev, up));
-    setInterval(() => { const now = performance.now(), dt = Math.min(0.5, (now - last) / 1000); last = now; if (G.scene !== 'cine') { t = 0; held = 0; return; }
+    const down = e => { if (G.scene === 'cine') { held = 1; if (e.cancelable && e.target && e.target.closest && e.target.closest('.c-skip')) e.preventDefault(); } }, up = () => { held = 0; };
+    document.addEventListener('pointerdown', down); document.addEventListener('touchstart', down, { passive: false }); ['pointerup', 'pointercancel', 'touchend', 'touchcancel'].forEach(ev => document.addEventListener(ev, up));
+    setInterval(() => { const now = performance.now(), dt = Math.min(0.5, (now - last) / 1000); last = now; if (G.scene !== 'cine') { t = 0; held = 0; wasOn = false; downFor = 0; return; }
       let padA = false; try { const pads = navigator.getGamepads ? navigator.getGamepads() : []; for (const p of pads) if (p && p.buttons && ((p.buttons[0] && p.buttons[0].pressed) || (p.buttons[9] && p.buttons[9].pressed))) padA = true; } catch (er) { }
-      const on = held || padA || Object.keys(keys).length > 0; t = on ? t + dt : Math.max(0, t - dt * 3);
-      const b = btn(); if (b) { const pad = G.input && G.input.usingPad; b.textContent = pad ? 'Hold (A) to skip' : (G.input && G.input.touch) ? 'Hold to skip' : 'Hold Space to skip'; const pc = Math.min(100, t / NEED * 100); b.style.background = pc > 0 ? 'linear-gradient(90deg, rgba(240,201,90,0.85) ' + pc + '%, rgba(20,16,24,0.7) ' + pc + '%)' : ''; b.style.color = pc > 45 ? '#1a1208' : ''; b.style.opacity = on ? 1 : ''; }
-      if (t >= NEED) { t = 0; held = 0; for (const k in keys) delete keys[k]; G.sfx('ui'); C.skip(); } }, 40); }
+      const on = !!(held || padA || Object.keys(keys).length > 0);
+      if (on) { downFor += dt; t = downFor > TAP ? t + dt : t; } else { if (wasOn && !fired && downFor > 0 && downFor <= TAP + 0.08 && !navigator.webdriver) C.nextShot(); downFor = 0; fired = false; t = Math.max(0, t - dt * 3); }
+      wasOn = on;
+      const b = btn(); if (b) { const pad = G.input && G.input.usingPad, touch = G.input && G.input.touch; b.textContent = pad ? '(A) next scene · hold to skip' : touch ? 'Tap: next scene · hold: skip' : 'Space: next scene · hold: skip'; const pc = Math.min(100, t / (NEED - TAP) * 100); b.style.background = pc > 0 ? 'linear-gradient(90deg, rgba(240,201,90,0.85) ' + pc + '%, rgba(20,16,24,0.7) ' + pc + '%)' : ''; b.style.color = pc > 45 ? '#1a1208' : ''; b.style.opacity = on ? 1 : ''; }
+      if (t >= NEED - TAP) { t = 0; held = 0; fired = true; downFor = 0; for (const kk in keys) delete keys[kk]; G.sfx('ui'); C.skip(); } }, 40); }
   C.update = function (dt, tt) {
     if (!C.active) return;
     now = tt; t += dt;
