@@ -52,6 +52,16 @@ game looks like, what the enemy is, and adds the story.
   the game; `build.py --v37` proves the cut reproduces the
   frozen v3.7 file byte for byte.
 
+- **Lil Bottie looks like himself, and he is mad** (Will, Nov
+  18). Scenes, the title and the defeat screen use his real
+  model (Sproutwild's sprite) with a red anger mark, in place
+  of the dark silhouette. BOTTIE PRIME, the last boss, is that
+  same model shown big, not a drone drawn to resemble him. His
+  lines are rewritten: he is furious about his drones and he
+  is the NUMBA ONE CLANKA. He gloats when the Heart falls. His
+  greyed-out keeper slot in the shop is now a plain "???",
+  since he is the villain here.
+
 Not in this version (next, in the brief's order): two upgrade
 paths per sprout, calling the next night early, petals to
 collect during a night, the menu pass, replay goals.

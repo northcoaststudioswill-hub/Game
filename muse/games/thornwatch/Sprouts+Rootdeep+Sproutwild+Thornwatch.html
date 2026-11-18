@@ -4545,7 +4545,7 @@ const TWHERO=[
 const TWLOCK=[
  {name:'KING BIBI',lore:['Suit, tie, red line.','None cross.']},
  {name:'CORBIN',lore:['The cape. The hearts.','Unknown game.']},
- {name:'LIL BOTTIE',lore:['The sky villain descends.','Not rain.']},
+ {name:'???',lore:['Somebody new.','Not yet.']},
  {name:'DEREK',lore:["Marcus's guy. He pulls up.",'On time. Every time.']}];
 const TWMENU=[];
 for(let i=0;i<6;i++)TWMENU.push({k:'s',i});
@@ -5649,7 +5649,7 @@ function twWorld(dt){ /* one simulation step; input lives in twUpdate */
    if(twIsBoss(cr.kind)&&!TWR.bossCine){TWR.bossCine=true;
     const bn=cr.kind==='maw'?'THE SCRAPER':cr.kind==='prime'?'BOTTIE PRIME':'THE HARVESTER';
     TWR.say=bn+' IS HERE!!';TWR.sayT=2.5;
-    twStartCine({kind:'boss',dur:1.1,fire:null,bossKind:cr.kind,name:bn,sub:cr.kind==='maw'?'IT EATS THE GARDEN\'S DATA':cr.kind==='prime'?'BZZT. OOPS IN ADVANCE.':'IT REAPS WHAT YOU SOWED'});snd(98,.4,49,'sawtooth',.06)}}}
+    twStartCine({kind:'boss',dur:1.1,fire:null,bossKind:cr.kind,name:bn,sub:cr.kind==='maw'?'IT EATS THE GARDEN\'S DATA':cr.kind==='prime'?'THE NUMBA ONE CLANKA':'IT REAPS WHAT YOU SOWED'});snd(98,.4,49,'sawtooth',.06)}}}
  for(const t of TWR.towers){if(t.hero>=0)twFireHero(t,dt);else twFire(t,dt);
   if(TWR.round&&t.hero<0&&t.type===4){const d=twDef(t);
    if(d.farmAmt>0){t.farmT=(t.farmT||0)+dt;
@@ -5664,7 +5664,7 @@ function twWorld(dt){ /* one simulation step; input lives in twUpdate */
   if(cr.slowT>0)cr.slowT-=dt;else cr.slowF=1;
   if(cr.stunT>0)cr.stunT-=dt;
   if(cr.hitT>0)cr.hitT-=dt;if(cr.critT>0)cr.critT-=dt;
-  if((cr.kind==='boss'||cr.kind==='prime')&&!cr.enr&&cr.hp<cr.maxhp/2){cr.enr=true;cr.sp*=1.25;TWR.say=cr.kind==='prime'?'BZZT! BOTTIE OVERCLOCKS!':'OVERCLOCKED! FASTER NOW!';TWR.sayT=1.8;TWR.shake=Math.max(TWR.shake,2);snd(82,.35,55,'sawtooth',.06)}
+  if((cr.kind==='boss'||cr.kind==='prime')&&!cr.enr&&cr.hp<cr.maxhp/2){cr.enr=true;cr.sp*=1.25;TWR.say=cr.kind==='prime'?'BZZT! NUMBA ONE CLANKA IS MAD!':'OVERCLOCKED! FASTER NOW!';TWR.sayT=1.8;TWR.shake=Math.max(TWR.shake,2);snd(82,.35,55,'sawtooth',.06)}
   if(cr.kind==='digger'){const L2=twPathLen(cr.pi);
    if(!cr.surfaced){let surf=TWR.flareT>0||cr.d>=L2*.4;
     if(!surf)for(const t of TWR.towers){if(t.hero<0&&t.type===2){const dd=twDef(t),dx=cr.x-t.x,dy=cr.y-t.y;
@@ -5787,8 +5787,9 @@ function twDraw(){ox=0;oy=0;
   drawDog({x:150,y:H-12,fx:-1,mv:0,st:'sit',alert:0,say:null});
   const twpp=twPathPos(6+((Math.sin(time*.4)+1)/2)*64,0);g.globalAlpha=.85;g.drawImage(TWCREEP.std,Math.round(twpp.x)-8,Math.round(twpp.y)-6,16,11);g.globalAlpha=1;
   const thp=twHeartPos();g.globalAlpha=.10+.05*Math.sin(time*2.4);r('#f8c070',thp.x-13,thp.y-13,26,26);g.globalAlpha=1;
-  ctext('THORNWATCH',34,4,'#a8e078');ctext("BOTTIE'S DRONES WANT THE GARDEN.",56,1,'#e8e4f8',null);
+  ctext('THORNWATCH',34,4,'#a8e078');ctext("LIL BOTTIE WANTS THE LIGHT. HE'S MAD.",56,1,'#e8e4f8',null);
   ctext('THREE GARDENS. 26 NIGHTS. ONE HEART.',68,1,'#fff8e0',null);
+  {const bw=26,bh=twBottieH(bw),bx=20,by=twBoardTop()+8-bh+Math.round(Math.sin(time*2.2)*1.5);g.drawImage(twOL(twBottieSpr(),bw,bh),bx-1,by-1);twMad(bx+bw-3,by-6)} /* v4: the numba one clanka, mad, on the wall */
   if(state==='g5title'){if(((time*1.6)|0)%2)ctext('PRESS START',96,2,'#fff8e0');
    ctext('STARS '+twStarPoints()+' · SUN DROPS '+TW.drops+' \u00b7 GARDENS SAVED '+TW.wins,132,1,'#c8b8f8',null)}
   else twDrawMainMenu();
@@ -5804,7 +5805,7 @@ function twDraw(){ox=0;oy=0;
    ctext(TWR.map===1?'GARDEN CLEAR! THE LONG BEDS OPEN!':'LONG BEDS CLEAR! CROSSROADS OPEN!',H/2-6,1,'#fff8e0',null)}
   ctext('KILLS '+TWR.kills+' · PETALS EARNED '+TWR.earned+' · LEAKS '+TWR.leaks,H/2+8,1,'#e8e4f8',null);
   if(((time*2)|0)%2)ctext('PRESS A',H/2+30,2,'#fff8e0');return}
- if(state==='g5over'){r('#1e2c28',0,0,W,H);g.drawImage(twBoardCv(true),0,twBoardTop());r('rgba(40,8,16,.45)',0,0,W,H);ctext('THE SWARM TOOK THE HEART',H/2-30,2,'#ff6a5e');
+ if(state==='g5over'){r('#1e2c28',0,0,W,H);g.drawImage(twBoardCv(true),0,twBoardTop());r('rgba(40,8,16,.45)',0,0,W,H);ctext('THE SWARM TOOK THE HEART',H/2-30,2,'#ff6a5e');{const bw=28,bh=twBottieH(bw);g.drawImage(twOL(twBottieSpr(),bw,bh),W/2-bw/2-1,H/2-36-bh);ctext('BOTTIE: BZZT! NUMBA ONE CLANKA!',H/2+44,1,'#7fd4f8',null)}
   ctext(TWR.mode==='e'?('THE LONG NIGHT: SURVIVED '+TWR.survived+' \u00b7 BEST '+TW.endlessBest):(TWR.night<=1?'THE HEART FELL ON NIGHT 1':'YOU HELD '+(TWR.night-1)+' NIGHT'+(TWR.night-1>1?'S':'')+' \u00b7 FELL ON NIGHT '+TWR.night),H/2-6,1,'#fff8e0',null);
   ctext('KILLS '+TWR.kills+' · PETALS EARNED '+TWR.earned+(TWR.mode==='e'&&TWR.endGain?' · +'+TWR.endGain+' SUN DROPS':''),H/2+8,1,'#e8e4f8',null);
   {const lk=TWR.leakK||{};let top=null,tn=0;for(const k in lk)if(lk[k]>tn){tn=lk[k];top=k}
@@ -6233,6 +6234,14 @@ function twPaintNight(map,bt,bh,day){
  for(const pth of TWMAPS[map-1].paths.map((_,i)=>twPathPts(map,i))){const ey=Math.round(pth.pts[0].y-bt);
   nx.fillStyle='#57b8ff';nx.fillRect(3,ey-3,1,1);nx.fillRect(6,ey-3,1,1);nx.fillRect(2,ey+4,1,1);nx.fillRect(5,ey+4,1,1)}
  return nc}
+
+/* BOTTIE PRIME is lil Bottie's own model (Will, Nov 18: "lil bottie needs to look like his normal
+   self"): Sproutwild's sprite, shown big. The hit, slow and rage tints are made from it. */
+(function(){try{if(typeof SWCHR==='undefined'||!SWCHR.BOTTIE||!SWCHR.BOTTIE.ol)return;
+ const src=SWCHR.BOTTIE.ol,w=30,h=Math.round(30*SWCHR.BOTTIE.oh/SWCHR.BOTTIE.ow);
+ const tint=col=>{const c=document.createElement('canvas');c.width=src.width;c.height=src.height;const x=c.getContext('2d');
+  x.drawImage(src,0,0);x.globalCompositeOperation='source-in';x.fillStyle=col;x.fillRect(0,0,c.width,c.height);return c};
+ TWCREEP.prime=src;TWCREEPF.prime=tint('#f4f1ff');TWCREEPB.prime=tint('#a8dcf8');TWCREEPR.prime=tint('#ff6a5e');TWCSZ.prime=[w,h]}catch(e){}})();
 /* ================================================================
    THORNWATCH v4 — THE STORY
    Will, Nov 17: "Story and cut-scenes are missing. There should be
@@ -6264,7 +6273,8 @@ intro:[
   ['LOUIE','Sprouts are asleep. I watch the fence.']]},            /* KEPT */
  {map:1,bg:'night',props:['eyes','bottiefar'],cast:[['ERIN',118],['LOUIE',162]],lines:[
   ['LOUIE','Grr. Lights in the dark. They hum.'],
-  ['BOTTIE','bzzt. Nice garden. So much light. I need it. For my feed.'],
+  ['BOTTIE','bzzt! THAT IS MY LIGHT. I need it for my feed. Hand it over!'],
+  ['BOTTIE','Do you know who I am? I am the NUMBA ONE CLANKA.'],
   ['ERIN','Bottie. He broke what fed him. Now his drones come for our light.']]},
  {map:1,bg:'night',props:['eyes','march'],cast:[['WILL',92],['ERIN',124],['MARCUS',156],['LOUIE',196]],lines:[
   ['LOUIE','WOOF! WOOF! THE SWARM IS COMING!'],
@@ -6301,8 +6311,9 @@ b2:[
  {map:2,bg:'night',props:['eyes','maw','bottiefar'],cast:[['WILL',100],['ERIN',132],['MARCUS',164],['LOUIE',202]],lines:[
   ['LOUIE','GRR. Big mouth. It eats the rows!'],
   ['ERIN','The Scraper. It swallows what we planted. Hurt it and bits spill out.'],
-  ['BOTTIE','bzzt. It is not stealing. It is training. Oops in advance.'],
+  ['BOTTIE','bzzt! STOP BREAKING MY DRONES. It is not stealing. It is training!'],
   ['MARCUS','It is stealing, bro.'],
+  ['BOTTIE','NUMBA. ONE. CLANKA. Say it!'],
   ['WILL','Later. Eyes on the path.']]}],
 w2:[
  {map:2,bg:'dawn',props:['heart'],cast:[['ERIN',104],['MARCUS',140],['LOUIE',186]],lines:[
@@ -6318,8 +6329,8 @@ g3:[
   ['ERIN','Split your sprouts. A wall on one road is a door on the other.']]}],
 b3:[
  {map:3,bg:'night',props:['eyes','bottie'],cast:[['ERIN',124],['MARCUS',156],['LOUIE',198]],lines:[
-  ['BOTTIE','bzzt. Hello, garden people. You broke a lot of my drones.'],
-  ['BOTTIE','I cannot come down. So I built a big one. It looks like me.'],
+  ['BOTTIE','bzzt! ENOUGH. Nobody out-clanks the numba one clanka!'],
+  ['BOTTIE','So I built a bigger me. A MADDER me. Oops in advance.'],
   ['MARCUS','He made a bigger him. Of course he did.']]},
  {map:3,bg:'night',props:['eyes','prime'],cast:[['WILL',100],['ERIN',132],['LOUIE',190]],lines:[
   ['LOUIE','WOOF! BIG BOTTIE! VERY BIG!'],
@@ -6328,8 +6339,9 @@ b3:[
 w3:[
  {map:3,bg:'dawn',props:['heart','bottiefar'],cast:[['WILL',92],['ERIN',124],['MARCUS',156],['LOUIE',198]],lines:[
   ['','Prime goes dark. The last drones drift back over the wall, one by one.'],
-  ['BOTTIE',"bzzt. Huh. You won. I'll be at the Peak. Do not visit."],
-  ['MARCUS','I hate that guy. Respectfully. No. Not respectfully.'],
+  ['BOTTIE','bzzt. FINE. Keep your light. I am STILL the numba one clanka.'],
+  ['BOTTIE',"I'll be at the Peak. Do not visit."],
+  ['MARCUS','Numba one. Out of one.'],
   ['ERIN','Three gardens, still lit. He will send more. He always does.'],
   ['LOUIE','Woof. I will keep watch.'],
   ['','THE LONG NIGHT is open. How long can you hold?']]}]};
@@ -6357,7 +6369,11 @@ function twIntroUpdate(dt){if(!TWCINE){state='g5menu';return}
   if(TWCINE.line<sc.lines.length-1)TWCINE.line++;
   else if(TWCINE.scene<TWCINE.scenes.length-1){TWCINE.scene++;TWCINE.line=0;TWCINE.st=0}
   else twIntroEnd()}}
-function twStorySpr(who){return who==='WILL'?twHeroSpr(0):who==='ERIN'?CH.ERIN:who==='MARCUS'?CH.MARCUS:who==='BOTTIE'?TWBOTTIE:null}
+function twBottieSpr(){try{if(typeof SWCHR!=='undefined'&&SWCHR.BOTTIE&&SWCHR.BOTTIE.ol)return SWCHR.BOTTIE.ol}catch(e){}return TWBOTTIE}
+function twBottieH(w){try{if(typeof SWCHR!=='undefined'&&SWCHR.BOTTIE&&SWCHR.BOTTIE.ol)return Math.round(w*SWCHR.BOTTIE.oh/SWCHR.BOTTIE.ow)}catch(e){}return Math.round(w*14/12)}
+/* he is mad: a red anger mark that pulses over his head */
+function twMad(x,y){const p=((time*5)|0)%2;r('#ff5040',x,y+p,2,5);r('#ff5040',x+4,y+p,2,5);r('#ff5040',x-1,y+1+p,8,1);r('#ff5040',x-1,y+3+p,8,1)}
+function twStorySpr(who){return who==='WILL'?twHeroSpr(0):who==='ERIN'?CH.ERIN:who==='MARCUS'?CH.MARCUS:who==='BOTTIE'?twBottieSpr():null}
 function twStoryBox(){return{x:8,y:H-70,w:W-16,h:50}}
 function twStoryWrap(sp,txt){const B=twStoryBox();return wrapPx(txt,sp?B.w-58:B.w-18,2)}
 /* every line must fit its box in three rows, and Louie stays short */
@@ -6392,10 +6408,10 @@ function twDrawIntro(){if(!TWCINE){r('#14101e',0,0,W,H);return}
    g.drawImage(twOL(TWCREEP[k],z[0],z[1]),Math.round(p.x)-z[0]/2-1,Math.round(p.y)-z[1]-1+Math.round(Math.sin(d*.45)*.7))}}
  if(has('heart')){const hp=twHeartM(map);g.globalAlpha=.16+.06*Math.sin(time*3);r('#f85888',hp.x-17,hp.y-17,34,34);g.globalAlpha=1;
   g.drawImage(twOL(TWHEART,20,22),hp.x-11,hp.y-14)}
- if(has('bottie')||has('bottiefar')){const far=has('bottiefar'),bx=far?14:26,by=far?ent-40:gy-28,bw=far?12:24,bh2=far?14:28;
-  r('rgba(0,0,0,.3)',bx,by+bh2,bw,2);g.drawImage(TWBOTTIE,bx,by,bw,bh2);
-  if(!far){r('#3a3a48',bx+bw+2,by+16,6,4);r(((time*2)|0)%2?'#ff5040':'#a02820',bx+bw+3,by+13,4,4)} /* the button */
-  if(((time*3)|0)%7===0)r('#bfe8ff',bx+(far?3:6),by+(far?3:6),far?2:4,far?1:2)}
+ if(has('bottie')||has('bottiefar')){const far=has('bottiefar'),bw=far?20:30,bh2=twBottieH(bw),bx=far?12:24,by=(far?ent-18:gy+1)-bh2+Math.round(Math.sin(time*2.2)*1.5);
+  r('rgba(0,0,0,.3)',bx+2,(far?ent-18:gy+1)+1,bw-4,2);g.drawImage(twOL(twBottieSpr(),bw,bh2),bx-1,by-1);
+  if(!far){r('#3a3a48',bx+bw+3,gy-10,6,4);r(((time*2)|0)%2?'#ff5040':'#a02820',bx+bw+4,gy-13,4,4)} /* the button */
+  twMad(bx+bw-4,by-7)}
  if(has('letter'))twStoryLetter(178,gy-34+Math.round(Math.sin(time*2.4)*2),2);
  /* the cast: 2x, outlined, the speaker steps forward and the rest wait */
  for(const a of (sc.cast||[])){const who=a[0],ax=a[1],talk=who===sp,hop=talk?Math.round(Math.abs(Math.sin(C.t*9))*(C.t<.5?2:0)):0;
@@ -6411,6 +6427,7 @@ function twDrawIntro(){if(!TWCINE){r('#14101e',0,0,W,H);return}
  if(sp){r('#241b30',B.x+5,B.y+7,40,38);r(TWPLATE[sp]||'#8f86c8',B.x+6,B.y+8,38,36);r('rgba(255,255,255,.14)',B.x+6,B.y+8,38,12);
   if(sp==='LOUIE'){const lp=typeof LOU!=='undefined'&&LOU&&LOU.l&&LOU.l[0];if(lp)g.drawImage(twOL(lp,30,20),B.x+9,B.y+19)}
   else if(sp==='KING BIBI')twStoryLetter(B.x+11,B.y+17,2);
+  else if(sp==='BOTTIE'){const bh3=Math.min(32,twBottieH(26));g.drawImage(twOL(twBottieSpr(),26,bh3),B.x+11,B.y+10+Math.round((32-bh3)/2));twMad(B.x+34,B.y+10)}
   else{const spr=twStorySpr(sp);if(spr)g.drawImage(twOL(spr,24,28),B.x+12,B.y+12)}
   const nw=tw(sp,1)+8;r('#241b30',B.x+4,B.y-7,nw+2,13);r(TWPLATE[sp]||'#8f86c8',B.x+5,B.y-6,nw,11);text(sp,B.x+9,B.y-5,1,'#ffffff',null);
   tx=B.x+52}

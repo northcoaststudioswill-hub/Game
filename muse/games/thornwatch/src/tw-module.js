@@ -138,7 +138,7 @@ const TWHERO=[
 const TWLOCK=[
  {name:'KING BIBI',lore:['Suit, tie, red line.','None cross.']},
  {name:'CORBIN',lore:['The cape. The hearts.','Unknown game.']},
- {name:'LIL BOTTIE',lore:['The sky villain descends.','Not rain.']},
+ {name:'???',lore:['Somebody new.','Not yet.']},
  {name:'DEREK',lore:["Marcus's guy. He pulls up.",'On time. Every time.']}];
 const TWMENU=[];
 for(let i=0;i<6;i++)TWMENU.push({k:'s',i});
@@ -1242,7 +1242,7 @@ function twWorld(dt){ /* one simulation step; input lives in twUpdate */
    if(twIsBoss(cr.kind)&&!TWR.bossCine){TWR.bossCine=true;
     const bn=cr.kind==='maw'?'THE SCRAPER':cr.kind==='prime'?'BOTTIE PRIME':'THE HARVESTER';
     TWR.say=bn+' IS HERE!!';TWR.sayT=2.5;
-    twStartCine({kind:'boss',dur:1.1,fire:null,bossKind:cr.kind,name:bn,sub:cr.kind==='maw'?'IT EATS THE GARDEN\'S DATA':cr.kind==='prime'?'BZZT. OOPS IN ADVANCE.':'IT REAPS WHAT YOU SOWED'});snd(98,.4,49,'sawtooth',.06)}}}
+    twStartCine({kind:'boss',dur:1.1,fire:null,bossKind:cr.kind,name:bn,sub:cr.kind==='maw'?'IT EATS THE GARDEN\'S DATA':cr.kind==='prime'?'THE NUMBA ONE CLANKA':'IT REAPS WHAT YOU SOWED'});snd(98,.4,49,'sawtooth',.06)}}}
  for(const t of TWR.towers){if(t.hero>=0)twFireHero(t,dt);else twFire(t,dt);
   if(TWR.round&&t.hero<0&&t.type===4){const d=twDef(t);
    if(d.farmAmt>0){t.farmT=(t.farmT||0)+dt;
@@ -1257,7 +1257,7 @@ function twWorld(dt){ /* one simulation step; input lives in twUpdate */
   if(cr.slowT>0)cr.slowT-=dt;else cr.slowF=1;
   if(cr.stunT>0)cr.stunT-=dt;
   if(cr.hitT>0)cr.hitT-=dt;if(cr.critT>0)cr.critT-=dt;
-  if((cr.kind==='boss'||cr.kind==='prime')&&!cr.enr&&cr.hp<cr.maxhp/2){cr.enr=true;cr.sp*=1.25;TWR.say=cr.kind==='prime'?'BZZT! BOTTIE OVERCLOCKS!':'OVERCLOCKED! FASTER NOW!';TWR.sayT=1.8;TWR.shake=Math.max(TWR.shake,2);snd(82,.35,55,'sawtooth',.06)}
+  if((cr.kind==='boss'||cr.kind==='prime')&&!cr.enr&&cr.hp<cr.maxhp/2){cr.enr=true;cr.sp*=1.25;TWR.say=cr.kind==='prime'?'BZZT! NUMBA ONE CLANKA IS MAD!':'OVERCLOCKED! FASTER NOW!';TWR.sayT=1.8;TWR.shake=Math.max(TWR.shake,2);snd(82,.35,55,'sawtooth',.06)}
   if(cr.kind==='digger'){const L2=twPathLen(cr.pi);
    if(!cr.surfaced){let surf=TWR.flareT>0||cr.d>=L2*.4;
     if(!surf)for(const t of TWR.towers){if(t.hero<0&&t.type===2){const dd=twDef(t),dx=cr.x-t.x,dy=cr.y-t.y;
@@ -1380,8 +1380,9 @@ function twDraw(){ox=0;oy=0;
   drawDog({x:150,y:H-12,fx:-1,mv:0,st:'sit',alert:0,say:null});
   const twpp=twPathPos(6+((Math.sin(time*.4)+1)/2)*64,0);g.globalAlpha=.85;g.drawImage(TWCREEP.std,Math.round(twpp.x)-8,Math.round(twpp.y)-6,16,11);g.globalAlpha=1;
   const thp=twHeartPos();g.globalAlpha=.10+.05*Math.sin(time*2.4);r('#f8c070',thp.x-13,thp.y-13,26,26);g.globalAlpha=1;
-  ctext('THORNWATCH',34,4,'#a8e078');ctext("BOTTIE'S DRONES WANT THE GARDEN.",56,1,'#e8e4f8',null);
+  ctext('THORNWATCH',34,4,'#a8e078');ctext("LIL BOTTIE WANTS THE LIGHT. HE'S MAD.",56,1,'#e8e4f8',null);
   ctext('THREE GARDENS. 26 NIGHTS. ONE HEART.',68,1,'#fff8e0',null);
+  {const bw=26,bh=twBottieH(bw),bx=20,by=twBoardTop()+8-bh+Math.round(Math.sin(time*2.2)*1.5);g.drawImage(twOL(twBottieSpr(),bw,bh),bx-1,by-1);twMad(bx+bw-3,by-6)} /* v4: the numba one clanka, mad, on the wall */
   if(state==='g5title'){if(((time*1.6)|0)%2)ctext('PRESS START',96,2,'#fff8e0');
    ctext('STARS '+twStarPoints()+' · SUN DROPS '+TW.drops+' \u00b7 GARDENS SAVED '+TW.wins,132,1,'#c8b8f8',null)}
   else twDrawMainMenu();
@@ -1397,7 +1398,7 @@ function twDraw(){ox=0;oy=0;
    ctext(TWR.map===1?'GARDEN CLEAR! THE LONG BEDS OPEN!':'LONG BEDS CLEAR! CROSSROADS OPEN!',H/2-6,1,'#fff8e0',null)}
   ctext('KILLS '+TWR.kills+' · PETALS EARNED '+TWR.earned+' · LEAKS '+TWR.leaks,H/2+8,1,'#e8e4f8',null);
   if(((time*2)|0)%2)ctext('PRESS A',H/2+30,2,'#fff8e0');return}
- if(state==='g5over'){r('#1e2c28',0,0,W,H);g.drawImage(twBoardCv(true),0,twBoardTop());r('rgba(40,8,16,.45)',0,0,W,H);ctext('THE SWARM TOOK THE HEART',H/2-30,2,'#ff6a5e');
+ if(state==='g5over'){r('#1e2c28',0,0,W,H);g.drawImage(twBoardCv(true),0,twBoardTop());r('rgba(40,8,16,.45)',0,0,W,H);ctext('THE SWARM TOOK THE HEART',H/2-30,2,'#ff6a5e');{const bw=28,bh=twBottieH(bw);g.drawImage(twOL(twBottieSpr(),bw,bh),W/2-bw/2-1,H/2-36-bh);ctext('BOTTIE: BZZT! NUMBA ONE CLANKA!',H/2+44,1,'#7fd4f8',null)}
   ctext(TWR.mode==='e'?('THE LONG NIGHT: SURVIVED '+TWR.survived+' \u00b7 BEST '+TW.endlessBest):(TWR.night<=1?'THE HEART FELL ON NIGHT 1':'YOU HELD '+(TWR.night-1)+' NIGHT'+(TWR.night-1>1?'S':'')+' \u00b7 FELL ON NIGHT '+TWR.night),H/2-6,1,'#fff8e0',null);
   ctext('KILLS '+TWR.kills+' · PETALS EARNED '+TWR.earned+(TWR.mode==='e'&&TWR.endGain?' · +'+TWR.endGain+' SUN DROPS':''),H/2+8,1,'#e8e4f8',null);
   {const lk=TWR.leakK||{};let top=null,tn=0;for(const k in lk)if(lk[k]>tn){tn=lk[k];top=k}

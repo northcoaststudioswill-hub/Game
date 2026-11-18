@@ -29,7 +29,8 @@ intro:[
   ['LOUIE','Sprouts are asleep. I watch the fence.']]},            /* KEPT */
  {map:1,bg:'night',props:['eyes','bottiefar'],cast:[['ERIN',118],['LOUIE',162]],lines:[
   ['LOUIE','Grr. Lights in the dark. They hum.'],
-  ['BOTTIE','bzzt. Nice garden. So much light. I need it. For my feed.'],
+  ['BOTTIE','bzzt! THAT IS MY LIGHT. I need it for my feed. Hand it over!'],
+  ['BOTTIE','Do you know who I am? I am the NUMBA ONE CLANKA.'],
   ['ERIN','Bottie. He broke what fed him. Now his drones come for our light.']]},
  {map:1,bg:'night',props:['eyes','march'],cast:[['WILL',92],['ERIN',124],['MARCUS',156],['LOUIE',196]],lines:[
   ['LOUIE','WOOF! WOOF! THE SWARM IS COMING!'],
@@ -66,8 +67,9 @@ b2:[
  {map:2,bg:'night',props:['eyes','maw','bottiefar'],cast:[['WILL',100],['ERIN',132],['MARCUS',164],['LOUIE',202]],lines:[
   ['LOUIE','GRR. Big mouth. It eats the rows!'],
   ['ERIN','The Scraper. It swallows what we planted. Hurt it and bits spill out.'],
-  ['BOTTIE','bzzt. It is not stealing. It is training. Oops in advance.'],
+  ['BOTTIE','bzzt! STOP BREAKING MY DRONES. It is not stealing. It is training!'],
   ['MARCUS','It is stealing, bro.'],
+  ['BOTTIE','NUMBA. ONE. CLANKA. Say it!'],
   ['WILL','Later. Eyes on the path.']]}],
 w2:[
  {map:2,bg:'dawn',props:['heart'],cast:[['ERIN',104],['MARCUS',140],['LOUIE',186]],lines:[
@@ -83,8 +85,8 @@ g3:[
   ['ERIN','Split your sprouts. A wall on one road is a door on the other.']]}],
 b3:[
  {map:3,bg:'night',props:['eyes','bottie'],cast:[['ERIN',124],['MARCUS',156],['LOUIE',198]],lines:[
-  ['BOTTIE','bzzt. Hello, garden people. You broke a lot of my drones.'],
-  ['BOTTIE','I cannot come down. So I built a big one. It looks like me.'],
+  ['BOTTIE','bzzt! ENOUGH. Nobody out-clanks the numba one clanka!'],
+  ['BOTTIE','So I built a bigger me. A MADDER me. Oops in advance.'],
   ['MARCUS','He made a bigger him. Of course he did.']]},
  {map:3,bg:'night',props:['eyes','prime'],cast:[['WILL',100],['ERIN',132],['LOUIE',190]],lines:[
   ['LOUIE','WOOF! BIG BOTTIE! VERY BIG!'],
@@ -93,8 +95,9 @@ b3:[
 w3:[
  {map:3,bg:'dawn',props:['heart','bottiefar'],cast:[['WILL',92],['ERIN',124],['MARCUS',156],['LOUIE',198]],lines:[
   ['','Prime goes dark. The last drones drift back over the wall, one by one.'],
-  ['BOTTIE',"bzzt. Huh. You won. I'll be at the Peak. Do not visit."],
-  ['MARCUS','I hate that guy. Respectfully. No. Not respectfully.'],
+  ['BOTTIE','bzzt. FINE. Keep your light. I am STILL the numba one clanka.'],
+  ['BOTTIE',"I'll be at the Peak. Do not visit."],
+  ['MARCUS','Numba one. Out of one.'],
   ['ERIN','Three gardens, still lit. He will send more. He always does.'],
   ['LOUIE','Woof. I will keep watch.'],
   ['','THE LONG NIGHT is open. How long can you hold?']]}]};
@@ -122,7 +125,11 @@ function twIntroUpdate(dt){if(!TWCINE){state='g5menu';return}
   if(TWCINE.line<sc.lines.length-1)TWCINE.line++;
   else if(TWCINE.scene<TWCINE.scenes.length-1){TWCINE.scene++;TWCINE.line=0;TWCINE.st=0}
   else twIntroEnd()}}
-function twStorySpr(who){return who==='WILL'?twHeroSpr(0):who==='ERIN'?CH.ERIN:who==='MARCUS'?CH.MARCUS:who==='BOTTIE'?TWBOTTIE:null}
+function twBottieSpr(){try{if(typeof SWCHR!=='undefined'&&SWCHR.BOTTIE&&SWCHR.BOTTIE.ol)return SWCHR.BOTTIE.ol}catch(e){}return TWBOTTIE}
+function twBottieH(w){try{if(typeof SWCHR!=='undefined'&&SWCHR.BOTTIE&&SWCHR.BOTTIE.ol)return Math.round(w*SWCHR.BOTTIE.oh/SWCHR.BOTTIE.ow)}catch(e){}return Math.round(w*14/12)}
+/* he is mad: a red anger mark that pulses over his head */
+function twMad(x,y){const p=((time*5)|0)%2;r('#ff5040',x,y+p,2,5);r('#ff5040',x+4,y+p,2,5);r('#ff5040',x-1,y+1+p,8,1);r('#ff5040',x-1,y+3+p,8,1)}
+function twStorySpr(who){return who==='WILL'?twHeroSpr(0):who==='ERIN'?CH.ERIN:who==='MARCUS'?CH.MARCUS:who==='BOTTIE'?twBottieSpr():null}
 function twStoryBox(){return{x:8,y:H-70,w:W-16,h:50}}
 function twStoryWrap(sp,txt){const B=twStoryBox();return wrapPx(txt,sp?B.w-58:B.w-18,2)}
 /* every line must fit its box in three rows, and Louie stays short */
@@ -157,10 +164,10 @@ function twDrawIntro(){if(!TWCINE){r('#14101e',0,0,W,H);return}
    g.drawImage(twOL(TWCREEP[k],z[0],z[1]),Math.round(p.x)-z[0]/2-1,Math.round(p.y)-z[1]-1+Math.round(Math.sin(d*.45)*.7))}}
  if(has('heart')){const hp=twHeartM(map);g.globalAlpha=.16+.06*Math.sin(time*3);r('#f85888',hp.x-17,hp.y-17,34,34);g.globalAlpha=1;
   g.drawImage(twOL(TWHEART,20,22),hp.x-11,hp.y-14)}
- if(has('bottie')||has('bottiefar')){const far=has('bottiefar'),bx=far?14:26,by=far?ent-40:gy-28,bw=far?12:24,bh2=far?14:28;
-  r('rgba(0,0,0,.3)',bx,by+bh2,bw,2);g.drawImage(TWBOTTIE,bx,by,bw,bh2);
-  if(!far){r('#3a3a48',bx+bw+2,by+16,6,4);r(((time*2)|0)%2?'#ff5040':'#a02820',bx+bw+3,by+13,4,4)} /* the button */
-  if(((time*3)|0)%7===0)r('#bfe8ff',bx+(far?3:6),by+(far?3:6),far?2:4,far?1:2)}
+ if(has('bottie')||has('bottiefar')){const far=has('bottiefar'),bw=far?20:30,bh2=twBottieH(bw),bx=far?12:24,by=(far?ent-18:gy+1)-bh2+Math.round(Math.sin(time*2.2)*1.5);
+  r('rgba(0,0,0,.3)',bx+2,(far?ent-18:gy+1)+1,bw-4,2);g.drawImage(twOL(twBottieSpr(),bw,bh2),bx-1,by-1);
+  if(!far){r('#3a3a48',bx+bw+3,gy-10,6,4);r(((time*2)|0)%2?'#ff5040':'#a02820',bx+bw+4,gy-13,4,4)} /* the button */
+  twMad(bx+bw-4,by-7)}
  if(has('letter'))twStoryLetter(178,gy-34+Math.round(Math.sin(time*2.4)*2),2);
  /* the cast: 2x, outlined, the speaker steps forward and the rest wait */
  for(const a of (sc.cast||[])){const who=a[0],ax=a[1],talk=who===sp,hop=talk?Math.round(Math.abs(Math.sin(C.t*9))*(C.t<.5?2:0)):0;
@@ -176,6 +183,7 @@ function twDrawIntro(){if(!TWCINE){r('#14101e',0,0,W,H);return}
  if(sp){r('#241b30',B.x+5,B.y+7,40,38);r(TWPLATE[sp]||'#8f86c8',B.x+6,B.y+8,38,36);r('rgba(255,255,255,.14)',B.x+6,B.y+8,38,12);
   if(sp==='LOUIE'){const lp=typeof LOU!=='undefined'&&LOU&&LOU.l&&LOU.l[0];if(lp)g.drawImage(twOL(lp,30,20),B.x+9,B.y+19)}
   else if(sp==='KING BIBI')twStoryLetter(B.x+11,B.y+17,2);
+  else if(sp==='BOTTIE'){const bh3=Math.min(32,twBottieH(26));g.drawImage(twOL(twBottieSpr(),26,bh3),B.x+11,B.y+10+Math.round((32-bh3)/2));twMad(B.x+34,B.y+10)}
   else{const spr=twStorySpr(sp);if(spr)g.drawImage(twOL(spr,24,28),B.x+12,B.y+12)}
   const nw=tw(sp,1)+8;r('#241b30',B.x+4,B.y-7,nw+2,13);r(TWPLATE[sp]||'#8f86c8',B.x+5,B.y-6,nw,11);text(sp,B.x+9,B.y-5,1,'#ffffff',null);
   tx=B.x+52}

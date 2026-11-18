@@ -30,11 +30,13 @@ All of this is from Sproutwild's own story (`alt/src/sproutwild/sw-lore.js`, `sw
 **The three gardens.**
 1. Erin's Garden, Sunkeep. The first Heart. Boss: THE HARVESTER, a machine built to mow a garden rather than sip from it.
 2. The Long Beds, the rows that feed Sunkeep. Boss: THE SCRAPER, which swallows what is planted.
-3. The Crossroads, old stone from before the Lantern, where two roads meet one Heart. Boss: BOTTIE PRIME, a drone he built to look like himself, because he cannot come in person.
+3. The Crossroads, old stone from before the Lantern, where two roads meet one Heart. Boss: BOTTIE PRIME, a bigger, madder copy of himself. In the game it is his own model, shown big.
 
 **How it ends.** Prime goes dark and the drones drift home. Bottie goes quiet at the Peak, which is where Sproutwild's keeper finds him. So Thornwatch sits beside Sproutwild, during the same dark: the keeper is out winning Sigils while the people at home keep the light they still have. Neither game needs the other.
 
 **The Long Night** (endless mode) is the nights that follow: he keeps sending them.
+
+**Who Bottie is here (Will, Nov 18).** He looks like his normal self, he is mad, and he is the NUMBA ONE CLANKA. He says so in every scene he is in. The gardens keep breaking his drones and it makes him angrier each time.
 
 ## Left alone on purpose
 

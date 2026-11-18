@@ -161,3 +161,11 @@ function twPaintNight(map,bt,bh,day){
  for(const pth of TWMAPS[map-1].paths.map((_,i)=>twPathPts(map,i))){const ey=Math.round(pth.pts[0].y-bt);
   nx.fillStyle='#57b8ff';nx.fillRect(3,ey-3,1,1);nx.fillRect(6,ey-3,1,1);nx.fillRect(2,ey+4,1,1);nx.fillRect(5,ey+4,1,1)}
  return nc}
+
+/* BOTTIE PRIME is lil Bottie's own model (Will, Nov 18: "lil bottie needs to look like his normal
+   self"): Sproutwild's sprite, shown big. The hit, slow and rage tints are made from it. */
+(function(){try{if(typeof SWCHR==='undefined'||!SWCHR.BOTTIE||!SWCHR.BOTTIE.ol)return;
+ const src=SWCHR.BOTTIE.ol,w=30,h=Math.round(30*SWCHR.BOTTIE.oh/SWCHR.BOTTIE.ow);
+ const tint=col=>{const c=document.createElement('canvas');c.width=src.width;c.height=src.height;const x=c.getContext('2d');
+  x.drawImage(src,0,0);x.globalCompositeOperation='source-in';x.fillStyle=col;x.fillRect(0,0,c.width,c.height);return c};
+ TWCREEP.prime=src;TWCREEPF.prime=tint('#f4f1ff');TWCREEPB.prime=tint('#a8dcf8');TWCREEPR.prime=tint('#ff6a5e');TWCSZ.prime=[w,h]}catch(e){}})();
