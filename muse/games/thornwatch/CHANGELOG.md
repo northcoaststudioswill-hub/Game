@@ -1,4 +1,44 @@
-# THORNWATCH — Changelog
+# CLANKAWATCH (was Thornwatch) — Changelog
+
+## v4.0 alpha 2 — Nov 18, 2026 — Played it, then fixed what playing found
+
+Will: "You need to play this game ... then we need to rework and
+make it better and fix it and make it playable." Played from a
+fresh save with real key presses; full record and the balance
+sim are in `PLAYTEST-v4.0.md`. Headless only; not phone-verified.
+
+- **Every button does one thing now.** B used to sell a sprout
+  if the cursor was on one and change speed if it was not, so
+  speeding up kept selling towers. B never sells: it is speed
+  at night and "back" in a panel. Selling is SELECT inside a
+  sprout's or keeper's panel, with the refund shown.
+- **Plant from where you stand.** A on open ground opens a PLANT
+  panel: six sprouts and six keepers with name, price and what
+  each does. The strip of sixteen tiny cards under the board,
+  and the 12-press walk to reach it, are gone.
+- **START no longer skips your build.** On the "NIGHT CLEAR"
+  card it used to start the next night at once.
+- **One clear bar at the bottom:** what the cursor is on, what A
+  does here, what START or B does now.
+- **The tutorial works on a phone-size screen.** Its second gold
+  marker sat on the path, where you cannot plant. Markers are
+  now worked out from the path. The first two sprouts are
+  EMBERs (a lone DEW popped nothing on night 1), and START
+  waits for both.
+- **Faster.** 1X runs 40% quicker. Night 1 went from about 45
+  seconds to about 20. Nothing else about the numbers moved.
+- **Loose petals.** The Heart throws off 2 to 5 petals a night.
+  Walk the cursor onto one to pick it up. They are half the
+  dawn bonus paid early, plus a quarter extra for catching
+  them, so a night pays at most 2 to 6 petals more than before.
+- **BALANCE CHANGE: each sprout already planted makes the next
+  one 10% dearer.** At v3.7's flat prices a player who spammed
+  81 level-1 sprouts won Erin's Garden with no leaks, and a
+  player who grew their sprouts did worse. At 10%, growing wins
+  every sim run and spam is a coin flip. Keeper, grow and power
+  prices are unchanged. Gardens 2 and 3 and the other modes
+  were not simmed at the new price.
+- HOW TO PLAY's controls page matches the new buttons.
 
 ## v4.0 alpha 1 — Nov 18, 2026 — The look, the story, and Bottie's swarm
 
