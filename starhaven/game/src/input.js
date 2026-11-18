@@ -161,7 +161,7 @@
   // Button names shown in signs, per input type.
   input.LABELS = {
     kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', SHOOT: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J', GIFT: 'F (or Q)', UPSTRIKE: 'hold W and press J', GUARD: 'hold S', CHOOSE: 'W (or J)' },
-    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'tap the \u25BC button', GIFT: 'the FLAME button', UPSTRIKE: 'the \u25B2 button', GUARD: 'hold the \u25BC button', CHOOSE: 'the gold CHOOSE button (or STRIKE)' },
+    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'the \u25BC button', GIFT: 'the FLAME button', UPSTRIKE: 'the \u25B2 button', GUARD: 'hold the \u25BC button', CHOOSE: 'the gold CHOOSE button (or STRIKE)' },
     pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', SHOOT: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X', GIFT: 'LB (left bumper)', UPSTRIKE: 'hold up and press X', GUARD: 'hold down', CHOOSE: 'Y (or X)' },
   };
   input.fill = function (text) {

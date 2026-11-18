@@ -4,8 +4,8 @@
   const X = {};
   X.AT = [0, 30, 80, 150, 240, 350];                 // total XP needed for level 1, 2, 3...
   X.PERKS = [null, null,
-    { name: 'Quick hands', text: 'The bow draws faster, and the Flame recovers faster.' },
-    { name: 'Light feet', text: 'The dash is ready again sooner.' },
+    { name: 'Quick hands', text: 'Everything in Wren\'s hands is ready again sooner: the bow now, and whatever comes after it.' },
+    { name: 'Light feet', text: 'Wren recovers her footing faster. When she learns to dash, it will be ready again sooner.' },
     { name: 'Hard to kill', text: 'One more heart.' },
     { name: 'Bonded', text: 'Every level starts with the bond bar a third full.' },
     { name: 'Hunter\'s patience', text: 'Starlight drifts to you from further away.' },

@@ -204,7 +204,7 @@
       { x0: 14, x1: 32, text: 'Dash strike: {DASH} toward the dummy, then {ATTACK} while you are still moving.', flag: 'rise', until: 'lunge' },
       { x0: 14, x1: 32, text: 'Guard: stand beside the dummy, face it, and {GUARD} when it says "swinging".', flag: 'lunge', until: 'guard' },
       { x0: 26, x1: 36, text: 'Bram\'s rings are for your daggers (Wren has no bow here). Cut all three: the low one from the ground, the middle one with a rising strike ({UPSTRIKE}), the high one from a jump.', until: 'rings3' },
-      { x0: 36, x1: 60, text: 'Jump onto a bud and it bounces you (strike down with {DOWNSTRIKE} for a higher bounce). Land on the planks between them and take them one at a time.', flag: 'combo', until: 'pit' },
+      { x0: 36, x1: 60, text: 'Jump onto a bud and it bounces you (for a higher bounce, strike down as you land: {DOWNSTRIKE}). Land on the planks between them and take them one at a time.', flag: 'combo', until: 'pit' },
       { x0: 61, x1: 69, text: 'Remember the four: combo, rising strike ({UPSTRIKE}), dash strike ({DASH} then {ATTACK}), and guard ({GUARD}).', flag: 'pit' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
     ],

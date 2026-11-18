@@ -123,9 +123,9 @@
       onGuard(parry) { if (G.activeGoal === 'guard') G.queueScript('ring_guard'); },
     };
     G.world = w;
-    G.explainWait = Math.max(G.explainWait || 0, 60 * 12);   // let a new place be looked at first
+    G.explainWait = Math.max(G.explainWait || 0, 60 * 6);   // let a new place be looked at first
     SH.arts.reset(); w.lowT = 0;
-    document.body.dataset.court = { woods: 'mortal', deep: 'thorn' }[def.id] || 'dusk';   // whose realm this is: it colours the menus
+    document.body.dataset.court = { woods: 'mortal', deep: 'thorn' }[def.id] || 'dusk';   // whose realm this is: it colors the menus
     if (SH.xp.level() >= 5 && SH.arts.active()) SH.arts.meter = Math.max(SH.arts.meter, 34);
     SH.draw.init(room, w.viewW);   // drawn with gates open, so gates draw on top as objects
     for (const g of gates) room.setGate(g, !g.open);
@@ -269,7 +269,7 @@
         const sc0 = sc;
         SH.modes.start(st.name, st, r => {
           if (st.name === 'flight' && st.variant === 'wall') { if (r && r.stars) { SH.xp.gain(Math.min(20, r.stars)); G.hud.toast('Wisps gathered on the ride: ' + r.stars + '.'); } }
-          else if (st.name === 'flight' && r) { G.bond('caelum', r.stars >= 14 ? 10 : 5, r.stars >= 14); G.hud.toast('Starlight gathered on the wing: ' + r.stars + (r.stars >= 14 ? '. Caelum noticed.' : '.')); }
+          else if (st.name === 'flight' && r) { G.bond('caelum', r.stars >= 40 ? 10 : 5, r.stars >= 40, r.stars >= 40 ? 'She leaned into the flight instead of away from it.' : 'She held on. That was enough for a first flight.'); G.hud.toast('Starlight gathered on the wing: ' + r.stars + (r.stars >= 40 ? '. Caelum noticed.' : '.')); }
           const nx = sc0.steps[sc0.i];
           if (typeof r === 'number' && nx && nx.choose) { sc0.i++; G.choosing = nx.choose; return G.pick(Math.min(r, nx.choose.length - 1)); }
           G.advance();
@@ -347,7 +347,7 @@
   G.explain = function (key) {
     const seen = G.progress.seen = G.progress.seen || {};
     if (G.noExplain || seen[key] || !ST.EXPLAIN[key] || G.explaining) return;
-    if (G.state !== 'play' || (G.explainWait || 0) > 0) { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for a quiet moment
+    if (G.state !== 'play' || (G.explainWait || 0) > 0 || (G.world && ((G.world.wyrm && G.world.wyrm.on) || (G.boss && !G.boss.dead)))) { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for a quiet moment
     seen[key] = 1; G.explaining = key; G.state = 'explain'; input.clear(true);
     const e = ST.EXPLAIN[key];
     document.getElementById('ex-icon').textContent = e.icon; document.getElementById('ex-title').textContent = e.title; document.getElementById('ex-text').textContent = e.text;
@@ -356,7 +356,7 @@
   G.explainClose = function () {
     if (!G.explaining) return;
     G.explaining = null; document.getElementById('explain').classList.remove('show'); G.state = 'play'; input.clear(true); G.save();
-    G.explainWait = 60 * 40;   // at least forty seconds of play before the next one
+    G.explainWait = 60 * 22;   // a good stretch of play before the next one
   };
   // What a decision did. Effects gather for a moment, then show together as one card.
   G.effects = []; G.effectT = 0;
@@ -406,7 +406,7 @@
     }
     else if (pts < 0) SH.sfx.play('back');
     // every change is shown: who, how much, and why
-    G.effect({ who, pts, why: why || (pts < 0 ? 'That stung.' : liked ? 'That meant a lot.' : 'Noted.'), heart: after > before ? after : 0 });
+    G.effect({ who, pts, why: why || (pts < 0 ? 'That stung.' : liked ? 'That meant a lot.' : 'She said what she thought, and it was heard.'), heart: after > before ? after : 0 });
     G.save();
   };
 
@@ -433,8 +433,11 @@
     if (w.victoryT) G.victoryStep();
     if (w.time % 90 === 45 && G.state === 'play' && !G.noExplain) G.loreCheck();
     if (G.state === 'play' && (G.explainWait || 0) > 0) G.explainWait--;
-    if (G.state === 'talk') G.explainWait = Math.max(G.explainWait || 0, 60 * 6);   // and never the moment a conversation ends
-    if (G.explainQ && G.explainQ.length && G.state === 'play' && !(G.explainWait > 0) && !G.mode && !SH.arts.cutin && !G.pending) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
+    if (G.state === 'talk') G.explainWait = Math.max(G.explainWait || 0, 60 * 3);   // and never the moment a conversation ends
+    // a card only ever opens in a calm moment: feet on the ground, nothing chasing her, no boss, no enemy close
+    const calm = () => { const w2 = G.world, p2 = w2.player; return p2.grounded && !(w2.wyrm && w2.wyrm.on) && !(G.boss && !G.boss.dead) && !w2.victoryT && !w2.koT
+      && !w2.things.some(e => (e.kind === 'thornSprite' || e.kind === 'wyrm' || e.kind === 'wolf') && !e.dead && !e.gone && Math.abs(e.x - p2.x) < 260 && Math.abs(e.y - p2.y) < 120); };
+    if (G.explainQ && G.explainQ.length && G.state === 'play' && !(G.explainWait > 0) && !G.mode && !SH.arts.cutin && !G.pending && calm()) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
     if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -598,7 +601,7 @@
     const motesLeft = w.motes.filter(m => !m.got && (G.activeGoal === 'report' || m.x < p.x)).length;   // Starlight still behind her
     const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0) && (h.above == null || p.y <= h.above * TS) && (h.below == null || p.y > h.below * TS));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
-    const bossTell = G.boss && !G.boss.dead ? ({ windup: 'It is about to CHARGE. Jump over it, or {DASH} straight through: nothing can touch you mid-dash.', charge: 'CHARGING. Jump it or {DASH} through it. If it hits the cliff it dazes itself.', crouch: 'It is going to LEAP to the shadow on the ground. Get away from the shadow.', leap: 'Move away from the shadow, then jump the shockwave.', slamrest: 'It is winded. Strike!', inhale: 'It is breathing in. Throw the Flame ({GIFT}) down its throat NOW.', breath: 'Frost along the ground. Jump onto a ledge or get behind it.', stun: 'DAZED. Strike it now: every cut does more.', roar: 'It is getting faster. The bond bar is full: use your Bond Art.' })[G.boss.state] : null;
+    const bossTell = G.boss && !G.boss.dead ? ({ windup: 'It is about to CHARGE. Jump over it, or dash straight through it ({DASH}): nothing can touch you mid-dash.', charge: 'CHARGING. Jump it, or dash through it ({DASH}). If it hits the cliff it dazes itself.', crouch: 'It is going to LEAP to the shadow on the ground. Get away from the shadow.', leap: 'Move away from the shadow, then jump the shockwave.', slamrest: 'It is winded. Strike!', inhale: 'It is breathing in. Throw the Flame ({GIFT}) down its throat NOW.', breath: 'Frost along the ground. Jump onto a ledge or get behind it.', stun: 'DAZED. Strike it now: every cut does more.', roar: 'It is getting faster. The bond bar is full: use your Bond Art.' })[G.boss.state] : null;
     { const text = bossTell ? input.fill(bossTell) : hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null;
       if (bossTell) { w.hintNow = text; w.hintHold = 0; G.hud.prompt(text); }
       else if (text !== w.hintNow && (w.hintHold || 0) > 0 && w.hintNow) w.hintHold--;          // the hint on screen gets its time

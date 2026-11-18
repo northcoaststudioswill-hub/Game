@@ -31,9 +31,13 @@ link Will has. Hold your phone either way up.
 Between chapters there are **evenings**: choose who to spend the night with (Caelum, Bram, Iris or Thane) for scenes,
 gifts and bond hearts.
 
-## Playtest build: v0.1.10 (Nov 18, 2026)
+## Playtest build: v0.1.11 (Nov 18, 2026)
 
-The newest build: [`releases/v0.1.10/`](releases/v0.1.10/RELEASE-NOTES.md), with `starhaven-v0.1.10-share.zip` to send.
+The newest build: [`releases/v0.1.11/`](releases/v0.1.11/RELEASE-NOTES.md), with `starhaven-v0.1.11-share.zip` to send.
+The result of one continuous bot playthrough from New Game to the ending: story and lore contradictions fixed,
+explanation cards that only open in calm moments, a reason on every bond change, and pop-ups kept off panels.
+
+Before it, v0.1.10 ([notes](releases/v0.1.10/RELEASE-NOTES.md)):
 The menus are redrawn (a list of words over the painted scene on the title, a two-column pause menu, gold-cornered
 plates elsewhere), the opening film has music, and Wren's blades stay close when she runs.
 

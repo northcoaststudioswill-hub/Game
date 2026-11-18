@@ -568,6 +568,11 @@ body.upright .fbtn .lbl { font-size: 18px !important; } body.upright .fbtn { pad
 #menu #controls { grid-column: 1 / -1; grid-row: 11; font: 400 14px/1.4 'IM Fell English', Georgia, serif; }
 body.upright #menu .card { display: block; padding: 22px 26px 18px !important; } body.upright #menu .btn { display: block; width: 100% !important; padding: 9px 8px 9px 4px !important; } body.upright #menu #m-status { margin-bottom: 8px; }
 @media (max-height: 460px) { #menu .card { padding: 14px 30px 12px !important; } #menu .card > h2 { font-size: 22px !important; } #menu .btn { padding: 4px 8px 4px 4px !important; font-size: 13px !important; } #menu #m-resume { font-size: 15px !important; padding: 5px 8px 5px 4px !important; } #menu #m-status { font-size: 13.5px; } #menu #m-status > div { margin-bottom: 5px; } #menu .motto { font-size: 13px; margin-bottom: 4px; } }
+
+/* ---- found on a full playthrough: pop-ups never sit on a panel, a chapter card, or a flying scene */
+body:has(.screen.show) #toast, body[data-state="card"] #toast, body[data-state="explain"] #toast { display: none !important; }
+body[data-mode] #effects { display: none !important; }
+html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom: auto !important; }
 </style>
 </head>
 <body>
@@ -626,7 +631,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.10 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.11 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 

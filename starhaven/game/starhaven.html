@@ -568,6 +568,11 @@ body.upright .fbtn .lbl { font-size: 18px !important; } body.upright .fbtn { pad
 #menu #controls { grid-column: 1 / -1; grid-row: 11; font: 400 14px/1.4 'IM Fell English', Georgia, serif; }
 body.upright #menu .card { display: block; padding: 22px 26px 18px !important; } body.upright #menu .btn { display: block; width: 100% !important; padding: 9px 8px 9px 4px !important; } body.upright #menu #m-status { margin-bottom: 8px; }
 @media (max-height: 460px) { #menu .card { padding: 14px 30px 12px !important; } #menu .card > h2 { font-size: 22px !important; } #menu .btn { padding: 4px 8px 4px 4px !important; font-size: 13px !important; } #menu #m-resume { font-size: 15px !important; padding: 5px 8px 5px 4px !important; } #menu #m-status { font-size: 13.5px; } #menu #m-status > div { margin-bottom: 5px; } #menu .motto { font-size: 13px; margin-bottom: 4px; } }
+
+/* ---- found on a full playthrough: pop-ups never sit on a panel, a chapter card, or a flying scene */
+body:has(.screen.show) #toast, body[data-state="card"] #toast, body[data-state="explain"] #toast { display: none !important; }
+body[data-mode] #effects { display: none !important; }
+html body[data-mode]:not(.none):not(.nil) #toast { top: 56px !important; bottom: auto !important; }
 </style>
 </head>
 <body>
@@ -626,7 +631,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
   </div>
   <div id="f-help"><span>&#8597; choose</span><span>A / tap: select</span><span>B: back</span></div>
   <div id="wm" class="wm"></div>
-  <div id="f-ver">v0.1.10 &middot; Prologue to Chapter 3</div>
+  <div id="f-ver">v0.1.11 &middot; Prologue to Chapter 3</div>
 </div>
 <div id="saving">&#10022; Saved</div>
 
@@ -1148,9 +1153,9 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ['caelum', 'Caelum. High Lord of the Court of Dusk, and the queen\'s favorite prisoner. I can close that wound, if you let me.'],
       ['caelum', 'But nothing is free Under the Mountain. One week of every month, for the rest of your life, at my home. Say yes, huntress.'],
       { choose: [
-        { text: '"Why would you help me?"', bond: { caelum: 5 }, then: [['caelum', 'Because you\'re the first person in fifty years to make the queen nervous. I\'d like you alive.']] },
-        { text: '"What do you really want?"', bond: { caelum: 10 }, then: [['caelum', 'Someone on my side when this is over. Someone who doesn\'t kneel.']] },
-        { text: '"I don\'t make deals with fae."', bond: { caelum: 5 }, then: [['caelum', 'Then you\'ll die of a fever before the first trial. Your choice.']] },
+        { text: '"Why would you help me?"', bond: { caelum: 5 }, why: 'A fair question. He respects those.', then: [['caelum', 'Because you\'re the first person in fifty years to make the queen nervous. I\'d like you alive.']] },
+        { text: '"What do you really want?"', bond: { caelum: 10 }, why: 'Straight to it. He liked that more than he showed.', then: [['caelum', 'Someone on my side when this is over. Someone who doesn\'t kneel.']] },
+        { text: '"I don\'t make deals with fae."', bond: { caelum: 5 }, why: 'Half dead and still stubborn. He was impressed anyway.', then: [['caelum', 'Then you\'ll die of a fever before the first trial. Your choice.']] },
       ] },
       ['wren', '...Yes.'],
       { do: 'meet', who: 'caelum' },
@@ -1217,8 +1222,8 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
     deep_caelum: [
       { do: 'flag', name: 'd_caelum' },
       ['caelum', 'Don\'t look straight at me. She watches who I look at.'],
-      ['wren', 'You wear her colours. You stand at her shoulder.'],
-      ['caelum', 'I am her favourite. It is the worst thing I have ever been, and the most useful.'],
+      ['wren', 'You wear her colors. You stand at her shoulder.'],
+      ['caelum', 'I am her favorite. It is the worst thing I have ever been, and the most useful.'],
       { choose: [
         { text: '"Then why help me?"', bond: { caelum: 10 }, why: 'Nobody has asked him why in fifty years.', then: [
           ['caelum', 'Because you walked in here on purpose. For someone else. I had forgotten people could do that.'],
@@ -1288,13 +1293,13 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ['caelum', 'They\'d be terribly rude about it. I\'m here for what I\'m owed: one week of every month, at my home. Our bargain from the Deep.'],
       { do: 'meet', who: 'caelum' },
       { choose: [
-        { text: '"Fine. Get me out of here."', bond: { caelum: 10 }, then: [
+        { text: '"Fine. Get me out of here."', bond: { caelum: 10 }, why: 'No hesitation. He had hoped, and not let himself expect it.', then: [
           ['caelum', 'Gladly. You\'ve been holding your breath for three months. Let\'s find you somewhere you can breathe.'],
         ] },
-        { text: '"I don\'t belong to you."', bond: { caelum: 5 }, then: [
+        { text: '"I don\'t belong to you."', bond: { caelum: 5 }, why: 'He agreed with her, which surprised them both.', then: [
           ['caelum', 'No. You don\'t belong to anyone. That\'s rather the point. One week. Then you decide.'],
         ] },
-        { text: '"Why now?"', bond: { caelum: 10 }, then: [
+        { text: '"Why now?"', bond: { caelum: 10 }, why: 'She asked the question he came ready to answer.', then: [
           ['caelum', 'Because the Iron King is moving, and I need people I trust. You are one of very few.'],
         ] },
       ] },
@@ -1371,13 +1376,13 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ['caelum', 'Then you get a very nice room and a very annoying neighbor.'],
       ['caelum', 'You painted my street awake in one night. Do you know how long it\'s been dark?'],
       { choose: [
-        { text: '"How long?"', bond: { caelum: 5 }, then: [
-          ['caelum', 'Two years. Since the war took my painters. I\'d stopped looking at it.'],
+        { text: '"How long?"', bond: { caelum: 5 }, why: 'She asked about his city before she asked about herself.', then: [
+          ['caelum', 'Fifty years. Since she took me, and my painters and lamplighters went to war without me. I came home three months ago and could not make myself look at it.'],
         ] },
-        { text: '"Is that why you really brought me here?"', bond: { caelum: 10 }, then: [
+        { text: '"Is that why you really brought me here?"', bond: { caelum: 10 }, why: 'She saw straight through him. He is not used to that.', then: [
           ['caelum', 'Partly. And partly because I remember a girl in the Deep who didn\'t break. I wanted to see her again.'],
         ] },
-        { text: '"Don\'t get sentimental, High Lord."', bond: { caelum: 5 }, then: [
+        { text: '"Don\'t get sentimental, High Lord."', bond: { caelum: 5 }, why: 'She teased him. Nobody teases him.', then: [
           ['caelum', 'Too late. I\'m unbearable when I\'m sentimental. Ask anyone.'],
         ] },
       ] },
@@ -1385,13 +1390,13 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ['caelum', 'A mating bond. The rarest thing there is between two people. Fate\'s doing, not mine.'],
       ['caelum', 'I felt it the first moment I saw you, Under the Mountain. You were mortal, so you couldn\'t. My blood didn\'t make the bond. It only let you feel what was already there.'],
       { choose: [
-        { text: '"You should have told me."', bond: { caelum: 5 }, then: [
+        { text: '"You should have told me."', bond: { caelum: 5 }, why: 'She was angry, and she stayed anyway.', then: [
           ['caelum', 'Yes. And you\'d have thought it was a trick to keep you. I wanted you to choose for yourself, with all of it in front of you.'],
         ] },
-        { text: '"Is that why you saved me?"', bond: { caelum: 5 }, then: [
+        { text: '"Is that why you saved me?"', bond: { caelum: 5 }, why: 'A hard question, asked to his face.', then: [
           ['caelum', 'I saved you because you were dying. The bond is why I could never have lived with not trying.'],
         ] },
-        { text: 'Say nothing. Take his hand.', bond: { caelum: 10 }, then: [
+        { text: 'Say nothing. Take his hand.', bond: { caelum: 10 }, why: 'No words. He will remember exactly how that felt.', then: [
           ['narr', 'The thread between them hums like a plucked string. Neither of them lets go for a long time.'],
         ] },
       ] },
@@ -1399,7 +1404,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ['wren', 'Rowan will come for me.'],
       ['caelum', 'He\'ll come for me. Let him. Tomorrow you meet the Five, my inner circle. Try not to stab any of them.'],
       ['wren', 'No promises.'],
-      { do: 'bond', who: 'caelum', pts: 10 },
+      { do: 'bond', who: 'caelum', pts: 10, why: 'A roof, a view, and the truth at last.' },
       { do: 'flag', name: 'rooftop' },
       { do: 'complete' },
     ],
@@ -1428,7 +1433,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ['caelum', 'The Five will test you tomorrow. Bram will try to break you. Iris will try to read you. Let them.'],
       ['wren', 'And you?'],
       ['caelum', 'I\'ll be watching from somewhere I can pretend I\'m not.'],
-      { do: 'bond', who: 'caelum', pts: 20 },
+      { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
     ],
 
     // ======================================================== Chapter 2: The Five
@@ -1438,10 +1443,10 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ['bram', 'Half of Spring wants your head for running off with our High Lord. Or him running off with you. The songs disagree.'],
       ['bram', 'Either way, there\'s an army on our southern border with your name on its banners. Caelum says you can fight. I\'d like to see it.'],
       { choose: [
-        { text: '"Point me at something."', bond: { bram: 10 }, then: [
+        { text: '"Point me at something."', bond: { bram: 10 }, why: 'A fighter\'s answer. Bram speaks that language.', then: [
           ['bram', 'Ha! I like you already. Don\'t tell Caelum.'],
         ] },
-        { text: '"Caelum talks about me?"', bond: { bram: 5 }, then: [
+        { text: '"Caelum talks about me?"', bond: { bram: 5 }, why: 'She made him laugh inside a minute.', then: [
           ['bram', 'Constantly. It\'s unbearable. Please hit something so he\'ll stop.'],
         ] },
       ] },
@@ -1481,7 +1486,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ['bram', 'Ha! Clean. Now some real work.'],
       ['bram', 'Thorn sprites, the Iron King\'s creatures, came over the north wall last night. Three of them. Clear them out.'],
       ['bram', 'They glow orange right before they lunge. Dash through the lunge, then cut them down.'],
-      { do: 'bond', who: 'bram', pts: 10 },
+      { do: 'bond', who: 'bram', pts: 10, why: 'Clean across his thorn pit.' },
       { do: 'flag', name: 'pit' },
       { do: 'goal', id: 'sprites' },
       { do: 'gate', id: 'northgate' },
@@ -1491,17 +1496,17 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       { do: 'meet', who: 'iris' },
       ['iris', 'Yours is very tangled and very shiny. Anyway, hi!'],
       { choose: [
-        { text: '"What does tangled mean?"', bond: { iris: 10 }, then: [
+        { text: '"What does tangled mean?"', bond: { iris: 10 }, why: 'She asked what Iris actually sees. Almost nobody does.', then: [
           ['iris', 'It means lots of people are tied to you. Some you know. Some you will. One you\'re pretending you don\'t.'],
         ] },
-        { text: '"Shiny is good, right?"', bond: { iris: 5 }, then: [
+        { text: '"Shiny is good, right?"', bond: { iris: 5 }, why: 'Iris likes people who can joke about fate.', then: [
           ['iris', 'Shiny is very good! Mostly. Shiny things get noticed.'],
         ] },
       ] },
       ['iris', 'Go stab things. Bram likes that.'],
     ],
     ring_done: [
-      ['caelum', 'Three thorn sprites and not a scratch. Bram owes me a drink.'],
+      ['caelum', 'Three thorn sprites, on your first day. Bram owes me a drink.'],
       ['bram', 'Bram owes nobody anything.'],
       ['caelum', 'The Iron King is testing our walls, Wren. Next time it won\'t be sprites.'],
       { do: 'winnow', npc: 'iris', near: 2 },
@@ -1514,13 +1519,13 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ['caelum', 'Then the Iron King knows who you are. Those sprites weren\'t testing our walls. They were looking for you.'],
       ['bram', 'Spring at our southern border, iron at our north. He wants us fighting Rowan while he walks in the back door.'],
       { choose: [
-        { text: '"If he touches them, I\'ll kill him."', bond: { bram: 10 }, then: [
+        { text: '"If he touches them, I\'ll kill him."', bond: { bram: 10 }, why: 'Bram trusts people who know what they would kill for.', then: [
           ['bram', 'Get in line, huntress. But I\'ll hold your coat.'],
         ] },
-        { text: '"How do we keep them safe?"', bond: { caelum: 10 }, then: [
+        { text: '"How do we keep them safe?"', bond: { caelum: 10 }, why: 'She said "we" without noticing. He noticed.', then: [
           ['caelum', 'Quietly, for now. I\'ll have eyes on their village by morning. You have my word.'],
         ] },
-        { text: '"Iris, what else did you see?"', bond: { iris: 10 }, then: [
+        { text: '"Iris, what else did you see?"', bond: { iris: 10 }, why: 'She trusted the vision, and the seer.', then: [
           ['iris', 'Fire. In your hands. Which is new. I\'d keep an eye on that.'],
         ] },
       ] },
@@ -1547,10 +1552,10 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ['caelum', 'Rowan sent a letter today. He says I stole you, and he will have you back, or have my court in ashes.'],
       ['caelum', 'And my spies say the Iron King asked about you by name. My people are already watching your sisters\' village.'],
       { choose: [
-        { text: '"Thank you."', bond: { caelum: 10 }, then: [
+        { text: '"Thank you."', bond: { caelum: 10 }, why: 'She let him help. That is new.', then: [
           ['caelum', 'Don\'t. It isn\'t a favor. It\'s what you do for your own.'],
         ] },
-        { text: '"I should go to them myself."', bond: { caelum: 5 }, then: [
+        { text: '"I should go to them myself."', bond: { caelum: 5 }, why: 'He would have said the same in her place.', then: [
           ['caelum', 'You will. When it\'s time, I\'ll fly you there myself. Not before you\'re ready.'],
         ] },
         { text: 'Give him a sketch of Starhaven', liked: 'caelum', bond: { caelum: 15 }, then: [
@@ -1560,7 +1565,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ] },
       ['caelum', 'One more thing. The bargain. You don\'t owe me anything anymore. You can leave whenever you like.'],
       ['wren', '...I know. I\'m staying anyway.'],
-      { do: 'bond', who: 'caelum', pts: 20 },
+      { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
     ],
     // Chapter 2, more to do
     ring_bram_talk: [
@@ -1595,38 +1600,38 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
         { text: 'Bring him spiced bread from the market', liked: 'bram', bond: { bram: 15 }, then: [
           ['bram', 'Is that from the Night Market? Sit down, huntress. You\'re officially my favorite. Don\'t tell Iris.'],
         ] },
-        { text: '"Spar with me again."', bond: { bram: 10 }, then: [
+        { text: '"Spar with me again."', bond: { bram: 10 }, why: 'Asking for more is the fastest way to Bram\'s good side.', then: [
           ['bram', 'Now you\'re talking.'],
           ['narr', 'You spar until neither of you can lift an arm, then lie in the sand laughing.'],
         ] },
-        { text: 'Ask about the north wall', bond: { bram: 5 }, then: [
+        { text: 'Ask about the north wall', bond: { bram: 5 }, why: 'She thinks like a soldier. He approves.', then: [
           ['bram', 'Lost my brother on that wall, years back, to the Iron King\'s father. I don\'t lose people on it anymore.'],
         ] },
       ] },
       ['bram', 'You fight like someone with people to protect.'],
       ['wren', 'Two sisters. Mortal. Across the sea.'],
       ['bram', 'Then we keep them safe. That\'s what the Five do.'],
-      { do: 'bond', who: 'bram', pts: 20 },
+      { do: 'bond', who: 'bram', pts: 20, why: 'An evening together.' },
     ],
     ev2_iris: [
       { do: 'art', id: 'observatory', title: 'Evening with Iris' },
       ['narr', 'A round tower above the Library, full of maps, candles and threads of starlight hanging in the air.'],
       ['iris', 'You came! Nobody visits the seer. They\'re afraid I\'ll tell them how they die.'],
-      { if: 'plums', then: [['wren', 'I found these in the thornwood. I think they were coming to you.'], ['iris', 'SUGARED PLUMS. I saw these arriving and I didn\'t dare believe it. You are my favourite thread.'], { do: 'bond', who: 'iris', pts: 15, liked: true, why: 'Sugared plums, carried out of a thornwood, for her.' }] },
+      { if: 'plums', then: [['wren', 'I found these in the thornwood. I think they were coming to you.'], ['iris', 'SUGARED PLUMS. I saw these arriving and I didn\'t dare believe it. You are my favorite thread.'], { do: 'bond', who: 'iris', pts: 15, liked: true, why: 'Sugared plums, carried out of a thornwood, for her.' }] },
       { choose: [
         { text: 'Bring her sugared plums', liked: 'iris', bond: { iris: 15 }, then: [
           ['iris', 'Plums! Sugared! Oh, you\'re a good thread, Wren. A very good thread.'],
         ] },
-        { text: 'Ask about your sisters\' threads', bond: { iris: 10 }, then: [
+        { text: 'Ask about your sisters\' threads', bond: { iris: 10 }, why: 'She asked Iris to look again, knowing what looking costs her.', then: [
           ['iris', 'Bright. Stubborn. One sharp, one soft. And iron getting closer. I\'m sorry. I can\'t see past it yet.'],
         ] },
-        { text: '"So how do I die?"', bond: { iris: 5 }, then: [
+        { text: '"So how do I die?"', bond: { iris: 5 }, why: 'Gallows humor. Iris collects it.', then: [
           ['iris', 'Ha! No. But not soon. You have far too much painting to do.'],
         ] },
       ] },
       ['iris', 'Can I tell you a secret? Caelum\'s thread tangled with yours the day you walked into the Deep. He pretends it didn\'t.'],
       ['wren', '...Does he.'],
-      { do: 'bond', who: 'iris', pts: 20 },
+      { do: 'bond', who: 'iris', pts: 20, why: 'An evening together.' },
     ],
 
     // ---------------- Heart scenes: play when a bond reaches a new heart
@@ -1668,9 +1673,9 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ['wren', 'Mine.'],
       ['caelum', 'Seven courts\' power, sleeping in one woman. Every High Lord alive will want it back. Or want her.'],
       { choose: [
-        { text: '"They can try."', bond: { caelum: 5, thane: 5 }, then: [['caelum', 'That\'s my girl. Our girl. Starhaven\'s. I\'ll stop talking.']] },
-        { text: '"Can it be taken out of me?"', bond: { thane: 10 }, then: [['thane', 'Honestly? I don\'t know. Nobody has ever done this. I\'d rather learn what it does than what it costs to remove.']] },
-        { text: '"Does Rowan know?"', bond: { caelum: 10 }, then: [['caelum', 'If he doesn\'t yet, he will soon. It won\'t make him want you back any less.']] },
+        { text: '"They can try."', bond: { caelum: 5, thane: 5 }, why: 'Neither of them doubted it for a second.', then: [['caelum', 'That\'s my girl. Our girl. Starhaven\'s. I\'ll stop talking.']] },
+        { text: '"Can it be taken out of me?"', bond: { thane: 10 }, why: 'The right question. Thane has waited for someone to ask it.', then: [['thane', 'Honestly? I don\'t know. Nobody has ever done this. I\'d rather learn what it does than what it costs to remove.']] },
+        { text: '"Does Rowan know?"', bond: { caelum: 10 }, why: 'She thought of the war before she thought of herself.', then: [['caelum', 'If he doesn\'t yet, he will soon. It won\'t make him want you back any less.']] },
       ] },
       ['thane', 'Flame is the one that woke. Let\'s see what it does. There are three braziers in the courtyard. Light them.'],
       { do: 'art', id: null },
@@ -1720,16 +1725,16 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       { if: 'rowanKnife', then: [['rowan', 'You reached for a knife the first night. I should have known then that you would not stay where you were put.']] },
       ['rowan', 'I\'ve brought an army to his border because of you. I will burn his city to the river if I have to. Come home, and none of that happens.'],
       { choose: [
-        { text: '"I\'m not going back, Rowan."', bond: { caelum: 10 }, then: [['rowan', 'You don\'t know what he is. What he wants with you.'], ['wren', 'I know exactly what he is. He let me choose. You never did.']] },
+        { text: '"I\'m not going back, Rowan."', bond: { caelum: 10 }, why: 'She chose, out loud, in front of both of them.', then: [['rowan', 'You don\'t know what he is. What he wants with you.'], ['wren', 'I know exactly what he is. He let me choose. You never did.']] },
         { text: '"Stop this war. Please."', then: [['rowan', 'He stole you from my bed in the middle of the night. There is no stopping this.'], ['wren', 'He didn\'t steal me. I left.']] },
-        { text: 'Show him the fire in your hand', bond: { caelum: 5 }, then: [['narr', 'The flame burns bright in Wren\'s palm. Rowan steps back for the first time.'], ['rowan', '...What did they do to you?'], ['wren', 'Nothing. This was always mine.']] },
+        { text: 'Show him the fire in your hand', bond: { caelum: 5 }, why: 'She answered Rowan without a word. Caelum saw.', then: [['narr', 'The flame burns bright in Wren\'s palm. Rowan steps back for the first time.'], ['rowan', '...What did they do to you?'], ['wren', 'Nothing. This was always mine.']] },
       ] },
       ['rowan', 'Then I\'ll take you back. One way or another.'],
       ['narr', 'The flowers wither. He is gone.'],
       ['caelum', 'Are you all right?'],
       ['wren', 'No. Take me home.'],
       ['caelum', '...Home. Yes.'],
-      { do: 'bond', who: 'caelum', pts: 10 },
+      { do: 'bond', who: 'caelum', pts: 10, why: 'She called it home.' },
       { do: 'flag', name: 'hunt' },
       { do: 'complete' },
     ],
@@ -1751,11 +1756,11 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       ['wren', 'It slipped out.'],
       ['caelum', 'Did it?'],
       { choose: [
-        { text: '"No. I meant it."', bond: { caelum: 15 }, then: [['narr', 'Caelum is quiet for a long moment. When he finally smiles, it\'s the first time Wren has seen him look young.']] },
+        { text: '"No. I meant it."', bond: { caelum: 15 }, why: 'She called Starhaven home, and meant it.', then: [['narr', 'Caelum is quiet for a long moment. When he finally smiles, it\'s the first time Wren has seen him look young.']] },
         { text: 'Light a small flame between your hands', liked: 'caelum', bond: { caelum: 15 }, then: [['caelum', 'Show-off.'], ['narr', 'He holds his hands around hers, and the little flame burns gold and violet together.']] },
-        { text: '"Ask me again some other night."', bond: { caelum: 10 }, then: [['caelum', 'Using my own lines against me. That\'s cruel, Wren. I respect it.']] },
+        { text: '"Ask me again some other night."', bond: { caelum: 10 }, why: 'His own words, handed back to him. He laughed.', then: [['caelum', 'Using my own lines against me. That\'s cruel, Wren. I respect it.']] },
       ] },
-      { do: 'bond', who: 'caelum', pts: 20 },
+      { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
     ],
     ev3_thane: [
       { do: 'art', id: 'library', title: 'Evening with Thane' },
@@ -1763,11 +1768,11 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       { if: 'page', then: [['wren', 'First: this is yours. It was frozen to the mountain.'], ['thane', '...Wyrms sleep facing the wind. I wrote that at nineteen, and lost it the same afternoon. Forty years.'], { do: 'bond', who: 'thane', pts: 10, liked: true, why: 'You carried a scrap of paper down a mountain for him.' }] },
       { choose: [
         { text: 'Bring him a rare book from the Night Market', liked: 'thane', bond: { thane: 15 }, then: [['thane', 'Is this... a first copy of the Tide Court star charts? Where did you... no, don\'t tell me. I\'ll cry on it.']] },
-        { text: '"Ask your forty-one questions."', bond: { thane: 10 }, then: [['narr', 'He asks all forty-one. Then he asks nine more. By the end, you both understand the fire a little better.']] },
-        { text: 'Ask about the other six powers', bond: { thane: 5 }, then: [['thane', 'Frost, shadow, light, tide, thorn and wind. Asleep, for now. Something will wake each of them. I\'d very much like to be there when it does.']] },
+        { text: '"Ask your forty-one questions."', bond: { thane: 10 }, why: 'Nobody has ever let him get to forty-one.', then: [['narr', 'He asks all forty-one. Then he asks nine more. By the end, you both understand the fire a little better.']] },
+        { text: 'Ask about the other six powers', bond: { thane: 5 }, why: 'Curiosity is the way to Thane\'s heart.', then: [['thane', 'Frost, shadow, light, tide, thorn and wind. Asleep, for now. Something will wake each of them. I\'d very much like to be there when it does.']] },
       ] },
       ['thane', 'You know, Caelum hasn\'t smiled like he does now in a long time. Whatever you\'re doing to him, keep doing it.'],
-      { do: 'bond', who: 'thane', pts: 20 },
+      { do: 'bond', who: 'thane', pts: 20, why: 'An evening together.' },
     ],
     heart_thane_2: [
       { do: 'art', id: 'library', title: 'Thane: heart 2' },
@@ -1840,12 +1845,12 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
         { h: 4, name: 'Second sight', text: 'A Bond Art that slows the world. (Chapters to come.)' },
         { h: 5, name: 'What she saw', text: 'She tells Wren the ending, in time to change it. (Chapters to come.)' },
       ] },
-    thane: { toward: 'The name of the older thing in Wren\'s blood. Thane is the only one reading for it.',
+    thane: { toward: 'What the six sleeping powers in Wren are, how to wake them safely, and whether any of them can be given back. Thane is the only one reading for it.',
       steps: [
         { h: 2, name: 'Well read', text: 'Wren learns faster: a fifth more experience from everything.', now: true },
         { h: 3, name: 'Margin notes', text: 'Flame costs less to cast. (Chapters to come.)' },
         { h: 4, name: 'The second gift', text: 'He finds the way to wake the next court gift. (Chapters to come.)' },
-        { h: 5, name: 'The name of it', text: 'He tells Wren what she is. (Chapters to come.)' },
+        { h: 5, name: 'The last question', text: 'He finds out whether the powers can ever be given back. (Chapters to come.)' },
       ] },
     nessa: { toward: 'Whether Nessa follows Wren when the Iron King comes for the sisters, or fights her the whole way.',
       steps: [
@@ -1872,7 +1877,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
     L('queen', 1, 'The Thorn Queen', { ch: 1 }, 'Go Under the Mountain.', 'She took the courts one at a time and their lords with them. She did not want land. She wanted them to watch. She kept her court in the Deep, under the mountain, where nothing grows that she did not plant.'),
     L('trials', 1, 'Three trials', { ch: 2 }, 'Survive the Deep.', 'A riddle, a maze, a beast. Win all three and Rowan went free; that was her bargain, and she never expected to pay. I answered her riddle. I walked her maze. The beast I beat, and it killed me anyway. I remember the floor being cold, and then I remember nothing.'),
     L('blood', 1, 'What his blood did', { ch: 2 }, 'Survive the Deep.', 'Mortals do not come back. Caelum opened his wrist over me and I did, and what got up was not what lay down. Faster. Harder to kill. Ears I still catch on my hood. He has never once said I owe him for it, which is how I know he thinks about it.'),
-    L('dusk', 1, 'The Court of Dusk', { ch: 2 }, 'Leave the Spring Court.', 'The other courts call it the court of nightmares, and Caelum lets them. A realm everyone is afraid of is a realm nobody visits. What is actually inside it he has hidden for five hundred years.'),
+    L('dusk', 1, 'The Court of Dusk', { ch: 2 }, 'Leave the Spring Court.', 'The other courts call it the court of nightmares, and Caelum lets them. A realm everyone is afraid of is a realm nobody visits. What is actually inside it his court has kept hidden for a thousand years, and he has spent five hundred of them making sure it stays that way.'),
     L('starhaven', 1, 'Starhaven', { ch: 2 }, 'Leave the Spring Court.', 'A city on a river under a sky with too many stars, with painted shutters and people who stay up late on purpose. No army has ever found it. It is the thing he is protecting when he plays the villain, and now I have seen it I would play one too.'),
     L('winnow', 1, 'Winnowing', { met: 'caelum' }, 'Meet Lord Caelum.', 'The fae can fold themselves from one place to another: a step, a smell like rain on stone, and they are across the room or across the realm. Caelum does it without looking. He says it costs him nothing. He is lying about how much.'),
     L('paint', 1, 'Painting the walls', { ch: 3 }, 'Paint in Starhaven.', 'I had not held a brush since the Deep. The street was dark and the wall was bare and my hands remembered before I did. Where I paint, the lamps come back. Nobody has explained that to me and I have stopped asking, in case it stops.'),
@@ -1881,12 +1886,12 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
     L('rowanwar', 2, 'Rowan\'s war', { ch: 3 }, 'Come to the Training Ring.', 'Caelum called in our bargain and took me out of Spring in front of Rowan\'s whole court. Rowan has called it theft and declared war on Dusk. He believes he is rescuing me. That is the worst of it: he truly does.'),
     L('ironking', 2, 'The Iron King', { ch: 3 }, 'Come to the Training Ring.', 'A king across the sea who has been building an army since before my grandmother was born. Two courts at each other\'s throats is exactly what he was waiting for. His creatures are already in our woods, and one of them knew my name.'),
     L('thornwood', 2, 'What the Queen left', { ch: 3 }, 'Come to the Training Ring.', 'She is dead and her thorns are not. They root wherever she walked, and the little sprites that tend them still think they have a mistress. Bram says cut them at the bud. He is right, and I hate that they look surprised.'),
-    L('flame', 2, 'Fire', { ch: 4 }, 'Climb the mountain.', 'It came out of my palm on the mountain road. Caelum\'s blood is night and starlight; this was neither. Thane went quiet, then went for his books. He says the High Lords each carry one gift and nobody carries two. He says "something older" and will not finish the sentence.'),
+    L('flame', 2, 'Fire', { ch: 4 }, 'Climb the mountain.', 'It came out of my palm in my sleep. Thane says the Thorn Queen spent fifty years draining all seven courts and hoarding what she took Under the Mountain: flame, frost, shadow, light, tide, thorn, wind. When she fell it broke loose, and most of it went home. Some of it went into the only heart that had just stopped. Mine. Flame is the one that woke first. He says "first" very carefully.'),
     L('wyrm', 2, 'The Old Wyrm', { ch: 4 }, 'Climb the mountain.', 'It has slept in the hollow under the peak since before the courts drew their borders. Its head is plate; its back is not. It hates fire down its throat. Something woke it, and it was not us.'),
     L('sq_lamp', 1, 'The First Lamp', { seen: 'sq_lamp' }, 'Something to look at in the Lamp Square.', 'Lit the night the city was hidden, and never out since. The lamplighters are a guild older than the Five. When a child is born in Starhaven they are carried to it and their hand is pressed to the brass, so the city knows them in the dark.'),
     L('sq_names', 2, 'The Stone of Names', { seen: 'sq_names' }, 'Something to look at in the Lamp Square.', 'Fifty years under the Thorn Queen, and Starhaven was never found. It still paid. Everyone who left the city to fight her and did not come back is cut into the stone, small, so they all fit. Bram can find forty-one of them without looking. I counted.'),
     L('sq_well', 1, 'The Star Well', { seen: 'sq_well' }, 'Something to look at in the Lamp Square.', 'You say what you would give up, not what you want, and drop the coin. I stood there a long time. I said: being the one who has to be strong. The coin did not make a sound. I do not know what that means and I am not asking Iris.'),
-    L('p_caelum1', 3, 'Caelum, as I found him', { met: 'caelum' }, 'Meet Lord Caelum.', 'High Lord of Dusk. He walked into the Deep wearing the Queen\'s favour like a coat he meant to burn. Everything he says in public is a blade pointed somewhere. I am learning to hear what he says when it is pointed nowhere.'),
+    L('p_caelum1', 3, 'Caelum, as I found him', { met: 'caelum' }, 'Meet Lord Caelum.', 'High Lord of Dusk. He walked into the Deep wearing the Queen\'s favor like a coat he meant to burn. Everything he says in public is a blade pointed somewhere. I am learning to hear what he says when it is pointed nowhere.'),
     L('p_caelum2', 3, 'Caelum, on the rooftop', { pts: ['caelum', 40] }, 'Grow closer to Caelum (heart 2).', 'He told me he watched the last trial and could not move. Five hundred years old and useless, he said. He has ruled alone so long that he says "I" when he means the whole city. I do not think anyone has asked him how he is since before I was born.'),
     L('p_caelum3', 3, 'Caelum, what he keeps', { pts: ['caelum', 120] }, 'Grow closer to Caelum (heart 3).', 'He keeps every sketch I throw away. I found them flattened inside a book of border treaties, in order. He does not know that I know. I have started throwing away better ones.'),
     L('p_bram1', 3, 'Bram', { met: 'bram' }, 'Meet Bram.', 'General of Dusk\'s armies, and the one who makes the bread. He was born in a war camp and learned to fight before he learned to read, and is touchy about only one of those. He hits the practice dummy as if it owes him money.'),
@@ -1894,7 +1899,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
     L('p_iris1', 3, 'Iris', { met: 'iris' }, 'Meet Iris.', 'She sees threads: what might happen, tangled, all at once. She is cheerful about it the way people are cheerful in a storm. She collects old maps of places that have changed, and sugared plums, and she already knew my name.'),
     L('p_iris2', 3, 'Iris, what she will not say', { pts: ['iris', 40] }, 'Grow closer to Iris (heart 2).', 'I asked her how this ends. She laughed, and then she did not. She said some threads fray if you look at them too hard, and that mine is the only one in the city she cannot see past a certain night. She would not tell me which night.'),
     L('p_thane1', 3, 'Thane', { met: 'thane' }, 'Meet Thane.', 'Keeper of the Library. He has a theory about everything and tests them on whoever is nearest. Ink on both cuffs. He talks to the books, and I am not completely certain they do not answer.'),
-    L('p_thane2', 3, 'Thane, in the margins', { pts: ['thane', 40] }, 'Grow closer to Thane (heart 2).', 'He showed me a page with seven court sigils and an eighth space, scraped blank on purpose, long ago. He thinks my fire belongs in the gap. He has not told Caelum yet. He asked me not to either, and I have not decided.'),
+    L('p_thane2', 3, 'Thane, in the margins', { pts: ['thane', 40] }, 'Grow closer to Thane (heart 2).', 'He showed me a page with seven court sigils and a column beside each for what the Queen took. Six of the columns have a question mark, in his small exact hand, and my name. He has forty-one questions for me. He apologized for the number, and then asked the first one.'),
     L('p_nessa1', 3, 'Nessa', { pts: ['nessa', 10] }, 'Do right by Nessa.', 'My older sister by a year, and she has never let me forget which of us it is. She gives away her share and then lies about it badly. She has not forgiven Father, or the winter, or me for being the one who can shoot. Tell her the truth and she will carry anything.'),
     L('p_nessa2', 3, 'Nessa\'s letter, unsent', { pts: ['nessa', 40] }, 'Grow closer to Nessa (heart 2).', '"You went with him so we would eat. I know that. I am angry anyway, and I will be until you walk back through this door and I can be angry at your face." It was folded inside my coat. She must have put it there before I left.'),
     L('p_lissa1', 3, 'Lissa', { pts: ['lissa', 10] }, 'Be kind to Lissa.', 'The youngest. She keeps a window box alive in a winter that has killed everything else, by what I can only call stubbornness. She believes spring always comes. I used to think that was softness. It is the hardest thing in our house.'),
@@ -1910,7 +1915,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
     L('c_rowanDebt', 4, 'A debt, paid', { mem: 'rowanDebt' }, 'A choice in the Deep.', 'I told him it was the law, a life for a life, and nothing more. He said I never owed him anything. It was the most honest thing he ever said to me, and he said it from inside a cage.'),
     L('c_lamps', 4, 'Four lamps', { mem: 'lamps' }, 'Something to do on the street in Starhaven.', 'Mirelle was a lamplighter for forty years. When the Thorn Queen fell the guild was half gone and the lamps on her street stayed dark, because nobody had the heart to climb. I climbed. I did not know I was doing anything but climbing. She says that is the only way the First Lamp ever stays lit.'),
     L('c_cat', 4, 'Mirelle\'s cat', { mem: 'cat' }, 'Someone in Starhaven needs help.', 'On an awning, furious, perfectly able to get down. The first thing I did in this city that was not about a war. I think about that more than it deserves.'),
-    L('c_page', 4, 'The torn page', { mem: 'page' }, 'Something to find on the mountain.', 'Thane\'s lost page, wedged in the rocks on the mountain road, a long way from any library. He held it by the edges. He did not say how it got up there, and he stopped talking, which he never does.'),
+    L('c_page', 4, 'The torn page', { mem: 'page' }, 'Something to find on the mountain.', 'Frozen to the rock on the mountain road, in Thane\'s hand: "wyrms sleep facing the wind". He lost it up there years ago, before the Queen, when he still went looking at things himself. He held it by the edges and said nothing for a while, which he never does.'),
     L('c_bram', 4, 'What I told Bram', { mem: 'bramTruth' }, 'A choice at the Training Ring.', 'He asked why I stay. I said: because nobody here has lied to me yet. He said to give it a week. He also said it was a soldier\'s answer, and from Bram that is a medal.'),
   ];
 })(window.SH = window.SH || {});
@@ -2124,7 +2129,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       { x0: 14, x1: 32, text: 'Dash strike: {DASH} toward the dummy, then {ATTACK} while you are still moving.', flag: 'rise', until: 'lunge' },
       { x0: 14, x1: 32, text: 'Guard: stand beside the dummy, face it, and {GUARD} when it says "swinging".', flag: 'lunge', until: 'guard' },
       { x0: 26, x1: 36, text: 'Bram\'s rings are for your daggers (Wren has no bow here). Cut all three: the low one from the ground, the middle one with a rising strike ({UPSTRIKE}), the high one from a jump.', until: 'rings3' },
-      { x0: 36, x1: 60, text: 'Jump onto a bud and it bounces you (strike down with {DOWNSTRIKE} for a higher bounce). Land on the planks between them and take them one at a time.', flag: 'combo', until: 'pit' },
+      { x0: 36, x1: 60, text: 'Jump onto a bud and it bounces you (for a higher bounce, strike down as you land: {DOWNSTRIKE}). Land on the planks between them and take them one at a time.', flag: 'combo', until: 'pit' },
       { x0: 61, x1: 69, text: 'Remember the four: combo, rising strike ({UPSTRIKE}), dash strike ({DASH} then {ATTACK}), and guard ({GUARD}).', flag: 'pit' },
       { x0: 69, x1: 80, text: 'Thorn sprites glow orange before they lunge. {DASH} through the lunge, then strike.', flag: 'pit' },
     ],
@@ -2427,7 +2432,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
   // Button names shown in signs, per input type.
   input.LABELS = {
     kb: { MOVE: 'A / D or the arrow keys', JUMP: 'Space', ATTACK: 'J', SHOOT: 'J', DASH: 'Shift', DOWN: 'S', TALK: 'W', PAINT: 'W', DOWNSTRIKE: 'hold S and press J', GIFT: 'F (or Q)', UPSTRIKE: 'hold W and press J', GUARD: 'hold S', CHOOSE: 'W (or J)' },
-    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'tap the \u25BC button', GIFT: 'the FLAME button', UPSTRIKE: 'the \u25B2 button', GUARD: 'hold the \u25BC button', CHOOSE: 'the gold CHOOSE button (or STRIKE)' },
+    touch: { MOVE: 'a thumb on the left half of the screen', JUMP: 'the JUMP button', ATTACK: 'the STRIKE button', SHOOT: 'the SHOOT button', DASH: 'the DASH button', DOWN: 'down on the stick', TALK: 'the TALK button', PAINT: 'the PAINT button', DOWNSTRIKE: 'the \u25BC button', GIFT: 'the FLAME button', UPSTRIKE: 'the \u25B2 button', GUARD: 'hold the \u25BC button', CHOOSE: 'the gold CHOOSE button (or STRIKE)' },
     pad: { MOVE: 'the left stick', JUMP: 'A', ATTACK: 'X', SHOOT: 'X', DASH: 'B', DOWN: 'down', TALK: 'Y', PAINT: 'Y', DOWNSTRIKE: 'hold down and press X', GIFT: 'LB (left bumper)', UPSTRIKE: 'hold up and press X', GUARD: 'hold down', CHOOSE: 'Y (or X)' },
   };
   input.fill = function (text) {
@@ -4307,8 +4312,8 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
   const X = {};
   X.AT = [0, 30, 80, 150, 240, 350];                 // total XP needed for level 1, 2, 3...
   X.PERKS = [null, null,
-    { name: 'Quick hands', text: 'The bow draws faster, and the Flame recovers faster.' },
-    { name: 'Light feet', text: 'The dash is ready again sooner.' },
+    { name: 'Quick hands', text: 'Everything in Wren\'s hands is ready again sooner: the bow now, and whatever comes after it.' },
+    { name: 'Light feet', text: 'Wren recovers her footing faster. When she learns to dash, it will be ready again sooner.' },
     { name: 'Hard to kill', text: 'One more heart.' },
     { name: 'Bonded', text: 'Every level starts with the bond bar a third full.' },
     { name: 'Hunter\'s patience', text: 'Starlight drifts to you from further away.' },
@@ -5649,7 +5654,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
   };
 
   // ================================================================ MURAL: face to the wall
-  // Her first mural: the star of Dusk over the rooftops. Trace it point to point; colour follows the brush.
+  // Her first mural: the star of Dusk over the rooftops. Trace it point to point; color follows the brush.
   const MU = { pts: [[0.5, 0.14], [0.56, 0.36], [0.74, 0.38], [0.6, 0.5], [0.66, 0.72], [0.5, 0.6], [0.34, 0.72], [0.4, 0.5], [0.26, 0.38], [0.44, 0.36], [0.5, 0.14]] };
   MODES.mural = {
     init() { return { bx: 0.5, by: 0.86, i: 0, done: 0, sparks: [], said: 0, idle: 0 }; },
@@ -7306,9 +7311,9 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
       onGuard(parry) { if (G.activeGoal === 'guard') G.queueScript('ring_guard'); },
     };
     G.world = w;
-    G.explainWait = Math.max(G.explainWait || 0, 60 * 12);   // let a new place be looked at first
+    G.explainWait = Math.max(G.explainWait || 0, 60 * 6);   // let a new place be looked at first
     SH.arts.reset(); w.lowT = 0;
-    document.body.dataset.court = { woods: 'mortal', deep: 'thorn' }[def.id] || 'dusk';   // whose realm this is: it colours the menus
+    document.body.dataset.court = { woods: 'mortal', deep: 'thorn' }[def.id] || 'dusk';   // whose realm this is: it colors the menus
     if (SH.xp.level() >= 5 && SH.arts.active()) SH.arts.meter = Math.max(SH.arts.meter, 34);
     SH.draw.init(room, w.viewW);   // drawn with gates open, so gates draw on top as objects
     for (const g of gates) room.setGate(g, !g.open);
@@ -7452,7 +7457,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
         const sc0 = sc;
         SH.modes.start(st.name, st, r => {
           if (st.name === 'flight' && st.variant === 'wall') { if (r && r.stars) { SH.xp.gain(Math.min(20, r.stars)); G.hud.toast('Wisps gathered on the ride: ' + r.stars + '.'); } }
-          else if (st.name === 'flight' && r) { G.bond('caelum', r.stars >= 14 ? 10 : 5, r.stars >= 14); G.hud.toast('Starlight gathered on the wing: ' + r.stars + (r.stars >= 14 ? '. Caelum noticed.' : '.')); }
+          else if (st.name === 'flight' && r) { G.bond('caelum', r.stars >= 40 ? 10 : 5, r.stars >= 40, r.stars >= 40 ? 'She leaned into the flight instead of away from it.' : 'She held on. That was enough for a first flight.'); G.hud.toast('Starlight gathered on the wing: ' + r.stars + (r.stars >= 40 ? '. Caelum noticed.' : '.')); }
           const nx = sc0.steps[sc0.i];
           if (typeof r === 'number' && nx && nx.choose) { sc0.i++; G.choosing = nx.choose; return G.pick(Math.min(r, nx.choose.length - 1)); }
           G.advance();
@@ -7530,7 +7535,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
   G.explain = function (key) {
     const seen = G.progress.seen = G.progress.seen || {};
     if (G.noExplain || seen[key] || !ST.EXPLAIN[key] || G.explaining) return;
-    if (G.state !== 'play' || (G.explainWait || 0) > 0) { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for a quiet moment
+    if (G.state !== 'play' || (G.explainWait || 0) > 0 || (G.world && ((G.world.wyrm && G.world.wyrm.on) || (G.boss && !G.boss.dead)))) { G.explainQ = G.explainQ || []; if (!G.explainQ.includes(key)) G.explainQ.push(key); return; }        // wait for a quiet moment
     seen[key] = 1; G.explaining = key; G.state = 'explain'; input.clear(true);
     const e = ST.EXPLAIN[key];
     document.getElementById('ex-icon').textContent = e.icon; document.getElementById('ex-title').textContent = e.title; document.getElementById('ex-text').textContent = e.text;
@@ -7539,7 +7544,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
   G.explainClose = function () {
     if (!G.explaining) return;
     G.explaining = null; document.getElementById('explain').classList.remove('show'); G.state = 'play'; input.clear(true); G.save();
-    G.explainWait = 60 * 40;   // at least forty seconds of play before the next one
+    G.explainWait = 60 * 22;   // a good stretch of play before the next one
   };
   // What a decision did. Effects gather for a moment, then show together as one card.
   G.effects = []; G.effectT = 0;
@@ -7589,7 +7594,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
     }
     else if (pts < 0) SH.sfx.play('back');
     // every change is shown: who, how much, and why
-    G.effect({ who, pts, why: why || (pts < 0 ? 'That stung.' : liked ? 'That meant a lot.' : 'Noted.'), heart: after > before ? after : 0 });
+    G.effect({ who, pts, why: why || (pts < 0 ? 'That stung.' : liked ? 'That meant a lot.' : 'She said what she thought, and it was heard.'), heart: after > before ? after : 0 });
     G.save();
   };
 
@@ -7616,8 +7621,11 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
     if (w.victoryT) G.victoryStep();
     if (w.time % 90 === 45 && G.state === 'play' && !G.noExplain) G.loreCheck();
     if (G.state === 'play' && (G.explainWait || 0) > 0) G.explainWait--;
-    if (G.state === 'talk') G.explainWait = Math.max(G.explainWait || 0, 60 * 6);   // and never the moment a conversation ends
-    if (G.explainQ && G.explainQ.length && G.state === 'play' && !(G.explainWait > 0) && !G.mode && !SH.arts.cutin && !G.pending) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
+    if (G.state === 'talk') G.explainWait = Math.max(G.explainWait || 0, 60 * 3);   // and never the moment a conversation ends
+    // a card only ever opens in a calm moment: feet on the ground, nothing chasing her, no boss, no enemy close
+    const calm = () => { const w2 = G.world, p2 = w2.player; return p2.grounded && !(w2.wyrm && w2.wyrm.on) && !(G.boss && !G.boss.dead) && !w2.victoryT && !w2.koT
+      && !w2.things.some(e => (e.kind === 'thornSprite' || e.kind === 'wyrm' || e.kind === 'wolf') && !e.dead && !e.gone && Math.abs(e.x - p2.x) < 260 && Math.abs(e.y - p2.y) < 120); };
+    if (G.explainQ && G.explainQ.length && G.state === 'play' && !(G.explainWait > 0) && !G.mode && !SH.arts.cutin && !G.pending && calm()) { G.explain(G.explainQ.shift()); if (G.state !== 'play') return; }
     if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -7781,7 +7789,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
     const motesLeft = w.motes.filter(m => !m.got && (G.activeGoal === 'report' || m.x < p.x)).length;   // Starlight still behind her
     const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0) && (h.above == null || p.y <= h.above * TS) && (h.below == null || p.y > h.below * TS));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
-    const bossTell = G.boss && !G.boss.dead ? ({ windup: 'It is about to CHARGE. Jump over it, or {DASH} straight through: nothing can touch you mid-dash.', charge: 'CHARGING. Jump it or {DASH} through it. If it hits the cliff it dazes itself.', crouch: 'It is going to LEAP to the shadow on the ground. Get away from the shadow.', leap: 'Move away from the shadow, then jump the shockwave.', slamrest: 'It is winded. Strike!', inhale: 'It is breathing in. Throw the Flame ({GIFT}) down its throat NOW.', breath: 'Frost along the ground. Jump onto a ledge or get behind it.', stun: 'DAZED. Strike it now: every cut does more.', roar: 'It is getting faster. The bond bar is full: use your Bond Art.' })[G.boss.state] : null;
+    const bossTell = G.boss && !G.boss.dead ? ({ windup: 'It is about to CHARGE. Jump over it, or dash straight through it ({DASH}): nothing can touch you mid-dash.', charge: 'CHARGING. Jump it, or dash through it ({DASH}). If it hits the cliff it dazes itself.', crouch: 'It is going to LEAP to the shadow on the ground. Get away from the shadow.', leap: 'Move away from the shadow, then jump the shockwave.', slamrest: 'It is winded. Strike!', inhale: 'It is breathing in. Throw the Flame ({GIFT}) down its throat NOW.', breath: 'Frost along the ground. Jump onto a ledge or get behind it.', stun: 'DAZED. Strike it now: every cut does more.', roar: 'It is getting faster. The bond bar is full: use your Bond Art.' })[G.boss.state] : null;
     { const text = bossTell ? input.fill(bossTell) : hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null;
       if (bossTell) { w.hintNow = text; w.hintHold = 0; G.hud.prompt(text); }
       else if (text !== w.hintNow && (w.hintHold || 0) > 0 && w.hintNow) w.hintHold--;          // the hint on screen gets its time
@@ -8227,6 +8235,7 @@ body.upright #menu .card { display: block; padding: 22px 26px 18px !important; }
         const bar = row.querySelector('.hb span'); requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.width = Math.round(k1 * 100) + '%'; }));
       }
       box.appendChild(row); setTimeout(() => row.remove(), 7600);
+      while (box.children.length > 3) box.firstElementChild.remove();
     }
     while (box.children.length > 4) box.firstChild.remove();
   };

@@ -199,6 +199,7 @@
         const bar = row.querySelector('.hb span'); requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.width = Math.round(k1 * 100) + '%'; }));
       }
       box.appendChild(row); setTimeout(() => row.remove(), 7600);
+      while (box.children.length > 3) box.firstElementChild.remove();
     }
     while (box.children.length > 4) box.firstChild.remove();
   };

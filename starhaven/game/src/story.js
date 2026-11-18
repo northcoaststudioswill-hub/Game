@@ -307,9 +307,9 @@
       ['caelum', 'Caelum. High Lord of the Court of Dusk, and the queen\'s favorite prisoner. I can close that wound, if you let me.'],
       ['caelum', 'But nothing is free Under the Mountain. One week of every month, for the rest of your life, at my home. Say yes, huntress.'],
       { choose: [
-        { text: '"Why would you help me?"', bond: { caelum: 5 }, then: [['caelum', 'Because you\'re the first person in fifty years to make the queen nervous. I\'d like you alive.']] },
-        { text: '"What do you really want?"', bond: { caelum: 10 }, then: [['caelum', 'Someone on my side when this is over. Someone who doesn\'t kneel.']] },
-        { text: '"I don\'t make deals with fae."', bond: { caelum: 5 }, then: [['caelum', 'Then you\'ll die of a fever before the first trial. Your choice.']] },
+        { text: '"Why would you help me?"', bond: { caelum: 5 }, why: 'A fair question. He respects those.', then: [['caelum', 'Because you\'re the first person in fifty years to make the queen nervous. I\'d like you alive.']] },
+        { text: '"What do you really want?"', bond: { caelum: 10 }, why: 'Straight to it. He liked that more than he showed.', then: [['caelum', 'Someone on my side when this is over. Someone who doesn\'t kneel.']] },
+        { text: '"I don\'t make deals with fae."', bond: { caelum: 5 }, why: 'Half dead and still stubborn. He was impressed anyway.', then: [['caelum', 'Then you\'ll die of a fever before the first trial. Your choice.']] },
       ] },
       ['wren', '...Yes.'],
       { do: 'meet', who: 'caelum' },
@@ -376,8 +376,8 @@
     deep_caelum: [
       { do: 'flag', name: 'd_caelum' },
       ['caelum', 'Don\'t look straight at me. She watches who I look at.'],
-      ['wren', 'You wear her colours. You stand at her shoulder.'],
-      ['caelum', 'I am her favourite. It is the worst thing I have ever been, and the most useful.'],
+      ['wren', 'You wear her colors. You stand at her shoulder.'],
+      ['caelum', 'I am her favorite. It is the worst thing I have ever been, and the most useful.'],
       { choose: [
         { text: '"Then why help me?"', bond: { caelum: 10 }, why: 'Nobody has asked him why in fifty years.', then: [
           ['caelum', 'Because you walked in here on purpose. For someone else. I had forgotten people could do that.'],
@@ -447,13 +447,13 @@
       ['caelum', 'They\'d be terribly rude about it. I\'m here for what I\'m owed: one week of every month, at my home. Our bargain from the Deep.'],
       { do: 'meet', who: 'caelum' },
       { choose: [
-        { text: '"Fine. Get me out of here."', bond: { caelum: 10 }, then: [
+        { text: '"Fine. Get me out of here."', bond: { caelum: 10 }, why: 'No hesitation. He had hoped, and not let himself expect it.', then: [
           ['caelum', 'Gladly. You\'ve been holding your breath for three months. Let\'s find you somewhere you can breathe.'],
         ] },
-        { text: '"I don\'t belong to you."', bond: { caelum: 5 }, then: [
+        { text: '"I don\'t belong to you."', bond: { caelum: 5 }, why: 'He agreed with her, which surprised them both.', then: [
           ['caelum', 'No. You don\'t belong to anyone. That\'s rather the point. One week. Then you decide.'],
         ] },
-        { text: '"Why now?"', bond: { caelum: 10 }, then: [
+        { text: '"Why now?"', bond: { caelum: 10 }, why: 'She asked the question he came ready to answer.', then: [
           ['caelum', 'Because the Iron King is moving, and I need people I trust. You are one of very few.'],
         ] },
       ] },
@@ -530,13 +530,13 @@
       ['caelum', 'Then you get a very nice room and a very annoying neighbor.'],
       ['caelum', 'You painted my street awake in one night. Do you know how long it\'s been dark?'],
       { choose: [
-        { text: '"How long?"', bond: { caelum: 5 }, then: [
-          ['caelum', 'Two years. Since the war took my painters. I\'d stopped looking at it.'],
+        { text: '"How long?"', bond: { caelum: 5 }, why: 'She asked about his city before she asked about herself.', then: [
+          ['caelum', 'Fifty years. Since she took me, and my painters and lamplighters went to war without me. I came home three months ago and could not make myself look at it.'],
         ] },
-        { text: '"Is that why you really brought me here?"', bond: { caelum: 10 }, then: [
+        { text: '"Is that why you really brought me here?"', bond: { caelum: 10 }, why: 'She saw straight through him. He is not used to that.', then: [
           ['caelum', 'Partly. And partly because I remember a girl in the Deep who didn\'t break. I wanted to see her again.'],
         ] },
-        { text: '"Don\'t get sentimental, High Lord."', bond: { caelum: 5 }, then: [
+        { text: '"Don\'t get sentimental, High Lord."', bond: { caelum: 5 }, why: 'She teased him. Nobody teases him.', then: [
           ['caelum', 'Too late. I\'m unbearable when I\'m sentimental. Ask anyone.'],
         ] },
       ] },
@@ -544,13 +544,13 @@
       ['caelum', 'A mating bond. The rarest thing there is between two people. Fate\'s doing, not mine.'],
       ['caelum', 'I felt it the first moment I saw you, Under the Mountain. You were mortal, so you couldn\'t. My blood didn\'t make the bond. It only let you feel what was already there.'],
       { choose: [
-        { text: '"You should have told me."', bond: { caelum: 5 }, then: [
+        { text: '"You should have told me."', bond: { caelum: 5 }, why: 'She was angry, and she stayed anyway.', then: [
           ['caelum', 'Yes. And you\'d have thought it was a trick to keep you. I wanted you to choose for yourself, with all of it in front of you.'],
         ] },
-        { text: '"Is that why you saved me?"', bond: { caelum: 5 }, then: [
+        { text: '"Is that why you saved me?"', bond: { caelum: 5 }, why: 'A hard question, asked to his face.', then: [
           ['caelum', 'I saved you because you were dying. The bond is why I could never have lived with not trying.'],
         ] },
-        { text: 'Say nothing. Take his hand.', bond: { caelum: 10 }, then: [
+        { text: 'Say nothing. Take his hand.', bond: { caelum: 10 }, why: 'No words. He will remember exactly how that felt.', then: [
           ['narr', 'The thread between them hums like a plucked string. Neither of them lets go for a long time.'],
         ] },
       ] },
@@ -558,7 +558,7 @@
       ['wren', 'Rowan will come for me.'],
       ['caelum', 'He\'ll come for me. Let him. Tomorrow you meet the Five, my inner circle. Try not to stab any of them.'],
       ['wren', 'No promises.'],
-      { do: 'bond', who: 'caelum', pts: 10 },
+      { do: 'bond', who: 'caelum', pts: 10, why: 'A roof, a view, and the truth at last.' },
       { do: 'flag', name: 'rooftop' },
       { do: 'complete' },
     ],
@@ -587,7 +587,7 @@
       ['caelum', 'The Five will test you tomorrow. Bram will try to break you. Iris will try to read you. Let them.'],
       ['wren', 'And you?'],
       ['caelum', 'I\'ll be watching from somewhere I can pretend I\'m not.'],
-      { do: 'bond', who: 'caelum', pts: 20 },
+      { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
     ],
 
     // ======================================================== Chapter 2: The Five
@@ -597,10 +597,10 @@
       ['bram', 'Half of Spring wants your head for running off with our High Lord. Or him running off with you. The songs disagree.'],
       ['bram', 'Either way, there\'s an army on our southern border with your name on its banners. Caelum says you can fight. I\'d like to see it.'],
       { choose: [
-        { text: '"Point me at something."', bond: { bram: 10 }, then: [
+        { text: '"Point me at something."', bond: { bram: 10 }, why: 'A fighter\'s answer. Bram speaks that language.', then: [
           ['bram', 'Ha! I like you already. Don\'t tell Caelum.'],
         ] },
-        { text: '"Caelum talks about me?"', bond: { bram: 5 }, then: [
+        { text: '"Caelum talks about me?"', bond: { bram: 5 }, why: 'She made him laugh inside a minute.', then: [
           ['bram', 'Constantly. It\'s unbearable. Please hit something so he\'ll stop.'],
         ] },
       ] },
@@ -640,7 +640,7 @@
       ['bram', 'Ha! Clean. Now some real work.'],
       ['bram', 'Thorn sprites, the Iron King\'s creatures, came over the north wall last night. Three of them. Clear them out.'],
       ['bram', 'They glow orange right before they lunge. Dash through the lunge, then cut them down.'],
-      { do: 'bond', who: 'bram', pts: 10 },
+      { do: 'bond', who: 'bram', pts: 10, why: 'Clean across his thorn pit.' },
       { do: 'flag', name: 'pit' },
       { do: 'goal', id: 'sprites' },
       { do: 'gate', id: 'northgate' },
@@ -650,17 +650,17 @@
       { do: 'meet', who: 'iris' },
       ['iris', 'Yours is very tangled and very shiny. Anyway, hi!'],
       { choose: [
-        { text: '"What does tangled mean?"', bond: { iris: 10 }, then: [
+        { text: '"What does tangled mean?"', bond: { iris: 10 }, why: 'She asked what Iris actually sees. Almost nobody does.', then: [
           ['iris', 'It means lots of people are tied to you. Some you know. Some you will. One you\'re pretending you don\'t.'],
         ] },
-        { text: '"Shiny is good, right?"', bond: { iris: 5 }, then: [
+        { text: '"Shiny is good, right?"', bond: { iris: 5 }, why: 'Iris likes people who can joke about fate.', then: [
           ['iris', 'Shiny is very good! Mostly. Shiny things get noticed.'],
         ] },
       ] },
       ['iris', 'Go stab things. Bram likes that.'],
     ],
     ring_done: [
-      ['caelum', 'Three thorn sprites and not a scratch. Bram owes me a drink.'],
+      ['caelum', 'Three thorn sprites, on your first day. Bram owes me a drink.'],
       ['bram', 'Bram owes nobody anything.'],
       ['caelum', 'The Iron King is testing our walls, Wren. Next time it won\'t be sprites.'],
       { do: 'winnow', npc: 'iris', near: 2 },
@@ -673,13 +673,13 @@
       ['caelum', 'Then the Iron King knows who you are. Those sprites weren\'t testing our walls. They were looking for you.'],
       ['bram', 'Spring at our southern border, iron at our north. He wants us fighting Rowan while he walks in the back door.'],
       { choose: [
-        { text: '"If he touches them, I\'ll kill him."', bond: { bram: 10 }, then: [
+        { text: '"If he touches them, I\'ll kill him."', bond: { bram: 10 }, why: 'Bram trusts people who know what they would kill for.', then: [
           ['bram', 'Get in line, huntress. But I\'ll hold your coat.'],
         ] },
-        { text: '"How do we keep them safe?"', bond: { caelum: 10 }, then: [
+        { text: '"How do we keep them safe?"', bond: { caelum: 10 }, why: 'She said "we" without noticing. He noticed.', then: [
           ['caelum', 'Quietly, for now. I\'ll have eyes on their village by morning. You have my word.'],
         ] },
-        { text: '"Iris, what else did you see?"', bond: { iris: 10 }, then: [
+        { text: '"Iris, what else did you see?"', bond: { iris: 10 }, why: 'She trusted the vision, and the seer.', then: [
           ['iris', 'Fire. In your hands. Which is new. I\'d keep an eye on that.'],
         ] },
       ] },
@@ -706,10 +706,10 @@
       ['caelum', 'Rowan sent a letter today. He says I stole you, and he will have you back, or have my court in ashes.'],
       ['caelum', 'And my spies say the Iron King asked about you by name. My people are already watching your sisters\' village.'],
       { choose: [
-        { text: '"Thank you."', bond: { caelum: 10 }, then: [
+        { text: '"Thank you."', bond: { caelum: 10 }, why: 'She let him help. That is new.', then: [
           ['caelum', 'Don\'t. It isn\'t a favor. It\'s what you do for your own.'],
         ] },
-        { text: '"I should go to them myself."', bond: { caelum: 5 }, then: [
+        { text: '"I should go to them myself."', bond: { caelum: 5 }, why: 'He would have said the same in her place.', then: [
           ['caelum', 'You will. When it\'s time, I\'ll fly you there myself. Not before you\'re ready.'],
         ] },
         { text: 'Give him a sketch of Starhaven', liked: 'caelum', bond: { caelum: 15 }, then: [
@@ -719,7 +719,7 @@
       ] },
       ['caelum', 'One more thing. The bargain. You don\'t owe me anything anymore. You can leave whenever you like.'],
       ['wren', '...I know. I\'m staying anyway.'],
-      { do: 'bond', who: 'caelum', pts: 20 },
+      { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
     ],
     // Chapter 2, more to do
     ring_bram_talk: [
@@ -754,38 +754,38 @@
         { text: 'Bring him spiced bread from the market', liked: 'bram', bond: { bram: 15 }, then: [
           ['bram', 'Is that from the Night Market? Sit down, huntress. You\'re officially my favorite. Don\'t tell Iris.'],
         ] },
-        { text: '"Spar with me again."', bond: { bram: 10 }, then: [
+        { text: '"Spar with me again."', bond: { bram: 10 }, why: 'Asking for more is the fastest way to Bram\'s good side.', then: [
           ['bram', 'Now you\'re talking.'],
           ['narr', 'You spar until neither of you can lift an arm, then lie in the sand laughing.'],
         ] },
-        { text: 'Ask about the north wall', bond: { bram: 5 }, then: [
+        { text: 'Ask about the north wall', bond: { bram: 5 }, why: 'She thinks like a soldier. He approves.', then: [
           ['bram', 'Lost my brother on that wall, years back, to the Iron King\'s father. I don\'t lose people on it anymore.'],
         ] },
       ] },
       ['bram', 'You fight like someone with people to protect.'],
       ['wren', 'Two sisters. Mortal. Across the sea.'],
       ['bram', 'Then we keep them safe. That\'s what the Five do.'],
-      { do: 'bond', who: 'bram', pts: 20 },
+      { do: 'bond', who: 'bram', pts: 20, why: 'An evening together.' },
     ],
     ev2_iris: [
       { do: 'art', id: 'observatory', title: 'Evening with Iris' },
       ['narr', 'A round tower above the Library, full of maps, candles and threads of starlight hanging in the air.'],
       ['iris', 'You came! Nobody visits the seer. They\'re afraid I\'ll tell them how they die.'],
-      { if: 'plums', then: [['wren', 'I found these in the thornwood. I think they were coming to you.'], ['iris', 'SUGARED PLUMS. I saw these arriving and I didn\'t dare believe it. You are my favourite thread.'], { do: 'bond', who: 'iris', pts: 15, liked: true, why: 'Sugared plums, carried out of a thornwood, for her.' }] },
+      { if: 'plums', then: [['wren', 'I found these in the thornwood. I think they were coming to you.'], ['iris', 'SUGARED PLUMS. I saw these arriving and I didn\'t dare believe it. You are my favorite thread.'], { do: 'bond', who: 'iris', pts: 15, liked: true, why: 'Sugared plums, carried out of a thornwood, for her.' }] },
       { choose: [
         { text: 'Bring her sugared plums', liked: 'iris', bond: { iris: 15 }, then: [
           ['iris', 'Plums! Sugared! Oh, you\'re a good thread, Wren. A very good thread.'],
         ] },
-        { text: 'Ask about your sisters\' threads', bond: { iris: 10 }, then: [
+        { text: 'Ask about your sisters\' threads', bond: { iris: 10 }, why: 'She asked Iris to look again, knowing what looking costs her.', then: [
           ['iris', 'Bright. Stubborn. One sharp, one soft. And iron getting closer. I\'m sorry. I can\'t see past it yet.'],
         ] },
-        { text: '"So how do I die?"', bond: { iris: 5 }, then: [
+        { text: '"So how do I die?"', bond: { iris: 5 }, why: 'Gallows humor. Iris collects it.', then: [
           ['iris', 'Ha! No. But not soon. You have far too much painting to do.'],
         ] },
       ] },
       ['iris', 'Can I tell you a secret? Caelum\'s thread tangled with yours the day you walked into the Deep. He pretends it didn\'t.'],
       ['wren', '...Does he.'],
-      { do: 'bond', who: 'iris', pts: 20 },
+      { do: 'bond', who: 'iris', pts: 20, why: 'An evening together.' },
     ],
 
     // ---------------- Heart scenes: play when a bond reaches a new heart
@@ -827,9 +827,9 @@
       ['wren', 'Mine.'],
       ['caelum', 'Seven courts\' power, sleeping in one woman. Every High Lord alive will want it back. Or want her.'],
       { choose: [
-        { text: '"They can try."', bond: { caelum: 5, thane: 5 }, then: [['caelum', 'That\'s my girl. Our girl. Starhaven\'s. I\'ll stop talking.']] },
-        { text: '"Can it be taken out of me?"', bond: { thane: 10 }, then: [['thane', 'Honestly? I don\'t know. Nobody has ever done this. I\'d rather learn what it does than what it costs to remove.']] },
-        { text: '"Does Rowan know?"', bond: { caelum: 10 }, then: [['caelum', 'If he doesn\'t yet, he will soon. It won\'t make him want you back any less.']] },
+        { text: '"They can try."', bond: { caelum: 5, thane: 5 }, why: 'Neither of them doubted it for a second.', then: [['caelum', 'That\'s my girl. Our girl. Starhaven\'s. I\'ll stop talking.']] },
+        { text: '"Can it be taken out of me?"', bond: { thane: 10 }, why: 'The right question. Thane has waited for someone to ask it.', then: [['thane', 'Honestly? I don\'t know. Nobody has ever done this. I\'d rather learn what it does than what it costs to remove.']] },
+        { text: '"Does Rowan know?"', bond: { caelum: 10 }, why: 'She thought of the war before she thought of herself.', then: [['caelum', 'If he doesn\'t yet, he will soon. It won\'t make him want you back any less.']] },
       ] },
       ['thane', 'Flame is the one that woke. Let\'s see what it does. There are three braziers in the courtyard. Light them.'],
       { do: 'art', id: null },
@@ -879,16 +879,16 @@
       { if: 'rowanKnife', then: [['rowan', 'You reached for a knife the first night. I should have known then that you would not stay where you were put.']] },
       ['rowan', 'I\'ve brought an army to his border because of you. I will burn his city to the river if I have to. Come home, and none of that happens.'],
       { choose: [
-        { text: '"I\'m not going back, Rowan."', bond: { caelum: 10 }, then: [['rowan', 'You don\'t know what he is. What he wants with you.'], ['wren', 'I know exactly what he is. He let me choose. You never did.']] },
+        { text: '"I\'m not going back, Rowan."', bond: { caelum: 10 }, why: 'She chose, out loud, in front of both of them.', then: [['rowan', 'You don\'t know what he is. What he wants with you.'], ['wren', 'I know exactly what he is. He let me choose. You never did.']] },
         { text: '"Stop this war. Please."', then: [['rowan', 'He stole you from my bed in the middle of the night. There is no stopping this.'], ['wren', 'He didn\'t steal me. I left.']] },
-        { text: 'Show him the fire in your hand', bond: { caelum: 5 }, then: [['narr', 'The flame burns bright in Wren\'s palm. Rowan steps back for the first time.'], ['rowan', '...What did they do to you?'], ['wren', 'Nothing. This was always mine.']] },
+        { text: 'Show him the fire in your hand', bond: { caelum: 5 }, why: 'She answered Rowan without a word. Caelum saw.', then: [['narr', 'The flame burns bright in Wren\'s palm. Rowan steps back for the first time.'], ['rowan', '...What did they do to you?'], ['wren', 'Nothing. This was always mine.']] },
       ] },
       ['rowan', 'Then I\'ll take you back. One way or another.'],
       ['narr', 'The flowers wither. He is gone.'],
       ['caelum', 'Are you all right?'],
       ['wren', 'No. Take me home.'],
       ['caelum', '...Home. Yes.'],
-      { do: 'bond', who: 'caelum', pts: 10 },
+      { do: 'bond', who: 'caelum', pts: 10, why: 'She called it home.' },
       { do: 'flag', name: 'hunt' },
       { do: 'complete' },
     ],
@@ -910,11 +910,11 @@
       ['wren', 'It slipped out.'],
       ['caelum', 'Did it?'],
       { choose: [
-        { text: '"No. I meant it."', bond: { caelum: 15 }, then: [['narr', 'Caelum is quiet for a long moment. When he finally smiles, it\'s the first time Wren has seen him look young.']] },
+        { text: '"No. I meant it."', bond: { caelum: 15 }, why: 'She called Starhaven home, and meant it.', then: [['narr', 'Caelum is quiet for a long moment. When he finally smiles, it\'s the first time Wren has seen him look young.']] },
         { text: 'Light a small flame between your hands', liked: 'caelum', bond: { caelum: 15 }, then: [['caelum', 'Show-off.'], ['narr', 'He holds his hands around hers, and the little flame burns gold and violet together.']] },
-        { text: '"Ask me again some other night."', bond: { caelum: 10 }, then: [['caelum', 'Using my own lines against me. That\'s cruel, Wren. I respect it.']] },
+        { text: '"Ask me again some other night."', bond: { caelum: 10 }, why: 'His own words, handed back to him. He laughed.', then: [['caelum', 'Using my own lines against me. That\'s cruel, Wren. I respect it.']] },
       ] },
-      { do: 'bond', who: 'caelum', pts: 20 },
+      { do: 'bond', who: 'caelum', pts: 20, why: 'An evening together.' },
     ],
     ev3_thane: [
       { do: 'art', id: 'library', title: 'Evening with Thane' },
@@ -922,11 +922,11 @@
       { if: 'page', then: [['wren', 'First: this is yours. It was frozen to the mountain.'], ['thane', '...Wyrms sleep facing the wind. I wrote that at nineteen, and lost it the same afternoon. Forty years.'], { do: 'bond', who: 'thane', pts: 10, liked: true, why: 'You carried a scrap of paper down a mountain for him.' }] },
       { choose: [
         { text: 'Bring him a rare book from the Night Market', liked: 'thane', bond: { thane: 15 }, then: [['thane', 'Is this... a first copy of the Tide Court star charts? Where did you... no, don\'t tell me. I\'ll cry on it.']] },
-        { text: '"Ask your forty-one questions."', bond: { thane: 10 }, then: [['narr', 'He asks all forty-one. Then he asks nine more. By the end, you both understand the fire a little better.']] },
-        { text: 'Ask about the other six powers', bond: { thane: 5 }, then: [['thane', 'Frost, shadow, light, tide, thorn and wind. Asleep, for now. Something will wake each of them. I\'d very much like to be there when it does.']] },
+        { text: '"Ask your forty-one questions."', bond: { thane: 10 }, why: 'Nobody has ever let him get to forty-one.', then: [['narr', 'He asks all forty-one. Then he asks nine more. By the end, you both understand the fire a little better.']] },
+        { text: 'Ask about the other six powers', bond: { thane: 5 }, why: 'Curiosity is the way to Thane\'s heart.', then: [['thane', 'Frost, shadow, light, tide, thorn and wind. Asleep, for now. Something will wake each of them. I\'d very much like to be there when it does.']] },
       ] },
       ['thane', 'You know, Caelum hasn\'t smiled like he does now in a long time. Whatever you\'re doing to him, keep doing it.'],
-      { do: 'bond', who: 'thane', pts: 20 },
+      { do: 'bond', who: 'thane', pts: 20, why: 'An evening together.' },
     ],
     heart_thane_2: [
       { do: 'art', id: 'library', title: 'Thane: heart 2' },

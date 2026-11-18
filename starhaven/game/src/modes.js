@@ -211,7 +211,7 @@
   };
 
   // ================================================================ MURAL: face to the wall
-  // Her first mural: the star of Dusk over the rooftops. Trace it point to point; colour follows the brush.
+  // Her first mural: the star of Dusk over the rooftops. Trace it point to point; color follows the brush.
   const MU = { pts: [[0.5, 0.14], [0.56, 0.36], [0.74, 0.38], [0.6, 0.5], [0.66, 0.72], [0.5, 0.6], [0.34, 0.72], [0.4, 0.5], [0.26, 0.38], [0.44, 0.36], [0.5, 0.14]] };
   MODES.mural = {
     init() { return { bx: 0.5, by: 0.86, i: 0, done: 0, sparks: [], said: 0, idle: 0 }; },
