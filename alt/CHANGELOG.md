@@ -3,6 +3,31 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: nature's balance (Nov 18 2026)
+
+Will: maybe buddies should eat sprouts. It keeps them alive, like the light in the other game; nature's balance. Not
+aggressive: only a sprout left behind that Louie can't get. It can trim the team. If it works cleanly it doesn't have to
+be mentioned.
+
+- **A wild buddy will quietly eat a stranded sprout.** All of these must be true: the sprout has stood idle for 30
+  seconds (Louie fetches strays he can reach well before that), Will is more than about nine tiles away, a buddy is
+  within ten tiles and can walk to it, the crew is 12 or more, and it is not night (they are at the lantern then).
+  The buddy ambles over, nibbles for under two seconds, and the sprout is gone in a puff of its colour.
+- **Never:** a star sprout, a gardener, a sprout in water, a sprout Louie is on his way to, or anything from a small
+  crew. Each buddy eats at most two a day and waits a minute and a half between.
+- **If Will comes back in time the buddy backs off** and the sprout is fine.
+- **Nothing announces it.** No message, no toast, no count. A fed buddy sparkles for a few seconds, and Scout says
+  "THE BUDDIES LOOK WELL FED" once, the next time you pass her. The evening roll call is where you would notice.
+- It is rare in busy play: two three-day autopilot runs that whistle often saw none. It is a consequence of leaving
+  sprouts behind, not a threat.
+
+**Canon this assumes (flag to Will):** buddies live on the light that sprouts carry, here as in Sproutwild. Nobody in
+Sprouts knows that yet, which is why nobody remarks on it.
+
+**Tested:** seven new checks in `sprouts_valley.js` (48 in all, five runs in a row): eaten when stranded; nothing said;
+not near Will; not a star; not from a small crew; not one that only just stopped; backs off if Will returns. Story run
+and three chaos seeds clean. Not played by hand or on a phone.
+
 ## Sprouts: the Collection, what comes after the missions, strays (Nov 18 2026)
 
 Will: keep working on the game.
@@ -15,7 +40,8 @@ Will: keep working on the game.
   finished everything get the same pointers.
 - **A full field guide pays out once:** 2 tickets and 30 petals.
 - **The evening report counts strays.** Sprouts left idle far from the lantern at nightfall are brought in by Louie
-  ("LOUIE BROUGHT 3 STRAYS HOME"), and he earns a little for it. Nobody is ever lost.
+  ("LOUIE BROUGHT 3 STRAYS HOME"), and he earns a little for it. (Since "nature's balance", above, a sprout stranded
+  for a long time during the day can be lost to a buddy; whoever is still out there at nightfall comes home.)
 - **The garden says how to get your crew back** the first time everyone with you has become a gardener.
 - The house desk rows are tiles like the other menus.
 

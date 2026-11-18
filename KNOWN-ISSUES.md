@@ -146,6 +146,8 @@ From [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), still open:
 - How often the people talk as you pass (one line every 9 s at most, 26 s per person).
 
 ### Balance to check
+- Buddies eating stranded sprouts: 30 s idle, crew of 12 or more, two a day per buddy. Rare in testing; may want to be
+  a little more or less common once it is felt on the phone.
 - The bridge takes 80 sprout-seconds (12 sprouts: about 7 s). Nectar blooms up to 12 sprouts, six blossoms a day.
 - The objective autopilot in `tests/sprouts_soak.js` reliably clears Erin's first three asks and sometimes reaches the
   garden; past that it is the bot that stalls (it cannot use the house desk). The mid-game is covered by its chaos runs.

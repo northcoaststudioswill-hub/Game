@@ -68,11 +68,22 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   await E(`for(let i=0;i<10;i++)mkBud(1,2,P.x,P.y);const it=mkItem('shard',18*16+8,33*16+8);it.w=8;buds.slice(-10).forEach(b=>{b.tgt=it;b.st='carry';it.on.push(b)});window.__it=it;void 0`); const sh0 = await E('shards');
   for (t = 0; t < 120; t++) { await step(30); if ((await E('shards')) > sh0 || (await E('state')) !== 'play') break; }
   ok('a shard dropped inside a wall is still walked home', (await E('shards')) > sh0, t + ' s'); await E(`state='play';sceneQ.length=0;void 0`);
+  /* nature's balance: a buddy eats a sprout left behind, quietly, and only then */
+  const strand = (extra = '') => E(`(()=>{mkWbuds();const q=wbuds[1];buds=[];for(let i=0;i<14;i++)mkBud(i%6,2,P.x,P.y);const b=buds[0];b.st='idle';b.it=40;b.x=q.x+40;b.y=q.y+8;window.__b=b;P.x=HX;P.y=HY+30;dayT=30;state='play';LO.st='sit';LO.t=999;${extra}})()`);
+  const eaten = async secs => { for (let i = 0; i < secs; i++) { await step(30); if (await E('__b.dead||!buds.includes(__b)')) return true; } return false; };
+  await strand(); ok('a buddy eats a sprout left idle far from Will', await eaten(25), await E('run.eaten'));
+  ok('and nothing is said about it', !/EAT|ATE |BUDD/.test(await E(`toasts.map(t=>t.s).join('|')+'|'+(msgT>0?msg:'')`)), await E(`toasts.map(t=>t.s).join('|')+'|'+(msgT>0?msg:'')`));
+  await strand(`P.x=b.x+50;P.y=b.y;`); ok('not while Will is near', !(await eaten(12)));
+  await strand(`b.star=true;`); ok('never a star sprout', !(await eaten(12)));
+  await strand(`buds.length=9;`); ok('never from a small crew', !(await eaten(12)));
+  await strand(`b.it=5;`); ok('not one that only just stopped', !(await eaten(8)));
+  await strand(); await step(60); await E(`P.x=__b.x+30;P.y=__b.y;void 0`); await step(30); ok('if Will comes back in time the buddy backs off', await E(`!__b.dead&&wbuds.every(q=>!q.hunt)`));
+  await E(`LO.st='follow';void 0`);
   await E(`npcs.forEach(n=>{n.st='done';n.mi=n.ms.length});run.keep=0;gates[5].alive=true;void 0`); ok('with the missions done the marker asks for the bridge', /BRIDGE/.test(await E('objective().text')));
   await E(`gates[5].alive=false;void 0`); ok('then for the old arch', /WILLOW FALLS/.test(await E('objective().text'))); await E(`run.keep=1;void 0`);
   await E(`found=found.map(()=>true);run.wbSeen={};WBDEF.forEach(q=>run.wbSeen[q[0]]=1);run.boss=true;ZONES.forEach(z=>run.seen[z[0]]=1);run.gdone=0;state='play';void 0`); const tx0 = await E('meta.tix'); await step(120);
   const tx1 = await E('meta.tix'); await step(120); ok('a full field guide pays two tickets, once', tx1 >= tx0 + 2 && (await E('run.gdone')) === 1 && (await E('meta.tix')) === tx1, [tx0, tx1]);
-  await E(`toasts.length=0;buds.slice(0,2).forEach(b=>{release(b);b.gard=false;b.st='idle';b.x=60*16;b.y=18*16});endDay();void 0`); await step(1); ok('the evening report counts the strays Louie brings home', (await E('tod.strays')) === 2 && (await E('state')) === 'dayend'); await E(`__g.draw();newDay();void 0`);
+  await E(`toasts.length=0;P.x=HX;P.y=HY+30;buds.forEach(b=>{release(b);b.gard=false;b.st='follow';b.x=P.x;b.y=P.y+6});buds.slice(0,2).forEach(b=>{b.st='idle';b.x=60*16;b.y=18*16});endDay();void 0`); await step(1); ok('the evening report counts the strays Louie brings home', (await E('tod.strays')) === 2 && (await E('state')) === 'dayend'); await E(`__g.draw();newDay();void 0`);
   await E(`dayT=DAYLEN*.95;flickT=.3;void 0`); await E(`__g.draw();void 0`); ok('night draws, with the lantern skipping', true);
   ok('no page errors', !errs.length, errs);
   console.log(fail ? fail + ' FAILED' : 'ALL PASS'); await browser.close(); process.exit(fail ? 1 : 0);

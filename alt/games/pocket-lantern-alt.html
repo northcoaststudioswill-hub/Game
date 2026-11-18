@@ -3422,7 +3422,7 @@ function finishPluck(){const s=P.pl;P.pl=null;const i=sprouts.indexOf(s);if(i<0)
 }
 function avoid(b){for(const n of npcs){const dx=b.x-n.x,dy=b.y-n.y,d=Math.hypot(dx,dy);if(d<13){const k=d||1;moveEnt(b,d?dx/k*(13-d):2,dy/k*(13-d),1.5,b.type===2)}}}
 function updBud(b,dt){
- const T=TYPES[b.type],sp=T.sp*(b.stage===2?1.25:1),swim=b.type===2;b.mv=false;if(b.cheer>0)b.cheer-=dt;
+ const T=TYPES[b.type],sp=T.sp*(b.stage===2?1.25:1),swim=b.type===2;b.mv=false;if(b.cheer>0)b.cheer-=dt;b.it=b.st==='idle'?(b.it||0)+dt:0;
  if(b.st==='carry'||b.st==='fight'||b.st==='work'){b.xp+=dt;if(!b.star&&b.xp>=40){b.star=true;puff(b.x,b.y-8,'#f8e060',6,30);snd(1175,.08,1568);if(!run.starSaid){run.starSaid=1;say('A SPROUT EARNED A GOLD STAR! STARS CAN MOVE INTO YOUR HOUSE',7)}}}
  if(!swim&&(b.st==='follow'||b.st==='idle')&&tileAt(b.x,b.y)===WA){puff(b.x,b.y,'#a8d8ff',5,30);b.st='fly';b.ret=true;b.sx=b.x;b.sy=b.y;b.tx=P.x;b.ty=P.y;b.t=0;snd(240,.08,160)}
  switch(b.st){
@@ -3610,7 +3610,7 @@ const BARKS={ERIN:['THE SOIL IS WARM TODAY.','LOUIE ATE A DAISY AGAIN.','BLOOMED
 let barkCD=6,floats=[];
 function barkTick(){barkCD-=.3;if(barkCD>0||state!=='play'||inHome||msgT>0||toasts.length||(LO.say&&LO.say.t>0)||npcs.some(n=>n.say&&n.say.t>0))return;
  for(const n of npcs){if(d2(P,n.x,n.y)>46*46||(n.bt||0)>time||npcMark(n))continue;const f=dayT/DAYLEN,L=BARKS[n.name];if(!L)continue;
-  n.say={s:n.name==='ERIN'&&f<.12?'MORNING, WILL!':n.name==='ERIN'&&f>.78?'THEY WATCH THE LIGHT.':n.name==='MARCUS'&&f>.8?'LONG DAY, BRO.':L[((n.bk=(n.bk||0)+1)+day)%L.length],t:2.8};n.bt=time+26;barkCD=9;snd(n.name==='MARCUS'?330:520,.04,0,'triangle',.03);return}}
+  n.say={s:n.name==='ERIN'&&f<.12?'MORNING, WILL!':n.name==='ERIN'&&f>.78?'THEY WATCH THE LIGHT.':n.name==='MARCUS'&&f>.8?'LONG DAY, BRO.':n.name==='SCOUT'&&run.eaten&&!n.fedSaid?(n.fedSaid=1,'THE BUDDIES LOOK WELL FED'):L[((n.bk=(n.bk||0)+1)+day)%L.length],t:2.8};n.bt=time+26;barkCD=9;snd(n.name==='MARCUS'?330:520,.04,0,'triangle',.03);return}}
 function drawFloats(){if(state!=='play')return;for(const q of floats){const s=q.s,w=tw(s,1),x=Math.max(2,Math.min(W-w-2,Math.round((q.x-ox)*Z-w/2))),y=Math.round((q.y-oy)*Z);g.globalAlpha=Math.min(1,q.t*2.5);text(s,x,y,1,q.c);g.globalAlpha=1}}
 function floatAt(x,y,s,c){floats.push({x,y,s,c:c||'#fff8c0',t:1.3})}
 
@@ -3626,12 +3626,21 @@ function updWbuds(dt){const f=dayT/DAYLEN;
   if(f>.74&&!q.night){q.night=true;const a=q.a*2.3,tx=HX+Math.cos(a)*50,ty=HY+8+Math.abs(Math.sin(a))*34;q.path=free(tx,ty,false)&&!wisp?pathTo(q.x,q.y,tx,ty,false):null}
   if(q.path&&q.path.length){const p=q.path[0],dx=p.x-q.x,dy=p.y-q.y,d=Math.hypot(dx,dy),m=46*dt;if(d<=m+1){q.x=p.x;q.y=p.y;q.path.shift()}else{q.x+=dx/d*m;q.y+=dy/d*m}q.mv=true;if(Math.abs(dx)>1)q.fx=dx>0?1:-1;continue}
   if(q.night&&q.path){q.fx=HX>q.x?1:-1;continue} /* sitting at the light */
+  if(q.fed>0)q.fed-=dt;
+  if(q.hunt){const b=q.hunt.b;q.mv=false;
+   if(b.dead||b.st!=='idle'||d2(P,b.x,b.y)<110*110||d2(P,q.x,q.y)<64*64){q.hunt=null;q.hp=null;q.fedT=time+10} /* Will is back: it thinks better of it */
+   else if(d2(q,b.x,b.y)>11*11){const w=q.hp&&q.hp[0];if(!w){q.hp=pathTo(q.x,q.y,b.x,b.y,false);if(!q.hp){q.hunt=null;q.fedT=time+20}}else{const dx=w.x-q.x,dy=w.y-q.y,d=Math.hypot(dx,dy),m=24*dt;if(d<=m+1){q.x=w.x;q.y=w.y;q.hp.shift();if(!q.hp.length&&d2(q,b.x,b.y)>11*11)q.hp=[{x:b.x,y:b.y}]}else{q.x+=dx/d*m;q.y+=dy/d*m}q.mv=true;if(Math.abs(dx)>1)q.fx=dx>0?1:-1}}
+   else{q.hunt.t+=dt;q.fx=b.x>q.x?1:-1;b.z=Math.abs(Math.sin(time*20))*1.5;if(Math.random()<dt*7)parts.push({x:b.x+R(-3,3),y:b.y-6,vx:R(-14,14),vy:-R(8,20),life:.4,c:TYPES[b.type].l});
+    if(q.hunt.t>1.7){b.dead=true;release(b);puff(b.x,b.y-4,TYPES[b.type].l,7,30);snd(520,.08,780,'sine',.03);q.hunt=null;q.hp=null;q.fedT=time+90;q.fed=4;q.ate=(q.ate||0)+1;run.eaten=(run.eaten||0)+1}}
+   if(q.hunt)continue}
+  else if(!q.night&&(q.fedT||0)<time&&(q.ate||0)<2&&buds.length>=12){q.fedT=time+2;for(const b of buds)if(b.st==='idle'&&!b.gard&&!b.star&&(b.it||0)>30&&LO.tg!==b&&tileAt(b.x,b.y)!==WA&&d2(b,P.x,P.y)>150*150&&d2(b,q.x,q.y)<160*160&&!wbuds.some(o=>o.hunt&&o.hunt.b===b)){const hp=pathTo(q.x,q.y,b.x,b.y,false);if(hp){q.hunt={b,t:0};q.hp=hp}break}}
   let ax=0,ay=0;const near=o=>{const d=d2(o,q.x,q.y);if(d<36*36&&d>0){const k=Math.sqrt(d);ax+=(q.x-o.x)/k;ay+=(q.y-o.y)/k}};near(P);for(const b of buds)if(b.st!=='ride'&&b.st!=='park')near(b);
   if(ax||ay){const k=Math.hypot(ax,ay)||1;moveEnt(q,ax/k*58*dt,ay/k*58*dt,4,false);q.mv=true;q.fx=ax>0?1:-1;q.t=1.5;q.wx=q.x;q.wy=q.y;continue}
   q.t-=dt;if(q.t<=0){q.t=R(2,5);q.wx=q.hx+R(-26,26);q.wy=q.hy+R(-20,20)}
   const dx=q.wx-q.x,dy=q.wy-q.y,d=Math.hypot(dx,dy);if(d>3){moveEnt(q,dx/d*14*dt,dy/d*14*dt,4,false);q.mv=true;q.fx=dx>0?1:-1}}}
 function drawWbud(q){const c=wbSprite(q),x=Math.round(q.x-ox),y=Math.round(q.y-oy),hop=q.mv?((time*8+q.a)|0)%2:0;r('rgba(0,0,0,.26)',x-6,y+1,12,3);
  if(c){g.imageSmoothingEnabled=true;g.drawImage(q.fx>0?q.sprF:c,x-10,y-17-hop,20,20);g.imageSmoothingEnabled=false}else{r('#383048',x-5,y-9-hop,10,10);r('#98a0b0',x-4,y-8-hop,8,8)}
+ if(q.fed>0&&((time*4)|0)%2){r('#fff8a0',x+6,y-20,1,3);r('#fff8a0',x+5,y-19,3,1)}
  if(q.id==='LANTERNWISP'){g.fillStyle='rgba(248,232,150,'+(.16+.08*Math.sin(time*4)).toFixed(2)+')';g.beginPath();g.arc(x,y-8,12,0,7);g.fill()}}
 /* the old stone arch behind the willows */
 const KEEP={x:66*16+8,y:2*16+12};
