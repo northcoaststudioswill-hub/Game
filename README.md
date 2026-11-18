@@ -30,7 +30,7 @@ A pocket game console in one HTML file, by North Coast Studios. Seven game cartr
 - **Lightswarm, cartridge 6 (Nov 18 2026):** a new game, built as a vertical slice and grown to v0.3: ten playable
   keepers, supers with cutscenes, finds, the Keeper's Trail. Source: [`alt/src/lightswarm.js`](alt/src/lightswarm.js).
 - **Sprouts (Nov 17 and 18 2026):** the valley update, the prequel pass, new menus and a field guide, the Collection,
-  nature's balance.
+  nature's balance, and now **cutscenes in 3D** (N64 style, drawn live) and a tenth place, **the North Coast**.
 - **Sproutwild v10 to v12 (Nov 17 2026):** Guardians of the Light, Sunkeep redesigned, expeditions and the Soul Lamp,
   the stretch to the first Sigil confirmed by script.
 - **Patch & Plate v0.4 to v0.7 (Nov 17 2026):** the stand moved to Sunkeep, big moments, kitchen buddies, heart scenes.

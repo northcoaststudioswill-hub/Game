@@ -2,6 +2,28 @@
 
 Kept next to the game so the code and the story stay in step. Newest first. These are Will's decisions; anything marked OPEN is still his to decide.
 
+## Nov 18: the North Coast and the second light (PROPOSED by Claude, not yet Will's)
+
+Will asked how, lore wise, to introduce the next area in Sprouts. This is what was built. None of it is decided; every
+line here is Will's to keep, change or cut. It was written to fit what is already canon and to leave Sproutwild alone.
+
+- **The skip was a call.** The Great Lantern skipping once a night (prequel pass) is the Lantern calling a second
+  lantern, and getting no answer.
+- **Two lights.** "One to keep. One to call." Sun Keep is the Great Lantern. The second is the NORTH LIGHT, a stone
+  tower on a rock in a lake with no far side, at the mouth of the Crooked River. Its carving reads SUN CALL, in the same
+  hand as the arch at Willow Falls.
+- **The Lanternwisp** at the falls was the North Light's last flame, waiting for a keeper to carry her home. This is
+  what "some say she is waiting for someone" was for.
+- **Thornback** remembers the two lights when he sees the beam. He still does not remember who set him to guard.
+- **Bessie** lives in the lake and watches the light. Marcus names her in the scene ("Nobody else name her").
+- **A third thing.** Thornback's last line: "Keep. Call. And a third thing, under the mountain. It hummed. I did not
+  like it." With a cold light on a far peak. This points at the Data Center under the Peak without naming it.
+- OPEN, and the reason for the name: Will's question from Nov 17 was who or what **called** the three of them to
+  Sunkeep. A light whose whole job is to call keepers is one possible answer. The game does not say so; it only puts
+  the light there.
+- OPEN: once relit here, the North Light has to be dark or silent again by Sproutwild, or Sproutwild has to mention it.
+- OPEN: the area is east on the map with the lake along its north edge. It is called the NORTH COAST for the lake.
+
 ## Nov 17: Guardians of the Light
 
 - The big dimmed buddies are **Guardians of the Light**, not alphas. The name is a north-east Ohio nod.

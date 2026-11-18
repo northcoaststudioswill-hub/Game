@@ -35,7 +35,7 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   const sig = `JSON.stringify([sprouts.length+seeds.length,buds.length,items.filter(i=>i.alive).map(i=>i.sub+(i.tri===undefined?'':i.tri)).sort(),gates.map(g=>g.alive)])`;
   const a = await E(sig); await E(`restore(JSON.parse(JSON.stringify(snap())));void 0`); ok('save and load keep the bridge, a treasure in transit and seeds in the air', a === await E(sig));
   ok('a save from before this update still loads', await E(`(()=>{init();const o=JSON.parse(JSON.stringify(snap()));delete o.gates.orchardBridge;o.items=o.items.filter(q=>q[0]==='berry'||q[0]==='big'||q[0]==='shard').map(q=>q.slice(0,6));o.run.spark={x:400,y:300,i:1};restore(o);return gates[5].alive&&run.spark.hp===DIGHP&&DIG.alive})()`));
-  await E(`newDay();void 0`); ok('nectar blossoms open again in the morning', (await E(`items.filter(i=>i.alive&&i.sub==='nectar').length`)) === 6);
+  await E(`newDay();void 0`); ok('nectar blossoms open again in the morning', (await E(`items.filter(i=>i.alive&&i.sub==='nectar').length`)) === 7);
   /* the prequel pass */
   ok('seven wild buddies live in the valley, with Sproutwild art', await E(`wbuds.length===7&&wbuds.every(q=>!!wbSprite(q))`));
   ok('nothing targets a buddy', await E(`(()=>{const q=wbuds[0];return findTarget({x:q.x,y:q.y,type:0},20)===null||findTarget({x:q.x,y:q.y,type:0},20).kind!==undefined})()`));
@@ -81,8 +81,8 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   await E(`LO.st='follow';void 0`);
   await E(`npcs.forEach(n=>{n.st='done';n.mi=n.ms.length});run.keep=0;gates[5].alive=true;void 0`); ok('with the missions done the marker asks for the bridge', /BRIDGE/.test(await E('objective().text')));
   await E(`gates[5].alive=false;void 0`); ok('then for the old arch', /WILLOW FALLS/.test(await E('objective().text'))); await E(`run.keep=1;void 0`);
-  await E(`found=found.map(()=>true);run.wbSeen={};WBDEF.forEach(q=>run.wbSeen[q[0]]=1);run.boss=true;ZONES.forEach(z=>run.seen[z[0]]=1);run.gdone=0;state='play';void 0`); const tx0 = await E('meta.tix'); await step(120);
-  const tx1 = await E('meta.tix'); await step(120); ok('a full field guide pays two tickets, once', tx1 >= tx0 + 2 && (await E('run.gdone')) === 1 && (await E('meta.tix')) === tx1, [tx0, tx1]);
+  await E(`found=found.map(()=>true);run.wbSeen={};WBDEF.forEach(q=>run.wbSeen[q[0]]=1);run.boss=true;run.lit=1;ZONES.forEach(z=>run.seen[z[0]]=1);run.gdone=0;state='play';void 0`); const tx0 = await E('meta.tix'); await step(120);
+  const tx1 = await E('meta.tix'); await step(120); ok('a full field guide pays two tickets, once', tx1 >= tx0 + 2 && (await E('run.gdone')) === 1 && (await E('meta.tix')) === tx1, [tx0, tx1, await E('state'), await E('spGuideCount()'), await E('TYPES.length+WBDEF.length+GPPL.length+ZONES.length'), await E('JSON.stringify([0,1,2,3].map(p=>spGuideList(p).filter(e=>!e.known).map(e=>e.n)))')]);
   await E(`toasts.length=0;P.x=HX;P.y=HY+30;buds.forEach(b=>{release(b);b.gard=false;b.st='follow';b.x=P.x;b.y=P.y+6});buds.slice(0,2).forEach(b=>{b.st='idle';b.x=60*16;b.y=18*16});endDay();void 0`); await step(1); ok('the evening report counts the strays Louie brings home', (await E('tod.strays')) === 2 && (await E('state')) === 'dayend'); await E(`__g.draw();newDay();void 0`);
   await E(`dayT=DAYLEN*.95;flickT=.3;void 0`); await E(`__g.draw();void 0`); ok('night draws, with the lantern skipping', true);
   ok('no page errors', !errs.length, errs);

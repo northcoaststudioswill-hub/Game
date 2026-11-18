@@ -12,7 +12,7 @@ by anything in here; v0.1 to v0.35 stay frozen.
 
 | # | Cartridge | In one line | How you play | Source |
 |---|---|---|---|---|
-| 1 | **Sprouts** | Relight the Great Lantern. Will throws sprouts at berries, gates, grubs and four sun shards; the crew carries things home; Louie fetches strays. Days and nights, a garden, a house, valley projects, a field guide. | D-pad walk, A throw or act, B call, Select swap kind | `src/console.js` |
+| 1 | **Sprouts** | Relight the Great Lantern. Will throws sprouts at berries, gates, grubs and four sun shards; the crew carries things home; Louie fetches strays. Days and nights, a garden, a house, valley projects, a field guide, 3D cutscenes for the big story beats, and the North Coast after the ending. | D-pad walk, A throw or act, B call, Select swap kind | `src/console.js` |
 | 2 | **North Coast Knockout** | A 2D fighter with the cast: Will, Erin, Marcus, Louie, Lil Bottie, King Bibi, Corbin, Mama. Two supers each with cut-ins, parry, wall bounce, an arcade tower, Survival, Training and Trials. | D-pad, A light, B heavy, X and Y specials, Select super | `src/knockout.js` |
 | 3 | **Rootdeep** | A roguelite crawl under the valley. Short rooms, relics, a new run every time. Also holds the Lantern menu (stats, achievements, tickets). | D-pad, A attack, B cast, Select swap | `src/rootdeep.js` |
 | 4 | **Patch & Plate** | Erin's farm stand beside the Great Lantern. Plant, cook and serve; each day is a level of a minute or two; the valley's people have favourites and heart scenes. | D-pad, A use, B toss, Select recipes | `src/patchplate.js` |
@@ -49,6 +49,8 @@ real game can't read or overwrite Erin's Patch & Plate days, Rootdeep runs, or a
 | `tests/ko_lab.js` | Knockout lab: feel metrics (jump arc, pose snap, hit slide, juggles), frame sheets, the new modes, a text audit of every menu. |
 | `tests/fable_lab.js` | Fable pass 1: parry, wall bounce, K.O. frame, stances, rules and Trials (20 pass/fail checks, sheets in `playtest/fable/`). |
 | `tests/sprouts_valley.js` | Sprouts, the valley update: bridge, nectar, pear, treasure, saves, and the prequel pass (25 checks). |
+| `src/sprouts3d.js` | Sprouts' 3D cutscenes: a small software renderer (triangles, depth buffer, fog, lamps, dither), the models, and the five scenes. Built into `console.js`'s scope by `build.py`; every name starts `c3`. |
+| `tests/sprouts_coast.js` | Sprouts, the 3D scenes and the North Coast: every shot draws, captions fit, the call, door, pier, lens, relight, saves, the ending (38 checks). Optional second argument: a folder for screenshots. |
 | `tests/sprouts_story.js` | Sprouts story run: four shards, Thornback, the ending, the house, a project, the next morning (17 checks). |
 | `tests/sprouts_soak.js` | Sprouts autopilots: Erin's first day by the objective marker, and seeded chaos runs of the mid-game, with invariant checks. |
 | `tests/sprouts_tour.js` | Plays Sprouts in real time from a fresh save by following the objective marker. |

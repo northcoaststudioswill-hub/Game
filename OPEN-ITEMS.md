@@ -56,15 +56,21 @@ Sources: [`alt/CHANGELOG.md`](alt/CHANGELOG.md) (the Sprouts sections, Nov 17 an
 - Nature's balance (a wild buddy quietly eats a stranded sprout) is rare by design. Two three-day autopilot runs saw none. Whether a player ever notices it is unknown.
 - The objective-marker bot got through four asks in four of five runs and two in the other.
 
+- The 3D cutscenes and the North Coast (Nov 18) were stepped by script only (`sprouts_coast.js`, 38 checks). Not played by hand, not seen on a phone, no sound listened to. Frame time on a real phone is unknown.
+- There is no way to watch a 3D scene again after it has played.
+
 **Waiting on Will (canon these updates assumed)**
 - Buddies live on the light that sprouts carry, here as in Sproutwild, and nobody in Sprouts knows that yet.
+- The North Coast lore, all of it proposed: the skip is a call, two lights ("one to keep, one to call"), the North Light and SUN CALL, the Lanternwisp as its last flame, Bessie in the lake, Thornback's "third thing under the mountain". See the Nov 18 section of [`alt/STORY-NOTES.md`](alt/STORY-NOTES.md).
+- Whether the North Light is what called Will, Erin and Marcus to Sunkeep (the game leaves it unsaid).
 - The prequel pass's canon: the old stones call the Lantern Field "Sun Keep", somebody kept this light before, and Thornback was set to guard a light and has forgotten who asked.
 - The Lanternwisp's line for this valley ("some say she is waiting for someone").
 - The field guide's lines for people (Marcus as the plumbing boss, Louie the evolved shiba).
 
 **Wanted (Will, Nov 18: "keep working on the game")**
 - More refining of gameplay, characters, lore, world building, the Pikmin-like play and the menus.
-- The lake monster renamed BESSIE in the code (story notes: still to do).
+- The lake monster renamed BESSIE in Sproutwild's code (story notes: still to do). Sprouts now has her as BESSIE.
+- More on the North Coast: it has one job today (pier, lens). A project, a person, or a second ask there.
 
 ---
 

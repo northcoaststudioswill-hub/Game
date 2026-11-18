@@ -3,6 +3,66 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: cutscenes in 3D, and the North Coast (Nov 18 2026)
+
+Will: develop Sprouts more. Lore wise, how do we introduce the next area? Actual cutscenes, 3D rendered occasionally,
+N64 era style.
+
+![The 3D scenes](playtest/sprouts-3d-cutscenes.png)
+
+**How the next area is introduced (the short version).** The Lantern has skipped once a night since the prequel pass
+and nobody could say why. Now it turns out the skip was a call. Once the Lantern is whole, one night the light gathers
+into a beam, opens an old sun door east of the orchard, and points down the Crooked River to a second lantern standing
+dark on a lake. Thornback remembers: two lights, one to keep, one to call. The canon this assumes is written up in
+[`STORY-NOTES.md`](STORY-NOTES.md) for Will to confirm or change.
+
+**3D cutscenes** (new file `src/sprouts3d.js`):
+- Five scenes, 24 shots, used only for the big beats. Everything else stays 2D.
+  - `dawn`: a new game opens on the Lantern at night, the crack with four shards flying off, and Will walking in at
+    dawn. Erin's 2D scene follows, starting on her hello.
+  - `blaze`: the fourth shard, before Erin's ending lines.
+  - `call`: the night the Lantern calls (nine shots).
+  - `coast`: the first walk onto the North Coast.
+  - `relight`: the lens comes home and the North Light burns.
+- The look is a 64-bit console's: low-poly models with a colour at each corner, fog, a lamp that lights the ground
+  around it, 15-bit colour with dither, drawn at the screen's own 240 pixels and scaled up soft. Will, Erin, Marcus,
+  Louie, Thornback, sprouts and buddies are all built as models from their sprite colours (Will wears the cap and coat
+  you have equipped). No WebGL, no image or model files; the page grew by about 60 KB with the new area.
+- A scene plays itself. A shows the whole caption, then goes to the next shot. Start skips the scene.
+
+**The North Coast** (the tenth place):
+
+![The North Coast](playtest/sprouts-north-coast.png)
+
+- **The call.** After the fourth shard, the next night (day 2 or later) the `call` scene plays wherever Will is
+  outdoors, and the sun door at the east end of the orchard path opens. Sprouts cannot open that door; throwing at it
+  says so. The dusk message hints that the Lantern is restless.
+- **The place.** Sand, a lake that fills the north, a tide pool, wild Dews, Pebs and Luckies, berries, a nectar
+  blossom, crabs, a trail post. The valley map is 22 tiles wider; the map screen is drawn smaller to fit.
+- **The pier.** Stakes on the shore; sprouts of any kind build it (it takes longer than the orchard bridge).
+- **The lens.** It lies on the rock by the North Light and needs 10 carrying strength. The crew carries it the whole
+  way home to the Lantern, the longest haul in the game. Delivering it plays `relight`, pays 60 petals and 2 tickets,
+  and lights the tower.
+- **Afterwards.** The tower shines and sweeps a beam at night, the Lantern stops skipping, Bessie raises her head in
+  the lake after dark, and she goes in the field guide under PEOPLE. The tower can be read with A (it says SUN CALL).
+- The objective marker carries the new steps: FOLLOW THE BEAM EAST, BUILD THE OLD PIER, CARRY THE LENS TO THE LANTERN.
+  These take over from the mission marker until the light is lit.
+
+**Saves:** old saves load with the door shut and get the call on their next night if the Lantern is already whole.
+The door, the pier, the lens and the lit tower are saved.
+
+**Changed on the way:** the pause tile reads "9 / 10 places" (it did not fit with ten). The second bridge reuses the
+orchard bridge's code, which had assumed there was only one.
+
+**Tested:** new `tests/sprouts_coast.js`, 38 checks, all pass: every shot of every scene draws a full picture (72
+frames, 4 to 5 ms each on average in headless Chromium, 19 ms at worst), every caption fits, the opening, the call, the
+door, the pier, the lens carried home by a real crew, the relight, three kinds of save, and the ending.
+`sprouts_valley.js`, `sprouts_story.js` and `sprouts_soak.js` pass after being updated for the new opening, ending and
+tenth place. Sproutwild lab 124 of 124, Patch & Plate 119 of 119, console shelf and Lightswarm lab pass.
+**Not tested:** by hand, or on a phone. Frame time on a real phone is unknown; the scenes are the heaviest drawing in
+Sprouts. No sound was listened to. `sprouts_valley.js` failed its field-guide check once in four runs here; that check
+waits on a timer and looks to have been flaky before this change.
+
 ## Docs: one list of everything open, front pages brought up to date, pushed to main (Nov 18 2026)
 
 Will: push this build to main; one big doc of every known bug, issue, want and wish per project from the latest notes
