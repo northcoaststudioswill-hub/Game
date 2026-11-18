@@ -58,7 +58,7 @@
   function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
 
   const D = {};
-  let room, layers = { bg: {} };
+  let room, layers = { bg: {}, fg: {} };
 
   D.init = function (r, viewW) {
     room = r;
@@ -213,6 +213,23 @@
     }
     g.fillStyle = T.midC;
     for (let x = 0; x < w; x += 30) { const h = 20 + r() * 50; g.beginPath(); g.moveTo(x, 360); g.lineTo(x + 15, 360 - h); g.lineTo(x + 30, 360); g.fill(); }
+    return c;
+  }
+  // A strip of near things in silhouette along the bottom edge: boughs and grass outdoors, rock teeth in the Deep,
+  // railings and crates in the city. Sparse, so it frames the picture without hiding the ground Wren stands on.
+  function makeForeground(name) {
+    const w = 900, h = 64, c = canvas(w, h), g = c.getContext('2d'), r = rng(name.length * 7 + 3);
+    const col = { deep: '#020504', thornwood: '#040208', winter: '#0a1020', mountain: '#060a14', city: '#05040f', dusk: '#06040f' }[name] || '#05040f';
+    g.fillStyle = col;
+    for (let x = 0; x < w; x += 2) { const gh = 3 + Math.sin(x * 0.05) * 2 + r() * 5; g.fillRect(x, h - gh, 2, gh); }   // a low uneven edge
+    for (let i = 0; i < 7; i++) {
+      const x = 40 + i * 128 + r() * 50;
+      if (name === 'deep') { const hh = 22 + r() * 30; g.beginPath(); g.moveTo(x - 16, h); g.lineTo(x - 3, h - hh); g.lineTo(x + 4, h - hh * 0.7); g.lineTo(x + 18, h); g.fill(); }
+      else if (name === 'city') { if (i % 2) { g.fillRect(x - 14, h - 26, 28, 26); g.fillRect(x - 17, h - 30, 34, 5); } else { for (let k = 0; k < 5; k++) g.fillRect(x - 40 + k * 20, h - 30, 3, 30); g.fillRect(x - 44, h - 30, 90, 4); } }
+      else if (name === 'thornwood') { g.lineWidth = 4; g.strokeStyle = col; g.beginPath(); g.moveTo(x - 30, h); g.quadraticCurveTo(x - 10, h - 50, x + 26, h - 30); g.stroke(); for (let k = 0; k < 5; k++) { const tx = x - 22 + k * 11, ty = h - 20 - k * 6 + (k > 3 ? 8 : 0); g.beginPath(); g.moveTo(tx, ty); g.lineTo(tx + 3, ty - 9); g.lineTo(tx + 6, ty); g.fill(); } }
+      else { for (let k = 0; k < 9; k++) { const bx = x - 26 + k * 6.5, bh = 14 + Math.sin(k * 0.8) * 10 + r() * 10; g.beginPath(); g.moveTo(bx - 4, h); g.lineTo(bx, h - bh); g.lineTo(bx + 4, h); g.fill(); }   // a tuft of tall grass, or a pine bough
+        if (i % 3 === 0) { g.beginPath(); g.moveTo(x + 40, h); g.lineTo(x + 58, h - 52); g.lineTo(x + 76, h); g.fill(); g.beginPath(); g.moveTo(x + 46, h - 18); g.lineTo(x + 58, h - 62); g.lineTo(x + 70, h - 18); g.fill(); } }
+    }
     return c;
   }
   function makeVignette(w) {
@@ -462,6 +479,9 @@
     drawParticles(ctx, fx);
     ctx.restore();
 
+    // the foreground: dark shapes close to the eye, sliding past faster than the world (depth, as in Hollow Knight)
+    { const fgName = zones[zi].theme, fg = layers.fg[fgName] || (layers.fg[fgName] = makeForeground(fgName)), fxo = ((cx * 1.45) % fg.width + fg.width) % fg.width;
+      ctx.globalAlpha = 0.9; for (let x0 = -fxo; x0 < vw; x0 += fg.width) ctx.drawImage(fg, Math.round(x0), VH - fg.height + Math.round((cy - (w.room.pxH - VH)) * 0.2)); ctx.globalAlpha = 1; }
     { const kk = zi > 0 ? Math.min(1, (mid - (zones[zi].x - 6)) / 12) : 0; drawLight(ctx, w, cx - sx, cy - sy, vw, VH, t, zones[Math.max(0, zi - 1)].theme, zones[zi].theme, kk); }
     ctx.restore();
     SH.arts.draw(ctx, w, vw, VH);
@@ -493,6 +513,14 @@
     const mist = ctx.createLinearGradient(0, 180 - cy * 0.3, 0, VH);
     mist.addColorStop(0, 'rgba(0,0,0,0)'); mist.addColorStop(1, T.mist);
     ctx.fillStyle = mist; ctx.fillRect(0, 0, vw, VH);
+    // shafts of light slanting down through the air (moonlight outdoors, a rose glow Under the Mountain)
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 5; i++) {
+      const sx0 = ((i * 211 - cx * 0.22) % (vw + 260) + vw + 260) % (vw + 260) - 130, wd = 26 + (i * 17) % 30, a = alpha * (0.035 + 0.02 * Math.sin(t * 0.012 + i * 1.7));
+      const sg = ctx.createLinearGradient(0, 0, 0, VH * 0.8); sg.addColorStop(0, 'rgba(' + (theme === 'deep' ? '255,150,180' : theme === 'city' ? '255,214,150' : '200,214,255') + ',' + a * 3 + ')'); sg.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = sg; ctx.beginPath(); ctx.moveTo(sx0, 0); ctx.lineTo(sx0 + wd, 0); ctx.lineTo(sx0 + wd - 90, VH * 0.8); ctx.lineTo(sx0 - 110, VH * 0.8); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
     // drifting motes
     for (let i = 0; i < (T.snow ? 70 : 22); i++) {
       const px = ((i * 137 + t * (0.15 + (i % 5) * 0.05) - cx * 0.6 + Math.sin(t * 0.02 + i) * 8) % (vw + 40) + vw + 40) % (vw + 40) - 20;

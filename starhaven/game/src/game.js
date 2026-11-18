@@ -22,7 +22,7 @@
     const pr = G.progress;
     SH.saves.write(G.slot, {
       chapter: G.resumeAt != null ? G.resumeAt : G.chapter, pending: G.resumeAt != null ? G.pending2 : null,
-      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
+      reached: pr.reached, bonds: pr.bonds, met: pr.met, playFrames: pr.playFrames || 0, motes: pr.motes || {}, stars: pr.stars || {}, mem: pr.mem || {}, seen: pr.seen || {}, said: SH.arts.said, bondMeter: Math.round(SH.arts.meter),
     });
     if (show) G.hud.saved();
   };
@@ -41,7 +41,7 @@
     const s = SH.saves.all()[slot];
     if (!s) return G.newGame(slot);
     G.slot = slot;
-    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})) };
+    G.progress = { reached: s.reached, bonds: JSON.parse(JSON.stringify(s.bonds || {})), met: (s.met || []).slice(), playFrames: s.playFrames || 0, motes: Object.assign({}, s.motes), stars: Object.assign({}, s.stars), mem: JSON.parse(JSON.stringify(s.mem || {})), seen: Object.assign({}, s.seen) };
     SH.arts.newGame(); SH.arts.said = Object.assign({}, s.said); SH.arts.meter = s.bondMeter || 0;
     const N = ST.CHAPTERS.length, target = s.chapter;
     const goOn = () => { if (target < N) G.startChapter(target); else G.runScript('finale'); };
@@ -85,7 +85,7 @@
       onPerfectDodge() {
         fx.slowmo = 26; player.stats.perfect++;
         player.dashCd = 0; player.airDashes = 1;
-        fx.word(player.x, player.y - 52, 'PERFECT DODGE', '#9fe8ff', 60);
+        fx.word(player.x, player.y - 52, 'PERFECT DODGE', '#9fe8ff', 60); G.explain('opening');
         SH.arts.open(this);
         fx.ring(player.x, player.y - 20, '#9fe8ff', 44, 22, 2);
       },
@@ -287,7 +287,7 @@
       case 'mode': break;   // skipped along with the scene
       case 'remember': G.remember(st.key, st.text, st.good); break;
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
-      case 'flag': G.flags[st.name] = true; G.hud.goal(); break;
+      case 'flag': G.flags[st.name] = true; G.hud.goal(); if (st.name === 'giftgot') G.explain('moons'); break;
       case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
       case 'gate': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, false); fx.kick(3); } break; }
       case 'meet': G.meet(st.who); break;
@@ -326,6 +326,20 @@
     }
     G.save();
   };
+  // Explain a system the first time it matters: a short card that holds the game until it is read. Once per save.
+  G.explain = function (key) {
+    const seen = G.progress.seen = G.progress.seen || {};
+    if (G.noExplain || seen[key] || !ST.EXPLAIN[key] || G.explaining) return;
+    if (G.state !== 'play') { G.explainNext = key; return; }        // wait for the scene to end
+    seen[key] = 1; G.explaining = key; G.state = 'explain'; input.clear(true);
+    const e = ST.EXPLAIN[key];
+    document.getElementById('ex-icon').textContent = e.icon; document.getElementById('ex-title').textContent = e.title; document.getElementById('ex-text').textContent = e.text;
+    document.getElementById('explain').classList.add('show'); SH.sfx.play('select');
+  };
+  G.explainClose = function () {
+    if (!G.explaining) return;
+    G.explaining = null; document.getElementById('explain').classList.remove('show'); G.state = 'play'; input.clear(true); G.save();
+  };
   // What a decision did. Effects gather for a moment, then show together as one card.
   G.effects = []; G.effectT = 0;
   G.effect = function (e) { G.effects.push(e); G.effectT = 6; };
@@ -335,6 +349,7 @@
     const m = G.progress.mem = G.progress.mem || {};
     if (m[key]) return;
     m[key] = { text, good: good == null ? null : !!good, ch: G.chapter };
+    G.explain('remember');
     G.effect({ mem: text, good: good == null ? null : !!good });
     G.save();
   };
@@ -343,6 +358,7 @@
     if (!G.progress.bonds[who]) G.progress.bonds[who] = { pts: 0 };
     const b = G.progress.bonds[who], before = G.heartsFor(b.pts);
     b.pts = Math.max(0, b.pts + pts);
+    G.explain('bonds');
     const after = G.heartsFor(b.pts);
     if (after > before) { G.heartQueue.push(`heart_${who}_${after}`); SH.sfx.play('heart'); }
     else if (pts < 0) SH.sfx.play('back');
@@ -371,6 +387,7 @@
     if (G.mode) { if (G.state === 'talk' || G.state === 'play') G.progress.playFrames = (G.progress.playFrames || 0) + 1; SH.modes.step(input); return; }
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
     G.effectStep();
+    if (G.explainNext && G.state === 'play' && !G.mode && !SH.arts.cutin) { const k = G.explainNext; G.explainNext = null; G.explain(k); if (G.state !== 'play') return; }
     if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
@@ -396,7 +413,7 @@
     // Starlight motes
     for (const m of w.motes) {
       if (m.got || Math.abs(m.x - p.x) > 16 || Math.abs(m.y - (p.y - 20)) > 24) continue;
-      m.got = true; SH.sfx.play('mote');
+      m.got = true; SH.sfx.play('mote'); G.explain('starlight');
       fx.burst(m.x, m.y, 6, { speed: 1.6, life: 18, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
       G.hud.motes(w.motes.filter(x => x.got).length, w.motes.length, true);
       if (w.motes.every(x => x.got)) { SH.arts.whisper('motesAll'); SH.fx.word(p.x, p.y - 64, 'ALL STARLIGHT', '#ffd27a', 90); }
@@ -495,6 +512,7 @@
         l.lit = true; p.hearts = p.maxHearts; SH.sfx.play('lantern');
         fx.ring(l.px, l.py - 46, '#ffd27a', 50, 26, 2);
         fx.burst(l.px, l.py - 46, 16, { speed: 2, life: 30, gravity: -0.03, colors: ['#ffd27a', '#fff6d8'], glow: true });
+        G.explain('lantern');
         G.hud.toast('Lantern lit: hearts restored. You come back here if knocked out.');
       }
       if (at && w.checkpoint !== l) w.checkpoint = l;
@@ -532,7 +550,7 @@
     const motesLeft = w.motes.filter(m => !m.got && (G.activeGoal === 'report' || m.x < p.x)).length;   // Starlight still behind her
     const hint = (def.hints || []).find(h => tx >= h.x0 && tx < h.x1 && (!h.flag || G.flags[h.flag]) && (!h.until || !G.flags[h.until]) && (!h.motesLeft || motesLeft > 0));
     const canPaint = w.muralNear && def.mural && !G.flags[def.mural.flag];
-    G.hud.prompt(hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Hold {PAINT} to paint the wall.') : null);
+    G.hud.prompt(hint ? input.fill(hint.text).replace('{LEFT}', motesLeft) : canPaint ? input.fill('Use {PAINT} at the wall to paint it.') : null);
     const usable = w.things.find(e => e.usable && e.near);
     G.hud.talkButton(talkable ? 'TALK' : canPaint ? 'PAINT' : usable ? usable.label : null);
 
@@ -680,6 +698,7 @@
     const go = () => input.take('jump') || input.take('attack');
     if (G.state === 'front') SH.front.menuInput(input);
     else if (G.state === 'card') { if (go()) G.hud.cardGo(); }
+    else if (G.state === 'explain') { if (go()) G.explainClose(); }
     else if (G.state === 'pause' || G.state === 'end') {
       const id = G.state === 'end' ? 'end' : ['journal', 'tune', 'stars'].find(x => document.getElementById(x).classList.contains('show')) || 'menu';
       if (input.take('up')) G.hud.nav(id, -1);
@@ -695,6 +714,10 @@
     const viewW = Math.max(420, Math.min(720, Math.round(SH.VIEW_H * W / H)));
     const scale = Math.min(W / viewW, H / SH.VIEW_H);
     const cv = G.canvas;
+    // Held upright, the picture sits at the top and everything you touch or read sits below it.
+    const upright = H > W * 1.15;
+    document.body.classList.toggle('upright', upright);
+    document.documentElement.style.setProperty('--cvh', Math.floor(SH.VIEW_H * scale) + 'px');
     if (cv.width !== viewW) { cv.width = viewW; cv.height = SH.VIEW_H; }
     cv.style.width = Math.floor(viewW * scale) + 'px';
     cv.style.height = Math.floor(SH.VIEW_H * scale) + 'px';
@@ -708,7 +731,7 @@
     // load('roomId', { story: false }): a bare room, every gate open, no story scripts.
     load(chapterOrRoom, opts) {
       opts = opts || {};
-      G.frozen = true; input.forced = { held: {}, pressed: {} }; SH.modes.auto = !opts.modes; G.mode = null; SH.modes.cur = null; delete document.body.dataset.mode;
+      G.frozen = true; input.forced = { held: {}, pressed: {} }; SH.modes.auto = !opts.modes; G.noExplain = !opts.explain; G.explaining = null; G.explainNext = null; G.mode = null; SH.modes.cur = null; delete document.body.dataset.mode;
       document.getElementById('front').classList.remove('show'); G.slot = null;
       if (typeof chapterOrRoom === 'number') { G.startChapter(chapterOrRoom); G.hud.cardGo(); }
       else {

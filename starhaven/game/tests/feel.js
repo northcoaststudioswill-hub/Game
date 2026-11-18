@@ -562,6 +562,19 @@ const path = require('path');
       SH.modes.auto = true;
     })();
 
+    // Systems explain themselves the first time, once
+    (function () {
+      SH.test.load('woods', { story: false, explain: true }); G.progress.seen = {};
+      const m = G.world.motes[0]; SH.test.place(m.x / T - 0.5, 16); P().x = m.x; P().y = m.y + 20; step({}, null); step({}, null);
+      const shown = G.state === 'explain' && document.getElementById('explain').classList.contains('show'), title = document.getElementById('ex-title').textContent;
+      const t0 = G.world.time; for (let i = 0; i < 20; i++) step({}, null); const held = G.world.time === t0;
+      G.explainClose(); const closed = G.state === 'play';
+      const m2 = G.world.motes[1]; P().x = m2.x; P().y = m2.y + 20; step({}, null); step({}, null);
+      const list = Object.keys(SH.STORY.EXPLAIN).length;
+      check('Explained once: the first Starlight opens a card that holds the game; the second does not; seven systems are listed', shown && title === 'Starlight' && held && closed && G.state === 'play' && list === 7, { shown, title, held, closed, again: G.state, listed: list });
+      G.noExplain = true;
+    })();
+
     // Evening 2 choices lead to the right person and add their bond points
     for (const [choice, who, script] of [[1, 'bram', 'ev2_bram'], [2, 'iris', 'ev2_iris']]) {
       SH.test.load(3); G.progress.bonds = {}; SH.test.choice = choice;

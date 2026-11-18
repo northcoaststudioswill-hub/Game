@@ -9,7 +9,7 @@ landscape on a phone (touch or a Bluetooth controller) or in any browser. All ch
 > across the sea, and the stolen powers of seven courts are waking up inside her.
 
 **Play it:** from the North Coast Arcade page ([`arcade/`](../arcade/README.md)), or download [`game/starhaven.html`](game/starhaven.html) and open it in a browser, or use the shared Claude
-link Will has. Hold your phone sideways.
+link Will has. Hold your phone either way up.
 
 > **New here?** Read this page, then [`STORY.md`](STORY.md) (what happens, chapter by chapter) and
 > [`CHANGELOG.md`](CHANGELOG.md) (what changed in each build). The design source of truth is [`DESIGN.md`](DESIGN.md).
@@ -33,6 +33,8 @@ gifts and bond hearts.
 
 ## Latest update (Nov 18, 2026)
 
+- **Play it upright or sideways.** Held upright, the picture is on top and the controls and text are below it.
+  Light shafts and a foreground layer in every level; each system explains itself the first time it matters.
 - **Decisions that matter, and a fuller hunt:** every choice shows who it touched, by how much and why; some are
   remembered and the story answers them later. The Winter Woods now has firewood, snares, archery targets,
   wintergreen and a starving wolf before the stag. New title and pause screens; finer portraits.

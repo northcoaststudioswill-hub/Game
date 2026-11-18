@@ -52,6 +52,7 @@
     if (!A.active() || A.scene) return;
     const was = A.meter >= A.max;
     A.meter = Math.min(A.max, A.meter + n * (1 + 0.15 * SH.stars.level('bond')));
+    if (A.meter > 20) SH.game.explain('bondbar');
     if (!was && A.meter >= A.max) {
       SH.sfx.play('lantern');
       const p = SH.game.world.player; SH.fx.ring(p.x, p.y - 22, '#b9a8ff', 60, 26, 3);

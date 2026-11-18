@@ -358,6 +358,9 @@
     on('m-journal', () => { H.menu(false); H.journal(true); });
     on('m-tune', () => { H.menu(false); H.tune(true); });
     on('m-stars', () => { H.menu(false); H.stars(true); });
+    on('m-howto', () => { H.menu(false); $('howto').classList.add('show'); $('hw-body').innerHTML = Object.values(ST.EXPLAIN).map(e => `<div class="hw-row"><span>${e.icon}</span><div><b>${esc(e.title)}</b><small>${esc(e.text)}</small></div></div>`).join(''); });
+    on('hw-back', () => { $('howto').classList.remove('show'); H.menu(true); });
+    on('ex-ok', () => SH.game.explainClose());
     on('st-back', () => { H.stars(false); H.menu(true); });
     on('m-restart', () => { H.menu(false); G.startChapter(G.chapter); });
     on('m-controls', () => $('controls').classList.toggle('show'));

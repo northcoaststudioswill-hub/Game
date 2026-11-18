@@ -25,6 +25,17 @@
     narr: { name: '', color: '#b9b2dd' },
   };
 
+  // How the game works, told the first time each thing matters (once per save) and listed under "How it works".
+  S.EXPLAIN = {
+    starlight: { icon: '\u2726', title: 'Starlight', text: 'The gold motes in every level. The counter beside MENU shows how many this level holds. Spend Starlight in the pause menu, under Constellation, on more hearts and stronger Bond Arts.' },
+    lantern: { icon: '\u2600', title: 'Lanterns', text: 'Lighting a lantern fills your hearts. If Wren is knocked out she comes back at the last one she lit, with nothing lost.' },
+    bonds: { icon: '\u2665', title: 'Bonds', text: 'What you say and do moves people toward you or away. A green card means closer, a red card means further, and the card says why. Each person has five hearts; a new heart plays a scene. See them in Story & goals.' },
+    remember: { icon: '\u2726', title: 'This will be remembered', text: 'Some decisions change scenes later in the story. Green: someone is better for it. Red: it will cost her. Gold: it could go either way. They are listed in Story & goals, under What Wren has done.' },
+    bondbar: { icon: '\u263E', title: 'The bond bar and Bond Arts', text: 'The bar under your hearts fills as your hits land, faster for long unbroken strings. When it is full, a BOND ART button appears: a huge attack, with a memory. Nothing can hurt Wren while it plays.' },
+    moons: { icon: '\u25CF', title: 'Moons and the Flame', text: 'Each Flame costs one moon. Hold the button and let go for a flame wave that costs two. Moons refill slowly by themselves, and quickly when your daggers land.' },
+    opening: { icon: '\u2727', title: 'Perfect dodge', text: 'Dash through an attack at the last moment and time slows: an opening. For a moment every cut does more and gets past armor.' },
+  };
+
   // Whispers down the mate bond: short lines that slide in during play and never stop it.
   // Each is said once per save, in order (the boss lines repeat). [who, text]
   S.WHISPERS = {

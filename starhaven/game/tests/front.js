@@ -96,6 +96,11 @@ const path = require('path');
 
   // ---- controller in the pause menu
   await page.evaluate(() => { SH.game.hud.cardGo(); SH.game.script = null; SH.game.hud.dialog(null); SH.game.hud.sceneArt(null); SH.game.choosing = null; SH.game.hud.choice(null); (SH.game.world.room.def.triggers || []).forEach((t, i) => (SH.game.world.fired[i] = true)); SH.game.state = 'play'; });
+  await page.waitForTimeout(250);
+  const explained = await page.evaluate(() => SH.game.state === 'explain' ? document.getElementById('ex-title').textContent : null);
+  if (explained) await press(A);                      // a first-time explanation card: A closes it
+  const afterCard = await page.evaluate(() => SH.game.state);
+  check('First-time explanation: a card holds the game until A closes it', !explained || afterCard === 'play', { explained, afterCard });
   await press(9);                                     // Start
   const paused = await page.evaluate(() => SH.game.state);
   await press(DOWN); await press(A);                  // Resume -> Story & goals

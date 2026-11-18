@@ -1,5 +1,30 @@
 # Starhaven — Changelog
 
+## Reimagined 6 — play it upright, depth in the picture, systems that explain themselves (Nov 18, 2026)
+Will: keep beautifying (characters, animation, menus, graphics); you shouldn't have to turn your phone to play, Sootborn
+works upright; make the systems more understandable.
+
+- **You can hold the phone upright.** The "turn your phone sideways" screen is gone. Upright, the picture sits at the
+  top of the screen and a control deck sits below it: the goal and hints, dialogue with its portrait, the stick on the
+  left and the buttons on the right, so thumbs never cover the action. Cutscenes and the opening film fit the width
+  with their text underneath. Sideways still works as before. Turning the phone switches between the two at once.
+- **Depth in every level.** Shafts of light slant down through the air (moonlight outdoors, a rose glow Under the
+  Mountain, lamplight in the city), and a dark foreground of grass, boughs, rock teeth or railings slides past faster
+  than the world along the bottom edge.
+- **Systems explain themselves the first time they matter,** once per save, on a card that holds the game until you
+  close it: Starlight, lanterns, bonds, "this will be remembered", the bond bar and Bond Arts, moons and the Flame,
+  and the perfect dodge. All seven are also listed any time under **How it works** in the pause menu.
+- The paint hint now matches the mural ("Use PAINT at the wall").
+
+**Honest notes.**
+- Upright, the picture is about a third of the screen (the game's view is wider than it is tall). It is readable in
+  screenshots at 390 by 844; whether it feels too small in the hand is for Will to say. Making the view itself taller
+  when upright is possible but touches the whole renderer.
+- "Character models and animations" in this pass means the depth and light around them. Wren's own figure, the thorn
+  sprites and the wyrms are still drawn as before; they are the next thing to redraw.
+- Tests: 47 play checks, 19 menu checks, the screenshot run, plus upright screenshots. **Not played by hand or on a
+  phone.**
+
 ## Reimagined 5 — decisions that matter, a fuller hunt, menus and faces (Nov 18, 2026)
 Will: we have to know why our decisions matter, whether they help or hurt. The slice needs more content and a slower
 pace, with more to do before the deer is shot. Better menus, better design, updated characters.
