@@ -3,6 +3,38 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: from Will's playtest - the house in 3D, the front door, fewer trail posts (Nov 18 2026)
+
+Will, after playing: it's fun. Fast travel points don't need to be so close together, or any at all within one region;
+maybe region to region. The house locked me out after using it once. Consider a full house redesign, in the N64 style.
+
+![The house](playtest/sprouts-house-3d.png)
+
+- **The house is drawn in 3D.** Inside is now a cutaway room in the same style as the scenes, live while you walk
+  about: plank floor, two windows that show day or night, a fire on the west wall, a lamp that lights at night, the
+  desk, and a corner for each job (berry crates and jars for the pickers, a bench of flowerpots for the florists,
+  Louie's rug, bed and hoop for the trainers, a round rug for the resting). Residents are 3D sprouts, Will and Louie
+  are their scene models. Each time the house is made bigger it gains a bed, then a plant, then a bookshelf.
+  - What you do in it has not changed: the same room to walk, the desk in the same place, the same menu, walk down to
+    leave. The room is fitted to the screen's shape so all of it shows between the top bar and the bottom strip.
+- **The front door.** Walking up into the door now goes in. Pressing A at it also works while a direction is held,
+  and an arrow bobs over the door when Will is near.
+  - Why: the door used to open only on A, and only if Will was standing still and facing it. Holding the pad toward
+    the door and pressing A threw a sprout instead. A full lock-out could not be made to happen by script (in, out,
+    the desk, bed, the day ending indoors, in again all work), so this is the likely cause, not a proven one.
+- **Four trail posts instead of ten:** the Lantern Field, the Sunny Orchard, Pebble Beach and the North Coast. The
+  posts in the Berry Field, North Meadow, Erin's Garden, Dew Pond, Thornback's Hollow and Willow Falls are gone; those
+  are walked to from the nearest post.
+
+**Tested:** `tests/sprouts_coast.js` 108 checks (eight new: four posts and what they offer, no post in the meadow,
+walking in, walking out, A while moving, the 3D room drawn and fitting, the desk). `sprouts_valley.js`,
+`sprouts_story.js`, soak (two mid-game and two late-game seeds), Sproutwild lab 124 of 124, Patch & Plate 119 of 119,
+console shelf: all pass. The room was looked at on three screen shapes, by day, at night, empty and full.
+**Not tested:** by hand, or on a phone. On a very wide, short screen the room is drawn small.
+
+**For Will:** if the lock-out happens again after this, note what the screen said and where Will was standing; that
+would be a different bug from the one fixed here. Which four posts stay is a first guess and easy to change.
+
 ## Sprouts: five easter-egg scenes (Nov 18 2026)
 
 Will: more easter-egg scenes with Marcus and Will ripping dabs, "seeing one and sending one" (that's what Marcus

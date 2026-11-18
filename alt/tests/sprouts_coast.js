@@ -188,6 +188,23 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   const mid = await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);return run.call===1&&!coastGate('sunDoor').alive&&coastGate('northPier').alive&&items.filter(i=>i.alive&&i.sub==='lens').length===1&&sprouts.some(q=>q.x>70*16)})()`);
   ok('saved half way, the lens and the wild coast sprouts are still there', mid);
 
+  /* ---- from Will's playtest: fewer trail posts, the front door, the house in 3D ---- */
+  await E(`init();live=true;state='play';dayT=30;ZONES.forEach(z=>run.seen[z[0]]=1);void 0`); await step(4);
+  ok('trail posts stand only where regions meet (four, not ten)', await E(`PZ.length===4&&PZ.map(z=>z[0]).join()==='LANTERN FIELD,SUNNY ORCHARD,PEBBLE BEACH,NORTH COAST'`), await E('PZ.map(z=>z[0])'));
+  await E(`const p=postXY(PZ[0]);P.x=p.x;P.y=p.y+14;P.dx=0;P.dy=-1;buds.forEach(b=>b.st='idle');void 0`); await step(3); await tap('a');
+  ok('a post offers the other three', await E(`state==='travel'&&tlist.length===3`), [await E('state'), await E('tlist.length')]); await tap('b');
+  await E(`const p=postXY(ZONES[2]);P.x=p.x;P.y=p.y+14;P.dx=0;P.dy=-1;void 0`); await step(3); await tap('a'); ok('there is no post in the North Meadow any more', (await E('state')) === 'play', await E('state'));
+  await E(`state='play';P.x=DOOR.x;P.y=DOOR.y+30;P.dx=0;P.dy=1;buds=[];void 0`); await E(`keys.up=1;void 0`); await step(50); await E(`keys.up=0;void 0`); await step(30);
+  ok('walking into the front door goes in (no button)', await E('inHome===true'), await E('[P.x|0,P.y|0,inHome]'));
+  await E(`keys.down=1;void 0`); await step(70); await E(`keys.down=0;void 0`); await step(30); ok('walking down leaves', await E('inHome===false'));
+  await E(`P.x=DOOR.x+14;P.y=DOOR.y+14;void 0`); await E(`keys.left=1;keys.up=1;void 0`); await step(6); await E(`keys.a=1;void 0`); await step(1); await E(`keys.a=0;keys.left=0;keys.up=0;void 0`); await step(40);
+  ok('A at the door works while still holding a direction', await E('inHome===true'), await E('[P.x|0,P.y|0,inHome]'));
+  const room = JSON.parse(await E(`(()=>{home.res=[4,3,3,2,3,2];home.jobs=[5,6,3];home.up=2;mkRes();for(let i=0;i<20;i++)__g.update(1/30);g.setTransform(2,0,0,2,0,0);draw();const s=new Set();for(let j=0;j<c3px.length;j+=53)s.add(c3px[j]);const f=c3HomeFit();c3Cam(5.5,f[0]*f[1],f[0],5.5,.7,3.1,38);let y0=1e9,y1=-1e9,x0=1e9,x1=-1e9;for(const x of[-.3,11.3])for(const y of[-.2,3.3])for(const z of[-.3,7.25]){const q=c3Proj(x,y,z);x0=Math.min(x0,q[0]);x1=Math.max(x1,q[0]);y0=Math.min(y0,q[1]+f[2]);y1=Math.max(y1,q[1]+f[2])}return JSON.stringify([s.size,c3stat.tris,Math.round(x0),Math.round(x1),Math.round(y0),Math.round(y1),H])})()`));
+  ok('the house is drawn in 3D and the whole room fits between the top bar and the bottom strip', room[0] > 60 && room[1] > 800 && room[2] >= 0 && room[3] <= 240 && room[4] >= 36 && room[5] <= room[6] - 50, room);
+  await shot('house-3d');
+  await E(`P.x=RX+88;P.y=RY+30;P.dx=0;P.dy=-1;void 0`); await step(3); await tap('a'); ok('the desk still opens the house menu', (await E('state')) === 'house', await E('state')); await tap('b');
+  await E(`exitHome();void 0`); await step(3);
+
   /* ---- easter eggs ---- */
   await E(`init();live=true;state='play';dayT=30;ZONES.forEach(z=>run.seen[z[0]]=1);run.key=1;openGate(gates[1]);openGate(coastGate('jobsite'));void 0`); await step(4);
   ok('no van by the pond until Marcus has been met', await E('!vanHere()'));

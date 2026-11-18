@@ -567,3 +567,70 @@ function c3DrawScene(){const q=c3q;r('#06050c',0,0,W,H);if(!q)return;const top=1
  ls.slice(0,3).forEach((l,k)=>{text(l.slice(0,Math.max(0,n-c)),6,y+k*13,2,who?'#fff8e0':'#d8d4e8',null);c+=l.length+1});
  text((q.i+1)+' / '+q.S.length,4,0,1,'#585070',null);rtext('START: SKIP',236,0,1,'#585070',null);
  if(q.ff){text('>>',224,H-13,1,'#f8e060',null)}else if(n>=s.length&&((time*3)|0)%2){r('#f8e060',229,H-9,5,3);r('#f8e060',230,H-6,3,1);r('#f8e060',231,H-5,1,1)}}
+
+/* ---------- 7. the house, inside ----------
+   The room is drawn live in the same 3D as the scenes: a cutaway seen from the south, like a doll's house. The game
+   underneath is unchanged (Will walks the same 11 by 7 tiles, the desk is where it was, the four corners are the four
+   jobs); only the picture is new. One unit is one tile. The house grows more furniture as it is upgraded. */
+function c3Proj(x,y,z){const dx=x-c3CE[0],dy=y-c3CE[1],dz=z-c3CE[2],zc=dx*c3CF[0]+dy*c3CF[1]+dz*c3CF[2];if(zc<.2)return null;return[c3W/2+(dx*c3CR[0]+dz*c3CR[2])*c3FL/zc,c3H/2-(dx*c3CU[0]+dy*c3CU[1]+dz*c3CU[2])*c3FL/zc]}
+function c3Room(t,night,up,J){const WALL='#d8c8a0',WAL2='#f0e4c4',WD='#6a4428',WL='#c89050';
+ for(let i=0;i<11;i++)c3Box(i,-.2,0,i+1,0,7,i%2?'#8a5a34':'#946238',i%2?'#b88048':'#c08850');
+ c3Box(-.3,0,-.3,11.3,3.3,0,WALL,WAL2);c3Box(-.3,0,0,0,3.3,7,'#c8b890',WAL2);c3Box(11,0,0,11.3,3.3,7,'#c8b890',WAL2);
+ c3Box(0,0,0,11,.85,.05,'#7a4c28','#a87040');c3Box(0,0,0,.05,.85,7,'#7a4c28','#a87040');c3Box(10.95,0,0,11,.85,7,'#7a4c28','#a87040');
+ c3Box(-.3,-.2,7,4.5,.35,7.25,'#383048','#585068');c3Box(6.5,-.2,7,11.3,.35,7.25,'#383048','#585068');c3Box(4.6,0,6.35,6.4,.03,7,'#3c8840','#78c870');
+ /* windows, and what is hung between them */
+ for(const wx of[1.5,8.2]){c3Box(wx-.1,1.4,0,wx+1.4,2.7,.06,WD,WL);const pc=night?'#283868':'#88d0f8',p2=night?'#101838':'#c8e8ff';c3Box(wx,1.5,.05,wx+1.3,2.6,.09,pc,p2,night?.5:.9);c3Box(wx+.62,1.5,.08,wx+.68,2.6,.11,WD);c3Box(wx,2.02,.08,wx+1.3,2.08,.11,WD);
+  if(night)c3Box(wx+.9,2.25,.09,wx+1.05,2.4,.1,'#e8ecff','#e8ecff',1);c3Box(wx-.22,1.35,.06,wx+.06,2.75,.12,'#a03838','#e06060');c3Box(wx+1.24,1.35,.06,wx+1.52,2.75,.12,'#a03838','#e06060')}
+ c3Box(3.5,1.7,0,4.4,2.5,.06,WD,WL);c3Box(3.58,1.78,.05,4.32,2.42,.08,'#f8e8b0');c3Box(3.84,1.9,.07,4.06,2.24,.1,'#f8d030','#fff8a0',.6);c3Box(3.78,2.24,.07,4.12,2.3,.1,'#c04848');
+ c3Box(6.6,1.7,0,7.5,2.5,.06,WD,WL);c3Box(6.68,1.78,.05,7.42,2.42,.08,'#b0e0f8');c3Box(6.85,1.9,.07,7.25,2.15,.1,'#e89040');c3Box(6.9,2.02,.09,7.02,2.12,.11,'#fff0d8');
+ /* the desk */
+ c3Box(4.6,.72,.2,6.4,.82,1,'#8a5a34','#c89050');for(const dx of[4.68,6.24])for(const dz of[.28,.86])c3Box(dx,0,dz,dx+.08,.72,dz+.08,WD);c3Box(4.95,.82,.4,5.5,.85,.8,'#f4f0e0','#ffffff');c3Box(5.9,.82,.45,6.2,.92,.75,'#a02838','#e23b5e');
+ c3Box(4.75,.82,.3,4.85,1.15,.4,'#383048');c3Box(4.66,1.15,.22,4.94,1.3,.48,night?'#f8e060':'#c8b060',night?'#fff8a0':'#e8d080',night?1:.2);c3Box(5.25,0,1.15,5.75,.42,1.6,WD,WL);c3Box(5.25,.42,1.5,5.75,.95,1.6,WD,WL);
+ /* pickers: shelves, jars, crates of berries */
+ c3Box(.15,0,.08,2.3,.1,.55,WD);c3Box(.15,.9,.08,2.3,.98,.55,WD,WL);c3Box(.15,1.6,.08,2.3,1.68,.5,WD,WL);c3Box(.15,0,.08,.23,1.68,.55,WD);c3Box(2.22,0,.08,2.3,1.68,.55,WD);
+ for(let k=0;k<5;k++){const jx=.35+k*.4;c3Box(jx,.98,.18,jx+.26,1.32,.44,['#e83860','#f0a020','#9070b8','#e83860','#58a058'][k],'#ffffff')}
+ for(let c=0;c<Math.min(3,1+((J[0]+2)/3|0));c++){const cx=.5+c*.95,cz=1.05+(c%2)*.25;c3Box(cx,0,cz,cx+.75,.5,cz+.6,'#8a5a34','#c89050');for(let b=0;b<4;b++){c3Push();c3T(cx+.2+(b%2)*.34,.56,cz+.17+((b/2)|0)*.26);c3Ball(.15,.14,.15,'#a01838','#f06080',5,3);c3Pop()}}
+ /* florists: a bench of pots */
+ c3Box(8,.7,.1,10.8,.8,.75,'#8a5a34','#c89050');c3Box(8.05,0,.15,8.15,.7,.7,WD);c3Box(10.65,0,.15,10.75,.7,.7,WD);
+ for(let k=0;k<5;k++){const fx=8.3+k*.55,C=[['#ffffff','#f8d040'],['#f85888','#f8a0c8'],['#f8c020','#f8e060'],['#a8c8ff','#ffffff'],['#f85888','#f8a0c8']][k];c3Push();c3T(fx,.8,.42);c3Cyl(6,.12,.16,0,.22,'#a05030','#d07848',0,1);c3Box(-.015,.22,-.015,.015,.55+(k%2)*.1,.015,'#2c8030');c3T(0,.6+(k%2)*.1,0);c3Ball(.13,.09,.13,C[0],C[1],6,3);c3Pop()}
+ c3Push();c3T(10.4,0,1.6);c3Cyl(6,.22,.28,0,.4,'#a05030','#d07848',0,1);c3T(0,.4,0);c3Cyl(5,.05,.04,0,.7,'#3c2414','#6a4428');c3T(0,.95,0);c3Ball(.42,.5,.42,'#286838','#58a868',6,4);c3Pop();
+ /* Louie's corner: rug, bed, bowl, ball, hoop */
+ c3Box(.5,0,4.5,3.4,.03,6.3,'#2850a0','#4878d0');c3Box(.7,.03,4.7,3.2,.04,6.1,'#3868c0','#78a8f0');c3Push();c3T(1.1,0,5.9);c3Cyl(8,.5,.5,0,.16,'#a03838','#e06060');c3Cyl(8,.36,.36,.16,.2,'#f8e8d0','#fff8e8',0,1);c3Pop();
+ c3Push();c3T(2.1,0,6.5);c3Cyl(8,.2,.24,0,.12,'#60b8f8','#a8d8ff',0,1);c3Pop();c3Push();c3T(2.9,.16,5.2);c3Ball(.16,.16,.16,'#c02848','#f8e060',6,4);c3Pop();
+ c3Box(3.1,0,4.6,3.18,1.3,4.68,WD);c3Push();c3T(3.14,1.3,4.64);c3RX(1.5708);c3Cyl(8,.3,.3,-.03,.03,'#f08030','#f8c060');c3Cyl(8,.22,.22,-.04,.04,WALL,WALL);c3Pop();
+ /* the middle: a round rug and cushions */
+ c3Disc(5.55,.03,3.85,1.75,[176,64,56],1,2,1.05);c3Disc(5.55,.035,3.85,1.4,[240,168,104],1,2,.82);c3Disc(5.55,.04,3.85,.5,[248,224,96],1,2,.3);
+ for(const [qx,qz,c] of[[4.5,3.3,'#9070d0'],[6.6,4.4,'#58a058'],[6.5,3.2,'#e88020']]){c3Push();c3T(qx,.1,qz);c3Ball(.3,.12,.3,c,'#ffffff',6,3);c3Pop()}
+ /* beds along the east wall: one more for each time the house was made bigger */
+ for(let b=0;b<=Math.min(3,up);b++){const bz=4.1+b*.72;if(bz>6.4)break;c3Box(9.2,0,bz,10.9,.3,bz+.6,WD,WL);c3Box(9.25,.3,bz+.04,10.85,.42,bz+.56,'#f0e0c0','#ffffff');c3Box(9.25,.42,bz+.04,10.2,.46,bz+.56,['#60b8f8','#f85888','#58a058','#f8c020'][b],'#ffffff');c3Box(10.45,.42,bz+.12,10.8,.5,bz+.48,'#ffffff')}
+ if(up>=1){c3Push();c3T(.5,0,3.2);c3Cyl(6,.2,.26,0,.36,'#a05030','#d07848',0,1);c3T(0,.36,0);c3Ball(.3,.4,.3,'#286838','#78c870',6,4);c3Pop()}
+ if(up>=2){c3Box(8.3,0,2.2,8.4,1.5,3.3,WD);c3Box(8.3,0,2.2,8.75,.08,3.3,WD);for(let k=0;k<3;k++){c3Box(8.3,.45+k*.5,2.2,8.75,.5+k*.5,3.3,WD,WL);for(let q=0;q<5;q++)c3Box(8.42,.5+k*.5-.42,2.3+q*.19,8.7,.5+k*.5-.02-(q%2)*.05,2.45+q*.19,RAINBOW[(q+k)%6])}}
+ /* the fire on the west wall */
+ c3Box(0,0,3.3,.5,1.5,4.4,'#585068','#888098');c3Box(0,1.5,3.2,.62,1.62,4.5,'#383048','#686078');c3Box(.3,.05,3.55,.52,.95,4.15,'#181020');
+ {const f=.75+.25*Math.sin(t*11);c3Push();c3T(.42,.1,3.85);c3Cyl(5,.2,0,0,.5*f,'#f08030','#f8e060',1,1);c3Pop();c3Glow(.5,.4,3.85,.8+f*.3,'#ffb050',.45)}
+ /* the lamp over the middle */
+ c3Box(5.52,2.75,3.5,5.58,3.3,3.56,'#383048');c3Box(5.3,2.45,3.3,5.8,2.78,3.76,night?'#f8e060':'#d8c060',night?'#fff8a0':'#f0e090',night?1:.3);if(night)c3Glow(5.55,2.6,3.53,1.5,'#ffe890',.4)}
+/* fit the room to the screen: back away until all of it is between the top bar and the bottom strip, then centre it */
+const C3HF={};
+function c3HomeFit(){if(C3HF[c3H])return C3HF[c3H];const asp=c3H/c3W,ratio=Math.max(.6,Math.min(1.2,.5+(asp-.7)*1.15)),b0=38,b1=c3H-54;let out=[20,ratio,0];
+ for(let b=10;b<46;b+=.4){c3Cam(5.5,b*ratio,b,5.5,.7,3.1,38);let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,ok=true;for(const x of[-.3,11.3])for(const y of[-.2,3.3])for(const z of[-.3,7.25]){const q=c3Proj(x,y,z);if(!q){ok=false;continue}x0=Math.min(x0,q[0]);x1=Math.max(x1,q[0]);y0=Math.min(y0,q[1]);y1=Math.max(y1,q[1])}
+  if(ok&&x0>=1&&x1<=c3W-1&&y1-y0<=b1-b0){out=[b,ratio,Math.round((b0+b1)/2-(y0+y1)/2)];break}}
+ return C3HF[c3H]=out}
+function c3HomeDraw(){const t=time,night=dayT/DAYLEN>.7,X0=RX,Z0=RY,wx=v=>(v-X0)/16,wz=v=>(v-Z0)/16,J=home.jobs,up=home.up|0;
+ c3Size(H);c3D=c3M=c3New();c3X=[1,0,0,0,0,1,0,0,0,0,1,0];c3XS=[];c3stat.tris=0;
+ const E=c3Env(night?'night':'day');E.sky=[[14,10,22],[14,10,22]];E.fog=[14,10,22];E.fn=60;E.ff=200;E.stars=0;E.amb=night?[.34,.32,.4]:[.62,.58,.54];E.sun=night?[.14,.14,.2]:[.5,.46,.4];E.sd=[.25,.8,.55];const l=Math.hypot(.25,.8,.55);E.sd=E.sd.map(v=>v/l);
+ if(night){c3Lamp(5.55,2.5,3.5,'#ffd890',5,1.5);c3Lamp(4.8,1.3,.6,'#ffd890',2,.7)}c3Lamp(.7,.6,3.85,'#ffa050',night?3.2:2,night?1.1:.5);
+ const px=wx(P.x),pz=wz(P.y),fit=c3HomeFit(),DY=fit[2],cx=5.5+(px-5.5)*.12;c3Cam(cx,fit[0]*fit[1],fit[0],cx,.7,3.1,38);
+ c3Room(t,night,up,J);
+ for(const q of resid)c3Sprout(wx(q.x),wz(q.y),q.type,{y:0,stage:2,ang:q.mv?(q.fx>0?1.5708:-1.5708):0,hop:q.mv?Math.abs(Math.sin(t*9+q.a))*.1:0});
+ c3Dog(wx(LO.x),wz(LO.y)+.3,LO.fx>0?1.5708:-1.5708,{y:0,sit:LO.st==='sit',walk:LO.mv?t:0});
+ c3Person(px,pz,Math.atan2(P.dx,P.dy),Object.assign(c3Look(),{y:0,walk:P.mv?P.anim:0}));
+ c3Sky(t);c3Show([],[c3D]);if(c3cx)c3cx.putImageData(c3im,0,0);
+ r('#0e0a16',0,0,W,H);g.imageSmoothingEnabled=true;g.drawImage(c3cv,0,0,c3W,c3H,0,DY,W,H);g.imageSmoothingEnabled=false;const c3P=(x,y,z)=>{const q=c3Proj(x,y,z);if(q)q[1]+=DY;return q};
+ /* over the picture: the four jobs, Louie's bubbles, hearts, and the strip at the bottom */
+ [['PICKERS '+J[0],1.9,1.9,1.9],['FLORISTS '+J[1],9.2,1.9,1.6],['TRAINERS '+J[2],1.9,1.5,5.4],['RESTING '+(homeTotal()-J[0]-J[1]-J[2]),5.55,1.2,3.85]].forEach(([n,lx,ly,lz])=>{const q=c3P(lx,ly,lz);if(q){const w=tw(n,1);text(n,Math.round(Math.max(2,Math.min(W-w-2,q[0]-w/2))),Math.round(q[1]),1,'#fff8e0','#181020')}});
+ {const q=c3P(wx(LO.x),1.25,wz(LO.y)+.3);if(q){const x=Math.round(q[0]),y=Math.round(q[1]);if(LO.say&&LO.say.t>0){const s2=LO.say.s,w2=tw(s2,2)+8,bx=Math.max(2,Math.min(W-w2-2,Math.round(x-w2/2)));r('#181020',bx-1,y-17,w2+2,16);r('#ffffff',bx,y-16,w2,14);text(s2,bx+4,y-15,2,'#281c30',null)}
+   else if(petOK&&state==='play'){const by=y-12+(((time*3)|0)%2);r('#181020',x-6,by-1,13,11);r('#ffffff',x-5,by,11,9);r('#f85888',x-3,by+2,2,2);r('#f85888',x+1,by+2,2,2);r('#f85888',x-3,by+3,6,2);r('#f85888',x-2,by+5,4,1);r('#f85888',x-1,by+6,2,1)}}}
+ for(const p of parts){const q=c3P(wx(p.x),p.gh?1.1:.3,wz(p.y));if(!q)continue;const x=Math.round(q[0]),y=Math.round(q[1]-(1-p.life)*10);if(p.gh===2){r(p.c,x-2,y-1,2,2);r(p.c,x+1,y-1,2,2);r(p.c,x-2,y,5,2);r(p.c,x-1,y+2,3,1);r(p.c,x,y+3,1,1)}else r(p.c,x,y,2,2)}
+ if(state==='play'){const fy=H-50,dk=facing(DESK,36);box(0,fy,W,31,'rgba(24,16,32,.92)');ctext(dk?'A: MANAGE THE HOUSE':!resid.length?'NOBODY LIVES HERE YET. TRY THE DESK':'LIVING HERE '+homeTotal()+' / '+homeCap(),fy+2,2,dk?'#f8e060':'#fff8e0');ctext('WALK DOWN TO LEAVE',fy+17,1,'#a098b0');
+  if(dk){const q=c3P(5.5,1.5,.6);if(q&&((time*3)|0)%3)text('!',Math.round(q[0])-2,Math.round(q[1])-8,3,'#f8e060')}}}
