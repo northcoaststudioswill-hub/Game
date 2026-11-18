@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Book One. Current build: v0.10 (playtest round: heist redesign, cutscene acting, animation) (see CHANGELOG.md).
+Book One. Current build: v0.11 (the Assay: 3D fights, fury, Memory Arts, film opening, save slots) (see CHANGELOG.md).
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
