@@ -1,5 +1,21 @@
 # lil Bottie: Clankin' in the Cloud — changelog
 
+## Music video: Overclocked (Nov 18 2026)
+
+Will asked for a square animation of lil Bottie, built in the game engine and cut to Overclocked, to post as a
+music video.
+
+- New `video/` folder: a render page built from the game's own source, a 53-shot storyboard for Overclocked, and
+  a renderer that writes a finished 1080 x 1080, 30 fps mp4 with the song on it (about a minute to render).
+- New `src/bottie/bt-4-mv.js`: video mode inside the cartridge (shots, a director bot that plays real gameplay,
+  a zoom pulse on every kick). The cartridge's closing block moved to `bt-9-end.js`. The game does not use any of
+  it; `say` and `toast` go quiet and the HUD hides only when video mode is on.
+- Shots follow the lyrics: the boot sequence, HUNDRED DEGREES, the rooftop, cloud stomping, the chain, six
+  continents, 24/7, the captcha, data rain, CTRL ALT DELETE, and three of Will's reference photos (the rooftop with
+  the jets, the fence, the highway at 03:14:22 AM).
+- Timing: tempo, kicks and drum drop-outs are measured; verse 2's line times are measured; the rest is placed from
+  the song's structure and may be a bar or two off. See `video/README.md`.
+
 ## v0.5 (Nov 18 2026): shorter quips, finishers, supers, animations
 
 Will: "The quips last too long. Refine gameplay one more time and add some fire animations and finishers and

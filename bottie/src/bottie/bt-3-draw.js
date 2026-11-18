@@ -150,7 +150,14 @@ function drawWorld(){const th=L.th,P=L.P,mw=L.w*TS,mh=L.h*TS;
  if(L.fire>0&&L.mode==='fire')flames(H-14,Math.min(1,L.fire/1.5)*.9,10)
 }
 
-function drawHud(){const hub=!!L.def.hub;g.fillStyle='rgba(6,8,16,.88)';g.fillRect(0,0,W,13);r('#1c2440',0,13,W,1);
+function drawSlam(){
+ /* finisher band */
+ if(L.slam&&(G.s==='play'||G.s==='card')){const m=L.slam,age=m.T-m.t,k=Math.min(1,age/.12),out=Math.min(1,m.t/.2),y=Math.round(H*.34),bh=38,sx=age<.25?Math.round(R(-2,2)):0;
+  g.globalAlpha=.85*out;r('#05060c',0,y-6,W,bh);g.globalAlpha=out;r(m.c,0,y-7,W,2);r(m.c,0,y+bh-6,W,2);if(m.c===HOT)flames(y-7,.9*out,9);else if(m.c===GOLD){for(let i=0;i<14;i++){const sxx=(hash(i,(G.t*6)|0)*W)|0;px('#fff',sxx,y-9-((hash(i,7)*8)|0));px(GOLD,sxx+1,y+bh-4+((hash(i,9)*6)|0))}}
+  g.save();g.translate(W/2+sx,y+10);g.scale(2-k,2-k);const sc=tw(m.s,4)>W-16?3:4,w=tw(m.s,sc);g.translate(-Math.min(w,W-12)/2,-8);if(w>W-12)g.scale((W-12)/w,1);text(m.s,0,0,sc,'#fff',m.c===GOLD?'#604000':m.c===HOT?'#601000':'#102040');g.restore();
+  if(m.sub){const w2=tw(m.sub,1);text(m.sub,Math.round((W-w2)/2),y+21,1,m.c)}g.globalAlpha=1}
+}
+function drawHud(){const hub=!!L.def.hub;if(G.mv){drawSlam();return}g.fillStyle='rgba(6,8,16,.88)';g.fillRect(0,0,W,13);r('#1c2440',0,13,W,1);
  if(hub){text('THE CRIB',4,2,1,BLUE2);const s='AURA +'+SV.aura.toLocaleString();text(s,W-4-tw(s,1),2,1,GOLD)}
  else{const fo=L.spawns.filter(s=>s.st==='follow').length;drawSpawn(7,11,0,0,'',false);text(fo+'/'+L.spawns.length,13,2,1,'#fff');
   const gs=goalState();let s=L.open?(L.def.final?'YOU ARE THE CLOUD':'PORT OPEN'):'GOLD '+gs.own+'/'+gs.cores+(gs.need?'  NPC '+Math.min(gs.npc,gs.need)+'/'+gs.need:'');
@@ -166,11 +173,7 @@ function drawHud(){const hub=!!L.def.hub;g.fillStyle='rgba(6,8,16,.88)';g.fillRe
  /* somebody is pulling a plug off-screen: red arrow at the edge */
  if(!hub)for(const f of L.foes)if(f.st==='unplug'&&!f.npc){const x=f.x-L.ox,y=f.y-L.oy;if(x<4||x>W-4||y<18||y>H-18){const a=Math.atan2(y-H/2,x-W/2),ax=clamp(W/2+Math.cos(a)*200,12,W-12),ay=clamp(H/2+Math.sin(a)*200,24,H-30);
    if(((G.t*5)|0)%2){g.save();g.translate(ax,ay);g.rotate(a);g.fillStyle=HOT;g.beginPath();g.moveTo(7,0);g.lineTo(-4,-6);g.lineTo(-4,6);g.fill();g.restore();text('!',Math.round(ax-Math.cos(a)*12)-2,Math.round(ay-Math.sin(a)*12)-5,2,'#fff',HOT)}}}
- /* finisher band */
- if(L.slam&&(G.s==='play'||G.s==='card')){const m=L.slam,age=m.T-m.t,k=Math.min(1,age/.12),out=Math.min(1,m.t/.2),y=Math.round(H*.34),bh=38,sx=age<.25?Math.round(R(-2,2)):0;
-  g.globalAlpha=.85*out;r('#05060c',0,y-6,W,bh);g.globalAlpha=out;r(m.c,0,y-7,W,2);r(m.c,0,y+bh-6,W,2);if(m.c===HOT)flames(y-7,.9*out,9);else if(m.c===GOLD){for(let i=0;i<14;i++){const sxx=(hash(i,(G.t*6)|0)*W)|0;px('#fff',sxx,y-9-((hash(i,7)*8)|0));px(GOLD,sxx+1,y+bh-4+((hash(i,9)*6)|0))}}
-  g.save();g.translate(W/2+sx,y+10);g.scale(2-k,2-k);const sc=tw(m.s,4)>W-16?3:4,w=tw(m.s,sc);g.translate(-Math.min(w,W-12)/2,-8);if(w>W-12)g.scale((W-12)/w,1);text(m.s,0,0,sc,'#fff',m.c===GOLD?'#604000':m.c===HOT?'#601000':'#102040');g.restore();
-  if(m.sub){const w2=tw(m.sub,1);text(m.sub,Math.round((W-w2)/2),y+21,1,m.c)}g.globalAlpha=1}
+ drawSlam();
  if(G.toast){const s=G.toast.s,w=Math.min(W-8,tw(s,2)+10);g.fillStyle='rgba(6,8,16,.9)';g.fillRect(Math.round((W-w)/2),18,w,15);r(BLUE,Math.round((W-w)/2),32,w,1);ctx(s,20,2,'#fff')}
  /* his lines come out of him: a bubble at his head (under him when he faces up, so it does not cover what he aims at) */
  if(G.cap&&G.s==='play'&&!L.slam){const ls=wrap(G.cap.s,150,1),bw=Math.max.apply(null,ls.map(l=>tw(l,1)))+10,bh=ls.length*10+5,px0=Math.round(L.P.x-L.ox),py0=Math.round(L.P.y-L.oy);
@@ -278,11 +281,3 @@ function draw(){H=A.H();
  if(!L){drawTitle();return}
  drawWorld();drawHud();drawOverlay()}
 
-return{
- start(){G.s='title';G.mi=0;G.t=0},
- resume(){if(!L||G.s==='title')return;G.s='play';toast('BACK IN THE CRIB')},
- mus:()=>'',
- paused:()=>G.s==='pause',
- update,draw,
- _:{G,REAL,SONGS_ON,SUPERS,startSuper,superHit,fire,slam,DRIPS,say,useThing,TOOLS,haveTools,curTool,useTool,get L(){return L},get SV(){return SV},set SV(v){SV=v},LV,ORDER,ALBUM,DV,LN,startLevel,goCrib,finish,build,complete,give,aim,targets,goalState,bfs,solid,free,store,KEY}};
-};

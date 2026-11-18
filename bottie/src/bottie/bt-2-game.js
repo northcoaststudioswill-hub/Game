@@ -27,7 +27,7 @@ function useTool(){const t=curTool(),P=L.P;if(!t){SFX.nope();toast('NO TOOLS YET
 /* His lines. pri 2 = a big moment, always shown. pri 1 = ordinary, at most one every 16 seconds.
    pri 0 = filler, rare. Will's note on v0.3: too many quips, some are good, it's too much. */
 let sayAt=-99;
-function say(s,pri,t){if(!s)return;if(pri===undefined)pri=1;if(pri<2){if(G.t-sayAt<(pri===1?16:32))return;if(pri===0&&Math.random()<.5)return}sayAt=G.t;G.cap={s,t:t||2.3}}
+function say(s,pri,t){if(!s||G.mv)return;if(pri===undefined)pri=1;if(pri<2){if(G.t-sayAt<(pri===1?16:32))return;if(pri===0&&Math.random()<.5)return}sayAt=G.t;G.cap={s,t:t||2.3}}
 const DRIPS=[{n:'SILVER PUFFER',at:0,c:['#b4b8c6','#e4e7ee','#8e93a6','#a0a4b4']},{n:'ICE PUFFER',at:25000,c:['#8fc8f0','#d8f0ff','#5a98c8','#78b0dc']},{n:'GOLD PUFFER',at:75000,c:['#e8c040','#fff0a0','#b08818','#d0a830']},{n:'BLACKOUT PUFFER',at:150000,c:['#30323c','#5a5e6c','#1c1e26','#282a34']}];
 /* ---------- fire, finishers and the super ----------
    fire(): flame particles (blue for his own LED fire). slam(): the big finisher text band. hit(): a short freeze
@@ -63,7 +63,7 @@ function gain(base,x,y){L.combo=(L.comboT>0?L.combo:0)+1;L.comboT=4;const m=Math
  if(!L.quiet){const was=L.sup;L.sup=Math.min(100,L.sup+3+m);if(was<100&&L.sup>=100){SFX.open();if(!L.saidSup){L.saidSup=1;G.tip={s:'SUPER READY. PRESS Y: '+curSuper().n.join(' ')+'.',t:7}}}}
  if(L.combo===4&&!L.saidAura){L.saidAura=1;slam('AURA FARMING','x4 COMBO',GOLD)}
  if(L.combo===8&&!L.saidMil){L.saidMil=1;slam('PLUS A MILLION AURA','x8 COMBO',GOLD,1.4);say("Plus a million aura (aura!)",2);hit(.12);burst(L.P.x,L.P.y-12,GOLD,24);ring(L.P.x,L.P.y-8,GOLD,60)}}
-function toast(s,t){G.toast={s,t:t||2.2}}
+function toast(s,t){if(G.mv)return;G.toast={s,t:t||2.2}}
 
 /* ---------- build a level from its map ---------- */
 function build(id){const def=LV[id],rows=def.map,w=Math.max.apply(null,rows.map(s=>s.length)),h=rows.length;

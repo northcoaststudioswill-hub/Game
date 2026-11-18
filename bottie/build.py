@@ -88,7 +88,7 @@ if swmod.count(SWMARK) != 1:
 swmod = swmod.replace(SWMARK, '\n'.join(code('sproutwild/' + f + '.js').rstrip() for f in SPROUTWILD[2:]) + '\n' + SWMARK)
 console = console.replace('/*@include sproutwild*/', code('sproutwild/sw-cartart.js').rstrip() + '\n' + swmod.rstrip() + '\n')
 
-BOTTIE = ['bt-0-head', 'bt-1-levels', 'bt-2-game', 'bt-3-draw']  # one function, split over four files
+BOTTIE = ['bt-0-head', 'bt-1-levels', 'bt-2-game', 'bt-3-draw', 'bt-4-mv', 'bt-9-end']  # one function, split over these files
 
 parts = {
     'bottie.js': '\n'.join(code('bottie/' + f + '.js').rstrip() for f in BOTTIE),
