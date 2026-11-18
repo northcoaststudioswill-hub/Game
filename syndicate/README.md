@@ -218,3 +218,11 @@ multiclassing, recorded music or voice, cloud saves, typing a name with a contro
 ## Frame rate (`js/gfx.js`, `js/perf.js`)
 
 The renderer caps resolution at 1.5x, redraws the shadow map every other frame, and lowers its resolution by itself if frames stay slow (and raises it again if they recover). Small props do not cast shadows, menus have no backdrop blur, and the world behind a full menu is drawn at half rate. Settings has a **Performance mode** that forces the low tier.
+
+## Gear, sets and builds (`js/gear.js`)
+
+- **Rungs.** Kits run Junk, Common, Good, Fine, Awesome. Each kit adds its own pieces to the character model (straps, mail skirt, pauldrons, cloak, crown) as well as its colours.
+- **Sets.** Each kit names a weapon (per class) and a charm. Wear all three for the set bonus; the Outfitter shows what is missing.
+- **Earned pieces.** Raider's Ashcloak (three expeditions), Hourglass Regalia and the Roseinbeirg Sandglass (wizard gold, from David), Crownbearer's Mail and the Shard of the Guttercrown (after the crown).
+- **Builds.** The Guildmaster's sheet has three pages to save and recall weapon, kit, charm and technique loadout.
+- **Bodies.** Dwarves are short and broad, elves slim, half-orcs wide, tieflings have a tail.

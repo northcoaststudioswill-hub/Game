@@ -172,8 +172,11 @@
     if (cos.back === 'moneybag') { const sk = mesh(new T.SphereGeometry(0.3, 8, 6), M(0x6a5236), 0, 0.42, -0.4, torso); sk.scale.set(1, 1.15, 0.85); mesh(new T.CylinderGeometry(0.1, 0.16, 0.14, 7), M(0x6a5236), 0, 0.78, -0.4, torso); mesh(new T.TorusGeometry(0.11, 0.02, 4, 8), m.trim, 0, 0.74, -0.4, torso).rotation.x = Math.PI / 2; [[-0.06, 0.88, -0.38], [0.05, 0.86, -0.42], [0.0, 0.9, -0.44], [0.2, 0.3, -0.62]].forEach(q => mesh(new T.CylinderGeometry(0.05, 0.05, 0.02, 7), M(0xf0c95a, true, 0x6a4a08), q[0], q[1], q[2], torso).rotation.x = q[0] * 6); }
     let auraM = null;
     if (cos.aura) { const ac = (G.COSMETICS.find(x => x.id === cos.aura) || {}).color || 0xffffff; glows.push(gfx.glow(ac, 2.4, 0, 0.15, 0, root, 0.3)); auraM = [0, 1, 2, 3].map(() => { const s = gfx.glow(ac, 0.3, 0, 0.5, 0, root, 0.9); glows.push(s); return s; }); }
-    const sc = (look.scale || 1) * race.scale;
-    root.scale.set(sc * (look.race === 'dwarf' ? 1.16 : 1), sc, sc * (look.race === 'dwarf' ? 1.16 : 1));
+    // what you wear changes your outline, not only your colours
+    if (G.kitModel && look.kit) G.kitModel(look.kit, { torso, head, armL, armR, foreL, foreR, legL, legR, m, w, cls, box, mesh, M, robed });
+    if (look.race === 'tiefling' && look.kit !== 'ashcloak') { let par = torso, y = 0.02, z = -0.22; for (let i = 0; i < 5; i++) { const sg = new T.Group(); sg.position.set(0, y, z); sg.rotation.x = i ? 0.42 : 0.9; par.add(sg); box(0.09 - i * 0.012, 0.09 - i * 0.012, 0.24, m.skin, 0, 0, -0.1, sg); par = sg; y = 0; z = -0.22; } mesh(new T.ConeGeometry(0.07, 0.16, 4), m.dark, 0, 0, -0.26, par).rotation.x = -Math.PI / 2; }
+    const sc = (look.scale || 1) * race.scale, wide = { dwarf: 1.16, halforc: 1.09, elf: 0.93 }[look.race] || 1;
+    root.scale.set(sc * wide, sc, sc * (look.race === 'elf' ? 0.96 : wide));
     root.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; } });
 
     let lastAlpha = 1;
@@ -280,7 +283,7 @@
   let pr = null, pscene, pcam; const pcache = {};
   G.portrait = function (look, size, full) {
     full = full === 'full';
-    const key = JSON.stringify([look.cls, look.race, look.tint, look.gear, look.cos, look.skin, look.arm, full]);
+    const key = JSON.stringify([look.cls, look.race, look.tint, look.gear, look.cos, look.skin, look.arm, look.kit, full]);
     const img = document.createElement('img'); img.className = 'portrait'; img.style.width = img.style.height = (size / 16) + 'rem'; img.alt = '';
     if (!pcache[key]) {
       try {
