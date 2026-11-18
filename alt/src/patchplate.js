@@ -470,7 +470,7 @@ function finish(){const L=G.L,d=L.d,st=starsFor(L),prevDay=SV.day;
  const prevSt=SV.stars[d]|0;if(st>prevSt)SV.stars[d]=st;const best=L.coins>(SV.best[d]|0);if(best)SV.best[d]=L.coins;
  if(st>=1&&SV.day<d+1)SV.day=Math.min(DAYS.length,d+1);
  let seed=null;if(st>=1&&SEEDDAY[d]&&!hasSp(SEEDDAY[d])){seed=SEEDDAY[d];SV.seeds.push(seed)}
- let tix=0;if(st===3&&!SV.tix[d]){SV.tix[d]=1;tix=1;try{const m=A.meta();m.tix++;A.persist()}catch(e){}}
+ let tix=0;if(st===3&&!SV.tix[d]){SV.tix[d]=1;tix=1;try{const m=A.meta();m.ltix=(m.ltix||0)+1;A.persist()}catch(e){}}
  SV.run=null;if(st>=1)bumpAsk('day');if(st)bumpAsk('stars',st);store();
  G.res={d,st,coins:L.coins,tips:L.tips,served:L.served,n:L.q.length,missed:L.missed,tix,seed,jobs:Object.assign({},L.jobs),fed:L.louFed|0,hearts:SV.hpend.length,best:best&&prevSt>0,
   unl:st>=1&&prevDay<d+1&&d+1<DAYS.length,last:st>=1&&d+1>=DAYS.length&&prevDay<DAYS.length};
@@ -610,7 +610,7 @@ const askText=a=>ASKS.find(x=>x[0]===a.id)[1].replace('{n}',a.n);
 function bumpAsk(id,v=1,max){const D=asks();let hit=0;
  for(const a of D.a)if(a.id===id&&!a.done){a.p=max?Math.max(a.p,v):a.p+v;if(a.p>=a.n){a.p=a.n;a.done=1;SV.coins+=15;SV.asksDone=(SV.asksDone|0)+1;hit=a}}
  if(hit){SFX.star();G.quip={who:'ASK DONE',s:askText(hit)+': +15 COINS',t:0,icon:1};if(G.L)G.L.qcd=6}
- if(hit&&!D.all&&D.a.every(a=>a.done)){D.all=1;try{A.meta().tix++;A.persist()}catch(e){}G.quip={who:'ALL 3 ASKS DONE',s:'+1 CAPSULE TICKET. SEE YOU TOMORROW!',t:0,icon:1}}
+ if(hit&&!D.all&&D.a.every(a=>a.done)){D.all=1;try{const M9=A.meta();M9.ltix=(M9.ltix||0)+1;A.persist()}catch(e){}G.quip={who:'ALL 3 ASKS DONE',s:'+1 CAPSULE TICKET. SEE YOU TOMORROW!',t:0,icon:1}}
  store();}
 function quip(k,force){const L=G.L;if(!L)return;if(!force&&(L.qcd||0)>0)return;const q=pick(QP[k]);G.quip={who:q[0],s:q[1],t:0};L.qcd=10;}
 function quipLine(who,s,force){const L=G.L;if(!L)return;if(!force&&(L.qcd||0)>0)return;G.quip={who,s,t:0};L.qcd=10;}

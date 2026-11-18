@@ -19,7 +19,7 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   const throwFor = async n => { await E(`keys.a=1;void 0`); await step(n); await E(`keys.a=0;void 0`); };
   const scenes = []; const skip = async () => { await step(4); /* a queued scene starts on the next frame */ for (let i = 0; i < 90 && (await E('state')) !== 'play'; i++) { if ((await E('state')) === 'cine' && !scenes.includes(await E('scn[0][0]'))) scenes.push(await E('scn[0][0]')); await tap('a'); } };
   const until = async (cond, secs) => { let t = 0; for (; t < secs; t++) { await step(30); if ((await E('state')) !== 'play' || await E(cond)) break; } return t; };
-  await E(`init();live=true;state='play';ZONES.forEach(z=>run.seen[z[0]]=1);run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1};run.tips={br:1,ne:1,dg:1,wb:1,wn:1,fl:1};found=found.map(()=>true);gates.forEach(q=>q.alive&&openGate(q));openGarden();wakeGrubs();
+  await E(`init();live=true;state='play';ZONES.forEach(z=>run.seen[z[0]]=1);run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1};run.tips={br:1,ne:1,dg:1,wb:1,wn:1,fl:1};run.egg={sesh:1,job:1,dream:1,zoomies:1,button:1}; /* the hidden scenes would cut into this scripted run (the bot pets Louie by accident) */found=found.map(()=>true);gates.forEach(q=>q.alive&&openGate(q));openGarden();wakeGrubs();
     for(let i=0;i<30;i++)mkBud(i%6,2,P.x,P.y);for(let i=0;i<8;i++)mkBud(2,2,P.x,P.y);void 0`);
   for (const [name, tx, ty] of [['berry field', 51, 21], ['north meadow', 34, 6]]) { await tp(tx, ty, 0, -1); await throwFor(150); const s0 = await E('shards'); const t = await until(`shards>${s0}`, 200);
     ok('the ' + name + ' shard is carried home', (await E('shards')) === s0 + 1, t + ' s'); await skip(); }

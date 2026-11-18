@@ -100,6 +100,15 @@ if console.count(LOOP) != 1:
     die('console.js: loop marker not found')
 console = console.replace(LOOP, '\n'.join(code('clankawatch/' + f + '.js').rstrip() for f in CLANKA) + '\n' + LOOP)
 
+# splash screens: alt/splash/cart0.jpg .. cart6.jpg, one small screenshot per cartridge, shown before a game boots
+SPLASH = []
+for n in range(7):
+    f = here / 'splash' / f'cart{n}.jpg'
+    SPLASH.append('data:image/jpeg;base64,' + base64.b64encode(f.read_bytes()).decode() if f.exists() else '')
+if console.count('/*@SPLASH*/') != 1:
+    die('console.js needs exactly one /*@SPLASH*/')
+console = console.replace('/*@SPLASH*/', 'const SPLASHSRC=' + json.dumps(SPLASH) + ';')
+
 parts = {
     '@MUSIC tracks': music['tracks'],
     '@MUSIC pp': music['pp'],

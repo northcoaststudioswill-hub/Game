@@ -3,6 +3,61 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## What the house is for, a full restart, Sprouts' own capsules, and a splash for every cartridge (Nov 18 2026)
+
+Will: I like the 3D house, but consider the gameplay: the functions it serves, what you can do there, how it feeds the
+greater goal. We need a way to totally restart, pulls and stats included. I'm not sure I still like the cross-game
+rewards versus capsules and pulls inside this game only. And a splash screen before a cartridge loads, with a
+description and a screenshot.
+
+![Splash screens](playtest/console/splash-screens.png)
+
+**The console: a splash before each cartridge.** Picking a cartridge now shows one screen first: a screenshot from the
+game, its name, one line on what it is, three points on how it goes, and its controls. A or Start goes on to the
+game's own boot; B puts the cartridge back. All seven have one. The screenshots live in `alt/splash/` and are built in
+(about 100 KB in all).
+
+![The house, erasing, the splash](playtest/sprouts-house-uses.png)
+
+**Sprouts: what the house is for.** There were three jobs and a desk. Now there are four places inside, each tied to
+the game outside:
+- **DESK** (as before): who lives here and what they do. Pickers leave new sprouts in the soil each morning (a bigger
+  crew for the shards and the lens). Florists make petals (capsules and valley projects). Trainers level Louie.
+  **New: every two residents who rest send one of your crew out bloomed in the morning**, so nobody indoors is idle.
+- **BEDS: nap until dusk, or sleep until morning.** The nap is for everything that only happens after dark: dusk bugs,
+  the van, the wisp, the night the Lantern calls. The soil keeps growing while Will naps.
+- **PANTRY: pack a lunch.** With three pickers living in the house, once a day: the crew hauls a quarter faster until
+  nightfall (a FED tag shows by the day bar). This is the house's help with the long carries.
+- **FIRE: the story so far.** Up to five lines of what has happened in this save, and what to do next.
+- Each place has a marker in the room and its name in the strip at the bottom. GO TO BED is still on the desk as well.
+- This is a first answer, built so it can be played and judged; the jobs, numbers and names are all easy to change.
+
+**Sprouts: ERASE EVERYTHING.** On the title menu. It asks first (NO is selected), then YES needs three presses. It puts
+Sprouts back to a brand-new cartridge: the valley and story, petals, tickets, Keeper Rank, every style and capsule
+pull, rewards and streak, the Collection, Louie's level, the scenes found and every count. Sound settings stay. Nothing
+belonging to another cartridge is touched. (NEW GAME still restarts only the valley, as before.)
+
+**Sprouts has its own capsules again.** CAPSULES on Sprouts' menu opens Sprouts' own machine, which holds only Sprouts
+styles and takes only Sprouts tickets and petals. Tickets earned in Sprouts stay in Sprouts.
+- The Lantern's machine (from the shelf, and from Rootdeep) now holds only Rootdeep's unlocks and takes **Lantern
+  tickets**, a separate count. Rootdeep bosses and escapes, Patch & Plate stars and asks, Knockout and the Lantern
+  achievements all pay Lantern tickets now, not Sprouts tickets. Its tutorial and two of its pages were reworded.
+- Tickets already held stay with Sprouts. RESET PULLS gives style pulls back as Sprouts tickets and Rootdeep pulls back
+  as Lantern tickets.
+- **Not changed, waiting on Will:** the Lantern menu itself (cross-game achievements and stats) is still there and
+  still reads Sprouts' counts for some achievements. Whether to keep it, shrink it or remove it is the open question.
+
+**Tested:** `tests/sprouts_coast.js` 129 checks (21 new: the four places and what each does, the lunch's speed, the
+resting bonus, Sprouts' machine and its pool, the two kinds of ticket, erasing and what it keeps, the splash for two
+cartridges, B and A on it, every splash's text fitting). Updated for the two machines: `tests/v02/capsules_reset.js`
+and `saves_onboarding.js` (both pass). `sprouts_valley.js`, `sprouts_story.js` five runs in a row, soak, console
+shelf, Sproutwild lab 124 of 124, Patch & Plate 119 of 119, Lightswarm lab and Knockout lab: all pass.
+**Not tested:** by hand, or on a phone. `tests/v02/lantern_menu.js` had eight failing checks before this pass (it
+predates the three-row shelf) and has the same eight now.
+
+**For the test harnesses:** with `?dev` in the address the splash is skipped unless `window.__splash` is set, because
+most of the other games' tests expect a cartridge to boot the moment it is picked. Real play always shows it.
+
 ## Sprouts: from Will's playtest - the house in 3D, the front door, fewer trail posts (Nov 18 2026)
 
 Will, after playing: it's fun. Fast travel points don't need to be so close together, or any at all within one region;

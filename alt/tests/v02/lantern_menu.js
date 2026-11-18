@@ -14,24 +14,24 @@ const D = require('path').join(__dirname, 'out', 'lantern_menu') + '/'; require(
   const hit = async (key, ms = 160) => { await page.keyboard.down(key); await page.waitForTimeout(70); await page.keyboard.up(key); await page.waitForTimeout(ms); };
   const ok = (c, m) => console.log((c ? 'PASS ' : 'FAIL ') + m);
   const cv = await page.$('canvas'); const shot = async nm => { await page.waitForTimeout(150); await cv.screenshot({ path: D + nm + '.png' }) };
-  await E(`localStorage.removeItem('lantern-v1');LAN.ach={};LAN.played={};LAN.ko={w:0,cl:0};LAN.tixEarned=0;LAN.capTut=1;meta.tix=5`);
+  await E(`localStorage.removeItem('lantern-v1');LAN.ach={};LAN.played={};LAN.ko={w:0,cl:0};LAN.tixEarned=0;LAN.capTut=1;meta.ltix=5`);
   await page.screenshot({ path: D + 'shelf.png' });
   await hit('ArrowDown', 150); ok(await page.evaluate(() => document.getElementById('lanBtn').classList.contains('sel')), 'down on the shelf highlights the Lantern menu');
   await hit('KeyZ', 300); ok((await E('state')) === 'lan', 'A opens the Lantern menu'); await shot('menu');
-  await hit('KeyZ', 200); ok((await E('state')) === 'lancaps', 'CAPSULES: the unified machine'); const t0 = await E('meta.tix');
-  await hit('KeyZ', 1500); ok((await E('capR.ph')) === 'show' && (await E('meta.tix')) === t0 - 1, 'a pull from the console spends a ticket'); await shot('caps_reveal');
+  await hit('KeyZ', 200); ok((await E('state')) === 'lancaps', 'CAPSULES: the unified machine'); const t0 = await E('meta.ltix');
+  await hit('KeyZ', 1500); ok((await E('capR.ph')) === 'show' && (await E('meta.ltix')) === t0 - 1, 'a pull from the console spends a ticket'); await shot('caps_reveal');
   await hit('KeyZ', 200); await hit('KeyX', 200); ok((await E('state')) === 'lan', 'B returns to the Lantern menu');
   await E(`lanSel=1`); await hit('KeyZ', 200); ok((await E('state')) === 'lanstats', 'STATS opens'); for (let p = 0; p < 4; p++) { await shot('stats_' + p); await hit('ArrowRight', 150); }
   await hit('KeyX', 200); await E(`lanSel=2`); await hit('KeyZ', 200); ok((await E('state')) === 'lanach', 'ACHIEVEMENTS opens'); await shot('ach');
   await hit('KeyX', 200); await hit('KeyX', 200); ok((await E('state')) === 'off' && await page.evaluate(() => !document.getElementById('shelf').hidden), 'B twice: back to the shelf');
   // cross-game achievement + Knockout tickets
-  await E(`LAN.played={0:1,1:1,2:1};localStorage.setItem('ncko-v1',JSON.stringify({diff:0,clear:{will:1},w:12,l:3}))`); const tb = await E('meta.tix');
-  const r = JSON.parse(await E(`JSON.stringify(lanCheck(true))`)); ok(r.got.includes('TRIPLE THREAT') && r.tix >= 2 + 1 + 1 && (await E('meta.tix')) === tb + r.tix, 'TRIPLE THREAT + a Knockout arcade clear + 10 wins pay ' + r.tix + ' tickets');
+  await E(`LAN.played={0:1,1:1,2:1};localStorage.setItem('ncko-v1',JSON.stringify({diff:0,clear:{will:1},w:12,l:3}))`); const tb = await E('meta.ltix');
+  const r = JSON.parse(await E(`JSON.stringify(lanCheck(true))`)); ok(r.got.includes('TRIPLE THREAT') && r.tix >= 2 + 1 + 1 && (await E('meta.ltix')) === tb + r.tix, 'TRIPLE THREAT + a Knockout arcade clear + 10 wins pay ' + r.tix + ' tickets');
   await page.waitForTimeout(200); await page.screenshot({ path: D + 'shelf_toast.png' }); console.log('  shelf says:', await page.evaluate(() => document.getElementById('shelfMsg').textContent));
   // Sprouts' and Rootdeep's CAPSULES open the same machine and return home
   await page.evaluate(`document.querySelector('.cart[data-i="0"]').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}))`); await page.waitForTimeout(1500);
   for (let k = 0; k < 30 && (await E('state')) !== 'menu'; k++) await hit('Enter', 250);
-  await E(`mi=menuItems().indexOf('CAPSULES')`); await hit('KeyZ', 200); ok((await E('state')) === 'lancaps', "Sprouts' CAPSULES opens the unified machine"); await hit('KeyX', 200); ok((await E('state')) === 'menu', 'and B returns to the Sprouts menu');
+  await E(`mi=menuItems().indexOf('CAPSULES')`); await hit('KeyZ', 200); ok((await E('state')) === 'caps', "Sprouts' CAPSULES opens Sprouts' own machine (Nov 18)"); await hit('KeyX', 200); ok((await E('state')) === 'menu', 'and B returns to the Sprouts menu');
   await E('eject()'); await page.evaluate(`document.querySelector('.cart[data-i="2"]').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}))`); await page.waitForTimeout(1500);
   await E(`RD.flags.cineSeen=1;RD.stats.runs=1;state='g3menu';menuSel=rdMenuItems().indexOf('CAPSULES')`); await hit('KeyZ', 200); ok((await E('state')) === 'lancaps', "Rootdeep's CAPSULES opens the same machine"); await hit('KeyX', 200); ok((await E('state')) === 'g3menu', 'and B returns to the Rootdeep menu');
   // Rootdeep: the Burrow, overflow sprouts, the surface scene

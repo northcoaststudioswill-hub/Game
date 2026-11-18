@@ -42,6 +42,7 @@ real game can't read or overwrite Erin's Patch & Plate days, Rootdeep runs, or a
 | `tests/console_shelf.js` | The power-on sequence, the shelf, and Clankawatch booting and playing. |
 | `src/lightswarm.js` | Lightswarm (cartridge 6), vertical slice v0.1: a survivors-style expedition. Test: `tests/lightswarm_lab.js`. |
 | `src/sproutwild/` | Sproutwild (cartridge 5): its files are listed in `build.py` in build order; see its own `README.md` and `CHANGELOG.md`. |
+| `splash/` | One small screenshot per cartridge (`cart0.jpg` to `cart6.jpg`, 400 by 224) for the splash screen shown before a game boots. Built in by `build.py`. |
 | `backups/` | Frozen builds. Never edit. |
 | `STORY-NOTES.md` | Will's story decisions for Pocket Lantern, and what is still open. |
 | `tests/sproutwild/` | Sproutwild's checks. `field-lab.js` (step-by-step rules, about 90 s). `checkpoint.js <html> <out> <point>` plays one stretch in real time from a saved point: `walkend`, `plot`, `barn`, `castle`, `reload` (30 to 100 s each). `old-saves-from-main.js` makes saves with main's build and continues them here. `autopilot.js` is a full fresh-save run (slow; use the checkpoints first). |
@@ -50,7 +51,7 @@ real game can't read or overwrite Erin's Patch & Plate days, Rootdeep runs, or a
 | `tests/fable_lab.js` | Fable pass 1: parry, wall bounce, K.O. frame, stances, rules and Trials (20 pass/fail checks, sheets in `playtest/fable/`). |
 | `tests/sprouts_valley.js` | Sprouts, the valley update: bridge, nectar, pear, treasure, saves, and the prequel pass (25 checks). |
 | `src/sprouts3d.js` | Sprouts' 3D cutscenes: a small software renderer (triangles, depth buffer, fog, lamps, dither), the models, and the fifteen scenes. Built into `console.js`'s scope by `build.py`; every name starts `c3`. |
-| `tests/sprouts_coast.js` | Sprouts, the 3D scenes and the North Coast: every shot draws, captions fit, the call, door, pier, lens, relight, saves, the ending (108 checks). Optional second argument: a folder for screenshots. |
+| `tests/sprouts_coast.js` | Sprouts, the 3D scenes and the North Coast: every shot draws, captions fit, the call, door, pier, lens, relight, saves, the ending (129 checks). Optional second argument: a folder for screenshots. |
 | `tests/sprouts_story.js` | Sprouts story run: four shards, Thornback, the ending, the house, a project, the next morning (17 checks). |
 | `tests/sprouts_soak.js` | Sprouts autopilots: Erin's first day by the objective marker, seeded chaos runs of the mid-game, and late-game runs (the call, the North Coast), with invariant checks. Arguments: build, seeds, days, late-game seeds. |
 | `tests/sprouts_tour.js` | Plays Sprouts in real time from a fresh save by following the objective marker. |

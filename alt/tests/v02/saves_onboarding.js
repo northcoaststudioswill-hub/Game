@@ -37,8 +37,8 @@ const D = require('path').join(__dirname, 'out', 'saves_onboarding') + '/'; requ
   await shot('menu_saved');
   await E('menuSel=0'); await hit('KeyZ', 300); ok((await E('state')) === 'g3run' && (await E('RUN.chamber')) === 2 && (await E('RUN.petals')) === ck.petals, 'CONTINUE resumes chamber 2 with the same petals');
   // capsules from Rootdeep's menu
-  await E(`RUN=null;meta.tix=3;LAN.capTut=1;state='g3menu';menuSel=rdMenuItems().indexOf('CAPSULES')`); await hit('KeyZ', 200); ok((await E('state')) === 'lancaps', 'CAPSULES opens from the menu'); await shot('caps');
-  const tix = await E('meta.tix'); await hit('KeyZ', 1500); await shot('caps_reveal'); ok((await E('meta.tix')) === tix - 1 && (await E('capR.ph')) === 'show', 'a pull from Rootdeep spends a ticket and reveals the item');
+  await E(`RUN=null;meta.ltix=3;LAN.capTut=1;state='g3menu';menuSel=rdMenuItems().indexOf('CAPSULES')`); await hit('KeyZ', 200); ok((await E('state')) === 'lancaps', 'CAPSULES opens from the menu'); await shot('caps');
+  const tix = await E('meta.ltix'); await hit('KeyZ', 1500); await shot('caps_reveal'); ok((await E('meta.ltix')) === tix - 1 && (await E('capR.ph')) === 'show', 'a pull from Rootdeep spends a ticket and reveals the item');
   await hit('KeyZ', 200); await hit('KeyX', 200);
   // death cinematic
   await E(`RD.char='WILL';rdStartRun();state='g3run';for(const t of [0,2,3])RUN.buds.push({type:t,x:P3.x+20,y:P3.y,a:0,cd:0,z:0});RUN.kills=12`);

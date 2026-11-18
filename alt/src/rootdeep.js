@@ -437,7 +437,7 @@ function chamberCleared(){RUN.phase='doors';RD.stats.chambers++;
  if(ch===3||ch===7||ch===11)a='boon';
  RUN.doors=[{kind:a,x:W/2-40,y:30},{kind:b,x:W/2+40,y:30}].map(d=>({...d,god:GODIDS[(Math.random()*GODIDS.length)|0]}));
  rdSave();}
-function bossDown(e){RD.stats.bosses++;if(!RD.flags['kill_'+BOSSES[e.bossIx].id]){try{meta.tix++;persist(true)}catch(x){}ftext(P3.x,P3.y-36,'+1 CAPSULE TICKET','#f8e060')}RD.flags['kill_'+BOSSES[e.bossIx].id]=1;RUN.keys++;const heat=RUN.heat,paid=RD.bounty[BOSSES[e.bossIx].id]||0;
+function bossDown(e){RD.stats.bosses++;if(!RD.flags['kill_'+BOSSES[e.bossIx].id]){try{meta.ltix=(meta.ltix||0)+1;persist(true)}catch(x){}ftext(P3.x,P3.y-36,'+1 CAPSULE TICKET','#f8e060')}RD.flags['kill_'+BOSSES[e.bossIx].id]=1;RUN.keys++;const heat=RUN.heat,paid=RD.bounty[BOSSES[e.bossIx].id]||0;
  let bonus=0;if(heat>paid){bonus=25*(heat-paid);RD.bounty[BOSSES[e.bossIx].id]=heat}
  RUN.dew+=40+bonus;say2(BOSSES[e.bossIx].s+' FALLEN!',3.2);
  ftext(P3.x,P3.y-16,'+1 KEY','#f8d030');if(bonus)ftext(P3.x,P3.y-26,'+'+bonus+' BOUNTY DEW','#7fd0e8');
@@ -463,7 +463,7 @@ function genShop(){const all=[
  const out=[];while(out.length<3){const it=all.splice((Math.random()*all.length)|0,1)[0];if(it)out.push(it)}return out;}
 function rdDie(){RUN.dieT=0;RUN.inv=99;RUN.atkA=null;RUN.rush=null;RUN.cutT=0;state='g3dying';snd(196,.5,49,'sawtooth',.08);later(()=>snd(147,.6,49,'triangle',.05),400)}
 function rdDieFinish(){const R0=RUN;{const k=ks(R0.char);k.deaths++;k.best=Math.max(k.best,R0.chamber)}RD.ckpt=null;RD.stats.deaths++;RD.lastRun={chamber:RUN.chamber,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds(),sub:rdDeathLine(R0)};RD.lastRun.msgs=rdMilestones(R0,false);RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;RUN=null;rdSave();overT=0;state='g3over';}
-function rdEscape(){RD.ckpt=null;RD.stats.escapes++;try{meta.tix++;persist(true)}catch(x){}const R0=RUN;{const k=ks(R0.char);k.esc++;k.best=12}RD.lastRun={chamber:12,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.lastRun.msgs=rdMilestones(R0,true);RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;
+function rdEscape(){RD.ckpt=null;RD.stats.escapes++;try{meta.ltix=(meta.ltix||0)+1;persist(true)}catch(x){}const R0=RUN;{const k=ks(R0.char);k.esc++;k.best=12}RD.lastRun={chamber:12,kills:RUN.kills,dew:RUN.dew,petals:RUN.petals,heat:RUN.heat,spr:bankBuds()};RD.lastRun.msgs=rdMilestones(R0,true);RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey;
  if(RD.stats.escapes===1)say2('FIRST ESCAPE!',5);
  RUN=null;rdSave();overT=0;if(!RD.flags.cine_escape)startCine('win','escape');else state='g3win';snd(523,.15);later(()=>snd(659,.15),140);later(()=>snd(784,.15),280);later(()=>snd(1046,.5),420);}
 function rdAbandon(){RD.ckpt=null;if(RUN){bankBuds();RD.dew+=RUN.dew;RD.keys+=RUN.keys;RD.honey+=RUN.honey}RUN=null;rdSave();state='g3hub';}
@@ -572,7 +572,7 @@ const RDAPPR=[
   "Before you go down, pick up to three of them at the bed. They start the run with you and fight for you.","Find more down there and your string grows. When it's full, the extras climb up here to the bed.",
   "Spare sprouts trade at the bed too. That's the Exchange. Up here, sprouts buy almost everything."]},
  {id:'r_escape',who:'RANGER',when:()=>RD.stats.escapes>=1,lines:["You came out the bottom and back up. Not many have.","The gate by the wall is open now. The Pact of Roots.","Sign it and the deep gets meaner. Meaner deep, better rewards. Your call, keeper."]},
- {id:'m_caps',who:'MARCUS',when:()=>RD.stats.runs>=1&&(typeof meta!=='undefined')&&meta.tix>0,lines:["Bro. BRO. You've got capsule tickets and you're just... holding them?",
+ {id:'m_caps',who:'MARCUS',when:()=>RD.stats.runs>=1&&(typeof meta!=='undefined')&&(meta.ltix||0)>0,lines:["Bro. BRO. You've got capsule tickets and you're just... holding them?",
   "Press START, hit CAPSULES. One ticket, one capsule. Keepers, lanterns, Sprouts styles. One machine for everything.","Bosses down here pay tickets. Sprouts pays them. Even the Lantern achievements on the shelf pay them, J.","Don't thank me. Actually, thank me."]}];
 let rdAppr=null,rdApprWait=0,rdApprTalk=false;
 function rdApprCheck(){RD.heard=RD.heard||{};for(const a of RDAPPR){const done=a.flag?RD.flags[a.id]:RD.heard[a.id];if(done)continue;let ok=false;try{ok=a.when()}catch(e){}if(ok&&HUBNPC[a.who]){rdApproach(a);return true}}return false}
@@ -1811,7 +1811,7 @@ function drawOver(win){r(win?'#141a10':'#180a10',0,0,W,H);const L=RD.lastRun||{c
    The same machine as Sprouts' CAPSULES: one shared pool (Sprouts styles + Rootdeep unlocks), the same
    tickets and petals (Sprouts' wallet), the same odds, no duplicates. */
 let capR={ph:'idle',t:0,it:null,msg:'',msgT:0};
-const CAPTUT=()=>["This is the capsule machine. It's the same machine in every cartridge.","One ticket opens one capsule. No ticket? It takes "+PULL+" petals from Sprouts instead. Never the same thing twice.","LEFT and RIGHT show what's inside for each game, and how to earn tickets."];
+const CAPTUT=()=>["This is the Lantern's capsule machine. It holds Rootdeep's unlocks.","One Lantern ticket opens one capsule. Never the same thing twice. Sprouts has a machine and tickets of its own, in its menu.","LEFT and RIGHT show what's inside, and how to earn Lantern tickets."];
 const CAPPG=['SPROUTS','ROOTDEEP','KNOCKOUT','TICKETS'];
 function capsUpdate(dt){const c=capR;c.t+=dt;if(c.msgT>0)c.msgT-=dt;
  if(c.pg===undefined)c.pg=String(lanFrom).slice(0,2)==='g3'?1:0;
@@ -1819,14 +1819,14 @@ function capsUpdate(dt){const c=capR;c.t+=dt;if(c.msgT>0)c.msgT-=dt;
  if(c.tut>=0){if(pressed('a')||pressed('b')||pressed('start')){c.tut++;snd(520,.04);if(c.tut>=CAPTUT().length){c.tut=-1;LAN.capTut=1;lanSave()}}return}
  if(c.ph==='idle'&&(pressed('left')||pressed('right'))){c.pg=(c.pg+(pressed('right')?1:3))%4;snd(520,.04)}
  if(c.ph==='idle'){if(pressed('b')||pressed('start')){lanBack();return}
-  if(pressed('a')){if(!pool().length){c.msg='YOU HAVE EVERYTHING!';c.msgT=2.5;snd(140,.1)}
-   else if(meta.tix>0||meta.petals>=PULL){if(meta.tix>0)meta.tix--;else meta.petals-=PULL;c.it=pullOne();c.ph='shake';c.t=0;meta.life.pulls++;snd(200,.5,500)}
-   else{c.msg='NEED A TICKET OR '+PULL+' PETALS';c.msgT=2.5;snd(140,.1)}}}
+  if(pressed('a')){if(!pool('rd').length){c.msg='YOU HAVE EVERYTHING!';c.msgT=2.5;snd(140,.1)}
+   else if((meta.ltix||0)>0){meta.ltix--;c.it=pullOne('rd');c.ph='shake';c.t=0;meta.life.pulls++;snd(200,.5,500)}
+   else{c.msg='NEED A LANTERN TICKET';c.msgT=2.5;snd(140,.1)}}}
  else if(c.ph==='shake'){if(c.t>1.2){const it=c.it;meta.own[it.k].push(it.i);if(it.k==='rd')rdCapGot(it.i);else{meta.eq[it.k]=it.i;applyLook(meta.eq)}
    try{metaAch()}catch(e){}persist(true);c.ph='show';c.t=0;snd(784,.1);later(()=>snd(988,.1),100);later(()=>snd(1319,.3),200)}}
  else if(c.t>.5&&(pressed('a')||pressed('b'))){c.ph='idle';c.t=0}}
-function drawCaps(){const c=capR;screenShell('CAPSULES','ONE MACHINE FOR EVERY CARTRIDGE');
- text('TICKETS '+meta.tix,10,40,1,'#f8e060',null);rtext('PETALS '+meta.petals,W-10,40,1,'#f8a0c8',null);
+function drawCaps(){const c=capR;screenShell('CAPSULES','ROOTDEEP UNLOCKS  ·  LANTERN TICKETS');
+ text('LANTERN TICKETS '+(meta.ltix||0),10,40,1,'#f8e060',null);
  const mx=W/2+(c.ph==='shake'?Math.round(Math.sin(c.t*40)*2):0),my=54;
  if(c.ph!=='show'){r('#181020',mx-23,my,46,40);r('#b0e0f8',mx-21,my+2,42,36);r('#e0f8ff',mx-18,my+5,5,12);
   [['#f85888',-14,24],['#f8e060',-3,28],['#60b8f8',8,23],['#a070e8',-9,13],['#60d880',4,14],['#f8a040',11,31]].forEach(([col,a,b2],i)=>{const j=c.ph==='shake'?Math.round(Math.sin(c.t*30+i)*2):0;r('#181020',mx+a-1,my+b2-1+j,8,8);r(col,mx+a,my+b2+j,6,6);r('#ffffff',mx+a,my+b2+j,6,2)});
@@ -1840,10 +1840,10 @@ function drawCaps(){const c=capR;screenShell('CAPSULES','ONE MACHINE FOR EVERY C
  const head=['SPROUTS STYLES '+ROWS.reduce((a,q)=>a+((meta.own[q[1]]||[]).length),0)+' / '+ROWS.reduce((a,q)=>a+((STY[q[1]]||[]).length),0),'ROOTDEEP '+rdCapOwned().length+' / '+RDCAP.length,'KNOCKOUT','HOW TO GET TICKETS'][pg];
  ctext('◀ '+head+' ▶',top,1,'#ffd94d',null);
  let rows=[];
- if(pg===0)rows=ROWS.map(q=>[({CAP:'CAPS',COAT:'COATS',FLOWER:'FLOWERS',LOUIE:"LOUIE'S BANDANAS",TRAIL:'TRAILS'})[q[0]]||q[0],((meta.own[q[1]]||[]).length)+' / '+((STY[q[1]]||[]).length),'#e8e4f5','#ffd94d']).concat([['WEAR THEM IN SPROUTS: STYLE MENU','','#8d84a8','']]);
+ if(pg===0)rows=ROWS.map(q=>[({CAP:'CAPS',COAT:'COATS',FLOWER:'FLOWERS',LOUIE:"LOUIE'S BANDANAS",TRAIL:'TRAILS'})[q[0]]||q[0],((meta.own[q[1]]||[]).length)+' / '+((STY[q[1]]||[]).length),'#e8e4f5','#ffd94d']).concat([['SPROUTS HAS ITS OWN MACHINE NOW','','#f8e060',''],['WEAR THEM IN SPROUTS: STYLE MENU','','#8d84a8','']]);
  else if(pg===1){const owned=rdCapOwned();rows=RDCAP.map((it,i)=>{const has=owned.includes(i);return[it.n,has?'OWNED':RAR[it.r][0],has?'#e8e4f5':'#6a6284',has?'#a8f080':RAR[it.r][1]]})}
  else if(pg===2)rows=[['NOTHING IN THE MACHINE YET','','#c8c0d8',''],['KNOCKOUT STILL PAYS TICKETS:','','#8d84a8',''],['  EACH NEW ARCADE CLEAR','+1','#e8e4f5','#f8e060'],['  EVERY 10 WINS','+1','#e8e4f5','#f8e060'],['  SURVIVAL: EVERY 5 IN A ROW','+1','#e8e4f5','#f8e060'],['  TRIALS: EVERY 4 STARS','+1','#e8e4f5','#f8e060']];
- else rows=[['SPROUTS','','#a8f080',''],['  KEEPER RANK UP','+1','#e8e4f5','#f8e060'],['  VISIT EACH DAY','+1','#e8e4f5','#f8e060'],['  ALL 3 DAILY ASKS','+1','#e8e4f5','#f8e060'],["  EVERY 3 OF ERIN'S ORDERS",'+1','#e8e4f5','#f8e060'],
+ else rows=[['SPROUTS KEEPS ITS OWN TICKETS','','#8d84a8',''],
   ['ROOTDEEP','','#a8f080',''],['  FIRST WIN OVER EACH BOSS','+1','#e8e4f5','#f8e060'],['  EVERY ESCAPE','+1','#e8e4f5','#f8e060'],
   ['PATCH & PLATE','','#a8f080',''],['  FIRST 3 STARS ON A DAY','+1','#e8e4f5','#f8e060'],
   ['KNOCKOUT · THE LANTERN','','#a8f080',''],['  ARCADE CLEARS, EVERY 10 WINS','+1','#e8e4f5','#f8e060'],['  SURVIVAL x5, TRIAL STARS x4','+1','#e8e4f5','#f8e060'],['  LANTERN ACHIEVEMENTS','+2-5','#e8e4f5','#f8e060']];
@@ -1852,7 +1852,7 @@ function drawCaps(){const c=capR;screenShell('CAPSULES','ONE MACHINE FOR EVERY C
  if(c.tut>=0){const L=CAPTUT(),ls=wrapPx(L[c.tut],222,1),bh=Math.max(2,ls.length)*11+26,by=H-4-bh;r('rgba(8,5,14,.6)',0,0,W,H);r('#181020',4,by,W-8,bh);r('#f8f0d8',5,by+1,W-10,bh-2);
   const nw=tw('ERIN',2)+10;r('#181020',8,by-7,nw+2,14);r(RDCPLATE.ERIN,9,by-6,nw,12);text('ERIN',14,by-4,2,'#ffffff',null);
   ls.slice(0,4).forEach((l,i)=>text(l,10,by+10+i*11,1,'#281c30',null));text(c.tut<L.length-1?'A: MORE ▼':'A: GOT IT',10,H-16,1,'#7a6a8a',null);return}
- ctext(c.msgT>0?c.msg:c.ph==='show'?'A: NICE!':pool().length?(meta.tix>0?'A: OPEN ONE (1 TICKET)    B: BACK':'A: OPEN ONE ('+PULL+' PETALS)    B: BACK'):'YOU HAVE EVERYTHING    B: BACK',H-13,1,c.msgT>0?'#f8a060':'#8d84a8',null);}
+ ctext(c.msgT>0?c.msg:c.ph==='show'?'A: NICE!':pool('rd').length?((meta.ltix||0)>0?'A: OPEN ONE (1 TICKET)    B: BACK':'NO LANTERN TICKETS YET    B: BACK'):'YOU HAVE EVERYTHING    B: BACK',H-13,1,c.msgT>0?'#f8a060':'#8d84a8',null);}
 
 /* ---------------- the Burrow Beneath, and sprouts going up to the surface ----------------
    The old Mirror is now a hatch in the Hearth floor: the sprouts you've banked dug a burrow under it, and Moondew
@@ -1961,7 +1961,7 @@ function lanCheck(onShelf){const got=[];let tix=0;
  const w10=Math.floor(ko.w/10);if(w10>Math.floor(LAN.ko.w/10)){tix+=w10-Math.floor(LAN.ko.w/10);got.push('KNOCKOUT WINS')}LAN.ko.w=ko.w;
  const s5=Math.floor((ko.surv||0)/5);if(s5>(LAN.ko.s5||0)){tix+=s5-(LAN.ko.s5||0);got.push('SURVIVAL STREAK');LAN.ko.s5=s5}
  const t4=Math.floor(koStars()/4);if(t4>(LAN.ko.t4||0)){tix+=t4-(LAN.ko.t4||0);got.push('TRIAL STARS');LAN.ko.t4=t4}
- if(tix){meta.tix+=tix;LAN.tixEarned+=tix;try{persist(true)}catch(e){}}
+ if(tix){meta.ltix=(meta.ltix||0)+tix;LAN.tixEarned+=tix;try{persist(true)}catch(e){}}
  lanSave();
  if(onShelf&&got.length){const m=$('shelfMsg');if(m){m.textContent='✦ '+got[0]+(got.length>1?' +'+(got.length-1)+' MORE':'')+'  +'+tix+' TICKETS';setTimeout(()=>{if(state==='off')m.textContent='Pick a cartridge'},4500)}}
  return{got,tix}}
@@ -1987,11 +1987,11 @@ function lanDraw(){r('#0c0a12',0,0,W,H);
  const top=state==='lan'?Math.round(H*.12):0;
  if(state==='lan'){for(let i=0;i<30;i++)r(i%5?'#3a3350':'#8d84a8',(i*53+17)%240,(i*29+11)%H,1,1);lanDrawLamp(W/2,top+8);
   ctext('POCKET LANTERN',top+34,3,'#ffd94d','#403010');ctext('THE CONSOLE',top+52,1,'#a89ec2',null);
-  const done=LACH.filter(a=>LAN.ach[a[0]]).length;ctext('TICKETS '+meta.tix+'   ·   ACHIEVEMENTS '+done+'/'+LACH.length,top+70,1,'#c8c0d8',null);
+  const done=LACH.filter(a=>LAN.ach[a[0]]).length;ctext('LANTERN TICKETS '+(meta.ltix||0)+'   ·   ACHIEVEMENTS '+done+'/'+LACH.length,top+70,1,'#c8c0d8',null);
   const st=20,y0=Math.round(H*.5);r('rgba(8,5,14,.8)',W/2-74,y0-10,148,LANITEMS.length*st+12);r('#ffd94d',W/2-74,y0-10,148,1);drawList(LANITEMS,lanSel,y0,st);
   ctext(lanMsgT>0?lanMsg:['ONE MACHINE FOR EVERY CARTRIDGE','NUMBERS FROM ALL FOUR GAMES','GOALS THAT SPAN THE GAMES','PICK A CARTRIDGE'][lanSel],H-16,1,lanMsgT>0?'#ffd94d':'#8d84a8',null);return}
  if(state==='lanstats'){const P=['ALL GAMES','SPROUTS','KNOCKOUT','ROOTDEEP','PATCH & PLATE'][lanPage];screenShell('STATS','◀ '+P+' ▶');let rows=[];
-  if(lanPage===0){const done=LACH.filter(a=>LAN.ach[a[0]]).length;rows=[['CARTRIDGES PLAYED',lanPlayedN()+' / 4'],['LANTERN ACHIEVEMENTS',done+' / '+LACH.length],['CAPSULES OPENED',meta.life.pulls],['CAPSULE ITEMS OWNED',pulledCount()],['TICKETS ON HAND',meta.tix],['TICKETS FROM THE LANTERN',LAN.tixEarned]]}
+  if(lanPage===0){const done=LACH.filter(a=>LAN.ach[a[0]]).length;rows=[['CARTRIDGES PLAYED',lanPlayedN()+' / 4'],['LANTERN ACHIEVEMENTS',done+' / '+LACH.length],['CAPSULES OPENED',meta.life.pulls],['CAPSULE ITEMS OWNED',pulledCount()],['LANTERN TICKETS ON HAND',meta.ltix||0],['TICKETS FROM THE LANTERN',LAN.tixEarned]]}
   else if(lanPage===1){const L=meta.life;rows=[['KEEPER RANK',rankOf(meta.xp)[0]],['PETALS EARNED',meta.xp],['ACHIEVEMENTS',Object.keys(meta.ach).length+' / '+ACH.length],['MISSIONS',L.missions],['BERRIES BROUGHT HOME',L.berries],['BUGS CAUGHT',L.bugs],['FLOWERS HARVESTED',L.flowers],['LOUIE PETS',L.pets]]}
   else if(lanPage===2){const k=koSV(),c=Object.keys(k.clear);rows=[['WINS',k.w],['LOSSES',k.l],['ARCADE CLEARS',c.length+' / 8'],['CLEARED WITH',c.length?c.map(x=>x.toUpperCase()).slice(0,3).join(', ')+(c.length>3?'...':''):'NOBODY YET'],['BEST SURVIVAL STREAK',k.surv||0],['TRIAL STARS',koStars()+' / 32']]}
   else if(lanPage===4){const q=ppSV();rows=[['DAYS OPEN',Math.min(12,q.day+1)+' / 12'],['STARS',q.stars+' / 36'],['DISHES SERVED',q.served],['COINS EARNED',q.earned],['SPROUT CREW',q.crew+' / 6'],['FRIEND HEARTS',q.friends+' / 20']]}

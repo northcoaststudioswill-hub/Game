@@ -85,7 +85,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await E(`buds.forEach(b=>{release(b);b.gard=false;b.st='follow'});void 0`); await tp(43, 9, -1, 0); await step(6); await shot('key-2-in-the-garden'); await throwFor(30);
   let ks = 0; for (; ks < 90 && !(await E('run.key')); ks++) await step(30);
   ok('the crew carries the key home', await E(`run.key===1&&state==='card'`), ks + ' s, ' + await E('state'));
-  await tap('a'); await step(12); ok('then the marker says to unlock the pond road', /POND ROAD/.test(await E('OBJ&&OBJ.text')), await E('OBJ&&OBJ.text'));
+  for (let i = 0; i < 8 && (await E('state')) === 'card'; i++) { await step(10); await tap('a'); } await step(12); ok('then the marker says to unlock the pond road', /POND ROAD/.test(await E('OBJ&&OBJ.text')), await E('OBJ&&OBJ.text'));
   await tp(20, 20, -1, 0); await step(12);
   ok('walking up with the key opens it', await E(`!coastGate('jobsite').alive&&fieldL[20*MW+17]>0`), await E('msg'));
   ok('a save keeps the key and the open road', await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);return run.key===1&&!coastGate('jobsite').alive})()`));
@@ -205,6 +205,35 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await E(`P.x=RX+88;P.y=RY+30;P.dx=0;P.dy=-1;void 0`); await step(3); await tap('a'); ok('the desk still opens the house menu', (await E('state')) === 'house', await E('state')); await tap('b');
   await E(`exitHome();void 0`); await step(3);
 
+  /* ---- what the house is for ---- */
+  await E(`init();live=true;state='play';dayT=30;home.res=[6,0,0,0,0,0];home.jobs=[3,1,0];for(let i=0;i<8;i++)mkBud(0,0,P.x,P.y);enterHome();mkRes();void 0`); await step(3);
+  ok('four places inside: desk, beds, pantry, fire', await E(`HST.map(h=>h.id).join()==='desk,bed,pantry,fire'&&!homeAt()`));
+  await E(`P.x=RX+150;P.y=RY+86;void 0`); await step(2); await tap('a');
+  ok('the beds offer a nap or the night', await E(`state==='hsel'&&hsel.opts.length===2`), await E('state')); await shot('house-beds');
+  await tap('a'); ok('a nap wakes at dusk, still at home, and the soil has grown meanwhile', await E(`state==='play'&&inHome&&dayT>=DAYLEN*.62&&dayT<DAYLEN*.64&&sprouts.every(q=>q.age>100)`), await E('[dayT|0,inHome]'));
+  await E(`dayT=30;P.x=RX+24;P.y=RY+20;void 0`); await step(2); await tap('a'); await tap('a'); await step(2);
+  ok('with three pickers the pantry packs a lunch, once a day', await E(`tod.fed===1&&state==='play'`), await E('state'));
+  ok('fed, a carried berry moves a quarter faster', await E(`(()=>{const sp=f=>{tod.fed=f;const it=mkItem('berry',30*16,24*16),b=mkBud(0,2,it.x,it.y);b.tgt=it;b.st='carry';it.on.push(b);const x0=it.x,y0=it.y;updItem(it,.1);const d=Math.hypot(it.x-x0,it.y-y0);it.alive=false;b.dead=true;return d};const a=sp(0),b=sp(1);tod.fed=1;buds=buds.filter(q=>!q.dead);return b>a*1.2&&b<a*1.3})()`));
+  await E(`P.x=RX+14;P.y=RY+62;void 0`); await step(2); await tap('a');
+  ok('the fire tells the story so far and what is next', await E(`state==='hsel'&&hsel.sub.length>=2&&/^NEXT:/.test(hsel.sub[hsel.sub.length-1])&&hsel.sub.every(l=>wrapPx(l,226,1).length<=2)`), await E('hsel&&hsel.sub')); await shot('house-fire'); await tap('a');
+  await E(`home.jobs=[1,0,0];buds.forEach(b=>b.stage=0);exitHome();newDay();void 0`); await step(3);
+  ok('every two who rest send one of the crew out bloomed', (await E(`buds.filter(b=>b.stage===2).length`)) === 2, await E(`[homeTotal(),buds.filter(b=>b.stage===2).length]`));
+
+  /* ---- Sprouts' own capsules, and erasing everything ---- */
+  await E(`state='menu';mi=menuItems().indexOf('CAPSULES');meta.tix=2;meta.ltix=5;meta.petals=0;void 0`); await tap('a');
+  ok("CAPSULES opens Sprouts' own machine", (await E('state')) === 'caps', await E('state'));
+  ok('it holds Sprouts styles only; Rootdeep unlocks are only in the Lantern machine', await E(`pool('sp').every(q=>q.k!=='rd')&&pool('sp').length>0&&pool('rd').every(q=>q.k==='rd')&&pool().length===pool('sp').length+pool('rd').length`));
+  await tap('a'); await step(60); ok('a pull spends a Sprouts ticket and leaves Lantern tickets alone', await E(`meta.tix===1&&meta.ltix===5&&capS.it&&capS.it.k!=='rd'`), await E('[meta.tix,meta.ltix]'));
+  await tap('a'); await tap('b');
+  await E(`meta.petals=77;meta.life.berries=9;meta.trs=[1];meta.own.rd=[0];run.pets=3;state='menu';mi=menuItems().indexOf('ERASE EVERYTHING');void 0`); await tap('a');
+  ok('ERASE EVERYTHING asks first, with NO chosen', await E(`state==='wipe'&&wipeI===0`), await E('state')); await shot('erase');
+  await tap('a'); ok('NO goes back and erases nothing', await E(`state==='menu'&&meta.petals===77`));
+  await tap('a'); await tap('down'); await tap('a'); await tap('a'); ok('YES needs three presses', await E(`state==='wipe'&&meta.petals===77`), await E('state'));
+  await tap('a');
+  ok('then Sprouts is brand new: valley, petals, tickets, pulls, stats, Collection, scenes', await E(`state==='menu'&&!live&&meta.petals===0&&meta.tix===1&&meta.xp===0&&meta.life.berries===0&&meta.life.pulls===0&&meta.trs.length===0&&!meta.scn&&Object.keys(meta.ach).length===0&&ownCount()===0&&SAVE.run===null`), await E('JSON.stringify([state,live,meta.petals,meta.tix,meta.life.pulls,ownCount()])'));
+  ok("and what belongs to other games is kept (Rootdeep's unlocks, Lantern tickets, sound)", await E(`meta.own.rd.length===1&&meta.ltix===5&&meta.mus>=0`));
+  ok('it is saved that way', await E(`JSON.parse(localStorage.getItem('pl-alt:sprouts-v2')||localStorage.getItem('sprouts-v2')).meta.petals===0`));
+
   /* ---- easter eggs ---- */
   await E(`init();live=true;state='play';dayT=30;ZONES.forEach(z=>run.seen[z[0]]=1);run.key=1;openGate(gates[1]);openGate(coastGate('jobsite'));void 0`); await step(4);
   ok('no van by the pond until Marcus has been met', await E('!vanHere()'));
@@ -264,6 +293,14 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await tap('b'); ok('B leaves the Collection as before', (await E('state')) === 'pause', await E('state')); await E(`state='play';void 0`);
   const long2 = JSON.parse(await E(`JSON.stringify(C3LIST.filter(q=>tw(q[1],2)>118||wrapPx(q[2]+' Press A to watch it again.',228,2).length>3||wrapPx('One of five hidden scenes. '+q[2],228,2).length>3).map(q=>q[0]))`));
   ok('the scene names and lines fit', long2.length === 0, long2);
+
+  /* ---- the splash before a cartridge boots ---- */
+  await E(`eject();void 0`); await page.waitForTimeout(200); await page.evaluate(() => { window.__splash = 1; }); /* ?dev skips the splash unless asked */
+  for (const i of [0, 4]) { await page.evaluate(i => document.querySelector('.cart[data-i="' + i + '"]').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })), i); await page.waitForTimeout(1400);
+    ok('cartridge ' + (i + 1) + ' shows its splash first, with a picture', await E(`state==='splash'&&cart===${i}&&!!splImg(${i})&&splImg(${i}).naturalWidth===400`), await E('state')); if (i === 0) await shot('splash-sprouts');
+    if (i === 0) { await page.keyboard.press('KeyX'); await E(`keys.b=1;void 0`); await page.waitForTimeout(120); await E(`keys.b=0;void 0`); await page.waitForTimeout(200); ok('B puts the cartridge back', (await E('state')) === 'off', await E('state')); }
+    else { for (let k = 0; k < 12 && (await E('state')) === 'splash'; k++) { await page.keyboard.down('Enter'); await page.waitForTimeout(90); await page.keyboard.up('Enter'); await page.waitForTimeout(120); } ok('A or Start goes on to the game', /^(boot|g4)/.test(await E('state')), await E('state')); await E(`eject();void 0`); } }
+  ok('every splash has a name, a line, three points and its controls, and they fit', await E(`SPLASH.length===7&&SPLASH.every(S=>S.n&&wrapPx(S.tag,232,2).length<=2&&S.l.length===3&&S.l.every(l=>wrapPx(l,222,1).length<=2)&&S.pad)`));
 
   ok('no page errors', errs.length === 0, errs.slice(0, 3));
   console.log(fail ? fail + ' FAILED' : 'ALL PASS'); await browser.close(); process.exit(fail ? 1 : 0);
