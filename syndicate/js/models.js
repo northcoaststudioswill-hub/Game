@@ -33,10 +33,20 @@
 
     // legs
     const legL = new T.Group(), legR = new T.Group(); legL.position.set(0.17, 0.62, 0); legR.position.set(-0.17, 0.62, 0); body.add(legL, legR);
-    [legL, legR].forEach(l => { box(0.24, 0.5, 0.28, robed ? m.dark : m.legs, 0, -0.25, 0, l); box(0.27, 0.16, 0.38, m.dark, 0, -0.54, 0.05, l); });
+    const legMat = robed ? m.dark : m.legs;
+    [legL, legR].forEach(l => { box(0.25, 0.32, 0.29, legMat, 0, -0.15, 0, l);                                  // thigh
+      const sh = new T.Group(); sh.position.y = -0.3; l.add(sh); l.userData.shin = sh;                            // the knee
+      mesh(new T.SphereGeometry(0.125, 6, 5), cls === 'fighter' ? m.armor2 : legMat, 0, 0, 0.03, sh);            // kneecap
+      box(0.21, 0.24, 0.25, legMat, 0, -0.13, 0, sh);                                                           // shin
+      box(0.26, 0.1, 0.3, m.dark, 0, -0.2, 0.01, sh); box(0.27, 0.13, 0.4, m.dark, 0, -0.275, 0.06, sh);        // boot shaft and foot
+      box(0.25, 0.09, 0.12, m.armor2, 0, -0.27, 0.23, sh); box(0.29, 0.035, 0.43, m.dark, 0, -0.335, 0.055, sh); });   // toe cap, sole
     // torso
     const torso = new T.Group(); torso.position.y = 0.6; body.add(torso);
-    box(w, 0.64, 0.42, m.armor, 0, 0.34, 0, torso); box(w + 0.03, 0.11, 0.45, m.armor2, 0, 0.06, 0, torso);
+    box(w, 0.38, 0.44, m.armor, 0, 0.47, 0, torso); box(w * 0.84, 0.3, 0.38, m.armor, 0, 0.16, 0, torso);       // chest, then a waist
+    box(w * 0.86 + 0.03, 0.11, 0.42, m.armor2, 0, 0.06, 0, torso); box(0.13, 0.13, 0.04, m.trim, 0, 0.06, 0.215, torso);   // belt and buckle
+    box(w * 0.82, 0.2, 0.36, robed ? m.cloth : m.legs, 0, -0.06, 0, torso);                                     // hips, so the legs join something
+    mesh(new T.CylinderGeometry(0.1, 0.12, 0.14, 7), m.skin, 0, 0.7, 0, torso);                                  // neck
+    [-1, 1].forEach(sd => mesh(new T.SphereGeometry(0.13, 6, 5), cls === 'sorcerer' ? m.cloth : m.armor2, sd * (w / 2 + 0.08), 0.57, 0, torso));   // shoulder joints
     let robe = null;
     if (robed) { robe = mesh(new T.CylinderGeometry(w * 0.52, 0.56, 0.66, 8), m.cloth, 0, -0.27, 0, torso); mesh(new T.CylinderGeometry(0.57, 0.57, 0.06, 8), m.trim, 0, -0.58, 0, torso); }
     if (cls === 'fighter') { const e = box(0.2, 0.2, 0.05, m.trim, 0, 0.4, 0.22, torso); e.rotation.z = Math.PI / 4; }
@@ -50,7 +60,13 @@
     // head
     const head = new T.Group(); head.position.set(0, 0.92, 0); torso.add(head);
     mesh(new T.SphereGeometry(0.26, 9, 7), m.skin, 0, 0, 0, head);
-    box(0.06, 0.07, 0.04, m.dark, 0.1, 0.03, 0.24, head); box(0.06, 0.07, 0.04, m.dark, -0.1, 0.03, 0.24, head);
+    { const white = new T.MeshLambertMaterial({ color: 0xe9e4d8 }), eyeC = { elf: 0x3aa06a, tiefling: 0xffb020, halforc: 0x8a2a1a, dwarf: 0x4a3a2a }[look.race] || 0x2a3a5a, iris = new T.MeshBasicMaterial({ color: look.race === 'tiefling' ? eyeC : 0x15131a });
+      [-1, 1].forEach(sd => { box(0.085, 0.062, 0.03, white, sd * 0.1, 0.035, 0.232, head).castShadow = false; box(0.042, 0.052, 0.02, iris, sd * 0.095, 0.033, 0.25, head).castShadow = false;
+        const br = box(0.11, 0.028, 0.04, m.hair, sd * 0.1, 0.09, 0.238, head); br.rotation.z = -sd * 0.16; br.castShadow = false;
+        mesh(new T.SphereGeometry(0.055, 5, 4), m.skin, sd * 0.255, 0.0, 0.0, head).scale.set(0.5, 1, 0.8); });                        // ears
+      box(0.05, 0.075, 0.06, m.skin, 0, -0.025, 0.262, head).castShadow = false;                                                      // nose
+      box(0.1, 0.016, 0.02, m.dark, 0, -0.105, 0.24, head).castShadow = false;                                                        // mouth
+      box(0.2, 0.1, 0.16, m.skin, 0, -0.19, 0.11, head).castShadow = false; }                                                         // jaw
     const cap = (mat, r) => mesh(new T.SphereGeometry(r || 0.3, 9, 5, 0, Math.PI * 2, 0, Math.PI * 0.55), mat, 0, 0.01, 0, head);
     if (cls === 'fighter') { cap(m.armor, 0.31); box(0.06, 0.26, 0.06, m.armor, 0, 0, 0.28, head); box(0.07, 0.24, 0.36, m.cloth, 0, 0.38, -0.04, head); }
     if (cls === 'rogue') { cap(m.cloth, 0.31); box(0.46, 0.44, 0.14, m.cloth, 0, -0.08, -0.22, head); box(0.4, 0.15, 0.1, m.armor2, 0, -0.12, 0.2, head); const tip = mesh(new T.ConeGeometry(0.12, 0.3, 5), m.cloth, 0, 0.3, -0.12, head); tip.rotation.x = -0.9; }
@@ -68,8 +84,15 @@
     // arms: model faces +Z, weapon hand is on -X
     const armR = new T.Group(), armL = new T.Group(); armR.position.set(-(w / 2 + 0.11), 0.56, 0); armL.position.set(w / 2 + 0.11, 0.56, 0); torso.add(armR, armL);
     const sleeve = cls === 'sorcerer' ? m.cloth : m.armor2;
-    [armR, armL].forEach(a => { box(0.2, 0.5, 0.22, sleeve, 0, -0.22, 0, a); mesh(new T.SphereGeometry(0.11, 6, 5), m.skin, 0, -0.52, 0, a); });
-    const hand = (arm) => { const h = new T.Group(); h.position.y = -0.52; arm.add(h); return h; };
+    [armR, armL].forEach((a, i) => { box(0.2, 0.28, 0.22, sleeve, 0, -0.12, 0, a);                                 // upper arm
+      const f = new T.Group(); f.position.y = -0.27; a.add(f); a.userData.fore = f;                                 // the elbow
+      mesh(new T.SphereGeometry(0.105, 6, 5), sleeve, 0, 0, -0.01, f);
+      box(0.18, 0.24, 0.2, sleeve, 0, -0.11, 0, f);                                                                // forearm
+      if (cls === 'fighter' || cls === 'cleric') box(0.215, 0.1, 0.235, m.trim, 0, -0.17, 0, f);                   // gauntlet cuff
+      else if (cls === 'rogue') box(0.2, 0.14, 0.22, m.dark, 0, -0.14, 0, f);                                      // wrapped wrists
+      box(0.13, 0.12, 0.16, cls === 'fighter' ? m.armor2 : m.skin, 0, -0.27, 0.01, f); box(0.05, 0.06, 0.08, cls === 'fighter' ? m.armor2 : m.skin, (i ? -1 : 1) * 0.075, -0.25, 0.05, f); });   // palm and thumb
+    const foreR = armR.userData.fore, foreL = armL.userData.fore;
+    const hand = (arm) => { const h = new T.Group(); h.position.y = -0.25; arm.userData.fore.add(h); return h; };
     const hR = hand(armR), hL = hand(armL);
     const blade = (h, len) => { box(0.09, 0.04, len, m.weapon, 0, 0, len / 2 + 0.1, h); box(0.3, 0.07, 0.07, m.trim, 0, 0, 0.1, h); if (g.weapon || wsk) glows.push(gfx.glow(wsk ? wsk.glow : WCOL[g.weapon], 0.7, 0, 0, len * 0.6, h, 0.55)); };
     const arm = look.arm ? String(look.arm).split('_')[1] : '', wglow = (z, hh) => { if (g.weapon || wsk) glows.push(gfx.glow(wsk ? wsk.glow : WCOL[g.weapon], 0.7, 0, 0, z, hh, 0.55)); };
@@ -79,12 +102,12 @@
     else if (cls === 'fighter' && arm === 'hammer') { shaft(hR, 1.1, -0.1); box(0.24, 0.24, 0.4, m.weapon, 0, 0, 0.95, hR); box(0.27, 0.27, 0.08, m.trim, 0, 0, 0.78, hR); box(0.27, 0.27, 0.08, m.trim, 0, 0, 1.12, hR); wglow(0.95, hR); }
     else if (cls === 'fighter' && arm === 'spear') {
       shaft(hR, 1.9, -0.5); const tip = mesh(new T.ConeGeometry(0.08, 0.36, 4), m.weapon, 0, 0, 1.56, hR); tip.rotation.x = Math.PI / 2; box(0.16, 0.05, 0.05, m.trim, 0, 0, 1.36, hR); wglow(1.5, hR);
-      const sh = mesh(new T.CylinderGeometry(0.4, 0.4, 0.07, 6), m.armor2, 0.1, -0.3, 0.12, armL); sh.rotation.z = Math.PI / 2; sh.scale.z = 0.85;
+      const sh = mesh(new T.CylinderGeometry(0.4, 0.4, 0.07, 6), m.armor2, 0.1, -0.05, 0.12, foreL); sh.rotation.z = Math.PI / 2; sh.scale.z = 0.85;
     }
     else if (cls === 'fighter') {
       blade(hR, 1.0);
-      const sh = mesh(new T.CylinderGeometry(0.4, 0.4, 0.07, 6), m.armor2, 0.1, -0.3, 0.12, armL); sh.rotation.z = Math.PI / 2; sh.scale.z = 0.85;
-      const boss = mesh(new T.CylinderGeometry(0.16, 0.16, 0.1, 6), m.trim, 0.14, -0.3, 0.12, armL); boss.rotation.z = Math.PI / 2;
+      const sh = mesh(new T.CylinderGeometry(0.4, 0.4, 0.07, 6), m.armor2, 0.1, -0.05, 0.12, foreL); sh.rotation.z = Math.PI / 2; sh.scale.z = 0.85;
+      const boss = mesh(new T.CylinderGeometry(0.16, 0.16, 0.1, 6), m.trim, 0.14, -0.05, 0.12, foreL); boss.rotation.z = Math.PI / 2;
     }
     if (cls === 'rogue' && arm === 'rapier') { box(0.04, 0.03, 1.0, m.weapon, 0, 0, 0.6, hR); const cup = mesh(new T.SphereGeometry(0.1, 7, 5, 0, 6.28, 0, 1.6), m.trim, 0, 0, 0.12, hR); cup.rotation.x = Math.PI / 2; wglow(0.7, hR); blade(hL, 0.32); }
     else if (cls === 'rogue' && arm === 'chain') { for (let i = 0; i < 8; i++) box(0.05, 0.05, 0.09, m.dark, Math.sin(i * 1.3) * 0.04, -i * 0.02, 0.15 + i * 0.13, hR); mesh(new T.IcosahedronGeometry(0.12, 0), m.weapon, 0, -0.16, 1.22, hR); wglow(1.2, hR); blade(hL, 0.32); }
@@ -107,8 +130,8 @@
 
     // ---- outfit upgrades: armour tiers add real plates, not just a trim colour
     if (g.armor >= 1) {
-      [armR, armL].forEach(a => { box(0.25, 0.2, 0.27, m.trim, 0, -0.34, 0, a); box(0.27, 0.05, 0.29, m.armor, 0, -0.22, 0, a); });
-      [legL, legR].forEach(l => { box(0.28, 0.17, 0.33, m.trim, 0, -0.2, 0.02, l); box(0.3, 0.05, 0.4, m.trim, 0, -0.45, 0.05, l); });
+      [armR, armL].forEach(a => { box(0.23, 0.18, 0.25, m.trim, 0, -0.1, 0, a.userData.fore); box(0.25, 0.05, 0.27, m.armor, 0, -0.2, 0, a); });
+      [legL, legR].forEach(l => { box(0.28, 0.17, 0.33, m.trim, 0, -0.16, 0.02, l); box(0.25, 0.16, 0.29, m.trim, 0, -0.12, 0.02, l.userData.shin); });
       box(w * 0.74, 0.07, 0.05, m.trim, 0, 0.56, 0.22, torso); box(w * 0.5, 0.07, 0.05, m.trim, 0, 0.22, 0.22, torso); box(w * 0.74, 0.07, 0.05, m.trim, 0, 0.4, -0.22, torso);
     }
     if (g.armor >= 2) {
@@ -222,6 +245,21 @@
       if (robe) robe.rotation.z = mv ? sw * 0.08 : 0;
       root.rotation.z = 0; root.rotation.x = 0; root.position.y = p.y || 0;
       if (act === 'dodge') { const s2 = Math.sin(k * Math.PI); body.rotation.x = 0.5 * s2; body.rotation.z = 0.18 * s2; body.position.y = -0.18 * s2; legL.rotation.x = 0.95 * s2; legR.rotation.x = -0.75 * s2; armR.rotation.x = -0.9 - 0.4 * s2; armL.rotation.x = 0.4 * s2; cur.bx = 0.3; cur.by = -0.1; }       // weight drops, one long step, no tumbling
+      { const crouch = Math.max(0, Math.min(1, -cur.by * 3.2)), sitting = act === 'sit' || act === 'kneel';
+        if (!sitting && act !== 'dodge') { legL.rotation.x -= crouch * 0.42; legR.rotation.x -= crouch * 0.42; }
+        const knee = l => Math.max(0, Math.min(1.75, Math.max(0, l) * 0.95 + Math.max(0, -l) * 0.3 + Math.max(0, -l - 0.9) * 2.0 + (sitting ? 0 : crouch * 0.85)));
+        legL.userData.shin.rotation.x = J('kl', knee(legL.rotation.x), 0.6); legR.userData.shin.rotation.x = J('kr', knee(legR.rotation.x), 0.6);
+        let eR = 0.28, eL = 0.28;
+        if (act === 'swing') { eR = k < 0.5 ? mix(1.0, 0.04, Math.pow(Math.min(1, k / 0.5), 3)) : mix(0.04, 0.45, (k - 0.5) / 0.5); eL = p.sty === 2 || p.sty === 3 || cls === 'rogue' ? eR : 0.7; }
+        else if (act === 'cast') { eR = eL = 0.55 - k * 0.3; } else if (act === 'release') { eR = 0.1; eL = 0.5; }
+        else if (act === 'parry') { eR = 1.0; eL = 1.1; } else if (act === 'lunge') { eR = 0.05; eL = 0.6; }
+        else if (act === 'cheer' || act === 'salute') { eR = 0.35; eL = 0.35; } else if (act === 'kneel' || act === 'stun') { eR = eL = 0.5; } else if (act === 'sit') { eR = eL = 0.9; }
+        else if (p.guard) { eR = 0.9; eL = 1.15; }
+        else if (p.ready) { eR = FAM === 'fence' ? 0.25 : FAM === 'heavy' ? 0.95 : 0.75; eL = FAM === 'fence' ? 0.9 : 0.8; }
+        else if (mv) { eR = 0.35 + Math.max(0, sw) * 0.3; eL = 0.35 + Math.max(0, -sw) * 0.3; }
+        if (p.hurt > 0) { eR += 0.3; eL += 0.3; }
+        foreR.rotation.x = -J('er', eR, Math.max(0.35, snap)); foreL.rotation.x = -J('el', eL, Math.max(0.35, snap)); }
+      if (act === 'ko') { legL.userData.shin.rotation.x = 0.25; legR.userData.shin.rotation.x = 0.5; foreR.rotation.x = -0.3; foreL.rotation.x = -0.5; }
       if (act === 'ko') { const f = Math.min(1, (p.prog || 0) * 2.2), e = eo(f); body.rotation.x = -1.5 * e; body.position.y = 0.2 * e + Math.sin(f * Math.PI) * 0.25; legL.rotation.x = 0.3 * e; legR.rotation.x = -0.15 * e; armR.rotation.set(-2.6 * e, 0, -0.5 * e); armL.rotation.set(-2.4 * e, 0, 0.6 * e); head.rotation.x = -0.3 * e; }
       // sorcerer flames + cast glow
       const fl = 0.85 + Math.sin(t * 17) * 0.12;
