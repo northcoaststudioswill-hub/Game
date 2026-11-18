@@ -433,3 +433,33 @@ button:not(:disabled):hover { filter: brightness(1.12); }
 .sw { width: 2.3rem; height: 2.3rem; padding: 0; border-radius: 50%; border: 2px solid #0b090d; box-shadow: 0 0 0 1px var(--bronze); } .sw.sel { box-shadow: 0 0 0 2px var(--gold), 0 0 0.8rem rgba(240, 201, 90, 0.6); transform: scale(1.1); }
 .fld { display: block; margin-top: 0.4rem; } .fld small { display: block; font-family: var(--display); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--bronze-hi); }
 .fld input { width: 100%; max-width: 14rem; font: inherit; font-size: 1.1rem; color: #efe4c8; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--bronze); border-radius: 0.3rem; padding: 0.35rem 0.6rem; }
+
+/* the catalogue: pages, pictured tiles, preview */
+.card.catcard { width: 60rem; }
+.cat { display: grid; grid-template-columns: 9.5rem 1fr 15.5rem; gap: 0.7rem; align-items: start; }
+.cat-nav { display: flex; flex-direction: column; gap: 0.3rem; }
+.cn { display: flex; align-items: center; gap: 0.5rem; text-align: left; padding: 0.5rem 0.55rem; font-size: 0.74rem; border-radius: 0.3rem; } .cn i { font-style: normal; width: 1.7rem; height: 1.7rem; flex: none; display: grid; place-items: center; border-radius: 0.25rem; background: rgba(0, 0, 0, 0.4); color: var(--gold); font-size: 1rem; box-shadow: inset 0 0 0 1px var(--bronze); }
+.cn.sel { background: linear-gradient(#7a5c22, #4a3612); box-shadow: inset 0 1px 0 rgba(255, 230, 150, 0.35), 0 0 0 1px #f0c95a; color: #fff3cf; }
+.cat-head { padding: 0.5rem 0.7rem; margin-bottom: 0.5rem; background: linear-gradient(90deg, rgba(120, 92, 30, 0.35), rgba(0, 0, 0, 0.15)); border-left: 3px solid var(--gold); border-radius: 0.25rem; } .cat-head b { font-family: var(--title); font-size: 1.35rem; color: #f6dc8a; } .cat-head p { margin: 0.15rem 0 0; font-size: 0.9rem; color: #cfc4a8; }
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(4.9rem, 1fr)); gap: 0.4rem; max-height: 21rem; overflow-y: auto; padding: 0.15rem; }
+.ct { position: relative; aspect-ratio: 1; padding: 0.15rem; border-radius: 0.35rem; background: radial-gradient(circle at 50% 70%, rgba(120, 100, 140, 0.35), rgba(12, 10, 16, 0.9) 70%); box-shadow: inset 0 0 0 1px var(--line); display: grid; place-items: center; overflow: hidden; }
+.ct img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.6)); }
+.ct.sel { box-shadow: inset 0 0 0 2px var(--gold), 0 0 0.9rem rgba(240, 201, 90, 0.45); background: radial-gradient(circle at 50% 70%, rgba(200, 160, 70, 0.4), rgba(20, 14, 10, 0.9) 72%); }
+.ct.lk img, .ct.lk .iso { filter: grayscale(1) brightness(0.45); } .ct.full { opacity: 0.75; }
+.ct i { position: absolute; font-style: normal; font-family: var(--display); font-weight: 800; font-size: 0.62rem; line-height: 1; padding: 0.16rem 0.3rem; border-radius: 0.2rem; }
+.ct .pr { right: 0.2rem; bottom: 0.2rem; background: rgba(10, 8, 12, 0.85); color: #f6dc8a; box-shadow: 0 0 0 1px var(--bronze); } .ct .bd { left: 0.2rem; top: 0.2rem; background: #2c5a3a; color: #d8ffd8; } .ct .lkk { right: 0.2rem; bottom: 0.2rem; font-size: 0.8rem; background: none; }
+.iso { width: 62%; aspect-ratio: 2 / 1.25; background: var(--c); clip-path: polygon(50% 0, 100% 40%, 100% 60%, 50% 100%, 0 60%, 0 40%); box-shadow: inset 0 -0.5rem 0 rgba(0, 0, 0, 0.35); display: block; } .iso.big { width: 70%; }
+.cat-prev { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--line); border-radius: 0.4rem; padding: 0.6rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.cp-pic { height: 9rem; display: grid; place-items: center; border-radius: 0.3rem; background: radial-gradient(ellipse at 50% 78%, rgba(240, 201, 90, 0.22), transparent 60%), repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03) 0 0.7rem, transparent 0.7rem 1.4rem), #15111a; box-shadow: inset 0 0 0 1px var(--bronze); overflow: hidden; } .cp-pic img { max-height: 100%; max-width: 100%; object-fit: contain; filter: drop-shadow(0 6px 4px rgba(0, 0, 0, 0.6)); }
+.cp-name { font-family: var(--title); font-size: 1.3rem; color: #f6dc8a; line-height: 1.1; } .cp-desc { margin: 0; font-size: 0.95rem; color: #e6dcc0; }
+.cp-meta { list-style: none; margin: 0.1rem 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.25rem; } .cp-meta li { font-family: var(--display); font-size: 0.6rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.2rem 0.4rem; border-radius: 0.2rem; background: rgba(0, 0, 0, 0.4); color: #cfc4a8; box-shadow: inset 0 0 0 1px var(--line); } .cp-meta .dot { display: inline-block; width: 0.5rem; height: 0.5rem; border-radius: 50%; margin-right: 0.3rem; box-shadow: 0 0 0.4rem currentColor; }
+.cp-buy { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: 0.2rem; } .cp-price { display: flex; align-items: center; gap: 0.35rem; font-family: var(--title); font-size: 1.5rem; color: #f6dc8a; } .cp-lock { font-family: var(--display); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: #cfc4a8; padding: 0.5rem; text-align: center; background: rgba(0, 0, 0, 0.35); border-radius: 0.3rem; }
+.cat-foot { display: flex; align-items: center; gap: 1rem; margin-top: 0.7rem; } .cat-foot #x { margin-left: auto; } .cat-purse { display: flex; align-items: center; gap: 0.35rem; } .cat-purse b { font-family: var(--title); font-size: 1.3rem; color: #f6dc8a; } .cat-comf { font-size: 0.85rem; color: #cfc4a8; }
+@media (orientation: portrait) {
+  .cat { grid-template-columns: 1fr; gap: 0.5rem; }
+  .cat-nav { flex-direction: row; overflow-x: auto; padding-bottom: 0.2rem; } .cn { flex: none; flex-direction: column; gap: 0.15rem; padding: 0.4rem 0.5rem; font-size: 0.6rem; text-align: center; }
+  .cat-head p { display: none; } .cat-head { padding: 0.3rem 0.6rem; margin-bottom: 0.35rem; }
+  .cat-grid { grid-template-columns: repeat(5, 1fr); max-height: 10.4rem; }
+  .cat-prev { display: grid; grid-template-columns: 6.5rem 1fr; column-gap: 0.6rem; } .cp-pic { height: 6.5rem; grid-row: 1 / span 3; align-self: start; } .cp-name { font-size: 1.1rem; } .cp-desc { font-size: 0.85rem; } .cp-buy, .cp-lock { grid-column: 1 / -1; }
+  .cat-foot { gap: 0.6rem; } .cat-comf { font-size: 0.72rem; }
+}

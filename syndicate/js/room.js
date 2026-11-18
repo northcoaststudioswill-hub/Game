@@ -1,7 +1,7 @@
 // Guttercrown — the room builder: tabbed catalogue, floors and walls, wall-hung pieces, furniture you can use,
 // four-way rotation, comfort rating and visitors. Overrides the simpler placement UI in ui.js.
 (function () {
-  const G = window.G, ui = G.ui, W = G.world, $ = id => document.getElementById(id);
+  const G = window.G, T = THREE, ui = G.ui, W = G.world, $ = id => document.getElementById(id);
   const show = (h, c) => ui._show(h, c), on = (s, f) => ui._on(s, f);
   const H = () => W.get('hideout');
   const hexc = n => '#' + n.toString(16).padStart(6, '0');
@@ -93,34 +93,59 @@
   };
 
   // ------------------------------------------------------------ the catalogue
-  const TABS = [['furn', 'Furniture'], ['garden', 'Garden'], ['light', 'Lights'], ['wall', 'On the wall'], ['style', 'Floors & walls']];
+  // Pages down the left, a grid of pictured tiles in the middle, and a preview of whatever is selected.
+  const TABS = [['furn', 'Furniture', '⌂', 'Beds, tables, shelves and the things that make a cellar a home. Many give a small edge in the pit.'], ['garden', 'Garden', '❀', 'For the cavern outside your door. Most of it glows.'], ['light', 'Lights', '✦', 'Lamps and fires. Each one lights the room around it.'], ['wall', 'Wall pieces', '▣', 'These hang on the two house walls. Buy one, then tap along a wall to choose its place.'], ['style', 'Floors & walls', '■', 'Relay the floor, redo the walls, or change the garden ground. Bought once, yours to swap for good.']];
   const tabOf = d => d.light && d.zone !== 'garden' && ['lantern', 'firebowl', 'hearth'].includes(d.id) ? 'light' : d.zone === 'garden' ? 'garden' : 'furn';
-  ui.catalog = function (tab) {
+  // thumbnails: each piece rendered once from the same angle the room is seen from
+  let tr = null, tsc, tcam; const tcache = {};
+  G.furniThumb = function (kind, id) {
+    const key = kind + ':' + id;
+    if (tcache[key] == null) {
+      try {
+        if (!tr) { tr = new T.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); tr.setSize(144, 144, false); tr.toneMapping = T.ACESFilmicToneMapping; tr.toneMappingExposure = 1.35; tsc = new T.Scene(); tsc.add(new T.HemisphereLight(0xb0a8d0, 0x3a2c24, 1.5)); const dl = new T.DirectionalLight(0xffe0c0, 2.4); dl.position.set(2, 6, 5); tsc.add(dl); tcam = new T.OrthographicCamera(-1, 1, 1, -1, 0.1, 80); }
+        let g; if (kind === 'wall') { g = new T.Group(); W.wallBuilders()[id](g); } else g = W.buildItem(id, 0);
+        tsc.add(g); g.updateMatrixWorld(true);
+        const bb = new T.Box3(); g.traverse(o => { if (o.isMesh) { o.geometry.computeBoundingBox(); bb.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld)); } });
+        const c = bb.getCenter(new T.Vector3()), sz = bb.getSize(new T.Vector3()), rad = Math.max(0.45, sz.length() / 2 * 0.9);
+        tcam.left = tcam.bottom = -rad; tcam.right = tcam.top = rad; tcam.updateProjectionMatrix();
+        if (kind === 'wall') tcam.position.set(c.x + 6, c.y + 3, c.z + 12); else tcam.position.set(c.x + 10, c.y + 8.2, c.z + 10);
+        tcam.lookAt(c); tr.render(tsc, tcam); tcache[key] = tr.domElement.toDataURL('image/png'); tsc.remove(g);
+      } catch (e) { tcache[key] = ''; }
+    }
+    return tcache[key];
+  };
+  ui.catalog = function (tab, sel) {
     const st = G.state, rk = G.rankOf(st.respect), own = G.owned(st), r = room(st), cf = G.comfort(st); tab = tab || G.catTab || 'furn'; G.catTab = tab;
-    let h = '<div class="card"><h2>The Quartermaster’s Catalogue</h2><p class="dim">You have <b>' + st.coin + '</b> coin. Comfort <b>' + cf + '</b>, ' + G.comfortName(cf) + '. A comfortable room draws visitors, and visitors leave coin.</p><div class="chips">' +
-      TABS.map(t => '<button class="chip' + (t[0] === tab ? ' sel' : '') + '" data-tab="' + t[0] + '">' + t[1] + '</button>').join('') + '</div>';
-    const row = (ic, col, name, sub, desc, btn, locked) => '<div class="ab-row' + (locked ? ' lockedrow' : '') + '"><div class="ab-ic pas" style="color:' + col + '">' + ic + '</div><div class="ab-tx"><b>' + name + '</b><small>' + sub + '</small><p>' + desc + '</p></div>' + btn + '</div>';
-    if (tab === 'style') {
-      [['floor', 'House floor', G.FLOORS], ['wall', 'House walls', G.WALLS], ['garden', 'Garden ground', G.GARDENS]].forEach(g => {
-        h += '<h3>' + g[1] + '</h3>';
-        g[2].forEach(s => { const have = r.owned[s.id], on2 = r[g[0]] === s.id, locked = rk < s.rank && !have;
-          h += row('■', hexc(s.sw || s.color), s.name, on2 ? 'In use' : have ? 'Owned' : s.cost + ' coin', s.desc, on2 ? '<span class="lock">In use</span>' : have ? '<button class="big" data-use="' + g[0] + ':' + s.id + '">Lay it</button>' : locked ? '<span class="lock">' + G.RANKS[s.rank].name + '</span>' : '<button class="big" data-sty="' + g[0] + ':' + s.id + '"' + (st.coin < s.cost ? ' disabled' : '') + '>' + s.cost + ' coin</button>', locked); });
-      });
-    } else if (tab === 'wall') {
-      h += '<p class="dim">These hang on the two house walls. Buy one, then tap along a wall to choose its place.</p>';
-      G.WALLITEMS.forEach(d => { const locked = rk < d.rank; h += row('▣', d.light ? hexc(d.light) : 'var(--gold)', d.name, 'Wall piece · ' + (st.wallItems || []).filter(p => p.id === d.id).length + ' hung', d.desc, locked ? '<span class="lock">' + G.RANKS[d.rank].name + '</span>' : '<button class="big" data-wbuy="' + d.id + '"' + (st.coin < d.cost ? ' disabled' : '') + '>' + d.cost + ' coin</button>', locked); });
-    } else G.DECOR.filter(d => tabOf(d) === tab).forEach(d => {
-      const n = own[d.id] || 0, locked = rk < d.rank, full = n >= d.max;
-      h += row(d.zone === 'garden' ? '❀' : d.zone === 'house' ? '⌂' : '✦', d.light ? hexc(d.light) : 'var(--gold)', d.name, (d.zone === 'any' ? 'House or garden' : d.zone === 'house' ? 'House' : 'Garden') + ' · ' + d.w + '×' + d.d + (d.max > 1 ? ' · ' + n + '/' + d.max : n ? ' · placed' : '') + (USE[d.id] ? ' · ' + USE[d.id][0].toLowerCase() : ''), d.perk,
-        locked ? '<span class="lock">' + G.RANKS[d.rank].name + '</span>' : full ? '<span class="lock">Owned</span>' : '<button class="big" data-buy="' + d.id + '"' + (st.coin < d.cost ? ' disabled' : '') + '>' + d.cost + ' coin</button>', locked);
-    });
-    h += '<div class="row end"><button class="big" id="x">Close</button></div></div>';
-    show(h);
-    on('#x', () => { ui.close(); ui.topbar(); }); on('[data-tab]', el => ui.catalog(el.dataset.tab));
-    on('[data-buy]', el => { const w = W.walker; ui.close(); ui.startPlace({ id: el.dataset.buy, x: Math.round(w.x), z: Math.round(w.z) + 1, r: 0, from: null }); });
-    on('[data-wbuy]', el => { ui.close(); ui.startPlace({ id: el.dataset.wbuy, wallItem: true, wall: 'n', s: 2, from: null }); });
-    on('[data-sty]', el => { const p = el.dataset.sty.split(':'), s = (p[0] === 'floor' ? G.FLOORS : p[0] === 'wall' ? G.WALLS : G.GARDENS).find(x => x.id === p[1]); st.coin -= s.cost; r.owned[s.id] = 1; r[p[0]] = s.id; G.save(); G.sfx('coin'); H().refresh(); ui.catalog('style'); ui.topbar(); });
-    on('[data-use]', el => { const p = el.dataset.use.split(':'); r[p[0]] = p[1]; G.save(); G.sfx('place'); H().refresh(); ui.catalog('style'); });
+    const T0 = TABS.find(t => t[0] === tab) || TABS[0];
+    // every page is a flat list of entries so the grid and the preview do not care what kind of thing it is
+    let items = [];
+    if (tab === 'style') [['floor', 'Floor', G.FLOORS], ['wall', 'Walls', G.WALLS], ['garden', 'Garden ground', G.GARDENS]].forEach(g => g[2].forEach(x => { const have = r.owned[x.id], inuse = r[g[0]] === x.id;
+      items.push({ key: g[0] + ':' + x.id, kind: 'style', name: x.name, cost: x.cost, rank: x.rank, desc: x.desc, col: hexc(x.sw || x.color), meta: [g[1], inuse ? 'In use' : have ? 'Owned' : 'Not owned'], locked: rk < x.rank && !have, badge: inuse ? '✔' : have ? '•' : '', act: inuse ? null : have ? ['Lay it', 'use'] : ['Buy · ' + x.cost, 'sty'], have: have }); }));
+    else if (tab === 'wall') G.WALLITEMS.forEach(d => { const n = (st.wallItems || []).filter(q => q.id === d.id).length; items.push({ key: 'w:' + d.id, id: d.id, kind: 'wall', name: d.name, cost: d.cost, rank: d.rank, desc: d.desc, light: d.light, meta: ['Wall piece', n ? n + ' hung' : 'None hung'], locked: rk < d.rank, badge: n ? '×' + n : '', act: ['Buy and hang · ' + d.cost, 'wbuy'] }); });
+    else G.DECOR.filter(d => tabOf(d) === tab).forEach(d => { const n = own[d.id] || 0, full = n >= d.max;
+      items.push({ key: 'f:' + d.id, id: d.id, kind: 'furn', name: d.name, cost: d.cost, rank: d.rank, desc: d.perk, light: d.light, meta: [d.zone === 'any' ? 'House or garden' : d.zone === 'house' ? 'House only' : 'Garden only', d.w + ' × ' + d.d + ' tiles', 'Own ' + n + ' of ' + d.max].concat(USE[d.id] ? ['You can ' + USE[d.id][0].toLowerCase()] : []), locked: rk < d.rank, full, badge: n ? (d.max > 1 ? n + '/' + d.max : '✔') : '', act: full ? null : ['Buy and place · ' + d.cost, 'buy'] }); });
+    sel = sel || G.catSel; let cur = items.find(x => x.key === sel) || items.find(x => !x.locked && x.act) || items[0];
+    const thumb = (x, big) => x.kind === 'style' ? '<span class="iso' + (big ? ' big' : '') + '" style="--c:' + x.col + '"></span>' : (() => { const u = G.furniThumb(x.kind, x.id); return u ? '<img src="' + u + '" alt="">' : '<span class="iso" style="--c:#6a5a4a"></span>'; })();
+    const tile = x => '<button class="ct' + (x.key === cur.key ? ' sel' : '') + (x.locked ? ' lk' : '') + (x.full ? ' full' : '') + '" data-k="' + x.key + '" title="' + x.name + '">' + thumb(x) + (x.badge ? '<i class="bd">' + x.badge + '</i>' : '') + (x.locked ? '<i class="lkk">🔒</i>' : '<i class="pr">' + (x.cost ? x.cost : 'free') + '</i>') + '</button>';
+    const preview = x => '<div class="cp-pic">' + thumb(x, true) + '</div><b class="cp-name">' + x.name + '</b><p class="cp-desc">' + x.desc + '</p><ul class="cp-meta">' + x.meta.map(m => '<li>' + m + '</li>').join('') + (x.light ? '<li><span class="dot" style="background:' + hexc(x.light) + '"></span>Gives light</li>' : '') + '</ul>' +
+      (x.locked ? '<div class="cp-lock">Needs rank <b style="color:' + G.RANKS[x.rank].color + '">' + G.RANKS[x.rank].name + '</b></div>' : !x.act ? '<div class="cp-lock">' + (x.kind === 'style' ? 'Already in use' : 'You own as many as will fit') + '</div>' :
+        '<div class="cp-buy"><span class="cp-price"><span class="coin"></span>' + (x.act[1] === 'use' ? 'Owned' : x.cost) + '</span><button class="big" id="cpGo"' + (x.act[1] !== 'use' && st.coin < x.cost ? ' disabled' : '') + '>' + (x.act[1] !== 'use' && st.coin < x.cost ? 'Not enough coin' : x.act[0].split(' · ')[0]) + '</button></div>');
+    show('<div class="card catcard"><h2>The Quartermaster’s Catalogue</h2><div class="cat">' +
+      '<nav class="cat-nav">' + TABS.map(t => '<button class="cn' + (t[0] === tab ? ' sel' : '') + '" data-tab="' + t[0] + '"><i>' + t[2] + '</i><span>' + t[1] + '</span></button>').join('') + '</nav>' +
+      '<section class="cat-main"><div class="cat-head"><b>' + T0[1] + '</b><p>' + T0[3] + '</p></div><div class="cat-grid">' + items.map(tile).join('') + '</div></section>' +
+      '<aside class="cat-prev" id="catPrev">' + preview(cur) + '</aside></div>' +
+      '<div class="cat-foot"><span class="cat-purse"><span class="coin"></span><b>' + st.coin + '</b> coin</span><span class="cat-comf">Comfort <b>' + cf + '</b> · ' + G.comfortName(cf) + '</span><button class="big" id="x">Close</button></div></div>');
+    const go = () => {
+      const x = cur; if (!x.act || x.locked) return; const k = x.act[1], pr = x.key.split(':');
+      if (k === 'buy') { const w = W.walker; ui.close(); ui.startPlace({ id: x.id, x: Math.round(w.x), z: Math.round(w.z) + 1, r: 0, from: null }); }
+      else if (k === 'wbuy') { ui.close(); ui.startPlace({ id: x.id, wallItem: true, wall: 'n', s: 2, from: null }); }
+      else if (k === 'sty') { if (st.coin < x.cost) return; st.coin -= x.cost; r.owned[pr[1]] = 1; r[pr[0]] = pr[1]; G.save(); G.sfx('coin'); H().refresh(); ui.topbar(); ui.catalog('style', x.key); }
+      else if (k === 'use') { r[pr[0]] = pr[1]; G.save(); G.sfx('place'); H().refresh(); ui.catalog('style', x.key); }
+    };
+    const wireGo = () => { const b = $('cpGo'); if (b) b.onclick = () => go(); };
+    wireGo();
+    on('#x', () => { ui.close(); ui.topbar(); }); on('[data-tab]', el => { G.catSel = null; ui.catalog(el.dataset.tab); });
+    on('[data-k]', (el, e) => { const x = items.find(q => q.key === el.dataset.k); if (!x) return; if (cur === x && e.detail > 1) return go(); cur = x; G.catSel = x.key; G.sfx('ui'); document.querySelectorAll('#panel .ct').forEach(q => q.classList.toggle('sel', q === el)); $('catPrev').innerHTML = preview(x); wireGo(); });
   };
 
   // ------------------------------------------------------------ placing (floor pieces and wall pieces)

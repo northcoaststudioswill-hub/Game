@@ -106,6 +106,8 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **Market layout.** Brick walls, wood grain, bout posters and damp. Worn paths mark the main routes, every usable spot has a coloured ring on the ground, and bystanders were moved out of the lanes.
 
+**The catalogue.** The furniture catalogue is laid out like a hotel-builder's: pages down the side, a grid of pictured tiles (each piece rendered from the room's own angle, with price and owned count), and a preview pane with details and the buy button. Double-tap a tile to buy straight away.
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |
