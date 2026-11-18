@@ -1,5 +1,34 @@
 # Starhaven — Changelog
 
+## Reimagined 8 — seven cutscenes rebuilt in layers (Nov 18, 2026)
+Will: make the graphics even better; more pretty animated cutscenes and depth in the existing slice.
+
+Seven story scenes that were still pictures with a slow zoom are now animated cinematics built in parallax layers
+(`src/cine2.js`). The camera drifts sideways and pushes in, and each layer moves by a different amount, so the picture
+has depth. The cast in them are the same shaded sprites as in the levels, so they blink and breathe.
+
+- **The Rooftop House** (the mates scene, and every evening with Caelum): moon and shooting stars, three depths of
+  city with windows that flicker, the river catching the lights, chimney smoke, a swinging lantern, the table and the
+  wine, and a gold thread between Wren and Caelum that pulses: the bond, drawn.
+- **Midnight at the Spring Court:** curtains breathing with the night air, moonlight on the floor, petals outside, a
+  candle; then wings fill the window, then the man, then his eyes open.
+- **The Spring Court:** a turning sun, rose hills, marble columns, a fountain that runs, blossom close to the eye, and
+  two guards who never look at her and never look away.
+- **Starhaven at night** (evenings, the final scene, the title screen): four depths of city, the Library's tower and
+  its light, a lantern-lit bridge, a boat crossing the river, strings of lanterns swaying.
+- **The peak:** an aurora, wind-driven snow from one side meeting Rowan's petals from the other, flowers coming up
+  through the snow where he stands, the Old Wyrm already snowing over.
+- **By the fire** (Bram's evenings): a hearth with real flames, its light breathing on the floor and wall.
+- **Iris's vision:** threads of light over a dark sea, an iron crown turning, and two threads pulled taut to two small
+  figures in a cottage doorway.
+
+The opening film and the title backdrop pick these up automatically.
+
+**Honest notes.** Still panels remain for the Library, the observatory, the morning-after spark, the mountain and the
+ships. The memory half of a Bond Art cut-in still uses the old still of the rooftop. Checked as screenshots of single
+frames, not watched in motion. Tests: 48 play checks, 19 menu checks, the fuzz run, the screenshot run. **Not played by
+hand or on a phone.**
+
 ## Reimagined 7 — errands, callbacks, a bug hunt (Nov 18, 2026)
 Will: keep improving the graphics, the systems and the content; make it more content rich; fix bugs.
 

@@ -93,7 +93,7 @@
   F.filmState = () => film ? { shot: film.i, id: F.FILM[film.i].id, t: film.t } : null;
   // the title sits over a living picture: the rooftop, the city and the mural wall, slowly turning over
   let bgT = 0;
-  setInterval(() => { if (SH.game.state !== 'front' || phase === 'film' || phase === 'ncs' || phase === 'econ') return; bgT++; const g = $('f-bg').getContext('2d'); g.setTransform(2, 0, 0, 2, 0, 0); g.imageSmoothingEnabled = false; SH.cine.drawStatic(g, ['rooftop', 'city', 'observatory'][Math.floor(bgT / 420) % 3], bgT % 420); g.setTransform(1, 0, 0, 1, 0, 0); }, 1000 / 20);
+  setInterval(() => { if (SH.game.state !== 'front' || phase === 'film' || phase === 'ncs' || phase === 'econ') return; bgT++; const g = $('f-bg').getContext('2d'); g.setTransform(2, 0, 0, 2, 0, 0); g.imageSmoothingEnabled = false; { const id = ['city', 'rooftop', 'peak'][Math.floor(bgT / 420) % 3]; (SH.cine.has(id) ? SH.cine[id] : (gg, tt) => SH.cine.drawStatic(gg, id, tt))(g, bgT * 3); } g.setTransform(1, 0, 0, 1, 0, 0); }, 1000 / 20);
   F.press = function () {
     phase = 'press';
     $('splash').className = '';
