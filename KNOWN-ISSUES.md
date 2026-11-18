@@ -2,6 +2,14 @@
 
 Updated Nov 17 2026. Newest game first. "Not confirmed on iPhone" applies to everything until Will plays it there.
 
+## Lightswarm (cartridge 6, vertical slice v0.1)
+
+- Not played by hand or on a phone. Balance comes from a simple bot (about one win in three with no upgrades).
+- One expedition only (Crooked Hollow). No obstacles on the field, no second Guardian, no sounds of its own beyond the console's beeps.
+- Whether the D-pad feels good for eight-way walking on a phone is the first thing to check.
+- Starting with DEW is the weakest start: the ring only lights what comes close.
+- The Lantern menu (stats, achievements) does not know about cartridge 6 yet.
+
 ## Sproutwild (cartridge 5, v12.10)
 
 ### Not confirmed
