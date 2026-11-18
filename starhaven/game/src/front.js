@@ -38,9 +38,59 @@
   F.next = function () {
     clearTimeout(timer);
     if (phase === 'ncs') F.splash('econ');
-    else if (phase === 'econ') F.press();
+    else if (phase === 'econ') { if (F.filmSeen) F.press(); else F.film(F.press); }
+    else if (phase === 'film') F.filmEnd();
     else if (phase === 'press') { SH.sfx.play('select'); F.main(); }
   };
+  // The opening: a short film before the title, with the credits over picture. Any button skips it.
+  // (Sootborn opens this way; Starhaven used to go from the logos straight to a menu.)
+  F.FILM = [
+    { id: 'hunt', frames: 290, cue: ['shoot', 150], credit: 'NORTH COAST STUDIOS PRESENTS', cap: 'She was nineteen, mortal, and the only hunter in a starving house.' },
+    { id: 'wall', frames: 230, credit: 'IN ASSOCIATION WITH E CONCEPTS', cap: 'The stag belonged to the fae. After that, so did she.' },
+    { id: 'thorns', frames: 220, cap: 'Then a queen of thorns took every court at once.' },
+    { id: 'trials', frames: 230, cap: 'Three trials to win them back. She died on the last.' },
+    { id: 'rebirth', frames: 300, cue: ['rise', 110], flash: true, cap: 'And woke with a High Lord\'s blood in her veins, and a bond she could finally feel.' },
+    { id: 'city', frames: 210, flash: true, cap: 'This is what came after.' },
+  ];
+  let film = null, filmTimer = 0;
+  F.film = function (done) {
+    phase = 'film'; F.filmSeen = true;
+    $('splash').className = ''; $('f-logo').classList.remove('show'); $('f-press').classList.remove('show'); $('f-menu-wrap').classList.remove('show');
+    $('film').classList.add('show');
+    film = { i: -1, t: 0, total: 0, done };
+    F.filmShot(0);
+    clearInterval(filmTimer); filmTimer = setInterval(F.filmTick, 1000 / 60);
+  };
+  F.filmShot = function (i) {
+    film.i = i; film.t = 0;
+    const s = F.FILM[i];
+    $('film-credit').textContent = s.credit || ''; $('film-credit').classList.remove('on'); $('film-cap').classList.remove('on');
+    $('film-cap').textContent = s.cap;
+    if (s.flash) { $('film').style.filter = 'brightness(3)'; setTimeout(() => { $('film').style.filter = ''; }, 90); SH.sfx.play('thud'); }
+  };
+  F.filmTick = function (n) {
+    if (!film) return;
+    for (let k = 0; k < (n || 1); k++) {
+      const s = F.FILM[film.i]; film.t++; film.total++;
+      if (film.t === 24) { $('film-cap').classList.add('on'); if (s.credit) $('film-credit').classList.add('on'); }
+      if (film.t === s.frames - 26) { $('film-cap').classList.remove('on'); $('film-credit').classList.remove('on'); }
+      if (s.cue && film.t === s.cue[1]) SH.sfx.play(s.id === 'hunt' ? 'slash' : 'lantern');
+      if (film.t >= s.frames) { if (film.i + 1 < F.FILM.length) F.filmShot(film.i + 1); else return F.filmEnd(); }
+    }
+    const s = F.FILM[film.i], g = $('film-art').getContext('2d');
+    g.setTransform(3, 0, 0, 3, 0, 0); g.imageSmoothingEnabled = false;
+    const cue = s.cue && film.t >= s.cue[1] ? { name: s.cue[0], t: film.t - s.cue[1] } : null;
+    if (SH.cine.has(s.id)) SH.cine[s.id](g, film.t, cue); else SH.cine.drawStatic(g, s.id, film.t);
+    g.setTransform(1, 0, 0, 1, 0, 0);
+  };
+  F.filmEnd = function () {
+    if (!film) return;
+    clearInterval(filmTimer); const done = film.done; film = null;
+    $('film').classList.remove('show'); $('film').style.filter = '';
+    SH.sfx.play('lantern');
+    done();
+  };
+  F.filmState = () => film ? { shot: film.i, id: F.FILM[film.i].id, t: film.t } : null;
   F.press = function () {
     phase = 'press';
     $('splash').className = '';
@@ -91,7 +141,7 @@
   // Controller / keyboard, called every frame while the front end is up.
   F.input = function (input) {
     const any = ['jump', 'attack', 'dash', 'pause', 'up', 'down', 'left', 'right'].some(a => input.take(a));
-    if (phase === 'ncs' || phase === 'econ' || phase === 'press') { if (any) F.next(); return; }
+    if (phase === 'ncs' || phase === 'econ' || phase === 'press' || phase === 'film') { if (any) F.next(); return; }
   };
   F.menuInput = function (input) {
     if (phase !== 'menu') return F.input(input);
@@ -112,6 +162,7 @@
     items.push({ label: 'Load game', disabled: !any, action: () => F.slots('load') });
     items.push({ label: 'Chapter select', sub: 'Any chapter, without saving (concept build)', action: F.chapters });
     items.push({ label: 'Settings', action: () => F.settings(F.main) });
+    items.push({ label: 'Watch the opening', action: () => F.film(() => { phase = 'menu'; $('f-logo').classList.add('show'); F.main(); }) });
     items.push({ label: 'Credits', action: F.credits });
     F.show(null, items, null);
   };

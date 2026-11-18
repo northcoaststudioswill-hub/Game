@@ -37,6 +37,10 @@
     boss2: [['caelum', 'It\'s angry. Good. Angry things make mistakes.']],
     boss3: [['caelum', 'Nearly, Wren. Don\'t get greedy now.']],
     choke: [['caelum', 'Fire down its throat. I\'m stealing that.']],
+    // Wren thinks out loud in a fight; it never stops the fight
+    bossStart: [['wren', 'It is a wyrmling the size of a house. I know what to do with wyrmlings.']],
+    hurt: [['wren', 'That one was mine to dodge. Watch the shoulders, not the teeth.']],
+    combo10: [['wren', 'Ten in a row. Nessa would say I am showing off. Nessa would be right.']],
     room_ashes: [['caelum', 'This was the Artists\' Quarter. It was loud, once.']],
     room_ring: [['bram', 'Feet, huntress. I can hear you dragging them from here.']],
     room_mountain: [['thane', 'Do try not to set the Library on fire on your way out.']],

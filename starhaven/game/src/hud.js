@@ -185,8 +185,9 @@
   // The bond meter, the Bond Art button, and whispers down the bond.
   let lastArt = '';
   H.art = function (a) {
-    const on = a.active(), ready = a.ready(), key = on + '|' + ready + '|' + Math.round(a.meter) + '|' + a.nextKind();
+    const on = a.active(), ready = a.ready(), key = on + '|' + ready + '|' + Math.round(a.meter) + '|' + a.nextKind() + '|' + !!a.cutin;
     if (key === lastArt) return; lastArt = key;
+    document.body.classList.toggle('cutin', !!a.cutin);
     $('art').style.display = on ? 'block' : 'none';
     $('art').classList.toggle('ready', ready);
     $('art').firstChild.style.width = Math.round(a.meter / a.max * 100) + '%';
@@ -196,7 +197,7 @@
   H.whisper = function (who, text) {
     const el = $('whisper');
     if (!who) { el.classList.remove('show'); return; }
-    $('w-face').src = SH.art.portraitURL(who); $('w-name').textContent = ST.CAST[who].name + ', down the bond';
+    $('w-face').src = SH.art.portraitURL(who); $('w-name').textContent = who === 'wren' ? 'Wren' : ST.CAST[who].name + ', down the bond';
     $('w-name').style.color = ST.CAST[who].color; $('w-text').textContent = text;
     el.classList.add('show');
   };

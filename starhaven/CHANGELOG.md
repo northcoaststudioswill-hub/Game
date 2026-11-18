@@ -1,5 +1,41 @@
 # Starhaven — Changelog
 
+## Reimagined 2 — a camera, weight, memories in the fights, an opening (Nov 18, 2026)
+Will, after looking at Guttercrown and Sootborn v0.11 together: don't copy those titles, but see how far those ideas
+have been taken, and build Starhaven's own concept up to that level.
+
+What those two do that Starhaven did not: they shoot their fights (a camera that pushes in, cuts and frames), every hit
+has weight, the story is carried inside the fight (Sootborn's Memory Arts), and they open like a film. Starhaven's own
+version of each:
+
+- **The camera acts** (`G.direct` in `game.js`). It zooms about the point it is looking at. It frames Wren and whoever
+  she is talking to, closes on a Bond Art, goes to the Old Wyrm when it wakes and each time it roars, and pushes in and
+  slows down on the killing blow.
+- **Weight.** Every clean hit punches the camera in by how hard it was (more for finishers and kills); being hit
+  punches it too; the Old Wyrm's slam lands with it.
+- **A hit counter.** Unbroken hits count up on screen (called out at 5, 10 and 20, each with a bond bonus). Being hit
+  drops it.
+- **Bond Arts are choreographed, and each one is a memory.** The cut-in is now two slanted panels: the memory the art
+  comes from (the rooftop where she learned what the bond was; the morning the fire first sat in her palm), and the
+  face, with the name of the blow and a line.
+  - **STARFALL:** Caelum lends her the night. She winnows through her target five times, the cuts hang in the air,
+    then all land at once (10 to the target, 6 to everything else in sight) and the stars come down.
+  - **FIRST LIGHT:** she rises on a pillar of her own fire, then the ring of dawn bursts out (as before: 10 nearby,
+    lights braziers, burns thorns, mends a heart).
+  - Nothing can hurt her during a Bond Art. A button skips the cut-in after half a second.
+- **The bond answers the boss.** Each time the Old Wyrm roars into a new phase, the bond bar fills, so the story beat
+  and the big attack arrive together.
+- **Wren thinks out loud in the boss fight** (the same slide-in as Caelum's whispers, under her own name).
+- **An opening film** before the title: six shots from the prologue cinematics with the credits over picture (North
+  Coast Studios presents, in association with E Concepts) and five captions that tell the premise. About 25 seconds.
+  Any button skips it; "Watch the opening" on the main menu replays it.
+- **Fixed:** Wren flickered or vanished during her own Bond Art (she was being drawn as "just hit"). The HUD and touch
+  buttons no longer sit on top of the cut-in.
+
+**Honest notes.** Still 2D and still the same levels. Wren, the enemies and the backdrops are not redrawn. The camera
+zoom is new machinery over the whole renderer: it has been looked at in screenshots, not felt in motion. Tests: 41 play
+checks, 18 menu checks (two new, for the film), the screenshot run. **Not played by hand or on a phone.**
+
 ## Reimagined 1 (Rebuild 9) — the studio's newer techniques, applied to Starhaven (Nov 18, 2026)
 Will: study how the new games in the repo work, save what we have as a duplicate, and reimagine Starhaven with the
 techniques we have been using.

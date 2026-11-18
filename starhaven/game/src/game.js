@@ -99,7 +99,7 @@
       dropRocks(n, at) {
         for (let i = 0; i < n; i++) this.rocks.push({ x: at != null ? at + (i - (n - 1) / 2) * 30 : player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
       },
-      onBossDown() { SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
+      onBossDown() { const b = this.things.find(e => e.boss); if (b) G.look(b.x, b.y - 30, 1.5, 110); fx.slowmo = 70; SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
@@ -120,6 +120,27 @@
   };
 
   G.snapCamera = function () { const w = G.world; G.cameraTarget(); w.cam.x = w.camT.x; w.cam.y = w.camT.y; };
+  // The camera director. It follows Wren, and it also acts: it pushes in on heavy hits, frames whoever is talking,
+  // closes on a Bond Art, and goes to the boss when it roars or falls. (Sootborn and Guttercrown both shoot their
+  // fights; Starhaven's camera only ever followed.)
+  G.punch = function (amount) { const c = G.world.cam; c.kick = Math.min(0.22, Math.max(c.kick || 0, amount)); };
+  G.look = function (x, y, zoom, frames) { G.world.cam.shot = { x, y, zoom, t: frames }; };
+  G.direct = function () {
+    const w = G.world, p = w.player, c = w.cam, A = SH.arts;
+    let zt = 1, fx0 = p.x, fy0 = p.y - 30;
+    if (c.shot && c.shot.t > 0) { c.shot.t--; zt = c.shot.zoom; fx0 = c.shot.x; fy0 = c.shot.y; }
+    else if (A.cutin || A.scene) { zt = 1.22; const f = A.scene && A.scene.focus; if (f) { fx0 = f.x; fy0 = f.y; } }
+    else if (G.state === 'talk') {
+      const sp = w.npcs.filter(n => !n.hidden && Math.abs(n.x - p.x) < 220).sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x))[0];
+      if (sp) { zt = 1.16; fx0 = (sp.x + p.x) / 2; fy0 = p.y - 44; }
+    }
+    c.kick = (c.kick || 0) * 0.86; if (c.kick < 0.002) c.kick = 0;
+    c.zoomBase = (c.zoomBase || 1) + (zt - (c.zoomBase || 1)) * 0.09;
+    c.zoom = c.zoomBase + c.kick;
+    if (Math.abs(c.zoom - 1) < 0.003) c.zoom = 1;
+    c.fx = c.fx == null ? fx0 : c.fx + (fx0 - c.fx) * 0.12; c.fy = c.fy == null ? fy0 : c.fy + (fy0 - c.fy) * 0.12;
+    c.sx = Math.max(60, Math.min(w.viewW - 60, c.fx - c.x)); c.sy = Math.max(60, Math.min(SH.VIEW_H - 40, c.fy - c.y));
+  };
   G.cameraTarget = function () {
     const w = G.world, p = w.player;
     const look = p.facing * 46 + p.vx * 8;
@@ -251,7 +272,7 @@
       case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
       case 'close': case 'open': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, st.do === 'close'); g.lift = st.do === 'open' ? 0 : 0; fx.kick(4); SH.sfx.play('thud'); } break; }
-      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; SH.sfx.music('tense'); } break; }
+      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; SH.sfx.music('tense'); G.look(b.x, b.y - 30, 1.35, 70); SH.arts.whisper('bossStart'); } break; }
       case 'end': G.afterScript = () => { G.state = 'end'; G.hud.end(true); }; break;
     }
   };
@@ -308,7 +329,7 @@
     const w = G.world, p = w.player;
     input.step();
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
-    if (G.state === 'talk') { G.talkStep(); fx.update(); return; }
+    if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
     if (G.pending) { const id = G.pending; G.pending = null; G.runScript(id); return; }
@@ -322,7 +343,7 @@
       if (input.pressed.art) SH.arts.buf = 12;
       return;
     }
-    if (SH.arts.cutinStep(w)) return;
+    if (SH.arts.cutinStep(w)) { G.direct(); return; }
     if (fx.slowmo > 0) fx.slowmo--;
     w.time++; w.frames = (w.frames || 0) + 1;
     // whispers down the bond
@@ -481,6 +502,7 @@
     G.cameraTarget();
     w.cam.x += (w.camT.x - w.cam.x) * 0.14;
     w.cam.y += (w.camT.y - w.cam.y) * 0.10;
+    G.direct();
     fx.update();
     if (w.fade > 0) w.fade = Math.max(0, w.fade - 0.08);
   };
@@ -529,6 +551,7 @@
 
   G.hazard = function (kind) {
     const w = G.world, p = w.player;
+    if (SH.arts.scene || SH.arts.cutin) return;
     if (p.invuln <= 0) { p.hearts = Math.max(0, p.hearts - 1); p.stats.hurt++; }
     fx.flashScreen(8, kind === 'thorns' ? 'rgba(255,80,110,0.4)' : 'rgba(10,10,30,0.8)');
     fx.kick(4);

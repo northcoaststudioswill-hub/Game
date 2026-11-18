@@ -246,6 +246,7 @@
     // a new phase: it roars as soon as it has its feet under it
     if (this.boss && this.roarDue && this.grounded && this.state !== 'charge' && this.state !== 'leap') {
       this.roarDue = false; this.state = 'roar'; this.t = 0; this.vx = 0;
+      SH.game.look(this.x + this.dir * 20, this.y - this.h * 0.6, 1.4, 50); if (SH.arts.active() && !SH.arts.scene) { SH.arts.meter = Math.max(SH.arts.meter, SH.arts.max - 0.5); SH.arts.gain(1); }   // the bond answers its rage
       fx.kick(8); SH.sfx.play('rumble'); SH.sfx.play('thud');
       fx.ring(this.x + this.dir * this.w / 2, this.y - this.h * 0.7, '#c8d2e2', 90, 30, 3);
       fx.word(this.x, this.y - this.h - 34, ph === 3 ? 'It is furious!' : 'It is angry now!', '#ff8a8a', 80);
@@ -296,7 +297,7 @@
         this.vx = this.leapVx;
         if (this.grounded && this.t > 6) {
           this.vx = 0; this.state = 'slamrest'; this.t = 0;
-          fx.kick(10); SH.sfx.play('thud');
+          fx.kick(10); SH.sfx.play('thud'); SH.game.punch(0.14);
           fx.ring(this.x, this.y - 4, '#c8d2e2', 60, 18, 3);
           fx.burst(this.x, this.y - 4, 24, { angle: -Math.PI / 2, spread: 2.6, speed: 3.6, life: 30, size: 3, colors: ['#5a6680', '#8a96b8', '#c8d2e2'] });
           world.spawnWave(this.x - this.w / 2, this.y, -1); world.spawnWave(this.x + this.w / 2, this.y, 1);

@@ -201,6 +201,16 @@ body[data-input="touch"] #touch { display: block; }
 #splash .word { font-family: var(--display); font-weight: 800; letter-spacing: .3em; font-size: clamp(20px, 6vh, 34px); color: #fff6d8; margin-top: 6px; }
 #splash .word2 { font-family: var(--display); letter-spacing: .6em; font-size: clamp(12px, 3vh, 16px); color: #9fd0ff; }
 #splash.econ .word { background: linear-gradient(90deg, #4ad8c8, #9a6aff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+#film { display: none; position: absolute; inset: 0; z-index: 4; background: #04040a; }
+#film.show { display: block; }
+#film-art { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; display: block; }
+#film::before, #film::after { content: ''; position: absolute; left: 0; right: 0; height: 11vh; background: #04040a; z-index: 1; }
+#film::before { top: 0; } #film::after { bottom: 0; }
+#film-credit { position: absolute; z-index: 2; left: 0; right: 0; top: 16vh; text-align: center; font-family: var(--display); letter-spacing: .34em; font-size: clamp(12px, 3.6vh, 18px); color: #fff6d8; text-shadow: 0 2px 0 #04040a, 0 0 18px rgba(0,0,0,.9); opacity: 0; transition: opacity .6s; }
+#film-cap { position: absolute; z-index: 2; left: 8vw; right: 8vw; bottom: 14vh; text-align: center; font: italic 600 clamp(15px, 4.6vh, 22px)/1.3 var(--body); color: #f2eeff; text-shadow: 0 2px 0 #04040a, 0 0 14px rgba(0,0,0,.95); opacity: 0; transition: opacity .5s; }
+#film-credit.on, #film-cap.on { opacity: 1; }
+#film-skip { position: absolute; z-index: 2; right: 14px; bottom: 3vh; font: 700 11px var(--body); letter-spacing: .1em; color: rgba(255,255,255,.45); text-transform: uppercase; }
+#film-flash { position: absolute; inset: 0; z-index: 3; background: #fff6d8; opacity: 0; pointer-events: none; }
 #f-logo { display: none; }
 #f-logo.show { display: block; }
 #f-logo h1 { font-family: var(--display); font-weight: 800; letter-spacing: .14em; font-size: clamp(34px, 11vh, 76px); margin: 0; color: #fff6d8; text-shadow: 0 0 24px rgba(255,210,122,.55); }
@@ -254,9 +264,10 @@ body[data-input="touch"] #touch { display: block; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
+body.cutin #touch, body.cutin #bossbar, body.cutin #sign, body.cutin #goal, body.cutin #whisper, body.cutin #pause-btn, body.cutin #motes, body.cutin #pips, body.cutin #hearts, body.cutin #art { visibility: hidden; }
 /* ---- Reimagined skin: every frame is an engraved night-steel plate with a starlight edge (as Sootborn frames its menus in brass). */
 :root { --plate: linear-gradient(180deg, rgba(30,26,62,.96), rgba(14,12,34,.96)); --plate-edge: #b9a8ff; --plate-line: #6a5aa8; }
-#goal, #sign, #toast, #dialog, .card, #motes, #menu-btn, .choice, #d-skip, #saved {
+#goal, #sign, #toast, #dialog, .card, #motes, #pause-btn, .choice, #d-skip, #saved {
   background: var(--plate); border: 1px solid var(--plate-line); border-radius: 4px;
   box-shadow: 0 0 0 2px #0a0818, 0 0 0 3px rgba(185,168,255,.35), inset 0 1px 0 rgba(255,255,255,.10), inset 0 -2px 0 rgba(0,0,0,.35); }
 #dialog, .card { border-color: var(--plate-edge); border-width: 1px; position: fixed; }
@@ -311,6 +322,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
 
 <div id="front">
   <div id="splash"></div>
+  <div id="film"><canvas id="film-art" width="960" height="450"></canvas><div id="film-credit"></div><div id="film-cap"></div><div id="film-skip">any button skips</div></div>
   <div id="f-logo">
     <h1>STARHAVEN</h1>
     <div class="sub">A COURT OF DUSK AND STARLIGHT</div>
@@ -554,6 +566,10 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     boss2: [['caelum', 'It\'s angry. Good. Angry things make mistakes.']],
     boss3: [['caelum', 'Nearly, Wren. Don\'t get greedy now.']],
     choke: [['caelum', 'Fire down its throat. I\'m stealing that.']],
+    // Wren thinks out loud in a fight; it never stops the fight
+    bossStart: [['wren', 'It is a wyrmling the size of a house. I know what to do with wyrmlings.']],
+    hurt: [['wren', 'That one was mine to dodge. Watch the shoulders, not the teeth.']],
+    combo10: [['wren', 'Ten in a row. Nessa would say I am showing off. Nessa would be right.']],
     room_ashes: [['caelum', 'This was the Artists\' Quarter. It was loud, once.']],
     room_ring: [['bram', 'Feet, huntress. I can hear you dragging them from here.']],
     room_mountain: [['thane', 'Do try not to set the Library on fire on your way out.']],
@@ -2331,7 +2347,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
         if (!r) continue;
         if (r.deflect) continue;
         if (SH.game.can('flame')) this.pips = Math.min(SH.stars.maxPips(), this.pips + SH.GIFTS.perHit); // close-up hits refill the moons
-        this.stats.hits++; SH.arts.gain(d.finisher ? 9 : 6);
+        this.stats.hits++; SH.arts.gain(d.finisher ? 9 : 6); SH.arts.hit();
+        SH.game.punch(r.killed ? 0.12 : d.finisher ? 0.08 : 0.035);
         { const hb2 = tgt.hurtBox(); fx.spark((Math.max(hb.l, hb2.l) + Math.min(hb.r, hb2.r)) / 2, (Math.max(hb.t, hb2.t) + Math.min(hb.b, hb2.b)) / 2, s.kind === 'pogo' ? Math.PI / 2 : s.kind === 'up' ? -Math.PI / 2 : (this.facing > 0 ? 0 : Math.PI), d.finisher || r.killed); }
         if (r.killed && !tgt.boss && (tgt.kind === 'wyrm' || tgt.kind === 'thornSprite')) { const nm = { thrust: ['RUN THROUGH', 'DASH STRIKE'], up: ['SKYBOUND', 'RISING STRIKE'], pogo: ['FROM ABOVE', 'DOWN STRIKE'] }[s.kind]; if (nm) SH.arts.finisher(nm[0], nm[1], '#9fe8ff'); }
         SH.sfx.play(r.killed ? 'kill' : 'hit');
@@ -2365,10 +2382,11 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
 
   // Returns true if the hit landed.
   Player.prototype.hurt = function (fromX, dmg, world) {
-    if (this.dead || this.invuln > 0) return false;
+    if (this.dead || this.invuln > 0 || SH.arts.cutin || SH.arts.scene) return false;   // nothing touches her mid Bond Art
     if (this.iframes > 0) return false;
     const fx = SH.fx;
     this.hearts = Math.max(0, this.hearts - dmg);
+    SH.game.punch(0.07); SH.arts.dropCombo();
     this.stats.hurt++; this.hitFlash = 6; this.charging = false; this.chargeT = 0;
     SH.sfx.play('hurt');
     this.invuln = SH.PLAYER.hurtInvuln;
@@ -2645,6 +2663,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     // a new phase: it roars as soon as it has its feet under it
     if (this.boss && this.roarDue && this.grounded && this.state !== 'charge' && this.state !== 'leap') {
       this.roarDue = false; this.state = 'roar'; this.t = 0; this.vx = 0;
+      SH.game.look(this.x + this.dir * 20, this.y - this.h * 0.6, 1.4, 50); if (SH.arts.active() && !SH.arts.scene) { SH.arts.meter = Math.max(SH.arts.meter, SH.arts.max - 0.5); SH.arts.gain(1); }   // the bond answers its rage
       fx.kick(8); SH.sfx.play('rumble'); SH.sfx.play('thud');
       fx.ring(this.x + this.dir * this.w / 2, this.y - this.h * 0.7, '#c8d2e2', 90, 30, 3);
       fx.word(this.x, this.y - this.h - 34, ph === 3 ? 'It is furious!' : 'It is angry now!', '#ff8a8a', 80);
@@ -2695,7 +2714,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
         this.vx = this.leapVx;
         if (this.grounded && this.t > 6) {
           this.vx = 0; this.state = 'slamrest'; this.t = 0;
-          fx.kick(10); SH.sfx.play('thud');
+          fx.kick(10); SH.sfx.play('thud'); SH.game.punch(0.14);
           fx.ring(this.x, this.y - 4, '#c8d2e2', 60, 18, 3);
           fx.burst(this.x, this.y - 4, 24, { angle: -Math.PI / 2, spread: 2.6, speed: 3.6, life: 30, size: 3, colors: ['#5a6680', '#8a96b8', '#c8d2e2'] });
           world.spawnWave(this.x - this.w / 2, this.y, -1); world.spawnWave(this.x + this.w / 2, this.y, 1);
@@ -3422,6 +3441,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     opening: 0,       // frames left in which every cut bites deeper and breaks armor
     stars: [],
     said: {}, queue: [], whisperT: 0, whisperGap: 0,
+    combo: 0, comboT: 0, comboPop: 0, best: 0,
   };
 
   // ---- a 3x5 pixel font for anything lettered on the game canvas
@@ -3446,12 +3466,13 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   SH.ptextW = (s, sc) => String(s).length * 4 * (sc || 1) - (sc || 1);
 
   const ARTS = {
-    starfall: { name: 'STARFALL', who: 'caelum', sub: 'BOND ART - CAELUM', c1: '#2c3d74', c2: '#b9a8ff', c3: '#fff6d8' },
-    firstlight: { name: 'FIRST LIGHT', who: 'wren', sub: 'BOND ART - WREN', c1: '#a8452a', c2: '#ffb057', c3: '#fff6d8' },
+    // memory: the story panel that cuts in beside the face; line: what is said as it does
+    starfall: { name: 'STARFALL', who: 'caelum', sub: 'BOND ART - CAELUM', c1: '#2c3d74', c2: '#b9a8ff', c3: '#fff6d8', memory: 'rooftop', line: 'YOU WERE NEVER ALONE. NOT ONCE.' },
+    firstlight: { name: 'FIRST LIGHT', who: 'wren', sub: 'BOND ART - WREN', c1: '#a8452a', c2: '#ffb057', c3: '#fff6d8', memory: 'fire', line: 'IT DOES NOT BURN. IT WAS ALWAYS MINE.' },
   };
   A.ARTS = ARTS;
 
-  A.reset = function () { A.cutin = A.scene = A.band = null; A.opening = 0; A.stars.length = 0; A.queue.length = 0; A.whisperT = 0; A.whisperGap = 120; if (SH.game && SH.game.hud) SH.game.hud.whisper(null); };
+  A.reset = function () { A.combo = A.comboT = 0; A.cutin = A.scene = A.band = null; A.opening = 0; A.stars.length = 0; A.queue.length = 0; A.whisperT = 0; A.whisperGap = 120; if (SH.game && SH.game.hud) SH.game.hud.whisper(null); };
   A.newGame = function () { A.meter = 0; A.next = 0; A.said = {}; A.reset(); };
   A.active = function () { return !SH.game.mortal; };
   A.nextKind = function () { return SH.game.can('flame') && A.next % 2 === 1 ? 'firstlight' : 'starfall'; };
@@ -3483,9 +3504,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   A.cutinStep = function (world) {
     if (!A.cutin) return false;
     const c = A.cutin; c.t++;
-    world.player.invuln = Math.max(world.player.invuln || 0, 4);
     if (c.t === 14) SH.sfx.play('slash');
-    if (c.t >= 54) { A.scene = { kind: c.kind, t: 0 }; A.cutin = null; SH.fx.kick(6); }
+    if (c.t >= 84 || (c.t > 30 && (SH.input.pressed.jump || SH.input.pressed.attack || SH.input.pressed.art))) { A.scene = { kind: c.kind, t: 0 }; A.cutin = null; SH.fx.kick(6); }
     return true;
   };
 
@@ -3494,34 +3514,59 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   A.update = function (world) {
     const p = world.player, fx = SH.fx;
     if (A.opening > 0) A.opening--;
+    if (A.comboPop > 0) A.comboPop--;
+    if (A.comboT > 0 && --A.comboT === 0) A.combo = 0;
     if (A.band) { A.band.t++; if (A.band.t > A.band.life) A.band = null; }
     A.whisperStep();
     if (A.buf > 0) A.buf--;
     if (SH.input.pressed.art || A.buf > 0) { const held = !SH.input.pressed.art; A.buf = 0; if (A.ready()) A.fire(world); else if (held) { /* a buffered press that came to nothing */ } else if (A.active() && !A.scene) fx.word(p.x, p.y - 52, 'bond not ready', '#b9b2dd', 30); }
     const s = A.scene; if (!s) return;
     s.t++;
-    p.invuln = Math.max(p.invuln || 0, 6);
     const vw = world.viewW, cx = world.cam.x, cy = world.cam.y;
     if (s.kind === 'starfall') {
-      // stars rain across everything in sight: three waves of 3
-      if (s.t < 70 && s.t % 2 === 0) A.stars.push({ x: cx + Math.random() * (vw + 160) - 40, y: cy - 20, vx: -2.6, vy: 9 + Math.random() * 3, life: 60 });
-      if (s.t === 16 || s.t === 36 || s.t === 56) {
-        fx.kick(5); SH.sfx.play('hit');
+      // Caelum lends her the night: she winnows through her target five times, and every cut lands at once.
+      if (s.t === 1) {
+        const on = foes(world).filter(e => e.x > cx - 20 && e.x < cx + vw + 20);
+        s.tgt = on.sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x))[0] || null;
+        s.home = { x: p.x, y: p.y, facing: p.facing }; s.pass = 0;
+        s.focus = s.tgt ? { x: s.tgt.x, y: s.tgt.y - (s.tgt.h || 24) / 2 } : { x: p.x, y: p.y - 30 };
+      }
+      if (s.t >= 4 && s.t < 36 && (s.t - 4) % 6 === 0) {
+        const T = SH.TILE, tg = s.tgt, side = s.pass % 2 ? 1 : -1; s.pass++;
+        const ax = tg ? tg.x : s.home.x + s.home.facing * 40, ay = tg ? tg.y - (tg.h || 24) / 2 : s.home.y - 24;
+        const nx = ax + side * ((tg ? tg.w / 2 : 0) + 30);
+        if (tg && !SH.isSolid(world.room.get(Math.floor(nx / T), Math.floor((tg.y - 4) / T))) && world.room.groundY(Math.floor(nx / T), 0) != null) {
+          fx.burst(p.x, p.y - 22, 8, { speed: 1.6, life: 18, gravity: -0.02, colors: ['#b9a8ff', '#fff6d8'], glow: true });
+          p.x = nx; p.y = tg.y; p.vx = p.vy = 0; p.facing = -side; p.grounded = true;
+          if (tg.vx != null) tg.vx = 0;
+        }
+        const ang = (s.pass * 2.4) % Math.PI;
+        fx.lines.push({ x: ax, y: ay, ang, len: 34, grow: 0, life: 44 - s.t, max: 44 - s.t, slash: true });
+        SH.sfx.play('slash'); SH.game.punch(0.03);
+      }
+      if (s.t >= 4 && s.t < 36 && s.tgt && s.tgt.vx != null) s.tgt.vx = 0;
+      if (s.t === 38) {
+        fx.flashScreen(6, 'rgba(230,220,255,0.8)'); fx.stop(10); fx.kick(10); SH.game.punch(0.2); SH.sfx.play('kill');
         for (const e of foes(world)) {
           if (e.x < cx - 30 || e.x > cx + vw + 30) continue;
-          A.stars.push({ x: e.x + 40, y: cy - 20, vx: -2.6, vy: 10, life: 60, tx: e.x, ty: e.y - (e.h || 20) / 2 });
-          e.takeHit({ dmg: 3, kb: 1.5, dir: e.x > p.x ? 1 : -1, finisher: s.t === 56, art: true, open: true }, world);
-          fx.spark(e.x, e.y - (e.h || 20) / 2, Math.PI / 2, true);
+          const cy0 = e.y - (e.h || 20) / 2;
+          for (let i = 0; i < 5; i++) fx.spark(e.x + (Math.random() - 0.5) * 20, cy0 + (Math.random() - 0.5) * 16, Math.random() * 6.3, true);
+          A.stars.push({ x: e.x + 40, y: cy - 20, vx: -2.6, vy: 10, life: 60, tx: e.x, ty: cy0 });
+          e.takeHit({ dmg: e === s.tgt ? 10 : 6, kb: 4, dir: e.x > s.home.x ? 1 : -1, finisher: true, art: true, open: true }, world);
         }
       }
-      if (s.t >= 86) A.scene = null;
+      if (s.t === 44) { p.x = s.home.x; p.y = s.home.y; p.vx = p.vy = 0; p.facing = s.home.facing; fx.burst(p.x, p.y - 22, 10, { speed: 1.6, life: 18, gravity: -0.02, colors: ['#b9a8ff', '#fff6d8'], glow: true }); }
+      if (s.t > 36 && s.t < 76 && s.t % 2 === 0) A.stars.push({ x: cx + Math.random() * (vw + 160) - 40, y: cy - 20, vx: -2.6, vy: 9 + Math.random() * 3, life: 60 });
+      if (s.t >= 90) A.scene = null;
     } else {
-      // a ring of dawn bursts out of her: burns everything near, lights braziers, burns thorn walls, mends one heart
-      if (s.t === 1) { fx.flashScreen(8, 'rgba(255,220,150,0.7)'); SH.sfx.play('kill'); fx.kick(9); }
-      if (s.t === 8) {
+      // Her own fire: she rises on it, and a ring of dawn bursts out. Burns what is near, lights braziers, burns thorn walls, mends a heart.
+      if (s.t === 1) { s.focus = { x: p.x, y: p.y - 40 }; p.vy = -5.5; p.grounded = false; SH.sfx.play('lantern'); }
+      if (s.t < 14) { p.vx = 0; if (s.t > 6) p.vy = Math.min(p.vy, -0.6); fx.burst(p.x + (Math.random() - 0.5) * 14, p.y, 2, { angle: -Math.PI / 2, spread: 0.5, speed: 3, life: 22, gravity: -0.08, colors: ['#ff8a3a', '#ffd27a', '#fff6d8'], glow: true }); }
+      if (s.t === 14) { fx.flashScreen(8, 'rgba(255,220,150,0.7)'); SH.sfx.play('kill'); fx.kick(9); SH.game.punch(0.2); fx.stop(6); }
+      if (s.t === 16) {
         const R = 190;
         for (const e of world.things) {
-          if (e.arrowOnly || !e.hittable || !e.hittable() || Math.abs(e.x - p.x) > R || Math.abs(e.y - p.y) > 130) continue;
+          if (e.arrowOnly || !e.hittable || !e.hittable() || Math.abs(e.x - p.x) > R || Math.abs(e.y - p.y) > 150) continue;
           const big = e.kind === 'thornSprite' || e.kind === 'wyrm';
           e.takeHit({ fire: true, dmg: big ? 10 : 1, kb: 6, dir: e.x > p.x ? 1 : -1, finisher: true, art: true, open: true }, world);
         }
@@ -3529,11 +3574,19 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
         if (p.hearts < p.maxHearts) { p.hearts++; fx.word(p.x, p.y - 64, '+1 heart', '#ff9ac0', 60); }
         fx.burst(p.x, p.y - 22, 60, { speed: 6, life: 40, gravity: -0.03, colors: ['#ff8a3a', '#ffd27a', '#fff6d8'], glow: true });
       }
-      if (s.t >= 60) A.scene = null;
+      if (s.t >= 70) A.scene = null;
     }
     for (const st of A.stars) { st.x += st.vx; st.y += st.vy; st.life--; if (st.ty != null && st.y >= st.ty) st.life = 0; }
     A.stars = A.stars.filter(st => st.life > 0);
   };
+
+  // ---- the hit counter: unbroken hits, called out at 5, 10 and 20; being hit drops it
+  A.hit = function () {
+    A.combo++; A.comboT = 120; A.comboPop = 8; A.best = Math.max(A.best, A.combo);
+    if (A.combo === 10) A.whisper('combo10');
+    if (A.combo === 5 || A.combo === 10 || A.combo === 20) { A.gain(A.combo); const p = SH.game.world.player; SH.fx.word(p.x, p.y - 70, A.combo + ' HITS!', '#ffd27a', 60); }
+  };
+  A.dropCombo = function () { if (SH.game.boss) A.whisper('hurt'); A.combo = 0; A.comboT = 0; };
 
   // ---- finisher bands: a strip of text across the screen, a short freeze and a shake
   A.finisher = function (text, sub, color) {
@@ -3572,7 +3625,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const cx = Math.round(w.cam.x), cy = Math.round(w.cam.y), t = w.time;
     const s = A.scene;
     if (s && s.kind === 'starfall') {
-      const k = Math.min(1, s.t / 10) * Math.min(1, (86 - s.t) / 12);
+      const k = Math.min(1, s.t / 10) * Math.min(1, (90 - s.t) / 12);
       ctx.fillStyle = 'rgba(8,6,30,' + (0.55 * k) + ')'; ctx.fillRect(0, 0, vw, VH);
     }
     for (const st of A.stars) {
@@ -3581,7 +3634,8 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       ctx.fillStyle = '#fff6d8'; ctx.fillRect(x - 2, y - 2, 4, 4); ctx.fillStyle = '#b9a8ff'; ctx.fillRect(x - 4, y - 1, 8, 2); ctx.fillRect(x - 1, y - 4, 2, 8);
     }
     if (s && s.kind === 'firstlight') {
-      const p = w.player, x = p.x - cx, y = p.y - 22 - cy, r = Math.min(200, s.t * 16), k = Math.max(0, 1 - s.t / 60);
+      const p = w.player, x = p.x - cx, y = p.y - 22 - cy, r = Math.min(200, Math.max(0, s.t - 14) * 16), k = s.t < 14 ? 0 : Math.max(0, 1 - (s.t - 14) / 56);
+      if (s.t < 20) { const pk = Math.min(1, s.t / 6) * (s.t < 14 ? 1 : (20 - s.t) / 6); ctx.globalCompositeOperation = 'lighter'; const pg = ctx.createLinearGradient(x - 22, 0, x + 22, 0); pg.addColorStop(0, 'rgba(255,140,60,0)'); pg.addColorStop(0.5, 'rgba(255,230,170,' + (0.8 * pk) + ')'); pg.addColorStop(1, 'rgba(255,140,60,0)'); ctx.fillStyle = pg; ctx.fillRect(x - 22, 0, 44, y + 30); ctx.globalCompositeOperation = 'source-over'; }
       ctx.globalCompositeOperation = 'lighter';
       const g = ctx.createRadialGradient(x, y, r * 0.5, x, y, r + 10); g.addColorStop(0, 'rgba(255,170,80,0)'); g.addColorStop(0.8, 'rgba(255,190,100,' + (0.75 * k) + ')'); g.addColorStop(1, 'rgba(255,120,40,0)');
       ctx.fillStyle = g; ctx.fillRect(x - r - 12, y - r - 12, r * 2 + 24, r * 2 + 24);
@@ -3591,6 +3645,10 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     }
     if (A.opening > 0) {   // a thin gold frame while the opening lasts
       ctx.globalAlpha = Math.min(1, A.opening / 20) * 0.6; ctx.strokeStyle = '#fff6d8'; ctx.lineWidth = 3; ctx.strokeRect(3, 3, vw - 6, VH - 6); ctx.globalAlpha = 1;
+    }
+    if (A.combo >= 2 && !A.cutin) {   // the hit counter
+      const sc = A.comboPop > 4 ? 4 : 3, txt = A.combo + ' HITS', tw = SH.ptextW(txt, sc), fade = Math.min(1, A.comboT / 20);
+      ctx.globalAlpha = fade; SH.ptext(ctx, txt, vw - tw - 16, 64 - (sc - 3) * 2, A.combo >= 10 ? '#ff8a3a' : A.combo >= 5 ? '#ffd27a' : '#fff6d8', sc, '#0a0818'); ctx.globalAlpha = 1;
     }
     if (A.band) drawBand(ctx, vw, VH);
     if (A.cutin) drawCutin(ctx, vw, VH, t);
@@ -3607,32 +3665,40 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     if (b.sub) SH.ptext(ctx, b.sub, Math.round(vw / 2 - SH.ptextW(b.sub, 2) / 2 - slide), Math.round(VH * 0.42 + 12), b.color, 2);
   }
 
+  // The cut-in: two slanted panels. On the left the memory the art is drawn from; on the right the face.
+  // Then the name of the blow and the line. (Sootborn's Memory Arts carry its story into its fights this way.)
+  function slant(ctx, x0, x1, y0, y1, lean) { ctx.beginPath(); ctx.moveTo(x0 + lean, y0); ctx.lineTo(x1 + lean, y0); ctx.lineTo(x1 - lean, y1); ctx.lineTo(x0 - lean, y1); ctx.closePath(); }
   function drawCutin(ctx, vw, VH, t) {
-    const c = A.cutin, a = ARTS[c.kind], k = Math.min(1, c.t / 8), out = c.t > 46 ? (c.t - 46) / 8 : 0;
-    ctx.fillStyle = 'rgba(4,3,14,' + (0.8 * k * (1 - out)) + ')'; ctx.fillRect(0, 0, vw, VH);
-    ctx.save(); ctx.translate(vw / 2, VH / 2); ctx.rotate(-0.16); ctx.globalAlpha = 1 - out;
-    const W = vw * 1.4, slide = (1 - k) * vw;
-    ctx.fillStyle = a.c1; ctx.fillRect(-W / 2 - slide, -66, W, 132);
-    ctx.fillStyle = '#0a0818'; ctx.fillRect(-W / 2 + slide, -50, W, 100);
-    ctx.fillStyle = a.c2; ctx.fillRect(-W / 2 + slide, -44, W, 88);
-    // speed lines along the band
-    ctx.fillStyle = a.c3; ctx.globalAlpha = 0.5 * (1 - out);
-    for (let i = 0; i < 14; i++) { const lx = ((i * 97 + c.t * 34) % (W + 80)) - W / 2 - 40; ctx.fillRect(lx, -40 + (i * 29) % 80, 46, 2); }
+    const c = A.cutin, a = ARTS[c.kind], k = Math.min(1, c.t / 9), out = c.t > 76 ? Math.min(1, (c.t - 76) / 8) : 0, e = 1 - Math.pow(1 - k, 3);
+    ctx.fillStyle = 'rgba(4,3,14,' + (0.86 * k * (1 - out)) + ')'; ctx.fillRect(0, 0, vw, VH);
+    ctx.save(); ctx.globalAlpha = 1 - out; ctx.imageSmoothingEnabled = false;
+    const y0 = 34, y1 = VH - 92, lean = 26, mid = Math.round(vw * 0.56), pad = 5;
+    // left: the memory, sliding in from the left with a slow push
+    const lx0 = 18 - (1 - e) * vw, lx1 = mid - pad - (1 - e) * vw;
+    ctx.save(); slant(ctx, lx0, lx1, y0, y1, lean); ctx.fillStyle = '#0a0818'; ctx.fill(); ctx.clip();
+    const mem = SH.art.panel(a.memory), ms = Math.max((lx1 - lx0 + lean * 2) / mem.width, (y1 - y0) / mem.height) * (1.06 + c.t * 0.0016);
+    ctx.drawImage(mem, (lx0 + lx1) / 2 - mem.width * ms / 2 - c.t * 0.25, (y0 + y1) / 2 - mem.height * ms / 2, mem.width * ms, mem.height * ms);
+    ctx.fillStyle = 'rgba(10,8,24,0.18)'; ctx.fillRect(lx0 - lean, y0, lx1 - lx0 + lean * 2, y1 - y0);
     ctx.restore();
+    ctx.strokeStyle = a.c2; ctx.lineWidth = 2; slant(ctx, lx0, lx1, y0, y1, lean); ctx.stroke();
+    // right: the face, sliding in from the right
+    const rx0 = mid + pad + (1 - e) * vw, rx1 = vw - 18 + (1 - e) * vw;
+    ctx.save(); slant(ctx, rx0, rx1, y0, y1, lean); ctx.fillStyle = a.c1; ctx.fill(); ctx.clip();
+    ctx.fillStyle = a.c2; ctx.globalAlpha = 0.35 * (1 - out);
+    for (let i = 0; i < 12; i++) { const ly = y0 + ((i * 37 + c.t * 9) % (y1 - y0)); ctx.fillRect(rx0 - lean, ly, rx1 - rx0 + lean * 2, 2); }
     ctx.globalAlpha = 1 - out;
-    // the face, big and square-pixelled, sliding in from the side
-    const face = SH.art.portrait(a.who === 'wren' && SH.game.mortal ? 'wren_m' : a.who), fs = 144;
-    const fx = Math.round(vw * 0.5 - fs - 20 - (1 - k) * 200), fy = Math.round(VH / 2 - fs / 2 - 6);
-    ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#0a0818'; ctx.fillRect(fx - 4, fy - 4, fs + 8, fs + 8);
-    ctx.drawImage(face, fx, fy, fs, fs);
-    ctx.strokeStyle = a.c3; ctx.lineWidth = 2; ctx.strokeRect(fx - 3, fy - 3, fs + 6, fs + 6);
-    if (c.t > 8) {
-      const tx = Math.round(vw * 0.5 + 4 + (1 - Math.min(1, (c.t - 8) / 6)) * 80);
-      SH.ptext(ctx, a.name, tx, Math.round(VH / 2 - 24), '#0a0818', 6);
-      SH.ptext(ctx, a.sub, tx, Math.round(VH / 2 + 16), '#0a0818', 2);
+    const face = SH.art.portrait(a.who === 'wren' && SH.game.mortal ? 'wren_m' : a.who, c.t % 16 < 8 && c.t > 20 && c.t < 60 ? 'talk' : undefined), fs = Math.round((y1 - y0) * 1.25);
+    ctx.drawImage(face, 6, 4, 36, 36, Math.round((rx0 + rx1) / 2 - fs / 2), y0 - 6, fs, fs);
+    ctx.restore();
+    ctx.strokeStyle = a.c3; ctx.lineWidth = 2; slant(ctx, rx0, rx1, y0, y1, lean); ctx.stroke();
+    // the name of the blow, and the line
+    if (c.t > 10) {
+      const sc = SH.ptextW(a.name, 7) > vw * 0.6 ? 5 : 7, nx = Math.round(26 + (1 - Math.min(1, (c.t - 10) / 6)) * -60);
+      SH.ptext(ctx, a.name, nx, VH - 82, a.c3, sc, '#0a0818');
+      SH.ptext(ctx, a.sub, nx + 2, VH - 82 + sc * 6 + 3, a.c2, 2);
     }
-    ctx.globalAlpha = 1;
+    if (c.t > 22) { const n = Math.min(a.line.length, Math.floor((c.t - 22) * 1.2)), lw = SH.ptextW(a.line, 2); SH.ptext(ctx, a.line.slice(0, n), Math.round(vw - lw - 22), VH - 30, '#fff6d8', 2, '#0a0818'); }
+    ctx.restore();
   }
 
   SH.arts = A;
@@ -4363,6 +4429,10 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const zones = def.zones || [{ x: 0, theme: def.theme }];
     const mid = (cx + vw / 2) / SH.TILE;
     let zi = 0; for (let i = 0; i < zones.length; i++) if (mid >= zones[i].x - 6) zi = i;
+    // the camera director's zoom: everything in the world is scaled about the point it is looking at
+    const zoom = cam.zoom || 1, zfx = cam.sx != null ? cam.sx : vw / 2, zfy = cam.sy != null ? cam.sy : VH * 0.6;
+    ctx.save();
+    if (zoom !== 1) { ctx.translate(zfx, zfy); ctx.scale(zoom, zoom); if (cam.roll) ctx.rotate(cam.roll); ctx.translate(-zfx, -zfy); }
     drawBackdrop(ctx, w, zones[Math.max(0, zi - 1)].theme, cx, cy, vw, VH, 1);
     if (zi > 0) { const k = Math.min(1, (mid - (zones[zi].x - 6)) / 12); drawBackdrop(ctx, w, zones[zi].theme, cx, cy, vw, VH, k); }
 
@@ -4438,6 +4508,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     ctx.restore();
 
     { const kk = zi > 0 ? Math.min(1, (mid - (zones[zi].x - 6)) / 12) : 0; drawLight(ctx, w, cx - sx, cy - sy, vw, VH, t, zones[Math.max(0, zi - 1)].theme, zones[zi].theme, kk); }
+    ctx.restore();
     SH.arts.draw(ctx, w, vw, VH);
     // cinema bars slide in while people are talking
     w.letter = (w.letter || 0) + ((SH.game.state === 'talk' ? 1 : 0) - (w.letter || 0)) * 0.15;
@@ -4938,7 +5009,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       dropRocks(n, at) {
         for (let i = 0; i < n; i++) this.rocks.push({ x: at != null ? at + (i - (n - 1) / 2) * 30 : player.x + (Math.random() - 0.5) * 360, y: -20 - Math.random() * 120, vy: 0, warn: 50 + i * 10, ground: null });
       },
-      onBossDown() { SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
+      onBossDown() { const b = this.things.find(e => e.boss); if (b) G.look(b.x, b.y - 30, 1.5, 110); fx.slowmo = 70; SH.arts.finisher('WYRMSLAYER', 'THE OLD WYRM FALLS', '#ffd27a'); G.boss = null; SH.sfx.music(G.roomMusic); G.queueScript('mtn_peak'); },
       onStagDown() { SH.sfx.play('kill'); G.queueScript('woods_kill'); },
       onDummyCombo() { if (G.activeGoal === 'combo' && def.dummyCombo) G.queueScript(def.dummyCombo); },
     };
@@ -4959,6 +5030,27 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   };
 
   G.snapCamera = function () { const w = G.world; G.cameraTarget(); w.cam.x = w.camT.x; w.cam.y = w.camT.y; };
+  // The camera director. It follows Wren, and it also acts: it pushes in on heavy hits, frames whoever is talking,
+  // closes on a Bond Art, and goes to the boss when it roars or falls. (Sootborn and Guttercrown both shoot their
+  // fights; Starhaven's camera only ever followed.)
+  G.punch = function (amount) { const c = G.world.cam; c.kick = Math.min(0.22, Math.max(c.kick || 0, amount)); };
+  G.look = function (x, y, zoom, frames) { G.world.cam.shot = { x, y, zoom, t: frames }; };
+  G.direct = function () {
+    const w = G.world, p = w.player, c = w.cam, A = SH.arts;
+    let zt = 1, fx0 = p.x, fy0 = p.y - 30;
+    if (c.shot && c.shot.t > 0) { c.shot.t--; zt = c.shot.zoom; fx0 = c.shot.x; fy0 = c.shot.y; }
+    else if (A.cutin || A.scene) { zt = 1.22; const f = A.scene && A.scene.focus; if (f) { fx0 = f.x; fy0 = f.y; } }
+    else if (G.state === 'talk') {
+      const sp = w.npcs.filter(n => !n.hidden && Math.abs(n.x - p.x) < 220).sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x))[0];
+      if (sp) { zt = 1.16; fx0 = (sp.x + p.x) / 2; fy0 = p.y - 44; }
+    }
+    c.kick = (c.kick || 0) * 0.86; if (c.kick < 0.002) c.kick = 0;
+    c.zoomBase = (c.zoomBase || 1) + (zt - (c.zoomBase || 1)) * 0.09;
+    c.zoom = c.zoomBase + c.kick;
+    if (Math.abs(c.zoom - 1) < 0.003) c.zoom = 1;
+    c.fx = c.fx == null ? fx0 : c.fx + (fx0 - c.fx) * 0.12; c.fy = c.fy == null ? fy0 : c.fy + (fy0 - c.fy) * 0.12;
+    c.sx = Math.max(60, Math.min(w.viewW - 60, c.fx - c.x)); c.sy = Math.max(60, Math.min(SH.VIEW_H - 40, c.fy - c.y));
+  };
   G.cameraTarget = function () {
     const w = G.world, p = w.player;
     const look = p.facing * 46 + p.vx * 8;
@@ -5090,7 +5182,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       case 'winnow': G.winnow(st.npc, st.near != null ? Math.floor(w.player.x / TS) + st.near : st.to, st.y); break;
       case 'complete': G.afterScript = () => G.completeChapter(); break;
       case 'close': case 'open': { const g = w.gates.find(x => x.id === st.id); if (g) { w.room.setGate(g, st.do === 'close'); g.lift = st.do === 'open' ? 0 : 0; fx.kick(4); SH.sfx.play('thud'); } break; }
-      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; SH.sfx.music('tense'); } break; }
+      case 'boss': { const b = w.things.find(e => e.boss); if (b) { b.wake(); G.boss = b; SH.sfx.music('tense'); G.look(b.x, b.y - 30, 1.35, 70); SH.arts.whisper('bossStart'); } break; }
       case 'end': G.afterScript = () => { G.state = 'end'; G.hud.end(true); }; break;
     }
   };
@@ -5147,7 +5239,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     const w = G.world, p = w.player;
     input.step();
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
-    if (G.state === 'talk') { G.talkStep(); fx.update(); return; }
+    if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
     if (G.state !== 'play') return;
     if (G.pending) { const id = G.pending; G.pending = null; G.runScript(id); return; }
@@ -5161,7 +5253,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
       if (input.pressed.art) SH.arts.buf = 12;
       return;
     }
-    if (SH.arts.cutinStep(w)) return;
+    if (SH.arts.cutinStep(w)) { G.direct(); return; }
     if (fx.slowmo > 0) fx.slowmo--;
     w.time++; w.frames = (w.frames || 0) + 1;
     // whispers down the bond
@@ -5320,6 +5412,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     G.cameraTarget();
     w.cam.x += (w.camT.x - w.cam.x) * 0.14;
     w.cam.y += (w.camT.y - w.cam.y) * 0.10;
+    G.direct();
     fx.update();
     if (w.fade > 0) w.fade = Math.max(0, w.fade - 0.08);
   };
@@ -5368,6 +5461,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
 
   G.hazard = function (kind) {
     const w = G.world, p = w.player;
+    if (SH.arts.scene || SH.arts.cutin) return;
     if (p.invuln <= 0) { p.hearts = Math.max(0, p.hearts - 1); p.stats.hurt++; }
     fx.flashScreen(8, kind === 'thorns' ? 'rgba(255,80,110,0.4)' : 'rgba(10,10,30,0.8)');
     fx.kick(4);
@@ -5707,8 +5801,9 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   // The bond meter, the Bond Art button, and whispers down the bond.
   let lastArt = '';
   H.art = function (a) {
-    const on = a.active(), ready = a.ready(), key = on + '|' + ready + '|' + Math.round(a.meter) + '|' + a.nextKind();
+    const on = a.active(), ready = a.ready(), key = on + '|' + ready + '|' + Math.round(a.meter) + '|' + a.nextKind() + '|' + !!a.cutin;
     if (key === lastArt) return; lastArt = key;
+    document.body.classList.toggle('cutin', !!a.cutin);
     $('art').style.display = on ? 'block' : 'none';
     $('art').classList.toggle('ready', ready);
     $('art').firstChild.style.width = Math.round(a.meter / a.max * 100) + '%';
@@ -5718,7 +5813,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   H.whisper = function (who, text) {
     const el = $('whisper');
     if (!who) { el.classList.remove('show'); return; }
-    $('w-face').src = SH.art.portraitURL(who); $('w-name').textContent = ST.CAST[who].name + ', down the bond';
+    $('w-face').src = SH.art.portraitURL(who); $('w-name').textContent = who === 'wren' ? 'Wren' : ST.CAST[who].name + ', down the bond';
     $('w-name').style.color = ST.CAST[who].color; $('w-text').textContent = text;
     el.classList.add('show');
   };
@@ -5918,9 +6013,59 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   F.next = function () {
     clearTimeout(timer);
     if (phase === 'ncs') F.splash('econ');
-    else if (phase === 'econ') F.press();
+    else if (phase === 'econ') { if (F.filmSeen) F.press(); else F.film(F.press); }
+    else if (phase === 'film') F.filmEnd();
     else if (phase === 'press') { SH.sfx.play('select'); F.main(); }
   };
+  // The opening: a short film before the title, with the credits over picture. Any button skips it.
+  // (Sootborn opens this way; Starhaven used to go from the logos straight to a menu.)
+  F.FILM = [
+    { id: 'hunt', frames: 290, cue: ['shoot', 150], credit: 'NORTH COAST STUDIOS PRESENTS', cap: 'She was nineteen, mortal, and the only hunter in a starving house.' },
+    { id: 'wall', frames: 230, credit: 'IN ASSOCIATION WITH E CONCEPTS', cap: 'The stag belonged to the fae. After that, so did she.' },
+    { id: 'thorns', frames: 220, cap: 'Then a queen of thorns took every court at once.' },
+    { id: 'trials', frames: 230, cap: 'Three trials to win them back. She died on the last.' },
+    { id: 'rebirth', frames: 300, cue: ['rise', 110], flash: true, cap: 'And woke with a High Lord\'s blood in her veins, and a bond she could finally feel.' },
+    { id: 'city', frames: 210, flash: true, cap: 'This is what came after.' },
+  ];
+  let film = null, filmTimer = 0;
+  F.film = function (done) {
+    phase = 'film'; F.filmSeen = true;
+    $('splash').className = ''; $('f-logo').classList.remove('show'); $('f-press').classList.remove('show'); $('f-menu-wrap').classList.remove('show');
+    $('film').classList.add('show');
+    film = { i: -1, t: 0, total: 0, done };
+    F.filmShot(0);
+    clearInterval(filmTimer); filmTimer = setInterval(F.filmTick, 1000 / 60);
+  };
+  F.filmShot = function (i) {
+    film.i = i; film.t = 0;
+    const s = F.FILM[i];
+    $('film-credit').textContent = s.credit || ''; $('film-credit').classList.remove('on'); $('film-cap').classList.remove('on');
+    $('film-cap').textContent = s.cap;
+    if (s.flash) { $('film').style.filter = 'brightness(3)'; setTimeout(() => { $('film').style.filter = ''; }, 90); SH.sfx.play('thud'); }
+  };
+  F.filmTick = function (n) {
+    if (!film) return;
+    for (let k = 0; k < (n || 1); k++) {
+      const s = F.FILM[film.i]; film.t++; film.total++;
+      if (film.t === 24) { $('film-cap').classList.add('on'); if (s.credit) $('film-credit').classList.add('on'); }
+      if (film.t === s.frames - 26) { $('film-cap').classList.remove('on'); $('film-credit').classList.remove('on'); }
+      if (s.cue && film.t === s.cue[1]) SH.sfx.play(s.id === 'hunt' ? 'slash' : 'lantern');
+      if (film.t >= s.frames) { if (film.i + 1 < F.FILM.length) F.filmShot(film.i + 1); else return F.filmEnd(); }
+    }
+    const s = F.FILM[film.i], g = $('film-art').getContext('2d');
+    g.setTransform(3, 0, 0, 3, 0, 0); g.imageSmoothingEnabled = false;
+    const cue = s.cue && film.t >= s.cue[1] ? { name: s.cue[0], t: film.t - s.cue[1] } : null;
+    if (SH.cine.has(s.id)) SH.cine[s.id](g, film.t, cue); else SH.cine.drawStatic(g, s.id, film.t);
+    g.setTransform(1, 0, 0, 1, 0, 0);
+  };
+  F.filmEnd = function () {
+    if (!film) return;
+    clearInterval(filmTimer); const done = film.done; film = null;
+    $('film').classList.remove('show'); $('film').style.filter = '';
+    SH.sfx.play('lantern');
+    done();
+  };
+  F.filmState = () => film ? { shot: film.i, id: F.FILM[film.i].id, t: film.t } : null;
   F.press = function () {
     phase = 'press';
     $('splash').className = '';
@@ -5971,7 +6116,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
   // Controller / keyboard, called every frame while the front end is up.
   F.input = function (input) {
     const any = ['jump', 'attack', 'dash', 'pause', 'up', 'down', 'left', 'right'].some(a => input.take(a));
-    if (phase === 'ncs' || phase === 'econ' || phase === 'press') { if (any) F.next(); return; }
+    if (phase === 'ncs' || phase === 'econ' || phase === 'press' || phase === 'film') { if (any) F.next(); return; }
   };
   F.menuInput = function (input) {
     if (phase !== 'menu') return F.input(input);
@@ -5992,6 +6137,7 @@ h2 { letter-spacing: .12em; text-transform: uppercase; }
     items.push({ label: 'Load game', disabled: !any, action: () => F.slots('load') });
     items.push({ label: 'Chapter select', sub: 'Any chapter, without saving (concept build)', action: F.chapters });
     items.push({ label: 'Settings', action: () => F.settings(F.main) });
+    items.push({ label: 'Watch the opening', action: () => F.film(() => { phase = 'menu'; $('f-logo').classList.add('show'); F.main(); }) });
     items.push({ label: 'Credits', action: F.credits });
     F.show(null, items, null);
   };

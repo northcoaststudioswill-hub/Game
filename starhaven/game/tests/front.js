@@ -36,7 +36,15 @@ const path = require('path');
   s = await st();
   check('Boot: then the E Concepts splash', /econ/.test(s.splash), s);
   await press(A);                                     // skip it
+  const film0 = await page.evaluate(() => SH.front.filmState());
+  await page.waitForTimeout(700);
+  const film1 = await page.evaluate(() => ({ st: SH.front.filmState(), credit: document.getElementById('film-credit').textContent, shown: document.getElementById('film').classList.contains('show') }));
+  const shots = await page.evaluate(() => { const seen = []; for (let i = 0; i < 2000 && SH.front.filmState(); i++) { const f = SH.front.filmState(); if (!seen.includes(f.id)) seen.push(f.id); if (f.id === 'city') break; SH.front.filmTick(8); } return seen; });
+  check('Opening film: plays after the logos with the credits over picture, through six shots', !!film0 && film1.shown && film1.st.t > 20 && /NORTH COAST/.test(film1.credit) && shots.length === 6, { first: film0, after: film1.st, credit: film1.credit, shots });
+  await press(A);                                     // any button skips it
   s = await st();
+  const filmGone = await page.evaluate(() => !SH.front.filmState() && !document.getElementById('film').classList.contains('show'));
+  check('Opening film: a button skips it', filmGone, { filmGone });
   check('Boot: then "Press any button" (a controller button works, no touch needed)', s.press, s);
   await press(A);
   s = await st();

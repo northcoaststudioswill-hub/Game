@@ -331,6 +331,10 @@
     const zones = def.zones || [{ x: 0, theme: def.theme }];
     const mid = (cx + vw / 2) / SH.TILE;
     let zi = 0; for (let i = 0; i < zones.length; i++) if (mid >= zones[i].x - 6) zi = i;
+    // the camera director's zoom: everything in the world is scaled about the point it is looking at
+    const zoom = cam.zoom || 1, zfx = cam.sx != null ? cam.sx : vw / 2, zfy = cam.sy != null ? cam.sy : VH * 0.6;
+    ctx.save();
+    if (zoom !== 1) { ctx.translate(zfx, zfy); ctx.scale(zoom, zoom); if (cam.roll) ctx.rotate(cam.roll); ctx.translate(-zfx, -zfy); }
     drawBackdrop(ctx, w, zones[Math.max(0, zi - 1)].theme, cx, cy, vw, VH, 1);
     if (zi > 0) { const k = Math.min(1, (mid - (zones[zi].x - 6)) / 12); drawBackdrop(ctx, w, zones[zi].theme, cx, cy, vw, VH, k); }
 
@@ -406,6 +410,7 @@
     ctx.restore();
 
     { const kk = zi > 0 ? Math.min(1, (mid - (zones[zi].x - 6)) / 12) : 0; drawLight(ctx, w, cx - sx, cy - sy, vw, VH, t, zones[Math.max(0, zi - 1)].theme, zones[zi].theme, kk); }
+    ctx.restore();
     SH.arts.draw(ctx, w, vw, VH);
     // cinema bars slide in while people are talking
     w.letter = (w.letter || 0) + ((SH.game.state === 'talk' ? 1 : 0) - (w.letter || 0)) * 0.15;

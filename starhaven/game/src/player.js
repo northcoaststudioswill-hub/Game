@@ -305,7 +305,8 @@
         if (!r) continue;
         if (r.deflect) continue;
         if (SH.game.can('flame')) this.pips = Math.min(SH.stars.maxPips(), this.pips + SH.GIFTS.perHit); // close-up hits refill the moons
-        this.stats.hits++; SH.arts.gain(d.finisher ? 9 : 6);
+        this.stats.hits++; SH.arts.gain(d.finisher ? 9 : 6); SH.arts.hit();
+        SH.game.punch(r.killed ? 0.12 : d.finisher ? 0.08 : 0.035);
         { const hb2 = tgt.hurtBox(); fx.spark((Math.max(hb.l, hb2.l) + Math.min(hb.r, hb2.r)) / 2, (Math.max(hb.t, hb2.t) + Math.min(hb.b, hb2.b)) / 2, s.kind === 'pogo' ? Math.PI / 2 : s.kind === 'up' ? -Math.PI / 2 : (this.facing > 0 ? 0 : Math.PI), d.finisher || r.killed); }
         if (r.killed && !tgt.boss && (tgt.kind === 'wyrm' || tgt.kind === 'thornSprite')) { const nm = { thrust: ['RUN THROUGH', 'DASH STRIKE'], up: ['SKYBOUND', 'RISING STRIKE'], pogo: ['FROM ABOVE', 'DOWN STRIKE'] }[s.kind]; if (nm) SH.arts.finisher(nm[0], nm[1], '#9fe8ff'); }
         SH.sfx.play(r.killed ? 'kill' : 'hit');
@@ -339,10 +340,11 @@
 
   // Returns true if the hit landed.
   Player.prototype.hurt = function (fromX, dmg, world) {
-    if (this.dead || this.invuln > 0) return false;
+    if (this.dead || this.invuln > 0 || SH.arts.cutin || SH.arts.scene) return false;   // nothing touches her mid Bond Art
     if (this.iframes > 0) return false;
     const fx = SH.fx;
     this.hearts = Math.max(0, this.hearts - dmg);
+    SH.game.punch(0.07); SH.arts.dropCombo();
     this.stats.hurt++; this.hitFlash = 6; this.charging = false; this.chargeT = 0;
     SH.sfx.play('hurt');
     this.invuln = SH.PLAYER.hurtInvuln;

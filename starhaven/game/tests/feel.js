@@ -472,7 +472,7 @@ const path = require('path');
       const hp0 = sprites.map(e => e.hp), t0 = w.time;
       step({}, ['art']); for (let i = 0; i < 12 && !A.cutin; i++) step({}, null); const cut = !!A.cutin && A.cutin.kind === 'starfall';
       for (let i = 0; i < 30; i++) step({}, null); const frozen = w.time - t0 <= 2 && !!A.cutin;
-      for (let i = 0; i < 140; i++) step({}, null);
+      for (let i = 0; i < 230; i++) step({}, null);
       const dead = sprites.filter(e => e.dead).length, spent = A.meter < 100 && !A.scene;
       check('Bond Art: no bond while mortal; hits fill the meter; STARFALL cuts in, freezes the world, then clears every sprite in sight', mortalNoArt && ready && btn && cut && frozen && dead === 3 && spent,
         { mortalNoArt, hitsToFill: filledAfter, ready, touchButton: btn, cutin: cut, frozen, spritesDown: dead, hp0 });

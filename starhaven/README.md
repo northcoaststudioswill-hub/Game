@@ -33,6 +33,8 @@ gifts and bond hearts.
 
 ## Latest update (Nov 18, 2026)
 
+- **A camera, weight and memories:** the camera now zooms, frames conversations and goes to the boss; hits punch it;
+  Bond Arts are choreographed attacks that cut to a memory; a hit counter; an opening film before the title.
 - **Reimagined** with the techniques from the studio's newer games (Sootborn, Lightswarm, lil Bottie, Knockout): the
   cast redrawn as shaded pixel sprites that blink, breathe and react; talking portraits; **Bond Arts** (supers with a
   cut-in: STARFALL and FIRST LIGHT); finisher bands; openings after a perfect dodge; **whispers down the bond** during
