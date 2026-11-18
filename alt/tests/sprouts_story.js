@@ -14,10 +14,10 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   for (let i = 0; i < 60 && (await E('state')) !== 'menu'; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(200); }
   let fail = 0; const ok = (name, cond, info) => { if (!cond) fail++; console.log((cond ? 'PASS ' : 'FAIL ') + name + (info !== undefined ? '  ' + JSON.stringify(info) : '')); };
   const step = n => E(`(()=>{for(let i=0;i<${n};i++){__g.update(1/30);if(i%10===0)__g.draw();for(const k in __g.keys)__g.prev[k]=__g.keys[k]}})()`);
-  const tp = (tx, ty, dx, dy) => E(`P.x=${tx}*16+8;P.y=${ty}*16+8;P.dx=${dx};P.dy=${dy};LO.x=LO.sx=P.x-18;LO.y=LO.sy=P.y+4;trail=[];buds.forEach(b=>{release(b);b.gard=false;b.x=P.x;b.y=P.y+4;b.st='follow'});void 0`);
+  const tp = (tx, ty, dx, dy) => E(`dayT=Math.min(dayT,20);P.x=${tx}*16+8;P.y=${ty}*16+8;P.dx=${dx};P.dy=${dy};LO.x=LO.sx=P.x-18;LO.y=LO.sy=P.y+4;trail=[];buds.forEach(b=>{release(b);b.gard=false;b.x=P.x;b.y=P.y+4;b.st='follow'});void 0`);
   const tap = async k => { await E(`keys.${k}=1;void 0`); await step(1); await E(`keys.${k}=0;void 0`); await step(3); };
   const throwFor = async n => { await E(`keys.a=1;void 0`); await step(n); await E(`keys.a=0;void 0`); };
-  const scenes = []; const skip = async () => { for (let i = 0; i < 90 && (await E('state')) !== 'play'; i++) { if ((await E('state')) === 'cine' && !scenes.includes(await E('scn[0][0]'))) scenes.push(await E('scn[0][0]')); await tap('a'); } };
+  const scenes = []; const skip = async () => { await step(4); /* a queued scene starts on the next frame */ for (let i = 0; i < 90 && (await E('state')) !== 'play'; i++) { if ((await E('state')) === 'cine' && !scenes.includes(await E('scn[0][0]'))) scenes.push(await E('scn[0][0]')); await tap('a'); } };
   const until = async (cond, secs) => { let t = 0; for (; t < secs; t++) { await step(30); if ((await E('state')) !== 'play' || await E(cond)) break; } return t; };
   await E(`init();live=true;state='play';ZONES.forEach(z=>run.seen[z[0]]=1);run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1};run.tips={br:1,ne:1,dg:1,wb:1,wn:1,fl:1};found=found.map(()=>true);gates.forEach(q=>q.alive&&openGate(q));openGarden();wakeGrubs();
     for(let i=0;i<30;i++)mkBud(i%6,2,P.x,P.y);for(let i=0;i<8;i++)mkBud(2,2,P.x,P.y);void 0`);
@@ -26,9 +26,9 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/poc
   await tp(16, 19, -1, 0); await step(3); ok('aiming at water picks Dews by itself', (await E('TYPES[sel].n')) === 'DEW');
   await throwFor(200); ok('only Dews go in the water', await E(`buds.every(b=>b.type===2||tileAt(b.x,b.y)!==WA||b.st==='fly')`));
   let t = await until('run.isle', 150); ok('the island shard is swum home', await E('!!run.isle&&shards===3'), t + ' s'); await skip();
-  await tp(28, 33, 0, 1); await throwFor(240); t = await until('run.boss', 120); ok('a crowd wakes Old Thornback', await E('!!run.boss'), t + ' s');
+  await tp(28, 33, 0, 1); await throwFor(240); t = await until('run.boss', 120); ok('a crowd wakes Old Thornback', await E('!!run.boss'), t + ' s ' + await E(`JSON.stringify({st:state,b:[...new Set(buds.map(b=>b.st+(b.tgt?':'+(b.tgt.kind+(b.tgt.sub||'')):'')))],n:buds.length,boss:foes.filter(e=>e.boss).map(e=>[e.x|0,e.y|0,e.hp|0,e.on.length,e.st]),P:[P.x|0,P.y|0,P.stun],soil:sprouts.length,dayT:dayT|0,msg})`));
   ok('his scene has the guardian lines', await E(`state==='cine'&&scn.some(e=>/set to guard that light/.test(e[0]))`)); await skip();
-  t = await until('shards>=4', 200); ok('the last shard comes home and the ending plays', await E(`shards===4&&state==='cine'&&/last shard slides home/.test(scn[0][0])`), t + ' s');
+  await E(`dayT=20;void 0`); t = await until('shards>=4', 200); ok('the last shard comes home and the ending plays', await E(`shards===4&&state==='cine'&&/last shard slides home/.test(scn[0][0])`), t + ' s ' + await E(`JSON.stringify({st:state,shards,sh:items.filter(i=>i.alive&&i.sub==='shard').map(i=>[i.x|0,i.y|0,i.w,str(i),i.on.map(b=>b.type).join(''),tileAt(i.x,i.y),fieldL[(i.y>>4)*MW+(i.x>>4)]]),b:[...new Set(buds.map(b=>b.st+(b.tgt?':'+(b.tgt.kind+(b.tgt.sub||'')):'')))],dayT:dayT|0})`));
   ok('the ending says nobody remembers who lit it', await E(`scn.some(e=>/Nobody remembers who lit it first/.test(e[0]))`)); await skip();
   for (let i = 0; i < 10 && (await E('state')) !== 'play'; i++) await tap('a');
   ok('the lantern is relit and play goes on', await E(`won&&state==='play'&&meta.ach[5]===1`), scenes.length + ' scenes seen');

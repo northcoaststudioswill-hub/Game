@@ -3,6 +3,47 @@
 ALT = v0.3 plus the changes below. Names and likenesses are unchanged everywhere. Patch & Plate's code was untouched until v0.4 (Nov 17 2026, below).
 Everything here is **invented this pass and not phone-confirmed**; flag anything to Will (he hands out canon).
 
+## Sprouts: menus, the field guide and small talk (Nov 18 2026)
+
+Will: keep refining the gameplay, characters, lore, world building, Pikmin-like stuff and menus; "I love the new menus
+in Sproutwild". Built on the combined branch (Sproutwild v12, Patch & Plate v0.7 and the Sprouts valley work).
+
+![Menus and the field guide](playtest/sprouts-menus-guide.png)
+
+**Menus, in Sproutwild's style** (slate background, a header band with the sprout mark, tiles):
+- **Pause is a grid of six tiles with icons:** RESUME, MAP, FIELD GUIDE, COLLECTION, SETTINGS, SAVE & QUIT, each with a
+  line under it (places found, entries, things collected). The header shows where you are, the day and the four shards.
+  Missions are listed underneath. The Collection can now be opened from pause and comes back to it.
+- The title menu and the trail post list are tiles. Rewards, Capsules, Style, Collection, Settings, Home and the valley
+  project screen share the same background, header and footer.
+
+**The field guide** (new, from pause). Four pages, filled in as you meet things; left and right change page:
+- SPROUTS: the six kinds, each once you have plucked one.
+- BUDDIES: the seven wild buddies, each once you have been near it (a note floats up when one goes in). The lines are
+  Sproutwild's own descriptions, so the two games agree; the Lanternwisp has a line for this valley.
+- PEOPLE: Will, Erin, Marcus, Ranger, Scout, Louie, and Thornback once he is awake. Marcus is the plumbing boss and
+  Louie the evolved shiba, as in Knockout.
+- PLACES: the nine places with a small live picture and a line of lore each. Two lines change with the story (Sunkeep
+  after the arch, the hollow after Thornback).
+
+**Characters:** the four people say a short line in a bubble as you walk past (Erin: "MORNING, WILL!", "THEY WATCH THE
+LIGHT." at dusk; Marcus: "FLOW PROS, BABY."; Ranger: "OLD STONES HUM AT NIGHT"; Scout: "EVER SEEN THE WISP?"). One voice
+at a time: never over a message, a toast or Louie, and never while they have something to tell you.
+
+**Pikmin feel:**
+- Carriers that are too few strain: they wobble, sweat, and the count turns orange until enough arrive.
+- Idle sprouts glow softly in their own colour so you can find the ones you left behind.
+- Numbers float up: "+3 SEEDS" at the lantern, petals at a harvested bed.
+
+**Fixed:** Thornback's shard was dropped a fixed step to his left, which could be inside a wall, where nothing could ever
+carry it (the last shard, so the game could not be finished). It now only shifts onto ground with a way home, and any
+carried thing that ends up on a tile with no way home is walked to the nearest tile that has one.
+
+**Tested:** `sprouts_valley.js` now 36 checks (pause grid, guide pages and text fit, small talk, the stuck shard), six
+runs in a row; `sprouts_story.js` (two races in the test itself fixed); `sprouts_soak.js` two seeds of two days; Sproutwild
+lab 124 of 124; Patch & Plate 119 of 119. Three of my new function names clashed with Sproutwild's (`drawGuide`,
+`guideUpdate`, `pauseUpdate`); caught on the screenshots and renamed. **Not tested:** by hand, or on a phone.
+
 ## Sprouts: the story run (Nov 17 2026)
 
 Will: one more pass, then push. No game code changed in this one; it is a check of the whole arc.

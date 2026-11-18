@@ -21,6 +21,9 @@ A pocket game console in one HTML file, by North Coast Studios. Five game cartri
 
 ## Latest updates
 
+- **Sprouts: menus, field guide, small talk (Nov 18 2026):** Sproutwild-style menus with a tile pause screen, a field
+  guide of sprouts, buddies, people and places, people who talk as you pass, and a fix for a shard that could get stuck
+  in a wall. Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).
 - **Sprouts, the prequel pass (Nov 17 2026):** Sprouts is now set before Sproutwild. Wild buddies keep their distance and
   sit by the Lantern at night, an old arch names the place Sunkeep, Thornback is the guardian of the light, and each
   treasure carries a memory. Details: [`alt/CHANGELOG.md`](alt/CHANGELOG.md).

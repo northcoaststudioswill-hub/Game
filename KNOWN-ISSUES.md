@@ -141,6 +141,10 @@ From [`v0.2/CHANGELOG.md`](v0.2/CHANGELOG.md), still open:
   "nobody here knows"; the red button and the fallen chip as hints of what is coming.
 - Which buddies live here. The seven were picked as one relative per sprout kind plus the Lanternwisp.
 
+### Not tested in play yet (Nov 18)
+- The new menus and field guide by thumb; whether the guide list (10 px rows) is comfortable to read on the phone.
+- How often the people talk as you pass (one line every 9 s at most, 26 s per person).
+
 ### Balance to check
 - The bridge takes 80 sprout-seconds (12 sprouts: about 7 s). Nectar blooms up to 12 sprouts, six blossoms a day.
 - The objective autopilot in `tests/sprouts_soak.js` reliably clears Erin's first three asks and sometimes reaches the
