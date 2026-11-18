@@ -1,5 +1,38 @@
 # Starhaven — Changelog
 
+## Reimagined 3 — other ways of seeing (Nov 18, 2026)
+Will: we can be a side scroller sometimes and other things other times. Try multiple perspectives; keep the gameplay
+fresh and the look nice; tell the story and the relationships; stick to the source material.
+
+Three moments that were a cutscene, a held button and a menu are now played, each from its own point of view
+(`src/modes.js`). The missions stay side-on.
+
+- **Flight, into the screen (Chapter 1).** Caelum no longer winnows Wren out of the Spring Court: he opens the window
+  and his wings. You steer the two of them from behind, over the sea, for about 45 seconds: gather Starlight, lean away
+  from Rowan's archers' arrows, thread the gaps in a storm on the border, and watch Starhaven's lights come up on the
+  horizon. They talk the whole way (nine lines, none of which stop the flight). Fourteen or more Starlight is worth a
+  little extra with Caelum. Being hit costs nothing but the moment: he has her.
+- **The mural, face to the wall (Chapter 1).** PAINT at the wall now opens the wall itself. You move the brush along the
+  chalk from point to point (eleven of them) and the star of Dusk fills in behind it; when the last point closes, the
+  night sky and rooftops bloom out round it. Caelum watches and says three things. This is the design doc's
+  "trace-and-fill" mural, replacing "hold the button".
+- **The city, from above (the evenings after Chapters 2 and 3).** Choosing who to spend the evening with was a list.
+  Now it is the Lamp Square at night, seen from above: Caelum by the Rooftop House door, Bram at his stall by the Ring,
+  Iris (or Thane) across the square. Walk up to someone and that is who the evening is with. It is the first piece of
+  the design doc's city.
+- A scripted scene can now start any of these with `{ do: 'mode', name: ... }` and carries on when it ends. The pause
+  button skips the flight and the mural. Skipping a scene stops at one, as it stops at a choice.
+- Wren has a sprite in the same style as the rest of the cast (used in the square).
+- The pixel font has a comma.
+
+**Story change to flag:** Wren's first arrival used to be a winnow; it is now a flight, then a walk "because the wards
+will not let me fly you in". Winnowing is still explained in the same line.
+
+**Honest notes.** All three are first versions, played only by test bots (a pilot, a tracer, a walker). The flight's
+difficulty is a guess. The mural brush is steered with the stick, not by dragging a finger on the wall, which is what
+a phone player may expect. Tests: 44 play checks, 18 menu checks, the screenshot run. **Not played by hand or on a
+phone.**
+
 ## Reimagined 2 — a camera, weight, memories in the fights, an opening (Nov 18, 2026)
 Will, after looking at Guttercrown and Sootborn v0.11 together: don't copy those titles, but see how far those ideas
 have been taken, and build Starhaven's own concept up to that level.

@@ -236,6 +236,16 @@
         G.talkWait = 10; // a short pause so a held button doesn't skip the line
         return;
       }
+      if (st.do === 'mode') {   // another way of seeing: the script waits for it, then carries on
+        const sc0 = sc;
+        SH.modes.start(st.name, st, r => {
+          if (st.name === 'flight' && r) { G.bond('caelum', r.stars >= 14 ? 10 : 5, r.stars >= 14); G.hud.toast('Starlight gathered on the wing: ' + r.stars + (r.stars >= 14 ? '. Caelum noticed.' : '.')); }
+          const nx = sc0.steps[sc0.i];
+          if (typeof r === 'number' && nx && nx.choose) { sc0.i++; G.choosing = nx.choose; return G.pick(Math.min(r, nx.choose.length - 1)); }
+          G.advance();
+        });
+        return;
+      }
       if (st.choose) {
         G.choosing = st.choose;
         G.hud.choice(st.choose.map(o => o.text));
@@ -259,6 +269,7 @@
   G.act = function (st) {
     const w = G.world;
     switch (st.do) {
+      case 'mode': break;   // skipped along with the scene
       case 'goal': G.activeGoal = st.id; G.hud.goal(true); break;
       case 'flag': G.flags[st.name] = true; G.hud.goal(); break;
       case 'wyrm': SH.sfx.play('rumble'); SH.sfx.music('tense'); w.wyrm.on = true; w.wyrm.x = w.player.x - 13 * TS; fx.kick(8); fx.flashScreen(10, 'rgba(10,30,20,0.6)'); break;
@@ -328,6 +339,7 @@
   G.step = function () {
     const w = G.world, p = w.player;
     input.step();
+    if (G.mode) { if (G.state === 'talk' || G.state === 'play') G.progress.playFrames = (G.progress.playFrames || 0) + 1; SH.modes.step(input); return; }
     if (G.state === 'play' || G.state === 'talk') G.progress.playFrames = (G.progress.playFrames || 0) + 1;
     if (G.state === 'talk') { G.talkStep(); fx.update(); G.direct(); return; }
     if (input.pressed.pause && G.state === 'play') { G.pause(); return; }
@@ -513,9 +525,12 @@
     if (!m) return false;
     const cx = (m.x + m.w / 2) * TS;
     w.muralNear = Math.abs(p.x - cx) < m.w * TS / 2 + 10 && p.grounded && !!G.flags[m.needs] && !G.flags[m.flag];
-    if (!w.muralNear || !input.held.up) return false;
+    if (G.flags[m.flag]) return false;
+    if (!w.muralDone && (!w.muralNear || !(input.held.up || input.pressed.up))) return false;
     p.vx = 0; p.swing = null;
-    w.muralProgress = Math.min(1, w.muralProgress + 1 / m.frames);
+    // face to the wall: the mural is traced in its own view, and the street wakes when it is done
+    if (!w.muralDone) { SH.modes.start('mural', {}, () => { w.muralDone = true; w.muralProgress = 1; }); return true; }
+    w.muralProgress = 1;
     if (w.time % 6 === 0) SH.sfx.play('paint');
     if (w.time % 4 === 0) fx.burst(m.x * TS + m.w * TS * w.muralProgress, 16 * TS - 40 - Math.random() * 60, 2, { speed: 1, life: 20, colors: ['#ffd27a', '#ff9a7a', '#8a6aff', '#4ad8c8'], glow: true });
     if (w.muralProgress >= 1) {
@@ -534,7 +549,7 @@
   // Skip a scene: run it to its end (or to the next choice), still applying everything it does.
   G.skipScene = function () {
     let n = 0;
-    while (G.script && !G.choosing && G.state === 'talk' && n++ < 400) { G.hud.finishTyping(); G.talkWait = 0; G.advance(); }
+    while (G.script && !G.choosing && !G.mode && G.state === 'talk' && n++ < 400) { G.hud.finishTyping(); G.talkWait = 0; G.advance(); }
   };
   G.talkStep = function () {
     if (input.pressed.pause && !G.choosing) { G.skipScene(); return; }
@@ -625,6 +640,7 @@
     const w = G.world;
     if (!w) return;
     G.ctx.imageSmoothingEnabled = false;
+    if (G.mode) return SH.modes.draw(G.ctx, w.viewW);
     SH.draw.frame(G.ctx, w);
   };
 
@@ -661,7 +677,7 @@
     // load('roomId', { story: false }): a bare room, every gate open, no story scripts.
     load(chapterOrRoom, opts) {
       opts = opts || {};
-      G.frozen = true; input.forced = { held: {}, pressed: {} };
+      G.frozen = true; input.forced = { held: {}, pressed: {} }; SH.modes.auto = !opts.modes; G.mode = null; SH.modes.cur = null; delete document.body.dataset.mode;
       document.getElementById('front').classList.remove('show'); G.slot = null;
       if (typeof chapterOrRoom === 'number') { G.startChapter(chapterOrRoom); G.hud.cardGo(); }
       else {

@@ -33,6 +33,8 @@ gifts and bond hearts.
 
 ## Latest update (Nov 18, 2026)
 
+- **Other perspectives:** a flight into the screen on Caelum's wings, the first mural traced face to the wall, and
+  the Lamp Square seen from above for choosing your evening. The missions stay side-on.
 - **A camera, weight and memories:** the camera now zooms, frames conversations and goes to the boss; hits punch it;
   Bond Arts are choreographed attacks that cut to a memory; a hit counter; an opening film before the title.
 - **Reimagined** with the techniques from the studio's newer games (Sootborn, Lightswarm, lil Bottie, Knockout): the

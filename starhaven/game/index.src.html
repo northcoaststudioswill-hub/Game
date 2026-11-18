@@ -264,6 +264,8 @@ body[data-input="touch"] #touch { display: block; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
+body[data-mode] #hud, body[data-mode] #pause-btn, body[data-mode] #b-attack, body[data-mode] #b-dash, body[data-mode] #b-down, body[data-mode] #b-gift, body[data-mode] #b-art, body[data-mode] #b-talk, body[data-mode] #whisper, body[data-mode] #dialog { display: none !important; }
+body[data-mode="flight"] #b-jump, body[data-mode="mural"] #b-jump { display: none !important; }
 body.cutin #touch, body.cutin #bossbar, body.cutin #sign, body.cutin #goal, body.cutin #whisper, body.cutin #pause-btn, body.cutin #motes, body.cutin #pips, body.cutin #hearts, body.cutin #art { visibility: hidden; }
 /* ---- Reimagined skin: every frame is an engraved night-steel plate with a starlight edge (as Sootborn frames its menus in brass). */
 :root { --plate: linear-gradient(180deg, rgba(30,26,62,.96), rgba(14,12,34,.96)); --plate-edge: #b9a8ff; --plate-line: #6a5aa8; }

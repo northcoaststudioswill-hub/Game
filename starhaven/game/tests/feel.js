@@ -505,6 +505,45 @@ const path = require('path');
       SH.saves.erase(0);
     })();
 
+    // Other perspectives: the flight (into the screen), the mural (face-on), the city (from above)
+    (function () {
+      const M = SH.modes;
+      SH.test.load(2, { modes: true }); G.progress.bonds = {}; SH.test.choice = 0;
+      let f = 0; while (!G.mode && f++ < 3000) talk({}, null);
+      const started = G.mode === 'flight', hudHidden = getComputedStyle(document.getElementById('hud')).display === 'none';
+      let maxObjs = 0, kinds = new Set(), frames = 0;
+      while (G.mode === 'flight' && frames++ < 3000) {
+        const s = M.cur.s; s.objs.forEach(o => kinds.add(o.kind)); maxObjs = Math.max(maxObjs, s.objs.length);
+        // a simple pilot: go to the nearest star, but get out of the way of anything else that is close
+        const close = s.objs.filter(o => o.z < 0.5).sort((a, b) => a.z - b.z), bad = close.find(o => o.kind !== 'star' && Math.abs(o.x - s.x) < 0.34 && Math.abs(o.y - s.y) < 0.4), star = close.find(o => o.kind === 'star');
+        const held = {};
+        if (bad) { held[bad.x > s.x ? 'left' : 'right'] = true; }
+        else if (star) { if (star.x > s.x + 0.05) held.right = true; else if (star.x < s.x - 0.05) held.left = true; if (star.y > s.y + 0.05) held.down = true; else if (star.y < s.y - 0.05) held.up = true; }
+        step(held, null);
+      }
+      const res = { stars: 0 }; const b = G.progress.bonds.caelum || { pts: 0 };
+      for (let i = 0; i < 400 && G.activeGoal !== 'arrive'; i++) talk({}, null);
+      check('Flight (into the screen): Caelum flies Wren out of Spring; starlight, arrows and storm cloud come at you; it ends on the road to Starhaven', started && hudHidden && kinds.has('star') && kinds.has('arrow') && kinds.has('cloud') && !G.mode && G.activeGoal === 'arrive' && b.pts >= 15,
+        { started, hudHidden, kinds: [...kinds], seconds: +(frames / 60).toFixed(1), caelumPoints: b.pts, goal: G.activeGoal });
+      // the mural, traced
+      for (let i = 0; i < 600 && G.state !== 'play'; i++) talk({}, null);
+      G.flags.arrive = true; const m = G.world.room.def.mural; SH.test.place(m.x + m.w / 2, 16);
+      for (let i = 0, calm = 0; i < 3000 && calm < 20; i++) { talk({}, null); calm = G.state === 'play' && !G.pending ? calm + 1 : 0; }   // let the walk's scenes play out
+      G.flags.arrive = true; SH.test.place(m.x + m.w / 2, 16); step({}, null);
+      step({}, ['up']); const inMural = G.mode === 'mural'; let mf = 0;
+      while (G.mode === 'mural' && mf++ < 3000) { const s = M.cur.s, p = s.done ? null : [[0.5, 0.14], [0.56, 0.36], [0.74, 0.38], [0.6, 0.5], [0.66, 0.72], [0.5, 0.6], [0.34, 0.72], [0.4, 0.5], [0.26, 0.38], [0.44, 0.36], [0.5, 0.14]][s.i]; const held = {}; if (p) { if (p[0] > s.bx + 0.006) held.right = true; else if (p[0] < s.bx - 0.006) held.left = true; if (p[1] > s.by + 0.01) held.down = true; else if (p[1] < s.by - 0.01) held.up = true; } step(held, null); }
+      for (let i = 0; i < 30; i++) step({}, null);
+      check('Mural (face to the wall): PAINT opens the wall; tracing all eleven points finishes it and the street wakes', inMural && !G.mode && G.flags.painted && G.world.cityLightTarget === 1, { inMural, seconds: +(mf / 60).toFixed(1), painted: !!G.flags.painted });
+      // the city from above: walk to Bram
+      SH.test.load(3, { modes: true }); G.progress.bonds = {}; G.runScript('evening2');
+      f = 0; while (!G.mode && f++ < 600) talk({}, null);
+      const inCity = G.mode === 'city'; let cf = 0, nearWho = null;
+      while (G.mode === 'city' && cf++ < 900) { const s = M.cur.s, t = s.spots[1], held = {}; if (t.x < s.x - 3) held.left = true; else if (t.x > s.x + 3) held.right = true; if (t.y + 34 < s.y - 3) held.up = true; else if (t.y + 34 > s.y + 3) held.down = true; if (s.near === 1) nearWho = s.spots[1].who; step(held, s.near === 1 && s.pick < 0 ? ['jump'] : null); }
+      for (let i = 0; i < 30 && !seen.has('ev2_bram'); i++) talk({}, null);
+      check('City (from above): walking up to Bram in the Lamp Square spends the evening with Bram', inCity && nearWho === 'bram' && !G.mode && seen.has('ev2_bram'), { inCity, nearWho, seconds: +(cf / 60).toFixed(1), withBram: seen.has('ev2_bram') });
+      SH.modes.auto = true;
+    })();
+
     // Evening 2 choices lead to the right person and add their bond points
     for (const [choice, who, script] of [[1, 'bram', 'ev2_bram'], [2, 'iris', 'ev2_iris']]) {
       SH.test.load(3); G.progress.bonds = {}; SH.test.choice = choice;

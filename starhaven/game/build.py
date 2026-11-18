@@ -24,6 +24,7 @@ ORDER = [
     'stars.js',      # the Constellation: Starlight upgrades
     'arts.js',       # Bond Arts, finisher bands, openings, whispers, pixel font
     'people.js',     # the cast as shaded, outlined pixel sprites with blinks and emotes
+    'modes.js',      # other perspectives: flight (into the screen), mural (face-on), city (from above)
     'wren.js',       # Wren's jointed figure, poses and slash crescents
     'draw.js',       # world drawing
     'game.js',       # loop, camera, checkpoints

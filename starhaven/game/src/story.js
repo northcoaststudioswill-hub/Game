@@ -316,10 +316,12 @@
       ] },
       ['wren', 'And this thread between us? Since the Deep, I can feel you. All the time. What did your blood do to me?'],
       ['caelum', 'Nothing that wasn\'t already there. I\'ll tell you everything, I promise. Not here, with Rowan\'s guards outside the door.'],
-      ['caelum', 'Take my hand.'],
-      ['narr', 'The room folds into shadow and starlight, and then there is cold air, and a road, and the smell of pine.'],
+      ['caelum', 'Take my hand. And don\'t scream. It carries.'],
+      ['narr', 'He does not use the door. He opens the window, and then he opens his wings.'],
       { do: 'art', id: null },
-      ['caelum', 'Fae can winnow: step out of one place and into another. I\'ll meet you up the road. Walk with me.'],
+      { do: 'mode', name: 'flight' },
+      ['narr', 'They come down on a mountain road in the cold, with the smell of pine, and Wren\'s legs do not quite work.'],
+      ['caelum', 'The wards will not let me fly you in. From here we walk. Fae can winnow, step out of one place and into another: I\'ll meet you up the road.'],
       { do: 'goal', id: 'arrive' },
       { do: 'winnow', npc: 'caelum', to: 41 },
     ],
@@ -492,6 +494,8 @@
     evening2: [
       { do: 'art', id: 'city', title: 'Evening: Starhaven' },
       ['narr', 'Night falls over Starhaven. Wren can\'t stop thinking about her sisters, and she doesn\'t want to be alone.'],
+      { do: 'art', id: null },
+      { do: 'mode', name: 'city', title: 'THE LAMP SQUARE, EVENING', spots: [{ who: 'caelum', label: 'with Caelum, on the rooftop' }, { who: 'bram', label: 'with Bram, at the Ring' }, { who: 'iris', label: 'with Iris, in her tower' }] },
       { choose: [
         { text: 'Caelum, on the rooftop', then: [{ do: 'goto', id: 'ev2_caelum' }] },
         { text: 'Bram, at the Training Ring', then: [{ do: 'goto', id: 'ev2_bram' }] },
@@ -667,6 +671,8 @@
     evening3: [
       { do: 'art', id: 'city', title: 'Evening: Starhaven' },
       ['narr', 'The whole city heard about the Old Wyrm by sundown. Wren can\'t walk ten steps without someone thanking her. She needs somewhere quiet.'],
+      { do: 'art', id: null },
+      { do: 'mode', name: 'city', title: 'THE LAMP SQUARE, EVENING', spots: [{ who: 'caelum', label: 'with Caelum, on the rooftop' }, { who: 'thane', label: 'with Thane, in the Library' }] },
       { choose: [
         { text: 'Caelum, on the rooftop', then: [{ do: 'goto', id: 'ev3_caelum' }] },
         { text: 'Thane, in the Library', then: [{ do: 'goto', id: 'ev3_thane' }] },
