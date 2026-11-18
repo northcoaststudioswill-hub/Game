@@ -22,6 +22,8 @@
     W('c_pick', 'cleric', 'War Pick', 'pick', 0, 0, 'breaker', 'c_basic', { range: 62, arc: 80, wind: 0.24, rec: 0.28, cost: 8, dmg: [1, 10], pz: 1.7 }, 'One point, a great deal of conviction behind it.')
   ];
   G.ARM_BY = {}; G.ARMS.forEach(w => G.ARM_BY[w.id] = w);
+  // the pit's regulars carry their own steel
+  { const OA = { maul: 'c_flail', kessa: 's_frost', brakk: 'f_hammer', vexa: 'r_rapier' }; G.OPPONENTS.forEach(o => { if (OA[o.id]) o.arm = OA[o.id]; }); }
 
   // ------------------------------------------------------------ the tempo: fewer, heavier blows, and a charged one
   const HEAVY = { fighter: 'Overhead Cleave', rogue: 'Gutting Thrust', sorcerer: 'Charged Bolt', cleric: 'Judgement Swing' };

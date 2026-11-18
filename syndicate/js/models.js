@@ -182,6 +182,7 @@
       } else if (act === 'parry') { snap = 1; q.arx = -1.9; q.arz = 1.1; q.alx = -1.2; q.alz = -0.6; q.ty = 0.5; q.bx = -0.05; q.by = -0.06; q.ll = 0.25; q.lr = -0.3;
       } else if (act === 'cheer') { snap = 0.4; const b = Math.abs(Math.sin(t * 5)); q.arx = -2.9 + b * 0.3; q.arz = -0.35; q.alx = -2.7 + b * 0.4; q.alz = 0.4; q.by = b * 0.12; q.bx = -0.12; q.hx = -0.3; q.cape = 0.3 + b * 0.3;
       } else if (act === 'salute') { snap = 0.3; q.arx = -2.2 + Math.sin(t * 3) * 0.08; q.arz = -0.2; q.ty = -0.2; q.bx = 0; q.hx = -0.1;
+      } else if (act === 'kneel') { snap = 0.3; q.by = -0.44; q.ll = -1.5; q.lr = 0.4; q.bx = 0.5 + Math.sin(t * 4) * 0.03; q.hx = 0.45; q.arx = 0.25; q.alx = -0.35; q.tz = Math.sin(t * 3) * 0.05; q.cape = 0.5;
       } else if (act === 'sit') { q.ll = q.lr = -1.5; q.by = -0.3; q.bx = -0.06; q.arx = -0.75; q.alx = -0.75; snap = 0.4;
       } else if (act === 'stun') { q.hz = Math.sin(t * 9) * 0.3; q.tz = Math.sin(t * 7) * 0.12; q.arx = 0.1; q.alx = 0.1; q.bx = 0.28; q.by = -0.04; }
       if (p.ready && act === 'idle') { q.by -= 0.05; q.bx = 0.14; q.arx = -0.95 + Math.sin(t * 2.4) * 0.05; q.arz = 0.2; q.alx = (cls === 'fighter' ? -1.2 : restL - 0.45) + Math.sin(t * 2.4 + 1) * 0.04; q.ty = 0.25; if (!mv) { q.ll = 0.18; q.lr = -0.22; } }

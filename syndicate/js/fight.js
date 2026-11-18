@@ -37,7 +37,7 @@
     P = makeEntity(h, pd, G.lookOf(h, st), true);
     P.potions = st.potions + pd.freePotion; P.startPotions = st.potions;
     if (pd.ward) P.shield = pd.ward;
-    const eh = { name: o.name, cls: o.cls, race: o.race, level: o.level, stats: G.baseStats(o.cls, o.race), sub: o.sub || null, feats: [], known: o.known, ult: o.ult || null, tint: o.tint, scale: o.scale };
+    const eh = { name: o.name, cls: o.cls, race: o.race, level: o.level, stats: G.baseStats(o.cls, o.race), sub: o.sub || null, feats: [], known: o.known, ult: o.ult || null, tint: o.tint, scale: o.scale, arm: o.arm || null };
     const prim = G.CLASSES[o.cls].primary; eh.stats[prim] += Math.floor(o.level / 2); eh.stats.con += Math.floor(o.level / 3);
     const ed = G.derive(eh, null);
     F.sabotaged = !!st.sabotage; if (st.sabotage) { ed.maxHp *= 0.85; st.sabotage = 0; }
@@ -81,7 +81,7 @@
     let act = 'idle', prog = 0, glow = null, stepOv = 0;
     if (e.state === 'ko') { act = 'ko'; prog = e.koT; }
     else if (e.down > 0) { act = 'ko'; prog = Math.min(e.downT - e.down, e.down) * 1.7; }
-    else if (e.st.stun) act = 'stun';
+    else if (e.st.stun) act = e.st.broken ? 'kneel' : 'stun';
     else if (e.state === 'dodge') { act = 'dodge'; prog = 1 - e.t / 0.3; }
     else if (e.act) {
       const ab = e.act.ab, melee = ab.type === 'melee' && !ab.spell;
@@ -498,7 +498,7 @@
     }
     if (e.buffs.stealth && ab.type !== 'buff' && ab.type !== 'dash') delete e.buffs.stealth;
     G.sfx(ab.type === 'melee' && !ab.spell ? 'swing' : ab.type === 'dash' ? 'dash' : 'cast');
-    if (ab.heavy) { fx.push({ k: 'ring', x: e.x, y: e.y, r: 70, col: '#ffe9a0', t: 0, life: 0.3 }); }
+    if (ab.heavy) { fx.push({ k: 'ring', x: e.x, y: e.y, r: 70, col: e.isPlayer ? '#ffe9a0' : '#ff5030', t: 0, life: 0.3 }); if (!e.isPlayer && !F.ex) { text(e, '!', '#ff5030', true); flashLight(e.x, e.y, '#ff5030', 30); } }       // a heavy blow is coming: read it
     if (!ab.basic && !ab.heavy && ab.name) { gfx.floatText(e.x / S, 2.9, e.y / S, ab.name, ab.color || '#fff'); if (ab.ult) { fx.push({ k: 'ring', x: e.x, y: e.y, r: 150, col: ab.color, t: 0, life: 0.5 }); hitstop = Math.max(hitstop, 0.1); flashLight(e.x, e.y, ab.color, 60); camVh += 1.5; } }
     return true;
   }

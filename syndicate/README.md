@@ -122,6 +122,8 @@ phone portrait, phone landscape, or a desktop monitor.
 
 **Intro and backdrop.** The intro now shows the market at work (Mark's table, the Wardens at the Long Stair) and a "Blood" sequence in the pit with limbs coming off. The market sits above a lower city of roofs and lit windows instead of a black void, and the whole view has a soft vignette.
 
+**Readability and record.** Opponents carry their own weapons (flail, frost, warhammer, rapier). An enemy heavy blow is flagged with a red flash and a mark as it starts. A fighter whose posture breaks drops to one knee. The results card lists what happened in the bout (parries, limbs, postures broken), and the Notice Board keeps your running page in the Ledger.
+
 ## Controls
 
 | Action | Keyboard / mouse | Touch | Xbox controller |

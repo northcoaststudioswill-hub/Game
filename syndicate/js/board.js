@@ -33,12 +33,25 @@
       h += '<h3>Your contract</h3><div class="ab-row deeddone"><div class="ab-ic pas">✉</div><div class="ab-tx"><b>' + cur.name + '</b><small>' + n + ' / ' + cur.goal + ' · posted by ' + cur.by + '</small><p>' + cur.desc + ' Pays <b>' + p.coin + ' coin</b> and <b>' + p.respect + ' respect</b>.</p><div class="bar xp"><i style="width:' + (n / cur.goal * 100) + '%"></i></div></div><button id="drop">Tear it up</button></div>';
     } else { h += '<h3>Posted today</h3>'; offers(st).forEach(c => { const p = pay(st, c); h += '<div class="ab-row"><div class="ab-ic pas">✉</div><div class="ab-tx"><b>' + c.name + '</b><small>Posted by ' + c.by + '</small><p>' + c.desc + ' Pays <b>' + p.coin + ' coin</b> and <b>' + p.respect + ' respect</b>.</p></div><button class="big" data-take="' + c.id + '">Take it</button></div>'; }); }
     h += '<h3>Also pinned here</h3><div class="ab-row"><div class="ab-ic pas">❦</div><div class="ab-tx"><b>The Guild Codex</b><p>Everything known about the Undercity, the pit and the throne above it.</p></div><button id="cx">Read</button></div>' +
+      '<div class="ab-row"><div class="ab-ic pas">✎</div><div class="ab-tx"><b>Your page in the Ledger</b><p>Bouts, limbs, postures, parries: everything the Keeper has counted.</p></div><button id="pg">Read</button></div>' +
       '<div class="ab-row"><div class="ab-ic pas">♛</div><div class="ab-tx"><b>Win streak: ' + (st.streak || 0) + '</b><p>Every win in a row adds 5% to the purse, up to 25%. One loss and the crowd forgets.</p></div></div>' +
       '<div class="row end"><button class="big" id="x">Step away</button></div></div>';
     show(h);
-    on('#x', () => { ui.close(); ui.topbar(); }); on('#cx', () => ui.codex());
+    on('#x', () => { ui.close(); ui.topbar(); }); on('#cx', () => ui.codex()); on('#pg', () => ui.ledgerPage());
     on('[data-take]', el => { const c = BY[el.dataset.take]; st.contract = { id: c.id, base: stat(st, c.stat) }; G.save(); G.sfx('page'); ui.board('You pull it off the nail. ' + c.by + ' will know.'); });
     on('#drop', () => { st.contract = null; G.save(); G.sfx('page'); ui.board('Torn up. No hard feelings, the paper says, in smaller writing.'); });
+  };
+  // what happened in the bout just fought, for the crier's account on the results card
+  const KEYS = [['parry', 'parry', 'parries'], ['perfect', 'perfect dodge', 'perfect dodges'], ['break', 'posture broken', 'postures broken'], ['heavy', 'heavy blow', 'heavy blows'], ['sever', 'limb taken', 'limbs taken'], ['wall', 'wall slam', 'wall slams'], ['block', 'block', 'blocks']];
+  const start0 = G.fight.start;
+  G.fight.start = function () { G._snap = Object.assign({}, G.state.stats || {}); return start0.apply(this, arguments); };
+  ui.ledgerPage = function () {
+    const st = G.state, s = k => stat(st, k), won = Object.keys(st.wins).reduce((n, k) => n + st.wins[k], 0), cell = (v, l) => '<div class="stat"><b>' + v + '</b><small>' + l + '</small></div>';
+    show('<div class="card small"><h2>Your Page</h2><p class="dim">What the Ledger-Keeper has written beside your name, in the second column.</p><div class="pagegrid">' +
+      cell(won, 'bouts won') + cell(st.losses || 0, 'bouts lost') + cell(st.bestStreak || 0, 'best streak') + cell(s('mortal'), 'mortal blows') + cell(s('sever'), 'limbs taken') + cell(s('break'), 'postures broken') +
+      cell(s('parry'), 'parries') + cell(s('perfect'), 'perfect dodges') + cell(s('heavy'), 'heavy blows') + cell(s('wall'), 'wall slams') + cell(st.contractsDone || 0, 'contracts') + cell(Object.keys(st.deeds || {}).length, 'deeds') +
+      '</div><div class="row end"><button class="big" id="b">Back</button></div></div>');
+    on('#b', () => ui.board());
   };
   // results: streak purse and contract payout
   const res0 = ui.results;
@@ -46,9 +59,12 @@
     const st = G.state; let extra = [];
     if (r.win && !r.forfeit) { st.streak = (st.streak || 0) + 1; const b = Math.round((r.coin || 0) * Math.min(0.25, (st.streak - 1) * 0.05)); if (b > 0) { st.coin += b; extra.push('Win streak of ' + st.streak + ': <b>+' + b + ' coin</b> from the crowd.'); } }
     else st.streak = 0;
+    st.bestStreak = Math.max(st.bestStreak || 0, st.streak || 0);
+    const snap = G._snap || {}, acct = KEYS.map(k => [stat(st, k[0]) - (snap[k[0]] || 0), k]).filter(q => q[0] > 0).map(q => '<span><b>' + q[0] + '</b> ' + (q[0] === 1 ? q[1][1] : q[1][2]) + '</span>');
     const done = G.contract.settle(); if (done) extra.push('Contract honoured: <b>' + done.c.name + '</b>. +' + done.p.coin + ' coin, +' + done.p.respect + ' respect.');
     G.save(); res0.apply(this, arguments);
     const end = document.querySelector('#panel .card.res .row.end'); if (end) extra.forEach(t => { const p = document.createElement('p'); p.className = 'rankup'; p.innerHTML = t; end.parentNode.insertBefore(p, end); });
+    const rw = document.querySelector('#panel .card.res .rewards'); if (rw && acct.length) { const d = document.createElement('div'); d.className = 'acct'; d.innerHTML = '<small>The crier’s account</small>' + acct.join(''); rw.parentNode.insertBefore(d, rw); }
     if (done) G.sfx('coin');
   };
   // tell the objective line about an open contract

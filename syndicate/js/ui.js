@@ -276,7 +276,7 @@
       el.querySelector('.hp i').style.width = Math.max(0, e.hp / e.maxHp * 100) + '%';
       el.querySelector('.hp b').style.width = Math.min(100, e.shield / e.maxHp * 100) + '%';
       el.querySelector('.hp span').textContent = Math.max(0, Math.ceil(e.hp)) + ' / ' + e.maxHp;
-      el.querySelector('.res i').style.width = e.res + '%';
+      el.querySelector('.res i').style.width = e.res + '%'; el.querySelector('.res').classList.toggle('low', e.res < 22);
       let pz = el.querySelector('.pz'); if (!pz) { pz = document.createElement('div'); pz.className = 'bar pz'; pz.innerHTML = '<i></i>'; const rs = el.querySelector('.res'); rs.parentNode.insertBefore(pz, rs.nextSibling); }
       pz.firstChild.style.width = Math.max(0, (e.poise || 0) / (e.maxPoise || 1) * 100) + '%'; pz.classList.toggle('low', e.poise < e.maxPoise * 0.3); pz.classList.toggle('brk', !!e.st.broken);
       const s = stStr(e), se = el.querySelector('.hud-status'); if (se.textContent !== s) se.textContent = s;
