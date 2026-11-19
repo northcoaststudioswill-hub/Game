@@ -220,6 +220,13 @@ between("  function updateFinisher(dt) {", "  pl.update = function (dt, rdt) {",
 
 `);
 
+/* ---- ground that holds still: more depth precision close in, sharper texture at a slant ---- */
+rep("G.camera = new THREE.PerspectiveCamera(SC.T.camFov, 1, 0.25, 500);", "G.camera = new THREE.PerspectiveCamera(SC.T.camFov, 1, 0.45, 520);");
+rep("    t.anisotropy = 4;", "    t.anisotropy = 8;");
+rep("sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.04;", "sun.shadow.bias = -0.0009; sun.shadow.normalBias = 0.07;");
+/* ---- the music up here is the shift song, not a city's walking bass ---- */
+rep("const BASS = [38, 0, 38, 41, 0, 43, 0, 36, 38, 0, 45, 43, 0, 41, 36, 0], LEAD = [62, 65, 69, 0, 67, 65, 0, 62];", "const BASS = [38, 0, 38, 45, 0, 43, 0, 41, 38, 0, 45, 43, 0, 41, 40, 0], LEAD = [62, 65, 69, 67, 65, 64, 62, 0];");
+
 if (/Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow/.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''))) {
   const m = s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').match(/.{0,60}(Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow).{0,40}/g);
   console.log('LEFTOVER:', m.slice(0, 12));

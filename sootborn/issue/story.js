@@ -192,7 +192,7 @@
       { who: 'hero', face: 'shock', text: 'Nobody needs forty halberds to guard a barge. This was never a watch. It is a *stair party*.' }]) });
     W.addInteract({ id: 'ledger', x: -27.2, y: 4, z: -8.7, fx: -29, fz: -8.7, r: 2.1, label: 'SEARCH', marker: 'clue', mh: 1.8, when: () => F.e_wh && !F.ledger, act: clue('ledger', [
       { who: 'cap', text: 'The dock log, open under the lamp. An entry at the first bell, in the Stair Captain\'s hand.' },
-      { who: 'hero', face: 'angry', text: '"By order, the Clerk\'s rota is set aside. *Rook* to hold the moorings." Initialled by Marshal Cade.' },
+      { who: 'hero', face: 'angry', text: '"By order, the Clerk\'s rota is set aside. In the Dockmaster\'s absence *Rook* holds the moorings." Initialled by Marshal Cade.' },
       { who: 'cap', text: 'Somebody gave Cade the hour. I did not have the time to wonder who. Clipped to the page: a key marked ROOF.' }], () => { setFlag('ledger'); U.toast('*ROOF KEY* TAKEN. THE BACK STAIRS GO UP.', 3.5); }) });
     W.addInteract({ id: 'loft', x: -27.8, y: 9, z: -26.7, fx: -29.7, fz: -26.7, r: 2.1, label: 'LOOK', marker: 'clue', mh: 1.8, when: () => !F.clue_loft, act: clue('loft', [
       { who: 'cap', text: 'A signal hut. The lamp inside is aimed straight down the Spire, and the glass is still warm.' },

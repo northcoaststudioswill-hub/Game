@@ -1,5 +1,27 @@
 # SOOTBORN — changelog
 
+## v0.29.6 · 2026-11-19 — the High Docks: steadier ground, and what leads in and out of it
+From play notes: some glitchy ground textures; tighten it up, then work out how it fits the game, the lore and the story, and build what leads in and out; then keep polishing, the new sections most.
+
+**Ground**
+- No two surfaces sit at the same height any more: the hall runner was level with the bond-house floor, the causeway overlapped the quay, and a slab under the crane overlapped the deck. Painted layers (lane lines, puddles, kneeling plates, the Watcher inlay) are now stacked with clear gaps.
+- More depth precision close to the camera, sharper textures at a slant, and a wider shadow bias so the deck does not stripe.
+- I could not see the glitch you saw in my own renders, so these are the likely causes fixed, not a confirmed one. If it is still there, tell me where on the level and what it looks like.
+
+**What leads in** (Part Two, chapter 3, after Freight Three)
+- **The Dock Stair**, told below-style: what the stair is (nine hundred steps on the outside of the Spire; porters use it, the Accredited have a lift); who has which part of the night (Ilse and forty Unlit on the lower basins, Sable aboard the lead hull, Brand and Kael at the top); who keeps the docks (Dockmaster Vant, at table with the Marshal tonight; his Stair Captain, Rook, has the watch); what Kael sees at the gate (statues, trees, a running fountain, six tiers over Nell counting water by the cup); then the second bell.
+
+**What leads out**
+- From Mooring One he watches the fleet go into the weather, takes the Count's sun off his collar and lets it go over the rail. "Edric Sorrel went over the rail with it. What was left ran for the stair."
+- Chapter 4 now opens from there if you played the level: he comes down to an empty quay, and everything Rook had left is on the dock stair. (If the 2D fight played instead, chapter 4 opens as before.)
+
+**Fit**
+- Rook now sits under Vant, who was the dock's commander in the older 2D version, so both are true. The dock log says so.
+- The level's music is the shift song, like every other track in the game, not the city bass it came with.
+- The story bible now describes the level's fighting: the five beats, the Count, the memories.
+
+**Not done:** the wider polish pass on the rest of the game. This round went on the level and the scenes around it.
+
 ## v0.29.5 · 2026-11-19 — the High Docks: a five-beat chain, the Count in a fight, and words that are ours
 From play notes: the comic pop-ups on hits should say things from the lore, and there should be combos; keep improving the fighting animations and make sure every limb is rigged.
 

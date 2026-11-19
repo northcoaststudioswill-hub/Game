@@ -261,14 +261,34 @@ const P2 = {
     { say: 'brand', t: 'I know his name. I have known it seven years. I have never once said it. ...Hollis.' },
     { narr: 'He said it like a man putting down something he had carried up nine floors. Then he went to see to his halberd, and I let him, because I thought there would be a morning after.' },
     { fade: 'out' }, { panel: null },
+    // ---- the way up: what the dock stair is, who has which part of the night, and who keeps the docks
+    { music: 'mystery' }, { card: 'THE DOCK STAIR', sub: 'Seven years from now. Before the second bell.', big: 1, min: 1.5, max: 4.5 },
+    { panel: 'dockstair' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
+    { narr: 'Nine hundred steps go up the outside of the Spire to the High Docks. Porters climb them with a hundredweight on a strap. No Accredited has ever set a foot on them. There is a lift.' },
+    { narr: 'We went up in the dark with our boots wrapped. Ilse had the lower basins and forty of the Unlit. Sable was already aboard the lead hull with a knife on the mooring. Brand and I had the top.' },
+    { say: 'ilse', t: 'Four hundred hulls, in pairs. You will want to save every one. Cut the pair in front of you, soot. That is the whole of the method.' },
+    { say: 'kael', t: 'Vant keeps these docks.' },
+    { say: 'ilse', t: 'Dockmaster Vant dines with the Marshal on the last night of the quarter. His Stair Captain has the watch. A man called Rook. He is punctual. It is the worst thing one knows about him.' },
+    { say: 'brand', t: 'Nine minutes at the second bell. If they are there, I am a porter going home. If they are not, I am a stair.' },
+    { narr: 'At the gate I looked at the docks the way I had looked at them for three years from a window in the Count. Statues with lamps. Trees in tubs. A fountain, running. Six tiers under it Nell counts water by the cup.' },
+    { sfx: 'bell' }, { narr: 'Then the second bell rang, and the top of the stair was full of light.' },
+    { fade: 'out' }, { panel: null },
     { card: 'THE HIGH DOCKS', sub: 'Seven years from now. The second bell.', big: 1, min: 1.5, max: 4.5 },
-    { issue: 'docks', or: [{ brawl: () => FF.docks() }] }
+    { issue: 'docks', or: [{ brawl: () => FF.docks() }] },
+    // ---- the way out: the fleet is away, the sun goes over the rail, and the stair is still to pay for
+    { music: 'mystery' }, { panel: 'weather' }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
+    { narr: 'From Mooring One I watched four hundred hulls go into the weather with their lamps out. It was the largest theft in the history of the Count, and I was the clerk who would have had to enter it.' },
+    { narr: 'I took the Count\'s sun off my collar. Seven years I had worn it. It weighed about what a washer weighs. I held it over the rail and let go, and did not hear it land. Nothing up here lands.' },
+    { sfx: 'heart' }, { narr: 'Edric Sorrel went over the rail with it. What was left ran for the stair.' },
+    { fade: 'out' }, { panel: null }
   ],
   4: () => [
     { music: 'mystery' }, { card: 'TWO YEARS', sub: 'Seven to nine years from now.', big: 1, min: 1.6, max: 5 },
     { panel: 'dockstair' }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
-    { narr: 'The High Docks should have been dark at that bell. I had written the watch rota myself. They were on the stair with their lamps already lit.' },
-    { narr: 'Somebody had told them the hour. Brand looked at the lamps, and then at me, and counted them the way a Warden counts.' },
+    { when: () => !G.flags.issue_docks, narr: 'The High Docks should have been dark at that bell. I had written the watch rota myself. They were on the stair with their lamps already lit.' },
+    { when: () => !G.flags.issue_docks, narr: 'Somebody had told them the hour. Brand looked at the lamps, and then at me, and counted them the way a Warden counts.' },
+    { when: () => !!G.flags.issue_docks, narr: 'I came down off Mooring One three steps at a time. The quay was empty. Everything Rook had left was on the dock stair, and all of it was going down.' },
+    { when: () => !!G.flags.issue_docks, narr: 'Every Warden under the docks had answered that signal lamp. Brand had counted them coming, the way a Warden counts, and had not sent anyone to tell me.' },
     { narr: 'Brand held the dock stair behind us while we cut the last moorings. He had been a Warden. He knew exactly how many of them it would take, and that it was more than he had minutes.' },
     { pstage: 1 }, { wait: 2.4 },
     { narr: 'He said: go. I said no. He said: Brennick, I put a halberd butt into a welder for humming, once. I have been waiting seven years for a stair. Go.' },
@@ -406,7 +426,7 @@ const P2 = {
   ]
 };
 const P2_TITLES = { 1: 'The Post', 2: 'The Balancing', 3: 'What She Knows', 4: 'Two Years', 5: 'The Count' };
-const P2KEYS = ['lucanFriend', 'signedFour', 'liedToHer', 'ending', 'marenKind', 'marenDoor', 'wrenMet', 'wrenClose', 'wrenAsk', 'fury', 'rays', 'ranForHer'];
+const P2KEYS = ['lucanFriend', 'signedFour', 'liedToHer', 'ending', 'marenKind', 'marenDoor', 'wrenMet', 'wrenClose', 'wrenAsk', 'fury', 'rays', 'ranForHer', 'issue_docks'];
 function p2Save() { try { const o = {}; for (const k of P2KEYS) if (G.flags[k] !== undefined) o[k] = G.flags[k]; Store.set('sootborn_p2f', JSON.stringify(o)); if (G.tendency) Store.set('sootborn_tend', G.tendency); } catch (e) { } }
 function p2Load() { try { G.flags = G.flags || {}; const o = JSON.parse(Store.get('sootborn_p2f') || '{}'); for (const k of P2KEYS) if (G.flags[k] === undefined && o[k] !== undefined) G.flags[k] = o[k]; if (!G.tendency && Store.get('sootborn_tend')) G.tendency = Store.get('sootborn_tend'); } catch (e) { } }
 function playPart2(n) { p2Load(); Store.set('sootborn_p2', String(n)); UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(P2[n](), () => afterPart2(n)); }

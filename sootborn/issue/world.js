@@ -102,16 +102,16 @@
 
     // ----- the shelf itself -----
     D('concrete', 0, -0.75, -18, 92, 1.5, 72, DECK, { outline: 0 });                           // main deck: quay, yard, bond house, roofs' footings
-    D('concrete', 0, -0.75, 34, 7.8, 1.5, 32.4, DECK, { outline: 0.06 });                      // the causeway out to the dock stair
+    D('concrete', 0, -0.76, 34.15, 7.8, 1.5, 32.2, DECK, { outline: 0.06 });                      // the causeway out to the dock stair
     B('flat', -46.2, 17.9, -3.9, 18.25, -1.6, -1.2, GILT, { outline: 0.04, col: false }); B('flat', 3.9, 17.9, 46.2, 18.25, -1.6, -1.2, GILT, { outline: 0.04, col: false });
     D('concrete', 0, -1.9, 18.6, 92, 0.9, 1.6, STONE2, { outline: 0.06 });
     for (let x = -42; x <= 42; x += 7) if (Math.abs(x) > 5) { D('concrete', x, -3.4, 18.9, 0.9, 4.4, 2.2, STONE2, { rx: 0.5, outline: 0.06 }); }
     for (let z = 22; z <= 46; z += 6) { D('concrete', 0, -2.6, z, 7.2, 2.4, 0.8, STONE2, { outline: 0.05 }); D('flat', 0, -1.55, z, 8.1, 0.2, 0.3, GILT, { outline: 0.03 }); }
     // deck inlay: gilt lines the freight sleds follow, and the mooring numbers
-    for (let x = -37; x < 40; x += 6) D('flat', x, 0.012, 12, 2.6, 0.02, 0.16, GILT, { outline: 0 });
-    D('flat', 0, 0.012, 15.2, 79, 0.02, 0.1, DECK2, { outline: 0 }); D('flat', 0, 0.012, 8.8, 79, 0.02, 0.1, DECK2, { outline: 0 });
-    for (let z = 20; z < 46; z += 2.2) D('flat', 0, 0.012, z, 0.14, 0.02, 1.2, GILT, { outline: 0 });
-    [[1.2, 40.8, 2.2, 1.3], [-1.4, 33, 1.6, 2.4], [1.6, 25.5, 2.4, 1.2], [-20, 10, 3, 1.6], [14, 13, 2.4, 1.4], [22, -6, 3, 2], [-6, -38, 3, 2]].forEach(p => D('flat', p[0], 0.014, p[1], p[2], 0.02, p[3], 0x5c5e9c, { outline: 0, ry: 0.4 }));
+    for (let x = -37; x < 40; x += 6) D('flat', x, 0.011, 12, 2.6, 0.02, 0.16, GILT, { outline: 0 });
+    D('flat', 0, 0.011, 15.2, 79, 0.02, 0.1, DECK2, { outline: 0 }); D('flat', 0, 0.011, 8.8, 79, 0.02, 0.1, DECK2, { outline: 0 });
+    for (let z = 20; z < 46; z += 2.2) D('flat', 0, 0.011, z, 0.14, 0.02, 1.2, GILT, { outline: 0 });
+    [[1.2, 40.8, 2.2, 1.3], [-1.4, 33, 1.6, 2.4], [1.6, 25.5, 2.4, 1.2], [-20, 10, 3, 1.6], [14, 13, 2.4, 1.4], [22, -6, 3, 2], [-6, -38, 3, 2]].forEach(p => D('flat', p[0], 0.032, p[1], p[2], 0.02, p[3], 0x5c5e9c, { outline: 0, ry: 0.4 }));
 
     // ----- the causeway and the head of the dock stair -----
     wall(-4.3, 18, -3.5, 46.4); wall(3.5, 18, 4.3, 46.4); wall(-3.5, 46, 3.5, 46.6);
@@ -146,7 +146,7 @@
     standard(-39.2, 8.2, 0, 6.2, VIOLET); standard(-39.2, 15.8, 0, 6.2, TEAL);
     // east end: the quay runs out into the air; a cargo crane stands over the drop
     wall(40, 6, 40.6, 18); rail(40.25, 6.3, 40.25, 18, 0);
-    B('concrete', 40.6, 6, 46, 18, -1.5, 0.02, DECK, { outline: 0.05, col: false }); D('brick', 43.4, 3.0, 12, 3.2, 6, 3.2, STONE2, { outline: 0.08 }); D('flat', 43.4, 6.2, 12, 3.6, 0.4, 3.6, GILT, { outline: 0.04 });
+    D('brick', 43.4, 3.0, 12, 3.2, 6, 3.2, STONE2, { outline: 0.08 }); D('flat', 43.4, 6.2, 12, 3.6, 0.4, 3.6, GILT, { outline: 0.04 });
     line(43.4, 6.4, 12, 43.4, 16, 12, 0.22); line(43.4, 15.4, 12, 43.4, 13.2, 26, 0.16); line(43.4, 15.4, 12, 43.4, 14.2, 5, 0.16); line(43.4, 16, 12, 43.4, 13.3, 25.6, 0.04); line(43.4, 13.2, 25.4, 43.4, 5.5, 25.4, 0.035);
     D('crate', 43.4, 4.8, 25.4, 1.5, 1.5, 1.5, 0xb98a55, { ry: 0.3, outline: 0.05 }); D('glow', 43.4, 16.4, 12, 0.4, 0.4, 0.4, TLAMP, { outline: 0 });
     sign('AIR BREATHED. AIR OWED.', 40.0, 3.4, 12, -Math.PI / 2, 8, 1.2, '#e8c25a', '#0b0d24');
@@ -190,7 +190,7 @@
     D('flat', 14.95, 0.25, -0.5, 1, 0.07, 0.9, 0x8d94ac, { outline: 0.02 });
     D('metal', 31.8, 1.5, -8, 0.3, 1.2, 0.9, GILT, { outline: 0.05 }); D('flat', 31.62, 1.5, -8, 0.06, 0.5, 0.12, 0x15151f, { outline: 0 }); D('glow', 31.62, 2.3, -8, 0.06, 0.16, 0.16, 0xff5a1f, { outline: 0 });
     lamp(8, -19.4, 1, 0); lamp(31.4, 3.6, -1, 0);
-    for (let x = 9; x < 31; x += 5.5) D('flat', x, 0.012, -9, 0.14, 0.02, 20, GILT, { outline: 0 });
+    for (let x = 9; x < 31; x += 5.5) D('flat', x, 0.011, -9, 0.14, 0.02, 20, GILT, { outline: 0 });
     // the yard gantry: a rail overhead from the gate to the back wall
     [[7.2, 3.2], [7.2, -19.6]].forEach(p => line(p[0], 0, p[1], p[0], 7.4, p[1], 0.14)); line(7.2, 7.3, 3.4, 7.2, 7.3, -19.8, 0.12); line(7.2, 7.3, -6, 7.2, 5.2, -6, 0.03); D('flat', 7.2, 5.0, -6, 0.3, 0.4, 0.3, GILT, { outline: 0.03 });
 
@@ -239,7 +239,7 @@
     [[-11, -7.5], [-1, -7.5], [-11, 3], [-1, -17]].forEach(p => { B('concrete', p[0] - 0.34, p[1] - 0.34, p[0] + 0.34, p[1] + 0.34, 0, 8, STONE, { outline: 0.04 }); D('concrete', p[0], 0.3, p[1], 1, 0.6, 1, STONE2, { outline: 0.04 }); D('flat', p[0], 7.5, p[1], 0.95, 0.3, 0.95, TRIM, { outline: 0.03 }); });
     crateStatic(3.6, -17.6, 1.6); crateStatic(3.9, -15.9, 1.2); crateStatic(3.7, -17.5, 1, 1.6, 0xd9a05f); crateStatic(-20.6, 0.6, 1.4); crateStatic(-25, -2, 1.3); crateStatic(-27.5, -14, 1.5);
     crate(-4.6, 4.4, 1, 0, 'hp'); crate(-5.7, 4.5, 1); crate(-18.6, -17.8, 1, 0, 'meter'); crate(2.6, 3.4, 1, 0, 'hp'); crate(-29.6, -18, 1, 0, 'hp');
-    D('flat', -13, 0.02, -6.5, 30, 0.02, 0.5, VIOLET, { outline: 0 }); D('flat', -13, 0.022, -6.5, 30, 0.02, 0.1, TRIM, { outline: 0 });       // the runner down the hall
+    D('flat', -13, 0.052, -6.5, 30, 0.02, 0.5, VIOLET, { outline: 0 }); D('flat', -13, 0.074, -6.5, 30, 0.02, 0.1, TRIM, { outline: 0 });       // the runner down the hall
     [[-4.5, -9.5], [-15.5, -1], [-26, -8]].forEach((p, i) => {
       cyl('flat', p[0], 7.2, p[1], 0.02, 0.02, 1.8, 0x15151f, { outline: 0 }); cyl('flat', p[0], 6.2, p[1], 0.2, 0.7, 0.4, TRIM, { seg: 10, outline: 0.04 });
       D('glow', p[0], 5.98, p[1], 0.5, 0.06, 0.5, LAMP, { outline: 0 });
@@ -281,7 +281,7 @@
     crate(30, -34, 1, 11, 'hp'); crate(0.6, -24, 1, 11, 'hp'); crate(30, -40, 1, 11, 'meter');
     crate(-12, -24, 1, 9, 'hp'); crate(-30.6, -36, 1, 9, 'meter');
     [8, 22].forEach(x => { bollard(x, -44.9, 11); bollard(x, -23.3, 11); });
-    for (let x = 3; x < 31; x += 4.6) D('flat', x, 11.05, -34, 0.12, 0.02, 20, GILT, { outline: 0 });
+    for (let x = 3; x < 31; x += 4.6) D('flat', x, 11.07, -34, 0.12, 0.02, 20, GILT, { outline: 0 });
     // the pairs out past the north edge, riding level with the roof
     [[6, -66], [12.6, -66.4], [25, -64], [31.6, -64.6], [-20, -66], [-26.6, -66.5]].forEach((p, i) => bargeS(p[0], 9.2 + (i % 2) * 0.4 - (p[0] < 0 ? 2 : 0), p[1], Math.PI / 2 + (i % 3 - 1) * 0.04));
     [[8, 11.9, -45.2, 8, 10, -58], [22, 11.9, -45.2, 26, 10, -56], [-18, 9.9, -45.2, -21, 8, -58]].forEach(l => line(l[0], l[1], l[2], l[3], l[4], l[5], 0.045));
@@ -318,9 +318,9 @@
       blob(x, y + 2.3 * s, z, 0.75 * s, 0.7 * s, 0.75 * s, GREEN); blob(x + 0.2, y + 3.0 * s, z - 0.1, 0.5 * s, 0.5 * s, 0.5 * s, GREEN2);
     }
     // the Watcher, inlaid where the causeway meets the quay: everyone who comes up the stair walks across the eye
-    cyl('flat', 0, 0.016, 12, 2.5, 2.5, 0.02, GILT, { seg: 28, outline: 0 }); cyl('flat', 0, 0.02, 12, 2.1, 2.1, 0.02, DECK, { seg: 28, outline: 0 });
-    for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; D('flat', Math.sin(a) * 3.6, 0.016, 12 + Math.cos(a) * 3.6, 0.3, 0.02, i % 2 ? 1.2 : 2.0, GILT, { ry: a, outline: 0 }); }
-    D('flat', 0, 0.024, 12, 2.6, 0.02, 1.0, 0xffffff, { outline: 0 }); cyl('flat', 0, 0.028, 12, 0.48, 0.48, 0.02, IRON, { seg: 14, outline: 0 });
+    cyl('flat', 0, 0.053, 12, 2.5, 2.5, 0.02, GILT, { seg: 28, outline: 0 }); cyl('flat', 0, 0.074, 12, 2.1, 2.1, 0.02, DECK, { seg: 28, outline: 0 });
+    for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; D('flat', Math.sin(a) * 3.6, 0.053, 12 + Math.cos(a) * 3.6, 0.3, 0.02, i % 2 ? 1.2 : 2.0, GILT, { ry: a, outline: 0 }); }
+    D('flat', 0, 0.095, 12, 2.6, 0.02, 1.0, 0xffffff, { outline: 0 }); cyl('flat', 0, 0.116, 12, 0.48, 0.48, 0.02, IRON, { seg: 14, outline: 0 });
     // the Auditors on the quay rail, and on Mooring One
     statue(-18, 16.9, 0, 4.4, Math.PI); statue(18, 16.9, 0, 4.4, Math.PI);
     statue(10, -44.3, 11, 3.6, 0); statue(20, -44.3, 11, 3.6, 0);
@@ -342,9 +342,9 @@
     cyl('flat', -26.2, 0.4, 7.3, 0.3, 0.2, 0.8, GILT, { seg: 8, outline: 0.04 }); blob(-26.2, 0.92, 7.3, 0.24, 0.14, 0.24, GREEN, 0.03); cyl('glow', -25.7, 0.9, 7.5, 0.05, 0.05, 0.2, LAMP, { outline: 0 });
     [-29, -25].forEach(x => { D('flat', x, 1.3, 7.8, 0.1, 2.6, 0.1, GILT, { outline: 0.03 }); D('flat', x, 1.5, 7.76, 0.5, 2.0, 0.04, IVORY, { outline: 0.03 }); });
     // and ours: the line soot walk, the plates where porters kneel, the meter at the gate
-    for (let x = -30; x < 5; x += 1.6) D('flat', x, 0.014, 8.15, 1.0, 0.02, 0.14, IRON, { outline: 0 });
+    for (let x = -30; x < 5; x += 1.6) D('flat', x, 0.032, 8.15, 1.0, 0.02, 0.14, IRON, { outline: 0 });
     sign('SOOT WALK THE LINE', -9.5, 1.5, 6.14, 0, 3.6, 0.55, '#e8c25a', '#07070d'); sign('KNEEL AT THE BELL', -39.72, 1.5, 15.6, Math.PI / 2, 2.8, 0.5, '#e8c25a', '#07070d');
-    for (let x = -38.2; x < -35.4; x += 0.85) for (let z = 10.4; z <= 13.6; z += 0.8) D('flat', x, 0.014, z, 0.36, 0.02, 0.2, 0xb8902e, { outline: 0 });
+    for (let x = -38.2; x < -35.4; x += 0.85) for (let z = 10.4; z <= 13.6; z += 0.8) D('flat', x, 0.032, z, 0.36, 0.02, 0.2, 0xb8902e, { outline: 0 });
     D('metal', 16.9, 1.1, 6.5, 0.4, 2.2, 0.5, GILT, { outline: 0.05 }); D('glow', 16.9, 1.7, 6.77, 0.24, 0.5, 0.04, 0xff5a1f, { outline: 0 }); sign('AIR OWED', 16.9, 2.5, 6.78, 0, 1.3, 0.34, '#07070d', '#e8c25a');   // the breath meter every porter passes
     // a colonnade on the east edge of Mooring One, to frame the fleet
     [-43, -38, -33, -28].forEach(z => { cyl('concrete', 31.8, 13.95, z, 0.22, 0.27, 4.4, STONE, { outline: 0.04 }); D('flat', 31.8, 16.2, z, 0.7, 0.16, 0.7, GILT, { outline: 0.03 }); });

@@ -28,7 +28,7 @@ const Cutscene = {
   run(s) {
     const T = (x, y) => ({ x: x * 16 + 8, y: y * 16 + 12 });
     if (s.when && !s.when()) return false;
-    if (s.issue) { const rest = this.steps.slice(this.i), cb = this.onEnd, or = s.or || []; this.onEnd = null; this.steps = []; this.end(); Issue.start(s.issue, ok => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play((ok ? [] : or).concat(rest), cb); }); return true; }
+    if (s.issue) { const rest = this.steps.slice(this.i), cb = this.onEnd, or = s.or || []; this.onEnd = null; this.steps = []; this.end(); Issue.start(s.issue, ok => { G.flags['issue_' + s.issue] = ok ? 1 : 0; Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play((ok ? [] : or).concat(rest), cb); }); return true; }
     if (s.mission) { const rest = this.steps.slice(this.i), cb = this.onEnd; this.onEnd = null; this.steps = []; this.end(); Mission.start(s.mission, () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(rest, cb); }); return true; }
     if (s.card !== undefined) { this.card(s.card, s.sub, s.big); if (s.sfx) Sound.play(s.sfx); this.block = { type: 'card', t: 0, min: s.min || 1.4, max: s.max || 7 }; return true; }
     if (s.scene) { this.hideCard(); this.panel = null; World.load(s.scene, null, true); this.actors = []; this.dark = s.dark || null; this.cam = { x: s.cam[0] * 16 + 8, y: s.cam[1] * 16 }; this.pillarRed = false; this.beam = 0; this.furnace = 0; this.motes = []; this.zoomT = s.zoom || 1; this.zoom = this.zoomT; return false; }
