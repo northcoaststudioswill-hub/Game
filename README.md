@@ -52,6 +52,11 @@ A pocket game console in one HTML file, by North Coast Studios. Seven game cartr
 | Every older version (frozen, never edited) | [`LATEST.md`](LATEST.md) has the table: `v0.1/`, `v0.2/`, `v0.3/`, `v0.35/` |
 | The public web copy (GitHub Pages) | [`docs/`](docs/) (still the old four-cartridge build; updated only when Will says so) |
 
+## Also in this repo: GODMODE.EXE
+
+A separate game, not a cartridge: a mobile-first 3D god game in one HTML file, in its own folder. Play
+[`godmode/index.html`](godmode/index.html); details and changelog in [`godmode/README.md`](godmode/README.md).
+
 ## Branches
 
 `main` holds this seven-cartridge build as of Nov 18 2026. Work in progress happens on working branches and shows here
