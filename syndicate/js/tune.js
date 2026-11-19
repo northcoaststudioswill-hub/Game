@@ -32,7 +32,7 @@
   const fs0 = G.fight.start;
   G.fight.start = function (o) { const r = fs0.apply(this, arguments), st = G.state, P = G.fight.P; if (!P || G.fight.ex) return r;
     P.mastered = !!(G.mastery && G.mastery.level(st, P.basic) >= 5 && A[P.basic + '_m']);
-    if (P.mastered && !(o && o.spar) && G.ARM_BY[P.basic] && G.SIG[P.basic]) { st.sigSeen = st.sigSeen || {}; if (!st.sigSeen[P.basic]) { st.sigSeen[P.basic] = 1; setTimeout(() => G.ui.toast('Mastered: your heavy blow with the ' + G.ARM_BY[P.basic].name + ' is now ' + G.SIG[P.basic].name + '. It ' + G.SIG[P.basic].text + '.'), 1800); } }
+    if (P.mastered && !(o && o.spar) && G.ARM_BY[P.basic] && G.SIG[P.basic]) { st.sigSeen = st.sigSeen || {}; if (!st.sigSeen[P.basic]) { const wid = P.basic; st.sigSeen[wid] = 1; setTimeout(() => G.ui.toast('Mastered: your heavy blow with the ' + G.ARM_BY[wid].name + ' is now ' + G.SIG[wid].name + '. It ' + G.SIG[wid].text + '.'), 1800); }       // the weapon as it was at the bell: a druid may be a wolf by the time this shows }
     return r; };
   // the Armoury says what mastery will give
   const arm0 = G.ui.armory;
