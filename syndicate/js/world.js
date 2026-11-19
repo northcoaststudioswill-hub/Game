@@ -70,6 +70,7 @@
         const cl = new T.PointLight(0xff9a50, 5, 9, 1.6); cl.position.set(mx + nx * 0.2, 2.2, mz + nz * 0.2); cineG.add(cl); continue; }
       const H = 3.4;
       const w = wall(s, L + 1.1, H, 1, mat); w.position.set(mx + nx * 1.1, 0, mz + nz * 1.1); w.rotation.y = rot;
+      { const pl = box(L + 1.0, 0.42, 0.34, matDark, mx + nx * 0.5, 0.21, mz + nz * 0.5, s); pl.rotation.y = rot; const sc2 = box(L + 1.0, 0.14, 0.16, matDark, mx + nx * 0.56, 1.02, mz + nz * 0.56, s); sc2.rotation.y = rot; const cp = box(L + 1.0, 0.2, 0.3, matDark, mx + nx * 0.52, 3.3, mz + nz * 0.52, s); cp.rotation.y = rot; }
       const walk = box(L + 3.2, 0.36, 3.4, matDark, mx + nx * 3.2, H + 0.1, mz + nz * 3.2, s); walk.rotation.y = rot;
       const rail = box(L + 1.6, 0.5, 0.2, matDark, mx + nx * 1.75, H + 0.5, mz + nz * 1.75, s); rail.rotation.y = rot;
       const back = wall(s, L + 5.4, 5.2, 1, matDark); back.position.set(mx + nx * 5.2, H, mz + nz * 5.2); back.rotation.y = rot;
@@ -110,10 +111,29 @@
       else { const b = box(0.07, 0.03, R(0.6, 1), steelM, x, 0.03, z, s); b.rotation.y = R(0, 3); }
     }
     [[-AR - 0.2, 2.6, 1.57], [-AR - 0.2, -2.6, 1.57], [2.6, -AR - 0.2, 0], [-2.6, -AR - 0.2, 0]].forEach(q => {
-      const g = new T.Group(); g.position.set(q[0] + (q[2] ? 0.72 : 0), 0, q[1] + (q[2] ? 0 : 0.72)); g.rotation.y = q[2]; s.add(g);
-      box(1.7, 1.5, 0.14, ironM, 0, 1.05, -0.02, g); box(1.8, 0.1, 0.2, steelM, 0, 1.82, 0, g); box(1.8, 0.1, 0.2, steelM, 0, 0.28, 0, g);
-      for (let r = 0; r < 3; r++) for (let k = 0; k < 4; k++) { const sp = mesh(new T.ConeGeometry(0.075, 0.95, 5), steelM, -0.6 + k * 0.4 + (r % 2) * 0.1, 0.6 + r * 0.45, 0.5, g); sp.rotation.x = Math.PI / 2; }       // points toward the sand
+      // a spike wall is part of the wall: a stone buttress, an iron plate bolted into it, and the points driven through from behind
+      const g = new T.Group(); g.position.set(q[0] - (q[2] ? 0.35 : 0), 0, q[1] - (q[2] ? 0 : 0.35)); g.rotation.y = q[2]; s.add(g);
+      box(2.5, 2.9, 0.62, mat, 0, 1.45, 0.2, g); box(2.8, 0.32, 0.8, matDark, 0, 0.16, 0.24, g); box(2.8, 0.26, 0.76, matDark, 0, 3.0, 0.22, g); [-1.32, 1.32].forEach(x => box(0.26, 2.9, 0.74, matDark, x, 1.45, 0.24, g));
+      box(2.05, 2.05, 0.09, ironM, 0, 1.38, 0.55, g); [[-0.93, 0.45], [0.93, 0.45], [-0.93, 2.3], [0.93, 2.3], [0, 0.45], [0, 2.3]].forEach(p => mesh(new T.SphereGeometry(0.07, 6, 5), steelM, p[0], p[1], 0.62, g));
+      [0.78, 1.38, 1.98].forEach(y => box(2.05, 0.07, 0.05, steelM, 0, y - 0.3, 0.61, g));
+      for (let r = 0; r < 4; r++) for (let k = 0; k < 5; k++) { const x = -0.76 + k * 0.38 + (r % 2) * 0.12, y = 0.66 + r * 0.46, len = 0.62 + ((r * 5 + k) % 3) * 0.11; mesh(new T.CylinderGeometry(0.085, 0.1, 0.07, 6), ironM, x, y, 0.6, g).rotation.x = Math.PI / 2; const sp = mesh(new T.ConeGeometry(0.06, len, 5), steelM, x, y, 0.6 + len / 2, g); sp.rotation.x = Math.PI / 2; }
+      { const st = new T.Mesh(new T.PlaneGeometry(1.5, 1.2), new T.MeshBasicMaterial({ map: gfx.tex('blood'), color: 0x7a1010, transparent: true, opacity: 0.75, depthWrite: false })); st.position.set(R(-0.2, 0.2), 0.95, 0.605); g.add(st); const pool = gfx.decal(gfx.tex('blood'), 2.2, 0x8a1a14, 0.6); pool.position.set(0, 0.016, 1.3); g.add(pool); }
     });
+    // ---- what the last bouts left behind: set out fresh before each fight, and not always there
+    const remG = new T.Group(); s.add(remG); const remains = [];
+    { const skin = [0xc9977a, 0x7f9a62, 0x8a6a52, 0xb5564e].map(c => gfx.lambert(c)), gorem = gfx.lambert(0x6a0e0c), cloth = [0x4a4031, 0x3a3a50, 0x5a2a2a].map(c => gfx.lambert(c));
+      const piece = fn => { const g = new T.Group(); fn(g); g.visible = false; const d = gfx.decal(gfx.tex('blood'), 1.5, 0x8a1a14, 0.7); d.position.y = -0.05; g.add(d); remG.add(g); remains.push(g); };
+      for (let i = 0; i < 4; i++) piece(g => { const sk = skin[i % 4]; mesh(new T.SphereGeometry(0.17, 7, 6), sk, 0, 0.16, 0, g); if (i % 2) { const hm = mesh(new T.SphereGeometry(0.19, 7, 5, 0, 6.28, 0, 1.7), steelM, 0, 0.18, 0, g); hm.rotation.x = 0.4; } else box(0.3, 0.1, 0.2, gfx.lambert(0x2a1c10), 0, 0.27, -0.06, g); mesh(new T.CylinderGeometry(0.07, 0.09, 0.08, 6), gorem, 0, 0.02, 0.1, g); });
+      for (let i = 0; i < 4; i++) piece(g => { const sk = skin[(i + 1) % 4]; const a1 = box(0.13, 0.11, 0.42, cloth[i % 3], 0, 0.07, 0, g); const a2 = box(0.11, 0.1, 0.38, sk, 0.06, 0.07, 0.36, g); a2.rotation.y = 0.5; box(0.13, 0.09, 0.14, sk, 0.14, 0.06, 0.58, g); mesh(new T.SphereGeometry(0.08, 6, 5), gorem, 0, 0.07, -0.22, g); });
+      for (let i = 0; i < 3; i++) piece(g => { const l1 = box(0.17, 0.15, 0.5, cloth[(i + 1) % 3], 0, 0.09, 0, g); const l2 = box(0.15, 0.14, 0.46, cloth[(i + 1) % 3], -0.05, 0.09, 0.44, g); l2.rotation.y = -0.4; box(0.18, 0.12, 0.26, gfx.lambert(0x1c1410), -0.15, 0.07, 0.7, g); mesh(new T.SphereGeometry(0.1, 6, 5), gorem, 0, 0.09, -0.27, g); });
+      for (let i = 0; i < 2; i++) piece(g => { box(0.5, 0.26, 0.6, cloth[i], 0, 0.14, 0, g); mesh(new T.SphereGeometry(0.2, 7, 5), gorem, 0, 0.16, -0.3, g).scale.y = 0.6; for (let k = 0; k < 4; k++) { const rb = mesh(new T.TorusGeometry(0.2, 0.022, 4, 8, Math.PI), boneM, 0, 0.2, -0.26 - k * 0.07, g); rb.rotation.z = 0; } });
+      for (let i = 0; i < 3; i++) piece(g => { const sk = mesh(new T.SphereGeometry(0.16, 7, 6), boneM, 0, 0.14, 0, g); sk.scale.set(1, 0.9, 1.15); box(0.16, 0.08, 0.1, boneM, 0, 0.05, 0.12, g); [-0.06, 0.06].forEach(x => mesh(new T.SphereGeometry(0.04, 5, 4), ironM, x, 0.16, 0.14, g)); if (i) for (let k = 0; k < 3; k++) { const bn = box(0.4, 0.05, 0.06, boneM, R(-0.3, 0.3), 0.04, R(0.3, 0.6), g); bn.rotation.y = R(0, 3); } }); }
+    const setRemains = n => { const pool = remains.slice().sort(() => Math.random() - 0.5); pool.forEach((g, i) => { g.visible = i < n; if (i >= n) return; let x = 0, z = 0; for (let k = 0; k < 12; k++) { const a = R(0, 6.28), r = R(2.6, 7.3); x = Math.cos(a) * r; z = Math.sin(a) * r; if (inOct(x, z, -0.9)) break; } g.position.set(x, 0.05, z); g.rotation.y = R(0, 6.28); }); };
+    // shackles on the walls and a gibbet or two overhead
+    [[-AR - 0.5, 0.2, 1.57], [0.2, -AR - 0.5, 0]].forEach(q => { const g = new T.Group(); g.position.set(q[0], 0, q[1]); g.rotation.y = q[2]; s.add(g); [-0.5, 0.5].forEach(x => { mesh(new T.TorusGeometry(0.09, 0.025, 5, 8), ironM, x, 2.3, 0.12, g); for (let k = 0; k < 5; k++) mesh(new T.TorusGeometry(0.05, 0.016, 4, 6), ironM, x, 2.16 - k * 0.11, 0.14, g).rotation.y = k % 2 ? 1.57 : 0; mesh(new T.TorusGeometry(0.08, 0.03, 5, 8), steelM, x, 1.58, 0.16, g).rotation.x = 1.57; }); });
+    [[-5.6, -5.6], [6.3, -3.2]].forEach((q, i) => { const g = new T.Group(); g.position.set(q[0], 5.6 + i * 0.5, q[1]); s.add(g); for (let k = 0; k < 8; k++) { const a = k * 0.785; mesh(new T.CylinderGeometry(0.02, 0.02, 1.5, 4), ironM, Math.cos(a) * 0.38, 0, Math.sin(a) * 0.38, g); } [0.75, 0, -0.75].forEach(y => mesh(new T.TorusGeometry(0.38, 0.03, 5, 12), ironM, 0, y, 0, g).rotation.x = 1.57); mesh(new T.ConeGeometry(0.4, 0.3, 8), ironM, 0, 0.9, 0, g); mesh(new T.CylinderGeometry(0.02, 0.02, 3, 4), ironM, 0, 2.5, 0, g);
+      const sk = mesh(new T.SphereGeometry(0.13, 6, 5), boneM, 0.05, 0.25, 0, g); sk.scale.y = 0.9; box(0.2, 0.5, 0.14, boneM, 0, -0.15, 0, g); box(0.07, 0.5, 0.07, boneM, 0.16, -0.5, 0.05, g).rotation.z = 0.5; });
+    { const worn = new T.Mesh(new T.RingGeometry(3.2, 5.6, 40), new T.MeshBasicMaterial({ color: 0x1a1210, transparent: true, opacity: 0.16, depthWrite: false })); worn.rotation.x = -Math.PI / 2; worn.position.y = 0.011; s.add(worn); }
     [[5, 0], [-5, 0], [0, 5], [0, -5]].forEach(q => { const gr = box(0.9, 0.02, 0.9, new T.MeshBasicMaterial({ color: 0x08060a }), q[0], 0.012, q[1], s); gr.castShadow = false; for (let k = -1; k <= 1; k++) box(0.9, 0.03, 0.06, ironM, q[0], 0.02, q[1] + k * 0.28, s); });
     // crowd
     const n = crowdSpots.length, bodies = new T.InstancedMesh(new T.CapsuleGeometry(0.2, 0.45, 2, 6), new T.MeshLambertMaterial({ flatShading: true }), n), heads = new T.InstancedMesh(new T.SphereGeometry(0.16, 6, 5), new T.MeshLambertMaterial({ flatShading: true }), n);
@@ -150,7 +170,7 @@
       if (hypeNow > 0.75 && n && Math.random() < 0.35) { const p = crowdSpots[Math.floor(Math.random() * n)]; gfx.emit(p[0], p[1] + 1, p[2], -p[0] * R(0.25, 0.5), R(2, 4), -p[2] * R(0.25, 0.5), 1.4, 0xffd36b, 9); }
     };
     update(0);
-    return { scene: s, update, garden: v => { gardenG.visible = !!v; bodies.visible = heads.visible = !v; s.background = v ? gardenSky : bg0; s.fog = v ? null : fog0; }, inGarden: () => gardenG.visible, cineWall: v => { cineG.visible = !!v && !gardenG.visible; }, setHype: h => { hypeNow = h; }, flash: new T.PointLight(0xffffff, 0, 14, 1.4) };
+    return { scene: s, update, remains: n => setRemains(n | 0), garden: v => { gardenG.visible = !!v; remG.visible = !v; bodies.visible = heads.visible = !v; s.background = v ? gardenSky : bg0; s.fog = v ? null : fog0; }, inGarden: () => gardenG.visible, cineWall: v => { cineG.visible = !!v && !gardenG.visible; }, setHype: h => { hypeNow = h; }, flash: new T.PointLight(0xffffff, 0, 14, 1.4) };
   }
 
   W.get = function (name) {

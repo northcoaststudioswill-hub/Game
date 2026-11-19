@@ -29,7 +29,7 @@
     };
   }
 
-  F.start = function (o) { hazT = 0; haz.length = 0;
+  F.start = function (o) { hazT = 0; haz.length = 0; { const ar = G.world.get('arena'); if (ar.remains) ar.remains(o && (o.spar || o.garden) ? 0 : Math.random() < 0.7 ? 2 + Math.floor(Math.random() * 6) : 0); }
     opp = o; const st = G.state, h = st.hero;
     arena = G.world.get('arena'); sc = arena.scene; gfx.setScene(sc);
     if (F.P) [F.P, F.E].forEach(e => { if (e.vis) { sc.remove(e.vis.g); if (e.vis.tele) sc.remove(e.vis.tele); } });

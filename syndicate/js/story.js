@@ -54,7 +54,7 @@
         S('npc', 'Ferren Voss', 'Same terms. And the loser carries the winner’s bag to the gate, the night they fight Vexa.', 'npc')],
       choices: [{ label: 'Again, then', go: () => { done(); rivalDuel(st, 2); } }, { label: 'Another night', go: () => { flags(st).rival2 = 0; flags(st).rivalAsk = bouts(st) + 2; G.save(); back(); } }], done: () => { flags(st).rival2 = 0; flags(st).rivalAsk = bouts(st) + 2; G.save(); back(); } }) },
     { id: 'cloak', when: st => !!st.wins.brakk, scene: (st, done) => ({ place: 'arena', npc: [-1.6, -1.6], you: [1.9, 1.9], spawn: { look: CLOAK }, lines: [
-        S('', '', 'A man in a plain grey cloak is standing where Brakk Ironjaw fell. The sawdust has not been swept.', 'wide'),
+        S('', '', 'A man in a plain grey cloak is standing where your last opponent fell. The sawdust has not been swept.', 'wide'),
         S('npc', 'The Man in Grey', 'Forty fights he stood here. I signed the order that sent him down the Stair. He was the best gate-sergeant I ever had.', 'npc'),
         S('you', st.hero.name, 'Vilhelm van Koheneim IV.', 'you'),
         S('npc', 'Vilhelm van Koheneim IV', 'Down here I am a man in a cloak. My wife, Eerin Koheneim, believes this place keeps the realm quiet. I come to see what the quiet costs.', 'low'),

@@ -653,3 +653,5 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .card.letter .choices small, .card.letter button small { color: #e0d6bc; font-size: 0.78rem; letter-spacing: 0.04em; }
 .card.letter .choices button b { font-size: 1.08rem; text-shadow: 0 1px 2px #000; } .card.letter button:disabled b { color: #9a8f7a; }
 .card.letter .choices button.big b { text-shadow: none; } .card.letter .choices button.big small { color: #3a2a10; }
+.ruled { margin: 0.2rem 0 0.6rem; padding: 0.4rem 0.7rem; font-size: 0.8rem; color: #b8ad98; border-left: 3px solid #8a1410; background: rgba(0, 0, 0, 0.2); } .ruled small { color: #c96a60; letter-spacing: 0.1em; margin-right: 0.4rem; } .ruled s { color: #9a8f7a; text-decoration-color: #b03020; }
+.ladder p.more { text-align: center; margin: 0.5rem 0 0; font-size: 0.82rem; }

@@ -375,3 +375,10 @@ Refusing David's contract now has teeth. Die unsigned and he does not carry you 
 
 - **The Hour Garden is now one fight.** All ten souls are on the grass at once and everybody fights everybody. Each one that falls bursts and is erased. Be the last one standing.
 - **Loans.** David lends at 25% on the whole debt after every bout and takes a soul if it reaches 600. Marc lends at ten on the hundred, and sometimes offers the loan interest-free for a favour: leaning on a late payer, or holding a package the Wardens would like to see.
+
+## Latest pass: a fresh pit every run
+
+- **The Ledger is generated.** The eight names under the champion are drawn new for every fighter you make: name, class, race, kit and taunt. Only Vexa stays.
+- **Cantrips.** Fighters start with Fire Bolt, rogues with Ray of Frost (slows), druids with Thorn Whip (drags them in). Weak, slow to come back, but they reach.
+- **The pit.** Spike walls are built into stone buttresses with bolted iron plates. Walls have plinths and string courses, shackles and gibbets. Most bouts start with the last ones' remains on the sand: heads, limbs, skulls.
+- **Tidier cards.** The Ledger folds the dead into one line and shows only the next two names. The pre-fight card drops the controls list after two bouts. The objective line shows one task and at most one reminder.

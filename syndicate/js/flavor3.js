@@ -22,7 +22,7 @@
     vexa: { any: 'Vexa takes the crown off herself and holds it out. “Seven years. It is heavier than it looks.”', rogue: '“There,” says Vexa. “That is how I fought. I wondered what it looked like from here.”', drow: '“Tell them below,” says Vexa, “that I never once missed the dark.”', elf: '“Cousin,” says Vexa, and laughs, and stops.' } };
   const res0 = ui.results;
   ui.results = function (r) { const out = res0.apply(this, arguments), h = hero(), st = G.state; if (!r || !h) return out; const card = document.querySelector('#panel .card.res'); if (!card) return out;
-    if (r.win && r.first && r.opp && LAST[r.opp.id]) { const L = LAST[r.opp.id], q = card.querySelector('.quote'); if (q) q.insertAdjacentHTML('afterend', '<p class="dim lastwords">' + (L[h.cls] || L[h.race] || L.any) + '</p>'); }
+    if (r.win && r.first && r.opp && !r.opp.gen && LAST[r.opp.id]) { const L = LAST[r.opp.id], q = card.querySelector('.quote'); if (q) q.insertAdjacentHTML('afterend', '<p class="dim lastwords">' + (L[h.cls] || L[h.race] || L.any) + '</p>'); }
     if (!r.win && !card.querySelector('.epitaph')) { const E = EPI[h.cls] || [], ER = EPIR[h.race], q = card.querySelector('.quote'); if (q) q.insertAdjacentHTML('afterend', '<p class="dim epitaph">' + (ER && Math.random() < 0.35 ? ER : pick(E)) + '</p>'); }
     return out; };
   // what is said over your body
