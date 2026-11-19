@@ -435,7 +435,7 @@
       if (SC.state !== 'play') return;
       if (pl.control) S.time += rdt;
       updateEnc(dt);
-      if (S.enc && RIS && pl.control && pl.pos.z > 10.9) pl.pos.z = Math.max(10.9, pl.pos.z - dt * 9);   // he holds the line north of the hatch; he does not fight from behind it
+      if (S.enc && RIS && pl.control && pl.pos.z > 10.9) pl.pos.z = pl.pos.z > 11.6 ? Math.max(10.9, pl.pos.z - dt * 9) : 10.9;   // he holds the line north of the hatch; he does not fight from behind it
       if (S.enc && S.enc.arena && !RIS && pl.control && pl.state !== 'dead') { const A = S.enc.arena; pl.pos.x = SC.clamp(pl.pos.x, A[0] - 0.2, A[2] + 0.2); pl.pos.z = SC.clamp(pl.pos.z, A[1] - 0.2, A[3] + 0.2); }   // a landing is fought on the landing
       if (!pl.control || S.enc || pl.state === 'dead') return;
       const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;

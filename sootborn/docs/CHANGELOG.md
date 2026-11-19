@@ -1,4 +1,26 @@
-# SOOTBORN — changelog (latest v0.47 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.48 · 2026-11-19)
+
+## v0.48 · 2026-11-19 — the guards, watched: a bot fought all three levels for real
+From play notes: see how the guards behave on the second level, then the third, then the first; last push before tonight's playtest; do anything else that is glaring.
+
+Until now the levels were tested by deleting each wave. This time a bot fought every encounter in Riser Nine, the Stair and the High Docks (walks at the nearest guard, strikes, dodges a swing it can see coming, finishes anyone who is open), and every guard was logged frame by frame: where it was, what it was doing, whether it moved.
+
+**What the guards did (all three levels, 63 of them)**
+- None was moved by the game from one place to another, none fell through a floor, none ended on a different level from Kael, none was left alive and unreachable. Every encounter ended.
+- The longest a guard stood still while not in reach was about three seconds: that is a guard holding off while others take their turn, which is intended.
+- **Riser Nine, the new line in front of the hatch:** with Kael standing on it and doing nothing, three guards came down the road, reached him and hit him five times in eight seconds. They stop at the line; he is put back on it if he steps behind. Nobody gets stuck there.
+
+**What was wrong, and is changed**
+- **They were far too easy.** The bot went through all of Riser Nine without being hit once, and the Stair with two hits. Three light cuts killed a Dock Guard, and every cut stopped whatever he was doing, so most of them died without ever swinging: at the Stair five of eight never attacked.
+  - Dock Guard health 42 → 64, Stair Blade 30 → 46, Warden 130 → 165, bosses 400 → 520.
+  - Three guards may attack at once (was two).
+  - A guard more than halfway into his swing is no longer stopped by a light cut. The cut lands and so does he. Heavy blows still stop him.
+  - After: one hit taken at Riser Nine, six on the Stair, eight on the docks, by the same bot. A person will take more. This is a judgement made from a bot, the night before you play it; if it is now too hard, the three numbers above are one line each.
+- **Inside the bond house the camera went straight up and looked down through the rafters** whenever there was a wall behind Kael, which in a fight in a warehouse is most of the time. It may now climb a little; after that it comes in close behind him. (Pictures of the same fight before and after.)
+- **Dying at Riser Nine or on the Stair said "the second bell has not finished ringing"**, which is the docks. Each level has its own line. Dying and choosing BACK TO THE LAST SUN was run: full health, same wave again.
+- **The Table** is in the Dev menu under Levels in 3D, so it can be opened without playing to the first dream.
+
+**Checked by script:** the above; then all three levels and the Table start to end; start and hand-back inside the game frame; chapters build. **Not checked:** by a person. The bot dodges better than people do and never uses the hook, the kick, the jump or ELEVEN, so nothing here says how those feel against the tougher guards.
 
 ## v0.47 · 2026-11-19 — Riser Nine rebuilt from the middle out
 From play notes: in the second comic level there is a lot of clipping in the middle area, and the level is very ugly and glitchy; go deep on it and improve it a lot.
