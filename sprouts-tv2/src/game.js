@@ -61,14 +61,14 @@ async function cloudInit(){try{if(typeof claude==='undefined'||!claude.use){clou
  const ref=db.collection('data/users/'+id).doc('sprouts'),sn=await ref.get();cloud=ref;
  if(sn&&sn.exists){const d=sn.data();if(d&&d.json&&(d.t||0)>(SAVE.t||0)&&(state==='off'||state==='boot'||state==='menu')){const o=JSON.parse(d.json);if(o&&o.meta){SAVE=o;meta=fixMeta(o.meta);applyLook(meta.eq);loadWorld();try{localStorage.setItem('sprouts-v2',JSON.stringify(SAVE))}catch(e){}}}}
  else if(SAVE.t)persist(true);}catch(e){}cloudDone=true;}
-const rankOf=xp=>{let k=1,need=30;while(xp>=need){xp-=need;k++;need+=15}return[k,xp,need]};
-function earn(n){const a=rankOf(meta.xp)[0];meta.petals+=n;meta.xp+=n;const b=rankOf(meta.xp)[0];if(b>a){meta.tix+=b-a;toast('KEEPER RANK '+b+'!  +1 TICKET')}save();}
+const rankOf=xp=>{let k=1,need=60;while(xp>=need){xp-=need;k++;need+=40}return[k,xp,need]}; /* slower than the handheld (30, +15): a rank should be an event */
+function earn(n){const a=rankOf(meta.xp)[0];meta.petals+=n;meta.xp+=n;const b=rankOf(meta.xp)[0];if(b>a){meta.tix+=b-a;news('KEEPER RANK '+b+'  +1 TICKET')}save();}
 const today=()=>new Date().toDateString();
 const dailyReady=()=>meta.last!==today();
 function claimDaily(){const y=new Date(Date.now()-864e5).toDateString();meta.streak=meta.last===y?meta.streak+1:1;const a=10+5*Math.min(meta.streak-1,6);meta.last=today();meta.tix++;earn(a);return a;}
 function dailies(){if(!meta.dq||meta.dq.d!==today()){const ids=['pluck','berry','bug','pet','throw'];if(meta.life.flowers>0)ids.push('flower');if(meta.life.grubs>0)ids.push('grub');
   for(let i=ids.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[ids[i],ids[j]]=[ids[j],ids[i]]}meta.dq={d:today(),q:ids.slice(0,3).map(id=>[id,0])}}return meta.dq;}
-function bump(id,n=1){const dq=dailies();for(const q of dq.q)if(q[0]===id&&q[1]<DQ[id][1]){q[1]=Math.min(DQ[id][1],q[1]+n);if(q[1]>=DQ[id][1]){meta.life.dailies++;toast('DAILY ASK DONE!  +8');earn(8);if(dq.q.every(k=>k[1]>=DQ[k[0]][1])){meta.tix++;toast('ALL 3 DAILY ASKS!  +1 TICKET')}}}}
+function bump(id,n=1){const dq=dailies();for(const q of dq.q)if(q[0]===id&&q[1]<DQ[id][1]){q[1]=Math.min(DQ[id][1],q[1]+n);if(q[1]>=DQ[id][1]){meta.life.dailies++;tod.dq=(tod.dq||0)+1;earn(8);if(dq.q.every(k=>k[1]>=DQ[k[0]][1])){meta.tix++;news('ALL 3 DAILY ASKS  +1 TICKET')}}}}
 const ownCount=()=>Object.keys(STY).reduce((a,k)=>a+meta.own[k].length,0)-7;
 const styTotal=Object.keys(STY).reduce((a,k)=>a+STY[k].length,0)-7;
 /* scope 'sp': Sprouts' own machine (styles only). 'rd': the Lantern machine (Rootdeep unlocks only). None: both, for counting. */
@@ -76,6 +76,14 @@ function pool(scope){const o=[];if(scope!=='rd')for(const k in STY)STY[k].forEac
  return o;}
 /* RESET PULLS: everything that came out of a capsule goes back in, and every pull is refunded as a ticket.
    Starting styles and BUILT items (valley projects) stay. */
+/* IMPORT A SAVE: looks, read-only, for a Sprouts save made by Sprouts TV or by Pocket Lantern in this same browser, and
+   takes the newest. Nothing is written to those games. It replaces this game's save, so it asks twice. */
+function importFind(){const out=[];for(const [nm,key] of [['SPROUTS TV','sprouts-tv:sprouts-v2'],['POCKET LANTERN','pl-alt:sprouts-v2'],['POCKET LANTERN','sprouts-v2']]){try{const raw=window.__rawGet&&window.__rawGet(key);if(!raw)continue;const o=JSON.parse(raw);if(o&&o.meta)out.push({nm,o})}catch(e){}}
+ out.sort((a,b)=>(b.o.t||0)-(a.o.t||0));return out}
+function importSave(){const f=importFind()[0];if(!f){flash='NO OTHER SPROUTS SAVE IN THIS BROWSER';flashT=3;snd(140,.1);return false}
+ if(!impArm){impArm=1;flash='FOUND '+f.nm+(f.o.run?', DAY '+f.o.run.day:'')+'. A AGAIN TO BRING IT IN';flashT=6;snd(330,.1);return false}
+ impArm=0;const keep={mus:meta.mus,sfx:meta.sfx,view:meta.view|0};SAVE={t:Date.now(),meta:fixMeta(Object.assign({},f.o.meta,keep)),run:f.o.run||null};meta=SAVE.meta;applyLook(meta.eq);loadWorld();persist(true);
+ state='menu';mi=0;flash='BROUGHT IN FROM '+f.nm;flashT=4;snd(784,.1);later(()=>snd(1175,.25),110);return true}
 function resetPulls(){const D=DEF();let n=0;for(const k in STY){const keep=meta.own[k].filter(i=>D.own[k].includes(i)||STY[k][i][3]===3);n+=meta.own[k].length-keep.length;meta.own[k]=keep;if(!keep.includes(meta.eq[k]))meta.eq[k]=D.eq[k]}
  meta.tix+=n;const nr=(meta.own.rd||[]).length;meta.own.rd=[];meta.ltix=(meta.ltix||0)+nr;applyLook(meta.eq);persist(true);return n+nr;}
 const pulledCount=()=>{const D=DEF();let n=(meta.own.rd||[]).length;for(const k in STY)n+=meta.own[k].filter(i=>!D.own[k].includes(i)&&STY[k][i][3]!==3).length;return n};
@@ -217,20 +225,27 @@ const TL={
 TL.wood=tile(p=>{p('#c89860',0,0,16,16);p('#a87848',0,7,16,1);p('#a87848',0,15,16,1);p('#a87848',5,0,1,7);p('#a87848',12,8,1,7);p('#e0b880',1,1,3,1);p('#e0b880',7,9,3,1)});
 /* ---------- state ---------- */
 let map,fieldL,fieldW,P,LO,buds,sprouts,items,foes,gates,bugs,npcs,plots,parts,spawns,trail,squad,sel,day,dayT,shards,run,tod,gard,won,time=0,msg='',msgT=0,cam,cur,wr,aT,found,winT,sndT=0,duskSaid,achT=0,saveT=0,petOK=false;
-const Z=1,VW=TVW;let VH=TVH,SCW=240,TRN=null,hop=null,pan=null,card=null,scn=null,scnDone=null,sceneQ=[];
+let Z=1,VW=TVW,VH=TVH; /* VIEW in Settings: WIDE shows 320 of the valley across, CLOSE zooms 1.5x like the handheld */
+function setView(){Z=meta&&meta.view?1.5:1;VW=Math.ceil(TVW/Z);VH=Math.ceil(TVH/Z)}
+let SCW=240,TRN=null,hop=null,pan=null,card=null,scn=null,scnDone=null,sceneQ=[];
 let manT=0,needT=-1,inHome=false,parked=[],resid=[],cineI=0,cineT=0,cpage=0;
 let home={res:Array(NT).fill(0),jobs:[0,0,0],up:0},hi=0;
 const DOOR={x:33*16+8,y:17*16+2};
 const homeTotal=()=>home.res.reduce((a,b)=>a+b,0),homeLv=()=>Math.min(10,(homeTotal()/5)|0),capNow=()=>CAP+5*homeLv()+2*(rankOf(meta.xp)[0]-1);
 const inSoil=q=>q.x>=400&&q.x<512&&q.y>=352&&q.y<400,crewCount=()=>buds.filter(b=>!b.gard).length+sprouts.filter(inSoil).length+seeds.length;
 const HCAP=[10,20,35,50],UPCOST=[200,600,1400],homeCap=()=>HCAP[home.up|0];
-const LOU_AT=[0,15,40,80,140,220],LOU_AB=['FETCHES LOST SPROUTS','SHARP NOSE: MORE BERRIES','PACK LEADER: FETCHES GROUPS','DOGGY PADDLE: FETCHES FROM WATER','GUARD DOG: SCARES GRUBS','TREASURE HOUND: FINDS TICKETS'];
+const LOU_AT=[0,30,90,180,320,500],LOU_AB=['FETCHES LOST SPROUTS','SHARP NOSE: MORE BERRIES','PACK LEADER: FETCHES GROUPS','DOGGY PADDLE: FETCHES FROM WATER','GUARD DOG: SCARES GRUBS','TREASURE HOUND: FINDS TICKETS'];
 const petAsk=()=>{const e=npcs&&npcs[0];return !!e&&e.st==='active'&&e.ms[e.mi]&&e.ms[e.mi].id==='e3'&&e.ms[e.mi].get()<e.ms[e.mi].goal};
 const louLv=()=>{let k=1;for(let i=1;i<LOU_AT.length;i++)if(meta.dog.xp>=LOU_AT[i])k=i+1;return k};
-function louXP(n){const a=louLv();meta.dog.xp+=n;const b=louLv();if(b>a){toast('LOUIE REACHED LEVEL '+b+'!');spSay('NEW TRICK!',3);say('LOUIE LEARNED '+LOU_AB[b-1],6);snd(784,.1);later(()=>snd(1175,.25),110);save()}}
+function louXP(n){const a=louLv();meta.dog.xp+=n;const b=louLv();if(b>a){news('LOUIE REACHED LEVEL '+b);spSay('NEW TRICK!',3);say('LOUIE LEARNED '+LOU_AB[b-1],6);snd(784,.1);later(()=>snd(1175,.25),110);save()}}
 let state='tv0',mi=0,ri=0,si=0,pi=0,look=null,dlg=null,dlgPage=0,toasts=[],flash='',flashT=0,capS={ph:'idle',t:0,it:null},eraseArm=0,resetArm=0,seti=0,setFrom='menu';
 const say=(s,t=4)=>{msg=s;msgT=t};
-const toast=s=>toasts.push({s,t:3.2});
+const SETROWS=['MUSIC','SOUND FX','VIEW','IMPORT A SAVE','RESET PULLS','ERASE EVERYTHING','BACK'];let impArm=0;
+/* CALM REWARDS. A toast is for a moment worth stopping for. Rank-ups, baskets, daily asks, rewards, orders and
+   Louie's levels are kept as the day's news and read out in the evening report (a second page, ALSO TODAY).
+   What happens overnight is told in one line with the morning greeting, not as a stack of pop-ups. */
+let mornQ=null;const toast=s=>{if(mornQ){mornQ.push(s);return}toasts.push({s,t:3.2})};
+const news=s=>{if(typeof tod==='undefined'||!tod)return;(tod.news=tod.news||[]).push(s)};
 function carve(x,y,w,h,t=G){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)map[j*MW+i]=t;}
 function tileAt(px,py){const tx=px>>4,ty=py>>4;if(tx<0||ty<0||tx>=MW||ty>=MH)return TR;return map[ty*MW+tx];}
 function free(px,py,swim){const t=tileAt(px,py);return t<=2||t===7||(swim&&t===WA);}
@@ -255,7 +270,7 @@ const stageOf=s=>s.age<12?0:s.age<30?1:2;
 const str=it=>it.on.reduce((a,b)=>a+(b.type===1?2:1),0);
 function soilSpot(){for(let n=0;n<10;n++){const x=R(404,508),y=R(357,396);if(!sprouts.some(s=>d2(s,x,y)<49))return[x,y];}return[R(404,508),R(357,396)];}
 const kinds=()=>meta.bugs.filter(x=>x>0).length;
-const gardeners=()=>buds.filter(b=>b.gard).length;
+const gardeners=()=>buds.filter(b=>b.gard).length,gardCap=()=>Math.max(5,plots.length); /* one gardener a bed is plenty: more only empties the crew */
 const inGarden=(x,y)=>gard.open&&x>=640&&x<832&&y>=48&&y<160;
 /* garden beds */
 const BEDS=[[44,8],[48,8],[42,8],[50,8],[44,6],[48,6],[42,6],[50,6],[44,4],[48,4],[42,4],[50,4]];
@@ -303,8 +318,8 @@ function mkNPCs(){
    {id:'s6',t:'FIND 20 GLIMMERS',say:"Ten! I'm drawing a map. Some are past the bridge, some out west, and I'd bet the garden has its three. Twenty this time.",get:()=>glimHave(),goal:20,rw:50,tk:1}]),
   N('MARCUS',17,23,'#78c8f8',['#284878','#5080b8','#e88020','#f8c060'],
    "Bro. BRO. Will! Perfect timing. I've got the best idea anyone has ever had. A lazy river. Around the WHOLE valley. Dews as lifeguards. Waterslide off the lantern. Marcus Waterworks, bro.","Waterworks is basically done, bro. In my head. Go enjoy that lantern.",[
-   {id:'m1',t:'FIND A DEW',say:"First I need staff. Blue Dews grow on the north shore. They swim, nobody else does. See one, send one, bro. Go grab me a Dew.",get:()=>found[2]?1:0,goal:1,rw:10},
-   {id:'m2',late:"See that island, bro? Future VIP section. There WAS a shard on it. You already got it. See one, send one. Respect.",t:'BRING THE ISLAND SHARD',say:"See that island, bro? Future VIP section. There's a shard on it. Send your Dews into the water and they'll swim out and haul it home. I'd do it myself but these are new shoes.",get:()=>run.isle?1:0,goal:1,rw:30},
+   {id:'m1',t:'FIND A DEW',say:"First I need staff. Blue Dews grow on the north shore. They swim, nobody else does. Go grab me a Dew, bro.",get:()=>found[2]?1:0,goal:1,rw:10},
+   {id:'m2',late:"See that island, bro? Future VIP section. There WAS a shard on it. You already got it. Respect.",t:'BRING THE ISLAND SHARD',say:"See that island, bro? Future VIP section. There's a shard on it. Send your Dews into the water and they'll swim out and haul it home. I'd do it myself but these are new shoes.",get:()=>run.isle?1:0,goal:1,rw:30},
    {id:'m3',t:'CATCH A DRAGONFLY',say:"Last thing. Waterworks needs a mascot. Dragonflies over the pond, bro. Only a Dew can reach one. I've caught like a hundred. ...I've caught zero. Send one!",get:()=>meta.bugs[3]?1:0,goal:1,rw:20,tk:1}])];
 }
 function init(){
@@ -397,7 +412,7 @@ function awayGrowth(){if(!live||!gard.open||!SAVE.t)return;const hrs=Math.min(8,
 function loadWorld(){live=false;if(SAVE.run){try{restore(SAVE.run);live=true;awayGrowth();return}catch(e){SAVE.run=null}}init();}
 
 /* ---------- rewards ---------- */
-function unlock1(i){if(meta.ach[i])return;meta.ach[i]=1;toast(ACH[i][0]+'  +'+ACH[i][2]);earn(ACH[i][2]);snd(784,.1);later(()=>snd(1175,.25),110);}
+function unlock1(i){if(meta.ach[i])return;meta.ach[i]=1;news('REWARD: '+ACH[i][0]+'  +'+ACH[i][2]);earn(ACH[i][2]);snd(988,.05,1175,'triangle',.04);}
 function checkAch(){const c=buds.length,L=meta.life;if(c>run.maxCrew)run.maxCrew=c;
  if(run.plucked>=1)unlock1(0);if(c>=20)unlock1(1);if(c>=40)unlock1(2);if(found.every(x=>x))unlock1(3);if(shards>=1)unlock1(4);
  if(shards>=4){unlock1(5);if(day<=6)unlock1(6)}if(run.boss)unlock1(7);if(kinds()>=BUGS.length)unlock1(8);if(meta.trs.length>=6)unlock1(28);if(meta.trs.length>=TRS.length)unlock1(29);if(homeTotal()>=10)unlock1(30);if(homeTotal()>=30)unlock1(31);if(home.up>0)unlock1(32);if(L.pets>=10)unlock1(9);if(L.flowers>=10)unlock1(10);
@@ -511,13 +526,13 @@ function talk(n,met){if(n.name==='ERIN'&&gard.open&&inGarden(P.x,P.y)&&dayT/DAYL
  if(!inHome){run.trk=n.name;if(n.st!=='active'||!msDone(n))run.meet=0;else run.meet=1}
  if(n.st==='new'){L.push(met?"So. Marcus Waterworks. You're in, bro. I already told Derek you're in.":n.intro);offer(M[0]);n.st='active';}
  else if(n.st==='active'){const m=M[n.mi],v=m.get();
-  if(v>=m.goal){meta.life.missions++;if(m.tk)meta.tix++;earn(m.rw);L.push(n.name==='MARCUS'?["AYYY! See one, send one! That's my guy. Bring it in, bro.","BROOO. Told you. Never doubted you once. Dap me up.","LET'S GOOO! Waterworks is officially happening. Come here, bro."][n.mi%3]+' *DAP* Here, take '+m.rw+' petals'+(m.tk?' and a capsule ticket.':'.'):['Nicely done','You did it','Perfect','Lovely work'][n.mi%4]+(n.name==='ERIN'?', Will':'')+'! Here, take '+m.rw+' petals'+(m.tk?' and a capsule ticket.':'.'));if(n.name==='MARCUS')dap(n);n.mi++;snd(660,.08);later(()=>snd(990,.2),90);
+  if(v>=m.goal){meta.life.missions++;if(m.tk)meta.tix++;earn(m.rw);L.push(n.name==='MARCUS'?["AYYY! That's my guy. Bring it in, bro.","BROOO. Told you. Never doubted you once. Dap me up.","LET'S GOOO! Waterworks is officially happening. Come here, bro."][n.mi%3]+' *DAP* Here, take '+m.rw+' petals'+(m.tk?' and a capsule ticket.':'.'):['Nicely done','You did it','Perfect','Lovely work'][n.mi%4]+(n.name==='ERIN'?', Will':'')+'! Here, take '+m.rw+' petals'+(m.tk?' and a capsule ticket.':'.'));if(n.name==='MARCUS')dap(n);n.mi++;snd(660,.08);later(()=>snd(990,.2),90);
    if(n.mi<M.length)offer(M[n.mi]);else{n.st='done';L.push(n.bye)}checkAch();}
   else L.push(m.hint||m.say,m.t+': '+Math.min(v,m.goal)+' / '+m.goal);}
- else L.push(n.name==='ERIN'?[n.bye,"Louie's been helping himself to the daisies again. I'm pretending I haven't noticed.","The moonblooms only open properly at dusk. Stick around this evening, Will.","If you ever want a quiet job, the garden always needs gardeners.","One sip of nectar and a sprout blooms on the spot. The blossoms open fresh every morning.","When Louie starts sniffing, something's buried close by. The crew can dig it up and carry it home.","The buddies were here before any of us. They never come close. But every night they sit and watch the lantern."][(day+run.pets)%7]:n.name==='MARCUS'?(dap(n),run.pjSeen&&run.pjSeen.ww&&!pjDone(PJ[0])&&(day+run.pets)%2===0?"Blueprint sign's up by the pond, bro. Bring me sprouts. Like, a LOT of sprouts. See one, send one.":pjDone(PJ[0])&&(day+run.pets)%3===0?"Waterworks, bro. Best thing anyone ever built. You helped. A little. A lot. Dap me up.":[n.bye,"Lazy river's coming, bro. I've got a guy. The guy is me.","I'd race you to the island but I'd win. Respectfully, bro.","See one, send one. That's the whole philosophy, bro. Write it down.","Dap me up. *DAP* Yeah. Feels right.","Next idea: a hot tub. Heated by Embers. Don't tell Erin yet."][(day+run.pets)%6]):n.bye);
+ else L.push(n.name==='ERIN'?[n.bye,"Louie's been helping himself to the daisies again. I'm pretending I haven't noticed.","The moonblooms only open properly at dusk. Stick around this evening, Will.","If you ever want a quiet job, the garden always needs gardeners.","One sip of nectar and a sprout blooms on the spot. The blossoms open fresh every morning.","When Louie starts sniffing, something's buried close by. The crew can dig it up and carry it home.","The buddies were here before any of us. They never come close. But every night they sit and watch the lantern."][(day+run.pets)%7]:n.name==='MARCUS'?(dap(n),run.pjSeen&&run.pjSeen.ww&&!pjDone(PJ[0])&&(day+run.pets)%2===0?"Blueprint sign's up by the pond, bro. Bring me sprouts. Like, a LOT of sprouts.":pjDone(PJ[0])&&(day+run.pets)%3===0?"Waterworks, bro. Best thing anyone ever built. You helped. A little. A lot. Dap me up.":[n.bye,"Lazy river's coming, bro. I've got a guy. The guy is me.","I'd race you to the island but I'd win. Respectfully, bro.","See one, send one. That's the whole philosophy, bro. Write it down.","Dap me up. *DAP* Yeah. Feels right.","Next idea: a hot tub. Heated by Embers. Don't tell Erin yet."][(day+run.pets)%6]):n.bye);
  const pages=[];for(const p of L){const w=wrapPx(p,178);for(let i=0;i<w.length;i+=3)pages.push(w.slice(i,i+3))}
  dlg={name:n.name,col:n.col,spr:n.spr,pages};dlgPage=0;state='talk';snd(440,.05);}
-function dap(n){toast('DAPPED UP!');noise(.05,.35,1800);later(()=>noise(.04,.25,2600),70);later(()=>snd(880,.06),120);const x=(n.x+P.x)/2,y=(n.y+P.y)/2-6;for(let k=0;k<10;k++)parts.push({x,y,vx:R(-30,30),vy:-R(10,40),life:R(.4,.8),c:k%2?'#f8c060':'#78c8f8'})}
+function dap(n){floatAt(n.x,n.y-26,'DAPPED UP!','#78c8f8');noise(.05,.35,1800);later(()=>noise(.04,.25,2600),70);later(()=>snd(880,.06),120);const x=(n.x+P.x)/2,y=(n.y+P.y)/2-6;for(let k=0;k<10;k++)parts.push({x,y,vx:R(-30,30),vy:-R(10,40),life:R(.4,.8),c:k%2?'#f8c060':'#78c8f8'})}
 const npcMark=n=>n.st==='new'?1:n.st==='active'&&n.ms[n.mi].get()>=n.ms[n.mi].goal?2:0;
 
 /* ---------- power on: the console's own start-up, before the shelf (the games keep their own boot) ----------
@@ -551,12 +566,12 @@ function pwrDraw(){const t=pwrT,cx=120,cy=Math.round(H*.3),k=Math.max(0,Math.min
 function eject(){persist(true);tvTitle();return}
 /* ---------- update ---------- */
 function nav(i,n){if(pressed('down')){snd(520,.04);return(i+1)%n}if(pressed('up')){snd(520,.04);return(i+n-1)%n}return i;}
-const menuItems=()=>(live?['CONTINUE','NEW GAME']:['PLAY']).concat(['REWARDS','CAPSULES','STYLE','COLLECTION','SETTINGS','ERASE EVERYTHING','TITLE SCREEN']);
+const menuItems=()=>(live?['CONTINUE','NEW GAME']:['PLAY']).concat(['REWARDS','CAPSULES','STYLE','COLLECTION','SETTINGS','TITLE SCREEN']);
 /* ERASE EVERYTHING: Sprouts back to a brand-new cartridge. The valley, petals, tickets, rank, styles and every capsule
    pull, rewards, the Collection, Louie's level, the scenes found, and all the counts. Sound settings stay. Nothing
    belonging to another cartridge is touched (Rootdeep's unlocks and the Lantern's own tickets are kept). */
 let wipeI=0,wipeArm=0;
-function wipeAll(){const keep={mus:meta.mus,sfx:meta.sfx,ltix:meta.ltix||0,own:{rd:(meta.own.rd||[]).slice()}};meta=fixMeta(keep);SAVE={t:0,meta,run:null};live=false;applyLook(meta.eq);init();persist(true);state='menu';mi=0;flash='SPROUTS IS BRAND NEW AGAIN';flashT=4;snd(330,.3,110,'triangle',.08)}
+function wipeAll(){const keep={mus:meta.mus,sfx:meta.sfx,view:meta.view|0};meta=fixMeta(keep);SAVE={t:0,meta,run:null};live=false;applyLook(meta.eq);init();persist(true);state='menu';mi=0;flash='SPROUTS IS BRAND NEW AGAIN';flashT=4;snd(330,.3,110,'triangle',.08)}
 function update(dt){
  time+=dt;musTick(dt);if(msgT>0&&!toasts.length)msgT-=dt;sndT-=dt;if(flashT>0)flashT-=dt;
  if(toasts.length){toasts[0].t-=dt*(toasts.length>2?2:1);if(toasts[0].t<=0)toasts.shift()}
@@ -577,7 +592,7 @@ function update(dt){
    if(k==='CONTINUE'){state='play';if(awayMsg){toast('WHILE YOU WERE AWAY:  +'+awayMsg+' IN THE BASKET');awayMsg=0}}
    else if(k==='NEW GAME'&&!eraseArm){eraseArm=1;flash='PRESS A AGAIN TO START OVER';flashT=4}
    else if(k==='PLAY'||k==='NEW GAME'){eraseArm=0;flashT=0;init();live=true;persist(true);c3Play('dawn',()=>playScene('open',()=>talk(npcs[0])))}
-   else if(k==='REWARDS'){state='rewards';ri=0}else if(k==='CAPSULES'){state='caps';capS={ph:'idle',t:0,it:null};flashT=0}else if(k==='ERASE EVERYTHING'){state='wipe';wipeI=0;wipeArm=0}else if(k==='STYLE'){state='style';si=0;look={...meta.eq}}else if(k==='BUG BOOK'||k==='COLLECTION'){state='bugs';cpage=0;csel=0;colFrom='menu'}else if(k==='SETTINGS'){state='settings';setFrom='menu';seti=0}else eject();}
+   else if(k==='REWARDS'){state='rewards';ri=0}else if(k==='CAPSULES'){state='caps';capS={ph:'idle',t:0,it:null};flashT=0}else if(k==='STYLE'){state='style';si=0;look={...meta.eq}}else if(k==='BUG BOOK'||k==='COLLECTION'){state='bugs';cpage=0;csel=0;colFrom='menu'}else if(k==='SETTINGS'){state='settings';setFrom='menu';seti=0}else eject();}
   return;}
  case 'rewards':ri=nav(ri,ACH.length+4);if(pressed('a')&&ri===0){if(dailyReady()){const a=claimDaily();metaAch();flash='+'+a+' PETALS AND A TICKET!  STREAK '+meta.streak;flashT=3.5;snd(784,.1);later(()=>snd(1046,.2),100)}else snd(140,.08)}
   if(pressed('b')||pressed('start')){state='menu'}return;
@@ -598,8 +613,8 @@ function update(dt){
   if(csel!==was||pressed('left')||pressed('right'))snd(520,.04);
   if(cpage===2&&pressed('a')){const k=C3LIST[csel][0];if(c3SeenScene(k)){snd(660,.08,990);c3Play(k,()=>{state='bugs'})}else snd(140,.08);return}
   if(pressed('b')||pressed('a')||pressed('start'))state=colFrom;return}
- case 'wipe':{if(pressed('up')||pressed('down')){wipeI=1-wipeI;wipeArm=0;snd(520,.04)}if(pressed('b')||pressed('start')){state='menu';return}
-  if(pressed('a')){if(!wipeI){state='menu';snd(440,.05)}else if(wipeArm<2){wipeArm++;snd(330,.1)}else wipeAll()}return}
+ case 'wipe':{if(pressed('up')||pressed('down')){wipeI=1-wipeI;wipeArm=0;snd(520,.04)}if(pressed('b')||pressed('start')){state='settings';return}
+  if(pressed('a')){if(!wipeI){state='settings';snd(440,.05)}else if(wipeArm<2){wipeArm++;snd(330,.1)}else wipeAll()}return}
  case 'hsel':{const h=hsel;h.i=nav(h.i,h.opts.length);if(pressed('b')||pressed('start')){state='play';return}if(pressed('a'))h.opts[h.i][2]();return}
  case 'talk':if(pressed('a')||pressed('b')){dlgPage++;snd(440,.04);if(dlgPage>=dlg.pages.length){state='play';persist()}}return;
  case 'pause':spPauseUpdate();return;
@@ -617,13 +632,13 @@ function update(dt){
    else if(hi===6){if(inHome)exitHome();state='play';dayT=DAYLEN-.01}}return}
  case 'build':if(pressed('b')||pressed('start')){state='play';persist();return}if(pressed('a'))pjSend(bp);return;
  case 'travel':ti=nav(ti,tlist.length);if(pressed('b')||pressed('start'))state='play';else if(pressed('a')){hop={fx:P.x,fy:P.y,z:tlist[ti],t:0};state='hop';noise(.3,.1,700,'lowpass');snd(330,.5,990,'triangle',.05)}return;
- case 'settings':{const was=seti;seti=nav(seti,4);if(seti>=2&&was>=2&&(pressed('left')||pressed('right')))seti=seti===2?3:2;if(seti!==was)resetArm=0;const k=['mus','sfx'][seti];
-  if(k&&(pressed('right')||pressed('left'))){const v=Math.max(0,Math.min(10,meta[k]+(pressed('right')?1:-1)));if(v!==meta[k]){meta[k]=v;save();if(k==='sfx')snd(660,.07,990);else snd(520,.04)}}
-  if(seti===2&&pressed('a')){const n=pulledCount();if(!n){flash='NOTHING YET';flashT=2;snd(140,.1)}
-   else if(!resetArm){resetArm=1;snd(330,.1)}
-   else{resetArm=0;const m=resetPulls();flash='RESET! +'+m+' TIX';flashT=3;snd(784,.1);later(()=>snd(523,.2),100)}return}
-  if(pressed('b')||pressed('start')||(seti===3&&pressed('a'))){resetArm=0;state=setFrom}return;}
- case 'dayend':if(pressed('a')||pressed('start'))newDay();return;
+ case 'settings':{const R=SETROWS,was=seti;seti=nav(seti,R.length);if(seti!==was){resetArm=0;impArm=0;flashT=0}const k=R[seti],lr=(pressed('right')?1:0)-(pressed('left')?1:0),vk=k==='MUSIC'?'mus':k==='SOUND FX'?'sfx':'';
+  if(vk&&lr){const v=Math.max(0,Math.min(10,meta[vk]+lr));if(v!==meta[vk]){meta[vk]=v;save();if(vk==='sfx')snd(660,.07,990);else snd(520,.04)}}
+  if(k==='VIEW'&&(lr||pressed('a'))){meta.view=meta.view?0:1;setView();cam.x=P.x-VW/2;cam.y=P.y-VH/2;save();snd(520,.04)}
+  if(pressed('a')){if(k==='RESET PULLS'){const n=pulledCount();if(!n){flash='NOTHING YET';flashT=2;snd(140,.1)}else if(!resetArm){resetArm=1;snd(330,.1)}else{resetArm=0;const m=resetPulls();flash='RESET! +'+m+' TIX';flashT=3;snd(784,.1);later(()=>snd(523,.2),100)}}
+   else if(k==='IMPORT A SAVE')importSave();else if(k==='ERASE EVERYTHING'){state='wipe';wipeI=0;wipeArm=0;return}else if(k==='BACK'){resetArm=0;state=setFrom;return}}
+  if(pressed('b')||pressed('start')){resetArm=0;impArm=0;state=setFrom}return;}
+ case 'dayend':if(pressed('a')||pressed('start')){if(!tod.pg&&tod.news&&tod.news.length){tod.pg=1;snd(520,.04)}else newDay()}return;
  case 'win':if(pressed('a')||pressed('start')){state='play';persist(true)}return;
  }
  if(pressed('start')){persist(true);state='pause';pi=0;return;}
@@ -649,7 +664,7 @@ function update(dt){
  const push=(x,y,rad)=>{const d=Math.sqrt(d2(P,x,y));if(d<rad&&d>0){P.x=x+(P.x-x)/d*rad;P.y=y+(P.y-y)/d*rad}};
  push(HX,HY-2,9);push(KEEP.x,KEEP.y-4,12);push(NLIGHT.x,NLIGHT.y-4,13);if(vanHere())push(VAN.x,VAN.y-5,13);for(const n of npcs)push(n.x,n.y,8);if(run.boss)push(THORN.x,THORN.y-5,13);
  if(!trail.length||d2(P,trail[0].x,trail[0].y)>16){trail.unshift({x:P.x,y:P.y});if(trail.length>70)trail.pop();}
- if(gard.open&&gard.basket>0&&d2(P,46*16,7*16+8)<15*15){toast('GARDEN BASKET  +'+gard.basket);earn(gard.basket);gard.basket=0;snd(700,.08,1100)}
+ if(gard.open&&gard.basket>0&&d2(P,46*16,7*16+8)<15*15){floatAt(46*16,7*16-6,'+'+gard.basket,'#f8c8e0');tod.bask=(tod.bask||0)+gard.basket;earn(gard.basket);gard.basket=0;snd(700,.08,1100)}
  // cursor with gentle snap
  let cx=P.x+P.dx*56,cy=P.y+P.dy*56,sb=26*26,sn=null;
  /* the aim snaps to whatever is nearest the line from just ahead of Will out to the cursor, not only to things at the cursor itself:
@@ -704,7 +719,7 @@ function ambSound(dt){ambS-=dt;if(ambS>0||inHome)return;ambS=R(5,11);const f=day
  else if(f>.7)for(let k=0;k<3;k++)later(()=>snd(4300,.025,0,'square',.004),k*70)}
 function moveIn(list){const room=homeCap()-homeTotal();if(room<=0){flash='THE HOUSE IS FULL. UPGRADE IT FIRST';flashT=3;snd(140,.1);return}list=list.slice(0,room);
  let pet=0;const a=homeLv();list.forEach(b=>{home.res[b.type]++;home.jobs[1]++;pet+=b.star?12:2;b.dead=true;release(b)});buds=buds.filter(b=>!b.dead);parked=parked.filter(b=>!b.dead);
- flash=list.length+' MOVED IN AS FLORISTS!   +'+pet+' PETALS';flashT=3.5;snd(660,.08,990);later(()=>snd(1175,.2),100);earn(pet);if(homeLv()>a)toast('HOME LEVEL '+homeLv()+'!  CREW ROOM +5');checkAch();persist();}
+ flash=list.length+' MOVED IN AS FLORISTS!   +'+pet+' PETALS';flashT=3.5;snd(660,.08,990);later(()=>snd(1175,.2),100);earn(pet);if(homeLv()>a)news('HOME LEVEL '+homeLv()+':  CREW ROOM +5');checkAch();persist();}
 function cycleSel(){for(let n=1;n<=NT;n++){const t=(sel+n)%NT;if(squad.some(b=>b.type===t)){sel=t;snd(520,.05);return}}}
 function call(x,y,rad){for(const b of buds){if(b.st==='follow'||b.st==='fly')continue;if(d2(b,x,y)<rad*rad){release(b);b.gard=false;b.st='follow';}}}
 function doA(fresh){
@@ -753,7 +768,7 @@ function updBud(b,dt){
     {const f=swim?fieldW:fieldL;if(free(b.x,b.y,swim)&&f[(b.y>>4)*MW+(b.x>>4)]<0&&f[(P.y>>4)*MW+(P.x>>4)]>=0){b.ret=true;b.sx=b.x;b.sy=b.y;b.tx=P.x;b.ty=P.y;b.t=0;b.st='fly';snd(240,.08,160);break}} /* thrown clean over a shut gate: it comes back, or it would be stranded */
     if(!free(b.x,b.y,swim)){if(tileAt(b.x,b.y)===WA){puff(b.x,b.y,'#a8d8ff',5,30);if(b.type===0&&npcBy('MARCUS').st!=='new'&&(run.emb=(run.emb||0)+1)>=5)egg('hottub')}b.ret=true;b.sx=b.x;b.sy=b.y;b.tx=P.x;b.ty=P.y;b.t=0;b.st='fly';snd(240,.08,160);break;}
     const tg=findTarget(b,tileAt(b.x,b.y)===WA?64:44);
-    if(tg){b.tgt=tg;b.st='seek';b.t=0;if(tg.kind==='plot'){b.gard=true;tg.claim=time+4}}else if(inGarden(b.x,b.y)){b.gard=true;b.st='tend';b.t=.5}else b.st='idle';}
+    if(tg){b.tgt=tg;b.st='seek';b.t=0;if(tg.kind==='plot'){b.gard=true;tg.claim=time+4}}else if(inGarden(b.x,b.y)&&gardeners()<gardCap()){b.gard=true;b.st='tend';b.t=.5}else{b.st='idle';if(inGarden(b.x,b.y)){const T=run.tips=run.tips||{};if(!T.gc){T.gc=1;say('THE BEDS HAVE ALL THE GARDENERS THEY NEED. THE REST WAIT FOR YOU',6)}}}}
    break;}
  case 'seek':{const t=b.tgt,out=()=>{b.tgt=null;b.st=b.gard?'tend':'idle';b.t=.5};if(!t||!t.alive||(t.kind==='plot'&&(!needs(t)||t.on.length))){out();break}
    const p=tpos(b),reach=t.kind==='en'?t.r+3:t.kind==='ga'?15:t.r+5,d=go(b,p.x,p.y,sp,dt,swim,reach-1);b.t+=dt;
@@ -775,7 +790,7 @@ function updPlot(p,dt){
   if(p.st===0){p.st=1;p.dry=true;p.flower=Math.min(gard.seed,seedsOpen()-1);puff(p.x,p.y,'#a87850',4,25);snd(300,.06)}
   else if(p.st===4){const F=FLOWERS[p.flower],so=seedsOpen(),n=plots.length;p.st=0;p.dry=true;gard.harv++;gard.basket=Math.min(150,gard.basket+F.v);floatAt(p.x,p.y-16,'+'+F.v,'#f8c8e0');meta.life.flowers++;tod.flowers++;bump('flower');if(p.flower===3)unlock1(27);puff(p.x,p.y-8,FCOL[p.flower][0],8,40);snd(880,.07,1320);
    syncBeds();if(plots.length>n)say('THE GARDEN GREW! '+plots.length+' BEDS NOW',4);else if(seedsOpen()>so)say('NEW SEEDS: '+FLOWERS[so].pl+'! PICK THEM AT THE SEED SIGN',6);
-   const o=gard.order;if(o&&o.k===p.flower&&++o.have>=o.need){gard.orders++;meta.life.orders=(meta.life.orders||0)+1;toast("ERIN'S ORDER DONE!  +"+o.rw);earn(o.rw);if(gard.orders%3===0){meta.tix++;toast('3 ORDERS FILLED!  +1 TICKET')}if(meta.life.orders>=5)unlock1(26);newOrder()}}
+   const o=gard.order;if(o&&o.k===p.flower&&++o.have>=o.need){gard.orders++;meta.life.orders=(meta.life.orders||0)+1;tod.ord=(tod.ord||0)+1;tod.ordp=(tod.ordp||0)+o.rw;say("ERIN'S ORDER IS FILLED",3);earn(o.rw);if(gard.orders%3===0){meta.tix++;news('3 FLOWER ORDERS FILLED  +1 TICKET')}if(meta.life.orders>=5)unlock1(26);newOrder()}}
   else{p.dry=false;p.t=FLOWERS[p.flower].g;puff(p.x,p.y-4,'#a8d8ff',5,25);snd(1000,.05,700)}
   p.on.slice().forEach(b=>{b.tgt=null;b.z=0;b.st='tend';b.t=R(.3,.9)});p.on.length=0;}
 }
@@ -872,8 +887,9 @@ function updGate(ga,dt){const n=ga.on.length;if(!n)return;ga.hp-=n*dt;if(sndT<=0
  if(ga.hp<=0){openGate(ga,true);snd(300,.3,900,'triangle',.08);if(ga.id==='northPier')respawn();say(ga.id==='northPier'?'THE PIER IS BUILT! THE NORTH LIGHT IS IN REACH':ga.sub===3?'THE BRIDGE IS BUILT! WILLOW FALLS IS OPEN':ga.sub?'THE CRYSTAL SHATTERS!':'THE BRAMBLE BURNS AWAY!',4);persist(true);}}
 function endDay(){tod.strays=buds.filter(b=>!b.gard&&b.st!=='follow'&&b.st!=='park'&&d2(b,HX,HY)>150*150).length;if(tod.strays)louXP(Math.min(6,tod.strays));buds.forEach(b=>{if(!b.gard){b.tgt=null;b.z=0}});[...foes,...items,...gates,...bugs,DIG].forEach(o=>o.on.length=0);
  if(tod.berries>=6&&tod.berries>(meta.best||0)){meta.best=tod.berries;tod.best=1}
- const bonus=5+Math.min(15,tod.berries)+Math.min(15,tod.flowers*2)+(tod.best?5:0);tod.bonus=bonus;earn(bonus);state='dayend';snd(330,.5,110,'triangle',.08);}
-function newDay(){mkWbuds();inHome=false;parked=[];day++;dayT=0;duskSaid=false;wr=0;tod={berries:0,flowers:0,bugs:0,spooked:0};P.x=HX;P.y=HY+22;P.dx=0;P.dy=1;P.stun=0;P.pluck=0;trail=[];parts=[];
+ const bonus=5+Math.min(15,tod.berries)+Math.min(15,tod.flowers*2)+(tod.best?5:0);tod.bonus=bonus;earn(bonus);{const N=[];if(tod.bask)N.push('GARDEN BASKETS  +'+tod.bask);if(tod.ord)N.push("ERIN'S ORDERS FILLED: "+tod.ord+'  +'+tod.ordp);if(tod.dq)N.push('DAILY ASKS DONE: '+tod.dq+'  +'+tod.dq*8);tod.news=N.concat(tod.news||[])}tod.pg=0;state='dayend';snd(330,.5,110,'triangle',.08);}
+function newDay(){mornQ=[];try{newDay0()}finally{const q=mornQ;mornQ=null;say('DAY '+day+'. GOOD MORNING, WILL!'+(q.length?'   '+q.slice(0,4).join('   ·   ')+(q.length>4?'   ·   AND '+(q.length-4)+' MORE':''):''),q.length?9:4)}}
+function newDay0(){mkWbuds();inHome=false;parked=[];day++;dayT=0;duskSaid=false;wr=0;tod={berries:0,flowers:0,bugs:0,spooked:0};P.x=HX;P.y=HY+22;P.dx=0;P.dy=1;P.stun=0;P.pluck=0;trail=[];parts=[];
  LO.x=LO.sx=P.x-22;LO.y=LO.sy=P.y+4;LO.st='follow';
  let k=0;buds.forEach(b=>{if(b.gard)return;b.st='follow';b.x=P.x+((k%7)-3)*6;b.y=P.y+8+((k/7)|0)*5;k++});
  for(const p of plots)if(p.st>=1&&p.st<=3&&!p.dry){p.st++;p.dry=p.st<4;p.t=0}
@@ -882,7 +898,7 @@ function newDay(){mkWbuds();inHome=false;parked=[];day++;dayT=0;duskSaid=false;w
   if(J[2])louXP(J[2]*2);if(made||J[1]){toast('HOME:'+(made?'  +'+made+' SPROUTS':'')+(J[1]?'  +'+J[1]*2+' PETALS':''));if(J[1])earn(J[1]*2)}}
  if(!buds.length&&!sprouts.length){for(let i=0;i<3;i++){const [x,y]=soilSpot();mkSprout(0,x,y,8)}}
  {const n=wildRegrow();const T=run.tips=run.tips||{};if(n&&!T.wr){T.wr=1;toast('WILD SPROUTS GROW BACK WHERE YOU FOUND THEM')}}
- newSpark();pjMorning();say('DAY '+day+'. GOOD MORNING, WILL!',4);
+ newSpark();pjMorning();
  cam.x=P.x-VW/2;cam.y=P.y-VH/2;state='play';snd(440,.1,880);persist(true);}
 
 /* ---------- menus, the Sproutwild way: slate background, a header band, tiles with icons ---------- */
@@ -1047,7 +1063,7 @@ function glimInit(){GLIM=[];const ok=new Uint8Array(MW*MH),q=[HTY*MW+HTX];ok[q[0
 const glimHave=()=>run&&run.gl?Object.keys(run.gl).length:0,glimIn=zi=>GLIM.reduce((n,q,i)=>n+(q.z===zi&&run.gl&&run.gl[i]?1:0),0);
 function glimTick(){if(inHome||!GLIM.length)return;const G2=run.gl=run.gl||{};for(let i=0;i<GLIM.length;i++){const q=GLIM[i];if(G2[i]||d2(P,q.x,q.y)>11*11)continue;G2[i]=1;const n=glimHave();earn(2);floatAt(q.x,q.y-14,'GLIMMER  '+n+' / '+GLIM.length,'#fff8a0');
   for(let k=0;k<8;k++)parts.push({x:q.x,y:q.y-4,vx:R(-26,26),vy:-R(10,44),life:R(.4,.8),c:k%2?'#fff8a0':'#f8e060',gh:3});snd(880+(n%10)*60,.08,1320+(n%10)*60,'triangle',.07);later(()=>snd(1320+(n%10)*60,.18,1760,'triangle',.05),90);
-  if(glimIn(q.z)===3){earn(5);toast('ALL 3 GLIMMERS IN '+zName(ZONES[q.z][0])+'!  +5')}
+  if(glimIn(q.z)===3){earn(5);news('ALL 3 GLIMMERS IN '+zName(ZONES[q.z][0])+'  +5')}
   if(n===GLIM.length){earn(50);meta.tix+=2;toast('EVERY GLIMMER FOUND!  +50 AND 2 TICKETS')}else if(n%10===0){meta.tix++;toast(n+' GLIMMERS!  +1 TICKET')}
   if(n===1)say('A GLIMMER: A MOTE OF THE LANTERN. THREE HIDE IN EVERY PLACE',8);persist()}}
 function drawGlim(q){const x=Math.round(q.x-ox),y=Math.round(q.y-oy)-6+Math.round(Math.sin(time*3+q.x)*2),tw2=((time*5+q.x)|0)%3;g.fillStyle='rgba(255,244,160,'+(.22+.1*Math.sin(time*4+q.y)).toFixed(2)+')';g.beginPath();g.arc(x+.5,y+.5,6,0,7);g.fill();
@@ -1387,6 +1403,7 @@ function drawWorld0(){
  g.restore();SCW=TVW;drawNight();drawFloats();
 }
 function box(x,y,w,h,c='rgba(24,16,32,.82)'){r(c,x,y,w,h);}
+const wrapHint=s=>wrapPx(s,TVW-16,1).slice(0,3);
 function drawHUD(){
  const HL=()=>{g.save();g.translate(-UX,0)},HR=()=>{g.save();g.translate(UX,0)},HE=()=>g.restore(); /* TV: corners of the screen, not of the 240 column */
  HL();const ds='DAY '+day,dw=tw(ds);box(2,2,dw+66,15);text(ds,5,3,2,'#fff8c0');
@@ -1398,17 +1415,17 @@ function drawHUD(){
   r(on?'#f8e060':'rgba(24,16,32,.82)',x,y,w+2,15);if(on)r('#281c30',x+1,y+1,w,13);
   r(T.d,x+3,y+4,7,7);r(T.c,x+4,y+5,5,5);r(T.l,x+4,y+5,2,1);r('#181020',x+5,y+7,1,2);r('#181020',x+7,y+7,1,2);
   text(n,x+13,y+1,2,on?'#ffffff':'#b0a8c0',null);x+=w+4;}HE();
- if(zoneT>0&&state==='play'){const a=Math.min(1,zoneT*2,(2.2-zoneT)*4);const zn=zName(zone),zw=tw(zn,3)+22,zy=Math.round(H*.25);g.globalAlpha=a;r('rgba(24,16,32,.82)',Math.round((W-zw)/2),zy-3,zw,21);r('#f8e060',Math.round((W-zw)/2),zy+16,zw,2);ctext(zn,zy,3,'#fff8c0','#403010');g.globalAlpha=1}
+ if(zoneT>0&&state==='play'&&!inHome){const a=Math.min(1,zoneT*2,(2.2-zoneT)*4);const zn=zName(zone),zw=tw(zn,3)+22,zy=Math.round(H*.25);g.globalAlpha=a;r('rgba(24,16,32,.82)',Math.round((W-zw)/2),zy-3,zw,21);r('#f8e060',Math.round((W-zw)/2),zy+16,zw,2);ctext(zn,zy,3,'#fff8c0','#403010');g.globalAlpha=1}
  HR();const tot=buds.filter(b=>!b.gard).length+' / '+capNow(),tw2=tw(tot);box(W-tw2-8,y,tw2+6,15);text(tot,W-tw2-5,y+1,2,'#c8f0a0');HE();
  let my=20;
- if(OBJ){const w=tw(OBJ.text)+12;box(Math.round((W-w)/2),my,w,15,'rgba(24,16,32,.88)');r(OBJ.done?'#a8f080':OBJ.col,Math.round((W-w)/2),my,3,15);ctext(OBJ.text,my+1,2,OBJ.done?'#a8f080':'#ffffff');my+=17;
+ if(OBJ&&!inHome){const w=tw(OBJ.text)+12;box(Math.round((W-w)/2),my,w,15,'rgba(24,16,32,.88)');r(OBJ.done?'#a8f080':OBJ.col,Math.round((W-w)/2),my,3,15);ctext(OBJ.text,my+1,2,OBJ.done?'#a8f080':'#ffffff');my+=17;
   const tx=(OBJ.x-ox)*Z,ty=(OBJ.y-oy)*Z,col=OBJ.done?'#a8f080':'#f8e060',on=tx>10&&tx<TVW-10&&ty>44&&ty<H-24;
   if(state==='play'&&!inHome){HL();if(!on){const cx=TVW/2,cy=H/2,a=Math.atan2(ty-cy,tx-cx),k=Math.min((TVW/2-14)/Math.abs(Math.cos(a)||1e-6),(H/2-36)/Math.abs(Math.sin(a)||1e-6)),p=1+Math.sin(time*6)*2;
     g.save();g.translate(Math.round(cx+Math.cos(a)*(k+p)),Math.round(cy+6+Math.sin(a)*(k+p)));g.rotate(a);g.fillStyle='#181020';g.beginPath();g.moveTo(9,0);g.lineTo(-6,-8);g.lineTo(-6,8);g.fill();g.fillStyle=col;g.beginPath();g.moveTo(6,0);g.lineTo(-4,-5);g.lineTo(-4,5);g.fill();g.restore()}
    else if(d2(P,OBJ.x,OBJ.y)>34*34){const by=Math.round(ty-30+Math.sin(time*6)*2),bx=Math.round(tx);r('#181020',bx-4,by-1,9,5);r('#181020',bx-2,by+4,5,2);r('#181020',bx-1,by+6,3,1);r(col,bx-3,by,7,3);r(col,bx-1,by+3,3,2);r(col,bx,by+5,1,1)}HE()}}
  if(toasts.length){const s=toasts[0].s,w=tw(s)+20;r('#f8e060',Math.round((W-w)/2),my,w,17);r('#281c30',Math.round((W-w)/2)+1,my+1,w-2,15);petalIcon(Math.round((W-w)/2)+5,my+6);text(s,Math.round((W-w)/2)+14,my+2,2,'#f8e060')}
- else if(msgT>0&&msg){const ls=wrapPx(msg,222,1),w=Math.max(...ls.map(l=>tw(l,1)))+10,bh=5+ls.length*10,by=inHome?my:H-20-bh;box(Math.round((W-w)/2),by,w,bh,'rgba(24,16,32,.86)');r('#f8e060',Math.round((W-w)/2),by,w,1);ls.forEach((l,i)=>ctext(l,by+3+i*10,1,'#ffffff'))}
- else if(inGarden(P.x,P.y)){const o=gard.order,s=(o?'ERIN WANTS '+o.have+' / '+o.need+' '+FLOWERS[o.k].pl+'   ':'')+'GARDENERS '+gardeners();const w=tw(s)+8;box(Math.round((W-w)/2),my,w,15,'rgba(40,90,50,.85)');ctext(s,my+1,2,'#e0ffd0')}
+ else if(msgT>0&&msg&&!inHome){const ls=wrapHint(msg),bh=4+ls.length*10,by=H-19-bh;g.save();g.translate(-UX,0);r('rgba(24,16,32,.86)',0,by,TVW,bh);r('#f8e060',0,by,TVW,1);ls.forEach((l,i)=>text(l,Math.round((TVW-tw(l,1))/2),by+3+i*10,1,'#ffffff'));g.restore()}
+ else if(!inHome&&inGarden(P.x,P.y)){const o=gard.order,s=(o?'ERIN WANTS '+o.have+' / '+o.need+' '+FLOWERS[o.k].pl+'   ':'')+'GARDENERS '+gardeners();const w=tw(s)+8;box(Math.round((W-w)/2),my,w,15,'rgba(40,90,50,.85)');ctext(s,my+1,2,'#e0ffd0')}
 }
 function npCard(){if(MUS.np>0&&MUS.cur>=0&&state==='play'){g.save();g.translate(-UX,0);try{npCard0()}finally{g.restore()}}}
 function npCard0(){{const t=TRACKS[MUS.cur],w=Math.max(tw(t.title,2),tw(t.artist,1),tw('NOW PLAYING',1))+42,k=Math.min(1,(5.5-MUS.np)*4,MUS.np*3),cx=Math.round(-w+(w+3)*k),cy=H-60;
@@ -1704,38 +1721,16 @@ function draw0(){
    if(has){trArt(i,x+9,y+7);text(q[0],x+21,y+1,2,on?'#281c30':'#ffffff',null)}else text('? ? ?',x+21,y+1,2,on?'#5a4a28':'#607080',null)});
   {const i=csel,k=cpage?meta.trs.includes(i):meta.bugs[i]>0;mFoot(114);text(k?(cpage?TRS[i][0]:BUGS[i].n):cpage?'NOT FOUND YET':'NOT CAUGHT YET',6,116,2,'#f8e060',null);
    wrapPx(k?(cpage?TRL[i]:BUGL[i]):cpage?'A new sparkle hides each morning. Louie sniffs when one is close.':'Where: '+BUG_AT[i].toLowerCase()+'. Throw a sprout at one to catch it.',228,2).slice(0,3).forEach((l,j)=>text(l,6,129+j*12,2,'#e8e4f5',null))}}
- else if(state==='settings'){mHead('SETTINGS');
-  [['MUSIC','mus'],['SOUND FX','sfx']].forEach(([lab,k],i)=>{const y=30+i*28,on=seti===i;if(on)r('rgba(248,224,96,.2)',2,y-3,236,26);
-   text(lab,8,y,2,on?'#ffffff':'#c8c0d8');rtext(meta[k]?String(meta[k]*10)+'%':'OFF',232,y,2,on?'#f8e060':'#a098b0');
-   for(let n=0;n<10;n++){const x=8+n*22,hh=3+n;r('#181020',x,y+22-hh,18,hh);r(n<meta[k]?(on?'#f8e060':'#a8f080'):'#504860',x+1,y+23-hh,16,hh-2)}});
-  /* RESET PULLS and BACK share one row (the music panel sits right below) */
-  const ry=88,ron=seti===2,bon=seti===3;if(ron)r('rgba(248,224,96,.2)',2,ry-3,140,17);if(bon)r('rgba(248,224,96,.2)',146,ry-3,92,17);
-  const rl=resetArm?'A AGAIN = RESET':flashT>0&&/^RESET!|^NOTHING/.test(flash)?flash:'RESET PULLS';
-  text(rl,8,ry,2,resetArm||flashT>0&&/^RESET!/.test(flash)?'#f8a060':ron?'#ffffff':'#c8c0d8');text('BACK',Math.round(192-tw('BACK',2)/2),ry,2,bon?'#ffffff':'#c8c0d8');
-  mFoot(108);text('NOW PLAYING',8,110,1,'#a098b0');
-  const t=TRACKS[MUS.cur>=0?MUS.cur:MUS.shown];if(t){r('#181020',7,121,26,26);if(t.img&&t.img.complete)g.drawImage(t.img,8,122,24,24);text(t.title,38,121,2,'#ffffff');text(t.artist,38,134,1,'#c8a8f8');if(MUS.from)rtext(MUS.from,234,110,1,'#706888')}
-  else text(TRACKS.length?(meta.mus?'...':'MUSIC IS OFF'):'NO MUSIC LOADED',8,124,2,'#a098b0');
-  const pc=pulledCount();ctext(seti===2?(pc?'GIVES BACK '+pc+(pc===1?' ITEM FOR 1 TICKET':' ITEMS FOR '+pc+' TICKETS'):'NO CAPSULE PULLS TO RESET'):((time/4)|0)%2?'NO SOUND ON IPHONE? CHECK THE RING SWITCH':'LEFT / RIGHT: ADJUST      B: BACK',146,2,'#a098b0');}
- else if(state==='map'||state==='hop'){const hp=state==='hop',MS=2.5,mx=5,my=24,col=['#58b858','#d8b878','#8a5a3a','#3888e0','#1c5038','#58b858','#c04848'];
-  for(let ty=0;ty<MH;ty++)for(let tx=0;tx<MW;tx++){const t=map[ty*MW+tx];if(t!==TR&&t!==7)r(col[t],mx+tx*MS,my+ty*MS,MS,MS)}
-  for(const ga of gates)if(ga.alive)ga.tiles.forEach(([tx,ty])=>r(['#f08030','#90f0f8','#c89050','#3888e0','#b0a8c0','#f89040'][ga.sub],mx+tx*MS,my+ty*MS,MS,MS));
-  const dot=(x,y,c,sz=4)=>{const X=Math.round(mx+x*MS/16-sz/2),Y=Math.round(my+y*MS/16-sz/2);r('#181020',X-1,Y-1,sz+2,sz+2);r(c,X,Y,sz,sz)};
-  for(const z of PZ){const p=postXY(z);dot(p.x,p.y,'#e8c888',2)}
-  if(run.spark&&((time*2)|0)%2)dot(run.spark.x,run.spark.y,'#f078c0',3);dot(HX,HY,'#f8e060',5);dot(DOOR.x,DOOR.y-20,'#c04848',5);for(const it of items)if(it.alive&&(it.sub==='shard'||it.sub==='lens'))dot(it.x,it.y,it.sub==='lens'?'#a8c8ff':'#f8d030',3);if(run.seen&&run.seen['NORTH COAST'])dot(NLIGHT.x,NLIGHT.y-10,run.lit?'#f8e060':'#8088a0',4);for(const n of npcs)dot(n.x,n.y,n.col);for(const p of PJ)if(pjOpen(p))dot(p.sx,p.sy,pjDone(p)?'#f8d030':'#3870c8',3);
-  if(!hp&&OBJ&&((time*3)|0)%2){const X=Math.round(mx+OBJ.x*MS/16),Y=Math.round(my+OBJ.y*MS/16);r('#f8e060',X-5,Y-5,10,1);r('#f8e060',X-5,Y+4,10,1);r('#f8e060',X-5,Y-5,1,10);r('#f8e060',X+4,Y-5,1,10)}
-  if(!hp){const wx=inHome?DOOR.x:P.x,wy=inHome?DOOR.y+10:P.y;if(!inHome)dot(LO.x,LO.y,'#e89040',3);dot(wx,wy,((time*4)|0)%2?'#ffffff':'#f85888',5)}
-  else{const a=postXY(hop.z),k=Math.min(1,hop.t/1.2),e2=k*k*(3-2*k),at=q=>[hop.fx+(a.x-hop.fx)*q,hop.fy+(a.y-hop.fy)*q-Math.sin(Math.PI*q)*90];for(let q=0;q<=14;q++)if(q/14<=e2){const p=at(q/14);dot(p[0],p[1],'#fff8e0',1)}const p=at(e2);dot(p[0],p[1],'#f85888',5);dot(a.x,a.y,((time*5)|0)%2?'#f8e060':'#ffffff',4)}
-  for(const z of ZONES)if(!run.seen||run.seen[z[0]]||z[0]==='LANTERN FIELD'){const n=zName(z[0]).replace('WILLOW ','').replace("THORNBACK'S ",'').replace("ERIN'S ",'').replace('SUNNY ','').replace('PEBBLE ','').replace(' FIELD','').replace('NORTH MEADOW','MEADOW').replace('NORTH COAST','COAST').replace('DEW ',''),w=tw(n,1);text(n,Math.max(2,Math.min(W-w-2,Math.round(mx+(z[1]+z[3]/2)*MS-w/2))),Math.round(my+(z[2]+z[4])*MS-1),1,'#fff8e0')}
-  if(hp){ctext('TO '+zName(hop.z[0]),1,3,'#f8e060')}else{text('MAP',5,1,3,'#f8e060');let lx=64;[['WILL','#ffffff'],['LOUIE','#e89040'],['SHARD','#f8d030'],['HOME','#c04848']].forEach(([n,c])=>{r('#181020',lx,5,6,6);r(c,lx+1,6,4,4);text(n,lx+9,3,1,'#c8c0d8');lx+=tw(n,1)+17});
-  box(170,146,70,14,'rgba(24,16,32,.9)');text('B: BACK',180,147,2,'#a098b0')}}
- else if(state==='house'){mHead('HOME');walletBox(3);const sq=inHome?parked:buds.filter(b=>b.st==='follow'),ns=sq.filter(b=>b.star).length,J=home.jobs,rest=homeTotal()-J[0]-J[1]-J[2],uc=UPCOST[home.up];
-  const rows=[['MOVE IN STAR SPROUTS',ns+' HERE'],['MOVE IN 5 SPROUTS',sq.length-ns+' HERE'],['BERRY PICKERS',J[0]],['FLORISTS',J[1]],["LOUIE'S TRAINERS",J[2]],['BUILD A BIGGER HOUSE',uc?uc+' PETALS':'MAX'],['GO TO BED','']];
-  rows.forEach(([l,v],i)=>{const y=21+i*13,on=i===hi,job=i>=2&&i<=4;mTile(3,y-2,234,13,on);text(l,9,y-1,2,on?'#281c30':job?'#a8f080':'#e8e4f5',null);rtext(job?(on?'<  '+v+'  >':String(v)):v,231,y-1,2,on?'#a33b2e':'#8fa0b0',null)});
-  mFoot(112);ctext(flashT>0?flash:['WORKERS EARN GOLD STARS: +12 PETALS EACH','ANY SPROUTS WITH YOU: +2 PETALS EACH','EACH LEAVES 1 NEW SPROUT EVERY MORNING','EACH MAKES 2 PETALS EVERY MORNING','EACH GIVES LOUIE 2 XP EVERY MORNING',uc?'ROOM FOR '+HCAP[home.up+1]+' SPROUTS INSTEAD OF '+homeCap():'NO BIGGER HOUSE TO BUILD','SKIP TO THE EVENING REPORT'][hi],115,2,flashT>0?'#a8f080':'#fff8c0');
-  text('LIVING '+homeTotal()+' / '+homeCap(),8,130,2,'#ffffff');rtext('RESTING '+rest+(rest>1?'  (BLOOM '+(rest>>1)+')':''),232,130,2,rest?'#a8f080':'#a098b0');
-  text('HOME LV '+homeLv(),8,144,2,'#f8a060');ctext('LOUIE LV '+louLv(),144,2,'#e89040');rtext('CREW '+capNow(),232,144,2,'#c8f0a0');}
+ else if(state==='settings'){mHead('SETTINGS');const R=SETROWS,pc=pulledCount();
+  R.forEach((k,i)=>{const y=23+i*13,on=seti===i,vk=k==='MUSIC'?'mus':k==='SOUND FX'?'sfx':'';if(on)r('rgba(248,224,96,.2)',2,y-1,236,13);
+   const lab=k==='RESET PULLS'&&on&&resetArm?'A AGAIN = RESET':k==='IMPORT A SAVE'&&on&&impArm?'A AGAIN = REPLACE THIS GAME':k;text(lab,8,y,2,k==='ERASE EVERYTHING'?(on?'#f8a060':'#c88868'):on?'#ffffff':'#c8c0d8');
+   if(vk){for(let n=0;n<10;n++){const x=112+n*9;r('#181020',x,y+2,8,8);r(n<meta[vk]?(on?'#f8e060':'#a8f080'):'#504860',x+1,y+3,6,6)}rtext(meta[vk]?String(meta[vk]*10)+'%':'OFF',232,y,2,on?'#f8e060':'#a098b0')}
+   if(k==='VIEW')rtext(meta.view?'< CLOSE >':'< WIDE >',232,y,2,on?'#f8e060':'#a098b0')});
+  mFoot(116);const t=TRACKS[MUS.cur>=0?MUS.cur:MUS.shown];text('NOW PLAYING',8,118,1,'#a098b0');text(t?t.title+(t.artist?'  ·  '+t.artist:''):TRACKS.length?(meta.mus?'...':'MUSIC IS OFF'):'NO MUSIC LOADED',8,128,1,t?'#ffffff':'#a098b0');
+  const k=R[seti],hint=flashT>0?flash:k==='VIEW'?(meta.view?'CLOSE: THE HANDHELD\'S ZOOM, 213 ACROSS':'WIDE: 320 OF THE VALLEY ACROSS'):k==='IMPORT A SAVE'?'BRINGS IN A SPROUTS TV OR POCKET LANTERN SAVE':k==='RESET PULLS'?(pc?'GIVES BACK '+pc+(pc===1?' ITEM FOR 1 TICKET':' ITEMS FOR '+pc+' TICKETS'):'NO CAPSULE PULLS TO RESET'):k==='ERASE EVERYTHING'?'A BRAND-NEW GAME. IT ASKS THREE TIMES FIRST':'UP / DOWN: CHOOSE    LEFT / RIGHT: CHANGE    B: BACK';
+  wrapPx(hint,230,1).slice(0,2).forEach((l,i)=>ctext(l,140+i*9,1,flashT>0?'#f8a060':'#a098b0'))}
  else if(state==='wipe'){mHead('ERASE EVERYTHING',2);['THIS PUTS SPROUTS BACK TO A BRAND-NEW','CARTRIDGE. IT ERASES:','','  YOUR VALLEY AND THE STORY SO FAR','  PETALS, TICKETS AND KEEPER RANK','  EVERY STYLE AND CAPSULE PULL','  REWARDS, STREAK, THE COLLECTION','  THE SCENES FOUND, AND ALL STATS'].forEach((l,i)=>text(l,8,24+i*10,1,i<2?'#fff8c0':'#e8e4f5',null));
-  mTile(8,108,224,14,wipeI===0);text('NO, GO BACK',14,109,2,wipeI===0?'#281c30':'#ffffff',null);mTile(8,124,224,14,wipeI===1);text(wipeI===1&&wipeArm?['','PRESS A AGAIN','ONCE MORE TO ERASE'][wipeArm]:'YES, ERASE EVERYTHING',14,125,2,wipeI===1?'#a33b2e':'#f8a060',null);ctext('OTHER GAMES ARE NOT TOUCHED',143,1,'#a098b0')}
+  mTile(8,108,224,14,wipeI===0);text('NO, GO BACK',14,109,2,wipeI===0?'#281c30':'#ffffff',null);mTile(8,124,224,14,wipeI===1);text(wipeI===1&&wipeArm?['','PRESS A AGAIN','ONCE MORE TO ERASE'][wipeArm]:'YES, ERASE EVERYTHING',14,125,2,wipeI===1?'#a33b2e':'#f8a060',null);ctext('SOUND AND VIEW SETTINGS ARE KEPT',143,1,'#a098b0')}
  else if(state==='hsel'){const h=hsel;mHead(h.title);let y=24;h.sub.forEach(l=>{wrapPx(l,226,1).forEach(q=>{text(q,7,y,1,/^NEXT:/.test(l)?'#f8e060':'#e8e4f5',null);y+=10});y+=2});y=Math.max(y+4,96-(h.opts.length-1)*16);
   h.opts.forEach((o,i)=>{mTile(8,y+i*16,224,14,i===h.i);text(o[0],14,y+i*16+1,2,i===h.i?'#281c30':'#ffffff',null)});mFoot(132);ctext(flashT>0?flash:h.opts[h.i][1],135,1,flashT>0?'#f8a060':'#fff8c0');ctext('A: CHOOSE      B: LEAVE',147,1,'#a098b0')}
  else if(state==='build')drawPjBuild();
@@ -1743,12 +1738,13 @@ function draw0(){
  else if(state==='card'){const ls=wrapPx(card.sub,168,2),k=Math.min(1,card.t*5);r('#181020',28,28,184,112);r('#f8f0d8',29,29,182,110);r('#f8e060',29,29,182,18);ctext(card.title,31,2,'#281c30',null);g.save();g.translate(120,74);g.scale(k,k);g.translate(-120,-74);r('#c8e8a0',84,50,72,46);{const sx=ox,sy=oy;ox=oy=0;card.art();ox=sx;oy=sy}g.restore();ls.slice(0,3).forEach((l,i)=>ctext(l,99+i*13,2,'#281c30',null));if(card.t>.45&&((time*2)|0)%2)ctext('A: OK',144,2,'#f8e060')}
  else if(state==='pause')drawPauseMenu();
  else if(state==='guide')spDrawGuide();
+ else if(state==='dayend'&&tod.pg){ctext('ALSO TODAY',6,4,'#b0c8f8');const N=tod.news,mx=10,sh=N.slice(0,N.length>mx?mx-1:mx);sh.forEach((l,i)=>ctext(l,34+i*11,/^KEEPER RANK|^LOUIE/.test(l)?2:1,/^KEEPER RANK/.test(l)?'#f8e060':/^LOUIE/.test(l)?'#f8a060':/^REWARD/.test(l)?'#a8f080':'#e8e4f5'));if(N.length>sh.length)ctext('AND '+(N.length-sh.length)+' MORE',34+sh.length*11,1,'#a098b0');if(((time*2)|0)%2)ctext('A: SLEEP',147,2,'#a8f080')}
  else if(state==='dayend'){ctext('NIGHT FALLS',6,4,'#b0c8f8');ctext("ERIN'S EVENING REPORT, DAY "+day,32,2,'#c8a8f8');
   ctext('BERRIES BROUGHT HOME:  '+tod.berries,48,2);ctext('FLOWERS PICKED:  '+tod.flowers,60,2);ctext('BUGS CAUGHT:  '+tod.bugs,72,2);
   ctext(tod.strays?'LOUIE BROUGHT '+tod.strays+(tod.strays===1?' STRAY':' STRAYS')+' HOME.  CREW OF '+buds.length:'EVERYONE IS HOME SAFE.  CREW OF '+buds.length,86,2,'#a8f080');
   {const cnt=TYPES.map((q,t)=>buds.filter(b=>b.type===t).length),sh=cnt.map((n,t)=>t).filter(t=>cnt[t]>0),ws=sh.map(t=>14+tw(String(cnt[t]))+7);let x=Math.round((W-ws.reduce((a,b)=>a+b,0)+7)/2);sh.forEach((t,i)=>{const T=TYPES[t],y=100-Math.round(Math.max(0,Math.sin(time*5+i*1.1))*2);r(T.d,x,y+3,7,7);r(T.c,x+1,y+4,5,5);r(T.l,x+1,y+4,2,1);r('#181020',x+2,y+6,1,2);r('#181020',x+4,y+6,1,2);r('#2c6030',x+3,y+1,1,2);r('#f8a0c8',x+2,y-1,3,2);text(String(cnt[t]),x+10,99,2,T.l);x+=ws[i]})}
   ctext('DAY BONUS:  +'+tod.bonus+' PETALS',115,2,'#f8c8e0');
-  ctext(tod.best?'A NEW BEST DAY FOR BERRIES!  +5':tod.berries+tod.flowers>12?'"What a day, Will!"':tod.berries+tod.flowers>3?'"Nice and steady, Will."':'"A slow day is still a good day."',129,2,'#c8a8f8');if(((time*2)|0)%2)ctext('A: SLEEP',145,2,'#a8f080');}
+  ctext(tod.best?'A NEW BEST DAY FOR BERRIES!  +5':tod.berries+tod.flowers>12?'"What a day, Will!"':tod.berries+tod.flowers>3?'"Nice and steady, Will."':'"A slow day is still a good day."',129,2,'#c8a8f8');if(((time*2)|0)%2)ctext(tod.news&&tod.news.length?'A: ALSO TODAY ('+tod.news.length+')':'A: SLEEP',145,2,'#a8f080');}
  else if(state==='win'){r('rgba(40,20,20,.6)',0,24,W,112);ctext('THE LANTERN SHINES!',34,4,'#f8e060','#783010');ctext('WILL, ERIN AND LOUIE DID IT',62,2);ctext('RELIT IN '+day+(day===1?' DAY':' DAYS'),78,2,'#a8f080');ctext('THE GARDEN IS STILL GROWING...',94,2,'#c8a8f8');if(((time*2)|0)%2)ctext('A: KEEP PLAYING',116,2,'#b0e0f8');}
  g.restore();
  if(TRN){const k=TRN.t<.3?1-TRN.t/.3:Math.max(0,(TRN.t-.36)/.32);g.fillStyle='#0c0a12';g.beginPath();g.rect(-UX,0,TVW,H);g.arc(W/2,H/2,k*Math.hypot(TVW,H)/2,0,7,true);g.fill()}
@@ -1788,7 +1784,7 @@ function tvDraw(){
 /* the canvas is drawn at the window's own resolution: K device pixels for each game pixel, a whole number, so pixel
    art stays square and text is drawn sharp instead of being stretched */
 function fit(){const dpr=window.devicePixelRatio||1,k=Math.max(2,Math.min(12,Math.floor(Math.min(innerWidth*dpr/TVW,innerHeight*dpr/TVH))||2));
- if(k!==K||cv.width!==TVW*k){K=k;cv.width=TVW*K;cv.height=TVH*K}cv.style.width=(TVW*K/dpr)+'px';cv.style.height=(TVH*K/dpr)+'px';H=TVH;VH=TVH}
+ if(k!==K||cv.width!==TVW*k){K=k;cv.width=TVW*K;cv.height=TVH*K}cv.style.width=(TVW*K/dpr)+'px';cv.style.height=(TVH*K/dpr)+'px';H=TVH;setView()}
 fit();addEventListener('resize',fit);
 loadWorld();cloudInit();
 let last=0;
