@@ -297,6 +297,30 @@ rep("P.ATTACK = [{ dur: 0.4, hit: 0.12, chain: 0.2 }, { dur: 0.44, hit: 0.14, ch
 rep("    if (i === 3) return clip([[0, g], [0.08, Kw], [0.17, Ks], [0.29, Ks], [0.46, g]], t);", "    if (i === 3) return clip([[0, g], [0.08, Kw], [0.17, Ks], [0.29, Ks], [0.46, g]], t);\n    if (i === 5) { const sw = Object.assign({}, A2s, { hips: [0, -2.7, 0], chest: [-0.1, -0.9, 0], head: [0.05, 2.2, 0] }); return clip([[0, g], [0.08, A2w], [0.2, sw], [0.36, sw], [0.56, g]], t); }");
 rep("KeyC: 'attack', KeyF: 'boots',", "KeyC: 'kick', KeyV: 'hook', KeyF: 'boots',");
 
+/* ---- the guard fights back with more than one idea ---- */
+rep("          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e);\n        }", `          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e);
+          if (e.kind !== 'boss') e.sub = Math.random() < (e.kind === 'knifer' ? 0.45 : e.kind === 'bruiser' ? 0.22 : 0.3) ? 1 : 0;      // a second blow straight after the first
+        }
+        // the Stair Blade steps out of a cut and comes straight back in
+        if (e.state === 'chase' && e.kind === 'knifer' && pl.state === 'attack' && pl.st < 0.07 && d < 2.7 && (e.hopCd || 0) <= 0 && Math.random() < 0.5) { const f = fwd(e.yaw, _a); e.vel.set(-f.x * 12 + f.z * e.strafe * 5, 0, -f.z * 12 - f.x * e.strafe * 5); e.hopCd = 2.2; e.cool = Math.min(e.cool, 0.3); FX.puff(e.pos, 2, 0.6); _a.copy(e.pos); _a.y += 2.1; FX.word('NOTED.', _a, '#dfe6ff', 0.8); }
+        e.hopCd = (e.hopCd || 0) - dt;
+        // a Warden who is given room uses it: up, and down on the spot you were standing
+        if (e.state === 'chase' && e.kind === 'bruiser' && playerOK && e.cool <= 0 && d > 6.5 && d < 14 && Math.abs(pl.pos.y - e.pos.y) < 0.4 && (e.leapCd || 0) <= 0 && Math.random() < dt * 0.9) { e.state = 'leap'; e.st = 0; e.lp = { step: 0, tx: pl.pos.x, tz: pl.pos.z }; e.leapCd = 7; alert(e); }
+        e.leapCd = (e.leapCd || 0) - dt;`);
+rep("if (e.kind === 'boss' && e.sub === 1) { e.sub = 2; e.state = 'windup'; e.st = K.wind * 0.45; alert(e); }", "if (e.sub === 1) { e.sub = 2; e.state = 'windup'; e.st = K.wind * (e.kind === 'boss' ? 0.45 : 0.35); e.struck = false; e.sw = false; alert(e); }");
+rep("  const SPEAK = {", "  const SPEAK = U.SPEAK = {");
+rep("SC.hitPlayer(30, e.pos.x, e.pos.z, true); } }\n    else { e.pose = P.slamDown;", "SC.hitPlayer(e.kind === 'boss' ? 30 : 16, e.pos.x, e.pos.z, true); } }\n    else { e.pose = P.slamDown;");
+/* ---- he looks at who he is fighting ---- */
+rep("    { const k = SC.state === 'play' ? SC.clamp((p.meter - 30) / 70, 0, 1) : 0,", `    { let best = null, bd = 81; for (const e of SC.enemies) { if (e.state === 'dead') continue; const dx = e.pos.x - p.pos.x, dz = e.pos.z - p.pos.z, d2 = dx * dx + dz * dz; if (d2 < bd) { bd = d2; best = e; } }
+      const want = best && p.state !== 'scripted' && p.state !== 'dodge' ? SC.clamp(SC.angDiff(p.yaw, Math.atan2(best.pos.x - p.pos.x, best.pos.z - p.pos.z)), -1.0, 1.0) : 0; U.headY = (U.headY || 0) + (want - (U.headY || 0)) * Math.min(1, rdt * 9);
+      const bn = p.model.bones; if (bn && Math.abs(U.headY) > 0.01) { bn.head.rotation.y += U.headY * 0.6; bn.neck.rotation.y += U.headY * 0.2; bn.chest.rotation.y += U.headY * 0.2; }
+      // weight: he leans into a run, banks into a turn, and breathes harder the more fury he is carrying
+      if (bn && (p.state === 'idle' || p.state === 'run' || p.state === 'move')) { const sp = Math.hypot(p.vel.x, p.vel.z), yr = SC.clamp(SC.angDiff(U.lastYaw === undefined ? p.yaw : U.lastYaw, p.yaw) / Math.max(rdt, 0.001), -6, 6); U.bank = (U.bank || 0) + (yr * 0.035 - (U.bank || 0)) * Math.min(1, rdt * 6);
+        bn.chest.rotation.x += Math.min(0.16, sp * 0.014); bn.hips.rotation.z -= U.bank; bn.chest.rotation.z -= U.bank * 0.6; bn.head.rotation.z += U.bank * 0.8;
+        const br = Math.sin(performance.now() * 0.001 * (2.2 + p.meter * 0.03)) * (0.012 + p.meter * 0.0003); bn.chest.rotation.x += br; bn.shL.rotation.z += br * 1.5; bn.shR.rotation.z -= br * 1.5; }
+      U.lastYaw = p.yaw; }
+    { const k = SC.state === 'play' ? SC.clamp((p.meter - 30) / 70, 0, 1) : 0,`);
+
 if (/Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow/.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''))) {
   const m = s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').match(/.{0,60}(Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow).{0,40}/g);
   console.log('LEFTOVER:', m.slice(0, 12));

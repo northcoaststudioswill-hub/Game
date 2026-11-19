@@ -83,6 +83,33 @@
       D('flat', x + 0.8, y + h - 1.6, z, 1.3, 2.8, 0.06, col, { outline: 0.04 }); cyl('flat', x + 0.8, y + h - 1.2, z + 0.05, 0.3, 0.3, 0.04, GILT, { rx: Math.PI / 2, seg: 12, outline: 0 }); D('flat', x + 0.8, y + h - 1.2, z + 0.08, 0.3, 0.12, 0.02, 0xffffff, { outline: 0 }); D('flat', x + 0.8, y + h - 1.2, z + 0.1, 0.1, 0.1, 0.02, IRON, { outline: 0 }); D('flat', x, y + h + 0.1, z, 0.22, 0.22, 0.22, GILT, { outline: 0.03 });
     }
 
+    /* ----- lived in: what people leave behind them ----- */
+    const CHALK = 0xfff6d8;
+    // a sun in chalk on a wall: the Unlit's mark, low down, where the Accredited do not look
+    function chalkW(x, y, z, ry, s) { const tx = Math.cos(ry), tz = -Math.sin(ry); D('flat', x, y, z, s, s, 0.02, CHALK, { ry, outline: 0 });
+      for (let i = 0; i < 8; i++) { const a = i / 8 * 6.283, r = s * 1.15; D('flat', x + tx * Math.cos(a) * r, y + Math.sin(a) * r, z + tz * Math.cos(a) * r, s * 0.3, s * 0.3, 0.02, CHALK, { ry, outline: 0 }); } }
+    function chalkF(x, y, z, s) { D('flat', x, y, z, s, 0.012, s, CHALK, { ry: 0.5, outline: 0 }); for (let i = 0; i < 8; i++) { const a = i / 8 * 6.283; D('flat', x + Math.cos(a) * s * 1.2, y, z + Math.sin(a) * s * 1.2, s * 0.3, 0.012, s * 0.3, CHALK, { ry: a, outline: 0 }); } }
+    // a litter: the Accredited do not walk the docks, they are carried over them
+    function litter(x, z, y, ry, col) { const c = Math.cos(ry), sn = Math.sin(ry);
+      solid(x - 1.2, z - 1.2, x + 1.2, z + 1.2, y, y + 2.2, { cam: false });
+      D('flat', x, y + 0.95, z, 1.9, 1.1, 1.1, IVORY, { ry, outline: 0.05 }); D('flat', x, y + 1.62, z, 2.1, 0.16, 1.3, GILT, { ry, outline: 0.04 }); D('flat', x, y + 1.8, z, 1.3, 0.2, 0.8, GILT, { ry, outline: 0.03 });
+      D('flat', x, y + 1.0, z, 1.0, 0.8, 1.14, col, { ry, outline: 0 }); D('flat', x, y + 0.36, z, 2.0, 0.1, 1.2, GILT, { ry, outline: 0.03 });
+      [-0.66, 0.66].forEach(o => D('wood', x - sn * o, y + 0.5, z - c * o * -1, 4.2, 0.09, 0.09, 0x4a3524, { ry, outline: 0.03 }));
+      [[-0.9, -0.5], [0.9, -0.5], [-0.9, 0.5], [0.9, 0.5]].forEach(p => D('flat', x + c * p[0] + sn * p[1], y + 0.18, z - sn * p[0] + c * p[1], 0.1, 0.36, 0.1, GILT, { outline: 0.02 }));
+      // and the four pads worn into the stone where the bearers stand
+      [[-1.9, -0.66], [1.9, -0.66], [-1.9, 0.66], [1.9, 0.66]].forEach(p => D('flat', x + c * p[0] + sn * p[1], y + 0.033, z - sn * p[0] + c * p[1], 0.34, 0.02, 0.2, 0x8f8a7c, { ry, outline: 0 })); }
+    // a porter's load, put down where he was told to kneel
+    function load(x, y, z, ry) { D('crate', x, y + 0.3, z, 0.7, 0.6, 0.5, 0xb98a55, { ry, outline: 0.04 }); D('crate', x + 0.05, y + 0.76, z, 0.5, 0.32, 0.42, 0xd9a05f, { ry: ry + 0.2, outline: 0.04 }); D('flat', x, y + 0.5, z, 0.74, 0.06, 0.54, IRON, { ry, outline: 0 }); D('flat', x + 0.5, y + 0.04, z + 0.3, 0.5, 0.03, 0.08, 0x8a6a48, { ry: ry + 0.9, outline: 0 }); }
+    function halbD(x, y, z, ry) { D('wood', x, y + 0.05, z, 2.5, 0.06, 0.06, 0x4a3524, { ry, outline: 0.02 }); D('flat', x + Math.cos(ry) * 1.2, y + 0.05, z - Math.sin(ry) * 1.2, 0.34, 0.04, 0.3, 0xd9dde6, { ry, outline: 0.03 }); }
+    function helmD(x, y, z, ry) { cyl('flat', x, y + 0.14, z, 0.15, 0.19, 0.28, 0xd9dde6, { seg: 8, outline: 0.03 }); D('flat', x, y + 0.3, z, 0.05, 0.12, 0.34, GILT, { ry, outline: 0.02 }); }
+    // a House banner, torn down and walked on
+    function torn(x, y, z, ry, col) { D('flat', x, y + 0.02, z, 1.0, 0.02, 2.2, col, { ry, outline: 0 }); D('flat', x + 0.2, y + 0.035, z + 0.3, 0.5, 0.02, 0.5, GILT, { ry: ry + 0.4, outline: 0 }); D('wood', x - 0.6, y + 0.05, z - 0.8, 1.6, 0.05, 0.05, GILT, { ry: ry + 1.2, outline: 0.02 }); }
+    // what is left of a camp: poles, a ridge line, canvas gone grey
+    function tentD(x, z, ry, col) { const c = Math.cos(ry), sn = Math.sin(ry); [-1, 1].forEach(k => { cyl('wood', x + c * k * 1.2, 0.8, z - sn * k * 1.2, 0.04, 0.05, 1.6 - (k > 0 ? 0.5 : 0), 0x4a3524, { outline: 0.02 }); });
+      line(x - c * 1.2, 1.6, z + sn * 1.2, x + c * 1.2, 1.1, z - sn * 1.2, 0.02, 0x8a6a48); D('flat', x + sn * 0.5, 0.5, z + c * 0.5, 2.3, 0.03, 1.5, 0xb9b3a4, { ry, rx: 0.9, outline: 0.03 }); D('flat', x - sn * 0.7, 0.05, z - c * 0.7, 2.0, 0.03, 1.2, 0x9a9486, { ry: ry + 0.2, outline: 0 }); D('flat', x - sn * 0.7, 0.07, z - c * 0.7, 0.5, 0.03, 0.5, col, { ry: ry + 0.5, outline: 0 }); }
+    function fireRing(x, z, lit) { for (let i = 0; i < 9; i++) { const a = i / 9 * 6.283; D('concrete', x + Math.cos(a) * 0.7, 0.1, z + Math.sin(a) * 0.7, 0.3, 0.2, 0.26, STONE2, { ry: a, outline: 0.03 }); } cyl('flat', x, 0.03, z, 0.6, 0.6, 0.03, 0x15151f, { seg: 10, outline: 0 }); D('wood', x, 0.12, z, 0.8, 0.09, 0.1, 0x2a1f18, { ry: 0.6, outline: 0.02 }); D('wood', x, 0.14, z, 0.8, 0.09, 0.1, 0x2a1f18, { ry: -0.7, outline: 0.02 }); if (lit) D('glow', x, 0.2, z, 0.2, 0.1, 0.2, 0xff7a1f, { outline: 0 }); }
+    // a marker stone with a gilt nail: the Authority counts everything, even the ground
+    function marker(x, z, n) { D('concrete', x, 0.3, z, 0.34, 0.6, 0.24, STONE, { ry: n, rz: 0.06 * (n % 3 - 1), outline: 0.04 }); D('flat', x, 0.62, z, 0.08, 0.06, 0.08, GILT, { outline: 0 }); }
     const DOCKS_A = () => {
     // ----- the weather, far below -----
     D('flat', 0, -58, 0, 1400, 2, 1400, 0x343a80, { outline: 0 });
@@ -352,6 +379,23 @@
     // a colonnade on the east edge of Mooring One, to frame the fleet
     [-43, -38, -33, -28].forEach(z => { cyl('concrete', 31.8, 13.95, z, 0.22, 0.27, 4.4, STONE, { outline: 0.04 }); D('flat', 31.8, 16.2, z, 0.7, 0.16, 0.7, GILT, { outline: 0.03 }); });
     D('concrete', 31.8, 16.6, -35.5, 0.7, 0.6, 16.4, STONE, { outline: 0.06 }); D('flat', 31.8, 16.95, -35.5, 0.8, 0.12, 16.6, GILT, { outline: 0.03 });
+    // ===== lived in =====
+    litter(-19.5, 15.6, 0, 0, VIOLET); litter(27.5, 8.4, 0, 0.5, TEAL);
+    // the porters' tap: one cup a shift, the cups on chains, and the tally of who has drunk
+    D('metal', -22, 1.0, 6.3, 0.5, 0.9, 0.3, 0x8d94ac, { outline: 0.04 }); D('flat', -22, 0.72, 6.5, 0.08, 0.08, 0.3, IRON, { outline: 0.02 }); D('concrete', -22, 0.25, 6.6, 0.8, 0.5, 0.5, STONE2, { outline: 0.04 }); D('flat', -22, 0.51, 6.6, 0.6, 0.02, 0.34, WATER, { outline: 0 });
+    [-0.3, 0.3].forEach(o => { line(-22 + o, 1.3, 6.4, -22 + o * 1.6, 0.62, 6.84, 0.012, IRON); cyl('metal', -22 + o * 1.6, 0.58, 6.84, 0.06, 0.05, 0.1, 0xb98a55, { seg: 6, outline: 0.02 }); });
+    sign('PORTERS. ONE CUP. NOTED.', -22, 1.9, 6.14, 0, 2.6, 0.4, '#e8c25a', '#07070d');
+    // the board where this quarter's struck lines are posted, and what somebody left under it
+    D('wood', -16, 1.7, 6.16, 2.6, 1.7, 0.08, 0x3a3350, { outline: 0.05 }); sign('STRUCK THIS QUARTER', -16, 2.4, 6.22, 0, 2.3, 0.3, '#07070d', '#e8c25a');
+    for (let i = 0; i < 15; i++) D('flat', -17.05 + (i % 5) * 0.52, 2.0 - Math.floor(i / 5) * 0.4, 6.22, 0.42, 0.3, 0.02, i === 7 ? 0xffe14a : 0xece6d6, { rz: (i * 7 % 5 - 2) * 0.03, outline: 0 });
+    for (let i = 0; i < 6; i++) D('glow', -17 + i * 0.4, 0.1, 6.5 + (i % 2) * 0.16, 0.08, 0.16 + (i % 3) * 0.05, 0.08, i % 2 ? LAMP : 0xff9a3c, { outline: 0 });
+    D('crate', -15.2, 0.07, 6.6, 0.3, 0.14, 0.2, 0x8a1f24, { ry: 0.4, outline: 0.02 });
+    chalkW(-17.6, 0.5, 6.13, 0, 0.16); chalkW(-38.6, 0.45, 6.6, 0, 0.14); chalkF(6.9, 0.034, 16.9, 0.2); chalkF(-33.5, 0.034, 17.2, 0.16);
+    // loads put down at the kneeling plates, and never picked up again tonight
+    load(-37.2, 0, 14.6, 0.3); load(-36.2, 0, 10.9, -0.4); load(13.5, 0, 16.9, 1.1); halbD(1.5, 0, 8.6, 0.7); helmD(2.6, 0, 9.5, 0.4); halbD(-12.4, 0, 16.4, -0.3);
+    // a wine table by the pavilion, knocked over when the bell went wrong
+    D('flat', -24.2, 0.3, 8.6, 0.9, 0.06, 0.9, IVORY, { rz: 1.2, outline: 0.04 }); cyl('glow', -23.6, 0.06, 9.1, 0.07, 0.07, 0.12, 0xff5a8a, { seg: 6, outline: 0 }); D('flat', -23.4, 0.034, 9.3, 0.7, 0.02, 0.4, 0x8a1f3a, { ry: 0.6, outline: 0 }); cyl('flat', -24.8, 0.06, 9.2, 0.05, 0.07, 0.12, GILT, { seg: 6, outline: 0.02 });
+    torn(31.5, 0, 12.6, 0.4, VIOLET);
     };
     const cloudSea = (y, n, seed) => { D('flat', 0, y - 30, 0, 1400, 2, 1400, 0x343a80, { outline: 0 }); const rc = SC.seeded(seed), ico = new THREE.IcosahedronGeometry(1, 1);
       for (let i = 0; i < n; i++) { const a = rc() * 6.283, r = 50 + rc() * 250, sc = 14 + rc() * 26, g = ico.clone(); g.scale(sc, sc * 0.3, sc * 0.8); batch.add('flat', g, G.mx(Math.cos(a) * r, y - rc() * 20, Math.sin(a) * r, rc() * 3), [0xe0a08a, 0xc98aa8, 0xf2c8a0][i % 3], 0); g.dispose(); } };
@@ -386,6 +430,22 @@
       [[-9, 9], [10, -9], [12, 10], [-11, 2]].forEach(p => { solid(p[0] - 0.2, p[1] - 0.2, p[0] + 0.2, p[1] + 0.2, 0, 2.4, { cam: false }); cyl('wood', p[0], 1.1, p[1], 0.06, 0.08, 2.2, 0x4a3524, { outline: 0.03 }); D('glow', p[0], 2.3, p[1], 0.26, 0.34, 0.26, TLAMP, { outline: 0 }); });
       crateStatic(-9.6, -6.4, 1.1); crate(-9.2, -4.9, 0.9, 0, 'hp'); crate(14, 16, 0.9, 0, 'meter'); crate(-16, 17, 0.9, 0, 'hp'); crate(20, -8, 0.9, 0, 'hp');
       D('crate', 3.4, 0.14, 3.2, 0.3, 0.16, 0.5, 0x8a1f24, { ry: 0.6, outline: 0.03 });    // a child's shoe
+      // ===== nine years on: what the Assay left in this valley, and nobody was sent to clear =====
+      tentD(-15, 10, 0.4, VIOLET); tentD(-19, 6.5, -0.5, VIOLET); tentD(16, 15, 2.2, TEAL); tentD(19.5, -3, 1.2, 0xb8902e);
+      fireRing(-16.6, 7.6, false); fireRing(15.5, 12, false); fireRing(4.5, 5.6, true);
+      // the Violet standard, down in the grass where he left it standing
+      D('wood', -13.2, 0.08, 12.4, 4.4, 0.08, 0.08, GILT, { ry: 0.5, outline: 0.03 }); torn(-11.6, 0, 13.6, 0.5, VIOLET);
+      [[-22, 18, 1], [-6, 20, 2], [8, 21, 3], [22, 17, 4], [24, -12, 5], [10, -20, 6], [-12, -21, 7], [-24, -16, 8], [-25, 1, 9]].forEach(m => marker(m[0], m[1], m[2]));
+      // a wooden practice blade, and a ration tin with a House seal, gone to rust
+      D('wood', -17.6, 0.06, 9.2, 1.1, 0.05, 0.09, 0x8a6a48, { ry: 1.0, outline: 0.02 }); cyl('metal', 16.4, 0.08, 13.2, 0.12, 0.12, 0.16, 0x8a5a3a, { seg: 8, outline: 0.02 }); helmD(18.6, 0, -4.2, 1); halbD(20.6, 0, -1.8, 2.0);
+      // what came up the riser with them: bundles, a handcart, blankets, the lamps set down in a ring
+      load(3.6, 0, -3.4, 0.4); load(-3.8, 0, 3.4, 2.0); load(-4.4, 0, -3.0, 1.0);
+      D('wood', 6.2, 0.5, 4.4, 1.6, 0.1, 1.0, 0x8a6a48, { ry: 0.3, outline: 0.04 }); cyl('wood', 6.9, 0.3, 4.9, 0.3, 0.3, 0.08, 0x4a3524, { seg: 10, outline: 0.03 }); D('wood', 5.1, 0.34, 4.0, 1.2, 0.06, 0.06, 0x4a3524, { ry: 0.3, rz: -0.3, outline: 0.02 }); D('crate', 6.2, 0.78, 4.4, 0.7, 0.44, 0.6, 0xb98a55, { ry: 0.5, outline: 0.04 });
+      [[5.2, 6.8, 0x8a1f24], [3.4, 6.4, 0x3c4e8a], [6.4, 6.2, 0x8a6a48]].forEach((b, i) => D('flat', b[0], 0.03 + i * 0.004, b[1], 1.5, 0.03, 0.8, b[2], { ry: i * 0.7, outline: 0 }));
+      for (let i = 0; i < 7; i++) { const a = i / 7 * 6.283; D('glow', 4.5 + Math.cos(a) * 1.5, 0.12, 5.6 + Math.sin(a) * 1.5, 0.12, 0.2, 0.12, i % 3 ? LAMP : TLAMP, { outline: 0 }); }
+      chalkW(-10.93, 0.5, -10.4, Math.PI / 2, 0.16); chalkF(-2.9, 0.012, 2.9, 0.22); chalkW(0, 0.6, -19.78, 0, 0.18);
+      // the Authority's notice on the pylon, and the tally of the riser's air
+      sign('SEALED BY THE COUNT', 0, 2.6, -19.78, 0, 2.2, 0.4, '#07070d', '#e8c25a'); sign('NINE HOUSES. ONE STANDING.', -10.92, 3.1, -9, Math.PI / 2, 4.2, 0.36, '#e8c25a', '#07070d');
     };
 
     /* ===== THE STAIR: the last flights up the Sun Spire at sunset, nine years on. Three flights, three landings, the white door. ===== */
@@ -424,6 +484,23 @@
       [[24, 36], [27, 33], [22, 31]].forEach((p, i) => { D('glow', p[0], -4 + i, p[1], 1.6, 2.4 + i, 1.6, i ? 0xff7a1f : 0xffe14a, { ry: i, outline: 0 }); const g = new THREE.IcosahedronGeometry(1, 1); g.scale(3 + i, 2.4, 3); batch.add('flat', g, G.mx(p[0] + 1, 3 + i * 4, p[1] - 1 - i * 2), 0x3a3040, 0); g.dispose(); });
       for (let i = 0; i < 26; i++) D('glow', -8.4 + (i % 13) * 1.4, 0.9 + (i % 3) * 0.2, 42.6 + Math.floor(i / 13) * 1.6, 0.16, 0.22, 0.16, i % 4 ? LAMP : TLAMP, { outline: 0 });
       standard(-8.6, 44.6, 0, 5, 0x8a6a48); standard(7.4, 44.6, 0, 5, 0x8a6a48);
+      // ===== the stair after four hundred hulls came down on it =====
+      torn(-3.6, 0, 37, 0.5, VIOLET); torn(4.2, 6, 9, -0.6, TEAL); torn(-4.4, 12, -14, 1.0, 0xb8902e); torn(5.5, 18, -40, 0.2, 0xd9dde6);
+      halbD(3.2, 0, 34.4, 0.5); helmD(4.4, 0, 35.6, 0.2); halbD(-4.6, 6, 13.6, -0.9); helmD(-2.2, 6, 5.6, 1); helmD(5.2, 12, -18.6, 0.6); halbD(2.6, 12, -20.2, 2.2); halbD(-6.2, 18, -38.4, 0.2); helmD(7.2, 18, -44, 2);
+      // the loads the porters put down when the bell said kneel, and did not pick up when they stood
+      load(-5.6, 6, 8.2, 0.2); load(-5.2, 6, 10.4, -0.5); load(-5.8, 12, -12.6, 0.6); load(5.6, 12, -9.6, 2.2); load(-7.8, 18, -36.6, 0.3);
+      // a litter left on the first landing with the curtain still swinging; a wine jar; one slipper
+      litter(4.2, 14.2, 6, 1.2, VIOLET); cyl('flat', 2.4, 6.16, 12.4, 0.12, 0.16, 0.32, GILT, { seg: 8, outline: 0.03 }); D('flat', 2.1, 6.034, 11.9, 0.9, 0.02, 0.5, 0x8a1f3a, { ry: 0.4, outline: 0 }); D('flat', 1.2, 6.06, 15.6, 0.26, 0.08, 0.12, IVORY, { ry: 0.8, outline: 0.02 });
+      // suns, chalked all the way up, by everyone who has ever carried on this stair
+      [[0.5, 0, 33, 0.7], [0.7, 6, 16.5, 0.6], [0.5, 6, 6, 0.8], [0.6, 12, -9.5, 0.7], [0.5, 12, -20.5, 0.9], [0.7, 18, -36, 1.0]].forEach((c, i) => chalkW(-W0 + 0.02, c[1] + c[0], c[2], Math.PI / 2, 0.2 + i * 0.03));
+      [[0.5, 0, 31.5], [0.6, 6, 12], [0.5, 12, -15.5]].forEach(c => chalkW(W0 - 0.02, c[1] + c[0], c[2], -Math.PI / 2, 0.22));
+      chalkF(0, 18.13, -46, 0.26);
+      // barge wreck on the terrace: a spar through the rail, hull planks, mooring line run out across the stone
+      D('wood', 8.4, 1.4, 40, 7, 0.24, 0.24, HULL, { ry: 0.4, rz: 0.3, outline: 0.05 }); D('wood', 6.6, 0.1, 37.6, 2.6, 0.1, 0.7, HULL, { ry: 1.0, outline: 0.04 }); D('wood', 7.9, 0.14, 35.4, 2.0, 0.1, 0.6, HULL, { ry: -0.3, outline: 0.04 }); line(8.6, 0.08, 44, 2.4, 0.08, 36, 0.05, 0x8a6a48); line(2.4, 0.08, 36, -1.6, 0.08, 34.6, 0.05, 0x8a6a48);
+      // the names. Mara's list, begun in chalk on the door wall, because nobody had paper
+      sign('MARA KEEPS THE LIST', -8.6, 19.6, -57.9, 0, 2.6, 0.36, '#fff6d8', '#3a3350'); for (let i = 0; i < 18; i++) D('flat', -9.6 + (i % 3) * 0.72, 19.1 - Math.floor(i / 3) * 0.2, -57.92, 0.5 + (i * 5 % 3) * 0.08, 0.06, 0.02, CHALK, { outline: 0 });
+      // the Auditor's own table, set for one, under the door
+      D('flat', 6.4, 18.5, -54.6, 1.6, 0.08, 1.0, IVORY, { outline: 0.04 }); D('flat', 6.4, 18.24, -54.6, 0.2, 0.5, 0.2, GILT, { outline: 0.03 }); D('flat', 6.4, 18.57, -54.6, 0.5, 0.03, 0.4, 0xece6d6, { ry: 0.2, outline: 0 }); cyl('glow', 6.9, 18.66, -54.4, 0.04, 0.04, 0.24, LAMP, { seg: 6, outline: 0 }); D('flat', 5.9, 18.6, -54.8, 0.1, 0.12, 0.1, 0x15151f, { outline: 0.02 });
     };
     if (SC.issue === 'riser') RISER(); else if (SC.issue === 'stair') STAIR(); else { DOCKS_A(); DOCKS_B(); }
 

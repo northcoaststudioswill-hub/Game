@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.27 (see CHANGELOG.md). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, and the Gilding in full. Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.30.1 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -383,6 +383,13 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **The Auditor's Blade** had a name once; Celestine took it with the post. Kael offers him one from Mara's list.
 - **Brand's halberd** was carried up the Stair by Hollis and stood on the second landing.
 - **New canon to confirm:** the Warden Captain at Riser Nine is unnamed; three Wardens died there.
+
+### Built in v0.31
+- **The Auditor's Blade is Oswin Hale** (House Violet, the Camp, Day 3: his father finished ninth for thirty years). Celestine offered him a post so he need not finish ninth, and took his name with it. The mask breaks at the top of the Stair; he fights on with two blades; Kael puts "Hale, O." on Mara's list. Oswin keeps Accredited speech ("one", "noted") to the end. **To confirm:** this makes the last fight of the Stair a man Kael made, and it means Oswin does not appear among the Unlit later.
+- **Mara's list** is begun in chalk on the wall by the white door, because nobody had paper.
+- **The Unlit's mark** is a small chalk sun, low on walls and on decks, in all three places.
+- **The docks:** the Accredited are carried over them in litters; porters get one cup of water a shift at a tap, and it is noted; struck lines are posted on a board each quarter, and people leave lamps under it.
+- **The Assay valley** was never cleared: tents, fire rings and the fallen Violet standard are still there nine years on. The Authority's notice on the pylon reads SEALED BY THE COUNT.
 
 ### Third-person levels: how they play (v0.30.1)
 - Fury shows as gold on Kael himself, never as red on the screen.

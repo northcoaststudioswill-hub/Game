@@ -305,6 +305,7 @@
     };
     bossIntro = function () {
       const again = F.bossIntro; F.bossIntro = 1; save(); pl.control = false; pl.setState('scripted'); pl.script = t => P.guard(t); pl.scriptRate = 6; U.showHud(false); SC.emit('letterbox', true); cam.lock = null;
+      S.vossName = S.vossName || U.SPEAK.voss.name; if (!RIS) { S.stage2 = false; SC.SPECS.boss.face = 'halfmask'; U.SPEAK.voss.name = S.vossName; }
       const bz = RIS ? -15 : -50, e = SC.spawnEnemy('boss', 0, BY, bz, ENC.boss); e.state = 'wait'; e.model.group.scale.set(1, 1, 1); e.yaw = 0; S.bossE = e; pl.yaw = Math.PI;
       cam.move(v3(4, BY + 1.9, bz + 6), v3(0, BY + 2, bz), v3(2.4, BY + 1.7, bz + 4.2), v3(0, BY + 2.1, bz), 4.5, 40);
       const lines = again ? [{ who: 'voss', text: RIS ? 'Still on the hatch. *Stand off it.*' : 'Again, Clerk. One has the whole evening.' }, { who: 'hero', face: 'angry', text: RIS ? 'Count them again.' : "So've we." }] : RIS ? [
@@ -326,7 +327,8 @@
           { who: 'hero', face: 'hurt', text: 'Forty.' },
           { who: 'cap', text: 'The order said eleven hundred. I was back at my desk before the bell, and I wrote "clerical" beside the difference.' }
         ] : [
-          { who: 'cap', text: 'He went down on the eye they had inlaid in their own floor. Behind me the stair was full, flight on flight, and nobody on it was kneeling.' },
+          { who: 'cap', text: 'He went down on the eye they had inlaid in their own floor. I put his name on Mara\'s list myself. Hale, O. It was a good name. He should have kept it.' },
+          { who: 'cap', text: 'Behind me the stair was full, flight on flight, and nobody on it was kneeling.' },
           { who: 'clerk', text: "That's nine hundred. I counted. You count everything else." },
           { who: 'hero', face: 'smirk', text: 'Aye.' },
           { who: 'cap', text: 'There was one door left. It was white, and there was somebody standing in front of it with a pen.' }
@@ -358,6 +360,25 @@
       }
       SC.on('power', () => { S.artN = (S.artN || 0) + 1; U.memory(art(ARTS[(S.artN - 1) % ARTS.length])); });
       SC.on('finisherStart', e => { if (e.kind === 'boss') U.memory(art(FIN.boss)); else { S.finN = (S.finN || 0) + 1; if (S.finN <= 2) U.memory(art(FIN.warden)); } });
+      // the last boss has a second stage: the mask comes off, and it is somebody he lit a fire for
+      SC.on('dazed', e => {
+        if (RIS || e.kind !== 'boss' || S.stage2) return; S.stage2 = true; e.state = 'wait'; e.st = 0; e.hp = 1; pl.control = false; pl.setState('scripted'); pl.script = t => P.guard(t); pl.scriptRate = 6; U.showHud(false); SC.emit('letterbox', true); cam.lock = null;
+        SC.clearEnemies && SC.enemies.slice().forEach(x => { if (x !== e) x.die(0, 0, {}); });
+        FX.burst(e.head || e.pos, 0xffffff, 2); SC.audio.sfx('crate'); SC.cam.shake(0.6); e.model.spec = Object.assign({}, e.model.spec, { face: 'oswin' }); SC.SPECS.boss.face = 'oswin'; e.model.expr = null; e.model.setGlow(0xff5a1f, '#ff5a1f'); e.model.face('hurt'); U.SPEAK.voss.name = 'OSWIN HALE';
+        { const dx = pl.pos.x - e.pos.x, dz = pl.pos.z - e.pos.z, L = Math.hypot(dx, dz) || 1, ux = dx / L, uz = dz / L; e.yaw = Math.atan2(ux, uz); if (L < 3.2) { pl.pos.x = e.pos.x + ux * 3.2; pl.pos.z = e.pos.z + uz * 3.2; }
+          cam.move(v3(e.pos.x + ux * 2.6 - uz * 1.5, 20.3, e.pos.z + uz * 2.6 + ux * 1.5), v3(e.pos.x, 19.9, e.pos.z), v3(e.pos.x + ux * 1.7 - uz * 0.9, 20.1, e.pos.z + uz * 1.7 + ux * 0.9), v3(e.pos.x, 20.0, e.pos.z), 7, 32); }
+        run([0.9, n => U.say([
+            { who: 'cap', text: 'The mask came off in two pieces. Under it was a face I had last seen across a fire I lit in a starving camp.' },
+            { who: 'hero', face: 'shock', text: 'Oswin.' },
+            { who: 'voss', face: 'hurt', text: 'One\'s father finished ninth for thirty years. She said one need not. *She only wanted the name.*' },
+            { who: 'hero', face: 'hurt', text: "You carried wood for me. You said nobody'd ever lit you a fire." },
+            { who: 'voss', face: 'angry', text: 'It is *noted*. One has been paying on it nine years. Come and collect, Sorrel.' },
+            { who: 'cap', text: 'He drew the second blade. He had been the best of House Violet. I had made sure of it.' }
+          ], n),
+          n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true);
+            e.maxHp = Math.round(e.maxHp * 0.85); e.hp = e.maxHp; e.K = Object.assign({}, e.K, { speed: e.K.speed * 1.22, wind: e.K.wind * 0.78, rec: e.K.rec * 0.8, cool: [0.4, 0.9], dmg: e.K.dmg + 5 }); e.phase = 2; e.armorT = 1.5; e.state = 'chase'; e.st = 0; e.cool = 0.8; e.model.face('angry');
+            FX.ring(e.pos, 0xffd23a, 0.5, 5, 0.6); FX.word('OSWIN HALE', v3(e.pos.x, 21.4, e.pos.z), '#ffe14a', 1.6); SC.audio.sfx('roar'); U.boss(e, 'OSWIN HALE · HOUSE VIOLET'); n(); }]);
+      });
       SC.on('dazed', () => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted ? 'WIDE OPEN. GET CLOSE AND PRESS *A* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
       SC.on('secondchance', () => SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)));
       SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));

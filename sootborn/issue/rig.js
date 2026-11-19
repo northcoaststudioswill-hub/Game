@@ -22,7 +22,7 @@
     SPECS.boss = { h: 1.32, b: 1.55, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true, pal: { skin: 0xc9cbd6, top: 0xefe8d4, trim: 0xe8c25a, shirt: 0x8a1f24, tie: 0xe8c25a, pants: 0x23232e, boots: 0x14141d, hair: 0xefe8d4, glove: 0x23232e, wrap: 0xefe8d4 } };
   }
   if (SC.issue === 'stair') {   // the Auditor's Blade, and Tavi at sixteen
-    SPECS.boss = { h: 1.18, b: 1.0, face: 'halfmask', hood: true, coat: true, weapon: 'blade', sash: true, pal: { skin: 0xe6c79a, top: 0x15151f, trim: 0xe8c25a, shirt: 0xe8c25a, tie: 0xe8c25a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0xe8c25a, wrap: 0x15151f } };
+    SPECS.boss = { h: 1.18, b: 1.0, face: 'halfmask', hood: true, coat: true, weapon: 'blade', weapon2: true, sash: true, pal: { skin: 0xe6c79a, top: 0x15151f, trim: 0xe8c25a, shirt: 0xe8c25a, tie: 0xe8c25a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0xe8c25a, wrap: 0x15151f } };
     SPECS.clerk = { h: 0.94, b: 0.9, face: 'tavi', hair: 'tavi', pal: { skin: 0xc98a62, top: 0x8a6a48, trim: 0x4a3524, shirt: 0xd9a05f, tie: 0x4a3524, pants: 0x3a3350, boots: 0x15151f, hair: 0x2a1c14, glove: 0xc98a62, wrap: 0x8a6a48 } };
   }
 //@@FACES
@@ -49,9 +49,9 @@
       g.fillStyle = '#1a1620'; g.fillRect(0, 0, S, S); g.fillStyle = '#e6c79a'; g.fillRect(14, 46, 100, 30);
       const e = EX[expr] || EX.neutral; eye(42, 60, 11, e[0], '#e2a81c', e[1] + 0.2); eye(86, 60, 11, e[0], '#e2a81c', e[1] + 0.2);
       stroke([10, 44, 118, 44], 4); stroke([10, 78, 118, 78], 4); for (let x = 30; x < 110; x += 16) stroke([x, 88, x - 4, 118], 2, '#2e2a40');
-    } else if (kind === 'tavi') {
-      g.fillStyle = '#c98a62'; g.fillRect(0, 0, S, S); g.fillStyle = '#a56e4c'; g.beginPath(); g.moveTo(0, 36); g.lineTo(28, 60); g.lineTo(28, 100); g.lineTo(50, 128); g.lineTo(0, 128); g.fill();
-      const e = EX[expr] || EX.neutral; eye(42, 60, 12, e[0] + 1, '#4a2e1c', e[1]); eye(86, 60, 12, e[0] + 1, '#4a2e1c', e[1]);
+    } else if (kind === 'tavi' || kind === 'oswin') {
+      const os = kind === 'oswin'; g.fillStyle = os ? '#e6c79a' : '#c98a62'; g.fillRect(0, 0, S, S); g.fillStyle = os ? '#c29a6a' : '#a56e4c'; g.beginPath(); g.moveTo(0, 36); g.lineTo(28, 60); g.lineTo(28, 100); g.lineTo(50, 128); g.lineTo(0, 128); g.fill();
+      const e = EX[expr] || EX.neutral; eye(42, 60, 12, e[0] + 1, os ? '#e2a81c' : '#4a2e1c', e[1]); eye(86, 60, 12, e[0] + 1, os ? '#e2a81c' : '#4a2e1c', e[1]); if (os) { stroke([20, 30, 60, 52, 54, 90], 3, '#8a1f24'); stroke([40, 96, 86, 100], 4); }
       stroke([28, 44, 54, 46], 5, '#2a1c14'); stroke([100, 44, 74, 46], 5, '#2a1c14'); stroke([66, 60, 62, 78, 68, 81], 2.5);
       stroke([50, 98, 66, 104, 82, 98], 4); g.fillStyle = 'rgba(30,26,34,0.5)'; g.fillRect(24, 74, 14, 8);
     } else if (kind === 'kael') {
@@ -206,6 +206,17 @@
     if (!sp.hood && !sp.helm) { part('head', tbox(0.03, 0.06, 0.04), 0.118, 0.13, 0, pal.skin, null, 0.008); part('head', tbox(0.03, 0.06, 0.04), -0.118, 0.13, 0, pal.skin, null, 0.008); }
 //@@WEAPONS
     const steel = G.toon({ color: 0xd9dde6 }), dark = G.toon({ color: 0x23232e }), gilt = G.toon({ color: 0xe8c25a });
+    if (sp.armor) {
+      // what the plate carries on it: gauntlet knuckles, a scabbard on the hip, the cord the washer hangs from, boot cuffs
+      const dk = G.toon({ color: 0x2a2630 }), gl = G.toon({ color: 0xe8c25a }), iv = G.toon({ color: 0xefe8d4 }); model.mats.push(dk, gl, iv);
+      add('haR', tbox(0.1, 0.05, 0.11), gl, 0, -0.02, 0, 0.01); add('haR', tbox(0.1, 0.04, 0.03), iv, 0, -0.09, 0.05, 0.008);
+      add('hips', tbox(0.05, 0.6, 0.07, 1, 0.6), dk, 0.21, -0.22, -0.06, 0.012).rotation.x = 0.35; add('hips', tbox(0.06, 0.06, 0.08), gl, 0.21, 0.04, -0.01, 0.008);
+      add('hips', tbox(0.1, 0.11, 0.06), dk, -0.19, -0.02, 0.1, 0.01);                                              // the pouch the tin's invoice lives in
+      ['shnL', 'shnR'].forEach(b => add(b, tbox(0.15, 0.05, 0.16), gl, 0, -0.24, 0, 0.008));
+      add('neck', tbox(0.2, 0.07, 0.2, 0.85, 1), iv, 0, 0.0, 0, 0.012);                                             // gorget
+      add('chest', tbox(0.06, 0.2, 0.05), dk, 0.17, 0.05, -0.15, 0.008).rotation.z = 0.5; add('chest', tbox(0.06, 0.2, 0.05), dk, -0.17, 0.05, -0.15, 0.008).rotation.z = -0.5;   // cape straps
+      add('head', tbox(0.02, 0.07, 0.02), gl, 0.125, 0.09, 0.02, 0.004);                                            // the Count's ring in one ear, never taken out
+    }
     if (sp.cape) {
       // House Violet's cape, cut short so it does not catch on a valve wheel
       const cm = model.capeMat = G.toon({ color: 0x5a3aa8 }), hem = G.toon({ color: 0xe8c25a }); model.mats.push(cm, hem);
@@ -226,6 +237,7 @@
       add('chest', tbox(0.012, 0.16, 0.012), dark, -0.03, 0.2, 0.14, 0); model.mats.push(dark); model.washer = w;
     }
     if (sp.weapon === 'baton') { add('haR', limb(0.03, 0.036, 0.62), dark, 0, -0.3, 0, 0.014); add('haR', limb(0.042, 0.042, 0.07), gilt, 0, -0.03, 0, 0.01); model.mats.push(dark, gilt); }
+    if (sp.weapon2) { add('haL', tbox(0.028, 0.56, 0.06, 0.15, 1), steel, 0, -0.4, 0.01, 0.014); add('haL', tbox(0.05, 0.03, 0.16), gilt, 0, -0.1, 0.01, 0.01); }
     if (sp.weapon === 'blade') { add('haR', tbox(0.028, 0.56, 0.06, 0.15, 1), steel, 0, -0.4, 0.01, 0.014); add('haR', tbox(0.05, 0.03, 0.16), gilt, 0, -0.1, 0.01, 0.01); model.mats.push(steel, gilt); }
     if (sp.weapon === 'halberd') {
       // held short, a hand under the head, the way a Warden carries it in a crowd

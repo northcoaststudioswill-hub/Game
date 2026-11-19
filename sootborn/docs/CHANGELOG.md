@@ -1,6 +1,30 @@
-# SOOTBORN — changelog
+# SOOTBORN — changelog (latest v0.31 · 2026-11-19)
 
-## v0.30.1 · 2026-11-19 — the third-person levels: brighter, gold instead of red, more ways to fight, a memory at every sun
+## v0.31 · 2026-11-19 — the third-person levels: Kael's model and movement, guards with more moves, a second stage for the last boss, lived-in places
+From play notes: keep improving Kael's model and his rigging so the animation reads better; enemies need more moves; the biggest boss should have a second stage, at least on the last map; all three environments need more detail, more lore, more of a lived-in world.
+
+**Kael**
+- Model: gauntlet knuckles, a scabbard on the hip, the invoice pouch, a gorget, cape straps, boot cuffs, and the ring in one ear.
+- Movement: his head and chest turn to whoever is nearest; he leans into a run and banks into a turn; his breathing gets heavier as fury builds.
+
+**The guard**
+- Any of them may follow a blow with a second one straight after. Stair Blades do it nearly half the time.
+- **Stair Blades** step out of a cut ("NOTED.") and come back in.
+- **Wardens** given room jump it: a red ring on the ground where he will land, 16 damage if you are in it. Same level only; not up or down a flight.
+
+**The last boss: two stages (the Stair)**
+- When the Auditor's Blade is beaten his mask breaks. He is **Oswin Hale**, the House Violet cadet Kael lit a fire for in the Camp. A short scene, then stage two: health back to 85%, a second blade, about a fifth faster, shorter wind-ups, +5 damage, bar renamed OSWIN HALE · HOUSE VIOLET.
+- The ending adds a line: Kael puts "Hale, O." on Mara's list himself.
+- Losing in stage two restarts the fight from stage one.
+
+**Places**
+- **High Docks:** two litters with the bearers' pads worn in the stone; the porters' tap with chained cups ("ONE CUP. NOTED."); the board of this quarter's struck lines with lamps left under it; loads left at the kneeling plates; dropped halberds and a helm; an overturned wine table by the pavilion; a torn House banner; chalk suns low on walls and on the deck.
+- **Riser Nine:** what the Assay left nine years ago: tent frames, cold fire rings, the Violet standard down in the grass, nine marker stones with gilt nails, a practice blade, a ration tin. What came up the hatch tonight: bundles, a handcart, blankets, a ring of lamps round a lit fire. "SEALED BY THE COUNT" on the pylon; "NINE HOUSES. ONE STANDING." on the pump house.
+- **The Stair:** torn banners on every landing, dropped halberds and helms, porters' loads, an abandoned litter and a spilled wine jar, chalk suns all the way up both walls, barge wreck on the terrace, Mara's list begun in chalk by the white door, and a table set for one.
+
+**Checked by script:** all three levels start to finish; stage two triggers, runs and ends; double strikes, the Blades' step-back and the Wardens' jump fire without errors; both levels load in the game frame. **Not checked:** none of it played by hand; the difficulty of stage two; phone frame rate with the added props; chalk suns on walls were not confirmed in a close picture. About now says Version 0.31.
+
+## v0.30.1 · 2026-11-19 — the third-person levels: brighter, gold instead of red, more ways to fight, and a memory at every sun
 From play notes: the cel shading is a little dark; the red flare round the edge reads as dying, so let him glow gold as the rage grows; more fighting animations, a kick, and moves from his own story as in the other fights; text overlapping in the cinematics; every circle on the ground should trigger something different, with memories from below, from the Assay, and of Wren and the conflict between her and Seren in his head.
 
 **Picture**
@@ -28,7 +52,7 @@ From play notes: the cel shading is a little dark; the red flare round the edge 
 
 **Checked** by script: the kick, the Wide Cut and the hook line fire and name themselves; the gold glow rises with fury; all three levels still run to their endings. **Not checked:** whether the brighter picture is right on a phone and on a big screen (I looked at one size); the Wide Cut's turn in motion; the memories' wording on screen. The memory about Wren in the valley uses the picture of her at the Clerk's desk, because there is no picture of the Island.
 
-## v0.30 · 2026-11-19 — Riser Nine and the Stair are built; the boots are in all three
+## v0.30 · 2026-11-19 — Riser Nine and the Stair are built, and the boots are in all three
 From play notes: start building the two new third-person levels where they were placed, make sure they fit there, and give him what he has by then, the boots above all.
 
 **The boots** (all three third-person levels)
@@ -55,7 +79,7 @@ From play notes: start building the two new third-person levels where they were 
 
 **Checked** by script: each level from first panel to hand-back, every wave, both finds, the boss intro and ending, with no errors; started from the game itself in its frame with BOOTS on the button; the boots carry, land and hurt. The High Docks still runs start to end. **Not checked:** played by hand, any of it; whether four waves is too long for Riser Nine; whether enemies path sensibly on the flights of the Stair; how the sunset level looks on a phone.
 
-## v0.29.8 · 2026-11-19 — the second half: the rings, the Dockmaster's table, word of Lucan, the night before
+## v0.29.8 · 2026-11-19 — the second half: the rings, the Dockmaster's table, word of Lucan, the night before the Fall
 From play notes: work on the chapters' cutscenes, lore and story; keep the placeholders; decide where the third-person combat fits the story best.
 
 **Where the third-person levels go (decided)**
@@ -79,9 +103,9 @@ From play notes: two more stretches of play like the High Docks are wanted, in d
 - Both are listed under Dev menu → Levels in 3D as PLANNED.
 - The story bible has a map of Part Two (every scene, fight and playable stretch in order) and a note on what each of the two levels would be. These two are my proposal, not a decision; moving a slot is a one-line change.
 
-Nothing else changed in this version.
+Nothing else changed in this version. The High Docks has still not been played by hand.
 
-## v0.29.6 · 2026-11-19 — the High Docks: steadier ground, and what leads in and out of it
+## v0.29.6 · 2026-11-19 — the High Docks: steadier ground, what leads in and out of it
 From play notes: some glitchy ground textures; tighten it up, then work out how it fits the game, the lore and the story, and build what leads in and out; then keep polishing, the new sections most.
 
 **Ground**
@@ -103,7 +127,7 @@ From play notes: some glitchy ground textures; tighten it up, then work out how 
 
 **Not done:** the wider polish pass on the rest of the game. This round went on the level and the scenes around it.
 
-## v0.29.5 · 2026-11-19 — the High Docks: a five-beat chain, the Count in a fight, and words that are ours
+## v0.29.5 · 2026-11-19 — the High Docks: a five-beat chain, the Count in a fight, words that are ours
 From play notes: the comic pop-ups on hits should say things from the lore, and there should be combos; keep improving the fighting animations and make sure every limb is rigged.
 
 - **Five beats instead of three**, each its own animation using a different limb: the cut (blade, from the shoulder), the backhand (blade, rising), **the ram** (off hand, straight from the hip), **the boot** (knee up, then through him; it knocks ordinary guards down), and the cleave (both hands, from the air).
@@ -113,7 +137,7 @@ From play notes: the comic pop-ups on hits should say things from the lore, and 
 
 **Checked** by script: the chain reaches its fifth beat, the count reaches ELEVEN and strikes, guards answer back, no errors. **Not checked:** how it feels to play, and whether five beats with the higher damage make ordinary guards too easy.
 
-## v0.29.4 · 2026-11-19 — the High Docks: HUD out of the way, suns that work, a blade that lands, and a place that looks like theirs
+## v0.29.4 · 2026-11-19 — the High Docks: HUD out of the way, suns that work, a blade that lands, a place that looks like theirs
 From play notes on a phone: the HUD sat in the middle of the action; walking onto the circles did nothing; with finishers in, the finisher and the fighting need to hit like the other fights do ("he's hitting like a sponge"); the place should feel like the Accredited and their society.
 
 - **HUD.** Scaled to the size of the frame and kept to the corners: health and fury top left, the objective top right, messages low. The portrait is dropped in the small frame.
@@ -131,7 +155,7 @@ From play notes on a phone: the HUD sat in the middle of the action; walking ont
 
 **Checked** in an upright phone-sized window with the on-screen buttons: A opens a question mark; walking onto the sun starts the count; A on a dazed Warden runs the memory and the three-beat finisher. **Not checked:** how the new cuts look in motion at speed (seen in stills), fight balance with the higher damage (fights will be shorter and Rook easier), and all of it on a real phone.
 
-## v0.29.2 · 2026-11-19 — the High Docks plays in the game's own frame, with memories instead of powers
+## v0.29.2 · 2026-11-19 — the High Docks plays in the game's own frame, with memories in place of powers
 From play notes: it played in its own vertical window; it should sit in the same frame and use the same controls as the rest of the game; no start button and no "turn your phone"; drop the roguelite abilities for story beats; question marks should show memories from the future section; finishers and ultimates should cut to memories that show his rage; the fighter should look more like Kael.
 
 - **Same frame, same controls.** The level is placed exactly over the game screen, upright or sideways, under SOOTBORN's own d-pad and buttons. A strikes, or uses whatever the prompt says; B dodges; ELEVEN (the hook button) is the ultimate; LOCK and LOOK are on the guard and jump buttons; Menu pauses. Drag the picture to turn the camera. Its own stick, buttons, pause icon and rotate notice are gone.
@@ -142,7 +166,7 @@ From play notes: it played in its own vertical window; it should sit in the same
 - **Kael's model rebuilt** to match the rest of the game: Accredited plate (collar, tassets, greaves, big pauldrons), House Violet's cape, the blade in his right hand, the bronze valve ram lit on his off arm, the pinned sun on his chest. The trench coat is gone.
 - Sound uses the game's own audio channel, so it does not need a second tap to start.
 
-- **v0.29.3 fix:** the touch pad and buttons were hidden during the level (they only showed in the walking and fighting parts). They now stay up for the whole level. Checked by pressing the on-screen A and holding the on-screen d-pad in an upright phone-sized window.
+- **v0.29.3 fix.** The touch pad and buttons were hidden during the level (they only showed in the walking and fighting parts). They now stay up for the whole level. Checked by pressing the on-screen A and holding the on-screen d-pad in an upright phone-sized window.
 
 **Not checked:** played by hand; whether the d-pad's four directions feel right for a third-person camera (there is no analogue stick on the touch pad); the blade with the old punch animations was only looked at in still poses.
 
