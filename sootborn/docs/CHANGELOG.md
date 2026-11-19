@@ -1,4 +1,26 @@
-# SOOTBORN — changelog (latest v0.55 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.56 · 2026-11-19)
+
+## v0.56 · 2026-11-19 — down the open list: a run with arms, guards with three blows and a guard, the fleet, the Scuffle's own row
+Worked from the open list while you were away. Nothing here was played by hand.
+
+**Found: why story beats stopped showing from the Dev menu**
+- Opening the **Training room** from the Dev menu switched on "Skip fight intro films" and never switched it off. From then until the page was reloaded, every fight skipped its opening film and its memory cut-ins. Leaving the training room, by any route, now puts the switch back the way you had it.
+- If beats are still missing after this, tell me which entry.
+
+**Comic levels**
+- **The run has arms.** Both arms hung in front of him with the elbows locked. Now one drives forward as the other goes back past the hip, elbow opening on the back swing, and the hook trails low behind on its side. Checked on an eight-frame side-on sheet.
+- **Guards have three blows.** A Dock Guard picks one each time: the cross cut he always had, an overhead chop, or a straight thrust from the hip. If he follows with a second blow it is a different one. Wardens mix their overhead with a wide sweep.
+- **Guards guard.** A Dock Guard who is facing you and not mid-swing will sometimes turn a light cut on his weapon (TURNED.): steel up across the body, a fifth of the damage, pushed back a step. He cannot do it again for about two and a half seconds, and never against a heavy blow, the hook, the boots or ELEVEN. Sixty light cuts by script: three turned.
+- **The fleet over the Stair** (and the docks). The far ships were scattered at random and some sat inside each other. They now ride in two rings, one behind the other, spaced so no two can touch; the rings turn slowly against each other and rise and fall a little, and each hull has a riding lamp that winks.
+- **Riser Nine: room at the start.** The first sun was three metres from where he stands up. It is eight metres up the road now, so there is a walk before the Wardens come.
+
+**Fights**
+- **The second wind remembers where the story is.** In the Assay it alternates the furnace with the Table ("They opened my bones so that I could stand here. So I stand."); on the Spire, Seren's line in the Count ("Holloway, S. The line is still struck. So I get up."); from the Fall onward, Brand ("Brand held a stair for eleven minutes. We can hold a floor.").
+- **Losing a fight that can be lost** (the Scuffle, the Ember Ring, the Drill) now says something under KAEL IS DOWN: "I've been on this floor before. I know the way up."
+- **The Scuffle is fought on Row K.** Behind the chalk: the doors with their lamps, the sun on K-7, the washing line, Garrow's post with its knots, the row watching.
+- **Controller legend in arena fights.** With a pad in hand, one dim line in the bottom corner: X cut, Y kick, A jump, B dodge, RB guard, LB hook (no hook shown below the rock).
+
+**Checked by script:** all three levels start to end after the changes; the run sheet; the guard's new blows forced one after another with no errors; the block counted; the Scuffle's backdrop and the losing line in a picture; a bot won the Pairing; the page loads clean. **Not checked:** anything in motion or by hand; how often a guard turning a cut feels right; the ring of ships seen in one still; the controller legend (no pad here); the new second-wind memories were not triggered, only written.
 
 ## v0.55 · 2026-11-19 — the controller in the comic levels, properly this time; Dev menu levels start from their opening
 From play notes.

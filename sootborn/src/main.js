@@ -3,7 +3,7 @@
 // ============================================================
 const HEIST_LANE_MID = [[18, 6, 1, 0.9], [18, 6, 0, 0.9], [7, 6, 1, 0.9], [7, 6, 0, 0.9]], HEIST_LANE_N = [[16, 3, 0, 1.1], [5, 3, 0, 1.1]];
 const Game = {
-  toTitle() { World.gilded = 0; World.gildP2 = 0;
+  toTitle() { World.gilded = 0; World.gildP2 = 0; if (DEV._tq !== undefined) { DEV.quick = DEV._tq; DEV._tq = undefined; }
     G.mode = 'title'; Dialogue.active = false; $('#dlg').classList.add('hidden'); if (Puzzle.active) Puzzle.close();
     if (!P.sheet) World.resetSheets(); World.showPlayer = false; G.flags = G.flags || {};
     World.load('square', { x: 13 * 16 + 8, y: 8 * 16, dir: 0 }); Sound.music('home');

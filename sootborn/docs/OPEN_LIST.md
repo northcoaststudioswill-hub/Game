@@ -1,5 +1,5 @@
-# SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.55 (2026-11-19).
+# SOOTBORN — open list 
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.56 (2026-11-19).
 
 ## Waiting on you
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
@@ -13,10 +13,11 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - The Lamp's wrong-name fight (v0.50).
 - Controller in the comic levels: both sticks and lock-on now reach the level (v0.55); legend and pause menu on the stick (v0.49). Never tried with a real pad.
 - The second wind's furnace scene in arena fights (v0.54). Levels from the Dev menu starting at their opening (v0.55).
+- v0.56: guards' three blows and their guard (TURNED.); the run's arms; the ring of ships over the Stair; the Scuffle on Row K; the second wind's memory by era; the controller legend in arena fights.
 
 ## Characters and animation
-0. **The run in the comic levels.** Lean halved and cape fixed in v0.53 from side-on frames; needs your eye in motion. Next: arms (the weapon arm barely moves), and the guards' jog checked the same way.
-1. **Guards:** better models and their own set of strikes, blocks and stances, so they stop looking like they are jogging at you. Use the same rigs in cutscenes.
+0. **The run in the comic levels.** Lean and cape (v0.53), arms (v0.56), all from side-on frames. Needs your eye in motion before anything more is changed. The guards' jog was looked at the same way and left.
+1. **Guards:** three blows and a guard for Dock Guards, two blows for Wardens (v0.56). Still to do: better models; more for the Stair Blades; the same rigs in cutscenes.
 2. **Kael in the arena fights:** arms, hands, blade, legs and body brought up to his head; a ready stance and small movement in held shots.
 3. **Capes:** changed four times today from stills. The rule you gave: it kicks up with momentum and then falls; it never floats. Needs your eye in motion, then another pass if it still hangs in the air.
 4. **Tavi:** a better body now that he walks the Stair.
@@ -27,23 +28,23 @@ Kept current each round. "Keep going" means work down this list from the top unl
 7. **2.5D walking:** the camp and Ashgate Square as places you walk with flat sprites in a 3D space; the fire scene on night 28 staged that way (everyone comes to the circle, it is said, the fight starts).
 8. **The High Docks rebuilt from reference:** laid out like a real dock, dressed as somewhere the Accredited live, with side corridors that go nowhere, height for the boots, and hidden things that feed the Codex.
 9. **Riser Nine:** more character still. It has a hill, a hoist and a road now.
-9a. **The Stair's sky:** bring the moored and drifting ships to life (lamps, slow movement, crew), and make sure none pass through each other.
-9b. **More room at the start of every comic level** before anything happens. Docks and Stair done; check the feel, and build any new level with a long first stretch.
-9c. **2D scenes in the Dev menu:** you said they no longer show their story beats. The comic levels are fixed (v0.55). For the 2D ones I need to know which entry: if "Skip fight intro films" is switched on in the Dev menu, that is what hides them.
+9a. **The Stair's sky:** the far fleet rides in two turning rings with winking lamps and cannot touch (v0.56). Still to do: crew on the near hulls; the three near wrecks and the smoke do not move.
+9b. **More room at the start of every comic level.** Docks, Stair and Riser Nine done (v0.56). Check the feel; build any new level with a long first stretch.
+9c. **Story beats missing from the Dev menu:** cause found in v0.56 (the Training room left film-skipping switched on). Tell me if any entry still starts without its scenes.
 10. **2D valley maps:** more terrain you can read (rises, banks, cover), more detail.
-11. **The Scuffle** has the square behind it; it needs its own background.
+11. **The Scuffle** has Row K behind it (v0.56). The floor and the lamp posts on it are still the square's.
 
 ## Story and scenes
-- **Going down in a fight should always be a moment.** Done for the arena second wind (v0.54) and the comic-level bosses (v0.50). Still to do: the 2D fights below, and different memories by where the story is.
+- **Going down in a fight should always be a moment.** Arena second wind (v0.54), comic-level bosses (v0.50), memories by era and a line on losing (v0.56). Still to do: a drawn scene for losing below, not only a line.
 12. **More short 2D memory scenes**, especially memories.
-13. **Memories inside fights chosen by where the story is:** the Assay; Kestrel and the week he blamed her; Brand.
+13. **Memories inside fights chosen by where the story is:** done for the second wind (v0.56). Still to do: the every-fifth-kill memories in the comic levels; Kestrel and the week he blamed her.
 14. **Transitions between story parts:** go through every hand-off (card, fade, music) from the opening to THE END.
 15. **Comic layouts:** the Table was checked; the three levels' opening pages and memory pages still need the same look.
 16. **More 2D films built from stills** in the comic style; the Pairing's and the Ford's own intro shots.
 17. Part Two play: the service stair as a walked level (chapter 1); a barge in the weather (chapter 4); a quiet scene with the Unlit before the Stair; the ending as a Table-style sequence; a suspicion meter in Spire talk; the Count as a puzzle.
 
 ## Fighting and controls
-18. **One controls card** that holds across the 2D fights, the arena fights and the comic levels; a button legend in the arena fights.
+18. **One controls card** that holds across the 2D fights, the arena fights and the comic levels. (The arena legend for a pad is in, v0.56.)
 19. **Group fights still read as busy.**
 20. **Difficulty:** tuned from your notes and a mashing bot only. The Scuffle and the Ember Ring were not re-fought after the changes.
 21. The on-screen pad has no second stick, so on a phone the camera still turns by dragging the picture.

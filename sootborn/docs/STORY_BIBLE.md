@@ -1,5 +1,5 @@
-# SOOTBORN — Story bible 
-Tagline: "Every breath is hers." Current build: v0.55 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+# SOOTBORN — Story bible
+Tagline: "Every breath is hers." Current build: v0.56 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -480,3 +480,6 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **In the air (v0.51):** with the boots, the hook hauls a man up to him and the blade cuts him down from there. Guards answer a man who will not come down by throwing a knife or a hatchet. Nobody in this world has a gun.
 - **His face in dialogue** is the gilded one from the end of the Table onward.
 - **The second wind (v0.54):** when he is beaten down in an arena fight and gets up, what he sees is Seren in the furnace doors. "Every breath I take is hers. So I get up."
+- **Guards (v0.56):** a Dock Guard has three blows (cross cut, overhead, thrust) and can turn a light cut on his weapon. Kael's word for it is TURNED.
+- **Going down (v0.56):** what gets him up depends on when. Below and in training: the furnace. The Assay: the furnace, or the Table. The Spire: her line in the Count. The Fall onward: Brand on the stair, and "we".
+- **The Scuffle** is fought at the west end of Row K, in front of the doors, with the row watching.
