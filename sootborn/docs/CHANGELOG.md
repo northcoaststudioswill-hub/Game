@@ -1,4 +1,24 @@
-# SOOTBORN — changelog (latest v0.36 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.37 · 2026-11-19)
+
+## v0.37 · 2026-11-19 — checking pass: titles in frame, cleaner hand-offs into the levels, things in the wrong place
+From play notes: make sure no titles are out of frame; clean transitions between the (now three) kinds of play; look for things misplaced, wrong, or going through each other; make the Assay and its places feel more authentic.
+
+**Titles**
+- Measured every title card in the game (63) at four screen sizes, upright and sideways. Two kinds ran off the edge:
+  - the **Assay calendar strip** under every Assay card was up to 228 px too wide on an upright phone. It now fits the width and its labels shrink and wrap.
+  - long **big titles** ("THE DOCKMASTER'S TABLE", "TWO AND A HALF YEARS FROM NOW") ran off the sides. Big titles now wrap, centre, and size to the shorter side of the screen.
+- After the fix all 63 fit at all four sizes. Captions and move names drawn inside fights (87 strings) were measured too and already fit.
+
+**Into and out of the third-person levels**
+- Going in: the level's own title card (THE HIGH DOCKS / RISER NINE / THE STAIR, with its year) holds the screen while the level wakes, then the level fades up under it. Before, the picture cut to black and then snapped on.
+- Coming out: the level fades down before the story carries on.
+
+**Wrong or in the way**
+- **Brand was standing where the camera is** at the start of the High Docks, so on an upright phone the first thing on screen was the inside of his fist and halberd. He now stands to one side of the stair head.
+- **The hook's tip went through the floor** when Kael stood still. He carries it point forward at rest now.
+- **Opening messages in the levels named the old controls** (BOOTS, and keyboard keys on Riser Nine and the Stair). They now describe the current ones: held strike, held jump.
+
+**Checked:** the title measurements above; the fade in and out by script in the game frame; the finisher memory still fires; the docks start in an upright window (picture). **Not done this round:** the Assay's 2D camps and the 3D valley, ford and keep were not changed. I did not want to place new objects in those maps blind; that is the next pass, and I would rather do it against your notes on what feels thin there. Nothing was played by hand.
 
 ## v0.36 · 2026-11-19 — story pass: four new scenes, Oswin's thread laid in, the blade's history settled
 From play notes: give the whole game some work; more lore; check the story; add any new scenes with impact.

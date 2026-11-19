@@ -28,10 +28,12 @@ const Issue = {
     try { if (Sound.mus) Sound.mus.gain.value = 0; window.__issueAudio = Sound.ctx || null; } catch (e) { /* no audio yet */ }
     const f = this.el = document.createElement('iframe');
     f.setAttribute('title', 'SOOTBORN: ' + this.LEVELS[key]); f.setAttribute('tabindex', '-1');
-    f.style.cssText = 'position:fixed;border:0;background:#07070d;image-rendering:auto';
+    f.style.cssText = 'position:fixed;border:0;background:#07070d;image-rendering:auto;opacity:0;transition:opacity .6s';
+    // a title holds the screen while the level wakes, and the level fades up under it
+    const TT = { docks: ['THE HIGH DOCKS', 'Seven years from now. The second bell.'], riser: ['RISER NINE', 'Five years from now. The Assay valley, at night.'], stair: ['THE STAIR', 'Nine years from now. Sunset.'] }[key]; try { Cutscene.card(TT[0], TT[1], 1); } catch (e) { /* no title */ } this.t0 = performance.now();
     this.onMsg = e => {
       const d = e.data; if (!d || typeof d.sootborn !== 'string' || !this.el || e.source !== this.el.contentWindow) return;
-      if (d.sootborn === 'issue-ready') { this.ready = true; try { this.el.contentWindow.postMessage({ sootborn: 'assets', panels: this.assets() }, '*'); } catch (er) { /* it plays without them */ } }
+      if (d.sootborn === 'issue-ready') { this.ready = true; setTimeout(() => { if (this.el) this.el.style.opacity = 1; try { Cutscene.hideCard(); } catch (er) { /* gone */ } }, Math.max(0, 1500 - (performance.now() - this.t0))); try { this.el.contentWindow.postMessage({ sootborn: 'assets', panels: this.assets() }, '*'); } catch (er) { /* it plays without them */ } }
       if (d.sootborn === 'issue-done') this.finish(true, d.data);
     };
     window.addEventListener('message', this.onMsg);
@@ -52,7 +54,9 @@ const Issue = {
     try { this.el.contentWindow.postMessage({ sootborn: 'in', x, y, press, hold }, '*'); } catch (e) { /* frame is going away */ }
   },
   finish(ok, data) {
-    if (!this.on) return; this.on = false; clearTimeout(this.timer); window.removeEventListener('message', this.onMsg);
+    if (!this.on) return;
+    if (ok && this.el && !this.closing) { this.closing = true; this.el.style.transition = 'opacity .45s'; this.el.style.opacity = 0; setTimeout(() => this.finish(ok, data), 460); return; }
+    this.closing = false; try { Cutscene.hideCard(); } catch (e) { /* gone */ } this.on = false; clearTimeout(this.timer); window.removeEventListener('message', this.onMsg);
     try { this.el.contentWindow.postMessage({ sootborn: 'stop' }, '*'); this.el.contentWindow.SC.audio.kill(); } catch (e) { /* its own context dies with the frame */ }
     if (this.el) this.el.remove(); this.el = null; window.__issueAudio = null; Sound.setVol(); try { window.focus(); } catch (e) { /* fine */ }
     if (this.lab) for (const id in this.lab) { const b = $('#' + id); if (b) b.textContent = this.lab[id]; } this.lab = null;

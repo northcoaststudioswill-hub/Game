@@ -445,6 +445,8 @@ rep("    { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) :
       // air: something is always drifting in these places
       if (SC.state === 'play') { if (!U.graded) { U.graded = 1; G.renderer.domElement.style.filter = 'saturate(1.14) contrast(1.06)'; } }
       if (SC.hookMesh && p.state !== 'hook') SC.hookMesh.visible = false;
+      // at rest the hook is carried point forward, not grounded: the tip was going through the floor
+      if (bn && p.state === 'idle') { bn.elR.rotation.x -= 0.55 * (1 - (U.stance || 0)); bn.shR.rotation.x += 0.12; }
       // nearly down: the rage answers once
       if (SC.state === 'play') { if (p.hp > 0 && p.hp < SC.T.hp * 0.3) { if (!U.lowCut && U.cut('ON MY BREATH', 'EVERY BREATH IS HERS', true)) { U.lowCut = 1; p.gain(40); p.inv = Math.max(p.inv, 1.2); } } else if (p.hp > SC.T.hp * 0.6) U.lowCut = 0; }
       U.lastYaw = p.yaw; }

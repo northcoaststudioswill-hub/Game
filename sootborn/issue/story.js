@@ -98,7 +98,7 @@
   function hideClerk() { clerk.group.visible = false; }
   function shot(px, py, pz, lx, ly, lz, fov, w, h) { const c = G.camera; c.position.set(px, py, pz); c.fov = fov; c.updateProjectionMatrix(); c.lookAt(lx, ly, lz); return G.snap(w || 768, h || 432); }
   /* Brand keeps the head of the dock stair, at the blind end of Bond Alley, for the whole issue. */
-  function brandOnStair() { showClerk(0.9, 0, 43.6, Math.PI); }
+  function brandOnStair() { showClerk(2.7, 0, 42.4, Math.PI * 0.9); }   // to one side of the stair head: he was standing where the camera is
 
   function intro() {
     SC.state = 'play'; U.showHud(false); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; pl.faceOverride = 'shock';
@@ -126,7 +126,7 @@
         { who: 'clerk', text: 'You do not argue, and you do not come back for me. Count your eleven, decide how you mean to fight, and *go*.' }
       ], n); },
       n => { brandOnStair(); SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.snapBehind(Math.PI); cam.endCine(0.9); U.showHud(true); setFlag('intro');
-        U.toast(SC.hosted ? 'DRAG THE PICTURE TO LOOK ROUND. *A* STRIKES AND USES. *B* DODGES.' : SC.input.touch ? 'LEFT THUMB MOVES. DRAG THE RIGHT SIDE TO TURN THE CAMERA.' : 'WASD MOVES. DRAG THE MOUSE OR USE THE ARROWS TO TURN THE CAMERA.', 5); n(); }]);
+        U.toast(SC.hosted ? 'DRAG THE PICTURE TO LOOK ROUND. *A* CUTS AND USES; HELD, THREE HEAVY BLOWS. *B* DODGES.' : SC.input.touch ? 'LEFT THUMB MOVES. DRAG THE RIGHT SIDE TO TURN THE CAMERA.' : 'WASD MOVES. DRAG THE MOUSE OR USE THE ARROWS TO TURN THE CAMERA.', 5); n(); }]);
   }
   function bossIntro() {
     const again = F.bossIntro; F.bossIntro = 1; save(); pl.control = false; pl.setState('scripted'); pl.script = t => P.guard(t); pl.scriptRate = 6; U.showHud(false); SC.emit('letterbox', true); cam.lock = null;
@@ -288,7 +288,7 @@
       else { brandOnStair(); U.toast(id === 'alley' ? 'THE TERRACE IS OURS. *UP.*' : id === 'l1' ? 'TAVI: "ON YOUR LEFT. KEEP GOING."' : 'ONE FLIGHT LEFT. *THE WHITE DOOR.*', 3.4); }
     };
     const begin = () => { SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.mode = 'follow'; cam.snapBehind(Math.PI); U.showHud(true); setFlag('intro');
-      U.toast(SC.hosted ? 'DRAG THE PICTURE TO LOOK ROUND. *A* STRIKES AND USES. *B* DODGES. *BOOTS* CARRY HIM OVER THEM.' : 'WASD MOVES. J STRIKES. K DODGES. F IS THE BOOTS.', 5.5); };
+      U.toast(SC.hosted ? 'DRAG THE PICTURE TO LOOK ROUND. *A* CUTS; HELD, THREE HEAVY BLOWS. *JUMP*, HELD, HOVERS.' : 'WASD MOVES. J STRIKES. K DODGES. F IS THE BOOTS.', 5.5); };
     intro = function () {
       SC.state = 'play'; U.showHud(false); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; pl.faceOverride = 'angry';
       pl.place(0, 0, RIS ? 5.5 : 41, Math.PI); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.face('angry'); pl.model.group.updateMatrixWorld(true); brandOnStair(); if (clerk) clerk.group.updateMatrixWorld(true);
