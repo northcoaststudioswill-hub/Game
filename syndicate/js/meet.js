@@ -61,9 +61,9 @@
     const side = (px + pz) >= 0 ? 1 : -1, k = Math.min(1, D.t / 6), port = gfx.portrait, shot = (ln && ln.shot) || 'two';
     let pos, look, fov;
     // keep the lens between the two when they stand close, so nobody's shoulder or back fills the frame
-    const fit = c => Math.min(c, Math.max(1.75, d - 0.55)), fv = (c, c0) => Math.min(44, 32 * c0 / c);
-    if (shot === 'npc') { const c0 = lerp(3.5, 3.1, k), c = fit(c0); pos = [n[0] + ux * c + px * side * 0.9, nh + 0.1, n[1] + uz * c + pz * side * 0.9]; look = [n[0], nh - 0.08, n[1]]; fov = fv(c, c0); }
-    else if (shot === 'you') { const c0 = lerp(3.0, 2.6, k), c = fit(c0); pos = [y[0] - ux * c + px * side * 1.0, 1.55, y[1] - uz * c + pz * side * 1.0]; look = [y[0], 1.12, y[1]]; fov = fv(c, c0); }
+    const tight = d < 3.7, fit = c => tight ? Math.max(1.3, d * 0.5) : c, so = tight ? 1.9 : 0.9, fv = (c, c0) => tight ? 46 : 32;       // two people standing close are filmed from the side of the gap between them, never from behind a shoulder
+    if (shot === 'npc') { const c0 = lerp(3.5, 3.1, k), c = fit(c0); pos = [n[0] + ux * c + px * side * so, nh + 0.1, n[1] + uz * c + pz * side * so]; look = [n[0], nh - 0.08, n[1]]; fov = fv(c, c0); }
+    else if (shot === 'you') { const c0 = lerp(3.0, 2.6, k), c = fit(c0); pos = [y[0] - ux * c + px * side * (tight ? so : 1.0), 1.55, y[1] - uz * c + pz * side * (tight ? so : 1.0)]; look = [y[0], 1.12, y[1]]; fov = fv(c, c0); }
     else if (shot === 'low') { const c = fit(2.2); pos = [n[0] + ux * c + px * side * 0.5, 0.45, n[1] + uz * c + pz * side * 0.5]; look = [n[0], nh - 0.12, n[1]]; fov = lerp(34, 44, k) * (c < 2.2 ? 1.2 : 1); }
     else if (shot === 'ots') { pos = [y[0] + ux * 1.7 + px * side * 1.25, 2.1, y[1] + uz * 1.7 + pz * side * 1.25]; look = [n[0], nh - 0.15, n[1]]; fov = lerp(40, 36, k); }
     else if (shot === 'wide') { pos = [mx + px * side * 7.5 + ux * 1, lerp(3.4, 4.0, k), mz + pz * side * 7.5 + uz * 1]; look = [mx, 0.9, mz]; fov = 44; }

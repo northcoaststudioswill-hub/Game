@@ -38,7 +38,7 @@
 
   // ------------------------------------------------------------ honing: a weapon you keep gets better
   const HONE = [60, 130, 220];
-  if (ui.armory) { const ar0 = ui.armory; ui.armory = function () { const r = ar0.apply(this, arguments), st = G.state, h = st.hero, id = G.armOf(h), n = (st.hone = st.hone || {})[id] || 0, end = document.querySelector('#panel .row.end'); if (!end) return r;
+  if (ui.armory) { const ar0 = ui.armory; ui.armory = function () { const r = ar0.apply(this, arguments), st = G.state, h = st.hero, id = G.armOf(h), n = (st.hone = st.hone || {})[id] || 0, end = document.querySelector('#panel .row.end'); if (!end || document.querySelector('#panel .locked-card') || (G.unlocked && !G.unlocked('armory'))) return r;
     const row = document.createElement('div'); row.className = 'ab-row'; row.innerHTML = '<div class="ab-ic pas">✦</div><div class="ab-tx"><b>Hone the ' + G.ARM_BY[id].name + '</b><small>' + n + ' of 3</small><p>The Fence knows a grinder. Each honing adds +1 to every blow with this weapon, on top of its mastery and the grade of your steel.</p></div>' + (n >= 3 ? '<span class="lock">Honed</span>' : '<button id="hone"' + (st.coin < HONE[n] ? ' disabled' : '') + '>' + HONE[n] + ' coin</button>');
     end.parentNode.insertBefore(row, end); on('#hone', () => { if (st.coin < HONE[n]) return; st.coin -= HONE[n]; st.hone[id] = n + 1; G.save(); G.sfx('coin'); ui.topbar(); ui.armory(); }); return r; }; }
 
