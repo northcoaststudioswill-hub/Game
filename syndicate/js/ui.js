@@ -129,7 +129,7 @@
   };
   ui.leaveHub = () => { const w = W().walker; if (G.scene === 'hub') G.hubPos = { x: w.x, z: Math.max(w.z, 1.2) }; };
   ui.hideout = function () {
-    ui.leaveHub(); ui.close(); G.hubPos = { x: 1.2, z: 9 };
+    ui.leaveHub(); ui.close(); G.hubPos = { x: -11.4, z: 19.3 };
     G.scene = 'hideout'; W().enter('hideout'); ui.topbar();
     if (!G.state.seenHideout) { G.state.seenHideout = true; G.save(); ui.toast('This cave is yours. Press Decorate to buy furniture and plants. Tap anything you own to pick it up and move it.'); }
   };

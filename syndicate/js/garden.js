@@ -26,8 +26,18 @@
   // he watches from the rotunda, and cannot keep it to himself
   const HIS = ['OH, that is LOVELY. Do it again. Slower. I want to remember it.', 'Look at them go! I paid nothing for this. NOTHING. It is the best thing I own.', 'I could watch this all day. I have. I own the day.', 'Bleed on the lilies, meat, the gardener gets paid either way. He does not, actually.', 'Do you know what this is worth? I do. I counted it. Then I counted it again for pleasure.', 'That one owed me eleven. Now it owes me nothing, and I STILL feel robbed. Wonderful.', 'Gold under my arse and guts on my lawn. A man could weep. A lesser man.', 'Not the roses! …No, go on. The roses can be bought. Everything can.', 'Scream if you like. It carries beautifully in here. I had the dome built for it.', 'I love it. I LOVE it. Somebody write that down. Not you, you are busy dying.'];
   const HIS_KILL = ['ERASED! Oh, the look on its face. It had a face a moment ago.', 'Another one off the books. I adore a clean ledger.', 'HA! Gone. Not dead, GONE. Do you understand how much better that is?', 'That is one. I am keeping count. I am always keeping count.'];
+  // and he has opinions about everybody's blood but his own
+  const HATE = {
+    elf: ['Look at the elf run. Six hundred years to learn that, and it is still wrong.', 'Pointy-eared, leaf-chewing, poem-writing waste of a long life. ERASE it.', 'An elf! I had one stuffed once. It was better company.'],
+    dwarf: ['The dwarf! Go on, stunty, dig. DIG. It is the only thing your kind was ever for.', 'Half a man and all beard. Somebody step on it.', 'I can smell the tunnel on that one from up here. Scrub the lawn after.'],
+    halforc: ['Tusks! In MY garden! Put it down before it breeds.', 'A half-orc. Half of what, I ask you? Half of something that should have been drowned.', 'It thinks with its jaw. Watch. There. Told you.'],
+    tiefling: ['Horns and a tail and it wonders why nobody lends to it. Burn it back where it came from.', 'Hell-spawn on the grass. The gardener will have to salt it.', 'A tiefling. Somebody’s grandmother made a very poor bargain, and here it is, bleeding on my lilies.'],
+    drow: ['Cave-pale spider-kisser. Squinting, is it? GOOD. Have some more sun.', 'A drow in daylight. Look at it flinch. I could watch that for a year.', 'Crawl back under your rock, you bleached little grub. Oh, you cannot. HA!'],
+    human: ['A human. Seventy years if it is lucky, and it spends them on THIS.', 'Mayflies, the lot of you. Loud, greasy mayflies.', 'Humans. Bred like rats, think like rats, and they will die like rats while I applaud.'] };
+  const ALL_HATE = ['Every one of you is beneath me. I had to build the throne this high just to be sure.', 'Elves, dwarves, orc-get, hell-get, cave-get, and the common herd. A full set! I shall have you all mounted.', 'Not one drop of decent blood on the whole lawn. Mine is the only kind worth spilling, and I am not offering.', 'I am the only real person here. The rest of you are furniture that screams.'];
+  const hateFor = r => HATE[r] || ALL_HATE;
   let davT = 6, davEl = null;
-  function says(pool) { if (!G.garden.run || !G.garden.run.brawl) return; if (!davEl) { davEl = document.createElement('div'); davEl.id = 'gdavid'; document.getElementById('ui').appendChild(davEl); } davEl.innerHTML = '<b>David</b> “' + pick(pool) + '”'; davEl.classList.remove('on'); void davEl.offsetWidth; davEl.classList.add('on'); davT = 9 + Math.random() * 5; }
+  function says(pool) { if (!G.garden.run || !G.garden.run.brawl) return; if (!davEl) { davEl = document.createElement('div'); davEl.id = 'gdavid'; document.getElementById('ui').appendChild(davEl); } davEl.innerHTML = '<b>David</b> “' + pick(pool) + '”'; davEl.classList.remove('on'); void davEl.offsetWidth; davEl.classList.add('on'); davT = 7 + Math.random() * 4; }
   function hud() { if (!hudEl) { hudEl = document.createElement('div'); hudEl.id = 'gsouls'; document.getElementById('ui').appendChild(hudEl); } hudEl.textContent = 'SOULS LEFT · ' + (mobs.length + 1); }
   function gore(x, y, big) {
     const gf = G.gfx, X = x / S, Z = y / S, on = G.state.gore !== false;
@@ -36,7 +46,7 @@
     const sc = arena().scene, T = THREE; for (let i = 0; i < (on ? 9 : 4); i++) { const m = new T.Mesh(new T.BoxGeometry(0.16 + Math.random() * 0.2, 0.14 + Math.random() * 0.16, 0.16 + Math.random() * 0.2), new T.MeshLambertMaterial({ color: on && i % 3 ? [0x8a1410, 0xb02018, 0x5a0c0a][i % 3] : 0xcfe0ee, transparent: true })); m.position.set(X, 0.9 + Math.random() * 0.6, Z); sc.add(m); const a = Math.random() * 6.28, v = 2 + Math.random() * 4.5; chunks.push({ m, vx: Math.cos(a) * v, vz: Math.sin(a) * v, vy: 4 + Math.random() * 5, t: 0 }); }
     G.sfx('crit'); G.sfx('wall');
   }
-  function dropMob(m, by) { const i = mobs.indexOf(m); if (i < 0) return; mobs.splice(i, 1); gore(m.x, m.y, true); word(m.x, m.y, 'ERASED', '#ff3020', true); if (Math.random() < 0.45) says(HIS_KILL); m.dead = 0.001; m.c.root.visible = false; arena().scene.remove(m.c.root); hud(); if (by === 'you' && G.fight.addHypeX) G.fight.addHypeX(8); }
+  function dropMob(m, by) { const i = mobs.indexOf(m); if (i < 0) return; mobs.splice(i, 1); gore(m.x, m.y, true); word(m.x, m.y, 'ERASED', '#ff3020', true); if (Math.random() < 0.6) says(Math.random() < 0.6 ? hateFor(m.race) : HIS_KILL); m.dead = 0.001; m.c.root.visible = false; arena().scene.remove(m.c.root); hud(); if (by === 'you' && G.fight.addHypeX) G.fight.addHypeX(8); }
   // the soul you were fighting is gone: the nearest one left turns to face you
   function nextSoul(e) {
     if (!mobs.length) { G.fight.noSever = false; return false; }
@@ -57,7 +67,7 @@
       if (G.state.gore !== false) G.gfx.blood(m.x / S, 1.1, m.y / S, 14, 4); word(m.x, m.y, String(dmg), '#ffffff', false); if (m.hp <= 0) dropMob(m, 'you'); });
   }
   function stepMobs(dt) {
-    const F = G.fight, P = F.P, E = F.E; if (!P || !E) return; clock += dt; davT -= dt; if (davT <= 0) says(HIS); const live = F.inFight && F.inFight();
+    const F = G.fight, P = F.P, E = F.E; if (!P || !E) return; clock += dt; davT -= dt; if (davT <= 0) { const r = Math.random(), alive = mobs.length ? mobs[Math.floor(Math.random() * mobs.length)] : null; says(r < 0.3 ? HIS : r < 0.5 ? ALL_HATE : r < 0.7 ? hateFor(G.state.hero.race) : hateFor(alive ? alive.race : G.state.hero.race)); } const live = F.inFight && F.inFight();
     for (let i = chunks.length - 1; i >= 0; i--) { const c = chunks[i]; c.t += dt; c.vy -= 20 * dt; c.m.position.x += c.vx * dt; c.m.position.z += c.vz * dt; c.m.position.y += c.vy * dt; c.m.rotation.x += dt * 6; c.m.rotation.z += dt * 5; if (c.m.position.y < 0.08) { c.m.position.y = 0.08; c.vy *= -0.3; c.vx *= 0.5; c.vz *= 0.5; } if (c.t > 2.2) { c.m.material.opacity = Math.max(0, 1 - (c.t - 2.2) / 0.6); if (c.t > 2.8) { c.m.parent && c.m.parent.remove(c.m); chunks.splice(i, 1); } } }
     if (live) hitMobs();
     const onYou = mobs.filter(m => m.tg === P).length;
@@ -90,7 +100,7 @@
     o.onDone = win => { o.onDone = null; run.left = mobs.length + 1; endBrawl(); if (!win) return soulDeath(o); G.sfx('holy'); survived(); };
     G.fight.start(o); const F = G.fight, lv = st.hero.level; clock = 0; tPrev = 'idle'; mobs = []; chunks = [];
     run.list.slice(1).forEach((q, i) => { const an = i / 9 * 6.2832 + 0.35, r = 150 + (i % 3) * 34, c = G.makeChar({ cls: q.cls, race: q.race, tint: q.tint }), hp = 34 + lv * 9 + i * 3;
-      const m = { c, name: q.name, x: Math.cos(an) * r, y: Math.sin(an) * r, hp, maxHp: hp, dmg: 2.5 + lv * 0.7, spd: 105 + Math.random() * 40, state: 'idle', t: 0, cd: 1 + Math.random() * 2, pickT: Math.random(), walk: Math.random() * 6, face: an + Math.PI, kx: 0, ky: 0, tg: null }; a.scene.add(c.root); mobs.push(m); });
+      const m = { c, name: q.name, race: q.race, x: Math.cos(an) * r, y: Math.sin(an) * r, hp, maxHp: hp, dmg: 2.5 + lv * 0.7, spd: 105 + Math.random() * 40, state: 'idle', t: 0, cd: 1 + Math.random() * 2, pickT: Math.random(), walk: Math.random() * 6, face: an + Math.PI, kx: 0, ky: 0, tg: null }; a.scene.add(c.root); mobs.push(m); });
     run.brawl = 1; davT = 5; F.noSever = true; F.onFoeDown = e => nextSoul(e); hud();
     setTimeout(() => { if (G.garden.run && G.garden.run.brawl) ui.toast('Ten of them, all at once, and they hate each other as much as you. Last one breathing walks.'); }, 500);
   }

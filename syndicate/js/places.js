@@ -42,15 +42,16 @@
     // worn paths: the promenade along the north row, the west lane to your door, and spokes into the square
     const onLane = (x, z) => (z >= 2 && z <= 3 && x >= 0 && x <= 28) || (x >= 1 && x <= 2 && z >= 2 && z <= 15) || (x >= 13 && x <= 15 && z >= 3 && z <= 5) || (z >= 8 && z <= 10 && x >= 2 && x <= 9) || (z >= 8 && z <= 10 && x >= 19 && x <= 23) || (x >= 22 && x <= 23 && z >= 3 && z <= 8) || (z >= 5 && z <= 6 && x >= 23 && x <= 28) || (z >= 13 && z <= 14 && x >= 2 && x <= 28) || (x >= 13 && x <= 15 && z >= 13 && z <= 20) || (x >= 26 && x <= 27 && z >= 6 && z <= 18);
     for (let x = -1; x <= X1 + 1; x++) for (let z = -1; z <= Z1 + 1; z++) cells.push({ x, z, tint: Math.hypot(x - 14, z - 9) < 4.6 ? plaza : onLane(x, z) ? lane : null });
+    for (let x = -14; x <= -2; x++) for (let z = 17; z <= 21; z++) cells.push({ x, z, tint: z >= 18 && z <= 20 ? lane : null });       // Tallow Row: the alley home
     tiles(s, cells, 'cobble', [0.5, 0.5, 0.56]);
     const m1 = stoneMat(0x6f6a72), m2 = stoneMat(0x56525c), m3 = stoneMat(0x625a5a);
     // building line on the two far sides, broken into houses of different heights
     const b1 = brickMat(0x8a8088, 11, 2), b2 = brickMat(0x74707c, 8, 2), bh1 = brickMat(0x8a7a78, 2.2, 0.7), bh2 = brickMat(0x726c7a, 2.2, 0.7);
     const bw = wall(s, X1 + 5, 5.2, 1, b1); bw.position.set(X1 / 2, 0, -2.05);
-    const lw = wall(s, Z1 + 5, 5.2, 1, b2); lw.position.set(-2.05, 0, Z1 / 2); lw.rotation.y = Math.PI / 2;
+    { const la = wall(s, 19.9, 5.2, 1, b2); la.position.set(-2.05, 0, 7.45); la.rotation.y = Math.PI / 2; }       // the west wall stops short of the corner, where the alley runs off
     [[2, 7.5, 6.6, bh1], [12, 6, 7.4, bh2], [18, 5, 6.2, bh1], [23, 6.5, 7.8, bh2], [28.5, 4, 6.4, bh1], [32.5, 4, 7.2, bh2]].forEach(q => { box(q[1], q[2] - 5.2, 1.6, q[3], q[0], 5.2 + (q[2] - 5.2) / 2, -2.5, s); box(q[1] + 0.5, 0.35, 2.3, m2, q[0], q[2] + 0.15, -2.5, s); });
-    [[3, 6, 6.8, bh1], [10, 5, 6.2, bh2], [15.5, 4, 7.2, bh1], [20, 3.4, 6.4, bh2]].forEach(q => { box(1.6, q[2] - 5.2, q[1], q[3], -2.5, 5.2 + (q[2] - 5.2) / 2, q[0], s); box(2.3, 0.35, q[1] + 0.5, m2, -2.5, q[2] + 0.15, q[0], s); });
-    for (let i = 0; i < 10; i++) { windowLight(s, 1 + i * 3.1, 3.9, -1.5, 0); if (i % 3 === 0) windowLight(s, 1.6 + i * 3.1, 6.1, -1.65, 0); if (i < 6) windowLight(s, -1.5, 3.9, 1.2 + i * 3.2, Math.PI / 2); }
+    [[3, 6, 6.8, bh1], [10, 5, 6.2, bh2], [15.2, 3.6, 7.2, bh1]].forEach(q => { box(1.6, q[2] - 5.2, q[1], q[3], -2.5, 5.2 + (q[2] - 5.2) / 2, q[0], s); box(2.3, 0.35, q[1] + 0.5, m2, -2.5, q[2] + 0.15, q[0], s); });
+    for (let i = 0; i < 10; i++) { windowLight(s, 1 + i * 3.1, 3.9, -1.5, 0); if (i % 3 === 0) windowLight(s, 1.6 + i * 3.1, 6.1, -1.65, 0); if (i < 5) windowLight(s, -1.5, 3.9, 1.2 + i * 3.2, Math.PI / 2); }
     [[-1.6, -1.6], [8.3, -1.7], [17.2, -1.7], [22.6, -1.7], [28.6, -1.7], [-1.7, 6], [-1.7, 12.4]].forEach(p => box(1.1, 6, 1.1, m2, p[0], 3, p[1], s));
     box(X1 + 3.4, 0.4, 0.5, m2, X1 / 2, 0.1, Z1 + 1.65, s); box(0.5, 0.4, Z1 + 3.4, m2, X1 + 1.65, 0.1, Z1 / 2, s);
     for (let x = 1; x < X1; x += 4) box(0.4, 0.9, 0.4, m2, x, 0.45, Z1 + 1.65, s);
@@ -93,7 +94,24 @@
     doorway(s, -1.45, 3, Math.PI / 2, 0xffb060, 1.4, 2.4);
     box(0.08, 0.5, 0.9, woodD(), -1.0, 3.1, 3, s); { const lm = new T.Mesh(new T.BoxGeometry(0.2, 0.26, 0.2), emis(0xffe0a0)); lm.position.set(-0.8, 2.7, 3); s.add(lm); gfx.fire(s, -0.8, 2.5, 3, 0xffb060, 0.4, 12); }
     barrel(s, -0.3, 1.4); barrel(s, 0.3, 4.6); box(0.9, 0.08, 0.6, wood(), 0.6, 0.55, 1.6, s); box(0.1, 0.55, 0.1, woodD(), 0.6, 0.27, 1.6, s);
-    doorway(s, -1.45, 9, Math.PI / 2, 0x50b0ff, 1.5, 2.5);
+    // ---- Tallow Row: the alley your door is on, off the south-west corner. Other people live here; you can tell by what they leave outside.
+    doorway(s, -1.45, 9, Math.PI / 2, 0x3a2c20, 1.5, 2.5); box(1.3, 2.2, 0.08, woodD(), -1.0, 1.1, 9, s).rotation.y = Math.PI / 2;       // the old coal-store door, boarded
+    { const ar1 = brickMat(0x7c7480, 5, 2), ar2 = brickMat(0x8a7a78, 2, 0.7), Z = 19.3;
+      const nw = wall(s, 12.4, 5.0, 1, ar1); nw.position.set(-8.3, 0, 16.7); const ew = wall(s, 6.6, 5.0, 1, ar1); ew.position.set(-14.6, 0, Z); ew.rotation.y = Math.PI / 2;
+      [[-4.4, 3.6, 6.3], [-8.4, 4.2, 7.2], [-12.4, 3.4, 6.0]].forEach(q => { box(q[1], q[2] - 5, 1.5, ar2, q[0], 5 + (q[2] - 5) / 2, 16.3, s); box(q[1] + 0.4, 0.3, 2.1, m2, q[0], q[2] + 0.15, 16.3, s); box(0.5, 1.1, 0.5, m2, q[0] + 0.9, q[2] + 0.7, 16.3, s); });
+      const sw = wall(s, 12.4, 0.9, 0.5, m3); sw.position.set(-8.3, 0, 21.6);       // the south side is only a yard wall, so the street stays in view
+      doorway(s, -14.0, Z, Math.PI / 2, 0x50b0ff, 1.5, 2.5);                         // yours, at the end
+      [[-4.4, 0xffb060], [-8.2, 0xff8a50], [-11.6, 0xffd080]].forEach((q, i) => { doorway(s, q[0], 17.3, 0, q[1], 1.2, 2.2); box(1.5, 0.14, 0.5, m2, q[0], 0.07, 17.65, s); windowLight(s, q[0] + 1.3, 1.7, 17.25, 0); windowLight(s, q[0] - 0.2, 3.9, 17.25, 0); if (i !== 1) windowLight(s, q[0] + 1.2, 3.9, 17.25, 0);
+        box(0.5, 0.05, 0.34, wood(), q[0] + 1.3, 1.22, 17.4, s); for (let k = 0; k < 3; k++) mesh(new T.ConeGeometry(0.07, 0.16, 5), emis([0xff8aa8, 0xffe27a, 0xc9a6ff][k]), q[0] + 1.14 + k * 0.16, 1.36, 17.4, s); });
+      // what the neighbours leave out: a bench, a broom, boots, a plant, somebody's supper cooling on the sill
+      box(1.3, 0.1, 0.4, wood(), -6.3, 0.45, 17.65, s); [-6.8, -5.8].forEach(x => box(0.1, 0.45, 0.36, woodD(), x, 0.22, 17.65, s)); mesh(new T.CylinderGeometry(0.03, 0.03, 1.5, 5), woodD(), -9.5, 0.75, 17.5, s).rotation.z = 0.2; box(0.3, 0.2, 0.1, L(0xb89a5a), -9.38, 0.1, 17.54, s);
+      [[-10.3, 17.7], [-10.0, 17.62]].forEach(q => box(0.16, 0.26, 0.26, L(0x2a1c10), q[0], 0.13, q[1], s)); barrel(s, -3.2, 17.7); barrel(s, -13.2, 17.8); crate(s, -12.9, 20.9, 0.6); crate(s, -7.2, 21.0, 0.5); mesh(new T.CylinderGeometry(0.22, 0.16, 0.26, 8), L(0x8a4a2a), -5.0, 0.13, 21.0, s); mesh(new T.IcosahedronGeometry(0.24, 0), L(0x3f7a3a), -5.0, 0.42, 21.0, s);
+      mesh(new T.CylinderGeometry(0.2, 0.16, 0.2, 8), L(0x3a3a40), -7.6, 1.26, 17.4, s); gfx.glow(0xffd0a0, 0.5, -7.6, 1.5, 17.4, s, 0.25);
+      // washing strung across, house to yard wall
+      [[-5.6, 0], [-10.6, 1]].forEach(q => { const ln = box(0.03, 0.03, 4.6, woodD(), q[0], 3.3, 19.3, s); ln.castShadow = false; [0xd8d0c0, 0x7a3a3a, 0x3a5a7a, 0xc8b070, 0xd8d0c0].forEach((c, k) => { const sh = new T.Mesh(new T.PlaneGeometry(0.5, k % 2 ? 0.7 : 0.5), new T.MeshLambertMaterial({ color: c, side: T.DoubleSide })); sh.position.set(q[0], 3.0 - (k % 2 ? 0.1 : 0), 17.8 + k * 0.75); sh.rotation.y = Math.PI / 2; s.add(sh); }); box(0.1, 3.4, 0.1, woodD(), q[0], 1.7, 21.5, s); });
+      lantern(s, -6.9, 0, 17.8, 0xffb060, 12, 2.3); lantern(s, -12.2, 0, 21.1, 0xffb060, 10, 2.0); lantern(s, -2.2, 0, 17.6, 0x60b8ff, 14, 2.2);
+      const n1 = npc(s, { cls: 'cleric', race: 'dwarf', tint: { cloth: '#6a5a4a', armor: '#5a4a3a', armor2: '#3a3026', hair: '#b8b0a0' } }, -6.3, 17.95, 0); const n2 = npc(s, { cls: 'rogue', race: 'human', tint: { cloth: '#4a5a6a', armor: '#3a4450', hair: '#5a3a1a' }, scale: 0.8 }, -10.9, 20.8, 2.6); const n3 = npc(s, { cls: 'sorcerer', race: 'halforc', tint: { cloth: '#5a3a4a', armor: '#3a2a34' } }, -3.6, 20.9, 3.4);
+      s.userData.rowFolk = [[n1, 'sit', ['Evening.', 'You are the one in the pit? Keep the noise down coming home.', 'Mind the step. It minds nobody.']], [n2, 'idle', ['Are you a real fighter? Did you bring anything back?', 'My da says your door used to be the coal store.']], [n3, 'idle', ['If the Guild asks, I have not seen you. I never see anybody.', 'Third door has soup on. She makes too much. Knock.']]]; }
     lantern(s, -0.9, 0, 10.7, 0x60b8ff, 16, 2.0).rotation.y = -Math.PI / 2;
     // (the Long Stair gate stands here: see life.js)
     // ---- the First Lamp: the monument in the middle of the market
@@ -135,7 +153,7 @@
       for (let i = 0; i < 16; i++) { const d = gfx.decal(gfx.tex('blood'), R(1.2, 2.6), i % 3 ? 0x24301c : 0x101418, R(0.35, 0.6)); if (i < 10) d.position.set(R(0, 29), 0.014 + i * 0.0006, R(-0.3, 0.5)); else d.position.set(R(-0.3, 0.5), 0.014 + i * 0.0006, R(0, 17)); d.rotation.z = R(0, 6); s.add(d); } }
     const life = W.hubLife ? W.hubLife(s, obstacles) : null;
     return {
-      scene: s, start: { x: 13.5, z: 4.5 }, zoom: [13.5, 24], bounds: [0, 0, 33, 21],
+      scene: s, start: { x: 13.5, z: 4.5 }, zoom: [13.5, 24], bounds: [-13, 0, 33, 21],
       spots: [
         { x: 5, z: 0.4, r: 2.2, y: 4.7, label: 'The Blood Pit', act: 'Enter the pit', go: () => G.ui.pit(), badge: () => !G.state.wins.grubb },
         { x: 11, z: 0.6, r: 1.5, y: 3.0, label: 'Notice Board', act: 'Read the board', go: () => G.ui.board(), badge: () => !G.state.contract },
@@ -144,11 +162,12 @@
         { x: 25.6, z: 2.5, r: 1.9, y: 3.6, label: 'Marc · The Long Odds', act: 'Gamble', go: () => G.meet('mark', () => G.ui.mark()), badge: () => !(G.state.met || {}).mark || !!G.state.schemeDone },
         { x: 28.3, z: 6.2, r: 1.7, y: 4.4, label: 'The Wisp Table', act: 'Roll the wispdice', go: () => G.ui.wisp() },
         { x: -0.2, z: 3, r: 1.6, y: 3.5, label: 'The Low Lamp', act: 'See your Tally', go: () => G.ui.tally(), badge: () => (G.state.reports || []).length > 0 || (G.state.tally || []).some(t => !t.job) && G.state.second == null },
-        { x: -0.2, z: 9, r: 1.9, y: 3.6, label: 'Your Hideout', act: 'Go home', go: () => G.ui.hideout() },
+        { x: -12.9, z: 19.3, r: 1.7, y: 3.6, label: 'Your Hideout', act: 'Go home', go: () => G.ui.hideout() },
         { x: 1.3, z: 14.5, r: 1.5, y: 4.2, label: 'The Long Stair', act: 'Read the proclamation', go: () => G.ui.stair(), badge: () => G.state.stairSeen !== (Object.keys(G.state.wins).length + (G.state.losses || 0)) }
       ],
-      blocked: (x, z) => x < -0.55 || x > X1 + 0.9 || z < -0.75 || z > Z1 + 0.9 || obstacles.some(o => x > o[0] - 0.35 && x < o[2] + 0.35 && z > o[1] - 0.35 && z < o[3] + 0.35),
+      blocked: (x, z) => (x < -0.55 && !(x > -13.4 && z > 18.2 && z < 20.7)) || x > X1 + 0.9 || z < -0.75 || z > Z1 + 0.9 || obstacles.some(o => x > o[0] - 0.35 && x < o[2] + 0.35 && z > o[1] - 0.35 && z < o[3] + 0.35),
       update: (t) => {
+        { const rf = s.userData.rowFolk; if (rf) { rf.forEach((q, i) => q[0].pose({ t: t + i * 2.1, act: q[1] })); const w = walker; if (w.x < -2.5 && !G.ui.isOpen() && !G.talk && (s.userData.rowT = (s.userData.rowT || 3) - 0.016) <= 0) { s.userData.rowT = 6 + Math.random() * 6; const q = rf.slice().sort((a, b) => Math.hypot(a[0].root.position.x - w.x, a[0].root.position.z - w.z) - Math.hypot(b[0].root.position.x - w.x, b[0].root.position.z - w.z))[0]; if (Math.hypot(q[0].root.position.x - w.x, q[0].root.position.z - w.z) < 5) gfx.floatText(q[0].root.position.x, 2.5, q[0].root.position.z, q[2][Math.floor(Math.random() * q[2].length)], '#ffe9c0'); } } }
         if (life) life(t);
         npcs.forEach((c, i) => c.pose({ t: t + i * 2, act: 'idle' }));
         mark.pose({ t, act: Math.sin(t * 0.7) > 0.6 ? 'cast' : 'idle', prog: 0.3 });
