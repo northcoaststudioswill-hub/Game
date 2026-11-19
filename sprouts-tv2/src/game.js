@@ -4,7 +4,9 @@ const $=id=>document.getElementById(id);
 const cv=$('screen'),g=cv.getContext('2d');
 /* SPROUTS TV. The screen is TVW x TVH (16:9). W stays 240: every menu, card and caption is laid out in a 240-wide
    column, drawn in the middle of the screen (UX from the left). The valley itself is drawn across the whole width. */
-const TVW=320,TVH=180;let H=TVH,K=2,UIX=0;const W=240,UX=(TVW-W)/2,MW=92,MH=40,G=0,D=1,S=2,WA=3,TR=4,GT=5;
+/* ONE SOURCE, TWO BUILDS. build.py writes this file twice: once as it is (the television), once with POCKET true (a
+   phone held upright: 240 wide, as tall as the screen allows, touch buttons, the handheld's 1.5x zoom). */
+const POCKET=/*@POCKET*/false,TVW=POCKET?240:320;let TVH=POCKET?200:180,H=TVH,K=2,UIX=0;const W=240,UX=(TVW-W)/2,MW=92,MH=40,G=0,D=1,S=2,WA=3,TR=4,GT=5;
 const HTX=28,HTY=20,HX=HTX*16+8,HY=HTY*16+8,DAYLEN=240,CAP=20,NT=6,PULL=25;
 const TYPES=[
  {n:'EMBER',c:'#f07830',d:'#983818',l:'#f8c070',sp:74},
@@ -226,7 +228,7 @@ TL.wood=tile(p=>{p('#c89860',0,0,16,16);p('#a87848',0,7,16,1);p('#a87848',0,15,1
 /* ---------- state ---------- */
 let map,fieldL,fieldW,P,LO,buds,sprouts,items,foes,gates,bugs,npcs,plots,parts,spawns,trail,squad,sel,day,dayT,shards,run,tod,gard,won,time=0,msg='',msgT=0,cam,cur,wr,aT,found,winT,sndT=0,duskSaid,achT=0,saveT=0,petOK=false;
 let Z=1,VW=TVW,VH=TVH; /* VIEW in Settings: WIDE shows 320 of the valley across, CLOSE zooms 1.5x like the handheld */
-function setView(){Z=meta&&meta.view?1.5:1;VW=Math.ceil(TVW/Z);VH=Math.ceil(TVH/Z)}
+function setView(){Z=POCKET||(meta&&meta.view)?1.5:1;VW=Math.ceil(TVW/Z);VH=Math.ceil(TVH/Z)}
 let SCW=240,TRN=null,hop=null,pan=null,card=null,scn=null,scnDone=null,sceneQ=[];
 let manT=0,needT=-1,inHome=false,parked=[],resid=[],cineI=0,cineT=0,cpage=0;
 let home={res:Array(NT).fill(0),jobs:[0,0,0],up:0},hi=0;
@@ -240,7 +242,7 @@ const louLv=()=>{let k=1;for(let i=1;i<LOU_AT.length;i++)if(meta.dog.xp>=LOU_AT[
 function louXP(n){const a=louLv();meta.dog.xp+=n;const b=louLv();if(b>a){news('LOUIE REACHED LEVEL '+b);spSay('NEW TRICK!',3);if(mornQ)mornQ.push('LOUIE LEARNED '+LOU_AB[b-1]);else say('LOUIE LEARNED '+LOU_AB[b-1],6);snd(784,.1);later(()=>snd(1175,.25),110);save()}}
 let state='tv0',mi=0,ri=0,si=0,pi=0,look=null,dlg=null,dlgPage=0,toasts=[],flash='',flashT=0,capS={ph:'idle',t:0,it:null},eraseArm=0,resetArm=0,seti=0,setFrom='menu';
 const say=(s,t=4)=>{msg=s;msgT=t};
-const SETROWS=['MUSIC','SOUND FX','VIEW','IMPORT A SAVE','RESET PULLS','ERASE EVERYTHING','BACK'];let impArm=0;
+const SETROWS=['MUSIC','SOUND FX','VIEW','IMPORT A SAVE','RESET PULLS','ERASE EVERYTHING','BACK'].filter(k=>!(POCKET&&k==='VIEW'));let impArm=0;
 /* CALM REWARDS. A toast is for a moment worth stopping for. Rank-ups, baskets, daily asks, rewards, orders and
    Louie's levels are kept as the day's news and read out in the evening report (a second page, ALSO TODAY).
    What happens overnight is told in one line with the morning greeting, not as a stack of pop-ups. */
@@ -1196,7 +1198,7 @@ function drawGlim(q){const x=Math.round(q.x-ox),y=Math.round(q.y-oy)-6+Math.roun
 const nearGlim=()=>{let b=null,bd=1e12;GLIM.forEach((q,i)=>{if(run.gl&&run.gl[i])return;if(!(run.seen&&run.seen[ZONES[q.z][0]])&&q.z!==0)return;const d=d2(P,q.x,q.y);if(d<bd){bd=d;b=q}});return b||{x:HX,y:HY}};
 const coastDue=()=>won&&!run.call&&day>=2&&day>(run.wonDay||0)&&!inHome&&!sceneQ.length; /* never on the same evening as the ending */
 /* the relight is a night scene ('That night the Lantern warms the cold lens'), so a lens brought home by day waits for dusk */
-const relightDue=()=>!!run.lens&&!run.lit&&!sceneQ.length,relightGo=()=>sceneQ.push(['3:relight',()=>{run.lit=1;persist(true);c3Play('home',()=>{run.fin=1;run.finDay=day;won=true;state='win';persist(true)})}]);
+const relightDue=()=>!!run.lens&&!run.lit&&!sceneQ.length,relightGo=()=>sceneQ.push(['3:relight',()=>{run.lit=1;persist(true);c3Play('home',()=>{run.fin=1;run.finDay=day;run.book=1;won=true;state='win';persist(true)})}]);
 const DEREKL=['YO. COLD ONE?','TELL MARCUS NOTHING.','THE VAN IS FINE. PROBABLY.','NINE BURGERS. ONE CUSTOMER.','I DRIVE. THAT IS MY PART.'];let derekT=0;
 function coastTick(){if(state!=='play'||inHome||sceneQ.length)return;
  if(run.pj&&run.pj.lf&&run.pj.lf.s>=3&&time>derekT&&d2(P,71*16+42,15*16)<44*44&&msgT<=0&&!toasts.length){derekT=time+22;floatAt(71*16+42,15*16-18,'DEREK: '+DEREKL[(day+((time/22)|0))%DEREKL.length],'#5a9af0');snd(300,.04,0,'triangle',.03)}
@@ -1868,7 +1870,7 @@ function draw0(){
 /*@include sprouts3d.js*/
 /* a screen drawn only in the 240 column has its first and last column of pixels stretched out to the screen's edges:
    skies, ground and boxes that reach the column's edge carry on to the edge of the television */
-function tvEdges(){const w=UX*K,h=cv.height;g.save();g.setTransform(1,0,0,1,0,0);g.imageSmoothingEnabled=false;try{g.drawImage(cv,w,0,1,h,0,0,w,h);g.drawImage(cv,cv.width-w-1,0,1,h,cv.width-w,0,w,h)}catch(e){}g.restore()}
+function tvEdges(){if(!UX)return;const w=UX*K,h=cv.height;g.save();g.setTransform(1,0,0,1,0,0);g.imageSmoothingEnabled=false;try{g.drawImage(cv,w,0,1,h,0,0,w,h);g.drawImage(cv,cv.width-w-1,0,1,h,cv.width-w,0,w,h)}catch(e){}g.restore()}
 /* ---------- PHOTO MODE ----------
    Y (V on the keyboard) in the valley. The 3D renderer draws the place Will is standing, with Louie, the crew and
    anyone near, at the hour it is. Left and right turn the camera, up and down raise it, Select makes everyone wave,
@@ -1908,15 +1910,16 @@ function tvUpdate(dt){tvT+=dt;tvIdleT+=dt;if(tvIdleT>3)document.body.classList.a
  if(state==='tvtitle'){if(tvT>1.2&&(pressed('a')||pressed('start'))){snd(660,.08,990);later(()=>snd(990,.2),90);state='menu';mi=0}}}
 function tvDraw(){
  if(state==='tv0'){r('#07060c',0,0,TVW,TVH);g.save();g.translate(UX,0);UIX=UX;const cx=120,cy=Math.round(H*.36),L=(c,x,y,w,h)=>r(c,cx+x*3,cy+y*3,w*3,h*3),d='#2a2238';L(d,-5,-9,10,2);L(d,-3,-11,6,2);L(d,-4,-7,8,10);L('#141020',-3,-6,6,8);L(d,-5,3,10,2);L(d,-4,5,8,1);
-  if(((time*1.6)|0)%2)ctext('PRESS ANY BUTTON',cy+50,2,'#c8c0d8',null);ctext('CONTROLLER:  STICK MOVE   A ACT   B CALL   X SWAP   START PAUSE',H-36,1,'#787090',null);ctext('KEYBOARD:  ARROWS MOVE   Z ACT   X CALL   SHIFT SWAP   ENTER PAUSE',H-25,1,'#787090',null);ctext('Y OR V: PHOTO MODE        A SECOND CONTROLLER PLAYS LOUIE',H-47,1,'#787090',null);ctext('F: FULL SCREEN',H-12,1,'#585070',null);g.restore();UIX=0;return}
+  if(((time*1.6)|0)%2)ctext('PRESS ANY BUTTON',cy+50,2,'#c8c0d8',null);if(POCKET){g.restore();UIX=0;return}ctext('CONTROLLER:  STICK MOVE   A ACT   B CALL   X SWAP   START PAUSE',H-36,1,'#787090',null);ctext('KEYBOARD:  ARROWS MOVE   Z ACT   X CALL   SHIFT SWAP   ENTER PAUSE',H-25,1,'#787090',null);ctext('Y OR V: PHOTO MODE        A SECOND CONTROLLER PLAYS LOUIE',H-47,1,'#787090',null);ctext('F: FULL SCREEN',H-12,1,'#585070',null);g.restore();UIX=0;return}
  if(state==='tvpwr'){g.save();g.translate(UX,0);UIX=UX;try{pwrDraw()}finally{g.restore();UIX=0}return}
  c3TitleDraw(tvT)}
 /* ---------- loop ---------- */
 /* the canvas is drawn at the window's own resolution: K device pixels for each game pixel, a whole number, so pixel
    art stays square and text is drawn sharp instead of being stretched */
-function fit(){const dpr=window.devicePixelRatio||1,k=Math.max(2,Math.min(12,Math.floor(Math.min(innerWidth*dpr/TVW,innerHeight*dpr/TVH))||2));
+function fit(){if(POCKET){const p=cv.parentNode||{};let nh=Math.round(240*p.clientHeight/p.clientWidth/2)*2;nh=Math.max(160,Math.min(304,nh||200));K=2;if(cv.height!==nh*2||cv.width!==480){cv.width=480;cv.height=nh*2}H=TVH=nh;setView();return}
+ const dpr=window.devicePixelRatio||1,k=Math.max(2,Math.min(12,Math.floor(Math.min(innerWidth*dpr/TVW,innerHeight*dpr/TVH))||2));
  if(k!==K||cv.width!==TVW*k){K=k;cv.width=TVW*K;cv.height=TVH*K}cv.style.width=(TVW*K/dpr)+'px';cv.style.height=(TVH*K/dpr)+'px';H=TVH;setView()}
-fit();addEventListener('resize',fit);
+fit();addEventListener('resize',fit);if(POCKET)try{new ResizeObserver(fit).observe(cv.parentNode)}catch(e){}
 loadWorld();cloudInit();
 let last=0;
 function frame(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;

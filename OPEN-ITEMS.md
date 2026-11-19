@@ -23,6 +23,16 @@ at phone size. Will's rule stands: a change is not done until it has been played
 
 ---
 
+## Sprouts TV 2 (`sprouts-tv2/`, Nov 19 2026)
+
+- Not played by hand, on a television, on a phone, or with a real controller. Not listened to.
+- All the new lore and lines are Claude's: see `sprouts-tv2/STORY-NOTES.md`. The biggest proposal is who called the three to Sunkeep (the Lanternwisp). Will to rule.
+- Erin's welcome and two of her lines were changed to fit the canon that she is Will's fiancee and was called here too. Listed in the story notes so they can be put back.
+- Balance of the new things (night grubs, rain, the bet, the wedding book, Louie's morning) is a first guess.
+- Buddies eating strays, and the van jokes, were left alone.
+- There are now three copies of Sprouts: `alt/` (handheld, in the console), `sprouts-tv/` and `sprouts-tv2/` (which builds a TV and a phone version from one source). OPEN: retire the older two?
+- `sprouts_story.js` there fails about one run in ten (autopilot).
+
 ## Sprouts TV (standalone, `sprouts-tv/`, Nov 18 2026)
 
 - Not played on a television or with a real controller: the controller in `sprouts-tv/tests/tv.js` is simulated. Not tried in Firefox or Safari. Not listened to.

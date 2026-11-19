@@ -18,7 +18,7 @@ await E(`window.__T=[];window.__tl=m=>{window.__T.push('D'+day+' '+String(Math.r
  {const o=talk;talk=function(n,m){const r=o.apply(this,arguments);if(state==='talk'&&dlg)__tl('TALK   '+dlg.name+': '+dlg.pages.map(p=>p.join(' ')).join(' | '));return r}}
  {const o=endDay;endDay=function(){__tl('---- NIGHT / EVENING REPORT ----');return o.apply(this,arguments)}}
  void 0`);
-await E(`init();live=true;persist(true);c3Play('dawn',()=>playScene('open',()=>talk(npcs[0])));window.__bot={log:[],bad:[],seen:{},stuck:0,lx:0,ly:0};void 0`);
+await E(`init();live=true;persist(true);c3Play('dawn',()=>c3Play('open',()=>talk(npcs[0])));window.__bot={log:[],bad:[],seen:{},stuck:0,lx:0,ly:0};void 0`);
   const runA = secs => E(`(()=>{const B=window.__bot,K=__g.keys,PR=__g.prev,dt=1/30;
    const press=k=>{K[k]=1};const inv=()=>{const bad=m=>{if(B.bad.length<40&&!B.bad.includes(m))B.bad.push(m)};
      for(const b of buds){if(!isFinite(b.x)||!isFinite(b.y))bad('bud NaN '+b.st);
@@ -53,11 +53,15 @@ await E(`init();live=true;persist(true);c3Play('dawn',()=>playScene('open',()=>t
    return JSON.stringify({day,dayT:Math.round(dayT),state,crew:buds.length,soil:sprouts.length,shards,deliv:run.delivered,petals:meta.petals,stuck:B.stuck,ms:npcs.map(n=>n.name[0]+(n.st==='done'?'done':n.mi))})})()`);
 
 
-const assist=()=>E(`(()=>{const o=objective(),home=(it)=>{it.x=HX;it.y=HY+12;it.w=1;it.on.length=0;const b=mkBud(1,2,HX,HY+14);b.tgt=it;b.st='carry';it.on.push(b)};
+const assist=()=>E(`(()=>{const o=objective(),home=(it)=>{it.on.slice().forEach(b=>{release(b);b.st='follow'});it.x=HX;it.y=HY+12;it.w=1;const b=mkBud(1,2,HX,HY+14);b.tgt=it;b.st='carry';it.on.push(b)}; /* carriers are let go properly first: the old helper left them pointing at the item, which the checker flagged */
  const n=tracked(),m=n&&n.st==='active'?n.ms[n.mi]:null,id=m&&!(coastObj()||keyObj())?m.id:'';let did='';
  if(!o){dayT=Math.max(dayT,DAYLEN*.97);return 'none: on to the night'}
  if(/UNLOCK THE POND/.test(o.text)){const j=coastGate('jobsite');P.x=j.x;P.y=j.y+24;did='walked to the job site gate'}
  else if(/BUILD THE OLD PIER/.test(o.text)){openGate(coastGate('northPier'),true);did='pier built'}
+ else if(/LOOK INSIDE THE NORTH LIGHT/.test(o.text)){P.x=86*16+8;P.y=7*16+8;did='walked up to the North Light'}
+ else if(/TELL MARCUS/.test(o.text)){const q=npcBy('MARCUS');P.x=q.x;P.y=q.y+14;P.dx=0;P.dy=-1;P.mv=false;if(state==='play')talk(q);did='walked to Marcus'}
+ else if(/FLOW PROS JOB/.test(o.text)){P.x=86*16+8;P.y=7*16+8;while(buds.filter(b=>!b.gard).length<10)mkBud(1,2,P.x,P.y);buds.forEach(b=>{if(!b.gard){release(b);b.st='follow';b.x=P.x;b.y=P.y+4}});did='took ten sprouts to the North Light'}
+ else if(/WEDDING BOOK/.test(o.text)){dayT=Math.max(dayT,DAYLEN*.97);did='the wedding book is the goal now: on to the night'}
  else if(/CARRY THE LENS/.test(o.text)){home(items.find(i=>i.alive&&i.sub==='lens'));did='lens carried home'}
  else if(/FOLLOW THE BEAM/.test(o.text)){P.x=71*16;P.y=20*16+8;did='walked through the sun door'}
  else if(/ORCHARD BRIDGE/.test(o.text)){openGate(gates[5],true);did='bridge built'}
@@ -74,5 +78,5 @@ let last,key='',since=0;const MAXD=+(process.argv[3]||16);
 while((await E('day'))<=MAXD){last=JSON.parse(await runA(6));const k=await E(`(()=>{const o=objective();return state+'|'+(o?o.text.replace(/\\d+ \\/ \\d+/,''):'-')+'|'+shards})()`);
  if(k===key)since+=6;else{key=k;since=0}
  if(since>=18&&(await E('state'))==='play'){await assist();since=0}
- if(await E(`run.lit&&npcs.every(n=>n.st==='done')`))break;}
+ if(await E(`run.fin&&run.rest&&npcs.every(n=>n.st==='done')`))break;}
 console.log((await E('window.__T.join("\\n")')));console.log(JSON.stringify(last));console.log('BAD',await E('JSON.stringify(window.__bot.bad)'),errs);await browser.close()})();

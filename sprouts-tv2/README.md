@@ -1,62 +1,62 @@
-# Sprouts TV
+# Sprouts TV 2
 
-Sprouts on its own, widescreen, for a browser on a television. No console body, no cartridge shelf, no other games.
+Sprouts, finished: the standalone widescreen game, reworked from the review of Nov 18 ("Sprouts: State of the Game").
+Also builds as a phone version from the same source.
 
-**Play:** open `sprouts-tv/games/sprouts-tv.html` in Chrome or Edge on the PC, press **F** (or F11) for full screen.
+**Play on a television:** open `games/sprouts-tv2.html` in Chrome or Edge on the PC, press **F** for full screen.
+**Play on a phone:** open `games/sprouts-pocket.html`.
 
-![Title](playtest/tv-2-title.png)
+![Title](playtest/title.png)
 
 ## This is a separate copy
 
-Forked from `alt/src` on Nov 18 2026. Nothing outside `sprouts-tv/` was changed to make it, and nothing here is read
-by the Pocket Lantern builds. From now on the two change separately: a fix made in one does not reach the other
-unless it is made twice.
+`sprouts-tv2/` started as a copy of `sprouts-tv/` on Nov 19 2026. `sprouts-tv/`, `alt/` and the frozen folders were not
+changed. Its saves are stored under `sprouts-tv2:`. Settings has IMPORT A SAVE, which reads (never writes) a Sprouts
+TV or Pocket Lantern save in the same browser.
 
-Saves are separate too. Every key is stored under `sprouts-tv:`, so this game never reads or overwrites a Pocket
-Lantern save, even in the same browser. There is no import yet: Sprouts TV starts as a new game.
+## What changed from Sprouts TV
 
-## What is different from the handheld
+- **The story has one ending, after the second light.** Four shards make the Lantern whole, and it still skips: that
+  is the midpoint. Then the call, the coast, the pier, a flooded lamp room, the Flow Pros job, the lens, and the
+  relight at night with everyone there.
+- **Marcus on day one.** Flow Pros are locked out of their own job site, so the van is by the west path.
+- **Ranger and Scout are people.** Each has a story ask, a line for every turn of the story, and Scout's notebook is a
+  page of the Collection that fills in with what the valley finds out.
+- **Every story scene is 3D.** 25 scenes, 116 shots (16 story, 9 hidden).
+- **Calmer.** Rank-ups, baskets, daily asks and rewards are read out in the evening report, not popped up all day.
+- **Things to do after the ending.** The wedding book, expeditions, the notebook, night grubs, rain days.
+- **New ways to play.** Photo mode, a second controller as Louie, Louie's morning.
+- **Small fixes.** Hints stay in a bottom strip, Erase Everything is in Settings, a VIEW setting, gardeners capped.
 
-| | Handheld (Pocket Lantern) | Sprouts TV |
-|---|---|---|
-| Screen | 240 wide, as tall as the phone allows | 320 x 180 (16:9), drawn at the window's own resolution |
-| View of the valley | 160 wide, zoomed 1.5x | 320 wide, no zoom: twice as much to each side |
-| 3D scenes | 240 wide | 320 wide, same height and lens: the framing is kept and the sides are added |
-| Way in | shelf, cartridge, splash, boot | any button, studio card, 3D title, menu |
-| Controls | touch buttons, keyboard | controller, keyboard |
-| Menu's last entry | SWAP CARTRIDGE | TITLE SCREEN |
-
-Menus, cards, speech and captions are still laid out 240 wide, in the middle of the screen. Their backgrounds and
-bars reach the edges. The day bar, shard count, sprout tray and crew count sit in the screen's corners.
+The full list, set against the review item by item, is in [CHANGELOG.md](CHANGELOG.md). Everything invented for the
+story is in [STORY-NOTES.md](STORY-NOTES.md), marked as Claude's.
 
 ## Controls
 
-| | Controller | Keyboard |
-|---|---|---|
-| Move | left stick or d-pad | arrows or WASD |
-| Act (pluck, throw, talk) | A | Z, J or Space |
-| Call the crew back | B | X or K |
-| Swap sprout kind | X, Y, shoulders, Back | Shift, Q or E |
-| Pause | Start | Enter or P |
-| Full screen | (keyboard) | F, or double click |
-
-A browser will not play sound until something has been pressed, which is why the game opens on PRESS ANY BUTTON.
-A browser will not go full screen from a controller button either; use F or F11 once.
+| | Controller | Keyboard | Phone |
+|---|---|---|---|
+| Move | left stick or d-pad | arrows or WASD | pad |
+| Act (pluck, throw, talk) | A | Z, J or Space | A |
+| Call the crew back | B | X or K | B |
+| Swap sprout kind | X, shoulders, Back | Shift, Q or E | Select |
+| Photo mode | Y | V or I | Photo |
+| Pause | Start | Enter or P | Start |
+| Louie (player two) | a second controller: stick, A barks, B digs | number pad: 8 4 2 6, 0 barks, + digs | |
+| Full screen | (keyboard) | F, or double click | |
 
 ## Files
 
-- `build.py` builds `games/sprouts-tv.html` (13.8 MB; the songs are 13 MB of it, read from the v0.3 build).
-- `src/shell.html` the page. `src/game.js` the game (forked from `alt/src/console.js`). `src/sprouts3d.js` the 3D
-  scenes, house and title. `src/buddies.js` art for the eight wild buddies, copied from the Sproutwild files.
-- `tests/tv.js` what is new here (34 checks). `tests/sprouts_*.js` are copies of the handheld's Sprouts tests, run
-  against this build.
+- `build.py` writes both builds. `src/game.js` is the game, `src/sprouts3d.js` the 3D scenes, house, title and photo
+  mode, `src/buddies.js` the wild buddies' art. `src/shell.html` is the television page, `src/shell-pocket.html` the
+  phone page. One line in `game.js` (`POCKET`) is the only difference between the builds.
+- `tests/tv2.js` (48 checks) covers what this copy adds. `tests/tv.js` (34) the television screen and controller.
+  `tests/pocket.js` (16) the phone build. `tests/sprouts_coast.js` (183), `sprouts_valley.js` (50) and
+  `sprouts_story.js` (17) the game itself. `tests/sprouts_playthrough.js` plays the whole story and prints it in order;
+  the last run is `playtest/story-run.txt`.
 
-`src/game.js` still carries code from the handheld that this build never reaches (the shelf, the Lantern menu,
-the hooks for the other cartridges). It is dead weight, not a fault; it was left so the first version of this fork
-stayed close to the game that was tested.
+## Not done, and not tested
 
-## Not done
-
-- Not played on a television or with a real controller. The controller was a simulated one in the test.
-- No import of a Pocket Lantern save.
-- The studio card says NORTH COAST STUDIOS (the handheld's power-on already did). Say if it should say something else.
+- Not played by hand, on a television, on a phone, with a real controller, or listened to. Controllers and touch were
+  simulated in the tests.
+- `sprouts_story.js` is driven by an autopilot and fails about one run in ten when a stray card cuts in.
+- The older copies (`alt/` and `sprouts-tv/`) still exist and do not get these changes.

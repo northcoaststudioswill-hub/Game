@@ -15,7 +15,7 @@
    ================================================================ */
 
 /* ---------- 1. the renderer ---------- */
-const c3W=320,C3REF=240,c3NEAR=.25,c3DTH=[0,4,1,5,6,2,7,3,1,5,0,4,7,3,6,2];
+const c3W=TVW,C3REF=240,c3NEAR=.25,c3DTH=[0,4,1,5,6,2,7,3,1,5,0,4,7,3,6,2];
 let c3H=0,c3cv=null,c3cx=null,c3im=null,c3px=null,c3zb=null,c3stat={tris:0};
 function c3Size(h){if(c3H===h&&c3px)return;c3H=h;if(typeof document!=='undefined'){c3cv=c3cv||document.createElement('canvas');c3cv.width=c3W;c3cv.height=h;c3cx=c3cv.getContext('2d');c3im=c3cx.createImageData(c3W,h);c3px=new Uint32Array(c3im.data.buffer)}else c3px=new Uint32Array(c3W*h);c3zb=new Float32Array(c3W*h)}
 const c3HEX={};
@@ -651,7 +651,7 @@ function c3Frame(q,top,h){const sh=q.S[q.i],t=q.t;c3Size(h);if(!C3VAL)c3BuildVal
  if(c3cx)c3cx.putImageData(c3im,0,0)}
 /* On a slow device the picture is worked out every other frame (the last one is shown again in between); words and
    input still run every frame. It switches on above about 26 ms a frame and off again below 11. */
-function c3DrawScene(){const q=c3q;r('#06050c',0,0,W,H);if(!q)return;const top=0,bot=42,h=Math.max(60,H-top-bot),sh=q.S[q.i]; /* TV: the picture starts at the top edge and is as tall as the handheld's, and wider */q.fn=(q.fn||0)+1;
+function c3DrawScene(){const q=c3q;r('#06050c',0,0,W,H);if(!q)return;const top=POCKET?10:0,bot=POCKET?50:42,h=Math.max(60,H-top-bot),sh=q.S[q.i]; /* TV: the picture starts at the top edge and is as tall as the handheld's, and wider */q.fn=(q.fn||0)+1;
  if(!q.half||q.fn%2||q.shot!==q.i||c3H!==h){const t0=typeof performance!=='undefined'?performance.now():0;c3Frame(q,top,h);q.shot=q.i;if(t0){const ms=performance.now()-t0;q.ms=q.ms===undefined||q.fn<3?ms:q.ms*.9+ms*.1;if(q.fn>8){if(q.ms>26)q.half=1;else if(q.ms<11)q.half=0}}}
  g.imageSmoothingEnabled=true;g.drawImage(c3cv,0,0,c3W,h,-UIX,top,TVW,h);g.imageSmoothingEnabled=false;
  if(q.flash>0)r('rgba(255,248,220,'+Math.min(1,q.flash).toFixed(2)+')',0,top,W,h);
@@ -707,7 +707,7 @@ function c3Room(t,night,up,J){const WALL='#d8c8a0',WAL2='#f0e4c4',WD='#6a4428',W
  c3Box(5.52,2.75,3.5,5.58,3.3,3.56,'#383048');c3Box(5.3,2.45,3.3,5.8,2.78,3.76,night?'#f8e060':'#d8c060',night?'#fff8a0':'#f0e090',night?1:.3);if(night)c3Glow(5.55,2.6,3.53,1.5,'#ffe890',.4)}
 /* fit the room to the screen: back away until all of it is between the top bar and the bottom strip, then centre it */
 const C3HF={};
-function c3HomeFit(){if(C3HF[c3H])return C3HF[c3H];const asp=c3H/c3W,ratio=Math.max(.6,Math.min(1.2,.5+(asp-.7)*1.15)),b0=22,b1=c3H-36;let out=[20,ratio,0];
+function c3HomeFit(){if(C3HF[c3H])return C3HF[c3H];const asp=c3H/c3W,ratio=Math.max(.6,Math.min(1.2,.5+(asp-.7)*1.15)),b0=POCKET?38:22,b1=c3H-(POCKET?54:36);let out=[20,ratio,0];
  for(let b=10;b<46;b+=.4){c3Cam(5.5,b*ratio,b,5.5,.7,3.1,38);let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,ok=true;for(const x of[-.3,11.3])for(const y of[-.2,3.3])for(const z of[-.3,7.25]){const q=c3Proj(x,y,z);if(!q){ok=false;continue}x0=Math.min(x0,q[0]);x1=Math.max(x1,q[0]);y0=Math.min(y0,q[1]);y1=Math.max(y1,q[1])}
   if(ok&&x0>=1&&x1<=c3W-1&&y1-y0<=b1-b0){out=[b,ratio,Math.round((b0+b1)/2-(y0+y1)/2)];break}}
  return C3HF[c3H]=out}
@@ -727,7 +727,7 @@ function c3HomeDraw(){const t=time,night=dayT/DAYLEN>.7,X0=RX,Z0=RY,wx=v=>(v-X0)
  {const q=c3P(wx(LO.x),1.25,wz(LO.y)+.3);if(q){const x=Math.round(q[0]),y=Math.round(q[1]);if(LO.say&&LO.say.t>0){const s2=LO.say.s,w2=tw(s2,2)+8,bx=Math.max(2,Math.min(TVW-w2-2,Math.round(x-w2/2)));r('#181020',bx-1,y-17,w2+2,16);r('#ffffff',bx,y-16,w2,14);text(s2,bx+4,y-15,2,'#281c30',null)}
    else if(petOK&&state==='play'){const by=y-12+(((time*3)|0)%2);r('#181020',x-6,by-1,13,11);r('#ffffff',x-5,by,11,9);r('#f85888',x-3,by+2,2,2);r('#f85888',x+1,by+2,2,2);r('#f85888',x-3,by+3,6,2);r('#f85888',x-2,by+5,4,1);r('#f85888',x-1,by+6,2,1)}}}
  for(const p of parts){const q=c3P(wx(p.x),p.gh?1.1:.3,wz(p.y));if(!q)continue;const x=Math.round(q[0]),y=Math.round(q[1]-(1-p.life)*10);if(p.gh===2){r(p.c,x-2,y-1,2,2);r(p.c,x+1,y-1,2,2);r(p.c,x-2,y,5,2);r(p.c,x-1,y+2,3,1);r(p.c,x,y+3,1,1)}else r(p.c,x,y,2,2)}
- if(state==='play'){const fy=H-50,st=homeAt();box(0,fy,TVW,31,'rgba(24,16,32,.92)');g.save();g.translate(UX,0);if(msgT>0&&msg){const ls=wrapPx(msg,300,1).slice(0,3);ls.forEach((l,i)=>ctext(l,fy+(ls.length>2?1:ls.length>1?5:10)+i*10,1,'#ffffff'))} /* a hint takes the strip's two lines for as long as it shows, so it never covers the room */
+ if(state==='play'){const fy=H-50,st=homeAt();box(0,fy,TVW,31,'rgba(24,16,32,.92)');g.save();g.translate(UX,0);if(msgT>0&&msg){const ls=wrapPx(msg,Math.min(300,TVW-12),1).slice(0,3);ls.forEach((l,i)=>ctext(l,fy+(ls.length>2?1:ls.length>1?5:10)+i*10,1,'#ffffff'))} /* a hint takes the strip's two lines for as long as it shows, so it never covers the room */
   else{ctext(st?st.t:!resid.length?'NOBODY LIVES HERE YET. TRY THE DESK':'LIVING HERE '+homeTotal()+' / '+homeCap(),fy+2,2,st?'#f8e060':'#fff8e0');ctext('DESK   BEDS   PANTRY   FIRE      WALK DOWN TO LEAVE',fy+17,1,'#a098b0')}g.restore();
   for(const h of HST){const q=c3P(h.p[0],h.p[1],h.p[2]);if(!q)continue;const on=h===st,x=Math.round(q[0]),y=Math.round(q[1])-8+(on?Math.round(Math.sin(time*6)*1.5):0);if(on){if(((time*3)|0)%3)text('!',x-2,y,3,'#f8e060')}else{r('#181020',x-2,y+4,5,5);r('#f8e060',x-1,y+5,3,3)}}}}
 
@@ -744,8 +744,8 @@ function c3TitleDraw(t){const q={key:'title',S:[C3TITLE],i:0,t,tt:t,cue:{},sched
   if(k>0){g.save();g.translate(cx,y);g.scale(sc,sc);text(T[i],1.5,1.5,5,'#281408',null);text(T[i],0,0,5,'#f8e060','#783010');g.restore()}cx+=tw(T[i],5)*sc}
  g.restore();
  if(t>1.9){g.globalAlpha=Math.min(1,(t-1.9)/.5);const s2='A POCKET LANTERN GAME',w2=tw(s2,2);text(s2,Math.round((TVW-w2)/2),70,2,'#fff8e0','#181020');g.globalAlpha=1}
- if(t>2.6&&((t*1.6)|0)%2){const s3=padSeen?'PRESS START':'PRESS ENTER',w3=tw(s3,3);text(s3,Math.round((TVW-w3)/2),TVH-44,3,'#ffffff','#181020')}
- if(t>2.6){text('NORTH COAST STUDIOS',6,TVH-12,1,'#a098b0','#181020');rtext('F: FULL SCREEN',TVW-6,TVH-12,1,'#a098b0','#181020')}}
+ if(t>2.6&&((t*1.6)|0)%2){const s3=padSeen||POCKET?'PRESS START':'PRESS ENTER',w3=tw(s3,3);text(s3,Math.round((TVW-w3)/2),TVH-44,3,'#ffffff','#181020')}
+ if(t>2.6){text('NORTH COAST STUDIOS',6,TVH-12,1,'#a098b0','#181020');if(!POCKET)rtext('F: FULL SCREEN',TVW-6,TVH-12,1,'#a098b0','#181020')}}
 
 
 /* ---------- 9. photo mode ----------
