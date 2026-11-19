@@ -119,7 +119,7 @@
   function navigate(dx, dy) {
     const list = menuButtons(); if (!list.length) return;
     const cur = list.includes(document.activeElement) ? document.activeElement : null;
-    if (!cur) { (list.find(b => b.classList.contains('big')) || list[0]).focus(); return; }
+    if (!cur) { (list.find(b => b.classList.contains('big')) || list[0]).focus({ preventScroll: true }); return; }
     const r = cur.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
     let best = null, bs = 1e9;
     list.forEach(el => {

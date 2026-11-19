@@ -412,3 +412,8 @@ The weapon left in the body is a copy of the one you were carrying. Casters with
 ## Opening cinematic (reshot)
 
 22 shots, about two minutes; tap advances a shot, hold skips the film. New beats: the Kingdom of United Realms, the Guild's list of the fallen, Marc dé Fleuprau's table (bets and loans), Tallow Row, the spiked pit with last night's remains, the changing names behind the nine gates, the war with Eireania, and David Roseinbeirg in the Hour Garden. Every shot is framed for 16:9 and for phone portrait; the Flame bout uses an over-the-shoulder camera on tall screens.
+
+## Controller and phone checks
+
+`tests/pad.js` drives the whole opening with a simulated standard gamepad: boot, title, tap/hold through the cinematic, the builder, walking the market, the sheet, a bout (strike, dodge, parry, abilities, pause, resume). Long cards pin their closing row to the bottom; on a phone that row is one line that scrolls sideways with the main button fixed at the right.
+The scripts in `tests/` need Playwright and a local server (`python3 -m http.server 8765` from this folder): `pad.js` (controller), `bout.js <class> <weapon>` (films a live bout), `cinef.js` (films every cinematic shot in landscape and portrait).

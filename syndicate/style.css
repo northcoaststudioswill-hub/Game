@@ -707,3 +707,11 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
   #panel .row.bst { flex-wrap: wrap; gap: 0.35rem; } #panel .bout { padding-bottom: 0.6rem; }
 }
 .builder .bopt span { font-family: var(--body); font-size: 0.9rem; line-height: 1.25; font-variant: normal; } .builder .bsum p { font-size: 0.86rem; }
+
+/* long cards on a phone: the pinned closing row stays one line; extra buttons scroll sideways, the main one stays put */
+@media (max-width: 560px) {
+  .card > .row.end.foot { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; gap: 0.35rem; scrollbar-width: none; background: linear-gradient(rgba(22, 17, 26, 0), rgba(22, 17, 26, 0.98) 30%); }
+  .card > .row.end.foot::-webkit-scrollbar { display: none; }
+  .card > .row.end.foot > button { flex: 0 0 auto; white-space: nowrap; padding: 0.55rem 0.7rem; font-size: 0.7rem; }
+  .card > .row.end.foot > button:last-child { position: sticky; right: 0; margin-left: auto; box-shadow: -0.6rem 0 0.8rem rgba(22, 17, 26, 0.95); }
+}

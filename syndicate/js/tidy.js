@@ -20,4 +20,8 @@
 
   // the line at the top of the market: one thing to do, and at most one reminder
   if (G.objective) { const ob0 = G.objective; G.objective = function () { const s = ob0.apply(this, arguments); if (!s) return s; const parts = s.split(' · '); return parts.length > 2 ? parts.slice(0, 2).join(' · ') : s; }; }
+  // a long card keeps its closing buttons in reach: the last row sticks to the bottom while the rest scrolls
+  { const panel = document.getElementById('panel'); let q = 0;
+    const pin = () => { q = 0; const c = panel && panel.querySelector('.card'); if (!c || c.querySelector(':scope > .foot')) return; const rows = c.querySelectorAll(':scope > .row.end'), e = rows[rows.length - 1]; if (e && e === c.lastElementChild && c.scrollHeight > c.clientHeight + 60) e.classList.add('foot'); };
+    if (panel && window.MutationObserver) new MutationObserver(() => { if (!q) q = setTimeout(pin, 0); }).observe(panel, { childList: true, subtree: true }); window.addEventListener('resize', () => { if (!q) q = setTimeout(pin, 0); }); }
 })();
