@@ -23,6 +23,7 @@
       const y = G.makeChar(G.lookOf(G.state.hero, G.state)); y.root.position.set(opts.you[0], 0, opts.you[1]); a.scene.add(y.root); D.actors.push([y, a.scene]); D.you = y;
       n.root.rotation.y = Math.atan2(opts.you[0] - opts.npc[0], opts.you[1] - opts.npc[1]); y.root.rotation.y = n.root.rotation.y + Math.PI;
     } else { const ex = opts.you[0] - opts.npc[0], ez = opts.you[1] - opts.npc[1], ed = Math.hypot(ex, ez) || 1; if (ed < 2.3) opts.you = [opts.npc[0] + ex / ed * 2.3, opts.npc[1] + ez / ed * 2.3];       // never film two people standing on each other's toes
+      { const hb = W.get('hub'); if (hb.blocked && hb.blocked(opts.you[0], opts.you[1])) { let best = null; for (let rr = 0.3; rr <= 3.6 && !best; rr += 0.3) for (let k = 0; k < 12 && !best; k++) { const fx = opts.you[0] + Math.cos(k * 0.5236) * rr, fz = opts.you[1] + Math.sin(k * 0.5236) * rr; if (!hb.blocked(fx, fz) && Math.hypot(fx - opts.npc[0], fz - opts.npc[1]) > 1.6) best = [fx, fz]; } if (best) opts.you = best; } }       // never stand the player inside a stall or the lamp
       w.x = opts.you[0]; w.z = opts.you[1]; w.target = null; w.path = null; w.emote = null; w.face = Math.atan2(opts.npc[0] - w.x, opts.npc[1] - w.z); }
     el.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; G.audioInit(); advance(); });
     el.querySelector('.c-skip').onclick = () => finish(true);

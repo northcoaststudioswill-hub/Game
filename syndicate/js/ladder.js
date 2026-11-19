@@ -88,7 +88,7 @@
   // and they come and find you in the market
   let actor = null;
   function approach() {
-    const st = G.state; if (!st.exh || st.exh.told || G.talk || ui.isOpen() || G.scene !== 'hub' || G.pipComing) return;
+    const st = G.state; if (!st.exh || st.exh.told || G.talk || ui.isOpen() || G.scene !== 'hub' || (G.pipComing && G.pipComing())) return;
     const K = KINDS[st.exh.kind], o = exhOpp(st), w = W.walker, hub = W.get('hub'), nx = w.x + (w.x > 16 ? -2.4 : 2.4), nz = w.z + 0.4, p = purse(st, K), L = K.say(o.name);
     st.exh.told = 1; G.save();
     actor = G.makeChar({ cls: o.cls, race: o.race, tint: o.tint }); actor.root.position.set(nx, 0, nz); actor.root.rotation.y = Math.atan2(w.x - nx, w.z - nz); actor.pose({ t: 1, act: 'idle' }); hub.scene.add(actor.root);

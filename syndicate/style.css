@@ -637,3 +637,4 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .lock.dead { color: #c96a60; letter-spacing: 0.08em; } .opp.beaten .op canvas, .opp.beaten .op img { filter: grayscale(1) brightness(0.55); }
 .row.bst.watch { margin-top: 0.35rem; align-items: center; gap: 0.6rem; } .row.bst.watch small { color: #b8ad98; font-size: 0.72rem; }
 .opp.exh { border-color: #6ad0ff; box-shadow: 0 0 0.8rem rgba(106, 208, 255, 0.25); } .opp.exh .taunt { color: #a8dcf0; }
+.pausecard .choices button.danger b { color: #ff9a8f; }

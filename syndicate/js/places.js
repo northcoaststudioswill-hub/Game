@@ -430,8 +430,9 @@
     if (walker.moving) {
       walker.v = (walker.v || 0) + (1 - (walker.v || 0)) * Math.min(1, dt * 6);
       const sp = 4.9 * walker.v * Math.min(1, l) * dt, nx = walker.x + mx / l * sp, nz = walker.z + mz / l * sp, ox = walker.x, oz = walker.z;
-      if (!pl.blocked(nx, walker.z)) walker.x = nx;
-      if (!pl.blocked(walker.x, nz)) walker.z = nz;
+      const inside = pl.blocked(walker.x, walker.z);       // if something ever leaves you standing in a wall, you can always walk out of it
+      if (inside || !pl.blocked(nx, walker.z)) walker.x = nx;
+      if (inside || !pl.blocked(walker.x, nz)) walker.z = nz;
       if (walker.target && Math.hypot(walker.x - ox, walker.z - oz) < sp * 0.2) { walker.stuckT = (walker.stuckT || 0) + dt; if (walker.stuckT > 0.5) { walker.target = null; walker.stuckT = 0; } } else walker.stuckT = 0;
       walker.face = Math.atan2(mx, mz); { const w0 = walker.walk; walker.walk += dt * (3 + 8 * walker.v); if (Math.floor(walker.walk / Math.PI) !== Math.floor(w0 / Math.PI) && !frozen) G.sfx('step'); }
     }
