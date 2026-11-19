@@ -1,4 +1,32 @@
-# SOOTBORN — changelog (latest v0.59 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.60 · 2026-11-19)
+
+## v0.60 · 2026-11-19 — characters first: guards, Rook and Tavi re-kitted; arms and legs in the arena; the boots in the arena follow you up
+From your notes: do characters and animations first and use good free resources if there are any; in arena fights the camera should follow you up on the boots, with a zoom on the big dives, and the arena needs the boots-hook-hit combo.
+
+**Comic levels: everybody but Kael was wearing a coat and nothing else**
+- **Dock Guard:** white enamel shoulder plates with gilt rims, a breastplate and back plate, bracers, greaves, knee and ankle rims, a belt with a pouch and a teal lamp on it, hands with a thumb. His stick is now a dock bill: a long boat hook with an edge and a back spike.
+- **Stair Blade:** a short mantle with a gilt edge over the cowl, bracers, a belt with a second sheath, knee and ankle wraps, hands.
+- **Warden:** steel plate with red rims on chest, back, arms, thighs and shins.
+- **Stair Captain Rook:** coat buttons, a ribbon bar on the chest, a red belt with a buckle and a sheath, gilt cuffs, bracers, hands. The Warden Captain and the Auditor's Blade get the officer's version of the same.
+- **Tavi:** a bedroll across his back, a strap and a satchel, a scarf, patched cuffs, a lamp on his belt.
+- Seen in a line-up picture beside Kael, before and after.
+
+**Arena fights: arms and legs** (Kael and everybody built on the same body)
+- A band on the upper arm, a cop on the elbow, a vambrace with a rim, a gauntlet plate, and three fingers on each hand where there was a mitten.
+- A tasset at each hip, a point on the knee, a plate behind the calf, a second rim at the ankle.
+- These are small at fighting distance; they show in the films' close shots.
+
+**Arena fights: the boots**
+- **The camera goes up with you.** It rises as he rises, so a dive is seen from where it starts.
+- **It closes in on a dive.** While he is coming down (the slam, Shaft Drop, a dive kick) the picture pushes in by about a quarter, and a slam started from high up gets a beat of slow motion.
+- **Hook from the air** hauls an ordinary man up to him (UP HERE), and gives a little lift and boot fuel back. **Strike** while he is up there cuts him down (STRUCK DOWN): three times the blow, and he goes into the ground. Against captains and duellists the hook still takes Kael to them, as before.
+- By script in the High Docks arena fight: the camera rose from 89 to 174 as he climbed; the hook put a guard at his height; the cut took 19 health to 12 and floored him; the picture pushed in from 150 to 184 on the dive.
+
+**Free resources: one found, not used yet**
+- Quaternius's Universal Animation Library is CC0 (public domain; fine to sell with) and has a sprint, a jog, deaths and three- and four-hit sword combos. I could not download it from here (this workspace cannot reach that site), and it is made for a different skeleton, so it has to be converted to the game's joints.
+- **If you attach "Universal Animation Library [Standard].zip" (about 14 MB, free from quaternius.com), I can take the run, the jog, a death and the sword combos from it and put them on Kael and the guards.** That is the real fix for a run that I have only ever adjusted from stills.
+
+**Checked by script:** line-up pictures of all the re-kitted figures; all three levels start to end; the arena boots camera, air hook and cut-down measured as above; a bot won the Pairing; the page loads clean. **Not checked:** any of it by hand or in motion; the arena arm and leg detail was seen only at fighting distance, where it is a few pixels; the Stair's and Riser Nine's figures were rendered but half hidden by scenery in my pictures.
 
 ## v0.59 · 2026-11-19 — the HUD in the comic levels, found from your screenshot; the fire scene in 2.5D; a memory to walk in
 From your screenshot of Riser Nine on the phone, and your notes: the tap prompt can go; keep the fire scene in 2.5D; when a 2.5D space is made, use it for story that adds flavour and changes nothing.

@@ -318,7 +318,11 @@ const G3 = {
   arm2(D, am, fm, UA, arm, trim, skin) {
     D.loft(am, [[-UA, 1.3, 1.4], [-UA * .5, 1.7, 1.85], [-.7, 1.85, 1.95], [1, 1.45, 1.55]], 6, arm); D.loft(fm, [[-1, 1.45, 1.55], [0, 1.7, 1.8], [1, 1.45, 1.55]], 6, trim);
     D.loft(fm, [[-6.6, 1, 1.1], [-3.6, 1.55, 1.65], [-.7, 1.4, 1.5]], 6, shade(arm, .9)); D.loft(fm, [[-6.2, 1.45, 1.55], [-3.3, 1.9, 2], [-2.8, 1.95, 2.05]], 6, [arm, trim]);
-    D.loft(fm, [[-8.7, .85, .65], [-7.6, 1.2, .95], [-6.5, 1, .9]], 6, skin); D.box(fm, 1.15, -7.4, .45, .65, 1.3, .8, shade(skin, .9)); },
+    D.loft(fm, [[-8.7, .85, .65], [-7.6, 1.2, .95], [-6.5, 1, .9]], 6, skin); D.box(fm, 1.15, -7.4, .45, .65, 1.3, .8, shade(skin, .9));
+    // plate where an arm gets hit: a band on the upper arm, a cop on the elbow, a vambrace with a rim, a gauntlet with fingers
+    D.loft(am, [[-UA * .74, 1.8, 1.95], [-UA * .56, 1.95, 2.1], [-UA * .5, 1.85, 2]], 6, trim); D.box(fm, 0, .1, -1.75, 2.3, 2.4, 1.3, trim); D.box(fm, 0, .1, -2.5, 1.1, 1.2, .8, shade(trim, .85));
+    D.fr(fm, 0, -6, 1.5, 1.7, .6, 2.5, .7, 3.6, arm); D.loft(fm, [[-6.5, 1.5, 1.6], [-6.0, 1.62, 1.72]], 6, trim);
+    D.box(fm, 0, -7.5, .85, 2.3, 1.4, .7, arm); D.box(fm, 0, -6.95, .9, 2.4, .35, .8, trim); for (let i = -1; i <= 1; i++) D.box(fm, i * .72, -8.95, .3, .58, 1.05, 1, shade(skin, i ? .9 : .96)); },
   head2(D, hd, o, opt, L, skin, hair, trim, st, fwdV, idx, t, rm) {
     D.loft(hd, [[.3, 1.45, 1.65, 0, .55], [1.5, 2.45, 2.55, 0, .4], [3, 3.1, 3.15, 0, .2], [4.8, 3.3, 3.45], [6.3, 3.05, 3.25, 0, -.1], [7.3, 2.05, 2.25, 0, -.2], [7.75, .6, .7, 0, -.2]], 8, skin);
     for (const sd of [-1, 1]) D.box(hd, sd * 3.3, 3.8, -.1, .6, 1.6, 1.2, shade(skin, .86));
@@ -367,7 +371,10 @@ const G3 = {
     for (const sd of [-1, 1]) { const hip = sd < 0 ? P.hl : P.hr, knee = Math.max(0, sd < 0 ? P.kl : P.kr), lm = M4.chain(root, M4.t(sd * HX, HIP, 0), M4.rz(sd * P.sp), M4.rx(-hip)), sm = M4.chain(lm, M4.t(0, -TH, 0), M4.rx(knee)), fm = M4.chain(sm, M4.t(0, -SHN, 0), M4.rx(Math.max(-.6, hip - knee) * .6));
       if (N) { D.loft(lm, [[-TH, 1.85, 2], [-TH * .5, 2.45, 2.65], [-1.2, 2.85, 3.05], [1.4, 2.5, 2.7]], 7, dark); D.fr(lm, sd * .3, -TH * .86, 2.25, 2.4, .7, 3.5, .7, TH * .66, arm); D.box(lm, sd * .3, -TH * .86 + .3, 2.5, 2.6, .6, .7, trim);
         D.loft(sm, [[-1.5, 1.8, 2, 0, .5], [0, 2.25, 2.55, 0, .75], [1.4, 1.85, 2.1, 0, .4]], 6, trim); D.loft(sm, [[-SHN, 1.2, 1.35], [-SHN * .58, 1.9, 2.2, 0, -.45], [-1.2, 1.85, 2]], 7, dark); D.fr(sm, 0, -SHN + 1.4, 1.45, 2, .8, 3.1, .9, SHN * .6, arm); D.box(sm, 0, -SHN + 1.7, 1.85, 2.4, .6, .9, trim);
-        D.loft(fm, [[-1.3, 1.75, 3.7, 0, 1.6], [0, 1.6, 3.2, 0, 1.3], [1.6, 1.45, 1.7, 0, 0]], 6, '#3e2e24'); D.box(fm, 0, -1.55, 1.6, 3.7, .55, 7.6, '#201812'); D.box(fm, 0, 1.2, .1, 3.3, .7, 3.6, trim); continue; }
+        D.loft(fm, [[-1.3, 1.75, 3.7, 0, 1.6], [0, 1.6, 3.2, 0, 1.3], [1.6, 1.45, 1.7, 0, 0]], 6, '#3e2e24'); D.box(fm, 0, -1.55, 1.6, 3.7, .55, 7.6, '#201812'); D.box(fm, 0, 1.2, .1, 3.3, .7, 3.6, trim);
+        // a tasset at the hip, a point on the knee, a plate behind the calf, a second rim at the ankle
+        D.fr(lm, sd * 2.55, -TH * .56, .2, .7, 2.5, .8, 3.4, TH * .5, arm); D.box(lm, sd * 2.6, -TH * .56 + .3, .2, .7, .6, 2.8, trim);
+        D.box(sm, 0, .9, 2.75, 1.3, 1.5, .8, trim); D.fr(sm, 0, -SHN + 1.8, -1.75, 1.5, .6, 2.5, .7, SHN * .5, shade(arm, .9)); D.loft(sm, [[-SHN + .5, 1.5, 1.7], [-SHN + 1.2, 1.7, 1.9]], 6, trim); continue; }
       D.cyl(lm, 0, -8.7, 0, 2.7, 3.6, 9, 6, dark); D.box(lm, 0, -8.4, 2.4, 3.8, 3, 2.2, arm); D.box(lm, 0, -8.4, 3.5, 2, 1.6, .5, trim); D.box(lm, 0, -3, 3.3, 5.2, 5, .6, arm); D.box(lm, 0, -8.4, .6, 5.8, 2.2, 6.8, trim);
       D.cyl(sm, 0, -8.8, 0, 2.1, 3, 8.8, 6, dark); D.box(sm, 0, -4.6, -2.2, 3.4, 4, 1.6, shade(dark, .9)); D.fr(sm, 0, -7.6, 2.5, 3.6, 1, 5, 1.4, 7, arm); D.box(sm, 0, -1.2, 2.9, 5.2, 1.2, 1, trim); D.box(fm, 0, .6, 1.4, 5.4, 3.2, 8.8, '#4a3a2a'); D.box(fm, 0, -.7, 1.4, 5.6, .8, 9, '#2e241a'); }
     if (L.skirt || (L.accredited && !L.cadet)) { const fl = 8.4 + Math.abs(P.hl - P.hr) * 1.6 + clamp(spd / 80, 0, 1.4), rc = L.robe || arm; D.cyl(root, 0, 2.2, 0, fl, 5.8, 17.4, 8, rc); D.cyl(root, 0, 2.2, 0, fl + .3, fl + .1, 1.3, 8, trim); D.box(root, 0, 10, 5.2, 2.2, 15, .5, trim); }

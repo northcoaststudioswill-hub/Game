@@ -5,13 +5,13 @@
   const SPECS = SC.SPECS = {
     hero: { h: 1.1, b: 1.12, face: 'kael', hair: 'kael', armor: true, cape: true, glowHand: true, washer: true, weapon: 'kblade', pauldron: true,
       pal: { skin: 0xe6c79a, top: 0xefe8d4, trim: 0xe8c25a, shirt: 0x5a3aa8, tie: 0xe8c25a, pants: 0x2e2a40, boots: 0x1a1620, hair: 0xe9cf7a, streak: 0x2a2630, glove: 0x2a2630, wrap: 0x2e2a40, band: 0x5a3aa8 } },
-    hollow: { h: 1.0, b: 1.05, face: 'visor', helm: 'guard', weapon: 'baton', tabard: true,
+    hollow: { h: 1.0, b: 1.05, face: 'visor', helm: 'guard', weapon: 'baton', tabard: true, kit: { plate: 0xe9e6dc, trim: 0xd8a83a, belt: 0x1f2233, lamp: 0x5ff2e2, hands: 0xe9e6dc },
       pal: { skin: 0xefe8d4, top: 0x2f8f8a, trim: 0xe8c25a, shirt: 0xefe8d4, tie: 0xe8c25a, pants: 0x30344a, boots: 0x14141d, hair: 0xefe8d4, glove: 0xefe8d4, wrap: 0x2f8f8a } },
-    knifer: { h: 0.97, b: 0.9, face: 'halfmask', hood: true, weapon: 'blade', sash: true,
+    knifer: { h: 0.97, b: 0.9, face: 'halfmask', hood: true, weapon: 'blade', sash: true, kit: { light: 1, mantle: 0x432a86, plate: 0x33206a, trim: 0xe8c25a, belt: 0x14141d, hands: 0x14141d, sheath: 1 },
       pal: { skin: 0xe6c79a, top: 0x5a3aa8, trim: 0x33206a, shirt: 0xe8c25a, tie: 0xe8c25a, pants: 0x23202c, boots: 0x14141d, hair: 0x5a3aa8, glove: 0x14141d, wrap: 0x5a3aa8 } },
-    bruiser: { h: 1.24, b: 1.5, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true,
+    bruiser: { h: 1.24, b: 1.5, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true, kit: { noSh: 1, plate: 0x8a8ea6, trim: 0xb02a2a, belt: 0x14141d, hands: 0x23232e },
       pal: { skin: 0x9aa1b8, top: 0x3a3f5c, trim: 0xe8c25a, shirt: 0x8a1f24, tie: 0xe8c25a, pants: 0x23232e, boots: 0x14141d, hair: 0x9aa1b8, glove: 0x23232e, wrap: 0x3a3f5c } },
-    boss: { h: 1.14, b: 1.08, face: 'rook', hat: 'captain', coat: true, weapon: 'gaff', pauldron: true,
+    boss: { h: 1.14, b: 1.08, face: 'rook', hat: 'captain', coat: true, weapon: 'gaff', pauldron: true, kit: { light: 1, noSh: 1, officer: 1, plate: 0xf2efe6, trim: 0xe8c25a, belt: 0x8a1f24, hands: 0x8a1f24, sheath: 1 },
       pal: { skin: 0xd9b48f, top: 0xf2efe6, trim: 0xe8c25a, shirt: 0x8a1f24, tie: 0xe8c25a, pants: 0x23232e, boots: 0x0c0c12, hair: 0xb9bcc8, glove: 0x8a1f24, wrap: 0xf2efe6 } },
     clerk: { h: 1.12, b: 1.25, face: 'brand', hair: 'brand', coat: true, weapon: 'halberd2',
       pal: { skin: 0xb98a66, top: 0x4a4650, trim: 0x2a2630, shirt: 0x6e6a78, tie: 0x2a2630, pants: 0x2a2630, boots: 0x15151f, hair: 0x9a9aa6, glove: 0x2a2630, wrap: 0x4a4650 } }
@@ -19,11 +19,11 @@
   if (SC.issue === 'riser') {   // a clerk cannot be seen to fight: black cloth over the face, no cape, nothing gilt
     Object.assign(SPECS.hero, { face: 'cloth', cape: false, hood: true, pauldron: false, hair: null });
     Object.assign(SPECS.hero.pal, { top: 0x2a2630, trim: 0x4a4650, shirt: 0x2a2630, tie: 0x4a4650, band: 0x2a2630 });
-    SPECS.boss = { h: 1.32, b: 1.55, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true, pal: { skin: 0xc9cbd6, top: 0xefe8d4, trim: 0xe8c25a, shirt: 0x8a1f24, tie: 0xe8c25a, pants: 0x23232e, boots: 0x14141d, hair: 0xefe8d4, glove: 0x23232e, wrap: 0xefe8d4 } };
+    SPECS.boss = { h: 1.32, b: 1.55, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true, kit: { noSh: 1, officer: 1, plate: 0xefe8d4, trim: 0xe8c25a, belt: 0x8a1f24, hands: 0x23232e }, pal: { skin: 0xc9cbd6, top: 0xefe8d4, trim: 0xe8c25a, shirt: 0x8a1f24, tie: 0xe8c25a, pants: 0x23232e, boots: 0x14141d, hair: 0xefe8d4, glove: 0x23232e, wrap: 0xefe8d4 } };
   }
   if (SC.issue === 'stair') {   // the Auditor's Blade, and Tavi at sixteen
-    SPECS.boss = { h: 1.18, b: 1.0, face: 'halfmask', hood: true, coat: true, weapon: 'blade', weapon2: true, sash: true, pal: { skin: 0xe6c79a, top: 0x15151f, trim: 0xe8c25a, shirt: 0xe8c25a, tie: 0xe8c25a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0xe8c25a, wrap: 0x15151f } };
-    SPECS.clerk = { h: 0.94, b: 0.9, face: 'tavi', hair: 'tavi', pal: { skin: 0xc98a62, top: 0x8a6a48, trim: 0x4a3524, shirt: 0xd9a05f, tie: 0x4a3524, pants: 0x3a3350, boots: 0x15151f, hair: 0x2a1c14, glove: 0xc98a62, wrap: 0x8a6a48 } };
+    SPECS.boss = { h: 1.18, b: 1.0, face: 'halfmask', hood: true, coat: true, weapon: 'blade', weapon2: true, sash: true, kit: { light: 1, officer: 1, mantle: 0x23232e, plate: 0x2a2a38, trim: 0xe8c25a, belt: 0xe8c25a, hands: 0x15151f }, pal: { skin: 0xe6c79a, top: 0x15151f, trim: 0xe8c25a, shirt: 0xe8c25a, tie: 0xe8c25a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0xe8c25a, wrap: 0x15151f } };
+    SPECS.clerk = { h: 0.94, b: 0.9, face: 'tavi', hair: 'tavi', kit: { light: 1, noSh: 1, soot: 1, plate: 0x6a4a34, trim: 0xd9a05f, belt: 0x2a1c14, hands: 0xc98a62, lamp: 0xffd98a }, pal: { skin: 0xc98a62, top: 0x8a6a48, trim: 0x4a3524, shirt: 0xd9a05f, tie: 0x4a3524, pants: 0x3a3350, boots: 0x15151f, hair: 0x2a1c14, glove: 0xc98a62, wrap: 0x8a6a48 } };
   }
   if (SC.issue === 'gild') {   // the table: the man who went onto it, the man on it, the man who came off, the woman who did it, and two of the Unlit to hold the lamp
     const shift = { top: 0x6a6672, trim: 0x4f4b57, shirt: 0x6a6672, tie: 0x4f4b57, pants: 0x4f4b57, wrap: 0x6a6672 };
@@ -248,6 +248,26 @@
     if (sp.tabard) { part('hips', tbox(0.22 * b, 0.42, 0.03, 1, 0.85), 0, -0.16, 0.125 * b, pal.shirt); part('hips', tbox(0.1 * b, 0.1, 0.035), 0, -0.08, 0.13 * b, pal.trim, [0, 0, 0.785], 0.006); }
     if (sp.sash) part('chest', tbox(0.5 * b, 0.07, 0.27 * b), 0, 0.12, 0, pal.shirt, [0, 0, 0.6], 0.008);
     if (!sp.hood && !sp.helm) { part('head', tbox(0.03, 0.06, 0.04), 0.118, 0.13, 0, pal.skin, null, 0.008); part('head', tbox(0.03, 0.06, 0.04), -0.118, 0.13, 0, pal.skin, null, 0.008); }
+    if (sp.kit) {   // what a man on a post actually wears: plate where he gets hit, a belt with things on it, hands
+      const k = sp.kit, c1 = k.plate, c2 = k.trim, cb = k.belt;
+      part('neck', tbox(0.19, 0.06, 0.19, 0.85, 1), 0, 0.0, 0, c1, null, 0.01);
+      if (k.mantle) { part('chest', tbox(0.56 * b, 0.1, 0.34 * b, 0.7, 1), 0, 0.22, -0.01, k.mantle, null, 0.014); part('chest', tbox(0.58 * b, 0.025, 0.35 * b), 0, 0.165, -0.01, c2, null, 0.006); }
+      else part('chest', tbox(0.47 * b, 0.07, 0.28 * b, 1, 0.92), 0, 0.24, 0, c1, null, 0.012);
+      if (!k.light) { part('chest', tbox(0.34 * b, 0.2, 0.05, 0.85, 1), 0, 0.1, 0.13 * b, c1, null, 0.012); part('chest', tbox(0.35 * b, 0.03, 0.055), 0, 0.0, 0.13 * b, c2, null, 0.006); part('chest', tbox(0.32 * b, 0.22, 0.04, 0.9, 1), 0, 0.09, -0.135 * b, c1, null, 0.01); }
+      if (k.officer) { [-1, 1].forEach(q => { part('chest', tbox(0.035, 0.035, 0.03), 0.07 * q * b, 0.15, 0.14 * b, c2, null, 0.004); part('chest', tbox(0.035, 0.035, 0.03), 0.07 * q * b, 0.07, 0.14 * b, c2, null, 0.004); }); part('chest', tbox(0.09, 0.05, 0.03), -0.13 * b, 0.13, 0.14 * b, cb, null, 0.005); }
+      part('hips', tbox(0.38 * b, 0.06, 0.27 * b), 0, 0.09, 0, cb, null, 0.01); part('hips', tbox(0.07, 0.07, 0.04), 0, 0.09, 0.14 * b, c2, null, 0.008);
+      part('hips', tbox(0.09, 0.12, 0.07), 0.16 * b, 0.02, 0.07, cb, null, 0.008);
+      if (k.sheath) { part('hips', tbox(0.045, 0.34, 0.06, 1, 0.6), -0.2 * b, -0.1, -0.04, cb, [0.3, 0, 0], 0.01); part('hips', tbox(0.055, 0.05, 0.07), -0.2 * b, 0.06, 0.0, c2, null, 0.006); }
+      if (k.lamp) { part('hips', tbox(0.07, 0.1, 0.07), -0.17 * b, -0.0, 0.08, 0x23232e, null, 0.006); part('hips', tbox(0.05, 0.055, 0.075), -0.17 * b, -0.0, 0.085, k.lamp, null, 0); }
+      if (k.soot) { part('chest', tbox(0.34 * b, 0.11, 0.11), 0, 0.2, -0.17 * b, 0x5a5348, [0, 0, 0.12], 0.012); part('chest', tbox(0.05, 0.34, 0.03), 0.09 * b, 0.1, 0.125 * b, cb, [0, 0, -0.5], 0.006); part('neck', tbox(0.22, 0.07, 0.22, 0.9, 1), 0, 0.02, 0, c2, null, 0.01); part('chest', tbox(0.07, 0.2, 0.03, 1, 0.7), -0.08, 0.1, 0.13 * b, c2, [0, 0, 0.12], 0.006); }
+      [['L', 1], ['R', -1]].forEach(q => {
+        part('el' + q[0], tbox(0.13 * b, 0.16, 0.13 * b, 1, 0.85), 0, -0.15, 0, c1, null, 0.01); part('el' + q[0], tbox(0.137 * b, 0.03, 0.137 * b), 0, -0.07, 0, c2, null, 0.006);
+        part('shn' + q[0], tbox(0.135 * b, 0.065, 0.1), 0, -0.03, 0.045, k.light ? c1 : c2, null, 0.008); part('shn' + q[0], tbox(0.15, 0.045, 0.16), 0, -0.25, 0, c2, null, 0.007);
+        if (!k.light) { part('shn' + q[0], tbox(0.125 * b, 0.2, 0.075, 0.9, 1.05), 0, -0.17, 0.04, c1, null, 0.01); part('th' + q[0], tbox(0.15 * b, 0.2, 0.05, 1, 0.85), 0.04 * q[1], -0.1, 0.05, c1, [0, 0.45 * q[1], 0], 0.01); part('th' + q[0], tbox(0.155 * b, 0.03, 0.055), 0.04 * q[1], -0.19, 0.05, c2, [0, 0.45 * q[1], 0], 0.005); }
+        if (!k.noSh) { part('sh' + q[0], tbox(0.2 * b, 0.08, 0.21 * b, 0.75, 1), 0.03 * q[1], 0.07, 0, c1, [0, 0, -0.2 * q[1]], 0.012); part('sh' + q[0], tbox(0.21 * b, 0.025, 0.22 * b), 0.03 * q[1], 0.03, 0, c2, [0, 0, -0.2 * q[1]], 0.006); }
+        part('ha' + q[0], tbox(0.085, 0.045, 0.06, 1, 0.85), 0, -0.118, 0.03, k.hands, null, 0.008); part('ha' + q[0], tbox(0.028, 0.055, 0.04), 0.05 * q[1], -0.07, 0.03, k.hands, null, 0.006); part('ha' + q[0], tbox(0.095, 0.04, 0.1), 0, -0.02, 0, c2, null, 0.008);
+      });
+    }
 //@@WEAPONS
     const steel = G.toon({ color: 0xd9dde6 }), dark = G.toon({ color: 0x23232e }), gilt = G.toon({ color: 0xe8c25a });
     if (sp.armor) {
@@ -288,7 +308,7 @@
       const w = add('chest', new THREE.TorusGeometry(0.036, 0.013, 6, 12), brass, -0.03, 0.1, 0.145, 0.008);
       add('chest', tbox(0.012, 0.16, 0.012), dark, -0.03, 0.2, 0.14, 0); model.mats.push(dark); model.washer = w;
     }
-    if (sp.weapon === 'baton') { add('haR', limb(0.03, 0.036, 0.62), dark, 0, -0.3, 0, 0.014); add('haR', limb(0.042, 0.042, 0.07), gilt, 0, -0.03, 0, 0.01); model.mats.push(dark, gilt); }
+    if (sp.weapon === 'baton') { add('haR', limb(0.03, 0.036, 0.78), dark, 0, -0.34, 0, 0.014); add('haR', limb(0.042, 0.042, 0.07), gilt, 0, -0.03, 0, 0.01); add('haR', limb(0.04, 0.04, 0.05), gilt, 0, -0.66, 0, 0.008); add('haR', tbox(0.026, 0.2, 0.11, 0.25, 1), steel, 0, -0.8, 0.035, 0.012); add('haR', tbox(0.024, 0.07, 0.1), steel, 0, -0.74, -0.06, 0.008).rotation.x = 0.7; model.mats.push(dark, gilt, steel); }   // a dock bill: a boat hook with an edge on it
     if (sp.weapon2) { add('haL', tbox(0.028, 0.56, 0.06, 0.15, 1), steel, 0, -0.4, 0.01, 0.014); add('haL', tbox(0.05, 0.03, 0.16), gilt, 0, -0.1, 0.01, 0.01); }
     if (sp.weapon === 'blade') { add('haR', tbox(0.028, 0.56, 0.06, 0.15, 1), steel, 0, -0.4, 0.01, 0.014); add('haR', tbox(0.05, 0.03, 0.16), gilt, 0, -0.1, 0.01, 0.01); model.mats.push(steel, gilt); }
     if (sp.weapon === 'halberd') {

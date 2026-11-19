@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.59 (2026-11-19).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.60 (2026-11-19).
 
 ## Waiting on you
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
@@ -8,6 +8,8 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **The High Docks:** the empty, locked level was a broken save from v0.49 (quay cleared, no key); v0.53 mends it and adds START THIS LEVEL AGAIN. What made that save is still unknown. Tell me if the gate refuses again.
 
 ## Untested, built blind (check these first when playing)
+- **v0.60: arena boots.** The camera follows you up and closes in on dives; hook in the air hauls a man up, strike cuts him down.
+- **v0.60: new kit** on Dock Guards, Stair Blades, Wardens, Rook, the other two bosses and Tavi.
 - **v0.59: the comic levels' HUD on your phone.** Cause found from your screenshot (the level was leaving room for the notch). Check the health bar is top-left and the objective top-right in all three levels.
 - **v0.59: the two 2.5D places.** The fire on night 28 (the Lamp) and the square memory at the Pillar on Day 1.
 - **v0.58: fights below are harder to mash.** A man who is down takes one blow and gets up guarding. Say if the Scuffle or the Ember Ring is now too much.
@@ -19,16 +21,16 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - v0.56: guards' three blows and their guard (TURNED.); the run's arms; the ring of ships over the Stair; the Scuffle on Row K; the second wind's memory by era; the controller legend in arena fights.
 
 ## Characters and animation
-0. **The run in the comic levels.** Lean and cape (v0.53), arms (v0.56), all from side-on frames. Needs your eye in motion before anything more is changed. The guards' jog was looked at the same way and left.
-1. **Guards:** three blows and a guard for Dock Guards, two blows for Wardens (v0.56). Stair Blades have two (v0.57). Still to do: better models; the same rigs in cutscenes.
-2. **Kael in the arena fights:** arms, hands, blade, legs and body brought up to his head. Standing figures in films now breathe and shift (v0.57); a held cut is still a still.
+0. **The run in the comic levels.** Lean, cape and arms done from stills (v0.53, v0.56). **Next step needs a file from you:** Quaternius's Universal Animation Library (CC0, free) has a real sprint, jog, deaths and sword combos; attach the Standard zip and I will put them on Kael and the guards.
+1. **Guards:** moves (v0.56, v0.57) and kit (v0.60: plate, belts, hands, a dock bill) done. Still to do: faces and helms; the same rigs in cutscenes.
+2. **Kael in the arena fights:** arm and leg plate and fingers added for everybody on that body (v0.60); figures in films breathe (v0.57). Still to do: torso and blade; a ready stance in held shots.
 3. **Capes:** changed four times today from stills. The rule you gave: it kicks up with momentum and then falls; it never floats. Needs your eye in motion, then another pass if it still hangs in the air.
-4. **Tavi:** a better body now that he walks the Stair.
-5. **Rook** and the other bosses at Kael's level of model.
+4. **Tavi:** re-kitted (v0.60: bedroll, satchel, scarf, lamp). Needs your eye.
+5. **Rook** and the other two bosses re-kitted (v0.60). Still short of Kael: faces, weapons, their own idle.
 6. **The Proctors on the dais:** detailed figures, or detailed flat sprites standing in the 3D scene.
 
 ## Places
-7. **2.5D places.** Built in v0.59: the fire on night 28 (stays 2.5D, as you said) and Ashgate Square as a memory. **Your rule: new 2.5D places are for new story beats or memories that add flavour and understanding and do not affect the plot.** Next candidates: the Assay camp by day (day 3); Row K the morning after the wedding; the fever ward with the fans up; the deck of a barge in the two years; the Spire's fourth ring at night. Also still open: the whole square explorable this way in the present, not only as a memory.
+7. **2.5D places.** Built in v0.59: the fire on night 28 (stays 2.5D, as you said) and Ashgate Square as a memory. **Your rules: (1) from here on, new 2.5D places are for new story beats or memories that add flavour and understanding and do not affect the plot (the fire was already in the story, so it stands). (2) Do not change an existing area to another dimension (2D, 2.5D, 3D) unless you name the area and the dimension.** All five candidates below are approved, to be built after the rest of this list has been gone over. Next candidates: the Assay camp by day (day 3); Row K the morning after the wedding; the fever ward with the fans up; the deck of a barge in the two years; the Spire's fourth ring at night. Also still open: the whole square explorable this way in the present, not only as a memory.
 8. **The High Docks rebuilt from reference:** laid out like a real dock, dressed as somewhere the Accredited live, with side corridors that go nowhere, height for the boots, and hidden things that feed the Codex.
 9. **Riser Nine:** more character still. It has a hill, a hoist and a road now.
 9a. **The Stair's sky:** the far fleet rides in two turning rings with winking lamps and cannot touch (v0.56). Still to do: crew on the near hulls; the three near wrecks and the smoke do not move.
