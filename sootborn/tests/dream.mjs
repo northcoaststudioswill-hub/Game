@@ -6,7 +6,7 @@ const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
 const shot = n => page.screenshot({ path: `shots/dr-${n}.png` });
 await page.goto(new URL('../index.html', import.meta.url).href); await wait(600); await page.keyboard.press('Enter');
 for (let i = 0; i < 100 && !(await ev(() => BTS.G.mode === 'opening')); i++) await wait(100);
-await wait(1500); await page.keyboard.press('Space'); await wait(2500);
+await wait(1500); await page.keyboard.press('Space'); await wait(2500); await ev(() => { Settings.d.issue3d = 0; });
 const click = l => ev(l => { [...document.querySelectorAll('.mi')].reverse().find(b => b.textContent.includes(l)).click(); }, l);
 const run = async (sec, label, tag, max) => {
   await ev(() => { BTS.UI.clear(); BTS.Cutscene.active && BTS.Cutscene.skip(true); BTS.Brawl.active = false; BTS.Brawl.cine = null; BTS.G.heist = 0; BTS.Game.toTitle(); BTS.Menus.checkpoints(); }); await wait(200);

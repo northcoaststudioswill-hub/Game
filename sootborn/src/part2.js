@@ -261,7 +261,8 @@ const P2 = {
     { say: 'brand', t: 'I know his name. I have known it seven years. I have never once said it. ...Hollis.' },
     { narr: 'He said it like a man putting down something he had carried up nine floors. Then he went to see to his halberd, and I let him, because I thought there would be a morning after.' },
     { fade: 'out' }, { panel: null },
-    { brawl: () => FF.docks() }
+    { card: 'THE HIGH DOCKS', sub: 'Seven years from now. The second bell.', big: 1, min: 1.5, max: 4.5 },
+    { issue: 'docks', or: [{ brawl: () => FF.docks() }] }
   ],
   4: () => [
     { music: 'mystery' }, { card: 'TWO YEARS', sub: 'Seven to nine years from now.', big: 1, min: 1.6, max: 5 },
@@ -276,6 +277,16 @@ const P2 = {
     { music: 'mystery' }, { panel: 'dockstair' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { sfx: 'heart' }, { wait: 2 },
     { narr: 'Eleven minutes. Somebody timed it. I asked them to.' },
     { fade: 'out' }, { panel: 'weather' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
+    ...(P2F('wrenMet') ? [
+      { narr: 'For a week I knew who had done it. The dock log had one pass entered against the lamp gallery at the first bell. An engineer\'s pass. Halloran, W.' },
+      { narr: 'I did not say it to anyone. I counted it instead. She had the gallery. She had the hour. She had my face, nearly, from a pump house on a dark island.' },
+      ...(P2F('wrenClose') ? [{ narr: 'And she had put her hand over mine on a weeping manifold, and I had left it there. I went over that evening eleven times, looking for the lie in it. I wanted very badly to find one. It would have been simpler.' }] : []),
+      { say: 'ilse', t: 'You have a name in your mouth. I can see you chewing it. Swallow it or spit it, soot. Do not carry it about.' },
+      { say: 'kael', t: 'An engineer lit those lamps.' },
+      { say: 'ilse', t: 'An engineer\'s pass lit those lamps. That is not the same sentence. You have struck four hundred names from a book. You of all people know what a line in a book is worth.' },
+      { narr: 'I knew. I went on believing it anyway. It is a thing I am not proud of: Brand was a week dead, and I needed it to be somebody I could reach.' },
+      { fx: () => { G.flags.fury = (G.flags.fury || 0) + 1; } }
+    ] : []),
     { narr: 'Sable got the note out of the dock office a week later. One line, in a hand I had sat across from for three years.' },
     { sfx: 'heart' }, { narr: '"The high docks. The second bell. The Clerk\'s own rota. For Teo Aldane. Balanced."' },
     { say: 'ilse', t: 'You are going to tell me she had the right. Do not. I can hear you preparing it.' },
@@ -301,6 +312,13 @@ const P2 = {
     { narr: 'Seven years late. Tavi looked for a long time and then said: she was right. And then: she\'d be unbearable about it.' },
     { say: 'wren', t: 'Clerk... no. Brennick. I have brought eleven engineers and the Array schematics. One touches the pipe. I worked out why it works. It is because somebody has to care whether it does.' },
     { say: 'wren', t: 'We. I am practising. We touch the pipe. ...Aye?' },
+    ...(P2F('wrenMet') ? [
+      { say: 'wren', t: 'There is a pass in the dock log with my name on it. One went to the lamp gallery to shut the valve. They were waiting there too. They held me, and lit it with my own hand on the wheel.' },
+      { say: 'wren', t: 'You thought it was me.' },
+      { say: 'kael', t: 'For a week.' },
+      { say: 'wren', t: 'A week. One would have given it two days. ...It is the only slow thing about you, Brennick, thinking ill of somebody. One hopes you keep it.' },
+      { narr: 'The eleven engineers were the ones who had held her. She had talked to them for two years through a cell door, about pressure. I have never worked out how to say sorry in Accredited. There is no word. I said it in soot. She said: noted.' }
+    ] : []),
     { say: 'tavi', t: 'Close enough. Ta for the schematics.' },
     { narr: 'She found me that night at the rail, with the cord out of my collar.' },
     { say: 'wren', t: 'The washer. You hold it when you count. I have watched you do it for four years and never asked.' },

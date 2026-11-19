@@ -1,5 +1,29 @@
 # SOOTBORN — changelog
 
+## v0.29 · 2026-11-19 — The High Docks in third person, drawn like Second Chance; more to do in 2D than hide; the thought of betrayal
+From play notes: a level or two in the future sequences that looks like Second Chance, in our universe, with a model for Kael, the enemies and the boss; more 2D mission types than stealth and pipes; another 2D fight; Kael striking the Proctor down in 2D and what he gets from it; the Wren arc and the thought of betrayal.
+
+**The High Docks: a third-person level in the Second Chance art style** (Part Two, end of chapter 3; Dev menu → Levels in 3D)
+- It is the Second Chance engine itself: cel shading with halftone dots, ink outlines, drawn faces, comic captions, story pages and SFX lettering. `issue/patch.mjs` re-casts and re-dresses it at build time; `issue/base.html` is Second Chance, untouched.
+- **New character models:** Kael, gilded (ivory coat, gilt trim, gold hair with the one streak the Gilding never took, the band, the soot smudge, gold-leaf eyes, Seren's washer on a cord, the rigging line wound on his left arm); the **Dock Guard** (white enamel helm with one slit, dock teal); the **Stair Blade** (violet cowl, gilt half-mask, long knife); the **Warden** (steel helm with a red comb, halberd held short); the boss, **Stair Captain Ansel Rook** (white coat, gilt pauldrons, peaked cap and plume, a mooring gaff); and **Brand** (grey cloak, beard, halberd grounded), who keeps the head of the dock stair for the whole level.
+- **The place:** the same streets re-dressed as Spire stone, enamel plate and gilt, at night in the weather. Two airship barges ride over the freight yard on one line from Mooring One. The moored fleet hangs all round the sky and the Sun Spire stands to the north.
+- **How he fights:** the three paths are his three forms. BANK HANDS (Shaft Drop), THE TURN, THE LINE (the hook line). The revive is ON MY BREATH. Checkpoints are chalked suns where he counts eleven.
+- **Story:** the lamps are already lit. Five things to find on the way (a trimmed lamp, the watch board with FIRST chalked over SECOND, forty halberds to a crate, the dock log initialled by Cade, a signal lamp still warm). Rook at Mooring One, then **cut the last mooring yourself**; the level ends on Brand's halberd striking stone at the foot of the stair, which is where chapter 4 picks up.
+- It runs in its own frame inside the same single file (the file is now about 1.8 MB). If the device cannot start it, or you choose "Skip this level" from its pause menu, the story carries on; if it cannot start at all the old 2D docks fight plays instead.
+
+**2D levels: more to do than hide**
+- **The Camp** now has a fistfight in the lane (Thorne), flint to strike and a sun to chalk as button sequences.
+- **The Island** ends in a timed run with the standard.
+- **The Lamp** (new, night 28): somebody is selling the House's watch. Question the camp, read what does not fit, accuse one of them. Get it right and it is a 2D duel with Corin Ashby in the rain, and a choice about what to do with him.
+- **On the Ground** (new 2D fight): after the 3D fight with Proctor Voss, Kael finishes it on foot. Then a 2D cinematic of what he takes: the boots, the Proctors' seal and the cache it opens, the note of who owes the Proctors, and the white cloak.
+- 2D fights set in the storm are now at night, in rain, with lightning.
+
+**Wren, and the thought of betrayal** (Part Two, chapter 4; only if he met her on the Island)
+- For a week after the docks Kael believes it was Wren: an engineer's pass is entered against the lamp gallery at the first bell. Ilse tells him a pass in a book is not a person. He goes on believing it, because Brand is a week dead and he needs it to be somebody he can reach. Then Sable brings Maren's note.
+- When Wren comes up with eleven engineers she tells him what happened: she went to shut the valve, they held her and lit the lamps with her hand on the wheel. The eleven are the ones who held her. "You thought it was me." "For a week."
+
+**Not checked:** nobody has played the High Docks by hand yet. It was driven by script from the title to the end card, and through the hand-off back into the story; fights inside it were not fought by hand in this version of the cast. Frame rate on a phone is unknown (it drops to its "FAST" picture by itself if it cannot hold the rate). Whether the level starts inside the Claude app is unknown until it is tried there; the fallback is the 2D fight.
+
 ## v0.28 · 2026-11-19 — Part Two on foot, a fourth Assay level, a second training bout, nicer flash-forwards, a lived-in world above
 From play notes: keep fleshing out where the game is thin; more detail, more cutscenes.
 

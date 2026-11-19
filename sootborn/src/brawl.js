@@ -590,7 +590,7 @@ const Brawl = {
   scene(g, extra) {
     const bg = (this.def.bg === 'pit' ? 'ring' : this.def.bg) || 'ring', rm = Settings.d.reduce, c = this.cam;
     const sx = this.shake > 0 && !rm ? Math.round((Math.random() - .5) * 6) : 0, sy = this.shake > 0 && !rm ? Math.round((Math.random() - .5) * 4) : 0;
-    const artOn = this.art && this.art.t > this.art.C, rush = ((this.sup && this.sup.t >= SUPT) || artOn) && !this.cine, d3 = this.g3 = G3.want(bg);
+    const artOn = this.art && this.art.t > this.art.C, rush = ((this.sup && this.sup.t >= SUPT) || artOn) && !this.cine, d3 = this.g3 = !this.def.d2 && G3.want(bg);
     g.save(); g.translate(sx, sy);
     if (d3) { g.clearRect(-8, -8, W + 16, H + 16); G3.begin(this, rush && !rm ? (artOn ? [.04, .025, .09] : [.1, .01, .02]) : null, sx, sy); if (this.def.flat && !(rush && !rm)) { if (!this.flatC) { this.flatC = document.createElement('canvas'); this.flatC.width = 320; this.flatC.height = 180; } if (this.flatC.width !== W) this.flatC.width = W; const fg = this.flatC.getContext('2d'); this.g3 = false; this.backdrop(fg, bg, c.hor, this.t); this.floor(fg, bg); for (const q of this.props.filter(q => q.y < -8).sort((a, b) => a.y - b.y)) this.prop(fg, q); this.g3 = true; G3.flatSrc = this.flatC; } } else { this.backdrop(g, bg, c.hor, this.t); this.floor(g, bg); }
     if (!rm && !d3 && (bg === 'valley' || bg === 'ford')) { const t = this.t; for (let i = 0; i < 3; i++) { const cx0 = ((i * 190 + t * 9) % 620) - 310, cy0 = -90 + i * 70; this.poly(g, Array.from({ length: 14 }, (_, k) => [cx0 + Math.cos(k / 14 * 6.283) * (70 + i * 14), cy0 + Math.sin(k / 14 * 6.283) * 30]), 'rgba(10,30,40,.13)'); }
@@ -600,6 +600,14 @@ const Brawl = {
     if (rush && !rm) { const tg = artOn ? this.art.tg : this.sup.tg || this.p, pr = this.proj(tg.x, tg.y, 24), t = this.t; if (!d3) { g.fillStyle = artOn ? (this.art.a.dark || 'rgba(10,6,22,.8)') : 'rgba(26,2,4,.78)'; g.fillRect(-8, -8, W + 16, H + 16); } g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 40; i++) { const a = i / 40 * 6.283 + (i % 5) * .13, r0 = 26 + (i * 37 + t * 520) % 150, r1 = r0 + 30 + (i % 4) * 16; g.strokeStyle = i % 3 ? (artOn ? `rgba(${this.art.a.rgb || '255,200,90'},.5)` : 'rgba(255,90,30,.5)') : 'rgba(255,220,160,.6)'; g.lineWidth = i % 4 === 0 ? 2 : 1; g.beginPath(); g.moveTo(pr.x + Math.cos(a) * r0, pr.y + Math.sin(a) * r0 * .7); g.lineTo(pr.x + Math.cos(a) * r1, pr.y + Math.sin(a) * r1 * .7); g.stroke(); } g.globalCompositeOperation = 'source-over'; }
     const list = (rush || d3 ? [] : this.props.map(q => ({ y: q.y, d: () => this.prop(g, q) }))).concat(extra);
     list.sort((a, b) => a.y - b.y); for (const e of list) e.d();
+    if (!d3 && bg === 'storm' && !rush) { // the 2D valley at night, in the rain: the painted day is underneath
+      const t = this.t, fl = rm ? 0 : Math.max(0, Math.sin(t * 0.83) * Math.sin(t * 2.9) - 0.93) * 9;
+      g.fillStyle = 'rgba(8,10,36,' + (0.5 - fl * 0.3).toFixed(3) + ')'; g.fillRect(-8, -8, W + 16, H + 16);
+      const gr = g.createRadialGradient(W / 2, H * 0.62, 8, W / 2, H * 0.62, W * 0.42); gr.addColorStop(0, 'rgba(255,190,110,.20)'); gr.addColorStop(1, 'rgba(255,190,110,0)');
+      g.globalCompositeOperation = 'lighter'; g.fillStyle = gr; g.fillRect(-8, -8, W + 16, H + 16); g.globalCompositeOperation = 'source-over';
+      g.fillStyle = 'rgba(190,210,255,.42)'; for (let i = 0; i < (rm ? 20 : 54); i++) { const x = ((i * 53.7 - t * (60 + i % 5 * 18)) % (W + 40) + W + 40) % (W + 40) - 20, y = (i * 29.3 + t * (430 + i % 7 * 36)) % (H + 30) - 15; g.fillRect(x | 0, y | 0, 1, 5 + i % 3 * 2); }
+      if (fl > 0.05) { g.fillStyle = 'rgba(220,230,255,' + Math.min(0.5, fl * 0.5).toFixed(3) + ')'; g.fillRect(-8, -8, W + 16, H + 16); }
+    }
     if (d3 && this.p.st === 'hook' && this.p.hk) { const p = this.p, f = p.hk, k = Math.min(1, p.t / .13); for (let i = 1; i <= 12; i++) { const u = i / 12 * k; G3.glow(p.x + (f.x - p.x) * u, (30 + Math.sin(u * 3.14) * 6) * G3.HK, p.y + (f.y - p.y) * u, i === 12 ? 4 : 1.8, [1, .85, .5], .95); } }
     if (d3 && this.p.st === 'ram' && this.p.t > .13 && this.p.t < .36) { const p = this.p, k = (p.t - .13) / .23; for (let i = 0; i < 9; i++) { const a = i / 9 * 6.283 + this.t * 9, r = 3 + k * 16; G3.glow(p.x + p.ax * (20 + k * 14) - p.ay * Math.cos(a) * r * .6, (30 + Math.sin(a) * r) * G3.HK, p.y + p.ay * (20 + k * 14) + p.ax * Math.cos(a) * r * .6, 6 - k * 3, [1, .7, .25], 1 - k * .8); } }
     if (d3 && this.p.boots && this.p.z > 2 && !this.sup && !this.art) { const p = this.p, zz = p.z * G3.HK * 1.2; for (let i = 0; i < 4; i++) G3.glow(p.x + (i % 2 ? 3 : -3), Math.max(1, zz - 2 - i * 4 * (p.hov ? 1.6 : 1)), p.y, (p.hov ? 5 : 3) - i * .7, [.55, .85, 1], .9 - i * .2); }

@@ -321,3 +321,22 @@ Rule: every level above the rock has things to read that nobody points at, the w
 - **Seren, new:** the fire on a valve block at nine ("Hands, Kael. Everything is hands."); the bet on the noodle-stall roof that the sky is blue, for a ring; the night he gave her the washer ("it is the only round thing I own"); she wore it eleven months.
 - **Rage, new:** the window (she won the bet and they burned her under it); the furnace doors (eleven seconds was a worn valve seat, a fault; Celestine wants it fixed to seven; flag `doors` = kept or fixed); the camp (the heirs say "balanced" of their own dead; Tier Four is forty feet under their feet); the dais.
 - New Memory Arts: WARM THING (the Proctor), A RING (the Gallery), ELEVEN MONTHS (the Stair). A **Memories** shelf on the title screen and pause menu keeps every Memory Art seen.
+
+## The High Docks, in third person (v0.29)
+One level of the future is played in third person and drawn like a comic. It uses the engine and art style of the user's other game, Second Chance, with our cast and our place. Nothing from Second Chance's own story is in it.
+- **When:** +7, the night of the High Docks, between "The night before the docks" and Brand's stair.
+- **Kael's model:** gilded. Ivory coat with gilt trim, gold hair pushed up with one dark streak, a violet band, the soot smudge on his cheek, gold-leaf eyes, the seam of the Gilding along the jaw, Seren's washer on a cord, the rigging line wound on his left forearm.
+- **Enemies:** Dock Guard (white enamel helm, teal), Stair Blade (violet cowl, gilt half-mask), Warden (steel helm, red comb, halberd).
+- **Boss:** Stair Captain Ansel Rook. Accredited, grey, a duelling scar kept on purpose, a mooring gaff. He calls Kael "Clerk Sorrel"; he was told a clerk would come. Dies saying it does not balance. New to canon.
+- **Brand** holds the head of the dock stair from the first panel. The level ends on his halberd butt striking stone.
+- **What Kael learns there:** the watch was moved from the second bell to the first on Marshal Cade's initial. He does not learn who gave Cade the hour. That stays with Maren's note, a week later.
+- **Forms:** Bank Hands (Shaft Drop), The Turn, The Line (hook line). Last breath is ON MY BREATH. He counts eleven at chalked suns.
+- **The barges** are airships: a wooden hull under a long ivory gas cell with gilt hoops, teal lamps at the corners, moored in pairs on a single line.
+
+### Wren and the week (v0.29)
+If Kael met Wren on the Island, he spends the week after the docks believing she lit the lamps, because her pass is in the dock log. She had gone to shut the valve and was held. The eleven engineers she brings at +9 are the ones who held her. He apologises in soot; she says "noted".
+
+### More in the Assay (v0.29)
+- **The Lamp** (night 28): find who is selling the House's watch; Corin Ashby; a 2D duel in the rain and a choice.
+- **On the Ground:** Kael finishes Proctor Voss on foot in 2D and takes the boots, the Proctors' seal, the note of debts, and the white cloak.
+

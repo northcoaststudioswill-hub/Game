@@ -1,0 +1,174 @@
+//@@OBJECTIVE
+  function objective() {
+    let t = '', g = null;
+    if (S.enc) t = S.enc.id === 'boss' ? 'CAPTAIN ROOK HOLDS MOORING ONE. TAKE IT.' : 'PUT THE DOCK GUARD DOWN';
+    else if (!F.path) { t = F.clue_casings ? 'STEP ONTO THE CHALKED SUN' : 'LOOK AT THE LAMP, THEN STEP ONTO THE CHALKED SUN'; g = CROSS.alley; }
+    else if (!F.e_alley) t = 'PUT THE DOCK GUARD DOWN';
+    else if (!F.e_street) { t = 'OUT ONTO THE QUAY'; g = { x: 0, y: 0, z: 12 }; }
+    else if (!F.gate) { t = 'HIGH DOCKS FREIGHT: OPEN THE YARD GATE'; g = { x: 18, y: 0, z: 7 }; }
+    else if (!F.e_yard) { t = 'CROSS THE FREIGHT YARD'; g = { x: 19, y: 0, z: -8 }; }
+    else if (!F.breaker) { t = 'THROW THE WINCH BREAKER TO RAISE THE SHUTTER'; g = { x: 31.2, y: 0, z: -8 }; }
+    else if (!F.e_wh) { t = 'GO THROUGH THE BOND HOUSE'; g = { x: 3, y: 0, z: -6.5 }; }
+    else if (!F.ledger) { t = 'SEARCH THE DOCK OFFICE UP THE STAIRS'; g = { x: -27.4, y: 4, z: -8.7 }; }
+    else if (!F.hatch) { t = 'TAKE THE BACK STAIRS TO THE ROOF'; g = { x: -13.6, y: 8, z: -18.2 }; }
+    else if (!F.e_roof && !F.bossIntro) { t = 'CROSS THE PLANK TO THE NEXT ROOF'; g = { x: -26, y: 9, z: -24 }; }
+    else if (!F.boss) { t = 'MOORING ONE. THE LAST PAIR.'; g = { x: 2, y: 11, z: -34.2 }; }
+    else if (!F.cut) { t = 'CUT THE LAST MOORING'; g = { x: MOOR.x, y: 11, z: MOOR.z }; }
+    U.objective(t); S.goal = g;
+  }
+//@@ENCDONE
+  function encDone(id) {
+    setFlag('e_' + id);
+    if (id === 'alley') U.toast('DOCK GUARD. ON THE STAIR ALREADY, WITH THEIR LAMPS LIT.', 3.5);
+    if (id === 'street') { F.key = 1; save(); SC.audio.sfx('clue'); U.toast('THE STAIR BLADE CARRIED A *YARD KEY*. HIGH DOCKS FREIGHT.', 4); }
+    if (id === 'yard') U.toast('THE SHUTTER IS DOWN. THERE WILL BE A *WINCH BREAKER*.', 3.5);
+    if (id === 'wh') U.toast('QUIET. THE *DOCK OFFICE* IS UP THE STAIRS.', 3.5);
+    if (id === 'roof') U.toast('ONE ROOF LEFT. MOORING ONE.', 3);
+  }
+//@@CUTSCENES
+  /* ---------- cutscenes ---------- */
+  let clerk, barge, cable;
+  const MOOR = { x: 16, z: -23.4 };
+  function showClerk(x, y, z, yaw) { clerk.group.visible = true; clerk.group.position.set(x, y, z); clerk.group.rotation.y = yaw; clerk.anim.apply(P.clerk(0), 999, 0.016); }
+  function hideClerk() { clerk.group.visible = false; }
+  function shot(px, py, pz, lx, ly, lz, fov, w, h) { const c = G.camera; c.position.set(px, py, pz); c.fov = fov; c.updateProjectionMatrix(); c.lookAt(lx, ly, lz); return G.snap(w || 768, h || 432); }
+  /* Brand keeps the head of the dock stair, at the blind end of Bond Alley, for the whole issue. */
+  function brandOnStair() { showClerk(0.9, 0, 43.6, Math.PI); }
+
+  function intro() {
+    SC.state = 'play'; U.showHud(false); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; pl.faceOverride = 'shock';
+    pl.place(0.3, 0, 40.2, Math.PI * 0.92); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.face('shock'); pl.model.group.updateMatrixWorld(true);
+    showClerk(1.3, 0, 38.4, -0.5); clerk.group.updateMatrixWorld(true);
+    const a = shot(2.7, 6.4, 33.2, 0.4, 0.6, 39.6, 40, 768, 720);
+    const b = shot(-0.6, 1.5, 36.2, 1.3, 1.85, 38.4, 30);
+    pl.model.face('angry'); const hd = pl.model.head.getWorldPosition(v3());
+    const c = shot(hd.x - 0.35, hd.y + 0.12, hd.z - 1.25, hd.x, hd.y, hd.z, 27);
+    pl.model.expr = null;
+    U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: [
+      { img: a, area: '1 / 1 / 3 / 2', cap: 'THE HIGH DOCKS. SEVEN YEARS AFTER THE FURNACE.', cap2: 'FOUR HUNDRED BARGES, MOORED IN PAIRS. CUT THE PAIRS AND THE WIND DOES THE REST.', fx: 'BONG!' },
+      { img: b, area: '1 / 2 / 2 / 3', cap2: 'THE SECOND BELL. NINE MINUTES WHEN NOBODY LOOKS AT THE STAIR. *I WROTE THE ROTA MYSELF.*' },
+      { img: c, area: '2 / 2 / 3 / 3', cap: 'THE LAMPS WERE ALREADY LIT.', cap2: 'SOMEBODY HAD TOLD THEM THE HOUR.' }
+    ] }, wake);
+  }
+  function wake() {
+    SC.emit('letterbox', true); pl.st = 0; pl.scriptRate = 7; pl.faceOverride = 'neutral'; pl.script = t => P.idle(t);
+    cam.move(v3(-2.3, 1.0, 42.3), v3(0.6, 1.4, 39.4), v3(-2.5, 1.6, 36.6), v3(0.8, 1.4, 39.1), 3.4, 44);
+    run([1.6, n => { pl.yaw = Math.PI * 0.95; U.say([
+        { who: 'clerk', text: 'Lamps, Brennick. Trimmed and lit. *They were told the hour.*' },
+        { who: 'hero', face: 'shock', text: 'I wrote that rota. It was nine minutes.' },
+        { who: 'clerk', text: 'It is no minutes. I hold the stair. You cut the moorings. *Mooring One* is the last pair, on the far roof.' },
+        { who: 'hero', face: 'angry', text: 'Brand.' },
+        { who: 'clerk', text: 'You do not argue, and you do not come back for me. Count your eleven, decide how you mean to fight, and *go*.' }
+      ], n); },
+      n => { brandOnStair(); SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.snapBehind(Math.PI); cam.endCine(0.9); U.showHud(true); setFlag('intro');
+        U.toast(SC.input.touch ? 'LEFT THUMB MOVES. DRAG THE RIGHT SIDE TO TURN THE CAMERA.' : 'WASD MOVES. DRAG THE MOUSE OR USE THE ARROWS TO TURN THE CAMERA.', 5); n(); }]);
+  }
+  function bossIntro() {
+    const again = F.bossIntro; F.bossIntro = 1; save(); pl.control = false; pl.setState('scripted'); pl.script = t => P.guard(t); pl.scriptRate = 6; U.showHud(false); SC.emit('letterbox', true); cam.lock = null;
+    const e = SC.spawnEnemy('boss', 22, 11, -34, ENC.boss); e.state = 'wait'; e.model.group.scale.set(1, 1, 1); e.yaw = -Math.PI / 2; S.bossE = e;
+    pl.yaw = Math.PI / 2;
+    cam.move(v3(26.5, 12.1, -31.5), v3(22, 12.9, -34), v3(18.6, 11.9, -32.2), v3(22, 12.6, -34), 4.5, 40);
+    const lines = again ? [{ who: 'voss', text: 'The clerk again. One had you marked down as *struck*.' }, { who: 'hero', face: 'angry', text: 'Check your figures, Captain.' }] : [
+      { who: 'voss', text: 'Clerk Sorrel. One was told a clerk would come to the moorings at the second bell. One did not believe it.' },
+      { who: 'hero', face: 'angry', text: 'Count your guard again, Captain. You are short.' },
+      { who: 'voss', text: 'Four hundred hulls and one clerk. It is *noted*. Marshal Cade will have your hands for it.' },
+      { who: 'hero', face: 'smirk', text: 'He can come up the stair and ask for them.' }];
+    run([0.8, n => U.say(lines, n), n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true); e.state = 'chase'; e.st = 0; e.cool = 1.2;
+      S.enc = ENC.boss; ENC.boss.wave = 0; ENC.boss.wait = 0; U.boss(e, 'STAIR CAPTAIN ANSEL ROOK'); objective(); n(); }]);
+  }
+  /* Rook is down. The level is not over until the last pair is cut. */
+  function ending(e) {
+    S.enc = null; U.boss(null); SC.clearEnemies(); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 5;
+    run([0.5, n => U.say([
+        { who: 'voss', text: 'It does not... balance. You were *one of us*. One sat at table with you.' },
+        { who: 'hero', face: 'angry', text: 'I was never one of you. I only learned to count like you.' }
+      ], n),
+      n => { pl.setState('idle'); pl.control = true; setFlag('boss'); U.toast('THE GAFF IS ON THE CLEAT. *CUT THE LAST MOORING.*', 4); n(); }]);
+  }
+  function finale() {
+    setFlag('cut'); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 5; U.showHud(false); SC.emit('letterbox', true);
+    pl.place(MOOR.x, 11, MOOR.z - 0.9, 0); cable.visible = false; S.drift = 0.0001;
+    const p = v3(MOOR.x, 11, MOOR.z); FX.burst(v3(p.x, 12, p.z + 1), 0xffd23a, 1.6); FX.word('SNAP!', v3(p.x, 13.2, p.z + 1), '#ffe14a', 2.2); cam.shake(0.6); SC.audio.sfx('door');
+    cam.move(v3(p.x - 4.2, 12.3, p.z - 5.2), v3(p.x + 1, 15, p.z + 8), v3(p.x - 5.4, 13, p.z - 6.6), v3(p.x + 6, 21, p.z + 16), 11, 46);
+    run([1.6, n => U.say([
+        { who: 'cap', text: 'The last pair went out on the wind like the rest. Four hundred hulls, and not one lamp on any of them.' },
+        { who: 'cap', text: 'Below me the dock stair was full of light. It should have been dark. I had written the hour myself.' },
+        { who: 'hero', face: 'shock', text: 'Brand.' },
+        { who: 'cap', text: 'Then a halberd butt struck stone at the foot of the stair. Once. Brand was counting them.' }
+      ], n), 0.8,
+      n => { S.done = true;
+        U.end({ time: S.time, path: SC.PATHS[pl.path].name, kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { S.wipe(); if (!SC.host('done', { time: S.time, kills: pl.stats.kills, clues: pl.echoes })) { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); } }); n(); }]);
+  }
+
+  function makeBarge() {
+    const hullM = G.toon({ map: G.tex.wood, color: 0x6e5a48 }), bagM = G.toon({ color: 0xefe8d4 }), giltM = G.toon({ color: 0xe8c25a }), darkM = G.toon({ color: 0x23232e });
+    const g = new THREE.Group(), put = (geo, mat, x, y, z, t, rz) => { const o = G.inked(geo, mat, t === undefined ? 0.08 : t); o.position.set(x, y, z); if (rz) o.rotation.z = rz; g.add(o); return o; };
+    put(new THREE.BoxGeometry(15, 2.2, 5.2), hullM, 0, 0, 0); put(new THREE.BoxGeometry(15.6, 0.3, 5.6), giltM, 0, 1.1, 0, 0.05);
+    put(new THREE.BoxGeometry(2.6, 1.6, 4.4), hullM, -8.6, 0.5, 0, 0.08, 0.5); put(new THREE.BoxGeometry(2.6, 1.6, 4.4), hullM, 8.6, 0.5, 0, 0.08, -0.5);
+    put(new THREE.BoxGeometry(4.2, 1.8, 3), bagM, 3.6, 2.2, 0); put(new THREE.BoxGeometry(4.6, 0.25, 3.4), darkM, 3.6, 3.2, 0, 0.05);
+    const bag = put(new THREE.CylinderGeometry(2.7, 2.7, 15, 10), bagM, 0, 7.6, 0, 0.1); bag.rotation.z = Math.PI / 2;
+    [-7.5, 7.5].forEach(x => { const c = put(new THREE.ConeGeometry(2.7, 2.6, 10), bagM, x + Math.sign(x) * 1.3, 7.6, 0, 0.1); c.rotation.z = -Math.sign(x) * Math.PI / 2; });
+    [-4.4, 0, 4.4].forEach(x => put(new THREE.CylinderGeometry(2.76, 2.76, 0.35, 10), giltM, x, 7.6, 0, 0).rotation.z = Math.PI / 2);
+    [[-5.5, 2.2], [5.5, 2.2], [-5.5, -2.2], [5.5, -2.2]].forEach(p => put(new THREE.BoxGeometry(0.14, 4.2, 0.14), darkM, p[0], 3.2, p[1], 0.03));
+    const lampM = new THREE.MeshBasicMaterial({ color: 0x5ff2e2, fog: false });
+    [[-7.4, 2.7], [7.4, 2.7], [-7.4, -2.7], [7.4, -2.7]].forEach(p => put(new THREE.BoxGeometry(0.34, 0.34, 0.34), lampM, p[0], 1.5, p[1], 0.03));
+    return g;
+  }
+//@@INIT
+  S.init = function () {
+    clerk = S.clerk = SC.makeHumanoid('clerk'); G.scene.add(clerk.group); clerk.group.visible = false;
+    W.dyn.push(t => { if (clerk.group.visible) clerk.anim.apply(P.clerk(t), 6, 0.016); });
+    pl.model.setGlow(0xf6f2e6, '#f6f2e6');
+    // the last pair, riding over the freight yard on one line from Mooring One
+    barge = S.barge = makeBarge(); barge.position.set(MOOR.x + 2, 17.5, -11.5); barge.rotation.y = 0.18; G.scene.add(barge);
+    const pair = makeBarge(); pair.position.set(MOOR.x - 20, 25, 4); pair.rotation.y = -0.5; G.scene.add(pair);
+    { const a = v3(MOOR.x, 11.9, -22.2), b = v3(MOOR.x + 1, 16.6, -14), len = a.distanceTo(b);
+      cable = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, len, 5), new THREE.MeshBasicMaterial({ color: G.INK })); cable.position.copy(a).add(b).multiplyScalar(0.5);
+      cable.quaternion.setFromUnitVectors(v3(0, 1, 0), b.clone().sub(a).normalize()); G.scene.add(cable); }
+    W.dyn.push((t, dt) => {
+      if (S.drift) { S.drift += dt; const k = S.drift; barge.position.set(MOOR.x + 2 + k * k * 0.22, 17.5 + k * 0.9, -11.5 + k * 1.6); barge.rotation.y = 0.18 + k * 0.03; barge.rotation.z = Math.sin(k * 0.9) * 0.04; }
+      else { barge.position.y = 17.5 + Math.sin(t * 0.7) * 0.25; barge.rotation.z = Math.sin(t * 0.5) * 0.02; }
+      pair.position.y = 25 + Math.sin(t * 0.6 + 2) * 0.3;
+    });
+    // chalked suns: where he counts eleven
+    Object.keys(CROSS).forEach(id => {
+      const c = CROSS[id], mk = (tex, s, col, op) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(s, s), new THREE.MeshBasicMaterial({ map: tex, color: col, transparent: true, opacity: op, depthWrite: false, fog: false })); m.rotation.x = -Math.PI / 2; m.position.set(c.x, c.y + 0.05, c.z); m.renderOrder = 3; G.scene.add(m); return m; };
+      const a = mk(G.tex.ring, 3.4, 0xffe14a, 0.9), b = mk(G.tex.disc, 2.3, 0xffe14a, 0.35);
+      W.dyn.push(t => { a.rotation.z = t * 0.25; const col = pl.path ? SC.PATHS[pl.path].color : 0xffe14a; a.material.color.set(col); b.material.color.set(col); b.material.opacity = 0.25 + Math.sin(t * 3) * 0.12; });
+      W.addInteract({ id: 'x_' + id, x: c.x, y: c.y, z: c.z, r: 1.9, label: 'COUNT ELEVEN', act: crossing(id), when: () => F.intro });
+    });
+    W.addInteract({ id: 'casings', x: 1.5, y: 0, z: 38.8, r: 1.9, label: 'LOOK', marker: 'clue', mh: 1.1, when: () => F.intro && !F.clue_casings, act: clue('casings', [
+      { who: 'cap', text: 'A watch lamp on the stones. The wick is trimmed and the well is full.' },
+      { who: 'hero', face: 'hurt', text: 'Nobody trims a lamp for a watch that is about to go off. They were *waiting*.' }]) });
+    W.addInteract({ id: 'bike', x: 9.2, y: 0, z: 13.7, fx: 9.3, fz: 15, r: 2.2, label: 'LOOK', marker: 'clue', mh: 1.4, when: () => F.e_alley && !F.clue_bike, act: clue('bike', [
+      { who: 'cap', text: 'The watch board, face down by a spilled sled. My rota, chalked up fair. I know my own sevens.' },
+      { who: 'hero', text: 'The second bell is struck through. Somebody has chalked *FIRST* over it.' }]) });
+    W.addInteract({ id: 'masks', x: 21, y: 0, z: -16.3, fx: 21, fz: -18.4, r: 2.2, label: 'LOOK', marker: 'clue', mh: 1.6, when: () => F.e_yard && !F.clue_masks, act: clue('masks', [
+      { who: 'cap', text: 'The freight box is full of crates. The crates are full of halberds, forty to a crate, greased and tagged for tonight.' },
+      { who: 'hero', face: 'shock', text: 'Nobody needs forty halberds to guard a barge. This was never a watch. It is a *stair party*.' }]) });
+    W.addInteract({ id: 'ledger', x: -27.2, y: 4, z: -8.7, fx: -29, fz: -8.7, r: 2.1, label: 'SEARCH', marker: 'clue', mh: 1.8, when: () => F.e_wh && !F.ledger, act: clue('ledger', [
+      { who: 'cap', text: 'The dock log, open under the lamp. An entry at the first bell, in the Stair Captain\'s hand.' },
+      { who: 'hero', face: 'angry', text: '"By order, the Clerk\'s rota is set aside. *Rook* to hold the moorings." Initialled by Marshal Cade.' },
+      { who: 'cap', text: 'Somebody gave Cade the hour. I did not have the time to wonder who. Clipped to the page: a key marked ROOF.' }], () => { setFlag('ledger'); U.toast('*ROOF KEY* TAKEN. THE BACK STAIRS GO UP.', 3.5); }) });
+    W.addInteract({ id: 'loft', x: -27.8, y: 9, z: -26.7, fx: -29.7, fz: -26.7, r: 2.1, label: 'LOOK', marker: 'clue', mh: 1.8, when: () => !F.clue_loft, act: clue('loft', [
+      { who: 'cap', text: 'A signal hut. The lamp inside is aimed straight down the Spire, and the glass is still warm.' },
+      { who: 'hero', text: 'They did not only know. They *answered*. Every Warden under the docks is on that stair by now.' }]) });
+    W.addInteract({ id: 'gate', x: 18, y: 0, z: 7.1, fx: 18, fz: 5.8, r: 2.2, label: 'OPEN GATE', marker: 'act', mh: 2.6, when: () => F.e_alley && !F.gate, act: () => {
+      if (!F.key) { U.toast('LOCKED. SOMEBODY ON THIS QUAY CARRIES THE KEY.', 2.6); SC.audio.sfx('deny'); return; }
+      W.openDoor('gate'); SC.audio.sfx('door'); setFlag('gate'); U.toast('THE GATE ROLLS BACK.', 2); } });
+    W.addInteract({ id: 'breaker', x: 31.1, y: 0, z: -8, fx: 32, fz: -8, r: 2, label: 'BREAKER', marker: 'act', mh: 2.6, when: () => F.e_yard && !F.breaker, act: () => {
+      setFlag('breaker'); W.openDoor('shutter'); SC.audio.sfx('door'); pl.control = false; U.showHud(false); SC.emit('letterbox', true);
+      cam.move(v3(13.5, 2.2, -3.2), v3(5.7, 1.6, -6.5), v3(11.5, 1.7, -4.4), v3(5.7, 2.6, -6.5), 2.2, 44);
+      run([2.3, n => { SC.emit('letterbox', false); cam.endCine(0.6); U.showHud(true); pl.control = true; n(); }]); } });
+    W.addInteract({ id: 'hatch', x: -13.5, y: 8.1, z: -18.2, fx: -12.5, fz: -18.2, r: 1.8, label: 'ROOF DOOR', marker: 'act', mh: 2.2, when: () => F.e_wh && !F.hatch, act: () => {
+      if (!F.ledger) { U.toast('LOCKED. THE KEY WILL BE IN THE *DOCK OFFICE*.', 2.6); SC.audio.sfx('deny'); return; }
+      W.openDoor('hatch'); SC.audio.sfx('door'); setFlag('hatch'); } });
+    W.addInteract({ id: 'moor', x: MOOR.x, y: 11, z: MOOR.z, r: 2.4, label: 'CUT THE LINE', marker: 'act', mh: 2.4, when: () => F.boss && !F.cut, act: finale });
+    SC.on('dazed', e => { if (!F.tutFinish) { F.tutFinish = 1; U.toast('WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
+    SC.on('secondchance', () => SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)));
+    SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
+    SC.on('kill', e => { if (e.kind === 'boss') S.bossDown = true; });
+    SC.on('finisherEnd', e => { if (e.kind === 'boss') ending(e); });
+    SC.on('bossPhase', e => { SC.spawnEnemy('hollow', e.pos.x + 3, 11, e.pos.z + 3, ENC.boss); SC.spawnEnemy('knifer', e.pos.x - 3, 11, e.pos.z - 3, ENC.boss); U.toast('"TO THE MOORINGS! HE IS ONE CLERK!"', 2.6); });
+  };
+

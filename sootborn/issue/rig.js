@@ -1,0 +1,194 @@
+//@@SPECS
+  /* SOOTBORN cast. The slot names are the engine's; the people are ours.
+     hero = Kael Brennick, gilded, seven years on.  hollow = Dock Guard.  knifer = Stair Blade.
+     bruiser = Warden.  boss = Stair Captain Ansel Rook.  clerk = Brand. */
+  const SPECS = SC.SPECS = {
+    hero: { h: 1.06, b: 1.04, face: 'kael', hair: 'kael', coat: true, scarf: true, glowHand: true, washer: true,
+      pal: { skin: 0xe6c79a, top: 0xefe8d4, trim: 0xe8c25a, shirt: 0x5a3aa8, tie: 0xe8c25a, pants: 0x3a3350, boots: 0x1a1620, hair: 0xe9cf7a, streak: 0x2a2630, glove: 0x2a2630, wrap: 0x8a6a48, band: 0x5a3aa8 } },
+    hollow: { h: 1.0, b: 1.05, face: 'visor', helm: 'guard', weapon: 'baton', tabard: true,
+      pal: { skin: 0xefe8d4, top: 0x2f8f8a, trim: 0xe8c25a, shirt: 0xefe8d4, tie: 0xe8c25a, pants: 0x30344a, boots: 0x14141d, hair: 0xefe8d4, glove: 0xefe8d4, wrap: 0x2f8f8a } },
+    knifer: { h: 0.97, b: 0.9, face: 'halfmask', hood: true, weapon: 'blade', sash: true,
+      pal: { skin: 0xe6c79a, top: 0x5a3aa8, trim: 0x33206a, shirt: 0xe8c25a, tie: 0xe8c25a, pants: 0x23202c, boots: 0x14141d, hair: 0x5a3aa8, glove: 0x14141d, wrap: 0x5a3aa8 } },
+    bruiser: { h: 1.24, b: 1.5, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true,
+      pal: { skin: 0x9aa1b8, top: 0x3a3f5c, trim: 0xe8c25a, shirt: 0x8a1f24, tie: 0xe8c25a, pants: 0x23232e, boots: 0x14141d, hair: 0x9aa1b8, glove: 0x23232e, wrap: 0x3a3f5c } },
+    boss: { h: 1.14, b: 1.08, face: 'rook', hat: 'captain', coat: true, weapon: 'gaff', pauldron: true,
+      pal: { skin: 0xd9b48f, top: 0xf2efe6, trim: 0xe8c25a, shirt: 0x8a1f24, tie: 0xe8c25a, pants: 0x23232e, boots: 0x0c0c12, hair: 0xb9bcc8, glove: 0x8a1f24, wrap: 0xf2efe6 } },
+    clerk: { h: 1.12, b: 1.25, face: 'brand', hair: 'brand', coat: true, weapon: 'halberd2',
+      pal: { skin: 0xb98a66, top: 0x4a4650, trim: 0x2a2630, shirt: 0x6e6a78, tie: 0x2a2630, pants: 0x2a2630, boots: 0x15151f, hair: 0x9a9aa6, glove: 0x2a2630, wrap: 0x4a4650 } }
+  };
+//@@FACES
+  function drawFace(g, kind, expr, glow) {
+    const S = 128, ink = '#07070d';
+    g.setTransform(1, 0, 0, 1, 0, 0); g.lineCap = 'round'; g.lineJoin = 'round';
+    const eye = (x, y, w, h, iris, lid) => {
+      g.fillStyle = ink; g.beginPath(); g.ellipse(x, y, w + 3, h + 3, 0, 0, 7); g.fill();
+      g.fillStyle = '#fff'; g.beginPath(); g.ellipse(x, y + 1, w, h, 0, 0, 7); g.fill();
+      g.fillStyle = iris; g.beginPath(); g.arc(x, y + 1, Math.min(h + 1, 6), 0, 7); g.fill();
+      g.fillStyle = ink; g.beginPath(); g.arc(x, y + 1, 2.4, 0, 7); g.fill();
+      g.fillStyle = ink; g.fillRect(x - w - 4, y - h - 4, (w + 4) * 2, h * lid + 3);
+    };
+    const stroke = (pts, w, col) => { g.strokeStyle = col || ink; g.lineWidth = w; g.beginPath(); g.moveTo(pts[0], pts[1]); for (let i = 2; i < pts.length; i += 2) g.lineTo(pts[i], pts[i + 1]); g.stroke(); };
+    const EX = { neutral: [5.5, 0.35, 0, 0], angry: [5, 0.5, 7, 0], hurt: [3, 0.9, -6, 0], shock: [8, 0, -3, -4], smirk: [5, 0.45, 3, 0], shut: [1, 1.2, 0, 0], dead: [1, 1.2, -4, 0] };
+    const mouth = (y, col) => {
+      if (expr === 'angry') { g.fillStyle = ink; g.fillRect(44, y - 7, 42, 15); g.fillStyle = '#fff'; g.fillRect(47, y - 4, 36, 9); stroke([56, y - 4, 56, y + 5], 1.5); stroke([65, y - 4, 65, y + 5], 1.5); stroke([74, y - 4, 74, y + 5], 1.5); }
+      else if (expr === 'hurt' || expr === 'dead') { g.fillStyle = ink; g.beginPath(); g.ellipse(65, y, 13, 8, 0, 0, 7); g.fill(); g.fillStyle = col || '#8a1f24'; g.beginPath(); g.ellipse(65, y + 2, 8, 4, 0, 0, 7); g.fill(); }
+      else if (expr === 'shock') { g.fillStyle = ink; g.beginPath(); g.ellipse(65, y + 1, 7, 9, 0, 0, 7); g.fill(); }
+      else if (expr === 'smirk') stroke([48, y + 1, 70, y + 2, 84, y - 6], 4);
+      else stroke([50, y, 80, y], 4);
+    };
+    if (kind === 'kael') {
+      // gilded: warm gold skin, gold-leaf eyes, and the soot he never quite washes off one cheek
+      g.fillStyle = '#e6c79a'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#c29a6a'; g.beginPath(); g.moveTo(0, 36); g.lineTo(30, 60); g.lineTo(28, 98); g.lineTo(50, 128); g.lineTo(0, 128); g.fill();
+      g.fillStyle = '#c29a6a'; g.fillRect(42, 110, 56, 18);
+      const e = EX[expr] || EX.neutral;
+      eye(42, 60, 11, e[0], '#e2a81c', e[1]); eye(86, 60, 11, e[0], glow === '#f6f2e6' ? '#e2a81c' : glow, e[1]);
+      stroke([27, 45 + e[3] - e[2] * 0.3, 54, 47 + e[3] + e[2]], 7, '#4a3a22'); stroke([101, 45 + e[3] - e[2] * 0.3, 74, 47 + e[3] + e[2]], 7, '#4a3a22');
+      stroke([66, 58, 61, 80, 68, 84], 3);
+      // the smudge
+      g.fillStyle = 'rgba(30,26,34,0.62)'; g.beginPath(); g.moveTo(88, 76); g.lineTo(112, 70); g.lineTo(116, 84); g.lineTo(96, 92); g.fill();
+      stroke([90, 80, 110, 74], 2.2, 'rgba(7,7,13,0.7)'); stroke([94, 86, 112, 80], 2, 'rgba(7,7,13,0.7)');
+      // the seam the Gilding left along the jaw
+      stroke([18, 92, 30, 104, 44, 112], 2, '#a87a4c');
+      mouth(101); stroke([58, 113, 72, 113], 2);
+    } else if (kind === 'brand') {
+      g.fillStyle = '#b98a66'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#946a4c'; g.beginPath(); g.moveTo(0, 30); g.lineTo(30, 56); g.lineTo(26, 128); g.lineTo(0, 128); g.fill();
+      const e = EX[expr] || EX.neutral;
+      eye(42, 60, 10, Math.max(1, e[0] - 1.5), '#5a4a3a', e[1] + 0.2); eye(86, 60, 10, Math.max(1, e[0] - 1.5), '#5a4a3a', e[1] + 0.2);
+      stroke([26, 46, 55, 50 + e[2] * 0.5], 9, '#8f8f9c'); stroke([102, 46, 73, 50 + e[2] * 0.5], 9, '#8f8f9c');
+      stroke([66, 56, 60, 80, 70, 84], 3.5);
+      stroke([30, 30, 40, 44, 36, 56], 2.5, '#6e3a30');                                   // an old cut through the brow
+      stroke([24, 70, 34, 74], 2); stroke([96, 74, 106, 70], 2);                           // lines
+      g.fillStyle = '#8f8f9c'; g.beginPath(); g.moveTo(22, 84); g.lineTo(106, 84); g.lineTo(100, 128); g.lineTo(28, 128); g.fill();   // beard
+      g.fillStyle = '#b98a66'; g.beginPath(); g.ellipse(64, 82, 22, 7, 0, 0, 7); g.fill();
+      for (let i = 0; i < 12; i++) stroke([30 + i * 6.4, 96 + (i % 3) * 4, 32 + i * 6.4, 112 + (i % 2) * 6], 1.8, '#6a6a78');
+      stroke([50, 100, 78, 100], 4.5);
+    } else if (kind === 'rook') {
+      g.fillStyle = '#d9b48f'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#b58e6c'; g.beginPath(); g.moveTo(0, 40); g.lineTo(28, 62); g.lineTo(30, 100); g.lineTo(52, 128); g.lineTo(0, 128); g.fill();
+      g.fillStyle = ink; g.fillRect(0, 0, S, 26);                                          // the shade of the cap peak
+      const e = EX[expr] || EX.angry;
+      eye(42, 60, 11, Math.max(1, e[0] - 1), '#ffd23a', e[1] + 0.15); eye(86, 60, 11, Math.max(1, e[0] - 1), '#ffd23a', e[1] + 0.15);
+      stroke([26, 40, 54, 49 + e[2] * 0.4], 6); stroke([102, 40, 74, 49 + e[2] * 0.4], 6);
+      stroke([66, 56, 70, 80, 62, 84], 3);
+      stroke([40, 92, 64, 88, 88, 92], 6, '#b9bcc8'); stroke([40, 92, 30, 98], 4, '#b9bcc8'); stroke([88, 92, 98, 98], 4, '#b9bcc8');   // moustache
+      if (expr === 'hurt' || expr === 'dead') { g.fillStyle = ink; g.beginPath(); g.ellipse(64, 104, 11, 7, 0, 0, 7); g.fill(); }
+      else stroke([50, 103, 70, 104, 82, 99], 3.5);
+      stroke([96, 30, 104, 64, 98, 90], 2.5, '#8a1f24');                                  // a duelling scar, kept on purpose
+      g.fillStyle = '#b9bcc8'; g.fillRect(52, 110, 24, 14);
+    } else if (kind === 'halfmask') {
+      g.fillStyle = '#e6c79a'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#e8c25a'; g.beginPath(); g.moveTo(0, 0); g.lineTo(S, 0); g.lineTo(S, 70); g.lineTo(78, 84); g.lineTo(64, 74); g.lineTo(50, 84); g.lineTo(0, 70); g.fill();
+      g.strokeStyle = ink; g.lineWidth = 4; g.beginPath(); g.moveTo(0, 70); g.lineTo(50, 84); g.lineTo(64, 74); g.lineTo(78, 84); g.lineTo(S, 70); g.stroke();
+      g.fillStyle = '#b8902e'; g.fillRect(0, 0, 26, 70);
+      const lit = expr === 'dead' ? null : (expr === 'bound' ? '#19d3c5' : '#ffffff');
+      [[42, -1], [86, 1]].forEach(a => { g.fillStyle = ink; g.beginPath(); g.moveTo(a[0] - 17, 50 + a[1] * 5); g.lineTo(a[0] + 17, 50 - a[1] * 5); g.lineTo(a[0] + 12, 64); g.lineTo(a[0] - 12, 64); g.fill();
+        if (lit) { g.fillStyle = lit; g.beginPath(); g.arc(a[0], 58, expr === 'angry' ? 4.6 : 3.2, 0, 7); g.fill(); } });
+      stroke([64, 6, 64, 40], 2.5, '#8a6a1e'); stroke([40, 20, 56, 30], 2, '#8a6a1e'); stroke([88, 20, 72, 30], 2, '#8a6a1e');
+      stroke([52, 102, 76, 102], 4); stroke([58, 112, 70, 112], 2);
+    } else if (kind === 'grille') {
+      g.fillStyle = '#9aa1b8'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#6f7690'; g.beginPath(); g.moveTo(0, 20); g.lineTo(28, 50); g.lineTo(24, 128); g.lineTo(0, 128); g.fill();
+      const lit = expr === 'dead' ? null : (expr === 'bound' ? '#19d3c5' : '#ff3b30');
+      g.fillStyle = ink; g.fillRect(22, 46, 84, 18); g.fillRect(56, 46, 16, 62);          // the T
+      if (lit) { g.fillStyle = lit; g.beginPath(); g.arc(42, 55, expr === 'angry' ? 5 : 3.6, 0, 7); g.fill(); g.beginPath(); g.arc(86, 55, expr === 'angry' ? 5 : 3.6, 0, 7); g.fill(); }
+      for (let x = 34; x < 100; x += 11) if (x < 54 || x > 74) stroke([x, 78, x, 112], 4);
+      stroke([20, 72, 108, 72], 3); stroke([14, 30, 114, 30], 3, '#e8c25a');
+      [[18, 38], [110, 38], [18, 118], [110, 118]].forEach(p => { g.fillStyle = '#e8c25a'; g.beginPath(); g.arc(p[0], p[1], 3.5, 0, 7); g.fill(); });
+    } else {
+      // 'visor': the Dock Guard's helm. White enamel, one slit, somebody behind it.
+      g.fillStyle = '#efe8d4'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#c4bda8'; g.beginPath(); g.moveTo(0, 26); g.lineTo(28, 54); g.lineTo(22, 128); g.lineTo(0, 128); g.fill();
+      const lit = expr === 'dead' ? null : (expr === 'bound' ? '#19d3c5' : '#5ff2e2');
+      g.fillStyle = ink; g.beginPath(); g.moveTo(20, 48); g.lineTo(108, 48); g.lineTo(102, 68); g.lineTo(26, 68); g.fill();
+      if (lit) { g.fillStyle = lit; g.beginPath(); g.arc(44, 58, expr === 'angry' ? 5 : 3.4, 0, 7); g.fill(); g.beginPath(); g.arc(84, 58, expr === 'angry' ? 5 : 3.4, 0, 7); g.fill(); }
+      g.fillStyle = '#efe8d4'; g.fillRect(60, 44, 8, 30); g.strokeStyle = ink; g.lineWidth = 2.5; g.strokeRect(60, 44, 8, 30);
+      stroke([30, 84, 98, 84], 3); for (let x = 44; x < 90; x += 10) stroke([x, 92, x, 106], 3);
+      stroke([12, 36, 116, 36], 4, '#e8c25a'); stroke([100, 80, 94, 100, 100, 114], 2.2);
+    }
+  }
+//@@HEADGEAR
+    if (sp.hair === 'kael') {
+      // gold, cropped at the sides, pushed up at the front; one streak the Gilding never took
+      part('head', tbox(0.25, 0.09, 0.26, 0.82, 1), 0, 0.23, -0.02, pal.hair, [-0.1, 0, 0]);
+      part('head', tbox(0.245, 0.18, 0.09, 1, 0.8), 0, 0.13, -0.105, pal.hair);
+      part('head', tbox(0.04, 0.1, 0.14), 0.118, 0.18, -0.03, pal.hair, null, 0.01);
+      part('head', tbox(0.04, 0.1, 0.14), -0.118, 0.18, -0.03, pal.hair, null, 0.01);
+      [[-0.075, 0.3, 0.07, 0.5, 0.3], [0, 0.325, 0.085, 0.62, 0], [0.075, 0.3, 0.07, 0.5, -0.3], [-0.045, 0.32, -0.01, 0.1, 0.2], [0.05, 0.315, -0.02, 0.05, -0.2], [0, 0.3, -0.09, -0.5, 0]].forEach((s, i) =>
+        part('head', tbox(0.07, 0.15, 0.075, 0.12, 1), s[0], s[1], s[2], i === 2 ? pal.streak : pal.hair, [s[3], 0, s[4]], 0.014));
+      part('head', tbox(0.258, 0.026, 0.268), 0, 0.243, -0.008, pal.band, null, 0.006);   // the band
+    }
+    if (sp.hair === 'brand') {
+      part('head', tbox(0.25, 0.07, 0.26, 0.85, 1), 0, 0.225, -0.02, pal.hair);
+      part('head', tbox(0.245, 0.16, 0.08, 1, 0.85), 0, 0.14, -0.108, pal.hair);
+      part('head', tbox(0.035, 0.09, 0.13), 0.12, 0.17, -0.03, pal.hair, null, 0.01); part('head', tbox(0.035, 0.09, 0.13), -0.12, 0.17, -0.03, pal.hair, null, 0.01);
+      part('head', tbox(0.2, 0.1, 0.09, 1, 0.6), 0, 0.02, 0.085, pal.hair, [0.25, 0, 0], 0.012);   // the beard, standing off the jaw
+    }
+    if (sp.hood) {
+      part('head', tbox(0.29, 0.16, 0.29, 0.72, 1), 0, 0.235, -0.025, pal.top);
+      part('head', tbox(0.28, 0.26, 0.11, 1, 0.9), 0, 0.11, -0.115, pal.top);
+      part('head', tbox(0.05, 0.25, 0.2), 0.13, 0.12, -0.02, pal.top); part('head', tbox(0.05, 0.25, 0.2), -0.13, 0.12, -0.02, pal.top);
+      part('chest', tbox(0.36 * b, 0.09, 0.3 * b), 0, 0.29, -0.01, pal.trim);
+      part('head', tbox(0.06, 0.1, 0.06, 0.2, 1), 0, 0.33, -0.06, pal.top, [-0.5, 0, 0], 0.012);   // the cowl's point
+    }
+    if (sp.helm === 'guard') {
+      part('head', tbox(0.3, 0.15, 0.3, 0.7, 1), 0, 0.235, -0.02, pal.hair);
+      part('head', tbox(0.29, 0.25, 0.11, 1, 0.92), 0, 0.11, -0.115, pal.hair);
+      part('head', tbox(0.05, 0.24, 0.21), 0.135, 0.12, -0.02, pal.hair); part('head', tbox(0.05, 0.24, 0.21), -0.135, 0.12, -0.02, pal.hair);
+      part('head', tbox(0.035, 0.09, 0.3, 1, 1), 0, 0.33, -0.03, pal.top, null, 0.012);            // crest, in the dock's teal
+      part('head', tbox(0.31, 0.03, 0.31), 0, 0.165, -0.02, pal.trim, null, 0.006);
+      part('chest', tbox(0.38 * b, 0.07, 0.3 * b), 0, 0.29, -0.01, pal.hair);                      // gorget
+    }
+    if (sp.helm === 'warden') {
+      part('head', tbox(0.31, 0.2, 0.31, 0.62, 1), 0, 0.25, -0.02, pal.hair);
+      part('head', tbox(0.3, 0.27, 0.12, 1, 0.92), 0, 0.11, -0.12, pal.hair);
+      part('head', tbox(0.055, 0.27, 0.22), 0.14, 0.11, -0.02, pal.hair); part('head', tbox(0.055, 0.27, 0.22), -0.14, 0.11, -0.02, pal.hair);
+      part('head', tbox(0.05, 0.2, 0.34, 1, 1), 0, 0.4, -0.04, pal.shirt, null, 0.014);            // the red comb
+      part('head', tbox(0.33, 0.035, 0.33), 0, 0.16, -0.02, pal.trim, null, 0.006);
+      part('chest', tbox(0.4 * b, 0.1, 0.32 * b), 0, 0.3, -0.01, pal.hair);
+    }
+    if (sp.hat === 'captain') {
+      part('head', tbox(0.25, 0.06, 0.26, 0.85, 1), 0, 0.215, -0.02, pal.hair);                    // grey hair under it
+      part('head', tbox(0.245, 0.15, 0.08, 1, 0.85), 0, 0.14, -0.108, pal.hair);
+      part('head', limb(0.15, 0.128, 0.11), 0, 0.3, -0.01, pal.top);                               // the white crown
+      part('head', limb(0.132, 0.132, 0.04), 0, 0.255, -0.01, pal.shirt, null, 0.004);             // red band
+      part('head', tbox(0.2, 0.02, 0.13, 1, 1), 0, 0.243, 0.12, 0x15151f, [0.22, 0, 0], 0.012);   // peak
+      part('head', tbox(0.05, 0.05, 0.02), 0, 0.3, 0.13, pal.trim, [0, 0, 0.785], 0.006);          // badge
+      part('head', tbox(0.04, 0.24, 0.07, 0.3, 1), 0.13, 0.42, -0.04, pal.shirt, [-0.25, 0, -0.2], 0.014);   // plume
+    }
+    if (sp.pauldron) {
+      part('shL', tbox(0.2 * b, 0.07, 0.2 * b, 0.8, 1), 0.02, 0.06, 0, pal.trim, [0, 0, -0.18], 0.012);
+      part('shR', tbox(0.2 * b, 0.07, 0.2 * b, 0.8, 1), -0.02, 0.06, 0, pal.trim, [0, 0, 0.18], 0.012);
+    }
+    if (sp.tabard) { part('hips', tbox(0.22 * b, 0.42, 0.03, 1, 0.85), 0, -0.16, 0.125 * b, pal.shirt); part('hips', tbox(0.1 * b, 0.1, 0.035), 0, -0.08, 0.13 * b, pal.trim, [0, 0, 0.785], 0.006); }
+    if (sp.sash) part('chest', tbox(0.5 * b, 0.07, 0.27 * b), 0, 0.12, 0, pal.shirt, [0, 0, 0.6], 0.008);
+    if (!sp.hood && !sp.helm) { part('head', tbox(0.03, 0.06, 0.04), 0.118, 0.13, 0, pal.skin, null, 0.008); part('head', tbox(0.03, 0.06, 0.04), -0.118, 0.13, 0, pal.skin, null, 0.008); }
+//@@WEAPONS
+    const steel = G.toon({ color: 0xd9dde6 }), dark = G.toon({ color: 0x23232e }), gilt = G.toon({ color: 0xe8c25a });
+    if (sp.washer) {
+      // Seren's washer, on a cord. The only round thing he owns.
+      const brass = G.toon({ color: 0xc9923a }); model.mats.push(brass);
+      const w = add('chest', new THREE.TorusGeometry(0.036, 0.013, 6, 12), brass, -0.03, 0.1, 0.145, 0.008);
+      add('chest', tbox(0.012, 0.16, 0.012), dark, -0.03, 0.2, 0.14, 0); model.mats.push(dark); model.washer = w;
+    }
+    if (sp.weapon === 'baton') { add('haR', limb(0.03, 0.036, 0.62), dark, 0, -0.3, 0, 0.014); add('haR', limb(0.042, 0.042, 0.07), gilt, 0, -0.03, 0, 0.01); model.mats.push(dark, gilt); }
+    if (sp.weapon === 'blade') { add('haR', tbox(0.028, 0.56, 0.06, 0.15, 1), steel, 0, -0.4, 0.01, 0.014); add('haR', tbox(0.05, 0.03, 0.16), gilt, 0, -0.1, 0.01, 0.01); model.mats.push(steel, gilt); }
+    if (sp.weapon === 'halberd') {
+      // held short, a hand under the head, the way a Warden carries it in a crowd
+      add('haR', limb(0.03, 0.03, 1.5), dark, -0.075, 0.08, 0, 0.016);
+      add('haR', tbox(0.03, 0.32, 0.28, 1, 0.35), steel, -0.075, -0.46, 0.13, 0.016); add('haR', tbox(0.04, 0.22, 0.07, 1, 0.1), steel, -0.075, -0.77, 0, 0.014);
+      add('haR', limb(0.05, 0.05, 0.08), gilt, -0.075, -0.3, 0, 0.01); model.mats.push(steel, dark, gilt);
+    }
+    if (sp.weapon === 'halberd2') {
+      // Brand's: carried upright at his side, butt on the stone
+      add('haR', limb(0.028, 0.028, 2.5), dark, -0.07, 0.42, 0.03, 0.016);
+      add('haR', tbox(0.03, 0.34, 0.3, 1, 0.35), steel, -0.07, 1.42, 0.16, 0.016).rotation.x = Math.PI;
+      add('haR', tbox(0.04, 0.3, 0.07, 0.1, 1), steel, -0.07, 1.78, 0.03, 0.014); model.mats.push(steel, dark);
+    }
+    if (sp.weapon === 'gaff') {
+      // a mooring gaff: what you haul a barge in with
+      add('haR', limb(0.024, 0.024, 1.3), dark, 0, -0.52, 0, 0.014);
+      add('haR', tbox(0.03, 0.05, 0.32), gilt, 0, -1.16, 0.14, 0.014); add('haR', tbox(0.03, 0.2, 0.05, 0.3, 1), gilt, 0, -1.05, 0.29, 0.014);
+      add('haR', tbox(0.035, 0.22, 0.06, 1, 0.1), steel, 0, -1.28, 0, 0.012); model.mats.push(steel, dark, gilt);
+    }

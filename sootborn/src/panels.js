@@ -4,7 +4,7 @@
 // so the story is told with close-ups and tableaux, not only with pans and zooms.
 // Each panel draws on a 320x180 canvas: fn(g, t, stage, st)  (t = time on panel, st = time in stage)
 // ============================================================
-const FUTURE_PANELS = new Set(['gild', 'lesson', 'assay', 'spire', 'desk', 'ledger', 'ante', 'weather', 'dockstair', 'dawn']);
+const FUTURE_PANELS = new Set(['voss', 'gild', 'lesson', 'assay', 'spire', 'desk', 'ledger', 'ante', 'weather', 'dockstair', 'dawn']);
 const Panels = {
   c: null, g: null, sil: {},
   draw(g, p) {
@@ -210,6 +210,23 @@ const PANELS = {
     for (let L = 0; L < 4; L++) for (let i = 0; i < 7; i++) { const x = ((i * 64 + t * (2 + L * 2) + L * 30) % 440) - 60, y = 60 + L * 30 + (i % 2) * 8, a = .35 + L * .16; R(g, x, y, 70, 12, `rgba(255,${240 - L * 10},${236 - L * 16},${a})`); R(g, x + 12, y - 6, 40, 8, `rgba(255,255,255,${a})`); if (L === 1 || L === 2) { const bx = x + 18 + (i * 7) % 20; if (i % 2) { R(g, bx, y - 2, 24, 5, '#2a2c3a'); R(g, bx + 4, y - 5, 12, 3, '#3a3c4a'); R(g, bx + 22, y, 1, 1, '#ffb040'); } } }
     if (st >= 1) { R(g, 0, 148, 320, 32, '#2a2c3a'); R(g, 0, 148, 320, 2, '#5a5c6c'); for (let x = 0; x < 320; x += 20) R(g, x, 142, 2, 8, '#3a3c4a'); R(g, 0, 142, 320, 1, '#4a4c5c'); const ids = ['hollis', 'ivo', 'nell', 'kit', 'juno', 'dace']; for (let i = 0; i < 6; i++) PX.spr(g, World.sheetFor(ids[i]), 1, 40 + i * 44 + (i % 2) * 6, 166, 2); PX.spr(g, World.sheetFor('ilse'), 0, 290, 168, 2.4); if (st >= 2) { g.fillStyle = 'rgba(20,16,30,.45)'; g.fillRect(0, 0, 320, 180); PX.spr(g, World.sheetFor('kael2'), 3, 132, 172, 3.4); PX.spr(g, World.sheetFor('tavi'), 2, 190, 172, 3.2); glow(g, 250, 60, 70, '255,236,170', .5); R(g, 244, 54, 12, 12, '#fff6c0'); } }
     if (st === 0) plate(g, 'FOUR HUNDRED BARGES, IN THE WEATHER', 160, 168);
+  },
+  // ---- the Proctor on the ground (0: kneeling in the rain · 1: struck down · 2: the boots · 3: the cloak)
+  voss(g, t, st, s) {
+    const { R, glow, plate } = PX; const gr = g.createLinearGradient(0, 0, 0, 180); gr.addColorStop(0, '#0a0c1c'); gr.addColorStop(.6, '#1a2238'); gr.addColorStop(1, '#141c20'); g.fillStyle = gr; g.fillRect(0, 0, 320, 180);
+    const bolt = (Math.sin(t * .9) > .985 || (st === 1 && s < .25)) ? 1 : 0; if (bolt) { g.fillStyle = 'rgba(210,220,255,.5)'; g.fillRect(0, 0, 320, 180); let bx = 70 + ((t * 7) % 3) * 80, by = 0; g.fillStyle = '#f4f6ff'; for (let i = 0; i < 9; i++) { const nx = bx + (hash(i, (t * 3) | 0) - .5) * 22; R(g, Math.min(bx, nx), by, Math.abs(nx - bx) + 2, 9, '#f4f6ff'); bx = nx; by += 9; } }
+    for (let i = 0; i < 7; i++) { const x = i * 52 - 10 + (i % 2) * 14, h2 = 34 + (i * 13) % 22; R(g, x, 96 - h2, 26, h2, '#0c1420'); R(g, x + 6, 86 - h2, 14, 12, '#0c1420'); R(g, x + 10, 78 - h2, 6, 9, '#0c1420'); }
+    R(g, 0, 96, 320, 84, '#161e1c'); R(g, 0, 96, 320, 1, '#2a3632'); for (let i = 0; i < 40; i++) { const a = hash(i, 5), b = hash(i, 8); R(g, a * 320, 100 + b * 76, 6 + a * 10, 1, b > .5 ? '#1e2a28' : '#0e1614'); }
+    R(g, 258, 30, 44, 4, '#c8c4d4'); R(g, 262, 34, 3, 62, '#8a8698'); R(g, 295, 34, 3, 62, '#8a8698'); R(g, 256, 26, 48, 4, '#e8c25a'); glow(g, 280, 44, 26, '255,230,160', .25); for (let i = 0; i < 3; i++) PX.spr(g, World.sheetFor('warden'), 0, 266 + i * 10, 62, 1.2);
+    const ids = ['cadv1', 'cadv2', 'cadt1', 'cadv1', 'cadt2', 'cadv2', 'cadt1', 'cadv1']; for (let i = 0; i < 8; i++) { const x = 20 + i * 38 + (i % 2) * 8, y = 118 + (i % 3) * 4; if (x > 120 && x < 210) continue; PX.spr(g, World.sheetFor(ids[i]), x < 160 ? 3 : 2, x, y, 1.6); if (st >= 3) R(g, x + (x < 160 ? 6 : -7), y - 46 - Math.round(Math.sin(t * 2 + i)), 1, 16, '#dfe6ff'); }
+    for (let i = 0; i < 5; i++) { const x = 122 + i * 20; R(g, x, 164, 16, 3, 'rgba(60,80,90,.5)'); }
+    if (st === 0) { PX.spr(g, World.sheetFor('voss'), 2, 186, 158, 3); PX.spr(g, World.sheetFor('kael2'), 3, 134, 160, 3.2); R(g, 150, 108, 2, 30, '#dfe6ff'); glow(g, 151, 110, 10, '200,220,255', .5); }
+    else { g.save(); g.translate(196, 160); g.rotate(1.45); PX.spr(g, World.sheetFor('voss'), 0, 0, 0, 3); g.restore(); R(g, 170, 162, 56, 3, 'rgba(120,20,20,.55)'); R(g, 214, 150, 2, 14, '#b8b8c8'); R(g, 208, 150, 14, 2, '#b8b8c8');
+      PX.spr(g, World.sheetFor('kael2'), 0, 140, 160, 3.2);
+      if (st === 2) { R(g, 128, 150, 9, 12, '#e8c25a'); R(g, 126, 160, 13, 4, '#fff0b0'); R(g, 152, 150, 9, 12, '#e8c25a'); R(g, 150, 160, 13, 4, '#fff0b0'); glow(g, 144, 164, 22, '255,220,140', .5 + .2 * Math.sin(t * 6)); for (let i = 0; i < 6; i++) R(g, 126 + i * 6, 168 + ((t * 30 + i * 5) % 10), 1, 2, '#ffd65a'); }
+      if (st >= 3) { g.fillStyle = '#f4f2ec'; g.beginPath(); g.moveTo(128, 102); g.lineTo(156, 102); g.lineTo(166 + Math.sin(t * 2) * 3, 160); g.lineTo(118 + Math.sin(t * 2 + 1) * 3, 160); g.fill(); R(g, 119, 157, 46, 3, '#e8c25a'); R(g, 150, 120, 8, 14, 'rgba(150,20,20,.7)'); PX.spr(g, World.sheetFor('kael2'), 0, 140, 160, 3.2); g.globalAlpha = .82; g.fillStyle = '#f4f2ec'; g.fillRect(126, 104, 6, 50); g.fillRect(152, 104, 6, 50); g.globalAlpha = 1; glow(g, 142, 120, 46, '255,245,220', .22); } }
+    g.fillStyle = 'rgba(190,205,235,.35)'; for (let i = 0; i < 90; i++) { const x = (hash(i, 2) * 360 + t * 60) % 340 - 10, y = (hash(i, 7) * 200 + t * (240 + (i % 5) * 30)) % 190; g.fillRect(x | 0, y | 0, 1, 5); }
+    if (st === 0) plate(g, 'DAY THIRTY-ONE', 160, 12);
   },
   // ---- Part Two: the Clerk's desk (0: the order · 1: the pen · 2: done)
   desk(g, t, st, s) {

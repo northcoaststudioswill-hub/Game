@@ -281,7 +281,9 @@ const World = {
       if (!this.boxHits(nx, P.y)) P.x = nx; if (!this.boxHits(P.x, ny)) P.y = ny;
       P.anim += dt; P.moved += sp; P.stepT = (P.stepT || 0) + dt; if (P.stepT > 0.3) { P.stepT = 0; Sound.play(this.tileAt(P.x, P.y - 2) === ',' ? 'stepg' : 'step'); if (!Settings.d.reduce) for (let i = 0; i < 2; i++) this.parts.push({ x: P.x - 3 + Math.random() * 6, y: P.y, v: 4 + Math.random() * 5, s: Math.random() * 6, c: '#7a6a60', steam: 1, life: 0.5 }); }
     } else P.anim = 0;
-    if (G.heist) { this.heistCheck(dt); if (this.caughtT > 0) return; this.boltCd = (this.boltCd || 0) - dt; if (Input.p('B') && this.boltCd <= 0) this.throwBolt(); const t = this.target = this.findTarget(), hold = t && ((G.heist === 1 && t.id === 'relay' && !G.flags.relayCut) || (G.heist === 2 && t.id === 'pillarFest') || (G.heist === 3 && Mission.holds(t)));
+    if (G.heist === 3 && this.seq) { this.seqUpdate(dt); this.updateNPCs(dt); return; }
+    if (G.heist === 3) Mission.tick(dt);
+    if (G.heist) { this.heistCheck(dt); if (this.caughtT > 0) return; this.boltCd = (this.boltCd || 0) - dt; if (Input.p('B') && this.boltCd <= 0 && !(G.heist === 3 && Mission.def.calm)) this.throwBolt(); const t = this.target = this.findTarget(), hold = t && ((G.heist === 1 && t.id === 'relay' && !G.flags.relayCut) || (G.heist === 2 && t.id === 'pillarFest') || (G.heist === 3 && Mission.holds(t)));
       if (hold) { if (Input.h('A') && !P.moving) { const w0 = this.work || 0; this.work = w0 + dt; if (Math.floor(this.work * 5) !== Math.floor(w0 * 5)) Sound.play('rotate'); if (this.work >= WORK_T) { this.work = 0; this.interact(t); } } else this.work = Math.max(0, (this.work || 0) - dt * 0.6); }
       else { this.work = 0; if (Input.p('A') && t) { Sound.play('blip'); this.interact(t); } }
       this.updateNPCs(dt); return; }
@@ -291,6 +293,14 @@ const World = {
     if (Input.p('A') && this.target) { Sound.play('blip'); this.interact(this.target); }
     this.updateNPCs(dt);
   },
+  // a short run of A and B presses, in time: striking a flint, chalking rays, turning a wheel
+  seqStart(keys, label, onDone) { this.seq = { keys, i: 0, t: 0, bad: 0, label, onDone }; Input.consume(); },
+  seqUpdate(dt) { const q = this.seq; q.t += dt; q.bad = Math.max(0, q.bad - dt); const a = Input.p('A'), b = Input.p('B'); if (!a && !b) return;
+    if ((a && q.keys[q.i] === 'A') || (b && !a && q.keys[q.i] === 'B')) { if (Sound.ctx && Sound.ctx.state === 'running') Sound.tone([62, 65, 69, 67, 65, 64, 62, 69, 67][q.i % 9] + 12, Sound.ctx.currentTime + .005, .22, 'triangle', .22); q.i++; if (q.i >= q.keys.length) { const cb = q.onDone; this.seq = null; Input.consume(); Sound.play('ok'); cb && cb(); } }
+    else { q.i = 0; q.bad = .5; Sound.play('deny'); } },
+  seqDraw(g, cx, cy) { const q = this.seq, n = q.keys.length, w = n * 12 + 6, bx = Math.round(P.x - cx - w / 2), by = Math.round(P.y - cy - 46); g.fillStyle = '#120a0e'; g.fillRect(bx - 1, by - 11, w + 2, 26); g.fillStyle = q.bad > 0 ? '#5a1a14' : '#2a1c16'; g.fillRect(bx, by - 10, w, 24);
+    ptext(g, q.label, bx + Math.max(2, Math.floor((w - ptextW(q.label)) / 2)), by - 8, '#c8b090'); const kb = Input.device === 'kb';
+    for (let i = 0; i < n; i++) { const done = i < q.i, cur = i === q.i, A = q.keys[i] === 'A', x = bx + 4 + i * 12, y = by + 1 + (cur ? Math.round(Math.sin(q.t * 9)) : 0); g.fillStyle = done ? '#ffd65a' : cur ? (A ? '#e8a030' : '#5aa0e8') : '#4a3a30'; g.fillRect(x, y, 9, 9); ptext(g, kb ? (A ? 'E' : 'X') : (A ? 'A' : 'B'), x + 3, y + 2, done ? '#5a3a10' : '#120a0e'); } },
   updateNPCs(dt) {
     for (const n of this.npcs) {
       if (n.patrol) { // lamps sweep: turn toward the wanted facing instead of snapping
@@ -458,7 +468,8 @@ const World = {
     if (Cutscene.active) { Cutscene.renderFX(g, cx, cy, t); return; }
     const show = (this.target && !Dialogue.active && !UI.stack.length);
     const mk3 = G.heist === 3 ? Mission.mark() : null; if ((G.heist === 1 || mk3) && !Dialogue.active && !UI.stack.length) { const cut = G.flags.relayCut, o = mk3 || (cut ? { x: 10.5 * 16, y: 20 } : { x: 21.5 * 16, y: 7 * 16 }), sx = o.x - cx, sy = o.y - cy, on = sx > 8 && sx < W - 8 && sy > 20 && sy < H - 14, px = Math.round(clamp(sx, 12, W - 12)), py = Math.round(clamp(sy - (on ? 18 : 0), 30, H - 20)), lab = mk3 ? mk3.lab : cut ? 'BANK 7' : 'RELAY'; g.fillStyle = '#120a0e'; g.fillRect(px - 4, py - 4, 9, 9); g.fillStyle = Math.floor(t * 3) % 2 ? PAL.amber : '#fff2c0'; g.fillRect(px - 3, py - 3, 7, 7); ptext(g, lab, Math.round(clamp(px - ptextW(lab) / 2, 2, W - ptextW(lab) - 2)), py + 7, '#fff2c0'); }
-    if (show) { const bx = Math.round(this.target.x - cx), by = Math.round(this.target.y - cy) + (rm ? 0 : Math.round(Math.sin(t * 5))); g.fillStyle = '#120a0e'; g.fillRect(bx - 5, by - 6, 11, 10); g.fillStyle = PAL.amber; g.fillRect(bx - 4, by - 5, 9, 8); g.fillStyle = '#120a0e'; g.fillRect(bx, by + 3, 1, 2); ptext(g, Input.device === 'kb' ? 'E' : 'A', bx - 1, by - 4, '#2a1408'); if (G.heist && (Mission.holds(this.target) && G.heist === 3 || this.target.id === 'pillarFest' || (this.target.id === 'relay' && !G.flags.relayCut)) && !this.work) { g.fillStyle = '#120a0e'; g.fillRect(bx - 10, by + 6, 21, 9); ptext(g, 'HOLD', bx - 7, by + 8, PAL.amber); } }
+    if (this.seq && G.heist === 3) this.seqDraw(g, cx, cy);
+    if (show && !this.seq) { const bx = Math.round(this.target.x - cx), by = Math.round(this.target.y - cy) + (rm ? 0 : Math.round(Math.sin(t * 5))); g.fillStyle = '#120a0e'; g.fillRect(bx - 5, by - 6, 11, 10); g.fillStyle = PAL.amber; g.fillRect(bx - 4, by - 5, 9, 8); g.fillStyle = '#120a0e'; g.fillRect(bx, by + 3, 1, 2); ptext(g, Input.device === 'kb' ? 'E' : 'A', bx - 1, by - 4, '#2a1408'); if (G.heist && (Mission.holds(this.target) && G.heist === 3 || this.target.id === 'pillarFest' || (this.target.id === 'relay' && !G.flags.relayCut)) && !this.work) { g.fillStyle = '#120a0e'; g.fillRect(bx - 10, by + 6, 21, 9); ptext(g, 'HOLD', bx - 7, by + 8, PAL.amber); } }
     if (Settings.d.highlight && !Dialogue.active) { const a = Math.floor(t * 2) % 2 ? PAL.cyan : PAL.amber; g.fillStyle = a;
       for (const h of m.hot) { const [hx, hy] = h.tiles[0]; g.fillRect(hx * 16 + 7 - cx, hy * 16 - cy + (isWall(m.grid[hy][hx]) ? 13 : 1), 2, 2); }
       for (const n of this.npcs) g.fillRect(Math.round(n.x - 1 - cx), Math.round(n.y - 24 - cy), 2, 2); }
