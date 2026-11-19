@@ -80,7 +80,7 @@
   }
   function syncEntity(e) {
     const v = e.vis, X = e.x / S, Z = e.y / S;
-    { const hz = e.z / S; v.hy = v.hy == null || hz >= v.hy ? hz : Math.max(hz, v.hy - 34 * (syncDt || 0)); v.g.position.set(X, v.hy, Z); }       // whatever is dropped falls fast, but it does fall
+    { const hz = e.z / S; v.hy = v.hy == null || hz >= v.hy ? hz : Math.max(hz, v.hy - 19 * (syncDt || 0)); v.g.position.set(X, v.hy, Z); }       // whatever is dropped falls fast, but it does fall
     { const ry = Math.atan2(Math.cos(e.aim), Math.sin(e.aim)); if (v.ry == null) v.ry = ry; let d = ry - v.ry; d = Math.atan2(Math.sin(d), Math.cos(d)); const tdt = syncDt, cap = (e.state === 'dodge' ? 34 : 17) * tdt; let stp = d * (1 - Math.pow(0.7, tdt * 60)); if (stp > cap) stp = cap; else if (stp < -cap) stp = -cap; v.ry += stp; v.c.root.rotation.y = v.ry; }       // a body takes a moment to turn
     let act = 'idle', prog = 0, glow = null, stepOv = 0;
     if (e.state !== 'ko' && !(e.down > 0)) v.lie = 0;
@@ -415,6 +415,19 @@
     const hold = (act, t0, dur) => { if (m.t >= t0 && m.t < t0 + dur) P.poseOv = { act, prog: (m.t - t0) / dur }; else if (P.poseOv && P.poseOv.act === act && m.t >= t0 + dur) P.poseOv = null; };
     if (k === 'stomp') { once('trip', 0.25, () => { fx.push({ k: 'slash', x: P.x, y: P.y, a: m.a, r: 120, arc: 2.2, col, t: 0, life: 0.22 }); e.state = 'ko'; e.koT = 0; e.st = {}; blood(e.x, e.y, 14, m.a); G.sfx('hit'); shake = Math.max(shake, 9); text(e, 'DOWN', col, true); });
       once('walk', 0.55, () => { P.x = e.x - Math.cos(m.a) * 34; P.y = e.y - Math.sin(m.a) * 34; clampArena(P); fx.push({ k: 'dust', x: P.x, y: P.y, r: 50, t: 0, life: 0.4 }); }); hold('stomp', IMP - 0.5, 0.75); }
+    if (k === 'tear') { const gx = P.x + Math.cos(m.a) * 30, gy = P.y + Math.sin(m.a) * 30;
+      if (m.t > 0.15 && m.t < 0.5) { const u = (m.t - 0.15) / 0.35; e.x += (gx - e.x) * u * 0.3; e.y += (gy - e.y) * u * 0.3; }
+      if (m.t >= 0.3) P.poseOv = m.t < IMP + 0.5 ? { act: 'tear', prog: Math.min(1, (m.t - 0.3) / (IMP - 0.3 + 0.2)) } : null;
+      once('grip', 0.5, () => { e.x = gx; e.y = gy; text(e, 'GRIPPED', col, true); G.sfx('hit'); shake = Math.max(shake, 8); e.poseOv = { act: 'hoist', prog: 0.5 }; });
+      if (m.t > 0.5 && m.t < IMP) { const u = (m.t - 0.5) / (IMP - 0.5); e.x = gx + rand(-1.5, 1.5) * u; e.y = gy; e.z = 10 + u * 8; e.vis.g.scale.set(1 + u * 0.55, 1 - u * 0.1, 1 + u * 0.2); e.flash = u > 0.7 ? 0.03 : 0; if (Math.random() < 0.25 + u * 0.6) blood(e.x, e.y, 3 + Math.round(u * 6), rand(0, 6.28)); shake = Math.max(shake, 3 + u * 8); }
+      every('strain', 0.65, IMP - 0.05, 0.2, i => { G.sfx('wall'); text(e, ['TEARING', 'SOMETHING GIVES', 'COMING APART'][i % 3], '#ff3020', false); });
+      once('pv', IMP + 0.5, () => { P.poseOv = { act: 'cheer', prog: 0 }; }); }
+    if (k === 'cocoon') { if (!m.f.web) { const cm = new T.Mesh(new T.SphereGeometry(0.5, 10, 8), new T.MeshLambertMaterial({ color: 0xe8e4f4, transparent: true, opacity: 0.0, flatShading: true })); cm.position.y = 0.95; cm.scale.set(0.9, 1.9, 0.9); e.vis.g.add(cm); m.f.web = cm; }
+      const cm = m.f.web; P.poseOv = m.t < IMP ? { act: 'cast', prog: Math.min(1, m.t / IMP) } : (m.t < IMP + 0.4 ? { act: 'release', prog: (m.t - IMP) / 0.4 } : null);
+      every('strand', 0.12, IMP - 0.15, 0.15, i => { const a2 = i * 2.4, d = 230; fx.push({ k: 'trail', x1: e.x + Math.cos(a2) * d, y1: e.y + Math.sin(a2) * d, x2: e.x + rand(-8, 8), y2: e.y + rand(-8, 8), col: '#e8e4f4', t: 0, life: 0.7 }); G.sfx('swing'); e.flash = 0.03; });
+      if (m.t > 0.15 && m.t < IMP) { const u = (m.t - 0.15) / (IMP - 0.15); e.z = u * 46; cm.material.opacity = Math.min(0.96, u * 1.5); cm.scale.set(0.9 - u * 0.25, 1.9, 0.9 - u * 0.25); e.poseOv = { act: 'stun', prog: 0 }; e.aim += dt * (2 + u * 14); if (u > 0.6) { e.x += rand(-2, 2); e.vis.c.root.visible = u < 0.75; } }
+      once('wrapd', IMP * 0.75, () => { text(e, 'WRAPPED', col, true); G.sfx('holy'); });
+      once('sq', IMP - 0.02, () => { cm.scale.set(0.3, 1.5, 0.3); e.vis.c.root.visible = true; }); once('rm', IMP + 0.05, () => { if (cm.parent) cm.parent.remove(cm); for (let wi = 0; wi < 30; wi++) gfx.emit(e.x / S + rand(-0.4, 0.4), rand(0.4, 2.2), e.y / S + rand(-0.4, 0.4), rand(-3, 3), rand(0, 4), rand(-3, 3), rand(0.6, 1.2), wi % 3 ? '#e8e4f4' : '#8a0c0c', 1); e.poseOv = null; }); }
     if (k === 'puppet') { if (m.t > 0.15 && m.t < IMP - 0.1) { e.z = Math.min(80, e.z + dt * 130); e.flash = 0.03; } once('p0', 0.15, () => { fx.push({ k: 'ring', x: e.x, y: e.y, r: 110, col, t: 0, life: 0.5 }); G.sfx('holy'); });
       ['armL', 'armR', 'legL'].forEach((part, i) => once('pp' + i, 0.5 + i * 0.3, () => { if (gore() && !e.vis.c.beast) sever(e, part, null, m.a + (i - 1) * 1.6); else blood(e.x, e.y, 20); fx.push({ k: 'bolt', x1: P.x, y1: P.y, x2: e.x, y2: e.y, col, t: 0, life: 0.14 }); e.flash = 0.12; G.sfx('crit'); shake = Math.max(shake, 9); hitstop = Math.max(hitstop, 0.07); })); }
     if (k === 'ice') { const ice = new T.Color(0xbfe8ff); every('ic', 0.2, IMP, 0.14, i => { e.vis.c.mats.forEach(mm => mm.color.lerp(ice, 0.3)); fx.push({ k: 'ring', x: e.x, y: e.y, r: 150 - i * 12, col: '#bfe8ff', t: 0, life: 0.3 }); e.flash = 0.05; if (i % 2 === 0) G.sfx('ice'); spark(e.x, e.y, 6, '#dff4ff', 8, 120); }); e.st = { stun: { t: 1 } }; }
