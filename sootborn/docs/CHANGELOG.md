@@ -1,4 +1,30 @@
-# SOOTBORN — changelog (latest v0.33 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.34 · 2026-11-19)
+
+## v0.34 · 2026-11-19 — the third-person levels: one strike button, a hook that always does something, rounder bodies, idle habits
+From play notes: the hook does nothing; there is still a heavy button when light and heavy were meant to be on the attack itself; Kael needs more idle animation; the levels need a graphics pass and the models should start to be less blocky.
+
+**Strike is one button**
+- **Tap A:** light. **Keep A held** as a cut lands and it ends the chain heavy. Which heavy depends on the cut you held: first cut UP THE SHAFT, second WIDE CUT, third (the ram) THE HAUL, fourth (the boot) LAST BELL.
+- At full fury, holding A a little longer is ELEVEN instead.
+- The HEAVY button is gone. That button is now **HOOK**; the old hook button is **LOCK** (lock on to an enemy).
+
+**The hook**
+- It was only working when an enemy stood inside a narrow cone ahead, and gave no sign otherwise. Now it reaches further and almost all the way round; with nobody to catch it throws anyway and pulls him five paces forward into a ram. Recharge is 2.5 seconds (was 4.5), and pressing it early says LINE OUT.
+
+**Models**
+- Every block on every figure (Kael, guards, Wardens, bosses, Tavi, Brand) now has turned edges and smooth shading, and limbs have twelve sides, not seven. Same designs, less brick.
+- This is a first step. Faces are still drawn on a flat front; hands, heads and hair are still simple shapes.
+
+**Kael, idle**
+- He shifts his weight and looks about. Left alone a few seconds he does one of three things in turn: puts his hand to the washer, looks up at the sky, turns the hook over in his hand.
+
+**Picture**
+- Colour is a little richer and contrast a little higher in all three levels.
+- The Stair has a setting sun with bars of cloud across it.
+- The lamps at the foot of the Stair were floating squares; they are small lanterns set down on the stone now.
+- I tried drifting embers and motes in the air and took them out: they drew as squares.
+
+**Checked by script:** held strike gives the right heavy after the first and second cuts; ELEVEN still fires from a hold at full fury; the hook with and without a target; all three levels to their endings. **Not checked:** played by hand; how long a hold feels right (it is about a quarter of a second); the rounded models on a phone; the idle habits in motion. The levels' graphics pass is mostly still to do: see the question in chat.
 
 ## v0.33 · 2026-11-19 — the third-person levels: finer dots, calmer openings, more weight in the movement
 From play notes: the dots are still too big on the scene; the changes are liked but the animations need more; the first clues and circles trigger too easily and the whole start is jarring.

@@ -482,9 +482,10 @@
       // below and behind: the fleet where it fell, one hull still burning, and the lamps of everyone who came up with him
       bargeS(26, -7, 34, 0.5); bargeS(-4, -5.4, 60, -0.3); bargeS(30, -9, 6, 1.2);
       [[24, 36], [27, 33], [22, 31]].forEach((p, i) => { D('glow', p[0], -4 + i, p[1], 1.6, 2.4 + i, 1.6, i ? 0xff7a1f : 0xffe14a, { ry: i, outline: 0 }); const g = new THREE.IcosahedronGeometry(1, 1); g.scale(3 + i, 2.4, 3); batch.add('flat', g, G.mx(p[0] + 1, 3 + i * 4, p[1] - 1 - i * 2), 0x3a3040, 0); g.dispose(); });
-      for (let i = 0; i < 26; i++) D('glow', -8.4 + (i % 13) * 1.4, 0.9 + (i % 3) * 0.2, 42.6 + Math.floor(i / 13) * 1.6, 0.16, 0.22, 0.16, i % 4 ? LAMP : TLAMP, { outline: 0 });
+      for (let i = 0; i < 26; i++) { const lx = -8.4 + (i % 13) * 1.4 + (i * 7 % 5) * 0.08, lz = 43.4 + Math.floor(i / 13) * 1.3 + (i * 3 % 4) * 0.1; cyl('flat', lx, 0.03, lz, 0.09, 0.1, 0.06, IRON, { seg: 8, outline: 0.02 }); cyl('glow', lx, 0.15, lz, 0.06, 0.07, 0.18, i % 4 ? LAMP : TLAMP, { seg: 8, outline: 0 }); cyl('flat', lx, 0.27, lz, 0.03, 0.09, 0.06, IRON, { seg: 8, outline: 0.02 }); }
       standard(-8.6, 44.6, 0, 5, 0x8a6a48); standard(7.4, 44.6, 0, 5, 0x8a6a48);
       // ===== the stair after four hundred hulls came down on it =====
+      { const g = new THREE.IcosahedronGeometry(1, 2); g.scale(26, 26, 2); batch.add('glow', g, G.mx(40, 34, 190), 0xffe2a8, 0); g.dispose(); for (let i = 0; i < 7; i++) D('glow', 40 + (i - 3) * 16, 34 - Math.abs(i - 3) * 1.5, 189, 60 - Math.abs(i - 3) * 12, 0.5, 0.4, 0xffc27a, { outline: 0 }); }
       torn(-3.6, 0, 37, 0.5, VIOLET); torn(4.2, 6, 9, -0.6, TEAL); torn(-4.4, 12, -14, 1.0, 0xb8902e); torn(5.5, 18, -40, 0.2, 0xd9dde6);
       halbD(3.2, 0, 34.4, 0.5); helmD(4.4, 0, 35.6, 0.2); halbD(-4.6, 6, 13.6, -0.9); helmD(-2.2, 6, 5.6, 1); helmD(5.2, 12, -18.6, 0.6); halbD(2.6, 12, -20.2, 2.2); halbD(-6.2, 18, -38.4, 0.2); helmD(7.2, 18, -44, 2);
       // the loads the porters put down when the bell said kneel, and did not pick up when they stood

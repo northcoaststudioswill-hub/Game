@@ -149,7 +149,7 @@ rep("  U.resize = function () {", "  U.resize = function () {\n    if (SC.hosted
 rep(".project(G.camera); const w = window.innerWidth, h = window.innerHeight;", ".project(G.camera); const w = window.innerWidth / (U.hudK || 1), h = window.innerHeight / (U.hudK || 1);");
 rep('<div id="mem" class="hide"></div>', '<div id="mem" class="hide"></div>\n  <div id="rage"></div>');
 rep("#mem.hide{display:none}", "#mem.hide{display:none}\n#rage{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity .25s;box-shadow:inset 0 0 16vh 5vh rgba(210,24,12,.8)}\nbody.hosted #obj{max-width:40vw}body.hosted #toast{top:15%}body.hosted #page{grid-template-columns:1fr!important;grid-template-rows:1fr!important}body.hosted #page .pn{grid-area:1 / 1 / 2 / 2!important}body.hosted #who .pic{display:none}");
-rep("    $('bPf').style.transform = ", "    { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) : 0, mm = p.model.mats; for (let i = 0; i < mm.length; i++) if (mm[i].emissive) mm[i].emissive.setRGB(0.2 * k, 0.14 * k, 0.03 * k);\n      U.auraT = (U.auraT || 0) - rdt; if (k >= 1 && U.auraT <= 0 && !U.blocking()) { U.auraT = 0.7; _v.copy(p.pos); _v.x += (Math.random() - 0.5) * 0.7; _v.z += (Math.random() - 0.5) * 0.7; _v.y += 0.3 + Math.random() * 1.4 + p.lift; G.fx.burst(_v, 0xffd23a, 0.3); }\n      if (p.state === 'hurt') p.lift = 0;\n      if (p.meter >= SC.T.meter) { if (!U.fullT && SC.state === 'play') { U.fullT = 1; U.toast('FURY FULL. *HOLD STRIKE: ELEVEN.*', 2.6); } } else U.fullT = 0;\n      if (!U.taught && SC.enemies.length && SC.state === 'play' && !U.blocking()) { U.taught = 1; U.toast('LIGHT, LIGHT, *HEAVY*: THE HEAVY ENDS A CHAIN FOUR WAYS', 4.5); } }\n    $('bPf').style.transform = ");
+rep("    $('bPf').style.transform = ", "    { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) : 0, mm = p.model.mats; for (let i = 0; i < mm.length; i++) if (mm[i].emissive) mm[i].emissive.setRGB(0.2 * k, 0.14 * k, 0.03 * k);\n      U.auraT = (U.auraT || 0) - rdt; if (k >= 1 && U.auraT <= 0 && !U.blocking()) { U.auraT = 0.7; _v.copy(p.pos); _v.x += (Math.random() - 0.5) * 0.7; _v.z += (Math.random() - 0.5) * 0.7; _v.y += 0.3 + Math.random() * 1.4 + p.lift; G.fx.burst(_v, 0xffd23a, 0.3); }\n      if (p.state === 'hurt') p.lift = 0;\n      if (p.meter >= SC.T.meter) { if (!U.fullT && SC.state === 'play') { U.fullT = 1; U.toast('FURY FULL. *HOLD STRIKE: ELEVEN.*', 2.6); } } else U.fullT = 0;\n      if (!U.taught && SC.enemies.length && SC.state === 'play' && !U.blocking()) { U.taught = 1; U.toast('TAP TO CUT. *HOLD* THE SAME BUTTON TO END THE CHAIN HEAVY', 4.5); } }\n    $('bPf').style.transform = ");
 rep("    const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;\n    if (F.e_alley && !F.e_street", "    const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;\n" + ST.SUNS + "    if (F.e_alley && !F.e_street");
 
 /* ---- the blade: three cuts instead of three punches, and they land ---- */
@@ -275,12 +275,12 @@ rep("  U.toast = function (t, dur) {", "  U.toast = function (t, dur) { if (U.dl
 
 /* ---- more of how he fights: the boot on its own button, the wide cut, the hook line, the riposte ---- */
 rep("wantBoot = can && inp.buffered('boots', 0.2),", "wantBoot = can && inp.buffered('boots', 0.2), wantKick = can && inp.buffered('kick', 0.2), wantHook = can && inp.buffered('hook', 0.2),");
-rep("      if (wantBoot && (pl.bootCd || 0) <= 0 && pl.onGround) { inp.clear('boots'); startBoots(mx, mz, mag); }", "      if (wantKick && pl.onGround) { inp.clear('kick'); startAttack(pl.state === 'attack' && pl.combo === 3 ? 5 : 3, mx, mz, mag); }\n      else if (wantHook && (pl.hookCd || 0) <= 0 && pl.onGround) { inp.clear('hook'); useHook(mx, mz, mag); }\n      else if (wantBoot && (pl.bootCd || 0) <= 0 && pl.onGround) { inp.clear('boots'); startBoots(mx, mz, mag); }");
+rep("      if (wantBoot && (pl.bootCd || 0) <= 0 && pl.onGround) { inp.clear('boots'); startBoots(mx, mz, mag); }", "      if (wantKick && pl.onGround) { inp.clear('kick'); startAttack(pl.state === 'attack' && pl.combo === 3 ? 5 : 3, mx, mz, mag); }\n      else if (wantHook && pl.onGround) { inp.clear('hook'); if ((pl.hookCd || 0) <= 0) useHook(mx, mz, mag); else { SC.audio.sfx('deny'); _a.copy(pl.pos); _a.y += 2.4; FX.word('LINE OUT', _a, '#dfe6ff', 0.7); } }\n      else if (wantBoot && (pl.bootCd || 0) <= 0 && pl.onGround) { inp.clear('boots'); startBoots(mx, mz, mag); }");
 rep("  function startBoots(mx, mz, mag) {", `  /* the rigging line off the valve banks: it brings an ordinary guard to him, and takes him to a big one. Either way he arrives with the ram. */
   function useHook(mx, mz, mag) {
-    let dx = mag > 0.3 ? mx / mag : Math.sin(pl.yaw), dz = mag > 0.3 ? mz / mag : Math.cos(pl.yaw); const t = pickTarget(12, 0.2, dx, dz);
-    SC.audio.sfx('chainThrow'); if (!t) { pl.hookCd = 1; return; }
-    pl.hookCd = 4.5; const ex = t.pos.x - pl.pos.x, ez = t.pos.z - pl.pos.z, d = Math.hypot(ex, ez) || 1; pl.yaw = Math.atan2(ex, ez);
+    let dx = mag > 0.3 ? mx / mag : Math.sin(pl.yaw), dz = mag > 0.3 ? mz / mag : Math.cos(pl.yaw); const t = pickTarget(15, -0.35, dx, dz);
+    SC.audio.sfx('chainThrow'); if (!t) { pl.hookCd = 1.2; pl.yaw = Math.atan2(dx, dz); for (let k = 1; k < 9; k++) { _a.set(pl.pos.x + dx * k * 0.9, pl.pos.y + 1.2, pl.pos.z + dz * k * 0.9); FX.burst(_a, 0xffd23a, 0.45); } pl.pos.x += dx * 5; pl.pos.z += dz * 5; W.collide(pl.pos, pl.r, pl.pos.y, pl.h); _a.copy(pl.pos); _a.y += 2.5; FX.word('HOOK LINE!', _a, '#ffd23a', 0.9); SC.audio.sfx('chainYank'); startAttack(2, dx, dz, 1); return; }
+    pl.hookCd = 2.5; const ex = t.pos.x - pl.pos.x, ez = t.pos.z - pl.pos.z, d = Math.hypot(ex, ez) || 1; pl.yaw = Math.atan2(ex, ez);
     for (let k = 1; k < 8; k++) { _a.set(pl.pos.x + ex * k / 8, pl.pos.y + 1.2, pl.pos.z + ez * k / 8); FX.burst(_a, 0xffd23a, 0.45); }
     if (t.K.armor) { pl.pos.x = t.pos.x - ex / d * (t.r + 1.2); pl.pos.z = t.pos.z - ez / d * (t.r + 1.2); W.collide(pl.pos, pl.r, pl.pos.y, pl.h); }
     else { t.pos.x = pl.pos.x + ex / d * 1.6; t.pos.z = pl.pos.z + ez / d * 1.6; t.vel.set(0, 0, 0); t.hit(5, 0, 0, { named: true, quiet: true }); }
@@ -303,7 +303,10 @@ rep("  I.reset = () =>", "  I.hold = {};\n  I.reset = () =>");
 rep("(d.press || []).forEach(", "SC.input.hold = d.hold || {}; (d.press || []).forEach(");
 rep("KeyC: 'kick', KeyV: 'hook', KeyF: 'boots',", "KeyC: 'kick', KeyV: 'hook', KeyF: 'boots', KeyT: 'jump',");
 rep("wantKick = can && inp.buffered('kick', 0.2),", "wantKick = can && inp.buffered('kick', 0.2), wantJump = can && inp.buffered('jump', 0.2),");
-rep("      if (wantKick && pl.onGround) { inp.clear('kick'); startAttack(pl.state === 'attack' && pl.combo === 3 ? 5 : 3, mx, mz, mag); }", `      if (can && inp.hold.a && pl.path && pl.meter >= T.powerCost && pl.onGround) { pl.holdA = (pl.holdA || 0) + dt; if (pl.holdA > 0.2 && ((pl.holdA * 20) | 0) % 3 === 0) FX.ring(pl.pos, 0xffd23a, 1.6 - pl.holdA * 2, 0.3, 0.18); if (pl.holdA > 0.45) { pl.holdA = 0; pl.lift = 0; inp.clear('attack'); usePower(mx, mz, mag); } } else pl.holdA = 0;
+rep("      if (wantKick && pl.onGround) { inp.clear('kick'); startAttack(pl.state === 'attack' && pl.combo === 3 ? 5 : 3, mx, mz, mag); }", `      if (can && inp.hold.a && pl.onGround && (free || pl.state === 'attack')) { pl.holdA = (pl.holdA || 0) + dt;
+        if (pl.path && pl.meter >= T.powerCost) { if (pl.holdA > 0.2 && ((pl.holdA * 20) | 0) % 3 === 0) FX.ring(pl.pos, 0xffd23a, 1.6 - pl.holdA * 2, 0.3, 0.18); if (pl.holdA > 0.5) { pl.holdA = 0; pl.lift = 0; inp.clear('attack'); usePower(mx, mz, mag); } }
+        else if (pl.holdA > 0.24 && !pl.heldHeavy && pl.state === 'attack' && pl.combo < 4 && pl.st >= P.ATTACK[pl.combo].hit) { pl.heldHeavy = 1; inp.clear('attack'); startAttack([6, 5, 7, 8][pl.combo], mx, mz, mag); }
+      } else { pl.holdA = 0; pl.heldHeavy = 0; }
       const hc = pl.state === 'attack' ? pl.combo : -1;
       if (pl.state === 'power') { /* the eleven has started */ }
       else if (wantKick && pl.onGround && (hc < 0 || pl.st >= P.ATTACK[hc].hit)) { inp.clear('kick'); startAttack(hc === 0 ? 6 : hc === 1 ? 5 : hc === 2 ? 7 : hc === 3 ? 8 : 3, mx, mz, mag); }
@@ -347,6 +350,12 @@ rep("U.showHud(true); pl.meter = SC.T.meter;", "U.showHud(true); pl.meter = Math
 rep("pl.gain(heavy ? 12 : 8)", "pl.gain(heavy || i >= 5 ? 9 : 5)");
 rep("pl.meter = d.path ? 68 : 0;", "pl.meter = 0;");
 
+/* ---- v0.34: bodies are no longer made of bricks: every block has turned edges and smooth shading ---- */
+rep("    const g = new THREE.BoxGeometry(w, h, d), p = g.attributes.position;\n    top = top === undefined ? 1 : top; bot = bot === undefined ? 1 : bot;", `    const mn = Math.min(w, h, d), r = mn < 0.045 ? 0 : Math.min(0.075, mn * 0.32), g = r ? new THREE.BoxGeometry(w, h, d, 3, 3, 3) : new THREE.BoxGeometry(w, h, d), p = g.attributes.position, nn = g.attributes.normal;
+    top = top === undefined ? 1 : top; bot = bot === undefined ? 1 : bot;
+    if (r) { for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i), cx = Math.max(-(w / 2 - r), Math.min(w / 2 - r, x)), cy = Math.max(-(h / 2 - r), Math.min(h / 2 - r, y)), cz = Math.max(-(d / 2 - r), Math.min(d / 2 - r, z)), dx = x - cx, dy = y - cy, dz = z - cz, L = Math.hypot(dx, dy, dz); if (L > 1e-6) { p.setXYZ(i, cx + dx / L * r, cy + dy / L * r, cz + dz / L * r); nn.setXYZ(i, dx / L, dy / L, dz / L); } }
+      for (let i = 0; i < p.count; i++) { const k = p.getY(i) > 0 ? top : bot; p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k); } return g; }`);
+rep("function limb(rt, rb, h) { const g = new THREE.CylinderGeometry(rt, rb, h, 7); return g; }", "function limb(rt, rb, h) { const g = new THREE.CylinderGeometry(rt, rb, h, 12); return g; }");
 /* ---- the guard fights back with more than one idea ---- */
 rep("          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e);\n        }", `          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e);
           if (e.kind !== 'boss') e.sub = Math.random() < (e.kind === 'knifer' ? 0.45 : e.kind === 'bruiser' ? 0.22 : 0.3) ? 1 : 0;      // a second blow straight after the first
@@ -373,6 +382,15 @@ rep("    { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) :
       // landings are taken in the knees; on a run the hook trails
       if (bn) { if ((U.pLift || 0) > 0.3 && p.lift <= 0.02) U.sq = 1; U.pLift = p.lift; U.sq = (U.sq || 0) * Math.exp(-rdt * 7); const q = U.sq; if (q > 0.03) { bn.thL.rotation.x -= 0.7 * q; bn.shnL.rotation.x += 1.2 * q; bn.thR.rotation.x -= 0.5 * q; bn.shnR.rotation.x += 1.0 * q; bn.spine.rotation.x += 0.35 * q; bn.head.rotation.x -= 0.2 * q; }
         if (p.state === 'run') { bn.shR.rotation.x += 0.6; bn.shR.rotation.z -= 0.25; bn.elR.rotation.x += 0.3; bn.chest.rotation.y -= 0.15; } }
+      // idle: he does not stand like a statue. Weight from foot to foot; and every few seconds, with nobody near, one of three habits
+      if (bn && p.state === 'idle' && SC.state === 'play') { const tt = performance.now() / 1000, sw = Math.sin(tt * 0.9) * 0.05; bn.hips.rotation.z += sw; bn.spine.rotation.z -= sw * 0.7; bn.thL.rotation.z -= sw * 0.5; bn.thR.rotation.z -= sw * 0.5; bn.head.rotation.y += Math.sin(tt * 0.37) * 0.12;
+        U.idleT = (U.idleT || 0) + rdt; if (best && bd < 100) U.idleT = 0; const ph = U.idleT - 3.5, cyc = ((ph % 6) + 6) % 6, wch = Math.floor(ph / 6) % 3, e2 = ph > 0 && cyc < 2.4 ? Math.sin(cyc / 2.4 * Math.PI) : 0, en = Math.min(1, e2 * 1.8);
+        if (en > 0.01) { if (wch === 0) { bn.shL.rotation.x -= 0.75 * en; bn.shL.rotation.z -= 0.35 * en; bn.elL.rotation.x -= 1.75 * en; bn.head.rotation.x += 0.32 * en; bn.chest.rotation.x += 0.06 * en; }              // his hand goes to the washer
+          else if (wch === 1) { bn.head.rotation.x -= 0.5 * en; bn.head.rotation.y += Math.sin(cyc * 2.2) * 0.5 * en; bn.chest.rotation.x -= 0.1 * en; bn.shR.rotation.z -= 0.15 * en; }                                             // he looks up: nine years on, the sky still gets him
+          else { bn.shR.rotation.x -= 0.5 * en; bn.elR.rotation.x -= 1.0 * en; bn.haR.rotation.z += cyc / 2.4 * Math.PI * 2; bn.head.rotation.y -= 0.35 * en; bn.head.rotation.x += 0.15 * en; } } }                                    // he turns the hook over in his hand
+      else U.idleT = 0;
+      // air: something is always drifting in these places
+      if (SC.state === 'play') { if (!U.graded) { U.graded = 1; G.renderer.domElement.style.filter = 'saturate(1.14) contrast(1.06)'; } }
       U.lastYaw = p.yaw; }
     { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) : 0,`);
 
