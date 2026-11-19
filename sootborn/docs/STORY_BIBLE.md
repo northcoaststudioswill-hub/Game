@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.43 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.44 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -418,6 +418,15 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **Grounded blades.** A House that is out of the Assay grounds its blade point-down at the edge of the keep, ribbon on the hilt. On the last day there are ten.
 - **The vent stack** on Teal's island is the only one in the valley. Lamps, the Proctors' boots and the pump all run off it. Wren Halloran kept it as an apprentice.
 - **Four blades for forty.** Practice blades are issued blunt, and too few, on purpose.
+
+### The ending, settled (v0.44)
+- **Form:** the ending is a cinematic. Nothing is played after the duel with Celestine.
+- **What Celestine knew.** She recognised him at the Pinning (+4), not by his face (the Gilding took that) but by how he looked at her: Seren at the furnace door, then the boy kneeling in the square. "You remind me of someone... no" was a false entry, the only one she ever made. She let him up on purpose, as her successor. At +6, when he hums, she is not finding out; she has waited two years for him to slip so it can be said aloud. Kael does not learn this until the white room at +9. **This replaces** the older reading that she first knew at +6.
+- **Why:** the Array is failing, her engineers cannot seat a valve, Lucan is kind, and Kael is the only person who ever balanced a bank under her eye. "Forty beds, and you."
+- **Lucan at the door:** friend, he grounds his blade and leaves a note; otherwise he stands there until Tavi says "come", and lays the blade flat and walks down.
+- **The two endings:** below, she sits at Mara's table by the stove; struck, hers is the last line Kael strikes and it is read with the others.
+- **Age:** seventy at +6, seventy-three at +9.
+- **The plot is frozen here.** Remaining story work is reading and pacing, not new threads.
 
 ### Third-person levels: how they play (v0.30.1)
 - Fury shows as gold on Kael himself, never as red on the screen.

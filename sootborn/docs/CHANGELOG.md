@@ -1,4 +1,16 @@
-# SOOTBORN — changelog (latest v0.43 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.44 · 2026-11-19)
+
+## v0.44 · 2026-11-19 — the ending: Lucan at the door, and why Celestine let him up
+Decided in conversation: the ending stays a cinematic, not played; Celestine gets her weight from the story and not from a shorter Oswin fight; the stacked last chapter stays until it has been played through.
+
+- **Lucan is at the door now** (chapter 5, before Maren). Chapter 4 says he has been made Captain of the Door; the door then had only Maren at it.
+  - *If Kael taught him:* he is not there. His blade is, grounded point-down against the frame the way a House that is out grounds its blade at the keep, with a white cloth on the hilt and a note: "I am not where she put me. I should like to be taught the rest."
+  - *If not:* he is standing there on his stick with his blade drawn. "One was told to hold this door. One has never been told anything else." Kael will not fight him twice. It is Tavi who says "Then come and find out", and he lays the blade flat across the threshold and walks down past all of them.
+- **Celestine, before the duel** (new scene in the white room). She is at the valve he once seated for her, hand flat on the pipe. She answers the line from the Pinning ("you remind me of someone"): it was Seren at the furnace door, and then him kneeling in the square six weeks later, and she knew him on the steps of the keep. She pinned the sun on him anyway. The Array is failing, her engineers ring for a servant when a seat weeps, her son is kind, and in fifty years one person balanced a bank under her eye and left it tidier than he found it. "One did not let a thief up the lift, little ember. One sent for a successor." Kael: for nine years he thought he was a knife she had not seen; he was a line in her book, in her own hand, with a date. "Forty beds, and you. One has never made a better trade."
+- **After the duel**, on her knees, she is still auditing: he has the book, the door and the lift; she asks only that he count them, because somebody must. He knows she is right.
+- **The two endings now reach the last scene.** If she was sent below, she is at Mara's table in a grey ration coat, nearest the stove. If her line was struck, it is the last one he ever struck, and it is read out with the others each quarter.
+
+**Checked:** each new scene's lines played through by script on both Lucan branches with no errors; all five chapters build; no contractions found in Accredited lines. **Not checked:** read on screen by a person. This changes what Celestine knew and when: see the bible note.
 
 ## v0.43 · 2026-11-19 — above-ground fights: Kael redrawn in 2D, a real blade and swing, the hook from Part Two on everywhere, rounder and better-lit 3D figures
 From play notes: the fully 2D fights above ground need a lot of work (the ones below are liked); the models there are ugly and the one sword move is poor; the hooked blade must be consistent; the fully 3D ones still need work and smoothing, Kael most of all.
