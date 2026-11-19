@@ -410,42 +410,68 @@
       const rp = SC.seeded(55);
       for (let i = 0; i < 64; i++) { const a = i / 64 * 6.283, r = 33 + rp() * 16; pine(Math.cos(a) * r * 1.05, Math.sin(a) * r * 0.9, 1.3 + rp() * 1.3); }
       [[-20, 14], [-23, -3], [21, -15], [18, 12], [-8, -19], [9, 19], [23, 2]].forEach(p => pine(p[0], p[1], 1.5, true));
-      for (let i = 0; i < 70; i++) { const x = (rp() - 0.5) * 50, z = (rp() - 0.5) * 44; D('flat', x, 0.16, z, 0.06, 0.34, 0.06, i % 3 ? 0x3f7a52 : 0x5a9a62, { rz: (rp() - 0.5) * 0.6, outline: 0 }); }
-      for (let i = 0; i < 9; i++) D('flat', (rp() - 0.5) * 40, 0.012, (rp() - 0.5) * 34, 2 + rp() * 2, 0.02, 1.2 + rp(), 0x3c4e8a, { ry: rp() * 3, outline: 0 });
+      // ---- the ground: a meadow, not a lawn. Mottled turf, the road worn down from the pylon, standing water, stones, flowers
+      const rq = SC.seeded(91), HZ = 15, roadX = z => Math.sin(z * 0.23) * 1.3 + (z < -12 ? (-12 - z) * 0.42 : 0);   // it swings wide of the pylon
+      const disc = (x, z, rad, y, col, sx) => { const g = new THREE.CylinderGeometry(rad, rad, 0.004, 9); g.scale(sx || 1, 1, 1); batch.add('flat', g, G.mx(x, y, z, rq() * 3), col, 0); g.dispose(); };
+      for (let i = 0; i < 46; i++) disc((rq() - 0.5) * 50, (rq() - 0.5) * 44, 1.6 + rq() * 3.2, 0.006, i % 3 ? 0x2a5640 : 0x316246, 1 + rq() * 0.8);
+      for (let z = -23.6; z <= 9.4; z += 1.1) disc(roadX(z) + (rq() - 0.5) * 0.5, z, 1.25 + rq() * 0.5, 0.012, (z * 10 | 0) % 2 ? 0x5a5346 : 0x625a4a, 1.15);
+      for (let z = -23; z <= 8.6; z += 0.9) { D('flat', roadX(z) - 0.55, 0.018, z, 0.14, 0.01, 0.8, 0x463f34, { ry: -Math.cos(z * 0.23) * 0.3, outline: 0 }); D('flat', roadX(z) + 0.55, 0.018, z, 0.14, 0.01, 0.8, 0x463f34, { ry: -Math.cos(z * 0.23) * 0.3, outline: 0 }); }
+      for (let i = 0; i < 16; i++) { const a2 = i / 16 * 6.283; disc(Math.cos(a2) * 2.8 * rq(), 11.4 + Math.sin(a2) * 1.7 * rq(), 1.2 + rq() * 0.8, 0.013, i % 2 ? 0x5a5346 : 0x625a4a, 1.2); }   // trodden flat in front of the hatch
+      [[-6.5, -3, 1.1], [5.5, -9, 0.9], [8, 3.5, 1.3], [-13, -15, 1.0], [14.5, -3.5, 0.8], [-4.4, 6.2, 0.7], [17, 7, 1.1], [-19, -2, 0.9], [1.4, -12.5, 0.6]].forEach(p => { disc(p[0], p[1], p[2] * 1.12, 0.017, 0x234a38, 1.5); disc(p[0], p[1], p[2], 0.02, 0x1c3050, 1.5); disc(p[0] + 0.2, p[1] - 0.12, p[2] * 0.4, 0.024, 0x2e4c78, 1.5); });
+      const open = (x, z) => !(z < 10.5 && Math.abs(x - roadX(z)) < 2.1) && Math.hypot(x, z - 11.4) > 3.4 && Math.hypot(x, z - HZ) > 3.2 && !(x > -19 && x < -10 && z > -13 && z < -5);
+      for (let i = 0; i < 240; i++) { const x = (rq() - 0.5) * 50, z = (rq() - 0.5) * 43; if (!open(x, z)) continue; const c = [0x3f7a52, 0x5a9a62, 0x356a48, 0x4a8a58][i % 4]; for (let k = 0; k < 3; k++) D('flat', x + (k - 1) * 0.07, 0.14 + rq() * 0.08, z + (rq() - 0.5) * 0.12, 0.05, 0.3 + rq() * 0.2, 0.05, c, { rz: (k - 1) * 0.36 + (rq() - 0.5) * 0.2, outline: 0 }); }
+      for (let i = 0; i < 44; i++) { const x = (rq() - 0.5) * 48, z = (rq() - 0.5) * 42; if (!open(x, z)) continue; D('flat', x, 0.12, z, 0.025, 0.24, 0.025, 0x3f7a52, { outline: 0 }); D('flat', x, 0.26, z, 0.09, 0.06, 0.09, [0xe8e0f4, 0xb89ae8, 0xf0d870][i % 3], { ry: i, outline: 0 }); }
+      for (let i = 0; i < 13; i++) { const x = (rq() - 0.5) * 46, z = (rq() - 0.5) * 40; if (!open(x, z)) continue; const g = new THREE.IcosahedronGeometry(1, 0), s = 0.3 + rq() * 0.3; g.scale(s * 1.4, s * 0.7, s); batch.add('concrete', g, G.mx(x, s * 0.25, z, rq() * 3), i % 2 ? 0x6a6e7a : 0x585c68, 0.04); g.dispose(); }
+      // the edge of the meadow is the edge of the wood: undergrowth all the way round, open only where the hill road comes in
+      { const bush = (x, z) => { const g = new THREE.IcosahedronGeometry(1, 0), s = 1.0 + rq() * 0.7; g.scale(s * 1.3, s * 0.8, s * 1.1); batch.add('flat', g, G.mx(x, s * 0.3, z, rq() * 3), [0x1f4a34, 0x24553a, 0x1a4030][(rq() * 3) | 0], 0.07); g.dispose(); };
+        for (let x = -26; x <= 26; x += 2.1) { if (Math.abs(x - roadX(-23)) > 2.6) bush(x + (rq() - 0.5), -23.6 - rq() * 0.8); bush(x + (rq() - 0.5), 23.9 + rq() * 0.8); }
+        for (let z = -22; z <= 22; z += 2.1) { bush(-26.8 - rq() * 0.8, z + (rq() - 0.5)); bush(26.8 + rq() * 0.8, z + (rq() - 0.5)); }
+        [-2.9, 2.9].forEach(x => { D('concrete', roadX(-23) + x, 0.7, -23.2, 0.5, 1.4, 0.5, STONE, { outline: 0.05 }); D('flat', roadX(-23) + x, 1.44, -23.2, 0.6, 0.1, 0.6, GILT, { outline: 0.03 }); }); }
+      cyl('wood', -13.6, 0.22, 15.6, 0.2, 0.24, 3.0, 0x4a3524, { rz: Math.PI / 2, ry: 0.5, seg: 8, outline: 0.04 }); cyl('wood', 12, 0.2, -16.4, 0.18, 0.2, 2.4, 0x3e2c1e, { rz: Math.PI / 2, ry: -0.7, seg: 8, outline: 0.04 });   // windfall
       // hills, and the white keep on its ridge: the same valley he won the Assay in
       [[-30, -64, 60, 20, 0.5], [34, -70, 70, 26, -0.4], [-66, -20, 50, 22, 1.2], [68, 4, 56, 20, -1.3], [0, 70, 90, 16, 0.1]].forEach(h => { const g = new THREE.IcosahedronGeometry(1, 1); g.scale(h[2], h[3], h[2] * 0.6); batch.add('flat', g, G.mx(h[0], -4, h[1], h[4]), 0x1f4a3a, 0.2); g.dispose(); });
       D('brick', 30, 24, -78, 14, 12, 10, 0xd8d3e2, { outline: 0.14 }); D('brick', 24, 30, -78, 4, 20, 4, 0xd8d3e2, { outline: 0.1 }); D('brick', 37, 28, -78, 3.4, 16, 3.4, 0xd8d3e2, { outline: 0.1 }); D('flat', 24, 40.6, -78, 4.6, 0.8, 4.6, GILT, { outline: 0.06 }); D('glow', 30, 26, -72.9, 1.2, 2.4, 0.1, LAMP, { outline: 0 });
       // the river along the south edge
       D('flat', 0, 0.02, 30, 150, 0.04, 12, 0x3a5fa8, { outline: 0 }); for (let x = -40; x < 40; x += 3.3) D('flat', x, 0.06, 26 + (x * 7 % 5), 1.6, 0.02, 0.12, 0xcfe0ff, { outline: 0 });
       // Riser Nine: a maintenance hatch nobody above has looked at in thirty years. Warm air and people come out of it.
-      solid(-2.3, -2.3, 2.3, 2.3, 0, 0.5, { cam: false }); cyl('concrete', 0, 0.25, 0, 2.3, 2.5, 0.5, STONE2, { seg: 14, outline: 0.07 }); cyl('glow', 0, 0.52, 0, 1.7, 1.7, 0.04, 0xff8a2e, { seg: 14, outline: 0 });
-      D('flat', 1.5, 1.0, 0, 0.1, 1.6, 0.1, IRON, { outline: 0.03 }); D('flat', 1.1, 1.0, 0, 0.1, 1.6, 0.1, IRON, { outline: 0.03 }); D('flat', 2.6, 0.9, -1.4, 0.2, 1.8, 2.4, 0x8d94ac, { rz: 1.2, outline: 0.05 });
-      sign('RISER 9', 0, 1.3, -2.52, Math.PI, 2.4, 0.6, '#e8c25a', '#07070d');
-      { const l = new THREE.PointLight(0xff8a2e, 60, 16, 1.6); l.position.set(0, 1.6, 0); G.scene.add(l); }
+      { const g = new THREE.IcosahedronGeometry(1, 1); g.scale(7, 1.5, 3.2); batch.add('flat', g, G.mx(0, -0.25, HZ + 5, 0.08), 0x24503a, 0.1); g.dispose(); }
+      [[-3.3, 0.55, HZ + 3.5, 1.5, 1.2, 1.2, 0.4], [3.0, 0.45, HZ + 3.8, 1.3, 1.0, 1.1, 1.9], [0.3, 0.35, HZ + 4.3, 1.6, 0.8, 1.0, 0.9], [-5.6, 0.3, HZ + 2.2, 0.8, 0.6, 0.7, 2.4]].forEach(k => { const g = new THREE.IcosahedronGeometry(1, 0); g.scale(k[3], k[4], k[5]); batch.add('concrete', g, G.mx(k[0], k[1], k[2], k[6]), 0x565a68, 0.06); g.dispose(); });
+      solid(-5, HZ + 2.5, 5, HZ + 5.4, 0, 2.2); pine(-6.4, HZ + 4.4, 1.8, true); pine(6.2, HZ + 4.8, 1.6, true);
+      solid(-1.75, HZ - 1.75, 1.75, HZ + 1.75, 0, 1.4, { cam: false });
+      cyl('concrete', 0, 0.2, HZ, 1.9, 2.06, 0.4, STONE2, { seg: 10, outline: 0.07 }); cyl('concrete', 0, 0.42, HZ, 1.9, 1.9, 0.05, 0xe9e4d6, { seg: 10, outline: 0 });
+      cyl('flat', 0, 0.452, HZ, 1.5, 1.5, 0.012, 0x0c0b10, { seg: 10, outline: 0 }); cyl('glow', 0, 0.46, HZ, 1.0, 1.0, 0.012, 0xb04a16, { seg: 10, outline: 0 }); cyl('glow', 0.06, 0.468, HZ + 0.1, 0.52, 0.52, 0.012, 0xff9a3a, { seg: 10, outline: 0 });   // the dark of the shaft, and light a long way down it
+      for (let i = 0; i < 10; i++) { const a2 = i / 10 * 6.283 + 0.31; D('flat', Math.cos(a2) * 1.72, 0.46, HZ + Math.sin(a2) * 1.72, 0.12, 0.05, 0.12, IRON, { ry: -a2, outline: 0 }); }
+      [-0.3, 0.3].forEach(x => D('flat', x, 1.05, HZ + 1.3, 0.07, 1.3, 0.07, IRON, { outline: 0.03 })); D('flat', 0, 1.7, HZ + 1.3, 0.67, 0.07, 0.07, IRON, { outline: 0.03 }); [0.72, 1.05, 1.38].forEach(y => D('flat', 0, y, HZ + 1.3, 0.56, 0.05, 0.05, IRON, { outline: 0.02 }));
+      cyl('metal', 3.1, 0.13, HZ + 0.5, 1.5, 1.5, 0.16, 0x8d94ac, { seg: 10, outline: 0.05 }); cyl('flat', 3.1, 0.22, HZ + 0.5, 0.5, 0.5, 0.04, IRON, { seg: 8, outline: 0.03 }); D('flat', 3.1, 0.25, HZ + 0.5, 1.5, 0.05, 0.1, IRON, { ry: 0.5, outline: 0.02 }); D('flat', 3.1, 0.25, HZ + 0.5, 1.5, 0.05, 0.1, IRON, { ry: 2.07, outline: 0.02 }); D('flat', 2.0, 0.3, HZ + 0.2, 0.5, 0.1, 0.16, IRON, { ry: 0.3, outline: 0.03 });   // the lid, thrown back on the grass, wheel uppermost
+      sign('RISER 9', -1.5, 1.3, HZ + 2.46, Math.PI, 1.7, 0.46, '#e8c25a', '#07070d'); D('concrete', -1.5, 1.3, HZ + 2.62, 1.9, 0.66, 0.3, 0x565a68, { outline: 0.04 });   // cut into a slab against the rock, where nothing can get behind it
+      { const l = new THREE.PointLight(0xff8a2e, 60, 15, 1.6); l.position.set(0, 1.5, HZ - 0.4); G.scene.add(l); }
       // the pump house, with every Assay's names cut in the lintel
       B('brick', -18, -12, -11, -6, 0, 3.6, STONE2, { outline: 0.1 }); B('roof', -18.4, -12.4, -10.6, -5.6, 3.6, 3.9, SLATE, { outline: 0.06, col: false }); D('flat', -10.95, 1.2, -9, 0.1, 2.4, 1.3, 0x15151f, { outline: 0.04 }); D('concrete', -10.9, 2.7, -9, 0.3, 0.5, 2.2, STONE, { outline: 0.04 }); D('glow', -10.9, 1.6, -7.2, 0.06, 0.5, 0.4, LAMP, { outline: 0 });
       // what the Authority left here: a pylon with the eye on it, and the road the Wardens come down
-      D('brick', 0, 4, -21, 2.4, 8, 2.4, 0xd8d3e2, { outline: 0.08 }); solid(-1.2, -22.2, 1.2, -19.8, 0, 8); D('flat', 0, 8.2, -21, 2.8, 0.4, 2.8, GILT, { outline: 0.04 });
+      D('brick', 0, 4, -21, 2.4, 8, 2.4, 0xd8d3e2, { outline: 0.08 }); solid(-1.6, -22.6, 1.6, -19.4, 0, 8); D('flat', 0, 8.2, -21, 2.8, 0.4, 2.8, GILT, { outline: 0.04 });
+      D('concrete', 0, 0.3, -21, 3.2, 0.6, 3.2, 0xb8b3c4, { outline: 0.06 }); D('flat', 0, 0.66, -21, 2.7, 0.12, 2.7, GILT, { outline: 0.03 }); D('flat', 0, 5.4, -21, 2.52, 0.2, 2.52, GILT, { outline: 0.03 }); D('flat', 0, 8.9, -21, 1.3, 1.0, 1.3, 0x23232e, { outline: 0.04 }); D('flat', 0, 8.9, -20.2, 0.9, 0.6, 0.5, 0x23232e, { outline: 0.03 }); D('flat', 0, 9.5, -21, 1.7, 0.16, 1.7, GILT, { outline: 0.03 });   // a plinth, two bands, and the housing the eye looks out of
       // the riser's own pump, on the pump-house wall: a standpipe, a gauge, and a wheel nobody has turned in thirty years
       cyl('metal', -10.78, 1.2, -7.9, 0.09, 0.09, 2.4, 0x6f7a86, { seg: 8, outline: 0.03 }); D('flat', -10.78, 2.36, -7.55, 0.1, 0.1, 0.8, 0x6f7a86, { outline: 0.03 }); D('flat', -10.74, 1.25, -7.9, 0.07, 0.07, 0.56, 0xb23a2e, { outline: 0.03 }); D('flat', -10.74, 1.25, -7.9, 0.07, 0.56, 0.07, 0xb23a2e, { outline: 0.03 }); D('flat', -10.86, 1.9, -7.9, 0.06, 0.26, 0.26, 0xece6d6, { outline: 0.03 });
-      for (let z = -19; z < -4; z += 2.4) D('flat', 3.4 + (z % 2), 0.012, z, 2.2, 0.02, 1.6, 0x5a5346, { outline: 0 });
-      [[-9, 9], [10, -9], [12, 10], [-11, 2]].forEach(p => { solid(p[0] - 0.2, p[1] - 0.2, p[0] + 0.2, p[1] + 0.2, 0, 2.4, { cam: false }); cyl('wood', p[0], 1.1, p[1], 0.06, 0.08, 2.2, 0x4a3524, { outline: 0.03 }); D('glow', p[0], 2.3, p[1], 0.26, 0.34, 0.26, TLAMP, { outline: 0 }); });
+      [[-9, 9], [10, -9], [12, 10], [-11, 2]].forEach(p => { solid(p[0] - 0.2, p[1] - 0.2, p[0] + 0.2, p[1] + 0.2, 0, 2.4, { cam: false }); cyl('wood', p[0], 1.1, p[1], 0.06, 0.08, 2.2, 0x4a3524, { outline: 0.03 }); D('flat', p[0], 2.12, p[1], 0.34, 0.05, 0.34, 0x23232e, { outline: 0.02 }); D('glow', p[0], 2.3, p[1], 0.24, 0.3, 0.24, TLAMP, { outline: 0 }); D('flat', p[0], 2.5, p[1], 0.36, 0.07, 0.36, 0x23232e, { outline: 0.02 }); const l = new THREE.PointLight(0x5ff2e2, 7, 7, 1.6); l.position.set(p[0], 2.2, p[1]); G.scene.add(l); });
       crateStatic(-9.6, -6.4, 1.1); crate(-9.2, -4.9, 0.9, 0, 'hp'); crate(14, 16, 0.9, 0, 'meter'); crate(-16, 17, 0.9, 0, 'hp'); crate(20, -8, 0.9, 0, 'hp');
-      D('crate', 3.4, 0.14, 3.2, 0.3, 0.16, 0.5, 0x8a1f24, { ry: 0.6, outline: 0.03 });    // a child's shoe
+      D('crate', 2.5, 0.09, HZ - 2.5, 0.16, 0.1, 0.3, 0x8a1f24, { ry: 0.6, outline: 0.02 }); D('flat', 2.46, 0.045, HZ - 2.5, 0.2, 0.03, 0.34, 0x2a1c14, { ry: 0.6, outline: 0 });    // a child's shoe
       // ===== nine years on: what the Assay left in this valley, and nobody was sent to clear =====
       tentD(-15, 10, 0.4, VIOLET); tentD(-19, 6.5, -0.5, VIOLET); tentD(16, 15, 2.2, TEAL); tentD(19.5, -3, 1.2, 0xb8902e);
-      fireRing(-16.6, 7.6, false); fireRing(15.5, 12, false); fireRing(4.5, 5.6, true);
+      fireRing(-16.6, 7.6, false); fireRing(15.5, 12, false); fireRing(-6.2, HZ - 0.6, true);
       // the Violet standard, down in the grass where he left it standing
       D('wood', -13.2, 0.08, 12.4, 4.4, 0.08, 0.08, GILT, { ry: 0.5, outline: 0.03 }); torn(-11.6, 0, 13.6, 0.5, VIOLET);
       [[-22, 18, 1], [-6, 20, 2], [8, 21, 3], [22, 17, 4], [24, -12, 5], [10, -20, 6], [-12, -21, 7], [-24, -16, 8], [-25, 1, 9]].forEach(m => marker(m[0], m[1], m[2]));
       // a wooden practice blade, and a ration tin with a House seal, gone to rust
       D('wood', -17.6, 0.06, 9.2, 1.1, 0.05, 0.09, 0x8a6a48, { ry: 1.0, outline: 0.02 }); cyl('metal', 16.4, 0.08, 13.2, 0.12, 0.12, 0.16, 0x8a5a3a, { seg: 8, outline: 0.02 }); helmD(18.6, 0, -4.2, 1); halbD(20.6, 0, -1.8, 2.0);
       // what came up the riser with them: bundles, a handcart, blankets, the lamps set down in a ring
-      load(3.6, 0, -3.4, 0.4); load(-3.8, 0, 3.4, 2.0); load(-4.4, 0, -3.0, 1.0);
-      D('wood', 6.2, 0.5, 4.4, 1.6, 0.1, 1.0, 0x8a6a48, { ry: 0.3, outline: 0.04 }); cyl('wood', 6.9, 0.3, 4.9, 0.3, 0.3, 0.08, 0x4a3524, { seg: 10, outline: 0.03 }); D('wood', 5.1, 0.34, 4.0, 1.2, 0.06, 0.06, 0x4a3524, { ry: 0.3, rz: -0.3, outline: 0.02 }); D('crate', 6.2, 0.78, 4.4, 0.7, 0.44, 0.6, 0xb98a55, { ry: 0.5, outline: 0.04 });
-      [[5.2, 6.8, 0x8a1f24], [3.4, 6.4, 0x3c4e8a], [6.4, 6.2, 0x8a6a48]].forEach((b, i) => D('flat', b[0], 0.03 + i * 0.004, b[1], 1.5, 0.03, 0.8, b[2], { ry: i * 0.7, outline: 0 }));
-      for (let i = 0; i < 7; i++) { const a = i / 7 * 6.283; D('glow', 4.5 + Math.cos(a) * 1.5, 0.12, 5.6 + Math.sin(a) * 1.5, 0.12, 0.2, 0.12, i % 3 ? LAMP : TLAMP, { outline: 0 }); }
-      chalkW(-10.93, 0.5, -10.4, Math.PI / 2, 0.16); chalkF(-2.9, 0.012, 2.9, 0.22); chalkW(0, 0.6, -19.78, 0, 0.18);
+      // east of the hatch: the handcart, and what they carried. West: a fire, the lamps set down round it, and the bedrolls of people who expected to wait
+      load(5.0, 0, HZ - 1.9, 0.4); load(8.6, 0, HZ + 1.3, 2.0); load(5.4, 0, HZ + 2.0, 1.0); solid(4.5, HZ - 2.3, 5.5, HZ - 1.5, 0, 1, { cam: false }); solid(8.1, HZ + 0.9, 9.1, HZ + 1.7, 0, 1, { cam: false });
+      D('wood', 7.2, 0.5, HZ - 0.4, 1.6, 0.1, 1.0, 0x8a6a48, { ry: 0.3, outline: 0.04 }); cyl('wood', 7.9, 0.3, HZ + 0.12, 0.3, 0.3, 0.08, 0x4a3524, { seg: 10, rx: Math.PI / 2, ry: 0.3, outline: 0.03 }); cyl('wood', 6.9, 0.3, HZ - 0.95, 0.3, 0.3, 0.08, 0x4a3524, { seg: 10, rx: Math.PI / 2, ry: 0.3, outline: 0.03 }); D('wood', 6.0, 0.36, HZ - 0.78, 1.3, 0.06, 0.06, 0x4a3524, { ry: 0.3, rz: -0.25, outline: 0.02 }); D('crate', 7.2, 0.78, HZ - 0.4, 0.7, 0.44, 0.6, 0xb98a55, { ry: 0.5, outline: 0.04 }); solid(6.4, HZ - 1.0, 8.0, HZ + 0.2, 0, 1.0, { cam: false });
+      [[-4.5, HZ + 1.3, 0x6a3a3a, 0.5], [-8.2, HZ + 0.6, 0x3a4a6a, 2.2], [-7.4, HZ - 2.4, 0x6a5a40, 1.2]].forEach(b => { D('flat', b[0], 0.04, b[1], 1.5, 0.06, 0.62, b[2], { ry: b[3], outline: 0.02 }); cyl('flat', b[0] + Math.cos(b[3]) * 0.7, 0.11, b[1] - Math.sin(b[3]) * 0.7, 0.11, 0.11, 0.6, 0xb9b3a4, { rx: Math.PI / 2, ry: b[3], seg: 8, outline: 0.02 }); });
+      for (let i = 0; i < 6; i++) { const a2 = i / 6 * 6.283 + 0.4; cyl('metal', -6.2 + Math.cos(a2) * 1.5, 0.05, HZ - 0.6 + Math.sin(a2) * 1.5, 0.08, 0.08, 0.04, 0x23232e, { seg: 6, outline: 0 }); D('glow', -6.2 + Math.cos(a2) * 1.5, 0.16, HZ - 0.6 + Math.sin(a2) * 1.5, 0.11, 0.18, 0.11, i % 3 ? LAMP : TLAMP, { outline: 0 }); D('flat', -6.2 + Math.cos(a2) * 1.5, 0.27, HZ - 0.6 + Math.sin(a2) * 1.5, 0.16, 0.04, 0.16, 0x23232e, { outline: 0 }); }
+      [[0, 0.3, 0.16], [0.08, 0.44, 0.1], [-0.06, 0.52, 0.06]].forEach(f => D('glow', -6.2 + f[0], f[1], HZ - 0.6, f[2], f[2] * 1.6, f[2], f[1] > 0.4 ? 0xffd070 : 0xff7a1f, { ry: f[1] * 9, outline: 0 }));
+      { const l = new THREE.PointLight(0xffa24a, 26, 9, 1.6); l.position.set(-6.2, 0.9, HZ - 0.6); G.scene.add(l); }
+      chalkW(-10.93, 0.5, -10.4, Math.PI / 2, 0.16); chalkF(-2.6, 0.016, HZ - 2.6, 0.22); chalkW(0, 0.6, -19.78, 0, 0.18);
       // the Authority's notice on the pylon, and the tally of the riser's air
       sign('SEALED BY THE COUNT', 0, 2.6, -19.78, 0, 2.2, 0.4, '#07070d', '#e8c25a'); sign('NINE HOUSES. ONE STANDING.', -10.92, 3.1, -9, Math.PI / 2, 4.2, 0.36, '#e8c25a', '#07070d');
     };

@@ -104,12 +104,9 @@
     const mk = (col, op, add) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: soft, color: col, transparent: true, opacity: op, depthWrite: false, fog: false, blending: add ? THREE.AdditiveBlending : THREE.NormalBlending })); G.scene.add(s); return s; };
     const wrap = (v, c, span) => c + ((((v - c) % span) + span * 1.5) % span) - span / 2, L = [];
     if (kind === 'stair') for (let i = 0; i < 60; i++) { const s = mk(i % 3 ? 0xff8a2a : 0xffd890, .95, true), z = .3 + (i % 4) * .1; s.scale.set(z, z, 1); L.push({ s, x: i * 3.7, z: i * 5.3, ph: i * .61, sp: .7 + (i % 5) * .26, k: 0 }); }
-    if (kind === 'docks' || kind === 'riser') for (let i = 0; i < 14; i++) { const s = mk(kind === 'docks' ? 0xc9c0f4 : 0xa8c6e0, kind === 'docks' ? .13 : .17, false); s.scale.set(7 + (i % 3) * 3, 1.6 + (i % 2) * .8, 1); L.push({ s, x: i * 6.1, z: i * 4.7, ph: i * .9, sp: .35 + (i % 4) * .12, k: 1 }); }
-    const amb0 = G.amb.color.clone(); let bolt = 9 + Math.random() * 6, fl = 0;
     W.dyn.push((tt, dt) => { const p = pl.pos;
       for (const q of L) { if (q.k === 0) { const y = (tt * q.sp + q.ph * 3) % 10; q.s.position.set(wrap(q.x + tt * 1.3 + Math.sin(tt * .9 + q.ph) * .7, p.x, 26), p.y - .6 + y, wrap(q.z + Math.sin(tt * .5 + q.ph) * .5, p.z, 26)); q.s.material.opacity = Math.min(1, y * .8) * Math.max(0, 1 - y / 10) * (.8 + .2 * Math.sin(tt * 9 + q.ph)); }
-        else q.s.position.set(wrap(q.x + tt * q.sp, p.x, 44), p.y + .5 + (q.ph % 1) * .9 + Math.sin(tt * .3 + q.ph) * .15, wrap(q.z + Math.sin(tt * .11 + q.ph) * 2, p.z, 40)); }
-      if (kind === 'riser') { bolt -= dt; if (bolt <= 0) { bolt = 11 + Math.random() * 9; fl = .34; } if (fl > 0) { fl -= dt; const k = fl > .24 || (fl > .06 && fl < .13) ? 2.5 : 1; G.amb.color.copy(amb0).multiplyScalar(k); } } });
+        else q.s.position.set(wrap(q.x + tt * q.sp, p.x, 44), p.y + .5 + (q.ph % 1) * .9 + Math.sin(tt * .3 + q.ph) * .15, wrap(q.z + Math.sin(tt * .11 + q.ph) * 2, p.z, 40)); } });
   }
   function shot(px, py, pz, lx, ly, lz, fov, w, h) { const c = G.camera; c.position.set(px, py, pz); c.fov = fov; c.updateProjectionMatrix(); c.lookAt(lx, ly, lz); return G.snap(w || 768, h || 432); }
   /* Brand keeps the head of the dock stair, at the blind end of Bond Alley, for the whole issue. */
@@ -263,12 +260,12 @@
   if (SC.issue === 'riser' || SC.issue === 'stair') {
     const RIS = SC.issue === 'riser', BY = RIS ? 0 : 18, done = () => { S.done = true; S.wipe(); if (!SC.host('done', { time: S.time, kills: pl.stats.kills, clues: pl.echoes })) U.end({ time: S.time, path: '', kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); };
     for (const k in CROSS) delete CROSS[k]; for (const k in ENC) delete ENC[k];
-    Object.assign(CROSS, RIS ? { alley: { x: 0, y: 0, z: 3.4, yaw: Math.PI }, yard: { x: -12, y: 0, z: 4, yaw: Math.PI } } : { alley: { x: 0, y: 0, z: 37, yaw: Math.PI }, yard: { x: 0, y: 6, z: 14.5, yaw: Math.PI }, roof: { x: 0, y: 12, z: -11, yaw: Math.PI } });
+    Object.assign(CROSS, RIS ? { alley: { x: 0, y: 0, z: 7.4, yaw: Math.PI }, yard: { x: -12, y: 0, z: 4, yaw: Math.PI } } : { alley: { x: 0, y: 0, z: 37, yaw: Math.PI }, yard: { x: 0, y: 6, z: 14.5, yaw: Math.PI }, roof: { x: 0, y: 12, z: -11, yaw: Math.PI } });
     Object.assign(ENC, RIS ? {
-      alley: { arena: [-25, -22, 25, 22], floor: 0, waves: [[['hollow', 3, -20], ['hollow', 5, -21], ['hollow', 1.6, -21.5]]] },
-      w2: { arena: [-25, -22, 25, 22], floor: 0, waves: [[['hollow', 4, -21], ['knifer', 2, -21.5], ['knifer', 6, -20.5]], [['hollow', 23, -10], ['hollow', -23, -6], ['knifer', 3.4, -21]]] },
-      w3: { arena: [-25, -22, 25, 22], floor: 0, waves: [[['bruiser', -23, -15], ['hollow', -22, -12], ['hollow', 23, -14]], [['bruiser', 23, 4], ['knifer', -22, 8], ['knifer', 22, 10], ['hollow', 0, 21]]] },
-      boss: { arena: [-25, -22, 25, 22], floor: 0, waves: [[['boss', 0, -15]]] }
+      alley: { arena: [-25, -22, 25, 10.6], floor: 0, waves: [[['hollow', 3, -20], ['hollow', 5, -21], ['hollow', 1.6, -21.5]]] },
+      w2: { arena: [-25, -22, 25, 10.6], floor: 0, waves: [[['hollow', 4, -21], ['knifer', 2, -21.5], ['knifer', 6, -20.5]], [['hollow', 23, -10], ['hollow', -23, -6], ['knifer', 3.4, -21]]] },
+      w3: { arena: [-25, -22, 25, 10.6], floor: 0, waves: [[['bruiser', -23, -15], ['hollow', -22, -12], ['hollow', 23, -14]], [['bruiser', 23, 4], ['knifer', -22, 8], ['knifer', 22, 9], ['hollow', -23, 2]]] },
+      boss: { arena: [-25, -22, 25, 10.6], floor: 0, waves: [[['boss', 0, -15]]] }
     } : {
       alley: { arena: [-9.6, 30.4, 9.6, 45.6], floor: 0, waves: [[['hollow', -3, 32], ['hollow', 3, 32], ['knifer', 0, 31.4]], [['hollow', -5, 32.4], ['knifer', 5, 32.4], ['hollow', 0, 31.6]]] },
       l1: { arena: [-6.6, 4.4, 6.6, 17.6], floor: 6, waves: [[['knifer', -3, 7], ['knifer', 3, 7], ['hollow', 0, 6]], [['bruiser', 0, 6.4], ['hollow', -4, 8]]] },
@@ -283,12 +280,12 @@
       let t = '', g = null;
       if (RIS) {
         if (S.enc && S.enc.id === 'boss') t = 'THE WARDEN CAPTAIN. HE DOES NOT REACH THE HATCH.';
-        else if (!F.path) { t = 'TO THE HATCH'; g = CROSS.alley; }
+        else if (!F.path) { t = 'MEET THEM ON THE ROAD'; g = CROSS.alley; }
         else if (F.boss) t = 'FORTY OF FORTY';
         else if (S.enc) t = 'HOLD THE RISER · ' + up() + ' OF 40 UP';
         else if (F.e_alley && !F.pump) { t = 'THE HATCH IS STUCK. THE PUMP HOUSE.'; g = { x: -9.9, y: 0, z: -7.2 }; }
         else if (F.e_w2 && !F.pylon) { t = 'PUT OUT THE EYE ON THE PYLON'; g = { x: 0, y: 0, z: -19.2 }; }
-        else if (F.e_w3 && !F.pull) { t = 'SOMEBODY HAS STOPPED ON THE LADDER'; g = { x: -2.7, y: 0, z: -0.4 }; }
+        else if (F.e_w3 && !F.pull) { t = 'SOMEBODY HAS STOPPED ON THE LADDER'; g = { x: 0, y: 0, z: 12.7 }; }
         else t = 'HOLD THE RISER · ' + up() + ' OF 40 UP';
       } else {
         if (S.enc) t = S.enc.id === 'boss' ? (S.stage2 ? 'OSWIN HALE. THE DOOR IS BEHIND HIM.' : "THE AUDITOR'S BLADE. THE DOOR IS BEHIND HIM.") : 'CLEAR THE LANDING';
@@ -304,18 +301,18 @@
     S.objective = objective;
     encDone = function (id) {
       setFlag('e_' + id); S.pending = false;
-      if (RIS) { if (id === 'alley') U.toast('THE ROAD IS CLEAR FOR NOW. *THE HATCH HAS NOT LIFTED.*', 3.4); else { S.walk = 0.001; U.toast('*' + ['TEN', 'TWENTY', 'THIRTY', 'FORTY'][up() / 10 - 1] + '* UP THE RISER. THEY GO UP THE HILL ROAD WITH THEIR LAMPS HOODED.', 3.6); } SC.audio.sfx('clue'); objective(); }
+      if (RIS) { if (id === 'alley') U.toast('THE ROAD IS CLEAR FOR NOW. *THE HATCH HAS NOT LIFTED.*', 3.4); else { S.walk = 0.001; U.toast('*' + ['TEN', 'TWENTY', 'THIRTY', 'FORTY'][up() / 10 - 1] + '* UP THE RISER. THEY GO INTO THE PINES WITH THEIR LAMPS HOODED.', 3.6); } SC.audio.sfx('clue'); objective(); }
       else { brandOnStair(); U.toast(id === 'alley' ? 'THE TERRACE IS OURS. *UP.*' : id === 'l1' ? 'TAVI: "ON YOUR LEFT. KEEP GOING."' : 'ONE FLIGHT LEFT. *THE WHITE DOOR.*', 3.4); }
     };
     const begin = () => { SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.mode = 'follow'; cam.snapBehind(Math.PI); U.showHud(true); setFlag('intro');
       U.toast(SC.hosted ? 'DRAG THE PICTURE TO LOOK ROUND. *A* CUTS; HELD, THREE HEAVY BLOWS. *JUMP*, HELD, HOVERS.' : 'WASD MOVES. J STRIKES. K DODGES. F IS THE BOOTS.', 5.5); };
     intro = function () {
       SC.state = 'play'; U.showHud(false); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; pl.faceOverride = 'angry';
-      pl.place(0, 0, RIS ? 5.5 : 41, Math.PI); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.face('angry'); pl.model.group.updateMatrixWorld(true); brandOnStair(); if (clerk) clerk.group.updateMatrixWorld(true);
+      pl.place(0, 0, RIS ? 10.4 : 41, Math.PI); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.face('angry'); pl.model.group.updateMatrixWorld(true); brandOnStair(); if (clerk) clerk.group.updateMatrixWorld(true);
       const pg = RIS ? [
-        { img: shot(7, 6.5, 13, 0, 0.6, 1, 44, 768, 720), area: '1 / 1 / 3 / 2', cap: 'RISER NINE. FIVE YEARS AFTER THE FURNACE.', cap2: 'NINE FLOORS OF LADDER UNDER TIER FOUR. IT COMES UP IN THE VALLEY WHERE I WON THEIR ASSAY.', fx: 'CLANG!' },
-        { img: shot(-1.2, 1.7, 3.2, 0, 1.75, 5.5, 30), area: '1 / 2 / 2 / 3', cap2: 'THE ORDER SAID ELEVEN HUNDRED. DACE SAID: HOLD THE TOP FOR AN HOUR. *A CLERK CANNOT BE SEEN TO FIGHT. I WORE A MASK.*' },
-        { img: shot(1.5, 2.2, 2, 0, 6.5, -21, 40), area: '2 / 2 / 3 / 3', cap: 'THE WARDENS WERE ALREADY ON THE HILL ROAD.', cap2: 'FORTY PEOPLE BEHIND ME ON A LADDER.' }
+        { img: shot(-9.5, 5.2, 4.5, 0.6, 0.6, 14, 42, 768, 720), area: '1 / 1 / 3 / 2', cap: 'RISER NINE. FIVE YEARS AFTER THE FURNACE.', cap2: 'NINE FLOORS OF LADDER UNDER TIER FOUR. IT COMES UP IN THE VALLEY WHERE I WON THEIR ASSAY.', fx: 'CLANG!' },
+        { img: shot(-1.2, 1.7, 8.1, 0, 1.75, 10.4, 30), area: '1 / 2 / 2 / 3', cap2: 'THE ORDER SAID ELEVEN HUNDRED. DACE SAID: HOLD THE TOP FOR AN HOUR. *A CLERK CANNOT BE SEEN TO FIGHT. I WORE A MASK.*' },
+        { img: shot(1.6, 2.0, 13.2, 0, 5.2, -21, 40), area: '2 / 2 / 3 / 3', cap: 'THE WARDENS WERE ALREADY ON THE HILL ROAD.', cap2: 'FORTY PEOPLE BEHIND ME ON A LADDER.' }
       ] : [
         { img: shot(9, 4.5, 47, 0, 7, 10, 46, 768, 720), area: '1 / 1 / 3 / 2', cap: 'THE SUN SPIRE. NINE YEARS AFTER THE FURNACE.', cap2: 'FOUR HUNDRED HULLS CAME DOWN ON THE TERRACES AT DAWN. BY SUNSET THERE WAS ONE STAIR LEFT.', fx: 'HMMMM' },
         { img: shot(0.4, 1.5, 38.4, -1.6, 1.5, 40.2, 30), area: '1 / 2 / 2 / 3', cap2: '"I\'M ON YOUR LEFT THE WHOLE WAY UP. DON\'T ARGUE. *I\'VE FLOWN A BARGE.*"' },
@@ -327,6 +324,7 @@
     bossIntro = function () {
       const again = F.bossIntro; F.bossIntro = 1; save(); pl.control = false; pl.setState('scripted'); pl.script = t => P.guard(t); pl.scriptRate = 6; U.showHud(false); SC.emit('letterbox', true); cam.lock = null;
       S.vossName = S.vossName || U.SPEAK.voss.name; const osw = !RIS && !!F.oswin; if (!RIS) { S.stage2 = osw; SC.SPECS.boss.face = osw ? 'oswin' : 'halfmask'; U.SPEAK.voss.name = osw ? 'OSWIN HALE' : S.vossName; }
+      if (RIS) pl.place(0, 0, 8.6, Math.PI);
       const bz = RIS ? -15 : -50, e = SC.spawnEnemy('boss', 0, BY, bz, ENC.boss); e.state = 'wait'; e.model.group.scale.set(1, 1, 1); e.yaw = 0; S.bossE = e; pl.yaw = Math.PI;
       cam.move(v3(4, BY + 1.9, bz + 6), v3(0, BY + 2, bz), v3(2.4, BY + 1.7, bz + 4.2), v3(0, BY + 2.1, bz), 4.5, 40);
       const lines = osw ? [{ who: 'voss', face: 'angry', text: 'Get up, Sorrel. One has not finished paying.' }, { who: 'hero', face: 'angry', text: "It's Kael. It was always Kael." }] : again ? [{ who: 'voss', text: RIS ? 'Still on the hatch. *Stand off it.*' : 'Again, Clerk. One has the whole evening.' }, { who: 'hero', face: 'angry', text: RIS ? 'Count them again.' : "So've we." }] : RIS ? [
@@ -344,7 +342,7 @@
     ending = function () {
       S.enc = null; U.boss(null); SC.clearEnemies(); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 5; setFlag('boss'); if (RIS) S.walk = 0.001;
       run([0.6, n => U.say(RIS ? [
-          { who: 'cap', text: 'The last of them went up the hill road with their lamps out. I counted forty past me. Then I pulled the hatch down and stood on it until my legs stopped.' },
+          { who: 'cap', text: 'The last of them went into the pines with their lamps hooded. I counted forty past me. Then I pulled the hatch down and stood on it until my legs stopped.' },
           { who: 'hero', face: 'hurt', text: 'Forty.' },
           { who: 'cap', text: 'The order said eleven hundred. I was back at my desk before the bell, and I wrote "clerical" beside the difference.' }
         ] : [
@@ -363,27 +361,27 @@
         const a = mk(G.tex.ring, 3.4, 0xffe14a, 0.9), b = mk(G.tex.disc, 2.3, 0xffe14a, 0.35); W.dyn.push(t => { a.rotation.z = t * 0.25; b.material.opacity = 0.25 + Math.sin(t * 3) * 0.12; });
         W.addInteract({ id: 'x_' + id, x: c.x, y: c.y, z: c.z, r: 1.9, label: 'REMEMBER', marker: 'clue', mh: 1.5, act: crossing(id, true), when: () => !!F.path && !S.enc && !!(SUN[SC.issue] || {})[id] && !F['sun_' + id] }); });
       if (RIS) {
-        // the forty: lamps with hoods on, going up the hill road ten at a time
-        const lamps = []; for (let i = 0; i < 10; i++) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.5, 0.22), new THREE.MeshBasicMaterial({ color: 0xffd9a0, fog: false })); m.visible = false; G.scene.add(m); lamps.push(m); }
-        W.dyn.push((t, dt) => { if (!S.walk) return; S.walk += dt; lamps.forEach((m, i) => { const k = (S.walk - i * 0.45) / 7; m.visible = k > 0 && k < 1; if (m.visible) m.position.set(2.5 + k * 26, 0.9 + Math.sin(S.walk * 9 + i) * 0.06, 1 + k * 9 + (i % 3 - 1) * 0.5); }); if (S.walk > 12) { S.walk = 0; lamps.forEach(m => { m.visible = false; }); } });
+        // the forty: hooded lamps and the people carrying them, going east along the rock and into the pines ten at a time
+        const lamps = [], cloth = G.toon({ color: 0x2a2634 }); for (let i = 0; i < 10; i++) { const m = new THREE.Group(), sm = i % 4 === 3, body = new THREE.Mesh(new THREE.CylinderGeometry(sm ? 0.1 : 0.14, sm ? 0.2 : 0.27, sm ? 0.8 : 1.15, 7), cloth), head = new THREE.Mesh(new THREE.ConeGeometry(0.19, 0.4, 7), cloth), lamp = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.2, 0.12), new THREE.MeshBasicMaterial({ color: 0xffd9a0, fog: false })); body.position.y = sm ? 0.4 : 0.58; head.position.y = sm ? 0.98 : 1.33; lamp.position.set(0.3, sm ? 0.45 : 0.62, 0.1); m.add(body, head, lamp); m.visible = false; G.scene.add(m); lamps.push(m); }
+        W.dyn.push((t, dt) => { if (!S.walk) return; S.walk += dt; lamps.forEach((m, i) => { const k = (S.walk - i * 0.45) / 7; m.visible = k > 0 && k < 1; if (m.visible) { m.position.set(2.2 + k * 25, Math.abs(Math.sin(S.walk * 7 + i)) * 0.05, 13.0 - k * 0.6 + Math.sin(k * 3.1) * -1.6 + (i % 3 - 1) * 0.4); m.rotation.y = 1.5 + Math.sin(S.walk * 7 + i) * 0.08; } }); if (S.walk > 12) { S.walk = 0; lamps.forEach(m => { m.visible = false; }); } });
         const said = (flag, lines, after) => () => { setFlag(flag); SC.audio.sfx('clue'); pl.control = false; U.say(lines, () => { pl.control = true; if (after) after(); objective(); }); };
-        const eye = new THREE.PointLight(0xffe9a0, 90, 34, 1.4); eye.position.set(0, 8.6, -19.6); G.scene.add(eye); const eyeM = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.9, 0.7), new THREE.MeshBasicMaterial({ color: 0xfff2c0, fog: false })); eyeM.position.set(0, 9, -21); G.scene.add(eyeM); const beam = new THREE.Mesh(new THREE.ConeGeometry(4.6, 10.5, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0xffe9a0, transparent: true, opacity: 0.13, depthWrite: false, side: THREE.DoubleSide, fog: false })); beam.geometry.translate(0, -5.25, 0); beam.position.set(0, 9, -20.4); beam.rotation.x = 0.62; G.scene.add(beam); W.dyn.push(tt => { beam.rotation.z = Math.sin(tt * 0.5) * 0.5; beam.rotation.x = 0.62 + Math.sin(tt * 0.31) * 0.12; });
+        const eye = new THREE.PointLight(0xffe9a0, 90, 34, 1.4); eye.position.set(0, 8.6, -19.6); G.scene.add(eye); const eyeM = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.42, 0.06), new THREE.MeshBasicMaterial({ color: 0xfff2c0, fog: false })); eyeM.position.set(0, 8.9, -19.96); G.scene.add(eyeM); const beam = new THREE.Mesh(new THREE.ConeGeometry(4.6, 10.5, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0xffe9a0, transparent: true, opacity: 0.08, depthWrite: false, side: THREE.DoubleSide, fog: false })); beam.geometry.translate(0, -5.25, 0); beam.position.set(0, 8.9, -19.9); beam.rotation.x = 0.62; G.scene.add(beam); W.dyn.push(tt => { beam.rotation.z = Math.sin(tt * 0.5) * 0.5; beam.rotation.x = 0.62 + Math.sin(tt * 0.31) * 0.12; });
         const eyeOff = () => { eye.intensity = 0; eyeM.material.color.set(0x1c1c26); beam.visible = false; }; if (F.pylon) eyeOff();
         W.addInteract({ id: 'pump', x: -9.9, y: 0, z: -7.3, fx: -11, fz: -7.9, r: 1.9, label: 'RAISE THE PRESSURE', marker: 'act', mh: 2.4, when: () => F.e_alley && !F.pump && !S.enc, act: said('pump', [
           { who: 'cap', text: 'The hatch had lifted a hand\'s width and stuck. The riser\'s own pump had not been run in thirty years. It still drew. Everything they forget down here still draws.' },
           { who: 'hero', face: 'angry', text: 'Up. One at a time. Lamps hooded.' }], () => { S.walk = 0.001; U.toast('*TEN* UP THE RISER. LAMPS ON THE HILL ROAD: *THEIRS.*', 3.4); }) });
         W.addInteract({ id: 'pylon', x: 0, y: 0, z: -19.2, fx: 0, fz: -21, r: 2, label: 'PUT OUT THE EYE', marker: 'act', mh: 3, when: () => F.e_w2 && !F.pylon && !S.enc, act: said('pylon', [
           { who: 'cap', text: 'The Authority puts an eye on every hill. This one lit the whole valley floor for anyone coming down the road.' },
-          { who: 'hero', face: 'smirk', text: 'Then they can come down it in the dark. Like us.' }], () => { eyeOff(); FX.burst(v3(0, 9, -21), 0xffe9a0, 1.6); SC.audio.sfx('crate'); U.toast('THE VALLEY IS DARK. *THEY ARE COMING ANYWAY.*', 3); }) });
-        W.addInteract({ id: 'pull', x: -2.7, y: 0, z: -0.4, fx: 0, fz: 0, r: 1.9, label: 'REACH DOWN', marker: 'act', mh: 1.6, when: () => F.e_w3 && !F.pull && !S.enc, act: said('pull', [
+          { who: 'hero', face: 'smirk', text: 'Then they can come down it in the dark. Like us.' }], () => { eyeOff(); FX.burst(v3(0, 8.9, -19.9), 0xffe9a0, 1.6); SC.audio.sfx('crate'); U.toast('THE VALLEY IS DARK. *THEY ARE COMING ANYWAY.*', 3); }) });
+        W.addInteract({ id: 'pull', x: 0, y: 0, z: 12.7, fx: 0, fz: 15, r: 1.9, label: 'REACH DOWN', marker: 'act', mh: 1.6, when: () => F.e_w3 && !F.pull && !S.enc, act: said('pull', [
           { who: 'cap', text: 'The last of them had stopped on the ladder. A girl, with a smaller girl on her back, and no hand free.' },
           { who: 'hero', face: 'hurt', text: 'Give her to me. ...Now you.' },
           { who: 'cap', text: 'She did not say thank you. She said: is the sky blue. I said: go and look.' }], () => { S.walk = 0.001; U.toast('*FORTY* UP THE RISER. ONE MORE LAMP ON THE ROAD. *HIS.*', 3.4); }) });
         W.addInteract({ id: 'lintel', x: -9.9, y: 0, z: -9, fx: -11, fz: -9, r: 1.45, label: 'LOOK', marker: 'clue', mh: 2.2, when: () => F.e_alley && !F.clue_lintel, act: clue('lintel', [
           { who: 'cap', text: 'Names cut in the lintel, one Assay under another. Most are scored through. Mine is there, with a gold nail in it. It is not my name.' },
           { who: 'hero', face: 'angry', text: 'Sorrel, E. ...Forty feet under this grass there is a tier they are striking tonight.' }]) });
-        W.addInteract({ id: 'shoe', x: 3.6, y: 0, z: 3.6, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.1, when: () => F.e_alley && !F.clue_shoe, act: clue('shoe', [
-          { who: 'cap', text: 'A child\'s shoe by the hatch. Somebody went up the hill road with one foot bare and did not come back for it.' },
+        W.addInteract({ id: 'shoe', x: 2.5, y: 0, z: 12.2, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.1, when: () => F.e_alley && !F.clue_shoe, act: clue('shoe', [
+          { who: 'cap', text: 'A child\'s shoe by the hatch. Somebody went into the pines with one foot bare and did not come back for it.' },
           { who: 'hero', face: 'hurt', text: 'Good. Do not come back.' }]) });
       } else {
         // the kneeling bell on the first landing: it comes down
@@ -437,6 +435,7 @@
       if (SC.state !== 'play') return;
       if (pl.control) S.time += rdt;
       updateEnc(dt);
+      if (S.enc && RIS && pl.control && pl.pos.z > 10.9) pl.pos.z = Math.max(10.9, pl.pos.z - dt * 9);   // he holds the line north of the hatch; he does not fight from behind it
       if (S.enc && S.enc.arena && !RIS && pl.control && pl.state !== 'dead') { const A = S.enc.arena; pl.pos.x = SC.clamp(pl.pos.x, A[0] - 0.2, A[2] + 0.2); pl.pos.z = SC.clamp(pl.pos.z, A[1] - 0.2, A[3] + 0.2); }   // a landing is fought on the landing
       if (!pl.control || S.enc || pl.state === 'dead') return;
       const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;

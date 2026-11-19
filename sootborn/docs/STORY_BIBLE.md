@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.46 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.47 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -445,4 +445,9 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **Riser Nine has three Wardens:** two in the third wave and the Captain. That is Cade's number.
 - **The fortieth:** a girl carrying a smaller girl, stopped on the ladder with no hand free. Kael takes the small one, then her. She asks whether the sky is blue; he tells her to go and look. (Pip asked the same in the fever ward.)
 - **2D fights, the edge:** the Ember Ring's edge is the crowd, who shove a man back in; the pump room and the furnace bay have walls.
+
+### Riser Nine, the ground (v0.47)
+- The hatch is at the **south end of the meadow, against rock**, not in its centre. The fight is north of it. Kael holds a line; nobody gets behind him.
+- The hill road comes in through a gap in the wood on the north side, past the Authority's pylon, and ends at the hatch. **The Wardens come down it. The forty do not use it:** they go east along the rock and into the pines, hooded, ten at a time, children among them.
+- West of the hatch the first people up have lit a fire and set their lamps round it. East, a handcart.
 

@@ -1,4 +1,29 @@
-# SOOTBORN — changelog (latest v0.46 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.47 · 2026-11-19)
+
+## v0.47 · 2026-11-19 — Riser Nine rebuilt from the middle out
+From play notes: in the second comic level there is a lot of clipping in the middle area, and the level is very ugly and glitchy; go deep on it and improve it a lot.
+
+I went through the middle of the valley piece by piece. What was wrong:
+- **The hatch stood in the centre of the fight**, a white drum 4.6 m across with a flat orange plate on top. Every guard was herded round it and knocked into it. The camera passed straight through it, through its lid (a tall tilted slab) and through its ladder posts.
+- **Its sign had a black back** that filled the screen whenever you stood north of it, which is where the level starts.
+- **A guard who fell through anything was put back at the centre of the arena**, which was the top of the hatch.
+- **The first sun's ring was drawn through the hatch wall.** The ring of lamps was drawn through the handcart.
+- The ground was a flat green sheet with nine blue rectangles for puddles and a column of brown rectangles for a road. The sky was full of the docks' moored fleet, which has no business over this valley and read as slabs floating across the moon.
+- Last version's far lightning and ground mist could not be told from faults. Both are gone (the docks' mist too).
+
+**What it is now**
+- **The hatch is at the south end, against rock, under two old pines.** A low stone collar with bolts, the dark of the shaft, light a long way down it, a ladder head, the lid thrown back on the grass with its wheel uppermost, RISER 9 cut in a slab on the rock. Nothing there is tall enough to slice the camera.
+- **The fight is held north of it.** Guards cannot be pushed past the trodden ground in front of the hatch, and neither can Kael while a wave is up: he holds the line, he does not fight from behind it. The Captain's line was already "he does not reach the hatch".
+- **What the forty carried is set down either side:** the handcart and bundles east (solid now, not walk-through), and west a lit fire with flames and its own light, six hooded lamps round it, and three bedrolls.
+- **The forty are people now**, hooded figures carrying lamps (one in four is a child), going east along the rock into the pines. They were bare floating lamps.
+- **The meadow:** mottled turf, about 700 blades of grass in clumps, wildflowers, stones, two windfalls, round puddles in the turf colour, and a rutted road that winds down from a gap in the wood, swings wide of the pylon, and ends in the trodden ground at the hatch.
+- **The edge of the meadow is the edge of the wood:** undergrowth all the way round where there was an invisible wall in open grass, with two gilt-capped posts where the hill road comes in.
+- **The pylon** has a plinth, two gilt bands and a housing the eye looks out of. Each lamp post has a hood and throws its own teal light.
+- **The sky** is the night, the moon and the keep on its ridge.
+- The opening three panels are re-shot for the new layout.
+- Small story fix that came with it: the forty no longer leave "up the hill road", which is the road the Wardens come down. They go into the pines.
+
+**Checked by script:** the whole level start to end in the new layout (road, pump, both treelines, the eye, the ladder, the Captain); pictures of the hatch from four sides, the play camera at the start, on the road and at each task, the walkers, the pylon, the pump house, and the three opening panels; it starts and hands back inside the game frame; the docks and the Stair still run to their endings. **Not checked:** played by hand; guards' behaviour at the new southern limit in a real fight; phone frame rate with the extra grass (roughly 16,000 more triangles; the docks level draws more).
 
 ## v0.46 · 2026-11-19 — last pass of the day: hits in the 2D fights, the Assay camps and the 3D places dressed, story checked against today's changes
 From play notes: testing and final updates; make sure the story lines up; beautify all the 3D environments and the new Assay locations in 2D; animate more types of hits and combat in the 2D fights.
