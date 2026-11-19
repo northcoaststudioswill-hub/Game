@@ -42,7 +42,7 @@ const Cutscene = {
       const st = s.choice ? [{ choice: s.choice }] : s.narr ? [narr(s.narr)] : [say(s.say, s.t)];
       this.block = { type: 'dlg' }; Dialogue.start(st, () => { if (this.active) this.next(); }); return true;
     }
-    if (s.brawl !== undefined) { const d = typeof s.brawl === 'function' ? s.brawl() : s.brawl; if (!d) return false; this.hideCard(); this.block = { type: 'brawl' }; Brawl.start(d, () => { if (!this.active) return; this.next(); if (this.active && Fade.a >= 1 && !Fade.busy) { Fade.dir = -1; Fade.sp = 1.6; Fade.busy = true; } }); return true; }
+    if (s.brawl !== undefined) { const d = typeof s.brawl === 'function' ? s.brawl() : s.brawl; if (!d) return false; this.hideCard(); this.block = { type: 'brawl' }; Brawl.start(d, () => { if (!this.active) return; this.next(); if (this.active && Fade.a >= 1 && !Fade.busy) { Fade.dir = -1; Fade.sp = 1.6; Fade.busy = true; } }); Fade.a = 1; Fade.dir = -1; Fade.sp = 2.4; Fade.busy = true; return true; }
     if (s.noskip !== undefined) { this.noSkip = !!s.noskip; HUD.dirty = true; return false; }
     if (s.dlg) { this.block = { type: 'dlg' }; Dialogue.start(s.dlg, () => { if (this.active) this.next(); }); return true; }
     if (s.wait) { this.block = { type: 'wait', t: s.wait }; return true; }

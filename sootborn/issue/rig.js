@@ -135,6 +135,10 @@
       part('head', tbox(0.04, 0.1, 0.14), -0.118, 0.18, -0.03, pal.hair, null, 0.01);
       [[-0.075, 0.3, 0.07, 0.5, 0.3], [0, 0.325, 0.085, 0.62, 0], [0.075, 0.3, 0.07, 0.5, -0.3], [-0.045, 0.32, -0.01, 0.1, 0.2], [0.05, 0.315, -0.02, 0.05, -0.2], [0, 0.3, -0.09, -0.5, 0]].forEach((s, i) =>
         part('head', tbox(0.07, 0.15, 0.075, 0.12, 1), s[0], s[1], s[2], i === 2 ? pal.streak : pal.hair, [s[3], 0, s[4]], 0.014));
+      // more of it: a second row behind the first, the nape, and what falls over the band
+      [[-0.09, 0.285, -0.06, -0.25, 0.45], [0.09, 0.285, -0.06, -0.25, -0.45], [-0.035, 0.31, -0.06, -0.3, 0.12], [0.04, 0.305, -0.07, -0.35, -0.15], [-0.06, 0.2, -0.14, -0.9, 0.2], [0.06, 0.2, -0.14, -0.9, -0.2], [0, 0.17, -0.15, -1.1, 0]].forEach((s, i) =>
+        part('head', tbox(0.065, 0.13, 0.07, 0.12, 1), s[0], s[1], s[2], pal.hair, [s[3], 0, s[4]], 0.012));
+      part('head', tbox(0.05, 0.07, 0.03, 1, 0.3), -0.05, 0.225, 0.118, pal.hair, [0.25, 0, 0.3], 0.008); part('head', tbox(0.04, 0.06, 0.03, 1, 0.3), 0.065, 0.23, 0.115, pal.streak, [0.25, 0, -0.35], 0.008);
       part('head', tbox(0.258, 0.026, 0.268), 0, 0.243, -0.008, pal.band, null, 0.006);   // the band
     }
     if (sp.hair === 'tavi') {
@@ -207,6 +211,11 @@
 //@@WEAPONS
     const steel = G.toon({ color: 0xd9dde6 }), dark = G.toon({ color: 0x23232e }), gilt = G.toon({ color: 0xe8c25a });
     if (sp.armor) {
+      // ears, and hands that are hands: a thumb and a row of fingers closed on the hilt, and open on the off side
+      { const sk = G.toon({ color: sp.pal.skin || 0xe6c79a }), kn = G.toon({ color: 0xefe8d4 }); model.mats.push(sk, kn);
+        [-1, 1].forEach(k => add('head', tbox(0.03, 0.065, 0.045, 0.8, 0.7), sk, 0.119 * k, 0.135, -0.005, 0.008));
+        add('haR', tbox(0.095, 0.045, 0.06, 1, 0.85), kn, 0, -0.118, 0.03, 0.01); add('haR', tbox(0.03, 0.06, 0.045), kn, 0.052, -0.07, 0.03, 0.008);
+        [-0.03, -0.01, 0.01, 0.03].forEach((x, i) => add('haL', tbox(0.018, 0.06 - Math.abs(i - 1.5) * 0.008, 0.03, 0.7, 1), kn, x, -0.135, 0.01, 0.006)); add('haL', tbox(0.022, 0.05, 0.03, 0.7, 1), kn, 0.055, -0.09, 0.015, 0.006).rotation.z = 0.5; }
       // what the plate carries on it: gauntlet knuckles, a scabbard on the hip, the cord the washer hangs from, boot cuffs
       const dk = G.toon({ color: 0x2a2630 }), gl = G.toon({ color: 0xe8c25a }), iv = G.toon({ color: 0xefe8d4 }); model.mats.push(dk, gl, iv);
       add('haR', tbox(0.1, 0.05, 0.11), gl, 0, -0.02, 0, 0.01); add('haR', tbox(0.1, 0.04, 0.03), iv, 0, -0.09, 0.05, 0.008);

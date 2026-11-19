@@ -1,4 +1,27 @@
-# SOOTBORN — changelog (latest v0.39 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.40 · 2026-11-19)
+
+## v0.40 · 2026-11-19 — dots nearly gone, ELEVEN rebuilt as a sequence, and the open list
+From play notes and a phone screenshot: the dots are still too big and make it ugly; the ELEVEN finisher should be far cooler, in the manner of Zenless Zone Zero; do the list of open things.
+
+**Dots.** The screenshot showed why they looked so coarse: on a phone the picture is drawn small and scaled up, so every dot was scaled up with it and they covered the whole floor. They are now a faint print and not a pattern: on a phone-sized picture they are about a tenth as strong and finer; on a large screen a little stronger. The mid tone they used to make is now mostly a flat tone.
+
+**ELEVEN** (hold strike at full fury) is a sequence of about three seconds:
+1. The memory cuts in, as before.
+2. Close on Kael, low: he sinks, gold rings draw in, speed lines.
+3. The world drops to a crawl and the camera pulls out wide. Ten cuts, one after another and faster each time, through everyone within reach; he is somewhere else on each one. Each cut is counted (ONE … TEN) and the slashes and the numbers are left hanging in the air.
+4. Low angle, looking up: ELEVEN. He goes four metres up and comes down two-handed in the middle of them. Time snaps back at the hit; white flash; the ground ring goes out nine metres.
+- It hits everyone near, not one target. The last word is EVERY BREATH.
+- The hold needed is a little shorter.
+
+**The open list**
+1. **Kael's model.** Heads on every figure are properly round now (they had ten flat sides). Kael has ears, a thumb and fingers closed on the hilt, four open fingers and a thumb on the off hand, and about twice the hair: a second row, the nape, and two locks over the band.
+2. **Pictures.** The Dockmaster's Table has its own picture: the table, eleven greens in a silver dish, candles, Vant, Rook with his scar, the clerk, and the fleet moored in the window. The Island has one: the pump house, the vent stack, Teal's lamps, the apprentice with her hand on the pipe, and him in the reeds. The Island picture is used for the Riser Nine memory of Wren.
+3. **The ford** already had the Proctors' board and the cairns from v0.38 (it shares the valley). **The keep still has nothing new.**
+4. **Lock-on.** There is no room for a button, so the camera now locks on to a boss by itself when the boss fight starts, in all three levels and for Oswin's second stage.
+5. **2D into arena fights.** A fight that starts inside a scene now fades up from black over half a second. It used to cut.
+6. **Frame rate.** With Settings → Show frame time on, the third-person levels now show frames per second, average and worst frame, triangle count and picture size in the bottom left. I still cannot measure a phone from here; that readout is how you can tell me.
+
+**Checked by script:** ELEVEN from a held strike through all four stages with three guards (pictures of each stage; all three down; control returns; time back to normal); both new pictures drawn; all three levels to their endings; held jump in the game frame; Part Two builds; title cards fit. **Not checked:** played by hand; ELEVEN in motion and against a boss; whether the numbers left hanging are too much on a small screen (the last close shot is crowded); Kael's new head and hands from a good angle (my close pictures were too close to judge).
 
 ## v0.39 · 2026-11-19 — loose ends: stage two is remembered, memories from below, Petra's ending, controls written down
 From play notes: keep going on things not done and things to clean up. This round takes items I had listed as open in earlier notes.

@@ -250,7 +250,7 @@ const P2 = {
     { fade: 'out' }, { panel: null },
     // the Dockmaster's table: Vant again, Rook for the first time, and where the nine minutes came from
     { music: 'spire' }, { card: 'THE DOCKMASTER\'S TABLE', sub: 'The last night of the quarter. The High Docks.', big: 1, min: 1.5, max: 4.5 },
-    { panel: 'spire' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { panel: 'table' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'On the last night of every quarter the Dockmaster gives a dinner, and the Clerk of the Count is asked, because somebody must sign for what the docks have landed. That is how I came to sit at table with a man I had beaten in a river.' },
     { say: 'vant', t: 'Sorrel. One has not had the pleasure since the Ford. You have grown into the collar. One would not have said, that day, that you were a man for sums.' },
     { say: 'kael', t: 'One counts what is in front of one, Dockmaster.' },

@@ -199,6 +199,43 @@ const PANELS = {
     else { R(g, 208, 70, 2, 46, '#8a8478'); R(g, 205, 66, 8, 6, '#c8ccd4'); glow(g, 209, 70, 18, '255,240,200', .25 + Math.sin(t * 2) * .05); }
     if (st === 0) plate(g, 'THE DOCK STAIR', 70, 20); if (st === 2) plate(g, 'ELEVEN MINUTES', 209, 130);
   },
+  // ---- the Dockmaster's table: the last night of a quarter. White cloth, eleven kinds of greens, and the fleet in the window
+  table(g, t, st, s) {
+    const { R, glow, plate } = PX; g.fillStyle = '#2a2436'; g.fillRect(0, 0, 320, 180); R(g, 0, 0, 320, 96, '#e8e2d4'); R(g, 0, 92, 320, 4, '#e8c25a'); R(g, 0, 96, 320, 84, '#3a3048');
+    // the window: night, the moored pairs, their lamps
+    R(g, 60, 12, 200, 66, '#e8c25a'); R(g, 63, 15, 194, 60, '#0a1030'); for (let i = 0; i < 26; i++) R(g, 66 + hash(i, 4) * 188, 17 + hash(i, 5) * 30, 1, 1, `rgba(255,255,255,${.3 + .4 * Math.abs(Math.sin(t + i))})`);
+    for (let i = 0; i < 9; i++) { const x = 70 + i * 21, y = 52 + (i % 2) * 6 + Math.round(Math.sin(t * .8 + i) * 1); R(g, x, y, 15, 4, '#efe8d4'); R(g, x + 2, y + 5, 11, 3, '#4a3c30'); R(g, x + 14, y + 6, 1, 1, '#4ad8e0'); glow(g, x + 14, y + 6, 4, '90,220,230', .5); }
+    R(g, 63, 68, 194, 7, '#cfc9bc'); for (let x = 66; x < 256; x += 12) R(g, x, 64, 2, 5, '#e4dfd2'); [108, 160, 212].forEach(x => R(g, x, 15, 2, 60, '#e8c25a'));
+    // the table
+    R(g, 20, 112, 280, 10, '#f4f0e6'); R(g, 20, 112, 280, 1, '#ffffff'); R(g, 24, 122, 272, 30, '#dcd6c8'); for (let x = 30; x < 296; x += 22) R(g, x, 122, 1, 30, '#c8c2b4');
+    R(g, 130, 104, 60, 8, '#c8ccd8'); R(g, 130, 104, 60, 1, '#f0f2f8'); const GC = ['#3f9a5c', '#58b848', '#2f7a4a', '#7ac85a', '#3aa850', '#8ad06a', '#2f9646', '#5aa84a', '#4ab85a', '#6ac060', '#3f8a4c']; for (let i = 0; i < 11; i++) R(g, 133 + i * 5, 100 - (i % 3), 4, 5, GC[i]);
+    [60, 100, 220, 260].forEach((x, i) => { R(g, x, 100, 2, 12, '#e8c25a'); R(g, x - 1, 96 + Math.round(Math.sin(t * 6 + i)), 4, 4, '#ffe9a0'); glow(g, x + 1, 97, 12, '255,220,150', .35 + Math.sin(t * 5 + i) * .06); });
+    [48, 84, 206, 244, 278].forEach(x => { R(g, x, 106, 12, 3, '#ffffff'); R(g, x + 3, 104, 6, 2, '#58b848'); });
+    // who is at it: Vant at the head, Rook, and a clerk
+    const fig = (x, y, robe, hair, trim) => { R(g, x, y, 14, 22, robe); R(g, x, y, 14, 2, trim); R(g, x + 3, y - 9, 8, 9, '#f0dccc'); R(g, x + 3, y - 10, 8, 3, hair); R(g, x + 5, y - 5, 1, 1, '#e8a81c'); R(g, x + 9, y - 5, 1, 1, '#e8a81c'); glow(g, x + 7, y - 4, 12, '255,240,200', .12); };
+    fig(36, 90, '#2f8f8a', '#c8ccd4', '#e8c25a'); fig(92, 90, '#efe8d4', '#8a8a92', '#e8c25a'); fig(232, 90, '#efe8d4', '#e9cf7a', '#7a5ac8');
+    R(g, 98, 86, 1, 2, '#8a1f24');   // the scar he keeps
+    if (st === 0) plate(g, 'ELEVEN KINDS OF GREENS', 160, 164);
+  },
+  // ---- the Island, night twenty-five: the pump house, the vent stack, and an apprentice with her hand on a pipe
+  island(g, t, st, s) {
+    const { R, glow, plate } = PX; const gr = g.createLinearGradient(0, 0, 0, 180); gr.addColorStop(0, '#04060f'); gr.addColorStop(1, '#101a2c'); g.fillStyle = gr; g.fillRect(0, 0, 320, 180);
+    for (let i = 0; i < 40; i++) R(g, hash(i, 7) * 320, hash(i, 8) * 80, 1, 1, `rgba(255,255,255,${.2 + .5 * Math.abs(Math.sin(t * .7 + i))})`);
+    for (let i = 0; i < 9; i++) { const x = i * 40 - 10, h = 40 + hash(i, 9) * 30; g.fillStyle = '#0a1420'; g.beginPath(); g.moveTo(x, 110); g.lineTo(x + 18, 110 - h); g.lineTo(x + 36, 110); g.fill(); }
+    R(g, 0, 110, 320, 70, '#0e1a18'); R(g, 0, 138, 320, 42, '#122a4a'); for (let i = 0; i < 14; i++) R(g, ((i * 31 + t * 9) % 340) - 10, 142 + (i % 5) * 7, 14, 1, 'rgba(160,200,255,.3)');
+    // the pump house and its stack
+    R(g, 120, 70, 70, 44, '#5a5a66'); R(g, 120, 70, 70, 2, '#8a8a96'); R(g, 116, 64, 78, 7, '#3a3a48'); R(g, 148, 88, 14, 26, '#15151f'); R(g, 196, 30, 12, 84, '#4a4a58'); R(g, 196, 30, 2, 84, '#6a6a78'); R(g, 193, 26, 18, 5, '#3a3a48');
+    for (let i = 0; i < 6; i++) { const k = (t * .5 + i / 6) % 1; R(g, 199 + Math.sin(k * 6 + i) * 5, 24 - k * 26, 6 + k * 6, 3, `rgba(200,220,255,${.3 * (1 - k)})`); }
+    R(g, 160, 100, 46, 4, '#6a6a78'); R(g, 160, 100, 46, 1, '#9a9aa6'); R(g, 172, 96, 6, 6, '#c9923a'); glow(g, 175, 99, 8, '140,230,190', .3);
+    // House Teal's lamps, running off it
+    [[40, 96], [84, 104], [250, 100], [290, 92]].forEach((p, i) => { const on = st < 1; R(g, p[0], p[1], 2, 16, '#3a3a48'); R(g, p[0] - 2, p[1] - 5, 6, 6, on ? '#ffe090' : '#2a2a34'); if (on) glow(g, p[0] + 1, p[1] - 2, 16 + Math.sin(t * 3 + i) * 1.5, '255,220,140', .4); });
+    R(g, 28, 104, 14, 10, '#3aa8a0'); g.fillStyle = '#3aa8a0'; g.beginPath(); g.moveTo(24, 104); g.lineTo(35, 92); g.lineTo(46, 104); g.fill(); R(g, 268, 102, 14, 10, '#3aa8a0'); g.beginPath(); g.moveTo(264, 102); g.lineTo(275, 90); g.lineTo(286, 102); g.fill();
+    // her: an apprentice's grey, one hand flat on the pipe, head turned as if listening to it
+    const b = Math.round(Math.sin(t * 1.6) * .6); R(g, 212, 92 + b, 9, 18, '#8d94ac'); R(g, 212, 92 + b, 9, 2, '#e8c25a'); R(g, 214, 85 + b, 6, 7, '#f0dccc'); R(g, 213, 84 + b, 8, 3, '#b8742a'); R(g, 205, 98 + b, 8, 2, '#8d94ac'); R(g, 203, 98 + b, 3, 3, '#f0dccc'); R(g, 213, 110, 3, 6, '#3a3f5c'); R(g, 218, 110, 3, 6, '#3a3f5c'); glow(g, 204, 99, 7, '140,230,190', .35 + Math.sin(t * 4) * .1);
+    // him, in the reeds, where the light does not go
+    R(g, 96, 112, 8, 14, '#0c0c14'); R(g, 97, 106, 6, 6, '#0c0c14'); for (let i = 0; i < 10; i++) R(g, 84 + i * 4, 112 + (i % 3), 1, 14, '#1c3a2a');
+    if (st === 0) plate(g, 'THE VENT STACK', 202, 20);
+  },
   // ---- two years in the weather (0: the hidden fleet · 1: they learn to fly)
   weather(g, t, st, s) {
     const { R, glow, plate } = PX; const gr = g.createLinearGradient(0, 0, 0, 180); gr.addColorStop(0, '#2a3a7a'); gr.addColorStop(.6, '#c8a0b0'); gr.addColorStop(1, '#f0d0b0'); g.fillStyle = gr; g.fillRect(0, 0, 320, 180); glow(g, 250, 120, 80, '255,220,170', .5);

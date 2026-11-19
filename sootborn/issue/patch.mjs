@@ -19,7 +19,7 @@ between("  ember: {\n    id: 'ember'", "SC.T = {", `  ember: {
     color: 0xff5a1f, hot: 0xffd23a, css: '#ff5a1f', cssHot: '#ffd23a',
     blurb: 'Nothing clean about it. Leap, and come down on them like a lift with the cable cut.',
     passive: 'The third hit of a chain lands like a furnace door.',
-    word: 'NINE FLOORS!'
+    word: 'EVERY BREATH!'
   },
   shade: {
     id: 'shade', name: 'THE TURN', title: "ILSE'S LESSON", power: 'THE TURN', btn: 'THE<br>TURN',
@@ -95,7 +95,7 @@ rep("    SC.story.title();\n    requestAnimationFrame(frame);", `    if (SC.host
     /* inside SOOTBORN: its d-pad and buttons drive this, and it sends the memories to show */
     window.addEventListener('message', e => {
       const d = e.data; if (!d || typeof d.sootborn !== 'string' || e.source !== window.parent) return;
-      if (d.sootborn === 'assets') SC.assets = d.panels || {};
+      if (d.sootborn === 'assets') { SC.assets = d.panels || {}; SC.showFps = !!d.fps; }
       if (d.sootborn === 'in') { SC.input.ext = { x: +d.x || 0, y: +d.y || 0 }; (d.press || []).forEach(n => { SC.audio.unlock(); if (!SC.ui.key(n)) SC.input.press(n); }); }
       if (d.sootborn === 'stop') SC.audio.kill();
     });
@@ -304,7 +304,7 @@ rep("(d.press || []).forEach(", "SC.input.hold = d.hold || {}; (d.press || []).f
 rep("KeyC: 'kick', KeyV: 'hook', KeyF: 'boots',", "KeyC: 'kick', KeyV: 'hook', KeyF: 'boots', KeyT: 'jump',");
 rep("wantKick = can && inp.buffered('kick', 0.2),", "wantKick = can && inp.buffered('kick', 0.2), wantJump = can && inp.buffered('jump', 0.2),");
 rep("      if (wantKick && pl.onGround) { inp.clear('kick'); startAttack(pl.state === 'attack' && pl.combo === 3 ? 5 : 3, mx, mz, mag); }", `      if (can && inp.hold.a && pl.onGround && (free || pl.state === 'attack')) { pl.holdA = (pl.holdA || 0) + dt;
-        if (pl.path && pl.meter >= T.powerCost) { if (pl.holdA > 0.2 && ((pl.holdA * 20) | 0) % 3 === 0) FX.ring(pl.pos, 0xffd23a, 1.6 - pl.holdA * 2, 0.3, 0.18); if (pl.holdA > 0.5) { pl.holdA = 0; pl.lift = 0; inp.clear('attack'); usePower(mx, mz, mag); } }
+        if (pl.path && pl.meter >= T.powerCost) { if (pl.holdA > 0.2 && ((pl.holdA * 20) | 0) % 3 === 0) FX.ring(pl.pos, 0xffd23a, 1.6 - pl.holdA * 2, 0.3, 0.18); if (pl.holdA > 0.4) { pl.holdA = 0; pl.lift = 0; inp.clear("attack"); usePower(mx, mz, mag); } }
         else if (pl.holdA > 0.24 && !pl.heldHeavy && pl.state === 'attack' && pl.combo < 4 && pl.st >= P.ATTACK[pl.combo].hit) { pl.heldHeavy = 1; inp.clear('attack'); startAttack([6, 5, 7, 8][pl.combo], mx, mz, mag); }
       } else { pl.holdA = 0; pl.heldHeavy = 0; }
       const hc = pl.state === 'attack' ? pl.combo : -1;
@@ -409,6 +409,45 @@ rep("if (pl.cnt >= 11) { pl.cnt = 0; pl.gain(35);", "if (pl.cnt >= 11) { pl.cnt 
 rep("SC.audio.sfx('perfect'); SC.emit('speedlines', 0.8);", "SC.audio.sfx('perfect'); SC.emit('speedlines', 0.8); SC.ui.cut('THE TURN', 'NEVER GIVE GROUND');");
 rep("if (bell) { FX.ring(pl.pos, 0xffd23a, 0.5, 3.8, 0.4); SC.cam.shake(0.8); }", "if (bell) { FX.ring(pl.pos, 0xffd23a, 0.5, 3.8, 0.4); SC.cam.shake(0.8); if (pl.heldHeavy) SC.ui.cut('LAST BELL', 'FOR HER', true); }");
 
+/* ---- v0.40: ELEVEN is a sequence, not a jump. The world all but stops; ten cuts through everyone in reach, counted, left hanging in the air; the eleventh from above. ---- */
+rep("      case 'power': updatePower(dt); break;", "      case 'power': updatePower(dt, rdt); break;");
+rep("  function updatePower(dt) {", "  function updatePower(dt, rdt) {");
+between("      const up = 0.4;\n", "    } else if (pw.id === 'shade') {", `      if (!pw.init) { pw.init = 1; pw.t = 0; pw.n = 0; pw.next = 0.5; pw.pk = 0; pw.c = pl.pos.clone(); pw.ts = E.filter(e => e.hittable() && Math.abs(e.pos.y - pl.pos.y) < 2.4 && SC.dist2(e.pos.x, e.pos.z, pl.pos.x, pl.pos.z) < 9.5);
+        if (pw.ts.length) { let sx = 0, sz = 0; pw.ts.forEach(e => { sx += e.pos.x; sz += e.pos.z; }); pw.c.x = (pw.c.x + sx) / (pw.ts.length + 1); pw.c.z = (pw.c.z + sz) / (pw.ts.length + 1); }
+        SC.slowmo(0.07, 4); SC.emit('letterbox', true); SC.ui.showHud(false); SC.cam.lock = null; const c = pl.pos; SC.cam.move(v3(c.x + Math.sin(pl.yaw) * 2.6 + 1.2, c.y + 0.9, c.z + Math.cos(pl.yaw) * 2.6), v3(c.x, c.y + 1.35, c.z), v3(c.x + Math.sin(pl.yaw) * 2.1 + 1.0, c.y + 1.0, c.z + Math.cos(pl.yaw) * 2.1), v3(c.x, c.y + 1.4, c.z), 0.5, 40); SC.audio.sfx('roar'); SC.emit('speedlines', 1); }
+      pw.t += rdt || dt; const st2 = pw.t; pl.inv = Math.max(pl.inv, 0.5); pl.vel.set(0, 0, 0);
+      if (st2 < 0.5) { // the breath before: he sinks, the hook comes back, the gold draws in
+        pl.pose = SC.mixPose(P.slamDown, P.attack(0, 0.06), SC.clamp(st2 / 0.5, 0, 1)); pl.poseRate = 600; pl.lift = 0;
+        if (((st2 * 40) | 0) !== pw.rk) { pw.rk = (st2 * 40) | 0; FX.ring(pl.pos, pw.rk % 2 ? 0xffd23a : 0xffffff, 3.2 - st2 * 5.5, 0.3, 0.02); } }
+      else if (pw.n < 10) {
+        if (!pw.wide) { pw.wide = 1; const c = pw.c; SC.cam.move(v3(c.x + 6.2, c.y + 5.4, c.z + 7.4), v3(c.x, c.y + 1, c.z), v3(c.x + 4.6, c.y + 4.2, c.z + 8.6), v3(c.x, c.y + 1.1, c.z), 1.6, 50); }
+        if (st2 >= pw.next) { const ts = pw.ts.filter(e => e.state !== 'dead' && !e.gone), t = ts.length ? ts[pw.n % ts.length] : null, a = pw.n * 2.513 + 0.7, cx = t ? t.pos.x : pw.c.x, cz = t ? t.pos.z : pw.c.z, r = (t ? t.r : 0) + 1.7;
+          _b.copy(pl.pos); _b.y += 1.1; FX.burst(_b, 0xffd23a, 1.3); FX.puff(pl.pos, 2, 0.9);
+          const ox = pl.pos.x, oz = pl.pos.z; pl.pos.x = cx + Math.cos(a) * r; pl.pos.z = cz + Math.sin(a) * r; W.collide(pl.pos, pl.r, pl.pos.y, pl.h); pl.yaw = Math.atan2(ox - pl.pos.x, oz - pl.pos.z) + Math.PI;
+          _c.set(cx, pl.pos.y + 1.25, cz); FX.slash(_c, Math.atan2(pl.pos.x - ox, pl.pos.z - oz), pw.n % 2 ? 0xffffff : 0xffc23a, 6.2, (pw.n % 3 - 1) * 0.9); FX.burst(_c, 0xffffff, 1.7);
+          for (let k = 1; k < 5; k++) { _b.set(ox + (pl.pos.x - ox) * k / 5, pl.pos.y + 1.1, oz + (pl.pos.z - oz) * k / 5); FX.burst(_b, pw.n % 2 ? 0xffe9a0 : 0xffc23a, 0.6); }
+          if (t) t.hit(8, 0, 0, { quiet: true, power: true });
+          _c.y += 1.5 + (pw.n % 3) * 0.35; FX.word(['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN'][pw.n], _c, pw.n > 6 ? '#ff7a2e' : '#ffffff', 0.75 + pw.n * 0.08);
+          SC.audio.sfx('whoosh', pw.n % 3); SC.cam.shake(0.22 + pw.n * 0.05); if (pw.n === 9) SC.emit('flash', '#ffffff'); pw.n++; pw.pk = pw.n % 3; pw.next = st2 + Math.max(0.07, 0.17 - pw.n * 0.011); }
+        pl.pose = P.attack(pw.pk === 0 ? 0 : pw.pk === 1 ? 1 : 5, 0.2); pl.poseRate = 600; pl.lift = 0; }
+      else { // the eleventh
+        if (!pw.up) { pw.up = st2 + 0.12; const ts = pw.ts.filter(e => e.state !== 'dead' && !e.gone); let bx = pw.c.x, bz = pw.c.z; if (ts.length) { bx = 0; bz = 0; ts.forEach(e => { bx += e.pos.x; bz += e.pos.z; }); bx /= ts.length; bz /= ts.length; }
+          pl.pos.x = bx; pl.pos.z = bz; W.collide(pl.pos, pl.r, pl.pos.y, pl.h); const c = pl.pos; SC.cam.move(v3(c.x + 2.4, c.y + 0.5, c.z + 3.2), v3(c.x, c.y + 3.6, c.z), v3(c.x + 3.4, c.y + 1.0, c.z + 4.6), v3(c.x, c.y + 1.4, c.z), 0.8, 52);
+          _c.copy(pl.pos); _c.y += 5.4; FX.word('ELEVEN!', _c, '#ffd23a', 2.6); SC.audio.sfx('leap'); SC.emit('speedlines', 1); }
+        const k = (st2 - pw.up) / 0.62;
+        if (k < 0) { pl.pose = P.slamDown; pl.poseRate = 600; }
+        else if (k < 1) { pl.lift = k < 0.7 ? Math.sin(k / 0.7 * Math.PI / 2) * 4.2 : 4.2 * (1 - (k - 0.7) / 0.3); pl.pose = k < 0.7 ? P.attack(8, 0.2) : P.attack(4, 0.2); pl.poseRate = 600; if (((st2 * 40) | 0) % 2 === 0) { _b.copy(pl.pos); _b.y += pl.lift; FX.burst(_b, 0xffd23a, 0.8); } }
+        else { if (pw.step === 0) { pw.step = 1; pl.lift = 0; SC.time.slowT = 0; SC.time.slowK = 1; emberImpact(); SC.emit('flash', '#ffffff'); SC.time.hitstop = 0.18; SC.cam.shake(1.3); FX.ring(pl.pos, 0xffffff, 0.6, 9, 0.6); FX.light(pl.pos, 0xffd23a, 220, 0.7); } pl.pose = P.slamDown; pl.poseRate = 45; }
+        if (st2 - pw.up > 1.5) { SC.emit('letterbox', false); SC.ui.showHud(true); SC.cam.endCine(0.5); pl.setState('idle'); } }
+`);
+/* ---- dots: on a phone-sized picture they were most of the picture. They are now a faint print, and much finer. ---- */
+rep("G.uDot = { value: 5 };", "G.uDot = { value: 5 }; G.uDotK = { value: 0.3 };");
+rep("sh.uniforms.uDot = G.uDot; sh.uniforms.uKey = G.uKey;", "sh.uniforms.uDot = G.uDot; sh.uniforms.uDotK = G.uDotK; sh.uniforms.uKey = G.uKey;");
+rep("sh.fragmentShader = 'uniform float uDot;\\nuniform vec3 uKey;\\n'", "sh.fragmentShader = 'uniform float uDot;\\nuniform float uDotK;\\nuniform vec3 uKey;\\n'");
+rep("'    float scM = 1.0 - smoothstep(0.30, 0.36, scD);',", "'    float scM = mix(0.4, 1.0 - smoothstep(0.30, 0.36, scD), uDotK);',");
+rep("G.uDot.value = Math.max(2.2, Math.min(w, h) * pr / 340);", "G.uDot.value = Math.max(2, Math.min(w, h) * pr / 420); G.uDotK.value = SC.clamp((Math.min(w, h) * pr - 500) / 1400, 0.1, 0.45);");
+
+rep("const g0 = new THREE.SphereGeometry(1, 10, 7), p0 = g0.attributes.position;", "const g0 = new THREE.SphereGeometry(1, 18, 12), p0 = g0.attributes.position;");
 /* ---- the guard fights back with more than one idea ---- */
 rep("          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e);\n        }", `          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e);
           if (e.kind !== 'boss') e.sub = Math.random() < (e.kind === 'knifer' ? 0.45 : e.kind === 'bruiser' ? 0.22 : 0.3) ? 1 : 0;      // a second blow straight after the first
@@ -449,6 +488,8 @@ rep("    { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) :
       if (bn && p.state === 'idle') { bn.elR.rotation.x -= 0.55 * (1 - (U.stance || 0)); bn.shR.rotation.x += 0.12; }
       // nearly down: the rage answers once
       if (SC.state === 'play') { if (p.hp > 0 && p.hp < SC.T.hp * 0.3) { if (!U.lowCut && U.cut('ON MY BREATH', 'EVERY BREATH IS HERS', true)) { U.lowCut = 1; p.gain(40); p.inv = Math.max(p.inv, 1.2); } } else if (p.hp > SC.T.hp * 0.6) U.lowCut = 0; }
+      // frame time, when the game's own "Show frame time" is on: the only way to know how this runs on a real phone
+      if (SC.showFps) { const ms = rdt * 1000; U.ftA = (U.ftA || ms) * 0.95 + ms * 0.05; U.ftW = Math.max((U.ftW || 0) * 0.99, ms); U.ftN = (U.ftN || 0) + 1; if (U.ftN % 20 === 0) { let el = $('ft'); if (!el) { el = document.createElement('div'); el.id = 'ft'; el.style.cssText = 'position:absolute;left:4px;bottom:4px;z-index:70;font:700 10px monospace;color:#fff;background:rgba(0,0,0,.6);padding:2px 5px;pointer-events:none'; $('mem').parentNode.appendChild(el); } const r = G.renderer.info.render; el.textContent = (1000 / U.ftA).toFixed(0) + ' fps · avg ' + U.ftA.toFixed(1) + ' ms · worst ' + U.ftW.toFixed(0) + ' ms · ' + (r.triangles / 1000).toFixed(0) + 'k tris · ' + G.renderer.domElement.width + 'x' + G.renderer.domElement.height; } }
       U.lastYaw = p.yaw; }
     { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) : 0,`);
 

@@ -71,7 +71,7 @@
         { k: 'ward0', cap: 'TIER SIX. THE FEVER WARD.', cap2: 'THE NIGHT THE FEVER BROKE, TAVI ASKED FOR BREAD. I NEVER TOLD TEO THERE WAS A SHE. *THERE WERE FORTY BEDS, AND A SHE.*' }] } },
     riser: {
       yard: { fury: 1, toast: 'HANDS. *FURY.*', p: [
-        { k: 'desk3', cap: 'THIS VALLEY. NIGHT TWENTY-FIVE OF THE ASSAY.', cap2: 'AN APPRENTICE KEPT THE VENT STACK AT THIS PUMP HOUSE. SHE NEVER SAW MY FACE. *SHE PUT HER HAND ON THE PIPE THE WAY I DO.*' },
+        { k: 'island0', cap: 'THIS VALLEY. NIGHT TWENTY-FIVE OF THE ASSAY.', cap2: 'AN APPRENTICE KEPT THE VENT STACK AT THIS PUMP HOUSE. SHE NEVER SAW MY FACE. *SHE PUT HER HAND ON THE PIPE THE WAY I DO.*' },
         { k: 'furnace2', cap2: 'SEREN TAUGHT ME THAT. HANDS, KAEL. EVERYTHING IS HANDS. *I HAD NOT KNOWN ANYONE ABOVE THE ROCK COULD LEARN IT.*' }] } },
     stair: {
       yard: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
@@ -139,7 +139,7 @@
       { who: 'hero', face: 'angry', text: 'Count your guard again, Captain. You are short.' },
       { who: 'voss', text: 'Four hundred hulls and one clerk. It is *noted*. Marshal Cade will have your hands for it.' },
       { who: 'hero', face: 'smirk', text: 'He can come up the stair and ask for them.' }];
-    run([0.8, n => U.say(lines, n), n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true); e.state = 'chase'; e.st = 0; e.cool = 1.2;
+    run([0.8, n => U.say(lines, n), n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true); e.state = 'chase'; e.st = 0; e.cool = 1.2; cam.lock = e;
       S.enc = ENC.boss; ENC.boss.wave = 0; ENC.boss.wait = 0; U.boss(e, 'STAIR CAPTAIN ANSEL ROOK'); objective(); n(); }]);
   }
   /* Rook is down. The level is not over until the last pair is cut. */
@@ -319,7 +319,7 @@
         { who: 'hero', face: 'angry', text: "We've got names for everybody. Mara has a list. We'll find you one." },
         { who: 'voss', text: 'One does not kneel, and one is not sorry. *Come up.*' },
         { who: 'hero', face: 'smirk', text: "That's all right. I've done enough of both for two." }];
-      run([0.8, n => U.say(lines, n), n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true); e.state = 'chase'; e.st = 0; e.cool = 1.2;
+      run([0.8, n => U.say(lines, n), n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true); e.state = 'chase'; e.st = 0; e.cool = 1.2; cam.lock = e;
         S.enc = ENC.boss; ENC.boss.wave = 0; ENC.boss.wait = 0; U.boss(e, RIS ? 'THE WARDEN CAPTAIN' : osw ? 'OSWIN HALE · HOUSE VIOLET' : "THE AUDITOR'S BLADE"); if (osw) oswinUp(e); objective(); n(); }]);
     };
     ending = function () {
@@ -379,7 +379,7 @@
           ], n),
           n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true);
             oswinUp(e); F.oswin = 1; save(); e.armorT = 1.5; e.state = 'chase'; e.st = 0; e.cool = 0.8; e.model.face('angry');
-            FX.ring(e.pos, 0xffd23a, 0.5, 5, 0.6); FX.word('OSWIN HALE', v3(e.pos.x, 21.4, e.pos.z), '#ffe14a', 1.6); SC.audio.sfx('roar'); U.boss(e, 'OSWIN HALE · HOUSE VIOLET'); objective(); n(); }]);
+            FX.ring(e.pos, 0xffd23a, 0.5, 5, 0.6); FX.word('OSWIN HALE', v3(e.pos.x, 21.4, e.pos.z), '#ffe14a', 1.6); SC.audio.sfx('roar'); U.boss(e, 'OSWIN HALE · HOUSE VIOLET'); objective(); cam.lock = e; n(); }]);
       });
       SC.on('dazed', () => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted ? 'WIDE OPEN. GET CLOSE AND PRESS *A* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
       SC.on('secondchance', () => SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)));

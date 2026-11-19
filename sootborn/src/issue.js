@@ -9,7 +9,7 @@ const Issue = {
   on: false, el: null, done: null, ready: false, timer: 0, onMsg: null, last: '', lab: null,
   // the memories the level may show, drawn by the same panel code as the rest of the game
   LEVELS: { docks: 'The High Docks', riser: 'Riser Nine', stair: 'The Stair' },
-  PANELS: ['desk:3', 'assay:0', 'weather:2', 'under:0', 'ward:0', 'row:0', 'desk:2', 'desk:4', 'desk:5', 'ledger:2', 'freight:0', 'furnace:0', 'furnace:1', 'furnace:2', 'hands:0', 'kael:0', 'tin:0', 'lift:0', 'dockstair:0'],
+  PANELS: ['desk:3', 'assay:0', 'weather:2', 'under:0', 'ward:0', 'row:0', 'desk:2', 'desk:4', 'desk:5', 'ledger:2', 'freight:0', 'furnace:0', 'furnace:1', 'furnace:2', 'hands:0', 'kael:0', 'tin:0', 'lift:0', 'dockstair:0', 'island:0'],
   can() { if (Settings.d.issue3d === 0) return false; try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } },
   assets() {
     const out = {}, was = Panels.narrow;
@@ -33,7 +33,7 @@ const Issue = {
     const TT = { docks: ['THE HIGH DOCKS', 'Seven years from now. The second bell.'], riser: ['RISER NINE', 'Five years from now. The Assay valley, at night.'], stair: ['THE STAIR', 'Nine years from now. Sunset.'] }[key]; try { Cutscene.card(TT[0], TT[1], 1); } catch (e) { /* no title */ } this.t0 = performance.now();
     this.onMsg = e => {
       const d = e.data; if (!d || typeof d.sootborn !== 'string' || !this.el || e.source !== this.el.contentWindow) return;
-      if (d.sootborn === 'issue-ready') { this.ready = true; setTimeout(() => { if (this.el) this.el.style.opacity = 1; try { Cutscene.hideCard(); } catch (er) { /* gone */ } }, Math.max(0, 1500 - (performance.now() - this.t0))); try { this.el.contentWindow.postMessage({ sootborn: 'assets', panels: this.assets() }, '*'); } catch (er) { /* it plays without them */ } }
+      if (d.sootborn === 'issue-ready') { this.ready = true; setTimeout(() => { if (this.el) this.el.style.opacity = 1; try { Cutscene.hideCard(); } catch (er) { /* gone */ } }, Math.max(0, 1500 - (performance.now() - this.t0))); try { this.el.contentWindow.postMessage({ sootborn: 'assets', panels: this.assets(), fps: Settings.d.fps ? 1 : 0 }, '*'); } catch (er) { /* it plays without them */ } }
       if (d.sootborn === 'issue-done') this.finish(true, d.data);
     };
     window.addEventListener('message', this.onMsg);
