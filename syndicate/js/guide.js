@@ -24,7 +24,7 @@
     if (bouts(st) >= 1 && !(st.items || []).length) tips.push('Your hideout (west door) is empty: a bed there gives bonus XP');
     if (bouts(st) >= 2 && !st.talked) tips.push('People in the market will talk: try the old miner east of the lamp');
     if (open('apoth') && (st.seen || {}).apoth && st.coin >= 60 && !(st.boons || {}).tonic && bouts(st) % 2 === 0) tips.push('You can afford a tonic before your next bout');
-    if ((st.deaths || 0) >= 1 && (st.signed || st.bound) && (st.soulDebt || 0) >= 3) tips.push('You owe David ' + st.soulDebt + ' souls: he is taking a cut. Pay some down in his cellar');
+    if ((st.deaths || 0) >= 1 && (st.signed || st.bound) && (st.soulDebt || 0) >= 4) tips.push('You owe David ' + st.soulDebt + ' souls: he is taking a cut. Pay some down in his cellar');
     if (has(st, 'bed') && G.homeReady && G.homeReady(st)) tips.push('Things at home are ready before your next bout');
     const nr = nextRankLine(st); if (nr && (Math.floor(performance.now() / 9000) % 2)) tips.push(nr);
     return tips.length ? tips[Math.floor(performance.now() / 9000) % tips.length] + ' · then ' + short : base;

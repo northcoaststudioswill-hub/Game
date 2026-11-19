@@ -18,7 +18,7 @@
   function stall(p, x, z, color, goods, far) {
     far = far || 1; const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
     [-1.2, 1.2].forEach(px => { mesh(new T.CylinderGeometry(0.06, 0.06, 2.9, 5), woodD(), px, 1.45, far * 0.95, g); mesh(new T.CylinderGeometry(0.06, 0.06, 1.0, 5), woodD(), px, 0.5, -far * 0.6, g); mesh(new T.SphereGeometry(0.08, 6, 5), L(0xd9a93c), px, 1.03, -far * 0.6, g); });
-    const can = box(2.9, 0.1, 1.0, L(color), 0, 2.86, far * 0.62, g); can.rotation.x = -far * 0.2; box(2.9, 0.3, 0.06, L(color), 0, 2.58, far * 0.14, g); box(2.9, 0.07, 0.07, woodD(), 0, 2.74, far * 0.14, g);
+    box(2.9, 0.3, 0.06, L(color), 0, 2.58, far * 0.95, g); box(2.9, 0.07, 0.07, woodD(), 0, 2.86, far * 0.95, g);       // a strip of cloth on the back rail; no roof, so nobody is hidden under one
     box(2.5, 0.12, 0.9, wood(), 0, 0.9, 0.2, g); box(2.3, 0.8, 0.7, woodD(), 0, 0.45, 0.2, g);
     for (let i = 0; i < 7; i++) { const c = G.pick(goods); const b = new T.Mesh(new T.CylinderGeometry(0.07, 0.1, 0.26, 6), emis(c)); b.position.set(-1 + i * 0.33 + R(-0.05, 0.05), 1.1, 0.2 + R(-0.25, 0.25)); g.add(b); gfx.glow(c, 0.5, b.position.x, 1.15, b.position.z, g, 0.5); }
     return g;

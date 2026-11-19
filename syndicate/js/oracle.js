@@ -20,8 +20,8 @@
     look: () => ({ cls: 'sorcerer', race: (G.state.hero || {}).race || 'human', tint: { cloth: '#2a1a3a', armor: '#1a1024', armor2: '#120a1a', trim: '#f0c95a', hair: '#e8e2f4' }, cos: { head: 'widehat', back: 'greatcloak', aura: 'gold' } }),
     deaths: st => st.deaths || 0, debt: st => st.soulDebt || 0, bound: st => !!st.bound, signed: st => !!st.signed,
     // his cut of every purse while you owe him
-    cut: st => { const d = st.soulDebt || 0; return d >= 6 ? 0.2 : d >= 3 ? 0.1 : 0; },
-    price: st => 120 + 30 * Math.max(0, (st.soulsPaid || 0))
+    cut: st => { const d = st.soulDebt || 0; return d >= 8 ? 0.1 : d >= 4 ? 0.05 : 0; },
+    price: st => 70 + 15 * Math.max(0, (st.soulsPaid || 0))
   };
   const O = G.oracle;
   O.known = st => (st.deaths || 0) >= 1 || !!st.davidCall;      // he can also send for you, if you insist on staying alive
@@ -112,7 +112,7 @@
     if (h1) h1.textContent = 'Death'; if (ov) ov.textContent = 'The pit keeps what it kills';
     if (q) q.textContent = r.forfeit ? 'There is no yielding in the Blood Pit. You lower your guard, and ' + r.opp.name + ' does what the crowd paid for.' : r.opp.name + ' does not stop when you fall. Nobody down here does. The last thing you hear is the crowd.';
     cardEl.querySelectorAll('.rewards i').forEach(i => { if (/stretcher/.test(i.textContent)) i.textContent = 'taken from your body'; });
-    cardEl.querySelectorAll('p.dim').forEach(p => { if (/Losing costs you/.test(p.textContent)) p.innerHTML = 'Death takes your purse, your streak and a little of your name. Coin in a strongbox at home is safe. <b>Deaths: ' + O.deaths(st) + '</b>.'; });
+    cardEl.querySelectorAll('p.dim').forEach(p => { if (/Losing costs you/.test(p.textContent)) p.innerHTML = 'Death takes half your purse and a little of your name. A strongbox at home saves most of it. He turns the clock back one day, so nobody above the cellar remembers you fell. <b>Deaths: ' + O.deaths(st) + '</b>.'; });
     const ok = cardEl.querySelector('#ok'); if (!ok) return;
     const nb = ok.cloneNode(true); nb.textContent = 'Go into the dark'; ok.parentNode.replaceChild(nb, ok);
     nb.addEventListener('click', () => { G.audioInit(); G.sfx('ui'); ui.close(); O.revive(() => ui.levelCheck()); });

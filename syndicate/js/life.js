@@ -129,7 +129,7 @@
     const bx = new T.Group(), bp = at(4.3, 0, 3.5); bx.position.set(bp[0], bp[1], bp[2]); bx.rotation.y = rotY; s.add(bx);
     box(4.4, 1.3, 1.8, gfx.lambert(0x4a4448), 0, 0.65, 0, bx); box(4.7, 0.16, 2.1, L(0x2a2428), 0, 1.36, 0, bx); box(4.6, 0.5, 0.14, L(0x5a1f7a), 0, 1.05, 0.98, bx); box(4.6, 0.08, 0.16, gold, 0, 1.32, 0.98, bx); box(4.6, 0.08, 0.16, gold, 0, 0.78, 0.98, bx);
     [[-2.1, 0.85], [2.1, 0.85], [-2.1, -0.85], [2.1, -0.85]].forEach(q => mesh(new T.CylinderGeometry(0.07, 0.07, 2.9, 6), gold, q[0], 2.85, q[1], bx));
-    const can = box(4.8, 0.12, 2.3, L(0x5a1f7a), 0, 4.32, 0, bx); can.rotation.x = 0.12; box(4.8, 0.36, 0.08, gold, 0, 4.05, 1.14, bx);
+    box(4.8, 0.36, 0.08, gold, 0, 4.25, -0.85, bx);
     [-2.2, 2.2].forEach(x => box(0.5, 2.4, 0.08, L(0x471862), x, 3.0, -0.9, bx));
     box(0.9, 1.5, 0.2, L(0x2a1438), 0, 2.2, -0.6, bx); box(0.9, 0.16, 0.8, L(0x5a1f7a), 0, 1.86, -0.2, bx); [-0.5, 0.5].forEach(x => { box(0.12, 0.5, 0.8, gold, x, 2.05, -0.2, bx); mesh(new T.SphereGeometry(0.1, 6, 5), gold, x, 3.0, -0.6, bx); });
     const mkBox = (look, x, z, rot) => { const c = G.makeChar(look); c.root.position.set(x, 1.44, z); c.root.rotation.y = rot; bx.add(c.root); return c; };

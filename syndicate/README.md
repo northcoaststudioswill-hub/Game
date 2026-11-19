@@ -360,3 +360,13 @@ Found with a frame-by-frame detector that flags any joint, facing or position th
 ## Latest pass: the Hour Garden
 
 Refusing David's contract now has teeth. Die unsigned and he does not carry you back: he opens a door on a walled garden in blossom and puts you in with ten souls. They come one at a time, your wounds carry over, and you get a little breath back between them. Survive all ten and you wake in the pit. Die in the garden and the game is over: the save is erased. You can still sign at the garden door instead. He no longer binds you automatically on a third death.
+
+## Latest pass: debts and choices
+
+- **Dying costs less.** You lose half your purse, not all of it, and less respect. A strongbox at home now works just by being there: you lose 15% instead of half. David's cut starts later and is smaller, and souls are cheaper to buy back.
+- **Collectors.** Owe David three souls or more and he sends somebody to your home with a note. Pay for a soul, or throw them out in a fight to the yield.
+- **A first choice.** Before your first bout you choose one of three weapons and a bent (Tough, Quick, Sharp or Canny). The Armoury opens after your first win, and any weapon can be honed three times.
+- **Blood matters.** Each race has a trait, shown when you choose it and on your sheet.
+- **The open card.** At the top of the Ledger: a fresh generated fighter at any rank you have cleared, for coin.
+- **Marc** has more to say, and three wins in a row at his table make him turn it over and ask you outside.
+- Stall roofs and the Guild box canopy are gone. The codex explains how nobody remembers you dying: David turns the day back.

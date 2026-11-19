@@ -540,6 +540,7 @@
   }
   function interrupt(e) { if (e.state === 'wind' || e.state === 'recover') { e.state = 'idle'; e.act = null; e.z = 0; } e.chain = null; }
   function ko(e) {
+    if (e.isPlayer && e.endure && phase === 'fight' && !F.ex) { e.endure = 0; e.hp = Math.max(1, Math.round(e.maxHp * 0.12)); e.st = {}; e.iframe = 0.9; text(e, 'RELENTLESS', '#ffb070', true); fx.push({ k: 'ring', x: e.x, y: e.y, r: 150, col: '#ffb070', t: 0, life: 0.5 }); G.sfx('cheer'); addHype(8); return; }       // half-orc blood: once a bout, the blow that should end it does not
     if (e.isPlayer && e.borrow && phase === 'fight' && !opp.spar && !F.ex) {       // Borrowed Time: the Oracle's clock skips back, on account
       e.borrow = 0; e.hp = Math.round(e.maxHp * 0.33); e.st = {}; e.iframe = 1.1; e.poise = e.maxPoise; text(e, 'TIME TURNS BACK', '#c8a0ff', true);
       fx.push({ k: 'ring', x: e.x, y: e.y, r: 260, col: '#c8a0ff', t: 0, life: 0.7 }); fx.push({ k: 'ring', x: e.x, y: e.y, r: 140, col: '#ffffff', t: -0.1, life: 0.5 }); flashLight(e.x, e.y, '#c8a0ff', 120); slowT = 0.6; hitstop = Math.max(hitstop, 0.2); G.sfx('holy'); G.sfx('bell');
@@ -1091,8 +1092,8 @@
     if (win) r.coin += tossed;
     if (result.forfeit) { r.xp = 0; r.coin = 0; }
     if (!win) {                                  // a lost bout is a death: the purse goes, and some of the name with it
-      r.lost = st.coin; st.coin = 0; st.deaths = (st.deaths || 0) + 1; st.soulDebt = (st.soulDebt || 0) + 1;
-      const floor = G.RANKS[G.rankOf(st.respect)].at; st.respect = Math.max(floor, st.respect - Math.max(4, Math.round((st.respect - floor) * 0.25)));
+      r.lost = Math.round(st.coin * (G.owned(st).strongbox ? 0.15 : 0.5)); st.coin -= r.lost; st.deaths = (st.deaths || 0) + 1; st.soulDebt = (st.soulDebt || 0) + 1;
+      const floor = G.RANKS[G.rankOf(st.respect)].at; st.respect = Math.max(floor, st.respect - Math.max(3, Math.round((st.respect - floor) * 0.12)));
     }
     r.mortal = win ? (M ? M.name : G.MORTAL[P.cls].name) : null;
     if (win && G.deeds) { G.deeds.bump('win'); G.deeds.bump('mortal'); if (P.hp >= P.maxHp) G.deeds.bump('flawless'); if (hy >= 100) G.deeds.bump('hype100'); } gfx.cine = null; G.afterFight = true;

@@ -14,7 +14,7 @@
     card: ['Three bouts tonight on the undercard. They fight while you fight. I watch both. I am very talented.', 'Pick a winner, bro. Or do not, and be poor. Up to you.'],
     self: ['You want to bet on YOURSELF? Bro. That is either heart or brain damage. I will take it.']
   };
-  const say = k => pick(SAY[k]);
+  const say = k => { if (G.marcSaid) G.marcSaid(k); return pick(SAY[k]); }; G.marcSAY = SAY;
   const NAMES = [['Hod', 'the Lamplighter'], ['Sela', 'Two-Rings'], ['Big Orrin', ''], ['Crow', 'of the Ninth Stair'], ['Mags', 'Ironside'], ['Thimble', ''], ['Dray', 'the Unpaid'], ['Wick', ''], ['Bess', 'Coldwater'], ['Old Pell', ''], ['Varn', 'Half-Hand'], ['Juniper', 'Slate'], ['Kettle', ''], ['Roan', 'the Quiet']];
   const ENDS = ['put {l} into the wall in the second exchange.', 'bled {l} out slowly. The crowd got restless.', 'took one clean shot from {l} and answered with six.', 'was losing badly until {l} whiffed a finisher.', 'parried everything {l} had. It was honestly rude.', 'won ugly. {l} will not be fighting again.', 'ended it with a single mortal blow. {l} never saw it.'];
 

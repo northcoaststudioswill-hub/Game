@@ -644,3 +644,6 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .fallen i { width: 2.2rem; text-align: right; color: #9a8f7a; font-style: normal; font-size: 0.75rem; } .fallen b { color: #e8a09a; text-decoration: line-through; text-decoration-color: #b03020; } .fallen small { color: #b8ad98; font-size: 0.74rem; }
 .opp button.mini[data-low] { margin-left: 0.5rem; }
 .gpips { margin: 0.5rem 0; } .card.gameover h2 { color: #ff8a80; }
+.made-g { display: flex; flex-wrap: wrap; gap: 0.4rem 0.6rem; margin: 0.2rem 0 0.6rem; } .made-g span { flex: 1 1 9rem; padding: 0.4rem 0.6rem; border: 1px solid rgba(201, 160, 64, 0.3); border-radius: 0.4rem; background: rgba(0, 0, 0, 0.22); }
+.made-g small { display: block; color: #9a8f7a; font-size: 0.62rem; letter-spacing: 0.1em; } .made-g b { color: #fff3cf; } .made-g i { display: block; font-style: normal; font-size: 0.76rem; color: #cfc4ab; }
+.opencard { margin: 0.2rem 0 0.6rem; padding: 0.5rem 0.7rem; border: 1px solid rgba(201, 160, 64, 0.3); border-radius: 0.4rem; background: rgba(0, 0, 0, 0.22); } .opencard small { margin-left: 0.5rem; color: #b8ad98; } .opencard .slots { margin-top: 0.4rem; flex-wrap: wrap; } .opencard .slot i { display: block; font-style: normal; font-size: 0.66rem; color: #b8ad98; }
