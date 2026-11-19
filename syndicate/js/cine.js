@@ -67,7 +67,7 @@
         update: (p) => { shoot(V([0.6, 0.7, 10.5], [-0.2, 1.3, 6.2], ease(p)), V([0, 1.9, -0.4], [0, 1.75, -0.4], p), lerp(40, 32, p), 0.02 - p * 0.04); throne().update(now); }
       },
       {
-        dur: 5.4, cut: true, text: 'Nothing is done above without their seal. So everything they forbid is done below. And they allow it.',
+        dur: 5.4, cut: true, text: 'Across the Kingdom of United Realms nothing is done without their seal. So everything they forbid is done below. And they allow it.',
         update: (p) => { const th = lerp(-0.5, 0.5, ease(p)); shoot([Math.sin(th) * 5.6, lerp(2.6, 2.0, p), Math.cos(th) * 5.6 + 0.2], [0, 1.7, -0.2], lerp(34, 29, p), 0.03); throne().update(now); }
       },
 
@@ -84,22 +84,27 @@
       },
       // low orbit around the Guildmaster
       {
-        dur: 5.2, cut: true, text: 'The Deep Guild writes every debt in the Blood Ledger. The Guild always collects.',
+        dur: 5.6, cut: true, text: 'The Deep Guild writes every debt in the Blood Ledger, and beside it every name the pit has finished. The Guild always collects.',
         update: (p, dt) => { const th = lerp(0.8, 1.5, ease(p)), r = lerp(3.3, 2.4, p); shoot([GM[0] + Math.cos(th) * r, lerp(1.0, 1.55, p), GM[2] + Math.sin(th) * r], [GM[0], lerp(1.5, 1.35, p), GM[2]], lerp(46, 34, p), -0.07); hub().update(now, dt); }
       },
       // the underworld at work: Marc's table, the dice of light, and the Wardens taking the Crown's tenth
       {
-        dur: 4.8, cut: true, text: 'Dice. Coin. Unsealed steel. Whatever is forbidden above is for sale beneath one lamp.',
-        update: (p, dt) => { shoot(V([22.6, 2.5, 5.2], [24.3, 2.0, 2.9], ease(p)), [25.7, 1.15, -0.1], lerp(48, 36, p), 0.04 - p * 0.06); hub().update(now, dt); }
+        dur: 5.4, cut: true, text: 'Marc dé Fleuprau keeps the corner table. Dice, wagers on tonight’s bouts, and loans you will live to regret.',
+        update: (p, dt) => { shoot(V([22.4, 2.7, 5.4], [24.2, 3.1, 3.3], ease(p)), [25.7, lerp(1.25, 1.1, p), -0.1], lerp(48, 38, p), 0.04 - p * 0.06); hub().update(now, dt); }
       },
       {
         dur: 4.4, cut: true, text: 'At the foot of the Long Stair, the throne’s Wardens count their tenth, and look away.',
         update: (p, dt) => { shoot(V([5.8, 0.8, 12.0], [3.9, 1.4, 13.0], ease(p)), [-0.9, lerp(2.2, 1.8, p), 14.5], lerp(52, 42, p), -0.06 + p * 0.05); hub().update(now, dt); }
       },
+      // Tallow Row: a slow walk down the alley to the blue door at the end
+      {
+        dur: 5.6, cut: true, text: 'Down Tallow Row the ones who owe live door to door. Washing on the line. Supper on the sill. A debt behind every lamp.',
+        update: (p, dt) => { shoot(V([-2.2, 3.3, 24.9], [-4.6, 2.8, 24.3], ease(p)), V([-5.6, 1.9, 17.6], [-9.6, 1.7, 18.3], ease(p)), lerp(54, 46, p), 0.03 - p * 0.05); hub().update(now, dt); }
+      },
       // smash cut: the crowd, then whip down into the pit
       {
         dur: 4.2, cut: true, text: 'Cannot pay in coin? You pay in the pit.',
-        setup: () => { toArena(1); G.sfx('bell'); G.sfx('crowd'); flash(0.8); },
+        setup: () => { toArena(1); if (arena.remains) arena.remains(6); G.sfx('bell'); G.sfx('crowd'); flash(0.8); },
         update: (p) => {
           const w = easeOut(cl((p - 0.38) / 0.4));
           shoot(V([2, 4.6, -5.2], [6.5, 2.4, 6.5], w), V([1.2, 4.2, -11], [0, 0.9, 0], w), lerp(38, 50, w), (1 - w) * 0.12);
@@ -107,6 +112,12 @@
         }
       },
 
+      // the pit itself: low along the west wall, past the spikes and what last night left
+      {
+        dur: 5.2, cut: true, text: 'Nine gates. Iron spikes set in the walls. And whatever is left of last night, still lying on the sand.',
+        setup: () => { arena.setHype(0.35); },
+        update: (p) => { const k = ease(p); shoot(V([-3.4, 0.55, 6.2], [-4.6, 1.25, -1.6], k), V([-8.0, 1.3, 3.4], [-8.0, 1.2, -2.6], k), lerp(56, 46, p), 0.05 - p * 0.09); }
+      },
       // ---- montage: STEEL — a leaping slam straight at the lens
       {
         dur: 4.8, cut: true, card: 'Steel',
@@ -130,7 +141,8 @@
           at('fb', 1.7, () => F.exCast(A, 'fireball')); at('slow', 2.3, () => { F.speed = 0.14; }); at('norm', 3.35, () => { F.speed = 1; });
           at('chaos', 3.7, () => F.exCast(A, 'chaos_bolt')); at('frost', 4.3, () => F.exCast(A, 'ray_frost')); at('bolt2', 4.9, () => F.exCast(A, 'lightning_bolt'));
           const k = cl(t / 5.4), a = wp(A), b = wp(B), m = ease(cl((t - 0.2) / 2.6));
-          shoot(V([-5.6, 1.1, 4.4], [0.4, 3.6, 7.2], ease(k)), V(a, [(a[0] + b[0]) / 2, 1.0, (a[2] + b[2]) / 2], m), lerp(44, 58, k), 0.05 - k * 0.08);
+          if (gfx.portrait) { const dx = a[0] - b[0], dz = a[2] - b[2], d = Math.hypot(dx, dz) || 1, r = lerp(2.2, 3.0, ease(k)); let cx = a[0] + dx / d * r - dz / d * 0.9, cz = a[2] + dz / d * r + dx / d * 0.9; const cr = Math.hypot(cx, cz); if (cr > 7.0) { cx *= 7.0 / cr; cz *= 7.0 / cr; } shoot([cx, lerp(2.2, 3.6, ease(k)), cz], [(a[0] + b[0]) / 2, 1.0, (a[2] + b[2]) / 2], lerp(40, 46, k), 0.03 - k * 0.05); }
+          else shoot(V([-5.6, 1.1, 4.4], [0.4, 3.6, 7.2], ease(k)), V(a, [(a[0] + b[0]) / 2, 1.0, (a[2] + b[2]) / 2], m), lerp(44, 58, k), 0.05 - k * 0.08);
         }
       },
       // ---- FAITH — spiral crane above the dawn-burst
@@ -175,7 +187,7 @@
 
       // hero shot: ground-level dolly zoom up at the champion
       {
-        dur: 7, cut: true, text: 'Seven years. One champion. Vexa, the Pale Queen. She wears the Guttercrown.',
+        dur: 7, cut: true, text: 'The names behind the gates change every season. One has not, in seven years. Vexa, the Pale Queen. She wears the Guttercrown.',
         setup: () => { F.speed = 1; arena.setHype(0.2); G.sfx('bell'); },
         update: (p) => {
           const A = ex.A, v = wp(A, 0), d = lerp(5.2, 2.7, ease(p));
@@ -195,17 +207,27 @@
           shoot(V([v[0] + 1.6, 0.6, v[2] + 1.6], [11.5, 11, 11.5], k), V(v, [0, 0.5, 0], k), lerp(56, 46, k), (1 - k) * 0.05);
         }
       },
+      // the other debt: the Hour Garden, and the man who owns the hours
+      {
+        dur: 6.4, cut: true, text: 'And if the pit kills you? There was a war with Eireania once. The wizard who sold both crowns their yesterdays was put below.',
+        setup: () => { F.exStop(); ex = null; arena.setHype(0); arena.flash.intensity = 0; if (arena.cineWall) arena.cineWall(false); if (arena.garden) arena.garden(true); G.sfx('holy'); flash(0.9); },
+        update: (p) => { const k = ease(p); shoot(V([2.6, 0.8, 2.6], [-2.6, 1.5, -2.2], k), V([-8.6, 2.0, -8.2], [-9.8, 3.4, -9.8], k), lerp(60, 52, p), 0.02); if (arena.update) arena.update(now); }
+      },
+      {
+        dur: 6.6, cut: true, text: 'David Roseinbeirg keeps the hours. Sign, and he sells you yesterday back. Refuse, and you fight ten souls in his garden while he watches from his gold.',
+        update: (p) => { const k = ease(p); shoot(V([-4.2, 4.8, -4.2], [-5.6, 5.5, -5.6], k), V([-9.8, 5.4, -9.8], [-9.8, 5.6, -9.8], k), lerp(48, 40, p), -0.02); if (arena.update) arena.update(now); }
+      },
       // the quiet beat: pulling back out of the bare house
       {
-        dur: 5.6, text: 'The Guild lent you a cave, a rusted blade, and a debt you will never pay in coin.',
-        setup: () => { F.exStop(); arena.setHype(0); savedItems = G.state.items; G.state.items = []; const h = W.get('hideout'); gfx.setScene(h.scene); h.refresh(); hideRegulars(); if (!caveL) { caveL = new T.PointLight(0xffb070, 26, 14, 1.5); caveL.position.set(3.2, 2.6, 3.0); } h.scene.add(caveL); },
-        update: (p, dt) => { shoot(V([5.2, 2.0, 5.0], [9.8, 4.4, 9.4], ease(p)), V([1.6, 0.5, 1.2], [2.6, 0.3, 2.0], p), lerp(52, 42, p), 0); W.get('hideout').update(now, dt); }
+        dur: 5.6, cut: true, text: 'The Guild lent you the last door on Tallow Row, a rusted blade, and a debt you will never pay in coin.',
+        setup: () => { F.exStop(); if (arena && arena.garden) arena.garden(false); flash(0.5); arena.setHype(0); savedItems = G.state.items; G.state.items = []; const h = W.get('hideout'); gfx.setScene(h.scene); h.refresh(); hideRegulars(); if (!caveL) { caveL = new T.PointLight(0xffb070, 26, 14, 1.5); caveL.position.set(3.2, 2.6, 3.0); } h.scene.add(caveL); },
+        update: (p, dt) => { shoot(V([7.4, 3.4, 7.2], [10.4, 5.6, 10.0], ease(p)), V([2.4, 0.9, 2.0], [2.8, 0.5, 2.4], p), lerp(52, 44, p), 0); W.get('hideout').update(now, dt); }
       },
       // the rush: sprint down the street and into the black of the gate
       {
         dur: 4.3, cut: true, text: 'Tonight, your name was entered.',
         setup: () => { restoreItems(); gfx.setScene(hub().scene); hideRegulars(); },
-        update: (p, dt) => { const k = easeIn(p); shoot(V([13, 1.5, 9.5], [5, 1.45, -0.7], k), [5, lerp(1.9, 1.5, p), -1.6], lerp(38, 86, k), Math.sin(p * 9) * 0.02 * (1 - p)); gfx.cam.shake = k * 0.12; hub().update(now, dt); }
+        update: (p, dt) => { const k = easeIn(p); shoot(V([13, 1.5, 9.5], [5, 1.6, 1.5], k), [5, lerp(1.9, 1.7, p), -1.6], lerp(38, 72, k), Math.sin(p * 9) * 0.02 * (1 - p)); gfx.cam.shake = k * 0.12; hub().update(now, dt); }
       },
       { dur: 4.4, black: true, logo: true, cut: true, setup: () => { gfx.cam.shake = 0; G.sfx('boom'); G.sfx('bell'); flash(0.9); } }
     ];
@@ -237,7 +259,7 @@
   function finish() {
     if (!C.active) return;
     C.active = false; F.exStop(); restoreItems(); gfx.cine = null; try { localStorage.setItem('guttercrown_intro_seen', '1'); } catch (er) { }
-    const a = W.cache.arena; if (a) { a.flash.intensity = 0; a.setHype(0); if (a.cineWall) a.cineWall(false); } if (royal) royal.cineWall(false);
+    const a = W.cache.arena; if (a) { a.flash.intensity = 0; a.setHype(0); if (a.cineWall) a.cineWall(false); if (a.garden && a.inGarden && a.inGarden()) a.garden(false); } if (royal) royal.cineWall(false);
     gfx.cam.shake = 0; el.remove(); const d = onDone; onDone = null; if (d) d();
   }
   C.skip = finish; C.where = () => ({ idx, t, n: shots ? shots.length : 0, dur: shots && shots[idx] ? shots[idx].dur : 0 });

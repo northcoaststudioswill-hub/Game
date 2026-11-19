@@ -408,3 +408,7 @@ What is in your hand now has its own way of ending a bout. When a kill lands the
 | Cleric and druid staves | Swept and Staved | Legs swept, then the butt comes down |
 
 The weapon left in the body is a copy of the one you were carrying. Casters with bolts, orbs and rods keep their spell finishers.
+
+## Opening cinematic (reshot)
+
+22 shots, about two minutes; tap advances a shot, hold skips the film. New beats: the Kingdom of United Realms, the Guild's list of the fallen, Marc dé Fleuprau's table (bets and loans), Tallow Row, the spiked pit with last night's remains, the changing names behind the nine gates, the war with Eireania, and David Roseinbeirg in the Hour Garden. Every shot is framed for 16:9 and for phone portrait; the Flame bout uses an over-the-shoulder camera on tall screens.
