@@ -1,4 +1,4 @@
-# SOOTBORN — changelog (latest v0.51 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.52 · 2026-11-19) 
 
 ## v0.52 · 2026-11-19 — the docks would not start in v0.50: found
 From playing v0.50: nobody on the docks ever came, and the gate stayed shut.
