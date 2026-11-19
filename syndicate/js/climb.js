@@ -1,27 +1,28 @@
 // Guttercrown — the long climb: undercard bouts between the named fighters, ten levels, and a market that opens up as you earn it
 (function () {
   const G = window.G, ui = G.ui, show = (h, c) => ui._show(h, c), on = (s, f) => ui._on(s, f);
-  const NEED = [2, 3, 3, 4, 4], GATES = G.OPPONENTS.slice(0, 5), BASE = GATES.length;
-  const U = st => st.under || (st.under = [0, 0, 0, 0, 0]);
+  const NEED = [2, 2, 2, 3, 3, 3, 3, 3, 4], GATES = G.OPPONENTS.slice(0, 9), BASE = GATES.length, OLD = [0, 2, 4, 6, 8];
+  // a save from the five-name ladder keeps its place: the four new names it has already climbed past are marked as beaten before its time
+  const U = st => { if (!st.under) st.under = Object.keys(st.wins || {}).length && !st.wins.dolly && !st.wins.ansel ? [0, 0, 0, 0, 0] : NEED.map(() => 0); if (st.under.length < NEED.length) { const o = st.under, n = NEED.map(() => 0); OLD.forEach((t, i) => { n[t] = Math.min(NEED[t], o[i] || 0); }); [1, 3, 5, 7].forEach(t => { const nx = GATES[t + 1]; if (st.wins[nx.id] || n[t + 1] > 0) { n[t] = NEED[t]; if (!st.wins[GATES[t].id]) { st.wins[GATES[t].id] = 1; (st.before = st.before || {})[GATES[t].id] = 1; } } }); st.under = n; } return st.under; };
   const rankName = i => G.RANKS[i].name;
 
   // ------------------------------------------------------------ a longer ladder
   // the named five are stronger now: you reach them with more levels behind you
-  { const LV = [1, 3, 5, 6, 8], HP = [1.34, 1.24, 1.2, 1.14, 0.94], DM = [1.34, 1.4, 1.44, 1.44, 1.22], GD = [0.3, 0.4, 0.3, 0.6, 0.45], PR = [0.06, 0.12, 0.1, 0.2, 0.28], AG = [0.62, 0.66, 0.7, 0.74, 0.82]; GATES.forEach((o, i) => { o.level = LV[i]; o.hpMul = +(o.hpMul * HP[i]).toFixed(2); o.dmgMul = +(o.dmgMul * DM[i]).toFixed(2); o.ai = Object.assign({}, o.ai, { react: +(o.ai.react * 0.82).toFixed(2), aggro: Math.max(o.ai.aggro, AG[i]), guard: GD[i], parry: PR[i] }); o.respect0 = o.respect; o.respect = Math.round(o.respect * 0.55); }); }   // respect is spread over four times as many bouts
+  { const LV = [1, 2, 3, 4, 5, 6, 6, 7, 8], HP = [1.34, 1, 1.24, 1, 1.2, 1, 1.14, 1, 0.94], DM = [1.34, 1, 1.4, 1, 1.44, 1, 1.44, 1, 1.22], GD = [0.3, 0.35, 0.4, 0.35, 0.3, 0.45, 0.6, 0.5, 0.45], PR = [0.06, 0.09, 0.12, 0.11, 0.1, 0.15, 0.2, 0.24, 0.28], AG = [0.62, 0.64, 0.66, 0.68, 0.7, 0.72, 0.74, 0.78, 0.82]; GATES.forEach((o, i) => { o.level = LV[i]; o.hpMul = +(o.hpMul * HP[i]).toFixed(2); o.dmgMul = +(o.dmgMul * DM[i]).toFixed(2); o.ai = Object.assign({}, o.ai, { react: +(o.ai.react * 0.82).toFixed(2), aggro: Math.max(o.ai.aggro, AG[i]), guard: GD[i], parry: PR[i] }); o.respect0 = Math.round(o.respect * 0.62); o.respect = Math.round(o.respect * 0.55 * 0.62); o.xp = Math.round(o.xp * 0.62); o.coin = Math.round(o.coin * 0.7); }); }       // nine names now, so each pays a little less   // respect is spread over four times as many bouts
 
   const rng = seed => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   const FIRST = ['Tam', 'Odger', 'Nell', 'Brisk', 'Hob', 'Cray', 'Wenna', 'Stitch', 'Lodd', 'Marnie', 'Pike', 'Sorrel', 'Duff', 'Ketch', 'Jory', 'Mab', 'Crick', 'Tansy', 'Garl', 'Ibb', 'Roon', 'Hesper'];
   const LAST = ['the Late Payer', 'Three-Loans', 'of the Wet Stair', 'Sootfoot', 'the Understudy', 'Lampless', 'Pawnticket', 'of the Second Shift', 'Borrowed-Boots', 'the Hopeful', 'Shortweight', 'of Nobody’s Stable', 'Half-a-Chance', 'the Substitute'];
-  const TITLE = ['a debtor on the first page', 'a pit-hand with ideas', 'a Guild bruiser on wages', 'a name the gate-men know', 'one bout from the champion’s card'];
+  const TITLE = ['a debtor on the first page', 'a scrapper off the heap', 'a pit-hand with ideas', 'somebody’s hired knife', 'a Guild bruiser on wages', 'a name with a patron', 'a name the gate-men know', 'a veteran of the upper card', 'one bout from the champion’s card'];
   const TAUNT = ['They told me you were new. So am I. One of us stops being new tonight.', 'I owe less than you do. I checked.', 'The Keeper said win two and they will feed me. So.', 'Do not take it personal. I have a landlord.', 'My brother fought here. Ask the sand where he is.', 'I am only on the undercard until somebody notices me. Notice me.', 'You hit me, I hit you, the crowd throws coin. Simple trade.', 'I have been practising on rats. Big ones.', 'Somebody bet a week’s wages on me. I think it was me.', 'After you, the Guild says I get a real name on the board.'];
   const PAL = [['#5b4a2a', '#4a4031'], ['#3a4a3a', '#3a3a30'], ['#4a3a4a', '#35303a'], ['#5a3a2a', '#40342c'], ['#2f4450', '#333a40'], ['#55452f', '#3d362c']];
   const cache = {};
   function make(t, k) {
     const key = t + '_' + k + (k >= NEED[t] && G.state && G.state.hero ? '_' + G.state.hero.level : ''); if (cache[key]) return cache[key];
     const g = GATES[t], r = rng(t * 4099 + k * 131 + 7), pick = a => a[Math.floor(r() * a.length)], cls = pick(G.FOE_CLASSES || ['fighter', 'rogue', 'sorcerer', 'cleric']), C = G.CLASSES[cls], extra = k >= NEED[t], kk = Math.min(k, 4);
-    const sub = t >= 3 ? pick(Object.keys(C.subs)) : null, known = C.start.slice(0, 2).concat(t >= 1 ? [C.l2[Math.floor(r() * C.l2.length)]] : [], sub ? [C.subs[sub].ability] : []).filter(id => G.ABILITIES[id]);
+    const sub = t >= 6 ? pick(Object.keys(C.subs)) : null, known = C.start.slice(0, 2).concat(t >= 2 ? [C.l2[Math.floor(r() * C.l2.length)]] : [], sub ? [C.subs[sub].ability] : []).filter(id => G.ABILITIES[id]);
     const arms = (G.ARMS || []).filter(w => w.cls === cls), pal = pick(PAL), name = pick(FIRST) + ' ' + pick(LAST), pay = extra ? 0.6 : 1;
-    const o = { id: 'u' + t + '_' + k, name, title: TITLE[t], cls, race: pick(Object.keys(G.RACES)), level: Math.max(1, g.level - 1, extra && G.state && G.state.hero ? G.state.hero.level - 2 : 0), sub, known, arm: t >= 2 && arms.length ? pick(arms).id : null,
+    const o = { id: 'u' + t + '_' + k, name, title: TITLE[t], cls, race: pick(Object.keys(G.RACES)), level: Math.max(1, g.level - 1, extra && G.state && G.state.hero ? G.state.hero.level - 2 : 0), sub, known, arm: t >= 4 && arms.length ? pick(arms).id : null,
       hpMul: +(g.hpMul * (0.8 + 0.04 * kk)).toFixed(2), dmgMul: +(g.dmgMul * (0.84 + 0.03 * kk)).toFixed(2),
       ai: { react: g.ai.react + 0.08, aggro: Math.max(0.5, g.ai.aggro - 0.08), dodge: g.ai.dodge * 0.8, guard: Math.max(0.2, g.ai.guard - 0.1), parry: Math.max(0.04, g.ai.parry - 0.04) },
       xp: Math.round(g.xp * 0.45 * pay), coin: Math.round(g.coin * 0.4 * pay), respect: Math.round(g.respect0 * 0.12 * pay), taunt: pick(TAUNT), tint: { cloth: pal[0], armor: pal[1] }, under: t, extra };
@@ -37,20 +38,22 @@
   const who = o => '<small>Level ' + o.level + ' ' + G.RACES[o.race].name + ' ' + G.CLASSES[o.cls].name;
   ui.pit = function () {
     const st = G.state, u = U(st), now = tierNow(st), byId = {}; if (G.ensureLedger) G.ensureLedger();
-    let h = '<div class="card"><h2>The Blood Ledger</h2><p class="dim">' + (now < 0 ? 'You hold the Guttercrown, and the Ledger never closes. <b>' + G.defended(st) + '</b> challenger' + (G.defended(st) === 1 ? '' : 's') + ' turned away. Each one is a little worse than the last.' : 'Five names stand between you and the crown. Nobody is handed a name: win your <b>undercard</b> bouts and the Ledger-Keeper writes you in against the next one.') + '</p><div class="ladder">';
+    let h = '<div class="card"><h2>The Blood Ledger</h2><p class="dim">' + (now < 0 ? 'You hold the Guttercrown, and the Ledger never closes. <b>' + G.defended(st) + '</b> challenger' + (G.defended(st) === 1 ? '' : 's') + ' turned away. Each one is a little worse than the last.' : 'Nine names stand between you and the crown. Nobody is handed a name: win your <b>undercard</b> bouts and the Ledger-Keeper writes you in against the next one.') + '</p><div class="ladder">';
     GATES.forEach((o, t) => {
       const wins = st.wins[o.id] || 0, reach = t === 0 || !!st.wins[GATES[t - 1].id], open = gateOpen(st, t);
       if (t === now) {
         const uo = make(t, u[t]); byId[uo.id] = uo; const left = NEED[t] - u[t];
-        h += '<div class="tier"><b>Undercard</b><span class="pips">' + Array.from({ length: NEED[t] }, (_, i) => '<i class="' + (i < u[t] ? 'on' : '') + '"></i>').join('') + '</span><small>' + (left > 0 ? left + ' more to earn ' + o.name : 'Earned. Fight on for smaller purses, or face ' + o.name + '.') + '</small></div>';
+        h += '<div class="tier"><b>Tonight’s undercard</b><span class="pips">' + Array.from({ length: NEED[t] }, (_, i) => '<i class="' + (i < u[t] ? 'on' : '') + '"></i>').join('') + '</span><small>' + (left > 0 ? left + ' more to earn ' + o.name : 'Earned. Fight on for smaller purses, or face ' + o.name + '.') + '</small></div>';
+        h += '<p class="uc-why">' + o.name + ' does not fight strangers. The <b>undercard</b> is the run of smaller bouts the Guild stages first: hungry nobodies, each one fighting for the same line in the Ledger you are. Beat <b>' + NEED[t] + '</b> of them and the Keeper writes you in. Nobody you kill comes back; the Guild always finds another.</p>';
+        h += '<div class="uc-card">' + Array.from({ length: Math.max(NEED[t], u[t] + 1) }, (_, i) => { const q = make(t, i); return '<span class="' + (i < u[t] ? 'dead' : i === u[t] ? 'now' : '') + '">' + (i < u[t] ? '✝ ' : i === u[t] ? '▶ ' : '') + q.name + (i > u[t] ? ' <i>' + G.CLASSES[q.cls].name + '</i>' : '') + '</span>'; }).join('') + '</div>';
         h += row(uo, 'under' + (left > 0 ? ' cur' : ''), who(uo) + '</small><em class="taunt">“' + uo.taunt + '”</em>' + rew(uo, 0), '<button class="' + (left > 0 ? 'big' : '') + '" data-under="' + t + '">Fight</button>');
       }
       byId[o.id] = o;
-      h += row(o, (open ? '' : 'locked') + (o.boss ? ' boss' : '') + (wins ? ' beaten' : '') + (open && !wins ? ' cur' : ''), who(o) + (wins ? ' · beaten ' + wins + 'x' : '') + '</small>' + (open ? '<em class="taunt">“' + o.taunt + '”</em>' : '') + rew(o, wins),
-        open ? '<button class="' + (wins ? '' : 'big') + '" data-fight="' + t + '">' + (wins ? 'Rematch' : 'Fight') + '</button>' : '<span class="lock">' + (reach ? 'Undercard first' : 'Sealed') + '</span>');
+      h += row(o, (open ? '' : 'locked') + (o.boss ? ' boss' : '') + (wins ? ' beaten' : '') + (open && !wins ? ' cur' : ''), who(o) + '</small>' + (wins ? '<em class="taunt">' + ((st.before || {})[o.id] ? 'Somebody else got there first. The sand does not keep names.' : 'Carried out by the gate-men. The Keeper drew one line through the name, with a ruler.') + '</em>' : (open ? '<em class="taunt">“' + o.taunt + '”</em>' : '') + rew(o, wins)),
+        wins ? '<span class="lock dead">' + ((st.before || {})[o.id] ? 'Gone before you' : 'Dead') + '</span>' : open ? '<button class="big" data-fight="' + t + '">Fight</button>' : '<span class="lock">' + (reach ? 'Undercard first' : 'Sealed') + '</span>');
     });
     if (now < 0) G.OPPONENTS.forEach((o, i) => { if (i < BASE || i < G.OPPONENTS.length - 3) return; const wins = st.wins[o.id] || 0; byId[o.id] = o;
-      h += row(o, (o.elite ? 'boss' : '') + (wins ? ' beaten' : ' cur'), who(o) + (wins ? ' · beaten ' + wins + 'x' : '') + '</small><em class="taunt">“' + o.taunt + '”</em>' + rew(o, wins), '<button class="' + (wins ? '' : 'big') + '" data-fight="' + i + '">' + (wins ? 'Rematch' : 'Fight') + '</button>'); });
+      h += row(o, (o.elite ? 'boss' : '') + (wins ? ' beaten' : ' cur'), who(o) + '</small>' + (wins ? '<em class="taunt">Came for the crown. Stayed in the sand.</em>' : '<em class="taunt">“' + o.taunt + '”</em>' + rew(o, wins)), wins ? '<span class="lock dead">Dead</span>' : '<button class="big" data-fight="' + i + '">Fight</button>'); });
     h += '</div><div class="row end"><button id="x">Back</button></div></div>';
     show(h);
     document.querySelectorAll('#panel .op').forEach(el => { const o = byId[el.dataset.o]; el.appendChild(G.portrait({ cls: o.cls, race: o.race, tint: o.tint }, 56, 1.2)); });

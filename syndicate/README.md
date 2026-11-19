@@ -327,3 +327,13 @@ The Fence, Marc, the Apothecary, Big Hobb, the charm seller, Whisper and the Bus
 - Heavy blows are overhead chops (or a deep driving lunge for pointed weapons); signature blows are a rising uppercut, a spin or a drive depending on the weapon.
 - Castings have eight stances: a burst from the chest, a call from above, a blessing, a two-handed cone, a breath, a planted trap, a throw, and a bracing flex.
 - Blade wakes follow the cut: diagonal for combo strokes, vertical for chops and smites, a full ring for spins, low for low cuts, a hard line for thrusts.
+
+## Latest pass: a nine-name ladder, the dead stay dead, and bouts you can watch
+
+- **Nine names** stand between you and the crown. Four are new: Dolly Two-Teeth, Ansel Vane, Old Sallow and Iron Beatrix. Purses are a little smaller each so the climb ends at about the same level as before. Old saves keep their place.
+- **Nobody you kill fights again.** Rematches are gone. The undercard and the challengers after the crown are generated fresh, so there is always somebody new.
+- **The undercard is explained** on the Ledger, with tonight's card listed by name: who you have put down, who is next, who is waiting.
+- **Watch your bets.** Put money on a bout on Marc's card and you can go to the rail and watch it fought. The result of the fight you watch settles the bet.
+- **Exhibitions.** After a real bout somebody may find you in the market with an offer: a bout to the yield, for respect, coin or XP. Eight kinds. Nobody dies and nothing goes in the Ledger.
+- Market names are back on at all times, small from a distance and full size up close. Shut shops are shown with a lock and still turn you away with a line.
+- Dice-roll results are readable now. New lore in the codex and new things for the townsfolk to say.

@@ -106,6 +106,7 @@
         ['Getting ready for a bout', 'Tonic from the Apothecary, a meal from Hobb or your own stove, a song off the busker, a word with Whisper, a night in your own bed. The card before the bout shows what you have and what you skipped. None of it is needed. All of it adds up.'], ['Dying', 'You lose in the pit, you are dead. Purse gone. Unless you have a strongbox at home: what is in the box stays in the box. And they say some come back. I have seen one or two walking about who should not be. I do not ask.'],
         ['Your home', 'Furniture works. Bed, dummy, stove, cauldron: use them once between bouts. Desk, map table, trophies, shrine: they work just by standing there. Tap the Comfort sign in your hideout and it lists the lot.'], ['Show me round again', '__tour']] }
   };
+  G.FOLK = FOLK;
   ui.talkTo = function (id, topic) {
     const st = G.state, f = FOLK[id]; if (!f) return; st.talked = (st.talked || 0) + (topic == null ? 1 : 0); if (topic == null) G.save();
     const t = topic != null ? f.topics[topic] : null; if (t && t[1] === '__tour') return G.tour();

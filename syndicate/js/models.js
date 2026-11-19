@@ -210,7 +210,7 @@
         if (Math.abs(ms) > 0.35) { const a = Math.min(1, Math.abs(ms)); q.bz += ms * 0.13; q.tz -= ms * 0.08; q.ll *= mix(1, 0.62, a); q.lr *= mix(1, 0.62, a); q.by -= 0.03 * a; q.bx = mix(q.bx, 0.12, a); }       // circling: a crouched side-step
       }
       if (act === 'swing') {
-        snap = 1; const step = p.sty === 2 || p.mv === 'smite' || p.mv === 'chop' ? 2 : (p.step || 0), w = Math.min(1, k / 0.5), r = Math.max(0, (k - 0.5) / 0.5);
+        snap = k < 0.07 || k > 0.9 ? 0.45 : 1; const step = p.sty === 2 || p.mv === 'smite' || p.mv === 'chop' ? 2 : (p.step || 0), w = Math.min(1, k / 0.5), r = Math.max(0, (k - 0.5) / 0.5);
         const cock = eo(Math.min(1, w / 0.6)), hit = ei(Math.max(0, (w - 0.6) / 0.4)), back = r * r * (3 - 2 * r);
         const seq = (ready, cocked, struck) => k < 0.5 ? mix(mix(ready, cocked, cock), struck, hit) : mix(struck, ready, back);
         if (step === 0) { q.arx = seq(-0.45, -2.6, 0.3); q.arz = seq(0, -0.5, 0.5); q.ty = seq(0, 0.6, -0.65); q.bx = seq(0.06, -0.06, 0.3); }
@@ -243,7 +243,7 @@
         else if (cs === 'plant') { q.by = -0.3 * k; q.bx = 0.5 * k; q.ll = -1.2 * k; q.lr = 0.45 * k; q.arx = mix(-0.45, -2.4, k); q.arz = 0; q.alx = 0.2; q.alz = 0; q.hx = 0.2 * k; }
         else if (cs === 'throw') { q.arx = mix(-0.45, -1.9, k); q.arz = 1.2 * k; q.ty = -0.8 * k; q.alx = -1.1; q.alz = -0.3; q.bx = -0.05; }
         else if (cs === 'steel') { q.arx = -1.9; q.arz = 0.8 * k; q.alx = -1.9; q.alz = -0.8 * k; q.by -= 0.1 * k; q.hx = 0.3 * k; q.bx = 0.12 * k; }
-      } else if (act === 'release') { snap = 0.9; const r = 1 - k; q.arx = mix(-0.45, -1.75, r); q.arz = 0.15 * r; q.alx = mix(restL, -0.2, r); q.ty = -0.5 * r; q.bx = 0.06 + 0.3 * r; q.bpz = 0.18 * r; q.ll = 0.35 * r; q.lr = -0.3 * r; q.cape = 0.3 + 0.5 * r;
+      } else if (act === 'release') { snap = k > 0.85 ? 0.4 : 0.9; const r = 1 - k; q.arx = mix(-0.45, -1.75, r); q.arz = 0.15 * r; q.alx = mix(restL, -0.2, r); q.ty = -0.5 * r; q.bx = 0.06 + 0.3 * r; q.bpz = 0.18 * r; q.ll = 0.35 * r; q.lr = -0.3 * r; q.cape = 0.3 + 0.5 * r;
         const cs = p.cs;
         if (cs === 'nova') { q.arx = mix(-0.45, -2.3, r); q.arz = -1.25 * r; q.alx = mix(restL, -2.3, r); q.alz = 1.25 * r; q.by = 0.14 * r; q.bx = 0.06 - 0.3 * r; q.hx = -0.45 * r; q.ty = 0; q.ll = 0.3 * r; q.lr = -0.3 * r; q.bpz = 0; }
         else if (cs === 'call') { q.arx = mix(-0.45, -1.0, r); q.arz = 0; q.bx = 0.06 + 0.4 * r; q.by = -0.08 * r; q.ll = 0.45 * r; q.lr = -0.35 * r; q.hx = 0.2 * r; q.ty = -0.3 * r; }

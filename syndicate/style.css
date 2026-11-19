@@ -343,7 +343,7 @@ h3 .dim { color: var(--dim); }
 .roll { display: flex; align-items: center; gap: 0.8rem; margin: 0.4rem 0 0.7rem; } .roll small { color: inherit; font-size: 0.8rem; }
 .die { display: grid; place-items: center; width: 3.2rem; height: 3.2rem; flex: none; font-family: var(--title); font-weight: 900; font-size: 1.9rem; color: #fff; background: linear-gradient(135deg, #3a2f4a, #17121c); clip-path: polygon(50% 0, 100% 27%, 100% 73%, 50% 100%, 0 73%, 0 27%); }
 .roll.ok .die { background: linear-gradient(135deg, #2f8a4a, #124a22); } .roll.no .die { background: linear-gradient(135deg, #a3231d, #4a0e0c); }
-.roll.ok b { color: #1f6a34; } .roll.no b { color: #8a1410; } .roll.mini .die { width: 2.4rem; height: 2.4rem; font-size: 1.3rem; } .roll.mini { margin: 0; }
+.roll.ok b { color: #8fe6a6; } .roll.no b { color: #ff9a8f; } .roll small { color: #e8dcc0 !important; } .roll b { text-shadow: 0 1px 2px #000; } .roll.mini .die { width: 2.4rem; height: 2.4rem; font-size: 1.3rem; } .roll.mini { margin: 0; }
 .card.event .got { font-family: var(--display); font-weight: 900; color: #5e120f; letter-spacing: 0.06em; }
 .card.letter.event h2 { font-size: 1.7rem; }
 #tParry { right: calc(8.2rem + var(--sr)); bottom: calc(6.4rem + var(--sb)); width: 4.4rem; height: 4.4rem; border-color: #ffe9a0; color: #ffe9a0; }
@@ -616,9 +616,10 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .gearcmp p { grid-column: 1 / -1; margin: 0.3rem 0 0; font-size: 0.82rem; color: var(--dim); } .gearcmp.warn { border-color: #c9a040; } .gearcmp.bad { border-color: #c8372d; background: rgba(90, 16, 12, 0.3); } .gearcmp.bad p { color: #ff9a8a; }
 
 /* ---------- market labels: names when you are near, markers when you are not ---------- */
-.tag.far { font-size: 0; padding: 0; width: 0.8rem; height: 0.8rem; min-width: 0; border-radius: 50%; background: #c9a040; border: 2px solid #20140a; box-shadow: 0 0 0.5rem rgba(255, 200, 90, 0.6); opacity: 0.85; }
-.tag.far.badge::after { display: none; }
-.tag.far.goal { width: 1.25rem; height: 1.25rem; background: #ffd36b; border-color: #fff3cf; opacity: 1; animation: goalpulse 1.1s infinite; }
+.tag.far { font-size: 0.62rem; padding: 0.26em 0.55em; opacity: 0.92; letter-spacing: 0.02em; box-shadow: none; }
+.tag.far.badge::after { width: 0.8rem; height: 0.8rem; line-height: 0.8rem; font-size: 0.55rem; top: -0.45rem; right: -0.4rem; }
+.tag.far.goal { opacity: 1; border-color: #ffd36b; color: #fff3cf; animation: goalpulse 1.1s infinite; }
+.tag.shut { opacity: 0.5; font-style: italic; } .tag.shut::before { content: '\1F512  '; font-style: normal; font-size: 0.8em; }
 .tag.goal:not(.far) { border-color: #ffd36b; box-shadow: 0 0 1rem rgba(255, 211, 107, 0.55); }
 @keyframes goalpulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 211, 107, 0.7); } 50% { box-shadow: 0 0 0 0.6rem rgba(255, 211, 107, 0); } }
 @media (prefers-reduced-motion: reduce) { .tag.far.goal { animation: none; } }
@@ -627,3 +628,12 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 #veil { position: fixed; inset: 0; background: #050406; opacity: 0; pointer-events: none; z-index: 40; }
 #ui.talking #floaters { display: none !important; }
 #ui:has(#cine) #floaters { display: none !important; }
+
+/* the undercard card, and the dead */
+.uc-why { font-size: 0.82rem; color: #cfc4ab; margin: 0.2rem 0 0.4rem; line-height: 1.4; }
+.uc-card { display: flex; flex-wrap: wrap; gap: 0.3rem 0.5rem; margin: 0 0 0.5rem; font-size: 0.74rem; }
+.uc-card span { padding: 0.18em 0.6em; border: 1px solid rgba(201, 160, 64, 0.3); border-radius: 0.3rem; color: #d8cdb2; background: rgba(0, 0, 0, 0.25); }
+.uc-card span.dead { text-decoration: line-through; color: #8a7f70; border-color: rgba(120, 110, 100, 0.25); } .uc-card span.now { border-color: var(--gold); color: #fff3cf; } .uc-card i { color: #9a8f7a; font-style: normal; font-size: 0.9em; }
+.lock.dead { color: #c96a60; letter-spacing: 0.08em; } .opp.beaten .op canvas, .opp.beaten .op img { filter: grayscale(1) brightness(0.55); }
+.row.bst.watch { margin-top: 0.35rem; align-items: center; gap: 0.6rem; } .row.bst.watch small { color: #b8ad98; font-size: 0.72rem; }
+.opp.exh { border-color: #6ad0ff; box-shadow: 0 0 0.8rem rgba(106, 208, 255, 0.25); } .opp.exh .taunt { color: #a8dcf0; }

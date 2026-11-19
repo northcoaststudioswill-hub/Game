@@ -15,7 +15,7 @@
   const look0 = G.lookOf;
   G.lookOf = function (h, st) { const l = look0.apply(this, arguments); if (l && l.gear) l.gear = { weapon: Math.min(2, l.gear.weapon || 0), armor: Math.min(2, l.gear.armor || 0) }; return l; };
   // what grade a given opponent carries
-  const of = o => { if (!o) return 0; if (o.ascent != null) return 5; if (o.challenger) return 5; if (o.under != null) return Math.min(4, o.under + (o.extra ? 1 : 0)); if (o.grudge) return 2; const i = G.OPPONENTS.indexOf(G.OPPONENTS.find(q => q.id === o.id)); return i >= 0 && i < 5 ? i + 1 : 0; };
+  const of = o => { if (!o) return 0; if (o.ascent != null) return 5; if (o.challenger) return 5; if (o.under != null) return Math.min(4, Math.floor(o.under / 2) + (o.extra ? 1 : 0)); if (o.grudge) return 2; const i = G.OPPONENTS.indexOf(G.OPPONENTS.find(q => q.id === o.id)); return i >= 0 && i < 9 ? Math.floor(i / 2) + 1 : 0; };
   G.gearRace = { W, A, D, WN, AN, of };
 
   // the card before a bout says what they are carrying, and what you are

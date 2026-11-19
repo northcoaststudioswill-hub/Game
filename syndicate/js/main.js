@@ -185,7 +185,8 @@
       // a name only when you are close to it; a small marker from further off, and only where there is a reason to go
       const locked = sp.x < -50 || !!(sp.isLocked && sp.isLocked()), wk = W.walker, close = sp === near || Math.hypot(sp.x - wk.x, sp.z - wk.z) < 4.4, badge = !!(sp.badge && sp.badge()), goal = !!(G.goalSpot && G.goalSpot() === sp);
       el.classList.toggle('near', sp === near); el.classList.toggle('far', !close); el.classList.toggle('goal', goal); el.classList.toggle('badge', badge);
-      el.style.display = hide || locked || (!close && !badge && !goal) ? 'none' : '';
+      el.classList.toggle('shut', locked); el.style.zIndex = sp === near ? 3 : close ? 2 : goal || badge ? 1 : 0;
+      el.style.display = hide || sp.x < -50 ? 'none' : '';       // names stay on: small from a distance, full size up close
     });
   }
 
