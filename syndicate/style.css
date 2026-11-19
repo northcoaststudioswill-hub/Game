@@ -648,3 +648,8 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .made-g small { display: block; color: #9a8f7a; font-size: 0.62rem; letter-spacing: 0.1em; } .made-g b { color: #fff3cf; } .made-g i { display: block; font-style: normal; font-size: 0.76rem; color: #cfc4ab; }
 .opencard { margin: 0.2rem 0 0.6rem; padding: 0.5rem 0.7rem; border: 1px solid rgba(201, 160, 64, 0.3); border-radius: 0.4rem; background: rgba(0, 0, 0, 0.22); } .opencard small { margin-left: 0.5rem; color: #b8ad98; } .opencard .slots { margin-top: 0.4rem; flex-wrap: wrap; } .opencard .slot i { display: block; font-style: normal; font-size: 0.66rem; color: #b8ad98; }
 #gsouls { position: absolute; top: 5.2rem; left: 50%; transform: translateX(-50%); font-family: var(--title); font-weight: 900; letter-spacing: 0.14em; font-size: 0.9rem; color: #ffd9d4; text-shadow: 0 2px 0 #000, 0 0 0.8rem rgba(255, 60, 40, 0.7); pointer-events: none; z-index: 5; }
+/* buttons on parchment cards keep light text: the parchment's dark-red bold was leaking into them */
+.card.letter button b, .card.letter button, .card.letter .slot { color: #fff3cf; } .card.letter button.big b, .card.letter button.big { color: #20140a; }
+.card.letter .choices small, .card.letter button small { color: #e0d6bc; font-size: 0.78rem; letter-spacing: 0.04em; }
+.card.letter .choices button b { font-size: 1.08rem; text-shadow: 0 1px 2px #000; } .card.letter button:disabled b { color: #9a8f7a; }
+.card.letter .choices button.big b { text-shadow: none; } .card.letter .choices button.big small { color: #3a2a10; }
