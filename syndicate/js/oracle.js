@@ -51,7 +51,8 @@
       S('npc', NAME, 'Sign. I keep hauling your carcass back, I lend you power you could not earn in ten lifetimes, and you climb until you are sitting exactly where I point. In return you owe me souls. Do not ask how many. More.', 'npc')];
     const OFFER = { choices: [
         { label: 'Sign it', go: () => { st.signed = true; G.save(); card('The Contract', 'The pen is warm. The ink is gold. Your name looks very small beside his, which takes up most of the page. “Good dog,” he says, and rubs his hands together, and laughs like a man watching a hanging he paid for.', 'Signed · the Oracle’s cellar is open to you in the market', then); } },
-        { label: 'Not yet', go: () => { G.save(); card('An Open Offer', '“Not yet?” He leans in until you can smell the gold on him. “Take your time, meat. I have all of it. You will be back, and you will be deader, and I will be exactly this pleased.” He rolls the contract up, unsigned.', 'The Oracle’s cellar is open to you in the market', then); } }],
+        { label: 'Not yet', go: () => { G.save(); if (G.garden && (st.deaths || 0) > 0) return then();       // unsigned and dead: the garden door is the answer, not another card
+          card('An Open Offer', '“Not yet?” He leans in until you can smell the gold on him. “Take your time, meat. I have all of it. You will be back, and you will be deader, and I will be exactly this pleased.” He rolls the contract up, unsigned.', 'The Oracle’s cellar is open to you in the market', then); } }],
         done: fin };
     if (n === 0) { st.davidMet = 1; return G.playScene(scene(st, [
       S('', '', 'The hatch opens on gold. A great deal of gold, and a man in the middle of it, looking at you the way a butcher looks at a calf.', 'wide'),
