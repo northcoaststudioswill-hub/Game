@@ -632,7 +632,7 @@ function update(dt){
    if((k==='CONTINUE'||k==='PLAY'||k==='NEW GAME')&&!cloudDone&&time<9){flash='CHECKING FOR YOUR SAVE...';flashT=1.5;return}
    if(k==='CONTINUE'){state='play';if(awayMsg){toast('WHILE YOU WERE AWAY:  +'+awayMsg+' IN THE BASKET');awayMsg=0}}
    else if(k==='NEW GAME'&&!eraseArm){eraseArm=1;flash='PRESS A AGAIN TO START OVER';flashT=4}
-   else if(k==='PLAY'||k==='NEW GAME'){eraseArm=0;flashT=0;init();live=true;persist(true);c3Play('dawn',()=>playScene('open',()=>talk(npcs[0])))}
+   else if(k==='PLAY'||k==='NEW GAME'){eraseArm=0;flashT=0;init();live=true;persist(true);c3Play('dawn',()=>c3Play('open',()=>talk(npcs[0])))}
    else if(k==='REWARDS'){state='rewards';ri=0}else if(k==='CAPSULES'){state='caps';capS={ph:'idle',t:0,it:null};flashT=0}else if(k==='STYLE'){state='style';si=0;look={...meta.eq}}else if(k==='BUG BOOK'||k==='COLLECTION'){state='bugs';cpage=0;csel=0;colFrom='menu'}else if(k==='SETTINGS'){state='settings';setFrom='menu';seti=0}else eject();}
   return;}
  case 'rewards':ri=nav(ri,ACH.length+4);if(pressed('a')&&ri===0){if(dailyReady()){const a=claimDaily();metaAch();flash='+'+a+' PETALS AND A TICKET!  STREAK '+meta.streak;flashT=3.5;snd(784,.1);later(()=>snd(1046,.2),100)}else snd(140,.08)}
@@ -910,7 +910,7 @@ function deliver(it){
  it.on.slice().forEach((b,i)=>{b.tgt=null;b.z=0;b.st=near?'follow':'idle';b.cheer=.8+i*.07;const a=i*1.3;b.x=HX+Math.cos(a)*16;b.y=HY+10+Math.sin(a)*6;});it.on.length=0;
  puff(HX,HY-22,'#f8e060',12,45);
  if(it.sub==='shard'){shards++;if(it.isle)run.isle=true;earn(10);snd(523,.12);later(()=>snd(659,.12),120);later(()=>snd(784,.12),240);later(()=>snd(1046,.3),360);
-  sceneQ.push(shards>=4?['3:blaze',()=>{won=true;run.wonDay=day;toast('THE GREAT LANTERN IS WHOLE');persist(true)}]:[shards===1?'3:marks':'s'+shards,null]);checkAch();persist(true);return;}
+  sceneQ.push(shards>=4?['3:blaze',()=>{won=true;run.wonDay=day;toast('THE GREAT LANTERN IS WHOLE');persist(true)}]:[shards===1?'3:marks':'3:s'+shards,null]);checkAch();persist(true);return;}
  if(it.sub==='key'){run.key=1;run.meet=1;card={t:0,title:'FLOW PROS KEY',sub:"Stamped FLOW PROS. It fits the job site on the pond road, out west past the crystal.",art:()=>{g.save();g.translate(120,76);g.scale(3,3);keyArt(0,0);g.restore()}};state='card';earn(10);snd(784,.1);later(()=>snd(1175,.2),100);persist(true);return}
  if(it.sub==='lens'){run.lens=1;earn(60);meta.tix+=2;snd(523,.12);later(()=>snd(784,.12),120);later(()=>snd(1046,.3),240);if(dayT>DAYLEN*.78)relightGo();else say('THE LENS IS HOME. TONIGHT THE LANTERN WILL WARM IT',8);persist(true);return}
  if(it.sub==='trs'){const i=it.tri|0;if(!meta.trs.includes(i))meta.trs.push(i);card={t:0,title:TRS[i][0],sub:TRL[i],art:()=>{g.save();g.translate(120,72);g.scale(4,4);trArt(i,0,0);g.restore()}};
@@ -1493,24 +1493,7 @@ function drawPreview(x,y,w,h){r('#181020',x,y,w,h);g.save();g.beginPath();g.rect
  const tr=STY.trail[(look||meta.eq).trail];if(tr[1]){for(let i=0;i<4;i++){const px=x+10+i*13,py=y+h-6-((time*20+i*9)%14);r(tr[1],px,py,3,3)}}}
 const WHO={DEREK:'#5a9af0',ERIN:'#c8a8f8',RANGER:'#f8a070',MARCUS:'#78c8f8',THORNBACK:'#f07878',LOUIE:'#e89040'};
 const SCN={
- open:[["Hi, Will! I'm Erin. I look after the lantern and the garden. This is Louie. He looks after snacks.",'erin','ERIN'],
-  ["You're the new keeper. These little ones are sprouts. They grow in the lantern's soil and follow whoever plucks them.",'sprouts','ERIN'],
-  ["Each kind is good at something. Aim at a thing and the right sprout steps up by itself.",'types','ERIN'],
-  ["Throw them with A. Call them back with B. Bring the shards home, and make yourself at home too. Ready?",'home','ERIN']],
- s2:()=>[["Two shards home. The lantern's light reaches the edge of the field now.",'relight'],
-  ...(npcs[3].st==='new'?[ /* Will has not met Marcus yet: Ranger reports it */
-  ["More of those marks, out west by the pond. Something huge was dragging something warm.",'trail','RANGER'],
-  [run.boss?"The trail went south, into the hollow. Which explains our big new neighbour.":"The trail heads south, into the hollow. Nobody goes in the hollow.",'trail','RANGER']]:[
-  ["Bro. Found more of those marks by my pond. Something huge was dragging something warm. I could take it. Probably.",'trail','MARCUS'],
-  [run.boss?"Trail went south, into the hollow. Which explains our big new neighbor. I would've handled it, bro.":"Trail heads south, into the hollow. Nobody goes in the hollow. ...You first though, bro.",'trail','MARCUS']]),
-  ["Grr. ...Woof?",'erin','LOUIE']],
- s3:()=>[["Three shards. The nights are almost warm again.",'relight'],
-  run.boss?["One left, and you already know who was keeping it warm. Bring it home, Will.",'erin','ERIN']:["One left, and we know where it is. Old Thornback has slept in that hollow since before I was born.",'thorn','ERIN'],
-  run.boss?["Woof!",'erin','LOUIE']:["Go gently, Will. Bring plenty of sprouts, and bring Louie.",'thorn','ERIN']],
- end:[["You did it, Will. You, Louie, and a few dozen very small friends.",'party','ERIN'],
-  ["Warm. Finally warm. I'll keep watch at night, if you'll have me.",'party','THORNBACK'],
-  ["The lantern is whole. Nobody remembers who lit it first, or why the valley needs it so.",'party'],
-  ["The garden is growing. And there's still plenty to find out there.",'party']]};
+};
 /* ---------- valley projects: sprouts move out for good to build things ---------- */
 const npcBy=n=>npcs.find(q=>q.name===n)||{st:'',mi:0};
 const PJ=[

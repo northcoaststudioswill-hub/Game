@@ -20,7 +20,7 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/spr
   const throwFor = async n => { await E(`keys.a=1;void 0`); await step(n); await E(`keys.a=0;void 0`); };
   const scenes = []; const skip = async () => { await step(4); /* a queued scene starts on the next frame */ for (let i = 0; i < 90 && (await E('state')) !== 'play'; i++) { if ((await E('state')) === 'cine' && !scenes.includes(await E('scn[0][0]'))) scenes.push(await E('scn[0][0]')); await tap('a'); } };
   const until = async (cond, secs) => { let t = 0; for (; t < secs; t++) { await step(30); if ((await E('state')) !== 'play' || await E(cond)) break; } return t; };
-  await E(`init();live=true;state='play';ZONES.forEach(z=>run.seen[z[0]]=1);run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1};run.tips={br:1,ne:1,dg:1,wb:1,wn:1,fl:1};run.egg={sesh:1,job:1,dream:1,zoomies:1,button:1}; /* the hidden scenes would cut into this scripted run (the bot pets Louie by accident) */found=found.map(()=>true);gates.forEach(q=>q.alive&&openGate(q));openGarden();wakeGrubs();
+  await E(`init();live=true;state='play';ZONES.forEach(z=>run.seen[z[0]]=1);run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1};run.tips={br:1,ne:1,dg:1,wb:1,wn:1,fl:1};run.egg={sesh:1,job:1,dream:1,zoomies:1,button:1,hottub:1,moon:1,slide:1,bessie:1};npcs[3].st='active';run.keyScn=1; /* Marcus now stands by the west path from day one: met already here, so a stray A beside him is a chat and not his scene */ /* the hidden scenes would cut into this scripted run (the bot pets Louie by accident) */found=found.map(()=>true);gates.forEach(q=>q.alive&&openGate(q));openGarden();wakeGrubs();
     for(let i=0;i<30;i++)mkBud(i%6,2,P.x,P.y);for(let i=0;i<8;i++)mkBud(2,2,P.x,P.y);void 0`);
   for (const [name, tx, ty] of [['berry field', 51, 21], ['north meadow', 34, 6]]) { await tp(tx, ty, 0, -1); await throwFor(150); const s0 = await E('shards'); const t = await until(`shards>${s0}`, 200);
     ok('the ' + name + ' shard is carried home', (await E('shards')) === s0 + 1, t + ' s'); await skip(); }
@@ -31,7 +31,7 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/spr
   ok('his scene (3D now) has the guardian lines', await E(`state==='c3'&&c3q.key==='thorn'&&c3q.S.some(e=>/set to guard that light/.test(e.cap[1]))`)); await skip();
   await E(`dayT=20;void 0`); t = await until('shards>=4', 200); ok('the last shard comes home and the blaze plays', await E(`shards===4&&state==='c3'&&c3q.key==='blaze'&&/last shard slides home/.test(c3q.S[0].cap[1])`), t + ' s ' + await E(`JSON.stringify({st:state,shards,sh:items.filter(i=>i.alive&&i.sub==='shard').map(i=>[i.x|0,i.y|0,i.w,str(i),i.on.map(b=>b.type).join(''),tileAt(i.x,i.y),fieldL[(i.y>>4)*MW+(i.x>>4)]]),b:[...new Set(buds.map(b=>b.st+(b.tgt?':'+(b.tgt.kind+(b.tgt.sub||'')):'')))],dayT:dayT|0})`));
   await E(`keys.start=1;void 0`); await step(1); await E(`keys.start=0;void 0`); await step(4); /* START skips the scene: the Lantern is whole, and the story is only half told */
-  ok('the Lantern is whole and the game goes on (the ending comes after the second light)', await E(`state==='play'&&won&&!run.fin&&C3SCN.home.some(e=>/Nobody remembers who lit the Great Lantern first/.test(e.cap[1]))`), await E('state')); await skip();
+  ok('the Lantern is whole and the game goes on (the ending comes after the second light)', await E(`state==='play'&&won&&!run.fin&&C3SCN.home.some(e=>/Nobody remembers who lit the Great Lantern first/.test(e.cap[1]))`), await E('JSON.stringify([state,won,shards,sceneQ.length,c3q&&c3q.key,toasts.map(t=>t.s),msg])')); await skip();
   for (let i = 0; i < 10 && (await E('state')) !== 'play'; i++) await tap('a');
   ok('the lantern is relit and play goes on', await E(`won&&state==='play'&&meta.ach[5]===1`), scenes.length + ' scenes seen');
   await tp(33, 19, 0, -1); await E(`buds.slice(0,3).forEach(b=>{b.star=true});enterHome();void 0`); await step(5);
@@ -39,7 +39,7 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/spr
   await E(`hi=0;void 0`); await tap('a'); ok('star sprouts move in for more petals', (await E('homeTotal()')) === 8, await E('flash'));
   await E(`state='play';exitHome();void 0`); await step(3); ok('the crew is waiting outside', await E(`buds.length>0&&buds.every(b=>b.st==='follow')`));
   await E(`npcs[3].st='done';bp=PJ[0];state='build';void 0`); await tap('a'); ok('Pebs move out to build the Waterworks', (await E('pjS(PJ[0]).got[1]')) > 0, await E('flash'));
-  await E(`state='play';endDay();void 0`); await step(2); ok('the evening report shows', (await E('state')) === 'dayend'); await tap('a'); await step(5);
+  await E(`state='play';endDay();void 0`); await step(2); ok('the evening report shows', (await E('state')) === 'dayend'); for (let k = 0; k < 3 && (await E('state')) === 'dayend'; k++) { await tap('a'); await step(3); } /* a second page, ALSO TODAY, when there is news */ await step(5);
   ok('morning comes: day 2, home pays out in the one morning line, the buddies are back', await E(`day===2&&state==='play'&&wbuds.length===8&&tod.morn.some(l=>/^HOME:/.test(l))&&!toasts.some(t=>/^HOME:/.test(t.s))`), await E('JSON.stringify(tod.morn)'));
   ok('no page errors', !errs.length, errs);
   console.log(fail ? fail + ' FAILED' : 'ALL PASS'); await browser.close(); process.exit(fail ? 1 : 0);
