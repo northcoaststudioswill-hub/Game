@@ -9,6 +9,7 @@ FF.under = () => ({
   arts: [{ at: .5, name: F('ranForHer') ? 'THREE STEPS' : 'STOOD STILL', line: F('ranForHer') ? 'I GOT THREE STEPS TOWARD HER BEFORE ONE OF THESE PUT ME ON THE FLOOR. THIS IS THE FOURTH.' : 'MARA HELD MY ARMS AND I LET HER. NOBODY IS HOLDING THEM TONIGHT.', panel: 'furnace', stage: 1, kind: 'rise', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }]
 });
 const DREAM4 = () => [
+  { fx: () => { World.gilded = 1; } },
   { card: 'THAT NIGHT', sub: 'It shows him the day he arrives.', min: 1.4, max: 4 },
   { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'Four years from now the lift opens on grass. I have read the word. I stand on it for a full minute before I can make myself walk.' },

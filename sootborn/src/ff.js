@@ -220,7 +220,7 @@ const DREAM1 = () => [
   { say: 'seren', t: "Hands, Kael. Everything is hands. If you can make one warm thing you can make another. Don't tell Mara." },
   { narr: 'She held mine over it until they stopped shaking. I had not known they were. She had known for a week.' },
   { sfx: 'heart' }, { narr: 'Every time the wire went in I put my hands back over that fire. By the sixth month I could smell the packing burn.' },
-  { fade: 'out' }, { panel: 'gild' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { fade: 'out' }, { fx: () => { World.gilded = 1; } }, { panel: 'gild' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { when: () => !G.flags.issue_gild, narr: 'Last, the eyes. Gold leaf laid behind the lens, so the sun cannot burn what it was never meant to reach. It is the only part done awake.' },
   { when: () => !G.flags.issue_gild, narr: 'When the wrappings came off the first thing I saw was Ilse, holding a bare lamp a hand from my face. It did not hurt. Nothing bright has hurt since. I have never forgiven how easy that was to give us, and how long they did not.' },
   { fx: () => { G.flags.fury = (G.flags.fury || 0) + 2; } },
@@ -251,6 +251,7 @@ const DREAM1 = () => [
   { card: 'THE ASSAY', sub: 'Four years from now. Day nineteen.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.ford() }
 ];
 const DREAM2 = () => [
+  { fx: () => { World.gilded = 1; } },
   { card: 'THAT NIGHT', sub: 'The dream again. It is getting longer.', min: 1.4, max: 4 },
   { panel: 'gild' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'The second year. I could walk. I could say "granted" without tasting it. I still wore the gloves.' },
@@ -284,6 +285,7 @@ const DREAM2 = () => [
   { fade: 'out' }, { panel: null }
 ];
 const DREAM3 = () => [
+  { fx: () => { World.gilded = 1; } },
   { panel: 'spire' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'And once, only once, the dream runs all the way out to the end.' },
   { narr: 'The Sun Spire. Where they keep the count. Above the weather, where the sky was never poison at all.' },

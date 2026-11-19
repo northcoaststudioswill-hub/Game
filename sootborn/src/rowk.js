@@ -193,3 +193,5 @@ Object.assign(HOT, {
 });
 function barksRowK() { return { orla: ['FIRST BELL, HOT WATER.', 'MIND THE WET.'], garrow: ['OPEN HANDS!', 'NOBODY\'S ANGRY.', 'SIT HIM DOWN!'], tam: ['HA!', 'TOO SLOW!'], bryn: ['COME ON, THEN.', 'AGAIN.'], wick: ['NOT IT!', 'SIX, FIVE, FOUR...'], sela: ['SHH.'], dov: ['...'] }; }
 { const b0 = barks; barks = id => barksRowK()[id] || b0(id); }
+// the gilded portrait lasts as long as the dream it was set in
+{ const cp = Cutscene.play; Cutscene.play = function (steps, done) { return cp.call(this, steps, function () { World.gilded = 0; return done && done.apply(this, arguments); }); }; }

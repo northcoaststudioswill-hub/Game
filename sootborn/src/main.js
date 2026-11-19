@@ -3,7 +3,7 @@
 // ============================================================
 const HEIST_LANE_MID = [[18, 6, 1, 0.9], [18, 6, 0, 0.9], [7, 6, 1, 0.9], [7, 6, 0, 0.9]], HEIST_LANE_N = [[16, 3, 0, 1.1], [5, 3, 0, 1.1]];
 const Game = {
-  toTitle() {
+  toTitle() { World.gilded = 0; World.gildP2 = 0;
     G.mode = 'title'; Dialogue.active = false; $('#dlg').classList.add('hidden'); if (Puzzle.active) Puzzle.close();
     if (!P.sheet) World.resetSheets(); World.showPlayer = false; G.flags = G.flags || {};
     World.load('square', { x: 13 * 16 + 8, y: 8 * 16, dir: 0 }); Sound.music('home');
@@ -49,6 +49,7 @@ const Game = {
   },
   startPresent() {
     if (!G.tendency) G.tendency = 'caretaker';
+    World.gilded = 0; World.gildP2 = 0;
     Codex.add('c_valve', true); Codex.add('c_eleven', true);
     World.load('apt', { x: 3 * 16 + 8, y: 3 * 16 + 12, dir: 2 }); G.mode = 'world';
     Fade.a = 1; Fade.dir = -1; Fade.sp = 0.8; Fade.busy = true; Sound.play('bell'); Sound.music('home');

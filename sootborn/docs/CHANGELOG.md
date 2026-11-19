@@ -1,4 +1,22 @@
-# SOOTBORN — changelog (latest v0.50 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.51 · 2026-11-19)
+
+## v0.51 · 2026-11-19 — his new face in dialogue, the cape the right way round, fighting from the air
+From play notes on v0.49 and v0.50.
+
+- **Portrait.** After the Gilding, every line Kael speaks showed the valve tech's face. From the moment he stands up from the table (and through the Assay dreams, the Assay missions and all of Part Two) his portrait is the gilded one. It goes back when the dream ends and he wakes below.
+- **The cape in the arena fights was hinged backwards.** Running swung it forward through his legs, and v0.49's fix then held it there. It now trails behind him, no higher than his belt, with a little flutter at speed.
+- **Dorian standing with his hands up.** That was the stagger: light hits filled it fast enough that near the end he was staggered almost half the time. Plain light hits fill it more slowly, a stagger is shorter, and he cannot be staggered again for five seconds after one.
+- **Fighting from the air (comic levels).**
+  - **Hook, while airborne:** hauls an ordinary guard up to him (UP HERE.) and buys a little more time in the air.
+  - **Strike, with a man hauled up:** cuts him out of the air (STRUCK DOWN.), a heavy blow that throws him back to the ground.
+  - Strike with nobody hauled is still the dive, LIFT ZERO.
+- **Something thrown.** Hang in the air for a second and the nearest guard on the ground throws what he has (LOOSE!). If it reaches him still up there, it costs health and the boots cut out. No guns. It cannot kill him, and Wardens and bosses do not throw.
+- **Phone.** The objective box is back to its old size on small and upright screens; the larger one is for big screens only. In the comic levels the message box sits higher.
+- **Comic pages checked** in an upright and a sideways phone-sized frame after the restyle: captions fit and read.
+
+**Checked:** the page loads clean; the cape seen hanging behind him in a still; the Table's pages in both orientations. **Not checked:** the air hook, the air cut and the thrown weapon were built and compile but were not run at all, so treat them as untested; the gilded portrait was not looked at in a scene; Dorian's stagger was not re-fought.
+
+**Open list:** kept in the project as "SOOTBORN — open list".
 
 ## v0.50 · 2026-11-19 — dying, going down, Tavi walking, a hill at Riser Nine, and the Lamp's wrong answer
 From play notes on the 2D Assay missions and the comic levels.

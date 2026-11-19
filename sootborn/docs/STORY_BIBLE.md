@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.50 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.51 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -477,3 +477,5 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **Open:** the Assay may be renamed.
 - **The hook line is not carried below.** Era 0 is fists, kicks, the boot, guard and parry, headbutt, roar. The line comes with training (era 1). This replaces the older list.
 - **On the Spire and its docks the porters are "the service".** No sign there says soot.
+- **In the air (v0.51):** with the boots, the hook hauls a man up to him and the blade cuts him down from there. Guards answer a man who will not come down by throwing a knife or a hatchet. Nobody in this world has a gun.
+- **His face in dialogue** is the gilded one from the end of the Table onward.

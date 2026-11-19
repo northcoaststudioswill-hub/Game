@@ -221,7 +221,8 @@ const World = {
   sheetFor(id) { if (!this.sheets[id]) { const L = CAST[id].look(); this.sheets[id] = L.cadet ? makeCadet(L) : L.accredited ? makeAccredited(L) : makeChar(L); } return this.sheets[id]; },
   resetSheets() { this.sheets = {}; this.busts = {}; P.sheet = makeChar(playerLook()); },
   busts: {},
-  bustFor(id) { if (id === 'kael') return makeBust(Object.assign(playerLook(), { mouth: MOUTH.kael, scar: G.mode === 'world' && (F('ranForHer') || F('spatAtHer')) })); if (!this.busts[id]) this.busts[id] = makeBust(Object.assign({}, CAST[id].look(), { mouth: MOUTH[id] })); return this.busts[id]; },
+  bustFor(id) { if (id === 'kael' && CAST.kael2 && (this.gilded || this.gildP2 || (G.heist === 3 && this.map && (this.map.theme === 'valley' || this.map.theme === 'spire')))) return this.bustFor('kael2');   // after the Gilding he has their face: the portrait was still the valve tech's
+    if (id === 'kael') return makeBust(Object.assign(playerLook(), { mouth: MOUTH.kael, scar: G.mode === 'world' && (F('ranForHer') || F('spatAtHer')) })); if (!this.busts[id]) this.busts[id] = makeBust(Object.assign({}, CAST[id].look(), { mouth: MOUTH[id] })); return this.busts[id]; },
   load(id, spawn, noNPC) {
     G.mapId = id; this.map = MAPS[id]; this.layer = renderMapLayer(this.map);
     if (spawn) { P.x = spawn.x; P.y = spawn.y; P.dir = spawn.dir | 0; }
