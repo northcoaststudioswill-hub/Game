@@ -29,9 +29,9 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/spr
   let t = await until('run.isle', 150); ok('the island shard is swum home', await E('!!run.isle&&shards===3'), t + ' s'); await skip();
   await tp(28, 33, 0, 1); await throwFor(240); t = await until('run.boss', 120); ok('a crowd wakes Old Thornback', await E('!!run.boss'), t + ' s ' + await E(`JSON.stringify({st:state,b:[...new Set(buds.map(b=>b.st+(b.tgt?':'+(b.tgt.kind+(b.tgt.sub||'')):'')))],n:buds.length,boss:foes.filter(e=>e.boss).map(e=>[e.x|0,e.y|0,e.hp|0,e.on.length,e.st]),P:[P.x|0,P.y|0,P.stun],soil:sprouts.length,dayT:dayT|0,msg})`));
   ok('his scene (3D now) has the guardian lines', await E(`state==='c3'&&c3q.key==='thorn'&&c3q.S.some(e=>/set to guard that light/.test(e.cap[1]))`)); await skip();
-  await E(`dayT=20;void 0`); t = await until('shards>=4', 200); ok('the last shard comes home and the ending plays', await E(`shards===4&&state==='c3'&&c3q.key==='blaze'&&/last shard slides home/.test(c3q.S[0].cap[1])`), t + ' s ' + await E(`JSON.stringify({st:state,shards,sh:items.filter(i=>i.alive&&i.sub==='shard').map(i=>[i.x|0,i.y|0,i.w,str(i),i.on.map(b=>b.type).join(''),tileAt(i.x,i.y),fieldL[(i.y>>4)*MW+(i.x>>4)]]),b:[...new Set(buds.map(b=>b.st+(b.tgt?':'+(b.tgt.kind+(b.tgt.sub||'')):'')))],dayT:dayT|0})`));
-  await E(`keys.start=1;void 0`); await step(1); await E(`keys.start=0;void 0`); await step(2); /* START skips the 3D shot; Erin's scene follows */
-  ok('the ending says nobody remembers who lit it', await E(`state==='cine'&&scn.some(e=>/Nobody remembers who lit it first/.test(e[0]))`)); await skip();
+  await E(`dayT=20;void 0`); t = await until('shards>=4', 200); ok('the last shard comes home and the blaze plays', await E(`shards===4&&state==='c3'&&c3q.key==='blaze'&&/last shard slides home/.test(c3q.S[0].cap[1])`), t + ' s ' + await E(`JSON.stringify({st:state,shards,sh:items.filter(i=>i.alive&&i.sub==='shard').map(i=>[i.x|0,i.y|0,i.w,str(i),i.on.map(b=>b.type).join(''),tileAt(i.x,i.y),fieldL[(i.y>>4)*MW+(i.x>>4)]]),b:[...new Set(buds.map(b=>b.st+(b.tgt?':'+(b.tgt.kind+(b.tgt.sub||'')):'')))],dayT:dayT|0})`));
+  await E(`keys.start=1;void 0`); await step(1); await E(`keys.start=0;void 0`); await step(4); /* START skips the scene: the Lantern is whole, and the story is only half told */
+  ok('the Lantern is whole and the game goes on (the ending comes after the second light)', await E(`state==='play'&&won&&!run.fin&&C3SCN.home.some(e=>/Nobody remembers who lit the Great Lantern first/.test(e.cap[1]))`), await E('state')); await skip();
   for (let i = 0; i < 10 && (await E('state')) !== 'play'; i++) await tap('a');
   ok('the lantern is relit and play goes on', await E(`won&&state==='play'&&meta.ach[5]===1`), scenes.length + ' scenes seen');
   await tp(33, 19, 0, -1); await E(`buds.slice(0,3).forEach(b=>{b.star=true});enterHome();void 0`); await step(5);
@@ -40,7 +40,7 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/spr
   await E(`state='play';exitHome();void 0`); await step(3); ok('the crew is waiting outside', await E(`buds.length>0&&buds.every(b=>b.st==='follow')`));
   await E(`npcs[3].st='done';bp=PJ[0];state='build';void 0`); await tap('a'); ok('Pebs move out to build the Waterworks', (await E('pjS(PJ[0]).got[1]')) > 0, await E('flash'));
   await E(`state='play';endDay();void 0`); await step(2); ok('the evening report shows', (await E('state')) === 'dayend'); await tap('a'); await step(5);
-  ok('morning comes: day 2, home pays out, the buddies are back', await E(`day===2&&state==='play'&&wbuds.length===8&&toasts.some(t=>/^HOME:/.test(t.s))`));
+  ok('morning comes: day 2, home pays out in the one morning line, the buddies are back', await E(`day===2&&state==='play'&&wbuds.length===8&&tod.morn.some(l=>/^HOME:/.test(l))&&!toasts.some(t=>/^HOME:/.test(t.s))`), await E('JSON.stringify(tod.morn)'));
   ok('no page errors', !errs.length, errs);
   console.log(fail ? fail + ' FAILED' : 'ALL PASS'); await browser.close(); process.exit(fail ? 1 : 0);
 })();

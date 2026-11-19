@@ -24,7 +24,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
 
   /* ---- the scenes themselves ---- */
   const keys = JSON.parse(await E('JSON.stringify(Object.keys(C3SCN))'));
-  ok('nineteen 3D scenes (ten story, nine hidden)', keys.slice().sort().join() === 'arch,bessie,blaze,button,call,coast,dawn,dream,hottub,job,key,marks,moon,relight,sesh,slide,thorn,van,zoomies', keys);
+  ok('twenty-one 3D scenes so far in this list (twelve story, nine hidden)', ['arch','bessie','blaze','button','call','coast','dawn','dream','home','hottub','job','key','leak','marks','moon','relight','sesh','slide','thorn','van','zoomies'].every(k => keys.includes(k)), keys);
   const long = JSON.parse(await E(`JSON.stringify(Object.entries(C3SCN).flatMap(([k,S])=>S.map((s,i)=>[k,i,wrapPx(s.cap[1],228).length])).filter(q=>q[2]>3))`));
   ok('every caption fits its three lines', long.length === 0, long);
   await E(`init();live=true;void 0`);
@@ -94,13 +94,19 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok('a fresh old save keeps the new errand', await E(`(()=>{init();live=true;state='play';const o=JSON.parse(JSON.stringify(snap()));delete o.gates.jobsite;restore(o);return !run.key&&coastGate('jobsite').alive})()`));
   ok('a save made in the middle of the errand still has the key to carry', await E(`(()=>{init();live=true;state='play';openGarden();npcs[0].st='active';npcs[0].mi=npcs[0].ms.findIndex(m=>m.id==='e12');keySpawn();const o=JSON.parse(JSON.stringify(snap()));o.items=o.items.filter(q=>q[0]!=='key');restore(o);return items.filter(i=>i.alive&&i.sub==='key').length===1})()`));
 
-  /* ---- meeting Marcus: the van ---- */
-  await E(`init();live=true;state='play';dayT=30;ZONES.forEach(z=>run.seen[z[0]]=1);run.key=1;void 0`); await tp(17, 24, 0, -1); await E(`buds.forEach(b=>b.st='idle');void 0`); await step(4); await tap('a');
+  /* ---- meeting Marcus: locked out of his own job site, by the west path, from the first day ---- */
+  await E(`init();live=true;state='play';dayT=30;run.egg={};ZONES.forEach(z=>run.seen[z[0]]=1);void 0`); await step(4);
+  ok('on a new game the van and Marcus are on the near side of the crystal, in the Lantern Field', await E(`vanHere()&&npcs[3].st==='new'&&(npcs[3].x>>4)===22&&(npcs[3].y>>4)===21&&(VAN.x>>4)===22&&zoneAt(22,21)===0&&free(npcs[3].x,npcs[3].y,false)&&reachable(npcs[3])`), await E(`[npcs[3].x>>4,npcs[3].y>>4,VAN.x>>4,VAN.y>>4]`));
+  await tp(22, 22, 0, -1); await E(`buds.forEach(b=>b.st='idle');void 0`); await step(4); await shot('marcus-early'); await tap('a');
   ok('talking to Marcus the first time cuts to the van in 3D', await E(`state==='c3'&&c3q.key==='van'`), await E('state'));
   await tap('start'); await step(2);
-  ok('then he gives his first ask, without saying the idea twice', await E(`state==='talk'&&dlg.name==='MARCUS'&&npcs[3].st==='active'&&!/lazy river/i.test(dlg.pages.flat().join(' '))&&/Dew/.test(dlg.pages.flat().join(' '))`), await E('state'));
+  ok('then he asks for his lost key, without saying the idea twice', await E(`state==='talk'&&dlg.name==='MARCUS'&&npcs[3].st==='active'&&npcs[3].ms[0].id==='m0'&&!/lazy river/i.test(dlg.pages.flat().join(' '))&&/key/.test(dlg.pages.flat().join(' '))`), await E('state'));
   for (let i = 0; i < 12 && (await E('state')) === 'talk'; i++) await tap('a');
   await step(4); await tap('a'); ok('the second talk is an ordinary one', (await E('state')) === 'talk', await E('state')); for (let i = 0; i < 12 && (await E('state')) === 'talk'; i++) await tap('a');
+  ok('his ask points at the garden until the key is dug up, and is done when the key is home', await E(`(()=>{const a=AT.m0();const b=npcs[3].ms[0].get();run.key=1;return (a===npcs[0]||a===GARD||!!a)&&b===0&&npcs[3].ms[0].get()===1})()`));
+  await E(`openGate(gates[1]);const j=coastGate('jobsite');P.x=j.x+30;P.y=j.y;keyTick();void 0`);
+  ok('when the key opens the pond road, Flow Pros roll through to the Dew Pond', await E(`!coastGate('jobsite').alive&&(npcs[3].x>>4)===17&&(npcs[3].y>>4)===23&&(VAN.x>>4)===13&&/POND/.test(msg)`), await E(`[npcs[3].x>>4,npcs[3].y>>4,VAN.x>>4,msg]`));
+  ok('a save puts them back where the road says they are', await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);const a=(npcs[3].x>>4)===17;init();return a&&(npcs[3].x>>4)===22})()`));
 
   /* ---- before the call ---- */
   await E(`init();live=true;state='play';ZONES.forEach(z=>{if(z[0]!=='NORTH COAST')run.seen[z[0]]=1});run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1};run.tips={br:1,ne:1,dg:1,wb:1,wn:1,fl:1};found=found.map(()=>true);
@@ -119,7 +125,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await E(`won=true;shards=4;dayT=DAYLEN*.8;void 0`); await tp(28, 22); await step(30);
   ok('with the Lantern whole, night brings the 3D scene', await E(`state==='c3'&&c3q.key==='call'`), await E('state'));
   await skip3();
-  ok('afterwards the door is open, the way is walkable, the lens is out there', await E(`state==='play'&&run.call===1&&!coastGate('sunDoor').alive&&fieldL[20*MW+72]>0&&items.some(i=>i.alive&&i.sub==='lens')`), await E('msg'));
+  ok('afterwards the door is open and the way is walkable (the lens waits for the lamp room to be fixed)', await E(`state==='play'&&run.call===1&&!coastGate('sunDoor').alive&&fieldL[20*MW+72]>0&&!items.some(i=>i.alive&&i.sub==='lens')`), await E('msg'));
   ok('the coast has its berries and bugs now, but the berry on the rock waits for the pier', await E(`items.filter(i=>i.alive&&i.x>=70*16&&i.sub!=='lens').length>=8&&bugs.some(q=>q.alive&&q.x>=70*16)&&!items.some(i=>i.alive&&i.sub==='big'&&i.y<10*16&&i.x>=83*16)`), await E(`items.filter(i=>i.alive&&i.x>=70*16).length`));
   await step(12); ok('the marker points east', /BEAM EAST/.test(await E('OBJ&&OBJ.text')), await E('OBJ&&OBJ.text'));
   await E(`dayT=20;void 0`); await step(30); ok('it does not play twice', (await E('state')) === 'play');
@@ -135,6 +141,19 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok('any sprout builds the pier', (await E(`coastGate('northPier').on.length`)) >= 10, await E(`coastGate('northPier').on.length`));
   await step(30 * 14); ok('the pier gets built, and the berry on the rock appears', await E(`!coastGate('northPier').alive&&fieldL[6*MW+86]>0&&items.some(i=>i.alive&&i.sub==='big'&&i.y<10*16&&i.x>=83*16)`), await E('msg'));
   await tp(86, 7, 0, -1); await step(20); await shot('coast-4-north-light');
+  /* ---- the lamp room leaks: it is the job Flow Pros were rung about ---- */
+  ok('no lens yet: the lamp room has to be dry first', await E(`!items.some(i=>i.alive&&i.sub==='lens')&&leakNeed()`));
+  ok('at the North Light the lamp room is found flooded', /LAMP ROOM/.test(await E('msg')) && await E('run.tips.lk===1'), await E('msg'));
+  await step(12); ok('and the marker sends Will to tell Marcus', /TELL MARCUS/.test(await E('objective().text')) && await E(`objective().x===npcs[3].x`), await E('objective().text'));
+  await E(`npcs[3].st='active';const m=npcs[3];P.x=m.x;P.y=m.y+14;P.dx=0;P.dy=-1;msg='';msgT=0;buds.forEach(b=>{release(b);b.st='follow';b.x=P.x;b.y=P.y+6});talk(m);void 0`);
+  ok('Marcus works out that this was the job, and asks for ten sprouts', await E(`state==='talk'&&run.leakAsk===1&&/THAT was the job/.test(dlg.pages.flat().join(' '))&&/ten sprouts/.test(dlg.pages.flat().join(' '))`), await E('state'));
+  for (let i = 0; i < 14 && (await E('state')) === 'talk'; i++) await tap('a'); await step(12);
+  ok('the marker counts the crew for the Flow Pros job', /FLOW PROS JOB.*\/ 10/.test(await E('objective().text')), await E('objective().text'));
+  await tp(86, 9, 0, -1); await E(`buds.slice(8).forEach(b=>{b.st='idle';b.x=HX;b.y=HY+40});squad=buds.filter(b=>b.st==='follow');P.y=7*16+8;void 0`); await step(14);
+  ok('with fewer than ten it only says how many are there', (await E('state')) === 'play' && /TEN SPROUTS/.test(await E('msg')) && !(await E('run.leak')), await E('msg'));
+  await E(`buds.forEach(b=>{release(b);b.st='follow'});void 0`); await step(20);
+  ok('with ten at the light, the job is done in a 3D scene', await E(`state==='c3'&&c3q.key==='leak'`), await E('state')); await skip3(); await step(12);
+  ok('and then the lens is out, with the lamp room dry', await E(`run.leak===1&&items.some(i=>i.alive&&i.sub==='lens')`), await E('msg'));
   await E(`run.tips.ln=1;msg='';void 0`); await tp(86, 6, 0, -1); await E(`buds.forEach(b=>{b.st='idle'});void 0`); await tap('a');
   ok('the tower can be read', /NORTH LIGHT|TO KEEP|SUN CALL/.test(await E('msg')), await E('msg'));
 
@@ -151,8 +170,11 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   for (let k = 0; k < 6 && (await E('state')) !== 'play'; k++) { await tap('a'); await step(3); }
   await E(`dayT=DAYLEN*.7;void 0`); await step(12); ok('from the afternoon the arrow says it happens tonight', await E(`/TONIGHT/.test(objective().text)&&state==='play'`), await E('objective().text'));
   await E(`dayT=DAYLEN*.79;void 0`); await step(14); ok('and the relight scene plays in 3D once night has fallen', await E(`state==='c3'&&c3q.key==='relight'`), await E('state'));
-  await skip3(); await step(12);
-  ok('the North Light is lit, and paid for', await E(`run.lit===1&&(state==='play'||state==='card')`), await E('toasts.length&&toasts[0].s'));
+  await skip3(); await step(6);
+  ok('the ending follows the relight: everyone at the Lantern', await E(`run.lit===1&&state==='c3'&&c3q.key==='home'&&!run.fin`), await E('state')); await shot('ending');
+  await skip3(); await step(6);
+  ok('then the win screen, once, after the second act', await E(`state==='win'&&run.fin===1&&won`), await E('state')); await shot('win'); await tap('a'); await step(6);
+  ok('and the valley goes on', await E(`state==='play'||state==='card'`), await E('state'));
   for (let i = 0; i < 6 && (await E('state')) === 'card'; i++) await tap('a'); await step(12);
   ok('the marker goes back to the missions', !/LENS|PIER|BEAM/.test(await E('OBJ&&OBJ.text')), await E('OBJ&&OBJ.text'));
   await E(`dayT=DAYLEN*.9;tod.flick=0;void 0`); await tp(28, 22); await step(30);
@@ -190,8 +212,8 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
     return coastGate('sunDoor').alive&&coastGate('northPier').alive&&won&&!run.call&&fieldL[20*MW+57]>=0})()`);
   ok('a save from before this update loads with the door shut', old);
   await E(`dayT=DAYLEN*.8;void 0`); await step(30); ok('and that save gets the call on its next night', await E(`state==='c3'&&c3q.key==='call'`), await E('state')); await skip3();
-  const mid = await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);return run.call===1&&!coastGate('sunDoor').alive&&coastGate('northPier').alive&&items.filter(i=>i.alive&&i.sub==='lens').length===1&&sprouts.some(q=>q.x>70*16)})()`);
-  ok('saved half way, the lens and the wild coast sprouts are still there', mid);
+  const mid = await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);return run.call===1&&!coastGate('sunDoor').alive&&coastGate('northPier').alive&&sprouts.some(q=>q.x>70*16)&&(()=>{run.coastScn=1;openGate(coastGate('northPier'));leakDone();const o2=JSON.parse(JSON.stringify(snap()));restore(o2);return run.leak===1&&items.filter(i=>i.alive&&i.sub==='lens').length===1})()})()`);
+  ok('saved half way, the wild coast sprouts are still there; saved after the job, so is the lens', mid);
 
   /* ---- from Will's playtest: fewer trail posts, the front door, the house in 3D ---- */
   await E(`init();live=true;state='play';dayT=30;ZONES.forEach(z=>run.seen[z[0]]=1);void 0`); await step(4);
@@ -243,21 +265,21 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   /* ---- Sprouts' own capsules, and erasing everything ---- */
   await E(`state='menu';mi=menuItems().indexOf('CAPSULES');meta.tix=2;meta.ltix=5;meta.petals=0;void 0`); await tap('a');
   ok("CAPSULES opens Sprouts' own machine", (await E('state')) === 'caps', await E('state'));
-  ok('it holds Sprouts styles only; Rootdeep unlocks are only in the Lantern machine', await E(`pool('sp').every(q=>q.k!=='rd')&&pool('sp').length>0&&pool('rd').every(q=>q.k==='rd')&&pool().length===pool('sp').length+pool('rd').length`));
-  await tap('a'); await step(60); ok('a pull spends a Sprouts ticket and leaves Lantern tickets alone', await E(`meta.tix===1&&meta.ltix===5&&capS.it&&capS.it.k!=='rd'`), await E('[meta.tix,meta.ltix]'));
+  ok('it holds Sprouts styles only; Rootdeep unlocks are only in the Lantern machine', await E(`pool('sp').every(q=>q.k!=='rd')&&pool('sp').length>0&&pool().length===pool('sp').length`));
+  await tap('a'); await step(60); ok('a pull spends a Sprouts ticket and leaves Lantern tickets alone', await E(`meta.tix===1&&capS.it&&capS.it.k!=='rd'`), await E('[meta.tix]'));
   await tap('a'); await tap('b');
-  await E(`meta.petals=77;meta.life.berries=9;meta.trs=[1];meta.own.rd=[0];run.pets=3;state='menu';mi=menuItems().indexOf('ERASE EVERYTHING');void 0`); await tap('a');
+  await E(`meta.petals=77;meta.life.berries=9;meta.trs=[1];meta.own.rd=[0];run.pets=3;state='settings';setFrom='menu';seti=SETROWS.indexOf('ERASE EVERYTHING');void 0`); ok('ERASE EVERYTHING is in Settings, not on the main menu', await E(`!menuItems().includes('ERASE EVERYTHING')&&seti>=0`)); await tap('a');
   ok('ERASE EVERYTHING asks first, with NO chosen', await E(`state==='wipe'&&wipeI===0`), await E('state')); await shot('erase');
-  await tap('a'); ok('NO goes back and erases nothing', await E(`state==='menu'&&meta.petals===77`));
+  await tap('a'); ok('NO goes back and erases nothing', await E(`state==='settings'&&meta.petals===77`));
   await tap('a'); await tap('down'); await tap('a'); await tap('a'); ok('YES needs three presses', await E(`state==='wipe'&&meta.petals===77`), await E('state'));
   await tap('a');
   ok('then Sprouts is brand new: valley, petals, tickets, pulls, stats, Collection, scenes', await E(`state==='menu'&&!live&&meta.petals===0&&meta.tix===1&&meta.xp===0&&meta.life.berries===0&&meta.life.pulls===0&&meta.trs.length===0&&!meta.scn&&Object.keys(meta.ach).length===0&&ownCount()===0&&SAVE.run===null`), await E('JSON.stringify([state,live,meta.petals,meta.tix,meta.life.pulls,ownCount()])'));
-  ok("and what belongs to other games is kept (Rootdeep's unlocks, Lantern tickets, sound)", await E(`meta.own.rd.length===1&&meta.ltix===5&&meta.mus>=0`));
-  ok('it is saved that way', await E(`JSON.parse(localStorage.getItem('pl-alt:sprouts-v2')||localStorage.getItem('sprouts-v2')).meta.petals===0`));
+  ok("and the sound and view settings are kept", await E(`meta.mus>=0&&meta.sfx>=0`));
+  ok('it is saved that way', await E(`JSON.parse(localStorage.getItem('sprouts-v2')).meta.petals===0`));
 
   /* ---- easter eggs ---- */
   await E(`init();live=true;state='play';dayT=30;ZONES.forEach(z=>run.seen[z[0]]=1);run.key=1;openGate(gates[1]);openGate(coastGate('jobsite'));void 0`); await step(4);
-  ok('no van by the pond until Marcus has been met', await E('!vanHere()'));
+  ok('with the road open the van is by the pond', await E('vanHere()&&(VAN.x>>4)===13'));
   await E(`npcs[3].st='active';void 0`); await tp(13, 27, 0, -1); await E(`P.y=VAN.y+16;buds.forEach(b=>b.st='idle');void 0`); await step(3); await shot('egg-1-van'); await tap('a'); await step(3);
   ok('A at the van by day: Marcus and Derek tear off to a job, in 3D', await E(`state==='c3'&&c3q.key==='job'&&tod.vanGone===1`), await E('state'));
   await tap('start'); await step(3); ok('and the van is gone for the day', await E(`!vanHere()&&state==='play'`));
@@ -304,10 +326,10 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
 
   /* ---- the ending in 3D ---- */
   await E(`init();live=true;state='play';shards=3;const it=mkItem('shard',24*16+8-50,18*16+8);it.w=1;for(let i=0;i<6;i++)mkBud(1,2,P.x,P.y);void 0`); await tp(24, 18, -1, 0); await step(3); await throwFor(20); await step(30 * 12);
-  ok('the fourth shard plays the 3D ending', await E(`shards===4&&state==='c3'&&c3q.key==='blaze'`), [await E('shards'), await E('state')]);
-  await skip3(); ok("then Erin's lines", await E(`state==='cine'&&/^You did it/.test(scn[0][0])`), await E('state'));
-  for (let i = 0; i < 30 && (await E('state')) === 'cine'; i++) await tap('a');
-  ok('and the win screen', await E(`state==='win'&&won`), await E('state'));
+  ok('the fourth shard plays the blaze in 3D', await E(`shards===4&&state==='c3'&&c3q.key==='blaze'&&C3SCN.blaze.length===5&&/skips/.test(C3SCN.blaze[3].cap[1])&&C3SCN.blaze[4].cap[0]==='THORNBACK'`), [await E('shards'), await E('state')]);
+  await skip3(); await step(6);
+  ok('it is a midpoint, not an ending: the Lantern is whole, no win screen, the story goes on', await E(`state==='play'&&won&&!run.fin&&run.wonDay===day&&toasts.some(q=>/WHOLE/.test(q.s))`), await E('state'));
+  ok('Erin\'s "You did it" has moved to the ending after the second light', await E(`C3SCN.home.some(q=>q.cap[0]==='ERIN'&&/^You did it, Will/.test(q.cap[1]))&&!C3SCN.blaze.some(q=>/You did it/.test(q.cap[1]))&&C3SCN.home[C3SCN.home.length-1].cap[0]==='THORNBACK'`));
 
   /* ---- found in the playtest pass ---- */
   await E(`init();live=true;state='play';won=true;shards=4;day=3;ZONES.forEach(z=>run.seen[z[0]]=1);dayT=DAYLEN-.01;void 0`); await step(6);
@@ -359,8 +381,8 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   for (let k = 7; k < rest.length - 1; k++) await walk(rest[k]); const pl = await E('meta.petals'), tl = await E('meta.tix'); await walk(rest[rest.length - 1]);
   ok('the last one pays 50 and 2 tickets', (await E('glimHave()')) === 30 && (await E('meta.tix')) >= tl + 2 && (await E('meta.petals')) >= pl + 52, [pl, await E('meta.petals'), tl, await E('meta.tix')]);
   await E(`state='pause';void 0`); await shot('glimmer-pause'); await E(`state='play';void 0`);
-  const sc = JSON.parse(await E(`(()=>{const n=npcs.find(n=>n.name==='SCOUT'),ids=n.ms.map(m=>m.id);const a=ids.indexOf('s4'),m5=n.ms[a+1],m6=n.ms[a+2];return JSON.stringify([ids.slice(a),m5.get(),m5.goal,m6.goal,wrapPx(m5.say,228,1).length,wrapPx(m6.say,228,1).length,tw(m5.t,1),tw(m6.t,1)])})()`));
-  ok("Scout asks for 10 and then 20 after her bug asks, counted from what Will has found", sc[0].join() === 's4,s5,s6' && sc[1] === 30 && sc[2] === 10 && sc[3] === 20, sc);
+  const sc = JSON.parse(await E(`(()=>{const n=npcs.find(n=>n.name==='SCOUT'),ids=n.ms.map(m=>m.id);const a=ids.indexOf('s4'),m5=n.ms[ids.indexOf('s5')],m6=n.ms[ids.indexOf('s6')];return JSON.stringify([ids.slice(a),m5.get(),m5.goal,m6.goal,wrapPx(m5.say,228,1).length,wrapPx(m6.say,228,1).length,tw(m5.t,1),tw(m6.t,1)])})()`));
+  ok("Scout asks for 10 and then 20 after her bug asks, counted from what Will has found", sc[0].join() === 's4,s7,s5,s6' && sc[1] === 30 && sc[2] === 10 && sc[3] === 20, sc);
   ok('the marker for her ask points at the nearest glimmer not yet found', await E(`(()=>{init();live=true;state='play';const t=AT.s5();return GLIM.some(q=>q.x===t.x&&q.y===t.y)&&GLIM.filter(q=>q.z===0).some(q=>q.x===t.x&&q.y===t.y)})()`));
   /* A at someone talks even while Will is still walking */
   await E(`init();live=true;state='play';run.egg={};ZONES.forEach(z=>run.seen[z[0]]=1);const n=npcs.find(n=>n.name==='SCOUT');P.x=n.x-34;P.y=n.y+4;P.d=1;P.fx=1;P.fy=0;LO.x=LO.sx=P.x-30;LO.y=LO.sy=P.y+20;void 0`);
@@ -376,14 +398,14 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
     e.ms[e.mi].get=()=>99;out.push(objective().text);at(e);talk(e);state='play';out.push(objective().text);return JSON.stringify(out)})()`));
   ok("the arrow stays on Erin for her first three asks", arrows.slice(0, 3).every(t => /PLUCK|BERRIES|LOUIE|ERIN/.test(t)), arrows.slice(0, 3));
   ok('then it sends Will to meet Ranger, and after his first ask, Scout', /TALK TO RANGER/.test(arrows[3]) && /BRAMBLE/.test(arrows[4]) && /GO SEE RANGER/.test(arrows[5]) && /TALK TO SCOUT/.test(arrows[6]) && /ZIP/.test(arrows[7]), arrows.slice(3, 8));
-  ok('with everyone met it stays on whoever Will last spoke to', /BUGS/.test(arrows[8]), arrows[8]);
+  ok('then Marcus, who can be met from the first day', /TALK TO MARCUS/.test(arrows[8]), arrows[8]);
   ok('an ask that is finished calls him back, whoever gave it, and talking to them puts the arrow on theirs', /GO SEE ERIN/.test(arrows[9]) && /FLOWERS/.test(arrows[10]), arrows.slice(9));
-  ok('Marcus is not named until the pond road is open', await E(`(()=>{${fresh}const e=npcs[0];e.st='active';e.mi=4;run.meet=1;npcs[1].st=npcs[2].st='active';run.trk='ERIN';P.x=HX;P.y=HY+20;reachC=null;const a=tracked().name;openGate(gates[1]);openGate(coastGate('jobsite'));reachC=null;return a==='ERIN'&&tracked().name==='MARCUS'})()`));
+  ok('with everyone met the arrow stays on whoever Will last spoke to', await E(`(()=>{${fresh}const e=npcs[0];e.st='active';e.mi=4;run.meet=1;npcs[1].st=npcs[2].st=npcs[3].st='active';run.trk='SCOUT';P.x=HX;P.y=HY+20;reachC=null;return tracked().name==='SCOUT'})()`));
   ok('the pause list marks the ask the arrow is on', await E(`(()=>{${fresh}npcs[0].st='active';npcs[0].mi=4;npcs[1].st='active';run.trk='RANGER';state='pause';g.setTransform(2,0,0,2,0,0);const o=g.fillRect.bind(g);let n=0;g.fillRect=(x,y,w,h)=>{if(g.fillStyle==='#f8e060'&&x<=3&&y>118)n++;o(x,y,w,h)};draw();g.fillRect=o;state='play';return n===2})()`));
   const s2v = JSON.parse(await E(`(()=>{${fresh}const a=SCN.s2().map(q=>q[2]||'');npcs[3].st='active';const b=SCN.s2().map(q=>q[2]||'');return JSON.stringify([a,b,SCN.s2().every(q=>wrapPx(q[0],228,2).length<=4)])})()`));
   ok('at two shards Marcus only speaks if Will has met him; otherwise Ranger brings the news', s2v[0].includes('RANGER') && !s2v[0].includes('MARCUS') && s2v[1].includes('MARCUS'), s2v);
   const late = JSON.parse(await E(`(()=>{${fresh}const r=npcs[1];r.st='active';r.mi=r.ms.findIndex(m=>m.id==='r5');r.ms[r.mi].get=()=>1;run.boss=true;P.x=r.x;P.y=r.y+14;talk(r);const t=dlg.pages.map(p=>p.join(' ')).join(' ');state='play';
-    return JSON.stringify([/already been to see him/.test(t),!/sleeps like a boulder/.test(t),npcs.reduce((k,n)=>k+n.ms.filter(m=>m.late).length,0)===6])})()`));
+    return JSON.stringify([/already been to see him/.test(t),!/sleeps like a boulder/.test(t),npcs.reduce((k,n)=>k+n.ms.filter(m=>m.late).length,0)===9])})()`));
   ok('an ask that is already done when it is given gets a line that says so (Thornback is not "asleep" after he has moved in)', late.every(Boolean), late);
   ok('the call never comes on the same evening as the ending', await E(`(()=>{${fresh}won=true;day=3;run.wonDay=3;const a=coastDue();day=4;return !a&&coastDue()})()`));
   ok('the job site lock cannot be opened through the crystal beside it', await E(`(()=>{${fresh}run.key=1;const j=coastGate('jobsite');P.x=j.x+30;P.y=j.y;keyTick();const a=j.alive;openGate(gates[1]);keyTick();return a&&!j.alive})()`));
