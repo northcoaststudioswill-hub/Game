@@ -383,3 +383,8 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **The Auditor's Blade** had a name once; Celestine took it with the post. Kael offers him one from Mara's list.
 - **Brand's halberd** was carried up the Stair by Hollis and stood on the second landing.
 - **New canon to confirm:** the Warden Captain at Riser Nine is unnamed; three Wardens died there.
+
+### Third-person levels: how they play (v0.30.1)
+- Fury shows as gold on Kael himself, never as red on the screen.
+- Moves: the five-beat chain, the boot and the Wide Cut, the hook line, the boots (LIFT ZERO), the Turn and the Riposte, the Count, ELEVEN.
+- Every chalked sun is a memory. The first is always the count. The others are, by level: Wren at the manifold and the Pairing (the docks); Wren at the pump house, whom he did not yet know (Riser Nine); the Pinning and the rail of the barge (the Stair). The ones about Wren set her against Seren in his own head: the washer that would not get heavier, hands on a pipe, a shelf made longer.

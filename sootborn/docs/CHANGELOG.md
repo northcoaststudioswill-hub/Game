@@ -1,5 +1,33 @@
 # SOOTBORN — changelog
 
+## v0.30.1 · 2026-11-19 — the third-person levels: brighter, gold instead of red, more ways to fight, a memory at every sun
+From play notes: the cel shading is a little dark; the red flare round the edge reads as dying, so let him glow gold as the rage grows; more fighting animations, a kick, and moves from his own story as in the other fights; text overlapping in the cinematics; every circle on the ground should trigger something different, with memories from below, from the Assay, and of Wren and the conflict between her and Seren in his head.
+
+**Picture**
+- Ambient light is up by about half and the key light a little, in all three levels. The ink, the dots and the night are kept; the shadows are less deep.
+- The red edge is gone. As fury rises Kael himself glows gold, gold motes lift off him, and near full he lights the ground. His cuts turn gold above half fury.
+
+**Fighting: what each button does in a level now**
+- **A**: the five-beat chain (cut, backhand, ram, boot, cleave), or whatever the prompt says.
+- **KICK**: the boot on its own. Press it again as it lands for the **Wide Cut**, a turning cut that hits everyone round him.
+- **HOOK**: the **hook line**. It drags an ordinary guard to him; a Warden or a boss it takes him to. Either way he arrives with the ram.
+- **BOOTS**: the leap and LIFT ZERO.
+- **ELEVEN**: the ultimate, at full fury.
+- **B**: dodge. A late dodge is the Turn, and the next cut after it is a **Riposte** for double.
+- That is nine named moves from the 2D and arena fights now in the third-person levels: the chain, the ram, the boot, the Wide Cut, the hook line, the boots, the Turn, the Riposte, and the Count.
+
+**Text**
+- In the small frame, story pages show one panel at a time, filling the frame, so captions cannot sit on each other.
+- Messages are held back while a dialogue, a page or a memory is up, and cleared when one starts.
+
+**A different memory at every chalked sun**
+- The first sun in each level is still the count.
+- *The High Docks*: the yard sun is Wren turning his hand over at the east manifold, and the washer that did not get heavier (fury fills). The roof sun is the Pairing: Teo's bread, and "I hope she was worth it."
+- *Riser Nine*: a second sun by the pump house. This is the valley where he first met Wren and she never saw his face; she put her hand on the pipe the way Seren taught him (fury fills).
+- *The Stair*: the first landing is the last day of the Assay, and Celestine saying he reminded her of someone. The second landing is the rail of the barge: "I am not asking for her place." "There is not a place. There is a shelf." (fury fills).
+
+**Checked** by script: the kick, the Wide Cut and the hook line fire and name themselves; the gold glow rises with fury; all three levels still run to their endings. **Not checked:** whether the brighter picture is right on a phone and on a big screen (I looked at one size); the Wide Cut's turn in motion; the memories' wording on screen. The memory about Wren in the valley uses the picture of her at the Clerk's desk, because there is no picture of the Island.
+
 ## v0.30 · 2026-11-19 — Riser Nine and the Stair are built; the boots are in all three
 From play notes: start building the two new third-person levels where they were placed, make sure they fit there, and give him what he has by then, the boots above all.
 

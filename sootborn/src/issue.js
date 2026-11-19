@@ -9,7 +9,7 @@ const Issue = {
   on: false, el: null, done: null, ready: false, timer: 0, onMsg: null, last: '', lab: null,
   // the memories the level may show, drawn by the same panel code as the rest of the game
   LEVELS: { docks: 'The High Docks', riser: 'Riser Nine', stair: 'The Stair' },
-  PANELS: ['under:0', 'ward:0', 'row:0', 'desk:2', 'desk:4', 'desk:5', 'ledger:2', 'freight:0', 'furnace:0', 'furnace:1', 'furnace:2', 'hands:0', 'kael:0', 'tin:0', 'lift:0', 'dockstair:0'],
+  PANELS: ['desk:3', 'assay:0', 'weather:2', 'under:0', 'ward:0', 'row:0', 'desk:2', 'desk:4', 'desk:5', 'ledger:2', 'freight:0', 'furnace:0', 'furnace:1', 'furnace:2', 'hands:0', 'kael:0', 'tin:0', 'lift:0', 'dockstair:0'],
   can() { if (Settings.d.issue3d === 0) return false; try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } },
   assets() {
     const out = {}, was = Panels.narrow;
@@ -37,7 +37,7 @@ const Issue = {
     window.addEventListener('message', this.onMsg);
     f.srcdoc = html; document.body.insertBefore(f, $('#controls')); this.place();
     // the fight buttons, named for what they do up here
-    this.lab = {}; [['bY', 'BOOTS'], ['bX', 'STRIKE'], ['bR', 'LOCK'], ['bL', 'ELEVEN']].forEach(([id, t]) => { const b = $('#' + id); if (b) { this.lab[id] = b.textContent; b.textContent = t; } });
+    this.lab = {}; [['bY', 'BOOTS'], ['bX', 'KICK'], ['bR', 'HOOK'], ['bL', 'ELEVEN']].forEach(([id, t]) => { const b = $('#' + id); if (b) { this.lab[id] = b.textContent; b.textContent = t; } });
     this.timer = setTimeout(() => { if (!this.ready) this.finish(false); }, 15000);
   },
   // once a frame from the main loop: hand the level this game's own input
@@ -46,8 +46,8 @@ const Issue = {
     const bc = document.body.classList; if (!bc.contains('ingame')) bc.add('ingame'); if (!bc.contains('fight')) bc.add('fight'); if (bc.contains('ctlfade')) bc.remove('ctlfade');   // this game's pad and buttons stay up for the whole level
     if (!this.ready) return;
     const x = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), y = (Input.h('up') ? 1 : 0) - (Input.h('down') ? 1 : 0), press = [];
-    if (Input.p('A')) press.push('ctx'); if (Input.p('B')) press.push('dodge'); if (Input.p('X')) press.push('attack'); if (Input.p('Y')) press.push('boots');
-    if (Input.p('L')) press.push('power'); if (Input.p('R')) press.push('lock'); if (Input.p('START')) press.push('pause');
+    if (Input.p('A')) press.push('ctx'); if (Input.p('B')) press.push('dodge'); if (Input.p('X')) press.push('kick'); if (Input.p('Y')) press.push('boots');
+    if (Input.p('L')) press.push('power'); if (Input.p('R')) press.push('hook'); if (Input.p('START')) press.push('pause');
     const k = x + ',' + y; if (k === this.sent && !press.length) return; this.sent = k;
     try { this.el.contentWindow.postMessage({ sootborn: 'in', x, y, press }, '*'); } catch (e) { /* frame is going away */ }
   },

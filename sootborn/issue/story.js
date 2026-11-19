@@ -53,20 +53,41 @@
     halberd: [{ k: 'dockstair0', cap: 'TWO YEARS AGO. THE DOCK STAIR.', cap2: 'ELEVEN MINUTES. SOMEBODY TIMED IT. *I ASKED THEM TO.*' }],
     loft: [{ k: 'lift0', cap: 'LAST YEAR. HER ROOM.', cap2: 'I HUMMED THE SHIFT SONG AT HER VALVE AND DID NOT HEAR MYSELF. *SHE HAS KNOWN SINCE.*' }, { k: 'hands0', cap2: 'THE WASHER IS UNDER MY COLLAR. IT HAS NOT GOT ANY HEAVIER.' }]
   };
-  function sayThenMemory(id, lines, done) {
-    U.say(lines, () => {
-      const m = (MEM[id] || []).filter(p => A_(p.k)); if (!m.length) { done(); return; }
-      const wide = window.innerWidth > window.innerHeight * 1.35 && m.length > 1;
-      U.page({ cols: wide ? '1fr 1fr' : '1fr', rows: wide || m.length < 2 ? '1fr' : '1fr 1fr',
-        panels: m.map((p, i) => ({ img: A_(p.k), cls: 'px', area: wide ? '1 / ' + (i + 1) + ' / 2 / ' + (i + 2) : (i + 1) + ' / 1 / ' + (i + 2) + ' / 2', cap: p.cap, cap2: p.cap2 })) }, done);
-    });
+  function pagesOf(list, done) {
+    const m = (list || []).filter(p => A_(p.k)); if (!m.length) { done(); return; }
+    const wide = window.innerWidth > window.innerHeight * 1.35 && m.length > 1;
+    U.page({ cols: wide ? '1fr 1fr' : '1fr', rows: wide || m.length < 2 ? '1fr' : '1fr 1fr',
+      panels: m.map((p, i) => ({ img: A_(p.k), cls: 'px', area: wide ? '1 / ' + (i + 1) + ' / 2 / ' + (i + 2) : (i + 1) + ' / 1 / ' + (i + 2) + ' / 2', cap: p.cap, cap2: p.cap2 })) }, done);
   }
+  function sayThenMemory(id, lines, done) { U.say(lines, () => pagesOf(MEM[id], done)); }
+  /* every chalked sun is a different thing he cannot put down: below, the Assay, and the two women */
+  const SUN = {
+    docks: {
+      yard: { fury: 1, toast: 'THE WASHER. *FURY FULL.*', p: [
+        { k: 'desk3', cap: 'THE EAST MANIFOLD. LAST YEAR.', cap2: 'WREN HALLORAN TURNED MY HAND OVER AND SAW THE VALVE BURNS THE GILDING DID NOT TAKE. *SHE DID NOT ASK.*' },
+        { k: 'hands0', cap2: 'THE WASHER WAS UNDER MY COLLAR. I WAITED FOR IT TO GET HEAVIER. *IT DID NOT, AND I HAVE NOT FORGIVEN IT.*' }] },
+      roof: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
+        { k: 'assay0', cap: 'THE ASSAY. THREE YEARS AGO.', cap2: 'TWO SEALED IN A ROOM, ONE COMES OUT A CADET. TEO ALDANE SHARED HIS BREAD ON THE LIFT. *"I HOPE SHE WAS WORTH IT."*' },
+        { k: 'kael0', cap2: 'I NEVER TOLD HIM THERE WAS A SHE.' }] } },
+    riser: {
+      yard: { fury: 1, toast: 'HANDS. *FURY FULL.*', p: [
+        { k: 'desk3', cap: 'THIS VALLEY. NIGHT TWENTY-FIVE OF THE ASSAY.', cap2: 'AN APPRENTICE KEPT THE VENT STACK AT THIS PUMP HOUSE. SHE NEVER SAW MY FACE. *SHE PUT HER HAND ON THE PIPE THE WAY I DO.*' },
+        { k: 'furnace2', cap2: 'SEREN TAUGHT ME THAT. HANDS, KAEL. EVERYTHING IS HANDS. *I HAD NOT KNOWN ANYONE ABOVE THE ROCK COULD LEARN IT.*' }] } },
+    stair: {
+      yard: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
+        { k: 'assay0', cap: 'THE LAST DAY OF THE ASSAY.', cap2: 'I TOOK A KEEP FROM THE HIGH AUDITOR\'S SON WHILE SHE WATCHED. SHE PINNED A SUN ON ME FOR IT. *SHE SAID I REMINDED HER OF SOMEONE.*' }] },
+      roof: { fury: 1, toast: 'A SHELF CAN BE MADE LONGER. *FURY FULL.*', p: [
+        { k: 'weather2', cap: 'THE RAIL OF A BARGE. THIS YEAR.', cap2: '"I AM NOT ASKING FOR HER PLACE." "THERE IS NOT A PLACE. THERE IS A SHELF."' },
+        { k: 'tin0', cap2: 'SEREN WOULD HAVE HECKLED. THEN SHE WOULD HAVE MOVED UP. *EVERY BREATH IS STILL HERS. THERE TURNED OUT TO BE A GREAT MANY OF THEM.*' }] } }
+  };
   /* a chalked sun: he counts eleven. The first time, the count is what starts him. */
   function crossing(id) {
     return function () {
       const first = !F.path; S.cp = id; pl.hp = SC.T.hp; pl.chance = 1; SC.audio.sfx('clue');
       if (first) { pl.control = false; pl.setPath('ember'); F.path = 'ember'; save(); U.memory(art(FIN.count), bargain); }
-      else { save(); FX.ring(pl.pos, 0xffe14a, 0.5, 3, 0.5); U.toast('ELEVEN SECONDS. SAVED. HEALED. YOUR BREATH IS BACK.', 2.6); objective(); }
+      else { save(); FX.ring(pl.pos, 0xffe14a, 0.5, 3, 0.5); const sm = (SUN[SC.issue] || {})[id];
+        if (sm && !F['sun_' + id]) { F['sun_' + id] = 1; save(); pl.control = false; pagesOf(sm.p, () => { pl.control = true; if (sm.fury) pl.meter = SC.T.meter; U.toast(sm.toast, 3.2); objective(); }); }
+        else { U.toast('ELEVEN SECONDS. SAVED. HEALED. YOUR BREATH IS BACK.', 2.6); objective(); } }
     };
   }
 //@@CUTSCENES
@@ -227,7 +248,7 @@
   if (SC.issue === 'riser' || SC.issue === 'stair') {
     const RIS = SC.issue === 'riser', BY = RIS ? 0 : 18, done = () => { S.done = true; S.wipe(); if (!SC.host('done', { time: S.time, kills: pl.stats.kills, clues: pl.echoes })) U.end({ time: S.time, path: '', kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); };
     for (const k in CROSS) delete CROSS[k]; for (const k in ENC) delete ENC[k];
-    Object.assign(CROSS, RIS ? { alley: { x: 0, y: 0, z: 9, yaw: Math.PI } } : { alley: { x: 0, y: 0, z: 39, yaw: Math.PI }, roof: { x: 0, y: 12, z: -11, yaw: Math.PI } });
+    Object.assign(CROSS, RIS ? { alley: { x: 0, y: 0, z: 9, yaw: Math.PI }, yard: { x: -12, y: 0, z: 4, yaw: Math.PI } } : { alley: { x: 0, y: 0, z: 39, yaw: Math.PI }, yard: { x: 0, y: 6, z: 14.5, yaw: Math.PI }, roof: { x: 0, y: 12, z: -11, yaw: Math.PI } });
     Object.assign(ENC, RIS ? {
       alley: { arena: [-25, -22, 25, 22], floor: 0, waves: [[['hollow', -4, -14], ['hollow', 4, -15], ['hollow', 0, -17]]] },
       w2: { arena: [-25, -22, 25, 22], floor: 0, waves: [[['hollow', -12, -12], ['knifer', 10, -14], ['knifer', -2, -18], ['hollow', 14, -6]]] },
