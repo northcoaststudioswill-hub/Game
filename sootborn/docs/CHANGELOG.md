@@ -1,4 +1,24 @@
-# SOOTBORN — changelog (latest v0.42 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.43 · 2026-11-19)
+
+## v0.43 · 2026-11-19 — above-ground fights: Kael redrawn in 2D, a real blade and swing, the hook from Part Two on everywhere, rounder and better-lit 3D figures
+From play notes: the fully 2D fights above ground need a lot of work (the ones below are liked); the models there are ugly and the one sword move is poor; the hooked blade must be consistent; the fully 3D ones still need work and smoothing, Kael most of all.
+
+**2D, above ground**
+- **The cadet sprite is redrawn**, which is Kael gilded and every Accredited cadet in the 2D fights and in the Assay camps: a head two pixels wider with real eyes and brows, pauldrons wider than the waist, separate arms with gilt cuffs and hands, tassets, greaves with a knee, cuffed boots, a cape with folds and a gilt hem. It was a narrow column with a small head.
+- **The blade is a piece of steel now**, not a line: a tapered shape with an outline, an edge highlight and a point. At rest Kael carries it forward and up, not straight up like a pole.
+- **The swing leaves a crescent**: wide and bright at the blade, thinning to nothing behind it, in twelve steps (was a flat wedge in seven).
+- **2D fights at night in the storm** (the Lamp, On the Ground, the lane fight) drew the darkness and a warm haze over the fighters, so they looked like ghosts. Night now falls on the valley and the tents behind them; the fighters are drawn clean on top, with rain over everything.
+
+**The hook, consistently**
+- Rule: from the night Brand reforges it (the start of Part Two), Kael's blade ends in the hook. Before that it is straight.
+- It now shows in every fight from Part Two on, 2D and 3D: the Gallery, Riser Nine, the Son, the High Docks, the Fall, the Stair, the last duel, the training room, and in those fights' films. The Assay fights and the training years keep the straight blade. Brand's and Mara's fights are unchanged.
+- The three third-person levels already had it.
+
+**3D figures**
+- **Rounder:** every lofted part (limbs, torsos, heads) has ten or thirteen sides where it had six or eight, on Medium and High graphics.
+- **Lit:** figures were standing in their own shadow whenever the sun was behind them, which on the keep is always; Kael's gold hair read brown and his ivory plate read purple-grey. Fighters now get more fill light and their shadow side is no longer pushed blue. Scenery is unchanged.
+
+**Checked:** bots won the Drill (2D), the Valley and the Son with no errors; close pictures of Kael in 2D and 3D before and after; the hook seen on the 3D blade in the training room; which fights have the hook listed by script (nine checked). **Not checked:** played by hand; the 2D hook and the new swing were seen in one still each; the rounder figures cost more to draw and I cannot measure that on a phone (Low graphics keeps the old side count).
 
 ## v0.42 · 2026-11-19 — the older 3D fights: new bodies for everyone, and the crowded ones moved onto painted backgrounds
 From play notes: the older 3D arena fights are chaotic and ugly; a mix of painted 2D backgrounds and 3D is fine; the fully 3D ones need work.

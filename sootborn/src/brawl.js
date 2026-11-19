@@ -493,6 +493,9 @@ const Brawl = {
   poly(g, pts, col) { if (this.g3) return G3.poly(pts, col); g.fillStyle = col; g.beginPath(); pts.forEach((q, i) => { const pr = this.proj(q[0], q[1]); if (i) g.lineTo(pr.x, pr.y); else g.moveTo(pr.x, pr.y); }); g.closePath(); g.fill(); },
   disc(g, x, y, r, col, stroke) { if (this.g3 && stroke) return G3.ring(x, y, r, col, stroke * .9); const pts = []; for (let i = 0; i < 18; i++) pts.push([x + Math.cos(i / 18 * 6.283) * r, y + Math.sin(i / 18 * 6.283) * r]); if (stroke) { g.strokeStyle = col; g.lineWidth = stroke; g.beginPath(); pts.forEach((q, i) => { const pr = this.proj(q[0], q[1]); if (i) g.lineTo(pr.x, pr.y); else g.moveTo(pr.x, pr.y); }); g.closePath(); g.stroke(); } else this.poly(g, pts, col); },
   // one fighter: billboard, lean, shine, aura, weapon
+  // from the night Brand reforged it (+4, Part Two onward), Kael's blade ends in the hook, everywhere
+  hookEra() { return !!(this.def && (this.def.hook || this.era >= 5)); },
+  hooked() { const h = this.def && this.def.hero; return this.hookEra() && (!h || !h.id || h.id === 'kael2'); },
   fighter(g, o, opt) {
     if (this.g3) { // above the rock the fighter is a 3D figure; only the pixel HUD is drawn here
       G3.char(o, opt); if (o.st === 'down') return; const hp = this.proj(o.x, o.y, 76 + (o.z || 0) * 1.2); if (hp.dz < 10) return; const cx = hp.x, top = Math.round(hp.y);
@@ -549,14 +552,20 @@ const Brawl = {
       if (o.st === 'roar' && !rm) { g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 3; i++) { const r2 = (o.t * 160 + i * 14) % 70; g.strokeStyle = `rgba(255,110,50,${Math.max(0, .5 - r2 / 140)})`; g.lineWidth = 2; g.beginPath(); g.ellipse(pr.x, pr.y + oy - hgt * .5, r2 * sc * .4, r2 * sc * .22, 0, 0, 6.3); g.stroke(); } g.globalCompositeOperation = 'source-over'; }
     }
     const limb = (a, len, col, wd) => { const hx = shx + Math.cos(a) * len, hy = shy + Math.sin(a) * len; g.strokeStyle = '#2a1e16'; g.lineWidth = wd + 2; g.lineCap = 'round'; g.beginPath(); g.moveTo(shx, shy); g.lineTo(hx, hy); g.stroke(); g.strokeStyle = col; g.lineWidth = wd; g.stroke(); g.lineCap = 'butt'; return [hx, hy]; };
-    if (blade) { const L = hgt * (blade === 2 ? .9 : .55); let a = up + sg * (blade === 2 ? .25 : .5) + Math.sin(t * 2.2 + (o.idx || 0)) * .05, a0 = a, tr = 0;
+    if (blade) { const L = hgt * (blade === 2 ? .9 : .55), hk = blade === 1 && (o === this.p ? this.hooked() : opt.id === 'kael2' && this.hookEra()); let a = (o === this.p && blade === 1 ? base - sg * .95 : up + sg * (blade === 2 ? .25 : .5)) + Math.sin(t * 2.2 + (o.idx || 0)) * .05, a0 = a, tr = 0;
       if (sw >= 0) { const e = 1 - Math.pow(1 - sw, 2); if (blade === 2) { a0 = base; a = base; tr = 0; } else if (cb === 2) { a0 = base + 2.0 * sg; a = a0 + (base - 1.0 * sg - a0) * e; tr = 1; } else if (cb === 3) { a0 = up - .9 * sg; a = a0 + (base + .9 * sg - a0) * e; tr = 1; } else { a0 = base - 2.0 * sg; a = a0 + (base + 1.0 * sg - a0) * e; tr = 1; } }
       else if (o.st === 'wind') a = up - sg * (.7 + Math.min(.5, o.t)) + (rm ? 0 : Math.sin(t * 60) * .04);
       else if (o.st === 'guard') a = up + sg * 1.25; else if (o.st === 'bore') { a = a0 = base; tr = 0; } else if (o.st === 'lash') { a = base; a0 = base - 2.6 * sg; tr = 1; sw = Math.min(1, o.t / .42); } else if (o.st === 'plunge' || o.st === 'drop') a = Math.PI / 2 + sg * .1; else if (o.st === 'kick' || o.st === 'skick' || o.st === 'ram' || o.st === 'butt') a = base + Math.PI - sg * .5; else if (o.st === 'roar') a = base + sg * 2.2; else if (o.st === 'dive') a = base + Math.PI;
       else if (o.st === 'hurt') a = up + sg * 1.6; else if (o.st === 'recover' && o.t < .2) a = base + sg * (blade === 2 ? 0 : .9);
       const reachK = blade === 2 && sw >= 0 ? 1 + Math.sin(sw * Math.PI) * .9 : 1, [hx, hy] = limb(a, armL * reachK, armC, Math.max(2, sc * 1.5));
-      if (tr && sw < 1.01 && !rm) { const r1 = armL + L * 1.08, r0 = armL + L * .35, N = 7; g.globalCompositeOperation = 'lighter'; for (let i = 0; i < N; i++) { const k0 = i / N, k1 = (i + 1) / N, b0 = a0 + (a - a0) * k0, b1 = a0 + (a - a0) * k1; g.fillStyle = (opt.aura > 1.5 ? 'rgba(255,150,60,' : 'rgba(255,240,190,') + (.12 + k1 * .5) * (cb === 3 ? 1.2 : 1) + ')'; g.beginPath(); g.moveTo(shx + Math.cos(b0) * r0, shy + Math.sin(b0) * r0); g.lineTo(shx + Math.cos(b0) * r1, shy + Math.sin(b0) * r1); g.lineTo(shx + Math.cos(b1) * r1, shy + Math.sin(b1) * r1); g.lineTo(shx + Math.cos(b1) * r0, shy + Math.sin(b1) * r0); g.fill(); } g.strokeStyle = '#fff'; g.lineWidth = 1; g.beginPath(); g.arc(shx, shy, r1, Math.min(a0, a), Math.max(a0, a)); g.stroke(); g.globalCompositeOperation = 'source-over'; }
-      const tx = hx + Math.cos(a) * L, ty = hy + Math.sin(a) * L; g.strokeStyle = '#3a2e1a'; g.lineWidth = Math.max(3, sc * 1.3); g.beginPath(); g.moveTo(hx, hy); g.lineTo(tx, ty); g.stroke(); g.strokeStyle = blade === 2 ? '#c8ccd4' : '#fff6dc'; g.lineWidth = Math.max(1, sc * .6); g.stroke();
+      if (tr && sw < 1.01 && !rm) { const r1 = armL + L * 1.08, r0 = armL + L * .2, N = 12; g.globalCompositeOperation = 'lighter'; for (let i = 0; i < N; i++) { const k0 = i / N, k1 = (i + 1) / N, b0 = a0 + (a - a0) * k0, b1 = a0 + (a - a0) * k1; const q0 = r1 - (r1 - r0) * Math.pow(k0, 1.5), q1 = r1 - (r1 - r0) * Math.pow(k1, 1.5); g.fillStyle = (opt.aura > 1.5 ? 'rgba(255,150,60,' : 'rgba(255,240,190,') + (.08 + k1 * k1 * .7) * (cb === 3 ? 1.2 : 1) + ')'; g.beginPath(); g.moveTo(shx + Math.cos(b0) * q0, shy + Math.sin(b0) * q0); g.lineTo(shx + Math.cos(b0) * r1, shy + Math.sin(b0) * r1); g.lineTo(shx + Math.cos(b1) * r1, shy + Math.sin(b1) * r1); g.lineTo(shx + Math.cos(b1) * q1, shy + Math.sin(b1) * q1); g.fill(); } g.strokeStyle = '#fff'; g.lineWidth = 1; g.beginPath(); g.arc(shx, shy, r1, Math.min(a0, a), Math.max(a0, a)); g.stroke(); g.globalCompositeOperation = 'source-over'; }
+      const tx = hx + Math.cos(a) * L, ty = hy + Math.sin(a) * L;
+      if (blade === 2) { g.strokeStyle = '#3a2e1a'; g.lineWidth = Math.max(3, sc * 1.3); g.beginPath(); g.moveTo(hx, hy); g.lineTo(tx, ty); g.stroke(); g.strokeStyle = '#c8ccd4'; g.lineWidth = Math.max(1, sc * .6); g.stroke(); }
+      else { const dx = Math.cos(a), dy = Math.sin(a), nx = -dy * sg, ny = dx * sg, wB = Math.max(1.3, sc * .85); g.beginPath(); g.moveTo(hx - nx * wB, hy - ny * wB); g.lineTo(tx - nx * wB * .75, ty - ny * wB * .75);
+        if (hk) { g.quadraticCurveTo(tx + dx * L * .24 - nx * wB, ty + dy * L * .24 - ny * wB, tx + nx * L * .3 - dx * L * .04, ty + ny * L * .3 - dy * L * .04); g.quadraticCurveTo(tx + dx * L * .08 + nx * L * .1, ty + dy * L * .08 + ny * L * .1, tx + nx * wB * .75 - dx * L * .1, ty + ny * wB * .75 - dy * L * .1); }
+        else { g.lineTo(tx + dx * wB * 2.2, ty + dy * wB * 2.2); g.lineTo(tx + nx * wB * .75, ty + ny * wB * .75); }
+        g.lineTo(hx + nx * wB, hy + ny * wB); g.closePath(); g.fillStyle = '#fff6dc'; g.fill(); g.strokeStyle = '#2a2016'; g.lineWidth = Math.max(1, sc * .45); g.lineJoin = 'round'; g.stroke(); g.lineJoin = 'miter';
+        g.strokeStyle = '#c8b890'; g.lineWidth = Math.max(1, sc * .3); g.beginPath(); g.moveTo(hx + nx * wB * .2, hy + ny * wB * .2); g.lineTo(tx + nx * wB * .1, ty + ny * wB * .1); g.stroke(); }
       const gx = Math.cos(a + 1.57) * sc * 1.6, gy = Math.sin(a + 1.57) * sc * 1.6; g.strokeStyle = '#e8c25a'; g.lineWidth = Math.max(2, sc); g.beginPath(); g.moveTo(hx - gx, hy - gy); g.lineTo(hx + gx, hy + gy); g.stroke();
       if (blade === 2) { g.fillStyle = '#e8ecf2'; g.beginPath(); g.moveTo(tx + Math.cos(a) * sc * 4, ty + Math.sin(a) * sc * 4); g.lineTo(tx + gx, ty + gy); g.lineTo(tx - gx, ty - gy); g.fill(); }
       if (!rm && (o.st === 'wind' ? o.t > .12 && Math.floor(t * 10) % 2 : Math.sin(t * 3 + (o.idx || 0)) > .96)) { g.fillStyle = '#fff'; g.fillRect(tx - sc * 2.5, ty, sc * 5 + 1, 1); g.fillRect(tx, ty - sc * 2.5, 1, sc * 5 + 1); }
@@ -599,12 +608,16 @@ const Brawl = {
     for (const r of this.rings) this.disc(g, r.x, r.y, r.r, r.c === '#fff' ? `rgba(255,255,255,${r.life * .8})` : r.c + (Math.round(clamp(r.life, 0, 1) * 200).toString(16).padStart(2, '0')), 2);
     if (rush && !rm) { const tg = artOn ? this.art.tg : this.sup.tg || this.p, pr = this.proj(tg.x, tg.y, 24), t = this.t; if (!d3) { g.fillStyle = artOn ? (this.art.a.dark || 'rgba(10,6,22,.8)') : 'rgba(26,2,4,.78)'; g.fillRect(-8, -8, W + 16, H + 16); } g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 40; i++) { const a = i / 40 * 6.283 + (i % 5) * .13, r0 = 26 + (i * 37 + t * 520) % 150, r1 = r0 + 30 + (i % 4) * 16; g.strokeStyle = i % 3 ? (artOn ? `rgba(${this.art.a.rgb || '255,200,90'},.5)` : 'rgba(255,90,30,.5)') : 'rgba(255,220,160,.6)'; g.lineWidth = i % 4 === 0 ? 2 : 1; g.beginPath(); g.moveTo(pr.x + Math.cos(a) * r0, pr.y + Math.sin(a) * r0 * .7); g.lineTo(pr.x + Math.cos(a) * r1, pr.y + Math.sin(a) * r1 * .7); g.stroke(); } g.globalCompositeOperation = 'source-over'; }
     const list = (rush || d3 ? [] : this.props.map(q => ({ y: q.y, d: () => this.prop(g, q) }))).concat(extra);
-    list.sort((a, b) => a.y - b.y); for (const e of list) e.d();
-    if (!d3 && bg === 'storm' && !rush) { // the 2D valley at night, in the rain: the painted day is underneath
-      const t = this.t, fl = rm ? 0 : Math.max(0, Math.sin(t * 0.83) * Math.sin(t * 2.9) - 0.93) * 9;
-      g.fillStyle = 'rgba(8,10,36,' + (0.5 - fl * 0.3).toFixed(3) + ')'; g.fillRect(-8, -8, W + 16, H + 16);
+    const storm2 = !d3 && bg === 'storm' && !rush, nfl = storm2 && !rm ? Math.max(0, Math.sin(this.t * 0.83) * Math.sin(this.t * 2.9) - 0.93) * 9 : 0;
+    if (storm2) { // night falls on the painted valley and its tents, not on the people fighting in it
+      const pl2 = this.props.map(q => ({ y: q.y, d: () => this.prop(g, q) })); pl2.sort((a, b) => a.y - b.y); for (const e of pl2) e.d();
+      g.fillStyle = 'rgba(8,10,36,' + (0.56 - nfl * 0.3).toFixed(3) + ')'; g.fillRect(-8, -8, W + 16, H + 16);
       const gr = g.createRadialGradient(W / 2, H * 0.62, 8, W / 2, H * 0.62, W * 0.42); gr.addColorStop(0, 'rgba(255,190,110,.20)'); gr.addColorStop(1, 'rgba(255,190,110,0)');
       g.globalCompositeOperation = 'lighter'; g.fillStyle = gr; g.fillRect(-8, -8, W + 16, H + 16); g.globalCompositeOperation = 'source-over';
+      const fl2 = extra.slice(); fl2.sort((a, b) => a.y - b.y); for (const e of fl2) e.d(); }
+    else { list.sort((a, b) => a.y - b.y); for (const e of list) e.d(); }
+    if (storm2) { // rain and lightning over everything
+      const t = this.t, fl = nfl;
       g.fillStyle = 'rgba(190,210,255,.42)'; for (let i = 0; i < (rm ? 20 : 54); i++) { const x = ((i * 53.7 - t * (60 + i % 5 * 18)) % (W + 40) + W + 40) % (W + 40) - 20, y = (i * 29.3 + t * (430 + i % 7 * 36)) % (H + 30) - 15; g.fillRect(x | 0, y | 0, 1, 5 + i % 3 * 2); }
       if (fl > 0.05) { g.fillStyle = 'rgba(220,230,255,' + Math.min(0.5, fl * 0.5).toFixed(3) + ')'; g.fillRect(-8, -8, W + 16, H + 16); }
     }

@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.42 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.43 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -401,6 +401,7 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **Moves named in the levels:** UP THE SHAFT, WIDE CUT, THE HAUL, LAST BELL (chain enders); LIFT ZERO (the dive and the lunge); ELEVEN (held strike at full fury).
 - **Fury is earned in the fight.** Suns give some, never all.
 - Rule: the game never uses the source books' weapon names. The curved blade is the bank hook.
+- **When he has it (v0.43):** straight blade through training and the Assay (to +4); the hook from the night before the lift onward, in every fight, film and level. In code: fights with `era >= 5`, or `hook: 1` on the fight.
 
 ### Story pass (v0.36)
 - **Seat knives.** Every valve hand is issued one: a hooked blade a palm long. The only edge soot may carry. Numbered; counted back onto a board at last bell by a Warden; an empty hook is a line struck by morning. Seren's was number 306. Brand counted the Tier Six board for eleven years.
