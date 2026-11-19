@@ -40,9 +40,9 @@ between("  ember: {\n    id: 'ember'", "SC.T = {", `  ember: {
 `);
 
 /* ---- sky: the weather, the moored fleet, the Sun Spire ---- */
-rep("const a = i / 46 * Math.PI * 2 + rnd() * 0.08, r = 150 + rnd() * 60, w = 14 + rnd() * 22, h = 22 + rnd() * 60;", "const a = i / 46 * Math.PI * 2 + rnd() * 0.08, r = 130 + rnd() * 90, w = 30 + rnd() * 26, h = 5 + rnd() * 5;");
-rep("const geo = new THREE.BoxGeometry(w, h, w), uv = geo.attributes.uv;", "const geo = new THREE.BoxGeometry(w, h, w * 0.34), uv = geo.attributes.uv;");
-rep("b.position.set(Math.cos(a) * r, h / 2 - 2, Math.sin(a) * r); b.rotation.y = rnd() * 3; sky.add(b);\n    }", "b.position.set(Math.cos(a) * r, -14 + rnd() * 90, Math.sin(a) * r); b.rotation.y = rnd() * 3; sky.add(b);\n      const bag = new THREE.Mesh(new THREE.CylinderGeometry(w * 0.16, w * 0.16, w * 0.96, 8), new THREE.MeshBasicMaterial({ color: i % 3 ? 0x8f8aa8 : 0xb7b0c4, fog: false })); bag.rotation.z = Math.PI / 2; bag.rotation.y = b.rotation.y; bag.position.copy(b.position); bag.position.y += h / 2 + w * 0.2; sky.add(bag);\n    }");
+rep("const a = i / 46 * Math.PI * 2 + rnd() * 0.08, r = 150 + rnd() * 60, w = 14 + rnd() * 22, h = 22 + rnd() * 60;", "const a = i / 46 * Math.PI * 2 + rnd() * 0.08, r = (SC.issue === 'stair' ? 190 : 130) + rnd() * (SC.issue === 'stair' ? 60 : 90), w = 30 + rnd() * 26, h = 5 + rnd() * 5;");
+rep("const geo = new THREE.BoxGeometry(w, h, w), uv = geo.attributes.uv;", "const geo = new THREE.BoxGeometry(w, h, w * 0.34), uv = geo.attributes.uv; { const gp = geo.attributes.position; for (let k = 0; k < gp.count; k++) if (gp.getY(k) < 0) { gp.setX(k, gp.getX(k) * 0.7); gp.setZ(k, gp.getZ(k) * 0.45); } }");
+rep("b.position.set(Math.cos(a) * r, h / 2 - 2, Math.sin(a) * r); b.rotation.y = rnd() * 3; sky.add(b);\n    }", "b.position.set(Math.cos(a) * r, SC.issue === 'stair' ? -34 + rnd() * 46 : -14 + rnd() * 90, Math.sin(a) * r); b.rotation.y = rnd() * 3; sky.add(b);\n      { const ln = new THREE.Mesh(new THREE.BoxGeometry(w * 0.86, 0.45, w * 0.35), new THREE.MeshBasicMaterial({ color: 0xffd98a, fog: false })); ln.position.y = h * 0.2; b.add(ln); }\n      const bag = new THREE.Mesh(new THREE.CylinderGeometry(w * 0.16, w * 0.16, w * 0.96, 8), new THREE.MeshBasicMaterial({ color: i % 3 ? 0x8f8aa8 : 0xb7b0c4, fog: false })); bag.rotation.z = Math.PI / 2; bag.rotation.y = b.rotation.y; bag.position.copy(b.position); bag.position.y += h / 2 + w * 0.2; sky.add(bag);\n    }");
 
 rep("const rnd = SC.seeded(99), mat = new THREE.MeshBasicMaterial({ map: TEX.skyline, fog: false });", "const rnd = SC.seeded(99), mat = new THREE.MeshBasicMaterial({ color: 0x1a1c44, fog: false });");
 /* ---- rig: our people ---- */
@@ -236,7 +236,8 @@ rep("const bands = ['#0a0d2a', '#10163a', '#1a2156', '#2a2a70', '#48358a', '#7a4
 rep("rain = { m, pos, d, N };", "rain = { m, pos, d, N }; G.rainMesh = m;");
 rep("    G.init(document.getElementById('gl'));", `    G.init(document.getElementById('gl'));
     if (SC.issue === 'stair') { G.scene.background.set(0x4a3470); G.scene.fog.color.set(0xb06a7a); G.scene.fog.near = 60; G.scene.fog.far = 260; G.amb.color.setRGB(0.5, 0.36, 0.44); G.sun.color.setRGB(1.0, 0.72, 0.42); G.uKey.value.set(1.0, 0.74, 0.46); if (G.rainMesh) G.rainMesh.visible = false; }
-    if (SC.issue === 'riser') { G.scene.background.set(0x0a1226); G.scene.fog.color.set(0x12233a); G.scene.fog.near = 26; G.scene.fog.far = 120; G.amb.color.setRGB(0.22, 0.3, 0.42); }`);
+    if (SC.issue === 'riser') { G.scene.background.set(0x0a1226); G.scene.fog.color.set(0x12233a); G.scene.fog.near = 26; G.scene.fog.far = 120; G.amb.color.setRGB(0.22, 0.3, 0.42); }
+    if (SC.issue === 'gild') { G.scene.background.set(0x07060a); G.scene.fog.color.set(0x0c0a10); G.scene.fog.near = 10; G.scene.fog.far = 34; G.amb.color.setRGB(0.3, 0.28, 0.34); G.sun.color.setRGB(0.34, 0.3, 0.26); G.uKey.value.set(1.0, 0.9, 0.72); if (G.rainMesh) G.rainMesh.visible = false; }`);
 
 /* ---- the boots: he has had them since the last day of the Assay. One press carries him over their heads and down on them. ---- */
 rep("wantPow = can && inp.buffered('power', 0.2),", "wantPow = can && inp.buffered('power', 0.2), wantBoot = can && inp.buffered('boots', 0.2),");
@@ -449,6 +450,9 @@ rep("'    float scM = 1.0 - smoothstep(0.30, 0.36, scD);',", "'    float scM = m
 rep("G.uDot.value = Math.max(2.2, Math.min(w, h) * pr / 340);", "G.uDot.value = Math.max(2, Math.min(w, h) * pr / 420); G.uDotK.value = SC.clamp((Math.min(w, h) * pr - 500) / 1400, 0.1, 0.45);");
 
 rep("const g0 = new THREE.SphereGeometry(1, 10, 7), p0 = g0.attributes.position;", "const g0 = new THREE.SphereGeometry(1, 18, 12), p0 = g0.attributes.position;");
+/* ---- v0.45: guards arrive, they do not grow out of the floor. On the stair and the docks they drop in from above; in the valley they are simply far off when they appear. ---- */
+rep("case 'spawn': { const k = Math.min(1, e.st / 0.8); m.group.scale.set(1, SC.easeOut(k), 1); pose = P.lurk(e.t); if (k >= 1) { e.state = 'chase'; e.st = 0; } e.vel.set(0, 0, 0); break; }", "case 'spawn': { const far = SC.issue === 'riser', k = far ? 1 : Math.min(1, e.st / 0.5); m.group.scale.set(1, 1, 1); if (!far) { e.drop = (1 - k) * (1 - k) * 6; pose = k < 0.85 ? P.leap : P.slamDown; rate = 30; } else pose = P.lurk(e.t); if (k >= 1) { e.drop = 0; if (!far) FX.puff(e.pos, 4, 1); e.state = 'chase'; e.st = 0; } e.vel.set(0, 0, 0); break; }");
+rep("m.group.position.copy(e.pos);", "m.group.position.copy(e.pos); if (e.drop) m.group.position.y += e.drop;");
 /* ---- the guard fights back with more than one idea ---- */
 rep("          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e);\n        }", `          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e);
           if (e.kind !== 'boss') e.sub = Math.random() < (e.kind === 'knifer' ? 0.45 : e.kind === 'bruiser' ? 0.22 : 0.3) ? 1 : 0;      // a second blow straight after the first

@@ -25,6 +25,14 @@
     SPECS.boss = { h: 1.18, b: 1.0, face: 'halfmask', hood: true, coat: true, weapon: 'blade', weapon2: true, sash: true, pal: { skin: 0xe6c79a, top: 0x15151f, trim: 0xe8c25a, shirt: 0xe8c25a, tie: 0xe8c25a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0xe8c25a, wrap: 0x15151f } };
     SPECS.clerk = { h: 0.94, b: 0.9, face: 'tavi', hair: 'tavi', pal: { skin: 0xc98a62, top: 0x8a6a48, trim: 0x4a3524, shirt: 0xd9a05f, tie: 0x4a3524, pants: 0x3a3350, boots: 0x15151f, hair: 0x2a1c14, glove: 0xc98a62, wrap: 0x8a6a48 } };
   }
+  if (SC.issue === 'gild') {   // the table: the man who went onto it, the man on it, the man who came off, the woman who did it, and two of the Unlit to hold the lamp
+    const shift = { top: 0x6a6672, trim: 0x4f4b57, shirt: 0x6a6672, tie: 0x4f4b57, pants: 0x4f4b57, wrap: 0x6a6672 };
+    SPECS.k0 = { h: 1.0, b: 1.0, face: 'kael0', hair: 'kael', pal: Object.assign({ skin: 0xc8946a, hair: 0x2a2018, streak: 0x2a2018, band: 0x2a2018, boots: 0xc8946a, glove: 0xc8946a }, shift) };
+    SPECS.k1 = { h: 1.05, b: 1.05, face: 'kaelm', pal: Object.assign({ skin: 0xd8b088, hair: 0x2a2018, boots: 0xd8b088, glove: 0xc8946a }, shift) }; SPECS.k1w = Object.assign({}, SPECS.k1, { h: 1.08, face: 'kaelw' });   // months in: longer, shaved, the eyes wrapped. The hands are still his
+    SPECS.k2 = { h: 1.1, b: 1.12, face: 'kael', hair: 'kael', pal: { skin: 0xe6c79a, hair: 0xe9cf7a, streak: 0x2a2630, band: 0xe9cf7a, top: 0xefe8d4, trim: 0xd8d0bc, shirt: 0xefe8d4, tie: 0xd8d0bc, pants: 0xd8d0bc, wrap: 0xefe8d4, boots: 0xe6c79a, glove: 0x2a2630 } };
+    SPECS.ilse = { h: 1.15, b: 0.94, face: 'ilse', hair: 'ilse', coat: true, pal: { skin: 0xe6c79a, top: 0x3f3a48, trim: 0x2a2630, shirt: 0x9a9488, tie: 0x2a2630, pants: 0x2a2630, boots: 0x15151f, hair: 0xb9bcc8, glove: 0xefe8d4, wrap: 0x3f3a48 } };
+    SPECS.unlit = { h: 1.0, b: 1.06, face: 'cloth', hood: true, pal: { skin: 0xc8946a, top: 0x2a2634, trim: 0x1c1a24, shirt: 0x2a2634, tie: 0x1c1a24, pants: 0x1c1a24, boots: 0x0c0c12, hair: 0x2a2634, glove: 0x4a4030, wrap: 0x2a2634 } };
+  }
 //@@FACES
   function drawFace(g, kind, expr, glow) {
     const S = 128, ink = '#07070d';
@@ -69,6 +77,32 @@
       // the seam the Gilding left along the jaw
       stroke([18, 92, 30, 104, 44, 112], 2, '#a87a4c');
       mouth(101); stroke([58, 113, 72, 113], 2);
+    } else if (kind === 'kael0' || kind === 'kaelm' || kind === 'kaelw') {
+      // before the gold: Tier Six skin, grey-brown eyes, soot in both cheeks. And in the middle of it: shaved, paler, the eyes under wrappings
+      const w = kind === 'kaelw', mid = kind !== 'kael0'; g.fillStyle = mid ? '#d8b088' : '#c8946a'; g.fillRect(0, 0, S, S);
+      g.fillStyle = mid ? '#b88c62' : '#a56e4c'; g.beginPath(); g.moveTo(0, 36); g.lineTo(30, 60); g.lineTo(28, 98); g.lineTo(50, 128); g.lineTo(0, 128); g.fill(); g.fillRect(42, 110, 56, 18);
+      const e = EX[expr] || EX.neutral;
+      if (w) {
+        g.fillStyle = '#efe8d4'; g.fillRect(0, 40, S, 40); stroke([0, 40, S, 40], 3); stroke([0, 80, S, 80], 3); stroke([0, 55, S, 50], 1.6, '#b8b0a0'); stroke([0, 68, S, 71], 1.6, '#b8b0a0');
+        g.fillStyle = 'rgba(232,194,90,0.6)'; g.beginPath(); g.ellipse(42, 61, 10, 5, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(86, 61, 10, 5, 0, 0, 7); g.fill();
+      } else {
+        eye(42, 60, 11, e[0], '#6a5846', e[1]); eye(86, 60, 11, e[0], '#6a5846', e[1]);
+        stroke([27, 45 + e[3] - e[2] * 0.3, 54, 47 + e[3] + e[2]], 7, '#2a2018'); stroke([101, 45 + e[3] - e[2] * 0.3, 74, 47 + e[3] + e[2]], 7, '#2a2018');
+        if (!mid) { g.fillStyle = 'rgba(30,26,34,0.6)'; g.beginPath(); g.moveTo(88, 76); g.lineTo(112, 70); g.lineTo(116, 84); g.lineTo(96, 92); g.fill(); g.beginPath(); g.moveTo(14, 72); g.lineTo(34, 78); g.lineTo(30, 90); g.lineTo(16, 86); g.fill(); }
+      }
+      if (mid) { stroke([18, 92, 30, 104, 44, 112], 2.4, '#8a1f24'); stroke([22, 96, 26, 92], 1.6, '#8a1f24'); stroke([30, 106, 34, 102], 1.6, '#8a1f24'); stroke([38, 111, 41, 106], 1.6, '#8a1f24'); }   // the seam along the jaw, new, with its stitches
+      stroke([66, 58, 61, 80, 68, 84], 3); mouth(101); stroke([58, 113, 72, 113], 2);
+    } else if (kind === 'ilse') {
+      // Accredited once: the height, the gold in the eye, and forty years on the seam they gave her at twelve
+      g.fillStyle = '#e6c79a'; g.fillRect(0, 0, S, S);
+      g.fillStyle = '#c9a678'; g.beginPath(); g.moveTo(0, 30); g.lineTo(28, 58); g.lineTo(26, 128); g.lineTo(0, 128); g.fill();
+      const e = EX[expr] || EX.neutral;
+      eye(42, 60, 11, Math.max(1, e[0] - 1), '#e2a81c', e[1] + 0.15); eye(86, 60, 11, Math.max(1, e[0] - 1), '#e2a81c', e[1] + 0.15);
+      stroke([27, 43, 54, 46 + e[2] * 0.5], 4, '#8f8f9c'); stroke([101, 43, 74, 46 + e[2] * 0.5], 4, '#8f8f9c');
+      stroke([66, 58, 62, 80, 69, 83], 2.5);
+      stroke([22, 68, 32, 73], 1.8); stroke([96, 73, 106, 68], 1.8); stroke([40, 92, 46, 106], 1.6, '#a87a4c'); stroke([90, 92, 84, 106], 1.6, '#a87a4c');
+      stroke([18, 92, 30, 104, 44, 112], 2, '#a87a4c');
+      mouth(100);
     } else if (kind === 'brand') {
       g.fillStyle = '#b98a66'; g.fillRect(0, 0, S, S);
       g.fillStyle = '#946a4c'; g.beginPath(); g.moveTo(0, 30); g.lineTo(30, 56); g.lineTo(26, 128); g.lineTo(0, 128); g.fill();
@@ -145,6 +179,12 @@
       part('head', tbox(0.26, 0.09, 0.27, 0.85, 1), 0, 0.23, -0.02, pal.hair); part('head', tbox(0.25, 0.2, 0.09, 1, 0.85), 0, 0.12, -0.108, pal.hair);
       part('head', tbox(0.04, 0.14, 0.14), 0.12, 0.15, -0.03, pal.hair, null, 0.01); part('head', tbox(0.04, 0.14, 0.14), -0.12, 0.15, -0.03, pal.hair, null, 0.01);
       part('head', tbox(0.1, 0.07, 0.1, 0.5, 1), 0.05, 0.27, 0.08, pal.hair, [0.3, 0, -0.2], 0.012);
+    }
+    if (sp.hair === 'ilse') {   // grey, drawn back hard, knotted
+      part('head', tbox(0.255, 0.08, 0.265, 0.85, 1), 0, 0.228, -0.02, pal.hair);
+      part('head', tbox(0.25, 0.2, 0.09, 1, 0.85), 0, 0.12, -0.108, pal.hair);
+      part('head', tbox(0.035, 0.1, 0.13), 0.12, 0.17, -0.03, pal.hair, null, 0.01); part('head', tbox(0.035, 0.1, 0.13), -0.12, 0.17, -0.03, pal.hair, null, 0.01);
+      part('head', tbox(0.11, 0.11, 0.1), 0, 0.2, -0.19, pal.hair, null, 0.012);
     }
     if (sp.hair === 'brand') {
       part('head', tbox(0.25, 0.07, 0.26, 0.85, 1), 0, 0.225, -0.02, pal.hair);

@@ -425,7 +425,9 @@
       // the pump house, with every Assay's names cut in the lintel
       B('brick', -18, -12, -11, -6, 0, 3.6, STONE2, { outline: 0.1 }); B('roof', -18.4, -12.4, -10.6, -5.6, 3.6, 3.9, SLATE, { outline: 0.06, col: false }); D('flat', -10.95, 1.2, -9, 0.1, 2.4, 1.3, 0x15151f, { outline: 0.04 }); D('concrete', -10.9, 2.7, -9, 0.3, 0.5, 2.2, STONE, { outline: 0.04 }); D('glow', -10.9, 1.6, -7.2, 0.06, 0.5, 0.4, LAMP, { outline: 0 });
       // what the Authority left here: a pylon with the eye on it, and the road the Wardens come down
-      D('brick', 0, 4, -21, 2.4, 8, 2.4, 0xd8d3e2, { outline: 0.08 }); solid(-1.2, -22.2, 1.2, -19.8, 0, 8); D('flat', 0, 8.2, -21, 2.8, 0.4, 2.8, GILT, { outline: 0.04 }); D('glow', 0, 9, -21, 0.7, 0.9, 0.7, LAMP, { outline: 0 });
+      D('brick', 0, 4, -21, 2.4, 8, 2.4, 0xd8d3e2, { outline: 0.08 }); solid(-1.2, -22.2, 1.2, -19.8, 0, 8); D('flat', 0, 8.2, -21, 2.8, 0.4, 2.8, GILT, { outline: 0.04 });
+      // the riser's own pump, on the pump-house wall: a standpipe, a gauge, and a wheel nobody has turned in thirty years
+      cyl('metal', -10.78, 1.2, -7.9, 0.09, 0.09, 2.4, 0x6f7a86, { seg: 8, outline: 0.03 }); D('flat', -10.78, 2.36, -7.55, 0.1, 0.1, 0.8, 0x6f7a86, { outline: 0.03 }); D('flat', -10.74, 1.25, -7.9, 0.07, 0.07, 0.56, 0xb23a2e, { outline: 0.03 }); D('flat', -10.74, 1.25, -7.9, 0.07, 0.56, 0.07, 0xb23a2e, { outline: 0.03 }); D('flat', -10.86, 1.9, -7.9, 0.06, 0.26, 0.26, 0xece6d6, { outline: 0.03 });
       for (let z = -19; z < -4; z += 2.4) D('flat', 3.4 + (z % 2), 0.012, z, 2.2, 0.02, 1.6, 0x5a5346, { outline: 0 });
       [[-9, 9], [10, -9], [12, 10], [-11, 2]].forEach(p => { solid(p[0] - 0.2, p[1] - 0.2, p[0] + 0.2, p[1] + 0.2, 0, 2.4, { cam: false }); cyl('wood', p[0], 1.1, p[1], 0.06, 0.08, 2.2, 0x4a3524, { outline: 0.03 }); D('glow', p[0], 2.3, p[1], 0.26, 0.34, 0.26, TLAMP, { outline: 0 }); });
       crateStatic(-9.6, -6.4, 1.1); crate(-9.2, -4.9, 0.9, 0, 'hp'); crate(14, 16, 0.9, 0, 'meter'); crate(-16, 17, 0.9, 0, 'hp'); crate(20, -8, 0.9, 0, 'hp');
@@ -449,12 +451,72 @@
     };
 
     /* ===== THE STAIR: the last flights up the Sun Spire at sunset, nine years on. Three flights, three landings, the white door. ===== */
+    /* ===== THE TABLE: a sealed pump room under Tier Six. Everything the Accredited use on their own children, carried down a piece at a time. Nobody fights here. ===== */
+    const GILD = () => {
+      W.underRoof = () => true; W.inside = () => true;
+      const BR = 0x24202c, TILE = 0x3a3644, DARK = 0x15131c, STEELC = 0x8d94ac, BODY = 0x3f4a56;
+      // floor: worn tile, a drain, and thirty years of nobody
+      D('concrete', 0, -0.5, 0, 14, 1, 12, 0x2c2834, { outline: 0 });
+      for (let x = -6; x <= 6; x += 1.2) D('flat', x, 0.008, 0, 0.03, 0.012, 10.6, DARK, { outline: 0 });
+      for (let z = -4.8; z <= 5; z += 1.2) D('flat', 0, 0.008, z, 12.6, 0.012, 0.03, DARK, { outline: 0 });
+      cyl('flat', 0.95, 0.014, 1.35, 0.2, 0.2, 0.02, 0x0c0b10, { seg: 10, outline: 0 });
+      [[1.5, 0.6, 0.5], [-1.2, 1.4, 0.36], [0.4, -1.5, 0.3]].forEach(s => cyl('flat', s[0], 0.012, s[1], s[2], s[2], 0.012, 0x221f29, { seg: 9, outline: 0 }));
+      // walls: brick above, tile to the shoulder
+      D('brick', 0, 2.1, -5.3, 13.2, 4.6, 0.6, BR, { outline: 0 }); D('flat', 0, 0.85, -4.98, 12.6, 1.7, 0.04, TILE, { outline: 0 }); D('flat', 0, 1.72, -4.97, 12.6, 0.06, 0.05, 0x4a4650, { outline: 0 });
+      D('brick', 0, 2.1, 5.3, 13.2, 4.6, 0.6, BR, { outline: 0 }); D('flat', 0, 0.85, 4.98, 12.6, 1.7, 0.04, TILE, { outline: 0 });
+      D('brick', 6.3, 2.1, 0, 0.6, 4.6, 11, BR, { outline: 0 }); D('flat', 5.98, 0.85, 0, 0.04, 1.7, 10.6, TILE, { outline: 0 }); D('flat', 5.97, 1.72, 0, 0.05, 0.06, 10.6, 0x4a4650, { outline: 0 });
+      D('brick', -6.3, 2.1, 0, 0.6, 4.6, 11, BR, { outline: 0 }); D('flat', -5.98, 0.85, 0, 0.04, 1.7, 10.6, TILE, { outline: 0 }); D('flat', -5.97, 1.72, 0, 0.05, 0.06, 10.6, 0x4a4650, { outline: 0 });
+      D('concrete', 0, 4.5, 0, 14, 0.4, 12, DARK, { outline: 0 });
+      // the pipes that still run through it
+      D('flat', 0, 3.95, -3.9, 12.6, 0.24, 0.24, 0x4a4650, { outline: 0.03 }); D('flat', 0, 3.72, -3.4, 12.6, 0.12, 0.12, 0x6a4a3a, { outline: 0.02 }); D('flat', 0, 3.9, 3.6, 12.6, 0.18, 0.18, 0x3a3640, { outline: 0.03 });
+      [-4.4, -1.2, 2.2, 4.8].forEach(x => D('flat', x, 3.95, -3.9, 0.1, 0.34, 0.34, 0x2a2630, { outline: 0.02 }));
+      D('flat', 3.6, 3.0, -4.9, 0.2, 2.4, 0.2, 0x4a4650, { outline: 0.03 }); D('flat', -5.2, 2.9, -4.9, 0.14, 2.2, 0.14, 0x6a4a3a, { outline: 0.02 });
+      // the pump itself: two bodies, a wheel, a dead gauge
+      cyl('metal', -2.9, 1.15, -4.2, 0.78, 0.78, 2.3, BODY, { seg: 12, outline: 0.06 }); cyl('metal', -2.9, 2.42, -4.2, 0.42, 0.78, 0.26, BODY, { seg: 12, outline: 0.05 }); cyl('flat', -2.9, 3.2, -4.2, 0.12, 0.12, 1.4, 0x4a4650, { seg: 8, outline: 0.03 });
+      cyl('metal', -1.3, 0.85, -4.4, 0.5, 0.5, 1.7, 0x35404b, { seg: 10, outline: 0.05 }); D('flat', -2.1, 0.9, -4.3, 1.0, 0.16, 0.16, 0x4a4650, { outline: 0.03 });
+      D('flat', -2.9, 1.5, -3.38, 0.64, 0.08, 0.06, 0xb23a2e, { outline: 0.03 }); D('flat', -2.9, 1.5, -3.38, 0.08, 0.64, 0.06, 0xb23a2e, { outline: 0.03 }); D('flat', -2.9, 1.5, -3.34, 0.14, 0.14, 0.06, 0x2a2630, { outline: 0.02 });
+      D('flat', -1.3, 1.5, -3.88, 0.3, 0.3, 0.05, 0xece6d6, { outline: 0.03 }); D('flat', -1.3, 1.56, -3.85, 0.02, 0.14, 0.02, 0x15131c, { rz: 0.9, outline: 0 });
+      sign('PUMP ROOM 7', -2.2, 3.05, -4.96, 0, 2.6, 0.42, '#b8b0a0', '#15131c'); sign('SEALED BY THE COUNT', 3.2, 2.5, -4.96, 0, 3.0, 0.36, '#07070d', '#e8c25a');
+      // the table: an Accredited child's table, lengthened with a welded plate for a grown man
+      D('metal', 0, 0.9, 0, 0.92, 0.08, 2.0, 0x6a6672, { outline: 0.04 }); D('metal', 0, 0.9, 1.22, 0.92, 0.07, 0.44, 0x4f4b57, { outline: 0.04 }); D('flat', 0, 0.945, 1.0, 0.92, 0.012, 0.05, 0xb8742e, { outline: 0 });
+      D('flat', 0, 0.83, 0.1, 0.8, 0.06, 2.3, 0x2a2630, { outline: 0.03 }); D('metal', 0, 0.42, 0, 0.3, 0.78, 0.7, 0x2a2630, { outline: 0.04 }); D('metal', 0, 0.045, 0, 0.9, 0.09, 1.5, 0x3a3640, { outline: 0.04 });
+      D('flat', 0, 0.948, -0.8, 0.4, 0.016, 0.34, 0x8a8478, { outline: 0.02 });
+      [[-0.5, -0.2], [0.5, -0.2], [-0.5, 0.5], [0.5, 0.5], [-0.5, 1.15], [0.5, 1.15]].forEach(b => { D('flat', b[0], 0.84, b[1], 0.05, 0.2, 0.1, 0x8a7a5a, { outline: 0.02 }); D('flat', b[0] * 1.04, 0.9, b[1], 0.03, 0.06, 0.07, 0xc8ccd4, { outline: 0 }); });
+      // the lamp she rigged over it: three, off one arm
+      D('flat', 0, 4.0, 0, 0.07, 0.7, 0.07, 0x2a2630, { outline: 0.02 }); D('flat', 0, 3.62, 0, 1.9, 0.07, 0.07, 0x2a2630, { outline: 0.02 });
+      [[0, 0.74, 0.5], [-0.85, 0.42, 0.3], [0.85, 0.42, 0.3]].forEach(l => { cyl('metal', l[0], 3.36, 0, l[1] * 0.62, l[1], 0.26, 0x4a4650, { seg: 12, outline: 0.05 }); cyl('glow', l[0], 3.22, 0, l[1] * 0.86, l[1] * 0.86, 0.03, 0xfff0c8, { seg: 12, outline: 0 }); });
+      // the tray: what she works with
+      D('metal', 1.3, 0.92, -0.5, 0.52, 0.04, 0.9, STEELC, { outline: 0.03 }); D('flat', 1.3, 0.5, -0.5, 0.46, 0.03, 0.84, 0x4a4650, { outline: 0.02 });
+      [[1.08, -0.9], [1.52, -0.9], [1.08, -0.1], [1.52, -0.1]].forEach(l => D('flat', l[0], 0.46, l[1], 0.035, 0.92, 0.035, 0x4a4650, { outline: 0.02 }));
+      for (let i = 0; i < 7; i++) D('flat', 1.2 + (i % 2) * 0.05, 0.95, -0.88 + i * 0.075, 0.26, 0.014, 0.02, i % 3 === 1 ? 0xe8c25a : 0xd9dde6, { ry: (i % 3 - 1) * 0.12, outline: 0 });
+      D('flat', 1.07, 0.955, -0.6, 0.02, 0.024, 0.2, 0x15131c, { outline: 0 }); D('flat', 1.07, 0.955, -0.78, 0.02, 0.024, 0.1, 0x8a1f24, { outline: 0 });
+      cyl('flat', 1.4, 1.02, -0.22, 0.085, 0.085, 0.13, 0xe8c25a, { seg: 10, outline: 0.02 }); cyl('flat', 1.4, 0.95, -0.22, 0.12, 0.12, 0.02, 0x4a3524, { seg: 10, outline: 0.02 }); cyl('flat', 1.4, 1.09, -0.22, 0.12, 0.12, 0.02, 0x4a3524, { seg: 10, outline: 0.02 });
+      cyl('flat', 1.16, 0.975, -0.24, 0.14, 0.1, 0.08, 0xece6d6, { seg: 10, outline: 0.02 }); cyl('flat', 1.16, 1.012, -0.24, 0.12, 0.12, 0.01, 0xc9c2b0, { seg: 10, outline: 0 });
+      // the drip: gold in oil, a drop at a time for nine months
+      cyl('metal', -0.95, 1.12, -0.95, 0.022, 0.022, 2.24, STEELC, { seg: 6, outline: 0.02 }); D('flat', -0.95, 2.24, -0.95, 0.4, 0.03, 0.03, STEELC, { outline: 0.02 }); D('flat', -0.95, 0.03, -0.95, 0.44, 0.05, 0.44, 0x4a4650, { outline: 0.02 });
+      D('flat', -0.8, 2.02, -0.95, 0.19, 0.34, 0.09, 0x4a4030, { outline: 0.03 }); D('glow', -0.8, 2.0, -0.9, 0.14, 0.26, 0.02, 0xffd26e, { outline: 0 });
+      // where he sleeps, when she lets him: a cot, a blanket, a bucket, his own boots that no longer fit
+      D('wood', 4.5, 0.32, 3.4, 1.0, 0.08, 2.1, 0x4a3524, { outline: 0.04 }); [[4.05, 2.45], [4.95, 2.45], [4.05, 4.35], [4.95, 4.35]].forEach(l => D('wood', l[0], 0.15, l[1], 0.07, 0.3, 0.07, 0x3a2a1c, { outline: 0.02 }));
+      D('flat', 4.5, 0.42, 3.7, 0.98, 0.1, 1.4, 0x5a3a3a, { outline: 0.03 }); D('flat', 4.5, 0.44, 2.66, 0.62, 0.12, 0.34, 0xd8d0bc, { outline: 0.03 });
+      cyl('metal', 3.5, 0.2, 4.3, 0.2, 0.16, 0.4, 0x4a4650, { seg: 10, outline: 0.03 }); D('flat', 3.5, 0.13, 2.5, 0.14, 0.26, 0.3, 0x2a2018, { outline: 0.03 }); D('flat', 3.7, 0.13, 2.56, 0.14, 0.26, 0.3, 0x2a2018, { ry: 0.3, outline: 0.03 });
+      // her shelf: jars, a lamp, the gloves he will wear for a year
+      D('wood', 5.8, 1.9, -1.6, 0.34, 0.05, 2.6, 0x4a3524, { outline: 0.03 }); D('wood', 5.8, 2.6, -1.6, 0.34, 0.05, 2.6, 0x4a3524, { outline: 0.03 });
+      for (let i = 0; i < 6; i++) { cyl('flat', 5.8, 2.06, -2.7 + i * 0.42, 0.08, 0.08, 0.26, [0x8d94ac, 0x6e7a5a, 0x8d94ac][i % 3], { seg: 8, outline: 0.02 }); if (i % 2) cyl('glow', 5.8, 2.02, -2.7 + i * 0.42, 0.06, 0.06, 0.14, 0xffd26e, { seg: 8, outline: 0 }); }
+      for (let i = 0; i < 4; i++) D('flat', 5.8, 2.74, -2.6 + i * 0.5, 0.2, 0.22 + (i % 2) * 0.06, 0.07, [0x5a3aa8, 0x4a4650, 0x8a1f24, 0x3a3640][i], { outline: 0.02 });
+      // nine months, kept in chalk the way a tier keeps anything
+      for (let m = 0; m < 9; m++) D('flat', 5.955, 1.25 + (m % 2) * 0.012, 1.0 + m * 0.13 + (m > 4 ? 0.14 : 0), 0.012, 0.3, 0.028, 0xefe8d4, { rx: (m % 3 - 1) * 0.05, outline: 0 });
+      D('flat', 5.953, 1.25, 1.27, 0.012, 0.03, 0.7, 0xefe8d4, { rx: 0.42, outline: 0 });
+      // a stool, a basin, and the curtain she hangs when the eyes are done
+      cyl('wood', 1.35, 0.3, 1.0, 0.2, 0.2, 0.6, 0x4a3524, { seg: 8, outline: 0.03 }); cyl('metal', -1.6, 0.42, 1.4, 0.26, 0.18, 0.84, 0x4a4650, { seg: 10, outline: 0.03 }); cyl('flat', -1.6, 0.85, 1.4, 0.24, 0.24, 0.02, 0x3c4e8a, { seg: 10, outline: 0 });
+      D('flat', -3.2, 3.5, 2.4, 0.04, 0.04, 5.0, 0x4a4650, { outline: 0 }); for (let i = 0; i < 9; i++) D('flat', -3.2, 2.0, 0.2 + i * 0.52, 0.05, 3.0, 0.46, i % 2 ? 0x2e2a40 : 0x363248, { ry: (i % 2 ? 0.3 : -0.3), outline: 0.02 });
+      { const l = new THREE.PointLight(0xffecbe, 46, 13, 1.5); l.position.set(0, 2.9, 0); G.scene.add(l); W.gildLamp = l; const c = new THREE.PointLight(0x5ff2e2, 9, 9, 1.6); c.position.set(-2.4, 2.2, -3.2); G.scene.add(c); const w = new THREE.PointLight(0xffb060, 10, 7, 1.6); w.position.set(5, 2.3, -1.6); G.scene.add(w); }
+    };
     const STAIR = () => {
       W.underRoof = () => false; W.inside = () => false;
       cloudSea(-26, 90, 77);
       { const R = 62, cx = -71, cz = -8, rAt = y => R + 6 * (270 - y) / 300; let g = new THREE.CylinderGeometry(R, R + 6, 320, 64, 1, true); const uv = g.attributes.uv; for (let k = 0; k < uv.count; k++) uv.setXY(k, uv.getX(k) * 98, uv.getY(k) * 76);
         batch.add('concrete', g, G.mx(cx, 110, cz), 0xf0e2cc, 0); g.dispose();
-        [4, 26, 54, 92, 140].forEach(y => { const r = rAt(y) + 0.9; g = new THREE.CylinderGeometry(r, r + 0.1, 2.2, 64, 1, true); batch.add('flat', g, G.mx(cx, y, cz), GILT, 0); g.dispose(); }); }
+        [54, 92, 140].forEach(y => { const r = rAt(y) + 0.9; g = new THREE.CylinderGeometry(r, r + 0.1, 2.2, 64, 1, true); batch.add('flat', g, G.mx(cx, y, cz), GILT, 0); g.dispose(); }); }
       const W0 = 7;
       // the terrace the barges came down on
       B('concrete', -W0 - 3, 30, W0 + 3, 46, -3, 0, DECK, { outline: 0.08 }); wall(-W0 - 3.6, 46, W0 + 3.6, 46.6); wall(-W0 - 3.6, 30, -W0 - 3, 46); wall(W0 + 3, 30, W0 + 3.6, 46); rail(W0 + 2.8, 30.4, W0 + 2.8, 46, 0); rail(-W0 - 2.4, 46, W0 + 2.8, 46, 0);
@@ -481,7 +543,8 @@
       crate(8.4, -36, 0.9, 18, 'hp'); crate(-8.4, -36, 0.9, 18, 'meter'); crate(8.4, -50, 0.9, 18, 'hp');
       // below and behind: the fleet where it fell, one hull still burning, and the lamps of everyone who came up with him
       bargeS(26, -7, 34, 0.5); bargeS(-4, -5.4, 60, -0.3); bargeS(30, -9, 6, 1.2);
-      [[24, 36], [27, 33], [22, 31]].forEach((p, i) => { D('glow', p[0], -4 + i, p[1], 1.6, 2.4 + i, 1.6, i ? 0xff7a1f : 0xffe14a, { ry: i, outline: 0 }); const g = new THREE.IcosahedronGeometry(1, 1); g.scale(3 + i, 2.4, 3); batch.add('flat', g, G.mx(p[0] + 1, 3 + i * 4, p[1] - 1 - i * 2), 0x3a3040, 0); g.dispose(); });
+      [[38, 40], [46, 30], [35, 22]].forEach((p, i) => { D('glow', p[0], -6 + i, p[1], 2.2, 3 + i, 2.2, i ? 0xff7a1f : 0xffe14a, { ry: i, outline: 0 });   // the barges they burned behind them: three columns of smoke, well off the terrace, leaning with the wind
+        for (let k = 0; k < 8; k++) { const g = new THREE.IcosahedronGeometry(1, 1), s = 1.6 + k * 0.75; g.scale(s, s * 0.8, s); batch.add('flat', g, G.mx(p[0] + k * k * 0.42, -2 + k * 4.6, p[1] - k * 1.1, k + i), [0x4a3c4a, 0x5a4a58, 0x6e5c68, 0x837079][Math.min(3, k >> 1)], 0); g.dispose(); } });
       for (let i = 0; i < 26; i++) { const lx = -8.4 + (i % 13) * 1.4 + (i * 7 % 5) * 0.08, lz = 43.4 + Math.floor(i / 13) * 1.3 + (i * 3 % 4) * 0.1; cyl('flat', lx, 0.03, lz, 0.09, 0.1, 0.06, IRON, { seg: 8, outline: 0.02 }); cyl('glow', lx, 0.15, lz, 0.06, 0.07, 0.18, i % 4 ? LAMP : TLAMP, { seg: 8, outline: 0 }); cyl('flat', lx, 0.27, lz, 0.03, 0.09, 0.06, IRON, { seg: 8, outline: 0.02 }); }
       standard(-8.6, 44.6, 0, 5, 0x8a6a48); standard(7.4, 44.6, 0, 5, 0x8a6a48);
       // ===== the stair after four hundred hulls came down on it =====
@@ -493,8 +556,8 @@
       // a litter left on the first landing with the curtain still swinging; a wine jar; one slipper
       litter(4.2, 14.2, 6, 1.2, VIOLET); cyl('flat', 2.4, 6.16, 12.4, 0.12, 0.16, 0.32, GILT, { seg: 8, outline: 0.03 }); D('flat', 2.1, 6.034, 11.9, 0.9, 0.02, 0.5, 0x8a1f3a, { ry: 0.4, outline: 0 }); D('flat', 1.2, 6.06, 15.6, 0.26, 0.08, 0.12, IVORY, { ry: 0.8, outline: 0.02 });
       // suns, chalked all the way up, by everyone who has ever carried on this stair
-      [[0.5, 0, 33, 0.7], [0.7, 6, 16.5, 0.6], [0.5, 6, 6, 0.8], [0.6, 12, -9.5, 0.7], [0.5, 12, -20.5, 0.9], [0.7, 18, -36, 1.0]].forEach((c, i) => chalkW(-W0 + 0.02, c[1] + c[0], c[2], Math.PI / 2, 0.2 + i * 0.03));
-      [[0.5, 0, 31.5], [0.6, 6, 12], [0.5, 12, -15.5]].forEach(c => chalkW(W0 - 0.02, c[1] + c[0], c[2], -Math.PI / 2, 0.22));
+      [[0.7, 6, 16.5, 0.6], [0.5, 6, 6, 0.8], [0.6, 12, -9.5, 0.7], [0.5, 12, -20.5, 0.9], [0.6, 3, 24, 0.7], [0.6, 9, -2, 0.7]].forEach((c, i) => chalkW(-W0 + 0.02, c[1] + c[0], c[2], Math.PI / 2, 0.2 + i * 0.03));
+      [[0.6, 6, 12], [0.5, 12, -15.5], [0.6, 15, -28]].forEach(c => chalkW(W0 - 0.02, c[1] + c[0], c[2], -Math.PI / 2, 0.22));
       chalkF(0, 18.13, -46, 0.26);
       // barge wreck on the terrace: a spar through the rail, hull planks, mooring line run out across the stone
       D('wood', 8.4, 1.4, 40, 7, 0.24, 0.24, HULL, { ry: 0.4, rz: 0.3, outline: 0.05 }); D('wood', 6.6, 0.1, 37.6, 2.6, 0.1, 0.7, HULL, { ry: 1.0, outline: 0.04 }); D('wood', 7.9, 0.14, 35.4, 2.0, 0.1, 0.6, HULL, { ry: -0.3, outline: 0.04 }); line(8.6, 0.08, 44, 2.4, 0.08, 36, 0.05, 0x8a6a48); line(2.4, 0.08, 36, -1.6, 0.08, 34.6, 0.05, 0x8a6a48);
@@ -502,8 +565,10 @@
       sign('MARA KEEPS THE LIST', -8.6, 19.6, -57.9, 0, 2.6, 0.36, '#fff6d8', '#3a3350'); for (let i = 0; i < 18; i++) D('flat', -9.6 + (i % 3) * 0.72, 19.1 - Math.floor(i / 3) * 0.2, -57.92, 0.5 + (i * 5 % 3) * 0.08, 0.06, 0.02, CHALK, { outline: 0 });
       // the Auditor's own table, set for one, under the door
       D('flat', 6.4, 18.5, -54.6, 1.6, 0.08, 1.0, IVORY, { outline: 0.04 }); D('flat', 6.4, 18.24, -54.6, 0.2, 0.5, 0.2, GILT, { outline: 0.03 }); D('flat', 6.4, 18.57, -54.6, 0.5, 0.03, 0.4, 0xece6d6, { ry: 0.2, outline: 0 }); cyl('glow', 6.9, 18.66, -54.4, 0.04, 0.04, 0.24, LAMP, { seg: 6, outline: 0 }); D('flat', 5.9, 18.6, -54.8, 0.1, 0.12, 0.1, 0x15151f, { outline: 0.02 });
+      // the frame the kneeling bell hangs in, on the first landing
+      [-0.7, 0.7].forEach(o => D('wood', -5.3, 7.5, 15.6 + o, 0.14, 3, 0.14, 0x4a3524, { outline: 0.03 })); D('wood', -5.3, 9.05, 15.6, 0.16, 0.16, 1.7, 0x4a3524, { outline: 0.03 }); D('flat', -5.3, 8.92, 15.6, 0.05, 0.14, 0.05, IRON, { outline: 0 }); solid(-5.5, 14.7, -5.1, 16.5, 6, 9, { cam: false });
     };
-    if (SC.issue === 'riser') RISER(); else if (SC.issue === 'stair') STAIR(); else { DOCKS_A(); DOCKS_B(); }
+    if (SC.issue === 'riser') RISER(); else if (SC.issue === 'stair') STAIR(); else if (SC.issue === 'gild') GILD(); else { DOCKS_A(); DOCKS_B(); }
 
     W.statics = batch.build(G.scene); batch = null;
   };
