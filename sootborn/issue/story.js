@@ -2,7 +2,7 @@
   function objective() {
     let t = '', g = null;
     if (S.enc) t = S.enc.id === 'boss' ? 'CAPTAIN ROOK HOLDS MOORING ONE. TAKE IT.' : 'PUT THE DOCK GUARD DOWN';
-    else if (!F.path) { t = F.clue_casings ? 'STEP ONTO THE CHALKED SUN' : 'LOOK AT THE LAMP, THEN STEP ONTO THE CHALKED SUN'; g = CROSS.alley; }
+    else if (!F.path) { t = 'STEP ONTO THE CHALKED SUN'; g = CROSS.alley; }
     else if (!F.e_alley) t = 'PUT THE DOCK GUARD DOWN';
     else if (!F.e_street) { t = 'OUT ONTO THE QUAY'; g = { x: 0, y: 0, z: 12 }; }
     else if (!F.gate) { t = 'HIGH DOCKS FREIGHT: OPEN THE YARD GATE'; g = { x: 18, y: 0, z: 7 }; }
@@ -154,6 +154,10 @@
     [[-7.4, 2.7], [7.4, 2.7], [-7.4, -2.7], [7.4, -2.7]].forEach(p => put(new THREE.BoxGeometry(0.34, 0.34, 0.34), lampM, p[0], 1.5, p[1], 0.03));
     return g;
   }
+//@@SUNS
+    // a chalked sun works when he steps onto it; nothing to press
+    { let on = null; if (F.intro && !S.enc) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && Math.hypot(x - c.x, z - c.z) < 1.5) on = id; }
+      if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
 //@@INIT
   S.init = function () {
     clerk = S.clerk = SC.makeHumanoid('clerk'); G.scene.add(clerk.group); clerk.group.visible = false;
@@ -175,7 +179,7 @@
       const c = CROSS[id], mk = (tex, s, col, op) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(s, s), new THREE.MeshBasicMaterial({ map: tex, color: col, transparent: true, opacity: op, depthWrite: false, fog: false })); m.rotation.x = -Math.PI / 2; m.position.set(c.x, c.y + 0.05, c.z); m.renderOrder = 3; G.scene.add(m); return m; };
       const a = mk(G.tex.ring, 3.4, 0xffe14a, 0.9), b = mk(G.tex.disc, 2.3, 0xffe14a, 0.35);
       W.dyn.push(t => { a.rotation.z = t * 0.25; const col = pl.path ? SC.PATHS[pl.path].color : 0xffe14a; a.material.color.set(col); b.material.color.set(col); b.material.opacity = 0.25 + Math.sin(t * 3) * 0.12; });
-      W.addInteract({ id: 'x_' + id, x: c.x, y: c.y, z: c.z, r: 1.9, label: 'COUNT ELEVEN', act: crossing(id), when: () => F.intro });
+      W.addInteract({ id: 'x_' + id, x: c.x, y: c.y, z: c.z, r: 1.9, label: 'COUNT ELEVEN', act: crossing(id), when: () => false });
     });
     W.addInteract({ id: 'casings', x: 1.5, y: 0, z: 38.8, r: 1.9, label: 'LOOK', marker: 'clue', mh: 1.1, when: () => F.intro && !F.clue_casings, act: clue('casings', [
       { who: 'cap', text: 'A watch lamp on the stones. The wick is trimmed and the well is full.' },

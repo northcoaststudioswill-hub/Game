@@ -80,7 +80,7 @@
     }
     function standard(x, z, y, h, col) {
       cyl('flat', x, y + h / 2, z, 0.07, 0.09, h, IRON, { outline: 0.03 }); D('flat', x + 0.75, y + h - 0.12, z, 1.6, 0.1, 0.1, IRON, { outline: 0.02 });
-      D('flat', x + 0.8, y + h - 1.6, z, 1.3, 2.8, 0.06, col, { outline: 0.04 }); D('flat', x + 0.8, y + h - 1.2, z + 0.04, 0.5, 0.5, 0.04, GILT, { rz: 0.785, outline: 0 }); D('flat', x, y + h + 0.1, z, 0.22, 0.22, 0.22, GILT, { outline: 0.03 });
+      D('flat', x + 0.8, y + h - 1.6, z, 1.3, 2.8, 0.06, col, { outline: 0.04 }); cyl('flat', x + 0.8, y + h - 1.2, z + 0.05, 0.3, 0.3, 0.04, GILT, { rx: Math.PI / 2, seg: 12, outline: 0 }); D('flat', x + 0.8, y + h - 1.2, z + 0.08, 0.3, 0.12, 0.02, 0xffffff, { outline: 0 }); D('flat', x + 0.8, y + h - 1.2, z + 0.1, 0.1, 0.1, 0.02, IRON, { outline: 0 }); D('flat', x, y + h + 0.1, z, 0.22, 0.22, 0.22, GILT, { outline: 0.03 });
     }
 
     // ----- the weather, far below -----
@@ -285,6 +285,70 @@
     // the pairs out past the north edge, riding level with the roof
     [[6, -66], [12.6, -66.4], [25, -64], [31.6, -64.6], [-20, -66], [-26.6, -66.5]].forEach((p, i) => bargeS(p[0], 9.2 + (i % 2) * 0.4 - (p[0] < 0 ? 2 : 0), p[1], Math.PI / 2 + (i % 3 - 1) * 0.04));
     [[8, 11.9, -45.2, 8, 10, -58], [22, 11.9, -45.2, 26, 10, -56], [-18, 9.9, -45.2, -21, 8, -58]].forEach(l => line(l[0], l[1], l[2], l[3], l[4], l[5], 0.045));
+
+    // ===== theirs: what the Accredited build to be looked at, and what they build to keep us in line =====
+    const GREEN = 0x3f9a5c, GREEN2 = 0x2f7a4a, WATER = 0x9fd7ff;
+    const blob = (x, y, z, sx, sy, sz, col, ol) => { const g = new THREE.IcosahedronGeometry(1, 1); g.scale(sx, sy, sz); batch.add('flat', g, G.mx(x, y, z, x * 1.7), col, ol === undefined ? 0.06 : ol); g.dispose(); };
+    /* the Watcher: a gold sun with an open eye. The same cloth hangs over Ashgate Square. */
+    function watcher(x, y, z, ry, s) {
+      const rx = Math.cos(ry), rz = -Math.sin(ry), nx = Math.sin(ry), nz = Math.cos(ry);
+      cyl('flat', x, y, z, s, s, 0.14, GILT, { rx: Math.PI / 2, ry, seg: 20, outline: 0.06 });
+      for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2, d = s * (i % 2 ? 1.5 : 1.75); D('flat', x + rx * Math.cos(a) * d, y + Math.sin(a) * d, z + rz * Math.cos(a) * d, s * 0.16, s * (i % 2 ? 0.6 : 1.0), 0.1, GILT, { ry, rz: a - Math.PI / 2, outline: 0.04 }); }
+      D('flat', x + nx * 0.1, y, z + nz * 0.1, s * 1.25, s * 0.5, 0.06, 0xffffff, { ry, outline: 0.04 });
+      cyl('flat', x + nx * 0.15, y, z + nz * 0.15, s * 0.24, s * 0.24, 0.06, IRON, { rx: Math.PI / 2, ry, seg: 10, outline: 0 });
+    }
+    /* an Auditor in gold, twice the height of anybody who has to walk past it, holding the light */
+    function statue(x, z, y, h, ry, solidToo) {
+      if (solidToo !== false) solid(x - 0.8, z - 0.8, x + 0.8, z + 0.8, y, y + 1.2 + h, { cam: false });
+      D('concrete', x, y + 0.6, z, 1.6, 1.2, 1.6, STONE, { outline: 0.06 }); D('flat', x, y + 1.24, z, 1.75, 0.12, 1.75, GILT, { outline: 0.03 });
+      const b = y + 1.3, fx = Math.sin(ry), fz = Math.cos(ry), sx = Math.cos(ry), sz = -Math.sin(ry);
+      cyl('flat', x, b + h * 0.3, z, h * 0.11, h * 0.2, h * 0.6, GILT, { seg: 8, outline: 0.06 });
+      D('flat', x, b + h * 0.68, z, h * 0.26, h * 0.2, h * 0.15, GILT, { ry, outline: 0.05 });
+      blob(x, b + h * 0.86, z, h * 0.075, h * 0.09, h * 0.075, GILT, 0.04);
+      cyl('glow', x - fx * h * 0.06, b + h * 0.88, z - fz * h * 0.06, h * 0.17, h * 0.17, 0.05, LAMP, { rx: Math.PI / 2, ry, seg: 16, outline: 0 });     // the halo
+      D('flat', x + sx * h * 0.2, b + h * 0.86, z + sz * h * 0.2, h * 0.06, h * 0.36, h * 0.06, GILT, { ry, rz: -0.35, outline: 0.04 });                 // the raised arm
+      D('glow', x + sx * h * 0.27, b + h * 1.06, z + sz * h * 0.27, h * 0.09, h * 0.09, h * 0.09, LAMP, { outline: 0 });
+      D('flat', x - sx * h * 0.17, b + h * 0.56, z - sz * h * 0.17 + fz * 0.05, h * 0.1, h * 0.14, h * 0.04, STONE, { ry, outline: 0.03 });               // the book in the other hand: the Count
+    }
+    /* a tree. Nobody below the rock has seen one. Up here they are furniture. */
+    function tree(x, z, y, s) {
+      s = s || 1; solid(x - 0.55, z - 0.55, x + 0.55, z + 0.55, y, y + 0.8, { cam: false });
+      D('concrete', x, y + 0.35, z, 1.1, 0.7, 1.1, STONE, { outline: 0.05 }); D('flat', x, y + 0.72, z, 1.2, 0.1, 1.2, GILT, { outline: 0.03 });
+      cyl('wood', x, y + 1.3 * s, z, 0.07, 0.1, 1.4 * s, 0x6e4a2c, { outline: 0.03 });
+      blob(x, y + 2.3 * s, z, 0.75 * s, 0.7 * s, 0.75 * s, GREEN); blob(x + 0.2, y + 3.0 * s, z - 0.1, 0.5 * s, 0.5 * s, 0.5 * s, GREEN2);
+    }
+    // the Watcher, inlaid where the causeway meets the quay: everyone who comes up the stair walks across the eye
+    cyl('flat', 0, 0.016, 12, 2.5, 2.5, 0.02, GILT, { seg: 28, outline: 0 }); cyl('flat', 0, 0.02, 12, 2.1, 2.1, 0.02, DECK, { seg: 28, outline: 0 });
+    for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; D('flat', Math.sin(a) * 3.6, 0.016, 12 + Math.cos(a) * 3.6, 0.3, 0.02, i % 2 ? 1.2 : 2.0, GILT, { ry: a, outline: 0 }); }
+    D('flat', 0, 0.024, 12, 2.6, 0.02, 1.0, 0xffffff, { outline: 0 }); cyl('flat', 0, 0.028, 12, 0.48, 0.48, 0.02, IRON, { seg: 14, outline: 0 });
+    // the Auditors on the quay rail, and on Mooring One
+    statue(-18, 16.9, 0, 4.4, Math.PI); statue(18, 16.9, 0, 4.4, Math.PI);
+    statue(10, -44.3, 11, 3.6, 0); statue(20, -44.3, 11, 3.6, 0);
+    statue(7.6, -11.4, 0, 3.0, Math.PI / 2); statue(7.6, -1.6, 0, 3.0, Math.PI / 2);
+    // the twelve standards, one a House, along the open rail
+    [0x5a3aa8, 0x2f8f8a, 0xd98a1f, 0x8a1f24, 0x3a5fa8, 0xefe8d4, 0x2f7a4a, 0xc9a063, 0x7a2f8a, 0x23232e, 0xb5484a, 0x4a8ac8].forEach((c, i) => { const x = i < 6 ? -36.5 + i * 5.6 : 8.5 + (i - 6) * 5.6; standard(x, 17.75, 0, 5.4, c); });
+    // the great eye over the freight yard, and the words under it
+    watcher(15, 7.6, -21.82, 0, 1.25); sign('GRATITUDE IS BREATH', 15, 4.5, -21.86, 0, 9.5, 1.0, '#07070d', '#e8c25a');
+    watcher(-43, 11.4, 12, Math.PI / 2, 1.3); D('concrete', -43, 9.2, 12, 0.5, 1.6, 0.5, STONE, { outline: 0.04 });
+    // greens: trees in gilt tubs along the bond house, by the Spire gate, on Mooring One
+    [[-21, 7.0], [-15, 7.0], [-1.6, 7.0], [3.4, 7.0], [-38.6, 10.2], [-38.6, 13.8], [38.6, 7.2], [38.6, 16.8]].forEach(p => tree(p[0], p[1], 0, 1));
+    tree(30.4, -44.8, 11, 0.9); tree(-0.4, -23.4, 11, 0.9); tree(-30.8, -23.2, 9, 0.8);
+    // a fountain, running, on a shelf where the tiers below are rationed by the cup
+    solid(18.3, 8.9, 21.7, 12.3, 0, 0.7, { cam: false }); cyl('concrete', 20, 0.3, 10.6, 1.75, 1.85, 0.6, STONE, { seg: 14, outline: 0.06 }); cyl('flat', 20, 0.62, 10.6, 1.5, 1.5, 0.04, WATER, { seg: 14, outline: 0 });
+    cyl('concrete', 20, 1.1, 10.6, 0.16, 0.24, 1.2, STONE, { outline: 0.04 }); cyl('flat', 20, 1.75, 10.6, 0.7, 0.2, 0.22, GILT, { seg: 12, outline: 0.04 }); cyl('flat', 20, 1.87, 10.6, 0.6, 0.6, 0.03, WATER, { seg: 12, outline: 0 });
+    [0, 1.6, 3.2, 4.8].forEach(a => line(20 + Math.cos(a) * 0.55, 1.8, 10.6 + Math.sin(a) * 0.55, 20 + Math.cos(a) * 1.0, 0.66, 10.6 + Math.sin(a) * 1.0, 0.03, WATER));
+    // the viewing pavilion: where they sit to watch the barges come in
+    D('flat', -28.2, 0.36, 7.3, 1.7, 0.26, 0.62, IVORY, { outline: 0.04 }); D('flat', -28.95, 0.66, 7.3, 0.2, 0.6, 0.62, IVORY, { rz: 0.35, outline: 0.04 }); D('flat', -28.2, 0.52, 7.3, 1.4, 0.08, 0.5, VIOLET, { outline: 0 });
+    cyl('flat', -26.2, 0.4, 7.3, 0.3, 0.2, 0.8, GILT, { seg: 8, outline: 0.04 }); blob(-26.2, 0.92, 7.3, 0.24, 0.14, 0.24, GREEN, 0.03); cyl('glow', -25.7, 0.9, 7.5, 0.05, 0.05, 0.2, LAMP, { outline: 0 });
+    [-29, -25].forEach(x => { D('flat', x, 1.3, 7.8, 0.1, 2.6, 0.1, GILT, { outline: 0.03 }); D('flat', x, 1.5, 7.76, 0.5, 2.0, 0.04, IVORY, { outline: 0.03 }); });
+    // and ours: the line soot walk, the plates where porters kneel, the meter at the gate
+    for (let x = -30; x < 5; x += 1.6) D('flat', x, 0.014, 8.15, 1.0, 0.02, 0.14, IRON, { outline: 0 });
+    sign('SOOT WALK THE LINE', -9.5, 1.5, 6.14, 0, 3.6, 0.55, '#e8c25a', '#07070d'); sign('KNEEL AT THE BELL', -39.72, 1.5, 15.6, Math.PI / 2, 2.8, 0.5, '#e8c25a', '#07070d');
+    for (let x = -38.2; x < -35.4; x += 0.85) for (let z = 10.4; z <= 13.6; z += 0.8) D('flat', x, 0.014, z, 0.36, 0.02, 0.2, 0xb8902e, { outline: 0 });
+    D('metal', 16.9, 1.1, 6.5, 0.4, 2.2, 0.5, GILT, { outline: 0.05 }); D('glow', 16.9, 1.7, 6.77, 0.24, 0.5, 0.04, 0xff5a1f, { outline: 0 }); sign('AIR OWED', 16.9, 2.5, 6.78, 0, 1.3, 0.34, '#07070d', '#e8c25a');   // the breath meter every porter passes
+    // a colonnade on the east edge of Mooring One, to frame the fleet
+    [-43, -38, -33, -28].forEach(z => { cyl('concrete', 31.8, 13.95, z, 0.22, 0.27, 4.4, STONE, { outline: 0.04 }); D('flat', 31.8, 16.2, z, 0.7, 0.16, 0.7, GILT, { outline: 0.03 }); });
+    D('concrete', 31.8, 16.6, -35.5, 0.7, 0.6, 16.4, STONE, { outline: 0.06 }); D('flat', 31.8, 16.95, -35.5, 0.8, 0.12, 16.6, GILT, { outline: 0.03 });
 
     W.statics = batch.build(G.scene); batch = null;
   };

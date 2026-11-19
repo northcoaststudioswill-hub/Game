@@ -58,7 +58,6 @@ between("  P.clerk = t => (", "\n", "  P.clerk = t => ({ spine: [0.03, 0, 0], ch
 between("  function car(x, z, alongX, color) {", "  function lamp(x, z, dx, dz) {", WD.SLED);
 between("  /* ---------- the level ---------- */", "  /* ---------- interactables, pickups, crates ---------- */", WD.BUILD);
 /* ---- words on the page ---- */
-rep("FX.word(e.kind === 'boss' ? 'PAID IN FULL!' : 'KA-THOOM!'", "FX.word(e.kind === 'boss' ? 'STRUCK THROUGH!' : 'KA-THOOM!'");
 rep("FX.word('NOT YET!'", "FX.word('ON MY BREATH!'");
 rep("FX.word('RISE!'", "FX.word('TO ME!'");
 rep('<span class="ch" id="tagCh">2ND CHANCE</span>', '<span class="ch" id="tagCh">ON MY BREATH</span>');
@@ -91,7 +90,7 @@ rep("    if (!F.intro) { intro(); return; }", "    S.drift = F.cut ? 0.0001 : 0;
 /* ---- running inside another page's frame: a pad may be forbidden there, and asking must not stop the game ---- */
 rep("const pads = navigator.getGamepads ? navigator.getGamepads() : [];", "let pads = []; if (!I.noPad) { try { pads = navigator.getGamepads ? navigator.getGamepads() : []; } catch (e) { I.noPad = true; } }");
 /* ---- boot: tell the host we are up ---- */
-rep("    SC.story.title();\n    requestAnimationFrame(frame);", `    if (SC.hosted) { document.body.classList.add('hosted'); SC.input.noPad = true; SC.audio.unlock(); if (SC.story.hasSave()) SC.story.load(); else SC.story.newGame(); } else SC.story.title();
+rep("    SC.story.title();\n    requestAnimationFrame(frame);", `    if (SC.hosted) { document.body.classList.add('hosted'); SC.input.noPad = true; SC.audio.unlock(); SC.ui.resize(); if (SC.story.hasSave()) SC.story.load(); else SC.story.newGame(); } else SC.story.title();
     requestAnimationFrame(frame);
     /* inside SOOTBORN: its d-pad and buttons drive this, and it sends the memories to show */
     window.addEventListener('message', e => {
@@ -143,6 +142,56 @@ rep("'<div class=\"card split\"><h2>PAUSED</h2>' + CONTROLS +", "'<div class=\"c
 rep("    pl.setState('finish'); pl.fin = { e, step: 0 };", "    SC.emit('finisherStart', e); pl.setState('finish'); pl.fin = { e, step: 0 };");
 rep("try { ctx = A.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }", "try { let pc = null; try { pc = SC.hosted && window.parent.__issueAudio; } catch (e) { pc = null; } ctx = A.ctx = pc || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }");
 rep("  A.toggle = function () {", "  A.kill = function () { A.on = false; try { if (master) master.disconnect(); } catch (e) { /* gone already */ } };\n  A.toggle = function () {");
+
+
+/* ---- a small frame gets a small HUD, kept to the corners ---- */
+rep("  U.resize = function () {", "  U.resize = function () {\n    if (SC.hosted) { const k = U.hudK = SC.clamp(Math.min(window.innerWidth / 560, window.innerHeight / 330), 0.6, 1), h = $('hud'); h.style.transformOrigin = '0 0'; h.style.transform = 'scale(' + k + ')'; h.style.right = h.style.bottom = 'auto'; h.style.width = (100 / k) + '%'; h.style.height = (100 / k) + '%'; }");
+rep(".project(G.camera); const w = window.innerWidth, h = window.innerHeight;", ".project(G.camera); const w = window.innerWidth / (U.hudK || 1), h = window.innerHeight / (U.hudK || 1);");
+rep('<div id="mem" class="hide"></div>', '<div id="mem" class="hide"></div>\n  <div id="rage"></div>');
+rep("#mem.hide{display:none}", "#mem.hide{display:none}\n#rage{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity .25s;box-shadow:inset 0 0 16vh 5vh rgba(210,24,12,.8)}\nbody.hosted #obj{max-width:40vw}body.hosted #toast{top:auto;bottom:22%}body.hosted #who .pic{display:none}");
+rep("    $('bPf').style.transform = ", "    $('rage').style.opacity = SC.state === 'play' && !U.blocking() ? SC.clamp((p.meter - 45) / 55, 0, 1) * (0.75 + Math.sin(performance.now() / 140) * 0.25) : 0;\n    $('bPf').style.transform = ");
+rep("    const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;\n    if (F.e_alley && !F.e_street", "    const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;\n" + ST.SUNS + "    if (F.e_alley && !F.e_street");
+
+/* ---- the blade: three cuts instead of three punches, and they land ---- */
+between("  const A1w = {", "  P.attack = (i, t) => {", `  const A1w = { hips: [0, -0.7, 0], spine: [-0.05, -0.3, 0], chest: [-0.05, -0.4, 0], head: [0, 0.9, 0], shR: [-2.5, 0, -0.7], elR: [-1.5, 0, 0], shL: [-0.9, 0, 0.3], elL: [-1.2, 0, 0], thL: [-0.5, 0, 0.1], shnL: [0.6, 0, 0], thR: [0.4, 0, -0.1], shnR: [0.5, 0, 0], sc1: [-0.9, 0, 0], y: -0.14 };
+  const A1s = { hips: [0, 0.7, 0], spine: [0.35, 0.35, 0], chest: [0.15, 0.5, 0], head: [-0.1, -1.0, 0], shR: [-0.9, 0, 0.95], elR: [-0.1, 0, 0], shL: [0.6, 0, 0.4], elL: [-1.4, 0, 0], thL: [-0.95, 0, 0.05], shnL: [1.0, 0, 0], thR: [0.7, 0, -0.1], shnR: [0.3, 0, 0], ftR: [-0.5, 0, 0], sc1: [-0.3, 0.4, 0], y: -0.24 };
+  const A2w = { hips: [0, 0.8, 0], spine: [0.2, 0.3, 0], chest: [0.1, 0.5, 0], head: [0, -1.1, 0], shR: [-0.8, 0, 1.2], elR: [-1.6, 0, 0], shL: [0.4, 0, 0.6], elL: [-1.2, 0, 0], thL: [0.2, 0, 0.12], shnL: [0.45, 0, 0], thR: [-0.5, 0, -0.1], shnR: [0.6, 0, 0], sc1: [-0.9, 0, 0], y: -0.16 };
+  const A2s = { hips: [0, -0.9, 0], spine: [-0.1, -0.4, 0], chest: [-0.1, -0.6, 0], head: [0.05, 1.3, 0], shR: [-1.9, 0, -1.1], elR: [-0.08, 0, 0], shL: [-0.6, 0, 0.5], elL: [-1.5, 0, 0], thL: [-0.7, 0, 0.1], shnL: [0.8, 0, 0], thR: [0.55, 0, -0.14], shnR: [0.3, 0, 0], ftR: [-0.4, 0, 0], sc1: [-0.4, -0.5, 0], y: -0.12 };
+  const A3w = { hips: [-0.2, 0, 0], spine: [-0.35, 0, 0], chest: [-0.25, 0, 0], head: [0.3, 0, 0], shR: [-3.0, 0, -0.15], elR: [-0.7, 0, 0], shL: [-3.0, 0, 0.15], elL: [-0.7, 0, 0], thL: [-1.1, 0, 0.1], shnL: [1.6, 0, 0], thR: [-0.3, 0, -0.1], shnR: [1.3, 0, 0], sc1: [0.2, 0, 0], y: 0.34 };
+  const A3s = { hips: [0.25, 0, 0], spine: [0.7, 0, 0], chest: [0.3, 0, 0], head: [-0.5, 0, 0], shR: [-0.75, 0, 0.25], elR: [-0.1, 0, 0], shL: [-0.75, 0, -0.25], elL: [-0.1, 0, 0], thL: [-1.3, 0, 0.1], shnL: [1.5, 0, 0], thR: [0.5, 0, -0.1], shnR: [1.2, 0, 0], ftR: [0.5, 0, 0], sc1: [-0.2, 0, 0], y: -0.42 };
+`);
+rep("const DMG = [9, 11, 19];", "const DMG = [14, 17, 32];");
+rep("e.hit(DMG[i] + (pl.rank > 1 ? 1 : 0),", "e.hit((DMG[i] + (pl.rank > 1 ? 2 : 0)) * (1 + pl.meter / T.meter * 0.6),");
+rep("FX.slash(_b, pl.yaw + (i === 1 ? 0.4 : -0.3), i === 1 && path ? path.color : 0xffffff, heavy ? 3.2 : 2.3, (i === 0 ? -0.5 : i === 1 ? 0.45 : 0.08));", "{ const hot = path && pl.meter > 45; FX.slash(_b, pl.yaw + (i === 1 ? 0.4 : -0.3), hot ? path.color : 0xffffff, heavy ? 4.6 : 3.3, (i === 0 ? -0.6 : i === 1 ? 0.55 : 1.45)); if (heavy || hot) FX.slash(_b, pl.yaw + (i === 1 ? 0.2 : -0.15), hot ? path.hot : 0xfff2c4, heavy ? 3.4 : 2.4, (i === 0 ? -0.4 : i === 1 ? 0.35 : 1.3)); }");
+rep("SC.time.hitstop = heavy ? 0.11 : 0.05; SC.cam.shake(heavy ? 0.4 : 0.14); pl.gain(heavy ? 9 : 6);", "SC.time.hitstop = heavy ? 0.17 : 0.085; SC.cam.shake(heavy ? 0.85 : 0.32); pl.gain(heavy ? 12 : 8); if (heavy) { FX.puff(_b, 5, 1.2); SC.audio.sfx('slam'); }");
+rep("this.vel.x += dx * (o.heavy ? 9 : 3.6) * big; this.vel.z += dz * (o.heavy ? 9 : 3.6) * big;", "this.vel.x += dx * (o.heavy ? 13 : 5.5) * big; this.vel.z += dz * (o.heavy ? 13 : 5.5) * big;");
+rep("FX.burst(_a, 0xffffff, o.heavy ? 1.7 : 1);", "FX.burst(_a, 0xffffff, o.heavy ? 2.4 : 1.5); FX.burst(_a, 0xff5a1f, o.heavy ? 1.6 : 0.9);");
+/* the finisher: two cuts counted aloud, then he goes up and brings the third down */
+between("  function updateFinisher(dt) {", "  pl.update = function (dt, rdt) {", `  function updateFinisher(dt) {
+    const f = pl.fin, e = f.e, st = pl.st, path = SC.PATHS[pl.path || 'ember'], boss = e.kind === 'boss'; pl.vel.set(0, 0, 0);
+    const cut = (n, word, yaw, tilt) => { if (f.step !== n) return; f.step = n + 1; _a.copy(e.pos); _a.y += 1.3;
+      FX.slash(_a, pl.yaw + yaw, path.color, 4.2, tilt); FX.slash(_a, pl.yaw + yaw * 0.6, 0xffffff, 3.2, tilt * 0.8); FX.burst(_a, 0xffffff, 2); FX.burst(_a, path.color, 1.4); FX.puff(_a, 4, 1);
+      _a.y += 1.0; FX.word(word, _a, '#ffe14a', 0.95); SC.time.hitstop = 0.11; SC.cam.shake(0.7); SC.audio.sfx('hit', 1); e.flash = 0.16; e.pos.addScaledVector(fwd(pl.yaw, _b), 0.12); };
+    if (st < 0.16) { pl.pose = P.attack(0, 0.06); pl.poseRate = 30; }
+    else if (st < 0.38) { cut(0, boss ? 'NINE!' : 'ONE!', -0.4, -0.6); pl.pose = P.attack(0, 0.2); pl.poseRate = 70; }
+    else if (st < 0.48) { pl.pose = P.attack(1, 0.07); pl.poseRate = 44; }
+    else if (st < 0.7) { cut(1, boss ? 'TEN!' : 'TWO!', 0.5, 0.55); pl.pose = P.attack(1, 0.2); pl.poseRate = 70; }
+    else if (st < 1.04) { pl.pose = P.attack(2, 0.12); pl.poseRate = 26; pl.lift = Math.sin((st - 0.7) / 0.34 * Math.PI * 0.5) * 1.0; }
+    else {
+      if (f.step === 2) {
+        f.step = 3; pl.stats.finishers++;
+        _a.copy(e.pos); _a.y += 1.5; FX.slash(_a, pl.yaw, 0xffffff, 5.4, 1.5); FX.slash(_a, pl.yaw, path.color, 4.4, 1.5); FX.burst(_a, path.color, 3.4); FX.burst(_a, 0xffffff, 2.4);
+        _a.y += 1.5; FX.word(boss ? 'ELEVEN!' : 'STRUCK THROUGH!', _a, path.cssHot, 1.5);
+        FX.ring(e.pos, path.color, 0.5, 5, 0.5); FX.ring(e.pos, 0xffffff, 0.3, 3, 0.35); FX.light(e.pos, path.color, 200, 0.8); FX.ink(e.pos, 10, 1.8); FX.puff(e.pos, 9, 1.6);
+        SC.time.hitstop = 0.26; SC.cam.shake(1.5); SC.audio.sfx('finish'); SC.audio.sfx('slam'); SC.emit('flash', path.css);
+        e.finished();
+      }
+      pl.pose = P.attack(2, 0.3); pl.poseRate = 80; pl.lift = Math.max(0, pl.lift - dt * 16);
+    }
+    if (st > 1.6) { pl.lift = 0; combat.freeze = null; pl.setState('idle'); SC.cam.endCine(0.45); SC.emit('letterbox', false); SC.emit('finisherEnd', e); }
+  }
+
+`);
 
 if (/Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow/.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''))) {
   const m = s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').match(/.{0,60}(Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow).{0,40}/g);

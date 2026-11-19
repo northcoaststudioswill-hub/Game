@@ -1,5 +1,23 @@
 # SOOTBORN — changelog
 
+## v0.29.4 · 2026-11-19 — the High Docks: HUD out of the way, suns that work, a blade that lands, and a place that looks like theirs
+From play notes on a phone: the HUD sat in the middle of the action; walking onto the circles did nothing; with finishers in, the finisher and the fighting need to hit like the other fights do ("he's hitting like a sponge"); the place should feel like the Accredited and their society.
+
+- **HUD.** Scaled to the size of the frame and kept to the corners: health and fury top left, the objective top right, messages low. The portrait is dropped in the small frame.
+- **Chalked suns** now work when you walk onto them. Nothing to press. The first one is still the count.
+- **Fighting.** The three punches are three cuts with the blade: a diagonal from the shoulder, a rising backhand, and a leaping two-handed cleave. About half again as much damage per hit, more again as fury rises, longer hit-stop, harder shake, bigger knock-back, two slashes on a heavy blow, and the cuts burn orange above half fury. The edges of the screen redden and pulse as the bar fills.
+- **Finisher** rebuilt: two cuts counted aloud (ONE, TWO; on Rook NINE, TEN), then he goes up and brings the third down (STRUCK THROUGH; on Rook, ELEVEN), after the memory cut-in.
+- **The Accredited's docks.**
+  - The Watcher (the gold sun with an eye) inlaid in the deck where the causeway meets the quay, so everyone who comes up the stair walks across it; again over the freight yard above GRATITUDE IS BREATH; again over the Spire gate.
+  - Gold Auditors twice life size on the quay rail, at the bond house door and on Mooring One, each with a lit halo, a raised lamp and the Count under one arm.
+  - The twelve House standards along the open rail.
+  - Trees in gilt tubs, and a running fountain, on a shelf whose tiers below are rationed by the cup.
+  - A viewing pavilion with a couch and a bowl of greens, for watching the barges come in.
+  - And what is there for us: a painted line (SOOT WALK THE LINE), brass plates before the Spire gate where porters kneel (KNEEL AT THE BELL), a breath meter at the yard gate (AIR OWED).
+  - A colonnade on the east edge of Mooring One.
+
+**Checked** in an upright phone-sized window with the on-screen buttons: A opens a question mark; walking onto the sun starts the count; A on a dazed Warden runs the memory and the three-beat finisher. **Not checked:** how the new cuts look in motion at speed (seen in stills), fight balance with the higher damage (fights will be shorter and Rook easier), and all of it on a real phone.
+
 ## v0.29.2 · 2026-11-19 — the High Docks plays in the game's own frame, with memories instead of powers
 From play notes: it played in its own vertical window; it should sit in the same frame and use the same controls as the rest of the game; no start button and no "turn your phone"; drop the roguelite abilities for story beats; question marks should show memories from the future section; finishers and ultimates should cut to memories that show his rage; the fighter should look more like Kael.
 
