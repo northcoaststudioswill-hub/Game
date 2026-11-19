@@ -345,3 +345,14 @@ The Fence, Marc, the Apothecary, Big Hobb, the charm seller, Whisper and the Bus
 - **Bodies keep their distance.** Fighters hold a shoulder's width apart and ease out of each other instead of popping; lunges stop at contact; an interrupted spin unwinds instead of snapping.
 - **The lower cards never close.** Every name you have killed leaves a "Lower card" button: a fresh fighter from that tier, at that tier's level, for a small purse.
 - **The Fallen.** The Guildmaster keeps a tally of every name you have put in the sand, newest first.
+
+## Latest pass: fight polish
+
+Found with a frame-by-frame detector that flags any joint, facing or position that jumps between two frames of a real bout.
+
+- Joints move at a capped speed and ease by time, so nothing snaps when a blow is interrupted, a hit lands or a dodge ends. Dodge and the fall use the same joints as everything else.
+- A missed blow no longer replays its swing during the longer recovery. Blows hold where they landed for a beat before coming back. Quick blows draw back less.
+- Spins turn through the whole blow. Facing turns at a real rate. A fighter killed while already down stays down.
+- The kill is filmed from the side, with a smoothed camera and a wall behind it on the open side. From range, the killer crosses the sand instead of appearing beside the body.
+- Fighters stay off the kerbs and braziers. The open side of the pit has a floor instead of a void.
+- Hit flash is a warm tint, not a white silhouette. Dash trails are a thin line and wake. The kill flash is dimmer. Combat words stack instead of overprinting.

@@ -192,7 +192,9 @@
     C.limbs = { armL, armR, legL, legR, head };
     C.sever = function (part) { const g = C.limbs[part]; if (!g || !g.parent || g.userData.gone) return null; g.userData.gone = 1; const st = new T.Mesh(new T.SphereGeometry(part === 'head' ? 0.15 : 0.11, 6, 5), new T.MeshLambertMaterial({ color: 0x7a0a0a, flatShading: true })); st.position.copy(g.position); st.scale.y = 0.55; g.parent.add(st); const bn = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 0.1, 5), new T.MeshLambertMaterial({ color: 0xe6dcc4 })); bn.position.copy(g.position); bn.position.y -= 0.04; g.parent.add(bn); return g; };
     // Joint targets are computed per state, then eased toward, so stances blend instead of snapping.
-    const cur = {}, J = (k, v, s) => (cur[k] = cur[k] == null ? v : cur[k] + (v - cur[k]) * s);
+    let cur = {}, dtp = 1 / 60, lastPT = null, fresh = 0;
+    const CAP = { arx: 30, arz: 30, alx: 30, alz: 30, ll: 22, lr: 22, bx: 12, bz: 10, ty: 16, tz: 12, hx: 14, hz: 14, by: 4.5, bpz: 4.5, kl: 26, kr: 26, er: 30, el: 30, cape: 20 };
+    const J = (k, v, s) => { if (cur[k] == null) return (cur[k] = v); const a = 1 - Math.pow(1 - Math.min(0.999, s), dtp * 60), m = (CAP[k] || 30) * dtp; let d = (v - cur[k]) * a; if (d > m) d = m; else if (d < -m) d = -m; return (cur[k] += d); };
     const mix = G.lerp, eo = x => 1 - Math.pow(1 - x, 3), ei = x => x * x;
     const restL = cls === 'fighter' ? -0.9 : cls === 'rogue' || cls === 'sorcerer' ? -0.5 : 0.05;
     const FAM = { axe: 'heavy', hammer: 'heavy', pick: 'heavy', spear: 'pole', halberd: 'pole', staff: 'pole', rapier: 'fence', axes: 'dual', chain: 'swing', flail: 'swing', frost: 'orb', spark: 'orb', acid: 'orb' }[arm] || (cls === 'rogue' ? 'dual' : cls === 'sorcerer' ? 'orb' : '');
@@ -200,6 +202,8 @@
     // pose: {moving, walk, act:'idle|swing|cast|stun|dodge|ko', prog, step (combo step), hurt, guard, flash, alpha, t, glow}
     C.pose = function (p) {
       const t = p.t || 0, act = p.act || 'idle', mv = p.moving && act !== 'ko' && act !== 'dodge';
+      if (fresh === 1) { cur = {}; fresh = 2; }       // a figure posed once (a portrait, a stall-keeper) takes its pose outright
+      dtp = lastPT == null || t <= lastPT || t - lastPT > 0.2 ? 1 / 60 : Math.max(1 / 240, t - lastPT); lastPT = t;
       const sw = mv ? Math.sin(p.walk) : 0, k = Math.max(0, Math.min(1, p.prog || 0));
       const q = { by: Math.sin(t * 2.4) * 0.015, bx: 0.06, bz: Math.sin(t * 1.2) * 0.02, bpz: 0, ll: 0.05, lr: -0.05, ty: Math.sin(t * 1.2) * 0.04, tz: 0, hx: 0, hz: 0,
         arx: -0.45 + Math.sin(t * 2.4) * 0.04, arz: 0, alx: restL + Math.sin(t * 2.4 + 1) * 0.03, alz: 0, cape: 0.16 + Math.sin(t * 2) * 0.04 };
@@ -211,8 +215,8 @@
       }
       if (act === 'swing') {
         snap = k < 0.07 || k > 0.9 ? 0.45 : 1; const step = p.sty === 2 || p.mv === 'smite' || p.mv === 'chop' ? 2 : (p.step || 0), w = Math.min(1, k / 0.5), r = Math.max(0, (k - 0.5) / 0.5);
-        const cock = eo(Math.min(1, w / 0.6)), hit = ei(Math.max(0, (w - 0.6) / 0.4)), back = r * r * (3 - 2 * r);
-        const seq = (ready, cocked, struck) => k < 0.5 ? mix(mix(ready, cocked, cock), struck, hit) : mix(struck, ready, back);
+        const rb = Math.max(0, (r - 0.3) / 0.7), cock = eo(Math.min(1, w / 0.6)), hit = ei(Math.max(0, (w - 0.6) / 0.4)), back = rb * rb * (3 - 2 * rb), amp = p.wt ? Math.max(0.5, Math.min(1, p.wt / 0.24)) : 1;
+        const seq = (ready, cocked, struck) => k < 0.5 ? mix(mix(ready, ready + (cocked - ready) * amp, cock), struck, hit) : mix(struck, ready, back);
         if (step === 0) { q.arx = seq(-0.45, -2.6, 0.3); q.arz = seq(0, -0.5, 0.5); q.ty = seq(0, 0.6, -0.65); q.bx = seq(0.06, -0.06, 0.3); }
         else if (step === 1) { q.arx = seq(-0.45, -1.35, -1.15); q.arz = seq(0, 1.0, -1.2); q.ty = seq(0, -0.75, 0.8); q.bx = seq(0.06, 0.06, 0.22); }
         else { q.arx = seq(-0.45, -3.05, 0.5); q.alx = seq(restL, -2.9, 0.4); q.bx = seq(0.06, -0.3, 0.5); q.by = k < 0.5 ? Math.sin(w * Math.PI) * 0.42 : 0; q.ll = q.lr = k < 0.5 ? Math.sin(w * Math.PI) * 0.7 : 0; q.hx = seq(0, -0.3, 0.2); }
@@ -225,7 +229,7 @@
         // ---- signature moves: each named technique has its own shape
         const m = p.mv, ld = k < 0.5 ? cock : 1 - back;
         if (m === 'bash') { q.alx = seq(restL, -0.5, -1.6); q.alz = seq(0, 0.6, -0.45); q.arx = seq(-0.45, 0.1, 0.2); q.arz = seq(0, -0.2, -0.3); q.ty = seq(0, -0.7, 0.85); q.bx = seq(0.06, -0.08, 0.42); q.bpz = seq(0, -0.14, 0.36); q.ll = seq(0.05, -0.3, 0.75); q.lr = seq(-0.05, 0.3, -0.65); q.by = -0.1 * ld; q.hx = seq(0, 0.1, 0.2); }
-        else if (m === 'spin') { q.spin = k < 0.5 ? mix(mix(0, -1.0, cock), 5.0, hit) : mix(5.0, 6.2832, back); q.arx = -1.5; q.arz = seq(0, 0.5, -0.2); q.alx = cls === 'rogue' ? -1.5 : seq(restL, -1.2, -1.3); q.alz = cls === 'rogue' ? 0.9 : 0; q.ty = seq(0, -0.5, 0.3); q.by = -0.14 * ld; q.bx = seq(0.06, 0.1, 0.2); q.ll = seq(0.05, 0.4, 0.45); q.lr = seq(-0.05, -0.4, -0.5); q.hx = 0; q.cape = 0.9; }
+        else if (m === 'spin') { const su = Math.max(0, Math.min(1, (k - 0.12) / 0.66)); q.spin = k < 0.12 ? -0.5 * (k / 0.12) : -0.5 + 6.7832 * (su * su * (3 - 2 * su)); q.arx = -1.5; q.arz = seq(0, 0.5, -0.2); q.alx = cls === 'rogue' ? -1.5 : seq(restL, -1.2, -1.3); q.alz = cls === 'rogue' ? 0.9 : 0; q.ty = seq(0, -0.5, 0.3); q.by = -0.14 * ld; q.bx = seq(0.06, 0.1, 0.2); q.ll = seq(0.05, 0.4, 0.45); q.lr = seq(-0.05, -0.4, -0.5); q.hx = 0; q.cape = 0.9; }
         else if (m === 'smite') { if (k < 0.5) q.by = Math.sin(w * Math.PI) * 0.6; else { const hold = 1 - back; q.by = -0.3 * hold; q.ll = -1.2 * hold; q.lr = 0.5 * hold; q.bx = 0.06 + 0.5 * hold; } }
         else if (m === 'backstab') { q.arx = seq(-0.45, -2.95, -0.55); q.arz = seq(0, -0.35, 0.25); q.alx = seq(restL, -1.5, -0.8); q.alz = seq(0, 0.4, -0.6); q.ty = seq(0, 0.55, -0.5); q.bx = seq(0.06, -0.12, 0.6); q.by = seq(0, 0.08, -0.18); q.ll = seq(0.05, -0.35, 0.85); q.lr = seq(-0.05, 0.3, -0.7); q.hx = seq(0, -0.2, 0.25); q.bpz = seq(0, -0.1, 0.3); }
         else if (m === 'lowcut') { q.by = seq(0, -0.2, -0.26); q.bx = seq(0.06, 0.3, 0.5); q.arx = seq(-0.45, -0.55, -0.95); q.arz = seq(0, 1.35, -1.35); q.ty = seq(0, -0.95, 0.95); q.ll = seq(0.05, 0.5, 0.6); q.lr = seq(-0.05, -0.5, -0.6); q.hx = seq(0, -0.3, -0.35); if (cls === 'rogue') { q.alx = q.arx + 0.3; q.alz = -q.arz * 0.7; } }
@@ -267,6 +271,8 @@
       } else if (act === 'salute') { snap = 0.3; q.arx = -2.2 + Math.sin(t * 3) * 0.08; q.arz = -0.2; q.ty = -0.2; q.bx = 0; q.hx = -0.1;
       } else if (act === 'kneel') { snap = 0.3; q.by = -0.44; q.ll = -1.5; q.lr = 0.4; q.bx = 0.5 + Math.sin(t * 4) * 0.03; q.hx = 0.45; q.arx = 0.25; q.alx = -0.35; q.tz = Math.sin(t * 3) * 0.05; q.cape = 0.5;
       } else if (act === 'sit') { q.ll = q.lr = -1.5; q.by = -0.3; q.bx = -0.06; q.arx = -0.75; q.alx = -0.75; snap = 0.4;
+      } else if (act === 'dodge') { snap = 1; const s2 = Math.sin(k * Math.PI); q.bx = 0.5 * s2; q.bz = 0.18 * s2; q.by = -0.18 * s2; q.ll = 0.95 * s2; q.lr = -0.75 * s2; q.arx = -0.9 - 0.4 * s2; q.alx = 0.4 * s2; q.cape = 0.7;       // weight drops, one long step, no tumbling
+      } else if (act === 'ko') { snap = 1; const f = Math.min(1, (p.prog || 0) * 2.2), e = eo(f); q.bx = -1.5 * e; q.bz = 0; q.bpz = 0; q.by = 0.2 * e + Math.sin(f * Math.PI) * 0.25; q.ll = 0.3 * e; q.lr = -0.15 * e; q.arx = -2.6 * e; q.arz = -0.5 * e; q.alx = -2.4 * e; q.alz = 0.6 * e; q.hx = -0.3 * e; q.hz = 0; q.ty = 0; q.tz = 0;
       } else if (act === 'stun') { q.hz = Math.sin(t * 9) * 0.3; q.tz = Math.sin(t * 7) * 0.12; q.arx = 0.1; q.alx = 0.1; q.bx = 0.28; q.by = -0.04; }
       if (p.ready && act === 'idle') { q.by -= 0.05; q.bx = 0.14; q.arx = -0.95 + Math.sin(t * 2.4) * 0.05; q.arz = 0.2; q.alx = (cls === 'fighter' ? -1.2 : restL - 0.45) + Math.sin(t * 2.4 + 1) * 0.04; q.ty = 0.25; if (!mv) { q.ll = 0.18; q.lr = -0.22; } }
       if (p.ready && act === 'idle' && !p.guard) { const br = Math.sin(t * 2.4) * 0.04;
@@ -281,9 +287,10 @@
       if (p.wounded && (act === 'idle') && !p.guard) { q.alx = -0.95; q.alz = -0.75; q.bx += 0.14; q.bz += 0.07; q.hx = 0.12; q.by -= 0.03; if (mv) { q.lr *= 0.55; q.by += Math.abs(Math.sin(p.walk)) * 0.05; } }      // a hand pressed to the wound, and a limp
       if (p.crawl && act !== 'ko') { const c = Math.sin(mv ? p.walk * 1.3 : t * 1.4), reach = act === 'swing' ? Math.sin(k * Math.PI) : 0; q.bx = 1.36; q.by = 0.1; q.bpz = -0.45; q.bz = c * 0.07; q.tz = c * 0.1; q.hx = -1.05; q.arx = -2.55 + c * 0.75 - reach * 0.5; q.alx = -2.55 - c * 0.75; q.arz = 0.25; q.alz = -0.25; q.ll = 0.12; q.lr = -0.08; q.cape = 0.05; snap = 0.5; }      // on the belly, hauling forward on the arms
       if (p.hop) { q.bz += 0.16; q.tz -= 0.1; q.by += mv ? Math.abs(Math.sin(p.walk)) * 0.14 : Math.abs(Math.sin(t * 3)) * 0.02; q.lr = mv ? Math.sin(p.walk * 2) * 0.4 : 0; q.arx -= 0.3; }
-      if (p.guard) { q.alx = -1.55; q.alz = -0.55; q.arx = -1.25; q.arz = 0.45; q.bx = 0.14; q.by = -0.05; snap = 0.5; }
+      if (p.guard && act !== 'ko' && act !== 'dodge') { q.alx = -1.55; q.alz = -0.55; q.arx = -1.25; q.arz = 0.45; q.bx = 0.14; q.by = -0.05; snap = 0.5; }
       if (p.hurt > 0 && !(prevHurt > 0)) side = -side; prevHurt = p.hurt || 0;
-      if (p.hurt > 0 && p.guard) { const h = Math.min(1, p.hurt / 0.28); q.bx -= 0.16 * h; q.by -= 0.1 * h; q.bpz -= 0.16 * h; q.alx += 0.3 * h; q.arx += 0.2 * h; q.tz += 0.08 * h * side; q.ll = 0.3; q.lr = -0.4; snap = Math.max(snap, 0.7); }      // caught on the guard: driven back, not opened up
+      if (act === 'ko') { /* the dead do not flinch */ }
+      else if (p.hurt > 0 && p.guard) { const h = Math.min(1, p.hurt / 0.28); q.bx -= 0.16 * h; q.by -= 0.1 * h; q.bpz -= 0.16 * h; q.alx += 0.3 * h; q.arx += 0.2 * h; q.tz += 0.08 * h * side; q.ll = 0.3; q.lr = -0.4; snap = Math.max(snap, 0.7); }      // caught on the guard: driven back, not opened up
       else if (p.hurt > 0) { const h = Math.min(1, p.hurt / 0.28); q.tz += (side - 1) * 0.28 * h; q.hz = side * 0.25 * h; q.ll += 0.2 * h; q.lr -= 0.3 * h; q.bx -= 0.6 * h; q.tz += 0.28 * h; q.hx = -0.5 * h; q.by -= 0.05 * h; q.arx += 0.55 * h; q.alx += 0.65 * h; q.bpz -= 0.1 * h; snap = Math.max(snap, 0.7); }
       body.position.y = J('by', q.by, snap); body.position.z = J('bpz', q.bpz, snap); if (q.spin != null) spinNow = q.spin; else if (spinNow) { spinNow = Math.atan2(Math.sin(spinNow), Math.cos(spinNow)) * 0.55; if (Math.abs(spinNow) < 0.02) spinNow = 0; }
       body.rotation.set(J('bx', q.bx, snap), spinNow, J('bz', q.bz, snap));
@@ -293,7 +300,6 @@
       if (cape) cape.rotation.x = J('cape', q.cape, 0.2);
       if (robe) robe.rotation.z = mv ? sw * 0.08 : 0;
       root.rotation.z = 0; root.rotation.x = 0; root.position.y = p.y || 0;
-      if (act === 'dodge') { const s2 = Math.sin(k * Math.PI); body.rotation.x = 0.5 * s2; body.rotation.z = 0.18 * s2; body.position.y = -0.18 * s2; legL.rotation.x = 0.95 * s2; legR.rotation.x = -0.75 * s2; armR.rotation.x = -0.9 - 0.4 * s2; armL.rotation.x = 0.4 * s2; cur.bx = 0.3; cur.by = -0.1; }       // weight drops, one long step, no tumbling
       { const crouch = Math.max(0, Math.min(1, -cur.by * 3.2)), sitting = act === 'sit' || act === 'kneel';
         if (!sitting && act !== 'dodge') { legL.rotation.x -= crouch * 0.42; legR.rotation.x -= crouch * 0.42; }
         const knee = l => Math.max(0, Math.min(1.75, Math.max(0, l) * 0.95 + Math.max(0, -l) * 0.3 + Math.max(0, -l - 0.9) * 2.0 + (sitting ? 0 : crouch * 0.85)));
@@ -310,7 +316,6 @@
         foreR.rotation.x = -J('er', eR, Math.max(0.35, snap)); foreL.rotation.x = -J('el', eL, Math.max(0.35, snap)); }
       if (act === 'kick') legL.userData.shin.rotation.x = 0.15;
       if (act === 'ko') { legL.userData.shin.rotation.x = 0.25; legR.userData.shin.rotation.x = 0.5; foreR.rotation.x = -0.3; foreL.rotation.x = -0.5; }
-      if (act === 'ko') { const f = Math.min(1, (p.prog || 0) * 2.2), e = eo(f); body.rotation.x = -1.5 * e; body.position.y = 0.2 * e + Math.sin(f * Math.PI) * 0.25; legL.rotation.x = 0.3 * e; legR.rotation.x = -0.15 * e; armR.rotation.set(-2.6 * e, 0, -0.5 * e); armL.rotation.set(-2.4 * e, 0, 0.6 * e); head.rotation.x = -0.3 * e; }
       // sorcerer flames + cast glow
       const fl = 0.85 + Math.sin(t * 17) * 0.12;
       if (orbs) orbs.forEach(o => o.scale.setScalar((act === 'cast' ? 1.2 + k * 0.9 : 0.9) * fl));
@@ -318,11 +323,11 @@
       if (auraM) auraM.forEach((s, i) => { const a = t * 1.5 + i * 1.57; s.position.set(Math.cos(a) * 0.6, 0.35 + i * 0.38 + Math.sin(t * 2 + i) * 0.15, Math.sin(a) * 0.6); });
       // flash + stealth
       const fl2 = p.flash > 0;
-      for (const mt of mats) { if (fl2) mt.emissive.setRGB(0.9, 0.9, 0.9); else mt.emissive.copy(mt.userData.e); }
+      for (const mt of mats) { if (fl2) mt.emissive.setRGB(0.4, 0.36, 0.3); else mt.emissive.copy(mt.userData.e); }       // a hit lights them up without wiping them out
       const a = p.alpha == null ? 1 : p.alpha;
       if (a !== lastAlpha) { lastAlpha = a; for (const mt of mats) { mt.transparent = a < 1; mt.opacity = a; mt.needsUpdate = true; } glows.forEach(gl => gl.visible = a > 0.5); root.traverse(o => { if (o.isMesh) o.castShadow = a > 0.5; }); }
     };
-    C.pose({ t: 0, act: 'idle' });
+    C.pose({ t: 0, act: 'idle' }); fresh = 1;
     return C;
   };
 

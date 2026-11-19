@@ -8,8 +8,9 @@
 
   const rand = G.rand, clamp = G.clamp;
   function clampArena(o) {
-    o.x = clamp(o.x, -RAD, RAD); o.y = clamp(o.y, -RAD, RAD);
-    const k = (Math.abs(o.x) + Math.abs(o.y)) / RAD;
+    const R2 = RAD - 20;       // a body's width short of the stone, so nobody stands inside a wall, a kerb or a brazier
+    o.x = clamp(o.x, -R2, R2); o.y = clamp(o.y, -R2, R2);
+    const k = (Math.abs(o.x) + Math.abs(o.y)) / (RAD - 26);
     if (k > 1.5) { const f = 1.5 / k; o.x *= f; o.y *= f; }
   }
   const SPIKES = [[-RAD, 2.6 * S], [-RAD, -2.6 * S], [2.6 * S, -RAD], [-2.6 * S, -RAD]], GRATES = [[5 * S, 0], [-5 * S, 0], [0, 5 * S], [0, -5 * S]];
@@ -79,17 +80,19 @@
   }
   function syncEntity(e) {
     const v = e.vis, X = e.x / S, Z = e.y / S;
-    v.g.position.set(X, e.z / S, Z);
-    { const ry = Math.atan2(Math.cos(e.aim), Math.sin(e.aim)); if (v.ry == null || e.state === 'dodge') v.ry = ry; let d = ry - v.ry; d = Math.atan2(Math.sin(d), Math.cos(d)); v.ry += d * 0.3; v.c.root.rotation.y = v.ry; }       // a body takes a moment to turn
+    { const hz = e.z / S; v.hy = v.hy == null || hz >= v.hy ? hz : Math.max(hz, v.hy - 34 * (syncDt || 0)); v.g.position.set(X, v.hy, Z); }       // whatever is dropped falls fast, but it does fall
+    { const ry = Math.atan2(Math.cos(e.aim), Math.sin(e.aim)); if (v.ry == null) v.ry = ry; let d = ry - v.ry; d = Math.atan2(Math.sin(d), Math.cos(d)); const tdt = syncDt, cap = (e.state === 'dodge' ? 34 : 17) * tdt; let stp = d * (1 - Math.pow(0.7, tdt * 60)); if (stp > cap) stp = cap; else if (stp < -cap) stp = -cap; v.ry += stp; v.c.root.rotation.y = v.ry; }       // a body takes a moment to turn
     let act = 'idle', prog = 0, glow = null, stepOv = 0;
-    if (e.state === 'ko') { act = 'ko'; prog = e.koT; }
-    else if (e.down > 0) { act = 'ko'; prog = Math.min(e.downT - e.down, e.down) * 1.7; }
+    if (e.state !== 'ko' && !(e.down > 0)) v.lie = 0;
+    if (e.state === 'ko') { act = 'ko'; prog = Math.max(e.koT, v.lie || 0); }
+    else if (e.down > 0) { act = 'ko'; prog = Math.min(e.downT - e.down, e.down) * 1.7; v.lie = prog; }
     else if (e.st.stun) act = e.st.broken ? 'kneel' : 'stun';
     else if (e.state === 'dodge') { act = 'dodge'; prog = 1 - e.t / 0.22; }
     else if (e.act) {
       const ab = e.act.ab, melee = ab.type === 'melee' && !ab.spell;
       if (e.state === 'wind') { prog = 1 - e.t / (e.act.total || ab.wind || 0.01); act = melee ? 'swing' : 'cast'; if (melee) prog *= 0.5; glow = ab.color; }
-      else { prog = 1 - e.t / (ab.rec || 0.01); act = melee ? 'swing' : 'release'; if (melee) prog = 0.5 + prog * 0.5; }
+      else { if (v.rAct !== e.act) { v.rAct = e.act; v.recT = Math.max(e.t, 0.01); }       // a missed or finishing blow recovers for longer: measure against the time it was actually given, or the swing plays twice
+        prog = Math.max(0, 1 - e.t / v.recT); act = melee ? 'swing' : 'release'; if (melee) prog = 0.5 + prog * 0.5; }
       if (ab.type === 'dash') act = 'lunge'; if (ab.type === 'taunt') act = 'cheer';
     }
     else if (e.state === 'parry') act = 'parry';
@@ -100,7 +103,7 @@
     const alpha = e.buffs.stealth ? (e.isPlayer ? 0.4 : 0.1) : 1;
     if (act === 'cast' && e.state === 'wind' && glow && Math.random() < 0.6) { const ca = rand(0, 6.28), cr = rand(0.8, 1.5); gfx.emit(X + Math.cos(ca) * cr, 1.2 + rand(-0.4, 0.6), Z + Math.sin(ca) * cr, -Math.cos(ca) * cr * 3, 0, -Math.sin(ca) * cr * 3, 0.3, glow, 0); }
     let MF = 1, MS = 0; { const sp = Math.hypot(e.vx || 0, e.vy || 0), fx = e.foe ? e.foe.x - e.x : 0, fy = e.foe ? e.foe.y - e.y : 0, fd = Math.hypot(fx, fy); if (sp > 20 && fd > 1 && fd < 520) { MF = ((e.vx * fx + e.vy * fy) / (sp * fd)); MS = ((e.vx * fy - e.vy * fx) / (sp * fd)); } }
-    v.c.pose({ moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : stepOv, guard: e.guard > 0, sty: e.act && e.act.ab.type === 'melee' && !e.act.ab.spell ? (e.act.ab.arc < 60 ? 1 : (e.act.ab.pz || 1) >= 1.4 ? 2 : e.act.ab.arc >= 120 ? 3 : 0) : 0, mf: MF, ms: MS, ready: 1, hop: !!(e.lost && e.lost.legL), mv: e.act ? e.act.ab.mv : null, cs: e.act ? e.act.ab.cs : null, tired: e.hp < e.maxHp * 0.25, crawl: !!e.crawl, wounded: e.hp < e.maxHp * 0.4 && e.hp > 0, t: time + (e.isPlayer ? 0 : 1.7), glow });
+    v.c.pose({ wt: e.act ? (e.act.total || e.act.ab.wind || 0) : 0, moving: e.moving, walk: e.walk, act, prog, flash: e.flash, alpha, hurt: e.hurt || 0, step: e.act ? e.act.step : stepOv, guard: e.guard > 0, sty: e.act && e.act.ab.type === 'melee' && !e.act.ab.spell ? (e.act.ab.arc < 60 ? 1 : (e.act.ab.pz || 1) >= 1.4 ? 2 : e.act.ab.arc >= 120 ? 3 : 0) : 0, mf: MF, ms: MS, ready: 1, hop: !!(e.lost && e.lost.legL), mv: e.act ? e.act.ab.mv : null, cs: e.act ? e.act.ab.cs : null, tired: e.hp < e.maxHp * 0.25, crawl: !!e.crawl, wounded: e.hp < e.maxHp * 0.4 && e.hp > 0, t: time + (e.isPlayer ? 0 : 1.7), glow });
     const alive = e.state !== 'ko';
     if (alive && !F.ex && gore() && !v.c.beast) { const fr = e.hp / e.maxHp, want = fr < 0.25 ? 3 : fr < 0.45 ? 2 : fr < 0.7 ? 1 : 0; v.wounds = v.wounds || 0;
       while (v.wounds < want && v.c.body) { const w = new T.Mesh(new T.BoxGeometry(0.05 + Math.random() * 0.05, 0.22 + Math.random() * 0.22, 0.03), new T.MeshBasicMaterial({ color: 0x6a0808 })); w.position.set((Math.random() - 0.5) * 0.4, 1.0 + Math.random() * 0.45, 0.225 * (v.wounds === 1 ? -1 : 1)); w.rotation.z = (Math.random() - 0.5) * 1.6; v.c.body.add(w); v.wounds++; }
@@ -163,14 +166,17 @@
     } else if (k === 'bolt' || k === 'trail') {
       const dx = (f.x2 - f.x1) / S, dz = (f.y2 - f.y1) / S, L = Math.hypot(dx, dz) || 0.01, a = Math.atan2(dz, dx);
       g.position.set(f.x1 / S, 1.1, f.y1 / S); g.rotation.y = -a;
-      const core = new T.Mesh(new T.BoxGeometry(L, k === 'bolt' ? 0.1 : 0.5, k === 'bolt' ? 0.1 : 0.5), basicMat(k === 'bolt' ? 0xffffff : col, 0.9, true)); core.position.x = L / 2; g.add(core);
+      // a dash leaves a thin bright line and a tapered wake, not a slab
+      const core = new T.Mesh(new T.BoxGeometry(L, k === 'bolt' ? 0.1 : 0.05, k === 'bolt' ? 0.1 : 0.05), basicMat(0xffffff, 0.9, true)); core.position.x = L / 2; g.add(core);
+      if (k === 'trail') { const c = new T.Color(col), w = 0.2, geo = new T.BufferGeometry(), ps = [], cs = []; [[0, 1], [1, 0]].forEach(ax => { [[0, 0, 0, 0.02], [L, ax[0] * w, ax[1] * w, 0.85], [L, -ax[0] * w, -ax[1] * w, 0.85]].forEach(v => { ps.push(v[0], v[1], v[2]); cs.push(c.r * v[3], c.g * v[3], c.b * v[3]); }); });
+        geo.setAttribute('position', new T.Float32BufferAttribute(ps, 3)); geo.setAttribute('color', new T.Float32BufferAttribute(cs, 3)); const wake = new T.Mesh(geo, new T.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.8, depthWrite: false, side: T.DoubleSide, blending: T.AdditiveBlending })); g.add(wake); f.wake = wake; }
       const lines = [];
       if (k === 'bolt') {
         for (let j = 0; j < 4; j++) { const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.BufferAttribute(new Float32Array(16 * 3), 3)); const ln = new T.Line(geo, new T.LineBasicMaterial({ color: col, transparent: true, blending: T.AdditiveBlending })); g.add(ln); lines.push(ln); }
         for (let j = 0; j <= 6; j++) gfx.glow(col, 1.6, L * j / 6, 0, 0, g, 0.7);
       }
       f.upd = p => {
-        core.material.opacity = 0.9 * (1 - p); core.scale.set(1, 1 - p, 1 - p);
+        core.material.opacity = 0.9 * (1 - p); core.scale.set(1, 1 - p, 1 - p); if (f.wake) f.wake.material.opacity = 0.8 * (1 - p) * (1 - p);
         lines.forEach(ln => { const ps = ln.geometry.attributes.position.array; for (let i = 0; i < 16; i++) { const e = (i === 0 || i === 15) ? 0 : 1; ps[i * 3] = L * i / 15; ps[i * 3 + 1] = rand(-0.4, 0.4) * e; ps[i * 3 + 2] = rand(-0.5, 0.5) * e; } ln.geometry.attributes.position.needsUpdate = true; ln.material.opacity = 1 - p; });
         g.children.forEach(o => { if (o.isSprite) o.material.opacity = 0.7 * (1 - p); });
       };
@@ -179,8 +185,8 @@
       const ring = flat(new T.Mesh(new T.RingGeometry(0.82, 1, 40), basicMat(col, 0.9, true))); ring.position.y = 0.06; g.add(ring);
       const ball = new T.Mesh(new T.SphereGeometry(1, 14, 10), basicMat(col, 0.45, true)); ball.position.y = 0.4; g.add(ball);
       const gl = gfx.glow(0xffffff, r * 2.2, 0, 0.8, 0, g, 0.5);
-      let pil = null; if (f.pillar) { pil = new T.Mesh(new T.CylinderGeometry(r * 0.5, r * 0.6, 9, 14, 1, true), basicMat(col, 0.6, true)); pil.position.y = 4.5; g.add(pil); }
-      f.upd = p => { ring.scale.setScalar(r * (0.5 + p * 0.7)); ring.material.opacity = 0.9 * (1 - p); ball.scale.set(r * (0.4 + p * 0.5), r * (0.3 + p * 0.5), r * (0.4 + p * 0.5)); ball.material.opacity = 0.45 * (1 - p) * (1 - p); gl.material.opacity = 0.5 * (1 - p) * (1 - p); if (pil) { pil.material.opacity = 0.6 * (1 - p); pil.scale.set(1 - p * 0.5, 1, 1 - p * 0.5); } };
+      let pil = null; if (f.pillar) { pil = new T.Mesh(new T.CylinderGeometry(r * 0.2, r * 0.3, 9, 14, 1, true), basicMat(col, 0.42, true)); pil.position.y = 4.5; g.add(pil); }
+      f.upd = p => { ring.scale.setScalar(r * (0.5 + p * 0.7)); ring.material.opacity = 0.9 * (1 - p); ball.scale.set(r * (0.4 + p * 0.5), r * (0.3 + p * 0.5), r * (0.4 + p * 0.5)); ball.material.opacity = 0.45 * (1 - p) * (1 - p); gl.material.opacity = 0.5 * (1 - p) * (1 - p); if (pil) { pil.material.opacity = 0.42 * (1 - p) * (1 - p); pil.scale.set(1 - p * 0.5, 1, 1 - p * 0.5); } };
     } else if (k === 'dust') {
       const ring = flat(new T.Mesh(new T.RingGeometry(0.7, 1, 30), basicMat(0x9a8a78, 0.5))); g.add(ring); g.position.set(f.x / S, 0.07, f.y / S);
       f.upd = p => { ring.scale.setScalar(0.3 + f.r / S * p); ring.material.opacity = 0.5 * (1 - p); };
@@ -337,18 +343,20 @@
       const a = rand(0, 6.28), v = rand(1.5, ash ? 4 : 7); gibs.push({ m, vx: Math.cos(a) * v, vz: Math.sin(a) * v, vy: rand(3, 9), rx: rand(-9, 9), rz: rand(-9, 9), ash });
     }
   }
-  function startMortal(e) {
+  function startMortal(e) { gfx.clearFloats();
     e.st = { stun: { t: 99 } }; e.buffs = {}; interrupt(e); e.kx = e.ky = 0; e.guard = 0; e.state = 'idle';
     P.st = {}; delete P.buffs.stealth; interrupt(P); P.state = 'idle'; P.kx = P.ky = 0; P.iframe = 9;
     projs.forEach(p => p.m && sc.remove(p.m)); projs = []; zones.forEach(z => z.m && sc.remove(z.m)); zones = [];
-    const a = Math.atan2(e.y - P.y, e.x - P.x); P.x = e.x - Math.cos(a) * 66; P.y = e.y - Math.sin(a) * 66; clampArena(P); P.aim = a;
+    const a = Math.atan2(e.y - P.y, e.x - P.x), far = Math.hypot(e.x - P.x, e.y - P.y) > 66 + 24, goTo = { x: e.x - Math.cos(a) * 66, y: e.y - Math.sin(a) * 66 }; clampArena(goTo); P.aim = a;
+    const closeIn = far ? { x0: P.x, y0: P.y, x1: goTo.x, y1: goTo.y } : null; if (!far) { P.x = goTo.x; P.y = goTo.y; }       // from range, the killer crosses the sand in a few frames instead of appearing beside the body
     const def = G.mortalOf ? G.mortalOf(G.state) : Object.assign({ id: 'base' }, G.MORTAL[P.cls]);
-    M = { t: 0, e, a, f: {}, name: def.name, def, k: def.lead || def.id };
+    M = { t: 0, e, a, f: {}, name: def.name, def, k: def.lead || def.id, closeIn };
     phase = 'mortal'; hitstop = 0.3; shake = 10; result = { win: true };
     G.ui.banner('Mortal Blow', M.name, 'win mortal'); G.sfx('bell'); G.sfx('crowd');
   }
   function mortalStep(dt) {
     const m = M, e = m.e, cls = P.cls, def = m.def, k = m.k, IMP = def.imp || 1.2, cast = def.cast != null ? def.cast : (cls === 'sorcerer' || cls === 'cleric'); m.t += dt;
+    if (m.closeIn) { const c = m.closeIn, u = Math.min(1, m.t / 0.16), uu = u * u * (3 - 2 * u); P.x = c.x0 + (c.x1 - c.x0) * uu; P.y = c.y0 + (c.y1 - c.y0) * uu; P.moving = u < 1; P.walk = (P.walk || 0) + dt * 26; if (!m.f.ci) { m.f.ci = 1; fx.push({ k: 'trail', x1: c.x0, y1: c.y0, x2: c.x1, y2: c.y1, col: '#ffffff', t: 0, life: 0.3 }); G.sfx('dash'); } if (u >= 1) { m.closeIn = null; fx.push({ k: 'dust', x: P.x, y: P.y, r: 46, t: 0, life: 0.35 }); } }
     const once = (key, tt, fn) => { if (m.t >= tt && !m.f[key]) { m.f[key] = 1; fn(); } };
     const every = (key, t0, t1, step, fn) => { for (let i = 0, tt = t0; tt < t1; i++, tt += step) once(key + i, tt, () => fn(i)); };
     const col = def.col || { fighter: '#ffd36b', rogue: '#c79bff', sorcerer: '#8aff5a', cleric: '#fff0a0', druid: '#8fe07a', warlock: '#b070ff' }[cls];
@@ -394,7 +402,7 @@
       fx.push({ k: 'blast', x: e.x, y: e.y, r: def.fire ? 150 : 100, col, t: 0, life: 0.6, pillar: !!def.pillar });
       fx.push({ k: 'ring', x: e.x, y: e.y, r: 240, col, t: 0, life: 0.7 }); fx.push({ k: 'dust', x: e.x, y: e.y, r: 200, t: 0, life: 0.8 });
       if (def.crack) mark(e.x, e.y, 3.4, 'crack'); if (def.fire || ash) mark(e.x, e.y, 3, 'scorch');
-      spark(e.x, e.y, 30, col, 40, 420); flashLight(e.x, e.y, col, 170); shake = 22; hitstop = 0.22;
+      spark(e.x, e.y, 30, col, 40, 420); flashLight(e.x, e.y, col, 95); shake = 22; hitstop = 0.22;
       if (!ash && !def.swallow && !def.ice) { blood(e.x, e.y, 70); blood(e.x, e.y, 40, m.a); }
       screenFx('crit');
       e.z = 0; e.vis.g.scale.setScalar(1); const behead = def.behead && gore() && !e.vis.c.beast && !(e.lost && e.lost.head); m.f.stand = behead && !e.crawl ? 1 : 0;
@@ -673,7 +681,7 @@
 
   // ------------------------------------------------------------------ entity update
   function updateEntity(e, dt) {
-    e.iframe = Math.max(0, e.iframe - dt); e.flash = Math.max(0, e.flash - dt); e.dodgeT = Math.max(0, e.dodgeT - dt);
+    e.iframe = Math.max(0, e.iframe - dt); e.flash = Math.max(0, e.flash - Math.max(dt, dtFx * 0.6)); e.dodgeT = Math.max(0, e.dodgeT - dt);
     e.parryCd = Math.max(0, (e.parryCd || 0) - dt);
     e.mash = Math.max(0, (e.mash || 0) - dt * 0.9); if (e.guard > 0) e.guard -= dt; e.hurt = Math.max(0, (e.hurt || 0) - dt); if (e.down > 0) e.down -= dt;
     if (e.crawl && e.state !== 'ko' && e.moving && Math.random() < dt * 5) gfx.splat(e.x / S + rand(-0.2, 0.2), e.y / S + rand(-0.2, 0.2), rand(0.25, 0.5));
@@ -698,7 +706,7 @@
     if (e.kx || e.ky) { e.x += e.kx * dt; e.y += e.ky * dt; const f = Math.pow(0.002, dt); e.kx *= f; e.ky *= f; if (Math.abs(e.kx) + Math.abs(e.ky) < 8) e.kx = e.ky = 0;
       const bx = e.x, by = e.y; clampArena(e);
       if (Math.hypot(e.x - bx, e.y - by) > 0.5 && Math.hypot(e.kx, e.ky) > 110 && phase === 'fight') {       // slammed into the pit wall
-        const spiked = !F.ex && SPIKES.some(q => Math.hypot(e.x - q[0], e.y - q[1]) < 30);       // the spike walls: far worse than stone
+        const spiked = !F.ex && SPIKES.some(q => Math.hypot(e.x - q[0], e.y - q[1]) < 48);       // the spike walls: far worse than stone
         const wd = Math.round((5 + (e.kBy ? e.kBy.level * 2 : 4)) * (spiked ? 1.8 : 1)); e.hp -= wd; e.kx = e.ky = 0; e.st.stun = { t: spiked ? 0.95 : 0.4 }; interrupt(e); e.flash = 0.12; e.hurt = 0.3;
         if (spiked) { blood(e.x, e.y, 46, Math.atan2(-e.y, -e.x)); if (gore()) for (let si = 0; si < 3; si++) gfx.splat(e.x / S + rand(-0.7, 0.7), e.y / S + rand(-0.7, 0.7), rand(0.5, 1)); hitstop = Math.max(hitstop, 0.14); G.sfx('crit'); if (e.kBy && e.kBy.isPlayer) addHype(12); }
         text(e, (spiked ? 'IMPALED ' : 'WALL ') + wd, spiked ? '#ff3020' : '#ffb070', true); spark(e.x, e.y, 30, '#c8b8a0', 14, 220); shake = Math.max(shake, 9); G.sfx('wall'); if (e.kBy && e.kBy.isPlayer) addHype(10);
@@ -974,23 +982,29 @@
     if (!F.ex) G.ui.updateHud(P, E, hype);
   };
 
-  function sync(dt) {
+  let syncDt = 1 / 60;
+  function sync(dt) { syncDt = dt > 0 ? Math.min(0.1, dtFx || dt) : 0;
     syncEntity(P); syncEntity(E);
     projs.forEach(syncProj); zones.forEach(syncZone);
-    for (let i = fx.length - 1; i >= 0; i--) { const f = fx[i]; f.t += (f.k === 'slash' || f.k === 'lance' || f.k === 'blast') ? dtFx : dt; if (f.t < 0) continue; if (!f.obj) buildFx(f); if (f.t >= f.life) { killFx(f); fx.splice(i, 1); } else f.upd(f.t / f.life); }
+    for (let i = fx.length - 1; i >= 0; i--) { const f = fx[i]; f.t += (f.k === 'slash' || f.k === 'lance' || f.k === 'blast' || f.k === 'trail') ? dtFx : dt; if (f.t < 0) continue; if (!f.obj) buildFx(f); if (f.t >= f.life) { killFx(f); fx.splice(i, 1); } else f.upd(f.t / f.life); }
     arena.flash.intensity *= Math.pow(0.0005, dt); if (arena.flash.intensity < 0.3) arena.flash.intensity = 0;
     if (F.ex) { gfx.cam.shake = shake / 45; return; }
     arena.setHype(hype / 100);
     for (const g of gibs) { if (g.rest) continue; g.vy -= 20 * dt; g.m.position.x += g.vx * dt; g.m.position.y += g.vy * dt; g.m.position.z += g.vz * dt; g.m.rotation.x += g.rx * dt; g.m.rotation.z += g.rz * dt;
       if (g.m.position.y < 0.08) { g.m.position.y = 0.08; if (Math.abs(g.vy) < 2) { g.rest = 1; if (!g.ash && gore()) gfx.splat(g.m.position.x, g.m.position.z, rand(0.5, 1.1)); } else { g.vy *= -0.35; g.vx *= 0.6; g.vz *= 0.6; if (!g.ash && gore() && Math.random() < 0.5) gfx.splat(g.m.position.x, g.m.position.z, rand(0.3, 0.7)); } } }
+    if (arena.cineWall) arena.cineWall(phase === 'mortal' && !!M);       // the kill is filmed from inside the pit, so the open side gets its wall for as long as it lasts
     if (phase === 'mortal' && M) {                         // close orbiting camera for the kill
-      // camera stands toward the middle of the pit and looks outward, so the wall and crowd are the backdrop
-      const e = M.e, k = Math.min(1, M.t / 1.2), ex = e.x / S, ez = e.y / S, cd = Math.hypot(ex, ez);
-      const base = cd > 1.5 ? Math.atan2(-ez, -ex) : M.a + 2.1, th = base + 0.55 - M.t * 0.3, r = G.lerp(6.6, 4.6, k) + Math.max(0, M.t - 1.7) * 1.1;
-      const pos = [ex + Math.cos(th) * r, G.lerp(1.6, 2.5, k) + Math.max(0, M.t - 1.2) * 0.8, ez + Math.sin(th) * r];
-      const pl = Math.hypot(pos[0], pos[2]); if (pl > 6.6) { pos[0] *= 6.6 / pl; pos[2] *= 6.6 / pl; }
-      [P, e].forEach(q => { const dx = pos[0] - q.x / S, dz = pos[2] - q.y / S, d = Math.hypot(dx, dz) || 0.01; if (d < 3.4) { pos[0] = q.x / S + dx / d * 3.4; pos[2] = q.y / S + dz / d * 3.4; } });
-      gfx.cine = { pos, look: [(e.x * 2 + P.x) / 3 / S, 1.0, (e.y * 2 + P.y) / 3 / S], fov: gfx.portrait ? 82 : 54, roll: 0.04 };
+      // the kill is filmed from the side, so killer and victim are both in profile and neither hides the other; of the two sides, the one nearer the middle of the pit
+      const e = M.e, k = Math.min(1, M.t / 1.2), ex = e.x / S, ez = e.y / S, px = P.x / S, pz = P.y / S, mx = ex * 0.6 + px * 0.4, mz = ez * 0.6 + pz * 0.4;
+      const la = Math.hypot(px - ex, pz - ez) > 0.4 ? Math.atan2(pz - ez, px - ex) : M.a + Math.PI;
+      if (M.cs == null) { const c1 = Math.hypot(mx + Math.cos(la + 1.3) * 5, mz + Math.sin(la + 1.3) * 5), c2 = Math.hypot(mx + Math.cos(la - 1.3) * 5, mz + Math.sin(la - 1.3) * 5); M.cs = c1 <= c2 ? 1 : -1; }
+      const want = la + M.cs * (1.3 - Math.min(0.5, M.t * 0.14)); if (M.cth == null) M.cth = want; else { const dd = Math.atan2(Math.sin(want - M.cth), Math.cos(want - M.cth)); M.cth += dd * Math.min(1, (syncDt || 0) * 2.6); }
+      const r = G.lerp(6.2, 4.7, k) + Math.max(0, M.t - 1.7) * 1.0, pos = [mx + Math.cos(M.cth) * r, G.lerp(1.5, 2.3, k) + Math.max(0, M.t - 1.2) * 0.7, mz + Math.sin(M.cth) * r];
+      const pl = Math.hypot(pos[0], pos[2]); if (pl > 6.8) { pos[0] *= 6.8 / pl; pos[2] *= 6.8 / pl; }
+      [P, e].forEach(q => { const dx = pos[0] - q.x / S, dz = pos[2] - q.y / S, d = Math.hypot(dx, dz) || 0.01; if (d < 3.2) { pos[0] = q.x / S + dx / d * 3.2; pos[2] = q.y / S + dz / d * 3.2; } });
+      if (M.cp) { const f2 = Math.min(1, (syncDt || 0) * 7); pos[0] = M.cp[0] + (pos[0] - M.cp[0]) * f2; pos[1] = M.cp[1] + (pos[1] - M.cp[1]) * f2; pos[2] = M.cp[2] + (pos[2] - M.cp[2]) * f2; } M.cp = pos.slice();
+      const lk = [mx, 1.0 + Math.min(1.2, e.z / S * 0.5), mz]; if (M.cl) { const f3 = Math.min(1, (syncDt || 0) * 8); lk[0] = M.cl[0] + (lk[0] - M.cl[0]) * f3; lk[1] = M.cl[1] + (lk[1] - M.cl[1]) * f3; lk[2] = M.cl[2] + (lk[2] - M.cl[2]) * f3; } M.cl = lk.slice();
+      gfx.cine = { pos, look: lk, fov: gfx.portrait ? 82 : 52, roll: 0.03 };
       gfx.cam.shake = shake / 45; document.getElementById('foeArrow').className = 'hidden'; return;
     }
     if (gfx.cine && !F.ex) gfx.cine = null;

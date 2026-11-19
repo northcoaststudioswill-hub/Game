@@ -54,6 +54,7 @@
     const cells = [], bloodTint = new T.Color(1.15, 0.62, 0.58);
     for (let x = -10; x <= 10; x++) for (let z = -10; z <= 10; z++) if (inOct(x, z, 0.75)) cells.push({ x, z, tint: (Math.hypot(x, z) < 5 && Math.random() < 0.09) ? bloodTint : null });
     tiles(s, cells, 'stone', [0.66, 0.63, 0.6]);
+    { const apron = []; for (let x = -9; x <= 19; x++) for (let z = -9; z <= 19; z++) if (!inOct(x, z, 0.75) && x + z > -3 && Math.hypot(x, z) < 21) apron.push({ x, z, y: -0.04 }); tiles(s, apron, 'stone', [0.36, 0.33, 0.31]); }       // the walkway on the open side: dark, lower, and not a void
     for (let i = 0; i < 9; i++) { const d = gfx.decal(gfx.tex('blood'), R(1.6, 3.2), 0xffffff, R(0.35, 0.6)); d.position.set(R(-5, 5), 0.012 + i * 0.001, R(-5, 5)); d.rotation.z = R(0, 6); s.add(d); }
     const sig = gfx.decal(gfx.tex('sigil'), 7.5, 0xff6a30, 0.16, true); sig.position.y = 0.03; s.add(sig);
 
