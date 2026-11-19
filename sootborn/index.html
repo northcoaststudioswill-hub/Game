@@ -6069,7 +6069,9 @@ const Issue = {
   },
   // once a frame from the main loop: hand the level this game's own input
   tick() {
-    if (!this.on || !this.el) return; this.place(); if (!this.ready) return;
+    if (!this.on || !this.el) return; this.place();
+    const bc = document.body.classList; if (!bc.contains('ingame')) bc.add('ingame'); if (!bc.contains('fight')) bc.add('fight'); if (bc.contains('ctlfade')) bc.remove('ctlfade');   // this game's pad and buttons stay up for the whole level
+    if (!this.ready) return;
     const x = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), y = (Input.h('up') ? 1 : 0) - (Input.h('down') ? 1 : 0), press = [];
     if (Input.p('A')) press.push('ctx'); if (Input.p('B')) press.push('dodge'); if (Input.p('X')) press.push('attack'); if (Input.p('Y')) press.push('interact');
     if (Input.p('L')) press.push('power'); if (Input.p('R')) press.push('lock'); if (Input.p('START')) press.push('pause');

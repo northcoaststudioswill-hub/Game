@@ -11,6 +11,8 @@ From play notes: it played in its own vertical window; it should sit in the same
 - **Kael's model rebuilt** to match the rest of the game: Accredited plate (collar, tassets, greaves, big pauldrons), House Violet's cape, the blade in his right hand, the bronze valve ram lit on his off arm, the pinned sun on his chest. The trench coat is gone.
 - Sound uses the game's own audio channel, so it does not need a second tap to start.
 
+- **v0.29.3 fix:** the touch pad and buttons were hidden during the level (they only showed in the walking and fighting parts). They now stay up for the whole level. Checked by pressing the on-screen A and holding the on-screen d-pad in an upright phone-sized window.
+
 **Not checked:** played by hand; whether the d-pad's four directions feel right for a third-person camera (there is no analogue stick on the touch pad); the blade with the old punch animations was only looked at in still poses.
 
 ## v0.29 · 2026-11-19 — The High Docks in third person, drawn like Second Chance; more to do in 2D than hide; the thought of betrayal
