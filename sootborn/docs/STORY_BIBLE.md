@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.12.8 (the surface in real 3D; v0.11 added the Assay, fury, Memory Arts, the film opening and save slots) (see CHANGELOG.md).
+Tagline: "Every breath is hers." Current build: v0.27 (see CHANGELOG.md). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, and the Gilding in full. Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -142,7 +142,7 @@ The game tells two halves at once: the present below, and the years after, seen 
 **How they talk (rule for all new dialogue).**
 - *Soot*: contractions; "aye" for yes; "ta" for thanks; "breath" where others say life ("on my breath" is an oath, "she bought your breath"); "we" about everything.
 - *Accredited*: no contractions, ever; "noted" for thanks; "granted" for yes; "my time" for my life; "one" instead of I or we; never thank, never apologise, never say "we" or "us".
-- *In between*: Vale (born Tier Two, counted up) speaks their way with contractions slipping. Proctor Sull is soot who says "noted" when beaten. Ilse keeps Accredited speech. Wren is the Accredited who starts saying "we".
+- *In between*: Vale (born Tier Four, counted up) speaks their way with contractions slipping. Proctor Sull is soot who says "noted" when beaten. Ilse keeps Accredited speech. Wren is the Accredited who starts saying "we".
 - *Kael*: soot in dialogue through Part One. As Edric Sorrel he speaks Accredited aloud. His narration has no contractions because the training took them. He goes back to "we" out loud before the stair.
 
 **The shift song.** No words, because words cost breath; hummed through the teeth to keep time on a valve wheel. Humming is the only goodbye allowed at a commitment. After Seren, the Authority plays it on the tier speakers at every bell so that it means the furnace. At First Fire the tier hums it again.
@@ -263,7 +263,7 @@ Year 0 is the furnace. This sheet is the reference when a card, a line or a chap
 ### Decisions (v0.27). These are canon now.
 1. **Length of the Assay: one season, about fifty days.** Night 1 to the last day, then the Pinning. "Year-long" is retired everywhere.
 2. **The High Docks are at +7.** Chapter 3 (What She Knows) runs from +6 to +7 and ends on the docks.
-3. **Brand dies at +7, on the dock stair.** He struck Hollis at year 0, so his line is now "I have been waiting seven years for a stair." He deserted two years after the furnace rather than do the same to a child, and trained Kael from +15 months.
+3. **Brand dies at +7, on the dock stair.** He struck Hollis at year 0, so his line is now "I have been waiting seven years for a stair." He deserted within the year rather than do the same to a child, and trained Kael from +15 months.
 4. **Inspector Vale was born on Tier Four**, the top tier of Cinderwell, and counted up into the inspectorate. His sister died in a Tier 8 ward. He ends the story on a wheel on Tier Eight.
 5. **The Accredited bear late and live long.** Celestine says so. It is most of what the gold is for. She is seventy at +6; Lucan is her only child, born when she was fifty.
 6. **Order of the Assay stays as shown.** Every Assay card carries the calendar strip. The Standard still plays after the Keep.
