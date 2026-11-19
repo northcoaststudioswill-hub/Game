@@ -42,8 +42,9 @@ between("  ember: {\n    id: 'ember'", "SC.T = {", `  ember: {
 /* ---- sky: the weather, the moored fleet, the Sun Spire ---- */
 rep("const a = i / 46 * Math.PI * 2 + rnd() * 0.08, r = 150 + rnd() * 60, w = 14 + rnd() * 22, h = 22 + rnd() * 60;", "const a = i / 46 * Math.PI * 2 + rnd() * 0.08, r = 130 + rnd() * 90, w = 30 + rnd() * 26, h = 5 + rnd() * 5;");
 rep("const geo = new THREE.BoxGeometry(w, h, w), uv = geo.attributes.uv;", "const geo = new THREE.BoxGeometry(w, h, w * 0.34), uv = geo.attributes.uv;");
-rep("b.position.set(Math.cos(a) * r, h / 2 - 2, Math.sin(a) * r); b.rotation.y = rnd() * 3; sky.add(b);\n    }", "b.position.set(Math.cos(a) * r, 16 + rnd() * 80, Math.sin(a) * r); b.rotation.y = rnd() * 3; sky.add(b);\n      const bag = new THREE.Mesh(new THREE.CylinderGeometry(w * 0.16, w * 0.16, w * 0.96, 8), new THREE.MeshBasicMaterial({ color: i % 3 ? 0x8f8aa8 : 0xb7b0c4, fog: false })); bag.rotation.z = Math.PI / 2; bag.rotation.y = b.rotation.y; bag.position.copy(b.position); bag.position.y += h / 2 + w * 0.2; sky.add(bag);\n    }\n" + WD.SPIRE);
+rep("b.position.set(Math.cos(a) * r, h / 2 - 2, Math.sin(a) * r); b.rotation.y = rnd() * 3; sky.add(b);\n    }", "b.position.set(Math.cos(a) * r, -14 + rnd() * 90, Math.sin(a) * r); b.rotation.y = rnd() * 3; sky.add(b);\n      const bag = new THREE.Mesh(new THREE.CylinderGeometry(w * 0.16, w * 0.16, w * 0.96, 8), new THREE.MeshBasicMaterial({ color: i % 3 ? 0x8f8aa8 : 0xb7b0c4, fog: false })); bag.rotation.z = Math.PI / 2; bag.rotation.y = b.rotation.y; bag.position.copy(b.position); bag.position.y += h / 2 + w * 0.2; sky.add(bag);\n    }");
 
+rep("const rnd = SC.seeded(99), mat = new THREE.MeshBasicMaterial({ map: TEX.skyline, fog: false });", "const rnd = SC.seeded(99), mat = new THREE.MeshBasicMaterial({ color: 0x1a1c44, fog: false });");
 /* ---- rig: our people ---- */
 between("  const SPECS = SC.SPECS = {", "  function tbox(", RIG.SPECS + "\n");
 between("  function drawFace(g, kind, expr, glow) {", "  SC.drawFace = drawFace;", RIG.FACES);
@@ -54,15 +55,8 @@ rep("const sm = model.scarfMat = G.toon({ color: 0xff5a1f });", "const sm = mode
 between("  P.clerk = t => (", "\n", "  P.clerk = t => ({ spine: [0.03, 0, 0], chest: [0.02, 0, 0], head: [0.04 + Math.sin(t * 0.8) * 0.03, Math.sin(t * 0.5) * 0.12, 0], shL: [0.04, 0, 0.1], elL: [-0.25, 0, 0], shR: [0.02, 0, -0.14], elR: [-0.12, 0, 0], thL: [0, 0, 0.05], thR: [0, 0, -0.05], y: Math.sin(t * 1.2) * 0.008 });");
 
 /* ---- world: same streets, dressed as the High Docks ---- */
-rep("  let batch;\n", "  let batch;\n" + WD.PAL);
-rep("    batch = new G.Batch(); W.doors = {};", "    batch = new G.Batch(); W.doors = {};\n    { const add0 = batch.add; batch.add = function (mat, geo, mx, color, ol) { return add0.call(this, mat, geo, mx, PAL(mat, color), ol); }; }");
 between("  function car(x, z, alongX, color) {", "  function lamp(x, z, dx, dz) {", WD.SLED);
-between("    // the wrecked courier bike", "    // ----- north side", WD.BOARD);
-rep("    // ----- south side: Halloran Alley between two tenements -----", WD.ALLEY);
-rep("    // Meridian roof: the arena", WD.MOORING);
-[["sign('LETHE',", "sign('BOND 7',"], ["sign('ROOMS',", "sign('TALLY',"], ["sign('NO WAY OUT',", "sign('DOCK STAIR',"], ["sign('ROAD CLOSED',", "sign('QUAY CLOSED',"],
- ["sign('SECOND CHANCE LOANS',", "sign('AIR BREATHED. AIR OWED.',"], ["sign('PIER 9 FREIGHT',", "sign('HIGH DOCKS FREIGHT',"], ["sign('MERIDIAN',", "sign('MOORING ONE',"], ["sign('EVERYBODY PAYS',", "sign('THE COUNT IS KEPT',"]].forEach(p => rep(p[0], p[1]));
-
+between("  /* ---------- the level ---------- */", "  /* ---------- interactables, pickups, crates ---------- */", WD.BUILD);
 /* ---- words on the page ---- */
 rep("FX.word(e.kind === 'boss' ? 'PAID IN FULL!' : 'KA-THOOM!'", "FX.word(e.kind === 'boss' ? 'STRUCK THROUGH!' : 'KA-THOOM!'");
 rep("FX.word('NOT YET!'", "FX.word('ON MY BREATH!'");

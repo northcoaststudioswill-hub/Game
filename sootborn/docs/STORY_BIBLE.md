@@ -331,6 +331,7 @@ One level of the future is played in third person and drawn like a comic. It use
 - **Brand** holds the head of the dock stair from the first panel. The level ends on his halberd butt striking stone.
 - **What Kael learns there:** the watch was moved from the second bell to the first on Marshal Cade's initial. He does not learn who gave Cade the hour. That stays with Maren's note, a week later.
 - **Forms:** Bank Hands (Shaft Drop), The Turn, The Line (hook line). Last breath is ON MY BREATH. He counts eleven at chalked suns.
+- **The place:** a stone shelf bolted to the Spire's eastern footing, open to the sky on three sides. South to north: the dock stair and its gate, the causeway between two mooring basins, the quay (Spire gate west, crane east), the freight yard, the bond house with the dock office on its gallery, the signal roof, Mooring One. Barges moor in pairs lashed with a plank.
 - **The barges** are airships: a wooden hull under a long ivory gas cell with gilt hoops, teal lamps at the corners, moored in pairs on a single line.
 
 ### Wren and the week (v0.29)
