@@ -1,4 +1,18 @@
-# SOOTBORN — changelog (latest v0.37 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.38 · 2026-11-19)
+
+## v0.38 · 2026-11-19 — the Assay, lived in: boards, cairns, wagers, boots
+From play notes: do the part left over from the last pass. Make the Assay and its places feel more authentic.
+
+**Four new things you can find and read in the Assay camps** (new pixel art for each)
+- **The Proctors' board.** One is hammered in at the edge of every camp and repainted from the air each dawn: twelve bars, one a House. POSITIONS ARE PROVISIONAL. DEBTS ARE NOT. Violet is eleventh on day 3, fourth on night 28 after three raids, first on the last night. Teal's faces the ford so that Violet can read it.
+- **Cairns.** The heirs do not bury their dead; servants do. So they pile stones the way a picture book showed them and tie a House ribbon on. Two at Violet's camp on day 3 (BALANCED scratched in, and scratched out), four behind Teal's pump house, six on night 28, nine on the last night, and by then none of them says BALANCED.
+- **The patron's drop** (the Island). A white crate on a gilt cord, lowered to House Teal: lamp oil, a second cook-pot, salve. Violet has had nothing lowered in twenty-five days. Nobody placed a sum on it.
+- **On the dais:** the Proctors' **boots**, charging on a rack off the same vent stack as the lamps (he takes a pair on day 31); and an unlocked **strongbox of wagers** with a column for each Proctor: which House he is paid to find for. Voss has two names; one is Teal. "They are not grading the Assay. They are delivering it."
+- Also in the Camp: a rack of four practice blades for forty cadets, and a second cadet awake, in the one cloak her House sent.
+
+**The 3D Assay fights** (the Valley, the Ford, the Proctor, and anything else fought in the valley): the Proctors' board stands beside the dais and seven cairns with House ribbons sit near the tents.
+
+**Checked:** each camp drawn with the new things in it (pictures of the Camp, the Island, the Dais, the Last Night and night 28); nothing new sits on a guard's route in the two stealth levels; the valley fight starts with no errors. **Not checked:** played by hand; I did not walk up to each new thing and press A, so a wrong line on one of them would not have shown; the board and cairns in the 3D valley were not in the one picture I took of it.
 
 ## v0.37 · 2026-11-19 — checking pass: titles in frame, cleaner hand-offs into the levels, things in the wrong place
 From play notes: make sure no titles are out of frame; clean transitions between the (now three) kinds of play; look for things misplaced, wrong, or going through each other; make the Assay and its places feel more authentic.

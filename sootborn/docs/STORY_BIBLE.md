@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.37 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.38 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -402,6 +402,14 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **Oswin Hale, in order:** the Camp (day 3: "I shall carry the water myself. Do not tell my mother.") → the Last Night (night 49: the leg; "noted", and meaning it) → he finishes second → the salve comes eleven days late and the leg sets crooked → his father will not have him at table → Petra's letter (+5): a post from the High Auditor, something asked in exchange → the fitting (+6): Kael sees him masked, laying a fire, and does not turn round → the Stair (+9): the Auditor's Blade → "Hale, O." chalked forty-eighth on the wall by the white door; Maren starts a line for it.
 - **Petra Lune** keeps a column of the Count two rows ahead of Edric Sorrel from the first winter. She is the one who hears from Oswin. Open: where she is at +9.
 - **The list on the wall, in order:** Mara's forty-four, Brand, Aldane T., Rook A., Hale O.
+
+### The Assay, lived in (v0.38)
+- **The board.** The Proctors keep a ranking board at the edge of every camp: twelve bars, repainted from the air each dawn. "Positions are provisional. Debts are not." Violet: eleventh (day 3), fourth (night 28), first (night 49). It is the shift rota, with Houses for hands.
+- **Cairns.** Heirs pile stones for their dead and tie a House ribbon on; they have never buried anybody. Early ones are scratched BALANCED. Violet's stop saying it around day 30.
+- **Patrons.** A House with a sum placed on it is lowered supplies on a gilt cord (oil, cook-pots, salve). Violet had none. This is why Oswin's salve came late.
+- **The wagers.** Each Proctor is paid to find for a House. Voss was paid by two, one of them Teal.
+- **The boots** the Proctors hover on charge off the vent stack, the same one the lamps run on: Cinderwell's air.
+- **Four blades for forty.** Practice blades are issued blunt, and too few, on purpose.
 
 ### Third-person levels: how they play (v0.30.1)
 - Fury shows as gold on Kael himself, never as red on the screen.

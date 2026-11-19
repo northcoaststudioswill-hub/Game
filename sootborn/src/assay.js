@@ -34,27 +34,27 @@ MAPS.vcamp = buildMap({
   set: [[1, 7, 22, 1, ','], [3, 8, 1, 3, ','], [20, 6, 1, 1, ','], [12, 4, 1, 3, ',']],
   props: [{ t: 'vtent', x: 4, y: 4, a: '#7a5ac8', block: blk(4, 4, 2) }, { t: 'vtent', x: 8, y: 4, a: '#7a5ac8', block: blk(8, 4, 2) }, { t: 'vtent', x: 16, y: 4, a: '#7a5ac8', block: blk(16, 4, 2) },
     { t: 'standard', x: 12, y: 3, a: '#7a5ac8', block: blk(12, 3) }, { t: 'campfire', x: 12, y: 9, block: blk(12, 9) }, { t: 'woodpile', x: 20, y: 5, block: blk(20, 5) },
-    { t: 'pumphouse', x: 2, y: 11, block: blk(2, 11, 2) }, { t: 'bedroll', x: 9, y: 10 }, { t: 'bedroll', x: 15, y: 11 }, { t: 'bedroll', x: 17, y: 9 }, { t: 'stakes', x: 19, y: 11, a: 3 }],
+    { t: 'pumphouse', x: 2, y: 11, block: blk(2, 11, 2) }, { t: 'bedroll', x: 9, y: 10 }, { t: 'bedroll', x: 15, y: 11 }, { t: 'bedroll', x: 17, y: 9 }, { t: 'stakes', x: 19, y: 11, a: 3 }, { t: 'cairn', x: 22, y: 10, block: blk(22, 10) }, { t: 'cairn', x: 22, y: 11, block: blk(22, 11) }, { t: 'rankboard', x: 22, y: 4, a: 3, block: blk(22, 4) }, { t: 'rack', x: 6, y: 4, block: blk(6, 4) }],
   lights: [{ x: 200, y: 60, r: 70, c: '#c8b0ff' }, { x: 60, y: 150, r: 40, c: '#8ad8b0' }],
-  hot: [{ id: 'fire', tiles: blk(12, 9) }, { id: 'wood', tiles: blk(20, 5) }, { id: 'pump', tiles: blk(2, 11, 2) }, { id: 'vstd', tiles: blk(12, 3) }, { id: 'tentA', tiles: blk(4, 4, 2) }, { id: 'tentB', tiles: blk(8, 4, 2) }, { id: 'tentC', tiles: blk(16, 4, 2) }], exits: []
+  hot: [{ id: 'fire', tiles: blk(12, 9) }, { id: 'wood', tiles: blk(20, 5) }, { id: 'pump', tiles: blk(2, 11, 2) }, { id: 'vstd', tiles: blk(12, 3) }, { id: 'tentA', tiles: blk(4, 4, 2) }, { id: 'tentB', tiles: blk(8, 4, 2) }, { id: 'tentC', tiles: blk(16, 4, 2) }, { id: 'cairn', tiles: blk(22, 10).concat(blk(22, 11)) }, { id: 'board', tiles: blk(22, 4) }, { id: 'rack', tiles: blk(6, 4) }], exits: []
 });
 MAPS.raid = buildMap({
   name: 'House Teal — the island', w: 30, h: 15, theme: 'valley', music: 'mystery', dark: 'rgba(4,6,18,.76)',
   set: [[6, 2, 2, 12, '~'], [6, 7, 2, 2, ','], [1, 7, 5, 1, ','], [8, 7, 19, 1, ','], [14, 5, 1, 2, ','], [12, 10, 1, 1, '#'], [17, 5, 1, 1, '#'], [21, 6, 1, 1, '#'], [15, 12, 1, 1, '#'], [24, 11, 1, 1, '#'], [10, 4, 1, 1, '#'], [18, 10, 1, 1, '#'], [25, 4, 1, 1, '#']],
   props: [{ t: 'pumphouse', x: 13, y: 4, block: blk(13, 4, 2) }, { t: 'vtent', x: 10, y: 11, a: '#3aa8a0', block: blk(10, 11, 2) }, { t: 'vtent', x: 19, y: 3, a: '#3aa8a0', block: blk(19, 3, 2) }, { t: 'vtent', x: 20, y: 11, a: '#3aa8a0', block: blk(20, 11, 2) },
     { t: 'teallamp', x: 10, y: 6, block: blk(10, 6) }, { t: 'teallamp', x: 17, y: 9, block: blk(17, 9) }, { t: 'teallamp', x: 23, y: 9, block: blk(23, 9) }, { t: 'teallamp', x: 24, y: 5, block: blk(24, 5) },
-    { t: 'standard', x: 27, y: 7, a: '#3aa8a0', block: blk(27, 7) }, { t: 'bedroll', x: 21, y: 9, a: '#3aa8a0' }, { t: 'bedroll', x: 19, y: 12, a: '#3aa8a0' }, { t: 'stakes', x: 26, y: 4, a: 2 }, { t: 'stakes', x: 26, y: 11, a: 2 }],
+    { t: 'standard', x: 27, y: 7, a: '#3aa8a0', block: blk(27, 7) }, { t: 'bedroll', x: 21, y: 9, a: '#3aa8a0' }, { t: 'bedroll', x: 19, y: 12, a: '#3aa8a0' }, { t: 'stakes', x: 26, y: 4, a: 2 }, { t: 'stakes', x: 26, y: 11, a: 2 }, { t: 'cairn', x: 16, y: 3, a: '#3aa8a0', block: blk(16, 3) }, { t: 'cairn', x: 15, y: 2, a: '#3aa8a0', block: blk(15, 2) }, { t: 'strongbox', x: 28, y: 3, a: 1, block: blk(28, 3) }, { t: 'rankboard', x: 3, y: 5, a: 7, block: blk(3, 5) }],
   lights: [{ x: 168, y: 96, r: 54, c: '#ffe090' }, { x: 280, y: 146, r: 54, c: '#ffe090' }, { x: 376, y: 144, r: 54, c: '#ffe090' }, { x: 392, y: 80, r: 54, c: '#ffe090' }, { x: 224, y: 60, r: 30, c: '#8ad8b0' }],
-  hot: [{ id: 'valve', tiles: blk(13, 4, 2) }, { id: 'std', tiles: blk(27, 7) }, { id: 'ttA', tiles: blk(10, 11, 2) }, { id: 'ttB', tiles: blk(19, 3, 2) }, { id: 'ttC', tiles: blk(20, 11, 2) }], exits: []
+  hot: [{ id: 'valve', tiles: blk(13, 4, 2) }, { id: 'std', tiles: blk(27, 7) }, { id: 'ttA', tiles: blk(10, 11, 2) }, { id: 'ttB', tiles: blk(19, 3, 2) }, { id: 'ttC', tiles: blk(20, 11, 2) }, { id: 'tcairn', tiles: blk(16, 3).concat(blk(15, 2)) }, { id: 'drop', tiles: blk(28, 3) }, { id: 'tboard', tiles: blk(3, 5) }], exits: []
 });
 MAPS.dais = buildMap({
   name: "The Proctors' dais", w: 26, h: 14, theme: 'valley', music: 'mystery', dark: 'rgba(6,6,20,.7)',
   set: [[8, 3, 12, 8, '='], [1, 8, 7, 1, ','], [4, 5, 1, 1, '#'], [5, 11, 1, 1, '#'], [22, 4, 1, 1, '#'], [22, 10, 1, 1, '#']],
   props: [{ t: 'canopy', x: 11, y: 4, a: 6 }, { t: 'lectern', x: 10, y: 4, a: 1, block: blk(10, 4) }, { t: 'lectern', x: 14, y: 4, a: 2, block: blk(14, 4) }, { t: 'lectern', x: 18, y: 4, a: 3, block: blk(18, 4) },
     { t: 'crate', x: 11, y: 7, block: blk(11, 7) }, { t: 'barrel', x: 16, y: 7, block: blk(16, 7) }, { t: 'crate', x: 13, y: 9, block: blk(13, 9) }, { t: 'barrel', x: 18, y: 9, block: blk(18, 9) }, { t: 'crate', x: 8, y: 6, block: blk(8, 6) },
-    { t: 'teallamp', x: 8, y: 3, block: blk(8, 3) }, { t: 'teallamp', x: 19, y: 3, block: blk(19, 3) }, { t: 'standard', x: 21, y: 7, a: '#e8c25a', block: blk(21, 7) }],
+    { t: 'teallamp', x: 8, y: 3, block: blk(8, 3) }, { t: 'teallamp', x: 19, y: 3, block: blk(19, 3) }, { t: 'standard', x: 21, y: 7, a: '#e8c25a', block: blk(21, 7) }, { t: 'rack', x: 14, y: 8, a: 1, block: blk(14, 8) }, { t: 'strongbox', x: 12, y: 5, block: blk(12, 5) }],
   lights: [{ x: 136, y: 50, r: 50, c: '#ffe090' }, { x: 312, y: 50, r: 50, c: '#ffe090' }, { x: 232, y: 70, r: 40, c: '#4ad8e0' }],
-  hot: [{ id: 'book', tiles: blk(10, 4) }, { id: 'glass', tiles: blk(14, 4) }, { id: 'roster', tiles: blk(18, 4) }, { id: 'eye', tiles: blk(21, 7) }, { id: 'cloak', tiles: blk(11, 7).concat(blk(13, 9)) }], exits: []
+  hot: [{ id: 'book', tiles: blk(10, 4) }, { id: 'glass', tiles: blk(14, 4) }, { id: 'roster', tiles: blk(18, 4) }, { id: 'eye', tiles: blk(21, 7) }, { id: 'cloak', tiles: blk(11, 7).concat(blk(13, 9)) }, { id: 'boots', tiles: blk(14, 8) }, { id: 'wagers', tiles: blk(12, 5) }], exits: []
 });
 const CAMP_PUZZLE = { name: 'VIOLET CAMP · PUMP', tip: 'The heirs have water under their feet and no idea how to raise it. Feed every pipe, leave no open ends.', cols: 5, rows: 3, cells: [
   ['SRC:E:WELL', 'EW', 'SW', '', ''],
@@ -70,7 +70,7 @@ const MISSIONS = {
   // Day three. Why House Violet follows him: not the Pairing. A fire.
   camp: {
     map: 'vcamp', spawn: [2, 7, 3], toast: 'House Violet has not eaten in three days.', hint: 'Talk to the cadets · a fight, a pump, a fire',
-    calm: 1, npcs: () => [mS('petra', 10, 8, 3), mS('oswin', 15, 9, 2), mS('cadv1', 18, 8, 0)].concat(MF('wood') ? [mS('thorne', 6, 9, 3)] : [mS('thorne', 21, 5, 2)]),
+    calm: 1, npcs: () => [mS('petra', 10, 8, 3), mS('oswin', 15, 9, 2), mS('cadv1', 18, 8, 0), mS('cadv2', 7, 9, 1)].concat(MF('wood') ? [mS('thorne', 6, 9, 3)] : [mS('thorne', 21, 5, 2)]),
     obj: () => !MF('wood') ? 'Fetch wood from the pile (east). Somebody is sitting on it' : !MF('pump') ? 'Raise water at the pump house (south-west)' : 'Light the fire',
     mark: () => !MF('wood') ? { x: 20.5 * 16, y: 5 * 16, lab: 'WOOD' } : !MF('pump') ? { x: 3 * 16, y: 11 * 16, lab: 'PUMP' } : { x: 12.5 * 16, y: 9 * 16, lab: 'FIRE' },
     holds: t => false,
@@ -91,6 +91,10 @@ const MISSIONS = {
         fx(() => Sound.play('heart')), narr('The same word. They use it on their own children. I had thought it was only ours.'),
         fx(() => { MSET('oswin'); rage(1); })]);
       if (t.id === 'cadv1') return Dialogue.start([narr('He is asleep sitting up, with a blade across his knees that he has never had to clean.')]);
+      if (t.id === 'cadv2') return Dialogue.start([say('cadv2', 'One was told there would be servants. One was told a great many things. One was told the Assay is where a House learns what its heir is worth.'), say('cadv2', 'It is where the heir learns what the House is worth. Mine sent one cloak. It has the crest on it.'), narr('She is wearing it. She has not taken it off in three days. It is very fine, and it is not warm.')]);
+      if (t.id === 'cairn') return Dialogue.start([narr('Two cairns. The heirs do not bury their dead; servants bury. So they piled stones the way a picture book once showed them, and tied a ribbon on.'), narr('Somebody has scratched BALANCED into the top stone. Somebody else has scratched it out with a knife, and then given up halfway.')]);
+      if (t.id === 'board') return Dialogue.start([narr('The Proctors\' board. One is hammered in at the edge of every camp and repainted from the air each dawn. Twelve bars, one a House. Violet is eleventh.'), narr('Under the bars, in small clean script: POSITIONS ARE PROVISIONAL. DEBTS ARE NOT.'), narr('Below, the board is the shift rota, and the bars are us.')]);
+      if (t.id === 'rack') return Dialogue.start([narr('Practice blades, issued blunt. On the first day a Proctor came down on his boots and showed them where the edge is kept, and which of them it was for.'), narr('Four blades, forty cadets. Somebody decided that before the lift came up.')]);
       if (t.id === 'tentA') return Dialogue.start([narr('A campaign chest with a House crest on the lid. Eleven changes of linen, a silver comb, a book of forms. No tinder. No pot. Somebody packed this for him, and nobody who packed it had ever been cold.')]);
       if (t.id === 'tentB') return Dialogue.start([narr('A slate propped on a bedroll, in a small child\'s hand: "MOTHER SAYS YOU ARE TO FINISH FIRST OR NOT COME HOME. BRING ME A STANDARD."'), narr('There is a sun drawn in the corner. A circle, and rays. They draw them too. I do not know why that should be the thing that gets under the wire.')]);
       if (t.id === 'tentC') return Dialogue.start([narr('Not a tent. The Proctors\' cache: salve, bread, lamp oil, under a white ribbon and a card. "NOT TO BE OPENED BY CADETS. A RESULT MUST BE EARNED."'), narr('It is forty paces from thirty hungry children. Nobody has touched the ribbon. They would sooner starve than be marked down.'), fx(() => { if (!MF('cache')) rage(1); MSET('cache'); })]);
@@ -135,6 +139,9 @@ const MISSIONS = {
     caught: k => [say('cadt1', ['HOLD. WHO IS THAT?', 'VIOLET! ON THE ISLAND!', 'THERE. BY THE WATER.'][k % 3]), narr(k >= 2 ? 'I am back in the reeds before the lamp finishes turning. They are tired. They are looking less carefully than they were.' : 'I go back into the reeds and the dark, and wait for them to decide it was a deer.')],
     use(t) {
       if (t.id === 'wren') return Dialogue.start([say('wren', 'Go on. One saw nothing. One is watching a gauge.')]);
+      if (t.id === 'tcairn') return Dialogue.start([narr('House Teal\'s dead, behind the pump house where the lamps do not reach. Four cairns to our two. They are second on the board.'), narr('It is the same sum below. The tier that loses the most hands has the best figures.')]);
+      if (t.id === 'drop') return Dialogue.start([narr('A white crate on a gilt cord, lowered from the air and not yet unhooked. PATRON\'S CREDIT, and a seal.'), narr('Lamp oil. A second cook-pot. Salve. House Violet has had nothing lowered to it in twenty-five days. Nobody placed a sum on us.')]);
+      if (t.id === 'tboard') return Dialogue.start([narr('Their board faces the ford, so that we can read it. Teal second. Violet eleventh. It is repainted before either camp is awake.'), narr('The Proctors want this crossing. A House that will not raid is not a result.')]);
       if (t.id === 'ttA') return Dialogue.start([narr('Their captain\'s tent. He has ranked his own cadets on a board, one to forty, and hung it where all of them can read it. The bottom three names are underlined.')]);
       if (t.id === 'ttB') return Dialogue.start([narr('A cadet asleep with her boots on and a letter in her fist. "Darling. Your father and I have placed a sum on Teal. Do not embarrass it."'), fx(() => { if (!MF('letter')) rage(1); MSET('letter'); })]);
       if (t.id === 'ttC') return Dialogue.start([narr('Their cook-fire is a Proctor\'s lamp with the shade off. They never lit a real one either. They are only richer about it.')]);
@@ -169,6 +176,8 @@ const MISSIONS = {
     respawn: () => [2, 8, 3],
     caught: k => [say('warden', ['A CADET. ON THE DAIS.', 'YOU. BACK TO YOUR HOUSE.', 'NOTED.'][k % 3]), narr(k >= 2 ? 'They walk me to the edge of the marble and let go. A cadet out of bounds is a line in a book to them, not a threat. They do not even take my name. I go round again.' : 'A halberd butt between the shoulders, and the grass. Wardens above the rock hit exactly the way they do below it.')],
     use(t) {
+      if (t.id === 'boots') return Dialogue.start([narr('Four pairs of boots on a rack, humming, set to charge off the same vent stack as the lamps. The Proctors do not walk to their work.'), narr('Thirty days they have hung over us on these and written. I look at the straps for a while. They are only straps.')]);
+      if (t.id === 'wagers') return Dialogue.start([narr('A strongbox, not locked. Nobody up here locks anything; who would there be to lock it against.'), narr('A column for each Proctor: which House he is paid to find for, by whom, and how much. Voss has two names against his. One of them is Teal.'), narr('They are not grading the Assay. They are delivering it.')]);
       if (t.id === 'eye') return Dialogue.start([narr('The Proctors\' own standard. A gold sun with an open eye. It hangs over my tier\'s square as well. The same cloth. The same eye. I had half believed it would be a different one up here.')]);
       if (t.id === 'cloak') return Dialogue.start([narr('Crates, counted and sealed. Salve. Lamp oil. One is marked FOR THE VICTOR: a winter cloak, white, lined with gold.'), narr('Four hundred and eighty cadets came into this valley. They packed one cloak.')]);
       if (t.id === 'book') return Dialogue.start([
@@ -293,9 +302,9 @@ const VC2 = {
   set: [[1, 7, 20, 1, ','], [12, 4, 1, 3, ','], [22, 2, 2, 11, '~'], [21, 7, 1, 1, ',']],
   props: [{ t: 'vtent', x: 3, y: 4, a: '#7a5ac8', block: blk(3, 4, 2) }, { t: 'vtent', x: 7, y: 4, a: '#7a5ac8', block: blk(7, 4, 2) }, { t: 'vtent', x: 16, y: 4, a: '#3aa8a0', block: blk(16, 4, 2) }, { t: 'vtent', x: 4, y: 11, a: '#7a5ac8', block: blk(4, 11, 2) }, { t: 'vtent', x: 16, y: 11, a: '#3aa8a0', block: blk(16, 11, 2) },
     { t: 'standard', x: 11, y: 3, a: '#7a5ac8', block: blk(11, 3) }, { t: 'standard', x: 13, y: 3, a: '#3aa8a0', block: blk(13, 3) }, { t: 'standard', x: 14, y: 3, a: '#c8782a', block: blk(14, 3) },
-    { t: 'campfire', x: 12, y: 9, a: 1, block: blk(12, 9) }, { t: 'woodpile', x: 9, y: 10, block: blk(9, 10) }, { t: 'bedroll', x: 14, y: 10 }, { t: 'bedroll', x: 8, y: 8 }, { t: 'bedroll', x: 18, y: 9, a: '#3aa8a0' }, { t: 'stakes', x: 19, y: 4, a: 2 }, { t: 'stakes', x: 19, y: 11, a: 2 }],
+    { t: 'campfire', x: 12, y: 9, a: 1, block: blk(12, 9) }, { t: 'woodpile', x: 9, y: 10, block: blk(9, 10) }, { t: 'bedroll', x: 14, y: 10 }, { t: 'bedroll', x: 8, y: 8 }, { t: 'bedroll', x: 18, y: 9, a: '#3aa8a0' }, { t: 'stakes', x: 19, y: 4, a: 2 }, { t: 'stakes', x: 19, y: 11, a: 2 }, { t: 'cairn', x: 9, y: 12, block: blk(9, 12) }, { t: 'cairn', x: 10, y: 12, block: blk(10, 12) }, { t: 'cairn', x: 11, y: 12, a: '#3aa8a0', block: blk(11, 12) }, { t: 'rankboard', x: 20, y: 9, a: 0, block: blk(20, 9) }],
   lights: [{ x: 200, y: 150, r: 80, c: '#ffb050' }, { x: 200, y: 50, r: 46, c: '#c8b0ff' }, { x: 350, y: 110, r: 44, c: '#a8c8ff' }],
-  hot: [{ id: 'fire2', tiles: blk(12, 9) }, { id: 'stds', tiles: blk(11, 3).concat(blk(13, 3, 2)) }, { id: 'wnote', tiles: blk(9, 10) }, { id: 'ridge', tiles: blk(19, 4, 2) }, { id: 'tentQ', tiles: blk(4, 11, 2) }], exits: []
+  hot: [{ id: 'fire2', tiles: blk(12, 9) }, { id: 'stds', tiles: blk(11, 3).concat(blk(13, 3, 2)) }, { id: 'wnote', tiles: blk(9, 10) }, { id: 'ridge', tiles: blk(19, 4, 2) }, { id: 'tentQ', tiles: blk(4, 11, 2) }, { id: 'cairns', tiles: blk(9, 12, 3) }, { id: 'board2', tiles: blk(20, 9) }], exits: []
 };
 MAPS.vcamp2 = buildMap(VC2);
 MAPS.vcamp3 = buildMap(Object.assign({}, VC2, { name: 'House Violet — night twenty-eight', dark: 'rgba(6,6,22,.68)' }));
@@ -324,6 +333,8 @@ Object.assign(MISSIONS, {
         say('cadt1', 'One found one did not want to win something already paid for. Yours was only hungry. Hungry is at least one\'s own.'),
         narr('He has no idea how close that is to something Mara would say. I do not tell him. He would have to be told who Mara is, and then what a tier is, and then why.'), fx(() => MSET('e_teal'))]);
       if (t.id === 'cadv1' || t.id === 'cadv2') return Dialogue.start([narr(t.id === 'cadv1' ? 'She is oiling a blade she will use tomorrow on somebody she sat beside at lessons. She is humming. I know it. It is the shift song, in a bright key, with a turn on the end I have never heard. She says it is the Count-Out, a nursery game. One, two, the line is true. Her nurse sang it, and her nurse before. They took it up the lift with them when they left us down there, and forgot whose it was.' : 'He is writing a letter by the fire. The Proctors read them all. He knows. He is writing it anyway.')]);
+      if (t.id === 'cairns') return Dialogue.start([narr('Nine of ours now, and the row has been started again behind it for the thirty who came over from Teal. They build them properly. Petra showed them; I showed Petra.'), narr('Not one has BALANCED on it. I did not ask for that. They stopped by themselves around day thirty.')]);
+      if (t.id === 'board2') return Dialogue.start([narr('The board. Violet is first. It has been repainted so many times the wood has swollen.'), narr('POSITIONS ARE PROVISIONAL. After tomorrow they are not. Oswin\'s father has looked at a board like this one for thirty years.')]);
       if (t.id === 'wnote') return Dialogue.start([narr('Tucked under the top log, where only somebody who builds the fire would look: a strip of gauge paper, in an engineer\'s square hand.'), narr('"Stack pressure, two. It has held twenty-four days. Whoever you are: why did you care whether it would? W.H."'), narr('I put it in my collar with the page and the washer. It is getting crowded in there.')]);
       if (t.id === 'stds') return Dialogue.start([narr('Three standards now. Violet, Teal, and Amber, who came in on day thirty-four without a blade drawn. Each of them is a House that stopped existing because I picked up a pole.'), narr('It is exactly how the Count works. I am learning their trade by doing it to their children.')]);
       if (t.id === 'lucan') return Dialogue.start(MF('e_lucan') ? [say('lucan', 'Until the morning, Sorrel.')] : [
@@ -375,6 +386,8 @@ Object.assign(MISSIONS, {
         say('corin', 'It will be one of the Teal. It is always the ones who came over. A man who changes his House once has learned how.'),
         narr('He does not look up from his slate. He has a clerk\'s hand. Neat sevens.'), L('corin')]);
       if (t.id === 'cadv1') return Dialogue.start([narr('She was on the ridge picket the first night. She saw a light, she says, and thought it was a Proctor. Everybody thinks everything is a Proctor.')]);
+      if (t.id === 'cairns') return Dialogue.start([narr('Six cairns. Two of them are from this week, from raids that came where the pickets were not.'), narr('Whoever is selling the watch has walked past these every night to do it.')]);
+      if (t.id === 'board2') return Dialogue.start([narr('Violet: fourth. Three raids in three nights and we have dropped two places.'), narr('Somebody is reading this board from the other side of the river and being paid by the bar.')]);
       if (t.id === 'wnote') return Dialogue.start([narr('The stores, under an oilcloth beside the woodpile. Bread. Rope. Lamp oil.'), narr('I count nine flasks. Corin\'s tally says eleven.'), L('stores')]);
       if (t.id === 'ridge') return Dialogue.start([narr('The top of the ridge path, where it looks down on Teal\'s old allies across the valley. Bootprints in the wet. Narrow. The left heel drags a groove.'), narr('Beside them, a ring in the grass where a lamp stood, and three burnt matches. Three nights.'), L('ridge')]);
       if (t.id === 'tentQ') return Dialogue.start([narr('The quartermaster\'s tent. Everything squared. Under the bedroll, a second slate: three strokes, and beside each a number in a neat hand.'), narr('They are our picket counts. Ford, ridge, river. All three nights.'), fx(() => Sound.play('heart')), narr('And a boot, set to dry by the pole. The left heel is worn through on the outside.'), L('tent')]);
