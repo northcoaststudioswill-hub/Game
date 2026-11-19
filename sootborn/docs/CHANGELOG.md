@@ -1,5 +1,14 @@
 # SOOTBORN — changelog (latest v0.51 · 2026-11-19)
 
+## v0.52 · 2026-11-19 — the docks would not start in v0.50: found
+From playing v0.50: nobody on the docks ever came, and the gate stayed shut.
+
+- **Cause.** In v0.50 I moved the first chalked sun up the causeway and made you step on it instead of pass near it. The causeway is wider than the sun, so you could walk past it, and everything on the docks waits for that sun: the first fight, the watch waking, the key, the gate. Walk past it and the level was empty and locked. That was my change, not something you missed.
+- **Fix.** The first sun cannot be walked past: crossing its line anywhere on the causeway sets it off. Riser Nine and the Stair had the same weakness with a smaller chance of it, and their first suns now reach five and a half metres.
+- Tested by walking up the edge of the causeway, as far from the sun as the wall allows: the memory plays and the first fight starts.
+- **The cape in the comic levels** was still going up behind him at a run because I had changed the wrong part: his coat tails, not the cape. The cape itself now hangs and swings with the stride. Not seen in motion.
+- **The run:** you are right that it still looks wrong, and I have not fixed that here. It is first on the open list, with looking for a reference run cycle to work from.
+
 ## v0.51 · 2026-11-19 — his new face in dialogue, the cape the right way round, fighting from the air
 From play notes on v0.49 and v0.50.
 

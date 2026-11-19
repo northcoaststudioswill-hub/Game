@@ -193,7 +193,7 @@
   }
 //@@SUNS
     // a chalked sun works when he steps onto it; nothing to press
-    { let on = null; if (F.intro && !S.enc) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && Math.hypot(x - c.x, z - c.z) < (F.path || SC.issue !== 'docks' ? 1.6 : 1.9)) on = id; }
+    { let on = null; if (F.intro && !S.enc) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && (F.path ? Math.hypot(x - c.x, z - c.z) < 1.6 : id === 'alley' && z < c.z + 1.4)) on = id; }   // the first sun cannot be walked past: in v0.50 it could, and then nothing on the docks ever started
       if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
 //@@INIT
   S.init = function () {
@@ -471,7 +471,7 @@
       if (S.enc && S.enc.arena && !RIS && pl.control && pl.state !== 'dead') { const A = S.enc.arena; pl.pos.x = SC.clamp(pl.pos.x, A[0] - 0.2, A[2] + 0.2); pl.pos.z = SC.clamp(pl.pos.z, A[1] - 0.2, A[3] + 0.2); }   // a landing is fought on the landing
       if (!pl.control || S.enc || pl.state === 'dead') return;
       const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;
-      { let on = null; if (F.intro) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && Math.hypot(x - c.x, z - c.z) < (F.path || SC.issue !== 'docks' ? 1.6 : 1.9)) on = id; } if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
+      { let on = null; if (F.intro) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && Math.hypot(x - c.x, z - c.z) < (F.path ? 1.6 : id === 'alley' ? 5.5 : 1.6)) on = id; } if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
       if (RIS) {
         if (S.pending || !F.e_alley || F.boss || S.bossDown) return;
         const next = F.pump && !F.e_w2 ? 'w2' : F.pylon && !F.e_w3 ? 'w3' : F.pull ? 'boss' : null; if (!next) return; S.pending = true;
