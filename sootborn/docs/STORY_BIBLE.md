@@ -357,7 +357,7 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 | 4 Two Years | +7 to +9 | Brand; the week he blames Wren; Maren's note; the low point; the weather; Tavi comes up; Wren at the rail | 2D fight: the Dock Stair (you are Brand). 2D fight: Tier Six Stands (you are Mara). 3D fight: the Fall |
 | 5 The Count | +9 | The words before the stair; Maren at the white door; Celestine; the choice; Lift Zero open; Row K | **The Stair: 3D fight now, third-person level planned.** 3D fight: Little Ember (Celestine) |
 
-**The two planned levels (a proposal).**
+**The two planned levels (decided in v0.29.8; see below).**
 - **Riser Nine** (+5). The Assay valley at night in rain: pines, the pump house, the riser's hatch glowing in the grass. Kael in a mask, alone, holding the top of the riser while forty people from Tier Four come up behind him. No barges, no stone: mud, lamplight, Wardens coming down the hill. It would be the first time he fights for people instead of against a rival, and the reason Cade starts looking at "everyone who has done it before". Boss: a Warden captain.
 - **The Stair** (+9). The nine hundred steps up the outside of the Spire at sunset, a barge burning on the terrace below, the Unlit behind him and Tavi on his left. The same stair Brand died at the foot of, climbed the other way. Ends at the white door, where Maren is. Boss: the Auditor's Blade.
 - Both use the High Docks engine: the same chain, the Count, memories at the things he finds, memory cut-ins on ELEVEN and finishers. What changes is the place, the people in it, and what he remembers there.
@@ -367,3 +367,12 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - Between the Fall and the Stair there is no quiet scene with the Unlit as an army.
 - Chapter 4 is mostly told. The two years in the weather could hold a level of its own (flying or boarding a barge).
 - Lucan disappears after chapter 3 unless he was befriended.
+
+### Decided in v0.29.8
+- **Third-person levels: Riser Nine (+5), the High Docks (+7), the Stair (+9).** Hold, raid, ascent. None in chapter 1 (a clerk cannot be seen to fight) or chapter 4 (you play Brand and Mara there).
+- **The Spire's rings:** first the High Auditor, second the Marshals, third the twelve Houses in finishing order, fourth the clerks, then kitchens, then "the service": porters, lamp trimmers, plate carriers. They are soot and are never called it. They use the outside stair, on a painted line; stepping off it costs a day of air. One bell to kneel for a clerk, two for a House, none for the High Auditor.
+- **Ansel Rook** met Kael at the Dockmaster's table at +5, walked him along the moorings and gave him the nine minutes. Decent, exact, never below the kitchens. Kael liked him and puts his name on Mara's list.
+- **Vant** is Dockmaster from at least +5 and remembers the Assay fondly.
+- **Lucan** is Captain of the Door at +9. Friend: he writes that he will not be where she puts him. Otherwise: he will stand there.
+- **The list:** Mara sends forty-four names and Brand's up with Tavi, to be read aloud when it is done. Kael adds Aldane, T. and Rook, A.
+- The thin places listed above are now: chapter 1 has its rings but still no level; chapter 4 has its night before; Lucan is accounted for.

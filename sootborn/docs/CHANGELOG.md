@@ -1,5 +1,22 @@
 # SOOTBORN — changelog
 
+## v0.29.8 · 2026-11-19 — the second half: the rings, the Dockmaster's table, word of Lucan, the night before
+From play notes: work on the chapters' cutscenes, lore and story; keep the placeholders; decide where the third-person combat fits the story best.
+
+**Where the third-person levels go (decided)**
+- **Riser Nine** (+5), **the High Docks** (+7), **the Stair** (+9): one in each of chapters 2, 3 and 5, and each a different kind of fight. Riser Nine is holding a place so other people can get out. The docks is a raid that goes wrong. The Stair is going up. Chapters 1 and 4 stay without one on purpose: in 1 he is a clerk and cannot be seen to fight; 4 belongs to Brand and Mara, and you play them.
+- Riser Nine and the Stair are still placeholders (the 2D fight plays). After Riser Nine there is now a short scene that only shows once its level exists.
+
+**New scenes**
+- **The rings** (chapter 1, opening): how the Spire is laid out and who sleeps where; "the service", who are soot and are never called it; the porters' stair with a line painted down it; the bells people kneel to; the first time a porter knelt to him.
+- **The Dockmaster's Table** (end of chapter 2, new): the last night of the quarter. Vant, who remembers the Assay as the summer he lost a river. Eleven kinds of greens nobody finishes. **Rook**, two years before the docks: he walks Kael along the moorings with a lamp and tells him about the nine minutes himself. Kael likes him. This is what Rook means at the end by "one sat at table with you".
+- **Word of Lucan** (chapter 4): if Kael taught him, a letter with no name on it; he has been made Captain of the Door and will not be where she puts him. If not, he walks with a stick, has the same post, and Ilse tells Kael not to hope.
+- **The Night Before** (chapter 4, new, before the Fall): the only time the Unlit are an army at rest. Hollis, Nell (Pip is sixteen and tells everyone the sky is blue), Ivo finally says he held him down, Dace, Sable with a crate of greens "for after". Mara's list of forty-four names and Brand's, to be read aloud when it is done. Kael adds Teo, and then Rook, and leaves it in.
+
+**Lore fixed in place by these:** the Spire has rings in rank order; the service class above the rock is soot under another name; Vant is Dockmaster from at least +5; Rook's nine minutes are Rook's own figure; Lucan is Captain of the Door at +9 either way; the names are read aloud at the end because Mara asked for it.
+
+**Checked:** every chapter builds with either Lucan branch and every speaker has a portrait; each new scene played through on screen by script with no errors; a bot played from chapter 2 into the Fall's opening before its time ran out. **Not checked:** read through by a person. The new scenes reuse existing pictures: the Table opens on the Spire from outside and then the moorings; there is no picture of the table itself yet.
+
 ## v0.29.7 · 2026-11-19 — two more third-person levels have their places held
 From play notes: two more stretches of play like the High Docks are wanted, in different places at different points of the story; a placeholder is fine for now while the second half is refined.
 

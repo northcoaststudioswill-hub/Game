@@ -121,6 +121,8 @@ FF.stand = () => ({
     hurt: 'I HAVE HAD WORSE FROM A VALVE WHEEL.', fury: 'BE TOO MUCH FOR THEM. SHE WAS NOT ONLY TALKING TO HIM.', wave: 'MORE OF THEM. GOOD. LET THEM COUNT US.', half: 'HOLLIS HAS BOTH ARMS UP. I DID NOT KNOW HE COULD.', eleven: 'I KNOW HIS NUMBER. I TAUGHT HIM TO COUNT.' },
   arts: [{ on: 'start', after: 5, name: 'FORTY-FOUR', line: 'FORTY-FOUR TIMES I KNELT AND WATCHED THE DOORS CLOSE ON SOMEBODY I KNEW. I AM DONE KNEELING.', panel: 'furnace', stage: 2, kind: 'storm', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }, { on: 'wave', name: 'THE SHELF', line: 'A TIN FOR SEREN. A TIN FOR KAEL, WITH NOTHING IN IT. I DUST THEM ON REST DAYS.', panel: 'tin', kind: 'rise', rgb: '255,210,110', hex: '#ffd26e' }]
 });
+Object.assign(CAST, { rook: { name: 'Captain Rook', look: () => ({ accredited: 1, cadet: 1, skin: '#d9b48f', hair: '#b9bcc8', style: 'short', robe: '#f2efe6', armor: '#f2efe6', trim: '#e8c25a', sash: '#8a1f24' }) } });
+Object.assign(MOUTH, { rook: 'flat' });
 // ------------------------------------------------------------------ the chapters
 const P2 = {
   1: () => [
@@ -130,6 +132,11 @@ const P2 = {
     { narr: 'My name up here is Edric Sorrel. The real one died of a fever at eleven, in a minor House with no money to bury him loudly. Ilse bought his papers.' },
     { narr: 'I won their Assay under it. The High Auditor pinned a sun to my collar and made me Clerk of the Count. I live on the fourth ring of the Spire. There is a window in every room.' },
     { narr: 'I did not sleep the first month. There is a window in every room and the sky comes in. I lay under it and waited for a ceiling.' },
+    { narr: 'The Spire is built in rings, and everybody on it can tell you which one they sleep on before they tell you their name. The first ring is the High Auditor. The second is the Marshals. The third is the twelve Houses, in the order they finished.' },
+    { narr: 'The fourth ring is clerks. Below us are the kitchens, and below the kitchens there are people nobody has given a ring. Porters. Lamp trimmers. The women who take the plates away. They are soot, like me. Nobody up here says the word. They say "the service".' },
+    { narr: 'The service does not use the lifts. There is a stair up the outside of the Spire, nine hundred steps, with a line painted down the middle of it. A porter who steps off the line loses a day of air. I looked at that stair every morning for five years from a room with a window.' },
+    { narr: 'They kneel when a bell rings. One bell for a clerk. Two for a House. I am told that for the High Auditor nobody rings anything. People simply know.' },
+    { narr: 'The first time a porter knelt to me I nearly knelt back. Ilse had warned me about that. She said it was how the last one was caught.' },
     { fade: 'out' }, { panel: 'desk' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { pstage: 3 },
     { say: 'wren', t: 'Clerk Sorrel? Engineer Halloran. They have put me on the Array board. You will not remember, but we... no. Forgive me. You have a look of someone.' },
@@ -193,6 +200,9 @@ const P2 = {
     { say: 'dace', t: 'There is a riser under Tier Four that comes up in your valley. Nine floors, Kael. If somebody held the top of it for an hour.' },
     { fade: 'out' }, { panel: null },
     { issue: 'riser', or: [{ brawl: () => FF.riser() }] },
+    { when: () => !!G.flags.issue_riser, music: 'mystery' }, { when: () => !!G.flags.issue_riser, panel: 'under' }, { when: () => !!G.flags.issue_riser, fade: 'in', spd: 0.8 },
+    { when: () => !!G.flags.issue_riser, narr: 'Forty came up. I counted them past me in the rain, the way they count us. The fortieth was a girl carrying a smaller girl. Neither of them looked at the mask.' },
+    { when: () => !!G.flags.issue_riser, fade: 'out' },
     { music: 'spire' }, { panel: 'desk' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'Marshal Cade came to my desk the next morning. He did not sit.' },
     { say: 'cade', t: 'Forty lines short, Sorrel. Tier Four balanced at one thousand and sixty. Somebody held a riser against three of my Wardens. In a mask.' },
@@ -216,6 +226,24 @@ const P2 = {
       { t: '(Leave your hand where it is.)', fx: () => { G.flags.wrenClose = 1; }, then: [narr('It was the first time in five years anybody had touched me who was not trying to kill me or measure me.'), narr('I counted to eleven anyway. The washer was under my collar. It did not get any heavier. I had thought it would.')] },
       { t: 'One has columns to finish.', fx: () => { G.flags.wrenClose = 0; }, then: [say('wren', 'Noted.'), narr('She left the readings. She came back the next evening with more.')] }
     ] },
+    { fade: 'out' }, { panel: null },
+    // the Dockmaster's table: Vant again, Rook for the first time, and where the nine minutes came from
+    { music: 'spire' }, { card: 'THE DOCKMASTER\'S TABLE', sub: 'The last night of the quarter. The High Docks.', big: 1, min: 1.5, max: 4.5 },
+    { panel: 'spire' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { narr: 'On the last night of every quarter the Dockmaster gives a dinner, and the Clerk of the Count is asked, because somebody must sign for what the docks have landed. That is how I came to sit at table with a man I had beaten in a river.' },
+    { say: 'vant', t: 'Sorrel. One has not had the pleasure since the Ford. You have grown into the collar. One would not have said, that day, that you were a man for sums.' },
+    { say: 'kael', t: 'One counts what is in front of one, Dockmaster.' },
+    { say: 'vant', t: 'Granted. You counted my ribs rather thoroughly.' },
+    { narr: 'He laughed. They do, about the Assay, once it is far enough behind them. Four hundred and eighty children went into that valley. He remembered it as the summer he lost a river.' },
+    { narr: 'There were greens on the table in a silver dish. Eleven kinds. I knew four of them from the cold crates Sable skims for Nell\'s ward. Nobody at the table finished theirs.' },
+    { say: 'rook', t: 'Clerk. Ansel Rook, Stair Captain. One keeps the watch on the moorings. If you have signed for the landings, one would be glad to walk you along them. One likes them counted by somebody who can count.' },
+    { fade: 'out' }, { panel: 'weather' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
+    { narr: 'He walked me the whole length of the quay with a lamp. Four hundred hulls, moored in pairs, each pair on one line to one cleat. He knew every cleat by number. He was proud of them the way Mara is proud of a clean seal.' },
+    { say: 'rook', t: 'The watch turns over at the second bell. Nine minutes while the old watch goes down the stair and the new one comes up. One has asked for it to be shortened. One is told a porter cannot climb faster. So: nine minutes. One writes it in the log each night.' },
+    { say: 'kael', t: 'One will see the rota is kept to it.' },
+    { say: 'rook', t: 'Noted. It is restful, to deal with a man who is exact.' },
+    { narr: 'He said "noted". He meant he owed me for it. I wrote the nine minutes in my own hand that night, and every night for two years, and he checked each one against his log and found it true.' },
+    { sfx: 'heart' }, { narr: 'He was a decent officer. He had never been below the kitchens in his life. I liked him. I have a short list of people I killed that I liked, and I keep it with the other one.' },
     { fade: 'out' }, { panel: null }
   ],
   3: () => [
@@ -358,8 +386,33 @@ const P2 = {
     { say: 'ilse', t: 'One thing more, since we are being honest. The leaf in Lift Zero, the night of your festival. That was mine. I sent the car down empty to see who on that tier would look inside it instead of at the floor.' },
     { say: 'kael', t: 'And?' },
     { say: 'ilse', t: 'One man with a lantern, and a child who kept the leaf. It was enough to be going on with.' },
+    { fade: 'out' }, { panel: 'weather' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    // word of Lucan, either way
+    ...(P2F('lucanFriend') ? [
+      { narr: 'A letter came up through Freight Three in the second winter, in a hand I had taught to hold a blade. No name on it. It did not need one.' },
+      { narr: '"One has been made Captain of the Door. She says it is a post a kind man can hold. One has counted the guard on the white stair. There are fewer than she thinks, and one of them is me. One hopes that is useful arithmetic."' },
+      { say: 'ilse', t: 'He is telling you he will not be where she puts him. It is the bravest thing that family has done in three generations, and he has done it in a letter.' }
+    ] : [
+      { narr: 'Word came up through Freight Three in the second winter. Lucan Aurel walked again, with a stick. His mother had made him Captain of the Door.' },
+      { say: 'ilse', t: 'A post for a son one cannot use and will not bury. He will stand where she puts him. He was raised to. Do not hope otherwise on the stair, soot. Hope is what gets a man to check his blade.' },
+      { narr: 'I thought of him going over the parapet. I had counted how long he fell. It was less than eleven seconds, and he had lived, and I had not known which of those I wanted.' }
+    ]),
+    // the night before: the Unlit as an army, for the first and only time at rest
+    { fade: 'out' }, { panel: null }, { card: 'THE NIGHT BEFORE', sub: 'Nine years from now. Four hundred hulls, in the weather.', big: 1, min: 1.5, max: 4.5 },
+    { music: 'home' }, { panel: 'weather' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
+    { narr: 'The night before, nobody slept, and nobody said why. Six thousand people on four hundred decks, and every one of them found something that needed doing to a rope.' },
+    { say: 'hollis', t: "I've been asked to tell you the welders are ready. I've also been asked not to hum till we're over the rail. I said aye to one of those." },
+    { say: 'nell', t: "Forty beds came up with me. I don't mean the beds. I mean who was in them, nine years back. Pip's on the third hull. He's sixteen. He's told everybody the sky's blue like he found it himself." },
+    { say: 'ivo', t: "I held you down. At the furnace. I've wanted to say it on every one of these boats and there's always been a rope. I held you down, and I'd do it again, and I'm sorry, and all three of those are true." },
+    { say: 'kael', t: "I know. I've known nine years. If you hadn't, there'd be two tins on Mara's shelf with something in them." },
+    { say: 'dace', t: "Still don't see how it stays up. I've stopped asking. Sable says that's the first sensible thing I've done above the floor." },
+    { say: 'sable', t: "Lead hull's yours. I've put a cold crate aboard. Greens. For after. I'm told there's an after." },
+    { narr: 'Mara had sent a list up with Tavi. Forty-four names, in order, and then Brand\'s, in a different pencil. Under it she had written: read them out when it is done. Out loud. They never let us.' },
+    { say: 'tavi', t: "She says you'll want to add to it. She says leave room." },
+    { sfx: 'heart' }, { narr: 'I added one. Aldane, T. Then I added Rook, A., and looked at it for a while, and left it in.' },
+    { narr: 'Somebody on the next hull started the shift song, very low, the way you would hum to a valve you did not trust. It went from deck to deck across the dark until I could not tell where it stopped.' },
     { fade: 'out' }, { panel: null },
-    { panel: 'spire' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
+    { music: 'mystery' }, { panel: 'spire' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 1.2 },
     { narr: 'And then one morning the weather broke over the Sun Spire, and we were already above it.' },
     { fade: 'out' }, { panel: null },
     { brawl: () => FF.fall2() }
