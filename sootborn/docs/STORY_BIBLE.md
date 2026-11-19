@@ -232,3 +232,9 @@ How Kael fights is part of the story and changes with it. All names are ours.
 - **We** (era 6, the Fall onward): the shift song heals; his lines say "we".
 - **The blade breaks** in the duel with Celestine (at 45% of her health). He ends the story with Bank Hands.
 - Finishers: the eleven (per-fight names); one cut on a staggered enemy (LAST BELL / THE TURN / STRUCK THROUGH / HER NAME); from the air (NINE FLOORS / LIFT ZERO / THE WEATHER); last breath (ON MY BREATH, once a fight).
+
+## Graphics direction (v0.25)
+- Above-ground fights: anime-proportioned, cel-shaded, ink-outlined fighters in a low-poly world. All designs original to SOOTBORN.
+- Rebuilt so far: Kael (gilded) and Captain Vant, in the Ford only. The rest of the roster follows once the look is approved.
+- The Ford exists in two versions for comparison: the 3D valley, and the painted pixel-art valley with a side-on camera.
+- The Ford is single combat. Cadets of both Houses watch from the tree line (Lucan among them); nobody else fights in the background.

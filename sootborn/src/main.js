@@ -203,7 +203,7 @@ const Boot = { go: null };
 
 let last = 0, acc = 0;
 function frame(ts) {
-  requestAnimationFrame(frame);
+  requestAnimationFrame(frame); Perf.tick(ts);
   const dt = Math.min(0.1, last ? (ts - last) / 1000 : STEP); last = ts; acc += dt; Debug.frame(dt);
   let n = 0; while (acc >= STEP && n < 6) { step(STEP); acc -= STEP; n++; } if (n === 6) acc = 0;
   render(); Sound.tick();

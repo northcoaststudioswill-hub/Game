@@ -5,7 +5,7 @@ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH 
 const page = await (await browser.newContext({ viewport: PORT ? { width: 390, height: 844 } : { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await page.goto(new URL('../index.html', import.meta.url).href + '#noff' + (process.env.HASH || '')); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
 await ev(f => { const B = BTS.Brawl; BTS.UI.clear(); DEV.quick = 1; B.start(BTS.FF[f](), () => {}); B.cine = null; B.phase = 'fight'; B.tipT = 0; DEV.quick = 0; }, F);
 await wait(1200); let n = 0; const R = await ev(() => { const r = document.querySelector('#game').getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; }); const shot = async () => { await page.screenshot({ clip: R, path: `/tmp/cam/${F}-${S}-${String(n++).padStart(2, '0')}.png` }); };
 execSync('mkdir -p /tmp/cam && rm -f /tmp/cam/' + F + '-' + S + '-*.png');

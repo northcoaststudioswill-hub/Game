@@ -1,5 +1,39 @@
 # SOOTBORN — changelog
 
+## v0.25 · 2026-11-18 — graphics plan, stages A to C: presets, cel shading, and one duel rebuilt
+From play notes and the art-direction handoff: move toward anime-style characters; do one duel so both fighters look their best; mark it in the Dev menu; make a second version on 2D backgrounds; update or remove anyone in its background.
+
+**Stage A: measurement and presets**
+- Settings has **Graphics (3D fights): Low / Medium / High** (default High) and **Show frame time**.
+- The frame-time readout (bottom left) shows average frame time, the worst frame, how many of the last 120 frames were slow, triangle count, scene build time and the preset.
+- Low: lower render resolution, no glow pass, no outlines. Medium: full resolution and glow. High: adds ink outlines on rebuilt fighters.
+
+**Stage B: cel shading**
+- Lighting moved from per-vertex to per-pixel. Fighters get two hard light bands, a hard rim light and a hard highlight, with shadows pushed cool. Scenery gets the same treatment at about a third strength so it stays soft.
+- Add `#nocel` to the address to see the old lighting.
+
+**Stage C: one duel rebuilt, The Ford (Kael and Captain Vant)**
+- Both fighters are rebuilt on the same joints and animations at about six heads tall instead of four and a half: long legs, a shaped torso and waist, tapered arms, knee and elbow joints, smaller hands and boots, a small shaped head, spiked hair for Kael and swept hair for Vant, hanging bangs, larger eyes with a highlight, slimmer cape and pauldrons.
+- Bodies are lofted from rounded cross-sections with smooth normals, so the cel bands follow the form.
+- **Ink outlines** on the rebuilt fighters (High only).
+- Everyone else in the game still uses the old build. Add `#oldbody` to compare.
+
+**Two versions in the Dev menu, both marked with a star**
+- **The Ford (3D valley)**: the rebuilt fighters in the existing low-poly arena.
+- **The Ford (painted 2D valley)**: the same fight and fighters in front of the pixel-art valley (sky, mountains, the keep, pines, tents, House banners, the river), with the side-on camera of the 2D fights.
+
+**Background figures at the Ford**
+- 3D version: the duelling pairs in the background are removed. The Ford is single combat; a war behind it was noise.
+- Painted version: the cadets of both Houses watching from the tree line are kept as part of the painting, because the duel is public and Lucan sees it.
+
+**Measured (software renderer; only the comparisons mean anything)**
+- Outlines add about 2,000 triangles for two fighters and no measurable frame time.
+- Low is about 35% faster than Medium in the 3D Ford.
+- The painted version draws about 3,700 triangles against 25,700 and runs in roughly half the frame time.
+- Nothing here says how it runs on a phone. Turn on Show frame time and read the numbers there.
+
+**Not done:** face textures (faces are still built from small shapes); the other fighters; effects and arena polish (stage F). Nobody has played this build.
+
 ## v0.24 · 2026-11-18 — how he fights changes with the story; four finishers; a clipping pass on film
 From play notes: research how the reference hero's fighting changes through the books so moves and flashbacks fit each fight; more quips; more finishers than ELEVEN; then watch the fights on camera, check clipping, and polish.
 
