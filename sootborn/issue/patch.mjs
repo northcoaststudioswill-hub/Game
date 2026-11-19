@@ -311,7 +311,7 @@ rep("      if (wantKick && pl.onGround) { inp.clear('kick'); startAttack(pl.stat
       if (pl.state === 'power') { /* the eleven has started */ }
       else if (wantKick && pl.onGround && (hc < 0 || pl.st >= P.ATTACK[hc].hit)) { inp.clear('kick'); startAttack(hc === 0 ? 6 : hc === 1 ? 5 : hc === 2 ? 7 : hc === 3 ? 8 : 3, mx, mz, mag); }
       else if (wantKick) { /* held for the beat */ }
-      else if (wantJump && pl.onGround && free) { inp.clear('jump'); pl.setState('air'); pl.jv = 9; pl.airFuel = 2.4; pl.diving = 0; FX.ring(pl.pos, 0x7ad9ff, 0.3, 1.8, 0.3); FX.puff(pl.pos, 4, 0.9); SC.audio.sfx('leap'); }`);
+      else if (wantJump && pl.onGround && free) { inp.clear('jump'); pl.setState('air'); pl.jv = 9; pl.airFuel = 1.9; pl.diving = 0; FX.ring(pl.pos, 0x7ad9ff, 0.3, 1.8, 0.3); FX.puff(pl.pos, 4, 0.9); SC.audio.sfx('leap'); }`);
 rep("  function perfectDodge() {", `  // on the boots: one knee up, off hand out for balance, the hook held low and back
   const HOVP = { spine: [0.15, 0, 0], chest: [0.1, 0.25, 0], head: [-0.15, -0.2, 0], shR: [0.5, 0, -0.5], elR: [-0.4, 0, 0], shL: [-0.6, 0, 0.9], elL: [-0.5, 0, 0], thL: [-1.0, 0, 0.1], shnL: [1.5, 0, 0], thR: [0.15, 0, -0.08], shnR: [0.35, 0, 0], ftR: [0.6, 0, 0], sc1: [0.3, 0, 0], y: 0 };
   function bootSlam() {

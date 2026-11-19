@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.38 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.39 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -400,7 +400,7 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 ### Story pass (v0.36)
 - **Seat knives.** Every valve hand is issued one: a hooked blade a palm long. The only edge soot may carry. Numbered; counted back onto a board at last bell by a Warden; an empty hook is a line struck by morning. Seren's was number 306. Brand counted the Tier Six board for eleven years.
 - **Oswin Hale, in order:** the Camp (day 3: "I shall carry the water myself. Do not tell my mother.") → the Last Night (night 49: the leg; "noted", and meaning it) → he finishes second → the salve comes eleven days late and the leg sets crooked → his father will not have him at table → Petra's letter (+5): a post from the High Auditor, something asked in exchange → the fitting (+6): Kael sees him masked, laying a fire, and does not turn round → the Stair (+9): the Auditor's Blade → "Hale, O." chalked forty-eighth on the wall by the white door; Maren starts a line for it.
-- **Petra Lune** keeps a column of the Count two rows ahead of Edric Sorrel from the first winter. She is the one who hears from Oswin. Open: where she is at +9.
+- **Petra Lune** keeps a column of the Count two rows ahead of Edric Sorrel from the first winter. She is the one who hears from Oswin. After +9 she keeps her column in the new book and reads the names aloud each quarter; she stops at Hale, O. every time.
 - **The list on the wall, in order:** Mara's forty-four, Brand, Aldane T., Rook A., Hale O.
 
 ### The Assay, lived in (v0.38)

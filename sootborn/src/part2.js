@@ -490,6 +490,7 @@ const P2 = {
     { narr: 'I am told I stood there a long time. I was counting. I got to eleven, and for the first time, I did not have to start again.' },
     ...((G.flags.rays | 0) > 0 ? [{ narr: 'Seren\'s lantern was still on the Pillar, with ' + (G.flags.rays | 0) + ' paper rays on it. Nobody had been allowed to take it down, and then nobody had wanted to.' }] : []),
     { narr: 'Vale handed in his ledger the first morning the light came down. He asked for a wheel on Tier Eight, where his sister\'s ward had been. He is not good at it yet.' },
+    { narr: 'Petra Lune kept her column. It is the same book and a different sum. On the first day of every quarter she reads the names aloud in a very even voice. She stops at Hale, O., every time, and then she goes on.' },
     { narr: 'Sull kept the night watch. Somebody has to walk the bays. He says "aye" now and nobody makes anything of it.' },
     { narr: 'Nell\'s ward has forty beds and the fans up. Ivo runs Freight Three with Sable, and every crate that comes down is marked for whoever is hungry. Dace chalks suns on the new doors.' },
     ...(G.flags.marenDoor ? [{ narr: 'Maren Aldane keeps the new Count. It has no columns. It is a list of names, and she reads it aloud on rest days. Teo\'s first.' }] : [{ narr: 'Nobody has seen Maren Aldane since the stair. Her desk was cleared. There was a heel of bread on it.' }]),

@@ -68,14 +68,15 @@
         { k: 'hands0', cap2: 'THE WASHER WAS UNDER MY COLLAR. I WAITED FOR IT TO GET HEAVIER. *IT DID NOT, AND I HAVE NOT FORGIVEN IT.*' }] },
       roof: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
         { k: 'assay0', cap: 'THE ASSAY. THREE YEARS AGO.', cap2: 'TWO SEALED IN A ROOM, ONE COMES OUT A CADET. TEO ALDANE SHARED HIS BREAD ON THE LIFT. *"I HOPE SHE WAS WORTH IT."*' },
-        { k: 'kael0', cap2: 'I NEVER TOLD HIM THERE WAS A SHE.' }] } },
+        { k: 'ward0', cap: 'TIER SIX. THE FEVER WARD.', cap2: 'THE NIGHT THE FEVER BROKE, TAVI ASKED FOR BREAD. I NEVER TOLD TEO THERE WAS A SHE. *THERE WERE FORTY BEDS, AND A SHE.*' }] } },
     riser: {
       yard: { fury: 1, toast: 'HANDS. *FURY.*', p: [
         { k: 'desk3', cap: 'THIS VALLEY. NIGHT TWENTY-FIVE OF THE ASSAY.', cap2: 'AN APPRENTICE KEPT THE VENT STACK AT THIS PUMP HOUSE. SHE NEVER SAW MY FACE. *SHE PUT HER HAND ON THE PIPE THE WAY I DO.*' },
         { k: 'furnace2', cap2: 'SEREN TAUGHT ME THAT. HANDS, KAEL. EVERYTHING IS HANDS. *I HAD NOT KNOWN ANYONE ABOVE THE ROCK COULD LEARN IT.*' }] } },
     stair: {
       yard: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
-        { k: 'assay0', cap: 'THE LAST DAY OF THE ASSAY.', cap2: 'I TOOK A KEEP FROM THE HIGH AUDITOR\'S SON WHILE SHE WATCHED. SHE PINNED A SUN ON ME FOR IT. *SHE SAID I REMINDED HER OF SOMEONE.*' }] },
+        { k: 'assay0', cap: 'THE LAST DAY OF THE ASSAY.', cap2: 'I TOOK A KEEP FROM THE HIGH AUDITOR\'S SON WHILE SHE WATCHED. SHE PINNED A SUN ON ME FOR IT. *SHE SAID I REMINDED HER OF SOMEONE.*' },
+        { k: 'lift0', cap: 'ASHGATE SQUARE. NINE YEARS AGO.', cap2: 'THE FIRST TIME SHE LOOKED AT ME I WAS KNEELING WITH EVERYONE I KNEW. "A THIEF WHO TIDIES." *SHE HAS FORGOTTEN IT. I HAVE NOT.*' }] },
       roof: { fury: 1, toast: 'A SHELF CAN BE MADE LONGER. *FURY.*', p: [
         { k: 'weather2', cap: 'THE RAIL OF A BARGE. THIS YEAR.', cap2: '"I AM NOT ASKING FOR HER PLACE." "THERE IS NOT A PLACE. THERE IS A SHELF."' },
         { k: 'tin0', cap2: 'SEREN WOULD HAVE HECKLED. THEN SHE WOULD HAVE MOVED UP. *EVERY BREATH IS STILL HERS. THERE TURNED OUT TO BE A GREAT MANY OF THEM.*' }] } }
@@ -272,7 +273,7 @@
         else if (F.boss) t = 'FORTY OF FORTY';
         else t = 'HOLD THE RISER · ' + up() + ' OF 40 UP';
       } else {
-        if (S.enc) t = S.enc.id === 'boss' ? "THE AUDITOR'S BLADE. THE DOOR IS BEHIND HIM." : 'CLEAR THE LANDING';
+        if (S.enc) t = S.enc.id === 'boss' ? (S.stage2 ? 'OSWIN HALE. THE DOOR IS BEHIND HIM.' : "THE AUDITOR'S BLADE. THE DOOR IS BEHIND HIM.") : 'CLEAR THE LANDING';
         else if (!F.path) { t = 'STEP ONTO THE CHALKED SUN'; g = CROSS.alley; }
         else if (!F.e_alley) t = 'CLEAR THE TERRACE';
         else if (!F.e_l1) { t = 'UP THE FIRST FLIGHT'; g = { x: 0, y: 6, z: 12 }; }
@@ -303,12 +304,13 @@
       ];
       pl.model.expr = null; U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: pg }, begin);
     };
+    const oswinUp = e => { e.maxHp = Math.round(e.maxHp * 0.85); e.hp = e.maxHp; e.K = Object.assign({}, e.K, { speed: e.K.speed * 1.22, wind: e.K.wind * 0.78, rec: e.K.rec * 0.8, cool: [0.4, 0.9], dmg: e.K.dmg + 5 }); e.phase = 2; };
     bossIntro = function () {
       const again = F.bossIntro; F.bossIntro = 1; save(); pl.control = false; pl.setState('scripted'); pl.script = t => P.guard(t); pl.scriptRate = 6; U.showHud(false); SC.emit('letterbox', true); cam.lock = null;
-      S.vossName = S.vossName || U.SPEAK.voss.name; if (!RIS) { S.stage2 = false; SC.SPECS.boss.face = 'halfmask'; U.SPEAK.voss.name = S.vossName; }
+      S.vossName = S.vossName || U.SPEAK.voss.name; const osw = !RIS && !!F.oswin; if (!RIS) { S.stage2 = osw; SC.SPECS.boss.face = osw ? 'oswin' : 'halfmask'; U.SPEAK.voss.name = osw ? 'OSWIN HALE' : S.vossName; }
       const bz = RIS ? -15 : -50, e = SC.spawnEnemy('boss', 0, BY, bz, ENC.boss); e.state = 'wait'; e.model.group.scale.set(1, 1, 1); e.yaw = 0; S.bossE = e; pl.yaw = Math.PI;
       cam.move(v3(4, BY + 1.9, bz + 6), v3(0, BY + 2, bz), v3(2.4, BY + 1.7, bz + 4.2), v3(0, BY + 2.1, bz), 4.5, 40);
-      const lines = again ? [{ who: 'voss', text: RIS ? 'Still on the hatch. *Stand off it.*' : 'Again, Clerk. One has the whole evening.' }, { who: 'hero', face: 'angry', text: RIS ? 'Count them again.' : "So've we." }] : RIS ? [
+      const lines = osw ? [{ who: 'voss', face: 'angry', text: 'Get up, Sorrel. One has not finished paying.' }, { who: 'hero', face: 'angry', text: "It's Kael. It was always Kael." }] : again ? [{ who: 'voss', text: RIS ? 'Still on the hatch. *Stand off it.*' : 'Again, Clerk. One has the whole evening.' }, { who: 'hero', face: 'angry', text: RIS ? 'Count them again.' : "So've we." }] : RIS ? [
         { who: 'voss', text: 'You. In the mask. Stand off that hatch. That is an Authority riser, and those are *lines to be struck*.' },
         { who: 'hero', face: 'angry', text: 'They are forty people. Count them again.' },
         { who: 'voss', text: 'It is not a Warden\'s work to count. It is a Warden\'s work to *balance*.' },
@@ -318,7 +320,7 @@
         { who: 'voss', text: 'One does not kneel, and one is not sorry. *Come up.*' },
         { who: 'hero', face: 'smirk', text: "That's all right. I've done enough of both for two." }];
       run([0.8, n => U.say(lines, n), n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true); e.state = 'chase'; e.st = 0; e.cool = 1.2;
-        S.enc = ENC.boss; ENC.boss.wave = 0; ENC.boss.wait = 0; U.boss(e, RIS ? 'THE WARDEN CAPTAIN' : "THE AUDITOR'S BLADE"); objective(); n(); }]);
+        S.enc = ENC.boss; ENC.boss.wave = 0; ENC.boss.wait = 0; U.boss(e, RIS ? 'THE WARDEN CAPTAIN' : osw ? 'OSWIN HALE · HOUSE VIOLET' : "THE AUDITOR'S BLADE"); if (osw) oswinUp(e); objective(); n(); }]);
     };
     ending = function () {
       S.enc = null; U.boss(null); SC.clearEnemies(); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 5; setFlag('boss'); if (RIS) S.walk = 0.001;
@@ -376,8 +378,8 @@
             { who: 'cap', text: 'He drew the second blade and set the bad leg behind him. The salve came eleven days late. He had finished second in the Assay, behind a man who lit a fire.' }
           ], n),
           n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true);
-            e.maxHp = Math.round(e.maxHp * 0.85); e.hp = e.maxHp; e.K = Object.assign({}, e.K, { speed: e.K.speed * 1.22, wind: e.K.wind * 0.78, rec: e.K.rec * 0.8, cool: [0.4, 0.9], dmg: e.K.dmg + 5 }); e.phase = 2; e.armorT = 1.5; e.state = 'chase'; e.st = 0; e.cool = 0.8; e.model.face('angry');
-            FX.ring(e.pos, 0xffd23a, 0.5, 5, 0.6); FX.word('OSWIN HALE', v3(e.pos.x, 21.4, e.pos.z), '#ffe14a', 1.6); SC.audio.sfx('roar'); U.boss(e, 'OSWIN HALE · HOUSE VIOLET'); n(); }]);
+            oswinUp(e); F.oswin = 1; save(); e.armorT = 1.5; e.state = 'chase'; e.st = 0; e.cool = 0.8; e.model.face('angry');
+            FX.ring(e.pos, 0xffd23a, 0.5, 5, 0.6); FX.word('OSWIN HALE', v3(e.pos.x, 21.4, e.pos.z), '#ffe14a', 1.6); SC.audio.sfx('roar'); U.boss(e, 'OSWIN HALE · HOUSE VIOLET'); objective(); n(); }]);
       });
       SC.on('dazed', () => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted ? 'WIDE OPEN. GET CLOSE AND PRESS *A* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
       SC.on('secondchance', () => SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)));

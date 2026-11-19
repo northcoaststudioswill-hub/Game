@@ -1,4 +1,17 @@
-# SOOTBORN — changelog (latest v0.38 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.39 · 2026-11-19)
+
+## v0.39 · 2026-11-19 — loose ends: stage two is remembered, memories from below, Petra's ending, controls written down
+From play notes: keep going on things not done and things to clean up. This round takes items I had listed as open in earlier notes.
+
+- **Losing to Oswin no longer sends you back to the mask.** Once the mask has broken, a retry starts at stage two with him already unmasked: "Get up, Sorrel. One has not finished paying." "It's Kael. It was always Kael." The objective and health bar name him.
+- **A memory from below at the suns that lacked one.** The docks' roof sun now ends in the fever ward (Tavi asking for bread, set against Teo's bread). The Stair's first landing now ends in Ashgate Square nine years ago, kneeling, the first time Celestine looked at him ("A thief who tidies"). Every sun in all three levels now has something from Cinderwell in it.
+- **Petra Lune has an ending.** In the closing roll of where everyone went: she kept her column, and reads the names aloud each quarter, and stops at Hale, O. every time.
+- **About & controls** now lists the buttons for the three third-person levels. It had nothing on them.
+- **Hovering** lasts a little under two seconds, was nearly two and a half. It was the safest place in a fight.
+
+**Checked by script:** beating stage one, dying in stage two, choosing BACK TO THE LAST SUN, and walking back up gives Oswin unmasked with his stage-two health and speed; all three levels to their endings; every chapter of Part Two still builds; title cards still fit at all four sizes. **Not checked:** played by hand.
+
+**Still open, in the order I would take them:** Kael's model rebuilt properly (head, hands); pictures for the Island and the Dockmaster's table; the ford and the keep have nothing of their own; lock-on is not on the touch pad; the hand-off between 2D and the arena fights has not been looked at; phone frame rate has never been measured.
 
 ## v0.38 · 2026-11-19 — the Assay, lived in: boards, cairns, wagers, boots
 From play notes: do the part left over from the last pass. Make the Assay and its places feel more authentic.
