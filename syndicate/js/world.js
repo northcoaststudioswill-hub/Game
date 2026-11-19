@@ -18,6 +18,20 @@
     const under = new T.Mesh(new T.PlaneGeometry(200, 200), new T.MeshBasicMaterial({ color: opts.under || 0x050407 })); under.rotation.x = -Math.PI / 2; under.position.y = -0.3; scene.add(under);
     return im;
   }
+  // hand-drawn surfaces for the pit: dressed stone in courses, and raked, stained sand
+  const canvasT = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping; t.anisotropy = 4; return t; };
+  let ashlarT = null, sandT = null;
+  const ashlar = () => ashlarT || (ashlarT = canvasT(512, 256, (c, w, h) => { c.fillStyle = '#2a2624'; c.fillRect(0, 0, w, h); const bh = 42, rows = Math.ceil(h / bh);
+    for (let r = 0; r < rows; r++) { let x = -R(0, 60); while (x < w) { const bw = R(70, 130), v = R(-16, 16) | 0; c.fillStyle = 'rgb(' + (150 + v) + ',' + (142 + v) + ',' + (134 + v) + ')'; c.fillRect(x + 2, r * bh + 2, bw - 4, bh - 4); c.fillStyle = 'rgba(255,255,255,0.07)'; c.fillRect(x + 2, r * bh + 2, bw - 4, 3); c.fillStyle = 'rgba(0,0,0,0.16)'; c.fillRect(x + 2, r * bh + bh - 7, bw - 4, 5); for (let k = 0; k < 14; k++) { c.fillStyle = 'rgba(0,0,0,' + R(0.03, 0.1) + ')'; c.fillRect(x + R(4, bw - 8), r * bh + R(4, bh - 8), R(2, 9), R(1, 4)); } x += bw; } }
+    for (let i = 0; i < 16; i++) { const x = R(0, w), g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(10,6,4,0.4)'); g.addColorStop(1, 'rgba(10,6,4,0)'); c.fillStyle = g; c.fillRect(x, 0, R(4, 16), R(h * 0.4, h)); }
+    for (let i = 0; i < 5; i++) { c.fillStyle = 'rgba(90,14,10,' + R(0.12, 0.3) + ')'; c.beginPath(); c.ellipse(R(0, w), R(h * 0.4, h), R(10, 34), R(14, 40), 0, 0, 6.3); c.fill(); }
+    c.strokeStyle = 'rgba(8,6,5,0.6)'; c.lineWidth = 1.3; for (let i = 0; i < 7; i++) { let x = R(0, w), y = R(0, h); c.beginPath(); c.moveTo(x, y); for (let k = 0; k < 5; k++) { x += R(-26, 26); y += R(6, 30); c.lineTo(x, y); } c.stroke(); } }));
+  const sand = () => sandT || (sandT = canvasT(512, 512, (c, w, h) => { c.fillStyle = '#b3956a'; c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 9000; i++) { const v = R(-34, 30) | 0; c.fillStyle = 'rgba(' + (178 + v) + ',' + (150 + v) + ',' + (108 + v) + ',0.55)'; c.fillRect(R(0, w), R(0, h), R(1, 3), R(1, 3)); }
+    for (let i = 0; i < 26; i++) { c.fillStyle = 'rgba(60,40,22,' + R(0.05, 0.14) + ')'; c.beginPath(); c.ellipse(R(0, w), R(0, h), R(20, 80), R(14, 50), R(0, 3), 0, 6.3); c.fill(); }
+    c.lineWidth = 2; for (let r = 30; r < 360; r += 11) { c.strokeStyle = 'rgba(70,50,28,' + R(0.05, 0.12) + ')'; c.beginPath(); c.arc(w / 2, h / 2, r + R(-2, 2), R(0, 6), R(0, 6) + R(2, 5)); c.stroke(); }       // the rake
+    for (let i = 0; i < 14; i++) { c.fillStyle = 'rgba(86,16,10,' + R(0.14, 0.34) + ')'; const x = R(40, w - 40), y = R(40, h - 40); c.beginPath(); c.ellipse(x, y, R(8, 34), R(6, 24), R(0, 3), 0, 6.3); c.fill(); for (let k = 0; k < 6; k++) { c.beginPath(); c.arc(x + R(-46, 46), y + R(-46, 46), R(1, 5), 0, 6.3); c.fill(); } }       // old blood, gone brown
+    for (let i = 0; i < 40; i++) { c.strokeStyle = 'rgba(50,34,18,0.22)'; c.lineWidth = R(1, 3); const x = R(0, w), y = R(0, h), a = R(0, 6.3), l = R(14, 60); c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); c.stroke(); } }));       // drag marks
   const stoneMat = (c) => new T.MeshLambertMaterial({ color: c || 0x5d554e, map: gfx.tex('stone'), flatShading: true });
   // A wall made of a main block plus a darker cap and a base course so it does not read as one flat box.
   function wall(parent, len, h, thick, mat) {
@@ -48,18 +62,24 @@
   // ============================================================== THE PIT
   const AR = 8.2;
   function buildArena() {
-    const s = gfx.newScene({ ambient: 1.25, key: 1.5, shadowSize: 13, sky: 0x8a8cb8, ground: 0x2a2018, keyColor: 0xffe6cc }); const engineSet = s.children.slice();
+    const s = gfx.newScene({ ambient: 0.82, key: 1.4, shadowSize: 13, sky: 0x8a8cb8, ground: 0x2a2018, keyColor: 0xffdcb4 }); const engineSet = s.children.slice();
     s.fog = new T.Fog(0x07060a, 76, 112);
     const inOct = (x, z, m) => Math.abs(x) < AR + m && Math.abs(z) < AR + m && Math.abs(x) + Math.abs(z) < 1.5 * AR + m;
     const cells = [], bloodTint = new T.Color(1.15, 0.62, 0.58);
-    for (let x = -10; x <= 10; x++) for (let z = -10; z <= 10; z++) if (inOct(x, z, 0.75)) cells.push({ x, z, tint: (Math.hypot(x, z) < 5 && Math.random() < 0.09) ? bloodTint : null });
-    tiles(s, cells, 'stone', [0.66, 0.63, 0.6]);
+    for (let x = -10; x <= 10; x++) for (let z = -10; z <= 10; z++) if (inOct(x, z, 0.75)) cells.push({ x, z, y: Math.abs(x) < AR * 0.84 - 0.4 && Math.abs(z) < AR * 0.84 - 0.4 && Math.abs(x) + Math.abs(z) < 1.5 * AR * 0.84 - 0.6 ? -0.07 : 0, tint: null });
+    tiles(s, cells, 'stone', [0.4, 0.37, 0.35]);
+    { // the fighting ground is sand: raked, scuffed and stained, laid inside a border of dark flagstones with an iron gutter round it
+      const k = 0.84, V0 = [[AR, -AR / 2], [AR, AR / 2], [AR / 2, AR], [-AR / 2, AR], [-AR, AR / 2], [-AR, -AR / 2], [-AR / 2, -AR], [AR / 2, -AR]], sh = new T.Shape(); V0.forEach((v, i) => { const x = v[0] * k, y = -v[1] * k; if (i) sh.lineTo(x, y); else sh.moveTo(x, y); });
+      const geo = new T.ShapeGeometry(sh), uv = geo.attributes.uv, pos = geo.attributes.position; for (let i = 0; i < uv.count; i++) uv.setXY(i, pos.getX(i) / (AR * 2) + 0.5, pos.getY(i) / (AR * 2) + 0.5);
+      const sd = new T.Mesh(geo, new T.MeshLambertMaterial({ map: sand(), color: 0xc4aa84, polygonOffset: true, polygonOffsetFactor: -1 })); sd.rotation.x = -Math.PI / 2; sd.position.y = 0.007; sd.receiveShadow = true; s.add(sd);
+      const iron2 = gfx.lambert(0x141214); for (let i = 0; i < 8; i++) { const a = V0[i], b = V0[(i + 1) % 8], mx = (a[0] + b[0]) / 2 * k, mz = (a[1] + b[1]) / 2 * k, dx = b[0] - a[0], dz = b[1] - a[1], g2 = box(Math.hypot(dx, dz) * k + 0.1, 0.03, 0.16, iron2, mx, 0.012, mz, s); g2.rotation.y = -Math.atan2(dz, dx); g2.castShadow = false; } }
     { const apron = []; for (let x = -9; x <= 19; x++) for (let z = -9; z <= 19; z++) if (!inOct(x, z, 0.75) && x + z > -3 && Math.hypot(x, z) < 21) apron.push({ x, z, y: -0.04 }); tiles(s, apron, 'stone', [0.36, 0.33, 0.31]); }       // the walkway on the open side: dark, lower, and not a void
     for (let i = 0; i < 9; i++) { const d = gfx.decal(gfx.tex('blood'), R(1.6, 3.2), 0xffffff, R(0.35, 0.6)); d.position.set(R(-5, 5), 0.012 + i * 0.001, R(-5, 5)); d.rotation.z = R(0, 6); s.add(d); }
     const sig = gfx.decal(gfx.tex('sigil'), 7.5, 0xff6a30, 0.16, true); sig.position.y = 0.03; s.add(sig);
 
     const V = [[AR, -AR / 2], [AR, AR / 2], [AR / 2, AR], [-AR / 2, AR], [-AR, AR / 2], [-AR, -AR / 2], [-AR / 2, -AR], [AR / 2, -AR]];
-    const mat = stoneMat(0x7a746e), matDark = stoneMat(0x57524e), crowdSpots = [], cineG = new T.Group(); cineG.visible = false; s.add(cineG);
+    const mkAsh = (c, rx) => { const t = ashlar().clone(); t.needsUpdate = true; t.repeat.set(rx, 1); return new T.MeshLambertMaterial({ color: c, map: t, flatShading: true }); };
+    const mat = mkAsh(0xa39a90, 2), matDark = mkAsh(0x6f6860, 2), crowdSpots = [], cineG = new T.Group(); cineG.visible = false; s.add(cineG);
     for (let i = 0; i < 8; i++) {
       const a = V[i], b = V[(i + 1) % 8], mx = (a[0] + b[0]) / 2, mz = (a[1] + b[1]) / 2, dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz);
       const nl = Math.hypot(mx, mz), nx = mx / nl, nz = mz / nl, rot = -Math.atan2(dz, dx), near = nx + nz > 0.5;
@@ -101,7 +121,7 @@
     const seg = (a, b, r) => { const d = new T.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), m = new T.Mesh(new T.CylinderGeometry(r, r, d.length(), 5), ironM); m.position.set((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2); m.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), d.normalize()); s.add(m); };
     const chand = new T.Mesh(new T.TorusGeometry(2.2, 0.12, 6, 16), ironM); chand.rotation.x = Math.PI / 2; chand.position.y = 8.6; s.add(chand);
     for (let i = 0; i < 6; i++) { const a = i * 1.047; gfx.fire(s, Math.cos(a) * 2.2, 8.7, Math.sin(a) * 2.2, 0xffa050, 0.45, 0); seg([Math.cos(a) * 2.2, 8.6, Math.sin(a) * 2.2], [0, 12, 0], 0.03); }
-    const chandL = new T.PointLight(0xffb070, 16, 22, 1.4); chandL.position.set(0, 8, 0); s.add(chandL);
+    const chandL = new T.PointLight(0xffb070, 26, 24, 1.3); chandL.position.set(0, 8, 0); s.add(chandL);
     [3, 4, 5, 6, 7, 0].forEach(i => { const v = V[i], top = [v[0] * 1.1, 5.2, v[1] * 1.1]; let p0 = top; for (let k = 1; k <= 6; k++) { const u = k / 6, p1 = [lerp3(top[0], 0, u * 0.8), 5.2 + u * 3.4 - Math.sin(u * Math.PI) * 1.6, lerp3(top[2], 0, u * 0.8)]; seg(p0, p1, 0.045); p0 = p1; } });
     [[-3, -3], [2.5, -4], [-4.5, 1.5]].forEach((q, i) => { const m = new T.Mesh(new T.ConeGeometry(2.4, 13, 12, 1, true), new T.MeshBasicMaterial({ color: 0xffd8a0, transparent: true, opacity: 0.035, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide })); m.position.set(q[0], 6.5, q[1]); m.rotation.z = 0.08 * (i - 1); s.add(m); });
     for (let i = 0; i < 18; i++) {                         // bones, skulls and a dropped blade or two along the walls
@@ -174,6 +194,7 @@
     const gardenSky = new T.Color(0xcfe6f6); const stash = v => pitSet.concat(lifeSet).forEach(o => { if (v) { if (o.userData._gv == null) o.userData._gv = o.visible; o.visible = false; } else if (o.userData._gv != null) { o.visible = o.userData._gv; o.userData._gv = null; } });
     let hypeNow = 0, life = null;
     const update = (t) => {
+      if (!gardenG.visible && Math.random() < 0.3) { const a = R(0, 6.28), r = R(0, 7.5); gfx.emit(Math.cos(a) * r, R(0.3, 4.5), Math.sin(a) * r, R(-0.15, 0.15), R(0.05, 0.3), R(-0.15, 0.15), 3.5, 0xffd9a0, 0); }       // dust hanging in the torchlight
       if (gardenG.visible) { if (Math.random() < 0.7) { const a = R(0, 6.28), r = R(0, 11); gfx.emit(Math.cos(a) * r, R(3, 7), Math.sin(a) * r, R(-0.5, 0.2), -R(0.4, 1.0), R(-0.5, 0.2), 5, Math.random() < 0.5 ? 0xf7c6d8 : 0xffffff, 0); } if (Math.random() < 0.08) { const a = R(0, 6.28), r = R(2, 9); gfx.emit(Math.cos(a) * r, R(0.4, 1.6), Math.sin(a) * r, R(-0.8, 0.8), R(-0.1, 0.4), R(-0.8, 0.8), 2.5, [0xffe27a, 0x9fd0ff, 0xff9ac0][Math.floor(R(0, 3))], 0); } }       // blossom coming down, and now and then a butterfly
       if (!life && W.arenaLife) { const n0 = s.children.length; life = W.arenaLife(s, AR, crowdSpots); lifeSet = s.children.slice(n0); if (gardenG.visible) stash(true); }
       if (life) life(t, hypeNow);

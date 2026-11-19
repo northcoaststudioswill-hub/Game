@@ -655,3 +655,6 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .card.letter .choices button.big b { text-shadow: none; } .card.letter .choices button.big small { color: #3a2a10; }
 .ruled { margin: 0.2rem 0 0.6rem; padding: 0.4rem 0.7rem; font-size: 0.8rem; color: #b8ad98; border-left: 3px solid #8a1410; background: rgba(0, 0, 0, 0.2); } .ruled small { color: #c96a60; letter-spacing: 0.1em; margin-right: 0.4rem; } .ruled s { color: #9a8f7a; text-decoration-color: #b03020; }
 .ladder p.more { text-align: center; margin: 0.5rem 0 0; font-size: 0.82rem; }
+
+/* the pit closes in at the edges */
+#hud::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 46%, rgba(0,0,0,0) 46%, rgba(6,3,2,0.34) 78%, rgba(4,2,1,0.62) 100%); }

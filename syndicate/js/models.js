@@ -323,7 +323,7 @@
       if (auraM) auraM.forEach((s, i) => { const a = t * 1.5 + i * 1.57; s.position.set(Math.cos(a) * 0.6, 0.35 + i * 0.38 + Math.sin(t * 2 + i) * 0.15, Math.sin(a) * 0.6); });
       // flash + stealth
       const fl2 = p.flash > 0;
-      for (const mt of mats) { if (fl2) mt.emissive.setRGB(0.4, 0.36, 0.3); else mt.emissive.copy(mt.userData.e); }       // a hit lights them up without wiping them out
+      for (const mt of mats) { if (fl2) mt.emissive.setRGB(0.26, 0.22, 0.18); else mt.emissive.copy(mt.userData.e); }       // a hit lights them up without wiping them out
       const a = p.alpha == null ? 1 : p.alpha;
       if (a !== lastAlpha) { lastAlpha = a; for (const mt of mats) { mt.transparent = a < 1; mt.opacity = a; mt.needsUpdate = true; } glows.forEach(gl => gl.visible = a > 0.5); root.traverse(o => { if (o.isMesh) o.castShadow = a > 0.5; }); }
     };
