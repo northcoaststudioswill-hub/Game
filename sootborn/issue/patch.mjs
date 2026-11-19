@@ -158,12 +158,39 @@ between("  const A1w = {", "  P.attack = (i, t) => {", `  const A1w = { hips: [0
   const A2w = { hips: [0, 0.8, 0], spine: [0.2, 0.3, 0], chest: [0.1, 0.5, 0], head: [0, -1.1, 0], shR: [-0.8, 0, 1.2], elR: [-1.6, 0, 0], shL: [0.4, 0, 0.6], elL: [-1.2, 0, 0], thL: [0.2, 0, 0.12], shnL: [0.45, 0, 0], thR: [-0.5, 0, -0.1], shnR: [0.6, 0, 0], sc1: [-0.9, 0, 0], y: -0.16 };
   const A2s = { hips: [0, -0.9, 0], spine: [-0.1, -0.4, 0], chest: [-0.1, -0.6, 0], head: [0.05, 1.3, 0], shR: [-1.9, 0, -1.1], elR: [-0.08, 0, 0], shL: [-0.6, 0, 0.5], elL: [-1.5, 0, 0], thL: [-0.7, 0, 0.1], shnL: [0.8, 0, 0], thR: [0.55, 0, -0.14], shnR: [0.3, 0, 0], ftR: [-0.4, 0, 0], sc1: [-0.4, -0.5, 0], y: -0.12 };
   const A3w = { hips: [-0.2, 0, 0], spine: [-0.35, 0, 0], chest: [-0.25, 0, 0], head: [0.3, 0, 0], shR: [-3.0, 0, -0.15], elR: [-0.7, 0, 0], shL: [-3.0, 0, 0.15], elL: [-0.7, 0, 0], thL: [-1.1, 0, 0.1], shnL: [1.6, 0, 0], thR: [-0.3, 0, -0.1], shnR: [1.3, 0, 0], sc1: [0.2, 0, 0], y: 0.34 };
-  const A3s = { hips: [0.25, 0, 0], spine: [0.7, 0, 0], chest: [0.3, 0, 0], head: [-0.5, 0, 0], shR: [-0.75, 0, 0.25], elR: [-0.1, 0, 0], shL: [-0.75, 0, -0.25], elL: [-0.1, 0, 0], thL: [-1.3, 0, 0.1], shnL: [1.5, 0, 0], thR: [0.5, 0, -0.1], shnR: [1.2, 0, 0], ftR: [0.5, 0, 0], sc1: [-0.2, 0, 0], y: -0.42 };
+  const A3s = { hips: [0.25, 0, 0], spine: [0.7, 0, 0], chest: [0.3, 0, 0], head: [-0.5, 0, 0], shR: [-0.75, 0, 0.25], elR: [-0.1, 0, 0], shL: [-0.75, 0, -0.25], elL: [-0.1, 0, 0], thL: [-1.3, 0, 0.1], shnL: [1.5, 0, 0], thR: [0.5, 0, -0.1], shnR: [1.2, 0, 0], ftR: [0.5, 0, 0], sc1: [-1.5, 0, 0], y: -0.42 };
+  // the ram: his off hand, straight from the hip, the way he used to seat a valve
+  const Rw = { hips: [0, 0.6, 0], spine: [0.1, 0.25, 0], chest: [0.05, 0.4, 0], head: [0, -0.9, 0], shL: [0.4, 0, 0.5], elL: [-2.0, 0, 0], shR: [-0.4, 0, -0.5], elR: [-1.2, 0, 0], thL: [0.2, 0, 0.12], shnL: [0.45, 0, 0], thR: [-0.4, 0, -0.1], shnR: [0.55, 0, 0], sc1: [-0.9, 0, 0], y: -0.14 };
+  const Rs = { hips: [0, -0.8, 0], spine: [0.25, -0.3, 0], chest: [0.12, -0.5, 0], head: [-0.05, 1.2, 0], shL: [-1.55, 0, -0.1], elL: [-0.05, 0, 0], shR: [0.4, 0, -0.5], elR: [-1.4, 0, 0], thL: [-0.8, 0, 0.1], shnL: [0.85, 0, 0], thR: [0.55, 0, -0.14], shnR: [0.3, 0, 0], ftR: [-0.4, 0, 0], sc1: [-0.4, 0.5, 0], y: -0.18 };
+  // the boot: knee up, then straight through him
+  const Kw = { hips: [0.1, -0.3, 0], spine: [0.2, 0, 0], chest: [0.1, 0, 0], head: [-0.1, 0.3, 0], shL: [-0.8, 0, 0.5], elL: [-1.4, 0, 0], shR: [-0.3, 0, -0.7], elR: [-0.9, 0, 0], thL: [0.05, 0, 0.1], shnL: [0.25, 0, 0], thR: [-1.6, 0, -0.1], shnR: [1.9, 0, 0], sc1: [-0.8, 0, 0], y: -0.06 };
+  const Ks = { hips: [-0.35, -0.2, 0], spine: [-0.25, 0, 0], chest: [-0.1, 0, 0], head: [0.3, 0.2, 0], shL: [0.3, 0, 0.8], elL: [-0.5, 0, 0], shR: [0.5, 0, -0.8], elR: [-0.4, 0, 0], thL: [0.15, 0, 0.1], shnL: [0.2, 0, 0], thR: [-1.75, 0, -0.05], shnR: [0.1, 0, 0], ftR: [0.6, 0, 0], sc1: [-0.3, 0, 0], y: -0.02 };
 `);
-rep("const DMG = [9, 11, 19];", "const DMG = [14, 17, 32];");
+between("  P.attack = (i, t) => {", "  P.ATTACK = [", `  P.attack = (i, t) => {
+    const g = P.guard(0);
+    if (i === 0) return clip([[0, g], [0.06, A1w], [0.13, A1s], [0.24, A1s], [0.42, g]], t);
+    if (i === 1) return clip([[0, g], [0.07, A2w], [0.15, A2s], [0.27, A2s], [0.46, g]], t);
+    if (i === 2) return clip([[0, g], [0.06, Rw], [0.13, Rs], [0.24, Rs], [0.4, g]], t);
+    if (i === 3) return clip([[0, g], [0.08, Kw], [0.17, Ks], [0.29, Ks], [0.46, g]], t);
+    return clip([[0, g], [0.12, A3w], [0.22, A3s], [0.38, A3s], [0.62, g]], t);
+  };
+`);
+rep("P.ATTACK = [{ dur: 0.4, hit: 0.12, chain: 0.2 }, { dur: 0.44, hit: 0.14, chain: 0.22 }, { dur: 0.62, hit: 0.2, chain: 0.5 }];", "P.ATTACK = [{ dur: 0.4, hit: 0.12, chain: 0.2 }, { dur: 0.44, hit: 0.14, chain: 0.22 }, { dur: 0.4, hit: 0.13, chain: 0.2 }, { dur: 0.46, hit: 0.17, chain: 0.25 }, { dur: 0.62, hit: 0.2, chain: 0.5 }];");
+rep("if (pl.queued && pl.st >= A.chain && pl.combo < 2) startAttack(", "if (pl.queued && pl.st >= A.chain && pl.combo < 4) startAttack(");
+rep("const f = fwd(pl.yaw, _a), heavy = i === 2, reach = heavy ? 2.5 : 2.05,", "const f = fwd(pl.yaw, _a), heavy = i === 4, blunt = i === 2 || i === 3, reach = heavy ? 2.6 : i === 3 ? 2.3 : 2.05,");
+rep("if (heavy && pl.path === 'ember') e.burn = 3;", "if (heavy && pl.path === 'ember') e.burn = 3; if (blunt && hits === 0) { _c.copy(e.pos); _c.y += e.h * 0.9; FX.word(i === 2 ? 'THE RAM!' : 'THE BOOT!', _c, '#ffe14a', 1.1); }");
+rep("{ heavy, combo: i });", "{ heavy: heavy || i === 3, named: blunt, combo: i });");
+rep("if (o.heavy && !o.power) { _a.y += 0.7; FX.word(SC.pick(['WHAM!', 'KRAK!', 'POW!', 'THWAK!']), _a, '#ffe14a', 1.5); }", "if (o.heavy && !o.power && !o.named) { _a.y += 0.7; FX.word(SC.pick(pl.meter > 55 ? ['FOR HER!', 'EVERY BREATH!', 'LAST BELL!', 'HER NAME!'] : ['AIR OWED!', 'COUNTED!', 'SOOT!', 'BREATHE!']), _a, pl.meter > 55 ? '#ff7a2e' : '#ffe14a', 1.4); }");
+rep("    if (pl.inv > 0) return false;\n", "    if (pl.inv > 0) return false;\n    pl.cnt = 0; if (Math.random() < 0.6) { _c.set(fx, pl.pos.y + 2.4, fz); FX.word(SC.pick(['NOTED.', 'BALANCED.', 'KNEEL.', 'STRUCK.']), _c, '#dfe6ff', 0.95); }\n");
+rep("FX.word('TOO SLOW!', _a, '#ffffff', 1.5);", "FX.word('THE TURN!', _a, '#ffffff', 1.5);");
+rep("FX.word('FINISH!', _a, '#ffffff', 1.4);", "FX.word('HIS LINE IS OPEN!', _a, '#ffffff', 1.2);");
+rep("FX.word('THOOM!', _c, '#ff3b30', 1.7);", "FX.word('KNEEL!', _c, '#ff3b30', 1.7);");
+rep("FX.word('KRA-KOOM!', _a, '#ff3b30', 2.1);", "FX.word('BALANCED!', _a, '#ff3b30', 2.1);");
+
+rep("const DMG = [9, 11, 19];", "const DMG = [14, 17, 19, 22, 34];");
 rep("e.hit(DMG[i] + (pl.rank > 1 ? 1 : 0),", "e.hit((DMG[i] + (pl.rank > 1 ? 2 : 0)) * (1 + pl.meter / T.meter * 0.6),");
-rep("FX.slash(_b, pl.yaw + (i === 1 ? 0.4 : -0.3), i === 1 && path ? path.color : 0xffffff, heavy ? 3.2 : 2.3, (i === 0 ? -0.5 : i === 1 ? 0.45 : 0.08));", "{ const hot = path && pl.meter > 45; FX.slash(_b, pl.yaw + (i === 1 ? 0.4 : -0.3), hot ? path.color : 0xffffff, heavy ? 4.6 : 3.3, (i === 0 ? -0.6 : i === 1 ? 0.55 : 1.45)); if (heavy || hot) FX.slash(_b, pl.yaw + (i === 1 ? 0.2 : -0.15), hot ? path.hot : 0xfff2c4, heavy ? 3.4 : 2.4, (i === 0 ? -0.4 : i === 1 ? 0.35 : 1.3)); }");
-rep("SC.time.hitstop = heavy ? 0.11 : 0.05; SC.cam.shake(heavy ? 0.4 : 0.14); pl.gain(heavy ? 9 : 6);", "SC.time.hitstop = heavy ? 0.17 : 0.085; SC.cam.shake(heavy ? 0.85 : 0.32); pl.gain(heavy ? 12 : 8); if (heavy) { FX.puff(_b, 5, 1.2); SC.audio.sfx('slam'); }");
+rep("FX.slash(_b, pl.yaw + (i === 1 ? 0.4 : -0.3), i === 1 && path ? path.color : 0xffffff, heavy ? 3.2 : 2.3, (i === 0 ? -0.5 : i === 1 ? 0.45 : 0.08));", "if (blunt) { FX.burst(_b, 0xffffff, 1.5); if (i === 2) FX.ring(_b, 0xffd23a, 0.2, 1.6, 0.25); } else { const hot = path && pl.meter > 45; FX.slash(_b, pl.yaw + (i === 1 ? 0.4 : -0.3), hot ? path.color : 0xffffff, heavy ? 4.6 : 3.3, (i === 0 ? -0.6 : i === 1 ? 0.55 : 1.45)); if (heavy || hot) FX.slash(_b, pl.yaw + (i === 1 ? 0.2 : -0.15), hot ? path.hot : 0xfff2c4, heavy ? 3.4 : 2.4, (i === 0 ? -0.4 : i === 1 ? 0.35 : 1.3)); }");
+rep("SC.time.hitstop = heavy ? 0.11 : 0.05; SC.cam.shake(heavy ? 0.4 : 0.14); pl.gain(heavy ? 9 : 6);", "SC.time.hitstop = heavy ? 0.17 : 0.085; SC.cam.shake(heavy ? 0.85 : 0.32); pl.gain(heavy ? 12 : 8); if (heavy) { FX.puff(_b, 5, 1.2); SC.audio.sfx('slam'); }\n      if (pl.t - (pl.cntT || -9) > 2.8) pl.cnt = 0; pl.cnt = (pl.cnt || 0) + 1; pl.cntT = pl.t;\n      if (pl.cnt >= 3 && pl.cnt <= 11) { _c.copy(pl.pos); _c.y += 2.45; FX.word(['THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN', 'ELEVEN!'][pl.cnt - 3], _c, pl.cnt > 8 ? '#ff7a2e' : '#ffffff', 0.62 + pl.cnt * 0.06); }\n      if (pl.cnt >= 11) { pl.cnt = 0; pl.gain(35); SC.slowmo(0.3, 0.6); FX.ring(pl.pos, 0xff5a1f, 0.5, 5.2, 0.5); FX.light(pl.pos, 0xff5a1f, 120, 0.5); for (const e of E) { if (e.hittable() && Math.abs(e.pos.y - pl.pos.y) < 2 && SC.dist2(e.pos.x, e.pos.z, pl.pos.x, pl.pos.z) < 4.6) { const ex = e.pos.x - pl.pos.x, ez = e.pos.z - pl.pos.z, d = Math.hypot(ex, ez) || 1; e.hit(38, ex / d, ez / d, { heavy: true, power: true }); _c.copy(e.pos); _c.y += e.h + 0.4; FX.word('LINE STRUCK!', _c, '#ff5a1f', 1.3); } } }");
 rep("this.vel.x += dx * (o.heavy ? 9 : 3.6) * big; this.vel.z += dz * (o.heavy ? 9 : 3.6) * big;", "this.vel.x += dx * (o.heavy ? 13 : 5.5) * big; this.vel.z += dz * (o.heavy ? 13 : 5.5) * big;");
 rep("FX.burst(_a, 0xffffff, o.heavy ? 1.7 : 1);", "FX.burst(_a, 0xffffff, o.heavy ? 2.4 : 1.5); FX.burst(_a, 0xff5a1f, o.heavy ? 1.6 : 0.9);");
 /* the finisher: two cuts counted aloud, then he goes up and brings the third down */
@@ -176,7 +203,7 @@ between("  function updateFinisher(dt) {", "  pl.update = function (dt, rdt) {",
     else if (st < 0.38) { cut(0, boss ? 'NINE!' : 'ONE!', -0.4, -0.6); pl.pose = P.attack(0, 0.2); pl.poseRate = 70; }
     else if (st < 0.48) { pl.pose = P.attack(1, 0.07); pl.poseRate = 44; }
     else if (st < 0.7) { cut(1, boss ? 'TEN!' : 'TWO!', 0.5, 0.55); pl.pose = P.attack(1, 0.2); pl.poseRate = 70; }
-    else if (st < 1.04) { pl.pose = P.attack(2, 0.12); pl.poseRate = 26; pl.lift = Math.sin((st - 0.7) / 0.34 * Math.PI * 0.5) * 1.0; }
+    else if (st < 1.04) { pl.pose = P.attack(4, 0.12); pl.poseRate = 26; pl.lift = Math.sin((st - 0.7) / 0.34 * Math.PI * 0.5) * 1.0; }
     else {
       if (f.step === 2) {
         f.step = 3; pl.stats.finishers++;
@@ -186,7 +213,7 @@ between("  function updateFinisher(dt) {", "  pl.update = function (dt, rdt) {",
         SC.time.hitstop = 0.26; SC.cam.shake(1.5); SC.audio.sfx('finish'); SC.audio.sfx('slam'); SC.emit('flash', path.css);
         e.finished();
       }
-      pl.pose = P.attack(2, 0.3); pl.poseRate = 80; pl.lift = Math.max(0, pl.lift - dt * 16);
+      pl.pose = P.attack(4, 0.3); pl.poseRate = 80; pl.lift = Math.max(0, pl.lift - dt * 16);
     }
     if (st > 1.6) { pl.lift = 0; combat.freeze = null; pl.setState('idle'); SC.cam.endCine(0.45); SC.emit('letterbox', false); SC.emit('finisherEnd', e); }
   }

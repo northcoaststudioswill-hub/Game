@@ -1,5 +1,15 @@
 # SOOTBORN — changelog
 
+## v0.29.5 · 2026-11-19 — the High Docks: a five-beat chain, the Count in a fight, and words that are ours
+From play notes: the comic pop-ups on hits should say things from the lore, and there should be combos; keep improving the fighting animations and make sure every limb is rigged.
+
+- **Five beats instead of three**, each its own animation using a different limb: the cut (blade, from the shoulder), the backhand (blade, rising), **the ram** (off hand, straight from the hip), **the boot** (knee up, then through him; it knocks ordinary guards down), and the cleave (both hands, from the air).
+- **The Count.** Every swing that lands is tallied over his head: THREE, FOUR ... TEN. Land ELEVEN without a gap of about three seconds and the line is struck: a burst that hits everyone near him, LINE STRUCK over each, and a third of a fury bar. Being hit resets it.
+- **Words on the page are from the story.** Heavy hits: AIR OWED, COUNTED, SOOT, BREATHE; above half fury they change to FOR HER, EVERY BREATH, LAST BELL, HER NAME. THE RAM and THE BOOT name themselves. A late dodge is THE TURN. An enemy open to a finisher is HIS LINE IS OPEN. When a guard lands one he says NOTED, BALANCED, KNEEL or STRUCK. The Warden's slam is KNEEL; Rook's leap is BALANCED.
+- **Rig check.** All ten key poses of the chain were rendered from two sides: shoulders, elbows, hips, knees and the cape all move in every beat.
+
+**Checked** by script: the chain reaches its fifth beat, the count reaches ELEVEN and strikes, guards answer back, no errors. **Not checked:** how it feels to play, and whether five beats with the higher damage make ordinary guards too easy.
+
 ## v0.29.4 · 2026-11-19 — the High Docks: HUD out of the way, suns that work, a blade that lands, and a place that looks like theirs
 From play notes on a phone: the HUD sat in the middle of the action; walking onto the circles did nothing; with finishers in, the finisher and the fighting need to hit like the other fights do ("he's hitting like a sponge"); the place should feel like the Accredited and their society.
 
