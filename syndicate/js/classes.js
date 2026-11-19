@@ -145,7 +145,7 @@
       else if (act === 'ko') { const e = Math.min(1, k * 2.2); body.rotation.z = 1.45 * e; body.position.y = (kind === 'bat' ? 0.9 * (1 - e) : 0) + 0.25 * e; }
       else if (act === 'dodge') { body.rotation.z = Math.sin(k * Math.PI) * 0.4; body.position.y -= 0.1 * Math.sin(k * Math.PI); }
       if (p.hurt > 0) { const h = Math.min(1, p.hurt / 0.28); body.rotation.x -= 0.3 * h; body.position.z -= 0.15 * h; head.rotation.z = 0.3 * h; }
-      const fl = p.flash > 0 ? 0.75 : 0, a = p.alpha == null ? 1 : p.alpha; mats.forEach(m => { m.emissive.copy(m.userData.e); if (fl) m.emissive.setScalar(fl); m.transparent = a < 1; m.opacity = a; });
+      const fl = p.flash > 0 ? Math.min(1, p.flash / 0.09) : 0, a = p.alpha == null ? 1 : p.alpha; mats.forEach(m => { m.emissive.copy(m.userData.e); if (fl) m.emissive.setRGB(m.userData.e.r + 0.085 * fl, m.userData.e.g + 0.06 * fl, m.userData.e.b + 0.04 * fl); m.transparent = a < 1; m.opacity = a; });
     };
     return C;
   };

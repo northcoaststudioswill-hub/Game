@@ -140,7 +140,7 @@
 
   // ------------------------------------------------------------------ transient effects
   function killFx(f) { if (f.obj) { sc.remove(f.obj); f.obj.traverse(o => { if (o.geometry && !o.isSprite) o.geometry.dispose(); if (o.material && o.material.dispose) o.material.dispose(); }); f.obj = null; } }
-  function flashLight(x, y, color, power) { const L = arena.flash; L.position.set(x / S, 1.6, y / S); L.color.set(color); L.intensity = Math.max(L.intensity, power); }
+  function flashLight(x, y, color, power) { const L = arena.flash; L.position.set(x / S, 1.6, y / S); L.color.set(color); L.intensity = Math.max(L.intensity, 7 + Math.sqrt(power) * 1.5); }       // bright enough to read as a hit, never enough to bleach the fighters
   function buildFx(f) {
     const g = f.obj = new T.Group(); sc.add(g);
     const k = f.k, col = f.col;
@@ -880,6 +880,7 @@
       }
     }
     if (e.kx || e.ky) { e.x += e.kx * dt; e.y += e.ky * dt; const f = Math.pow(0.002, dt); e.kx *= f; e.ky *= f; if (Math.abs(e.kx) + Math.abs(e.ky) < 8) e.kx = e.ky = 0;
+      { const sp = Math.hypot(e.kx, e.ky); e.skidT = (e.skidT || 0) - dt; if (sp > 90 && !e.z && e.skidT <= 0 && e.state !== 'ko') { e.skidT = 0.07; const ka = Math.atan2(e.ky, e.kx); for (let si = 0; si < 3; si++) gfx.emit(e.x / S - Math.cos(ka) * 0.2 + rand(-0.15, 0.15), 0.08, e.y / S - Math.sin(ka) * 0.2 + rand(-0.15, 0.15), -Math.cos(ka) * rand(0.3, 1.2), rand(0.4, 1.1), -Math.sin(ka) * rand(0.3, 1.2), rand(0.25, 0.45), '#c9a878', 1); } }       // heels dragging through the sand
       const bx = e.x, by = e.y; clampArena(e);
       if (Math.hypot(e.x - bx, e.y - by) > 0.5 && Math.hypot(e.kx, e.ky) > 110 && phase === 'fight') {       // slammed into the pit wall
         const spiked = !F.ex && SPIKES.some(q => Math.hypot(e.x - q[0], e.y - q[1]) < 48);       // the spike walls: far worse than stone
@@ -955,7 +956,7 @@
     const f = e.foe;
     if (f.state !== 'ko' && e.state !== 'dodge' && e.z < 10) {
       const dx = e.x - f.x, dy = e.y - f.y, d = Math.hypot(dx, dy);
-      const MIN = ER * 2.25; if (d < MIN && d > 0.01) { const want = (MIN - d) / 2, push = d < ER * 1.2 ? want : Math.min(want, 300 * dt); e.x += dx / d * push; e.y += dy / d * push; }
+      const MIN = ER * 2.8;       // room for two shields and two sword arms if (d < MIN && d > 0.01) { const want = (MIN - d) / 2, push = d < ER * 1.2 ? want : Math.min(want, 300 * dt); e.x += dx / d * push; e.y += dy / d * push; }
     }
     clampArena(e);
   }
@@ -1163,7 +1164,7 @@
     syncEntity(P); syncEntity(E);
     projs.forEach(syncProj); zones.forEach(syncZone);
     for (let i = fx.length - 1; i >= 0; i--) { const f = fx[i]; f.t += (f.k === 'slash' || f.k === 'lance' || f.k === 'blast' || f.k === 'trail') ? dtFx : dt; if (f.t < 0) continue; if (!f.obj) buildFx(f); if (f.t >= f.life) { killFx(f); fx.splice(i, 1); } else f.upd(f.t / f.life); }
-    arena.flash.intensity *= Math.pow(0.0005, dt); if (arena.flash.intensity < 0.3) arena.flash.intensity = 0;
+    arena.flash.intensity *= Math.pow(0.00004, Math.max(dt, dtFx || 0)); if (arena.flash.intensity < 0.3) arena.flash.intensity = 0;
     if (F.ex) { gfx.cam.shake = shake / 45; return; }
     arena.setHype(hype / 100);
     for (const g of gibs) { if (g.rest) continue; g.vy -= 20 * dt; g.m.position.x += g.vx * dt; g.m.position.y += g.vy * dt; g.m.position.z += g.vz * dt; g.m.rotation.x += g.rx * dt; g.m.rotation.z += g.rz * dt;

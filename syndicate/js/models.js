@@ -342,7 +342,9 @@
       torso.rotation.set(0, J('ty', q.ty, snap), J('tz', q.tz, snap)); head.rotation.set(J('hx', q.hx, snap), -cur.ty * 0.6, J('hz', q.hz, snap));
       armR.rotation.set(J('arx', q.arx, snap), 0, J('arz', q.arz, snap)); armL.rotation.set(J('alx', q.alx, snap), 0, J('alz', q.alz, snap));
       if (cape) cape.rotation.x = J('cape', q.cape, 0.2);
-      if (robe) robe.rotation.z = mv ? sw * 0.08 : 0;
+      if (robe) { const R = robe.userData, ty = cur.ty || 0, spin = Math.min(1, Math.abs(ty - (R.ty == null ? ty : R.ty)) / Math.max(dtp, 1e-3) / 9); R.ty = ty; R.fl = (R.fl || 0) + (spin - (R.fl || 0)) * Math.min(1, dtp * (spin > (R.fl || 0) ? 18 : 5));
+        const tx = (mv ? -0.16 * (p.mf == null ? 1 : p.mf) : 0) - (cur.bx || 0) * 0.55 + (act === 'dodge' ? -0.25 : 0), tz = (mv ? sw * 0.14 : 0) - (cur.bz || 0) * 0.6 - (p.ms || 0) * (mv ? 0.12 : 0);       // the hem trails the stride, hangs plumb when the body leans, and flares on a fast turn
+        R.x = (R.x || 0) + (tx - (R.x || 0)) * Math.min(1, dtp * 9); R.z = (R.z || 0) + (tz - (R.z || 0)) * Math.min(1, dtp * 9); robe.rotation.x = R.x; robe.rotation.z = R.z; const fl = 1 + R.fl * 0.2; robe.scale.set(fl, 1 - R.fl * 0.05, fl); }
       root.rotation.z = 0; root.rotation.x = 0; root.position.y = p.y || 0;
       { const crouch = Math.max(0, Math.min(1, -cur.by * 3.2)), sitting = act === 'sit' || act === 'kneel';
         if (!sitting && act !== 'dodge') { legL.rotation.x -= crouch * 0.42; legR.rotation.x -= crouch * 0.42; }
@@ -367,7 +369,7 @@
       if (auraM) auraM.forEach((s, i) => { const a = t * 1.5 + i * 1.57; s.position.set(Math.cos(a) * 0.6, 0.35 + i * 0.38 + Math.sin(t * 2 + i) * 0.15, Math.sin(a) * 0.6); });
       // flash + stealth
       const fl2 = p.flash > 0;
-      for (const mt of mats) { if (fl2) mt.emissive.setRGB(0.26, 0.22, 0.18); else mt.emissive.copy(mt.userData.e); }       // a hit lights them up without wiping them out
+      const fk = fl2 ? Math.min(1, p.flash / 0.09) : 0; for (const mt of mats) { if (fl2) { const e0 = mt.userData.e; mt.emissive.setRGB(e0.r + 0.085 * fk, e0.g + 0.06 * fk, e0.b + 0.04 * fk); } else mt.emissive.copy(mt.userData.e); }       // a hit lights them up without wiping them out
       const a = p.alpha == null ? 1 : p.alpha;
       if (a !== lastAlpha) { lastAlpha = a; for (const mt of mats) { mt.transparent = a < 1; mt.opacity = a; mt.needsUpdate = true; } glows.forEach(gl => gl.visible = a > 0.5); root.traverse(o => { if (o.isMesh) o.castShadow = a > 0.5; }); }
     };
