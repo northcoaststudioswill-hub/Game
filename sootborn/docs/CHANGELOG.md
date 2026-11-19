@@ -1,5 +1,14 @@
 # SOOTBORN — changelog
 
+## v0.29.7 · 2026-11-19 — two more third-person levels have their places held
+From play notes: two more stretches of play like the High Docks are wanted, in different places at different points of the story; a placeholder is fine for now while the second half is refined.
+
+- **Riser Nine** (+5, chapter 2) and **The Stair** (+9, chapter 5) are wired as third-person levels that do not exist yet. Each plays its existing 2D fight until its level is built, and remembers which one you played so the scenes after can differ, the way chapter 4 already does for the docks.
+- Both are listed under Dev menu → Levels in 3D as PLANNED.
+- The story bible has a map of Part Two (every scene, fight and playable stretch in order) and a note on what each of the two levels would be. These two are my proposal, not a decision; moving a slot is a one-line change.
+
+Nothing else changed in this version.
+
 ## v0.29.6 · 2026-11-19 — the High Docks: steadier ground, and what leads in and out of it
 From play notes: some glitchy ground textures; tighten it up, then work out how it fits the game, the lore and the story, and build what leads in and out; then keep polishing, the new sections most.
 

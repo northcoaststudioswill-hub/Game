@@ -346,3 +346,24 @@ If Kael met Wren on the Island, he spends the week after the docks believing she
 - **The Lamp** (night 28): find who is selling the House's watch; Corin Ashby; a 2D duel in the rain and a choice.
 - **On the Ground:** Kael finishes Proctor Voss on foot in 2D and takes the boots, the Proctors' seal, the note of debts, and the white cloak.
 
+## Part Two as it stands, and where the third-person levels go (v0.29.7)
+What is in each chapter now, in order. "3D fight" is the arena fighter; "level" is something you walk through.
+
+| Ch | When | Scenes | Play |
+|---|---|---|---|
+| 1 The Post | +4 | The Spire; the Clerk's desk; the Count and Seren's line; Wren at the desk; Lucan asks to be taught; Maren | 3D fight: the Gallery (Tyr Cade) |
+| 2 The Balancing | +5 | The Tier Four order (sign or lose it); Dace's letter; Cade at the desk; Maren and the forty | 2D level: the Count hall (if he loses the order). 2D level: the Sun (Tavi, below). **Riser Nine: 2D/3D fight now, third-person level planned** |
+| 3 What She Knows | +6 to +7 | The hum; Celestine's offer; Lucan on the keep; Freight Three; the dock stair | 3D fight: the Son. **Third-person level: the High Docks** |
+| 4 Two Years | +7 to +9 | Brand; the week he blames Wren; Maren's note; the low point; the weather; Tavi comes up; Wren at the rail | 2D fight: the Dock Stair (you are Brand). 2D fight: Tier Six Stands (you are Mara). 3D fight: the Fall |
+| 5 The Count | +9 | The words before the stair; Maren at the white door; Celestine; the choice; Lift Zero open; Row K | **The Stair: 3D fight now, third-person level planned.** 3D fight: Little Ember (Celestine) |
+
+**The two planned levels (a proposal).**
+- **Riser Nine** (+5). The Assay valley at night in rain: pines, the pump house, the riser's hatch glowing in the grass. Kael in a mask, alone, holding the top of the riser while forty people from Tier Four come up behind him. No barges, no stone: mud, lamplight, Wardens coming down the hill. It would be the first time he fights for people instead of against a rival, and the reason Cade starts looking at "everyone who has done it before". Boss: a Warden captain.
+- **The Stair** (+9). The nine hundred steps up the outside of the Spire at sunset, a barge burning on the terrace below, the Unlit behind him and Tavi on his left. The same stair Brand died at the foot of, climbed the other way. Ends at the white door, where Maren is. Boss: the Auditor's Blade.
+- Both use the High Docks engine: the same chain, the Count, memories at the things he finds, memory cut-ins on ELEVEN and finishers. What changes is the place, the people in it, and what he remembers there.
+
+**Thin places in the second half** (candidates for more scenes or play, not yet decided).
+- Chapter 1 has one fight and no level. The Spire itself is never walked.
+- Between the Fall and the Stair there is no quiet scene with the Unlit as an army.
+- Chapter 4 is mostly told. The two years in the weather could hold a level of its own (flying or boarding a barge).
+- Lucan disappears after chapter 3 unless he was befriended.

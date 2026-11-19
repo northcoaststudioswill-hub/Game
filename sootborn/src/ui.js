@@ -235,7 +235,9 @@ const Menus = {
         ['★ NEW · Below, +5 · The Sun (you play Tavi)', () => { fresh(); Mission.start('sun'); }]
       ],
       'Levels in 3D (comic)': [
-        ['★ NEW · +7 · The High Docks (third person; Captain Rook)', () => { fresh(); G.mode = 'cut'; Issue.start('docks', ok => { if (!ok) HUD.toast('Could not start the 3D level on this device.'); Game.toTitle(); }); }]
+        ['★ NEW · +7 · The High Docks (third person; Captain Rook)', () => { fresh(); G.mode = 'cut'; Issue.start('docks', ok => { if (!ok) HUD.toast('Could not start the 3D level on this device.'); Game.toTitle(); }); }],
+        ['PLANNED · +5 · Riser Nine (the valley at night; plays the 2D fight for now)', () => { fresh(); G.mode = 'cut'; Cutscene.play([{ issue: 'riser', or: [{ brawl: () => FF.riser() }] }], () => Game.toTitle()); }],
+        ['PLANNED · +9 · The Stair (nine hundred steps; plays the 2D fight for now)', () => { fresh(); G.mode = 'cut'; Cutscene.play([{ issue: 'stair', or: [{ brawl: () => FF.stair() }] }], () => Game.toTitle()); }]
       ],
       'Story beats': [
         ['Opening film', () => { UI.clear(); Sound.tname = null; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => Game.toTitle()); G.mode = 'opening'; }],

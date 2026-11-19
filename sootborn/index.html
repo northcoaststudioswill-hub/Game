@@ -5402,7 +5402,7 @@ const P2 = {
     { music: 'mystery' }, { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
     { say: 'dace', t: 'There is a riser under Tier Four that comes up in your valley. Nine floors, Kael. If somebody held the top of it for an hour.' },
     { fade: 'out' }, { panel: null },
-    { brawl: () => FF.riser() },
+    { issue: 'riser', or: [{ brawl: () => FF.riser() }] },
     { music: 'spire' }, { panel: 'desk' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'Marshal Cade came to my desk the next morning. He did not sit.' },
     { say: 'cade', t: 'Forty lines short, Sorrel. Tier Four balanced at one thousand and sixty. Somebody held a riser against three of my Wardens. In a mask.' },
@@ -5588,7 +5588,7 @@ const P2 = {
     { say: 'kael', t: "She'd have written it." },
     { say: 'tavi', t: "I'm on your left the whole way up. Don't argue. I've flown a barge." },
     { fade: 'out' }, { panel: null },
-    { brawl: () => FF.stair() },
+    { issue: 'stair', or: [{ brawl: () => FF.stair() }] },
     { music: 'spire' }, { panel: 'spire' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'At the top of the nine hundred steps there was one clerk in front of the white door, with a pen in her hand and no blade.' },
     { say: 'maren', t: 'Brennick. That is the name, is it not. I read it in a sealed book, and then I sold you a stair for it.' },
@@ -5636,7 +5636,7 @@ const P2 = {
   ]
 };
 const P2_TITLES = { 1: 'The Post', 2: 'The Balancing', 3: 'What She Knows', 4: 'Two Years', 5: 'The Count' };
-const P2KEYS = ['lucanFriend', 'signedFour', 'liedToHer', 'ending', 'marenKind', 'marenDoor', 'wrenMet', 'wrenClose', 'wrenAsk', 'fury', 'rays', 'ranForHer', 'issue_docks'];
+const P2KEYS = ['lucanFriend', 'signedFour', 'liedToHer', 'ending', 'marenKind', 'marenDoor', 'wrenMet', 'wrenClose', 'wrenAsk', 'fury', 'rays', 'ranForHer', 'issue_docks', 'issue_riser', 'issue_stair'];
 function p2Save() { try { const o = {}; for (const k of P2KEYS) if (G.flags[k] !== undefined) o[k] = G.flags[k]; Store.set('sootborn_p2f', JSON.stringify(o)); if (G.tendency) Store.set('sootborn_tend', G.tendency); } catch (e) { } }
 function p2Load() { try { G.flags = G.flags || {}; const o = JSON.parse(Store.get('sootborn_p2f') || '{}'); for (const k of P2KEYS) if (G.flags[k] === undefined && o[k] !== undefined) G.flags[k] = o[k]; if (!G.tendency && Store.get('sootborn_tend')) G.tendency = Store.get('sootborn_tend'); } catch (e) { } }
 function playPart2(n) { p2Load(); Store.set('sootborn_p2', String(n)); UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(P2[n](), () => afterPart2(n)); }
@@ -6350,7 +6350,9 @@ const Menus = {
         ['★ NEW · Below, +5 · The Sun (you play Tavi)', () => { fresh(); Mission.start('sun'); }]
       ],
       'Levels in 3D (comic)': [
-        ['★ NEW · +7 · The High Docks (third person; Captain Rook)', () => { fresh(); G.mode = 'cut'; Issue.start('docks', ok => { if (!ok) HUD.toast('Could not start the 3D level on this device.'); Game.toTitle(); }); }]
+        ['★ NEW · +7 · The High Docks (third person; Captain Rook)', () => { fresh(); G.mode = 'cut'; Issue.start('docks', ok => { if (!ok) HUD.toast('Could not start the 3D level on this device.'); Game.toTitle(); }); }],
+        ['PLANNED · +5 · Riser Nine (the valley at night; plays the 2D fight for now)', () => { fresh(); G.mode = 'cut'; Cutscene.play([{ issue: 'riser', or: [{ brawl: () => FF.riser() }] }], () => Game.toTitle()); }],
+        ['PLANNED · +9 · The Stair (nine hundred steps; plays the 2D fight for now)', () => { fresh(); G.mode = 'cut'; Cutscene.play([{ issue: 'stair', or: [{ brawl: () => FF.stair() }] }], () => Game.toTitle()); }]
       ],
       'Story beats': [
         ['Opening film', () => { UI.clear(); Sound.tname = null; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => Game.toTitle()); G.mode = 'opening'; }],
