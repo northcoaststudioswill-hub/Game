@@ -109,6 +109,18 @@
   };
   if (G.objective) { const ob0 = G.objective; G.objective = function () { const s = ob0.apply(this, arguments), st = G.state; return st && st.exh && st.exh.told && s && !/calling you over/.test(s) ? s + ' · an exhibition bout is waiting at the Blood Pit' : s; }; }
 
+  // ------------------------------------------------------------ the fallen: every name you have put in the sand, kept by the Guildmaster
+  const fallen = st => { if (!st.fallen) { st.fallen = []; G.OPPONENTS.forEach(o => { if (st.wins[o.id] && !(st.before || {})[o.id]) st.fallen.push({ n: o.name, t: o.title }); }); } return st.fallen; };
+  const resF = ui.results;
+  ui.results = function (r) { const st = G.state; if (r && r.win && r.opp && !r.opp.spar && !r._fl && st.hero) { r._fl = 1; const f = fallen(st); f.push({ n: r.opp.name, t: r.opp.title, c: r.opp.cls, l: st.hero.level }); if (f.length > 500) f.splice(0, f.length - 500); G.save(); } return resF.apply(this, arguments); };
+  ui.fallen = function () {
+    const st = G.state, f = fallen(st);
+    show('<div class="card"><small class="over">Kept by the Ledger-Keeper</small><h2>The Fallen</h2><p class="dim">' + (f.length ? '<b>' + f.length + '</b> name' + (f.length === 1 ? '' : 's') + ' ruled through in red, with yours in the margin beside each one.' : 'The margin beside your name is empty. The Keeper has left room.') + '</p>' +
+      '<div class="fallen">' + f.slice().reverse().map((q, i) => '<div><i>' + (f.length - i) + '</i><b>' + q.n + '</b><small>' + (q.t || '') + (q.l ? ' · when you were level ' + q.l : '') + '</small></div>').join('') + '</div><div class="row end"><button class="big" id="x">Back</button></div></div>');
+    on('#x', () => (ui.sheet ? ui.sheet() : ui.close()));
+  };
+  if (ui.sheet) { const sh0 = ui.sheet; ui.sheet = function () { const r = sh0.apply(this, arguments), end = document.querySelector('#panel .row.end'); if (end && G.scene !== 'fight') { const b = document.createElement('button'); b.textContent = 'The Fallen (' + fallen(G.state).length + ')'; b.onclick = () => { G.sfx('page'); ui.fallen(); }; end.insertBefore(b, end.firstChild); } return r; }; }
+
   // ------------------------------------------------------------ the four new names, and what people know about them
   Object.assign(G.BIOS, {
     dolly: 'Dolly Two-Teeth ran the scrap heap behind the smelters until the Guild bought the heap and found she came with it. Her armour is made of other people’s: a pauldron here, a greave there, each one from somebody who underestimated her reach. She keeps the two teeth in a tin and will show you if you ask politely.',

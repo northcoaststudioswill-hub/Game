@@ -17,7 +17,8 @@
   const TAUNT = ['They told me you were new. So am I. One of us stops being new tonight.', 'I owe less than you do. I checked.', 'The Keeper said win two and they will feed me. So.', 'Do not take it personal. I have a landlord.', 'My brother fought here. Ask the sand where he is.', 'I am only on the undercard until somebody notices me. Notice me.', 'You hit me, I hit you, the crowd throws coin. Simple trade.', 'I have been practising on rats. Big ones.', 'Somebody bet a week’s wages on me. I think it was me.', 'After you, the Guild says I get a real name on the board.'];
   const PAL = [['#5b4a2a', '#4a4031'], ['#3a4a3a', '#3a3a30'], ['#4a3a4a', '#35303a'], ['#5a3a2a', '#40342c'], ['#2f4450', '#333a40'], ['#55452f', '#3d362c']];
   const cache = {};
-  function make(t, k) {
+  function make(t, k, low) {
+    if (low) { const b = make(t, k), key2 = 'L' + t + '_' + k; G.BIOS['l' + t + '_' + k] = b.name + ' fights on the lower card: the bouts under a name that is already in the sand. There is always somebody. The Guild sees to that.'; return cache[key2] || (cache[key2] = Object.assign({}, b, { id: 'l' + t + '_' + k, level: Math.max(1, GATES[t].level - 1), extra: true, low: 1, title: 'on the lower card', xp: Math.round(GATES[t].xp * 0.45 * 0.5), coin: Math.round(GATES[t].coin * 0.4 * 0.5), respect: Math.max(1, Math.round(GATES[t].respect0 * 0.12 * 0.4)) })); }
     const key = t + '_' + k + (k >= NEED[t] && G.state && G.state.hero ? '_' + G.state.hero.level : ''); if (cache[key]) return cache[key];
     const g = GATES[t], r = rng(t * 4099 + k * 131 + 7), pick = a => a[Math.floor(r() * a.length)], cls = pick(G.FOE_CLASSES || ['fighter', 'rogue', 'sorcerer', 'cleric']), C = G.CLASSES[cls], extra = k >= NEED[t], kk = Math.min(k, 4);
     const sub = t >= 6 ? pick(Object.keys(C.subs)) : null, known = C.start.slice(0, 2).concat(t >= 2 ? [C.l2[Math.floor(r() * C.l2.length)]] : [], sub ? [C.subs[sub].ability] : []).filter(id => G.ABILITIES[id]);
@@ -50,7 +51,7 @@
       }
       byId[o.id] = o;
       h += row(o, (open ? '' : 'locked') + (o.boss ? ' boss' : '') + (wins ? ' beaten' : '') + (open && !wins ? ' cur' : ''), who(o) + '</small>' + (wins ? '<em class="taunt">' + ((st.before || {})[o.id] ? 'Somebody else got there first. The sand does not keep names.' : 'Carried out by the gate-men. The Keeper drew one line through the name, with a ruler.') + '</em>' : (open ? '<em class="taunt">“' + o.taunt + '”</em>' : '') + rew(o, wins)),
-        wins ? '<span class="lock dead">' + ((st.before || {})[o.id] ? 'Gone before you' : 'Dead') + '</span>' : open ? '<button class="big" data-fight="' + t + '">Fight</button>' : '<span class="lock">' + (reach ? 'Undercard first' : 'Sealed') + '</span>');
+        wins ? '<span class="lock dead">' + ((st.before || {})[o.id] ? 'Gone before you' : 'Dead') + '</span><button class="mini" data-low="' + t + '" title="A fresh nobody from this tier, for a small purse">Lower card</button>' : open ? '<button class="big" data-fight="' + t + '">Fight</button>' : '<span class="lock">' + (reach ? 'Undercard first' : 'Sealed') + '</span>');
     });
     if (now < 0) G.OPPONENTS.forEach((o, i) => { if (i < BASE || i < G.OPPONENTS.length - 3) return; const wins = st.wins[o.id] || 0; byId[o.id] = o;
       h += row(o, (o.elite ? 'boss' : '') + (wins ? ' beaten' : ' cur'), who(o) + '</small>' + (wins ? '<em class="taunt">Came for the crown. Stayed in the sand.</em>' : '<em class="taunt">“' + o.taunt + '”</em>' + rew(o, wins)), wins ? '<span class="lock dead">Dead</span>' : '<button class="big" data-fight="' + i + '">Fight</button>'); });
@@ -60,6 +61,7 @@
     on('#x', () => ui.close());
     on('[data-fight]', el => ui.prefight(G.OPPONENTS[+el.dataset.fight]));
     on('[data-under]', el => ui.prefight(make(+el.dataset.under, u[+el.dataset.under])));
+    on('[data-low]', el => { const t = +el.dataset.low, lw = st.low || (st.low = {}); ui.prefight(make(t, NEED[t] + 40 + (lw[t] || 0), 1)); });
     const cur = document.querySelectorAll('#panel .opp.cur'), last = cur[cur.length - 1]; if (last && last.scrollIntoView) last.scrollIntoView({ block: 'center' });
   };
   // challengers after the crown teach you something too
@@ -68,6 +70,7 @@
   const res0 = ui.results;
   ui.results = function (r) {
     const st = G.state;
+    if (r && r.win && r.opp && r.opp.low && !r._uc) { r._uc = 1; const lw = st.low || (st.low = {}); lw[r.opp.under] = (lw[r.opp.under] || 0) + 1; G.save(); }
     if (r && r.win && r.opp && r.opp.under != null && !r._uc) { r._uc = 1; const t = r.opp.under, u = U(st); u[t]++; G.save();
       if (u[t] === NEED[t] && !st.wins[GATES[t].id]) setTimeout(() => ui.toast('The Ledger-Keeper writes your name against ' + GATES[t].name + '.'), 900); }
     return res0.apply(this, arguments);

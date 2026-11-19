@@ -196,7 +196,7 @@
     const mix = G.lerp, eo = x => 1 - Math.pow(1 - x, 3), ei = x => x * x;
     const restL = cls === 'fighter' ? -0.9 : cls === 'rogue' || cls === 'sorcerer' ? -0.5 : 0.05;
     const FAM = { axe: 'heavy', hammer: 'heavy', pick: 'heavy', spear: 'pole', halberd: 'pole', staff: 'pole', rapier: 'fence', axes: 'dual', chain: 'swing', flail: 'swing', frost: 'orb', spark: 'orb', acid: 'orb' }[arm] || (cls === 'rogue' ? 'dual' : cls === 'sorcerer' ? 'orb' : '');
-    let side = 1, prevHurt = 0;
+    let side = 1, prevHurt = 0, spinNow = 0;
     // pose: {moving, walk, act:'idle|swing|cast|stun|dodge|ko', prog, step (combo step), hurt, guard, flash, alpha, t, glow}
     C.pose = function (p) {
       const t = p.t || 0, act = p.act || 'idle', mv = p.moving && act !== 'ko' && act !== 'dodge';
@@ -285,7 +285,8 @@
       if (p.hurt > 0 && !(prevHurt > 0)) side = -side; prevHurt = p.hurt || 0;
       if (p.hurt > 0 && p.guard) { const h = Math.min(1, p.hurt / 0.28); q.bx -= 0.16 * h; q.by -= 0.1 * h; q.bpz -= 0.16 * h; q.alx += 0.3 * h; q.arx += 0.2 * h; q.tz += 0.08 * h * side; q.ll = 0.3; q.lr = -0.4; snap = Math.max(snap, 0.7); }      // caught on the guard: driven back, not opened up
       else if (p.hurt > 0) { const h = Math.min(1, p.hurt / 0.28); q.tz += (side - 1) * 0.28 * h; q.hz = side * 0.25 * h; q.ll += 0.2 * h; q.lr -= 0.3 * h; q.bx -= 0.6 * h; q.tz += 0.28 * h; q.hx = -0.5 * h; q.by -= 0.05 * h; q.arx += 0.55 * h; q.alx += 0.65 * h; q.bpz -= 0.1 * h; snap = Math.max(snap, 0.7); }
-      body.position.y = J('by', q.by, snap); body.position.z = J('bpz', q.bpz, snap); body.rotation.set(J('bx', q.bx, snap), q.spin || 0, J('bz', q.bz, snap));
+      body.position.y = J('by', q.by, snap); body.position.z = J('bpz', q.bpz, snap); if (q.spin != null) spinNow = q.spin; else if (spinNow) { spinNow = Math.atan2(Math.sin(spinNow), Math.cos(spinNow)) * 0.55; if (Math.abs(spinNow) < 0.02) spinNow = 0; }
+      body.rotation.set(J('bx', q.bx, snap), spinNow, J('bz', q.bz, snap));
       legL.rotation.x = J('ll', q.ll, snap); legR.rotation.x = J('lr', q.lr, snap);
       torso.rotation.set(0, J('ty', q.ty, snap), J('tz', q.tz, snap)); head.rotation.set(J('hx', q.hx, snap), -cur.ty * 0.6, J('hz', q.hz, snap));
       armR.rotation.set(J('arx', q.arx, snap), 0, J('arz', q.arz, snap)); armL.rotation.set(J('alx', q.alx, snap), 0, J('alz', q.alz, snap));

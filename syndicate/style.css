@@ -638,3 +638,8 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .row.bst.watch { margin-top: 0.35rem; align-items: center; gap: 0.6rem; } .row.bst.watch small { color: #b8ad98; font-size: 0.72rem; }
 .opp.exh { border-color: #6ad0ff; box-shadow: 0 0 0.8rem rgba(106, 208, 255, 0.25); } .opp.exh .taunt { color: #a8dcf0; }
 .pausecard .choices button.danger b { color: #ff9a8f; }
+
+.fallen { max-height: 50vh; overflow-y: auto; margin: 0.4rem 0; border-top: 1px solid rgba(201, 160, 64, 0.25); }
+.fallen div { display: flex; align-items: baseline; gap: 0.6rem; padding: 0.3rem 0.2rem; border-bottom: 1px solid rgba(201, 160, 64, 0.12); }
+.fallen i { width: 2.2rem; text-align: right; color: #9a8f7a; font-style: normal; font-size: 0.75rem; } .fallen b { color: #e8a09a; text-decoration: line-through; text-decoration-color: #b03020; } .fallen small { color: #b8ad98; font-size: 0.74rem; }
+.opp button.mini[data-low] { margin-left: 0.5rem; }

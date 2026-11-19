@@ -337,3 +337,11 @@ The Fence, Marc, the Apothecary, Big Hobb, the charm seller, Whisper and the Bus
 - **Exhibitions.** After a real bout somebody may find you in the market with an offer: a bout to the yield, for respect, coin or XP. Eight kinds. Nobody dies and nothing goes in the Ledger.
 - Market names are back on at all times, small from a distance and full size up close. Shut shops are shown with a lock and still turn you away with a line.
 - Dice-roll results are readable now. New lore in the codex and new things for the townsfolk to say.
+
+## Latest pass: the pit joins in
+
+- **Spike walls.** The four racks on the pit walls now point into the sand. Knock someone into one and they are impaled: more damage and a longer stagger than bare stone. It works on you too.
+- **The pit itself.** Now and then somebody in the stands throws a bottle, or a floor grate vents fire. Both are telegraphed by a ring on the ground, both can be dodged, and neither can land the killing blow. Rowdiest on the low cards, rare near the top, never on the Long Stair.
+- **Bodies keep their distance.** Fighters hold a shoulder's width apart and ease out of each other instead of popping; lunges stop at contact; an interrupted spin unwinds instead of snapping.
+- **The lower cards never close.** Every name you have killed leaves a "Lower card" button: a fresh fighter from that tier, at that tier's level, for a small purse.
+- **The Fallen.** The Guildmaster keeps a tally of every name you have put in the sand, newest first.

@@ -12,6 +12,7 @@
     const k = (Math.abs(o.x) + Math.abs(o.y)) / RAD;
     if (k > 1.5) { const f = 1.5 / k; o.x *= f; o.y *= f; }
   }
+  const SPIKES = [[-RAD, 2.6 * S], [-RAD, -2.6 * S], [2.6 * S, -RAD], [-2.6 * S, -RAD]], GRATES = [[5 * S, 0], [-5 * S, 0], [0, 5 * S], [0, -5 * S]];
   const inArena = (x, y, m) => Math.abs(x) < RAD + m && Math.abs(y) < RAD + m && Math.abs(x) + Math.abs(y) < 1.5 * RAD + m * 1.4;
 
   function makeEntity(h, d, look, isPlayer) {
@@ -27,7 +28,7 @@
     };
   }
 
-  F.start = function (o) {
+  F.start = function (o) { hazT = 0; haz.length = 0;
     opp = o; const st = G.state, h = st.hero;
     arena = G.world.get('arena'); sc = arena.scene; gfx.setScene(sc);
     if (F.P) [F.P, F.E].forEach(e => { if (e.vis) { sc.remove(e.vis.g); if (e.vis.tele) sc.remove(e.vis.tele); } });
@@ -697,8 +698,10 @@
     if (e.kx || e.ky) { e.x += e.kx * dt; e.y += e.ky * dt; const f = Math.pow(0.002, dt); e.kx *= f; e.ky *= f; if (Math.abs(e.kx) + Math.abs(e.ky) < 8) e.kx = e.ky = 0;
       const bx = e.x, by = e.y; clampArena(e);
       if (Math.hypot(e.x - bx, e.y - by) > 0.5 && Math.hypot(e.kx, e.ky) > 110 && phase === 'fight') {       // slammed into the pit wall
-        const wd = 5 + (e.kBy ? e.kBy.level * 2 : 4); e.hp -= wd; e.kx = e.ky = 0; e.st.stun = { t: 0.4 }; interrupt(e); e.flash = 0.12; e.hurt = 0.3;
-        text(e, 'WALL ' + wd, '#ffb070', true); spark(e.x, e.y, 30, '#c8b8a0', 14, 220); shake = Math.max(shake, 9); G.sfx('wall'); if (e.kBy && e.kBy.isPlayer) addHype(10);
+        const spiked = !F.ex && SPIKES.some(q => Math.hypot(e.x - q[0], e.y - q[1]) < 30);       // the spike walls: far worse than stone
+        const wd = Math.round((5 + (e.kBy ? e.kBy.level * 2 : 4)) * (spiked ? 1.8 : 1)); e.hp -= wd; e.kx = e.ky = 0; e.st.stun = { t: spiked ? 0.95 : 0.4 }; interrupt(e); e.flash = 0.12; e.hurt = 0.3;
+        if (spiked) { blood(e.x, e.y, 46, Math.atan2(-e.y, -e.x)); if (gore()) for (let si = 0; si < 3; si++) gfx.splat(e.x / S + rand(-0.7, 0.7), e.y / S + rand(-0.7, 0.7), rand(0.5, 1)); hitstop = Math.max(hitstop, 0.14); G.sfx('crit'); if (e.kBy && e.kBy.isPlayer) addHype(12); }
+        text(e, (spiked ? 'IMPALED ' : 'WALL ') + wd, spiked ? '#ff3020' : '#ffb070', true); spark(e.x, e.y, 30, '#c8b8a0', 14, 220); shake = Math.max(shake, 9); G.sfx('wall'); if (e.kBy && e.kBy.isPlayer) addHype(10);
         if (e.hp <= 0) { ko(e); return; }
       }
     }
@@ -721,7 +724,7 @@
       const pr = 1 - Math.max(0, e.t) / (ab.wind || 0.01);
       if (ab.lunge) {
         const d = Math.hypot(e.foe.x - e.x, e.foe.y - e.y);
-        if (d > 38) { const v = ab.lunge / ab.wind * spd; e.x += Math.cos(e.act.aim) * v * dt; e.y += Math.sin(e.act.aim) * v * dt; }
+        if (d > 46) { const v = ab.lunge / ab.wind * spd; e.x += Math.cos(e.act.aim) * v * dt; e.y += Math.sin(e.act.aim) * v * dt; }
       } else if (ab.leap) {
         e.x = G.lerp(e.act.sx, e.act.pt.x, pr); e.y = G.lerp(e.act.sy, e.act.pt.y, pr); e.z = Math.sin(pr * Math.PI) * 70; e.iframe = Math.max(e.iframe, 0.05);
       } else mv = e.C.ranged ? 0.45 : 0.25;
@@ -768,7 +771,7 @@
     const f = e.foe;
     if (f.state !== 'ko' && e.state !== 'dodge' && e.z < 10) {
       const dx = e.x - f.x, dy = e.y - f.y, d = Math.hypot(dx, dy);
-      if (d < ER * 1.7 && d > 0.01) { const push = (ER * 1.7 - d) / 2; e.x += dx / d * push; e.y += dy / d * push; }
+      const MIN = ER * 2.25; if (d < MIN && d > 0.01) { const want = (MIN - d) / 2, push = d < ER * 1.2 ? want : Math.min(want, 300 * dt); e.x += dx / d * push; e.y += dy / d * push; }
     }
     clampArena(e);
   }
@@ -884,6 +887,27 @@
   }
 
   // ------------------------------------------------------------------ main update
+  // ---- the pit joins in: a bottle from the stands, a vent in the floor. Rare, telegraphed, and never the thing that kills you.
+  let hazT = 0, haz = [];
+  const rowdy = () => { const t = opp.under != null ? opp.under : Math.max(0, G.OPPONENTS.findIndex(q => q.id === opp.id)); return opp.ascent != null || opp.id === 'mark' ? 0 : t <= 2 ? 1 : t <= 5 ? 0.6 : 0.35; };
+  function hazards(dt) {
+    if (phase !== 'fight' || F.ex) { haz.length = 0; return; }
+    const rw = rowdy(); if (!rw) return;
+    if (hazT <= 0) hazT = rand(13, 19) / rw; hazT -= dt;
+    if (hazT <= 0 && time > 6) {
+      const tg = Math.random() < 0.5 ? P : E;
+      if (Math.random() < 0.55) { const x = tg.x + (tg.vx || 0) * 0.5 + rand(-20, 20), y = tg.y + (tg.vy || 0) * 0.5 + rand(-20, 20), a = rand(Math.PI, Math.PI * 1.5); haz.push({ k: 'bottle', x, y, r: 44, t: 0, delay: 1.0 }); fx.push({ k: 'lob', x1: Math.cos(a) * RAD * 1.5, y1: Math.sin(a) * RAD * 1.5, x2: x, y2: y, col: '#9ad0a0', t: 0, life: 1.0 }); }
+      else { const g = GRATES.slice().sort((p, q) => Math.hypot(tg.x - p[0], tg.y - p[1]) - Math.hypot(tg.x - q[0], tg.y - q[1]))[0]; haz.push({ k: 'vent', x: g[0], y: g[1], r: 62, t: 0, delay: 1.4 }); G.sfx('fire'); }
+    }
+    for (let i = haz.length - 1; i >= 0; i--) { const h = haz[i], t0 = h.t; h.t += dt;
+      if (Math.floor(t0 / 0.3) !== Math.floor(h.t / 0.3) && h.t < h.delay) fx.push({ k: 'ring', x: h.x, y: h.y, r: h.r, col: h.k === 'vent' ? '#ff8a2a' : '#ffe9a0', t: 0, life: 0.3 });
+      if (h.k === 'vent' && h.t < h.delay && Math.random() < 0.7) gfx.emit(h.x / S + rand(-0.4, 0.4), 0.05, h.y / S + rand(-0.4, 0.4), 0, rand(1, 3), 0, 0.4, '#ff8a2a', -1);
+      if (h.t < h.delay) continue; haz.splice(i, 1);
+      if (h.k === 'vent') { fx.push({ k: 'blast', x: h.x, y: h.y, r: h.r, col: '#ff8a2a', t: 0, life: 0.5 }); for (let fi = 0; fi < 18; fi++) { const fa = rand(0, 6.28), fr = rand(0, h.r / S); gfx.emit(h.x / S + Math.cos(fa) * fr, 0.2, h.y / S + Math.sin(fa) * fr, 0, rand(3, 8), 0, rand(0.5, 1), fi % 2 ? '#ff8a2a' : '#ffd060', -1); } G.sfx('boom'); flashLight(h.x, h.y, '#ff8a2a', 60); mark(h.x, h.y, 1.6, 'scorch'); }
+      else { spark(h.x, h.y, 14, '#9ad0a0', 12, 160); G.sfx('clang'); }
+      [P, E].forEach(e => { if (e.state === 'ko' || e.iframe > 0 || e.z > 30 || Math.hypot(e.x - h.x, e.y - h.y) > h.r + ER * 0.5) return; const d = Math.max(1, Math.round(e.maxHp * (h.k === 'vent' ? 0.07 : 0.04))), was = e.hp; e.hp = Math.max(1, e.hp - d); e.flash = 0.1; e.hurt = 0.3; if (h.k === 'vent') { const a = Math.atan2(e.y - h.y, e.x - h.x); e.kx = Math.cos(a) * 150; e.ky = Math.sin(a) * 150; e.kBy = null; } text(e, (h.k === 'vent' ? 'SCORCHED ' : 'BOTTLE ') + (was - e.hp), h.k === 'vent' ? '#ff8a2a' : '#cfe8d0', false); });
+    }
+  }
   let dtFx = 0;
   F.update = function (rdt) {
     if (!F.active) return;
@@ -923,6 +947,7 @@
       if (projs[i] !== p) break;                 // the list was cleared mid-loop (a killing blow)
       if (dead) { if (p.m) sc.remove(p.m); projs.splice(i, 1); }
     }
+    hazards(dt);
     for (let i = zones.length - 1; i >= 0; i--) {
       const z = zones[i]; if (!z) break;
       if (z.ab.trap && !z.sprung) {                          // a trap waits for a foot

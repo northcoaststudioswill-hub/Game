@@ -110,8 +110,8 @@
     }
     [[-AR - 0.2, 2.6, 1.57], [-AR - 0.2, -2.6, 1.57], [2.6, -AR - 0.2, 0], [-2.6, -AR - 0.2, 0]].forEach(q => {
       const g = new T.Group(); g.position.set(q[0] + (q[2] ? 0.72 : 0), 0, q[1] + (q[2] ? 0 : 0.72)); g.rotation.y = q[2]; s.add(g);
-      box(1.5, 0.08, 0.12, ironM, 0, 1.5, 0, g); box(1.5, 0.08, 0.12, ironM, 0, 0.6, 0, g);
-      [-0.5, -0.17, 0.17, 0.5].forEach((x, k) => { box(0.07, 1.3, 0.03, steelM, x, 1.05, 0.05, g); if (k % 2) mesh(new T.ConeGeometry(0.1, 0.25, 4), steelM, x, 1.82, 0.05, g); });
+      box(1.7, 1.5, 0.14, ironM, 0, 1.05, -0.02, g); box(1.8, 0.1, 0.2, steelM, 0, 1.82, 0, g); box(1.8, 0.1, 0.2, steelM, 0, 0.28, 0, g);
+      for (let r = 0; r < 3; r++) for (let k = 0; k < 4; k++) { const sp = mesh(new T.ConeGeometry(0.075, 0.95, 5), steelM, -0.6 + k * 0.4 + (r % 2) * 0.1, 0.6 + r * 0.45, 0.5, g); sp.rotation.x = Math.PI / 2; }       // points toward the sand
     });
     [[5, 0], [-5, 0], [0, 5], [0, -5]].forEach(q => { const gr = box(0.9, 0.02, 0.9, new T.MeshBasicMaterial({ color: 0x08060a }), q[0], 0.012, q[1], s); gr.castShadow = false; for (let k = -1; k <= 1; k++) box(0.9, 0.03, 0.06, ironM, q[0], 0.02, q[1] + k * 0.28, s); });
     // crowd
