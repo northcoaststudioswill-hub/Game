@@ -30,7 +30,7 @@ FF.voss2d = () => ({ era: 3, d2: 1, title: 'ON THE GROUND', sub: 'HALDEN VOSS - 
 
 
 MAPS.vcamp = buildMap({
-  name: 'House Violet — the camp', w: 24, h: 14, theme: 'valley', music: 'mystery', dark: 'rgba(22,12,40,.5)',
+  name: 'House Violet — the camp', w: 24, h: 14, theme: 'valley', music: 'mystery', dark: 'rgba(22,12,40,.38)',
   set: [[1, 7, 22, 1, ','], [3, 8, 1, 3, ','], [20, 6, 1, 1, ','], [12, 4, 1, 3, ',']],
   props: [{ t: 'vtent', x: 4, y: 4, a: '#7a5ac8', block: blk(4, 4, 2) }, { t: 'vtent', x: 8, y: 4, a: '#7a5ac8', block: blk(8, 4, 2) }, { t: 'vtent', x: 16, y: 4, a: '#7a5ac8', block: blk(16, 4, 2) },
     { t: 'standard', x: 12, y: 3, a: '#7a5ac8', block: blk(12, 3) }, { t: 'campfire', x: 12, y: 9, block: blk(12, 9) }, { t: 'woodpile', x: 20, y: 5, block: blk(20, 5) },
@@ -39,7 +39,7 @@ MAPS.vcamp = buildMap({
   hot: [{ id: 'fire', tiles: blk(12, 9) }, { id: 'wood', tiles: blk(20, 5) }, { id: 'pump', tiles: blk(2, 11, 2) }, { id: 'vstd', tiles: blk(12, 3) }, { id: 'tentA', tiles: blk(4, 4, 2) }, { id: 'tentB', tiles: blk(8, 4, 2) }, { id: 'tentC', tiles: blk(16, 4, 2) }, { id: 'cairn', tiles: blk(22, 10).concat(blk(22, 11)) }, { id: 'board', tiles: blk(22, 4) }, { id: 'rack', tiles: blk(6, 4) }], exits: []
 });
 MAPS.raid = buildMap({
-  name: 'House Teal — the island', w: 30, h: 15, theme: 'valley', music: 'mystery', dark: 'rgba(4,6,18,.76)',
+  name: 'House Teal — the island', w: 30, h: 15, theme: 'valley', music: 'mystery', dark: 'rgba(4,6,18,.52)',
   set: [[6, 2, 2, 12, '~'], [6, 7, 2, 2, ','], [1, 7, 5, 1, ','], [8, 7, 19, 1, ','], [14, 5, 1, 2, ','], [12, 10, 1, 1, '#'], [17, 5, 1, 1, '#'], [21, 6, 1, 1, '#'], [15, 12, 1, 1, '#'], [24, 11, 1, 1, '#'], [10, 4, 1, 1, '#'], [18, 10, 1, 1, '#'], [25, 4, 1, 1, '#']],
   props: [{ t: 'pumphouse', x: 13, y: 4, block: blk(13, 4, 2) }, { t: 'vtent', x: 10, y: 11, a: '#3aa8a0', block: blk(10, 11, 2) }, { t: 'vtent', x: 19, y: 3, a: '#3aa8a0', block: blk(19, 3, 2) }, { t: 'vtent', x: 20, y: 11, a: '#3aa8a0', block: blk(20, 11, 2) },
     { t: 'teallamp', x: 10, y: 6, block: blk(10, 6) }, { t: 'teallamp', x: 17, y: 9, block: blk(17, 9) }, { t: 'teallamp', x: 23, y: 9, block: blk(23, 9) }, { t: 'teallamp', x: 24, y: 5, block: blk(24, 5) },
@@ -48,7 +48,7 @@ MAPS.raid = buildMap({
   hot: [{ id: 'valve', tiles: blk(13, 4, 2) }, { id: 'std', tiles: blk(27, 7) }, { id: 'ttA', tiles: blk(10, 11, 2) }, { id: 'ttB', tiles: blk(19, 3, 2) }, { id: 'ttC', tiles: blk(20, 11, 2) }, { id: 'tcairn', tiles: blk(16, 3).concat(blk(15, 2)) }, { id: 'drop', tiles: blk(28, 3) }, { id: 'tboard', tiles: blk(3, 5) }], exits: []
 });
 MAPS.dais = buildMap({
-  name: "The Proctors' dais", w: 26, h: 14, theme: 'valley', music: 'mystery', dark: 'rgba(6,6,20,.7)',
+  name: "The Proctors' dais", w: 26, h: 14, theme: 'valley', music: 'mystery', dark: 'rgba(6,6,20,.5)',
   set: [[8, 3, 12, 8, '='], [1, 8, 7, 1, ','], [4, 5, 1, 1, '#'], [5, 11, 1, 1, '#'], [22, 4, 1, 1, '#'], [22, 10, 1, 1, '#']],
   props: [{ t: 'canopy', x: 11, y: 4, a: 6 }, { t: 'lectern', x: 10, y: 4, a: 1, block: blk(10, 4) }, { t: 'lectern', x: 14, y: 4, a: 2, block: blk(14, 4) }, { t: 'lectern', x: 18, y: 4, a: 3, block: blk(18, 4) },
     { t: 'crate', x: 11, y: 7, block: blk(11, 7) }, { t: 'barrel', x: 16, y: 7, block: blk(16, 7) }, { t: 'crate', x: 13, y: 9, block: blk(13, 9) }, { t: 'barrel', x: 18, y: 9, block: blk(18, 9) }, { t: 'crate', x: 8, y: 6, block: blk(8, 6) },
@@ -121,7 +121,7 @@ const MISSIONS = {
     },
     reset() { const f = MAPS.vcamp.props.find(p => p.t === 'campfire'); if (f) f.a = 0; MAPS.vcamp.lights = MAPS.vcamp.lights.filter(l => !l.m); }
   },
-  // The night before day twenty-six. House Teal's island. The first time Wren Halloran does not see his face.
+  // The night before day twenty-six. House Teal's island. The first time Kestrel Dray does not see his face.
   raid: {
     map: 'raid', spawn: [2, 7, 3], toast: 'Their lamps run off the vent stack. Find the valve.', hint: 'B: throw a pebble · hold A to work · watch the lamps turn',
     npcs: () => { const slow = MF('dark') ? 2.4 : 1.5, a = [
@@ -237,7 +237,7 @@ const Mission = {
 
 // ------------------------------------------------------------------ Part Two on foot: the Count hall, and the square five years on.
 MAPS.counthall = buildMap({
-  name: 'The Count hall — fourth ring', w: 24, h: 13, theme: 'spire', music: 'spire', dark: 'rgba(8,8,26,.6)',
+  name: 'The Count hall — fourth ring', w: 24, h: 13, theme: 'spire', music: 'spire', dark: 'rgba(8,8,26,.42)',
   set: [[1, 7, 22, 1, ',']],
   props: [{ t: 'holes', x: 1, y: 3, a: 2, block: blk(1, 3, 2) }, { t: 'countbook', x: 11, y: 3, block: blk(11, 3, 2) }, { t: 'lectern', x: 22, y: 4, a: 3, block: blk(22, 4) },
     { t: 'cdesk', x: 4, y: 4, block: blk(4, 4, 2) }, { t: 'cdesk', x: 8, y: 5, block: blk(8, 5, 2) }, { t: 'cdesk', x: 15, y: 4, a: 1, block: blk(15, 4, 2) }, { t: 'cdesk', x: 19, y: 5, block: blk(19, 5, 2) },
@@ -245,7 +245,7 @@ MAPS.counthall = buildMap({
   lights: [{ x: 72, y: 168, r: 44, c: '#ffe090' }, { x: 264, y: 72, r: 48, c: '#ffe090' }, { x: 192, y: 52, r: 40, c: '#e8c25a' }, { x: 360, y: 60, r: 34, c: '#c8d8ff' }],
   hot: [{ id: 'shelf', tiles: blk(1, 3, 2) }, { id: 'count', tiles: blk(11, 3, 2) }, { id: 'tray', tiles: blk(22, 4) }, { id: 'marendesk', tiles: blk(15, 4, 2) }, { id: 'mydesk', tiles: blk(3, 10, 2) }, { id: 'motto', tiles: blk(6, 1, 2) }, { id: 'win', tiles: blk(17, 1) }, { id: 'deskA', tiles: blk(8, 5, 2) }, { id: 'deskB', tiles: blk(20, 9, 2) }], exits: []
 });
-MAPS.night5 = buildMap(Object.assign({}, SQUARE_DEF, { name: 'Ashgate Square — five years on', music: 'mystery', dark: 'rgba(6,4,14,.7)', hot: [{ id: 'pillarSun', tiles: blk(13, 8) }, { id: 'lift5', tiles: blk(12, 1, 2) }, { id: 'notice5', tiles: blk(7, 1, 2) }], exits: [] }));
+MAPS.night5 = buildMap(Object.assign({}, SQUARE_DEF, { name: 'Ashgate Square — five years on', music: 'mystery', dark: 'rgba(6,4,14,.5)', hot: [{ id: 'pillarSun', tiles: blk(13, 8) }, { id: 'lift5', tiles: blk(12, 1, 2) }, { id: 'notice5', tiles: blk(7, 1, 2) }], exits: [] }));
 Object.assign(MISSIONS, {
   // +5. "Lose it. Buy a day." Played.
   count: {
@@ -264,7 +264,7 @@ Object.assign(MISSIONS, {
       if (t.id === 'deskB') return Dialogue.start([narr('A child\'s drawing, pinned inside the kneehole where no auditor would look. A house. A tall person. A small person. A yellow circle.'), narr('So they draw it yellow as well.')]);
       if (t.id === 'mydesk') return Dialogue.start([narr('My desk. Fourth ring, third row. Eleven hundred lines waiting in the morning tray, and a pen I have worn a groove in.')]);
       if (t.id === 'count') return Dialogue.start([narr('The Count. Open, always. They do not lock it. Who up here would want to change it?'), narr('I know the page without looking. "Holloway, S. Tier Six. Air owed: balanced." The ink of the strike is browner than the rest. It was done with a different pen.'), fx(() => Sound.play('heart')), narr('Below it, in my own hand, four hundred and six lines I have struck since. I learned every one. It does not help them. It is the only thing I have that is not a lie.'), fx(() => { if (!MF('count')) rage(2); MSET('count'); })]);
-      if (t.id === 'marendesk') return Dialogue.start([narr('Maren Aldane\'s desk. Her lamp is still lit. She has left a second book open under the day\'s columns, and it is not the Count.'), narr('Sealed pairings. The Assay of four years ago. A ribbon at one page, and two names on it.'), fx(() => Sound.play('heart')), narr('"Aldane, T. Sorrel, E." She has underlined neither. She has drawn a small careful box around both, the way one marks a sum that does not come out.'), fx(() => MSET('saw'))]);
+      if (t.id === 'marendesk') return Dialogue.start([narr('Maren Aldane\'s desk. Her lamp is still lit. She has left a second book open under the day\'s columns, and it is not the Count.'), narr('Sealed pairings. The Assay of four years ago. A ribbon at one page, and two names on it.'), fx(() => Sound.play('heart')), narr('"Aldane, D. Sorrel, E." She has underlined neither. She has drawn a small careful box around both, the way one marks a sum that does not come out.'), fx(() => MSET('saw'))]);
       if (t.id === 'tray') { if (MF('order')) return Dialogue.start([narr('Empty. He will ask in the morning where it went.')]);
         return Dialogue.start([narr('Marshal Cade\'s tray. One order, eleven hundred lines, sanded and sealed and waiting for a clerk.'), narr('It weighs nothing. I had thought it would weigh something.'), fx(() => { MSET('order'); Sound.play('coin'); Mission.resetNPCs(); World.grace = 2.5; HUD.toast('Now lose it. The dead letters, north-west.'); })]); }
       if (t.id === 'shelf') { if (!MF('order')) return Dialogue.start([narr('The dead letters. Everything the Spire has ever written to somebody it had already struck. Nobody has opened a slot in years.')]);
@@ -298,7 +298,7 @@ Object.assign(MISSIONS, {
 
 // ------------------------------------------------------------------ The night before the last day. Nobody to hide from.
 const VC2 = {
-  name: 'House Violet — the last night', w: 26, h: 14, theme: 'valley', music: 'mystery', dark: 'rgba(8,8,24,.62)',
+  name: 'House Violet — the last night', w: 26, h: 14, theme: 'valley', music: 'mystery', dark: 'rgba(8,8,24,.44)',
   set: [[1, 7, 20, 1, ','], [12, 4, 1, 3, ','], [22, 2, 2, 11, '~'], [21, 7, 1, 1, ',']],
   props: [{ t: 'vtent', x: 3, y: 4, a: '#7a5ac8', block: blk(3, 4, 2) }, { t: 'vtent', x: 7, y: 4, a: '#7a5ac8', block: blk(7, 4, 2) }, { t: 'vtent', x: 16, y: 4, a: '#3aa8a0', block: blk(16, 4, 2) }, { t: 'vtent', x: 4, y: 11, a: '#7a5ac8', block: blk(4, 11, 2) }, { t: 'vtent', x: 16, y: 11, a: '#3aa8a0', block: blk(16, 11, 2) },
     { t: 'standard', x: 11, y: 3, a: '#7a5ac8', block: blk(11, 3) }, { t: 'standard', x: 13, y: 3, a: '#3aa8a0', block: blk(13, 3) }, { t: 'standard', x: 14, y: 3, a: '#c8782a', block: blk(14, 3) },
@@ -307,7 +307,7 @@ const VC2 = {
   hot: [{ id: 'fire2', tiles: blk(12, 9) }, { id: 'stds', tiles: blk(11, 3).concat(blk(13, 3, 2)) }, { id: 'wnote', tiles: blk(9, 10) }, { id: 'ridge', tiles: blk(19, 4, 2) }, { id: 'tentQ', tiles: blk(4, 11, 2) }, { id: 'cairns', tiles: blk(9, 12, 3) }, { id: 'board2', tiles: blk(20, 9) }], exits: []
 };
 MAPS.vcamp2 = buildMap(VC2);
-MAPS.vcamp3 = buildMap(Object.assign({}, VC2, { name: 'House Violet — night twenty-eight', dark: 'rgba(6,6,22,.68)' }));
+MAPS.vcamp3 = buildMap(Object.assign({}, VC2, { name: 'House Violet — night twenty-eight', dark: 'rgba(6,6,22,.48)' }));
 const EVE_N = () => ['petra', 'oswin', 'teal', 'lucan'].filter(k => MF('e_' + k)).length;
 Object.assign(MISSIONS, {
   eve: {
@@ -350,7 +350,7 @@ Object.assign(MISSIONS, {
         return Dialogue.start([
           narr('I sit down. The pack is under my knees. I know what is at the bottom of it.'),
           fx(() => Sound.play('heart')),
-          narr('Teo Aldane\'s bread. Half a heel, forty days old. He broke it on the lift and gave me the larger piece, and said: one ought to go up on something.'),
+          narr('Dorian Aldane\'s bread. Half a heel, forty days old. He broke it on the lift and gave me the larger piece, and said: one ought to go up on something.'),
           narr('It is a stone. I eat it. All of it. It takes most of an hour, and it is the worst thing I have ever done slowly.'),
           narr('Tomorrow I take the keep, and they pin gold on me, and I go to work for the woman who burned my wife. That was always the plan. Tonight it is only a fire, and I am the one who knows how.'),
           narr('Hands, Kael. Everything is hands.')], () => Mission.finish()); }

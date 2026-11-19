@@ -50,8 +50,8 @@ const Issue = {
     const x = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), y = (Input.h('up') ? 1 : 0) - (Input.h('down') ? 1 : 0), press = [];
     if (Input.p('A')) press.push('ctx'); if (Input.p('B')) press.push('dodge'); if (Input.p('X')) press.push('hook'); if (Input.p('Y')) press.push('jump');
     if (Input.p('L')) press.push('boots'); if (Input.p('R')) press.push('kick'); if (Input.p('START')) press.push('pause');
-    const hold = { a: Input.h('A') ? 1 : 0, y: Input.h('Y') ? 1 : 0 }, k = x + ',' + y + ',' + hold.a + hold.y; if (k === this.sent && !press.length) return; this.sent = k;
-    try { this.el.contentWindow.postMessage({ sootborn: 'in', x, y, press, hold }, '*'); } catch (e) { /* frame is going away */ }
+    const hold = { a: Input.h('A') ? 1 : 0, y: Input.h('Y') ? 1 : 0 }, pad = Input.device === 'pad' ? 1 : 0, k = x + ',' + y + ',' + hold.a + hold.y + pad; if (k === this.sent && !press.length) return; this.sent = k;
+    try { this.el.contentWindow.postMessage({ sootborn: 'in', x, y, press, hold, pad }, '*'); } catch (e) { /* frame is going away */ }
   },
   finish(ok, data) {
     if (!this.on) return;

@@ -13,7 +13,6 @@ const cu = (x, y, s0, s1, dx) => ({ cam: [x + (dx || 0), y + 200 / s0, 54, 200],
 const FIELD = { kind: 'rect', w: 250, h: 120 }, V = ['cadv1', 'cadv2'], TL = ['cadt1', 'cadt2'];
 const FF = {
   valley: () => ({
-    flat: 1,
     era: 3, title: 'THE ASSAY', sub: 'HOUSE VIOLET - HOLD THE VALLEY', bg: 'valley', arena: FIELD, music: 'battle', rage: 1, legend: 1, foeName: 'House Teal', winText: 'THE VALLEY HOLDS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 40 }, allies: V, shouts: ['FOR VIOLET!', 'WITH HIM!', 'PUSH!'],
     waves: [[{ id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 6 }, { id: 'cadt2', name: 'Teal', kind: 'cadet', hp: 6 }, { id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 6 }, { id: 'cadt2', name: 'Teal', kind: 'lancer', hp: 7 }],
@@ -80,13 +79,13 @@ const FF = {
   pairing: () => ({
     era: 2, newMove: 'NEW: BREACH - GUARD + JUMP', title: 'THE PAIRING', sub: 'TWO GO IN. ONE COMES OUT A CADET.', bg: 'cell', arena: { kind: 'ring', rx: 96, ry: 58 }, music: 'dusk', rage: 0, legend: 1, skip: 1, winText: 'ONE COMES OUT',
     hero: { id: 'kael2', hp: 8, pow: 1, blade: 1, fury0: 10 }, taunt: { 0: ['I DO NOT WANT TO.', 'PLEASE.', 'WHO IS THIS FOR?'] },
-    foes: [{ id: 'teo', name: 'Teo Aldane', kind: 'cadet', hp: 30 }],
+    foes: [{ id: 'teo', name: 'Dorian Aldane', kind: 'cadet', hp: 30 }],
     voice: { at: [[1, 'HE SHARED HIS BREAD ON THE LIFT UP. HE ASKED ABOUT MY FAMILY. I LIED WELL.'], [13, 'HE IS NOT BAD AT THIS. SOMEBODY LOVED HIM ENOUGH TO PAY FOR LESSONS.'], [26, 'UP IN THE GALLERY THEY ARE KEEPING SCORE.']],
       hurt: 'GOOD. MAKE IT EASIER FOR ME.', fury: 'I SAID HER NAME UNTIL IT WAS THE ONLY THING IN THE ROOM.', half: 'HE HAS STOPPED TRYING TO WIN. HE IS ONLY TRYING TO LAST.', eleven: 'ELEVEN. HE DID NOTHING TO EARN ANY OF THEM.' },
     arts: [{ at: .5, name: 'HER NAME', line: 'SHE WALKED INTO THE FURNACE SO FORTY CHILDREN COULD BREATHE. I AM DOING THIS FOR HER. I AM.', panel: 'furnace', kind: 'rise', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }],
     intro: [
       { d: 3.0, cam: [0, 250, 170, 150, .16], to: [0, 150, 66, 150, .3], acts: [{ id: 'kael2', a: [-38, 4], fx: 1, fy: 0, blade: 1 }, { id: 'teo', a: [38, 4], fx: -1, fy: 0, blade: 1 }], big: 'THE PAIRING', cap: 'THE ASSAY. THE FIRST NIGHT. THEY SEAL US IN BY TWOS.' },
-      { d: 2.4, ...cu(38, 4, 1.8, 2.4, 16), acts: [{ id: 'teo', a: [38, 4], blade: 1 }], cap: 'TEO ALDANE. HE SHARED HIS BREAD ON THE LIFT UP. HE IS THE YOUNGEST ONE HERE.' },
+      { d: 2.4, ...cu(38, 4, 1.8, 2.4, 16), acts: [{ id: 'teo', a: [38, 4], blade: 1 }], cap: 'DORIAN ALDANE. HE SHARED HIS BREAD ON THE LIFT UP. HE IS THE YOUNGEST ONE HERE.' },
       { d: 2.4, cam: [0, 130, 30, 150, .5], to: [0, 150, 26, 150, .62], acts: [{ id: 'kael2', a: [-38, 4], fx: 1, fy: 0, blade: 1 }, { id: 'teo', a: [38, 4], fx: -1, fy: 0, blade: 1 }], cap: 'A VOICE FROM THE GALLERY: ONE OF YOU LEAVES THIS ROOM A CADET.' },
       { d: 2.0, ...cu(-38, 4, 1.9, 2.7, -14), flash: 1, sfx: 'heart', acts: [{ id: 'kael2', a: [-38, 4], blade: 1, aura: 1 }], cap: 'I DID NOT COME UP HERE TO BE KIND.' }
     ],
@@ -160,8 +159,8 @@ const OPENING = [
   // below: the night it started. Slow, dark, eleven seconds long.
   { d: 2.6, black: 1, music: 'mystery', credit: 'NORTH COAST STUDIOS PRESENTS', cap: 'THEY SAY THE SURFACE BURNED TWO HUNDRED YEARS AGO.' },
   { d: 3.4, bg: 'furnace', cam: [0, 230, 80, 150, .3], to: [0, 150, 58, 160, .32], lin: 1, credit: 'IN ASSOCIATION WITH E CONCEPTS', acts: [{ id: 'seren', a: [0, 40], b: [0, 4], fy: -1 }, { id: 'warden', a: [-34, 20], fy: -1, blade: 2 }, { id: 'warden', a: [34, 20], fy: -1, blade: 2 }, { id: 'celestine', a: [0, -60], fy: 1 }], cap: 'THEY SAY WE ARE SOOT. WHAT IS LEFT WHEN SOMETHING USEFUL BURNS.' },
-  { d: 2.4, ...cu(-8, 70, 1.7, 2.3, -16), bolt: 1, tint: 'rgba(120,10,0,.25)', sfx: 'heart', acts: [{ id: 'mara', a: [6, 62], fy: 1 }, { id: 'kael', a: [-8, 70], fy: 1, aura: 1 }], cap: 'I WATCHED THEM WALK MY WIFE INTO A FURNACE.' },
-  { d: 4.2, cam: [0, 120, 50, 170, .32], to: [0, 30, 44, 200, .34], lin: 1, count: 11, tint: 'rgba(120,10,0,.18)', acts: [{ id: 'seren', a: [0, 4], b: [0, -74], fy: -1 }], cap: 'THE DOORS STOOD OPEN FOR ELEVEN SECONDS.' },
+  { d: 2.6, bg: 'furnace', cam: [-2, 176, 62, 170, .3], to: [-2, 158, 56, 186, .32], lin: 1, tint: 'rgba(120,10,0,.25)', sfx: 'heart', acts: [{ id: 'seren', a: [0, -6], b: [0, -14], fy: -1 }, { id: 'warden', a: [-30, 6], fy: -1, blade: 2 }, { id: 'warden', a: [30, 6], fy: -1, blade: 2 }, { id: 'hollis', a: [-26, 62], fx: .5, fy: -1 }, { id: 'mara', a: [22, 60], fx: -.5, fy: -1 }, { id: 'kael', a: [-2, 66], b: [-2, 58], fy: -1, aura: 1 }], cap: 'I WATCHED THEM WALK MY WIFE INTO A FURNACE.' },
+  { d: 4.6, bg: 'furnace', cam: [0, 150, 56, 170, .3], to: [0, 104, 48, 196, .34], lin: 1, count: 11, tint: 'rgba(120,10,0,.18)', acts: [{ id: 'seren', a: [0, -14], b: [0, -70], fy: -1 }, { id: 'warden', a: [-30, 6], fy: -1, blade: 2 }, { id: 'warden', a: [30, 6], fy: -1, blade: 2 }, { id: 'celestine', a: [22, -58], fx: -1, fy: .4 }], cap: 'THE DOORS STOOD OPEN FOR ELEVEN SECONDS.' },
   { d: 1.7, black: 1, sfx: 'rumble', shake: .8, big: 'THE DOORS CLOSED.' },
   { d: 1.9, black: 1, bolt: 2, sfx: 'roar', music: 'battle', flash: 1, big: 'SO I WENT UP.', bigC: '#ff7a30' },
   // above: four years on. Fast, bright, loud.
@@ -169,11 +168,11 @@ const OPENING = [
   { d: 2.3, cam: [-120, 112, 44, 170], to: [110, 112, 44, 170], lin: 1, acts: ffRow(V, 9, -120, 30, 30, { fy: 1 }), cap: 'ONE VALLEY. TWELVE HOUSES. ONE YEAR. THEY CALL IT THE ASSAY.' },
   { d: 1.4, cam: [70, 110, 46, 150], to: [-70, 110, 46, 150], lin: 1, speed: 1, sfx: 'roar', acts: ffRow(TL, 9, -120, 30, -110, { fy: 1 }, -10) },
   { d: 1.4, cam: [0, 270, 46, 150], to: [0, 180, 40, 160], speed: 1, shake: .4, acts: [{ id: 'kael2', a: [0, 124], b: [0, 30], fy: -1, blade: 1, aura: 2 }].concat(ffRow(V, 8, -105, 30, 140, { fy: -1 }, 48)) },
-  { d: 2.0, cam: [-50, 150, 56, 150], to: [50, 132, 50, 170], flash: 1, shake: .8, sfx: 'hit', acts: ffRow(V, 5, -80, 40, 8, { fx: 1, fy: -.5, swing: 1 }).concat(ffRow(TL, 5, -62, 40, -8, { fx: -1, fy: .5, swing: 1 }), [{ id: 'kael2', a: [8, 24], fx: 1, fy: -.4, blade: 1, aura: 2, swing: 1 }]), cap: 'THIS YEAR ONE CADET IS BETTER THAN ALL OF THEM.' },
-  { d: 2.0, ...cu(0, 24, 1.8, 2.6, -22), bolt: 1, acts: [{ id: 'kael2', a: [0, 24], blade: 1, aura: 3, swing: 1, fx: 1, fy: .3 }], cap: 'HE IS NOT ONE OF THEM.' },
-  { d: 2.2, bg: 'ford', cam: [-90, 140, 40, 170], to: [40, 124, 44, 190], flash: 1, sfx: 'hit', shake: .5, acts: [{ id: 'vant', a: [26, 0], fx: -1, fy: .2, blade: 1, sc: 1.12, swing: 1 }, { id: 'kael2', a: [-14, 6], fx: 1, fy: -.2, blade: 1, aura: 2, swing: 1 }].concat(ffRow(TL, 4, 60, 28, -30, { fx: -1 })), cap: 'HE CAME UP FROM UNDER THEIR FEET.' },
-  { d: 2.4, bg: 'keep', cam: [0, 250, 140, 150, .2], to: [0, 140, 56, 170, .32], flash: 1, acts: [{ id: 'lucan', a: [30, -6], fx: -1, fy: .2, blade: 1, sc: 1.08, swing: 1 }, { id: 'kael2', a: [-26, 4], fx: 1, fy: -.2, blade: 1, aura: 3, swing: 1 }], cap: 'HE CAME FOR ONE OF THEM IN PARTICULAR.' },
-  { d: 2.2, ...cu(-26, 4, 1.9, 3.0, -14), sfx: 'roar', flash: 1, bolt: 2, shake: .5, tint: 'rgba(160,20,0,.16)', acts: [{ id: 'kael2', a: [-26, 4], blade: 1, aura: 4 }], cap: 'AND HE HAS BEEN COUNTING TO ELEVEN EVER SINCE.' },
+  { d: 2.0, cam: [-20, 128, 50, 170, .3], to: [14, 112, 44, 190, .32], lin: 1, flash: 1, shake: .5, sfx: 'hit', acts: ffRow(V, 6, -110, 40, -74, { fx: .2, fy: 1 }).concat([{ id: 'cadt1', a: [34, 2], fx: -1, fy: .3, blade: 1, guard: 1 }, { id: 'cadt2', a: [-22, -14], fx: .6, fy: .8, st: 'down', t: 2 }, { id: 'cadt1', a: [-36, 22], fx: 1, fy: .2, st: 'down', t: 2 }, { id: 'cadt1', a: [60, -22], fx: -1, fy: .5, blade: 1 }, { id: 'cadt2', a: [84, 6], fx: -1, fy: .2, blade: 1 }, { id: 'kael2', a: [8, 10], fx: 1, fy: -.3, blade: 1, aura: 2, hold: 3 }]), cap: 'THIS YEAR ONE CADET IS BETTER THAN ALL OF THEM.' },
+  { d: 2.0, ...cu(0, 24, 1.8, 2.6, -22), bolt: 1, acts: [{ id: 'kael2', a: [0, 24], blade: 1, aura: 3, fx: .6, fy: .8 }], cap: 'HE IS NOT ONE OF THEM.' },
+  { d: 2.2, bg: 'ford', cam: [-90, 140, 40, 170], to: [40, 124, 44, 190], flash: 1, sfx: 'hit', shake: .5, acts: [{ id: 'vant', a: [14, 0], fx: -1, fy: .2, blade: 1, sc: 1.12, hold: 1 }, { id: 'kael2', a: [-12, 5], fx: 1, fy: -.2, blade: 1, aura: 2, guard: 1 }].concat(ffRow(TL, 4, 60, 28, -30, { fx: -1 })), cap: 'HE CAME UP FROM UNDER THEIR FEET.' },
+  { d: 2.4, bg: 'keep', cam: [0, 250, 140, 150, .2], to: [0, 140, 56, 170, .32], flash: 1, acts: [{ id: 'lucan', a: [4, -4], fx: -1, fy: .2, blade: 1, sc: 1.08, guard: 1 }, { id: 'kael2', a: [-22, 4], fx: 1, fy: -.2, blade: 1, aura: 3, hold: 2 }], cap: 'HE CAME FOR ONE OF THEM IN PARTICULAR.' },
+  { d: 2.2, bg: 'keep', ...cu(-22, 4, 1.9, 3.0, -14), sfx: 'roar', flash: 1, bolt: 2, shake: .5, tint: 'rgba(160,20,0,.16)', acts: [{ id: 'kael2', a: [-22, 4], blade: 1, aura: 4, fx: .5, fy: .9 }], cap: 'AND HE HAS BEEN COUNTING TO ELEVEN EVER SINCE.' },
   { d: 0.5, black: 1, flash: 1, sfx: 'hit', shake: .6 },
   { d: 3.6, black: 1, bolt: 1, sfx: 'choir', big: 'SOOTBORN', bigC: '#ffe08a', sub2: 'E V E R Y   B R E A T H   I S   H E R S', credit: 'NORTH COAST STUDIOS  x  E CONCEPTS' }
 ];
@@ -190,7 +189,7 @@ if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.d
   { narr: 'After that night the Authority put it on the tier speakers. Every bell. Slowed down, played on their own bright instruments.' },
   { narr: 'So that whenever we heard our own song, we would see the doors close. Hardly anybody on Tier Six has dared to hum it since.' });
   const j = PROLOGUE_B.findIndex(s => s.narr && /starts to hum the shift song/.test(s.narr)); if (j >= 0) PROLOGUE_B.splice(j + 1, 0, { narr: 'It is the only goodbye we are allowed. Speaking at a commitment is forbidden. Nobody ever wrote a rule about humming.' }); }
-if (!NOFF) { const i = PROLOGUE_B.findIndex(s => s.card === 'SOOTBORN'); if (i >= 0) PROLOGUE_B.splice(i, 0, { fade: 'out' }, { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The first night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.pairing() }, { card: 'FOUR YEARS EARLIER', sub: 'Cinderwell. The morning after the furnace.', big: 1, min: 1.6, max: 5 }); }
+if (!NOFF) { const i = PROLOGUE_B.findIndex(s => s.card === 'SOOTBORN'); if (i >= 0) PROLOGUE_B.splice(i, 0, { fade: 'out' }, { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The first night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.pairing() }); const c = PROLOGUE_B.find(s => s.card === 'FORTY-ONE DAYS AFTER THE FURNACE'); if (c) { c.card = 'FOUR YEARS EARLIER'; c.sub = 'Cinderwell, Tier Six. Forty-one days after the furnace.'; c.big = 1; } }
 // ---- the dreams: what happens between the fights, told below, the old way
 const DREAM1 = () => [
   { music: 'mystery' }, { card: 'THAT NIGHT', sub: 'Kael does not dream of the furnace. For once it runs forward.', min: 1.6, max: 5 },

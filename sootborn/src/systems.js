@@ -1,10 +1,10 @@
 // ============================================================
 // systems/ — state, save, dialogue, journal, puzzle, world
 // ============================================================
-const G = { mode: 'boot', name: 'Wren', look: 0, tendency: null, day: 1, mapId: 'apt', flags: {}, trust: {}, trust0: {}, scrip: 6, journal: [], newJ: 0, log: [], play: 0, time: 0, talkCount: {} };
+const G = { mode: 'boot', name: 'Kael', look: 0, tendency: null, day: 1, mapId: 'apt', flags: {}, trust: {}, trust0: {}, scrip: 6, journal: [], newJ: 0, log: [], play: 0, time: 0, talkCount: {} };
 const P = { x: 0, y: 0, dir: 0, anim: 0, moving: false, sheet: null, moved: 0 };
 function freshState(name, look) {
-  Object.assign(G, { name: name || 'Wren', look: look || 0, tendency: null, day: 1, mapId: 'apt', flags: {}, trust: { mara: 0, ivo: 0, tavi: 1, orin: 0, nell: 0 }, scrip: 6, journal: [], newJ: 0, log: [], play: 0, talkCount: {} });
+  Object.assign(G, { name: name || 'Kael', look: look || 0, tendency: null, day: 1, mapId: 'apt', flags: {}, trust: { mara: 0, ivo: 0, tavi: 1, orin: 0, nell: 0 }, scrip: 6, journal: [], newJ: 0, log: [], play: 0, talkCount: {} });
   G.trust0 = { ...G.trust };
 }
 function phase() { if (typeof Cutscene !== 'undefined' && Cutscene.active) return Cutscene.pillarRed ? 'evening' : 'morning'; if (G.mapId === 'fest') return 'evening'; if (F('day2Done')) return 'morning'; if (F('day1Done')) return F('lanternBuilt') ? 'evening' : F('fuseDone') ? 'noon' : 'morning'; if (F('clockedOut')) return 'evening'; if (F('puzzleDone')) return 'noon'; return 'morning'; }
@@ -337,6 +337,7 @@ const World = {
   flash: 0, flashC: '#f00', shakeT: 0, darkOverride: null, dynLights: [], caughtT: 0,
   fxFlash(c, s) { this.flash = 1; this.flashC = c; this.shakeT = s || 0; },
   // ---- heist: lantern vision cones with line of sight; caught = back to the door
+  pillarBeam(g, cx, cy, t, rm) { const px = 13 * 16 - cx, py = 8 * 16 - cy, pulse = rm ? 0 : Math.sin(t * 1.3) * .5 + .5, ph = phase(); g.fillStyle = '#5a5058'; g.fillRect(px + 4, py - 22, 8, 32); g.fillStyle = ph === 'evening' ? `rgb(255,${90 + pulse * 30 | 0},${70 + pulse * 20 | 0})` : ph === 'noon' ? `rgb(255,${238 + pulse * 15 | 0},${215 + pulse * 30 | 0})` : `rgb(255,${180 + pulse * 30 | 0},${100 + pulse * 40 | 0})`; g.fillRect(px + 5, py - 21, 6, 29); g.fillStyle = '#fff6e0'; g.fillRect(px + 7, py - 20, 2, 27); },
   seesPlayer(n) {
     const ox = n.x, oy = n.y - 6, dx = P.x - ox, dy = (P.y - 4) - oy, d = Math.hypot(dx, dy);
     if (d < 12) return true; if (d > 72) return false;
@@ -398,7 +399,7 @@ const World = {
     // animated props
     if (G.mapId === 'square' || G.mapId === 'fest') {
       const px = 13 * 16 - cx, py = 8 * 16 - cy, pulse = rm ? 0 : Math.sin(t * 1.3) * .5 + .5, ph = phase();
-      g.fillStyle = '#5a5058'; g.fillRect(px + 4, py - 22, 8, 32); g.fillStyle = ph === 'evening' ? `rgb(255,${90 + pulse * 30 | 0},${70 + pulse * 20 | 0})` : ph === 'noon' ? `rgb(255,${238 + pulse * 15 | 0},${215 + pulse * 30 | 0})` : `rgb(255,${180 + pulse * 30 | 0},${100 + pulse * 40 | 0})`; g.fillRect(px + 5, py - 21, 6, 29); g.fillStyle = '#fff6e0'; g.fillRect(px + 7, py - 20, 2, 27);
+      this.pillarBeam(g, cx, cy, t, rm);
       for (const [lx, ly] of [[7, 4], [19, 4], [9, 13], [22, 9]]) { g.fillStyle = '#3a3a40'; g.fillRect(lx * 16 + 4 - cx, ly * 16 - 13 - cy, 8, 4); g.fillStyle = '#ffd890'; g.fillRect(lx * 16 + 5 - cx, ly * 16 - 9 - cy, 6, 2); }
       const cs = typeof Cutscene !== 'undefined' && Cutscene.active ? Cutscene : null, liftOn = (cs && cs.lift) || (F('day1Done') && !F('day2Done')) || G.mapId === 'fest';
       g.fillStyle = cs && cs.lift > 1 ? '#ffffff' : liftOn ? '#3aff6a' : F('ivoTalk2') && Math.floor(t * 1.5) % 7 === 0 && !rm ? '#3aff6a' : '#1a2a1a'; g.fillRect(12 * 16 + 28 - cx, 16 + 6 - cy, 2, 2);
@@ -420,9 +421,11 @@ const World = {
     if (Cutscene.active) ents = Cutscene.actors.map(a => ({ x: a.x, y: a.y, dir: a.dir, f: a.moving ? 1 + (Math.floor(a.anim * 6) % 2) : 0, sheet: a.sheet, kn: a.kn || 0, hop: a.hop > 0 ? Math.sin(a.hop / 0.3 * Math.PI) * 4 : 0, emote: a.emote }));
     else { ents = this.npcs.map(n => ({ x: n.x, y: n.y, dir: n.vdir === undefined ? n.dir : n.vdir, f: n.moving ? 1 + (Math.floor(n.anim * 6) % 2) : 0, sheet: this.sheetFor(n.id) }));
       ents.push({ x: P.x, y: P.y, dir: P.dir, f: P.moving ? 1 + (Math.floor(P.anim * 8) % 2) : 0, sheet: P.sheet, me: 1 }); }
+    for (const T of this.layer.tall || []) ents.push({ y: T.base, tall: T });
     ents.sort((a, b) => a.y - b.y);
     this.land = !document.body.classList.contains('portrait');
-    for (const e of ents) { const fh = e.sheet.fh || 16, sx = Math.round(e.x - 8 - cx), sy = Math.round(e.y - fh + 1 - cy); if (!e.f && !rm && e.sheet.width >= 64 && ((t * 1.1 + e.x * 0.137 + e.y * 0.071) % 3.9) < 0.13) e.f = 3; g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(sx + 2, sy + fh - 2, 12, 2); g.fillRect(sx + 4, sy + fh - 3, 8, 4); g.fillRect(sx + 3, sy + fh, 10, 1); const br = !e.f && !rm && ((t * 0.9 + e.x * 0.07) % 2.4) < 0.35 ? 1 : 0; const kn = Math.round(e.kn || 0), hp = Math.round(e.hop || 0); g.drawImage(e.sheet, e.f * 16, e.dir * fh, 16, fh - br - kn, sx, sy + br + kn - hp - (e.f === 1 && !rm ? 1 : 0), 16, fh - br - kn);
+    for (const e of ents) { if (e.tall) { const T = e.tall; g.drawImage(T.cv, Math.round(T.x - cx), Math.round(T.y - cy)); if ((G.mapId === 'square' || G.mapId === 'fest') && T.t === 'pillarBase') this.pillarBeam(g, cx, cy, t, rm); else if (T.t === 'lampBase' && this.map.theme === 'city') { g.fillStyle = '#3a3a40'; g.fillRect(T.px * 16 + 4 - cx, T.py * 16 - 13 - cy, 8, 4); g.fillStyle = '#ffd890'; g.fillRect(T.px * 16 + 5 - cx, T.py * 16 - 9 - cy, 6, 2); } continue; }
+      const fh = e.sheet.fh || 16, sx = Math.round(e.x - 8 - cx), sy = Math.round(e.y - fh + 1 - cy); if (!e.f && !rm && e.sheet.width >= 64 && ((t * 1.1 + e.x * 0.137 + e.y * 0.071) % 3.9) < 0.13) e.f = 3; g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(sx + 2, sy + fh - 2, 12, 2); g.fillRect(sx + 4, sy + fh - 3, 8, 4); g.fillRect(sx + 3, sy + fh, 10, 1); const br = !e.f && !rm && ((t * 0.9 + e.x * 0.07) % 2.4) < 0.35 ? 1 : 0; const kn = Math.round(e.kn || 0), hp = Math.round(e.hop || 0); g.drawImage(e.sheet, e.f * 16, e.dir * fh, 16, fh - br - kn, sx, sy + br + kn - hp - (e.f === 1 && !rm ? 1 : 0), 16, fh - br - kn);
       if (e.emote) { const bx = sx + 8, by = sy + kn - 12 - Math.round(Math.min(1, (1.5 - e.emote.life) * 8) * 2), tx = e.emote.t; g.fillStyle = '#120a0e'; g.fillRect(bx - 7, by - 1, 15, 11); g.fillStyle = '#f3e3c3'; g.fillRect(bx - 6, by, 13, 9); g.fillRect(bx - 1, by + 9, 3, 2);
         if (tx === 'heart') { g.fillStyle = '#c8452e'; g.fillRect(bx - 3, by + 2, 3, 3); g.fillRect(bx + 1, by + 2, 3, 3); g.fillRect(bx - 2, by + 4, 5, 2); g.fillRect(bx - 1, by + 6, 3, 1); g.fillRect(bx, by + 7, 1, 1); g.fillStyle = '#f0a090'; g.fillRect(bx - 3, by + 2, 1, 1); }
         else ptext(g, tx, bx - Math.floor(ptextW(tx) / 2), by + 2, tx === '!' ? '#c8452e' : '#2a1408'); } }

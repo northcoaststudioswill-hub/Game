@@ -215,7 +215,7 @@ function DAY4() {
     { say: 'wren', t: 'One... touches it?' },
     { say: 'kael', t: 'We do. Down there. Aye.' },
     { say: 'wren', t: '"We." What a useful word. One is never allowed it.' },
-    { narr: 'Wren Halloran. Nineteen, and the only one of the forty who ever got grease on a cuff. She asks me once where I learned it. I say: Tier Six. She writes that down as if it were a school.' },
+    { narr: 'Kestrel Dray. Nineteen, and the only one of the forty who ever got grease on a cuff. She asks me once where I learned it. I say: Tier Six. She writes that down as if it were a school.' },
     { pstage: 2 },
     { say: 'celestine', t: 'You have stopped saying "aye," technician.' },
     { say: 'kael', t: 'Noted.' },

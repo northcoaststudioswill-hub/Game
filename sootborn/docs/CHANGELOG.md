@@ -1,4 +1,77 @@
-# SOOTBORN — changelog (latest v0.48 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.49 · 2026-11-19)
+
+## v0.49 · 2026-11-19 — two sets of play notes: Row K, the Codex, harder fights, the High Docks
+From play notes on the intro through to waking on Day 2, and a second set on the High Docks.
+
+**The opening and the films**
+- **The eleven seconds are back in the furnace hall.** The two shots after the first one had no place of their own and fell back to the Valley, so the film showed armoured cadets running in a meadow under "I watched them walk my wife into a furnace". They now play in the hall: Kael held between Mara and Hollis, Seren walking between the Wardens to the doors, the count over it.
+- **No more swinging at the air.** The Valley, Ford and Keep shots of the opening are held poses now: Kael mid-cut with two of them down, a cut met on a guard, a still close-up. A shot can ask for `hold` (a cut frozen at its hardest frame), `guard`, or a fallen body.
+- The glow that sat over Kael's face in close-ups is gone from films.
+- **Title cards.** After the Pairing there were three cards in a row, one of them wrong ("the morning after the furnace", two scenes after the tin that came two days later). Now: SOOTBORN, then "Four years earlier. Cinderwell, Tier Six. Forty-one days after the furnace."
+
+**Arena fights**
+- **The Valley is on its full 3D field again.** The Proctor and the Standard keep the painted one.
+- **ELEVEN in the arena is the one from the comic levels.** Ten counted passes straight through them, each leaving its line in the air, and the eleventh from above. It happens on the ground you were fighting on, not in a red void.
+- **Capes hang behind.** The cape leaned the same way as the body, so running put it through his legs. It now hangs back from a leaning body and can never swing forward of it.
+- **Longer, harder fights.** Enemy health is up by a little over half on every setting (Hard: 1.4x to 2.2x; fights below the rock 1.16x to 1.84x). They attack slightly more often. Fury fills at about 60% of the old rate so the longer fight does not hand out more ELEVENs. A bot that strikes and dodges won the Pairing in 33 seconds with 3 health left.
+
+**Names**
+- **Wren Halloran is Kestrel Dray** and **Tyr Cade is Severin Cade**, everywhere they are named: the Island, the desk, the east manifold, the dock log ("Dray, K."), Row K at the end; the Gallery and its captions. (Halloran was also a surname left over from the engine the comic levels came from.) The default save name was "Wren" for no reason; it is Kael.
+- **Teo Aldane is Dorian Aldane.** Every line: the Pairing, Maren's brother, his bread, "For Dorian Aldane. Balanced.", "Aldane, D." on the wall, Dorian's name first in Maren's list.
+
+**Day 1, the square**
+- **Layering.** The Pillar and its light, the lamps, the noodle stall and its awning, and the scrap cart are drawn among the people now, so somebody standing behind one is behind it.
+- **Doors you can see.** The way to Bay 3 is a lit bulkhead gate with chevrons on the floor and its name on a plate. House doors have a frame, a lamp and a number.
+
+**Row K (new)**
+- West of the square, through its own gate. A street of six doors: the wash-house, K-5, **K-7 (home, a sun painted on the door)**, K-9 (Mara's), K-11, and K-13 with an Authority seal on the latch. Leaving home puts you on the row; the square is at its east end.
+- **Seven people**: Nan Orla at the wash tub, Sela with a newborn, Wick who has lost his brother's whistle, Garrow who has run the Scuffle for thirty years, and Tam, Bryn and Dov in it.
+- **The Scuffle.** Open hands, no blades, first to sit down buys the tea. Three bouts, each harder.
+- **Things to do that nobody asks for**: fix the row's ration tap; find the whistle; look under the mat at K-13; read the wall by Mara's door; the ledge by your own.
+- None of it is needed to finish a day.
+
+**The Codex (new, title menu and pause menu)**
+- **The story**: thirteen entries in the order it happened to him, in his voice, filling in as you play.
+- **Found**: seven things on Row K. Three of them carry a second paragraph, the detail the thing leads to (every commitment on Mara's wall falls on an audit week; the row's meter turns ten for nine; the Hadleys were not committed, only docked).
+- Kept outside the save, so what is found stays found.
+
+**The High Docks and the other comic levels**
+- **Controller.** A pad was being read twice, once by the game and once by the level with the old game's layout, so X also did what A does and most buttons did two things. The level now takes buttons only from the game. The left stick is analogue again.
+- **The right stick looks round in a fight.** It was ignored while the camera was locked on a guard. It turns the view now, and goes back to him a second after the stick is let go.
+- **The pause menu answers the stick.**
+- **Button legend.** With a pad in hand, a small legend sits in the corner (X cut, Y hook, A jump, B dodge, RB kick, LB lunge, RS look) and the three prompts that explained controls are his narration instead.
+- **The hook cannot take him through a wall.** The pull moved him along a line and ignored what it hit. It now moves in short steps and stops at the first thing solid.
+- **Dots.** Finer and fainter, and the grey they laid over every mid-tone is halved.
+- **Guards are already there.** On the docks the watch stands its posts from the start, in pairs, saying things to each other. They know him when he comes within nine metres, once the way to them is open. Nothing appears in front of you when you read something.
+- **Tougher.** Dock Guard 64 to 96, knives 46 to 66, the big ones 165 to 240, Rook 520 to 980 and quicker on his feet. The count toward ELEVEN holds for four seconds between hits, not under three.
+- **ELEVEN less often, memories more often.** Fury comes at a little over half the old rate. Every fifth kill in a fight is a memory.
+- **A run that is a run.** He leans into it, knees up, arms driving. Guards have a soldier's jog with the weapon carried; they no longer shamble or hunch.
+- **Boots.** Held, they climb to about five and a half metres and last nearly twice as long.
+- **Signs** are enamel plates: a ruled border, rivets, the Authority's sun at each end, cut capitals, soot.
+- **Words.** What a heavy hit says comes at most every three seconds and never twice running. The last of the old game's sound words are gone (KRAK, SMASH, SNAP, BONG, CLANG). Page captions are ink with a gold rule instead of yellow stickers.
+
+**From a third note, the two quick ones**
+- **The 2D Assay missions are lighter.** The night over the camps, the raid, the dais and the Count hall is about a third less dark.
+- **The objective is bigger.** A fifth larger, with more room round it.
+
+**Checked**
+- The High Docks played start to end by script with the watch on its posts: every encounter woke, finished and saved; no errors.
+- Row K: every door, person and object called three times over under changing flags; all four ways in and out walked; a bout started, won and returned to the row; the Codex opened on both tabs.
+- The opening film captured shot by shot.
+
+**Not checked**
+- Nothing here was played by hand. A controller was not connected: the pad fixes are from reading both mappings, and the legend has not been seen on a screen.
+- The new run, the arena ELEVEN and the cape were looked at in stills, not in motion.
+- How hard the fights now feel. The numbers are up; whether it is enough is for a thumb to say.
+- Riser Nine and the Stair were not replayed after the guard, run and camera changes.
+
+**Still open from these notes**
+- The High Docks as a place: side corridors that go nowhere, things to find in them, and dressing it as somewhere the Accredited live.
+- Rook rebuilt to Kael's level of model.
+- More comic-engine stills inside the 2D films; the Pairing's and the Ford's own intro shots.
+- A button legend in the arena fights.
+- The Scuffle is drawn on the square's background, Pillar and all.
+- From the third note: Kael's arms, hands, blade, legs and body brought up to his head; fighting stances for Kael and a few for the guards; one controls card across all three fighting styles; the service stair as a walked level in chapter 1; a barge in chapter 4; a quiet scene with the Unlit; the ending as a Table sequence; the suspicion meter and the Count as a puzzle.
 
 ## v0.48 · 2026-11-19 — the guards, watched: a bot fought all three levels for real
 From play notes: see how the guards behave on the second level, then the third, then the first; last push before tonight's playtest; do anything else that is glaring.

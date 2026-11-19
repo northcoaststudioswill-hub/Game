@@ -280,7 +280,7 @@ rep("      if (wantBoot && (pl.bootCd || 0) <= 0 && pl.onGround) { inp.clear('bo
 rep("  function startBoots(mx, mz, mag) {", `  /* the rigging line off the valve banks: it brings an ordinary guard to him, and takes him to a big one. Either way he arrives with the ram. */
   function useHook(mx, mz, mag) {
     let dx = mag > 0.3 ? mx / mag : Math.sin(pl.yaw), dz = mag > 0.3 ? mz / mag : Math.cos(pl.yaw); const t = pickTarget(15, -0.35, dx, dz);
-    SC.audio.sfx('chainThrow'); if (!t) { pl.hookCd = 1.2; pl.yaw = Math.atan2(dx, dz); for (let k = 1; k < 9; k++) { _a.set(pl.pos.x + dx * k * 0.9, pl.pos.y + 1.2, pl.pos.z + dz * k * 0.9); FX.burst(_a, 0xffd23a, 0.45); } pl.pos.x += dx * 5; pl.pos.z += dz * 5; W.collide(pl.pos, pl.r, pl.pos.y, pl.h); _a.copy(pl.pos); _a.y += 2.5; FX.word('HOOK LINE!', _a, '#ffd23a', 0.9); SC.audio.sfx('chainYank'); startAttack(2, dx, dz, 1); return; }
+    SC.audio.sfx('chainThrow'); if (!t) { pl.hookCd = 1.2; pl.yaw = Math.atan2(dx, dz); for (let k = 1; k < 9; k++) { _a.set(pl.pos.x + dx * k * 0.9, pl.pos.y + 1.2, pl.pos.z + dz * k * 0.9); FX.burst(_a, 0xffd23a, 0.45); } for (let k = 0; k < 18; k++) { const ox = pl.pos.x, oz = pl.pos.z; pl.pos.x += dx * 0.28; pl.pos.z += dz * 0.28; W.collide(pl.pos, pl.r, pl.pos.y, pl.h); if (Math.hypot(pl.pos.x - ox, pl.pos.z - oz) < 0.12) break; } _a.copy(pl.pos); _a.y += 2.5; FX.word('HOOK LINE!', _a, '#ffd23a', 0.9); SC.audio.sfx('chainYank'); startAttack(2, dx, dz, 1); return; }
     pl.hookCd = 2.5; const ex = t.pos.x - pl.pos.x, ez = t.pos.z - pl.pos.z, d = Math.hypot(ex, ez) || 1; pl.yaw = Math.atan2(ex, ez);
     for (let k = 1; k < 8; k++) { _a.set(pl.pos.x + ex * k / 8, pl.pos.y + 1.2, pl.pos.z + ez * k / 8); FX.burst(_a, 0xffd23a, 0.45); }
     if (t.K.armor) { pl.pos.x = t.pos.x - ex / d * (t.r + 1.2); pl.pos.z = t.pos.z - ez / d * (t.r + 1.2); W.collide(pl.pos, pl.r, pl.pos.y, pl.h); }
@@ -312,7 +312,7 @@ rep("      if (wantKick && pl.onGround) { inp.clear('kick'); startAttack(pl.stat
       if (pl.state === 'power') { /* the eleven has started */ }
       else if (wantKick && pl.onGround && (hc < 0 || pl.st >= P.ATTACK[hc].hit)) { inp.clear('kick'); startAttack(hc === 0 ? 6 : hc === 1 ? 5 : hc === 2 ? 7 : hc === 3 ? 8 : 3, mx, mz, mag); }
       else if (wantKick) { /* held for the beat */ }
-      else if (wantJump && pl.onGround && free) { inp.clear('jump'); pl.setState('air'); pl.jv = 9; pl.airFuel = 1.9; pl.diving = 0; FX.ring(pl.pos, 0x7ad9ff, 0.3, 1.8, 0.3); FX.puff(pl.pos, 4, 0.9); SC.audio.sfx('leap'); }`);
+      else if (wantJump && pl.onGround && free) { inp.clear('jump'); pl.setState('air'); pl.jv = 9; pl.airFuel = 3.4; pl.diving = 0; FX.ring(pl.pos, 0x7ad9ff, 0.3, 1.8, 0.3); FX.puff(pl.pos, 4, 0.9); SC.audio.sfx('leap'); }`);
 rep("  function perfectDodge() {", `  // on the boots: one knee up, off hand out for balance, the hook held low and back
   const HOVP = { spine: [0.15, 0, 0], chest: [0.1, 0.25, 0], head: [-0.15, -0.2, 0], shR: [0.5, 0, -0.5], elR: [-0.4, 0, 0], shL: [-0.6, 0, 0.9], elL: [-0.5, 0, 0], thL: [-1.0, 0, 0.1], shnL: [1.5, 0, 0], thR: [0.15, 0, -0.08], shnR: [0.35, 0, 0], ftR: [0.6, 0, 0], sc1: [0.3, 0, 0], y: 0 };
   function bootSlam() {
@@ -322,10 +322,10 @@ rep("  function perfectDodge() {", `  // on the boots: one knee up, off hand out
   }
   function perfectDodge() {`);
 rep("      case 'power': updatePower(dt); break;", `      case 'air': {
-        const sp = T.playerSpeed * 0.95 * mag, kk = Math.min(1, dt * 6), hov = inp.hold.y && pl.airFuel > 0 && pl.jv <= 0.6 && !pl.diving;
+        const sp = T.playerSpeed * 0.95 * mag, kk = Math.min(1, dt * 6), hov = inp.hold.y && pl.airFuel > 0 && pl.jv <= 2.7 && !pl.diving;
         if (pl.diving) { pl.vel.set(pl.ddx, 0, pl.ddz); pl.pose = P.attack(4, 0.14); pl.poseRate = 30; }
         else { pl.vel.x += (mx / (mag || 1) * sp - pl.vel.x) * kk; pl.vel.z += (mz / (mag || 1) * sp - pl.vel.z) * kk; if (mag > 0.08) pl.yaw = SC.dampAng(pl.yaw, Math.atan2(mx, mz), T.turnRate, dt);
-          if (hov) { pl.jv += (0 - pl.jv) * Math.min(1, dt * 10); pl.airFuel -= dt; if (((pl.st * 30) | 0) % 2 === 0) { _a.copy(pl.pos); _a.y += pl.lift - 0.1; FX.burst(_a, 0x7ad9ff, 0.5); } } else pl.jv -= 22 * dt;
+          if (hov) { pl.jv += ((pl.lift < 5.6 ? 2.6 : 0) - pl.jv) * Math.min(1, dt * 8); pl.airFuel -= dt; if (((pl.st * 30) | 0) % 2 === 0) { _a.copy(pl.pos); _a.y += pl.lift - 0.1; FX.burst(_a, 0x7ad9ff, 0.5); } } else pl.jv -= 22 * dt;
           pl.pose = pl.jv > 2 ? SC.mixPose(HOVP, P.leap, 0.35) : Object.assign({}, HOVP, { y: Math.sin(pl.t * 4) * 0.06 }); pl.poseRate = 14;
           if (wantAtk || wantKick || wantBoot) { inp.clear('attack'); inp.clear('kick'); inp.clear('boots'); let dx = mag > 0.3 ? mx / mag : Math.sin(pl.yaw), dz = mag > 0.3 ? mz / mag : Math.cos(pl.yaw); const t = pickTarget(11, 0.2, dx, dz);
             let tm = 0.24, v = 9; if (t) { const ex = t.pos.x - pl.pos.x, ez = t.pos.z - pl.pos.z, d = Math.hypot(ex, ez) || 1; dx = ex / d; dz = ez / d; tm = SC.clamp(d / 24, 0.18, 0.5); v = Math.max(0, d - t.r - 0.7) / tm; }
@@ -348,7 +348,7 @@ rep("{ heavy: heavy || i === 3 || wide || rip, named: blunt || wide || rip, comb
 rep("        if (pl.state === 'attack') { pl.pose = P.attack(pl.combo, pl.st); pl.poseRate = 42; }", "        if (pl.state === 'attack') { pl.pose = P.attack(pl.combo, pl.st); pl.poseRate = 42; pl.lift = pl.combo === 8 ? Math.sin(SC.clamp(pl.st / 0.4, 0, 1) * Math.PI) * 1.5 : pl.combo === 6 ? Math.sin(SC.clamp((pl.st - 0.12) / 0.3, 0, 1) * Math.PI) * 0.5 : 0; } else if (pl.state !== 'power') pl.lift = 0;");
 /* fury is earned */
 rep("U.showHud(true); pl.meter = SC.T.meter;", "U.showHud(true); pl.meter = Math.max(pl.meter, 25);");
-rep("pl.gain(heavy ? 12 : 8)", "pl.gain(heavy || i >= 5 ? 9 : 5)");
+rep("pl.gain(heavy ? 12 : 8)", "pl.gain(heavy || i >= 5 ? 5 : 2.6)");
 rep("pl.meter = d.path ? 68 : 0;", "pl.meter = 0;");
 
 /* ---- v0.34: bodies are no longer made of bricks: every block has turned edges and smooth shading ---- */
@@ -387,7 +387,7 @@ between("  function useHook(mx, mz, mag) {", "  function startBoots(mx, mz, mag)
       else { h.mode = 2; const d = t ? Math.max(0, Math.hypot(t.pos.x - pl.pos.x, t.pos.z - pl.pos.z) - t.r - 1.2) : 5; h.gx = pl.pos.x + h.dx * d; h.gz = pl.pos.z + h.dz * d; } }
     if (h.done) { const q = SC.smooth(SC.clamp((pl.st - T1) / (T2 - T1), 0, 1));
       if (h.mode === 1 && t) { t.pos.x = SC.lerp(h.ex, pl.pos.x + h.dx * 1.6, q); t.pos.z = SC.lerp(h.ez, pl.pos.z + h.dz * 1.6, q); t.vel.set(0, 0, 0); }
-      else if (h.mode === 2) { pl.pos.x = SC.lerp(h.px, h.gx, q); pl.pos.z = SC.lerp(h.pz, h.gz, q); W.collide(pl.pos, pl.r, pl.pos.y, pl.h); pl.inv = Math.max(pl.inv, 0.1); if (((pl.st * 40) | 0) % 2 === 0) FX.puff(pl.pos, 1, 0.6); } }
+      else if (h.mode === 2) { const wx = SC.lerp(h.px, h.gx, q), wz = SC.lerp(h.pz, h.gz, q), mvx = wx - pl.pos.x, mvz = wz - pl.pos.z, md = Math.hypot(mvx, mvz), nn = Math.max(1, Math.ceil(md / 0.28)); if (!h.stop && (mvx * h.dx + mvz * h.dz) > 0) for (let i = 0; i < nn; i++) { const ox = pl.pos.x, oz = pl.pos.z; pl.pos.x += mvx / nn; pl.pos.z += mvz / nn; W.collide(pl.pos, pl.r, pl.pos.y, pl.h); if (Math.hypot(pl.pos.x - ox, pl.pos.z - oz) < md / nn * 0.45) { h.stop = 1; break; } } pl.inv = Math.max(pl.inv, 0.1); if (((pl.st * 40) | 0) % 2 === 0) FX.puff(pl.pos, 1, 0.6); } }
     if (pl.st >= T2) { hookMesh.visible = false; startAttack(2, h.dx, h.dz, 1); }
   }
 `);
@@ -407,7 +407,7 @@ rep("U.blocking = () => !!(U.dlg || U.pg || U.menuOpen || U.mem);", `U.blocking 
     el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); SC.slowmo(0.22, 0.8); SC.audio.sfx('path'); SC.emit('flash', '#ff5a1f'); U.cuts = (U.cuts || 0) + 1; return true;
   };
   { let kt = [], last = 0; SC.on('kill', () => { const t = performance.now(); kt = kt.filter(x => t - x < 4500); kt.push(t); if (kt.length >= 3 && t - last > 9000) { last = t; kt = []; if (U.cut('BALANCED', 'THREE LINES STRUCK')) SC.player.gain(15); } }); }`);
-rep("if (pl.cnt >= 11) { pl.cnt = 0; pl.gain(35);", "if (pl.cnt >= 11) { pl.cnt = 0; pl.gain(35); SC.ui.cut('LINE STRUCK', 'ELEVEN, COUNTED', true);");
+rep("if (pl.cnt >= 11) { pl.cnt = 0; pl.gain(35);", "if (pl.cnt >= 11) { pl.cnt = 0; pl.gain(22); SC.ui.cut('LINE STRUCK', 'ELEVEN, COUNTED', true);");
 rep("SC.audio.sfx('perfect'); SC.emit('speedlines', 0.8);", "SC.audio.sfx('perfect'); SC.emit('speedlines', 0.8); SC.ui.cut('THE TURN', 'NEVER GIVE GROUND');");
 rep("if (bell) { FX.ring(pl.pos, 0xffd23a, 0.5, 3.8, 0.4); SC.cam.shake(0.8); }", "if (bell) { FX.ring(pl.pos, 0xffd23a, 0.5, 3.8, 0.4); SC.cam.shake(0.8); if (pl.heldHeavy) SC.ui.cut('LAST BELL', 'FOR HER', true); }");
 
@@ -446,8 +446,8 @@ between("      const up = 0.4;\n", "    } else if (pw.id === 'shade') {", `     
 rep("G.uDot = { value: 5 };", "G.uDot = { value: 5 }; G.uDotK = { value: 0.3 };");
 rep("sh.uniforms.uDot = G.uDot; sh.uniforms.uKey = G.uKey;", "sh.uniforms.uDot = G.uDot; sh.uniforms.uDotK = G.uDotK; sh.uniforms.uKey = G.uKey;");
 rep("sh.fragmentShader = 'uniform float uDot;\\nuniform vec3 uKey;\\n'", "sh.fragmentShader = 'uniform float uDot;\\nuniform float uDotK;\\nuniform vec3 uKey;\\n'");
-rep("'    float scM = 1.0 - smoothstep(0.30, 0.36, scD);',", "'    float scM = mix(0.4, 1.0 - smoothstep(0.30, 0.36, scD), uDotK);',");
-rep("G.uDot.value = Math.max(2.2, Math.min(w, h) * pr / 340);", "G.uDot.value = Math.max(2, Math.min(w, h) * pr / 420); G.uDotK.value = SC.clamp((Math.min(w, h) * pr - 500) / 1400, 0.1, 0.45);");
+rep("'    float scM = 1.0 - smoothstep(0.30, 0.36, scD);',", "'    float scM = mix(0.2, 1.0 - smoothstep(0.30, 0.36, scD), uDotK);',");
+rep("G.uDot.value = Math.max(2.2, Math.min(w, h) * pr / 340);", "G.uDot.value = Math.max(1.6, Math.min(w, h) * pr / 560); G.uDotK.value = SC.clamp((Math.min(w, h) * pr - 500) / 2200, 0.05, 0.28);");
 
 rep("const g0 = new THREE.SphereGeometry(1, 10, 7), p0 = g0.attributes.position;", "const g0 = new THREE.SphereGeometry(1, 18, 12), p0 = g0.attributes.position;");
 /* ---- v0.45: guards arrive, they do not grow out of the floor. On the stair and the docks they drop in from above; in the valley they are simply far off when they appear. ---- */
@@ -455,10 +455,10 @@ rep("case 'spawn': { const k = Math.min(1, e.st / 0.8); m.group.scale.set(1, SC.
 rep("m.group.position.copy(e.pos);", "m.group.position.copy(e.pos); if (e.drop) m.group.position.y += e.drop;");
 /* ---- v0.48: a bot that only mashed strike and dodged went through all three levels without being hit, and most Dock Guards died before they ever swung.
    Three light cuts killed one; now it takes five. A third guard may attack at once. Being hit does not always stop a swing that is already coming. ---- */
-rep("hollow: { hp: 42, speed: 3.4,", "hollow: { hp: 64, speed: 3.6,");
-rep("knifer: { hp: 30, speed: 4.9,", "knifer: { hp: 46, speed: 4.9,");
-rep("bruiser: { hp: 130, speed: 2.6,", "bruiser: { hp: 165, speed: 2.7,");
-rep("boss: { hp: 400, speed: 4.2,", "boss: { hp: 520, speed: 4.2,");
+rep("hollow: { hp: 42, speed: 3.4,", "hollow: { hp: 96, speed: 3.6,");
+rep("knifer: { hp: 30, speed: 4.9,", "knifer: { hp: 66, speed: 4.9,");
+rep("bruiser: { hp: 130, speed: 2.6,", "bruiser: { hp: 240, speed: 2.7,");
+rep("boss: { hp: 400, speed: 4.2,", "boss: { hp: 980, speed: 4.5,");
 rep("const combat = SC.combat = { tokens: 0, maxTokens: 2, freeze: null };", "const combat = SC.combat = { tokens: 0, maxTokens: 3, freeze: null };");
 rep("if (!this.K.armor || o.heavy || o.power) { this.release();", "if (this.state === 'windup' && this.st > this.K.wind * 0.5 && !o.heavy && !o.power && !this.K.armor) { /* too late to stop him: a light cut lands, and so does he */ } else if (!this.K.armor || o.heavy || o.power) { this.release();");
 /* ---- v0.48: with a wall behind him the camera climbed until it was looking straight down through the rafters. It may climb a little; after that it comes in close instead ---- */
@@ -509,6 +509,57 @@ rep("    { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) :
       if (SC.showFps) { const ms = rdt * 1000; U.ftA = (U.ftA || ms) * 0.95 + ms * 0.05; U.ftW = Math.max((U.ftW || 0) * 0.99, ms); U.ftN = (U.ftN || 0) + 1; if (U.ftN % 20 === 0) { let el = $('ft'); if (!el) { el = document.createElement('div'); el.id = 'ft'; el.style.cssText = 'position:absolute;left:4px;bottom:4px;z-index:70;font:700 10px monospace;color:#fff;background:rgba(0,0,0,.6);padding:2px 5px;pointer-events:none'; $('mem').parentNode.appendChild(el); } const r = G.renderer.info.render; el.textContent = (1000 / U.ftA).toFixed(0) + ' fps · avg ' + U.ftA.toFixed(1) + ' ms · worst ' + U.ftW.toFixed(0) + ' ms · ' + (r.triangles / 1000).toFixed(0) + 'k tris · ' + G.renderer.domElement.width + 'x' + G.renderer.domElement.height; } }
       U.lastYaw = p.yaw; }
     { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) : 0,`);
+
+/* ---- v0.49: play notes on the High Docks ---- */
+// a controller was being read twice: once by the game, which sends what each button means, and once by the level itself with the old game's layout
+rep("gp.buttons.forEach((b, i) => { if (b.pressed && !padPrev[i] && map[i]) {", "if (SC.hosted) { const ax = dz(gp.axes[0] || 0), ay = dz(gp.axes[1] || 0); if (ax || ay) { mx = ax; my = -ay; } }\n      gp.buttons.forEach((b, i) => { if (SC.hosted && i !== 11) { padPrev[i] = b.pressed; return; } if (b.pressed && !padPrev[i] && map[i]) {");
+// the right stick turns the camera even while it is locked on somebody; it goes back to them when the stick is let go
+rep("if (!cam.lock) cam.yaw -= ax;", "if (!cam.lock || cam.sinceLook < 1.1) cam.yaw -= ax;");
+rep("if (sep > 0.6) cam.yaw = SC.dampAng(cam.yaw, Math.atan2(dx, dz), 5.5, rdt);", "if (sep > 0.6 && cam.sinceLook > 1.1) cam.yaw = SC.dampAng(cam.yaw, Math.atan2(dx, dz), 5.5, rdt);");
+// the pause menu answers the stick; with a pad in hand the corner shows what the buttons do and the prompts are his voice instead
+rep("if (d.sootborn === 'in') { SC.input.ext = { x: +d.x || 0, y: +d.y || 0 };", `if (d.sootborn === 'in') {
+        if (SC.ui.menuOpen) { const y = +d.y || 0; if (y && y !== SC._my) { const bs = Array.from(document.querySelectorAll('#menu .mbtn')); if (bs.length) { let i = bs.findIndex(b => b.classList.contains('y')); bs.forEach(b => b.classList.remove('y')); i = ((i < 0 ? 0 : i + (y < 0 ? 1 : -1)) + bs.length) % bs.length; bs[i].classList.add('y'); SC.audio.sfx('ui'); } } SC._my = y; } else SC._my = 0;
+        if (!SC._tw) { SC._tw = 1; const U = SC.ui, t0 = U.toast; U.toast = function (s, dd) { if (SC.pad && typeof s === 'string') { if (/^DRAG THE PICTURE/.test(s)) s = SC.issue === 'docks' ? 'THE SECOND BELL IS NINE MINUTES OFF. *BRAND HAS THE STAIR. I HAVE THE REST.*' : SC.issue === 'riser' ? 'FORTY PEOPLE ON A LADDER BEHIND ME. *NOBODY COMES DOWN THIS ROAD.*' : 'NINE HUNDRED STEPS. *TAVI IS ON MY LEFT.*'; else if (/^WIDE OPEN/.test(s)) s = 'HE IS OPEN. *I DO NOT LEAVE A LINE HALF STRUCK.*'; else if (/^WHEN THE FURY BAR/.test(s)) s = 'I HAVE COUNTED TO ELEVEN EVERY DAY SINCE THE DOORS CLOSED. *WHEN IT IS FULL, I HOLD THE CUT.*'; } return t0.call(U, s, dd); }; }
+        if (!!d.pad !== !!SC.pad) { SC.pad = !!d.pad; let el = document.getElementById('padleg'); if (!el) { const st = document.createElement('style'); st.textContent = '#padleg{position:fixed;right:10px;bottom:8px;z-index:60;pointer-events:none;font:700 9px/17px system-ui,sans-serif;letter-spacing:.04em;color:#f3e3c3;opacity:.78;text-align:right;text-shadow:0 1px 0 #000,0 0 3px #000}#padleg b{display:inline-block;min-width:14px;height:14px;line-height:14px;border-radius:7px;padding:0 2px;margin:0 3px 0 8px;text-align:center;color:#07070d;background:#c8c8c8;text-shadow:none;font-size:8px}#padleg .x{background:#5a9af0}#padleg .y{background:#e8c23a}#padleg .a{background:#6ac85a}#padleg .b{background:#e8604a}'; document.head.appendChild(st); el = document.createElement('div'); el.id = 'padleg'; el.innerHTML = '<b class="x">X</b>CUT &middot; HELD: HEAVY, ELEVEN<b class="y">Y</b>HOOK<br><b class="a">A</b>JUMP &middot; HELD: BOOTS<b class="b">B</b>DODGE<b>RB</b>KICK<b>LB</b>LUNGE<b>RS</b>LOOK'; document.body.appendChild(el); setInterval(() => { el.style.visibility = SC.ui.blocking() || SC.state !== 'play' ? 'hidden' : 'visible'; }, 200); } el.style.display = SC.pad ? 'block' : 'none'; }
+        SC.input.ext = { x: +d.x || 0, y: +d.y || 0 };`);
+// what a hit says: fewer of them, never the same twice running, and nothing from the old game
+rep("if (o.heavy && !o.power && !o.named) { _a.y += 0.7; FX.word(SC.pick(pl.meter > 55 ? ['FOR HER!', 'EVERY BREATH!', 'LAST BELL!', 'HER NAME!'] : ['AIR OWED!', 'COUNTED!', 'SOOT!', 'BREATHE!']), _a, pl.meter > 55 ? '#ff7a2e' : '#ffe14a', 1.4); }",
+    "if (o.heavy && !o.power && !o.named && pl.t - (pl.wordT || -9) > 3.2) { pl.wordT = pl.t; const pool = pl.meter > 55 ? ['FOR HER.', 'EVERY BREATH.', 'LAST BELL.', 'HER NAME.', 'ELEVEN SECONDS.', 'BALANCE THE BANK.'] : ['AIR OWED.', 'COUNTED.', 'SOOT.', 'BREATHE.', 'TIER SIX.', 'STRUCK.', 'BANK SEVEN.']; let w = SC.pick(pool); if (w === pl.wordL) w = pool[(pool.indexOf(w) + 1) % pool.length]; pl.wordL = w; _a.y += 0.7; FX.word(w, _a, pl.meter > 55 ? '#ff7a2e' : '#f3e3c3', 1.2); }");
+rep("G.fx.puff(p, 5, 1); G.fx.word(SC.pick(['KRAK!', 'SMASH!', 'KRUNCH!']), p, '#ffb52e', 1.2);", "G.fx.puff(p, 5, 1);");
+rep("if (heavy) { _a.y += 0.6; FX.word('KRAK!', _a, '#ff3b30', 1.5); }", "");
+rep("if (pl.t - (pl.cntT || -9) > 2.8) pl.cnt = 0;", "if (pl.t - (pl.cntT || -9) > 4.2) pl.cnt = 0;");
+// a run that is a run: he leans into it, the knees come up, the arms drive. The guards get a soldier's jog with the weapon carried
+rep("  /* enemies shamble rather than run */", `  { const walk = P.run; P.run = (ph, s) => { const o = walk(ph, s), a = Math.sin(ph), c = Math.cos(ph), f = SC.clamp(s, 0.25, 1.2), r = SC.clamp((s - 0.5) / 0.4, 0, 1); if (r <= 0) return o; const lean = 0.2 * f + 0.26 * r, sw = (0.85 + 0.5 * r) * f, th = 0.95 + 0.35 * r;
+    o.hips = [0, -0.22 * a * f, 0]; o.spine = [lean, 0, 0]; o.chest = [0.1 * f + 0.1 * r, 0.36 * a * f, 0]; o.head = [-(lean * 0.78 + 0.04), 0, 0];
+    o.shL = [sw * a, 0, 0.14]; o.elL = [-1.3 - 0.4 * r - 0.3 * a, 0, 0]; o.shR = [-sw * a, 0, -0.14]; o.elR = [-1.3 - 0.4 * r + 0.3 * a, 0, 0];
+    o.thL = [(-th * a - 0.14 - 0.16 * r) * f, 0, 0.03]; o.shnL = [(0.22 + (1.15 + 0.7 * r) * Math.max(0, c)) * f, 0, 0]; o.thR = [(th * a - 0.14 - 0.16 * r) * f, 0, -0.03]; o.shnR = [(0.22 + (1.15 + 0.7 * r) * Math.max(0, -c)) * f, 0, 0];
+    o.y = -0.05 * f - 0.05 * r + (0.045 + 0.055 * r) * Math.cos(ph * 2) * f; return o; };
+    P.jog = (ph, s, t) => { const o = P.run(ph, Math.min(0.95, s * 0.8)), a = Math.sin(ph); o.spine = [0.2, 0, 0]; o.head = [-0.12, Math.sin(t * 0.7) * 0.12, 0]; o.shR = [-0.55 + 0.12 * a, 0, -0.16]; o.elR = [-1.15, 0, 0]; o.shL = [0.6 * a, 0, 0.16]; o.elL = [-1.2 - 0.2 * a, 0, 0]; return o; }; }
+  /* enemies shamble rather than run */`);
+rep("e.kind === 'boss' || e.kind === 'knifer' ? P.run(e.runPh, sp / K.speed) : P.shamble(e.runPh, sp / K.speed + 0.5, e.t); } else pose = e.kind === 'boss' ? P.guard(e.t) : P.lurk(e.t); }", "e.kind === 'boss' || e.kind === 'knifer' ? P.run(e.runPh, sp / K.speed) : P.jog(e.runPh, sp / K.speed + 0.25, e.t); } else pose = P.guard(e.t); }");
+rep("pl.runPh += pl.speed * dt * 1.72;", "pl.runPh += pl.speed * dt * 1.5;");
+// signs: enamel plates with a rule, rivets and the Authority's sun, cut in capitals. They were flat boxes of poster lettering
+between("    const t = signTex[key] || (signTex[key] = G.canvasTex(512, Math.round(512 * h / w), (g, cw, ch) => {", "    }));", `    const t = signTex[key] || (signTex[key] = G.canvasTex(1024, Math.max(48, Math.round(1024 * h / w)), (g, cw, ch) => {
+      const dark = bg || '#0b0d24', u = ch / 100, rq = SC.seeded(text.length * 7 + 3);
+      g.fillStyle = dark; g.fillRect(0, 0, cw, ch);
+      const gr = g.createLinearGradient(0, 0, 0, ch); gr.addColorStop(0, 'rgba(255,255,255,.14)'); gr.addColorStop(0.45, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(0,0,0,.28)'); g.fillStyle = gr; g.fillRect(0, 0, cw, ch);
+      g.strokeStyle = '#07070d'; g.lineWidth = 9 * u; g.strokeRect(4.5 * u, 4.5 * u, cw - 9 * u, ch - 9 * u);
+      g.strokeStyle = color; g.globalAlpha = 0.95; g.lineWidth = 2.4 * u; g.strokeRect(13 * u, 13 * u, cw - 26 * u, ch - 26 * u); g.globalAlpha = 0.5; g.lineWidth = 1.1 * u; g.strokeRect(18.5 * u, 18.5 * u, cw - 37 * u, ch - 37 * u); g.globalAlpha = 1;
+      g.fillStyle = color; for (const [rx, ry] of [[24, 24], [cw / u - 24, 24], [24, 76], [cw / u - 24, 76]]) { g.beginPath(); g.arc(rx * u, ry * u, 2.4 * u, 0, 7); g.fill(); }
+      const wide = cw / ch > 3.4, sun = cx => { g.fillStyle = color; g.strokeStyle = color; g.beginPath(); g.arc(cx, ch / 2, 10 * u, 0, 7); g.fill(); g.lineWidth = 2.6 * u; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; g.beginPath(); g.moveTo(cx + Math.cos(a) * 14 * u, ch / 2 + Math.sin(a) * 14 * u); g.lineTo(cx + Math.cos(a) * 20 * u, ch / 2 + Math.sin(a) * 20 * u); g.stroke(); } g.fillStyle = dark; g.beginPath(); g.arc(cx, ch / 2, 4.2 * u, 0, 7); g.fill(); };
+      if (wide) { sun(50 * u); sun(cw - 50 * u); }
+      const fs = Math.round(46 * u); g.font = '700 ' + fs + 'px Georgia, "Times New Roman", serif'; g.textAlign = 'left'; g.textBaseline = 'middle';
+      const sp = fs * 0.13, ws = text.split('').map(c => g.measureText(c).width), tot = ws.reduce((a, b) => a + b, 0) + sp * (text.length - 1), avail = cw - (wide ? 150 : 56) * u, sc = Math.min(1, avail / tot);
+      g.save(); g.translate(cw / 2 - tot * sc / 2, ch / 2 + 2 * u); g.scale(sc, 1); let x = 0;
+      for (let i = 0; i < text.length; i++) { g.fillStyle = 'rgba(0,0,0,.55)'; g.fillText(text[i], x + 1.6 * u, 2 * u); g.fillStyle = color; g.fillText(text[i], x, 0); x += ws[i] + sp; } g.restore();
+      g.fillStyle = 'rgba(8,6,8,.16)'; for (let i = 0; i < 9; i++) { const sx = rq() * cw, sw = (2 + rq() * 7) * u; g.fillRect(sx, 9 * u, sw, (18 + rq() * 60) * u); }
+      g.strokeStyle = 'rgba(255,255,255,.10)'; g.lineWidth = u; for (let i = 0; i < 5; i++) { const sx = rq() * cw, sy = (20 + rq() * 60) * u; g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx + (10 + rq() * 40) * u, sy + (rq() - 0.5) * 6 * u); g.stroke(); }
+`);
+// guards that are already standing their post when he gets there
+rep("    const e = ENC[id]; S.enc = e; e.wave = -1; e.wait = 0.2; objective();", "    const e = ENC[id]; if (e.posted) return; S.enc = e; e.wave = -1; e.wait = 0.2; objective();");
+rep("SC.clearEnemies = function () { while (E.length) E[0].remove();", "SC.clearEnemies = function () { SC.cleared = (SC.cleared || 0) + 1; while (E.length) E[0].remove();");
+// the pages: his captions are ink and lamplight, not a yellow sticker, and the sound words say what the sound is
+rep("#page .cp.w{background:var(--paper);border-radius:14px}", "#page .cp.w{background:#e8e0cc;color:#07070d;border-radius:10px}\n#page .cp{background:#14111a;color:#f3e3c3;border:2px solid #07070d;box-shadow:inset 0 0 0 1px rgba(232,194,90,.55),3px 3px 0 #07070d}\n#page .cp b,#page .cp em,#page .cp i{color:#ffc86a}\n#page .cp.w b,#page .cp.w em,#page .cp.w i{color:#8a2a14}\n#page .fx{font:700 clamp(13px,5vh,28px) Georgia,'Times New Roman',serif;letter-spacing:.32em;color:#f3e3c3;-webkit-text-stroke:0;text-shadow:2px 2px 0 #07070d,0 0 14px rgba(0,0,0,.85);transform:none;text-transform:uppercase}\n#obj{background:#14111a !important;color:#f3e3c3 !important;box-shadow:inset 0 0 0 1px rgba(232,194,90,.6),3px 3px 0 #07070d !important}");
 
 if (/Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow/.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''))) {
   const m = s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').match(/.{0,60}(Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow).{0,40}/g);

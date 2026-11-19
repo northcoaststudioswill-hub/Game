@@ -101,6 +101,7 @@ const Menus = {
       { label: 'Resume', act: () => UI.pop() },
       ...(G.heist === 3 ? [{ label: 'Skip this mission', act: () => { UI.clear(); Mission.finish(); } }] : []),
       { label: () => 'Journal' + (G.newJ ? ` (${G.newJ} new)` : ''), act: () => Menus.journal() },
+      { label: () => `Codex (${Codex.count()} of ${CODEX_FINDS.length} found)`, act: () => Codex.open() },
       { label: 'Map of Cinderwell', act: () => Menus.map() },
       { label: 'Training room', act: () => { if (G.heist) { HUD.toast('Not now — finish this first'); Sound.play('deny'); return; } Game.autosave(); Menus.training(true); } },
       { label: 'Save game', act: () => { if (G.heist) { HUD.toast('Not now — finish this first'); Sound.play('deny'); return; } Menus.slots('save'); } },
@@ -168,7 +169,7 @@ const Menus = {
         if (J('e_dacenote')) { R(250, 129, 5, 8, '#1a1114'); R(244, 133, 2, 2, '#ffd890'); }
         if (J('e_riser')) { R(286, 30, 3, 100, '#0a0608'); R(287, 30, 1, 100, '#e8b23a'); for (let y = 34; y < 128; y += 8) R(287, y, 1, 3, '#fff0b0'); plate('RISER 9', 268, 52); } }
       if (J('e_aux9')) { R(214, 108, 1, 22, '#c87a3a'); plate('AUX-9', 168, 128); R(180, 132, 34, 1, '#c87a3a'); }
-      const at = { apt: [40, 100], square: [120, 106], fest: [120, 106], clinic: [184, 84], bay: [222, 106], fuse: [266, 86], tunnel: [222, 133] }[G.mapId]; if (at) here(at[0], at[1]);
+      const at = { apt: [40, 100], rowk: [66, 104], square: [120, 106], fest: [120, 106], clinic: [184, 84], bay: [222, 106], fuse: [266, 86], tunnel: [222, 133] }[G.mapId]; if (at) here(at[0], at[1]);
       const p = document.createElement('p'); p.style.opacity = .7; p.textContent = 'What Kael knows is lit. The rest is rock. The map fills in as you find things.'; b.appendChild(p);
     }, items: [{ label: 'Close', act: () => UI.pop() }] }));
   },
@@ -216,7 +217,7 @@ const Menus = {
       'Fights': [
         ['The Valley · battle (the first fight)', ff('FOUR YEARS FROM NOW', 'The Assay. Day forty.', 'valley')],
         ['Three Steps · the Warden at the furnace', () => { fresh(); G.flags.ranForHer = 1; ffScene('THREE STEPS', 'You make it three steps.', () => FF.furnace(), () => Game.toTitle()); }],
-        ['The Pairing · duel with Teo Aldane', ff('FOUR YEARS FROM NOW', 'The Assay. The first night.', 'pairing')],
+        ['The Pairing · duel with Dorian Aldane', ff('FOUR YEARS FROM NOW', 'The Assay. The first night.', 'pairing')],
         ['The Ford · single combat (3D)', ff('THE ASSAY', 'Four years from now. Day nineteen.', 'ford')],
         ['The Ford · on the painted valley', ff('THE ASSAY', 'Four years from now. Day nineteen.', 'ford2d')],
         ['The Proctor · duel with Halden Voss', ff('FOUR YEARS FROM NOW', 'The Assay. Day thirty-one.', 'proctor')],
@@ -227,7 +228,7 @@ const Menus = {
       ],
       'Assay missions (2D)': [
         ['★ NEW · Day 3 · The Camp (wood, water, fire)', () => { fresh(); Mission.start('camp'); }],
-        ['★ NEW · Night 25 · The Island (stealth; Wren)', () => { fresh(); Mission.start('raid'); }],
+        ['★ NEW · Night 25 · The Island (stealth; Kestrel)', () => { fresh(); Mission.start('raid'); }],
         ['★ NEW · Night 28 · The Lamp (find the traitor; a 2D duel)', () => { fresh(); Mission.start('lamp'); }],
         ['★ NEW · Night 30 · The Dais (stealth; the grading book)', () => { fresh(); Mission.start('dais'); }],
         ['★ NEW · Night 49 · The Last Night (the camp; Lucan under truce)', () => { fresh(); Mission.start('eve'); }],
@@ -273,7 +274,7 @@ const Menus = {
       ['Day 4 · the months, Mara, the way out, Ilse (no fights)', cs(DAY4)], ['Film · The Standard', film('twins')], ['Film · The Pinning', film('blade')], ['Film · The High Docks', film('docks')],
       ['Film · The Valley', film('valley')], ['Film · The Pairing', film('pairing')], ['Film · The Ford', film('ford')], ['Film · The Proctor', film('proctor')], ['Film · The Keep', film('keep')], ['Film · The Fall', film('fall')]
     ];
-    S['Fights'].splice(S['Fights'].length - 1, 0, ['★ NEW · Part Two · The Dock Stair · you play Brand', ff('THE DOCK STAIR', 'Seven years from now. Brand.', 'brandstair')], ['★ NEW · Assay · On the Ground · Proctor Voss (2D)', ff('MORNING', 'The Assay. Day thirty-one.', 'voss2d')], ['★ NEW · Training · No Gloves · Brand (2D)', ff('TWO AND A HALF YEARS FROM NOW', 'The pit. Brand. No gloves.', 'drill2')], ['Part Two · The Gallery · Tyr Cade', ff('PART TWO', 'The Sun Spire.', 'gallery')], ['Part Two · Riser Nine · the balancing of Tier Four', ff('PART TWO', 'Five years from now.', 'riser')], ['Part Two · The Son · Lucan Aurel again', ff('PART TWO', 'Six years from now.', 'son')], ['Part Two · Tier Six Stands · you play Mara (2D)', ff('MEANWHILE', 'Six tiers down.', 'stand')], ['Part Two · The Stair · up the Spire', ff('PART TWO', 'Nine years from now.', 'stair')], ['Part Two · Little Ember · Celestine (final)', ff('PART TWO', 'The top of the Spire.', 'ember')]);
+    S['Fights'].splice(S['Fights'].length - 1, 0, ['★ NEW · Part Two · The Dock Stair · you play Brand', ff('THE DOCK STAIR', 'Seven years from now. Brand.', 'brandstair')], ['★ NEW · Assay · On the Ground · Proctor Voss (2D)', ff('MORNING', 'The Assay. Day thirty-one.', 'voss2d')], ['★ NEW · Training · No Gloves · Brand (2D)', ff('TWO AND A HALF YEARS FROM NOW', 'The pit. Brand. No gloves.', 'drill2')], ['Part Two · The Gallery · Severin Cade', ff('PART TWO', 'The Sun Spire.', 'gallery')], ['Part Two · Riser Nine · the balancing of Tier Four', ff('PART TWO', 'Five years from now.', 'riser')], ['Part Two · The Son · Lucan Aurel again', ff('PART TWO', 'Six years from now.', 'son')], ['Part Two · Tier Six Stands · you play Mara (2D)', ff('MEANWHILE', 'Six tiers down.', 'stand')], ['Part Two · The Stair · up the Spire', ff('PART TWO', 'Nine years from now.', 'stair')], ['Part Two · Little Ember · Celestine (final)', ff('PART TWO', 'The top of the Spire.', 'ember')]);
     for (let n = 1; n <= 5; n++) { S['Story beats'].push([`Part Two · ${n} · ${P2_TITLES[n]}`, () => playPart2(n)]); S['Cutscenes'].push([`Part Two · ${n} · ${P2_TITLES[n]} (no fights)`, cs(P2[n])]); }
     S['Cutscenes'].push(['Film · The Gallery', film('gallery')], ['Film · Riser Nine', film('riser')], ['Film · The Son', film('son')], ['Film · The Stair', film('stair')], ['Film · Little Ember', film('ember')]);
     const sub = k => () => UI.push(modal({ title: k, items: S[k].map(([label, act]) => ({ label, act })).concat([{ label: 'Back', act: () => UI.pop() }]) }));
@@ -311,6 +312,7 @@ const Menus = {
       ...(+Store.get('sootborn_p2') >= 1 ? [{ label: `Continue Part Two — ${+Store.get('sootborn_p2')} · ${P2_TITLES[+Store.get('sootborn_p2')]}`, act: () => playPart2(+Store.get('sootborn_p2')) }] : []),
       { label: 'New game', act: () => Menus.newGame() },
       { label: 'Training room', act: () => Menus.training() },
+      { label: 'Codex', act: () => Codex.open() },
       { label: 'Memories', act: () => Menus.memories() },
       ...(Store.get('sootborn_done') ? [{ label: 'Chapter select', act: () => Menus.chapters() }] : []),
       { label: 'Load game', act: () => Menus.slots('load') },
@@ -323,7 +325,7 @@ const Menus = {
   chapters() { const go = f => () => { UI.clear(); f(); }; UI.push(modal({ title: 'Chapter select', build(b) { b.innerHTML = '<p>Replay any chapter. Your save slots are not touched until the game autosaves.</p>'; }, items: [{ label: 'Part One · from the beginning', act: () => Menus.newGame() }, ...[1, 2, 3, 4, 5].map(n => ({ label: `Part Two · ${n} · ${P2_TITLES[n]}`, act: go(() => playPart2(n)) })), { label: 'Back', act: () => UI.pop() }] })); },
   memories() { let L = []; try { L = JSON.parse(Store.get('sootborn_mem') || '[]'); } catch (e) { } UI.push(modal({ title: 'Memories', build(b) { b.innerHTML = '<p style="opacity:.7">Mara keeps them on the shelf, beside the tins. ' + L.length + ' kept so far.</p>' + (L.map(m => `<div class="card"><b>${esc(m[0])}</b><p>${esc(m[1])}</p><p style="opacity:.55">${esc(m[2] || '')}</p></div>`).join('') || '<p>None yet. They come back to him in fights.</p>'); }, items: [{ label: 'Back', act: () => UI.pop() }] })); },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Version 0.48. The whole story plays from the opening film to THE END: four days in Cinderwell, the Assay told in dreams, and five chapters above the rock, with about twenty fights. The training room is on the title screen and in the pause menu. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Version 0.49. The whole story plays from the opening film to THE END: four days in Cinderwell, the Assay told in dreams, and five chapters above the rock, with about twenty fights. The training room is on the title screen and in the pause menu. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p><b>The three third-person levels</b> (Riser Nine, the High Docks, the Stair): tap A for light cuts; keep A held for three heavy blows; at full fury a held A is ELEVEN. KICK kicks, twice for the Wide Cut. HOOK throws the hook line. JUMP jumps, held it hovers, and A in the air dives. LUNGE is the boots along the ground. B dodges. Walking over a chalked sun saves and heals; a marked one holds a memory, and A opens it. Drag the picture to look round.</p>
@@ -336,7 +338,7 @@ const Menus = {
       { label: 'Begin the prologue', act: () => { UI.clear(); Game.newGame(); } }, { label: 'Back', act: () => UI.pop() }] }));
   },
   _oldNewGame() {
-    let name = G.name || 'Wren', look = G.look || 0;
+    let name = G.name || 'Kael', look = G.look || 0;
     const m = modal({ title: 'New game', build(b) {
       b.innerHTML = `<p>Your name</p><input type="text" id="ngName" maxlength="14" value="${esc(name)}" autocomplete="off"><p style="margin-top:10px">Look</p><div class="looks"></div>`;
       const inp = b.querySelector('#ngName'); inp.oninput = () => { name = inp.value; };
@@ -345,7 +347,7 @@ const Menus = {
       LOOKS.forEach((L, i) => { const c = document.createElement('canvas'); c.width = 48; c.height = 48; portraitTo(c, makeChar(playerLook(i))); if (i === look) c.className = 'on'; c.onclick = () => { look = i; Sound.play('move'); m.refresh(); }; wrap.appendChild(c); });
     }, items: [
       { label: 'Look', value: () => LOOKS[look].label, adj: d => { look = (look + d + LOOKS.length) % LOOKS.length; } },
-      { label: 'Begin', act: () => { const n = (name || '').trim().slice(0, 14) || 'Wren'; UI.clear(); Game.newGame(n, look); } },
+      { label: 'Begin', act: () => { const n = (name || '').trim().slice(0, 14) || 'Kael'; UI.clear(); Game.newGame(n, look); } },
       { label: 'Back', act: () => UI.pop() }
     ] });
     UI.push(m);

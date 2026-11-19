@@ -44,10 +44,12 @@ const Game = {
   },
   onHeistDone() {
     G.heist = 0; G.flags.relayCut = 0; World.darkOverride = null; World.bolt = null; World.ripple = null; World.dynLights = []; World.npcs = [];
+    Codex.add('c_valve', true);
     Cutscene.play(PROLOGUE_B, () => Game.startPresent());
   },
   startPresent() {
     if (!G.tendency) G.tendency = 'caretaker';
+    Codex.add('c_valve', true); Codex.add('c_eleven', true);
     World.load('apt', { x: 3 * 16 + 8, y: 3 * 16 + 12, dir: 2 }); G.mode = 'world';
     Fade.a = 1; Fade.dir = -1; Fade.sp = 0.8; Fade.busy = true; Sound.play('bell'); Sound.music('home');
     addJ('p_seren', true); addJ('p_celestine', true); G.newJ = 0; Game.autosave();
@@ -58,7 +60,7 @@ const Game = {
     G.look = s.look | 0; World.resetSheets(); World.showPlayer = true; Save.apply(s); World.resetSheets();
     G.mode = 'world'; Fade.a = 1; Fade.dir = -1; Fade.sp = 2; Fade.busy = true; HUD.toast(`Day ${G.day} — ${MAPS[G.mapId].name}`);
   },
-  autosave() { if (G.mode !== 'world' || G.heist) return; Save.write('auto'); },
+  autosave() { if (G.mode !== 'world' || G.heist) return; Codex.sync(); Save.write('auto'); },
   onPuzzleDone() {
     setF('puzzleDone'); addJ('e_aux9'); Sound.play('clue'); World.refreshNPCs(); Game.autosave();
     Dialogue.start([narr('The bank shudders, then settles. Every gauge swings into the green.'),

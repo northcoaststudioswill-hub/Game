@@ -64,7 +64,7 @@
   const SUN = {
     docks: {
       yard: { fury: 1, toast: 'THE WASHER. *FURY.*', p: [
-        { k: 'desk3', cap: 'THE EAST MANIFOLD. LAST YEAR.', cap2: 'WREN HALLORAN TURNED MY HAND OVER AND SAW THE VALVE BURNS THE GILDING DID NOT TAKE. *SHE DID NOT ASK.*' },
+        { k: 'desk3', cap: 'THE EAST MANIFOLD. LAST YEAR.', cap2: 'KESTREL DRAY TURNED MY HAND OVER AND SAW THE VALVE BURNS THE GILDING DID NOT TAKE. *SHE DID NOT ASK.*' },
         { k: 'hands0', cap2: 'THE WASHER WAS UNDER MY COLLAR. I WAITED FOR IT TO GET HEAVIER. *IT DID NOT, AND I HAVE NOT FORGIVEN IT.*' }] },
       roof: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
         { k: 'assay0', cap: 'THE ASSAY. THREE YEARS AGO.', cap2: 'TWO SEALED IN A ROOM, ONE COMES OUT A CADET. TEO ALDANE SHARED HIS BREAD ON THE LIFT. *"I HOPE SHE WAS WORTH IT."*' },
@@ -122,7 +122,7 @@
     const c = shot(hd.x - 0.35, hd.y + 0.12, hd.z - 1.25, hd.x, hd.y, hd.z, 27);
     pl.model.expr = null;
     U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: [
-      { img: a, area: '1 / 1 / 3 / 2', cap: 'THE HIGH DOCKS. SEVEN YEARS AFTER THE FURNACE.', cap2: 'FOUR HUNDRED BARGES, MOORED IN PAIRS. CUT THE PAIRS AND THE WIND DOES THE REST.', fx: 'BONG!' },
+      { img: a, area: '1 / 1 / 3 / 2', cap: 'THE HIGH DOCKS. SEVEN YEARS AFTER THE FURNACE.', cap2: 'FOUR HUNDRED BARGES, MOORED IN PAIRS. CUT THE PAIRS AND THE WIND DOES THE REST.', fx: 'THE SECOND BELL' },
       { img: b, area: '1 / 2 / 2 / 3', cap2: 'THE SECOND BELL. NINE MINUTES WHEN NOBODY LOOKS AT THE STAIR. *I WROTE THE ROTA MYSELF.*' },
       { img: c, area: '2 / 2 / 3 / 3', cap: 'THE LAMPS WERE ALREADY LIT.', cap2: 'SOMEBODY HAD TOLD THEM THE HOUR.' }
     ] }, wake);
@@ -165,7 +165,7 @@
   function finale() {
     setFlag('cut'); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 5; U.showHud(false); SC.emit('letterbox', true);
     pl.place(MOOR.x, 11, MOOR.z - 0.9, 0); cable.visible = false; S.drift = 0.0001;
-    const p = v3(MOOR.x, 11, MOOR.z); FX.burst(v3(p.x, 12, p.z + 1), 0xffd23a, 1.6); FX.word('SNAP!', v3(p.x, 13.2, p.z + 1), '#ffe14a', 2.2); cam.shake(0.6); SC.audio.sfx('door');
+    const p = v3(MOOR.x, 11, MOOR.z); FX.burst(v3(p.x, 12, p.z + 1), 0xffd23a, 1.6); FX.word('THE LINE GOES.', v3(p.x, 13.2, p.z + 1), '#f3e3c3', 1.8); cam.shake(0.6); SC.audio.sfx('door');
     cam.move(v3(p.x - 4.2, 12.3, p.z - 5.2), v3(p.x + 1, 15, p.z + 8), v3(p.x - 5.4, 13, p.z - 6.6), v3(p.x + 6, 21, p.z + 16), 11, 46);
     run([1.6, n => U.say([
         { who: 'cap', text: 'The last pair went out on the wind like the rest. Four hundred hulls, and not one lamp on any of them.' },
@@ -245,6 +245,25 @@
       if (!F.ledger) { U.toast('LOCKED. THE KEY WILL BE IN THE *DOCK OFFICE*.', 2.6); SC.audio.sfx('deny'); return; }
       W.openDoor('hatch'); SC.audio.sfx('door'); setFlag('hatch'); } });
     W.addInteract({ id: 'moor', x: MOOR.x, y: 11, z: MOOR.z, r: 2.4, label: 'CUT THE LINE', marker: 'act', mh: 2.4, when: () => F.boss && !F.cut, act: finale });
+    // the watch is already on its posts, talking. It knows him when he walks up to it.
+    { const POST = ['street', 'yard', 'wh', 'roof'], PRE = { street: () => F.e_alley, yard: () => F.gate, wh: () => F.breaker, roof: () => F.hatch && !F.bossIntro },
+        TALK = ['SECOND BELL SOON.', 'ROOK SAYS HOLD.', 'ONE CLERK. ONE.', 'FORTY HALBERDS FOR A CLERK.', 'THE STAIR IS NOT OURS TO WATCH.', 'IT WAS QUIET AT THE FIRST BELL.', 'WHO CHALKED OVER THE ROTA?', 'CADE SIGNED FOR IT.', 'MIND THE EDGE.', 'LAMPS LIT. EYES OPEN.', 'HE KEPT THE COUNT, THEY SAY.', 'A CLERK DOES NOT FIGHT.'];
+      let seen = -1, talkT = 3, talkN = 0; const _pv = v3();
+      const post = () => { for (const id of POST) { const e = ENC[id]; e.posted = 0; if (F['e_' + id] || F.boss || S.bossDown || !e.waves || !e.waves[0]) continue; e.posted = 1; e.wave = 0; e.wait = 0;
+          e.waves[0].forEach((w, i) => { const m = SC.spawnEnemy(w[0], w[1], e.floor, w[2], e); m.state = 'wait'; m.st = 0; m.drop = 0; m.model.group.scale.set(1, 1, 1); m.postI = i; }); } };
+      const wake = (e, who) => { e.posted = 2; S.enc = e; e.wave = 0; e.wait = 0; for (const m of SC.enemies) if (m.enc === e && m.state === 'wait') { m.state = 'chase'; m.st = 0; m.cool = 0.9 + Math.random() * 0.9; }
+        _pv.copy(who.pos); _pv.y += who.h + 0.5; FX.word(SC.pick(['THERE. THE CLERK!', 'IT IS HIM. TO ME!', 'SORREL! HOLD HIM!']), _pv, '#ff3b30', 1.4); SC.audio.sfx('alert'); objective(); };
+      W.dyn.push((t, dt) => { if (SC.state !== 'play') return;
+        if (seen !== (SC.cleared || 0)) { if (!pl.control) return; seen = SC.cleared || 0; post(); }
+        talkT -= dt; let spoke = false;
+        for (const id of POST) { const e = ENC[id]; if (e.posted !== 1) continue; const mem = SC.enemies.filter(m => m.enc === e && m.state === 'wait'); if (!mem.length) { e.posted = 2; continue; }
+          for (const m of mem) { const o = mem[m.postI ^ 1] || mem[(m.postI + 1) % mem.length]; if (o && o !== m) m.yaw = SC.dampAng(m.yaw, Math.atan2(o.pos.x - m.pos.x, o.pos.z - m.pos.z) + Math.sin(t * 0.4 + m.postI) * 0.5, 2, dt); }
+          const near = mem.find(m => Math.abs(m.pos.y - pl.pos.y) < 3 && SC.dist2(m.pos.x, m.pos.z, pl.pos.x, pl.pos.z) < 81);
+          if (near && !S.enc && pl.control && PRE[id]()) { wake(e, near); continue; }
+          if (talkT <= 0 && !spoke) { const m = mem[talkN % mem.length]; if (SC.dist2(m.pos.x, m.pos.z, pl.pos.x, pl.pos.z) < 700) { _pv.copy(m.pos); _pv.y += m.h + 0.35; FX.word(TALK[talkN % TALK.length], _pv, '#dfe6ff', 0.62); talkN++; spoke = true; } } }
+        if (talkT <= 0) talkT = 3.4 + Math.random() * 2.4; }); }
+    // he remembers in the middle of it, not only at the end of it
+    SC.on('kill', () => { S.killN = (S.killN || 0) + 1; if (S.killN % 5 === 0 && SC.enemies.some(m => m.state !== 'dead' && m.state !== 'wait')) { S.artN = (S.artN || 0) + 1; U.memory(art(ARTS[(S.artN - 1) % ARTS.length])); } });
     SC.on('power', () => { S.artN = (S.artN || 0) + 1; U.memory(art(ARTS[(S.artN - 1) % ARTS.length])); });
     SC.on('finisherStart', e => { if (e.kind === 'boss') U.memory(art(FIN.boss)); else { S.finN = (S.finN || 0) + 1; if (S.finN <= 2) U.memory(art(FIN.warden)); } });
     SC.on('dazed', e => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted ? 'WIDE OPEN. GET CLOSE AND PRESS *A* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
@@ -310,11 +329,11 @@
       SC.state = 'play'; U.showHud(false); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; pl.faceOverride = 'angry';
       pl.place(0, 0, RIS ? 10.4 : 41, Math.PI); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.face('angry'); pl.model.group.updateMatrixWorld(true); brandOnStair(); if (clerk) clerk.group.updateMatrixWorld(true);
       const pg = RIS ? [
-        { img: shot(-9.5, 5.2, 4.5, 0.6, 0.6, 14, 42, 768, 720), area: '1 / 1 / 3 / 2', cap: 'RISER NINE. FIVE YEARS AFTER THE FURNACE.', cap2: 'NINE FLOORS OF LADDER UNDER TIER FOUR. IT COMES UP IN THE VALLEY WHERE I WON THEIR ASSAY.', fx: 'CLANG!' },
+        { img: shot(-9.5, 5.2, 4.5, 0.6, 0.6, 14, 42, 768, 720), area: '1 / 1 / 3 / 2', cap: 'RISER NINE. FIVE YEARS AFTER THE FURNACE.', cap2: 'NINE FLOORS OF LADDER UNDER TIER FOUR. IT COMES UP IN THE VALLEY WHERE I WON THEIR ASSAY.', fx: 'THE HATCH' },
         { img: shot(-1.2, 1.7, 8.1, 0, 1.75, 10.4, 30), area: '1 / 2 / 2 / 3', cap2: 'THE ORDER SAID ELEVEN HUNDRED. DACE SAID: HOLD THE TOP FOR AN HOUR. *A CLERK CANNOT BE SEEN TO FIGHT. I WORE A MASK.*' },
         { img: shot(1.6, 2.0, 13.2, 0, 5.2, -21, 40), area: '2 / 2 / 3 / 3', cap: 'THE WARDENS WERE ALREADY ON THE HILL ROAD.', cap2: 'FORTY PEOPLE BEHIND ME ON A LADDER.' }
       ] : [
-        { img: shot(9, 4.5, 47, 0, 7, 10, 46, 768, 720), area: '1 / 1 / 3 / 2', cap: 'THE SUN SPIRE. NINE YEARS AFTER THE FURNACE.', cap2: 'FOUR HUNDRED HULLS CAME DOWN ON THE TERRACES AT DAWN. BY SUNSET THERE WAS ONE STAIR LEFT.', fx: 'HMMMM' },
+        { img: shot(9, 4.5, 47, 0, 7, 10, 46, 768, 720), area: '1 / 1 / 3 / 2', cap: 'THE SUN SPIRE. NINE YEARS AFTER THE FURNACE.', cap2: 'FOUR HUNDRED HULLS CAME DOWN ON THE TERRACES AT DAWN. BY SUNSET THERE WAS ONE STAIR LEFT.', fx: 'THEY ARE HUMMING' },
         { img: shot(0.4, 1.5, 38.4, -1.6, 1.5, 40.2, 30), area: '1 / 2 / 2 / 3', cap2: '"I\'M ON YOUR LEFT THE WHOLE WAY UP. DON\'T ARGUE. *I\'VE FLOWN A BARGE.*"' },
         { img: shot(0, 1.6, 37, 0, 13, -20, 44), area: '2 / 2 / 3 / 3', cap: 'THE LAST OF NINE HUNDRED STEPS.', cap2: 'WE. IT WAS ALWAYS WE.' }
       ];
@@ -515,7 +534,7 @@
         out.push({ img: sh(0, 3.08, 0.62, 0, 1.0, 0.12, 66), cap: 'FIRST THE BONES.', cap2: 'A CHILD\'S BONES ARE SOFT AND TAKE THE WIRE. MINE HAD TO BE OPENED. *I COUNTED THE PLACES. OF COURSE I COUNTED.*' });
         PR.feed.span(v3(1.4, 1.1, -0.22), bw(k, 'shnR').add(v3(0, 0.07, 0)));
         A.u1.group.visible = false;
-        out.push({ img: sh(-0.95, 1.5, 1.75, 0.1, 1.08, 0.5, 34), cap2: 'A FINGER\'S WIDTH A DAY. THE WIRE DOES NOT STRETCH THE BONE. *IT GIVES THE BONE SOMETHING TO CLIMB.*', fx: 'KRRK' });
+        out.push({ img: sh(-0.95, 1.5, 1.75, 0.1, 1.08, 0.5, 34), cap2: 'A FINGER\'S WIDTH A DAY. THE WIRE DOES NOT STRETCH THE BONE. *IT GIVES THE BONE SOMETHING TO CLIMB.*'});
         A.ilse.group.visible = false; PR.feed.visible = false;
         out.push({ img: sh(0.5, 1.95, -0.1, 0, 1.13, -0.74, 28), cap2: 'THERE WERE MORE THAN ELEVEN, AND I HAD TO START AGAIN. *THAT WAS THE FIRST MONTH.*' });
         return Object.assign({ panels: out.map((p, i) => Object.assign(p, { area: a3[i] })) }, THREE_); },

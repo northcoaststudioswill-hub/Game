@@ -509,10 +509,13 @@ Object.assign(PROPS, {
     R(8, -6, 32, 10, '#1e100c'); R(9, -5, 30, 8, '#4a2c18'); R(9, -5, 30, 1, '#7a5030'); ptext(g, 'NOODLES', x + 11, y - 3, '#ffb35a'); R(4, 4, 1, 2, '#3a3038'); R(43, 4, 1, 2, '#3a3038'); },
   cot(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(1, 1, 14, 14, '#4a4e54'); R(1, 1, 14, 1, '#8a8e96'); R(2, 2, 12, 12, '#d0d4cc'); R(2, 2, 12, 4, '#f0f4ec'); R(3, 3, 6, 2, '#ffffff'); R(2, 7, 12, 7, '#5a7e90'); R(2, 7, 12, 1, '#82a8ba'); R(2, 13, 12, 1, '#3a5464'); for (let i = 4; i < 13; i += 4) R(i, 8, 1, 5, '#4a6a7c'); R(1, 15, 2, 1, '#222'); R(13, 15, 2, 1, '#222'); }
 });
+const TALLP = { pillarBase: [48, 80, 16, 60, 16], lampBase: [32, 48, 8, 28, 16], awning: [64, 32, 8, 8, 47], stall: [64, 32, 8, 12, 16], cart: [48, 40, 16, 20, 16] };
 function renderMapLayer(m) {
   const [c, g] = mk(m.w * 16, m.h * 16);
   for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) drawTile(g, m, x, y);
   g.fillStyle = 'rgba(6,3,5,.42)'; for (const p of m.props) if (p.block) for (const [bx, by] of p.block) { g.fillRect(bx * 16 + 1, by * 16 + 12, 15, 5); g.fillRect(bx * 16 + 3, by * 16 + 17, 12, 1); }
   for (const p of m.props) { const fn = PROPS[p.t]; if (fn) fn(g, p.x * 16, p.y * 16, p.w || p.a, p.h); }
+  // tall things are drawn a second time among the people, so somebody standing behind a lamp is behind it
+  c.tall = []; for (const p of m.props) { const T = TALLP[p.t], fn = PROPS[p.t]; if (!T || !fn) continue; const [c2, g2] = mk(T[0], T[1]); fn(g2, T[2], T[3], p.w || p.a, p.h); c.tall.push({ cv: c2, x: p.x * 16 - T[2], y: p.y * 16 - T[3], base: p.y * 16 + T[4], t: p.t, px: p.x, py: p.y }); }
   return c;
 }
