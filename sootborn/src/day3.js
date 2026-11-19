@@ -24,7 +24,12 @@ const DREAM4 = () => [
   { music: null }, { sfx: 'heart' }, { wait: 1 },
   { narr: 'I wake before I see what she does.' }, { music: 'mystery' },
   { fade: 'out' }, { panel: null },
-  { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The night before day twenty-six.', big: 1, min: 1.5, max: 4.5 }, { mission: 'raid' },
+  { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The night before day twenty-six.', big: 1, min: 1.5, max: 4.5 },
+  { panel: 'island' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'House Teal held the island in the river, and the island held the only pump house in the valley. Their lamps ran off its vent stack. So did the Proctors\' boots. So did everything.' },
+  { narr: 'An apprentice kept the stack at night. Grey coat, no House. She stood with one hand flat on the pipe, the way you stand when you are listening to it.' },
+  { narr: 'I had not known anyone above the rock did that.' },
+  { fade: 'out' }, { panel: null }, { mission: 'raid' },
   { card: 'MORNING', sub: 'The Assay. Day twenty-six. They have come for it.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.twins() },
   { card: 'FOUR YEARS EARLIER', sub: 'Cinderwell. Under the floor.', big: 1, min: 1.4, max: 4 }
 ];

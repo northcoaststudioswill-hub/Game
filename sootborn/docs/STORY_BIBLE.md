@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.40 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.41 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -409,6 +409,8 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **Patrons.** A House with a sum placed on it is lowered supplies on a gilt cord (oil, cook-pots, salve). Violet had none. This is why Oswin's salve came late.
 - **The wagers.** Each Proctor is paid to find for a House. Voss was paid by two, one of them Teal.
 - **The boots** the Proctors hover on charge off the vent stack, the same one the lamps run on: Cinderwell's air.
+- **Grounded blades.** A House that is out of the Assay grounds its blade point-down at the edge of the keep, ribbon on the hilt. On the last day there are ten.
+- **The vent stack** on Teal's island is the only one in the valley. Lamps, the Proctors' boots and the pump all run off it. Wren Halloran kept it as an apprentice.
 - **Four blades for forty.** Practice blades are issued blunt, and too few, on purpose.
 
 ### Third-person levels: how they play (v0.30.1)

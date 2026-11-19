@@ -1,4 +1,21 @@
-# SOOTBORN — changelog (latest v0.40 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.41 · 2026-11-19)
+
+## v0.41 · 2026-11-19 — the rest of the open list: the keep, ELEVEN's count on the glass, the Island's picture in the story
+From play notes: continue the open list.
+
+- **The keep** has its own things now: the Proctors' board on the last day, with two bars still in colour (Violet, and the High Auditor's son) and ten gone grey; and the blades of the ten Houses that are out, grounded point-down in a row along the edge, each with its ribbon.
+- **ELEVEN: the count is on the glass.** ONE to TEN now punch in at the top right of the screen, one replacing the last, and ELEVEN lands large across the middle. Before, ten words were left hanging in the world and the last close shot was buried in them. The slashes are smaller too, so Kael can be seen when the camera comes in.
+- **ELEVEN against a boss** was tried: it took 43% off the Auditor's Blade from full, and he keeps fighting through it (he is not frozen the way ordinary guards nearly are).
+- **The Island's picture is in the story.** The dream before the Island now opens on it, with three lines: House Teal holds the only pump house in the valley; their lamps, and the Proctors' boots, run off its vent stack; an apprentice stands with one hand flat on the pipe.
+- **Kael's new head and hands** were looked at from a proper distance: round head, ears, gauntlet fingers. Pictures were taken front and back.
+
+**Checked by script:** ELEVEN's count on screen at two points (pictures); ELEVEN on the boss; the keep drawn with the blades and board (picture); all three levels to their endings; Part Two builds; title cards fit. **Not checked:** played by hand; the new dream lines on screen.
+
+**What is left that I know of**
+- Frame rate on your phone (Settings → Show frame time, then tell me the number in a level).
+- The board and cairns in the 3D valley have never been in one of my pictures.
+- Nothing has been played by a person since v0.35's notes; everything after that is from scripts and stills.
+- A trademark check on the name before selling.
 
 ## v0.40 · 2026-11-19 — dots nearly gone, ELEVEN rebuilt as a sequence, and the open list
 From play notes and a phone screenshot: the dots are still too big and make it ugly; the ELEVEN finisher should be far cooler, in the manner of Zenless Zone Zero; do the list of open things.
