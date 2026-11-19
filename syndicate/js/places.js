@@ -175,7 +175,9 @@
         walkers.forEach(w => {
           if (w.wait > 0) { w.wait -= dt2; w.c.pose({ t, act: 'idle' }); return; }
           w.u += w.dir * w.sp * dt2 * 4; if (w.u > 1 || w.u < 0) { w.u = Math.max(0, Math.min(1, w.u)); w.dir *= -1; w.wait = 2 + Math.random() * 4; }
-          const x = w.a[0] + (w.b[0] - w.a[0]) * w.u, z = w.a[1] + (w.b[1] - w.a[1]) * w.u; w.c.root.position.set(x, 0, z);
+          const x = w.a[0] + (w.b[0] - w.a[0]) * w.u, z = w.a[1] + (w.b[1] - w.a[1]) * w.u;
+          if (G.scene === 'hub' && W.walker && W.walker.char && Math.hypot(x - W.walker.x, z - W.walker.z) < 1.05) { w.u -= w.dir * w.sp * dt2 * 4; w.c.root.rotation.y = Math.atan2(W.walker.x - w.c.root.position.x, W.walker.z - w.c.root.position.z); w.c.pose({ t, act: 'idle' }); return; }
+          w.c.root.position.set(x, 0, z);
           w.c.root.rotation.y = Math.atan2((w.b[0] - w.a[0]) * w.dir, (w.b[1] - w.a[1]) * w.dir); w.c.pose({ t, act: 'idle', moving: true, walk: t * 7 + w.sp * 99 });
         });
         const quiet = G.scene === 'hub' && !G.ui.isOpen();
@@ -304,6 +306,7 @@
       hover: (x, z) => { const cx = Math.round(x), cz = Math.round(z); hov.visible = cx >= 0 && cz >= 0 && cx < GW && cz < GD && !G.placing; hov.position.set(cx, 0.02, cz); },
       canPlace: (id, x, z, r, skip) => {
         const it = G.DECOR_BY[id], f = footprint(it, r);
+        { let inN = 0, outN = 0; for (let i = 0; i < f[0]; i++) for (let j = 0; j < f[1]; j++) { if (isHouse(x + i, z + j)) inN++; else outN++; } if (inN && outN) return false; }       // nothing stands half through the house wall
         for (let i = 0; i < f[0]; i++) for (let j = 0; j < f[1]; j++) {
           const cx = x + i, cz = z + j, k = cx + ',' + cz;
           if (cx < 0 || cz < 0 || cx >= GW || cz >= GD) return false;

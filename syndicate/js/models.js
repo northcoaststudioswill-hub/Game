@@ -388,7 +388,7 @@
       if (a !== lastAlpha) { lastAlpha = a; for (const mt of mats) { mt.transparent = a < 1; mt.opacity = a; mt.needsUpdate = true; } glows.forEach(gl => gl.visible = a > 0.5); root.traverse(o => { if (o.isMesh) o.castShadow = a > 0.5; }); }
     };
     if (robe) robe.userData.keep = 1;
-    slim(root);
+    if (!G.noSlim) slim(root);
     C.pose({ t: 0, act: 'idle' }); fresh = 1;
     return C;
   };

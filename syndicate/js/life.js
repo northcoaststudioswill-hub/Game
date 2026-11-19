@@ -140,7 +140,7 @@
     // ---- eyes behind the gate bars
     const eyes = [[-0.45, 1.3], [0.5, 1.0], [0.1, 1.75]].map(q => { const g = new T.Group(), p = at(0.5, q[0], q[1]); g.position.set(p[0], p[1], p[2]); g.rotation.y = rotY; [-0.07, 0.07].forEach(x => { const e = new T.Mesh(new T.SphereGeometry(0.03, 5, 4), emis(0xff5030)); e.position.x = x; g.add(e); }); s.add(g); return { g, t: R(0, 4) }; });
     // ---- Marc's odds board on the left wall, and gibbets hung from the vault
-    { const wxn = -1, wmx = -AR, p = [wmx - wxn * 0.56, 2.3, 1.3], g = new T.Group(); g.position.set(p[0], p[1], p[2]); g.rotation.y = Math.PI / 2; s.add(g); box(1.7, 1.3, 0.08, woodD, 0, 0, 0, g); for (let i = 0; i < 4; i++) { box(R(0.7, 1.3), 0.05, 0.02, L(0xdccba3), -0.1, 0.42 - i * 0.24, 0.05, g); box(0.16, 0.08, 0.02, L(i % 2 ? 0x9aff8a : 0xff7a6a), 0.68, 0.42 - i * 0.24, 0.05, g); } box(1.8, 0.1, 0.12, L(0x1f5a3a), 0, 0.7, 0.02, g); }
+    { const wxn = -1, wmx = -AR, p = [wmx - wxn * 0.02, 2.5, 0.2], g = new T.Group(); g.position.set(p[0], p[1], p[2]); g.rotation.y = Math.PI / 2; s.add(g); box(1.7, 1.3, 0.08, woodD, 0, 0, 0, g); for (let i = 0; i < 4; i++) { box(R(0.7, 1.3), 0.05, 0.02, L(0xdccba3), -0.1, 0.42 - i * 0.24, 0.05, g); box(0.16, 0.08, 0.02, L(i % 2 ? 0x9aff8a : 0xff7a6a), 0.68, 0.42 - i * 0.24, 0.05, g); } box(1.8, 0.1, 0.12, L(0x1f5a3a), 0, 0.7, 0.02, g); }
     const cages = [[-5.2, -2.4, 6.6], [-2.2, -5.4, 7.2], [3.8, -6.4, 6.9]].map((q, i) => {
       const g = new T.Group(); g.position.set(q[0], q[2] + 3.4, q[1]); s.add(g); const c = new T.Group(); c.position.y = -3.4; g.add(c);
       mesh(new T.CylinderGeometry(0.02, 0.02, 3.0, 4), iron, 0, -1.5, 0, g);
