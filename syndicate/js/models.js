@@ -13,6 +13,20 @@
   const TRIM = [null, 0xd0d8e4, 0xffd36b], WGLOW = [0x000000, 0x2a9ab8, 0xb8862a], WCOL = [null, 0x8fe8ff, 0xffd36b];
   const hex = v => typeof v === 'string' ? parseInt(v.slice(1), 16) : v;
 
+  // A figure is built from dozens of small boxes. Pieces that hang off the same joint and share a material never move
+  // against each other, so they are welded into one mesh: the same look and the same animation for far fewer draw calls.
+  const _m4 = new T.Matrix4(), _n3 = new T.Matrix3(), _v = new T.Vector3();
+  function slim(root) {
+    const groups = []; root.traverse(o => { if (o.children && o.children.length > 1) groups.push(o); });
+    groups.forEach(g => { const by = new Map();
+      g.children.forEach(c => { if (!c.isMesh || c.children.length || c.userData.keep || !c.visible || Array.isArray(c.material) || c.material.transparent || c.material.map || c.material.blending !== T.NormalBlending || !c.geometry.attributes.normal) return; const k = c.material.uuid; (by.get(k) || by.set(k, []).get(k)).push(c); });
+      by.forEach(list => { if (list.length < 2) return; let n = 0; const parts = list.map(c => { c.updateMatrix(); const ge = c.geometry.index ? c.geometry.toNonIndexed() : c.geometry; n += ge.attributes.position.count; return [c, ge]; });
+        const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3); let o = 0, shadow = false;
+        parts.forEach(([c, ge]) => { _m4.copy(c.matrix); _n3.getNormalMatrix(_m4); const p = ge.attributes.position, q = ge.attributes.normal; shadow = shadow || c.castShadow;
+          for (let i = 0; i < p.count; i++, o += 3) { _v.fromBufferAttribute(p, i).applyMatrix4(_m4); pos[o] = _v.x; pos[o + 1] = _v.y; pos[o + 2] = _v.z; _v.fromBufferAttribute(q, i).applyMatrix3(_n3).normalize(); nor[o] = _v.x; nor[o + 1] = _v.y; nor[o + 2] = _v.z; }
+          g.remove(c); if (ge !== c.geometry) ge.dispose(); });
+        const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.BufferAttribute(pos, 3)); geo.setAttribute('normal', new T.BufferAttribute(nor, 3)); const mm = new T.Mesh(geo, list[0].material); mm.castShadow = shadow; mm.receiveShadow = list[0].receiveShadow; g.add(mm); }); });
+  }
   G.makeChar = function (look) {
     const rcls = look.cls, cls = ({ druid: 'cleric', warlock: 'sorcerer' })[rcls] || rcls, race = G.RACES[look.race], g = look.gear || {};      // new callings wear an older one's frame
     const P = Object.assign({}, BASE[rcls]); if (look.race === 'drow') P.hair = 0xe8e8f0;
@@ -373,6 +387,8 @@
       const a = p.alpha == null ? 1 : p.alpha;
       if (a !== lastAlpha) { lastAlpha = a; for (const mt of mats) { mt.transparent = a < 1; mt.opacity = a; mt.needsUpdate = true; } glows.forEach(gl => gl.visible = a > 0.5); root.traverse(o => { if (o.isMesh) o.castShadow = a > 0.5; }); }
     };
+    if (robe) robe.userData.keep = 1;
+    slim(root);
     C.pose({ t: 0, act: 'idle' }); fresh = 1;
     return C;
   };

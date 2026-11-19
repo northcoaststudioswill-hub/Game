@@ -417,3 +417,7 @@ The weapon left in the body is a copy of the one you were carrying. Casters with
 
 `tests/pad.js` drives the whole opening with a simulated standard gamepad: boot, title, tap/hold through the cinematic, the builder, walking the market, the sheet, a bout (strike, dodge, parry, abilities, pause, resume). Long cards pin their closing row to the bottom; on a phone that row is one line that scrolls sideways with the main button fixed at the right.
 The scripts in `tests/` need Playwright and a local server (`python3 -m http.server 8765` from this folder): `pad.js` (controller), `bout.js <class> <weapon>` (films a live bout), `cinef.js` (films every cinematic shot in landscape and portrait).
+
+## Draw calls
+
+Characters were about 70% of the market's draw calls. Each figure's rigid pieces are now welded per joint and material when it is built (`slim` in `models.js`): same look, same animation, roughly 33 draws instead of 57. With three wanderers instead of six, the ordinary market view went from about 500 draw calls to about 310. The same saving applies in the pit and to the ten souls in the Hour Garden.
