@@ -1,4 +1,25 @@
-# SOOTBORN — changelog (latest v0.34 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.35 · 2026-11-19)
+
+## v0.35 · 2026-11-19 — the third-person levels: kick is back, a held strike is three blows, rage cuts in, a hook you can see
+From play notes: there is no kick button now; the held button should be a three-hit combo; more special rage moments mid-fight, like the other fighting scenes have (Zenless Zone Zero was the comparison); it is hard to see what the hook is doing.
+
+**Buttons in a level now:** A strike · B dodge · HOOK · JUMP · LUNGE · **KICK** (where LOCK was; lock-on is off the touch pad again).
+- **Kick:** the boot. Kick again as it lands for the Wide Cut.
+- **Held strike:** tap for light cuts; keep the button down and he goes into three heavy blows one after another for as long as you hold: UP THE SHAFT, THE HAUL, LAST BELL. Let go and he stops after the one he is on.
+- At full fury a held strike is still ELEVEN.
+
+**Rage cuts in** (the fight slows, it does not stop: a slanted band across the picture with his eyes and a word)
+- **LINE STRUCK** when the Count reaches eleven.
+- **LAST BELL** when the third heavy blow lands.
+- **THE TURN** on a late dodge.
+- **BALANCED** for three kills inside a few seconds (and a little fury).
+- **ON MY BREATH** the first time he drops under a third of his health: a moment where he cannot be hit, and a good piece of fury.
+- They are spaced at least five seconds apart except the first two and the last, which always show.
+- The full-screen memories on ELEVEN and on finishers are unchanged.
+
+**The hook** is now thrown and seen: a gold line with a steel hook on the end flies out from his hand, bites (a flash and a ring where it lands), and then somebody moves over a fifth of a second: a guard is dragged to him, or he is hauled to a Warden, a boss, or the spot on the ground. Then the ram, as before.
+
+**Checked by script:** the line drawn to a guard and the guard pulled in (pictures); held strike goes 6, 7, 8; kick and kick-again; the band on screen; ON MY BREATH at low health gives fury; all three levels to their endings. **Not checked:** played by hand; whether five rage cuts are too many or too few in a real fight; the hook in motion.
 
 ## v0.34 · 2026-11-19 — the third-person levels: one strike button, a hook that always does something, rounder bodies, idle habits
 From play notes: the hook does nothing; there is still a heavy button when light and heavy were meant to be on the attack itself; Kael needs more idle animation; the levels need a graphics pass and the models should start to be less blocky.

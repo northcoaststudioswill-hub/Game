@@ -37,7 +37,7 @@ const Issue = {
     window.addEventListener('message', this.onMsg);
     f.srcdoc = html; document.body.insertBefore(f, $('#controls')); this.place();
     // the fight buttons, named for what they do up here
-    this.lab = {}; [['bY', 'JUMP'], ['bX', 'HOOK'], ['bR', 'LOCK'], ['bL', 'LUNGE']].forEach(([id, t]) => { const b = $('#' + id); if (b) { this.lab[id] = b.textContent; b.textContent = t; } });
+    this.lab = {}; [['bY', 'JUMP'], ['bX', 'HOOK'], ['bR', 'KICK'], ['bL', 'LUNGE']].forEach(([id, t]) => { const b = $('#' + id); if (b) { this.lab[id] = b.textContent; b.textContent = t; } });
     this.timer = setTimeout(() => { if (!this.ready) this.finish(false); }, 15000);
   },
   // once a frame from the main loop: hand the level this game's own input
@@ -47,7 +47,7 @@ const Issue = {
     if (!this.ready) return;
     const x = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), y = (Input.h('up') ? 1 : 0) - (Input.h('down') ? 1 : 0), press = [];
     if (Input.p('A')) press.push('ctx'); if (Input.p('B')) press.push('dodge'); if (Input.p('X')) press.push('hook'); if (Input.p('Y')) press.push('jump');
-    if (Input.p('L')) press.push('boots'); if (Input.p('R')) press.push('lock'); if (Input.p('START')) press.push('pause');
+    if (Input.p('L')) press.push('boots'); if (Input.p('R')) press.push('kick'); if (Input.p('START')) press.push('pause');
     const hold = { a: Input.h('A') ? 1 : 0, y: Input.h('Y') ? 1 : 0 }, k = x + ',' + y + ',' + hold.a + hold.y; if (k === this.sent && !press.length) return; this.sent = k;
     try { this.el.contentWindow.postMessage({ sootborn: 'in', x, y, press, hold }, '*'); } catch (e) { /* frame is going away */ }
   },

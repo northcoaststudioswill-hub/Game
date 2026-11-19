@@ -356,6 +356,59 @@ rep("    const g = new THREE.BoxGeometry(w, h, d), p = g.attributes.position;\n 
     if (r) { for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i), cx = Math.max(-(w / 2 - r), Math.min(w / 2 - r, x)), cy = Math.max(-(h / 2 - r), Math.min(h / 2 - r, y)), cz = Math.max(-(d / 2 - r), Math.min(d / 2 - r, z)), dx = x - cx, dy = y - cy, dz = z - cz, L = Math.hypot(dx, dy, dz); if (L > 1e-6) { p.setXYZ(i, cx + dx / L * r, cy + dy / L * r, cz + dz / L * r); nn.setXYZ(i, dx / L, dy / L, dz / L); } }
       for (let i = 0; i < p.count; i++) { const k = p.getY(i) > 0 ? top : bot; p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k); } return g; }`);
 rep("function limb(rt, rb, h) { const g = new THREE.CylinderGeometry(rt, rb, h, 7); return g; }", "function limb(rt, rb, h) { const g = new THREE.CylinderGeometry(rt, rb, h, 12); return g; }");
+/* ---- v0.35: the hook is a thing you can see; a held strike is three heavy blows; rage cuts in mid-fight ---- */
+between("  function useHook(mx, mz, mag) {", "  function startBoots(mx, mz, mag) {", `  const HKs = { hips: [0, 0.5, 0], spine: [0.15, 0.2, 0], chest: [0.1, 0.5, 0], head: [0, -0.6, 0], shR: [-1.6, 0, 0.1], elR: [-0.05, 0, 0], shL: [0.5, 0, 0.5], elL: [-1.2, 0, 0], thL: [-0.7, 0, 0.1], shnL: [0.8, 0, 0], thR: [0.5, 0, -0.1], shnR: [0.3, 0, 0], sc1: [-0.4, 0, 0], y: -0.16 };
+  const HKp = { hips: [0, -0.5, 0], spine: [-0.2, -0.2, 0], chest: [-0.15, -0.4, 0], head: [0, 0.6, 0], shR: [-0.6, 0, -0.4], elR: [-1.9, 0, 0], shL: [-1.2, 0, 0.3], elL: [-0.9, 0, 0], thL: [0.3, 0, 0.1], shnL: [0.3, 0, 0], thR: [-0.5, 0, -0.1], shnR: [0.9, 0, 0], sc1: [-1.2, 0, 0], y: -0.22 };
+  let hookMesh = null; const _up = new THREE.Vector3(0, 1, 0), _hd = new THREE.Vector3();
+  function hookLine(ax, ay, az, bx, by, bz) {
+    if (!hookMesh) { hookMesh = new THREE.Group(); const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 1, 6), new THREE.MeshBasicMaterial({ color: 0xffd23a, fog: false })), ink = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 1, 6), new THREE.MeshBasicMaterial({ color: 0x07070d, fog: false, side: THREE.BackSide })), head = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.06, 5, 10, 4.4), new THREE.MeshBasicMaterial({ color: 0xf2f4ff, fog: false })), hi = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.1, 5, 10, 4.4), new THREE.MeshBasicMaterial({ color: 0x07070d, fog: false, side: THREE.BackSide }));
+      hookMesh.add(rope, ink, head, hi); hookMesh.userData = { rope, ink, head, hi }; SC.gfx.scene.add(hookMesh); SC.hookMesh = hookMesh; }
+    const u = hookMesh.userData, len = Math.max(0.05, Math.hypot(bx - ax, by - ay, bz - az)); _hd.set(bx - ax, by - ay, bz - az).divideScalar(len);
+    hookMesh.visible = true; hookMesh.position.set(0, 0, 0);
+    [u.rope, u.ink].forEach(m => { m.position.set((ax + bx) / 2, (ay + by) / 2, (az + bz) / 2); m.scale.set(1, len, 1); m.quaternion.setFromUnitVectors(_up, _hd); });
+    [u.head, u.hi].forEach(m => { m.position.set(bx, by, bz); m.quaternion.setFromUnitVectors(_up, _hd); m.rotateY(pl.st * 30); });
+  }
+  /* the hook on the rigging line: thrown, seen, and then somebody moves. An ordinary guard comes to him; he goes to a big one; with nobody on it, it bites the ground and takes him there. He arrives with the ram. */
+  function useHook(mx, mz, mag) {
+    let dx = mag > 0.3 ? mx / mag : Math.sin(pl.yaw), dz = mag > 0.3 ? mz / mag : Math.cos(pl.yaw); const t = pickTarget(15, -0.35, dx, dz);
+    if (t) { const ex = t.pos.x - pl.pos.x, ez = t.pos.z - pl.pos.z, d = Math.hypot(ex, ez) || 1; dx = ex / d; dz = ez / d; }
+    pl.hookCd = t ? 2.5 : 1.2; pl.yaw = Math.atan2(dx, dz); pl.setState('hook'); pl.inv = Math.max(pl.inv, 0.3); pl.hk = { t, dx, dz, tx: pl.pos.x + dx * 6.5, tz: pl.pos.z + dz * 6.5, done: 0 };
+    SC.audio.sfx('chainThrow'); SC.emit('speedlines', 0.3);
+  }
+  function updateHook() {
+    const h = pl.hk, T1 = 0.17, T2 = 0.4, t = h.t && alive(h.t) ? h.t : null; pl.vel.set(0, 0, 0);
+    const bx = t ? t.pos.x : h.tx, bz = t ? t.pos.z : h.tz, by = pl.pos.y + (t ? 1.2 : 0.15), ax = pl.pos.x + h.dx * 0.5, az = pl.pos.z + h.dz * 0.5, ay = pl.pos.y + 1.35, k = SC.clamp(pl.st / T1, 0, 1);
+    hookLine(ax, ay, az, ax + (bx - ax) * k, ay + (by - ay) * k + Math.sin(k * Math.PI) * 0.5, az + (bz - az) * k);
+    pl.pose = pl.st < T1 ? HKs : HKp; pl.poseRate = 34;
+    if (pl.st >= T1 && !h.done) { h.done = 1; _a.set(bx, by, bz); FX.burst(_a, 0xffffff, 1.6); FX.ring(_a.setY(pl.pos.y + 0.07), 0xffd23a, 0.2, 1.8, 0.3); _a.copy(pl.pos); _a.y += 2.5; FX.word('HOOK LINE!', _a, '#ffd23a', 1.1); SC.audio.sfx('chainYank'); SC.cam.shake(0.4); SC.time.hitstop = 0.06;
+      h.px = pl.pos.x; h.pz = pl.pos.z;
+      if (t && !t.K.armor) { h.mode = 1; h.ex = t.pos.x; h.ez = t.pos.z; t.hit(5, 0, 0, { named: true, quiet: true }); }
+      else { h.mode = 2; const d = t ? Math.max(0, Math.hypot(t.pos.x - pl.pos.x, t.pos.z - pl.pos.z) - t.r - 1.2) : 5; h.gx = pl.pos.x + h.dx * d; h.gz = pl.pos.z + h.dz * d; } }
+    if (h.done) { const q = SC.smooth(SC.clamp((pl.st - T1) / (T2 - T1), 0, 1));
+      if (h.mode === 1 && t) { t.pos.x = SC.lerp(h.ex, pl.pos.x + h.dx * 1.6, q); t.pos.z = SC.lerp(h.ez, pl.pos.z + h.dz * 1.6, q); t.vel.set(0, 0, 0); }
+      else if (h.mode === 2) { pl.pos.x = SC.lerp(h.px, h.gx, q); pl.pos.z = SC.lerp(h.pz, h.gz, q); W.collide(pl.pos, pl.r, pl.pos.y, pl.h); pl.inv = Math.max(pl.inv, 0.1); if (((pl.st * 40) | 0) % 2 === 0) FX.puff(pl.pos, 1, 0.6); } }
+    if (pl.st >= T2) { hookMesh.visible = false; startAttack(2, h.dx, h.dz, 1); }
+  }
+`);
+rep("      case 'air': {", "      case 'hook': updateHook(); break;\n      case 'air': {");
+/* a held strike: three heavy blows, one after another, for as long as it is held */
+rep("startAttack([6, 5, 7, 8][pl.combo], mx, mz, mag); }", "startAttack(6, mx, mz, mag); }");
+rep("        if (pl.queued && pl.st >= A.chain && pl.combo < 4) startAttack(pl.combo + 1, mx, mz, mag);", "        if (pl.heldHeavy && inp.hold.a && (pl.combo === 6 || pl.combo === 7) && pl.st >= A.chain) startAttack(pl.combo + 1, mx, mz, mag);\n        else if (pl.queued && pl.st >= A.chain && pl.combo < 4) startAttack(pl.combo + 1, mx, mz, mag);");
+rep("startAttack(hc === 0 ? 6 : hc === 1 ? 5 : hc === 2 ? 7 : hc === 3 ? 8 : 3, mx, mz, mag); }", "startAttack(hc === 3 ? 5 : 3, mx, mz, mag); }");
+/* rage, cutting in: a band across the picture with his eyes and a word. The fight slows; it does not stop. */
+rep("#mem.hide{display:none}", "#mem.hide{display:none}\n#cut{position:absolute;left:-12%;right:-12%;top:28%;height:36%;z-index:55;pointer-events:none;transform:rotate(-6deg) translateX(-125%);background:linear-gradient(90deg,#07070d,#7a1a1f 28%,#c8421a 68%,#07070d);border-top:4px solid var(--yel);border-bottom:4px solid var(--yel);overflow:hidden;box-shadow:0 0 0 3px var(--ink)}\n#cut.on{animation:cutin .95s cubic-bezier(.2,.9,.2,1) both}\n@keyframes cutin{0%{transform:rotate(-6deg) translateX(-125%)}16%{transform:rotate(-6deg) translateX(0)}80%{transform:rotate(-6deg) translateX(0)}100%{transform:rotate(-6deg) translateX(125%)}}\n#cut:before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(100deg,rgba(255,210,58,.22) 0 3px,transparent 3px 26px)}\n#cut .ce{position:absolute;left:12%;top:0;bottom:0;width:40%;background:50% 27%/300% auto no-repeat;image-rendering:pixelated}\n#cut .cn{position:absolute;right:16%;top:44%;transform:translateY(-50%);font:italic 900 clamp(20px,11vh,60px)/.9 var(--sfx);color:var(--yel);-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;text-align:right;white-space:nowrap}\n#cut .cs{position:absolute;right:16%;bottom:10%;font:700 clamp(9px,3vh,15px)/1 var(--hand);color:#fff;text-transform:uppercase;letter-spacing:.08em}", true);
+rep("U.blocking = () => !!(U.dlg || U.pg || U.menuOpen || U.mem);", `U.blocking = () => !!(U.dlg || U.pg || U.menuOpen || U.mem);
+  U.cut = function (name, sub, force) {
+    const t = performance.now(); if (U.blocking() || SC.state !== 'play' || (!force && t - (U.cutAt || 0) < 5000)) return false; U.cutAt = t;
+    let el = $('cut'); if (!el) { el = document.createElement('div'); el.id = 'cut'; $('mem').parentNode.appendChild(el); }
+    el.innerHTML = '<div class="ce" style="background-image:url(' + U.pic('hero', 'angry') + ')"></div><div class="cn">' + name + '</div><div class="cs">' + (sub || '') + '</div>';
+    el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); SC.slowmo(0.22, 0.8); SC.audio.sfx('path'); SC.emit('flash', '#ff5a1f'); U.cuts = (U.cuts || 0) + 1; return true;
+  };
+  { let kt = [], last = 0; SC.on('kill', () => { const t = performance.now(); kt = kt.filter(x => t - x < 4500); kt.push(t); if (kt.length >= 3 && t - last > 9000) { last = t; kt = []; if (U.cut('BALANCED', 'THREE LINES STRUCK')) SC.player.gain(15); } }); }`);
+rep("if (pl.cnt >= 11) { pl.cnt = 0; pl.gain(35);", "if (pl.cnt >= 11) { pl.cnt = 0; pl.gain(35); SC.ui.cut('LINE STRUCK', 'ELEVEN, COUNTED', true);");
+rep("SC.audio.sfx('perfect'); SC.emit('speedlines', 0.8);", "SC.audio.sfx('perfect'); SC.emit('speedlines', 0.8); SC.ui.cut('THE TURN', 'NEVER GIVE GROUND');");
+rep("if (bell) { FX.ring(pl.pos, 0xffd23a, 0.5, 3.8, 0.4); SC.cam.shake(0.8); }", "if (bell) { FX.ring(pl.pos, 0xffd23a, 0.5, 3.8, 0.4); SC.cam.shake(0.8); if (pl.heldHeavy) SC.ui.cut('LAST BELL', 'FOR HER', true); }");
+
 /* ---- the guard fights back with more than one idea ---- */
 rep("          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e);\n        }", `          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e);
           if (e.kind !== 'boss') e.sub = Math.random() < (e.kind === 'knifer' ? 0.45 : e.kind === 'bruiser' ? 0.22 : 0.3) ? 1 : 0;      // a second blow straight after the first
@@ -391,6 +444,9 @@ rep("    { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) :
       else U.idleT = 0;
       // air: something is always drifting in these places
       if (SC.state === 'play') { if (!U.graded) { U.graded = 1; G.renderer.domElement.style.filter = 'saturate(1.14) contrast(1.06)'; } }
+      if (SC.hookMesh && p.state !== 'hook') SC.hookMesh.visible = false;
+      // nearly down: the rage answers once
+      if (SC.state === 'play') { if (p.hp > 0 && p.hp < SC.T.hp * 0.3) { if (!U.lowCut && U.cut('ON MY BREATH', 'EVERY BREATH IS HERS', true)) { U.lowCut = 1; p.gain(40); p.inv = Math.max(p.inv, 1.2); } } else if (p.hp > SC.T.hp * 0.6) U.lowCut = 0; }
       U.lastYaw = p.yaw; }
     { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) : 0,`);
 
