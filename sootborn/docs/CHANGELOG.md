@@ -1,4 +1,27 @@
-# SOOTBORN — changelog (latest v0.60 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.61 · 2026-11-19)
+
+## v0.61 · 2026-11-19 — two early memories to walk in; held cuts strain; the air moves written down
+From your note: early story beats from the list, animation, and the fight moves.
+
+**Two early memories, in 2.5D** (optional, once per save, they set nothing the story reads)
+- **Row K, the morning after the First Fire.** Offered at the ledge of painted suns by your own door on Row K. The row is up before you: Seren on the step with the washer on her finger ("the inside half"), Nan Orla who has done your sheets in her own ration water, Garrow on the man Seren bit at fourteen and the knot it cost her, Mara giving you first bell and not the day, Tavi working out that he has a sister, Bryn hauling. Leave by the door of K-7.
+- **The fever ward, the first night the fans came up.** Offered at the ward board in the clinic. Every fan on the branch turning, a row of cots along the wall, the board at 40/40. Nell will not ask how. Seren: "I'm not married to a thief. I'm married to a man who tidies", which Celestine will say almost word for word three nights later. Tavi can breathe right to the bottom. Pip asks about the sky; Ada wants the fan left loud; Mosi is drawing somebody with a sun for a head. Leave by the board.
+- With the square (v0.59) that is three walkable memories in the first days below, each hung on something you already look at.
+
+**Animation**
+- **Held cuts in the films are no longer dead still.** A blade frozen at the hardest point of a swing now strains a little, the way a held blade does.
+- (From v0.60, for the record: guards, bosses and Tavi re-kitted; arm and leg plate in the arena.)
+
+**Fight moves**
+- The air hook and the cut-down (v0.60) are now in the pause menu's move list in any fight with boots, and in the opening tips for keyboard and controller.
+- They work in the 2D fights that have boots as well as the arena ones; it is the same code.
+
+**Not done, and why**
+- **The Proctors as detailed flat figures in the 3D valley:** the 3D renderer cannot draw a picture standing in the scene yet, only shapes and glows. That is a renderer job, not a drawing job; it stays on the list.
+- **A real run and sword combos from the free library:** still waiting on the file (see v0.60).
+- **A drawn scene for losing below:** still a line.
+
+**Checked by script:** both new places walked (move, talk, leave) with a picture of each; the opening film still plays; a bot won the Pairing; the page loads clean. **Not checked:** by hand; the two hooks that offer the memories were not clicked through in the world (the scenes were started directly); held cuts in motion.
 
 ## v0.60 · 2026-11-19 — characters first: guards, Rook and Tavi re-kitted; arms and legs in the arena; the boots in the arena follow you up
 From your notes: do characters and animations first and use good free resources if there are any; in arena fights the camera should follow you up on the boots, with a zoom on the big dives, and the arena needs the boots-hook-hit combo.

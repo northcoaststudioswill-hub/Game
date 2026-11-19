@@ -460,4 +460,32 @@ function walkSquare() {
         N('ivo', 108, 22, 'IVO', [say('ivo', "Cart's got a wheel going. Hear that? That's the sound of me pushing it uphill tomorrow. Give us a hand, Kael."), narr('I gave him a hand. I had a great many evenings, then, and I spent them like a man who thinks the meter is broken in his favour.')])],
       spots: [{ id: 'sun', x: 0, y: 4, r: 6, reach: 22, ph: 14, name: 'THE CHALK SUN', verb: 'LET IT GO', exit: 1, talk: () => [narr('That is all of it. Nothing happened that night. I have gone back to it more often than to the wedding.')] }] } };
 }
-FF.circle = walkCircle; FF.square = walkSquare;
+function walkRowMorning() {
+  const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines });
+  return { era: 0, bg2: 'rowk', title: 'ROW K', sub: 'THE MORNING AFTER THE FIRST FIRE', bg: 'ring', arena: { kind: 'ring', rx: 150, ry: 60 }, music: 'home',
+    walk: { id: 'rowmorn', spawn: [10, 8], keep: () => false,
+      obj: k => k.n >= 3 ? 'FIRST BELL IN A MINUTE. THE DOOR, WHEN I CAN.' : 'THE ROW IS UP BEFORE US. IT ALWAYS WAS.',
+      npcs: [
+        N('seren', -12, -4, 'SEREN', [say('seren', "Don't look at it like that. It's a washer. It's the only round thing you own and you gave it away, so now you own nothing round."), say('you', 'I own half of one.'), say('seren', 'Aye. The inside half.'), narr('She wore it eleven months. That was the first morning of them.')]),
+        N('orla', -92, -16, 'NAN ORLA', [say('orla', "Married on a festival night. Means the whole tier was drunk at your wedding and not one of them brought a thing. I've done your sheets. That's mine brought."), narr('She had done them in ration water, out of her own count. I did not know that then. I would not have known how to say ta for it.')]),
+        N('garrow', 104, -12, 'GARROW', [say('garrow', "Your wife bit a man in my ring when she was fourteen. I'd keep your hands where she can see them."), say('you', 'She told me. She said he had it coming.'), say('garrow', "He did. Cost her the knot, mind. Rules are rules.")]),
+        N('mara', 40, 30, 'MARA', [say('mara', "Bay Three at first bell, the both of you. I married you. I didn't give you the day."), narr('She had stood up in front of the whole of Crew Three the night before and said the words, and her voice had gone on the last one. Nobody ever mentioned it to her.')]),
+        N('tavi', -44, 28, 'TAVI', [say('tavi', 'Is she my sister now? Do I have to do what she says?'), say('you', 'Aye. And aye.'), narr('Tavi thought about that, and then went and stood next to her and not next to me. It stayed that way.')]),
+        N('bryn', 128, 20, 'BRYN', [say('bryn', "Don't mind me, I'm only hauling. Go on and be happy. Somebody on this row ought to try it.")])],
+      spots: [{ id: 'door', x: -12, y: -50, r: 8, reach: 30, ph: 40, name: 'THE DOOR OF K-7', verb: 'GO IN', exit: 1, talk: () => [narr('I went in. There was tea. I have told myself since that I knew what I had that morning. I did not. Nobody does, on the morning.')] }] } };
+}
+function walkWard() {
+  const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines });
+  return { era: 0, bg2: 'ward', title: 'THE FEVER WARD', sub: 'THE FIRST NIGHT THE FANS CAME UP', bg: 'pit', arena: { kind: 'ring', rx: 140, ry: 56 }, music: 'home',
+    walk: { id: 'ward', spawn: [-100, 24], keep: () => false,
+      obj: k => k.n >= 3 ? 'FORTY, BREATHING. THE BOARD, WHEN I CAN LEAVE THEM.' : 'LISTEN TO THAT. EVERY FAN ON THE BRANCH.',
+      npcs: [
+        N('nell', 30, -18, 'NELL', [say('nell', "Don't tell me how. I've forty of them breathing and a meter that says I should have twelve. I'm not going to ask it why."), narr('She did not ask. She chalked 40 on the board and underlined it, and then she sat down on the floor, which I had never seen her do.')]),
+        N('seren', -30, -6, 'SEREN', [say('seren', "Listen to that. That's not a fan, that's a gale. You've given them weather, valve man."), say('you', 'Eleven in the hundred, off a line nobody reads. It balances by dawn.'), say('seren', "It'd better. I'm not married to a thief. I'm married to a man who tidies."), narr('The High Auditor used almost the same words three nights later, in the square. I have never been able to hear the one without the other.')]),
+        N('tavi', -78, -22, 'TAVI', [say('tavi', 'I can breathe right down to the bottom. Kael. Right to the bottom. Is it always like this?'), narr('It had not been like that for anybody on Tier Six in his lifetime. I said aye.')]),
+        N('pip', 84, 14, 'PIP', [say('pip', 'Is the sky blue? Nell says nobody knows.'), say('you', "Seren says it is. She's got a bet on it.")]),
+        N('ada', 4, 30, 'ADA', [say('ada', "The fan's fixed! Did she fix the fan? Tell her it's too loud. Tell her don't make it quieter.")]),
+        N('mosi', 112, -20, 'MOSI', [narr('Mosi, cross-legged on a cot with a stub of chalk, drawing somebody with a sun where the head should be.'), say('mosi', "It's not finished. Don't look till it's finished.")])],
+      spots: [{ id: 'board', x: 124, y: -48, r: 8, reach: 30, ph: 44, name: 'THE WARD BOARD', verb: 'LEAVE THEM SLEEPING', exit: 1, talk: () => [narr('Three nights. That was all it ever was. I would do the sum the same way again, and I know what it comes to.')] }] } };
+}
+FF.circle = walkCircle; FF.square = walkSquare; FF.rowmorn = walkRowMorning; FF.ward = walkWard;

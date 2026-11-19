@@ -356,7 +356,10 @@ const HOT = {
   relay: () => [narr("The audit relay. The fuse you pulled forty-one days ago has been replaced with a sealed Authority unit, wired in gold."), narr('Of course it has.')],
   kidsuns: () => [narr("The kids have painted suns all over the ward wall, copying Seren's. Some are yellow. Some are blue. One is green, with a face."), narr('Under them, in Nell\'s neat hand: "FOR SEREN, WHO BROUGHT THE AIR."')],
   fanvent: () => [narr('The ward fan, turning slow. Ration speed.'), narr('For three nights it spun so fast the kids called it "the storm." You were the storm. She was the reason.')],
-  wardboard: () => [narr('BREATHING ON THEIR OWN: 40 / 40.'), narr("Forty names in chalk. Tavi's is ninth. Next to the board somebody has added a forty-first line, no name, just a little sun.")],
+  wardboard: () => [narr('BREATHING ON THEIR OWN: 40 / 40.'), narr("Forty names in chalk. Tavi's is ninth. Next to the board somebody has added a forty-first line, no name, just a little sun."),
+    ...(F('wardMem') || typeof walkWard !== 'function' ? [] : [{ choice: [
+      { t: 'Listen to the fans a moment. (A memory. It changes nothing.)', fx: () => setF('wardMem'), then: [narr('The same room. I let it be the first night the fans came up, with the relay cut and Bank Seven bleeding eleven in the hundred into this branch.'), fx(() => Brawl.start(walkWard(), () => { G.mode = 'world'; HUD.dirty = true; Dialogue.start([narr('The fans are on ration turn again. Forty names on the board, and a forty-first line with a sun on it.')]); }))] },
+      { t: 'Leave it.' }] }])],
   canisters: () => [narr('Air canisters. Empty, every one. Stamped RATION — TIER 6 — GRATITUDE IS BREATH.'), ...byTend({ tinkerer: 'The valves have been fitted with restrictors. Somebody went to real effort to make sure these could only ever be half full.', seeker: 'The fill dates are all the same day. The day after the commitment.', caretaker: "Seren's handwriting is still on one: 'FOR PIP. EXTRA. DON'T TELL.'" })],
   emptycot: () => [narr('An empty cot, freshly made. Nell keeps it that way. For whoever is next, she says. She never says what she thinks.')],
   hatch: () => {

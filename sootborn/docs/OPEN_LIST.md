@@ -1,5 +1,5 @@
-# SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.60 (2026-11-19).
+# SOOTBORN — open list 
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.61 (2026-11-19).
 
 ## Waiting on you
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
@@ -8,6 +8,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **The High Docks:** the empty, locked level was a broken save from v0.49 (quay cleared, no key); v0.53 mends it and adds START THIS LEVEL AGAIN. What made that save is still unknown. Tell me if the gate refuses again.
 
 ## Untested, built blind (check these first when playing)
+- **v0.61: two more memories to walk in.** Row K (the ledge of suns by your door) and the fever ward (the ward board in the clinic).
 - **v0.60: arena boots.** The camera follows you up and closes in on dives; hook in the air hauls a man up, strike cuts him down.
 - **v0.60: new kit** on Dock Guards, Stair Blades, Wardens, Rook, the other two bosses and Tavi.
 - **v0.59: the comic levels' HUD on your phone.** Cause found from your screenshot (the level was leaving room for the notch). Check the health bar is top-left and the objective top-right in all three levels.
@@ -27,10 +28,10 @@ Kept current each round. "Keep going" means work down this list from the top unl
 3. **Capes:** changed four times today from stills. The rule you gave: it kicks up with momentum and then falls; it never floats. Needs your eye in motion, then another pass if it still hangs in the air.
 4. **Tavi:** re-kitted (v0.60: bedroll, satchel, scarf, lamp). Needs your eye.
 5. **Rook** and the other two bosses re-kitted (v0.60). Still short of Kael: faces, weapons, their own idle.
-6. **The Proctors on the dais:** detailed figures, or detailed flat sprites standing in the 3D scene.
+6. **The Proctors on the dais:** detailed figures, or detailed flat sprites standing in the 3D scene. Needs the 3D renderer to be able to stand a picture in the scene first; not started.
 
 ## Places
-7. **2.5D places.** Built in v0.59: the fire on night 28 (stays 2.5D, as you said) and Ashgate Square as a memory. **Your rules: (1) from here on, new 2.5D places are for new story beats or memories that add flavour and understanding and do not affect the plot (the fire was already in the story, so it stands). (2) Do not change an existing area to another dimension (2D, 2.5D, 3D) unless you name the area and the dimension.** All five candidates below are approved, to be built after the rest of this list has been gone over. Next candidates: the Assay camp by day (day 3); Row K the morning after the wedding; the fever ward with the fans up; the deck of a barge in the two years; the Spire's fourth ring at night. Also still open: the whole square explorable this way in the present, not only as a memory.
+7. **2.5D places.** Built in v0.59: the fire on night 28 (stays 2.5D, as you said) and Ashgate Square as a memory. **Your rules: (1) from here on, new 2.5D places are for new story beats or memories that add flavour and understanding and do not affect the plot (the fire was already in the story, so it stands). (2) Do not change an existing area to another dimension (2D, 2.5D, 3D) unless you name the area and the dimension.** All five candidates below are approved, to be built after the rest of this list has been gone over. Built in v0.61: Row K the morning after the wedding; the fever ward with the fans up. Still to build: the Assay camp by day (day 3); the deck of a barge in the two years; the Spire's fourth ring at night. Also still open: the whole square explorable this way in the present, not only as a memory.
 8. **The High Docks rebuilt from reference:** laid out like a real dock, dressed as somewhere the Accredited live, with side corridors that go nowhere, height for the boots, and hidden things that feed the Codex.
 9. **Riser Nine:** more character still. It has a hill, a hoist and a road now.
 9a. **The Stair's sky:** the far fleet rides in two turning rings with winking lamps and cannot touch (v0.56). Still to do: crew on the near hulls; the three near wrecks and the smoke do not move.

@@ -1,5 +1,5 @@
-# SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.60 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+# SOOTBORN — Story bible 
+Tagline: "Every breath is hers." Current build: v0.61 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -493,3 +493,5 @@ Rule from the author: a 2.5D place is used for story that adds flavour and under
 - Tavi's age: six a year before the furnace, twelve at +5, sixteen at +9.
 - **What they carry (v0.60).** Dock Guards: white enamel plate over dock teal, a teal lamp on the belt, a dock bill (a boat hook with an edge). Stair Blades: a short mantle over the cowl, two sheaths. Wardens: steel with red rims. Rook: buttons, a ribbon bar, a red belt. Tavi at sixteen: a bedroll, a satchel, a scarf, a lamp.
 - **In the arena, from the air (v0.60):** the hook hauls an ordinary man up (UP HERE) and the blade cuts him down (STRUCK DOWN), as in the comic levels.
+- **Row K, the morning after the First Fire** (memory, from the ledge by K-7). Seren: the washer is the only round thing he owned and he gave it away; he owns "the inside half". Nan Orla did their sheets in her own ration water as a wedding gift. Garrow: the bite at fourteen cost Seren the knot; rules are rules. Mara's voice went on the last word of the binding and nobody ever mentioned it. Tavi asks whether Seren is his sister now and goes to stand beside her; it stayed that way.
+- **The fever ward, the first night the fans came up** (memory, from the ward board). Nell has forty breathing and a meter that says twelve, and will not ask why; she sat on the floor, which Kael had never seen. Seren: "I'm not married to a thief. I'm married to a man who tidies." Celestine's "a thief who tidies" three nights later echoes it, and Kael cannot hear one without the other. Tavi can breathe "right down to the bottom". Mosi is already drawing the figure with a sun for a head.
