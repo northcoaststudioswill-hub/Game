@@ -12,7 +12,7 @@ From play notes: do the part left over from the last pass. Make the Assay and it
 
 **The 3D Assay fights** (the Valley, the Ford, the Proctor, and anything else fought in the valley): the Proctors' board stands beside the dais and seven cairns with House ribbons sit near the tents.
 
-**Checked:** each camp drawn with the new things in it (pictures of the Camp, the Island, the Dais, the Last Night and night 28); nothing new sits on a guard's route in the two stealth levels; the valley fight starts with no errors. **Not checked:** played by hand; I did not walk up to each new thing and press A, so a wrong line on one of them would not have shown; the board and cairns in the 3D valley were not in the one picture I took of it.
+**Checked:** each camp drawn with the new things in it (pictures of the Camp, the Island, the Dais, the Last Night and night 28); nothing new sits on a guard's route in the two stealth levels; the valley fight starts with no errors. **Not checked:** played by hand; each new thing's text was opened by script, but I did not walk up to them on foot; the board and cairns in the 3D valley were not in the one picture I took of it.
 
 ## v0.37 · 2026-11-19 — checking pass: titles in frame, cleaner hand-offs into the levels, things in the wrong place
 From play notes: make sure no titles are out of frame; clean transitions between the (now three) kinds of play; look for things misplaced, wrong, or going through each other; make the Assay and its places feel more authentic.
