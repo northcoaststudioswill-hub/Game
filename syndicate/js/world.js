@@ -162,7 +162,7 @@
     s.add(bodies, heads);
     // ---- the garden: not the pit dressed up, but a different place on the same ground. Everything of the pit is put away while it stands.
     const pitSet = s.children.filter(o => engineSet.indexOf(o) < 0); let lifeSet = [];
-    const gardenG = new T.Group(); gardenG.visible = false; s.add(gardenG); const bg0 = s.background, fog0 = s.fog;
+    const gardenG = new T.Group(); gardenG.visible = false; s.add(gardenG); const bg0 = s.background, fog0 = s.fog; let perch = null, davidC = null;
     { const LM = (c, e) => new T.MeshLambertMaterial({ color: c, flatShading: true, emissive: e || 0x000000 }), marble = new T.MeshPhongMaterial({ color: 0xf2efe8, shininess: 40, flatShading: true, emissive: 0x2a2826 }), dummyG = new T.Object3D(), cG = new T.Color();
       const flatDisc = (r, c, y, seg) => { const m = new T.Mesh(new T.CircleGeometry(r, seg || 40), new T.MeshLambertMaterial({ color: c, polygonOffset: true, polygonOffsetFactor: -1 })); m.rotation.x = -Math.PI / 2; m.position.y = y; m.receiveShadow = true; gardenG.add(m); return m; };
       { // a lawn you can see the grass in: mottled, clovered, daisied
@@ -208,7 +208,14 @@
       const tree = (x, z, h, sc) => { const tr = new T.Group(); tr.position.set(x, 0, z); tr.scale.setScalar(sc); gardenG.add(tr); const tk = mesh(new T.CylinderGeometry(0.16, 0.32, h, 6), bark, 0, h / 2, 0, tr); tk.rotation.z = R(-0.1, 0.1); for (let k = 0; k < 3; k++) { const br = mesh(new T.CylinderGeometry(0.05, 0.1, 1.6, 5), bark, R(-0.5, 0.5), h - 0.3, R(-0.5, 0.5), tr); br.rotation.set(R(-0.7, 0.7), 0, R(-0.7, 0.7)); } for (let k = 0; k < 7; k++) { const cn = mesh(new T.IcosahedronGeometry(R(1.1, 1.9), 0), leafM[Math.floor(R(0, 4))], R(-1.7, 1.7), h + R(-0.2, 1.8), R(-1.7, 1.7), tr); cn.scale.y = 0.72; } };
       for (let i = 0; i < 46; i++) { const ring = i % 3, a = R(0, 6.28), r = 15.5 + ring * 5 + R(0, 3), x = Math.cos(a) * r, z = Math.sin(a) * r; if (x + z > 5) continue; tree(x, z, R(3.2, 5.4), 1 + ring * 0.25); }
       // a marble rotunda on the far side, and two figures who have seen all of this before
-      { const g = new T.Group(); g.position.set(-10.6, 0, -10.6); g.rotation.y = 0.785; gardenG.add(g); mesh(new T.CylinderGeometry(2.6, 2.8, 0.3, 16), marble, 0, 0.15, 0, g); for (let k = 0; k < 8; k++) { const a = k * 0.785; mesh(new T.CylinderGeometry(0.16, 0.19, 3.4, 8), marble, Math.cos(a) * 2.2, 2.0, Math.sin(a) * 2.2, g); } mesh(new T.CylinderGeometry(2.7, 2.7, 0.3, 16), marble, 0, 3.85, 0, g); const dome = mesh(new T.SphereGeometry(2.5, 16, 8, 0, 6.2832, 0, 1.5708), marble, 0, 4.0, 0, g); mesh(new T.SphereGeometry(0.2, 8, 6), new T.MeshPhongMaterial({ color: 0xf0c95a, emissive: 0x5a3c08, shininess: 90 }), 0, 6.55, 0, g); }
+      { const g = new T.Group(); g.position.set(-10.6, 0, -10.6); g.rotation.y = 0.785; gardenG.add(g); mesh(new T.CylinderGeometry(2.6, 2.8, 0.3, 16), marble, 0, 0.15, 0, g); for (let k = 0; k < 8; k++) { const a = k * 0.785; mesh(new T.CylinderGeometry(0.16, 0.19, 3.4, 8), marble, Math.cos(a) * 2.2, 2.0, Math.sin(a) * 2.2, g); } mesh(new T.CylinderGeometry(2.7, 2.7, 0.3, 16), marble, 0, 3.85, 0, g); const dome = mesh(new T.SphereGeometry(2.5, 16, 8, 0, 6.2832, 0, 1.5708), marble, 0, 4.0, 0, g); mesh(new T.SphereGeometry(0.2, 8, 6), new T.MeshPhongMaterial({ color: 0xf0c95a, emissive: 0x5a3c08, shininess: 90 }), 0, 6.55, 0, g);
+        // his perch: a gold throne under the dome, and more gold than anyone needs heaped round the steps
+        const gold = new T.MeshPhongMaterial({ color: 0xf0c95a, emissive: 0x6a4608, shininess: 140, specular: 0xfff0c0, flatShading: true });
+        mesh(new T.CylinderGeometry(1.5, 1.7, 0.9, 12), gold, 0, 0.75, 0, g); box(1.3, 0.24, 1.1, gold, 0, 1.32, 0, g); box(1.3, 2.0, 0.24, gold, 0, 2.2, -0.52, g); [-0.62, 0.62].forEach(x => { box(0.2, 0.6, 1.1, gold, x, 1.6, 0, g); mesh(new T.SphereGeometry(0.16, 8, 6), gold, x, 2.0, 0.5, g); }); mesh(new T.ConeGeometry(0.3, 0.6, 4), gold, 0, 3.5, -0.52, g);
+        [[2.9, 0.6, 1.2, 1.3], [-2.8, 1.0, 1.0, 1.0], [1.6, 2.9, 1.4, 1.6], [-1.2, 3.1, 0.9, 0.9], [3.4, 2.4, 0.8, 0.8], [0.3, 3.6, 0.7, 0.6]].forEach(q => mesh(new T.ConeGeometry(q[2], q[3], 9), gold, q[0], q[3] / 2, q[1], g));
+        const cn = new T.InstancedMesh(new T.CylinderGeometry(0.08, 0.08, 0.025, 7), gold, 260); for (let i = 0; i < 260; i++) { const a2 = R(0, 3.14), r2 = R(1.6, 4.6); dummyG.position.set(Math.cos(a2) * r2, R(0.03, 0.5) * (r2 < 3.4 ? 1 : 0.2), Math.sin(a2) * r2 * 0.9 + 0.3); dummyG.rotation.set(R(-0.7, 0.7), R(0, 3), R(-0.7, 0.7)); dummyG.scale.setScalar(1); dummyG.updateMatrix(); cn.setMatrixAt(i, dummyG.matrix); } g.add(cn);
+        [[2.2, 1.6], [-2.2, 1.9]].forEach(q => { box(0.9, 0.5, 0.6, LM(0x4a2e1a), q[0], 0.25, q[1], g); box(0.94, 0.1, 0.64, gold, q[0], 0.52, q[1], g); mesh(new T.SphereGeometry(0.36, 8, 5, 0, 6.28, 0, 1.3), gold, q[0], 0.5, q[1], g).scale.y = 0.6; });
+        const gl = new T.PointLight(0xffd070, 14, 9, 1.5); gl.position.set(0, 2.6, 1.2); g.add(gl); perch = new T.Group(); perch.position.set(0, 1.44, 0.1); g.add(perch); }
       [[-11.5, 1.5], [1.5, -11.5]].forEach((q, i) => { const g = new T.Group(); g.position.set(q[0], 0, q[1]); g.rotation.y = i ? 0 : 1.57; gardenG.add(g); box(0.8, 0.9, 0.8, marble, 0, 0.45, 0, g); mesh(new T.CylinderGeometry(0.2, 0.28, 1.1, 7), marble, 0, 1.45, 0, g); mesh(new T.SphereGeometry(0.19, 8, 6), marble, 0, 2.2, 0, g); const arm = box(0.12, 0.7, 0.12, marble, 0.28, 1.7, 0.1, g); arm.rotation.z = -0.5; });
       // light: a high sun, a rose fill, and the white of a clear day
       const sun = new T.PointLight(0xfff0c8, 64, 60, 1.1); sun.position.set(6, 16, 8); gardenG.add(sun); gardenG.add(new T.AmbientLight(0xeef0ff, 0.82)); const rose = new T.PointLight(0xffb8d4, 18, 26, 1.4); rose.position.set(-7, 4, -7); gardenG.add(rose);
@@ -217,6 +224,7 @@
     let hypeNow = 0, life = null;
     const update = (t) => {
       if (!gardenG.visible && Math.random() < 0.3) { const a = R(0, 6.28), r = R(0, 7.5); gfx.emit(Math.cos(a) * r, R(0.3, 4.5), Math.sin(a) * r, R(-0.15, 0.15), R(0.05, 0.3), R(-0.15, 0.15), 3.5, 0xffd9a0, 0); }       // dust hanging in the torchlight
+      if (gardenG.visible && davidC) davidC.pose({ t, act: Math.sin(t * 0.7) > 0.2 ? 'cheer' : 'sit' });
       if (gardenG.visible) { if (Math.random() < 0.7) { const a = R(0, 6.28), r = R(0, 11); gfx.emit(Math.cos(a) * r, R(3, 7), Math.sin(a) * r, R(-0.5, 0.2), -R(0.4, 1.0), R(-0.5, 0.2), 5, Math.random() < 0.5 ? 0xf7c6d8 : 0xffffff, 0); } if (Math.random() < 0.08) { const a = R(0, 6.28), r = R(2, 9); gfx.emit(Math.cos(a) * r, R(0.4, 1.6), Math.sin(a) * r, R(-0.8, 0.8), R(-0.1, 0.4), R(-0.8, 0.8), 2.5, [0xffe27a, 0x9fd0ff, 0xff9ac0][Math.floor(R(0, 3))], 0); } }       // blossom coming down, and now and then a butterfly
       if (!life && W.arenaLife) { const n0 = s.children.length; life = W.arenaLife(s, AR, crowdSpots); lifeSet = s.children.slice(n0); if (gardenG.visible) stash(true); }
       if (life) life(t, hypeNow);
@@ -232,7 +240,7 @@
       if (hypeNow > 0.75 && n && Math.random() < 0.35) { const p = crowdSpots[Math.floor(Math.random() * n)]; gfx.emit(p[0], p[1] + 1, p[2], -p[0] * R(0.25, 0.5), R(2, 4), -p[2] * R(0.25, 0.5), 1.4, 0xffd36b, 9); }
     };
     update(0);
-    return { scene: s, update, remains: n => setRemains(n | 0), garden: v => { v = !!v; if (v === gardenG.visible) return; gardenG.visible = v; stash(v); s.background = v ? gardenSky : bg0; s.fog = v ? new T.Fog(0xe4eef4, 96, 190) : fog0; }, inGarden: () => gardenG.visible, cineWall: v => { cineG.visible = !!v && !gardenG.visible; }, setHype: h => { hypeNow = h; }, flash: new T.PointLight(0xffffff, 0, 14, 1.4) };
+    return { scene: s, update, remains: n => setRemains(n | 0), garden: v => { v = !!v; if (v === gardenG.visible) return; gardenG.visible = v; if (v && perch && !davidC && G.oracle && G.oracle.look) { davidC = G.makeChar(G.oracle.look()); perch.add(davidC.root); } stash(v); s.background = v ? gardenSky : bg0; s.fog = v ? new T.Fog(0xe4eef4, 96, 190) : fog0; }, inGarden: () => gardenG.visible, cineWall: v => { cineG.visible = !!v && !gardenG.visible; }, setHype: h => { hypeNow = h; }, flash: new T.PointLight(0xffffff, 0, 14, 1.4) };
   }
 
   W.get = function (name) {
