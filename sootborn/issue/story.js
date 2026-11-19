@@ -182,7 +182,7 @@
 //@@SUNS
     // a chalked sun works when he steps onto it; nothing to press
     { let on = null; if (F.intro && !S.enc) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && Math.hypot(x - c.x, z - c.z) < 1.5) on = id; }
-      if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
+      if (on && S.onSun !== on) { const still = Math.hypot(pl.vel.x, pl.vel.z) < 1.6 && (pl.state === 'idle' || pl.state === 'run'), now = S.time; if (!still || S.sunId !== on) { if (S.sunId !== on && !S.sunHint) { S.sunHint = 1; U.toast('STAND ON THE SUN', 2.2); } S.sunId = on; S.sunAt = now; } else { const k = (now - S.sunAt) / 0.9; if (((now * 8) | 0) !== S.sunTick) { S.sunTick = (now * 8) | 0; FX.ring(pl.pos, 0xffe14a, Math.max(0.4, 1.6 - k * 1.2), 0.3, 0.2); } if (k >= 1) { S.onSun = on; S.sunId = null; crossing(on)(); return; } } } if (!on) { S.onSun = null; S.sunId = null; } }
 //@@INIT
   S.init = function () {
     clerk = S.clerk = SC.makeHumanoid('clerk'); G.scene.add(clerk.group); clerk.group.visible = false;
@@ -206,20 +206,20 @@
       W.dyn.push(t => { a.rotation.z = t * 0.25; const col = pl.path ? SC.PATHS[pl.path].color : 0xffe14a; a.material.color.set(col); b.material.color.set(col); b.material.opacity = 0.25 + Math.sin(t * 3) * 0.12; });
       W.addInteract({ id: 'x_' + id, x: c.x, y: c.y, z: c.z, r: 1.9, label: 'COUNT ELEVEN', act: crossing(id), when: () => false });
     });
-    W.addInteract({ id: 'casings', x: 1.5, y: 0, z: 38.8, r: 1.9, label: 'LOOK', marker: 'clue', mh: 1.1, when: () => F.intro && !F.clue_casings, act: clue('casings', [
+    W.addInteract({ id: 'casings', x: 1.5, y: 0, z: 38.8, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.1, when: () => F.path && !F.clue_casings, act: clue('casings', [
       { who: 'cap', text: 'A watch lamp on the stones. The wick is trimmed and the well is full.' },
       { who: 'hero', face: 'hurt', text: 'Nobody trims a lamp for a watch that is about to go off. They were *waiting*.' }]) });
-    W.addInteract({ id: 'bike', x: 9.2, y: 0, z: 13.7, fx: 9.3, fz: 15, r: 2.2, label: 'LOOK', marker: 'clue', mh: 1.4, when: () => F.e_alley && !F.clue_bike, act: clue('bike', [
+    W.addInteract({ id: 'bike', x: 9.2, y: 0, z: 13.7, fx: 9.3, fz: 15, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.4, when: () => F.e_alley && !F.clue_bike, act: clue('bike', [
       { who: 'cap', text: 'The watch board, face down by a spilled sled. My rota, chalked up fair. I know my own sevens.' },
       { who: 'hero', text: 'The second bell is struck through. Somebody has chalked *FIRST* over it.' }]) });
-    W.addInteract({ id: 'masks', x: 21, y: 0, z: -16.3, fx: 21, fz: -18.4, r: 2.2, label: 'LOOK', marker: 'clue', mh: 1.6, when: () => F.e_yard && !F.clue_masks, act: clue('masks', [
+    W.addInteract({ id: 'masks', x: 21, y: 0, z: -16.3, fx: 21, fz: -18.4, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.6, when: () => F.e_yard && !F.clue_masks, act: clue('masks', [
       { who: 'cap', text: 'The freight box is full of crates. The crates are full of halberds, forty to a crate, greased and tagged for tonight.' },
       { who: 'hero', face: 'shock', text: 'Nobody needs forty halberds to guard a barge. This was never a watch. It is a *stair party*.' }]) });
-    W.addInteract({ id: 'ledger', x: -27.2, y: 4, z: -8.7, fx: -29, fz: -8.7, r: 2.1, label: 'SEARCH', marker: 'clue', mh: 1.8, when: () => F.e_wh && !F.ledger, act: clue('ledger', [
+    W.addInteract({ id: 'ledger', x: -27.2, y: 4, z: -8.7, fx: -29, fz: -8.7, r: 1.45, label: 'SEARCH', marker: 'clue', mh: 1.8, when: () => F.e_wh && !F.ledger, act: clue('ledger', [
       { who: 'cap', text: 'The dock log, open under the lamp. An entry at the first bell, in the Stair Captain\'s hand.' },
       { who: 'hero', face: 'angry', text: '"By order, the Clerk\'s rota is set aside. In the Dockmaster\'s absence *Rook* holds the moorings." Initialled by Marshal Cade.' },
       { who: 'cap', text: 'Somebody gave Cade the hour. I did not have the time to wonder who. Clipped to the page: a key marked ROOF.' }], () => { setFlag('ledger'); U.toast('*ROOF KEY* TAKEN. THE BACK STAIRS GO UP.', 3.5); }) });
-    W.addInteract({ id: 'loft', x: -27.8, y: 9, z: -26.7, fx: -29.7, fz: -26.7, r: 2.1, label: 'LOOK', marker: 'clue', mh: 1.8, when: () => !F.clue_loft, act: clue('loft', [
+    W.addInteract({ id: 'loft', x: -27.8, y: 9, z: -26.7, fx: -29.7, fz: -26.7, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.8, when: () => !F.clue_loft, act: clue('loft', [
       { who: 'cap', text: 'A signal hut. The lamp inside is aimed straight down the Spire, and the glass is still warm.' },
       { who: 'hero', text: 'They did not only know. They *answered*. Every Warden under the docks is on that stair by now.' }]) });
     W.addInteract({ id: 'gate', x: 18, y: 0, z: 7.1, fx: 18, fz: 5.8, r: 2.2, label: 'OPEN GATE', marker: 'act', mh: 2.6, when: () => F.e_alley && !F.gate, act: () => {
@@ -344,17 +344,17 @@
         // the forty: lamps with hoods on, going up the hill road ten at a time
         const lamps = []; for (let i = 0; i < 10; i++) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.5, 0.22), new THREE.MeshBasicMaterial({ color: 0xffd9a0, fog: false })); m.visible = false; G.scene.add(m); lamps.push(m); }
         W.dyn.push((t, dt) => { if (!S.walk) return; S.walk += dt; lamps.forEach((m, i) => { const k = (S.walk - i * 0.45) / 7; m.visible = k > 0 && k < 1; if (m.visible) m.position.set(2.5 + k * 26, 0.9 + Math.sin(S.walk * 9 + i) * 0.06, 1 + k * 9 + (i % 3 - 1) * 0.5); }); if (S.walk > 12) { S.walk = 0; lamps.forEach(m => { m.visible = false; }); } });
-        W.addInteract({ id: 'lintel', x: -9.9, y: 0, z: -9, fx: -11, fz: -9, r: 2.2, label: 'LOOK', marker: 'clue', mh: 2.2, when: () => F.intro && !F.clue_lintel, act: clue('lintel', [
+        W.addInteract({ id: 'lintel', x: -9.9, y: 0, z: -9, fx: -11, fz: -9, r: 1.45, label: 'LOOK', marker: 'clue', mh: 2.2, when: () => F.e_alley && !F.clue_lintel, act: clue('lintel', [
           { who: 'cap', text: 'Names cut in the lintel, one Assay under another. Most are scored through. Mine is there, with a gold nail in it. It is not my name.' },
           { who: 'hero', face: 'angry', text: 'Sorrel, E. ...Forty feet under this grass there is a tier they are striking tonight.' }]) });
-        W.addInteract({ id: 'shoe', x: 3.6, y: 0, z: 3.6, r: 1.8, label: 'LOOK', marker: 'clue', mh: 1.1, when: () => F.e_alley && !F.clue_shoe, act: clue('shoe', [
+        W.addInteract({ id: 'shoe', x: 3.6, y: 0, z: 3.6, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.1, when: () => F.e_alley && !F.clue_shoe, act: clue('shoe', [
           { who: 'cap', text: 'A child\'s shoe by the hatch. Somebody went up the hill road with one foot bare and did not come back for it.' },
           { who: 'hero', face: 'hurt', text: 'Good. Do not come back.' }]) });
       } else {
-        W.addInteract({ id: 'plates', x: -2.4, y: 6, z: 8.5, r: 2, label: 'LOOK', marker: 'clue', mh: 1.2, when: () => F.e_l1 && !F.clue_plates, act: clue('plates', [
+        W.addInteract({ id: 'plates', x: -2.4, y: 6, z: 8.5, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.2, when: () => F.e_l1 && !F.clue_plates, act: clue('plates', [
           { who: 'cap', text: 'Brass plates set in the landing, worn bright in two places each. Knees.' },
           { who: 'hero', face: 'angry', text: "Nobody's using them tonight." }]) });
-        W.addInteract({ id: 'halberd', x: 2.4, y: 12, z: -12.6, fx: 3.2, fz: -12, r: 2, label: 'LOOK', marker: 'clue', mh: 2.9, when: () => F.e_l2 && !F.clue_halberd, act: clue('halberd', [
+        W.addInteract({ id: 'halberd', x: 2.4, y: 12, z: -12.6, fx: 3.2, fz: -12, r: 1.45, label: 'LOOK', marker: 'clue', mh: 2.9, when: () => F.e_l2 && !F.clue_halberd, act: clue('halberd', [
           { who: 'cap', text: 'Brand\'s halberd, stood upright in a crack in the stone. Somebody carried it up nine hundred steps and did not tell me.' },
           { who: 'hero', face: 'hurt', text: 'Hollis. ...He is still finishing the bar he was on.' }]) });
       }
@@ -393,7 +393,7 @@
       updateEnc(dt);
       if (!pl.control || S.enc || pl.state === 'dead') return;
       const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;
-      { let on = null; if (F.intro) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && Math.hypot(x - c.x, z - c.z) < 1.5) on = id; } if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
+      { let on = null; if (F.intro) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && Math.hypot(x - c.x, z - c.z) < 1.5) on = id; } if (on && S.onSun !== on) { const still = Math.hypot(pl.vel.x, pl.vel.z) < 1.6 && (pl.state === 'idle' || pl.state === 'run'), now = S.time; if (!still || S.sunId !== on) { if (S.sunId !== on && !S.sunHint) { S.sunHint = 1; U.toast('STAND ON THE SUN', 2.2); } S.sunId = on; S.sunAt = now; } else { const k = (now - S.sunAt) / 0.9; if (((now * 8) | 0) !== S.sunTick) { S.sunTick = (now * 8) | 0; FX.ring(pl.pos, 0xffe14a, Math.max(0.4, 1.6 - k * 1.2), 0.3, 0.2); } if (k >= 1) { S.onSun = on; S.sunId = null; crossing(on)(); return; } } } if (!on) { S.onSun = null; S.sunId = null; } }
       if (RIS) {
         if (S.pending || !F.e_alley || F.boss || S.bossDown) return;
         const next = !F.e_w2 ? 'w2' : !F.e_w3 ? 'w3' : 'boss'; S.pending = true;

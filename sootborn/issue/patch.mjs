@@ -168,11 +168,11 @@ between("  const A1w = {", "  P.attack = (i, t) => {", `  const A1w = { hips: [0
 `);
 between("  P.attack = (i, t) => {", "  P.ATTACK = [", `  P.attack = (i, t) => {
     const g = P.guard(0);
-    if (i === 0) return clip([[0, g], [0.06, A1w], [0.13, A1s], [0.24, A1s], [0.42, g]], t);
-    if (i === 1) return clip([[0, g], [0.07, A2w], [0.15, A2s], [0.27, A2s], [0.46, g]], t);
-    if (i === 2) return clip([[0, g], [0.06, Rw], [0.13, Rs], [0.24, Rs], [0.4, g]], t);
+    if (i === 0) return clip([[0, g], [0.06, A1w], [0.12, A1s], [0.16, mix(A1w, A1s, 1.16)], [0.26, A1s], [0.34, mix(g, A1s, 0.35)], [0.42, g]], t);
+    if (i === 1) return clip([[0, g], [0.07, A2w], [0.14, A2s], [0.18, mix(A2w, A2s, 1.16)], [0.29, A2s], [0.38, mix(g, A2s, 0.35)], [0.46, g]], t);
+    if (i === 2) return clip([[0, g], [0.06, Rw], [0.12, Rs], [0.15, mix(Rw, Rs, 1.14)], [0.25, Rs], [0.33, mix(g, Rs, 0.3)], [0.4, g]], t);
     if (i === 3) return clip([[0, g], [0.08, Kw], [0.17, Ks], [0.29, Ks], [0.46, g]], t);
-    return clip([[0, g], [0.12, A3w], [0.22, A3s], [0.38, A3s], [0.62, g]], t);
+    return clip([[0, g], [0.12, A3w], [0.2, A3s], [0.25, mix(A3w, A3s, 1.12)], [0.4, A3s], [0.52, mix(g, A3s, 0.4)], [0.62, g]], t);
   };
 `);
 rep("P.ATTACK = [{ dur: 0.4, hit: 0.12, chain: 0.2 }, { dur: 0.44, hit: 0.14, chain: 0.22 }, { dur: 0.62, hit: 0.2, chain: 0.5 }];", "P.ATTACK = [{ dur: 0.4, hit: 0.12, chain: 0.2 }, { dur: 0.44, hit: 0.14, chain: 0.22 }, { dur: 0.4, hit: 0.13, chain: 0.2 }, { dur: 0.46, hit: 0.17, chain: 0.25 }, { dur: 0.62, hit: 0.2, chain: 0.5 }];");
@@ -263,6 +263,7 @@ rep("KeyC: 'attack', KeyF: 'interact', KeyH: 'interact',", "KeyC: 'attack', KeyF
 rep("const KEY = { KeyJ: 'attack',", "const KEY = { KeyB: 'boots', KeyJ: 'attack',");
 
 /* ---- a brighter picture: the ink and the dots stay, the shadows lift ---- */
+rep("G.uDot.value = Math.max(4, Math.min(w, h) * pr / 150);", "G.uDot.value = Math.max(2.2, Math.min(w, h) * pr / 340);");
 rep("    if (SC.issue === 'riser') { G.scene.background.set(0x0a1226);", "    G.amb.color.multiplyScalar(SC.issue === 'stair' ? 1.25 : 1.5); G.sun.color.multiplyScalar(1.15); G.uKey.value.multiplyScalar(1.12);\n    if (SC.issue === 'riser') { G.scene.background.set(0x0a1226);");
 rep("G.amb.color.setRGB(0.22, 0.3, 0.42); }", "G.amb.color.setRGB(0.36, 0.46, 0.6); }");
 /* ---- one panel at a time in the small frame, and nothing written over anything else ---- */
@@ -308,7 +309,9 @@ rep("      if (wantKick && pl.onGround) { inp.clear('kick'); startAttack(pl.stat
       else if (wantKick && pl.onGround && (hc < 0 || pl.st >= P.ATTACK[hc].hit)) { inp.clear('kick'); startAttack(hc === 0 ? 6 : hc === 1 ? 5 : hc === 2 ? 7 : hc === 3 ? 8 : 3, mx, mz, mag); }
       else if (wantKick) { /* held for the beat */ }
       else if (wantJump && pl.onGround && free) { inp.clear('jump'); pl.setState('air'); pl.jv = 9; pl.airFuel = 2.4; pl.diving = 0; FX.ring(pl.pos, 0x7ad9ff, 0.3, 1.8, 0.3); FX.puff(pl.pos, 4, 0.9); SC.audio.sfx('leap'); }`);
-rep("  function perfectDodge() {", `  function bootSlam() {
+rep("  function perfectDodge() {", `  // on the boots: one knee up, off hand out for balance, the hook held low and back
+  const HOVP = { spine: [0.15, 0, 0], chest: [0.1, 0.25, 0], head: [-0.15, -0.2, 0], shR: [0.5, 0, -0.5], elR: [-0.4, 0, 0], shL: [-0.6, 0, 0.9], elL: [-0.5, 0, 0], thL: [-1.0, 0, 0.1], shnL: [1.5, 0, 0], thR: [0.15, 0, -0.08], shnR: [0.35, 0, 0], ftR: [0.6, 0, 0], sc1: [0.3, 0, 0], y: 0 };
+  function bootSlam() {
     FX.ring(pl.pos, 0x7ad9ff, 0.4, 3.6, 0.4); FX.puff(pl.pos, 7, 1.3); FX.light(pl.pos, 0x7ad9ff, 80, 0.35); SC.cam.shake(0.7); SC.audio.sfx('slam'); let n = 0;
     for (const e of E) { if (!e.hittable() || Math.abs(e.pos.y - pl.pos.y) > 1.9) continue; const ex = e.pos.x - pl.pos.x, ez = e.pos.z - pl.pos.z, d = Math.hypot(ex, ez); if (d < 2.9 + e.r) { e.hit(24 * (1 + pl.meter / T.meter * 0.5), ex / (d || 1), ez / (d || 1), { heavy: true, named: true }); n++; } }
     if (n) { _a.copy(pl.pos); _a.y += 2.6; FX.word('LIFT ZERO!', _a, '#7ad9ff', 1.3); SC.time.hitstop = 0.12; pl.gain(10); }
@@ -319,7 +322,7 @@ rep("      case 'power': updatePower(dt); break;", `      case 'air': {
         if (pl.diving) { pl.vel.set(pl.ddx, 0, pl.ddz); pl.pose = P.attack(4, 0.14); pl.poseRate = 30; }
         else { pl.vel.x += (mx / (mag || 1) * sp - pl.vel.x) * kk; pl.vel.z += (mz / (mag || 1) * sp - pl.vel.z) * kk; if (mag > 0.08) pl.yaw = SC.dampAng(pl.yaw, Math.atan2(mx, mz), T.turnRate, dt);
           if (hov) { pl.jv += (0 - pl.jv) * Math.min(1, dt * 10); pl.airFuel -= dt; if (((pl.st * 30) | 0) % 2 === 0) { _a.copy(pl.pos); _a.y += pl.lift - 0.1; FX.burst(_a, 0x7ad9ff, 0.5); } } else pl.jv -= 22 * dt;
-          pl.pose = hov ? SC.mixPose(P.guard(pl.t), P.leap, 0.45) : P.leap; pl.poseRate = 16;
+          pl.pose = pl.jv > 2 ? SC.mixPose(HOVP, P.leap, 0.35) : Object.assign({}, HOVP, { y: Math.sin(pl.t * 4) * 0.06 }); pl.poseRate = 14;
           if (wantAtk || wantKick || wantBoot) { inp.clear('attack'); inp.clear('kick'); inp.clear('boots'); let dx = mag > 0.3 ? mx / mag : Math.sin(pl.yaw), dz = mag > 0.3 ? mz / mag : Math.cos(pl.yaw); const t = pickTarget(11, 0.2, dx, dz);
             let tm = 0.24, v = 9; if (t) { const ex = t.pos.x - pl.pos.x, ez = t.pos.z - pl.pos.z, d = Math.hypot(ex, ez) || 1; dx = ex / d; dz = ez / d; tm = SC.clamp(d / 24, 0.18, 0.5); v = Math.max(0, d - t.r - 0.7) / tm; }
             pl.ddx = dx * v; pl.ddz = dz * v; pl.jv = -Math.max(0.2, pl.lift) / tm; pl.yaw = Math.atan2(dx, dz); pl.diving = 1; SC.emit('speedlines', 0.5); SC.audio.sfx('whoosh', 2); } }
@@ -367,6 +370,9 @@ rep("    { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) :
         const br = Math.sin(performance.now() * 0.001 * (2.2 + p.meter * 0.03)) * (0.012 + p.meter * 0.0003); bn.chest.rotation.x += br; bn.shL.rotation.z += br * 1.5; bn.shR.rotation.z -= br * 1.5; }
       // the stance: with somebody in reach of him he drops his weight and lets the hook trail low behind, edge up
       { const near = best && bd < 49 && (p.state === 'idle' || p.state === 'run'); U.stance = (U.stance || 0) + ((near ? 1 : 0) - (U.stance || 0)) * Math.min(1, rdt * 5); const k2 = U.stance; if (bn && k2 > 0.02 && p.state === 'idle') { bn.spine.rotation.x += 0.16 * k2; bn.hips.rotation.y -= 0.35 * k2; bn.chest.rotation.y += 0.2 * k2; bn.shR.rotation.x += 0.55 * k2; bn.shR.rotation.z -= 0.3 * k2; bn.elR.rotation.x += 0.5 * k2; bn.shL.rotation.x -= 0.5 * k2; bn.elL.rotation.x -= 0.7 * k2; bn.thL.rotation.x -= 0.3 * k2; bn.shnL.rotation.x += 0.45 * k2; bn.thR.rotation.x += 0.2 * k2; bn.shnR.rotation.x += 0.3 * k2; } }
+      // landings are taken in the knees; on a run the hook trails
+      if (bn) { if ((U.pLift || 0) > 0.3 && p.lift <= 0.02) U.sq = 1; U.pLift = p.lift; U.sq = (U.sq || 0) * Math.exp(-rdt * 7); const q = U.sq; if (q > 0.03) { bn.thL.rotation.x -= 0.7 * q; bn.shnL.rotation.x += 1.2 * q; bn.thR.rotation.x -= 0.5 * q; bn.shnR.rotation.x += 1.0 * q; bn.spine.rotation.x += 0.35 * q; bn.head.rotation.x -= 0.2 * q; }
+        if (p.state === 'run') { bn.shR.rotation.x += 0.6; bn.shR.rotation.z -= 0.25; bn.elR.rotation.x += 0.3; bn.chest.rotation.y -= 0.15; } }
       U.lastYaw = p.yaw; }
     { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) : 0,`);
 

@@ -1,4 +1,14 @@
-# SOOTBORN — changelog (latest v0.32 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.33 · 2026-11-19)
+
+## v0.33 · 2026-11-19 — the third-person levels: finer dots, calmer openings, more weight in the movement
+From play notes: the dots are still too big on the scene; the changes are liked but the animations need more; the first clues and circles trigger too easily and the whole start is jarring.
+
+- **Dots** are less than half the size they were.
+- **Suns no longer fire when you walk across them.** Stand on one for about a second; a ring closes on him while it counts. Running over one, or fighting on one, does nothing. A one-time message says so.
+- **Clues:** you have to be closer (about a pace and a half, was two). On the docks the first clue no longer appears until after the first sun, so the level does not open with two interruptions on the same spot. At Riser Nine the lintel waits until the first wave is down.
+- **Animation:** the light cuts, the ram and the cleave now swing past their mark and settle back instead of stopping dead; landings from a jump, a dive or Last Bell are taken in the knees; on a run the hook trails behind him; hovering has its own pose (one knee up, off hand out, hook low).
+
+**Checked by script:** a sun triggers after standing and not on a pass; hover and landing in stills; all three levels to their endings. **Not checked:** played by hand; the swings in motion; whether a second is the right wait on a sun.
 
 ## v0.32 · 2026-11-19 — the third-person levels: light and heavy, four chain enders, jump and hover, fury earned, the bank hook
 From play notes: more combo finisher animations; a jump, so the boots can hover and not only lunge (keep the lunge); the gold flashing is distracting; the meter should be earned and ELEVEN should be a long press, not its own button; light and heavy hits; more of his own style in the animation; he should have his curved blade by now.
