@@ -1,4 +1,26 @@
-# SOOTBORN — changelog (latest v0.57 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.58 · 2026-11-19)
+
+## v0.58 · 2026-11-19 — nothing in the middle of the screen in the comic levels; mashing no longer pins a man to the floor
+From your note on v0.57 (the UI in the comic levels is still in the middle of the screen), and from the open list.
+
+**Comic levels: the middle of the picture is clear**
+- I took pictures of the first level in a phone-sized frame, sideways and upright, and two things sat in the middle:
+  - **Messages** ("TAP TO CUT. HOLD THE SAME BUTTON…", SAVED, REMEMBER and the rest) came up as a wide cream box across the upper middle. They are now a small dark strip in the top-left corner, under the health bar.
+  - **The objective marker** (the yellow diamond with the distance) sits on whatever it marks, which is usually straight ahead, on top of Kael. When the thing it marks is on screen it is now half the size and faint. It goes back to full size at the edge of the screen when the way is behind you or off to one side.
+- Health and fury stay top-left, the objective top-right, prompts at the bottom.
+- The red band across the screen on rage moments (LINE STRUCK, LAST BELL, ON MY BREATH) and the count on ELEVEN are meant to cross the picture and are unchanged. If one of those is what you mean, say so.
+- **If it is still wrong, a screenshot would settle it**: I cannot see your phone, and this is the second time I have guessed at it.
+
+**Fights: why mashing still won below**
+- A bot that only presses strike beat Tam and Bryn in the Scuffle without being touched. The reason: the third blow of the chain knocks an ordinary man down, every blow on a man who is down did extra damage and reset the time he stays down, and if he did get up he was knocked down again before his swing finished. He spent the whole fight on the floor.
+- Now: one extra blow on a man who is down, and after that he gets up. He gets up with his guard raised, and for two seconds after getting up (or after blocking) he cannot be knocked off his feet or out of his swing by anything but a heavy blow. A light hit no longer shoves a man who is mid-swing out of his own reach.
+- This applies to every 2D and arena fight, not only the Scuffle.
+- The same mashing bot now: beats Tam with two health left of six (untouched before), beats Bryn with one, loses to Dov. A bot that dodges wins all three with three, two and five left. At the Pairing both bots win, and both need the second wind.
+
+**The Scuffle**
+- The people round the chalk are Row K's (Nan Orla, Garrow, Wick, Sela, whoever is not fighting), and the square's lamp posts are gone from it.
+
+**Checked by script:** the level's HUD in pictures, sideways and upright, before and after; the bot results above; the page loads clean. **Not checked:** by hand; the marker when the goal is off screen (not pictured); whether the harder fights below are now too hard for you (they are tuned to bots).
 
 ## v0.57 · 2026-11-19 — more from the list: memories that fit the year, figures that breathe in the films
 Still working down the open list. Nothing here was played by hand.

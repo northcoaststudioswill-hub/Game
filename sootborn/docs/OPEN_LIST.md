@@ -1,5 +1,5 @@
-# SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.57 (2026-11-19).
+# SOOTBORN — open list 
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.58 (2026-11-19).
 
 ## Waiting on you
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
@@ -8,6 +8,8 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **The High Docks:** the empty, locked level was a broken save from v0.49 (quay cleared, no key); v0.53 mends it and adds START THIS LEVEL AGAIN. What made that save is still unknown. Tell me if the gate refuses again.
 
 ## Untested, built blind (check these first when playing)
+- **v0.58: the comic levels' HUD.** Messages moved to the top-left, the marker shrinks when its target is on screen. If anything still sits mid-screen, send a screenshot.
+- **v0.58: fights below are harder to mash.** A man who is down takes one blow and gets up guarding. Say if the Scuffle or the Ember Ring is now too much.
 - Air hook, air cut and thrown weapons (v0.51).
 - Death animation, down-but-not-out, Tavi following (v0.50).
 - The Lamp's wrong-name fight (v0.50).
@@ -32,7 +34,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 9b. **More room at the start of every comic level.** Docks, Stair and Riser Nine done (v0.56). Check the feel; build any new level with a long first stretch.
 9c. **Story beats missing from the Dev menu:** cause found in v0.56 (the Training room left film-skipping switched on). Tell me if any entry still starts without its scenes.
 10. **2D valley maps:** more terrain you can read (rises, banks, cover), more detail.
-11. **The Scuffle** has Row K behind it (v0.56). The floor and the lamp posts on it are still the square's.
+11. **The Scuffle** has Row K behind it and Row K's people round it (v0.56, v0.58). The floor is still the square's flagstones.
 
 ## Story and scenes
 - **Going down in a fight should always be a moment.** Arena second wind (v0.54), comic-level bosses (v0.50), memories by era and a line on losing (v0.56). Still to do: a drawn scene for losing below, not only a line.
@@ -46,7 +48,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 ## Fighting and controls
 18. **One controls card** that holds across the 2D fights, the arena fights and the comic levels. (The arena legend for a pad is in, v0.56.)
 19. **Group fights still read as busy.**
-20. **Difficulty:** tuned from your notes and a mashing bot only. The Scuffle and the Ember Ring were not re-fought after the changes.
+20. **Difficulty:** the Scuffle re-fought by two bots in v0.58 after closing the knockdown lock (numbers in the changelog). The Ember Ring, the Drill and the group fights were not re-fought.
 21. The on-screen pad has no second stick, so on a phone the camera still turns by dragging the picture.
 
 ## Housekeeping

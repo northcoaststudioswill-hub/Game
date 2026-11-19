@@ -195,3 +195,4 @@ function barksRowK() { return { orla: ['FIRST BELL, HOT WATER.', 'MIND THE WET.'
 { const b0 = barks; barks = id => barksRowK()[id] || b0(id); }
 // the gilded portrait lasts as long as the dream it was set in
 { const cp = Cutscene.play; Cutscene.play = function (steps, done) { return cp.call(this, steps, function () { World.gilded = 0; return done && done.apply(this, arguments); }); }; }
+[0, 1, 2].forEach(i => { FF['scuffle' + i] = () => SCUFFLE[i]().def; });
