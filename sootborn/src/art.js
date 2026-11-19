@@ -275,7 +275,14 @@ function stoneAt(g, x, y, w, h, col, mortar) {
 }
 // The Assay valley at night: pines for walls, grass, trodden paths, the river, and marble for anything the Proctors stand on.
 function valleyTile(g, m, tx, ty, ch, x, y, r, r2, R, at) {
-  const grass = () => { R(0, 0, 16, 16, r < .5 ? '#1c3826' : '#1f3d29'); for (let i = 0; i < 5; i++) { const a = hash(tx * 7 + i, ty * 3 + 2), b = hash(tx * 2 + i, ty * 9 + 4); R((a * 15) | 0, (b * 14) | 0, 1, 2, i % 2 ? '#2a5234' : '#163020'); } if (r2 > .86) { const sx = 3 + (r2 * 40 | 0) % 9, sy = 4 + (r * 40 | 0) % 8; R(sx, sy, 1, 1, '#d8d0f0'); R(sx, sy + 1, 1, 2, '#2a5234'); } };
+  const grass = () => { R(0, 0, 16, 16, r < .34 ? '#1b3725' : r < .67 ? '#1f3d29' : '#1d3a27');
+    if (hash(tx * 3 + 1, ty * 5 + 9) > .55) { const px = (r2 * 9) | 0, py = 1 + ((r * 9) | 0); R(px, py, 7, 5, '#224430'); R(px + 1, py - 1, 5, 7, '#224430'); }                 // where the moon gets through
+    for (let i = 0; i < 7; i++) { const a = hash(tx * 7 + i, ty * 3 + 2), b = hash(tx * 2 + i, ty * 9 + 4), bx = (a * 15) | 0, by = (b * 13) | 0; R(bx, by, 1, 2 + (i % 2), ['#2a5234', '#163020', '#2f5c3a', '#1a3824'][i % 4]); if (i % 3 === 0) R(bx + 1, by + 1, 1, 1, '#356a42'); }
+    if (r2 > .8) { const sx = 3 + (r2 * 40 | 0) % 9, sy = 4 + (r * 40 | 0) % 8, fc = ['#d8d0f0', '#f0e0a0', '#b8a0e8'][(r2 * 100 | 0) % 3]; R(sx, sy, 1, 1, fc); R(sx, sy + 1, 1, 2, '#2a5234'); if (r2 > .93) { R(sx + 3, sy + 2, 1, 1, fc); R(sx + 3, sy + 3, 1, 1, '#2a5234'); } }
+    else if (r2 < .06) { const sx = 4 + (r * 30 | 0) % 8, sy = 6 + (r2 * 90 | 0) % 6; R(sx, sy, 3, 2, '#5a5e66'); R(sx, sy, 3, 1, '#7c8088'); R(sx + 1, sy + 2, 3, 1, 'rgba(0,0,0,.25)'); }   // a stone
+    else if (r2 > .485 && r2 < .5) { const sx = 5 + (r * 20 | 0) % 6; R(sx, 9, 1, 3, '#d8c8a8'); R(sx - 1, 8, 3, 2, '#b8442e'); R(sx, 8, 1, 1, '#f0e0d0'); }                              // a mushroom
+    if (at(0, -1) === '#') R(0, 0, 16, 5, 'rgba(4,10,8,.36)');                                                                                                                                 // under the pines
+    if (at(1, 0) === '~' || at(-1, 0) === '~') { const L = at(-1, 0) === '~'; for (let i = 0; i < 4; i++) { const a = hash(tx * 5 + i, ty * 11), x0 = L ? 1 + (a * 3 | 0) : 12 + (a * 3 | 0), y0 = 1 + i * 4; R(x0, y0 - 3 - (a * 3 | 0), 1, 6 + (a * 3 | 0), '#3a5e36'); R(x0, y0 - 4 - (a * 3 | 0), 1, 2, '#7a6a3a'); } } };   // reeds on the bank
   if (m.theme === 'spire' && ch === '#') {
     if (at(0, 1) !== '#') { R(0, 0, 16, 16, '#e4e0ee'); R(0, 0, 16, 2, '#ffffff'); for (let i = 0; i < 16; i += 8) { R(i, 2, 1, 11, '#c4c0d2'); R(i + 1, 2, 1, 11, '#f4f2fa'); } R(0, 12, 16, 2, '#e8c25a'); R(0, 12, 16, 1, '#fff0b0'); R(0, 14, 16, 2, '#8a8698');
       if ((tx % 5) === 2) { R(4, 2, 8, 9, '#0c1430'); R(4, 2, 8, 1, '#e8c25a'); R(4, 10, 8, 1, '#e8c25a'); R(3, 2, 1, 9, '#e8c25a'); R(12, 2, 1, 9, '#e8c25a'); R(6, 4, 1, 1, '#ffffff'); R(10, 7, 1, 1, '#c8d8ff'); R(7, 8, 1, 1, '#ffffff'); } }
@@ -287,9 +294,16 @@ function valleyTile(g, m, tx, ty, ch, x, y, r, r2, R, at) {
       for (const [a, b, w] of [[5, -6, 6], [3, -2, 10], [1, 2, 14], [0, 6, 16]]) { R(a, b, w, 4, '#14301f'); R(a, b, w, 1, '#1e4a2c'); R(a + 1, b + 3, w - 2, 1, '#0c2014'); } R(7, -8, 2, 2, '#1e4a2c'); }
     else { R(0, 0, 16, 16, '#0c1c13'); for (let i = 0; i < 4; i++) { const a = hash(tx * 5 + i, ty * 3 + 1), b = hash(tx + i * 7, ty * 5 + 2), sx = (a * 11) | 0, sy = (b * 11) | 0, c = ['#14301f', '#183826', '#102818'][i % 3]; R(sx, sy + 1, 6, 4, c); R(sx + 1, sy, 4, 6, c); R(sx + 1, sy, 3, 1, '#225032'); } }
     return; }
-  if (ch === '~') { R(0, 0, 16, 16, '#12263a'); R(0, 0, 16, 1, '#1c3852'); for (let i = 0; i < 3; i++) { const a = hash(tx * 3 + i, ty * 7 + 1); R((a * 12) | 0, 3 + i * 5, 4, 1, i % 2 ? '#2a5070' : '#3a6a8a'); } if (at(-1, 0) !== '~') R(0, 0, 2, 16, '#2a3a2a'); if (at(1, 0) !== '~') R(14, 0, 2, 16, '#22301f'); return; }
+  if (ch === '~') { R(0, 0, 16, 16, '#12263a'); R(0, 0, 16, 1, '#1c3852'); for (let i = 0; i < 3; i++) { const a = hash(tx * 3 + i, ty * 7 + 1); R((a * 12) | 0, 3 + i * 5, 4, 1, i % 2 ? '#2a5070' : '#3a6a8a'); } if (at(-1, 0) !== '~') { R(0, 0, 2, 16, '#2a3a2a'); R(2, 0, 1, 16, '#0c1a2a'); } if (at(1, 0) !== '~') { R(14, 0, 2, 16, '#22301f'); R(13, 0, 1, 16, '#1c3852'); }
+    if (r2 > .88) { R(5, 6, 5, 3, '#2a5a3a'); R(6, 5, 3, 5, '#2a5a3a'); R(6, 6, 3, 1, '#3a7a4a'); if (r > .5) R(8, 7, 1, 1, '#f0d0e0'); }   // a lily pad
+    else if (r2 < .08) { R(6, 8, 4, 3, '#4a4e58'); R(6, 8, 4, 1, '#6c7078'); R(5, 11, 6, 1, '#1c3852'); }                                     // a stone breaking the surface
+    return; }
   if (ch === ',' && m.theme === 'spire') { R(0, 0, 16, 16, '#6a2a3a'); R(0, 0, 16, 1, '#8a3a4c'); R(0, 0, 1, 16, '#e8c25a'); R(15, 0, 1, 16, '#e8c25a'); if ((ty & 1) === 0) R(6, 6, 4, 4, '#7a3244'); return; }
-  if (ch === ',') { R(0, 0, 16, 16, r < .5 ? '#3a3226' : '#40372a'); for (let i = 0; i < 5; i++) { const a = hash(tx * 7 + i, ty + 3), b = hash(tx + i, ty * 9 + 5); R((a * 14) | 0, (b * 14) | 0, 2, 1, i % 2 ? '#2c261c' : '#544838'); } if (at(-1, 0) === '~' || at(1, 0) === '~') { R(2, 3, 5, 3, '#6a6a70'); R(2, 3, 5, 1, '#8a8a92'); R(9, 9, 5, 3, '#62626a'); R(9, 9, 5, 1, '#84848c'); } return; }
+  if (ch === ',') { R(0, 0, 16, 16, r < .5 ? '#3a3226' : '#40372a'); for (let i = 0; i < 5; i++) { const a = hash(tx * 7 + i, ty + 3), b = hash(tx + i, ty * 9 + 5); R((a * 14) | 0, (b * 14) | 0, 2, 1, i % 2 ? '#2c261c' : '#544838'); } if (at(-1, 0) === '~' || at(1, 0) === '~') { R(2, 3, 5, 3, '#6a6a70'); R(2, 3, 5, 1, '#8a8a92'); R(9, 9, 5, 3, '#62626a'); R(9, 9, 5, 1, '#84848c'); }
+    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) { const n = at(dx, dy); if (n === ',' || n === '~' || n === '=' || n === '#') continue; for (let i = 0; i < 5; i++) { const a = hash(tx * 9 + i + dx * 3, ty * 7 + dy * 5 + i), k = (a * 3) | 0, c = i % 2 ? '#1f3d29' : '#2a5234'; if (dx) R(dx < 0 ? 0 : 15 - k, i * 3 + (a * 2 | 0), 1 + k, 2, c); else R(i * 3 + (a * 2 | 0), dy < 0 ? 0 : 15 - k, 2, 1 + k, c); } }   // the grass comes in over the edges
+    if (r2 > .95 && m.theme !== 'spire') { R(4, 6, 8, 4, '#1a2a3e'); R(5, 5, 6, 6, '#1a2a3e'); R(6, 7, 3, 1, '#7aa0c8'); R(5, 5, 6, 1, '#2c261c'); }                                           // standing water in a rut
+    else if (r > .5 && at(1, 0) === ',' && at(-1, 0) === ',') { R(0, 5, 16, 1, '#342c20'); R(0, 10, 16, 1, '#342c20'); }                                                                  // cart ruts
+    return; }
   if (ch === '=') { const c = ((tx + ty) & 1) ? '#b8b4c4' : '#c4c0d0'; R(0, 0, 16, 16, c); R(0, 0, 16, 1, '#e0dcec'); R(0, 0, 1, 16, '#d4d0e0'); R(15, 0, 1, 16, '#8a8698'); R(0, 15, 16, 1, '#8a8698'); if (r2 > .7) R(4 + (r2 * 30 | 0) % 8, 6, 3, 1, '#a09cb0'); if (at(0, 1) !== '=' && at(0, 1) !== 'x') { R(0, 13, 16, 3, '#e8c25a'); R(0, 13, 16, 1, '#fff0b0'); } return; }
   grass();
 }

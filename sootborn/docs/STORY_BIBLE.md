@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.45 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.46 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -440,4 +440,9 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **Suns (all three levels):** nobody stands on one. A plain sun saves and heals in passing. A sun with an unseen memory is marked and asks REMEMBER. The ELEVEN memory is shown once, at the High Docks.
 - **Riser Nine, in order:** the road (3) → the hatch has stuck; raise the pressure at the pump house: ten up → the road, then both treelines (6) → put out the Authority's eye on the pylon: twenty → in the dark (7) → the last girl has stopped on the ladder with a smaller girl on her back; reach down ("is the sky blue." "go and look."): forty → the Warden Captain. Flags `pump`, `pylon`, `pull`.
 - **The Stair, in order:** the terrace (two waves) → the first landing → **the kneeling bell** is cut down ("One bell to kneel for a clerk. Two for a House. It has rung on this landing every day for longer than there has been a Tier Six." "Not tonight."), flag `bell` → the second landing → the Auditor's Blade. The lamps of the Unlit take each landing as he clears it. Guards vault down from the flight above; a landing is fought on that landing.
+
+### Checked and settled (v0.46)
+- **Riser Nine has three Wardens:** two in the third wave and the Captain. That is Cade's number.
+- **The fortieth:** a girl carrying a smaller girl, stopped on the ladder with no hand free. Kael takes the small one, then her. She asks whether the sky is blue; he tells her to go and look. (Pip asked the same in the fever ward.)
+- **2D fights, the edge:** the Ember Ring's edge is the crowd, who shove a man back in; the pump room and the furnace bay have walls.
 

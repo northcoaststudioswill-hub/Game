@@ -455,7 +455,9 @@ const World = {
       for (const p of this.parts) { p.y -= p.v / 60; p.x += Math.sin(t * 1.5 + p.s) * (p.soot ? .3 : .15); if (p.life !== undefined) p.life -= 1 / 60; g.fillStyle = p.c; g.globalAlpha = p.drip ? .8 : p.steam ? Math.max(0, p.life) * .3 : p.soot ? .7 : .55; const sz = p.steam ? 3 : 1; g.fillRect(Math.round(p.x - cx), Math.round(p.y - cy), p.drip ? 1 : sz, p.drip ? 2 : sz); g.globalAlpha = 1; }
       this.parts = this.parts.filter(p => p.y > cy - 6 && p.y < cy + H + 8 && (p.life === undefined || p.life > 0)).slice(-120); }
     if (G.mapId === 'tunnel') { const off = rm ? 0 : ((t * 12) | 0) % 6; g.fillStyle = 'rgba(255,240,180,.5)'; for (let i = off; i < 40; i += 6) g.fillRect(23 * 16 + 12 + (i * 7) % 10 - cx, 16 + 10 + i - cy, 1, 2); }
+    if (m.theme === 'valley') Valley.water(g, m, cx, cy, t, rm);
     Light.draw(g, m, cx, cy, t);
+    if (m.theme === 'valley' && !rm) Valley.air(g, m, cx, cy, t);
     if (!this.vig || this.vig.width !== W || this.vig.height !== H) { const [vc, vg] = mk(W, H), gr = vg.createRadialGradient(W / 2, H / 2, H * .42, W / 2, H / 2, W * .68); gr.addColorStop(0, 'rgba(6,3,6,0)'); gr.addColorStop(1, 'rgba(6,3,6,.55)'); vg.fillStyle = gr; vg.fillRect(0, 0, W, H); this.vig = vc; }
     g.drawImage(this.vig, 0, 0);
     if (G.heist) this.drawCones(g, cx, cy, t);
@@ -474,6 +476,25 @@ const World = {
       for (const h of m.hot) { const [hx, hy] = h.tiles[0]; g.fillRect(hx * 16 + 7 - cx, hy * 16 - cy + (isWall(m.grid[hy][hx]) ? 13 : 1), 2, 2); }
       for (const n of this.npcs) g.fillRect(Math.round(n.x - 1 - cx), Math.round(n.y - 24 - cy), 2, 2); }
   }
+};
+
+// ---------- the valley at night: moving water under the dark, and over it the things that carry their own light
+const Valley = {
+  water(g, m, cx, cy, t, rm) {
+    if (!m.wt) { m.wt = []; for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (m.grid[y][x] === '~') m.wt.push([x, y]); }
+    for (const [x, y] of m.wt) { const sx = x * 16 - cx, sy = y * 16 - cy; if (sx < -16 || sy < -16 || sx > W || sy > H) continue;
+      for (let i = 0; i < 2; i++) { const ph = rm ? .5 : (t * (.3 + i * .17) + hash(x * 3 + i, y * 7) * 7) % 1, px = sx + ((hash(x + i * 5, y) * 12) | 0), py = sy + ((ph * 16) | 0); g.fillStyle = 'rgba(150,196,235,' + (.55 * Math.sin(ph * Math.PI)).toFixed(2) + ')'; g.fillRect(Math.round(px), Math.round(py), 3 + i, 1); }
+      if (!rm && hash(x * 11, y * 5) > .6 && Math.sin(t * 2.2 + x * 1.3 + y * 2.1) > .9) { g.fillStyle = '#eaf6ff'; g.fillRect(sx + 4 + ((hash(x, y * 3) * 8) | 0), sy + 3 + ((hash(x * 7, y) * 9) | 0), 1, 1); } } },
+  air(g, m, cx, cy, t) {
+    g.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 18; i++) { // fireflies: each keeps to its own patch and blinks on its own time
+      const x = hash(i * 7 + m.seed, 3) * m.w * 16 + Math.sin(t * .31 + i * 2.1) * 22 + Math.sin(t * .83 + i) * 7 - cx, y = hash(i * 5, 11 + m.seed) * m.h * 16 + Math.cos(t * .27 + i * 1.7) * 14 + Math.sin(t * 1.1 + i * .6) * 4 - cy;
+      if (x < -6 || y < -6 || x > W + 6 || y > H + 6) continue; const b = Math.max(0, Math.sin(t * (1.1 + (i % 4) * .23) + i * 1.9)); if (b < .2) continue;
+      const X = Math.round(x), Y = Math.round(y); g.fillStyle = 'rgba(190,255,150,' + (b * .16).toFixed(2) + ')'; g.fillRect(X - 3, Y, 7, 1); g.fillRect(X, Y - 3, 1, 7); g.fillRect(X - 1, Y - 2, 3, 5); g.fillRect(X - 2, Y - 1, 5, 3); g.fillStyle = 'rgba(190,255,150,' + (b * .3).toFixed(2) + ')'; g.fillRect(X - 1, Y, 3, 1); g.fillRect(X, Y - 1, 1, 3); g.fillStyle = 'rgba(235,255,180,' + (b * .95).toFixed(2) + ')'; g.fillRect(Math.round(x), Math.round(y), 1, 1); }
+    for (let i = 0; i < 5; i++) { // mist lying in bands on the low ground
+      const y = ((i * 53 + 20) % (m.h * 16)) - cy + Math.sin(t * .2 + i) * 3, x = ((i * 137 + t * (5 + i * 1.3)) % (m.w * 16 + 180)) - 90 - cx; if (y < -10 || y > H + 10 || x < -90 || x > W + 90) continue;
+      const gr = g.createLinearGradient(x - 80, 0, x + 80, 0); gr.addColorStop(0, 'rgba(150,170,215,0)'); gr.addColorStop(.5, 'rgba(150,170,215,.07)'); gr.addColorStop(1, 'rgba(150,170,215,0)'); g.fillStyle = gr; g.fillRect(x - 80, y - 4, 160, 9); g.fillRect(x - 50, y - 7, 100, 3); }
+    g.globalCompositeOperation = 'source-over'; }
 };
 
 // ---------- lighting: cheap darkness overlay with light holes + additive glow

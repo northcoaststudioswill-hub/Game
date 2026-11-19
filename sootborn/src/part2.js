@@ -214,7 +214,7 @@ const P2 = {
     { fade: 'out' }, { panel: null },
     { issue: 'riser', or: [{ brawl: () => FF.riser() }] },
     { when: () => !!G.flags.issue_riser, music: 'mystery' }, { when: () => !!G.flags.issue_riser, panel: 'under' }, { when: () => !!G.flags.issue_riser, fade: 'in', spd: 0.8 },
-    { when: () => !!G.flags.issue_riser, narr: 'Forty came up. I counted them past me in the rain, the way they count us. The fortieth was a girl carrying a smaller girl. Neither of them looked at the mask.' },
+    { when: () => !!G.flags.issue_riser, narr: 'Forty came up. I counted them past me in the rain, the way they count us. The fortieth was a girl carrying a smaller girl. She asked whether the sky was blue. I told her to go and look. Neither of them looked at the mask.' },
     { when: () => !!G.flags.issue_riser, fade: 'out' },
     { music: 'spire' }, { panel: 'desk' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'Marshal Cade came to my desk the next morning. He did not sit.' },

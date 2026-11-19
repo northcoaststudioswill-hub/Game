@@ -98,6 +98,19 @@
   const MOOR = { x: 16, z: -23.4 };
   function showClerk(x, y, z, yaw) { clerk.group.visible = true; clerk.group.position.set(x, y, z); clerk.group.rotation.y = yaw; clerk.anim.apply(P.clerk(0), 999, 0.016); }
   function hideClerk() { clerk.group.visible = false; }
+  /* the air of each place: mist on the docks, ground mist and far lightning in the valley, embers going up past the Stair */
+  function atmo(kind) {
+    const soft = G.canvasTex(64, 64, g => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.22, 'rgba(255,255,255,.9)'); gr.addColorStop(.5, 'rgba(255,255,255,.3)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); });
+    const mk = (col, op, add) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: soft, color: col, transparent: true, opacity: op, depthWrite: false, fog: false, blending: add ? THREE.AdditiveBlending : THREE.NormalBlending })); G.scene.add(s); return s; };
+    const wrap = (v, c, span) => c + ((((v - c) % span) + span * 1.5) % span) - span / 2, L = [];
+    if (kind === 'stair') for (let i = 0; i < 60; i++) { const s = mk(i % 3 ? 0xff8a2a : 0xffd890, .95, true), z = .3 + (i % 4) * .1; s.scale.set(z, z, 1); L.push({ s, x: i * 3.7, z: i * 5.3, ph: i * .61, sp: .7 + (i % 5) * .26, k: 0 }); }
+    if (kind === 'docks' || kind === 'riser') for (let i = 0; i < 14; i++) { const s = mk(kind === 'docks' ? 0xc9c0f4 : 0xa8c6e0, kind === 'docks' ? .13 : .17, false); s.scale.set(7 + (i % 3) * 3, 1.6 + (i % 2) * .8, 1); L.push({ s, x: i * 6.1, z: i * 4.7, ph: i * .9, sp: .35 + (i % 4) * .12, k: 1 }); }
+    const amb0 = G.amb.color.clone(); let bolt = 9 + Math.random() * 6, fl = 0;
+    W.dyn.push((tt, dt) => { const p = pl.pos;
+      for (const q of L) { if (q.k === 0) { const y = (tt * q.sp + q.ph * 3) % 10; q.s.position.set(wrap(q.x + tt * 1.3 + Math.sin(tt * .9 + q.ph) * .7, p.x, 26), p.y - .6 + y, wrap(q.z + Math.sin(tt * .5 + q.ph) * .5, p.z, 26)); q.s.material.opacity = Math.min(1, y * .8) * Math.max(0, 1 - y / 10) * (.8 + .2 * Math.sin(tt * 9 + q.ph)); }
+        else q.s.position.set(wrap(q.x + tt * q.sp, p.x, 44), p.y + .5 + (q.ph % 1) * .9 + Math.sin(tt * .3 + q.ph) * .15, wrap(q.z + Math.sin(tt * .11 + q.ph) * 2, p.z, 40)); }
+      if (kind === 'riser') { bolt -= dt; if (bolt <= 0) { bolt = 11 + Math.random() * 9; fl = .34; } if (fl > 0) { fl -= dt; const k = fl > .24 || (fl > .06 && fl < .13) ? 2.5 : 1; G.amb.color.copy(amb0).multiplyScalar(k); } } });
+  }
   function shot(px, py, pz, lx, ly, lz, fov, w, h) { const c = G.camera; c.position.set(px, py, pz); c.fov = fov; c.updateProjectionMatrix(); c.lookAt(lx, ly, lz); return G.snap(w || 768, h || 432); }
   /* Brand keeps the head of the dock stair, at the blind end of Bond Alley, for the whole issue. */
   function brandOnStair() { showClerk(2.7, 0, 42.4, Math.PI * 0.9); }   // to one side of the stair head: he was standing where the camera is
@@ -187,7 +200,7 @@
       if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
 //@@INIT
   S.init = function () {
-    clerk = S.clerk = SC.makeHumanoid('clerk'); G.scene.add(clerk.group); clerk.group.visible = false;
+    clerk = S.clerk = SC.makeHumanoid('clerk'); G.scene.add(clerk.group); clerk.group.visible = false; atmo('docks');
     W.dyn.push(t => { if (clerk.group.visible) clerk.anim.apply(P.clerk(t), 6, 0.016); });
     pl.model.setGlow(0xf6f2e6, '#f6f2e6');
     // the last pair, riding over the freight yard on one line from Mooring One
@@ -253,7 +266,7 @@
     Object.assign(CROSS, RIS ? { alley: { x: 0, y: 0, z: 3.4, yaw: Math.PI }, yard: { x: -12, y: 0, z: 4, yaw: Math.PI } } : { alley: { x: 0, y: 0, z: 37, yaw: Math.PI }, yard: { x: 0, y: 6, z: 14.5, yaw: Math.PI }, roof: { x: 0, y: 12, z: -11, yaw: Math.PI } });
     Object.assign(ENC, RIS ? {
       alley: { arena: [-25, -22, 25, 22], floor: 0, waves: [[['hollow', 3, -20], ['hollow', 5, -21], ['hollow', 1.6, -21.5]]] },
-      w2: { arena: [-25, -22, 25, 22], floor: 0, waves: [[['hollow', 4, -21], ['knifer', 2, -21.5], ['knifer', 6, -20.5]], [['hollow', 23, -10], ['hollow', -23, -6], ['bruiser', 3.4, -21]]] },
+      w2: { arena: [-25, -22, 25, 22], floor: 0, waves: [[['hollow', 4, -21], ['knifer', 2, -21.5], ['knifer', 6, -20.5]], [['hollow', 23, -10], ['hollow', -23, -6], ['knifer', 3.4, -21]]] },
       w3: { arena: [-25, -22, 25, 22], floor: 0, waves: [[['bruiser', -23, -15], ['hollow', -22, -12], ['hollow', 23, -14]], [['bruiser', 23, 4], ['knifer', -22, 8], ['knifer', 22, 10], ['hollow', 0, 21]]] },
       boss: { arena: [-25, -22, 25, 22], floor: 0, waves: [[['boss', 0, -15]]] }
     } : {
@@ -345,7 +358,7 @@
     S.init = function () {
       if (!RIS) { clerk = S.clerk = SC.makeHumanoid('clerk'); G.scene.add(clerk.group); clerk.group.visible = false; W.dyn.push(t => { if (clerk.group.visible) clerk.anim.apply(P.idle(t), 6, 0.016); }); }
       else clerk = { group: { visible: false, position: v3(0, 0, 0), rotation: {}, updateMatrixWorld() {} }, anim: { apply() {} } };
-      pl.model.setGlow(0xf6f2e6, '#f6f2e6');
+      pl.model.setGlow(0xf6f2e6, '#f6f2e6'); atmo(SC.issue);
       Object.keys(CROSS).forEach(id => { const c = CROSS[id], mk = (tex, s, col, op) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(s, s), new THREE.MeshBasicMaterial({ map: tex, color: col, transparent: true, opacity: op, depthWrite: false, fog: false })); m.rotation.x = -Math.PI / 2; m.position.set(c.x, c.y + 0.07, c.z); m.renderOrder = 3; G.scene.add(m); return m; };
         const a = mk(G.tex.ring, 3.4, 0xffe14a, 0.9), b = mk(G.tex.disc, 2.3, 0xffe14a, 0.35); W.dyn.push(t => { a.rotation.z = t * 0.25; b.material.opacity = 0.25 + Math.sin(t * 3) * 0.12; });
         W.addInteract({ id: 'x_' + id, x: c.x, y: c.y, z: c.z, r: 1.9, label: 'REMEMBER', marker: 'clue', mh: 1.5, act: crossing(id, true), when: () => !!F.path && !S.enc && !!(SUN[SC.issue] || {})[id] && !F['sun_' + id] }); });

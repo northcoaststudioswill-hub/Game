@@ -1,4 +1,36 @@
-# SOOTBORN — changelog (latest v0.45 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.46 · 2026-11-19)
+
+## v0.46 · 2026-11-19 — last pass of the day: hits in the 2D fights, the Assay camps and the 3D places dressed, story checked against today's changes
+From play notes: testing and final updates; make sure the story lines up; beautify all the 3D environments and the new Assay locations in 2D; animate more types of hits and combat in the 2D fights.
+
+**2D fights: a hit is no longer one flash and one lean**
+- **What lands looks like what was thrown.** A fist is a white star. A blade is a long cut, at a different angle for each of the three cuts in the chain. A boot is a crescent. The ram and any heavy blow are a burst with a ring. Steel on a raised guard throws chips back at whoever swung. A parry or a clash is a four-point flare. Sweat or sparks fly on from the blow in the direction it went.
+- **Bodies react four ways** where there was one: the head goes back; he folds over a kick or the ram; a cross turns him right round; a heavy blow takes him off his feet tumbling. It applies to Kael too.
+- **Reeling.** A man whose guard is broken, or who has been parried or staggered, sways with stars round his head until it wears off.
+- **Going down.** An ordinary finishing blow now drops him to his knees and then over, with dust. Only heavy blows still throw the body.
+- **The edge of the place.** Knock somebody hard into the edge and he comes back off it, stunned: SHOVED BACK IN at the Ember Ring (the crowd; no damage), INTO THE WALL in the pump room and the furnace bay, NOWHERE TO GO in the open (one point of damage).
+- Heels drag dust when somebody is knocked back; landings raise it.
+- The 3D and painted-background fights are unchanged.
+
+**The Assay camps (2D)**
+- Ground redrawn: three greens with moonlit patches, flowers in three colours, stones, the odd mushroom, shadow under the pines, reeds on the river bank, grass growing in over the path edges, cart ruts and standing water on the paths, lily pads and stones in the river.
+- At night the river moves and glints, fireflies keep to their own patches and blink on their own time, and mist lies in slow bands.
+- The Last Night and night twenty-eight: three tents are lit from inside.
+
+**3D fights**
+- White stone in full sun no longer burns out. The floors of the keep, the pairing room, the gallery, the Stair and the top of the Spire keep their paving, their shadows and their gold inlay, and the fighters stand out against them. Nothing else in the picture is changed.
+
+**Third-person levels**
+- The Stair: embers go up past the stair from the burning hulls.
+- Riser Nine: far lightning every ten to twenty seconds, and ground mist. The docks: mist. (The mist is faint; I could not see it in my own stills.)
+
+**Story, checked against today**
+- Riser Nine had grown a fourth Warden; Cade says three at his desk the next morning. It is three again (two in the dark and the Captain).
+- The scene after Riser Nine now matches what happens at the hatch: the girl asks whether the sky is blue, and he tells her to go and look.
+- About & controls said to stand on a chalked sun. It now says what they do.
+- Checked and left alone: the kneeling bell against the Spire's rule of bells; the gloves after the Table; Pump Room Seven against Brand's "sealed pump room".
+
+**Checked by script:** every kind of hit, reaction, block, reel, knockdown and edge bounce photographed in slow motion in a fist fight and a blade fight, with real button presses and no errors; bots won the Drill, the lane fight and Tier Six Stands; five Assay missions walked start to end on the new ground; six 3D arenas photographed before and after; all three levels and the Table run to their endings; all chapters build; no contractions in Accredited lines. **Not checked:** played by hand; the new hits in motion at full speed; whether the edge bounce makes any 2D fight too easy; phone frame rate.
 
 ## v0.45 · 2026-11-19 — the Table drawn in 3D, Riser Nine and the Stair redesigned, and no more standing on suns
 From play notes: more carver scenes, a 3D memory in the comic style with slides and detail on the carve (keep the 2D part); the level in the woods ends too fast; the third level is a glitch fest of enemies loading in and textures floating; standing on the sun is not liked unless a new memory or exposition happens.

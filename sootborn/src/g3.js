@@ -95,6 +95,7 @@ const G3 = {
           float spR=pow(max(dot(n,normalize(uSun+vdir)),0.),22.); float spec=mix(spR,smoothstep(.42,.5,spR)*.8,uCel);
           float ao=up>.5?1.:mix(.74,1.,clamp(vW.y/11.,0.,1.)); vec3 cool=mix(vec3(1.),vec3(.92,.93,1.05),uCel*(1.-dk));
           vec3 lit=vC*(uAmb*cool*(1.+.25*back)*(1.+.6*uCel)+uSunC*dk+uSky*(n.y*.5+.5))*ao+uSunC*(rim*.24+spec*.3)*(1.-up);
+          float kn=mix(.82,.62,up), rg=mix(.2,.34,up); vec3 hi=max(lit-vec3(kn),0.); lit=min(lit,vec3(kn))+rg*(1.-exp(-hi*mix(2.2,1.,up)));   // white stone in full sun keeps its joints and its shadows instead of burning out
           gl_FragColor=vec4(mix(lit,uFog,ff),0.); }`,
         ['aP', 'aN', 'aC', 'uVP', 'uSun', 'uSunC', 'uAmb', 'uSky', 'uEye', 'uSh', 'uFog', 'uFogR', 'uVoid', 'uCel']);
       this.S = prog(`attribute vec3 aP; attribute vec2 aU; attribute vec4 aC; uniform mat4 uVP; varying vec2 vU; varying vec4 vC; void main(){ vU=aU; vC=aC; gl_Position=uVP*vec4(aP,1.); }`,
