@@ -3,8 +3,8 @@
      hero = Kael Brennick, gilded, seven years on.  hollow = Dock Guard.  knifer = Stair Blade.
      bruiser = Warden.  boss = Stair Captain Ansel Rook.  clerk = Brand. */
   const SPECS = SC.SPECS = {
-    hero: { h: 1.06, b: 1.04, face: 'kael', hair: 'kael', coat: true, scarf: true, glowHand: true, washer: true,
-      pal: { skin: 0xe6c79a, top: 0xefe8d4, trim: 0xe8c25a, shirt: 0x5a3aa8, tie: 0xe8c25a, pants: 0x3a3350, boots: 0x1a1620, hair: 0xe9cf7a, streak: 0x2a2630, glove: 0x2a2630, wrap: 0x8a6a48, band: 0x5a3aa8 } },
+    hero: { h: 1.1, b: 1.12, face: 'kael', hair: 'kael', armor: true, cape: true, glowHand: true, washer: true, weapon: 'kblade', pauldron: true,
+      pal: { skin: 0xe6c79a, top: 0xefe8d4, trim: 0xe8c25a, shirt: 0x5a3aa8, tie: 0xe8c25a, pants: 0x2e2a40, boots: 0x1a1620, hair: 0xe9cf7a, streak: 0x2a2630, glove: 0x2a2630, wrap: 0x2e2a40, band: 0x5a3aa8 } },
     hollow: { h: 1.0, b: 1.05, face: 'visor', helm: 'guard', weapon: 'baton', tabard: true,
       pal: { skin: 0xefe8d4, top: 0x2f8f8a, trim: 0xe8c25a, shirt: 0xefe8d4, tie: 0xe8c25a, pants: 0x30344a, boots: 0x14141d, hair: 0xefe8d4, glove: 0xefe8d4, wrap: 0x2f8f8a } },
     knifer: { h: 0.97, b: 0.9, face: 'halfmask', hood: true, weapon: 'blade', sash: true,
@@ -157,6 +157,23 @@
       part('head', tbox(0.05, 0.05, 0.02), 0, 0.3, 0.13, pal.trim, [0, 0, 0.785], 0.006);          // badge
       part('head', tbox(0.04, 0.24, 0.07, 0.3, 1), 0.13, 0.42, -0.04, pal.shirt, [-0.25, 0, -0.2], 0.014);   // plume
     }
+    if (sp.armor) {
+      // the Accredited plate they gave him, worn like a valve man wears a harness: for use
+      part('chest', tbox(0.5 * b, 0.1, 0.29 * b, 1, 0.92), 0, 0.235, 0, pal.top, null, 0.014);                 // collar plate
+      part('chest', tbox(0.3 * b, 0.05, 0.05), 0, 0.215, 0.135 * b, pal.trim, null, 0.008);
+      part('chest', tbox(0.11, 0.11, 0.03), 0, 0.1, 0.14 * b, pal.trim, [0, 0, 0.785], 0.008);                 // the sun they pinned on him
+      part('spine', tbox(0.3 * b, 0.07, 0.24 * b), 0, 0.14, 0, pal.trim, null, 0.008); part('spine', tbox(0.28 * b, 0.07, 0.235 * b), 0, 0.04, 0, pal.top, null, 0.008);
+      part('hips', tbox(0.38 * b, 0.07, 0.27 * b), 0, 0.09, 0, pal.trim, null, 0.012); part('hips', tbox(0.09, 0.09, 0.04), 0, 0.09, 0.14 * b, pal.top, null, 0.008);
+      part('hips', tbox(0.15 * b, 0.36, 0.035, 1, 0.8), 0, -0.14, 0.125 * b, pal.shirt, null, 0.012);         // the violet fall
+      [['L', 1], ['R', -1]].forEach(q => {
+        part('th' + q[0], tbox(0.17 * b, 0.26, 0.06, 1, 0.85), 0.045 * q[1], -0.12, 0.05, pal.top, [0, 0.5 * q[1], 0], 0.012);   // tassets
+        part('th' + q[0], tbox(0.17 * b, 0.035, 0.065), 0.045 * q[1], -0.24, 0.05, pal.trim, [0, 0.5 * q[1], 0], 0.006);
+        part('shn' + q[0], tbox(0.13 * b, 0.26, 0.08, 0.9, 1.05), 0, -0.2, 0.045, pal.top, null, 0.012);                         // greaves
+        part('shn' + q[0], tbox(0.14 * b, 0.07, 0.11), 0, -0.03, 0.05, pal.trim, null, 0.01);                                    // knee
+        part('sh' + q[0], tbox(0.24 * b, 0.1, 0.25 * b, 0.75, 1), 0.03 * q[1], 0.075, 0, pal.top, [0, 0, -0.22 * q[1]], 0.014);  // big pauldron under the gilt rim
+      });
+      part('elR', tbox(0.14 * b, 0.2, 0.14 * b, 1, 0.85), 0, -0.14, 0, pal.top, null, 0.012); part('elR', tbox(0.145 * b, 0.035, 0.145 * b), 0, -0.05, 0, pal.trim, null, 0.006);
+    }
     if (sp.pauldron) {
       part('shL', tbox(0.2 * b, 0.07, 0.2 * b, 0.8, 1), 0.02, 0.06, 0, pal.trim, [0, 0, -0.18], 0.012);
       part('shR', tbox(0.2 * b, 0.07, 0.2 * b, 0.8, 1), -0.02, 0.06, 0, pal.trim, [0, 0, 0.18], 0.012);
@@ -166,6 +183,19 @@
     if (!sp.hood && !sp.helm) { part('head', tbox(0.03, 0.06, 0.04), 0.118, 0.13, 0, pal.skin, null, 0.008); part('head', tbox(0.03, 0.06, 0.04), -0.118, 0.13, 0, pal.skin, null, 0.008); }
 //@@WEAPONS
     const steel = G.toon({ color: 0xd9dde6 }), dark = G.toon({ color: 0x23232e }), gilt = G.toon({ color: 0xe8c25a });
+    if (sp.cape) {
+      // House Violet's cape, cut short so it does not catch on a valve wheel
+      const cm = model.capeMat = G.toon({ color: 0x5a3aa8 }), hem = G.toon({ color: 0xe8c25a }); model.mats.push(cm, hem);
+      add('chest', tbox(0.5, 0.08, 0.12), cm, 0, 0.29, -0.1, 0.016);
+      add('sc1', tbox(0.5, 0.03, 0.31), cm, 0, 0, -0.13, 0.016); add('sc2', tbox(0.56, 0.03, 0.31), cm, 0, 0, -0.13, 0.016); add('sc3', tbox(0.62, 0.03, 0.31), cm, 0, 0, -0.13, 0.016);
+      add('sc3', tbox(0.63, 0.034, 0.045), hem, 0, 0, -0.275, 0.008);
+      const brass = G.toon({ color: 0xb5793a }); model.mats.push(brass);
+      add('elL', limb(0.088, 0.076, 0.2), brass, 0, -0.13, 0, 0.014);                                          // the valve ram on his off arm
+    }
+    if (sp.weapon === 'kblade') {
+      add('haR', tbox(0.03, 0.72, 0.07, 0.1, 1), steel, 0, -0.49, 0.005, 0.014); add('haR', tbox(0.012, 0.58, 0.074), gilt, 0, -0.44, 0.005, 0);
+      add('haR', tbox(0.06, 0.035, 0.22), gilt, 0, -0.12, 0.005, 0.01); add('haR', tbox(0.045, 0.05, 0.045), gilt, 0, 0.07, 0, 0.008); model.mats.push(steel, gilt);
+    }
     if (sp.washer) {
       // Seren's washer, on a cord. The only round thing he owns.
       const brass = G.toon({ color: 0xc9923a }); model.mats.push(brass);

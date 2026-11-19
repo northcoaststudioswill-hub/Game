@@ -1,5 +1,18 @@
 # SOOTBORN — changelog
 
+## v0.29.2 · 2026-11-19 — the High Docks plays in the game's own frame, with memories instead of powers
+From play notes: it played in its own vertical window; it should sit in the same frame and use the same controls as the rest of the game; no start button and no "turn your phone"; drop the roguelite abilities for story beats; question marks should show memories from the future section; finishers and ultimates should cut to memories that show his rage; the fighter should look more like Kael.
+
+- **Same frame, same controls.** The level is placed exactly over the game screen, upright or sideways, under SOOTBORN's own d-pad and buttons. A strikes, or uses whatever the prompt says; B dodges; ELEVEN (the hook button) is the ultimate; LOCK and LOOK are on the guard and jump buttons; Menu pauses. Drag the picture to turn the camera. Its own stick, buttons, pause icon and rotate notice are gone.
+- **No title, no start.** It begins on its first panel straight from the chapter card and hands back without an end card. It keeps its place if you leave mid-level.
+- **No paths.** The three-way choice and its powers are removed. One fury bar; when it is full, ELEVEN.
+- **Memories at the question marks.** Each of the five finds now opens the memory it stirs, drawn with the game's own story panels: Maren taking the rota for copying; Brand in Freight Three; the Warden at the furnace; Cade at the desk the morning after Riser Nine; Celestine's room.
+- **Memory cut-ins in fights.** Every ELEVEN, the finisher on a Warden and the finisher on Rook stop the fight for a memory: the picture, his eyes, its name, one line, on a red field. Five rotate on the ultimate (ELEVEN, HER LINE, A RING, BALANCED, THE INVOICE). The first chalked sun is the count itself.
+- **Kael's model rebuilt** to match the rest of the game: Accredited plate (collar, tassets, greaves, big pauldrons), House Violet's cape, the blade in his right hand, the bronze valve ram lit on his off arm, the pinned sun on his chest. The trench coat is gone.
+- Sound uses the game's own audio channel, so it does not need a second tap to start.
+
+**Not checked:** played by hand; whether the d-pad's four directions feel right for a third-person camera (there is no analogue stick on the touch pad); the blade with the old punch animations was only looked at in still poses.
+
 ## v0.29 · 2026-11-19 — The High Docks in third person, drawn like Second Chance; more to do in 2D than hide; the thought of betrayal
 From play notes: a level or two in the future sequences that looks like Second Chance, in our universe, with a model for Kael, the enemies and the boss; more 2D mission types than stealth and pipes; another 2D fight; Kael striking the Proctor down in 2D and what he gets from it; the Wren arc and the thought of betrayal.
 

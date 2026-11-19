@@ -90,7 +90,7 @@ const Input = {
     }
   },
   update(dt) {
-    const fi = Brawl.active && !Brawl.cine && Brawl.phase === 'fight' && !Brawl.art && !Brawl.sup && !UI.stack.length; if (fi !== this.fight) { this.fight = fi; document.body.classList.toggle('fight', fi); }
+    const fi = (Brawl.active && !Brawl.cine && Brawl.phase === 'fight' && !Brawl.art && !Brawl.sup && !UI.stack.length) || (typeof Issue !== 'undefined' && Issue.on); if (fi !== this.fight) { this.fight = fi; document.body.classList.toggle('fight', fi); }
     this.pollPad();
     const n = {};
     for (const a of ACTIONS) n[a] = !!(this.kb[a] || this.touch[a] || this.pad[a]);

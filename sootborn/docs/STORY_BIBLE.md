@@ -325,12 +325,12 @@ Rule: every level above the rock has things to read that nobody points at, the w
 ## The High Docks, in third person (v0.29)
 One level of the future is played in third person and drawn like a comic. It uses the engine and art style of the user's other game, Second Chance, with our cast and our place. Nothing from Second Chance's own story is in it.
 - **When:** +7, the night of the High Docks, between "The night before the docks" and Brand's stair.
-- **Kael's model:** gilded. Ivory coat with gilt trim, gold hair pushed up with one dark streak, a violet band, the soot smudge on his cheek, gold-leaf eyes, the seam of the Gilding along the jaw, Seren's washer on a cord, the rigging line wound on his left forearm.
+- **Kael's model:** as in the rest of the game. Accredited plate in ivory and gilt, House Violet's short cape, the blade, the bronze valve ram lit on his off forearm, gold hair with one dark streak, the band, the soot smudge, gold-leaf eyes, Seren's washer on a cord.
 - **Enemies:** Dock Guard (white enamel helm, teal), Stair Blade (violet cowl, gilt half-mask), Warden (steel helm, red comb, halberd).
 - **Boss:** Stair Captain Ansel Rook. Accredited, grey, a duelling scar kept on purpose, a mooring gaff. He calls Kael "Clerk Sorrel"; he was told a clerk would come. Dies saying it does not balance. New to canon.
 - **Brand** holds the head of the dock stair from the first panel. The level ends on his halberd butt striking stone.
 - **What Kael learns there:** the watch was moved from the second bell to the first on Marshal Cade's initial. He does not learn who gave Cade the hour. That stays with Maren's note, a week later.
-- **Forms:** Bank Hands (Shaft Drop), The Turn, The Line (hook line). Last breath is ON MY BREATH. He counts eleven at chalked suns.
+- **How it plays (v0.29.2):** in the game's own frame and on its own buttons. No paths or powers: one fury bar and ELEVEN. The five finds open memories (Maren and the rota, Brand in Freight Three, the Warden at the furnace, Cade at the desk, Celestine's room). ELEVEN and the finishers cut to a memory. Last breath is ON MY BREATH. He counts eleven at chalked suns.
 - **The place:** a stone shelf bolted to the Spire's eastern footing, open to the sky on three sides. South to north: the dock stair and its gate, the causeway between two mooring basins, the quay (Spire gate west, crane east), the freight yard, the bond house with the dock office on its gallery, the signal roof, Mooring One. Barges moor in pairs lashed with a plank.
 - **The barges** are airships: a wooden hull under a long ivory gas cell with gilt hoops, teal lamps at the corners, moored in pairs on a single line.
 

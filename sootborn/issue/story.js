@@ -25,6 +25,46 @@
     if (id === 'wh') U.toast('QUIET. THE *DOCK OFFICE* IS UP THE STAIRS.', 3.5);
     if (id === 'roof') U.toast('ONE ROOF LEFT. MOORING ONE.', 3);
   }
+//@@CROSSING
+  /* ---------- what he remembers ---------- */
+  const A_ = k => (SC.assets || {})[k] || null;
+  const ARTS = [
+    { k: 'furnace1', name: 'ELEVEN', line: 'ELEVEN SECONDS THE DOORS STOOD OPEN. I HAVE COUNTED THEM EVERY DAY FOR SEVEN YEARS.' },
+    { k: 'ledger2', name: 'HER LINE', line: 'HOLLOWAY, S. STRUCK THROUGH IN A CLERK\'S HAND. I KEEP THAT BOOK NOW.' },
+    { k: 'hands0', name: 'A RING', line: 'IT WAS THE ONLY ROUND THING I OWNED. SHE WORE IT ELEVEN MONTHS.' },
+    { k: 'desk2', name: 'BALANCED', line: 'ELEVEN HUNDRED LINES AT ONE STROKE. THEY CALLED IT A BALANCING.' },
+    { k: 'tin0', name: 'THE INVOICE', line: 'THEY SENT A TIN. AND A BILL FOR THE FUEL.' }
+  ];
+  const FIN = {
+    count: { k: 'furnace2', name: 'ELEVEN', line: 'ONE. TWO. THREE. I COUNT THE SECONDS THE DOORS STOOD OPEN. THEN I GO TO WORK.' },
+    warden: { k: 'furnace0', name: 'FOR HUMMING', line: 'A WARDEN STRUCK A WELDER DOWN FOR HUMMING HER GOODBYE. I WAS HELD ON THE FLOOR FOR IT.' },
+    boss: { k: 'kael0', name: 'STRUCK THROUGH', line: 'I LEARNED TO COUNT THE WAY THEY DO. NOW I DO THE STRIKING.' }
+  };
+  const art = a => ({ img: A_(a.k), name: a.name, line: a.line });
+  /* the question marks: what he sees, then what it makes him remember */
+  const MEM = {
+    casings: [{ k: 'desk5', cap: 'THAT AFTERNOON. THE COUNT.', cap2: 'I WROTE THE ROTA AT MY DESK. MAREN ALDANE TOOK IT FOR COPYING. *SHE HAD NEVER OFFERED TO COPY ANYTHING BEFORE.*' }],
+    bike: [{ k: 'freight0', cap: 'LAST NIGHT. FREIGHT THREE.', cap2: '"IF THE NINE MINUTES ARE NOT THERE, THE STAIR WILL WANT HOLDING. *I HOLD IT.*"' }, { k: 'dockstair0', cap2: 'BRAND SAID IT LIKE A MAN READING OUT A LINE THAT WAS ALREADY WRITTEN.' }],
+    masks: [{ k: 'furnace0', cap: 'YEAR NOUGHT. THE HEART-FURNACE.', cap2: 'A WARDEN PUT A HALBERD BUTT INTO HOLLIS FOR HUMMING. *THAT WARDEN IS HOLDING THE STAIR BEHIND ME.*' }],
+    ledger: [{ k: 'desk4', cap: 'TWO YEARS AGO. THE MORNING AFTER RISER NINE.', cap2: '"SOMEONE WHO HAD DONE IT BEFORE," CADE SAID. HE LOOKED AT ME FOR AS LONG AS IT TAKES TO COUNT TO ELEVEN.' }, { k: 'ledger2', cap2: 'FOUR HUNDRED AND SIX LINES I HAVE STRUCK MYSELF. *I LEARNED EVERY ONE.*' }],
+    loft: [{ k: 'lift0', cap: 'LAST YEAR. HER ROOM.', cap2: 'I HUMMED THE SHIFT SONG AT HER VALVE AND DID NOT HEAR MYSELF. *SHE HAS KNOWN SINCE.*' }, { k: 'hands0', cap2: 'THE WASHER IS UNDER MY COLLAR. IT HAS NOT GOT ANY HEAVIER.' }]
+  };
+  function sayThenMemory(id, lines, done) {
+    U.say(lines, () => {
+      const m = (MEM[id] || []).filter(p => A_(p.k)); if (!m.length) { done(); return; }
+      const wide = window.innerWidth > window.innerHeight * 1.35 && m.length > 1;
+      U.page({ cols: wide ? '1fr 1fr' : '1fr', rows: wide || m.length < 2 ? '1fr' : '1fr 1fr',
+        panels: m.map((p, i) => ({ img: A_(p.k), cls: 'px', area: wide ? '1 / ' + (i + 1) + ' / 2 / ' + (i + 2) : (i + 1) + ' / 1 / ' + (i + 2) + ' / 2', cap: p.cap, cap2: p.cap2 })) }, done);
+    });
+  }
+  /* a chalked sun: he counts eleven. The first time, the count is what starts him. */
+  function crossing(id) {
+    return function () {
+      const first = !F.path; S.cp = id; pl.hp = SC.T.hp; pl.chance = 1; SC.audio.sfx('clue');
+      if (first) { pl.control = false; pl.setPath('ember'); F.path = 'ember'; save(); U.memory(art(FIN.count), bargain); }
+      else { save(); FX.ring(pl.pos, 0xffe14a, 0.5, 3, 0.5); U.toast('ELEVEN SECONDS. SAVED. HEALED. YOUR BREATH IS BACK.', 2.6); objective(); }
+    };
+  }
 //@@CUTSCENES
   /* ---------- cutscenes ---------- */
   let clerk, barge, cable;
@@ -61,7 +101,7 @@
         { who: 'clerk', text: 'You do not argue, and you do not come back for me. Count your eleven, decide how you mean to fight, and *go*.' }
       ], n); },
       n => { brandOnStair(); SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.snapBehind(Math.PI); cam.endCine(0.9); U.showHud(true); setFlag('intro');
-        U.toast(SC.input.touch ? 'LEFT THUMB MOVES. DRAG THE RIGHT SIDE TO TURN THE CAMERA.' : 'WASD MOVES. DRAG THE MOUSE OR USE THE ARROWS TO TURN THE CAMERA.', 5); n(); }]);
+        U.toast(SC.hosted ? 'DRAG THE PICTURE TO LOOK ROUND. *A* STRIKES AND USES. *B* DODGES.' : SC.input.touch ? 'LEFT THUMB MOVES. DRAG THE RIGHT SIDE TO TURN THE CAMERA.' : 'WASD MOVES. DRAG THE MOUSE OR USE THE ARROWS TO TURN THE CAMERA.', 5); n(); }]);
   }
   function bossIntro() {
     const again = F.bossIntro; F.bossIntro = 1; save(); pl.control = false; pl.setState('scripted'); pl.script = t => P.guard(t); pl.scriptRate = 6; U.showHud(false); SC.emit('letterbox', true); cam.lock = null;
@@ -96,7 +136,7 @@
         { who: 'hero', face: 'shock', text: 'Brand.' },
         { who: 'cap', text: 'Then a halberd butt struck stone at the foot of the stair. Once. Brand was counting them.' }
       ], n), 0.8,
-      n => { S.done = true;
+      n => { S.done = true; if (SC.hosted) { S.wipe(); SC.host('done', { time: S.time, kills: pl.stats.kills, clues: pl.echoes }); return; }
         U.end({ time: S.time, path: SC.PATHS[pl.path].name, kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { S.wipe(); if (!SC.host('done', { time: S.time, kills: pl.stats.kills, clues: pl.echoes })) { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); } }); n(); }]);
   }
 
@@ -164,7 +204,9 @@
       if (!F.ledger) { U.toast('LOCKED. THE KEY WILL BE IN THE *DOCK OFFICE*.', 2.6); SC.audio.sfx('deny'); return; }
       W.openDoor('hatch'); SC.audio.sfx('door'); setFlag('hatch'); } });
     W.addInteract({ id: 'moor', x: MOOR.x, y: 11, z: MOOR.z, r: 2.4, label: 'CUT THE LINE', marker: 'act', mh: 2.4, when: () => F.boss && !F.cut, act: finale });
-    SC.on('dazed', e => { if (!F.tutFinish) { F.tutFinish = 1; U.toast('WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
+    SC.on('power', () => { S.artN = (S.artN || 0) + 1; U.memory(art(ARTS[(S.artN - 1) % ARTS.length])); });
+    SC.on('finisherStart', e => { if (e.kind === 'boss') U.memory(art(FIN.boss)); else { S.finN = (S.finN || 0) + 1; if (S.finN <= 2) U.memory(art(FIN.warden)); } });
+    SC.on('dazed', e => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted ? 'WIDE OPEN. GET CLOSE AND PRESS *A* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
     SC.on('secondchance', () => SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)));
     SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
     SC.on('kill', e => { if (e.kind === 'boss') S.bossDown = true; });
