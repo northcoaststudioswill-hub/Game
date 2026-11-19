@@ -156,6 +156,19 @@ will I."
 
 **Changed in older scenes this round:** no lines. Only where people stand, where they look, and the van.
 
+## Words added in the third round (Nov 19) — Claude's
+
+- **Ranger, when the beach post is still behind Marcus's padlock:** "The beach post is down the pond road, and Marcus
+  has padlocked his job site right across it. That one waits on his key. It'll keep. So will I." His line for the
+  coast's post is now "The last one is east of the orchard, behind a stone door I have never once seen open. It'll
+  keep. So will I." (it used to begin "Three have had a look at you", which was wrong when two were left).
+- **The credits:** "A NORTH COAST STUDIOS GAME", "THE VALLEY" over the cast (Will, Erin, Louie, Marcus, Derek, Ranger,
+  Scout, Old Thornback, the Lanternwisp, Bessie), "MUSIC" over the songs in the build with the artist each file
+  names, "AND EVERY SPROUT WHO CARRIED SOMETHING HOME", "THANK YOU FOR PLAYING". No person is named except the
+  songs' artist, because the files name him. Add names if you want them there.
+- **A morning line** when the Lantern restarts an empty crew: "THE LANTERN GREW THREE EMBERS OVERNIGHT".
+- **The Controls page** uses the game's own words for each button. No story in it.
+
 ## Left alone
 
 - The van jokes. The review asks what they are for; that is Will's call, and he asked for them.

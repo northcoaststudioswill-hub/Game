@@ -179,6 +179,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await skip3(); await step(6);
   ok('the ending follows the relight: everyone at the Lantern', await E(`run.lit===1&&state==='c3'&&c3q.key==='home'&&!run.fin`), await E('state')); await shot('ending');
   await skip3(); await step(6);
+  ok('the credits roll first', await E(`state==='credits'&&run.fin===1&&won`), await E('state')); await step(30 * 6); await shot('credits'); await tap('a'); await step(3);
   ok('then the win screen, once, after the second act', await E(`state==='win'&&run.fin===1&&won`), await E('state')); await shot('win'); await tap('a'); await step(6);
   ok('and the valley goes on', await E(`state==='play'||state==='card'`), await E('state'));
   for (let i = 0; i < 6 && (await E('state')) === 'card'; i++) await tap('a'); await step(12);

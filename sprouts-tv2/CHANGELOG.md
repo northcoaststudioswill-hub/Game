@@ -1,5 +1,105 @@
 # Sprouts TV 2 changelog
 
+## Locking in: the whole game played with the buttons (Nov 19 2026, third round)
+
+Will: "Now your goal is making sure the game's playable up to wherever it's at, the story at the current point. And
+if we need to add anything, add it. I want to try to start finalizing this game, so let's really lock in."
+
+Until now the story run helped itself: it carried things, opened gates and counted asks as done when its autopilot
+stalled. So "it plays to the end" had never really been shown. This round a new bot plays with the controller's
+buttons and nothing else, and everything it could not do was either fixed in the game or learned by the bot.
+
+**It is still a bot. Nobody has played this by hand, on a television or a phone, or listened to it.** The bot reads
+exactly where everything is, never gets lost and never gets bored. It shows each step is possible. It does not show
+the game is clear or fun, and its times are a floor.
+
+### The honest run
+
+`tests/honest.js`, from a new game, on the final build. No item carried for it, no gate opened, no sprout made, no
+ask counted. Day and how far through that day:
+
+| What happened | When |
+|---|---|
+| First sprouts plucked (Erin, first ask) | D1  2% |
+| Louie petted three times | D1 12% |
+| Ranger met (scene) | D1 14% |
+| Scout met (scene) | D1 21% |
+| Marcus met at the van (scene) | D1 23% |
+| North bramble burned | D1 18% |
+| Garden: five flowers, five gardeners | D1 77% |
+| The key dug up (scene) | D1 77% |
+| Key carried home | D1 86% |
+| Five sprouts moved into the house | D1 95% |
+| First shard home (scene) | D2 34% |
+| West crystal smashed | D2 68% |
+| Pond road unlocked (scene) | D2 70% |
+| Island shard swum home by Dews | D3 14% |
+| Thornback woken (scene) | D3 41% |
+| Fourth shard: the Lantern is whole (scene) | D3 43% |
+| The Lantern calls, at night (scene) | D4 78% |
+| Through the sun door (scene) | D4 82% |
+| Ten sprouts fix the lamp room (scene) | D5 20% |
+| The lens carried home (scene) | D5 42% |
+| The relight and the ending (scenes) | D5 78% |
+| Last of the thirty asks handed in | D7  2% |
+| The North Light rests (scene) | D8 78% |
+| Wedding book full: save the date (scene) | day 11 in the run before this one; this run was still on day 10 with 5 of 6 pages when this was written |
+
+All thirty asks were handed in, it never set an ask aside, and nothing threw. Three full runs were made; each
+finished the story. The log is `playtest/honest-run.txt`. A three day run on the phone build made the Lantern whole
+on day 3.
+
+### What the run found in the game (fixed)
+
+| Found | Fix |
+|---|---|
+| **Louie's heart in the first minutes.** Erin asks Will to pet Louie while Will is standing in front of her. Louie comes round with his heart up, and A started Erin talking again instead. The bot stood there for three minutes. | While that ask is live, the heart wins over a person, a post, a sign or the van. Once it is done, A talks as before. |
+| **A throw beside a trail post, a sign, the van or the arch.** With the aim on a berry behind a trail post, A opened the travel list on every press. The bot spent two game days throwing at one berry in the orchard and most of a day at one on the beach. | The rule people already had now covers these: if the aim is on something, the throw wins unless Will is right up against the post. |
+| **Ranger's trail posts, again.** The beach post is behind Marcus's padlocked job site until the key is found, and the arrow led there anyway. | The arrow only leads to posts that can be walked to. When every post left is shut away it lets go of Ranger, and he says which one and why (a new line, mine). |
+| **The empty-crew safety net never fired.** Each morning the Lantern should start Will off again if he has nobody. It counted wild sprouts across the valley as "some left". | It looks at what Will can use: nobody out, nothing in the Lantern's soil, no seeds on the way. Then three Embers. |
+
+Three things the bot had to learn that the game had right all along: the island shard wants Dews thrown into the
+water (Marcus says so), the beam's marker is the doorway and you walk on through it, and Erin's orders need the seed
+sign switched (she says so).
+
+### Added
+
+- **CONTROLS** in Settings: every button for keyboard and controller, and on the phone build the buttons on the
+  glass. ![Controls](playtest/controls.png)
+- **CREDITS**: they roll after the last scene, before the TWO LIGHTS card, and again from Settings. The cast, and the
+  songs in the build with the artist each file names. No person is named otherwise. ![Credits](playtest/credits.png)
+- Settings lost its BACK row to make room (B goes back, as the strip under the list says).
+- **Each build is 4.8 MB, down from 13.8.** The build was carrying two songs that belong to other cartridges.
+
+### No dead ends
+
+Checked, with a test for each: a shard being carried when night falls is lying there in the morning; night falling
+on the coast puts Will back at the Lantern with his crew; the island shard dropped in the pond can be picked up
+again by Dews from the nearer bank; an empty crew is restarted (above).
+
+### Saves
+
+The honest run writes the game's own save each time the story moves on. Twelve of them are kept in `tests/saves/`,
+from the first hour to the wedding date. `tests/saves.js` puts each in storage, opens the page, presses CONTINUE and
+plays two minutes: the day, shards, petals and people are as saved, and nothing throws.
+
+### Tested
+
+- 430 checks pass: tv 34, tv2 63, pocket 16, scenes 36, coast 189, valley 50, story 17, saves 25.
+- New in tv2: the Controls page, the credits, the songs in the file, the safety net, Louie's heart both ways, the
+  throw past a post both ways, the trail-post arrow, and the three no-dead-end checks.
+- Three full honest runs (television build) and one three day run (phone build).
+
+### Not tested, not done
+
+- Not played by a person. Not on a television, a phone or a real controller. Not listened to.
+- The hidden scenes did not come up in the honest run (it never goes to the van at night). They are checked by
+  their triggers in `tests/scenes.js`, as before.
+- The bot's pace says nothing about balance. In its runs Louie reached his top level by about day 8 and keeper rank
+  14 by day 11, which may be faster than the "calmer" pass meant. That is for Will to judge.
+- Expeditions were not sent in the honest run.
+- `alt/` and `sprouts-tv/` were not touched.
+
 ## Cutscene clean-up and nine new scenes (Nov 19 2026, second round)
 
 Will: "I love the van humor with Marcus and Derek and Will ... a little Cheech and Chong vibe. Check some of the

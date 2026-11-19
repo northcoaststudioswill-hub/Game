@@ -1,0 +1,95 @@
+D1   0%  3D     <dawn>
+D1   0%  3D     <open>
+D1   0%  ASK    ERIN e1  PLUCK 6 SPROUTS  (crew )
+D1   0%  CARD   NEW SPROUT: EMBER
+D1   2%  DONE   ERIN e1  PLUCK 6 SPROUTS
+D1   2%  ASK    ERIN e2  BRING HOME 5 BERRIES  (crew 000000)
+D1  12%  DONE   ERIN e2  BRING HOME 5 BERRIES
+D1  12%  ASK    ERIN e3  PET LOUIE 3 TIMES  (crew 0000000)
+D1  12%  DONE   ERIN e3  PET LOUIE 3 TIMES
+D1  14%  3D     <ranger>
+D1  18%  DONE   RANGER r1  BURN THE BRAMBLE
+D1  21%  3D     <scout>
+D1  23%  3D     <van>
+D1  23%  ASK    ERIN e4  PLUCK 3 BLOOMED  (crew 0000000)
+D1  25%  DONE   ERIN e4  PLUCK 3 BLOOMED
+D1  25%  ASK    ERIN e5  HARVEST 5 FLOWERS  (crew 0000000000)
+D1  25%  CARD   NEW PROJECT!
+D1  77%  DONE   ERIN e5  HARVEST 5 FLOWERS
+D1  77%  3D     <key>
+D1  77%  DONE   ERIN e6  STATION 5 GARDENERS
+D1  77%  ASK    ERIN e12  BRING HOME THE KEY  (crew 00000)
+D1  83%  CARD   FLOW PROS KEY
+D1  86%  DONE   ERIN e12  BRING HOME THE KEY
+D1  90%  DONE   MARCUS m0  FIND THE FLOW PROS KEY
+D1  90%  ASK    ERIN e11  SEND 5 SPROUTS HOME  (crew 00000)
+D1  95%  DONE   ERIN e11  SEND 5 SPROUTS HOME
+D1  95%  ASK    ERIN e7  HAVE 15 SPROUTS  (crew )
+D2  27%  DONE   ERIN e7  HAVE 15 SPROUTS
+D2  27%  ASK    ERIN e8  BRING HOME 4 SHARDS  (crew 00000000000)
+D2  34%  3D     <marks>
+D2  44%  3D     <s2>
+D2  46%  CARD   NEW SPROUT: PEB
+D2  47%  DONE   RANGER r2  FIND A PEB
+D2  47%  CARD   NEW PROJECT!
+D2  68%  DONE   RANGER r3  SMASH THE WEST CRYSTAL
+D2  70%  3D     <road>
+D2  71%  CARD   NEW SPROUT: DEW
+D2  73%  DONE   MARCUS m1  FIND A DEW
+D3  13%  3D     <s3>
+D3  14%  DONE   MARCUS m2  BRING THE ISLAND SHARD
+D3  14%  DONE   MARCUS m3  CATCH A DRAGONFLY
+D3  41%  3D     <thorn>
+D3  41%  CARD   NEW PROJECT!
+D3  43%  3D     <blaze>
+D3  47%  DONE   ERIN e8  BRING HOME 4 SHARDS
+D3  47%  DONE   ERIN e9  HARVEST 30 FLOWERS
+D3  47%  ASK    ERIN e10  FILL 5 FLOWER ORDERS  (crew 0000000000122222)
+D4  72%  3D     <watch>
+D4  78%  3D     <call>
+D4  82%  3D     <coast>
+D5  20%  3D     <leak>
+D5  42%  3D     <lens>
+D5  78%  3D     <relight>
+D5  78%  3D     <home>
+D5  78%  CARD   NEW PROJECT!
+D5  86%  DONE   ERIN e10  FILL 5 FLOWER ORDERS
+D5  86%  ASK    RANGER r5  BUILD THE ORCHARD BRIDGE  (crew 0001)
+D5  96%  CARD   NEW SPROUT: LUCKY
+D6   1%  DONE   RANGER r5  BUILD THE ORCHARD BRIDGE
+D6   1%  DONE   RANGER r4  WAKE OLD THORNBACK
+D6   1%  ASK    RANGER r6  WALK THE FOUR TRAIL POSTS  (crew 000000125)
+D6  22%  DONE   RANGER r6  WALK THE FOUR TRAIL POSTS
+D6  22%  ASK    MARCUS m4  WIN THE BET: 8 BERRIES TODAY  (crew 00000125)
+D6  37%  DONE   MARCUS m4  WIN THE BET: 8 BERRIES TODAY
+D6  37%  ASK    SCOUT s1  FIND A ZIP  (crew 000000125)
+D6  37%  CARD   NEW PROJECT!
+D6  41%  CARD   NEW SPROUT: ZIP
+D6  42%  DONE   SCOUT s1  FIND A ZIP
+D6  42%  DONE   SCOUT s2  CATCH 3 BUGS
+D6  42%  ASK    SCOUT s3  BEAT 3 GRUBS  (crew 000001235)
+D6  45%  DONE   SCOUT s3  BEAT 3 GRUBS
+D6  45%  DONE   SCOUT s4  CATCH 4 KINDS OF BUGS
+D6  45%  ASK    SCOUT s7  SEE THE LANTERNWISP  (crew 000001235)
+D6  49%  3D     <arch>
+D6  61%  CARD   BLUE FEATHER
+D6  74%  DONE   SCOUT s7  SEE THE LANTERNWISP
+D6  74%  DONE   SCOUT s5  FIND 10 GLIMMERS
+D6  74%  ASK    SCOUT s6  FIND 20 GLIMMERS  (crew 000000011235)
+D7   2%  DONE   SCOUT s6  FIND 20 GLIMMERS
+D7   2%  CARD   NEW PROJECT!
+D7  13%  CARD   GOLD COIN
+D8   4%  CARD   TINY BELL
+D8  78%  3D     <rest>
+D9  21%  CARD   RED BUTTON
+D9  21%  3D     <button>
+D10  11%  CARD   STAR CHIP
+D11   5%  CARD   FOSSIL
+D11   7%  3D     <book>
+D11   7%  CARD   SAVE THE DATE
+
+STATUS {"day":11,"pct":8,"state":"play","doing":"after: berries: berry throw","at":[50,35],"crew":"0000000000111335","follow":16,"soil":36,"shards":4,"asks":"Edone Rdone Sdone Mdone","stuck":194,"bad":[]}
+DONE   {"e1":1.02,"e2":1.12,"e3":1.12,"r1":1.18,"e4":1.25,"e5":1.77,"e6":1.77,"e12":1.86,"m0":1.9,"e11":1.95,"e7":2.27,"r2":2.47,"r3":2.68,"m1":2.73,"m2":3.14,"m3":3.14,"e8":3.47,"e9":3.47,"e10":5.86,"r5":6.01,"r4":6.01,"r6":6.22,"m4":6.37,"s1":6.42,"s2":6.42,"s3":6.45,"s4":6.45,"s7":6.74,"s5":6.74,"s6":7.02}
+STORY  {"stage":"rest","shards":4,"won":true,"fin":true,"rest":true,"wed":true,"book":"6/6","lou":6,"treasures":6,"petals":4364,"rank":14,"scenes":23,"gaveUp":{}}
+saved /tmp/claude-0/-home-user-Game/5c85ab43-388c-566b-83a1-7d92924ef921/scratchpad/full3.json
+exit 0

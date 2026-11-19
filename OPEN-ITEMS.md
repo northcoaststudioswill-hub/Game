@@ -32,6 +32,9 @@ at phone size. Will's rule stands: a change is not done until it has been played
 - Buddies eating strays, and the van jokes, were left alone.
 - Second round (Nov 19): nine new 3D scenes, all lines Claude's, including three more hidden van scenes. "Who is it" is a nod to Cheech and Chong's "Dave's not here". OPEN: Will to say if that is closer than he wants. Also OPEN: Ranger calling the North Light's rest "the old way" is new lore.
 - OPEN: no scene has been watched at full speed or heard. Timing of the new scenes needs a person.
+- Third round (Nov 19): a bot finishes the whole game with the buttons only. That shows every step is possible. OPEN: a person still has to play it, on the television, to say whether it is clear and whether the pace is right. The bot lit both lights on day 5; expect a person to take longer.
+- OPEN: Louie reaches his top level (6) by about day 8 and keeper rank 14 by day 11 in the bot's run. Too fast after the "calmer" pass? Will to say.
+- OPEN: credits name no person except the songs' artist (from the files). Add names?
 - There are now three copies of Sprouts: `alt/` (handheld, in the console), `sprouts-tv/` and `sprouts-tv2/` (which builds a TV and a phone version from one source). OPEN: retire the older two?
 - `sprouts_story.js` there fails about one run in ten (autopilot).
 

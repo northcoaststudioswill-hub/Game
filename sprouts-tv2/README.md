@@ -28,6 +28,10 @@ TV or Pocket Lantern save in the same browser.
 - **Things to do after the ending.** The wedding book, expeditions, the notebook, night grubs, rain days.
 - **New ways to play.** Photo mode, a second controller as Louie, Louie's morning.
 - **Small fixes.** Hints stay in a bottom strip, Erase Everything is in Settings, a VIEW setting, gardeners capped.
+- **Played start to finish with the buttons.** A bot that only presses the controller's buttons finishes the whole
+  game: all thirty asks, both lights, the wedding book. See "The honest run" below.
+- **Finishing touches.** A CONTROLS page and CREDITS in Settings, credits after the last scene, and each build is
+  4.8 MB (it was 13.8: songs for other games were riding along).
 
 The full list, set against the review item by item, is in [CHANGELOG.md](CHANGELOG.md). Everything invented for the
 story is in [STORY-NOTES.md](STORY-NOTES.md), marked as Claude's.
@@ -50,16 +54,29 @@ story is in [STORY-NOTES.md](STORY-NOTES.md), marked as Claude's.
 - `build.py` writes both builds. `src/game.js` is the game, `src/sprouts3d.js` the 3D scenes, house, title and photo
   mode, `src/buddies.js` the wild buddies' art. `src/shell.html` is the television page, `src/shell-pocket.html` the
   phone page. One line in `game.js` (`POCKET`) is the only difference between the builds.
-- `tests/tv2.js` (52 checks) covers what this copy adds. `tests/scenes.js` (36) the second round of cutscenes.
+- `tests/tv2.js` (63 checks) covers what this copy adds. `tests/scenes.js` (36) the second round of cutscenes.
   `tests/tv.js` (34) the television screen and controller. `tests/pocket.js` (16) the phone build.
-  `tests/sprouts_coast.js` (188), `sprouts_valley.js` (50) and `sprouts_story.js` (17) the game itself. The stepped
+  `tests/sprouts_coast.js` (189), `sprouts_valley.js` (50) and `sprouts_story.js` (17) the game itself. The stepped
   suites hold the game's own clock still (`HOLD`), so a run is the same every time. `tests/sprouts_playthrough.js` plays the whole story and prints it in order;
   the last run is `playtest/story-run.txt`.
+- `tests/honest.js` and `tests/honest_bot.js` are the honest run (below). `tests/saves.js` (25 checks) loads a save
+  from every stage of the story (`tests/saves/`, written by the honest run) through CONTINUE and plays on.
+
+## The honest run
+
+`node sprouts-tv2/tests/honest.js --days 16 --stop end` plays a new game to the end with the controller's buttons
+only: no item is carried for it, no gate opened, no sprout made, no ask counted. It reads the game the way a player
+reads the screen (where things are, what the arrow says) and it never writes to it. The last run is
+`playtest/honest-run.txt`.
+
+What it proves: every step of the story, and every ask, can be done with the controls the game has. What it does
+not prove: that a person finds it clear or fun. The bot never misreads the screen, never gets lost and never gets
+bored, so its times are a floor, not a guess at yours.
 
 ## Not done, and not tested
 
-- Not played by hand, on a television, on a phone, with a real controller, or listened to. Controllers and touch were
-  simulated in the tests.
+- Not played by a person: not on a television, a phone or a real controller, and not listened to. The honest run
+  presses real buttons but it is a bot. Controllers and touch were simulated in the tests.
 - `sprouts_story.js` is driven by an autopilot that plays with the game's own dice. It failed one run in four on
   Nov 19 and passed the next three.
 - The older copies (`alt/` and `sprouts-tv/`) still exist and do not get these changes.

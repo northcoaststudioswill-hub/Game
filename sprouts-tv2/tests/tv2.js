@@ -31,7 +31,13 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
 
   /* ---- settings ---- */
   await E(`${fresh}state='settings';setFrom='menu';seti=SETROWS.indexOf('VIEW');void 0`); await shot('tv2-settings');
-  ok('Settings is one list: music, sound, view, import, reset pulls, erase, back', await E(`SETROWS.join()==='MUSIC,SOUND FX,VIEW,IMPORT A SAVE,RESET PULLS,ERASE EVERYTHING,BACK'`));
+  ok('Settings is one list: music, sound, view, controls, credits, import, reset pulls, erase (B goes back)', await E(`SETROWS.join()==='MUSIC,SOUND FX,VIEW,CONTROLS,CREDITS,IMPORT A SAVE,RESET PULLS,ERASE EVERYTHING'`));
+  await E(`state='settings';setFrom='pause';seti=SETROWS.indexOf('CONTROLS');void 0`); await tap('a'); await E('g.setTransform(K,0,0,K,0,0);draw();void 0');
+  ok('CONTROLS opens a page of every button, and B comes back to Settings', (await E('state')) === 'controls'); await shot('tv2-controls'); await tap('b'); ok('back in Settings', (await E('state')) === 'settings');
+  await E(`seti=SETROWS.indexOf('CREDITS');void 0`); await tap('a'); const cr = JSON.parse(await E(`JSON.stringify([state,crLines().map(q=>q[0]).filter(Boolean),crLines().every(q=>!q[0]||tw(q[0],q[1])<=236),crEnd()])`));
+  ok('CREDITS rolls the cast and the songs in the build, each line inside the screen', cr[0] === 'credits' && cr[1].includes('BEAUTIFUL SPROUTS') && cr[1].includes('WILL     ERIN     LOUIE') && cr[2] && cr[3] > 10 && cr[3] < 60, cr);
+  await E('g.setTransform(K,0,0,K,0,0);draw();void 0'); await step(30 * 5); await E('g.setTransform(K,0,0,K,0,0);draw();void 0'); await shot('tv2-credits'); await tap('a'); ok('A skips them, back to Settings', (await E('state')) === 'settings'); await E(`seti=SETROWS.indexOf('VIEW');void 0`);
+  ok('only the songs Sprouts plays are in the file', await E(`TRACKS.length===2&&TRACKS.every(t=>t.use.includes('game')||t.use.includes('menu'))`), await E('TRACKS.map(t=>t.title)'));
   const v0 = JSON.parse(await E('JSON.stringify([Z,VW,VH])')); await tap('a'); const v1 = JSON.parse(await E('JSON.stringify([Z,VW,VH,meta.view])')); await tap('right'); const v2 = JSON.parse(await E('JSON.stringify([Z,VW,VH,meta.view])'));
   ok('VIEW switches between wide (320 across) and close (the handheld\'s zoom), and back', v0[0] === 1 && v0[1] === 320 && v1[0] === 1.5 && v1[1] === 214 && v1[2] === 120 && v1[3] === 1 && v2[0] === 1 && v2[3] === 0, [v0, v1, v2]);
   await E(`meta.view=1;setView();state='play';P.x=HX;P.y=HY+30;cam.x=P.x-VW/2;cam.y=P.y-VH/2;void 0`); await step(4); await shot('tv2-close-view');
@@ -62,6 +68,12 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok('Ranger ends on the trail posts, Scout looks for the Lanternwisp before the glimmers, Marcus starts with his lost key and ends on a bet', asks[0] === 'r1,r2,r3,r5,r4,r6' && asks[1] === 's1,s2,s3,s4,s7,s5,s6' && asks[2] === 'm0,m1,m2,m3,m4' && asks[3] && asks[4] && asks[5], asks);
   const posts = JSON.parse(await E(`(()=>{${fresh}const a=postsSeen();PZ.forEach(z=>{const p=postXY(z);P.x=p.x;P.y=p.y+10;postTick()});const b=postsSeen();postTick();return JSON.stringify([a,b,postsSeen(),npcs[1].ms.find(m=>m.id==='r6').get()])})()`));
   ok('standing at a trail post is enough: four posts, each counted once', posts.join() === '0,4,4,4', posts);
+  const net = JSON.parse(await E(`(()=>{${fresh}const wild=sprouts.filter(q=>!inSoil(q)).length;buds.length=0;squad.length=0;sprouts=sprouts.filter(q=>!inSoil(q));seeds.length=0;newDay0();const a=sprouts.filter(inSoil).length;newDay0();return JSON.stringify([wild>0,a,sprouts.filter(inSoil).length>=3])})()`));
+  ok('with nobody out, nothing in the soil and no seeds, the Lantern grows three Embers by morning (wild sprouts elsewhere do not count as a crew)', net[0] && net[1] === 3 && net[2], net);
+  const heart = JSON.parse(await E(`(()=>{${fresh}const e=npcs[0];e.st='active';e.mi=2;DIG.alive=false;items.forEach(i=>i.alive=false);bugs.forEach(q=>q.alive=false);P.x=e.x;P.y=e.y+15;P.dx=0;P.dy=-1;P.mv=false;P.idle=2;LO.x=LO.sx=P.x;LO.y=LO.sy=P.y-9;LO.st='follow';for(let i=0;i<3;i++){__g.update(1/30)}const ok1=petOK;doA(true);const a=[state,run.pets];run.pets=3;for(let i=0;i<3;i++)__g.update(1/30);doA(true);return JSON.stringify([ok1,a,state])})()`));
+  ok('during Erin\'s PET LOUIE ask, A with the heart up scratches Louie even standing in front of Erin; once it is done, A talks to her again', heart[0] && heart[1][0] === 'play' && heart[1][1] === 1 && heart[2] === 'talk', heart); await E(`state='play';void 0`);
+  const past = JSON.parse(await E(`(()=>{const out=[];for(const berry of [1,0]){${fresh}gates.forEach(g=>{if(g.sub!==4&&g.alive)openGate(g,true)});items.forEach(i=>i.alive=false);bugs.forEach(q=>q.alive=false);DIG.alive=false;const q=postXY(PZ.find(z=>z[0]==='SUNNY ORCHARD'));P.x=q.x;P.y=q.y+18;P.dx=0;P.dy=-1;P.mv=false;LO.x=LO.sx=P.x+50;LO.y=LO.sy=P.y+30;LO.st='sit';LO.t=9;for(let i=0;i<5;i++)mkBud(0,2,P.x,P.y+6);if(berry)mkItem('berry',q.x,q.y-34);for(let i=0;i<6;i++)__g.update(1/30);doA(true);out.push(state,buds.some(b=>b.st==='fly'));state='play'}return JSON.stringify(out)})()`));
+  ok('a berry behind a trail post: A throws at the berry; with nothing aimed at, A at the post opens the travel list', past.join() === 'play,true,travel,false', past);
   const postWalk = JSON.parse(await E(`(()=>{${fresh}const r=npcs[1];r.st='active';r.mi=r.ms.findIndex(m=>m.id==='r6');run.trk='RANGER';run.meet=0;npcs[0].st='active';npcs[0].mi=5;run.keep=1;run.pjSeen={};PJ.forEach(p=>run.pjSeen[p.id]=1);gates.forEach(q=>{if(q.id!=='sunDoor'&&q.id!=='northPier'&&q.alive)openGate(q,true)});
     const o=()=>{const q=objective();return q?q.text:''},out=[];for(let k=0;k<3;k++){const q=AT.r6();out.push(/TRAIL POSTS/.test(o())&&!!q&&q!==r);P.x=q.x;P.y=q.y+10;postTick()}
     out.push(postsSeen(),postsWait(),/TRAIL POSTS|RANGER/.test(o()),AT.r6());talk(r);out.push(/stone door/.test(JSON.stringify(dlg.pages)));state='play';
@@ -124,6 +136,17 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok('rain is drawn over the whole screen', await E(`(()=>{const o=g.fillRect.bind(g);let n=0;g.fillRect=(x,y,w,h)=>{if(w===1&&h===5)n++;o(x,y,w,h)};g.setTransform(K,0,0,K,0,0);draw();tod.rain=0;let m=0;g.fillRect=(x,y,w,h)=>{if(w===1&&h===5)m++;o(x,y,w,h)};draw();g.fillRect=o;return n-m>=40})()`));
 
   /* ---- a second player is Louie ---- */
+  /* ---- no dead ends ---- */
+  const open = `${fresh}gates.forEach(g=>{if(g.sub!==4&&g.id!=='northPier'&&g.alive)openGate(g,true)});`;
+  const night = async () => { await E(`dayT=DAYLEN-.2;void 0`); await step(20); for (let k = 0; k < 40 && ((await E('state')) !== 'play' || (await E('dayT')) > 30); k++) { await tap('a'); await step(4); } };
+  await E(open + `const it=items.find(i=>i.sub==='shard'&&!i.isle);window.__it=it;P.x=it.x;P.y=it.y+20;for(let i=0;i<8;i++){const b=mkBud(1,2,it.x,it.y);b.tgt=it;b.st='carry';it.on.push(b)}void 0`); await step(60); await night();
+  ok('a shard that was being carried when night fell is lying where it was dropped in the morning, and can be walked to', await E(`day===2&&__it.alive&&items.includes(__it)&&__it.on.length===0&&shards===0&&!!pathTo(P.x,P.y,__it.x,__it.y,false)`), await E('[day,__it.alive,__it.on.length]'));
+  await E(open + `run.call=1;run.coastScn=1;run.egg.coast=1;coastOpen();sceneQ.length=0;P.x=80*16;P.y=18*16;for(let i=0;i<6;i++)mkBud(0,2,P.x,P.y+6);void 0`); await night();
+  ok('night falling on the coast: Will wakes at the Lantern with his crew', await E(`day===2&&(P.x>>4)<40&&free(P.x,P.y,false)&&buds.length===6`), await E('[P.x>>4,P.y>>4,buds.length]'));
+  await E(open + `const it=items.find(i=>i.isle);window.__it=it;it.x=7*16+8;it.y=22*16+8;P.x=4*16+8;P.y=22*16+8;P.dx=1;P.dy=0;for(let i=0;i<6;i++)mkBud(2,2,P.x-4,P.y+4);LO.x=LO.sx=P.x-10;LO.y=LO.sy=P.y+40;LO.st='sit';LO.t=99;void 0`); await step(4);
+  for (let k = 0; k < 6; k++) { await tap('a'); await step(8); } await step(30 * 6);
+  ok('the island shard dropped in the pond is not lost: Dews thrown in from the nearer bank pick it up again', await E(`str(__it)>=__it.w`), await E('[__it.on.length,__it.w,__it.x|0,__it.y|0]'));
+
   await E('HOLD=0;void 0'); /* the controller is read by the page's own loop */
   const padSet = (which, o) => page.evaluate(([w, o]) => { const p = window[w]; if (o.ax !== undefined) p.axes[0] = o.ax; if (o.ay !== undefined) p.axes[1] = o.ay; if (o.b !== undefined) p.buttons[o.b] = { pressed: !!o.on, value: o.on ? 1 : 0 }; }, [which, o]);
   await E(`${fresh}meta.p2=0;P.x=HX;P.y=HY+50;LO.x=LO.sx=P.x+20;LO.y=LO.sy=P.y;cam.x=P.x-VW/2;cam.y=P.y-VH/2;void 0`); await page.waitForTimeout(150);

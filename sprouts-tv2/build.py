@@ -11,8 +11,8 @@ on the two change separately.
   sprouts-tv2/src/sprouts3d.js  the 3D scenes, house and title (forked from alt/src/sprouts3d.js)
   sprouts-tv2/src/buddies.js    art for the eight wild buddies (copied from the Sproutwild cartridge's files)
 
-The songs are big (13 MB of embedded mp3), so they are not copied: the build reads the two music
-<script> blocks from the shipped v0.3 build, read-only, exactly as alt/build.py does.
+The songs are big (embedded mp3), so they are not copied: the build reads the two music <script> blocks
+from the shipped v0.3 build, read-only, and keeps only the songs Sprouts itself plays.
 
 Run:  python3 sprouts-tv2/build.py      -> sprouts-tv2/games/sprouts-tv2.html (television)
                                           and sprouts-tv2/games/sprouts-pocket.html (phone)
@@ -52,6 +52,28 @@ def code(name):
 
 
 music = music_blocks()
+
+
+def sprouts_songs(blocks):
+    """Only the songs Sprouts plays. The console's build carries songs for its other cartridges too (tagged "ko" and
+    "pp"); this game never plays them, and they were a third of the file."""
+    import json
+    dec, keep, seen = json.JSONDecoder(), [], 0
+    for body in blocks.values():
+        i = body.find('{"title":')
+        while i >= 0:
+            obj, end = dec.raw_decode(body, i)
+            seen += 1
+            if any(u in ('menu', 'game') for u in obj.get('use', [])):
+                keep.append(body[i:end])
+            i = body.find('{"title":', end)
+    if not keep:
+        die('no Sprouts songs found in the music blocks')
+    print(f'music: {len(keep)} of {seen} songs kept (the rest belong to other cartridges)')
+    return '\nwindow.SPROUT_TRACKS=[' + ',\n'.join(keep) + '];\n'
+
+
+songs = sprouts_songs(music)
 game = code('game.js')
 if game.count('/*@include sprouts3d.js*/') != 1:
     die('game.js needs exactly one /*@include sprouts3d.js*/')
@@ -63,7 +85,7 @@ if game.count('/*@POCKET*/false') != 1:
     die('game.js needs exactly one /*@POCKET*/false')
 # one source, two builds: the television, and a phone held upright
 for shell, out, pocket in (('shell.html', OUT, False), ('shell-pocket.html', here / 'games/sprouts-pocket.html', True)):
-    parts = {'@MUSIC tracks': music['tracks'], '@MUSIC pp': music['pp'], 'game.js': game.replace('/*@POCKET*/false', 'true') if pocket else game}
+    parts = {'@MUSIC tracks': songs, '@MUSIC pp': '/* (songs for other cartridges are left out of this build) */', 'game.js': game.replace('/*@POCKET*/false', 'true') if pocket else game}
     html = (SRC / shell).read_text(encoding='utf8')
     for slot, body in parts.items():
         tag = '/*' + slot + '*/'
