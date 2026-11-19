@@ -175,7 +175,7 @@
       ], n),
       n => { hideClerk(); n(); }, 0.8,
       n => { S.done = true;
-        U.end({ time: S.time, path: SC.PATHS[pl.path].name, kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { S.wipe(); location.reload(); }); n(); }]);
+        U.end({ time: S.time, path: SC.PATHS[pl.path].name, kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); n(); }]);
   }
 
   /* ---------- set up interactables and markers ---------- */
@@ -232,7 +232,9 @@
     U.title(S.hasSave(), S.newGame, S.load);
   };
   S.newGame = function () {
-    S.wipe(); F = SC.flags = {}; S.cp = 'alley'; S.time = 0; S.enc = null; pl.path = null; pl.rank = 1; pl.echoes = 0; pl.hp = SC.T.hp; pl.meter = 0; pl.chance = 1;
+    S.wipe(); W.reset(); SC.clearEnemies(); timers.length = 0; S.done = false; S.bossDown = false; U.boss(null); cam.lock = null;
+    Object.keys(pl.stats).forEach(k => { pl.stats[k] = 0; });
+    F = SC.flags = {}; S.cp = 'alley'; S.time = 0; S.enc = null; pl.path = null; pl.rank = 1; pl.echoes = 0; pl.hp = SC.T.hp; pl.meter = 0; pl.chance = 1;
     pl.model.setGlow(0xf6f2e6, '#f6f2e6'); intro();
   };
   S.load = function () {

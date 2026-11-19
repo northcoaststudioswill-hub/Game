@@ -404,6 +404,12 @@
     o.position.set(x, y + 0.7, z); G.scene.add(o);
     W.pickups.push({ kind, o, x, y, z, t: Math.random() * 6 });
   };
+  /* put the level back as it was at the start: doors shut, crates whole, nothing lying around */
+  W.reset = function () {
+    for (const k in W.doors) { const d = W.doors[k]; d.k = d.to = 0; d.sol.on = true; d.m.position.copy(d.from); }
+    for (const c of W.crates) { if (!c.alive) { c.alive = true; c.sol.on = true; G.scene.add(c.m); } c.hp = 2; }
+    while (W.pickups.length) G.scene.remove(W.pickups.pop().o);
+  };
   W.breakCrate = function (c) {
     if (!c.alive) return; c.alive = false; c.sol.on = false; G.scene.remove(c.m);
     const p = new THREE.Vector3(c.x, c.y + c.s / 2, c.z);

@@ -89,14 +89,17 @@ const path = require('path');
   await ev(() => { BOT.go(-26, -25, { until: () => !!SC.story.enc }); BOT.step(50); BOT.fight(); BOT.mark('rooftop fight'); BOT.go(-27.3, -26.7); BOT.use('clue_loft'); BOT.go(-12, -34.2); BOT.go(-6, -34.2); }); await snap('p18-bridge');
   await ev(() => { BOT.go(1.5, -34.2, { until: () => !SC.player.control }); BOT.wait(1.2); }); await snap('p19-boss-intro');
   await ev(() => { BOT.taps(); BOT.wait(1.5); let n = 0; while (SC.story.enc && n++ < 250) BOT.step(1); }); await snap('p20-boss');
-  const res = await ev(() => {
+  let res = await ev(() => {
     BOT.fight(400); BOT.mark('boss'); BOT.wait(2.5); BOT.taps(); BOT.wait(2);
     return { log: BOT.log, minD: +BOT.minD.toFixed(2), minAt: BOT.minAt, offscreenFrames: BOT.off, offAt: BOT.offAt, followFrames: BOT.total, hpLow: Math.round(BOT.hpLow), flags: Object.keys(SC.flags).join(' '), ended: !!SC.story.done, menu: SC.ui.menuOpen, clock: Math.round(BOT.frames / 30), stats: SC.player.stats, rank: SC.player.rank };
   });
   await snap('p21-end');
+  // PLAY AGAIN must put the level back without reloading the page
+  res.again = await ev(() => { SC.ui.menuFns.a(); BOT.step(5); const W = SC.world;
+    return { page: !!SC.ui.pg, flags: Object.keys(SC.flags).length, doorsShut: Object.keys(W.doors).every(k => W.doors[k].sol.on), cratesWhole: W.crates.every(c => c.alive), enemies: SC.enemies.length, path: SC.player.path }; });
   console.log(JSON.stringify(res, null, 1));
   console.log(errs.length ? 'ERRORS:\n' + errs.slice(0, 10).join('\n') : 'no console errors');
-  const pass = res.ended && !errs.length && res.minD >= 1.2 && res.offscreenFrames / Math.max(1, res.followFrames) < 0.01 && !res.log.some(l => !l.startsWith('ok'));
+  const pass = res.ended && res.again.page && res.again.doorsShut && res.again.cratesWhole && !res.again.path && !errs.length && res.minD >= 1.2 && res.offscreenFrames / Math.max(1, res.followFrames) < 0.01 && !res.log.some(l => !l.startsWith('ok'));
   console.log(pass ? 'PASS' : 'FAIL');
   await browser.close(); process.exit(pass ? 0 : 1);
 })();

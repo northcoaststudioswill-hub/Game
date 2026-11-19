@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#07070d">
 <title>Second Chance</title>
 <style>
-:root{--ink:#07070d;--paper:#f4f1e6;--yel:#ffe14a;--red:#ff3b30;--path:#ff5a1f;--hot:#ffd23a;
+:root{color-scheme:dark;--ink:#07070d;--paper:#f4f1e6;--yel:#ffe14a;--red:#ff3b30;--path:#ff5a1f;--hot:#ffd23a;
   --sfx:Impact,"Haettenschweiler","Arial Narrow Bold","Arial Black",sans-serif;
   --hand:"Chalkboard SE","Comic Sans MS","Comic Neue","Marker Felt",casual,"Trebuchet MS","Segoe UI",system-ui,sans-serif;
   --sl:env(safe-area-inset-left,0px);--sr:env(safe-area-inset-right,0px);--sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px)}
@@ -1630,6 +1630,12 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     o.position.set(x, y + 0.7, z); G.scene.add(o);
     W.pickups.push({ kind, o, x, y, z, t: Math.random() * 6 });
   };
+  /* put the level back as it was at the start: doors shut, crates whole, nothing lying around */
+  W.reset = function () {
+    for (const k in W.doors) { const d = W.doors[k]; d.k = d.to = 0; d.sol.on = true; d.m.position.copy(d.from); }
+    for (const c of W.crates) { if (!c.alive) { c.alive = true; c.sol.on = true; G.scene.add(c.m); } c.hp = 2; }
+    while (W.pickups.length) G.scene.remove(W.pickups.pop().o);
+  };
   W.breakCrate = function (c) {
     if (!c.alive) return; c.alive = false; c.sol.on = false; G.scene.remove(c.m);
     const p = new THREE.Vector3(c.x, c.y + c.s / 2, c.z);
@@ -2876,7 +2882,7 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
       ], n),
       n => { hideClerk(); n(); }, 0.8,
       n => { S.done = true;
-        U.end({ time: S.time, path: SC.PATHS[pl.path].name, kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { S.wipe(); location.reload(); }); n(); }]);
+        U.end({ time: S.time, path: SC.PATHS[pl.path].name, kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); n(); }]);
   }
 
   /* ---------- set up interactables and markers ---------- */
@@ -2933,7 +2939,9 @@ SC.emit = (name, a, b) => { (SC.events[name] || []).forEach(fn => fn(a, b)); };
     U.title(S.hasSave(), S.newGame, S.load);
   };
   S.newGame = function () {
-    S.wipe(); F = SC.flags = {}; S.cp = 'alley'; S.time = 0; S.enc = null; pl.path = null; pl.rank = 1; pl.echoes = 0; pl.hp = SC.T.hp; pl.meter = 0; pl.chance = 1;
+    S.wipe(); W.reset(); SC.clearEnemies(); timers.length = 0; S.done = false; S.bossDown = false; U.boss(null); cam.lock = null;
+    Object.keys(pl.stats).forEach(k => { pl.stats[k] = 0; });
+    F = SC.flags = {}; S.cp = 'alley'; S.time = 0; S.enc = null; pl.path = null; pl.rank = 1; pl.echoes = 0; pl.hp = SC.T.hp; pl.meter = 0; pl.chance = 1;
     pl.model.setGlow(0xf6f2e6, '#f6f2e6'); intro();
   };
   S.load = function () {
