@@ -428,6 +428,20 @@
       if (m.t > 0.15 && m.t < IMP) { const u = (m.t - 0.15) / (IMP - 0.15); e.z = u * 46; cm.material.opacity = Math.min(0.96, u * 1.5); cm.scale.set(0.9 - u * 0.25, 1.9, 0.9 - u * 0.25); e.poseOv = { act: 'stun', prog: 0 }; e.aim += dt * (2 + u * 14); if (u > 0.6) { e.x += rand(-2, 2); e.vis.c.root.visible = u < 0.75; } }
       once('wrapd', IMP * 0.75, () => { text(e, 'WRAPPED', col, true); G.sfx('holy'); });
       once('sq', IMP - 0.02, () => { cm.scale.set(0.3, 1.5, 0.3); e.vis.c.root.visible = true; }); once('rm', IMP + 0.05, () => { if (cm.parent) cm.parent.remove(cm); for (let wi = 0; wi < 30; wi++) gfx.emit(e.x / S + rand(-0.4, 0.4), rand(0.4, 2.2), e.y / S + rand(-0.4, 0.4), rand(-3, 3), rand(0, 4), rand(-3, 3), rand(0.6, 1.2), wi % 3 ? '#e8e4f4' : '#8a0c0c', 1); e.poseOv = null; }); }
+    if (k === 'melt') { P.poseOv = m.t < IMP ? { act: 'cast', prog: Math.min(1, m.t / IMP) } : (m.t < IMP + 0.5 ? { act: 'release', prog: (m.t - IMP) / 0.5 } : null);
+      once('beam', 0.25, () => { fx.push({ k: 'bolt', x1: P.x, y1: P.y, x2: e.x, y2: e.y, col, t: 0, life: 0.5 }); G.sfx('fire'); text(e, 'COMING APART', col, true); e.poseOv = { act: 'stun', prog: 0 };
+        const pm = new T.Mesh(new T.CircleGeometry(1, 20), new T.MeshBasicMaterial({ color: new T.Color(col).multiplyScalar(0.3), transparent: true, opacity: 0.82, depthWrite: false })); pm.rotation.x = -Math.PI / 2; pm.position.set(e.x / S, 0.05, e.y / S); pm.scale.setScalar(0.05); pm.renderOrder = 3; sc.add(pm); gibs.push({ m: pm, rest: 1 }); m.f.pud = pm; });
+      if (m.t > 0.3 && m.t < IMP) { const u = (m.t - 0.3) / (IMP - 0.3), goo = new T.Color(col); e.vis.g.scale.set(1 + u * 1.1, Math.max(0.05, 1 - u * 0.96), 1 + u * 1.1); e.x += rand(-1.2, 1.2) * (1 - u); e.vis.c.mats && e.vis.c.mats.forEach(mm => mm.color.lerp(goo, 0.05)); if (m.f.pud) { m.f.pud.scale.setScalar(0.05 + u * 1.5); m.f.pud.position.set(e.x / S, 0.05, e.y / S); }
+        for (let di = 0; di < 3; di++) gfx.emit(e.x / S + rand(-0.4, 0.4) * (1 + u), rand(0.2, 1.7) * (1 - u * 0.9), e.y / S + rand(-0.4, 0.4) * (1 + u), rand(-0.3, 0.3), -rand(0.5, 2.5), rand(-0.3, 0.3), 0.5, col, 1); if (Math.random() < 0.2) gfx.emit(e.x / S, 0.3, e.y / S, rand(-0.3, 0.3), rand(1, 2.5), rand(-0.3, 0.3), 1.2, '#d8d8d0', 0); shake = Math.max(shake, 2 + u * 4); }
+      every('hiss', 0.5, IMP - 0.1, 0.35, i => { G.sfx('fire'); text(e, ['SLOUGHING', 'RUNNING', 'NOTHING LEFT'][Math.min(2, i)], col, false); }); }
+    if (k === 'unravel') { P.poseOv = m.t < IMP ? { act: 'cast', prog: Math.min(1, m.t / IMP) } : null;
+      once('u0', 0.2, () => { fx.push({ k: 'ring', x: e.x, y: e.y, r: 130, col, t: 0, life: 0.5 }); G.sfx('holy'); text(e, 'UNPICKED', col, true); e.poseOv = { act: 'hoist', prog: 0.5 }; });
+      if (m.t > 0.2 && m.t < IMP) { const u = (m.t - 0.2) / (IMP - 0.2); e.z = u * 60; e.aim += dt * (3 + u * 26); e.vis.g.scale.set(Math.max(0.06, 1 - u * 0.94), 1 + u * 0.9, Math.max(0.06, 1 - u * 0.94)); for (let ri = 0; ri < 4; ri++) { const a2 = rand(0, 6.28); gfx.emit(e.x / S + Math.cos(a2) * 0.3, e.z / S + rand(0.2, 2.2), e.y / S + Math.sin(a2) * 0.3, Math.cos(a2) * (1 + u * 3), rand(0.5, 3), Math.sin(a2) * (1 + u * 3), rand(0.5, 1), ri % 3 ? col : '#8a0c0c', 0); } e.flash = u > 0.85 ? 0.03 : 0; }
+      every('thr', 0.5, IMP - 0.1, 0.3, () => G.sfx('swing')); }
+    if (k === 'salt') { P.poseOv = m.t < IMP ? { act: 'cast', prog: Math.min(1, m.t / IMP) } : null;
+      once('s0', 0.25, () => { fx.push({ k: 'blast', x: e.x, y: e.y, r: 60, col: '#ffffff', t: 0, life: 0.5, pillar: 1 }); G.sfx('holy'); text(e, 'LOOKED BACK', col, true); e.poseOv = { act: 'stun', prog: 0 }; });
+      if (m.t > 0.3 && m.t < IMP) { const wh = new T.Color(0xf2f0ea); e.vis.c.mats && e.vis.c.mats.forEach(mm => mm.color.lerp(wh, 0.09)); e.st = { stun: { t: 99 } }; if (Math.random() < 0.4) gfx.emit(e.x / S + rand(-0.4, 0.4), rand(0.2, 1.9), e.y / S + rand(-0.4, 0.4), 0, -rand(0.3, 1), 0, 0.8, '#ffffff', 1); }
+      once('crk', IMP - 0.25, () => { G.sfx('wall'); text(e, 'CRACKING', '#ffffff', false); shake = Math.max(shake, 6); }); }
     if (k === 'puppet') { if (m.t > 0.15 && m.t < IMP - 0.1) { e.z = Math.min(80, e.z + dt * 130); e.flash = 0.03; } once('p0', 0.15, () => { fx.push({ k: 'ring', x: e.x, y: e.y, r: 110, col, t: 0, life: 0.5 }); G.sfx('holy'); });
       ['armL', 'armR', 'legL'].forEach((part, i) => once('pp' + i, 0.5 + i * 0.3, () => { if (gore() && !e.vis.c.beast) sever(e, part, null, m.a + (i - 1) * 1.6); else blood(e.x, e.y, 20); fx.push({ k: 'bolt', x1: P.x, y1: P.y, x2: e.x, y2: e.y, col, t: 0, life: 0.14 }); e.flash = 0.12; G.sfx('crit'); shake = Math.max(shake, 9); hitstop = Math.max(hitstop, 0.07); })); }
     if (k === 'ice') { const ice = new T.Color(0xbfe8ff); every('ic', 0.2, IMP, 0.14, i => { e.vis.c.mats.forEach(mm => mm.color.lerp(ice, 0.3)); fx.push({ k: 'ring', x: e.x, y: e.y, r: 150 - i * 12, col: '#bfe8ff', t: 0, life: 0.3 }); e.flash = 0.05; if (i % 2 === 0) G.sfx('ice'); spark(e.x, e.y, 6, '#dff4ff', 8, 120); }); e.st = { stun: { t: 1 } }; }
@@ -440,10 +454,11 @@
       fx.push({ k: 'ring', x: e.x, y: e.y, r: 240, col, t: 0, life: 0.7 }); fx.push({ k: 'dust', x: e.x, y: e.y, r: 200, t: 0, life: 0.8 });
       if (def.crack) mark(e.x, e.y, 3.4, 'crack'); if (def.fire || ash) mark(e.x, e.y, 3, 'scorch');
       spark(e.x, e.y, 30, col, 40, 420); flashLight(e.x, e.y, col, 95); shake = 22; hitstop = 0.22;
-      if (!ash && !def.swallow && !def.ice) { blood(e.x, e.y, 70); blood(e.x, e.y, 40, m.a); }
+      if (!ash && !def.swallow && !def.ice && !def.gone) { blood(e.x, e.y, 70); blood(e.x, e.y, 40, m.a); }
       screenFx('crit');
       e.z = 0; e.vis.g.scale.setScalar(1); const behead = def.behead && gore() && !e.vis.c.beast && !(e.lost && e.lost.head); m.f.stand = behead && !e.crawl ? 1 : 0;
       if (behead) { sever(e, 'head', null, m.a); for (let bi = 0; bi < 26; bi++) gfx.emit(e.x / S + rand(-0.1, 0.1), 1.5, e.y / S + rand(-0.1, 0.1), rand(-1.4, 1.4), rand(4, 8), rand(-1.4, 1.4), rand(0.5, 0.9), '#8a0c0c', 1); }
+      else if (def.gone) { e.vis.g.visible = false; }
       else if (def.swallow) { e.vis.g.visible = false; fx.push({ k: 'dust', x: e.x, y: e.y, r: 260, t: 0, life: 1 }); mark(e.x, e.y, 3.6, 'crack'); }
       else if (def.bisect && gore() && !e.vis.c.beast) { halves(e, m.a); e.vis.g.visible = false; for (let bi = 0; bi < 30; bi++) gfx.emit(e.x / S, rand(0.3, 1.7), e.y / S, rand(-1, 1), rand(1, 5), rand(-1, 1), rand(0.5, 0.9), '#8a0c0c', 1); }
       else if (def.keep) { chunks(e, 8); mark(e.x, e.y, 2.4, 'crack'); }
