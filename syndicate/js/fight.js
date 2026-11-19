@@ -357,10 +357,10 @@
       else if (gr && Math.random() < 0.7) def = { id: 'env_fire', lead: 'firepit', at: gr[0], ash: 1, fire: 1, cast: false, imp: 2.0, col: '#ff8a2a', word: 'BURNED ALIVE', name: { fighter: 'Held Down in the Vent', rogue: 'Tripped into the Vent', sorcerer: 'Fed to the Fire', cleric: 'Purified', druid: 'Given Back to the Deep', warlock: 'A Small Offering' }[c] || 'Into the Fire' }; }
     // what is in your hand has its own way of ending things
     if (!P.form && !def.at && !F.ex && gore() && G.armOf && Math.random() < (G.state.hero.mortal ? 0.4 : 0.6)) { const aid = G.armOf(G.state.hero), kind = String(aid).split('_')[1], c = P.cls, wn = (G.ARM_BY[aid] || {}).name || 'weapon';
-      const fam = kind === 'basic' ? ({ fighter: 'sword', rogue: 'dual', cleric: 'blunt' })[c] : ({ spear: 'spear', hammer: 'blunt', pick: 'blunt', flail: c === 'druid' ? 'chain' : 'blunt', axes: 'dual', rapier: 'rapier', chain: 'chain', staff: c === 'cleric' || c === 'druid' ? 'staff' : null })[kind];
+      const fam = kind === 'basic' ? ({ fighter: 'sword', rogue: 'dual', cleric: 'blunt' })[c] : ({ spear: 'spear', axe: 'axe', halberd: 'halberd', hammer: 'blunt', pick: 'blunt', flail: c === 'druid' ? 'chain' : 'blunt', axes: 'dual', rapier: 'rapier', chain: 'chain', staff: c === 'cleric' || c === 'druid' ? 'staff' : null })[kind];
       const WF = { spear: { lead: 'javelin', imp: 1.3, word: 'SKEWERED', name: 'The ' + wn + ', Thrown' }, sword: { lead: 'legs', imp: 1.9, word: 'SPIKED', name: 'Legs, Then the Skull' }, blunt: { lead: 'facestuck', imp: 1.0, tail: 3.7, word: 'CAVED IN', name: 'Left the ' + wn + ' in Them' },
-        dual: { lead: 'gut', imp: 1.4, word: 'OPENED UP', name: 'Twenty Holes' }, rapier: { lead: 'heart', imp: 0.9, tail: 3.2, word: 'RUN THROUGH', name: 'Through the Heart, and Twisted' }, chain: { lead: 'strangle', imp: 1.8, word: 'THROTTLED', name: 'A Short Leash' }, staff: { lead: 'sweep', imp: 1.4, word: 'STAVED IN', name: 'Swept and Staved' } };
-      if (fam && WF[fam] && !e.vis.c.beast) def = Object.assign({ id: 'wf_' + fam, keep: 1, cast: false, wf: 1 }, WF[fam]); }
+        dual: { lead: 'gut', imp: 1.4, word: 'OPENED UP', name: 'Twenty Holes' }, rapier: { lead: 'heart', imp: 0.9, tail: 3.2, word: 'RUN THROUGH', name: 'Through the Heart, and Twisted' }, chain: { lead: 'strangle', imp: 1.8, word: 'THROTTLED', name: 'A Short Leash' }, staff: { lead: 'sweep', imp: 1.4, word: 'STAVED IN', name: 'Swept and Staved' }, axe: { lead: 'cleave', imp: 1.5, tail: 3.4, word: 'CLOVEN', name: 'Buried to the Breastbone' }, halberd: { lead: 'pin', imp: 1.7, word: 'PINNED', name: 'Hooked and Pinned' } };
+      if (fam && WF[fam] && !e.vis.c.beast) def = Object.assign({ id: 'wf_' + fam, keep: 1, cast: false, wf: 1 }, WF[fam]); if (!def.keep) delete def.keep; }
     // an animal ends it as that animal would
     if (P.form && !def.at) { const fid = P.form.id; if (P.buffs.form) P.buffs.form.t = Math.max(P.buffs.form.t, 9);
       def = fid === 'spider' ? { id: 'f_spider', lead: 'spiderfeast', gone: 1, cast: false, imp: 2.4, word: 'EATEN', name: 'Wrapped and Eaten', col: '#e8e4f4' }
@@ -459,12 +459,17 @@
       const stick = (len, y, z, rx, head) => { const g = new T.Group(), sh = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, len, 5), head === 'blade' ? steelM : woodM); g.add(sh); if (head === 'spear') { const tp = new T.Mesh(new T.ConeGeometry(0.07, 0.3, 5), steelM); tp.position.y = len / 2 + 0.12; g.add(tp); } else if (head === 'mace') { const hd = new T.Mesh(new T.IcosahedronGeometry(0.17, 0), steelM); hd.position.y = len / 2; g.add(hd); } else if (head === 'blade') { sh.scale.set(1.6, 1, 0.5); const gd = new T.Mesh(new T.BoxGeometry(0.3, 0.05, 0.07), woodM); gd.position.y = -len / 2 + 0.22; g.add(gd); } g.position.set(0, y, z); g.rotation.x = rx; root.add(g); m.f.prop = g; return g; };
       const fall = () => { e.poseOv = null; e.state = 'ko'; e.koT = 0; G.sfx('wall'); fx.push({ k: 'dust', x: e.x, y: e.y, r: 60, t: 0, life: 0.45 }); };
       const face = () => { e.aim = m.a + Math.PI; }, hand = v => { const w = P.vis.c.wHand; if (w) w.visible = v; };
+      const C0 = e.vis.c, hd = C0.limbs.head, tor = hd.parent;
+      // the weapon itself, left in them: a copy of what is in the hand, entering at a point and sunk to a depth
+      const lodge = (par, at, dir, depth) => { const w = P.vis.c.wHand; if (!w || !w.children.length) return stick(1, at[1], at[2], 0, 'blade'); const g = w.clone(true); const dead = []; g.traverse(o => { if (o.isLight || o.isSprite) dead.push(o); }); dead.forEach(o => o.parent && o.parent.remove(o)); g.visible = true; g.position.set(0, 0, 0); g.rotation.set(0, 0, 0); g.scale.set(1, 1, 1); g.updateMatrixWorld(true); const L = Math.max(0.4, new T.Box3().setFromObject(g).max.z), d = new T.Vector3(dir[0], dir[1], dir[2]).normalize(); g.quaternion.setFromUnitVectors(new T.Vector3(0, 0, 1), d); g.position.set(at[0], at[1], at[2]).addScaledVector(d, depth - L); par.add(g); m.f.prop = g; return g; };
+      const upIn = par => { par.updateWorldMatrix(true, false); return new T.Vector3(0, 1, 0).applyQuaternion(par.getWorldQuaternion(new T.Quaternion()).invert()); };
+      const plant = (par, y, depth) => { const up = upIn(par), at = new T.Vector3(0, y, 0).addScaledVector(up, 0.18); return lodge(par, [at.x, at.y, at.z], [-up.x, -up.y, -up.z], depth); };
       // a blade driven straight down into the head, whichever way the body is lying
       const spike = len => { const hd = e.vis.c.limbs.head, g = stick(len, 0, 0, 0, 'blade'); hd.add(g); hd.updateWorldMatrix(true, false); const up = new T.Vector3(0, 1, 0).applyQuaternion(hd.getWorldQuaternion(new T.Quaternion()).invert()); g.quaternion.setFromUnitVectors(new T.Vector3(0, -1, 0), up); g.position.set(0, 0.12, 0).addScaledVector(up, len * 0.3); return g; };
       if (k === 'javelin') { face(); if (!m.f.p0) m.f.p0 = [P.x, P.y]; if (m.t < 0.45) { const u = m.t / 0.45; P.x = m.f.p0[0] - dx * 80 * u; P.y = m.f.p0[1] - dy * 80 * u; clampArena(P); P.moving = true; P.walk = (P.walk || 0) + dt * 14; } else P.moving = false;
         if (m.t < IMP) { e.poseOv = { act: 'stun', prog: 0 }; P.poseOv = m.t < IMP - 0.12 ? { act: 'cast', cs: 'throw', prog: Math.min(1, m.t / (IMP - 0.12)) } : { act: 'release', cs: 'throw', prog: 0 }; }
         once('thr', IMP - 0.12, () => { fx.push({ k: 'lance', x: P.x, y: P.y, a: m.a, r: Math.hypot(e.x - P.x, e.y - P.y), col: '#ffffff', w: 0.08, t: 0, life: 0.18, h: 1.5 }); G.sfx('swing'); hand(false); });
-        once('hitf', IMP, () => { stick(2.0, 1.52, -0.25, Math.PI / 2, 'spear'); for (let bi = 0; bi < 30; bi++) gfx.emit(e.x / S + dx * 0.3, 1.5, e.y / S + dy * 0.3, dx * rand(2, 7) + rand(-1, 1), rand(0, 3), dy * rand(2, 7) + rand(-1, 1), rand(0.4, 0.9), '#8a0c0c', 1); e.poseOv = { act: 'hoist', prog: 0.5 }; e.kx = dx * 90; e.ky = dy * 90; });
+        once('hitf', IMP, () => { lodge(hd, [0, 0.16, 0.2], [0, 0, -1], 0.8); for (let bi = 0; bi < 30; bi++) gfx.emit(e.x / S + dx * 0.3, 1.5, e.y / S + dy * 0.3, dx * rand(2, 7) + rand(-1, 1), rand(0, 3), dy * rand(2, 7) + rand(-1, 1), rand(0.4, 0.9), '#8a0c0c', 1); e.poseOv = { act: 'hoist', prog: 0.5 }; e.kx = dx * 90; e.ky = dy * 90; });
         if (m.t > IMP && m.t < IMP + 0.9) { e.x += (e.kx || 0) * dt; e.y += (e.ky || 0) * dt; e.kx *= 0.9; e.ky *= 0.9; clampArena(e); P.poseOv = m.t < IMP + 0.4 ? { act: 'release', cs: 'throw', prog: (m.t - IMP) / 0.4 } : null; }
         once('jf', IMP + 0.9, fall); }
       if (k === 'legs') { face(); if (m.t > 0.15 && m.t < 0.65) P.poseOv = { act: 'swing', mv: 'lowcut', prog: (m.t - 0.15) / 0.5 };
@@ -473,11 +478,11 @@
         if (m.t > 0.8 && m.t < 1.1) { const u = (m.t - 0.8) / 0.3, tx = e.x - dx * 26, ty = e.y - dy * 26; P.x += (tx - P.x) * u * 0.4; P.y += (ty - P.y) * u * 0.4; P.moving = true; P.walk = (P.walk || 0) + dt * 12; } else if (m.t >= 1.1) P.moving = false;
         if (m.t >= 1.1 && m.t < IMP) P.poseOv = { act: 'hoist', prog: 0.5 }; else if (m.t >= IMP && m.t < IMP + 0.6) P.poseOv = { act: 'swing', mv: 'chop', prog: Math.min(0.62, 0.5 + (m.t - IMP)) }; else if (m.t >= IMP + 0.6 && P.poseOv && P.poseOv.mv === 'chop') P.poseOv = null;
         if (m.t >= IMP + 0.45 && m.t < IMP + 0.9) { P.x -= dx * 70 * dt; P.y -= dy * 70 * dt; P.moving = true; P.walk = (P.walk || 0) + dt * 10; } else if (m.t >= IMP + 0.9) P.moving = false;
-        once('sk', IMP, () => { spike(1.3); hand(false); for (let bi = 0; bi < 24; bi++) gfx.emit(e.x / S, 1.3, e.y / S, rand(-2, 2), rand(2, 6), rand(-2, 2), rand(0.4, 0.9), '#8a0c0c', 1); });
+        once('sk', IMP, () => { plant(hd, 0.12, 0.4); hand(false); for (let bi = 0; bi < 24; bi++) gfx.emit(e.x / S, 1.3, e.y / S, rand(-2, 2), rand(2, 6), rand(-2, 2), rand(0.4, 0.9), '#8a0c0c', 1); });
         once('lf', IMP + 0.9, fall); }
       if (k === 'facestuck') { face(); if (m.t > 0.2 && m.t < IMP + 2.1) e.poseOv = { act: 'kneel', prog: 0 };
         if (m.t < IMP) P.poseOv = { act: 'swing', mv: 'chop', prog: 0.5 * Math.min(1, m.t / IMP) * (m.t / IMP > 0.8 ? 1 : 0.6) };
-        once('cv', IMP, () => { stick(0.8, 1.42, 0.5, -1.0, 'mace'); hand(false); });
+        once('cv', IMP, () => { lodge(hd, [0, 0.3, 0.24], [0, -0.6, -0.8], 0.16); hand(false); });
         if (m.t >= IMP && m.t < IMP + 0.3) P.poseOv = { act: 'swing', mv: 'chop', prog: 0.55 };
         if (m.t >= IMP + 0.3 && m.t < IMP + 1.2) { P.poseOv = { act: 'tear', prog: 0.25 + Math.abs(Math.sin((m.t - IMP) * 9)) * 0.2 }; e.x += Math.sin(m.t * 30) * 1.2; }
         every('tug', IMP + 0.35, IMP + 1.15, 0.28, i => { text(e, ['STUCK', 'STILL STUCK', 'PROPERLY STUCK'][i % 3], '#cfd8e0', false); G.sfx('clang'); blood(e.x, e.y, 6, rand(0, 6.28)); });
@@ -486,13 +491,15 @@
         if (m.t >= IMP + 1.8 && m.t < IMP + 2.3) P.poseOv = { act: 'kick', prog: (m.t - IMP - 1.8) / 0.5 }; else if (m.t >= IMP + 2.3 && P.poseOv && P.poseOv.act === 'kick') P.poseOv = null;
         once('ff', IMP + 2.1, fall); }
       if (k === 'gut') { face(); if (m.t < 0.25) { const tx = e.x - dx * 26, ty = e.y - dy * 26; P.x += (tx - P.x) * 0.3; P.y += (ty - P.y) * 0.3; }
-        if (m.t > 0.2 && m.t < IMP + 0.5) e.poseOv = { act: 'stun', prog: 0 };
+        if (m.t > 0.2 && m.t < IMP + 0.28) e.poseOv = { act: 'stun', prog: 0 };
+        if (m.t >= IMP + 0.3 && m.t < IMP + 0.75) { e.x += dx * 110 * dt; e.y += dy * 110 * dt; clampArena(e); }
         if (m.t >= 0.25 && m.t < IMP) P.poseOv = { act: 'swing', prog: 0.34 + (((m.t * 1000) % 100) / 100) * 0.24, step: Math.floor(m.t * 10) % 2 };
         every('stb', 0.28, IMP, 0.1, i => { blood(e.x, e.y, 7, m.a + rand(-0.8, 0.8)); e.hurt = 0.2; e.hurtSide = i % 2 ? 1 : -1; e.flash = 0.03; G.sfx('hit'); shake = Math.max(shake, 3); if (i % 3 === 0) gfx.splat(e.x / S + rand(-0.6, 0.6), e.y / S + rand(-0.6, 0.6), rand(0.3, 0.6)); });
         if (m.t >= IMP && m.t < IMP + 0.5) P.poseOv = { act: 'kick', prog: (m.t - IMP) / 0.5 }; else if (m.t >= IMP + 0.5 && P.poseOv && P.poseOv.act === 'kick') P.poseOv = null;
+        once('thr', IMP - 0.02, () => { lodge(hd, [0, -0.02, 0.16], [0, 0.5, -0.86], 0.2); hand(false); text(e, 'AND ONE TO KEEP', '#ff3020', true); blood(e.x, e.y, 26, m.a); });
         once('gf', IMP + 0.3, fall); }
       if (k === 'heart') { face(); if (m.t < IMP) { const tx = e.x - dx * 46, ty = e.y - dy * 46; P.x += (tx - P.x) * 0.25; P.y += (ty - P.y) * 0.25; P.poseOv = { act: 'swing', mv: 'drive', prog: 0.5 * (m.t / IMP) }; e.poseOv = { act: 'stun', prog: 0 }; }
-        once('thru', IMP, () => { stick(0.9, 1.18, -0.55, Math.PI / 2, 'blade'); hand(false); e.poseOv = { act: 'hoist', prog: 0.5 }; });
+        once('thru', IMP, () => { lodge(tor, [0, hd.position.y - 0.38, 0.2], [0, 0, -1], 0.62); hand(false); e.poseOv = { act: 'hoist', prog: 0.5 }; });
         if (m.t >= IMP && m.t < IMP + 1.0) P.poseOv = { act: 'swing', mv: 'drive', prog: 0.52 };
         once('tw', IMP + 0.5, () => { text(e, 'TWISTED', '#ff3020', true); blood(e.x, e.y, 30, m.a); G.sfx('crit'); shake = Math.max(shake, 8); if (m.f.prop) m.f.prop.rotation.z = 1.2; });
         once('wd', IMP + 1.0, () => { hand(true); if (m.f.prop && m.f.prop.parent) m.f.prop.parent.remove(m.f.prop); blood(e.x, e.y, 40, m.a + Math.PI); e.poseOv = { act: 'kneel', prog: 0 }; });
@@ -504,7 +511,25 @@
         once('whp', 0.4, () => { hand(false); G.sfx('swing'); text(e, 'COLLARED', '#c8c0d8', true); });
         every('ch', 0.4, IMP, 0.05, () => { fx.push({ k: 'trail', x1: P.x, y1: P.y, x2: e.x, y2: e.y, col: '#b8bcc4', t: 0, life: 0.09 }); });
         every('ck', 0.6, IMP - 0.1, 0.4, i => { text(e, ['CHOKING', 'KICKING', 'SLOWING'][i % 3], '#c8c0d8', false); G.sfx('clang'); });
-        once('sn', IMP, () => { e.z = 0; P.poseOv = null; hand(true); e.x += dx * 18; e.y += dy * 18; }); once('sf', IMP + 0.25, fall); }
+        once('sn', IMP, () => { e.z = 0; P.poseOv = null; hand(true); });
+        if (m.t >= IMP + 0.1 && m.t < IMP + 0.6) { P.x += dx * 190 * dt; P.y += dy * 190 * dt; clampArena(P); P.moving = true; P.walk = (P.walk || 0) + dt * 10; } else if (m.t >= IMP + 0.6) P.moving = false; once('sf', IMP + 0.25, fall); }
+      if (k === 'cleave') { face(); if (m.t > 0.2 && m.t < IMP + 1.3) e.poseOv = { act: 'kneel', prog: 0 };
+        if (m.t < 0.3) { const tx = e.x - dx * 42, ty = e.y - dy * 42; P.x += (tx - P.x) * 0.25; P.y += (ty - P.y) * 0.25; }
+        if (m.t >= 0.3 && m.t < IMP - 0.14) P.poseOv = { act: 'hoist', prog: 0.5 }; else if (m.t >= IMP - 0.14 && m.t < IMP + 0.3) P.poseOv = { act: 'swing', mv: 'chop', prog: Math.min(0.6, 0.36 + (m.t - IMP + 0.14) * 1.2) };
+        once('hv', 0.5, () => text(P, 'HEAVES', '#e8e0d0', false));
+        once('bur', IMP, () => { lodge(tor, [0.14, hd.position.y - 0.02, 0.05], [-0.1, -1, -0.15], 0.5); hand(false); fx.push({ k: 'dust', x: e.x, y: e.y, r: 90, t: 0, life: 0.5 }); gfx.splat(e.x / S, e.y / S, 1.4); for (let bi = 0; bi < 30; bi++) gfx.emit(e.x / S, 1.2, e.y / S, rand(-2, 2), rand(2, 7), rand(-2, 2), rand(0.4, 0.9), '#8a0c0c', 1); });
+        if (m.t >= IMP + 0.3 && m.t < IMP + 0.95) { P.poseOv = { act: 'tear', prog: 0.25 + Math.abs(Math.sin((m.t - IMP) * 8)) * 0.2 }; e.x += Math.sin(m.t * 30) * 1.0; }
+        once('wr', IMP + 0.6, () => { text(e, 'WEDGED', '#cfd8e0', false); G.sfx('clang'); });
+        if (m.t >= IMP + 0.95 && m.t < IMP + 1.45) P.poseOv = { act: 'kick', prog: (m.t - IMP - 0.95) / 0.5 }; else if (m.t >= IMP + 1.45 && P.poseOv && P.poseOv.act === 'kick') P.poseOv = null;
+        once('out', IMP + 1.2, () => { if (m.f.prop && m.f.prop.parent) m.f.prop.parent.remove(m.f.prop); hand(true); text(e, 'WRENCHED OUT', '#ff3020', true); blood(e.x, e.y, 40, m.a); shake = Math.max(shake, 8); G.sfx('crit'); });
+        if (m.t >= IMP + 1.3 && m.t < IMP + 1.7) { e.x += dx * 100 * dt; e.y += dy * 100 * dt; clampArena(e); }
+        once('cf', IMP + 1.3, fall); }
+      if (k === 'pin') { face(); if (m.t > 0.15 && m.t < 0.6) P.poseOv = { act: 'swing', mv: 'lowcut', prog: (m.t - 0.15) / 0.45 };
+        once('hk', 0.4, () => { e.state = 'ko'; e.koT = 0; e.st = {}; e.poseOv = null; G.sfx('hit'); text(e, 'HOOKED', col, true); fx.push({ k: 'dust', x: e.x, y: e.y, r: 70, t: 0, life: 0.4 }); shake = Math.max(shake, 8); });
+        if (m.t > 0.7 && m.t < 1.1) { const tx = e.x - dx * 34, ty = e.y - dy * 34; P.x += (tx - P.x) * 0.2; P.y += (ty - P.y) * 0.2; }
+        if (m.t >= 1.1 && m.t < IMP) P.poseOv = { act: 'hoist', prog: 0.5 }; else if (m.t >= IMP && m.t < IMP + 0.5) P.poseOv = { act: 'swing', mv: 'chop', prog: Math.min(0.62, 0.5 + (m.t - IMP)) }; else if (m.t >= IMP + 0.5 && P.poseOv && P.poseOv.mv === 'chop') P.poseOv = null;
+        once('pn', IMP, () => { plant(tor, hd.position.y - 0.4, 0.55); hand(false); for (let bi = 0; bi < 24; bi++) gfx.emit(e.x / S, 0.5, e.y / S, rand(-2, 2), rand(2, 6), rand(-2, 2), rand(0.4, 0.9), '#8a0c0c', 1); });
+        if (m.t >= IMP + 0.5 && m.t < IMP + 0.9) { P.x -= dx * 60 * dt; P.y -= dy * 60 * dt; P.moving = true; P.walk = (P.walk || 0) + dt * 10; } else if (m.t >= IMP + 0.9) P.moving = false; }
       if (k === 'sweep') { face(); if (m.t > 0.15 && m.t < 0.6) P.poseOv = { act: 'swing', mv: 'lowcut', prog: (m.t - 0.15) / 0.45 };
         once('sw', 0.4, () => { e.state = 'ko'; e.koT = 0; e.st = {}; e.poseOv = null; G.sfx('hit'); text(e, 'SWEPT', col, true); fx.push({ k: 'dust', x: e.x, y: e.y, r: 70, t: 0, life: 0.4 }); shake = Math.max(shake, 8); });
         if (m.t > 0.7 && m.t < 1.0) { const tx = e.x - dx * 30, ty = e.y - dy * 30; P.x += (tx - P.x) * 0.2; P.y += (ty - P.y) * 0.2; }

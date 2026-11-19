@@ -397,10 +397,14 @@ What is in your hand now has its own way of ending a bout. When a kill lands the
 
 | Weapon | Finisher | What happens |
 | --- | --- | --- |
-| Spears | The spear, thrown | Step back, throw it through the face; it stays there and you walk off empty-handed |
+| Spears, pikes | The spear, thrown | Step back, throw it through the face; it stays there and you walk off empty-handed |
 | Longsword | Legs, Then the Skull | Both legs cut away, then the blade is driven down through the head and left standing |
+| Greataxe | Buried to the Breastbone | Overhead chop wedges in the collarbone; a boot on the chest wrenches it out |
+| Halberd | Hooked and Pinned | Legs hooked out, then the point goes through the chest into the sand |
 | Maces, hammers, picks, flails | Left the mace in them | Caved in, the weapon sticks, three tugs, you spit and kick the body over |
-| Daggers, paired axes | Twenty Holes | A flurry of stabs, then a boot |
+| Daggers, hand axes, sickles | Twenty Holes | A flurry of stabs, one left in the throat, and the body is booted clear |
 | Rapier | Through the Heart, and Twisted | Run through, twisted, withdrawn |
-| Chain whip, druid flail | A Short Leash | Collared from behind and hauled off the floor |
+| Chain, thorn whip | A Short Leash | Collared from behind and hauled off the floor |
 | Cleric and druid staves | Swept and Staved | Legs swept, then the butt comes down |
+
+The weapon left in the body is a copy of the one you were carrying. Casters with bolts, orbs and rods keep their spell finishers.
