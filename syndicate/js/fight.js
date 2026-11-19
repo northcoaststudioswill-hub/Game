@@ -1023,7 +1023,7 @@
     let tx = (P.x + E.x) / 2 / S, tz = (P.y + E.y) / 2 / S;
     const halfW = camVh * asp / 2 - 1.4, px = P.x / S, pz = P.y / S, off = ((px - tx) - (pz - tz)) * 0.7071;
     if (Math.abs(off) > halfW) { const d = (Math.abs(off) - halfW) * Math.sign(off) * 0.7071; tx += d; tz -= d; }
-    if (F.wideCam) { tx = tx * 0.5 - 1.0; tz = tz * 0.5 - 1.0; }
+    if (F.wideCam) { tx = tx * 0.28 - 1.5; tz = tz * 0.28 - 1.5; }
     { const kf = Math.pow(0.002, dt); camKx *= kf; camKz *= kf; tx += camKx; tz += camKz; }
     c.x += (tx - c.x) * k; c.z += (tz - c.z) * k; c.shake = shake / 45 * (G.shakeMul == null ? 1 : G.shakeMul);
     // edge arrow when the opponent is off screen

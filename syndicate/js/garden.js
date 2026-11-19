@@ -67,7 +67,8 @@
       if (G.state.gore !== false) G.gfx.blood(m.x / S, 1.1, m.y / S, 14, 4); word(m.x, m.y, String(dmg), '#ffffff', false); if (m.hp <= 0) dropMob(m, 'you'); });
   }
   function stepMobs(dt) {
-    const F = G.fight, P = F.P, E = F.E; if (!P || !E) return; clock += dt; davT -= dt; if (davT <= 0) { const r = Math.random(), alive = mobs.length ? mobs[Math.floor(Math.random() * mobs.length)] : null; says(r < 0.3 ? HIS : r < 0.5 ? ALL_HATE : r < 0.7 ? hateFor(G.state.hero.race) : hateFor(alive ? alive.race : G.state.hero.race)); } const live = F.inFight && F.inFight();
+    const F = G.fight, P = F.P, E = F.E; if (!P || !E) return; clock += dt; if (davEl) davEl.style.top = G.gfx.portrait ? '41%' : '45%';       // his words hang in the gap between the foot of the throne and the fight
+    davT -= dt; if (davT <= 0) { const r = Math.random(), alive = mobs.length ? mobs[Math.floor(Math.random() * mobs.length)] : null; says(r < 0.3 ? HIS : r < 0.5 ? ALL_HATE : r < 0.7 ? hateFor(G.state.hero.race) : hateFor(alive ? alive.race : G.state.hero.race)); } const live = F.inFight && F.inFight();
     for (let i = chunks.length - 1; i >= 0; i--) { const c = chunks[i]; c.t += dt; c.vy -= 20 * dt; c.m.position.x += c.vx * dt; c.m.position.z += c.vz * dt; c.m.position.y += c.vy * dt; c.m.rotation.x += dt * 6; c.m.rotation.z += dt * 5; if (c.m.position.y < 0.08) { c.m.position.y = 0.08; c.vy *= -0.3; c.vx *= 0.5; c.vz *= 0.5; } if (c.t > 2.2) { c.m.material.opacity = Math.max(0, 1 - (c.t - 2.2) / 0.6); if (c.t > 2.8) { c.m.parent && c.m.parent.remove(c.m); chunks.splice(i, 1); } } }
     if (live) hitMobs();
     const onYou = mobs.filter(m => m.tg === P).length;
