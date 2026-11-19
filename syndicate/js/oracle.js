@@ -71,7 +71,7 @@
       S('npc', NAME, HATE[ot[1]], 'npc'),
       S('you', me, 'You hate everyone.', 'you')].concat(TAIL), OFFER)); }
 
-    if (n === BIND) { st.bound = true; return G.playScene(scene(st, [
+    if (n === BIND && !G.garden) { st.bound = true; return G.playScene(scene(st, [
       S('npc', NAME, 'Three! Three times dead in the dirt, you clumsy bastard. Up. Oh, I do love a three.', 'npc'),
       S('you', me, 'You are in a good mood.', 'you'),
       S('npc', NAME, 'I am in a magnificent mood, and you are too thick to know why, which makes it better. Go on. Go and bleed on somebody. Not the ' + KIN[pick(others(h.race))] + ', mind. They cry. It puts me off my food.', 'low')], { done: fin })); }

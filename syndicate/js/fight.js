@@ -897,7 +897,7 @@
   // ------------------------------------------------------------------ main update
   // ---- the pit joins in: a bottle from the stands, a vent in the floor. Rare, telegraphed, and never the thing that kills you.
   let hazT = 0, haz = [];
-  const rowdy = () => { const t = opp.under != null ? opp.under : Math.max(0, G.OPPONENTS.findIndex(q => q.id === opp.id)); return opp.ascent != null || opp.id === 'mark' ? 0 : t <= 2 ? 1 : t <= 5 ? 0.6 : 0.35; };
+  const rowdy = () => { const t = opp.under != null ? opp.under : Math.max(0, G.OPPONENTS.findIndex(q => q.id === opp.id)); return opp.ascent != null || opp.id === 'mark' || opp.garden ? 0 : t <= 2 ? 1 : t <= 5 ? 0.6 : 0.35; };
   function hazards(dt) {
     if (phase !== 'fight' || F.ex) { haz.length = 0; return; }
     const rw = rowdy(); if (!rw) return;
@@ -1075,7 +1075,7 @@
   F.forfeit = function () { if (!F.active) return; result = { win: false, forfeit: true }; F.active = false; F.paused = false; G.ui.banner(null); finish(); };
 
   function finish() {
-    if (opp.spar) {                              // friendly duel: nothing at stake here but pride (and whatever was wagered)
+    if (opp.spar || opp.garden) {                // friendly duel, or a bout that is settled somewhere else: nothing at stake here but pride (and whatever was wagered)
       G.save(); gfx.cam.shake = 0; gfx.clearFloats(); gfx.cine = null; document.getElementById('foeArrow').className = 'hidden';
       const cb = opp.onDone; opp.onDone = null; return cb ? cb(result.win && !result.forfeit) : G.ui.hub();
     }

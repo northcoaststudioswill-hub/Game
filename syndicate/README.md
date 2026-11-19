@@ -356,3 +356,7 @@ Found with a frame-by-frame detector that flags any joint, facing or position th
 - The kill is filmed from the side, with a smoothed camera and a wall behind it on the open side. From range, the killer crosses the sand instead of appearing beside the body.
 - Fighters stay off the kerbs and braziers. The open side of the pit has a floor instead of a void.
 - Hit flash is a warm tint, not a white silhouette. Dash trails are a thin line and wake. The kill flash is dimmer. Combat words stack instead of overprinting.
+
+## Latest pass: the Hour Garden
+
+Refusing David's contract now has teeth. Die unsigned and he does not carry you back: he opens a door on a walled garden in blossom and puts you in with ten souls. They come one at a time, your wounds carry over, and you get a little breath back between them. Survive all ten and you wake in the pit. Die in the garden and the game is over: the save is erased. You can still sign at the garden door instead. He no longer binds you automatically on a third death.

@@ -643,3 +643,4 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .fallen div { display: flex; align-items: baseline; gap: 0.6rem; padding: 0.3rem 0.2rem; border-bottom: 1px solid rgba(201, 160, 64, 0.12); }
 .fallen i { width: 2.2rem; text-align: right; color: #9a8f7a; font-style: normal; font-size: 0.75rem; } .fallen b { color: #e8a09a; text-decoration: line-through; text-decoration-color: #b03020; } .fallen small { color: #b8ad98; font-size: 0.74rem; }
 .opp button.mini[data-low] { margin-left: 0.5rem; }
+.gpips { margin: 0.5rem 0; } .card.gameover h2 { color: #ff8a80; }
