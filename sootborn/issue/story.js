@@ -371,9 +371,9 @@
             { who: 'cap', text: 'The mask came off in two pieces. Under it was a face I had last seen across a fire I lit in a starving camp.' },
             { who: 'hero', face: 'shock', text: 'Oswin.' },
             { who: 'voss', face: 'hurt', text: 'One\'s father finished ninth for thirty years. She said one need not. *She only wanted the name.*' },
-            { who: 'hero', face: 'hurt', text: "You carried wood for me. You said nobody'd ever lit you a fire." },
+            { who: 'hero', face: 'hurt', text: "You said you'd carry the water yourself. You said not to tell your mother." },
             { who: 'voss', face: 'angry', text: 'It is *noted*. One has been paying on it nine years. Come and collect, Sorrel.' },
-            { who: 'cap', text: 'He drew the second blade. He had been the best of House Violet. I had made sure of it.' }
+            { who: 'cap', text: 'He drew the second blade and set the bad leg behind him. The salve came eleven days late. He had finished second in the Assay, behind a man who lit a fire.' }
           ], n),
           n => { SC.emit('letterbox', false); pl.setState('idle'); pl.control = true; cam.endCine(0.8); U.showHud(true);
             e.maxHp = Math.round(e.maxHp * 0.85); e.hp = e.maxHp; e.K = Object.assign({}, e.K, { speed: e.K.speed * 1.22, wind: e.K.wind * 0.78, rec: e.K.rec * 0.8, cool: [0.4, 0.9], dmg: e.K.dmg + 5 }); e.phase = 2; e.armorT = 1.5; e.state = 'chase'; e.st = 0; e.cool = 0.8; e.model.face('angry');

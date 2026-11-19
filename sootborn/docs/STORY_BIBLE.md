@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.35 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.36 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -392,10 +392,16 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **The Assay valley** was never cleared: tents, fire rings and the fallen Violet standard are still there nine years on. The Authority's notice on the pylon reads SEALED BY THE COUNT.
 
 ### Built in v0.32
-- **The bank hook.** Kael's blade from the end of training on: a valve tech's seat knife (a short hooked blade for cutting a seized seat out of a valve body) made sword-length in Accredited steel. Ilse had it made; Brand taught him to use it. **To confirm:** who made it, and whether this is the blade Celestine breaks at +9.
+- **The bank hook** (settled in v0.36). It is the blade Celestine pinned on him with the sun at the Pinning. The night before he went up as Edric Sorrel, Brand reforged its last hand into a seat hook. Their steel, our end. It is the blade she breaks at +9. At Riser Nine (+5) and after he carries it.
 - **Moves named in the levels:** UP THE SHAFT, WIDE CUT, THE HAUL, LAST BELL (chain enders); LIFT ZERO (the dive and the lunge); ELEVEN (held strike at full fury).
 - **Fury is earned in the fight.** Suns give some, never all.
 - Rule: the game never uses the source books' weapon names. The curved blade is the bank hook.
+
+### Story pass (v0.36)
+- **Seat knives.** Every valve hand is issued one: a hooked blade a palm long. The only edge soot may carry. Numbered; counted back onto a board at last bell by a Warden; an empty hook is a line struck by morning. Seren's was number 306. Brand counted the Tier Six board for eleven years.
+- **Oswin Hale, in order:** the Camp (day 3: "I shall carry the water myself. Do not tell my mother.") → the Last Night (night 49: the leg; "noted", and meaning it) → he finishes second → the salve comes eleven days late and the leg sets crooked → his father will not have him at table → Petra's letter (+5): a post from the High Auditor, something asked in exchange → the fitting (+6): Kael sees him masked, laying a fire, and does not turn round → the Stair (+9): the Auditor's Blade → "Hale, O." chalked forty-eighth on the wall by the white door; Maren starts a line for it.
+- **Petra Lune** keeps a column of the Count two rows ahead of Edric Sorrel from the first winter. She is the one who hears from Oswin. Open: where she is at +9.
+- **The list on the wall, in order:** Mara's forty-four, Brand, Aldane T., Rook A., Hale O.
 
 ### Third-person levels: how they play (v0.30.1)
 - Fury shows as gold on Kael himself, never as red on the screen.

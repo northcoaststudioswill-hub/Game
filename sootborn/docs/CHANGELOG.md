@@ -1,4 +1,23 @@
-# SOOTBORN — changelog (latest v0.35 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.36 · 2026-11-19)
+
+## v0.36 · 2026-11-19 — story pass: four new scenes, Oswin's thread laid in, the blade's history settled
+From play notes: give the whole game some work; more lore; check the story; add any new scenes with impact.
+
+**What the check found, and what was done**
+- **Oswin Hale came from nowhere.** v0.31 made him the man under the Auditor's Blade's mask, but nothing between the Assay and the Stair mentioned him, and the lines I wrote for the reveal did not match what he says in the Camp. Fixed both ways: two new scenes lead up to it (below), and the reveal now quotes him properly ("You said you'd carry the water yourself. You said not to tell your mother.") and uses his leg, which the Last Night already set up.
+- **Petra Lune was promised and never paid.** The Last Night says she will keep a column of the Count two rows ahead of him by winter. She had no scene on the Spire. She has one now.
+- **The blade had two histories.** The last duel says Celestine breaks "the blade they gave me"; v0.32 said Ilse had the bank hook made. Now one story: it is the blade pinned on him with the sun, and Brand reforged its last hand into a seat hook the night before he went up.
+- I ran a check for contractions in lines spoken by Accredited characters across Part Two and the Assay levels: none found by the pattern I used.
+
+**New scenes**
+- **The Seat Knife** (opens Part Two, the night before the lift). Brand at a forge with the blade. What a seat knife is: the one edge soot are allowed, numbered, counted back onto a board at last bell; an empty hook on the board is a line struck by morning. Seren's was counted back the night they walked her: number 306, and somebody had cleaned it. Brand counted that board for eleven years and never asked what the knives were for.
+- **Petra's letter** (chapter 2, +5, at the desks). Oswin's leg: the Proctors brought the salve when the Assay was over, as they said, eleven days late, and it set as it was. His father will not have him at table. The High Auditor has given him a post; something was asked in exchange, "and it was not much". Kael does not write back.
+- **The fitting** (chapter 3, +6, Celestine's anteroom, before the hum). A man being measured for a half-mask kneels to a dead brazier, one leg out straight, and lays the wood base to the draught. Nobody on the Spire lays a fire. Celestine: "He had a name. One has relieved him of it." Kael does not turn round.
+- **Hale, O.** (chapter 5, after the Stair, only if the third-person level was played). He comes up with the mask in two pieces and chalks the name on the wall by the white door, forty-eighth. Maren: there is no line for it; she struck it from the House rolls herself. Kael: "Then start one. That's what the book's for now."
+
+**The Stair level:** the reveal dialogue and the caption after it are rewritten to match (the water, his mother, the leg, second place behind a man who lit a fire).
+
+**Checked:** all five chapters build with every branch and every speaker has a portrait; each new scene's lines play through by script with no errors. **Not checked:** read by a person; the pictures behind the new scenes (they reuse the old-tunnel, desk and anteroom panels, and my test could not show me the right backdrop); nothing in Part One or the Assay levels was changed this round.
 
 ## v0.35 · 2026-11-19 — the third-person levels: kick is back, a held strike is three blows, rage cuts in, a hook you can see
 From play notes: there is no kick button now; the held button should be a three-hit combo; more special rage moments mid-fight, like the other fighting scenes have (Zenless Zone Zero was the comparison); it is hard to see what the hook is doing.
