@@ -48,7 +48,7 @@
   // ============================================================== THE PIT
   const AR = 8.2;
   function buildArena() {
-    const s = gfx.newScene({ ambient: 1.25, key: 1.5, shadowSize: 13, sky: 0x8a8cb8, ground: 0x2a2018, keyColor: 0xffe6cc });
+    const s = gfx.newScene({ ambient: 1.25, key: 1.5, shadowSize: 13, sky: 0x8a8cb8, ground: 0x2a2018, keyColor: 0xffe6cc }); const engineSet = s.children.slice();
     s.fog = new T.Fog(0x07060a, 76, 112);
     const inOct = (x, z, m) => Math.abs(x) < AR + m && Math.abs(z) < AR + m && Math.abs(x) + Math.abs(z) < 1.5 * AR + m;
     const cells = [], bloodTint = new T.Color(1.15, 0.62, 0.58);
@@ -140,23 +140,42 @@
     const ph = crowdSpots.map(() => R(0, 6.3)), skins = [0xc9977a, 0x7f9a62, 0xb5564e, 0xd8c3ae, 0x8a6a52];
     crowdSpots.forEach((p, i) => { col.setHSL(R(0, 1), 0.2, R(0.05, 0.12)); bodies.setColorAt(i, col); col.set(G.pick(skins)).multiplyScalar(0.3); heads.setColorAt(i, col); });
     s.add(bodies, heads);
-    // ---- the garden: the same ground, dressed for a different owner. Grass over the sand, blossom over the walls, nobody in the stands.
+    // ---- the garden: not the pit dressed up, but a different place on the same ground. Everything of the pit is put away while it stands.
+    const pitSet = s.children.filter(o => engineSet.indexOf(o) < 0); let lifeSet = [];
     const gardenG = new T.Group(); gardenG.visible = false; s.add(gardenG); const bg0 = s.background, fog0 = s.fog;
-    { const grass = new T.Mesh(new T.CircleGeometry(26, 40), new T.MeshLambertMaterial({ color: 0x5f9a4a, polygonOffset: true, polygonOffsetFactor: -1 })); grass.rotation.x = -Math.PI / 2; grass.position.y = 0.032; grass.receiveShadow = true; gardenG.add(grass);
-      for (let i = 0; i < 60; i++) { const a = R(0, 6.28), r = R(0.5, 7.6), p = new T.Mesh(new T.CircleGeometry(R(0.5, 1.3), 7), new T.MeshLambertMaterial({ color: [0x6fae52, 0x4f8a40, 0x7ab85a][i % 3], polygonOffset: true, polygonOffsetFactor: -2 })); p.rotation.x = -Math.PI / 2; p.position.set(Math.cos(a) * r, 0.036, Math.sin(a) * r); p.receiveShadow = true; gardenG.add(p); }
-      const petal = [0xf7c6d8, 0xffffff, 0xf2a0c0, 0xffe2a8], fl = new T.InstancedMesh(new T.ConeGeometry(0.07, 0.16, 5), new T.MeshLambertMaterial({ flatShading: true }), 260), d2 = new T.Object3D(), c2 = new T.Color();
-      for (let i = 0; i < 260; i++) { const a = R(0, 6.28), r = R(1.5, 9.2); d2.position.set(Math.cos(a) * r, 0.1, Math.sin(a) * r); d2.rotation.set(Math.PI, R(0, 3), 0); d2.scale.setScalar(R(0.7, 1.5)); d2.updateMatrix(); fl.setMatrixAt(i, d2.matrix); c2.set(petal[i % 4]); fl.setColorAt(i, c2); } gardenG.add(fl);
-      const bark = gfx.lambert(0x4a3424), leafM = [0xf4b8d0, 0xfbe4ee, 0xe890b4].map(c => new T.MeshLambertMaterial({ color: c, flatShading: true, emissive: 0x3a1420 }));
-      for (let i = 0; i < 22; i++) { const a = i / 22 * 6.2832 + R(-0.08, 0.08), r = 9.3 + (i % 2) * 1.5 + R(0, 0.6), x = Math.cos(a) * r, z = Math.sin(a) * r, h = R(3.4, 5.2), tr = new T.Group(); if (x + z > 3) continue;       // nothing between the camera and the fight tr.position.set(x, 0, z); gardenG.add(tr);
-        const tk = mesh(new T.CylinderGeometry(0.16, 0.3, h, 6), bark, 0, h / 2, 0, tr); tk.rotation.z = R(-0.12, 0.12);
-        for (let k = 0; k < 5; k++) { const cn = mesh(new T.IcosahedronGeometry(R(1.2, 2.0), 0), leafM[(i + k) % 3], R(-1.3, 1.3), h + R(-0.3, 1.6), R(-1.3, 1.3), tr); cn.scale.y = 0.75; } }
-      for (let i = 0; i < 26; i++) { const a = i / 26 * 6.2832, r = 8.75; if (Math.cos(a) + Math.sin(a) > 0.5) continue; const hd = mesh(new T.IcosahedronGeometry(R(0.7, 1.0), 0), new T.MeshLambertMaterial({ color: 0x3f7a3a, flatShading: true }), Math.cos(a) * r, 0.5, Math.sin(a) * r, gardenG); hd.scale.y = 0.8; }
-      mesh(new T.CylinderGeometry(1.5, 1.7, 0.3, 14), gfx.lambert(0xe8e2d4), 0, 0.02, 0, gardenG).scale.y = 0.2; const sun = new T.PointLight(0xfff0c8, 60, 40, 1.2); sun.position.set(4, 11, 6); gardenG.add(sun); gardenG.add(new T.AmbientLight(0xffe8f0, 0.9)); const rose = new T.PointLight(0xffb0d0, 16, 18, 1.5); rose.position.set(-5, 3, -5); gardenG.add(rose); }
-    const gardenSky = new T.Color(0xbfd8ee);
+    { const LM = (c, e) => new T.MeshLambertMaterial({ color: c, flatShading: true, emissive: e || 0x000000 }), marble = new T.MeshPhongMaterial({ color: 0xf2efe8, shininess: 40, flatShading: true, emissive: 0x2a2826 }), dummyG = new T.Object3D(), cG = new T.Color();
+      const flatDisc = (r, c, y, seg) => { const m = new T.Mesh(new T.CircleGeometry(r, seg || 40), new T.MeshLambertMaterial({ color: c, polygonOffset: true, polygonOffsetFactor: -1 })); m.rotation.x = -Math.PI / 2; m.position.y = y; m.receiveShadow = true; gardenG.add(m); return m; };
+      flatDisc(60, 0x6fa653, 0.002, 48);                                                     // the lawn, out to the horizon
+      for (let i = 0; i < 9; i++) { const st = new T.Mesh(new T.PlaneGeometry(26, 1.25), new T.MeshLambertMaterial({ color: 0x7db55f, polygonOffset: true, polygonOffsetFactor: -2 })); st.rotation.x = -Math.PI / 2; st.rotation.z = 0.785; st.position.set((i - 4) * 1.77, 0.004, -(i - 4) * 1.77); st.receiveShadow = true; gardenG.add(st); }       // mown stripes
+      { const path = new T.Mesh(new T.RingGeometry(8.5, 9.7, 48), new T.MeshLambertMaterial({ color: 0xe6dcc6, polygonOffset: true, polygonOffsetFactor: -3 })); path.rotation.x = -Math.PI / 2; path.position.y = 0.006; path.receiveShadow = true; gardenG.add(path); }       // a pale gravel walk round the lawn
+      { const pool = new T.Mesh(new T.CircleGeometry(1.25, 28), new T.MeshPhongMaterial({ color: 0x7fc4d8, shininess: 120, specular: 0xffffff, emissive: 0x1a3a48, polygonOffset: true, polygonOffsetFactor: -4 })); pool.rotation.x = -Math.PI / 2; pool.position.y = 0.008; gardenG.add(pool); const rim = new T.Mesh(new T.RingGeometry(1.25, 1.5, 28), new T.MeshLambertMaterial({ color: 0xf2efe8, polygonOffset: true, polygonOffsetFactor: -4 })); rim.rotation.x = -Math.PI / 2; rim.position.y = 0.009; gardenG.add(rim); }       // a lily pool, flush with the grass
+      // a low marble balustrade where the pit wall was, so the ground you can stand on still reads
+      for (let i = 0; i < 8; i++) { const a = V[i], b2 = V[(i + 1) % 8], mx = (a[0] + b2[0]) / 2, mz = (a[1] + b2[1]) / 2, dx = b2[0] - a[0], dz = b2[1] - a[1], L = Math.hypot(dx, dz), rot = -Math.atan2(dz, dx), near = mx + mz > 4;
+        const g = new T.Group(); g.position.set(mx * 1.04, 0, mz * 1.04); g.rotation.y = rot; gardenG.add(g); box(L, 0.16, 0.34, marble, 0, 0.08, 0, g); if (near) continue; box(L, 0.12, 0.3, marble, 0, 0.9, 0, g); const n = Math.floor(L / 0.42); for (let k = 0; k < n; k++) mesh(new T.CylinderGeometry(0.06, 0.09, 0.7, 6), marble, (k + 0.5) / n * L - L / 2, 0.5, 0, g); }
+      V.forEach((v, i) => { const x = v[0] * 1.05, z = v[1] * 1.05; box(0.5, x + z > 4 ? 0.3 : 1.15, 0.5, marble, x, x + z > 4 ? 0.15 : 0.575, z, gardenG); if (x + z <= 4) { mesh(new T.SphereGeometry(0.2, 8, 6), marble, x, 1.3, z, gardenG); } });
+      // flower beds along the far balustrade: thousands of blooms, a few shapes
+      const cols = [0xf7c6d8, 0xffffff, 0xf2a0c0, 0xffe2a8, 0xc9a6ff, 0xff8a8a, 0xfff3b0], N = 900, bloom = new T.InstancedMesh(new T.ConeGeometry(0.075, 0.17, 5), new T.MeshLambertMaterial({ flatShading: true, emissive: 0x201014 }), N), stem = new T.InstancedMesh(new T.CylinderGeometry(0.012, 0.012, 0.3, 3), LM(0x4f8a40), N);
+      for (let i = 0; i < N; i++) { let x, z; if (i < 520) { const a = R(0, 6.28), r = R(9.9, 12.6); x = Math.cos(a) * r; z = Math.sin(a) * r; if (x + z > 7) { x = -x; z = -z; } } else { const a = R(0, 6.28), r = R(1.7, 7.9); x = Math.cos(a) * r; z = Math.sin(a) * r; }
+        const h = i < 520 ? R(0.22, 0.5) : R(0.06, 0.14); dummyG.position.set(x, h, z); dummyG.rotation.set(Math.PI + R(-0.3, 0.3), R(0, 3), R(-0.3, 0.3)); dummyG.scale.setScalar(i < 520 ? R(0.9, 1.9) : R(0.5, 0.9)); dummyG.updateMatrix(); bloom.setMatrixAt(i, dummyG.matrix); cG.set(cols[Math.floor(R(0, cols.length))]); bloom.setColorAt(i, cG);
+        dummyG.position.set(x, h / 2, z); dummyG.rotation.set(0, 0, 0); dummyG.scale.set(1, h / 0.3, 1); dummyG.updateMatrix(); stem.setMatrixAt(i, dummyG.matrix); } gardenG.add(bloom, stem);
+      // clipped box hedges and topiary behind the beds
+      const hedgeM = LM(0x3f7a3a), hedgeD = LM(0x2f6230);
+      for (let i = 0; i < 20; i++) { const a = i / 20 * 6.2832, r = 13.4, x = Math.cos(a) * r, z = Math.sin(a) * r; if (x + z > 6) continue; const hb = box(3.9, 1.5, 1.1, i % 2 ? hedgeM : hedgeD, x, 0.75, z, gardenG); hb.rotation.y = -a + Math.PI / 2; if (i % 3 === 0) { mesh(new T.ConeGeometry(0.7, 1.9, 7), hedgeD, x * 0.94, 2.4, z * 0.94, gardenG); } else if (i % 3 === 1) { mesh(new T.IcosahedronGeometry(0.62, 1), hedgeM, x * 0.94, 2.1, z * 0.94, gardenG); } }
+      // blossom trees, close behind the hedge and standing off into the distance
+      const bark = LM(0x4a3424), leafM = [0xf4b8d0, 0xfbe4ee, 0xe890b4, 0xffffff].map(c => LM(c, 0x3a1420));
+      const tree = (x, z, h, sc) => { const tr = new T.Group(); tr.position.set(x, 0, z); tr.scale.setScalar(sc); gardenG.add(tr); const tk = mesh(new T.CylinderGeometry(0.16, 0.32, h, 6), bark, 0, h / 2, 0, tr); tk.rotation.z = R(-0.1, 0.1); for (let k = 0; k < 3; k++) { const br = mesh(new T.CylinderGeometry(0.05, 0.1, 1.6, 5), bark, R(-0.5, 0.5), h - 0.3, R(-0.5, 0.5), tr); br.rotation.set(R(-0.7, 0.7), 0, R(-0.7, 0.7)); } for (let k = 0; k < 7; k++) { const cn = mesh(new T.IcosahedronGeometry(R(1.1, 1.9), 0), leafM[Math.floor(R(0, 4))], R(-1.7, 1.7), h + R(-0.2, 1.8), R(-1.7, 1.7), tr); cn.scale.y = 0.72; } };
+      for (let i = 0; i < 46; i++) { const ring = i % 3, a = R(0, 6.28), r = 15.5 + ring * 5 + R(0, 3), x = Math.cos(a) * r, z = Math.sin(a) * r; if (x + z > 5) continue; tree(x, z, R(3.2, 5.4), 1 + ring * 0.25); }
+      // a marble rotunda on the far side, and two figures who have seen all of this before
+      { const g = new T.Group(); g.position.set(-10.6, 0, -10.6); g.rotation.y = 0.785; gardenG.add(g); mesh(new T.CylinderGeometry(2.6, 2.8, 0.3, 16), marble, 0, 0.15, 0, g); for (let k = 0; k < 8; k++) { const a = k * 0.785; mesh(new T.CylinderGeometry(0.16, 0.19, 3.4, 8), marble, Math.cos(a) * 2.2, 2.0, Math.sin(a) * 2.2, g); } mesh(new T.CylinderGeometry(2.7, 2.7, 0.3, 16), marble, 0, 3.85, 0, g); const dome = mesh(new T.SphereGeometry(2.5, 16, 8, 0, 6.2832, 0, 1.5708), marble, 0, 4.0, 0, g); mesh(new T.SphereGeometry(0.2, 8, 6), new T.MeshPhongMaterial({ color: 0xf0c95a, emissive: 0x5a3c08, shininess: 90 }), 0, 6.55, 0, g); }
+      [[-11.5, 1.5], [1.5, -11.5]].forEach((q, i) => { const g = new T.Group(); g.position.set(q[0], 0, q[1]); g.rotation.y = i ? 0 : 1.57; gardenG.add(g); box(0.8, 0.9, 0.8, marble, 0, 0.45, 0, g); mesh(new T.CylinderGeometry(0.2, 0.28, 1.1, 7), marble, 0, 1.45, 0, g); mesh(new T.SphereGeometry(0.19, 8, 6), marble, 0, 2.2, 0, g); const arm = box(0.12, 0.7, 0.12, marble, 0.28, 1.7, 0.1, g); arm.rotation.z = -0.5; });
+      // light: a high sun, a rose fill, and the white of a clear day
+      const sun = new T.PointLight(0xfff4d6, 70, 60, 1.1); sun.position.set(6, 16, 8); gardenG.add(sun); gardenG.add(new T.AmbientLight(0xf4f0ff, 1.15)); const rose = new T.PointLight(0xffb8d4, 18, 26, 1.4); rose.position.set(-7, 4, -7); gardenG.add(rose);
+      gfx.glow(0xfff6d8, 26, -22, 20, -22, gardenG, 0.55); }
+    const gardenSky = new T.Color(0xcfe6f6); const stash = v => pitSet.concat(lifeSet).forEach(o => { if (v) { if (o.userData._gv == null) o.userData._gv = o.visible; o.visible = false; } else if (o.userData._gv != null) { o.visible = o.userData._gv; o.userData._gv = null; } });
     let hypeNow = 0, life = null;
     const update = (t) => {
-      if (gardenG.visible && Math.random() < 0.5) { const a = R(0, 6.28), r = R(0, 9); gfx.emit(Math.cos(a) * r, R(3, 6), Math.sin(a) * r, R(-0.4, 0.4), -R(0.5, 1.1), R(-0.4, 0.4), 4, Math.random() < 0.5 ? 0xf7c6d8 : 0xffffff, 0); }
-      if (!life && W.arenaLife) life = W.arenaLife(s, AR, crowdSpots);
+      if (gardenG.visible) { if (Math.random() < 0.7) { const a = R(0, 6.28), r = R(0, 11); gfx.emit(Math.cos(a) * r, R(3, 7), Math.sin(a) * r, R(-0.5, 0.2), -R(0.4, 1.0), R(-0.5, 0.2), 5, Math.random() < 0.5 ? 0xf7c6d8 : 0xffffff, 0); } if (Math.random() < 0.08) { const a = R(0, 6.28), r = R(2, 9); gfx.emit(Math.cos(a) * r, R(0.4, 1.6), Math.sin(a) * r, R(-0.8, 0.8), R(-0.1, 0.4), R(-0.8, 0.8), 2.5, [0xffe27a, 0x9fd0ff, 0xff9ac0][Math.floor(R(0, 3))], 0); } }       // blossom coming down, and now and then a butterfly
+      if (!life && W.arenaLife) { const n0 = s.children.length; life = W.arenaLife(s, AR, crowdSpots); lifeSet = s.children.slice(n0); if (gardenG.visible) stash(true); }
       if (life) life(t, hypeNow);
       const amp = 0.03 + hypeNow * 0.2;
       for (let i = 0; i < n; i++) {
@@ -170,7 +189,7 @@
       if (hypeNow > 0.75 && n && Math.random() < 0.35) { const p = crowdSpots[Math.floor(Math.random() * n)]; gfx.emit(p[0], p[1] + 1, p[2], -p[0] * R(0.25, 0.5), R(2, 4), -p[2] * R(0.25, 0.5), 1.4, 0xffd36b, 9); }
     };
     update(0);
-    return { scene: s, update, remains: n => setRemains(n | 0), garden: v => { gardenG.visible = !!v; remG.visible = !v; bodies.visible = heads.visible = !v; s.background = v ? gardenSky : bg0; s.fog = v ? null : fog0; }, inGarden: () => gardenG.visible, cineWall: v => { cineG.visible = !!v && !gardenG.visible; }, setHype: h => { hypeNow = h; }, flash: new T.PointLight(0xffffff, 0, 14, 1.4) };
+    return { scene: s, update, remains: n => setRemains(n | 0), garden: v => { v = !!v; if (v === gardenG.visible) return; gardenG.visible = v; stash(v); s.background = v ? gardenSky : bg0; s.fog = v ? new T.Fog(0xcfe6f6, 84, 150) : fog0; }, inGarden: () => gardenG.visible, cineWall: v => { cineG.visible = !!v && !gardenG.visible; }, setHype: h => { hypeNow = h; }, flash: new T.PointLight(0xffffff, 0, 14, 1.4) };
   }
 
   W.get = function (name) {
