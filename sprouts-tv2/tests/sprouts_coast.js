@@ -252,13 +252,13 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await E(`init();live=true;state='play';dayT=30;home.res=[6,0,0,0,0,0];home.jobs=[3,1,0];for(let i=0;i<8;i++)mkBud(0,0,P.x,P.y);enterHome();mkRes();void 0`); await step(3);
   ok('four places inside: desk, beds, pantry, fire', await E(`HST.map(h=>h.id).join()==='desk,bed,pantry,fire'&&!homeAt()`));
   await E(`P.x=RX+150;P.y=RY+86;void 0`); await step(2); await tap('a');
-  ok('the beds offer a nap or the night', await E(`state==='hsel'&&hsel.opts.length===2`), await E('state')); await shot('house-beds');
+  ok("the beds offer a nap, the night, or Louie's morning", await E(`state==='hsel'&&hsel.opts.length===3`), await E('state')); await shot('house-beds');
   await tap('a'); ok('a nap wakes at dusk, still at home, and the soil has grown meanwhile', await E(`state==='play'&&inHome&&dayT>=DAYLEN*.62&&dayT<DAYLEN*.64&&sprouts.every(q=>q.age>100)`), await E('[dayT|0,inHome]'));
   await E(`dayT=30;P.x=RX+24;P.y=RY+20;void 0`); await step(2); await tap('a'); await tap('a'); await step(2);
   ok('with three pickers the pantry packs a lunch, once a day', await E(`tod.fed===1&&state==='play'`), await E('state'));
   ok('fed, a carried berry moves a quarter faster', await E(`(()=>{const sp=f=>{tod.fed=f;const it=mkItem('berry',30*16,24*16),b=mkBud(0,2,it.x,it.y);b.tgt=it;b.st='carry';it.on.push(b);const x0=it.x,y0=it.y;updItem(it,.1);const d=Math.hypot(it.x-x0,it.y-y0);it.alive=false;b.dead=true;return d};const a=sp(0),b=sp(1);tod.fed=1;buds=buds.filter(q=>!q.dead);return b>a*1.2&&b<a*1.3})()`));
   await E(`P.x=RX+14;P.y=RY+62;void 0`); await step(2); await tap('a');
-  ok('the fire tells the story so far and what is next', await E(`state==='hsel'&&hsel.sub.length>=2&&/^NEXT:/.test(hsel.sub[hsel.sub.length-1])&&hsel.sub.every(l=>wrapPx(l,226,1).length<=2)`), await E('hsel&&hsel.sub')); await shot('house-fire'); await tap('a');
+  ok('the fire tells the story so far and what is next', await E(`state==='hsel'&&hsel.sub.length>=2&&/^NEXT:/.test(hsel.sub[hsel.sub.length-1])&&hsel.sub.every(l=>wrapPx(l,226,1).length<=2)`), await E('hsel&&hsel.sub')); await shot('house-fire'); await tap('b');
   await E(`home.jobs=[1,0,0];buds.forEach(b=>b.stage=0);exitHome();newDay();void 0`); await step(3);
   ok('every two who rest send one of the crew out bloomed', (await E(`buds.filter(b=>b.stage===2).length`)) === 2, await E(`[homeTotal(),buds.filter(b=>b.stage===2).length]`));
 

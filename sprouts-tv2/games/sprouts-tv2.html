@@ -277,7 +277,7 @@ const SETROWS=['MUSIC','SOUND FX','VIEW','IMPORT A SAVE','RESET PULLS','ERASE EV
 /* CALM REWARDS. A toast is for a moment worth stopping for. Rank-ups, baskets, daily asks, rewards, orders and
    Louie's levels are kept as the day's news and read out in the evening report (a second page, ALSO TODAY).
    What happens overnight is told in one line with the morning greeting, not as a stack of pop-ups. */
-let mornQ=null;const toast=s=>{if(mornQ){mornQ.push(s);return}toasts.push({s,t:3.2})};
+let mornQ=null,rainT=0;const toast=s=>{if(mornQ){mornQ.push(s);return}toasts.push({s,t:3.2})};
 const news=s=>{if(typeof tod==='undefined'||!tod)return;(tod.news=tod.news||[]).push(s)};
 function carve(x,y,w,h,t=G){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)map[j*MW+i]=t;}
 function tileAt(px,py){const tx=px>>4,ty=py>>4;if(tx<0||ty<0||tx>=MW||ty>=MH)return TR;return map[ty*MW+tx];}
@@ -509,20 +509,21 @@ const wedHas=i=>{try{return !!WED[i][1]()}catch(e){return false}},wedN=()=>WED.f
 function wedObj(){return run.fin&&run.book&&!run.wed?{text:'THE WEDDING BOOK:  '+wedN()+' / '+WED.length,x:DOOR.x,y:DOOR.y,done:wedN()>=WED.length,col:'#c8a8f8'}:null}
 function wedOpen(){run.book=1;const n=wedN();hsel={title:'THE WEDDING BOOK',sub:WED.map((q,i)=>(wedHas(i)?'+ ':'- ')+q[0]+': '+(wedHas(i)?q[2]:q[3])),i:0,opts:[]};
  if(run.wed)hsel.opts.push(['SAVE THE DATE',"WHEN THE VALLEY CAN SPARE US. ERIN'S HANDWRITING",()=>{state='play'}]);
- else if(n>=WED.length)hsel.opts.push(['SET THE DATE','EVERY PAGE IS FILLED IN',()=>{state='play';exitHome();c3Play('book',()=>{run.wed=1;meta.tix+=3;earn(100);card={t:0,title:'SAVE THE DATE',sub:"The date is left open: when the valley can spare us. Three capsule tickets were tucked inside the cover.",art:()=>{r('#f8f0d8',96,52,48,40);r('#c8a8f8',96,52,48,6);r('#f85888',114,66,4,4);r('#f85888',122,66,4,4);r('#f85888',114,69,12,5);r('#f85888',116,74,8,3);r('#f85888',118,77,4,2)}};state='card';persist(true)})}]);
+ else if(n>=WED.length)hsel.opts.push(['SET THE DATE','EVERY PAGE IS FILLED IN',()=>{state='play';exitHome();c3Play('book',()=>{run.wed=1;meta.tix+=3;earn(100);card={t:0,sm:1,title:'SAVE THE DATE',sub:"The date is left open: when the valley can spare us. Three capsule tickets were tucked inside the cover.",art:()=>{r('#f8f0d8',96,52,48,40);r('#c8a8f8',96,52,48,6);r('#f85888',114,66,4,4);r('#f85888',122,66,4,4);r('#f85888',114,69,12,5);r('#f85888',116,74,8,3);r('#f85888',118,77,4,2)}};state='card';persist(true)})}]);
  hsel.opts.push(['CLOSE THE BOOK',n+' OF '+WED.length+' PAGES FILLED IN',()=>{state='play'}]);state='hsel'}
 /* EXPEDITIONS, a taste of them. Once both lights are lit, five sprouts who live in the house can be sent to carry the
    light down a road. They are gone two days and one stays out there to keep it. The rest come home with a postcard. */
-const EXPC=["They carried the light down the south road to a town with no lantern of its own. One stayed to keep it lit. The town sent back honey.","They reached the foot of the mountain. Something up there hums. They did not like it either. One stayed to watch it.","They found a meadow where the buddies had never seen a light. They sat and glowed until the buddies came close. One stayed.","They followed the Crooked River until it had another name. There was a mill with nobody in it. One stayed and lit the window."];
+const EXPC=["A town down the south road had no lantern of its own. One of them stayed to keep it lit.","They reached the foot of the mountain. Something up there hums. One stayed to watch it.","A far meadow where no buddy had seen a light. They glowed until the buddies came. One stayed.","They followed the Crooked River until it had another name. One stayed and lit a window there."];
 function expSend(){if(run.exp){flash='THEY ARE STILL OUT. BACK IN '+Math.max(1,run.exp.back-day)+(run.exp.back-day>1?' DAYS':' DAY');flashT=3;snd(140,.1);return}if(homeTotal()<5){flash='NEEDS 5 SPROUTS LIVING IN THE HOUSE';flashT=3;snd(140,.1);return}
  let n=5;const went=[];while(n>0){const t=home.res.findIndex(v=>v>0);if(t<0)break;home.res[t]--;went.push(t);n--}const J=home.jobs;let over=J[0]+J[1]+J[2]-homeTotal();for(let k=2;k>=0&&over>0;k--){const d=Math.min(J[k],over);J[k]-=d;over-=d}
  run.exp={back:day+2,t:went,n:(run.expN||0)};state='play';say('FIVE SPROUTS SET OUT WITH A LIGHT. BACK IN TWO DAYS',7);snd(523,.1);later(()=>snd(784,.25),120);persist(true)}
 function expBack(){const X=run.exp;if(!X||day<X.back)return;run.exp=null;run.expN=(run.expN||0)+1;X.t.slice(1).forEach(t=>{home.res[t]=(home.res[t]||0)+1});const tk=run.expN%2===0;earn(30);if(tk)meta.tix++;
- later(()=>{if(state==='play'){card={t:0,title:'A POSTCARD',sub:EXPC[X.n%EXPC.length]+'  +30'+(tk?' and a ticket.':'.'),art:()=>{r('#f8f0d8',90,50,60,40);r('#c8c0a8',90,50,60,1);r('#58c048',96,58,22,18);r('#88d0f8',96,58,22,8);r('#f8e060',104,60,4,4);r('#a33b2e',136,54,10,12);for(let k=0;k<3;k++)r('#a098b0',122,62+k*6,22,1)}};state='card'}},900);persist(true)}
+ later(()=>{if(state==='play'){card={t:0,sm:1,title:'A POSTCARD',sub:EXPC[X.n%EXPC.length]+'  +30'+(tk?' and a ticket.':'.'),art:()=>{r('#f8f0d8',90,50,60,40);r('#c8c0a8',90,50,60,1);r('#58c048',96,58,22,18);r('#88d0f8',96,58,22,8);r('#f8e060',104,60,4,4);r('#a33b2e',136,54,10,12);for(let k=0;k<3;k++)r('#a098b0',122,62+k*6,22,1)}};state='card'}},900);persist(true)}
 function homeUse(q){snd(440,.06,660);flashT=0;const J=home.jobs;
  if(q.id==='desk'){state='house';hi=0;return}
  if(q.id==='bed')hsel={title:'THE BEDS',sub:['A REST CHANGES THE HOUR, NOT THE VALLEY.'],i:0,opts:[['NAP UNTIL DUSK','FOR ALL THAT ONLY HAPPENS AFTER DARK',()=>{if(dayT>=DAYLEN*.62){flash='IT IS EVENING ALREADY';flashT=2.5;snd(140,.1);return}const d=DAYLEN*.62-dayT;dayT=DAYLEN*.62;for(const q2 of sprouts)q2.age+=d;state='play';say('YOU WAKE AS THE LIGHT GOES LOW',5);snd(330,.3,220,'triangle',.06)}],
-   ['SLEEP UNTIL MORNING','STRAIGHT TO THE EVENING REPORT',()=>{exitHome();state='play';dayT=DAYLEN-.01}]]};
+   ['SLEEP UNTIL MORNING','STRAIGHT TO THE EVENING REPORT',()=>{exitHome();state='play';dayT=DAYLEN-.01}],
+   ["LOUIE'S MORNING",'SLEEP, AND WAKE A MINUTE EARLY AS LOUIE',()=>{run.louNext=1;exitHome();state='play';dayT=DAYLEN-.01}]]};
  else if(q.id==='pantry')hsel={title:'THE PANTRY',sub:['BERRY PICKERS LIVING HERE:  '+J[0],J[0]?'THEY LEAVE '+J[0]+' NEW '+(J[0]===1?'SPROUT':'SPROUTS')+' IN THE SOIL EACH MORNING.':'MOVE SPROUTS IN AT THE DESK AND MAKE THEM PICKERS.'],i:0,opts:[['PACK A LUNCH',tod.fed?'PACKED. THE CREW HAULS FASTER UNTIL NIGHTFALL':J[0]>=3?'ONCE A DAY: THE CREW HAULS A QUARTER FASTER':'NEEDS 3 BERRY PICKERS LIVING HERE',()=>{if(tod.fed){flash='ALREADY PACKED TODAY';flashT=2.5;snd(140,.1)}else if(J[0]<3){flash='NEEDS 3 BERRY PICKERS LIVING HERE';flashT=2.5;snd(140,.1)}else{tod.fed=1;state='play';toast('PACKED LUNCH: THE CREW HAULS FASTER TODAY');snd(660,.08,990);later(()=>snd(990,.15),90);persist()}}]]};
  else{hsel={title:'BY THE FIRE',sub:storySoFar(),i:0,opts:[['THE WEDDING BOOK',wedN()+' OF '+WED.length+' PAGES FILLED IN',wedOpen]]};if(run.fin)hsel.opts.push(['SEND AN EXPEDITION',run.exp?'FIVE ARE OUT WITH A LIGHT':'FIVE WHO LIVE HERE CARRY THE LIGHT DOWN A ROAD',expSend]);hsel.opts.push(['BACK TO IT','LOUIE STAYS A MOMENT LONGER',()=>{state='play'}])}
  state='hsel'}
@@ -611,7 +612,7 @@ const NOTES=[
  ['THE JOB',()=>!!run.leak,"The leak Flow Pros were rung about was the North Light's oil line. No name, no number. 'Just a light on the line,' Derek says. He fixed it. It is up to code."],
  ['THERE SHE IS',()=>!!run.lit,"She stepped into the lens and the North Light opened its eye. She was its last flame. The light that calls keepers had gone dark, so she walked the roads and called them herself. Three of them came."],
  ['BESSIE',()=>!!run.lit,"Something very old lives in the lake. Marcus named her before anyone could stop him. She only wanted to say hello."],
- ['A LIGHT THAT RESTS',()=>!!run.rest,"Three nights, then the North Light banked down to an ember. Ranger says that is what it does once it has been answered. It is not out. It is waiting until it is needed."],
+ ['AT REST',()=>!!run.rest,"Three nights, then the North Light banked down to an ember. Ranger says that is what it does once it has been answered. It is not out. It is waiting until it is needed."],
  ['THE MOUNTAIN',()=>!!run.fin,"Thornback says there was a third thing. Under the mountain. It hummed. That is all he will say. New notebook. I am going to need boots."]];
 let notePg=0;const noteHas=i=>{try{return !!NOTES[i][1]()}catch(e){return false}},notesHave=()=>NOTES.filter((q,i)=>noteHas(i)).length;
 function talk(n,met){if(n.name==='ERIN'&&gard.open&&inGarden(P.x,P.y)&&dayT/DAYLEN>.66&&!inHome&&!msDone(n)&&egg('moon'))return;if(n.name==='ERIN'&&n.st==='active'&&n.ms[n.mi].id==='e6'&&n.ms[n.mi].get()>=n.ms[n.mi].goal&&!run.keyScn&&!inHome){run.keyScn=1;c3Play('key',()=>talk(n));return}if(n.name==='MARCUS'&&n.st==='new'&&!met&&!inHome){c3Play('van',()=>talk(n,1));return}const wasNew=n.st==='new',L=[],M=n.ms,offer=m=>{if(m.bet)run.bet={d:day,b:tod.berries};L.push(m.late&&m.get()>=m.goal?m.late:m.say);if(m.key||m.garden)run.meet=0; /* a story step keeps the arrow */if(m.wake)wakeGrubs();if(m.garden)openGarden(true);if(m.key)keySpawn()};
@@ -665,7 +666,8 @@ const menuItems=()=>(live?['CONTINUE','NEW GAME']:['PLAY']).concat(['REWARDS','C
    belonging to another cartridge is touched (Rootdeep's unlocks and the Lantern's own tickets are kept). */
 let wipeI=0,wipeArm=0;
 function wipeAll(){const keep={mus:meta.mus,sfx:meta.sfx,view:meta.view|0};meta=fixMeta(keep);SAVE={t:0,meta,run:null};live=false;applyLook(meta.eq);init();persist(true);state='menu';mi=0;flash='SPROUTS IS BRAND NEW AGAIN';flashT=4;snd(330,.3,110,'triangle',.08)}
-function update(dt){
+function update(dt){if(LOUM&&state==='play'){const K=Object.assign({},keys);for(const k in keys)if(k!=='start')keys[k]=0;try{update0(dt)}finally{for(const k in K)keys[k]=K[k]}if(LOUM&&state==='play')loumTick(dt,K);return}update0(dt)}
+function update0(dt){if(state==='photo'){photoUpdate(dt);return}
  time+=dt;musTick(dt);if(msgT>0&&!toasts.length)msgT-=dt;sndT-=dt;if(flashT>0)flashT-=dt;
  if(toasts.length){toasts[0].t-=dt*(toasts.length>2?2:1);if(toasts[0].t<=0)toasts.shift()}
  if(TRN){TRN.t+=dt;if(!TRN.done&&TRN.t>=.3){TRN.done=true;TRN.fn()}if(TRN.t>=.68)TRN=null;return}
@@ -736,6 +738,7 @@ function update(dt){
  case 'win':if(pressed('a')||pressed('start')){state='play';persist(true)}return;
  }
  if(pressed('start')){persist(true);state='pause';pi=0;return;}
+ if(pressed('y')&&!inHome&&!LOUM){photoOpen();return}
  if(sceneQ.length){const q=sceneQ.shift();playScene(q[0],q[1]);return}
  dayT+=dt;saveT+=dt;if(saveT>6){saveT=0;persist()}
  if(!tod.raid&&dayT>DAYLEN*.72&&!inHome)raidStart();
@@ -782,7 +785,7 @@ function update(dt){
  if(keys.a){if(pressed('a')){doA(true);aT=.24;aN=0}else{aT-=dt;if(aT<=0){doA(false);aN++;aT=Math.max(.09,.2-aN*.02)}}}
  if(state!=='play')return;
  if(keys.b){wr=Math.min(48,(wr||8)+dt*110);call(cur.x,cur.y,wr);call(P.x,P.y,18);if(sndT<=0){snd(700+wr*9,.06);sndT=.08}}else wr=0;
- for(const s of sprouts)s.age+=dt;
+ for(const s of sprouts)s.age+=dt*(tod.rain&&inSoil(s)?1.5:1);if(tod.rain&&(rainT-=dt)<=0){rainT=.55;noise(.6,.025,5200,'highpass')}
  squad.forEach((b,i)=>b.si=i);
  for(const b of buds)updBud(b,dt);
  for(const e of foes)if(e.alive)updFoe(e,dt);
@@ -796,7 +799,7 @@ function update(dt){
  for(const p of parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;if(!p.gh)p.vy+=60*dt;}
  parts=parts.filter(p=>p.life>0);
  if(inHome){cam.x=RX+88-W/2;cam.y=RY+42-H/2;return}
- const tx=P.x+P.dx*22-VW/2,ty=P.y+P.dy*16-VH/2,kk=Math.min(1,dt*5);cam.x+=(tx-cam.x)*kk;cam.y+=(ty-cam.y)*kk;
+ const tx=(LOUM?LO.x:P.x+P.dx*22)-VW/2,ty=(LOUM?LO.y:P.y+P.dy*16)-VH/2,kk=Math.min(1,dt*5);cam.x+=(tx-cam.x)*kk;cam.y+=(ty-cam.y)*kk;
  cam.x=Math.max(0,Math.min(MW*16-VW,cam.x));cam.y=Math.max(0,Math.min(MH*16-VH,cam.y));
 }
 let seeds=[],aN=0,ambS=4,rushN=0,rushT=-99;
@@ -877,7 +880,8 @@ function updBud(b,dt){
  }
 }
 function updPlot(p,dt){
- if(p.st>=1&&p.st<=3&&!p.dry){p.t-=dt;if(p.t<=0){p.st++;p.dry=p.st<4}}
+ if(tod.rain&&p.dry&&p.st>=1&&p.st<=3)p.dry=false;
+ if(p.st>=1&&p.st<=3&&!p.dry){p.t-=dt;if(p.t<=0){p.st++;p.dry=p.st<4&&!tod.rain}}
  if(!p.on.length)return;
  if(!needs(p)){p.on.slice().forEach(b=>{b.tgt=null;b.z=0;b.st='tend';b.t=.4});p.on.length=0;return}
  p.prog+=dt*p.on.reduce((a,b)=>a+(b.type===4?3:b.type===2?2.5:1),0);
@@ -899,6 +903,34 @@ function updBug(q,dt){const s=BUGS[q.sp];if(s.dusk&&dayT/DAYLEN<.6){q.hid=true;r
  if(vx)q.fx=vx>0?1:-1;
  if(s.fly){const lim=s.rng+(th&&!s.water?26:0);q.x=Math.max(q.hx-lim,Math.min(q.hx+lim,q.x+vx*dt));q.y=Math.max(q.hy-lim,Math.min(q.hy+lim,q.y+vy*dt));}
  else moveEnt(q,vx*dt,vy*dt,2,false);}
+/* LOUIE BY HAND. Used by a second player (couch co-op) and by Louie's morning. He walks where he is steered. A barks:
+   grubs near him stop for a moment, strays near him hop on his back, and a buried sparkle gets a little shallower.
+   B digs up a berry where he stands (once every 18 seconds). Riders hop off when he gets back to Will. With no
+   input for five seconds he goes back to looking after himself. */
+const LOK={up:0,down:0,left:0,right:0,a:0,b:0};let louMan=0,lokA=0,lokB=0,louCd=0,louDigCd=0;
+function louBark(){const l=LO;bark();l.alert=.8;spSay('WOOF!',1);for(const e of foes)if(e.alive&&!e.boss&&d2(e,l.x,l.y)<64*64){e.scare=2.5;if(!e.raid)e.st='wander'}
+ let n=0;for(const q of buds)if(q.st==='idle'&&!q.gard&&l.riders.length<8&&d2(q,l.x,l.y)<54*54){q.st='ride';q.tgt=null;l.riders.push(q);n++}if(n)spSay(n>1?'HOP ON, ALL '+n+'!':'HOP ON!',1.6);
+ const s=run.spark;if(s&&d2(l,s.x,s.y)<28*28&&s.hp>2){s.hp=Math.max(2,s.hp-3);puff(s.x,s.y,'#a87850',4,28)}if(LOUM)loumBark()}
+function louManual(dt){const l=LO,lv=louLv(),mx=LOK.right-LOK.left,my=LOK.down-LOK.up;louCd-=dt;louDigCd-=dt;if(l.st==='fetch'||l.st==='bring'){l.st='follow';l.path=null}
+ if(mx||my){const k=1/Math.hypot(mx,my),sp=(LOUM?116:104)*dt;moveEnt(l,mx*k*sp,my*k*sp,3,lv>=4);l.mv=true;if(mx)l.fx=mx>0?1:-1;if(l.st==='sit')l.st='follow'}l.sx=l.x;l.sy=l.y;
+ const A=LOK.a&&!lokA,B=LOK.b&&!lokB;lokA=LOK.a;lokB=LOK.b;if(A&&louCd<=0){louCd=.7;louBark()}
+ if(B&&!LOUM){if(louDigCd>0)spSay('...',.8);else{louDigCd=18;l.st='dig';l.t=0;l.dt=1.3}}
+ if(l.riders.length&&!LOUM&&d2(l,P.x,P.y)<30*30&&free(l.x,l.y,false)){l.riders.forEach((b,i)=>{b.st='follow';b.z=0;b.x=l.x+((i%3)-1)*5;b.y=l.y+4;if(!free(b.x,b.y,false)){b.x=l.x;b.y=l.y}});const n=l.riders.length;l.riders=[];bark();louXP(2*n);spSay(n>1?'BROUGHT '+n+'!':'BROUGHT ONE!')}}
+/* LOUIE'S MORNING. Chosen at the beds. The next day starts a minute early, with Louie: six snacks hidden around the
+   Lantern Field to sniff out, and a squirrel that will not hold still. Will sleeps through it. */
+let LOUM=null;const SQSPOTS=[[23,16],[33,21],[22,24],[34,16],[27,25],[31,16]];
+function loumStart(){const sn=[];for(let k=0;k<300&&sn.length<6;k++){const tx=21+((Math.random()*14)|0),ty=15+((Math.random()*11)|0),x=tx*16+8,y=ty*16+8;if(map[ty*MW+tx]===G&&d2({x,y},HX,HY)>44*44&&d2({x,y},DOOR.x,DOOR.y)>40*40&&!sn.some(q=>d2(q,x,y)<44*44))sn.push({x,y,got:0})}
+ LOUM={t:70,sn,got:0,sq:{x:SQSPOTS[0][0]*16+8,y:SQSPOTS[0][1]*16+8,i:0,cd:0,runs:0,treed:0}};LO.riders=[];LO.st='follow';LO.x=LO.sx=DOOR.x+6;LO.y=LO.sy=DOOR.y+20;P.x=DOOR.x-12;P.y=DOOR.y+18;P.dx=0;P.dy=1;
+ buds.forEach((b,i)=>{if(!b.gard){b.st='follow';b.x=P.x-10+(i%5)*5;b.y=P.y+6+((i/5)|0)*4}});trail=[];say('LOUIE IS UP BEFORE ANYONE. SNIFF OUT SIX SNACKS. A BARKS',8);bark()}
+function loumBark(){const M=LOUM,s=M.sq;if(!s.treed&&d2(LO,s.x,s.y)<70*70){if(s.runs>=3){s.treed=1;floatAt(s.x,s.y-18,'TREED IT!','#f8a060');puff(s.x,s.y-10,'#58c048',10,40);snd(1200,.08,1800)}else floatAt(s.x,s.y-14,'CHK CHK!','#c89050')}}
+function loumTick(dt,K){const M=LOUM,l=LO;for(const k in LOK)LOK[k]=K[k]|0;louMan=1;M.t-=dt;
+ for(const q of M.sn)if(!q.got&&d2(l,q.x,q.y)<13*13){q.got=1;M.got++;floatAt(q.x,q.y-12,'CHOMP  '+M.got+' / 6','#f8a060');snd(700,.06,1000);hearts(l.x,l.y)}
+ const s=M.sq;s.cd-=dt;if(!s.treed&&s.cd<=0&&d2(l,s.x,s.y)<40*40){s.cd=1.2;s.runs++;let b=s.i,bd=-1;SQSPOTS.forEach((q,i)=>{const d=d2(l,q[0]*16+8,q[1]*16+8);if(i!==s.i&&d>bd){bd=d;b=i}});s.i=b;puff(s.x,s.y-4,'#c89050',4,30);s.x=SQSPOTS[b][0]*16+8;s.y=SQSPOTS[b][1]*16+8;snd(1500,.04,2000)}
+ if(M.t<=0||(M.got>=6&&(s.treed||M.t<55)))loumEnd()}
+function loumEnd(){const M=LOUM;if(!M)return;LOUM=null;louMan=0;for(const k in LOK)LOK[k]=0;louXP(6+M.got*2+(M.sq.treed?6:0));earn(M.got*3);meta.life.loum=(meta.life.loum||0)+1;LO.x=LO.sx=P.x+18;LO.y=LO.sy=P.y+2;LO.st='follow';
+ say('WILL IS UP. LOUIE FOUND '+M.got+' OF 6 SNACKS'+(M.sq.treed?' AND TREED THE SQUIRREL':'')+'.  +'+M.got*3,8);snd(660,.08);later(()=>snd(990,.2),90);if(M.got>=6&&M.sq.treed)news('LOUIE HAD A PERFECT MORNING');persist()}
+function drawSnack(q){const x=Math.round(q.x-ox),y=Math.round(q.y-oy)-2+(((time*3+q.x)|0)%2);r('rgba(0,0,0,.25)',x-4,y+4,8,2);r('#281c30',x-5,y-1,10,5);r('#f8f0d8',x-4,y,8,3);r('#281c30',x-6,y-2,3,3);r('#f8f0d8',x-5,y-1,2,2);r('#281c30',x+3,y-2,3,3);r('#f8f0d8',x+3,y-1,2,2);r('#281c30',x-6,y+2,3,3);r('#f8f0d8',x-5,y+2,2,2);r('#281c30',x+3,y+2,3,3);r('#f8f0d8',x+3,y+2,2,2)}
+function drawSquirrel(s){if(s.treed)return;const x=Math.round(s.x-ox),y=Math.round(s.y-oy)-(((time*8)|0)%2),k='#281c30';r('rgba(0,0,0,.25)',x-4,y+1,8,2);r(k,x+1,y-9,6,8);r('#c87838',x+2,y-8,4,6);r('#e8a868',x+3,y-7,2,3);r(k,x-5,y-6,7,7);r('#a05828',x-4,y-5,5,5);r(k,x-6,y-9,5,5);r('#a05828',x-5,y-8,3,3);r(k,x-5,y-7,1,1);r('#e8c8a0',x-3,y-3,2,2)}
 function updLouie(dt){const l=LO,lv=louLv();if(l.say)l.say.t-=dt;l.mv=false;l.cd-=dt;l.bark-=dt;l.alert-=dt;
  l.riders=(l.riders||[]).filter(b=>!b.dead&&b.st==='ride');l.riders.forEach((b,i)=>{b.x=l.x+((i%3)-1)*4;b.y=l.y+1;b.z=9+((i/3)|0)*5;b.fx=l.fx});
  const walk=sp=>{const p=l.path&&l.path[0];if(!p)return true;const dx=p.x-l.x,dy=p.y-l.y,d=Math.hypot(dx,dy),m=sp*dt;if(d<=m+1){l.x=p.x;l.y=p.y;l.path.shift()}else{l.x+=dx/d*m;l.y+=dy/d*m}l.mv=true;if(Math.abs(dx)>1)l.fx=dx>0?1:-1;return !l.path.length};
@@ -907,7 +939,8 @@ function updLouie(dt){const l=LO,lv=louLv();if(l.say)l.say.t-=dt;l.mv=false;l.cd
    got.forEach(q=>{q.st='ride';q.tgt=null;l.riders.push(q)});bark();louXP(3*got.length);l.st='bring';l.rt=0;l.path=null}return}
  if(l.st==='bring'){if(!l.riders.length){l.st='follow';l.sx=l.x;l.sy=l.y;return}l.rt-=dt;if(l.rt<=0||!l.path||!l.path.length){l.rt=.8;l.path=pathTo(l.x,l.y,P.x,P.y,true)||[{x:P.x,y:P.y}]}
   walk(118+lv*8);if(d2(l,P.x,P.y)<30*30&&free(l.x,l.y,false)){l.riders.forEach((b,i)=>{b.st='follow';b.z=0;b.x=l.x+((i%3)-1)*5;b.y=l.y+4;if(!free(b.x,b.y,false)){b.x=l.x;b.y=l.y}});const n=l.riders.length;l.riders=[];l.st='follow';l.sx=l.x;l.sy=l.y;bark();spSay(n>1?'FOUND '+n+'!':'FOUND ONE!')}return}
- if(d2(l,P.x,P.y)>230*230){l.x=P.x+(free(P.x+20,P.y,false)?20:free(P.x-20,P.y,false)?-20:0);l.y=P.y+(l.x===P.x?10:2);l.sx=l.x;l.sy=l.y;l.st='follow'}
+ if(!LOUM&&d2(l,P.x,P.y)>230*230){l.x=P.x+(free(P.x+20,P.y,false)?20:free(P.x-20,P.y,false)?-20:0);l.y=P.y+(l.x===P.x?10:2);l.sx=l.x;l.sy=l.y;l.st='follow'}
+ if(louMan>0&&l.st!=='dig'){louMan-=dt;louManual(dt);return} /* a second player, or Louie's morning */
  if(l.st==='sit'){l.t-=dt;if(l.t<=0)l.st='follow';return}
  if(l.st==='dig'){if(l.t>0){const d=go(l,l.tx,l.ty,95,dt,false,3);l.tt+=dt;if(d<5||l.tt>3){l.t=0;l.dt=1.4}}
   else{l.dt-=dt;l.mv=true;if(Math.random()<dt*10)puff(l.x,l.y,'#a87850',1,30);if(l.dt<=0){mkItem(lv>=2&&Math.random()<.25?'big':'berry',l.x,l.y+2);spSay('BERRY!');bark();louXP(2);
@@ -928,7 +961,12 @@ function fling(e,b,stun){const a=R(0,6.28),dd=e.r+R(8,16),nx=e.x+Math.cos(a)*dd,
    at it stop it like any grub. Thornback, once he lives by the Lantern, sees the first one off. It is the one thing in
    the valley that can be lost for good, and it is small: a handful of seedlings, never the crew. */
 const RAIDSPOTS=[[34,24],[34,22],[33,25]];
-function raidN(){return !run.grubs||day<3?0:Math.min(3,1+((day-3)>>1))}
+/* WEATHER. From the third day about one day in five is a rain day (the same days in every game). Rain waters the garden's
+   beds by itself, seedlings in the Lantern's soil grow half again as fast, snails and frogs come out, and the night grubs
+   stay in. Ranger gives the forecast in the evening report. */
+const wxOf=d=>d>=3&&hsh(d,11,5)<.22?'rain':'clear';
+function drawRain(){if(!tod.rain||inHome)return;r('rgba(50,70,120,.17)',0,0,TVW,H);for(let i=0;i<46;i++){const x=((i*53+time*150)%(TVW+40))-20,y=(i*37+time*420)%H;r('rgba(200,220,255,.45)',Math.round(x),Math.round(y),1,5)}}
+function raidN(){return !run.grubs||day<3||tod.rain?0:Math.min(3,1+((day-3)>>1))}
 function raidStart(){tod.raid=1;let n=raidN();if(!n)return;if(run.boss){n--;later(()=>{floatAt(THORN.x,THORN.y-34,'THORNBACK: NOT TONIGHT.','#f07878');snd(110,.3,80,'sine',.3)},1200)}
  for(let k=0;k<n;k++){const q=RAIDSPOTS[k],e=mkFoe(q[0]*16+8,q[1]*16+8,false);e.raid=1;e.t=0;e.rx=-24+k*24}
  if(n){const T=run.tips=run.tips||{};say(T.rd?'GRUBS ARE MAKING FOR THE SOIL':'GRUBS COME OUT AT DUSK AND MAKE FOR THE SOIL. THEY EAT SEEDLINGS. THROW SPROUTS AT THEM',T.rd?5:9);T.rd=1;bark()}tod.raidN=raidN()}
@@ -998,8 +1036,8 @@ function updGate(ga,dt){const n=ga.on.length;if(!n)return;ga.hp-=n*dt;if(sndT<=0
 function endDay(){raidSleep();foes.forEach(e=>{if(e.raid)e.alive=false});if(tod.raidN){if(tod.eaten)news('GRUBS GOT '+tod.eaten+(tod.eaten===1?' SEEDLING':' SEEDLINGS')+' IN THE NIGHT');else{earn(5);news('THE SOIL WAS KEPT SAFE FROM THE GRUBS  +5')}}
  tod.strays=buds.filter(b=>!b.gard&&b.st!=='follow'&&b.st!=='park'&&d2(b,HX,HY)>150*150).length;if(tod.strays)louXP(Math.min(6,tod.strays));buds.forEach(b=>{if(!b.gard){b.tgt=null;b.z=0}});[...foes,...items,...gates,...bugs,DIG].forEach(o=>o.on.length=0);
  if(tod.berries>=6&&tod.berries>(meta.best||0)){meta.best=tod.berries;tod.best=1}
- const bonus=5+Math.min(15,tod.berries)+Math.min(15,tod.flowers*2)+(tod.best?5:0);tod.bonus=bonus;earn(bonus);{const N=[];if(tod.bask)N.push('GARDEN BASKETS  +'+tod.bask);if(tod.ord)N.push("ERIN'S ORDERS FILLED: "+tod.ord+'  +'+tod.ordp);if(tod.dq)N.push('DAILY ASKS DONE: '+tod.dq+'  +'+tod.dq*8);tod.news=N.concat(tod.news||[])}tod.pg=0;state='dayend';snd(330,.5,110,'triangle',.08);}
-function newDay(){mornQ=[];try{newDay0()}finally{const q=mornQ;mornQ=null;tod.morn=q;say('DAY '+day+'. GOOD MORNING, WILL!'+(q.length?'   '+q.slice(0,4).join('   ·   ')+(q.length>4?'   ·   AND '+(q.length-4)+' MORE':''):''),q.length?9:4)}}
+ const bonus=5+Math.min(15,tod.berries)+Math.min(15,tod.flowers*2)+(tod.best?5:0);tod.bonus=bonus;earn(bonus);{const N=[];if(tod.bask)N.push('GARDEN BASKETS  +'+tod.bask);if(tod.ord)N.push("ERIN'S ORDERS FILLED: "+tod.ord+'  +'+tod.ordp);if(tod.dq)N.push('DAILY ASKS DONE: '+tod.dq+'  +'+tod.dq*8);if(wxOf(day+1)==='rain')N.push('RANGER: RAIN TOMORROW. STAY ON THE DIRT');tod.news=N.concat(tod.news||[])}tod.pg=0;state='dayend';snd(330,.5,110,'triangle',.08);}
+function newDay(){mornQ=[];try{newDay0()}finally{if(run.louNext){run.louNext=0;later(loumStart,50)}const q=mornQ;mornQ=null;tod.morn=q;say('DAY '+day+'. GOOD MORNING, WILL!'+(q.length?'   '+q.slice(0,4).join('   ·   ')+(q.length>4?'   ·   AND '+(q.length-4)+' MORE':''):''),q.length?9:4)}}
 function newDay0(){if(run.fin&&!run.rest&&day+1>=(run.finDay||day)+3){run.rest=1;later(()=>toast('THE NORTH LIGHT HAS BANKED DOWN TO AN EMBER. IT RESTS'),600)}if(run.bet&&!run.bet.won)run.bet={d:day+1,b:0};
  mkWbuds();inHome=false;parked=[];day++;dayT=0;duskSaid=false;wr=0;tod={berries:0,flowers:0,bugs:0,spooked:0};P.x=HX;P.y=HY+22;P.dx=0;P.dy=1;P.stun=0;P.pluck=0;trail=[];parts=[];
  LO.x=LO.sx=P.x-22;LO.y=LO.sy=P.y+4;LO.st='follow';
@@ -1010,7 +1048,7 @@ function newDay0(){if(run.fin&&!run.rest&&day+1>=(run.finDay||day)+3){run.rest=1
   if(J[2])louXP(J[2]*2);if(made||J[1]){toast('HOME:'+(made?'  +'+made+' SPROUTS':'')+(J[1]?'  +'+J[1]*2+' PETALS':''));if(J[1])earn(J[1]*2)}}
  if(!buds.length&&!sprouts.length){for(let i=0;i<3;i++){const [x,y]=soilSpot();mkSprout(0,x,y,8)}}
  {const n=wildRegrow();const T=run.tips=run.tips||{};if(n&&!T.wr){T.wr=1;toast('WILD SPROUTS GROW BACK WHERE YOU FOUND THEM')}}
- newSpark();pjMorning();expBack();
+ newSpark();pjMorning();expBack();if(wxOf(day)==='rain'){tod.rain=1;toast('RAIN TODAY: THE GARDEN WATERS ITSELF');[[1,30,25],[1,24,21],[9,33,23]].forEach(([sp,x,y])=>mkBug(sp,x*16+8,y*16+8))}
  cam.x=P.x-VW/2;cam.y=P.y-VH/2;state='play';snd(440,.1,880);persist(true);}
 
 /* ---------- menus, the Sproutwild way: slate background, a header band, tiles with icons ---------- */
@@ -1577,7 +1615,7 @@ function drawWorld0(){
  for(const ga of gates)if(ga.alive&&ga.sub<2){const T=TYPES[ga.sub],x=Math.round(ga.x-ox)-3,y=Math.round(ga.y-oy)-24+Math.round(Math.sin(time*3)*1.5);r('#181020',x-2,y-2,11,11);r('#f8f0d8',x-1,y-1,9,9);r(T.d,x,y,7,7);r(T.c,x+1,y+1,5,5);r('#181020',x+2,y+3,1,2);r('#181020',x+4,y+3,1,2);r('#181020',x+2,y+9,3,1);r('#181020',x+3,y+10,1,1)}
  LO.pet=petOK&&state==='play';
  const L=[],vh=Math.ceil(H/Z),see=(q,m=28)=>q.x>ox-m&&q.x<ox+VW+m&&q.y>oy-m&&q.y<oy+vh+m+16; /* only what is on screen (and a little round it) is drawn */
- for(const s of sprouts)if(see(s,12))L.push([s.y,drawSprout,s]);for(const q of seeds)L.push([q.ty,drawSeed,q]);for(const q of wbuds)if(!q.hid&&see(q))L.push([q.y,drawWbud,q]);if(see(KEEP,40))L.push([KEEP.y,drawKeep]);L.push([NLIGHT.y,drawNLight]);if(vanHere())L.push([VAN.y,drawVan2D]);GLIM.forEach((q,i)=>{if(!(run.gl&&run.gl[i])&&see(q,12))L.push([q.y,drawGlim,q])});if(run.seen&&run.seen['NORTH COAST'])L.push([BESS.y,drawBessie]);for(const it of items)if(it.alive&&see(it,34))L.push([it.y+1,drawItem,it]);
+ for(const s of sprouts)if(see(s,12))L.push([s.y,drawSprout,s]);for(const q of seeds)L.push([q.ty,drawSeed,q]);for(const q of wbuds)if(!q.hid&&see(q))L.push([q.y,drawWbud,q]);if(see(KEEP,40))L.push([KEEP.y,drawKeep]);L.push([NLIGHT.y,drawNLight]);if(vanHere())L.push([VAN.y,drawVan2D]);if(LOUM){LOUM.sn.forEach(q=>{if(!q.got&&see(q,12))L.push([q.y,drawSnack,q])});L.push([LOUM.sq.y,drawSquirrel,LOUM.sq])}GLIM.forEach((q,i)=>{if(!(run.gl&&run.gl[i])&&see(q,12))L.push([q.y,drawGlim,q])});if(run.seen&&run.seen['NORTH COAST'])L.push([BESS.y,drawBessie]);for(const it of items)if(it.alive&&see(it,34))L.push([it.y+1,drawItem,it]);
  for(const e of foes)if(e.alive&&see(e,40))L.push([e.y,drawFoe,e]);for(const b of buds)if(see(b,22))L.push([b.y+(b.st==='fight'?4:0),drawBud,b]);
  for(const q of bugs)if(q.alive&&see(q,20))L.push([q.y,drawBug,q]);for(const n of npcs)if(see(n,90))L.push([n.y,drawNPC,n]);
  if(gard.open){noGard=!buds.some(b=>b.gard);if(ox+VW>620&&ox<850&&oy<190){for(const p of plots)L.push([p.y-2,drawBed,p]);L.push([7*16+12,drawBasket]);L.push([SIGN.y,drawSign])}}
@@ -1592,7 +1630,7 @@ function drawWorld0(){
   [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b])=>{r('#181020',x+a*q-1,y+b*q-1,3,3);r(c,x+a*q,y+b*q,1,1);r(c,x+a*q-a,y+b*q,1,1);r(c,x+a*q,y+b*q-b,1,1)});
   if(wr>0)for(let i=0;i<16;i++){const a=i/16*6.283+time*5;r(i%2?'#ffffff':'#f8e060',Math.round(x+Math.cos(a)*wr),Math.round(y+Math.sin(a)*wr),2,2)}}
  drawAmb();
- g.restore();SCW=TVW;drawNight();drawFloats();
+ g.restore();SCW=TVW;drawNight();drawRain();drawFloats();
 }
 function box(x,y,w,h,c='rgba(24,16,32,.82)'){r(c,x,y,w,h);}
 const wrapHint=s=>wrapPx(s,TVW-16,1).slice(0,3);
@@ -1610,7 +1648,8 @@ function drawHUD(){
  if(zoneT>0&&state==='play'&&!inHome){const a=Math.min(1,zoneT*2,(2.2-zoneT)*4);const zn=zName(zone),zw=tw(zn,3)+22,zy=Math.round(H*.25);g.globalAlpha=a;r('rgba(24,16,32,.82)',Math.round((W-zw)/2),zy-3,zw,21);r('#f8e060',Math.round((W-zw)/2),zy+16,zw,2);ctext(zn,zy,3,'#fff8c0','#403010');g.globalAlpha=1}
  HR();const tot=buds.filter(b=>!b.gard).length+' / '+capNow(),tw2=tw(tot);box(W-tw2-8,y,tw2+6,15);text(tot,W-tw2-5,y+1,2,'#c8f0a0');HE();
  let my=20;
- if(OBJ&&!inHome){const w=tw(OBJ.text)+12;box(Math.round((W-w)/2),my,w,15,'rgba(24,16,32,.88)');r(OBJ.done?'#a8f080':OBJ.col,Math.round((W-w)/2),my,3,15);ctext(OBJ.text,my+1,2,OBJ.done?'#a8f080':'#ffffff');my+=17;
+ if(LOUM){const M=LOUM,s2="LOUIE'S MORNING   "+Math.max(0,Math.ceil(M.t))+'   SNACKS '+M.got+' / 6',w=tw(s2)+12;box(Math.round((W-w)/2),my,w,15,'rgba(24,16,32,.88)');r('#f8a060',Math.round((W-w)/2),my,3,15);ctext(s2,my+1,2,'#ffffff');my+=17;HL();const zx=Math.round((P.x-ox)*Z),zy=Math.round((P.y-oy)*Z);text('z',zx+6,zy-24-((time*4)|0)%4,2,'#b0c8f8');text('Z',zx+12,zy-34-((time*4)|0)%4,2,'#b0c8f8');HE()}
+ else if(OBJ&&!inHome){const w=tw(OBJ.text)+12;box(Math.round((W-w)/2),my,w,15,'rgba(24,16,32,.88)');r(OBJ.done?'#a8f080':OBJ.col,Math.round((W-w)/2),my,3,15);ctext(OBJ.text,my+1,2,OBJ.done?'#a8f080':'#ffffff');my+=17;
   const tx=(OBJ.x-ox)*Z,ty=(OBJ.y-oy)*Z,col=OBJ.done?'#a8f080':'#f8e060',on=tx>10&&tx<TVW-10&&ty>44&&ty<H-24;
   if(state==='play'&&!inHome){HL();if(!on){const cx=TVW/2,cy=H/2,a=Math.atan2(ty-cy,tx-cx),k=Math.min((TVW/2-14)/Math.abs(Math.cos(a)||1e-6),(H/2-36)/Math.abs(Math.sin(a)||1e-6)),p=1+Math.sin(time*6)*2;
     g.save();g.translate(Math.round(cx+Math.cos(a)*(k+p)),Math.round(cy+6+Math.sin(a)*(k+p)));g.rotate(a);g.fillStyle='#181020';g.beginPath();g.moveTo(9,0);g.lineTo(-6,-8);g.lineTo(-6,8);g.fill();g.fillStyle=col;g.beginPath();g.moveTo(6,0);g.lineTo(-4,-5);g.lineTo(-4,5);g.fill();g.restore()}
@@ -1840,7 +1879,7 @@ function drawCine(){const t=cineT,i=cineI,e=scn[i],art=e[1],sx=ox,sy=oy,hh=H-74,
  const ls=wrapPx(e[0],214),n=Math.floor(t*38);let c=0;ls.slice(0,4).forEach((l,k)=>{text(l.slice(0,Math.max(0,n-c)),12,H-66+k*15,2,'#281c30',null);c+=l.length+1});
  if(n>=e[0].length&&((time*3)|0)%2){r('#c02848',224,H-14,5,3);r('#c02848',225,H-11,3,1);r('#c02848',226,H-10,1,1)}
  rtext('START: SKIP',236,3,1,dark?'#8090c8':'#a87048',null);text((i+1)+' / '+scn.length,5,3,1,dark?'#8090c8':'#a87048',null);ox=sx;oy=sy;}
-function draw(){if(state.slice(0,2)==='tv'){UIX=0;tvDraw();return}g.save();g.translate(UX,0);UIX=UX;try{draw0()}finally{g.restore();UIX=0}}
+function draw(){if(state.slice(0,2)==='tv'){UIX=0;tvDraw();return}if(state==='photo'){UIX=0;c3PhotoDraw();return}g.save();g.translate(UX,0);UIX=UX;try{draw0()}finally{g.restore();UIX=0}}
 function draw0(){
  const OY=(H-160)/2;
  if(state==='cine'){g.save();g.beginPath();g.rect(0,0,W,H);g.clip();const u=UIX;UIX=0;try{drawCine()}finally{UIX=u;g.restore()}tvEdges();return}
@@ -1916,7 +1955,7 @@ function draw0(){
   h.opts.forEach((o,i)=>{mTile(8,y+i*16,224,14,i===h.i);text(o[0],14,y+i*16+1,2,i===h.i?'#281c30':'#ffffff',null)});mFoot(132);ctext(flashT>0?flash:h.opts[h.i][1],135,1,flashT>0?'#f8a060':'#fff8c0');ctext('A: CHOOSE      B: LEAVE',147,1,'#a098b0')}
  else if(state==='build')drawPjBuild();
  else if(state==='travel'){mHead('TRAIL POST');ctext('WHERE TO, WILL?',28,2,'#c8c0d8');drawList(tlist.map(z=>zName(z[0])),ti,48,15,6);ctext('A: GO      B: STAY',146,2,'#a098b0');}
- else if(state==='card'){const ls=wrapPx(card.sub,168,2),k=Math.min(1,card.t*5);r('#181020',28,28,184,112);r('#f8f0d8',29,29,182,110);r('#f8e060',29,29,182,18);ctext(card.title,31,2,'#281c30',null);g.save();g.translate(120,74);g.scale(k,k);g.translate(-120,-74);r('#c8e8a0',84,50,72,46);{const sx=ox,sy=oy;ox=oy=0;card.art();ox=sx;oy=sy}g.restore();ls.slice(0,3).forEach((l,i)=>ctext(l,99+i*13,2,'#281c30',null));if(card.t>.45&&((time*2)|0)%2)ctext('A: OK',144,2,'#f8e060')}
+ else if(state==='card'){const sm=!!card.sm,ls=wrapPx(card.sub,sm?172:168,sm?1:2),k=Math.min(1,card.t*5); /* card.sm: a longer note in the small print (postcards) */r('#181020',28,28,184,112);r('#f8f0d8',29,29,182,110);r('#f8e060',29,29,182,18);ctext(card.title,31,2,'#281c30',null);g.save();g.translate(120,74);g.scale(k,k);g.translate(-120,-74);r('#c8e8a0',84,50,72,46);{const sx=ox,sy=oy;ox=oy=0;card.art();ox=sx;oy=sy}g.restore();ls.slice(0,sm?5:3).forEach((l,i)=>ctext(l,(sm?98:99)+i*(sm?9:13),sm?1:2,'#281c30',null));if(card.t>.45&&((time*2)|0)%2)ctext('A: OK',144,2,'#f8e060')}
  else if(state==='pause')drawPauseMenu();
  else if(state==='guide')spDrawGuide();
  else if(state==='dayend'&&tod.pg){ctext('ALSO TODAY',6,4,'#b0c8f8');const N=tod.news,mx=10,sh=N.slice(0,N.length>mx?mx-1:mx);sh.forEach((l,i)=>ctext(l,34+i*11,/^KEEPER RANK|^LOUIE/.test(l)?2:1,/^KEEPER RANK/.test(l)?'#f8e060':/^LOUIE/.test(l)?'#f8a060':/^REWARD/.test(l)?'#a8f080':'#e8e4f5'));if(N.length>sh.length)ctext('AND '+(N.length-sh.length)+' MORE',34+sh.length*11,1,'#a098b0');if(((time*2)|0)%2)ctext('A: SLEEP',147,2,'#a8f080')}
@@ -2680,17 +2719,54 @@ function c3TitleDraw(t){const q={key:'title',S:[C3TITLE],i:0,t,tt:t,cue:{},sched
  if(t>2.6){text('NORTH COAST STUDIOS',6,TVH-12,1,'#a098b0','#181020');rtext('F: FULL SCREEN',TVW-6,TVH-12,1,'#a098b0','#181020')}}
 
 
+/* ---------- 9. photo mode ----------
+   The valley where Will is standing, drawn by the same renderer as the scenes. A place on the 2D map is put at
+   ((x-HX)/16, (y-HY)/16) in the 3D valley, which was modelled on that map: the Lantern is the middle of both. */
+function c3PhotoScene(t){const q=PH,at=o=>[(o.x-HX)/16,(o.y-HY)/16],w=at(P),gy=c3G(w[0],w[1]),f=dayT/DAYLEN,night=f>.72,L=won?1.9:.35+shards*.35;
+ c3Cam(w[0]+Math.cos(q.a)*q.d,gy+q.h,w[1]+Math.sin(q.a)*q.d,w[0],gy+1,w[1],56);
+ if(night){c3Env('night');c3Moon(-.5,.42,-.75,13,'#e8ecff');c3Lamp(0,3.1,0,'#ffd890',7.5,2.3*Math.min(1.4,L));c3Lamp(6.2,1,-3.6,'#ffd890',2.2,.7)}else{c3Env(f<.12?'dawn':f>.6?'dusk':'day');c3Lamp(0,3.1,0,'#ffd890',5,.5)}
+ c3Lantern(night?L:.3+shards*.15,shards,{force:1});c3House(6.2,-5.4,-.5,night?1:0);c3Soil();if(run.call){c3Tower(run.lit&&!run.rest?1.4:0);if(!coastGate('northPier').alive)c3Pier(7)}if(run.keep)c3Arch(0,t);
+ const wave=q.wave?2.5+Math.sin(t*8)*.3:0,face=o=>Math.atan2(P.x-o.x,P.y-o.y);
+ c3Person(w[0],w[1],Math.atan2(Math.cos(q.a),Math.sin(q.a)),Object.assign(c3Look(),{arm:wave}));{const d=at(LO);c3Dog(d[0],d[1],face(LO),{sit:1,up:.2})}
+ buds.filter(b=>!b.gard&&d2(b,P.x,P.y)<150*150).slice(0,36).forEach((b,i)=>{const d=at(b);c3Sprout(d[0],d[1],b.type,{stage:b.stage,ang:face(b),hop:q.wave?Math.abs(Math.sin(t*7+i))*.22:0})});
+ const LK={ERIN:C3ERIN,RANGER:C3RANG,SCOUT:C3SCOUT,MARCUS:C3MARC};for(const n of npcs)if(d2(n,P.x,P.y)<260*260){const d=at(n);c3Person(d[0],d[1],face(n),Object.assign({},LK[n.name]||{},{arm:q.wave?2.4+Math.sin(t*7+d[0])*.3:0}))}
+ if(run.boss&&d2(THORN,P.x,P.y)<300*300){const d=at(THORN);c3Thorn(d[0],d[1],face(THORN),{t,up:1})}
+ if(vanHere()&&d2(VAN,P.x,P.y)<300*300){const d=at(VAN);c3Van(0,0,t,{pos:[d[0],d[1],1.2]})}}
+const C3PHOTO={d:1e9,cap:['',''],f(t){c3PhotoScene(t)}};
+function c3PhotoDraw(){const q=PH;if(!q)return;const fq={key:'photo',S:[C3PHOTO],i:0,t:q.t,tt:q.t,cue:{},sched:[],flash:0,tear:0,shake:0,label:null},was=c3q;c3q=fq;try{c3Frame(fq,0,TVH)}finally{c3q=was}
+ g.imageSmoothingEnabled=true;g.drawImage(c3cv,0,0,c3W,TVH,0,0,TVW,TVH);g.imageSmoothingEnabled=false;
+ if(q.snap){q.snap=0;photoSave()} /* the picture is saved before anything is written over it */
+ if(q.fl>0)r('rgba(255,255,255,'+Math.min(1,q.fl).toFixed(2)+')',0,0,TVW,TVH);
+ r('rgba(12,10,18,.7)',0,TVH-13,TVW,13);const s1='SELECT: WAVE     A: SAVE     B: BACK';text(s1,Math.max(3,Math.round((TVW-tw(s1,1))/2)),TVH-11,1,'#e8e4f5',null);
+ if(!q.n&&q.t<6)text('THE PAD TURNS AND LIFTS THE CAMERA',4,4,1,'#e8e4f5','#181020');
+ if(q.n&&q.fl<=0&&q.t%4<2.5){const s2=q.n+(q.n===1?' PICTURE':' PICTURES')+' SAVED TO YOUR DOWNLOADS';text(s2,Math.round((TVW-tw(s2,1))/2),4,1,'#a8f080','#181020')}}
+
 /* a screen drawn only in the 240 column has its first and last column of pixels stretched out to the screen's edges:
    skies, ground and boxes that reach the column's edge carry on to the edge of the television */
 function tvEdges(){const w=UX*K,h=cv.height;g.save();g.setTransform(1,0,0,1,0,0);g.imageSmoothingEnabled=false;try{g.drawImage(cv,w,0,1,h,0,0,w,h);g.drawImage(cv,cv.width-w-1,0,1,h,cv.width-w,0,w,h)}catch(e){}g.restore()}
+/* ---------- PHOTO MODE ----------
+   Y (V on the keyboard) in the valley. The 3D renderer draws the place Will is standing, with Louie, the crew and
+   anyone near, at the hour it is. Left and right turn the camera, up and down raise it, Select makes everyone wave,
+   A saves the picture as a PNG at the screen's own resolution, B goes back. */
+let PH=null;
+function photoOpen(){PH={a:Math.atan2(P.dy||1,P.dx||0)+.5,h:1.6,d:5.5,wave:0,snap:0,fl:0,t:0,n:0};state='photo';snd(880,.05,1320)}
+function photoUpdate(dt){const q=PH;q.t+=dt;if(q.fl>0)q.fl-=dt*2.5;const tr=(keys.right?1:0)-(keys.left?1:0),up=(keys.up?1:0)-(keys.down?1:0);q.a+=tr*dt*1.6;q.h=Math.max(.5,Math.min(9,q.h+up*dt*3));q.d=Math.max(3.5,Math.min(11,5.5+(q.h-1.6)*.6));
+ if(pressed('sel')){q.wave=q.wave?0:1;snd(520,.04)}if(pressed('a')&&q.fl<=0){q.snap=1}if(pressed('b')||pressed('start')||pressed('y')){state='play';PH=null}}
+function photoSave(){const q=PH;q.fl=1;q.n++;meta.life.photos=(meta.life.photos||0)+1;snd(1800,.03,900,'square',.05);later(()=>noise(.08,.2,2600),40);
+ try{cv.toBlob(b=>{if(!b)return;const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='sprouts-day'+day+'-'+meta.life.photos+'.png';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)},'image/png')}catch(e){}save()}
 /* ---------- TV: controller ----------
    Any standard gamepad. Left stick or d-pad moves; A (bottom) acts, B (right) calls; X, Y, the shoulders and Back swap
    the sprout kind; Start pauses. Only changes are written into keys, so the keyboard keeps working beside it. */
-const PADK={},PADMAP=[[0,'a'],[1,'b'],[2,'sel'],[3,'sel'],[4,'sel'],[5,'sel'],[8,'sel'],[9,'start'],[12,'up'],[13,'down'],[14,'left'],[15,'right']];let padSeen=false;
-function padPoll(){let ps;try{ps=navigator.getGamepads?navigator.getGamepads():[]}catch(e){return}const now={};
- for(const gp of ps){if(!gp||!gp.connected)continue;for(const [b,k] of PADMAP)if(gp.buttons[b]&&(gp.buttons[b].pressed||gp.buttons[b].value>.5))now[k]=1;
-  const ax=gp.axes[0]||0,ay=gp.axes[1]||0;if(Math.hypot(ax,ay)>.45){const a=Math.round(Math.atan2(ay,ax)/(Math.PI/4)),v=DIRS[a]||[0,0];if(v[0]>0)now.right=1;if(v[0]<0)now.left=1;if(v[1]>0)now.down=1;if(v[1]<0)now.up=1}}
- for(const k in keys){const v=now[k]?1:0;if(v!==(PADK[k]|0)){PADK[k]=v;keys[k]=v;if(v){padSeen=true;unlock();tvAwake()}}}}
+const PADK={},PADMAP=[[0,'a'],[1,'b'],[2,'sel'],[3,'y'],[4,'sel'],[5,'sel'],[8,'sel'],[9,'start'],[12,'up'],[13,'down'],[14,'left'],[15,'right']];let padSeen=false;
+function padRead(gp){const now={};for(const [b,k] of PADMAP)if(gp.buttons[b]&&(gp.buttons[b].pressed||gp.buttons[b].value>.5))now[k]=1;
+ const ax=gp.axes[0]||0,ay=gp.axes[1]||0;if(Math.hypot(ax,ay)>.45){const a=Math.round(Math.atan2(ay,ax)/(Math.PI/4)),v=DIRS[a]||[0,0];if(v[0]>0)now.right=1;if(v[0]<0)now.left=1;if(v[1]>0)now.down=1;if(v[1]<0)now.up=1}return now}
+/* COUCH CO-OP. The first controller is Will. A second controller (or the number pad) is Louie: see louManual. */
+const P2KEY={Numpad8:'up',Numpad2:'down',Numpad5:'down',Numpad4:'left',Numpad6:'right',Numpad0:'a',NumpadEnter:'a',NumpadAdd:'b'},P2K={};
+addEventListener('keydown',e=>{const k=P2KEY[e.code];if(k){P2K[k]=1;e.preventDefault()}});addEventListener('keyup',e=>{const k=P2KEY[e.code];if(k)P2K[k]=0});
+function padPoll(){let ps;try{ps=navigator.getGamepads?navigator.getGamepads():[]}catch(e){return}const pads=[];for(const gp of ps)if(gp&&gp.connected)pads.push(gp);
+ const now=pads[0]?padRead(pads[0]):{};for(const k in keys){const v=now[k]?1:0;if(v!==(PADK[k]|0)){PADK[k]=v;keys[k]=v;if(v){padSeen=true;unlock();tvAwake()}}}
+ if(LOUM)return;const two=pads[1]?padRead(pads[1]):{};let any=0;for(const k in LOK){const v=two[k]||P2K[k]?1:0;LOK[k]=v;any|=v}
+ if(any&&state==='play'&&!inHome){if(louMan<=0&&!meta.p2){meta.p2=1;toast('PLAYER 2 IS LOUIE:  STICK MOVES   A BARKS   B DIGS')}louMan=5}}
 /* the pointer hides after a few still seconds; F or a double click goes full screen */
 let tvIdleT=0;function tvAwake(){tvIdleT=0;document.body.classList.remove('idle')}
 addEventListener('mousemove',tvAwake);addEventListener('keydown',e=>{if(e.key==='f'||e.key==='F')tvFull()});addEventListener('dblclick',tvFull);
@@ -2707,7 +2783,7 @@ function tvUpdate(dt){tvT+=dt;tvIdleT+=dt;if(tvIdleT>3)document.body.classList.a
  if(state==='tvtitle'){if(tvT>1.2&&(pressed('a')||pressed('start'))){snd(660,.08,990);later(()=>snd(990,.2),90);state='menu';mi=0}}}
 function tvDraw(){
  if(state==='tv0'){r('#07060c',0,0,TVW,TVH);g.save();g.translate(UX,0);UIX=UX;const cx=120,cy=Math.round(H*.36),L=(c,x,y,w,h)=>r(c,cx+x*3,cy+y*3,w*3,h*3),d='#2a2238';L(d,-5,-9,10,2);L(d,-3,-11,6,2);L(d,-4,-7,8,10);L('#141020',-3,-6,6,8);L(d,-5,3,10,2);L(d,-4,5,8,1);
-  if(((time*1.6)|0)%2)ctext('PRESS ANY BUTTON',cy+50,2,'#c8c0d8',null);ctext('CONTROLLER:  STICK MOVE   A ACT   B CALL   X SWAP   START PAUSE',H-36,1,'#787090',null);ctext('KEYBOARD:  ARROWS MOVE   Z ACT   X CALL   SHIFT SWAP   ENTER PAUSE',H-25,1,'#787090',null);ctext('F: FULL SCREEN',H-12,1,'#585070',null);g.restore();UIX=0;return}
+  if(((time*1.6)|0)%2)ctext('PRESS ANY BUTTON',cy+50,2,'#c8c0d8',null);ctext('CONTROLLER:  STICK MOVE   A ACT   B CALL   X SWAP   START PAUSE',H-36,1,'#787090',null);ctext('KEYBOARD:  ARROWS MOVE   Z ACT   X CALL   SHIFT SWAP   ENTER PAUSE',H-25,1,'#787090',null);ctext('Y OR V: PHOTO MODE        A SECOND CONTROLLER PLAYS LOUIE',H-47,1,'#787090',null);ctext('F: FULL SCREEN',H-12,1,'#585070',null);g.restore();UIX=0;return}
  if(state==='tvpwr'){g.save();g.translate(UX,0);UIX=UX;try{pwrDraw()}finally{g.restore();UIX=0}return}
  c3TitleDraw(tvT)}
 /* ---------- loop ---------- */

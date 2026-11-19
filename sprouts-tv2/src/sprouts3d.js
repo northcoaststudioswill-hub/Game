@@ -747,3 +747,25 @@ function c3TitleDraw(t){const q={key:'title',S:[C3TITLE],i:0,t,tt:t,cue:{},sched
  if(t>2.6&&((t*1.6)|0)%2){const s3=padSeen?'PRESS START':'PRESS ENTER',w3=tw(s3,3);text(s3,Math.round((TVW-w3)/2),TVH-44,3,'#ffffff','#181020')}
  if(t>2.6){text('NORTH COAST STUDIOS',6,TVH-12,1,'#a098b0','#181020');rtext('F: FULL SCREEN',TVW-6,TVH-12,1,'#a098b0','#181020')}}
 
+
+/* ---------- 9. photo mode ----------
+   The valley where Will is standing, drawn by the same renderer as the scenes. A place on the 2D map is put at
+   ((x-HX)/16, (y-HY)/16) in the 3D valley, which was modelled on that map: the Lantern is the middle of both. */
+function c3PhotoScene(t){const q=PH,at=o=>[(o.x-HX)/16,(o.y-HY)/16],w=at(P),gy=c3G(w[0],w[1]),f=dayT/DAYLEN,night=f>.72,L=won?1.9:.35+shards*.35;
+ c3Cam(w[0]+Math.cos(q.a)*q.d,gy+q.h,w[1]+Math.sin(q.a)*q.d,w[0],gy+1,w[1],56);
+ if(night){c3Env('night');c3Moon(-.5,.42,-.75,13,'#e8ecff');c3Lamp(0,3.1,0,'#ffd890',7.5,2.3*Math.min(1.4,L));c3Lamp(6.2,1,-3.6,'#ffd890',2.2,.7)}else{c3Env(f<.12?'dawn':f>.6?'dusk':'day');c3Lamp(0,3.1,0,'#ffd890',5,.5)}
+ c3Lantern(night?L:.3+shards*.15,shards,{force:1});c3House(6.2,-5.4,-.5,night?1:0);c3Soil();if(run.call){c3Tower(run.lit&&!run.rest?1.4:0);if(!coastGate('northPier').alive)c3Pier(7)}if(run.keep)c3Arch(0,t);
+ const wave=q.wave?2.5+Math.sin(t*8)*.3:0,face=o=>Math.atan2(P.x-o.x,P.y-o.y);
+ c3Person(w[0],w[1],Math.atan2(Math.cos(q.a),Math.sin(q.a)),Object.assign(c3Look(),{arm:wave}));{const d=at(LO);c3Dog(d[0],d[1],face(LO),{sit:1,up:.2})}
+ buds.filter(b=>!b.gard&&d2(b,P.x,P.y)<150*150).slice(0,36).forEach((b,i)=>{const d=at(b);c3Sprout(d[0],d[1],b.type,{stage:b.stage,ang:face(b),hop:q.wave?Math.abs(Math.sin(t*7+i))*.22:0})});
+ const LK={ERIN:C3ERIN,RANGER:C3RANG,SCOUT:C3SCOUT,MARCUS:C3MARC};for(const n of npcs)if(d2(n,P.x,P.y)<260*260){const d=at(n);c3Person(d[0],d[1],face(n),Object.assign({},LK[n.name]||{},{arm:q.wave?2.4+Math.sin(t*7+d[0])*.3:0}))}
+ if(run.boss&&d2(THORN,P.x,P.y)<300*300){const d=at(THORN);c3Thorn(d[0],d[1],face(THORN),{t,up:1})}
+ if(vanHere()&&d2(VAN,P.x,P.y)<300*300){const d=at(VAN);c3Van(0,0,t,{pos:[d[0],d[1],1.2]})}}
+const C3PHOTO={d:1e9,cap:['',''],f(t){c3PhotoScene(t)}};
+function c3PhotoDraw(){const q=PH;if(!q)return;const fq={key:'photo',S:[C3PHOTO],i:0,t:q.t,tt:q.t,cue:{},sched:[],flash:0,tear:0,shake:0,label:null},was=c3q;c3q=fq;try{c3Frame(fq,0,TVH)}finally{c3q=was}
+ g.imageSmoothingEnabled=true;g.drawImage(c3cv,0,0,c3W,TVH,0,0,TVW,TVH);g.imageSmoothingEnabled=false;
+ if(q.snap){q.snap=0;photoSave()} /* the picture is saved before anything is written over it */
+ if(q.fl>0)r('rgba(255,255,255,'+Math.min(1,q.fl).toFixed(2)+')',0,0,TVW,TVH);
+ r('rgba(12,10,18,.7)',0,TVH-13,TVW,13);const s1='SELECT: WAVE     A: SAVE     B: BACK';text(s1,Math.max(3,Math.round((TVW-tw(s1,1))/2)),TVH-11,1,'#e8e4f5',null);
+ if(!q.n&&q.t<6)text('THE PAD TURNS AND LIFTS THE CAMERA',4,4,1,'#e8e4f5','#181020');
+ if(q.n&&q.fl<=0&&q.t%4<2.5){const s2=q.n+(q.n===1?' PICTURE':' PICTURES')+' SAVED TO YOUR DOWNLOADS';text(s2,Math.round((TVW-tw(s2,1))/2),4,1,'#a8f080','#181020')}}
