@@ -1,5 +1,28 @@
 # SOOTBORN — changelog
 
+## v0.21 · 2026-11-18 — more story and more scenes in the newer chapters
+From play notes: keep improving the cutscenes, especially the new ones; more detail, more story.
+
+**Four new illustrated scenes**
+- **Row K**: Mara's room. A lamp, a table, a cot, a plant in a can, and the shelf with the tins on it. One tin at first, two after Day 4, and at the very end Kael standing in it, taller.
+- **Freight Three**: the shutter, crates, the floor grating with light under it, and a cold crate breathing mist. It opens on greens.
+- **The dock stair**: night above the weather, guards with lamps at the top, the barges drifting away, and Brand alone on the steps with a halberd. Then only the halberd.
+- **In the weather**: a cloud sea at dusk with the stolen barges hidden in it, and then a deck with the Unlit lined up on it learning to fly.
+
+**New people**
+- **Sable** finally appears (she was named four times and never shown). She runs Freight Three and decides what nobody saw arrive. The cold crates are greens from the surface, marked for the Spire kitchens; four in forty reach Nell's ward.
+- **Wren Halloran**, the one Accredited engineer who asks why. Kael teaches her to put her hand on the pipe in Day 4. In Part Two she half-recognises him on the Spire, and in the end she brings eleven engineers and the Array schematics to the Unlit.
+
+**New story beats**
+- *Day 3*: Mara and Ivo argue leash against door before he goes up; Tavi asks him to find out whether the sun is yellow. When he comes down Tavi asks, and he either lies to a child for the first time or says nothing and nods.
+- *Day 4*: Wren; Sable; and a goodbye to Tavi that Tavi does not know is one.
+- *Part Two, The Post*: he cannot sleep under a sky; Wren at his desk.
+- *The Balancing*: Marshal Cade comes to his desk the morning after Riser Nine, forty lines short, and asks him what he would look for.
+- *Two Years*: Brand's last stand is now told and shown. He was the Warden who struck Hollis for humming at Seren's commitment; he had been waiting eight years for a stair. Tavi arrives: "You got tall." "You got old." Kael keeps the promise seven years late. Wren arrives.
+- *The Count*: Kael's words before the stair. After the square, he goes home to Row K; Mara does not get up; he opens the empty tin with his name on it, puts the washer inside, and sets it back beside Seren's.
+
+**Checked:** every expanded chapter walks through with no errors. Not read or played by a person.
+
 ## v0.20 · 2026-11-18 — character models and lighting
 From play notes: the fighting is good; the graphics and character models need to improve.
 

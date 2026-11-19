@@ -148,6 +148,47 @@ const PANELS = {
     for (const [x, y] of [[118, 34], [150, 28], [176, 36], [200, 44], [132, 42]]) R(g, x, y, 3, 2, '#c8c0c0');
     if (st >= 1) { const a = Math.min(1, s / 1.2); R(g, 132, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); R(g, 172, 82, 20, 5, `rgba(255,120,40,${.5 * a})`); glow(g, 142, 84, 14, '255,140,50', .5 * a); glow(g, 182, 84, 14, '255,140,50', .5 * a); }
   },
+  // ---- Row K: Mara's room and the shelf (0: one tin · 1: two · 2: he comes home · 3: with Tavi)
+  row(g, t, st, s) {
+    const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#1a1214'); for (let y = 0; y < 130; y += 9) for (let x = (y / 9 % 2) * 12; x < 320; x += 24) R(g, x, y, 23, 8, (x * 3 + y) % 5 ? '#241a1c' : '#2a1e20'); R(g, 0, 130, 320, 50, '#2e2220'); for (let x = 0; x < 320; x += 26) R(g, x, 130, 1, 50, '#221816'); R(g, 0, 130, 320, 1, '#4a3830');
+    const fl = .8 + Math.sin(t * 9) * .05 + Math.sin(t * 3.7) * .05; R(g, 44, 36, 3, 20, '#3a3028'); R(g, 38, 56, 15, 10, '#5a4a30'); R(g, 41, 58, 9, 6, `rgba(255,190,90,${fl})`); glow(g, 45, 60, 80 * fl, '255,170,80', .22); glow(g, 45, 60, 20, '255,210,120', .6 * fl);
+    R(g, 190, 62, 96, 4, '#5a4030'); R(g, 190, 66, 96, 2, '#3a2a1c'); R(g, 196, 68, 3, 10, '#3a2a1c'); R(g, 278, 68, 3, 10, '#3a2a1c');
+    const tin = (x, a) => { g.globalAlpha = a; R(g, x, 48, 20, 14, '#8a8e96'); R(g, x, 48, 20, 2, '#b0b4bc'); R(g, x + 7, 52, 6, 6, '#6a6e76'); R(g, x + 9, 54, 2, 2, '#e8c25a'); R(g, x, 61, 20, 1, '#5a5e66'); g.globalAlpha = 1; };
+    tin(204, 1); if (st >= 1) tin(238, st === 1 ? Math.min(1, s / 1.4) : 1); R(g, 268, 52, 8, 10, '#3a5a3a'); R(g, 270, 46, 1, 6, '#5a8a4a'); R(g, 273, 48, 1, 4, '#5a8a4a');
+    R(g, 96, 112, 90, 6, '#5a4030'); R(g, 96, 118, 90, 3, '#3a2a1c'); R(g, 102, 121, 5, 30, '#3a2a1c'); R(g, 175, 121, 5, 30, '#3a2a1c'); R(g, 130, 106, 10, 6, '#c8c0b0'); R(g, 150, 108, 8, 4, '#8a6a4a');
+    R(g, 10, 96, 60, 34, '#3a2e30'); R(g, 10, 96, 60, 5, '#5a4a4c'); R(g, 12, 102, 22, 8, '#c8c0b0');
+    PX.spr(g, World.sheetFor('mara'), 3, 86, 150, 3); if (st >= 3 || st === 0) PX.spr(g, World.sheetFor('tavi'), 2, 214, 152, 2.6);
+    if (st === 2 || st === 3) PX.spr(g, World.sheetFor('kael2'), 2, 176, 152, 2.6); else if (st < 2 && st >= 0 && s >= 0) { if (st === 0) PX.spr(g, World.sheetFor('kael'), 2, 176, 150, 3); }
+    if (st === 0) plate(g, 'ROW K', 160, 168);
+  },
+  // ---- Freight Three: where things arrive that are on no manifest (0: Sable · 1: the cold crate open)
+  freight(g, t, st, s) {
+    const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#0c0e12'); PX.plates(g, '#1c2028'); R(g, 0, 132, 320, 48, '#14181e'); R(g, 0, 132, 320, 1, '#2e3640');
+    R(g, 90, 20, 140, 112, '#2a3038'); for (let y = 24; y < 130; y += 8) { R(g, 94, y, 132, 6, '#3a424c'); R(g, 94, y, 132, 1, '#4e5864'); } R(g, 86, 16, 148, 5, '#e8b23a'); for (let x = 90; x < 230; x += 16) R(g, x, 16, 8, 5, '#1a1c20'); plate(g, 'FREIGHT 3', 160, 10);
+    for (const [x, y, w, h, c] of [[22, 100, 34, 32, '#5a4a30'], [44, 76, 30, 26, '#4a3e2a'], [250, 104, 40, 28, '#5a4a30'], [262, 82, 30, 24, '#4a3e2a']]) { R(g, x, y, w, h, c); R(g, x, y, w, 2, '#7a6644'); R(g, x + 3, y + h / 2 - 1, w - 6, 2, '#3a3020'); }
+    R(g, 140, 136, 44, 22, '#0a0c10'); for (let x = 142; x < 184; x += 6) R(g, x, 136, 2, 22, '#2e3640'); glow(g, 162, 150, 30, '255,170,80', .25 + Math.sin(t * 3) * .05);
+    R(g, 196, 108, 36, 24, '#8aa4b4'); R(g, 196, 108, 36, 3, '#b8d0dc'); R(g, 200, 114, 28, 1, '#5a7484'); for (let i = 0; i < 8; i++) { const ph = (t * .3 + i * .125) % 1; R(g, 198 + hash(i, 5) * 32 + Math.sin(t + i) * 2, 106 - ph * 26, 2, 1, `rgba(200,230,255,${.5 * (1 - ph)})`); }
+    if (st >= 1) { const a = Math.min(1, s / 1.2); R(g, 196, 104, 36, 5, '#5a7484'); for (let i = 0; i < 7; i++) { R(g, 199 + i * 4.5, 100 - (i % 3) * 2 - a * 3, 3, 6 + a * 2, i % 2 ? '#4a9a4e' : '#6ab85a'); } glow(g, 214, 100, 22 * a, '120,220,120', .4 * a); }
+    PX.spr(g, World.sheetFor('sable'), 2, 250, 150, 3); PX.spr(g, World.sheetFor('kael'), 3, 96, 150, 3);
+  },
+  // ---- the dock stair (0: Brand holds it · 1: the barges go · 2: what was left)
+  dockstair(g, t, st, s) {
+    const { R, glow, plate } = PX; const gr = g.createLinearGradient(0, 0, 0, 180); gr.addColorStop(0, '#060a1c'); gr.addColorStop(1, '#1c2444'); g.fillStyle = gr; g.fillRect(0, 0, 320, 180); for (let i = 0; i < 50; i++) R(g, hash(i, 1) * 320, hash(i, 2) * 90, 1, 1, `rgba(255,255,255,${.3 + hash(i, 3) * .5})`);
+    for (let i = 0; i < 6; i++) { const x = ((i * 70 + t * (2 + i % 3)) % 420) - 50; R(g, x, 150 + (i % 3) * 8, 80, 10, 'rgba(180,196,230,.25)'); }
+    if (st >= 1) for (let i = 0; i < 7; i++) { const a = Math.min(1, s / 3), x = 30 + i * 22 - a * (20 + i * 8), y = 30 + (i % 3) * 14 + a * (i * 3); R(g, x, y, 26, 6, '#1a1e2a'); R(g, x + 4, y - 3, 14, 3, '#2a2e3a'); R(g, x + 24, y + 2, 2, 2, '#ffb040'); glow(g, x + 25, y + 3, 5, '255,170,80', .6); }
+    for (let k = 0; k < 10; k++) { R(g, 150 + k * 16, 150 - k * 12, 170 - k * 16, 12, k % 2 ? '#3a4054' : '#30364a'); R(g, 150 + k * 16, 150 - k * 12, 170 - k * 16, 1, '#5a6480'); } R(g, 0, 162, 320, 18, '#22283a');
+    for (let i = 0; i < 5; i++) { const x = 256 + i * 13, y = 40 - i * 3 + Math.round(Math.sin(t * 3 + i)); R(g, x, y, 7, 18, '#e8e4dc'); R(g, x + 1, y - 5, 5, 5, '#d8dce4'); R(g, x + 8, y - 12, 1, 30, '#c8ccd4'); glow(g, x + 3, y + 4, 8, '255,240,200', .3); }
+    if (st < 2) { const b = Math.round(Math.sin(t * 2.4)); R(g, 196, 86 + b, 10, 20, '#4a4e58'); R(g, 197, 78 + b, 8, 8, '#b88a6a'); R(g, 197, 77 + b, 8, 3, '#8a8a8a'); R(g, 196, 106, 4, 10, '#2a2c34'); R(g, 202, 106, 4, 10, '#2a2c34'); R(g, 208, 64 + b, 2, 52, '#8a8478'); R(g, 205, 60 + b, 8, 6, '#c8ccd4'); for (let i = 0; i < 3; i++) R(g, 214 + i * 12, 92 - i * 9, 9, 4, '#8a8e96'); }
+    else { R(g, 208, 70, 2, 46, '#8a8478'); R(g, 205, 66, 8, 6, '#c8ccd4'); glow(g, 209, 70, 18, '255,240,200', .25 + Math.sin(t * 2) * .05); }
+    if (st === 0) plate(g, 'THE DOCK STAIR', 70, 20); if (st === 2) plate(g, 'ELEVEN MINUTES', 209, 130);
+  },
+  // ---- two years in the weather (0: the hidden fleet · 1: they learn to fly)
+  weather(g, t, st, s) {
+    const { R, glow, plate } = PX; const gr = g.createLinearGradient(0, 0, 0, 180); gr.addColorStop(0, '#2a3a7a'); gr.addColorStop(.6, '#c8a0b0'); gr.addColorStop(1, '#f0d0b0'); g.fillStyle = gr; g.fillRect(0, 0, 320, 180); glow(g, 250, 120, 80, '255,220,170', .5);
+    for (let L = 0; L < 4; L++) for (let i = 0; i < 7; i++) { const x = ((i * 64 + t * (2 + L * 2) + L * 30) % 440) - 60, y = 60 + L * 30 + (i % 2) * 8, a = .35 + L * .16; R(g, x, y, 70, 12, `rgba(255,${240 - L * 10},${236 - L * 16},${a})`); R(g, x + 12, y - 6, 40, 8, `rgba(255,255,255,${a})`); if (L === 1 || L === 2) { const bx = x + 18 + (i * 7) % 20; if (i % 2) { R(g, bx, y - 2, 24, 5, '#2a2c3a'); R(g, bx + 4, y - 5, 12, 3, '#3a3c4a'); R(g, bx + 22, y, 1, 1, '#ffb040'); } } }
+    if (st >= 1) { R(g, 0, 148, 320, 32, '#2a2c3a'); R(g, 0, 148, 320, 2, '#5a5c6c'); for (let x = 0; x < 320; x += 20) R(g, x, 142, 2, 8, '#3a3c4a'); R(g, 0, 142, 320, 1, '#4a4c5c'); const ids = ['hollis', 'ivo', 'nell', 'kit', 'juno', 'dace']; for (let i = 0; i < 6; i++) PX.spr(g, World.sheetFor(ids[i]), 1, 40 + i * 44 + (i % 2) * 6, 166, 2); PX.spr(g, World.sheetFor('ilse'), 0, 290, 168, 2.4); }
+    if (st === 0) plate(g, 'FOUR HUNDRED BARGES, IN THE WEATHER', 160, 168);
+  },
   // ---- Part Two: the Clerk's desk (0: the order · 1: the pen · 2: done)
   desk(g, t, st, s) {
     const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#e9e6de'); for (let x = 0; x < 320; x += 40) { R(g, x, 0, 1, 110, '#d6d2c8'); } R(g, 0, 0, 320, 5, '#e8c25a');

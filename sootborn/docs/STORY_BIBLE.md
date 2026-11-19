@@ -148,6 +148,13 @@ The game tells two halves at once: the present below, and the years after, seen 
 ### How Kael fights (v0.12.9)
 Nothing clean about it. The Accredited are taught forms; he was taught by a furnace. He kicks, jumps on people, drags them in with the rigging line he used on the valve banks, and parries because he has no patience for blocking. Moves: strike chain, heavy, kick (guard break, launcher), jump with air cuts, dive kick, plunge, dodge, guard and parry, hook line, ELEVEN. Signatures (v0.13): Breach, Shaft Drop (he came up a lift shaft; he comes down like one), Wide Cut, headbutt and throw, the roar, riposte. Assay fights can be lost: one second wind, then the fight restarts slightly easier.
 
+### People added in v0.21
+- **Sable**: runs Freight Three. Skims cold crates of surface greens (marked for the Spire kitchens) to Nell's fever ward. Prefers not to know where they grow.
+- **Wren Halloran**: Accredited engineer, 19 at Day 4. The only one of Celestine's forty who asks why. Half-recognises "Edric Sorrel" on the Spire. Defects to the Unlit with eleven engineers and the Array schematics before the Fall: "somebody has to care whether it works."
+- **Brand**: confirmed as the Warden who struck Hollis for humming at Seren's commitment. Deserted when ordered to kill a child for the same thing. Dies holding the dock stair for eleven minutes.
+- **Tavi**: asks on Day 3 whether the sun is yellow. Kael cannot say. He shows Tavi seven years later, on a barge.
+- **The shelf**: Mara keeps Seren's tin and Kael's empty one. At the end he puts the washer in his and sets it beside hers.
+
 ### Later eras (v0.19)
 era 5 (the Spire onward): + the Count (eleven tallied hits on one enemy strikes their line). era 6 (the Fall onward): the roar becomes the shift song and heals. Boss attacks: the long cut (`k2.line`, jump it) and the drop (`k2.slam`, move). Mara is playable once (Tier Six Stands): 61, has knelt at forty-four commitments, keeps two tins.
 
