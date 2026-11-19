@@ -1,5 +1,33 @@
 # SOOTBORN — changelog
 
+## v0.20 · 2026-11-18 — character models and lighting
+From play notes: the fighting is good; the graphics and character models need to improve.
+
+**Why they looked worse than they were.** Every piece of gold trim on every figure was drawn as a light source, and the glow pass then bloomed all of it, so in close-up a character was a white-gold smear with two glowing yellow rectangles for eyes. Fixing that mattered more than adding parts.
+
+**Lighting**
+- Gold trim is now lit metal, not a lamp: it takes light and shadow and catches a highlight. Only blades, gems, crowns and visor slits still glow.
+- A specular highlight on everything, a harder edge between light and shade, and darkening toward the feet so figures sit on the ground.
+- The glow pass is turned down (a third weaker in fights, more in films).
+
+**Faces**
+- Real eyes: whites, a gold iris, a dark pupil, an upper lid. They only blaze when Kael's fury is high, which now means something.
+- Warmer skin, so pale Accredited faces stop reading as grey stone.
+- Cheeks, a chin, ears, a fringe, sideburns and more volume in the hair.
+
+**Bodies**
+- Arms and legs are six-sided and tapered instead of square posts, with knee and elbow guards, calf plates and forearm plates.
+- Hands have a palm, fingers and a thumb.
+- Chest plates, abdominal plates, a spine and shoulder-blade plates, a collar ring, a belt buckle.
+- **Kael** carries the bronze valve ram on his off forearm, with a lit rim.
+- **Robes**: Celestine, Proctor Voss and the Wardens wear a full skirt that flares as they move, with a gold hem and centre band.
+- **Wardens** have a face plate, cheek guards, a red visor slit and a crest. The Accredited wear a five-point crown.
+
+**Camera**
+- In one-on-one fights the camera now sits much closer, so the two figures fill the frame. Battles with several enemies or allies keep the wider view from v0.12.7.
+
+**Not checked by a person.** Frame rate was only measured in a software renderer; the models have roughly 40% more geometry.
+
 ## v0.19 · 2026-11-18 — bosses with their own moves, the Count, Mara's fight, glimpses ahead
 From play notes: keep adding content, fights, new moves that fit the story, more scenes, and flash-forwards in the first part.
 
