@@ -1,5 +1,36 @@
 # SOOTBORN — changelog
 
+## v0.27 · 2026-11-19 — the Assay on foot, the second arc, a fall, and the Gilding in full
+From play notes: make the call on the open canon and finish the doc; more scenes, better content, more polish; a playable 2D mission in the Assay, and more than one; the other romance arc; more scenes that feed Kael's rage; new memories of Seren; more of Ilse and the transformation; use these moments to fill lore gaps.
+
+**Canon decided** (story bible, "Decisions"): the Assay is one season; the High Docks are at +7; Brand dies at +7 and his line is now "seven years"; Vale was born on Tier Four; the Accredited bear late and live long (Celestine says so); the Assay keeps its shown order with the calendar strip; Ilse sent the leaf.
+
+**Three playable 2D levels in the Assay** (Dev menu → Assay missions; they also play in the story)
+- **The Camp** (day 3, in Day 3's dream): wood, a pump puzzle, a fire. No enemies. Talk to Petra and Oswin.
+- **The Island** (night 25, before the Standard): stealth through House Teal's camp. Shut the lamp valve and their lamps go out, then take the standard. Wren Halloran is at the pump house.
+- **The Dais** (night 30, before the Proctor): stealth past two Wardens. Read the grading book, the viewing glass and the roster.
+- New night-valley tiles and props (pines, river, ford, tents, standards, pump house, lamps that go dark, marble dais, lecterns). A marker points at the current objective. "Skip this mission" is in the pause menu.
+
+**Part Two**
+- **Maren Aldane**, Teo's sister, across four chapters: the desk, the forty, the betrayal, the white door.
+- **The Dock Stair**: a new fight. You play Brand. It cannot be won.
+- **The low point** after Brand, and what gets Kael up.
+- **Wren's arc**: three new scenes and an ending at Row K.
+- Tavi before the stair; Ilse and the leaf; where Vale, Sull, Nell, Ivo, Sable, Dace and the other Houses ended up.
+- Drive, rays and the Part Two choices are remembered between chapters and sessions.
+
+**Part One**
+- The Gilding dream is about twice as long: Ilse's own story, the bones, the throat, the hands he refuses to give up, the eyes, the glass.
+- New memories of Seren: the fire at nine, the bet about the sky, the night of the washer.
+- New rage scenes: at the window on Day 3, and the furnace doors on Day 4 (a choice).
+
+**Fights and menus**
+- Three new Memory Arts (WARM THING, A RING, ELEVEN MONTHS).
+- **Memories** on the title screen and pause menu lists every Memory Art you have seen.
+- Fights can be endless (`endless`) and doomed-but-fought (`doomedFight`).
+
+**Checked:** each mission completes by script and hands back; every chapter from the Day 1 dream to THE END walks through with a bot (results below). **Not checked:** nobody has played any of it. Stealth difficulty in the two night levels is a guess; patrol timings were not tuned by hand. All new story is new canon.
+
 ## v0.26 · 2026-11-18 — acting on the State of the Game review: bug table, readability, onboarding
 From the State of the Game review (written against v0.24). This round takes its bug table and its "readability and onboarding" phase. New story content (a fall, Teo's family, a rival, a companion above) is not started; it needs decisions first.
 

@@ -115,7 +115,7 @@ Day 3 closes these: the ledger and Lift Zero, Dace under the floor, what Celesti
 - Cutscene step `{brawl: def}` runs a fight inside a cutscene; `{dlg: steps}` runs a dialogue list.
 
 ## The Assay (flash-forwards)
-- Four years on. The Accredited send their children to a year-long proving war (length under review; see the canon timeline) in a valley above the rock: twelve Houses, one winner. Kael, gilded and under a bought name, fights for House Violet.
+- Four years on. The Accredited send their children to a proving war that lasts one season, about fifty days in a valley above the rock: twelve Houses, one winner. Kael, gilded and under a bought name, fights for House Violet.
 - It is this game's own invention and uses only our names: the Assay, House Violet, House Teal, Captain Vant, Lucan Aurel (Celestine's son).
 - Purpose: show where the rage goes, and give the slow undercity chapters something to fall toward. The two halves should feel like different games: Cinderwell is dark, slow, talk and stealth; the Assay is daylight, fast, almost wordless except for Kael's voice.
 - Placement: opening before the title; The Valley at New Game; The Ford between Day 1 and Day 2; The Keep at the end of Day 2.
@@ -256,13 +256,43 @@ Year 0 is the furnace. This sheet is the reference when a card, a line or a chap
 | +5 | The Balancing of Tier Four. Riser Nine |
 | +6 | Celestine knows. The Son |
 | +7 | The High Docks |
-| +7 to +9 | Brand on the dock stair. Tier Six stands. Tavi comes up at sixteen (+9) |
+| +7 | Brand holds the dock stair for eleven minutes and dies there |
+| +7 to +9 | Two years in the weather. Tier Six stands. Tavi comes up at sixteen (+9) |
 | +9 | The Fall, the Stair, Little Ember, Lift Zero left open |
 
-### Open conflicts (need a decision; the game text is unchanged)
-1. **Length of the Assay.** The bible said "year-long"; every dated fight is inside forty days and the Post is "four years and a season". Proposed: the Assay lasts one season, about fifty days.
-2. **The High Docks.** Played inside chapter 3 (+6) but carded as seven years on. Proposed: keep +7 and say chapter 3 runs +6 to +7.
-3. **Brand's "eight years".** He struck Hollis at year 0 and waits eight years for a stair. Proposed: he dies at +8.
-4. **Inspector Vale.** Core cast has him Cinderwell-born with a sister lost in a Tier 8 ward; v0.22 has him born on Tier Two, and Cinderwell is Tiers 4 to 9. Pick one birthplace.
-5. **Celestine and Lucan.** She is seventy at +6; he comes of age at +4. Proposed: one line saying the Accredited bear late and live long.
-6. **Order the Assay is shown.** Day 26 (the Standard) is played after the last day (the Keep). v0.26 adds a calendar strip to every Assay card instead of reordering; reordering is still open.
+### Decisions (v0.27). These are canon now.
+1. **Length of the Assay: one season, about fifty days.** Night 1 to the last day, then the Pinning. "Year-long" is retired everywhere.
+2. **The High Docks are at +7.** Chapter 3 (What She Knows) runs from +6 to +7 and ends on the docks.
+3. **Brand dies at +7, on the dock stair.** He struck Hollis at year 0, so his line is now "I have been waiting seven years for a stair." He deserted two years after the furnace rather than do the same to a child, and trained Kael from +15 months.
+4. **Inspector Vale was born on Tier Four**, the top tier of Cinderwell, and counted up into the inspectorate. His sister died in a Tier 8 ward. He ends the story on a wheel on Tier Eight.
+5. **The Accredited bear late and live long.** Celestine says so. It is most of what the gold is for. She is seventy at +6; Lucan is her only child, born when she was fifty.
+6. **Order of the Assay stays as shown.** Every Assay card carries the calendar strip. The Standard still plays after the Keep.
+7. **Who opened Lift Zero at First Fire, with a leaf inside: Ilse Marrin.** She wanted to see who on the tier would look into the car instead of at the floor.
+
+## The Assay on foot (v0.27)
+Playable 2D levels above the rock, in the game's own pixel style, with gilded Kael. Each runs inside a dream and hands back to the fight that follows it. More will be added; each one should answer a question the story has left open.
+
+| Level | When | What you do | What it answers |
+|---|---|---|---|
+| **The Camp** | Day 3 | Fetch wood, raise water at the pump house (pipe puzzle), light the fire | Why House Violet follows him: not the Pairing, a fire. What the Assay is for (Oswin's father finished ninth and has been ninth for thirty years). The heirs call their own dead "balanced". The valley is the roof of Cinderwell: the pump water is warm because it comes off the Array |
+| **The Island** | Night 25 | Stealth past House Teal's pickets, shut the lamp valve, take the standard | How he met Wren Halloran. She keeps the vent stack as an apprentice and does not see his face. Leads into the Standard |
+| **The Dais** | Night 30 | Stealth past two Wardens, read the grading book and the viewing glass, tear his page from the roster | The Proctors invoice the Assay; Houses with patrons are credited standards in advance. The Spire watches half a day late with the dull parts cut. Celestine's note: "My son is to reach the last day. No further than he can walk." Voss recommended Sorrel's removal, which is why he comes down on day 31 |
+
+New names: Petra Lune and Oswin Hale (House Violet cadets).
+
+## Part Two additions (v0.27)
+- **Maren Aldane**, Second Clerk of the Count, Teo's elder sister. She likes Edric Sorrel's sums. She has the key to the sealed pairings and reads who was in Teo's room. At +7 she gives the dock office the hour of the raid ("For Teo Aldane. Balanced."), which is why the guards were waiting and why Brand had to hold the stair. At +9 she stands alone at the white door with a pen. Flags: `marenKind` (he told her Teo was kind), `marenDoor` (he told her the truth and she opened the door; she then keeps the new Count, a list of names read aloud, Teo's first).
+- **The low point.** Kael loses Brand to somebody who had the right. He sits on a barge for most of a month and counts nothing. A weeping seal gets him up.
+- **The Dock Stair** is now played: you are Brand, the fight cannot be won, and it ends when the last mooring is cut.
+- **Wren Halloran, the second arc.** Slow, and never in Seren's place. The Island (she does not see his face) → the Clerk's desk (she almost knows him) → the east manifold (she turns his hand over and sees the valve burns the Gilding did not take) → the rail of a barge at +9 ("I am not asking for her place." "There isn't a place. There's a shelf.") → Row K (Mara gets a third bowl down). Flags: `wrenMet`, `wrenClose`, `wrenAsk`. The last line of the game is unchanged and now means more.
+- **Tavi** is at his left shoulder up the stair.
+- **Where everyone went:** Vale on a wheel on Tier Eight; Sull still walks the night watch and says "aye"; Nell's ward has forty beds; Ivo and Sable run Freight Three; Dace chalks suns on new doors; four of the other eleven Houses opened their own lifts.
+- Choices now paid off in the last chapter: drive (a line before the stair), the rays (Seren's lantern still on the Pillar), the fury count (raised by the new scenes below).
+
+## The Gilding in full, and new memories of Seren (v0.27)
+- **Ilse's crime:** she kept a column of the Count for eleven years, was handed a line to strike, and asked to see the person first. A welder on Tier Five with a cough.
+- **Three takings and one refusal.** Bones (opened and wired; he counts the places and loses count). Throat (twenty years of furnace air; why everyone on a tier sounds alike). Eyes (gold leaf behind the lens, done awake; nothing bright hurts afterwards, and he never forgives how cheap that was to give). **He refuses the hands.** The valve burns on his palms stay. He wears gloves for a year.
+- **The glass.** He looks for the man she married and there is nobody either of them had met. Ilse: "He is underneath, where the wire is."
+- **Seren, new:** the fire on a valve block at nine ("Hands, Kael. Everything is hands."); the bet on the noodle-stall roof that the sky is blue, for a ring; the night he gave her the washer ("it is the only round thing I own"); she wore it eleven months.
+- **Rage, new:** the window (she won the bet and they burned her under it); the furnace doors (eleven seconds was a worn valve seat, a fault; Celestine wants it fixed to seven; flag `doors` = kept or fixed); the camp (the heirs say "balanced" of their own dead; Tier Four is forty feet under their feet); the dais.
+- New Memory Arts: WARM THING (the Proctor), A RING (the Gallery), ELEVEN MONTHS (the Stair). A **Memories** shelf on the title screen and pause menu keeps every Memory Art seen.

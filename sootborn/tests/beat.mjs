@@ -1,10 +1,9 @@
 import { chromium } from 'playwright';
-import { mkdirSync } from 'fs'; mkdirSync('shots', { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href + ''); await wait(600); await page.keyboard.press('Enter');
+await page.goto(new URL('../index.html', import.meta.url).href); await wait(600); await page.keyboard.press('Enter');
 for (let i = 0; i < 100 && !(await ev(() => BTS.G.mode === 'opening')); i++) await wait(100);
 await ev(() => { BTS.Brawl.tap = true; }); await wait(1500);
 const click = l => ev(l => { [...document.querySelectorAll('.mi')].reverse().find(b => b.textContent.includes(l)).click(); }, l);
@@ -15,6 +14,7 @@ for (const [beat, want] of [['Lift Zero', 'THE PAIRING'], ['Last Bell', 'THE PRO
   for (let i = 0; i < 900; i++) {
     const s = await ev(() => ({ cine: BTS.Cutscene.active, brawl: BTS.Brawl.active, ti: BTS.Brawl.active && BTS.Brawl.def.title, mode: BTS.G.mode, card: (document.querySelector('#card:not(.hidden) h1, .card:not(.hidden) h1') || {}).textContent, ui: BTS.UI.stack.length }));
     if (s.card && !cards.includes(s.card)) cards.push(s.card);
+    if (!s.cine && !s.brawl && await ev(() => BTS.G.heist === 3)) { seen.push('mission:' + await ev(() => Mission.key)); await wait(800); await ev(() => Mission.finish()); await wait(500); continue; }
     if (!s.cine && !s.brawl) { console.log(beat, 'ended in', s.mode, 'ui', s.ui); break; }
     if (s.brawl) { if (!seen.includes(s.ti)) seen.push(s.ti);
       await ev(() => { const B = BTS.Brawl; if (B.cine) B.nextShot(); else if (B.phase === 'fight' && !B.art && !B.sup && !B.def.doomed) for (const f of B.foes.slice()) if (f.st !== 'down' && !f.enter) B.hitFoe(f, 999, 1, 0, true); });

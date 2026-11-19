@@ -245,7 +245,7 @@ function makeBust(o) {
 function portraitTo(cv, sheet) { const g = cv.getContext('2d'); g.imageSmoothingEnabled = false; g.clearRect(0, 0, cv.width, cv.height); g.fillStyle = '#2a1a1a'; g.fillRect(0, 0, 48, 48); g.drawImage(sheet, 1, 0, 14, 13, 3, 6, 42, 39); }
 
 // ---- tiles
-const SOLID = new Set(['#', 'x', 'N']);
+const SOLID = new Set(['#', 'x', 'N', '~']);
 const isWall = ch => ch === '#' || ch === 'N';
 // Tiles are drawn as hand-laid stone, plate and timber: every surface gets a lit top-left
 // edge and a dark bottom-right edge, plus contact shadows where walls meet floors.
@@ -255,9 +255,23 @@ function stoneAt(g, x, y, w, h, col, mortar) {
   g.fillStyle = shade(col, 1.2); g.fillRect(x, y, w - 1, 1); g.fillRect(x, y, 1, h - 1);
   g.fillStyle = shade(col, .8); g.fillRect(x + 1, y + h - 2, w - 2, 1); g.fillRect(x + w - 2, y + 1, 1, h - 2);
 }
+// The Assay valley at night: pines for walls, grass, trodden paths, the river, and marble for anything the Proctors stand on.
+function valleyTile(g, m, tx, ty, ch, x, y, r, r2, R, at) {
+  const grass = () => { R(0, 0, 16, 16, r < .5 ? '#1c3826' : '#1f3d29'); for (let i = 0; i < 5; i++) { const a = hash(tx * 7 + i, ty * 3 + 2), b = hash(tx * 2 + i, ty * 9 + 4); R((a * 15) | 0, (b * 14) | 0, 1, 2, i % 2 ? '#2a5234' : '#163020'); } if (r2 > .86) { const sx = 3 + (r2 * 40 | 0) % 9, sy = 4 + (r * 40 | 0) % 8; R(sx, sy, 1, 1, '#d8d0f0'); R(sx, sy + 1, 1, 2, '#2a5234'); } };
+  if (ch === '#') {
+    if (at(0, 1) !== '#') { grass(); R(6, 6, 4, 10, '#2a1c14'); R(6, 6, 1, 10, '#3e2a1c'); R(9, 6, 1, 10, '#1a100c'); R(3, 14, 10, 2, 'rgba(0,0,0,.3)');
+      for (const [a, b, w] of [[5, -6, 6], [3, -2, 10], [1, 2, 14], [0, 6, 16]]) { R(a, b, w, 4, '#14301f'); R(a, b, w, 1, '#1e4a2c'); R(a + 1, b + 3, w - 2, 1, '#0c2014'); } R(7, -8, 2, 2, '#1e4a2c'); }
+    else { R(0, 0, 16, 16, '#0c1c13'); for (let i = 0; i < 4; i++) { const a = hash(tx * 5 + i, ty * 3 + 1), b = hash(tx + i * 7, ty * 5 + 2), sx = (a * 11) | 0, sy = (b * 11) | 0, c = ['#14301f', '#183826', '#102818'][i % 3]; R(sx, sy + 1, 6, 4, c); R(sx + 1, sy, 4, 6, c); R(sx + 1, sy, 3, 1, '#225032'); } }
+    return; }
+  if (ch === '~') { R(0, 0, 16, 16, '#12263a'); R(0, 0, 16, 1, '#1c3852'); for (let i = 0; i < 3; i++) { const a = hash(tx * 3 + i, ty * 7 + 1); R((a * 12) | 0, 3 + i * 5, 4, 1, i % 2 ? '#2a5070' : '#3a6a8a'); } if (at(-1, 0) !== '~') R(0, 0, 2, 16, '#2a3a2a'); if (at(1, 0) !== '~') R(14, 0, 2, 16, '#22301f'); return; }
+  if (ch === ',') { R(0, 0, 16, 16, r < .5 ? '#3a3226' : '#40372a'); for (let i = 0; i < 5; i++) { const a = hash(tx * 7 + i, ty + 3), b = hash(tx + i, ty * 9 + 5); R((a * 14) | 0, (b * 14) | 0, 2, 1, i % 2 ? '#2c261c' : '#544838'); } if (at(-1, 0) === '~' || at(1, 0) === '~') { R(2, 3, 5, 3, '#6a6a70'); R(2, 3, 5, 1, '#8a8a92'); R(9, 9, 5, 3, '#62626a'); R(9, 9, 5, 1, '#84848c'); } return; }
+  if (ch === '=') { const c = ((tx + ty) & 1) ? '#b8b4c4' : '#c4c0d0'; R(0, 0, 16, 16, c); R(0, 0, 16, 1, '#e0dcec'); R(0, 0, 1, 16, '#d4d0e0'); R(15, 0, 1, 16, '#8a8698'); R(0, 15, 16, 1, '#8a8698'); if (r2 > .7) R(4 + (r2 * 30 | 0) % 8, 6, 3, 1, '#a09cb0'); if (at(0, 1) !== '=' && at(0, 1) !== 'x') { R(0, 13, 16, 3, '#e8c25a'); R(0, 13, 16, 1, '#fff0b0'); } return; }
+  grass();
+}
 function drawTile(g, m, tx, ty) {
   const ch = m.grid[ty][tx], x = tx * 16, y = ty * 16, r = hash(tx + m.seed, ty), r2 = hash(tx * 3 + 11, ty * 7 + m.seed), R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); };
   const at = (dx, dy) => { const yy = ty + dy, xx = tx + dx; return yy < 0 || yy >= m.h || xx < 0 || xx >= m.w ? '#' : m.grid[yy][xx]; };
+  if (m.theme === 'valley') return valleyTile(g, m, tx, ty, ch, x, y, r, r2, R, at);
   const below = at(0, 1), th = m.theme, home = th === 'home', clinic = th === 'clinic', bay = th === 'bay', tunnel = th === 'tunnel';
   if (isWall(ch)) {
     if (!isWall(below)) { // ---- wall face
@@ -329,6 +343,16 @@ function drawTile(g, m, tx, ty) {
 }
 // ---- props (drawn into static layer); px coords from tile coords
 const PROPS = {
+  vtent(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }, c = a || '#7a5ac8'; for (let i = 0; i < 12; i++) { R(4 + i, 4 - i * 1.4 | 0 + 0, 24 - i * 2, 2, i % 3 ? '#e8e0d0' : c); } R(2, 5, 28, 10, '#d8d0c0'); R(2, 5, 28, 1, '#f6f0e4'); R(2, 14, 28, 1, '#8a8478'); for (let i = 0; i < 28; i += 7) R(2 + i, 5, 2, 10, c); R(13, 7, 6, 8, '#1a141c'); R(13, 7, 1, 8, '#3a3040'); R(15, -14, 1, 6, '#8a7a5a'); R(16, -14, 5, 3, c); },
+  standard(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }, c = a || '#3aa8a0'; R(7, -18, 2, 32, '#8a7a5a'); R(7, -18, 1, 32, '#b8a478'); R(5, 13, 6, 2, '#2a2420'); R(6, -20, 4, 3, '#e8c25a'); R(9, -16, 12, 12, c); R(9, -16, 12, 1, '#e8f4f0'); R(9, -5, 12, 1, 'rgba(0,0,0,.35)'); R(13, -12, 4, 4, '#e8c25a'); R(18, -4, 3, 3, c); },
+  campfire(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; for (const [p, q] of [[2, 10], [6, 12], [11, 11], [3, 6], [12, 7], [7, 5]]) { R(p, q, 3, 2, '#5a5a62'); R(p, q, 2, 1, '#7a7a84'); } R(4, 8, 8, 3, '#2a1c14'); R(5, 7, 6, 1, '#3e2a1c'); if (a) { R(6, 3, 4, 6, '#e8742a'); R(7, 1, 2, 6, '#ffb040'); R(7, 4, 2, 3, '#fff0b0'); R(5, 6, 1, 2, '#c84a1a'); R(10, 5, 1, 3, '#c84a1a'); } },
+  woodpile(g, x, y) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; for (let j = 0; j < 3; j++) for (let i = 0; i < 3 - (j > 1 ? 1 : 0); i++) { const px = 1 + i * 5 + (j % 2) * 2, py = 10 - j * 4; R(px, py, 5, 4, '#5a3a22'); R(px, py, 5, 1, '#7a5230'); R(px + 1, py + 1, 3, 2, '#c8a070'); R(px + 2, py + 2, 1, 1, '#8a6038'); } },
+  pumphouse(g, x, y) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(0, -10, 32, 26, '#5a5660'); R(0, -10, 32, 2, '#8a8690'); for (let j = 0; j < 4; j++) for (let i = 0; i < 4; i++) { R(1 + i * 8 + (j % 2) * 3, -7 + j * 6, 7, 5, (i + j) % 2 ? '#6a6670' : '#62606a'); } R(-2, -14, 36, 5, '#3a3038'); R(-2, -14, 36, 1, '#5a4a58'); R(24, -24, 5, 12, '#4a4650'); R(24, -24, 5, 1, '#7a7682'); R(4, 2, 24, 3, '#8a5a2a'); R(4, 2, 24, 1, '#c88a4a'); R(13, -2, 7, 7, '#2a2630'); R(14, -1, 5, 5, '#b03a2a'); R(16, -1, 1, 5, '#e87a5a'); R(14, 1, 5, 1, '#e87a5a'); R(4, 8, 6, 6, '#2a2630'); R(5, 9, 4, 4, '#3a8a5a'); R(6, 10, 1, 1, '#b8ffd0'); },
+  stakes(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; for (let i = 0; i < (a || 1) * 16; i += 5) { R(i + 1, 2, 3, 13, '#5a3a22'); R(i + 1, 2, 1, 13, '#7a5230'); R(i + 2, 0, 1, 2, '#7a5230'); } R(0, 8, (a || 1) * 16, 1, '#3a2414'); },
+  teallamp(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(7, -6, 2, 20, '#3a3038'); R(4, 13, 8, 2, '#2a2228'); R(4, -12, 8, 7, a ? '#3a3a44' : '#e8c060'); R(5, -11, 6, 5, a ? '#2a2a32' : '#fff0b0'); R(3, -13, 10, 1, '#8a7a5a'); },
+  lectern(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(3, 6, 10, 9, '#c8c4d4'); R(3, 6, 10, 1, '#f0ecf8'); R(12, 7, 1, 8, '#8a8698'); R(1, 1, 14, 6, '#e8e4f0'); R(1, 1, 14, 1, '#ffffff'); R(2, 2, 12, 4, a === 1 ? '#f4eedc' : a === 2 ? '#2a2630' : '#f4eedc'); R(8, 2, 1, 4, '#b8a880'); if (a === 2) { R(4, 3, 8, 2, '#4ad8e0'); R(5, 3, 2, 1, '#d8ffff'); } else { R(3, 3, 4, 1, '#3a2e22'); R(3, 5, 3, 1, '#3a2e22'); R(10, 3, 3, 1, a === 3 ? '#a02a1a' : '#3a2e22'); } },
+  canopy(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }, w = (a || 3) * 16; R(0, -20, w, 6, '#f4f2ec'); R(0, -20, w, 1, '#ffffff'); R(0, -15, w, 1, '#e8c25a'); for (let i = 0; i < w; i += 8) R(i, -14, 4, 3, '#e8c25a'); R(1, -14, 2, 28, '#d8d4e0'); R(w - 3, -14, 2, 28, '#d8d4e0'); },
+  bedroll(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(1, 6, 14, 7, a || '#7a5ac8'); R(1, 6, 14, 1, '#e8e0d0'); R(1, 6, 4, 7, '#e8e0d0'); R(2, 8, 2, 3, '#d8b8a0'); },
   bed(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(0, 2, 32, 30, PAL.woodD); R(2, 3, 28, 26, '#b8a890'); R(4, 4, 12, 7, PAL.cream); R(2, 13, 28, 16, '#2e5a5e'); for (let i = 0; i < 28; i += 4) R(2 + i, 15, 2, 12, '#356a6c'); R(0, 29, 32, 3, '#1a100c'); },
   table(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(1, 4, 30, 9, PAL.wood2); R(1, 4, 30, 2, '#6a4a34'); R(3, 13, 2, 3, PAL.woodD); R(27, 13, 2, 3, PAL.woodD); R(6, 1, 4, 5, '#c8b898'); R(6, 1, 4, 1, '#3a2a20'); R(17, 5, 9, 6, '#d8d0c0'); R(18, 6, 6, 1, '#6a6a6a'); R(18, 8, 5, 1, '#6a6a6a'); },
   rug(g, x, y, w, h) { g.fillStyle = '#5a2e24'; g.fillRect(x + 2, y + 2, w * 16 - 4, h * 16 - 4); g.fillStyle = '#7a4430'; g.fillRect(x + 4, y + 4, w * 16 - 8, h * 16 - 8); g.fillStyle = '#5a2e24'; for (let i = 6; i < w * 16 - 6; i += 6) g.fillRect(x + i, y + 6, 2, h * 16 - 12); },

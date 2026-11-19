@@ -198,7 +198,7 @@ const PANELS = {
     PX.spr(g, World.sheetFor('kael2'), 0, 86, 122, 3); R(g, 66, 118, 40, 10, '#5a4030');
     R(g, 120, 96, 86, 24, '#f4eedc'); R(g, 120, 96, 86, 1, '#fff8e8'); R(g, 120, 119, 86, 1, '#c8bca0'); ptext(g, 'TIER 4', 126, 100, '#3a2e22'); R(g, 126, 108, 60, 1, '#8a7a5a'); R(g, 126, 111, 48, 1, '#8a7a5a'); R(g, 126, 114, 54, 1, '#8a7a5a'); ptext(g, '1100', 176, 100, '#a02a1a'); R(g, 190, 108, 10, 10, '#a02a1a'); R(g, 192, 110, 6, 6, '#e8c25a');
     R(g, 214, 108, 10, 10, '#2a2630'); R(g, 216, 104, 6, 5, '#14121a');
-    if (st >= 3) { PX.spr(g, World.sheetFor(st === 3 ? 'wren' : 'cade'), 2, 268, 176, 3); if (st === 3) { R(g, 232, 112, 5, 4, '#2a2420'); R(g, 236, 114, 3, 3, '#3a3028'); } R(g, 126, 117, 40, 1, '#1a2a6a'); }
+    if (st >= 3) { PX.spr(g, World.sheetFor(st === 3 ? 'wren' : st === 5 ? 'maren' : 'cade'), 2, 268, 176, 3); if (st === 3) { R(g, 232, 112, 5, 4, '#2a2420'); R(g, 236, 114, 3, 3, '#3a3028'); } R(g, 126, 117, 40, 1, '#1a2a6a'); }
     else if (st >= 1) { const a = Math.min(1, s / 1.5), px = 150 + a * 30, py = 112 - Math.sin(a * 3.14) * 6; g.save(); g.translate(px, py); g.rotate(-.7); R(g, 0, -1, 20, 2, '#e8c25a'); R(g, -3, -1, 3, 2, '#2a2630'); g.restore(); if (st >= 2) { R(g, 126, 117, Math.round(40 * Math.min(1, s / .8)), 1, '#1a2a6a'); glow(g, 160, 108, 50, '255,90,40', .12); } }
     if (st === 0) plate(g, 'THE CLERK OF THE COUNT', 160, 168);
   },

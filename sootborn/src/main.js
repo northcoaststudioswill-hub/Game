@@ -20,6 +20,7 @@ const Game = {
     setTimeout(() => HUD.toast('Hold A at the relay · B throws a bolt'), 900);
   },
   resetHeist() {
+    if (G.heist === 3) return Mission.reset();
     if (G.heist === 2) return Game.resetFest();
     // Three lamps whose lanes interlock: no corridor is ever unwatched for long.
     //  - the Night Proctor walks the middle of the bay end to end, and looks up and down at each end
