@@ -71,6 +71,7 @@ FF.stair = () => ({
   ]
 });
 FF.ember = () => ({
+  breakAt: .45, breakMemo: { panel: 'kael', stage: 0, line: 'SHE BROKE THE BLADE THEY GAVE ME. I HAD HANDS BEFORE I HAD ANY OF THIS.', rgb: '255,170,80' }, breakLine: 'BANK HANDS. HERS WERE NEVER DIRTY ENOUGH TO KNOW WHAT THAT MEANS.',
   era: 6, boots: 1, title: 'LITTLE EMBER', sub: 'CELESTINE AUREL - THE HIGH AUDITOR', bg: 'crown', arena: { kind: 'rect', w: 220, h: 100 }, music: 'final', rage: 3, legend: 1, skip: 1, endAt: .08, winText: 'BALANCED',
   hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 60 }, taunt: { 0: ['THERE YOU ARE, TECHNICIAN.', 'I KEPT THE COUNT. SOMEBODY HAD TO.', 'SHE WAS QUICKER THAN YOU.', 'AND WHO WILL RATION IT WHEN I AM GONE?'] },
   foes: [{ id: 'celf', name: 'Celestine Aurel', kind: 'duelist', hp: 230, sc: 1.18, k2: { line: 1, slam: 1, triple: 1 } }],
@@ -95,6 +96,7 @@ FF.fall2 = () => { const d = FF.fall(); d.era = 6; d.intro = d.intro.slice(); d.
   d.outro = d.outro.slice(0, 2).concat([{ d: 3.0, black: 1, big: 'WE HIT.', cap: 'HALF OF US WALKED AWAY FROM IT. THAT WAS BETTER THAN ILSE\'S ARITHMETIC.' }]); d.voice = Object.assign({}, d.voice, { at: [[1, 'NINE YEARS AGO I KNELT WHEN THEY CAME DOWN IN LIGHT. TODAY WE ARE THE ONES COMING DOWN.'], [10, 'FOUR HUNDRED BARGES. EVERY ONE OF THEM FLOWN BY SOMEBODY WHO WAS BORN OWING AIR.'], [20, 'CADE SIGNED TIER FOUR AWAY WITH ONE LINE. I HAVE THE PEN HE USED. I TOOK IT FROM MY OWN DESK.'], [32, 'MARA IS ON THE NEXT BARGE OVER. SHE SAID SHE WOULD NOT MISS THIS IF IT KILLED HER. IT MIGHT.']] }); return d; };
 // a room to practise in: Brand does not go down, and neither do you
 FF.training = () => ({
+  barks: ['AGAIN.', 'SLOW.', 'YOUR FEET, BOY.', 'GUARD UP.'],
   era: 6, training: 1, title: 'THE PUMP ROOM', sub: 'BRAND - NOBODY GOES DOWN IN HERE', bg: 'hall', arena: { kind: 'ring', rx: 100, ry: 58 }, music: 'work', rage: 1, legend: 1, skip: 1, winText: 'ENOUGH',
   newMove: 'TRAINING: NOBODY CAN LOSE. PAUSE FOR THE MOVE LIST.',
   hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['AGAIN.', 'SLOWER. NOW FASTER.', 'USE ALL OF IT.', 'THAT ONE WAS CLEAN.'] },

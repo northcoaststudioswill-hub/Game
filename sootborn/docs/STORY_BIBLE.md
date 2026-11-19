@@ -222,3 +222,13 @@ Real devices, sound by ear, and how the heist, the festival stealth and the figh
 - Art pass toward the reference boards: 24–32px characters, hand-made tilesets, more portrait expressions.
 - Art and staging pass on all of Part Two; its own places (the Count room, the gallery, Riser Nine, the Spire stair); saving progress through Part Two; optional 2D Assay play to lengthen the middle. Sable has still not appeared on screen.
 - Combat growth toward battles: allies with orders, bigger fields, weapons.
+
+
+## Fighting forms (v0.24)
+How Kael fights is part of the story and changes with it. All names are ours.
+- **Bank Hands** (era 0, below): valve-man's hands. Fists, kicks, the hook line. Soot speech.
+- **The Turn** (eras 1-4, Ilse's training through the Assay): "Never give ground. Do not stop the pressure; turn it." A parry carries him behind the enemy.
+- **The Measure** (era 5, the Spire): the Accredited duelling form, learned as the Clerk and used against them. A parry answers by itself. The Count belongs to this period.
+- **We** (era 6, the Fall onward): the shift song heals; his lines say "we".
+- **The blade breaks** in the duel with Celestine (at 45% of her health). He ends the story with Bank Hands.
+- Finishers: the eleven (per-fight names); one cut on a staggered enemy (LAST BELL / THE TURN / STRUCK THROUGH / HER NAME); from the air (NINE FLOORS / LIFT ZERO / THE WEATHER); last breath (ON MY BREATH, once a fight).

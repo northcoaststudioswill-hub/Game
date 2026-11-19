@@ -1,5 +1,38 @@
 # SOOTBORN — changelog
 
+## v0.24 · 2026-11-18 — how he fights changes with the story; four finishers; a clipping pass on film
+From play notes: research how the reference hero's fighting changes through the books so moves and flashbacks fit each fight; more quips; more finishers than ELEVEN; then watch the fights on camera, check clipping, and polish.
+
+**Research, and what we took from it (in our own names)**
+The reference hero starts as a miner with fast hands and a stolen tool for a weapon, is later taught a named formal school whose rule is never to back up and to turn an enemy's force round, becomes a master duellist, and late on has his signature blade broken. SOOTBORN now has the same arc with its own words:
+- **Bank Hands** (below): fast and dirty, soot speech.
+- **The Turn** (training and the Assay): Ilse's rule, never give ground, turn it. A parry now puts Kael behind the man he parried.
+- **The Measure** (the Spire years): their own form used against them. A parry also answers with a free cut by itself.
+- **We** (the Fall onward): everything, with the tier behind him.
+- **The blade breaks.** In the last duel Celestine breaks the blade the Accredited gave him at 45% of her health. He finishes it with his hands (harder fists, no blade moves): "I had hands before I had any of this."
+
+**Four finishers instead of one**
+- **The eleven** (hold strike at full fury), named per fight as before.
+- **One cut** (the same, on a STAGGERED enemy): a single pass straight through him. LAST BELL below, THE TURN in the Assay, STRUCK THROUGH on the Spire, HER NAME at the end.
+- **From the air** (full fury while airborne, from the late Assay on): NINE FLOORS, then LIFT ZERO, then THE WEATHER. Hits everyone near the landing.
+- **Last breath** (half fury when nearly down, once per fight): three blows, ON MY BREATH.
+- The prompt under the fury bar names whichever one is available right now, and the pause-menu move list shows all four plus the current form.
+
+**Quips and flashbacks by era**
+- Kael now talks on kills, parries, breaking a stagger, low health and reaching FURNACE, from a different set of lines for each of the four periods (soot contractions below; no contractions once trained; "we" at the end).
+- Enemies answer back when they land a hit: townsfolk apologise, Wardens bark orders, the Accredited say "Noted."
+- Two new short memory flashes per period: one the first time he breaks an enemy's stagger, one when the second wind brings him back.
+- Memories are spaced at least five seconds apart so they do not stack.
+
+**Clipping and camera, found by filming the fights frame by frame**
+- **Fighters no longer walk through each other.** Standing bodies are eased apart; named enemies hold their ground more than cadets.
+- In a duel the camera rises when the enemy is between it and Kael, so he is not hidden behind the other man's back.
+- Memory Art close-ups in 3D sat inside the fighters; the camera now stays back.
+- The two braziers at the front of the keep, the stair and the Spire top stood in front of the action; they are moved out and hidden when the camera is near.
+- Enemy speech bubbles no longer cover the health bars; the hit counter and style no longer sit on the STAGGERED label; the MEMORY tag no longer covers a panel's own labels; fight call-outs are hidden during a memory.
+
+**Checked:** all four finishers fire and do damage in eight different fights; the parry turn moves him behind the enemy; the blade breaks and fists land afterwards. The later-book fighting details were researched from fan wiki and study-guide summaries, not the books themselves. Nobody has played this build.
+
 ## v0.23 · 2026-11-18 — the fighting system: feel, structure, and a place to practise
 From play notes: focus on building out and polishing the fighting.
 
