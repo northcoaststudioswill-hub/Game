@@ -1,5 +1,56 @@
 # Sprouts TV 2 changelog
 
+## One song, and music for the cutscenes (Nov 19 2026, fourth round)
+
+Will: "we could just loop like the August one, the music from the original game, instead of having both songs. And
+for the cutscenes, you can develop music, unless you already did that."
+
+**I have not heard any of this.** Everything below was checked by measuring, not by listening.
+
+### One song
+
+- I read "the August one" as **Autumn Study**. The build now carries only that song and loops it. If you meant the
+  other one (Beautiful Sprouts, the first Sprouts song), it is one word in `build.py` (`SONG`).
+- It no longer starts over between the menus and the valley: there is one list now, so it carries on.
+- Each build is 2.6 MB (it was 4.8 with both songs).
+
+### Cutscene music (new, mine)
+
+The scenes had sound effects but no music of their own: the song just played on underneath. There are now six short
+themes, written as notes and played by the same little oscillators the sound effects use, so they add nothing to the
+file. While a scene plays, the song drops to silence but keeps running, so it has not restarted when the scene ends.
+The music volume setting covers both; music off means no theme.
+
+| Theme | Feel aimed for | Scenes |
+|---|---|---|
+| lantern | warm, 80 bpm, C major | the welcome, Ranger, Scout, each shard home, the key, the lens, the wedding book, the moonblooms |
+| van | lazy reggae one-drop with a swung off-beat, 88 bpm | every Marcus and Derek scene: the van, the road, the job, the session, the rain, the berries, who is it, the hot tub, the leak |
+| mystery | slow bells over a drone, 60 bpm, A minor | the dawn, the call, the coast, the arch, at rest, Bessie |
+| triumph | a march, 104 bpm, D major | the blaze, the relight, the ending |
+| thorn | low and lumbering, 66 bpm, E minor | Thornback wakes, not tonight, the slide |
+| louie | quick and bouncy, 138 bpm, F major | the dream, the zoomies, the button |
+
+Listen to them without playing: `playtest/music/cutscene-*.mp3` (eight bars each, rendered from the game's own code).
+
+### Tested
+
+- `tests/music.js` (new, 18 checks): every one of the 34 scenes names a theme; every bar is sixteen steps of notes in
+  the theme's scale; the strong beats land on the chord (94 of 100 across the six); each theme renders to sound with
+  no silent bar and nothing clipped; a scene starts its theme, the next scene changes it, play stops it; one song is
+  in the build and the player is set to loop it.
+- By spectrum, 174 of 176 lead notes in the rendered files sit at the pitch they were written at (the two that do not
+  are a low C sharing its pitch with the bass under it).
+- 448 checks pass in all: tv 34, tv2 63, pocket 16, scenes 36, music 18, coast 189, valley 50, story 17, saves 25.
+
+### Not tested
+
+- **Not listened to.** Whether the themes are any good, whether the parts are balanced, whether the van theme has the
+  feel you wanted, and whether the hand-over between song and theme is smooth: all of that needs ears.
+- Whether the song's loop point is clean was not checked. The file is played end to start as it is.
+- Two test checks were loosened because they were wrong, not the game: petals can grow a little while the game is
+  shut (the saves test demanded an exact match), and Louie may eat a snack on the way in his morning (the test
+  assumed he had not).
+
 ## Locking in: the whole game played with the buttons (Nov 19 2026, third round)
 
 Will: "Now your goal is making sure the game's playable up to wherever it's at, the story at the current point. And

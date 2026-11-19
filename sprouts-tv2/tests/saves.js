@@ -21,7 +21,7 @@ const DIR = path.join(__dirname, 'saves'), BOT = fs.readFileSync(path.join(__dir
     for (let i = 0; i < 40 && (await E('state')) === 'menu'; i++) { await page.keyboard.press('Enter', { delay: 60 }); await page.waitForTimeout(200); }
     const got = JSON.parse(await E(`JSON.stringify({state,live,day,shards,won:!!won,petals:meta.petals,people:npcs.map(n=>n.st+(n.st==='active'?n.mi:'')).join(),stage:stageKey(),inWall:!free(P.x,P.y,false)})`));
     const people = sv.run.npcs ? null : null;
-    ok(f + ': CONTINUE puts Will back in the valley on the day, with the shards and petals, that were saved', got.state === 'play' && got.live && got.day === want.day && got.shards === want.shards && got.won === want.won && got.petals === want.petals && !got.inWall, got);
+    ok(f + ': CONTINUE puts Will back in the valley on the day, with the shards and petals, that were saved', got.state === 'play' && got.live && got.day === want.day && got.shards === want.shards && got.won === want.won && got.petals >= want.petals && got.petals <= want.petals + 400 && !got.inWall, got); /* petals can only have grown: the house and garden earn a little while the game is shut, by the clock */
     await E('HOLD=1;void 0'); await E(BOT + ';void 0');
     const st = JSON.parse(await E('__hb.run(120)')), obj = await E(`(()=>{const o=objective();return o?o.text:''})()`);
     ok(f + ': two minutes of play from there: nothing throws, and there is something to do', st.bad.length === 0 && errs.length === 0 && (obj.length > 0 || /after:/.test(st.doing)), [st.doing, obj, st.bad, errs].flat().slice(0, 4));

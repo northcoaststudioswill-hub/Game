@@ -30,8 +30,9 @@ TV or Pocket Lantern save in the same browser.
 - **Small fixes.** Hints stay in a bottom strip, Erase Everything is in Settings, a VIEW setting, gardeners capped.
 - **Played start to finish with the buttons.** A bot that only presses the controller's buttons finishes the whole
   game: all thirty asks, both lights, the wedding book. See "The honest run" below.
-- **Finishing touches.** A CONTROLS page and CREDITS in Settings, credits after the last scene, and each build is
-  4.8 MB (it was 13.8: songs for other games were riding along).
+- **Finishing touches.** A CONTROLS page and CREDITS in Settings, credits after the last scene.
+- **Music.** One song (Autumn Study) that loops and carries on through the menus, and six short themes for the
+  cutscenes, made of notes rather than recordings (`playtest/music/` has them to listen to). Each build is 2.6 MB.
 
 The full list, set against the review item by item, is in [CHANGELOG.md](CHANGELOG.md). Everything invented for the
 story is in [STORY-NOTES.md](STORY-NOTES.md), marked as Claude's.
@@ -59,6 +60,7 @@ story is in [STORY-NOTES.md](STORY-NOTES.md), marked as Claude's.
   `tests/sprouts_coast.js` (189), `sprouts_valley.js` (50) and `sprouts_story.js` (17) the game itself. The stepped
   suites hold the game's own clock still (`HOLD`), so a run is the same every time. `tests/sprouts_playthrough.js` plays the whole story and prints it in order;
   the last run is `playtest/story-run.txt`.
+- `tests/music.js` (18 checks) covers the one song and the cutscene themes, and can write the themes out as sound.
 - `tests/honest.js` and `tests/honest_bot.js` are the honest run (below). `tests/saves.js` (25 checks) loads a save
   from every stage of the story (`tests/saves/`, written by the honest run) through CONTINUE and plays on.
 

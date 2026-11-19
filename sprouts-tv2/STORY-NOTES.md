@@ -169,6 +169,12 @@ will I."
 - **A morning line** when the Lantern restarts an empty crew: "THE LANTERN GREW THREE EMBERS OVERNIGHT".
 - **The Controls page** uses the game's own words for each button. No story in it.
 
+## Cutscene music (Nov 19, fourth round) — Claude's
+
+Six short themes (lantern, van, mystery, triumph, thorn, louie) were written for the scenes. They are mine, written
+without being heard, and which scene gets which is my choice (`SCENE_MUS` in `src/game.js`). Swap, cut or replace any
+of them. The song (Autumn Study, William Cohen) is untouched.
+
 ## Left alone
 
 - The van jokes. The review asks what they are for; that is Will's call, and he asked for them.

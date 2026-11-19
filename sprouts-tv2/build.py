@@ -54,8 +54,11 @@ def code(name):
 music = music_blocks()
 
 
+SONG = 'Autumn Study'  # the one song this build loops (Will, Nov 19: one song, not both). The other Sprouts song is 'Beautiful Sprouts'.
+
+
 def sprouts_songs(blocks):
-    """Only the songs Sprouts plays. The console's build carries songs for its other cartridges too (tagged "ko" and
+    """Only the one song this build loops. The console's build carries songs for its other cartridges too (tagged "ko" and
     "pp"); this game never plays them, and they were a third of the file."""
     import json
     dec, keep, seen = json.JSONDecoder(), [], 0
@@ -64,12 +67,12 @@ def sprouts_songs(blocks):
         while i >= 0:
             obj, end = dec.raw_decode(body, i)
             seen += 1
-            if any(u in ('menu', 'game') for u in obj.get('use', [])):
+            if obj.get('title') == SONG:
                 keep.append(body[i:end])
             i = body.find('{"title":', end)
     if not keep:
-        die('no Sprouts songs found in the music blocks')
-    print(f'music: {len(keep)} of {seen} songs kept (the rest belong to other cartridges)')
+        die(f'the song "{SONG}" was not found in the music blocks')
+    print(f'music: "{SONG}" kept, {seen - len(keep)} other songs left out')
     return '\nwindow.SPROUT_TRACKS=[' + ',\n'.join(keep) + '];\n'
 
 

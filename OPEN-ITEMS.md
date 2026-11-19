@@ -35,6 +35,7 @@ at phone size. Will's rule stands: a change is not done until it has been played
 - Third round (Nov 19): a bot finishes the whole game with the buttons only. That shows every step is possible. OPEN: a person still has to play it, on the television, to say whether it is clear and whether the pace is right. The bot lit both lights on day 5; expect a person to take longer.
 - OPEN: Louie reaches his top level (6) by about day 8 and keeper rank 14 by day 11 in the bot's run. Too fast after the "calmer" pass? Will to say.
 - OPEN: credits name no person except the songs' artist (from the files). Add names?
+- Fourth round (Nov 19): the build loops one song. OPEN: I read "the August one" as Autumn Study; if Will meant Beautiful Sprouts it is one word in `sprouts-tv2/build.py`. OPEN: the six cutscene themes are Claude's and have not been heard by anyone.
 - There are now three copies of Sprouts: `alt/` (handheld, in the console), `sprouts-tv/` and `sprouts-tv2/` (which builds a TV and a phone version from one source). OPEN: retire the older two?
 - `sprouts_story.js` there fails about one run in ten (autopilot).
 

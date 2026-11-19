@@ -111,7 +111,7 @@ const TRACKS=(window.SPROUT_TRACKS||[]).map(t=>Object.assign({},t,{img:null}));
 TRACKS.forEach(t=>{try{const im=new Image();im.src=t.art;t.img=im}catch(e){}});
 const MUS={pending:-1,from:'',list:'',src:null,gain:null,buf:null,bi:-1,cur:-1,last:-1,loading:false,tok:0,gap:0,fade:1,np:0,shown:-1};
 const MENU_ST={intro:1,menu:1,rewards:1,caps:1,style:1,bugs:1};
-function musWant(){if(state==='tv0'||state==='tvpwr')return'';if(state==='tvtitle')return'menu';if(state==='settings'||state==='controls')return setFrom==='pause'?'game':'menu';return MENU_ST[state]&&!(state==='bugs'&&colFrom==='pause')?'menu':'game';}
+function musWant(){if(state==='tv0'||state==='tvpwr')return'';if(state==='tvtitle')return'menu';if(state==='settings'||state==='controls')return setFrom==='pause'?'game':'menu';return 'game';} /* one song now, so there is one list: it carries on through the menus instead of starting over */
 const musLevel=()=>Math.pow(meta.mus/10,2)*.85*(state==='pause'||((state==='settings'||state==='controls')&&setFrom==='pause')?.55:1);
 function musGain(){if(!MUS.gain&&ac){MUS.gain=ac.createGain();MUS.gain.gain.value=0;MUS.gain.connect(ac.destination)}return MUS.gain;}
 function getBuf(i){if(MUS.bi===i&&MUS.buf)return Promise.resolve(MUS.buf);
@@ -124,7 +124,7 @@ function playStored(i,tok,inGesture){const t=TRACKS[i];try{
   if(!musEl){musEl=new Audio();musEl.preload='auto';ac.createMediaElementSource(musEl).connect(musGain());}
   const h={stop(){try{musEl.pause()}catch(e){}}},bad=()=>{t.bad=true;if(tok===MUS.tok){MUS.loading=false;MUS.gap=.1}};
   musEl.onerror=bad;musEl.onended=()=>{if(MUS.src===h){MUS.src=null;MUS.cur=-1;MUS.gap=MUS.list==='menu'?1.5:3}};
-  musEl.src=t.url||'/_blob/'+t.blob;musEl.currentTime=0;
+  musEl.src=t.url||'/_blob/'+t.blob;musEl.loop=true;musEl.currentTime=0;
   const p=musEl.play();if(!p||!p.then){bad();return}
   p.then(()=>{if(tok!==MUS.tok){musEl.pause();return}MUS.loading=false;MUS.pending=-1;MUS.src=h;MUS.cur=MUS.last=i;MUS.np=5.5;MUS.from='STORED';setStrip(i)})
    .catch(e=>{if(e&&e.name==='NotAllowedError'&&!inGesture){if(tok===MUS.tok)MUS.pending=i}else bad()});
@@ -132,16 +132,63 @@ function playStored(i,tok,inGesture){const t=TRACKS[i];try{
 function playTrack(i){const tok=++MUS.tok;MUS.loading=true;if((TRACKS[i].blob||TRACKS[i].url)&&!TRACKS[i].bad){playStored(i,tok,false);return}
  if(!TRACKS[i].data&&!TRACKS[i].bytes){MUS.loading=false;MUS.gap=8;return}MUS.from='BUILT IN';
  getBuf(i).then(b=>{if(tok!==MUS.tok)return;MUS.loading=false;stopSrc();const s=ac.createBufferSource();s.buffer=b;s.connect(musGain());
-  s.onended=()=>{if(MUS.src===s){MUS.src=null;MUS.cur=-1;MUS.gap=MUS.list==='menu'?1.5:3}};s.start();MUS.src=s;MUS.cur=MUS.last=i;MUS.np=5.5;setStrip(i);})
+  s.loop=true; /* the one song goes round */s.onended=()=>{if(MUS.src===s){MUS.src=null;MUS.cur=-1;MUS.gap=MUS.list==='menu'?1.5:3}};s.start();MUS.src=s;MUS.cur=MUS.last=i;MUS.np=5.5;setStrip(i);})
  .catch(()=>{if(tok!==MUS.tok)return;MUS.loading=false;MUS.gap=10;});}
 function setStrip(i){const box=$('np');if(!box)return;MUS.shown=i;if(i<0){box.hidden=true;return}const t=TRACKS[i],tx=$('npText'),bx=$('npBox'),line='\u266A '+t.title+'  \u00B7  '+t.artist;
  box.hidden=false;try{$('npArt').src=t.art}catch(e){}tx.textContent=line;bx.classList.remove('roll');
  later(()=>{if(tx.scrollWidth>bx.clientWidth){tx.textContent=line+'\u2003\u2003\u2003'+line+'\u2003\u2003\u2003';bx.style.setProperty('--d',Math.max(8,line.length*.32)+'s');bx.classList.add('roll')}},30);}
-function musTick(dt){if(MUS.np>0)MUS.np-=dt;if(!ac||!TRACKS.length)return;const want=musWant(),g=musGain();if(!g)return;
+function musTick(dt){scmTick();if(MUS.np>0)MUS.np-=dt;if(!ac||!TRACKS.length)return;const want=musWant(),g=musGain();if(!g)return;
  if(want!==MUS.list){if(MUS.src&&MUS.fade>0){MUS.fade=Math.max(0,MUS.fade-dt/.9);g.gain.setTargetAtTime(musLevel()*MUS.fade,ac.currentTime,.03);return}
   MUS.tok++;MUS.loading=false;MUS.pending=-1;stopSrc();MUS.list=want;MUS.gap=.4;MUS.fade=1;if(!want){setStrip(-1);return}}
- g.gain.setTargetAtTime(musLevel(),ac.currentTime,.04);
+ g.gain.setTargetAtTime(SCM.name?0:musLevel(),ac.currentTime,SCM.name?.2:MUS.duck?.5:.04);MUS.duck=SCM.name?1:(MUS.duck>0?MUS.duck-dt:0); /* under a scene the song is silent but still running */
  if(!MUS.src&&!MUS.loading&&MUS.list){MUS.gap-=dt;if(MUS.gap<=0){const i=nextIdx();if(i>=0)playTrack(i);else MUS.gap=5}}}
+
+/* ---------- cutscene music ----------
+   Six short themes, written as notes and played by the same kind of little oscillators the sound effects use, so
+   they cost nothing in file size. Each 3D scene names one (SCENE_MUS). While a scene plays the song is turned down to
+   nothing and keeps running underneath, so it has not started over when the scene ends.
+   A theme: bpm, sw (swing: how late the off 16ths land, in 16ths), chords per bar [root midi, minor?], a lead line per
+   bar ("note:length in 16ths", "-" is a rest), and which parts play. One bar is 16 steps. */
+const SCM_T={
+ lantern:{bpm:80,sw:0,scale:[0,2,4,5,7,9,11],ch:[[48,0],[45,1],[41,0],[43,0],[48,0],[45,1],[41,0],[43,0]],lead:['e5:4 g5:4 c6:6 -:2','a5:4 e5:4 c5:6 -:2','f5:4 a5:4 c6:4 a5:4','g5:6 d5:2 g5:8','e5:4 g5:4 c6:4 e6:4','d6:2 c6:2 a5:4 e5:6 -:2','f5:4 a5:4 c6:4 a5:4','g5:4 b5:4 d6:6 -:2'],lv:'triangle',arp:1,pad:1},
+ van:{bpm:88,sw:.34,scale:[7,9,11,0,2,4,5],ch:[[43,0],[43,0],[48,0],[48,0],[43,0],[43,0],[41,0],[48,0]],lead:['-:4 d5:2 e5:2 g5:6 -:2','-:4 e5:2 d5:2 b4:6 -:2','-:4 e5:2 g5:2 a5:4 g5:2 e5:2','g5:8 -:8','-:4 d5:2 e5:2 g5:4 a5:2 b5:2','d6:6 b5:2 g5:6 -:2','-:4 f5:2 a5:2 c6:4 a5:2 f5:2','e5:4 d5:4 g5:8'],lv:'square',skank:1,reggae:1,drop:1},
+ mystery:{bpm:60,sw:0,scale:[9,11,0,2,4,5,7,8],ch:[[45,1],[45,1],[41,0],[41,0],[38,1],[38,1],[40,0],[40,0]],lead:['a4:8 e5:8','c5:6 b4:2 a4:8','f4:8 c5:8','a4:6 g4:2 f4:8','d5:8 a4:8','f5:6 e5:2 d5:8','e5:8 b4:8','g#4:8 e4:8'],lv:'sine',drone:1,bell:1},
+ triumph:{bpm:104,sw:0,scale:[2,4,6,7,9,11,1],ch:[[50,0],[43,0],[50,0],[45,0],[47,1],[43,0],[45,0],[50,0]],lead:['d5:2 d5:2 f#5:4 a5:4 d6:4','b5:6 a5:2 g5:8','f#5:2 f#5:2 a5:4 d6:4 f#6:4','e6:8 c#6:4 a5:4','d6:4 b5:4 f#5:4 b5:4','g5:4 b5:4 d6:6 b5:2','a5:4 c#6:4 e6:4 a5:2 c#6:2','d6:12 -:4'],lv:'square',arp:1,pad:1,beat:1,march:1},
+ thorn:{bpm:66,sw:0,scale:[4,6,7,9,11,0,2,3],ch:[[40,1],[40,1],[36,0],[35,0]],lead:['e3:4 -:2 g3:2 b3:6 -:2','a3:2 g3:2 e3:8 -:4','c3:4 -:2 e3:2 g3:6 -:2','f#3:4 d#3:4 b2:8'],lv:'triangle',stomp:1,tuba:1},
+ louie:{bpm:138,sw:0,scale:[5,7,9,10,0,2,4],ch:[[41,0],[41,0],[46,0],[48,0],[41,0],[38,1],[46,0],[41,0]],lead:['f5:2 a5:2 c6:2 a5:2 f5:2 a5:2 c6:4','d6:2 c6:2 a5:2 f5:2 g5:4 -:4','a#5:2 d6:2 f6:2 d6:2 a#5:2 d6:2 f6:4','e6:2 c6:2 g5:2 c6:2 e6:4 -:4','f5:2 a5:2 c6:2 f6:2 e6:2 c6:2 a5:4','d6:2 f6:2 d6:2 a5:2 f5:4 a5:4','a#5:2 d6:2 a#5:2 g5:2 f5:2 a#5:2 d6:4','f6:4 c6:4 f5:6 -:2'],lv:'square',skank:1,bounce:1,beat:1,stac:1}};
+const SCENE_MUS={dawn:'mystery',open:'lantern',ranger:'lantern',scout:'lantern',marks:'lantern',s2:'lantern',s3:'lantern',key:'lantern',lens:'lantern',book:'lantern',moon:'lantern',
+ van:'van',road:'van',job:'van',sesh:'van',fog:'van',munch:'van',knock:'van',hottub:'van',leak:'van',thorn:'thorn',watch:'thorn',slide:'thorn',blaze:'triumph',relight:'triumph',home:'triumph',
+ call:'mystery',coast:'mystery',arch:'mystery',rest:'mystery',bessie:'mystery',dream:'louie',zoomies:'louie',button:'louie'};
+const scmHz=m=>440*Math.pow(2,(m-69)/12),scmNote=n=>{const m=/^([a-g])(#?)(\d)$/.exec(n);return m?[0,2,4,5,7,9,11]['cdefgab'.indexOf(m[1])]+(m[2]?1:0)+12*(+m[3]+1):-1},
+ scmLead=str=>{const out=[];let at=0;for(const tk of str.split(' ')){const [n,l]=tk.split(':');if(n!=='-')out.push([at,scmNote(n),+l]);at+=+l}return out};
+function scmTone(ctx,dest,type,f,t,d,vol,o){o=o||{};const os=ctx.createOscillator(),ga=ctx.createGain(),a=o.a||.012,rl=o.r||.08;os.type=type;os.frequency.setValueAtTime(f,t);if(o.to)os.frequency.exponentialRampToValueAtTime(o.to,t+d);
+ if(o.vib){const lf=ctx.createOscillator(),lg=ctx.createGain();lf.frequency.value=o.vib;lg.gain.value=f*.006;lf.connect(lg);lg.connect(os.frequency);lf.start(t);lf.stop(t+d+rl+.02)}
+ ga.gain.setValueAtTime(0,t);ga.gain.linearRampToValueAtTime(vol,t+a);if(o.dec)ga.gain.exponentialRampToValueAtTime(Math.max(.0006,vol*o.dec),t+d);else ga.gain.setValueAtTime(vol,t+Math.max(a,d-.01));ga.gain.linearRampToValueAtTime(0,t+d+rl);
+ os.connect(ga);ga.connect(dest);os.start(t);os.stop(t+d+rl+.02)}
+function scmHit(ctx,dest,t,d,vol,type,fq){const b=ctx.__nz||(ctx.__nz=(()=>{const n=ctx.sampleRate>>1,bf=ctx.createBuffer(1,n,ctx.sampleRate),c=bf.getChannelData(0);let s=12345;for(let i=0;i<n;i++){s=(s*1103515245+12345)&0x7fffffff;c[i]=s/0x3fffffff-1}return bf})()),q=ctx.createBufferSource(),f=ctx.createBiquadFilter(),ga=ctx.createGain();
+ q.buffer=b;f.type=type;f.frequency.value=fq;ga.gain.setValueAtTime(vol,t);ga.gain.exponentialRampToValueAtTime(.0008,t+d);q.connect(f);f.connect(ga);ga.connect(dest);q.start(t,(t*7.13)%.2,d+.02)}
+/* schedules one bar of a theme starting at time t; returns the time the bar ends */
+function scmBar(ctx,dest,T,bar,t){const sd=60/T.bpm/4,at=s=>t+(s+(s%2?T.sw:0))*sd,c=T.ch[bar%T.ch.length],R=c[0],third=c[1]?3:4,tri=[0,third,7];
+ for(const [s,m,l] of scmLead(T.lead[bar%T.lead.length])){const d=(T.stac?Math.min(l,1.4):l-.25)*sd;scmTone(ctx,dest,T.lv,scmHz(m),at(s),d,T.lv==='square'?.05:T.lv==='sine'?.11:.1,{vib:l>=6&&!T.bell?5:0,dec:T.bell?.12:T.stac?.4:.7,r:T.bell?.5:.08})}
+ if(T.pad)for(const k of tri)scmTone(ctx,dest,'sine',scmHz(R+12+k),t,sd*15.5,.028,{a:.25,r:.3});
+ if(T.arp)for(let s=0;s<16;s+=2)scmTone(ctx,dest,'triangle',scmHz(R+12+[0,7,12+third,7,12,7,12+third,7][s>>1]),at(s),sd*1.7,.04,{dec:.25});
+ if(T.drone){scmTone(ctx,dest,'sine',scmHz(R),t,sd*16,.1,{a:.6,r:.5});scmTone(ctx,dest,'sine',scmHz(R+7)*1.003,t,sd*16,.05,{a:.8,r:.5})}
+ if(T.bell)for(const s of [4,12])scmTone(ctx,dest,'sine',scmHz(R+36+tri[(bar+(s>>3))%3]),at(s),sd*3.5,.03,{dec:.05,r:.4});
+ if(T.skank)for(const s of [2,6,10,14])for(const k of tri)scmTone(ctx,dest,'square',scmHz(R+12+k),at(s),sd*.8,.016,{dec:.3,r:.03});
+ if(T.reggae)for(const [s,k,l] of [[0,0,3],[6,0,2],[8,-5,3],[12,-2,2],[14,0,1.6]])scmTone(ctx,dest,'triangle',scmHz(R-12+k),at(s),sd*l,.2,{dec:.6});
+ if(T.bounce)for(const [s,k] of [[0,0],[4,-5],[8,0],[12,-5]])scmTone(ctx,dest,'triangle',scmHz(R-12+k),at(s),sd*2.4,.17,{dec:.4});
+ if(T.march)for(const [s,k,l] of [[0,0,6],[8,0,3],[12,-5,3]])scmTone(ctx,dest,'triangle',scmHz(R-12+k),at(s),sd*l,.17,{dec:.6});
+ if(T.tuba)for(const [s,k,l] of [[0,0,4],[6,0,1.6],[8,7,4]])scmTone(ctx,dest,'square',scmHz(R-12+k),at(s),sd*l,.05,{dec:.5,a:.03});
+ if(T.stomp)for(const s of [0,8])scmTone(ctx,dest,'sine',95,at(s),.22,.3,{to:38,dec:.05,a:.004});
+ if(T.drop){scmTone(ctx,dest,'sine',110,at(8),.16,.3,{to:44,dec:.05,a:.004});scmHit(ctx,dest,at(8),.09,.06,'bandpass',1700);for(const s of [2,6,10,14])scmHit(ctx,dest,at(s),.035,.03,'highpass',7000)}
+ if(T.beat){for(const s of [0,8])scmTone(ctx,dest,'sine',120,at(s),.14,.26,{to:46,dec:.05,a:.004});for(const s of [4,12])scmHit(ctx,dest,at(s),.1,.07,'bandpass',1900);for(let s=0;s<16;s+=2)scmHit(ctx,dest,at(s),.03,.022,'highpass',7500)}
+ return t+16*sd}
+const SCM={name:'',g:null,bar:0,next:0};
+function scmStop(){const g=SCM.g;SCM.name='';SCM.g=null;if(g&&ac){try{g.gain.cancelScheduledValues(ac.currentTime);g.gain.setTargetAtTime(0,ac.currentTime,.18)}catch(e){}later(()=>{try{g.disconnect()}catch(e){}},2500)}}
+function scmTick(){if(!ac)return;const want=state==='c3'&&c3q&&meta.mus?SCENE_MUS[c3q.key]||'lantern':'';
+ if(want!==SCM.name){scmStop();if(want){SCM.name=want;SCM.g=ac.createGain();SCM.g.gain.value=0;SCM.g.connect(ac.destination);SCM.bar=0;SCM.next=ac.currentTime+.12}}
+ if(!SCM.name)return;SCM.g.gain.setTargetAtTime(Math.pow(meta.mus/10,2)*1.5,ac.currentTime,.15);
+ let n=0;while(SCM.next<ac.currentTime+.4&&n++<3){if(SCM.next<ac.currentTime-.05)SCM.next=ac.currentTime+.05; /* the tab was asleep: pick up from now, not from then */SCM.next=scmBar(ac,SCM.g,SCM_T[SCM.name],SCM.bar++,SCM.next)}}
 
 function bindBtn(id,key){const el=$(id);if(!el)return;
  el.addEventListener('pointerdown',e=>{e.preventDefault();unlock();keys[key]=1;el.classList.add('on');try{el.setPointerCapture(e.pointerId)}catch(_){}} );
