@@ -715,3 +715,12 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
   .card > .row.end.foot > button { flex: 0 0 auto; white-space: nowrap; padding: 0.55rem 0.7rem; font-size: 0.7rem; }
   .card > .row.end.foot > button:last-child { position: sticky; right: 0; margin-left: auto; box-shadow: -0.6rem 0 0.8rem rgba(22, 17, 26, 0.95); }
 }
+
+/* the ending film: a title card at the close, and the tally under the last card */
+#talk.finale .fin-card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #05040a; opacity: 0; pointer-events: none; transition: opacity 1.2s; text-align: center; padding: 1rem; }
+#talk.finale.fin-end .fin-card { opacity: 1; } #talk.finale.fin-end .tk-box, #talk.finale.fin-end .c-skip { display: none; }
+#talk.finale .fin-card small { font-family: var(--title); letter-spacing: 0.35em; text-transform: uppercase; color: #9a8a66; font-size: 0.85rem; }
+#talk.finale .fin-card h1 { font-family: var(--title); font-size: clamp(2.4rem, 9vw, 5rem); color: #f6e7bd; margin: 0.4rem 0 0; text-shadow: 0 0 2.5rem rgba(255, 170, 60, 0.5); }
+.fin-tally { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin: 0.8rem 0 0.2rem; }
+.fin-tally span { display: flex; flex-direction: column; align-items: center; padding: 0.45rem 0.3rem; border: 1px solid rgba(201, 160, 64, 0.3); border-radius: 0.3rem; background: rgba(0, 0, 0, 0.25); }
+.fin-tally b { font-family: var(--title); font-size: 1.3rem; color: #fff3cf; } .fin-tally i { font-style: normal; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: #a89c84; text-align: center; }

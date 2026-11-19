@@ -58,7 +58,7 @@
     const out = res0.apply(this, arguments);
     if (r && r.win && a != null) { const cardEl = document.querySelector('#panel .card.res'), q = cardEl && cardEl.querySelector('.quote'), ok = cardEl && cardEl.querySelector('#ok');
       if (q) q.textContent = ['The Captain goes down on the first step of his own stair. Above you, nine hundred more.', 'The gauntlet comes off his hand and rings on the stone all the way down. Nobody picks it up.', 'She does not fall. She simply stops, like a clock, and all the light goes out of the wings.'][a];
-      if (a === 2 && ok) { const nb = ok.cloneNode(true); nb.textContent = 'Sit down'; ok.parentNode.replaceChild(nb, ok); nb.addEventListener('click', () => { G.sfx('ui'); ending(); }); } }
+      if (a === 2 && ok) { const nb = ok.cloneNode(true); nb.textContent = 'Sit down'; ok.parentNode.replaceChild(nb, ok); nb.addEventListener('click', () => { G.sfx('ui'); ui.ending(); }); } }
     return out;
   };
   const obj0 = G.objective;

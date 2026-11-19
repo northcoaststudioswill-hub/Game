@@ -37,14 +37,14 @@
   const ALL_HATE = ['Every one of you is beneath me. I had to build the throne this high just to be sure.', 'Elves, dwarves, orc-get, hell-get, cave-get, and the common herd. A full set! I shall have you all mounted.', 'Not one drop of decent blood on the whole lawn. Mine is the only kind worth spilling, and I am not offering.', 'I am the only real person here. The rest of you are furniture that screams.'];
   const hateFor = r => HATE[r] || ALL_HATE;
   let davT = 6, davEl = null;
-  function says(pool) { if (!G.garden.run || !G.garden.run.brawl) return; if (!davEl) { davEl = document.createElement('div'); davEl.id = 'gdavid'; document.getElementById('ui').appendChild(davEl); } davEl.innerHTML = '<b>David</b> “' + pick(pool) + '”'; davEl.classList.remove('on'); void davEl.offsetWidth; davEl.classList.add('on'); davT = 7 + Math.random() * 4; }
+  function says(pool) { if (!G.garden.run || !G.garden.run.brawl) return; if (!davEl) { davEl = document.createElement('div'); davEl.id = 'gdavid'; document.getElementById('ui').appendChild(davEl); } davEl.innerHTML = '<b>David</b> “' + pick(pool) + '”'; davEl.classList.remove('on'); void davEl.offsetWidth; davEl.classList.add('on'); davT = 7 + Math.random() * 4; if (Math.random() < 0.55) G.sfx('laugh'); }
   function hud() { if (!hudEl) { hudEl = document.createElement('div'); hudEl.id = 'gsouls'; document.getElementById('ui').appendChild(hudEl); } hudEl.textContent = 'SOULS LEFT · ' + (mobs.length + 1); }
   function gore(x, y, big) {
     const gf = G.gfx, X = x / S, Z = y / S, on = G.state.gore !== false;
     if (on) { gf.blood(X, 1.0, Z, big ? 90 : 50, 6); for (let i = 0; i < (big ? 6 : 3); i++) gf.splat(X + (Math.random() - 0.5) * 2.4, Z + (Math.random() - 0.5) * 2.4, 0.5 + Math.random() * 0.9); }
     gf.burst(X, 1.1, Z, 0xffffff, 26, 7, 3); gf.burst(X, 1.1, Z, 0xbfe0ff, 18, 4, 5);       // and then the white: not dead, removed
     const sc = arena().scene, T = THREE; for (let i = 0; i < (on ? 9 : 4); i++) { const m = new T.Mesh(new T.BoxGeometry(0.16 + Math.random() * 0.2, 0.14 + Math.random() * 0.16, 0.16 + Math.random() * 0.2), new T.MeshLambertMaterial({ color: on && i % 3 ? [0x8a1410, 0xb02018, 0x5a0c0a][i % 3] : 0xcfe0ee, transparent: true })); m.position.set(X, 0.9 + Math.random() * 0.6, Z); sc.add(m); const a = Math.random() * 6.28, v = 2 + Math.random() * 4.5; chunks.push({ m, vx: Math.cos(a) * v, vz: Math.sin(a) * v, vy: 4 + Math.random() * 5, t: 0 }); }
-    G.sfx('crit'); G.sfx('wall');
+    G.sfx('erase'); G.sfx('sever');
   }
   function dropMob(m, by) { const i = mobs.indexOf(m); if (i < 0) return; mobs.splice(i, 1); gore(m.x, m.y, true); word(m.x, m.y, 'ERASED', '#ff3020', true); if (Math.random() < 0.6) says(Math.random() < 0.6 ? hateFor(m.race) : HIS_KILL); m.dead = 0.001; m.c.root.visible = false; arena().scene.remove(m.c.root); hud(); if (by === 'you' && G.fight.addHypeX) G.fight.addHypeX(8); }
   // the soul you were fighting is gone: the nearest one left turns to face you

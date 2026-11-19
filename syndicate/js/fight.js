@@ -275,7 +275,7 @@
   function screenFx(kind) { const el = document.getElementById('hitfx'); if (!el || F.ex) return; el.className = ''; void el.offsetWidth; el.className = kind; }
   function knockdown(e, t) { if (e.state === 'ko') return; e.st.stun = { t }; interrupt(e); e.down = e.downT = t; e.lastDown = time; e.vx = e.vy = 0; fx.push({ k: 'dust', x: e.x, y: e.y, r: 90, t: 0.12, life: 0.5 }); }
   // a limb comes off: it is thrown as a gib, the stump bleeds, and the fighter is worse for it
-  function sever(tgt, part, att, dir) {
+  function sever(tgt, part, att, dir) { G.sfx('sever'); if (!F.ex && !(G.garden && G.garden.run)) G.sfx('roar');
     const limb = tgt.vis.c.sever(part); if (!limb) return; tgt.lost = tgt.lost || {}; tgt.lost[part] = 1;
     sc.attach(limb); const a = dir + rand(-0.6, 0.6), v = rand(3, 5.5);
     gibs.push({ m: limb, vx: Math.cos(a) * v, vz: Math.sin(a) * v, vy: rand(5.5, 8.5), rx: rand(-10, 10), rz: rand(-10, 10) });
@@ -344,7 +344,7 @@
       const a = rand(0, 6.28), v = rand(1.5, ash ? 4 : 7); gibs.push({ m, vx: Math.cos(a) * v, vz: Math.sin(a) * v, vy: rand(3, 9), rx: rand(-9, 9), rz: rand(-9, 9), ash });
     }
   }
-  function startMortal(e) { gfx.clearFloats();
+  function startMortal(e) { gfx.clearFloats(); if (!F.ex && !(G.garden && G.garden.run)) G.sfx('hush');
     e.st = { stun: { t: 99 } }; e.buffs = {}; interrupt(e); e.kx = e.ky = 0; e.guard = 0; e.state = 'idle';
     P.st = {}; delete P.buffs.stealth; interrupt(P); P.state = 'idle'; P.kx = P.ky = 0; P.iframe = 9;
     projs.forEach(p => p.m && sc.remove(p.m)); projs = []; zones.forEach(z => z.m && sc.remove(z.m)); zones = [];
@@ -468,8 +468,8 @@
       const spike = len => { const hd = e.vis.c.limbs.head, g = stick(len, 0, 0, 0, 'blade'); hd.add(g); hd.updateWorldMatrix(true, false); const up = new T.Vector3(0, 1, 0).applyQuaternion(hd.getWorldQuaternion(new T.Quaternion()).invert()); g.quaternion.setFromUnitVectors(new T.Vector3(0, -1, 0), up); g.position.set(0, 0.12, 0).addScaledVector(up, len * 0.3); return g; };
       if (k === 'javelin') { face(); if (!m.f.p0) m.f.p0 = [P.x, P.y]; if (m.t < 0.45) { const u = m.t / 0.45; P.x = m.f.p0[0] - dx * 80 * u; P.y = m.f.p0[1] - dy * 80 * u; clampArena(P); P.moving = true; P.walk = (P.walk || 0) + dt * 14; } else P.moving = false;
         if (m.t < IMP) { e.poseOv = { act: 'stun', prog: 0 }; P.poseOv = m.t < IMP - 0.12 ? { act: 'cast', cs: 'throw', prog: Math.min(1, m.t / (IMP - 0.12)) } : { act: 'release', cs: 'throw', prog: 0 }; }
-        once('thr', IMP - 0.12, () => { fx.push({ k: 'lance', x: P.x, y: P.y, a: m.a, r: Math.hypot(e.x - P.x, e.y - P.y), col: '#ffffff', w: 0.08, t: 0, life: 0.18, h: 1.5 }); G.sfx('swing'); hand(false); });
-        once('hitf', IMP, () => { lodge(hd, [0, 0.16, 0.2], [0, 0, -1], 0.8); for (let bi = 0; bi < 30; bi++) gfx.emit(e.x / S + dx * 0.3, 1.5, e.y / S + dy * 0.3, dx * rand(2, 7) + rand(-1, 1), rand(0, 3), dy * rand(2, 7) + rand(-1, 1), rand(0.4, 0.9), '#8a0c0c', 1); e.poseOv = { act: 'hoist', prog: 0.5 }; e.kx = dx * 90; e.ky = dy * 90; });
+        once('thr', IMP - 0.12, () => { fx.push({ k: 'lance', x: P.x, y: P.y, a: m.a, r: Math.hypot(e.x - P.x, e.y - P.y), col: '#ffffff', w: 0.08, t: 0, life: 0.18, h: 1.5 }); G.sfx('throw'); hand(false); });
+        once('hitf', IMP, () => { G.sfx('impale'); lodge(hd, [0, 0.16, 0.2], [0, 0, -1], 0.8); for (let bi = 0; bi < 30; bi++) gfx.emit(e.x / S + dx * 0.3, 1.5, e.y / S + dy * 0.3, dx * rand(2, 7) + rand(-1, 1), rand(0, 3), dy * rand(2, 7) + rand(-1, 1), rand(0.4, 0.9), '#8a0c0c', 1); e.poseOv = { act: 'hoist', prog: 0.5 }; e.kx = dx * 90; e.ky = dy * 90; });
         if (m.t > IMP && m.t < IMP + 0.9) { e.x += (e.kx || 0) * dt; e.y += (e.ky || 0) * dt; e.kx *= 0.9; e.ky *= 0.9; clampArena(e); P.poseOv = m.t < IMP + 0.4 ? { act: 'release', cs: 'throw', prog: (m.t - IMP) / 0.4 } : null; }
         once('jf', IMP + 0.9, fall); }
       if (k === 'legs') { face(); if (m.t > 0.15 && m.t < 0.65) P.poseOv = { act: 'swing', mv: 'lowcut', prog: (m.t - 0.15) / 0.5 };
@@ -478,28 +478,28 @@
         if (m.t > 0.8 && m.t < 1.1) { const u = (m.t - 0.8) / 0.3, tx = e.x - dx * 26, ty = e.y - dy * 26; P.x += (tx - P.x) * u * 0.4; P.y += (ty - P.y) * u * 0.4; P.moving = true; P.walk = (P.walk || 0) + dt * 12; } else if (m.t >= 1.1) P.moving = false;
         if (m.t >= 1.1 && m.t < IMP) P.poseOv = { act: 'hoist', prog: 0.5 }; else if (m.t >= IMP && m.t < IMP + 0.6) P.poseOv = { act: 'swing', mv: 'chop', prog: Math.min(0.62, 0.5 + (m.t - IMP)) }; else if (m.t >= IMP + 0.6 && P.poseOv && P.poseOv.mv === 'chop') P.poseOv = null;
         if (m.t >= IMP + 0.45 && m.t < IMP + 0.9) { P.x -= dx * 70 * dt; P.y -= dy * 70 * dt; P.moving = true; P.walk = (P.walk || 0) + dt * 10; } else if (m.t >= IMP + 0.9) P.moving = false;
-        once('sk', IMP, () => { plant(hd, 0.12, 0.4); hand(false); for (let bi = 0; bi < 24; bi++) gfx.emit(e.x / S, 1.3, e.y / S, rand(-2, 2), rand(2, 6), rand(-2, 2), rand(0.4, 0.9), '#8a0c0c', 1); });
+        once('sk', IMP, () => { G.sfx('skull'); plant(hd, 0.12, 0.4); hand(false); for (let bi = 0; bi < 24; bi++) gfx.emit(e.x / S, 1.3, e.y / S, rand(-2, 2), rand(2, 6), rand(-2, 2), rand(0.4, 0.9), '#8a0c0c', 1); });
         once('lf', IMP + 0.9, fall); }
       if (k === 'facestuck') { face(); if (m.t > 0.2 && m.t < IMP + 2.1) e.poseOv = { act: 'kneel', prog: 0 };
         if (m.t < IMP) P.poseOv = { act: 'swing', mv: 'chop', prog: 0.5 * Math.min(1, m.t / IMP) * (m.t / IMP > 0.8 ? 1 : 0.6) };
-        once('cv', IMP, () => { lodge(hd, [0, 0.3, 0.24], [0, -0.6, -0.8], 0.16); hand(false); });
+        once('cv', IMP, () => { G.sfx('skull'); lodge(hd, [0, 0.3, 0.24], [0, -0.6, -0.8], 0.16); hand(false); });
         if (m.t >= IMP && m.t < IMP + 0.3) P.poseOv = { act: 'swing', mv: 'chop', prog: 0.55 };
         if (m.t >= IMP + 0.3 && m.t < IMP + 1.2) { P.poseOv = { act: 'tear', prog: 0.25 + Math.abs(Math.sin((m.t - IMP) * 9)) * 0.2 }; e.x += Math.sin(m.t * 30) * 1.2; }
         every('tug', IMP + 0.35, IMP + 1.15, 0.28, i => { text(e, ['STUCK', 'STILL STUCK', 'PROPERLY STUCK'][i % 3], '#cfd8e0', false); G.sfx('clang'); blood(e.x, e.y, 6, rand(0, 6.28)); });
         if (m.t >= IMP + 1.2 && m.t < IMP + 1.75) P.poseOv = { act: m.t < IMP + 1.45 ? 'cast' : 'release', cs: 'breath', prog: m.t < IMP + 1.45 ? (m.t - IMP - 1.2) / 0.25 : (m.t - IMP - 1.45) / 0.3 };
-        once('spit', IMP + 1.47, () => { text(P, 'SPITS', '#e8e8e0', true); G.sfx('ui'); for (let si = 0; si < 6; si++) gfx.emit(P.x / S + dx * 0.3, 1.6, P.y / S + dy * 0.3, dx * rand(2.5, 4), rand(0, 1), dy * rand(2.5, 4), 0.35, '#e8f0f0', 1); });
+        once('spit', IMP + 1.47, () => { text(P, 'SPITS', '#e8e8e0', true); G.sfx('spit'); for (let si = 0; si < 6; si++) gfx.emit(P.x / S + dx * 0.3, 1.6, P.y / S + dy * 0.3, dx * rand(2.5, 4), rand(0, 1), dy * rand(2.5, 4), 0.35, '#e8f0f0', 1); });
         if (m.t >= IMP + 1.8 && m.t < IMP + 2.3) P.poseOv = { act: 'kick', prog: (m.t - IMP - 1.8) / 0.5 }; else if (m.t >= IMP + 2.3 && P.poseOv && P.poseOv.act === 'kick') P.poseOv = null;
         once('ff', IMP + 2.1, fall); }
       if (k === 'gut') { face(); if (m.t < 0.25) { const tx = e.x - dx * 26, ty = e.y - dy * 26; P.x += (tx - P.x) * 0.3; P.y += (ty - P.y) * 0.3; }
         if (m.t > 0.2 && m.t < IMP + 0.28) e.poseOv = { act: 'stun', prog: 0 };
         if (m.t >= IMP + 0.3 && m.t < IMP + 0.75) { e.x += dx * 110 * dt; e.y += dy * 110 * dt; clampArena(e); }
         if (m.t >= 0.25 && m.t < IMP) P.poseOv = { act: 'swing', prog: 0.34 + (((m.t * 1000) % 100) / 100) * 0.24, step: Math.floor(m.t * 10) % 2 };
-        every('stb', 0.28, IMP, 0.1, i => { blood(e.x, e.y, 7, m.a + rand(-0.8, 0.8)); e.hurt = 0.2; e.hurtSide = i % 2 ? 1 : -1; e.flash = 0.03; G.sfx('hit'); shake = Math.max(shake, 3); if (i % 3 === 0) gfx.splat(e.x / S + rand(-0.6, 0.6), e.y / S + rand(-0.6, 0.6), rand(0.3, 0.6)); });
+        every('stb', 0.28, IMP, 0.1, i => { blood(e.x, e.y, 7, m.a + rand(-0.8, 0.8)); e.hurt = 0.2; e.hurtSide = i % 2 ? 1 : -1; e.flash = 0.03; G.sfx('pierce'); shake = Math.max(shake, 3); if (i % 3 === 0) gfx.splat(e.x / S + rand(-0.6, 0.6), e.y / S + rand(-0.6, 0.6), rand(0.3, 0.6)); });
         if (m.t >= IMP && m.t < IMP + 0.5) P.poseOv = { act: 'kick', prog: (m.t - IMP) / 0.5 }; else if (m.t >= IMP + 0.5 && P.poseOv && P.poseOv.act === 'kick') P.poseOv = null;
         once('thr', IMP - 0.02, () => { lodge(hd, [0, -0.02, 0.16], [0, 0.5, -0.86], 0.2); hand(false); text(e, 'AND ONE TO KEEP', '#ff3020', true); blood(e.x, e.y, 26, m.a); });
         once('gf', IMP + 0.3, fall); }
       if (k === 'heart') { face(); if (m.t < IMP) { const tx = e.x - dx * 46, ty = e.y - dy * 46; P.x += (tx - P.x) * 0.25; P.y += (ty - P.y) * 0.25; P.poseOv = { act: 'swing', mv: 'drive', prog: 0.5 * (m.t / IMP) }; e.poseOv = { act: 'stun', prog: 0 }; }
-        once('thru', IMP, () => { lodge(tor, [0, hd.position.y - 0.38, 0.2], [0, 0, -1], 0.62); hand(false); e.poseOv = { act: 'hoist', prog: 0.5 }; });
+        once('thru', IMP, () => { G.sfx('pierce'); lodge(tor, [0, hd.position.y - 0.38, 0.2], [0, 0, -1], 0.62); hand(false); e.poseOv = { act: 'hoist', prog: 0.5 }; });
         if (m.t >= IMP && m.t < IMP + 1.0) P.poseOv = { act: 'swing', mv: 'drive', prog: 0.52 };
         once('tw', IMP + 0.5, () => { text(e, 'TWISTED', '#ff3020', true); blood(e.x, e.y, 30, m.a); G.sfx('crit'); shake = Math.max(shake, 8); if (m.f.prop) m.f.prop.rotation.z = 1.2; });
         once('wd', IMP + 1.0, () => { hand(true); if (m.f.prop && m.f.prop.parent) m.f.prop.parent.remove(m.f.prop); blood(e.x, e.y, 40, m.a + Math.PI); e.poseOv = { act: 'kneel', prog: 0 }; });
@@ -508,16 +508,16 @@
       if (k === 'strangle') { if (m.t < 0.4) { const tx = e.x + dx * 62, ty = e.y + dy * 62; P.x += (tx - P.x) * 0.25; P.y += (ty - P.y) * 0.25; P.moving = true; P.walk = (P.walk || 0) + dt * 16; } else { P.moving = false; P.aim = m.a + Math.PI; }
         e.aim = m.a + Math.PI;
         if (m.t >= 0.4 && m.t < IMP) { const u = (m.t - 0.4) / (IMP - 0.4); P.poseOv = { act: 'tear', prog: 0.3 + u * 0.4 }; e.poseOv = { act: 'hoist', prog: 0.5 }; e.z = 4 + u * 12; e.x += Math.sin(m.t * 34) * 1.5 * (1 - u); e.vis.c.mats && e.vis.c.mats.forEach(mm => mm.color.lerp(new T.Color(0x6a5a8a), 0.012)); }
-        once('whp', 0.4, () => { hand(false); G.sfx('swing'); text(e, 'COLLARED', '#c8c0d8', true); });
+        once('whp', 0.4, () => { hand(false); G.sfx('whipcrack'); text(e, 'COLLARED', '#c8c0d8', true); });
         every('ch', 0.4, IMP, 0.05, () => { fx.push({ k: 'trail', x1: P.x, y1: P.y, x2: e.x, y2: e.y, col: '#b8bcc4', t: 0, life: 0.09 }); });
-        every('ck', 0.6, IMP - 0.1, 0.4, i => { text(e, ['CHOKING', 'KICKING', 'SLOWING'][i % 3], '#c8c0d8', false); G.sfx('clang'); });
+        every('ck', 0.6, IMP - 0.1, 0.4, i => { text(e, ['CHOKING', 'KICKING', 'SLOWING'][i % 3], '#c8c0d8', false); G.sfx('choke'); });
         once('sn', IMP, () => { e.z = 0; P.poseOv = null; hand(true); });
         if (m.t >= IMP + 0.1 && m.t < IMP + 0.6) { P.x += dx * 190 * dt; P.y += dy * 190 * dt; clampArena(P); P.moving = true; P.walk = (P.walk || 0) + dt * 10; } else if (m.t >= IMP + 0.6) P.moving = false; once('sf', IMP + 0.25, fall); }
       if (k === 'cleave') { face(); if (m.t > 0.2 && m.t < IMP + 1.3) e.poseOv = { act: 'kneel', prog: 0 };
         if (m.t < 0.3) { const tx = e.x - dx * 42, ty = e.y - dy * 42; P.x += (tx - P.x) * 0.25; P.y += (ty - P.y) * 0.25; }
         if (m.t >= 0.3 && m.t < IMP - 0.14) P.poseOv = { act: 'hoist', prog: 0.5 }; else if (m.t >= IMP - 0.14 && m.t < IMP + 0.3) P.poseOv = { act: 'swing', mv: 'chop', prog: Math.min(0.6, 0.36 + (m.t - IMP + 0.14) * 1.2) };
         once('hv', 0.5, () => text(P, 'HEAVES', '#e8e0d0', false));
-        once('bur', IMP, () => { lodge(tor, [0.14, hd.position.y - 0.02, 0.05], [-0.1, -1, -0.15], 0.5); hand(false); fx.push({ k: 'dust', x: e.x, y: e.y, r: 90, t: 0, life: 0.5 }); gfx.splat(e.x / S, e.y / S, 1.4); for (let bi = 0; bi < 30; bi++) gfx.emit(e.x / S, 1.2, e.y / S, rand(-2, 2), rand(2, 7), rand(-2, 2), rand(0.4, 0.9), '#8a0c0c', 1); });
+        once('bur', IMP, () => { G.sfx('sever'); lodge(tor, [0.14, hd.position.y - 0.02, 0.05], [-0.1, -1, -0.15], 0.5); hand(false); fx.push({ k: 'dust', x: e.x, y: e.y, r: 90, t: 0, life: 0.5 }); gfx.splat(e.x / S, e.y / S, 1.4); for (let bi = 0; bi < 30; bi++) gfx.emit(e.x / S, 1.2, e.y / S, rand(-2, 2), rand(2, 7), rand(-2, 2), rand(0.4, 0.9), '#8a0c0c', 1); });
         if (m.t >= IMP + 0.3 && m.t < IMP + 0.95) { P.poseOv = { act: 'tear', prog: 0.25 + Math.abs(Math.sin((m.t - IMP) * 8)) * 0.2 }; e.x += Math.sin(m.t * 30) * 1.0; }
         once('wr', IMP + 0.6, () => { text(e, 'WEDGED', '#cfd8e0', false); G.sfx('clang'); });
         if (m.t >= IMP + 0.95 && m.t < IMP + 1.45) P.poseOv = { act: 'kick', prog: (m.t - IMP - 0.95) / 0.5 }; else if (m.t >= IMP + 1.45 && P.poseOv && P.poseOv.act === 'kick') P.poseOv = null;
@@ -528,7 +528,7 @@
         once('hk', 0.4, () => { e.state = 'ko'; e.koT = 0; e.st = {}; e.poseOv = null; G.sfx('hit'); text(e, 'HOOKED', col, true); fx.push({ k: 'dust', x: e.x, y: e.y, r: 70, t: 0, life: 0.4 }); shake = Math.max(shake, 8); });
         if (m.t > 0.7 && m.t < 1.1) { const tx = e.x - dx * 34, ty = e.y - dy * 34; P.x += (tx - P.x) * 0.2; P.y += (ty - P.y) * 0.2; }
         if (m.t >= 1.1 && m.t < IMP) P.poseOv = { act: 'hoist', prog: 0.5 }; else if (m.t >= IMP && m.t < IMP + 0.5) P.poseOv = { act: 'swing', mv: 'chop', prog: Math.min(0.62, 0.5 + (m.t - IMP)) }; else if (m.t >= IMP + 0.5 && P.poseOv && P.poseOv.mv === 'chop') P.poseOv = null;
-        once('pn', IMP, () => { plant(tor, hd.position.y - 0.4, 0.55); hand(false); for (let bi = 0; bi < 24; bi++) gfx.emit(e.x / S, 0.5, e.y / S, rand(-2, 2), rand(2, 6), rand(-2, 2), rand(0.4, 0.9), '#8a0c0c', 1); });
+        once('pn', IMP, () => { G.sfx('impale'); plant(tor, hd.position.y - 0.4, 0.55); hand(false); for (let bi = 0; bi < 24; bi++) gfx.emit(e.x / S, 0.5, e.y / S, rand(-2, 2), rand(2, 6), rand(-2, 2), rand(0.4, 0.9), '#8a0c0c', 1); });
         if (m.t >= IMP + 0.5 && m.t < IMP + 0.9) { P.x -= dx * 60 * dt; P.y -= dy * 60 * dt; P.moving = true; P.walk = (P.walk || 0) + dt * 10; } else if (m.t >= IMP + 0.9) P.moving = false; }
       if (k === 'sweep') { face(); if (m.t > 0.15 && m.t < 0.6) P.poseOv = { act: 'swing', mv: 'lowcut', prog: (m.t - 0.15) / 0.45 };
         once('sw', 0.4, () => { e.state = 'ko'; e.koT = 0; e.st = {}; e.poseOv = null; G.sfx('hit'); text(e, 'SWEPT', col, true); fx.push({ k: 'dust', x: e.x, y: e.y, r: 70, t: 0, life: 0.4 }); shake = Math.max(shake, 8); });
@@ -683,7 +683,7 @@
     spark(tgt.x, tgt.y, 34, ab.color || '#fff', crit ? 18 : 9, crit ? 260 : 170);
     blood(tgt.x, tgt.y, crit ? 18 : 9, o.from != null ? o.from : Math.atan2(tgt.y - att.y, tgt.x - att.x));
     flashLight(tgt.x, tgt.y, ab.color || '#ffffff', crit ? 40 : 18);
-    G.sfx(crit ? 'crit' : tgt.isPlayer ? 'hurt' : 'hit');
+    (G.hitSound ? G.hitSound(att, tgt, ab, crit) : G.sfx(crit ? 'crit' : tgt.isPlayer ? 'hurt' : 'hit'));
     if (G.rumble) G.rumble(tgt.isPlayer ? 160 : crit ? 110 : 50, tgt.isPlayer ? 0.8 : crit ? 0.6 : 0.25);
     if (att.isPlayer) { addHype(crit ? 10 : 5); if (ab.gain) att.res = Math.min(100, att.res + ab.gain); if (att.hp < att.maxHp * 0.2 && time - (att.lbT || -9) > 3) { att.lbT = time; addHype(8); text(att, 'LAST BREATH', '#ff8a6a', true); } }
     else addHype(-7);
@@ -760,7 +760,7 @@
       if (e.d.wild && Math.random() < 0.25) wildSurge(e);
     }
     if (e.buffs.stealth && ab.type !== 'buff' && ab.type !== 'dash') delete e.buffs.stealth;
-    G.sfx(ab.type === 'melee' && !ab.spell ? 'swing' : ab.type === 'dash' ? 'dash' : 'cast');
+    G.sfx(ab.type === 'melee' && !ab.spell ? (ab.heavy ? 'heavyswing' : (ab.arc || 0) < 60 ? 'lightswing' : 'swing') : ab.type === 'dash' ? 'dash' : 'cast');
     if (ab.heavy) { fx.push({ k: 'ring', x: e.x, y: e.y, r: 70, col: e.isPlayer ? '#ffe9a0' : '#ff5030', t: 0, life: 0.3 }); if (!e.isPlayer && !F.ex) { text(e, '!', '#ff5030', true); flashLight(e.x, e.y, '#ff5030', 30); } }       // a heavy blow is coming: read it
     if (!ab.basic && !ab.heavy && ab.name) { gfx.floatText(e.x / S, 2.9, e.y / S, ab.name, ab.color || '#fff'); if (ab.ult) { fx.push({ k: 'ring', x: e.x, y: e.y, r: 150, col: ab.color, t: 0, life: 0.5 }); hitstop = Math.max(hitstop, 0.1); flashLight(e.x, e.y, ab.color, 60); camVh += 1.5; } }
     return true;
@@ -885,7 +885,7 @@
       if (Math.hypot(e.x - bx, e.y - by) > 0.5 && Math.hypot(e.kx, e.ky) > 110 && phase === 'fight') {       // slammed into the pit wall
         const spiked = !F.ex && SPIKES.some(q => Math.hypot(e.x - q[0], e.y - q[1]) < 48);       // the spike walls: far worse than stone
         const wd = Math.round((5 + (e.kBy ? e.kBy.level * 2 : 4)) * (spiked ? 1.8 : 1)); e.hp -= wd; e.kx = e.ky = 0; e.st.stun = { t: spiked ? 0.95 : 0.4 }; interrupt(e); e.flash = 0.12; e.hurt = 0.3;
-        if (spiked) { blood(e.x, e.y, 46, Math.atan2(-e.y, -e.x)); if (gore()) for (let si = 0; si < 3; si++) gfx.splat(e.x / S + rand(-0.7, 0.7), e.y / S + rand(-0.7, 0.7), rand(0.5, 1)); hitstop = Math.max(hitstop, 0.14); G.sfx('crit'); if (e.kBy && e.kBy.isPlayer) addHype(12); }
+        if (spiked) { blood(e.x, e.y, 46, Math.atan2(-e.y, -e.x)); if (gore()) for (let si = 0; si < 3; si++) gfx.splat(e.x / S + rand(-0.7, 0.7), e.y / S + rand(-0.7, 0.7), rand(0.5, 1)); hitstop = Math.max(hitstop, 0.14); G.sfx('impale'); G.sfx('gasp'); if (e.kBy && e.kBy.isPlayer) addHype(12); }
         text(e, (spiked ? 'IMPALED ' : 'WALL ') + wd, spiked ? '#ff3020' : '#ffb070', true); spark(e.x, e.y, 30, '#c8b8a0', 14, 220); shake = Math.max(shake, 9); G.sfx('wall'); if (e.kBy && e.kBy.isPlayer) addHype(10);
         if (e.hp <= 0) { ko(e); return; }
       }
@@ -1082,14 +1082,14 @@
     if (hazT <= 0 && time > 6) {
       const tg = Math.random() < 0.5 ? P : E;
       if (Math.random() < 0.55) { const x = tg.x + (tg.vx || 0) * 0.5 + rand(-20, 20), y = tg.y + (tg.vy || 0) * 0.5 + rand(-20, 20), a = rand(Math.PI, Math.PI * 1.5); haz.push({ k: 'bottle', x, y, r: 44, t: 0, delay: 1.0 }); fx.push({ k: 'lob', x1: Math.cos(a) * RAD * 1.5, y1: Math.sin(a) * RAD * 1.5, x2: x, y2: y, col: '#9ad0a0', t: 0, life: 1.0 }); }
-      else { const g = GRATES.slice().sort((p, q) => Math.hypot(tg.x - p[0], tg.y - p[1]) - Math.hypot(tg.x - q[0], tg.y - q[1]))[0]; haz.push({ k: 'vent', x: g[0], y: g[1], r: 62, t: 0, delay: 1.4 }); G.sfx('fire'); }
+      else { const g = GRATES.slice().sort((p, q) => Math.hypot(tg.x - p[0], tg.y - p[1]) - Math.hypot(tg.x - q[0], tg.y - q[1]))[0]; haz.push({ k: 'vent', x: g[0], y: g[1], r: 62, t: 0, delay: 1.4 }); G.sfx('vent'); }
     }
     for (let i = haz.length - 1; i >= 0; i--) { const h = haz[i], t0 = h.t; h.t += dt;
       if (Math.floor(t0 / 0.3) !== Math.floor(h.t / 0.3) && h.t < h.delay) fx.push({ k: 'ring', x: h.x, y: h.y, r: h.r, col: h.k === 'vent' ? '#ff8a2a' : '#ffe9a0', t: 0, life: 0.3 });
       if (h.k === 'vent' && h.t < h.delay && Math.random() < 0.7) gfx.emit(h.x / S + rand(-0.4, 0.4), 0.05, h.y / S + rand(-0.4, 0.4), 0, rand(1, 3), 0, 0.4, '#ff8a2a', -1);
       if (h.t < h.delay) continue; haz.splice(i, 1);
       if (h.k === 'vent') { fx.push({ k: 'blast', x: h.x, y: h.y, r: h.r, col: '#ff8a2a', t: 0, life: 0.5 }); for (let fi = 0; fi < 18; fi++) { const fa = rand(0, 6.28), fr = rand(0, h.r / S); gfx.emit(h.x / S + Math.cos(fa) * fr, 0.2, h.y / S + Math.sin(fa) * fr, 0, rand(3, 8), 0, rand(0.5, 1), fi % 2 ? '#ff8a2a' : '#ffd060', -1); } G.sfx('boom'); flashLight(h.x, h.y, '#ff8a2a', 60); mark(h.x, h.y, 1.6, 'scorch'); }
-      else { spark(h.x, h.y, 14, '#9ad0a0', 12, 160); G.sfx('clang'); }
+      else { spark(h.x, h.y, 14, '#9ad0a0', 12, 160); G.sfx('bottle'); }
       [P, E].forEach(e => { if (e.state === 'ko' || e.iframe > 0 || e.z > 30 || Math.hypot(e.x - h.x, e.y - h.y) > h.r + ER * 0.5) return; const d = Math.max(1, Math.round(e.maxHp * (h.k === 'vent' ? 0.07 : 0.04))), was = e.hp; e.hp = Math.max(1, e.hp - d); e.flash = 0.1; e.hurt = 0.3; if (h.k === 'vent') { const a = Math.atan2(e.y - h.y, e.x - h.x); e.kx = Math.cos(a) * 150; e.ky = Math.sin(a) * 150; e.kBy = null; } text(e, (h.k === 'vent' ? 'SCORCHED ' : 'BOTTLE ') + (was - e.hp), h.k === 'vent' ? '#ff8a2a' : '#cfe8d0', false); });
     }
   }
@@ -1138,7 +1138,7 @@
       if (z.ab.trap && !z.sprung) {                          // a trap waits for a foot
         z.life = (z.life || 0) + dt; const tf = z.owner.foe, inside = z.life > 0.7 && tf.state !== 'ko' && !(tf.iframe > 0) && Math.hypot(tf.x - z.x, tf.y - z.y) < z.r * 0.85;
         if (!inside) { if (z.life > 18) { if (z.m) sc.remove(z.m); zones.splice(i, 1); } continue; }
-        z.sprung = 1; z.t = z.delay; G.sfx('clang'); text(tf, 'TRAPPED', '#ffb070', true); if (z.owner.isPlayer) addHype(8);
+        z.sprung = 1; z.t = z.delay; G.sfx('bottle'); text(tf, 'TRAPPED', '#ffb070', true); if (z.owner.isPlayer) addHype(8);
       }
       z.t += dt;
       if (z.t >= z.delay) {
@@ -1166,7 +1166,7 @@
     for (let i = fx.length - 1; i >= 0; i--) { const f = fx[i]; f.t += (f.k === 'slash' || f.k === 'lance' || f.k === 'blast' || f.k === 'trail') ? dtFx : dt; if (f.t < 0) continue; if (!f.obj) buildFx(f); if (f.t >= f.life) { killFx(f); fx.splice(i, 1); } else f.upd(f.t / f.life); }
     arena.flash.intensity *= Math.pow(0.00004, Math.max(dt, dtFx || 0)); if (arena.flash.intensity < 0.3) arena.flash.intensity = 0;
     if (F.ex) { gfx.cam.shake = shake / 45; return; }
-    arena.setHype(hype / 100);
+    F.hypeNow = hype / 100; arena.setHype(hype / 100);
     for (const g of gibs) { if (g.rest) continue; g.vy -= 20 * dt; g.m.position.x += g.vx * dt; g.m.position.y += g.vy * dt; g.m.position.z += g.vz * dt; g.m.rotation.x += g.rx * dt; g.m.rotation.z += g.rz * dt;
       if (g.m.position.y < 0.08) { g.m.position.y = 0.08; if (Math.abs(g.vy) < 2) { g.rest = 1; if (!g.ash && gore()) gfx.splat(g.m.position.x, g.m.position.z, rand(0.5, 1.1)); } else { g.vy *= -0.35; g.vx *= 0.6; g.vz *= 0.6; if (!g.ash && gore() && Math.random() < 0.5) gfx.splat(g.m.position.x, g.m.position.z, rand(0.3, 0.7)); } } }
     if (arena.cineWall) arena.cineWall(phase === 'mortal' && !!M);       // the kill is filmed from inside the pit, so the open side gets its wall for as long as it lasts

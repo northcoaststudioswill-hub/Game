@@ -421,3 +421,11 @@ The scripts in `tests/` need Playwright and a local server (`python3 -m http.ser
 ## Draw calls
 
 Characters were about 70% of the market's draw calls. Each figure's rigid pieces are now welded per joint and material when it is built (`slim` in `models.js`): same look, same animation, roughly 33 draws instead of 57. With three wanderers instead of six, the ordinary market view went from about 500 draw calls to about 310. The same saving applies in the pit and to the ten souls in the Hour Garden.
+
+## The ending, filmed
+
+Beating the Queen now plays a seven-shot film before the final card (`js/finale.js`): the walk up the hall, you seated and crowned, a shot particular to your ending (David looming behind the throne, the red light of the Ash Throne, David sent down the stair, or the throne alone), then the market, Marc, Tallow Row and the pit. Lines change with what you did: names in the sand, what you still owe Marc, gardens survived, deaths. A title card closes it, and the final card carries a tally of the climb. The stair's "Remember it" replays the film. `tests/finale.js` films all four.
+
+## Sound
+
+`js/sound.js` adds, with no audio files: a room (feedback-delay reverb that changes with pit, market, home, garden and throne hall); hits that depend on the weapon (slice, thud, pierce, whip-crack, spell); heavy and light swings; severing, impaling and skull sounds for the finishers; a crowd bed that follows the hype with gasps, roars, boos and chants; a hush before a kill; a heartbeat under a quarter health; birdsong, falling gold, David's laugh and an erasure sound in the Hour Garden; and chords for the throne.
