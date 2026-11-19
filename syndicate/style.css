@@ -697,3 +697,13 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 #talk .tk-box { padding-bottom: 3.1rem; } #talk .tk-hint { bottom: 0.95rem; }
 #talk .c-skip { top: auto; right: auto; left: calc(max(0.7rem, (100% - 46rem) / 2) + 0.8rem); bottom: calc(1.2rem + var(--sb) + 0.55rem); min-width: 5.5rem; min-height: 2.1rem; padding: 0.35em 1.1em; font-size: 0.74rem; opacity: 0.9; z-index: 2; }
 #cine .c-skip { top: auto; right: calc(0.8rem + var(--sr)); bottom: calc(21vh + var(--sb) + 0.6rem); min-height: 2.3rem; opacity: 0.9; }
+/* UI pass: builder tabs in one row, readable option text, thumb-sized small buttons on phones */
+.builder .bsteps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.25rem; } .builder .bsteps button { min-height: 2.3rem; padding: 0.3em 0.1em; font-size: 0.64rem; letter-spacing: 0.04em; white-space: nowrap; }
+.builder .bopt span { text-transform: none; letter-spacing: 0; font-size: 0.82rem; line-height: 1.3; font-family: inherit; } .builder .bopt { min-height: 3.2rem; }
+@media (orientation: portrait) {
+  .card.create.builder { max-height: 90% !important; }
+  .builder .bsteps button { font-size: 0.58rem; }
+  #panel button.mini, #panel .slot { min-height: 2.4rem; padding: 0.45em 0.7em; font-size: 0.72rem; }
+  #panel .row.bst { flex-wrap: wrap; gap: 0.35rem; } #panel .bout { padding-bottom: 0.6rem; }
+}
+.builder .bopt span { font-family: var(--body); font-size: 0.9rem; line-height: 1.25; font-variant: normal; } .builder .bsum p { font-size: 0.86rem; }

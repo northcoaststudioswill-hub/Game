@@ -46,3 +46,5 @@
   if (G.mortalsOpen) { const mo0 = G.mortalsOpen; G.mortalsOpen = function (st) { sync(); return mo0.apply(this, arguments); }; }
   if (G.LORE) G.LORE.push({ sec: 'The Pit', title: 'Blood Tells', unlock: st => G.rankOf(st.respect) >= 1, body: 'The Guild teaches a trade, but nobody leaves their blood at the gate. Dwarves know where a floor will break. Elves have had centuries to practise one cut. A half-orc does not need the blade at all. The stands can tell what you are by how you end it, and they have favourites.' });
 })();
+// whole numbers on every card: health is never shown with a tail of decimals
+(function () { const G = window.G, d0 = G.derive; G.derive = function () { const d = d0.apply(this, arguments); if (d && d.maxHp) d.maxHp = Math.round(d.maxHp); return d; }; })();
