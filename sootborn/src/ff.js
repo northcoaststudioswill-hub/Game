@@ -79,7 +79,7 @@ const FF = {
   pairing: () => ({
     era: 2, newMove: 'NEW: BREACH - GUARD + JUMP', title: 'THE PAIRING', sub: 'TWO GO IN. ONE COMES OUT A CADET.', bg: 'cell', arena: { kind: 'ring', rx: 96, ry: 58 }, music: 'dusk', rage: 0, legend: 1, skip: 1, winText: 'ONE COMES OUT',
     hero: { id: 'kael2', hp: 8, pow: 1, blade: 1, fury0: 10 }, taunt: { 0: ['I DO NOT WANT TO.', 'PLEASE.', 'WHO IS THIS FOR?'] },
-    foes: [{ id: 'teo', name: 'Dorian Aldane', kind: 'cadet', hp: 30 }],
+    foes: [{ id: 'teo', name: 'Dorian Aldane', kind: 'cadet', hp: 36, k2: { poise: 1, double: 1, wind: 0.44, cd: [0.45, 1.0] } }],
     voice: { at: [[1, 'HE SHARED HIS BREAD ON THE LIFT UP. HE ASKED ABOUT MY FAMILY. I LIED WELL.'], [13, 'HE IS NOT BAD AT THIS. SOMEBODY LOVED HIM ENOUGH TO PAY FOR LESSONS.'], [26, 'UP IN THE GALLERY THEY ARE KEEPING SCORE.']],
       hurt: 'GOOD. MAKE IT EASIER FOR ME.', fury: 'I SAID HER NAME UNTIL IT WAS THE ONLY THING IN THE ROOM.', half: 'HE HAS STOPPED TRYING TO WIN. HE IS ONLY TRYING TO LAST.', eleven: 'ELEVEN. HE DID NOTHING TO EARN ANY OF THEM.' },
     arts: [{ at: .5, name: 'HER NAME', line: 'SHE WALKED INTO THE FURNACE SO FORTY CHILDREN COULD BREATHE. I AM DOING THIS FOR HER. I AM.', panel: 'furnace', kind: 'rise', rgb: '255,110,40', hex: '#ff6e28', dark: 'rgba(26,4,2,.8)' }],

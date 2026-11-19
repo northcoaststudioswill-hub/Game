@@ -1,4 +1,52 @@
-# SOOTBORN — changelog (latest v0.49 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.50 · 2026-11-19)
+
+## v0.50 · 2026-11-19 — dying, going down, Tavi walking, a hill at Riser Nine, and the Lamp's wrong answer
+From play notes on the 2D Assay missions and the comic levels.
+
+**Comic levels**
+- **Death.** Guards were thrown into the air already lying down and turned there until they faded. Now a man is hit, reels, goes to his knees and falls where he stood, lies there a second, and then goes. A finished guard drops instead of flying.
+- **Down, but not out.** Against a boss, when ON MY BREATH brings him back he stays on the floor longer, gets a knee under him, and says something he should not: "You have miscounted, Captain. Count again." (the docks), "Is that all of you? Send up the hill for more." (Riser Nine), "I've been on the floor all my life. You should see what I do from it." (the Stair). It cuts in as a band and stays as a caption.
+- **Tavi walks.** On the Stair he follows on Kael's left and a little behind, running when Kael runs, and hangs back during a fight. He is only set down somewhere if he has been left a long way behind.
+- **The painted line on the Stair** lies on the steps. Each piece was measured from the wrong end and hung in the air.
+- **Riser Nine**
+  - **Flicker:** the road, the turf patches and the puddles were laid at almost the same height and on top of each other, which is what shimmered. Every patch now sits at its own height, well apart.
+  - **There is a hill.** It rises out of the north treeline with the road going up it, lamps on posts all the way up, and pines on its face. "Down the hill road" now means something you can see.
+  - **The ladder** has yellow rails standing well clear of the collar and pale rungs, under a hoist of three poles with a rope down the shaft and a lamp hung on it.
+- **Speech and caption boxes** in the levels are ink and cream, not yellow.
+
+**2D Assay missions**
+- **Names.** Coming up to anything you can use shows what it is on a plate over it: WOODPILE, PUMP HOUSE, RIDGE PATH, STORES, GRADING BOOK and so on (also on Row K).
+- **The woodpile** is a stack of sawn log ends with an axe in a block. It read as a fence.
+- **The ridge** on night 28 is a ridge: a stepped rock bluff with a path up it and a post at the foot, where there was a short fence on flat grass.
+- **The Lamp: what the wrong name costs.** Before, a wrong name was corrected for you and nothing changed.
+  - You are told first: one name, and if it is wrong the right man is over the ridge before you can say a second.
+  - **Right:** he is caught at the fire. Single combat. Afterwards you may turn him out or keep him to write false counts.
+  - **Wrong:** he reaches the pickets he sold you to. You fight three, on the ridge, where nobody sees it. He cannot be kept. If you named Merrow, he takes nine of the thirty Teal out before dawn; if Oswin, he stops carrying water for you.
+  - A line on screen says which happened.
+
+**The High Docks, from playing v0.49**
+- **The locked yard gate.** I could not make it happen: a script that walks up the causeway and fights for real gets the key and the gate rolls back. So it is guarded three ways instead of one. If the quay watch is gone and the key was never handed over, it is handed over after two and a half seconds. If Kael is standing on a watch's ground and they have not looked up, they look up. If a watch is fighting but the level has lost track of it, it picks it up again.
+- **Found while looking for it:** the watch was meant to notice him at nine metres and was noticing him at eighty-one, which is everywhere. Each watch woke the moment the one before it fell and ran at him from across the level, which is the jogging you saw. They wait until he is close now.
+- **I AM STUCK**, in the pause menu of every comic level. It clears the guards who are up; if none are, it does the next thing the level is waiting for (the key, the gate, the breaker, the roof door); otherwise it puts him back on the last sun. Nothing is lost.
+- **The cape** hangs lower and lifts and drops with each stride. It was held straight out behind him.
+- **Guards stand in one of three stances** when they are not moving: weapon forward, weapon high, or low and side-on.
+- **A longer walk before the first scene.** The first sun is four and a half metres further up the causeway and you have to reach it, not come near it.
+- **Signs, checked against the story.** One was wrong: on the Spire the porters are "the service" and are never called soot, so SOOT WALK THE LINE is now SERVICE KEEP TO THE LINE, as on the Stair. The rest stand: GRATITUDE IS BREATH and the breath meter are for the people who work the docks, not the people who own them.
+- **Touch.** On a phone, dragging the picture is still how the camera turns, because the on-screen pad has no second stick. Tapping the picture does not attack. With a controller the right stick turns it.
+
+**Fights, from playing v0.49**
+- **Mashing strike no longer wins.** Hitting a raised guard now costs Kael his footing for a quarter of a second and hands the other man the next move. Soft opponents raise a guard after four hits, not five. A bot that only mashes still beats Dorian, with one health left out of six; before, it was not touched.
+- **Dorian Aldane** cannot be stopped mid-swing by a light hit, follows one blow with a second, winds up quicker and has a fifth more health.
+- **No hook below.** In the fights under the rock (the Scuffle, the Ember Ring, the hatch) the hook line is gone; it comes with the training years.
+
+**Checked:** Riser Nine and the Stair played start to end by script after the changes (pictures of the hatch, the hill side and the line on the steps); the page loads without errors; the new bluff, woodpile and name plates seen in pictures. **Not checked:** the death and the knee in motion (not seen at all, only built); Tavi following was not watched, only run; the wrong-name fight was not fought; nothing was played by hand.
+
+**Asked for and not built yet**
+- A new name for the Assay (see chat: it needs your choice).
+- The camp and Ashgate Square as places you walk in 2.5D (flat sprites in a 3D space), and the fire scene staged that way.
+- A better body for Tavi. More terrain and character in the 2D valley maps generally. Group fights still busy.
+- The Proctors on the dais as detailed figures (or detailed flat sprites standing in the 3D scene).
+- Guards: better models and their own set of strikes and blocks. Memories in fights chosen by where the story is (the Assay, Kestrel and the week he blamed her). Side areas on the docks with height to them and things hidden for the boots. The docks laid out from reference, not placed by hand.
 
 ## v0.49 · 2026-11-19 — two sets of play notes: Row K, the Codex, harder fights, the High Docks
 From play notes on the intro through to waking on Day 2, and a second set on the High Docks.

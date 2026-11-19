@@ -373,7 +373,7 @@
     [-29, -25].forEach(x => { D('flat', x, 1.3, 7.8, 0.1, 2.6, 0.1, GILT, { outline: 0.03 }); D('flat', x, 1.5, 7.76, 0.5, 2.0, 0.04, IVORY, { outline: 0.03 }); });
     // and ours: the line soot walk, the plates where porters kneel, the meter at the gate
     for (let x = -30; x < 5; x += 1.6) D('flat', x, 0.032, 8.15, 1.0, 0.02, 0.14, IRON, { outline: 0 });
-    sign('SOOT WALK THE LINE', -9.5, 1.5, 6.14, 0, 3.6, 0.55, '#e8c25a', '#07070d'); sign('KNEEL AT THE BELL', -39.72, 1.5, 15.6, Math.PI / 2, 2.8, 0.5, '#e8c25a', '#07070d');
+    sign('SERVICE KEEP TO THE LINE', -9.5, 1.5, 6.14, 0, 3.6, 0.55, '#e8c25a', '#07070d'); sign('KNEEL AT THE BELL', -39.72, 1.5, 15.6, Math.PI / 2, 2.8, 0.5, '#e8c25a', '#07070d');
     for (let x = -38.2; x < -35.4; x += 0.85) for (let z = 10.4; z <= 13.6; z += 0.8) D('flat', x, 0.032, z, 0.36, 0.02, 0.2, 0xb8902e, { outline: 0 });
     D('metal', 16.9, 1.1, 6.5, 0.4, 2.2, 0.5, GILT, { outline: 0.05 }); D('glow', 16.9, 1.7, 6.77, 0.24, 0.5, 0.04, 0xff5a1f, { outline: 0 }); sign('AIR OWED', 16.9, 2.5, 6.78, 0, 1.3, 0.34, '#07070d', '#e8c25a');   // the breath meter every porter passes
     // a colonnade on the east edge of Mooring One, to frame the fleet
@@ -412,10 +412,10 @@
       [[-20, 14], [-23, -3], [21, -15], [18, 12], [-8, -19], [9, 19], [23, 2]].forEach(p => pine(p[0], p[1], 1.5, true));
       // ---- the ground: a meadow, not a lawn. Mottled turf, the road worn down from the pylon, standing water, stones, flowers
       const rq = SC.seeded(91), HZ = 15, roadX = z => Math.sin(z * 0.23) * 1.3 + (z < -12 ? (-12 - z) * 0.42 : 0);   // it swings wide of the pylon
-      const disc = (x, z, rad, y, col, sx) => { const g = new THREE.CylinderGeometry(rad, rad, 0.004, 9); g.scale(sx || 1, 1, 1); batch.add('flat', g, G.mx(x, y, z, rq() * 3), col, 0); g.dispose(); };
+      let dn = 0; const disc = (x, z, rad, y, col, sx) => { const g = new THREE.CylinderGeometry(rad, rad, 0.004, 9); g.scale(sx || 1, 1, 1); batch.add('flat', g, G.mx(x, y * 4 + (dn++ % 11) * 0.0045, z, rq() * 3), col, 0); g.dispose(); };   // every patch at its own height, well apart: laid level with each other they flickered
       for (let i = 0; i < 46; i++) disc((rq() - 0.5) * 50, (rq() - 0.5) * 44, 1.6 + rq() * 3.2, 0.006, i % 3 ? 0x2a5640 : 0x316246, 1 + rq() * 0.8);
       for (let z = -23.6; z <= 9.4; z += 1.1) disc(roadX(z) + (rq() - 0.5) * 0.5, z, 1.25 + rq() * 0.5, 0.012, (z * 10 | 0) % 2 ? 0x5a5346 : 0x625a4a, 1.15);
-      for (let z = -23; z <= 8.6; z += 0.9) { D('flat', roadX(z) - 0.55, 0.018, z, 0.14, 0.01, 0.8, 0x463f34, { ry: -Math.cos(z * 0.23) * 0.3, outline: 0 }); D('flat', roadX(z) + 0.55, 0.018, z, 0.14, 0.01, 0.8, 0x463f34, { ry: -Math.cos(z * 0.23) * 0.3, outline: 0 }); }
+      for (let z = -23; z <= 8.6; z += 0.9) { D('flat', roadX(z) - 0.55, 0.105, z, 0.14, 0.012, 0.8, 0x463f34, { ry: -Math.cos(z * 0.23) * 0.3, outline: 0 }); D('flat', roadX(z) + 0.55, 0.105, z, 0.14, 0.012, 0.8, 0x463f34, { ry: -Math.cos(z * 0.23) * 0.3, outline: 0 }); }
       for (let i = 0; i < 16; i++) { const a2 = i / 16 * 6.283; disc(Math.cos(a2) * 2.8 * rq(), 11.4 + Math.sin(a2) * 1.7 * rq(), 1.2 + rq() * 0.8, 0.013, i % 2 ? 0x5a5346 : 0x625a4a, 1.2); }   // trodden flat in front of the hatch
       [[-6.5, -3, 1.1], [5.5, -9, 0.9], [8, 3.5, 1.3], [-13, -15, 1.0], [14.5, -3.5, 0.8], [-4.4, 6.2, 0.7], [17, 7, 1.1], [-19, -2, 0.9], [1.4, -12.5, 0.6]].forEach(p => { disc(p[0], p[1], p[2] * 1.12, 0.017, 0x234a38, 1.5); disc(p[0], p[1], p[2], 0.02, 0x1c3050, 1.5); disc(p[0] + 0.2, p[1] - 0.12, p[2] * 0.4, 0.024, 0x2e4c78, 1.5); });
       const open = (x, z) => !(z < 10.5 && Math.abs(x - roadX(z)) < 2.1) && Math.hypot(x, z - 11.4) > 3.4 && Math.hypot(x, z - HZ) > 3.2 && !(x > -19 && x < -10 && z > -13 && z < -5);
@@ -427,6 +427,12 @@
         for (let x = -26; x <= 26; x += 2.1) { if (Math.abs(x - roadX(-23)) > 2.6) bush(x + (rq() - 0.5), -23.6 - rq() * 0.8); bush(x + (rq() - 0.5), 23.9 + rq() * 0.8); }
         for (let z = -22; z <= 22; z += 2.1) { bush(-26.8 - rq() * 0.8, z + (rq() - 0.5)); bush(26.8 + rq() * 0.8, z + (rq() - 0.5)); }
         [-2.9, 2.9].forEach(x => { D('concrete', roadX(-23) + x, 0.7, -23.2, 0.5, 1.4, 0.5, STONE, { outline: 0.05 }); D('flat', roadX(-23) + x, 1.44, -23.2, 0.6, 0.1, 0.6, GILT, { outline: 0.03 }); }); }
+      // the hill the road comes down: it rises straight out of the north treeline, lamps all the way up it
+      { const th = 0.46, L = 50, cz = -24 - Math.cos(th) * L / 2, cy = Math.sin(th) * L / 2 - 0.3, rx0 = roadX(-23);
+        D('roof', rx0, cy - 0.5, cz, 96, 1, L, 0x285238, { rx: th, outline: 0 }); D('flat', rx0, cy + 0.08, cz, 3.0, 0.06, L, 0x5a5346, { rx: th, outline: 0 });
+        for (let i = 1; i < 9; i++) { const d = i * 5, z = -24 - Math.cos(th) * d, y = Math.sin(th) * d - 0.3, sd = i % 2 ? -1 : 1; D('flat', rx0 + sd * 2.1, y + 1.1, z, 0.1, 2.2, 0.1, IRON, { outline: 0.02 }); D('glow', rx0 + sd * 2.1, y + 2.3, z, 0.5, 0.56, 0.5, 0x7ad9c8, { outline: 0 }); }
+        for (let i = 0; i < 26; i++) { const d = 3 + rq() * 40, x = rx0 + (rq() < 0.5 ? -1 : 1) * (5 + rq() * 38), z = -24 - Math.cos(th) * d, y = Math.sin(th) * d - 0.3, s = 1.2 + rq() * 1.2, g = new THREE.ConeGeometry(1.5 * s, 5.2 * s, 6); batch.add('flat', g, G.mx(x, y + 2.9 * s, z, rq() * 3), [0x1c4432, 0x173a2a, 0x21503a][i % 3], 0.06); g.dispose(); }
+        { const g = new THREE.IcosahedronGeometry(1, 1); g.scale(60, 9, 16); batch.add('flat', g, G.mx(rx0 - 6, Math.sin(th) * L - 4, -24 - Math.cos(th) * L - 6, 0.1), 0x1f4a3a, 0.12); g.dispose(); } }
       cyl('wood', -13.6, 0.22, 15.6, 0.2, 0.24, 3.0, 0x4a3524, { rz: Math.PI / 2, ry: 0.5, seg: 8, outline: 0.04 }); cyl('wood', 12, 0.2, -16.4, 0.18, 0.2, 2.4, 0x3e2c1e, { rz: Math.PI / 2, ry: -0.7, seg: 8, outline: 0.04 });   // windfall
       // hills, and the white keep on its ridge: the same valley he won the Assay in
       [[-30, -64, 60, 20, 0.5], [34, -70, 70, 26, -0.4], [-66, -20, 50, 22, 1.2], [68, 4, 56, 20, -1.3], [0, 70, 90, 16, 0.1]].forEach(h => { const g = new THREE.IcosahedronGeometry(1, 1); g.scale(h[2], h[3], h[2] * 0.6); batch.add('flat', g, G.mx(h[0], -4, h[1], h[4]), 0x1f4a3a, 0.2); g.dispose(); });
@@ -441,7 +447,9 @@
       cyl('concrete', 0, 0.2, HZ, 1.9, 2.06, 0.4, STONE2, { seg: 10, outline: 0.07 }); cyl('concrete', 0, 0.42, HZ, 1.9, 1.9, 0.05, 0xe9e4d6, { seg: 10, outline: 0 });
       cyl('flat', 0, 0.452, HZ, 1.5, 1.5, 0.012, 0x0c0b10, { seg: 10, outline: 0 }); cyl('glow', 0, 0.46, HZ, 1.0, 1.0, 0.012, 0xb04a16, { seg: 10, outline: 0 }); cyl('glow', 0.06, 0.468, HZ + 0.1, 0.52, 0.52, 0.012, 0xff9a3a, { seg: 10, outline: 0 });   // the dark of the shaft, and light a long way down it
       for (let i = 0; i < 10; i++) { const a2 = i / 10 * 6.283 + 0.31; D('flat', Math.cos(a2) * 1.72, 0.46, HZ + Math.sin(a2) * 1.72, 0.12, 0.05, 0.12, IRON, { ry: -a2, outline: 0 }); }
-      [-0.3, 0.3].forEach(x => D('flat', x, 1.05, HZ + 1.3, 0.07, 1.3, 0.07, IRON, { outline: 0.03 })); D('flat', 0, 1.7, HZ + 1.3, 0.67, 0.07, 0.07, IRON, { outline: 0.03 }); [0.72, 1.05, 1.38].forEach(y => D('flat', 0, y, HZ + 1.3, 0.56, 0.05, 0.05, IRON, { outline: 0.02 }));
+      [-0.34, 0.34].forEach(x => D('flat', x, 1.5, HZ + 1.25, 0.09, 2.6, 0.09, 0xe8b23a, { rx: -0.14, outline: 0.03 })); [0.62, 0.98, 1.34, 1.7, 2.06, 2.42].forEach(y => D('flat', 0, y, HZ + 1.25 + (y - 1.5) * 0.14, 0.62, 0.06, 0.06, 0xe8e0cc, { outline: 0.02 }));   // the ladder head: yellow rails standing well clear of the collar, pale rungs
+      { const top = [0, 3.5, HZ]; [[-1.9, 1.1], [1.9, 1.1], [0, -1.95]].forEach(f => { const dx = top[0] - f[0], dz = -f[1], L = Math.hypot(dx, 3.5, dz); const g = new THREE.CylinderGeometry(0.06, 0.08, L, 6); const m = new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(dx, 3.5, dz).normalize())); m.setPosition(f[0] + dx / 2, 1.75, HZ + f[1] + dz / 2); batch.add('wood', g, m, 0x5a4030, 0.03); g.dispose(); });
+        cyl('metal', 0, 3.3, HZ, 0.2, 0.2, 0.1, IRON, { rz: Math.PI / 2, seg: 8, outline: 0.03 }); D('flat', 0, 1.9, HZ, 0.03, 2.9, 0.03, 0xd8c8a0, { outline: 0 }); D('glow', 0.5, 2.7, HZ, 0.16, 0.24, 0.16, 0xffb060, { outline: 0 }); D('flat', 0.5, 2.86, HZ, 0.2, 0.06, 0.2, IRON, { outline: 0.02 }); }   // a hoist of three poles over the shaft, a rope down it, a lamp hung on it
       cyl('metal', 3.1, 0.13, HZ + 0.5, 1.5, 1.5, 0.16, 0x8d94ac, { seg: 10, outline: 0.05 }); cyl('flat', 3.1, 0.22, HZ + 0.5, 0.5, 0.5, 0.04, IRON, { seg: 8, outline: 0.03 }); D('flat', 3.1, 0.25, HZ + 0.5, 1.5, 0.05, 0.1, IRON, { ry: 0.5, outline: 0.02 }); D('flat', 3.1, 0.25, HZ + 0.5, 1.5, 0.05, 0.1, IRON, { ry: 2.07, outline: 0.02 }); D('flat', 2.0, 0.3, HZ + 0.2, 0.5, 0.1, 0.16, IRON, { ry: 0.3, outline: 0.03 });   // the lid, thrown back on the grass, wheel uppermost
       sign('RISER 9', -1.5, 1.3, HZ + 2.46, Math.PI, 1.7, 0.46, '#e8c25a', '#07070d'); D('concrete', -1.5, 1.3, HZ + 2.62, 1.9, 0.66, 0.3, 0x565a68, { outline: 0.04 });   // cut into a slab against the rock, where nothing can get behind it
       { const l = new THREE.PointLight(0xff8a2e, 60, 15, 1.6); l.position.set(0, 1.5, HZ - 0.4); G.scene.add(l); }
@@ -548,7 +556,7 @@
       B('concrete', -W0 - 3, 30, W0 + 3, 46, -3, 0, DECK, { outline: 0.08 }); wall(-W0 - 3.6, 46, W0 + 3.6, 46.6); wall(-W0 - 3.6, 30, -W0 - 3, 46); wall(W0 + 3, 30, W0 + 3.6, 46); rail(W0 + 2.8, 30.4, W0 + 2.8, 46, 0); rail(-W0 - 2.4, 46, W0 + 2.8, 46, 0);
       wall(-W0 - 3, 29.4, -W0, 30); wall(W0, 29.4, W0 + 3, 30);
       // three flights and two landings
-      const flight = (z0, z1, a, b) => { ramp('concrete', -W0, z0, W0, z1, Math.min(a, b) - 3, a, b, 'z', STONE, { steps: true }); for (let z = z0; z < z1; z += 2) { const y = SC.lerp(a, b, (z - z0) / (z1 - z0)); D('flat', 0, y + 0.03, z + 1, 0.3, 0.04, 1.2, GILT, { rx: Math.atan2(a - b, z1 - z0), outline: 0 }); } };
+      const flight = (z0, z1, a, b) => { ramp('concrete', -W0, z0, W0, z1, Math.min(a, b) - 3, a, b, 'z', STONE, { steps: true }); for (let z = z0; z < z1; z += 1) { const y = SC.lerp(a, b, (z + 0.5 - z0) / (z1 - z0)); D('flat', 0, y + 0.07, z + 0.5, 0.3, 0.03, 0.7, GILT, { rx: Math.atan2(a - b, z1 - z0), outline: 0 }); } };   // the painted line, laid on the steps: it was measured from the wrong end of each piece and hung in the air
       const landing = (z0, z1, y) => { B('concrete', -W0, z0, W0, z1, y - 4, y, DECK, { outline: 0.08 }); D('flat', 0, y + 0.012, (z0 + z1) / 2, 0.3, 0.02, z1 - z0 - 1, GILT, { outline: 0 }); };
       flight(18, 30, 6, 0); landing(4, 18, 6); flight(-8, 4, 12, 6); landing(-22, -8, 12); flight(-34, -22, 18, 12);
       wall(-W0 - 0.6, -34, -W0, 30, -4, 30); wall(W0, -34, W0 + 0.6, 30, -4, 30);

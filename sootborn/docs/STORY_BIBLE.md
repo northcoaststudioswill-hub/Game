@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.49 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.50 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -468,3 +468,12 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **The Codex** tells the story in Kael's voice in thirteen entries and keeps what is found. It lives outside the save.
 - **On the docks the watch is on its posts before he arrives** and talks: Rook says hold; Cade signed for it; somebody chalked over the rota.
 - Opening film: after the Pairing the cards are SOOTBORN, then "Four years earlier. Cinderwell, Tier Six. Forty-one days after the furnace."
+
+### The Lamp, and small things (v0.50)
+- **The Lamp (night 28) has two outcomes.** Right name: Corin Ashby is taken at the fire in single combat and may be turned out or kept (`corin` = out | kept). Wrong name (`lampWrong`): he reaches Teal's pickets, Kael fights three on the ridge unseen, and Corin can only be turned out. Naming Merrow costs nine of the thirty Teal; naming Oswin costs Oswin's goodwill, which matters for who he becomes.
+- **Down but not out.** Kael's lines when a boss puts him on the floor: to Rook, "You have miscounted, Captain. Count again."; to the Warden Captain, "Is that all of you? Send up the hill for more."; to the Auditor's Blade, in soot, "I've been on the floor all my life. You should see what I do from it."
+- **Riser Nine has a hill.** The road comes down it from the north, lit. The hatch has a hoist over it.
+- **Tavi climbs the Stair beside him**, on the left, on foot.
+- **Open:** the Assay may be renamed.
+- **The hook line is not carried below.** Era 0 is fists, kicks, the boot, guard and parry, headbutt, roar. The line comes with training (era 1). This replaces the older list.
+- **On the Spire and its docks the porters are "the service".** No sign there says soot.

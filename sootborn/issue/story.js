@@ -193,7 +193,7 @@
   }
 //@@SUNS
     // a chalked sun works when he steps onto it; nothing to press
-    { let on = null; if (F.intro && !S.enc) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && Math.hypot(x - c.x, z - c.z) < (F.path || SC.issue !== 'docks' ? 1.6 : 3.2)) on = id; }
+    { let on = null; if (F.intro && !S.enc) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && Math.hypot(x - c.x, z - c.z) < (F.path || SC.issue !== 'docks' ? 1.6 : 1.9)) on = id; }
       if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
 //@@INIT
   S.init = function () {
@@ -248,7 +248,7 @@
     // the watch is already on its posts, talking. It knows him when he walks up to it.
     { const POST = ['street', 'yard', 'wh', 'roof'], PRE = { street: () => F.e_alley, yard: () => F.gate, wh: () => F.breaker, roof: () => F.hatch && !F.bossIntro },
         TALK = ['SECOND BELL SOON.', 'ROOK SAYS HOLD.', 'ONE CLERK. ONE.', 'FORTY HALBERDS FOR A CLERK.', 'THE STAIR IS NOT OURS TO WATCH.', 'IT WAS QUIET AT THE FIRST BELL.', 'WHO CHALKED OVER THE ROTA?', 'CADE SIGNED FOR IT.', 'MIND THE EDGE.', 'LAMPS LIT. EYES OPEN.', 'HE KEPT THE COUNT, THEY SAY.', 'A CLERK DOES NOT FIGHT.'];
-      let seen = -1, talkT = 3, talkN = 0; const _pv = v3();
+      let seen = -1, talkT = 3, talkN = 0; const _pv = v3(), stuck = {}, inT = {};
       const post = () => { for (const id of POST) { const e = ENC[id]; e.posted = 0; if (F['e_' + id] || F.boss || S.bossDown || !e.waves || !e.waves[0]) continue; e.posted = 1; e.wave = 0; e.wait = 0;
           e.waves[0].forEach((w, i) => { const m = SC.spawnEnemy(w[0], w[1], e.floor, w[2], e); m.state = 'wait'; m.st = 0; m.drop = 0; m.model.group.scale.set(1, 1, 1); m.postI = i; }); } };
       const wake = (e, who) => { e.posted = 2; S.enc = e; e.wave = 0; e.wait = 0; for (const m of SC.enemies) if (m.enc === e && m.state === 'wait') { m.state = 'chase'; m.st = 0; m.cool = 0.9 + Math.random() * 0.9; }
@@ -258,16 +258,26 @@
         talkT -= dt; let spoke = false;
         for (const id of POST) { const e = ENC[id]; if (e.posted !== 1) continue; const mem = SC.enemies.filter(m => m.enc === e && m.state === 'wait'); if (!mem.length) { e.posted = 2; continue; }
           for (const m of mem) { const o = mem[m.postI ^ 1] || mem[(m.postI + 1) % mem.length]; if (o && o !== m) m.yaw = SC.dampAng(m.yaw, Math.atan2(o.pos.x - m.pos.x, o.pos.z - m.pos.z) + Math.sin(t * 0.4 + m.postI) * 0.5, 2, dt); }
-          const near = mem.find(m => Math.abs(m.pos.y - pl.pos.y) < 3 && SC.dist2(m.pos.x, m.pos.z, pl.pos.x, pl.pos.z) < 81);
+          const near = mem.find(m => Math.abs(m.pos.y - pl.pos.y) < 3 && SC.dist2(m.pos.x, m.pos.z, pl.pos.x, pl.pos.z) < 9.5);   // dist2 is metres, not metres squared: at 81 every watch woke the moment its turn came, wherever he was
           if (near && !S.enc && pl.control && PRE[id]()) { wake(e, near); continue; }
-          if (talkT <= 0 && !spoke) { const m = mem[talkN % mem.length]; if (SC.dist2(m.pos.x, m.pos.z, pl.pos.x, pl.pos.z) < 700) { _pv.copy(m.pos); _pv.y += m.h + 0.35; FX.word(TALK[talkN % TALK.length], _pv, '#dfe6ff', 0.62); talkN++; spoke = true; } } }
-        if (talkT <= 0) talkT = 3.4 + Math.random() * 2.4; }); }
+          if (talkT <= 0 && !spoke) { const m = mem[talkN % mem.length]; if (SC.dist2(m.pos.x, m.pos.z, pl.pos.x, pl.pos.z) < 24) { _pv.copy(m.pos); _pv.y += m.h + 0.35; FX.word(TALK[talkN % TALK.length], _pv, '#dfe6ff', 0.62); talkN++; spoke = true; } } }
+        if (talkT <= 0) talkT = 3.4 + Math.random() * 2.4;
+        // nobody is ever left locked out. If he is standing on their ground and they have not looked up, they look up; and if a watch is gone but was never closed off, it is closed off (the yard key with it)
+        for (const id of POST) { const e = ENC[id]; if (F['e_' + id] || !PRE[id]() || S.enc || !pl.control) { stuck[id] = 0; inT[id] = 0; continue; }
+          const mem = SC.enemies.filter(m => m.enc === e && m.state !== 'dead');
+          if (mem.length) { stuck[id] = 0; const A = e.arena, w = mem.filter(m => m.state === 'wait'); if (w.length && A && pl.pos.x > A[0] && pl.pos.x < A[2] && pl.pos.z > A[1] && pl.pos.z < A[3] && Math.abs(pl.pos.y - e.floor) < 3) { inT[id] = (inT[id] || 0) + dt; if (inT[id] > 1.2) { inT[id] = 0; wake(e, w[0]); } } else inT[id] = 0; if (!w.length && mem.length) { S.enc = e; if (e.wave < 0) e.wave = 0; e.wait = 0; e.posted = 2; } continue; }
+          stuck[id] = (stuck[id] || 0) + dt; if (stuck[id] > 2.5) { stuck[id] = 0; e.posted = 2; encDone(id); } } }); }
+    // while the game is being built: a way out of anything that has gone wrong, without losing the level
+    S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; }
+      if (F.e_alley && !S.enc) { const order = [['e_street', () => encDone('street')], ['gate', () => { W.openDoor('gate'); setFlag('gate'); }], ['e_yard', () => encDone('yard')], ['breaker', () => { setFlag('breaker'); W.openDoor('shutter'); }], ['e_wh', () => encDone('wh')], ['ledger', () => setFlag('ledger')], ['hatch', () => { W.openDoor('hatch'); setFlag('hatch'); }], ['e_roof', () => encDone('roof')]];
+        for (const [k, fn] of order) if (!F[k]) { SC.enemies.filter(e => e.enc && 'e_' + e.enc.id === k).forEach(e => e.remove()); fn(); U.toast('UNSTUCK: *' + k.replace('e_', '').toUpperCase() + '* IS DONE.', 2.5); return; } }
+      const c = CROSS[S.cp] || CROSS.alley; if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
     // he remembers in the middle of it, not only at the end of it
     SC.on('kill', () => { S.killN = (S.killN || 0) + 1; if (S.killN % 5 === 0 && SC.enemies.some(m => m.state !== 'dead' && m.state !== 'wait')) { S.artN = (S.artN || 0) + 1; U.memory(art(ARTS[(S.artN - 1) % ARTS.length])); } });
     SC.on('power', () => { S.artN = (S.artN || 0) + 1; U.memory(art(ARTS[(S.artN - 1) % ARTS.length])); });
     SC.on('finisherStart', e => { if (e.kind === 'boss') U.memory(art(FIN.boss)); else { S.finN = (S.finN || 0) + 1; if (S.finN <= 2) U.memory(art(FIN.warden)); } });
     SC.on('dazed', e => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted ? 'WIDE OPEN. GET CLOSE AND PRESS *A* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
-    SC.on('secondchance', () => SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)));
+    SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'YOU HAVE MISCOUNTED, CAPTAIN. COUNT AGAIN.'], riser: ['FORTY BEHIND ME', 'IS THAT ALL OF YOU? SEND UP THE HILL FOR MORE.'], stair: ['BORN DOWN HERE', "I'VE BEEN ON THE FLOOR ALL MY LIFE. YOU SHOULD SEE WHAT I DO FROM IT."] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I HAVE PLENTY LEFT.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
     SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
     SC.on('kill', e => { if (e.kind === 'boss') S.bossDown = true; });
     SC.on('finisherEnd', e => { if (e.kind === 'boss') ending(e); });
@@ -293,7 +303,7 @@
     });
     Object.keys(ENC).forEach(k => { ENC[k].id = k; });
     const up = () => (F.pump ? 10 : 0) + (F.e_w2 ? 10 : 0) + (F.e_w3 ? 10 : 0) + (F.pull ? 10 : 0);
-    const tavi = (x, y, z, yaw) => { if (!RIS) showClerk(x, y, z, yaw === undefined ? Math.PI : yaw); };
+    const tavi = (x, y, z, yaw) => { if (RIS) return; const g = clerk.group.position; if (clerk.group.visible && Math.hypot(g.x - pl.pos.x, g.z - pl.pos.z) < 30 && Math.abs(g.y - pl.pos.y) < 9) return; showClerk(x, y, z, yaw === undefined ? Math.PI : yaw); };   // Tavi walks now; he is only set down somewhere if he has been left a long way behind
     brandOnStair = function () { if (RIS) return; if (F.e_l2) tavi(-3, 18, -37); else if (F.e_l1) tavi(-2.5, 12, -10); else if (F.e_alley) tavi(-2.5, 6, 15); else tavi(-1.6, 0, 40.2, 2.4); };
     objective = function () {
       let t = '', g = null;
@@ -373,7 +383,9 @@
         ], n), 0.6, n => { done(); n(); }]);
     };
     S.init = function () {
-      if (!RIS) { clerk = S.clerk = SC.makeHumanoid('clerk'); G.scene.add(clerk.group); clerk.group.visible = false; W.dyn.push(t => { if (clerk.group.visible) clerk.anim.apply(P.idle(t), 6, 0.016); }); }
+      if (!RIS) { clerk = S.clerk = SC.makeHumanoid('clerk'); G.scene.add(clerk.group); clerk.group.visible = false; { let ph = 0; W.dyn.push((t, dt) => { if (!clerk.group.visible) return; const g = clerk.group.position, yaw = pl.yaw, tx = pl.pos.x - Math.sin(yaw) * 1.9 + Math.cos(yaw) * 1.35, tz = pl.pos.z - Math.cos(yaw) * 1.9 - Math.sin(yaw) * 1.35, dx = tx - g.x, dz = tz - g.z, d = Math.hypot(dx, dz);
+          if (dt > 0 && SC.state === 'play' && !S.enc && pl.control && d > 0.7 && d < 45) { const sp = Math.min(6.4, 1.2 + d * 2), k = Math.min(1, sp * dt / d); g.x += dx * k; g.z += dz * k; g.y = SC.damp(g.y, W.ground(g.x, g.z, g.y + 0.7), 16, dt); clerk.group.rotation.y = SC.dampAng(clerk.group.rotation.y, Math.atan2(dx, dz), 9, dt); ph += sp * dt * 1.7; clerk.anim.apply(P.run(ph, sp / 6.4), 16, dt); }
+          else { if (dt > 0) clerk.group.rotation.y = SC.dampAng(clerk.group.rotation.y, Math.atan2(pl.pos.x - g.x, pl.pos.z - g.z), 3, dt); clerk.anim.apply(P.idle(t), 6, 0.016); } }); } }
       else clerk = { group: { visible: false, position: v3(0, 0, 0), rotation: {}, updateMatrixWorld() {} }, anim: { apply() {} } };
       pl.model.setGlow(0xf6f2e6, '#f6f2e6'); atmo(SC.issue);
       Object.keys(CROSS).forEach(id => { const c = CROSS[id], mk = (tex, s, col, op) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(s, s), new THREE.MeshBasicMaterial({ map: tex, color: col, transparent: true, opacity: op, depthWrite: false, fog: false })); m.rotation.x = -Math.PI / 2; m.position.set(c.x, c.y + 0.07, c.z); m.renderOrder = 3; G.scene.add(m); return m; };
@@ -442,8 +454,9 @@
             oswinUp(e); F.oswin = 1; save(); e.armorT = 1.5; e.state = 'chase'; e.st = 0; e.cool = 0.8; e.model.face('angry');
             FX.ring(e.pos, 0xffd23a, 0.5, 5, 0.6); FX.word('OSWIN HALE', v3(e.pos.x, 21.4, e.pos.z), '#ffe14a', 1.6); SC.audio.sfx('roar'); U.boss(e, 'OSWIN HALE · HOUSE VIOLET'); objective(); cam.lock = e; n(); }]);
       });
+      S.unstick = function () { const live = SC.enemies.filter(e => e.state !== 'dead' && e.state !== 'wait' && e.kind !== 'boss'); if (live.length) { live.forEach(e => e.die(0, 0, {})); U.toast('CLEARED.', 2); return; } const c = CROSS[S.cp] || CROSS.alley; if (c) { pl.place(c.x, c.y, c.z, c.yaw); cam.snapBehind(c.yaw); U.toast('BACK ON THE LAST SUN.', 2); } };
       SC.on('dazed', () => { if (!F.tutFinish) { F.tutFinish = 1; U.toast(SC.hosted ? 'WIDE OPEN. GET CLOSE AND PRESS *A* TO FINISH IT.' : 'WIDE OPEN. GET CLOSE AND HIT *INTERACT* TO FINISH IT.', 4); } });
-      SC.on('secondchance', () => SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)));
+      SC.on('secondchance', () => { if (S.enc && S.enc.id === 'boss') { const L = { docks: ['STILL ON THE PAGE', 'YOU HAVE MISCOUNTED, CAPTAIN. COUNT AGAIN.'], riser: ['FORTY BEHIND ME', 'IS THAT ALL OF YOU? SEND UP THE HILL FOR MORE.'], stair: ['BORN DOWN HERE', "I'VE BEEN ON THE FLOOR ALL MY LIFE. YOU SHOULD SEE WHAT I DO FROM IT."] }[SC.issue] || ['NOT YET', 'EVERY BREATH IS HERS. I HAVE PLENTY LEFT.']; SC.after(0.5, () => U.cut(L[0], L[1], true)); SC.after(2.6, () => U.toast('*' + L[1] + '*', 3.2)); } else SC.after(1.4, () => U.toast('*ON MY BREATH.* ONCE. A CHALKED SUN GIVES IT BACK.', 3.5)); });
       SC.on('dead', () => SC.after(1.7, () => U.dead(S.load)));
       SC.on('kill', e => { if (e.kind === 'boss') S.bossDown = true; });
       SC.on('finisherEnd', e => { if (e.kind === 'boss') ending(e); });
@@ -458,7 +471,7 @@
       if (S.enc && S.enc.arena && !RIS && pl.control && pl.state !== 'dead') { const A = S.enc.arena; pl.pos.x = SC.clamp(pl.pos.x, A[0] - 0.2, A[2] + 0.2); pl.pos.z = SC.clamp(pl.pos.z, A[1] - 0.2, A[3] + 0.2); }   // a landing is fought on the landing
       if (!pl.control || S.enc || pl.state === 'dead') return;
       const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;
-      { let on = null; if (F.intro) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && Math.hypot(x - c.x, z - c.z) < (F.path || SC.issue !== 'docks' ? 1.6 : 3.2)) on = id; } if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
+      { let on = null; if (F.intro) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && Math.hypot(x - c.x, z - c.z) < (F.path || SC.issue !== 'docks' ? 1.6 : 1.9)) on = id; } if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
       if (RIS) {
         if (S.pending || !F.e_alley || F.boss || S.bossDown) return;
         const next = F.pump && !F.e_w2 ? 'w2' : F.pylon && !F.e_w3 ? 'w3' : F.pull ? 'boss' : null; if (!next) return; S.pending = true;
