@@ -1,4 +1,4 @@
-# SOOTBORN — changelog (latest v0.31 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.31 · 2026-11-19) 
 
 ## v0.31 · 2026-11-19 — the third-person levels: Kael's model and movement, guards with more moves, a second stage for the last boss, lived-in places
 From play notes: keep improving Kael's model and his rigging so the animation reads better; enemies need more moves; the biggest boss should have a second stage, at least on the last map; all three environments need more detail, more lore, more of a lived-in world.
