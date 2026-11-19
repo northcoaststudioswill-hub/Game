@@ -43,7 +43,7 @@ ask counted. Day and how far through that day:
 | The relight and the ending (scenes) | D5 78% |
 | Last of the thirty asks handed in | D7  2% |
 | The North Light rests (scene) | D8 78% |
-| Wedding book full: save the date (scene) | day 11 in the run before this one; this run was still on day 10 with 5 of 6 pages when this was written |
+| Wedding book full: save the date (scene) | D11  7% |
 
 All thirty asks were handed in, it never set an ask aside, and nothing threw. Three full runs were made; each
 finished the story. The log is `playtest/honest-run.txt`. A three day run on the phone build made the Lantern whole
