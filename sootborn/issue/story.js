@@ -63,20 +63,20 @@
   /* every chalked sun is a different thing he cannot put down: below, the Assay, and the two women */
   const SUN = {
     docks: {
-      yard: { fury: 1, toast: 'THE WASHER. *FURY FULL.*', p: [
+      yard: { fury: 1, toast: 'THE WASHER. *FURY.*', p: [
         { k: 'desk3', cap: 'THE EAST MANIFOLD. LAST YEAR.', cap2: 'WREN HALLORAN TURNED MY HAND OVER AND SAW THE VALVE BURNS THE GILDING DID NOT TAKE. *SHE DID NOT ASK.*' },
         { k: 'hands0', cap2: 'THE WASHER WAS UNDER MY COLLAR. I WAITED FOR IT TO GET HEAVIER. *IT DID NOT, AND I HAVE NOT FORGIVEN IT.*' }] },
       roof: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
         { k: 'assay0', cap: 'THE ASSAY. THREE YEARS AGO.', cap2: 'TWO SEALED IN A ROOM, ONE COMES OUT A CADET. TEO ALDANE SHARED HIS BREAD ON THE LIFT. *"I HOPE SHE WAS WORTH IT."*' },
         { k: 'kael0', cap2: 'I NEVER TOLD HIM THERE WAS A SHE.' }] } },
     riser: {
-      yard: { fury: 1, toast: 'HANDS. *FURY FULL.*', p: [
+      yard: { fury: 1, toast: 'HANDS. *FURY.*', p: [
         { k: 'desk3', cap: 'THIS VALLEY. NIGHT TWENTY-FIVE OF THE ASSAY.', cap2: 'AN APPRENTICE KEPT THE VENT STACK AT THIS PUMP HOUSE. SHE NEVER SAW MY FACE. *SHE PUT HER HAND ON THE PIPE THE WAY I DO.*' },
         { k: 'furnace2', cap2: 'SEREN TAUGHT ME THAT. HANDS, KAEL. EVERYTHING IS HANDS. *I HAD NOT KNOWN ANYONE ABOVE THE ROCK COULD LEARN IT.*' }] } },
     stair: {
       yard: { toast: 'ELEVEN SECONDS. SAVED. HEALED.', p: [
         { k: 'assay0', cap: 'THE LAST DAY OF THE ASSAY.', cap2: 'I TOOK A KEEP FROM THE HIGH AUDITOR\'S SON WHILE SHE WATCHED. SHE PINNED A SUN ON ME FOR IT. *SHE SAID I REMINDED HER OF SOMEONE.*' }] },
-      roof: { fury: 1, toast: 'A SHELF CAN BE MADE LONGER. *FURY FULL.*', p: [
+      roof: { fury: 1, toast: 'A SHELF CAN BE MADE LONGER. *FURY.*', p: [
         { k: 'weather2', cap: 'THE RAIL OF A BARGE. THIS YEAR.', cap2: '"I AM NOT ASKING FOR HER PLACE." "THERE IS NOT A PLACE. THERE IS A SHELF."' },
         { k: 'tin0', cap2: 'SEREN WOULD HAVE HECKLED. THEN SHE WOULD HAVE MOVED UP. *EVERY BREATH IS STILL HERS. THERE TURNED OUT TO BE A GREAT MANY OF THEM.*' }] } }
   };
@@ -86,7 +86,7 @@
       const first = !F.path; S.cp = id; pl.hp = SC.T.hp; pl.chance = 1; SC.audio.sfx('clue');
       if (first) { pl.control = false; pl.setPath('ember'); F.path = 'ember'; save(); U.memory(art(FIN.count), bargain); }
       else { save(); FX.ring(pl.pos, 0xffe14a, 0.5, 3, 0.5); const sm = (SUN[SC.issue] || {})[id];
-        if (sm && !F['sun_' + id]) { F['sun_' + id] = 1; save(); pl.control = false; pagesOf(sm.p, () => { pl.control = true; if (sm.fury) pl.meter = SC.T.meter; U.toast(sm.toast, 3.2); objective(); }); }
+        if (sm && !F['sun_' + id]) { F['sun_' + id] = 1; save(); pl.control = false; pagesOf(sm.p, () => { pl.control = true; if (sm.fury) pl.gain(50); U.toast(sm.toast, 3.2); objective(); }); }
         else { U.toast('ELEVEN SECONDS. SAVED. HEALED. YOUR BREATH IS BACK.', 2.6); objective(); } }
     };
   }

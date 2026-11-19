@@ -149,7 +149,7 @@ rep("  U.resize = function () {", "  U.resize = function () {\n    if (SC.hosted
 rep(".project(G.camera); const w = window.innerWidth, h = window.innerHeight;", ".project(G.camera); const w = window.innerWidth / (U.hudK || 1), h = window.innerHeight / (U.hudK || 1);");
 rep('<div id="mem" class="hide"></div>', '<div id="mem" class="hide"></div>\n  <div id="rage"></div>');
 rep("#mem.hide{display:none}", "#mem.hide{display:none}\n#rage{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity .25s;box-shadow:inset 0 0 16vh 5vh rgba(210,24,12,.8)}\nbody.hosted #obj{max-width:40vw}body.hosted #toast{top:15%}body.hosted #page{grid-template-columns:1fr!important;grid-template-rows:1fr!important}body.hosted #page .pn{grid-area:1 / 1 / 2 / 2!important}body.hosted #who .pic{display:none}");
-rep("    $('bPf').style.transform = ", "    { const k = SC.state === 'play' ? SC.clamp((p.meter - 30) / 70, 0, 1) : 0, pu = 0.8 + Math.sin(performance.now() / 160) * 0.2, mm = p.model.mats; for (let i = 0; i < mm.length; i++) if (mm[i].emissive) mm[i].emissive.setRGB(0.55 * k * pu, 0.4 * k * pu, 0.1 * k * pu);\n      U.auraT = (U.auraT || 0) - rdt; if (k > 0.25 && U.auraT <= 0 && !U.blocking()) { U.auraT = 0.34 - k * 0.2; _v.copy(p.pos); _v.x += (Math.random() - 0.5) * 0.9; _v.z += (Math.random() - 0.5) * 0.9; _v.y += 0.3 + Math.random() * 1.6 + p.lift; G.fx.burst(_v, 0xffd23a, 0.35 + k * 0.4); if (k > 0.7) G.fx.light(p.pos, 0xffc23a, 40 * k, 0.4); } }\n    $('bPf').style.transform = ");
+rep("    $('bPf').style.transform = ", "    { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) : 0, mm = p.model.mats; for (let i = 0; i < mm.length; i++) if (mm[i].emissive) mm[i].emissive.setRGB(0.2 * k, 0.14 * k, 0.03 * k);\n      U.auraT = (U.auraT || 0) - rdt; if (k >= 1 && U.auraT <= 0 && !U.blocking()) { U.auraT = 0.7; _v.copy(p.pos); _v.x += (Math.random() - 0.5) * 0.7; _v.z += (Math.random() - 0.5) * 0.7; _v.y += 0.3 + Math.random() * 1.4 + p.lift; G.fx.burst(_v, 0xffd23a, 0.3); }\n      if (p.state === 'hurt') p.lift = 0;\n      if (p.meter >= SC.T.meter) { if (!U.fullT && SC.state === 'play') { U.fullT = 1; U.toast('FURY FULL. *HOLD STRIKE: ELEVEN.*', 2.6); } } else U.fullT = 0;\n      if (!U.taught && SC.enemies.length && SC.state === 'play' && !U.blocking()) { U.taught = 1; U.toast('LIGHT, LIGHT, *HEAVY*: THE HEAVY ENDS A CHAIN FOUR WAYS', 4.5); } }\n    $('bPf').style.transform = ");
 rep("    const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;\n    if (F.e_alley && !F.e_street", "    const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;\n" + ST.SUNS + "    if (F.e_alley && !F.e_street");
 
 /* ---- the blade: three cuts instead of three punches, and they land ---- */
@@ -297,6 +297,53 @@ rep("P.ATTACK = [{ dur: 0.4, hit: 0.12, chain: 0.2 }, { dur: 0.44, hit: 0.14, ch
 rep("    if (i === 3) return clip([[0, g], [0.08, Kw], [0.17, Ks], [0.29, Ks], [0.46, g]], t);", "    if (i === 3) return clip([[0, g], [0.08, Kw], [0.17, Ks], [0.29, Ks], [0.46, g]], t);\n    if (i === 5) { const sw = Object.assign({}, A2s, { hips: [0, -2.7, 0], chest: [-0.1, -0.9, 0], head: [0.05, 2.2, 0] }); return clip([[0, g], [0.08, A2w], [0.2, sw], [0.36, sw], [0.56, g]], t); }");
 rep("KeyC: 'attack', KeyF: 'boots',", "KeyC: 'kick', KeyV: 'hook', KeyF: 'boots',");
 
+/* ---- v0.32: light and heavy, four chain enders, jump and hover, ELEVEN on a held strike, fury earned ---- */
+rep("  I.reset = () =>", "  I.hold = {};\n  I.reset = () =>");
+rep("(d.press || []).forEach(", "SC.input.hold = d.hold || {}; (d.press || []).forEach(");
+rep("KeyC: 'kick', KeyV: 'hook', KeyF: 'boots',", "KeyC: 'kick', KeyV: 'hook', KeyF: 'boots', KeyT: 'jump',");
+rep("wantKick = can && inp.buffered('kick', 0.2),", "wantKick = can && inp.buffered('kick', 0.2), wantJump = can && inp.buffered('jump', 0.2),");
+rep("      if (wantKick && pl.onGround) { inp.clear('kick'); startAttack(pl.state === 'attack' && pl.combo === 3 ? 5 : 3, mx, mz, mag); }", `      if (can && inp.hold.a && pl.path && pl.meter >= T.powerCost && pl.onGround) { pl.holdA = (pl.holdA || 0) + dt; if (pl.holdA > 0.2 && ((pl.holdA * 20) | 0) % 3 === 0) FX.ring(pl.pos, 0xffd23a, 1.6 - pl.holdA * 2, 0.3, 0.18); if (pl.holdA > 0.45) { pl.holdA = 0; pl.lift = 0; inp.clear('attack'); usePower(mx, mz, mag); } } else pl.holdA = 0;
+      const hc = pl.state === 'attack' ? pl.combo : -1;
+      if (pl.state === 'power') { /* the eleven has started */ }
+      else if (wantKick && pl.onGround && (hc < 0 || pl.st >= P.ATTACK[hc].hit)) { inp.clear('kick'); startAttack(hc === 0 ? 6 : hc === 1 ? 5 : hc === 2 ? 7 : hc === 3 ? 8 : 3, mx, mz, mag); }
+      else if (wantKick) { /* held for the beat */ }
+      else if (wantJump && pl.onGround && free) { inp.clear('jump'); pl.setState('air'); pl.jv = 9; pl.airFuel = 2.4; pl.diving = 0; FX.ring(pl.pos, 0x7ad9ff, 0.3, 1.8, 0.3); FX.puff(pl.pos, 4, 0.9); SC.audio.sfx('leap'); }`);
+rep("  function perfectDodge() {", `  function bootSlam() {
+    FX.ring(pl.pos, 0x7ad9ff, 0.4, 3.6, 0.4); FX.puff(pl.pos, 7, 1.3); FX.light(pl.pos, 0x7ad9ff, 80, 0.35); SC.cam.shake(0.7); SC.audio.sfx('slam'); let n = 0;
+    for (const e of E) { if (!e.hittable() || Math.abs(e.pos.y - pl.pos.y) > 1.9) continue; const ex = e.pos.x - pl.pos.x, ez = e.pos.z - pl.pos.z, d = Math.hypot(ex, ez); if (d < 2.9 + e.r) { e.hit(24 * (1 + pl.meter / T.meter * 0.5), ex / (d || 1), ez / (d || 1), { heavy: true, named: true }); n++; } }
+    if (n) { _a.copy(pl.pos); _a.y += 2.6; FX.word('LIFT ZERO!', _a, '#7ad9ff', 1.3); SC.time.hitstop = 0.12; pl.gain(10); }
+  }
+  function perfectDodge() {`);
+rep("      case 'power': updatePower(dt); break;", `      case 'air': {
+        const sp = T.playerSpeed * 0.95 * mag, kk = Math.min(1, dt * 6), hov = inp.hold.y && pl.airFuel > 0 && pl.jv <= 0.6 && !pl.diving;
+        if (pl.diving) { pl.vel.set(pl.ddx, 0, pl.ddz); pl.pose = P.attack(4, 0.14); pl.poseRate = 30; }
+        else { pl.vel.x += (mx / (mag || 1) * sp - pl.vel.x) * kk; pl.vel.z += (mz / (mag || 1) * sp - pl.vel.z) * kk; if (mag > 0.08) pl.yaw = SC.dampAng(pl.yaw, Math.atan2(mx, mz), T.turnRate, dt);
+          if (hov) { pl.jv += (0 - pl.jv) * Math.min(1, dt * 10); pl.airFuel -= dt; if (((pl.st * 30) | 0) % 2 === 0) { _a.copy(pl.pos); _a.y += pl.lift - 0.1; FX.burst(_a, 0x7ad9ff, 0.5); } } else pl.jv -= 22 * dt;
+          pl.pose = hov ? SC.mixPose(P.guard(pl.t), P.leap, 0.45) : P.leap; pl.poseRate = 16;
+          if (wantAtk || wantKick || wantBoot) { inp.clear('attack'); inp.clear('kick'); inp.clear('boots'); let dx = mag > 0.3 ? mx / mag : Math.sin(pl.yaw), dz = mag > 0.3 ? mz / mag : Math.cos(pl.yaw); const t = pickTarget(11, 0.2, dx, dz);
+            let tm = 0.24, v = 9; if (t) { const ex = t.pos.x - pl.pos.x, ez = t.pos.z - pl.pos.z, d = Math.hypot(ex, ez) || 1; dx = ex / d; dz = ez / d; tm = SC.clamp(d / 24, 0.18, 0.5); v = Math.max(0, d - t.r - 0.7) / tm; }
+            pl.ddx = dx * v; pl.ddz = dz * v; pl.jv = -Math.max(0.2, pl.lift) / tm; pl.yaw = Math.atan2(dx, dz); pl.diving = 1; SC.emit('speedlines', 0.5); SC.audio.sfx('whoosh', 2); } }
+        pl.lift += pl.jv * dt; if (pl.lift > 1.1) pl.inv = Math.max(pl.inv, 0.1);
+        if (pl.lift <= 0 && pl.jv < 0) { pl.lift = 0; pl.vel.multiplyScalar(0.2); if (pl.diving) { bootSlam(); pl.bootCd = 2; } else FX.puff(pl.pos, 3, 0.8); pl.diving = 0; pl.setState('idle'); }
+        break; }
+      case 'power': updatePower(dt); break;`);
+/* the chain enders */
+rep("const DMG = [14, 17, 19, 22, 34, 26];", "const DMG = [12, 14, 16, 24, 34, 28, 26, 28, 42];");
+rep("{ dur: 0.62, hit: 0.2, chain: 0.5 }, { dur: 0.56, hit: 0.2, chain: 0.4 }];", "{ dur: 0.62, hit: 0.2, chain: 0.5 }, { dur: 0.56, hit: 0.2, chain: 0.4 }, { dur: 0.5, hit: 0.16, chain: 0.34 }, { dur: 0.6, hit: 0.2, chain: 0.42 }, { dur: 0.78, hit: 0.36, chain: 0.6 }];");
+rep("    if (i === 5) { const sw", `    if (i === 6) { const Uw = Object.assign({}, A2w, { y: -0.42, thL: [-1.2, 0, 0.1], shnL: [1.6, 0, 0], thR: [-0.9, 0, -0.1], shnR: [1.5, 0, 0], spine: [0.5, 0.3, 0], shR: [0.3, 0, 1.0], elR: [-0.4, 0, 0] }), Us = Object.assign({}, A2s, { shR: [-3.05, 0, -0.35], elR: [-0.05, 0, 0], spine: [-0.4, -0.3, 0], chest: [-0.3, -0.5, 0], head: [0.4, 1.0, 0], y: 0.26, thL: [-0.15, 0, 0.1], shnL: [0.15, 0, 0], thR: [0.35, 0, -0.1], shnR: [0.2, 0, 0], ftR: [0.7, 0, 0], ftL: [0.7, 0, 0] }); return clip([[0, g], [0.09, Uw], [0.17, Us], [0.32, Us], [0.5, g]], t); }
+    if (i === 7) { const Hw = Object.assign({}, A1s, { shR: [-1.5, 0, -0.15], elR: [-0.05, 0, 0], hips: [0, 0.3, 0], spine: [0.55, 0.2, 0], y: -0.32 }), Hs = Object.assign({}, A1w, { hips: [0, -2.4, 0], shR: [-1.2, 0, -1.3], elR: [-1.9, 0, 0], chest: [-0.1, -0.8, 0], head: [0, 1.9, 0], y: -0.2 }); return clip([[0, g], [0.1, Hw], [0.2, Hw], [0.3, Hs], [0.44, Hs], [0.6, g]], t); }
+    if (i === 8) return clip([[0, g], [0.14, A3w], [0.3, A3w], [0.4, A3s], [0.58, A3s], [0.78, g]], t);
+    if (i === 5) { const sw`);
+rep("heavy = i === 4, wide = i === 5, blunt = i === 2 || i === 3,", "heavy = i === 4 || i === 8, wide = i === 5, up = i === 6, haul = i === 7, bell = i === 8, blunt = i === 2 || i === 3,");
+rep("reach = wide ? 3.2 : heavy ? 2.6 :", "reach = wide ? 3.2 : haul ? 3.4 : bell ? 3.3 : heavy ? 2.6 :");
+rep("minDot = wide ? -1.1 : heavy ? -0.25 : 0.2,", "minDot = wide || bell ? -1.1 : haul ? -0.1 : heavy ? -0.25 : 0.2,");
+rep("{ heavy: heavy || i === 3 || wide || rip, named: blunt || wide || rip, combo: i });", "{ heavy: heavy || i === 3 || wide || rip || up || haul, named: blunt || wide || rip || up || haul || bell, combo: i }); if (haul && !e.K.armor && e.state !== 'dead') { e.pos.x = pl.pos.x - Math.sin(pl.yaw) * 1.9; e.pos.z = pl.pos.z - Math.cos(pl.yaw) * 1.9; e.vel.set(0, 0, 0); } if ((up || haul || bell) && hits === 0) { _c.copy(pl.pos); _c.y += 2.9; FX.word(up ? 'UP THE SHAFT!' : haul ? 'THE HAUL!' : 'LAST BELL!', _c, '#ffd23a', 1.25); if (bell) { FX.ring(pl.pos, 0xffd23a, 0.5, 3.8, 0.4); SC.cam.shake(0.8); } }");
+rep("        if (pl.state === 'attack') { pl.pose = P.attack(pl.combo, pl.st); pl.poseRate = 42; }", "        if (pl.state === 'attack') { pl.pose = P.attack(pl.combo, pl.st); pl.poseRate = 42; pl.lift = pl.combo === 8 ? Math.sin(SC.clamp(pl.st / 0.4, 0, 1) * Math.PI) * 1.5 : pl.combo === 6 ? Math.sin(SC.clamp((pl.st - 0.12) / 0.3, 0, 1) * Math.PI) * 0.5 : 0; } else if (pl.state !== 'power') pl.lift = 0;");
+/* fury is earned */
+rep("U.showHud(true); pl.meter = SC.T.meter;", "U.showHud(true); pl.meter = Math.max(pl.meter, 25);");
+rep("pl.gain(heavy ? 12 : 8)", "pl.gain(heavy || i >= 5 ? 9 : 5)");
+rep("pl.meter = d.path ? 68 : 0;", "pl.meter = 0;");
+
 /* ---- the guard fights back with more than one idea ---- */
 rep("          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e);\n        }", `          e.token = true; combat.tokens++; e.state = 'windup'; e.st = 0; alert(e);
           if (e.kind !== 'boss') e.sub = Math.random() < (e.kind === 'knifer' ? 0.45 : e.kind === 'bruiser' ? 0.22 : 0.3) ? 1 : 0;      // a second blow straight after the first
@@ -311,15 +358,17 @@ rep("if (e.kind === 'boss' && e.sub === 1) { e.sub = 2; e.state = 'windup'; e.st
 rep("  const SPEAK = {", "  const SPEAK = U.SPEAK = {");
 rep("SC.hitPlayer(30, e.pos.x, e.pos.z, true); } }\n    else { e.pose = P.slamDown;", "SC.hitPlayer(e.kind === 'boss' ? 30 : 16, e.pos.x, e.pos.z, true); } }\n    else { e.pose = P.slamDown;");
 /* ---- he looks at who he is fighting ---- */
-rep("    { const k = SC.state === 'play' ? SC.clamp((p.meter - 30) / 70, 0, 1) : 0,", `    { let best = null, bd = 81; for (const e of SC.enemies) { if (e.state === 'dead') continue; const dx = e.pos.x - p.pos.x, dz = e.pos.z - p.pos.z, d2 = dx * dx + dz * dz; if (d2 < bd) { bd = d2; best = e; } }
+rep("    { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) : 0,", `    { let best = null, bd = 81; for (const e of SC.enemies) { if (e.state === 'dead') continue; const dx = e.pos.x - p.pos.x, dz = e.pos.z - p.pos.z, d2 = dx * dx + dz * dz; if (d2 < bd) { bd = d2; best = e; } }
       const want = best && p.state !== 'scripted' && p.state !== 'dodge' ? SC.clamp(SC.angDiff(p.yaw, Math.atan2(best.pos.x - p.pos.x, best.pos.z - p.pos.z)), -1.0, 1.0) : 0; U.headY = (U.headY || 0) + (want - (U.headY || 0)) * Math.min(1, rdt * 9);
       const bn = p.model.bones; if (bn && Math.abs(U.headY) > 0.01) { bn.head.rotation.y += U.headY * 0.6; bn.neck.rotation.y += U.headY * 0.2; bn.chest.rotation.y += U.headY * 0.2; }
       // weight: he leans into a run, banks into a turn, and breathes harder the more fury he is carrying
       if (bn && (p.state === 'idle' || p.state === 'run' || p.state === 'move')) { const sp = Math.hypot(p.vel.x, p.vel.z), yr = SC.clamp(SC.angDiff(U.lastYaw === undefined ? p.yaw : U.lastYaw, p.yaw) / Math.max(rdt, 0.001), -6, 6); U.bank = (U.bank || 0) + (yr * 0.035 - (U.bank || 0)) * Math.min(1, rdt * 6);
         bn.chest.rotation.x += Math.min(0.16, sp * 0.014); bn.hips.rotation.z -= U.bank; bn.chest.rotation.z -= U.bank * 0.6; bn.head.rotation.z += U.bank * 0.8;
         const br = Math.sin(performance.now() * 0.001 * (2.2 + p.meter * 0.03)) * (0.012 + p.meter * 0.0003); bn.chest.rotation.x += br; bn.shL.rotation.z += br * 1.5; bn.shR.rotation.z -= br * 1.5; }
+      // the stance: with somebody in reach of him he drops his weight and lets the hook trail low behind, edge up
+      { const near = best && bd < 49 && (p.state === 'idle' || p.state === 'run'); U.stance = (U.stance || 0) + ((near ? 1 : 0) - (U.stance || 0)) * Math.min(1, rdt * 5); const k2 = U.stance; if (bn && k2 > 0.02 && p.state === 'idle') { bn.spine.rotation.x += 0.16 * k2; bn.hips.rotation.y -= 0.35 * k2; bn.chest.rotation.y += 0.2 * k2; bn.shR.rotation.x += 0.55 * k2; bn.shR.rotation.z -= 0.3 * k2; bn.elR.rotation.x += 0.5 * k2; bn.shL.rotation.x -= 0.5 * k2; bn.elL.rotation.x -= 0.7 * k2; bn.thL.rotation.x -= 0.3 * k2; bn.shnL.rotation.x += 0.45 * k2; bn.thR.rotation.x += 0.2 * k2; bn.shnR.rotation.x += 0.3 * k2; } }
       U.lastYaw = p.yaw; }
-    { const k = SC.state === 'play' ? SC.clamp((p.meter - 30) / 70, 0, 1) : 0,`);
+    { const k = SC.state === 'play' ? SC.clamp((p.meter - 40) / 60, 0, 1) : 0,`);
 
 if (/Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow/.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''))) {
   const m = s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').match(/.{0,60}(Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow).{0,40}/g);

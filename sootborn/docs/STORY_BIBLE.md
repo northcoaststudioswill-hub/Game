@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.31 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.32 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -390,6 +390,12 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **The Unlit's mark** is a small chalk sun, low on walls and on decks, in all three places.
 - **The docks:** the Accredited are carried over them in litters; porters get one cup of water a shift at a tap, and it is noted; struck lines are posted on a board each quarter, and people leave lamps under it.
 - **The Assay valley** was never cleared: tents, fire rings and the fallen Violet standard are still there nine years on. The Authority's notice on the pylon reads SEALED BY THE COUNT.
+
+### Built in v0.32
+- **The bank hook.** Kael's blade from the end of training on: a valve tech's seat knife (a short hooked blade for cutting a seized seat out of a valve body) made sword-length in Accredited steel. Ilse had it made; Brand taught him to use it. **To confirm:** who made it, and whether this is the blade Celestine breaks at +9.
+- **Moves named in the levels:** UP THE SHAFT, WIDE CUT, THE HAUL, LAST BELL (chain enders); LIFT ZERO (the dive and the lunge); ELEVEN (held strike at full fury).
+- **Fury is earned in the fight.** Suns give some, never all.
+- Rule: the game never uses the source books' weapon names. The curved blade is the bank hook.
 
 ### Third-person levels: how they play (v0.30.1)
 - Fury shows as gold on Kael himself, never as red on the screen.

@@ -227,7 +227,10 @@
       add('elL', limb(0.088, 0.076, 0.2), brass, 0, -0.13, 0, 0.014);                                          // the valve ram on his off arm
     }
     if (sp.weapon === 'kblade') {
-      add('haR', tbox(0.03, 0.72, 0.07, 0.1, 1), steel, 0, -0.49, 0.005, 0.014); add('haR', tbox(0.012, 0.58, 0.074), gilt, 0, -0.44, 0.005, 0);
+      add("haR", tbox(0.03, 0.6, 0.07, 0.6, 1), steel, 0, -0.43, 0.005, 0.014); add("haR", tbox(0.012, 0.5, 0.074), gilt, 0, -0.4, 0.005, 0);
+      // the bank hook: the curved knife a valve tech cuts a seized seat out with, made long, in their steel
+      [[-0.8, 0.035, 0.45, 0.2], [-0.9, 0.12, 1.0, 0.2], [-0.93, 0.24, 1.6, 0.18], [-0.88, 0.33, 2.3, 0.12]].forEach(c => { add('haR', tbox(0.028, c[3], 0.062, 0.6, 1), steel, 0, c[0], c[1], 0.012).rotation.x = -c[2]; });
+     
       add('haR', tbox(0.06, 0.035, 0.22), gilt, 0, -0.12, 0.005, 0.01); add('haR', tbox(0.045, 0.05, 0.045), gilt, 0, 0.07, 0, 0.008); model.mats.push(steel, gilt);
     }
     if (sp.washer) {

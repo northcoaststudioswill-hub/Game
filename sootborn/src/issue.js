@@ -37,7 +37,7 @@ const Issue = {
     window.addEventListener('message', this.onMsg);
     f.srcdoc = html; document.body.insertBefore(f, $('#controls')); this.place();
     // the fight buttons, named for what they do up here
-    this.lab = {}; [['bY', 'BOOTS'], ['bX', 'KICK'], ['bR', 'HOOK'], ['bL', 'ELEVEN']].forEach(([id, t]) => { const b = $('#' + id); if (b) { this.lab[id] = b.textContent; b.textContent = t; } });
+    this.lab = {}; [['bY', 'JUMP'], ['bX', 'HEAVY'], ['bR', 'HOOK'], ['bL', 'LUNGE']].forEach(([id, t]) => { const b = $('#' + id); if (b) { this.lab[id] = b.textContent; b.textContent = t; } });
     this.timer = setTimeout(() => { if (!this.ready) this.finish(false); }, 15000);
   },
   // once a frame from the main loop: hand the level this game's own input
@@ -46,10 +46,10 @@ const Issue = {
     const bc = document.body.classList; if (!bc.contains('ingame')) bc.add('ingame'); if (!bc.contains('fight')) bc.add('fight'); if (bc.contains('ctlfade')) bc.remove('ctlfade');   // this game's pad and buttons stay up for the whole level
     if (!this.ready) return;
     const x = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), y = (Input.h('up') ? 1 : 0) - (Input.h('down') ? 1 : 0), press = [];
-    if (Input.p('A')) press.push('ctx'); if (Input.p('B')) press.push('dodge'); if (Input.p('X')) press.push('kick'); if (Input.p('Y')) press.push('boots');
-    if (Input.p('L')) press.push('power'); if (Input.p('R')) press.push('hook'); if (Input.p('START')) press.push('pause');
-    const k = x + ',' + y; if (k === this.sent && !press.length) return; this.sent = k;
-    try { this.el.contentWindow.postMessage({ sootborn: 'in', x, y, press }, '*'); } catch (e) { /* frame is going away */ }
+    if (Input.p('A')) press.push('ctx'); if (Input.p('B')) press.push('dodge'); if (Input.p('X')) press.push('kick'); if (Input.p('Y')) press.push('jump');
+    if (Input.p('L')) press.push('boots'); if (Input.p('R')) press.push('hook'); if (Input.p('START')) press.push('pause');
+    const hold = { a: Input.h('A') ? 1 : 0, y: Input.h('Y') ? 1 : 0 }, k = x + ',' + y + ',' + hold.a + hold.y; if (k === this.sent && !press.length) return; this.sent = k;
+    try { this.el.contentWindow.postMessage({ sootborn: 'in', x, y, press, hold }, '*'); } catch (e) { /* frame is going away */ }
   },
   finish(ok, data) {
     if (!this.on) return; this.on = false; clearTimeout(this.timer); window.removeEventListener('message', this.onMsg);

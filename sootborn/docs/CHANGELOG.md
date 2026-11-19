@@ -1,4 +1,29 @@
-# SOOTBORN — changelog (latest v0.31 · 2026-11-19) 
+# SOOTBORN — changelog (latest v0.32 · 2026-11-19)
+
+## v0.32 · 2026-11-19 — the third-person levels: light and heavy, four chain enders, jump and hover, fury earned, the bank hook
+From play notes: more combo finisher animations; a jump, so the boots can hover and not only lunge (keep the lunge); the gold flashing is distracting; the meter should be earned and ELEVEN should be a long press, not its own button; light and heavy hits; more of his own style in the animation; he should have his curved blade by now.
+
+**Buttons in a level now**
+- **A**: light. Five-beat chain as before. **Hold A at full fury: ELEVEN.**
+- **HEAVY** (was KICK): on its own, the boot. After lights it ends the chain a different way each time:
+  - light, heavy: **UP THE SHAFT**, a rising rip from a crouch that takes him off the ground.
+  - light, light, heavy: **WIDE CUT**, the turning cut that hits all round.
+  - light, light, light, heavy: **THE HAUL**, he hooks a man and drags him through to behind him.
+  - heavy, heavy (or four lights then heavy): **LAST BELL**, up and down two-handed, a ring that hits everyone near.
+- **JUMP** (was BOOTS): tap to jump. Hold to hover on the boots for about two and a half seconds; you can steer. Press A or HEAVY in the air to dive on whoever you are aimed at: LIFT ZERO.
+- **LUNGE** (was ELEVEN): the boots lunge from the ground, unchanged.
+- **HOOK**, **B** dodge: unchanged.
+
+**Fury**
+- Starts empty. The first sun gives a quarter; the suns that used to fill it give half. Light hits give less than before, heavy hits and chain enders more. No button fires it: a message says HOLD STRIKE when it is full.
+- The gold on Kael is steady and faint now, no pulsing, no light on the ground; a few motes only when the bar is full.
+
+**Kael**
+- **The bank hook.** His blade now ends in a hook, edge inward: the curved knife a valve tech cuts a seized seat out with, made long in Accredited steel. It is our own design and name; the game cannot use the books' weapon or its name.
+- With an enemy within a few paces he drops into a stance: weight down, off hand forward, blade drawn in.
+- Light damage is a little lower and heavy higher, so the two feel different.
+
+**Checked by script:** each of the four enders starts from its chain; jump, hover, running out of hover, and the dive (two guards knocked down); ELEVEN from a held strike; fury starts at 25 after the first sun; all three levels still run to their endings; JUMP from the game's own button in the frame (Riser Nine). **Not checked:** played by hand; how the new enders look in motion (seen in three stills); whether hovering above a fight is too safe (he cannot be hit above about waist height); on the Stair the held JUMP did not register in my slow test browser, which I believe is its frame rate and not the game, but I could not prove it there.
 
 ## v0.31 · 2026-11-19 — the third-person levels: Kael's model and movement, guards with more moves, a second stage for the last boss, lived-in places
 From play notes: keep improving Kael's model and his rigging so the animation reads better; enemies need more moves; the biggest boss should have a second stage, at least on the last map; all three environments need more detail, more lore, more of a lived-in world.
