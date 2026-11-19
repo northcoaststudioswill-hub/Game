@@ -28,7 +28,7 @@
   G.wipe = () => { try { localStorage.removeItem(KEY); } catch (e) { } G.state = G.newState(); };
 
   // ---------- audio (tiny synth, no files) ----------
-  let ac = null, master = null;
+  let ac = null, master = null, nbuf = null;
   G.muted = false;
   G.audioCtx = () => ac; G.audioOut = () => master;
   G.audioInit = () => {
@@ -44,15 +44,15 @@
     o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
     if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(20, f * slide), t + dur);
     g.gain.setValueAtTime(vol || 0.15, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02); o.onended = () => { try { g.disconnect(); } catch (e) { } };
   }
   function noise(dur, vol, freq, type, delay) {
     if (!ac || G.muted) return;
-    const t = ac.currentTime + (delay || 0), n = Math.floor(ac.sampleRate * dur), buf = ac.createBuffer(1, n, ac.sampleRate), d = buf.getChannelData(0);
-    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const t = ac.currentTime + (delay || 0);
+    if (!nbuf) { nbuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate); const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
     const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
-    s.buffer = buf; f.type = type || 'lowpass'; f.frequency.value = freq || 1200; g.gain.value = vol || 0.2;
-    s.connect(f); f.connect(g); g.connect(master); s.start(t);
+    s.buffer = nbuf; f.type = type || 'lowpass'; f.frequency.value = freq || 1200; g.gain.setValueAtTime(vol || 0.2, t); g.gain.linearRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(master); s.start(t, Math.random() * 1.5); s.stop(t + dur + 0.02); s.onended = () => { try { g.disconnect(); } catch (e) { } };
   }
   const SFX = {
     swing: () => { noise(0.12, 0.16, 1500, 'highpass'); tone(110, 0.1, 'sine', 0.08, 0.5); },

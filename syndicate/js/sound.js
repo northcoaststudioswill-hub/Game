@@ -4,6 +4,12 @@
   'use strict';
   const G = window.G;
   let ac = null, out = null, wet = null, wetIn = null, nbuf = null, bed = null, bedG = null, bedF = null, wind = null, windG = null;
+  // Phones have a small audio budget. Everything here is counted, capped and rate-limited, and the whole layer steps
+  // down to a lighter mode on touch devices or the moment the page shows signs of falling behind.
+  let live = 0, lite = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints || 0) > 1, late = 0;
+  const lastAt = {}, CAP = () => (lite ? 10 : 22);
+  const done = n => { live++; n.onended = () => { live = Math.max(0, live - 1); try { n.disconnect(); } catch (e) { } }; };
+  G.soundLite = v => { if (v != null) lite = !!v; return lite; }; G.soundLive = () => live;
   const ready = () => {
     if (ac) return !G.muted;
     ac = G.audioCtx && G.audioCtx(); if (!ac) return false;
@@ -11,30 +17,32 @@
     // one long buffer of noise, shared by everything
     nbuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
     const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    // the room: three feedback delays into a dark filter. Everything the old synth plays goes through it too.
-    wetIn = ac.createGain(); wet = ac.createGain(); wet.gain.value = 0.12;
-    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2100;
-    [0.043, 0.071, 0.113].forEach(t => { const dl = ac.createDelay(0.5), fb = ac.createGain(); dl.delayTime.value = t; fb.gain.value = 0.34; wetIn.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(lp); });
-    lp.connect(wet); wet.connect(ac.destination); out.connect(wetIn);
+    // a limiter on the way out, so a pile-up of sounds is squashed instead of crackling
+    try { const lim = ac.createDynamicsCompressor(); lim.threshold.value = -14; lim.knee.value = 10; lim.ratio.value = 12; lim.attack.value = 0.003; lim.release.value = 0.2; out.disconnect(); out.connect(lim); lim.connect(ac.destination);
+      // the room: one feedback delay into a dark filter. Left out altogether in the light mode.
+      if (!lite) { wetIn = ac.createGain(); wet = ac.createGain(); wet.gain.value = 0.1; const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1900; const dl = ac.createDelay(0.5), fb = ac.createGain(); dl.delayTime.value = 0.083; fb.gain.value = 0.3; wetIn.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(lp); lp.connect(wet); wet.connect(lim); out.connect(wetIn); }
+    } catch (e) { }
     return !G.muted;
   };
   // ---- voices
   function tone(f, dur, type, vol, slide, delay, attack) {
-    const t = ac.currentTime + (delay || 0), o = ac.createOscillator(), g = ac.createGain();
+    if (live >= CAP()) return;
+    const t = ac.currentTime + (delay || 0), o = ac.createOscillator(), g = ac.createGain(); done(o);
     o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
     if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(20, f * slide), t + dur);
     g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + (attack || 0.004)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     o.connect(g); g.connect(out); o.start(t); o.stop(t + dur + 0.03);
   }
   function hiss(dur, vol, f0, type, delay, f1, q, attack) {
-    const t = ac.currentTime + (delay || 0), s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    if (live >= CAP()) return;
+    const t = ac.currentTime + (delay || 0), s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(); done(s);
     s.buffer = nbuf; f.type = type || 'bandpass'; f.frequency.setValueAtTime(f0, t); if (f1) f.frequency.exponentialRampToValueAtTime(f1, t + dur); f.Q.value = q || 0.8;
     g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + (attack || 0.004)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     s.connect(f); f.connect(g); g.connect(out); s.start(t, Math.random() * 1.5); s.stop(t + dur + 0.03);
   }
   // a crowd is a lot of voices: several bands of noise that swell and wander
   function voices(dur, vol, lo, hi, delay, rise) {
-    for (let i = 0; i < 4; i++) { const f = lo + (hi - lo) * (i / 3); hiss(dur * (0.8 + Math.random() * 0.4), vol * (0.7 + Math.random() * 0.5), f, 'bandpass', (delay || 0) + i * 0.03, f * (rise || 1.25), 2.2, dur * 0.3); }
+    const nb = lite ? 1 : 2; for (let i = 0; i < nb; i++) { const f = lo + (hi - lo) * (nb === 1 ? 0.5 : i); hiss(dur * (0.8 + Math.random() * 0.4), vol * (0.7 + Math.random() * 0.5), f, 'bandpass', (delay || 0) + i * 0.03, f * (rise || 1.25), 2.2, dur * 0.3); }
   }
   const R = (a, b) => a + Math.random() * (b - a);
   const X = {
@@ -75,7 +83,14 @@
     heart: () => { tone(52, 0.13, 'sine', 0.3, 0.7); tone(48, 0.16, 'sine', 0.22, 0.7, 0.16); }
   };
   const s0 = G.sfx;
-  G.sfx = n => { if (X[n]) { try { if (ready()) X[n](); } catch (e) { } return; } try { ready(); } catch (e) { } s0(n); };
+  const CROWD = { gasp: 1, roar: 1, boo: 1, ooh: 1, chant: 1, hush: 1 }, GAP = n => (CROWD[n] ? 2200 : n === 'laugh' ? 4000 : n === 'bird' || n === 'goldfall' ? 900 : 70);
+  G.sfx = n => {
+    const now = performance.now(); if (now - (lastAt[n] || 0) < (X[n] ? GAP(n) : 45)) return; lastAt[n] = now;
+    if (X[n]) { if (lite && CROWD[n] && n !== 'roar') return; try { if (ready()) X[n](); } catch (e) { } return; }
+    try { ready(); } catch (e) { }
+    if (live >= CAP() + 6) return;
+    s0(n);
+  };
   G.SFX_EXTRA = Object.keys(X);
 
   // ---- what a blow sounds like depends on what landed it
@@ -87,7 +102,7 @@
     if (ab && (ab.spell || ab.type === 'proj' || ab.type === 'aoe' || ab.type === 'line') && !(ab.basic && BASIC[att.cls] !== 'spellhit')) k = 'spellhit';
     else if (att && att.vis && att.vis.c && att.vis.c.beast) k = 'slice';
     else { const arm = att && att.isPlayer && G.armOf ? String(G.armOf(G.state.hero)).split('_')[1] : (att && att.arm ? String(att.arm).split('_')[1] : 'basic'); k = FAM[arm] || BASIC[att && att.cls] || 'thud'; }
-    G.sfx(k); if (crit) G.sfx('bigcrit');
+    G.sfx(crit && lite ? 'bigcrit' : k); if (crit && !lite) G.sfx('bigcrit');
     const now = performance.now();
     if (!G.fight.ex && !(G.garden && G.garden.run) && now - lastGasp > 1400 && (crit || (ab && ab.heavy))) { lastGasp = now; G.sfx(tgt && tgt.isPlayer ? 'ooh' : 'gasp'); }
   };
@@ -96,21 +111,24 @@
   // ---- beds: the crowd under a bout, the wind and birds in the garden, the heartbeat when you are nearly done
   function loop(freq, q) { const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(); s.buffer = nbuf; s.loop = true; f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q; g.gain.value = 0; s.connect(f); f.connect(g); g.connect(out); s.start(); return [g, f]; }
   let hbT = 0, birdT = 2, murT = 3, wasHype = 0;
+  let tickAt = 0, lastCrowd = -1, lastWind = -1, lastWet = -1, lastF = -1;
+  const setP = (p, v, tc) => { try { p.cancelScheduledValues(ac.currentTime); p.setTargetAtTime(v, ac.currentTime, tc); } catch (e) { } };
   setInterval(() => {
+    const nowMs = performance.now(); if (tickAt && nowMs - tickAt > 700 && !document.hidden) { if (++late >= 3 && !lite) { lite = true; if (wet) setP(wet.gain, 0, 0.1); } } tickAt = nowMs;
     let okA = false; try { okA = ready(); } catch (e) { }
     if (!ac) return;
     const F = G.fight, inFight = G.scene === 'fight' && F && F.active && !F.paused, garden = !!(G.garden && G.garden.run), hall = G.finale && G.finale.on;
     if (!bed) { const b = loop(620, 0.6); bedG = b[0]; bedF = b[1]; const w = loop(380, 0.4); windG = w[0]; wind = w[1]; }
     const t = ac.currentTime, hy = (F && F.hypeNow != null ? F.hypeNow : 0.3);
     const crowd = okA && inFight && !garden && !F.ex ? 0.022 + hy * 0.07 : 0;
-    bedG.gain.setTargetAtTime(crowd, t, 0.4); bedF.frequency.setTargetAtTime(520 + hy * 520, t, 0.5);
-    windG.gain.setTargetAtTime(okA && (garden && G.scene !== 'hub') ? 0.03 : hall ? 0.022 : 0, t, 0.6);
-    if (wet) wet.gain.setTargetAtTime(hall ? 0.4 : garden ? 0.05 : G.scene === 'fight' ? 0.2 : G.scene === 'hideout' ? 0.06 : 0.13, t, 0.3);
+    const cr = Math.round(crowd * 200) / 200, fq = Math.round((520 + hy * 520) / 40) * 40, wd = okA && (garden && G.scene !== 'hub') ? 0.03 : hall ? 0.022 : 0, wt = lite ? 0 : hall ? 0.3 : garden ? 0.04 : G.scene === 'fight' ? 0.14 : G.scene === 'hideout' ? 0.05 : 0.1;
+    if (cr !== lastCrowd) { lastCrowd = cr; setP(bedG.gain, cr, 0.4); } if (fq !== lastF) { lastF = fq; setP(bedF.frequency, fq, 0.5); }
+    if (wd !== lastWind) { lastWind = wd; setP(windG.gain, wd, 0.6); } if (wet && wt !== lastWet) { lastWet = wt; setP(wet.gain, wt, 0.3); }
     if (!okA) return;
     if (inFight && !garden && !F.ex) {
-      murT -= 0.25; if (murT <= 0) { murT = R(2.5, 6); if (hy > 0.75) G.sfx(Math.random() < 0.4 ? 'chant' : 'roar'); else if (hy < 0.15 && Math.random() < 0.3) G.sfx('boo'); }
-      if (hy - wasHype > 0.12) G.sfx('roar'); wasHype = hy;
-      const P = F.P; if (P && P.hp > 0 && P.hp < P.maxHp * 0.25 && F.inFight && F.inFight()) { hbT -= 0.25; if (hbT <= 0) { hbT = 0.9; G.sfx('heart'); } }
+      murT -= 0.25; if (murT <= 0) { murT = R(5, 10); if (hy > 0.75) G.sfx(Math.random() < 0.4 ? 'chant' : 'roar'); else if (hy < 0.15 && Math.random() < 0.3) G.sfx('boo'); }
+      if (hy - wasHype > 0.2) G.sfx('roar'); wasHype = hy;
+      const P = F.P; if (P && P.hp > 0 && P.hp < P.maxHp * 0.25 && F.inFight && F.inFight()) { hbT -= 0.25; if (hbT <= 0) { hbT = 1.1; G.sfx('heart'); } }
     }
     if (inFight && garden) { birdT -= 0.25; if (birdT <= 0) { birdT = R(1.2, 4); G.sfx('bird'); if (Math.random() < 0.15) G.sfx('goldfall'); } }
   }, 250);
