@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.54 (2026-11-19).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.55 (2026-11-19).
 
 ## Waiting on you
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
@@ -11,7 +11,8 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - Air hook, air cut and thrown weapons (v0.51).
 - Death animation, down-but-not-out, Tavi following (v0.50).
 - The Lamp's wrong-name fight (v0.50).
-- Controller: legend, right stick in fights, pause menu on the stick (v0.49).
+- Controller in the comic levels: both sticks and lock-on now reach the level (v0.55); legend and pause menu on the stick (v0.49). Never tried with a real pad.
+- The second wind's furnace scene in arena fights (v0.54). Levels from the Dev menu starting at their opening (v0.55).
 
 ## Characters and animation
 0. **The run in the comic levels.** Lean halved and cape fixed in v0.53 from side-on frames; needs your eye in motion. Next: arms (the weapon arm barely moves), and the guards' jog checked the same way.
@@ -26,6 +27,9 @@ Kept current each round. "Keep going" means work down this list from the top unl
 7. **2.5D walking:** the camp and Ashgate Square as places you walk with flat sprites in a 3D space; the fire scene on night 28 staged that way (everyone comes to the circle, it is said, the fight starts).
 8. **The High Docks rebuilt from reference:** laid out like a real dock, dressed as somewhere the Accredited live, with side corridors that go nowhere, height for the boots, and hidden things that feed the Codex.
 9. **Riser Nine:** more character still. It has a hill, a hoist and a road now.
+9a. **The Stair's sky:** bring the moored and drifting ships to life (lamps, slow movement, crew), and make sure none pass through each other.
+9b. **More room at the start of every comic level** before anything happens. Docks and Stair done; check the feel, and build any new level with a long first stretch.
+9c. **2D scenes in the Dev menu:** you said they no longer show their story beats. The comic levels are fixed (v0.55). For the 2D ones I need to know which entry: if "Skip fight intro films" is switched on in the Dev menu, that is what hides them.
 10. **2D valley maps:** more terrain you can read (rises, banks, cover), more detail.
 11. **The Scuffle** has the square behind it; it needs its own background.
 

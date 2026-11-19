@@ -86,7 +86,7 @@
   function crossing(id, viaAct) {
     return function () {
       const first = !F.path; S.cp = id; pl.hp = SC.T.hp; pl.chance = 1;
-      if (first && SC.issue !== 'docks') { pl.setPath('ember'); F.path = 'ember'; save(); pl.meter = Math.max(pl.meter, 25); FX.ring(pl.pos, 0xffe14a, 0.5, 3, 0.5); startEnc('alley'); return; }   // he has counted eleven before. Once is the memory; after that it is only where he starts
+      if (first && SC.issue !== 'docks') { pl.setPath('ember'); F.path = 'ember'; save(); pl.meter = Math.max(pl.meter, 25); FX.ring(pl.pos, 0xffe14a, 0.5, 3, 0.5); startEnc('alley'); if (S.enc) S.enc.wait = 2.2; return; }   // a breath before the first of them lands   // he has counted eleven before. Once is the memory; after that it is only where he starts
       if (first) { SC.audio.sfx('clue'); pl.control = false; pl.setPath('ember'); F.path = 'ember'; save(); U.memory(art(FIN.count), bargain); return; }
       const sm = (SUN[SC.issue] || {})[id];
       if (viaAct && sm && !F['sun_' + id]) { SC.audio.sfx('clue'); F['sun_' + id] = 1; save(); pl.control = false; pagesOf(sm.p, () => { pl.control = true; if (sm.fury) pl.gain(50); U.toast(sm.toast, 3.2); objective(); }); return; }
@@ -291,7 +291,7 @@
   if (SC.issue === 'riser' || SC.issue === 'stair') {
     const RIS = SC.issue === 'riser', BY = RIS ? 0 : 18, done = () => { S.done = true; S.wipe(); if (!SC.host('done', { time: S.time, kills: pl.stats.kills, clues: pl.echoes })) U.end({ time: S.time, path: '', kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); };
     for (const k in CROSS) delete CROSS[k]; for (const k in ENC) delete ENC[k];
-    Object.assign(CROSS, RIS ? { alley: { x: 0, y: 0, z: 7.4, yaw: Math.PI }, yard: { x: -12, y: 0, z: 4, yaw: Math.PI } } : { alley: { x: 0, y: 0, z: 37, yaw: Math.PI }, yard: { x: 0, y: 6, z: 14.5, yaw: Math.PI }, roof: { x: 0, y: 12, z: -11, yaw: Math.PI } });
+    Object.assign(CROSS, RIS ? { alley: { x: 0, y: 0, z: 7.4, yaw: Math.PI }, yard: { x: -12, y: 0, z: 4, yaw: Math.PI } } : { alley: { x: 0, y: 0, z: 33, yaw: Math.PI }, yard: { x: 0, y: 6, z: 14.5, yaw: Math.PI }, roof: { x: 0, y: 12, z: -11, yaw: Math.PI } });
     Object.assign(ENC, RIS ? {
       alley: { arena: [-25, -22, 25, 10.6], floor: 0, waves: [[['hollow', 3, -20], ['hollow', 5, -21], ['hollow', 1.6, -21.5]]] },
       w2: { arena: [-25, -22, 25, 10.6], floor: 0, waves: [[['hollow', 4, -21], ['knifer', 2, -21.5], ['knifer', 6, -20.5]], [['hollow', 23, -10], ['hollow', -23, -6], ['knifer', 3.4, -21]]] },
@@ -473,7 +473,7 @@
       if (S.enc && S.enc.arena && !RIS && pl.control && pl.state !== 'dead') { const A = S.enc.arena; pl.pos.x = SC.clamp(pl.pos.x, A[0] - 0.2, A[2] + 0.2); pl.pos.z = SC.clamp(pl.pos.z, A[1] - 0.2, A[3] + 0.2); }   // a landing is fought on the landing
       if (!pl.control || S.enc || pl.state === 'dead') return;
       const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;
-      { let on = null; if (F.intro) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && Math.hypot(x - c.x, z - c.z) < (F.path ? 1.6 : id === 'alley' ? 5.5 : 1.6)) on = id; } if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
+      { let on = null; if (F.intro) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && (F.path ? Math.hypot(x - c.x, z - c.z) < 1.6 : id === 'alley' && (Math.hypot(x - c.x, z - c.z) < 2.2 || z < c.z - 0.8))) on = id; } if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
       if (RIS) {
         if (S.pending || !F.e_alley || F.boss || S.bossDown) return;
         const next = F.pump && !F.e_w2 ? 'w2' : F.pylon && !F.e_w3 ? 'w3' : F.pull ? 'boss' : null; if (!next) return; S.pending = true;

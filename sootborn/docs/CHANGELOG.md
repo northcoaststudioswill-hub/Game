@@ -1,4 +1,14 @@
-# SOOTBORN — changelog (latest v0.54 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.55 · 2026-11-19)
+
+## v0.55 · 2026-11-19 — the controller in the comic levels, properly this time; Dev menu levels start from their opening
+From play notes.
+
+- **I had the controller wrong in v0.49.** I said the level was reading the pad twice. It was not reading it at all: inside the game the level takes everything from the game, and the game was only sending it the left stick as four directions and the buttons. So the right stick did nothing in a level, however the camera was set. The game now sends both sticks (the left one as a real analogue stick) and the right-stick click (lock on). Checked by sending a right-stick push into a running level: the camera turns.
+- **Levels opened from the Dev menu start from their opening**, with their pages and dialogue, every time. They were picking up wherever you last left that level, which is why the story beats had stopped showing. Inside the story they still resume.
+- **The Stair: room to breathe.** The first sun is four metres further up the terrace, and the first guards wait two seconds after it before they come down. In v0.52 I had made that sun reach so far that the fight began the moment you appeared.
+- **More room at the start of the docks** was done in v0.50 and v0.52 (about ten metres of causeway before the first scene). Riser Nine has no corridor to lengthen.
+
+**Checked:** the Stair start to end by script; a level opened with a save present resumes, and opened from the Dev menu shows its first page; the page loads clean. **Not checked:** a real controller, still.
 
 ## v0.54 · 2026-11-19 — getting up is a scene; capes that fall
 From play notes.

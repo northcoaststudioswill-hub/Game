@@ -22,7 +22,7 @@ const Issue = {
   },
   start(key, done) {
     // one engine, three levels: the frame is told which one it is
-    const base = (window.ISSUE_HTML || {}).docks, html = base && this.LEVELS[key] ? base.replace("issue: 'docks'", "issue: '" + key + "'") : null;
+    const base = (window.ISSUE_HTML || {}).docks, fr = this.fresh, html = base && this.LEVELS[key] ? base.replace("issue: 'docks'", "issue: '" + key + "'" + (fr ? ', devFresh: 1' : '')) : null; this.fresh = 0;
     if (!html || !this.can()) { done(false); return; }
     this.on = true; this.done = done; this.ready = false; this.key = key; this.last = ''; this.sent = '';
     try { if (Sound.mus) Sound.mus.gain.value = 0; window.__issueAudio = Sound.ctx || null; } catch (e) { /* no audio yet */ }
@@ -50,8 +50,12 @@ const Issue = {
     const x = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), y = (Input.h('up') ? 1 : 0) - (Input.h('down') ? 1 : 0), press = [];
     if (Input.p('A')) press.push('ctx'); if (Input.p('B')) press.push('dodge'); if (Input.p('X')) press.push('hook'); if (Input.p('Y')) press.push('jump');
     if (Input.p('L')) press.push('boots'); if (Input.p('R')) press.push('kick'); if (Input.p('START')) press.push('pause');
-    const hold = { a: Input.h('A') ? 1 : 0, y: Input.h('Y') ? 1 : 0 }, pad = Input.device === 'pad' ? 1 : 0, k = x + ',' + y + ',' + hold.a + hold.y + pad; if (k === this.sent && !press.length) return; this.sent = k;
-    try { this.el.contentWindow.postMessage({ sootborn: 'in', x, y, press, hold, pad }, '*'); } catch (e) { /* frame is going away */ }
+    // the level does not read the controller itself: both sticks and the stick click go to it from here
+    let ax = 0, ay = 0, lx = 0, ly = 0, r3 = 0; try { for (const gp of (navigator.getGamepads ? navigator.getGamepads() : [])) { if (!gp || !gp.connected) continue; const dz = v => Math.abs(v) < .18 ? 0 : Math.round(v * 10) / 10; ax = dz(gp.axes[0] || 0); ay = dz(gp.axes[1] || 0); lx = dz(gp.axes[2] || 0); ly = dz(gp.axes[3] || 0); r3 = gp.buttons[11] && gp.buttons[11].pressed ? 1 : 0; break; } } catch (e) { /* no pad */ }
+    if (r3 && !this.r3) press.push('lock'); this.r3 = r3;
+    const sx = ax || ay ? ax : x, sy = ax || ay ? -ay : y;
+    const hold = { a: Input.h('A') ? 1 : 0, y: Input.h('Y') ? 1 : 0 }, pad = Input.device === 'pad' ? 1 : 0, k = sx + ',' + sy + ',' + lx + ',' + ly + ',' + hold.a + hold.y + pad; if (k === this.sent && !press.length) return; this.sent = k;
+    try { this.el.contentWindow.postMessage({ sootborn: 'in', x: sx, y: sy, lk: [lx, ly], press, hold, pad }, '*'); } catch (e) { /* frame is going away */ }
   },
   finish(ok, data) {
     if (!this.on) return;
