@@ -128,7 +128,7 @@ const TALK = {
       say('tavi', "You're home. You've got the thinking face. Seren called it your 'scheme face.'"),
       F('toldIvo') ? say('tavi', 'Ivo came by looking serious. Ivo is never serious. Is something happening?') : say('tavi', 'Ivo came by. Said the lift light was on again. Said not to tell you. So obviously I am telling you.'),
       { choice: [
-        { t: "Nothing's happening. Go to sleep.", fx: () => setF('liedTavi'), then: [say('tavi', "Okay. You're a bad liar when you're tired. Night.")] },
+        { t: "Nothing's happening. Go to sleep.", fx: () => setF('liedTavi'), then: [say('tavi', "Aye, fine. You're a bad liar when you're tired. Night.")] },
         { t: "Something is. And I'm going to be ready for it.", fx: () => { setF('honestTavi'); trust('tavi', 1); }, then: [say('tavi', 'Then I want to be ready too. Promise you won\'t do it alone. Not like last time.'), say('you', 'Promise.')] }
       ] },
       fx(() => setF('taviNight'))
@@ -145,7 +145,7 @@ const TALK = {
       say('mara', 'And Kael — whatever you see on that bank, you see it with your mouth shut.'),
       { choice: [
         { t: 'My mouth is famously well behaved.', then: [say('mara', "Your mouth is the reason I'm grey.")] },
-        { t: 'You held me down that day.', fx: () => setF('confrontedMara'), then: [say('mara', 'I did.'), say('mara', "And I'd do it again. She bought your life, boy. I wasn't going to let you hand it back.")] }
+        { t: 'You held me down that day.', fx: () => setF('confrontedMara'), then: [say('mara', 'I did.'), say('mara', "And I'd do it again. She bought your breath, boy. I wasn't going to let you hand it back.")] }
       ] },
       fx(() => { setF('talkedMara1'); addJ('p_mara', true); addJ('pl_bay', true); Game.autosave(); })
     ];
@@ -216,7 +216,7 @@ const TALK = {
           say('ivo', "Here's my thing to show you. Last night, Lift Zero's call light came on. Green. Eleven seconds."),
           say('ivo', "Nobody came down this time, Kael. Something went up.")] },
         { t: "Long shift. I'm just tired.", fx: () => setF('keptFromIvo'), then: [
-          say('ivo', "Sure. You've got your 'I'm fine' face on, and it's a terrible face, but sure."),
+          say('ivo', "Aye. You've got your 'I'm fine' face on, and it's a terrible face, but aye."),
           say('ivo', "When you're ready: Lift Zero's light came on last night. Eleven seconds. Nobody came down.")] },
         { t: 'Leave it, Ivo. You saw what asking gets you.', fx: () => { trust('ivo', -1); setF('warnedIvo'); }, then: [
           say('ivo', "...I held your arm while they walked her to the furnace. Don't tell me what I saw."),
@@ -253,7 +253,7 @@ const TALK = {
       say('nell', '...'), say('nell', "Don't say that word in the square again. I mean it."),
       say('nell', 'Come by the clinic in a few days. Quietly. Bring whatever you saw. Seren would have.'), fx(() => setF('nellHook')), ...first];
     if (F('nellHook')) return [say('nell', 'Quietly, Kael.')];
-    if (F('bledAgain') && !F('nellBleed')) return [say('nell', 'Somebody fed my ward an hour ago. The gauge jumped like a heart.'), say('nell', "I'm not going to ask. I'm going to say thank you to the air, and I'm going to pray that whoever it was is better at not getting caught than she was."), fx(() => setF('nellBleed')), ...first, ...visit];
+    if (F('bledAgain') && !F('nellBleed')) return [say('nell', 'Somebody fed my ward an hour ago. The gauge jumped like a heart.'), say('nell', "I'm not going to ask. I'm going to say ta to the air, and I'm going to pray that whoever it was is better at not getting caught than she was."), fx(() => setF('nellBleed')), ...first, ...visit];
     return [say('nell', 'Kael. You came in. Most people can\'t, now.'), say('nell', "Forty kids. Every one of them breathing on their own. That's what she bought. Look at them. Don't look away from it. You earned that, both of you."), say('nell', "And now they've cut us to ration again. Fever salts gone. Shipments come in full and the depot sends them out half-empty. Nobody's stealing. Nobody is ever stealing."), ...first, ...visit];
   },
   proctor() {
@@ -278,7 +278,7 @@ const TALK = {
   pip() { return [say('pip', "You're Seren's Kael! She said you'd be grumpy and tall. You're only grumpy."), say('pip', 'She told us the sky is blue. Like the inside of a gas flame. Is that true?'),
     { choice: [{ t: "It's true. She saw it in a book.", then: [say('pip', "I KNEW it. Mosi said it was green.")] }, { t: "I don't know yet. I'm going to find out.", fx: () => setF('promisedPip'), then: [say('pip', 'Then come back and tell us. Promise. She always came back.')] }] }]; },
   mosi() { return [say('mosi', "I drew her. Look. That's her, and that's the sun. Her head is the sun because she's warm."), narr('The drawing is crayon on the back of a ration wrapper. A woman with a sun for a head, holding hands with forty stick children.'),
-    ...(F('gotDrawing') ? [] : [{ choice: [{ t: 'Can I keep it?', fx: () => { setF('gotDrawing'); addJ('e_drawing'); }, then: [say('mosi', "...Okay. But you have to put it somewhere high up. Where the sky would be.")] }, { t: "It's perfect. Keep it safe.", then: [say('mosi', "I'm putting it under my pillow. The Proctors don't check under pillows.")] }] }])]; },
+    ...(F('gotDrawing') ? [] : [{ choice: [{ t: 'Can I keep it?', fx: () => { setF('gotDrawing'); addJ('e_drawing'); }, then: [say('mosi', "...Aye. But you have to put it somewhere high up. Where the sky would be.")] }, { t: "It's perfect. Keep it safe.", then: [say('mosi', "I'm putting it under my pillow. The Proctors don't check under pillows.")] }] }])]; },
   ada() { if (F('bledAgain')) return [say('ada', 'The storm came back! The fan did the storm again! ...Was that you?'), say('kael', 'Storms just happen, sweetheart. Nobody does them.'), say('ada', '...Seren said that too. Exactly like that.')]; return [narr('Ada is very small and very still. She is breathing on her own, slow and steady, which six weeks ago she could not do.'), say('ada', '...Is she coming back to fix the fan again?'), say('kael', '...No, sweetheart. But I will. I\'m very good at fans.')]; },
   pell() { const l = ["Sorry about Seren, Kael. She swept better than me. Don't tell anyone.", "Festival's tomorrow. I'm sweeping early. Like a professional.", "Pillar's going white soon. Day's half gone."]; return [say('pell', l[(G.talkCount.pell = (G.talkCount.pell || 0) + 1) % l.length])]; },
   juno() { const l = ["I drew Seren's sun on the Pillar again! The grey men scrub it. I draw it faster.", 'My brother says the sky is fire. My other brother says it\'s soup.', "When I grow up I'm gonna ride Lift Zero and never come back. Except for noodles."]; return [say('juno', l[(G.talkCount.juno = (G.talkCount.juno || 0) + 1) % l.length])]; },

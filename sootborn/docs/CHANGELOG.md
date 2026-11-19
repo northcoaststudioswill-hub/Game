@@ -1,5 +1,31 @@
 # SOOTBORN — changelog
 
+## v0.22 · 2026-11-18 — two ways of speaking, written into everyone
+From play notes: make sure the language difference is written into the characters; more detail in the new scenes; polish.
+
+**The audit.** I checked every line spoken by an Accredited character against the rule from the lesson (no contractions; "noted", "granted", "one", "my time"; never thanks, never sorry, never "we"). They were nearly clean already. The gap was on the other side: nobody below had ever actually said "aye" or "ta", anywhere in the game. The rule was taught but not lived in.
+
+**Below (soot)**
+- Seren accepts the proposal with "Aye. Obviously aye." and answers the heist question "Aye."
+- Kael swears "on my breath" (to Seren before the heist, to Tavi about the sun). Mara: "She bought your breath, boy." and "not once in all your breath".
+- Ivo, Tavi, Mosi and Mara say "aye" where they said yes, sure or okay. Nell says "ta" to the air.
+
+**Above (Accredited)**
+- Celestine no longer says "thank you" ("Noted. You have spared me the saying of it."), no longer says "us" or "let us".
+- In the white room Kael says "Aye, Auditor" and she corrects him: "One does not say 'aye' in this room. It sounds like something a pipe does."
+
+**The ones in between**
+- **Vale** keeps his contractions, and now the story says why: born on Tier Two, counted up, says "noted" like a borrowed coat and "don't" when he is tired.
+- **Wren** is the Accredited who slips. On Day 4 she hears Kael say "we" and says "What a useful word. One is never allowed it." On the Spire she says "we" and "forgive me" and he has to stop himself answering in his own voice. At the end: "We. I am practising. We touch the pipe. ...Aye?"
+- **Kael** himself: Ilse's lesson now ends with him admitting he can no longer say "don't" inside his own head, which is why his narration sounds the way it does. His last soot word before the table is "ta", and Ilse tells him it is the last time for nine years. When Tavi arrives he says "Tav" and it comes out rusty. Before the stair he throws "one" away in front of everybody: "It's 'we.' It was always we."
+- **Celestine at the end** (if sent below): she says "...Noted." and Kael says "Down there it's 'aye.'" The closing card adds that on the fourth day she said "ta" to Mara, and Mara pretended not to hear.
+
+**Scenes**
+- Wren is now drawn in Celestine's room on Day 4, at her gauge.
+- Ivo is at the table in Row K for the leash-and-door argument.
+- The Clerk's desk has a visitor standing at it: Wren (with her grease print) or Marshal Cade.
+- Tavi and Kael face each other on the barge deck under a real sun.
+
 ## v0.21 · 2026-11-18 — more story and more scenes in the newer chapters
 From play notes: keep improving the cutscenes, especially the new ones; more detail, more story.
 

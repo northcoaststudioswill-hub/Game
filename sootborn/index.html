@@ -1179,7 +1179,7 @@ const TALK = {
       say('tavi', "You're home. You've got the thinking face. Seren called it your 'scheme face.'"),
       F('toldIvo') ? say('tavi', 'Ivo came by looking serious. Ivo is never serious. Is something happening?') : say('tavi', 'Ivo came by. Said the lift light was on again. Said not to tell you. So obviously I am telling you.'),
       { choice: [
-        { t: "Nothing's happening. Go to sleep.", fx: () => setF('liedTavi'), then: [say('tavi', "Okay. You're a bad liar when you're tired. Night.")] },
+        { t: "Nothing's happening. Go to sleep.", fx: () => setF('liedTavi'), then: [say('tavi', "Aye, fine. You're a bad liar when you're tired. Night.")] },
         { t: "Something is. And I'm going to be ready for it.", fx: () => { setF('honestTavi'); trust('tavi', 1); }, then: [say('tavi', 'Then I want to be ready too. Promise you won\'t do it alone. Not like last time.'), say('you', 'Promise.')] }
       ] },
       fx(() => setF('taviNight'))
@@ -1196,7 +1196,7 @@ const TALK = {
       say('mara', 'And Kael — whatever you see on that bank, you see it with your mouth shut.'),
       { choice: [
         { t: 'My mouth is famously well behaved.', then: [say('mara', "Your mouth is the reason I'm grey.")] },
-        { t: 'You held me down that day.', fx: () => setF('confrontedMara'), then: [say('mara', 'I did.'), say('mara', "And I'd do it again. She bought your life, boy. I wasn't going to let you hand it back.")] }
+        { t: 'You held me down that day.', fx: () => setF('confrontedMara'), then: [say('mara', 'I did.'), say('mara', "And I'd do it again. She bought your breath, boy. I wasn't going to let you hand it back.")] }
       ] },
       fx(() => { setF('talkedMara1'); addJ('p_mara', true); addJ('pl_bay', true); Game.autosave(); })
     ];
@@ -1267,7 +1267,7 @@ const TALK = {
           say('ivo', "Here's my thing to show you. Last night, Lift Zero's call light came on. Green. Eleven seconds."),
           say('ivo', "Nobody came down this time, Kael. Something went up.")] },
         { t: "Long shift. I'm just tired.", fx: () => setF('keptFromIvo'), then: [
-          say('ivo', "Sure. You've got your 'I'm fine' face on, and it's a terrible face, but sure."),
+          say('ivo', "Aye. You've got your 'I'm fine' face on, and it's a terrible face, but aye."),
           say('ivo', "When you're ready: Lift Zero's light came on last night. Eleven seconds. Nobody came down.")] },
         { t: 'Leave it, Ivo. You saw what asking gets you.', fx: () => { trust('ivo', -1); setF('warnedIvo'); }, then: [
           say('ivo', "...I held your arm while they walked her to the furnace. Don't tell me what I saw."),
@@ -1304,7 +1304,7 @@ const TALK = {
       say('nell', '...'), say('nell', "Don't say that word in the square again. I mean it."),
       say('nell', 'Come by the clinic in a few days. Quietly. Bring whatever you saw. Seren would have.'), fx(() => setF('nellHook')), ...first];
     if (F('nellHook')) return [say('nell', 'Quietly, Kael.')];
-    if (F('bledAgain') && !F('nellBleed')) return [say('nell', 'Somebody fed my ward an hour ago. The gauge jumped like a heart.'), say('nell', "I'm not going to ask. I'm going to say thank you to the air, and I'm going to pray that whoever it was is better at not getting caught than she was."), fx(() => setF('nellBleed')), ...first, ...visit];
+    if (F('bledAgain') && !F('nellBleed')) return [say('nell', 'Somebody fed my ward an hour ago. The gauge jumped like a heart.'), say('nell', "I'm not going to ask. I'm going to say ta to the air, and I'm going to pray that whoever it was is better at not getting caught than she was."), fx(() => setF('nellBleed')), ...first, ...visit];
     return [say('nell', 'Kael. You came in. Most people can\'t, now.'), say('nell', "Forty kids. Every one of them breathing on their own. That's what she bought. Look at them. Don't look away from it. You earned that, both of you."), say('nell', "And now they've cut us to ration again. Fever salts gone. Shipments come in full and the depot sends them out half-empty. Nobody's stealing. Nobody is ever stealing."), ...first, ...visit];
   },
   proctor() {
@@ -1329,7 +1329,7 @@ const TALK = {
   pip() { return [say('pip', "You're Seren's Kael! She said you'd be grumpy and tall. You're only grumpy."), say('pip', 'She told us the sky is blue. Like the inside of a gas flame. Is that true?'),
     { choice: [{ t: "It's true. She saw it in a book.", then: [say('pip', "I KNEW it. Mosi said it was green.")] }, { t: "I don't know yet. I'm going to find out.", fx: () => setF('promisedPip'), then: [say('pip', 'Then come back and tell us. Promise. She always came back.')] }] }]; },
   mosi() { return [say('mosi', "I drew her. Look. That's her, and that's the sun. Her head is the sun because she's warm."), narr('The drawing is crayon on the back of a ration wrapper. A woman with a sun for a head, holding hands with forty stick children.'),
-    ...(F('gotDrawing') ? [] : [{ choice: [{ t: 'Can I keep it?', fx: () => { setF('gotDrawing'); addJ('e_drawing'); }, then: [say('mosi', "...Okay. But you have to put it somewhere high up. Where the sky would be.")] }, { t: "It's perfect. Keep it safe.", then: [say('mosi', "I'm putting it under my pillow. The Proctors don't check under pillows.")] }] }])]; },
+    ...(F('gotDrawing') ? [] : [{ choice: [{ t: 'Can I keep it?', fx: () => { setF('gotDrawing'); addJ('e_drawing'); }, then: [say('mosi', "...Aye. But you have to put it somewhere high up. Where the sky would be.")] }, { t: "It's perfect. Keep it safe.", then: [say('mosi', "I'm putting it under my pillow. The Proctors don't check under pillows.")] }] }])]; },
   ada() { if (F('bledAgain')) return [say('ada', 'The storm came back! The fan did the storm again! ...Was that you?'), say('kael', 'Storms just happen, sweetheart. Nobody does them.'), say('ada', '...Seren said that too. Exactly like that.')]; return [narr('Ada is very small and very still. She is breathing on her own, slow and steady, which six weeks ago she could not do.'), say('ada', '...Is she coming back to fix the fan again?'), say('kael', '...No, sweetheart. But I will. I\'m very good at fans.')]; },
   pell() { const l = ["Sorry about Seren, Kael. She swept better than me. Don't tell anyone.", "Festival's tomorrow. I'm sweeping early. Like a professional.", "Pillar's going white soon. Day's half gone."]; return [say('pell', l[(G.talkCount.pell = (G.talkCount.pell || 0) + 1) % l.length])]; },
   juno() { const l = ["I drew Seren's sun on the Pillar again! The grey men scrub it. I draw it faster.", 'My brother says the sky is fire. My other brother says it\'s soup.', "When I grow up I'm gonna ride Lift Zero and never come back. Except for noodles."]; return [say('juno', l[(G.talkCount.juno = (G.talkCount.juno || 0) + 1) % l.length])]; },
@@ -2165,7 +2165,7 @@ const PROLOGUE_A = [
   { say: 'kael', t: "Seren Holloway. I can't give you the sky. But I can give you a perfectly balanced pressure seal." },
   { say: 'seren', t: "...That is the worst proposal in the history of Cinderwell." },
   { pstage: 1 }, { sfx: 'coin' },
-  { say: 'seren', t: 'Yes. Obviously yes. Put it on me before I come to my senses.' },
+  { say: 'seren', t: 'Aye. Obviously aye. Put it on me before I come to my senses.' },
   { wait: 0.9 }, { panel: null }, { emote: 'seren', t: 'heart' }, { emote: 'kael', t: 'heart' }, { move: 'ivo', to: [13, 10], spd: 40 }, { move: 'juno', to: [10, 10], spd: 46 }, { move: 'c1', to: [8, 7], spd: 30 }, { move: 'c2', to: [15, 8], spd: 30 },
   { narr: 'Mara binds you at the Pillar, in front of the whole crew, with chalk on your hands and Ivo crying louder than anyone.' },
   { emote: 'ivo', t: '...' },
@@ -2204,7 +2204,7 @@ const PROLOGUE_A = [
   { move: 'nell', to: [6, 8], spd: 30 }, { move: 'seren', to: [4.2, 3], spd: 24 },
   { say: 'seren', t: 'Why you? Why does it always have to be you?' },
   { choice: [
-    { t: "Because I won't watch Tav drown in their own bed.", fx: () => G.tendency = 'caretaker', then: [say('seren', "...Yeah. That's the answer I married, you idiot. That exact one.")] },
+    { t: "Because I won't watch Tav drown in their own bed.", fx: () => G.tendency = 'caretaker', then: [say('seren', "...Aye. That's the answer I married, you idiot. That exact one.")] },
     { t: "Because I'm better at this than anyone they've got.", fx: () => G.tendency = 'tinkerer', then: [say('seren', "Modest, too. Fine. You are. It's infuriating.")] },
     { t: 'Because one day I want to be the one who decides who breathes.', fx: () => G.tendency = 'seeker', then: [say('seren', "...Careful, Kael. That's how they talk."), say('kael', 'Then somebody had better learn the language.')] }
   ] },
@@ -2233,7 +2233,7 @@ const PROLOGUE_B = [
   { say: 'seren', t: "You're insufferable when you're right." },
   { say: 'kael', t: 'Then I plan to be insufferable for a very long time.' },
   { say: 'seren', t: "Balance it back before the audit. Promise me. Every night until the fever breaks, and then never again." },
-  { say: 'kael', t: 'Every night. Balanced by dawn. I promise.' },
+  { say: 'kael', t: 'Every night. Balanced by dawn. On my breath.' },
   { narr: 'She pulls you close by the collar. For a moment, Cinderwell is warm for the right reasons.' },
   { fade: 'out' }, { music: null },
   { card: 'For three nights, you bled the line and balanced the bank by dawn.', sub: 'On the third night, the fever broke. Tavi asked for bread.', min: 1.6, max: 6 },
@@ -2257,7 +2257,7 @@ const PROLOGUE_B = [
   { narr: 'Cinderwell kneels. It is very good at kneeling.' },
   { zoom: 2.3 }, { pan: [13, 4], dur: 1.2 },
   { say: 'celestine', t: 'The Cinders. How... warm it is down here. I had been told. One is never quite prepared for the smell.' },
-  { say: 'celestine', t: 'For three nights, a line that belongs to us lost eleven percent of its pressure. And for three dawns, someone put it back. Very neatly.' },
+  { say: 'celestine', t: 'For three nights, a line that belongs to the Authority lost eleven percent of its pressure. And for three dawns, someone put it back. Very neatly.' },
   { say: 'celestine', t: 'I confess I admire it. A thief who tidies. It is almost civilized.' },
   { say: 'celestine', t: 'But the account must balance. And an account is not balanced by putting air back. It is balanced by taking something back.' },
   { say: 'vale', t: 'The bleed was routed through Valve Bank Seven. Crew Three. Night shift.' },
@@ -2292,7 +2292,7 @@ const PROLOGUE_B = [
   { emote: 'tavi', t: '...' },
   { say: 'tavi', t: "I'm looking at her. Somebody has to." },
   { pan: [16, 4], dur: 2.2 }, { zoom: 2.4 },
-  { say: 'celestine', t: 'Gratitude, Cinderwell, is not a feeling. It is a practice. Let us practice.' },
+  { say: 'celestine', t: 'Gratitude, Cinderwell, is not a feeling. It is a practice. One practises.' },
   { music: 'hum' },
   { narr: 'Somewhere in the back row, someone starts to hum the shift song. Then another. Then all of Crew Three, low, through closed teeth.' },
   { say: 'celestine', t: 'Silence.' },
@@ -2531,13 +2531,14 @@ const PANELS = {
   },
   // ---- Row K: Mara's room and the shelf (0: one tin · 1: two · 2: he comes home · 3: with Tavi)
   row(g, t, st, s) {
-    const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#1a1214'); for (let y = 0; y < 130; y += 9) for (let x = (y / 9 % 2) * 12; x < 320; x += 24) R(g, x, y, 23, 8, (x * 3 + y) % 5 ? '#241a1c' : '#2a1e20'); R(g, 0, 130, 320, 50, '#2e2220'); for (let x = 0; x < 320; x += 26) R(g, x, 130, 1, 50, '#221816'); R(g, 0, 130, 320, 1, '#4a3830');
+    const ivoHere = st === 4; if (ivoHere) st = 0; const { R, glow, plate } = PX; R(g, 0, 0, 320, 180, '#1a1214'); for (let y = 0; y < 130; y += 9) for (let x = (y / 9 % 2) * 12; x < 320; x += 24) R(g, x, y, 23, 8, (x * 3 + y) % 5 ? '#241a1c' : '#2a1e20'); R(g, 0, 130, 320, 50, '#2e2220'); for (let x = 0; x < 320; x += 26) R(g, x, 130, 1, 50, '#221816'); R(g, 0, 130, 320, 1, '#4a3830');
     const fl = .8 + Math.sin(t * 9) * .05 + Math.sin(t * 3.7) * .05; R(g, 44, 36, 3, 20, '#3a3028'); R(g, 38, 56, 15, 10, '#5a4a30'); R(g, 41, 58, 9, 6, `rgba(255,190,90,${fl})`); glow(g, 45, 60, 80 * fl, '255,170,80', .22); glow(g, 45, 60, 20, '255,210,120', .6 * fl);
     R(g, 190, 62, 96, 4, '#5a4030'); R(g, 190, 66, 96, 2, '#3a2a1c'); R(g, 196, 68, 3, 10, '#3a2a1c'); R(g, 278, 68, 3, 10, '#3a2a1c');
     const tin = (x, a) => { g.globalAlpha = a; R(g, x, 48, 20, 14, '#8a8e96'); R(g, x, 48, 20, 2, '#b0b4bc'); R(g, x + 7, 52, 6, 6, '#6a6e76'); R(g, x + 9, 54, 2, 2, '#e8c25a'); R(g, x, 61, 20, 1, '#5a5e66'); g.globalAlpha = 1; };
     tin(204, 1); if (st >= 1) tin(238, st === 1 ? Math.min(1, s / 1.4) : 1); R(g, 268, 52, 8, 10, '#3a5a3a'); R(g, 270, 46, 1, 6, '#5a8a4a'); R(g, 273, 48, 1, 4, '#5a8a4a');
     R(g, 96, 112, 90, 6, '#5a4030'); R(g, 96, 118, 90, 3, '#3a2a1c'); R(g, 102, 121, 5, 30, '#3a2a1c'); R(g, 175, 121, 5, 30, '#3a2a1c'); R(g, 130, 106, 10, 6, '#c8c0b0'); R(g, 150, 108, 8, 4, '#8a6a4a');
     R(g, 10, 96, 60, 34, '#3a2e30'); R(g, 10, 96, 60, 5, '#5a4a4c'); R(g, 12, 102, 22, 8, '#c8c0b0');
+    if (ivoHere) PX.spr(g, World.sheetFor('ivo'), 2, 250, 150, 3);
     PX.spr(g, World.sheetFor('mara'), 3, 86, 150, 3); if (st >= 3 || st === 0) PX.spr(g, World.sheetFor('tavi'), 2, 214, 152, 2.6);
     if (st === 2 || st === 3) PX.spr(g, World.sheetFor('kael2'), 2, 176, 152, 2.6); else if (st < 2 && st >= 0 && s >= 0) { if (st === 0) PX.spr(g, World.sheetFor('kael'), 2, 176, 150, 3); }
     if (st === 0) plate(g, 'ROW K', 160, 168);
@@ -2567,7 +2568,7 @@ const PANELS = {
   weather(g, t, st, s) {
     const { R, glow, plate } = PX; const gr = g.createLinearGradient(0, 0, 0, 180); gr.addColorStop(0, '#2a3a7a'); gr.addColorStop(.6, '#c8a0b0'); gr.addColorStop(1, '#f0d0b0'); g.fillStyle = gr; g.fillRect(0, 0, 320, 180); glow(g, 250, 120, 80, '255,220,170', .5);
     for (let L = 0; L < 4; L++) for (let i = 0; i < 7; i++) { const x = ((i * 64 + t * (2 + L * 2) + L * 30) % 440) - 60, y = 60 + L * 30 + (i % 2) * 8, a = .35 + L * .16; R(g, x, y, 70, 12, `rgba(255,${240 - L * 10},${236 - L * 16},${a})`); R(g, x + 12, y - 6, 40, 8, `rgba(255,255,255,${a})`); if (L === 1 || L === 2) { const bx = x + 18 + (i * 7) % 20; if (i % 2) { R(g, bx, y - 2, 24, 5, '#2a2c3a'); R(g, bx + 4, y - 5, 12, 3, '#3a3c4a'); R(g, bx + 22, y, 1, 1, '#ffb040'); } } }
-    if (st >= 1) { R(g, 0, 148, 320, 32, '#2a2c3a'); R(g, 0, 148, 320, 2, '#5a5c6c'); for (let x = 0; x < 320; x += 20) R(g, x, 142, 2, 8, '#3a3c4a'); R(g, 0, 142, 320, 1, '#4a4c5c'); const ids = ['hollis', 'ivo', 'nell', 'kit', 'juno', 'dace']; for (let i = 0; i < 6; i++) PX.spr(g, World.sheetFor(ids[i]), 1, 40 + i * 44 + (i % 2) * 6, 166, 2); PX.spr(g, World.sheetFor('ilse'), 0, 290, 168, 2.4); }
+    if (st >= 1) { R(g, 0, 148, 320, 32, '#2a2c3a'); R(g, 0, 148, 320, 2, '#5a5c6c'); for (let x = 0; x < 320; x += 20) R(g, x, 142, 2, 8, '#3a3c4a'); R(g, 0, 142, 320, 1, '#4a4c5c'); const ids = ['hollis', 'ivo', 'nell', 'kit', 'juno', 'dace']; for (let i = 0; i < 6; i++) PX.spr(g, World.sheetFor(ids[i]), 1, 40 + i * 44 + (i % 2) * 6, 166, 2); PX.spr(g, World.sheetFor('ilse'), 0, 290, 168, 2.4); if (st >= 2) { g.fillStyle = 'rgba(20,16,30,.45)'; g.fillRect(0, 0, 320, 180); PX.spr(g, World.sheetFor('kael2'), 3, 132, 172, 3.4); PX.spr(g, World.sheetFor('tavi'), 2, 190, 172, 3.2); glow(g, 250, 60, 70, '255,236,170', .5); R(g, 244, 54, 12, 12, '#fff6c0'); } }
     if (st === 0) plate(g, 'FOUR HUNDRED BARGES, IN THE WEATHER', 160, 168);
   },
   // ---- Part Two: the Clerk's desk (0: the order · 1: the pen · 2: done)
@@ -2578,7 +2579,8 @@ const PANELS = {
     PX.spr(g, World.sheetFor('kael2'), 0, 86, 122, 3); R(g, 66, 118, 40, 10, '#5a4030');
     R(g, 120, 96, 86, 24, '#f4eedc'); R(g, 120, 96, 86, 1, '#fff8e8'); R(g, 120, 119, 86, 1, '#c8bca0'); ptext(g, 'TIER 4', 126, 100, '#3a2e22'); R(g, 126, 108, 60, 1, '#8a7a5a'); R(g, 126, 111, 48, 1, '#8a7a5a'); R(g, 126, 114, 54, 1, '#8a7a5a'); ptext(g, '1100', 176, 100, '#a02a1a'); R(g, 190, 108, 10, 10, '#a02a1a'); R(g, 192, 110, 6, 6, '#e8c25a');
     R(g, 214, 108, 10, 10, '#2a2630'); R(g, 216, 104, 6, 5, '#14121a');
-    if (st >= 1) { const a = Math.min(1, s / 1.5), px = 150 + a * 30, py = 112 - Math.sin(a * 3.14) * 6; g.save(); g.translate(px, py); g.rotate(-.7); R(g, 0, -1, 20, 2, '#e8c25a'); R(g, -3, -1, 3, 2, '#2a2630'); g.restore(); if (st >= 2) { R(g, 126, 117, Math.round(40 * Math.min(1, s / .8)), 1, '#1a2a6a'); glow(g, 160, 108, 50, '255,90,40', .12); } }
+    if (st >= 3) { PX.spr(g, World.sheetFor(st === 3 ? 'wren' : 'cade'), 2, 268, 176, 3); if (st === 3) { R(g, 232, 112, 5, 4, '#2a2420'); R(g, 236, 114, 3, 3, '#3a3028'); } R(g, 126, 117, 40, 1, '#1a2a6a'); }
+    else if (st >= 1) { const a = Math.min(1, s / 1.5), px = 150 + a * 30, py = 112 - Math.sin(a * 3.14) * 6; g.save(); g.translate(px, py); g.rotate(-.7); R(g, 0, -1, 20, 2, '#e8c25a'); R(g, -3, -1, 3, 2, '#2a2630'); g.restore(); if (st >= 2) { R(g, 126, 117, Math.round(40 * Math.min(1, s / .8)), 1, '#1a2a6a'); glow(g, 160, 108, 50, '255,90,40', .12); } }
     if (st === 0) plate(g, 'THE CLERK OF THE COUNT', 160, 168);
   },
   // ---- Part Two: the ledger of who breathes (0: the book · 1: struck names · 2: hers)
@@ -2613,8 +2615,9 @@ const PANELS = {
     for (let y = 0; y < sh; y += 6) { R(g, 199, 29 + y, 90, 5, '#d8d4ca'); R(g, 199, 34 + y, 90, 1, '#a8a498'); } R(g, 243, 29, 2, 78, '#b8943a');
     if (open > 0) { g.fillStyle = `rgba(255,244,200,${.16 * open})`; g.beginPath(); g.moveTo(199, 29 + sh); g.lineTo(289, 29 + sh); g.lineTo(250, 180); g.lineTo(40, 180); g.closePath(); g.fill(); for (let i = 0; i < 24; i++) { const ph = (t * .1 + hash(i, 9)) % 1; R(g, 80 + hash(i, 3) * 190, 60 + ph * 110, 1, 1, `rgba(255,250,220,${.7 * open})`); } }
     R(g, 20, 104, 60, 6, '#f6f4ee'); R(g, 20, 110, 60, 3, '#d6d2c8'); R(g, 24, 113, 4, 17, '#d6d2c8'); R(g, 72, 113, 4, 17, '#d6d2c8'); R(g, 20, 88, 4, 16, '#f6f4ee'); // the bench
-    const gold = st >= 4; if (st === 5) { const a = t * .8; R(g, 60, 84, 28, 28, '#8a8478'); R(g, 62, 86, 24, 24, '#3a3e46'); g.strokeStyle = '#c8ccd4'; g.lineWidth = 2; g.beginPath(); g.arc(74, 98, 9, 0, 6.3); for (let k = 0; k < 4; k++) { g.moveTo(74, 98); g.lineTo(74 + Math.cos(a + k * 1.57) * 9, 98 + Math.sin(a + k * 1.57) * 9); } g.stroke(); g.lineWidth = 1; R(g, 40, 96, 22, 4, '#8a8478'); const NT = [0, 3, 7, 5, 3, 2, 0]; for (let i = 0; i < 7; i++) { const ph = (t * .22 + i / 7) % 1, x = 92 + ph * 60 + Math.sin(ph * 9 + i) * 3, y = 84 - NT[i] * 2 - ph * 34; g.globalAlpha = Math.sin(ph * 3.14); R(g, x, y, 3, 2, '#3a2e22'); R(g, x + 2, y - 6, 1, 7, '#3a2e22'); g.globalAlpha = 1; } }
+    const gold = st >= 4 && st !== 7; if (st === 5) { const a = t * .8; R(g, 60, 84, 28, 28, '#8a8478'); R(g, 62, 86, 24, 24, '#3a3e46'); g.strokeStyle = '#c8ccd4'; g.lineWidth = 2; g.beginPath(); g.arc(74, 98, 9, 0, 6.3); for (let k = 0; k < 4; k++) { g.moveTo(74, 98); g.lineTo(74 + Math.cos(a + k * 1.57) * 9, 98 + Math.sin(a + k * 1.57) * 9); } g.stroke(); g.lineWidth = 1; R(g, 40, 96, 22, 4, '#8a8478'); const NT = [0, 3, 7, 5, 3, 2, 0]; for (let i = 0; i < 7; i++) { const ph = (t * .22 + i / 7) % 1, x = 92 + ph * 60 + Math.sin(ph * 9 + i) * 3, y = 84 - NT[i] * 2 - ph * 34; g.globalAlpha = Math.sin(ph * 3.14); R(g, x, y, 3, 2, '#3a2e22'); R(g, x + 2, y - 6, 1, 7, '#3a2e22'); g.globalAlpha = 1; } }
     const ks = World.sheetFor(gold ? 'kael2' : 'kael'); PX.spr(g, ks, st === 5 ? 2 : st >= 2 ? 3 : 0, st === 5 ? 96 : 108, 150, 3); R(g, 96, 150, 26, 2, 'rgba(0,0,0,.18)');
+    if (st === 7) { PX.spr(g, World.sheetFor('wren'), 2, 64, 150, 2.6); R(g, 54, 150, 22, 2, 'rgba(0,0,0,.18)'); R(g, 50, 128, 10, 8, '#8a8478'); R(g, 52, 124, 6, 4, '#c8ccd4'); }
     if (st === 4) { PX.spr(g, World.sheetFor('lucan'), 2, 170, 150, 3); R(g, 158, 150, 26, 2, 'rgba(0,0,0,.18)'); return; }
     if (st === 6) { g.save(); g.translate(0, 62); g.scale(1, .6); } if (st === 5) { R(g, 150, 118, 44, 4, '#f6f4ee'); R(g, 150, 122, 44, 2, '#d6d2c8'); R(g, 154, 124, 3, 26, '#d6d2c8'); R(g, 187, 124, 3, 26, '#d6d2c8'); R(g, 160, 112, 6, 6, '#ffffff'); R(g, 160, 112, 6, 1, '#e8c25a'); }
     if (st >= 1) { const a = Math.min(1, st > 1 ? 1 : s / 1.2), x = st === 6 ? 176 : st === 5 ? 192 : 166, b = Math.round(Math.sin(t * 1.2)); g.globalAlpha = a; glow(g, x + 10, 84, 46, '255,236,180', .22); R(g, x - 4, 150, 30, 2, 'rgba(0,0,0,.18)'); R(g, x, 66 + b, 22, 86 - b, '#fbf8f0'); R(g, x + 18, 66 + b, 4, 86 - b, '#e2ddd0'); R(g, x - 3, 96 + b, 4, 56 - b, '#f2ede2'); R(g, x + 21, 100 + b, 3, 52 - b, '#e2ddd0'); R(g, x, 66 + b, 22, 2, '#e8c25a'); R(g, x + 9, 68 + b, 4, 84 - b, '#e8c25a'); R(g, x, 150, 22, 2, '#e8c25a'); R(g, x - 4, 64 + b, 8, 6, '#e8c25a'); R(g, x + 18, 64 + b, 8, 6, '#e8c25a'); R(g, x - 4, 64 + b, 8, 1, '#fff2c0');
@@ -4028,6 +4031,7 @@ const DREAM1 = () => [
   { say: 'kael', t: 'One is... not sorry.' },
   { say: 'ilse', t: 'Better. Now mean it.' },
   { narr: 'That part nobody had to teach me.' },
+  { narr: 'You can hear what she did in the way I tell this. I have not been able to say "don\'t" inside my own head for years. It is the one thing they took that I let them keep.' },
   { narr: 'Then Brand, in a sealed pump room, every day for three years.' },
   { fade: 'out' }, { panel: null },
   { brawl: () => FF.drill() },
@@ -4118,7 +4122,7 @@ const RING = [
     win: [say('garran', '...Good left. Hers was better.'), say('kael', 'Everyone keeps telling me.'), fx(() => { G.scrip += 8; Sound.play('coin'); HUD.toast('+8 scrip'); })]
   },
   () => ({ pre: [say('hollis', "Last bout. A belt-holder's second stands for her when she can't. Seren's second was —"), say('mara', 'Me.'), narr("Mara steps over the chalk, rolling her sleeves. Forty years of hauling valve wheels in those forearms."), say('mara', "You've wanted to hit me for forty-two days, boy. In here it's legal."),
-      { choice: [{ t: "I don't want to hit you, Mara.", then: [say('mara', 'Liar. Hands up.')] }, { t: 'Yes. I have.', fx: () => setF('ringHonest'), then: [say('mara', 'Good. Honest. Hands up.')] }] }],
+      { choice: [{ t: "I don't want to hit you, Mara.", then: [say('mara', 'Liar. Hands up.')] }, { t: 'Aye. I have.', fx: () => setF('ringHonest'), then: [say('mara', 'Good. Honest. Hands up.')] }] }],
     def: { title: 'FINAL BOUT', sub: "MARA VENN - FOREWOMAN'S PRIVILEGE", winText: 'THE BELT IS YOURS', foes: [{ id: 'mara', name: 'Mara', kind: 'boss', hp: 39 }], taunt: { 0: ['I HELD YOU DOWN. HIT ME!', 'SHE BOUGHT YOUR LIFE!', 'THERE HE IS.'] } },
     win: [narr('Mara sits down hard in the chalk. And laughs. A real one, rusty from forty-two days of not being used.'), say('mara', "There he is. There's the one she married."), say('mara', '...She had a better left.'),
       { choice: [{ t: '(Help her up.)', fx: () => { trust('mara', 1); setF('ringMercy'); }, then: [say('mara', "I'm sorry, Kael. I'd do it again, and I'm sorry. Both. Every day.")] }, { t: "I'm still angry.", fx: () => fury(1), then: [say('mara', "Good. Aim it up, not sideways. I'll hold the bag until you can reach them.")] }] },
@@ -4646,9 +4650,11 @@ function DAY3() {
     { narr: 'The top is a white room with a shuttered frame in the wall. Vale takes the ledger out of my hands at the door and does not come in.' },
     { pstage: 1 }, { wait: 1.2 },
     { say: 'celestine', t: 'The valve technician. You hung a lantern where I had forbidden one. Sit.' },
+    { say: 'kael', t: 'Aye, Auditor.' },
+    { say: 'celestine', t: 'One does not say "aye" in this room. It sounds like something a pipe does.' },
     { say: 'celestine', t: 'Somebody balanced Bank Seven for three nights with a bleed I could not find on any gauge. I burned a girl for it. The fever ward is still breathing. So it was not her hands on that wheel.' },
     { choice: [
-      { t: 'It was mine.', fx: () => { G.flags.toldHer = 1; G.flags.fury = (G.flags.fury || 0) + 1; }, then: [say('celestine', 'Yes. Thank you for not making me say it for you.')] },
+      { t: 'It was mine.', fx: () => { G.flags.toldHer = 1; G.flags.fury = (G.flags.fury || 0) + 1; }, then: [say('celestine', 'Yes. Noted. You have spared me the saying of it.')] },
       { t: 'She was my wife.', fx: () => { G.flags.fury = (G.flags.fury || 0) + 1; }, then: [say('celestine', 'I know what she was. I am asking what you are.')] },
       { t: '(Say nothing.)', then: [say('celestine', 'Good. You can hold your tongue. That is rarer down there than talent.')] }
     ] },
@@ -4663,7 +4669,7 @@ function DAY3() {
     { narr: 'Blue. I had the word. I did not have the thing.' },
     { narr: 'The surface did not burn. Or it stopped burning a long time ago, and nobody came down to tell us.' },
     { say: 'celestine', t: 'Now you know what I have seen. You will not say it below. Nobody would believe you, and I should have to burn whoever did.' },
-    { say: 'celestine', t: 'You may go. When I dismiss you the word is "granted," technician. Not "aye." You will learn.' },
+    { say: 'celestine', t: 'You may go. And when I dismiss you, the word is "granted." You will learn. Your kind always does, eventually.' },
     { fade: 'out' }, { panel: null },
     { card: 'He came down at second bell', sub: 'with a pass stamped in gold, and four hundred people watching the light to see if he would.', min: 1.8, max: 6 },
     { panel: 'row' }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
@@ -4704,14 +4710,15 @@ function DAY3() {
     { music: 'home' }, { card: 'DAY THREE', sub: 'First bell. Forty-three days after the furnace.', big: 1, min: 1.6, max: 5 },
     { panel: 'kael' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'I did not sleep much. Vale\'s offer sat on my chest all night. Carry the Bank Seven ledger up Lift Zero. Nobody from Cinderwell has ever gone up.' },
-    { fade: 'out' }, { panel: 'row' }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
+    { fade: 'out' }, { panel: 'row' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
     { say: 'mara', t: 'It\'s a leash. They put it on the clever ones first. Your father thought he was being promoted, too.' },
     { say: 'ivo', t: 'It\'s a door, Mara. Nobody from here has ever seen the other side of that lift. He\'d be the first to know what we\'re even kneeling to.' },
     { say: 'tavi', t: 'Will you see the sun? The real one? Seren said it was yellow. Will you tell me if she was right?' },
-    { say: 'kael', t: 'If I see it, Tav, you\'ll be the first to know.' },
+    { say: 'kael', t: 'If I see it, Tav, you\'ll be the first to know. On my breath.' },
     { narr: 'I did not know yet that this was a promise I would not be allowed to keep.' },
     { fade: 'out' }, { panel: 'kael' }, { fade: 'in', spd: 0.8 }, { wait: 0.4 },
     { say: 'vale', t: 'First bell, Brennick. The Auditor is waiting on a ledger.' },
+    { narr: 'Vale says "noted" the way a man wears a borrowed coat. He was born on Tier Two and counted up. When he is tired he still says "don\'t."' },
     { choice: [
       { t: 'I\'ll carry it.', fx: () => { G.flags.ledgerUp = 1; }, then: [say('vale', 'Noted. Stand up straight. Do not touch anything white.')] },
       { t: 'Send your clerk.', fx: () => { G.flags.ledgerUp = 0; G.flags.fury = (G.flags.fury || 0) + 1; }, then: [say('vale', 'I was being polite. She asked for the hands that know the bank. You were never being offered a choice. Nobody down here is.'), narr('He holds out the ledger until I take it.')] }
@@ -4805,10 +4812,14 @@ function DAY4() {
     { panel: 'ante' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'Twice a week, for four months, I ride up in the white car and teach forty engineers what a valve is for. They are not stupid. They have simply never had to keep anything alive.' },
     { narr: 'I listen. Noted. Granted. One does not. I learn where the nine floors are, and which doors want a gold pass, and who is afraid of whom. I draw none of it. I count it.' },
+    { pstage: 7 }, { wait: 0.4 },
     { say: 'wren', t: 'Technician. If the seat is scored, why does the gauge still read true? I have asked three of my seniors. They told me gauges do not lie.' },
     { say: 'kael', t: 'Gauges lie all the time. You put your hand on the pipe.' },
     { say: 'wren', t: 'One... touches it?' },
+    { say: 'kael', t: 'We do. Down there. Aye.' },
+    { say: 'wren', t: '"We." What a useful word. One is never allowed it.' },
     { narr: 'Wren Halloran. Nineteen, and the only one of the forty who ever got grease on a cuff. She asks me once where I learned it. I say: Tier Six. She writes that down as if it were a school.' },
+    { pstage: 2 },
     { say: 'celestine', t: 'You have stopped saying "aye," technician.' },
     { say: 'kael', t: 'Noted.' },
     { narr: 'She laughed. It is the only time I ever heard it. I added it to the list.' },
@@ -4820,10 +4831,10 @@ function DAY4() {
     { say: 'sable', t: 'Cold crates. Greens, from somewhere with dirt and daylight. They come down marked for the Spire kitchens and four in forty go missing on my count. Nell\'s ward gets them.' },
     { say: 'sable', t: 'You\'ve seen where they grow, haven\'t you. Don\'t tell me. I like not knowing. It keeps my face honest.' },
     { fade: 'out' }, { panel: 'row' }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
-    { say: 'mara', t: 'You\'ve gone quiet. You were never quiet, not once in your life. You\'re leaving.' },
+    { say: 'mara', t: 'You\'ve gone quiet. You were never quiet, not once in all your breath. You\'re leaving.' },
     { choice: [
       { t: 'Yes.', fx: () => { G.flags.toldMara = 1; }, then: [say('mara', 'Don\'t tell me where. If I know, they can ask me.')] },
-      { t: 'I can\'t tell you.', then: [say('mara', 'That\'s a yes. You never could lie to me, you only ever managed it with yourself.')] }
+      { t: 'I can\'t tell you.', then: [say('mara', 'That\'s an aye. You never could lie to me, you only ever managed it with yourself.')] }
     ] },
     { say: 'mara', t: 'Tavi will ask. I\'ll say you went to fix something big. That\'s true, isn\'t it?' },
     { say: 'kael', t: 'The biggest valve there is.' },
@@ -4851,8 +4862,8 @@ function DAY4() {
     { fade: 'out' }, { panel: 'under' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'I go out through the old tunnel, past Seren\'s suns. I touch every one of them. Then the hatch, and a stair I did not know was there, and at the top of it a tall woman with gold in her eyes.' },
     { say: 'ilse', t: 'You are shorter than I was told.' },
-    { say: 'kael', t: 'I\'m told that can be fixed.' },
-    { say: 'ilse', t: 'It can. You will wish it could not. Come along, soot. One does not keep the table waiting.' },
+    { say: 'kael', t: 'I\'m told that can be fixed. ...Ta. For coming.' },
+    { say: 'ilse', t: 'That is the last time you will say that word for nine years. Enjoy it. It can be fixed, and you will wish it could not. Come along, soot. One does not keep the table waiting.' },
     { fade: 'out' }, { panel: null },
     { card: 'END OF PART ONE', sub: 'B E L O W', big: 1, sfx: 'splash', min: 2.6, max: 7 },
     ...(NOFF ? [] : [
@@ -4983,9 +4994,11 @@ const P2 = {
     { narr: 'I won their Assay under it. The High Auditor pinned a sun to my collar and made me Clerk of the Count. I live on the fourth ring of the Spire. There is a window in every room.' },
     { narr: 'I did not sleep the first month. There is a window in every room and the sky comes in. I lay under it and waited for a ceiling.' },
     { fade: 'out' }, { panel: 'desk' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { pstage: 3 },
     { say: 'wren', t: 'Clerk Sorrel? Engineer Halloran. They have put me on the Array board. You will not remember, but we... no. Forgive me. You have a look of someone.' },
     { say: 'kael', t: 'One is told that often.' },
     { say: 'wren', t: 'He was a technician from below. He taught me to put my hand on the pipe. He fell in a furnace, they said. I have been touching pipes ever since. Nobody up here can tell me why it works.' },
+    { narr: 'She said "we," and "forgive me." Nobody on the Spire says either. I had to stop myself answering her in my own voice.' },
     { narr: 'She left a grease print on my desk. I did not wipe it off for a week.' },
     { fade: 'out' }, { panel: 'ledger' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'The Count is a book. Every person below has a line in it. What they breathe, and what they owe for it.' },
@@ -5022,7 +5035,7 @@ const P2 = {
     { say: 'dace', t: 'There is a riser under Tier Four that comes up in your valley. Nine floors, Kael. If somebody held the top of it for an hour.' },
     { fade: 'out' }, { panel: null },
     { brawl: () => FF.riser() },
-    { music: 'spire' }, { panel: 'desk' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { music: 'spire' }, { panel: 'desk' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'Marshal Cade came to my desk the next morning. He did not sit.' },
     { say: 'cade', t: 'Forty lines short, Sorrel. Tier Four balanced at one thousand and sixty. Somebody held a riser against three of my Wardens. In a mask.' },
     { say: 'cade', t: 'You were in the Assay. You know what that kind of fighting looks like. Tell me what you would look for.' },
@@ -5071,13 +5084,16 @@ const P2 = {
     { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
     { say: 'dace', t: 'She stood up, and the whole row stood up behind her, and the Wardens found they did not have enough halberds. The boy is on the wheel with Tavi now.' },
     { say: 'dace', t: 'Tavi is coming up. Sixteen. Don\'t give me that look, I am only the messenger. Mara says you were younger when you married.' },
-    { fade: 'out' }, { panel: 'weather' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { fade: 'out' }, { panel: 'weather' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { say: 'tavi', t: 'You got tall.' },
     { say: 'kael', t: 'You got old.' },
     { say: 'tavi', t: 'You said I\'d be the first to know. If it was yellow.' },
     { say: 'kael', t: 'Look up, Tav.' },
+    { narr: 'My own voice. "Tav." I had not used it in seven years. It came out rusty, like a wheel nobody had turned.' },
     { narr: 'Seven years late. Tavi looked for a long time and then said: she was right. And then: she\'d be unbearable about it.' },
     { say: 'wren', t: 'Clerk... no. Brennick. I have brought eleven engineers and the Array schematics. One touches the pipe. I worked out why it works. It is because somebody has to care whether it does.' },
+    { say: 'wren', t: 'We. I am practising. We touch the pipe. ...Aye?' },
+    { say: 'tavi', t: 'Close enough. Ta for the schematics.' },
     { fade: 'out' }, { panel: 'gild' }, { pstage: 3 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { say: 'ilse', t: 'When you stand in front of her, soot, you will want to use the words I taught you. Do not. Use your own. That is the only thing she has never heard.' },
     { say: 'kael', t: 'Noted.' },
@@ -5092,6 +5108,7 @@ const P2 = {
     { music: 'mystery' }, { card: 'THE COUNT', sub: 'Nine years from now. The Sun Spire.', big: 1, min: 1.6, max: 5 },
     { panel: 'weather' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'They wanted me to say something before the stair. I am not good at it. Seren was the one who talked.' },
+    { say: 'kael', t: 'For five years up here I said "one." One does not kneel. One is not sorry. I\'m done with it. It\'s "we." It was always we.' },
     { say: 'kael', t: 'They taught us to count. Air breathed, air owed. They never thought about what else we might count.' },
     { say: 'kael', t: 'I have counted eleven seconds every day for nine years. Mara has counted forty-four commitments. Tier Four counted eleven hundred, and then stopped being able to.' },
     { say: 'kael', t: 'Today we go up nine hundred steps and we read them the total. Out loud. Every name. And then we open every door they have.' },
@@ -5103,7 +5120,7 @@ const P2 = {
     { narr: 'She knelt on her own floor with the sun going down behind her, and she looked, for the first time since I had known her, like somebody waiting to be told a number.' },
     { choice: [
       { t: 'Strike her line.', fx: () => { G.flags.ending = 'struck'; }, then: [narr('I opened the book on her desk and found her line. Aurel, C. I struck it, and wrote one word after, in my own hand.'), narr('Balanced.'), narr('Then I put down the pen and never picked that one up again.')] },
-      { t: 'Send her down Lift Zero.', fx: () => { G.flags.ending = 'below'; }, then: [narr('I walked her to the white car myself. Nine minutes down. I told Mara to give her a bunk on Row K and a ration book.'), say('celestine', 'This is crueller than the furnace.'), say('kael', 'No. It\'s Tuesday. You\'ll get used to it. We did.')] }
+      { t: 'Send her down Lift Zero.', fx: () => { G.flags.ending = 'below'; }, then: [narr('I walked her to the white car myself. Nine minutes down. I told Mara to give her a bunk on Row K and a ration book.'), say('celestine', 'This is crueller than the furnace.'), say('kael', 'No. It\'s Tuesday. You\'ll get used to it. We did.'), say('celestine', '...Noted.'), say('kael', 'Down there it\'s "aye."')] }
     ] },
     { fade: 'out' }, { music: 'dawn' }, { panel: 'dawn' }, { fade: 'in', spd: 0.6 }, { wait: 2.4 },
     { narr: 'I unlocked Lift Zero from the top and left it running, doors open, all the way down.' },
@@ -5128,7 +5145,7 @@ const P2 = {
 const P2_TITLES = { 1: 'The Post', 2: 'The Balancing', 3: 'What She Knows', 4: 'Two Years', 5: 'The Count' };
 function playPart2(n) { Store.set('sootborn_p2', String(n)); UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(P2[n](), () => afterPart2(n)); }
 function afterPart2(n) { Store.set('sootborn_p2', n >= 5 ? '' : String(n + 1)); G.mode = 'dayend'; Sound.music('mystery'); UI.push(modal({ clear: true, onBack: null, build(b) { b.parentNode.style.textAlign = 'center'; b.parentNode.style.background = 'rgba(10,6,9,.9)';
-    b.innerHTML = n >= 5 ? '<h2>THE END</h2><p>' + (G.flags.ending === 'below' ? 'Celestine Aurel has a bunk on Row K and a ration book. She is learning the shift song. She is not good at it.' : 'There is one line in the Count struck in a valve tech\'s hand. Nobody has struck another.') + '</p><p style="opacity:.7">SOOTBORN · thanks for playing.</p>' : `<h2>Part Two · ${n} of 5</h2><p>${P2_TITLES[n]} is done. Next: ${P2_TITLES[n + 1]}.</p>`; },
+    b.innerHTML = n >= 5 ? '<h2>THE END</h2><p>' + (G.flags.ending === 'below' ? 'Celestine Aurel has a bunk on Row K and a ration book. She is learning the shift song. She is not good at it. On the fourth day she said "ta" to Mara for a bowl of noodles. Mara pretended not to hear.' : 'There is one line in the Count struck in a valve tech\'s hand. Nobody has struck another.') + '</p><p style="opacity:.7">SOOTBORN · thanks for playing.</p>' : `<h2>Part Two · ${n} of 5</h2><p>${P2_TITLES[n]} is done. Next: ${P2_TITLES[n + 1]}.</p>`; },
   items: (n < 5 ? [{ label: 'Continue: ' + P2_TITLES[n + 1], act: () => playPart2(n + 1) }] : []).concat([{ label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }]) })); }
 
 // ---- src/checkpoints.js
@@ -5431,7 +5448,7 @@ const Menus = {
     ] }));
   },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.21): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Vertical slice (v0.22): the prologue, two days in Cinderwell, and five fights from the Assay, four years on, three of them single combat. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));

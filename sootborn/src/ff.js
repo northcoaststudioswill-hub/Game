@@ -211,6 +211,7 @@ const DREAM1 = () => [
   { say: 'kael', t: 'One is... not sorry.' },
   { say: 'ilse', t: 'Better. Now mean it.' },
   { narr: 'That part nobody had to teach me.' },
+  { narr: 'You can hear what she did in the way I tell this. I have not been able to say "don\'t" inside my own head for years. It is the one thing they took that I let them keep.' },
   { narr: 'Then Brand, in a sealed pump room, every day for three years.' },
   { fade: 'out' }, { panel: null },
   { brawl: () => FF.drill() },

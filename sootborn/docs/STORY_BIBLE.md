@@ -139,7 +139,11 @@ The game tells two halves at once: the present below, and the years after, seen 
 - **+7 years, the High Docks:** with Ilse, Brand and the Unlit he cuts four hundred lift-barges loose. Vant is Dockmaster. Kael drops the sun over the rail.
 - **+9 years, the Fall:** the Belowborn and their allies drop four hundred stolen lift-barges onto the Sun Spire. Marshal Cade. Further fights should live out here: bigger, off the ground.
 
-**How they talk.** Soot: "thanks", "aye", "my breath" (for my life), "we". Accredited: "noted", "granted", "my time", "one". They never thank and never apologise.
+**How they talk (rule for all new dialogue).**
+- *Soot*: contractions; "aye" for yes; "ta" for thanks; "breath" where others say life ("on my breath" is an oath, "she bought your breath"); "we" about everything.
+- *Accredited*: no contractions, ever; "noted" for thanks; "granted" for yes; "my time" for my life; "one" instead of I or we; never thank, never apologise, never say "we" or "us".
+- *In between*: Vale (born Tier Two, counted up) speaks their way with contractions slipping. Proctor Sull is soot who says "noted" when beaten. Ilse keeps Accredited speech. Wren is the Accredited who starts saying "we".
+- *Kael*: soot in dialogue through Part One. As Edric Sorrel he speaks Accredited aloud. His narration has no contractions because the training took them. He goes back to "we" out loud before the stair.
 
 **The shift song.** No words, because words cost breath; hummed through the teeth to keep time on a valve wheel. Humming is the only goodbye allowed at a commitment. After Seren, the Authority plays it on the tier speakers at every bell so that it means the furnace. At First Fire the tier hums it again.
 

@@ -114,9 +114,11 @@ const P2 = {
     { narr: 'I won their Assay under it. The High Auditor pinned a sun to my collar and made me Clerk of the Count. I live on the fourth ring of the Spire. There is a window in every room.' },
     { narr: 'I did not sleep the first month. There is a window in every room and the sky comes in. I lay under it and waited for a ceiling.' },
     { fade: 'out' }, { panel: 'desk' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { pstage: 3 },
     { say: 'wren', t: 'Clerk Sorrel? Engineer Halloran. They have put me on the Array board. You will not remember, but we... no. Forgive me. You have a look of someone.' },
     { say: 'kael', t: 'One is told that often.' },
     { say: 'wren', t: 'He was a technician from below. He taught me to put my hand on the pipe. He fell in a furnace, they said. I have been touching pipes ever since. Nobody up here can tell me why it works.' },
+    { narr: 'She said "we," and "forgive me." Nobody on the Spire says either. I had to stop myself answering her in my own voice.' },
     { narr: 'She left a grease print on my desk. I did not wipe it off for a week.' },
     { fade: 'out' }, { panel: 'ledger' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'The Count is a book. Every person below has a line in it. What they breathe, and what they owe for it.' },
@@ -153,7 +155,7 @@ const P2 = {
     { say: 'dace', t: 'There is a riser under Tier Four that comes up in your valley. Nine floors, Kael. If somebody held the top of it for an hour.' },
     { fade: 'out' }, { panel: null },
     { brawl: () => FF.riser() },
-    { music: 'spire' }, { panel: 'desk' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { music: 'spire' }, { panel: 'desk' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'Marshal Cade came to my desk the next morning. He did not sit.' },
     { say: 'cade', t: 'Forty lines short, Sorrel. Tier Four balanced at one thousand and sixty. Somebody held a riser against three of my Wardens. In a mask.' },
     { say: 'cade', t: 'You were in the Assay. You know what that kind of fighting looks like. Tell me what you would look for.' },
@@ -202,13 +204,16 @@ const P2 = {
     { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
     { say: 'dace', t: 'She stood up, and the whole row stood up behind her, and the Wardens found they did not have enough halberds. The boy is on the wheel with Tavi now.' },
     { say: 'dace', t: 'Tavi is coming up. Sixteen. Don\'t give me that look, I am only the messenger. Mara says you were younger when you married.' },
-    { fade: 'out' }, { panel: 'weather' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { fade: 'out' }, { panel: 'weather' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { say: 'tavi', t: 'You got tall.' },
     { say: 'kael', t: 'You got old.' },
     { say: 'tavi', t: 'You said I\'d be the first to know. If it was yellow.' },
     { say: 'kael', t: 'Look up, Tav.' },
+    { narr: 'My own voice. "Tav." I had not used it in seven years. It came out rusty, like a wheel nobody had turned.' },
     { narr: 'Seven years late. Tavi looked for a long time and then said: she was right. And then: she\'d be unbearable about it.' },
     { say: 'wren', t: 'Clerk... no. Brennick. I have brought eleven engineers and the Array schematics. One touches the pipe. I worked out why it works. It is because somebody has to care whether it does.' },
+    { say: 'wren', t: 'We. I am practising. We touch the pipe. ...Aye?' },
+    { say: 'tavi', t: 'Close enough. Ta for the schematics.' },
     { fade: 'out' }, { panel: 'gild' }, { pstage: 3 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { say: 'ilse', t: 'When you stand in front of her, soot, you will want to use the words I taught you. Do not. Use your own. That is the only thing she has never heard.' },
     { say: 'kael', t: 'Noted.' },
@@ -223,6 +228,7 @@ const P2 = {
     { music: 'mystery' }, { card: 'THE COUNT', sub: 'Nine years from now. The Sun Spire.', big: 1, min: 1.6, max: 5 },
     { panel: 'weather' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'They wanted me to say something before the stair. I am not good at it. Seren was the one who talked.' },
+    { say: 'kael', t: 'For five years up here I said "one." One does not kneel. One is not sorry. I\'m done with it. It\'s "we." It was always we.' },
     { say: 'kael', t: 'They taught us to count. Air breathed, air owed. They never thought about what else we might count.' },
     { say: 'kael', t: 'I have counted eleven seconds every day for nine years. Mara has counted forty-four commitments. Tier Four counted eleven hundred, and then stopped being able to.' },
     { say: 'kael', t: 'Today we go up nine hundred steps and we read them the total. Out loud. Every name. And then we open every door they have.' },
@@ -234,7 +240,7 @@ const P2 = {
     { narr: 'She knelt on her own floor with the sun going down behind her, and she looked, for the first time since I had known her, like somebody waiting to be told a number.' },
     { choice: [
       { t: 'Strike her line.', fx: () => { G.flags.ending = 'struck'; }, then: [narr('I opened the book on her desk and found her line. Aurel, C. I struck it, and wrote one word after, in my own hand.'), narr('Balanced.'), narr('Then I put down the pen and never picked that one up again.')] },
-      { t: 'Send her down Lift Zero.', fx: () => { G.flags.ending = 'below'; }, then: [narr('I walked her to the white car myself. Nine minutes down. I told Mara to give her a bunk on Row K and a ration book.'), say('celestine', 'This is crueller than the furnace.'), say('kael', 'No. It\'s Tuesday. You\'ll get used to it. We did.')] }
+      { t: 'Send her down Lift Zero.', fx: () => { G.flags.ending = 'below'; }, then: [narr('I walked her to the white car myself. Nine minutes down. I told Mara to give her a bunk on Row K and a ration book.'), say('celestine', 'This is crueller than the furnace.'), say('kael', 'No. It\'s Tuesday. You\'ll get used to it. We did.'), say('celestine', '...Noted.'), say('kael', 'Down there it\'s "aye."')] }
     ] },
     { fade: 'out' }, { music: 'dawn' }, { panel: 'dawn' }, { fade: 'in', spd: 0.6 }, { wait: 2.4 },
     { narr: 'I unlocked Lift Zero from the top and left it running, doors open, all the way down.' },
@@ -259,5 +265,5 @@ const P2 = {
 const P2_TITLES = { 1: 'The Post', 2: 'The Balancing', 3: 'What She Knows', 4: 'Two Years', 5: 'The Count' };
 function playPart2(n) { Store.set('sootborn_p2', String(n)); UI.clear(); Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(P2[n](), () => afterPart2(n)); }
 function afterPart2(n) { Store.set('sootborn_p2', n >= 5 ? '' : String(n + 1)); G.mode = 'dayend'; Sound.music('mystery'); UI.push(modal({ clear: true, onBack: null, build(b) { b.parentNode.style.textAlign = 'center'; b.parentNode.style.background = 'rgba(10,6,9,.9)';
-    b.innerHTML = n >= 5 ? '<h2>THE END</h2><p>' + (G.flags.ending === 'below' ? 'Celestine Aurel has a bunk on Row K and a ration book. She is learning the shift song. She is not good at it.' : 'There is one line in the Count struck in a valve tech\'s hand. Nobody has struck another.') + '</p><p style="opacity:.7">SOOTBORN · thanks for playing.</p>' : `<h2>Part Two · ${n} of 5</h2><p>${P2_TITLES[n]} is done. Next: ${P2_TITLES[n + 1]}.</p>`; },
+    b.innerHTML = n >= 5 ? '<h2>THE END</h2><p>' + (G.flags.ending === 'below' ? 'Celestine Aurel has a bunk on Row K and a ration book. She is learning the shift song. She is not good at it. On the fourth day she said "ta" to Mara for a bowl of noodles. Mara pretended not to hear.' : 'There is one line in the Count struck in a valve tech\'s hand. Nobody has struck another.') + '</p><p style="opacity:.7">SOOTBORN · thanks for playing.</p>' : `<h2>Part Two · ${n} of 5</h2><p>${P2_TITLES[n]} is done. Next: ${P2_TITLES[n + 1]}.</p>`; },
   items: (n < 5 ? [{ label: 'Continue: ' + P2_TITLES[n + 1], act: () => playPart2(n + 1) }] : []).concat([{ label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }]) })); }
