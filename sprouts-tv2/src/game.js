@@ -99,7 +99,11 @@ let ac=null;
 function unlock(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();}catch(e){}
  try{if(typeof MUS!=='undefined'&&MUS.pending>=0&&MUS.loading){const i=MUS.pending;MUS.pending=-1;playStored(i,MUS.tok,true)}}catch(e){}}
 function snd(f,d=.08,f2=0,type='square',vol=.045){if(!ac||!meta.sfx)return;vol*=Math.pow(meta.sfx/10,1.5)*1.4;try{const o=ac.createOscillator(),ga=ac.createGain(),t=ac.currentTime;o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);ga.gain.setValueAtTime(vol,t);ga.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(ga);ga.connect(ac.destination);o.start(t);o.stop(t+d+.02);}catch(e){}}
-const later=(f,ms)=>{if(typeof setTimeout!=='undefined')setTimeout(f,ms)};
+/* HOLD is for the stepped tests only (set through ?dev): the page's own loop stands still and timers run on the stepped clock,
+   so a test run is the same every time instead of racing the real one */
+let HOLD=0,HOLDT=0,HOLDQ=[];
+const later=(f,ms)=>{if(HOLD){HOLDQ.push([HOLDT+ms/1000,f]);return}if(typeof setTimeout!=='undefined')setTimeout(f,ms)};
+function holdTick(dt){HOLDT+=dt;for(let i=0;i<HOLDQ.length;i++)if(HOLDQ[i][0]<=HOLDT){const f=HOLDQ[i][1];HOLDQ.splice(i--,1);f()}}
 function noise(d=.05,vol=.2,freq=2000,type='highpass'){if(!ac||!meta.sfx)return;try{const n=Math.ceil(ac.sampleRate*d),b=ac.createBuffer(1,n,ac.sampleRate),ch=b.getChannelData(0);for(let i=0;i<n;i++)ch[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);
  const q=ac.createBufferSource(),f=ac.createBiquadFilter(),ga=ac.createGain();q.buffer=b;f.type=type;f.frequency.value=freq;ga.gain.value=vol*Math.pow(meta.sfx/10,1.5)*1.4;q.connect(f);f.connect(ga);ga.connect(ac.destination);q.start()}catch(e){}}
 /* ---------- music ---------- */
@@ -310,7 +314,7 @@ function mkNPCs(){
    {id:'r3',late:"The west path was sealed with crystal. Was. Your Pebs got there before I did.",t:'SMASH THE WEST CRYSTAL',say:"The west path is sealed with crystal. Only Pebs can smash it.",get:()=>gates[1].alive?0:1,goal:1,rw:15},
    {id:'r5',late:"I was going to ask you to bridge the Crooked River, past Scout. You already have. Willow Falls is on the other side.",t:'BUILD THE ORCHARD BRIDGE',say:"One more path. A river cuts off the north end of the orchard, past Scout. That's the Crooked River. Throw a crowd of sprouts at the stakes and they'll build a bridge. Any kind will do. Willow Falls is on the other side.",get:()=>gates[5].alive?0:1,goal:1,rw:25},
    {id:'r4',t:'WAKE OLD THORNBACK',say:"Those marks lead south, to Old Thornback's hollow. The old folk called him the guardian of the light. He sleeps like a boulder. It takes a whole crowd of sprouts climbing on him to wake him.",late:"Those marks led south, to Old Thornback's hollow. And you had already been to see him. The old folk called him the guardian of the light. Looks like they were right.",get:()=>run.boss?1:0,goal:1,rw:50,tk:1},
-   {id:'r6',t:'WALK THE FOUR TRAIL POSTS',say:"One more. Not a chore. My grandmother set those posts. One for every road a keeper might come in by. Nobody came. I kept them standing. Go stand at each one. Let them get a look at you.",late:"My grandmother set those posts. One for every road a keeper might come in by. You've stood at all four already. They've had a look at you. Good.",get:()=>postsSeen(),goal:4,rw:40,tk:1}]),
+   {id:'r6',t:'WALK THE FOUR TRAIL POSTS',say:"One more. Not a chore. My grandmother set those posts. One for every road a keeper might come in by. Nobody came. I kept them standing. Go stand at each one. Let them get a look at you.",late:"My grandmother set those posts. One for every road a keeper might come in by. You've stood at all four already. They've had a look at you. Good.",get hint(){return postsWait()?"Three have had a look at you. The fourth is east of the orchard, behind a stone door I have never once seen open. It'll keep. So will I.":undefined},wait:postsWait,get:()=>postsSeen(),goal:4,rw:40,tk:1}]),
   N('SCOUT',47,22,'#a8f080',['#3c8840','#78c870','#b89858','#e0c888'],
    "I'm Scout. I write things down. Bugs, mostly. Everything, really. Somebody has to. Want to help?","That's the notebook full. It's in your Collection, under NOTEBOOK. Read it. Somebody should.",[
    {id:'s1',t:'FIND A ZIP',say:"Yellow Zip sprouts grow in the far corner of this field. Zips are the fastest sprouts there are.",get:()=>found[3]?1:0,goal:1,rw:10},
@@ -328,7 +332,7 @@ function mkNPCs(){
    {id:'m3',t:'CATCH A DRAGONFLY',say:"Last thing. Waterworks needs a mascot. Dragonflies over the pond, bro. Only a Dew can reach one. I've caught like a hundred. ...I've caught zero. Send one!",get:()=>meta.bugs[3]?1:0,goal:1,rw:20,tk:1},
    {id:'m4',t:'WIN THE BET: 8 BERRIES TODAY',bet:1,say:"Double or nothing, bro. I bet you forty petals your little guys can't haul eight berries home before the sun goes down. Today. Clock's running.",hint:"Eight berries home before dark, bro. If the sun beats you it's nothing, and we go again tomorrow. Double or nothing.",get:()=>betGot(),goal:8,rw:40,tk:1}])];
 }
-function init(){
+function init(){sceneQ.length=0; /* a scene queued in the last game does not follow Will into a new one */
  map=new Uint8Array(MW*MH).fill(TR);
  carve(21,15,14,11);carve(35,19,4,3);carve(39,13,14,13);carve(47,15,3,2,WA);carve(43,19,2,2,TR);
  carve(27,10,3,5);carve(19,2,18,8);carve(18,19,3,3);carve(3,12,15,15);carve(5,14,11,11,WA);carve(9,18,3,3);
@@ -521,7 +525,7 @@ const nearBug=()=>near(bugs,q=>q.alive&&!q.hid)||{x:42*16,y:18*16};
 const AT={e1:()=>near(sprouts,()=>true)||SOIL,e2:nearBerry,e3:()=>LO,e4:()=>near(sprouts,q=>inSoil(q)&&stageOf(q)===2)||SOIL,e5:()=>nearBed(),e6:()=>nearBed(),e7:nearBerry,e8:nearShard,e9:()=>nearBed(),e10:()=>nearBed(),e11:()=>DOOR,e12:()=>items.find(i=>i.alive&&i.sub==='key')||{x:HX,y:HY},
  r1:()=>gates[0],r2:()=>({x:23*16+8,y:4*16+8}),r3:()=>gates[1],r5:()=>gates[5],r4:()=>near(foes,e=>e.alive&&e.boss)||nearShard(),
  s5:()=>nearGlim(),s6:()=>nearGlim(),s1:()=>({x:51*16+8,y:24*16+8}),s2:nearBug,s3:()=>near(foes,e=>e.alive&&!e.boss)||{x:44*16,y:16*16},s4:nearBug,
- m0:()=>items.find(i=>i.alive&&i.sub==='key')||(gard.open?nearBed():npcs[0]),m4:nearBerry,r6:()=>{const z=PZ.find(z=>!(run.posts&&run.posts[z[0]])&&(z[0]==='LANTERN FIELD'||(run.seen&&run.seen[z[0]])));return z?postXY(z):npcs[1]},
+ m0:()=>items.find(i=>i.alive&&i.sub==='key')||(gard.open?nearBed():npcs[0]),m4:nearBerry,r6:()=>{let b=null,bd=1e12;for(const z of postsLeft()){if(!postOpen(z))continue;const q=postXY(z),d=d2(P,q.x,q.y);if(d<bd){bd=d;b=q}}return b},
  s7:()=>wbuds.find(q=>q.id==='LANTERNWISP'&&!q.hid)||{x:65*16+8,y:8*16+8},m1:()=>({x:10*16,y:12*16+10}),m2:()=>near(items,i=>i.alive&&i.isle)||{x:HX,y:HY},m3:()=>({x:7*16+8,y:16*16+8})};
 const nearBed=()=>(gard.open&&near(plots,p=>needs(p)&&!p.on.length))||GARD;
 let OBJ=null,objT=0;
@@ -536,6 +540,7 @@ function tracked(){const e=npcs[0];if(e.st==='new'||(e.st==='active'&&e.mi<3))re
 function keepObj(){const br=gates[5];if(br&&br.alive)return{text:'BUILD THE ORCHARD BRIDGE',x:br.x,y:br.y,done:false,col:'#f8a070'};if(!run.keep)return{text:'SOMETHING OLD AT WILLOW FALLS',x:KEEP.x,y:KEEP.y+8,done:false,col:'#f8e060'};return null}
 function objective(){{const c=coastObj()||keyObj();if(c)return c}const n=tracked();if(!n)return keepObj()||wedObj()||pjObj();if(n.st==='new')return{text:'TALK TO '+n.name,x:n.x,y:n.y,done:false,col:n.col};
  const m=n.ms[n.mi],v=Math.min(m.get(),m.goal);if(v>=m.goal)return{text:'DONE! GO SEE '+n.name,x:n.x,y:n.y,done:true,col:n.col};
+ if(m.wait&&m.wait())return keepObj()||wedObj()||pjObj(); /* an ask that cannot move yet does not hold the arrow on the person who gave it */
  const p=(AT[m.id]&&AT[m.id]())||n;return{text:m.t+':  '+v+' / '+m.goal,x:p.x,y:p.y,done:false,col:n.col};}
 const ZONES=[['LANTERN FIELD',21,15,14,11,26,17],['BERRY FIELD',39,13,14,13,40,18],['NORTH MEADOW',19,2,18,8,26,8],["ERIN'S GARDEN",40,3,12,7,40,8],['DEW POND',3,12,15,15,17,18],["THORNBACK'S HOLLOW",19,31,18,7,26,31],['SUNNY ORCHARD',55,14,13,12,56,18],['PEBBLE BEACH',3,30,13,9,8,31],['WILLOW FALLS',55,2,13,9,63,7],['NORTH COAST',70,2,20,23,73,18]];
 /* trail posts stand only where regions meet: home, the far south-west, the east, and the coast */
@@ -562,7 +567,8 @@ const leakNeed=()=>!!run.call&&!run.leak&&!!run.coastScn&&!coastGate('northPier'
 /* Marcus's bet: eight berries home in one day. A day that ends short is 'nothing' and the bet starts again in the morning. */
 function betGot(){const B=run.bet;if(!B)return 0;if(B.won)return 8;const v=B.d===day?Math.max(0,tod.berries-B.b):0;if(v>=8)B.won=1;return v}
 /* Ranger's posts: standing at one is enough */
-const postsSeen=()=>Object.keys(run.posts||{}).length;
+const postsSeen=()=>Object.keys(run.posts||{}).length,postsLeft=()=>PZ.filter(z=>!(run.posts&&run.posts[z[0]])),postOpen=z=>z[0]!=='NORTH COAST'||!(coastGate('sunDoor')||{}).alive,
+ postsWait=()=>{const L=postsLeft();return L.length>0&&!L.some(postOpen)}; /* only the coast's post is left and the sun door is still shut: nothing Will can do about it yet */
 function postTick(){for(const z of PZ){const p=postXY(z);if(d2(P,p.x,p.y)<26*26){const S=run.posts=run.posts||{};if(!S[z[0]]){S[z[0]]=1;floatAt(p.x,p.y-30,'THE POST HAS SEEN YOU  '+postsSeen()+' / 4','#f8a070');snd(660,.08,880,'triangle',.05);persist()}}}}
 /* SCOUT'S NOTEBOOK: the fourth page of the Collection. Scout writes everything down, so the valley's story is kept
    here in her words, one page for each thing the player has found out. A page shows once its 'when' is true. */
@@ -584,9 +590,9 @@ const NOTES=[
  ['AT REST',()=>!!run.rest,"Three nights, then the North Light banked down to an ember. Ranger says that is what it does once it has been answered. It is not out. It is waiting until it is needed."],
  ['THE MOUNTAIN',()=>!!run.fin,"Thornback says there was a third thing. Under the mountain. It hummed. That is all he will say. New notebook. I am going to need boots."]];
 let notePg=0;const noteHas=i=>{try{return !!NOTES[i][1]()}catch(e){return false}},notesHave=()=>NOTES.filter((q,i)=>noteHas(i)).length;
-function talk(n,met){if(n.name==='ERIN'&&gard.open&&inGarden(P.x,P.y)&&dayT/DAYLEN>.66&&!inHome&&!msDone(n)&&egg('moon'))return;if(n.name==='ERIN'&&n.st==='active'&&n.ms[n.mi].id==='e6'&&n.ms[n.mi].get()>=n.ms[n.mi].goal&&!run.keyScn&&!inHome){run.keyScn=1;c3Play('key',()=>talk(n));return}if(n.name==='MARCUS'&&n.st==='new'&&!met&&!inHome){c3Play('van',()=>talk(n,1));return}const wasNew=n.st==='new',L=[],M=n.ms,offer=m=>{if(m.bet)run.bet={d:day,b:tod.berries};L.push(m.late&&m.get()>=m.goal?m.late:m.say);if(m.key||m.garden)run.meet=0; /* a story step keeps the arrow */if(m.wake)wakeGrubs();if(m.garden)openGarden(true);if(m.key)keySpawn()};
+function talk(n,met){if(n.name==='ERIN'&&gard.open&&inGarden(P.x,P.y)&&dayT/DAYLEN>.66&&!inHome&&!msDone(n)&&egg('moon'))return;if(n.name==='ERIN'&&n.st==='active'&&n.ms[n.mi].id==='e6'&&n.ms[n.mi].get()>=n.ms[n.mi].goal&&!run.keyScn&&!inHome){run.keyScn=1;c3Play('key',()=>talk(n));return}if(n.name==='MARCUS'&&n.st==='new'&&!met&&!inHome){c3Play('van',()=>talk(n,1));return}if((n.name==='RANGER'||n.name==='SCOUT')&&n.st==='new'&&!met&&!inHome){c3Play(n.name==='RANGER'?'ranger':'scout',()=>talk(n,1));return}const wasNew=n.st==='new',L=[],M=n.ms,offer=m=>{if(m.bet)run.bet={d:day,b:tod.berries};L.push(m.late&&m.get()>=m.goal?m.late:m.say);if(m.key||m.garden)run.meet=0; /* a story step keeps the arrow */if(m.wake)wakeGrubs();if(m.garden)openGarden(true);if(m.key)keySpawn()};
  if(!inHome){run.trk=n.name;if(n.st!=='active'||!msDone(n))run.meet=0;else run.meet=1}
- if(n.st==='new'){L.push(met?"So. Marcus Waterworks. You're in, bro. I already told Derek you're in.":n.intro);offer(M[0]);n.st='active';}
+ if(n.st==='new'){L.push(met?(n.name==='RANGER'?"Ranger. Two paths are blocked. You look like you can throw.":n.name==='SCOUT'?"I'm Scout. I write things down. Everything, really. Somebody has to. Want to help?":"So. Marcus Waterworks. You're in, bro. I already told Derek you're in."):n.intro);offer(M[0]);n.st='active';}
  else if(n.st==='active'){const m=M[n.mi],v=m.get();
   if(v>=m.goal){meta.life.missions++;if(m.tk)meta.tix++;earn(m.rw);L.push(n.name==='MARCUS'?["AYYY! That's my guy. Bring it in, bro.","BROOO. Told you. Never doubted you once. Dap me up.","LET'S GOOO! Waterworks is officially happening. Come here, bro."][n.mi%3]+' *DAP* Here, take '+m.rw+' petals'+(m.tk?' and a capsule ticket.':'.'):['Nicely done','You did it','Perfect','Lovely work'][n.mi%4]+(n.name==='ERIN'?', Will':'')+'! Here, take '+m.rw+' petals'+(m.tk?' and a capsule ticket.':'.'));if(n.name==='MARCUS')dap(n);n.mi++;snd(660,.08);later(()=>snd(990,.2),90);
    if(n.mi<M.length)offer(M[n.mi]);else{n.st='done';L.push(n.bye)}checkAch();}
@@ -635,7 +641,7 @@ const menuItems=()=>(live?['CONTINUE','NEW GAME']:['PLAY']).concat(['REWARDS','C
    belonging to another cartridge is touched (Rootdeep's unlocks and the Lantern's own tickets are kept). */
 let wipeI=0,wipeArm=0;
 function wipeAll(){const keep={mus:meta.mus,sfx:meta.sfx,view:meta.view|0};meta=fixMeta(keep);SAVE={t:0,meta,run:null};live=false;applyLook(meta.eq);init();persist(true);state='menu';mi=0;flash='SPROUTS IS BRAND NEW AGAIN';flashT=4;snd(330,.3,110,'triangle',.08)}
-function update(dt){if(LOUM&&state==='play'){const K=Object.assign({},keys);for(const k in keys)if(k!=='start')keys[k]=0;try{update0(dt)}finally{for(const k in K)keys[k]=K[k]}if(LOUM&&state==='play')loumTick(dt,K);return}update0(dt)}
+function update(dt){if(HOLD)holdTick(dt);if(LOUM&&state==='play'){const K=Object.assign({},keys);for(const k in keys)if(k!=='start')keys[k]=0;try{update0(dt)}finally{for(const k in K)keys[k]=K[k]}if(LOUM&&state==='play')loumTick(dt,K);return}update0(dt)}
 function update0(dt){if(state==='photo'){photoUpdate(dt);return}
  time+=dt;musTick(dt);if(msgT>0&&!toasts.length)msgT-=dt;sndT-=dt;if(flashT>0)flashT-=dt;
  if(toasts.length){toasts[0].t-=dt*(toasts.length>2?2:1);if(toasts[0].t<=0)toasts.shift()}
@@ -936,7 +942,7 @@ const RAIDSPOTS=[[34,24],[34,22],[33,25]];
 const wxOf=d=>d>=3&&hsh(d,11,5)<.22?'rain':'clear';
 function drawRain(){if(!tod.rain||inHome)return;r('rgba(50,70,120,.17)',0,0,TVW,H);for(let i=0;i<46;i++){const x=((i*53+time*150)%(TVW+40))-20,y=(i*37+time*420)%H;r('rgba(200,220,255,.45)',Math.round(x),Math.round(y),1,5)}}
 function raidN(){return !run.grubs||day<3||tod.rain?0:Math.min(3,1+((day-3)>>1))}
-function raidStart(){tod.raid=1;let n=raidN();if(!n)return;if(run.boss){n--;later(()=>{floatAt(THORN.x,THORN.y-34,'THORNBACK: NOT TONIGHT.','#f07878');snd(110,.3,80,'sine',.3)},1200)}
+function raidStart(){tod.raid=1;let n=raidN();if(!n)return;if(run.boss){n--;if(!run.wtch){run.wtch=1;sceneQ.push(['3:watch',null])}else later(()=>{floatAt(THORN.x,THORN.y-34,'THORNBACK: NOT TONIGHT.','#f07878');snd(110,.3,80,'sine',.3)},1200)}
  for(let k=0;k<n;k++){const q=RAIDSPOTS[k],e=mkFoe(q[0]*16+8,q[1]*16+8,false);e.raid=1;e.t=0;e.rx=-24+k*24}
  if(n){const T=run.tips=run.tips||{};say(T.rd?'GRUBS ARE MAKING FOR THE SOIL':'GRUBS COME OUT AT DUSK AND MAKE FOR THE SOIL. THEY EAT SEEDLINGS. THROW SPROUTS AT THEM',T.rd?5:9);T.rd=1;bark()}tod.raidN=raidN()}
 function raidSleep(){if(tod.raid)return;tod.raid=1;let n=raidN();if(!n)return;tod.raidN=n;if(run.boss)n--;const S=sprouts.filter(inSoil);n=Math.min(n,S.length);for(let k=0;k<n;k++){const i=sprouts.indexOf(S[k]);if(i>=0)sprouts.splice(i,1)}tod.eaten=(tod.eaten||0)+n}
@@ -987,7 +993,7 @@ function deliver(it){
  if(it.sub==='shard'){shards++;if(it.isle)run.isle=true;earn(10);snd(523,.12);later(()=>snd(659,.12),120);later(()=>snd(784,.12),240);later(()=>snd(1046,.3),360);
   sceneQ.push(shards>=4?['3:blaze',()=>{won=true;run.wonDay=day;toast('THE GREAT LANTERN IS WHOLE');persist(true)}]:[shards===1?'3:marks':'3:s'+shards,null]);checkAch();persist(true);return;}
  if(it.sub==='key'){run.key=1;run.meet=1;card={t:0,title:'FLOW PROS KEY',sub:"Stamped FLOW PROS. It fits the job site on the pond road, out west past the crystal.",art:()=>{g.save();g.translate(120,76);g.scale(3,3);keyArt(0,0);g.restore()}};state='card';earn(10);snd(784,.1);later(()=>snd(1175,.2),100);persist(true);return}
- if(it.sub==='lens'){run.lens=1;earn(60);meta.tix+=2;snd(523,.12);later(()=>snd(784,.12),120);later(()=>snd(1046,.3),240);if(dayT>DAYLEN*.78)relightGo();else say('THE LENS IS HOME. TONIGHT THE LANTERN WILL WARM IT',8);persist(true);return}
+ if(it.sub==='lens'){run.lens=1;earn(60);meta.tix+=2;snd(523,.12);later(()=>snd(784,.12),120);later(()=>snd(1046,.3),240);if(dayT>DAYLEN*.78)relightGo();else sceneQ.push(['3:lens',()=>say('THE LENS IS HOME. TONIGHT THE LANTERN WILL WARM IT',8)]);persist(true);return}
  if(it.sub==='trs'){const i=it.tri|0;if(!meta.trs.includes(i))meta.trs.push(i);card={t:0,title:TRS[i][0],sub:TRL[i],art:()=>{g.save();g.translate(120,72);g.scale(4,4);trArt(i,0,0);g.restore()}};
   if(i===7)egg('button');state='card';earn(20);spSay('GOOD FIND!',3);snd(784,.1);later(()=>snd(1175,.12),100);later(()=>snd(1568,.25),200);checkAch();persist(true);return}
  if(it.sub!=='husk'){run.delivered++;meta.life.berries++;tod.berries++;bump('berry');earn(lucky?3:1);
@@ -1007,7 +1013,7 @@ function endDay(){raidSleep();foes.forEach(e=>{if(e.raid)e.alive=false});if(tod.
  if(tod.berries>=6&&tod.berries>(meta.best||0)){meta.best=tod.berries;tod.best=1}
  const bonus=5+Math.min(15,tod.berries)+Math.min(15,tod.flowers*2)+(tod.best?5:0);tod.bonus=bonus;earn(bonus);{const N=[];if(tod.bask)N.push('GARDEN BASKETS  +'+tod.bask);if(tod.ord)N.push("ERIN'S ORDERS FILLED: "+tod.ord+'  +'+tod.ordp);if(tod.dq)N.push('DAILY ASKS DONE: '+tod.dq+'  +'+tod.dq*8);if(wxOf(day+1)==='rain')N.push('RANGER: RAIN TOMORROW. STAY ON THE DIRT');tod.news=N.concat(tod.news||[])}tod.pg=0;state='dayend';snd(330,.5,110,'triangle',.08);}
 function newDay(){mornQ=[];try{newDay0()}finally{if(run.louNext){run.louNext=0;later(loumStart,50)}const q=mornQ;mornQ=null;tod.morn=q;say('DAY '+day+'. GOOD MORNING, WILL!'+(q.length?'   '+q.slice(0,4).join('   ·   ')+(q.length>4?'   ·   AND '+(q.length-4)+' MORE':''):''),q.length?9:4)}}
-function newDay0(){if(run.fin&&!run.rest&&day+1>=(run.finDay||day)+3){run.rest=1;later(()=>toast('THE NORTH LIGHT HAS BANKED DOWN TO AN EMBER. IT RESTS'),600)}if(run.bet&&!run.bet.won)run.bet={d:day+1,b:0};
+function newDay0(){if(run.fin&&!run.rest&&day>=(run.finDay||day)+3){run.rest=1;later(()=>toast('THE NORTH LIGHT HAS BANKED DOWN TO AN EMBER. IT RESTS'),600)}if(run.bet&&!run.bet.won)run.bet={d:day+1,b:0};
  mkWbuds();inHome=false;parked=[];day++;dayT=0;duskSaid=false;wr=0;tod={berries:0,flowers:0,bugs:0,spooked:0};P.x=HX;P.y=HY+22;P.dx=0;P.dy=1;P.stun=0;P.pluck=0;trail=[];parts=[];
  LO.x=LO.sx=P.x-22;LO.y=LO.sy=P.y+4;LO.st='follow';
  let k=0;buds.forEach(b=>{if(b.gard)return;b.st='follow';b.x=P.x+((k%7)-3)*6;b.y=P.y+8+((k/7)|0)*5;k++});
@@ -1154,7 +1160,7 @@ function keySpawn(){if(!run.key&&!items.some(i=>i.alive&&i.sub==='key'))mkItem('
 function keyArt(X,Y){const a='#a87818',b='#f8d858';r('#3a2c10',X-4,Y-6,7,7);r(b,X-3,Y-5,5,5);r('#3a2c10',X-2,Y-4,3,3);r('#3a2c10',X-2,Y,3,8);r(b,X-1,Y+1,1,6);r('#3a2c10',X,Y+4,4,2);r(b,X,Y+5,3,1);r('#3a2c10',X,Y+1,3,2);r(b,X,Y+2,2,1);r(a,X-3,Y-1,5,1)}
 function keyObj(){if(!run||!run.key)return null;const j=coastGate('jobsite');return j&&j.alive&&!gates[1].alive?{text:'UNLOCK THE POND ROAD',x:j.x,y:j.y,done:false,col:'#78c8f8'}:null}
 function keyTick(){if(state!=='play'||inHome)return;const j=coastGate('jobsite');if(!j||!j.alive)return;const T=run.tips=run.tips||{};
- if(d2(P,j.x,j.y)<46*46&&!gates[1].alive){if(run.key){openGate(j,true);for(let k=0;k<8;k++)puff(VAN.x-14+k*4,VAN.y,'#c8b898',2,26);marcusAt();noise(.8,.2,300,'lowpass');say('THE KEY FITS. FLOW PROS ROLL THROUGH TO THE POND',7);snd(300,.08,200);later(()=>snd(660,.1,990),140);later(()=>snd(990,.25),260);persist(true)}else if(!T.js){T.js=1;say('A FLOW PROS JOB SITE, PADLOCKED. SOMEBODY HAS LOST THE KEY',7)}}}
+ if(d2(P,j.x,j.y)<46*46&&!gates[1].alive){if(run.key){openGate(j,true);for(let k=0;k<8;k++)puff(VAN.x-14+k*4,VAN.y,'#c8b898',2,26);marcusAt();noise(.8,.2,300,'lowpass');say('THE KEY FITS. FLOW PROS ROLL THROUGH TO THE POND',7);sceneQ.push(['3:road',null]);snd(300,.08,200);later(()=>snd(660,.1,990),140);later(()=>snd(990,.25),260);persist(true)}else if(!T.js){T.js=1;say('A FLOW PROS JOB SITE, PADLOCKED. SOMEBODY HAS LOST THE KEY',7)}}}
 function drawJobsite(ga){const X=ga.tiles[0][0]*16-ox,Y=ga.tiles[0][1]*16-oy,cx=X+8,k='#281c30';if(X<-40||X>VW+24)return;r('rgba(0,0,0,.25)',cx-7,Y+47,14,2);
  for(const py of[-2,42]){r('#3c2414',cx-8,Y+py,16,3);r('#a87040',cx-7,Y+py,14,1);r('#3c2414',cx-7,Y+py+3,2,4);r('#3c2414',cx+5,Y+py+3,2,4)}
  r(k,cx-5,Y+1,10,42);for(let i=0;i<7;i++)r(i%2?'#f4f6fa':'#f08030',cx-4,Y+2+i*6,8,i<6?6:4);
@@ -1170,7 +1176,7 @@ function drawJobsite(ga){const X=ga.tiles[0][0]*16-ox,Y=ga.tiles[0][1]*16-oy,cx=
 const VAN={x:13*16+8,y:25*16+12},VANSPOTS=[[13*16+8,25*16+12,17*16+8,23*16+8],[22*16+8,23*16+14,22*16+8,21*16+8]],vanHere=()=>!(tod&&tod.vanGone);
 function marcusAt(){const j=(gates||[]).find(q=>q.id==='jobsite'),S=VANSPOTS[j&&j.alive?1:0],m=(npcs||[]).find(q=>q.name==='MARCUS');VAN.x=S[0];VAN.y=S[1];if(m){m.x=S[2];m.y=S[3]}}
 function egg(k){const E=run.egg=run.egg||{};if(E[k])return false;E[k]=1;sceneQ.push(['3:'+k,null]);return true}
-function vanUse(){const m=npcBy('MARCUS');if(m.st==='new'){talk(m);return}if(dayT/DAYLEN>.6){if(!egg('sesh'))say(['MARCUS: SEE ONE, SEND ONE, BRO.','DEREK: ...BRO.','THE VAN IS FOGGED UP FROM THE INSIDE. AGAIN.','DEREK: MARCUS OWES ME FOR GAS.','DEREK: A LAZY RIVER. HIS IDEA.','DEREK: THAT IS NOT UP TO CODE. NONE OF THIS IS.'][(day+run.pets)%6],5);snd(330,.06,220,'triangle',.05)}
+function vanUse(){const m=npcBy('MARCUS');if(m.st==='new'){talk(m);return}if(tod.rain&&egg('fog'))return;if(dayT/DAYLEN>.6){if(egg('sesh')){run.seshDay=day;return}if(tod.berries>=10&&egg('munch'))return;if(day>(run.seshDay||0)&&egg('knock'))return;say(['MARCUS: SEE ONE, SEND ONE, BRO.','DEREK: ...BRO.','THE VAN IS FOGGED UP FROM THE INSIDE. AGAIN.','DEREK: MARCUS OWES ME FOR GAS.','DEREK: A LAZY RIVER. HIS IDEA.','DEREK: THAT IS NOT UP TO CODE. NONE OF THIS IS.'][(day+run.pets)%6],5);snd(330,.06,220,'triangle',.05)}
  else{tod.vanGone=1;if(!(dayT/DAYLEN<.4&&egg('job')))say('FLOW PROS, BABY! THE VAN TEARS OFF TO A JOB. BACK BY MORNING',6);noise(.8,.2,300,'lowpass');snd(150,.4,110,'sawtooth',.06);for(let k=0;k<6;k++)puff(VAN.x-10+k*5,VAN.y,'#c8b898',2,26)}}
 function drawVan2D(){const x=Math.round(VAN.x-ox),y=Math.round(VAN.y-oy),k='#282038';if(x<-40||x>VW+40||y<-20||y>VH+40)return;r('rgba(0,0,0,.28)',x-17,y+1,34,3);
  r(k,x-18,y-17,30,17);r('#e8ecf4',x-17,y-16,28,15);r('#c8ccd8',x-17,y-4,28,3);r(k,x+12,y-11,7,11);r('#e8ecf4',x+12,y-10,6,9);r('#78b0e0',x+13,y-9,4,4);r('#2a6ad0',x-17,y-9,35,2);
@@ -1204,6 +1210,7 @@ function coastTick(){if(state!=='play'||inHome||sceneQ.length)return;
  if(run.pj&&run.pj.lf&&run.pj.lf.s>=3&&time>derekT&&d2(P,71*16+42,15*16)<44*44&&msgT<=0&&!toasts.length){derekT=time+22;floatAt(71*16+42,15*16-18,'DEREK: '+DEREKL[(day+((time/22)|0))%DEREKL.length],'#5a9af0');snd(300,.04,0,'triangle',.03)}
  if(coastDue()&&dayT>DAYLEN*.78){sceneQ.push(['3:call',coastOpen]);return}
  if(relightDue()&&dayT>DAYLEN*.78){relightGo();return}
+ if(run.fin&&!run.rest&&day>=(run.finDay||day)+3&&dayT>DAYLEN*.78){run.rest=1;sceneQ.push(['3:rest',()=>persist(true)]);return}
  if(run.lit&&dayT/DAYLEN>.66&&P.y<10*16&&P.x>82*16)egg('bessie');
  if(!run.call)return;const T=run.tips=run.tips||{},pr=coastGate('northPier');
  if(!run.coastScn&&zone==='NORTH COAST'){run.coastScn=1;sceneQ.push(['3:coast',()=>{zoneT=2.2;persist(true)}]);return}
@@ -1922,7 +1929,7 @@ function fit(){if(POCKET){const p=cv.parentNode||{};let nh=Math.round(240*p.clie
 fit();addEventListener('resize',fit);if(POCKET)try{new ResizeObserver(fit).observe(cv.parentNode)}catch(e){}
 loadWorld();cloudInit();
 let last=0;
-function frame(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;
+function frame(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;if(HOLD){requestAnimationFrame(frame);return}
  padPoll();try{update(dt);g.setTransform(K,0,0,K,0,0);g.imageSmoothingEnabled=false;if(TBON)TBX=[];draw();if(TBON){TBL=TBX;TBX=null}}catch(err){console.error(err)}
  for(const k in keys)prev[k]=keys[k];
  requestAnimationFrame(frame);}

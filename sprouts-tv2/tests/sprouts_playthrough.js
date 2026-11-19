@@ -12,6 +12,7 @@ const path=require('path');const BUILD=path.resolve(process.argv[2]||path.join(_
 await page.goto('file://'+BUILD+'?dev');await page.waitForTimeout(500);
 /* TV: no cartridge to pick */
 const E=s=>page.evaluate(s=>__g.ev(s),s);for(let i=0;i<60&&(await E('state'))!=='menu';i++){await page.keyboard.press('Enter',{delay:70});await page.waitForTimeout(200)}
+await E('HOLD=1;void 0'); /* from here the script owns the clock: the page's own loop and timers stand still */
 await E(`window.__T=[];window.__tl=m=>{window.__T.push('D'+day+' '+String(Math.round(dayT/DAYLEN*100)).padStart(3)+'%  '+m)};
  {const o=c3Play;c3Play=function(k,d){__tl('3D     <'+k+'> '+C3SCN[k].map(s=>s.cap?(s.cap[0]?s.cap[0]+': ':'')+s.cap[1]:'').join(' / '));return o.apply(this,arguments)}}
  {const o=playScene;playScene=function(k,d){if(k.slice(0,2)!=='3:'){const q=typeof SCN[k]==='function'?SCN[k]():SCN[k];__tl('2D     <'+k+'> '+q.map(s=>(s[2]?s[2]+': ':'')+s[0]).join(' / '))}return o.apply(this,arguments)}}
@@ -39,7 +40,7 @@ await E(`init();live=true;persist(true);c3Play('dawn',()=>c3Play('open',()=>talk
        if(inHome){press('down')}
        else{const d=Math.hypot(o.x-P.x,o.y-P.y);
         if(f%15===0||!B.path){B.path=pathTo(P.x,P.y,o.x,o.y,false);if(!B.path){/* walk toward the nearest reachable tile */let best=null,bd=1e9;for(let ty=0;ty<MH;ty++)for(let tx=0;tx<MW;tx++){if(fieldL[ty*MW+tx]<0)continue;const dd=Math.hypot(tx*16+8-o.x,ty*16+8-o.y);if(dd<bd&&pathTo(P.x,P.y,tx*16+8,ty*16+8,false)){bd=dd;best=[tx,ty]}}B.path=best?pathTo(P.x,P.y,best[0]*16+8,best[1]*16+8,false):[]}}
-        const talkO=/^TALK|^DONE|PET LOUIE/.test(o.text),pluckO=/PLUCK/.test(o.text),near=!talkO&&!pluckO&&d<46;let wp=B.path&&B.path[0];while(wp&&Math.hypot(wp.x-P.x,wp.y-P.y)<5){B.path.shift();wp=B.path[0]}
+        const talkO=/^TALK|^DONE|PET LOUIE/.test(o.text),pluckO=/PLUCK/.test(o.text),near=!talkO&&!pluckO&&!/TRAIL POSTS/.test(o.text)&&d<46;let wp=B.path&&B.path[0];while(wp&&Math.hypot(wp.x-P.x,wp.y-P.y)<5){B.path.shift();wp=B.path[0]}
         if(near&&d>16){const dx=o.x-P.x,dy=o.y-P.y;P.dx=dx/d;P.dy=dy/d;if(f%4<2)press('a')}
         else if(talkO&&d<22){const dx=o.x-P.x,dy=o.y-P.y;P.dx=dx/d;P.dy=dy/d;if(f%20===10)press('a')}
         else if(pluckO&&o.x===SOIL.x&&o.y===SOIL.y&&/BLOOMED/.test(o.text)){if(d<40)press('up')}

@@ -21,6 +21,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   const E = s => page.evaluate(s => __g.ev(s), s);
   const shot = async n => { if (SHOTS) { await E('g.setTransform(K,0,0,K,0,0);draw();void 0'); await page.screenshot({ path: path.join(SHOTS, n + '.png') }); } };
   const step = (n, dt = 1 / 30) => E(`(()=>{for(let i=0;i<${n};i++){__g.update(${dt});for(const k in __g.keys)__g.prev[k]=__g.keys[k]}})()`);
+  await E('HOLD=1;void 0'); /* the test owns the clock; only the controller section below lets the page's own loop run */
   const tap = async k => { await E(`keys.${k}=1;void 0`); await step(1); await E(`keys.${k}=0;void 0`); await step(2); };
   const fresh = `init();live=true;state='play';run.egg={sesh:1,job:1,dream:1,zoomies:1,button:1,hottub:1,moon:1,slide:1,bessie:1};ZONES.forEach(z=>run.seen[z[0]]=1);run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1,lf:1};toasts.length=0;msgT=0;`; /* (project cards would cut in at random) */
 
@@ -61,11 +62,18 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok('Ranger ends on the trail posts, Scout looks for the Lanternwisp before the glimmers, Marcus starts with his lost key and ends on a bet', asks[0] === 'r1,r2,r3,r5,r4,r6' && asks[1] === 's1,s2,s3,s4,s7,s5,s6' && asks[2] === 'm0,m1,m2,m3,m4' && asks[3] && asks[4] && asks[5], asks);
   const posts = JSON.parse(await E(`(()=>{${fresh}const a=postsSeen();PZ.forEach(z=>{const p=postXY(z);P.x=p.x;P.y=p.y+10;postTick()});const b=postsSeen();postTick();return JSON.stringify([a,b,postsSeen(),npcs[1].ms.find(m=>m.id==='r6').get()])})()`));
   ok('standing at a trail post is enough: four posts, each counted once', posts.join() === '0,4,4,4', posts);
+  const postWalk = JSON.parse(await E(`(()=>{${fresh}const r=npcs[1];r.st='active';r.mi=r.ms.findIndex(m=>m.id==='r6');run.trk='RANGER';run.meet=0;npcs[0].st='active';npcs[0].mi=5;run.keep=1;run.pjSeen={};PJ.forEach(p=>run.pjSeen[p.id]=1);gates.forEach(q=>{if(q.id!=='sunDoor'&&q.id!=='northPier'&&q.alive)openGate(q,true)});
+    const o=()=>{const q=objective();return q?q.text:''},out=[];for(let k=0;k<3;k++){const q=AT.r6();out.push(/TRAIL POSTS/.test(o())&&!!q&&q!==r);P.x=q.x;P.y=q.y+10;postTick()}
+    out.push(postsSeen(),postsWait(),/TRAIL POSTS|RANGER/.test(o()),AT.r6());talk(r);out.push(/stone door/.test(JSON.stringify(dlg.pages)));state='play';
+    openGate(coastGate('sunDoor'),false);const q=AT.r6();out.push(postsWait(),/TRAIL POSTS/.test(o()),ZONES.find(z=>z[0]==='NORTH COAST')[5]===(q.x>>4));P.x=q.x;P.y=q.y+10;postTick();out.push(/GO SEE RANGER/.test(o()));return JSON.stringify(out)})()`));
+  ok('the arrow leads to each post in turn, found or not; with only the coast\'s post left behind a shut door it lets go of Ranger, and he says where the fourth is', postWalk.join() === 'true,true,true,3,true,false,,true,false,true,true,true', postWalk);
   const bet = JSON.parse(await E(`(()=>{${fresh}run.bet={d:day,b:tod.berries};tod.berries+=5;const a=betGot();newDay0();const b=betGot();tod.berries+=8;const c=betGot();newDay0();return JSON.stringify([a,b,c,betGot(),!!run.bet.won])})()`));
   ok('Marcus\'s bet is eight berries in one day: a short day is nothing and it starts again; a won bet stays won', bet.join() === '5,0,8,8,true', bet);
   ok('"see one, send one" is only the dab now: it is gone from his asks about Dews and sprouts', await E(`npcs[3].ms.every(m=>!/see one, send one/i.test(m.say+(m.late||'')))&&C3SCN.sesh.some(q=>/See one, send one/.test(q.cap[1]))`));
-  const rest = JSON.parse(await E(`(()=>{${fresh}run.call=1;run.lit=1;run.fin=1;run.finDay=day;const a=[];for(let k=0;k<3;k++){newDay0();a.push(run.rest|0)}return JSON.stringify(a)})()`));
-  ok('three nights after it is answered the North Light banks down to an ember (it is not put out)', rest.join() === '0,0,1' && await E(`run.lit===1`), rest);
+  const rest = JSON.parse(await E(`(()=>{${fresh}run.call=1;run.lit=1;run.fin=1;run.finDay=day;const a=[];for(let k=0;k<4;k++){newDay0();a.push(run.rest|0)}return JSON.stringify(a)})()`));
+  ok('three nights after it is answered the North Light banks down to an ember (it is not put out), even for a keeper who sleeps through the dusk', rest.join() === '0,0,0,1' && await E(`run.lit===1`), rest);
+  const restScn = JSON.parse(await E(`(()=>{${fresh}run.call=1;run.lit=1;run.fin=1;run.finDay=day;const out=[];day+=2;dayT=DAYLEN*.8;coastTick();out.push(sceneQ.length);day+=1;dayT=DAYLEN*.5;coastTick();out.push(sceneQ.length);dayT=DAYLEN*.8;coastTick();out.push(sceneQ.length&&sceneQ[0][0],run.rest|0);coastTick();out.push(sceneQ.length);return JSON.stringify(out)})()`));
+  ok('awake at dusk on the third night, the keeper watches it lower: the scene plays once', restScn.join() === '0,0,3:rest,1,1', restScn);
 
   /* ---- Scout's notebook ---- */
   const nb = JSON.parse(await E(`(()=>{${fresh}const a=notesHave();run.boss=true;won=true;run.keep=1;run.call=1;run.leak=1;run.lit=1;run.fin=1;run.rest=1;run.wbSeen={LANTERNWISP:1};shards=4;npcs.forEach(n=>{n.st='active';n.mi=3});const b=notesHave();
@@ -90,7 +98,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
     home.res=[2,1,0,0,0,0];home.jobs=[1,1,1];state='hsel';expSend();const few=[!!run.exp,flash];home.res=[3,3,1,0,0,0];home.jobs=[3,2,2];expSend();const sent=[homeTotal(),run.exp&&run.exp.back-day,home.jobs.reduce((a,b)=>a+b,0)<=homeTotal(),state];
     expSend();const again=flash;inHome=false;state='play';const p0=meta.petals;day+=1;expBack();const early=!!run.exp;day+=1;expBack();return JSON.stringify([before,after,few,sent,/STILL OUT/.test(again),early,homeTotal(),meta.petals-p0,run.expN])})()`));
   ok('after the ending five sprouts who live in the house can be sent out with a light for two days', !ex[0].includes('SEND AN EXPEDITION') && ex[1].includes('SEND AN EXPEDITION') && !ex[2][0] && /NEEDS 5/.test(ex[2][1]) && ex[3][0] === 2 && ex[3][1] === 2 && ex[3][2] && ex[3][3] === 'play' && ex[4], ex);
-  await page.waitForTimeout(1100); await step(2);
+  await step(40); /* the postcard arrives on a timer: a second or so of stepped time */
   ok('four come home with a postcard and thirty petals; one stays out to keep the light', ex[5] === true && ex[6] === 6 && ex[7] === 30 && ex[8] === 1 && await E(`state==='card'&&card.title==='A POSTCARD'&&EXPC.every(l=>wrapPx(l+'  +30 and a ticket.',172,1).length<=5)`), [ex.slice(5), await E('state')]); await shot('tv2-postcard'); await tap('a'); await step(2);
 
   /* ---- night grubs ---- */
@@ -99,7 +107,9 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
     for(let i=0;i<30*45;i++){if(dayT>DAYLEN-2)dayT=DAYLEN*.8;__g.update(1/30)}return JSON.stringify([out,n,/GRUBS/.test(tip),tod.eaten,sprouts.filter(inSoil).length,foes.filter(e=>e.raid&&e.alive).length])})()`));
   ok('from the third day grubs come at dusk, more as the days go on, never in rain, never before grubs are awake', raid[0].join() === '0,1,3,0,0' && raid[1] === 2 && raid[2], raid);
   ok('left alone, each eats two seedlings from the Lantern\'s soil and burrows off', raid[3] === 4 && raid[4] === 2 && raid[5] === 0, raid.slice(3));
-  const guard = JSON.parse(await E(`(()=>{${fresh}day=4;run.grubs=true;run.boss=true;sprouts=sprouts.filter(q=>!inSoil(q));for(let i=0;i<6;i++)mkSprout(0,410+i*16,376,0);P.x=HX;P.y=HY-60;dayT=DAYLEN*.73;__g.update(1/30);const thorn=foes.filter(e=>e.raid).length;
+  const watch = JSON.parse(await E(`(()=>{${fresh}day=4;run.grubs=true;run.boss=true;tod.raid=0;raidStart();const a=sceneQ.map(q=>q[0]).join(),n1=foes.filter(e=>e.raid).length;sceneQ.length=0;tod.raid=0;raidStart();return JSON.stringify([a,n1,sceneQ.length,run.wtch])})()`));
+  ok('the first dusk Thornback turns a grub away is a scene; after that it is a line over his head', watch.join() === '3:watch,0,0,1', watch);
+  const guard = JSON.parse(await E(`(()=>{${fresh}day=4;run.grubs=true;run.boss=true;run.wtch=1;sprouts=sprouts.filter(q=>!inSoil(q));for(let i=0;i<6;i++)mkSprout(0,410+i*16,376,0);P.x=HX;P.y=HY-60;dayT=DAYLEN*.73;__g.update(1/30);const thorn=foes.filter(e=>e.raid).length;
     run.boss=false;tod.raid=0;__g.update(1/30);const e=foes.find(q=>q.raid);for(let i=0;i<5;i++){const b=mkBud(0,2,e.x,e.y);b.tgt=e;b.st='fight';e.on.push(b)}for(let i=0;i<30*12;i++)__g.update(1/30);const beaten=!e.alive&&!tod.eaten;
     endDay();return JSON.stringify([thorn,beaten,tod.news.find(l=>/SOIL|GRUBS GOT/.test(l))])})()`));
   ok('Thornback sees the first one off; sprouts thrown at one stop it; the evening report says how the night went', guard[0] === 0 && guard[1] && /KEPT SAFE/.test(guard[2]), guard);
@@ -114,12 +124,14 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok('rain is drawn over the whole screen', await E(`(()=>{const o=g.fillRect.bind(g);let n=0;g.fillRect=(x,y,w,h)=>{if(w===1&&h===5)n++;o(x,y,w,h)};g.setTransform(K,0,0,K,0,0);draw();tod.rain=0;let m=0;g.fillRect=(x,y,w,h)=>{if(w===1&&h===5)m++;o(x,y,w,h)};draw();g.fillRect=o;return n-m>=40})()`));
 
   /* ---- a second player is Louie ---- */
+  await E('HOLD=0;void 0'); /* the controller is read by the page's own loop */
   const padSet = (which, o) => page.evaluate(([w, o]) => { const p = window[w]; if (o.ax !== undefined) p.axes[0] = o.ax; if (o.ay !== undefined) p.axes[1] = o.ay; if (o.b !== undefined) p.buttons[o.b] = { pressed: !!o.on, value: o.on ? 1 : 0 }; }, [which, o]);
   await E(`${fresh}meta.p2=0;P.x=HX;P.y=HY+50;LO.x=LO.sx=P.x+20;LO.y=LO.sy=P.y;cam.x=P.x-VW/2;cam.y=P.y-VH/2;void 0`); await page.waitForTimeout(150);
   const lx0 = await E('LO.x'), px0 = await E('P.x'); await padSet('__pad2', { ax: 1 }); await page.waitForTimeout(600); await padSet('__pad2', { ax: 0 }); await page.waitForTimeout(100);
   ok('the second controller walks Louie, not Will, and says so the first time', (await E('LO.x')) > lx0 + 25 && Math.abs((await E('P.x')) - px0) < 1 && await E(`louMan>0&&toasts.concat([]).some(t=>/PLAYER 2 IS LOUIE/.test(t.s))`), [lx0, await E('LO.x')]);
   await E(`const b=mkBud(2,2,LO.x+20,LO.y);b.st='idle';const e=mkFoe(LO.x-30,LO.y,false);void 0`); await padSet('__pad2', { b: 0, on: 1 }); await page.waitForTimeout(150); await padSet('__pad2', { b: 0, on: 0 }); await page.waitForTimeout(100);
   ok('A barks: a stray near him hops on, and a grub near him stops', await E(`LO.riders.length===1&&foes.some(e=>e.scare>0)`), await E('[LO.riders.length,foes.map(e=>e.scare)]'));
+  await E('HOLD=1;void 0');
   await E(`LO.x=P.x+10;LO.y=P.y+4;LOK.left=1;louMan=5;void 0`); await step(3); await E('LOK.left=0;void 0');
   ok('back at Will the rider hops off and joins the crew', await E(`LO.riders.length===0&&buds.some(b=>b.type===2&&b.st==='follow')`));
   await E(`foes.length=0;const n0=items.filter(i=>i.alive&&(i.sub==='berry'||i.sub==='big')).length;window.__n0=n0;LOK.b=1;louMan=5;void 0`); await step(2); await E('LOK.b=0;void 0'); await step(70);
@@ -129,7 +141,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   /* ---- Louie's morning ---- */
   await E(`${fresh}enterHome();homeUse(HST.find(h=>h.id==='bed'));void 0`);
   ok('the beds offer Louie\'s morning', await E(`hsel.opts.length===3&&/LOUIE/.test(hsel.opts[2][0])`)); await E(`hsel.i=2;void 0`); await tap('a'); await step(40);
-  for (let k = 0; k < 4 && (await E('state')) === 'dayend'; k++) { await tap('a'); await step(3); } await page.waitForTimeout(200); await step(3);
+  for (let k = 0; k < 4 && (await E('state')) === 'dayend'; k++) { await tap('a'); await step(3); } await step(10);
   ok('the next day starts with Louie: six snacks, a squirrel, Will asleep', await E(`day===2&&!!LOUM&&LOUM.sn.length===6&&LOUM.sn.every(q=>map[(q.y>>4)*MW+(q.x>>4)]===G)&&LOUM.t>60`), await E('[day,!!LOUM,state]'));
   const w0 = JSON.parse(await E('JSON.stringify([P.x,LO.x])')); await E('keys.left=1;void 0'); await step(30); await E('keys.left=0;void 0'); const w1 = JSON.parse(await E('JSON.stringify([P.x,LO.x,cam.x+VW/2])')); await shot('tv2-louies-morning');
   ok('the controls move Louie, Will stays put, and the camera goes with Louie', w1[1] < w0[1] - 30 && Math.abs(w1[0] - w0[0]) < 1 && Math.abs(w1[2] - w1[1]) < 60, [w0, w1]);

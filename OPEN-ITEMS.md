@@ -30,6 +30,8 @@ at phone size. Will's rule stands: a change is not done until it has been played
 - Erin's welcome and two of her lines were changed to fit the canon that she is Will's fiancee and was called here too. Listed in the story notes so they can be put back.
 - Balance of the new things (night grubs, rain, the bet, the wedding book, Louie's morning) is a first guess.
 - Buddies eating strays, and the van jokes, were left alone.
+- Second round (Nov 19): nine new 3D scenes, all lines Claude's, including three more hidden van scenes. "Who is it" is a nod to Cheech and Chong's "Dave's not here". OPEN: Will to say if that is closer than he wants. Also OPEN: Ranger calling the North Light's rest "the old way" is new lore.
+- OPEN: no scene has been watched at full speed or heard. Timing of the new scenes needs a person.
 - There are now three copies of Sprouts: `alt/` (handheld, in the console), `sprouts-tv/` and `sprouts-tv2/` (which builds a TV and a phone version from one source). OPEN: retire the older two?
 - `sprouts_story.js` there fails about one run in ten (autopilot).
 

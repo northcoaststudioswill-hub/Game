@@ -1,5 +1,90 @@
 # Sprouts TV 2 changelog
 
+## Cutscene clean-up and nine new scenes (Nov 19 2026, second round)
+
+Will: "I love the van humor with Marcus and Derek and Will ... a little Cheech and Chong vibe. Check some of the
+cutscenes and just clean them up. For example, the one where Derek rips through town, his truck's facing the wrong way
+the whole time. Let's keep testing the new content as well. Add more cutscenes for the story."
+
+Everything here was checked by script and by looking at rendered frames. **Nothing was played by hand, on a television
+or phone, or listened to. No scene was watched running at full speed: each shot was looked at as stills.**
+
+![Ten shots from the fixed and the new scenes](playtest/new-scenes.png)
+
+### Cleaned up
+
+Every one of the 25 earlier scenes was rendered three frames per shot (start, middle, end) and looked at.
+
+| Scene | What was wrong | Now |
+|---|---|---|
+| The job ("Derek rips through town") | The van was turned a quarter turn from the way it travelled in all three driving shots, so it slid sideways. | It drives nose first. A check now measures this in every shot of every scene where the van moves. |
+| The job | Nobody was driving: Marcus and Derek both sat in the side door. | The cab is open framed, Derek is at the wheel, Marcus rides in the door with the rig. |
+| Thornback wakes, shot 6 | Erin faced away from Thornback while speaking to him. | She turns to him; Louie moved out of her way. |
+| The coast, shot 3 | Louie stood inside Will. | Apart. |
+| The leak, shots 1 and 2 | The camera started inside a dune; Derek talked to a wall. | Camera moved; Derek faces the pipe. |
+| The relight, shot 4 | Marcus and Will had their backs to the camera for Marcus's line. | They turn. |
+| Thornback's speaking shots | He faced a quarter turn off camera. | He faces it. |
+| The key, shot 4 | The van was parked across the job site gate, on the far side from everyone. | On the near side. |
+| The blaze (shots 3, 5), the ending (all seven), three shards | A second Erin, Will and Thornback: the night set draws its own cast and these shots also placed theirs. | One of each. |
+| Scout | Wore Erin's hair. | A green cap of her own. |
+
+### Nine new scenes (34 scenes, 152 shots now; 22 in the story, 12 hidden)
+
+Every line in these is mine, not Will's. They are listed in `STORY-NOTES.md`.
+
+| Scene | When it plays |
+|---|---|
+| **The paths** (Ranger, 3 shots) | The first time Will talks to Ranger, before his first ask. |
+| **The notebook** (Scout, 3 shots) | The first time Will talks to Scout. |
+| **The pond road** (4 shots) | When the Flow Pros key opens the job site. Derek drives the van through. |
+| **The lens** (3 shots) | When the lens reaches the Lantern by day. After dark it goes straight to the relight, as before. |
+| **Not tonight** (3 shots) | The first dusk Thornback turns a night grub away. After that it is a line over his head. |
+| **At rest** (3 shots) | Dusk on the third night after the ending: the North Light banks down. Asleep for it, Will is told in the morning. |
+| **The driest place** (hidden, 5 shots) | A at the van on a rain day. |
+| **Eleven berries** (hidden, 6 shots) | A at the van after dark on a day ten berries came home. |
+| **Who is it** (hidden, 6 shots) | A at the van after dark, on a night after the session. |
+
+At the van after dark the order is: the session first, then eleven berries (if it was a ten berry day), then who is
+it, then the usual lines.
+
+### Found while testing
+
+- **A scene queued in one game could play in the next.** Starting a new game, or loading, did not clear scenes waiting
+  to play. It does now.
+- **The tests were racing the real clock.** The game's own loop and timers kept running while a test stepped it by hand,
+  so the same test could pass or fail from run to run (the coast suite failed three runs in four once the new scenes
+  made it longer). A test can now hold the game still (`HOLD`, only reachable with `?dev`), and the stepped suites do.
+  Two failures that were left after that were the test's own staging: Louie standing where a throw was aimed, and a
+  buried treasure spot that is placed at random.
+- **Ranger's last ask could hold the arrow on Ranger with nothing to do.** "Walk the four trail posts" pointed only at
+  posts in places Will had already found, and fell back to Ranger himself. The fourth post is on the North Coast, behind
+  the sun door, so before the call the arrow sat on Ranger and he repeated the ask (the story run's bot talked to him
+  about a thousand times). Now the arrow leads to the nearest post still to be stood at, found or not. When only the
+  coast's post is left and the door is shut, the arrow lets go of Ranger, and he says where the fourth one is (a new
+  line, mine: see the story notes). It picks the ask up again when the door opens.
+
+### Tested
+
+- `tests/scenes.js` (new, 36 checks): the scene list and captions, the van's heading in every moving shot, each new
+  scene from its real trigger and only once, the van's order after dark, each new scene played start to finish.
+- All suites together: 393 checks pass (tv 34, tv2 52, pocket 16, scenes 36, coast 188, valley 50, story 17).
+- After the clock fix the coast suite was run three times in a row and tv2 four times: the same result each time.
+  The story suite passed three runs in a row and failed one before that (its autopilot plays with the game's own
+  dice, so it can still lose a run).
+- Soak: Erin's day, two chaos seeds for two days each, one late-game seed. Nothing broke.
+- The story run played from a fresh save to day 10 and met every story scene, the new ones included:
+  `playtest/story-run.txt`. The script still helps itself in places (it counted the trail posts as walked, for one);
+  every such place is marked "helped" in the file.
+- Fifteen of the fixed and new shots were also rendered on the phone build and looked at.
+
+### Not tested, not done
+
+- Not played by hand. Not seen on a television or a phone. Not heard: four of the nine new scenes have a sound cue
+  and none of them was listened to.
+- Timing was judged from stills. Whether a shot runs too long or a joke lands too late needs someone watching it.
+- The three hidden van scenes were checked for order by calling the van directly, not by walking there at night.
+- `alt/` and `sprouts-tv/` were not touched.
+
 ## First version (Nov 19 2026)
 
 Will: make a copy of the standalone Sprouts, implement everything in the review document and finish the game, clean up

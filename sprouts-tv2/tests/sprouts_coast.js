@@ -14,6 +14,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   /* TV: no cartridge to pick; the keys below walk the real way in (any button, studio card, title, menu) */
   const E = s => page.evaluate(s => __g.ev(s), s);
   for (let i = 0; i < 60 && (await E('state')) !== 'menu'; i++) { await page.keyboard.press('Enter', { delay: 70 }); await page.waitForTimeout(200); }
+  await E('HOLD=1;void 0'); /* from here the test owns the clock: the page's own loop and timers stand still */
   let fail = 0; const ok = (name, cond, info) => { if (!cond) fail++; console.log((cond ? 'PASS ' : 'FAIL ') + name + (info !== undefined ? '  [' + JSON.stringify(info) + ']' : '')); };
   const step = (n, dt = 1 / 30) => E(`(()=>{for(let i=0;i<${n};i++){__g.update(${dt});for(const k in __g.keys)__g.prev[k]=__g.keys[k]}})()`);
   const tap = async k => { await E(`keys.${k}=1;void 0`); await step(1); await E(`keys.${k}=0;void 0`); await step(2); };
@@ -89,6 +90,8 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   for (let i = 0; i < 8 && (await E('state')) === 'card'; i++) { await step(10); await tap('a'); } await step(12); ok('then the marker says to unlock the pond road', /POND ROAD/.test(await E('OBJ&&OBJ.text')), await E('OBJ&&OBJ.text'));
   await tp(20, 20, -1, 0); await step(12);
   ok('walking up with the key opens it', await E(`!coastGate('jobsite').alive&&fieldL[20*MW+17]>0`), await E('msg'));
+  await step(6); ok('and the van rolls through in a scene: Derek at the wheel, four miles an hour', await E(`state==='c3'&&c3q.key==='road'`), await E('state+" "+(c3q&&c3q.key)')); await shot('road-scene'); await skip3();
+  ok('once: play goes on with nothing else queued', await E(`state==='play'&&!sceneQ.length&&c3SeenScene('road')`), await E('state'));
   ok('a save keeps the key and the open road', await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);return run.key===1&&!coastGate('jobsite').alive})()`));
   ok('a save from before this update that has met Marcus is not locked out', await E(`(()=>{init();live=true;state='play';openGate(gates[1]);npcs[3].st='active';const o=JSON.parse(JSON.stringify(snap()));delete o.gates.jobsite;restore(o);return run.key===1&&!coastGate('jobsite').alive&&fieldL[20*MW+17]>0})()`));
   ok('a fresh old save keeps the new errand', await E(`(()=>{init();live=true;state='play';const o=JSON.parse(JSON.stringify(snap()));delete o.gates.jobsite;restore(o);return !run.key&&coastGate('jobsite').alive})()`));
@@ -106,6 +109,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok('his ask points at the garden until the key is dug up, and is done when the key is home', await E(`(()=>{const a=AT.m0();const b=npcs[3].ms[0].get();run.key=1;return (a===npcs[0]||a===GARD||!!a)&&b===0&&npcs[3].ms[0].get()===1})()`));
   await E(`openGate(gates[1]);const j=coastGate('jobsite');P.x=j.x+30;P.y=j.y;keyTick();void 0`);
   ok('when the key opens the pond road, Flow Pros roll through to the Dew Pond', await E(`!coastGate('jobsite').alive&&(npcs[3].x>>4)===17&&(npcs[3].y>>4)===23&&(VAN.x>>4)===13&&/POND/.test(msg)`), await E(`[npcs[3].x>>4,npcs[3].y>>4,VAN.x>>4,msg]`));
+  await E(`sceneQ.length=0;void 0`);
   ok('a save puts them back where the road says they are', await E(`(()=>{const o=JSON.parse(JSON.stringify(snap()));restore(o);const a=(npcs[3].x>>4)===17;init();return a&&(npcs[3].x>>4)===22})()`));
 
   /* ---- before the call ---- */
@@ -166,7 +170,9 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   let secs = 0; for (; secs < 200 && (await E('state')) === 'play' && !(await E('run.lens')); secs++) { await step(30); if (secs === 12) await shot('coast-5-lens-on-the-pier'); }
   ok('the lens is carried across the valley to the Lantern', await E('run.lens===1'), secs + ' s, state ' + await E('state'));
   await E(`if(dayT>DAYLEN*.5)dayT=DAYLEN*.5;void 0`); await step(12);
-  ok('by day the relight waits: the lens is home, the light is not lit yet', await E(`state!=='c3'&&!run.lit&&relightDue()&&coastObj()===null`), await E('state'));
+  ok('the lens coming home by day is a scene: ten sprouts and one cold lens through the sun door', await E(`state==='c3'&&c3q.key==='lens'`), await E('state+" "+(c3q&&c3q.key)'));
+  await shot('coast-5b-lens-home'); await tap('start'); await step(6);
+  ok('by day the relight waits: the lens is home, the light is not lit yet', await E(`state!=='c3'&&!run.lit&&relightDue()&&coastObj()===null&&/TONIGHT/.test(msg)`), await E('state+" "+msg'));
   for (let k = 0; k < 6 && (await E('state')) !== 'play'; k++) { await tap('a'); await step(3); }
   await E(`dayT=DAYLEN*.7;void 0`); await step(12); ok('from the afternoon the arrow says it happens tonight', await E(`/TONIGHT/.test(objective().text)&&state==='play'`), await E('objective().text'));
   await E(`dayT=DAYLEN*.79;void 0`); await step(14); ok('and the relight scene plays in 3D once night has fallen', await E(`state==='c3'&&c3q.key==='relight'`), await E('state'));
@@ -233,7 +239,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await E(`exitHome();void 0`); await step(3);
 
   /* ---- from Will's second playtest: Louie, pacing, messages, greens and Pebs ---- */
-  await E(`init();live=true;state='play';dayT=30;npcs[0].st='active';npcs[0].mi=2;items.forEach(i=>i.alive=false);bugs.forEach(q=>q.alive=false);P.x=24*16;P.y=18*16;LO.x=LO.sx=P.x-40;LO.y=LO.sy=P.y-30;P.dx=1;P.dy=0;void 0`);
+  await E(`init();live=true;state='play';dayT=30;npcs[0].st='active';npcs[0].mi=2;items.forEach(i=>i.alive=false);bugs.forEach(q=>q.alive=false);DIG.alive=false;P.x=24*16;P.y=18*16;LO.x=LO.sx=P.x-40;LO.y=LO.sy=P.y-30;P.dx=1;P.dy=0;void 0`);
   let pets = 0; for (let k = 0; k < 3; k++) { await step(45); await tap('a'); if (await E(`run.pets===${k + 1}`)) pets++; await step(60); }
   ok("during Erin's pet-Louie ask he comes round and waits when Will stands still: three scratches without chasing him", pets === 3, [pets, await E('[LO.st,Math.hypot(LO.x-P.x,LO.y-P.y)|0]')]);
   await E(`npcs[0].mi=1;LO.st='follow';LO.x=LO.sx=P.x+40;LO.y=LO.sy=P.y+30;P.dx=1;P.dy=0;P.idle=0;const it=mkItem('berry',P.x+60,P.y);window.__it=it;buds=[];for(let i=0;i<3;i++)mkBud(0,2,P.x-6,P.y+6);void 0`); await step(50); const p0 = await E('run.pets'); await tap('a'); await step(40);
@@ -286,7 +292,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   await E(`newDay();void 0`); await step(3); ok('it is back in the morning', await E('vanHere()'));
   await tp(13, 27, 0, -1); await E(`P.y=VAN.y+16;buds.forEach(b=>b.st='idle');void 0`); await step(3); await tap('a'); await step(3);
   ok('the second time it is a line, not the scene', await E(`state==='play'&&/JOB/.test(msg)`), await E('msg'));
-  await E(`newDay();dayT=DAYLEN*.7;duskSaid=true;void 0`); await tp(13, 27, 0, -1); await E(`P.y=VAN.y+16;buds.forEach(b=>b.st='idle');void 0`); await step(3); await tap('a'); await step(3);
+  await E(`newDay();tod.rain=0;tod.berries=0;dayT=DAYLEN*.7;duskSaid=true;void 0`); await tp(13, 27, 0, -1); await E(`P.y=VAN.y+16;buds.forEach(b=>b.st='idle');void 0`); await step(3); await tap('a'); await step(3);
   ok('A at the van after dark: see one, send one', await E(`state==='c3'&&c3q.key==='sesh'&&c3q.S.some(e=>/[Ss]ee one, send one/.test(e.cap[1]))`), await E('state'));
   await tap('start'); await step(3);
   await E(`dayT=30;run.pets=4;LO.st='follow';LO.x=LO.sx=P.x+14;LO.y=LO.sy=P.y;P.dx=1;P.dy=0;P.idle=1;P.mv=false;void 0`); await step(2); await tap('a'); await step(4);
@@ -303,7 +309,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   /* four more hidden scenes */
   const clear = async () => { for (let k = 0; k < 8 && (await E('state')) !== 'play'; k++) { const st = await E('state'); if (st === 'c3') await skip3(); else if (st === 'pause' || st === 'hsel') await tap('b'); else await tap('a'); await step(4); } };
   await clear(); await E(`dayT=30;npcs[3].st='active';run.emb=0;run.pjSeen={ww:1,gh:1,den:1,lo:1,bh:1,lf:1};buds=[];for(let i=0;i<6;i++)mkBud(0,2,P.x,P.y);void 0`); await tp(17, 20, -1, 0); await step(4);
-  for (let k = 0; k < 40 && (await E('state')) === 'play' && (await E('run.emb')) < 5; k++) { await E(`P.x=16*16+12;P.y=20*16+8;P.dx=-1;P.dy=0;buds.forEach(b=>{release(b);b.st='follow';b.x=P.x+4;b.y=P.y+4});void 0`); await step(2); await throwFor(3); await step(30); }
+  for (let k = 0; k < 40 && (await E('state')) === 'play' && (await E('run.emb')) < 5; k++) { await E(`P.x=16*16+12;P.y=20*16+8;P.dx=-1;P.dy=0;LO.x=LO.sx=P.x+44;LO.y=LO.sy=P.y+20;LO.st='sit';LO.t=3;buds.forEach(b=>{release(b);b.st='follow';b.x=P.x+4;b.y=P.y+4});void 0`); await step(2); await throwFor(3); await step(30); } /* Louie is sat behind Will: in front, A scratches him instead of throwing */
   await step(6); ok('five Embers thrown in the pond: the hot tub', await E(`state==='c3'&&c3q.key==='hottub'`), [await E('state'), await E('run.emb')]); await clear();
   await E(`openGarden();dayT=DAYLEN*.7;duskSaid=true;void 0`); await step(12); await clear(); await E(`P.x=npcs[0].x;P.y=npcs[0].y+14;P.dx=0;P.dy=-1;buds.forEach(b=>{release(b);b.st='idle';b.x=P.x+40}); LO.x=LO.sx=P.x+50;void 0`); await step(3); await tap('a'); await step(4);
   ok('talking to Erin in her garden at dusk: the moonblooms', await E(`state==='c3'&&c3q.key==='moon'`), await E('state')); await clear();
@@ -312,7 +318,7 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   ok('bothering Thornback five times: the slide', await E(`state==='c3'&&c3q.key==='slide'`), [await E('state'), await E('run.thk')]); await clear();
   await E(`run.call=1;run.lit=1;run.coastScn=1;run.seen['NORTH COAST']=1;if(coastGate('sunDoor').alive)openGate(coastGate('sunDoor'));if(coastGate('northPier').alive)openGate(coastGate('northPier'));dayT=DAYLEN*.7;void 0`); await step(12); await clear(); await tp(86, 7); await step(14);
   ok('the rock by the North Light after dark: Bessie says hello', await E(`state==='c3'&&c3q.key==='bessie'`), await E('state')); await clear();
-  ok('nine hidden scenes in the Collection, each with a hint that fits', await E(`C3LIST.length-C3HID===9&&C3LIST.slice(C3HID).every(q=>wrapPx('A hidden scene (9 in all). '+q[2],228,2).length<=3)`));
+  ok('twelve hidden scenes in the Collection, each with a hint that fits', await E(`C3LIST.length-C3HID===12&&C3LIST.slice(C3HID).every(q=>wrapPx('A hidden scene (12 in all). '+q[2],228,2).length<=3)`));
   await E(`init();live=true;state='play';dayT=30;rushN=0;rushT=-99;const p0=meta.petals;window.__p0=p0;for(let k=0;k<5;k++){const it=mkItem('berry',HX,HY+6);deliver(it)}void 0`);
   ok('five berries home in a row is a berry rush', await E(`rushN===5&&toasts.some(t=>/BERRY RUSH/.test(t.s))&&meta.petals>=__p0+8`), await E('[rushN,meta.petals-__p0]'));
   ok('a best day for berries is remembered and shown in the evening report', await E(`(()=>{meta.best=0;tod.berries=9;endDay();const a=tod.best===1&&meta.best===9;state='play';tod.best=0;tod.berries=3;endDay();const b=!tod.best&&meta.best===9;state='play';return a&&b})()`));
@@ -393,8 +399,8 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   const fresh = `init();live=true;state='play';run.egg={};ZONES.forEach(z=>run.seen[z[0]]=1);`;
   const arrows = JSON.parse(await E(`(()=>{${fresh}const out=[],e=npcs[0],at=n=>{P.x=n.x;P.y=n.y+14};at(e);talk(e);state='play';out.push(objective().text);
     for(let k=0;k<3;k++){e.ms[e.mi].get=()=>99;talk(e);state='play';out.push(objective().text)}
-    const r=npcs[1];at(r);talk(r);state='play';out.push(objective().text);openGate(gates[0]);out.push(objective().text);talk(r);state='play';out.push(objective().text);
-    const sc=npcs[2];at(sc);talk(sc);state='play';out.push(objective().text);found[3]=true;talk(sc);state='play';out.push(objective().text);
+    const r=npcs[1];at(r);talk(r,1);state='play';out.push(objective().text);openGate(gates[0]);out.push(objective().text);talk(r);state='play';out.push(objective().text);
+    const sc=npcs[2];at(sc);talk(sc,1);state='play';out.push(objective().text);found[3]=true;talk(sc);state='play';out.push(objective().text);
     e.ms[e.mi].get=()=>99;out.push(objective().text);at(e);talk(e);state='play';out.push(objective().text);return JSON.stringify(out)})()`));
   ok("the arrow stays on Erin for her first three asks", arrows.slice(0, 3).every(t => /PLUCK|BERRIES|LOUIE|ERIN/.test(t)), arrows.slice(0, 3));
   ok('then it sends Will to meet Ranger, and after his first ask, Scout', /TALK TO RANGER/.test(arrows[3]) && /BRAMBLE/.test(arrows[4]) && /GO SEE RANGER/.test(arrows[5]) && /TALK TO SCOUT/.test(arrows[6]) && /ZIP/.test(arrows[7]), arrows.slice(3, 8));
@@ -415,7 +421,10 @@ const SHOTS = process.argv[3] ? path.resolve(process.argv[3]) : null;
   const tv = JSON.parse(await E(`JSON.stringify([cur.o===gates[0],squad.length])`)); await tap('a'); await step(2);
   ok('aimed at the bramble with Ranger standing in front of it, A throws', tv[0] && tv[1] > 0 && (await E('state')) === 'play' && await E(`buds.some(b=>b.st==='fly'||b.tgt===gates[0])`), [tv, await E('state')]);
   await E(`buds.forEach(b=>{release(b);b.st='follow'});const n=npcs[1];P.x=n.x;P.y=n.y+13;P.dx=0;P.dy=-1;void 0`); await step(3); await tap('a'); await step(2);
-  ok('right up against him, A talks', (await E('state')) === 'talk', await E('state')); await E(`state='play';void 0`);
+  ok('right up against him, A talks: the first time, that is his scene', await E(`state==='c3'&&c3q.key==='ranger'`), await E('state')); await shot('ranger-scene'); await tap('start'); await step(4);
+  ok('and when it ends he is already mid-sentence with his first ask', await E(`state==='talk'&&npcs[1].st==='active'&&/Two paths/.test(JSON.stringify(dlg.pages))`), await E('state+" "+JSON.stringify(dlg&&dlg.pages)')); await E(`state='play';void 0`);
+  await E(`buds.forEach(b=>{release(b);b.st='follow'});const n=npcs[1];P.x=n.x;P.y=n.y+13;P.dx=0;P.dy=-1;void 0`); await step(3); await tap('a'); await step(2);
+  ok('the second time A just talks', (await E('state')) === 'talk', await E('state')); await E(`state='play';void 0`);
 
   /* (the handheld's cartridge splash checks are not here: Sprouts TV has no cartridges. Its own way in is checked by tv.js) */
 

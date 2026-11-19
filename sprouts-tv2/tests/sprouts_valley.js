@@ -12,6 +12,7 @@ const BUILD = path.resolve(process.argv[2] || path.join(__dirname, '../games/spr
   /* TV: no cartridge to pick; the keys below walk the real way in (any button, studio card, title, menu) */
   const E = s => page.evaluate(s => __g.ev(s), s);
   for (let i = 0; i < 60 && (await E('state')) !== 'menu'; i++) { await page.keyboard.press('Enter', { delay: 70 }); await page.waitForTimeout(200); }
+  await E('HOLD=1;void 0'); /* from here the test owns the clock: the page's own loop and timers stand still */
   let fail = 0; const ok = (name, cond, info) => { if (!cond) fail++; console.log((cond ? 'PASS ' : 'FAIL ') + name + (info !== undefined ? '  [' + JSON.stringify(info) + ']' : '')); };
   const step = (n, dt = 1 / 30) => E(`(()=>{for(let i=0;i<${n};i++){__g.update(${dt});for(const k in __g.keys)__g.prev[k]=__g.keys[k]}})()`);
   const tp = (tx, ty) => E(`P.x=${tx}*16+8;P.y=${ty}*16+8;P.dx=0;P.dy=-1;LO.x=LO.sx=P.x-18;LO.y=LO.sy=P.y+4;trail=[];buds.forEach(b=>{release(b);b.x=P.x;b.y=P.y+4;b.st='follow'});void 0`);

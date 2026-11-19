@@ -1,244 +1,312 @@
-Sprouts TV 2 story run, Nov 19 2026 (node sprouts-tv2/tests/sprouts_playthrough.js). Lines marked (helped: ...) are the script, not the game.
-
 D1   0%  3D     <dawn> For as long as anyone can remember, the Great Lantern has kept this valley warm and bright. / Last night it cracked. Four sun shards flew off into the wild, and the nights are getting longer. / This morning the new keeper walked in from the south road.
-D1   0%  3D     <open> ERIN: Will! You made it. I've been minding the Lantern. Louie's been minding the snacks. / ERIN: It cracked, and you're its keeper. Don't ask who decided. Sprouts follow whoever plucks them. / ERIN: Each kind is good at something. Aim at a thing and the right sprout steps up by itself. / ERIN: A throws them. B calls them back. Bring the shards home. The seating plan can wait
+D1   0%  3D     <open> ERIN: Will! You made it. I've been minding the Lantern. Louie's been minding the snacks. / ERIN: It cracked, and you're its keeper. Don't ask who decided. Sprouts follow whoever plucks them. / ERIN: Each kind is good at something. Aim at a thing and the right sprout steps up by itself. / ERIN: A throws them. B calls them back. Bring the shards home. The seating plan can wait. Ready?
 D1   0%  TALK   ERIN: Right then, Will. Let's start small. | See the sprouts in the soil below the lantern? Walk up to one and press A | to pluck it. They'll follow you anywhere.
 D1   0%  ARROW  PLUCK 6 SPROUTS:  0 / 6
 D1   0%  CARD   NEW SPROUT: EMBER
+D1   1%  SAY    SOMETHING IS BURIED HERE. THROW SPROUTS AT IT TO DIG
 D1   2%  ARROW  DONE! GO SEE ERIN
 D1   3%  TALK   ERIN: Nicely done, Will! Here, take 10 petals. | Face a berry and press A to throw a sprout at it. They carry it home, and | the lantern turns berries into new sprouts. Hold B to call everyone back.
 D1   3%  ARROW  BRING HOME 5 BERRIES:  0 / 5
-D1   4%  TALK   ERIN: Face a berry and press A to throw a sprout at it. They carry it home, and | the lantern turns berries into new sprouts. Hold B to call everyone back. | BRING HOME 5 BERRIES: 0 / 5
-D1   8%  SAY    LOUIE LEARNED SHARP NOSE: MORE BERRIES
-D1   9%  SAY    A WILD BUDDY. THEY KEEP TO THEMSELVES OUT HERE
-D1  12%    (helped: counted e2 as done)
-D1  12%  ARROW  DONE! GO SEE ERIN
-D1  12%  TALK   ERIN: You did it, Will! Here, take 12 petals. | Louie sniffs out berries and rounds up strays. Stand still facing him and | press A when the heart pops up.
-D1  12%  ARROW  PET LOUIE 3 TIMES:  0 / 3
-D1  13%  ARROW  DONE! GO SEE ERIN
-D1  14%  TALK   ERIN: Perfect, Will! Here, take 10 petals. | Leave sprouts in the soil a while. Leaf, then bud, then bloom. Bloomed | sprouts are faster and stronger.
-D1  14%  ARROW  TALK TO RANGER
-D1  16%  TALK   RANGER: Ranger. I watch the paths. Two are blocked. Stay on the dirt and we'll get | along. | Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it.
-D1  16%  ARROW  BURN THE BRAMBLE:  0 / 1
+D1   3%  TALK   ERIN: Face a berry and press A to throw a sprout at it. They carry it home, and | the lantern turns berries into new sprouts. Hold B to call everyone back. | BRING HOME 5 BERRIES: 0 / 5
+D1   3%  TALK   ERIN: Face a berry and press A to throw a sprout at it. They carry it home, and | the lantern turns berries into new sprouts. Hold B to call everyone back. | BRING HOME 5 BERRIES: 0 / 5
+D1   5%  SAY    A WILD BUDDY. THEY KEEP TO THEMSELVES OUT HERE
+D1   6%  SAY    NEW BUG: LADYBUG!
+D1   9%  SAY    LOUIE LEARNED SHARP NOSE: MORE BERRIES
+D1  10%    (helped: counted e2 as done)
+D1  10%  ARROW  DONE! GO SEE ERIN
+D1  10%  TALK   ERIN: You did it, Will! Here, take 12 petals. | Louie sniffs out berries and rounds up strays. Stand still facing him and | press A when the heart pops up.
+D1  10%  ARROW  PET LOUIE 3 TIMES:  0 / 3
+D1  11%  ARROW  DONE! GO SEE ERIN
+D1  11%  TALK   ERIN: Perfect, Will! Here, take 10 petals. | Leave sprouts in the soil a while. Leaf, then bud, then bloom. Bloomed | sprouts are faster and stronger.
+D1  11%  ARROW  TALK TO RANGER
+D1  14%  3D     <ranger> North of the Lantern a man is straightening a trail post that was already straight. / RANGER: You came in by the south road. I cleared that one last week. Didn't think anybody would use it. / RANGER: Forty years of clearing roads for keepers. You're the first one to walk in on one.
+D1  14%  TALK   RANGER: Ranger. Two paths are blocked. You look like you can throw. | Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it.
+D1  14%  ARROW  BURN THE BRAMBLE:  0 / 1
+D1  14%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  14%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  14%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  14%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  14%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  14%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  14%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  14%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  14%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  14%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  14%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  14%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  15%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  15%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  15%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  15%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  15%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  15%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  15%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  15%  SAY    DUG UP: GLASS MARBLE!  CARRY IT HOME TO THE LANTERN
+D1  15%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
 D1  16%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
-D1  17%  SAY    THE BRAMBLE BURNS AWAY!
-D1  17%  ARROW  DONE! GO SEE RANGER
-D1  18%  TALK   RANGER: Nicely done! Here, take 15 petals. | Grey Pebs sleep up north. They carry double, and grubs can't budge them.
-D1  18%  ARROW  TALK TO SCOUT
-D1  22%  SAY    A NECTAR BLOSSOM! THROW A SPROUT AT IT AND THE CREW BLOOMS
-D1  24%  TALK   SCOUT: I'm Scout. I write things down. Bugs, mostly. Everything, really. | Somebody has to. Want to help? | Yellow Zip sprouts grow in the far corner of this field. Zips are the | fastest sprouts there are.
-D1  24%  ARROW  FIND A ZIP:  0 / 1
-D1  26%  SAY    LOUIE YAWNS. HE WILL SLEEP WELL TONIGHT
-D1  26%  3D     <zoomies> It starts, as it always does, with no warning at all. / LOUIE: ARF ARF ARF ARF ARF ARF ARF / Eleven sprouts down. No injuries. Several complaints. / And then, just as suddenly, it is over.
-D1  28%  CARD   NEW SPROUT: ZIP
-D1  28%  ARROW  DONE! GO SEE SCOUT
-D1  28%  SAY    A GLIMMER: A MOTE OF THE LANTERN. THREE HIDE IN EVERY PLACE
-D1  28%  TALK   SCOUT: Nicely done! Here, take 10 petals. | Throw a sprout at a bug to catch it. Ladybugs are slow. Butterflies need | someone quick, like a Zip.
-D1  29%  TALK   SCOUT: You did it! Here, take 15 petals. | Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest.
-D1  29%  ARROW  TALK TO MARCUS
-D1  30%  SAY    SOMETHING IS BURIED HERE. THROW SPROUTS AT IT TO DIG
-D1  32%  3D     <van> By the pond road sits a van. FLOW PROS. The windows are fogged from the inside. / DEREK: *kkhhh* ...Hoo. Okay. That's the one, Marcus. / MARCUS: Bro. BRO. Will! Perfect timing. Derek. Derek. It's Will. / MARCUS: Business idea. A lazy river. Around the WHOLE valley. Dews as lifeguards. / MARCUS: Waterslide off the Lantern. Marcus Waterworks, bro. Derek's in. Derek? / DEREK: I'
-D1  32%  TALK   MARCUS: So. Marcus Waterworks. You're in, bro. I already told Derek you're in. | One thing first. We shut the pond road for a job. Padlocked it. Very | professional. Then I lost the key. Derek says that's on me. It's somewhere with | flowers, bro. I remember flowers.
-D1  32%  ARROW  FIND THE FLOW PROS KEY:  0 / 1
-D1  34%  SAY    LOUIE LEARNED PACK LEADER: FETCHES GROUPS
-D1  35%  TALK   ERIN: Leave sprouts in the soil a while. Leaf, then bud, then bloom. Bloomed | sprouts are faster and stronger. | PLUCK 3 BLOOMED: 2 / 3
-D1  35%  ARROW  PLUCK 3 BLOOMED:  2 / 3
-D1  36%  ARROW  DONE! GO SEE ERIN
-D1  36%  TALK   ERIN: Lovely work, Will! Here, take 15 petals and a capsule ticket. | You're a natural, Will. I've unlocked my garden for you! Go east through | the berry field, then north past the fence. I'll meet you there.
-D1  36%  ARROW  HARVEST 5 FLOWERS:  0 / 5
-D1  37%  CARD   NEW PROJECT!
-D1  40%  SAY    GARDENERS STAY AND WORK. HOLD B NEAR THEM TO CALL THEM BACK
-D1  40%  SAY    THE BEDS HAVE ALL THE GARDENERS THEY NEED. THE REST WAIT FOR YOU
-D1  41%  SAY    DUG UP: RED BUTTON!  CARRY IT HOME TO THE LANTERN
-D1  44%  TALK   ERIN: Throw sprouts at the soil beds. They plant, water and pick the flowers all | on their own, and they keep at it for as long as you leave them here. Dews | water fastest. | HARVEST 5 FLOWERS: 0 / 5
-D1  45%    (helped: counted e5 as done)
-D1  45%  ARROW  DONE! GO SEE ERIN
-D1  45%  TALK   ERIN: Nicely done, Will! Here, take 20 petals. | Picked flowers land in the basket by the path. Walk over it to collect your | petals. The sign beside it picks which seeds get planted. Leave five | sprouts here as gardeners and we'll never run short.
-D1  45%  3D     <key> Five gardeners at work, and the far bed is turned over for the first time in years. / ERIN: That is not a bulb. / ERIN: FLOW PROS. That's Marcus's. He closed the pond road for a job, then lost the key. / Out west, past the crystal, a job site has been 'in progress' for a week.
-D1  45%  TALK   ERIN: You did it, Will! Here, take 20 petals and a capsule ticket. | That key the gardeners dug up says FLOW PROS. It's Marcus's. He closed the | pond road out west for a 'job' and lost it here. Have the crew carry it | home, then take it to his gate.
-D1  45%  ARROW  BRING HOME THE KEY:  0 / 1
-D1  47%  SAY    A SPROUT EARNED A GOLD STAR! STARS CAN MOVE INTO YOUR HOUSE
-D1  51%  CARD   FLOW PROS KEY
-D1  51%  ARROW  DONE! GO SEE ERIN
-D1  54%  TALK   ERIN: Perfect, Will! Here, take 15 petals. | Crew getting crowded? Our house is in the corner of the Lantern Field. Walk in | the front door and use the desk. Sprouts that move in live there and take a job: | picking berries, making petals or training Louie. You choose who does what.
-D1  54%  ARROW  DONE! GO SEE MARCUS
-D1  59%  TALK   MARCUS: AYYY! That's my guy. Bring it in, bro. *DAP* Here, take 20 petals. | First I need staff. Blue Dews grow on the north shore. They swim, nobody | else does. Go grab me a Dew, bro.
-D1  59%  ARROW  FIND A DEW:  0 / 1
-D1  67%    (helped: counted m1 as done)
-D1  67%  ARROW  DONE! GO SEE MARCUS
-D1  70%  TALK   MARCUS: BROOO. Told you. Never doubted you once. Dap me up. *DAP* Here, take 10 | petals. | See that island, bro? Future VIP section. There's a shard on it. | Send your Dews into the water and they'll swim out and haul it home. I'd do | it myself but these are new shoes.
-D1  70%  ARROW  BRING THE ISLAND SHARD:  0 / 1
-D1  79%    (helped: a shard carried home)
-D1  79%  ARROW  DONE! GO SEE MARCUS
-D1  79%  3D     <marks> The shard clicks back into place. The Lantern coughs, flickers, and glows a little brighter. / ERIN: One down, Will! Feel that? The soil's warming up already. / RANGER: Before you celebrate, come look at this. Something left marks by the lantern. Big ones. / ERIN: So it didn't just crack. Something cracked it. Keep your eyes open out there.
-D1  80%  TALK   MARCUS: LET'S GOOO! Waterworks is officially happening. Come here, bro. *DAP* Here, | take 30 petals. | Last thing. Waterworks needs a mascot. Dragonflies over the pond, | bro. Only a Dew can reach one. I've caught like a hundred. ...I've caught | zero. Send one!
-D1  80%  ARROW  CATCH A DRAGONFLY:  0 / 1
+D1  16%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  16%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  16%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  16%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  16%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  16%  TALK   RANGER: Bramble blocks the north path. Only orange Embers can burn it. Throw them | right at it. | BURN THE BRAMBLE: 0 / 1
+D1  16%  SAY    THE BRAMBLE BURNS AWAY!
+D1  16%  ARROW  DONE! GO SEE RANGER
+D1  17%  TALK   RANGER: Nicely done! Here, take 15 petals. | Grey Pebs sleep up north. They carry double, and grubs can't budge them.
+D1  17%  ARROW  TALK TO SCOUT
+D1  18%  SAY    A NECTAR BLOSSOM! THROW A SPROUT AT IT AND THE CREW BLOOMS
+D1  20%  SAY    CAUGHT A LADYBUG!
+D1  20%  3D     <scout> In the berry field somebody is lying flat in the grass, writing. / SCOUT: Shh. Ladybug. ...Gone. That's all right. I got the spots. Seven. / SCOUT: You're the new keeper. I wrote that down this morning. Now I get to cross out 'probably'.
+D1  20%  TALK   SCOUT: I'm Scout. I write things down. Everything, really. Somebody has to. Want to | help? | Yellow Zip sprouts grow in the far corner of this field. Zips are the | fastest sprouts there are.
+D1  20%  ARROW  FIND A ZIP:  0 / 1
+D1  21%  SAY    LOUIE YAWNS. HE WILL SLEEP WELL TONIGHT
+D1  21%  3D     <zoomies> It starts, as it always does, with no warning at all. / LOUIE: ARF ARF ARF ARF ARF ARF ARF / Eleven sprouts down. No injuries. Several complaints. / And then, just as suddenly, it is over.
+D1  24%  CARD   NEW SPROUT: ZIP
+D1  24%  ARROW  DONE! GO SEE SCOUT
+D1  24%  SAY    A SPROUT EARNED A GOLD STAR! STARS CAN MOVE INTO YOUR HOUSE
+D1  25%  TALK   SCOUT: Nicely done! Here, take 10 petals. | Throw a sprout at a bug to catch it. Ladybugs are slow. Butterflies need | someone quick, like a Zip.
+D1  25%  ARROW  TALK TO MARCUS
+D1  28%  3D     <van> By the pond road sits a van. FLOW PROS. The windows are fogged from the inside. / DEREK: *kkhhh* ...Hoo. Okay. That's the one, Marcus. / MARCUS: Bro. BRO. Will! Perfect timing. Derek. Derek. It's Will. / MARCUS: Business idea. A lazy river. Around the WHOLE valley. Dews as lifeguards. / MARCUS: Waterslide off the Lantern. Marcus Waterworks, bro. Derek's in. Derek? / DEREK: I'm in. I drive the van. That's my whole part.
+D1  28%  TALK   MARCUS: So. Marcus Waterworks. You're in, bro. I already told Derek you're in. | One thing first. We shut the pond road for a job. Padlocked it. Very | professional. Then I lost the key. Derek says that's on me. It's somewhere with | flowers, bro. I remember flowers.
+D1  28%  ARROW  FIND THE FLOW PROS KEY:  0 / 1
+D1  31%  TALK   ERIN: Leave sprouts in the soil a while. Leaf, then bud, then bloom. Bloomed | sprouts are faster and stronger. | PLUCK 3 BLOOMED: 1 / 3
+D1  31%  ARROW  PLUCK 3 BLOOMED:  1 / 3
+D1  32%  ARROW  DONE! GO SEE ERIN
+D1  33%  TALK   ERIN: Lovely work, Will! Here, take 15 petals and a capsule ticket. | You're a natural, Will. I've unlocked my garden for you! Go east through | the berry field, then north past the fence. I'll meet you there.
+D1  33%  ARROW  HARVEST 5 FLOWERS:  0 / 5
+D1  33%  CARD   NEW PROJECT!
+D1  36%  SAY    GARDENERS STAY AND WORK. HOLD B NEAR THEM TO CALL THEM BACK
+D1  36%  SAY    THE BEDS HAVE ALL THE GARDENERS THEY NEED. THE REST WAIT FOR YOU
+D1  39%  SAY    LOUIE LEARNED PACK LEADER: FETCHES GROUPS
+D1  40%    (helped: counted e5 as done)
+D1  40%  ARROW  DONE! GO SEE ERIN
+D1  41%  TALK   ERIN: Nicely done, Will! Here, take 20 petals. | Picked flowers land in the basket by the path. Walk over it to collect your | petals. The sign beside it picks which seeds get planted. Leave five | sprouts here as gardeners and we'll never run short.
+D1  41%  SAY    NEW BUG: BUTTERFLY!
+D1  41%  3D     <key> Five gardeners at work, and the far bed is turned over for the first time in years. / ERIN: That is not a bulb. / ERIN: FLOW PROS. That's Marcus's. He closed the pond road for a job, then lost the key. / Out west, past the crystal, a job site has been 'in progress' for a week.
+D1  41%  TALK   ERIN: You did it, Will! Here, take 20 petals and a capsule ticket. | That key the gardeners dug up says FLOW PROS. It's Marcus's. He closed the | pond road out west for a 'job' and lost it here. Have the crew carry it | home, then take it to his gate.
+D1  41%  ARROW  DONE! GO SEE SCOUT
+D1  43%  TALK   SCOUT: You did it! Here, take 15 petals. | Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest.
+D1  43%  ARROW  BEAT 3 GRUBS:  0 / 3
+D1  43%  TALK   SCOUT: Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest. | BEAT 3 GRUBS: 0 / 3
+D1  43%  TALK   SCOUT: Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest. | BEAT 3 GRUBS: 0 / 3
+D1  43%  TALK   SCOUT: Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest. | BEAT 3 GRUBS: 0 / 3
+D1  43%  TALK   SCOUT: Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest. | BEAT 3 GRUBS: 0 / 3
+D1  43%  TALK   SCOUT: Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest. | BEAT 3 GRUBS: 0 / 3
+D1  43%  TALK   SCOUT: Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest. | BEAT 3 GRUBS: 0 / 3
+D1  43%  TALK   SCOUT: Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest. | BEAT 3 GRUBS: 0 / 3
+D1  43%  TALK   SCOUT: Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest. | BEAT 3 GRUBS: 0 / 3
+D1  43%  TALK   SCOUT: Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest. | BEAT 3 GRUBS: 0 / 3
+D1  43%  TALK   SCOUT: Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest. | BEAT 3 GRUBS: 0 / 3
+D1  43%  TALK   SCOUT: Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest. | BEAT 3 GRUBS: 0 / 3
+D1  44%  TALK   SCOUT: Purple grubs spook sprouts back into the soil. Throw a bunch at one at once. | Embers shoo them off fastest. | BEAT 3 GRUBS: 0 / 3
+D1  53%    (helped: counted s3 as done)
+D1  53%  ARROW  DONE! GO SEE SCOUT
+D1  53%  SAY    A GLIMMER: A MOTE OF THE LANTERN. THREE HIDE IN EVERY PLACE
+D1  54%  TALK   SCOUT: Perfect! Here, take 20 petals. | Some bugs only come out at dusk, and one lives over water. Catch 4 different | kinds.
+D1  54%  ARROW  CATCH 4 KINDS OF BUGS:  2 / 4
+D1  57%  SAY    CAUGHT A LADYBUG!
+D1  58%  SAY    NEW BUG: BEE!
+D1  59%  SAY    CAUGHT A BEE!
+D1  59%  SAY    CAUGHT A BUTTERFLY!
+D1  60%  SAY    THE CROOKED RIVER. THROW SPROUTS AT THE STAKES TO BUILD A BRIDGE
+D1  62%    (helped: counted s4 as done)
+D1  62%  ARROW  DONE! GO SEE SCOUT
+D1  65%  TALK   SCOUT: Lovely work! Here, take 30 petals and a capsule ticket. | One more for the notebook, and it isn't a bug. A pale light walks at night. By | the Lantern, by the old arch at the falls. I've tried to draw her for a | year and never got close. You might. Go after dark. Walk, don't run.
+D1  65%  ARROW  SEE THE LANTERNWISP:  0 / 1
+D1  74%    (helped: counted s7 as done)
+D1  74%  ARROW  DONE! GO SEE SCOUT
+D1  77%  TALK   SCOUT: Nicely done! Here, take 30 petals and a capsule ticket. | Seen the little lights lying about? Glimmers. Motes of the Lantern, I | think, from when it cracked. Three in every place. Walk over one and | it's yours. Find me ten.
+D1  77%  ARROW  FIND 10 GLIMMERS:  1 / 10
 D1  82%  SAY    SUN'S GOING DOWN. NO RUSH.
-D1  88%    (helped: counted m3 as done)
-D1  88%  ARROW  DONE! GO SEE MARCUS
-D1  88%  SAY    ERIN'S ORDER IS FILLED
-D1  88%  TALK   MARCUS: AYYY! That's my guy. Bring it in, bro. *DAP* Here, take 20 petals and a | capsule ticket. | Double or nothing, bro. I bet you forty petals your little guys can't haul | eight berries home before the sun goes down. Today. Clock's running.
-D1  88%  ARROW  WIN THE BET: 8 BERRIES TODAY:  0 / 8
-D1  89%  SAY    THE BUDDIES COME AND SIT BY THE LIGHT AT NIGHT. NOBODY KNOWS WHY
-D1  92%  SAY    THE GARDEN GREW! 8 BEDS NOW
-D1  97%    (helped: counted m4 as done)
-D1  97%  ARROW  DONE! GO SEE MARCUS
-D1  99%  TALK   MARCUS: BROOO. Told you. Never doubted you once. Dap me up. *DAP* Here, take 40 | petals and a capsule ticket. | Waterworks is basically done, bro. In my head. Go enjoy that lantern.
-D1  99%  ARROW  SEND 5 SPROUTS HOME:  0 / 5
-D1  99%  CARD   NEW PROJECT!
 D1 100%  3D     <dream> Louie dreams. / In the dream the squirrel is enormous, and slow, and has it coming. / LOUIE: ...Woof? / He wakes. It was only a dream. Probably.
 D1 100%  ---- NIGHT / EVENING REPORT ----
 D2   0%  SAY    DAY 2. GOOD MORNING, WILL!   WILD SPROUTS GROW BACK WHERE YOU FOUND THEM
-D2   5%    (helped: counted e11 as done)
-D2   5%  ARROW  DONE! GO SEE ERIN
-D2   6%  CARD   RED BUTTON
-D2   6%  3D     <button> It says DO NOT PRESS. Everyone agrees that is very clear. / LOUIE: Boop. / Nothing happens. Far to the north, something that was asleep rolls over. / MARCUS: Bro. Did your dog just... nah. Nah. It's fine. It's probably fine.
-D2   8%  TALK   ERIN: Lovely work, Will! Here, take 25 petals. | Now, those shards. Fair warning: purple grubs are waking up out there. They | can't hurt a sprout, only spook it back into the soil, and Louie barks when | one's near. Grow the crew to 15 first.
-D2   8%  ARROW  HAVE 15 SPROUTS:  10 / 15
-D2  11%  SAY    LOUIE LEARNED DOGGY PADDLE: FETCHES FROM WATER
-D2  15%  SAY    NEW SEEDS: TULIPS! PICK THEM AT THE SEED SIGN
-D2  15%  SAY    ERIN'S ORDER IS FILLED
-D2  16%    (helped: counted e7 as done)
-D2  16%  ARROW  DONE! GO SEE ERIN
-D2  19%  TALK   ERIN: Nicely done, Will! Here, take 25 petals. | Four sun shards: one east, one north, one on the island out west, and one | down south with Old Thornback. Ranger, Scout and Marcus know the way.
-D2  19%  ARROW  BRING HOME 4 SHARDS:  1 / 4
-D2  27%  3D     <s2> Two shards home. The Lantern's light reaches the edge of the field now. / MARCUS: Bro. Found more of those marks by my pond. Something huge was dragging something warm. I could take it. Probably. / MARCUS: Trail heads south, into the hollow. Nobody goes in the hollow. ...You first though, bro. / LOUIE: Grr. ...Woof?
-D2  35%  CARD   NEW SPROUT: LEAF
-D2  35%  SAY    NEW SEEDS TAKE AFTER WHOEVER CARRIES THE BERRY HOME. SEND PEBS FOR PEBS, LEAFS FOR LEAFS
-D2  35%    (helped: a shard carried home)
-D2  35%  3D     <s3> Three shards. The nights are almost warm again. / RANGER: One left, and we know where it is. Old Thornback has slept in that hollow since before I was born. / ERIN: Go gently, Will. Bring plenty of sprouts, and bring Louie.
-D2  44%    (helped: Thornback woken)
-D2  44%  3D     <thorn> Old Thornback blinks awake. Tucked under his chin, glowing softly, is the last sun shard. / THORNBACK: ...Oh. Oh no. Is this yours? The nights got so cold. I only wanted the warm. / THORNBACK: I must have squeezed too tight. I heard a crack, and I ran. I'm sorry, little keeper. / THORNBACK: I was set to guard that light, long ago. I have forgotten who asked me. Or why. / RA
-D2  45%  CARD   NEW PROJECT!
-D2  50%    (helped: a shard carried home)
-D2  50%  ARROW  DONE! GO SEE ERIN
-D2  50%  3D     <blaze> The last shard slides home. / The Great Lantern blazes, and the whole valley turns gold. / ERIN: It's whole. Will, it's whole! ...Wait. Did you see that? / The Lantern skips. Like a picture jumping. Then it is fine. / THORNBACK: It did that before the crack, too. Every night. Keep... and a second word. I have lost it.
-D2  50%  TOAST  THE GREAT LANTERN IS WHOLE
-D2  55%  TALK   ERIN: It's whole, Will. And it still skips. I keep telling myself that's just | what old lanterns do. | You did it, Will! Here, take 50 petals and a capsule ticket. | The Lantern's whole and it still skips, and I can't fix that by staring at it. | A garden I can fix. More flowers open more beds. Let's fill this place.
-D2  55%  ARROW  HARVEST 30 FLOWERS:  24 / 30
-D2  55%  TALK   ERIN: The Lantern's whole and it still skips, and I can't fix that by staring at it. | A garden I can fix. More flowers open more beds. Let's fill this place. | HARVEST 30 FLOWERS: 24 / 30
-D2  55%  TALK   ERIN: The Lantern's whole and it still skips, and I can't fix that by staring at it. | A garden I can fix. More flowers open more beds. Let's fill this place. | HARVEST 30 FLOWERS: 24 / 30
-D2  60%  SAY    THE GARDEN GREW! 12 BEDS NOW
-D2  69%    (helped: counted e9 as done)
-D2  69%  ARROW  DONE! GO SEE ERIN
-D2  70%  SAY    NEW SEEDS: SUNFLOWERS! PICK THEM AT THE SEED SIGN
-D2  70%  TALK   ERIN: Perfect, Will! Here, take 60 petals and a capsule ticket. | I've started taking flower orders, Will. The banner at the top of the garden | shows what I need. Bigger flowers take longer but pay better, and every | third order earns a capsule ticket.
-D2  70%  ARROW  FILL 5 FLOWER ORDERS:  3 / 5
-D2  70%  SAY    NOW PLANTING TULIPS:  5 PETALS EACH
-D2  70%  SAY    NOW PLANTING SUNFLOWERS:  8 PETALS EACH
-D2  71%  SAY    NOW PLANTING DAISIES:  3 PETALS EACH
-D2  78%  SAY    NOW PLANTING TULIPS:  5 PETALS EACH
-D2  79%  SAY    NOW PLANTING SUNFLOWERS:  8 PETALS EACH
-D2  79%  SAY    NOW PLANTING DAISIES:  3 PETALS EACH
-D2  79%  SAY    NOW PLANTING TULIPS:  5 PETALS EACH
-D2  79%  SAY    NOW PLANTING SUNFLOWERS:  8 PETALS EACH
-D2  79%  SAY    NOW PLANTING DAISIES:  3 PETALS EACH
-D2  79%  SAY    NOW PLANTING TULIPS:  5 PETALS EACH
-D2  79%  SAY    NOW PLANTING SUNFLOWERS:  8 PETALS EACH
-D2  79%  SAY    NOW PLANTING DAISIES:  3 PETALS EACH
-D2  79%  SAY    NOW PLANTING TULIPS:  5 PETALS EACH
-D2  79%  SAY    NOW PLANTING SUNFLOWERS:  8 PETALS EACH
-D2  79%    (helped: counted e10 as done)
-D2  79%  ARROW  DONE! GO SEE ERIN
-D2  80%  TALK   ERIN: Lovely work, Will! Here, take 60 petals and a capsule ticket. | Look at it all, Will. The lantern's lit and the garden's blooming. Not bad | for the three of us.
-D2  80%  ARROW  FIND A PEB:  0 / 1
-D2  82%  SAY    SUN'S GOING DOWN. THE LANTERN IS RESTLESS TONIGHT
-D2  89%  CARD   NEW SPROUT: PEB
-D2  89%  ARROW  DONE! GO SEE RANGER
-D2  90%  SAY    THE LANTERN SKIPPED, LIKE A PICTURE JUMPING. THEN IT WAS FINE
-D2  90%  TALK   RANGER: Whole. Still skips. It did that when I was a boy. Nobody asked why. | You did it! Here, take 10 petals. | The west path is sealed with crystal. Only Pebs can smash it.
-D2  90%  ARROW  SMASH THE WEST CRYSTAL:  0 / 1
-D2  91%  CARD   NEW PROJECT!
-D2  92%  TALK   MARCUS: Whole lantern, bro. You know what a whole lantern needs? A waterslide. I'm | just saying. | Next idea: a hot tub. Heated by Embers. Don't tell Erin yet.
-D2  98%    (helped: crystal smashed)
-D2  98%  ARROW  UNLOCK THE POND ROAD
-D2  98%  SAY    THE KEY FITS. FLOW PROS ROLL THROUGH TO THE POND
-D2  98%  ARROW  DONE! GO SEE RANGER
-D2 100%  TALK   RANGER: Perfect! Here, take 15 petals. | One more path. A river cuts off the north end of the orchard, past Scout. | That's the Crooked River. Throw a crowd of sprouts at the stakes and they'll | build a bridge. Any kind will do. Willow Falls is on the other side.
-D2 100%  ARROW  BUILD THE ORCHARD BRIDGE:  0 / 1
+D2   1%  SAY    ERIN'S ORDER IS FILLED
+D2   1%  SAY    THE GARDEN GREW! 8 BEDS NOW
+D2   2%  CARD   GLASS MARBLE
+D2   8%    (helped: counted s5 as done)
+D2   8%  ARROW  DONE! GO SEE SCOUT
+D2  12%  SAY    CAUGHT A LADYBUG!
+D2  13%  TALK   SCOUT: You did it! Here, take 30 petals and a capsule ticket. | Ten! I'm drawing a map. Some are past the bridge, some out west, and I'd bet | the garden has its three. Twenty this time.
+D2  13%  ARROW  FIND 20 GLIMMERS:  2 / 20
+D2  82%  SAY    SUN'S GOING DOWN. NO RUSH.
 D2 100%  ---- NIGHT / EVENING REPORT ----
 D3   0%  SAY    DAY 3. GOOD MORNING, WILL!   RAIN TODAY: THE GARDEN WATERS ITSELF
-D3   4%  SAY    THE CROOKED RIVER. THROW SPROUTS AT THE STAKES TO BUILD A BRIDGE
-D3   4%  CARD   NEW SPROUT: LUCKY
-D3   4%  SAY    NEW SEEDS: MOONBLOOMS! PICK THEM AT THE SEED SIGN
-D3   7%    (helped: bridge built)
-D3   7%  ARROW  DONE! GO SEE RANGER
-D3  11%  TALK   RANGER: Lovely work! Here, take 25 petals. | Those marks led south, to Old Thornback's hollow. And you had already been | to see him. The old folk called him the guardian of the light. Looks like they | were right.
-D3  11%  TALK   RANGER: Nicely done! Here, take 50 petals and a capsule ticket. | One more. Not a chore. My grandmother set those posts. One for every road | a keeper might come in by. Nobody came. I kept them standing. Go stand at each | one. Let them get a look at you.
-D3  11%  ARROW  WALK THE FOUR TRAIL POSTS:  2 / 4
-D3  11%  TALK   RANGER: One more. Not a chore. My grandmother set those posts. One for every road | a keeper might come in by. Nobody came. I kept them standing. Go stand at each | one. Let them get a look at you. | WALK THE FOUR TRAIL POSTS: 2 / 4
-D3  78%  3D     <call> Night. The Great Lantern is whole again. And still, once a night, it skips. / LOUIE: Grr...? / This time the light does not settle. It gathers. It turns, slowly, like something looking. / East of the orchard the beam crosses old stone. A carved sun wakes. A hidden door grinds open. / Then it runs the length of the Crooked River, out to the Wending Lake. / On a rock in the la
-D3  78%  SAY    THE DOOR EAST OF THE ORCHARD IS OPEN
-D3  78%  ARROW  FOLLOW THE BEAM EAST
+D3   1%  SAY    CAUGHT A BUTTERFLY!
+D3   1%  SAY    NEW SEEDS: TULIPS! PICK THEM AT THE SEED SIGN
+D3   1%  SAY    NEW BUG: FROG!
+D3   1%  SAY    NEW BUG: SNAIL!
+D3   2%  SAY    ERIN'S ORDER IS FILLED
+D3   8%  SAY    THE GARDEN GREW! 12 BEDS NOW
+D3   9%    (helped: counted s6 as done)
+D3   9%  ARROW  DONE! GO SEE SCOUT
+D3   9%  SAY    NEW SEEDS: SUNFLOWERS! PICK THEM AT THE SEED SIGN
+D3  13%  TALK   SCOUT: Perfect! Here, take 50 petals and a capsule ticket. | That's the notebook full. It's in your Collection, under NOTEBOOK. Read it. | Somebody should.
+D3  13%  ARROW  BRING HOME THE KEY:  0 / 1
+D3  13%  CARD   NEW PROJECT!
+D3  17%  SAY    LOUIE LEARNED DOGGY PADDLE: FETCHES FROM WATER
 D3  82%  SAY    SUN'S GOING DOWN. NO RUSH.
-D3  86%    (helped: walked through the sun door)
-D3  86%  ARROW  BUILD THE OLD PIER
-D3  86%  3D     <coast> Past the door the trees stop. Sand. Wind. The Wending Lake, with no far side. / On a rock stands the NORTH LIGHT. Its lamp room is dark, and its lens lies cold at its foot. / LOUIE: ...Woof? / The pier is out. But sprouts can build, and a lens can be carried home to a light that still burns.
-D3  89%  SAY    AN OLD PIER. THROW SPROUTS AT THE STAKES TO BUILD IT
-D3  95%    (helped: pier built)
-D3  95%  ARROW  LOOK INSIDE THE NORTH LIGHT
-D3  96%  SAY    THE LAMP ROOM IS ANKLE DEEP IN OIL AND LAKE WATER. THIS WANTS A PLUMBER
-D3  96%  ARROW  THE LAMP ROOM LEAKS. TELL MARCUS
 D3 100%  ---- NIGHT / EVENING REPORT ----
 D4   0%  SAY    DAY 4. GOOD MORNING, WILL!
-D4   5%  TALK   MARCUS: Hold up. A lighthouse. Leaking. Bro... the call we got. 'It's leaking.' | Didn't say what. Didn't say where. THAT was the job. DEREK. We found the | job. | Bring me ten sprouts at the North Light. Pipes don't carry themselves. | Flow Pros, baby. | Blueprint sign's up by the pond, bro. Bring me sprouts. Like, a LOT of | sprouts.
-D4   5%  ARROW  FLOW PROS JOB: 10 SPROUTS TO THE LIGHT:  0 / 10
-D4  14%  SAY    MARCUS WANTS TEN SPROUTS HERE. YOU HAVE 3
-D4  14%    (helped: took ten sprouts to the North Light)
-D4  15%  SAY    LOUIE LEARNED GUARD DOG: SCARES GRUBS
-D4  17%  3D     <leak> Ten sprouts, two plumbers and forty feet of pipe go up the North Light. / DEREK: Whoever ran this oil line did it by candle. That is not up to code. / MARCUS: FIXED. Flow Pros, baby! Bill it to... wait. Derek. Who actually called us? / DEREK: No name. No number. Just a light on the line.
-D4  17%  SAY    THE LAMP ROOM IS DRY. THE LENS CAN GO HOME NOW
-D4  17%  ARROW  CARRY THE LENS TO THE LANTERN
-D4  17%  SAY    THE LENS OF THE NORTH LIGHT. HEAVY, AND A LONG WAY FROM HOME
-D4  21%  CARD   NEW SPROUT: DEW
-D4  26%    (helped: lens carried home)
-D4  26%  SAY    THE LENS IS HOME. TONIGHT THE LANTERN WILL WARM IT
-D4  26%  ARROW  WALK THE FOUR TRAIL POSTS:  2 / 4
-D4  36%    (helped: counted r6 as done)
-D4  36%  ARROW  DONE! GO SEE RANGER
-D4  39%  SAY    NO ROOM FOR MORE SPROUTS. SEND SOME HOME TO YOUR HOUSE
-D4  42%  TALK   RANGER: Tonight. I'll light the posts. Folk should be able to find their way. | You did it! Here, take 40 petals and a capsule ticket. | Paths are clear. Stay on the dirt.
-D4  42%  ARROW  BEAT 3 GRUBS:  2 / 3
-D4  47%  ARROW  DONE! GO SEE SCOUT
-D4  56%  TALK   SCOUT: Tonight? I'll bring both pencils. | Perfect! Here, take 20 petals. | Some bugs only come out at dusk, and one lives over water. Catch 4 different | kinds.
-D4  56%  TALK   SCOUT: Lovely work! Here, take 30 petals and a capsule ticket. | One more for the notebook, and it isn't a bug. A pale light walks at night. By | the Lantern, by the old arch at the falls. I've tried to draw her for a | year and never got close. You might. Go after dark. Walk, don't run.
-D4  56%  ARROW  SEE THE LANTERNWISP:  0 / 1
-D4  58%  SAY    NO ROOM FOR MORE SPROUTS. SEND SOME HOME TO YOUR HOUSE
-D4  60%  ARROW  TONIGHT THE LANTERN WARMS THE LENS
-D4  65%  SAY    LOUIE LEARNED TREASURE HOUND: FINDS TICKETS
-D4  67%  SAY    NO ROOM FOR MORE SPROUTS. SEND SOME HOME TO YOUR HOUSE
-D4  70%    (helped: counted s7 as done)
-D4  78%  3D     <relight> That night the Lantern warms the lens until it glows. The wisp who visits each night steps inside. / She was the North Light's last flame, waiting for a keeper to carry her home. / The North Light opens its eye. Out in the water, something very old lifts its head to look. / MARCUS: BRO. There is a lake monster. Nobody else name her. She's Bessie. I called it. / Two lights
-D4  78%  3D     <home> Two lights, talking across the valley. Everyone the valley has came out to watch. / ERIN: You did it, Will. You, Louie, and a few dozen very small friends. / MARCUS: That leak job, bro? It was the lighthouse all along. Derek fixed it. Don't tell him I said so. / SCOUT: There she is. I wrote all of it down. This time somebody will know who lit it. / RANGER: Both lit. Paths cl
-D4  78%  ARROW  DONE! GO SEE SCOUT
-D4  78%  CARD   NEW PROJECT!
-D4  80%  TALK   SCOUT: There she is. I wrote it all down, Will. This time somebody will know who lit | it. | Nicely done! Here, take 30 petals and a capsule ticket. | Seen the little lights lying about? Glimmers. Motes of the Lantern, I | think, from when it cracked. Three in every place. Walk over one and | it's yours. Find me ten.
-D4  80%  ARROW  FIND 10 GLIMMERS:  6 / 10
+D4   7%  CARD   FLOW PROS KEY
+D4   7%  ARROW  DONE! GO SEE ERIN
+D4  10%  TALK   ERIN: Perfect, Will! Here, take 15 petals. | Crew getting crowded? Our house is in the corner of the Lantern Field. Walk in | the front door and use the desk. Sprouts that move in live there and take a job: | picking berries, making petals or training Louie. You choose who does what.
+D4  10%  ARROW  DONE! GO SEE MARCUS
+D4  15%  TALK   MARCUS: AYYY! That's my guy. Bring it in, bro. *DAP* Here, take 20 petals. | First I need staff. Blue Dews grow on the north shore. They swim, nobody | else does. Go grab me a Dew, bro.
+D4  15%  ARROW  FIND A DEW:  0 / 1
+D4  22%    (helped: counted m1 as done)
+D4  22%  ARROW  DONE! GO SEE MARCUS
+D4  23%  SAY    NEW SEEDS: MOONBLOOMS! PICK THEM AT THE SEED SIGN
+D4  25%  TALK   MARCUS: BROOO. Told you. Never doubted you once. Dap me up. *DAP* Here, take 10 | petals. | See that island, bro? Future VIP section. There's a shard on it. | Send your Dews into the water and they'll swim out and haul it home. I'd do | it myself but these are new shoes.
+D4  25%  ARROW  BRING THE ISLAND SHARD:  0 / 1
+D4  34%    (helped: a shard carried home)
+D4  34%  ARROW  DONE! GO SEE MARCUS
+D4  34%  3D     <marks> The shard clicks back into place. The Lantern coughs, flickers, and glows a little brighter. / ERIN: One down, Will! Feel that? The soil's warming up already. / RANGER: Before you celebrate, come look at this. Something left marks by the lantern. Big ones. / ERIN: So it didn't just crack. Something cracked it. Keep your eyes open out there.
+D4  35%  TALK   MARCUS: LET'S GOOO! Waterworks is officially happening. Come here, bro. *DAP* Here, | take 30 petals. | Last thing. Waterworks needs a mascot. Dragonflies over the pond, | bro. Only a Dew can reach one. I've caught like a hundred. ...I've caught | zero. Send one!
+D4  35%  ARROW  CATCH A DRAGONFLY:  0 / 1
+D4  43%    (helped: counted m3 as done)
+D4  43%  ARROW  DONE! GO SEE MARCUS
+D4  43%  TALK   MARCUS: AYYY! That's my guy. Bring it in, bro. *DAP* Here, take 20 petals and a | capsule ticket. | Double or nothing, bro. I bet you forty petals your little guys can't haul | eight berries home before the sun goes down. Today. Clock's running.
+D4  43%  ARROW  WIN THE BET: 8 BERRIES TODAY:  0 / 8
+D4  44%  SAY    CAUGHT A LADYBUG!
+D4  52%    (helped: counted m4 as done)
+D4  52%  ARROW  DONE! GO SEE MARCUS
+D4  54%  TALK   MARCUS: BROOO. Told you. Never doubted you once. Dap me up. *DAP* Here, take 40 | petals and a capsule ticket. | Waterworks is basically done, bro. In my head. Go enjoy that lantern.
+D4  54%  ARROW  SEND 5 SPROUTS HOME:  0 / 5
+D4  54%  CARD   NEW PROJECT!
+D4  57%  SAY    CAUGHT A BUTTERFLY!
+D4  61%    (helped: counted e11 as done)
+D4  61%  ARROW  DONE! GO SEE ERIN
+D4  65%  TALK   ERIN: Lovely work, Will! Here, take 25 petals. | Now, those shards. Fair warning: purple grubs are waking up out there. They | can't hurt a sprout, only spook it back into the soil, and Louie barks when | one's near. Grow the crew to 15 first.
+D4  65%  TALK   ERIN: Nicely done, Will! Here, take 25 petals. | Four sun shards: one east, one north, one on the island out west, and one | down south with Old Thornback. Ranger, Scout and Marcus know the way.
+D4  65%  ARROW  BRING HOME 4 SHARDS:  1 / 4
+D4  71%  3D     <s2> Two shards home. The Lantern's light reaches the edge of the field now. / MARCUS: Bro. Found more of those marks by my pond. Something huge was dragging something warm. I could take it. Probably. / MARCUS: Trail heads south, into the hollow. Nobody goes in the hollow. ...You first though, bro. / LOUIE: Grr. ...Woof?
+D4  72%  SAY    GRUBS COME OUT AT DUSK AND MAKE FOR THE SOIL. THEY EAT SEEDLINGS. THROW SPROUTS AT THEM
+D4  79%  TALK   RANGER: Grey Pebs sleep up north. They carry double, and grubs can't budge them. | FIND A PEB: 0 / 1
+D4  79%  ARROW  FIND A PEB:  0 / 1
+D4  79%  3D     <s3> Three shards. The nights are almost warm again. / RANGER: One left, and we know where it is. Old Thornback has slept in that hollow since before I was born. / ERIN: Go gently, Will. Bring plenty of sprouts, and bring Louie.
+D4  81%  SAY    NEW BUG: MOTH!
 D4  82%  SAY    SUN'S GOING DOWN. NO RUSH.
-D4  89%    (helped: counted s5 as done)
-D4  89%  ARROW  DONE! GO SEE SCOUT
-D4  91%  TALK   SCOUT: You did it! Here, take 30 petals and a capsule ticket. | Ten! I'm drawing a map. Some are past the bridge, some out west, and I'd bet | the garden has its three. Twenty this time.
-D4  91%  ARROW  FIND 20 GLIMMERS:  8 / 20
-D4  99%    (helped: counted s6 as done)
-D4  99%  ARROW  DONE! GO SEE SCOUT
+D4  82%  CARD   NEW SPROUT: PEB
+D4  82%  ARROW  DONE! GO SEE RANGER
+D4  84%  SAY    NEW SEEDS TAKE AFTER WHOEVER CARRIES THE BERRY HOME. SEND PEBS FOR PEBS, LEAFS FOR LEAFS
+D4  84%  TALK   RANGER: You did it! Here, take 10 petals. | The west path is sealed with crystal. Only Pebs can smash it.
+D4  84%  ARROW  SMASH THE WEST CRYSTAL:  0 / 1
+D4  84%  CARD   NEW PROJECT!
+D4  85%  SAY    THE BUDDIES COME AND SIT BY THE LIGHT AT NIGHT. NOBODY KNOWS WHY
+D4  86%  SAY    WALK UP TO IT. YOU HAVE THE KEY
+D4  86%  TALK   MARCUS: See one, send one. That's the whole philosophy, bro. Write it down.
+D4  86%  ARROW  BRING HOME 4 SHARDS:  3 / 4
+D4  88%  SAY    THE LANTERN SKIPPED, LIKE A PICTURE JUMPING. THEN IT WAS FINE
+D4  95%  SAY    THE CRYSTAL SHATTERS!
+D4  95%  ARROW  UNLOCK THE POND ROAD
+D4  96%  SAY    THE KEY FITS. FLOW PROS ROLL THROUGH TO THE POND
+D4  96%  ARROW  DONE! GO SEE RANGER
+D4  96%  3D     <road> The key fits. It was Marcus's key the whole time. Marcus is as surprised as anyone. / MARCUS: DEREK. Start the van. Flow Pros is BACK in business. / DEREK: It's been running since Tuesday. / Flow Pros roll through to the Dew Pond at four miles an hour, windows up.
+D4  98%  TALK   RANGER: Perfect! Here, take 15 petals. | One more path. A river cuts off the north end of the orchard, past Scout. | That's the Crooked River. Throw a crowd of sprouts at the stakes and they'll | build a bridge. Any kind will do. Willow Falls is on the other side.
+D4  98%  ARROW  BUILD THE ORCHARD BRIDGE:  0 / 1
 D4 100%  ---- NIGHT / EVENING REPORT ----
 D5   0%  SAY    DAY 5. GOOD MORNING, WILL!   RAIN TODAY: THE GARDEN WATERS ITSELF
-D5   4%  TALK   SCOUT: Perfect! Here, take 50 petals and a capsule ticket. | That's the notebook full. It's in your Collection, under NOTEBOOK. Read it. | Somebody should.
-D5   4%  ARROW  SOMETHING OLD AT WILLOW FALLS
-D5   4%  CARD   NEW PROJECT!
-D5   8%  3D     <arch> Behind the willows stands an arch of old stone, older than any path in the valley. / ERIN: Look at the carving, Will. A lantern. Sprouts. And big creatures beside them. Buddies. / ERIN: There are words. '...promised to sprouts and buddies. Keep the...' The rest is worn away. / ERIN: And here, under the sun: SUN KEEP. Is that an order, or a name? / ERIN: Our house sits on sto
-D5   8%  ARROW  THE WEDDING BOOK:  5 / 6
-D5  10%  TOAST  10 GLIMMERS!  +1 TICKET
-D5  10%  SAY    NO ROOM FOR MORE SPROUTS. SEND SOME HOME TO YOUR HOUSE
-D5  97%    (helped: the wedding book is the goal now: on to the night)
-D5  97%  SAY    SUN'S GOING DOWN. NO RUSH.
-D5  98%  SAY    NO ROOM FOR MORE SPROUTS. SEND SOME HOME TO YOUR HOUSE
-D5  99%  SAY    NO ROOM FOR MORE SPROUTS. SEND SOME HOME TO YOUR HOUSE
+D5   4%  CARD   NEW SPROUT: LUCKY
+D5   4%  SAY    CAUGHT A BUTTERFLY!
+D5   7%    (helped: bridge built)
+D5   7%  ARROW  DONE! GO SEE RANGER
+D5  12%  TALK   RANGER: Lovely work! Here, take 25 petals. | Those marks lead south, to Old Thornback's hollow. The old folk called him | the guardian of the light. He sleeps like a boulder. It takes a whole crowd of | sprouts climbing on him to wake him.
+D5  12%  ARROW  WAKE OLD THORNBACK:  0 / 1
+D5  21%    (helped: Thornback woken)
+D5  21%  ARROW  DONE! GO SEE RANGER
+D5  21%  3D     <thorn> Old Thornback blinks awake. Tucked under his chin, glowing softly, is the last sun shard. / THORNBACK: ...Oh. Oh no. Is this yours? The nights got so cold. I only wanted the warm. / THORNBACK: I must have squeezed too tight. I heard a crack, and I ran. I'm sorry, little keeper. / THORNBACK: I was set to guard that light, long ago. I have forgotten who asked me. Or why. / RANGER: A guardian. So my grandmother's stories were true. I wish I'd listened to the rest of them. / ERIN: He wasn't stealing it. He was freezing. Will... there's room by the lantern, isn't there? / Thornback pads off toward the Lantern Field. Carry the shard home.
+D5  21%  CARD   NEW PROJECT!
+D5  23%  TALK   RANGER: Nicely done! Here, take 50 petals and a capsule ticket. | One more. Not a chore. My grandmother set those posts. One for every road | a keeper might come in by. Nobody came. I kept them standing. Go stand at each | one. Let them get a look at you.
+D5  23%  ARROW  WALK THE FOUR TRAIL POSTS:  2 / 4
+D5  28%  ARROW  SOMETHING OLD AT WILLOW FALLS
+D5  36%  3D     <arch> Behind the willows stands an arch of old stone, older than any path in the valley. / ERIN: Look at the carving, Will. A lantern. Sprouts. And big creatures beside them. Buddies. / ERIN: There are words. '...promised to sprouts and buddies. Keep the...' The rest is worn away. / ERIN: And here, under the sun: SUN KEEP. Is that an order, or a name? / ERIN: Our house sits on stones just like these. Somebody kept this light before us. / LOUIE: Woof. / Erin starts calling the Lantern Field 'Sunkeep'. It sticks.
+D5  36%    (helped: read the arch)
+D5  36%  ARROW  BUILD: SWIM SPOT
+D5  45%    (helped: counted r6 as done)
+D5  45%  ARROW  DONE! GO SEE RANGER
+D5  45%  TALK   RANGER: You did it! Here, take 40 petals and a capsule ticket. | Paths are clear. Stay on the dirt.
+D5  45%  ARROW  BRING HOME 4 SHARDS:  3 / 4
+D5  54%    (helped: a shard carried home)
+D5  54%  ARROW  DONE! GO SEE ERIN
+D5  54%  3D     <blaze> The last shard slides home. / The Great Lantern blazes, and the whole valley turns gold. / ERIN: It's whole. Will, it's whole! ...Wait. Did you see that? / The Lantern skips. Like a picture jumping. Then it is fine. / THORNBACK: It did that before the crack, too. Every night. Keep... and a second word. I have lost it.
+D5  54%  TOAST  THE GREAT LANTERN IS WHOLE
+D5  55%  SAY    LOUIE LEARNED GUARD DOG: SCARES GRUBS
+D5  58%  TALK   ERIN: It's whole, Will. And it still skips. I keep telling myself that's just | what old lanterns do. | You did it, Will! Here, take 50 petals and a capsule ticket. | The Lantern's whole and it still skips, and I can't fix that by staring at it. | A garden I can fix. More flowers open more beds. Let's fill this place.
+D5  58%  TALK   ERIN: Perfect, Will! Here, take 60 petals and a capsule ticket. | I've started taking flower orders, Will. The banner at the top of the garden | shows what I need. Bigger flowers take longer but pay better, and every | third order earns a capsule ticket.
+D5  58%  ARROW  FILL 5 FLOWER ORDERS:  3 / 5
+D5  61%  SAY    DUG UP: BLUE FEATHER!  CARRY IT HOME TO THE LANTERN
+D5  67%    (helped: counted e10 as done)
+D5  67%  ARROW  DONE! GO SEE ERIN
+D5  68%  CARD   BLUE FEATHER
+D5  68%  TALK   ERIN: Lovely work, Will! Here, take 60 petals and a capsule ticket. | Look at it all, Will. The lantern's lit and the garden's blooming. Not bad | for the three of us.
+D5  68%  ARROW  BUILD: SWIM SPOT
+D5  75%  SAY    CAUGHT A FROG!
+D5  76%  CARD   NEW SPROUT: DEW
+D5  82%  SAY    SUN'S GOING DOWN. THE LANTERN IS RESTLESS TONIGHT
 D5 100%  ---- NIGHT / EVENING REPORT ----
 D6   0%  SAY    DAY 6. GOOD MORNING, WILL!
-D6   2%  SAY    NO ROOM FOR MORE SPROUTS. SEND SOME HOME TO YOUR HOUSE
-D6  97%    (helped: the wedding book is the goal now: on to the night)
-D6  97%  SAY    SUN'S GOING DOWN. NO RUSH.
+D6   4%  SAY    CAUGHT A FROG!
+D6  72%  SAY    GRUBS ARE MAKING FOR THE SOIL
+D6  72%  3D     <watch> Dusk. Something purple is coming out of the east trees, and it is hungry. / THORNBACK: Not tonight. / It goes home. Thornback goes back to sleep. He was not asleep.
+D6  78%  3D     <call> Night. The Great Lantern is whole again. And still, once a night, it skips. / LOUIE: Grr...? / This time the light does not settle. It gathers. It turns, slowly, like something looking. / East of the orchard the beam crosses old stone. A carved sun wakes. A hidden door grinds open. / Then it runs the length of the Crooked River, out to the Wending Lake. / On a rock in the lake stands a second lantern, long dark. For one breath, it answers. / THORNBACK: Two lights. I remember now. One to keep. One to call. / ERIN: So that's the skip. It has been calling every night, and nobody ever answered. / By morning the beam is gone. The door east of the orchard is still open.
+D6  78%  SAY    THE DOOR EAST OF THE ORCHARD IS OPEN
+D6  78%  ARROW  FOLLOW THE BEAM EAST
+D6  82%  SAY    SUN'S GOING DOWN. NO RUSH.
+D6  86%    (helped: walked through the sun door)
+D6  86%  ARROW  BUILD THE OLD PIER
+D6  86%  3D     <coast> Past the door the trees stop. Sand. Wind. The Wending Lake, with no far side. / On a rock stands the NORTH LIGHT. Its lamp room is dark, and its lens lies cold at its foot. / LOUIE: ...Woof? / The pier is out. But sprouts can build, and a lens can be carried home to a light that still burns.
+D6  88%  SAY    AN OLD PIER. THROW SPROUTS AT THE STAKES TO BUILD IT
+D6  93%  SAY    THE PIER IS BUILT! THE NORTH LIGHT IS IN REACH
+D6  93%  ARROW  LOOK INSIDE THE NORTH LIGHT
+D6  94%  SAY    THE LAMP ROOM IS ANKLE DEEP IN OIL AND LAKE WATER. THIS WANTS A PLUMBER
+D6  94%  ARROW  THE LAMP ROOM LEAKS. TELL MARCUS
 D6 100%  ---- NIGHT / EVENING REPORT ----
 D7   0%  SAY    DAY 7. GOOD MORNING, WILL!
-
+D7   2%  SAY    LOUIE LEARNED TREASURE HOUND: FINDS TICKETS
+D7   2%  TALK   MARCUS: Hold up. A lighthouse. Leaking. Bro... the call we got. 'It's leaking.' | Didn't say what. Didn't say where. THAT was the job. DEREK. We found the | job. | Bring me ten sprouts at the North Light. Pipes don't carry themselves. | Flow Pros, baby. | Blueprint sign's up by the pond, bro. Bring me sprouts. Like, a LOT of | sprouts.
+D7   2%    (helped: walked to Marcus)
+D7   2%  ARROW  FLOW PROS JOB: 10 SPROUTS TO THE LIGHT:  9 / 10
+D7  11%    (helped: took ten sprouts to the North Light)
+D7  12%  3D     <leak> Ten sprouts, two plumbers and forty feet of pipe go up the North Light. / DEREK: Whoever ran this oil line did it by candle. That is not up to code. / MARCUS: FIXED. Flow Pros, baby! Bill it to... wait. Derek. Who actually called us? / DEREK: No name. No number. Just a light on the line.
+D7  12%  SAY    THE LAMP ROOM IS DRY. THE LENS CAN GO HOME NOW
+D7  12%  ARROW  CARRY THE LENS TO THE LANTERN
+D7  12%  SAY    THE LENS OF THE NORTH LIGHT. HEAVY, AND A LONG WAY FROM HOME
+D7  15%  SAY    CAUGHT A FROG!
+D7  15%  SAY    NEW BUG: CRAB!
+D7  21%    (helped: lens carried home)
+D7  21%  ARROW  BUILD: SWIM SPOT
+D7  21%  3D     <lens> Ten sprouts and one cold lens come through the sun door. It takes most of an afternoon. / MARCUS: Bro. That is the biggest contact lens I have ever seen in my life. / ERIN: Set it down by the Lantern. Gently. Tonight we find out what it's for.
+D7  21%  SAY    THE LENS IS HOME. TONIGHT THE LANTERN WILL WARM IT
+D7  24%  SAY    NO ROOM FOR MORE SPROUTS. SEND SOME HOME TO YOUR HOUSE
+D7  26%  SAY    CAUGHT A FROG!
+D7  97%    (helped: other (BUILD: SWIM SPOT): on to the night)
+D7  97%  ARROW  TONIGHT THE LANTERN WARMS THE LENS
+D7  97%  SAY    SUN'S GOING DOWN. NO RUSH.
+D7  97%  3D     <relight> That night the Lantern warms the lens until it glows. The wisp who visits each night steps inside. / She was the North Light's last flame, waiting for a keeper to carry her home. / The North Light opens its eye. Out in the water, something very old lifts its head to look. / MARCUS: BRO. There is a lake monster. Nobody else name her. She's Bessie. I called it. / Two lights, talking across the valley. The Lantern does not skip that night.
+D7  97%  3D     <home> Two lights, talking across the valley. Everyone the valley has came out to watch. / ERIN: You did it, Will. You, Louie, and a few dozen very small friends. / MARCUS: That leak job, bro? It was the lighthouse all along. Derek fixed it. Don't tell him I said so. / SCOUT: There she is. I wrote all of it down. This time somebody will know who lit it. / RANGER: Both lit. Paths clear. ...Somebody came, in the end. / THORNBACK: Warm. Finally warm. I'll keep watch at night, if you'll have me. / Nobody remembers who lit the Great Lantern first. This time, somebody wrote down who lit it again. / THORNBACK: Keep. Call. And a third thing, under the mountain. It hummed. I did not like it.
+D7  97%  ARROW  THE WEDDING BOOK:  5 / 6
+D7  97%  CARD   NEW PROJECT!
+D7 100%  ---- NIGHT / EVENING REPORT ----
+D8   0%  SAY    DAY 8. GOOD MORNING, WILL!   RAIN TODAY: THE GARDEN WATERS ITSELF
+D8   2%  SAY    NO ROOM FOR MORE SPROUTS. SEND SOME HOME TO YOUR HOUSE
+D8   5%  SAY    CAUGHT A FROG!
+D8  97%    (helped: the wedding book is the goal now: on to the night)
+D8  97%  SAY    SUN'S GOING DOWN. NO RUSH.
+D8 100%  ---- NIGHT / EVENING REPORT ----
+D9   0%  SAY    DAY 9. GOOD MORNING, WILL!
+D9   2%  SAY    CAUGHT A BUTTERFLY!
+D9   2%  SAY    NO ROOM FOR MORE SPROUTS. SEND SOME HOME TO YOUR HOUSE
+D9  97%    (helped: the wedding book is the goal now: on to the night)
+D9  97%  SAY    SUN'S GOING DOWN. NO RUSH.
+D9  97%  SAY    GRUBS ARE MAKING FOR THE SOIL
+D9 100%  ---- NIGHT / EVENING REPORT ----
+D10   0%  SAY    DAY 10. GOOD MORNING, WILL!   RAIN TODAY: THE GARDEN WATERS ITSELF
+D10   2%  SAY    CAUGHT A BUTTERFLY!
+D10   2%  SAY    NO ROOM FOR MORE SPROUTS. SEND SOME HOME TO YOUR HOUSE
+D10  97%    (helped: the wedding book is the goal now: on to the night)
+D10  97%  SAY    SUN'S GOING DOWN. NO RUSH.
+D10  97%  3D     <rest> The third night the North Light's beam slows, and lowers, like an eye closing. / RANGER: Not out. Resting. It's been answered. That's the old way. / An ember stays in the lamp room. It is not out. It is waiting until it is needed.
+{"day":10,"dayT":236,"state":"play","crew":24,"soil":59,"shards":4,"deliv":15,"petals":2253,"stuck":140,"ms":["Edone","Rdone","Sdone","Mdone"]}
+BAD [] []
+exit 0

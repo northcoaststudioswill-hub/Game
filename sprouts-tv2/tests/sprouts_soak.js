@@ -18,6 +18,7 @@ const SEEDS = +(process.argv[3] || 2), DAYS = +(process.argv[4] || 2), LATE = +(
     /* TV: no cartridge to pick; the keys below walk the real way in (any button, studio card, title, menu) */
     const E = s => page.evaluate(s => __g.ev(s), s);
     for (let i = 0; i < 60 && (await E('state')) !== 'menu'; i++) { await page.keyboard.press('Enter', { delay: 70 }); await page.waitForTimeout(200); }
+    await E('HOLD=1;void 0'); /* from here the test owns the clock: the page's own loop and timers stand still */
     return { page, E, errs }; };
   const ok = (name, cond, info) => { if (!cond) fail++; console.log((cond ? 'PASS ' : 'FAIL ') + name + (info !== undefined ? '  ' + JSON.stringify(info) : '')); };
   { const { page, E, errs } = await open();

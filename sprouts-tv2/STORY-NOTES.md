@@ -102,6 +102,60 @@ until the valley can spare us. But soon. Write that down: soon." / Louie: "Woof.
 **Derek at the van:** "MARCUS OWES ME FOR GAS." "A LAZY RIVER. HIS IDEA." (both his own, from Lightswarm) and "THAT IS
 NOT UP TO CODE. NONE OF THIS IS."
 
+## New scenes, second round (Nov 19) — all of these lines are Claude's
+
+Will asked for more cutscenes and said he likes the van humor ("a little Cheech and Chong vibe"). None of the lines
+below is his. Keep, change or cut any of them.
+
+**The paths** (first talk with Ranger). "North of the Lantern a man is straightening a trail post that was already
+straight." / Ranger: "You came in by the south road. I cleared that one last week. Didn't think anybody would use it."
+/ "Forty years of clearing roads for keepers. You're the first one to walk in on one." Then his first ask opens with
+"Ranger. Two paths are blocked. You look like you can throw."
+*Proposed:* Will arrived by the south road; Ranger has kept the roads forty years (this matches his trail post ask).
+
+**The notebook** (first talk with Scout). "In the berry field somebody is lying flat in the grass, writing." / Scout:
+"Shh. Ladybug. ...Gone. That's all right. I got the spots. Seven." / "You're the new keeper. I wrote that down this
+morning. Now I get to cross out 'probably'." Then: "I'm Scout. I write things down. Everything, really. Somebody has
+to. Want to help?"
+
+**The pond road** (the key opens the job site). "The key fits. It was Marcus's key the whole time. Marcus is as
+surprised as anyone." / Marcus: "DEREK. Start the van. Flow Pros is BACK in business." / Derek: "It's been running
+since Tuesday." / "Flow Pros roll through to the Dew Pond at four miles an hour, windows up."
+
+**The lens** (the lens reaches the Lantern by day). "Ten sprouts and one cold lens come through the sun door. It takes
+most of an afternoon." / Marcus: "Bro. That is the biggest contact lens I have ever seen in my life." / Erin: "Set it
+down by the Lantern. Gently. Tonight we find out what it's for."
+
+**Not tonight** (Thornback's first watch). "Dusk. Something purple is coming out of the east trees, and it is hungry."
+/ Thornback: "Not tonight." / "It goes home. Thornback goes back to sleep. He was not asleep."
+
+**At rest** (third night after the ending). "The third night the North Light's beam slows, and lowers, like an eye
+closing." / Ranger: "Not out. Resting. It's been answered. That's the old way." / "An ember stays in the lamp room. It
+is not out. It is waiting until it is needed."
+*Proposed:* "the old way" says lights have been answered and rested before. That is new lore and it is mine.
+
+**The driest place** (hidden: the van in the rain). "It is raining. The Flow Pros van is the driest place in the
+valley, and has been for some time." / Marcus: "Bro. What if rain is just the sky taking a shower." / Derek:
+"...Marcus. The sky IS the shower." / "Will says nothing. Will has been looking at his own hand for some time now." /
+Louie: "Woof."
+
+**Eleven berries** (hidden: the van after a ten berry day). "Ten berries came home today. Eleven were picked. Marcus
+is looking at the sky." / Marcus: "Bro. These are the best berries I have ever had in my entire life." / Derek: "Those
+were for the Lantern." / Marcus: "The Lantern's had plenty, bro. Look at it. It's GLOWING." / Erin: "...Marcus." /
+Marcus: "...I'll plant some."
+
+**Who is it** (hidden: the van, a night after the session). "After dark. The van is fogged from the inside. Will
+knocks." / Marcus: "Who is it?" / "It's Will. Will says so." / Marcus: "Will's not here, bro." / Derek: "...Marcus.
+That IS Will." / Marcus: "Nah. Will's outside."
+This one is a nod to Cheech and Chong's "Dave's not here" routine, since Will named them. The wording is new, the
+shape of the joke is theirs. Say if that is closer than you want.
+
+**Ranger, when only the coast's trail post is left and the sun door is still shut** (not a scene, a line): "Three have
+had a look at you. The fourth is east of the orchard, behind a stone door I have never once seen open. It'll keep. So
+will I."
+
+**Changed in older scenes this round:** no lines. Only where people stand, where they look, and the van.
+
 ## Left alone
 
 - The van jokes. The review asks what they are for; that is Will's call, and he asked for them.

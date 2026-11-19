@@ -22,7 +22,8 @@ TV or Pocket Lantern save in the same browser.
 - **Marcus on day one.** Flow Pros are locked out of their own job site, so the van is by the west path.
 - **Ranger and Scout are people.** Each has a story ask, a line for every turn of the story, and Scout's notebook is a
   page of the Collection that fills in with what the valley finds out.
-- **Every story scene is 3D.** 25 scenes, 116 shots (16 story, 9 hidden).
+- **Every story scene is 3D.** 34 scenes, 152 shots (22 story, 12 hidden). Ranger and Scout each get a scene the
+  first time Will meets them, and the van drives nose first with Derek at the wheel.
 - **Calmer.** Rank-ups, baskets, daily asks and rewards are read out in the evening report, not popped up all day.
 - **Things to do after the ending.** The wedding book, expeditions, the notebook, night grubs, rain days.
 - **New ways to play.** Photo mode, a second controller as Louie, Louie's morning.
@@ -49,14 +50,16 @@ story is in [STORY-NOTES.md](STORY-NOTES.md), marked as Claude's.
 - `build.py` writes both builds. `src/game.js` is the game, `src/sprouts3d.js` the 3D scenes, house, title and photo
   mode, `src/buddies.js` the wild buddies' art. `src/shell.html` is the television page, `src/shell-pocket.html` the
   phone page. One line in `game.js` (`POCKET`) is the only difference between the builds.
-- `tests/tv2.js` (48 checks) covers what this copy adds. `tests/tv.js` (34) the television screen and controller.
-  `tests/pocket.js` (16) the phone build. `tests/sprouts_coast.js` (183), `sprouts_valley.js` (50) and
-  `sprouts_story.js` (17) the game itself. `tests/sprouts_playthrough.js` plays the whole story and prints it in order;
+- `tests/tv2.js` (52 checks) covers what this copy adds. `tests/scenes.js` (36) the second round of cutscenes.
+  `tests/tv.js` (34) the television screen and controller. `tests/pocket.js` (16) the phone build.
+  `tests/sprouts_coast.js` (188), `sprouts_valley.js` (50) and `sprouts_story.js` (17) the game itself. The stepped
+  suites hold the game's own clock still (`HOLD`), so a run is the same every time. `tests/sprouts_playthrough.js` plays the whole story and prints it in order;
   the last run is `playtest/story-run.txt`.
 
 ## Not done, and not tested
 
 - Not played by hand, on a television, on a phone, with a real controller, or listened to. Controllers and touch were
   simulated in the tests.
-- `sprouts_story.js` is driven by an autopilot and fails about one run in ten when a stray card cuts in.
+- `sprouts_story.js` is driven by an autopilot that plays with the game's own dice. It failed one run in four on
+  Nov 19 and passed the next three.
 - The older copies (`alt/` and `sprouts-tv/`) still exist and do not get these changes.
