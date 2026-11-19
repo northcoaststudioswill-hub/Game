@@ -1,11 +1,11 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.52 (2026-11-19).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.53 (2026-11-19).
 
 ## Waiting on you
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
 - **Names:** Kestrel Dray (was Wren Halloran) and Severin Cade (was Tyr Cade) are in. Say if either should change, and whether Tyr was who you meant by the Jackal.
 - **Celestine knew him at the Pinning** (v0.44) still wants your yes or no.
-- **The High Docks:** the empty level and shut gate in v0.50 was the first sun being walkable-past; fixed in v0.52. The v0.49 lock was never reproduced. Tell me if either comes back.
+- **The High Docks:** the empty, locked level was a broken save from v0.49 (quay cleared, no key); v0.53 mends it and adds START THIS LEVEL AGAIN. What made that save is still unknown. Tell me if the gate refuses again.
 
 ## Untested, built blind (check these first when playing)
 - Air hook, air cut and thrown weapons (v0.51).
@@ -14,7 +14,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - Controller: legend, right stick in fights, pause menu on the stick (v0.49).
 
 ## Characters and animation
-0. **The run in the comic levels.** Still looks wrong. Find a reference run cycle (key poses for a fighter's run: contact, down, passing, up) and rebuild Kael's from it; then the guards' jog from the same.
+0. **The run in the comic levels.** Lean halved and cape fixed in v0.53 from side-on frames; needs your eye in motion. Next: arms (the weapon arm barely moves), and the guards' jog checked the same way.
 1. **Guards:** better models and their own set of strikes, blocks and stances, so they stop looking like they are jogging at you. Use the same rigs in cutscenes.
 2. **Kael in the arena fights:** arms, hands, blade, legs and body brought up to his head; a ready stance and small movement in held shots.
 3. **Capes:** both kinds were changed this round; they need looking at in motion and probably another pass.

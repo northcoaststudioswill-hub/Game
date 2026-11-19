@@ -18,6 +18,7 @@
   }
 //@@ENCDONE
   function encDone(id) {
+    if (id === 'street') F.key = 1;   // the key first, before anything else can go wrong: a save with the quay cleared and no key is a level nobody can finish
     setFlag('e_' + id);
     if (id === 'alley') U.toast('DOCK GUARD. ON THE STAIR ALREADY, WITH THEIR LAMPS LIT.', 3.5);
     if (id === 'street') { F.key = 1; save(); SC.audio.sfx('clue'); U.toast('THE STAIR BLADE CARRIED A *YARD KEY*. HIGH DOCKS FREIGHT.', 4); }
@@ -235,7 +236,7 @@
       { who: 'cap', text: 'A signal hut. The lamp inside is aimed straight down the Spire, and the glass is still warm.' },
       { who: 'hero', text: 'They did not only know. They *answered*. Every Warden under the docks is on that stair by now.' }]) });
     W.addInteract({ id: 'gate', x: 18, y: 0, z: 7.1, fx: 18, fz: 5.8, r: 2.2, label: 'OPEN GATE', marker: 'act', mh: 2.6, when: () => F.e_alley && !F.gate, act: () => {
-      if (!F.key) { U.toast('LOCKED. SOMEBODY ON THIS QUAY CARRIES THE KEY.', 2.6); SC.audio.sfx('deny'); return; }
+      if (!F.key && !F.e_street) { U.toast('LOCKED. SOMEBODY ON THIS QUAY CARRIES THE KEY.', 2.6); SC.audio.sfx('deny'); return; }
       W.openDoor('gate'); SC.audio.sfx('door'); setFlag('gate'); U.toast('THE GATE ROLLS BACK.', 2); } });
     W.addInteract({ id: 'breaker', x: 31.1, y: 0, z: -8, fx: 32, fz: -8, r: 2, label: 'BREAKER', marker: 'act', mh: 2.6, when: () => F.e_yard && !F.breaker, act: () => {
       setFlag('breaker'); W.openDoor('shutter'); SC.audio.sfx('door'); pl.control = false; U.showHud(false); SC.emit('letterbox', true);
@@ -255,6 +256,7 @@
         _pv.copy(who.pos); _pv.y += who.h + 0.5; FX.word(SC.pick(['THERE. THE CLERK!', 'IT IS HIM. TO ME!', 'SORREL! HOLD HIM!']), _pv, '#ff3b30', 1.4); SC.audio.sfx('alert'); objective(); };
       W.dyn.push((t, dt) => { if (SC.state !== 'play') return;
         if (seen !== (SC.cleared || 0)) { if (!pl.control) return; seen = SC.cleared || 0; post(); }
+        if (F.e_street && !F.key) { F.key = 1; save(); objective(); U.toast('THE STAIR BLADE CARRIED A *YARD KEY*. HIGH DOCKS FREIGHT.', 4); }   // mends a save made by v0.49: the quay cleared, the key never handed over, so the level came back empty and locked every time
         talkT -= dt; let spoke = false;
         for (const id of POST) { const e = ENC[id]; if (e.posted !== 1) continue; const mem = SC.enemies.filter(m => m.enc === e && m.state === 'wait'); if (!mem.length) { e.posted = 2; continue; }
           for (const m of mem) { const o = mem[m.postI ^ 1] || mem[(m.postI + 1) % mem.length]; if (o && o !== m) m.yaw = SC.dampAng(m.yaw, Math.atan2(o.pos.x - m.pos.x, o.pos.z - m.pos.z) + Math.sin(t * 0.4 + m.postI) * 0.5, 2, dt); }

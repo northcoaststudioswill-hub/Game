@@ -1,4 +1,21 @@
-# SOOTBORN — changelog (latest v0.52 · 2026-11-19) 
+# SOOTBORN — changelog (latest v0.53 · 2026-11-19)
+
+## v0.53 · 2026-11-19 — a docks save that came back empty and locked every time, mended; the run looked at frame by frame
+From playing: the first comic level spawns you with no dialogue, nothing starts, and the door will not open.
+
+- **What had happened.** The level keeps its place between sessions. Yours was holding a save in which the quay had been cleared but the yard key had never been handed over. Loading that gives exactly what you saw: no opening scene (it has been played), no guards (they are down), and a gate that asks for a key nobody is left to carry. Every version since has loaded the same save.
+- **Mended four ways.**
+  - That save now repairs itself: a cleared quay with no key hands the key over within a second of loading.
+  - The key is given before anything else when the quay is cleared, so no later fault can separate the two.
+  - The gate opens for a cleared quay whether or not the key is held.
+  - **START THIS LEVEL AGAIN** is in the pause menu, under I AM STUCK. It wipes the level's place and plays it from its opening.
+- Tested by building that broken save by hand and loading it: the key appears and the gate rolls back.
+- I still do not know what made the save in the first place (it was made on v0.49). If the gate ever refuses again, I AM STUCK opens it.
+
+**The run, from a reference cycle**
+- I rendered the run as eight side-on frames and looked at it properly for the first time. Two things were plainly wrong: he was pitched forward like a man falling, and the cape stood straight out behind him like a board, because the cape is hinged to his chest and my forward lean had tipped it level.
+- He now leans about half as far. The cape hangs down his back and swings with the stride. The stride itself (reach, knee lift, the moment both feet are off the ground) reads correctly in the frames.
+- Still judged from stills. Tell me how it looks moving.
 
 ## v0.52 · 2026-11-19 — the docks would not start in v0.50: found
 From playing v0.50: nobody on the docks ever came, and the gate stayed shut.
