@@ -4,13 +4,29 @@
 // so the story is told with close-ups and tableaux, not only with pans and zooms.
 // Each panel draws on a 320x180 canvas: fn(g, t, stage, st)  (t = time on panel, st = time in stage)
 // ============================================================
+const FUTURE_PANELS = new Set(['gild', 'lesson', 'assay', 'spire', 'desk', 'ledger', 'ante', 'weather', 'dockstair', 'dawn']);
 const Panels = {
   c: null, g: null, sil: {},
   draw(g, p) {
     if (!this.c) [this.c, this.g] = mk(320, 180);
     const pg = this.g; pg.globalAlpha = 1; pg.globalCompositeOperation = 'source-over'; pg.fillStyle = '#07050a'; pg.fillRect(0, 0, 320, 180);
     this.narrow = W < 320; const fn = PANELS[p.id]; if (fn) fn(pg, p.t, p.stage, p.st);
+    this.finish(pg, p);
     g.fillStyle = '#07050a'; g.fillRect(0, 0, W, H); g.drawImage(this.c, Math.round((W - 320) / 2), Math.round((H - 180) / 2)); // portrait shows the middle 208px: panels keep their focus there
+  },
+  // the same last pass on every panel, so memories and things not yet happened each have a look: drifting motes, a closing vignette, a slow sweep of light, grain,
+  // and for the years ahead a thin gilt plate line, as if the scene were already engraved somewhere.
+  finish(g, p) {
+    const fut = FUTURE_PANELS.has(p.id), t = p.t, rm = Settings.d.reduce;
+    g.globalCompositeOperation = 'lighter';
+    if (!rm) { const sx = ((t * 14) % 520) - 100, gr = g.createLinearGradient(sx, 0, sx + 90, 0); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(.5, fut ? 'rgba(255,224,150,.05)' : 'rgba(255,170,110,.035)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(sx, 0, 90, 180); }
+    for (let i = 0; i < (rm ? 0 : 16); i++) { const a = hash(i * 7 + 1, 3), b = hash(i * 3 + 2, 9), sp = 2 + a * 5, x = (a * 320 + Math.sin(t * .4 + i) * 6 + t * (fut ? 1.5 : -1)) % 320, y = fut ? 180 - ((b * 180 + t * sp) % 190) : (b * 180 + t * sp) % 190, k = .12 + .1 * Math.sin(t * 1.3 + i * 2);
+      g.fillStyle = fut ? `rgba(255,220,140,${k})` : `rgba(210,190,170,${k * .8})`; g.fillRect((x + 320) % 320 | 0, y | 0, 1, 1); }
+    g.globalCompositeOperation = 'source-over';
+    if (!this.vg) { const [c, vg] = mk(320, 180), gr = vg.createRadialGradient(160, 84, 70, 160, 90, 200); gr.addColorStop(0, 'rgba(5,3,8,0)'); gr.addColorStop(.7, 'rgba(5,3,8,.28)'); gr.addColorStop(1, 'rgba(5,3,8,.72)'); vg.fillStyle = gr; vg.fillRect(0, 0, 320, 180); this.vg = c; }
+    g.drawImage(this.vg, 0, 0);
+    if (!rm) { g.fillStyle = 'rgba(255,255,255,.035)'; const f = (t * 24) | 0; for (let i = 0; i < 26; i++) g.fillRect((hash(i + f * 13, f) * 320) | 0, (hash(f, i + f * 7) * 180) | 0, 1, 1); }
+    if (fut) { const x0 = this.narrow ? 58 : 3, x1 = this.narrow ? 262 : 317; g.fillStyle = 'rgba(232,194,90,.5)'; g.fillRect(x0, 3, x1 - x0, 1); g.fillRect(x0, 3, 1, 9); g.fillRect(x1 - 1, 3, 1, 9); g.fillStyle = 'rgba(232,194,90,.9)'; g.fillRect(x0, 3, 5, 1); g.fillRect(x1 - 5, 3, 5, 1); g.fillRect(x0, 3, 1, 5); g.fillRect(x1 - 1, 3, 1, 5); }
   },
   // a character sprite as a flat dark shape, for figures against a light
   shape(id, dir, col) { const k = id + dir + col; if (!this.sil[k]) { const s = World.sheetFor(id), fh = s.fh || 16, [c, g] = mk(16, fh); g.drawImage(s, 0, dir * fh, 16, fh, 0, 0, 16, fh); g.globalCompositeOperation = 'source-in'; g.fillStyle = col; g.fillRect(0, 0, 16, fh); c.fh = fh; this.sil[k] = c; } return this.sil[k]; }
@@ -186,6 +202,11 @@ const PANELS = {
   // ---- two years in the weather (0: the hidden fleet · 1: they learn to fly)
   weather(g, t, st, s) {
     const { R, glow, plate } = PX; const gr = g.createLinearGradient(0, 0, 0, 180); gr.addColorStop(0, '#2a3a7a'); gr.addColorStop(.6, '#c8a0b0'); gr.addColorStop(1, '#f0d0b0'); g.fillStyle = gr; g.fillRect(0, 0, 320, 180); glow(g, 250, 120, 80, '255,220,170', .5);
+    for (let i = 0; i < 40; i++) { const a2 = hash(i, 11), b2 = hash(i, 23); R(g, a2 * 320, b2 * 60, 1, 1, `rgba(255,255,255,${.15 + .35 * Math.abs(Math.sin(t * .8 + i))})`); }
+    g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 9; i++) { const an = -2.9 + i * .34 + Math.sin(t * .2) * .03; g.fillStyle = 'rgba(255,214,150,.045)'; g.beginPath(); g.moveTo(250, 122); g.lineTo(250 + Math.cos(an) * 260, 122 + Math.sin(an) * 260); g.lineTo(250 + Math.cos(an + .12) * 260, 122 + Math.sin(an + .12) * 260); g.fill(); } g.globalCompositeOperation = 'source-over';
+    R(g, 240, 112, 20, 20, '#fff0c8'); R(g, 243, 109, 14, 26, '#fff0c8'); R(g, 237, 115, 26, 14, '#fff0c8'); R(g, 244, 116, 12, 12, '#fffbe8');
+    for (let i = 0; i < 26; i++) { const x = ((i * 23 + t * 1.2) % 360) - 20, y = 78 + (i % 5) * 4 + Math.sin(t * .5 + i) * 1; R(g, x, y, 6, 2, '#3a3a52'); R(g, x + 1, y - 1, 3, 1, '#4a4a62'); if (i % 3 === 0) R(g, x + 5, y, 1, 1, '#ffc060'); if (i % 2) R(g, x + 6, y + 1, 17, 1, 'rgba(40,40,60,.35)'); }
+    for (let i = 0; i < 7; i++) { const x = ((t * 9 + i * 13) % 380) - 30, y = 40 + i * 3 + Math.sin(t * 2 + i) * 3, w = Math.sin(t * 9 + i) > 0 ? 1 : 0; R(g, x, y - w, 2, 1, '#1a1a2a'); R(g, x + 2, y, 1, 1, '#1a1a2a'); R(g, x + 3, y - w, 2, 1, '#1a1a2a'); }
     for (let L = 0; L < 4; L++) for (let i = 0; i < 7; i++) { const x = ((i * 64 + t * (2 + L * 2) + L * 30) % 440) - 60, y = 60 + L * 30 + (i % 2) * 8, a = .35 + L * .16; R(g, x, y, 70, 12, `rgba(255,${240 - L * 10},${236 - L * 16},${a})`); R(g, x + 12, y - 6, 40, 8, `rgba(255,255,255,${a})`); if (L === 1 || L === 2) { const bx = x + 18 + (i * 7) % 20; if (i % 2) { R(g, bx, y - 2, 24, 5, '#2a2c3a'); R(g, bx + 4, y - 5, 12, 3, '#3a3c4a'); R(g, bx + 22, y, 1, 1, '#ffb040'); } } }
     if (st >= 1) { R(g, 0, 148, 320, 32, '#2a2c3a'); R(g, 0, 148, 320, 2, '#5a5c6c'); for (let x = 0; x < 320; x += 20) R(g, x, 142, 2, 8, '#3a3c4a'); R(g, 0, 142, 320, 1, '#4a4c5c'); const ids = ['hollis', 'ivo', 'nell', 'kit', 'juno', 'dace']; for (let i = 0; i < 6; i++) PX.spr(g, World.sheetFor(ids[i]), 1, 40 + i * 44 + (i % 2) * 6, 166, 2); PX.spr(g, World.sheetFor('ilse'), 0, 290, 168, 2.4); if (st >= 2) { g.fillStyle = 'rgba(20,16,30,.45)'; g.fillRect(0, 0, 320, 180); PX.spr(g, World.sheetFor('kael2'), 3, 132, 172, 3.4); PX.spr(g, World.sheetFor('tavi'), 2, 190, 172, 3.2); glow(g, 250, 60, 70, '255,236,170', .5); R(g, 244, 54, 12, 12, '#fff6c0'); } }
     if (st === 0) plate(g, 'FOUR HUNDRED BARGES, IN THE WEATHER', 160, 168);

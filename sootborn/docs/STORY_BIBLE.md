@@ -280,6 +280,31 @@ Playable 2D levels above the rock, in the game's own pixel style, with gilded Ka
 
 New names: Petra Lune and Oswin Hale (House Violet cadets).
 
+### Levels outside the Assay (v0.28)
+| Level | When | What you do | What it answers |
+|---|---|---|---|
+| **The Count hall** | +5, the Spire | Only if he chose to lose the Tier Four order: take it from the Marshal's tray and misfile it in the dead letters, past two Wardens and Maren | What the Count physically is; that he has struck 406 lines himself and learned every one; that Maren has the sealed pairings open at "Aldane, T. / Sorrel, E." with a box drawn round both |
+| **The Sun** | +5, below | You are Tavi, twelve. Chalk Seren's sun back on the Pillar past the night watch | That Cinderwell kept her sun for five years; Tavi kept the leaf; Kael's commitment notice is still up; Sull has started looking the other way ("I'm seeing less every year") and leaves one ray |
+
+| **The Last Night** | Night 49, the Assay | No enemies. Walk the camp, speak to Petra, Oswin, a Teal cadet and Lucan (under truce), then sit at the fire | Petra will keep a column of the Count by winter; "noted" is the only word the Accredited have for thanks and it means a debt; thirty of Teal came over because their House was bought; Amber came in on day 34; Lucan would like to understand; Kael finally eats Teo's bread |
+
+### The world above, lived in (v0.28)
+Rule: every level above the rock has things to read that nobody points at, the way Cinderwell has posters and tins.
+- **The Count-Out.** The Accredited have a nursery counting game ("one, two, the line is true") sung to the shift song in a major key. They carried the tune up Lift Zero generations ago and forgot whose it was. The ending track (Dawn) is the same tune in the same key.
+- **Their thanks is a debt.** "Noted" means: I have written down what you owe me. They have no other word.
+- **They draw suns too.** A child's slate in a cadet's tent; a drawing hidden in a clerk's kneehole. Yellow.
+- **The Proctors' cache.** Salve, bread and oil under a white ribbon in the middle of a starving camp: "A result must be earned." One winter cloak is packed for 480 cadets.
+- **The lintel.** Every Assay's names are cut into the pump house; a gold nail for a winner, a scored line for the dead.
+- **The same eye.** The Watcher standard over the dais is the same cloth as the one over Ashgate Square.
+- **Two mottos.** Over the Count hall: A BALANCED LINE IS A QUIET LINE, cut over an older EVERY LINE IS A PERSON.
+- **Greens.** A clerk leaves more surface greens on his plate than Nell's ward is skimmed in a month.
+- **How the flash-forwards look:** gilt plate line, gold motes rising, vignette. Memories below: ash falling.
+
+### Training and chapter 3 (v0.28)
+- **No Gloves** (+2½): Brand makes him take the gloves off a year early. "Ilse is teaching you to pass. I am teaching you to live." The Turn is "not being where the halberd is." Brand on Hollis: "He did not turn round. He finished the bar he was on."
+- **Lucan before The Son:** Kael says "aye" to him, the first time Lucan has heard the word. If Kael read the glass on the dais, he tells Lucan what Celestine wrote ("No further than he can walk"). Lucan: "I reached the last day. I have been proud of it for two years."
+- **The night before the docks, Freight Three:** Dace comes up for the first time in seven years and cannot face the sky. Kael wrote the watch rota; Maren took it "for copying". Brand says the name Hollis aloud for the first time.
+
 ## Part Two additions (v0.27)
 - **Maren Aldane**, Second Clerk of the Count, Teo's elder sister. She likes Edric Sorrel's sums. She has the key to the sealed pairings and reads who was in Teo's room. At +7 she gives the dock office the hour of the raid ("For Teo Aldane. Balanced."), which is why the guards were waiting and why Brand had to hold the stair. At +9 she stands alone at the white door with a pen. Flags: `marenKind` (he told her Teo was kind), `marenDoor` (he told her the truth and she opened the door; she then keeps the new Count, a list of names read aloud, Teo's first).
 - **The low point.** Kael loses Brand to somebody who had the right. He sits on a barge for most of a month and counts nothing. A weeping seal gets him up.

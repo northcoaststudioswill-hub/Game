@@ -258,12 +258,19 @@ function stoneAt(g, x, y, w, h, col, mortar) {
 // The Assay valley at night: pines for walls, grass, trodden paths, the river, and marble for anything the Proctors stand on.
 function valleyTile(g, m, tx, ty, ch, x, y, r, r2, R, at) {
   const grass = () => { R(0, 0, 16, 16, r < .5 ? '#1c3826' : '#1f3d29'); for (let i = 0; i < 5; i++) { const a = hash(tx * 7 + i, ty * 3 + 2), b = hash(tx * 2 + i, ty * 9 + 4); R((a * 15) | 0, (b * 14) | 0, 1, 2, i % 2 ? '#2a5234' : '#163020'); } if (r2 > .86) { const sx = 3 + (r2 * 40 | 0) % 9, sy = 4 + (r * 40 | 0) % 8; R(sx, sy, 1, 1, '#d8d0f0'); R(sx, sy + 1, 1, 2, '#2a5234'); } };
+  if (m.theme === 'spire' && ch === '#') {
+    if (at(0, 1) !== '#') { R(0, 0, 16, 16, '#e4e0ee'); R(0, 0, 16, 2, '#ffffff'); for (let i = 0; i < 16; i += 8) { R(i, 2, 1, 11, '#c4c0d2'); R(i + 1, 2, 1, 11, '#f4f2fa'); } R(0, 12, 16, 2, '#e8c25a'); R(0, 12, 16, 1, '#fff0b0'); R(0, 14, 16, 2, '#8a8698');
+      if ((tx % 5) === 2) { R(4, 2, 8, 9, '#0c1430'); R(4, 2, 8, 1, '#e8c25a'); R(4, 10, 8, 1, '#e8c25a'); R(3, 2, 1, 9, '#e8c25a'); R(12, 2, 1, 9, '#e8c25a'); R(6, 4, 1, 1, '#ffffff'); R(10, 7, 1, 1, '#c8d8ff'); R(7, 8, 1, 1, '#ffffff'); } }
+    else { R(0, 0, 16, 16, '#d0ccde'); R(0, 0, 16, 1, '#e8e4f2'); if (r > .6) R(3 + (r2 * 8 | 0), 5, 5, 1, '#bab6ca'); }
+    return; }
+  if (m.theme === 'spire' && ch !== '=' && ch !== ',') { ch = '='; }
   if (ch === '#') {
     if (at(0, 1) !== '#') { grass(); R(6, 6, 4, 10, '#2a1c14'); R(6, 6, 1, 10, '#3e2a1c'); R(9, 6, 1, 10, '#1a100c'); R(3, 14, 10, 2, 'rgba(0,0,0,.3)');
       for (const [a, b, w] of [[5, -6, 6], [3, -2, 10], [1, 2, 14], [0, 6, 16]]) { R(a, b, w, 4, '#14301f'); R(a, b, w, 1, '#1e4a2c'); R(a + 1, b + 3, w - 2, 1, '#0c2014'); } R(7, -8, 2, 2, '#1e4a2c'); }
     else { R(0, 0, 16, 16, '#0c1c13'); for (let i = 0; i < 4; i++) { const a = hash(tx * 5 + i, ty * 3 + 1), b = hash(tx + i * 7, ty * 5 + 2), sx = (a * 11) | 0, sy = (b * 11) | 0, c = ['#14301f', '#183826', '#102818'][i % 3]; R(sx, sy + 1, 6, 4, c); R(sx + 1, sy, 4, 6, c); R(sx + 1, sy, 3, 1, '#225032'); } }
     return; }
   if (ch === '~') { R(0, 0, 16, 16, '#12263a'); R(0, 0, 16, 1, '#1c3852'); for (let i = 0; i < 3; i++) { const a = hash(tx * 3 + i, ty * 7 + 1); R((a * 12) | 0, 3 + i * 5, 4, 1, i % 2 ? '#2a5070' : '#3a6a8a'); } if (at(-1, 0) !== '~') R(0, 0, 2, 16, '#2a3a2a'); if (at(1, 0) !== '~') R(14, 0, 2, 16, '#22301f'); return; }
+  if (ch === ',' && m.theme === 'spire') { R(0, 0, 16, 16, '#6a2a3a'); R(0, 0, 16, 1, '#8a3a4c'); R(0, 0, 1, 16, '#e8c25a'); R(15, 0, 1, 16, '#e8c25a'); if ((ty & 1) === 0) R(6, 6, 4, 4, '#7a3244'); return; }
   if (ch === ',') { R(0, 0, 16, 16, r < .5 ? '#3a3226' : '#40372a'); for (let i = 0; i < 5; i++) { const a = hash(tx * 7 + i, ty + 3), b = hash(tx + i, ty * 9 + 5); R((a * 14) | 0, (b * 14) | 0, 2, 1, i % 2 ? '#2c261c' : '#544838'); } if (at(-1, 0) === '~' || at(1, 0) === '~') { R(2, 3, 5, 3, '#6a6a70'); R(2, 3, 5, 1, '#8a8a92'); R(9, 9, 5, 3, '#62626a'); R(9, 9, 5, 1, '#84848c'); } return; }
   if (ch === '=') { const c = ((tx + ty) & 1) ? '#b8b4c4' : '#c4c0d0'; R(0, 0, 16, 16, c); R(0, 0, 16, 1, '#e0dcec'); R(0, 0, 1, 16, '#d4d0e0'); R(15, 0, 1, 16, '#8a8698'); R(0, 15, 16, 1, '#8a8698'); if (r2 > .7) R(4 + (r2 * 30 | 0) % 8, 6, 3, 1, '#a09cb0'); if (at(0, 1) !== '=' && at(0, 1) !== 'x') { R(0, 13, 16, 3, '#e8c25a'); R(0, 13, 16, 1, '#fff0b0'); } return; }
   grass();
@@ -271,7 +278,7 @@ function valleyTile(g, m, tx, ty, ch, x, y, r, r2, R, at) {
 function drawTile(g, m, tx, ty) {
   const ch = m.grid[ty][tx], x = tx * 16, y = ty * 16, r = hash(tx + m.seed, ty), r2 = hash(tx * 3 + 11, ty * 7 + m.seed), R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); };
   const at = (dx, dy) => { const yy = ty + dy, xx = tx + dx; return yy < 0 || yy >= m.h || xx < 0 || xx >= m.w ? '#' : m.grid[yy][xx]; };
-  if (m.theme === 'valley') return valleyTile(g, m, tx, ty, ch, x, y, r, r2, R, at);
+  if (m.theme === 'valley' || m.theme === 'spire') return valleyTile(g, m, tx, ty, ch, x, y, r, r2, R, at);
   const below = at(0, 1), th = m.theme, home = th === 'home', clinic = th === 'clinic', bay = th === 'bay', tunnel = th === 'tunnel';
   if (isWall(ch)) {
     if (!isWall(below)) { // ---- wall face
@@ -352,6 +359,9 @@ const PROPS = {
   teallamp(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(7, -6, 2, 20, '#3a3038'); R(4, 13, 8, 2, '#2a2228'); R(4, -12, 8, 7, a ? '#3a3a44' : '#e8c060'); R(5, -11, 6, 5, a ? '#2a2a32' : '#fff0b0'); R(3, -13, 10, 1, '#8a7a5a'); },
   lectern(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(3, 6, 10, 9, '#c8c4d4'); R(3, 6, 10, 1, '#f0ecf8'); R(12, 7, 1, 8, '#8a8698'); R(1, 1, 14, 6, '#e8e4f0'); R(1, 1, 14, 1, '#ffffff'); R(2, 2, 12, 4, a === 1 ? '#f4eedc' : a === 2 ? '#2a2630' : '#f4eedc'); R(8, 2, 1, 4, '#b8a880'); if (a === 2) { R(4, 3, 8, 2, '#4ad8e0'); R(5, 3, 2, 1, '#d8ffff'); } else { R(3, 3, 4, 1, '#3a2e22'); R(3, 5, 3, 1, '#3a2e22'); R(10, 3, 3, 1, a === 3 ? '#a02a1a' : '#3a2e22'); } },
   canopy(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }, w = (a || 3) * 16; R(0, -20, w, 6, '#f4f2ec'); R(0, -20, w, 1, '#ffffff'); R(0, -15, w, 1, '#e8c25a'); for (let i = 0; i < w; i += 8) R(i, -14, 4, 3, '#e8c25a'); R(1, -14, 2, 28, '#d8d4e0'); R(w - 3, -14, 2, 28, '#d8d4e0'); },
+  holes(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }, w = (a || 2) * 16; R(0, -12, w, 27, '#5a4630'); R(0, -12, w, 1, '#8a6c48'); R(0, 14, w, 1, '#2a2016'); for (let j = 0; j < 4; j++) for (let i = 0; i < w / 8; i++) { R(1 + i * 8, -10 + j * 6, 6, 5, '#2a2016'); if (hash(i * 3 + x, j * 7 + y) > .35) { R(2 + i * 8, -8 + j * 6, 4, 3, '#f4eedc'); R(2 + i * 8, -8 + j * 6, 4, 1, hash(i + x, j) > .7 ? '#a02a1a' : '#d8ceb0'); } } R(0, -14, w, 2, '#e8c25a'); },
+  cdesk(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(0, 2, 32, 12, '#7a5c3c'); R(0, 2, 32, 2, '#a88458'); R(0, 13, 32, 1, '#3a2a1a'); R(1, 14, 3, 2, '#3a2a1a'); R(28, 14, 3, 2, '#3a2a1a'); R(4, 0, 12, 5, '#f4eedc'); R(4, 0, 12, 1, '#ffffff'); R(10, 0, 1, 5, '#b8a880'); R(5, 2, 4, 1, '#3a2e22'); R(12, 2, 3, 1, '#3a2e22'); R(20, 1, 3, 3, '#1a1420'); R(21, -2, 1, 3, '#d8d0c0'); if (a) { R(25, -3, 4, 6, '#e8c060'); R(26, -2, 2, 4, '#fff0b0'); } },
+  countbook(g, x, y) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(2, 6, 28, 9, '#c8c4d4'); R(2, 6, 28, 1, '#f0ecf8'); R(0, 14, 32, 2, '#e8c25a'); R(1, -2, 30, 9, '#f4eedc'); R(1, -2, 30, 1, '#ffffff'); R(15, -2, 2, 9, '#b8a880'); for (let j = 0; j < 3; j++) { R(3, j * 2, 10, 1, '#3a2e22'); R(19, j * 2, 10, 1, j === 1 ? '#a02a1a' : '#3a2e22'); } R(0, -3, 32, 1, '#e8c25a'); },
   bedroll(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(1, 6, 14, 7, a || '#7a5ac8'); R(1, 6, 14, 1, '#e8e0d0'); R(1, 6, 4, 7, '#e8e0d0'); R(2, 8, 2, 3, '#d8b8a0'); },
   bed(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(0, 2, 32, 30, PAL.woodD); R(2, 3, 28, 26, '#b8a890'); R(4, 4, 12, 7, PAL.cream); R(2, 13, 28, 16, '#2e5a5e'); for (let i = 0; i < 28; i += 4) R(2 + i, 15, 2, 12, '#356a6c'); R(0, 29, 32, 3, '#1a100c'); },
   table(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(1, 4, 30, 9, PAL.wood2); R(1, 4, 30, 2, '#6a4a34'); R(3, 13, 2, 3, PAL.woodD); R(27, 13, 2, 3, PAL.woodD); R(6, 1, 4, 5, '#c8b898'); R(6, 1, 4, 1, '#3a2a20'); R(17, 5, 9, 6, '#d8d0c0'); R(18, 6, 6, 1, '#6a6a6a'); R(18, 8, 5, 1, '#6a6a6a'); },

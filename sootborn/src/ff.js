@@ -147,6 +147,10 @@ const FF = {
       hurt: 'HE HITS ME WHERE THE WIRE WENT IN. HE SAYS THEY WILL TOO.', fury: 'HE SAYS: DO NOT SPEND IT. BANK IT. I AM TRYING.', half: 'HE IS SMILING. I HAVE NOT SEEN THAT BEFORE.', eleven: 'ELEVEN. HE COUNTS ALONG WITH ME.' },
     arts: [{ at: .55, name: 'CLOSED TEETH', line: 'THE SHIFT SONG HAS NO WORDS. YOU HUM IT TO KEEP TIME ON THE WHEEL. I KEEP TIME ON HIM.', panel: 'pipe', kind: 'storm', rgb: '255,170,70', hex: '#ffaa46' }]
   }),
+  drill2: () => Object.assign(FF.drill(), { newMove: 'NEW: THE TURN. GUARD JUST AS HE SWINGS AND YOU COME OUT BEHIND HIM', title: 'NO GLOVES', sub: 'BRAND - THE SECOND YEAR', winText: 'AGAIN. BUT BETTER',
+    foes: [{ id: 'brand', name: 'Brand', kind: 'baton', hp: 56, k2: { triple: 1 } }], taunt: { 0: ['DO NOT STOP IT. TURN IT.', 'WHERE WERE YOUR FEET?', 'AN HEIR WOULD BE DEAD.', 'AGAIN.'] },
+    voice: { at: [[1, 'NO GLOVES. THE GRIP SITS ON THE OLD BURNS LIKE IT WAS CUT FOR THEM.'], [11, 'HE SWINGS WHERE A WARDEN SWINGS. I KNOW WHERE THAT IS. I HAVE BEEN UNDER IT.'], [22, 'STEP IN. LET IT PASS. BE BEHIND HIM. IT IS A VALVE. YOU DO NOT STOP PRESSURE. YOU SEND IT SOMEWHERE.']], hurt: 'THAT ONE I TRIED TO STOP. HE IS RIGHT. I CANNOT.', fury: 'BANK IT. HE SAYS IT EVERY DAY. BANK IT.', half: 'HE IS BREATHING HARD. HE IS FIFTY. HE HAS NOT SAID SO.', eleven: 'ELEVEN. HE DOES NOT COUNT ALONG THIS TIME. HE IS BUSY.' },
+    arts: [{ at: .6, name: 'NOT THOSE', line: 'SHE TOOK THE BONES AND THE THROAT AND THE EYES. I SAID: NOT THE HANDS. THOSE ARE BANK SEVEN.', panel: 'hands', kind: 'storm', rgb: '255,170,70', hex: '#ffaa46' }, { at: .28, name: 'THE BAR', line: 'HOLLIS DID NOT TURN ROUND. HE FINISHED THE BAR HE WAS ON. SO WILL I.', panel: 'pipe', kind: 'rise', rgb: '255,120,60', hex: '#ff783c' }] }),
   furnace: () => ({ title: 'THREE STEPS', sub: 'THE WARDEN', bg: 'furnace', arena: { kind: 'rect', w: 200, h: 80 }, music: 'mystery', doomed: 9, hero: { hp: 4, fury0: 80 }, voice: { at: [[.4, 'THREE STEPS.'], [3, 'IT IS LIKE HITTING THE ARRAY ITSELF.'], [6, 'SHE IS STILL LOOKING AT ME.']], eleven: 'I HIT HIM WITH EVERYTHING I WILL EVER BE. HE DOES NOT MOVE.' }, foes: [{ id: 'warden', name: 'Warden', kind: 'warden', hp: 999, sc: 1.1 }] })
 };
 // ---- the intro before the title: the Assay, start to finish, in thirty seconds
@@ -245,6 +249,20 @@ const DREAM1 = () => [
 ];
 const DREAM2 = () => [
   { card: 'THAT NIGHT', sub: 'The dream again. It is getting longer.', min: 1.4, max: 4 },
+  { panel: 'gild' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'The second year. I could walk. I could say "granted" without tasting it. I still wore the gloves.' },
+  { say: 'brand', t: 'Take them off.' },
+  { say: 'kael', t: 'Ilse said a year.' },
+  { say: 'brand', t: 'Ilse is teaching you to pass. I am teaching you to live. Every heir you meet has been handed a blade since he was six and has never once been hit. You have been hit all your breath. That is the only thing you have that they do not. Take them off and use it.' },
+  { say: 'brand', t: 'I am going to swing at your head. Do not stop it. You cannot. Step into it and let it go past, and be standing behind me when it lands. They call it the Turn. I call it not being where the halberd is.' },
+  { fade: 'out' }, { panel: null }, { card: 'TWO AND A HALF YEARS FROM NOW', sub: 'The pit. Brand. No gloves.', big: 1, min: 1.5, max: 4.5 },
+  { brawl: () => FF.drill2() },
+  { panel: 'hands' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'He looked at my palms afterwards, the way a man looks at a tool he sold once. He knew what a valve burn was. He had stood guard over the people who got them.' },
+  { say: 'brand', t: 'I hit a welder in the back once, for humming. He did not turn round. He finished the bar he was on. I have thought about that bar every day since.' },
+  { say: 'brand', t: 'When you get up there, boy, do not let them teach you it was ever a fair fight. It was never a fight. That is what the halberds are for.' },
+  { fx: () => { G.flags.fury = (G.flags.fury || 0) + 1; } },
+  { fade: 'out' },
   { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'The Assay. Every year the Accredited put their heirs, the year they come of age, into a walled valley with real steel and no rule that matters, and wait to see who walks out leading the rest.' },
   { pstage: 1 }, { wait: 2.2 },

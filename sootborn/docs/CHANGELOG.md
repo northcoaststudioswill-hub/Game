@@ -1,5 +1,37 @@
 # SOOTBORN — changelog
 
+## v0.28 · 2026-11-19 — Part Two on foot, a fourth Assay level, a second training bout, nicer flash-forwards, a lived-in world above
+From play notes: keep fleshing out where the game is thin; more detail, more cutscenes.
+
+**Two more playable 2D levels** (Dev menu → Assay missions, and in the story)
+- **The Count hall** (Part Two, chapter 2): if you choose "Lose it. Buy a day", you now do it. After the bell, take the Tier Four order from the Marshal's tray and misfile it in the dead letters, past two Wardens and Maren Aldane working late. The Count itself and Maren's desk can be read. New white-and-gold Spire tiles, desks, pigeonholes, the Count on its stand.
+- **The Sun** (below, five years on): you play Tavi, twelve, putting Seren's chalk sun back on the Pillar past Sull's night watch. This is the first time Part Two goes back below between chapters.
+- That makes six playable 2D levels outside Days 1 and 2.
+
+**Training years**
+- **No Gloves** (2D, start of Day 2's dream): a second bout with Brand in the second year. It teaches the Turn. Two new Memory Arts (NOT THOSE, THE BAR), and scenes with Brand before and after.
+
+**Chapter 3 (What She Knows) had two fights and nothing between them**
+- Before The Son: Lucan and Kael on the keep. Kael says "aye" to him. If you read the viewing glass on the dais, Lucan learns what his mother wrote about him.
+- Before the High Docks: the night in Freight Three. Dace comes up for the first time in seven years. The rota, and who took it for copying. Brand says Hollis's name.
+
+**A fourth Assay level: The Last Night** (night 49, before the Keep)
+- No enemies. Walk the camp the night before the last day. Petra, Oswin, a Teal cadet who came over, and Lucan under a truce cloth on the far bank. Then sit at the fire and eat Teo's bread.
+
+**The flash-forward scenes look better**
+- Every illustrated panel gets a finishing pass: a closing vignette, drifting motes (gold rising for the years ahead, ash falling for memories), a slow sweep of light and a little grain. Panels set in the future carry a thin gilt plate line. "Reduce motion & flicker" turns the moving parts off.
+- The weather panel gains a sun with rays, stars, a far line of moored barges with lamps, and a flock.
+
+**A world that is lived in, above the rock** (the way Cinderwell already is)
+- Things to read in every level: what the heirs packed and did not pack; a child's slate with a sun drawn on it; the Proctors' sealed cache forty paces from hungry cadets; names cut into the pump-house lintel, most scored through; House Teal's ranking board; a mother's letter about the sum placed on her daughter's House; the one cloak packed for 480 cadets; the Watcher's eye, the same cloth above as below; the two mottos over the Count hall, one cut over the other; a clerk's uneaten greens; a child's drawing hidden in a kneehole.
+- **The Count-Out.** A cadet hums the shift song in a bright key. It is an Accredited nursery game. They took the tune up the lift with them and forgot whose it was. (From research: in the source the hero finds the rulers' traditional dances resemble his own people's; this is our version, with a song.)
+- More endings: Lucan, Ilse, Tavi.
+
+**Engine**
+- Cutscene steps can be conditional (`when`). Missions can use another hero sprite and place name.
+
+**Checked:** every new level completes by script and its patrols run their routes; one bot run from the start of Day 3 through Day 4 and all five Part Two chapters to THE END, clicking the real "Wake up" and "Continue" buttons, with no errors. **Not checked:** nobody has played them; stealth difficulty is a guess.
+
 ## v0.27 · 2026-11-19 — the Assay on foot, the second arc, a fall, and the Gilding in full
 From play notes: make the call on the open canon and finish the doc; more scenes, better content, more polish; a playable 2D mission in the Assay, and more than one; the other romance arc; more scenes that feed Kael's rage; new memories of Seren; more of Ilse and the transformation; use these moments to fill lore gaps.
 

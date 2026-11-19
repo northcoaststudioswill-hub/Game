@@ -746,12 +746,19 @@ function stoneAt(g, x, y, w, h, col, mortar) {
 // The Assay valley at night: pines for walls, grass, trodden paths, the river, and marble for anything the Proctors stand on.
 function valleyTile(g, m, tx, ty, ch, x, y, r, r2, R, at) {
   const grass = () => { R(0, 0, 16, 16, r < .5 ? '#1c3826' : '#1f3d29'); for (let i = 0; i < 5; i++) { const a = hash(tx * 7 + i, ty * 3 + 2), b = hash(tx * 2 + i, ty * 9 + 4); R((a * 15) | 0, (b * 14) | 0, 1, 2, i % 2 ? '#2a5234' : '#163020'); } if (r2 > .86) { const sx = 3 + (r2 * 40 | 0) % 9, sy = 4 + (r * 40 | 0) % 8; R(sx, sy, 1, 1, '#d8d0f0'); R(sx, sy + 1, 1, 2, '#2a5234'); } };
+  if (m.theme === 'spire' && ch === '#') {
+    if (at(0, 1) !== '#') { R(0, 0, 16, 16, '#e4e0ee'); R(0, 0, 16, 2, '#ffffff'); for (let i = 0; i < 16; i += 8) { R(i, 2, 1, 11, '#c4c0d2'); R(i + 1, 2, 1, 11, '#f4f2fa'); } R(0, 12, 16, 2, '#e8c25a'); R(0, 12, 16, 1, '#fff0b0'); R(0, 14, 16, 2, '#8a8698');
+      if ((tx % 5) === 2) { R(4, 2, 8, 9, '#0c1430'); R(4, 2, 8, 1, '#e8c25a'); R(4, 10, 8, 1, '#e8c25a'); R(3, 2, 1, 9, '#e8c25a'); R(12, 2, 1, 9, '#e8c25a'); R(6, 4, 1, 1, '#ffffff'); R(10, 7, 1, 1, '#c8d8ff'); R(7, 8, 1, 1, '#ffffff'); } }
+    else { R(0, 0, 16, 16, '#d0ccde'); R(0, 0, 16, 1, '#e8e4f2'); if (r > .6) R(3 + (r2 * 8 | 0), 5, 5, 1, '#bab6ca'); }
+    return; }
+  if (m.theme === 'spire' && ch !== '=' && ch !== ',') { ch = '='; }
   if (ch === '#') {
     if (at(0, 1) !== '#') { grass(); R(6, 6, 4, 10, '#2a1c14'); R(6, 6, 1, 10, '#3e2a1c'); R(9, 6, 1, 10, '#1a100c'); R(3, 14, 10, 2, 'rgba(0,0,0,.3)');
       for (const [a, b, w] of [[5, -6, 6], [3, -2, 10], [1, 2, 14], [0, 6, 16]]) { R(a, b, w, 4, '#14301f'); R(a, b, w, 1, '#1e4a2c'); R(a + 1, b + 3, w - 2, 1, '#0c2014'); } R(7, -8, 2, 2, '#1e4a2c'); }
     else { R(0, 0, 16, 16, '#0c1c13'); for (let i = 0; i < 4; i++) { const a = hash(tx * 5 + i, ty * 3 + 1), b = hash(tx + i * 7, ty * 5 + 2), sx = (a * 11) | 0, sy = (b * 11) | 0, c = ['#14301f', '#183826', '#102818'][i % 3]; R(sx, sy + 1, 6, 4, c); R(sx + 1, sy, 4, 6, c); R(sx + 1, sy, 3, 1, '#225032'); } }
     return; }
   if (ch === '~') { R(0, 0, 16, 16, '#12263a'); R(0, 0, 16, 1, '#1c3852'); for (let i = 0; i < 3; i++) { const a = hash(tx * 3 + i, ty * 7 + 1); R((a * 12) | 0, 3 + i * 5, 4, 1, i % 2 ? '#2a5070' : '#3a6a8a'); } if (at(-1, 0) !== '~') R(0, 0, 2, 16, '#2a3a2a'); if (at(1, 0) !== '~') R(14, 0, 2, 16, '#22301f'); return; }
+  if (ch === ',' && m.theme === 'spire') { R(0, 0, 16, 16, '#6a2a3a'); R(0, 0, 16, 1, '#8a3a4c'); R(0, 0, 1, 16, '#e8c25a'); R(15, 0, 1, 16, '#e8c25a'); if ((ty & 1) === 0) R(6, 6, 4, 4, '#7a3244'); return; }
   if (ch === ',') { R(0, 0, 16, 16, r < .5 ? '#3a3226' : '#40372a'); for (let i = 0; i < 5; i++) { const a = hash(tx * 7 + i, ty + 3), b = hash(tx + i, ty * 9 + 5); R((a * 14) | 0, (b * 14) | 0, 2, 1, i % 2 ? '#2c261c' : '#544838'); } if (at(-1, 0) === '~' || at(1, 0) === '~') { R(2, 3, 5, 3, '#6a6a70'); R(2, 3, 5, 1, '#8a8a92'); R(9, 9, 5, 3, '#62626a'); R(9, 9, 5, 1, '#84848c'); } return; }
   if (ch === '=') { const c = ((tx + ty) & 1) ? '#b8b4c4' : '#c4c0d0'; R(0, 0, 16, 16, c); R(0, 0, 16, 1, '#e0dcec'); R(0, 0, 1, 16, '#d4d0e0'); R(15, 0, 1, 16, '#8a8698'); R(0, 15, 16, 1, '#8a8698'); if (r2 > .7) R(4 + (r2 * 30 | 0) % 8, 6, 3, 1, '#a09cb0'); if (at(0, 1) !== '=' && at(0, 1) !== 'x') { R(0, 13, 16, 3, '#e8c25a'); R(0, 13, 16, 1, '#fff0b0'); } return; }
   grass();
@@ -759,7 +766,7 @@ function valleyTile(g, m, tx, ty, ch, x, y, r, r2, R, at) {
 function drawTile(g, m, tx, ty) {
   const ch = m.grid[ty][tx], x = tx * 16, y = ty * 16, r = hash(tx + m.seed, ty), r2 = hash(tx * 3 + 11, ty * 7 + m.seed), R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); };
   const at = (dx, dy) => { const yy = ty + dy, xx = tx + dx; return yy < 0 || yy >= m.h || xx < 0 || xx >= m.w ? '#' : m.grid[yy][xx]; };
-  if (m.theme === 'valley') return valleyTile(g, m, tx, ty, ch, x, y, r, r2, R, at);
+  if (m.theme === 'valley' || m.theme === 'spire') return valleyTile(g, m, tx, ty, ch, x, y, r, r2, R, at);
   const below = at(0, 1), th = m.theme, home = th === 'home', clinic = th === 'clinic', bay = th === 'bay', tunnel = th === 'tunnel';
   if (isWall(ch)) {
     if (!isWall(below)) { // ---- wall face
@@ -840,6 +847,9 @@ const PROPS = {
   teallamp(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(7, -6, 2, 20, '#3a3038'); R(4, 13, 8, 2, '#2a2228'); R(4, -12, 8, 7, a ? '#3a3a44' : '#e8c060'); R(5, -11, 6, 5, a ? '#2a2a32' : '#fff0b0'); R(3, -13, 10, 1, '#8a7a5a'); },
   lectern(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(3, 6, 10, 9, '#c8c4d4'); R(3, 6, 10, 1, '#f0ecf8'); R(12, 7, 1, 8, '#8a8698'); R(1, 1, 14, 6, '#e8e4f0'); R(1, 1, 14, 1, '#ffffff'); R(2, 2, 12, 4, a === 1 ? '#f4eedc' : a === 2 ? '#2a2630' : '#f4eedc'); R(8, 2, 1, 4, '#b8a880'); if (a === 2) { R(4, 3, 8, 2, '#4ad8e0'); R(5, 3, 2, 1, '#d8ffff'); } else { R(3, 3, 4, 1, '#3a2e22'); R(3, 5, 3, 1, '#3a2e22'); R(10, 3, 3, 1, a === 3 ? '#a02a1a' : '#3a2e22'); } },
   canopy(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }, w = (a || 3) * 16; R(0, -20, w, 6, '#f4f2ec'); R(0, -20, w, 1, '#ffffff'); R(0, -15, w, 1, '#e8c25a'); for (let i = 0; i < w; i += 8) R(i, -14, 4, 3, '#e8c25a'); R(1, -14, 2, 28, '#d8d4e0'); R(w - 3, -14, 2, 28, '#d8d4e0'); },
+  holes(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }, w = (a || 2) * 16; R(0, -12, w, 27, '#5a4630'); R(0, -12, w, 1, '#8a6c48'); R(0, 14, w, 1, '#2a2016'); for (let j = 0; j < 4; j++) for (let i = 0; i < w / 8; i++) { R(1 + i * 8, -10 + j * 6, 6, 5, '#2a2016'); if (hash(i * 3 + x, j * 7 + y) > .35) { R(2 + i * 8, -8 + j * 6, 4, 3, '#f4eedc'); R(2 + i * 8, -8 + j * 6, 4, 1, hash(i + x, j) > .7 ? '#a02a1a' : '#d8ceb0'); } } R(0, -14, w, 2, '#e8c25a'); },
+  cdesk(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(0, 2, 32, 12, '#7a5c3c'); R(0, 2, 32, 2, '#a88458'); R(0, 13, 32, 1, '#3a2a1a'); R(1, 14, 3, 2, '#3a2a1a'); R(28, 14, 3, 2, '#3a2a1a'); R(4, 0, 12, 5, '#f4eedc'); R(4, 0, 12, 1, '#ffffff'); R(10, 0, 1, 5, '#b8a880'); R(5, 2, 4, 1, '#3a2e22'); R(12, 2, 3, 1, '#3a2e22'); R(20, 1, 3, 3, '#1a1420'); R(21, -2, 1, 3, '#d8d0c0'); if (a) { R(25, -3, 4, 6, '#e8c060'); R(26, -2, 2, 4, '#fff0b0'); } },
+  countbook(g, x, y) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(2, 6, 28, 9, '#c8c4d4'); R(2, 6, 28, 1, '#f0ecf8'); R(0, 14, 32, 2, '#e8c25a'); R(1, -2, 30, 9, '#f4eedc'); R(1, -2, 30, 1, '#ffffff'); R(15, -2, 2, 9, '#b8a880'); for (let j = 0; j < 3; j++) { R(3, j * 2, 10, 1, '#3a2e22'); R(19, j * 2, 10, 1, j === 1 ? '#a02a1a' : '#3a2e22'); } R(0, -3, 32, 1, '#e8c25a'); },
   bedroll(g, x, y, a) { const R = (p, q, w, h, c) => { g.fillStyle = c; g.fillRect(x + p, y + q, w, h); }; R(1, 6, 14, 7, a || '#7a5ac8'); R(1, 6, 14, 1, '#e8e0d0'); R(1, 6, 4, 7, '#e8e0d0'); R(2, 8, 2, 3, '#d8b8a0'); },
   bed(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(0, 2, 32, 30, PAL.woodD); R(2, 3, 28, 26, '#b8a890'); R(4, 4, 12, 7, PAL.cream); R(2, 13, 28, 16, '#2e5a5e'); for (let i = 0; i < 28; i += 4) R(2 + i, 15, 2, 12, '#356a6c'); R(0, 29, 32, 3, '#1a100c'); },
   table(g, x, y) { const R = (a, b, w, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, w, h); }; R(1, 4, 30, 9, PAL.wood2); R(1, 4, 30, 2, '#6a4a34'); R(3, 13, 2, 3, PAL.woodD); R(27, 13, 2, 3, PAL.woodD); R(6, 1, 4, 5, '#c8b898'); R(6, 1, 4, 1, '#3a2a20'); R(17, 5, 9, 6, '#d8d0c0'); R(18, 6, 6, 1, '#6a6a6a'); R(18, 8, 5, 1, '#6a6a6a'); },
@@ -2049,6 +2059,7 @@ const Cutscene = {
   hideCard() { const el = $('#card'); el.classList.add('hidden'); el.classList.remove('on'); },
   run(s) {
     const T = (x, y) => ({ x: x * 16 + 8, y: y * 16 + 12 });
+    if (s.when && !s.when()) return false;
     if (s.mission) { const rest = this.steps.slice(this.i), cb = this.onEnd; this.onEnd = null; this.steps = []; this.end(); Mission.start(s.mission, () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(rest, cb); }); return true; }
     if (s.card !== undefined) { this.card(s.card, s.sub, s.big); if (s.sfx) Sound.play(s.sfx); this.block = { type: 'card', t: 0, min: s.min || 1.4, max: s.max || 7 }; return true; }
     if (s.scene) { this.hideCard(); this.panel = null; World.load(s.scene, null, true); this.actors = []; this.dark = s.dark || null; this.cam = { x: s.cam[0] * 16 + 8, y: s.cam[1] * 16 }; this.pillarRed = false; this.beam = 0; this.furnace = 0; this.motes = []; this.zoomT = s.zoom || 1; this.zoom = this.zoomT; return false; }
@@ -2416,13 +2427,29 @@ const HEIST_PUZZLE = { name: 'BANK 7 · BLEED', tip: 'Bleed the Authority line i
 // so the story is told with close-ups and tableaux, not only with pans and zooms.
 // Each panel draws on a 320x180 canvas: fn(g, t, stage, st)  (t = time on panel, st = time in stage)
 // ============================================================
+const FUTURE_PANELS = new Set(['gild', 'lesson', 'assay', 'spire', 'desk', 'ledger', 'ante', 'weather', 'dockstair', 'dawn']);
 const Panels = {
   c: null, g: null, sil: {},
   draw(g, p) {
     if (!this.c) [this.c, this.g] = mk(320, 180);
     const pg = this.g; pg.globalAlpha = 1; pg.globalCompositeOperation = 'source-over'; pg.fillStyle = '#07050a'; pg.fillRect(0, 0, 320, 180);
     this.narrow = W < 320; const fn = PANELS[p.id]; if (fn) fn(pg, p.t, p.stage, p.st);
+    this.finish(pg, p);
     g.fillStyle = '#07050a'; g.fillRect(0, 0, W, H); g.drawImage(this.c, Math.round((W - 320) / 2), Math.round((H - 180) / 2)); // portrait shows the middle 208px: panels keep their focus there
+  },
+  // the same last pass on every panel, so memories and things not yet happened each have a look: drifting motes, a closing vignette, a slow sweep of light, grain,
+  // and for the years ahead a thin gilt plate line, as if the scene were already engraved somewhere.
+  finish(g, p) {
+    const fut = FUTURE_PANELS.has(p.id), t = p.t, rm = Settings.d.reduce;
+    g.globalCompositeOperation = 'lighter';
+    if (!rm) { const sx = ((t * 14) % 520) - 100, gr = g.createLinearGradient(sx, 0, sx + 90, 0); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(.5, fut ? 'rgba(255,224,150,.05)' : 'rgba(255,170,110,.035)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(sx, 0, 90, 180); }
+    for (let i = 0; i < (rm ? 0 : 16); i++) { const a = hash(i * 7 + 1, 3), b = hash(i * 3 + 2, 9), sp = 2 + a * 5, x = (a * 320 + Math.sin(t * .4 + i) * 6 + t * (fut ? 1.5 : -1)) % 320, y = fut ? 180 - ((b * 180 + t * sp) % 190) : (b * 180 + t * sp) % 190, k = .12 + .1 * Math.sin(t * 1.3 + i * 2);
+      g.fillStyle = fut ? `rgba(255,220,140,${k})` : `rgba(210,190,170,${k * .8})`; g.fillRect((x + 320) % 320 | 0, y | 0, 1, 1); }
+    g.globalCompositeOperation = 'source-over';
+    if (!this.vg) { const [c, vg] = mk(320, 180), gr = vg.createRadialGradient(160, 84, 70, 160, 90, 200); gr.addColorStop(0, 'rgba(5,3,8,0)'); gr.addColorStop(.7, 'rgba(5,3,8,.28)'); gr.addColorStop(1, 'rgba(5,3,8,.72)'); vg.fillStyle = gr; vg.fillRect(0, 0, 320, 180); this.vg = c; }
+    g.drawImage(this.vg, 0, 0);
+    if (!rm) { g.fillStyle = 'rgba(255,255,255,.035)'; const f = (t * 24) | 0; for (let i = 0; i < 26; i++) g.fillRect((hash(i + f * 13, f) * 320) | 0, (hash(f, i + f * 7) * 180) | 0, 1, 1); }
+    if (fut) { const x0 = this.narrow ? 58 : 3, x1 = this.narrow ? 262 : 317; g.fillStyle = 'rgba(232,194,90,.5)'; g.fillRect(x0, 3, x1 - x0, 1); g.fillRect(x0, 3, 1, 9); g.fillRect(x1 - 1, 3, 1, 9); g.fillStyle = 'rgba(232,194,90,.9)'; g.fillRect(x0, 3, 5, 1); g.fillRect(x1 - 5, 3, 5, 1); g.fillRect(x0, 3, 1, 5); g.fillRect(x1 - 1, 3, 1, 5); }
   },
   // a character sprite as a flat dark shape, for figures against a light
   shape(id, dir, col) { const k = id + dir + col; if (!this.sil[k]) { const s = World.sheetFor(id), fh = s.fh || 16, [c, g] = mk(16, fh); g.drawImage(s, 0, dir * fh, 16, fh, 0, 0, 16, fh); g.globalCompositeOperation = 'source-in'; g.fillStyle = col; g.fillRect(0, 0, 16, fh); c.fh = fh; this.sil[k] = c; } return this.sil[k]; }
@@ -2598,6 +2625,11 @@ const PANELS = {
   // ---- two years in the weather (0: the hidden fleet · 1: they learn to fly)
   weather(g, t, st, s) {
     const { R, glow, plate } = PX; const gr = g.createLinearGradient(0, 0, 0, 180); gr.addColorStop(0, '#2a3a7a'); gr.addColorStop(.6, '#c8a0b0'); gr.addColorStop(1, '#f0d0b0'); g.fillStyle = gr; g.fillRect(0, 0, 320, 180); glow(g, 250, 120, 80, '255,220,170', .5);
+    for (let i = 0; i < 40; i++) { const a2 = hash(i, 11), b2 = hash(i, 23); R(g, a2 * 320, b2 * 60, 1, 1, `rgba(255,255,255,${.15 + .35 * Math.abs(Math.sin(t * .8 + i))})`); }
+    g.globalCompositeOperation = 'lighter'; for (let i = 0; i < 9; i++) { const an = -2.9 + i * .34 + Math.sin(t * .2) * .03; g.fillStyle = 'rgba(255,214,150,.045)'; g.beginPath(); g.moveTo(250, 122); g.lineTo(250 + Math.cos(an) * 260, 122 + Math.sin(an) * 260); g.lineTo(250 + Math.cos(an + .12) * 260, 122 + Math.sin(an + .12) * 260); g.fill(); } g.globalCompositeOperation = 'source-over';
+    R(g, 240, 112, 20, 20, '#fff0c8'); R(g, 243, 109, 14, 26, '#fff0c8'); R(g, 237, 115, 26, 14, '#fff0c8'); R(g, 244, 116, 12, 12, '#fffbe8');
+    for (let i = 0; i < 26; i++) { const x = ((i * 23 + t * 1.2) % 360) - 20, y = 78 + (i % 5) * 4 + Math.sin(t * .5 + i) * 1; R(g, x, y, 6, 2, '#3a3a52'); R(g, x + 1, y - 1, 3, 1, '#4a4a62'); if (i % 3 === 0) R(g, x + 5, y, 1, 1, '#ffc060'); if (i % 2) R(g, x + 6, y + 1, 17, 1, 'rgba(40,40,60,.35)'); }
+    for (let i = 0; i < 7; i++) { const x = ((t * 9 + i * 13) % 380) - 30, y = 40 + i * 3 + Math.sin(t * 2 + i) * 3, w = Math.sin(t * 9 + i) > 0 ? 1 : 0; R(g, x, y - w, 2, 1, '#1a1a2a'); R(g, x + 2, y, 1, 1, '#1a1a2a'); R(g, x + 3, y - w, 2, 1, '#1a1a2a'); }
     for (let L = 0; L < 4; L++) for (let i = 0; i < 7; i++) { const x = ((i * 64 + t * (2 + L * 2) + L * 30) % 440) - 60, y = 60 + L * 30 + (i % 2) * 8, a = .35 + L * .16; R(g, x, y, 70, 12, `rgba(255,${240 - L * 10},${236 - L * 16},${a})`); R(g, x + 12, y - 6, 40, 8, `rgba(255,255,255,${a})`); if (L === 1 || L === 2) { const bx = x + 18 + (i * 7) % 20; if (i % 2) { R(g, bx, y - 2, 24, 5, '#2a2c3a'); R(g, bx + 4, y - 5, 12, 3, '#3a3c4a'); R(g, bx + 22, y, 1, 1, '#ffb040'); } } }
     if (st >= 1) { R(g, 0, 148, 320, 32, '#2a2c3a'); R(g, 0, 148, 320, 2, '#5a5c6c'); for (let x = 0; x < 320; x += 20) R(g, x, 142, 2, 8, '#3a3c4a'); R(g, 0, 142, 320, 1, '#4a4c5c'); const ids = ['hollis', 'ivo', 'nell', 'kit', 'juno', 'dace']; for (let i = 0; i < 6; i++) PX.spr(g, World.sheetFor(ids[i]), 1, 40 + i * 44 + (i % 2) * 6, 166, 2); PX.spr(g, World.sheetFor('ilse'), 0, 290, 168, 2.4); if (st >= 2) { g.fillStyle = 'rgba(20,16,30,.45)'; g.fillRect(0, 0, 320, 180); PX.spr(g, World.sheetFor('kael2'), 3, 132, 172, 3.4); PX.spr(g, World.sheetFor('tavi'), 2, 190, 172, 3.2); glow(g, 250, 60, 70, '255,236,170', .5); R(g, 244, 54, 12, 12, '#fff6c0'); } }
     if (st === 0) plate(g, 'FOUR HUNDRED BARGES, IN THE WEATHER', 160, 168);
@@ -4145,6 +4177,10 @@ const FF = {
       hurt: 'HE HITS ME WHERE THE WIRE WENT IN. HE SAYS THEY WILL TOO.', fury: 'HE SAYS: DO NOT SPEND IT. BANK IT. I AM TRYING.', half: 'HE IS SMILING. I HAVE NOT SEEN THAT BEFORE.', eleven: 'ELEVEN. HE COUNTS ALONG WITH ME.' },
     arts: [{ at: .55, name: 'CLOSED TEETH', line: 'THE SHIFT SONG HAS NO WORDS. YOU HUM IT TO KEEP TIME ON THE WHEEL. I KEEP TIME ON HIM.', panel: 'pipe', kind: 'storm', rgb: '255,170,70', hex: '#ffaa46' }]
   }),
+  drill2: () => Object.assign(FF.drill(), { newMove: 'NEW: THE TURN. GUARD JUST AS HE SWINGS AND YOU COME OUT BEHIND HIM', title: 'NO GLOVES', sub: 'BRAND - THE SECOND YEAR', winText: 'AGAIN. BUT BETTER',
+    foes: [{ id: 'brand', name: 'Brand', kind: 'baton', hp: 56, k2: { triple: 1 } }], taunt: { 0: ['DO NOT STOP IT. TURN IT.', 'WHERE WERE YOUR FEET?', 'AN HEIR WOULD BE DEAD.', 'AGAIN.'] },
+    voice: { at: [[1, 'NO GLOVES. THE GRIP SITS ON THE OLD BURNS LIKE IT WAS CUT FOR THEM.'], [11, 'HE SWINGS WHERE A WARDEN SWINGS. I KNOW WHERE THAT IS. I HAVE BEEN UNDER IT.'], [22, 'STEP IN. LET IT PASS. BE BEHIND HIM. IT IS A VALVE. YOU DO NOT STOP PRESSURE. YOU SEND IT SOMEWHERE.']], hurt: 'THAT ONE I TRIED TO STOP. HE IS RIGHT. I CANNOT.', fury: 'BANK IT. HE SAYS IT EVERY DAY. BANK IT.', half: 'HE IS BREATHING HARD. HE IS FIFTY. HE HAS NOT SAID SO.', eleven: 'ELEVEN. HE DOES NOT COUNT ALONG THIS TIME. HE IS BUSY.' },
+    arts: [{ at: .6, name: 'NOT THOSE', line: 'SHE TOOK THE BONES AND THE THROAT AND THE EYES. I SAID: NOT THE HANDS. THOSE ARE BANK SEVEN.', panel: 'hands', kind: 'storm', rgb: '255,170,70', hex: '#ffaa46' }, { at: .28, name: 'THE BAR', line: 'HOLLIS DID NOT TURN ROUND. HE FINISHED THE BAR HE WAS ON. SO WILL I.', panel: 'pipe', kind: 'rise', rgb: '255,120,60', hex: '#ff783c' }] }),
   furnace: () => ({ title: 'THREE STEPS', sub: 'THE WARDEN', bg: 'furnace', arena: { kind: 'rect', w: 200, h: 80 }, music: 'mystery', doomed: 9, hero: { hp: 4, fury0: 80 }, voice: { at: [[.4, 'THREE STEPS.'], [3, 'IT IS LIKE HITTING THE ARRAY ITSELF.'], [6, 'SHE IS STILL LOOKING AT ME.']], eleven: 'I HIT HIM WITH EVERYTHING I WILL EVER BE. HE DOES NOT MOVE.' }, foes: [{ id: 'warden', name: 'Warden', kind: 'warden', hp: 999, sc: 1.1 }] })
 };
 // ---- the intro before the title: the Assay, start to finish, in thirty seconds
@@ -4243,6 +4279,20 @@ const DREAM1 = () => [
 ];
 const DREAM2 = () => [
   { card: 'THAT NIGHT', sub: 'The dream again. It is getting longer.', min: 1.4, max: 4 },
+  { panel: 'gild' }, { pstage: 2 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'The second year. I could walk. I could say "granted" without tasting it. I still wore the gloves.' },
+  { say: 'brand', t: 'Take them off.' },
+  { say: 'kael', t: 'Ilse said a year.' },
+  { say: 'brand', t: 'Ilse is teaching you to pass. I am teaching you to live. Every heir you meet has been handed a blade since he was six and has never once been hit. You have been hit all your breath. That is the only thing you have that they do not. Take them off and use it.' },
+  { say: 'brand', t: 'I am going to swing at your head. Do not stop it. You cannot. Step into it and let it go past, and be standing behind me when it lands. They call it the Turn. I call it not being where the halberd is.' },
+  { fade: 'out' }, { panel: null }, { card: 'TWO AND A HALF YEARS FROM NOW', sub: 'The pit. Brand. No gloves.', big: 1, min: 1.5, max: 4.5 },
+  { brawl: () => FF.drill2() },
+  { panel: 'hands' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+  { narr: 'He looked at my palms afterwards, the way a man looks at a tool he sold once. He knew what a valve burn was. He had stood guard over the people who got them.' },
+  { say: 'brand', t: 'I hit a welder in the back once, for humming. He did not turn round. He finished the bar he was on. I have thought about that bar every day since.' },
+  { say: 'brand', t: 'When you get up there, boy, do not let them teach you it was ever a fair fight. It was never a fight. That is what the halberds are for.' },
+  { fx: () => { G.flags.fury = (G.flags.fury || 0) + 1; } },
+  { fade: 'out' },
   { panel: 'assay' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
   { narr: 'The Assay. Every year the Accredited put their heirs, the year they come of age, into a walled valley with real steel and no rule that matters, and wait to see who walks out leading the rest.' },
   { pstage: 1 }, { wait: 2.2 },
@@ -4806,7 +4856,7 @@ function festB() {
     { say: 'vale', t: 'I can send a clerk. Or I can send a valve tech who knows the bank, and who has just shown four hundred people he cannot be told where to put a light.' },
     { say: 'vale', t: 'Sleep on it. You have until first bell.' },
     { fade: 'out' },
-    ...(NOFF ? [] : DREAM2()), { card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
+    ...(NOFF ? [] : DREAM2()), ...(NOFF ? [] : [{ card: 'FOUR YEARS FROM NOW', sub: 'The Assay. The night before the last day.', big: 1, min: 1.5, max: 4.5 }, { mission: 'eve' }]), { card: NOFF ? 'FOUR YEARS FROM NOW' : 'MORNING', sub: 'The Assay. The last day.', big: 1, min: 1, max: 3.2 }, { brawl: () => NOFF ? null : FF.keep() },
     { card: 'FIRST FIRE', sub: 'One candle-hour. It burned for three.', big: 1, sfx: 'splash', min: 2.2, max: 6 }
   ].filter(Boolean);
 }
@@ -5216,7 +5266,7 @@ FF.brandstair = () => ({
   fin: { name: 'THE STAIR', l1: 'I WAS A WARDEN', l2: 'I KNOW WHAT A STAIR IS WORTH', rgb: '200,210,230' },
   hero: { id: 'brand', name: 'BRAND', hp: 16, pow: 3, blade: 1, fury0: 70 }, taunt: { 0: ['HE WAS ONE OF OURS!', 'TAKE THE STAIR!', 'HE IS ONE OLD MAN!'] },
   waves: [[{ id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 15 }, { id: 'sg2', name: 'Dock Guard', kind: 'lancer', hp: 15 }, { id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 15 }],
-    [{ id: 'sg2', name: 'Dock Guard', kind: 'lancer', hp: 16 }, { id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 16 }, { id: 'sg2', name: 'Dock Guard', kind: 'lancer', hp: 16 }, { id: 'vant', name: 'Dockmaster Vant', kind: 'captain', hp: 60, sc: 1.15 }]],
+    [{ id: 'sg2', name: 'Dock Guard', kind: 'lancer', hp: 16 }, { id: 'sg1', name: 'Dock Guard', kind: 'cadet', hp: 16 }, { id: 'sg2', name: 'Dock Guard', kind: 'lancer', hp: 16 }, { id: 'sg1', name: 'Stair Captain', kind: 'captain', hp: 60, sc: 1.15 }]],
   voice: { at: [[1, 'I WAS A WARDEN. I KNOW HOW MANY IT TAKES TO CLEAR A STAIR. IT IS MORE THAN I HAVE MINUTES.'], [9, 'I PUT A HALBERD BUTT INTO A WELDER FOR HUMMING, ONCE. I HAVE CARRIED IT UP EVERY STAIR SINCE.'], [18, 'THEN THEY ORDERED ME TO DO IT TO A CHILD. I PUT THE HALBERD DOWN. IT WAS NOT ENOUGH. THIS IS THE REST OF IT.'], [27, 'THE LAST MOORING IS CUT. I CAN HEAR IT GO. GOOD. COME BACK TALLER, SOOT.']], hurt: 'I HAVE HAD WORSE FROM A CADET I WAS TEACHING.', fury: 'YOUR FEET, BOY. I SAID IT A THOUSAND TIMES. MINE ARE STAYING WHERE THEY ARE.', wave: 'MORE. GOOD. EVERY ONE ON THIS STAIR IS ONE NOT ON THE DOCK.' }
 });
 FF.stand = () => ({
@@ -5265,6 +5315,11 @@ const P2 = {
     { sfx: 'heart' }, { narr: 'I found her on my third day. I had told myself I would not look.' },
     { narr: 'Holloway, S. They had not even written her whole name.' },
     { sfx: 'heart' }, { wait: 1.2 }, { narr: 'One. Two. Three. I closed the book at eleven and went on with the morning\'s columns. My hand was steady. I was learning what that cost.' },
+    { narr: 'The first line I struck myself was in the ninth week. "Marrow, J. Tier Six. Air owed: eleven days."' },
+    { sfx: 'heart' }, { narr: 'I knew him. He hummed at the furnace. They docked his air for it, and he never caught the eleven days up. He used to sit two benches from the noodle stall and complain about the broth.' },
+    { narr: 'It is a good pen. It does not drag. I had expected it to drag.' },
+    { narr: 'After that I learned where the Spire kitchens keep their surplus, and how to carry a day across from one column to another where nobody looks. I was handed nine hundred lines in five years. I struck four hundred and six. I know every name. It does not help them.' },
+    { fx: () => { G.flags.fury = (G.flags.fury || 0) + 2; } },
     { fade: 'out' }, { panel: 'ante' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { say: 'lucan', t: 'Sorrel. You are the one who put me on my knees in front of my mother. I have been wanting to meet you properly.' },
     { say: 'lucan', t: 'Nobody had ever beaten me. I found I did not mind as much as I was supposed to. Would you teach me how you did it?' },
@@ -5285,9 +5340,14 @@ const P2 = {
       { t: 'Sign it. Stay hidden.', fx: () => { G.flags.signedFour = 1; G.flags.fury = (G.flags.fury || 0) + 2; }, then: [narr('I signed. If I had not, another clerk would have by noon, and I would have been a line in the book myself by evening. I have told myself that every day since.')] },
       { t: 'Lose it. Buy a day.', fx: () => { G.flags.signedFour = 0; }, then: [narr('I let it fall behind a cabinet and found it again the next morning, with apologies. One day. Dace used all of it.'), narr('Cade signed it himself in the end, and looked at me for a long time while he did.')] }
     ] },
+    { when: () => !G.flags.signedFour, fade: 'out' }, { when: () => !G.flags.signedFour, panel: null }, { when: () => !G.flags.signedFour, card: 'THAT NIGHT', sub: 'The Count hall. After the bell.', big: 1, min: 1.5, max: 4.5 }, { when: () => !G.flags.signedFour, mission: 'count' },
+    { when: () => !G.flags.signedFour, panel: 'desk' }, { when: () => !G.flags.signedFour, pstage: 1 }, { when: () => !G.flags.signedFour, fade: 'in', spd: 0.8 },
     { pstage: 2 }, { wait: 1.4 }, { fade: 'out' }, { music: 'mystery' }, { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'A letter came up through Sable the same week, in Dace\'s chalk-fingered hand.' },
     { say: 'dace', t: 'Tavi is on the wheel now. Twelve. She hums while she turns it and nobody has the heart to stop her. Mara says to tell you the shelf is holding.' },
+    { say: 'dace', t: 'She puts the sun back on the Pillar every rest day. Sull scrubs it. She puts it back. I have stopped telling her not to.' },
+    { fade: 'out' }, { panel: null }, { card: 'BELOW', sub: 'Cinderwell. Five years after the furnace. Tavi.', big: 1, min: 1.5, max: 4.5 }, { mission: 'sun' },
+    { music: 'mystery' }, { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
     { say: 'dace', t: 'There is a riser under Tier Four that comes up in your valley. Nine floors, Kael. If somebody held the top of it for an hour.' },
     { fade: 'out' }, { panel: null },
     { brawl: () => FF.riser() },
@@ -5335,8 +5395,30 @@ const P2 = {
       { t: 'Granted.', fx: () => { G.flags.liedToHer = 1; }, then: [say('celestine', 'You said that too quickly. Never mind. You have until the morning to mean it.'), narr('I did not have until the morning. She told her son that night. I think she wanted to see what he would do.')] },
       { t: 'You burned her for forty beds.', fx: () => { G.flags.liedToHer = 0; G.flags.fury = (G.flags.fury || 0) + 2; }, then: [say('celestine', 'I burned her so that I would not have to burn the forty. That is what the Count is, technician. You have been keeping it for two years. Do not pretend you cannot do the sum.'), narr('I left by the window. By nightfall her son knew my name.')] }
     ] },
+    { fade: 'out' }, { panel: 'ante' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { narr: 'She did not send Wardens. She sent her son, alone, to the keep where I had beaten him two years before. I think she wanted to see which of us she had raised.' },
+    { say: 'lucan', t: 'She says you are soot. She says it the way one reports a column that will not close. Are you?' },
+    { say: 'kael', t: 'Aye.' },
+    { say: 'lucan', t: '...I have never heard anybody say that word. It is shorter than I expected.' },
+    ...(P2F('lucanFriend') ? [{ say: 'lucan', t: 'You taught me for two years. You could have opened my throat any morning in the gallery. I counted the mornings last night. There were a great many.' }] : [{ say: 'lucan', t: 'I asked you to teach me, once. You declined. I see now that it was a kindness, of a sort. One does not want to owe a blade to the man one is sent to remove.' }]),
+    { say: 'kael', t: 'There was a note pinned to the Proctors\' glass, at the Assay. Her hand. "My son is to reach the last day. No further than he can walk."' },
+    { sfx: 'heart' }, { say: 'lucan', t: '...She wrote that.' },
+    { say: 'lucan', t: 'Of course she wrote that. I reached the last day. I have been proud of it for two years.' },
+    { narr: 'He drew. His hand was steadier than it had been at the keep. I had done that. I was sorry for it, and I let him come.' },
     { fade: 'out' }, { panel: null },
     { brawl: () => FF.son() },
+    { music: 'mystery' }, { panel: 'freight' }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
+    { narr: 'The night before the docks we met in Freight Three. Sable, with the shutter down. Ilse. Brand. And Dace, up from under the floor for the first time in seven years.' },
+    { say: 'dace', t: "Give me a minute. I've had a ceiling all my breath, and then a lower one. Sable says there isn't one up there at all. I don't see how it stays up." },
+    { say: 'sable', t: "It doesn't stay up. There's nothing to stay. You'll hate it. Everybody does, the first week." },
+    { say: 'ilse', t: 'Four hundred barges, moored in pairs. Cut the pairs and the wind does the rest. The watch changes at the second bell, and for nine minutes nobody is looking at the stair.' },
+    { say: 'kael', t: 'I wrote the rota. It is nine minutes.' },
+    { narr: 'I had written it at my desk that afternoon. Maren Aldane had taken it for copying. She had never offered to copy anything before. I was thinking about the docks.' },
+    { say: 'brand', t: 'If the nine minutes are not there, the stair will want holding. I hold it. You do not argue, and you do not come back for me. You have a tier. I have a welder.' },
+    { say: 'kael', t: 'His name is Hollis.' },
+    { say: 'brand', t: 'I know his name. I have known it seven years. I have never once said it. ...Hollis.' },
+    { narr: 'He said it like a man putting down something he had carried up nine floors. Then he went to see to his halberd, and I let him, because I thought there would be a morning after.' },
+    { fade: 'out' }, { panel: null },
     { brawl: () => FF.docks() }
   ],
   4: () => [
@@ -5447,6 +5529,9 @@ const P2 = {
     { narr: 'Sull kept the night watch. Somebody has to walk the bays. He says "aye" now and nobody makes anything of it.' },
     { narr: 'Nell\'s ward has forty beds and the fans up. Ivo runs Freight Three with Sable, and every crate that comes down is marked for whoever is hungry. Dace chalks suns on the new doors.' },
     ...(G.flags.marenDoor ? [{ narr: 'Maren Aldane keeps the new Count. It has no columns. It is a list of names, and she reads it aloud on rest days. Teo\'s first.' }] : [{ narr: 'Nobody has seen Maren Aldane since the stair. Her desk was cleared. There was a heel of bread on it.' }]),
+    ...(P2F('lucanFriend') ? [{ narr: 'Lucan Aurel walks the tiers with a slate, learning names. He asks before he writes one down. He is kind. It has turned out to be of use.' }] : [{ narr: 'Lucan Aurel went out with the first envoy and did not look back. He sent one letter. It said: I should have liked to understand. I have kept it.' }]),
+    { narr: 'Ilse would not come down. She said she had been unmade once and it had taken. She keeps the glass room at the top of the Spire, and teaches anybody who asks how they talked up there, so that nobody can be shut out by a word again.' },
+    { narr: 'Tavi flies the lift-barges. Yellow hull. She painted the sun on it herself and would not be told it was the wrong yellow.' },
     { narr: 'The other eleven Houses sent envoys the first spring. We showed them the open lift and the list of names. Four went home and opened their own. We are still talking to the rest.' },
     { fade: 'out' }, { panel: 'row' }, { pstage: 3 }, { fade: 'in', spd: 0.7 }, { wait: 1.2 },
     { narr: 'Then Row K. The door was open. It had never had a lock. Mara looked up from the table and did not get up.' },
@@ -5486,7 +5571,7 @@ MAPS.vcamp = buildMap({
     { t: 'standard', x: 12, y: 3, a: '#7a5ac8', block: blk(12, 3) }, { t: 'campfire', x: 12, y: 9, block: blk(12, 9) }, { t: 'woodpile', x: 20, y: 5, block: blk(20, 5) },
     { t: 'pumphouse', x: 2, y: 11, block: blk(2, 11, 2) }, { t: 'bedroll', x: 9, y: 10 }, { t: 'bedroll', x: 15, y: 11 }, { t: 'bedroll', x: 17, y: 9 }, { t: 'stakes', x: 19, y: 11, a: 3 }],
   lights: [{ x: 200, y: 60, r: 70, c: '#c8b0ff' }, { x: 60, y: 150, r: 40, c: '#8ad8b0' }],
-  hot: [{ id: 'fire', tiles: blk(12, 9) }, { id: 'wood', tiles: blk(20, 5) }, { id: 'pump', tiles: blk(2, 11, 2) }, { id: 'vstd', tiles: blk(12, 3) }], exits: []
+  hot: [{ id: 'fire', tiles: blk(12, 9) }, { id: 'wood', tiles: blk(20, 5) }, { id: 'pump', tiles: blk(2, 11, 2) }, { id: 'vstd', tiles: blk(12, 3) }, { id: 'tentA', tiles: blk(4, 4, 2) }, { id: 'tentB', tiles: blk(8, 4, 2) }, { id: 'tentC', tiles: blk(16, 4, 2) }], exits: []
 });
 MAPS.raid = buildMap({
   name: 'House Teal — the island', w: 30, h: 15, theme: 'valley', music: 'mystery', dark: 'rgba(4,6,18,.76)',
@@ -5495,7 +5580,7 @@ MAPS.raid = buildMap({
     { t: 'teallamp', x: 10, y: 6, block: blk(10, 6) }, { t: 'teallamp', x: 17, y: 9, block: blk(17, 9) }, { t: 'teallamp', x: 23, y: 9, block: blk(23, 9) }, { t: 'teallamp', x: 24, y: 5, block: blk(24, 5) },
     { t: 'standard', x: 27, y: 7, a: '#3aa8a0', block: blk(27, 7) }, { t: 'bedroll', x: 21, y: 9, a: '#3aa8a0' }, { t: 'bedroll', x: 19, y: 12, a: '#3aa8a0' }, { t: 'stakes', x: 26, y: 4, a: 2 }, { t: 'stakes', x: 26, y: 11, a: 2 }],
   lights: [{ x: 168, y: 96, r: 54, c: '#ffe090' }, { x: 280, y: 146, r: 54, c: '#ffe090' }, { x: 376, y: 144, r: 54, c: '#ffe090' }, { x: 392, y: 80, r: 54, c: '#ffe090' }, { x: 224, y: 60, r: 30, c: '#8ad8b0' }],
-  hot: [{ id: 'valve', tiles: blk(13, 4, 2) }, { id: 'std', tiles: blk(27, 7) }], exits: []
+  hot: [{ id: 'valve', tiles: blk(13, 4, 2) }, { id: 'std', tiles: blk(27, 7) }, { id: 'ttA', tiles: blk(10, 11, 2) }, { id: 'ttB', tiles: blk(19, 3, 2) }, { id: 'ttC', tiles: blk(20, 11, 2) }], exits: []
 });
 MAPS.dais = buildMap({
   name: "The Proctors' dais", w: 26, h: 14, theme: 'valley', music: 'mystery', dark: 'rgba(6,6,20,.7)',
@@ -5504,7 +5589,7 @@ MAPS.dais = buildMap({
     { t: 'crate', x: 11, y: 7, block: blk(11, 7) }, { t: 'barrel', x: 16, y: 7, block: blk(16, 7) }, { t: 'crate', x: 13, y: 9, block: blk(13, 9) }, { t: 'barrel', x: 18, y: 9, block: blk(18, 9) }, { t: 'crate', x: 8, y: 6, block: blk(8, 6) },
     { t: 'teallamp', x: 8, y: 3, block: blk(8, 3) }, { t: 'teallamp', x: 19, y: 3, block: blk(19, 3) }, { t: 'standard', x: 21, y: 7, a: '#e8c25a', block: blk(21, 7) }],
   lights: [{ x: 136, y: 50, r: 50, c: '#ffe090' }, { x: 312, y: 50, r: 50, c: '#ffe090' }, { x: 232, y: 70, r: 40, c: '#4ad8e0' }],
-  hot: [{ id: 'book', tiles: blk(10, 4) }, { id: 'glass', tiles: blk(14, 4) }, { id: 'roster', tiles: blk(18, 4) }], exits: []
+  hot: [{ id: 'book', tiles: blk(10, 4) }, { id: 'glass', tiles: blk(14, 4) }, { id: 'roster', tiles: blk(18, 4) }, { id: 'eye', tiles: blk(21, 7) }, { id: 'cloak', tiles: blk(11, 7).concat(blk(13, 9)) }], exits: []
 });
 const CAMP_PUZZLE = { name: 'VIOLET CAMP · PUMP', tip: 'The heirs have water under their feet and no idea how to raise it. Feed every pipe, leave no open ends.', cols: 5, rows: 3, cells: [
   ['SRC:E:WELL', 'EW', 'SW', '', ''],
@@ -5541,10 +5626,13 @@ const MISSIONS = {
         fx(() => Sound.play('heart')), narr('The same word. They use it on their own children. I had thought it was only ours.'),
         fx(() => { MSET('oswin'); rage(1); })]);
       if (t.id === 'cadv1') return Dialogue.start([narr('He is asleep sitting up, with a blade across his knees that he has never had to clean.')]);
+      if (t.id === 'tentA') return Dialogue.start([narr('A campaign chest with a House crest on the lid. Eleven changes of linen, a silver comb, a book of forms. No tinder. No pot. Somebody packed this for him, and nobody who packed it had ever been cold.')]);
+      if (t.id === 'tentB') return Dialogue.start([narr('A slate propped on a bedroll, in a small child\'s hand: "MOTHER SAYS YOU ARE TO FINISH FIRST OR NOT COME HOME. BRING ME A STANDARD."'), narr('There is a sun drawn in the corner. A circle, and rays. They draw them too. I do not know why that should be the thing that gets under the wire.')]);
+      if (t.id === 'tentC') return Dialogue.start([narr('Not a tent. The Proctors\' cache: salve, bread, lamp oil, under a white ribbon and a card. "NOT TO BE OPENED BY CADETS. A RESULT MUST BE EARNED."'), narr('It is forty paces from thirty hungry children. Nobody has touched the ribbon. They would sooner starve than be marked down.'), fx(() => { if (!MF('cache')) rage(1); MSET('cache'); })]);
       if (t.id === 'vstd') return Dialogue.start([narr('House Violet\'s standard. A pole, a square of cloth, a gold boss. Lose it and the House is struck from the Assay. They guard it better than they feed themselves.')]);
       if (t.id === 'wood') return Dialogue.start(MF('wood') ? [narr('Enough for tonight.')] : [narr('Somebody cut this before the Assay began and stacked it where the cadets would find it. They walked past it for three days. Nobody had told them wood was for anything.'), narr('I take an armful. It smells like nothing in Cinderwell. It smells like the inside of the leaf.'), fx(() => { MSET('wood'); Sound.play('coin'); })]);
       if (t.id === 'pump') { if (MF('pump')) return Dialogue.start([narr('It is drawing. Warm, and it will stay warm.')]);
-        return Dialogue.start([narr('A pump house. Dressed stone, a wheel, a gauge. It is the only thing in this valley built like home.'), narr('My hand is flat on the pipe before I think about it.'), fx(() => Puzzle.open([CAMP_PUZZLE], () => { MSET('pump'); G.mode = 'world'; Sound.music('mystery'); Dialogue.start([
+        return Dialogue.start([narr('A pump house. Dressed stone, a wheel, a gauge. It is the only thing in this valley built like home.'), narr('Names are cut into the lintel, a row for every Assay. Hundreds. A few have a small gold nail beside them. Most have a line scored through. They keep a Count even here.'), narr('My hand is flat on the pipe before I think about it.'), fx(() => Puzzle.open([CAMP_PUZZLE], () => { MSET('pump'); G.mode = 'world'; Sound.music('mystery'); Dialogue.start([
           narr('It draws. The water comes up warm.'), fx(() => Sound.play('heart')),
           narr('Warm. There is only one thing under this rock that makes water warm. I know the line. I have bled it.'),
           narr('The Assay valley is the roof of Cinderwell. Their children are playing at war on top of Tier Four, and the pump they cannot work is fed off the same Array my tier is rationed from.'),
@@ -5579,6 +5667,9 @@ const MISSIONS = {
     caught: k => [say('cadt1', ['HOLD. WHO IS THAT?', 'VIOLET! ON THE ISLAND!', 'THERE. BY THE WATER.'][k % 3]), narr(k >= 2 ? 'I am back in the reeds before the lamp finishes turning. They are tired. They are looking less carefully than they were.' : 'I go back into the reeds and the dark, and wait for them to decide it was a deer.')],
     use(t) {
       if (t.id === 'wren') return Dialogue.start([say('wren', 'Go on. One saw nothing. One is watching a gauge.')]);
+      if (t.id === 'ttA') return Dialogue.start([narr('Their captain\'s tent. He has ranked his own cadets on a board, one to forty, and hung it where all of them can read it. The bottom three names are underlined.')]);
+      if (t.id === 'ttB') return Dialogue.start([narr('A cadet asleep with her boots on and a letter in her fist. "Darling. Your father and I have placed a sum on Teal. Do not embarrass it."'), fx(() => { if (!MF('letter')) rage(1); MSET('letter'); })]);
+      if (t.id === 'ttC') return Dialogue.start([narr('Their cook-fire is a Proctor\'s lamp with the shade off. They never lit a real one either. They are only richer about it.')]);
       if (t.id === 'std') { if (!MF('dark')) return Dialogue.start([narr('Four lamps and a picket standing on it. Not while they can see.')]);
         return Dialogue.start([narr('I take the pole in both hands. It is lighter than a valve wheel.'), narr('Thirty cadets asleep around it who would have killed me for it at noon. In the dark they are only breathing. Everybody breathes the same in the dark.'), narr('In the morning the Sisters Vey will come across the river for it, and for me.')], () => Mission.finish()); }
       if (t.id === 'valve') { if (MF('dark')) return Dialogue.start([narr('Shut, and holding at two.')]);
@@ -5610,6 +5701,8 @@ const MISSIONS = {
     respawn: () => [2, 8, 3],
     caught: k => [say('warden', ['A CADET. ON THE DAIS.', 'YOU. BACK TO YOUR HOUSE.', 'NOTED.'][k % 3]), narr(k >= 2 ? 'They walk me to the edge of the marble and let go. A cadet out of bounds is a line in a book to them, not a threat. They do not even take my name. I go round again.' : 'A halberd butt between the shoulders, and the grass. Wardens above the rock hit exactly the way they do below it.')],
     use(t) {
+      if (t.id === 'eye') return Dialogue.start([narr('The Proctors\' own standard. A gold sun with an open eye. It hangs over my tier\'s square as well. The same cloth. The same eye. I had half believed it would be a different one up here.')]);
+      if (t.id === 'cloak') return Dialogue.start([narr('Crates, counted and sealed. Salve. Lamp oil. One is marked FOR THE VICTOR: a winter cloak, white, lined with gold.'), narr('Four hundred and eighty cadets came into this valley. They packed one cloak.')]);
       if (t.id === 'book') return Dialogue.start([
         narr('The grading book. Every cut in the valley has a line, and a price beside it. They do not grade the Assay. They invoice it.'),
         narr('House Teal: three standards credited before the first day. In the margin a patron\'s seal, and a sum.'),
@@ -5638,7 +5731,7 @@ const Mission = {
     const d = this.def = MISSIONS[key]; this.key = key; this.done = done || null;
     this.prev = { map: G.mapId, x: P.x, y: P.y, dir: P.dir, sheet: P.sheet, show: World.showPlayer, dark: World.darkOverride };
     G.flags = G.flags || {}; for (const k of Object.keys(G.flags)) if (k.startsWith('m_')) delete G.flags[k];
-    G.heist = 3; G.flags.heistEase = 0; G.flags.mCaught = 0; UI.clear(); P.sheet = World.sheetFor('kael2'); World.showPlayer = true; World.darkOverride = null;
+    G.heist = 3; G.flags.heistEase = 0; G.flags.mCaught = 0; UI.clear(); P.sheet = World.sheetFor(d.sheet || 'kael2'); World.showPlayer = true; World.darkOverride = null;
     if (d.reset) d.reset();
     World.load(d.map, { x: d.spawn[0] * 16 + 8, y: d.spawn[1] * 16 + 4, dir: d.spawn[2] }, true); G.mode = 'world'; this.reset(); Sound.music(MAPS[d.map].music);
     Fade.a = 1; Fade.dir = -1; Fade.sp = 1; Fade.busy = true; HUD.dirty = true;
@@ -5651,7 +5744,7 @@ const Mission = {
   holds(t) { return !!(this.def && t && t.kind === 'hot' && this.def.holds(t)); },
   use(t) { this.def.use(t); },
   respawn() { const s = (this.def.respawn ? this.def.respawn() : this.def.spawn); return { x: s[0] * 16 + 8, y: s[1] * 16 + 4, dir: s[2] }; },
-  caught(n) { const k = G.flags.mCaught = (G.flags.mCaught || 0) + 1; if (k >= 2) G.flags.heistEase = 1; Dialogue.start(this.def.caught ? this.def.caught(k) : [narr('Seen.')]); },
+  caught(n) { const k = G.flags.mCaught = (G.flags.mCaught || 0) + 1; if (k >= 2) G.flags.heistEase = 1; Dialogue.start(this.def.caught ? this.def.caught(k, n) : [narr('Seen.')]); },
   finish() {
     if (G.heist !== 3) return; const pv = this.prev || {}, cb = this.done; this.done = null;
     G.heist = 0; G.flags.heistEase = 0; World.bolt = null; World.ripple = null; World.dynLights = []; World.npcs = []; World.work = 0; World.alert = 0; for (const k of Object.keys(G.flags)) if (k.startsWith('m_')) delete G.flags[k]; if (this.def.reset) this.def.reset();
@@ -5662,6 +5755,123 @@ const Mission = {
     if (cb) cb(); else Game.toTitle();
   }
 };
+
+// ------------------------------------------------------------------ Part Two on foot: the Count hall, and the square five years on.
+MAPS.counthall = buildMap({
+  name: 'The Count hall — fourth ring', w: 24, h: 13, theme: 'spire', music: 'spire', dark: 'rgba(8,8,26,.6)',
+  set: [[1, 7, 22, 1, ',']],
+  props: [{ t: 'holes', x: 1, y: 3, a: 2, block: blk(1, 3, 2) }, { t: 'countbook', x: 11, y: 3, block: blk(11, 3, 2) }, { t: 'lectern', x: 22, y: 4, a: 3, block: blk(22, 4) },
+    { t: 'cdesk', x: 4, y: 4, block: blk(4, 4, 2) }, { t: 'cdesk', x: 8, y: 5, block: blk(8, 5, 2) }, { t: 'cdesk', x: 15, y: 4, a: 1, block: blk(15, 4, 2) }, { t: 'cdesk', x: 19, y: 5, block: blk(19, 5, 2) },
+    { t: 'cdesk', x: 3, y: 10, a: 1, block: blk(3, 10, 2) }, { t: 'cdesk', x: 8, y: 9, block: blk(8, 9, 2) }, { t: 'cdesk', x: 14, y: 10, block: blk(14, 10, 2) }, { t: 'cdesk', x: 20, y: 9, block: blk(20, 9, 2) }],
+  lights: [{ x: 72, y: 168, r: 44, c: '#ffe090' }, { x: 264, y: 72, r: 48, c: '#ffe090' }, { x: 192, y: 52, r: 40, c: '#e8c25a' }, { x: 360, y: 60, r: 34, c: '#c8d8ff' }],
+  hot: [{ id: 'shelf', tiles: blk(1, 3, 2) }, { id: 'count', tiles: blk(11, 3, 2) }, { id: 'tray', tiles: blk(22, 4) }, { id: 'marendesk', tiles: blk(15, 4, 2) }, { id: 'mydesk', tiles: blk(3, 10, 2) }, { id: 'motto', tiles: blk(6, 1, 2) }, { id: 'win', tiles: blk(17, 1) }, { id: 'deskA', tiles: blk(8, 5, 2) }, { id: 'deskB', tiles: blk(20, 9, 2) }], exits: []
+});
+MAPS.night5 = buildMap(Object.assign({}, SQUARE_DEF, { name: 'Ashgate Square — five years on', music: 'mystery', dark: 'rgba(6,4,14,.7)', hot: [{ id: 'pillarSun', tiles: blk(13, 8) }, { id: 'lift5', tiles: blk(12, 1, 2) }, { id: 'notice5', tiles: blk(7, 1, 2) }], exits: [] }));
+Object.assign(MISSIONS, {
+  // +5. "Lose it. Buy a day." Played.
+  count: {
+    map: 'counthall', spawn: [5, 11, 1], where: 'The Sun Spire · five years on', toast: 'After the bell. The order is in the Marshal\'s tray.', hint: 'B: drop a pen · hold A to work · stay out of the lamps',
+    npcs: () => [mG('warden', 6, 7, 3, [[18, 7, 3, 1.6], [18, 11, 0, 1.8], [6, 11, 2, 1.6], [6, 7, 1, 1.8]]), mG('maren', 17, 5, 0, [[17, 5, 0, 3], [17, 5, 2, 1.8], [17, 5, 0, 3.4], [17, 5, 3, 1.6]]), mG('warden', 22, 9, 2, [[22, 9, 2, 2.2], [22, 9, 1, 1.8], [22, 9, 2, 2], [22, 9, 0, 1.4]])],
+    obj: () => !MF('order') ? "Take the Tier Four order from the Marshal's tray (north-east), unseen" : 'Misfile it in the dead letters (north-west), unseen',
+    mark: () => !MF('order') ? { x: 22.5 * 16, y: 4 * 16, lab: 'TRAY' } : { x: 2 * 16, y: 3 * 16, lab: 'DEAD LETTERS' },
+    holds: t => (t.id === 'tray' && !MF('order')) || (t.id === 'shelf' && MF('order')),
+    respawn: () => [5, 11, 1],
+    caught: (k, n) => n && n.id === 'maren' ? [say('maren', 'Sorrel. One is working late. So, it appears, is one\'s colleague.'), narr(MF('order') ? 'She looked at my hands. They were empty. The order had gone inside my coat a breath before. She looked at the coat, too.' : 'She looked at my hands. They were empty. She went back to her column, and I went back to my chair, and we both pretended to count.'), fx(() => { G.flags.marenSaw = 1; })]
+      : [say('warden', ['CLERK. THE HALL IS CLOSED.', 'YOUR DESK, CLERK.', 'NOTED.'][k % 3]), narr('A clerk out of his chair after the bell is not a crime up here. It is a note. I let him walk me back to my desk, and wait for his lamp to turn.')],
+    use(t) {
+      if (t.id === 'motto') return Dialogue.start([narr('Cut into the stone over the first row, and gilded: A BALANCED LINE IS A QUIET LINE.'), narr('Under it, smaller, older, half polished away: EVERY LINE IS A PERSON. Somebody had the first one cut over it. Somebody else, once, had cut the second.')]);
+      if (t.id === 'win') return Dialogue.start([narr('A window. Night, and the weather under it like a floor. Under that, rock. Under that, a square with a Pillar in it, and a girl of twelve with chalk on her fingers.')]);
+      if (t.id === 'deskA') return Dialogue.start([narr('Clerk Third\'s desk. A dish of surface greens, half eaten, going soft. Nell skims four crates in forty for a ward of forty children. He has left more than that on the plate.'), fx(() => { if (!MF('greens')) rage(1); MSET('greens'); })]);
+      if (t.id === 'deskB') return Dialogue.start([narr('A child\'s drawing, pinned inside the kneehole where no auditor would look. A house. A tall person. A small person. A yellow circle.'), narr('So they draw it yellow as well.')]);
+      if (t.id === 'mydesk') return Dialogue.start([narr('My desk. Fourth ring, third row. Eleven hundred lines waiting in the morning tray, and a pen I have worn a groove in.')]);
+      if (t.id === 'count') return Dialogue.start([narr('The Count. Open, always. They do not lock it. Who up here would want to change it?'), narr('I know the page without looking. "Holloway, S. Tier Six. Air owed: balanced." The ink of the strike is browner than the rest. It was done with a different pen.'), fx(() => Sound.play('heart')), narr('Below it, in my own hand, four hundred and six lines I have struck since. I learned every one. It does not help them. It is the only thing I have that is not a lie.'), fx(() => { if (!MF('count')) rage(2); MSET('count'); })]);
+      if (t.id === 'marendesk') return Dialogue.start([narr('Maren Aldane\'s desk. Her lamp is still lit. She has left a second book open under the day\'s columns, and it is not the Count.'), narr('Sealed pairings. The Assay of four years ago. A ribbon at one page, and two names on it.'), fx(() => Sound.play('heart')), narr('"Aldane, T. Sorrel, E." She has underlined neither. She has drawn a small careful box around both, the way one marks a sum that does not come out.'), fx(() => MSET('saw'))]);
+      if (t.id === 'tray') { if (MF('order')) return Dialogue.start([narr('Empty. He will ask in the morning where it went.')]);
+        return Dialogue.start([narr('Marshal Cade\'s tray. One order, eleven hundred lines, sanded and sealed and waiting for a clerk.'), narr('It weighs nothing. I had thought it would weigh something.'), fx(() => { MSET('order'); Sound.play('coin'); Mission.resetNPCs(); World.grace = 2.5; HUD.toast('Now lose it. The dead letters, north-west.'); })]); }
+      if (t.id === 'shelf') { if (!MF('order')) return Dialogue.start([narr('The dead letters. Everything the Spire has ever written to somebody it had already struck. Nobody has opened a slot in years.')]);
+        return Dialogue.start([narr('Row nine, slot four. Behind a petition from Tier Five that somebody answered eleven years late.'), narr('One day. They will find it by tomorrow evening and call it clerical. Dace has until then to get as many as he can up a nine-floor riser.'), narr('It is the first thing I have done in this hall that Seren would have recognised.')], () => Mission.finish()); }
+    }
+  },
+  // +5, below. Tavi is twelve. Somebody still puts the sun back.
+  sun: {
+    map: 'night5', spawn: [6, 13, 1], sheet: 'tavi', where: 'Cinderwell · five years after the furnace', toast: 'Sull scrubs it off every rest day. Put it back.', hint: 'B: throw a bolt · hold A to work · watch the lamps turn',
+    npcs: () => { const slow = G.flags.heistEase ? 2.6 : 1.6; return [mG('proctor', 9, 6, 3, [[17, 6, 0, 1.4], [17, 11, 2, slow], [9, 11, 1, slow], [9, 6, 3, 1.4]]), mG('watchman', 13, 12, 2, [[13, 12, 2, 2], [13, 12, 1, 1.6], [13, 12, 3, 2], [13, 12, 1, 1.6]]), mS('fen', 20, 14, 1), mS('kit', 24, 10, 2)]; },
+    obj: () => "Chalk Seren's sun back on the Pillar (hold), unseen",
+    mark: () => ({ x: 13.5 * 16, y: 8 * 16, lab: 'PILLAR' }),
+    holds: t => t.id === 'pillarSun',
+    respawn: () => [6, 13, 1],
+    caught: k => k >= 2 ? [say('proctor', "Brennick. The small one. ...Go home. I didn't see you. I'm seeing less every year."), narr("He's been on this beat since before I could reach the wheel. He turned his lamp the other way and kept it there.")] : [say('proctor', ['YOU. STOP THERE.', 'WHO IS THAT?'][k % 2]), narr("Back behind the stall. He never checks the stall. Kael told me that when I was seven.")],
+    use(t) {
+      if (t.id === 'fen') return Dialogue.start([say('fen', "Go on, little one. I'm only coughing. Coughing's not a report.")]);
+      if (t.id === 'kit') return Dialogue.start([say('kit', "Freight Three goes up nine floors. Sign still says six. Tell your brother, if he's anywhere.")]);
+      if (t.id === 'lift5') return Dialogue.start([narr("Lift Zero. It came down empty once, with a leaf in it. I've still got the leaf. It's gone brown and I've still got it.")]);
+      if (t.id === 'notice5') return Dialogue.start([narr('"COMMITTED: K. BRENNICK. FAILED SEAL, FURNACE LINE. LET THE ACCOUNT BALANCE." Five years old and they have never taken it down.'), narr("Mara says there's nothing in his tin. She says it like it's good news and won't say why.")]);
+      if (t.id === 'pillarSun') return Dialogue.start([
+        narr("Orin's chalk. Engineer's gold. You're not supposed to have it, which is how you know it's the right colour."),
+        narr("Round first. Then the rays. She did seventeen. I counted them on our wall every night till Kael went, and then I counted them for him."),
+        fx(() => Sound.play('heart')),
+        narr("He said he'd find out if it's yellow. He never said. So I do it yellow till somebody tells me different."),
+        narr("Sull will scrub it off on rest day. He takes longer over it every year. Last time he left one ray.")], () => Mission.finish());
+    }
+  }
+});
+
+// ------------------------------------------------------------------ The night before the last day. Nobody to hide from.
+MAPS.vcamp2 = buildMap({
+  name: 'House Violet — the last night', w: 26, h: 14, theme: 'valley', music: 'mystery', dark: 'rgba(8,8,24,.62)',
+  set: [[1, 7, 20, 1, ','], [12, 4, 1, 3, ','], [22, 2, 2, 11, '~'], [21, 7, 1, 1, ',']],
+  props: [{ t: 'vtent', x: 3, y: 4, a: '#7a5ac8', block: blk(3, 4, 2) }, { t: 'vtent', x: 7, y: 4, a: '#7a5ac8', block: blk(7, 4, 2) }, { t: 'vtent', x: 16, y: 4, a: '#3aa8a0', block: blk(16, 4, 2) }, { t: 'vtent', x: 4, y: 11, a: '#7a5ac8', block: blk(4, 11, 2) }, { t: 'vtent', x: 16, y: 11, a: '#3aa8a0', block: blk(16, 11, 2) },
+    { t: 'standard', x: 11, y: 3, a: '#7a5ac8', block: blk(11, 3) }, { t: 'standard', x: 13, y: 3, a: '#3aa8a0', block: blk(13, 3) }, { t: 'standard', x: 14, y: 3, a: '#c8782a', block: blk(14, 3) },
+    { t: 'campfire', x: 12, y: 9, a: 1, block: blk(12, 9) }, { t: 'woodpile', x: 9, y: 10, block: blk(9, 10) }, { t: 'bedroll', x: 14, y: 10 }, { t: 'bedroll', x: 8, y: 8 }, { t: 'bedroll', x: 18, y: 9, a: '#3aa8a0' }, { t: 'stakes', x: 19, y: 4, a: 2 }, { t: 'stakes', x: 19, y: 11, a: 2 }],
+  lights: [{ x: 200, y: 150, r: 80, c: '#ffb050' }, { x: 200, y: 50, r: 46, c: '#c8b0ff' }, { x: 350, y: 110, r: 44, c: '#a8c8ff' }],
+  hot: [{ id: 'fire2', tiles: blk(12, 9) }, { id: 'stds', tiles: blk(11, 3).concat(blk(13, 3, 2)) }], exits: []
+});
+const EVE_N = () => ['petra', 'oswin', 'teal', 'lucan'].filter(k => MF('e_' + k)).length;
+Object.assign(MISSIONS, {
+  eve: {
+    map: 'vcamp2', spawn: [2, 7, 3], toast: 'Tomorrow, the keep. Nobody is sleeping.', hint: 'Walk the camp · talk to whoever is awake',
+    npcs: () => [mS('petra', 10, 6, 0), mS('oswin', 14, 11, 1), mS('cadt1', 18, 8, 2), mS('lucan', 21, 7, 2), mS('cadv1', 6, 9, 3), mS('cadv2', 9, 12, 1)],
+    obj: () => EVE_N() < 3 ? 'Walk the camp. Speak to those who are awake (' + EVE_N() + '/4)' : 'Sit down at the fire (hold)',
+    mark: () => EVE_N() < 3 ? null : { x: 12.5 * 16, y: 9 * 16, lab: 'FIRE' },
+    holds: t => t.id === 'fire2' && EVE_N() >= 3,
+    use(t) {
+      if (t.id === 'petra') return Dialogue.start([
+        say('petra', 'Pickets are set. Two on the ford, four on the ridge path. One checked them oneself.'),
+        say('petra', 'Forty-six days ago I could not light a fire. I have killed two people since. One notes the order in which one learned things.'),
+        say('kael', 'Which do you wish you had learned first?'),
+        say('petra', '...The fire. One could have stopped there, and been somebody who knew how to make a fire.'),
+        narr('She is eighteen. By winter she will keep a column of the Count, and she will be good at it, and I will sit two rows behind her and never once say I remember this.'), fx(() => MSET('e_petra'))]);
+      if (t.id === 'oswin') return Dialogue.start([
+        say('oswin', 'Do not look at the leg. The Proctors have a salve. They will bring it down when the Assay is over and not before. It would not be a result otherwise.'),
+        say('oswin', 'My father finished ninth. If you take the keep tomorrow I shall have finished second, behind a man who lit a fire. He will never recover from it.'),
+        say('oswin', '...Noted, Sorrel. That is the word, is it not. I have said it all my time. I do not think I ever meant it before.'),
+        narr('It is their only word for thanks, and it means: I have written down what you owe me. He meant the other thing. He did not have a word for it. None of them do.'), fx(() => { MSET('e_oswin'); rage(1); })]);
+      if (t.id === 'cadt1') return Dialogue.start([
+        say('cadt1', 'You are wondering why thirty of Teal sleep under a Violet standard. Our House was bought before the first day. Three standards credited. Our captain told us so, to hearten us.'),
+        say('cadt1', 'One found one did not want to win something already paid for. Yours was only hungry. Hungry is at least one\'s own.'),
+        narr('He has no idea how close that is to something Mara would say. I do not tell him. He would have to be told who Mara is, and then what a tier is, and then why.'), fx(() => MSET('e_teal'))]);
+      if (t.id === 'cadv1' || t.id === 'cadv2') return Dialogue.start([narr(t.id === 'cadv1' ? 'She is oiling a blade she will use tomorrow on somebody she sat beside at lessons. She is humming. I know it. It is the shift song, in a bright key, with a turn on the end I have never heard. She says it is the Count-Out, a nursery game. One, two, the line is true. Her nurse sang it, and her nurse before. They took it up the lift with them when they left us down there, and forgot whose it was.' : 'He is writing a letter by the fire. The Proctors read them all. He knows. He is writing it anyway.')]);
+      if (t.id === 'stds') return Dialogue.start([narr('Three standards now. Violet, Teal, and Amber, who came in on day thirty-four without a blade drawn. Each of them is a House that stopped existing because I picked up a pole.'), narr('It is exactly how the Count works. I am learning their trade by doing it to their children.')]);
+      if (t.id === 'lucan') return Dialogue.start(MF('e_lucan') ? [say('lucan', 'Until the morning, Sorrel.')] : [
+        narr('He is standing on the far bank under a white cloth, alone, with his blade left on the stones behind him. Lucan Aurel. The High Auditor\'s son.'),
+        say('lucan', 'I asked for the truce. The Proctors are annoyed. They cannot grade a conversation.'),
+        say('lucan', 'Tomorrow I hold the keep and you come up the ridge, and my mother watches. I should like, once, to have spoken to you where it does not count.'),
+        say('lucan', 'You fight as if you hate the ground you are standing on. Nobody taught us that. Where does one learn it?'),
+        { choice: [
+          { t: 'One learns it by being under it.', fx: () => { rage(1); }, then: [say('lucan', '...I do not understand that.'), say('kael', 'No.'), say('lucan', 'I should like to. I think that is the difference between us, and I think it is not to my credit.'), narr('He is eighteen and he meant it. It is the most dangerous thing anybody said to me in fifty days. It is very hard to hate somebody who would like to understand.')] },
+          { t: 'One had a good teacher.', then: [say('lucan', 'Mine told me the first cut is a question and the second is the answer. Yours seems to have skipped the question.'), narr('He smiled. He has his mother\'s mouth, and none of what she does with it.')] }] },
+        say('lucan', 'She says I am kind. She says it the way one reports a fault in a casting. Until the morning, Sorrel.'), fx(() => MSET('e_lucan'))]);
+      if (t.id === 'fire2') { if (EVE_N() < 3) return Dialogue.start([narr('The fire I taught them. Somebody has kept it in for forty-six days. Not yet. Walk the lines first.')]);
+        return Dialogue.start([
+          narr('I sit down. The pack is under my knees. I know what is at the bottom of it.'),
+          fx(() => Sound.play('heart')),
+          narr('Teo Aldane\'s bread. Half a heel, forty days old. He broke it on the lift and gave me the larger piece, and said: one ought to go up on something.'),
+          narr('It is a stone. I eat it. All of it. It takes most of an hour, and it is the worst thing I have ever done slowly.'),
+          narr('Tomorrow I take the keep, and they pin gold on me, and I go to work for the woman who burned my wife. That was always the plan. Tonight it is only a fire, and I am the one who knows how.'),
+          narr('Hands, Kael. Everything is hands.')], () => Mission.finish()); }
+    }
+  }
+});
 
 // ---- src/checkpoints.js
 // dev checkpoints: saves captured from a scripted playthrough (see Menus.checkpoints)
@@ -5704,7 +5914,7 @@ const HUD = {
     s.classList.toggle('hidden', !world || Dialogue.active || Puzzle.active || Brawl.active);
     if (Puzzle.active) { o.querySelector('b').textContent = Puzzle.defs[Puzzle.si].wo || ('WO-114 · VALVE ' + Puzzle.defs[Puzzle.si].name); o.querySelector('span').textContent = Puzzle.defs[Puzzle.si].tip; }
     else { o.querySelector('b').textContent = 'OBJECTIVE'; o.querySelector('span').textContent = this.objective(); }
-    s.textContent = G.heist === 3 ? 'The Assay · four years from now' : `Day ${G.day} · ${G.scrip} scrip` + (F('d2Tavi') && !F('day2Done') ? ` · ☀${G.flags.rays | 0}` : '') + (G.newJ ? ` · ✎${G.newJ}` : '');
+    s.textContent = G.heist === 3 ? (Mission.def.where || 'The Assay · four years from now') : `Day ${G.day} · ${G.scrip} scrip` + (F('d2Tavi') && !F('day2Done') ? ` · ☀${G.flags.rays | 0}` : '') + (G.newJ ? ` · ✎${G.newJ}` : '');
     const ht = this.hint(); h.classList.toggle('hidden', !ht); h.querySelector('span').textContent = ht;
     document.body.classList.toggle('ctlfade', Dialogue.active || Puzzle.active);
     document.body.classList.toggle('ingame', world || (Brawl.active && !Brawl.cine)); if (Cutscene.active) $('#cskip').classList.toggle('hidden', Brawl.active || !!Cutscene.noSkip);
@@ -5898,7 +6108,10 @@ const Menus = {
       'Assay missions (2D)': [
         ['★ NEW · Day 3 · The Camp (wood, water, fire)', () => { fresh(); Mission.start('camp'); }],
         ['★ NEW · Night 25 · The Island (stealth; Wren)', () => { fresh(); Mission.start('raid'); }],
-        ['★ NEW · Night 30 · The Dais (stealth; the grading book)', () => { fresh(); Mission.start('dais'); }]
+        ['★ NEW · Night 30 · The Dais (stealth; the grading book)', () => { fresh(); Mission.start('dais'); }],
+        ['★ NEW · Night 49 · The Last Night (the camp; Lucan under truce)', () => { fresh(); Mission.start('eve'); }],
+        ['★ NEW · Part Two · The Count hall (stealth; lose the order)', () => { fresh(); Mission.start('count'); }],
+        ['★ NEW · Below, +5 · The Sun (you play Tavi)', () => { fresh(); Mission.start('sun'); }]
       ],
       'Story beats': [
         ['Opening film', () => { UI.clear(); Sound.tname = null; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => Game.toTitle()); G.mode = 'opening'; }],
@@ -5933,7 +6146,7 @@ const Menus = {
       ['Day 4 · the months, Mara, the way out, Ilse (no fights)', cs(DAY4)], ['Film · The Standard', film('twins')], ['Film · The Pinning', film('blade')], ['Film · The High Docks', film('docks')],
       ['Film · The Valley', film('valley')], ['Film · The Pairing', film('pairing')], ['Film · The Ford', film('ford')], ['Film · The Proctor', film('proctor')], ['Film · The Keep', film('keep')], ['Film · The Fall', film('fall')]
     ];
-    S['Fights'].splice(S['Fights'].length - 1, 0, ['★ NEW · Part Two · The Dock Stair · you play Brand', ff('THE DOCK STAIR', 'Seven years from now. Brand.', 'brandstair')], ['Part Two · The Gallery · Tyr Cade', ff('PART TWO', 'The Sun Spire.', 'gallery')], ['Part Two · Riser Nine · the balancing of Tier Four', ff('PART TWO', 'Five years from now.', 'riser')], ['Part Two · The Son · Lucan Aurel again', ff('PART TWO', 'Six years from now.', 'son')], ['Part Two · Tier Six Stands · you play Mara (2D)', ff('MEANWHILE', 'Six tiers down.', 'stand')], ['Part Two · The Stair · up the Spire', ff('PART TWO', 'Nine years from now.', 'stair')], ['Part Two · Little Ember · Celestine (final)', ff('PART TWO', 'The top of the Spire.', 'ember')]);
+    S['Fights'].splice(S['Fights'].length - 1, 0, ['★ NEW · Part Two · The Dock Stair · you play Brand', ff('THE DOCK STAIR', 'Seven years from now. Brand.', 'brandstair')], ['★ NEW · Training · No Gloves · Brand (2D)', ff('TWO AND A HALF YEARS FROM NOW', 'The pit. Brand. No gloves.', 'drill2')], ['Part Two · The Gallery · Tyr Cade', ff('PART TWO', 'The Sun Spire.', 'gallery')], ['Part Two · Riser Nine · the balancing of Tier Four', ff('PART TWO', 'Five years from now.', 'riser')], ['Part Two · The Son · Lucan Aurel again', ff('PART TWO', 'Six years from now.', 'son')], ['Part Two · Tier Six Stands · you play Mara (2D)', ff('MEANWHILE', 'Six tiers down.', 'stand')], ['Part Two · The Stair · up the Spire', ff('PART TWO', 'Nine years from now.', 'stair')], ['Part Two · Little Ember · Celestine (final)', ff('PART TWO', 'The top of the Spire.', 'ember')]);
     for (let n = 1; n <= 5; n++) { S['Story beats'].push([`Part Two · ${n} · ${P2_TITLES[n]}`, () => playPart2(n)]); S['Cutscenes'].push([`Part Two · ${n} · ${P2_TITLES[n]} (no fights)`, cs(P2[n])]); }
     S['Cutscenes'].push(['Film · The Gallery', film('gallery')], ['Film · Riser Nine', film('riser')], ['Film · The Son', film('son')], ['Film · The Stair', film('stair')], ['Film · Little Ember', film('ember')]);
     const sub = k => () => UI.push(modal({ title: k, items: S[k].map(([label, act]) => ({ label, act })).concat([{ label: 'Back', act: () => UI.pop() }]) }));
@@ -5983,7 +6196,7 @@ const Menus = {
   chapters() { const go = f => () => { UI.clear(); f(); }; UI.push(modal({ title: 'Chapter select', build(b) { b.innerHTML = '<p>Replay any chapter. Your save slots are not touched until the game autosaves.</p>'; }, items: [{ label: 'Part One · from the beginning', act: () => Menus.newGame() }, ...[1, 2, 3, 4, 5].map(n => ({ label: `Part Two · ${n} · ${P2_TITLES[n]}`, act: go(() => playPart2(n)) })), { label: 'Back', act: () => UI.pop() }] })); },
   memories() { let L = []; try { L = JSON.parse(Store.get('sootborn_mem') || '[]'); } catch (e) { } UI.push(modal({ title: 'Memories', build(b) { b.innerHTML = '<p style="opacity:.7">Mara keeps them on the shelf, beside the tins. ' + L.length + ' kept so far.</p>' + (L.map(m => `<div class="card"><b>${esc(m[0])}</b><p>${esc(m[1])}</p><p style="opacity:.55">${esc(m[2] || '')}</p></div>`).join('') || '<p>None yet. They come back to him in fights.</p>'); }, items: [{ label: 'Back', act: () => UI.pop() }] })); },
   about() {
-    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Version 0.27. The whole story plays from the opening film to THE END: four days in Cinderwell, the Assay told in dreams, and five chapters above the rock, with about twenty fights. The training room is on the title screen and in the pause menu. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
+    UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Version 0.28. The whole story plays from the opening film to THE END: four days in Cinderwell, the Assay told in dreams, and five chapters above the rock, with about twenty fights. The training room is on the title screen and in the pause menu. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));

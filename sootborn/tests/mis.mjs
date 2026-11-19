@@ -13,6 +13,10 @@ const st = () => ev(() => [BTS.G.heist, BTS.G.mode, BTS.G.mapId, BTS.UI.objectiv
 let ended = 0; const run = async (k, steps) => { ended = 0; await ev(k => { BTS.UI.clear(); window.__done = 0; Mission.start(k, () => { window.__done = 1; BTS.Game.toTitle(); }); }, k); await wait(2200); await shot(k + '-0'); console.log(k, 'start', await st());
   let i = 1; for (const [x, y, d, hold] of steps) { await at(x, y, d); await shot(k + '-' + i++); await use(hold); console.log(k, [x, y], await st()); }
   await wait(800); console.log(k, 'done', await ev(() => [window.__done, BTS.G.heist, BTS.G.mode])); };
+if (process.env.EVE) { await run('eve', [[10, 7, 1], [14, 10, 0], [19, 8, 2], [20, 7, 3], [12, 10, 1, 1]]); console.log('errors', errors); await browser.close(); process.exit(0); }
+await run('count', [[11, 4, 1], [15, 5, 1], [22, 5, 1, 1], [1, 4, 1, 1]]);
+await run('sun', [[13, 9, 1, 1]]);
+if (!process.env.ALL) { console.log('errors', errors); await browser.close(); process.exit(0); }
 await run('camp', [[11, 8, 2], [16, 9, 2], [20, 6, 1], [3, 12, 1], [12, 10, 1, 1]]);
 await run('raid', [[14, 5, 1, 1], [26, 7, 3, 1]]);
 await run('dais', [[10, 5, 1], [14, 5, 1], [18, 5, 1, 1]]);
