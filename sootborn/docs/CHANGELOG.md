@@ -1,5 +1,32 @@
 # SOOTBORN — changelog
 
+## v0.26 · 2026-11-18 — acting on the State of the Game review: bug table, readability, onboarding
+From the State of the Game review (written against v0.24). This round takes its bug table and its "readability and onboarding" phase. New story content (a fall, Teo's family, a rival, a companion above) is not started; it needs decisions first.
+
+**Bugs from the review**
+- **Tier Six Stands:** Mara no longer wears Kael's violet cape, and Hollis and Ivo no longer carry swords. Allies carry a blade only when the hero does.
+- **Gold smear at high fury:** the fury flames on a 3D fighter are fewer and dimmer, and much dimmer in a one-on-one duel, so the body stays readable at full fury.
+- **Finding Kael in a crowd:** in 3D fights with more than two other fighters, the marker over him carries his name.
+- **About screen** rewritten (it still described two days and five fights). **"Below the Sun"** removed from the save-import message and the screen label.
+- Already fixed before this round: braziers in front of fighters (v0.24). Not reproduced: the Valley hit counter and enemy bar running off the right edge; at 960x540 and 844x390 both sit inside the frame.
+
+**Readability and onboarding**
+- **Training room** is on the title screen and in the pause menu (it returns you to where you were). Its pause entry reads "Leave the training room".
+- **Cooldown tags** (HK, RM, WC, BR, DR, RO) are hidden until that move is cooling down.
+- **Assay calendar:** every flash-forward card for the Assay shows a strip of its seven beats in story order (Night 1, Day 19, Day 26, Day 31, Day 40, Last day, the Pinning) with the current one lit. The opening card now says "Day forty".
+- **Chapter select** appears on the title screen after THE END.
+- Text size and "Reduce motion & flicker" were already in Settings; the review missed them. Defaults unchanged.
+
+**Documents**
+- Story bible: a canon timeline with one date per event, and a list of six open conflicts with a proposed answer each. No game text was changed for these.
+
+**Not done from the review**
+- Reordering the Assay (the Standard before the Proctor), the Memories shelf, a HUD trim beyond cooldown tags, world dialogue size defaults.
+- Everything in its phases 3 and 4: suspicion meter, the Count as a puzzle, a walkable Spire, training-year 2D bouts, a Row K interlude, the Part Two story additions.
+
+**Not tested**
+- Nobody has played this build. The fury glow was judged from two still frames. Phone frame rate is still unmeasured.
+
 ## v0.25 · 2026-11-18 — graphics plan, stages A to C: presets, cel shading, and one duel rebuilt
 From play notes and the art-direction handoff: move toward anime-style characters; do one duel so both fighters look their best; mark it in the Dev menu; make a second version on 2D backgrounds; update or remove anyone in its background.
 

@@ -4,6 +4,9 @@
 // {face,dir} {remove} {say,t} {narr} {choice} {wait} {pan,dur} {music} {sfx} {flash} {beam}
 // {shake} {fade:'out'|'in'} {pillarRed} {fx}
 // ============================================================
+// where a flash-forward lands inside the Assay: the beats in story order, the current one lit
+const ASSAY_BEATS = [[/first night/i, 'NIGHT 1'], [/day nineteen/i, 'DAY 19'], [/day twenty-six/i, 'DAY 26'], [/day thirty-one/i, 'DAY 31'], [/day forty/i, 'DAY 40'], [/last day\.?$/i, 'LAST DAY'], [/after the keep/i, 'THE PINNING']];
+function assayCal(sub) { if (!sub || !/assay/i.test(sub)) return ''; const k = ASSAY_BEATS.findIndex(b => b[0].test(sub)); if (k < 0) return ''; return '<div class="acal">' + ASSAY_BEATS.map((b, i) => `<span class="${i === k ? 'on' : ''}"><i></i>${b[1]}</span>`).join('') + '</div>'; }
 const Cutscene = {
   active: false, steps: [], i: 0, actors: [], cam: { x: 0, y: 0 }, block: null, letter: 0, beam: 0, beamT: 0, flash: 0, flashC: '#fff', shake: 0, dark: null, onEnd: null, pillarRed: false, motes: [],
   actor(id) { return this.actors.find(a => a.id === id); },
@@ -18,7 +21,7 @@ const Cutscene = {
   },
   card(t, sub, big) {
     const el = $('#card'); el.classList.remove('hidden');
-    el.innerHTML = big ? `<div class="bigt">${esc(t)}</div>${sub ? `<div class="bigs">${esc(sub)}</div>` : ''}` : `<p>${esc(t)}</p>${sub ? `<p class="s">${esc(sub)}</p>` : ''}`;
+    el.innerHTML = big ? `<div class="bigt">${esc(t)}</div>${sub ? `<div class="bigs">${esc(sub)}</div>` : ''}${assayCal(sub)}` : `<p>${esc(t)}</p>${sub ? `<p class="s">${esc(sub)}</p>` : ''}`;
     el.classList.remove('on'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
   },
   hideCard() { const el = $('#card'); el.classList.add('hidden'); el.classList.remove('on'); },

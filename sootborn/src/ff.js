@@ -174,7 +174,7 @@ const OPENING = [
 const Opening = { run(done) { if (NOFF) return done(); G.mode = 'opening'; Brawl.start({ bg: 'valley', arena: FIELD, music: 'battle', cineOnly: 1, intro: OPENING, foes: [] }, () => { Fade.a = 1; Fade.dir = -1; Fade.sp = 1.2; Fade.busy = true; done(); }); } };
 
 // ---- weave them into the story
-if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { card: 'FOUR YEARS FROM NOW', sub: 'Above the rock. The Assay.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.valley() }, { card: 'FOUR YEARS EARLIER', sub: 'Cinderwell. Six tiers under the rock. Before any of it.', big: 1, min: 1.6, max: 5 }, { noskip: false });
+if (!NOFF) PROLOGUE_A.unshift({ noskip: true }, { fx: () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; } }, { card: 'FOUR YEARS FROM NOW', sub: 'Above the rock. The Assay. Day forty.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.valley() }, { card: 'FOUR YEARS EARLIER', sub: 'Cinderwell. Six tiers under the rock. Before any of it.', big: 1, min: 1.6, max: 5 }, { noskip: false });
 // the furnace: if he runs for her, he gets his three steps
 { const i = PROLOGUE_B.findIndex(s => s.choice && s.choice.some(c => /BREAK FREE/.test(c.t))), ch = PROLOGUE_B[i].choice.find(c => /BREAK FREE/.test(c.t)), was = ch.then;
   ch.then = [narr("You tear out of Mara's arms. Three steps. A Warden turns, unhurried, and lowers a halberd the length of a pipe.")];

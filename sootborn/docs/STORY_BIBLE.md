@@ -115,7 +115,7 @@ Day 3 closes these: the ledger and Lift Zero, Dace under the floor, what Celesti
 - Cutscene step `{brawl: def}` runs a fight inside a cutscene; `{dlg: steps}` runs a dialogue list.
 
 ## The Assay (flash-forwards)
-- Four years on. The Accredited send their children to a year-long proving war in a valley above the rock: twelve Houses, one winner. Kael, gilded and under a bought name, fights for House Violet.
+- Four years on. The Accredited send their children to a year-long proving war (length under review; see the canon timeline) in a valley above the rock: twelve Houses, one winner. Kael, gilded and under a bought name, fights for House Violet.
 - It is this game's own invention and uses only our names: the Assay, House Violet, House Teal, Captain Vant, Lucan Aurel (Celestine's son).
 - Purpose: show where the rage goes, and give the slow undercity chapters something to fall toward. The two halves should feel like different games: Cinderwell is dark, slow, talk and stealth; the Assay is daylight, fast, almost wordless except for Kael's voice.
 - Placement: opening before the title; The Valley at New Game; The Ford between Day 1 and Day 2; The Keep at the end of Day 2.
@@ -238,3 +238,31 @@ How Kael fights is part of the story and changes with it. All names are ours.
 - Rebuilt so far: Kael (gilded) and Captain Vant, in the Ford only. The rest of the roster follows once the look is approved.
 - The Ford exists in two versions for comparison: the 3D valley, and the painted pixel-art valley with a side-on camera.
 - The Ford is single combat. Cadets of both Houses watch from the tree line (Lucan among them); nobody else fights in the background.
+
+## Canon timeline, one date per event (v0.26)
+Year 0 is the furnace. This sheet is the reference when a card, a line or a chapter title disagrees.
+
+| When | Event |
+|---|---|
+| −1 yr | The proposal and the wedding |
+| 0 | The fever, the bleed, the heist, the audit. Seren walks into the furnace. Brand is the Warden who strikes Hollis for humming |
+| +41 to +43 days | Days 1 to 3: Ashgate, First Fire, Lift Zero and the window, Under the Floor |
+| +160 days | Day 4: the Way Out. Kael is dead on paper |
+| +6 months | Ilse finds him in the old tunnel |
+| +6 to +15 months | The Gilding |
+| +15 months to +4 yrs | Training with Ilse (speech) and Brand (blade, boots). The Drill is at +2 |
+| +4 yrs | The Assay: arrival, night 1 the Pairing, day 19 the Ford, day 26 the Standard, day 31 the Proctor, day 40 the Valley, last day the Keep, then the Pinning |
+| +4 and a season | The Post: Edric Sorrel, Clerk of the Count. Tyr Cade |
+| +5 | The Balancing of Tier Four. Riser Nine |
+| +6 | Celestine knows. The Son |
+| +7 | The High Docks |
+| +7 to +9 | Brand on the dock stair. Tier Six stands. Tavi comes up at sixteen (+9) |
+| +9 | The Fall, the Stair, Little Ember, Lift Zero left open |
+
+### Open conflicts (need a decision; the game text is unchanged)
+1. **Length of the Assay.** The bible said "year-long"; every dated fight is inside forty days and the Post is "four years and a season". Proposed: the Assay lasts one season, about fifty days.
+2. **The High Docks.** Played inside chapter 3 (+6) but carded as seven years on. Proposed: keep +7 and say chapter 3 runs +6 to +7.
+3. **Brand's "eight years".** He struck Hollis at year 0 and waits eight years for a stair. Proposed: he dies at +8.
+4. **Inspector Vale.** Core cast has him Cinderwell-born with a sister lost in a Tier 8 ward; v0.22 has him born on Tier Two, and Cinderwell is Tiers 4 to 9. Pick one birthplace.
+5. **Celestine and Lucan.** She is seventy at +6; he comes of age at +4. Proposed: one line saying the Accredited bear late and live long.
+6. **Order the Assay is shown.** Day 26 (the Standard) is played after the last day (the Keep). v0.26 adds a calendar strip to every Assay card instead of reordering; reordering is still open.
