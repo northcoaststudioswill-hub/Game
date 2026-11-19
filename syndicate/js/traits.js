@@ -48,3 +48,5 @@
 })();
 // whole numbers on every card: health is never shown with a tail of decimals
 (function () { const G = window.G, d0 = G.derive; G.derive = function () { const d = d0.apply(this, arguments); if (d && d.maxHp) d.maxHp = Math.round(d.maxHp); return d; }; })();
+// builds are stronger than they were (weapon traits, blood, pasts, natures, a cantrip): the Ledger keeps pace so the climb is as hard as it was
+(function () { const G = window.G; (G.OPPONENTS || []).slice(0, 9).forEach(o => { o.hpMul = +(o.hpMul * 1.07).toFixed(2); o.dmgMul = +(o.dmgMul * 1.05).toFixed(2); }); })();

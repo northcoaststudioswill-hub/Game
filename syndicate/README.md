@@ -382,3 +382,11 @@ Refusing David's contract now has teeth. Die unsigned and he does not carry you 
 - **Cantrips.** Fighters start with Fire Bolt, rogues with Ray of Frost (slows), druids with Thorn Whip (drags them in). Weak, slow to come back, but they reach.
 - **The pit.** Spike walls are built into stone buttresses with bolted iron plates. Walls have plinths and string courses, shackles and gibbets. Most bouts start with the last ones' remains on the sand: heads, limbs, skulls.
 - **Tidier cards.** The Ledger folds the dead into one line and shows only the next two names. The pre-fight card drops the controls list after two bouts. The objective line shows one task and at most one reminder.
+
+## State of the game
+
+Playable start to finish: character builder, nine-name generated ladder with undercards, the crown, the Long Stair and four endings. Around it: the market and its shops, Tallow Row and your home, Marc's games, the Knuckle Table and Knife Board, exhibitions, expeditions, loans, David's contract and the Hour Garden.
+
+Checked on the last pass: full simulated careers for all six classes reach the crown with no script errors; every finisher (class, racial, animal-form, environmental) runs to completion; old saves load; endings resolve; nothing leaks across repeated fights. Named fighters were nudged up about 6% to offset the power added by weapon traits, pasts and natures.
+
+Known gaps: never tested on a real phone or with a physical controller; the market's frame cost is dominated by its ~20 animated characters; balance is tuned against an AI player, not people.

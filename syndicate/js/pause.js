@@ -19,13 +19,13 @@
       '<button class="big" id="rs"><b>Resume</b><small>Back to ' + (fight ? 'the bout' : 'where you were') + '.</small></button>' +
       '<button id="pset"><b>Settings</b><small>Sound, music, blood, screen shake, text size, performance.</small></button>' +
       '<button id="pctl"><b>Controls</b><small>Keyboard, controller and touch.</small></button>' +
-      (fight && !watching ? '<button id="ff" class="danger"><b>Forfeit the bout</b><small>You walk out. It counts as a loss.</small></button>' : '') +
+      (fight && !watching ? (G.garden && G.garden.run ? '<button id="ff" class="danger"><b>Give up (soul death)</b><small>There is no walking out of the garden. Giving up ends this fighter for good and erases the save.</small></button>' : '<button id="ff" class="danger"><b>Forfeit the bout</b><small>You walk out. It counts as a loss.</small></button>') : '') +
       (!fight ? '<button id="pquit"><b>Save and quit to title</b><small>Your progress is saved. Continue picks up here.</small></button>' : '') +
       '</div></div>');
     on('#rs', resume);
     on('#pset', () => ui.settings());
     on('#pctl', () => { show('<div class="card small"><h2>Controls</h2><h3>Keyboard and mouse</h3>' + KEYS + '<h3>Controller</h3>' + PAD + '<h3>Touch</h3>' + TOUCH + '<div class="row end"><button class="big" id="x">Back</button></div></div>'); on('#x', () => ui.pauseMenu()); });
-    on('#ff', () => { fromPause = false; ui.close(); F().forfeit(); });
+    on('#ff', () => { if (G.garden && G.garden.run) { show('<div class="card small"><h2>Give up?</h2><p>This fighter dies in the garden and the save is erased. There is no way back.</p><div class="row end"><button class="big" id="x">Keep fighting</button><button class="danger" id="gy">Give up</button></div></div>'); on('#x', () => ui.pauseMenu()); on('#gy', () => { fromPause = false; ui.close(); F().forfeit(); }); return; } fromPause = false; ui.close(); F().forfeit(); });
     on('#pquit', () => { show('<div class="card small"><h2>Quit to title?</h2><p>Everything is saved. You can continue from the title screen.</p><div class="row end"><button id="x">Back</button><button class="big" id="qy">Save and quit</button></div></div>'); on('#x', () => ui.pauseMenu()); on('#qy', () => { G.save(); location.reload(); }); });
   };
   // the old in-fight pause now opens the same menu

@@ -103,7 +103,6 @@
     run.list.slice(1).forEach((q, i) => { const an = i / 9 * 6.2832 + 0.35, r = 150 + (i % 3) * 34, c = G.makeChar({ cls: q.cls, race: q.race, tint: q.tint }), hp = 34 + lv * 9 + i * 3;
       const m = { c, name: q.name, race: q.race, x: Math.cos(an) * r, y: Math.sin(an) * r, hp, maxHp: hp, dmg: 2.5 + lv * 0.7, spd: 105 + Math.random() * 40, state: 'idle', t: 0, cd: 1 + Math.random() * 2, pickT: Math.random(), walk: Math.random() * 6, face: an + Math.PI, kx: 0, ky: 0, tg: null }; a.scene.add(c.root); mobs.push(m); });
     run.brawl = 1; G.fight.wideCam = true; davT = 5; F.noSever = true; F.onFoeDown = e => nextSoul(e); hud();
-    setTimeout(() => { if (G.garden.run && G.garden.run.brawl) ui.toast('Ten of them, all at once, and they hate each other as much as you. Last one breathing walks.'); }, 500);
   }
   function survived() {
     const st = G.state, run = G.garden.run, then = run.then; leave(); st.gardens = (st.gardens || 0) + 1; G.save(); G.scene = 'hub';
