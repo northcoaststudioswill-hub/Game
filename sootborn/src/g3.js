@@ -201,8 +201,8 @@ const G3 = {
       for (let i = 0; i < 70; i++) { const a = r() * 6.2832, d = R(330, 1500); cloud(Math.cos(a) * d, R(-150, -60), Math.sin(a) * d, R(1.5, 4), [1, R(.86, .95), R(.82, .92)]); }
       for (let i = 0; i < 9; i++) { const a = Math.PI + (i + .5) / 9 * Math.PI; peak(Math.cos(a) * R(900, 1300), Math.sin(a) * R(900, 1300), R(160, 260), R(160, 330), [.5, .52, .74], [1, .95, .92]); }
     } else {
-      const ford = bg === 'ford', gcol = () => { const k = r(); return ford ? [.2 + k * .08, .36 + k * .1, .22 + k * .06] : [.24 + k * .1, .52 + k * .14, .22 + k * .08]; };
-      const gn = (x, z) => { const k = hash(Math.round(x / 20) + 500, Math.round(z / 20) + 500) * .5 + (Math.sin(x * .013 + 1) * Math.sin(z * .017) * .25 + .25), w = clamp(1 - Math.hypot(x / (hw + 30), z / (hh + 30)), 0, 1) * .08; return ford ? [.2 + k * .1 + w, .36 + k * .12, .22 + k * .06] : [.22 + k * .14 + w * 1.5, .5 + k * .18 + w, .2 + k * .1]; };
+      const ford = bg === 'ford', gcol = () => { const k = r(); return ford ? [.2 + k * .08, .36 + k * .1, .22 + k * .06] : [.25 + k * .08, .44 + k * .1, .24 + k * .06]; };
+      const gn = (x, z) => { const k = hash(Math.round(x / 20) + 500, Math.round(z / 20) + 500) * .5 + (Math.sin(x * .013 + 1) * Math.sin(z * .017) * .25 + .25), w = clamp(1 - Math.hypot(x / (hw + 30), z / (hh + 30)), 0, 1) * .08; return ford ? [.2 + k * .1 + w, .36 + k * .12, .22 + k * .06] : [.23 + k * .12 + w * 1.5, .43 + k * .18 + w, .2 + k * .1]; };
       for (let ix = -44; ix < 44; ix++) for (let iz = -48; iz < 24; iz++) { const x = ix * 20, z = iz * 20; if (ford && z >= -80 && z < 0) continue; if (Math.abs(x) > 460 && (ix & 1 || iz & 1)) continue; const s2 = Math.abs(x) > 460 ? 40 : 20; A.gquad(x, z, x + s2, z + s2, 0, gn); }
       for (let i = 0; i < 46; i++) { const t0 = i / 46, x = (t0 - .5) * 620 + R(-8, 8), z = (ford ? 40 : 4) + Math.sin(t0 * 5) * 22 + R(-5, 5); A.quad(x - R(14, 26), z - R(8, 14), x + R(14, 26), z + R(8, 14), .06, ford ? [.34, .26, .2] : [.5, .38, .24]); }
       if (ford) { // the river
@@ -210,7 +210,7 @@ const G3 = {
         for (let i = 0; i < 90; i++) { const x = R(-800, 800), z = r() < .5 ? R(-88, -78) : R(-4, 6); Sh.cyl(M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)), 0, -1, 0, R(3, 7), R(2, 4), R(2, 4), 6, '#8c8c84', 0, 1); }
         for (let i = 0; i < 70; i++) { const x = R(-500, 500), z = r() < .5 ? R(-96, -84) : R(0, 12), m = M4.chain(M4.t(x, 0, z), M4.rz(R(-.15, .15))); A.cyl(m, 0, 0, 0, .7, .4, R(14, 22), 3, '#6a8a44'); A.box(m, 0, 20, 0, 1.6, 5, 1.6, '#6a4a2a'); }
       }
-      for (let i = 0; i < 420; i++) { const x = R(-420, 420), z = R(-400, 200); if (Math.abs(x) < hw + 6 && Math.abs(z) < hh + 6 && r() < .7) continue; if (ford && z > -84 && z < 2) continue; const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); A.cyl(m, 0, 0, 0, 2.2, 0, R(4, 8), 3, ford ? '#3a6a40' : ['#3f9a3c', '#58b848', '#2f7a30'][i % 3]); if (i % 6 === 0 && !ford) A.box(m, 2, 3, 2, 1.5, 1.5, 1.5, i % 12 ? '#fff6d0' : '#ff9ac0', 1); }
+      for (let i = 0; i < 150; i++) { const x = R(-420, 420), z = R(-400, 200); if (Math.abs(x) < hw + 6 && Math.abs(z) < hh + 6 && r() < .7) continue; if (ford && z > -84 && z < 2) continue; const m = M4.chain(M4.t(x, 0, z), M4.ry(r() * 6)); A.cyl(m, 0, 0, 0, 2.2, 0, R(4, 8), 3, ford ? '#3a6a40' : ['#3f9a3c', '#58b848', '#2f7a30'][i % 3]); if (i % 6 === 0 && !ford) A.box(m, 2, 3, 2, 1.5, 1.5, 1.5, i % 12 ? '#fff6d0' : '#ff9ac0', 1); }
       for (let i = 0; i < 130; i++) { const a = r() * 6.2832, d = R(0, 1), x = Math.cos(a) * (hw + 60 + d * 560), z = Math.sin(a) * (hh + 60 + d * 520) - 60; if ((z > 30 && Math.abs(x) < 260) || z > 260 || (ford && z > -110 && z < 30 && Math.abs(x) < 500)) continue; pine(x, z, R(1.2, 2.4)); }
       for (let i = 0; i < 12; i++) pine((i % 2 ? 1 : -1) * (hw + R(60, 130)), -hh + i * 7 - 30, R(1.3, 2));
       for (let i = 0; i < 34; i++) { const a = r() * 6.2832, d = R(0, 1), x = Math.cos(a) * (hw + 70 + d * 420), z = Math.sin(a) * (hh + 70 + d * 380) - 50; if ((z > 30 && Math.abs(x) < 260) || z > 240 || (ford && z > -110 && z < 30)) continue; oak(x, z, R(1.4, 2.4), ford ? ['#b8642a', '#c8862e', '#8a4a2a'][i % 3] : ['#58b848', '#7ac850', '#e8c25a', '#48a040'][i % 4]); }
@@ -340,7 +340,7 @@ const G3 = {
     if (o === Brawl.p && o.inv > 0 && st !== 'dodge' && !Brawl.sup && !Brawl.art && Math.floor(t * 20) % 2) return;
     const arm = L.armor || '#efe8d4', trim = L.trim || '#e8c25a', sash = L.sash || '#7a5ac8', skin = (h => { const n = parseInt(h.slice(1), 16), r = Math.min(255, Math.round((n >> 16) * 1.06)), gg = Math.round((n >> 8 & 255) * .95), b = Math.round((n & 255) * .82); return '#' + ((1 << 24) | (r << 16) | (gg << 8) | b).toString(16).slice(1); })(L.skin || '#d8a07a'), hair = L.hair || '#e9cf7a', dark = shade(arm, .62), blade = opt.blade || 0;
     const z = (o.z || 0) * this.HK * 1.2;
-    const N = !OLDBODY && !!(Brawl.def && Brawl.def.body2) && !opt.far && !(L.helm || L.warden), HIP = N ? 23.9 : 18, TH = N ? 11.2 : 8.5, SHN = N ? 11 : 8.8, HX = N ? 2.8 : 3.7, SHY = N ? 12.3 : 13, SHX = N ? 6.9 : 8.8, UA = N ? 7.8 : 7, HEADY = N ? 14.7 : 16;
+    const N = !OLDBODY && !!(Brawl.def && Brawl.def.body2 !== 0) && !opt.far, HIP = N ? 23.9 : 18, TH = N ? 11.2 : 8.5, SHN = N ? 11 : 8.8, HX = N ? 2.8 : 3.7, SHY = N ? 12.3 : 13, SHX = N ? 6.9 : 8.8, UA = N ? 7.8 : 7, HEADY = N ? 14.7 : 16;
     Batch.OL = N && this.gfx >= 2 ? this.ol : null; this.ol.flash = 0;
     // the rig remembers where every joint was
     const key = opt.key || o; let R = this.rigs.get(key); const yawT = Math.atan2(fx, fy), fresh = !R;

@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.41 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.42 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -232,6 +232,11 @@ How Kael fights is part of the story and changes with it. All names are ours.
 - **We** (era 6, the Fall onward): the shift song heals; his lines say "we".
 - **The blade breaks** in the duel with Celestine (at 45% of her health). He ends the story with Bank Hands.
 - Finishers: the eleven (per-fight names); one cut on a staggered enemy (LAST BELL / THE TURN / STRUCK THROUGH / HER NAME); from the air (NINE FLOORS / LIFT ZERO / THE WEATHER); last breath (ON MY BREATH, once a fight).
+
+## Graphics direction (v0.42 update)
+- All arena fighters use the rebuilt body (six heads tall, cel-shaded, ink outline).
+- Fights with crowds or busy ground are staged on the painted pixel valley with a side-on camera: the Valley, the Standard, the Proctor (night, rain). Duels in stone rooms stay in 3D. Set `flat: 1` on a fight to move it; remove it to move it back.
+- Third-person levels (Riser Nine, the High Docks, the Stair) are the comic-book engine and are separate from both.
 
 ## Graphics direction (v0.25)
 - Above-ground fights: anime-proportioned, cel-shaded, ink-outlined fighters in a low-poly world. All designs original to SOOTBORN.

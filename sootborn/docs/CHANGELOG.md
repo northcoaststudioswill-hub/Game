@@ -1,4 +1,17 @@
-# SOOTBORN — changelog (latest v0.41 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.42 · 2026-11-19)
+
+## v0.42 · 2026-11-19 — the older 3D fights: new bodies for everyone, and the crowded ones moved onto painted backgrounds
+From play notes: the older 3D arena fights are chaotic and ugly; a mix of painted 2D backgrounds and 3D is fine; the fully 3D ones need work.
+
+I put every arena fight side by side three ways (as it was, with the rebuilt fighters, and on a painted background) and chose per fight.
+
+- **Everyone has the rebuilt body now.** The slimmer, taller, ink-outlined fighters were only ever used for Kael and Vant at the Ford. They are now used for every fighter in every arena fight: cadets, helmed guards, Wardens, Proctor Voss in his robe, Tyr Cade, Lucan, Celestine in her skirt. The squat block figures are gone from the arena fights.
+- **Three fights moved onto painted backgrounds**, with the side-on camera and big figures: **the Valley** (the opening battle), **the Standard** (the Sisters Vey), and **the Proctor**. These were the busiest: a field of green cones, tents, stakes and a second battle behind the first. The Proctor keeps its night and its storm: the painted valley is darkened, with rain and lightning.
+- **Still fully 3D**, because they were already clean stone rooms and read well with the new bodies: the Pairing, the Gallery, the Keep, the Son, the Stair, the last duel, the Fall, the Ford.
+- **The 3D valley that remains** (the Ford, Riser Nine's fallback) has about a third of the grass tufts it had and a less acid green.
+- Dev menu: the two Ford entries are renamed (3D, and on the painted valley). The "new models" stars are gone since everything has them.
+
+**Checked:** bots fought the Valley, the Proctor, the Standard, the Pairing, the last duel and the Stair to a win with no errors; opening films of the three moved fights looked at in pictures; the comparison sheet of eight fights. **Not checked:** played by hand; the Gallery, the Son, the Fall and the Ford were looked at in stills only, not fought, after the change; whether the three moved fights lose something you liked about the 3D camera. Any of the three can go back with one word in its definition.
 
 ## v0.41 · 2026-11-19 — the rest of the open list: the keep, ELEVEN's count on the glass, the Island's picture in the story
 From play notes: continue the open list.

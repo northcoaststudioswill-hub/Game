@@ -139,7 +139,7 @@ const DUEL_OUT = (id, c1, c2, c3, sc) => [
   { d: 3.0, cam: [0, 150, 60, 150, .3], to: [0, 250, 170, 150, .16], acts: [{ id: 'kael2', a: [-10, 2], blade: 1, aura: 1 }], cap: c3 }
 ];
 // day twenty-six: the standard, and the two who guard it
-FF.twins = () => ({
+FF.twins = () => ({ flat: 1,
   era: 3, title: 'THE STANDARD', sub: 'THE SISTERS VEY - TWO BLADES, ONE MIND', bg: 'ford', arena: FIELD, music: 'dusk', rage: 2, legend: 1, skip: 1, winText: 'THE STANDARD IS OURS',
   fin: { name: 'TWO FOR ONE', l1: 'THEY FIGHT AS ONE PERSON', l2: 'SO I ONLY COUNT ONCE', rgb: '120,220,210' },
   hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 40 }, taunt: { 0: ['HE IS SLOW ON THE LEFT.', 'I HAVE HIM.', 'TOGETHER.', 'NOW.'] },
@@ -291,4 +291,4 @@ function afterDay(n, sv) { G.mode = 'dayend'; UI.push(modal({ clear: true, onBac
     { label: 'Keep exploring Cinderwell', act: () => { UI.clear(); if (sv) { Game.loadSave(sv); Game.autosave(); } else Game.toTitle(); } }, { label: 'Back to title', act: () => { UI.clear(); Game.toTitle(); } }]) })); }
 
 // the Ford again, with the new fighters standing in the pixel-art valley instead of the low-poly one
-FF.ford2d = () => Object.assign(FF.ford(), { flat: 1, sub: 'NEW MODELS - PAINTED VALLEY' });
+FF.ford2d = () => Object.assign(FF.ford(), { flat: 1, sub: 'SINGLE COMBAT FOR THE CROSSING' });

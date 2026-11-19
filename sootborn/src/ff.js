@@ -13,6 +13,7 @@ const cu = (x, y, s0, s1, dx) => ({ cam: [x + (dx || 0), y + 200 / s0, 54, 200],
 const FIELD = { kind: 'rect', w: 250, h: 120 }, V = ['cadv1', 'cadv2'], TL = ['cadt1', 'cadt2'];
 const FF = {
   valley: () => ({
+    flat: 1,
     era: 3, title: 'THE ASSAY', sub: 'HOUSE VIOLET - HOLD THE VALLEY', bg: 'valley', arena: FIELD, music: 'battle', rage: 1, legend: 1, foeName: 'House Teal', winText: 'THE VALLEY HOLDS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 40 }, allies: V, shouts: ['FOR VIOLET!', 'WITH HIM!', 'PUSH!'],
     waves: [[{ id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 6 }, { id: 'cadt2', name: 'Teal', kind: 'cadet', hp: 6 }, { id: 'cadt1', name: 'Teal', kind: 'cadet', hp: 6 }, { id: 'cadt2', name: 'Teal', kind: 'lancer', hp: 7 }],
@@ -39,7 +40,7 @@ const FF = {
     ]
   }),
   ford: () => ({
-    body2: 1, era: 2, fin: { name: 'THE CROSSING', l1: 'ELEVEN STEPS ACROSS A RIVER', l2: 'I NEVER LEARNED TO SWIM', rgb: '120,200,255' }, title: 'THE FORD', sub: 'SINGLE COMBAT FOR THE CROSSING', bg: 'ford', arena: FIELD, music: 'dusk', rage: 2, legend: 1, skip: 1, winText: 'THE FORD IS OURS',
+    era: 2, fin: { name: 'THE CROSSING', l1: 'ELEVEN STEPS ACROSS A RIVER', l2: 'I NEVER LEARNED TO SWIM', rgb: '120,200,255' }, title: 'THE FORD', sub: 'SINGLE COMBAT FOR THE CROSSING', bg: 'ford', arena: FIELD, music: 'dusk', rage: 2, legend: 1, skip: 1, winText: 'THE FORD IS OURS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 45 }, taunt: { 0: ['WHO TRAINED YOU?', 'YOU FIGHT LIKE A MINER!', 'YIELD, BOY!'] },
     voice: { at: [[1, 'VANT IS THE BEST BLADE IN HOUSE TEAL. HE HAS NEVER ONCE BEEN HUNGRY.'], [11, 'MARA USED TO SAY: AIM IT UP, NOT SIDEWAYS. I AM AIMING, MARA.'], [26, 'EVERY NIGHT I WASH THE GOLD OFF MY HANDS AND CHECK THAT THE SOOT IS STILL THERE.']],
       hurt: 'HE HITS LIKE A PROCTOR. I HAVE BEEN HIT BY PROCTORS.', fury: 'I DO NOT GET ANGRY UP HERE. I WAS ALREADY ANGRY WHEN I ARRIVED.', eleven: 'ONE FOR EVERY SECOND.', half: 'HE IS AFRAID NOW. NOBODY EVER TAUGHT THEM WHAT TO DO WITH THAT.' },
@@ -97,6 +98,7 @@ const FF = {
   }),
   // day thirty-one: nobody touches a Proctor
   proctor: () => ({
+    flat: 1,
     era: 3, newMove: 'NEW: SHAFT DROP - JUMP, THEN JUMP AGAIN', fin: { name: 'THE RECKONING', l1: 'THEY CAME DOWN TO COUNT US', l2: 'I AM STILL COUNTING', rgb: '255,240,200' }, title: 'THE PROCTOR', sub: 'HALDEN VOSS - NOBODY TOUCHES A PROCTOR', bg: 'storm', arena: FIELD, music: 'duel', rage: 3, legend: 1, skip: 1, winText: 'HE BLEEDS',
     hero: { id: 'kael2', hp: 10, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['I GRADE YOU, BOY.', 'YOU WILL BE UNMADE FOR THIS.', 'WHAT ARE YOU?'] },
     foes: [{ id: 'voss', name: 'Proctor Voss', kind: 'warden', hp: 130, sc: 1.28, k2: { slam: 1 } }],
