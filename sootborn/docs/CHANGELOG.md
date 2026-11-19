@@ -1,4 +1,12 @@
-# SOOTBORN — changelog (latest v0.53 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.54 · 2026-11-19)
+
+## v0.54 · 2026-11-19 — getting up is a scene; capes that fall
+From play notes.
+
+- **The second wind in the arena fights is no longer something you can miss.** When his health reaches nothing and he comes back, the fight stops and cuts to the furnace: Seren in the doors, and one line, "Every breath I take is hers. So I get up." (From the Fall onward it is "we".) Then he rises into a blow, as with the other memories. It is kept on the Memories shelf as EVERY BREATH. Fights where you play Brand or Mara keep their own.
+- **Capes fall.** In the arena fights the cape no longer rides up behind him for as long as you hold a direction: it kicks up when he sets off and settles close to his back, with a small flap. In the comic levels the swing with each stride is larger, on top of v0.53's change.
+
+**Checked:** the second wind triggered by script in the Pairing: health comes back, the furnace fills the screen with the line (picture). **Not checked:** either cape in motion.
 
 ## v0.53 · 2026-11-19 — a docks save that came back empty and locked every time, mended; the run looked at frame by frame
 From playing: the first comic level spawns you with no dialogue, nothing starts, and the door will not open.

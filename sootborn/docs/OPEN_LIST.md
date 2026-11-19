@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.53 (2026-11-19).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.54 (2026-11-19).
 
 ## Waiting on you
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
@@ -17,7 +17,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 0. **The run in the comic levels.** Lean halved and cape fixed in v0.53 from side-on frames; needs your eye in motion. Next: arms (the weapon arm barely moves), and the guards' jog checked the same way.
 1. **Guards:** better models and their own set of strikes, blocks and stances, so they stop looking like they are jogging at you. Use the same rigs in cutscenes.
 2. **Kael in the arena fights:** arms, hands, blade, legs and body brought up to his head; a ready stance and small movement in held shots.
-3. **Capes:** both kinds were changed this round; they need looking at in motion and probably another pass.
+3. **Capes:** changed four times today from stills. The rule you gave: it kicks up with momentum and then falls; it never floats. Needs your eye in motion, then another pass if it still hangs in the air.
 4. **Tavi:** a better body now that he walks the Stair.
 5. **Rook** and the other bosses at Kael's level of model.
 6. **The Proctors on the dais:** detailed figures, or detailed flat sprites standing in the 3D scene.
@@ -30,6 +30,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 11. **The Scuffle** has the square behind it; it needs its own background.
 
 ## Story and scenes
+- **Going down in a fight should always be a moment.** Done for the arena second wind (v0.54) and the comic-level bosses (v0.50). Still to do: the 2D fights below, and different memories by where the story is.
 12. **More short 2D memory scenes**, especially memories.
 13. **Memories inside fights chosen by where the story is:** the Assay; Kestrel and the week he blamed her; Brand.
 14. **Transitions between story parts:** go through every hand-off (card, fade, music) from the opening to THE END.
@@ -44,5 +45,6 @@ Kept current each round. "Keep going" means work down this list from the top unl
 21. The on-screen pad has no second stick, so on a phone the camera still turns by dragging the picture.
 
 ## Housekeeping
+- **Rule:** everything asked for goes on this list and stays until it is done or you say drop it.
 - Phone frame rate has never been measured (Settings → Show frame time).
 - A trademark check on the name before selling.
