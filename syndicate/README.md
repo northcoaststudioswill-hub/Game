@@ -370,3 +370,8 @@ Refusing David's contract now has teeth. Die unsigned and he does not carry you 
 - **The open card.** At the top of the Ledger: a fresh generated fighter at any rank you have cleared, for coin.
 - **Marc** has more to say, and three wins in a row at his table make him turn it over and ask you outside.
 - Stall roofs and the Guild box canopy are gone. The codex explains how nobody remembers you dying: David turns the day back.
+
+## Latest pass: the brawl, and borrowed coin
+
+- **The Hour Garden is now one fight.** All ten souls are on the grass at once and everybody fights everybody. Each one that falls bursts and is erased. Be the last one standing.
+- **Loans.** David lends at 25% on the whole debt after every bout and takes a soul if it reaches 600. Marc lends at ten on the hundred, and sometimes offers the loan interest-free for a favour: leaning on a late payer, or holding a package the Wardens would like to see.

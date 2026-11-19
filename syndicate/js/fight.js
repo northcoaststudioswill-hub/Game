@@ -502,7 +502,7 @@
       if (tgt.isPlayer && (wt > 0.25 || crit)) screenFx('hurt'); else if (att.isPlayer && crit) screenFx('crit');
       if (crit && wt > 0.45) slowT = Math.max(slowT, 0.22);
       const heavy = crit || wt > 0.3 || !ab.basic || (att.act && att.act.fin);
-      if (!tgt.isPlayer && !F.ex && !opp.spar && gore() && tgt.hp > 0 && heavy) { const fr = tgt.hp / tgt.maxHp; tgt.lost = tgt.lost || {}; if (fr < 0.5 && !tgt.lost.armL) sever(tgt, 'armL', att, ha); else if (fr < 0.32 && !tgt.lost.legL) sever(tgt, 'legL', att, ha); else if (fr < 0.18 && tgt.lost.legL && !tgt.lost.legR) sever(tgt, 'legR', att, ha); }
+      if (!tgt.isPlayer && !F.ex && !opp.spar && !F.noSever && gore() && tgt.hp > 0 && heavy) { const fr = tgt.hp / tgt.maxHp; tgt.lost = tgt.lost || {}; if (fr < 0.5 && !tgt.lost.armL) sever(tgt, 'armL', att, ha); else if (fr < 0.32 && !tgt.lost.legL) sever(tgt, 'legL', att, ha); else if (fr < 0.18 && tgt.lost.legL && !tgt.lost.legR) sever(tgt, 'legR', att, ha); }
       if (tgt.hp > 0 && wt > 0.6 && !(tgt.down > 0) && time - (tgt.lastDown || -9) > 6) knockdown(tgt, 0.6);
     }
     if (real) { const kk = (crit ? 0.5 : 0.22) + wt * 0.4; camKx += Math.cos(ha) * kk; camKz += Math.sin(ha) * kk; camVh -= crit ? 0.5 : 0.15; if (crit || wt > 0.75) { fx.push({ k: 'dust', x: tgt.x, y: tgt.y, r: 70 + wt * 60, t: 0, life: 0.45 }); if (wt > 0.75) mark(tgt.x, tgt.y, 1.1, 'crack'); } }
@@ -540,6 +540,7 @@
   }
   function interrupt(e) { if (e.state === 'wind' || e.state === 'recover') { e.state = 'idle'; e.act = null; e.z = 0; } e.chain = null; }
   function ko(e) {
+    if (!e.isPlayer && F.onFoeDown && phase === 'fight' && !F.ex && F.onFoeDown(e)) return;       // a brawl: somebody else steps into the space
     if (e.isPlayer && e.endure && phase === 'fight' && !F.ex) { e.endure = 0; e.hp = Math.max(1, Math.round(e.maxHp * 0.12)); e.st = {}; e.iframe = 0.9; text(e, 'RELENTLESS', '#ffb070', true); fx.push({ k: 'ring', x: e.x, y: e.y, r: 150, col: '#ffb070', t: 0, life: 0.5 }); G.sfx('cheer'); addHype(8); return; }       // half-orc blood: once a bout, the blow that should end it does not
     if (e.isPlayer && e.borrow && phase === 'fight' && !opp.spar && !F.ex) {       // Borrowed Time: the Oracle's clock skips back, on account
       e.borrow = 0; e.hp = Math.round(e.maxHp * 0.33); e.st = {}; e.iframe = 1.1; e.poise = e.maxPoise; text(e, 'TIME TURNS BACK', '#c8a0ff', true);
@@ -1073,6 +1074,7 @@
   F.exDown = function (e) { e.state = 'ko'; e.koT = 0; e.act = null; e.st = {}; e.buffs = {}; e.chain = null; };
   F.exDodge = function (e, ang) { e.dodgeT = 0; if (e.state !== 'idle') interrupt(e); e.intent.mx = Math.cos(ang); e.intent.my = Math.sin(ang); e.buf = { id: 'dodge', t: 0.3 }; };
 
+  F.koEntity = e => ko(e); F.inFight = () => phase === 'fight';
   F.forfeit = function () { if (!F.active) return; result = { win: false, forfeit: true }; F.active = false; F.paused = false; G.ui.banner(null); finish(); };
 
   function finish() {
