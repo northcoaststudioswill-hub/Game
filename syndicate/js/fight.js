@@ -496,10 +496,11 @@
     if (ab.basic || (ab.type === 'melee' && !ab.spell)) dmg += att.d.weapon;
     if (att.d.fireBonus && ab.fire) dmg += ab.dmg[0];
     if (att.d.radiantMelee && ab.type === 'melee') dmg += G.roll([1, 6]);
-    let crit = Math.random() < att.d.crit, sneak = false;
+    let crit = Math.random() < att.d.crit + (ab.keen || 0), sneak = false;
     if (att.buffs.sneak) { crit = true; sneak = true; dmg += G.roll([att.d.sneakDice, 6]); delete att.buffs.sneak; delete att.buffs.stealth; }
     let mul = att.d.dmgMul * (1 + (att.buffs.dmg ? att.buffs.dmg.amt : 0)) * (o.power || 1) * (ab.pow || 1) * (att.mast && (ab.basic || ab.heavy) ? 1 + att.mast * 0.03 : 1) * (tgt.st.broken ? 1.35 : 1) * (tgt.st.winded ? 1.15 : 1);
     if (ab.execute && tgt.hp / tgt.maxHp < 0.4) mul *= 2;
+    if (ab.exe && tgt.hp / tgt.maxHp < 0.35) mul *= 1 + ab.exe; if (ab.opener && tgt.hp / tgt.maxHp > 0.85) mul *= 1 + ab.opener; if (ab.vsReel && (tgt.st.slow || tgt.st.stun || tgt.st.broken)) mul *= 1 + ab.vsReel;       // what the weapon in your hand is good at
     if (crit) mul *= att.d.critMul;
     if (tgt.st.mark) mul *= 1.25;
     if (att.d.tactical && (tgt.st.stun || tgt.st.slow)) mul *= 1.3;
@@ -510,7 +511,8 @@
     if (real && ab.type === 'melee' && tgt.state !== 'ko' && angDiff(Math.atan2(att.y - tgt.y, att.x - tgt.x), tgt.aim) > 2.2) { mul *= 1.2; if (time - (tgt.flankT || -9) > 1.5) { tgt.flankT = time; text(tgt, 'FLANKED', '#c79bff'); if (att.isPlayer) addHype(4); } }
     if (real && tgt.state === 'wind' && tgt.act) { mul *= 1.25; tag = 'COUNTER'; } else if (real && (tgt.state === 'recover' || tgt.state === 'parry')) { mul *= 1.4; tag = 'PUNISH'; }
     if (o.proj && o.proj.dis) mul *= 0.75;
-    dmg = Math.max(1, Math.round(dmg * mul * (1 - tgt.d.dr)));
+    dmg = Math.max(1, Math.round(dmg * mul * (1 - tgt.d.dr * (ab.pierce ? 0.5 : 1))));
+    if (ab.leech && ab.type !== 'aura' && !o.dot && att.hp > 0) att.hp = Math.min(att.maxHp, att.hp + Math.max(1, Math.round(dmg * ab.leech)));
     if (tgt.shield > 0) { const a = Math.min(tgt.shield, dmg); tgt.shield -= a; dmg -= a; if (a) text(tgt, 'WARD -' + a, '#ffe9a0'); }
     if (dmg > 0) {
       tgt.hp -= dmg; att.dmgDealt += dmg;
@@ -1100,6 +1102,7 @@
   F.exDown = function (e) { e.state = 'ko'; e.koT = 0; e.act = null; e.st = {}; e.buffs = {}; e.chain = null; };
   F.exDodge = function (e, ang) { e.dodgeT = 0; if (e.state !== 'idle') interrupt(e); e.intent.mx = Math.cos(ang); e.intent.my = Math.sin(ang); e.buf = { id: 'dodge', t: 0.3 }; };
 
+  F.hitTest = (a2, t2, ab2, o2) => hit(a2, t2, ab2, o2 || {});
   F.koEntity = e => ko(e); F.inFight = () => phase === 'fight';
   F.forfeit = function () { if (!F.active) return; result = { win: false, forfeit: true }; F.active = false; F.paused = false; G.ui.banner(null); finish(); };
 
