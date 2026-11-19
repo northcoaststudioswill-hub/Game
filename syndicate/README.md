@@ -390,3 +390,17 @@ Playable start to finish: character builder, nine-name generated ladder with und
 Checked on the last pass: full simulated careers for all six classes reach the crown with no script errors; every finisher (class, racial, animal-form, environmental) runs to completion; old saves load; endings resolve; nothing leaks across repeated fights. Named fighters were nudged up about 6% to offset the power added by weapon traits, pasts and natures.
 
 Known gaps: never tested on a real phone or with a physical controller; the market's frame cost is dominated by its ~20 animated characters; balance is tuned against an AI player, not people.
+
+## Weapon finishers
+
+What is in your hand now has its own way of ending a bout. When a kill lands there is a good chance (6 in 10, or 4 in 10 if you have chosen a signature finisher) the weapon decides instead of the class list. Environmental kills and animal forms still take priority.
+
+| Weapon | Finisher | What happens |
+| --- | --- | --- |
+| Spears | The spear, thrown | Step back, throw it through the face; it stays there and you walk off empty-handed |
+| Longsword | Legs, Then the Skull | Both legs cut away, then the blade is driven down through the head and left standing |
+| Maces, hammers, picks, flails | Left the mace in them | Caved in, the weapon sticks, three tugs, you spit and kick the body over |
+| Daggers, paired axes | Twenty Holes | A flurry of stabs, then a boot |
+| Rapier | Through the Heart, and Twisted | Run through, twisted, withdrawn |
+| Chain whip, druid flail | A Short Leash | Collared from behind and hauled off the floor |
+| Cleric and druid staves | Swept and Staved | Legs swept, then the butt comes down |

@@ -189,7 +189,7 @@
     let lastAlpha = 1;
     const C = { root, body, mats, height: 1.9 * sc };
     // dismemberment: detach a limb (the caller throws it) and leave a wet stump where it was
-    C.limbs = { armL, armR, legL, legR, head };
+    C.limbs = { armL, armR, legL, legR, head }; C.wHand = hR;
     C.sever = function (part) { const g = C.limbs[part]; if (!g || !g.parent || g.userData.gone) return null; g.userData.gone = 1; const st = new T.Mesh(new T.SphereGeometry(part === 'head' ? 0.15 : 0.11, 6, 5), new T.MeshLambertMaterial({ color: 0x7a0a0a, flatShading: true })); st.position.copy(g.position); st.scale.y = 0.55; g.parent.add(st); const bn = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 0.1, 5), new T.MeshLambertMaterial({ color: 0xe6dcc4 })); bn.position.copy(g.position); bn.position.y -= 0.04; g.parent.add(bn); return g; };
     // Joint targets are computed per state, then eased toward, so stances blend instead of snapping.
     let cur = {}, dtp = 1 / 60, lastPT = null, fresh = 0;

@@ -100,7 +100,7 @@
     else if (phase === 'intro') act = 'salute';
     else if (phase === 'ko' || (phase === 'mortal' && M && e.isPlayer && M.t > (M.def.cheerAt || (M.def.imp || 1.2) + 0.6))) act = 'cheer';
     if (e.poseOv) { act = e.poseOv.act; prog = e.poseOv.prog || 0; }
-    const povMv = e.poseOv && e.poseOv.mv;
+    const povMv = e.poseOv && e.poseOv.mv; if (e.poseOv && e.poseOv.step != null) stepOv = e.poseOv.step;
     const alpha = e.buffs.stealth ? (e.isPlayer ? 0.4 : 0.1) : 1;
     if (act === 'cast' && e.state === 'wind' && glow && Math.random() < 0.6) { const ca = rand(0, 6.28), cr = rand(0.8, 1.5); gfx.emit(X + Math.cos(ca) * cr, 1.2 + rand(-0.4, 0.6), Z + Math.sin(ca) * cr, -Math.cos(ca) * cr * 3, 0, -Math.sin(ca) * cr * 3, 0.3, glow, 0); }
     let MF = 1, MS = 0; { const sp = Math.hypot(e.vx || 0, e.vy || 0), fx = e.foe ? e.foe.x - e.x : 0, fy = e.foe ? e.foe.y - e.y : 0, fd = Math.hypot(fx, fy); if (sp > 20 && fd > 1 && fd < 520) { MF = ((e.vx * fx + e.vy * fy) / (sp * fd)); MS = ((e.vx * fy - e.vy * fx) / (sp * fd)); } }
@@ -355,6 +355,12 @@
     if (!F.ex && !opp.garden && !(arena.inGarden && arena.inGarden()) && gore()) { const near = (L, r) => L.map(q => [q, Math.hypot(e.x - q[0], e.y - q[1])]).sort((p, q) => p[1] - q[1]).filter(q => q[1] < r)[0], sp = near(SPIKES, 140), gr = near(GRATES, 78), c = P.cls;
       if (sp && Math.random() < 0.7) def = { id: 'env_spikes', lead: 'spikes', at: sp[0], keep: 1, cast: false, imp: 1.15, word: 'IMPALED', name: { fighter: 'Shield-Rushed onto the Spikes', rogue: 'Walked Backwards onto the Spikes', sorcerer: 'Blown onto the Spikes', cleric: 'Cast Out onto the Spikes', druid: 'Thrown by the Roots', warlock: 'Dragged There by Something' }[c] || 'On the Spikes' };
       else if (gr && Math.random() < 0.7) def = { id: 'env_fire', lead: 'firepit', at: gr[0], ash: 1, fire: 1, cast: false, imp: 2.0, col: '#ff8a2a', word: 'BURNED ALIVE', name: { fighter: 'Held Down in the Vent', rogue: 'Tripped into the Vent', sorcerer: 'Fed to the Fire', cleric: 'Purified', druid: 'Given Back to the Deep', warlock: 'A Small Offering' }[c] || 'Into the Fire' }; }
+    // what is in your hand has its own way of ending things
+    if (!P.form && !def.at && !F.ex && gore() && G.armOf && Math.random() < (G.state.hero.mortal ? 0.4 : 0.6)) { const aid = G.armOf(G.state.hero), kind = String(aid).split('_')[1], c = P.cls, wn = (G.ARM_BY[aid] || {}).name || 'weapon';
+      const fam = kind === 'basic' ? ({ fighter: 'sword', rogue: 'dual', cleric: 'blunt' })[c] : ({ spear: 'spear', hammer: 'blunt', pick: 'blunt', flail: c === 'druid' ? 'chain' : 'blunt', axes: 'dual', rapier: 'rapier', chain: 'chain', staff: c === 'cleric' || c === 'druid' ? 'staff' : null })[kind];
+      const WF = { spear: { lead: 'javelin', imp: 1.3, word: 'SKEWERED', name: 'The ' + wn + ', Thrown' }, sword: { lead: 'legs', imp: 1.9, word: 'SPIKED', name: 'Legs, Then the Skull' }, blunt: { lead: 'facestuck', imp: 1.0, tail: 3.7, word: 'CAVED IN', name: 'Left the ' + wn + ' in Them' },
+        dual: { lead: 'gut', imp: 1.4, word: 'OPENED UP', name: 'Twenty Holes' }, rapier: { lead: 'heart', imp: 0.9, tail: 3.2, word: 'RUN THROUGH', name: 'Through the Heart, and Twisted' }, chain: { lead: 'strangle', imp: 1.8, word: 'THROTTLED', name: 'A Short Leash' }, staff: { lead: 'sweep', imp: 1.4, word: 'STAVED IN', name: 'Swept and Staved' } };
+      if (fam && WF[fam] && !e.vis.c.beast) def = Object.assign({ id: 'wf_' + fam, keep: 1, cast: false, wf: 1 }, WF[fam]); }
     // an animal ends it as that animal would
     if (P.form && !def.at) { const fid = P.form.id; if (P.buffs.form) P.buffs.form.t = Math.max(P.buffs.form.t, 9);
       def = fid === 'spider' ? { id: 'f_spider', lead: 'spiderfeast', gone: 1, cast: false, imp: 2.4, word: 'EATEN', name: 'Wrapped and Eaten', col: '#e8e4f4' }
@@ -449,6 +455,61 @@
     if (k === 'drain') { const lx = e.x - Math.cos(m.a) * 16, ly = e.y - Math.sin(m.a) * 16; once('lt', 0.25, () => { fx.push({ k: 'trail', x1: P.x, y1: P.y, x2: lx, y2: ly, col, t: 0, life: 0.3 }); P.x = lx; P.y = ly; text(e, 'LATCHED', col, true); G.sfx('hit'); e.poseOv = { act: 'stun', prog: 0 }; });
       if (m.t > 0.25 && m.t < IMP) { const u = (m.t - 0.25) / (IMP - 0.25); P.x = lx; P.y = ly; P.z = 26; P.poseOv = { act: 'swing', prog: 0.4 + Math.sin(m.t * 18) * 0.08 }; e.vis.g.scale.set(1 - u * 0.4, 1 - u * 0.25, 1 - u * 0.4); e.vis.c.mats && e.vis.c.mats.forEach(mm => mm.color.lerp(new T.Color(0xd8d4cc), 0.04)); if (Math.random() < 0.6) gfx.emit(e.x / S + rand(-0.2, 0.2), rand(0.8, 1.6), e.y / S + rand(-0.2, 0.2), -Math.cos(m.a) * 1.5, rand(0, 1), -Math.sin(m.a) * 1.5, 0.4, '#8a0c0c', 0); }
       once('off', IMP, () => { P.z = 0; P.poseOv = null; }); }
+    if (def.wf) { const steelM = new T.MeshPhongMaterial({ color: 0xb8c0c8, shininess: 70, flatShading: true }), woodM = new T.MeshLambertMaterial({ color: 0x5a4028, flatShading: true }), root = e.vis.c.root, dx = Math.cos(m.a), dy = Math.sin(m.a);
+      const stick = (len, y, z, rx, head) => { const g = new T.Group(), sh = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, len, 5), head === 'blade' ? steelM : woodM); g.add(sh); if (head === 'spear') { const tp = new T.Mesh(new T.ConeGeometry(0.07, 0.3, 5), steelM); tp.position.y = len / 2 + 0.12; g.add(tp); } else if (head === 'mace') { const hd = new T.Mesh(new T.IcosahedronGeometry(0.17, 0), steelM); hd.position.y = len / 2; g.add(hd); } else if (head === 'blade') { sh.scale.set(1.6, 1, 0.5); const gd = new T.Mesh(new T.BoxGeometry(0.3, 0.05, 0.07), woodM); gd.position.y = -len / 2 + 0.22; g.add(gd); } g.position.set(0, y, z); g.rotation.x = rx; root.add(g); m.f.prop = g; return g; };
+      const fall = () => { e.poseOv = null; e.state = 'ko'; e.koT = 0; G.sfx('wall'); fx.push({ k: 'dust', x: e.x, y: e.y, r: 60, t: 0, life: 0.45 }); };
+      const face = () => { e.aim = m.a + Math.PI; }, hand = v => { const w = P.vis.c.wHand; if (w) w.visible = v; };
+      // a blade driven straight down into the head, whichever way the body is lying
+      const spike = len => { const hd = e.vis.c.limbs.head, g = stick(len, 0, 0, 0, 'blade'); hd.add(g); hd.updateWorldMatrix(true, false); const up = new T.Vector3(0, 1, 0).applyQuaternion(hd.getWorldQuaternion(new T.Quaternion()).invert()); g.quaternion.setFromUnitVectors(new T.Vector3(0, -1, 0), up); g.position.set(0, 0.12, 0).addScaledVector(up, len * 0.3); return g; };
+      if (k === 'javelin') { face(); if (!m.f.p0) m.f.p0 = [P.x, P.y]; if (m.t < 0.45) { const u = m.t / 0.45; P.x = m.f.p0[0] - dx * 80 * u; P.y = m.f.p0[1] - dy * 80 * u; clampArena(P); P.moving = true; P.walk = (P.walk || 0) + dt * 14; } else P.moving = false;
+        if (m.t < IMP) { e.poseOv = { act: 'stun', prog: 0 }; P.poseOv = m.t < IMP - 0.12 ? { act: 'cast', cs: 'throw', prog: Math.min(1, m.t / (IMP - 0.12)) } : { act: 'release', cs: 'throw', prog: 0 }; }
+        once('thr', IMP - 0.12, () => { fx.push({ k: 'lance', x: P.x, y: P.y, a: m.a, r: Math.hypot(e.x - P.x, e.y - P.y), col: '#ffffff', w: 0.08, t: 0, life: 0.18, h: 1.5 }); G.sfx('swing'); hand(false); });
+        once('hitf', IMP, () => { stick(2.0, 1.52, -0.25, Math.PI / 2, 'spear'); for (let bi = 0; bi < 30; bi++) gfx.emit(e.x / S + dx * 0.3, 1.5, e.y / S + dy * 0.3, dx * rand(2, 7) + rand(-1, 1), rand(0, 3), dy * rand(2, 7) + rand(-1, 1), rand(0.4, 0.9), '#8a0c0c', 1); e.poseOv = { act: 'hoist', prog: 0.5 }; e.kx = dx * 90; e.ky = dy * 90; });
+        if (m.t > IMP && m.t < IMP + 0.9) { e.x += (e.kx || 0) * dt; e.y += (e.ky || 0) * dt; e.kx *= 0.9; e.ky *= 0.9; clampArena(e); P.poseOv = m.t < IMP + 0.4 ? { act: 'release', cs: 'throw', prog: (m.t - IMP) / 0.4 } : null; }
+        once('jf', IMP + 0.9, fall); }
+      if (k === 'legs') { face(); if (m.t > 0.15 && m.t < 0.65) P.poseOv = { act: 'swing', mv: 'lowcut', prog: (m.t - 0.15) / 0.5 };
+        once('lg', 0.42, () => { sever(e, 'legL', null, m.a + 1.2); sever(e, 'legR', null, m.a - 1.2); e.crawl = 0; });
+        if (m.t > 0.45 && m.t < IMP + 0.9) { e.poseOv = { act: 'kneel', prog: 0 }; e.st = { stun: { t: 99 } }; }
+        if (m.t > 0.8 && m.t < 1.1) { const u = (m.t - 0.8) / 0.3, tx = e.x - dx * 26, ty = e.y - dy * 26; P.x += (tx - P.x) * u * 0.4; P.y += (ty - P.y) * u * 0.4; P.moving = true; P.walk = (P.walk || 0) + dt * 12; } else if (m.t >= 1.1) P.moving = false;
+        if (m.t >= 1.1 && m.t < IMP) P.poseOv = { act: 'hoist', prog: 0.5 }; else if (m.t >= IMP && m.t < IMP + 0.6) P.poseOv = { act: 'swing', mv: 'chop', prog: Math.min(0.62, 0.5 + (m.t - IMP)) }; else if (m.t >= IMP + 0.6 && P.poseOv && P.poseOv.mv === 'chop') P.poseOv = null;
+        if (m.t >= IMP + 0.45 && m.t < IMP + 0.9) { P.x -= dx * 70 * dt; P.y -= dy * 70 * dt; P.moving = true; P.walk = (P.walk || 0) + dt * 10; } else if (m.t >= IMP + 0.9) P.moving = false;
+        once('sk', IMP, () => { spike(1.3); hand(false); for (let bi = 0; bi < 24; bi++) gfx.emit(e.x / S, 1.3, e.y / S, rand(-2, 2), rand(2, 6), rand(-2, 2), rand(0.4, 0.9), '#8a0c0c', 1); });
+        once('lf', IMP + 0.9, fall); }
+      if (k === 'facestuck') { face(); if (m.t > 0.2 && m.t < IMP + 2.1) e.poseOv = { act: 'kneel', prog: 0 };
+        if (m.t < IMP) P.poseOv = { act: 'swing', mv: 'chop', prog: 0.5 * Math.min(1, m.t / IMP) * (m.t / IMP > 0.8 ? 1 : 0.6) };
+        once('cv', IMP, () => { stick(0.8, 1.42, 0.5, -1.0, 'mace'); hand(false); });
+        if (m.t >= IMP && m.t < IMP + 0.3) P.poseOv = { act: 'swing', mv: 'chop', prog: 0.55 };
+        if (m.t >= IMP + 0.3 && m.t < IMP + 1.2) { P.poseOv = { act: 'tear', prog: 0.25 + Math.abs(Math.sin((m.t - IMP) * 9)) * 0.2 }; e.x += Math.sin(m.t * 30) * 1.2; }
+        every('tug', IMP + 0.35, IMP + 1.15, 0.28, i => { text(e, ['STUCK', 'STILL STUCK', 'PROPERLY STUCK'][i % 3], '#cfd8e0', false); G.sfx('clang'); blood(e.x, e.y, 6, rand(0, 6.28)); });
+        if (m.t >= IMP + 1.2 && m.t < IMP + 1.75) P.poseOv = { act: m.t < IMP + 1.45 ? 'cast' : 'release', cs: 'breath', prog: m.t < IMP + 1.45 ? (m.t - IMP - 1.2) / 0.25 : (m.t - IMP - 1.45) / 0.3 };
+        once('spit', IMP + 1.47, () => { text(P, 'SPITS', '#e8e8e0', true); G.sfx('ui'); for (let si = 0; si < 6; si++) gfx.emit(P.x / S + dx * 0.3, 1.6, P.y / S + dy * 0.3, dx * rand(2.5, 4), rand(0, 1), dy * rand(2.5, 4), 0.35, '#e8f0f0', 1); });
+        if (m.t >= IMP + 1.8 && m.t < IMP + 2.3) P.poseOv = { act: 'kick', prog: (m.t - IMP - 1.8) / 0.5 }; else if (m.t >= IMP + 2.3 && P.poseOv && P.poseOv.act === 'kick') P.poseOv = null;
+        once('ff', IMP + 2.1, fall); }
+      if (k === 'gut') { face(); if (m.t < 0.25) { const tx = e.x - dx * 26, ty = e.y - dy * 26; P.x += (tx - P.x) * 0.3; P.y += (ty - P.y) * 0.3; }
+        if (m.t > 0.2 && m.t < IMP + 0.5) e.poseOv = { act: 'stun', prog: 0 };
+        if (m.t >= 0.25 && m.t < IMP) P.poseOv = { act: 'swing', prog: 0.34 + (((m.t * 1000) % 100) / 100) * 0.24, step: Math.floor(m.t * 10) % 2 };
+        every('stb', 0.28, IMP, 0.1, i => { blood(e.x, e.y, 7, m.a + rand(-0.8, 0.8)); e.hurt = 0.2; e.hurtSide = i % 2 ? 1 : -1; e.flash = 0.03; G.sfx('hit'); shake = Math.max(shake, 3); if (i % 3 === 0) gfx.splat(e.x / S + rand(-0.6, 0.6), e.y / S + rand(-0.6, 0.6), rand(0.3, 0.6)); });
+        if (m.t >= IMP && m.t < IMP + 0.5) P.poseOv = { act: 'kick', prog: (m.t - IMP) / 0.5 }; else if (m.t >= IMP + 0.5 && P.poseOv && P.poseOv.act === 'kick') P.poseOv = null;
+        once('gf', IMP + 0.3, fall); }
+      if (k === 'heart') { face(); if (m.t < IMP) { const tx = e.x - dx * 46, ty = e.y - dy * 46; P.x += (tx - P.x) * 0.25; P.y += (ty - P.y) * 0.25; P.poseOv = { act: 'swing', mv: 'drive', prog: 0.5 * (m.t / IMP) }; e.poseOv = { act: 'stun', prog: 0 }; }
+        once('thru', IMP, () => { stick(0.9, 1.18, -0.55, Math.PI / 2, 'blade'); hand(false); e.poseOv = { act: 'hoist', prog: 0.5 }; });
+        if (m.t >= IMP && m.t < IMP + 1.0) P.poseOv = { act: 'swing', mv: 'drive', prog: 0.52 };
+        once('tw', IMP + 0.5, () => { text(e, 'TWISTED', '#ff3020', true); blood(e.x, e.y, 30, m.a); G.sfx('crit'); shake = Math.max(shake, 8); if (m.f.prop) m.f.prop.rotation.z = 1.2; });
+        once('wd', IMP + 1.0, () => { hand(true); if (m.f.prop && m.f.prop.parent) m.f.prop.parent.remove(m.f.prop); blood(e.x, e.y, 40, m.a + Math.PI); e.poseOv = { act: 'kneel', prog: 0 }; });
+        if (m.t >= IMP + 1.0 && m.t < IMP + 1.4) P.poseOv = { act: 'swing', mv: 'drive', prog: 0.55 + (m.t - IMP - 1.0) }; else if (m.t >= IMP + 1.4 && P.poseOv && P.poseOv.mv === 'drive') P.poseOv = null;
+        once('hf', IMP + 1.7, fall); }
+      if (k === 'strangle') { if (m.t < 0.4) { const tx = e.x + dx * 62, ty = e.y + dy * 62; P.x += (tx - P.x) * 0.25; P.y += (ty - P.y) * 0.25; P.moving = true; P.walk = (P.walk || 0) + dt * 16; } else { P.moving = false; P.aim = m.a + Math.PI; }
+        e.aim = m.a + Math.PI;
+        if (m.t >= 0.4 && m.t < IMP) { const u = (m.t - 0.4) / (IMP - 0.4); P.poseOv = { act: 'tear', prog: 0.3 + u * 0.4 }; e.poseOv = { act: 'hoist', prog: 0.5 }; e.z = 4 + u * 12; e.x += Math.sin(m.t * 34) * 1.5 * (1 - u); e.vis.c.mats && e.vis.c.mats.forEach(mm => mm.color.lerp(new T.Color(0x6a5a8a), 0.012)); }
+        once('whp', 0.4, () => { hand(false); G.sfx('swing'); text(e, 'COLLARED', '#c8c0d8', true); });
+        every('ch', 0.4, IMP, 0.05, () => { fx.push({ k: 'trail', x1: P.x, y1: P.y, x2: e.x, y2: e.y, col: '#b8bcc4', t: 0, life: 0.09 }); });
+        every('ck', 0.6, IMP - 0.1, 0.4, i => { text(e, ['CHOKING', 'KICKING', 'SLOWING'][i % 3], '#c8c0d8', false); G.sfx('clang'); });
+        once('sn', IMP, () => { e.z = 0; P.poseOv = null; hand(true); e.x += dx * 18; e.y += dy * 18; }); once('sf', IMP + 0.25, fall); }
+      if (k === 'sweep') { face(); if (m.t > 0.15 && m.t < 0.6) P.poseOv = { act: 'swing', mv: 'lowcut', prog: (m.t - 0.15) / 0.45 };
+        once('sw', 0.4, () => { e.state = 'ko'; e.koT = 0; e.st = {}; e.poseOv = null; G.sfx('hit'); text(e, 'SWEPT', col, true); fx.push({ k: 'dust', x: e.x, y: e.y, r: 70, t: 0, life: 0.4 }); shake = Math.max(shake, 8); });
+        if (m.t > 0.7 && m.t < 1.0) { const tx = e.x - dx * 30, ty = e.y - dy * 30; P.x += (tx - P.x) * 0.2; P.y += (ty - P.y) * 0.2; }
+        if (m.t >= 1.0 && m.t < IMP) P.poseOv = { act: 'hoist', prog: 0.5 }; else if (m.t >= IMP && m.t < IMP + 0.6) P.poseOv = { act: 'swing', mv: 'chop', prog: Math.min(0.64, 0.5 + (m.t - IMP)) }; else if (m.t >= IMP + 0.6 && P.poseOv && P.poseOv.mv === 'chop') P.poseOv = null; }
+    }
     if (k === 'tear') { const gx = P.x + Math.cos(m.a) * 30, gy = P.y + Math.sin(m.a) * 30;
       if (m.t > 0.15 && m.t < 0.5) { const u = (m.t - 0.15) / 0.35; e.x += (gx - e.x) * u * 0.3; e.y += (gy - e.y) * u * 0.3; }
       if (m.t >= 0.3) P.poseOv = m.t < IMP + 0.5 ? { act: 'tear', prog: Math.min(1, (m.t - 0.3) / (IMP - 0.3 + 0.2)) } : null;
