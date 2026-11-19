@@ -17,11 +17,6 @@
     // one long buffer of noise, shared by everything
     nbuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
     const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    // a limiter on the way out, so a pile-up of sounds is squashed instead of crackling
-    try { const lim = ac.createDynamicsCompressor(); lim.threshold.value = -14; lim.knee.value = 10; lim.ratio.value = 12; lim.attack.value = 0.003; lim.release.value = 0.2; out.disconnect(); out.connect(lim); lim.connect(ac.destination);
-      // the room: one feedback delay into a dark filter. Left out altogether in the light mode.
-      if (!lite) { wetIn = ac.createGain(); wet = ac.createGain(); wet.gain.value = 0.1; const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1900; const dl = ac.createDelay(0.5), fb = ac.createGain(); dl.delayTime.value = 0.083; fb.gain.value = 0.3; wetIn.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(lp); lp.connect(wet); wet.connect(lim); out.connect(wetIn); }
-    } catch (e) { }
     return !G.muted;
   };
   // ---- voices
@@ -62,7 +57,7 @@
     spit: () => { hiss(0.05, 0.22, 3200, 'bandpass', 0, 1200, 4); hiss(0.04, 0.12, 900, 'bandpass', 0.07); },
     choke: () => { tone(R(92, 108), 0.22, 'sawtooth', 0.09, 0.8); hiss(0.2, 0.12, 700, 'bandpass', 0, 400, 5); tone(1400, 0.1, 'square', 0.03, 0.9, 0.03); },
     bottle: () => { for (let i = 0; i < 5; i++) tone(R(2200, 5200), R(0.05, 0.14), 'triangle', 0.07, R(0.7, 1.1), i * 0.012); hiss(0.14, 0.26, 6000, 'highpass'); },
-    vent: () => { hiss(0.9, 0.3, 1400, 'bandpass', 0, 3800, 0.7, 0.12); tone(70, 0.5, 'sine', 0.16, 0.7); },
+    vent: () => { hiss(0.45, 0.16, 1400, 'bandpass', 0, 3800, 0.7, 0.08); tone(70, 0.5, 'sine', 0.16, 0.7); },
     // ---- the crowd
     gasp: () => { voices(0.5, 0.11, 700, 1900, 0, 1.5); },
     roar: () => { voices(1.5, 0.17, 420, 1700, 0, 1.35); voices(1.0, 0.09, 1500, 2800, 0.12, 1.2); },
@@ -86,7 +81,8 @@
   const CROWD = { gasp: 1, roar: 1, boo: 1, ooh: 1, chant: 1, hush: 1 }, GAP = n => (CROWD[n] ? 2200 : n === 'laugh' ? 4000 : n === 'bird' || n === 'goldfall' ? 900 : 70);
   G.sfx = n => {
     const now = performance.now(); if (now - (lastAt[n] || 0) < (X[n] ? GAP(n) : 45)) return; lastAt[n] = now;
-    if (X[n]) { if (lite && CROWD[n] && n !== 'roar') return; try { if (ready()) X[n](); } catch (e) { } return; }
+    if (CROWD[n]) return;
+    if (X[n]) { try { if (ready()) X[n](); } catch (e) { } return; }
     try { ready(); } catch (e) { }
     if (live >= CAP() + 6) return;
     s0(n);
@@ -108,28 +104,13 @@
   };
   G.swingSound = function (ab) { G.sfx(ab && ab.heavy ? 'heavyswing' : 'lightswing'); };
 
-  // ---- beds: the crowd under a bout, the wind and birds in the garden, the heartbeat when you are nearly done
-  function loop(freq, q) { const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(); s.buffer = nbuf; s.loop = true; f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q; g.gain.value = 0; s.connect(f); f.connect(g); g.connect(out); s.start(); return [g, f]; }
-  let hbT = 0, birdT = 2, murT = 3, wasHype = 0;
-  let tickAt = 0, lastCrowd = -1, lastWind = -1, lastWet = -1, lastF = -1;
-  const setP = (p, v, tc) => { try { p.cancelScheduledValues(ac.currentTime); p.setTargetAtTime(v, ac.currentTime, tc); } catch (e) { } };
+  // ---- the heartbeat when you are nearly done, and birds in the garden. No continuous noise beds: on a phone they are just static.
+  let hbT = 0, birdT = 2;
   setInterval(() => {
-    const nowMs = performance.now(); if (tickAt && nowMs - tickAt > 700 && !document.hidden) { if (++late >= 3 && !lite) { lite = true; if (wet) setP(wet.gain, 0, 0.1); } } tickAt = nowMs;
     let okA = false; try { okA = ready(); } catch (e) { }
-    if (!ac) return;
-    const F = G.fight, inFight = G.scene === 'fight' && F && F.active && !F.paused, garden = !!(G.garden && G.garden.run), hall = G.finale && G.finale.on;
-    if (!bed) { const b = loop(620, 0.6); bedG = b[0]; bedF = b[1]; const w = loop(380, 0.4); windG = w[0]; wind = w[1]; }
-    const t = ac.currentTime, hy = (F && F.hypeNow != null ? F.hypeNow : 0.3);
-    const crowd = okA && inFight && !garden && !F.ex ? 0.022 + hy * 0.07 : 0;
-    const cr = Math.round(crowd * 200) / 200, fq = Math.round((520 + hy * 520) / 40) * 40, wd = okA && (garden && G.scene !== 'hub') ? 0.03 : hall ? 0.022 : 0, wt = lite ? 0 : hall ? 0.3 : garden ? 0.04 : G.scene === 'fight' ? 0.14 : G.scene === 'hideout' ? 0.05 : 0.1;
-    if (cr !== lastCrowd) { lastCrowd = cr; setP(bedG.gain, cr, 0.4); } if (fq !== lastF) { lastF = fq; setP(bedF.frequency, fq, 0.5); }
-    if (wd !== lastWind) { lastWind = wd; setP(windG.gain, wd, 0.6); } if (wet && wt !== lastWet) { lastWet = wt; setP(wet.gain, wt, 0.3); }
     if (!okA) return;
-    if (inFight && !garden && !F.ex) {
-      murT -= 0.25; if (murT <= 0) { murT = R(5, 10); if (hy > 0.75) G.sfx(Math.random() < 0.4 ? 'chant' : 'roar'); else if (hy < 0.15 && Math.random() < 0.3) G.sfx('boo'); }
-      if (hy - wasHype > 0.2) G.sfx('roar'); wasHype = hy;
-      const P = F.P; if (P && P.hp > 0 && P.hp < P.maxHp * 0.25 && F.inFight && F.inFight()) { hbT -= 0.25; if (hbT <= 0) { hbT = 1.1; G.sfx('heart'); } }
-    }
-    if (inFight && garden) { birdT -= 0.25; if (birdT <= 0) { birdT = R(1.2, 4); G.sfx('bird'); if (Math.random() < 0.15) G.sfx('goldfall'); } }
+    const F = G.fight, inFight = G.scene === 'fight' && F && F.active && !F.paused, garden = !!(G.garden && G.garden.run);
+    if (inFight && !garden && !F.ex) { const P = F.P; if (P && P.hp > 0 && P.hp < P.maxHp * 0.25 && F.inFight && F.inFight()) { hbT -= 0.25; if (hbT <= 0) { hbT = 1.1; G.sfx('heart'); } } }
+    if (inFight && garden) { birdT -= 0.25; if (birdT <= 0) { birdT = R(1.5, 4.5); G.sfx('bird'); if (Math.random() < 0.15) G.sfx('goldfall'); } }
   }, 250);
 })();
