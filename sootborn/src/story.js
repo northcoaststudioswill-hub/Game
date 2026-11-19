@@ -313,7 +313,10 @@ const HOT = {
       ...(done ? [] : [{ choice: [
         { t: F('charmedProctor') ? 'Redraw it. All of it. Bigger.' : 'Redraw her sun. Bigger than before.', fx: () => setF('chalkedSun'), then: [narr('You draw it bigger than before. Every ray. Your hand is steadier than you expected.'), say('you', "Morning, Seren. I'm back on your bank. Try not to laugh.")] },
         { t: 'Leave it. Not where Vale can see.', fx: () => setF('leftSun'), then: [narr("You keep walking. You'll come back when no one's watching. You always do.")] }
-      ] }]), fx(() => addJ('pl_square', true))];
+      ] }]), fx(() => addJ('pl_square', true)),
+      ...(F('sqMem') || typeof walkSquare !== 'function' ? [] : [{ choice: [
+        { t: 'Stand here a moment. (A memory. It changes nothing.)', fx: () => setF('sqMem'), then: [narr('The stone is the same stone. I let it be an ordinary night, a year and more ago, with the last bell just gone.'), fx(() => Brawl.start(walkSquare(), () => { G.mode = 'world'; HUD.dirty = true; Dialogue.start([narr('The Pillar is red. The stall is shut. I have been standing here long enough for a Proctor to look round.')]); }))] },
+        { t: 'Keep walking.' }] }])];
   },
   bench: () => [narr('A bench polished smooth by forty years of tired people. You and Seren split noodles here the night before the lift came down.')],
   cart: () => [narr("Ivo's scrap cart. A hand-painted sign: EVERYTHING WORKS (MOSTLY).")],

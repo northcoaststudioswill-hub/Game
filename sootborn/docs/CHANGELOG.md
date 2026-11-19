@@ -1,4 +1,32 @@
-# SOOTBORN — changelog (latest v0.58 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.59 · 2026-11-19)
+
+## v0.59 · 2026-11-19 — the HUD in the comic levels, found from your screenshot; the fire scene in 2.5D; a memory to walk in
+From your screenshot of Riser Nine on the phone, and your notes: the tap prompt can go; keep the fire scene in 2.5D; when a 2.5D space is made, use it for story that adds flavour and changes nothing.
+
+**The HUD in the middle of the comic levels: the real cause**
+- Your screenshot showed the health bar missing and the objective a third of the way down the picture. That was not where I had put them.
+- The level's page was asking the phone how tall the notch is, and moving its health bar and objective down by that much. That is right for a page that fills the phone. The level is a small frame in the middle of the screen, and your phone was answering with about a hundred points, so everything slid down into the picture and the health bar ended up under the message strip.
+- The level no longer asks. Health and fury are back in the top-left corner, the objective in the top-right.
+- I reproduced it here by forcing the same answer (health bar and objective move down by forty points; with the fix they stay at the top). My two earlier attempts moved things that were never the problem; the smaller message strip and the fainter marker from v0.58 stay, since they are still better.
+
+**Tap prompt**
+- "TAP TO CUT. HOLD THE SAME BUTTON…" is gone from the comic levels, with the older "ATTACK THREE TIMES" one.
+
+**The fire, night twenty-eight, in 2.5D (the Lamp)**
+- When you have seen enough and go to the fire, the camp is now a place with depth: flat figures standing in it, tents and the two standards behind, pines, rain. Forty of House Violet in a ring round the fire, nobody sitting; thirty of Teal at the edge of the light, darker.
+- You walk the circle. Petra, Oswin, Corin, Merrow and a cadet in a borrowed cloak each have something to say; the standards can be looked at. None of it is needed and none of it changes anything.
+- Go to the fire and SAY THE NAME: the scene you already know follows exactly as before (the one name, the right and wrong outcomes, the duel).
+- It plays once per attempt at the mission.
+
+**A memory to walk in: Ashgate Square, an ordinary night** (Day 1, optional)
+- At the Pillar, after the chalk sun, there is a new choice: stand here a moment. It opens the square a year and more ago, just after last bell, in the same 2.5D: Seren chalking a sun, Tavi and the green in the broth, Bao and the stamp, Hollis humming, Mara standing between them and the east arch, Ivo and his cart.
+- Nothing happens in it. That is the point of it. Leave by the chalk sun.
+- Once per save. It sets nothing the story reads.
+
+**How the 2.5D places are built** (so more can be added quickly)
+- They use the 2D fights' own floor and figures with nobody to fight: a painted floor in perspective, people and props standing on it as flat figures sorted by depth, a camera that follows. A place is a short list: who stands where, what each says, what is behind them, and where you leave.
+
+**Checked by script:** the notch reproduced and fixed, by measurement; both places walked (move, talk, leave) with pictures; the Lamp hands off into the circle and on to the accusation; a second visit to the fire goes straight to the name; bots still win the Scuffle and the Pairing; Part Two builds; the page loads clean. **Not checked:** on an iPhone (the fix is by reasoning from your screenshot plus a forced test, not a real notch); either place by hand; how the circle feels with forty figures on a small screen (it is crowded near the fire).
 
 ## v0.58 · 2026-11-19 — nothing in the middle of the screen in the comic levels; mashing no longer pins a man to the floor
 From your note on v0.57 (the UI in the comic levels is still in the middle of the screen), and from the open list.

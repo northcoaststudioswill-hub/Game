@@ -404,13 +404,14 @@ Object.assign(MISSIONS, {
             ] },
           narr(wrong ? 'I had named the wrong one first. Nobody has said so since. They only looked at each other, that night, a little longer than they used to.' : 'They only looked at each other, that night, a little longer than they used to. I had done that as well, by being right.'),
           narr('Somebody paid for that lamp. A cadet\'s father does not owe a debt that size to another cadet. He owes it to somebody who can write in the grading book.')], () => Mission.finish())));
-        return Dialogue.start([
+        const nameIt = () => Dialogue.start([
           narr('Forty of them round the fire. Thirty Teal at the edge of the light, not sitting. Everybody knows why I have called them.'),
           narr('I get one name. If it is the right one, he is caught here in the light with nowhere to go. If it is the wrong one, the right one will be over the ridge before I can say a second.'),
           { choice: [
             { t: 'Corin Ashby. The oil, the slate, the left heel.', then: [say('corin', '...Nine flasks. You counted. Nobody counts.'), say('corin', 'My father owes a Proctor. One does not say which. The debt is struck if Violet finishes below Teal\'s patron. It is only arithmetic, Sorrel.'), say('kael', 'It is always only arithmetic.'), narr('He stood up, and he drew. I had not thought he would. He had been afraid for twenty-five days, and it had made him quick.'), fx(() => { HUD.toast('The right name. He is caught at the fire: single combat.'); Sound.play('clue'); }), duel(0)] },
             { t: 'Merrow. It is always the ones who came over.', fx: () => { G.flags.lampWrong = 1; rage(1); }, then: [say('merrow', 'There it is. One wondered how long a Violet standard would stay kind.'), say('petra', 'He was on the ford with me, Sorrel. From dusk. One said so.'), narr('I had said Corin\'s own words back to forty people, in my own mouth. Corin was looking at his slate. Then he was not. Then he was running for the ridge, and that was all the answer anybody needed.'), narr('Merrow took nine of the thirty and walked out before dawn. I did not stop them. I had no right left to.'), fx(() => { HUD.toast('The wrong name. Corin reaches his pickets: three to fight, and he cannot be kept.'); Sound.play('deny'); }), duel(1)] },
-            { t: 'Oswin Hale. The prints drag.', fx: () => { G.flags.lampWrong = 1; rage(1); }, then: [say('oswin', 'The right, Sorrel. I told you. The right.'), narr('He said it quietly. He pulled the dressing off in front of all of them, and it was the right, and I have not forgotten his face.'), narr('In the quiet, somebody behind the stores put down a slate and began to walk, and then to run. Corin Ashby. That was all the answer anybody needed.'), narr('Oswin did not carry water for me again. He carried it. Not for me.'), fx(() => { HUD.toast('The wrong name. Corin reaches his pickets: three to fight, and he cannot be kept.'); Sound.play('deny'); }), duel(1)] }] }]); }
+            { t: 'Oswin Hale. The prints drag.', fx: () => { G.flags.lampWrong = 1; rage(1); }, then: [say('oswin', 'The right, Sorrel. I told you. The right.'), narr('He said it quietly. He pulled the dressing off in front of all of them, and it was the right, and I have not forgotten his face.'), narr('In the quiet, somebody behind the stores put down a slate and began to walk, and then to run. Corin Ashby. That was all the answer anybody needed.'), narr('Oswin did not carry water for me again. He carried it. Not for me.'), fx(() => { HUD.toast('The wrong name. Corin reaches his pickets: three to fight, and he cannot be kept.'); Sound.play('deny'); }), duel(1)] }] }]);
+        if (MF('circle')) return nameIt(); MSET('circle'); return Mission.fight(walkCircle(), () => nameIt()); }
     }
   }
 });
@@ -420,3 +421,43 @@ const HOTN = { fire: 'THE FIRE', wood: 'WOODPILE', pump: 'PUMP HOUSE', vstd: 'VI
   book: 'GRADING BOOK', glass: 'VIEWING GLASS', roster: 'ROSTER', eye: 'THE WATCHER', cloak: 'WHITE CLOAK', boots: 'BOOT RACK', wagers: 'STRONGBOX', fire2: 'THE FIRE', stds: 'STANDARDS', wnote: 'STORES', ridge: 'RIDGE PATH', tentQ: "QUARTERMASTER'S TENT", cairns: 'CAIRNS', board2: "PROCTORS' BOARD",
   shelf: 'DEAD LETTERS', count: 'THE COUNT', tray: "MARSHAL'S TRAY", marendesk: "MAREN'S DESK", mydesk: 'MY DESK', motto: 'THE MOTTO', win: 'WINDOW', pillarSun: 'THE PILLAR', lift5: 'LIFT ZERO', notice5: 'NOTICES',
   kwash: 'WASH-HOUSE', kdoor5: 'K-5', kdoorM: "K-9 · MARA'S", kdoor11: 'K-11', kdoor13: 'K-13 · SEALED', ksuns: 'THE LEDGE', kwall: "MARA'S WALL", ktap: 'RATION TAP', kbarrel: 'BARRELS', kpost: 'THE POST', khop: 'THE SQUARES', ktub: 'WASH TUB', kbench: 'THE BENCH' };
+
+/* ---------- places you walk in depth: flat figures, a camp round you. They add to the story and change none of it. ---------- */
+function walkCircle() {
+  const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines });
+  return { era: 3, d2: 1, title: 'THE CIRCLE', sub: 'NIGHT TWENTY-EIGHT', bg: 'storm', arena: { kind: 'ring', rx: 190, ry: 72 }, music: 'mystery', hero: { id: 'kael2', hp: 9, pow: 2, blade: 0, fury0: 0 },
+    walk: { id: 'circle', spawn: [-150, 34], clear: 200,
+      obj: k => k.n ? 'THEY ARE WAITING. THE FIRE, WHEN I AM READY.' : 'FORTY OF THEM, AND NOBODY SITTING. WALK THE CIRCLE, OR GO TO THE FIRE.',
+      floor(g) { g.fillStyle = 'rgba(70,50,34,.55)'; g.beginPath(); g.ellipse(256, 256, 112, 54, 0, 0, 6.3); g.fill(); g.fillStyle = 'rgba(40,28,22,.6)'; g.beginPath(); g.ellipse(256, 256, 30, 15, 0, 0, 6.3); g.fill(); g.fillStyle = 'rgba(20,14,12,.7)'; g.beginPath(); g.ellipse(256, 256, 14, 7, 0, 0, 6.3); g.fill();
+        g.fillStyle = 'rgba(70,50,34,.4)'; for (let i = 0; i < 26; i++) { g.beginPath(); g.ellipse(256 - 112 - i * 6, 256 + 12 + Math.sin(i * .5) * 6, 9, 4, 0, 0, 6.3); g.fill(); } },
+      props: [{ t: 'fire', x: 0, y: 0, k: 1 },
+        { t: 'tent', x: -196, y: -62, c: '#7a5ac8', k: 1 }, { t: 'tent', x: -120, y: -88, c: '#7a5ac8', k: 2 }, { t: 'tent', x: 30, y: -96, c: '#7a5ac8', k: 3 }, { t: 'tent', x: 150, y: -84, c: '#2aa6a0', k: 4 }, ...Array.from({ length: 14 }, (_, i) => ({ t: 'tree', x: -260 + i * 40 + (i * 13) % 17, y: -120 - (i * 7) % 30, k: i, h: 64 + (i * 11) % 24 })),
+        { t: 'banner', x: -50, y: -78, c: '#7a5ac8', k: 1 }, { t: 'banner', x: -30, y: -80, c: '#2aa6a0', k: 2 },
+        ...[[150, 4], [164, -14], [170, 22], [182, 2], [156, 36], [144, -30]].map(([x, y], i) => ({ t: 'crowd', x, y, s: World.sheetFor(i % 2 ? 'cadt2' : 'cadt1'), k: i + 20 }))],
+      npcs: [
+        ...Array.from({ length: 13 }, (_, i) => { const a = (-30 + i * 20) * Math.PI / 180, j = (i * 7) % 5 - 2; return { id: i % 3 === 2 ? 'cadv2' : 'cadv1', x: Math.cos(a) * (92 + j * 3), y: -Math.sin(a) * (46 + j * 2), r: 9 }; }),
+        N('petra', -50, -16, 'PETRA LUNE', [say('petra', 'Forty of us, and nobody has sat down. One has seen that once before: the morning they read the pairings.'), narr('She has her slate under her arm. She is the only one here who looked at the fire before she looked at me.')]),
+        N('oswin', 52, -14, 'OSWIN HALE', [say('oswin', 'One brought the water up before anybody asked. It seemed the night for it.'), narr('He is standing on the leg. He will not let any of them see him favour it.')]),
+        N('corin', -58, 10, 'CORIN ASHBY', [say('corin', 'One has the tally here, should it be wanted. Eleven flasks.'), narr('Eleven. He says it the way a man says his own name.')]),
+        N('merrow', 128, 12, 'MERROW', [say('merrow', 'Thirty of us at the edge of your light, Sorrel. Notice that nobody has asked us to come nearer.'), narr('Nobody has. That is mine to mend, and it will not be mended tonight.')]),
+        N('cadv1', 34, 28, 'A CADET IN A BORROWED CLOAK', [say('cadv1', 'Is it true that below the rock they burn their dead? One heard it from a porter. One did not believe it.'), narr('They burn more than their dead. I told her I had heard the same.')])],
+      spots: [
+        { id: 'fire', x: 0, y: 2, r: 15, reach: 34, ph: 30, name: 'THE FIRE', verb: 'SAY THE NAME', exit: 1, talk: () => [] },
+        { id: 'stds', x: -40, y: -70, r: 8, reach: 28, ph: 60, name: 'THE STANDARDS', verb: 'LOOK', talk: () => [narr('Two standards, and a gap for a third. Below, nobody ever called forty people to a fire. They called us to a furnace. We stood in rows there as well, and nobody sat.'), narr('It is the same silence. I did not expect to find it up here. I had thought it was ours.')] }] } };
+}
+function walkSquare() {
+  const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines });
+  return { era: 0, title: 'ASHGATE SQUARE', sub: 'AN ORDINARY NIGHT, A YEAR AND MORE AGO', bg: 'ring', arena: { kind: 'ring', rx: 150, ry: 66 }, music: 'home',
+    walk: { id: 'square', spawn: [-96, 30], keep: q => q.t === 'lamp',
+      obj: k => k.n >= 3 ? 'NOTHING HAPPENED THAT NIGHT. THE CHALK SUN, WHEN I CAN LET IT GO.' : 'LAST BELL JUST GONE. EVERYBODY IS WHERE THEY ALWAYS WERE.',
+      props: [...[[-128, -18], [118, 34], [-40, 52], [140, -8]].map(([x, y], i) => ({ t: 'crowd', x, y, s: World.sheetFor(['pell', 'juno', 'marrow', 'kit'][i]), k: i + 1 }))],
+      npcs: [
+        N('seren', -18, -8, 'SEREN', [say('seren', "Hold the lamp steady, valve man. A sun wants all its rays or it's just a spider."), say('you', 'How many is all?'), say('seren', "More than they've got brushes for."), narr('She had chalk to the elbow. The Authority scrubbed it off every week, and every week she said that was only them making room.')]),
+        N('tavi', 44, 12, 'TAVI', [say('tavi', "Kael! Bao's doing the broth with the green in it. Real green. I saw."), say('you', "That's onion top, Tav."), say('tavi', "It's GREEN."), narr('Tavi was six and had never seen a leaf. Neither had I. I stood there and told a child what was and was not green.')]),
+        N('bao', -86, -22, 'BAO', [say('bao', "Two bowls and one for the small one. Put the stamp away, I know your face."), narr('He stamped the card anyway, afterwards, when he thought I was not looking. Everybody on Tier Six kept their accounts straight. It was the only thing we were ever praised for.')]),
+        N('hollis', 84, -16, 'HOLLIS', [narr('Hollis, on the bench by the east lamp, humming the shift song through his teeth to keep time on nothing at all.'), say('hollis', "Habit. Twelve hours on the wheel and the tune won't get out of your jaw. Your Seren hums it a third high. Tell her it's wrong and I like it.")]),
+        N('mara', -8, 38, 'MARA', [say('mara', "Last bell's gone, the pair of you. Proctor walks at the quarter. If he finds chalk on her hands it's a week's air for both, and I'll not sign for it."), say('you', 'Aye, Mara.'), narr('She said it every night. Every night she stood between us and the east arch until the chalk was dry.')]),
+        N('ivo', 108, 22, 'IVO', [say('ivo', "Cart's got a wheel going. Hear that? That's the sound of me pushing it uphill tomorrow. Give us a hand, Kael."), narr('I gave him a hand. I had a great many evenings, then, and I spent them like a man who thinks the meter is broken in his favour.')])],
+      spots: [{ id: 'sun', x: 0, y: 4, r: 6, reach: 22, ph: 14, name: 'THE CHALK SUN', verb: 'LET IT GO', exit: 1, talk: () => [narr('That is all of it. Nothing happened that night. I have gone back to it more often than to the wedding.')] }] } };
+}
+FF.circle = walkCircle; FF.square = walkSquare;

@@ -1,5 +1,5 @@
-# SOOTBORN — open list 
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.58 (2026-11-19).
+# SOOTBORN — open list
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.59 (2026-11-19).
 
 ## Waiting on you
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
@@ -8,7 +8,8 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **The High Docks:** the empty, locked level was a broken save from v0.49 (quay cleared, no key); v0.53 mends it and adds START THIS LEVEL AGAIN. What made that save is still unknown. Tell me if the gate refuses again.
 
 ## Untested, built blind (check these first when playing)
-- **v0.58: the comic levels' HUD.** Messages moved to the top-left, the marker shrinks when its target is on screen. If anything still sits mid-screen, send a screenshot.
+- **v0.59: the comic levels' HUD on your phone.** Cause found from your screenshot (the level was leaving room for the notch). Check the health bar is top-left and the objective top-right in all three levels.
+- **v0.59: the two 2.5D places.** The fire on night 28 (the Lamp) and the square memory at the Pillar on Day 1.
 - **v0.58: fights below are harder to mash.** A man who is down takes one blow and gets up guarding. Say if the Scuffle or the Ember Ring is now too much.
 - Air hook, air cut and thrown weapons (v0.51).
 - Death animation, down-but-not-out, Tavi following (v0.50).
@@ -27,7 +28,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 6. **The Proctors on the dais:** detailed figures, or detailed flat sprites standing in the 3D scene.
 
 ## Places
-7. **2.5D walking:** the camp and Ashgate Square as places you walk with flat sprites in a 3D space; the fire scene on night 28 staged that way (everyone comes to the circle, it is said, the fight starts).
+7. **2.5D places.** Built in v0.59: the fire on night 28 (stays 2.5D, as you said) and Ashgate Square as a memory. **Your rule: new 2.5D places are for new story beats or memories that add flavour and understanding and do not affect the plot.** Next candidates: the Assay camp by day (day 3); Row K the morning after the wedding; the fever ward with the fans up; the deck of a barge in the two years; the Spire's fourth ring at night. Also still open: the whole square explorable this way in the present, not only as a memory.
 8. **The High Docks rebuilt from reference:** laid out like a real dock, dressed as somewhere the Accredited live, with side corridors that go nowhere, height for the boots, and hidden things that feed the Codex.
 9. **Riser Nine:** more character still. It has a hill, a hoist and a road now.
 9a. **The Stair's sky:** the far fleet rides in two turning rings with winking lamps and cannot touch (v0.56). Still to do: crew on the near hulls; the three near wrecks and the smoke do not move.

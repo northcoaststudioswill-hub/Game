@@ -53,15 +53,35 @@ const Brawl = {
     this.p = { boots: def.boots ? 1 : 0, fu: 1, kn: 0, xh: 0, z: 0, vz: 0, gd: 3, gdT: 0, hcd: 0, airN: 0, x: -hw * .5, y: 4, fx: 1, fy: 0, hp: hero.hp || 6, max: hero.hp || 6, pow: hero.pow || 1, blade: hero.blade || 0, sheet: hero.id ? World.sheetFor(hero.id) : P.sheet, st: 'idle', t: 0, combo: 0, comboT: 0, inv: 0, dcd: 0, open: 0, anim: 0, hit: false, kx: 0, ky: 0, hold: 0, trail: [],
       fury: DEV.fury ? 100 : hero.fury0 !== undefined ? hero.fury0 : Math.min(60, ((G.flags || {}).fury | 0) * 7), rage: def.rage || 0 };
     this.pb = hero.id ? World.bustFor(hero.id) : makeBust(Object.assign(playerLook(), { mouth: 'frown' }));
-    this.foes = []; this.spawn(def.waves ? def.waves[0] : def.foes, true); this.tap = false;
+    this.foes = []; this.spawn(def.waves ? def.waves[0] : def.foes || [], true); this.tap = false;
     this.allies = (def.allies || []).map((a, i) => ({ id: a, x: -hw * .5 - 14 + (i % 2) * 30, y: -24 + i * 22, fx: 1, fy: 0, st: 'approach', t: 0, cd: .6 + i * .4, anim: 0, kx: 0, ky: 0, sheet: World.sheetFor(a), ally: 1, flash: 0 }));
     this.buildProps(def.bg || 'ring', A); this.cam = { x: -60, y: 380, h: 170, f: 150, hor: Math.round(H * .2), roll: 0 }; this.rollK = 0;
     Sound.music(def.music || (def.bg && def.bg !== 'ring' ? 'battle' : 'work')); Input.consume(); HUD.dirty = true; Fade.a = 0; Fade.dir = 0; Fade.busy = false;
     this.era = def.era !== undefined ? def.era : def.hero && def.hero.id ? 3 : 0; { const p = this.p, e = this.era; if (e < 1) { p.pcd = 1e9; p.hcd = 1e9; } if (e < 1 || !p.blade) p.lcd = 1e9; if (e < 2 || !p.blade) p.bcd = 1e9; if (e < 3) p.scd = 1e9; }
     this.buf = {}; this.sty = { v: 0, r: 0, last: [], t: 0, pop: 0 };
     this.revived = 0; this.loseLine = null; this.D = DIFFS[Settings.d.diff === undefined ? 1 : Settings.d.diff] || DIFFS[1]; this._bg0 = def.bg; this.lt = 0;
+    if (this._wtex) { delete this.tex[this._wtex]; delete this.pat[this._wtex]; this._wtex = null; } if (def.walk) this.walkStart(def.walk);
     if (def.intro && !(DEV.quick && !def.cineOnly) && !def._tries) this.playCine(def.intro, () => { if (def.cineOnly || def.film) return this.end(true); this.phase = 'intro'; this.pt = 0; });
   },
+  // ---------------------------------------------------------- a place to walk: flat figures in a deep space, nobody to fight
+  walkStart(w) { const b = this.def.bg === 'pit' ? 'ring' : this.def.bg || 'ring'; delete this.tex[b]; delete this.pat[b]; this._wtex = b;
+    this.phase = 'walk'; this.tipT = 0; this.wk = { near: null, said: {}, n: 0 }; const p = this.p; p.x = w.spawn[0]; p.y = w.spawn[1]; p.fury = 0;
+    this.allies = (w.npcs || []).map((n, i) => Object.assign({ fx: n.x > 0 ? -1 : 1, fy: 0, st: 'idle', t: i * 1.3, cd: 0, anim: 0, kx: 0, ky: 0, sheet: World.sheetFor(n.id), ally: 1, flash: 0, idx: i + 1 }, n));
+    this.props = this.props.filter(q => q.t !== 'melee' && (w.keep ? w.keep(q) : Math.hypot(q.x, q.y * 1.6) > (w.clear || 0))).concat(w.props || []); this.cam.x = p.x * .85; this.cam.y = p.y + 185; this.cam.h = 104; },
+  updWalk(dt) { const p = this.p, w = this.def.walk, k = this.wk;
+    let vx = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), vy = (Input.h('down') ? 1 : 0) - (Input.h('up') ? 1 : 0); if (vx && vy) { vx *= .7071; vy *= .7071; }
+    if (vx || vy) { p.x += vx * 72 * dt; p.y += vy * 54 * dt; p.anim += dt; p.fx = vx; p.fy = vy; p.st = 'move'; } else { p.st = 'idle'; p.anim = 0; }
+    this.clampA(p); let best = null, bd = 1e9;
+    for (const n of this.allies.concat(w.spots || [])) { const dx = p.x - n.x, dy = (p.y - n.y) * 1.4, d = Math.hypot(dx, dy), r = n.r || 11; if (d < r && d > .01) { p.x = n.x + dx / d * r; p.y = n.y + dy / d * r / 1.4; } if (n.talk && d < (n.reach || 30) && d < bd) { bd = d; best = n; } }
+    k.near = best; for (const n of this.allies) { n.t += dt; if (best === n) { const d = Math.hypot(p.x - n.x, p.y - n.y) || 1; n.fx = (p.x - n.x) / d; n.fy = (p.y - n.y) / d; } }
+    if (best && Input.p('A')) { Input.consume(); p.st = 'idle'; p.anim = 0; const d = Math.hypot(best.x - p.x, best.y - p.y) || 1; p.fx = (best.x - p.x) / d; p.fy = (best.y - p.y) / d; const steps = best.talk(k) || []; if (best.exit) { Dialogue.start(steps, () => this.end(true)); return; } const id = best.key || best.id; if (!k.said[id]) { k.said[id] = 1; k.n++; } Dialogue.start(steps); return; }
+    this.stepParts(dt); { const c = this.cam, q = Math.min(1, dt * 4); c.x += (p.x * .85 - c.x) * q; c.y += (p.y + 185 - c.y) * q; c.h += (104 - c.h) * q; c.roll = 0; } },
+  hudWalk(g) { const w = this.def.walk, k = this.wk, n = k.near, o = typeof w.obj === 'function' ? w.obj(k) : w.obj;
+    if (this.t < 3.2 && this.def.title) { const tw = ptextW(this.def.title, 2); g.globalAlpha = clamp(3.2 - this.t, 0, 1); ptext(g, this.def.title, Math.round((W - tw) / 2), 30, '#ffe08a', 2); if (this.def.sub) { const sw = ptextW(this.def.sub); ptext(g, this.def.sub, Math.round((W - sw) / 2), 46, '#e8dcc0'); } g.globalAlpha = 1; }
+    if (o) { const tw = ptextW(o); g.fillStyle = 'rgba(10,6,8,.78)'; g.fillRect(3, 3, tw + 8, 11); ptext(g, o, 7, 5, '#e8dcc0'); }
+    { const pp = this.proj(this.p.x, this.p.y, 46), x = Math.round(pp.x), y = Math.round(pp.y); g.fillStyle = '#120a0e'; g.fillRect(x - 3, y - 1, 7, 4); g.fillStyle = '#ffe08a'; g.fillRect(x - 2, y, 5, 1); g.fillRect(x - 1, y + 1, 3, 1); g.fillRect(x, y + 2, 1, 1); }
+    if (n && !Dialogue.active) { const pr = this.proj(n.x, n.y, n.ph || 34), lab = n.name || '', tw = ptextW(lab), x = clamp(Math.round(pr.x - tw / 2), 3, W - tw - 5), y = Math.max(16, Math.round(pr.y) - 8); if (lab) { g.fillStyle = '#120a0e'; g.fillRect(x - 3, y - 2, tw + 6, 10); ptext(g, lab, x, y, k.said[n.key || n.id] ? '#b8a878' : '#ffe08a'); }
+      const a = (Input.device === 'kb' ? 'E' : 'A') + ': ' + (n.verb || 'TALK'), aw = ptextW(a); g.fillStyle = 'rgba(10,6,8,.82)'; g.fillRect(Math.round((W - aw) / 2) - 4, H - 16, aw + 8, 11); ptext(g, a, Math.round((W - aw) / 2), H - 14, '#f3e3c3'); } },
   spawn(list, first) {
     const A = this.arena, hw = A.kind === 'ring' ? A.rx : A.w / 2, hh = A.kind === 'ring' ? A.ry : A.h / 2, n = list.length, base = this.foes.length;
     list.forEach((f, i) => { const K = Object.assign({}, FOE_KINDS[f.kind], f.k2 || {}); const D = this.D = DIFFS[Settings.d.diff === undefined ? 1 : Settings.d.diff] || DIFFS[1], hard = this.def.hero && this.def.hero.id && !this.def.doomed, cs = hard ? D.cd : (1 + D.cd) / 2; K.wind *= hard ? D.wind : (1 + D.wind) / 2; K.cd = [K.cd[0] * cs, K.cd[1] * cs]; if (hard && K.poise && D !== DIFFS[0]) { K.double = 1; K.charge = 1; K.triple = 1; } if (!this.def.doomed) f = Object.assign({}, f, { hp: Math.round(f.hp * (hard ? D.hp : 1 + (D.hp - 1) * .7) * (1 - .08 * Math.min(3, this.def._tries || 0))) });
@@ -190,6 +210,7 @@ const Brawl = {
     this.t += dt; if (this.fin) { this.fin.t += dt; if (this.fin.t > 1.1) this.fin = null; } this.msgT = Math.max(0, this.msgT - dt); this.shake = Math.max(0, this.shake - dt); this.punch = Math.max(0, this.punch - dt); this.impact = Math.max(0, this.impact - dt); this.hitsT -= dt; this.tipT -= dt;
     if (this.cine) return this.updCine(dt);
     if (Input.p('START')) { this.pauseMenu(); return; }
+    if (this.def.walk) return this.updWalk(dt);
     if (this.phase === 'intro') { this.pt += dt; this.camFollow(dt); if (this.pt > 1.5 || (this.pt > .5 && Input.p('A'))) { this.phase = 'fight'; this.say('FIGHT!', true); Sound.play(this.def.hero && this.def.hero.id ? 'horn' : 'bell'); Input.consume(); } return; }
     if (this.phase === 'win' || this.phase === 'lose') { this.pt += dt; this.stepParts(dt * .5); this.camFollow(dt * .5); for (const f of this.foes) { f.t += dt * .5; f.x += f.kx * dt * .4; f.y += f.ky * dt * .4; f.kx *= .9; f.ky *= .9; } if (this.pt > 2.1) { if (this.phase === 'win' && this.def.outro) this.playCine(this.def.outro, () => this.end(true)); else if (this.phase === 'lose' && this.def.legend) { const d = this.def, e = this.onEnd; d._tries = (d._tries || 0) + 1; this.start(d, e); this.say('AGAIN.', true); } else this.end(this.phase === 'win'); } return; }
     if (this.def.doomed && this.t > this.def.doomed + 1.6) { const p = this.p; p.st = 'down'; p.t = 0; this.impact = .3; this.shake = .8; Sound.play('hit'); this.phase = 'lose'; this.pt = 0.9; return; }
@@ -478,7 +499,7 @@ const Brawl = {
       else { g.fillStyle = 'rgba(12,6,10,.5)'; g.fillRect(0, 0, 512, 512); g.globalCompositeOperation = 'destination-out'; g.beginPath(); g.ellipse(256, 256, arx, ary, 0, 0, 6.3); g.fill(); g.globalCompositeOperation = 'source-over';
         // punched-out circle shows nothing through a pattern, so lay the lit stones back in underneath
         g.globalCompositeOperation = 'destination-over'; for (let ty = 8; ty < 24; ty++) for (let tx = 6; tx < 26; tx++) { g.save(); drawTile(g, fm, tx, ty); g.restore(); } g.globalCompositeOperation = 'source-over';
-        g.fillStyle = 'rgba(255,170,80,.10)'; g.beginPath(); g.ellipse(256, 256, arx, ary, 0, 0, 6.3); g.fill(); g.strokeStyle = '#efe6d4'; g.lineWidth = 3; g.setLineDash([7, 3]); g.beginPath(); g.ellipse(256, 256, arx, ary, 0, 0, 6.3); g.stroke(); g.setLineDash([]);
+        g.fillStyle = 'rgba(255,170,80,.10)'; g.beginPath(); g.ellipse(256, 256, arx, ary, 0, 0, 6.3); g.fill(); if (!this.def.walk) { g.strokeStyle = '#efe6d4'; g.lineWidth = 3; g.setLineDash([7, 3]); g.beginPath(); g.ellipse(256, 256, arx, ary, 0, 0, 6.3); g.stroke(); g.setLineDash([]); }
         R(252, 252, 9, 9, '#e8b23a'); for (const [a, b] of [[-10, 0], [10, 0], [0, -10], [0, 10], [-7, -7], [7, 7], [-7, 7], [7, -7]]) R(255 + a, 255 + b, 3, 3, '#e8b23a'); }
     } else if (bg === 'keep') { for (let y = 0; y < 512; y += 32) for (let x = (y / 32 % 2) * 16 - 16; x < 512; x += 32) { const c0 = ['#d6cfc0', '#cdc5b4', '#dcd6c8'][(r() * 3) | 0]; R(x, y, 32, 32, '#9a9284'); R(x, y, 31, 31, c0); R(x, y, 31, 2, shade(c0, 1.08)); R(x, y + 29, 31, 2, shade(c0, .86)); if (r() > .8) R(x + 6 + r() * 16, y + 8, 1, 10, '#a8a090'); }
       g.strokeStyle = '#e8c25a'; g.lineWidth = 4; g.beginPath(); g.ellipse(256, 256, arx * .8, ary * .8, 0, 0, 6.3); g.stroke(); g.lineWidth = 2; g.beginPath(); g.ellipse(256, 256, arx * .45, ary * .45, 0, 0, 6.3); g.stroke(); R(246, 250, 20, 12, '#e8c25a'); R(251, 244, 10, 24, '#e8c25a'); R(252, 252, 8, 8, '#2a2438');
@@ -489,6 +510,7 @@ const Brawl = {
       g.fillStyle = 'rgba(96,70,40,.55)'; for (let i = 0; i < 40; i++) { const t0 = i / 40; g.beginPath(); g.ellipse(256 + (t0 - .5) * 420 + Math.sin(i) * 10, 256 + Math.sin(t0 * 5) * 26, 20 + r() * 16, 10 + r() * 6, 0, 0, 6.3); g.fill(); }
       if (bg === 'ford') { for (let y = 206; y < 250; y++) { const k = Math.sin((y - 206) / 44 * Math.PI); R(0, y, 512, 1, `rgb(${60 - k * 20 | 0},${130 + k * 20 | 0},${170 + k * 40 | 0})`); } for (let i = 0; i < 260; i++) R(r() * 512, 208 + r() * 40, 6 + r() * 10, 1, r() < .5 ? '#bfe6ff' : '#3a86b0'); for (let i = 0; i < 60; i++) { const x = r() * 512; R(x, 204 + r() * 3, 6, 3, '#8a8a80'); R(x, 249 + r() * 3, 6, 3, '#8a8a80'); } }
     }
+    if (this.def.walk && this.def.walk.floor) this.def.walk.floor(g);
     this.tex[bg] = c; return c;
   },
   backdrop(g, bg, hor, t) {
@@ -660,6 +682,7 @@ const Brawl = {
     if (q.t === 'crowd') { const fh = q.s.fh || 16, sc = this.K * s * .95, bob = Settings.d.reduce ? 0 : Math.abs(Math.sin(t * 3 + q.k * 1.3)) * 2 * s; g.drawImage(q.s, 0, 0, 16, fh, Math.round(pr.x - 8 * sc), Math.round(pr.y - fh * sc - bob), 16 * sc, fh * sc); if (q.k % 3 === 0) { R(7, -fh * 2.5, 5, 6, '#ffb040'); R(8, -fh * 2.5 + 1, 3, 3, '#fff0b0'); } }
     else if (q.t === 'lamp') { R(-1, -70, 2, 70, '#2a2228'); R(-5, -78, 10, 9, '#ffb040'); R(-3, -76, 6, 5, '#fff0b0'); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(pr.x, pr.y - 74 * s, 0, pr.x, pr.y - 74 * s, 34 * s); gr.addColorStop(0, 'rgba(255,190,100,.5)'); gr.addColorStop(1, 'rgba(255,170,80,0)'); g.fillStyle = gr; g.fillRect(pr.x - 40 * s, pr.y - 114 * s, 80 * s, 80 * s); g.globalCompositeOperation = 'source-over'; }
     else if (q.t === 'tree') { const h = q.h; R(-3, -h * .3, 6, h * .3, '#4a3020'); R(-3, -h * .3, 2, h * .3, '#6a4a30'); for (let i = 0; i < 4; i++) { const w = (22 - i * 4.5), y = -h * .28 - i * h * .19; g.fillStyle = ['#1e5a2a', '#246a30', '#2a7a36', '#308a3c'][i]; g.beginPath(); g.moveTo(pr.x - w * s, pr.y + y * s); g.lineTo(pr.x, pr.y + (y - h * .3) * s); g.lineTo(pr.x + w * s, pr.y + y * s); g.fill(); g.fillStyle = 'rgba(160,230,120,.25)'; g.beginPath(); g.moveTo(pr.x - w * s, pr.y + y * s); g.lineTo(pr.x, pr.y + (y - h * .3) * s); g.lineTo(pr.x - w * .2 * s, pr.y + y * s); g.fill(); } }
+    else if (q.t === 'fire') { const fl = Settings.d.reduce ? 0 : Math.sin(t * 9 + (q.k || 0)) * 2; for (const [a, b] of [[-12, -2], [9, -2], [-9, 1], [7, 1], [-1, 2]]) R(a, b, 5, 3, '#6a6a72'); R(-9, -4, 18, 4, '#2a1c14'); R(-7, -6, 14, 3, '#3e2a1c'); R(-5, -17 - fl, 10, 12 + fl, '#e8742a'); R(-3, -21 - fl * 1.5, 6, 13 + fl, '#ffb040'); R(-1, -14, 3, 8, '#fff0b0'); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(pr.x, pr.y - 10 * s, 0, pr.x, pr.y - 10 * s, 70 * s); gr.addColorStop(0, 'rgba(255,170,80,.5)'); gr.addColorStop(1, 'rgba(255,120,40,0)'); g.fillStyle = gr; g.fillRect(pr.x - 74 * s, pr.y - 84 * s, 148 * s, 148 * s); g.globalCompositeOperation = 'source-over'; }
     else if (q.t === 'banner') { R(-1, -76, 2, 76, '#8a8478'); R(-2, -80, 4, 4, '#e8c25a'); const wv = Settings.d.reduce ? 0 : Math.sin(t * 4 + q.k) * 2; g.fillStyle = q.c; g.beginPath(); g.moveTo(pr.x + s, pr.y - 76 * s); g.lineTo(pr.x + (26 + wv) * s, pr.y - 72 * s); g.lineTo(pr.x + (24 - wv) * s, pr.y - 50 * s); g.lineTo(pr.x + s, pr.y - 46 * s); g.fill(); R(8, -66, 8, 8, '#e8c25a'); R(10, -64, 4, 4, q.c); }
     else if (q.t === 'melee') { const sc = this.K * s, fh = 28, ph = t * 2.2 + q.k * 1.7, lunge = Math.max(0, Math.sin(ph)) * 3, fr = 1 + (Math.floor(ph) & 1);
       g.drawImage(q.a, fr * 16, 3 * fh, 16, fh, Math.round(pr.x - (15 - lunge) * s - 8 * sc), Math.round(pr.y - fh * sc), 16 * sc, fh * sc); g.drawImage(q.b, (3 - fr) * 16, 2 * fh, 16, fh, Math.round(pr.x + (15 - lunge) * s - 8 * sc), Math.round(pr.y - fh * sc), 16 * sc, fh * sc);
@@ -757,6 +780,7 @@ const Brawl = {
     else if (this.msgT > 0 && !this.sup && !this.memo && !(this.art && this.art.t < this.art.C)) big(this.msg, this.msg === 'FURY' ? '#ff7a30' : '#ffe08a', 40, this.msgT > 1.1 && ptextW(this.msg, 3) < W - 8 ? 3 : 2);
   },
   hud(g) {
+    if (this.def.walk) return this.hudWalk(g);
     const p = this.p, t = this.t, bw = Math.min(104, Math.floor(W / 2) - 30), live = this.foes.filter(f => f.st !== 'down');
     const bar = (x, y, w, v, c1, c2, flip) => { g.fillStyle = '#0c0808'; g.fillRect(x - 1, y - 1, w + 2, 7); g.fillStyle = '#3a2a24'; g.fillRect(x, y, w, 5); const vw = Math.round(w * clamp(v, 0, 1)); g.fillStyle = c1; g.fillRect(flip ? x + w - vw : x, y, vw, 5); g.fillStyle = c2; g.fillRect(flip ? x + w - vw : x, y, vw, 1); g.fillStyle = '#c8a050'; g.fillRect(x - 1, y + 6, w + 2, 1); };
     g.fillStyle = '#0c0808'; g.fillRect(2, 2, 22, 22); g.drawImage(this.pb, 4, 4, 24, 24, 3, 3, 20, 20); g.strokeStyle = '#c8a050'; g.lineWidth = 1; g.strokeRect(2.5, 2.5, 21, 21);

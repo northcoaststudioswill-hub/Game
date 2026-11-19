@@ -1,5 +1,5 @@
-# SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.58 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+# SOOTBORN — Story bible 
+Tagline: "Every breath is hers." Current build: v0.59 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -485,3 +485,9 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **The Scuffle** is fought at the west end of Row K, in front of the doors, with the row watching.
 - **What he remembers in a fight, by year (v0.57):** at Riser Nine (+5) the count is five years old and the memories are the Tier Four order, the forty beds, the valley and the ring. On the Stair (+9) they are Brand's eleven minutes, two years in the weather, the shelf with two tins, and her line in the book at the top.
 - **The Assay is one season** in the opening film too (it said one year).
+
+## Places you walk in depth (v0.59)
+Rule from the author: a 2.5D place is used for story that adds flavour and understanding and **changes nothing in the plot**. The one exception already decided is the fire on night 28, which stages a scene that was already there.
+- **The Circle** (night 28, the Lamp). House Violet round the fire, standing; Teal at the edge of the light. New lines, none of them plot: Petra has seen forty people not sit down once before, the morning they read the pairings. Oswin brought the water up unasked and will not be seen to favour the leg. Corin offers his tally: eleven flasks (Kael has counted nine). Merrow: nobody has asked Teal to come nearer. A cadet asks whether it is true that below the rock they burn their dead. At the standards Kael recognises the silence: below, nobody was ever called to a fire, only to a furnace, and they stood in rows there as well.
+- **Ashgate Square, an ordinary night** (memory, from the Pillar on Day 1). A year and more before the furnace, just after last bell. Seren: "A sun wants all its rays or it's just a spider." Tavi is six and has never seen a leaf; neither has Kael. Bao waves the stamp away and stamps the card afterwards. Hollis hums the shift song from habit and says Seren hums it a third high. Mara stood between them and the east arch every night until the chalk was dry. Ivo's cart. Kael's last line: he has gone back to this night more often than to the wedding.
+- Tavi's age: six a year before the furnace, twelve at +5, sixteen at +9.
