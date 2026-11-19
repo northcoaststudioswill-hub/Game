@@ -227,6 +227,41 @@ rep("sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.04;", "sun.shadow.bias
 /* ---- the music up here is the shift song, not a city's walking bass ---- */
 rep("const BASS = [38, 0, 38, 41, 0, 43, 0, 36, 38, 0, 45, 43, 0, 41, 36, 0], LEAD = [62, 65, 69, 0, 67, 65, 0, 62];", "const BASS = [38, 0, 38, 45, 0, 43, 0, 41, 38, 0, 45, 43, 0, 41, 40, 0], LEAD = [62, 65, 69, 67, 65, 64, 62, 0];");
 
+/* ---- three levels in one file: the host names the one it wants ---- */
+rep("const SAVE = 'sootborn-issue-docks-v1'", "const SAVE = 'sootborn-issue-' + SC.issue + '-v1'");
+rep("})();\n'use strict';\n/* SECOND CHANCE - main: boot and the frame loop. */", ST.ALT + "})();\n'use strict';\n/* SECOND CHANCE - main: boot and the frame loop. */");
+rep("voss: { name: 'CAPTAIN ROOK',", "voss: { name: SC.issue === 'riser' ? 'WARDEN CAPTAIN' : SC.issue === 'stair' ? \"THE AUDITOR'S BLADE\" : 'CAPTAIN ROOK',");
+rep("clerk: { name: 'BRAND',", "clerk: { name: SC.issue === 'stair' ? 'TAVI' : 'BRAND',");
+rep("const bands = ['#0a0d2a', '#10163a', '#1a2156', '#2a2a70', '#48358a', '#7a4690'];", "const bands = SC.issue === 'stair' ? ['#241e4a', '#4a3470', '#8a4a7a', '#c8645a', '#f09a4e', '#ffd98a'] : SC.issue === 'riser' ? ['#060a18', '#0a1226', '#101c36', '#16284a', '#1e3454', '#2a4460'] : ['#0a0d2a', '#10163a', '#1a2156', '#2a2a70', '#48358a', '#7a4690'];");
+rep("rain = { m, pos, d, N };", "rain = { m, pos, d, N }; G.rainMesh = m;");
+rep("    G.init(document.getElementById('gl'));", `    G.init(document.getElementById('gl'));
+    if (SC.issue === 'stair') { G.scene.background.set(0x4a3470); G.scene.fog.color.set(0xb06a7a); G.scene.fog.near = 60; G.scene.fog.far = 260; G.amb.color.setRGB(0.5, 0.36, 0.44); G.sun.color.setRGB(1.0, 0.72, 0.42); G.uKey.value.set(1.0, 0.74, 0.46); if (G.rainMesh) G.rainMesh.visible = false; }
+    if (SC.issue === 'riser') { G.scene.background.set(0x0a1226); G.scene.fog.color.set(0x12233a); G.scene.fog.near = 26; G.scene.fog.far = 120; G.amb.color.setRGB(0.22, 0.3, 0.42); }`);
+
+/* ---- the boots: he has had them since the last day of the Assay. One press carries him over their heads and down on them. ---- */
+rep("wantPow = can && inp.buffered('power', 0.2),", "wantPow = can && inp.buffered('power', 0.2), wantBoot = can && inp.buffered('boots', 0.2),");
+rep("      if (wantDodge && pl.dodgeCd <= 0 && pl.onGround) { inp.clear('dodge'); startDodge(mx, mz, mag); }", "      if (wantBoot && (pl.bootCd || 0) <= 0 && pl.onGround) { inp.clear('boots'); startBoots(mx, mz, mag); }\n      else if (wantDodge && pl.dodgeCd <= 0 && pl.onGround) { inp.clear('dodge'); startDodge(mx, mz, mag); }");
+rep("      case 'power': updatePower(dt); break;", `      case 'boots': {
+        const k = pl.st / 0.62, sp = 15 * (1 - 0.35 * k);
+        pl.vel.set(pl.ddx * sp, 0, pl.ddz * sp); pl.lift = Math.sin(Math.min(1, k) * Math.PI) * 2.3; pl.pose = k < 0.75 ? P.leap : P.attack(4, 0.2); pl.poseRate = 30; pl.inv = Math.max(pl.inv, 0.12);
+        if (((pl.st * 30) | 0) % 2 === 0) { _a.copy(pl.pos); _a.y += pl.lift; FX.burst(_a, 0x7ad9ff, 0.7); }
+        if (k >= 1) { pl.lift = 0; pl.vel.multiplyScalar(0.15); pl.setState('idle'); FX.ring(pl.pos, 0x7ad9ff, 0.4, 3.6, 0.4); FX.puff(pl.pos, 7, 1.3); FX.light(pl.pos, 0x7ad9ff, 80, 0.35); SC.cam.shake(0.7); SC.audio.sfx('slam'); let n = 0;
+          for (const e of E) { if (!e.hittable() || Math.abs(e.pos.y - pl.pos.y) > 1.9) continue; const ex = e.pos.x - pl.pos.x, ez = e.pos.z - pl.pos.z, d = Math.hypot(ex, ez); if (d < 2.9 + e.r) { e.hit(24 * (1 + pl.meter / T.meter * 0.5), ex / (d || 1), ez / (d || 1), { heavy: true, named: true }); n++; } }
+          if (n) { _a.copy(pl.pos); _a.y += 2.6; FX.word('LIFT ZERO!', _a, '#7ad9ff', 1.3); SC.time.hitstop = 0.12; pl.gain(10); } }
+        break; }
+      case 'power': updatePower(dt); break;`);
+rep("  function perfectDodge() {", `  function startBoots(mx, mz, mag) {
+    pl.setState('boots'); pl.bootCd = 3.2; pl.inv = Math.max(pl.inv, 0.7);
+    let dx = mag > 0.3 ? mx / mag : Math.sin(pl.yaw), dz = mag > 0.3 ? mz / mag : Math.cos(pl.yaw); const t = pickTarget(11, 0.3, dx, dz);
+    if (t) { const ex = t.pos.x - pl.pos.x, ez = t.pos.z - pl.pos.z, d = Math.hypot(ex, ez) || 1; dx = ex / d; dz = ez / d; }
+    pl.ddx = dx; pl.ddz = dz; pl.yaw = Math.atan2(dx, dz);
+    FX.ring(pl.pos, 0x7ad9ff, 0.3, 2.2, 0.3); FX.puff(pl.pos, 5, 1); SC.audio.sfx('leap'); SC.emit('speedlines', 0.5);
+  }
+  function perfectDodge() {`);
+rep("pl.t += dt; pl.st += dt; if (pl.inv > 0) pl.inv -= dt; pl.dodgeCd -= dt;", "pl.t += dt; pl.st += dt; if (pl.inv > 0) pl.inv -= dt; pl.dodgeCd -= dt; pl.bootCd = (pl.bootCd || 0) - dt;");
+rep("KeyC: 'attack', KeyF: 'interact', KeyH: 'interact',", "KeyC: 'attack', KeyF: 'boots', KeyH: 'interact',");
+rep("const KEY = { KeyJ: 'attack',", "const KEY = { KeyB: 'boots', KeyJ: 'attack',");
+
 if (/Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow/.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''))) {
   const m = s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').match(/.{0,60}(Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow).{0,40}/g);
   console.log('LEFTOVER:', m.slice(0, 12));

@@ -1,5 +1,32 @@
 # SOOTBORN — changelog
 
+## v0.30 · 2026-11-19 — Riser Nine and the Stair are built; the boots are in all three
+From play notes: start building the two new third-person levels where they were placed, make sure they fit there, and give him what he has by then, the boots above all.
+
+**The boots** (all three third-person levels)
+- He has had them since the last day of the Assay, so he has them at +5, +7 and +9. One press on the JUMP button (it reads BOOTS during a level) carries him up and over on a blue burn and brings him down on whoever he was aimed at: LIFT ZERO. It knocks ordinary guards flat and has a three-second recharge. It is also the quickest way across a landing.
+- The older fights already had them: every 3D arena fight from the Keep onward (the Pinning, the Gallery, Riser Nine, the Son, the Docks, the Fall, the Stair, Little Ember) lets him fly on the same button.
+
+**Riser Nine** (chapter 2, +5): a third-person level, replacing the 2D fight there
+- **Place:** the Assay valley at night in the rain. Grass, a ring of pines, the white keep on its ridge, the river, the pump house with every Assay's names in the lintel, the Authority's pylon on the hill road, and the hatch, glowing, with warm air coming out of it.
+- **Kael:** in black cloth, no cape, no gilt. A clerk cannot be seen to fight.
+- **What you do:** hold the hatch. Four waves come down the hill road; after each one ten more people get out and their hooded lamps go up the road. The count on screen is how many are up, out of forty.
+- **Boss:** the Warden Captain. Three Wardens in all, which is the number Cade quotes at his desk the next morning.
+- **Two things to find:** the lintel (his false name with a gold nail in it; the old tunnel and STILL FLOWING) and a child's shoe by the hatch (the fever ward's forty beds).
+- Afterwards, the scene with the fortieth girl carrying a smaller girl now plays.
+
+**The Stair** (chapter 5, +9): a third-person level, replacing the 2D fight there
+- **Place:** the last three flights up the outside of the Sun Spire at sunset. The Spire wall on one side, open air and the cloud sea on the other, a hull still burning on the terrace below, the lamps of everyone who came up with him at the foot. Gold Auditors on each landing, the porters' kneeling plates, and at the top the white door under the Watcher.
+- **Tavi** is on his left from the first panel and moves up a landing each time one is cleared.
+- **What you do:** clear the terrace, two landings, and the first ring.
+- **Boss:** the Auditor's Blade, on the eye inlaid in their own floor. "One had another name. She took it when she gave one the post." "We've got names for everybody. Mara has a list."
+- **Two things to find:** the kneeling plates (Mara's forty-four commitments) and Brand's halberd, stood upright in a crack on the second landing. Somebody carried it up nine hundred steps and did not tell him.
+- It ends on the white door, which is where the next scene already was.
+
+**How it is built:** one engine and one copy of it in the file; the game tells it which of the three levels to be. The file grew by about 40 KB for both.
+
+**Checked** by script: each level from first panel to hand-back, every wave, both finds, the boss intro and ending, with no errors; started from the game itself in its frame with BOOTS on the button; the boots carry, land and hurt. The High Docks still runs start to end. **Not checked:** played by hand, any of it; whether four waves is too long for Riser Nine; whether enemies path sensibly on the flights of the Stair; how the sunset level looks on a phone.
+
 ## v0.29.8 · 2026-11-19 — the second half: the rings, the Dockmaster's table, word of Lucan, the night before
 From play notes: work on the chapters' cutscenes, lore and story; keep the placeholders; decide where the third-person combat fits the story best.
 

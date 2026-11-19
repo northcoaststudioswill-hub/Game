@@ -83,6 +83,7 @@
       D('flat', x + 0.8, y + h - 1.6, z, 1.3, 2.8, 0.06, col, { outline: 0.04 }); cyl('flat', x + 0.8, y + h - 1.2, z + 0.05, 0.3, 0.3, 0.04, GILT, { rx: Math.PI / 2, seg: 12, outline: 0 }); D('flat', x + 0.8, y + h - 1.2, z + 0.08, 0.3, 0.12, 0.02, 0xffffff, { outline: 0 }); D('flat', x + 0.8, y + h - 1.2, z + 0.1, 0.1, 0.1, 0.02, IRON, { outline: 0 }); D('flat', x, y + h + 0.1, z, 0.22, 0.22, 0.22, GILT, { outline: 0.03 });
     }
 
+    const DOCKS_A = () => {
     // ----- the weather, far below -----
     D('flat', 0, -58, 0, 1400, 2, 1400, 0x343a80, { outline: 0 });
     { const rc = SC.seeded(404), ico = new THREE.IcosahedronGeometry(1, 1);
@@ -286,6 +287,7 @@
     [[6, -66], [12.6, -66.4], [25, -64], [31.6, -64.6], [-20, -66], [-26.6, -66.5]].forEach((p, i) => bargeS(p[0], 9.2 + (i % 2) * 0.4 - (p[0] < 0 ? 2 : 0), p[1], Math.PI / 2 + (i % 3 - 1) * 0.04));
     [[8, 11.9, -45.2, 8, 10, -58], [22, 11.9, -45.2, 26, 10, -56], [-18, 9.9, -45.2, -21, 8, -58]].forEach(l => line(l[0], l[1], l[2], l[3], l[4], l[5], 0.045));
 
+    };
     // ===== theirs: what the Accredited build to be looked at, and what they build to keep us in line =====
     const GREEN = 0x3f9a5c, GREEN2 = 0x2f7a4a, WATER = 0x9fd7ff;
     const blob = (x, y, z, sx, sy, sz, col, ol) => { const g = new THREE.IcosahedronGeometry(1, 1); g.scale(sx, sy, sz); batch.add('flat', g, G.mx(x, y, z, x * 1.7), col, ol === undefined ? 0.06 : ol); g.dispose(); };
@@ -317,6 +319,7 @@
       cyl('wood', x, y + 1.3 * s, z, 0.07, 0.1, 1.4 * s, 0x6e4a2c, { outline: 0.03 });
       blob(x, y + 2.3 * s, z, 0.75 * s, 0.7 * s, 0.75 * s, GREEN); blob(x + 0.2, y + 3.0 * s, z - 0.1, 0.5 * s, 0.5 * s, 0.5 * s, GREEN2);
     }
+    const DOCKS_B = () => {
     // the Watcher, inlaid where the causeway meets the quay: everyone who comes up the stair walks across the eye
     cyl('flat', 0, 0.053, 12, 2.5, 2.5, 0.02, GILT, { seg: 28, outline: 0 }); cyl('flat', 0, 0.074, 12, 2.1, 2.1, 0.02, DECK, { seg: 28, outline: 0 });
     for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; D('flat', Math.sin(a) * 3.6, 0.053, 12 + Math.cos(a) * 3.6, 0.3, 0.02, i % 2 ? 1.2 : 2.0, GILT, { ry: a, outline: 0 }); }
@@ -349,6 +352,80 @@
     // a colonnade on the east edge of Mooring One, to frame the fleet
     [-43, -38, -33, -28].forEach(z => { cyl('concrete', 31.8, 13.95, z, 0.22, 0.27, 4.4, STONE, { outline: 0.04 }); D('flat', 31.8, 16.2, z, 0.7, 0.16, 0.7, GILT, { outline: 0.03 }); });
     D('concrete', 31.8, 16.6, -35.5, 0.7, 0.6, 16.4, STONE, { outline: 0.06 }); D('flat', 31.8, 16.95, -35.5, 0.8, 0.12, 16.6, GILT, { outline: 0.03 });
+    };
+    const cloudSea = (y, n, seed) => { D('flat', 0, y - 30, 0, 1400, 2, 1400, 0x343a80, { outline: 0 }); const rc = SC.seeded(seed), ico = new THREE.IcosahedronGeometry(1, 1);
+      for (let i = 0; i < n; i++) { const a = rc() * 6.283, r = 50 + rc() * 250, sc = 14 + rc() * 26, g = ico.clone(); g.scale(sc, sc * 0.3, sc * 0.8); batch.add('flat', g, G.mx(Math.cos(a) * r, y - rc() * 20, Math.sin(a) * r, rc() * 3), [0xe0a08a, 0xc98aa8, 0xf2c8a0][i % 3], 0); g.dispose(); } };
+    const pine = (x, z, s, solidToo) => { if (solidToo) solid(x - 0.4, z - 0.4, x + 0.4, z + 0.4, 0, 6, { cam: false }); cyl('wood', x, 1.1 * s, z, 0.16 * s, 0.24 * s, 2.2 * s, 0x4a3524, { outline: 0.05 });
+      [[2.6, 1.9, 3.0], [4.4, 1.45, 2.6], [5.9, 0.95, 2.2]].forEach(c => { const g = new THREE.ConeGeometry(c[1] * s, c[2] * s, 7); batch.add('flat', g, G.mx(x, c[0] * s, z, x), c[0] > 5 ? 0x2f6a4c : 0x24543c, 0.07); g.dispose(); }); };
+
+    /* ===== RISER NINE: the Assay valley, five years on, at night in the rain. Grass, pines, the pump house, and a hatch. ===== */
+    const RISER = () => {
+      W.underRoof = () => false; W.inside = () => false;
+      D('roof', 0, -0.5, 0, 150, 1, 150, 0x2c5a40, { outline: 0 });
+      [[-27, -24, 27, -23], [-27, 23, 27, 24], [-27, -24, -26, 24], [26, -24, 27, 24]].forEach(w => wall(w[0], w[1], w[2], w[3]));
+      const rp = SC.seeded(55);
+      for (let i = 0; i < 64; i++) { const a = i / 64 * 6.283, r = 33 + rp() * 16; pine(Math.cos(a) * r * 1.05, Math.sin(a) * r * 0.9, 1.3 + rp() * 1.3); }
+      [[-20, 14], [-23, -3], [21, -15], [18, 12], [-8, -19], [9, 19], [23, 2]].forEach(p => pine(p[0], p[1], 1.5, true));
+      for (let i = 0; i < 70; i++) { const x = (rp() - 0.5) * 50, z = (rp() - 0.5) * 44; D('flat', x, 0.16, z, 0.06, 0.34, 0.06, i % 3 ? 0x3f7a52 : 0x5a9a62, { rz: (rp() - 0.5) * 0.6, outline: 0 }); }
+      for (let i = 0; i < 9; i++) D('flat', (rp() - 0.5) * 40, 0.012, (rp() - 0.5) * 34, 2 + rp() * 2, 0.02, 1.2 + rp(), 0x3c4e8a, { ry: rp() * 3, outline: 0 });
+      // hills, and the white keep on its ridge: the same valley he won the Assay in
+      [[-30, -64, 60, 20, 0.5], [34, -70, 70, 26, -0.4], [-66, -20, 50, 22, 1.2], [68, 4, 56, 20, -1.3], [0, 70, 90, 16, 0.1]].forEach(h => { const g = new THREE.IcosahedronGeometry(1, 1); g.scale(h[2], h[3], h[2] * 0.6); batch.add('flat', g, G.mx(h[0], -4, h[1], h[4]), 0x1f4a3a, 0.2); g.dispose(); });
+      D('brick', 30, 24, -78, 14, 12, 10, 0xd8d3e2, { outline: 0.14 }); D('brick', 24, 30, -78, 4, 20, 4, 0xd8d3e2, { outline: 0.1 }); D('brick', 37, 28, -78, 3.4, 16, 3.4, 0xd8d3e2, { outline: 0.1 }); D('flat', 24, 40.6, -78, 4.6, 0.8, 4.6, GILT, { outline: 0.06 }); D('glow', 30, 26, -72.9, 1.2, 2.4, 0.1, LAMP, { outline: 0 });
+      // the river along the south edge
+      D('flat', 0, 0.02, 30, 150, 0.04, 12, 0x3a5fa8, { outline: 0 }); for (let x = -40; x < 40; x += 3.3) D('flat', x, 0.06, 26 + (x * 7 % 5), 1.6, 0.02, 0.12, 0xcfe0ff, { outline: 0 });
+      // Riser Nine: a maintenance hatch nobody above has looked at in thirty years. Warm air and people come out of it.
+      solid(-2.3, -2.3, 2.3, 2.3, 0, 0.5, { cam: false }); cyl('concrete', 0, 0.25, 0, 2.3, 2.5, 0.5, STONE2, { seg: 14, outline: 0.07 }); cyl('glow', 0, 0.52, 0, 1.7, 1.7, 0.04, 0xff8a2e, { seg: 14, outline: 0 });
+      D('flat', 1.5, 1.0, 0, 0.1, 1.6, 0.1, IRON, { outline: 0.03 }); D('flat', 1.1, 1.0, 0, 0.1, 1.6, 0.1, IRON, { outline: 0.03 }); D('flat', 2.6, 0.9, -1.4, 0.2, 1.8, 2.4, 0x8d94ac, { rz: 1.2, outline: 0.05 });
+      sign('RISER 9', 0, 1.3, -2.52, Math.PI, 2.4, 0.6, '#e8c25a', '#07070d');
+      { const l = new THREE.PointLight(0xff8a2e, 60, 16, 1.6); l.position.set(0, 1.6, 0); G.scene.add(l); }
+      // the pump house, with every Assay's names cut in the lintel
+      B('brick', -18, -12, -11, -6, 0, 3.6, STONE2, { outline: 0.1 }); B('roof', -18.4, -12.4, -10.6, -5.6, 3.6, 3.9, SLATE, { outline: 0.06, col: false }); D('flat', -10.95, 1.2, -9, 0.1, 2.4, 1.3, 0x15151f, { outline: 0.04 }); D('concrete', -10.9, 2.7, -9, 0.3, 0.5, 2.2, STONE, { outline: 0.04 }); D('glow', -10.9, 1.6, -7.2, 0.06, 0.5, 0.4, LAMP, { outline: 0 });
+      // what the Authority left here: a pylon with the eye on it, and the road the Wardens come down
+      D('brick', 0, 4, -21, 2.4, 8, 2.4, 0xd8d3e2, { outline: 0.08 }); solid(-1.2, -22.2, 1.2, -19.8, 0, 8); D('flat', 0, 8.2, -21, 2.8, 0.4, 2.8, GILT, { outline: 0.04 }); D('glow', 0, 9, -21, 0.7, 0.9, 0.7, LAMP, { outline: 0 });
+      for (let z = -19; z < -4; z += 2.4) D('flat', 3.4 + (z % 2), 0.012, z, 2.2, 0.02, 1.6, 0x5a5346, { outline: 0 });
+      [[-9, 9], [10, -9], [12, 10], [-11, 2]].forEach(p => { solid(p[0] - 0.2, p[1] - 0.2, p[0] + 0.2, p[1] + 0.2, 0, 2.4, { cam: false }); cyl('wood', p[0], 1.1, p[1], 0.06, 0.08, 2.2, 0x4a3524, { outline: 0.03 }); D('glow', p[0], 2.3, p[1], 0.26, 0.34, 0.26, TLAMP, { outline: 0 }); });
+      crateStatic(-9.6, -6.4, 1.1); crate(-9.2, -4.9, 0.9, 0, 'hp'); crate(14, 16, 0.9, 0, 'meter'); crate(-16, 17, 0.9, 0, 'hp'); crate(20, -8, 0.9, 0, 'hp');
+      D('crate', 3.4, 0.14, 3.2, 0.3, 0.16, 0.5, 0x8a1f24, { ry: 0.6, outline: 0.03 });    // a child's shoe
+    };
+
+    /* ===== THE STAIR: the last flights up the Sun Spire at sunset, nine years on. Three flights, three landings, the white door. ===== */
+    const STAIR = () => {
+      W.underRoof = () => false; W.inside = () => false;
+      cloudSea(-26, 90, 77);
+      { const R = 62, cx = -71, cz = -8, rAt = y => R + 6 * (270 - y) / 300; let g = new THREE.CylinderGeometry(R, R + 6, 320, 64, 1, true); const uv = g.attributes.uv; for (let k = 0; k < uv.count; k++) uv.setXY(k, uv.getX(k) * 98, uv.getY(k) * 76);
+        batch.add('concrete', g, G.mx(cx, 110, cz), 0xf0e2cc, 0); g.dispose();
+        [4, 26, 54, 92, 140].forEach(y => { const r = rAt(y) + 0.9; g = new THREE.CylinderGeometry(r, r + 0.1, 2.2, 64, 1, true); batch.add('flat', g, G.mx(cx, y, cz), GILT, 0); g.dispose(); }); }
+      const W0 = 7;
+      // the terrace the barges came down on
+      B('concrete', -W0 - 3, 30, W0 + 3, 46, -3, 0, DECK, { outline: 0.08 }); wall(-W0 - 3.6, 46, W0 + 3.6, 46.6); wall(-W0 - 3.6, 30, -W0 - 3, 46); wall(W0 + 3, 30, W0 + 3.6, 46); rail(W0 + 2.8, 30.4, W0 + 2.8, 46, 0); rail(-W0 - 2.4, 46, W0 + 2.8, 46, 0);
+      wall(-W0 - 3, 29.4, -W0, 30); wall(W0, 29.4, W0 + 3, 30);
+      // three flights and two landings
+      const flight = (z0, z1, a, b) => { ramp('concrete', -W0, z0, W0, z1, Math.min(a, b) - 3, a, b, 'z', STONE, { steps: true }); for (let z = z0; z < z1; z += 2) { const y = SC.lerp(a, b, (z - z0) / (z1 - z0)); D('flat', 0, y + 0.03, z + 1, 0.3, 0.04, 1.2, GILT, { rx: Math.atan2(a - b, z1 - z0), outline: 0 }); } };
+      const landing = (z0, z1, y) => { B('concrete', -W0, z0, W0, z1, y - 4, y, DECK, { outline: 0.08 }); D('flat', 0, y + 0.012, (z0 + z1) / 2, 0.3, 0.02, z1 - z0 - 1, GILT, { outline: 0 }); };
+      flight(18, 30, 6, 0); landing(4, 18, 6); flight(-8, 4, 12, 6); landing(-22, -8, 12); flight(-34, -22, 18, 12);
+      wall(-W0 - 0.6, -34, -W0, 30, -4, 30); wall(W0, -34, W0 + 0.6, 30, -4, 30);
+      [[18, 30, 6, 0], [-8, 4, 12, 6], [-34, -22, 18, 12]].forEach(f => { for (let z = f[0] + 1; z < f[1]; z += 3) { const y = SC.lerp(f[2], f[3], (z - f[0]) / (f[1] - f[0])); D('concrete', W0 - 0.2, y + 0.6, z, 0.4, 1.2, 0.4, STONE, { outline: 0.04 }); D('concrete', -W0 + 0.2, y + 0.6, z, 0.4, 1.2, 0.4, STONE, { outline: 0.04 }); } line(W0 - 0.2, f[2] + 1.25, f[0], W0 - 0.2, f[3] + 1.25, f[1], 0.09, STONE); line(-W0 + 0.2, f[2] + 1.25, f[0], -W0 + 0.2, f[3] + 1.25, f[1], 0.09, STONE); });
+      [[4, 18, 6], [-22, -8, 12]].forEach(l => { rail(W0 - 0.2, l[0], W0 - 0.2, l[1], l[2]); rail(-W0 + 0.2, l[0], -W0 + 0.2, l[1], l[2]); statue(W0 - 1.3, l[0] + 1.4, l[2], 3.4, -Math.PI / 2); statue(-W0 + 1.3, l[1] - 1.4, l[2], 3.4, Math.PI / 2); column(W0 - 1.2, l[1] - 1.2, 4, LAMP); column(-W0 + 1.2, l[0] + 1.2, 4, LAMP); });
+      // the porters' line, all the way up, and the plates they kneel on
+      for (let x = -3.2; x <= -1.6; x += 0.8) for (let z = 7; z <= 10; z += 0.8) D('flat', x, 6.03, z, 0.36, 0.02, 0.2, 0xb8902e, { outline: 0 });
+      sign('KNEEL AT THE BELL', -W0 + 0.42, 7.6, 11, Math.PI / 2, 3, 0.5, '#e8c25a', '#07070d'); sign('SERVICE KEEP TO THE LINE', W0 - 0.42, 13.6, -15, -Math.PI / 2, 4, 0.5, '#e8c25a', '#07070d');
+      crate(4.6, 16, 0.9, 6, 'hp'); crate(-4.8, 6, 0.9, 6, 'meter'); crate(4.6, -10, 0.9, 12, 'hp'); crate(-4.6, -20, 0.9, 12, 'hp'); crateStatic(5.4, 6.2, 1.2, 6); crateStatic(-5.3, -19.6, 1.3, 12);
+      // Brand's halberd, stood in a crack on the second landing
+      D('flat', 3.2, 13.3, -12, 0.07, 2.6, 0.07, IRON, { rz: 0.08, outline: 0.03 }); D('flat', 3.1, 14.5, -11.86, 0.05, 0.34, 0.3, 0xd9dde6, { rz: 0.08, outline: 0.03 }); solid(3, -12.2, 3.4, -11.8, 12, 14, { cam: false });
+      // the top: the first ring, and the white door
+      B('concrete', -10, -58, 10, -34, 14, 18, DECK, { outline: 0.08 }); wall(-10.6, -58, -10, -34, 14, 30); wall(10, -58, 10.6, -34, 14, 30); wall(-10, -34.6, -W0, -34, 14, 30); wall(W0, -34.6, 10, -34, 14, 30);
+      rail(9.8, -57.6, 9.8, -34.4, 18); rail(-9.8, -57.6, -9.8, -34.4, 18);
+      B('brick', -10, -62, 10, -58, 14, 32, 0xf4efe2, { outline: 0.12 }); D('flat', 0, 22.2, -57.94, 4.2, 8.4, 0.12, 0xffffff, { outline: 0.08 }); D('flat', 0, 22.2, -57.9, 0.12, 8.4, 0.14, GILT, { outline: 0 }); D('flat', 0, 26.6, -57.9, 5, 0.4, 0.3, GILT, { outline: 0.04 });
+      watcher(0, 29, -57.86, 0, 1.3); [-6.5, 6.5].forEach(x => { statue(x, -56, 18, 4.6, 0); tree(x * 0.62, -55.6, 18, 1); });
+      cyl('flat', 0, 18.05, -46, 3.2, 3.2, 0.02, GILT, { seg: 28, outline: 0 }); cyl('flat', 0, 18.07, -46, 2.8, 2.8, 0.02, DECK, { seg: 28, outline: 0 }); D('flat', 0, 18.09, -46, 3.2, 0.02, 1.2, 0xffffff, { outline: 0 }); cyl('flat', 0, 18.11, -46, 0.6, 0.6, 0.02, IRON, { seg: 14, outline: 0 });
+      crate(8.4, -36, 0.9, 18, 'hp'); crate(-8.4, -36, 0.9, 18, 'meter'); crate(8.4, -50, 0.9, 18, 'hp');
+      // below and behind: the fleet where it fell, one hull still burning, and the lamps of everyone who came up with him
+      bargeS(26, -7, 34, 0.5); bargeS(-4, -5.4, 60, -0.3); bargeS(30, -9, 6, 1.2);
+      [[24, 36], [27, 33], [22, 31]].forEach((p, i) => { D('glow', p[0], -4 + i, p[1], 1.6, 2.4 + i, 1.6, i ? 0xff7a1f : 0xffe14a, { ry: i, outline: 0 }); const g = new THREE.IcosahedronGeometry(1, 1); g.scale(3 + i, 2.4, 3); batch.add('flat', g, G.mx(p[0] + 1, 3 + i * 4, p[1] - 1 - i * 2), 0x3a3040, 0); g.dispose(); });
+      for (let i = 0; i < 26; i++) D('glow', -8.4 + (i % 13) * 1.4, 0.9 + (i % 3) * 0.2, 42.6 + Math.floor(i / 13) * 1.6, 0.16, 0.22, 0.16, i % 4 ? LAMP : TLAMP, { outline: 0 });
+      standard(-8.6, 44.6, 0, 5, 0x8a6a48); standard(7.4, 44.6, 0, 5, 0x8a6a48);
+    };
+    if (SC.issue === 'riser') RISER(); else if (SC.issue === 'stair') STAIR(); else { DOCKS_A(); DOCKS_B(); }
 
     W.statics = batch.build(G.scene); batch = null;
   };

@@ -8,7 +8,8 @@
 const Issue = {
   on: false, el: null, done: null, ready: false, timer: 0, onMsg: null, last: '', lab: null,
   // the memories the level may show, drawn by the same panel code as the rest of the game
-  PANELS: ['desk:2', 'desk:4', 'desk:5', 'ledger:2', 'freight:0', 'furnace:0', 'furnace:1', 'furnace:2', 'hands:0', 'kael:0', 'tin:0', 'lift:0', 'dockstair:0'],
+  LEVELS: { docks: 'The High Docks', riser: 'Riser Nine', stair: 'The Stair' },
+  PANELS: ['under:0', 'ward:0', 'row:0', 'desk:2', 'desk:4', 'desk:5', 'ledger:2', 'freight:0', 'furnace:0', 'furnace:1', 'furnace:2', 'hands:0', 'kael:0', 'tin:0', 'lift:0', 'dockstair:0'],
   can() { if (Settings.d.issue3d === 0) return false; try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } },
   assets() {
     const out = {}, was = Panels.narrow;
@@ -20,12 +21,13 @@ const Issue = {
     Object.assign(this.el.style, { left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px' });
   },
   start(key, done) {
-    const html = (window.ISSUE_HTML || {})[key];
+    // one engine, three levels: the frame is told which one it is
+    const base = (window.ISSUE_HTML || {}).docks, html = base && this.LEVELS[key] ? base.replace("issue: 'docks'", "issue: '" + key + "'") : null;
     if (!html || !this.can()) { done(false); return; }
     this.on = true; this.done = done; this.ready = false; this.key = key; this.last = ''; this.sent = '';
     try { if (Sound.mus) Sound.mus.gain.value = 0; window.__issueAudio = Sound.ctx || null; } catch (e) { /* no audio yet */ }
     const f = this.el = document.createElement('iframe');
-    f.setAttribute('title', 'SOOTBORN: The High Docks'); f.setAttribute('tabindex', '-1');
+    f.setAttribute('title', 'SOOTBORN: ' + this.LEVELS[key]); f.setAttribute('tabindex', '-1');
     f.style.cssText = 'position:fixed;border:0;background:#07070d;image-rendering:auto';
     this.onMsg = e => {
       const d = e.data; if (!d || typeof d.sootborn !== 'string' || !this.el || e.source !== this.el.contentWindow) return;
@@ -35,7 +37,7 @@ const Issue = {
     window.addEventListener('message', this.onMsg);
     f.srcdoc = html; document.body.insertBefore(f, $('#controls')); this.place();
     // the fight buttons, named for what they do up here
-    this.lab = {}; [['bY', 'LOOK'], ['bX', 'STRIKE'], ['bR', 'LOCK'], ['bL', 'ELEVEN']].forEach(([id, t]) => { const b = $('#' + id); if (b) { this.lab[id] = b.textContent; b.textContent = t; } });
+    this.lab = {}; [['bY', 'BOOTS'], ['bX', 'STRIKE'], ['bR', 'LOCK'], ['bL', 'ELEVEN']].forEach(([id, t]) => { const b = $('#' + id); if (b) { this.lab[id] = b.textContent; b.textContent = t; } });
     this.timer = setTimeout(() => { if (!this.ready) this.finish(false); }, 15000);
   },
   // once a frame from the main loop: hand the level this game's own input
@@ -44,7 +46,7 @@ const Issue = {
     const bc = document.body.classList; if (!bc.contains('ingame')) bc.add('ingame'); if (!bc.contains('fight')) bc.add('fight'); if (bc.contains('ctlfade')) bc.remove('ctlfade');   // this game's pad and buttons stay up for the whole level
     if (!this.ready) return;
     const x = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), y = (Input.h('up') ? 1 : 0) - (Input.h('down') ? 1 : 0), press = [];
-    if (Input.p('A')) press.push('ctx'); if (Input.p('B')) press.push('dodge'); if (Input.p('X')) press.push('attack'); if (Input.p('Y')) press.push('interact');
+    if (Input.p('A')) press.push('ctx'); if (Input.p('B')) press.push('dodge'); if (Input.p('X')) press.push('attack'); if (Input.p('Y')) press.push('boots');
     if (Input.p('L')) press.push('power'); if (Input.p('R')) press.push('lock'); if (Input.p('START')) press.push('pause');
     const k = x + ',' + y; if (k === this.sent && !press.length) return; this.sent = k;
     try { this.el.contentWindow.postMessage({ sootborn: 'in', x, y, press }, '*'); } catch (e) { /* frame is going away */ }

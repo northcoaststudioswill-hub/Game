@@ -352,10 +352,10 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 | Ch | When | Scenes | Play |
 |---|---|---|---|
 | 1 The Post | +4 | The Spire; the Clerk's desk; the Count and Seren's line; Wren at the desk; Lucan asks to be taught; Maren | 3D fight: the Gallery (Tyr Cade) |
-| 2 The Balancing | +5 | The Tier Four order (sign or lose it); Dace's letter; Cade at the desk; Maren and the forty | 2D level: the Count hall (if he loses the order). 2D level: the Sun (Tavi, below). **Riser Nine: 2D/3D fight now, third-person level planned** |
+| 2 The Balancing | +5 | The Tier Four order (sign or lose it); Dace's letter; Cade at the desk; Maren and the forty | 2D level: the Count hall (if he loses the order). 2D level: the Sun (Tavi, below). **Third-person level: Riser Nine** |
 | 3 What She Knows | +6 to +7 | The hum; Celestine's offer; Lucan on the keep; Freight Three; the dock stair | 3D fight: the Son. **Third-person level: the High Docks** |
 | 4 Two Years | +7 to +9 | Brand; the week he blames Wren; Maren's note; the low point; the weather; Tavi comes up; Wren at the rail | 2D fight: the Dock Stair (you are Brand). 2D fight: Tier Six Stands (you are Mara). 3D fight: the Fall |
-| 5 The Count | +9 | The words before the stair; Maren at the white door; Celestine; the choice; Lift Zero open; Row K | **The Stair: 3D fight now, third-person level planned.** 3D fight: Little Ember (Celestine) |
+| 5 The Count | +9 | The words before the stair; Maren at the white door; Celestine; the choice; Lift Zero open; Row K | **Third-person level: the Stair.** 3D fight: Little Ember (Celestine) |
 
 **The two planned levels (decided in v0.29.8; see below).**
 - **Riser Nine** (+5). The Assay valley at night in rain: pines, the pump house, the riser's hatch glowing in the grass. Kael in a mask, alone, holding the top of the riser while forty people from Tier Four come up behind him. No barges, no stone: mud, lamplight, Wardens coming down the hill. It would be the first time he fights for people instead of against a rival, and the reason Cade starts looking at "everyone who has done it before". Boss: a Warden captain.
@@ -376,3 +376,10 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **Lucan** is Captain of the Door at +9. Friend: he writes that he will not be where she puts him. Otherwise: he will stand there.
 - **The list:** Mara sends forty-four names and Brand's up with Tavi, to be read aloud when it is done. Kael adds Aldane, T. and Rook, A.
 - The thin places listed above are now: chapter 1 has its rings but still no level; chapter 4 has its night before; Lucan is accounted for.
+
+### Built in v0.30
+- **Riser Nine** and **the Stair** exist as third-person levels where they were placed. Riser Nine: the Assay valley at night, Kael masked, forty people out in four waves, the Warden Captain. The Stair: three flights at sunset with Tavi on his left, the Auditor's Blade on the Watcher's eye, ending at the white door.
+- **The boots** are in all three levels (he has them from the last day of the Assay): one leap over their heads and down, called LIFT ZERO.
+- **The Auditor's Blade** had a name once; Celestine took it with the post. Kael offers him one from Mara's list.
+- **Brand's halberd** was carried up the Stair by Hollis and stood on the second landing.
+- **New canon to confirm:** the Warden Captain at Riser Nine is unnamed; three Wardens died there.

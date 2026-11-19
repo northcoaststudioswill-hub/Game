@@ -16,6 +16,15 @@
     clerk: { h: 1.12, b: 1.25, face: 'brand', hair: 'brand', coat: true, weapon: 'halberd2',
       pal: { skin: 0xb98a66, top: 0x4a4650, trim: 0x2a2630, shirt: 0x6e6a78, tie: 0x2a2630, pants: 0x2a2630, boots: 0x15151f, hair: 0x9a9aa6, glove: 0x2a2630, wrap: 0x4a4650 } }
   };
+  if (SC.issue === 'riser') {   // a clerk cannot be seen to fight: black cloth over the face, no cape, nothing gilt
+    Object.assign(SPECS.hero, { face: 'cloth', cape: false, hood: true, pauldron: false, hair: null });
+    Object.assign(SPECS.hero.pal, { top: 0x2a2630, trim: 0x4a4650, shirt: 0x2a2630, tie: 0x4a4650, band: 0x2a2630 });
+    SPECS.boss = { h: 1.32, b: 1.55, face: 'grille', helm: 'warden', weapon: 'halberd', apron: true, pauldron: true, pal: { skin: 0xc9cbd6, top: 0xefe8d4, trim: 0xe8c25a, shirt: 0x8a1f24, tie: 0xe8c25a, pants: 0x23232e, boots: 0x14141d, hair: 0xefe8d4, glove: 0x23232e, wrap: 0xefe8d4 } };
+  }
+  if (SC.issue === 'stair') {   // the Auditor's Blade, and Tavi at sixteen
+    SPECS.boss = { h: 1.18, b: 1.0, face: 'halfmask', hood: true, coat: true, weapon: 'blade', sash: true, pal: { skin: 0xe6c79a, top: 0x15151f, trim: 0xe8c25a, shirt: 0xe8c25a, tie: 0xe8c25a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0xe8c25a, wrap: 0x15151f } };
+    SPECS.clerk = { h: 0.94, b: 0.9, face: 'tavi', hair: 'tavi', pal: { skin: 0xc98a62, top: 0x8a6a48, trim: 0x4a3524, shirt: 0xd9a05f, tie: 0x4a3524, pants: 0x3a3350, boots: 0x15151f, hair: 0x2a1c14, glove: 0xc98a62, wrap: 0x8a6a48 } };
+  }
 //@@FACES
   function drawFace(g, kind, expr, glow) {
     const S = 128, ink = '#07070d';
@@ -36,7 +45,16 @@
       else if (expr === 'smirk') stroke([48, y + 1, 70, y + 2, 84, y - 6], 4);
       else stroke([50, y, 80, y], 4);
     };
-    if (kind === 'kael') {
+    if (kind === 'cloth') {
+      g.fillStyle = '#1a1620'; g.fillRect(0, 0, S, S); g.fillStyle = '#e6c79a'; g.fillRect(14, 46, 100, 30);
+      const e = EX[expr] || EX.neutral; eye(42, 60, 11, e[0], '#e2a81c', e[1] + 0.2); eye(86, 60, 11, e[0], '#e2a81c', e[1] + 0.2);
+      stroke([10, 44, 118, 44], 4); stroke([10, 78, 118, 78], 4); for (let x = 30; x < 110; x += 16) stroke([x, 88, x - 4, 118], 2, '#2e2a40');
+    } else if (kind === 'tavi') {
+      g.fillStyle = '#c98a62'; g.fillRect(0, 0, S, S); g.fillStyle = '#a56e4c'; g.beginPath(); g.moveTo(0, 36); g.lineTo(28, 60); g.lineTo(28, 100); g.lineTo(50, 128); g.lineTo(0, 128); g.fill();
+      const e = EX[expr] || EX.neutral; eye(42, 60, 12, e[0] + 1, '#4a2e1c', e[1]); eye(86, 60, 12, e[0] + 1, '#4a2e1c', e[1]);
+      stroke([28, 44, 54, 46], 5, '#2a1c14'); stroke([100, 44, 74, 46], 5, '#2a1c14'); stroke([66, 60, 62, 78, 68, 81], 2.5);
+      stroke([50, 98, 66, 104, 82, 98], 4); g.fillStyle = 'rgba(30,26,34,0.5)'; g.fillRect(24, 74, 14, 8);
+    } else if (kind === 'kael') {
       // gilded: warm gold skin, gold-leaf eyes, and the soot he never quite washes off one cheek
       g.fillStyle = '#e6c79a'; g.fillRect(0, 0, S, S);
       g.fillStyle = '#c29a6a'; g.beginPath(); g.moveTo(0, 36); g.lineTo(30, 60); g.lineTo(28, 98); g.lineTo(50, 128); g.lineTo(0, 128); g.fill();
@@ -118,6 +136,11 @@
       [[-0.075, 0.3, 0.07, 0.5, 0.3], [0, 0.325, 0.085, 0.62, 0], [0.075, 0.3, 0.07, 0.5, -0.3], [-0.045, 0.32, -0.01, 0.1, 0.2], [0.05, 0.315, -0.02, 0.05, -0.2], [0, 0.3, -0.09, -0.5, 0]].forEach((s, i) =>
         part('head', tbox(0.07, 0.15, 0.075, 0.12, 1), s[0], s[1], s[2], i === 2 ? pal.streak : pal.hair, [s[3], 0, s[4]], 0.014));
       part('head', tbox(0.258, 0.026, 0.268), 0, 0.243, -0.008, pal.band, null, 0.006);   // the band
+    }
+    if (sp.hair === 'tavi') {
+      part('head', tbox(0.26, 0.09, 0.27, 0.85, 1), 0, 0.23, -0.02, pal.hair); part('head', tbox(0.25, 0.2, 0.09, 1, 0.85), 0, 0.12, -0.108, pal.hair);
+      part('head', tbox(0.04, 0.14, 0.14), 0.12, 0.15, -0.03, pal.hair, null, 0.01); part('head', tbox(0.04, 0.14, 0.14), -0.12, 0.15, -0.03, pal.hair, null, 0.01);
+      part('head', tbox(0.1, 0.07, 0.1, 0.5, 1), 0.05, 0.27, 0.08, pal.hair, [0.3, 0, -0.2], 0.012);
     }
     if (sp.hair === 'brand') {
       part('head', tbox(0.25, 0.07, 0.26, 0.85, 1), 0, 0.225, -0.02, pal.hair);
