@@ -246,7 +246,7 @@
   { let held = 0, t = 0, last = 0, downFor = 0, wasOn = false, fired = false, downAt = 0, padWas = false, padFor = 0; const NEED = 0.9, TAP = 0.32, keys = {};
     const btn = () => document.querySelector('#cine .c-skip');
     window.addEventListener('keydown', e => { if (G.scene === 'cine' && (e.code === 'Escape' || e.code === 'Enter' || e.code === 'Space')) { if (!keys[e.code]) downAt = performance.now(); keys[e.code] = 1; e.preventDefault(); } });
-    const tapUp = () => { if (G.scene === 'cine' && downAt && performance.now() - downAt < 350 && !fired && !C.first && !navigator.webdriver) C.nextShot(); downAt = 0; };
+    const tapUp = () => { if (G.scene === 'cine' && downAt && performance.now() - downAt < 350 && !fired && !navigator.webdriver) C.nextShot(); downAt = 0; };
     window.addEventListener('keyup', e => { if (keys[e.code]) tapUp(); delete keys[e.code]; });
     const down = e => { if (G.scene === 'cine') { if (!held) downAt = performance.now(); held = 1; if (e.cancelable && e.target && e.target.closest && e.target.closest('.c-skip')) e.preventDefault(); } }, up = () => { if (held) tapUp(); held = 0; };
     document.addEventListener('pointerdown', down); document.addEventListener('touchstart', down, { passive: false }); ['pointerup', 'pointercancel', 'touchend', 'touchcancel'].forEach(ev => document.addEventListener(ev, up));
@@ -254,9 +254,9 @@
       let padA = false; try { const pads = navigator.getGamepads ? navigator.getGamepads() : []; for (const p of pads) if (p && p.buttons && ((p.buttons[0] && p.buttons[0].pressed) || (p.buttons[9] && p.buttons[9].pressed))) padA = true; } catch (er) { }
       const on = !!(held || padA || Object.keys(keys).length > 0);
       if (on) { downFor += dt; t = downFor > TAP ? t + dt : t; } else { downFor = 0; if (!padA) fired = false; t = Math.max(0, t - dt * 3); }
-      if (padA) padFor += dt; else { if (padWas && padFor <= TAP + 0.08 && !fired && !C.first) C.nextShot(); padFor = 0; } padWas = padA;
+      if (padA) padFor += dt; else { if (padWas && padFor <= TAP + 0.08 && !fired) C.nextShot(); padFor = 0; } padWas = padA;
       wasOn = on;
-      const b = btn(); if (b) { const pad = G.input && G.input.usingPad, touch = G.input && G.input.touch; b.textContent = C.first ? (pad ? 'Hold (A) to skip intro' : touch ? 'Hold to skip intro' : 'Hold Space to skip intro') : pad ? '(A) next scene · hold to skip' : touch ? 'Tap: next scene · hold: skip' : 'Space: next scene · hold: skip'; const pc = Math.min(100, t / (NEED - TAP) * 100); b.style.background = pc > 0 ? 'linear-gradient(90deg, rgba(240,201,90,0.85) ' + pc + '%, rgba(20,16,24,0.7) ' + pc + '%)' : ''; b.style.color = pc > 45 ? '#1a1208' : ''; b.style.opacity = on ? 1 : ''; }
+      const b = btn(); if (b) { const pad = G.input && G.input.usingPad, touch = G.input && G.input.touch; b.textContent = pad ? '(A) next scene · hold to skip' : touch ? 'Tap: next scene · hold: skip' : 'Space: next scene · hold: skip'; const pc = Math.min(100, t / (NEED - TAP) * 100); b.style.background = pc > 0 ? 'linear-gradient(90deg, rgba(240,201,90,0.85) ' + pc + '%, rgba(20,16,24,0.7) ' + pc + '%)' : ''; b.style.color = pc > 45 ? '#1a1208' : ''; b.style.opacity = on ? 1 : ''; }
       if (t >= NEED - TAP) { t = 0; held = 0; fired = true; downFor = 0; for (const kk in keys) delete keys[kk]; G.sfx('ui'); C.skip(); } }, 40); }
   C.update = function (dt, tt) {
     if (!C.active) return;

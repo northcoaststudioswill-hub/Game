@@ -14,6 +14,9 @@
   G.WEAPON_TRAIT = {};
   Object.keys(TR).forEach(id => { const t = TR[id], w = (G.ARM_BY || {})[id]; if (!A[id]) return; [id, id + '_h', id + '_m'].forEach(k => { if (A[k]) Object.keys(t[0]).forEach(p => { if (A[k][p] == null) A[k][p] = t[0][p]; }); });
     G.WEAPON_TRAIT[id] = [t[1], t[2]]; const line = ' ' + t[1] + ': ' + t[2]; if (w) w.blurb = (w.blurb || '') + line; if (A[id].desc && A[id].desc.indexOf(t[1] + ':') < 0) A[id].desc += line; });
+  // pointed weapons: a slightly more forgiving thrust, and a heavy blow that carries you onto the target
+  ['f_spear', 'd_spear', 'r_spear', 'r_rapier'].forEach(id => { if (!A[id]) return; A[id].arc = Math.max(A[id].arc || 44, 54); [id + '_h', id + '_m'].forEach(k => { if (A[k]) { A[k].arc = Math.max(A[k].arc || 44, 54); A[k].lunge = Math.max(A[k].lunge || 0, 70); } }); });
+  if (A.d_spear) { A.d_spear.dmg = [1, 10]; if (A.d_spear_h) A.d_spear_h.name = 'Deep Thrust'; if (A.f_spear_h) A.f_spear_h.name = 'Deep Thrust'; if (A.r_spear_h) A.r_spear_h.name = 'Deep Thrust'; }
   // every caster's mastered blow was called the same thing; name them for what they do
   const SIGN = { s_basic: 'Conflagrate', s_frost: 'Shatterpoint', s_spark: 'Forked Arc', s_acid: 'Dissolve', s_staff: 'Emberfall', w_basic: 'Agonising Blast', w_frost: 'Grave’s Grip', w_acid: 'The Long Hunger', w_spark: 'Soul Tether', w_staff: 'The Clause' };
   if (G.SIG) Object.keys(SIGN).forEach(id => { if (G.SIG[id]) { G.SIG[id] = Object.assign({}, G.SIG[id], { name: SIGN[id] }); if (A[id + '_m']) A[id + '_m'].name = SIGN[id]; } });
