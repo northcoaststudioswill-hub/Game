@@ -1,5 +1,24 @@
 # SOOTBORN — changelog
 
+## v0.23 · 2026-11-18 — the fighting system: feel, structure, and a place to practise
+From play notes: focus on building out and polishing the fighting.
+
+**Feel**
+- **Input buffering.** Every press of strike, kick, jump, dodge, guard or hook is remembered for a fifth of a second. Press the next move a little early and it comes out the moment the current one allows, instead of being lost. This is the single biggest change to how the fighting feels: chains no longer drop when you press fast.
+- The enemy's drop attack locks onto its landing spot earlier and hits a slightly smaller circle, so you can walk out of it if you start moving when the circle appears.
+
+**Structure**
+- **Stagger gauge** on every named enemy (a thin gold bar under their health). Hits fill it; kicks, the boot, Breach and especially the ram fill it faster; a parry adds a large chunk. When it fills the enemy is STAGGERED for about two and a half seconds: cannot guard, cannot act, and takes half again as much damage. Duels now have a rhythm: build the stagger, then spend everything.
+- **Style** (top right, under the hit counter): SPARK, EMBER, BLAZE, FURNACE. It rises faster when you use a move you have not used in your last three, and for parries and breaking a stagger. It falls when you stop hitting and drops by more than half when you are hit. Each rank adds 15% to fury gained.
+
+**Readouts**
+- **Cooldown tags** under the guard pips: HK (hook), RM (ram), WC (wide cut), BR (breach), DR (shaft drop), RO (roar). Bright when ready, dim with a small bar while recharging. Moves Kael has not learned yet at that point in the story are not listed.
+- **Move list** in the pause menu during any fight: every move available in that fight, with the buttons for whatever you are playing on (touch, keyboard or controller), and the name of that fight's finisher.
+
+**Training room** (Dev menu, top entry): the pump room with Brand. All moves unlocked, including boots. Nobody can lose: your health stays full, his refills, fury recharges on its own. He uses the long cut and the drop so you can practise reading them.
+
+**Checked:** a burst of seven presses 90 ms apart produces the full chain; style reaches FURNACE with varied moves; the stagger fills and breaks; the move list shows 21 entries. Balance with the new stagger and buffering was not re-measured, and nobody has played it.
+
 ## v0.22 · 2026-11-18 — two ways of speaking, written into everyone
 From play notes: make sure the language difference is written into the characters; more detail in the new scenes; polish.
 

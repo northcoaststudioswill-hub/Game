@@ -93,6 +93,13 @@ FF.ember = () => ({
 // the Fall, when it is no longer a dream
 FF.fall2 = () => { const d = FF.fall(); d.era = 6; d.intro = d.intro.slice(); d.intro[0] = { d: 2.8, black: 1, big: 'THE FALL', cap: 'NINE YEARS. FOUR HUNDRED BARGES. ONE MORNING.' }; d.intro[1] = Object.assign({}, d.intro[1], { big: '' });
   d.outro = d.outro.slice(0, 2).concat([{ d: 3.0, black: 1, big: 'WE HIT.', cap: 'HALF OF US WALKED AWAY FROM IT. THAT WAS BETTER THAN ILSE\'S ARITHMETIC.' }]); d.voice = Object.assign({}, d.voice, { at: [[1, 'NINE YEARS AGO I KNELT WHEN THEY CAME DOWN IN LIGHT. TODAY WE ARE THE ONES COMING DOWN.'], [10, 'FOUR HUNDRED BARGES. EVERY ONE OF THEM FLOWN BY SOMEBODY WHO WAS BORN OWING AIR.'], [20, 'CADE SIGNED TIER FOUR AWAY WITH ONE LINE. I HAVE THE PEN HE USED. I TOOK IT FROM MY OWN DESK.'], [32, 'MARA IS ON THE NEXT BARGE OVER. SHE SAID SHE WOULD NOT MISS THIS IF IT KILLED HER. IT MIGHT.']] }); return d; };
+// a room to practise in: Brand does not go down, and neither do you
+FF.training = () => ({
+  era: 6, training: 1, title: 'THE PUMP ROOM', sub: 'BRAND - NOBODY GOES DOWN IN HERE', bg: 'hall', arena: { kind: 'ring', rx: 100, ry: 58 }, music: 'work', rage: 1, legend: 1, skip: 1, winText: 'ENOUGH',
+  newMove: 'TRAINING: NOBODY CAN LOSE. PAUSE FOR THE MOVE LIST.',
+  hero: { id: 'kael2', hp: 12, pow: 2, blade: 1, fury0: 50 }, taunt: { 0: ['AGAIN.', 'SLOWER. NOW FASTER.', 'USE ALL OF IT.', 'THAT ONE WAS CLEAN.'] },
+  foes: [{ id: 'brand', name: 'Brand', kind: 'captain', hp: 400, sc: 1.05, k2: { line: 1, slam: 1 } }]
+});
 // meanwhile, six tiers down: you play Mara
 FF.stand = () => ({
   era: 0, title: 'TIER SIX STANDS', sub: 'MARA VENN - A COMMITMENT AT BAY THREE', bg: 'furnace', arena: { kind: 'rect', w: 200, h: 80 }, music: 'work', legend: 1, skip: 1, foeName: 'Warden', winText: 'NOBODY KNEELS',
