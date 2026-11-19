@@ -21,7 +21,7 @@ From your note: early story beats from the list, animation, and the fight moves.
 - **A real run and sword combos from the free library:** still waiting on the file (see v0.60).
 - **A drawn scene for losing below:** still a line.
 
-**Checked by script:** both new places walked (move, talk, leave) with a picture of each; the opening film still plays; a bot won the Pairing; the page loads clean. **Not checked:** by hand; the two hooks that offer the memories were not clicked through in the world (the scenes were started directly); held cuts in motion.
+**Checked by script:** both new places walked (move, talk, leave) with a picture of each; the opening film still plays; a bot won the Pairing; the page loads clean. **Not checked:** by hand; held cuts in motion. (All three memory offers were driven through the dialogue system by script: each opens its place, closes the dialogue under it, returns to the world with its closing line, and is not offered a second time.)
 
 ## v0.60 · 2026-11-19 — characters first: guards, Rook and Tavi re-kitted; arms and legs in the arena; the boots in the arena follow you up
 From your notes: do characters and animations first and use good free resources if there are any; in arena fights the camera should follow you up on the boots, with a zoom on the big dives, and the arena needs the boots-hook-hit combo.
