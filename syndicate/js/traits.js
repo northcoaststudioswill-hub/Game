@@ -21,3 +21,26 @@
   const SIGN = { s_basic: 'Conflagrate', s_frost: 'Shatterpoint', s_spark: 'Forked Arc', s_acid: 'Dissolve', s_staff: 'Emberfall', w_basic: 'Agonising Blast', w_frost: 'Grave’s Grip', w_acid: 'The Long Hunger', w_spark: 'Soul Tether', w_staff: 'The Clause' };
   if (G.SIG) Object.keys(SIGN).forEach(id => { if (G.SIG[id]) { G.SIG[id] = Object.assign({}, G.SIG[id], { name: SIGN[id] }); if (A[id + '_m']) A[id + '_m'].name = SIGN[id]; } });
 })();
+// ---- finishers that come with your blood, whatever your trade
+(function () {
+  'use strict';
+  const G = window.G, ui = G.ui;
+  const R = {
+    human: [{ id: 'rc_mob', rank: 1, name: 'Mob Justice', word: 'TORN DOWN', desc: 'You do it the way a crowd would: from every side at once, and not stopping when it is done.', lead: 'cuts', keep: 1, cast: false, imp: 1.3, col: '#ffd36b' },
+            { id: 'rc_steps', rank: 3, name: 'Down. Let It Settle.', word: 'SENTENCED', desc: 'The four words every Highmarch debtor hears, said over them, with a heel.', lead: 'stomp', behead: 1, kick: 1, cast: false, imp: 1.3, col: '#e8e0c0' }],
+    dwarf: [{ id: 'rc_seam', rank: 1, name: 'The Seam Closes', word: 'BURIED', desc: 'You strike the floor where forty years in the mine taught you it is weakest. It takes them like a shaft takes a careless boy.', lead: 'quake', crack: 1, swallow: 1, cast: false, imp: 1.4, col: '#c8a24a' },
+            { id: 'rc_anvil', rank: 3, name: 'Anvil Work', word: 'HAMMERED FLAT', desc: 'Down, and then struck until they are the shape you wanted.', lead: 'stomp', keep: 1, crack: 1, cast: false, imp: 1.4, col: '#ff8a3c' }],
+    elf: [{ id: 'rc_leaf', rank: 1, name: 'Leaf-Fall', word: 'UNMADE', desc: 'Six hundred years of practice. They come apart along lines they did not know they had.', lead: 'cuts', bisect: 1, cast: false, imp: 1.2, col: '#b8f0c0' },
+          { id: 'rc_still', rank: 3, name: 'The Long Patience', word: 'UNSEEN', desc: 'You were never where they looked. The head understands a moment after the neck.', lead: 'quiet', behead: 1, cast: false, imp: 1.5, col: '#e8f4ff' }],
+    halforc: [{ id: 'rc_hurl', rank: 1, name: 'Thrown Away', word: 'HURLED', desc: 'You pick them up over your head and throw them at the wall like something you are finished with.', lead: 'lift', toss: 1, hoist: 1, cast: false, imp: 1.3, col: '#9ad04a' },
+              { id: 'rc_tusk', rank: 3, name: 'Both Halves', word: 'RIPPED', desc: 'Hands. No blade. One to each side.', lead: 'spin', bisect: 1, cast: false, imp: 1.3, col: '#c0e070' }],
+    tiefling: [{ id: 'rc_mouth', rank: 1, name: 'Hellmouth', word: 'DRAGGED DOWN', desc: 'The sand goes red and soft, and something that knows your family reaches up for them.', lead: 'sink', swallow: 1, fire: 1, imp: 1.4, col: '#ff4a2a' },
+               { id: 'rc_kiss', rank: 3, name: 'Brimstone Kiss', word: 'CINDERS', desc: 'You breathe on them. It is not breath.', lead: 'implode', ash: 1, fire: 1, imp: 1.3, col: '#ff7a2a' }],
+    drow: [{ id: 'rc_web', rank: 1, name: 'Strung for the Larder', word: 'STRUNG UP', desc: 'Threads from nowhere lift them by wrist and ankle, the way it is done in Vael Ushar, and pull.', lead: 'puppet', keep: 1, imp: 1.4, col: '#c79bff' },
+           { id: 'rc_dark', rank: 3, name: 'Lights Out', word: 'SNUFFED', desc: 'Every torch on that side gutters. When they come back there is less of somebody.', lead: 'quiet', behead: 1, cast: false, imp: 1.5, col: '#7a5aff' }] };
+  G.RACE_MORTALS = R;
+  const sync = () => { const st = G.state, h = st && st.hero; if (!h || !G.MORTALS || !G.MORTALS[h.cls]) return; const L = G.MORTALS[h.cls]; for (let i = L.length - 1; i >= 0; i--) if (L[i].race && L[i].race !== h.race) L.splice(i, 1); (R[h.race] || []).forEach(m => { if (!L.some(q => q.id === m.id)) L.push(Object.assign({ race: h.race }, m)); }); };
+  ['hub', 'pit', 'prefight', 'sheet', 'finishers', 'mortals'].forEach(fn => { const f0 = ui[fn]; if (f0) ui[fn] = function () { sync(); return f0.apply(this, arguments); }; });
+  if (G.mortalsOpen) { const mo0 = G.mortalsOpen; G.mortalsOpen = function (st) { sync(); return mo0.apply(this, arguments); }; }
+  if (G.LORE) G.LORE.push({ sec: 'The Pit', title: 'Blood Tells', unlock: st => G.rankOf(st.respect) >= 1, body: 'The Guild teaches a trade, but nobody leaves their blood at the gate. Dwarves know where a floor will break. Elves have had centuries to practise one cut. A half-orc does not need the blade at all. The stands can tell what you are by how you end it, and they have favourites.' });
+})();
