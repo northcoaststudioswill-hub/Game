@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprouts</title>
+<style>
+html,body{height:100%;margin:0;background:#000;overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;-webkit-user-select:none;user-select:none}
+#stage{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+#screen{display:block;image-rendering:pixelated;image-rendering:crisp-edges;background:#07060c}
+body.idle{cursor:none}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="screen" width="640" height="360" aria-label="Sprouts"></canvas></div>
+<script>
+/* Sprouts TV 2 keeps its own saves: every key gets the "sprouts-tv2:" prefix, so it never reads or overwrites a
+   Pocket Lantern or Sprouts TV save, even in the same browser. The untouched reader is kept as __rawGet so the
+   game's IMPORT A SAVE can look at those other saves when asked (it only ever reads them). */
+(()=>{try{const P='sprouts-tv2:',S=Storage.prototype,g=S.getItem,st=S.setItem,rm=S.removeItem;window.__rawGet=k=>{try{return g.call(localStorage,k)}catch(e){return null}};
+S.getItem=function(k){return g.call(this,P+k)};S.setItem=function(k,v){return st.call(this,P+k,v)};
+S.removeItem=function(k){return rm.call(this,P+k)}}catch(e){}})();
+</script>
+<script>/*@MUSIC tracks*/</script>
+<script>/*@MUSIC pp*/</script>
+<script>/*game.js*/</script>
+</body>
+</html>
