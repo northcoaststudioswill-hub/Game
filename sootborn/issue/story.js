@@ -36,6 +36,24 @@
     { k: 'desk2', name: 'BALANCED', line: 'ELEVEN HUNDRED LINES AT ONE STROKE. THEY CALLED IT A BALANCING.' },
     { k: 'tin0', name: 'THE INVOICE', line: 'THEY SENT A TIN. AND A BILL FOR THE FUEL.' }
   ];
+  /* the same man remembers different things at +5, +7 and +9 */
+  const ARTS_BY = {
+    riser: [
+      { k: 'furnace1', name: 'ELEVEN', line: 'ELEVEN SECONDS THE DOORS STOOD OPEN. I HAVE COUNTED THEM EVERY DAY FOR FIVE YEARS.' },
+      { k: 'desk2', name: 'THE ORDER', line: 'A WHOLE TIER IN ONE LINE, WITH A COLUMN FOR THE AIR IT WOULD SAVE. IT CAME TO MY DESK FOR A SIGNATURE.' },
+      { k: 'ward0', name: 'FORTY BEDS', line: 'SHE BOUGHT FORTY CHILDREN THREE NIGHTS OF AIR. TONIGHT I AM BUYING FORTY PEOPLE A SKY.' },
+      { k: 'assay0', name: 'THIS VALLEY', line: 'I KILLED A BOY IN THIS VALLEY FOR A PLACE AT A DESK. THE DESK IS WHY THEY ARE STILL BREATHING.' },
+      { k: 'hands0', name: 'A RING', line: 'IT WAS THE ONLY ROUND THING I OWNED. SHE WORE IT ELEVEN MONTHS.' }
+    ],
+    stair: [
+      { k: 'dockstair0', name: 'ELEVEN MINUTES', line: 'BRAND HELD THE FOOT OF THIS STAIR FOR ELEVEN MINUTES. WE ARE GOING UP IT FOR HIM.' },
+      { k: 'furnace1', name: 'ELEVEN', line: 'ELEVEN SECONDS THE DOORS STOOD OPEN. NINE YEARS. TODAY WE STOP COUNTING.' },
+      { k: 'weather2', name: 'TWO YEARS', line: 'TWO YEARS IN THE WEATHER, LEARNING TO FLY WHAT WE STOLE. NOBODY UP HERE HAS EVER BEEN COLD.' },
+      { k: 'row0', name: 'THE SHELF', line: 'MARA KEEPS TWO TINS ON A SHELF. ONE OF THEM IS EMPTY AND HAS MY NAME ON IT.' },
+      { k: 'ledger2', name: 'HER LINE', line: 'HOLLOWAY, S. STRUCK THROUGH IN A CLERK\'S HAND. THE BOOK IS AT THE TOP OF THIS STAIR.' }
+    ]
+  };
+  { const by = ARTS_BY[SC.issue]; if (by) { ARTS.length = 0; by.forEach(a => ARTS.push(a)); } }
   const FIN = {
     count: { k: 'furnace2', name: 'ELEVEN', line: 'ONE. TWO. THREE. I COUNT THE SECONDS THE DOORS STOOD OPEN. THEN I GO TO WORK.' },
     warden: { k: 'furnace0', name: 'FOR HUMMING', line: 'A WARDEN STRUCK A WELDER DOWN FOR HUMMING HER GOODBYE. I WAS HELD ON THE FLOOR FOR IT.' },

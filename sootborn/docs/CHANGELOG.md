@@ -1,4 +1,14 @@
-# SOOTBORN — changelog (latest v0.56 · 2026-11-19)
+# SOOTBORN — changelog (latest v0.57 · 2026-11-19)
+
+## v0.57 · 2026-11-19 — more from the list: memories that fit the year, figures that breathe in the films
+Still working down the open list. Nothing here was played by hand.
+
+- **Memories in the comic levels now fit when the level happens.** All three levels shared the docks' set, so Riser Nine (five years after the furnace) said "seven years". Riser Nine has its own five: the count, the order for Tier Four, the forty beds, this valley, the ring. The Stair has its own five: Brand's eleven minutes, the count ("nine years; today we stop counting"), two years in the weather, the shelf, her line.
+- **Figures in the films breathe.** Anybody standing in a film shot was a statue, because the clock that drives the idle sway was stopped for them. They shift their weight and look about now. Held cuts stay held.
+- **Stair Blades have a second blow**: the lunge, or a straight thrust.
+- **Opening film:** "One valley. Twelve Houses. One year." said the wrong length. The Assay is one season; the caption says so.
+
+**Checked by script:** the opening film captured shot by shot; Riser Nine and the Stair start to end; all five Part Two chapters build; the 2D missions complete; no contractions in Accredited lines; the page loads clean. **Not checked:** the new memories on screen (they appear on every fifth kill, which my script does not reach by fighting); the breathing in motion.
 
 ## v0.56 · 2026-11-19 — down the open list: a run with arms, guards with three blows and a guard, the fleet, the Scuffle's own row
 Worked from the open list while you were away. Nothing here was played by hand.

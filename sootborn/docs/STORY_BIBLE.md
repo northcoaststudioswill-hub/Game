@@ -1,5 +1,5 @@
-# SOOTBORN — Story bible
-Tagline: "Every breath is hers." Current build: v0.56 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+# SOOTBORN — Story bible 
+Tagline: "Every breath is hers." Current build: v0.57 (see the changelog). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -483,3 +483,5 @@ What is in each chapter now, in order. "3D fight" is the arena fighter; "level" 
 - **Guards (v0.56):** a Dock Guard has three blows (cross cut, overhead, thrust) and can turn a light cut on his weapon. Kael's word for it is TURNED.
 - **Going down (v0.56):** what gets him up depends on when. Below and in training: the furnace. The Assay: the furnace, or the Table. The Spire: her line in the Count. The Fall onward: Brand on the stair, and "we".
 - **The Scuffle** is fought at the west end of Row K, in front of the doors, with the row watching.
+- **What he remembers in a fight, by year (v0.57):** at Riser Nine (+5) the count is five years old and the memories are the Tier Four order, the forty beds, the valley and the ring. On the Stair (+9) they are Brand's eleven minutes, two years in the weather, the shelf with two tins, and her line in the book at the top.
+- **The Assay is one season** in the opening film too (it said one year).

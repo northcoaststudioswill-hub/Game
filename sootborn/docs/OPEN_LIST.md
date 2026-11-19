@@ -1,5 +1,5 @@
-# SOOTBORN — open list 
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.56 (2026-11-19).
+# SOOTBORN — open list
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.57 (2026-11-19).
 
 ## Waiting on you
 - **A new name for the Assay.** It should be memorable. Candidates so far: the Proving, the Weighing, the Crucible, the Tithe, the Long Count, the Season of Knives. Nothing changes until you pick.
@@ -17,8 +17,8 @@ Kept current each round. "Keep going" means work down this list from the top unl
 
 ## Characters and animation
 0. **The run in the comic levels.** Lean and cape (v0.53), arms (v0.56), all from side-on frames. Needs your eye in motion before anything more is changed. The guards' jog was looked at the same way and left.
-1. **Guards:** three blows and a guard for Dock Guards, two blows for Wardens (v0.56). Still to do: better models; more for the Stair Blades; the same rigs in cutscenes.
-2. **Kael in the arena fights:** arms, hands, blade, legs and body brought up to his head; a ready stance and small movement in held shots.
+1. **Guards:** three blows and a guard for Dock Guards, two blows for Wardens (v0.56). Stair Blades have two (v0.57). Still to do: better models; the same rigs in cutscenes.
+2. **Kael in the arena fights:** arms, hands, blade, legs and body brought up to his head. Standing figures in films now breathe and shift (v0.57); a held cut is still a still.
 3. **Capes:** changed four times today from stills. The rule you gave: it kicks up with momentum and then falls; it never floats. Needs your eye in motion, then another pass if it still hangs in the air.
 4. **Tavi:** a better body now that he walks the Stair.
 5. **Rook** and the other bosses at Kael's level of model.
@@ -37,11 +37,11 @@ Kept current each round. "Keep going" means work down this list from the top unl
 ## Story and scenes
 - **Going down in a fight should always be a moment.** Arena second wind (v0.54), comic-level bosses (v0.50), memories by era and a line on losing (v0.56). Still to do: a drawn scene for losing below, not only a line.
 12. **More short 2D memory scenes**, especially memories.
-13. **Memories inside fights chosen by where the story is:** done for the second wind (v0.56). Still to do: the every-fifth-kill memories in the comic levels; Kestrel and the week he blamed her.
+13. **Memories inside fights chosen by where the story is:** second wind (v0.56) and the comic levels' kill memories (v0.57) done. Still to do: Kestrel and the week he blamed her, which has no picture of its own.
 14. **Transitions between story parts:** go through every hand-off (card, fade, music) from the opening to THE END.
 15. **Comic layouts:** the Table was checked; the three levels' opening pages and memory pages still need the same look.
 16. **More 2D films built from stills** in the comic style; the Pairing's and the Ford's own intro shots.
-17. Part Two play: the service stair as a walked level (chapter 1); a barge in the weather (chapter 4); a quiet scene with the Unlit before the Stair; the ending as a Table-style sequence; a suspicion meter in Spire talk; the Count as a puzzle.
+17. Part Two play: the service stair as a walked level (chapter 1); a barge in the weather (chapter 4); the ending as a Table-style sequence; a suspicion meter in Spire talk; the Count as a puzzle. (The quiet scene with the Unlit exists: the Night Before, chapter 4. Say if you want a second one between the Fall and the Stair.)
 
 ## Fighting and controls
 18. **One controls card** that holds across the 2D fights, the arena fights and the comic levels. (The arena legend for a pad is in, v0.56.)
