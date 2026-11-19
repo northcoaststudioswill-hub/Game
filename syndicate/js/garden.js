@@ -91,7 +91,7 @@
   }
   const fu0 = G.fight.update;
   G.fight.update = function (dt) { const r = fu0.apply(this, arguments), run = G.garden.run; if (run && run.brawl && G.fight.active && !G.fight.paused) { try { stepMobs(Math.min(0.05, dt) * (G.fight.speed || 1)); } catch (e) { console.error(e); } } return r; };
-  function endBrawl() { const sc = arena().scene; mobs.forEach(m => sc.remove(m.c.root)); mobs = []; chunks.forEach(c => c.m.parent && c.m.parent.remove(c.m)); chunks = []; G.fight.onFoeDown = null; G.fight.noSever = false; if (hudEl) { hudEl.remove(); hudEl = null; } if (davEl) { davEl.remove(); davEl = null; } if (G.garden.run) G.garden.run.brawl = 0; }
+  function endBrawl() { const sc = arena().scene; mobs.forEach(m => sc.remove(m.c.root)); mobs = []; chunks.forEach(c => c.m.parent && c.m.parent.remove(c.m)); chunks = []; G.fight.onFoeDown = null; G.fight.wideCam = false; G.fight.noSever = false; if (hudEl) { hudEl.remove(); hudEl = null; } if (davEl) { davEl.remove(); davEl = null; } if (G.garden.run) G.garden.run.brawl = 0; }
 
   function bout() {
     const run = G.garden.run, st = G.state, o = run.list[0]; ui.close();
@@ -101,7 +101,7 @@
     G.fight.start(o); const F = G.fight, lv = st.hero.level; clock = 0; tPrev = 'idle'; mobs = []; chunks = [];
     run.list.slice(1).forEach((q, i) => { const an = i / 9 * 6.2832 + 0.35, r = 150 + (i % 3) * 34, c = G.makeChar({ cls: q.cls, race: q.race, tint: q.tint }), hp = 34 + lv * 9 + i * 3;
       const m = { c, name: q.name, race: q.race, x: Math.cos(an) * r, y: Math.sin(an) * r, hp, maxHp: hp, dmg: 2.5 + lv * 0.7, spd: 105 + Math.random() * 40, state: 'idle', t: 0, cd: 1 + Math.random() * 2, pickT: Math.random(), walk: Math.random() * 6, face: an + Math.PI, kx: 0, ky: 0, tg: null }; a.scene.add(c.root); mobs.push(m); });
-    run.brawl = 1; davT = 5; F.noSever = true; F.onFoeDown = e => nextSoul(e); hud();
+    run.brawl = 1; G.fight.wideCam = true; davT = 5; F.noSever = true; F.onFoeDown = e => nextSoul(e); hud();
     setTimeout(() => { if (G.garden.run && G.garden.run.brawl) ui.toast('Ten of them, all at once, and they hate each other as much as you. Last one breathing walks.'); }, 500);
   }
   function survived() {
@@ -116,13 +116,35 @@
     show('<div class="card small letter event gameover"><small class="over">Soul death</small><h2>Game Over</h2><p>' + by.name + ' stands over you in the grass. There is no hatch this time, and no gold, and nobody turns anything back. The blossom covers you by evening.</p><p class="quote">“' + pick(['Pity. No, not pity. What is the other one? Lunch.', 'And THAT is what “not yet” buys you, you stubborn streak of piss. Next!', 'I did offer. I offered twice. Nobody can say I am not a generous man.']) + '”</p><p class="got">' + epi + '</p><p class="note">This fighter is gone. The save has been erased.</p><div class="row end"><button class="big" id="x">Back to the title</button></div></div>');
     on('#x', () => location.reload());
   }
+  // ------------------------------------------------------------ before the door shuts: him, and all of it
+  function intro(done) {
+    ui.close(); if (ui.leaveHub) ui.leaveHub(); const a = arena(); G.gfx.setScene(a.scene); if (a.garden) a.garden(true); if (G.fight.exStop && !G.fight.active) G.fight.exStop(); if (G.titleChars) G.titleChars.forEach(c => c.root.visible = false); if (G.world.walker.char) G.world.walker.char.root.visible = false;
+    const prev = G.scene; G.scene = 'cine'; ui.topbar();
+    const kin = (G.RACES[G.state.hero.race] || {}).name || 'meat', lerp = (p, q, u) => p + (q - p) * u, V = (p, q, u) => [lerp(p[0], q[0], u), lerp(p[1], q[1], u), lerp(p[2], q[2], u)];
+    const SH = [
+      { a: [[-1.5, 0.7, 1.5], [-11, 2.2, -9.5]], b: [[-4.5, 1.4, -2.0], [-11.5, 3.2, -11]], fov: 58, t: 'Gold. Hills of it, spilling down marble steps onto a lawn that has never seen rain. And above it, on a throne the size of a chapel, the man who owns the weather.' },
+      { a: [[-4.5, 6.5, -4.5], [-11.8, 9.6, -11.8]], b: [[-6.6, 9.4, -6.6], [-11.8, 10.4, -11.8]], fov: 40, n: 1, t: 'LOOK at it. Look at ME. Do you know what I am worth, ' + kin.toLowerCase() + '? No. You cannot count that high. I had to invent numbers.' },
+      { a: [[-15.5, 12.5, -15.5], [0, 0, 0]], b: [[-14.2, 11.6, -14.2], [1, 0, 1]], fov: 62, n: 1, t: 'My garden. My sun. My rules. Ten of the wretches I have been keeping, and you, and one way out. I am going to sit up here on more money than your whole bloodline ever touched, and I am going to WATCH.' },
+      { a: [[-7.4, 9.9, -7.4], [-11.8, 10.2, -11.8]], b: [[-8.6, 10.2, -8.6], [-11.8, 10.3, -11.8]], fov: 30, n: 1, t: 'Oh, I love this part. I LOVE it. Bleed prettily. Die slowly. And do try not to get any on the gold.' }];
+    const el = document.createElement('div'); el.id = 'talk'; el.innerHTML = '<div class="c-bar top"></div><div class="tk-box"><b class="tk-name"></b><p class="tk-text"></p><span class="tk-hint"></span></div><button class="c-skip mini">Skip</button>'; document.getElementById('ui').appendChild(el); document.getElementById('ui').classList.add('talking');
+    let i = 0, t0 = performance.now(), shown = 0, over = false; G.sfx('holy'); G.sfx('bell');
+    const end = () => { if (over) return; over = true; clearInterval(iv); window.removeEventListener('keydown', key, true); el.remove(); document.getElementById('ui').classList.remove('talking'); G.gfx.cine = null; if (G.gfx.veil) G.gfx.veil(0.4); done(); };
+    const next = () => { const s = SH[i]; if (shown < s.t.length) { shown = s.t.length; return; } i++; if (i >= SH.length) return end(); t0 = performance.now(); shown = 0; G.sfx('page'); if (G.gfx.veil) G.gfx.veil(0.25); };
+    const key = e => { if (over) return; if (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyE') { e.preventDefault(); e.stopPropagation(); next(); } else if (e.code === 'Escape') { e.stopPropagation(); end(); } };
+    window.addEventListener('keydown', key, true); el.addEventListener('pointerdown', e => { if (!e.target.closest('button')) next(); }); el.querySelector('.c-skip').onclick = end;
+    let padWas = true; const iv = setInterval(() => { if (over) return; const s = SH[i], tt = (performance.now() - t0) / 1000, u = Math.min(1, tt / 9), e2 = u * u * (3 - 2 * u), now = performance.now() / 1000;
+      G.gfx.cine = { pos: V(s.a[0], s.b[0], e2), look: V(s.a[1], s.b[1], e2), fov: G.gfx.portrait ? Math.min(92, s.fov * 1.5) : s.fov, roll: 0 }; if (a.update) a.update(now);
+      shown = Math.min(s.t.length, shown + 1.5); el.querySelector('.tk-name').textContent = s.n ? NAME : ''; el.querySelector('.tk-name').className = 'tk-name ' + (s.n ? 'npc' : 'none'); el.querySelector('.tk-text').textContent = s.t.slice(0, Math.floor(shown)); el.querySelector('.tk-hint').textContent = shown >= s.t.length ? (G.input.usingPad ? '(A) continue' : G.input.touch ? 'Tap to continue' : 'Click or Space to continue') : '';
+      let pad = false; try { for (const p of (navigator.getGamepads ? navigator.getGamepads() : [])) if (p && p.buttons && p.buttons[0] && p.buttons[0].pressed) pad = true; } catch (er) { } if (pad && !padWas) next(); padWas = pad; }, 33);
+  }
+  G.garden.intro = intro;
   function gate(then) {
     const st = G.state;
     show('<div class="card small letter event"><small class="over">You would not sign</small><h2>The Hour Garden</h2><p>He does not send you back up. He opens a different door. There is sunlight behind it, which is wrong, and grass, and blossom coming down like snow.</p><p class="quote">“' + (st.gardens ? 'Back again, and STILL too proud to hold a pen. Good. I was getting bored.' : 'Unsigned meat does not get carried. Unsigned meat EARNS it. My garden. Ten souls I have been keeping for a rainy day, and you, and one way out.') + ' Last one breathing gets to go on breathing. I watch. It is the only thing down here that still gets my blood up.”</p>' +
       '<p class="note"><b>Ten souls, all at once.</b> Everybody against everybody: they will cut each other down as gladly as you. Be the last one standing and you wake in the pit. <b>Die in the garden and the game is over: this fighter is erased.</b> Or sign, and he simply brings you back, as he does for everyone he owns.</p>' +
       '<div class="row end"><button id="sg">Sign the contract</button><button class="big danger" id="gd">Walk into the garden</button></div></div>');
     on('#sg', () => { st.signed = true; G.save(); G.sfx('level'); show('<div class="card small letter event"><h2>The Contract</h2><p>The pen is warm. The ink is gold. “There. Was that so hard? All that pride, and it folds like a wet hat.” He shuts the garden door with his foot.</p><p class="got">Signed · he will bring you back from now on · every death is a soul on your account</p><div class="row end"><button class="big" id="x">Carry on</button></div></div>'); on('#x', () => { ui.close(); then(); }); });
-    on('#gd', () => { G.garden.run = { list: souls(st), then }; G.save(); bout(); });
+    on('#gd', () => { G.garden.run = { list: souls(st), then }; G.save(); intro(bout); });
   }
   const rev0 = O.revive;
   O.revive = function (then) { const st = G.state; if (!(st.deaths > 0)) return rev0.call(this, then); return rev0.call(this, function () { if (tied(G.state)) return then(); gate(then); }); };
