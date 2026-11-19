@@ -20,7 +20,7 @@
   function leave() { const a = arena(); if (a.garden) a.garden(false); G.garden.run = null; }
 
   // ------------------------------------------------------------ the brawl: all ten at once, everybody against everybody
-  const S = 32, RAD = (W.AR || 8.2) * S; let mobs = [], chunks = [], hudEl = null, tPrev = 'idle', clock = 0;
+  const S = 32, RAD = (W.AR || 8.2) * S; let mobs = [], chunks = [], hudEl = null, tPrev = 'idle', clock = 0, youT = 0;
   const clampA = o => { const R2 = RAD - 22; o.x = Math.max(-R2, Math.min(R2, o.x)); o.y = Math.max(-R2, Math.min(R2, o.y)); const k = (Math.abs(o.x) + Math.abs(o.y)) / (RAD - 28); if (k > 1.5) { o.x *= 1.5 / k; o.y *= 1.5 / k; } };
   const word = (x, y, s, col, big) => G.gfx.floatText(x / S, 2.3, y / S, s, col, big);
   // he watches from the rotunda, and cannot keep it to himself
@@ -71,19 +71,19 @@
     davT -= dt; if (davT <= 0) { const r = Math.random(), alive = mobs.length ? mobs[Math.floor(Math.random() * mobs.length)] : null; says(r < 0.3 ? HIS : r < 0.5 ? ALL_HATE : r < 0.7 ? hateFor(G.state.hero.race) : hateFor(alive ? alive.race : G.state.hero.race)); } const live = F.inFight && F.inFight();
     for (let i = chunks.length - 1; i >= 0; i--) { const c = chunks[i]; c.t += dt; c.vy -= 20 * dt; c.m.position.x += c.vx * dt; c.m.position.z += c.vz * dt; c.m.position.y += c.vy * dt; c.m.rotation.x += dt * 6; c.m.rotation.z += dt * 5; if (c.m.position.y < 0.08) { c.m.position.y = 0.08; c.vy *= -0.3; c.vx *= 0.5; c.vz *= 0.5; } if (c.t > 2.2) { c.m.material.opacity = Math.max(0, 1 - (c.t - 2.2) / 0.6); if (c.t > 2.8) { c.m.parent && c.m.parent.remove(c.m); chunks.splice(i, 1); } } }
     if (live) hitMobs();
-    const onYou = mobs.filter(m => m.tg === P).length;
+    let onNow = mobs.filter(m => m.tg === P).length;
     mobs.slice().forEach((m, idx) => {
       m.flash = Math.max(0, (m.flash || 0) - dt); m.hurt = Math.max(0, (m.hurt || 0) - dt); m.cd = Math.max(0, m.cd - dt); m.pickT -= dt;
       if (m.kx || m.ky) { m.x += m.kx * dt; m.y += m.ky * dt; const f = Math.pow(0.004, dt); m.kx *= f; m.ky *= f; if (Math.abs(m.kx) + Math.abs(m.ky) < 8) m.kx = m.ky = 0; }
       const alive = t => t && (t === P ? P.hp > 0 : t === E ? E.hp > 0 : mobs.indexOf(t) >= 0);
-      if (m.pickT <= 0 || !alive(m.tg)) { m.pickT = 1.6 + Math.random() * 1.4; const pool = mobs.filter(q => q !== m).concat([E]); if (onYou < 2 || m.tg === P) pool.push(P); const dOf = q => Math.hypot(q.x - m.x, q.y - m.y) * (0.7 + Math.random() * 0.6); m.tg = pool.sort((p, q) => dOf(p) - dOf(q))[0]; }
+      if (m.pickT <= 0 || !alive(m.tg)) { m.pickT = 1.6 + Math.random() * 1.4; const lvN = G.state.hero.level, cap = lvN <= 6 ? 1 : 2, pool = mobs.filter(q => q !== m).concat([E]); if (onNow < cap && !(m.tg === P && Math.random() < 0.5)) pool.push(P); const dOf = q => Math.hypot(q.x - m.x, q.y - m.y) * (0.7 + Math.random() * 0.6) * (q === P ? 1.5 : 1); const was = m.tg; m.tg = pool.sort((p, q) => dOf(p) - dOf(q))[0]; if (was === P && m.tg !== P) onNow--; else if (was !== P && m.tg === P) onNow++; }
       const tg = m.tg, dx = tg.x - m.x, dy = tg.y - m.y, d = Math.hypot(dx, dy) || 1; let moving = false, act = 'idle', prog = 0;
-      if (m.state === 'idle') { m.face = Math.atan2(dy, dx); if (d > 54 && !m.hurt) { const v = m.spd * dt; m.x += dx / d * v; m.y += dy / d * v; m.walk += dt * 9; moving = true; } else if (live && m.cd <= 0 && clock > 2.6 && d <= 64) { m.state = 'wind'; m.t = 0; m.aim = m.face; } }
+      if (m.state === 'idle') { m.face = Math.atan2(dy, dx); if (d > 54 && !m.hurt) { const v = m.spd * dt; m.x += dx / d * v; m.y += dy / d * v; m.walk += dt * 9; moving = true; } else if (live && m.cd <= 0 && clock > 2.6 && d <= 64 && !(tg === P && clock < youT)) { m.state = 'wind'; m.t = 0; m.aim = m.face; if (tg === P) youT = clock + (G.state.hero.level <= 6 ? 1.5 : 1.0); } }
       else if (m.state === 'wind') { m.t += dt; act = 'swing'; prog = Math.min(0.5, m.t / 0.5 * 0.5); if (m.t >= 0.5) { m.state = 'rec'; m.t = 0; m.cd = 1.3 + Math.random() * 0.9; G.sfx('swing');
           const t2 = m.tg, dd = Math.hypot(t2.x - m.x, t2.y - m.y); let da = Math.atan2(t2.y - m.y, t2.x - m.x) - m.aim; da = Math.abs(Math.atan2(Math.sin(da), Math.cos(da)));
           if (alive(t2) && dd < 84 && da < 1.0) { if (t2 === P) { if (P.iframe > 0 || P.state === 'dodge') word(P.x, P.y, 'DODGED', '#9fd0ff', false); else { const g = P.guard > 0, dmg = Math.max(1, Math.round(m.dmg * (g ? 0.3 : 1) * (1 - Math.min(0.6, P.d.dr || 0)))); P.hp -= dmg; P.flash = 0.1; P.hurt = g ? 0.12 : 0.26; word(P.x, P.y, (g ? 'BLOCKED ' : '') + dmg, g ? '#cfd8e0' : '#ff7060', false); G.sfx('hit'); if (G.state.gore !== false && !g) G.gfx.blood(P.x / S, 1.1, P.y / S, 10, 3); if (P.hp <= 0) { P.hp = 0; F.koEntity(P); } } }
             else if (t2 === E) { E.hp -= Math.round(m.dmg * 0.7); E.flash = 0.1; if (G.state.gore !== false) G.gfx.blood(E.x / S, 1.1, E.y / S, 8, 3); if (E.hp <= 0) { E.hp = 1; if (mobs.length > 1) nextSoul(E); } }
-            else { t2.hp -= m.dmg * 0.8; t2.flash = 0.1; t2.hurt = 0.2; if (G.state.gore !== false) G.gfx.blood(t2.x / S, 1.1, t2.y / S, 10, 3); if (t2.hp <= 0) dropMob(t2, 'them'); } } } }
+            else { t2.hp -= m.dmg * 1.15; t2.flash = 0.1; t2.hurt = 0.2; if (G.state.gore !== false) G.gfx.blood(t2.x / S, 1.1, t2.y / S, 10, 3); if (t2.hp <= 0) dropMob(t2, 'them'); } } } }
       else { m.t += dt; act = 'swing'; prog = 0.5 + Math.min(0.5, m.t / 0.4 * 0.5); if (m.t >= 0.4) m.state = 'idle'; }
       [P, E].concat(mobs).forEach(q => { if (q === m) return; const ex = m.x - q.x, ey = m.y - q.y, ed = Math.hypot(ex, ey); if (ed < 36 && ed > 0.01) { const push = Math.min((36 - ed) / 2, 260 * dt); m.x += ex / ed * push; m.y += ey / ed * push; } });
       clampA(m); m.c.root.position.set(m.x / S, 0, m.y / S); m.c.root.rotation.y = Math.atan2(Math.cos(m.face), Math.sin(m.face));
@@ -97,11 +97,11 @@
   function bout() {
     const run = G.garden.run, st = G.state, o = run.list[0]; ui.close();
     ui.close(); if (ui.leaveHub) ui.leaveHub(); G.scene = 'fight'; ui.topbar(); const a = arena(); if (a.garden) a.garden(true);
-    o.name = 'The Ten'; o.title = 'everybody he kept'; o.hpMul = 0.5; o.dmgMul = 0.55;
+    o.name = 'The Ten'; o.title = 'everybody he kept'; { const lv0 = st.hero.level; o.hpMul = lv0 <= 3 ? 0.36 : lv0 <= 6 ? 0.43 : 0.5; o.dmgMul = lv0 <= 3 ? 0.36 : lv0 <= 6 ? 0.42 : 0.55; }
     o.onDone = win => { o.onDone = null; run.left = mobs.length + 1; endBrawl(); if (!win) return soulDeath(o); G.sfx('holy'); survived(); };
-    G.fight.start(o); const F = G.fight, lv = st.hero.level; clock = 0; tPrev = 'idle'; mobs = []; chunks = [];
-    run.list.slice(1).forEach((q, i) => { const an = i / 9 * 6.2832 + 0.35, r = 150 + (i % 3) * 34, c = G.makeChar({ cls: q.cls, race: q.race, tint: q.tint }), hp = 34 + lv * 9 + i * 3;
-      const m = { c, name: q.name, race: q.race, x: Math.cos(an) * r, y: Math.sin(an) * r, hp, maxHp: hp, dmg: 2.5 + lv * 0.7, spd: 105 + Math.random() * 40, state: 'idle', t: 0, cd: 1 + Math.random() * 2, pickT: Math.random(), walk: Math.random() * 6, face: an + Math.PI, kx: 0, ky: 0, tg: null }; a.scene.add(c.root); mobs.push(m); });
+    G.fight.start(o); const F = G.fight, lv = st.hero.level; clock = 0; youT = 0; tPrev = 'idle'; mobs = []; chunks = [];
+    run.list.slice(1).forEach((q, i) => { const an = i / 9 * 6.2832 + 0.35, r = 150 + (i % 3) * 34, c = G.makeChar({ cls: q.cls, race: q.race, tint: q.tint }), hp = Math.round((34 + lv * 9 + i * 3) * (lv < 7 ? 0.58 + lv * 0.06 : 1));       // the lower rungs meet thinner souls, not slower ones
+      const m = { c, name: q.name, race: q.race, x: Math.cos(an) * r, y: Math.sin(an) * r, hp, maxHp: hp, dmg: (2.5 + lv * 0.7) * (lv < 7 ? 0.8 : 1), spd: 105 + Math.random() * 40, state: 'idle', t: 0, cd: 1 + Math.random() * 2, pickT: Math.random(), walk: Math.random() * 6, face: an + Math.PI, kx: 0, ky: 0, tg: null }; a.scene.add(c.root); mobs.push(m); });
     run.brawl = 1; G.fight.wideCam = true; davT = 5; F.noSever = true; F.onFoeDown = e => nextSoul(e); hud();
   }
   function survived() {
