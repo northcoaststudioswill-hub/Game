@@ -193,7 +193,10 @@
   // ---------------------------------------------------------------- loop
   let last = performance.now(), lastScene = '';
   let fno = 0;
-  function frame(now) {
+  // one bad frame must never stop the game: the next frame is always scheduled, whatever this one threw
+  let errN = 0;
+  function frame(now) { try { frame1(now); } catch (e) { if (errN++ < 20) console.error(e); } requestAnimationFrame(frame); }
+  function frame1(now) {
     const dt = Math.min(0.033, (now - last) / 1000); last = now; T += dt;
     gfx.pace(now);
     const sc = G.scene, cam = gfx.cam, port = gfx.portrait;
@@ -226,7 +229,6 @@
     gfx.updateFires(T); gfx.updateParticles(dt); gfx.updateFloats(dt);
     // behind a full menu the world is only half-seen: draw it every other frame and give the time back
     { const pn = $('panel'), covered = !pn.classList.contains('hidden') && !G.talk && sc !== 'title' && sc !== 'create' && !/right|cellar|title/.test(pn.className); if (!covered || (fno++ & 1)) gfx.render(); }
-    requestAnimationFrame(frame);
   }
 
   G.applyOpts();

@@ -93,11 +93,12 @@
   const FAM = { axe: 'slice', halberd: 'slice', axes: 'slice', rapier: 'pierce', spear: 'pierce', hammer: 'thud', pick: 'pierce', flail: 'thud', staff: 'thud', chain: 'whipcrack', frost: 'spellhit', spark: 'spellhit', acid: 'spellhit' };
   const BASIC = { fighter: 'slice', rogue: 'pierce', cleric: 'thud', druid: 'thud', sorcerer: 'spellhit', warlock: 'spellhit' };
   let lastGasp = 0;
-  G.hitSound = function (att, tgt, ab, crit) {
+  G.hitSound = function (att, tgt, ab, crit) { try { hitSound(att, tgt, ab, crit); } catch (e) { G.sfx('hit'); } };
+  function hitSound(att, tgt, ab, crit) {
     let k = 'thud';
     if (ab && (ab.spell || ab.type === 'proj' || ab.type === 'aoe' || ab.type === 'line') && !(ab.basic && BASIC[att.cls] !== 'spellhit')) k = 'spellhit';
     else if (att && att.vis && att.vis.c && att.vis.c.beast) k = 'slice';
-    else { const arm = att && att.isPlayer && G.armOf ? String(G.armOf(G.state.hero)).split('_')[1] : (att && att.arm ? String(att.arm).split('_')[1] : 'basic'); k = FAM[arm] || BASIC[att && att.cls] || 'thud'; }
+    else { const hero = G.state && G.state.hero, arm = att && att.isPlayer && G.armOf && hero && !G.fight.ex ? String(G.armOf(hero)).split('_')[1] : (att && att.arm ? String(att.arm).split('_')[1] : 'basic'); k = FAM[arm] || BASIC[att && att.cls] || 'thud'; }
     G.sfx(crit && lite ? 'bigcrit' : k); if (crit && !lite) G.sfx('bigcrit');
     const now = performance.now();
     if (!G.fight.ex && !(G.garden && G.garden.run) && now - lastGasp > 1400 && (crit || (ab && ab.heavy))) { lastGasp = now; G.sfx(tgt && tgt.isPlayer ? 'ooh' : 'gasp'); }
