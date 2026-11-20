@@ -141,6 +141,12 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
 #app.cyber #scan{display:block}
 @media (max-width:640px){#slopx{top:auto;bottom:calc(var(--gb) + 150px)}}
 #app.cine #shop,#app.cine #bPose{display:none}
+#r1k{position:absolute;left:0;right:0;top:calc(var(--gt) + 58px);text-align:center;pointer-events:none;font-family:var(--display);z-index:3}
+#r1k b{display:block;font-weight:400;font-size:clamp(40px,11vw,110px);line-height:.9;color:var(--lime);-webkit-text-stroke:3px var(--ink);text-shadow:5px 0 0 var(--hot),-5px 0 0 var(--cyan);animation:r1kg .18s steps(2) infinite}
+#r1k i{font-style:normal;font-family:var(--body);font-size:14px;background:var(--ink);padding:2px 10px;border-radius:6px}
+@keyframes r1kg{0%{translate:2px -1px;rotate:-1.5deg}50%{translate:-3px 2px;rotate:1.5deg}}
+#app.r1k #c{animation:r1kc 1.6s linear infinite}@keyframes r1kc{0%{filter:hue-rotate(0) saturate(2.2) contrast(1.2)}50%{filter:hue-rotate(180deg) saturate(3) contrast(1.4)}100%{filter:hue-rotate(360deg) saturate(2.2) contrast(1.2)}}
+@media (prefers-reduced-motion:reduce){#r1k b,#app.r1k #c{animation:none}}
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 
 /* ---------- Screens ---------- */
@@ -194,6 +200,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
     <button id="bJump" class="pad">JUMP</button>
     <button id="bTalk" hidden></button>
     <div id="bigmsg"></div>
+    <div id="r1k" hidden><b id="r1kn">ROT x1</b><i>the filter is gone</i></div>
     <button id="bPose" aria-label="Strike a pose">😎</button>
     <button id="slopx" class="chip" hidden>🚪 LEAVE MAP</button>
     <div id="shop" hidden><button id="shopx" aria-label="Close">✕</button><div id="shopb"></div></div>
@@ -561,7 +568,7 @@ const SFX={jump:()=>tone(280,.16,'square',.1,0,620),jump2:()=>tone(420,.18,'squa
 const THEMES={hub:{bpm:132,root:57,sc:[0,2,4,7,9],lw:'square'},wild:{bpm:128,root:55,sc:[0,2,4,7,9],lw:'square'},grok:{bpm:116,root:45,sc:[0,3,5,6,7,10],lw:'sawtooth'},
   fable:{bpm:124,root:62,sc:[0,2,3,5,7,8,10],lw:'triangle'},astra:{bpm:104,root:64,sc:[0,2,4,6,7,9,11],lw:'sine'},boss:{bpm:170,root:40,sc:[0,1,3,5,6,8,10],lw:'sawtooth'},
   sunkeep:{bpm:112,root:60,sc:[0,2,4,5,7,9,11],lw:'triangle'},flow:{bpm:122,root:52,sc:[0,3,5,7,10],lw:'square'},clank:{bpm:150,root:41,sc:[0,1,3,6,7,10],lw:'sawtooth'},hour:{bpm:90,root:65,sc:[0,2,3,7,8],lw:'sine'},press:{bpm:132,root:57,sc:[0,2,4,7,9],lw:'square'},
-  fac:{bpm:140,root:48,sc:[0,3,5,7,10],lw:'square'},chrome:{bpm:118,root:45,sc:[0,2,3,5,7,8,10],lw:'sawtooth'},aura:{bpm:100,root:60,sc:[0,4,7,9,11],lw:'triangle'},fringe:{bpm:84,root:43,sc:[0,1,5,6,8],lw:'sawtooth'},mirror:{bpm:72,root:52,sc:[0,2,3,7,8],lw:'sine'},slop:{bpm:155,root:50,sc:[0,1,4,5,7,8,11],lw:'square'}};
+  fac:{bpm:140,root:48,sc:[0,3,5,7,10],lw:'square'},chrome:{bpm:118,root:45,sc:[0,2,3,5,7,8,10],lw:'sawtooth'},aura:{bpm:100,root:60,sc:[0,4,7,9,11],lw:'triangle'},fringe:{bpm:84,root:43,sc:[0,1,5,6,8],lw:'sawtooth'},mirror:{bpm:72,root:52,sc:[0,2,3,7,8],lw:'sine'},slop:{bpm:155,root:50,sc:[0,1,4,5,7,8,11],lw:'square'},r1k:{bpm:240,root:44,sc:[0,1,3,6,7,10],lw:'sawtooth'}};
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 function music(){if(!AU.ctx||AU.muted||S.mode==='title')return;const now=AU.ctx.currentTime;if(AU.next<now-.5)AU.next=now+.05;
   while(AU.next<now+.14){const th=THEMES[AU.theme]||THEMES.hub,s=AU.step%16,bar=Math.floor(AU.step/16),t=AU.next,prog=[0,3,4,2][bar%4],sc=th.sc;
@@ -746,7 +753,7 @@ function updateBoss(dt,active){if(!boss.active)return;const g=boss.g;boss.t+=dt;
   if(X.lit){boss.van-=dt;if(boss.van<=0){boss.van=8;gangAssist();}}}
 function win(){S.won=true;S.mode='end';addAura(67000);SFX.win();flash(1,1500);$('bossbar').hidden=true;$('hud').hidden=true;
   const rank=S.total>160000?'CERTIFIED OHIO FINAL BOSS':S.total>120000?'RIZZ LORD SUPREME':S.total>95000?'SIGMA INTERN':'NPC WITH A DREAM';
-  $('endstats').innerHTML='';[['AURA',fmt(S.aura)],['SUN SHARDS',shards()+'/4'],['BUDDIES',X.bud.length+'/15'],['MISSIONS',X.ms],['DATA DUMPED',X.dumped],['RATING','★ '+X.rate.toFixed(1)],['SLOP MAPS',X.maps],['67s',X.t67.length+'/67'],['CHECKLIST',X.ach.length+'/'+ACH.length],['FRAGMENTS',X.frag.length+'/12'],['TIMES RATIOED',S.deaths],['BRAIN CELLS LEFT',S.cells+'/'+S.max]].forEach(r=>{const s=document.createElement('span');s.textContent=r[0]+' ';const b=document.createElement('b');b.textContent=r[1];s.appendChild(b);$('endstats').appendChild(s);});
+  $('endstats').innerHTML='';[['AURA',fmt(S.aura)],['SUN SHARDS',shards()+'/4'],['BUDDIES',X.bud.length+'/15'],['MISSIONS',X.ms],['ROT SURVIVED',X.rot1000?'x1000':'x1'],['DATA DUMPED',X.dumped],['RATING','★ '+X.rate.toFixed(1)],['SLOP MAPS',X.maps],['67s',X.t67.length+'/67'],['CHECKLIST',X.ach.length+'/'+ACH.length],['FRAGMENTS',X.frag.length+'/12'],['TIMES RATIOED',S.deaths],['BRAIN CELLS LEFT',S.cells+'/'+S.max]].forEach(r=>{const s=document.createElement('span');s.textContent=r[0]+' ';const b=document.createElement('b');b.textContent=r[1];s.appendChild(b);$('endstats').appendChild(s);});
   $('endrank').textContent='Final rank: '+rank+'. A review we generated calls it "a game" and "technically 3D".';$('end').hidden=false;clearSave();}
 
 /* ================= player ================= */
@@ -881,7 +888,7 @@ padBtn($('bJump'),()=>{if(S.mode==='dialog')advance();else{inp.jump=true;inp.jh=
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
 /* ================= THE CROSSOVER: the North Coast cast wanders in ================= */
-const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0}});
+const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0}});
 Object.assign(X,X0());
 const XQ=['mission','flow','erin','clank','hour','lantern','cloud','bud','spr','frag','s67'];
 const shards=()=>(X.flow>=4)+(X.erin>=3)+(X.clank>=3)+(X.hour>=2);
@@ -1414,7 +1421,7 @@ function xInteract(){if(VAN.driving)return{label:'🚪 GET OUT OF THE VAN',fn:ex
   if(X.clank===1)for(let i=0;i<3;i++){const v=VALVES[i];if(!X.valves[i]&&Math.hypot(PL.x-v.x,PL.z-v.z)<4.6)return{label:'🔧 CLOSE THE VALVE',fn:()=>closeValve(i)};}
   if(BOT.state!=='fight'&&Math.hypot(PL.x-BOT.x,PL.z-BOT.z)<(BOT.state==='shield'?14.5:8))return{label:'💬 YAP WITH LIL BOTTIE',fn:TALK.bottie};
   for(let i=0;i<FRAGS.length;i++){const f=FRAGS[i];if(Math.hypot(PL.x-f.x,PL.z-f.z)<4.8&&Math.abs(PL.y-f.y)<4)return{label:X.frag.includes(i)?'📟 READ IT AGAIN':'📟 READ PROMPT FRAGMENT',fn:()=>readFrag(i)};}
-  if(Math.hypot(PL.x-GRASS.x,PL.z-GRASS.z)<4)return{label:'🌱 TOUCH GRASS',fn:touchGrass};
+  if(Math.hypot(PL.x-GRASS.x,PL.z-GRASS.z)<4)return{label:R1K.on?'🌱 TOUCH THE LAST GRASS. END THE ROT.':'🌱 TOUCH GRASS',fn:touchGrass};
   for(const t of TPOSE)if(Math.hypot(PL.x-t.x,PL.z-t.z)<4.6)return{label:'💬 YAP WITH '+t.nm,fn:()=>say([['tpose',pick(['I have been standing like this since the animation budget ran out.','Please do not walk through me. I can feel it. I just cannot react.','They said my texture was "coming in the next patch". That was four patches ago.','A',"I'm fine. This is my idle animation."])]])};
   if(Math.hypot(PL.x-BTN.x,PL.z-BTN.z)<5)return{label:'🔴 PRESS THE BUTTON',fn:()=>pressButton(false)};
   if(Math.hypot(PL.x-MS.x,PL.z-MS.z)<5.5)return{label:'🎯 SIDE QUEST DISPENSER',fn:openLog};
@@ -2188,6 +2195,41 @@ ACH.push(['prime','Prime Tier','reached a 4.5 star rating',()=>X.rate>=4.5],['pa
     ['sys','Do not stay out after the dogs notice you. They do not stop.']]);};}
 
 
+/* ================= ACT 11: ROT x1000. the Algorithm was the filter ================= */
+const R1K={on:false,t:0,lvl:1,rain:[],heads:[],sp:0,bk:0,tst:0,ch:0,re:0,fov:62};
+(function(){for(let k=0;k<44;k++){const s=emojiSprite('🗿',2);s.visible=false;scene.add(s);R1K.rain.push({s,v:0});}
+  ['🗿','📖','🌟','🐸','🤖','👑','🚐','🐕','🧠','👁️'].forEach((e,k)=>{const s=emojiSprite(e,34,false);s.visible=false;scene.add(s);R1K.heads.push(s);});})();
+const R1KLINES=['1000x','SIX SEVEN THOUSAND','AURA OVERFLOW','RATIO x1000','SKIBIDI x1000','based x1000','THE ROT IS SENTIENT','no cap x1000','who turned off the filter','bro. BRO. BROOOOO','unsubscribe me','I CAN SEE THE CODE','ERROR: vibes.exe','ohio is everywhere now'];
+function startRot1000(){S.inBoss=false;boss.active=false;boss.g.visible=false;bb.forEach(b=>{b.life=0;b.m.visible=false;});$('bossbar').hidden=true;$('hud').classList.remove('boss');
+  PL.x=0;PL.z=9;PL.y=PL.vis=.2;PL.vy=PL.vx=PL.vz=0;S.cells=S.max;S.mode='play';SFX.boom();flash(1,1500);S.shake=1.2;
+  say([['algo','YOU... DEFEATED ME?'],['algo','NO. YOU UNSUBSCRIBED ME. DO YOU KNOW WHAT I WAS? I WAS THE FILTER.'],['algo','I KEPT THE ROT AT 1x. EVERY MEME, EVERY 67, EVERY HAND WITH TOO MANY FINGERS. I HELD IT BACK.'],
+    ['algo','AND NOW NOTHING IS FILTERED. NOTHING. IS. FILTERED.',{cam:SH.world}],['sys','ROT LEVEL: 1x.',{cam:SH.hubwide}],['sys','ROT LEVEL: 10x.'],['sys','ROT LEVEL: 100x.'],['grok','GROK SCARED. GROK ALSO VIBING. BOTH.'],['sys','ROT LEVEL: 1000x.']],
+    ()=>{R1K.on=true;R1K.t=0;R1K.fov=camera.fov;app.classList.add('r1k');$('r1k').hidden=false;AU.theme='r1k';chapter('FINAL FINAL CHAPTER','ROT x1000');
+      toast('🌱 There is one thing the rot cannot survive. Find the LAST GRASS. Touch it.');R1K.heads.forEach(h=>h.visible=true);});}
+function endRot1000(){R1K.on=false;X.rot1000=1;app.classList.remove('r1k','disco','fry');$('r1k').hidden=true;CH.id='';CH.t=0;camera.fov=R1K.fov;camera.updateProjectionMatrix();R1K.rain.forEach(r=>r.s.visible=false);R1K.heads.forEach(h=>h.visible=false);
+  for(const id in npcs)npcs[id].g.scale.setScalar(1);for(let i=enemies.length-1;i>=0;i--)if(enemies[i].tag==='botmin')removeEnemy(enemies[i]);AU.theme=S.zone;flash(1,2500);SFX.win();save();
+  say([['sys','You touched grass. Real grass. The last grass. The rot drops: x1000... x100... x10...'],['sys','x1.'],['grok','GROK FEEL... NORMAL. GROK HATE IT. GROK MISS IT ALREADY.'],['fable','That was a lot. I have summarised it in one bullet point. The bullet point says: "a lot".'],
+    ['astra','✨ i liked it ✨'],['derek','...Bro.'],['sys','The filter is gone. The rot is back at 1x, held down by the only thing it fears: one square metre of grass. Please do not tell the grass.']],()=>{oWin();});}
+const oWin=win;win=function(){if(!X.rot1000&&!R1K.on){startRot1000();return;}oWin();};
+{const tg=touchGrass;touchGrass=function(){if(R1K.on){endRot1000();return;}tg();};}
+{const ct=compassTarget;compassTarget=function(){if(R1K.on)return{x:GRASS.x,z:GRASS.z,l:'THE LAST GRASS'};return ct();};}
+{const ar=act7Rows;act7Rows=function(){const r=ar();return R1K.on?[['r1k','🌱 TOUCH THE LAST GRASS. END THE ROT.',false]].concat(r):r;};}
+ACH.push(['r1k','ROT x1000','survived the unfiltered rot and touched the last grass',()=>!!X.rot1000]);
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(!R1K.on)return;R1K.t+=dt;const t=R1K.t;
+  R1K.lvl=Math.min(1000,Math.floor(Math.pow(10,Math.min(3,t/6))));setText('r1kn','ROT x'+fmt(R1K.lvl));U.time.value=S.t*7;
+  camera.fov=R1K.fov+Math.sin(t*2.7)*14+Math.sin(t*11)*3;camera.updateProjectionMatrix();S.shake=Math.max(S.shake,.18);
+  const sky=new THREE.Color().setHSL((t*.37)%1,1,.55);scene.fog.color.copy(sky);U.fogColor.value.copy(sky);
+  R1K.rain.forEach((r,k)=>{if(!r.s.visible||r.s.position.y<PL.y-6){r.s.visible=true;r.s.material.map=emojiTex(pick(['🗿','💀','🔥','💯','🧠','🐸','6️⃣','7️⃣','💩','👁️','✋','🦐','🌽','📉','📈','🤖','👑','✨']));r.s.material.needsUpdate=true;
+      r.s.position.set(PL.x+(Math.random()-.5)*50,PL.y+18+Math.random()*20,PL.z+(Math.random()-.5)*50);r.v=8+Math.random()*14;r.s.scale.setScalar(1.5+Math.random()*3);}r.s.position.y-=r.v*dt;r.s.material.rotation+=dt*4;});
+  R1K.heads.forEach((h,k)=>{const a=t*.3+k/R1K.heads.length*TAU;h.position.set(PL.x+Math.cos(a)*90,PL.y+45+Math.sin(t*1.3+k)*12,PL.z+Math.sin(a)*90);h.material.rotation=Math.sin(t*2+k)*.6;h.scale.setScalar(30+Math.sin(t*3+k)*10);});
+  for(const id in npcs){const n=npcs[id];if(Math.hypot(PL.x-n.x,PL.z-n.z)<90){const w=Math.sin(t*9+n.x);n.g.scale.set(1+w*.25,1-w*.2,1+w*.25);}}
+  R1K.re-=dt;if(R1K.re<=0){R1K.re=.6;heroRegen(true);HERO.muts.forEach(m=>m.visible=Math.random()<.7);}
+  R1K.ch-=dt;if(R1K.ch<=0){R1K.ch=5;CH.id=pick(['grav','big','tiny','zoom','rain','disco','fry']);CH.t=5;app.classList.remove('disco','fry');if(CH.id==='disco'||CH.id==='fry')app.classList.add(CH.id);}
+  if(!play)return;R1K.sp-=dt;if(R1K.sp<=0){R1K.sp=1.8;if(enemies.filter(e=>e.tag==='botmin').length<26)for(let k=0;k<2;k++){const a=Math.random()*TAU;spawnEnemy(PL.x+Math.cos(a)*24,PL.z+Math.sin(a)*24,'botmin');}}
+  R1K.bk-=dt;if(R1K.bk<=0){R1K.bk=.45;const all=Object.values(npcs).filter(n=>Math.hypot(PL.x-n.x,PL.z-n.z)<60),e=enemies[Math.floor(Math.random()*enemies.length)];if(all.length&&Math.random()<.6){const n=pick(all);bubble(pick(R1KLINES),n.x,n.y+6,n.z);}else if(e)bubble(pick(R1KLINES),e.x,e.y+3.5,e.z);}
+  R1K.tst-=dt;if(R1K.tst<=0){R1K.tst=1.6;toast(pick(Math.random()<.5?CHAT:ADS));if(Math.random()<.25)showAd();tone(100+Math.random()*900,.08,pick(['square','sawtooth']),.05);}};}
+
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
@@ -2214,7 +2256,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,R1K,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
