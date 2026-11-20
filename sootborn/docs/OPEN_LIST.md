@@ -2,7 +2,7 @@
 Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.65 (2026-11-19).
 
 ## Waiting on you
-- **The reorder is in (v0.65).** Play it and say if any night now feels too long. The old game is kept as its own artifact and as a tag.
+- **The reorder is in (v0.65).** Play it and say if any night now feels too long. The old game is kept as its own artifact and as a branch in the repo.
 - **The boots:** he takes them on day 31 and cannot fly until the last day. Either he flies from the Valley on, or a line says they have no charge. Your call.
 - **Your notes from playing to the Stair** (v0.63): send them when ready.
 - **The budget split** in the same document: say if you want it weighted differently.

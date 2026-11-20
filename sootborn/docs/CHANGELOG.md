@@ -13,7 +13,7 @@ You approved the proposed timeline. Nothing was cut and nothing was rewritten ex
 - One line changed to fit: the dream that explains the Assay said "for forty days"; it is now told on day twenty-five and says so.
 
 **Going back**
-- The game as it was is kept as a separate playable copy in your artifacts, **"SOOTBORN — v0.64, before the reorder"**, as the tag `v0.64-before-reorder` in the repo, and the old order is written down in the plan.
+- The game as it was is kept as a separate playable copy in your artifacts, **"SOOTBORN — v0.64, before the reorder"**, as the branch `sootborn-v0.64-before-reorder` in the repo, and the old order is written down in the plan.
 
 **The plan document, rewritten** ("the master plan: order, people, gaps, cutscenes, grades, budget")
 - The order as it now plays, and as it was.

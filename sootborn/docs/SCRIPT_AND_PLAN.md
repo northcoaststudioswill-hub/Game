@@ -1,7 +1,7 @@
 # SOOTBORN — the master plan: order, people, gaps, cutscenes, grades, budget
 Written at v0.65 (2026-11-19). Built from a bot that plays the whole story from New Game to THE END without being able to lose, and from everything in the story bible. Grades and judgements are mine; nothing here has been judged by a person playing except where you have told me.
 
-**Going back:** the game as it was before the reorder is kept three ways: a separate playable copy in your artifacts called "SOOTBORN — v0.64, before the reorder"; the tag `v0.64-before-reorder` in the repo; and the old order in section 3 below.
+**Going back:** the game as it was before the reorder is kept three ways: a separate playable copy in your artifacts called "SOOTBORN — v0.64, before the reorder"; the branch `sootborn-v0.64-before-reorder` in the repo; and the old order in section 3 below.
 
 ## 1. Time: one rule
 - **One clock, the furnace.** Cards say how long before or after the furnace, or name a day of the Assay. Never "from now", "later", "earlier", "ago".
