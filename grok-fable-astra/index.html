@@ -1063,8 +1063,14 @@ const PR=ABY.press;
   addNpc('bibi','KING BIBI','👑',200,'square',cx,cz,1.33,{col:'#ffd400'});})();
 
 // ---- Louie (follows you and fetches aura) and the sprout squad (bonks things)
+const FOL={T:45,bud:0,spr:0,ns:-1};
 const LOU={x:SK.x-11,z:SK.z+13,y:0,face:0,orb:-1,seek:0,walk:0,g:new THREE.Group()};LOU.hx=LOU.x;LOU.hz=LOU.z;
-(function(){const m=new THREE.Mesh(dogGeo,lam);m.scale.setScalar(2.3);LOU.g.add(m);const l=textSprite('LOUIE',.9,{color:'#ffb060'});l.position.y=3.3;LOU.g.add(l);scene.add(LOU.g);SPEAK.louie={name:'LOUIE',face:'🐕',pitch:600,wave:'square'};})();
+(function(){const O=0xe89040,C=0xfff0d8,K=0x111111,R=new THREE.Group();R.scale.setScalar(2.3);LOU.g.add(R);LOU.rig=R;const mk=(geo,x,y,z,par)=>{const q=new THREE.Mesh(geo,lam);q.position.set(x,y,z);(par||R).add(q);return q;};
+  LOU.body=mk(merge([pt(Sph(1,10,8),O,M(0,0,0,0,0,0,.22,.2,.42)),pt(Sph(1,8,6),C,M(0,-.07,0,0,0,0,.18,.14,.36)),pt(Cyl(.2,.19,.1,8),0xe03040,M(0,.1,.32))]),0,.5,-.02);
+  const lg=merge([pt(Box(.12,.34,.13),C,M(0,-.17,0)),pt(Box(.13,.07,.16),O,M(0,-.31,.02))]);LOU.legs=[[-.14,.26],[.14,.26],[-.14,-.26],[.14,-.26]].map(q=>mk(lg,q[0],.34,q[1]));
+  LOU.tail=mk(merge([pt(Sph(1,6,5),C,M(0,.1,-.06,0,0,0,.07,.16,.08))]),0,.58,-.4);
+  LOU.head=new THREE.Group();LOU.head.position.set(0,.74,.34);R.add(LOU.head);mk(merge([pt(Sph(.21,10,8),O,M(0,0,0)),pt(Box(.17,.11,.2),C,M(0,-.05,.16)),pt(Box(.07,.06,.04),K,M(0,-.02,.27)),pt(Box(.06,.06,.03),K,M(-.11,.05,.18)),pt(Box(.06,.06,.03),K,M(.11,.05,.18))]),0,0,0,LOU.head);
+  LOU.ears=[-1,1].map(k=>mk(merge([pt(Cone(.085,.17,4),O,M(0,.08,0))]),k*.13,.16,-.02,LOU.head));LOU.tongue=mk(merge([pt(Box(.06,.02,.1),0xff6a8a,M(0,0,.05))]),0,-.11,.2,LOU.head);const l=textSprite('LOUIE',.9,{color:'#ffb060'});l.position.y=3.3;LOU.g.add(l);scene.add(LOU.g);SPEAK.louie={name:'LOUIE',face:'🐕',pitch:600,wave:'square'};})();
 /* ================= ACT 3: a story, places to find, buddies, wild sprouts, a sloppier hero ================= */
 const TYPES=[{n:'EMBER',c:0xf07830},{n:'PEB',c:0x98a0b0},{n:'DEW',c:0x48a0f0},{n:'ZIP',c:0xf0d020},{n:'LEAF',c:0x58c048},{n:'LUCKY',c:0xf078c0}];
 const shot=(x,z,h,tx,tz,th)=>[x,groundH(x,z)+h,z,tx,groundH(tx,tz)+th,tz];
@@ -1245,7 +1251,10 @@ const SPR={max:24,list:[],mesh:new THREE.InstancedMesh(sproutGeo,lam,24),lit:fal
 BUD.forEach(b=>{const sh=new THREE.Mesh(new THREE.CircleGeometry(1,14),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.28,depthWrite:false}));sh.rotation.x=-Math.PI/2;b.g.add(sh);b.sh=sh;});
 function sprSync(){while(SPR.list.length>X.spr.length)SPR.list.pop();for(let i=SPR.list.length;i<X.spr.length&&i<SPR.max;i++)SPR.list.push({t:X.spr[i],x:PL.x+Math.cos(i)*2,z:PL.z+Math.sin(i)*2,y:PL.y,tg:null,cd:0,hop:i});
   const c=new THREE.Color();SPR.list.forEach((s,i)=>{s.t=X.spr[i];c.setHex(TYPES[s.t].c);SPR.mesh.setColorAt(i,c);});if(SPR.mesh.instanceColor)SPR.mesh.instanceColor.needsUpdate=true;}
-function updateSprouts(dt,active){const n=SPR.list.length,gyb=S.inBoss?ARENA.top:null;
+function updateSprouts(dt,active){if(FOL.ns<0)FOL.ns=X.spr.length;if(X.spr.length>FOL.ns){if(FOL.spr<=0)SPR.list.forEach((q,i)=>{q.x=PL.x+Math.cos(i)*2;q.z=PL.z+Math.sin(i)*2;});FOL.spr=FOL.T;}FOL.ns=X.spr.length;
+  if(FOL.spr>0&&!S.inBoss){FOL.spr-=dt;if(FOL.spr<=0&&SPR.list.length){SPR.list.forEach(q=>burst(q.x,q.y+.5,q.z,5,.3,5,3,.4));toast('🌱 The sprout squad wandered home. They come back out when a new sprout joins, and for the boss.');}}
+  if(FOL.bud>0){FOL.bud-=dt;if(FOL.bud<=0){const b=BUD.find(q=>q.lead);if(b){burst(b.x,b.y+1.5,b.z,14,null,7,4,.5);floatText('bye!',b.x,b.y+4.5,b.z,'#ffd400');toast('🐾 '+b.nm+' headed home to Sunkeep.');}budSync();}}
+  const n=(FOL.spr>0||S.inBoss)?SPR.list.length:0,gyb=S.inBoss?ARENA.top:null;
   for(let i=0;i<SPR.max;i++){if(i>=n){dummy.position.set(0,-9999,0);dummy.scale.setScalar(.001);dummy.updateMatrix();SPR.mesh.setMatrixAt(i,dummy.matrix);continue;}const s=SPR.list[i];if(s.cd>0)s.cd-=dt;const t=s.tg;
     if(t&&!(t===boss?boss.active&&boss.hp>0:t===BOT?BOT.state==='fight':enemies.includes(t)))s.tg=null;
     if(!s.tg&&s.cd<=0&&active&&!VAN.driving){let bd=20;for(const e of enemies){const d=Math.hypot(e.x-PL.x,e.z-PL.z);if(d<bd){bd=d;s.tg=e;}}
@@ -1331,9 +1340,9 @@ function storyBeat(){const rel=(S.relics.grok?1:0)+(S.relics.fable?1:0)+(S.relic
   return false;}
 
 /* ---- finding things ---- */
-function catchBud(b){b.caught=true;b.joy=1.3;X.bud.push(b.id);SFX.relic();burst(b.x,b.y+2,b.z,50,null,14,8,1);addAura(1500,b.x,b.y+4,b.z);floatText('BEFRIENDED',b.x,b.y+5.5,b.z,'#ffd400');budSync();save();
+function catchBud(b){b.caught=true;b.joy=1.3;X.bud.push(b.id);FOL.bud=FOL.T;SFX.relic();burst(b.x,b.y+2,b.z,50,null,14,8,1);addAura(1500,b.x,b.y+4,b.z);floatText('BEFRIENDED',b.x,b.y+5.5,b.z,'#ffd400');budSync();save();
   toast('🐾 '+b.nm+' ('+TYPES[b.t].n+'): '+b.d);if(X.bud.length>=BUD.length){addAura(50000,PL.x,PL.y+5,PL.z);zoneCard('BUDDYDEX COMPLETE','every buddy has seen the light');}}
-function budSync(){const lead=X.bud[X.bud.length-1];BUD.forEach((b,i)=>{b.caught=X.bud.includes(b.id);b.lead=b.caught&&b.id===lead;b.m.material=b.caught?lam:dimMat;b.q.visible=!b.caught;b.l.visible=b.caught;
+function budSync(){const lead=X.bud[X.bud.length-1];BUD.forEach((b,i)=>{b.caught=X.bud.includes(b.id);b.lead=b.caught&&b.id===lead&&FOL.bud>0;b.m.material=b.caught?lam:dimMat;b.q.visible=!b.caught;b.l.visible=b.caught;
     if(b.caught&&!b.lead){const a=i/BUD.length*TAU;b.hx=SK.x+Math.cos(a)*22;b.hz=SK.z+Math.sin(a)*22;b.fy=undefined;if(Math.hypot(b.x-b.hx,b.z-b.hz)>40){b.x=b.hx;b.z=b.hz;}}
     if(!b.caught){const h=BHOME[b.id];b.hx=h[0];b.hz=h[1];b.fy=h[3]||undefined;}});hudCache.q=null;}
 function updateBuds(dt,wdt,active){const rx=Math.cos(cam.yaw),rz=-Math.sin(cam.yaw);
@@ -1393,8 +1402,8 @@ const TALK={
     if(X.lit)say([['will',pick(['It works on my machine.','Quick match, then back to work.','I built this game. Well. Not THIS game. Mine had a build script.','Let me just push this first.'])]]);
     else if(n>=4)say([['will','Four shards. Okay. Hold on. Do not touch anything. Pushing to prod.']],lightLantern);
     else say([['will','Hey. Will. I built the nice version of this place. Then the Great Lantern cracked, and your slop leaked in through the hole.'],['will','Bring me four sun shards and I can relight it. Marcus, Erin\'s customer, David and that robot each ended up with one. Shards so far: '+n+' of 4.'],['will','Also, that is Louie. He is a good boy. You should pet him.']]);}};
-function petLouie(){SFX.page();for(let k=0;k<5;k++)floatText('❤️',LOU.x+(Math.random()-.5)*2,LOU.y+3+Math.random()*2,LOU.z);addAura(67,LOU.x,LOU.y+4,LOU.z);
-  if(!X.louie){X.louie=1;save();say([['louie','ARF. ARF ARF. (Louie has decided you are his now. He will fetch aura for you.)']]);}else floatText(pick(['ARF','BORK','WOOF','...boop']),LOU.x,LOU.y+4.5,LOU.z,'#ffd400');}
+function petLouie(){LOU.fol=FOL.T;SFX.page();for(let k=0;k<5;k++)floatText('❤️',LOU.x+(Math.random()-.5)*2,LOU.y+3+Math.random()*2,LOU.z);addAura(67,LOU.x,LOU.y+4,LOU.z);
+  if(!X.louie){X.louie=1;save();say([['louie','ARF. ARF ARF. (Louie has decided you are his now. For a little while he will fetch aura for you.)']]);}else floatText(pick(['ARF','BORK','WOOF','...boop']),LOU.x,LOU.y+4.5,LOU.z,'#ffd400');}
 function lightLantern(){X.lit=1;syncX();save();SFX.win();flash(1,1200);S.shake=.8;addAura(10000,PL.x,PL.y+4,PL.z);for(let k=0;k<8;k++)burst(SK.x+(Math.random()-.5)*20,LANT.y+(Math.random()-.5)*10,SK.z+(Math.random()-.5)*20,40,.13,22,8,1.6);
   if(!X.gift){X.gift=1;for(let t=0;t<6;t++)X.spr.push(t);}syncX();save();zoneCard('THE LANTERN IS LIT','the sprouts are glowing');toast('🌱 One of every sprout joined you, and the whole squad now hits twice as hard');toast('🚐 The whole gang will show up for the final boss');}
 function closeValve(i){X.valves[i]=1;SFX.page();const v=VALVES[i];addAura(500,v.x,v.y+4,v.z);burst(v.x,v.y+3,v.z,24,.55,10,6,.7);
@@ -1437,7 +1446,7 @@ function xInteract(){if(VAN.driving)return{label:'🚪 GET OUT OF THE VAN',fn:ex
   let best=null,bd=6.5;for(const id in npcs){const n=npcs[id],d=Math.hypot(PL.x-n.x,PL.z-n.z);if(d<bd&&Math.abs(PL.y-n.y)<6){bd=d;best=n;}}
   if(best)return{label:'💬 YAP WITH '+best.short,fn:TALK[best.id]};
   if(Math.hypot(PL.x-VAN.x,PL.z-VAN.z)<8.5)return X.flow>=3?{label:'🚐 DRIVE THE VAN',fn:enterVan}:{label:'💬 YAP WITH DEREK',fn:TALK.derek};
-  if(Math.hypot(PL.x-LOU.x,PL.z-LOU.z)<4.5)return{label:X.louie?'🐕 PET LOUIE AGAIN':'🐕 PET LOUIE',fn:petLouie};
+  if(!(X.louie&&LOU.fol>0)&&Math.hypot(PL.x-LOU.x,PL.z-LOU.z)<4.5)return{label:X.louie?'🐕 PET LOUIE (he tags along for a bit)':'🐕 PET LOUIE',fn:petLouie};
   if(X.clank===1)for(let i=0;i<3;i++){const v=VALVES[i];if(!X.valves[i]&&Math.hypot(PL.x-v.x,PL.z-v.z)<4.6)return{label:'🔧 CLOSE THE VALVE',fn:()=>closeValve(i)};}
   if(BOT.state!=='fight'&&Math.hypot(PL.x-BOT.x,PL.z-BOT.z)<(BOT.state==='shield'?14.5:8))return{label:'💬 YAP WITH LIL BOTTIE',fn:TALK.bottie};
   for(let i=0;i<FRAGS.length;i++){const f=FRAGS[i];if(Math.hypot(PL.x-f.x,PL.z-f.z)<4.8&&Math.abs(PL.y-f.y)<4)return{label:X.frag.includes(i)?'📟 READ IT AGAIN':'📟 READ PROMPT FRAGMENT',fn:()=>readFrag(i)};}
@@ -1472,7 +1481,7 @@ function syncX(){LEAKS.forEach((L,i)=>{L.b.visible=!X.leaks[i];});GAR.crops.forE
   FRAGS.forEach((f,i)=>{const r=X.frag.includes(i);f.b.visible=!r;f.scr.material.color.setHex(r?0x1a4a30:0x40ff90);});SPOTS.forEach((q,i)=>{q.m.visible=q.b.visible=!X.spt.includes(i);});T67.forEach((t,i)=>{t.s.visible=!X.t67.includes(i);});CORES.forEach((c,i)=>{c.hp=X.cores[i]?0:10;c.m.visible=c.b.visible=!X.cores[i];});
   $('shardn').textContent='☀️'+shards();act7Sync();$('elev').hidden=X.clank<2;$('bSlow').hidden=X.hour<2;hudCache.q=null;}
 function xReset(){VAN.driving=false;VAN.x=VAN.hx;VAN.z=VAN.hz;VAN.h=VAN.hh;VAN.sp=VAN.vy=0;VAN.y=groundH(VAN.x,VAN.z);VAN.gr=true;VAN.rode=false;pGroup.visible=true;
-  if(X.louie){LOU.x=PL.x+3;LOU.z=PL.z+3;}else{LOU.x=LOU.hx;LOU.z=LOU.hz;}LOU.orb=-1;SPR.list.length=0;BUD.forEach(b=>{const h=BHOME[b.id];b.x=b.hx=h[0];b.z=b.hz=h[1];b.caught=b.lead=false;});GRASS.cd=0;
+  LOU.x=LOU.hx;LOU.z=LOU.hz;LOU.fol=0;LOU.vx=LOU.vz=0;LOU.orb=-1;FOL.bud=0;FOL.spr=0;FOL.ns=-1;SPR.list.length=0;BUD.forEach(b=>{const h=BHOME[b.id];b.x=b.hx=h[0];b.z=b.hz=h[1];b.caught=b.lead=false;});GRASS.cd=0;
   S.slow=0;S.slowCd=0;S.shots=0;S.snack=0;act7Reset();PO.list.forEach(p=>{p.life=0;p.s.visible=false;});PL.fuel=3.2;PO.r67=0;if(MS.m)endMission();G.lj=0;G.ls=0;CH.id='';CH.t=0;ROT.beat=0;ROT.btn=0;$('ad').hidden=true;assistN=0;app.classList.remove('slow','disco','fry');STILL.t=STILL.fail=0;BOT.state='x';BOT.x=CY.x;BOT.z=CY.z;BOT.y=BOT.gy+1;FLY.g.visible=false;big('');syncX();}
 function updateBB(dt){for(const b of bb){if(b.life<=0)continue;b.life-=dt;const p=b.m.position;p.x+=b.vx*dt;p.y+=b.vy*dt;p.z+=b.vz*dt;b.m.scale.setScalar(1+Math.sin(S.t*14+p.x)*.2);
     const dx=p.x-PL.x,dy=p.y-(PL.y+1.4),dz=p.z-PL.z;if(dx*dx+dz*dz<1.7&&Math.abs(dy)<1.7){hurt(-dx,-dz);b.life=0;}
@@ -1485,16 +1494,25 @@ function updateBottie(dt,active){const g=BOT.g;BOT.t+=dt;
   g.position.set(BOT.x,BOT.y,BOT.z);g.scale.setScalar(lerp(g.scale.x,1,Math.min(1,dt*10)));}
 function takeOrb(i){const o=orbs[i];o.taken=true;S.orbCount++;addAura(67,o.x,o.y,o.z);SFX.orb(S.orbCount);burst(o.x,o.y,o.z,8,null,6,3,.5);dummy.position.set(0,-9999,0);dummy.rotation.set(0,0,0);dummy.scale.setScalar(.001);dummy.updateMatrix();orbMesh.setMatrixAt(i,dummy.matrix);
   if(S.orbCount%12===0&&S.cells<S.max){S.cells++;toast('🧠 A brain cell grew back. Use it wisely.');}}
-function updateLouie(dt){const L=LOU;let moving=false;
-  if(X.louie){let tx,tz;const sp=VAN.driving?46:25;if(L.orb>=0&&orbs[L.orb].taken)L.orb=-1;
+function updateLouie(dt){const L=LOU,fol=X.louie&&L.fol>0;let tx,tz,stop=1.6,sp=0,mx=0,mz=0;
+  if(fol){L.fol-=dt;if(L.orb>=0&&orbs[L.orb].taken)L.orb=-1;
     L.seek-=dt;if(L.orb<0&&L.seek<=0&&!S.inBoss){L.seek=.5;let bd=30*30;for(let i=0;i<orbs.length;i++){const o=orbs[i];if(o.taken||o.fy!==undefined)continue;const dx=o.x-L.x,dz=o.z-L.z,d2=dx*dx+dz*dz;if(d2<bd&&Math.hypot(o.x-PL.x,o.z-PL.z)<42){bd=d2;L.orb=i;}}}
-    if(L.orb>=0){tx=orbs[L.orb].x;tz=orbs[L.orb].z;}else{tx=PL.x+Math.cos(PL.face)*3.6;tz=PL.z-Math.sin(PL.face)*3.6;}
-    const dx=tx-L.x,dz=tz-L.z,d=Math.hypot(dx,dz);if(d>(L.orb>=0?1.4:1.2)){const st=Math.min(sp*dt,d);L.x+=dx/d*st;L.z+=dz/d*st;L.face=Math.atan2(dx,dz);moving=true;}
-    else if(L.orb>=0){takeOrb(L.orb);L.orb=-1;if(Math.random()<.3)floatText(pick(['ARF','BORK','fetched']),L.x,L.y+4,L.z,'#ffd400');}
-    if(Math.hypot(PL.x-L.x,PL.z-L.z)>75){L.x=PL.x+3;L.z=PL.z+3;L.orb=-1;}}
-  else L.face=Math.atan2(PL.x-L.x,PL.z-L.z);
-  if(moving)L.walk+=dt*16;const gy=S.inBoss?ARENA.top:groundH(L.x,L.z);L.y=gy+(moving?Math.abs(Math.sin(L.walk))*.5:0);
-  L.g.position.set(L.x,L.y,L.z);L.g.rotation.set(moving?Math.sin(L.walk)*.12:0,L.face,X.louie&&!moving?Math.sin(S.t*9)*.06:0);}
+    if(L.orb>=0){tx=orbs[L.orb].x;tz=orbs[L.orb].z;stop=1.2;}else{tx=PL.x+Math.cos(PL.face)*3.6;tz=PL.z-Math.sin(PL.face)*3.6;}
+    if(Math.hypot(PL.x-L.x,PL.z-L.z)>75){L.x=PL.x+3;L.z=PL.z+3;L.orb=-1;L.vx=L.vz=0;}
+    if(L.fol<=0){L.orb=-1;toast('🐕 Louie trotted home to Sunkeep. Pet him there to bring him along again.');floatText('ARF (bye)',L.x,L.y+4.5,L.z,'#ffd400');}}
+  else{tx=L.hx;tz=L.hz;L.orb=-1;if(Math.hypot(tx-L.x,tz-L.z)>3&&Math.hypot(PL.x-L.x,PL.z-L.z)>55){L.x=tx;L.z=tz;L.vx=L.vz=0;}}
+  const dx=tx-L.x,dz=tz-L.z,d=Math.hypot(dx,dz)||.01;
+  if(d>stop){mx=dx/d;mz=dz/d;sp=Math.min(VAN.driving&&fol?46:L.orb>=0?24:fol?20:13,(d-stop*.6)*4.5);}
+  else if(fol&&L.orb>=0){takeOrb(L.orb);L.orb=-1;if(Math.random()<.3)floatText(pick(['ARF','BORK','fetched']),L.x,L.y+4,L.z,'#ffd400');}
+  const k=Math.min(1,dt*(sp>0?6:9));L.vx=lerp(L.vx||0,mx*sp,k);L.vz=lerp(L.vz||0,mz*sp,k);L.x+=L.vx*dt;L.z+=L.vz*dt;const v=Math.hypot(L.vx,L.vz),run=clamp(v/18);
+  const want=v>.8?Math.atan2(L.vx,L.vz):Math.atan2(PL.x-L.x,PL.z-L.z);let da=want-L.face;da=Math.atan2(Math.sin(da),Math.cos(da));L.face+=da*Math.min(1,dt*(v>.8?10:4));
+  L.walk+=dt*(5+v*.75);L.sit=lerp(L.sit||0,v<.5?1:0,Math.min(1,dt*(v<.5?3:10)));const w=L.walk,sit=L.sit,gy=S.inBoss?ARENA.top:groundH(L.x,L.z);
+  L.y=gy+Math.abs(Math.sin(w))*.42*run;L.g.position.set(L.x,L.y,L.z);L.g.rotation.set(0,L.face,0);
+  L.rig.rotation.x=Math.sin(w*2)*.07*run-sit*.34;L.rig.position.y=-sit*.2;L.rig.rotation.z=-clamp(da*1.2,-.25,.25)*run;
+  L.legs.forEach((g,i)=>{const front=i<2,ph=(i===0||i===3)?0:Math.PI;g.rotation.x=Math.sin(w+ph)*(.35+.6*run)*Math.min(1,v/2)+(front?sit*.34:sit*1.25);g.position.y=.34-(front?0:sit*.06);});
+  L.tail.rotation.z=Math.sin(S.t*(v>.5?13:fol||!X.louie?9:5))*(.45+.3*sit);L.tail.rotation.x=-.5+run*.5-sit*.3;
+  L.head.rotation.x=sit*.3+Math.sin(w*2+1)*.1*run+Math.sin(S.t*2.3)*.05*sit;L.head.rotation.z=Math.sin(S.t*.9)*.22*sit;L.head.rotation.y=clamp(da,-.6,.6)*.6;
+  L.ears.forEach((e,i)=>{e.rotation.x=-.15-run*.5+Math.sin(w*2+i)*.12*run;e.rotation.z=(i?-1:1)*(.15+Math.sin(S.t*3+i*2)*.06);});L.tongue.scale.z=.6+Math.abs(Math.sin(S.t*7))*.9*(sit>.5||run>.5?1:.3);}
 function damageEnemy(e,n,kx,kz){e.hp-=n;e.hit=.12;if(kx!==undefined){e.kx=kx;e.kz=kz;}SFX.hit();if(e.hp<=0)killEnemy(e);}
 function xUpdate(dt,wdt,active){const play=S.mode==='play'&&!S.dead;rotUpdate(dt,play);gUpdate(dt,play);skyUpdate(dt,play);act7Update(dt,wdt,play,active);
   // timers: borrowed time, the meal going cold
@@ -2621,7 +2639,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
