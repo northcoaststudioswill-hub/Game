@@ -1,4 +1,23 @@
-# SOOTBORN — changelog (latest v0.74 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.75 · 2026-11-20)
+
+## v0.75 · 2026-11-20 — matching the writing: the coat, the gloves, the leg, the small things people do
+Step 10 of the plan. Things the story says that the pictures did not show.
+
+- **Clerk Sorrel wears a clerk's coat, and gloves.** On the fourth ring, on the service stair and in the Count hall he is a robed clerk now, not a cadet in plate. At the High Docks (the comic-book level) the plate, the pauldrons and House Violet's cape are gone: a pale coat and dark gloves. He keeps the plate where he fights in the open (the Gallery, the Son, the Stair, Little Ember).
+- **The Auditor's Blade walks on a leg that does not bend** (the Stair). It is Oswin Hale's leg from night forty-nine.
+- **A palm flat on the pipe.** Kestrel on the fourth ring and the valve hand on the service stair stand with a hand laid on the pipe beside them. Kestrel no longer turns away from it when you walk up.
+- **The hand to the washer before ELEVEN** in the arena fights: as the count begins, his off hand goes to his collar.
+- **The row sways together at a commitment** (Tier Six Stands), in time, instead of each figure bobbing by itself.
+- **Hollis and Brand, one line each** (after Riser Nine): "You're the one that did my arm." / "I am. It set crooked. I have looked at it every day since. Take the hand or leave it." He takes the hand.
+- **The week he blamed her has a picture of its own:** the dock log under a lamp, with one pass ringed in red. Dray, K. (Only if you met her at the pump house.)
+- Already true, checked and left: Tavi walks on his left on the Stair; Lucan is "on his stick" at the door in the words.
+
+**Checked:** by script and stills: the coat in the ring and on the service stair; Kestrel's palm; the dock log picture; the docks figure with no plate and no cape; the limp's numbers for the Blade and for nobody else. The whole-story bot (see below).
+
+**The whole-story bot:** new game to THE END, no errors, the same order as v0.74.
+
+**Not checked:** nothing by hand. The Blade's leg was not seen moving (only its numbers). The hand to the washer is behind the ELEVEN cut-in for most of its length and was seen only as a small figure. The sway was not seen moving. The 3D clerk's coat is the same body with the plate left off, not a new model.
+
 
 ## v0.74 · 2026-11-20 — the Count, the last flash, the ending
 Step 9 of the plan. The last chapter is now something you do.

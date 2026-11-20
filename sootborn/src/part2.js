@@ -112,7 +112,7 @@ FF.brandstair = () => ({
   voice: { at: [[1, 'I WAS A WARDEN. I KNOW HOW MANY IT TAKES TO CLEAR A STAIR. IT IS MORE THAN I HAVE MINUTES.'], [9, 'I PUT A HALBERD BUTT INTO A WELDER FOR HUMMING, ONCE. I HAVE CARRIED IT UP EVERY STAIR SINCE.'], [18, 'THEN THEY ORDERED ME TO DO IT TO A CHILD. I PUT THE HALBERD DOWN. IT WAS NOT ENOUGH. THIS IS THE REST OF IT.'], [27, 'THE LAST MOORING IS CUT. I CAN HEAR IT GO. GOOD. COME BACK TALLER, SOOT.']], hurt: 'I HAVE HAD WORSE FROM A CADET I WAS TEACHING.', fury: 'YOUR FEET, BOY. I SAID IT A THOUSAND TIMES. MINE ARE STAYING WHERE THEY ARE.', wave: 'MORE. GOOD. EVERY ONE ON THIS STAIR IS ONE NOT ON THE DOCK.' }
 });
 FF.stand = () => ({
-  era: 0, title: 'TIER SIX STANDS', sub: 'MARA VENN - A COMMITMENT AT BAY THREE', bg: 'furnace', arena: { kind: 'rect', w: 200, h: 80 }, music: 'work', legend: 1, skip: 1, foeName: 'Warden', winText: 'NOBODY KNEELS',
+  era: 0, hum: 1, title: 'TIER SIX STANDS', sub: 'MARA VENN - A COMMITMENT AT BAY THREE', bg: 'furnace', arena: { kind: 'rect', w: 200, h: 80 }, music: 'work', legend: 1, skip: 1, foeName: 'Warden', winText: 'NOBODY KNEELS',
   fin: { name: 'TWO TINS', l1: 'ONE FOR SEREN. ONE FOR KAEL.', l2: 'THERE WILL NOT BE A THIRD', rgb: '255,120,40' },
   hero: { id: 'mara', name: 'MARA', hp: 11, pow: 2, fury0: 60 }, allies: ['hollis', 'ivo'], shouts: ['UP! ALL OF YOU, UP!', 'WITH MARA!', 'HUM IT!'], taunt: { 0: ['KNEEL.', 'GRATITUDE IS BREATH.', 'YOU ARE OWED TO THE FURNACE.'] },
   waves: [[{ id: 'warden', name: 'Warden', kind: 'baton', hp: 22, sc: 1.1 }, { id: 'watchman', name: 'Night Watch', kind: 'quick', hp: 9 }], [{ id: 'warden', name: 'Warden', kind: 'baton', hp: 26, sc: 1.1 }, { id: 'warden', name: 'Warden', kind: 'heavy', hp: 30, sc: 1.15 }, { id: 'proctor', name: 'Proctor Sull', kind: 'quick', hp: 14 }]],
@@ -228,6 +228,10 @@ const P2 = {
     { issue: 'riser', or: [{ brawl: () => FF.riser() }] },
     { when: () => !!G.flags.issue_riser, music: 'mystery' }, { when: () => !!G.flags.issue_riser, panel: 'under' }, { when: () => !!G.flags.issue_riser, fade: 'in', spd: 0.8 },
     { when: () => !!G.flags.issue_riser, narr: 'Forty came up. I counted them past me in the rain, the way they count us. The fortieth was a girl carrying a smaller girl. She asked whether the sky was blue. I told her to go and look. Neither of them looked at the mask.' },
+    { when: () => !!G.flags.issue_riser, narr: 'Hollis the welder was the thirty-first. Brand was at the top of the ladder with a hand out, and Hollis knew the hand.' },
+    { when: () => !!G.flags.issue_riser, say: 'hollis', t: "You're the one that did my arm." },
+    { when: () => !!G.flags.issue_riser, say: 'brand', t: 'I am. It set crooked. I have looked at it every day since. Take the hand or leave it.' },
+    { when: () => !!G.flags.issue_riser, narr: 'He took the hand.' },
     { when: () => !!G.flags.issue_riser, fade: 'out' },
     { music: 'spire' }, { panel: 'desk' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'Marshal Cade came to my desk the next morning. He did not sit.' },
@@ -382,6 +386,7 @@ const P2 = {
     { fade: 'out' }, { panel: 'weather' }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     ...(P2F('wrenMet') ? [
       { narr: 'For a week I knew who had done it. The dock log had one pass entered against the lamp gallery at the first bell. An engineer\'s pass. Dray, K.' },
+      { plate: 'docklog', secs: 7 }, { music: 'mystery' }, { panel: 'weather' }, { fade: 'in', spd: 0.8 }, { wait: 0.5 },
       { narr: 'I did not say it to anyone. I counted it instead. She had the gallery. She had the hour. She had my face, nearly, from a pump house on a dark island.' },
       ...(P2F('wrenClose') ? [{ narr: 'And she had put her hand over mine on a weeping manifold, and I had left it there. I went over that evening eleven times, looking for the lie in it. I wanted very badly to find one. It would have been simpler.' }] : []),
       { say: 'ilse', t: 'You have a name in your mouth. I can see you chewing it. Swallow it or spit it, soot. Do not carry it about.' },

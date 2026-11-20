@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.74 (2026-11-20).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.75 (2026-11-20).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -20,6 +20,11 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **Weight:** no keeping a man in the air from the ground; air combos need the boots and run out. Say if the fights now feel too stiff, or the heavy launch too low.
 - **Deaths:** knees and over, or onto the back; nobody spins.
 - **The hook shot in the arena fights:** a real line; pulls an ordinary man to you, takes you to a heavy one.
+
+## Built in v0.75 (needs your eye)
+- **The clerk's coat and gloves** on Kael above the rock (2D, 2.5D, and the High Docks level). Say if he should keep House Violet's cape at the docks, or wear the coat in the Gallery too.
+- **The stiff leg, the palm on the pipe, the hand to the washer, the sway.** All small; say which do not read.
+- **Left from Step 10:** Lucan's stick is in the words but not drawn; Brand grounding the halberd is not drawn (Hollis's is told); hand to the washer in the 2D fights and the comic levels; Ivo's errand below; a valve job done with Kestrel beyond the ring.
 
 ## Built in v0.74 (needs your eye, and one answer)
 - **Answer wanted: Tavi.** The plan's line for Lucan is "You have a brother." The written Part Two calls Tavi "her" twice (the yellow barge; Lucan at the door) and the Codex says "your little sibling". Which is it? Until you say, my new lines say "a child" and name no gender.
@@ -88,8 +93,8 @@ Kept current each round. "Keep going" means work down this list from the top unl
 ## Matching the writing (from the master plan, v0.65)
 - ~~The seat knife~~ built in v0.69: on Kael's, Seren's, Mara's and Ivo's belts; the board in Bay Three; counting back at last bell on First Fire. Still open: the count at the end of the other days.
 - ~~The Proctor's white cloak on Kael from day 31~~ built in v0.68 (Valley, Last Night, Keep, Pinning).
-- A clerk's coat for Kael on the Spire and at the High Docks; gloves.
-- Oswin's stiff leg as the Auditor's Blade; Lucan's stick.
+- ~~A clerk's coat for Kael on the Spire and at the High Docks; gloves~~ built in v0.75.
+- ~~Oswin's stiff leg as the Auditor's Blade~~ built in v0.75. Lucan's stick: still only in the words.
 - Deliberate animations: hand flat on the pipe (Seren, Kael, Kestrel); soot turn their heads and the Accredited do not; the kneel at the bell; hand to the washer before ELEVEN everywhere; humming sway; Brand and Hollis grounding the halberd; Tavi on the left.
 - Unexplored and worth a scene: Seren tracing the line before Kael did; Hollis and Brand; a memory of Celestine's own Assay; a valve job done with Kestrel.
 

@@ -1,7 +1,7 @@
-# SOOTBORN — handoff progress, steps 7 to 9 (v0.72 to v0.74)
-The project's "sootborn handoff" and "sootborn master timeline" docs still hold their v0.71 text (steps 1 to 6 marked done). Steps 7, 8 and 9 are now done too; their build notes are below, copied from the current handoff, which is `docs/HANDOFF.md` in the repo. **Next is Step 10 (matching the writing), version 0.75.** `GAME_VER` in `src/ui.js` is 0.74.
+# SOOTBORN — handoff progress, steps 7 to 10 (v0.72 to v0.75)
+The project's "sootborn handoff" and "sootborn master timeline" docs still hold their v0.71 text (steps 1 to 6 marked done). Steps 7, 8 and 9 are done and Step 10 mostly; their build notes are below, copied from the current handoff, which is `docs/HANDOFF.md` in the repo. **Next is Step 11 (characters and animation), version 0.76.** `GAME_VER` in `src/ui.js` is 0.75.
 
-Project docs: the changelog is `claude/sootborn-changelog.md` (v0.71 on), with v0.66 to v0.70 in `-changelog-archive-3.md`. Story additions since v0.71 are in `claude/sootborn-story-bible-additions.md`.
+Project docs: the changelog is `claude/sootborn-changelog.md` (v0.71 on), with v0.66 to v0.70 in `-changelog-archive-3.md`. Story additions since v0.71 are in `claude/sootborn-story-bible-additions.md`. Open questions for the owner are at the top of the open list.
 
 **Step 7 · v0.72 · Part Two's spine** — **DONE 2026-11-20**
 - The fourth ring as home base (12a), with the suspicion meter, visited in the Post, the Balancing and What She Knows, with its own date card each time; Kestrel, Sable, porters; finds into the Codex. The head rule here first (soot look at whoever speaks; the Accredited don't). Porters kneel at the bell.
@@ -25,4 +25,11 @@ Project docs: the changelog is `claude/sootborn-changelog.md` (v0.71 on), with v
 - Done, in `src/prelude.js`: `Prelude.ledger(done)` (the puzzle; state in `Prelude.gm`; flags `countDone`, `countNoted`), `Prelude.pages(list, done, music)` (captioned pictures turned with A or a press), plates `furnace`, `lift`, `square`, `sun`, `names`, `tbarge`, `shelf` (the last two take the ending as `arg`), and `count` / `white` / `hold` on a plate. Steps `{ ledger: 1 }` and `{ pages: () => list }` in `src/cinema.js`. In `P2[5]` (`src/part2.js`): the book after the chapter card; the last flash after `FF.ember()`; the ending's old steps wrapped in `endPages([...])` with `{ pic }` markers (every old line kept). The Stair's echo is a toast in the `stair` block of `issue/story.js`.
 - Open with the owner: whether Tavi is a brother or a sister (the plan and the written lines disagree); where the puzzle happens.
 - Tests: `ledger.mjs`, `ending.mjs` (E=below|struck), `plates2.mjs`. The whole-story bot skips the puzzle (`Prelude.finish()`), as it skips fights.
+
+**Step 10 · matching the writing (what is left after steps 3 to 9)** — **MOSTLY DONE in v0.75, 2026-11-20**
+- Done: cast `kaelc` (the clerk's coat; hero of `walkRing`, `walkServiceStair`, mission `count`); the docks hero re-skin and `SC.limp` in `issue/rig.js` (one rep in `issue/patch.mjs`); `palm` and `still` on walk people; `pose: 'washer'` in `src/g3.js` during the ELEVEN wind-up; `hum: 1` on a fight sways its crowd; Hollis and Brand after `{ issue: 'riser' }`; plate `docklog`.
+- Left: Lucan's stick and Brand's halberd drawn; the washer gesture in the 2D fights and the comic levels; Ivo's errand below; a valve job with Kestrel.
+- A clerk's coat for Kael on the Spire and at the High Docks; plate only where he fights openly; gloves on the clerk. Oswin's stiff leg as the Auditor's Blade. Lucan's stick in his last scene (if not befriended).
+- The rest of the eight deliberate animations: hand flat on the pipe (Seren, Kael, Kestrel); the kneel at the bell; Kael's hand to the washer before ELEVEN in every engine; a humming sway at a commitment; Brand and then Hollis grounding the halberd; Tavi on Seren's left, then on Kael's left.
+- Unexplored scenes worth one each: Hollis and Brand, one line each; a valve job done with Kestrel; Ivo's errand below; Kestrel and the week he blamed her (a memory picture).
 

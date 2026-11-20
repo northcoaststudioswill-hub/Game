@@ -503,7 +503,19 @@ const Prelude = (() => {
     if (o === 'below') { g.save(); g.translate(1240, 760); capsule(g, 0, -230, 0, 0, 96); fs(g, '#8a8a8e'); tone(g, '#3a3a40', .5, 8); st(g, 10); circ(g, 0, -356, 76); fs(g, '#f4e6dc'); st(g, 9); g.beginPath(); g.arc(0, -372, 80, Math.PI, TAU); g.lineTo(84, -300); g.quadraticCurveTo(60, -380, 0, -384); g.quadraticCurveTo(-60, -380, -84, -300); g.closePath(); fs(g, '#f6eac0'); st(g, 7); ell(g, -130, -30, 74, 24, 0); fs(g, '#d8d2c0'); st(g, 7); capsule(g, -60, -110, -120, -50, 22); fs(g, '#a8905c'); st(g, 6); g.restore(); }
     else { g.save(); g.translate(1240, 760); poly(g, [-160, -40, 160, -40, 180, 0, -180, 0]); fs(g, '#f1e6c8'); st(g, 8); g.beginPath(); g.moveTo(-120, -22); g.lineTo(60, -22); st(g, 6, '#b3261c'); g.restore(); }
   }
-  const PLATES = { furnace: [pFurnace, [800, 470, 1.0, 800, 470, 1.22]], lift: [eLift, [800, 420, 1.0, 800, 520, 1.12]], square: [eSquare, [800, 520, 1.06, 800, 420, 1.0]], sun: [eSun, [720, 440, 1.0, 800, 410, 1.14]], names: [eNames, [800, 520, 1.0, 800, 560, 1.08]], tbarge: [eBarge, [760, 440, 1.0, 800, 400, 1.1]], shelf: [eShelf, [760, 470, 1.0, 900, 420, 1.12]], book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
+  // the week he blamed her: one line in the dock log, under a hooded lamp
+  function pDockLog(g, u, T) {
+    g.fillStyle = '#12100e'; g.fillRect(-300, -200, 2200, 1300); glow(g, 620, 300, 900, '255,200,120', .5 + Math.sin(T * 2.6) * .03);
+    poly(g, [120, 140, 1560, 60, 1640, 900, 60, 1010]); fs(g, '#efe4c6'); st(g, 9); g.save(); poly(g, [120, 140, 1560, 60, 1640, 900, 60, 1010]); g.clip(); g.beginPath(); g.rect(900, -200, 900, 1400); tone(g, '#8a7a5c', .5, 8); g.restore();
+    g.textBaseline = 'alphabetic'; const rows = [['SECOND BELL', 'MOORING ONE', 'ROOK, A.'], ['FIRST BELL', 'LAMP GALLERY', 'DRAY, K.'], ['LAST BELL', 'DOCK OFFICE', 'ALDANE, M.'], ['LAST BELL', 'FREIGHT THREE', '—']];
+    g.save(); g.transform(1, -.055, .03, 1, 0, 0); g.font = "700 30px 'Pixelify Sans', monospace"; g.fillStyle = '#6a5a4c'; g.fillText('BELL', 200, 250); g.fillText('WHERE', 620, 250); g.fillText('PASS', 1130, 250); g.beginPath(); g.moveTo(180, 270); g.lineTo(1500, 270); st(g, 4);
+    rows.forEach((r, i) => { const y = 370 + i * 150, hot = i === 1; g.font = `700 ${hot ? 52 : 44}px 'Pixelify Sans', monospace`; g.fillStyle = hot ? '#1a1016' : '#8a7a6a'; g.fillText(r[0], 200, y); g.fillText(r[1], 620, y); g.fillStyle = hot ? '#b3261c' : '#8a7a6a'; g.fillText(r[2], 1130, y); g.beginPath(); g.moveTo(180, y + 40); g.lineTo(1500, y + 40); st(g, 2, '#c9bb98');
+      if (hot) { const k = ez(cl(u * 1.6, 0, 1)); g.beginPath(); g.ellipse(1262, y - 18, 170 * k + 1, 56, -.04, 0, TAU * k); st(g, 7, '#b3261c'); } });
+    g.restore();
+    // his thumb on the edge of the page, in a glove
+    g.save(); g.translate(1420, 860); ell(g, 0, 0, 150, 90, -.5); fs(g, '#6a5a44'); tone(g, '#2a2016', .5, 8); st(g, 9); capsule(g, -90, -60, -200, -150, 40); fs(g, '#6a5a44'); st(g, 8); g.restore();
+  }
+  const PLATES = { docklog: [pDockLog, [800, 500, .98, 900, 500, 1.1]], furnace: [pFurnace, [800, 470, 1.0, 800, 470, 1.22]], lift: [eLift, [800, 420, 1.0, 800, 520, 1.12]], square: [eSquare, [800, 520, 1.06, 800, 420, 1.0]], sun: [eSun, [720, 440, 1.0, 800, 410, 1.14]], names: [eNames, [800, 520, 1.0, 800, 560, 1.08]], tbarge: [eBarge, [760, 440, 1.0, 800, 400, 1.1]], shelf: [eShelf, [760, 470, 1.0, 900, 420, 1.12]], book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
   const SHOTS = [
     [[1, s1]], [[1, s2]], [[1, s3], [1.5, s3fg]], [[1, s4], [1.6, s4fg]], [[1, s5]], [[1, s6]], [[1, s7]], [[1, s8], [1.35, s8fg]],
     [[1, (g, u, T) => eyes(g, u, T, 0)]], [[1, (g, u, T) => eyes(g, u, T, 1)]], [[1, s11]]

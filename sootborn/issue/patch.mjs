@@ -630,6 +630,9 @@ rep("const bands = SC.issue === 'stack' ? ", "const bands = SC.issue === 'array'
 // ---- v0.72: the comic pages never say TAP (the standing rule: no tap prompt). The arrow alone marks a page that is waiting
 rep("go.innerHTML = 'TAP &#9654;';", "go.innerHTML = '&#9654;';");
 
+// ---- v0.75: the Auditor's Blade walks on a leg that does not bend (SC.limp, in rig.js)
+rep("pose = e.kind === 'boss' || e.kind === 'knifer' ? P.run(e.runPh, sp / K.speed) : P.jog(", "pose = e.kind === 'boss' || e.kind === 'knifer' ? SC.limp(e, P.run(e.runPh, sp / K.speed)) : P.jog(");
+
 if (/Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow/.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''))) {
   const m = s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').match(/.{0,60}(Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow).{0,40}/g);
   console.log('LEFTOVER:', m.slice(0, 12));

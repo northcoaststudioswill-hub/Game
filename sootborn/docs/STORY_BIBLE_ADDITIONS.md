@@ -1,4 +1,4 @@
-# SOOTBORN — story bible, additions v0.72 to v0.74
+# SOOTBORN — story bible, additions v0.72 to v0.75
 These sections were added to the story bible after v0.71. The project's "sootborn story bible" doc still holds the v0.71 text; the whole current bible is `docs/STORY_BIBLE.md` in the repo. Read this alongside it.
 
 ## The fourth ring, walked (v0.72)
@@ -32,4 +32,10 @@ These sections were added to the story bible after v0.71. The project's "sootbor
 - **The last flash:** the heart-furnace and the count, to eleven, held.
 - **Row K, if she is sent down:** Mara calls her "little ember" without knowing. She calls every new mouth on the row that.
 - **Open question:** whether Tavi is his brother or his sister. The plan says brother; the written Part Two says "her"; the Codex says sibling.
+
+## What people wear and do, as built (v0.75)
+- **Edric Sorrel, Clerk of the Count:** a pale clerk's coat with a gilt trim and a grey sash, dark gloves always. No plate and no House cape except where he fights openly.
+- **The Auditor's Blade** (Oswin Hale, nine years after): the left leg does not bend.
+- **Hollis and Brand** met again at the top of Riser Nine, five years after; Brand had a hand out and Hollis took it.
+- **The week he blamed Kestrel:** the dock log reads FIRST BELL, LAMP GALLERY, pass DRAY, K. The same page has ALDANE, M. against the dock office at last bell.
 

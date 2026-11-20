@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible 
-Tagline: "Every breath is hers." Current build: v0.74 (see the changelog). **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.75 (see the changelog). **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -590,4 +590,10 @@ One look for each kind of jump, so it is learned once. **Wake:** white fading ou
 - **The last flash:** the heart-furnace and the count, to eleven, held.
 - **Row K, if she is sent down:** Mara calls her "little ember" without knowing. She calls every new mouth on the row that.
 - **Open question:** whether Tavi is his brother or his sister. The plan says brother; the written Part Two says "her"; the Codex says sibling.
+
+## What people wear and do, as built (v0.75)
+- **Edric Sorrel, Clerk of the Count:** a pale clerk's coat with a gilt trim and a grey sash, dark gloves always. No plate and no House cape except where he fights openly.
+- **The Auditor's Blade** (Oswin Hale, nine years after): the left leg does not bend.
+- **Hollis and Brand** met again at the top of Riser Nine, five years after; Brand had a hand out and Hollis took it.
+- **The week he blamed Kestrel:** the dock log reads FIRST BELL, LAMP GALLERY, pass DRAY, K. The same page has ALDANE, M. against the dock office at last bell.
 

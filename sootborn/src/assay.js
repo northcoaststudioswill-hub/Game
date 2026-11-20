@@ -249,7 +249,7 @@ MAPS.night5 = buildMap(Object.assign({}, SQUARE_DEF, { name: 'Ashgate Square · 
 Object.assign(MISSIONS, {
   // +5. "Lose it. Buy a day." Played.
   count: {
-    map: 'counthall', spawn: [5, 11, 1], where: 'The Sun Spire · five years after the furnace', toast: 'After the bell. The order is in the Marshal\'s tray.', hint: 'B: drop a pen · hold A to work · stay out of the lamps',
+    map: 'counthall', sheet: 'kaelc', spawn: [5, 11, 1], where: 'The Sun Spire · five years after the furnace', toast: 'After the bell. The order is in the Marshal\'s tray.', hint: 'B: drop a pen · hold A to work · stay out of the lamps',
     npcs: () => [mG('warden', 6, 7, 3, [[18, 7, 3, 1.6], [18, 11, 0, 1.8], [6, 11, 2, 1.6], [6, 7, 1, 1.8]]), mG('maren', 17, 5, 0, [[17, 5, 0, 3], [17, 5, 2, 1.8], [17, 5, 0, 3.4], [17, 5, 3, 1.6]]), mG('warden', 22, 9, 2, [[22, 9, 2, 2.2], [22, 9, 1, 1.8], [22, 9, 2, 2], [22, 9, 0, 1.4]])],
     obj: () => !MF('order') ? "Take the Tier Four order from the Marshal's tray (north-east), unseen" : 'Misfile it in the dead letters (north-west), unseen',
     mark: () => !MF('order') ? { x: 22.5 * 16, y: 4 * 16, lab: 'TRAY' } : { x: 2 * 16, y: 3 * 16, lab: 'DEAD LETTERS' },
@@ -637,7 +637,7 @@ function walkRing(n) {
       { choice: [
         { t: 'Take the glove off. Put your hand on the pipe.', fx: () => { F.wrenPipe = 1; }, then: [S(1), narr('It was running a breath short. Four beats and a catch. Four beats and a catch. Seren could have told you the valve by the catch. I could tell you the tier.'), say('you', 'East manifold. A seat is lifting.'), say('wren', '...Yes. That is what one thought. You did not look at the board.'), narr('She was not looking at the pipe any more. She was looking at my palm, and I put the glove back on it too slowly.')] },
         { t: '"One reads the board, Engineer."', fx: () => { F.wrenPipe = 0; }, then: [front, S(-1), say('you', 'One reads the board, Engineer.'), say('wren', 'The board says it is well. The board has said so for a year. Noted, Sorrel.'), narr('She kept her hand where it was. Walking away from that pipe was harder than walking past the bell.')] }] }],
-      [say('wren', 'Four beats and a catch. One is not imagining it.')])));
+      [say('wren', 'Four beats and a catch. One is not imagining it.')]), { palm: 1, fx: 1, fy: 0, still: 1 }));
   // ---- things on the wall
   const spots = [
     { id: 'window', x: -200, y: -32, r: 8, reach: 26, ph: 96, name: 'A WINDOW', verb: 'LOOK', talk: () => n === 1 ? [narr('The sky. It goes up and does not stop. I counted four hundred lights in it before I understood that they were not lamps, and that nobody trims them.'), narr('I did not sleep the first month. I still stand with my back to these when I can.')] : n === 2 ? [narr('I can look at it now for the length of a count. One. Two. At eleven I look away. It is not the sky\'s fault.')] : [narr('I looked at it for the whole of a count. There is no ceiling. There was never going to be one. I have stopped waiting.')] },
@@ -669,7 +669,7 @@ function walkRing(n) {
         pick('Stay upright.', 2, [narr('I did not bow. I had won their Assay, and for the length of two bells I thought it had bought me a neck.'), narr('It had not. The boy in House colours noticed. Then every clerk on the ring noticed him noticing.')])] },
       kneel(0), narr('They got up. Nobody had looked at anybody. Everybody knew exactly who had done what.')]
     : null;
-  return { era: 5, d2: 1, title: 'THE FOURTH RING', sub, bg: 'keep', bg2: 'ring4', arena: { kind: 'rect', w: 448, h: 60 }, music: 'spire', hero: { id: 'kael2', hp: 10, pow: 1, blade: 0, fury0: 0 },
+  return { era: 5, d2: 1, title: 'THE FOURTH RING', sub, bg: 'keep', bg2: 'ring4', arena: { kind: 'rect', w: 448, h: 60 }, music: 'spire', hero: { id: 'kaelc', hp: 10, pow: 1, blade: 0, fury0: 0 },
     walk: { id: 'ring' + n, spawn: [-206, 6], keep: () => false, props, npcs, spots,
       open: () => n === 1 ? [narr('Up here nobody looks at anybody. I had to learn that before I learned anything else.'), narr('The fourth ring, at night. Eleven doors, a lamp between each, and a line painted on the floor that I am not supposed to see.')]
         : n === 2 ? [narr('The fourth ring. A year of it. I can walk it now without counting the doors.'), narr('That is the danger. The ones they catch are never caught in their first month.')]
@@ -729,9 +729,9 @@ Object.assign(CAST, {
 });
 function walkServiceStair() {
   const F = G.flags, once = {}, one = (id, first, again) => () => { if (once[id]) return again; once[id] = 1; return first; };
-  const N = (id, x, y, name, talk) => ({ id, x, y, name, talk }); let turn = 0, heard = 0;
+  const N = (id, x, y, name, talk, o) => Object.assign({ id, x, y, name, talk }, o || {}); let turn = 0, heard = 0;
   const wall = ['plain', 'lamp', 'plain', 'plain', 'door', 'lamp', 'valve', 'valve', 'plain', 'lamp', 'arch', 'plain', 'lamp', 'plain', 'plain'], W0 = 7;
-  return { era: 5, d2: 1, title: 'THE SERVICE STAIR', sub: 'THE SUN SPIRE. THE PAINTED LINE', bg: 'keep', bg2: 'sstair', arena: { kind: 'rect', w: 300, h: 60 }, music: 'mystery', hero: { id: 'kael2', hp: 10, pow: 1, blade: 0, fury0: 0 },
+  return { era: 5, d2: 1, title: 'THE SERVICE STAIR', sub: 'THE SUN SPIRE. THE PAINTED LINE', bg: 'keep', bg2: 'sstair', arena: { kind: 'rect', w: 300, h: 60 }, music: 'mystery', hero: { id: 'kaelc', hp: 10, pow: 1, blade: 0, fury0: 0 },
     walk: { id: 'sstair', spawn: [-138, 6], keep: () => false,
       props: wall.map((v, j) => ({ t: 'swall', v, x: (j - W0) * 40, y: -40, k: j, turn: () => turn })),
       open: () => [narr('Behind the kitchens there is a door no clerk uses, and behind the door a line painted across the floor. I had looked at it every morning for a season.'), narr('That night I stepped over it.')],
@@ -743,7 +743,7 @@ function walkServiceStair() {
           { choice: [
             { t: '"It\'s not the seat. Back it a quarter, let it settle, then close."', fx: () => { F.svcValve = 1; }, then: [say('you', "It's not the seat. Back it a quarter, let it settle, then close."), fx(() => { turn = 1; Sound.play('clue'); }), narr('He did it. The wheel sighed, and came home.'), say('svc1', '...Who taught you that, Clerk?'), say('you', 'A careful woman.'), say('svc1', 'Aye. She would have been.'), narr('He did not look at my collar again. He looked at my hands, in their gloves. Then he went back to his work, and after a moment he said it. Very quietly.'), fx(() => { heard = 1; Sound.play('heart'); }), say('svc1', 'Brennick.')] },
             { t: 'Say nothing. A clerk does not know valves.', fx: () => { F.svcValve = 0; }, then: [narr('I said nothing. I stood and watched a man fight a wheel I could have closed with two fingers, and I kept my hands behind my back.'), say('svc1', "Don't trouble yourself, Clerk. It's only a valve."), narr('He waited until I had turned away. Then he said it to the pipe. Very quietly.'), fx(() => { heard = 1; Sound.play('heart'); }), say('svc1', 'Brennick.')] }] }],
-          [say('svc1', "Mind how you go. The line's wet.")])),
+          [say('svc1', "Mind how you go. The line's wet.")]), { palm: -1 }),
         N('svc2', -74, 16, 'A WOMAN WITH PLATES', () => [say('svc2', "Don't stand in the light, love. They can see this door from the ring."), narr('Love. Nobody has called me anything but Clerk and Sorrel for a season. I stood out of the light.')]),
         N('svc3', 84, -16, 'A LAMP TRIMMER', () => [say('svc3', "Crew Three, wasn't it. I trimmed the lamps over Bank Seven nine years before they brought me up."), narr('He said it to the wick he was cutting. Then he turned his head and looked at me, the way you look at somebody who has spoken. I had not spoken.'), say('svc3', "We hummed for her. Up here. They can't hear it through the stone.")])],
       spots: [
