@@ -1,4 +1,17 @@
-# SOOTBORN — changelog (latest v0.77 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.78 · 2026-11-20)
+
+## v0.78 · 2026-11-20 — a playthrough check: every 2.5D place walked on foot; one dead end fixed
+Your aim for today: play it start to finish, in order, with every played moment finished. Every scene in the plan is built (v0.67 to v0.75), so this version looks for places a person would get stuck that the story bot cannot see, because the bot ends walks and fights as they start.
+
+- **Fixed: the fever ward could not be left on foot.** Its way out, the ward board, sat past the edge of the floor with Mosi standing in front of it. Since v0.61 the only way out was the Skip button. Mosi has moved to a cot and the board can be reached.
+- **New test: every 2.5D place walked with real key presses** (fourteen of them: the Circle, Ashgate Square, Row K, the ward, the camp by day, last bell, the three ring visits, the cloak, the service stair, the barge, Seren's bay). In each, the bot walks to every person and every thing and then the way out. All fourteen now end by walking.
+
+**Checked:** the walk test above; the whole-story bot (see below).
+
+**The whole-story bot:** new game to THE END, no errors.
+
+**Not checked:** nothing by hand. The comic-book levels' routes (the vent stack, the Deep Array, the Stair's cold open) were proved earlier by stepping the route against the level's own collision, not by a bot holding a stick. The fights are won by scripts that set the state, not by playing them.
+
 
 ## v0.77 · 2026-11-20 — the Gallery's onlookers; how each boss stands (Step 11, second part)
 - **The Gallery has people watching.** The figures between its columns were the Assay's Proctors, borrowed from the pairing room. They are now clerks and ladies of the fourth ring, in four different coats and heads, standing with their hands folded.

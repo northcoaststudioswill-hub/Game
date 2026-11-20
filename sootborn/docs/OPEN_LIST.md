@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.77 (2026-11-20).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.78 (2026-11-20).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -20,6 +20,12 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **Weight:** no keeping a man in the air from the ground; air combos need the boots and run out. Say if the fights now feel too stiff, or the heavy launch too low.
 - **Deaths:** knees and over, or onto the back; nobody spins.
 - **The hook shot in the arena fights:** a real line; pulls an ordinary man to you, takes you to a heavy one.
+
+## Your aim (2026-11-20): play it start to finish today; after that, only polish
+- Every scene in the plan is built and in order (the bot's log matches the plan). v0.78 fixed the one dead end found by walking every 2.5D place on foot (the fever ward).
+- **When you play, tell me where you got stuck, lost, or bored.** That list replaces Steps 12 to 14 as what I do next.
+- Most likely trouble, in my guess: the three new comic-book levels (vent stack, Deep Array, the cold open) because nobody has held a stick in them; the Count puzzle's speed; the Keep's ending if you never hold strike.
+- Polish that waits until you have played: Step 11's last two (Kael's stance, capes), Step 12 (places), Step 13 (controls), Step 14 (films).
 
 ## Built in v0.77 (look at these first: built unseen)
 - **How the three bosses stand when still** (the High Docks, Riser Nine, the Stair). Never seen, even by me. If a limb is wrong, say which boss.

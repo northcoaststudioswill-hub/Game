@@ -7024,8 +7024,8 @@ function walkWard() {
         N('tavi', -78, -22, 'TAVI', [say('tavi', 'I can breathe right down to the bottom. Kael. Right to the bottom. Is it always like this?'), narr('It had not been like that for anybody on Tier Six in his lifetime. I said aye.')]),
         N('pip', 84, 14, 'PIP', [say('pip', 'Is the sky blue? Nell says nobody knows.'), say('you', "Seren says it is. She's got a bet on it.")]),
         N('ada', 4, 30, 'ADA', [say('ada', "The fan's fixed! Did she fix the fan? Tell her it's too loud. Tell her don't make it quieter.")]),
-        N('mosi', 112, -20, 'MOSI', [narr('Mosi, cross-legged on a cot with a stub of chalk, drawing somebody with a sun where the head should be.'), say('mosi', "It's not finished. Don't look till it's finished.")])],
-      spots: [{ id: 'board', x: 124, y: -48, r: 8, reach: 30, ph: 44, name: 'THE WARD BOARD', verb: 'LEAVE THEM SLEEPING', exit: 1, talk: () => [narr('Three nights. That was all it ever was. I would do the sum the same way again, and I know what it comes to.')] }] } };
+        N('mosi', 66, -30, 'MOSI', [narr('Mosi, cross-legged on a cot with a stub of chalk, drawing somebody with a sun where the head should be.'), say('mosi', "It's not finished. Don't look till it's finished.")])],
+      spots: [{ id: 'board', x: 124, y: -48, r: 8, reach: 46, ph: 44, name: 'THE WARD BOARD', verb: 'LEAVE THEM SLEEPING', exit: 1, talk: () => [narr('Three nights. That was all it ever was. I would do the sum the same way again, and I know what it comes to.')] }] } };
 }
 FF.circle = walkCircle; FF.square = walkSquare; FF.rowmorn = walkRowMorning; FF.ward = walkWard;
 
@@ -8513,11 +8513,11 @@ const Menus = {
 
 // ---------- boot splash: North Coast Studios, then E Concepts
 // ---- the Dev menu's notes. GAME_VER is the one place the version number lives; DEV_NEW and DEV_VER are brought up to date every release.
-const GAME_VER = '0.77';
-const DEV_NEW = 'the Gallery has onlookers from the fourth ring; each of the three bosses stands his own way when still (the comic-book levels).';
+const GAME_VER = '0.78';
+const DEV_NEW = 'a fix: the fever ward\'s way out (the ward board) could not be reached on foot. Every 2.5D place has now been walked with real key presses.';
 // which version last changed each scene: first match wins; the last line is everything older
 const DEV_VER = [
-  [/Gallery|High Docks|Riser Nine|The Stair/i, '0.77'], [/The Keep|Keep end|The Pinning|cold open/i, '0.76'], [/fourth ring|service stair|Count hall|High Docks|Tier Six Stands|The Balancing|Two Years/i, '0.75'], [/Count, as a puzzle|last flash|ending in six|Little Ember|The Count|What She Knows|The Son/i, '0.74'], [/The cloak: the camp|service stair|Celestine.s own Assay|barge, in the weather|Seren finds|The Post|Two Years/i, '0.73'], [/fourth ring|cold open|Flash forward|Part Two|The Balancing|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
+  [/fever ward/i, '0.78'], [/Gallery|High Docks|Riser Nine|The Stair/i, '0.77'], [/The Keep|Keep end|The Pinning|cold open/i, '0.76'], [/fourth ring|service stair|Count hall|High Docks|Tier Six Stands|The Balancing|Two Years/i, '0.75'], [/Count, as a puzzle|last flash|ending in six|Little Ember|The Count|What She Knows|The Son/i, '0.74'], [/The cloak: the camp|service stair|Celestine.s own Assay|barge, in the weather|Seren finds|The Post|Two Years/i, '0.73'], [/fourth ring|cold open|Flash forward|Part Two|The Balancing|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
   [/Keep|The Son|Lucan|What She Knows/i, '0.69'], [/Ashgate|First Fire|festival|Lamp|first dream|Ashgate, that night/i, '0.69'],
   [/Valley|Pinning|Proctor(?! Sull)|Last Night|Way Out \(160|The Way Out · the months|last dream|The Post|New game from the top|Prologue/i, '0.68'],
   [/Three Steps|Pairing|Ford|Camp|Island|Dais|The Sun|Table|High Docks|Dock Stair|Tier Six|Ledger|dream|Part Two|Two Years|The Balancing|The Count/i, '0.67'],

@@ -488,8 +488,8 @@ function walkWard() {
         N('tavi', -78, -22, 'TAVI', [say('tavi', 'I can breathe right down to the bottom. Kael. Right to the bottom. Is it always like this?'), narr('It had not been like that for anybody on Tier Six in his lifetime. I said aye.')]),
         N('pip', 84, 14, 'PIP', [say('pip', 'Is the sky blue? Nell says nobody knows.'), say('you', "Seren says it is. She's got a bet on it.")]),
         N('ada', 4, 30, 'ADA', [say('ada', "The fan's fixed! Did she fix the fan? Tell her it's too loud. Tell her don't make it quieter.")]),
-        N('mosi', 112, -20, 'MOSI', [narr('Mosi, cross-legged on a cot with a stub of chalk, drawing somebody with a sun where the head should be.'), say('mosi', "It's not finished. Don't look till it's finished.")])],
-      spots: [{ id: 'board', x: 124, y: -48, r: 8, reach: 30, ph: 44, name: 'THE WARD BOARD', verb: 'LEAVE THEM SLEEPING', exit: 1, talk: () => [narr('Three nights. That was all it ever was. I would do the sum the same way again, and I know what it comes to.')] }] } };
+        N('mosi', 66, -30, 'MOSI', [narr('Mosi, cross-legged on a cot with a stub of chalk, drawing somebody with a sun where the head should be.'), say('mosi', "It's not finished. Don't look till it's finished.")])],
+      spots: [{ id: 'board', x: 124, y: -48, r: 8, reach: 46, ph: 44, name: 'THE WARD BOARD', verb: 'LEAVE THEM SLEEPING', exit: 1, talk: () => [narr('Three nights. That was all it ever was. I would do the sum the same way again, and I know what it comes to.')] }] } };
 }
 FF.circle = walkCircle; FF.square = walkSquare; FF.rowmorn = walkRowMorning; FF.ward = walkWard;
 
