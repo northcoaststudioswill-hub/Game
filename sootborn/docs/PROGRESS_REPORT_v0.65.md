@@ -5,6 +5,8 @@ Tagline: "Every breath is hers." Report date: 2026-11-19. Build: v0.65.
 
 **How it was made.** A bot played the whole story from New Game to THE END without being able to lose (eight minutes, no errors), logging every card, fight, level and menu. The grades and judgements are mine, from that run, from scripted checks and still pictures, and from your play notes. Nothing here was judged by a person playing except where you told me.
 
+**The illustrated version.** The same report with frames from the build and charts, in the style of the State of the Game reports, is in your artifacts: "SOOTBORN Progress Report, v0.65" (https://claude.ai/artifact/QWMxG9cP55RwhK5J56P5Qf). In the repo it is `docs/reports/2026-11-19-progress-report-v0.65/`.
+
 **Going back.** The game as it was before the reorder is kept as a separate playable copy in your artifacts ("SOOTBORN — v0.64, before the reorder") and as the branch `sootborn-v0.64-before-reorder` in the repo.
 
 ## 1. How we got here
