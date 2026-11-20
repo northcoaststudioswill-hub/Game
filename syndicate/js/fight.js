@@ -612,6 +612,15 @@
     if (m.t > IMP + 2.2) P.poseOv = null;
     once('roar', IMP + 0.55, () => { G.sfx('cheer'); G.sfx('win'); G.ui.banner('Victory', 'The pit erupts', 'win mortal'); });
     once('roar2', IMP + 1.3, () => G.sfx('cheer'));
+    // the victory flourish: once the kill is done and the lead has let go, the winner shows off, the way their trade does
+    { const end = IMP + (m.f.parade ? Math.max(def.tail || 2.3, 3.1) : (def.tail || 2.3)), c0 = Math.max(IMP + 0.9, end - 1.25);
+      if (!F.ex && !P.form && !m.f.parade && m.t > c0 && !(m.f.celeb === undefined && P.poseOv)) { if (m.f.celeb === undefined) m.f.celeb = 0; const u = Math.min(1, (m.t - c0) / Math.max(0.3, end - c0)), cl = P.cls, X = P.x / S, Z = P.y / S;
+        once('cel', c0 + 0.02, () => { G.sfx('cheer'); fx.push({ k: 'ring', x: P.x, y: P.y, r: 150, col: col, t: 0, life: 0.6 }); if (!(G.garden && G.garden.run)) for (let i = 0; i < 26; i++) { const a = rand(0, 6.28), d = rand(3.5, 7.5); gfx.emit(X + Math.cos(a) * d, rand(3.5, 5.5), Z + Math.sin(a) * d, -Math.cos(a) * rand(1, 3), rand(1, 3), -Math.sin(a) * rand(1, 3), rand(1.2, 1.9), ['#ff8aa8', '#ffd060', '#f4f0e8', '#c0d0ff'][i % 4], 1); } });
+        if (cl === 'fighter') { P.poseOv = { act: 'cheer', prog: u }; once('cf', c0 + 0.35, () => { shake = Math.max(shake, 6); fx.push({ k: 'dust', x: P.x, y: P.y, r: 120, t: 0, life: 0.5 }); G.sfx('wall'); text(P, 'WHO NEXT', '#ffd36b', true); }); }
+        else if (cl === 'rogue') { P.poseOv = u < 0.6 ? { act: 'swing', mv: 'spin', prog: (u / 0.6) * 0.9 } : { act: 'idle' }; P.aim += dt * (u < 0.6 ? 11 : 0); once('cr', c0 + 0.7, () => { G.sfx('clang'); text(P, 'TOO EASY', '#c79bff', true); }); }
+        else if (cl === 'sorcerer' || cl === 'warlock') { P.poseOv = { act: u < 0.4 ? 'cast' : 'release', cs: 'nova', prog: u < 0.4 ? u / 0.4 : (u - 0.4) / 0.6 }; every('fw', c0 + 0.2, end - 0.1, 0.22, i => { const a = rand(0, 6.28), cc = cl === 'warlock' ? ['#8a4aff', '#c79bff', '#3a1a6a'][i % 3] : ['#ff8a2a', '#ffd060', '#ff4a2a', '#8ab0ff'][i % 4]; for (let q = 0; q < 16; q++) { const b = rand(0, 6.28), v = rand(2, 4); gfx.emit(X + Math.cos(a) * 1.4, 4.2 + rand(0, 1.2), Z + Math.sin(a) * 1.4, Math.cos(b) * v, Math.sin(b) * v * 0.7, Math.sin(b + 1) * v, 0.8, cc, 0); } G.sfx(i % 2 ? 'zap' : 'fire'); }); }
+        else if (cl === 'cleric') { P.poseOv = { act: 'cheer', prog: u }; once('ch', c0 + 0.1, () => { fx.push({ k: 'ring', x: P.x, y: P.y, r: 90, col: '#fff4c0', t: 0, life: 1.1 }); G.sfx('holy'); text(P, 'BY THE LIGHT', '#fff4c0', true); }); if (Math.random() < dt * 30) gfx.emit(X + rand(-0.4, 0.4), rand(0.2, 3.6), Z + rand(-0.4, 0.4), 0, rand(1, 2.4), 0, 0.9, '#fff4c0', 0); }
+        else if (cl === 'druid') { P.poseOv = { act: 'cheer', prog: u }; once('cd', c0 + 0.15, () => { G.sfx('holy'); text(P, 'THE DEEP REMEMBERS', '#9ad0a0', true); }); if (Math.random() < dt * 22) { const a = rand(0, 6.28); gfx.emit(X + Math.cos(a) * 1.2, rand(0.1, 0.4), Z + Math.sin(a) * 1.2, -Math.sin(a) * 1.5, rand(1.5, 3), Math.cos(a) * 1.5, 1.1, ['#7fd68a', '#c0e070', '#5a9a40'][Math.floor(rand(0, 3))], 0); } } } }
     if (m.t > IMP + (m.f.parade ? Math.max(def.tail || 2.3, 3.1) : (def.tail || 2.3))) { P.poseOv = null; P.moving = false; if (m.f.pHead && m.f.pHead.parent) m.f.pHead.parent.remove(m.f.pHead); (m.f.dogs || []).forEach(b => sc.remove(b.root)); phase = 'ko'; phaseT = 0.35; }
   }
 
@@ -1189,11 +1198,11 @@
     if (arena.cineWall) arena.cineWall(phase === 'mortal' && !!M);       // the kill is filmed from inside the pit, so the open side gets its wall for as long as it lasts
     if (phase === 'mortal' && M) {                         // close orbiting camera for the kill
       // the kill is filmed from the side, so killer and victim are both in profile and neither hides the other; of the two sides, the one nearer the middle of the pit
-      const e = M.e, k = Math.min(1, M.t / 1.2), ex = e.x / S, ez = e.y / S, px = P.x / S, pz = P.y / S, mx = ex * 0.6 + px * 0.4, mz = ez * 0.6 + pz * 0.4;
+      const e = M.e, k = Math.min(1, M.t / 1.2), ex = e.x / S, ez = e.y / S, px = P.x / S, pz = P.y / S; M.cw = (M.cw || 0.4) + ((M.f && M.f.celeb !== undefined ? 0.88 : 0.4) - (M.cw || 0.4)) * Math.min(1, (syncDt || 0) * 3); const mx = ex * (1 - M.cw) + px * M.cw, mz = ez * (1 - M.cw) + pz * M.cw;
       const la = Math.hypot(px - ex, pz - ez) > 0.4 ? Math.atan2(pz - ez, px - ex) : M.a + Math.PI;
       if (M.cs == null) { const c1 = Math.hypot(mx + Math.cos(la + 1.3) * 5, mz + Math.sin(la + 1.3) * 5), c2 = Math.hypot(mx + Math.cos(la - 1.3) * 5, mz + Math.sin(la - 1.3) * 5); M.cs = c1 <= c2 ? 1 : -1; }
       const want = la + M.cs * (1.3 - Math.min(0.5, M.t * 0.14)); if (M.cth == null) M.cth = want; else { const dd = Math.atan2(Math.sin(want - M.cth), Math.cos(want - M.cth)); M.cth += dd * Math.min(1, (syncDt || 0) * 2.6); }
-      const r = G.lerp(6.2, 4.7, k) + Math.max(0, M.t - 1.7) * 1.0, pos = [mx + Math.cos(M.cth) * r, G.lerp(1.5, 2.3, k) + Math.max(0, M.t - 1.2) * 0.7, mz + Math.sin(M.cth) * r];
+      const r = Math.min(M.cw > 0.6 ? 5.0 : 99, G.lerp(6.2, 4.7, k) + Math.max(0, M.t - 1.7) * 1.0), pos = [mx + Math.cos(M.cth) * r, G.lerp(1.5, 2.3, k) + Math.max(0, M.t - 1.2) * 0.7, mz + Math.sin(M.cth) * r];
       const pl = Math.hypot(pos[0], pos[2]); if (pl > 6.8) { pos[0] *= 6.8 / pl; pos[2] *= 6.8 / pl; }
       [P, e].forEach(q => { const dx = pos[0] - q.x / S, dz = pos[2] - q.y / S, d = Math.hypot(dx, dz) || 0.01; if (d < 3.2) { pos[0] = q.x / S + dx / d * 3.2; pos[2] = q.y / S + dz / d * 3.2; } });
       if (M.cp) { const f2 = Math.min(1, (syncDt || 0) * 7); pos[0] = M.cp[0] + (pos[0] - M.cp[0]) * f2; pos[1] = M.cp[1] + (pos[1] - M.cp[1]) * f2; pos[2] = M.cp[2] + (pos[2] - M.cp[2]) * f2; } M.cp = pos.slice();
