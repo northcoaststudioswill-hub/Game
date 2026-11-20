@@ -29,6 +29,7 @@
     if (preview && preview.root.parent) preview.root.parent.remove(preview.root);
     preview = G.makeChar(look); preview.root.position.set(0, 0, 0); a.scene.add(preview.root); if (showOff) showT = T;
   };
+  G.clearPreview = () => { if (preview) { preview.root.parent && preview.root.parent.remove(preview.root); preview = null; previewKey = ''; } };       // a bout never starts with the builder's figure still standing in the middle of the sand
   function leaveSpecial() {
     if (G.titleChars && G.scene !== 'title') G.titleChars.forEach(c => c.root.visible = false);
     if (preview && G.scene !== 'create') { preview.root.parent && preview.root.parent.remove(preview.root); preview = null; previewKey = ''; const a = W.cache.arena; if (a && a.flash) a.flash.intensity = 0; }

@@ -18,7 +18,7 @@
 
   function makeEntity(h, d, look, isPlayer) {
     const C = G.CLASSES[h.cls];
-    return {
+    const e = {
       isPlayer, name: h.name, cls: h.cls, C, look, stats: h.stats, level: h.level, d,
       x: isPlayer ? (gfx.portrait ? 105 : -150) : (gfx.portrait ? -105 : 150), y: isPlayer ? (gfx.portrait ? 105 : 150) : (gfx.portrait ? -105 : -150), z: 0, kx: 0, ky: 0, aim: isPlayer ? (gfx.portrait ? -2.36 : -0.78) : (gfx.portrait ? 0.78 : 2.36),
       hp: d.maxHp, maxHp: d.maxHp, res: 100, shield: 0,
@@ -27,9 +27,11 @@
       intent: { mx: 0, my: 0, aim: 0, pt: { x: 0, y: 0 }, attack: false, queue: [] }, buf: null,
       potions: 0, ai: null, think: 0.6, strafe: 1, strafeT: 1, combo: 0, lastSeen: { x: 0, y: 0 }, auraT: 0, dmgDealt: 0, vis: null
     };
+    e.intent.aim = e.aim; e.intent.pt.x = e.x + Math.cos(e.aim) * 200; e.intent.pt.y = e.y + Math.sin(e.aim) * 200;       // the walk-in copies the intended aim onto the body, so it has to start facing the foe, not due east
+    return e;
   }
 
-  F.start = function (o) { hazT = 0; haz.length = 0; { const ar = G.world.get('arena'); if (ar.remains) ar.remains(o && (o.spar || o.garden) ? 0 : Math.random() < 0.7 ? 2 + Math.floor(Math.random() * 6) : 0); }
+  F.start = function (o) { if (G.clearPreview) G.clearPreview(); if (G.titleChars) G.titleChars.forEach(c => c.root.visible = false); hazT = 0; haz.length = 0; { const ar = G.world.get('arena'); if (ar.remains) ar.remains(o && (o.spar || o.garden) ? 0 : Math.random() < 0.7 ? 2 + Math.floor(Math.random() * 6) : 0); }
     opp = o; const st = G.state, h = st.hero;
     arena = G.world.get('arena'); sc = arena.scene; gfx.setScene(sc);
     if (F.P) [F.P, F.E].forEach(e => { if (e.vis) { sc.remove(e.vis.g); if (e.vis.tele) sc.remove(e.vis.tele); } });
@@ -387,6 +389,14 @@
     phase = 'mortal'; hitstop = 0.3; shake = 10; result = { win: true };
     G.ui.banner('Mortal Blow', M.name, 'win mortal'); G.sfx('bell'); G.sfx('crowd');
   }
+  // two bodies are about 32 across: a finisher may close in, but the killer stops at arm's length of a standing or reeling
+  // victim instead of walking into them. Only the finishers that are about contact (a grab, a stomp, a mouth) come closer,
+  // and a body already on the ground is left to the finisher.
+  const CONTACT = { drain: 1, strangle: 1, ninefloors: 1, liftzero: 1, curb: 1, stomp: 1, devour: 1, spiderfeast: 1, facestuck: 1, cocoon: 1, tear: 1, pack: 1, hounds: 1, onbreath: 1 };
+  function spaceBodies(m) { const e = m.e; if (!e || !P || CONTACT[m.k] || m.def.close || e.state === 'ko' || e.crawl || (P.z || 0) > 4 || (e.z || 0) > 4) return;
+    const po = e.poseOv && e.poseOv.act, low = po === 'kneel' || po === 'sit' || po === 'ko', min = po === 'ko' ? 0 : low ? 32 : 40; if (!min) return;
+    let dx = P.x - e.x, dy = P.y - e.y, d = Math.hypot(dx, dy); if (d >= min) return; if (d < 0.5) { dx = -Math.cos(m.a); dy = -Math.sin(m.a); d = 1; }
+    P.x = e.x + dx / d * min; P.y = e.y + dy / d * min; }
   const pick3 = a => a[Math.floor(Math.random() * a.length)];
   function mortalStep(dt) {
     const m = M, e = m.e, cls = P.cls, def = m.def, k = m.k, IMP = def.imp || 1.2, cast = def.cast != null ? def.cast : (cls === 'sorcerer' || cls === 'cleric'); m.t += dt;
@@ -1344,7 +1354,7 @@
       if (!G.debugAuto && E.state === 'idle' && !E.st.stun && E.hp > E.maxHp * 0.5 && (P.st.broken || (Math.hypot(P.x - E.x, P.y - E.y) > 300 && Math.random() < dt * 0.04))) taunt(E);
     } else { P.intent.mx = P.intent.my = E.intent.mx = E.intent.my = 0; P.intent.attack = E.intent.attack = false; P.intent.queue.length = E.intent.queue.length = 0; }
     updateEntity(P, dt); updateEntity(E, dt);
-    if (phase === 'mortal') mortalStep(dt);
+    if (phase === 'mortal') { mortalStep(dt); if (M) spaceBodies(M); }
 
     for (let i = projs.length - 1; i >= 0; i--) {
       const p = projs[i]; if (!p) break; p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt;
