@@ -139,6 +139,9 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
 #shop .imp button{flex:none;font-family:var(--display);font-size:16px;letter-spacing:.04em;padding:5px 12px;border-radius:10px;border:3px solid var(--cyan);background:var(--grape);color:var(--paper)}#shop .imp button:disabled{opacity:.45}
 #scan{position:absolute;inset:0;pointer-events:none;display:none;background:repeating-linear-gradient(0deg,rgba(64,255,144,.07) 0 2px,transparent 2px 5px);box-shadow:inset 0 0 140px rgba(25,227,255,.28)}
 #app.cyber #scan{display:block}
+#app.sim #scan{display:block;background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 3px);box-shadow:inset 0 0 220px rgba(0,0,0,.95)}
+#simhud{position:absolute;left:50%;translate:-50% 0;top:calc(var(--gt) + 96px);font-family:var(--display);font-size:16px;letter-spacing:.05em;color:#c8c6d8;white-space:nowrap;pointer-events:none}
+@media (max-width:640px){#simhud{top:auto;bottom:calc(var(--gb) + 150px);font-size:14px}}
 @media (max-width:640px){#slopx{top:auto;bottom:calc(var(--gb) + 150px)}}
 #app.cine #shop,#app.cine #bPose{display:none}
 #r1k{position:absolute;left:0;right:0;top:calc(var(--gt) + 58px);text-align:center;pointer-events:none;font-family:var(--display);z-index:3}
@@ -200,6 +203,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
     <button id="bJump" class="pad">JUMP</button>
     <button id="bTalk" hidden></button>
     <div id="bigmsg"></div>
+    <div id="simhud" class="chip" hidden>🌀</div>
     <div id="r1k" hidden><b id="r1kn">ROT x1</b><i>the filter is gone</i></div>
     <button id="bPose" aria-label="Strike a pose">😎</button>
     <button id="slopx" class="chip" hidden>🚪 LEAVE MAP</button>
@@ -276,10 +280,11 @@ const AREAS=[
   {id:'chrome',x:-96,z:140,r:18,base:2,name:'CHROME ALLEY',sub:'unlicensed upgrades · no refunds',hue:.55,lit:.28,col:[.62,.3,.18]},
   {id:'aura',x:60,z:-118,r:16,base:5,name:'THE AURA FARM',sub:'pose responsibly',hue:.13,lit:.7,col:[.13,.7,.55]},
   {id:'fringe',x:-36,z:-92,r:14,base:3,name:'THE FRINGE',sub:'where the algorithm does not look',hue:.8,lit:.22,col:[.8,.25,.18]},
-  {id:'mirror',x:-96,z:24,r:16,base:2,name:'THE SMART HOME',sub:'everything is connected · please rate your experience',hue:.58,lit:.82,col:[.58,.08,.86]}];
+  {id:'mirror',x:-96,z:24,r:16,base:2,name:'THE SMART HOME',sub:'everything is connected · please rate your experience',hue:.58,lit:.82,col:[.58,.08,.86]},
+  {id:'cue',x:150,z:120,r:13,base:4,name:'THE CUE-ANON SHRINE',sub:'trust the plan · the plan is a PDF',hue:.12,lit:.35,col:[.1,.4,.3]}];
 const ABY={};AREAS.forEach(a=>ABY[a.id]=a);
 function aw(a,x,z){const d=Math.hypot(x-a.x,z-a.z);return smooth(1-clamp((d-a.r*.7)/(a.r*.6)));}
-const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26},slop:{hue:.78,lit:.42}};
+const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26},slop:{hue:.78,lit:.42},sim:{hue:.7,lit:.06}};
 function zw(i,x,z){const zn=ZONES[i],d=Math.hypot(x-zn.x,z-zn.z);return smooth(1-clamp((d-ZR*.55)/(ZR*.85)));}
 function groundH(x,z){
   let h=(fbm(x*.011+5.3,z*.011+9.1)-.5)*52+(fbm(x*.045+2,z*.045+7)-.5)*8;
@@ -568,7 +573,7 @@ const SFX={jump:()=>tone(280,.16,'square',.1,0,620),jump2:()=>tone(420,.18,'squa
 const THEMES={hub:{bpm:132,root:57,sc:[0,2,4,7,9],lw:'square'},wild:{bpm:128,root:55,sc:[0,2,4,7,9],lw:'square'},grok:{bpm:116,root:45,sc:[0,3,5,6,7,10],lw:'sawtooth'},
   fable:{bpm:124,root:62,sc:[0,2,3,5,7,8,10],lw:'triangle'},astra:{bpm:104,root:64,sc:[0,2,4,6,7,9,11],lw:'sine'},boss:{bpm:170,root:40,sc:[0,1,3,5,6,8,10],lw:'sawtooth'},
   sunkeep:{bpm:112,root:60,sc:[0,2,4,5,7,9,11],lw:'triangle'},flow:{bpm:122,root:52,sc:[0,3,5,7,10],lw:'square'},clank:{bpm:150,root:41,sc:[0,1,3,6,7,10],lw:'sawtooth'},hour:{bpm:90,root:65,sc:[0,2,3,7,8],lw:'sine'},press:{bpm:132,root:57,sc:[0,2,4,7,9],lw:'square'},
-  fac:{bpm:140,root:48,sc:[0,3,5,7,10],lw:'square'},chrome:{bpm:118,root:45,sc:[0,2,3,5,7,8,10],lw:'sawtooth'},aura:{bpm:100,root:60,sc:[0,4,7,9,11],lw:'triangle'},fringe:{bpm:84,root:43,sc:[0,1,5,6,8],lw:'sawtooth'},mirror:{bpm:72,root:52,sc:[0,2,3,7,8],lw:'sine'},slop:{bpm:155,root:50,sc:[0,1,4,5,7,8,11],lw:'square'},r1k:{bpm:240,root:44,sc:[0,1,3,6,7,10],lw:'sawtooth'}};
+  fac:{bpm:140,root:48,sc:[0,3,5,7,10],lw:'square'},chrome:{bpm:118,root:45,sc:[0,2,3,5,7,8,10],lw:'sawtooth'},aura:{bpm:100,root:60,sc:[0,4,7,9,11],lw:'triangle'},fringe:{bpm:84,root:43,sc:[0,1,5,6,8],lw:'sawtooth'},mirror:{bpm:72,root:52,sc:[0,2,3,7,8],lw:'sine'},slop:{bpm:155,root:50,sc:[0,1,4,5,7,8,11],lw:'square'},r1k:{bpm:240,root:44,sc:[0,1,3,6,7,10],lw:'sawtooth'},cue:{bpm:96,root:50,sc:[0,1,5,7,8],lw:'triangle'},sim:{bpm:60,root:36,sc:[0,1,6,7],lw:'sine'}};
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 function music(){if(!AU.ctx||AU.muted||S.mode==='title')return;const now=AU.ctx.currentTime;if(AU.next<now-.5)AU.next=now+.05;
   while(AU.next<now+.14){const th=THEMES[AU.theme]||THEMES.hub,s=AU.step%16,bar=Math.floor(AU.step/16),t=AU.next,prog=[0,3,4,2][bar%4],sc=th.sc;
@@ -781,7 +786,7 @@ function updatePlayer(dt,active){if(VAN.driving){if(PL.cd>0)PL.cd-=dt;if(PL.inv>
   PL.x=nx;PL.z=nz;
   if(active&&inp.jump){if(PL.grounded||PL.jumps<(X.tj?3:2)){PL.vy=(PL.jumps?14.5:15.5)*(X.imp.includes('knees')?1.12:1);PL.jumps++;PL.grounded=false;(PL.jumps>1?SFX.jump2:SFX.jump)();burst(PL.x,PL.y+.3,PL.z,PL.jumps>1?16:8,null,5,1,.4);PL.squash=.25;}}
   inp.jump=false;
-  PL.air=PL.grounded?0:PL.air+dt;PL.flying=active&&inp.jh&&!PL.grounded&&PL.fuel>0&&PL.air>.2&&!S.inSlop;if(PL.flying){PL.vy=Math.min(13,PL.vy+100*dt);PL.fuel-=dt;flyFx(dt);}else if(PL.grounded)PL.fuel=Math.min(fuelMax(),PL.fuel+dt*2.4);
+  PL.air=PL.grounded?0:PL.air+dt;PL.flying=active&&inp.jh&&!PL.grounded&&PL.fuel>0&&PL.air>.2&&!S.inSlop&&!S.inSim&&!jamFly();if(PL.flying){PL.vy=Math.min(13,PL.vy+100*dt);PL.fuel-=dt;flyFx(dt);}else if(PL.grounded)PL.fuel=Math.min(fuelMax(),PL.fuel+dt*2.4);
   PL.vy-=(CH.id==='grav'?11:40)*dt;PL.y+=PL.vy*dt;const gy=surfaceY(PL.x,PL.z,prevY);
   if(PL.y<=gy){if(!PL.grounded&&PL.vy<-14){SFX.land();PL.squash=-.3;burst(PL.x,gy+.2,PL.z,8,null,5,1,.35);}PL.y=gy;PL.vy=0;PL.grounded=true;PL.jumps=0;}
   else if(PL.grounded&&PL.vy<=0&&PL.y-gy<1.3){PL.y=gy;PL.vy=0;}else PL.grounded=false;
@@ -817,14 +822,14 @@ function updatePickups(){pages.forEach((p,i)=>{if(S.pages[i])return;p.m.rotation
     if(Math.hypot(PL.x-r.x,PL.z-r.z)<3&&Math.abs(PL.y+1.5-r.g.position.y)<4.5)takeRelic(id);});}
 const TOASTS=['🏆 ACHIEVEMENT: Walked','🏆 ACHIEVEMENT: Blinked manually','📈 Engagement up 0.0001%','Fun fact: this fact was hallucinated','🔥 Hot single GPUs in your area','Your free trial of legs expires in 3 days','Tip: you cannot pause the brain rot','🏆 ACHIEVEMENT: Read a toast','Rate this game 5 stars to continue having knees','Tip: the fingers are not load-bearing','🤖 "Great question!" — nobody asked','New skin unlocked: the same skin','Reminder: drink water. Or don\'t. I\'m a toast.','📉 Your aura dipped. Just kidding. Or am I.'];
 let toastT=14;
-function updateZone(dt){let z='wild';const dh=Math.hypot(PL.x,PL.z);if(S.inBoss)z='boss';else if(S.inSlop)z='slop';else if(dh<30)z='hub';else{for(const Z of ZONES)if(Math.hypot(PL.x-Z.x,PL.z-Z.z)<ZR*.95)z=Z.id;for(const a of AREAS)if(Math.hypot(PL.x-a.x,PL.z-a.z)<a.r*1.05)z=a.id;}
-  if(z!==S.zone){S.zone=z;AU.theme=z;if(z==='hub')zoneCard('PROMPT PLAZA','population: 3 chatbots and you');else if(z==='boss')zoneCard('THE FOR-YOU PAGE','final boss · do not scroll');else if(z==='slop')zoneCard(SM.name,'map_generated_'+SM.seed+'.level · playable? unconfirmed');else if(ZBY[z])zoneCard(ZBY[z].name,ZBY[z].sub);else if(ABY[z])zoneCard(ABY[z].name,ABY[z].sub);}
+function updateZone(dt){let z='wild';const dh=Math.hypot(PL.x,PL.z);if(S.inBoss)z='boss';else if(S.inSlop)z='slop';else if(S.inSim)z='sim';else if(dh<30)z='hub';else{for(const Z of ZONES)if(Math.hypot(PL.x-Z.x,PL.z-Z.z)<ZR*.95)z=Z.id;for(const a of AREAS)if(Math.hypot(PL.x-a.x,PL.z-a.z)<a.r*1.05)z=a.id;}
+  if(z!==S.zone){S.zone=z;AU.theme=z;if(z==='hub')zoneCard('PROMPT PLAZA','population: 3 chatbots and you');else if(z==='boss')zoneCard('THE FOR-YOU PAGE','final boss · do not scroll');else if(z==='sim')zoneCard('THE SIMULATION SPACE','it is eating you from the inside out');else if(z==='slop')zoneCard(SM.name,'map_generated_'+SM.seed+'.level · playable? unconfirmed');else if(ZBY[z])zoneCard(ZBY[z].name,ZBY[z].sub);else if(ABY[z])zoneCard(ABY[z].name,ABY[z].sub);}
   toastT-=dt;if(toastT<=0){toastT=16+Math.random()*14;toast(pick(TOASTS));}
   // interaction target
-  interact=null;if(!S.inBoss&&!S.inSlop){for(const id in mascots){const m=mascots[id];if(Math.hypot(PL.x-m.x,PL.z-m.z)<6.5){interact={label:'💬 YAP WITH '+m.name,fn:()=>{const hint=!S.relics[id]?[[id,id==='grok'?'RELIC IN OHIO. FOLLOW ARROW. BLAST THINGS.':id==='fable'?'My pages are scattered across the Delve Woods. Each has a helpful beam of light. You\'re welcome!':'✨ nebula is behind the plaza. jump twice. the second jump is free ✨']]:[];say([[id,pick(YAP[id])[0]]].concat(hint));}};}}
+  interact=null;if(!S.inBoss&&!S.inSlop&&!S.inSim){for(const id in mascots){const m=mascots[id];if(Math.hypot(PL.x-m.x,PL.z-m.z)<6.5){interact={label:'💬 YAP WITH '+m.name,fn:()=>{const hint=!S.relics[id]?[[id,id==='grok'?'RELIC IN OHIO. FOLLOW ARROW. BLAST THINGS.':id==='fable'?'My pages are scattered across the Delve Woods. Each has a helpful beam of light. You\'re welcome!':'✨ nebula is behind the plaza. jump twice. the second jump is free ✨']]:[];say([[id,pick(YAP[id])[0]]].concat(hint));}};}}
     if(Math.hypot(PL.x-portal.x,PL.z-portal.z)<6)interact=portal.open?{label:'🌀 ENTER THE FOR-YOU PAGE',fn:enterBoss}:{label:'🔒 NEEDS 3 RELICS',fn:()=>{toast('The portal wants all 3 relics. It is very needy.');SFX.hit();}};
     if(Math.hypot(PL.x-throne.x,PL.z-throne.z)<5)interact={label:'🚽 SIT ON THE THRONE',fn:()=>{addAura(1,PL.x,PL.y+3,PL.z);toast(pick(['You sat. Nothing happened. +1 aura.','The throne is cold. +1 aura.','You feel exactly the same. +1 aura.']));SFX.orb(3);}};}
-  if(!S.inBoss&&!S.inSlop){const xi=xInteract();if(xi)interact=xi;}
+  if(!S.inBoss&&!S.inSlop&&!S.inSim){const xi=xInteract();if(xi)interact=xi;}
   const b=$('bTalk');if(interact){if(b.hidden||hudCache.talk!==interact.label){b.hidden=false;b.textContent=interact.label+(app.classList.contains('touchy')?'':'  [E]');hudCache.talk=interact.label;}}else if(!b.hidden)b.hidden=true;}
 function doInteract(){if(S.mode==='play'&&interact&&!S.dead)interact.fn();}
 $('bTalk').addEventListener('click',doInteract);
@@ -888,7 +893,7 @@ padBtn($('bJump'),()=>{if(S.mode==='dialog')advance();else{inp.jump=true;inp.jh=
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
 /* ================= THE CROSSOVER: the North Coast cast wanders in ================= */
-const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0}});
+const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,drops:[],pins:0,files:[],sim:0,slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0}});
 Object.assign(X,X0());
 const XQ=['mission','flow','erin','clank','hour','lantern','cloud','bud','spr','frag','s67'];
 const shards=()=>(X.flow>=4)+(X.erin>=3)+(X.clank>=3)+(X.hour>=2);
@@ -1588,7 +1593,7 @@ function rotUpdate(dt,play){if(S.snack>0)S.snack-=dt;if(ROT.btn>0)ROT.btn-=dt;
   if(ROT.beat>0){ROT.beat-=dt;AU.theme='boss';ROT.lyr-=dt;if(ROT.lyr<=0){ROT.lyr=1.4;bubble(pick(LYRICS),BOT.x,BOT.y+7,BOT.z);}if(ROT.beat<=0)AU.theme=S.zone;}
   if(ROT.adT>0){ROT.adT-=dt;if(ROT.adT<=0)$('ad').hidden=true;}
   if(!play||S.inBoss){if(!$('ad').hidden&&S.inBoss)$('ad').hidden=true;return;}
-  if(!S.inSlop)rotMoments();if(S.mode!=='play')return;
+  if(!S.inSlop&&!S.inSim)rotMoments();if(S.mode!=='play')return;
   if(X.louie&&ROT.btn<=0&&Math.hypot(LOU.x-BTN.x,LOU.z-BTN.z)<13&&Math.hypot(PL.x-BTN.x,PL.z-BTN.z)<12){pressButton(true);return;}
   ROT.bark-=dt;if(ROT.bark<=0){ROT.bark=3.5+Math.random()*4;let best=null,bd=26;for(const id in npcs){const n=npcs[id],d=Math.hypot(PL.x-n.x,PL.z-n.z);if(d<bd){bd=d;best=n;}}
     if(best)bubble(pick(BARK[best.id]),best.x,best.y+6,best.z);else if(Math.hypot(PL.x-VAN.x,PL.z-VAN.z)<22&&!VAN.driving)bubble(pick(BARK2.derek),VAN.x,VAN.y+6.5,VAN.z);
@@ -1714,7 +1719,7 @@ function skyUpdate(dt,play){
     if(hit||onBoss||p.life<=0){p.life=0;p.s.visible=false;burst(q.x,q.y+.3,q.z,5,.07,5,3,.4);if(onBoss)hitBoss(q);
       for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(Math.hypot(e.x-q.x,e.z-q.z)<3&&Math.abs(e.y-q.y)<3.6){X.c.pk=(X.c.pk||0)+1;floatText('💩 DIRECT HIT',e.x,e.y+4,e.z,'#e0a050');damageEnemy(e,1);}}}}
   const fm=fuelMax();if(PL.fuel>fm)PL.fuel=fm;const show=PL.fuel<fm-.05&&fm<50,n=Math.ceil(clamp(PL.fuel/fm)*5),t=show?'💩'+'▮'.repeat(n)+'▯'.repeat(5-n):'';if(hudCache.fuel!==t){hudCache.fuel=t;$('fuel').hidden=!show;$('fuel').textContent=t;}
-  pGroup.rotation.x=lerp(pGroup.rotation.x,PL.flying?.6:0,Math.min(1,dt*8));if(PL.y>260&&PL.vy>0&&!S.inSlop)PL.vy=0;
+  pGroup.rotation.x=lerp(pGroup.rotation.x,PL.flying?.6:0,Math.min(1,dt*8));if(PL.y>260&&PL.vy>0&&!S.inSlop&&!S.inSim)PL.vy=0;
   if(PL.flying&&!PO.hint){PO.hint=true;toast('💩 You are flying. Keep holding JUMP. Land to refuel. Anything underneath you is having a bad day.');}
   T67.forEach((t,i)=>{if(!t.s.visible)return;t.s.position.y=t.y+Math.sin(S.t*2.2+i)*.4;t.s.material.rotation=Math.sin(S.t*3)*.12;
     if(play&&Math.abs(PL.x-t.x)<3.4&&Math.abs(PL.z-t.z)<3.4&&Math.abs(PL.y+1.6-t.y)<3.6){X.t67.push(i);t.s.visible=false;addAura(670,t.x,t.y,t.z);SFX.orb(X.t67.length);floatText('6 7',t.x,t.y+2,t.z,'#ffd400');burst(t.x,t.y,t.z,20,.13,10,5,.7);hudCache.q=null;save();
@@ -2230,6 +2235,132 @@ ACH.push(['r1k','ROT x1000','survived the unfiltered rot and touched the last gr
   R1K.tst-=dt;if(R1K.tst<=0){R1K.tst=1.6;toast(pick(Math.random()<.5?CHAT:ADS));if(Math.random()<.25)showAd();tone(100+Math.random()*900,.08,pick(['square','sawtooth']),.05);}};}
 
 
+/* ================= ACT 12: THE RED STRING ARC. drops, the path up, the island, the simulation ================= */
+const SHR=ABY.cue,B0=groundH(SHR.x,SHR.z),ISC={x:150,z:96},RS={plats:[],cp:[],t:0},ISL={files:[],cuts:[],objs:[]},JAM={msg:0};
+CAST.deb={coat:0xc85a8a,dress:1,legs:0x3c4a66,hair:0xe0c070,bun:1,extra:[pt(Cone(.42,.9,6),0xd8dce6,M(0,1.75,0))]};
+CAST.fol={coat:0x6a6a7a,legs:0x3c4a66,hair:0x5a4a3a,extra:[pt(Cone(.42,.9,6),0xd8dce6,M(0,1.75,0))]};
+BARK.deb=['trust the plan.','the storm is coming (light drizzle)','I\'m just asking questions.','do your own research (not too much)','C posted again!!','we are regular people. in hats.'];
+SPEAK.c={name:'C (ANONYMOUS)',face:'📜',pitch:140,wave:'square'};SPEAK.file={name:'CLASSIFIED',face:'🗂️',pitch:90,wave:'square'};
+HATS.push(['📡','Tinfoil Antenna',1]);
+CHAT.push('📱 DEB: C POSTED. "Tuesday is coming." WHAT DOES IT MEAN','📱 CONSPIRACY CARL: deb that is just a day','📱 DEB: that is exactly what they want you to think carl','📱 GROK: GROK READ ALL DROPS. GROK UNDERSTAND NOTHING. GROK BELIEVE.');
+ADS.push('📜 New drop just posted. Nobody understands it. Share it anyway.','🧵 Red string, 500 metres, bulk discount','📡 Signal jammed? Try a bigger hat.');
+// ---- the shrine of C
+(function(){const c=SHR,y=B0;const ped=new THREE.Mesh(merge([pt(Cyl(3.2,3.6,1.2,10),0x2a2018,M(0,.6,0)),pt(Box(1.6,.9,1),0x1a1a1a,M(0,1.65,2.2)),pt(Box(1.5,.08,1.1),0x9ffcff,M(0,2.25,2.1,-.5))]),lam);ped.position.set(c.x,y,c.z);scene.add(ped);
+  const C=new THREE.Mesh(new THREE.TorusGeometry(3.2,.7,12,40,Math.PI*1.55),new THREE.MeshBasicMaterial({color:0xffd400}));C.position.set(c.x,y+6.2,c.z);C.rotation.z=Math.PI*.22;scene.add(C);SHR.C=C;colliders.push({x:c.x,z:c.z,r:3.4,top:y+1.2});platforms.push({x:c.x,z:c.z,r:3.2,top:y+1.2});
+  const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:dot,color:0xffd400,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));gl.scale.set(18,18,1);gl.position.copy(C.position);scene.add(gl);
+  for(let k=0;k<8;k++){const a=k/8*TAU,s=emojiSprite('🕯️',1);s.position.set(c.x+Math.cos(a)*4.4,y+1.6,c.z+Math.sin(a)*4.4);scene.add(s);}
+  ['TRUST THE PLAN','THE STORM IS COMING (light drizzle)','DO YOUR OWN RESEARCH (NOT TOO MUCH)','THE PLAN IS A PDF','C IS NOT A BOT (probably)'].forEach((t,k)=>{const s=textSprite(t,1,{color:['#ffd400','#c8a8ff','#ffffff','#ff9ecf','#9ffcff'][k]}),a=k/5*TAU+.4;s.position.set(c.x+Math.cos(a)*10,y+4+k%2*2,c.z+Math.sin(a)*10);scene.add(s);});
+  SHR.fol=[];const fg=personGeo(CAST.fol);for(let k=0;k<4;k++){const m=new THREE.Mesh(fg,lam),a=k/4*TAU+.8;m.scale.setScalar(2.2);m.position.set(c.x+Math.cos(a)*7,groundH(c.x+Math.cos(a)*7,c.z+Math.sin(a)*7),c.z+Math.sin(a)*7);m.rotation.y=Math.atan2(c.x-m.position.x,c.z-m.position.z);scene.add(m);SHR.fol.push(m);}
+  addNpc('deb','DEB (FROM THE GROUP)','📢',380,'triangle',c.x+5,c.z-6,0,{col:'#ff9ecf',full:'DEB (FROM THE GROUP)'});
+  SHR.pins=[0,1,2].map(k=>{const x=c.x-7+k*3.5,z=c.z-11,p=new THREE.Mesh(merge([pt(Cyl(.15,.15,2.2,6),0x8a6a3a,M(0,1.1,0)),pt(Sph(.4,8,6),0xe01020,M(0,2.3,0))]),lam);p.position.set(x,groundH(x,z),z);scene.add(p);const l=textSprite('📌 PIN #'+(k+1),.7,{color:'#ff6060'});l.position.set(x,groundH(x,z)+3.4,z);scene.add(l);return{x,z,l};});
+  sign(c.x-4,c.z-16,['THE CUE-ANON SHRINE','we are just asking questions'],Math.atan2(-c.x,-c.z),'#ffd400');
+  // 5G towers that jam flight near the island
+  for(let k=0;k<3;k++){const a=k/3*TAU+1,x=ISC.x+Math.cos(a)*30,z=ISC.z+Math.sin(a)*30,gy=groundH(x,z),t=new THREE.Mesh(merge([pt(Cyl(.3,.7,22,6),0x8a8f98,M(0,11,0)),pt(Box(1.6,.3,.3),0x8a8f98,M(0,19,0)),pt(Box(1.6,.3,.3),0x8a8f98,M(0,16,0))]),lam);t.position.set(x,gy,z);scene.add(t);colliders.push({x,z,r:.9,top:gy+22});
+    const l=new THREE.Mesh(Sph(.4,8,6),new THREE.MeshBasicMaterial({color:0xe01020}));l.position.set(x,gy+22.4,z);scene.add(l);(JAM.l=JAM.l||[]).push(l);const s=textSprite('📡 5G (JAMMING)',.8,{color:'#ff6060'});s.position.set(x,gy+24,z);scene.add(s);}})();
+// ---- the drops
+const DROPT=['Watch the water. Not that water. The other water.','17 + 50 = 67. Think about it. Then stop thinking about it.','Why does Derek only have one line? Who benefits?','The van is parked facing NORTH. Coincidence? (yes)','Count the fingers. Then count them again. Different? EXACTLY.','Tuesday is coming. Stock up on corn.',
+  'Follow the red string. Not that one. That one is a shoelace.','The Great Lantern was never cracked. It was REDACTED.','Grok knows. Ask him. He will say ROCK. That is a code.','The birds are listening. The frogs are judging. Choose wisely.','Bottie\'s loading bar has been at 99% for two years. What is in the last 1%?','Look up. Further. Further. Not that far. There.',
+  'The storm is coming. Forecast: light drizzle.','The Council meets on an island. The island is in the sky. The sky is a JPEG.','This drop is disinformation. Or is it. (It is.)','Trust the plan. The plan is a PDF. The PDF is a 404.','You have all of them. Go to the shrine. Look UP. The red string goes all the way.'];
+const DROPS=[[ZBY.grok.x-30,ZBY.grok.z-34,44],[SK.x,SK.z,34],[CLOUDS[13].x,CLOUDS[13].z,CLOUDS[13].top-groundH(CLOUDS[13].x,CLOUDS[13].z)+2.4],[ISLE.a3.x,ISLE.a3.z,ISLE.a3.top-groundH(ISLE.a3.x,ISLE.a3.z)+2.4],[ISLE.b.x,ISLE.b.z,ISLE.b.top-groundH(ISLE.b.x,ISLE.b.z)+2.4],
+  [GV.x,GV.z,2.2],[VD.x,VD.z,2.2],[FM.x-6,FM.z-7,9.6],[FL.tub[0],FL.tub[2],5],[FROG.x+2.5,FROG.z,2.8],[CHR.x,CHR.z,13],[HG.x,HG.z,9],[CL.x,CL.z,CL.top-groundH(CL.x,CL.z)+2.4],[PR.x+4,PR.z+4,2.2],[COOK.mir.x+2,COOK.mir.z+2,9.5],[FR.x-9,FR.z+6,2.2],[TOP.x,TOP.z,TOP.y-groundH(TOP.x,TOP.z)+2.4]].map((q,i)=>{
+  const y=groundH(q[0],q[1])+q[2],s=emojiSprite('📜',2.2),l=textSprite('DROP #'+(i+1),.7,{color:'#ffd400'});s.position.set(q[0],y,q[1]);l.position.set(q[0],y+1.8,q[1]);scene.add(s,l);return{x:q[0],y,z:q[1],s,l};});
+function takeDrop(i){X.drops.push(i);const d=DROPS[i];d.s.visible=d.l.visible=false;SFX.page();addAura(670,d.x,d.y+2,d.z);burst(d.x,d.y,d.z,30,.14,10,6,.8);save();hudCache.q=null;
+  say([['c','DROP #'+(i+1)+' · '+DROPT[X.drops.length-1]]],()=>{if(X.drops.length>=17){redSync();flash(1,1200);SFX.win();say([['deb','ALL SEVENTEEN. Oh my god. Oh my god. The plan is real.'],['carl','(on the phone) Deb. Look up. LOOK UP.'],['sys','Above the shrine, where there was only sky, an island has decided to exist. The red string goes all the way up.']],()=>chapter('THE RED STRING ARC','the path goes up'));}});}
+// ---- the red string path
+(function(){const r=mulberry(1717);let a=Math.atan2(SHR.z-ISC.z,SHR.x-ISC.x),prev=null;const strMat=new THREE.MeshBasicMaterial({color:0xe01020}),cork=new THREE.MeshLambertMaterial({color:0xa0703a}),red=new THREE.MeshBasicMaterial({color:0x0a0a0a}),cab=new THREE.MeshLambertMaterial({color:0x8a8f98});
+  for(let i=0;i<34;i++){const rad=17+((i%3)-1)*1.2,x=ISC.x+Math.cos(a)*rad,z=ISC.z+Math.sin(a)*rad,top=B0+3+i*3.9,cp=i===9||i===18||i===27,kind=cp?'cp':(i>2&&i%5===0)?'red':(i>2&&i%7===3)?'move':'n',pr=cp?3.4:2.3;
+    const m=new THREE.Mesh(cp?new THREE.CylinderGeometry(pr,pr,1,20):new THREE.BoxGeometry(pr*1.6,1,pr*1.6),kind==='red'?red:kind==='move'?cab:cork);m.position.set(x,top-.5,z);m.rotation.y=-a;scene.add(m);
+    const P={x,z,ox:x,oz:z,r:pr,top,y0:top,kind,m,ph:i,ax:Math.cos(a),az:Math.sin(a)};platforms.push(P);RS.plats.push(P);if(cp){RS.cp.push(P);const l=textSprite('📌 PIN #'+RS.cp.length,.8,{color:'#ff6060'});l.position.set(x,top+2,z);scene.add(l);}
+    else if(kind==='red'){const l=textSprite('█████ (REDACTED)',.6,{color:'#ffffff'});l.position.set(x,top+1.6,z);scene.add(l);P.lab=l;}else if(r()<.3){const s=emojiSprite(pick(['📌','📎','🗞️','🔍','👁️']),.9);s.position.set(x,top+.6,z);scene.add(s);}
+    if(prev){const dx=x-prev.x,dy=top-prev.top,dz=z-prev.z,l=Math.hypot(dx,dy,dz),st=new THREE.Mesh(new THREE.BoxGeometry(.08,.08,l),strMat);st.position.set((x+prev.x)/2,(top+prev.top)/2-.4,(z+prev.z)/2);st.lookAt(x,top-.4,z);scene.add(st);}
+    prev=P;a+=.37+r()*.06;}
+  RS.topY=prev.top+3.4;
+  // the secret island
+  const y=RS.topY,g=new THREE.Group();g.position.set(ISC.x,y,ISC.z);scene.add(g);ISL.g=g;ISL.y=y;
+  g.add(new THREE.Mesh(merge([pt(Cyl(12,10.5,2,24),0x4a5a3a,M(0,-1,0)),pt(Cone(10,20,10),0x5a4a3a,M(0,-12,0,Math.PI)),pt(Box(6,3.4,4),0x5a5e66,M(-3,1.7,-5.5)),pt(Box(2,2.4,.2),0x111111,M(-3,1.2,-3.45))]),lam));
+  ISL.vault=new THREE.Mesh(new THREE.CylinderGeometry(1.8,1.8,.5,24),new THREE.MeshPhongMaterial({color:0x8a8f98,shininess:120}));ISL.vault.rotation.x=Math.PI/2;ISL.vault.position.set(0,2.1,0);g.add(ISL.vault);
+  const vl=textSprite(['THE VAULT','opens after 7 files'],.9,{color:'#ffd400'});vl.position.set(0,4.6,0);g.add(vl);ISL.vl=vl;const ts=textSprite(['TOP SECRET ISLAND','(do not tell anyone. we told everyone.)'],1.4,{color:'#ff6060'});ts.position.set(0,10,0);g.add(ts);
+  const fg=merge([pt(Box(1.1,2,1),0x6a6e76,M(0,1,0)),pt(Box(.5,.1,.06),0xd8d8d8,M(0,1.5,.52)),pt(Box(.5,.1,.06),0xd8d8d8,M(0,.9,.52))]);
+  for(let k=0;k<7;k++){const a2=k/7*TAU,m=new THREE.Mesh(fg,lam),x=Math.cos(a2)*7,z=Math.sin(a2)*7;m.position.set(x,0,z);m.rotation.y=Math.atan2(-x,-z);g.add(m);const s=emojiSprite('📁',.9);s.position.set(x,2.8,z);g.add(s);ISL.files.push({x:ISC.x+x,z:ISC.z+z,s});}
+  const NAMES=['SEN. GERALD CLAMPS','MINISTER OF TUESDAYS','GOV. VELVET WEXLER','CHANCELLOR BRICK DOORMAT','SECRETARY OF FINGERS','ADMIRAL OF THE COMMENTS','MAYOR OF OHIO (?)','COUNCILWOMAN PAM DORITO','LORD TREASURER OF VIBES','SPEAKER OF MUMBLING','THE VICE-DEPUTY'];
+  NAMES.forEach((n,k)=>{const a2=k/11*TAU+.15,x=Math.cos(a2)*10.4,z=Math.sin(a2)*10.4,m=new THREE.Mesh(personGeo({coat:0x1e2430,legs:0x1e2430,hair:[0xe0c070,0x2a1a10,0xd8d8d8,0x8a4a2a][k%4],extra:[pt(Box(.07,.34,.05),0xc8102e,M(0,.64,.25))]}),lam);m.scale.set(2.3,2.3,.4);m.position.set(x,0,z);m.rotation.y=Math.atan2(-x,-z);g.add(m);
+    const l=textSprite(n,.55,{color:'#ffffff',size:40});l.position.set(x,3.6,z);g.add(l);});
+  ISL.plat={x:ISC.x,z:ISC.z,r:11.6,top:-999};platforms.push(ISL.plat);ISL.col={x:ISC.x-3+0,z:ISC.z-5.5,r:3,top:-999};colliders.push(ISL.col);})();
+function redSync(){const on=X.drops.length>=17;ISL.g.visible=on;ISL.plat.top=on?ISL.y:-999;ISL.col.top=on?ISL.y+3.4:-999;DROPS.forEach((d,i)=>{d.s.visible=d.l.visible=!X.drops.includes(i);});ISL.files.forEach((f,i)=>{f.s.visible=!X.files.includes(i);});ISL.vault.material.color.setHex(X.files.length>=7?0xffd400:0x8a8f98);}
+function jamFly(){const j=!S.inSlop&&!S.inSim&&Math.hypot(PL.x-ISC.x,PL.z-ISC.z)<52&&PL.y>groundH(PL.x,PL.z)+6;if(j&&inp.jh&&S.t-JAM.msg>12){JAM.msg=S.t;toast('📡 SIGNAL JAMMED: no flying near the island. Deb says it is 5G. It is 5G.');}return j;}
+// ---- the classified files
+const COUNCIL=['SEN. GERALD CLAMPS','THE MINISTER OF TUESDAYS','GOV. VELVET WEXLER','THE FULL COUNCIL','THE SECRETARY OF FINGERS','THE ADMIRAL OF THE COMMENT SECTION','THE FULL COUNCIL (AGAIN)'];
+const FILES=['Voted to make every Monday 40 hours long. Has never personally attended a Monday. Owns three Fridays.','Sold the moon to a cereal company. The moon is now a JPEG. Carl was right about one thing. Do not tell Carl.','Replaced every bird with a drone, then forgot the password. The birds are just flying around now. Unsupervised. Judging.',
+  'Hid the last grass. On purpose. Touching grass was making the public far too reasonable.','Passed the Fingers Act: every hand must have "between 4 and 11" fingers. Astra was only ever following the law.','Invented the word "first". Has commented it 4,000,000 times. Has never once been first.',
+  'Built THE ALGORITHM to keep the rot at exactly 1x. Not to protect anyone. Rot at 1x is simply the most watchable amount of rot.'];
+function readFile(k){if(!X.files.includes(k)){X.files.push(k);addAura(2500,PL.x,PL.y+4,PL.z);}redSync();save();hudCache.q=null;
+  say([['file','📁 CLASSIFIED FILE '+(k+1)+'/7 · SUBJECT: '+COUNCIL[k]],['file',FILES[k]]].concat(X.files.length===7?[['sys','That is all seven. The vault in the middle of the island is glowing. It would like to be opened. It is very obvious about it.']]:[]));}
+function openVault(){if(X.files.length<7){toast('🔒 The vault wants all 7 files read first. It has standards. Low ones, but standards.');return;}
+  say([['sys','The vault opens. Inside is one last file, labelled THE LAST SECRET.'],['file','THE LAST SECRET: The Council of Eleven does not exist. Every file on this island was generated. Every drop. Every red string. The whole conspiracy was AI slop. It always was.'],
+    ['deb','(on the phone) ...So C was a bot?'],['carl','(on the phone) It was the birds. The birds are a bot. Everything is a bot.'],['sys','And now the simulation knows that you know. It is opening its mouth.']],simEnter);}
+// ---- the simulation space: it eats you from the inside out. slop is the way out.
+const SIM={b:900,cx:-40,cz:40,objs:[],gen:[],ch:6,rg:0,vy:0,t:0,exit:null,eaten:0};
+(function(){const cv=document.createElement('canvas');cv.width=cv.height=128;const g=cv.getContext('2d');for(let i=0;i<128;i++)for(let j=0;j<128;j++){const v=Math.floor(Math.random()*90);g.fillStyle='rgb('+v+','+v+','+v+')';g.fillRect(i,j,1,1);}
+  const t=new THREE.CanvasTexture(cv);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(30,30);SIM.void=new THREE.Mesh(new THREE.PlaneGeometry(500,500),new THREE.MeshBasicMaterial({map:t,transparent:true,opacity:.96,fog:false}));SIM.void.rotation.x=-Math.PI/2;SIM.void.visible=false;scene.add(SIM.void);SIM.vt=t;})();
+const GENL=['prompt: "floor"','a platform, 4k','stairs but wrong','something to stand on (trending)','slop.png','floor (AI generated)','ground? (hallucinated)','platform_final_FINAL'];
+function simAdd(o){scene.add(o);SIM.objs.push(o);return o;}
+function simPlat(x,y,z,r,o){o=o||{};const geo=Math.random()<.5?new THREE.BoxGeometry(r*1.6,1,r*1.6):new THREE.CylinderGeometry(r,r*.7,1,pick([3,4,5,6,8,20])),m=simAdd(new THREE.Mesh(geo,o.mat||pick([rainbowMat,normalMat,MATS.ck,pick(MATS.plain)])));m.userData.own=1;m.position.set(x,y-.5,z);m.rotation.y=Math.random()*TAU;
+  const P={x,z,r:r*.95,top:y,sim:true,m,life:o.life||0};platforms.push(P);if(o.label){const l=simAdd(textSprite(o.label,.6,{color:'#ffffff',size:40}));l.userData.tex=1;l.position.set(x,y+1.5,z);P.lab=l;}return P;}
+function simGen(){if(SIM.ch<1){floatText('OUT OF SLOP · wait',PL.x,PL.y+4,PL.z,'#c8c6d8');tone(150,.1,'square',.06);return;}SIM.ch-=1;let x,y,z;
+  if(!PL.grounded&&PL.vy<3){x=PL.x;z=PL.z;y=PL.y-.6;}else{x=PL.x+Math.sin(PL.face)*5.6;z=PL.z+Math.cos(PL.face)*5.6;y=PL.y+2.6;}
+  const P=simPlat(x,y,z,2.4,{life:13,label:pick(GENL)});SIM.gen.push(P);burst(x,y,z,24,null,8,4,.6);tone(500+Math.random()*500,.12,'triangle',.08);X.c.gens=(X.c.gens||0)+1;}
+function simEnter(){if(S.inSim)return;S.inSim=true;SIM.t=0;SIM.ch=6;SIM.eaten=0;const b=SIM.b,cx=SIM.cx,cz=SIM.cz;simPlat(cx,b,cz,5.5,{label:'you are here (for now)'});
+  for(let k=0;k<7;k++){const a=Math.random()*TAU,r=6+Math.random()*16;simPlat(cx+Math.cos(a)*r,b+12+k*11,cz+Math.sin(a)*r,2.2,{mat:new THREE.MeshBasicMaterial({color:0x9a9aa8,wireframe:true}),label:'half-rendered'});}
+  const ex={x:cx+(Math.random()-.5)*20,y:b+96,z:cz+(Math.random()-.5)*20};SIM.exit=ex;simPlat(ex.x,ex.y,ex.z,4,{mat:rainbowMat,label:'THE WAY OUT'});const ring=simAdd(new THREE.Mesh(Tor(3,.5,10,32),rainbowMat));ring.position.set(ex.x,ex.y+3.6,ex.z);SIM.ring=ring;
+  for(let k=0;k<6;k++){const s=simAdd(textSprite(pick(['IT IS EATING YOU','colour: deleted','fingers: deleted','meaning: deleted','GENERATE','only slop survives']),2,{color:'#c8c6d8'}));s.userData.tex=1;s.position.set(cx+(Math.random()-.5)*80,b+Math.random()*90,cz+(Math.random()-.5)*80);}
+  SIM.vy=b-14;SIM.void.visible=true;PL.x=cx;PL.z=cz;PL.y=PL.vis=b+.3;PL.vy=PL.vx=PL.vz=0;scene.fog.near=18;scene.fog.far=150;app.classList.add('sim');$('simhud').hidden=false;flash(1,1500);SFX.portal();S.zone='';
+  say([['sys','THE SIMULATION SPACE. It is eating you from the inside out. Colour goes first. Then fingers. Then the rest.'],['grok','GROK FOUND TRUTH. TRUTH IS SLOP. GROK ALWAYS KNEW. (GROK DID NOT KNOW.)'],['fable','To escape a simulation made of content, you must out-produce it. I have a forty-step plan. Step one: generate.'],
+    ['astra','✨ make platforms. bad ones. the worse they are the harder they are to digest ✨'],['sys',(app.classList.contains('touchy')?'Tap BLAST':'Press F or click')+' to generate a slop platform ahead of you. Generate while falling and it appears under you. Climb to THE WAY OUT before the void catches up.']]);}
+function simClear(){SIM.objs.forEach(o=>{scene.remove(o);if(o.isMesh&&o.userData.own)o.geometry.dispose();if(o.isSprite&&o.userData.tex)o.material.map.dispose();});SIM.objs.length=0;SIM.gen.length=0;for(let i=platforms.length-1;i>=0;i--)if(platforms[i].sim)platforms.splice(i,1);
+  SIM.void.visible=false;scene.fog.near=70;scene.fog.far=340;app.classList.remove('sim');$('simhud').hidden=true;}
+function simExit(won){if(!S.inSim)return;simClear();S.inSim=false;PL.x=ISC.x+2;PL.z=ISC.z+3;PL.y=PL.vis=ISL.y+.3;PL.vy=PL.vx=PL.vz=0;S.cells=S.max;flash(1,1500);SFX.portal();
+  if(!won){zoneCard('SPAT OUT','the simulation found you hard to digest · try again from the vault');return;}
+  const first=!X.sim;X.sim=1;addAura(first?67000:6700,PL.x,PL.y+4,PL.z);X.data+=first?100:20;if(!X.hats.includes('📡')){X.hats.push('📡');X.hat='📡';hatSync();}save();SFX.win();
+  say([['sys','You climbed out on a staircase of pure slop. The simulation could not digest it. Nobody could.'],['deb','(on the phone) I KNEW IT. ...I did not know it. But I said it loudly, which is basically the same.'],['carl','(on the phone) It was the birds. It is always the birds.'],['derek','...Bro.'],['grok','GROK SAY: SLOP SAVED US. GROK PUT THAT ON A MUG.']],()=>chapter('THE WAY OUT','was slop all along'));}
+{const of=fire;fire=function(){if(S.inSim){PL.cd=.22;simGen();return;}of();};}
+{const uh=updateHero;updateHero=function(dt){uh(dt);if(S.inSim)heroU.diss.value=Math.max(heroU.diss.value,clamp(1-(PL.y-SIM.vy)/30)*.7);};}
+{const ct=compassTarget;compassTarget=function(){if(S.inSim&&SIM.exit)return{x:SIM.exit.x,z:SIM.exit.z,l:'THE WAY OUT · '+Math.max(0,Math.round(SIM.exit.y-PL.y))+'m up'};return ct();};}
+function simUpdate(dt){SIM.t+=dt;const sp=Math.min(2.8,1.25+SIM.t*.016);SIM.vy+=sp*dt;SIM.void.position.set(PL.x,SIM.vy,PL.z);SIM.vt.offset.set(Math.random(),Math.random());SIM.ring.rotation.y+=dt*2;
+  SIM.rg+=dt;if(SIM.rg>=1){SIM.rg=0;SIM.ch=Math.min(6,SIM.ch+1);}
+  for(let i=SIM.gen.length-1;i>=0;i--){const P=SIM.gen[i];P.life-=dt;if(P.life<3)P.m.visible=Math.floor(P.life*8)%2===0;if(P.life<=0||P.top<SIM.vy){P.top=-999;scene.remove(P.m);if(P.lab)scene.remove(P.lab);SIM.gen.splice(i,1);}}
+  setText('simhud','🌀 SLOP '+'▮'.repeat(Math.floor(SIM.ch))+'▯'.repeat(6-Math.floor(SIM.ch))+' · void '+Math.max(0,Math.round(PL.y-SIM.vy))+'m below');
+  if(PL.y<SIM.vy+.6){SIM.eaten++;S.cells--;floatText('THE SIMULATION ATE A PIECE OF YOU',PL.x,PL.y+4,PL.z,'#c8c6d8');tone(60,.6,'sawtooth',.15,0,30);S.shake=.6;heroRegen(true);
+    if(S.cells<=0){simExit(false);return;}PL.y=SIM.vy+.8;PL.vy=30;PL.grounded=false;}
+  const ex=SIM.exit;if(ex&&Math.hypot(PL.x-ex.x,PL.z-ex.z)<4&&Math.abs(PL.y-ex.y)<3)simExit(true);}
+// ---- quests, interactions, moments, achievements
+XQ.push('drops','red','files','sim');
+{const ar=act7Rows;act7Rows=function(){const on=X.drops.length>=17;return ar().concat([['drops','📜 Find C\'s drops '+X.drops.length+'/17',on],['red','🧵 Climb the Red String Path to the secret island'+(X.pins?' · pin '+X.pins+'/3':''),!!X.c.isl],['files','🗂️ Read the classified files '+X.files.length+'/7',X.files.length>=7],['sim','🌀 Escape the simulation',!!X.sim]]);};}
+{const at=act7Target;act7Target=function(id){const near=(arr,ok,l)=>{let b=null,bd=1e9;arr.forEach((p,i)=>{if(!ok(i))return;const d=Math.hypot(PL.x-p.x,PL.z-p.z);if(d<bd){bd=d;b=p;}});return b?{x:b.x,z:b.z,l}:null;};
+  if(id==='drops')return near(DROPS,i=>!X.drops.includes(i),'DROP');if(id==='red'){if(X.drops.length<17)return{x:SHR.x,z:SHR.z,l:'THE SHRINE (find the drops first)'};const nx=RS.plats.find(p=>p.top>PL.y+.5);return nx?{x:nx.x,z:nx.z,l:'NEXT STRING'}:{x:ISC.x,z:ISC.z,l:'THE ISLAND'};}
+  if(id==='files')return X.drops.length<17?{x:SHR.x,z:SHR.z,l:'THE SHRINE'}:near(ISL.files,i=>!X.files.includes(i),'FILE');if(id==='sim')return{x:ISC.x,z:ISC.z,l:'THE VAULT'};return at(id);};}
+TALK.deb=()=>{say(X.drops.length>=17?[['deb',pick(['The plan was real! The plan was... a staircase. Fine. I will take it.','I have started a new group. It is about the island. We meet in the island.','C has not posted since. C is either dead or on vacation. Both are bad signs.'])]]:
+  [['deb','Hi hun! Find the drops. All 17. They are all over the world. Some are very high up. C likes heights.'],['deb','So far you have '+X.drops.length+'. '+pick(['That is a lot of research!','Keep going! Trust the plan!','The more you find, the less sense it makes. That is how you know it is working.'])]]);};
+{const ai=act7Interact;act7Interact=function(){const r=ai();if(r)return r;
+  for(let k=0;k<3;k++){const p=SHR.pins[k];if(Math.hypot(PL.x-p.x,PL.z-p.z)<2&&X.pins>k)return{label:'📌 RETURN TO PIN #'+(k+1),fn:()=>{const c=RS.cp[k];PL.x=c.x;PL.z=c.z;PL.y=PL.vis=c.top+.3;PL.vy=0;SFX.portal();}};}
+  if(X.drops.length>=17&&Math.abs(PL.y-ISL.y)<2){for(let k=0;k<7;k++){const f=ISL.files[k];if(Math.hypot(PL.x-f.x,PL.z-f.z)<2.2)return{label:X.files.includes(k)?'📁 READ IT AGAIN':'📁 OPEN CLASSIFIED FILE',fn:()=>readFile(k)};}
+    if(Math.hypot(PL.x-ISC.x,PL.z-ISC.z)<3)return{label:X.files.length>=7?'🚪 OPEN THE VAULT':'🔒 THE VAULT (read the files)',fn:openVault};}return null;};}
+ACH.push(['drops','Do Your Own Research','found all 17 drops',()=>X.drops.length>=17],['pins','Pinned','reached all three pins',()=>X.pins>=3],['isl','Red String Climber','stood on the secret island',()=>!!X.c.isl],['files','Classified','read all 7 files',()=>X.files.length>=7],['simx','Generated Your Way Out','escaped the simulation',()=>!!X.sim],['gens','Prompt Engineer (Physical)','generated 50 slop platforms',()=>(X.c.gens||0)>=50]);
+{const ar=act7Reset;act7Reset=function(){ar();if(S.inSim){simClear();S.inSim=false;}redSync();};}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(S.inSim){if(play)simUpdate(dt);return;}const t=S.t;
+  if(Math.hypot(PL.x-SHR.x,PL.z-SHR.z)<90){SHR.C.rotation.y=Math.sin(t*.6)*.4;SHR.fol.forEach((m,k)=>{m.rotation.z=Math.sin(t*2+k)*.08;});JAM.l.forEach(l=>l.material.color.setHex(Math.floor(t*2)%2?0xe01020:0x400000));
+    if(play&&Math.random()<dt*.3){const m=pick(SHR.fol);bubble(pick(['trust the plan','where is the next drop','i read it 40 times. still nothing','C is not a bot','the storm is coming']),m.position.x,m.position.y+5,m.position.z);}
+    RS.t+=dt;for(const P of RS.plats){const on=PL.grounded&&Math.abs(PL.y-P.top)<.1&&Math.hypot(PL.x-P.x,PL.z-P.z)<P.r+.2;
+      if(P.kind==='move'){const k=Math.sin(RS.t*1.2+P.ph)*2.6,nx=P.ox+P.ax*k,nz=P.oz+P.az*k;if(on){PL.x+=nx-P.x;PL.z+=nz-P.z;}P.x=nx;P.z=nz;P.m.position.x=nx;P.m.position.z=nz;}
+      else if(P.kind==='red'){const ph=(RS.t+P.ph)%3.6,solid=ph<2.4;P.top=solid?P.y0:-999;P.m.visible=solid&&!(ph>1.9&&Math.floor(RS.t*16)%2);}
+      else if(P.kind==='cp'&&on){const k=RS.cp.indexOf(P)+1;if(k>X.pins){X.pins=k;toast('📌 PIN #'+k+' reached. You can return here from the pins at the shrine.');SFX.page();save();}}}}
+  if(play)DROPS.forEach((d,i)=>{if(!d.s.visible)return;d.s.material.rotation=Math.sin(t*2+i)*.3;if(Math.hypot(PL.x-d.x,PL.z-d.z)<3.2&&Math.abs(PL.y+1.4-d.y)<3.6)takeDrop(i);});
+  if(X.drops.length>=17){ISL.vault.rotation.z+=dt*(X.files.length>=7?2:.2);if(play&&!X.c.isl&&Math.abs(PL.y-ISL.y)<.3&&PL.grounded&&Math.hypot(PL.x-ISC.x,PL.z-ISC.z)<12){X.c.isl=1;save();
+    moment('isl',[['sys','THE SECRET ISLAND. Above the clouds. Signal-jammed. Full of filing cabinets. Every politician with a secret kept it here, apparently, in alphabetical order.'],['sys','Eleven cardboard figures stand guard: THE COUNCIL OF ELEVEN. Nobody knows who they are. Their files are right there, unlocked. Read them.']]);}}
+  if(play&&!S.inSlop&&Math.hypot(PL.x-SHR.x,PL.z-SHR.z)<18)moment('cue',[['deb','Oh! A new researcher! Welcome to the Shrine of C. We are just regular people asking questions.',{cam:shot(SHR.x-6,SHR.z-20,6,SHR.x,SHR.z,5)}],
+    ['deb','C is an anonymous poster. C leaves DROPS: little scrolls of intel, all over the world. Nobody knows who C is. C is probably a bot. We do not talk about that.'],['carl','(on the phone) Deb. DEB. Is it the birds? Tell me it is not the birds.'],
+    ['deb','It is a person, Carl. ...Probably. Anyway: find all 17 drops and the plan will be revealed. The plan is always about to be revealed.'],['sys','17 drops are hidden around the world, some very high up. Track them in the quest list and the arrow will help.']]);};}
+
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
@@ -2256,7 +2387,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,R1K,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,R1K,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
