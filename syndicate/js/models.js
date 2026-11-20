@@ -37,7 +37,13 @@
     const [a, b2] = R.col; x.shadowColor = a; x.shadowBlur = 14; { const g = x.createRadialGradient(0, 0, 60, 0, 0, 124); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.75, a + '30'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.beginPath(); x.arc(0, 0, 124, 0, 6.2832); x.fill(); }
     if (id === 'cinder') { circ(112, 6, a); ticks(16, 92, 104, b2, 4); dots(16, 82, 3, a); }
     else if (id === 'glass') { circ(114, 4, a); circ(96, 3, b2, 0.8); for (let i = 0; i < 6; i++) { x.save(); x.rotate(i * 1.0472); x.fillStyle = a; x.beginPath(); x.moveTo(0, -112); x.lineTo(8, -96); x.lineTo(0, -80); x.lineTo(-8, -96); x.closePath(); x.fill(); x.restore(); } }
-    else if (id === 'storm') { circ(114, 5, a); poly(3, 104, b2, 4, -1.5708); poly(3, 104, a, 2, 1.5708); dots(6, 104, 6, b2); circ(30, 3, a); }
+    else if (id === 'hourmark') { circ(114, 5, a); poly(3, 104, b2, 4, -1.5708); poly(3, 104, a, 2, 1.5708); dots(6, 104, 6, b2); circ(30, 3, a); }
+    else if (id === 'storm') { circ(116, 4, a); x.strokeStyle = b2; x.lineWidth = 4; x.beginPath(); for (let i = 0; i <= 36; i++) { const an = i * 6.2832 / 36, rr = i % 2 ? 84 : 104; i ? x.lineTo(Math.cos(an) * rr, Math.sin(an) * rr) : x.moveTo(Math.cos(an) * rr, Math.sin(an) * rr); } x.stroke(); dots(6, 64, 5, a); circ(40, 2, b2); }
+    else if (id === 'ash') { for (let i = 0; i < 12; i++) { x.strokeStyle = i % 2 ? b2 : a; x.lineWidth = 6; x.beginPath(); x.arc(0, 0, 110, i * 0.5236 + 0.08, i * 0.5236 + 0.44); x.stroke(); } ticks(12, 84, 96, b2, 3); circ(70, 2, a, 0.7); }
+    else if (id === 'line') { circ(116, 3, a); circ(88, 3, a); for (let i = 0; i < 40; i++) { const an = i * 6.2832 / 40, h = 4 + ((i * 37) % 9); x.strokeStyle = b2; x.lineWidth = 2.5; x.beginPath(); x.moveTo(Math.cos(an) * (100 - h), Math.sin(an) * (100 - h)); x.lineTo(Math.cos(an + 0.05) * (100 + h), Math.sin(an + 0.05) * (100 + h)); x.stroke(); } }
+    else if (id === 'teeth') { circ(116, 6, a); x.fillStyle = b2; for (let i = 0; i < 24; i++) { x.save(); x.rotate(i * 0.2618); x.beginPath(); x.moveTo(-7, -112); x.lineTo(7, -112); x.lineTo(0, -88); x.closePath(); x.fill(); x.restore(); } circ(60, 3, a, 0.8); }
+    else if (id === 'seal') { circ(116, 5, a); circ(104, 2, b2); poly(5, 100, b2, 3.5, -1.5708, 2); circ(42, 3, a); dots(5, 100, 6, a); }
+    else if (id === 'unspoken') { circ(118, 4, a); circ(100, 2, b2); poly(7, 96, b2, 2.5, 0, 3); poly(7, 60, a, 2, 0.45, 2); ticks(28, 106, 116, a, 2); dots(7, 78, 4, b2); circ(26, 3, a); }
     else if (id === 'wyrm') { circ(116, 6, a); circ(98, 2, b2); for (let i = 0; i < 8; i++) { x.save(); x.rotate(i * 0.7854); x.strokeStyle = b2; x.lineWidth = 4; x.beginPath(); x.moveTo(-14, -84); x.quadraticCurveTo(0, -60, 14, -84); x.stroke(); x.fillStyle = a; x.beginPath(); x.moveTo(0, -108); x.lineTo(5, -96); x.lineTo(-5, -96); x.fill(); x.restore(); } dots(8, 70, 4, a); }
     else if (id === 'pale') { circ(118, 4, a); circ(104, 2, b2); circ(64, 3, a); poly(12, 100, b2, 2.5, 0, 5); poly(6, 64, a, 2, 0.5236); ticks(24, 108, 116, b2, 2); dots(12, 82, 3.5, a); }
     const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; return (RINGTEX[id] = t); };
@@ -57,7 +63,7 @@
     const m = { skin: M(hex(look.skin || race.skin)), armor: M(P.armor, true), armor2: M(P.armor2, true), trim: M(P.trim, true), cloth: M(P.cloth), legs: M(P.legs), hair: M(P.hair), dark: M(0x15131a), weapon: M(P.weapon, true, wsk ? wsk.e : WGLOW[g.weapon || 0]) };
     const box = gfx.box, mesh = gfx.mesh;
     const root = new T.Group(), body = new T.Group(); root.add(body);
-    const robed = cls === 'sorcerer' || cls === 'cleric', hover = rcls === 'sorcerer'; let hovY = 0;
+    const robed = cls === 'sorcerer' || cls === 'cleric', hover = rcls === 'sorcerer' || rcls === 'warlock'; let hovY = 0;
     const w = { fighter: 0.74, rogue: 0.54, sorcerer: 0.56, cleric: 0.66 }[cls];
     const glows = [];
 
@@ -382,7 +388,7 @@
         hR.rotation.x = J('wr', wr, 0.5); hL.rotation.x = J('wl', wl, 0.45); }
       if (cape) cape.rotation.x = J('cape', q.cape, 0.2);
       if (robe) robe.rotation.z = mv && !hover ? sw * 0.08 : 0;
-      root.rotation.z = 0; root.rotation.x = 0; { const flo = hover && act !== 'ko' && act !== 'kneel' && act !== 'sit' && !p.crawl; hovY += ((flo ? 0.16 + Math.sin(t * 2.1) * 0.035 : 0) - hovY) * Math.min(1, dtp * 6); root.position.y = (p.y || 0) + hovY; if (C.ring) { C.ring.position.y = 0.08 - hovY; C.ring.visible = act !== 'ko'; C.ring.children.forEach(pl => { pl.rotation.z = t * 0.35 * pl.userData.dir; }); } }
+      root.rotation.z = 0; root.rotation.x = 0; { const flo = hover && act !== 'ko' && act !== 'kneel' && act !== 'sit' && !p.crawl; hovY += ((flo ? 0.16 + Math.sin(t * 2.1) * 0.035 : 0) - hovY) * Math.min(1, dtp * 6); root.position.y = (p.y || 0) + hovY; if (C.ring) { C.ring.position.y = 0.08 - hovY; C.ring.visible = act !== 'ko' && act !== 'sit' && act !== 'kneel'; C.ring.children.forEach(pl => { pl.rotation.z = t * 0.35 * pl.userData.dir; }); } }
       { const crouch = Math.max(0, Math.min(1, -cur.by * 3.2)), sitting = act === 'sit' || act === 'kneel';
         if (!sitting && act !== 'dodge') { legL.rotation.x -= crouch * 0.42; legR.rotation.x -= crouch * 0.42; }
         const knee = l => robe && !sitting && act !== 'ko' ? Math.max(0, Math.min(0.35, Math.abs(l) * 0.4 + crouch * 0.4)) : Math.max(0, Math.min(1.75, Math.max(0, l) * 0.95 + Math.max(0, -l) * 0.3 + Math.max(0, -l - 0.9) * 2.0 + (sitting ? 0 : crouch * 0.85)));
@@ -412,7 +418,7 @@
       if (a !== lastAlpha) { lastAlpha = a; for (const mt of mats) { mt.transparent = a < 1; mt.opacity = a; mt.needsUpdate = true; } glows.forEach(gl => gl.visible = a > 0.5); root.traverse(o => { if (o.isMesh) o.castShadow = a > 0.5; }); }
     };
     if (robe) robe.userData.keep = 1;
-    let ringM = null; if (look.ring && rcls === 'sorcerer' && ringTex(look.ring)) { const R = G.RINGS[look.ring]; ringM = new T.Group(); [[2.5, 0], [1.75, 1]].slice(0, R.layers || 1).forEach(q => { const pl = new T.Mesh(new T.PlaneGeometry(q[0], q[0]), new T.MeshBasicMaterial({ map: ringTex(look.ring), transparent: true, depthWrite: false, opacity: q[1] ? 0.7 : 1 })); pl.rotation.x = -Math.PI / 2; pl.renderOrder = 6; pl.userData.keep = 1; pl.userData.dir = q[1] ? -1.6 : 1; ringM.add(pl); }); ringM.position.y = 0.08; root.add(ringM); C.ring = ringM; }
+    let ringM = null; if (look.ring && hover && ringTex(look.ring)) { const R = G.RINGS[look.ring]; ringM = new T.Group(); [[2.5, 0], [1.75, 1]].slice(0, R.layers || 1).forEach(q => { const pl = new T.Mesh(new T.PlaneGeometry(q[0], q[0]), new T.MeshBasicMaterial({ map: ringTex(look.ring), transparent: true, depthWrite: false, opacity: q[1] ? 0.7 : 1 })); pl.rotation.x = -Math.PI / 2; pl.renderOrder = 6; pl.userData.keep = 1; pl.userData.dir = q[1] ? -1.6 : 1; ringM.add(pl); }); ringM.position.y = 0.08; root.add(ringM); C.ring = ringM; }
     if (!G.noSlim) slim(root);
     C.pose({ t: 0, act: 'idle' }); fresh = 1;
     return C;

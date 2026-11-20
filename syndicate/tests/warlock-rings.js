@@ -1,0 +1,14 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [];
+  const p = await b.newPage({ viewport: { width: 1500, height: 380 } }); p.on('pageerror', e => errs.push(e.message + (e.stack || '').split('\n')[1]));
+  await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(700); await p.evaluate(() => { G.bootSkip(); G.bootSkip(); }); await p.waitForTimeout(400);
+  await p.evaluate(() => { document.getElementById('ui').style.display = 'none'; const a = G.world.get('arena'); G.gfx.setScene(a.scene); G.titleChars && G.titleChars.forEach(c => c.root.visible = false);
+    const L = [['warlock', 'ash'], ['warlock', 'line'], ['warlock', 'teeth'], ['warlock', 'seal'], ['warlock', 'unspoken'], ['sorcerer', 'storm'], ['DAVID', null]];
+    window.ROW = L.map((q, i) => { const look = q[0] === 'DAVID' ? G.oracle.look() : { cls: q[0], race: ['human', 'tiefling', 'drow', 'elf', 'halforc', 'human'][i], ring: q[1] }; const c = G.makeChar(look); c.root.position.set(-7.2 + i * 2.4, 0, 0); c.root.rotation.y = 0.5; a.scene.add(c.root); return c; });
+    for (let rep = 0; rep < 80; rep++) ROW.forEach((c, i) => c.pose({ t: 1 + rep * 0.016, act: i === 2 ? 'dodge' : 'idle', prog: 0.4, moving: i % 2 === 1, walk: rep * 0.15, ready: 1 })); G.gfx.cine = { pos: [0, 5.5, 8.5], look: [0, 0.3, 0], fov: 42, roll: 0 }; G.gfx.render(); });
+  await p.waitForTimeout(80); await p.screenshot({ path: 'wl.png' });
+  await p.evaluate(() => { document.getElementById('ui').style.display = ''; (window.ROW || []).forEach(c => c.root.parent && c.root.parent.remove(c.root)); });
+  await p.click('#bNew'); await p.click('.c-skip'); await p.click('[data-cls=warlock]'); await p.click('#go'); await p.click('#ok'); await p.waitForTimeout(150);
+  console.log(await p.evaluate(() => { const st = G.state, h = st.hero; h.level = 6; st.toured = 1; st.tourAsked = 1; st.kitPicked = 1; st.shownPlaces = { a: 1 }; G.ui.close(); if (G.talk) G.talkApi.skip(); G.ui.close(); const lk = G.lookOf(h, st); G.ui.sheet(); const row = [...document.querySelectorAll('#panel [data-ring]')].map(b => b.textContent).join('|'); return 'warlock L6 auto ring: ' + lk.ring + ' | sheet: ' + row + ' | old sorcerer save with storm: ' + (() => { const hh = { cls: 'sorcerer', level: 6, ring: 'storm' }; return G.lookOf(hh, st).ring; })(); }));
+  await p.evaluate(() => { G.ui.close(); G.ui.oracle(); }); await p.waitForTimeout(300); console.log('cellar ok, david portrait', await p.evaluate(() => !!document.querySelector('#op canvas, #op img')));
+  console.log('ERRORS', errs.length, errs.slice(0, 3).join(' || ')); await b.close(); })();

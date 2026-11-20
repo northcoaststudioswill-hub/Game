@@ -17,7 +17,7 @@
   const others = r => Object.keys(KIN).filter(k => k !== r);
   const sneer = r => SNEER[pick(others(r))];
   G.oracle = {
-    look: () => ({ cls: 'sorcerer', race: (G.state.hero || {}).race || 'human', tint: { cloth: '#2a1a3a', armor: '#1a1024', armor2: '#120a1a', trim: '#f0c95a', hair: '#e8e2f4' }, cos: { head: 'widehat', back: 'greatcloak', aura: 'gold' } }),
+    look: () => ({ cls: 'sorcerer', ring: 'hourmark', race: (G.state.hero || {}).race || 'human', tint: { cloth: '#2a1a3a', armor: '#1a1024', armor2: '#120a1a', trim: '#f0c95a', hair: '#e8e2f4' }, cos: { head: 'widehat', back: 'greatcloak', aura: 'gold' } }),
     deaths: st => st.deaths || 0, debt: st => st.soulDebt || 0, bound: st => !!st.bound, signed: st => !!st.signed,
     // his cut of every purse while you owe him
     cut: st => { const d = st.soulDebt || 0; return d >= 8 ? 0.1 : d >= 4 ? 0.05 : 0; },
