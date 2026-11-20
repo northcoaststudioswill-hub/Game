@@ -63,7 +63,7 @@
     const m = { skin: M(hex(look.skin || race.skin)), armor: M(P.armor, true), armor2: M(P.armor2, true), trim: M(P.trim, true), cloth: M(P.cloth), legs: M(P.legs), hair: M(P.hair), dark: M(0x15131a), weapon: M(P.weapon, true, wsk ? wsk.e : WGLOW[g.weapon || 0]) };
     const box = gfx.box, mesh = gfx.mesh;
     const root = new T.Group(), body = new T.Group(); root.add(body);
-    const robed = (cls === 'sorcerer' && rcls !== 'warlock') || cls === 'cleric', hover = rcls === 'sorcerer' || rcls === 'warlock'; let hovY = 0;
+    const robed = (cls === 'sorcerer' && rcls !== 'warlock') || cls === 'cleric', hover = (rcls === 'sorcerer' || rcls === 'warlock') && !!(look.ring && (G.RINGS || {})[look.ring]); let hovY = 0;       // they float on a ring; without one they walk like anybody
     const w = { fighter: 0.74, rogue: 0.54, sorcerer: 0.56, cleric: 0.66 }[cls];
     const glows = [];
 

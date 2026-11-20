@@ -37,10 +37,13 @@
     const stone = new T.MeshLambertMaterial({ color: 0x2a2436 }), glass = new T.MeshBasicMaterial({ color: 0x9a8aff, transparent: true, opacity: 0.35, depthWrite: false, blending: T.AdditiveBlending });
     const floor = new T.Mesh(new T.CircleGeometry(R + 0.55, 40), new T.MeshLambertMaterial({ color: 0x1c1826 })); floor.rotation.x = -Math.PI / 2; floor.position.y = 0.012; floor.receiveShadow = true; grp.add(floor);
     const rim = new T.Mesh(new T.RingGeometry(R + 0.45, R + 0.55, 48), new T.MeshBasicMaterial({ color: 0xf0c95a, transparent: true, opacity: 0.55 })); rim.rotation.x = -Math.PI / 2; rim.position.y = 0.02; grp.add(rim);
+    // sixteen plinths and their glass, each drawn in one call
+    const dm = new T.Object3D(), pl = new T.InstancedMesh(new T.CylinderGeometry(0.2, 0.24, 0.1, 10), stone, 16), gg = new T.RingGeometry(0.17, 0.23, 20); gg.rotateX(-Math.PI / 2); const gl = new T.InstancedMesh(gg, new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, depthWrite: false, blending: T.AdditiveBlending }), 16), gc = new T.Color();
     const slots = []; for (let i = 0; i < 16; i++) { const yours = i < 8, j = yours ? i : i - 8, a = yours ? (0.25 + j * (2.64 / 7)) : (Math.PI + 0.25 + j * (2.64 / 7)), x = Math.cos(a) * R, z = Math.sin(a) * R;
-      const p = new T.Mesh(new T.CylinderGeometry(0.2, 0.24, 0.1, 10), stone); p.position.set(x, 0.05, z); grp.add(p); const gl = new T.Mesh(new T.RingGeometry(0.17, 0.23, 20), glass.clone()); gl.rotation.x = -Math.PI / 2; gl.position.set(x, 0.105, z); grp.add(gl); slots.push({ x, z, gl }); }
-    const man = G.makeChar(LOOK); man.root.position.set(0, 0, -0.15); man.root.rotation.y = 0; grp.add(man.root);
-    const L = new T.PointLight(0xb0a0ff, 6, 6, 1.6); L.position.set(0, 2.4, 0.4); grp.add(L);
+      dm.position.set(x, 0.05, z); dm.updateMatrix(); pl.setMatrixAt(i, dm.matrix); dm.position.set(x, 0.105, z); dm.updateMatrix(); gl.setMatrixAt(i, dm.matrix);
+      const sl = { x, z, glow: v => { gc.setRGB(0.6 * v, 0.54 * v, 1.0 * v); gl.setColorAt(i, gc); gl.instanceColor.needsUpdate = true; } }; slots.push(sl); }
+    grp.add(pl, gl); slots.forEach(sl => sl.glow(0.35));
+    const man = G.makeChar(LOOK); man.root.position.set(0, 0, -0.15); man.root.rotation.y = 0; grp.add(man.root); const L = null;
     return (built = { scene: s, grp, slots, man, L, dice: [] });
   }
   const bh0 = W.buildHub;
@@ -51,7 +54,7 @@
 
   // ---------------------------------------------------------------- throwing
   let flights = [], waitT = 0, queue = [];
-  function clearDice() { const b = built; if (!b) return; b.dice.forEach(d => d.parent && d.parent.remove(d)); b.dice = []; flights = []; b.slots.forEach(s => s.gl.material.opacity = 0.35); }
+  function clearDice() { const b = built; if (!b) return; b.dice.forEach(d => d.parent && d.parent.remove(d)); b.dice = []; flights = []; b.slots.forEach(s => s.glow(0.35)); }
   // throw a die to slot i, landing on value v; the man throws, it lands, then cb()
   function toss(i, v, yours, cb) { const b = built, sl = b.slots[i], d = mkDie(yours ? '#f0d890' : '#b8a8ff'); b.grp.add(d); b.dice[i] && b.dice[i].parent && b.dice[i].parent.remove(b.dice[i]); b.dice[i] = d;
     d.position.set(0, 1.25, 0.25); flights.push({ d, sl, v, t: 0, yaw: Math.random() * 6.28, cb, spin: [3 + Math.random() * 5, 2 + Math.random() * 4] }); b.manAct = { act: 'release', cs: 'throw', t: 0 }; b.man.root.rotation.y = Math.atan2(sl.x, sl.z); G.sfx('swing'); }
@@ -59,11 +62,10 @@
     // the man: idle, turning to face where he throws, or whoever is playing
     if (b.manAct) { b.manAct.t += dt; b.man.pose({ t, act: b.manAct.act, cs: b.manAct.cs, prog: Math.min(1, b.manAct.t / 0.35) }); if (b.manAct.t > 0.45) b.manAct = null; }
     else { const w = W.walker, want = D.on ? Math.atan2(w.x - C.x, w.z - C.z) : 0.2 * Math.sin(t * 0.4); let dd = want - b.man.root.rotation.y; dd = Math.atan2(Math.sin(dd), Math.cos(dd)); b.man.root.rotation.y += dd * Math.min(1, dt * 4); b.man.pose({ t, act: 'idle' }); }
-    b.L.intensity = D.on ? 9 + Math.sin(t * 3) : 5;
     for (let k = flights.length - 1; k >= 0; k--) { const f = flights[k]; f.t += dt; const u = Math.min(1, f.t / 0.55), x = G.lerp(0, f.sl.x, u), z = G.lerp(0.25, f.sl.z, u), top = 0.1 + DS / 2;
       if (u < 1) { f.d.position.set(x, G.lerp(1.25, top, u) + Math.sin(u * Math.PI) * 0.75, z); f.d.userData.m.rotation.set(f.t * f.spin[0] * 4, 0, f.t * f.spin[1] * 4); f.d.rotation.y = f.yaw + f.t * 6; }
       else { const bt = f.t - 0.55, bo = bt < 0.22 ? Math.sin(bt / 0.22 * Math.PI) * 0.07 : 0; f.d.position.set(f.sl.x, top + bo, f.sl.z); const r = UP[f.v]; f.d.userData.m.rotation.set(r[0], 0, r[1]); f.d.rotation.y = f.yaw;
-        if (!f.landed) { f.landed = 1; G.sfx('clang'); f.sl.gl.material.opacity = 0.85; gfx.burst && gfx.burst(C.x + f.sl.x, top, C.z + f.sl.z, 0xc8b8ff, 6, 1.5, 1.5); }
+        if (!f.landed) { f.landed = 1; G.sfx('clang'); f.sl.glow(0.85); gfx.burst && gfx.burst(C.x + f.sl.x, top, C.z + f.sl.z, 0xc8b8ff, 6, 1.5, 1.5); }
         if (bt > 0.25) { flights.splice(k, 1); f.cb && f.cb(); } } }
     if (!flights.length && queue.length) { waitT -= dt; if (waitT <= 0) { const q = queue.shift(); waitT = 0.12; q(); } }
     if (D.on) { const p = gfx.portrait; gfx.cine = { pos: [C.x + (p ? 1.0 : 1.9), p ? 6.6 : 5.0, C.z + (p ? 5.0 : 4.4)], look: [C.x - 0.15, 0.2, C.z + (p ? 1.5 : 1.0)], fov: p ? 58 : 46, roll: 0 }; }
@@ -94,7 +96,7 @@
     on('[data-s]', b => { stake = +b.dataset.s; bar(); }); on('#dback', () => { clearDice(); phase = 'pick'; bar(); say('hello'); }); on('#dleave', () => D.leave()); on('#dgo', start); on('#dagain', () => { clearDice(); phase = 'stake'; bar(); start(); });
     on('#droll', () => { phase = 'wait'; bar(); const v = d6(); you.push(v); toss(you.length - 1, v, true, () => { const s = tot(you); if (s > GAMES[G0].target) { settle(-1, 'bust'); } else if (s === GAMES[G0].target || you.length >= 8) { dealer(); } else { phase = 'yours'; bar(); say('roll'); } }); });
     on('#dstand', () => { phase = 'wait'; bar(); dealer(); });
-    on('[data-h]', b => { const i = +b.dataset.h; holds[i] = !holds[i]; built.slots[i].gl.material.opacity = holds[i] ? 1 : 0.85; built.dice[i] && built.dice[i].userData.m.material.forEach(m => m.emissiveIntensity = holds[i] ? 0.9 : 0.35); bar(); });
+    on('[data-h]', b => { const i = +b.dataset.h; holds[i] = !holds[i]; built.slots[i].glow(holds[i] ? 1.6 : 0.85); built.dice[i] && built.dice[i].userData.m.material.forEach(m => m.emissiveIntensity = holds[i] ? 0.9 : 0.35); bar(); });
     on('#dreroll', () => { phase = 'wait'; bar(); you.forEach((v, i) => { if (holds[i]) return; after(() => { const nv = d6(); you[i] = nv; toss(i, nv, true, null); }); }); after(() => { rolled = 1; dealer(); }); });
     on('#dpress', () => { take(stake); stake *= 2; pressed = true; ui.topbar(); phase = 'wait'; bar(); const i = you[0] <= you[1] ? 0 : 1; const nv = d6(); you[i] = nv; toss(i, nv, true, () => { phase = 'yours'; bar(); say('Pressing. How exciting for both of us.'); }); });
   }
