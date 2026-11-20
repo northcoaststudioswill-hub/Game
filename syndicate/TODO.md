@@ -14,6 +14,9 @@ Done so far:
 - An effect of its own on every guest move.
 - A staged finisher for every guest (Derek Pulls Up, Latte-ality, Selfie-ality, Garden-ality, Bork-ality, Filibuster-ality, Compost-ality, Escape Velocity, Eleven Pieces, Your Hour Is Up).
 - King Bibi comes back once per bout: below 30% health he returns to 75%.
+- A career of titles for every guest (a new one each level) and their own level-up card instead of the Guild's lessons.
+- The market reacts to whoever you brought: lines from Marc, Pip, the Guildmaster, Big Hobb and David about each guest.
+- Spar any guest with your own fighter from their card on the Guest List; nobody is hurt.
 
 Not done:
 
@@ -27,9 +30,9 @@ Not done:
 - **Cinematic art** — the screens are flat shapes and type, far simpler than the Knockout pixel scenes.
 - **More moves from the other games** — not yet recreated: Leash Lasso, Shiba Plane, Paw Paw Paw, Snake the Drain, Plunger Pop, Bean Dip, and the whole sets of Corbin, Mama and Gas Guy.
 - **Unique attack animations** — guests use their frame's swings and casts (Bottie does not fire from the arm guns, Marcus swings the wrench like a hammer, Eleven's blade like an axe).
-- **Career paths** — guests start with everything and level like their frame class; the level-up screen still offers that class's moves. No guest-specific unlocks, story beats or endings.
-- **Interactions** — no special dialogue when a guest meets Marc, Pip, the Guildmaster or David (including David meeting himself), and no lines between guests.
-- **Guests as opponents** — they are playable only.
+- **Guest careers are titles only** — no new moves unlocked by level, no story scenes, no guest-specific ending; the normal ending plays.
+- **Guest dialogue is one-liners** — passing remarks in the market only. Talking to Marc, Pip, the Guildmaster or David as a guest still plays the normal conversation, and guests have no lines about each other.
+- **Guests only appear as opponents when you choose to spar them** — never on the ladder, and sparring guests do not use their cinematic ultimates.
 - **More of the old cast** — Corbin, Mama, Gas Guy are not on the list.
 - **Shop and Tailor on a guest** — kits and cosmetics do not show on a guest's body; the shops do not say so.
 - **Stance pictures for Louie** — the stance picker assumes a two-legged fighter.
