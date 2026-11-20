@@ -254,7 +254,7 @@
     if (!st.tally.length) h += '<p class="note">Nobody owes you anything yet. Reach the rank of <b>Scrapper</b> and someone will.</p>';
     st.tally.forEach((t, i) => {
       const job = t.job && G.JOBS.find(j => j.id === t.job.id), sec = st.second === i;
-      h += '<div class="tm"><span class="tp" data-p="' + i + '"></span><div class="ab-tx"><b>' + esc(t.name) + '</b><small>' + G.RACES[t.race].name + ' ' + G.CLASSES[t.cls].name + ' · skill +' + t.skill + ' · ' + t.trait + '</small>' +
+      h += '<div class="tm"><span class="tp" data-p="' + i + '"></span><div class="ab-tx"><b>' + esc(t.name) + '</b><small>' + G.RACES[t.race].name + ' ' + G.clsName(t) + ' · skill +' + t.skill + ' · ' + t.trait + '</small>' +
         '<p>' + (job ? 'Out on <b>' + job.name + '</b>, back in ' + t.job.left + ' bout' + (t.job.left > 1 ? 's' : '') + '.' : sec ? 'In your corner as your <b>Second</b>. Call them once per bout.' : 'Idle at your hideout.') + '</p>' +
         (job ? '' : '<div class="row">' + G.JOBS.map(j => '<button class="mini" data-job="' + i + ':' + j.id + '" title="' + j.desc + '">' + j.name + '<i>' + j.fights + (j.fights > 1 ? ' bouts' : ' bout') + ' · ' + (j.dc ? 'DC ' + j.dc : 'sure') + ' · ' + j.gain + '</i></button>').join('') +
           '<button class="mini' + (sec ? ' sel' : '') + '" data-sec="' + i + '">' + (sec ? 'Dismiss as Second' : 'Make my Second') + '</button></div>') + '</div></div>';

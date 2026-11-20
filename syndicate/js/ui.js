@@ -41,7 +41,7 @@
     tb.className = '';
     tb.innerHTML =
       '<div class="tb-box tb-hero" data-go="sheet"><div class="tb-port"></div><div><b>' + esc(h.name) + '</b>' +
-      '<small>Level ' + h.level + ' ' + (h.sub ? C.subs[h.sub].name + ' ' : '') + C.name + '</small>' +
+      '<small>Level ' + h.level + ' ' + (h.sub ? C.subs[h.sub].name + ' ' : '') + G.clsName(h) + '</small>' +
       '<div class="bar xp"><i style="width:' + xpPct + '%"></i></div></div></div>' +
       '<div class="tb-box tb-rank"><small>GUILD RANK</small><b style="color:' + R.color + '">' + R.name + '</b>' +
       '<div class="bar rep"><i style="width:' + rPct + '%"></i></div><small>' + st.respect + (next ? ' / ' + next.at : '') + ' respect</small></div>' +
@@ -169,8 +169,8 @@
   const CONTROLS = { toString: () => G.controlsHTML() };
   ui.prefight = function (o) {
     const st = G.state, h = st.hero;
-    show('<div class="card vs"><div class="vs-row"><div class="vs-side"><span id="vp"></span><b>' + esc(h.name) + '</b><small>Lv ' + h.level + ' ' + G.CLASSES[h.cls].name + '</small></div><div class="vs-mid">VS</div>' +
-      '<div class="vs-side"><span id="ve"></span><b>' + o.name + '</b><small>Lv ' + o.level + ' ' + G.CLASSES[o.cls].name + '</small></div></div>' +
+    show('<div class="card vs"><div class="vs-row"><div class="vs-side"><span id="vp"></span><b>' + esc(h.name) + '</b><small>Lv ' + h.level + ' ' + G.clsName(h) + '</small></div><div class="vs-mid">VS</div>' +
+      '<div class="vs-side"><span id="ve"></span><b>' + o.name + '</b><small>Lv ' + o.level + ' ' + G.clsName(o) + '</small></div></div>' +
       '<p class="quote">“' + o.taunt + '”</p><p class="dim">' + G.BIOS[o.id].split('. ')[0] + '.</p><p class="note"><b>Pit wisdom:</b> ' + G.pick(G.TIPS) + '</p>' +
       '<div class="row end"><button id="x">Back</button><button class="big" id="go">Enter the pit</button></div></div>');
     $('#vp').appendChild(G.portrait(G.lookOf(h, st), 96, 1.2)); $('#ve').appendChild(G.portrait({ cls: o.cls, race: o.race, tint: o.tint }, 96, 1.2));
@@ -310,7 +310,7 @@
     s += '<div class="derived"><span>HP <b>' + d.maxHp + '</b></span><span>Crit <b>' + Math.round(d.crit * 100) + '%</b></span><span>Damage <b>' + Math.round(d.dmgMul * 100) + '%</b></span><span>' + (d.dr < 0 ? 'Exposed <b>+' + Math.round(-d.dr * 100) : 'Armor <b>-' + Math.round(d.dr * 100)) + '%</b></span><span>Speed <b>' + Math.round(d.speed) + '</b></span><span>' + C.res + ' <b>' + d.regen.toFixed(1) + '/s</b></span><span>Coin <b>' + Math.round(d.coinMul * 100) + '%</b></span><span>Respect <b>' + Math.round(d.respectMul * 100) + '%</b></span></div>';
     // the build path: one glance shows what you chose and what is coming
     const step = (n, title, got, todo) => '<div class="pstep' + (h.level >= n ? ' done' : '') + '"><span>' + n + '</span><b>' + title + '</b><small>' + (h.level >= n ? got : todo) + '</small></div>';
-    s += '<h3>Your build</h3><div class="path">' + step(1, C.name, C.start.map(i => A[i].name).join(', '), '') +
+    s += '<h3>Your build</h3><div class="path">' + step(1, G.clsName(h), C.start.map(i => A[i].name).join(', '), '') +
       step(2, 'Technique', (C.l2.filter(i => h.known.includes(i)).map(i => A[i].name)[0] || 'chosen'), 'Choose ' + C.l2.map(i => A[i].name).join(' or ')) +
       step(3, 'Subclass', sub ? sub.name : '', Object.values(C.subs).map(x => x.name).join(' or ')) +
       step(4, 'Feat', h.feats.length ? G.FEATS[h.feats[0]].name : 'Ability Improvement', 'Choose a feat') +

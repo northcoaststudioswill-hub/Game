@@ -1,0 +1,20 @@
+// The Guest List: found from the title, every guest starts, shows their own race/title, and survives a full bout with their own moves
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [];
+  const p = await b.newPage({ viewport: { width: 1280, height: 720 } }); p.on('pageerror', e => errs.push(e.message + (e.stack || '').split('\n')[1]));
+  await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(700); await p.evaluate(() => { G.bootSkip(); G.bootSkip(); }); await p.waitForTimeout(500);
+  console.log('button before finding:', await p.evaluate(() => !!document.getElementById('bGuests')));
+  for (let i = 0; i < 5; i++) await p.click('#panel .logo'); await p.waitForTimeout(300);
+  console.log('page:', await p.evaluate(() => (document.querySelector('#panel h2') || {}).textContent + ' x' + document.querySelectorAll('[data-egg]').length)); await p.screenshot({ path: 'guests.png' });
+  const ids = await p.evaluate(() => Object.keys(G.EGGS)), shots = [];
+  for (const id of ids) { await p.evaluate(id => { if (G.talk) G.talkApi.skip(); G.ui.close(); G.ui.title(); G.ui.guests(); document.querySelector('[data-egg=' + id + ']').click(); }, id); await p.waitForTimeout(80); if (id === 'will') await p.screenshot({ path: 'guest_card.png' });
+    await p.evaluate(() => document.querySelector('#y, [data-rep="1"]').click()); await p.waitForTimeout(600);
+    const r = await p.evaluate(() => { G.muted = true; const st = G.state, h = st.hero; Object.assign(st, { toured: 1, tourAsked: 1, firstPath: 9, shownPlaces: { a: 1 } }); G.ui.close(); if (G.talk) G.talkApi.skip(); G.ui.close(); const top = (document.querySelector('#topbar, .topbar, #hud') || document.body).textContent.replace(/\s+/g, ' ').slice(0, 60);
+      G.debugAuto = true; G.ui.pit(); document.querySelector('[data-under]').click(); for (let i = 0; i < 6 && G.ui.isOpen(); i++) { const q = document.querySelector('#panel #go, #panel .big'); q && q.click(); } const F = G.fight; G.titleChars.forEach(c => c.root.visible = false); document.getElementById('panel').style.visibility = 'hidden';
+      const used = {}; let t = 0; for (; t < 60 * 40 && F.active && F.E.hp > 0; t++) { F.update(1 / 60); if (F.P.act && F.P.act.ab && F.P.act.ab.egg) used[F.P.act.ab.name] = 1; if (t === 200) { G.gfx.updateParticles(1 / 60); G.gfx.render(); } }
+      return { name: h.name, race: G.RACES[h.race].name, cls: G.clsName(h), top, beast: !!(F.P.vis.c.beast), form: !!F.P.form, used: Object.keys(used), php: Math.round(F.P.hp) + '/' + Math.round(F.P.maxHp), ehp: Math.round(F.E.hp), frames: t }; });
+    await p.evaluate(() => { for (let i = 0; i < 30; i++) { G.fight.update(1 / 60); G.gfx.updateParticles(1 / 60); } G.gfx.render(); }); shots.push((await p.screenshot({ type: 'jpeg', quality: 80, clip: { x: 240, y: 60, width: 800, height: 560 } })).toString('base64'));
+    const fin = await p.evaluate(() => { const bn = (document.querySelector('#banner') || {}).textContent; let t = 0; while (G.fight.active && t++ < 4000) G.fight.update(1 / 30); document.getElementById('panel').style.visibility = ''; for (let i = 0; i < 8 && G.ui.isOpen(); i++) { const q = document.querySelector('#panel #ok, #panel #x, #panel .big'); q && q.click(); } return bn; });
+    console.log(id.padEnd(7), JSON.stringify(r), '| banner:', fin); }
+  const pg = await b.newPage({ viewport: { width: 1600, height: 100 } }); await pg.setContent('<body style="margin:0;background:#111"><div style="display:grid;grid-template-columns:repeat(4,400px)">' + shots.map(f => `<img src="data:image/jpeg;base64,${f}" width=400>`).join('') + '</div></body>'); await pg.screenshot({ path: 'guest_fights.png', fullPage: true });
+  console.log('ERRORS', errs.length, [...new Set(errs)].slice(0, 5).join(' || ')); await b.close(); })();

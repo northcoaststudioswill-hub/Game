@@ -851,3 +851,9 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .stance.on { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold) inset; }
 .gm-tiles.gm9 { grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 560px) { .stances { grid-template-columns: repeat(2, 1fr); } .stance small { display: none; } .gm-tiles.gm9 { grid-template-columns: repeat(3, 1fr); } .gm-tiles.gm9 .fence-room small { display: none; } }
+
+/* the Guest List */
+.guests .eg-p img { width: 5.2rem; height: 5.2rem; } .guests .stance { padding-top: 0.5rem; }
+.eg-moves { display: grid; gap: 0.35rem; margin: 0.5rem 0; } .eg-moves div { padding: 0.4rem 0.6rem; border: 1px solid rgba(240, 201, 90, 0.25); border-radius: 0.3rem; background: rgba(0, 0, 0, 0.25); }
+.eg-moves b { display: block; font-size: 0.9rem; } .eg-moves b i { font-style: normal; font-size: 0.62rem; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; margin-left: 0.4rem; } .eg-moves small { font-size: 0.72rem; color: #c8bea8; text-transform: none; letter-spacing: 0; line-height: 1.25; }
+.title-wrap .logo { pointer-events: auto; cursor: default; -webkit-tap-highlight-color: transparent; }

@@ -48,6 +48,8 @@
     else if (id === 'pale') { circ(118, 4, a); circ(104, 2, b2); circ(64, 3, a); poly(12, 100, b2, 2.5, 0, 5); poly(6, 64, a, 2, 0.5236); ticks(24, 108, 116, b2, 2); dots(12, 82, 3.5, a); }
     const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; return (RINGTEX[id] = t); };
   G.makeChar = function (look) {
+    if (look.beast && G.makeBeast) { const b = G.makeBeast(look.beast.kind, look.beast.col); b.root.scale.setScalar((look.scale || 1) * 0.92); return b; }
+    if (look.egg && G.EGGS && G.EGGS[look.egg]) look = Object.assign({}, look, { cls: G.EGGS[look.egg].frame });
     const rcls = look.cls, cls = ({ druid: 'cleric', warlock: 'sorcerer' })[rcls] || rcls, race = G.RACES[look.race], g = look.gear || {};      // new callings wear an older one's frame
     const P = Object.assign({}, BASE[rcls]); if (look.race === 'drow') P.hair = 0xe8e8f0;
     if (look.tint) Object.keys(look.tint).forEach(k => P[k] = hex(look.tint[k]));
@@ -223,6 +225,7 @@
     let lastAlpha = 1;
     const C = { root, body, mats, height: 1.9 * sc };
     // dismemberment: detach a limb (the caller throws it) and leave a wet stump where it was
+    if (look.egg && G.EGG_MODEL) { try { G.EGG_MODEL(look.egg, { head, torso, body, root }); } catch (e) { } }
     C.limbs = { armL, armR, legL, legR, head, foreL: armL.userData.fore, foreR: armR.userData.fore, shinL: legL.userData.shin, shinR: legR.userData.shin }; C.wHand = hR;
     C.sever = function (part) { const g = C.limbs[part]; if (!g || !g.parent || g.userData.gone) return null; g.userData.gone = 1; const st = new T.Mesh(new T.SphereGeometry(part === 'head' ? 0.15 : 0.11, 6, 5), new T.MeshLambertMaterial({ color: 0x7a0a0a, flatShading: true })); st.position.copy(g.position); st.scale.y = 0.55; g.parent.add(st); const bn = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 0.1, 5), new T.MeshLambertMaterial({ color: 0xe6dcc4 })); bn.position.copy(g.position); bn.position.y -= 0.04; g.parent.add(bn); return g; };
     // Joint targets are computed per state, then eased toward, so stances blend instead of snapping.
@@ -447,7 +450,7 @@
         }
         const c = G.makeChar(Object.assign({}, look, { scale: 1 })); const k = 1 / G.RACES[look.race].scale; c.root.scale.multiplyScalar(k);
         { const r = full ? 1.02 : 0.62; pcam.left = pcam.bottom = -r; pcam.right = pcam.top = r; pcam.updateProjectionMatrix(); pcam.position.set(full ? 4.4 : 3, full ? 2.9 : 3.1, 4.2); pcam.lookAt(0, full ? 0.98 : 1.32, 0); if (full) c.pose({ t: 0, act: 'idle', ready: 1 }); }
-        pscene.add(c.root); pr.render(pscene, pcam); pcache[key] = pr.domElement.toDataURL('image/png'); pscene.remove(c.root);
+        if (c.beast) c.root.position.y = full ? 0.3 : 0.78; pscene.add(c.root); pr.render(pscene, pcam); pcache[key] = pr.domElement.toDataURL('image/png'); pscene.remove(c.root);
       } catch (e) { pcache[key] = ''; }
     }
     if (pcache[key]) img.src = pcache[key];

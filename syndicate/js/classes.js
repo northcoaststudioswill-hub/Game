@@ -158,7 +158,7 @@
       const def = FORMS[id]; if (!def) return; if (e.form) G.forms.end(e, true);
       e.form = { id, basic0: e.basic, keys: Object.keys(ab.buff || {}).filter(k => k !== 'form').concat(e.d && e.d.formBonus ? ['dmg'] : []) }; e.basic = def.basic; e.charging = 0; e.chg = 0;
       if (e.d && e.d.formBonus) { ['form', 'speed', 'dmg', 'shield'].forEach(k => { if (e.buffs[k] && ab.buff && ab.buff[k]) e.buffs[k].t += 4; }); e.buffs.dmg = { t: e.buffs.form.t, amt: (ab.buff && ab.buff.dmg ? ab.buff.dmg[1] : 0) + 0.1 }; }
-      const v = e.vis; if (v && v.c && !v.human) { v.human = v.c; v.g.remove(v.c.root); const b = G.makeBeast(id === 'avatar' ? 'bear' : id, def.col, def.glow); b.root.scale.setScalar(def.scale * (e.look && e.look.scale || 1)); b.root.rotation.y = v.c.root.rotation.y; v.c = b; v.g.add(b.root); }
+      const v = e.vis; if (v && v.c && !v.human) { v.human = v.c; v.g.remove(v.c.root); const b = G.makeBeast(def.kind || (id === 'avatar' ? 'bear' : id), def.col, def.glow); b.root.scale.setScalar(def.scale * (e.look && e.look.scale || 1)); b.root.rotation.y = v.c.root.rotation.y; v.c = b; v.g.add(b.root); }
       puff(e, ab.color || '#ffffff'); G.sfx('buff'); if (gfx.cam) gfx.cam.shake = Math.max(gfx.cam.shake || 0, id === 'avatar' ? 0.5 : 0.2);
     },
     end: function (e, quiet) {

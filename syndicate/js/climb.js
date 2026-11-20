@@ -36,7 +36,7 @@
 
   const row = (o, cls, body, btn) => '<div class="opp ' + cls + '"><span class="op" data-o="' + o.id + '"></span><div class="opp-tx"><b>' + o.name + '</b> <small>' + o.title + '</small>' + body + '</div>' + btn + '</div>';
   const rew = (o, wins) => '<small class="rew">' + (wins ? Math.round(o.xp * .6) : o.xp) + ' XP · ' + (wins ? Math.round(o.coin * .6) : o.coin) + ' coin · ' + (wins ? Math.round(o.respect * .3) : o.respect) + ' respect</small>';
-  const who = o => '<small>Level ' + o.level + ' ' + G.RACES[o.race].name + ' ' + G.CLASSES[o.cls].name;
+  const who = o => '<small>Level ' + o.level + ' ' + G.RACES[o.race].name + ' ' + G.clsName(o);
   ui.pit = function () {
     const st = G.state, u = U(st), now = tierNow(st), byId = {}; if (G.ensureLedger) G.ensureLedger();
     let h = '<div class="card"><h2>The Blood Ledger</h2><p class="dim">' + (now < 0 ? 'You hold the Guttercrown, and the Ledger never closes. <b>' + G.defended(st) + '</b> challenger' + (G.defended(st) === 1 ? '' : 's') + ' turned away. Each one is a little worse than the last.' : 'Nine names stand between you and the crown. Nobody is handed a name: win your <b>undercard</b> bouts and the Ledger-Keeper writes you in against the next one.') + '</p><div class="ladder">';
@@ -46,7 +46,7 @@
         const uo = make(t, u[t]); byId[uo.id] = uo; const left = NEED[t] - u[t];
         h += '<div class="tier"><b>Tonight’s undercard</b><span class="pips">' + Array.from({ length: NEED[t] }, (_, i) => '<i class="' + (i < u[t] ? 'on' : '') + '"></i>').join('') + '</span><small>' + (left > 0 ? left + ' more to earn ' + o.name : 'Earned. Fight on for smaller purses, or face ' + o.name + '.') + '</small></div>';
         h += '<p class="uc-why">' + o.name + ' does not fight strangers. The <b>undercard</b> is the run of smaller bouts the Guild stages first: hungry nobodies, each one fighting for the same line in the Ledger you are. Beat <b>' + NEED[t] + '</b> of them and the Keeper writes you in. Nobody you kill comes back; the Guild always finds another.</p>';
-        h += '<div class="uc-card">' + Array.from({ length: Math.max(NEED[t], u[t] + 1) }, (_, i) => { const q = make(t, i); return '<span class="' + (i < u[t] ? 'dead' : i === u[t] ? 'now' : '') + '">' + (i < u[t] ? '✝ ' : i === u[t] ? '▶ ' : '') + q.name + (i > u[t] ? ' <i>' + G.CLASSES[q.cls].name + '</i>' : '') + '</span>'; }).join('') + '</div>';
+        h += '<div class="uc-card">' + Array.from({ length: Math.max(NEED[t], u[t] + 1) }, (_, i) => { const q = make(t, i); return '<span class="' + (i < u[t] ? 'dead' : i === u[t] ? 'now' : '') + '">' + (i < u[t] ? '✝ ' : i === u[t] ? '▶ ' : '') + q.name + (i > u[t] ? ' <i>' + G.clsName(q) + '</i>' : '') + '</span>'; }).join('') + '</div>';
         h += row(uo, 'under' + (left > 0 ? ' cur' : ''), who(uo) + '</small><em class="taunt">“' + uo.taunt + '”</em>' + rew(uo, 0), '<button class="' + (left > 0 ? 'big' : '') + '" data-under="' + t + '">Fight</button>');
       }
       byId[o.id] = o;

@@ -168,6 +168,7 @@
     Object.keys(b).forEach(k => s[k] += b[k]);
     return s;
   };
+  G.clsName = h => (G.CLASSES[h && h.cls] || {}).name || '';
   G.newHero = (name, race, cls) => {
     const C = G.CLASSES[cls];
     return { name, race, cls, level: 1, xp: 0, stats: G.baseStats(cls, race), sub: null, feats: [], known: C.start.slice(), slots: [C.start[0], C.start[1], null], ult: null };

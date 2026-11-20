@@ -14,7 +14,7 @@
     const fight = G.scene === 'fight' && F().active; if (!fight && !inWorld()) return; if (G.talk) return;
     if (fight) F().paused = true; fromPause = true; const st = G.state, h = st.hero, watching = !!G.spectating;
     show('<div class="card small pausecard"><small class="over">' + (fight ? (watching ? 'At the rail' : 'In the pit') : G.scene === 'hideout' ? 'At home' : 'In the market') + '</small><h2>Paused</h2>' +
-      (h && !watching ? '<p class="dim">' + h.name + ' · level ' + h.level + ' ' + G.CLASSES[h.cls].name + ' · ' + G.RANKS[G.rankOf(st.respect)].name + '</p>' : '') +
+      (h && !watching ? '<p class="dim">' + h.name + ' · level ' + h.level + ' ' + G.clsName(h) + ' · ' + G.RANKS[G.rankOf(st.respect)].name + '</p>' : '') +
       '<div class="choices">' +
       '<button class="big" id="rs"><b>Resume</b><small>Back to ' + (fight ? 'the bout' : 'where you were') + '.</small></button>' +
       '<button id="pset"><b>Settings</b><small>Sound, music, blood, screen shake, menu size, performance.</small></button>' +

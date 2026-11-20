@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const G = window.G, ui = G.ui, show = (h, c) => ui._show(h, c), on = (s, f) => ui._on(s, f), W = G.world;
-  const line = q => q ? '<b>' + G.esc(q.hero.name) + '</b><small>Level ' + q.hero.level + ' ' + (G.RACES[q.hero.race] || {}).name + ' ' + (G.CLASSES[q.hero.cls] || {}).name + ' · ' + G.RANKS[G.rankOf(q.respect || 0)].name + ' · ' + (q.coin || 0) + ' coin' + (q.usurper ? ' · crowned' : '') + '</small>' : '<b>Empty</b><small>A fresh page in the Ledger.</small>';
+  const line = q => q ? '<b>' + G.esc(q.hero.name) + '</b><small>Level ' + q.hero.level + ' ' + (G.RACES[q.hero.race] || {}).name + ' ' + G.clsName(q.hero) + ' · ' + G.RANKS[G.rankOf(q.respect || 0)].name + ' · ' + (q.coin || 0) + ' coin' + (q.usurper ? ' · crowned' : '') + '</small>' : '<b>Empty</b><small>A fresh page in the Ledger.</small>';
   const slots = () => { const a = []; for (let n = 1; n <= G.SLOTS; n++) a.push(G.slotInfo(n)); return a; };
 
   // ---------------------------------------------------------------- choosing a fighter
@@ -29,7 +29,7 @@
     const r = t0.apply(this, arguments), all = slots(), n = all.filter(Boolean).length, menu = document.querySelector('#panel .menu'); if (!menu) return r;
     const swap = (id, fn) => { const b = document.getElementById(id); if (!b) return null; const c = b.cloneNode(true); b.parentNode.replaceChild(c, b); c.onclick = () => { G.audioInit && G.audioInit(); G.sfx('ui'); fn(); }; return c; };
     // Continue: the fighter you last played; with more than one, a line says who, and Fighters lists them all
-    if (n) { if (!all[G.slot - 1]) G.setSlot(all.findIndex(Boolean) + 1); const cur = all[G.slot - 1]; const c = swap('bCont', () => { G.load(); G.applyOpts(); ui._coin = G.state.coin; ui.hub(); }); if (c) c.innerHTML = 'Continue<small class="t-who">' + G.esc(cur.hero.name) + ' · level ' + cur.hero.level + ' ' + G.CLASSES[cur.hero.cls].name + '</small>'; }
+    if (n) { if (!all[G.slot - 1]) G.setSlot(all.findIndex(Boolean) + 1); const cur = all[G.slot - 1]; const c = swap('bCont', () => { G.load(); G.applyOpts(); ui._coin = G.state.coin; ui.hub(); }); if (c) c.innerHTML = 'Continue<small class="t-who">' + G.esc(cur.hero.name) + ' · level ' + cur.hero.level + ' ' + G.clsName(cur.hero) + '</small>'; }
     swap('bNew', () => { if (!n) { G.setSlot(1); return G.cine.play(() => ui.create()); } const free = all.findIndex(q => !q); if (free >= 0) { G.setSlot(free + 1); G.state = G.newState(); return G.cine.play(() => ui.create()); } ui.saves('new'); });
     const add = (id, label, fn, after) => { const b = document.createElement('button'); b.id = id; b.textContent = label; b.onclick = () => { G.audioInit && G.audioInit(); G.sfx('ui'); fn(); }; after.insertAdjacentElement('afterend', b); return b; };
     const nw = document.getElementById('bNew'); let last = nw;

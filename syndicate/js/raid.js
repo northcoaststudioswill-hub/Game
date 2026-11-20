@@ -93,7 +93,7 @@
   ui.pit = function () {
     const r = pit0.apply(this, arguments), st = G.state, lad = document.querySelector('#panel .ladder'); if (!st.grudge || !lad) return r;
     const o = grudgeOpp(st), row = document.createElement('div'); row.className = 'opp grudge cur';
-    row.innerHTML = '<span class="op"></span><div class="opp-tx"><b>' + o.name + '</b> <small>' + o.title + '</small><small>Level ' + o.level + ' ' + G.RACES[o.race].name + ' ' + G.CLASSES[o.cls].name + ' · a grudge</small><em class="taunt">“' + o.taunt + '”</em><small class="rew">' + o.xp + ' XP · ' + o.coin + ' coin · heat −2 · the named fighters wait until this is settled</small></div><button class="big">Answer it</button>';
+    row.innerHTML = '<span class="op"></span><div class="opp-tx"><b>' + o.name + '</b> <small>' + o.title + '</small><small>Level ' + o.level + ' ' + G.RACES[o.race].name + ' ' + G.clsName(o) + ' · a grudge</small><em class="taunt">“' + o.taunt + '”</em><small class="rew">' + o.xp + ' XP · ' + o.coin + ' coin · heat −2 · the named fighters wait until this is settled</small></div><button class="big">Answer it</button>';
     row.querySelector('.op').appendChild(G.portrait({ cls: o.cls, race: o.race, tint: o.tint }, 56, 1.2)); row.querySelector('button').onclick = () => { G.sfx('ui'); ui.prefight(o); };
     lad.insertBefore(row, lad.firstChild);
     lad.querySelectorAll('[data-fight]').forEach(b => { if (/^Fight$/.test(b.textContent)) { const s = document.createElement('span'); s.className = 'lock'; s.textContent = 'Grudge first'; b.parentNode.replaceChild(s, b); } });

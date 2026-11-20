@@ -99,7 +99,7 @@
     const row = (a, b) => '<span><b>' + b + '</b><i>' + a + '</i></span>';
     d.innerHTML = row('bouts won', wins) + row('names in the sand', (st.fallen || []).length) + row('deaths', st.deaths || 0) + row('gardens survived', st.gardens || 0) + row('level', h.level) + row('respect', st.respect);
     end.parentNode.insertBefore(d, end);
-    try { const r = JSON.parse(localStorage.getItem('guttercrown_reigns') || '[]'); r.push(h.name + ', ' + G.CLASSES[h.cls].name + ' · ' + TITLES[st.usurper || 'alone'] + ' · ' + wins + ' bouts'); localStorage.setItem('guttercrown_reigns', JSON.stringify(r.slice(-12))); } catch (e) { }
+    try { const r = JSON.parse(localStorage.getItem('guttercrown_reigns') || '[]'); r.push(h.name + ', ' + G.clsName(h) + ' · ' + TITLES[st.usurper || 'alone'] + ' · ' + wins + ' bouts'); localStorage.setItem('guttercrown_reigns', JSON.stringify(r.slice(-12))); } catch (e) { }
   }
   // once it is yours, the stair lets you remember how it went
   const st0 = ui.stair;
