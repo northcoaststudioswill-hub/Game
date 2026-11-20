@@ -7,7 +7,8 @@ Kept current as work lands. Newest section first.
 Done so far:
 
 - Hidden roster page: tap the crown five times, type `louie`, or hold both shoulder buttons on the title.
-- Ten guests, each with their own race, title, moves, ultimate and named finisher: David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout, Kael, Eleven.
+- Thirteen guests, each with their own race, title, moves, ultimate and finisher: David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout, Kael, Eleven, Mama, Corbin, Gas Guy.
+- Starting a career as a guest: one big button on their card; if all three pages are in use it asks which page they take. The crown opens the list by mouse or touch.
 - Their own body style (round, smooth, big heads, cartoon eyes; Lil Bottie square and chrome; Louie a Shiba; only David keeps the pit's body) and their own clothes and props.
 - Current starters, on the sand when called: Cuyapup, Bessling, Grasskin for Erin; Cuyaflare, Bessie, Mossman for Will.
 - Knockout cinematics as ultimates: Hasbara (Will), Louie Airlines (Erin), The Final Bet (Marcus), Nuke the Data Center (Lil Bottie), War Criminal (King Bibi, the data-centre half only), Judgement's side-eye (Louie).
@@ -28,14 +29,13 @@ Not done:
 - **Louie** — on the wolf's skeleton and animations; no airplane ears.
 - **Guest bodies** — share the pit skeleton and its animations. Fully separate rigs (the Sprout as a seed with stub legs, Bottie with jointed robot limbs) are not built.
 - **Cinematic art** — the screens are flat shapes and type, far simpler than the Knockout pixel scenes.
-- **More moves from the other games** — not yet recreated: Leash Lasso, Shiba Plane, Paw Paw Paw, Snake the Drain, Plunger Pop, Bean Dip, and the whole sets of Corbin, Mama and Gas Guy.
+- **Kael should come from Sootborn** — Will says Kael is written in depth there. That game is not in this repository; the current Kael is a placeholder until it can be read.
+- **Mama, Corbin and Gas Guy** — added in one pass and only checked by the automatic bout test; nobody has looked at their models or moves on screen yet. Gas Guy's look is invented.
+- **Guest endings** — a one-line card after the normal ending; not seen in a real run.
 - **Unique attack animations** — guests use their frame's swings and casts (Bottie does not fire from the arm guns, Marcus swings the wrench like a hammer, Eleven's blade like an axe).
 - **Guest careers are titles only** — no new moves unlocked by level, no story scenes, no guest-specific ending; the normal ending plays.
 - **Guest dialogue is one-liners** — passing remarks in the market only. Talking to Marc, Pip, the Guildmaster or David as a guest still plays the normal conversation, and guests have no lines about each other.
 - **Guests only appear as opponents when you choose to spar them** — never on the ladder, and sparring guests do not use their cinematic ultimates.
-- **More of the old cast** — Corbin, Mama, Gas Guy are not on the list.
-- **Shop and Tailor on a guest** — kits and cosmetics do not show on a guest's body; the shops do not say so.
-- **Stance pictures for Louie** — the stance picker assumes a two-legged fighter.
 - **The computer never picks the cinematic ultimates** — they fire from a real button press only.
 - **Balance** — deliberately broken. Not tuned at all.
 
