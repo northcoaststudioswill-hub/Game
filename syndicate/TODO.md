@@ -29,10 +29,10 @@ Not done:
 - **Louie** — on the wolf's skeleton and animations; no airplane ears.
 - **Guest bodies** — share the pit skeleton and its animations. Fully separate rigs (the Sprout as a seed with stub legs, Bottie with jointed robot limbs) are not built.
 - **Cinematic art** — the screens are flat shapes and type, far simpler than the Knockout pixel scenes.
-- **Kael should come from Sootborn** — Will says Kael is written in depth there. That game is not in this repository; the current Kael is a placeholder until it can be read.
-- **Mama, Corbin and Gas Guy** — added in one pass and only checked by the automatic bout test; nobody has looked at their models or moves on screen yet. Gas Guy's look is invented.
+- **Kael should come from Sootborn** — Will says Kael is written in depth there. Sootborn is not in this repository or in the account's other three (kira, itsforfun, renderit, including their side branches); the current Kael is a placeholder until it can be read.
+- **Mama, Corbin and Gas Guy** — models checked in a line-up; their moves and finishers have only been through the automatic bout test, not watched. Gas Guy's look is invented.
 - **Guest endings** — a one-line card after the normal ending; not seen in a real run.
-- **Unique attack animations** — guests use their frame's swings and casts (Bottie does not fire from the arm guns, Marcus swings the wrench like a hammer, Eleven's blade like an axe).
+- **Attack animations** — each guest now has their own idle, walk and cast poses laid over the frame (Bottie's stiff march and both arms out to fire, Mama carrying the baby, Bibi's wagging finger, Kael's skating lean), but melee swings are still the frame's: Marcus swings the wrench like a hammer, Eleven's blade like an axe.
 - **Guest careers are titles only** — no new moves unlocked by level, no story scenes, no guest-specific ending; the normal ending plays.
 - **Guest dialogue is one-liners** — passing remarks in the market only. Talking to Marc, Pip, the Guildmaster or David as a guest still plays the normal conversation, and guests have no lines about each other.
 - **Guests only appear as opponents when you choose to spar them** — never on the ladder, and sparring guests do not use their cinematic ultimates.
