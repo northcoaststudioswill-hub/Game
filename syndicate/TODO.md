@@ -7,7 +7,7 @@ Kept current as work lands. Newest section first.
 Done so far:
 
 - Hidden roster page: tap the crown five times, type `louie`, or hold both shoulder buttons on the title.
-- Thirteen guests, each with their own race, title, moves, ultimate and finisher: David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout, Kael, Eleven, Mama, Corbin, Gas Guy.
+- Ten guests, exactly the ones Will named, each with their own race, title, moves, ultimate and finisher: David Roseinbeirg, Lil Bottie, Marcus, Will, Erin, Louie, King Bibi, a Sprout, Kael, Eleven. (Mama, Corbin and Gas Guy were added by mistake and removed. Do not add anyone Will has not asked for.)
 - Starting a career as a guest: one big button on their card; if all three pages are in use it asks which page they take. The crown opens the list by mouse or touch.
 - Their own body style (round, smooth, big heads, cartoon eyes; Lil Bottie square and chrome; Louie a Shiba; only David keeps the pit's body) and their own clothes and props.
 - Current starters, on the sand when called: Cuyapup, Bessling, Grasskin for Erin; Cuyaflare, Bessie, Mossman for Will.
@@ -30,7 +30,6 @@ Not done:
 - **Guest bodies** — share the pit skeleton and its animations. Fully separate rigs (the Sprout as a seed with stub legs, Bottie with jointed robot limbs) are not built.
 - **Cinematic art** — the screens are flat shapes and type, far simpler than the Knockout pixel scenes.
 - **Kael should come from Sootborn** — Will says Kael is written in depth there. Sootborn is not in this repository or in the account's other three (kira, itsforfun, renderit, including their side branches); the current Kael is a placeholder until it can be read.
-- **Mama, Corbin and Gas Guy** — models checked in a line-up; their moves and finishers have only been through the automatic bout test, not watched. Gas Guy's look is invented.
 - **Guest endings** — a one-line card after the normal ending; not seen in a real run.
 - **Attack animations** — each guest now has their own idle, walk and cast poses laid over the frame (Bottie's stiff march and both arms out to fire, Mama carrying the baby, Bibi's wagging finger, Kael's skating lean), but melee swings are still the frame's: Marcus swings the wrench like a hammer, Eleven's blade like an axe.
 - **Guest careers are titles only** — no new moves unlocked by level, no story scenes, no guest-specific ending; the normal ending plays.
