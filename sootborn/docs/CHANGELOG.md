@@ -1,4 +1,17 @@
-# SOOTBORN — changelog (latest v0.81 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.82 · 2026-11-20)
+
+## v0.82 · 2026-11-20 — a picture in front of the Pairing and the Ford
+Step 14 (films): the two Assay fights that started cold now open on a drawn picture, seven seconds each, any button passes it.
+
+- **The Pairing:** the gallery's lamps and three heads keeping score, then down to the floor of the sealed room: two short blades laid apart, the door they came in by, the other door standing dark, and half a loaf on a lift ticket.
+- **The Ford:** dusk over the river; eleven stones light one after another from your boots on the near bank to the far one, where Captain Vant waits under House Teal's standard with his point down.
+
+**Checked:** a still of each (the end of the move, not the whole move); the whole-story bot (see below).
+
+**The whole-story bot:** new game to THE END, no errors.
+
+**Not checked:** nothing by hand. Neither picture was seen moving. The start of the Pairing's picture (the gallery) was not looked at, only its end.
+
 
 ## v0.81 · 2026-11-20 — the High Docks: three things to find for the Codex
 A small part of Step 12. **The High Docks was not rebuilt.** I looked at it first: it was already rebuilt once (every surface, v0.5x), and "from reference" needs a reference I do not have and eyes I cannot use on a whole level. So this adds the one thing on that line that could be done and checked: hidden things for the Codex.

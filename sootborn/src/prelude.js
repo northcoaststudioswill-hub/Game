@@ -549,6 +549,44 @@ const Prelude = (() => {
     circ(g, 4, 250, 76); fs(g, '#9a6448'); st(g, 9); g.beginPath(); g.arc(4, 236, 80, Math.PI, TAU); g.closePath(); fs(g, '#2a1a14'); st(g, 7); g.beginPath(); g.rect(-70, 226, 148, 22); fs(g, '#3a3028'); st(g, 5);
     g.lineCap = 'round'; g.beginPath(); g.moveTo(90, 390); g.lineTo(180, 470); g.lineTo(250, 430); st(g, 60, '#120a0e'); st(g, 46, '#5a4a3a'); g.lineCap = 'butt'; ell(g, 258, 424, 34, 28, 0); fs(g, '#9a6448'); st(g, 7); g.restore();
   }
+  // the Pairing: a sealed room, two short blades on the floor, half a loaf, and the gallery keeping score
+  function pPairing(g, u, T) {
+    g.fillStyle = '#0e0c12'; g.fillRect(-300, -200, 2200, 1300);
+    /* the gallery slit, lamps and three heads */
+    poly(g, [200, 60, 1400, 60, 1400, 230, 200, 230]); fs(g, '#2a2218'); st(g, 9); glow(g, 800, 150, 700, '255,214,140', .32 + Math.sin(T * 2.2) * .02);
+    for (const x of [520, 800, 1080]) { g.beginPath(); g.moveTo(x - 62, 230); g.lineTo(x - 50, 150); g.quadraticCurveTo(x, 70, x + 50, 150); g.lineTo(x + 62, 230); g.closePath(); fs(g, '#08060a'); st(g, 6); }
+    for (const x of [360, 1240]) { circ(g, x, 140, 16); fs(g, '#ffd98a'); glow(g, x, 140, 120, '255,214,140', .5); }
+    /* two doors: the one they came in by, and the other */
+    poly(g, [60, 330, 300, 330, 300, 800, 60, 800]); fs(g, '#3a3026'); tone(g, '#120c0a', .5, 9); st(g, 10); for (const y of [420, 560, 700]) { g.beginPath(); g.moveTo(60, y); g.lineTo(300, y); st(g, 7); }
+    poly(g, [1300, 330, 1540, 330, 1540, 800, 1300, 800]); fs(g, '#040306'); st(g, 10); glow(g, 1420, 800, 260, '120,160,220', .22);
+    /* the floor, a cone of lamp light */
+    poly(g, [-300, 800, 1900, 800, 1900, 1400, -300, 1400]); fs(g, '#1c1820'); st(g, 8); g.save(); g.globalAlpha = .5; poly(g, [560, 800, 1040, 800, 1440, 1400, 160, 1400]); fs(g, '#4a4034'); g.restore();
+    /* two blades laid down, hilts apart */
+    const k = ez(cl(u * 1.4, 0, 1));
+    g.save(); g.translate(690, 900); g.rotate(-.18); poly(g, [-150, -8, 60, -12, 110, 0, 60, 12, -150, 8]); fs(g, '#d8dce4'); st(g, 6); poly(g, [-150, -22, -134, -22, -134, 22, -150, 22]); fs(g, '#7a4ad0'); st(g, 5); poly(g, [-220, -10, -150, -10, -150, 10, -220, 10]); fs(g, '#3a2a20'); st(g, 5); g.restore();
+    g.save(); g.translate(930, 930); g.rotate(Math.PI + .22); poly(g, [-150, -8, 60, -12, 110, 0, 60, 12, -150, 8]); fs(g, '#d8dce4'); st(g, 6); poly(g, [-150, -22, -134, -22, -134, 22, -150, 22]); fs(g, '#7a4ad0'); st(g, 5); poly(g, [-220, -10, -150, -10, -150, 10, -220, 10]); fs(g, '#3a2a20'); st(g, 5); g.restore();
+    /* half a loaf, torn, on a lift ticket */
+    g.save(); g.translate(800, 1010); g.globalAlpha = k; poly(g, [-90, 20, 80, 8, 96, 44, -76, 56]); fs(g, '#e8dcc0'); st(g, 5); g.beginPath(); g.moveTo(-60, 10); g.quadraticCurveTo(-50, -52, 20, -50); g.lineTo(40, -30); g.lineTo(30, -6); g.lineTo(52, 8); g.lineTo(-60, 22); g.closePath(); fs(g, '#b98a4a'); tone(g, '#5a3a1a', .45, 7); st(g, 7); g.restore();
+  }
+  // the Ford: eleven stones across a river at dusk, and one man on the far bank who has never been hungry
+  function pFord(g, u, T) {
+    g.fillStyle = lin(g, 0, -200, 0, 1100, ['#2a2a52', '#7a4a6a', '#e08a5a', '#f2c27a']); g.fillRect(-300, -200, 2200, 1300); glow(g, 1180, 330, 520, '255,220,160', .6);
+    /* the far ridge, the far bank, a teal standard */
+    g.beginPath(); g.moveTo(-300, 380); g.quadraticCurveTo(300, 250, 800, 340); g.quadraticCurveTo(1300, 250, 1900, 360); g.lineTo(1900, 470); g.lineTo(-300, 470); g.closePath(); fs(g, '#3a2e4a'); st(g, 8);
+    poly(g, [-300, 440, 1900, 420, 1900, 500, -300, 520]); fs(g, '#4a4034'); tone(g, '#1a1410', .45, 9); st(g, 8);
+    g.beginPath(); g.moveTo(1150, 450); g.lineTo(1150, 190); st(g, 12, '#120a0e'); st(g, 6, '#8a6a48'); g.beginPath(); g.moveTo(1150, 200); g.quadraticCurveTo(1230 + Math.sin(T * 2) * 10, 215, 1290, 205 + Math.sin(T * 2.4) * 8); g.lineTo(1280, 290); g.quadraticCurveTo(1220, 280, 1150, 296); g.closePath(); fs(g, '#2aa6a0'); st(g, 6);
+    /* Vant, small, waiting, blade point down */
+    g.save(); g.translate(900, 0); g.beginPath(); g.moveTo(-34, 450); g.lineTo(-26, 350); g.quadraticCurveTo(0, 318, 26, 350); g.lineTo(34, 450); g.closePath(); fs(g, '#2aa6a0'); tone(g, '#0a3a3a', .45, 6); st(g, 7); circ(g, 0, 300, 26); fs(g, '#f0d8c4'); st(g, 6); g.beginPath(); g.arc(0, 294, 28, Math.PI, TAU); g.closePath(); fs(g, '#e9c860'); st(g, 5); g.beginPath(); g.moveTo(44, 360); g.lineTo(52, 452); st(g, 9, '#120a0e'); st(g, 4, '#eef2f6'); g.restore();
+    /* the water */
+    poly(g, [-300, 500, 1900, 480, 1900, 1100, -300, 1100]); g.fillStyle = lin(g, 0, 480, 0, 1100, ['#c8785a', '#5a4a7a', '#1e2444']); g.fill(); st(g, 8);
+    for (let i = 0; i < 14; i++) { const y = 540 + i * 40, x = ((i * 397 + T * (30 + i * 4)) % 2400) - 400; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + 90, y - 10, x + 200, y); st(g, 4, 'rgba(255,236,200,.35)'); }
+    /* eleven stones, lit one at a time from the near bank */
+    const n = Math.floor(cl(u * 1.25, 0, 1) * 11 + .001);
+    for (let i = 0; i < 11; i++) { const f = i / 10, x = 520 + f * 340 + Math.sin(i * 1.7) * 60, y = 980 - f * 440, r = 74 - f * 46; ell(g, x, y, r, r * .42, 0); fs(g, i < n ? '#f2e2b8' : '#6a5a6a'); st(g, 7 - f * 3); }
+    /* the near bank, and his boots at the edge of it */
+    poly(g, [-300, 1010, 420, 990, 520, 1100, -300, 1100]); fs(g, '#2a2420'); st(g, 9);
+    g.save(); g.translate(250, 1000); ell(g, -40, 0, 52, 24, -.1); fs(g, '#3a2a22'); st(g, 7); ell(g, 60, 6, 52, 24, .05); fs(g, '#3a2a22'); st(g, 7); g.restore();
+  }
   // the week he blamed her: one line in the dock log, under a hooded lamp
   function pDockLog(g, u, T) {
     g.fillStyle = '#12100e'; g.fillRect(-300, -200, 2200, 1300); glow(g, 620, 300, 900, '255,200,120', .5 + Math.sin(T * 2.6) * .03);
@@ -561,7 +599,7 @@ const Prelude = (() => {
     // his thumb on the edge of the page, in a glove
     g.save(); g.translate(1420, 860); ell(g, 0, 0, 150, 90, -.5); fs(g, '#6a5a44'); tone(g, '#2a2016', .5, 8); st(g, 9); capsule(g, -90, -60, -200, -150, 40); fs(g, '#6a5a44'); st(g, 8); g.restore();
   }
-  const PLATES = { down: [pDown, [860, 430, .9, 900, 440, 1.0]], lucan: [pLucan, [800, 500, .98, 810, 380, 1.2]], halberd: [pHalberd, [760, 480, 1.0, 800, 380, 1.14]], docklog: [pDockLog, [800, 500, .98, 900, 500, 1.1]], furnace: [pFurnace, [800, 470, 1.0, 800, 470, 1.22]], lift: [eLift, [800, 420, 1.0, 800, 520, 1.12]], square: [eSquare, [800, 520, 1.06, 800, 420, 1.0]], sun: [eSun, [720, 440, 1.0, 800, 410, 1.14]], names: [eNames, [800, 520, 1.0, 800, 560, 1.08]], tbarge: [eBarge, [760, 440, 1.0, 800, 400, 1.1]], shelf: [eShelf, [760, 470, 1.0, 900, 420, 1.12]], book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
+  const PLATES = { pairing: [pPairing, [800, 300, 1.0, 800, 850, 1.06]], ford: [pFord, [700, 760, 1.12, 860, 470, 1.0]], down: [pDown, [860, 430, .9, 900, 440, 1.0]], lucan: [pLucan, [800, 500, .98, 810, 380, 1.2]], halberd: [pHalberd, [760, 480, 1.0, 800, 380, 1.14]], docklog: [pDockLog, [800, 500, .98, 900, 500, 1.1]], furnace: [pFurnace, [800, 470, 1.0, 800, 470, 1.22]], lift: [eLift, [800, 420, 1.0, 800, 520, 1.12]], square: [eSquare, [800, 520, 1.06, 800, 420, 1.0]], sun: [eSun, [720, 440, 1.0, 800, 410, 1.14]], names: [eNames, [800, 520, 1.0, 800, 560, 1.08]], tbarge: [eBarge, [760, 440, 1.0, 800, 400, 1.1]], shelf: [eShelf, [760, 470, 1.0, 900, 420, 1.12]], book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
   const SHOTS = [
     [[1, s1]], [[1, s2]], [[1, s3], [1.5, s3fg]], [[1, s4], [1.6, s4fg]], [[1, s5]], [[1, s6]], [[1, s7]], [[1, s8], [1.35, s8fg]],
     [[1, (g, u, T) => eyes(g, u, T, 0)]], [[1, (g, u, T) => eyes(g, u, T, 1)]], [[1, s11]]
