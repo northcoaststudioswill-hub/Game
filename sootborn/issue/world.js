@@ -651,7 +651,46 @@
       D('flat', -13.86, 13.1, 9.6, 0.04, 0.5, 0.36, 0x23232e, { outline: 0.02 }); D('flat', -C - 0.06, 25.6, 3.4, 0.05, 0.9, 1.5, GILT, { outline: 0.03 }); D('flat', -C - 0.1, 25.6, 3.4, 0.03, 0.6, 1.2, 0x23232e, { outline: 0 });
       chalkW(-C - 0.04, 13.2, 6.6, -Math.PI / 2, 0.24); chalkW(C + 0.04, 4.4, 1, Math.PI / 2, 0.22);
     };
-    if (SC.issue === 'riser') RISER(); else if (SC.issue === 'stair') STAIR(); else if (SC.issue === 'gild') GILD(); else if (SC.issue === 'stack') STACK(); else { DOCKS_A(); DOCKS_B(); }
+    // ===== THE DEEP ARRAY: under the floor of Tier Six, forty-three days after the furnace. The machine the air comes from, and what is left of it =====
+    const ARRAY = () => {
+      W.underRoof = () => true; W.inside = () => true;
+      const IR = 0x3a3f4c, RUST = 0x7a4a2a, BR = 0xb8863a, WALL = 0x26302c, WARM = 0xffb060, SEAL = 0x5ff2e2, rs = SC.seeded(77);
+      D('roof', 0, -0.5, 0, 44, 1, 64, 0x1f2624, { outline: 0 });
+      B('concrete', -20, -29.6, 20, -28, 0, 24, WALL, { outline: 0.1 }); B('concrete', -20, 28, 20, 29.6, 0, 24, WALL, { outline: 0.1 }); B('concrete', -20.6, -29, -18, 29, 0, 24, WALL, { outline: 0.1 }); B('concrete', 18, -29, 20.6, 29, 0, 24, WALL, { outline: 0.1 });
+      D('roof', 0, 24.4, 0, 42, 0.8, 60, 0x141918, { outline: 0 });
+      for (let i = 0; i < 9; i++) { D('flat', -17.9, 3 + i * 2.3, -24 + (i * 13) % 48, 0.2, 0.3, 9 + (i % 3) * 4, i % 2 ? RUST : IR, { outline: 0.03 }); D('flat', 17.9, 2 + i * 2.4, -20 + (i * 17) % 44, 0.2, 0.3, 7 + (i % 4) * 3, i % 2 ? IR : BR, { outline: 0.03 }); }
+      const post = (x, y, z) => D('flat', x, y + 0.55, z, 0.1, 1.1, 0.1, IR, { outline: 0.02 });
+      const edge = (x0, z0, x1, z1, ya, yb) => { if (z0 === z1) solid(x0, z0 - 0.1, x1, z0 + 0.1, Math.min(ya, yb) - 0.5, Math.max(ya, yb) + 1.25, { cam: false }); else solid(x0 - 0.1, z0, x0 + 0.1, z1, Math.min(ya, yb) - 0.5, Math.max(ya, yb) + 1.25, { cam: false });
+        const n = Math.max(1, Math.round(Math.hypot(x1 - x0, z1 - z0) / 1.7)); for (let i = 0; i <= n; i++) post(SC.lerp(x0, x1, i / n), SC.lerp(ya, yb, i / n), SC.lerp(z0, z1, i / n)); };
+      const pad = (x0, z0, x1, z1, y) => B('flat', x0, z0, x1, z1, y - 0.45, y, IR, { outline: 0.05 });
+      // the hatch gantry, the ladder down from the tunnel, and the stair along the west wall
+      pad(-18, 20, -10, 28, 12); edge(-14.6, 20, -10, 20, 12, 12); edge(-10, 20, -10, 28, 12, 12);
+      [-0.4, 0.4].forEach(o => D('flat', -14 + o, 18, 27.7, 0.1, 12, 0.1, IR, { outline: 0.02 })); for (let y = 12.6; y < 24; y += 0.7) D('flat', -14, y, 27.7, 0.9, 0.07, 0.07, IR, { outline: 0 }); D('glow', -14, 23.9, 27.2, 1.6, 0.1, 1.2, WARM, { outline: 0 });
+      ramp('flat', -18, 4, -14.6, 20, 7.55, 8, 12, 'z', IR, { steps: true }); edge(-14.6, 4, -14.6, 20, 8, 12);
+      // the long catwalk across the hall, and a bay to stand in while the watch lamp goes by
+      pad(-18, 0, 18, 4, 8); edge(-18, 0, 14.6, 0, 8, 8); edge(-14.6, 4, -12, 4, 8, 8); edge(-8, 4, 18, 4, 8, 8);
+      pad(-12, 4, -8, 7.4, 8); edge(-12, 7.4, -8, 7.4, 8, 8); edge(-12, 4, -12, 7.4, 8, 8); edge(-8, 4, -8, 7.4, 8, 8); crateStatic(-11, 6.5, 1.3, 8); crateStatic(-9.4, 6.7, 0.9, 8);
+      for (let x = -15; x <= 15; x += 6) [0.3, 3.7].forEach(z => D('flat', x, 3.8, z, 0.26, 7.6, 0.26, IR, { outline: 0.03 }));
+      D('flat', 3, 13.2, 2, 16, 0.14, 0.14, IR, { outline: 0.02 });   // the rail the watch lamp runs on
+      // the east stair down to the floor
+      ramp('flat', 14.6, -20, 18, 0, -0.45, 0, 8, 'z', IR, { steps: true }); edge(14.6, -20, 14.6, 0, 0, 8);
+      // the floor: the heart of it, the main, forty-eight banks
+      cyl('flat', 0, 2.2, -18, 4.2, 4.8, 4.4, RUST, { seg: 20, outline: 0.1 }); cyl('flat', 0, 4.6, -18, 4.5, 4.5, 0.4, BR, { seg: 20, outline: 0.06 }); solid(-4.3, -22.3, 4.3, -13.7, 0, 4.8, {});
+      cyl('glow', 0, 1.5, -13.52, 0.5, 0.5, 0.1, SEAL, { seg: 12, outline: 0 }); D('glow', 0, 0.9, -13.5, 0.12, 1.2, 0.06, SEAL, { outline: 0 }); D('flat', 0, 0.02, -12.6, 2.4, 0.02, 1.8, 0x1f4a48, { outline: 0 });
+      D('flat', 0, 1.3, -6.5, 1.7, 1.7, 14, BR, { outline: 0.08 }); solid(-0.85, -13.5, 0.85, 0.5, 0, 2.15, { cam: false });
+      [[-9.5, 0x8a7a5a], [-6.2, 0x6a5a48], [-2.6, 0x9a8468]].forEach(p => D('wood', 0, 1.3, p[0], 1.86, 1.86, 0.7, p[1], { outline: 0.03 }));
+      for (let i = 0; i < 4; i++) D('flat', (i < 2 ? -1 : 1) * 9, 1.1, -18 + (i % 2 ? 5 : -5), 14, 1.1, 1.1, i % 2 ? RUST : BR, { outline: 0.06 });
+      for (let k = 0; k < 48; k++) { const side = k < 24 ? -1 : 1, i = k % 24, x = side * (16.4 - (i % 2) * 2.4), z = -26 + Math.floor(i / 2) * 3.6, live = (k * 7) % 48 < 31;
+        D('flat', x, 0.65, z, 0.5, 1.3, 0.5, IR, { outline: 0.03 }); cyl('flat', x, 1.4, z, 0.52, 0.52, 0.09, live ? BR : 0x4a3a2c, { seg: 10, outline: 0.03 }); D(live ? 'glow' : 'flat', x, 1.62, z, 0.14, 0.14, 0.14, live ? SEAL : 0x2a2220, { outline: 0 }); }
+      // the board on the south wall, repainted when somebody can be bothered
+      sign('BANKS LIVE   31 OF 48', 0, 9.4, -27.94, 0, 11, 1.3, '#e8c25a', '#07070d'); for (let k = 0; k < 48; k++) { const live = (k * 7) % 48 < 31; D(live ? 'glow' : 'flat', -8.2 + (k % 16) * 1.09, 7.6 - Math.floor(k / 16) * 0.7, -27.94, 0.5, 0.36, 0.06, live ? SEAL : 0x2a2220, { outline: 0 }); }
+      watcher(0, 14, -27.9, 0, 1.6); sign('GRATITUDE IS BREATH', 0, 11.6, -27.94, 0, 8, 0.7, '#e8c25a', '#07070d');
+      // what the people who keep it leave: lamps, a tar pot, chalk on everything
+      [[-6, -10], [5, -9.4], [-3, 2.6], [11, -22]].forEach(p => { cyl('flat', p[0], 0.04, p[1], 0.1, 0.11, 0.06, IR, { seg: 8, outline: 0.02 }); cyl('glow', p[0], 0.2, p[1], 0.08, 0.09, 0.26, LAMP, { seg: 8, outline: 0 }); });
+      cyl('flat', 1.6, 0.3, -5, 0.34, 0.3, 0.6, 0x15151f, { seg: 10, outline: 0.03 }); chalkW(0.88, 1.5, -9.5, Math.PI / 2, 0.22); chalkW(0.88, 1.4, -6.2, Math.PI / 2, 0.2); chalkW(-0.88, 1.5, -2.6, -Math.PI / 2, 0.22); chalkF(-14, 12.03, 23.5, 0.22);
+      crate(-12, -6, 0.9, 0, 'hp'); crate(10, -4, 0.9, 0, 'hp'); crateStatic(-13, -22, 1.3, 0); crateStatic(12.6, -25, 1.1, 0);
+    };
+    if (SC.issue === 'riser') RISER(); else if (SC.issue === 'stair') STAIR(); else if (SC.issue === 'gild') GILD(); else if (SC.issue === 'stack') STACK(); else if (SC.issue === 'array') ARRAY(); else { DOCKS_A(); DOCKS_B(); }
 
     W.statics = batch.build(G.scene); batch = null;
   };

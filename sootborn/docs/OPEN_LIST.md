@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.70 (2026-11-20).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.71 (2026-11-20).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -20,6 +20,9 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **Weight:** no keeping a man in the air from the ground; air combos need the boots and run out. Say if the fights now feel too stiff, or the heavy launch too low.
 - **Deaths:** knees and over, or onto the back; nobody spins.
 - **The hook shot in the arena fights:** a real line; pulls an ordinary man to you, takes you to a heavy one.
+
+## Built in v0.71 (needs your eye)
+- **The Deep Array:** a sixth comic-book level in The Ledger. A wrench, a watch lamp to get past, the heart of the Array (31 of 48 banks lit), a brawl, a sixty-second run for the hatch. Tested by teleport only.
 
 ## Built in v0.70 (needs your eye)
 - **The vent stack:** a fifth comic-book level, a climb with dead boots, charged at the crown. Tested by teleport only: say how the camera and the platform fights feel.
@@ -97,7 +100,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 16. **More 2D films built from stills** in the comic style; the Pairing's and the Ford's own intro shots.
 16a. **Built (v0.67 the cold open, v0.68 the intro and the ending; needs your eye).** The Keep as the cold open (master plan 9b): black and the shift song; a 25-second animated intro of moving drawn stills counting to eleven; the Keep at dawn as a duel you cannot lose (strike, dodge, fly); ELEVEN, cut before the blow; then the prologue. The Valley returns to its place. The same fight on the last day, where the blow lands.
 16b. **Part Two flashbacks** (master plan 9c): the Post → the white cloak at the Assay; What She Knows → Celestine's own Assay, played as her; Two Years → Seren tracing the line first; the Count → no cuts, then one flash to the furnace at eleven; the ending as a played sequence of pictures.
-16c. **One built (the vent stack, v0.70); the Deep Array is next.** Two more comic-book levels in the first half (master plan 9e): the Deep Array with Dace (The Ledger); the vent stack on day 31, where he takes the boots.
+16c. **Both built (the vent stack v0.70, the Deep Array v0.71; need your eye).** Two more comic-book levels in the first half (master plan 9e): the Deep Array with Dace (The Ledger); the vent stack on day 31, where he takes the boots.
 16d. **Built in v0.69 (needs your eye).** Two more 2.5D parts with story in the first half: the Assay camp by day (its people: Dorian, Oswin, Petra); Bay 3 at last bell, counting the knives back.
 16e. **2D and 2.5D flashbacks through Part Two**, which is otherwise all 3D (master plan 9c, 9e).
 16f. **The Assay's art in the opening:** the expression, the ring, ELEVEN. Its people and story should be felt, not only fought.

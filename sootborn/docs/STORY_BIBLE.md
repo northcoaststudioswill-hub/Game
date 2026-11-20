@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible 
-Tagline: "Every breath is hers." Current build: v0.70 (see the changelog). **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.71 (see the changelog). **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -549,3 +549,12 @@ One look for each kind of jump, so it is learned once. **Wake:** white fading ou
 - **The collar:** on the crown of the stack, worn bright by a hundred Proctors' heels. A pair of boots stood on it take one long breath, like a ward fan when the branch comes up, and burn blue.
 - **Day thirty-one, in order:** the Proctor in the air; On the Ground; he takes the boots, dead; he crosses to the island, puts down Teal's pickets and a Warden of the dais, climbs, charges them, and steps off the edge. **He flies from that afternoon** ("it took me the rest of that day to stop falling out of the sky"). Then the seal, the paper in the boot, the cloak, and the camp. This replaces the older line that he could not fly until the last day.
 - Kael's line for it: "They had told us the boots were what made a Proctor. They are a battery, and a stack, and a man who isn't afraid of the height."
+
+## The Deep Array, seen (v0.71)
+- **What it is:** one hall under all six tiers. A rust drum at the south end (the heart) with the main seal on it; the main running north out of it; **forty-eight valve banks** in two rows down the hall; four great fans in the west wall. Every breath on the tiers and above them comes through it.
+- **What state it is in, forty-three days after the furnace:** **thirty-one banks of forty-eight are lit.** The board on the south wall (under the Watcher and GRATITUDE IS BREATH) reads BANKS LIVE 31 OF 48; the 31 is painted over an older 36. One fan turns, one stutters, two have stopped. The main has nine patches in rag, wire and tar, each with a date chalked beside it, the oldest forty years gone, all of them soot's work. The main seal weeps the way a bank does a year before it goes. The dark banks have dates chalked on them in hands Kael knows: Orin's, Mara's, and one he knows better than his own.
+- **Who is allowed in:** nobody from Tier Six. Kael has read its name on a thousand work orders. The Array has its own watch (grey, with amber lamps) and a watch lamp on a rail over the catwalk.
+- **What Dace tells him there:** "Nobody's looking after it. They're counting it. That's what the Count is." And at the hatch: "Now you know what they are counting. Not who breathes. How long."
+- Kael's line: "I had been keeping it alive for ten years, one valve at a time, and nobody had ever let me see it." He has been a valve hand ten years.
+- **Not said there:** that Seren traced the line and saw this first. That is held for Part Two.
+- This is where "the Array has about ten years" (Celestine, six years after) comes from: he has seen the number himself.

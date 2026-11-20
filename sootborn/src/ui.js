@@ -241,6 +241,7 @@ const Menus = {
         ['★ NEW · +7 · The High Docks (third person; Captain Rook)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Issue.start('docks', ok => { if (!ok) HUD.toast('Could not start the 3D level on this device.'); Game.toTitle(); }); }],
         ['★ NEW · +5 · Riser Nine (third person; hold the hatch, in a mask)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Cutscene.play([{ issue: 'riser', or: [{ brawl: () => FF.riser() }] }], () => Game.toTitle()); }],
         ['★ NEW · +9 · The Stair (third person; three flights to the white door)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Cutscene.play([{ issue: 'stair', or: [{ brawl: () => FF.stair() }] }], () => Game.toTitle()); }],
+        ['43 days after · The Deep Array (third person; a wrench, a watch lamp, the heart of it, a run)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Cutscene.play([{ issue: 'array', or: [] }], () => Game.toTitle()); }],
         ['The Assay, day 31 · The Vent Stack (third person; a climb, the boots charged at the crown)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Cutscene.play([{ issue: 'stack', or: [] }], () => Game.toTitle()); }],
         ['★ NEW · +6 months · The Table (the Gilding, drawn; no fighting)', () => { fresh(); G.mode = 'cut'; Issue.fresh = 1; Cutscene.play([{ issue: 'gild', or: [] }], () => Game.toTitle()); }]
       ],
@@ -365,11 +366,11 @@ const Menus = {
 
 // ---------- boot splash: North Coast Studios, then E Concepts
 // ---- the Dev menu's notes. GAME_VER is the one place the version number lives; DEV_NEW and DEV_VER are brought up to date every release.
-const GAME_VER = '0.70';
-const DEV_NEW = 'the Vent Stack (a fifth comic-book level: Levels in 3D); the boots in the Valley; this menu shows the version that last changed each scene, and a scene started from it comes back to it.';
+const GAME_VER = '0.71';
+const DEV_NEW = 'the Deep Array (a sixth comic-book level, in The Ledger; Levels in 3D).';
 // which version last changed each scene: first match wins; the last line is everything older
 const DEV_VER = [
-  [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
+  [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
   [/Keep|The Son|Lucan|What She Knows/i, '0.69'], [/Ashgate|First Fire|festival|Lamp|first dream|Ashgate, that night/i, '0.69'],
   [/Valley|Pinning|Proctor(?! Sull)|Last Night|Way Out \(160|The Way Out · the months|last dream|The Post|New game from the top|Prologue/i, '0.68'],
   [/Three Steps|Pairing|Ford|Camp|Island|Dais|The Sun|Table|High Docks|Dock Stair|Tier Six|Ledger|dream|Part Two|Two Years|The Balancing|The Count/i, '0.67'],

@@ -24,7 +24,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Repo:** `https://github.com/northcoaststudioswill-hub/game`, branch **`sootborn`**. The pre-reorder game is kept on branch `sootborn-v0.64-before-reorder`.
 - **Layout:** `src/*.js` (the game), `src/shell.html`, `issue/` (the comic-book levels), `build.mjs`, `index.html` (built), `tests/`, `docs/`.
 - **Build:** `node build.mjs` → `index.html` (one self-contained file, about 2.2 MB). It runs `issue/patch.mjs` itself, which turns `issue/base.html` + `rig.js` + `world.js` + `story.js` into `issue/issue.html`. Never edit `issue/base.html`; add patches in `issue/patch.mjs` (each `rep(a, b)` must match exactly once; new blocks go before the marker `\nif (/Calloway|Tally|Deacon`).
-- **Version:** `GAME_VER` in `src/ui.js` (0.70; next is 0.71). Update `DEV_NEW` and `DEV_VER` beside it in the same edit.
+- **Version:** `GAME_VER` in `src/ui.js` (0.71; next is 0.72). Update `DEV_NEW` and `DEV_VER` beside it in the same edit.
 - **Publish:** the game is the Claude artifact with slug `2a8a025c-511d-454c-861c-d9bc7a4565f5`; publish `index.html` with `publish_files` and the live version as `base_version` (get it with `get_artifact`). The illustrated progress report is `be5babce-6d5d-4c6e-9668-9b2185959f6c`.
 - **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md` (v0.66 on; v0.56 to v0.65 in `-changelog-archive-2.md`, v0.1 to v0.55 in `-changelog-archive.md`, so the live one stays cheap to read), `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
 - **Commits** end with the attribution lines your session gives you. Push with `git -c push.negotiate=true push origin sootborn` (it prints "repository moved" and still succeeds). If the push is rejected, fetch and rebase first: other sessions also push here.
@@ -37,7 +37,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Fights:** `src/brawl.js` is both the 2D fights and the 3D arena fights (the arena is drawn by `src/g3.js`, plain WebGL). A fight is a def from `FF` in `src/ff.js` (and `assay.js`, `rowk.js`), started with `Brawl.start(def, cb)` or `Mission.fight(def, after)`. `def.era` gates moves; `hookEra()` gives the hook only if `def.hook` or era ≥ 5.
 - **2.5D places** are Brawl's walk mode: a def with `walk: { id, spawn, npcs, spots, props, floor, obj, keep|clear }` (see `walkCircle`, `walkSquare`, `walkRowMorning`, `walkWard` in `src/assay.js`).
 - **2D levels** (top-down missions): `Mission.start(id, done)`; defs in `src/assay.js` and elsewhere.
-- **Comic-book levels** (third person, three.js, `SC` namespace) are chosen by the key replaced into `issue: 'docks'`; existing keys: `gild` (the Table), `riser`, `docks`, `stair`, `stack` (the vent stack, v0.70). Started from the game with `Issue.start(key, ok => …)`. Hosted in an iframe; input arrives by postMessage.
+- **Comic-book levels** (third person, three.js, `SC` namespace) are chosen by the key replaced into `issue: 'docks'`; existing keys: `gild` (the Table), `riser`, `docks`, `stair`, `stack` (the vent stack, v0.70), `array` (the Deep Array, v0.71). Started from the game with `Issue.start(key, ok => …)`. Hosted in an iframe; input arrives by postMessage.
 - **The opening:** the animated intro is `src/prelude.js` (v0.68); the old film is still in `src/ff.js` (`OPENING`) for the Dev menu only; the cold open is `FF.keepCold`. The Keep is `FF.keep` (src/ff.js, around line 60).
 
 ### A5. Tests (in `tests/`)
@@ -161,7 +161,7 @@ Kael's names: **Kael Brennick** below; **Edric Sorrel** (a dead boy's name) from
 - Happening: the High Auditor, Celestine Aurel, comes down Lift Zero to Tier Six, the first time in years. She looks at Kael; this is where she first sees him. The window: someone tells him the sky is blue.
 - Say: existing lines stand.
 - 7a: prose card *He came down at second bell* / *with a pass stamped in gold, and four hundred people watching the light to see if he would.* Happening: trouble at the hatch; a Warden; Kael goes under the floor. Plays: **Under the Floor** (2D).
-- 7b: **NEW — the Deep Array (comic-book level).** Card: **THE DEEP ARRAY** / *Forty-three days after the furnace. Under the floor, with Dace.* In: PAGE. Trigger: Dace: *"You want to see what they're counting?"* Happening: Dace Morrow, who worked beside Seren and now lives under the floor with the Unlit, takes him down to the Deep Array, the machine all the air comes from, named all through the game and never shown. Kael sees what it is and that it is failing. He is untrained: **no boots, no ELEVEN, no Assay moves**; a climb, a hide, a scramble; any fight is a brawl with a wrench. Say: Kael: *"I had been keeping it alive for ten years, one valve at a time, and nobody had ever let me see it."* What he sees here is what Part Two is about. Out: PAGE. Build: **NEW** (`issue/`, new level key e.g. `array`).
+- 7b: **NEW — the Deep Array (comic-book level).** Card: **THE DEEP ARRAY** / *Forty-three days after the furnace. Under the floor, with Dace.* In: PAGE. Trigger: Dace: *"You want to see what they're counting?"* Happening: Dace Morrow, who worked beside Seren and now lives under the floor with the Unlit, takes him down to the Deep Array, the machine all the air comes from, named all through the game and never shown. Kael sees what it is and that it is failing. He is untrained: **no boots, no ELEVEN, no Assay moves**; a climb, a hide, a scramble; any fight is a brawl with a wrench. Say: Kael: *"I had been keeping it alive for ten years, one valve at a time, and nobody had ever let me see it."* What he sees here is what Part Two is about. Out: PAGE. Build: **BUILT v0.71** (`issue/`, key `array`).
 
 **8. That night: the Dais, the Proctor, the boots**
 - Card: **THAT NIGHT** / *Further in than it has gone before.* In: CUT. Trigger: he falls asleep under the floor with the Array's hum in his ears.
@@ -309,9 +309,10 @@ Release after every step (Part A2, rule 6). Each step lists what is in it, why i
 - Also in v0.70, from the owner: the Dev menu shows the version that last changed each scene (`DEV_VER`, `GAME_VER`, `DEV_NEW` in `src/ui.js`; **bring all three up to date every release**), and scenes started from it come back to it (`DEV.from`, `Game.abort()`, `Game.devBack()`, `#devback`, F2).
 - Tests: `stack.mjs` (the level by teleport), `devm.mjs` (the Dev menu).
 
-**Step 6 · v0.71 · the Deep Array (comic-book level, 7b)**
-- Kael untrained: a mode with no boots, no ELEVEN, no Assay moves; climb, hide, scramble; a wrench brawl. Show what the Array is and that it is failing.
-- Check: `runlv.sh array`; none of the Assay moves can be triggered.
+**Step 6 · v0.71 · the Deep Array (comic-book level, 7b)** — **DONE 2026-11-20**
+- Done: level key `array` (`ARRAY` in `issue/world.js`; the `SC.issue === 'array'` block in `issue/story.js`; six reps at the end of `issue/patch.mjs`; the hero re-skin, Dace in the clerk slot and a wrench in `issue/rig.js`). `S.plain()` switches off the hook and ELEVEN; `S.noBoots()` the boots. No first fight (a level without `ENC.alley` skips it). Flags: `across`, `down`, `heart`, `e_w1` (only if seen by the lamp), `e_l1`, then a 60-second run (`S.runT`) to the hatch and `ending()`. In the story: `DAY3` in `src/day3.js`, before Dace's "Go home".
+- Kept out on purpose: Seren finding the bleed first (15c).
+- Test: `array.mjs`.
 
 **Step 7 · v0.72 · Part Two's spine**
 - The fourth ring as home base (12a), with the suspicion meter, visited in the Post, the Balancing and What She Knows, with its own date card each time; Kestrel, Sable, porters; finds into the Codex. The head rule here first (soot look at whoever speaks; the Accredited don't). Porters kneel at the bell.

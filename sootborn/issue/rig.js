@@ -24,6 +24,12 @@
   if (SC.issue === 'stack') {   // House Teal's pickets hold the island; their blades wear teal, not violet
     Object.assign(SPECS.knifer.pal, { top: 0x1f6f6a, wrap: 0x1f6f6a });
   }
+  if (SC.issue === 'array') {   // forty-three days after the furnace: a valve hand with a wrench, Dace in his hood, and the Array's own watch
+    Object.assign(SPECS.hero, { h: 1.0, b: 1.0, face: 'kael0', hair: 'kael', armor: false, cape: false, pauldron: false, glowHand: false, weapon: 'wrench' });
+    Object.assign(SPECS.hero.pal, { skin: 0xc8946a, hair: 0x6a2e18, streak: 0x6a2e18, top: 0x3d5a6a, trim: 0x2a3440, shirt: 0x3d5a6a, tie: 0xb8682a, pants: 0x2a3440, boots: 0x1e1418, glove: 0xc8946a, wrap: 0x3d5a6a, band: 0xb8682a });
+    SPECS.clerk = { h: 1.03, b: 1.02, face: 'cloth', hood: true, kit: { light: 1, noSh: 1, soot: 1, plate: 0x2a2634, trim: 0x4a4030, belt: 0x1c1a24, hands: 0xb98a66, lamp: 0xffd98a }, pal: { skin: 0xb98a66, top: 0x2a2634, trim: 0x1c1a24, shirt: 0x2a2634, tie: 0x1c1a24, pants: 0x1c1a24, boots: 0x0c0c12, hair: 0x2a2634, glove: 0x4a4030, wrap: 0x2a2634 } };
+    Object.assign(SPECS.hollow.pal, { top: 0x4a5068, wrap: 0x4a5068 }); if (SPECS.hollow.kit) SPECS.hollow.kit.lamp = 0xffb060;
+  }
   if (SC.issue === 'stair') {   // the Auditor's Blade, and Tavi at sixteen
     SPECS.boss = { h: 1.18, b: 1.0, face: 'halfmask', hood: true, coat: true, weapon: 'blade', weapon2: true, sash: true, kit: { light: 1, officer: 1, mantle: 0x23232e, plate: 0x2a2a38, trim: 0xe8c25a, belt: 0xe8c25a, hands: 0x15151f }, pal: { skin: 0xe6c79a, top: 0x15151f, trim: 0xe8c25a, shirt: 0xe8c25a, tie: 0xe8c25a, pants: 0x15151f, boots: 0x0c0c12, hair: 0x15151f, glove: 0xe8c25a, wrap: 0x15151f } };
     SPECS.clerk = { h: 0.94, b: 0.9, face: 'tavi', hair: 'tavi', kit: { light: 1, noSh: 1, soot: 1, plate: 0x6a4a34, trim: 0xd9a05f, belt: 0x2a1c14, hands: 0xc98a62, lamp: 0xffd98a }, pal: { skin: 0xc98a62, top: 0x8a6a48, trim: 0x4a3524, shirt: 0xd9a05f, tie: 0x4a3524, pants: 0x3a3350, boots: 0x15151f, hair: 0x2a1c14, glove: 0xc98a62, wrap: 0x8a6a48 } };
@@ -311,6 +317,7 @@
       const w = add('chest', new THREE.TorusGeometry(0.036, 0.013, 6, 12), brass, -0.03, 0.1, 0.145, 0.008);
       add('chest', tbox(0.012, 0.16, 0.012), dark, -0.03, 0.2, 0.14, 0); model.mats.push(dark); model.washer = w;
     }
+    if (sp.weapon === 'wrench') { add('haR', limb(0.028, 0.032, 0.5), dark, 0, -0.22, 0, 0.012); add('haR', tbox(0.05, 0.1, 0.13), steel, 0, -0.5, 0, 0.01); add('haR', tbox(0.05, 0.08, 0.035), steel, 0, -0.57, 0.048, 0.008); add('haR', tbox(0.05, 0.08, 0.035), steel, 0, -0.57, -0.048, 0.008); }
     if (sp.weapon === 'baton') { add('haR', limb(0.03, 0.036, 0.78), dark, 0, -0.34, 0, 0.014); add('haR', limb(0.042, 0.042, 0.07), gilt, 0, -0.03, 0, 0.01); add('haR', limb(0.04, 0.04, 0.05), gilt, 0, -0.66, 0, 0.008); add('haR', tbox(0.026, 0.2, 0.11, 0.25, 1), steel, 0, -0.8, 0.035, 0.012); add('haR', tbox(0.024, 0.07, 0.1), steel, 0, -0.74, -0.06, 0.008).rotation.x = 0.7; model.mats.push(dark, gilt, steel); }   // a dock bill: a boat hook with an edge on it
     if (sp.weapon2) { add('haL', tbox(0.028, 0.56, 0.06, 0.15, 1), steel, 0, -0.4, 0.01, 0.014); add('haL', tbox(0.05, 0.03, 0.16), gilt, 0, -0.1, 0.01, 0.01); }
     if (sp.weapon === 'blade') { add('haR', tbox(0.028, 0.56, 0.06, 0.15, 1), steel, 0, -0.4, 0.01, 0.014); add('haR', tbox(0.05, 0.03, 0.16), gilt, 0, -0.1, 0.01, 0.01); model.mats.push(steel, gilt); }

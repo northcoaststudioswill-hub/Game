@@ -104,7 +104,7 @@
   function crossing(id, viaAct) {
     return function () {
       const first = !F.path; S.cp = id; pl.hp = SC.T.hp; pl.chance = 1;
-      if (first && SC.issue !== 'docks') { pl.setPath('ember'); F.path = 'ember'; save(); pl.meter = Math.max(pl.meter, 25); FX.ring(pl.pos, 0xffe14a, 0.5, 3, 0.5); startEnc('alley'); if (S.enc) S.enc.wait = 2.2; return; }   // a breath before the first of them lands   // he has counted eleven before. Once is the memory; after that it is only where he starts
+      if (first && SC.issue !== 'docks') { pl.setPath('ember'); F.path = 'ember'; save(); pl.meter = Math.max(pl.meter, 25); FX.ring(pl.pos, 0xffe14a, 0.5, 3, 0.5); if (!ENC.alley) { setFlag('e_alley'); S.objective && S.objective(); return; } startEnc('alley'); if (S.enc) S.enc.wait = 2.2; return; }   // a breath before the first of them lands   // he has counted eleven before. Once is the memory; after that it is only where he starts
       if (first) { SC.audio.sfx('clue'); pl.control = false; pl.setPath('ember'); F.path = 'ember'; save(); U.memory(art(FIN.count), bargain); return; }
       const sm = (SUN[SC.issue] || {})[id];
       if (viaAct && sm && !F['sun_' + id]) { SC.audio.sfx('clue'); F['sun_' + id] = 1; save(); pl.control = false; pagesOf(sm.p, () => { pl.control = true; if (sm.fury) pl.gain(50); U.toast(sm.toast, 3.2); objective(); }); return; }
@@ -583,6 +583,110 @@
       if (F.e_alley && !F.e_l1 && y > 11.4 && x < -5.6 && z > 5.6) startEnc('l1');
       else if (F.e_l1 && !F.e_l2 && y > 23.4 && x < -5.6 && z > 5.6) startEnc('l2');
       else if (F.charged && !F.boss && y > 35.4 && z > 7.5 && Math.abs(x) < 4.6) ending();
+    };
+  }
+  /* ================= THE DEEP ARRAY: forty-three days after the furnace, with Dace. He is a valve hand with a wrench: no boots, no hook, no ELEVEN. A stair down, a lamp to get past, the heart of it, a brawl, and a run for the hatch ================= */
+  if (SC.issue === 'array') {
+    const done = () => { S.done = true; S.wipe(); if (!SC.host('done', { time: S.time, kills: pl.stats.kills, clues: pl.echoes })) U.end({ time: S.time, path: '', kills: pl.stats.kills, finishers: pl.stats.finishers, perfect: pl.stats.perfect, chances: pl.stats.chances, clues: pl.echoes }, () => { SC.emit('letterbox', false); cam.mode = 'follow'; S.newGame(); }); };
+    for (const k in CROSS) delete CROSS[k]; for (const k in ENC) delete ENC[k];
+    Object.assign(CROSS, { alley: { x: -14, y: 12, z: 23.5, yaw: Math.PI }, yard: { x: 16.3, y: 8, z: 2, yaw: Math.PI }, roof: { x: 9, y: 0, z: -11, yaw: -Math.PI / 2 } });
+    Object.assign(ENC, {
+      w1: { arena: [-13.6, 0.3, 14, 3.7], floor: 8, waves: [[['hollow', 12, 2], ['hollow', -12.6, 2]]] },
+      l1: { arena: [-13, -27, 13, -5.6], floor: 0, waves: [[['hollow', 11, -8], ['hollow', -11, -9]], [['hollow', 10, -24], ['hollow', -10, -24], ['hollow', 0, -7]]] }
+    });
+    Object.keys(ENC).forEach(k => { ENC[k].id = k; });
+    S.noBoots = () => true; S.plain = () => true;   // nothing he has not learned yet
+    const dace = (x, y, z, yaw) => { const g = clerk.group.position; if (clerk.group.visible && Math.hypot(g.x - pl.pos.x, g.z - pl.pos.z) < 26 && Math.abs(g.y - pl.pos.y) < 9) return; showClerk(x, y, z, yaw === undefined ? Math.PI : yaw); };
+    brandOnStair = function () { if (F.heart) dace(3, 0, -11); else if (F.down) dace(15, 0, -22, 0); else dace(-12.4, 12, 25.4, 2.6); };
+    const left = () => Math.max(0, Math.ceil(S.runT || 0));
+    objective = function () {
+      let t = '', g = null;
+      if (S.enc) t = S.enc.id === 'w1' ? 'THE ARRAY WATCH. THEY HAVE SEEN US.' : 'THE ARRAY WATCH. A WRENCH WILL HAVE TO DO.';
+      else if (!F.path) { t = 'DOWN THE LADDER, AFTER DACE'; g = CROSS.alley; }
+      else if (!F.across) { t = 'CROSS THE CATWALK WHEN THE LAMP HAS GONE BY'; g = { x: 16.3, y: 8, z: 2 }; }
+      else if (!F.down) { t = 'DOWN TO THE FLOOR'; g = { x: 16.3, y: 0, z: -22 }; }
+      else if (!F.heart) { t = 'THE HEART OF IT'; g = { x: 0, y: 0, z: -12.4 }; }
+      else if (!F.e_l1) t = 'THE ARRAY WATCH. A WRENCH WILL HAVE TO DO.';
+      else if (!F.boss) { t = 'THE SEAL HAS GONE. THE HATCH. ' + left(); g = { x: -14, y: 12, z: 24 }; }
+      U.objective(t); S.goal = g;
+    };
+    S.objective = objective;
+    encDone = function (id) { setFlag('e_' + id); S.pending = false; SC.audio.sfx('clue');
+      if (id === 'w1') U.toast('TWO OF THE WATCH, AND NOBODY TO MISS THEM TILL THE BELL. *GO ON.*', 3.4);
+      else { S.runT = 60; SC.cam.shake(0.8); U.toast('THE SEAL HAS GONE. *THE HATCH.* DACE IS ALREADY RUNNING.', 3.6); showClerk(-13, 12, 25, 2.6); }
+      objective(); };
+    const begin = () => { SC.emit('letterbox', false); pl.faceOverride = null; pl.setState('idle'); pl.control = true; cam.mode = 'follow'; cam.snapBehind(Math.PI); U.showHud(true); setFlag('intro');
+      U.toast(SC.hosted ? 'A WRENCH AND TWO HANDS. *NO BOOTS, NO LINE, NO COUNT.*' : 'WASD MOVES. J STRIKES. K DODGES. THAT IS ALL HE KNOWS YET.', 5); };
+    intro = function () {
+      SC.state = 'play'; U.showHud(false); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; pl.faceOverride = 'angry';
+      pl.place(-14, 12, 26, Math.PI); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.face('angry'); pl.model.group.updateMatrixWorld(true); brandOnStair(); if (clerk) clerk.group.updateMatrixWorld(true);
+      const pg = [
+        { img: shot(-16, 15.5, 27, 4, 3, -16, 58, 768, 720), area: '1 / 1 / 3 / 2', cap: 'THE DEEP ARRAY. FORTY-THREE DAYS AFTER THE FURNACE.', cap2: 'UNDER THE FLOOR, UNDER ALL SIX TIERS. THE MACHINE THE AIR COMES FROM.', fx: 'THIRTY-ONE' },
+        { img: shot(-11.6, 13.5, 23.6, -13.4, 13.4, 25.8, 34), area: '1 / 2 / 2 / 3', cap2: '"YOU WANT TO SEE WHAT THEY\'RE COUNTING?" DACE SAID. *I HAD A WRENCH, AND NO IDEA.*' },
+        { img: shot(-16.6, 10.4, 6, 12, 8.6, 2, 46), area: '2 / 2 / 3 / 3', cap: 'I HAD READ ITS NAME ON A THOUSAND WORK ORDERS.', cap2: 'NOBODY FROM TIER SIX HAS BEEN LET IN TO SEE IT.' }
+      ];
+      pl.model.expr = null; U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: pg }, begin);
+    };
+    bossIntro = function () {};
+    ending = function () {
+      if (F.boss) return; setFlag('boss'); S.runT = 0; S.enc = null; SC.clearEnemies(); pl.control = false; pl.setState('scripted'); pl.script = t => P.idle(t); pl.scriptRate = 999; U.showHud(false); SC.audio.sfx('clue');
+      const still = (x, y, z, yaw) => { pl.place(x, y, z, yaw); pl.model.anim.apply(P.idle(0), 999, 0.016); pl.model.group.updateMatrixWorld(true); };
+      still(-14, 12, 26.4, 0); showClerk(-12.6, 12, 25.6, -0.6); clerk.group.updateMatrixWorld(true);
+      const a = shot(-11, 13.6, 22.4, -13.6, 13.3, 26.2, 36, 768, 720), b = shot(-15, 17, 24, 2, 3, -17, 54), c = shot(2, 7, -8, 0, 8, -27.9, 40);
+      U.page({ cols: '1.25fr 1fr', rows: '1fr 1fr', panels: [
+        { img: a, area: '1 / 1 / 3 / 2', cap: 'I CAME UP THROUGH THE FLOOR WITH TAR ON MY HANDS.', cap2: 'I HAD BEEN KEEPING IT ALIVE FOR TEN YEARS, ONE VALVE AT A TIME, AND NOBODY HAD EVER LET ME SEE IT.', fx: 'OURS' },
+        { img: b, area: '1 / 2 / 2 / 3', cap2: '"NOW YOU KNOW WHAT THEY ARE COUNTING," DACE SAID.' },
+        { img: c, area: '2 / 2 / 3 / 3', cap2: '*NOT WHO BREATHES. HOW LONG.*' }
+      ] }, () => done());
+    };
+    S.init = function () {
+      clerk = S.clerk = SC.makeHumanoid('clerk'); G.scene.add(clerk.group); clerk.group.visible = false;
+      { let ph = 0; W.dyn.push((t, dt) => { if (!clerk.group.visible) return; const g = clerk.group.position, yaw = pl.yaw, tx = pl.pos.x - Math.sin(yaw) * 1.9 + Math.cos(yaw) * 1.35, tz = pl.pos.z - Math.cos(yaw) * 1.9 - Math.sin(yaw) * 1.35, dx = tx - g.x, dz = tz - g.z, d = Math.hypot(dx, dz);
+          if (dt > 0 && SC.state === 'play' && !S.enc && pl.control && !(S.runT > 0) && d > 0.7 && d < 45) { const sp = Math.min(6.4, 1.2 + d * 2), k = Math.min(1, sp * dt / d); g.x += dx * k; g.z += dz * k; g.y = SC.damp(g.y, W.ground(g.x, g.z, g.y + 0.7), 16, dt); clerk.group.rotation.y = SC.dampAng(clerk.group.rotation.y, Math.atan2(dx, dz), 9, dt); ph += sp * dt * 1.7; clerk.anim.apply(P.run ? P.run(ph) : P.idle(t), 12, dt); }
+          else { if (dt > 0) clerk.group.rotation.y = SC.dampAng(clerk.group.rotation.y, Math.atan2(pl.pos.x - g.x, pl.pos.z - g.z), 3, dt); clerk.anim.apply(P.idle(t), 6, 0.016); } }); }
+      pl.model.setGlow(0xffd98a, '#ffd98a');
+      try { const st = document.createElement('style'); st.textContent = '#tagPw,#tagEc{display:none!important}'; document.head.appendChild(st); } catch (e) { /* the chips stay */ }   // no ELEVEN and no Count on a man who has not learned them
+      Object.keys(CROSS).forEach(id => { const c = CROSS[id], mk = (tex, s, col, op) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(s, s), new THREE.MeshBasicMaterial({ map: tex, color: col, transparent: true, opacity: op, depthWrite: false, fog: false })); m.rotation.x = -Math.PI / 2; m.position.set(c.x, c.y + 0.07, c.z); m.renderOrder = 3; G.scene.add(m); return m; };
+        const a = mk(G.tex.ring, 3.4, 0xffe14a, 0.9), b = mk(G.tex.disc, 2.3, 0xffe14a, 0.35); W.dyn.push(t => { a.rotation.z = t * 0.25; b.material.opacity = 0.25 + Math.sin(t * 3) * 0.12; }); });
+      // light: warm where people work, sea-green where the Array still runs
+      [[-14, 15, 24, 0xffb060, 60], [0, 6, -18, 0x5ff2e2, 70], [0, 12, -24, 0xffe9a0, 40], [10, 6, -6, 0xffb060, 30], [-10, 6, -8, 0x5ff2e2, 26]].forEach(l => { const p = new THREE.PointLight(l[3], l[4], 34, 1.4); p.position.set(l[0], l[1], l[2]); G.scene.add(p); });
+      // four great fans in the west wall. One turns. One is trying to. Two have stopped
+      const fans = [[-22, 1.6], [-13, 0.22], [-4, 0], [-25.4, 0]].map((f, i) => { const g = new THREE.Group(), m = G.toon({ color: i < 2 ? 0xb8863a : 0x4a3a2c }); for (let k = 0; k < 4; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.16, 3.6, 0.7), m); b.position.y = 1.8; const h = new THREE.Group(); h.add(b); h.rotation.x = k * Math.PI / 2; g.add(h); } const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.3, 10), m); hub.rotation.z = Math.PI / 2; g.add(hub); g.position.set(-17.7, i === 3 ? 17 : 15.5, i === 3 ? -14 : f[0]); G.scene.add(g); return { g, sp: f[1] }; });
+      W.dyn.push((t, dt) => { fans.forEach((f, i) => { if (f.sp) f.g.rotation.x += dt * f.sp * (i === 1 ? (Math.sin(t * 0.9) > 0.2 ? 1 : 0.05) : 1); }); });
+      // the watch lamp: it runs up and down a rail over the middle of the catwalk
+      const lamp = new THREE.PointLight(0xffe9a0, 60, 16, 1.6), cone = new THREE.Mesh(new THREE.ConeGeometry(2.5, 5, 18, 1, true), new THREE.MeshBasicMaterial({ color: 0xffe9a0, transparent: true, opacity: 0.16, depthWrite: false, side: THREE.DoubleSide, fog: false })), spot = new THREE.Mesh(new THREE.CircleGeometry(2.5, 24), new THREE.MeshBasicMaterial({ color: 0xffe9a0, transparent: true, opacity: 0.3, depthWrite: false, fog: false })), box = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.5), new THREE.MeshBasicMaterial({ color: 0xfff2c0, fog: false }));
+      spot.rotation.x = -Math.PI / 2; [lamp, cone, spot, box].forEach(o => G.scene.add(o)); S.lampX = 3;
+      W.dyn.push(t => { const on = !F.across && !F.e_w1, x = 3 + Math.sin(t * 0.42) * 8.5; S.lampX = x; lamp.position.set(x, 12.6, 2); lamp.intensity = on ? 60 : 0; cone.position.set(x, 10.6, 2); spot.position.set(x, 8.05, 2); box.position.set(x, 13, 2); cone.visible = spot.visible = on; box.material.color.set(on ? 0xfff2c0 : 0x2a2a30); });
+      const said = (flag, lines, after) => () => { setFlag(flag); SC.audio.sfx('clue'); pl.control = false; U.say(lines, () => { pl.control = true; if (after) after(); objective(); }); };
+      W.addInteract({ id: 'heart', x: 0, y: 0, z: -12.4, fx: 0, fz: -14, r: 2, label: 'PUT A HAND ON IT', marker: 'act', mh: 2, when: () => F.down && !F.heart && !S.enc, act: said('heart', [
+        { who: 'cap', text: 'The heart of the Array. Every breath on six tiers comes through this drum, and every breath above them. The main seal was weeping under my palm, the way a bank does a year before it goes.' },
+        { who: 'clerk', text: 'Forty-eight banks. Count the lamps.' },
+        { who: 'cap', text: 'Thirty-one lit. The dark ones had dates chalked on them, in hands I knew. Orin. Mara. One in a hand I knew better than my own.' },
+        { who: 'hero', face: 'hurt', text: "Ten years I've kept my seven valves turning. I thought the rest of it was up here being looked after." },
+        { who: 'clerk', text: "Nobody's looking after it. They're counting it. *That's what the Count is, Kael.* Lamps on the gantry. Move." }], () => { brandOnStair(); startEnc('l1'); }) });
+      W.addInteract({ id: 'patch', x: 2.2, y: 0, z: -6.2, fx: 0.9, fz: -6.2, r: 1.6, label: 'LOOK', marker: 'clue', mh: 1.8, when: () => F.down && !F.clue_patch, act: clue('patch', [
+        { who: 'cap', text: 'A split in the main, bound in rag and wire and tar. A date chalked beside it, forty years gone. Then another beside that. Nine patches on one pipe, and every one of them ours.' },
+        { who: 'hero', face: 'angry', text: 'They never mended it. They let us.' }]) });
+      W.addInteract({ id: 'board', x: 0, y: 0, z: -26.4, fx: 0, fz: -28, r: 1.9, label: 'LOOK', marker: 'clue', mh: 3, when: () => F.down && !F.clue_board, act: clue('board', [
+        { who: 'cap', text: 'BANKS LIVE: 31 OF 48. Somebody has painted the 31 over an older number. Under the paint you can still read 36.' },
+        { who: 'hero', face: 'hurt', text: 'Five banks since anybody last troubled to repaint it.' }]) });
+    };
+    S.update = function (dt, rdt) {
+      for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= rdt; if (timers[i].t <= 0) { const f = timers[i].fn; timers.splice(i, 1); f(); } }
+      if (SC.state !== 'play') return;
+      if (pl.control) S.time += rdt;
+      updateEnc(dt);
+      if (S.enc && S.enc.arena && pl.control && pl.state !== 'dead') { const A = S.enc.arena; pl.pos.x = SC.clamp(pl.pos.x, A[0] - 0.2, A[2] + 0.2); pl.pos.z = SC.clamp(pl.pos.z, A[1] - 0.2, A[3] + 0.2); }
+      if (!pl.control || S.enc || pl.state === 'dead') return;
+      const x = pl.pos.x, y = pl.pos.y, z = pl.pos.z;
+      { let on = null; if (F.intro) for (const id in CROSS) { const c = CROSS[id]; if (Math.abs(y - c.y) < 1.2 && (F.path ? Math.hypot(x - c.x, z - c.z) < 1.6 : id === 'alley' && (Math.hypot(x - c.x, z - c.z) < 2.2 || z < c.z - 0.8))) on = id; } if (on && S.onSun !== on) { S.onSun = on; crossing(on)(); return; } if (!on) S.onSun = null; }
+      if (!F.path) return;
+      if (!F.across && !F.e_w1 && Math.abs(y - 8) < 0.8 && z < 4.2 && Math.abs(x - S.lampX) < 2.3) { U.toast('*SEEN.* THE WATCH IS ON THE CATWALK.', 2.6); SC.audio.sfx('hurt'); startEnc('w1'); return; }
+      if (!F.across && Math.abs(y - 8) < 0.8 && x > 14.8) { setFlag('across'); if (!F.e_w1) U.toast('PAST IT. *NOBODY SAW.*', 2.6); objective(); }
+      if (F.across && !F.down && y < 0.6 && z < -16) { setFlag('down'); brandOnStair(); objective(); }
+      if (F.e_l1 && !F.boss) { const was = left(); S.runT -= rdt; if (S.runT <= 0) { S.runT = 25; pl.hp = Math.max(8, pl.hp - 22); SC.cam.shake(0.6); SC.emit('flash', '#ffffff'); U.toast('THE AIR IS GOING. *MOVE.*', 2.4); }
+        if (left() !== was) objective(); if (Math.random() < dt * 5) FX.puff(v3((Math.random() - 0.5) * 30, 0.2 + Math.random() * 8, -26 + Math.random() * 44), 4, 1.2);
+        if (y > 11.4 && z > 20.4) ending(); }
     };
   }
   /* ================= THE TABLE: the Gilding, drawn. Nobody fights. Fourteen pictures of what was done, in the order it was done ================= */

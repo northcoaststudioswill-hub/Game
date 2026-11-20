@@ -1,4 +1,26 @@
-# SOOTBORN — changelog (latest v0.70 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.71 · 2026-11-20)
+
+## v0.71 · 2026-11-20 — the Deep Array (a sixth comic-book level)
+Step 6 of the plan. The machine the air comes from has been named all through the game and never shown. Now it is.
+
+- **Where it sits:** The Ledger, forty-three days after the furnace, after the Warden goes down under the floor. Dace: "Ten years you've kept that bank turning. You want to see what they're counting?" Card: THE DEEP ARRAY / Forty-three days after the furnace. Under the floor, with Dace.
+- **Who you are:** Kael as he is below. Work shirt, his own hair, **a wrench**. No boots, no hook line, no ELEVEN, no Count; the ELEVEN and Count chips are off the screen. Dace, hooded, follows with a lamp.
+- **The place:** a hall under all six tiers. A hatch gantry and a stair down the west wall; a long catwalk across the hall; a stair down the east wall; the floor, with the heart of the Array (a rust drum with a weeping seal), the main running out of it bound in rag and tar, and **forty-eight valve banks, thirty-one of them lit**. Four great fans in the wall: one turns, one is trying to, two have stopped. On the south wall, under the Watcher: BANKS LIVE 31 OF 48.
+- **How it plays:**
+  1. **Hide.** A watch lamp runs up and down a rail over the catwalk. Cross while it is away (there is a bay with crates to stand in) and nobody sees you. Walk into it and two of the Array's watch come for you on the catwalk.
+  2. **Look.** Two finds on the floor: nine patches on one pipe, each with a date chalked beside it ("They never mended it. They let us."); and the board, where 31 has been painted over 36.
+  3. **The heart.** Put a hand on it. Dace: "Nobody's looking after it. They're counting it. That's what the Count is, Kael."
+  4. **Brawl.** The watch, in two waves, with the wrench.
+  5. **Run.** The seal goes. Sixty seconds back up to the hatch, steam bursting round you; if the count runs out it costs health and starts again, so it cannot be failed outright.
+- **The end:** three pictures at the hatch, with the plan's line: "I had been keeping it alive for ten years, one valve at a time, and nobody had ever let me see it." And Dace: "Now you know what they are counting. Not who breathes. How long."
+- If the 3D level cannot start, one paragraph of narration says the same.
+- Kept back on purpose: that Seren saw it first. That is Part Two's reveal (plan 15c) and nothing here gives it away.
+
+**Engine:** a level can switch off the hook and ELEVEN (`S.plain`), as the vent stack switches off the boots; a level may have no first fight; a wrench.
+
+**Checked:** by script, end to end, by teleport: the route's ground from the hatch to the heart; the lamp catching him; the catwalk fight; both finds; the heart; the brawl; the run's clock; the hatch; the hand back to the story. Stills of the intro page, the gantry, the lamp, the floor, the heart and the ending. The vent stack re-run after the engine change. The whole-story bot (see below).
+
+**Not checked:** nothing by hand. Slipping past the lamp unseen was not tried by walking (only being caught was). Whether sixty seconds is the right length for the run. The wrench as a weapon in motion.
 
 ## v0.70 · 2026-11-20 — the vent stack (a fifth comic-book level), and the Dev menu's versions and way back
 Step 5 of the plan, and your note about the Dev menu.

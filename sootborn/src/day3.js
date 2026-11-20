@@ -105,6 +105,10 @@ function DAY3() {
     { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: F('ranForHer') ? 'A Warden, on the floor, breathing through his teeth. Forty-three days ago one of them did not move when I hit him with everything I had.' : 'A Warden, on the floor, breathing through his teeth. I had not known they could be put there.' },
     { say: 'dace', t: 'Well. That\'s done it. He\'ll wake with a headache and a story nobody will want to write down. Wardens don\'t lose.' },
+    { say: 'dace', t: "Before you go home. Ten years you've kept that bank turning. You want to see what they're counting?" },
+    // the Deep Array: named all through the game, never shown until now. He has a wrench and nothing he will learn later
+    { fade: 'out' }, { panel: null }, { issue: 'array', or: [{ panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { narr: 'He took me down a ladder under the floor, to the machine the air comes from. Forty-eight banks. Thirty-one of them lit. I had been keeping it alive for ten years, one valve at a time, and nobody had ever let me see it.' }, { fade: 'out' }, { panel: null }] },
+    { panel: 'under' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
     { say: 'dace', t: 'Go home. You were never here. And Kael. She\'d have liked that.' },
     { fade: 'out' }, { panel: null }
   ];
