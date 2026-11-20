@@ -301,7 +301,9 @@ const AREAS=[
   {id:'pit',x:-280,z:-22,r:28,base:3,name:'THE LAMP MARKET PIT',sub:'the Guild always collects (in aura)',hue:.07,lit:.5,col:[.08,.5,.42]},
   {id:'dc',x:255,z:125,r:30,base:4,name:'THE DATA CENTER UNDER THE PEAK',sub:'it hums at 67 hertz',hue:.6,lit:.45,col:[.6,.35,.32]},
   {id:'scroll',x:-30,z:-286,r:28,base:2,name:'THE SCROLL FARM',sub:'you are the crop',hue:.9,lit:.45,col:[.9,.5,.42]},
-  {id:'audit',x:-72,z:278,r:22,base:2,name:'BOBBY SCREWDRIVER\'S STUDIO',sub:'how screwed are you?',hue:.95,lit:.4,col:[.95,.4,.35]}];
+  {id:'audit',x:-72,z:278,r:22,base:2,name:'BOBBY SCREWDRIVER\'S STUDIO',sub:'how screwed are you?',hue:.95,lit:.4,col:[.95,.4,.35]},
+  {id:'debate',x:120,z:262,r:26,base:2,name:'THE IDIOT DEBATE',sub:'day 400 · nobody has won',hue:.12,lit:.5,col:[.12,.5,.42]},
+  {id:'npcls',x:-232,z:164,r:18,base:2,name:'THE NPC LIVESTREAM',sub:'your people · they are live',hue:.33,lit:.5,col:[.33,.5,.42]}];
 const ABY={};AREAS.forEach(a=>ABY[a.id]=a);
 function aw(a,x,z){const d=Math.hypot(x-a.x,z-a.z);return smooth(1-clamp((d-a.r*.7)/(a.r*.6)));}
 const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26},slop:{hue:.78,lit:.42},sim:{hue:.7,lit:.06}};
@@ -3351,6 +3353,75 @@ CX.push(['w_bobby','WORLD','The Screwdriver Podcast','A studio far to the north.
 ACH.push(['bob','Screwed Level: Known','got audited by Bobby Screwdriver',()=>(X.baud||0)>0],['bobs','Binge Watcher','watched every Screwdriver Podcast episode',()=>(X.beps||[]).length>=EPS.length]);
 (function(){const W=WR.c,a=Math.PI,x=W.x+Math.cos(a)*11,z=W.z+Math.sin(a)*11;warpPad(x,z,groundH(x,z)+.15,'🪛','BOBBY SCREWDRIVER',0xff2e88,()=>warpTo(ABY.audit.x-8,ABY.audit.z+9,undefined,Math.PI*.8));})();
 
+/* ================= ACT 22: the Idiot Debate (a giant who thinks everyone is an idiot) and the NPC Livestream ================= */
+SPEAK.byron={name:'BYRON PAINS (40 FT)',face:'🍪',pitch:110,wave:'sawtooth'};SPEAK.crowd={name:'THE CROWD',face:'📢',pitch:260,wave:'square'};
+const GI={g:null,P:{},sc:7.5,want:7.5,ch:0,phase:0,crowd:[],n:0,deflate:0,meter:0};
+function monsterTex(){const cv=document.createElement('canvas');cv.width=cv.height=128;const g=cv.getContext('2d');g.fillStyle='#14141a';g.fillRect(0,0,128,128);
+  g.fillStyle='#2a6ad8';g.beginPath();g.arc(64,70,44,0,7);g.fill();for(let k=0;k<40;k++){const a=k/40*7;g.beginPath();g.arc(64+Math.cos(a)*44,70+Math.sin(a)*44,6,0,7);g.fill();}
+  [[46,40],[82,36]].forEach(q=>{g.fillStyle='#fff';g.beginPath();g.arc(q[0],q[1],15,0,7);g.fill();g.fillStyle='#000';g.beginPath();g.arc(q[0]+4,q[1]+3,6,0,7);g.fill();});
+  g.fillStyle='#000';g.beginPath();g.ellipse(64,86,28,16,0,0,7);g.fill();g.fillStyle='#b8783a';g.beginPath();g.arc(70,92,14,0,7);g.fill();g.fillStyle='#4a2a14';[[64,88],[74,95],[70,86]].forEach(q=>{g.beginPath();g.arc(q[0],q[1],2.5,0,7);g.fill();});
+  const t=new THREE.CanvasTexture(cv);return t;}
+(function(){const A=ABY.debate,gy=groundH(A.x,A.z),add=o=>{scene.add(o);return o;};A.gy=gy;const SK=0xc69472,HD=0x16161c,JN=0x2a3a5a,SH=0xf4f4f4,HR=0x1c140e;
+  const root=add(new THREE.Group());root.position.set(A.x,gy,A.z);GI.g=root;const part=(par,list,x,y,z)=>{const g=new THREE.Group();g.position.set(x,y,z);if(list)g.add(new THREE.Mesh(merge(list),lam));par.add(g);return g;};
+  const P=GI.P;P.body=part(root,null,0,0,0);
+  [-1,1].forEach(sd=>{P['leg'+sd]=part(P.body,[pt(Box(.36,.95,.4),JN,M(0,-.47,0)),pt(Box(.4,.16,.6),SH,M(0,-.98,.08))],sd*.22,1.05,0);});
+  P.torso=part(P.body,[pt(Box(1.05,1.15,.62),HD,M(0,.55,0)),pt(Box(1.08,.12,.65),0x2a2a34,M(0,0,0)),pt(Box(.9,.35,.3),HD,M(0,1.12,-.3)),pt(Cyl(.17,.19,.18,10),SK,M(0,1.2,0))],0,1.05,0);
+  const chest=new THREE.Mesh(new THREE.PlaneGeometry(.72,.72),new THREE.MeshBasicMaterial({map:monsterTex()}));chest.position.set(0,.6,.315);P.torso.add(chest);
+  P.head=part(P.torso,[pt(Sph(.3,14,12),SK,M(0,0,0,0,0,0,1,1.08,1)),pt(new THREE.SphereGeometry(.31,14,10,0,TAU,0,Math.PI*.42),HR,M(0,.04,-.02)),pt(Box(.42,.2,.18),HR,M(0,-.2,.18)),pt(Box(.08,.05,.03),0x111111,M(.11,.04,.29)),pt(Box(.08,.05,.03),0x111111,M(-.11,.04,.29)),
+    pt(Box(.12,.03,.03),0x111111,M(.11,.11,.29,0,0,-.2)),pt(Box(.12,.03,.03),0x111111,M(-.11,.11,.29,0,0,.2)),pt(Box(.06,.1,.08),SK,M(0,-.03,.3))],0,1.55,0);
+  P.mouth=new THREE.Mesh(new THREE.BoxGeometry(.16,.05,.03),new THREE.MeshBasicMaterial({color:0x3a1010}));P.mouth.position.set(0,-.13,.3);P.head.add(P.mouth);
+  [-1,1].forEach(sd=>{const a=part(P.torso,[pt(Box(.28,.62,.3),HD,M(0,-.31,0))],sd*.67,1.0,0);a.fore=part(a,[pt(Box(.25,.55,.27),HD,M(0,-.27,0)),pt(Box(.2,.2,.2),SK,M(0,-.62,0)),pt(Box(.06,.22,.06),SK,M(0,-.78,.05))],0,-.62,0);P['arm'+sd]=a;});
+  root.scale.setScalar(GI.sc);colliders.push({x:A.x,z:A.z,r:4.5,top:gy+20});
+  const lab=add(textSprite(['BYRON PAINS','40 feet tall · thinks you are an idiot'],1.6,{color:'#ffd400'}));lab.position.set(A.x,gy+23,A.z);GI.lab=lab;
+  // the crowd, in rings, shouting up at him
+  const r=mulberry(919);for(let k=0;k<34;k++){const a=k/34*TAU+r()*.1,d=10+(k%3)*2.6,x=A.x+Math.cos(a)*d,z=A.z+Math.sin(a)*d,o={coat:pick([0xd83030,0x3f8a52,0x2a6ad8,0xe88020,0x7a2cff,0xffd400,0x19e3ff]),legs:pick([0x2a3a5a,0x3a2a22,0x1c1c22]),skin:pick([0xf0c8a0,0xc69472,0x8a5a3a,0xe8b088]),cap:r()<.4?pick([0xd83030,0x101014,0xffffff]):undefined,armUp:r()<.6?1:undefined};
+    const m=add(new THREE.Mesh(personGeo(o),lam));m.scale.setScalar(2.1);m.position.set(x,groundH(x,z),z);m.rotation.y=Math.atan2(A.x-x,A.z-z);colliders.push({x,z,r:.6,top:m.position.y+3.6});GI.crowd.push({m,y:m.position.y,k});}
+  psign(A.x+A.r-4,gy,A.z-6,['THE IDIOT DEBATE','day 400. nobody has won.'],-Math.PI/2,'#ffd400');psign(A.x+A.r-4,gy,A.z+6,['FIGHT HIM WITH WORDS','join the chant (E near the crowd)'],-Math.PI/2,'#ff9ecf');homePad(A.x+A.r-6,A.z);})();
+const GCHANT=[['crowd','YOU\'RE AN IDIOT!'],['byron','NO. YOU\'RE THE IDIOTS!'],['crowd','YOU\'RE A GIANT IDIOT!'],['byron','I\'M A GIANT. YOU\'RE IDIOTS. THAT\'S TWO DIFFERENT THINGS.'],['crowd','SIT DOWN!'],['byron','I CAN\'T. I\'M FORTY FEET TALL. NO CHAIR FITS. IDIOTS.'],['crowd','TOUCH GRASS!'],['byron','I AM STANDING ON ALL OF THE GRASS. ALL OF IT.'],['crowd','RATIO!'],['byron','I HAVE BEEN RATIOED ELEVEN THOUSAND TIMES. I WON ALL OF THEM.']];
+function giUpdate(dt,play){const A=ABY.debate,P=GI.P,t=S.t;if(!GI.g)return;const near=Math.hypot(PL.x-A.x,PL.z-A.z)<A.r+60;
+  GI.deflate>0&&(GI.deflate-=dt);GI.want=GI.deflate>0?1.6:7.5;GI.sc=lerp(GI.sc,GI.want,Math.min(1,dt*(GI.deflate>0?1.2:.4)));GI.g.scale.setScalar(GI.sc);GI.lab.position.y=A.gy+GI.sc*3+1.5;
+  const fpl=Math.atan2(PL.x-A.x,PL.z-A.z),ang=GI.phase%2?fpl:Math.sin(t*.35)*2.4;GI.g.rotation.y+=angDiff(ang,GI.g.rotation.y)*Math.min(1,dt*1.2);
+  const shout=(GI.ch%2)===1;P['arm1'].rotation.set(shout?-1.6+Math.sin(t*9)*.15:-.2,0,shout?-.2:.1);P['arm1'].fore.rotation.x=shout?-.2:-.3;P['arm-1'].rotation.set(shout?-.4:-.2,0,shout?.9+Math.sin(t*7)*.2:-.1);P['arm-1'].fore.rotation.x=shout?-1.4:-.3;
+  P.head.rotation.x=shout?-.18+Math.sin(t*12)*.05:.05;P.mouth.scale.y=shout?2+Math.abs(Math.sin(t*14))*2.5:1;P.torso.rotation.x=shout?-.08:0;P.body.position.y=Math.sin(t*1.2)*.01;
+  GI.crowd.forEach(c=>{const j=!shout;c.m.position.y=c.y+(j?Math.abs(Math.sin(t*8+c.k))*.5:0);});
+  if(!near)return;GI.ct=(GI.ct||0)-dt;if(GI.ct<=0){GI.ct=2.6;GI.ch++;const L=GCHANT[GI.ch%GCHANT.length],isG=L[0]==='byron';if(GI.deflate>0)return;
+    if(isG)floatText(L[1],A.x,A.gy+GI.sc*2.6,A.z,'#ffd400');else{for(let k=0;k<3;k++){const c=pick(GI.crowd);floatText(L[1],c.m.position.x,c.y+4.5,c.m.position.z,'#ff9ecf');}}tone(isG?90:300,.3,isG?'sawtooth':'square',.06);}}
+function giChant(){const A=ABY.debate;X.gich=(X.gich||0)+1;GI.meter++;floatText('YOU\'RE AN IDIOT!',PL.x,PL.y+4,PL.z,'#b6ff00');tone(420,.15,'square',.08);GI.crowd.forEach(c=>{if(Math.random()<.3)floatText(pick(['YEAH!','WHAT HE SAID','IDIOT!','📢']),c.m.position.x,c.y+4.5,c.m.position.z);});
+  if(GI.meter<20){if(GI.meter%5===0)bubble(pick(['A NEW IDIOT HAS ENTERED THE CHAT.','YOU TOO? IDIOT.','I HAVE MORE AURA THAN ALL OF YOU COMBINED. IDIOTS.']),A.x,A.gy+GI.sc*2.4,A.z);return;}
+  GI.meter=0;GI.deflate=45;X.gideflate=(X.gideflate||0)+1;addAura(20000,PL.x,PL.y+4,PL.z);SFX.win();S.shake=.8;
+  setTimeout(()=>say([['crowd','YOU\'RE! AN! IDIOT!'],['byron','...'],['byron','...okay. Okay. Maybe one of us is an idiot.'],['byron','It\'s not me. But I\'ve shrunk. Why have I shrunk. IDIOTS, what did you do.'],['sys','The crowd has argued Byron Pains down to normal size. It will last about forty-five seconds. He is already growing back. Out of spite.'],['byron','I\'M GROWING BACK OUT OF SPITE. IDIOTS.']]),400);}
+TALK.byron=()=>{const L=[[['byron','Everyone here is an idiot. I\'m not mad. I\'m just factually correct.'],['byron','You\'re called NPC? Bro. You are the most NPC NPC I have ever seen. Idiot.']],
+  [['byron','The hoodie? It\'s a monster eating a cookie. It\'s a metaphor. For me. Eating debates.'],['byron','I won every debate I\'ve ever had. Nobody agreed with me once. That is how you know you won.']],
+  [['byron','I\'m built different. Literally. I\'m forty feet tall. Look at the crowd. Ants. Shouting ants. Idiot ants.']],
+  [['byron','The rock in the plaza? Idiot. The plumber? Idiot. The book with eyes? Huge idiot.'],['byron','...The dog\'s alright. Don\'t tell the dog.']],
+  [['byron','The guy on the gold throne says he\'s better than everyone. Idiot. He\'s sitting. I\'m standing. I\'m forty feet tall.']]];const k=(X.lt.byron||0)%L.length;X.lt.byron=(X.lt.byron||0)+1;say(L[k]);};
+// ---- the NPC Livestream: NPC finds his people
+const NLS={st:[],chat:[],gifts:0};
+const NPCQ=['gang gang','yes yes yes','mmm data so good','you got me feeling like a 67','thank you for the rose','keep the gifts coming chat','I am a real person (beep)','ooh, a lion. rawr.','hat gang hat gang','gyatt? no. gyatt? no.','*twitches in 4k*','I am buffering. I am buffering.'];
+(function(){const A=ABY.npcls,gy=groundH(A.x,A.z),add=o=>{scene.add(o);return o;};A.gy=gy;const fl=add(new THREE.Mesh(new THREE.CylinderGeometry(12,12.4,.5,32),MATS.ck));fl.position.set(A.x,gy+.15,A.z);platforms.push({x:A.x,z:A.z,r:12,top:gy+.4});
+  for(let k=0;k<6;k++){const a=-1+k/5*2,x=A.x+Math.sin(a)*7,z=A.z-Math.cos(a)*7,o={coat:pick([0xff9ecf,0xb6ff00,0x19e3ff,0xffd400,0xc8a8ff,0xff7a1f]),legs:0x2a2a34,skin:pick([0xf0c8a0,0xc69472,0x8a5a3a,0xe8b088]),hair:pick([0x101014,0xe8c060,0xff2e88])};
+    const m=add(new THREE.Mesh(personGeo(o),lam));m.scale.setScalar(2.3);m.position.set(x,gy+.4,z);m.rotation.y=Math.atan2(A.x-x,A.z-z);const rl=add(new THREE.Mesh(Tor(1,.08,6,24),new THREE.MeshBasicMaterial({color:0xffffff})));const fx=A.x+Math.sin(a)*4.6,fz=A.z-Math.cos(a)*4.6;rl.position.set(fx,gy+3,fz);rl.lookAt(x,gy+3,z);
+    const ph=add(emojiSprite('📱',1.1));ph.position.set(fx,gy+3,fz);const lb=add(textSprite('NPC_'+(100+k*67)+' · LIVE 🔴',.55,{color:'#fff'}));lb.position.set(x,gy+5.4,z);colliders.push({x,z,r:1.1,top:gy+4});NLS.st.push({m,x,z,y:gy+.4,k,t:Math.random()*4,tw:0});}
+  for(let k=0;k<10;k++){const s=add(textSprite(pick(['🌹 sent a rose','🦁 sent a lion','❤️❤️❤️','first','is this real?','67 67 67','NPC NPC NPC','gang gang','W','💎 sent a diamond']),.7,{color:pick(['#fff','#ffd400','#b6ff00','#ff9ecf'])}));s.position.set(A.x+8+Math.random()*3,gy+1+k*.9,A.z+Math.random()*4-2);NLS.chat.push({s,y:s.position.y,k});}
+  psign(A.x-A.r+4,gy,A.z+5,['THE NPC LIVESTREAM','your people. they are live.'],Math.PI/2,'#b6ff00');homePad(A.x-A.r+5,A.z-4);})();
+function nlsUpdate(dt,play){const A=ABY.npcls;if(A.gy===undefined)return;NLS.st.forEach(s=>{s.t-=dt;if(s.tw>0){s.tw-=dt;s.m.rotation.z=Math.sin(S.t*30+s.k)*.12;s.m.position.y=s.y+Math.abs(Math.sin(S.t*20))*.25;}else{s.m.rotation.z=Math.sin(S.t*1.5+s.k)*.03;s.m.position.y=s.y;}
+    if(s.t<=0){s.t=3+Math.random()*4;s.tw=.8;if(play&&Math.hypot(PL.x-A.x,PL.z-A.z)<A.r+25)bubble(pick(NPCQ),s.x,s.y+5,s.z);}});
+  NLS.chat.forEach(c=>{c.s.position.y+=dt*.8;if(c.s.position.y>A.gy+10)c.s.position.y=A.gy+1;});}
+function nlsGift(s){if(S.aura<67){toast('🎁 Gifts cost 67 aura. You are broke. Bobby Screwdriver would like a word.');return;}S.aura-=67;X.nlsg=(X.nlsg||0)+1;s.tw=2.2;bubble(pick(NPCQ),s.x,s.y+5,s.z);floatText('🌹 −67 AURA',PL.x,PL.y+4,PL.z,'#ff9ecf');tone(880,.1,'sine',.08);
+  if(X.nlsg===10){addAura(6700,PL.x,PL.y+4,PL.z);if(!X.hats.includes('📱'))X.hats.push('📱');save();setTimeout(()=>say([['sys','All six streamers stop twitching at once and look straight at you.'],['sys','"NPC," they say. "NPC. NPC. NPC."'],['sys','You have been recognised by your people. New hat: 📱. You still have no lines.']]),300);}}
+{const ai=act15Interact;act15Interact=function(){if(!S.inPk&&!S.dead){const A=ABY.debate;if(A.gy!==undefined&&Math.hypot(PL.x-A.x,PL.z-A.z)<16&&Math.hypot(PL.x-A.x,PL.z-A.z)>7&&Math.abs(PL.y-A.gy)<4&&!(Math.hypot(PL.x-A.x,PL.z-A.z)<9.5&&npcs.byron))return{label:'📢 CHANT "YOU\'RE AN IDIOT" ('+GI.meter+'/20)',fn:giChant};
+    const B=ABY.npcls;if(B.gy!==undefined)for(const s of NLS.st)if(Math.hypot(PL.x-s.x,PL.z-s.z)<3.2&&Math.abs(PL.y-s.y)<3)return{label:'🎁 SEND A GIFT (67 aura)',fn:()=>nlsGift(s)};}return ai();};}
+(function(){const A=ABY.debate;const g=new THREE.Group();addCustomNpc('byron','BYRON PAINS','🍪',110,'sawtooth',A.x,A.z+5.5,0,g,{col:'#ffd400',full:'BYRON PAINS (40 FT)',noFace:1,cr:.1,ct:0,ly:-99});})();
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);giUpdate(dt,play);nlsUpdate(dt,play);};}
+BARK.byron=['IDIOTS.','I\'M FORTY FEET TALL.','RATIO? IDIOT.','NOBODY AGREES. I WIN.'];
+CAST_CX.push(['byron','🍪','BYRON PAINS','A forty-foot man in a black hoodie with a monster eating a cookie on it. Has been in the same shouting match with the same crowd for four hundred days. Everyone is an idiot. He is also an idiot. He will never say so.']);
+CX.push(['w_debate','WORLD','The Idiot Debate','A giant and a crowd, shouting "you\'re an idiot" at each other forever. Join the chant twenty times and the crowd argues him down to normal size. He grows back out of spite.',()=>X.vis.includes('debate')],
+  ['w_npcls','WORLD','The NPC Livestream','Six streamers who repeat the same lines for gifts. Send them ten and they recognise you as one of their own. NPC. NPC. NPC.',()=>X.vis.includes('npcls')]);
+ACH.push(['idiot','We\'re All Idiots','argued the giant down to normal size',()=>(X.gideflate||0)>0],['npcls','Recognised By Your People','sent ten gifts at the NPC Livestream',()=>(X.nlsg||0)>=10]);
+{const ar=act7Rows;act7Rows=function(){return ar().concat([['debate','📢 Out-chant the giant at the Idiot Debate',(X.gideflate||0)>0],['npcls','🎁 Gift the NPC Livestream '+Math.min(10,X.nlsg||0)+'/10',(X.nlsg||0)>=10]]);};}
+{const at=act7Target;act7Target=function(id){if(id==='debate')return{x:ABY.debate.x,z:ABY.debate.z,l:'THE IDIOT DEBATE'};if(id==='npcls')return{x:ABY.npcls.x,z:ABY.npcls.z,l:'THE NPC LIVESTREAM'};return at(id);};}
+(function(){const W=WR.c;[[Math.PI*.25,'📢','THE IDIOT DEBATE',()=>warpTo(ABY.debate.x+ABY.debate.r-8,ABY.debate.z,undefined,Math.PI/2)],[Math.PI*.75,'📱','NPC LIVESTREAM',()=>warpTo(ABY.npcls.x-ABY.npcls.r+8,ABY.npcls.z,undefined,-Math.PI/2)]].forEach(q=>{const x=W.x+Math.cos(q[0])*11,z=W.z+Math.sin(q[0])*11;warpPad(x,z,groundH(x,z)+.15,q[1],q[2],0xffd400,q[3]);});})();
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
@@ -3377,7 +3448,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
