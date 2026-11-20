@@ -1,18 +1,19 @@
 import { chromium } from 'playwright';
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
-const page = await (await browser.newContext({ viewport: { width: 960, height: 540 } })).newPage();
-const errors = []; page.on('pageerror', e => errors.push(e.message));
-const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
-await ev(() => { BTS.UI.clear(); Mission.start('camp', () => BTS.Game.toTitle()); }); await wait(2500);
-const pos = () => ev(() => [Math.round(BTS.P.x / 16 * 10) / 10, Math.round(BTS.P.y / 16 * 10) / 10, BTS.P.dir]);
-console.log('start', await pos());
-const go = async (k, ms) => { await page.keyboard.down(k); await wait(ms); await page.keyboard.up(k); await wait(150); };
-await go('ArrowRight', 2600); console.log('right', await pos());
-await go('ArrowDown', 500); console.log('down', await pos(), await ev(() => BTS.World.target && BTS.World.target.id));
-await go('ArrowRight', 600); console.log('at petra?', await pos(), await ev(() => BTS.World.target && BTS.World.target.id));
-await page.keyboard.press('KeyE'); await wait(500); console.log('dlg', await ev(() => [BTS.Dialogue.active, document.querySelector('#dlg .nm') && document.querySelector('#dlg .nm').textContent]));
-await page.screenshot({ path: 'shots/walk-camp.png' });
-// pause menu has skip
-await ev(() => { BTS.Dialogue.end(); BTS.Menus.pause(); }); await wait(300); console.log('pause', await ev(() => [...document.querySelectorAll('.mi')].map(e => e.textContent.trim()).slice(0, 3)));
-console.log(errors); await browser.close();
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
+const errors = []; page.on('pageerror', e => errors.push(e.message)); const wait = ms => page.waitForTimeout(ms);
+await page.goto(new URL('../index.html', import.meta.url).href + ''); await wait(600); await page.keyboard.press('Enter'); for (let i = 0; i < 100 && !(await page.evaluate(() => BTS.G.mode === 'opening')); i++) await wait(100);
+await page.evaluate(() => { BTS.Brawl.tap = true; }); await wait(800);
+await page.evaluate(m => { window.__r = null; BTS.Brawl.start(BTS.FF[m](), w => { window.__r = 'ended:' + w; }); }, process.env.M || 'circle');
+await wait(1200); await page.screenshot({ path: '/home/claude/shots/issue/walk-0.png' });
+const hold = async (k, ms) => { await page.keyboard.down(k); await wait(ms); await page.keyboard.up(k); };
+await hold('ArrowRight', 900); await hold('ArrowUp', 500); await wait(300); await page.screenshot({ path: '/home/claude/shots/issue/walk-1.png' });
+console.log('near', await page.evaluate(() => { const k = BTS.Brawl.wk; return [k.near && (k.near.name), Math.round(BTS.Brawl.p.x), Math.round(BTS.Brawl.p.y)]; }));
+await page.keyboard.press('KeyE'); await wait(700); await page.screenshot({ path: '/home/claude/shots/issue/walk-2.png' });
+console.log('dlg', await page.evaluate(() => BTS.Dialogue.active));
+for (let i = 0; i < 8 && await page.evaluate(() => BTS.Dialogue.active); i++) { await page.keyboard.press('KeyE'); await wait(350); }
+// walk to the fire and say it
+await page.evaluate(() => { BTS.Brawl.p.x = -20; BTS.Brawl.p.y = 10; }); await hold('ArrowRight', 250); await wait(200);
+console.log('near2', await page.evaluate(() => { const k = BTS.Brawl.wk; return [k.near && k.near.name, k.n]; })); await page.screenshot({ path: '/home/claude/shots/issue/walk-3.png' });
+await page.keyboard.press('KeyE'); await wait(600);
+console.log('result', await page.evaluate(() => [window.__r, BTS.Brawl.active]), 'errors', errors); await browser.close();

@@ -3,7 +3,7 @@ const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome'
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message)); const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
 const shot = n => page.screenshot({ path: '/home/claude/report/raw/' + n + '.png' });
-await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6000);
+await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6000);
 await shot('title'); console.log('mode', await ev(() => [BTS.G.mode, BTS.UI.stack.length]));
 const fight = async (m, n, ms, cam) => {
   await ev(m => { BTS.UI.clear(); DEV.quick = 1; const d = BTS.FF[m](); delete d.arts; delete d.voice; (d.foes || (d.waves && d.waves[0]) || []).forEach(f => { f.hp = 9999; }); BTS.Brawl.start(d, () => {}); }, m);
