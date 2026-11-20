@@ -735,3 +735,9 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 /* there is no crowd in the garden, so its meter stays out of the way of David's face */
 #ui.ingarden .hud-mid .hype-label, #ui.ingarden .hud-mid .bar.hype { display: none; }
 .opp.exh.resting { opacity: 0.6; }
+
+/* moves: a stripe in the move's role colour along the foot of each button, and a matching chip on cards */
+#abar .ab[data-role]:not([data-role=""])::after { content: ''; position: absolute; left: 12%; right: 12%; bottom: 0.14rem; height: 0.2rem; border-radius: 1rem; background: var(--role); box-shadow: 0 0 0.45rem var(--role); opacity: 0.9; pointer-events: none; }
+.rolechip { display: inline-block; margin-left: 0.45rem; padding: 0.05em 0.5em; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 0.25rem; color: var(--role); border: 1px solid var(--role); vertical-align: 0.15em; }
+.ab-row.mymove kbd { align-self: center; margin-left: auto; min-width: 2.6rem; text-align: center; }
+.ab svg, .ab-ic svg { overflow: visible; }
