@@ -242,6 +242,7 @@
     // pose: {moving, walk, act:'idle|swing|cast|stun|dodge|ko', prog, step (combo step), hurt, guard, flash, alpha, t, glow}
     C.pose = function (p) {
       const t = p.t || 0, act = p.act || 'idle', mv = p.moving && act !== 'ko' && act !== 'dodge';
+      for (const k in C.limbs) { const L = C.limbs[k]; if (k !== 'head') { L.rotation.y = 0; L.rotation.z = 0; } }       // the pose sets only the swing of legs, shins, forearms and hands; the side and twist start from zero every frame, or a sprawl, flinch or finisher bend adds itself again each frame and the joint winds round
       if (fresh === 1) { cur = {}; fresh = 2; }       // a figure posed once (a portrait, a stall-keeper) takes its pose outright
       dtp = lastPT == null || t <= lastPT || t - lastPT > 0.2 ? 1 / 60 : Math.max(1 / 240, t - lastPT); lastPT = t;
       const sw = mv ? Math.sin(p.walk) : 0, k = Math.max(0, Math.min(1, p.prog || 0));
