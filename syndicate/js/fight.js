@@ -1334,10 +1334,11 @@
       const e = M.e, k = Math.min(1, M.t / 1.2), ex = e.x / S, ez = e.y / S, px = P.x / S, pz = P.y / S; M.cw = (M.cw || 0.4) + ((M.f && M.f.celeb !== undefined ? 0.88 : 0.4) - (M.cw || 0.4)) * Math.min(1, (syncDt || 0) * 3); const mx = ex * (1 - M.cw) + px * M.cw, mz = ez * (1 - M.cw) + pz * M.cw;
       const la = Math.hypot(px - ex, pz - ez) > 0.4 ? Math.atan2(pz - ez, px - ex) : M.a + Math.PI;
       if (M.cs == null) { const c1 = Math.hypot(mx + Math.cos(la + 1.3) * 5, mz + Math.sin(la + 1.3) * 5), c2 = Math.hypot(mx + Math.cos(la - 1.3) * 5, mz + Math.sin(la - 1.3) * 5); M.cs = c1 <= c2 ? 1 : -1; }
-      const want = la + M.cs * (1.3 - Math.min(0.5, M.t * 0.14)); if (M.cth == null) M.cth = want; else { const dd = Math.atan2(Math.sin(want - M.cth), Math.cos(want - M.cth)); M.cth += dd * Math.min(1, (syncDt || 0) * 2.6); }
+      const want = la + M.cs * (1.45 - Math.min(0.15, M.t * 0.05)); if (M.cth == null) M.cth = want; else { const dd = Math.atan2(Math.sin(want - M.cth), Math.cos(want - M.cth)); M.cth += dd * Math.min(1, (syncDt || 0) * 2.6); }
       const r = Math.min(M.cw > 0.6 ? 5.0 : 99, G.lerp(6.2, 4.7, k) + Math.max(0, M.t - 1.7) * 1.0), pos = [mx + Math.cos(M.cth) * r, G.lerp(1.5, 2.3, k) + Math.max(0, M.t - 1.2) * 0.7, mz + Math.sin(M.cth) * r];
       const pl = Math.hypot(pos[0], pos[2]); if (pl > 6.8) { pos[0] *= 6.8 / pl; pos[2] *= 6.8 / pl; }
       [P, e].forEach(q => { const dx = pos[0] - q.x / S, dz = pos[2] - q.y / S, d = Math.hypot(dx, dz) || 0.01; if (d < 3.2) { pos[0] = q.x / S + dx / d * 3.2; pos[2] = q.y / S + dz / d * 3.2; } });
+      { const vax = px - pos[0], vaz = pz - pos[2], vbx = ex - pos[0], vbz = ez - pos[2], dP = Math.hypot(vax, vaz) || 0.01, dE = Math.hypot(vbx, vbz) || 0.01, cs2 = (vax * vbx + vaz * vbz) / (dP * dE); if (dP < dE && cs2 > 0.9) pos[1] += Math.min(1.4, (cs2 - 0.9) * 22); }       // if the killer still stands in the way after the walls have had their say, look over them from higher up
       if (M.cp) { const f2 = Math.min(1, (syncDt || 0) * 7); pos[0] = M.cp[0] + (pos[0] - M.cp[0]) * f2; pos[1] = M.cp[1] + (pos[1] - M.cp[1]) * f2; pos[2] = M.cp[2] + (pos[2] - M.cp[2]) * f2; } M.cp = pos.slice();
       const lk = [mx, 1.0 + Math.min(1.2, e.z / S * 0.5), mz]; if (M.cl) { const f3 = Math.min(1, (syncDt || 0) * 8); lk[0] = M.cl[0] + (lk[0] - M.cl[0]) * f3; lk[1] = M.cl[1] + (lk[1] - M.cl[1]) * f3; lk[2] = M.cl[2] + (lk[2] - M.cl[2]) * f3; } M.cl = lk.slice();
       gfx.cine = { pos, look: lk, fov: gfx.portrait ? 82 : 52, roll: 0.03 };
