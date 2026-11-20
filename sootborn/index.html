@@ -3222,7 +3222,8 @@ const Brawl = {
     if (Input.p('START')) { this.pauseMenu(); return; }
     if (this.def.walk) return this.updWalk(dt);
     if (this.phase === 'intro') { this.pt += dt; this.camFollow(dt); if (this.pt > 1.5 || (this.pt > .5 && Input.p('A'))) { this.phase = 'fight'; this.say('FIGHT!', true); Sound.play(this.def.hero && this.def.hero.id ? 'horn' : 'bell'); Input.consume(); } return; }
-    if (this.phase === 'win' || this.phase === 'lose') { this.pt += dt; this.stepParts(dt * .5); this.camFollow(dt * .5); for (const f of this.foes) { f.t += dt * .5; f.x += f.kx * dt * .4; f.y += f.ky * dt * .4; f.kx *= .9; f.ky *= .9; } if (this.pt > 2.1) { if (this.phase === 'win' && this.def.outro) this.playCine(this.def.outro, () => this.end(true)); else if (this.phase === 'win' && this.def.afterWin && !this._aw) { this._aw = 1; this.sup = this.art = this.fin = this.memo = null; this.msgT = 0; this.vcur = null; this.vq = []; this.lines = []; this.slashes = []; this.punch = this.impact = this.shake = this.slow = 0; { const c = this.cam, p = this.p; c.x = p.x * .85; c.y = p.y + 185; c.h = 104; c.f = 150; c.roll = 0; c.hor = Math.round(H * .2); this.p.st = 'idle'; this.p.z = 0; } Dialogue.start(this.def.afterWin, () => this.end(true)); } else if (this.phase === 'lose' && this.def.legend) { const d = this.def, e = this.onEnd; d._tries = (d._tries || 0) + 1; this.start(d, e); this.say('AGAIN.', true); } else this.end(this.phase === 'win'); } return; }
+    if (this.phase === 'win' || this.phase === 'lose') { this.pt += dt; this.stepParts(dt * .5); this.camFollow(dt * .5); for (const f of this.foes) { f.t += dt * .5; f.x += f.kx * dt * .4; f.y += f.ky * dt * .4; f.kx *= .9; f.ky *= .9; } if (this.pt > 2.1) { if (this.phase === 'win' && this.def.outro) this.playCine(this.def.outro, () => this.end(true)); else if (this.phase === 'win' && this.def.afterWin && !this._aw) { this._aw = 1; this.sup = this.art = this.fin = this.memo = null; this.msgT = 0; this.vcur = null; this.vq = []; this.lines = []; this.slashes = []; this.punch = this.impact = this.shake = this.slow = 0; { const c = this.cam, p = this.p; c.x = p.x * .85; c.y = p.y + 185; c.h = 104; c.f = 150; c.roll = 0; c.hor = Math.round(H * .2); this.p.st = 'idle'; this.p.z = 0; } Dialogue.start(this.def.afterWin, () => this.end(true)); } else if (this.phase === 'lose' && !this.def.legend && !this.def.doomed && !this.g3 && (this.def.era || 0) <= 1 && !this.def.walk && !this.def._dn && typeof Prelude !== 'undefined') { this.def._dn = 1; Prelude.plate('down', 5, () => this.end(false)); }
+      else if (this.phase === 'lose' && this.def.legend) { const d = this.def, e = this.onEnd; d._tries = (d._tries || 0) + 1; this.start(d, e); this.say('AGAIN.', true); } else this.end(this.phase === 'win'); } return; }
     if (this.def.doomed && this.t > this.def.doomed + 1.6) { const p = this.p; p.st = 'down'; p.t = 0; this.impact = .3; this.shake = .8; Sound.play('hit'); this.phase = 'lose'; this.pt = 0.9; return; }
     Sound.rage = this.phase === 'fight' ? this.p.fury / 100 : 0; this.updVoice(dt); { const S = this.sty; if (this.t - S.t > 2.4 && S.v > 0) { S.v = Math.max(0, S.v - dt * 16); this.styleRank(); } S.pop = Math.max(0, S.pop - dt); } if (this.def.training && this.phase === 'fight') { const p = this.p; p.hp = p.max; if (p.fury < 100) p.fury = Math.min(100, p.fury + dt * 9); for (const f of this.foes) { if (f.hp < f.max * .6) f.hp = f.max; } } if (this.def.lurch && this.phase === 'fight' && !this.art && !this.sup) this.lurch(dt); if (this.p.fury >= 100 && this.phase === 'fight') { this.hbT = (this.hbT || 0) - dt; if (this.hbT <= 0) { Sound.play('heart'); this.hbT = .62; if (!Settings.d.reduce) this.spark(this.p.x, this.p.y, '#ff7a30', 3, 2); } }
     if (this.freeze > 0) { this.freeze -= dt; return; }
@@ -3525,6 +3526,12 @@ const Brawl = {
       if (bg === 'ford') { for (let y = 206; y < 250; y++) { const k = Math.sin((y - 206) / 44 * Math.PI); R(0, y, 512, 1, `rgb(${60 - k * 20 | 0},${130 + k * 20 | 0},${170 + k * 40 | 0})`); } for (let i = 0; i < 260; i++) R(r() * 512, 208 + r() * 40, 6 + r() * 10, 1, r() < .5 ? '#bfe6ff' : '#3a86b0'); for (let i = 0; i < 60; i++) { const x = r() * 512; R(x, 204 + r() * 3, 6, 3, '#8a8a80'); R(x, 249 + r() * 3, 6, 3, '#8a8a80'); } }
     }
     { const wf = this.def.walk || this.def.stage; if (wf && wf.floor) wf.floor(g); }
+    if (this.def.bg2 === 'rowk' && !this.def.walk) {   /* the Scuffle is fought on Row K's own ground: packed ash between the doorsteps, a duckboard walk, and Garrow's ring in chalk */
+      for (let y = 0; y < 512; y += 4) for (let x = 0; x < 512; x += 4) { const k = ((x * 73 + y * 151 + ((x * y) >> 3)) % 17) / 17; g.fillStyle = k > .8 ? '#4a3c34' : k > .45 ? '#3e322c' : '#372c27'; g.fillRect(x, y, 4, 4); }
+      for (let i = 0; i < 40; i++) { const x = (i * 97) % 512, y = (i * 211) % 512; g.fillStyle = 'rgba(20,14,12,.5)'; g.fillRect(x, y, 6 + i % 5, 2); }
+      for (let x = 0; x < 512; x += 22) { g.fillStyle = '#2a201a'; g.fillRect(x, 256 + 62, 22, 14); g.fillStyle = x % 44 ? '#6a543c' : '#5e4a34'; g.fillRect(x, 256 + 62, 20, 12); g.fillStyle = 'rgba(255,255,255,.08)'; g.fillRect(x, 256 + 62, 20, 1); }
+      g.strokeStyle = 'rgba(240,236,224,.75)'; g.lineWidth = 2; g.setLineDash([9, 3, 4, 3]); g.beginPath(); g.ellipse(256, 256, 96, 46, 0, 0, 6.3); g.stroke(); g.setLineDash([]); g.strokeStyle = 'rgba(240,236,224,.3)'; g.beginPath(); g.ellipse(256, 256, 99, 48, 0, 0, 6.3); g.stroke();
+      g.fillStyle = 'rgba(240,236,224,.6)'; for (let i = 0; i < 3; i++) g.fillRect(256 - 8 + i * 6, 256 - 60, 2, 9); }
     this.tex[bg] = c; return c;
   },
   backdrop(g, bg, hor, t) {
@@ -7974,6 +7981,21 @@ const Prelude = (() => {
     if (o === 'below') { g.save(); g.translate(1240, 760); capsule(g, 0, -230, 0, 0, 96); fs(g, '#8a8a8e'); tone(g, '#3a3a40', .5, 8); st(g, 10); circ(g, 0, -356, 76); fs(g, '#f4e6dc'); st(g, 9); g.beginPath(); g.arc(0, -372, 80, Math.PI, TAU); g.lineTo(84, -300); g.quadraticCurveTo(60, -380, 0, -384); g.quadraticCurveTo(-60, -380, -84, -300); g.closePath(); fs(g, '#f6eac0'); st(g, 7); ell(g, -130, -30, 74, 24, 0); fs(g, '#d8d2c0'); st(g, 7); capsule(g, -60, -110, -120, -50, 22); fs(g, '#a8905c'); st(g, 6); g.restore(); }
     else { g.save(); g.translate(1240, 760); poly(g, [-160, -40, 160, -40, 180, 0, -180, 0]); fs(g, '#f1e6c8'); st(g, 8); g.beginPath(); g.moveTo(-120, -22); g.lineTo(60, -22); st(g, 6, '#b3261c'); g.restore(); }
   }
+  // losing a fight below: the flagstones from above, and a hand coming down for him
+  function pDown(g, u, T) {
+    g.fillStyle = '#231a1c'; g.fillRect(-300, -200, 2200, 1300); for (let r = 0; r < 9; r++) for (let c = 0; c < 8; c++) { const x = -260 + c * 290 + (r & 1) * 145, y = -180 + r * 150, k = rnd(r * 9 + c); g.fillStyle = k > .6 ? '#3a2e2c' : k > .3 ? '#33282a' : '#402f2c'; g.fillRect(x + 6, y + 6, 278, 138); }
+    glow(g, 760, 520, 700, '255,170,90', .3 + Math.sin(T * 2) * .03);
+    g.save(); g.translate(760, 560); g.rotate(-.18);
+    capsule(g, -260, 60, -40, 40, 60); fs(g, '#2e2a40'); st(g, 9); capsule(g, -250, -40, -40, -20, 60); fs(g, '#2e2a40'); st(g, 9); ell(g, -300, 70, 54, 30, .2); fs(g, '#1a1620'); st(g, 7); ell(g, -292, -52, 54, 30, -.2); fs(g, '#1a1620'); st(g, 7);
+    poly(g, [-60, -110, 220, -130, 240, 130, -50, 120]); fs(g, '#7a5a3a'); tone(g, '#2a1c12', .5, 8); st(g, 10); poly(g, [60, -122, 100, -124, 110, 126, 70, 126]); fs(g, '#c9a23a'); st(g, 6);
+    g.lineCap = 'round'; g.beginPath(); g.moveTo(170, -110); g.quadraticCurveTo(250, -250, 150, -330); st(g, 62, '#120a0e'); st(g, 48, '#7a5a3a'); g.beginPath(); g.moveTo(190, 110); g.quadraticCurveTo(330, 190, 400, 120 - ez(u) * 60); st(g, 62, '#120a0e'); st(g, 48, '#7a5a3a'); g.lineCap = 'butt';
+    ell(g, 150, -340, 40, 34, 0); fs(g, '#c48a64'); st(g, 7); ell(g, 412, 110 - ez(u) * 60, 40, 34, 0); fs(g, '#c48a64'); st(g, 7);
+    circ(g, 320, 0, 96); fs(g, '#c48a64'); st(g, 10); g.beginPath(); g.arc(320, 0, 100, -Math.PI * .5, Math.PI * .5); g.quadraticCurveTo(380, 0, 320, -100); fs(g, '#3a2a1e'); st(g, 8);
+    g.beginPath(); g.moveTo(270, -40); g.lineTo(300, -28); g.moveTo(270, 40); g.lineTo(300, 28); st(g, 7); g.beginPath(); g.moveTo(262, -8); g.lineTo(262, 12); st(g, 6); circ(g, 300, 62, 12); fs(g, '#8a3a2a');
+    g.restore();
+    // a hand coming down into the picture for him
+    g.save(); g.translate(1010 - ez(u) * 50, 40 + ez(u) * 60); g.rotate(Math.PI + .6); g.scale(.62, .62); g.lineCap = 'round'; g.beginPath(); g.moveTo(0, 900); g.lineTo(0, 120); st(g, 120, '#120a0e'); st(g, 100, '#5a4a3a'); g.lineCap = 'butt'; hand(g, 0, .25); g.restore();
+  }
   // the Captain of the Door, on his stick, where she put him
   function pLucan(g, u, T) {
     g.fillStyle = '#efe8d6'; g.fillRect(-300, -200, 2200, 1300); glow(g, 800, 300, 900, '255,246,220', .7);
@@ -8017,7 +8039,7 @@ const Prelude = (() => {
     // his thumb on the edge of the page, in a glove
     g.save(); g.translate(1420, 860); ell(g, 0, 0, 150, 90, -.5); fs(g, '#6a5a44'); tone(g, '#2a2016', .5, 8); st(g, 9); capsule(g, -90, -60, -200, -150, 40); fs(g, '#6a5a44'); st(g, 8); g.restore();
   }
-  const PLATES = { lucan: [pLucan, [800, 500, .98, 810, 380, 1.2]], halberd: [pHalberd, [760, 480, 1.0, 800, 380, 1.14]], docklog: [pDockLog, [800, 500, .98, 900, 500, 1.1]], furnace: [pFurnace, [800, 470, 1.0, 800, 470, 1.22]], lift: [eLift, [800, 420, 1.0, 800, 520, 1.12]], square: [eSquare, [800, 520, 1.06, 800, 420, 1.0]], sun: [eSun, [720, 440, 1.0, 800, 410, 1.14]], names: [eNames, [800, 520, 1.0, 800, 560, 1.08]], tbarge: [eBarge, [760, 440, 1.0, 800, 400, 1.1]], shelf: [eShelf, [760, 470, 1.0, 900, 420, 1.12]], book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
+  const PLATES = { down: [pDown, [860, 430, .9, 900, 440, 1.0]], lucan: [pLucan, [800, 500, .98, 810, 380, 1.2]], halberd: [pHalberd, [760, 480, 1.0, 800, 380, 1.14]], docklog: [pDockLog, [800, 500, .98, 900, 500, 1.1]], furnace: [pFurnace, [800, 470, 1.0, 800, 470, 1.22]], lift: [eLift, [800, 420, 1.0, 800, 520, 1.12]], square: [eSquare, [800, 520, 1.06, 800, 420, 1.0]], sun: [eSun, [720, 440, 1.0, 800, 410, 1.14]], names: [eNames, [800, 520, 1.0, 800, 560, 1.08]], tbarge: [eBarge, [760, 440, 1.0, 800, 400, 1.1]], shelf: [eShelf, [760, 470, 1.0, 900, 420, 1.12]], book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
   const SHOTS = [
     [[1, s1]], [[1, s2]], [[1, s3], [1.5, s3fg]], [[1, s4], [1.6, s4fg]], [[1, s5]], [[1, s6]], [[1, s7]], [[1, s8], [1.35, s8fg]],
     [[1, (g, u, T) => eyes(g, u, T, 0)]], [[1, (g, u, T) => eyes(g, u, T, 1)]], [[1, s11]]
@@ -8564,11 +8586,11 @@ const Menus = {
 
 // ---------- boot splash: North Coast Studios, then E Concepts
 // ---- the Dev menu's notes. GAME_VER is the one place the version number lives; DEV_NEW and DEV_VER are brought up to date every release.
-const GAME_VER = '0.79';
-const DEV_NEW = 'one set of buttons everywhere and a Controls card in the menu; Lucan on his stick and Hollis with the halberd, drawn (the Stair\'s top).';
+const GAME_VER = '0.80';
+const DEV_NEW = 'the Scuffle is fought on Row K\'s own ground; losing a fight below has a drawn picture (once per fight).';
 // which version last changed each scene: first match wins; the last line is everything older
 const DEV_VER = [
-  [/fever ward/i, '0.78'], [/Gallery|High Docks|Riser Nine|The Stair/i, '0.77'], [/The Keep|Keep end|The Pinning|cold open/i, '0.76'], [/fourth ring|service stair|Count hall|High Docks|Tier Six Stands|The Balancing|Two Years/i, '0.75'], [/Count, as a puzzle|last flash|ending in six|Little Ember|The Count|What She Knows|The Son/i, '0.74'], [/The cloak: the camp|service stair|Celestine.s own Assay|barge, in the weather|Seren finds|The Post|Two Years/i, '0.73'], [/fourth ring|cold open|Flash forward|Part Two|The Balancing|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
+  [/Scuffle/i, '0.80'], [/fever ward/i, '0.78'], [/Gallery|High Docks|Riser Nine|The Stair/i, '0.77'], [/The Keep|Keep end|The Pinning|cold open/i, '0.76'], [/fourth ring|service stair|Count hall|High Docks|Tier Six Stands|The Balancing|Two Years/i, '0.75'], [/Count, as a puzzle|last flash|ending in six|Little Ember|The Count|What She Knows|The Son/i, '0.74'], [/The cloak: the camp|service stair|Celestine.s own Assay|barge, in the weather|Seren finds|The Post|Two Years/i, '0.73'], [/fourth ring|cold open|Flash forward|Part Two|The Balancing|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],
   [/Keep|The Son|Lucan|What She Knows/i, '0.69'], [/Ashgate|First Fire|festival|Lamp|first dream|Ashgate, that night/i, '0.69'],
   [/Valley|Pinning|Proctor(?! Sull)|Last Night|Way Out \(160|The Way Out · the months|last dream|The Post|New game from the top|Prologue/i, '0.68'],
   [/Three Steps|Pairing|Ford|Camp|Island|Dais|The Sun|Table|High Docks|Dock Stair|Tier Six|Ledger|dream|Part Two|Two Years|The Balancing|The Count/i, '0.67'],

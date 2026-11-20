@@ -1,4 +1,17 @@
-# SOOTBORN — changelog (latest v0.79 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.80 · 2026-11-20)
+
+## v0.80 · 2026-11-20 — the Scuffle's own ground; a picture for losing below
+One thing each from Step 12 (places) and Step 14 (films).
+
+- **The Scuffle is fought on Row K's ground** now: packed ash, a duckboard walk along the front, and Garrow's ring drawn in chalk with three tally strokes. It was the square's flagstones.
+- **Losing a fight below has a drawn picture:** Kael on the flagstones seen from above, and a hand coming down for him. Five seconds, any button passes it, and it shows once per fight, not on every loss. It is for the fights below the rock that send you back (the Scuffle, Thorne, the Drill and the like), not the ones that start again by themselves.
+
+**Checked:** a still of each; a loss shows the picture and then ends the fight as lost; a second loss of the same fight does not show it again; the whole-story bot (see below).
+
+**The whole-story bot:** new game to THE END, no errors.
+
+**Not checked:** nothing by hand. The hand in the losing picture was moved after its last still and not looked at again.
+
 
 ## v0.79 · 2026-11-20 — one set of buttons everywhere; two things drawn that were only told
 The start of Step 13 (controls) and the rest of Step 10 that could be done.

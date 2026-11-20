@@ -503,6 +503,21 @@ const Prelude = (() => {
     if (o === 'below') { g.save(); g.translate(1240, 760); capsule(g, 0, -230, 0, 0, 96); fs(g, '#8a8a8e'); tone(g, '#3a3a40', .5, 8); st(g, 10); circ(g, 0, -356, 76); fs(g, '#f4e6dc'); st(g, 9); g.beginPath(); g.arc(0, -372, 80, Math.PI, TAU); g.lineTo(84, -300); g.quadraticCurveTo(60, -380, 0, -384); g.quadraticCurveTo(-60, -380, -84, -300); g.closePath(); fs(g, '#f6eac0'); st(g, 7); ell(g, -130, -30, 74, 24, 0); fs(g, '#d8d2c0'); st(g, 7); capsule(g, -60, -110, -120, -50, 22); fs(g, '#a8905c'); st(g, 6); g.restore(); }
     else { g.save(); g.translate(1240, 760); poly(g, [-160, -40, 160, -40, 180, 0, -180, 0]); fs(g, '#f1e6c8'); st(g, 8); g.beginPath(); g.moveTo(-120, -22); g.lineTo(60, -22); st(g, 6, '#b3261c'); g.restore(); }
   }
+  // losing a fight below: the flagstones from above, and a hand coming down for him
+  function pDown(g, u, T) {
+    g.fillStyle = '#231a1c'; g.fillRect(-300, -200, 2200, 1300); for (let r = 0; r < 9; r++) for (let c = 0; c < 8; c++) { const x = -260 + c * 290 + (r & 1) * 145, y = -180 + r * 150, k = rnd(r * 9 + c); g.fillStyle = k > .6 ? '#3a2e2c' : k > .3 ? '#33282a' : '#402f2c'; g.fillRect(x + 6, y + 6, 278, 138); }
+    glow(g, 760, 520, 700, '255,170,90', .3 + Math.sin(T * 2) * .03);
+    g.save(); g.translate(760, 560); g.rotate(-.18);
+    capsule(g, -260, 60, -40, 40, 60); fs(g, '#2e2a40'); st(g, 9); capsule(g, -250, -40, -40, -20, 60); fs(g, '#2e2a40'); st(g, 9); ell(g, -300, 70, 54, 30, .2); fs(g, '#1a1620'); st(g, 7); ell(g, -292, -52, 54, 30, -.2); fs(g, '#1a1620'); st(g, 7);
+    poly(g, [-60, -110, 220, -130, 240, 130, -50, 120]); fs(g, '#7a5a3a'); tone(g, '#2a1c12', .5, 8); st(g, 10); poly(g, [60, -122, 100, -124, 110, 126, 70, 126]); fs(g, '#c9a23a'); st(g, 6);
+    g.lineCap = 'round'; g.beginPath(); g.moveTo(170, -110); g.quadraticCurveTo(250, -250, 150, -330); st(g, 62, '#120a0e'); st(g, 48, '#7a5a3a'); g.beginPath(); g.moveTo(190, 110); g.quadraticCurveTo(330, 190, 400, 120 - ez(u) * 60); st(g, 62, '#120a0e'); st(g, 48, '#7a5a3a'); g.lineCap = 'butt';
+    ell(g, 150, -340, 40, 34, 0); fs(g, '#c48a64'); st(g, 7); ell(g, 412, 110 - ez(u) * 60, 40, 34, 0); fs(g, '#c48a64'); st(g, 7);
+    circ(g, 320, 0, 96); fs(g, '#c48a64'); st(g, 10); g.beginPath(); g.arc(320, 0, 100, -Math.PI * .5, Math.PI * .5); g.quadraticCurveTo(380, 0, 320, -100); fs(g, '#3a2a1e'); st(g, 8);
+    g.beginPath(); g.moveTo(270, -40); g.lineTo(300, -28); g.moveTo(270, 40); g.lineTo(300, 28); st(g, 7); g.beginPath(); g.moveTo(262, -8); g.lineTo(262, 12); st(g, 6); circ(g, 300, 62, 12); fs(g, '#8a3a2a');
+    g.restore();
+    // a hand coming down into the picture for him
+    g.save(); g.translate(1010 - ez(u) * 50, 40 + ez(u) * 60); g.rotate(Math.PI + .6); g.scale(.62, .62); g.lineCap = 'round'; g.beginPath(); g.moveTo(0, 900); g.lineTo(0, 120); st(g, 120, '#120a0e'); st(g, 100, '#5a4a3a'); g.lineCap = 'butt'; hand(g, 0, .25); g.restore();
+  }
   // the Captain of the Door, on his stick, where she put him
   function pLucan(g, u, T) {
     g.fillStyle = '#efe8d6'; g.fillRect(-300, -200, 2200, 1300); glow(g, 800, 300, 900, '255,246,220', .7);
@@ -546,7 +561,7 @@ const Prelude = (() => {
     // his thumb on the edge of the page, in a glove
     g.save(); g.translate(1420, 860); ell(g, 0, 0, 150, 90, -.5); fs(g, '#6a5a44'); tone(g, '#2a2016', .5, 8); st(g, 9); capsule(g, -90, -60, -200, -150, 40); fs(g, '#6a5a44'); st(g, 8); g.restore();
   }
-  const PLATES = { lucan: [pLucan, [800, 500, .98, 810, 380, 1.2]], halberd: [pHalberd, [760, 480, 1.0, 800, 380, 1.14]], docklog: [pDockLog, [800, 500, .98, 900, 500, 1.1]], furnace: [pFurnace, [800, 470, 1.0, 800, 470, 1.22]], lift: [eLift, [800, 420, 1.0, 800, 520, 1.12]], square: [eSquare, [800, 520, 1.06, 800, 420, 1.0]], sun: [eSun, [720, 440, 1.0, 800, 410, 1.14]], names: [eNames, [800, 520, 1.0, 800, 560, 1.08]], tbarge: [eBarge, [760, 440, 1.0, 800, 400, 1.1]], shelf: [eShelf, [760, 470, 1.0, 900, 420, 1.12]], book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
+  const PLATES = { down: [pDown, [860, 430, .9, 900, 440, 1.0]], lucan: [pLucan, [800, 500, .98, 810, 380, 1.2]], halberd: [pHalberd, [760, 480, 1.0, 800, 380, 1.14]], docklog: [pDockLog, [800, 500, .98, 900, 500, 1.1]], furnace: [pFurnace, [800, 470, 1.0, 800, 470, 1.22]], lift: [eLift, [800, 420, 1.0, 800, 520, 1.12]], square: [eSquare, [800, 520, 1.06, 800, 420, 1.0]], sun: [eSun, [720, 440, 1.0, 800, 410, 1.14]], names: [eNames, [800, 520, 1.0, 800, 560, 1.08]], tbarge: [eBarge, [760, 440, 1.0, 800, 400, 1.1]], shelf: [eShelf, [760, 470, 1.0, 900, 420, 1.12]], book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
   const SHOTS = [
     [[1, s1]], [[1, s2]], [[1, s3], [1.5, s3fg]], [[1, s4], [1.6, s4fg]], [[1, s5]], [[1, s6]], [[1, s7]], [[1, s8], [1.35, s8fg]],
     [[1, (g, u, T) => eyes(g, u, T, 0)]], [[1, (g, u, T) => eyes(g, u, T, 1)]], [[1, s11]]

@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const page = await (await browser.newContext({ viewport: { width: 1280, height: 720 } })).newPage();
+const errors = []; page.on('pageerror', e => errors.push(e.message)); const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600);
+for (let i = 0; i < 40 && !(await ev(() => BTS.G.mode === 'title' && BTS.UI.stack.length)); i++) { await page.keyboard.press('Enter'); await wait(250); } await wait(300);
+await ev(() => { BTS.UI.clear(); window.__r = []; BTS.Brawl.start(Object.assign(BTS.FF.scuffle0(), { intro: null }), w => { window.__r.push(w); }); BTS.UI.clear(); }); await wait(2600); await page.screenshot({ path: '/home/claude/shots/v80/scuffle.png' });
+await ev(() => { const B = BTS.Brawl; B.phase = 'fight'; B.p.hp = 0; B.p.st = 'down'; B.phase = 'lose'; B.pt = 0; }); for (let i = 0; i < 40 && !(await ev(() => Prelude.on)); i++) await wait(150);
+console.log('picture on a loss:', await ev(() => Prelude.on && Prelude.pl && Prelude.pl.name)); await wait(2600); await page.screenshot({ path: '/home/claude/shots/v80/down.png' });
+for (let i = 0; i < 40 && (await ev(() => Prelude.on)); i++) await wait(200); await wait(400); console.log('then the fight ended as lost:', await ev(() => JSON.stringify(window.__r)));
+await ev(() => { BTS.UI.clear(); const d = BTS.FF.scuffle0(); d._dn = 1; BTS.Brawl.start(Object.assign(d, { intro: null }), w => { window.__r.push('second:' + w); }); BTS.UI.clear(); }); await wait(2000); await ev(() => { const B = BTS.Brawl; B.phase = 'lose'; B.pt = 0; }); await wait(3200); console.log('second loss, no picture:', await ev(() => [Prelude.on, JSON.stringify(window.__r)]));
+console.log('errors', errors); await browser.close();
