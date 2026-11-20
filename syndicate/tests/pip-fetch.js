@@ -1,0 +1,24 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [];
+  const p = await b.newPage({ viewport: { width: 1000, height: 560 } }); p.on('pageerror', e => errs.push(e.message + (e.stack || '').split('\n')[1]));
+  await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(700); await p.evaluate(() => { G.bootSkip(); G.bootSkip(); }); await p.waitForTimeout(500);
+  await p.click('#bNew'); await p.click('.c-skip'); await p.click('#go'); await p.click('#ok'); await p.waitForTimeout(150);
+  const step = (n) => p.evaluate((n) => { const h = G.world.get('hub'); for (let i = 0; i < n; i++) { window._T = (window._T || 10) + 1 / 30; G.world.updateWalk(1 / 30, window._T, G.ui.isOpen() || !!G.talk); h.update(window._T, 1 / 30); if (G.talk) G.talkApi.update(1 / 30, window._T); } G.gfx.render(); return { talk: !!G.talk, name: G.talk ? (document.querySelector('.tk-name') || {}).textContent : '', text: G.talk ? G.talk.o.lines[Math.max(0, G.talk.i)].text.slice(0, 90) : '', choosing: !!(G.talk && G.talkApi.choosing()), toast: document.getElementById('toast').classList.contains('on') ? document.getElementById('toast').textContent : '', w: [G.world.walker.x.toFixed(1), G.world.walker.z.toFixed(1)].join(','), coming: G.pipComing() }; }, n);
+  await p.evaluate(() => { G.muted = true; const st = G.state; st.toured = 1; st.tourAsked = 1; st.kitPicked = 1; G.ui.close(); if (G.talk) G.talkApi.skip(); G.ui.close(); st.wins = { x: 1 }; st.respect = 60; G.ui.hub(); G.ui.close(); });
+  console.log('after 1st win  ', JSON.stringify(await step(5)));
+  let s; for (let i = 0; i < 40; i++) { s = await step(15); if (s.talk) break; } console.log('pip arrives    ', JSON.stringify(s)); await p.screenshot({ path: 'usher1.png' });
+  for (let i = 0; i < 6 && !s.choosing; i++) { await p.evaluate(() => { G.talkApi.next(); G.talkApi.next(); }); s = await step(2); } console.log('choice         ', JSON.stringify(s), await p.evaluate(() => [...document.querySelectorAll('.tk-choices button')].map(b => b.textContent).join('|')));
+  await p.evaluate(() => G.talkApi.confirm()); for (let i = 0; i < 80; i++) { s = await step(15); if (s.talk) break; } console.log('walked + explain', JSON.stringify(s)); await p.screenshot({ path: 'usher2.png' });
+  for (let i = 0; i < 8 && s.talk; i++) { await p.evaluate(() => { G.talkApi.next(); G.talkApi.next(); }); s = await step(2); if (s.talk) console.log('   line:', s.text); }
+  console.log('after          ', JSON.stringify(await step(5)), JSON.stringify(await p.evaluate(() => G.state.shownPlaces)));
+  await p.evaluate(() => { G.ui.hub(); G.ui.close(); }); console.log('re-enter hub   ', JSON.stringify(await step(30)));
+  for (let i = 0; i < 40; i++) { s = await step(15); if (s.talk) break; } console.log('FETCH arrives  ', JSON.stringify(s)); await p.screenshot({ path: 'usher1.png' });
+  for (let i = 0; i < 6 && !s.choosing; i++) { await p.evaluate(() => { G.talkApi.next(); G.talkApi.next(); }); s = await step(2); } console.log('FETCH choice   ', s.choosing, await p.evaluate(() => [...document.querySelectorAll('.tk-choices button')].map(b => b.textContent).join('|')));
+  await p.evaluate(() => G.talkApi.confirm()); for (let i = 0; i < 80; i++) { s = await step(15); if (s.talk) break; } console.log('FETCH explain  ', JSON.stringify(s)); await p.screenshot({ path: 'usher2.png' });
+  for (let i = 0; i < 8 && s.talk; i++) { await p.evaluate(() => { G.talkApi.next(); G.talkApi.next(); }); s = await step(2); if (s.talk) console.log('   line:', s.text); }
+  console.log('FETCH after    ', JSON.stringify(await step(5)), JSON.stringify(await p.evaluate(() => G.state.shownPlaces)));
+  await p.evaluate(() => { G.ui.hub(); G.ui.close(); }); console.log('FETCH again?   ', (await step(30)).coming);
+  await p.evaluate(() => G.ui.talkTo('pip')); console.log('pip topics:', await p.evaluate(() => [...document.querySelectorAll('#panel .choices button')].map(b => b.textContent).join(' | '))); await p.evaluate(() => { [...document.querySelectorAll('#panel .choices button')].find(b => /place/.test(b.textContent)).click(); document.querySelector('[data-p]').click(); }); console.log('ask place:', await p.evaluate(() => document.querySelector('#panel .quote').textContent.slice(0, 120)));
+  // objective / notification samples
+  console.log(await p.evaluate(() => { G.ui.close(); const out = []; const st = G.state; const snap = (lbl) => out.push(lbl + ': ' + G.objective()); snap('1 win'); st.coin = 0; snap('broke'); st.hero.level = 3; st.respect = 400; st.wins = { a: 5 }; snap('lvl3'); st.loanM = 100; snap('marc loan'); st.deaths = 1; snap('died'); return out.join('\n'); }));
+  console.log('ERRORS', errs.length, errs.slice(0, 3).join(' || ')); await b.close(); })();

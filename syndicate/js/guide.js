@@ -58,15 +58,57 @@
   let coming = null, lastT = 0;
   const stepPip = t => { const dt = Math.min(0.1, Math.max(0, t - lastT)); lastT = t; if (!coming || !pip) return; if (G.talk || ui.isOpen() || G.scene !== 'hub') return;
     const w = W.walker, dx = w.x - pip.root.position.x, dz = w.z - pip.root.position.z, d = Math.hypot(dx, dz);
-    if (!coming.said) { coming.said = 1; ui.toast('“Oi! Fresh meat! Hold up!” Somebody is running over.'); G.sfx('ui'); }
+    if (!coming.said) { coming.said = 1; ui.toast(coming.fetch ? '“Oi! ' + G.state.hero.name + '! Something has opened!” Pip is running over.' : '“Oi! Fresh meat! Hold up!” Somebody is running over.'); G.sfx('ui'); }
     if (d > 2.3) { const v = 4.2 * dt; pip.root.position.x += dx / d * v; pip.root.position.z += dz / d * v; pip.root.rotation.y = Math.atan2(dx, dz); coming.walk = (coming.walk || 0) + dt * 9; pip.pose({ t, act: 'idle', moving: 1, walk: coming.walk }); }
-    else { coming = null; tour(0); } };
-  G.pipComing = () => !!coming;
+    else { const fl = coming.fetch; coming = null; if (fl) usher(fl); else tour(0); } };
+  G.pipComing = () => !!coming || !!leading;
+  // ------------------------------------------------------------ when something new opens, Pip comes to fetch you, walks you to it and says what it is for
+  const PLACE = [
+    [/Notice Board/, 'the Notice Board', 'Paper nailed over paper. Somebody always wants something done in the pit: win without a potion, finish it fast, that sort of thing.', 'Take one contract down, do it in your next bouts, come back for the coin and the respect. One at a time.'],
+    [/Hobb/, 'Big Hobb’s Pot', 'Hobb sells a hot meal. Eat before a bout and you go in with more health or more wind, depending on the bowl.', 'One meal lasts one bout. Cheap, and it is the difference in a close one.'],
+    [/Low Lamp/, 'the Low Lamp', 'That is where your Tally drinks: the fighters you beat and spared, who owe you now.', 'Send them on jobs for coin, or name one your Second and call them into a bout with you.'],
+    [/Apothecary/, 'the Apothecary', 'Tonics. Drink one before a bout: harder skin, quicker hands, a hotter temper. They wear off after one fight.', 'Potions for mid-fight are the Fence. Tonics for before are here.'],
+    [/Marc/, 'Marc’s table', 'Marc dé Fleuprau. Dice, a bet on tonight’s other bouts, and a loan if you are short. You can watch the bout you bet on.', 'He is fun and he is a crook. Borrow from him and he collects at the pit gate.'],
+    [/Wisp/, 'the Wisp Table', 'Wispdice. Dice made of light, Guild-work, cannot be loaded. Marc’s back room.', 'Pure gambling. Set a stake, roll, walk away while you are ahead. Nobody does.'],
+    [/Charms/, 'the charm-seller', 'Charms. One worn at a time. Small edges: a bit of luck, a bit of coin, a second wind.', 'Some are cut to go with a particular kit and weapon. Wear all three and they add up.'],
+    [/Whisper/, 'Whisper', 'She sells what she hears. Pay her and she tells you how your next opponent fights: what they open with, what they fear.', 'Worth it before a named bout. Not worth it for an undercard.'],
+    [/Long Stair/, 'the Long Stair', 'The way up. Wardens on it, and the Crown’s tithe.', 'When you hold the crown long enough, that gate is the next thing.']];
+  const placeOf = sp => PLACE.find(q => q[0].test(sp.label)), openNow = hub => hub.spots.filter(sp => sp.isLocked && !sp.isLocked() && placeOf(sp) && !/Pip/.test(sp.label));
+  let leading = null;
+  const seenAll = (st, list) => { st.shownPlaces = st.shownPlaces || {}; list.forEach(sp => { st.shownPlaces[placeOf(sp)[1]] = 1; }); G.save(); };
+  function usher(list) { const st = G.state, sp = list[0], pl = placeOf(sp), w = W.walker, me = st.hero.name;
+    const px = pip.root.position.x, pz = pip.root.position.z;
+    G.playScene({ place: 'hub', npc: [px, pz], you: [w.x, w.z], npcH: 1.24, lines: [S('npc', PIP, 'There you are. ' + (list.length > 1 ? list.length + ' doors have opened for you since I last looked. ' : '') + 'You have earned your way into ' + pl[1] + '. Want showing?', 'npc')],
+      choices: [{ label: 'Show me', go: () => { leading = { sp, list, t0: lastT, walk: 0 }; W.walkTo({ x: sp.x, z: sp.z }); } }, { label: 'Not now', go: () => { seenAll(st, list); if (pip) pip.root.visible = false; ui.toast('Pip is by the pit gate. Ask him about any place, any time.'); } }],
+      done: () => { seenAll(st, list); if (pip) pip.root.visible = false; } }); }
+  function explain(L) { const st = G.state, sp = L.sp, pl = placeOf(sp), rest = L.list.slice(1).map(q => placeOf(q)[1]), w = W.walker;
+    G.playScene({ place: 'hub', npc: [pip.root.position.x, pip.root.position.z], you: [w.x, w.z], npcH: 1.24, lines: [S('npc', PIP, pl[2], 'npc'), S('npc', PIP, pl[3], 'low')].concat(rest.length ? [S('npc', PIP, 'Also open to you now: ' + rest.join(', ') + '. I am not walking you to all of them for a penny. Find me by the pit gate and ask.', 'npc')] : [S('npc', PIP, 'That is it. Forget any of that, I am by the pit gate. Ask me about any place.', 'npc')]),
+      done: () => { seenAll(st, L.list); if (pip) pip.root.visible = false; } }); }
+  const stepLead = t => { const dt = Math.min(0.1, Math.max(0, t - lastT)); lastT = t; const L = leading; if (!L || !pip) return; if (G.talk || ui.isOpen() || G.scene !== 'hub') return;
+    const w = W.walker, tx = L.sp.x + 1.1, tz = L.sp.z + 0.5, dx = tx - pip.root.position.x, dz = tz - pip.root.position.z, d = Math.hypot(dx, dz), near = Math.hypot(w.x - L.sp.x, w.z - L.sp.z) < 2.6; L.age = (L.age || 0) + dt;
+    if (d > 0.4) { const ahead = Math.hypot(pip.root.position.x - w.x, pip.root.position.z - w.z), v = (ahead > 5 ? 1.5 : 4.6) * dt; pip.root.position.x += dx / d * v; pip.root.position.z += dz / d * v; pip.root.rotation.y = Math.atan2(dx, dz); L.walk += dt * 9; pip.pose({ t, act: 'idle', moving: 1, walk: L.walk }); }
+    else { pip.root.rotation.y = Math.atan2(w.x - pip.root.position.x, w.z - pip.root.position.z); pip.pose({ t, act: near ? 'idle' : 'cheer', prog: (t * 0.8) % 1 }); }
+    if (near && d <= 0.4) { leading = null; explain(L); }
+    else if (L.age > 40) { leading = null; seenAll(G.state, L.list); pip.root.visible = false; ui.toast('Pip gives up waiting. He is by the pit gate if you want to ask.'); } };
+  ui.pipPlaces = function (k) { const hub = W.get('hub'), open = openNow(hub).concat(hub.spots.filter(sp => !sp.isLocked && placeOf(sp))), pl = k != null ? placeOf(open[k]) : null;
+    show('<div class="card small"><h2>' + PIP + '</h2><div class="mk-top"><span id="fp"></span><div><p class="dim">Ask about a place</p><p class="quote">“' + (pl ? pl[2] + ' ' + pl[3] : open.length ? 'Which one? I know them all. I have been thrown out of most.' : 'Nothing has opened for you yet. Win a bout.') + '”</p></div></div><div class="choices">' + open.map((sp, i) => '<button data-p="' + i + '"' + (i === k ? ' class="sel"' : '') + '><b>' + sp.label + '</b></button>').join('') + '</div><div class="row end"><button id="bk">Back</button><button class="big" id="x">Leave him be</button></div></div>');
+    const el = document.getElementById('fp'); if (el) el.appendChild(G.portrait(pipLook, 92)); on('#x', () => { ui.close(); ui.topbar(); }); on('#bk', () => ui.talkTo('pip')); on('[data-p]', b => { G.sfx('page'); ui.pipPlaces(+b.dataset.p); }); };
   const hub0 = ui.hub;
   ui.hub = function (first) { const r = hub0.apply(this, arguments), st = G.state; if (!st || !st.hero) return r;
     if (!st.casterKit && !bouts(st) && (st.hero.cls === 'sorcerer' || st.hero.cls === 'warlock')) { st.casterKit = 1; st.potions = Math.max(st.potions || 0, 2); G.save(); }      // casters start with a second potion: their first bouts are the hardest
+    { const hub = W.get('hub'), open = openNow(hub); if (!st.shownPlaces) { st.shownPlaces = {}; if (bouts(st) > 1) open.forEach(sp => { st.shownPlaces[placeOf(sp)[1]] = 1; }); }
+      const fresh = open.filter(sp => !st.shownPlaces[placeOf(sp)[1]]); if (fresh.length && st.toured && !coming && !leading && !G.talk && G.scene === 'hub') { const w = W.walker; placePip(Math.max(1.5, w.x - 7), Math.max(3, w.z + 3.5), w.x, w.z); coming = { said: 0, t0: 0, fetch: fresh }; } }
     if (!st.tourAsked && !bouts(st) && !(st.deaths > 0)) { st.tourAsked = 1; G.save(); const w = W.walker; placePip(Math.max(1.5, w.x - 7), Math.max(3, w.z + 3.5), w.x, w.z); coming = { said: 0, t0: 0 }; }
     return r; };
+
+  // ------------------------------------------------------------ the market calls out to you: whoever has something new says so
+  const HAWK = [[/Fence/, ['Oi! New steel in. Over here!', 'You! Yes, you. Come and look at this.']], [/Guildmaster/, ['A word. You have something to choose.', 'Your page wants attention. Come here.']], [/Apothecary/, ['Tonics! Fresh today!', 'You look pale. I have something for that.']], [/Hobb/, ['Hot bowl! You look thin!', 'Eat before you fight, fool! Over here!']], [/Marc/, ['Bro. BRO. Over here.', 'Psst! Good odds tonight. For you, special.']], [/Low Lamp/, ['Your people are asking for you!', 'Oi, boss! News from the jobs!']], [/Whisper/, ['Psst. I heard something about your next one.', 'A rumour. Cheap. Come closer.']], [/Charms/, ['Something new on the cloth!', 'Lucky face, you have. Come and prove it.']], [/Notice Board/, ['(a fresh sheet has been nailed up)']], [/Knuckle/, ['Fancy your arm? Sit down!']], [/Blood Pit/, ['The gate is open! Who is next?']]];
+  let hawkT = 9, hawkLast = '';
+  setInterval(() => { const st = G.state; if (!st || !st.hero || G.scene !== 'hub' || ui.isOpen() || G.talk || coming || leading || G.placing) return; hawkT -= 1; if (hawkT > 0) return;
+    const hub = W.get('hub'), w = W.walker, want = hub.spots.filter(sp => !(sp.isLocked && sp.isLocked()) && HAWK.some(h => h[0].test(sp.label)) && sp.label !== hawkLast && Math.hypot(sp.x - w.x, sp.z - w.z) > 3 && Math.hypot(sp.x - w.x, sp.z - w.z) < 22);
+    const hot = want.filter(sp => { try { return sp.badge && sp.badge(); } catch (e) { return false; } }), pool = hot.length ? hot : (Math.random() < 0.35 ? want.filter(sp => /Hobb|Apothecary|Marc|Knuckle|Fence/.test(sp.label)) : []);
+    if (!pool.length) { hawkT = 6; return; } const sp = pool[Math.floor(Math.random() * pool.length)], ln = HAWK.find(h => h[0].test(sp.label))[1]; hawkLast = sp.label; hawkT = hot.length ? 14 + Math.random() * 8 : 24 + Math.random() * 14;
+    G.gfx.floatText(sp.x, (sp.y || 2.6) + 0.5, sp.z - 0.6, '“' + ln[Math.floor(Math.random() * ln.length)] + '”', hot.length ? '#ffe9a0' : '#d8d0c0', false); }, 1000);
 
   // ------------------------------------------------------------ what your home is doing for you
   const READY = [['bed', 'Sleep'], ['dummy', 'Train'], ['stove', 'Cook'], ['cauldron', 'Ladle a potion', 2]];
@@ -104,12 +146,12 @@
       hi: () => '“Still alive, then. Good. That is my reputation, that is.”',
       topics: [['How things open', () => { const st = G.state, nr = nextRankLine(st); return 'It is all respect. Win a bout: the Notice Board and Big Hobb. Scrapper: the Low Lamp, the Apothecary, Marc and his dice room. Bloodied: the Tailor. Enforcer: the Outfitter, charms, Whisper. Underboss: the Crown’s tithe at the Stair.' + (nr ? ' For you, next: ' + nr + '.' : ' You have the lot open, far as I know.'); }],
         ['Getting ready for a bout', 'Tonic from the Apothecary, a meal from Hobb or your own stove, a song off the busker, a word with Whisper, a night in your own bed. The card before the bout shows what you have and what you skipped. None of it is needed. All of it adds up.'], ['Dying', 'You lose in the pit, you are dead. Purse gone. Unless you have a strongbox at home: what is in the box stays in the box. And they say some come back. I have seen one or two walking about who should not be. I do not ask.'],
-        ['Your home', 'Furniture works. Bed, dummy, stove, cauldron: use them once between bouts. Desk, map table, trophies, shrine: they work just by standing there. Tap the Comfort sign in your hideout and it lists the lot.'], ['Show me round again', '__tour']] }
+        ['Your home', 'Furniture works. Bed, dummy, stove, cauldron: use them once between bouts. Desk, map table, trophies, shrine: they work just by standing there. Tap the Comfort sign in your hideout and it lists the lot.'], ['Ask about a place', '__places'], ['Show me round again', '__tour']] }
   };
   G.FOLK = FOLK;
   ui.talkTo = function (id, topic) {
     const st = G.state, f = FOLK[id]; if (!f) return; st.talked = (st.talked || 0) + (topic == null ? 1 : 0); if (topic == null) G.save();
-    const t = topic != null ? f.topics[topic] : null; if (t && t[1] === '__tour') return G.tour();
+    const t = topic != null ? f.topics[topic] : null; if (t && t[1] === '__tour') return G.tour(); if (t && t[1] === '__places') return ui.pipPlaces();
     const body = t ? (typeof t[1] === 'function' ? t[1]() : t[1]) : null;
     show('<div class="card small"><h2>' + f.name + '</h2><div class="mk-top"><span id="fp"></span><div><p class="dim">' + f.sub + '</p><p class="quote">' + (body ? '“' + body + '”' : f.hi()) + '</p></div></div><div class="choices">' + f.topics.map((q, i) => '<button data-t="' + i + '"' + (i === topic ? ' class="sel"' : '') + '><b>' + q[0] + '</b></button>').join('') + '</div><div class="row end"><button class="big" id="x">Leave them be</button></div></div>');
     const el = document.getElementById('fp'); if (el) el.appendChild(G.portrait(f.look, 92)); on('#x', () => { ui.close(); ui.topbar(); }); on('[data-t]', el2 => { G.sfx('page'); ui.talkTo(id, +el2.dataset.t); });
@@ -119,7 +161,7 @@
   W.buildHub = function () { const h = bh0.apply(this, arguments), folk = [];
     Object.keys(FOLK).forEach(id => { const f = FOLK[id]; let x = f.at[0], z = f.at[1]; for (let k = 0; k < 12 && h.blocked(x, z); k++) { x += 0.5; z += k % 2 ? 0.4 : -0.3; } const c = G.makeChar(f.look); c.root.position.set(x, 0, z); c.root.rotation.y = Math.atan2(14 - x, 9 - z); h.scene.add(c.root); folk.push(c);
       const sp = { x, z: z + 0.9, r: 1.3, y: 2.6, label: f.name.split(' of ')[0], act: 'Talk', go: () => ui.talkTo(id) }; if (id === 'pip') { pipFolk = c; sp.isLocked = () => !G.state.toured || !!(pip && pip.root.visible); } h.spots.push(sp); });
-    const up0 = h.update; h.update = function (t) { up0.apply(this, arguments); folk.forEach((c, i) => c.pose({ t: t + i * 1.7, act: 'idle' })); if (pipFolk) pipFolk.root.visible = !!G.state.toured && !(pip && pip.root.visible); if (coming) stepPip(t); else if (pip && pip.root.visible) pip.pose({ t, act: 'idle' }); };
+    const up0 = h.update; h.update = function (t) { up0.apply(this, arguments); folk.forEach((c, i) => c.pose({ t: t + i * 1.7, act: 'idle' })); if (pipFolk) pipFolk.root.visible = !!G.state.toured && !(pip && pip.root.visible); if (coming) stepPip(t); else if (leading) stepLead(t); else if (pip && pip.root.visible) pip.pose({ t, act: 'idle' }); };
     pip = null; return h; };
 
   // ------------------------------------------------------------ and David, who will talk for as long as you will listen
