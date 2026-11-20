@@ -1,7 +1,7 @@
 # SOOTBORN — MASTER TIMELINE AND BUILD PLAN
 Version 2 · written 2026-11-19, on top of game build v0.65 · **APPROVED by the owner 2026-11-19 (all suggestions)** · for the next build session (Fable) to execute
 
-**This is the one document to work from.** It holds the whole game in play order: every card, every jump in time with the context for it, every transition and what triggers it, the bugs to fix first, what to build in what order, and how to build, test and release. The other SOOTBORN docs are reference only: `STORY_BIBLE.md` (lore and people), `CHANGELOG.md` (history), `OPEN_LIST.md` (everything ever asked for). Where they disagree with this document, this document wins; then update them.
+**This is the one document to work from.** It holds the whole game in play order: every card, every jump in time with the context for it, every transition and what triggers it, the bugs to fix first, what to build in what order, and how to build, test and release. The other SOOTBORN docs are reference only: `STORY_BIBLE.md` (lore and people), `CHANGELOG.md` (history; entries before v0.56 are in `CHANGELOG_ARCHIVE.md`), `OPEN_LIST.md` (everything ever asked for). Where they disagree with this document, this document wins; then update them.
 
 ---
 
@@ -26,7 +26,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Build:** `node build.mjs` → `index.html` (one self-contained file, about 2.2 MB). It runs `issue/patch.mjs` itself, which turns `issue/base.html` + `rig.js` + `world.js` + `story.js` into `issue/issue.html`. Never edit `issue/base.html`; add patches in `issue/patch.mjs` (each `rep(a, b)` must match exactly once; new blocks go before the marker `\nif (/Calloway|Tally|Deacon`).
 - **Version string:** `src/ui.js`, "Version 0.66." Next is 0.67.
 - **Publish:** the game is the Claude artifact with slug `2a8a025c-511d-454c-861c-d9bc7a4565f5`; publish `index.html` with `publish_files` and the live version as `base_version` (get it with `get_artifact`). The illustrated progress report is `be5babce-6d5d-4c6e-9668-9b2185959f6c`.
-- **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md`, `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
+- **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md` (recent versions; older ones in `-changelog-archive.md`, so the live one stays cheap to read), `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
 - **Commits** end with the attribution lines your session gives you. Push with `git -c push.negotiate=true push origin sootborn` (it prints "repository moved" and still succeeds). If the push is rejected, fetch and rebase first: other sessions also push here.
 
 ### A4. How the code is put together (what you need for this plan)
