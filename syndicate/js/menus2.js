@@ -53,6 +53,23 @@
     return r;
   };
 
+  // ---------------------------------------------------------------- before a bout: who, what they said, what you carry, and the gate
+  const pf0 = ui.prefight;
+  if (pf0) ui.prefight = function (o) {
+    const r = pf0.apply(this, arguments), card = document.querySelector('#panel .card.vs'); if (!card) return r; card.classList.add('pf2');
+    const h = G.state.hero, foot = card.querySelector('.row.end'), q = sel => card.querySelector(sel);
+    card.querySelectorAll('.ctitle, .ctab, .cmore, .keys, .keys-hint').forEach(e => e.remove()); [...card.querySelectorAll('p.dim')].forEach(e => { if (/Red marks on the floor/.test(e.textContent)) e.remove(); });
+    // what you carry in
+    const keys = G.input.usingPad ? ['LB', 'RB', 'Y'] : G.input.touch ? ['', '', ''] : ['Q', 'E', 'R'], carry = document.createElement('div'); carry.className = 'pf-carry';
+    carry.innerHTML = '<small class="over">You carry</small><span class="gm-slots">' + [0, 1, 2].map(i => { const ab = A[(h.slots || [])[i]]; return '<span class="gm-slot' + (ab ? '' : ' none') + '"><i class="gm-ic">' + (ab ? G.icon(ab) : '') + '</i><b>' + (ab ? ab.name : 'Empty') + '</b>' + (keys[i] ? '<kbd>' + keys[i] + '</kbd>' : '') + '</span>'; }).join('') + '</span>';
+    // gear: one line when it is even, the full comparison only when somebody has the edge
+    const gear = q('.gearcmp'); let gline = null; if (gear && gear.classList.contains('ok')) { gline = document.createElement('p'); gline.className = 'pf-even'; gline.textContent = 'Steel and armour: evenly matched.'; gear.remove(); }
+    const tip = q('p.note'); if (tip) tip.classList.add('pf-tip');
+    const prep = q('.prep'), off = q('.prep-off'); let prow = null; if (prep || off) { prow = document.createElement('div'); prow.className = 'pf-prep'; if (prep) prow.appendChild(prep); if (off) prow.appendChild(off); }
+    [carry, gline || q('.gearcmp'), prow, tip].forEach(el => { if (el && foot) foot.parentNode.insertBefore(el, foot); });
+    return r;
+  };
+
   // ---------------------------------------------------------------- the Fence: the three back rooms as big tiles, then what is for sale
   const shop0 = ui.shop;
   if (shop0) ui.shop = function () {

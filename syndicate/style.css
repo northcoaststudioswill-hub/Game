@@ -828,3 +828,12 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .saveslot .ss-tx { flex: 1; min-width: 0; } .saveslot .ss-tx b { display: block; font-family: var(--title); font-size: 1.15rem; color: #f6e7bd; } .saveslot .ss-tx small { display: block; color: #c8bea8; font-size: 0.78rem; }
 .saveslot .ss-btn { display: flex; flex-direction: column; gap: 0.3rem; align-items: stretch; }
 .menu .t-who { display: block; font-size: 0.62rem; letter-spacing: 0.06em; opacity: 0.8; text-transform: none; }
+
+/* before a bout */
+.card.vs.pf2 .quote { margin-bottom: 0.25rem; } .card.vs.pf2 .retort { margin: 0 0 0.6rem; }
+.pf-carry { margin: 0.5rem 0; } .pf-carry .gm-slots { margin-top: 0.3rem; }
+.pf-even { margin: 0.45rem 0; font-size: 0.85rem; color: #b8d8b0; }
+.pf-prep { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.8rem; margin: 0.45rem 0; } .pf-prep .prep { margin: 0; } .pf-prep .prep-off { margin: 0; font-size: 0.8rem; }
+.card.vs.pf2 .pf-tip { font-size: 0.82rem; padding: 0.45rem 0.7rem; margin: 0.5rem 0 0.2rem; opacity: 0.9; }
+.card.vs.pf2 > .row.end #go { flex: 1; padding-top: 0.85rem; padding-bottom: 0.85rem; font-size: 1rem; }
+@media (max-width: 560px) { .pf-carry .gm-slots { grid-template-columns: 1fr 1fr 1fr; } .pf-carry .gm-slot { flex-direction: column; text-align: center; gap: 0.15rem; padding: 0.4rem 0.2rem; } .pf-carry .gm-slot b { font-size: 0.7rem; white-space: normal; } }

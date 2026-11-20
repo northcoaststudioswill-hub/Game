@@ -171,7 +171,7 @@
     const st = G.state, h = st.hero;
     show('<div class="card vs"><div class="vs-row"><div class="vs-side"><span id="vp"></span><b>' + esc(h.name) + '</b><small>Lv ' + h.level + ' ' + G.CLASSES[h.cls].name + '</small></div><div class="vs-mid">VS</div>' +
       '<div class="vs-side"><span id="ve"></span><b>' + o.name + '</b><small>Lv ' + o.level + ' ' + G.CLASSES[o.cls].name + '</small></div></div>' +
-      '<p class="quote">“' + o.taunt + '”</p><p class="dim">' + G.BIOS[o.id].split('. ')[0] + '.</p><p class="note"><b>Pit wisdom:</b> ' + G.pick(G.TIPS) + '</p>' + CONTROLS +
+      '<p class="quote">“' + o.taunt + '”</p><p class="dim">' + G.BIOS[o.id].split('. ')[0] + '.</p><p class="note"><b>Pit wisdom:</b> ' + G.pick(G.TIPS) + '</p>' +
       '<div class="row end"><button id="x">Back</button><button class="big" id="go">Enter the pit</button></div></div>');
     $('#vp').appendChild(G.portrait(G.lookOf(h, st), 96, 1.2)); $('#ve').appendChild(G.portrait({ cls: o.cls, race: o.race, tint: o.tint }, 96, 1.2));
     on('#x', () => ui.pit());
