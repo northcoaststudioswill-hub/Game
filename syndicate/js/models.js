@@ -420,6 +420,7 @@
         foreR.rotation.x = -J('er', eR, Math.max(0.35, snap)); foreL.rotation.x = -J('el', eL, Math.max(0.35, snap)); }
       if (act === 'kick') legL.userData.shin.rotation.x = 0.15;
       if (act === 'ko') { legL.userData.shin.rotation.x = 0.25; legR.userData.shin.rotation.x = 0.5; foreR.rotation.x = -0.3; foreL.rotation.x = -0.5; }
+      if (C.fl) { C.fl.t -= dtp; if (C.fl.t <= 0 || act === 'ko') C.fl = null; else { const u = C.fl.t / C.fl.T, w = u > 0.7 ? (1 - u) / 0.3 : u / 0.7; for (const k2 in C.fl.j) { const L = C.limbs[k2], b = C.fl.j[k2]; if (L && !L.userData.gone) { L.rotation.x += b[0] * w; L.rotation.z += (b[1] || 0) * w; } } } }       // a heavy blow snaps the head round and throws the hands, then it settles
       if (C.brk) for (const k2 in C.brk) { const L = C.limbs[k2], b = C.brk[k2]; if (L && !L.userData.gone && b) { L.rotation.x += b[0] || 0; L.rotation.y += b[2] || 0; L.rotation.z += b[1] || 0; } }       // a finisher can bend any joint past where it should go
       // sorcerer flames + cast glow
       const fl = 0.85 + Math.sin(t * 17) * 0.12;

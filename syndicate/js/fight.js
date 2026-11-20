@@ -849,7 +849,7 @@
     }
     if (tag && att.isPlayer) { text(tgt, tag, '#ffd23c', true); addHype(6); }
     if (tag === 'COUNTER' && tgt.act && !tgt.act.ab.armor) interrupt(tgt);
-    tgt.hurt = 0.28; { const fa = Math.atan2(att.y - tgt.y, att.x - tgt.x), rel = Math.atan2(Math.sin(fa - tgt.aim), Math.cos(fa - tgt.aim)); tgt.hurtSide = rel >= 0 ? 1 : -1; tgt.hurtBack = Math.abs(rel) > 2.1 ? 1 : 0; tgt.hurtBig = (ab.pz || 1) >= 1.4 || ab.heavy || crit ? 1 : 0; }       // which way the blow came from, for the flinch
+    tgt.hurt = 0.28; { const fa = Math.atan2(att.y - tgt.y, att.x - tgt.x), rel = Math.atan2(Math.sin(fa - tgt.aim), Math.cos(fa - tgt.aim)); tgt.hurtSide = rel >= 0 ? 1 : -1; tgt.hurtBack = Math.abs(rel) > 2.1 ? 1 : 0; tgt.hurtBig = (ab.pz || 1) >= 1.4 || ab.heavy || crit ? 1 : 0; } { const c = tgt.vis && tgt.vis.c; if (c && c.limbs && !c.beast && tgt.hurtBig) { const sd = tgt.hurtSide, bk = tgt.hurtBack ? -1 : 1; c.fl = { t: 0.32, T: 0.32, j: { head: [-0.55 * bk, 0.35 * sd], foreL: [-0.9, 0], foreR: [-0.9, 0], handL: [0, 0.7 * sd], handR: [0, -0.7 * sd], shinL: [0.5, 0], shinR: [0.25, 0] } }; } }       // which way the blow came from, for the flinch
     if (real) { poiseHit(tgt, (ab.heavy ? 60 : ab.basic ? 9 : 28) * (ab.pz || 1) * (crit ? 1.3 : 1), att); if (ab.heavy && att.isPlayer && counted()) G.deeds.bump('heavy'); }
     const wt = Math.min(1, dmg / Math.max(1, tgt.maxHp) * 5), ha = o.from != null ? o.from : Math.atan2(tgt.y - att.y, tgt.x - att.x);       // weight: how much of them this blow took
     tgt.flash = 0.12; hitstop = Math.max(hitstop, (crit ? 0.13 : 0.065) + wt * 0.07); shake = Math.max(shake, (crit ? 12 : 5) + wt * 6);
@@ -1436,7 +1436,7 @@
   F.exDodge = function (e, ang) { e.dodgeT = 0; if (e.state !== 'idle') interrupt(e); e.intent.mx = Math.cos(ang); e.intent.my = Math.sin(ang); e.buf = { id: 'dodge', t: 0.3 }; };
 
   F.hitTest = (a2, t2, ab2, o2) => hit(a2, t2, ab2, o2 || {});
-  F.eggApi = { hit, text, spark, blood, mark, S, fx: o => fx.push(o), shake: v => { shake = Math.max(shake, v); }, stop: v => { hitstop = Math.max(hitstop, v); }, alive: e => e && e.hp > 0 && phase === 'fight' };
+  F.eggApi = { hit, text, spark, blood, mark, sever, S, fx: o => fx.push(o), shake: v => { shake = Math.max(shake, v); }, stop: v => { hitstop = Math.max(hitstop, v); }, alive: e => e && e.hp > 0 && phase === 'fight' };
   F.koEntity = e => ko(e); F.inFight = () => phase === 'fight';
   F.forfeit = function () { if (!F.active) return; result = { win: false, forfeit: true }; F.active = false; F.paused = false; G.ui.banner(null); finish(); };
 
