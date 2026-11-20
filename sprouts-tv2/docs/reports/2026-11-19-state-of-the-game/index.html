@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprouts State of the Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: the same inspection sheet as the SOOTBORN review, so the two read side by side. Shared with the SOOTBORN and Guttercrown reviews. */
+:root{
+  color-scheme: dark;
+  --page:#121110; --surface:#1a1a19; --raise:#232220; --line:#34322e;
+  --ink:#f0efec; --ink2:#c3c2b7; --muted:#8f8c84;
+  --gold:#e0b04a;
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --c5:#d55181; --c6:#9085e9; --c7:#c3c2b7; --c8:#e66767;
+  --good:#0ca30c; --warn:#fab219; --crit:#e66767;
+  --display:'Barlow Condensed','Arial Narrow',sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+main{max-width:860px;margin:0 auto;padding:28px 18px 80px;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1;letter-spacing:.01em}
+h1{font-size:46px;font-weight:700;text-transform:uppercase;color:var(--gold)}
+h2{font-size:30px;font-weight:600;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid var(--line)}
+h3{font-size:21px;font-weight:600}
+p{margin:0;max-width:68ch}
+a{color:var(--gold)}
+section{display:flex;flex-direction:column;gap:16px}
+.lede{font-size:18px;color:var(--ink2)}
+.meta{color:var(--muted);font-size:13px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.tile b{display:block;font-family:var(--display);font-size:34px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.tile span{font-size:13px;color:var(--ink2)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px}
+li{max-width:68ch}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.scroll svg{display:block}
+.hint{font-size:12px;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--display);font-size:15px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+.c-good{color:#4cc24c}.c-warn{color:var(--warn)}.c-crit{color:var(--crit)}.c-own{color:var(--gold)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--ink2)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.score{display:grid;grid-template-columns:minmax(120px,190px) 1fr 34px;gap:4px 10px;align-items:center;font-size:14px}
+.score .bar{height:10px;background:var(--raise);border-radius:5px;overflow:hidden}
+.score .bar i{display:block;height:100%;border-radius:5px}
+.score .n{font-variant-numeric:tabular-nums;color:var(--ink2);text-align:right}
+.score .why{grid-column:1/-1;font-size:13px;color:var(--muted);margin:-2px 0 8px}
+.lanes td,.lanes th{text-align:center;padding:6px 4px;font-size:12px}
+.lanes td:first-child,.lanes th:first-child{text-align:left;white-space:nowrap;font-size:13px;padding-right:12px}
+.lanes td{border:2px solid var(--surface)}
+.lanes .on{background:rgba(224,176,74,.75)}
+.lanes .if{background:repeating-linear-gradient(135deg,rgba(224,176,74,.55) 0 5px,rgba(224,176,74,.15) 5px 10px)}
+.lanes .bg{background:rgba(224,176,74,.22)}
+.vers{display:flex;flex-wrap:wrap;gap:4px}
+.vers span{font-size:11px;font-weight:600;padding:3px 6px;border-radius:3px;color:#0b0b0b;font-variant-numeric:tabular-nums}
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+figure img{display:block;width:100%;height:auto;max-width:100%}
+figcaption{padding:9px 12px;font-size:13px;color:var(--ink2)}
+figcaption b{color:var(--ink)}
+.phase{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.phase .n{font-family:var(--display);font-size:34px;font-weight:700;color:var(--gold);line-height:1}
+.phase p{color:var(--ink2);font-size:14.5px}
+.sev{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.flag{border-left:3px solid var(--crit);background:var(--surface);border-radius:0 6px 6px 0;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.flow{display:flex;flex-direction:column;gap:6px}
+.step{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.step .k{font-family:var(--display);font-size:22px;font-weight:700;color:var(--gold);line-height:1.1}
+.step p{font-size:14.5px;color:var(--ink2)}
+.step b{color:var(--ink)}
+.branch{margin-left:40px;border-left:2px dashed var(--muted);padding-left:12px;font-size:14px;color:var(--ink2)}
+@media (max-width:560px){h1{font-size:36px}h2{font-size:25px}.branch{margin-left:16px}}
+svg text{font-family:var(--body)}
+code{font-size:.9em;color:var(--ink2)}
+</style>
+</head>
+<body>
+<main>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="meta">North Coast Studios · updated 19 November 2026 for <b>Sprouts TV 2</b> (last change 8:01 am) · first review: Sprouts TV, 18 November</div>
+  <h1>Sprouts<br>State of the Game</h1>
+  <p class="lede">Overnight, Sprouts TV 2 worked through almost every item in last night's review. The story now has a midpoint and one ending. Marcus arrives on day one, Ranger and Scout have stories, every story scene is 3D, and the pop-ups are gone. A bot that only presses the controller's buttons finished the whole game three times. What's left is the one thing no script can do: a person playing it on the couch and saying whether it's fun.</p>
+  <div class="tiles">
+    <div class="tile"><b>448</b><span>checks in the repo; 192 re-run by me today, all passing</span></div>
+    <div class="tile"><b>34</b><span>3D scenes, 152 shots (22 story, 12 hidden)</span></div>
+    <div class="tile"><b>30</b><span>asks from four people</span></div>
+    <div class="tile"><b>0</b><span>toasts on day 1 (was 16)</span></div>
+    <div class="tile"><b>2</b><span>builds from one source: TV and phone</span></div>
+    <div class="tile"><b>2.6 MB</b><span>per build (was 13.8)</span></div>
+  </div>
+  <p class="meta">Which build: <code>sprouts-tv2/</code> on the <code>claude/gifted-pascal-7d963q</code> branch, a copy of Sprouts TV made at 11:56 pm and changed in four rounds until 8:01 am. Sources: its README, CHANGELOG (which answers last night's review item by item), STORY-NOTES, the honest-run and story-run logs, and the build. I re-ran six of its nine test suites (<code>tv2</code> 63, <code>scenes</code> 36, <code>tv</code> 34, <code>saves</code> 25, <code>music</code> 18, <code>pocket</code> 16; the TV suite's two timing checks only passed once I ran it alone). The frames below were captured by the repo's own tests this morning. Sprouts TV 2 isn't published as a page yet. Scores are my judgment.</p>
+</header>
+
+<section>
+  <h2>Since last night</h2>
+  <div class="scroll"><table>
+    <tr><th>Last night's review said</th><th>Sprouts TV 2</th><th></th></tr>
+    <tr><td>The ending comes on day 2, before half the game</td><td>The four shards are a midpoint: the Lantern is whole and still skips. One ending, after the relight</td><td><span class="chip c-good">Done</span></td></tr>
+    <tr><td>Marcus arrives on day 3 with three asks</td><td>Met a quarter of the way through day 1, locked out of his own job site, with five asks</td><td><span class="chip c-good">Done</span></td></tr>
+    <tr><td>Ranger and Scout are placeholders</td><td>A scene each, a story ask, a line for every turn, and Scout's notebook</td><td><span class="chip c-good">Done</span></td></tr>
+    <tr><td>Day 4 is thin; nothing to come back for</td><td>The wedding book, expeditions, night grubs, rain days, the notebook, Marcus's bet</td><td><span class="chip c-good">Done</span></td></tr>
+    <tr><td>Constant toasts, fast ranks</td><td>Rewards are read out in the evening report. Zero toasts on day 1 of today's story run</td><td><span class="chip c-good">Done</span></td></tr>
+    <tr><td>Hint banner covers the house and field</td><td>Hints sit in a bottom strip</td><td><span class="chip c-good">Done</span></td></tr>
+    <tr><td>Erase Everything sits in the main menu</td><td>Moved to Settings</td><td><span class="chip c-good">Done</span></td></tr>
+    <tr><td>Two copies of Sprouts</td><td>One source, two builds (TV and phone) inside TV 2. <code>alt/</code> and <code>sprouts-tv/</code> remain as they were</td><td><span class="chip c-warn">Partly</span></td></tr>
+    <tr><td>Couch co-op, photo mode, weather, Louie's day</td><td>Player two is Louie; photo mode; rain days; Louie's morning</td><td><span class="chip c-good">Done</span></td></tr>
+    <tr><td>Canon still unconfirmed</td><td>More of it now: the new scenes and lines are all marked as Claude's in STORY-NOTES</td><td><span class="chip c-warn">Yours</span></td></tr>
+    <tr><td>Van jokes and the age rating</td><td>Left as they are, by your call; the van now has its own reggae theme</td><td><span class="chip c-own">Your call</span></td></tr>
+    <tr><td>Play it on the TV with a pad</td><td>Still not done by a person</td><td><span class="chip c-crit">Open</span></td></tr>
+  </table></div>
+  <p>Also new, beyond the review: a cutscene audit that fixed eleven staging problems (the van now drives nose first with Derek at the wheel); nine more 3D scenes; a Controls page and credits; save import from Sprouts TV and Pocket Lantern; a bot that plays the whole game with buttons only; and the music rebuilt as one looping song (Autumn Study) plus six cutscene themes written as notes.</p>
+</section>
+
+<section>
+  <h2>Where it stands</h2>
+  <div class="grid2">
+    <div class="card"><h3>What exists</h3>
+      <ul>
+        <li><b>The loop:</b> pluck, throw, carry home; six kinds with jobs; the Lantern makes more.</li>
+        <li><b>The story:</b> four shards (midpoint), the call, the North Coast, the flooded lamp room, the Flow Pros job, the lens, the relight and one ending. After it, the North Light rests, and the wedding book fills.</li>
+        <li><b>People:</b> Erin (12 asks), Scout (7), Ranger (6), Marcus (5), Thornback, Derek and Louie.</li>
+        <li><b>After the ending:</b> wedding book, expeditions, the notebook, night grubs, rain, glimmers, projects.</li>
+        <li><b>Ways to play:</b> TV (16:9, controller), phone build, a second controller as Louie, photo mode.</li>
+      </ul></div>
+    <div class="card"><h3>What that means</h3>
+      <ul>
+        <li>This is the closest of your games to finished. The CHANGELOG's own word for this round is "locking in".</li>
+        <li>Every step of the story is shown possible with real controls. Whether it's clear and fun is unproven.</li>
+        <li>The remaining work is yours more than Claude's: play it, rule on the canon, judge the music, decide where it lives.</li>
+      </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>Frames from this morning's build</h2>
+  <p class="meta">Captured by the repo's own tests on the TV 2 and phone builds (Nov 19). The 3D scenes use Sprouts' own software renderer.</p>
+  <div class="shots">
+    <figure><img src="img3/title.jpg" alt="SPROUTS title over the 3D valley" loading="lazy"><figcaption><b>Title.</b> Still says "A Pocket Lantern game", though this is now the standalone.</figcaption></figure>
+    <figure><img src="img3/marcus-day-one.jpg" alt="Lantern Field with the Flow Pros van on day one" loading="lazy"><figcaption><b>Marcus on day one.</b> The van is by the west path from the start.</figcaption></figure>
+    <figure><img src="img3/new-scenes.jpg" alt="Contact sheet of the new and fixed 3D scenes" loading="lazy"><figcaption><b>New and fixed 3D scenes.</b> The job, the pond road, the lens, not tonight, the van after dark.</figcaption></figure>
+    <figure><img src="img3/rain.jpg" alt="A rain day in the valley" loading="lazy"><figcaption><b>A rain day.</b> "The garden waters itself." Hints sit in the bottom strip now.</figcaption></figure>
+    <figure><img src="img3/notebook.jpg" alt="Scout's notebook page in the Collection" loading="lazy"><figcaption><b>Scout's notebook.</b> Sixteen entries that fill in as the valley finds things out.</figcaption></figure>
+    <figure><img src="img3/wedding-book.jpg" alt="The wedding book, every page filled" loading="lazy"><figcaption><b>The wedding book.</b> Six pages filled by play, then "set the date".</figcaption></figure>
+    <figure><img src="img3/also-today.jpg" alt="Evening report listing the day's rewards" loading="lazy"><figcaption><b>The evening report.</b> Where the rewards went instead of pop-ups.</figcaption></figure>
+    <figure><img src="img3/settings.jpg" alt="Settings with view, import and erase" loading="lazy"><figcaption><b>Settings.</b> VIEW wide or close, import a save, Erase Everything moved here.</figcaption></figure>
+    <figure><img src="img3/controls.jpg" alt="Controls page for keyboard and controller" loading="lazy"><figcaption><b>Controls.</b> Keyboard and pad side by side, player two as Louie.</figcaption></figure>
+    <figure><img src="img3/photo-saved.jpg" alt="Photo mode view in 3D" loading="lazy"><figcaption><b>Photo mode.</b> The 3D renderer draws where Will stands.</figcaption></figure>
+    <figure><img src="img3/ending.jpg" alt="The ending scene with everyone at the Lantern" loading="lazy"><figcaption><b>The ending.</b> Everyone at the Lantern after the relight.</figcaption></figure>
+    <figure><img src="img3/two-lights.jpg" alt="TWO LIGHTS win card" loading="lazy"><figcaption><b>Two lights.</b> "The valley is still growing…"</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>How the story is layered</h2>
+  <p>This is the honest run: a bot playing from a new game with the controller's buttons only, nothing carried or opened for it. A person will be slower and will get lost, so read the days as a floor. The first act now ends at a midpoint on day 3, the second act runs to the ending on day 5, and the epilogue carries on to the wedding date on day 11.</p>
+  <div class="legend"><span><i style="background:var(--c1)"></i>story scene (3D)</span><span><i style="background:var(--c3)"></i>someone new to talk to</span><span><i style="background:var(--c4)"></i>after the ending</span></div>
+  <div class="scroll"><svg id="days" role="img" aria-label="Story beats by in-game day in the honest run"></svg></div>
+  <div class="grid2">
+    <div class="card"><h3>What the new shape gets right</h3>
+      <ul>
+        <li>The whole cast is met before noon on day 1, so every later scene has people you know in it.</li>
+        <li>The midpoint is a real turn: the Lantern is whole, and it still skips. That's a better hook than an early "you did it".</li>
+        <li>The second act has steps (coast, pier, lamp room, the job, the lens) instead of one carry.</li>
+        <li>The ending lands at night with everyone there, and the credits roll before the TWO LIGHTS card.</li>
+      </ul></div>
+    <div class="card"><h3>What to watch</h3>
+      <ul>
+        <li><b>Day 1 is very full.</b> Four people, three scenes, the garden, the key and the house, all by the end of day 1 even at a bot's pace. A person might feel rushed. The pointer arrow still changes 26 times on day 1 of the story run.</li>
+        <li><b>A quiet day 2.</b> The story run shows almost nothing new on days 2 and 3 between shards. That may be the right breather; it needs a person to say.</li>
+        <li><b>The epilogue is long.</b> Six days from the ending to the wedding date. Worth checking that it feels like a reward, not a list.</li>
+        <li><b>Louie reached his top level by about day 8</b> and keeper rank 14 by day 11 in the honest run. The CHANGELOG itself asks whether that is still too fast.</li>
+      </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>Against its sources</h2>
+  <p>Unchanged from last night in kind; what moved is in bold.</p>
+  <div class="scroll"><table>
+    <tr><th>Source idea</th><th>Sprouts TV 2</th><th>Fit</th></tr>
+    <tr><td>Pluck, throw, swarm, carry home (Pikmin)</td><td>The same, with auto-aim and a throw that now wins over nearby posts and signs</td><td><span class="chip c-good">Close</span></td></tr>
+    <tr><td>Colours with jobs</td><td>Six kinds; Dews now swim the island shard home</td><td><span class="chip c-good">Close</span></td></tr>
+    <tr><td>Ship parts as the goal</td><td>Four shards (midpoint), then the lens for the North Light</td><td><span class="chip c-good">Close</span></td></tr>
+    <tr><td>Enemies that eat your crew</td><td><b>Night grubs eat seedlings in the soil</b>, never the crew</td><td><span class="chip c-own">Its own (gentle)</span></td></tr>
+    <tr><td>Neighbours with requests (Stardew, Animal Crossing)</td><td><b>30 asks, and Ranger and Scout now have stories</b></td><td><span class="chip c-good">Close</span></td></tr>
+    <tr><td>Weather</td><td><b>Rain days</b> water beds, bring snails and a frog, keep grubs in</td><td><span class="chip c-good">Close</span></td></tr>
+    <tr><td>A pet companion</td><td>Louie, <b>now playable by a second player</b>, with his own morning</td><td><span class="chip c-own">Better</span></td></tr>
+    <tr><td>Expeditions (Pikmin Bloom)</td><td><b>After the ending: five house sprouts carry the light down a road</b></td><td><span class="chip c-good">Close</span></td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>Mechanics</h2>
+  <div class="grid2">
+    <div class="card"><h3>Who gives you things to do</h3><div id="asks" style="display:flex;flex-direction:column;gap:8px;margin-top:10px"></div><p class="meta" style="margin-top:10px">30 asks, up from 26; Erin's share falls from 46% to 40%.</p></div>
+    <div class="card"><h3>What the 34 scenes are</h3><div id="scenes" style="display:flex;flex-direction:column;gap:8px;margin-top:10px"></div><p class="meta" style="margin-top:10px">152 shots. Six cutscene themes cover them all.</p></div>
+  </div>
+  <h3>How often the game interrupts you</h3>
+  <div class="scroll"><svg id="pops" role="img" aria-label="Pop-ups per in-game day, last night's build against today's"></svg></div>
+  <p>Toasts are gone: rank-ups, baskets and daily asks now wait for the evening report. What remains is mostly the pointer arrow changing target (26 times on day 1, 20 on day 4), plus new-sprout cards. The arrow is useful, but day 1 still has a lot of "go here, now go there". Both runs are bots, so read this for shape, not numbers.</p>
+</section>
+
+<section>
+  <h2>Scorecard</h2>
+  <p class="meta">My read, out of 5. Grey ticks show last night's score for Sprouts TV.</p>
+  <div class="card"><div class="score" id="score"></div></div>
+</section>
+
+<section>
+  <h2>Succeeding</h2>
+  <ul>
+    <li><b>Turning a review into a build overnight.</b> The CHANGELOG checks off each review item, with honest notes on what wasn't touched and why.</li>
+    <li><b>The honest run.</b> Proving every step is reachable with buttons only, and fixing four real dead ends it found (Louie's heart vs Erin's talk, throws next to posts, Ranger's unreachable post, an empty-crew safety net that never fired).</li>
+    <li><b>Story shape.</b> A midpoint, a second act with steps, one ending, credits.</li>
+    <li><b>Cast.</b> Everyone met early; Ranger and Scout are people now.</li>
+    <li><b>Louie.</b> Still the heart of it, and now a second player can be him.</li>
+    <li><b>Size.</b> 13.8 MB down to 2.6 MB per build, with a phone build from the same source.</li>
+    <li><b>Test discipline.</b> Tests that hold the game's clock still, so a run gives the same result every time.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Lacking</h2>
+  <ul>
+    <li><b>A person has still not played it.</b> Not on a TV, a phone or a real controller. Nothing has been listened to, including the six new themes and the loop point of the song.</li>
+    <li><b>Canon.</b> Nine new scenes and many new lines are Claude's. STORY-NOTES lists them; they need your yes or no.</li>
+    <li><b>Pace.</b> A packed day 1, then a long epilogue. Louie maxes out by about day 8.</li>
+    <li><b>Three copies.</b> <code>alt/</code>, <code>sprouts-tv/</code> and <code>sprouts-tv2/</code> all exist. Only TV 2 has today's work.</li>
+    <li><b>Not published.</b> TV 2 lives only in the repo. If you want to play it from the phone, it needs a page.</li>
+    <li><b>Tone.</b> The van humour stays by your call; it still sets the age rating.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Known bugs and risks</h2>
+  <div class="scroll"><table>
+    <tr><th>Level</th><th>Issue</th><th>Source</th></tr>
+    <tr><td><span class="sev c-warn">Check</span></td><td><code>sprouts_story.js</code> (the autopilot) failed one run in four on Nov 19 and passed the next three</td><td>README</td></tr>
+    <tr><td><span class="sev c-warn">Check</span></td><td>The TV suite's two timing checks (title appearing, 1080p frame under 16 ms) fail on a busy machine; they passed when run alone (10.3 ms)</td><td>My run today</td></tr>
+    <tr><td><span class="sev c-warn">Check</span></td><td>Photo mode places people by map position; they can stand slightly off from the 2D view</td><td>Changelog</td></tr>
+    <tr><td><span class="sev c-warn">Check</span></td><td>A grub raid in progress isn't saved; loading mid-raid gives ordinary grubs</td><td>Changelog</td></tr>
+    <tr><td><span class="sev c-warn">Check</span></td><td>Marcus stands three tiles from the Lantern's soil; A at him talks, which may get in the way of plucking</td><td>Changelog</td></tr>
+    <tr><td><span class="sev c-warn">Visible</span></td><td>The title still reads "A Pocket Lantern game"</td><td>Seen in frame</td></tr>
+    <tr><td><span class="sev">Unheard</span></td><td>The song's loop point and the six cutscene themes</td><td>Changelog</td></tr>
+    <tr><td><span class="sev">Untested</span></td><td>Expeditions were not sent in the honest run; hidden scenes are checked by trigger, not reached by the bot</td><td>Changelog</td></tr>
+    <tr><td><span class="sev">Open</span></td><td>Three copies of Sprouts in the repo</td><td>README</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>Ideas from here</h2>
+  <div class="grid2">
+    <div class="card"><h3>Before calling it done</h3>
+      <ul>
+        <li>One evening on the TV with a pad; one session on the phone. Five notes each.</li>
+        <li>Listen to the song loop and the six themes (<code>playtest/music/</code> has them).</li>
+        <li>Rule on STORY-NOTES: keep, change or cut each of Claude's lines.</li>
+        <li>Publish TV 2 and the phone build as pages.</li>
+      </ul></div>
+    <div class="card"><h3>Small, high value</h3>
+      <ul>
+        <li>Let day 1 breathe: hold Scout or the house until day 2.</li>
+        <li>Slow Louie's last two levels so he's still growing in the epilogue.</li>
+        <li>Change the title line to "A North Coast Studios game".</li>
+        <li>Retire <code>sprouts-tv/</code> once TV 2 is the one you play.</li>
+      </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>Development timeline</h2>
+  <p>From the Dev Board (to Nov 14) and the repo (Eastern time). Sprouts TV 2 is the fourth home for the same game, and the first that is meant to be finished.</p>
+  <div class="legend" id="catlegend"></div>
+  <div class="card" id="devlog" style="display:flex;flex-direction:column;gap:12px"></div>
+  <h3>Proposed order from here</h3>
+  <div>
+    <div class="phase"><div class="n">1</div><div><h3>Play it and listen to it</h3><p>TV with a pad, the phone, the music. Write down what's unclear, slow or annoying.</p></div></div>
+    <div class="phase"><div class="n">2</div><div><h3>Rule on the canon</h3><p>Go through STORY-NOTES and mark each Claude line keep, change or cut.</p></div></div>
+    <div class="phase"><div class="n">3</div><div><h3>Tune from your notes</h3><p>Day 1 density, Louie's levels, the epilogue's length, grubs, rain frequency.</p></div></div>
+    <div class="phase" style="border-bottom:0"><div class="n">4</div><div><h3>Publish and retire</h3><p>Publish TV 2 and Pocket as pages; retire the older copies; then decide on Steam.</p></div></div>
+  </div>
+</section>
+
+</main>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const el=(p,t,a,txt)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;p.appendChild(e);return e;};
+const INK=css('--ink'),INK2=css('--ink2'),MUT=css('--muted'),LINE=css('--line'),SURF=css('--surface'),GOLD=css('--gold');
+const C1=css('--c1'),C3=css('--c3'),C4=css('--c4'),C7=css('--c7');
+
+/* honest run by day */
+(function(){
+  const B=[
+   [1.14,'Ranger','P','a1','end'],[1.21,'Scout','P','b1','middle'],[1.23,'Marcus','P','a1','start'],
+   [1.77,'The key','S','a1','middle'],[2.34,'First shard','S','b1','middle'],[2.70,'Pond road','S','a1','middle'],[3.41,'Thornback','S','b1','end'],[3.43,'Midpoint: the Lantern is whole','S','a2','middle'],
+   [4.78,'The call','S','b1','end'],[4.82,'Sun door','S','a1','start'],[5.20,'Lamp room','S','b2','middle'],[5.42,'Lens','S','b1','start'],[5.78,'Relight and the ending','S','a2','middle'],
+   [7.02,'Last ask','A','a1','middle'],[8.78,'The North Light rests','A','b1','middle'],[11.07,'Wedding: save the date','A','a1','middle']];
+  const s=document.getElementById('days'),W=1100,H=290,L=110,R=1080,D1=1,D2=12;
+  s.setAttribute('viewBox',`0 0 ${W} ${H}`);s.setAttribute('width',W);s.setAttribute('height',H);
+  const X=d=>L+(d-D1)/(D2-D1)*(R-L);
+  const lane={S:115,P:205,A:115};
+  [['Story scenes',115],['People met',205]].forEach(([n,y])=>{el(s,'text',{x:L-12,y:y+4,'text-anchor':'end','font-size':12.5,fill:INK2},n);el(s,'line',{x1:L,x2:R,y1:y,y2:y,stroke:LINE});});
+  for(let d=D1;d<=D2;d++){el(s,'line',{x1:X(d),x2:X(d),y1:44,y2:240,stroke:LINE,'stroke-dasharray':'3 4'});if(d<D2)el(s,'text',{x:(X(d)+X(d+1))/2,y:260,'text-anchor':'middle','font-size':11.5,fill:MUT},'Day '+d);}
+  [[1,3.43,'first act'],[3.43,5.78,'second act'],[5.78,11.5,'epilogue']].forEach(([a,b,n],i)=>{el(s,'rect',{x:X(a),y:44,width:X(b)-X(a),height:196,fill:GOLD,'fill-opacity':i===1?.10:i===2?.04:0});el(s,'text',{x:(X(a)+X(b))/2,y:30,'text-anchor':'middle','font-size':12,'font-weight':600,fill:INK},n);});
+  const col={S:C1,P:C3,A:C4};
+  const off={a1:-12,a2:-36,b1:22,b2:40};
+  B.forEach(([d,n,k,pos,anc])=>{const x=X(d),y=lane[k];const big=pos==='a2';const g=el(s,'g',{});el(g,'title',{},`Day ${Math.floor(d)}, ${Math.round((d%1)*100)}% through: ${n}`);
+    if(big)el(s,'line',{x1:x,x2:x,y1:y-32,y2:y-8,stroke:MUT});
+    el(g,'circle',{cx:x,cy:y,r:big?8:6,fill:col[k],stroke:SURF,'stroke-width':2});
+    el(s,'text',{x:anc==='end'?x-4:anc==='start'?x+4:x,y:y+off[pos],'text-anchor':anc,'font-size':big?12:11,'font-weight':big?600:400,fill:big?INK:INK2},n);});
+})();
+
+/* asks & scenes */
+(function(){
+  const bar=(id,rows,max,color)=>{const b=document.getElementById(id);rows.forEach(([n,v,c,o])=>b.insertAdjacentHTML('beforeend',`<div style="display:grid;grid-template-columns:110px 1fr 54px;gap:10px;align-items:center;font-size:14px"><span>${n}</span><div style="height:12px;background:var(--raise);border-radius:6px" title="${n}: ${v}${o!=null?' (was '+o+')':''}"><i style="display:block;height:100%;width:${v/max*100}%;background:${c||color};border-radius:6px"></i></div><span style="text-align:right;color:var(--ink2);font-variant-numeric:tabular-nums">${v}${o!=null&&o!==v?` <small style="color:var(--muted)">(${o})</small>`:''}</span></div>`));};
+  bar('asks',[['Erin',12,C1,12],['Scout',7,null,6],['Ranger',6,null,5],['Marcus',5,null,3]],12,MUT);
+  bar('scenes',[['Story, 3D',22,C1,10],['Hidden, 3D',12,C4,9]],22,MUT);
+})();
+
+/* pop-ups: last night vs today */
+(function(){
+  const old=[40,38,42,8,null,null], now=[29,3,3,24,17,4];
+  const s=document.getElementById('pops'),W=760,H=220,L=50,B=180;
+  s.setAttribute('viewBox',`0 0 ${W} ${H}`);s.setAttribute('width',W);s.setAttribute('height',H);
+  const max=45,y=v=>B-v/max*145,cw=(W-L-20)/6;
+  [0,20,40].forEach(v=>{el(s,'line',{x1:L,x2:W-20,y1:y(v),y2:y(v),stroke:LINE});el(s,'text',{x:L-8,y:y(v)+4,'text-anchor':'end','font-size':11,fill:MUT},v);});
+  now.forEach((v,i)=>{const x0=L+i*cw+cw*.18,w=cw*.28;
+    if(old[i]!=null){const g=el(s,'g',{});el(g,'title',{},`Day ${i+1}, Sprouts TV (last night): ${old[i]}`);el(g,'rect',{x:x0,y:y(old[i]),width:w,height:B-y(old[i]),rx:2,fill:MUT,'fill-opacity':.6});el(s,'text',{x:x0+w/2,y:y(old[i])-5,'text-anchor':'middle','font-size':11,fill:INK2},old[i]);}
+    const g=el(s,'g',{});el(g,'title',{},`Day ${i+1}, Sprouts TV 2 (today): ${v}`);el(g,'rect',{x:x0+w+4,y:y(v),width:w,height:B-y(v),rx:2,fill:C1});el(s,'text',{x:x0+w*1.5+4,y:y(v)-5,'text-anchor':'middle','font-size':11.5,'font-weight':600,fill:INK},v);
+    el(s,'text',{x:x0+w+2,y:B+16,'text-anchor':'middle','font-size':12,fill:INK2},'Day '+(i+1));});
+  el(s,'rect',{x:L,y:H-12,width:10,height:10,rx:2,fill:MUT,'fill-opacity':.6});el(s,'text',{x:L+15,y:H-3,'font-size':11.5,fill:INK2},'Sprouts TV, last night (toasts, cards, pointer changes)');
+  el(s,'rect',{x:L+340,y:H-12,width:10,height:10,rx:2,fill:C1});el(s,'text',{x:L+355,y:H-3,'font-size':11.5,fill:INK2},'Sprouts TV 2, today');
+})();
+
+/* score */
+(function(){
+  const S=[['Testing and stability',5,4.5,'448 checks, a buttons-only bot that finishes the game, tests that hold the clock.'],
+  ['Story shape',4,2.5,'A midpoint, a stepped second act, one ending, credits.'],
+  ['Characters',4,2.5,'Everyone met on day 1; Ranger and Scout have stories; Marcus has five asks.'],
+  ['Companion (Louie)',4.5,4.5,'Now also a second player, with his own morning.'],
+  ['Core loop',4,4,'Throws now win over nearby posts; Dews swim shards home.'],
+  ['3D scenes and presentation',4.5,4,'34 scenes, all story beats in 3D, staging audited shot by shot.'],
+  ['Pacing and rewards',3.5,2.5,'Toasts gone. Day 1 is still busy, and Louie maxes out by day 8.'],
+  ['World and lore',3.5,3.5,'Richer, but more of it is Claude\'s and unconfirmed.'],
+  ['Platform (TV and phone)',4,3.5,'Two builds from one source, controls page, save import. Not tried by hand.'],
+  ['Codebase health',4,3,'One source, console code stripped, 2.6 MB. Three copies in the repo.']];
+  const b=document.getElementById('score');
+  S.forEach(([n,v,o,w])=>{b.insertAdjacentHTML('beforeend',`<span>${n}</span><div class="bar" style="position:relative" title="${n}: ${v} of 5 (last night ${o})"><i style="width:${v*20}%;background:${v>=4?GOLD:MUT}"></i>${o!==v?`<b style="position:absolute;left:calc(${o*20}% - 1px);top:-3px;width:2px;height:16px;background:${INK2}"></b>`:''}</div><span class="n">${v.toFixed(1)}</span><div class="why">${w}${o!==v?' (was '+o.toFixed(1)+')':''}</div>`);});
+})();
+
+/* dev log */
+(function(){
+  const K={S:['Story and scenes',css('--c4')],G:['Gameplay and systems',css('--c3')],A:['Art and 3D',css('--c1')],F:['Fixes and testing',css('--c7')],P:['Platform',css('--c5')],M:['Music',css('--c8')]};
+  document.getElementById('catlegend').innerHTML=Object.values(K).map(([n,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join('');
+  const D=[['Before Nov 13 · the first cartridge',[['G','v1–v15: the Pikmin-like, Louie, Erin, house, garden, capsules']]],
+   ['Nov 13–16 · on the console',[['F','v16: fixes, camera, chapters'],['S','v17: Marcus the bro'],['G','v19: valley projects'],['P','v0.1–v0.35 console releases'],['S','Sproutwild grows out of it as the sequel']]],
+   ['Nov 17 · the valley update',[['G','4:49 pm valley update'],['S','5:00 prequel pass'],['F','5:16 checking pass'],['F','5:23 story run test'],['G','7:30 menus, field guide'],['G','7:56 Collection'],['G','8:01 nature\'s balance']]],
+   ['Nov 18 · 3D scenes, the North Coast, Sprouts TV',[['A','12:33 am 3D cutscenes, North Coast'],['F','1:00 playtest pass'],['A','9:58 scene timing, the key'],['S','11:14 easter-egg scenes'],['A','12:00 pm house in 3D'],['F','12:58 your playtest fixes'],['S','1:21 hidden scenes'],['G','4:05 glimmers'],['S','5:24 story order fixes'],['P','6:15 Sprouts TV']]],
+   ['Nov 18–19 overnight · Sprouts TV 2',[['P','11:56 pm TV 2: a copy, console code stripped'],['G','12:00 am review fixes, calmer rewards'],['S','12:13 a midpoint and one ending'],['A','12:20 every story scene in 3D'],['G','12:24 wedding book, expeditions, night grubs'],['G','12:34 photo mode, player-two Louie, rain'],['P','12:43 phone build from one source'],['A','6:40 van drives nose first'],['A','7:14 nine new 3D scenes'],['F','7:51 the honest run, controls, credits'],['M','8:01 one looping song, six themes']]]];
+  const b=document.getElementById('devlog');
+  D.forEach(([d,vs])=>b.insertAdjacentHTML('beforeend',`<div><div style="font-family:var(--display);font-size:17px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);margin-bottom:4px">${d}</div><div class="vers">${vs.map(([k,t])=>`<span style="background:${K[k][1]}">${t}</span>`).join('')}</div></div>`));
+})();
+</script>
+</body>
+</html>
