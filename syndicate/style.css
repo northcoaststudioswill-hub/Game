@@ -842,3 +842,12 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .pf-essrow button { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; padding: 0.5rem 0.3rem; text-align: center; }
 .pf-essrow i { font-style: normal; font-size: 1.2rem; line-height: 1; color: var(--gold); } .pf-essrow i svg { width: 1.3rem; height: 1.3rem; }
 .pf-essrow b { font-size: 0.82rem; } .pf-essrow small { font-size: 0.64rem; color: #c8bea8; line-height: 1.2; text-transform: none; letter-spacing: 0; max-height: 2.4em; overflow: hidden; } .pf-essrow em { font-style: normal; font-size: 0.74rem; color: #f0d890; }
+
+/* stances: a picture of each on your own fighter */
+.stances { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin: 0.5rem 0 0.8rem; }
+.stance { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; padding: 0.3rem 0.3rem 0.55rem; text-align: center; }
+.stance img { width: 100%; max-width: 8.5rem; aspect-ratio: 1; object-fit: contain; }
+.stance b { font-size: 0.92rem; } .stance small { font-size: 0.66rem; color: #c8bea8; text-transform: none; letter-spacing: 0; line-height: 1.2; }
+.stance.on { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold) inset; }
+.gm-tiles.gm9 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 560px) { .stances { grid-template-columns: repeat(2, 1fr); } .stance small { display: none; } .gm-tiles.gm9 { grid-template-columns: repeat(3, 1fr); } .gm-tiles.gm9 .fence-room small { display: none; } }

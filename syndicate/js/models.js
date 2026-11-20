@@ -358,6 +358,8 @@
         else if (FAM === 'swing') { q.arx = -0.55 + Math.sin(t * 3.4) * 0.28; q.arz = 0.3 + Math.cos(t * 3.4) * 0.12; q.ty = 0.3; }               // the head never stops moving
         else if (FAM === 'orb') { q.arx = -1.05 + br; q.arz = -0.3; q.alx = -1.05 - br; q.alz = 0.3; q.by += Math.sin(t * 1.6) * 0.012; }
       }
+      q.eR = q.eL = q.fl = q.kn = q.fbx = null;
+      if (p.ready && act === 'idle' && !p.guard && !(p.hurt > 0) && p.stn && G.STANCE_POSE) { const sf = G.STANCE_POSE[hover ? 'f' : 'g'][p.stn[hover ? 1 : 0]]; if (sf) sf(q, t, mv, robe); }
       if (p.tired && (act === 'idle' || act === 'cheer')) { q.bx += 0.2 + Math.sin(t * 5) * 0.04; q.hx = 0.25; q.by -= 0.04 + Math.abs(Math.sin(t * 2.5)) * 0.02; q.arx += 0.3; }
       if (p.wounded && (act === 'idle') && !p.guard) { q.alx = -0.95; q.alz = -0.75; q.bx += 0.14; q.bz += 0.07; q.hx = 0.12; q.by -= 0.03; if (mv) { q.lr *= 0.55; q.by += Math.abs(Math.sin(p.walk)) * 0.05; } }      // a hand pressed to the wound, and a limp
       if (p.crawl && act !== 'ko') { const c = Math.sin(mv ? p.walk * 1.3 : t * 1.4), reach = act === 'swing' ? Math.sin(k * Math.PI) : 0; q.bx = 1.36; q.by = 0.1; q.bpz = -0.45; q.bz = c * 0.07; q.tz = c * 0.1; q.hx = -1.05; q.arx = -2.55 + c * 0.75 - reach * 0.5; q.alx = -2.55 - c * 0.75; q.arz = 0.25; q.alz = -0.25; q.ll = 0.12; q.lr = -0.08; q.cape = 0.05; snap = 0.5; }      // on the belly, hauling forward on the arms
@@ -375,9 +377,10 @@
       else if (p.hurt > 0) { const h = Math.min(1, p.hurt / 0.28), big = p.hbig ? 1.25 : 1, fb = p.hb ? -1 : 1;       // the body goes the way the blow sent it: back from a hit in front, pitched forward from one behind, and twisted off the side it landed on
         q.tz += side * 0.3 * h * big; q.hz = side * 0.28 * h * big; q.ty += -side * 0.32 * h * big; q.bx -= (fb > 0 ? 0.5 : 0.34) * h * big * fb; q.hx = -0.45 * h * fb; q.by -= 0.06 * h * big; q.bpz -= 0.12 * h * big * fb; q.ll += 0.25 * h * fb; q.lr -= 0.35 * h * fb; q.arx += 0.55 * h; q.alx += 0.65 * h; if (side > 0) q.arz -= 0.5 * h * big; else q.alz += 0.5 * h * big; snap = Math.max(snap, 0.7); }
       body.position.y = J('by', q.by, snap); body.position.z = J('bpz', q.bpz, snap); if (q.spin != null) spinNow = q.spin; else if (spinNow) { spinNow = Math.atan2(Math.sin(spinNow), Math.cos(spinNow)) * 0.55; if (Math.abs(spinNow) < 0.02) spinNow = 0; }
-      if (hover && act !== 'ko' && act !== 'kneel' && act !== 'sit' && !p.crawl) { q.bx = 0; q.bz = 0; q.bpz *= 0.4; q.tz *= 0.4; if (act === 'dodge') q.by = 0; }
+      if (hover && act !== 'ko' && act !== 'kneel' && act !== 'sit' && !p.crawl) { q.bx = q.fbx || 0; q.bz = 0; q.bpz *= 0.4; q.tz *= 0.4; if (act === 'dodge') q.by = 0; }
       body.rotation.set(J('bx', q.bx, snap), spinNow, J('bz', q.bz, snap));
       if ((robe || hover) && act !== 'kneel' && act !== 'sit' && act !== 'ko' && !p.crawl) { if (hover) { q.ll = 0.1 + q.ll * 0.08; q.lr = -0.12 + q.lr * 0.08; } else { const L = act === 'dodge' ? 0.34 : 0.26; q.ll = Math.max(-L, Math.min(L, q.ll * 0.55)); q.lr = Math.max(-L, Math.min(L, q.lr * 0.55)); } }       // a robe hides the stride, it does not let the shins through it
+      if (hover && q.fl) { q.ll = q.fl[0]; q.lr = q.fl[1]; }
       legL.rotation.x = J('ll', q.ll, snap); legR.rotation.x = J('lr', q.lr, snap);
       pelvis.rotation.y = J('py', act === 'ko' || act === 'sit' ? 0 : Math.max(-0.7, Math.min(0.7, (q.ty || 0) * 0.55 - (mv ? sw * 0.13 : 0))), Math.max(snap, 0.45));
       torso.rotation.set(0, J('ty', q.ty, snap), J('tz', q.tz, snap)); head.rotation.set(J('hx', q.hx, snap), J('nk', act === 'ko' || act === 'sit' || act === 'cheer' ? -cur.ty * 0.5 : -cur.ty * 0.92, 0.5), J('hz', q.hz, snap));
@@ -395,7 +398,7 @@
       { const crouch = Math.max(0, Math.min(1, -cur.by * 3.2)), sitting = act === 'sit' || act === 'kneel';
         if (!sitting && act !== 'dodge') { legL.rotation.x -= crouch * 0.42; legR.rotation.x -= crouch * 0.42; }
         const knee = l => hover && !robe && !sitting && act !== 'ko' && act !== 'kneel' && !p.crawl ? (l > 0 ? 0.55 : 0.25) : robe && !sitting && act !== 'ko' ? Math.max(0, Math.min(0.35, Math.abs(l) * 0.4 + crouch * 0.4)) : Math.max(0, Math.min(1.75, Math.max(0, l) * 0.95 + Math.max(0, -l) * 0.3 + Math.max(0, -l - 0.9) * 2.0 + (sitting ? 0 : crouch * 0.85)));
-        legL.userData.shin.rotation.x = J('kl', knee(legL.rotation.x), 0.6); legR.userData.shin.rotation.x = J('kr', knee(legR.rotation.x), 0.6);
+        legL.userData.shin.rotation.x = J('kl', q.kn ? q.kn[0] : knee(legL.rotation.x), 0.6); legR.userData.shin.rotation.x = J('kr', q.kn ? q.kn[1] : knee(legR.rotation.x), 0.6);
         { const flat = act !== 'ko' && !p.crawl, bxa = body.rotation.x; [legL, legR].forEach(l => { const an = l.userData.ankle; if (!an) return; an.rotation.x = flat ? Math.max(-0.9, Math.min(0.75, -(bxa + l.rotation.x + l.userData.shin.rotation.x))) : 0; }); }
         let eR = 0.28, eL = 0.28;
         if (act === 'swing') { eR = k < 0.5 ? mix(1.0, 0.04, Math.pow(Math.min(1, k / 0.5), 3)) : mix(0.04, 0.45, (k - 0.5) / 0.5); eL = p.sty === 2 || p.sty === 3 || cls === 'rogue' ? eR : 0.7; }
@@ -405,6 +408,7 @@
         else if (p.guard) { eR = 0.9; eL = 1.15; }
         else if (p.ready) { eR = FAM === 'fence' ? 0.25 : FAM === 'heavy' ? 0.95 : 0.75; eL = FAM === 'fence' ? 0.9 : 0.8; }
         else if (mv) { eR = 0.35 + Math.max(0, sw) * 0.3; eL = 0.35 + Math.max(0, -sw) * 0.3; }
+        if (q.eR != null) eR = q.eR; if (q.eL != null) eL = q.eL;
         if (p.hurt > 0) { eR += 0.3; eL += 0.3; }
         foreR.rotation.x = -J('er', eR, Math.max(0.35, snap)); foreL.rotation.x = -J('el', eL, Math.max(0.35, snap)); }
       if (act === 'kick') legL.userData.shin.rotation.x = 0.15;

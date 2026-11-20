@@ -193,36 +193,49 @@
   };
 
   // ------------------------------------------------------------ blood: dark droplets that leave splats on the floor
-  const BN = 260, SN = 70;
+  const BN = 260, SN = 420;
   function bloodSys(sc) {
     if (sc.userData.blood) return sc.userData.blood;
     const geo = new T.BufferGeometry(), pos = new Float32Array(BN * 3); for (let i = 0; i < BN; i++) pos[i * 3 + 1] = -999;
     geo.setAttribute('position', new T.BufferAttribute(pos, 3));
     const pts = new T.Points(geo, new T.PointsMaterial({ size: 8, map: gfx.tex('glow'), color: 0x8a0d0d, transparent: true, opacity: 0.95, depthWrite: false, sizeAttenuation: false })); pts.frustumCulled = false; sc.add(pts);
-    const splats = []; const mat = () => new T.MeshBasicMaterial({ map: gfx.tex('blood'), transparent: true, opacity: 0.85, depthWrite: false });
-    for (let i = 0; i < SN; i++) { const m = new T.Mesh(new T.PlaneGeometry(1, 1), mat()); m.rotation.x = -Math.PI / 2; m.visible = false; sc.add(m); splats.push(m); }
-    return sc.userData.blood = { pts, pos, list: Array.from({ length: BN }, () => ({ life: 0 })), next: 0, splats, sn: 0 };
+    // every stain on the sand is one instance of a single mesh: hundreds of them cost one draw call
+    const pg = new T.PlaneGeometry(1, 1); pg.rotateX(-Math.PI / 2);
+    const inst = new T.InstancedMesh(pg, new T.MeshBasicMaterial({ map: gfx.tex('blood'), transparent: true, opacity: 0.82, depthWrite: false }), SN); inst.frustumCulled = false; inst.count = 0; inst.renderOrder = 1; sc.add(inst);
+    return sc.userData.blood = { pts, pos, list: Array.from({ length: BN }, () => ({ life: 0 })), next: 0, inst, sn: 0 };
   }
   gfx.blood = function (x, y, z, n, speed, dir) {
-    if (!scene) return; const B = bloodSys(scene);
+    if (!scene) return; const B = bloodSys(scene); n = Math.max(2, Math.round(n * 0.5));       // fewer drops in the air; what there is ends up on the floor
     for (let k = 0; k < n; k++) {
       const p = B.list[B.next]; B.next = (B.next + 1) % BN;
-      const a = dir == null ? Math.random() * 6.283 : dir + (Math.random() - 0.5) * 1.6, v = (0.25 + Math.random() * 0.75) * speed;
-      p.x = x; p.y = y + Math.random() * 0.4; p.z = z; p.vx = Math.cos(a) * v; p.vz = Math.sin(a) * v; p.vy = 1.5 + Math.random() * 4; p.life = 1.6;
+      const a = dir == null ? Math.random() * 6.283 : dir + (Math.random() - 0.5) * 1.3, v = (0.3 + Math.random() * 0.7) * speed;
+      p.x = x; p.y = y + Math.random() * 0.3; p.z = z; p.vx = Math.cos(a) * v; p.vz = Math.sin(a) * v; p.vy = 0.8 + Math.random() * 2.6; p.life = 1.2;
     }
   };
-  gfx.splat = function (x, z, size) {
-    if (!scene) return; const B = bloodSys(scene), m = B.splats[B.sn % SN]; B.sn++;
-    m.position.set(x, 0.014 + (B.sn % SN) * 0.0004, z); m.scale.setScalar(size); m.rotation.z = Math.random() * 6.283; m.material.opacity = 0.55 + Math.random() * 0.35; m.visible = true;
+  const _m = new T.Matrix4(), _q = new T.Quaternion(), _p = new T.Vector3(), _s = new T.Vector3(), _c = new T.Color(), _up = new T.Vector3(0, 1, 0);
+  gfx.splat = function (x, z, size, dir, stretch) {
+    if (!scene) return; const B = bloodSys(scene), i = B.sn % SN; B.sn++;
+    _q.setFromAxisAngle(_up, dir == null ? Math.random() * 6.283 : -dir); _p.set(x, 0.014 + i * 0.00006, z); _s.set(size * (stretch || 1), 1, size / Math.sqrt(stretch || 1)); _m.compose(_p, _q, _s);
+    B.inst.setMatrixAt(i, _m); const sh = 0.55 + Math.random() * 0.45; _c.setRGB(sh, sh * 0.9, sh * 0.9); B.inst.setColorAt(i, _c);
+    B.inst.count = Math.min(SN, B.sn); B.inst.instanceMatrix.needsUpdate = true; if (B.inst.instanceColor) B.inst.instanceColor.needsUpdate = true;
   };
-  gfx.clearBlood = function (sc) { const B = sc && sc.userData.blood; if (!B) return; B.splats.forEach(m => m.visible = false); B.sn = 0; B.list.forEach((p, i) => { p.life = 0; B.pos[i * 3 + 1] = -999; }); B.pts.geometry.attributes.position.needsUpdate = true; };
+  // paint the floor directly, in the shape the wound throws it: a stab leaves a long thin line out the far side, a spiked head a ring of flecks, an edge a fan
+  gfx.paint = function (x, z, dir, kind, amt) {
+    if (!scene) return; amt = amt || 1; const R = Math.random, put = (a, d, size, st) => gfx.splat(x + Math.cos(a) * d, z + Math.sin(a) * d, size, a, st);
+    if (kind === 'stab') { const n = Math.round(5 * amt) + 2; for (let i = 0; i < n; i++) { const d = 0.45 + (i / n) * 2.4 * Math.min(1.5, amt) + R() * 0.25; put(dir + (R() - 0.5) * 0.16, d, 0.34 - (i / n) * 0.2 + R() * 0.08, 2.6 + R() * 1.6); } gfx.splat(x + (R() - 0.5) * 0.3, z + (R() - 0.5) * 0.3, 0.3 + R() * 0.2); }
+    else if (kind === 'spike') { const n = Math.round(16 * amt) + 6; for (let i = 0; i < n; i++) { const a = R() * 6.283, fwd = Math.cos(a - dir) > 0 ? 1.7 : 0.8; put(a, (0.3 + R() * 1.5) * fwd, 0.06 + R() * 0.13, 1.4 + R() * 1.6); } for (let i = 0; i < 3; i++) put(dir + (R() - 0.5) * 0.9, 0.5 + R() * 1.1, 0.26 + R() * 0.2, 2.2); }
+    else if (kind === 'blunt') { const n = Math.round(11 * amt) + 4; for (let i = 0; i < n; i++) { const a = R() * 6.283, fwd = Math.cos(a - dir) > 0 ? 1.5 : 0.8; put(a, (0.3 + R() * 1.3) * fwd, 0.07 + R() * 0.16, 1 + R() * 0.8); } for (let i = 0; i < 2; i++) put(dir + (R() - 0.5) * 0.7, 0.5 + R() * 0.8, 0.3 + R() * 0.2, 1.6); }
+    else if (kind === 'slash') { const n = Math.round(5 * amt) + 2, sw = R() < 0.5 ? 1 : -1; for (let i = 0; i < n; i++) { const u = i / (n - 1) - 0.5; put(dir + u * 1.5 * sw, 0.6 + R() * 1.2 + (0.5 - Math.abs(u)) * 0.6, 0.2 + R() * 0.22, 2 + R() * 1.4); } }
+    else if (kind === 'burn') { gfx.splat(x + (R() - 0.5) * 0.4, z + (R() - 0.5) * 0.4, 0.2 + R() * 0.2); }
+  };
+  gfx.clearBlood = function (sc) { const B = sc && sc.userData.blood; if (!B) return; B.inst.count = 0; B.sn = 0; B.list.forEach((p, i) => { p.life = 0; B.pos[i * 3 + 1] = -999; }); B.pts.geometry.attributes.position.needsUpdate = true; };
   function updateBlood(dt) {
     const B = scene && scene.userData.blood; if (!B) return;
-    B.pts.material.size = Math.max(3, 0.16 * gfx.pxPerUnit() * renderer.getPixelRatio());
+    B.pts.material.size = Math.max(2.5, 0.105 * gfx.pxPerUnit() * renderer.getPixelRatio());
     for (let i = 0; i < BN; i++) {
       const p = B.list[i]; if (p.life <= 0) continue;
       p.life -= dt; p.vy -= 16 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt;
-      if (p.y <= 0.03 || p.life <= 0) { if (p.y <= 0.03 && Math.random() < 0.55) gfx.splat(p.x, p.z, 0.35 + Math.random() * 0.75); p.life = 0; B.pos[i * 3 + 1] = -999; continue; }
+      if (p.y <= 0.03 || p.life <= 0) { if (p.y <= 0.03) gfx.splat(p.x, p.z, 0.16 + Math.random() * 0.42, Math.atan2(p.vz, p.vx), 1 + Math.min(1.6, Math.hypot(p.vx, p.vz) * 0.4)); p.life = 0; B.pos[i * 3 + 1] = -999; continue; }
       B.pos[i * 3] = p.x; B.pos[i * 3 + 1] = p.y; B.pos[i * 3 + 2] = p.z;
     }
     B.pts.geometry.attributes.position.needsUpdate = true;
