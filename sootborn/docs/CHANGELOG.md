@@ -1,4 +1,17 @@
-# SOOTBORN — changelog (latest v0.82 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.83 · 2026-11-20)
+
+## v0.83 · 2026-11-20 — the yard gate you could not get through; group fights; valley ground; the washer
+- **Fixed: the High Docks yard gate** (your screenshot). I could not make it refuse on my side: a bot pressing the same A button at the gate opened it. So I took the button out of the question. **With the key, the gate now rolls back by itself when you walk up to it**, anywhere along its front, and the reach of the OPEN GATE button is doubled so it also answers from the lit post. Works on a save that is already stuck there.
+- **Group fights are thinner.** With four or more men standing, the ones not taking a turn now stand off at more than twice the distance and circle, and step in when a place opens. Before, everybody crowded him and waited there.
+- **The valley maps have rises you can read:** raised ground is a shade lighter, with a lip along its top and sides and a shaded bank on the low side. Looks only; it does not block or slow.
+- **Hand to the washer in the 2D fights:** as ELEVEN winds up, his hand and a glint of brass show at his collar.
+
+**Checked:** a bot walked with the stick from the dock stair to the gate, pressed nothing, and went through into the yard. A still of the camp map with the rises. The whole-story bot (see below).
+
+**The whole-story bot:** new game to THE END, no errors.
+
+**Not checked:** nothing by hand. Why the gate refused on your phone is not known; this goes round it. The group fights were not fought or measured (you said no sims). The washer in 2D fights was not seen. Not done: the hand to the washer in the comic-book levels.
+
 
 ## v0.82 · 2026-11-20 — a picture in front of the Pairing and the Ford
 Step 14 (films): the two Assay fights that started cold now open on a drawn picture, seven seconds each, any button passes it.

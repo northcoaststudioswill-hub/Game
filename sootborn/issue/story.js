@@ -253,7 +253,7 @@
     W.addInteract({ id: 'loft', x: -27.8, y: 9, z: -26.7, fx: -29.7, fz: -26.7, r: 1.45, label: 'LOOK', marker: 'clue', mh: 1.8, when: () => !F.clue_loft, act: clue('loft', [
       { who: 'cap', text: 'A signal hut. The lamp inside is aimed straight down the Spire, and the glass is still warm.' },
       { who: 'hero', text: 'They did not only know. They *answered*. Every Warden under the docks is on that stair by now.' }]) });
-    W.addInteract({ id: 'gate', x: 18, y: 0, z: 7.1, fx: 18, fz: 5.8, r: 2.2, label: 'OPEN GATE', marker: 'act', mh: 2.6, when: () => F.e_alley && !F.gate, act: () => {
+    W.addInteract({ id: 'gate', x: 18, y: 0, z: 7.1, fx: 18, fz: 5.8, r: 4.4, label: 'OPEN GATE', marker: 'act', mh: 2.6, when: () => F.e_alley && !F.gate, act: () => {
       if (!F.key && !F.e_street) { U.toast('LOCKED. SOMEBODY ON THIS QUAY CARRIES THE KEY.', 2.6); SC.audio.sfx('deny'); return; }
       W.openDoor('gate'); SC.audio.sfx('door'); setFlag('gate'); U.toast('THE GATE ROLLS BACK.', 2); } });
     W.addInteract({ id: 'breaker', x: 31.1, y: 0, z: -8, fx: 32, fz: -8, r: 2, label: 'BREAKER', marker: 'act', mh: 2.6, when: () => F.e_yard && !F.breaker, act: () => {
@@ -280,6 +280,7 @@
       W.dyn.push((t, dt) => { if (SC.state !== 'play') return;
         if (seen !== (SC.cleared || 0)) { if (!pl.control) return; seen = SC.cleared || 0; post(); }
         if (F.e_street && !F.key) { F.key = 1; save(); objective(); U.toast('THE STAIR BLADE CARRIED A *YARD KEY*. HIGH DOCKS FREIGHT.', 4); }   // mends a save made by v0.49: the quay cleared, the key never handed over, so the level came back empty and locked every time
+        if (F.e_street && !F.gate && pl.control && Math.abs(pl.pos.x - 18) < 4.5 && pl.pos.z > 5.9 && pl.pos.z < 9.6 && pl.pos.y < 2) { W.openDoor('gate'); SC.audio.sfx('door'); setFlag('gate'); U.toast('THE YARD KEY TURNS. THE GATE ROLLS BACK.', 2.4); }   /* the gate opens when he walks up to it with the key: nobody should be stopped by a button here */
         talkT -= dt; let spoke = false;
         for (const id of POST) { const e = ENC[id]; if (e.posted !== 1) continue; const mem = SC.enemies.filter(m => m.enc === e && m.state === 'wait'); if (!mem.length) { e.posted = 2; continue; }
           for (const m of mem) { const o = mem[m.postI ^ 1] || mem[(m.postI + 1) % mem.length]; if (o && o !== m) m.yaw = SC.dampAng(m.yaw, Math.atan2(o.pos.x - m.pos.x, o.pos.z - m.pos.z) + Math.sin(t * 0.4 + m.postI) * 0.5, 2, dt); }
