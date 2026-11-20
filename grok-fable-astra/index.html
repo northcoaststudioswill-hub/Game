@@ -2975,9 +2975,9 @@ function menuRender(){const B=$('mbody'),esc=t=>String(t).replace(/[&<>]/g,c=>({
   else if(MENU.tab==='cx'){const L=cxList();['WORLD','PLACES','THE OTHER GAMES'].forEach(g=>{const E=L.filter(c=>c.g===g);h+='<h4>'+g+' · '+E.filter(c=>c.u).length+'/'+E.length+'</h4>'+E.map(c=>c.u?'<div class="ent"><b>'+esc(c.t)+'</b>'+esc(c.b)+'</div>':'<div class="ent lock"><b>???</b>'+(g==='PLACES'?'go somewhere you have not been':'keep playing to unlock')+'</div>').join('');});}
   else if(MENU.tab==='who'){h+='<h4>THE CAST · talk to them to fill these in</h4><div class="cast">'+CAST_CX.map(c=>{const u=c[4]?c[4]():X.met.includes(c[0]);return u?'<div class="ent"><span>'+c[1]+'</span><b>'+esc(c[2])+'</b>'+esc(c[3])+'</div>':'<div class="ent lock"><span>❔</span><b>???</b>not met yet</div>';}).join('')+'</div>';}
   else{const f=folText();h+='<div class="fol"><b>FOLLOWER:</b> '+esc(f||'nobody. Pet Louie, catch or pick a buddy, or pluck sprouts at the Sprout Patch.')+'<br><small>One follower at a time. A new one sends the old one home. Patch sprouts go back to the patch and have to be plucked again.</small></div>';
-    h+='<h4>PC</h4><p><kbd>WASD</kbd> move · drag to look · <kbd>Space</kbd> jump (hold in the air: 💩 boost) · <kbd>F</kbd>/click blast · <kbd>E</kbd> yap · <kbd>R</kbd> pose · <kbd>Shift</kbd> dash · <kbd>G</kbd> hook · <kbd>T</kbd> transform · <kbd>C</kbd> throw a sprout · <kbd>Q</kbd> borrowed time · <kbd>M</kbd>/<kbd>Tab</kbd> this menu</p>';
-    h+='<h4>CONTROLLER</h4><p>A jump (hold: boost) · X/RT blast · B yap · Y pose · LB dash · LT hook · RB transform · D-pad ↓ throw a sprout · D-pad ↑ borrowed time · Start this menu (LB/RB change tab, right stick scrolls) · View: Slop Pass</p>';
-    h+='<h4>PHONE</h4><p>Left thumb moves, right thumb looks. JUMP, BLAST, ⏩ dash, 🪝 hook, 🔄 transform, 🌱 throw (when sprouts follow you), 😎 pose, ☰ this menu.</p>';
+    h+='<h4>PC</h4><p><kbd>WASD</kbd> move · drag to look · <kbd>Space</kbd> jump (hold in the air: 💩 boost) · <kbd>F</kbd>/click blast · <kbd>E</kbd> yap · <kbd>R</kbd> pose · <kbd>Shift</kbd> dash · <kbd>G</kbd> hook · <kbd>T</kbd> transform · <kbd>C</kbd> throw a sprout · <kbd>V</kbd> use your power-up · <kbd>Q</kbd> borrowed time · <kbd>M</kbd>/<kbd>Tab</kbd> this menu</p>';
+    h+='<h4>CONTROLLER</h4><p>A jump (hold: boost) · X/RT blast · B yap · Y pose · LB dash · LT hook · RB transform · D-pad ↓ throw a sprout · D-pad ← power-up · D-pad ↑ borrowed time · Start this menu (LB/RB change tab, right stick scrolls) · View: Slop Pass</p>';
+    h+='<h4>PHONE</h4><p>Left thumb moves, right thumb looks. JUMP, BLAST, ⏩ dash, 🪝 hook, 🔄 transform, 🌱 throw (when sprouts follow you), the item slot (tap to use a power-up), 😎 pose, ☰ this menu. Touch a rainbow ❓ box to roll a power-up.</p>';
     h+='<h4>WARPS</h4><p>The Warp Ring is just outside Prompt Plaza'+(WR.c?' (follow the compass to it from the quest list)':'')+'. Every warp destination has a 🌀 pad that brings you back.</p>';}
   B.innerHTML=h;}
 function folText(){if(FOL.cur==='louie'&&LOU.fol>0)return '🐕 Louie · '+Math.ceil(LOU.fol)+'s';if(FOL.cur==='bud'&&FOL.bud>0){const b=BUD.find(q=>q.id===FOL.budId)||BUD.find(q=>q.lead);return '🐾 '+(b?b.nm:'a buddy')+' · '+Math.ceil(FOL.bud)+'s';}
@@ -3192,6 +3192,105 @@ ACH.push(['loosh','Unplugged','drained the loosh tank at the Scroll Farm',()=>X.
 {const ar=act7Rows;act7Rows=function(){return ar().concat([['loosh','📱 Unplug the loosh pumps '+X.loosh.reduce((a,b)=>a+b,0)+'/4 (Scroll Farm)',X.loosh.reduce((a,b)=>a+b,0)>=4]]);};}
 {const at=act7Target;act7Target=function(id){if(id==='loosh')return{x:SF.x,z:SF.z,l:'THE SCROLL FARM'};return at(id);};}
 
+/* ================= ACT 20: item boxes and power-ups from the other games, and solid buildings ================= */
+// ---- power-ups. Each one comes from one of the other games in the repo.
+const PUS=[
+  {id:'boots',e:'🥾',n:'THE BOOTS FROM VOSS',g:'Sootborn',d:'Charged at the vent stack. Hold JUMP to fly. Kael flies from day 31; you fly now.',dur:14},
+  {id:'plane',e:'✈️',n:'SHIBA PLANE',g:'Guttercrown · Sprouts',d:'Louie\'s ears plane out. Ride him. Steer with the camera, hold JUMP to climb. Cleared for take-off.',dur:12},
+  {id:'wings',e:'🦋',n:'DUSK WINGS',g:'Starhaven',d:'Wings from the Court of Dusk. Hold JUMP to flap, let go to glide.',dur:16},
+  {id:'hydro',e:'💦',n:'HYDRO JET',g:'Guttercrown (Marcus)',d:'Four thousand PSI. Launches you forward and blasts everything in a line.',dur:0},
+  {id:'double',e:'🪙',n:'DOUBLE OR NOTHING',g:'Guttercrown (Marcus)',d:'Marcus flips a coin. Heads: double aura for 30 seconds. Tails: he had money on that.',dur:0},
+  {id:'derek',e:'🚐',n:'DEREK PULLS UP',g:'Guttercrown (Marcus\'s finisher)',d:'The van comes through. Everything near you is gone. "Not again."',dur:0},
+  {id:'air',e:'💣',n:'AIR SUPPORT',g:'Guttercrown (lil Bottie)',d:'Something lil Bottie requisitioned arrives from above, on every enemy near you.',dur:0},
+  {id:'selfie',e:'📸',n:'SELFIE FLASH',g:'Guttercrown (Will)',d:'Say cheese. Everything near you is stunned, and a brain cell grows back. Posted.',dur:0},
+  {id:'midnight',e:'🕛',n:'MIDNIGHT',g:'Guttercrown (David)',d:'It is always his hour. Very fast, very fast blaster, boost charges refilled.',dur:9},
+  {id:'filib',e:'🎤',n:'FILIBUSTER',g:'Guttercrown (King Bibi)',d:'King Bibi starts talking. Every enemy near you stops to listen for ten seconds. Next question.',dur:0},
+  {id:'wisp',e:'🏮',n:'LANTERNWISP',g:'Pocket Lantern',d:'The North Light\'s last flame. It flies to the nearest 67 you have not found and lights it up.',dur:25},
+  {id:'stampede',e:'🐄',n:'STAMPEDE',g:'Sproutwild (Erin)',d:'Cuyapup, Bessling and Grasskin charge ahead of you and flatten everything. Nice and steady (not steady).',dur:0}];
+const PU={held:null,roll:0,act:null,t:0,x2:0,fx:[],plane:null,wings:null,boots:null,wisp:null,beam:null,boxes:[]};
+// ---- the HUD slot
+(function(){const st=document.createElement('style');st.textContent='#pu{position:absolute;left:var(--gl);bottom:calc(var(--gb) + 298px);width:62px;height:62px;border-radius:14px;border:3px solid var(--gold);background:rgba(18,2,31,.82);color:#fff;font-size:34px;line-height:56px;text-align:center;pointer-events:auto;z-index:4;padding:0;cursor:pointer}#pu small{position:absolute;left:0;right:0;bottom:-18px;font-size:10px;line-height:1;font-weight:700;color:var(--gold);white-space:nowrap;text-shadow:0 1px 2px #000}#pu i{position:absolute;left:4px;right:4px;bottom:3px;height:4px;border-radius:2px;background:var(--lime);transform-origin:left}#pu.roll{border-color:var(--hot)}#app.cine #pu{display:none}';document.head.appendChild(st);
+  const b=document.createElement('button');b.id='pu';b.hidden=true;b.setAttribute('aria-label','Use your power-up');b.innerHTML='<span></span><i></i><small></small>';$('hud').appendChild(b);b.addEventListener('pointerdown',e=>{e.preventDefault();audioInit();puUse();});})();
+// ---- item boxes all over the map
+(function(){const r=mulberry(4242),spots=[];const free=(x,z)=>Math.hypot(x,z)<WORLD_R-18&&!colliders.some(c=>Math.hypot(c.x-x,c.z-z)<c.r+2.5)&&!spots.some(s=>Math.hypot(s.x-x,s.z-z)<14);
+  const tryAt=(cx,cz,rad,n)=>{let k=0;for(let t=0;t<40&&k<n;t++){const a=r()*TAU,d=rad*(.3+r()*.7),x=cx+Math.cos(a)*d,z=cz+Math.sin(a)*d;if(free(x,z)){spots.push({x,z});k++;}}};
+  tryAt(0,0,26,3);AREAS.forEach(a=>{if(a.id==='glitch'||a.id==='void')return;tryAt(a.x,a.z,a.r*.9,a.r>25?2:1);});ZONES.forEach(Z=>tryAt(Z.x,Z.z,ZR*.8,3));for(let k=0;k<200&&spots.length<60;k++){const a=r()*TAU,d=40+r()*250;tryAt(Math.cos(a)*d,Math.sin(a)*d,1,1);}
+  const geo=new THREE.BoxGeometry(1.7,1.7,1.7);spots.forEach(s=>{const g=new THREE.Group(),y=groundH(s.x,s.z)+1.7;g.position.set(s.x,y,s.z);scene.add(g);const m=new THREE.Mesh(geo,rainbowMat);g.add(m);const q=textSprite('?',1.4,{color:'#fff'});g.add(q);PU.boxes.push({x:s.x,z:s.z,y,g,m,cd:0});});})();
+function puRandom(){return PUS[Math.floor(Math.random()*PUS.length)];}
+function puSlot(){const b=$('pu');const show=!!(PU.held||PU.roll>0||PU.act)&&S.mode!=='title';if(b.hidden===show)b.hidden=!show;if(!show)return;const sp=b.firstChild,bar=b.children[1],lab=b.children[2];
+  if(PU.roll>0){sp.textContent=PUS[Math.floor(S.t*14)%PUS.length].e;lab.textContent='…';bar.style.transform='scaleX(0)';b.classList.add('roll');return;}b.classList.remove('roll');
+  if(PU.act){sp.textContent=PU.act.e;lab.textContent=PU.act.n;bar.style.transform='scaleX('+Math.max(0,PU.t/PU.act.dur)+')';}else{sp.textContent=PU.held.e;lab.textContent=PU.held.n+(app.classList.contains('touchy')?' · tap':app.classList.contains('gp')?' · D-pad ←':' · V');bar.style.transform='scaleX(0)';}}
+function puGet(){PU.roll=1.1;SFX.page();}
+function puUse(){if(S.mode!=='play'||S.dead||!PU.held||PU.roll>0)return;const p=PU.held;PU.held=null;X.c.pu=(X.c.pu||0)+1;zoneCard(p.e+' '+p.n,'from '+p.g);tone(660,.15,'square',.1,0,1320);puFire(p);}
+const ENEAR=r=>enemies.filter(e=>e.hp>0&&Math.hypot(e.x-PL.x,e.z-PL.z)<r);
+function puFire(p){const fx=-Math.sin(cam.yaw),fz=-Math.cos(cam.yaw);
+  if(p.dur&&p.id!=='wisp'){puEnd(true);PU.act=p;PU.t=p.dur;}
+  if(p.id==='boots'){PU.boots.visible=true;PL.vy=Math.max(PL.vy,10);PL.grounded=false;floatText('VENT STACK: CHARGED',PL.x,PL.y+4,PL.z,'#ffd400');}
+  else if(p.id==='plane'){X.plane=1;PU.plane.visible=true;PL.y+=1.5;PL.vy=6;PL.grounded=false;bubble('Ears out. Cleared for take-off.',PL.x,PL.y+4,PL.z);SFX.jump2();}
+  else if(p.id==='wings'){PU.wings.visible=true;PL.vy=Math.max(PL.vy,9);PL.grounded=false;}
+  else if(p.id==='midnight'){BST.c=bstMax();flash(.5,500);floatText('IT IS ALWAYS HIS HOUR',PL.x,PL.y+4,PL.z,'#f0c95a');}
+  else if(p.id==='hydro'){PL.kx=fx*70;PL.kz=fz*70;PL.vy=Math.max(PL.vy,8);PL.grounded=false;S.shake=.6;SFX.boom();for(let k=1;k<14;k++)burst(PL.x+fx*k*2.5,PL.y+1.5,PL.z+fz*k*2.5,6,.55,6,3,.5);
+    enemies.slice().forEach(e=>{const dx=e.x-PL.x,dz=e.z-PL.z,along=dx*fx+dz*fz,side=Math.abs(dx*fz-dz*fx);if(along>0&&along<40&&side<5)damageEnemy(e,6,fx*40,fz*40);});floatText('4,000 PSI',PL.x,PL.y+4,PL.z,'#6ac8ff');}
+  else if(p.id==='double'){const h=Math.random()<.5;if(h){PU.x2=30;zoneCard('🪙 HEADS','double aura for 30 seconds · "BRO."');}else zoneCard('🪙 TAILS','"Bro. I had money on that."');SFX.orb(5);}
+  else if(p.id==='derek'){const v=emojiSprite('🚐',7);scene.add(v);const a=Math.atan2(fx,fz),sx=PL.x-fx*40,sz=PL.z-fz*40;PU.fx.push({s:v,t:0,T:1.6,f:u=>{v.position.set(lerp(sx,PL.x+fx*40,u),PL.y+2.5,lerp(sz,PL.z+fz*40,u));}});
+    setTimeout(()=>{ENEAR(28).forEach(e=>{if(enemies.includes(e))killEnemy(e);});S.shake=1;SFX.boom();bubble('NOT AGAIN.',PL.x,PL.y+5,PL.z);setTimeout(()=>bubble('...Bro.',PL.x+2,PL.y+4,PL.z),900);},800);}
+  else if(p.id==='air'){const L=ENEAR(36);const pl=emojiSprite('✈️',5);scene.add(pl);PU.fx.push({s:pl,t:0,T:2.2,f:u=>pl.position.set(PL.x-40+80*u,PL.y+30,PL.z)});bubble('I MIGHT JUST HIT MY RATE LIMIT.',PL.x,PL.y+5,PL.z);
+    L.forEach((e,k)=>setTimeout(()=>{if(!enemies.includes(e))return;burst(e.x,e.y+1,e.z,40,.05,14,10,.9);S.shake=.7;SFX.boom();killEnemy(e);},500+k*180));if(!L.length)toast('💣 AIR SUPPORT: no targets. lil Bottie bombed a tree out of spite.');}
+  else if(p.id==='selfie'){flash(1,700);ENEAR(24).forEach(e=>{e.stun=4;floatText('😵',e.x,e.y+3.5,e.z);});if(S.cells<S.max)S.cells++;bubble('Say cheese. Posted.',PL.x,PL.y+5,PL.z);SFX.relic();}
+  else if(p.id==='filib'){ENEAR(32).forEach(e=>{e.stun=10;floatText('🎤 …',e.x,e.y+3.5,e.z,'#ffd400');});const L=['CITIZENS. I WILL BE BRIEF.','I WILL NOT BE BRIEF.','NEXT QUESTION.','THE COALITION HOLDS.','I ALWAYS COME BACK.'];L.forEach((t,k)=>setTimeout(()=>bubble(t,PL.x,PL.y+5,PL.z),k*1800));}
+  else if(p.id==='wisp'){let best=null,bd=1e9;T67.forEach((t,i)=>{if(!t.s.visible)return;const d=Math.hypot(t.x-PL.x,t.z-PL.z);if(d<bd){bd=d;best=t;}});if(!best){toast('🏮 The wisp looks around. You have found every 67. It goes home to the lake.');return;}
+    PU.act=p;PU.t=p.dur;PU.wispT=best;if(PU.beam)scene.remove(PU.beam);PU.beam=beam(best.x,best.z,0xffe27a,.9);PU.wisp.visible=true;PU.wisp.position.set(PL.x,PL.y+3,PL.z);toast('🏮 The Lanternwisp found a 67, '+Math.round(bd)+'m away. Follow the light.');}
+  else if(p.id==='stampede'){const H=['🐕','🦕','🌿','🐕','🦕','🌿'];H.forEach((h,k)=>{const s=emojiSprite(h,3);scene.add(s);const off=(k-2.5)*2.4,sx=PL.x+fz*off,sz=PL.z-fx*off;PU.fx.push({s,t:0,T:2.4,f:u=>{const x=sx+fx*u*55,z=sz+fz*u*55;s.position.set(x,groundH(x,z)+1.6+Math.abs(Math.sin(u*30+k))*.8,z);
+      enemies.slice().forEach(e=>{if(Math.hypot(e.x-x,e.z-z)<3.2&&enemies.includes(e))damageEnemy(e,9,fx*30,fz*30);});}});});bubble('Nice and steady! (not steady)',PL.x,PL.y+5,PL.z);SFX.boom();}}
+function puEnd(silent){const a=PU.act;if(!a)return;PU.act=null;PU.t=0;PU.boots.visible=PU.plane.visible=PU.wings.visible=false;if(a.id==='wisp'){if(PU.beam){scene.remove(PU.beam);PU.beam=null;}PU.wisp.visible=false;}if(!silent)toast(a.e+' '+a.n+' ran out.');}
+// ---- what the flying ones look like
+(function(){const O=0xe89040,C=0xfff0d8,pl=new THREE.Group();const body=new THREE.Mesh(dogGeo,lam);body.scale.setScalar(4.2);pl.add(body);
+  [-1,1].forEach(sd=>{const ear=new THREE.Mesh(merge([pt(Cone(.5,4.2,4),O,M(0,0,0,0,0,sd*Math.PI/2,1,1,.25))]),lam);ear.position.set(sd*2.3,3.6,1.2);pl.add(ear);});const sc=emojiSprite('🧣',1.4);sc.position.set(0,3.2,1.5);pl.add(sc);
+  pl.visible=false;scene.add(pl);PU.plane=pl;
+  const w=new THREE.Group();[-1,1].forEach(sd=>{const s=emojiSprite('🦋',3.2);s.position.set(sd*1.6,2.4,-.6);w.add(s);});w.visible=false;pGroup.add(w);PU.wings=w;
+  const b=new THREE.Group();[-.4,.4].forEach(x=>{const s=emojiSprite('🥾',1.1);s.position.set(x,.35,0);b.add(s);});b.visible=false;pGroup.add(b);PU.boots=b;
+  const wi=emojiSprite('🏮',1.6,false);wi.visible=false;scene.add(wi);PU.wisp=wi;})();
+{const fr=FRM;FRM=function(){const f=fr();const a=PU.act;if(!a)return f;if(a.id==='midnight')return Object.assign({},f,{sp:f.sp*1.8});if(a.id==='boots')return Object.assign({},f,{sp:f.sp*1.55});if(a.id==='wings')return Object.assign({},f,{sp:f.sp*1.25});return f;};}
+{const aa=addAura;addAura=function(n,x,y,z){aa(PU.x2>0?n*2:n,x,y,z);};}
+function puUpdate(dt,play){if(PU.roll>0){PU.roll-=dt;if(Math.floor(PU.roll*14)!==Math.floor((PU.roll+dt)*14))tone(400+Math.random()*600,.04,'square',.04);if(PU.roll<=0){PU.roll=0;PU.held=puRandom();SFX.relic();toast('🎁 '+PU.held.e+' '+PU.held.n+' ('+PU.held.g+'). '+PU.held.d+' Use it with '+(app.classList.contains('touchy')?'the item button.':app.classList.contains('gp')?'D-pad ←.':'V.'));}}
+  if(PU.x2>0)PU.x2-=dt;
+  PU.boxes.forEach((b,k)=>{if(b.cd>0){b.cd-=dt;b.g.visible=b.cd<=0;return;}b.m.rotation.x+=dt*.9;b.m.rotation.y+=dt*1.3;b.g.position.y=b.y+Math.sin(S.t*2+k)*.3;
+    if(play&&!S.inPk&&Math.hypot(PL.x-b.x,PL.z-b.z)<2.4&&Math.abs(PL.y+1.2-b.y)<3){if(PU.held||PU.roll>0){if(!b.warn){b.warn=1;toast('🎁 You already have a power-up. Use it first.');}return;}b.warn=0;b.cd=22;b.g.visible=false;burst(b.x,b.y,b.z,30,null,10,6,.6);puGet();}});
+  PU.fx=PU.fx.filter(f=>{f.t+=dt;const u=Math.min(1,f.t/f.T);f.f(u);if(u>=1){scene.remove(f.s);return false;}return true;});
+  const a=PU.act;if(a){PU.t-=dt;const fx=-Math.sin(cam.yaw),fz=-Math.cos(cam.yaw);
+    if(a.id==='boots'){if(inp.jh){PL.vy=Math.min(14,PL.vy+70*dt);PL.grounded=false;if(Math.random()<.5)burst(PL.x,PL.vis+.2,PL.z,3,.08,4,-6,.4);}else if(!PL.grounded)PL.vy=Math.max(PL.vy,-4);}
+    else if(a.id==='wings'){if(inp.jh){PL.vy=Math.max(PL.vy,7);PL.grounded=false;}else if(!PL.grounded)PL.vy=Math.max(PL.vy,-2.2);PU.wings.children.forEach((s,i)=>s.material.rotation=(i?-1:1)*Math.sin(S.t*14)*.4);}
+    else if(a.id==='plane'){PL.x+=fx*30*dt;PL.z+=fz*30*dt;PL.face=Math.atan2(fx,fz);PL.vy=inp.jh?9:Math.max(PL.vy,-1.6);PL.grounded=false;const gy=groundH(PL.x,PL.z);if(PL.y<gy+.5){PL.y=PL.vis=gy+.5;}
+      const P=PU.plane;P.position.set(PL.x,PL.vis-2.4,PL.z);P.rotation.set(-PL.vy*.02,PL.face,Math.sin(S.t*2)*.08);if(Math.random()<.3)burst(PL.x-fx*3,PL.vis-1,PL.z-fz*3,2,.08,3,0,.5);}
+    else if(a.id==='midnight'){if(PL.cd>.07)PL.cd=.07;}
+    else if(a.id==='wisp'){const t=PU.wispT,w=PU.wisp;if(!t||!t.s.visible){puEnd(true);toast('🏮 Found it. The wisp goes home to the lake.');}else{const k=Math.min(1,dt*1.2);w.position.x=lerp(w.position.x,t.x,k);w.position.y=lerp(w.position.y,t.y+2,k);w.position.z=lerp(w.position.z,t.z,k);}}
+    if(PU.act&&PU.t<=0)puEnd(false);}
+  puSlot();}
+addEventListener('keydown',e=>{if(e.repeat||S.mode!=='play')return;if(e.code==='KeyV')puUse();});
+(function gp3(){requestAnimationFrame(gp3);const gs=navigator.getGamepads?navigator.getGamepads():[];let gp=null;for(const g of gs)if(g&&g.connected){gp=g;break;}if(!gp)return;const d=!!(gp.buttons[14]&&gp.buttons[14].pressed);if(d&&!PU.gpPrev&&S.mode==='play')puUse();PU.gpPrev=d;})();
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);puUpdate(dt,play);};}
+{const ar=act7Reset;act7Reset=function(){ar();puEnd(true);PU.held=null;PU.roll=0;PU.x2=0;};}
+{const rs=respawn;respawn=function(){puEnd(true);rs();};}
+CX.push(['w_items','WORLD','Item Boxes','Rainbow boxes with a question mark sit all over the map. Touch one and a power-up rolls into your slot, taken from one of the other games: '+PUS.map(p=>p.e+' '+p.n+' ('+p.g+')').join(', ')+'. One at a time. The boxes come back after a while.',()=>(X.c.pu||0)>0]);
+ACH.push(['pu','Item Box Enjoyer','used 20 power-ups',()=>(X.c.pu||0)>=20],['plane','Cleared For Take-Off','flew on Louie\'s Shiba Plane',()=>!!X.plane]);
+
+/* ---------- solid buildings: big merged meshes get a collider for every 1.6m cell their walls actually stand in ---------- */
+(function(){const T=THREE,CELL=1.6,v=new T.Vector3(),box=new T.Box3(),sz=new T.Vector3(),skipG=new Set([pGroup,PU.plane]);[LOU,BOT,VAN,typeof FROG!=='undefined'?FROG:null].concat(BUD,enemies,Object.values(npcs)).forEach(o=>{if(o&&o.g&&o.g.isObject3D)skipG.add(o.g);});
+  const avoid=[];const pts=(arr,r)=>{try{(arr||[]).forEach(o=>{if(o&&o.x!==undefined)avoid.push({x:o.x,z:o.z,r});});}catch(e){}};
+  pts(Object.values(npcs),4.5);pts(Object.values(mascots),6);pts(VALVES,4);pts(LEAKS,4);pts(GAR&&GAR.crops,3.5);pts(PADS,3.5);pts(SPOTS,2.5);pts(FRAGS,2.5);pts(WR.pads,4);pts([GRASS,BTN,TERM,SMP,MD,STG,VAN,{x:0,z:0}],6);pts([SHR,ISC,FR,COOK,COIN,CHR,AF,FAC,MACH,CMT,DTH.desk,DTH.orb],5);pts(DROPS,2.5);pts(T67,2);pts(PU.boxes,2.5);pts(SF.pumps,3);
+  ['glitch','void','mirror'].forEach(id=>{const a=ABY[id];if(a)avoid.push({x:a.x,z:a.z,r:a.r*1.15});});
+  const ok=(x,z)=>!avoid.some(a=>Math.hypot(a.x-x,a.z-z)<a.r),BAD=/Torus|Plane|Circle|Ring/,cells=new Map();let added=0;
+  scene.updateMatrixWorld(true);scene.traverse(m=>{if(!m.isMesh||m.isInstancedMesh||!m.geometry||BAD.test(m.geometry.type))return;const mt=Array.isArray(m.material)?m.material[0]:m.material;if(!mt||mt.transparent||mt.opacity<1||mt.depthWrite===false||mt.side===T.BackSide)return;
+    let p=m;while(p&&p!==scene){if(skipG.has(p)||p.isSprite||p.visible===false)return;p=p.parent;}const geo=m.geometry;if(!geo.boundingBox)geo.computeBoundingBox();box.copy(geo.boundingBox).applyMatrix4(m.matrixWorld);box.getSize(sz);
+    if(Math.max(sz.x,sz.z)<5||Math.max(sz.x,sz.z)>120||box.min.y>400||sz.y<2)return;
+    const pos=geo.attributes.position,idx=geo.index,n=idx?idx.count:pos.count,mw=m.matrixWorld,own=new Map(),P=[new T.Vector3(),new T.Vector3(),new T.Vector3()];
+    for(let i=0;i<n;i+=3){for(let j=0;j<3;j++){const k=idx?idx.getX(i+j):i+j;P[j].fromBufferAttribute(pos,k).applyMatrix4(mw);}
+      const x0=Math.min(P[0].x,P[1].x,P[2].x),x1=Math.max(P[0].x,P[1].x,P[2].x),z0=Math.min(P[0].z,P[1].z,P[2].z),z1=Math.max(P[0].z,P[1].z,P[2].z),y0=Math.min(P[0].y,P[1].y,P[2].y),y1=Math.max(P[0].y,P[1].y,P[2].y);
+      if((x1-x0)*(z1-z0)>400)continue;for(let cx=Math.floor(x0/CELL);cx<=Math.floor(x1/CELL);cx++)for(let cz=Math.floor(z0/CELL);cz<=Math.floor(z1/CELL);cz++){const key=cx+','+cz,c=own.get(key);if(c){c[0]=Math.min(c[0],y0);c[1]=Math.max(c[1],y1);}else own.set(key,[y0,y1]);}}
+    own.forEach((c,key)=>{const [cx,cz]=key.split(',').map(Number),x=(cx+.5)*CELL,z=(cz+.5)*CELL,gy=groundH(x,z);if(c[0]>gy+1.2||c[1]<gy+2)return;const g=cells.get(key);if(g)g[1]=Math.max(g[1],c[1]);else cells.set(key,[x,c[1],z]);});});
+  cells.forEach((c,key)=>{const [cx,cz]=key.split(',').map(Number);if(cells.has((cx+1)+','+cz)&&cells.has((cx-1)+','+cz)&&cells.has(cx+','+(cz+1))&&cells.has(cx+','+(cz-1)))return;const x=c[0],z=c[2];if(!ok(x,z))return;
+    if(colliders.some(q=>Math.hypot(q.x-x,q.z-z)<q.r-.4&&q.top>=c[1]-.5))return;colliders.push({x,z,r:1.05,top:c[1]});added++;});AUTOCOL.cells=added;})();
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
@@ -3218,7 +3317,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
