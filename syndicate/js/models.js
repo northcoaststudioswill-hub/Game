@@ -66,7 +66,8 @@
     const ball = new T.SphereGeometry(0.5, 14, 10), box = soft ? (w, h, d, mat, x, y, z, parent) => { const q = new T.Mesh(ball, mat); q.scale.set(w * 1.3, h * 1.3, d * 1.3); q.position.set(x || 0, y || 0, z || 0); q.castShadow = true; if (parent) parent.add(q); return q; } : gfx.box, mesh = gfx.mesh;
     const root = new T.Group(), body = new T.Group(); root.add(body);
     const civ = look.civ || null, gc = civ ? 'civ' : cls, cm = civ ? { arm: M(hex(civ.arm)), fore: M(hex(civ.fore)), shin: M(hex(civ.shin)), shoe: M(hex(civ.shoe)) } : null;
-    const robed = (gc === 'sorcerer' && rcls !== 'warlock') || gc === 'cleric', hover = (rcls === 'sorcerer' || rcls === 'warlock') && !!(look.ring && (G.RINGS || {})[look.ring]); let hovY = 0;       // they float on a ring; without one they walk like anybody
+    const hover = (rcls === 'sorcerer' || rcls === 'warlock') && !!(look.ring && (G.RINGS || {})[look.ring]), robed = hover && gc === 'sorcerer' && rcls !== 'warlock'; let hovY = 0;       // only a sorcerer floating on a ring keeps the robe; anyone who walks (druid, cleric, a sorcerer off the ring) wears trousers like the warlock
+          // they float on a ring; without one they walk like anybody
     const w = (civ && civ.w) || { fighter: 0.74, rogue: 0.54, sorcerer: 0.56, cleric: 0.66 }[cls];
     const glows = [];
 
