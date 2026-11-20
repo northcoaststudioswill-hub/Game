@@ -140,3 +140,38 @@ The Assay played: day 40, night 1, day 19, nights 28–31, night 49, last day, d
 3. **20% — the High Docks rebuilt.**
 4. **15% — Part Two play:** the service stair first.
 5. **10% — controls card, touch camera, group fights, a hand-off pass with pictures.**
+
+## 9. Proposed, waiting on your yes (2026-11-19, after v0.65)
+Agreed in talk, not built. Nothing here changes the game until you approve it.
+
+### 9a. The present and the flashes
+- **Day one is Ashgate** (41 days after the furnace). From Ashgate on, the present only moves forward.
+- **Anything before or after the present is a flash, back or forward.** Each flash needs a trigger in the present (an object, a sound, a line) and a signpost (the calendar strip slides to the day; one look for every jump).
+- **Reordering is the point.** The order is chosen to pace the story and keep it short with gameplay. Scenes are placed by echo (what the day below calls up), not by date.
+- **Today the present never plays the Assay.** It runs through the four days below, then skips from The Way Out to the Pinning; the gilding, training and the Assay are only ever flashes. Two ways to build it, **your pick**:
+  1. **The Assay stays as flashes**, in any order, each earned by a trigger below. Shorter game.
+  2. **The Assay becomes its own act.** After The Way Out the present moves up: gilded, trained, the Assay in order. A few flash-forwards stay below as teasers; Cinderwell becomes flashbacks. Longer game, matches the rule exactly.
+- **Echo pairings proposed** (if option 1): First Fire → the Lamp and the Circle (fire answers fire); The Ledger → the Proctor (the day he learns who keeps the book, he beats one of the scorekeepers); The Way Out → the Last Night and the Keep (leaving below, finishing above).
+
+### 9b. The cold open: the Keep
+Replaces the Valley as the first thing you play. The Valley goes back to its place in order.
+1. **Black, and the shift song.** One voice humming.
+2. **An animated intro, about 25 seconds.** Drawn stills that move, in the Table's style: a hand flat on a pipe, then a gauntlet closing on a hilt; a chalk sun on a wall, then the real one over the valley. A count runs under it, one to eleven, cuts getting faster.
+3. **On eleven, you are in the fight.** One opponent at dawn under banners. Three things to learn: strike, dodge, fly. The camera follows you up and pushes in on the dive. Cannot be lost.
+4. **At full fury ELEVEN lights.** The blade comes down; cut to black before it lands.
+5. **A card dated from the furnace**, then the dark, the valves, the prologue.
+- **Why:** gold plate under open sky, then underground as a valve hand, so "how does he get from there to here" carries Part One; a bookend (the same fight on the last day, where the blow lands); one duel reads better than the Valley's group fight; and it **settles the boots**: he flies on the last day, the day he can.
+- **Limits:** "pretty" here means the arena as it is plus moving drawn stills. Real character animation still waits on the library.
+
+### 9c. Part Two: more time, a proper ending
+**The problem:** Part One spends four full days below plus the dreams; Part Two covers five years in six chapters, mostly told on reused pictures, and the endings are told rather than shown. The top arrives before it feels earned.
+**The fix:** the present on the Spire still only moves forward; each chapter gets one flashback that goes deeper than the last, then the last chapter stops cutting.
+
+| Chapter | Flash | What it gives | Cost |
+|---|---|---|---|
+| The Post | Back to the Assay: the white cloak, the cadets following him | Why people above defer to him | Low (reuses) |
+| The Balancing | Same time, below: Tavi chalks the sun | Already in the game | — |
+| What She Knows | Back fifty years: Celestine's own Assay, played as her for one scene | You understand her before you fight her | Medium (new) |
+| Two Years | Back before the furnace: Seren tracing the line; she found the leak first | The biggest reveal in the game | Medium (new) |
+| The Count | **No cuts.** The present runs straight through. After the last blow, one flash to the furnace and the count reaching eleven | Closes the loop back to the start | Low |
+| The ending | Played as a Table-style sequence of pictures, not told | A proper ending | Medium |

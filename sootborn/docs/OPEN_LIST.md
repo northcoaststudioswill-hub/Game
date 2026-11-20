@@ -11,6 +11,9 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **Celestine knew him at the Pinning** (v0.44) still wants your yes or no.
 - **The High Docks:** the empty, locked level was a broken save from v0.49 (quay cleared, no key); v0.53 mends it and adds START THIS LEVEL AGAIN. What made that save is still unknown. Tell me if the gate refuses again.
 
+- **The present and the flashes** (master plan 9a): day one is Ashgate; everything else is a flash with a trigger and a signpost. Pick: the Assay stays as flashes (shorter), or the Assay becomes its own act after The Way Out (longer).
+- **Approved to plan, not yet to build (2026-11-19):** the Keep as the new cold open with an animated intro (9b), and Part Two's deepening flashbacks and played ending (9c). Say build.
+
 ## Untested, built blind (check these first when playing)
 - **v0.63: arena figures.** Torso plate, baldric, scabbard, and a blade that is a sword.
 - **v0.62: the Proctors** behind the Dorian fight (low balcony, in the dark) and on the valley dais.
@@ -61,6 +64,8 @@ Kept current each round. "Keep going" means work down this list from the top unl
 14. **Transitions between story parts:** go through every hand-off (card, fade, music) from the opening to THE END.
 15. **Comic layouts:** the Table was checked; the three levels' opening pages and memory pages still need the same look.
 16. **More 2D films built from stills** in the comic style; the Pairing's and the Ford's own intro shots.
+16a. **The Keep as the cold open** (master plan 9b): black and the shift song; a 25-second animated intro of moving drawn stills counting to eleven; the Keep at dawn as a duel you cannot lose (strike, dodge, fly); ELEVEN, cut before the blow; then the prologue. The Valley returns to its place. The same fight on the last day, where the blow lands.
+16b. **Part Two flashbacks** (master plan 9c): the Post → the white cloak at the Assay; What She Knows → Celestine's own Assay, played as her; Two Years → Seren tracing the line first; the Count → no cuts, then one flash to the furnace at eleven; the ending as a played sequence of pictures.
 17. Part Two play: the service stair as a walked level (chapter 1); a barge in the weather (chapter 4); the ending as a Table-style sequence; a suspicion meter in Spire talk; the Count as a puzzle. (The quiet scene with the Unlit exists: the Night Before, chapter 4. Say if you want a second one between the Fall and the Stair.)
 
 ## Fighting and controls
