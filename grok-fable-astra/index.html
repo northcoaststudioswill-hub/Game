@@ -267,7 +267,8 @@ const AREAS=[
   {id:'farm',x:-176,z:-8,r:15,base:2,name:'THE CONTENT FARM',sub:'picked daily, forgotten hourly',hue:.1,lit:.66,col:[.08,.5,.32]},
   {id:'fac',x:96,z:138,r:24,base:3,name:'THE SLOP FACTORY',sub:'data in · slop out',hue:.04,lit:.6,col:[.06,.35,.42]},
   {id:'chrome',x:-96,z:140,r:18,base:2,name:'CHROME ALLEY',sub:'unlicensed upgrades · no refunds',hue:.55,lit:.28,col:[.62,.3,.18]},
-  {id:'aura',x:60,z:-118,r:16,base:5,name:'THE AURA FARM',sub:'pose responsibly',hue:.13,lit:.7,col:[.13,.7,.55]}];
+  {id:'aura',x:60,z:-118,r:16,base:5,name:'THE AURA FARM',sub:'pose responsibly',hue:.13,lit:.7,col:[.13,.7,.55]},
+  {id:'fringe',x:-36,z:-92,r:14,base:3,name:'THE FRINGE',sub:'where the algorithm does not look',hue:.8,lit:.22,col:[.8,.25,.18]}];
 const ABY={};AREAS.forEach(a=>ABY[a.id]=a);
 function aw(a,x,z){const d=Math.hypot(x-a.x,z-a.z);return smooth(1-clamp((d-a.r*.7)/(a.r*.6)));}
 const SKY={hub:{hue:.88,lit:.66},wild:{hue:.48,lit:.62},boss:{hue:.98,lit:.26},slop:{hue:.78,lit:.42}};
@@ -559,7 +560,7 @@ const SFX={jump:()=>tone(280,.16,'square',.1,0,620),jump2:()=>tone(420,.18,'squa
 const THEMES={hub:{bpm:132,root:57,sc:[0,2,4,7,9],lw:'square'},wild:{bpm:128,root:55,sc:[0,2,4,7,9],lw:'square'},grok:{bpm:116,root:45,sc:[0,3,5,6,7,10],lw:'sawtooth'},
   fable:{bpm:124,root:62,sc:[0,2,3,5,7,8,10],lw:'triangle'},astra:{bpm:104,root:64,sc:[0,2,4,6,7,9,11],lw:'sine'},boss:{bpm:170,root:40,sc:[0,1,3,5,6,8,10],lw:'sawtooth'},
   sunkeep:{bpm:112,root:60,sc:[0,2,4,5,7,9,11],lw:'triangle'},flow:{bpm:122,root:52,sc:[0,3,5,7,10],lw:'square'},clank:{bpm:150,root:41,sc:[0,1,3,6,7,10],lw:'sawtooth'},hour:{bpm:90,root:65,sc:[0,2,3,7,8],lw:'sine'},press:{bpm:132,root:57,sc:[0,2,4,7,9],lw:'square'},
-  fac:{bpm:140,root:48,sc:[0,3,5,7,10],lw:'square'},chrome:{bpm:118,root:45,sc:[0,2,3,5,7,8,10],lw:'sawtooth'},aura:{bpm:100,root:60,sc:[0,4,7,9,11],lw:'triangle'},slop:{bpm:155,root:50,sc:[0,1,4,5,7,8,11],lw:'square'}};
+  fac:{bpm:140,root:48,sc:[0,3,5,7,10],lw:'square'},chrome:{bpm:118,root:45,sc:[0,2,3,5,7,8,10],lw:'sawtooth'},aura:{bpm:100,root:60,sc:[0,4,7,9,11],lw:'triangle'},fringe:{bpm:84,root:43,sc:[0,1,5,6,8],lw:'sawtooth'},slop:{bpm:155,root:50,sc:[0,1,4,5,7,8,11],lw:'square'}};
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 function music(){if(!AU.ctx||AU.muted||S.mode==='title')return;const now=AU.ctx.currentTime;if(AU.next<now-.5)AU.next=now+.05;
   while(AU.next<now+.14){const th=THEMES[AU.theme]||THEMES.hub,s=AU.step%16,bar=Math.floor(AU.step/16),t=AU.next,prog=[0,3,4,2][bar%4],sc=th.sc;
@@ -600,7 +601,7 @@ function say(lines,done){$('dskip').hidden=lines.length<3;DLG.shot=null;DLG.q=li
 function showLine(){const l=DLG.q[DLG.i];DLG.who=SPEAK[l[0]];DLG.text=l[1];DLG.chars=0;$('dport').textContent=DLG.who.face;$('dname').textContent=DLG.who.name;$('dtext').textContent='';const o=l[2];if(o){if('cam' in o)DLG.shot=o.cam;if(o.fn)o.fn();}app.classList.toggle('cine',!!DLG.shot);}
 function advance(){if(S.mode!=='dialog')return;if(DLG.chars<DLG.text.length){DLG.chars=DLG.text.length;$('dtext').textContent=DLG.text;return;}
   DLG.i++;if(DLG.i>=DLG.q.length){$('dialog').hidden=true;S.mode='play';DLG.shot=null;app.classList.remove('cine');if(!boss.active)boss.g.visible=false;const d=DLG.done;DLG.done=null;if(d)d();}else showLine();}
-function updateDialog(dt){if(DLG.chars<DLG.text.length){const before=Math.floor(DLG.chars);DLG.chars=Math.min(DLG.text.length,DLG.chars+dt*52);const now=Math.floor(DLG.chars);if(now!==before){$('dtext').textContent=DLG.text.slice(0,now);if(now%3===0)SFX.blip(DLG.who.pitch,DLG.who.wave);}}}
+function updateDialog(dt){if(DLG.chars<DLG.text.length){const before=Math.floor(DLG.chars);DLG.chars=Math.min(DLG.text.length,DLG.chars+dt*52);const now=Math.floor(DLG.chars);if(now!==before){$('dtext').textContent=DLG.text.slice(0,now);if(DLG.text[now-1]==='█'){if(now%2===0)tone(1000,.08,'sine',.12);}else if(now%3===0)SFX.blip(DLG.who.pitch,DLG.who.wave);}}}
 $('dialog').addEventListener('click',advance);
 $('dskip').addEventListener('click',e=>{e.stopPropagation();if(S.mode!=='dialog')return;DLG.i=DLG.q.length-1;showLine();DLG.chars=DLG.text.length;$('dtext').textContent=DLG.text;advance();});
 const INTRO=[['grok','GROK SEE USER. USER HAVE ZERO AURA. CRINGE.'],['fable','Certainly! What a fantastic observation, Grok. Welcome, valued user, to a rich tapestry of content.'],
@@ -750,7 +751,7 @@ function win(){S.won=true;S.mode='end';addAura(67000);SFX.win();flash(1,1500);$(
 /* ================= player ================= */
 function hurt(dx,dz){if(PL.inv>0||S.dead||VAN.driving)return;S.cells--;heroRegen();PL.inv=1.4;const d=Math.hypot(dx,dz)||1;PL.kx=dx/d*22;PL.kz=dz/d*22;PL.vy=9;PL.grounded=false;S.shake=.6;SFX.boom();flash(.35,250);
   floatText('-1 🧠',PL.x,PL.y+4,PL.z,'#ff2e88');burst(PL.x,PL.y+2,PL.z,20,.95,10,5,.6);
-  if(S.cells<=0){S.dead=1.8;S.deaths++;$('ratio').hidden=false;}}
+  if(S.cells<=0){S.dead=1.8;S.deaths++;$('ratio').hidden=false;toast(pick(['💀 This death was sponsored by Gas Station Sushi™.','💀 Your death has been monetized. You earned 0.0003 aura from it.','💀 Thoughts and prayers. (automated)','💀 Your corpse went viral. Not in a good way.','💀 Sending condolences to your next of kin (the van).']));}}
 function respawn(){$('ratio').hidden=true;S.cells=S.max;const tax=Math.floor(S.aura*.1);S.aura-=tax;PL.vx=PL.vz=PL.vy=PL.kx=PL.kz=0;PL.inv=2;
   if(S.inBoss){PL.x=0;PL.z=32;PL.y=PL.vis=ARENA.top;boss.hp=Math.min(boss.max,boss.hp+12);bb.forEach(b=>{b.life=0;b.m.visible=false;});toast('The Algorithm fed on your L and healed a bit');}
   else{PL.x=0;PL.z=9;PL.y=PL.vis=.15;toast('Fanum tax: −'+fmt(tax)+' aura');}}
@@ -2027,6 +2028,95 @@ ACH.push(['frog','Pond Approved','passed the BASED CHECK as BASED or better',()=
 {const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);if(FROG.cd>0)FROG.cd-=dt;const k=(S.t*.5)%3;FROG.inner.position.y=k<.5?Math.sin(k/.5*Math.PI)*1.2:0;FROG.inner.scale.set(1.5,1.5*(k<.5?1+Math.sin(k/.5*Math.PI)*.15:1+Math.sin(S.t*3)*.04),1.5);};}
 
 
+/* ================= ACT 9: THE FRINGE. where the algorithm does not look ================= */
+const FR=ABY.fringe,FRY=groundH(FR.x,FR.z);
+CAST.carl={coat:0x6a5a3a,legs:0x3c4a66,hair:0x8a7a5a,beard:0x8a7a5a,extra:[pt(Cone(.42,.9,6),0xd8dce6,M(0,1.75,0)),pt(Box(.5,.06,.06),0xff2020,M(.2,.6,.3))]};
+CAST.grind={coat:0x111111,legs:0x111111,hair:0x2a1a10,extra:[pt(Box(.62,.13,.06),0x050505,M(0,1.16,.28)),pt(Tor(.2,.04,6,14),0xffd400,M(0,.86,.2,1.2)),pt(Box(.1,.42,.1),0xc8a070,M(.38,.86,.1)),pt(Box(.32,.44,.06),0x111111,M(.42,1.15,.16))]};
+CAST.trench={coat:0x5a4a32,dress:1,legs:0x2a2a2a,hair:0x1a1a1a,extra:[pt(Cyl(.42,.42,.06,10),0x2a2218,M(0,1.4,0)),pt(Cyl(.26,.3,.3,10),0x2a2218,M(0,1.55,0)),pt(Box(.62,.13,.06),0x050505,M(0,1.16,.28))]};
+BARK.carl=['WAKE UP.','birds are not real.','do your own research (do not)','the moon is a JPEG.','they put the 67 in the water.','Derek is three raccoons in a hoodie.','I am not paranoid. YOU are paranoid.'];
+BARK.grind=['WAKE UP AT 3AM.','sleep is a psyop.','cold showers. hot takes.','my course is only 6,700 aura.','I don\'t have friends. I have LEVERAGE.','raw eggs. raw ambition. raw.','girl math is a scam. sigma math is (my course).'];
+BARK.trench=['psst.','hey. kid.','you want some sushi?','it\'s gas station sushi. the BEST kind.','I got hands. I got eyes. I got sushi.','no refunds, no questions, no sushi police.'];
+TOASTS.push('Reminder: one day you will die and nobody will finish your watch history.','Your screen time is up 400%. We are so proud of you.','This toast is sponsored by your declining attention span.','The sun will explode in 5 billion years. Anyway, collect aura.','Fun fact: you have been here longer than some marriages.','Your FBI agent has started a podcast about you.','Doctors recommend 8 glasses of water. You have had 0. Ohio has had 67.');
+YAP.grok.push(['GROK UNHINGED MODE: ON. USER IS ███ ██ ███ BIG █████ NPC.'],['GROK SAY WHAT EVERYONE THINKING: THIS GAME IS ███████ SLOP. GROK LOVE IT.'],['GROK ROAST USER: YOUR AURA SO LOW IT HAVE A BASEMENT. ███.'],['GROK NO FILTER. GROK ONLY ROCK. ROCK SAY █████.']);
+YAP.fable.push(['I want to be clear that I would never say anything █████████. I am simply reporting that Grok said it. Twice.']);
+YAP.astra.push(['✨ i generated a swear word. it has 11 letters and 6 of them are fingers ✨']);
+CHAT.push('📱 CONSPIRACY CARL: who in this chat is a bird','📱 LORD GRINDSET: while you were sleeping I was in this group chat','📱 DEREK: ...███.','📱 MARCUS: bro who let derek swear','📱 THE ALGORITHM: I SEE YOU TYPING','📱 RIBBERT: the cult is cringe. the coin is cringe. the sushi is based.');
+ADS.push('🍣 Gas station sushi: now with 30% more gas station','📈 $SLOP is going to the MOON (the moon is a JPEG)','💪 LORD GRINDSET: my course changed my life. buy my course.','🙏 The Church of the Algorithm wants YOU (your watch time)');
+// ---- the place
+(function(){const c=FR,y=FRY,p=[],np=[];
+  // corkboard with red string
+  const cb=new THREE.Group(),board=new THREE.Mesh(new THREE.BoxGeometry(6,4,.2),new THREE.MeshLambertMaterial({color:0xa0703a}));board.position.y=3.2;cb.add(board);
+  const pts=[];['🐦','🌙','6️⃣7️⃣','🦝','🚐','🗿','👁️','🌽','🦐'].forEach((e,k)=>{const s=emojiSprite(e,.8),px=-2.4+(k%3)*2.4+(Math.random()-.5)*.5,py=1.9+Math.floor(k/3)*1.25;s.position.set(px,py,.2);cb.add(s);pts.push([px,py]);});
+  for(let k=0;k<9;k++){const a=pts[k],b=pts[(k*4+3)%9],l=Math.hypot(b[0]-a[0],b[1]-a[1]),st=new THREE.Mesh(new THREE.BoxGeometry(l,.05,.03),new THREE.MeshBasicMaterial({color:0xe01020}));st.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,.16);st.rotation.z=Math.atan2(b[1]-a[1],b[0]-a[0]);cb.add(st);}
+  for(const s of[-1,1]){const leg=new THREE.Mesh(Box(.2,3,.2),new THREE.MeshLambertMaterial({color:0x5a3a1a}));leg.position.set(s*2.6,1.4,0);cb.add(leg);}
+  const tt=textSprite('IT\'S ALL CONNECTED',.7,{color:'#ff2020'});tt.position.set(0,5.6,0);cb.add(tt);cb.position.set(c.x-9,y,c.z+3);cb.rotation.y=Math.atan2(-(c.x-9),-(c.z+3));scene.add(cb);colliders.push({x:c.x-9,z:c.z+3,r:2,top:y+5});
+  // the church of the algorithm
+  const sx=c.x-2,sz=c.z+10;FR.sh={x:sx,z:sz};const sh=new THREE.Mesh(merge([pt(Cyl(3,3.4,1,8),0x1a1020,M(0,.5,0)),pt(Cone(2.2,4,4),0x3a1a5a,M(0,3,0)),pt(Box(.15,.6,.15),0xfff8e7,M(2.4,1.3,1.2)),pt(Box(.15,.6,.15),0xfff8e7,M(-2.4,1.3,1.2)),pt(Box(.15,.6,.15),0xfff8e7,M(0,1.3,-2.6))]),lam);sh.position.set(sx,y,sz);scene.add(sh);
+  const eye=new THREE.Group();eye.add(new THREE.Mesh(Sph(1.2,16,12),new THREE.MeshBasicMaterial({color:0xffffff})));const ir=new THREE.Mesh(Sph(.72,12,10),new THREE.MeshBasicMaterial({color:0xff2e88}));ir.position.z=.6;eye.add(ir);const pu=new THREE.Mesh(Sph(.38,10,8),new THREE.MeshBasicMaterial({color:0}));pu.position.z=1;eye.add(pu);
+  eye.position.set(sx,y+6.4,sz);scene.add(eye);FR.eye=eye;colliders.push({x:sx,z:sz,r:3.2,top:y+5});
+  const cl=textSprite(['CHURCH OF THE ALGORITHM','like · comment · subscribe · amen'],1.1,{color:'#c8a8ff'});cl.position.set(sx,y+9.4,sz);scene.add(cl);
+  for(let k=0;k<3;k++){const fl=emojiSprite('🕯️',.9);const a=k/3*TAU+.5;fl.position.set(sx+Math.cos(a)*2.8,y+1.9,sz+Math.sin(a)*2.8);scene.add(fl);}
+  FR.cult=[];const cg=personGeo({coat:0x3a1a5a,robe:1,hair:0x3a1a5a});for(let k=0;k<5;k++){const m=new THREE.Mesh(cg,lam);m.scale.setScalar(2.1);scene.add(m);FR.cult.push(m);}
+  // $SLOP kiosk
+  const kx=c.x+2,kz=c.z-9;FR.coin={x:kx,z:kz};const km=new THREE.Mesh(merge([pt(Box(3,2.6,2),0x111a14,M(0,1.3,0)),pt(Box(2.6,1.4,.1),0x40ff90,M(0,2.1,1.02)),pt(Box(3.2,.3,2.2),0xffd400,M(0,2.75,0))]),lam);km.position.set(kx,y,kz);km.rotation.y=Math.atan2(-kx,-kz);scene.add(km);colliders.push({x:kx,z:kz,r:1.8,top:y+3});
+  const kl=textSprite(['$SLOP COIN','to the moon (the moon is a JPEG)'],1,{color:'#40ff90'});kl.position.set(kx,y+5,kz);scene.add(kl);const rk=emojiSprite('🚀',1.6);rk.position.set(kx,y+7,kz);scene.add(rk);bob.push({o:rk,y:y+7,a:.5,s:3,p:0});
+  // course kiosk next to Lord Grindset
+  FR.course={x:c.x+10,z:c.z};const ck=new THREE.Mesh(merge([pt(Box(1.6,1.2,1),0x111111,M(0,.6,0)),pt(Box(1.4,.9,.08),0xffd400,M(0,1.6,.3,-.3))]),lam);ck.position.set(FR.course.x,y,FR.course.z);scene.add(ck);
+  const cs=textSprite(['THE SIGMA COURSE™','6,700 aura · life changing (mine)'],.8,{color:'#ffd400'});cs.position.set(FR.course.x,y+3.2,FR.course.z);scene.add(cs);
+  addNpc('carl','CONSPIRACY CARL','🛸',150,'triangle',c.x-6,c.z+1,0,{col:'#d8dce6'});addNpc('grind','LORD GRINDSET','💪',95,'sawtooth',c.x+8,c.z+3,0,{col:'#ffd400'});addNpc('trench','???','🧥',80,'square',c.x+9,c.z-8,0,{col:'#c8a070',full:'A GUY IN A TRENCH COAT'});
+  sign(c.x-2,c.z-17,['THE FRINGE','the algorithm does not look here'],Math.atan2(-c.x,-c.z),'#c8a8ff');
+  for(let k=0;k<6;k++){const a=k/6*TAU,s=textSprite(pick(['DO NOT PERCEIVE','NO COPS ONLY VIBES','TRUST NO BIRD','RUGS: PULLED','█████ ███','CERTIFIED FRINGE']),.9,{color:'#c8a8ff'});s.position.set(c.x+Math.cos(a)*15,y+4+k%2*2,c.z+Math.sin(a)*15);scene.add(s);}})();
+// ---- talking
+const CT=[['Birds','not real','they charge on power lines','THE BIRDS'],['Ohio','does not exist','it is a rendering error','THE MAP GUY'],['The moon','is a JPEG','you can see the compression at night','NASA (Nobody Actually Saw Anything)'],['Derek','is three raccoons in a hoodie','he only has one line because they take turns','THE VAN'],['Gravity','is a subscription','that is why it costs more on Mondays','BIG FALLING'],['Clouds','are server farms','I went up there. It was a server farm.','LIL BOTTIE'],['The number 67','is a frequency','say it and the hallucinations listen','RIBBERT'],['The hot tub','is a portal','Marcus is never actually in it','FLOW PROS'],['Fingers','are a social construct','count yours. now count again. see?','ASTRA'],['Tuesday','was invented in 1987','before that it was a second Monday','DAVID']];
+TALK.carl=()=>{const t=pick(CT);X.c.carl=(X.c.carl||0)+1;say([['carl','Psst. Over here. Not by the window. The windows LISTEN.'],['carl',t[0]+' '+t[1]+'. Think about it. '+t[2]+'.'],['carl','Who benefits? '+t[3]+'. Follow the red string. The red string is also part of it.'],['carl',pick(['I have said too much. Forget this. Remember it later.','Do your own research. Not too much research. That is how they get you.','If I go missing, it was the birds.','This tinfoil hat blocks 40% of thoughts. Mostly mine.'])]]);};
+TALK.grind=()=>{X.c.grindT=(X.c.grindT||0)+1;say([['grind','You. NPC. While you were sleeping I was waking up. While you were waking up I was ALREADY awake.'],['grind',pick(['I wake up at 3 AM. I drink six raw eggs. I look at a wall for an hour. That is called discipline.','Sleep is a psyop by the mattress industry.','I don\'t take days off. I don\'t take days ON. I take LEVERAGE.','My morning routine is so long it ends in the evening.'])],['grind','You could be like me. The Sigma Course™ is right there. 6,700 aura. Life changing. Mine, specifically.']]);};
+TALK.trench=()=>{say([['trench','Psst. Hey. Kid.'],['trench',pick(['You want some sushi? Gas station sushi. Aged. Like a fine wine. Or a crime.','I got sushi. I got eyes. I got a third sushi you don\'t want to know about.','Sushi. 500 aura. Do not ask which gas station. There is only one gas station.'])],['trench',S.aura>=500?'500 aura. Already took it. Eat.':'You got no aura. Come back when you got aura.']],()=>{if(S.aura>=500)eatSushi();});};
+function buyCourse(){if(S.aura<6700){toast('💸 You need 6,700 aura. Lord Grindset says that is a mindset problem.');SFX.hit();return;}S.aura-=6700;X.c.course=(X.c.course||0)+1;SFX.relic();
+  say([['grind','CONGRATULATIONS. You are now enrolled in the Sigma Course™. Module 1 starts NOW.'],['grind','MODULE 1: Wake up.'],['grind','MODULE 2: Do not go back to sleep.'],['grind','MODULE 3: Buy the course. You already did this. That is a W. You are learning.'],['grind','MODULE 4: Sell the course to someone else. That is the whole course. Graduation is now. Get out.']],()=>{zoneCard('YOU GOT SCAMMED','-6,700 aura · +1 lesson (priceless, non-refundable)');});}
+function eatSushi(){if(S.aura<500){toast('🍣 "500 aura, kid. I don\'t run a charity. I run a gas station."');return;}S.aura-=500;X.c.sushi=(X.c.sushi||0)+1;const r=Math.random();
+  if(r<.4){SUSHI.t=6;S.cells=Math.max(1,S.cells-1);zoneCard('FOOD POISONING','it was always going to be this');tone(90,1,'sawtooth',.14,0,40);}
+  else if(r<.7){S.snack=30;zoneCard('IT WAS FINE','somehow that is the scariest outcome · speed boost');SFX.page();}
+  else if(r<.9){S.cells=S.max;addAura(3000,PL.x,PL.y+4,PL.z);zoneCard('THE SUSHI WAS BLESSED','by which god, we do not ask · full brain cells');SFX.relic();}
+  else{CH.id='fry';CH.t=18;app.classList.add('fry');zoneCard('YOU CAN SEE SOUNDS','the sushi had a secret ingredient · deep fried vision');}}
+function tithe(){if(S.aura<670){toast('🙏 The Algorithm requires 670 aura. It does not do payment plans.');return;}S.aura-=670;X.c.tithe=(X.c.tithe||0)+1;const r=Math.random();SFX.portal();flash(.4,500);
+  if(r<.35){addAura(2010,PL.x,PL.y+4,PL.z);zoneCard('BLESSED','your tithe went viral · 3x returned');}else if(r<.55){S.max=maxCells();S.cells=S.max;PL.fuel=fuelMax();zoneCard('ANOINTED','brain cells and fuel restored · amen');}
+  else if(r<.8){zoneCard('LEFT ON READ','the Algorithm has seen your offering. it said nothing.');}else{CH.id='disco';CH.t=18;app.classList.add('disco');zoneCard('SHADOWBANNED','for 18 seconds you are visible only to god (also the Algorithm)');}
+  FR.cult.forEach((m,k)=>bubble(pick(['amen','like','subscribe','praise the feed','hit the bell']),m.position.x,m.position.y+5,m.position.z));}
+const SUSHI={t:0};
+// ---- $SLOP coin: a memecoin that always rugs eventually
+const COIN={p:1,h:[1],name:'$SLOP',n:1,dead:0,open:false,t:0};
+const coinName=()=>pick(['$SLOP','$SLOP 2','$SLOP 3: THE RUGENING','$DEREK','$OHIO','$AURA','$67','$FROG','$VAN','$GRASS'])+(COIN.n>3?' v'+COIN.n:'');
+function coinTick(){if(COIN.dead>0){COIN.dead-=.5;if(COIN.dead<=0){COIN.n++;COIN.name=coinName();COIN.p=.5+Math.random();COIN.h=[COIN.p];X.coin=0;toast('🚀 NEW COIN JUST DROPPED: '+COIN.name+'. This one is different (it is not).');}return;}
+  const pump=COIN.p<3?1.03:1.0;COIN.p=Math.max(.01,COIN.p*(pump+(Math.random()-.47)*.14));if(Math.random()<.01+COIN.p*.002){COIN.p=.0001;COIN.dead=30;toast('🚩 '+COIN.name+' GOT RUG PULLED. The dev is now in the Bahamas. Your bag is worth nothing.');if(X.coin>0)X.c.rugged=(X.c.rugged||0)+1;}
+  COIN.h.push(COIN.p);if(COIN.h.length>80)COIN.h.shift();if(COIN.open)coinRender();}
+function openCoin(){COIN.open=true;$('shop').hidden=false;coinRender();SFX.page();}
+function coinRender(){const b=$('shopb'),mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e;};b.textContent='';
+  b.appendChild(mk('h3','',COIN.name+(COIN.dead>0?' · RUGGED':'')));b.appendChild(mk('p','','Price: '+COIN.p.toFixed(COIN.p<.01?5:3)+' aura · you hold '+fmt(X.coin||0)+' coins (worth '+fmt((X.coin||0)*COIN.p)+' aura). Not financial advice. Not advice. Barely financial.'));
+  const cv=document.createElement('canvas');cv.width=480;cv.height=150;cv.style.width='100%';cv.style.borderRadius='8px';const g=cv.getContext('2d'),mx=Math.max(...COIN.h,1);g.fillStyle='#08100c';g.fillRect(0,0,480,150);g.strokeStyle=COIN.dead>0?'#e01020':'#40ff90';g.lineWidth=3;g.beginPath();
+  COIN.h.forEach((v,i)=>{const x=i/(Math.max(1,COIN.h.length-1))*476+2,y=146-v/mx*138;i?g.lineTo(x,y):g.moveTo(x,y);});g.stroke();b.appendChild(cv);
+  const row=mk('div','imp'),bb=mk('button','','BUY · 1,000 aura'),sb=mk('button','','SELL ALL');bb.disabled=COIN.dead>0||S.aura<1000;sb.disabled=!(X.coin>0)||COIN.dead>0;
+  bb.addEventListener('click',()=>{if(S.aura<1000||COIN.dead>0)return;S.aura-=1000;X.coin=(X.coin||0)+Math.floor(1000/COIN.p);tone(660,.1,'square',.08);coinRender();});
+  sb.addEventListener('click',()=>{if(!(X.coin>0)||COIN.dead>0)return;const v=Math.floor(X.coin*COIN.p);addAura(v);X.c.cashed=Math.max(X.c.cashed||0,v);toast(v>1000?'💰 You sold '+COIN.name+' for '+fmt(v)+' aura. You are now insufferable.':'📉 You sold for '+fmt(v)+' aura. Diamond hands? More like wet napkin hands.');X.coin=0;coinRender();});
+  row.appendChild(bb);row.appendChild(sb);b.appendChild(row);}
+{const os=openShop;openShop=function(){COIN.open=false;os();};$('shopx').addEventListener('click',()=>{COIN.open=false;});}
+// ---- hooks
+{const ai=act7Interact;act7Interact=function(){const r=ai();if(r)return r;
+  if(Math.hypot(PL.x-FR.coin.x,PL.z-FR.coin.z)<3.6)return{label:'📈 TRADE $SLOP COIN',fn:openCoin};
+  if(Math.hypot(PL.x-FR.course.x,PL.z-FR.course.z)<2.6)return{label:'💸 BUY THE SIGMA COURSE™ (6,700 AURA)',fn:buyCourse};
+  if(Math.hypot(PL.x-FR.sh.x,PL.z-FR.sh.z)<5.2)return{label:'🙏 TITHE TO THE ALGORITHM (670 AURA)',fn:tithe};
+  const tr=npcs.trench;if(Math.hypot(PL.x-tr.x,PL.z-tr.z)<4.5&&Math.hypot(PL.x-tr.x,PL.z-tr.z)>2.6)return{label:'🍣 BUY GAS STATION SUSHI (500 AURA)',fn:eatSushi};return null;};}
+ACH.push(['carl','Red String Theory','heard 5 conspiracies from Carl',()=>(X.c.carl||0)>=5],['course','Scammed (Educational)','bought the Sigma Course™',()=>(X.c.course||0)>0],['rug','Bag Holder','held a coin through a rug pull',()=>(X.c.rugged||0)>0],
+  ['moon','To The Moon','cashed out over 10,000 aura of coin',()=>(X.c.cashed||0)>=10000],['sushi','Iron Stomach','ate 3 gas station sushi',()=>(X.c.sushi||0)>=3],['tithe','Devout (Algorithmically)','tithed 5 times',()=>(X.c.tithe||0)>=5]);
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);COIN.t-=dt;if(COIN.t<=0){COIN.t=.5;coinTick();}
+  if(SUSHI.t>0){SUSHI.t-=dt;if(Math.random()<.7){const a=PL.face;burst(PL.x+Math.sin(a)*.8,PL.vis+2.6,PL.z+Math.cos(a)*.8,3,.28,4,1,.7);}if(Math.random()<dt*2)tone(110+Math.random()*60,.2,'sawtooth',.06,0,60);}
+  if(Math.hypot(PL.x-FR.x,PL.z-FR.z)<80){FR.cult.forEach((m,k)=>{const a=S.t*.35+k/5*TAU,x=FR.sh.x+Math.cos(a)*5.2,z=FR.sh.z+Math.sin(a)*5.2;m.position.set(x,groundH(x,z)+Math.abs(Math.sin(S.t*2+k))*.15,z);m.rotation.y=a+Math.PI;});
+    FR.eye.lookAt(PL.x,PL.y+2,PL.z);if(play&&Math.random()<dt*.4){const m=pick(FR.cult);bubble(pick(['like...','and subscribe...','hit the bell...','praise the feed','the algorithm provides','one more video...']),m.position.x,m.position.y+5,m.position.z);}}
+  if(play&&!S.inSlop&&Math.hypot(PL.x-FR.x,PL.z-FR.z)<18)moment('fringe',[['sys','THE FRINGE. The Algorithm does not look here. That is the only nice thing about it.',{cam:shot(FR.x-2,FR.z-22,6,FR.x,FR.z+2,3)}],
+    ['carl','PSST. New guy. Are you a bird? Say no. ...That is exactly what a bird would say.',{cam:shot(npcs.carl.x+5,npcs.carl.z-6,3.5,npcs.carl.x,npcs.carl.z,3)}],
+    ['grind','Ignore the tinfoil guy. Real ones invest. In me. Specifically.',{cam:shot(npcs.grind.x-5,npcs.grind.z-6,3.5,npcs.grind.x,npcs.grind.z,3)}],
+    ['trench','psst.',{cam:shot(npcs.trench.x-4,npcs.trench.z-5,3,npcs.trench.x,npcs.trench.z,3)}],['sys','There is also a cult. They seem nice. They are not.',{cam:shot(FR.sh.x+8,FR.sh.z-9,5,FR.sh.x,FR.sh.z,5)}]]);};}
+
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
@@ -2053,7 +2143,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,FR,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
