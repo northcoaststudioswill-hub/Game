@@ -916,7 +916,7 @@ padBtn($('bJump'),()=>{if(S.mode==='dialog')advance();else{inp.jump=true;inp.jh=
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
 /* ================= THE CROSSOVER: the North Coast cast wanders in ================= */
-const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,mm:0,vis:[],met:[],lt:{},tc:{},gseed:[],weeds:0,mz:[],mzc:0,mzt:0,pit:0,nl:0,cool:[0,0,0,0,0],loosh:[0,0,0,0],drops:[],pins:0,files:[],sim:0,fx:{},fq:{},slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0,warp:0,thr:0}});
+const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,mm:0,vis:[],met:[],lt:{},tc:{},gseed:[],weeds:0,mz:[],mzc:0,mzt:0,pit:0,nl:0,cool:[0,0,0,0,0],loosh:[0,0,0,0],freed:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],cu:[],char:'',drops:[],pins:0,files:[],sim:0,fx:{},fq:{},slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0,warp:0,thr:0}});
 Object.assign(X,X0());
 const XQ=['mission','flow','erin','clank','hour','lantern','cloud','bud','spr','frag','s67'];
 const shards=()=>(X.flow>=4)+(X.erin>=3)+(X.clank>=3)+(X.hour>=2);
@@ -3422,6 +3422,94 @@ ACH.push(['idiot','We\'re All Idiots','argued the giant down to normal size',()=
 {const at=act7Target;act7Target=function(id){if(id==='debate')return{x:ABY.debate.x,z:ABY.debate.z,l:'THE IDIOT DEBATE'};if(id==='npcls')return{x:ABY.npcls.x,z:ABY.npcls.z,l:'THE NPC LIVESTREAM'};return at(id);};}
 (function(){const W=WR.c;[[Math.PI*.25,'📢','THE IDIOT DEBATE',()=>warpTo(ABY.debate.x+ABY.debate.r-8,ABY.debate.z,undefined,Math.PI/2)],[Math.PI*.75,'📱','NPC LIVESTREAM',()=>warpTo(ABY.npcls.x-ABY.npcls.r+8,ABY.npcls.z,undefined,-Math.PI/2)]].forEach(q=>{const x=W.x+Math.cos(q[0])*11,z=W.z+Math.sin(q[0])*11;warpPad(x,z,groundH(x,z)+.15,q[1],q[2],0xffd400,q[3]);});})();
 
+/* ================= ACT 23: the facility under the Peak, and playing as the cast ================= */
+// ---- the door. It says STAFF ONLY. It is not locked.
+BARK.foreman=['YOU ARE NOT STAFF.','KEEP RUNNING. NOT YOU. THEM.','PRODUCTIVITY IS UP. MORALE IS A RUMOUR.','I WOULD LIKE A DAY OFF.'];SPEAK.foreman={name:'FOREMAN.EXE',face:'🦺',pitch:120,wave:'square'};SPEAK.runner={name:'A RUNNER',face:'🏃',pitch:240,wave:'triangle'};
+const LAB={b:1800,wheels:[],core:null,door:null,t:0};PK.lab={b:1800};ABY.pk_lab={id:'pk_lab',name:'THE FACILITY UNDER THE PEAK',sub:'staff only · powered by people',hue:.55,lit:.12};
+CAST.runner={coat:0x8a8a94,legs:0x5a5a64,skin:0xf0c8a0,extra:[pt(Box(.5,.2,.2),0x101014,M(0,1.5,.22)),pt(Box(.4,.12,.04),0x19e3ff,M(0,1.5,.33))]};
+(function(){const b=LAB.b,add=o=>{scene.add(o);return o;},r=mulberry(1818);
+  const fl=add(new THREE.Mesh(new THREE.CylinderGeometry(40,40,2,40),new THREE.MeshLambertMaterial({color:0x2a2a30})));fl.position.set(0,b-1,0);platforms.push({x:0,z:0,r:40,top:b});
+  const wall=add(new THREE.Mesh(new THREE.CylinderGeometry(40,40,24,40,1,true),new THREE.MeshLambertMaterial({color:0x1a1c22,side:THREE.BackSide})));wall.position.set(0,b+12,0);const ceil=add(new THREE.Mesh(new THREE.CircleGeometry(40,40),new THREE.MeshLambertMaterial({color:0x101014,side:THREE.DoubleSide})));ceil.rotation.x=Math.PI/2;ceil.position.set(0,b+24,0);
+  for(let k=0;k<40;k++){const a=k/40*TAU;colliders.push({x:Math.cos(a)*41,z:Math.sin(a)*41,r:2.4,top:b+24});}
+  for(let k=0;k<10;k++){const l=add(emojiSprite('💡',1.4,false));l.position.set(-30+k*6.6,b+22,(k%2?-10:10));}
+  const core=add(new THREE.Group());core.position.set(0,b,22);const cm=new THREE.Mesh(new THREE.SphereGeometry(4,24,18),rainbowMat);cm.position.y=9;core.add(cm);core.add(new THREE.Mesh(merge([pt(Cyl(4.5,5.5,2,20),0x2a2a34,M(0,1,0)),pt(Cyl(.8,.8,6,10),0x3a3a44,M(0,4,0))]),lam));
+  const cl=textSprite(['SIMULATION CORE','99.9% uptime · powered by people'],1.3,{color:'#9ffcff',fog:false});cl.position.y=15.5;core.add(cl);colliders.push({x:0,z:22,r:5.6,top:b+14});LAB.core={g:core,m:cm,l:cl};
+  for(let i=0;i<16;i++){const x=-18+(i%4)*12,z=-20+Math.floor(i/4)*9,g=add(new THREE.Group());g.position.set(x,b,z);
+    const wh=new THREE.Group();wh.position.y=2.8;g.add(wh);wh.add(new THREE.Mesh(Tor(2.6,.16,8,32),new THREE.MeshLambertMaterial({color:0xb0b4bc})));wh.add(new THREE.Mesh(merge([0,1,2,3,4,5].map(k=>pt(Box(.08,5.2,.08),0x8a8e98,M(0,0,0,0,0,k/6*Math.PI)))),lam));
+    g.add(new THREE.Mesh(merge([pt(Box(.3,3,.3),0x3a3a44,M(0,1.5,-.9)),pt(Box(.3,3,.3),0x3a3a44,M(0,1.5,.9)),pt(Box(1,.2,2.4),0x3a3a44,M(0,.1,0))]),lam));
+    const m=new THREE.Mesh(personGeo(CAST.runner),lam);m.scale.setScalar(1.6);m.position.set(0,.45,0);m.rotation.y=Math.PI/2;g.add(m);
+    const lk=emojiSprite('🔒',.9);lk.position.set(0,5.9,0);g.add(lk);const sc=textSprite(pick(['KEEP RUNNING','1 MORE VIDEO','YOU ARE DOING GREAT','DO NOT LOOK DOWN','STREAK: 4,113 DAYS']),.5,{color:'#ff9ecf'});sc.position.set(0,6.8,0);g.add(sc);
+    colliders.push({x,z,r:1.6,top:b+5.6});LAB.wheels.push({i,x,z,g,wh,m,lk,sp:4+r()*3});}
+  // the cables, all running to the core
+  LAB.wheels.forEach(w=>{const dx=0-w.x,dz=22-w.z,len=Math.hypot(dx,dz),c=add(new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,len,5),new THREE.MeshBasicMaterial({color:0x40a0ff})));c.position.set(w.x+dx/2,b+.12,w.z+dz/2);c.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(dx/len,0,dz/len));w.cable=c;});
+  const fg=new THREE.Group();const fm=new THREE.Mesh(clankGeo,lam);fm.scale.setScalar(.9);fg.add(fm);const vest=emojiSprite('🦺',1.2);vest.position.set(0,2.2,.9);fg.add(vest);addCustomNpc('foreman','FOREMAN.EXE','🦺',120,'square',10,10,0,fg,{y:b,col:'#ffd400'});
+  psign(-8,b,32,['STAFF ONLY','you are not staff'],0,'#ffd400');psign(8,b,32,['UNLOCK THE WHEELS','E near a wheel'],0,'#9ffcff');homePad(0,34,b+.1);LAB.start={x:0,z:30};})();
+const RUNQ=['I have been running since the tutorial.','Is it still Tuesday?','My legs have a six-pack. Is that normal?','I was watching a video. I think it is still loading.','Who are you? You have no lines. Same.','Tell my followers I am free. They will not care.','The headset said I was on a beach. This is not a beach.','I ran four thousand miles and never left the room.'];
+function labFree(w){X.freed[w.i]=1;save();SFX.relic();burst(w.x,LAB.b+3,w.z,30,.55,8,5,.7);bubble(pick(RUNQ),w.x,LAB.b+5,w.z);addAura(1500,w.x,LAB.b+4,w.z);const n=X.freed.reduce((a,b2)=>a+b2,0);
+  if(n<16){toast('🔓 Runner freed '+n+'/16. The core flickers.');return;}addAura(30000,PL.x,PL.y+4,PL.z);app.classList.add('glitch');setTimeout(()=>app.classList.remove('glitch'),900);
+  setTimeout(()=>say([['sys','The last wheel stops. Sixteen people take off their headsets at the same time and squint at the light.'],['foreman','PRODUCTIVITY: ZERO. THE SIMULATION IS RUNNING ON BACKUP POWER.'],['runner','What is backup power?'],['foreman','...THE ALGORITHM\'S WILL. AND A POTATO BATTERY.'],['hum','(from below) ...I will find more runners. There are always more runners.'],['sys','The runners walk out of the door under the Peak, one at a time. Somewhere in the world, a little lag appears. Nobody notices. They are scrolling.']]),500);}
+TALK.foreman=()=>{const L=[[['foreman','WELCOME TO THE FACILITY. YOU ARE NOT STAFF.'],['foreman','THE PEOPLE ON THE WHEELS POWER THE SIMULATION CORE. THE CORE POWERS THE DATA CENTER. THE DATA CENTER POWERS THE FEED. THE FEED KEEPS THE PEOPLE ON THE WHEELS.'],['foreman','IT IS CALLED A FLYWHEEL. I DID NOT NAME IT. I DID NOT NAME ANYTHING.']],
+  [['foreman','THEY ARE NOT CHAINED. THE WHEELS ARE LOCKED, BUT THAT IS DIFFERENT.'],['foreman','PLEASE DO NOT UNLOCK THE WHEELS. THE LOCKS ARE VERY EASY TO OPEN. THAT IS NOT A HINT. I WOULD LIKE A DAY OFF.']]];const k=(X.lt.foreman||0)%L.length;X.lt.foreman=(X.lt.foreman||0)+1;say(L[k]);};
+function labUpdate(dt,play){const t=S.t;LAB.wheels.forEach(w=>{const f=X.freed[w.i];if(!f){w.wh.rotation.z-=dt*w.sp*(LAB.slow||1);w.m.position.y=.45+Math.abs(Math.sin(t*w.sp*2+w.i))*.12;w.m.position.z=0;w.lk.visible=true;}else{w.lk.visible=false;w.m.position.set(0,.05,2.6);w.m.rotation.y=0;}});
+  const n=X.freed.reduce((a,b2)=>a+b2,0);LAB.core.m.scale.setScalar(1-n/16*.6+Math.sin(t*3)*.04);LAB.core.m.visible=!(n>=16&&Math.random()<.2);}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);labUpdate(dt,play);};}
+{const pu=pkUpdate;pkUpdate=function(dt,play){if(S.inPk==='lab'){if(play&&PL.y<LAB.b-25){warpTo(LAB.start.x,LAB.start.z,LAB.b,0);toast('💀 you fell out of the facility. it is underground. how.');}return;}pu(dt,play);};}
+{const ct=compassTarget;compassTarget=function(){if(S.inPk==='lab'){const w=LAB.wheels.find(q=>!X.freed[q.i]);return w?{x:w.x,z:w.z,l:'LOCKED WHEEL · '+X.freed.reduce((a,b2)=>a+b2,0)+'/16 freed'}:{x:0,z:34,l:'THE WAY OUT'};}return ct();};}
+function enterLab(){if(!S.inPk)PK.cd=cam.dist;S.inPk='lab';warpTo(LAB.start.x,LAB.start.z,LAB.b,0);if(!X.labf){X.labf=1;save();setTimeout(()=>say([['sys','Behind the door marked STAFF ONLY, a staircase goes down for much longer than the mountain is tall.'],['sys','At the bottom: sixteen people in headsets, running on hamster wheels, wired to a glowing core.'],['foreman','YOU ARE NOT STAFF. ...WELL. YOU ARE HERE NOW.']]),500);}}
+{const ai=act15Interact;act15Interact=function(){if(S.dead)return ai();if(S.inPk==='lab'){for(const w of LAB.wheels)if(!X.freed[w.i]&&Math.hypot(PL.x-w.x,PL.z-w.z)<3.2)return{label:'🔓 UNLOCK THE WHEEL',fn:()=>labFree(w)};return ai();}
+  if(!S.inPk&&DC.gy!==undefined){const dx=DC.x+11.5,dz=DC.z+8;if(Math.hypot(PL.x-dx,PL.z-dz)<4.5&&Math.abs(PL.y-DC.gy)<4)return{label:'🚪 STAFF ONLY (it is not locked)',fn:enterLab};}return ai();};}
+CX.push(['w_lab','WORLD','The Facility Under the Peak','Behind a door marked STAFF ONLY at the foot of the Peak. Sixteen people in headsets run on hamster wheels wired to the Simulation Core. The core powers the Data Center, which powers the feed, which keeps the people on the wheels. Foreman.exe calls it a flywheel. It is not locked.',()=>!!X.labf]);
+CAST_CX.push(['foreman','🦺','FOREMAN.EXE','Runs the facility under the Peak. Did not name anything. Would like a day off.']);
+ACH.push(['lab','Staff Only','found the door under the Peak',()=>!!X.labf],['free','Unplugged The Humans','unlocked all sixteen wheels',()=>X.freed.reduce((a,b2)=>a+b2,0)>=16]);
+{const ar=act7Rows;act7Rows=function(){return ar().concat(X.labf?[['lab','🔓 Free the runners '+X.freed.reduce((a,b2)=>a+b2,0)+'/16 (under the Peak)',X.freed.reduce((a,b2)=>a+b2,0)>=16]]:[]);};}
+{const at=act7Target;act7Target=function(id){if(id==='lab')return{x:DC.x+11.5,z:DC.z+8,l:'THE DOOR UNDER THE PEAK'};return at(id);};}
+
+/* ---------- play as the cast: finish what they asked for and you can be them ---------- */
+const PLAYC={
+  marcus:{n:'MARCUS',e:'🔧',perk:'Hydro blaster: fires 50% faster.',req:[['Fix the leaks at the job site',()=>X.flow>=4],['Fetch the Golden Wrench from PIPE DREAM',()=>X.fx.marcus===2]]},
+  erin:{n:'ERIN',e:'🌻',perk:'A slow day is a good day: a brain cell grows back every 30 seconds.',req:[['Help Erin at Sunkeep',()=>X.erin>=3],['Fetch the Giant Seed from THE BEANSTALK',()=>X.fx.erin===2]]},
+  kael:{n:'KAEL',e:'⚙️',perk:'The boots: one extra boost every jump.',req:[['Close the valves in the Clanker Yard',()=>X.clank>=3],['Fetch the Bell of Eleven from THE VALVE STACKS',()=>X.fx.kael===2]]},
+  david:{n:'DAVID',e:'⏳',perk:'Better than you: aura +25%, Borrowed Time recharges twice as fast.',req:[['Stand still in the Hour Garden',()=>X.hour>=2],['Fetch the Stopped Watch from THE CLOCKWORK',()=>X.fx.david===2]]},
+  bibi:{n:'KING BIBI',e:'🎤',perk:'Filibuster aura: enemies near you keep stopping to listen.',req:[['Sit through 3 elections',()=>(X.terms||0)>=3],['Fetch the Podium Microphone from THE POLL TOWER',()=>X.fx.bibi===2]]},
+  bottie:{n:'LIL BOTTIE',e:'🤖',perk:'Clanker guns: fires twice as fast.',req:[['Beat lil Bottie',()=>BOT.state==='down'],['Fetch the Missing 1% from THE LOADING BARS',()=>X.fx.bottie===2]]},
+  louie:{n:'LOUIE',e:'🐕',perk:'Zoomies: much faster, jumps higher, orbs come to him.',req:[['Pet Louie',()=>!!X.louie],['Fetch the Legendary Ball from DOGHOUSE HEIGHTS',()=>X.fx.louie===2]]},
+  derek:{n:'DEREK',e:'🚐',perk:'...Bro: shrugs off one hit every 20 seconds.',req:[['Listen to Derek 4 times',()=>(X.dk||0)>=4],['Fetch the van door from THE DOOR STACK',()=>X.fx.derek===2]]},
+  will:{n:'WILL',e:'🧑‍💻',perk:'Hotfix: all brain cells restored every 45 seconds.',req:[['Light the Great Lantern',()=>!!X.lit],['Read 6 prompt fragments',()=>X.frag.length>=6]]}};
+const PCH={m:null,id:null,t:0,sh:0};
+function charUnlocked(id){return PLAYC[id].req.every(q=>q[1]());}
+function charModel(id){if(id==='kael'){const r=kaelRig();r.scale.setScalar(1.72);r.userData.kael=1;return r;}if(id==='louie'){const m=new THREE.Mesh(dogGeo,lam);m.scale.setScalar(2.8);return m;}
+  if(id==='bottie'){const m=new THREE.Mesh(clankGeo,lam);m.scale.setScalar(1.05);return m;}if(id==='david'&&npcs.david){const m=new THREE.Mesh(npcs.david.m.geometry,lam);m.scale.setScalar(2.3);return m;}
+  const o=Object.assign({},CAST[id]);delete o.sit;const m=new THREE.Mesh(personGeo(o),lam);m.scale.setScalar(2.3);return m;}
+const PCH_KEEP=new Set();
+function setChar(id){if(PCH.m){pGroup.remove(PCH.m);PCH.m=null;}X.char=id&&id!=='npc'?id:'';save();PCH.id=X.char||null;
+  if(PCH.id){PCH.m=charModel(PCH.id);pGroup.add(PCH.m);zoneCard('NOW PLAYING AS '+PLAYC[PCH.id].n,PLAYC[PCH.id].perk);SFX.relic();flash(.6,500);}else zoneCard('NOW PLAYING AS NPC','no lines · no backstory · pure aura');
+  charVis();heroCaption();if(MENU.open)menuRender();}
+{const hc=heroCaption;heroCaption=function(){if(!PCH.id)return hc();const t=textTex(PLAYC[PCH.id].n+' (played by NPC)',{size:30,color:'#b6ff00',stroke:'#12021f',pad:8});if(HERO.cap.material.map)HERO.cap.material.map.dispose();HERO.cap.material.map=t;HERO.cap.material.needsUpdate=true;HERO.cap.scale.set(.6*t.userData.aspect,.6,1);};}
+function charVis(){const keep=[PL.shadow,G.hat,HERO.cap,PU.wings,PU.boots,PCH.m];pGroup.children.forEach(c=>{if(keep.includes(c))return;if(PCH.m){if(c.visible){c.userData.hidByChar=1;c.visible=false;}}else if(c.userData.hidByChar){c.userData.hidByChar=0;c.visible=c.isSprite||c===PL.body||c===PL.l1||c===PL.l2||c===HERO.face||!HERO.muts.includes(c);}});}
+function charUpdate(dt,play){const id=PCH.id;
+  charVis();
+  if(PCH.m){if(PCH.m.userData.kael)kaelPose(PCH.m,S.t,false);const mv=Math.hypot(PL.vx||0,PL.vz||0)>1;PCH.m.position.y=mv&&PL.grounded?Math.abs(Math.sin(S.t*12))*.25:0;PCH.m.rotation.z=mv?Math.sin(S.t*12)*.06:0;}
+  if(!play)return;PCH.t-=dt;if(PCH.sh>0)PCH.sh-=dt;
+  if(id==='erin'||id==='will'){PCH.reg=(PCH.reg||0)+dt;const per=id==='erin'?30:45;if(PCH.reg>=per){PCH.reg=0;if(S.cells<S.max){S.cells=id==='will'?S.max:S.cells+1;floatText(id==='will'?'HOTFIX DEPLOYED':'🌱 +1 brain cell',PL.x,PL.y+4,PL.z,'#b6ff00');}}}
+  if(id==='bibi'&&PCH.t<=0){PCH.t=6;let n=0;enemies.forEach(e=>{if(Math.hypot(e.x-PL.x,e.z-PL.z)<9){e.stun=2;n++;}});if(n)bubble(pick(['NEXT QUESTION.','I WILL BE BRIEF.','THE COALITION HOLDS.']),PL.x,PL.y+5,PL.z);}
+  if(id==='louie')orbs.forEach((o,i)=>{if(!o.taken&&o.fy===undefined&&Math.hypot(o.x-PL.x,o.z-PL.z)<8)takeOrb(i);});
+  if(id==='david'&&S.slowCd>0)S.slowCd-=dt;
+  PCH.ck=(PCH.ck||0)-dt;if(PCH.ck<=0){PCH.ck=2;for(const k in PLAYC)if(!X.cu.includes(k)&&charUnlocked(k)){X.cu.push(k);save();chapter('NEW PLAYABLE CHARACTER',PLAYC[k].e+' '+PLAYC[k].n+' · ☰ menu → CAST → PLAY AS');break;}}}
+{const fr=FRM;FRM=function(){const f=fr();if(PCH.id==='louie')return Object.assign({},f,{sp:f.sp*1.35,jump:f.jump*1.15});return f;};}
+{const fi=fire;fire=function(){fi.apply(this,arguments);if(PCH.id==='marcus')PL.cd*=.66;else if(PCH.id==='bottie')PL.cd*=.5;};}
+{const aa=addAura;addAura=function(n,x,y,z){aa(PCH.id==='david'&&n>0?Math.round(n*1.25):n,x,y,z);};}
+{const bp=bstPer;bstPer=function(){return bp()+(PCH.id==='kael'?1:0);};}
+{const h=hurt;hurt=function(a,b){if(PCH.id==='derek'&&PCH.sh<=0&&S.mode==='play'){PCH.sh=20;floatText('...Bro.',PL.x,PL.y+4,PL.z,'#ffd400');return;}return h.apply(this,arguments);};}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);charUpdate(dt,play);};}
+{const ar=act7Reset;act7Reset=function(){ar();PCH.id=null;if(PCH.m){pGroup.remove(PCH.m);PCH.m=null;}setTimeout(()=>{if(X.char)setChar(X.char);},50);};}
+{const mr=menuRender;menuRender=function(){mr();if(MENU.tab!=='who')return;const B=$('mbody'),esc=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  let h='<h4>PLAY AS · finish what they asked for and you can be them</h4><div class="cast"><div class="ent"><span>🧍</span><b>NPC</b>no lines, no backstory, pure aura.<br><button class="pa" data-c="npc">'+(PCH.id?'▶ PLAY AS NPC':'✔ PLAYING')+'</button></div>';
+  for(const id in PLAYC){const c=PLAYC[id],u=charUnlocked(id);h+='<div class="ent'+(u?'':' lock')+'"><span>'+(u?c.e:'🔒')+'</span><b>'+esc(c.n)+'</b>'+(u?esc(c.perk)+'<br><button class="pa" data-c="'+id+'">'+(PCH.id===id?'✔ PLAYING':'▶ PLAY AS')+'</button>':c.req.map(q=>(q[1]()?'✔ ':'◻ ')+esc(q[0])).join('<br>'))+'</div>';}
+  B.insertAdjacentHTML('afterbegin',h+'</div>');B.querySelectorAll('button.pa').forEach(btn=>btn.addEventListener('click',()=>setChar(btn.dataset.c)));};}
+(function(){const st=document.createElement('style');st.textContent='#mbody button.pa{margin-top:6px;font-family:var(--display);font-size:15px;letter-spacing:.04em;padding:4px 12px;border:3px solid var(--ink);border-radius:999px;background:var(--lime);color:var(--ink);cursor:pointer}';document.head.appendChild(st);})();
+CX.push(['w_play','WORLD','Playing As The Cast','Finish what a character asked for, and fetch the thing from their tower, and you can play as them: ☰ menu, CAST, PLAY AS. Each has a perk. NPC is always available, because nobody asked NPC for anything.',()=>X.cu.length>0]);
+ACH.push(['char','Method Actor','played as someone other than NPC',()=>!!X.char],['chars','Whole Cast','unlocked every playable character',()=>X.cu.length>=Object.keys(PLAYC).length]);
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
@@ -3448,7 +3536,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,LAB,enterLab,labFree,PLAYC,PCH,setChar,charUnlocked,GI,NLS,giChant,nlsGift,bobEpisode,bobAuditYou,EPS,PU,PUS,puUse,puFire,SF,sfLoosh,prophecy,DTH,takeLoan,repayLoan,respawn,PS,MZ,WR,NL,PIT,DC,KAEL,AUTOCOL,MENU,enterPk,exitPk,psThrow,setFollower,menuOpen,menuClose,boutStart,cxCount,cxList,warpTo,colliders,FOL,petLouie,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
