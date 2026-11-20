@@ -3,8 +3,8 @@ import { chromium } from 'playwright';
 const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message)); const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-const pick = +(process.env.PICK || 0), shot = n => page.screenshot({ path: '' + new URL('./shots/', import.meta.url).pathname + 'circ' + pick + '-' + n + '.png' });
-await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(4500);
+const pick = +(process.env.PICK || 0), shot = n => page.screenshot({ path: '/home/claude/shots/v66/circ' + pick + '-' + n + '.png' });
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(4500);
 await ev(() => { BTS.UI.clear(); window.__done = 0; window.__modes = []; Mission.start('lamp', () => { window.__done = 1; BTS.Game.toTitle(); }); }); await wait(8000); for (let i = 0; i < 6; i++) { await page.keyboard.press('KeyE'); await wait(400); }
 await ev(() => { for (const k of ['stores', 'ridge', 'tent']) BTS.G.flags['m_l_' + k] = 1; Mission.def.use({ id: 'fire2' }); }); await wait(1500);
 console.log('walk', await ev(() => [BTS.Brawl.active, BTS.Brawl.phase, BTS.Brawl.def.title]));

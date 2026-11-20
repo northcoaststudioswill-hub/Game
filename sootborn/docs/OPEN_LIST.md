@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.80 (2026-11-20).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.81 (2026-11-20).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -20,6 +20,9 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **Weight:** no keeping a man in the air from the ground; air combos need the boots and run out. Say if the fights now feel too stiff, or the heavy launch too low.
 - **Deaths:** knees and over, or onto the back; nobody spins.
 - **The hook shot in the arena fights:** a real line; pulls an ordinary man to you, takes you to a heavy one.
+
+## Built in v0.81
+- Three Codex finds on the High Docks. **The level itself was not rebuilt:** to do that properly I need the reference you had in mind (a picture, a game, a description of the dock you want) and your eye on the result. Send it and I will.
 
 ## Built in v0.80 (needs your eye)
 - The Scuffle's own ground. A drawn picture when you lose a fight below.

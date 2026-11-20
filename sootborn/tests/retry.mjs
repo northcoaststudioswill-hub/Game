@@ -1,10 +1,9 @@
 import { chromium } from 'playwright';
-import { mkdirSync } from 'fs'; mkdirSync('shots', { recursive: true });
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href + ''); await wait(600); await page.keyboard.press('Enter');
+await page.goto('file:///home/claude/below-the-sun/dist/index.html'); await wait(600); await page.keyboard.press('Enter');
 for (let i = 0; i < 100 && !(await ev(() => BTS.G.mode === 'opening')); i++) await wait(100);
 await wait(1500); await page.keyboard.press('Space'); await wait(2500);
 const click = l => ev(l => { [...document.querySelectorAll('.mi')].reverse().find(b => b.textContent.includes(l)).click(); }, l);
@@ -15,7 +14,7 @@ const untilFight = async () => { for (let i = 0; i < 80 && (await ev(() => BTS.B
 await untilFight(); console.log('start', JSON.stringify(await st()));
 const kill = () => ev(() => { const B = BTS.Brawl; B.p.inv = 0; B.p.st = 'idle'; B.hurtPlayer(B.foes[0], 99, 1, 0); });
 await kill(); await wait(300); console.log('first death', JSON.stringify(await st()));
-await wait(1800); await kill(); await wait(400); console.log('second death', JSON.stringify(await st())); await page.screenshot({ path: 'shots/retry.png' });
+await wait(1800); await kill(); await wait(400); console.log('second death', JSON.stringify(await st())); await page.screenshot({ path: '/home/claude/shots/ff/retry.png' });
 await wait(3200); await untilFight(); console.log('after restart', JSON.stringify(await st()));
 await ev(() => { const B = BTS.Brawl; B.hitFoe(B.foes[0], 999, 1, 0, true); }); await wait(3500);
 for (let i = 0; i < 40 && (await ev(() => BTS.Brawl.active)); i++) { await ev(() => BTS.Brawl.cine && BTS.Brawl.nextShot()); await wait(200); }

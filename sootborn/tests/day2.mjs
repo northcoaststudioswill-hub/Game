@@ -1,15 +1,14 @@
 import { chromium } from 'playwright';
-import { mkdirSync } from 'fs'; mkdirSync('shots', { recursive: true });
-const url = new URL('../index.html', import.meta.url).href + '#noff';
+const url = 'file:///home/claude/below-the-sun/dist/index.html#noff';
 const VP = process.env.PORTRAIT ? { width: 390, height: 844 } : { width: 844, height: 390 };
 const errors = [];
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined, args: ['--autoplay-policy=no-user-gesture-required'] });
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--autoplay-policy=no-user-gesture-required'] });
 const ctx = await browser.newContext({ viewport: VP, hasTouch: !!process.env.PORTRAIT });
 const page = await ctx.newPage();
 page.on('pageerror', e => errors.push('pageerror: ' + e.message + '\n' + (e.stack || '').split('\n').slice(0, 4).join('\n')));
 page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
 const tag = process.env.PORTRAIT ? 'p-' : '';
-const shot = n => page.screenshot({ path: `shots/d2-${tag}${n}.png` });
+const shot = n => page.screenshot({ path: `/home/claude/shots/d2-${tag}${n}.png` });
 const wait = ms => page.waitForTimeout(ms);
 const key = async (k, n = 1, gap = 120) => { for (let i = 0; i < n; i++) { await page.keyboard.press(k); await wait(gap); } };
 const ev = (f, a) => page.evaluate(f, a);

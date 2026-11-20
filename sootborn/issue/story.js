@@ -264,6 +264,11 @@
       if (!F.ledger) { U.toast('LOCKED. THE KEY WILL BE IN THE *DOCK OFFICE*.', 2.6); SC.audio.sfx('deny'); return; }
       W.openDoor('hatch'); SC.audio.sfx('door'); setFlag('hatch'); } });
     W.addInteract({ id: 'moor', x: MOOR.x, y: 11, z: MOOR.z, r: 2.4, label: 'CUT THE LINE', marker: 'act', mh: 2.4, when: () => F.boss && !F.cut, act: finale });
+    // three things off the path, for the Codex (v0.81). Nothing depends on them
+    { const find = (id, x, y, z, fx, fz, lines) => W.addInteract({ id, x, y, z, fx, fz, r: 1.5, label: 'LOOK', marker: 'clue', mh: 1.5, when: () => !F['find_' + id], act: () => { setFlag('find_' + id); SC.audio.sfx('clue'); SC.host('find', { id }); U.say(lines); } });
+      find('f_tally', -10.05, 0, 15.4, -10.05, 16.3, [{ who: 'cap', text: 'The tally booth. A stroke for every sled, in ink. And beside it a second column, in pencil, very faint.' }, { who: 'hero', text: "Sable's hand. What went *down* the stair, in the same crates. Nobody up here reads pencil." }]);
+      find('f_bench', -27, 0, 8.6, -27, 7, [{ who: 'cap', text: 'The watch shelter. Under the bench, where a man sits out a long watch, names cut with a seat knife.' }, { who: 'hero', face: 'hurt', text: 'Four of them. I know one. *BRAND.* And under it a tally of nights, and it stops.' }]);
+      find('f_signal', -13.5, 9, -41.9, -13.5, -43.6, [{ who: 'cap', text: 'A line locker on the signal roof, and in it the signal book. Two lamps: a House barge. One lamp: freight.' }, { who: 'hero', text: 'Nothing in it for a barge that does not answer. They have *never needed the page*.' }]); }
     // the watch is already on its posts, talking. It knows him when he walks up to it.
     { const POST = ['street', 'yard', 'wh', 'roof'], PRE = { street: () => F.e_alley, yard: () => F.gate, wh: () => F.breaker, roof: () => F.hatch && !F.bossIntro },
         TALK = ['SECOND BELL SOON.', 'ROOK SAYS HOLD.', 'ONE CLERK. ONE.', 'FORTY HALBERDS FOR A CLERK.', 'THE STAIR IS NOT OURS TO WATCH.', 'IT WAS QUIET AT THE FIRST BELL.', 'WHO CHALKED OVER THE ROTA?', 'CADE SIGNED FOR IT.', 'MIND THE EDGE.', 'LAMPS LIT. EYES OPEN.', 'HE KEPT THE COUNT, THEY SAY.', 'A CLERK DOES NOT FIGHT.'];

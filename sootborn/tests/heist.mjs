@@ -1,10 +1,9 @@
-import { mkdirSync } from 'fs'; mkdirSync('shots', { recursive: true });
 import { chromium } from 'playwright';
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
 await ev(() => { BTS.UI.clear(); BTS.Game.newGame(); BTS.Cutscene.skip(); }); await wait(1500);
 console.log('heist', await ev(() => [BTS.G.heist, BTS.G.mapId]));
 const held = new Set(); const hold = async (k, on) => { if (on && !held.has(k)) { held.add(k); await page.keyboard.down(k); } if (!on && held.has(k)) { held.delete(k); await page.keyboard.up(k); } };
@@ -25,4 +24,4 @@ console.log('relay cut', await ev(() => !!BTS.G.flags.relayCut), 'caught', await
 for (const [x, y] of [[19, 6], [11, 6], [10, 3], [10, 2]]) await goto(x, y, `-> ${x},${y}`);
 await page.keyboard.down('ArrowUp'); await wait(80); await page.keyboard.up('ArrowUp'); await page.keyboard.press('KeyE'); await wait(500);
 console.log('puzzle', await ev(() => BTS.Puzzle.active), 'total', ((Date.now() - T0) / 1000).toFixed(1) + 's', 'caught', await ev(() => BTS.G.flags.caught | 0), 'close', await ev(() => BTS.G.flags.closeCalls | 0), errors);
-await page.screenshot({ path: 'shots/heist-end.png' }); await browser.close();
+await page.screenshot({ path: '/home/claude/shots/heist-end.png' }); await browser.close();

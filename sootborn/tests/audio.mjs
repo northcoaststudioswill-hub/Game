@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
 const page = await browser.newPage(); const errors = []; page.on('pageerror', e => errors.push(e.message));
-await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await page.waitForTimeout(500);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await page.waitForTimeout(500);
 const res = await page.evaluate(async () => {
   const out = {}, S = Sound;
   const render = async (secs, fill) => { const c = new OfflineAudioContext(1, 44100 * secs, 44100), g = S.graph(c); g.mus.gain.value = .6 * 1.5; g.sfx.gain.value = .8 * 1.0;

@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
+const errors = []; page.on('pageerror', e => errors.push(e.message)); const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await ev(() => { const B = BTS.Brawl; BTS.UI.clear(); DEV.quick = 1; const d = BTS.FF.pairing(); delete d.arts; delete d.outro; B.start(d, () => {}); B.phase = 'fight'; B.tipT = 0; });
+await wait(1500); await ev(() => { const B = BTS.Brawl; B.p.inv = 0; B.p.hp = 1; B.hurt ? 0 : 0; });
+const fn = await ev(() => { const B = BTS.Brawl; const k = Object.getOwnPropertyNames(B).find(n => typeof B[n] === 'function' && /NOT TODAY/.test(String(B[n]))); B.p.inv = 0; B.p.hp = 1; try { B[k](B.foes[0], 5, 1, 0); } catch (e) { return k + ' ERR ' + e.message; } return [k, B.p.hp, !!B.art, B.revived]; });
+console.log(fn); await wait(900); await page.screenshot({ path: '/home/claude/shots/ff/rev-0.png' }); await wait(1800); await page.screenshot({ path: '/home/claude/shots/ff/rev-1.png' }); await wait(2500);
+console.log(await ev(() => [BTS.Brawl.phase, !!BTS.Brawl.art, BTS.Brawl.p.hp]), errors.slice(0, 3)); await browser.close();

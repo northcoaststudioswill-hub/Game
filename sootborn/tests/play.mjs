@@ -1,13 +1,12 @@
-import { mkdirSync } from 'fs'; mkdirSync('shots', { recursive: true });
 import { chromium } from 'playwright';
-const url = new URL('../index.html', import.meta.url).href + '#noff';
+const url = 'file:///home/claude/below-the-sun/dist/index.html#noff';
 const errors = [];
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined, args: ['--autoplay-policy=no-user-gesture-required'] });
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--autoplay-policy=no-user-gesture-required'] });
 const ctx = await browser.newContext({ viewport: { width: 844, height: 390 }, hasTouch: false });
 const page = await ctx.newPage();
 page.on('pageerror', e => errors.push('pageerror: ' + e.message));
 page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
-const shot = n => page.screenshot({ path: `shots/${n}.png` });
+const shot = n => page.screenshot({ path: `/home/claude/shots/${n}.png` });
 const wait = ms => page.waitForTimeout(ms);
 const key = async (k, n = 1, gap = 120) => { for (let i = 0; i < n; i++) { await page.keyboard.press(k); await wait(gap); } };
 const ev = (f, a) => page.evaluate(f, a);

@@ -1,0 +1,6 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const p = await (await b.newContext({ viewport: { width: 844, height: 390 } })).newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+await p.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await p.waitForTimeout(600); await p.keyboard.press('Enter'); await p.waitForTimeout(5000);
+for (const k of process.env.K.split(',')) { await p.evaluate(k => { const B = BTS.Brawl; BTS.UI.clear(); DEV.quick = 0; const d = BTS.FF[k](); delete d.arts; B.start(d, () => {}); }, k); for (const i of [1, 3]) { await p.evaluate(i => { const B = BTS.Brawl; while (B.cine && B.cine.i < i) B.nextShot(); }, i); await p.waitForTimeout(900); await p.screenshot({ path: `/home/claude/shots/ff/film-${k}-${i}.png` }); }
+  await p.evaluate(() => { const B = BTS.Brawl; let n = 0; while (B.cine && n++ < 40) B.nextShot(); }); await p.waitForTimeout(2500); await p.screenshot({ path: `/home/claude/shots/ff/film-${k}-f.png` }); }
+console.log('errors', errs); await b.close();

@@ -4,7 +4,7 @@ import { chromium } from 'playwright';
 const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message)); const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto((process.env.URL || new URL('../index.html', import.meta.url).href + '') + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(4500);
+await page.goto((process.env.URL || 'file:///home/claude/below-the-sun/dist/index.html') + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(4500);
 for (const m of (process.env.M || 'drill,ford,keep').split(',')) {
   await ev(m => { BTS.UI.clear(); DEV.quick = 1; const d = BTS.FF[m](); delete d.arts; delete d.voice; delete d.endAt; delete d.intro; d.foes = [{ id: 'cadt1', name: 'x', kind: 'cadet', hp: 99999 }]; delete d.waves; BTS.Brawl.start(d, () => {}); }, m); await wait(2400);
   const r = await ev(boots => { const B = BTS.Brawl, f = B.foes[0], p = B.p, u = B.update.bind(B); BTS.UI.clear(); B.update = () => {}; B.phase = 'fight'; p.fury = 0; f.cd = 1e9; f.x = 20; f.y = 0; p.x = 0; p.y = 0;

@@ -1,4 +1,18 @@
-# SOOTBORN — changelog (latest v0.80 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.81 · 2026-11-20)
+
+## v0.81 · 2026-11-20 — the High Docks: three things to find for the Codex
+A small part of Step 12. **The High Docks was not rebuilt.** I looked at it first: it was already rebuilt once (every surface, v0.5x), and "from reference" needs a reference I do not have and eyes I cannot use on a whole level. So this adds the one thing on that line that could be done and checked: hidden things for the Codex.
+
+- **Three finds on the High Docks, off the path, that go into the main Codex:**
+  - **The pencil column** (the tally booth on the quay): ink for every sled, and beside it, in Sable's hand, what went back down the stair.
+  - **Names under a bench** (the watch shelter): four names cut with a seat knife; one is BRAND.
+  - **The signal book** (a line locker on the signal roof): no page for a barge that does not answer.
+- **A comic-book level can now add to the Codex** (it could not before; its finds stayed inside the level).
+
+**Checked:** a bot walked with the stick from the dock stair to the booth and the shelter, pressed interact at each, and both were in the Codex afterwards. The whole-story bot (see below).
+
+**Not checked:** nothing by hand. The third find, on the signal roof, was placed by the roof's numbers and not walked to. Not done from the High Docks line: side corridors that go nowhere, more height for the boots, a new look.
+
 
 ## v0.80 · 2026-11-20 — the Scuffle's own ground; a picture for losing below
 One thing each from Step 12 (places) and Step 14 (films).

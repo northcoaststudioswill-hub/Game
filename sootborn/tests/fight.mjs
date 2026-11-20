@@ -1,9 +1,9 @@
 import { chromium } from 'playwright';
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
 await ev(() => { const s = { v: 2, t: 1, name: 'Kael', look: 0, tendency: 'caretaker', day: 2, map: 'square', x: 300, y: 130, dir: 0, flags: { day1Done: 1, d2Tavi: 1 }, trust: {}, scrip: 0, journal: [], log: [], play: 0, talkCount: {} }; BTS.UI.clear(); BTS.Game.loadSave(s); });
 await wait(800);
 const DEFS = { ivo: [{ id: 'ivo', name: 'Ivo', kind: 'jab', hp: 9 }], garran: [{ id: 'garran', name: 'Garran', kind: 'heavy', hp: 16 }, { id: 'pike', name: 'Pike', kind: 'quick', hp: 8 }], sull: [{ id: 'proctor', name: 'Sull', kind: 'baton', hp: 22 }], mara: [{ id: 'mara', name: 'Mara', kind: 'boss', hp: 39 }] };

@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+const page = await (await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true })).newPage();
+const errors = []; page.on('pageerror', e => errors.push(e.message));
+const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await ev(() => { BTS.UI.clear(); BTS.Game.newGame(); }); await wait(4000); await page.keyboard.press('Enter'); await wait(3500); await page.keyboard.press('Enter'); await wait(1500);
+await page.screenshot({ path: '/home/claude/shots/pp-world.png' });
+await ev(() => BTS.Cutscene.skip()); await wait(2500); await page.screenshot({ path: '/home/claude/shots/pp-heist.png' });
+console.log(errors); await browser.close();

@@ -1,20 +1,19 @@
 import { chromium } from 'playwright';
-import { mkdirSync } from 'fs'; mkdirSync('shots', { recursive: true });
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
 const start = k => ev(k => { const B = BTS.Brawl; BTS.UI.clear(); DEV.quick = 1; const d = BTS.FF[k](); delete d.arts; delete d.voice; delete d.outro; B.start(d, () => {}); B.phase = 'fight'; B.tipT = 0; }, k);
 const shots = [];
 const force = async (mode, tag, dodge) => { await ev(mode => { const B = BTS.Brawl, f = B.foes[0], p = B.p; p.inv = 0; p.st = 'idle'; p.z = 0; f.st = 'wind'; f.t = 0; f.mode = mode; f.second = false; f.sx = p.x; f.sy = p.y; const d = Math.hypot(p.x - f.x, p.y - f.y) || 1; f.ax = (p.x - f.x) / d; f.ay = (p.y - f.y) / d; f.z = 0; if (!B.token.includes(f)) B.token.push(f); }, mode);
   const hp0 = await ev(() => BTS.Brawl.p.hp); await wait(520); if (dodge === 'jump') await ev(() => BTS.Brawl.jump()); if (dodge === 'move') await ev(() => { BTS.Brawl.p.x -= 60; });
-  const p = `shots/boss-${tag}.png`; await page.screenshot({ path: p }); shots.push(p); await wait(700); console.log(tag, 'hp', hp0, '->', await ev(() => BTS.Brawl.p.hp), await ev(() => BTS.Brawl.foes[0].st)); };
+  const p = `/home/claude/shots/ff/boss-${tag}.png`; await page.screenshot({ path: p }); shots.push(p); await wait(700); console.log(tag, 'hp', hp0, '->', await ev(() => BTS.Brawl.p.hp), await ev(() => BTS.Brawl.foes[0].st)); };
 await start('ember'); await wait(1200);
 await force('line', 'line-hit'); await force('line', 'line-jump', 'jump'); await force('slam', 'slam-hit'); await force('slam', 'slam-move', 'move');
 // the count: eleven quick hits
 await ev(() => { const B = BTS.Brawl, f = B.foes[0]; f.st = 'approach'; f.cd = 99; for (let i = 0; i < 11; i++) { B.hitFoe(f, 1, 1, 0, false); } }); console.log('count', await ev(() => [BTS.Brawl.msg, BTS.Brawl.foes[0].cnt]));
 await ev(() => { const B = BTS.Brawl; B.p.hp = 3; B.p.rcd = 0; B.p.fury = 0; B.roar(); }); console.log('song', await ev(() => [BTS.Brawl.msg, BTS.Brawl.p.hp]));
-await start('stand'); await wait(1500); const p2 = 'shots/boss-mara.png'; await page.keyboard.press('KeyE'); await wait(150); await page.screenshot({ path: p2 }); shots.push(p2);
+await start('stand'); await wait(1500); const p2 = '/home/claude/shots/ff/boss-mara.png'; await page.keyboard.press('KeyE'); await wait(150); await page.screenshot({ path: p2 }); shots.push(p2);
 console.log('mara', await ev(() => [BTS.Brawl.def.title, BTS.Brawl.p.hp, BTS.Brawl.foes.map(f => f.max), !!BTS.Brawl.g3]), 'errors', errors);
 await browser.close();

@@ -1,11 +1,11 @@
 // live cam: play a fight (or a scripted moment) and lay the frames out on one sheet
 import { chromium } from 'playwright'; import { execSync } from 'child_process';
 const F = process.env.F || 'ford', S = process.env.S || 'bot', N = +(process.env.N || 12), GAP = +(process.env.GAP || 260), PORT = process.env.PORT;
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
 const page = await (await browser.newContext({ viewport: PORT ? { width: 390, height: 844 } : { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href + '#noff' + (process.env.HASH || '')); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff' + (process.env.HASH || '')); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
 await ev(f => { const B = BTS.Brawl; BTS.UI.clear(); DEV.quick = 1; B.start(BTS.FF[f](), () => {}); B.cine = null; B.phase = 'fight'; B.tipT = 0; DEV.quick = 0; }, F);
 await wait(1200); let n = 0; const R = await ev(() => { const r = document.querySelector('#game').getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; }); const shot = async () => { await page.screenshot({ clip: R, path: `/tmp/cam/${F}-${S}-${String(n++).padStart(2, '0')}.png` }); };
 execSync('mkdir -p /tmp/cam && rm -f /tmp/cam/' + F + '-' + S + '-*.png');
@@ -28,5 +28,5 @@ fs=sorted(glob.glob('/tmp/cam/${F}-${S}-*.png')); port=${PORT ? 1 : 0}
 cols=6 if port else 3; im0=Image.open(fs[0]); tw=280 if port else 562; th=int(tw*im0.height/im0.width)
 rows=(len(fs)+cols-1)//cols; sh=Image.new('RGB',(cols*tw,rows*th))
 for i,f in enumerate(fs): sh.paste(Image.open(f).convert('RGB').resize((tw,th)),((i%cols)*tw,(i//cols)*th))
-sh.save('shots/cam-${F}-${S}.png')
+sh.save('/home/claude/shots/ff/cam-${F}-${S}.png')
 PY`);

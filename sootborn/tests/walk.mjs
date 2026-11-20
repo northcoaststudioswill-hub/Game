@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message)); const wait = ms => page.waitForTimeout(ms);
-await page.goto(new URL('../index.html', import.meta.url).href + ''); await wait(600); await page.keyboard.press('Enter'); for (let i = 0; i < 100 && !(await page.evaluate(() => BTS.G.mode === 'opening')); i++) await wait(100);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html'); await wait(600); await page.keyboard.press('Enter'); for (let i = 0; i < 100 && !(await page.evaluate(() => BTS.G.mode === 'opening')); i++) await wait(100);
 await page.evaluate(() => { BTS.Brawl.tap = true; }); await wait(800);
 await page.evaluate(m => { window.__r = null; BTS.Brawl.start(BTS.FF[m](), w => { window.__r = 'ended:' + w; }); }, process.env.M || 'circle');
 await wait(1200); await page.screenshot({ path: '/home/claude/shots/issue/walk-0.png' });

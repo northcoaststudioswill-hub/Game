@@ -1,0 +1,4 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const p = await b.newPage();
+await p.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await p.waitForTimeout(600); await p.keyboard.press('Enter'); await p.waitForTimeout(5000);
+console.log(await p.evaluate(() => { const B = BTS.Brawl, o = []; for (const k of ['training', 'ember', 'keep', 'docks', 'son', 'valley', 'drill', 'brandstair', 'stand']) { BTS.UI.clear(); DEV.quick = 1; const d = BTS.FF[k](); B.start(d, () => {}); o.push(k + ':' + B.era + ':' + B.hookEra() + ':' + B.hooked() + ':' + (d.hero && d.hero.id)); } return o.join(' '); })); await b.close();

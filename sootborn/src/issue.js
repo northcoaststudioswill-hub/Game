@@ -34,6 +34,7 @@ const Issue = {
     this.onMsg = e => {
       const d = e.data; if (!d || typeof d.sootborn !== 'string' || !this.el || e.source !== this.el.contentWindow) return;
       if (d.sootborn === 'issue-ready') { this.ready = true; setTimeout(() => { if (this.el) this.el.style.opacity = 1; try { Cutscene.hideCard(); } catch (er) { /* gone */ } }, Math.max(0, 1500 - (performance.now() - this.t0))); try { this.el.contentWindow.postMessage({ sootborn: 'assets', panels: this.assets(), fps: Settings.d.fps ? 1 : 0 }, '*'); } catch (er) { /* it plays without them */ } }
+      if (d.sootborn === 'issue-find' && d.data && d.data.id) { try { Codex.add(d.data.id); } catch (er) { /* no codex */ } }
       if (d.sootborn === 'issue-done') this.finish(true, d.data);
     };
     window.addEventListener('message', this.onMsg);

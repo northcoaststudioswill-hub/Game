@@ -1,16 +1,17 @@
 import { chromium } from 'playwright';
 // VW/VH choose the window; TAG names the shots. Drives the level through SOOTBORN's own keys.
 const VW = +(process.env.VW || 844), VH = +(process.env.VH || 390), TAG = process.env.TAG || 'l';
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined, args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await (await browser.newContext({ viewport: { width: VW, height: VH }, hasTouch: VW < VH })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push('C:' + m.text().slice(0, 200)); });
-const wait = ms => page.waitForTimeout(ms), shot = n => page.screenshot({ path: `shots/int-${TAG}-${n}.png` });
-await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(5000);
+const wait = ms => page.waitForTimeout(ms), shot = n => page.screenshot({ path: `/home/claude/shots/issue/int-${TAG}-${n}.png` });
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(5000);
 await page.evaluate(() => { BTS.UI.clear(); window.LOG = []; BTS.Cutscene.play([{ issue: 'docks', or: [{ card: 'FALLBACK', sub: 'x' }] }, { card: 'AFTER THE DOCKS', sub: 'resumed', min: 0.5, max: 30 }], () => LOG.push('cutscene-end')); });
 await wait(4500);
 const fr = page.frames().find(f => f !== page.mainFrame());
 const fe = (f, a) => fr.evaluate(f, a);
 console.log('start', await page.evaluate(() => { const r = document.querySelector('iframe').getBoundingClientRect(), c = document.querySelector('#game').getBoundingClientRect(); return [Issue.on, Issue.ready, [r.x, r.y, r.width, r.height].map(Math.round), [c.x, c.y, c.width, c.height].map(Math.round), document.body.classList.contains('fight'), document.querySelector('#bL').textContent]; }));
+console.log('pad', await page.evaluate(() => { Settings.d.touch = 'on'; Layout.update(); return new Promise(r => setTimeout(() => { const v = id => { const e = document.querySelector(id), b = e.getBoundingClientRect(); return getComputedStyle(e).display + ' ' + Math.round(b.x) + ',' + Math.round(b.y); }; r([document.body.className, getComputedStyle(document.querySelector('#controls')).display, v('#dpad'), v('#bA'), v('#bL')]); }, 300)); }));
 console.log('child', await fe(() => [SC.hosted, SC.state, !!SC.ui.pg, Object.keys(SC.assets || {}).length, document.body.className, getComputedStyle(document.getElementById('touch')).display, getComputedStyle(document.getElementById('rotate')).display, !!SC.audio.ctx]));
 await shot('page');
 const key = async (k, n, ms) => { for (let i = 0; i < (n || 1); i++) { await page.keyboard.press(k); await wait(ms || 350); } };

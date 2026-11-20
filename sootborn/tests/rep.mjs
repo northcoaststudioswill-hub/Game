@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+const page = await (await browser.newContext({ viewport: { width: +(process.env.VW||390), height: 844 }, deviceScaleFactor: 1 })).newPage();
+const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push('C:' + m.text().slice(0, 120)); });
+await page.goto('file:///home/claude/report/index.html'); await page.waitForTimeout(1200);
+await page.evaluate(() => document.querySelectorAll('img').forEach(i => i.loading = 'eager')); await page.waitForTimeout(800);
+const info = await page.evaluate(() => ({ h: document.documentElement.scrollHeight, sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth, secs: [...document.querySelectorAll('section')].map(s => [s.querySelector('h2').textContent, Math.round(s.getBoundingClientRect().top + scrollY), Math.round(s.getBoundingClientRect().height)]), broken: [...document.images].filter(i => !i.naturalWidth).map(i => i.src), wide: [...document.querySelectorAll('main *')].filter(e => e.getBoundingClientRect().right > innerWidth + 1 && !e.closest('.scroll')).slice(0, 8).map(e => e.tagName + '.' + e.className + ':' + Math.round(e.getBoundingClientRect().right)) }));
+console.log(JSON.stringify(info));
+await page.screenshot({ path: '/home/claude/report/raw/page.png', fullPage: true });
+console.log('errors', errors); await browser.close();

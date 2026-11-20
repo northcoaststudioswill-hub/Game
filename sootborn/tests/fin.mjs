@@ -1,9 +1,9 @@
 import { chromium } from 'playwright';
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
 const go = (F, setup) => ev(([F, setup]) => { const B = BTS.Brawl; BTS.UI.clear(); DEV.quick = 1; B.start(BTS.FF[F](), () => {}); B.cine = null; B.phase = 'fight'; B.tipT = 0; const p = B.p, f = B.foes[0]; f.cd = 99; f.x = p.x + 36; f.y = p.y; f.st = 'approach'; if (setup === 'one') { f.broken = 5; p.fury = 100; } if (setup === 'three') { p.hp = 2; p.fury = 60; } if (setup === 'air') { p.fury = 100; p.z = 40; p.vz = 60; } if (setup === 'rush') p.fury = 100; return [B.era, B.band(), B.finKind(p.z > 0), f.hp]; }, [F, setup]);
 for (const [F, S] of [['ford', 'one'], ['proctor', 'three'], ['keep', 'air'], ['gallery', 'one'], ['fall', 'air'], ['pairing', 'rush'], ['under', 'one'], ['ember', 'rush']]) {
   const a = await go(F, S); await page.keyboard.down('KeyE'); let nm = null; for (let i = 0; i < 40 && !nm; i++) { await wait(150); nm = await ev(() => { const s = BTS.Brawl.sup; return s ? [s.kind, s.fn && s.fn.name] : null; }); } await page.keyboard.up('KeyE'); for (let i = 0; i < 80; i++) { await wait(200); if (!(await ev(() => !!BTS.Brawl.sup))) break; }

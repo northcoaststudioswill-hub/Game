@@ -1,10 +1,9 @@
 import { chromium } from 'playwright';
-import { mkdirSync } from 'fs'; mkdirSync('shots', { recursive: true });
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
 const page = await (await browser.newContext({ viewport: { width: 844, height: 390 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href + '#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
 await ev(() => { const s = { v: 2, t: 1, name: 'Kael', look: 0, tendency: 'caretaker', day: 2, map: 'apt', x: 88, y: 92, dir: 0, flags: { day1Done: 1, d2Tavi: 1, talkedTavi: 1, interacted: 1, puzzleDone: 1, proctorDone: 1, sull2Done: 1, fuseOrder: 1, journalHint: 1 }, trust: {}, scrip: 12, journal: [], log: [], play: 0, talkCount: {} }; BTS.UI.clear(); BTS.Game.loadSave(s); });
 await wait(600);
 const cdp = await page.context().newCDPSession(page); await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 });

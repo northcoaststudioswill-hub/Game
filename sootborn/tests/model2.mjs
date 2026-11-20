@@ -1,11 +1,11 @@
 // close-up pose sheet of the two fighters in a duel (F=fight, HASH=extra url flags)
 import { chromium } from 'playwright'; import { execSync } from 'child_process';
 const F = process.env.F || 'ford', HASH = process.env.HASH || '', OUT = process.env.OUT || 'model2';
-const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
 const page = await (await browser.newContext({ viewport: { width: 1280, height: 720 } })).newPage();
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
-await page.goto(new URL('../index.html', import.meta.url).href + '#noff' + HASH); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff' + HASH); await wait(600); await page.keyboard.press('Enter'); await wait(6500);
 await ev(f => { const B = BTS.Brawl; BTS.UI.clear(); DEV.quick = 1; B.start(BTS.FF[f](), () => {}); B.cine = null; B.phase = 'fight'; B.tipT = 0; B.def.arts = null; B.vq = []; B.voice = () => {}; B.quip = () => {}; B.camFollow = () => {}; B.separate = () => {};
   const p = B.p, f0 = B.foes[0]; window.__pose = (px, fxp, cam) => { p.x = -14; p.y = 0; f0.x = 16; f0.y = 0; f0.cd = 99; f0.st = 'approach'; f0.t = 0; f0.kx = f0.ky = 0; p.kx = p.ky = 0; p.fx = px[0]; p.fy = px[1]; f0.fx = fxp[0]; f0.fy = fxp[1]; p.hp = p.max; Object.assign(B.cam, cam); }; }, F);
 execSync('mkdir -p /tmp/m2 && rm -f /tmp/m2/*.png'); let n = 0;
@@ -28,5 +28,5 @@ from PIL import Image; import glob
 fs=sorted(glob.glob('/tmp/m2/*.png')); cols=3; im0=Image.open(fs[0]); tw=562; th=int(tw*im0.height/im0.width)
 rows=(len(fs)+cols-1)//cols; sh=Image.new('RGB',(cols*tw,rows*th))
 for i,f in enumerate(fs): sh.paste(Image.open(f).convert('RGB').resize((tw,th)),((i%cols)*tw,(i//cols)*th))
-sh.save('shots/${OUT}.png')
+sh.save('/home/claude/shots/ff/${OUT}.png')
 PY`);

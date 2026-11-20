@@ -1,0 +1,4 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' }); const p = await b.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+await p.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await p.waitForTimeout(800);
+console.log(await p.evaluate(() => { const out = []; for (const st of [0, 1]) for (const lf of [0, 1]) { BTS.G.flags.issue_stair = st; BTS.G.flags.lucanFriend = lf; for (let c = 1; c <= 5; c++) { const a = P2[c](); let bad = 0; const walk = l => l.forEach(s => { const w = s.say || s.s; if (w && !CAST[w]) { bad++; (window.BADS = window.BADS || new Set()).add(w); } if (s.choice) s.choice.forEach(o => walk(o.then || [])); }); walk(a); out.push(c + ':' + a.length + (bad ? '!' + bad : '')); } } return out.join(' ') + ' ' + [...(window.BADS||[])].join(','); }), errs); await b.close();
