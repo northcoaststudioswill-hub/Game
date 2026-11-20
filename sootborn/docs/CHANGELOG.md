@@ -15,7 +15,7 @@ Step 3 of the plan. Four things, all in Part One.
 - At the end of Part One the Keep is now fought the whole way through. Lucan cannot be put down by ordinary blows (he stops at a fifth of his health). When he is at half or less your fury fills and the game says HOLD STRIKE; **an ELEVEN begun then breaks his blade** and he goes to his knees. An ELEVEN used earlier only hurts him.
 - Two new pictures at the head of the film afterwards: the eleventh coming down on his blade, and Lucan on his knees with Celestine standing behind him. Then the three that were there (the circlet, the sun, the candle-hour).
 - Kael's lines in the fight now start with the cold open's line and then: IF I PUT HIM ON HIS KNEES IN FRONT OF HER, SHE WILL HAVE TO PIN THE GOLD ON ME HERSELF.
-- The banner reads ON HIS KNEES. He lives.
+- The fight stops the moment the blade breaks (THE BLADE BREAKS), with Kael standing over him. He lives.
 
 **The white cloak (plan 8d)**
 - From day thirty-one Kael wears Voss's white cloak in place of House Violet's: the last two pictures after the Proctor, the Valley (day forty), the Last Night (his walking figure), the Keep (the cold open too, since it is the same morning) and the Pinning.
