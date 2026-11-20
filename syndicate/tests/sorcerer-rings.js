@@ -1,0 +1,13 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [];
+  const p = await b.newPage({ viewport: { width: 1500, height: 360 } }); p.on('pageerror', e => errs.push(e.message + (e.stack || '').split('\n')[1]));
+  await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(700); await p.evaluate(() => { G.bootSkip(); G.bootSkip(); }); await p.waitForTimeout(400);
+  await p.evaluate(() => { document.getElementById('ui').style.display = 'none'; const a = G.world.get('arena'); G.gfx.setScene(a.scene); G.titleChars && G.titleChars.forEach(c => c.root.visible = false);
+    window.ROW = [null, 'cinder', 'glass', 'storm', 'pale', 'wyrm'].map((r, i) => { const c = G.makeChar({ cls: 'sorcerer', race: ['human', 'elf', 'tiefling', 'drow', 'halforc', 'dwarf'][i], ring: r }); c.root.position.set(-6.2 + i * 2.5, 0, 0); c.root.rotation.y = 0.5; a.scene.add(c.root); return c; });
+    for (let rep = 0; rep < 80; rep++) ROW.forEach((c, i) => c.pose({ t: 1 + rep * 0.016, act: i === 3 ? 'swing' : 'idle', prog: 0.5, moving: i % 2 === 1, walk: rep * 0.15, ready: 1 })); G.gfx.cine = { pos: [0, 5.5, 8], look: [0, 0.3, 0], fov: 40, roll: 0 }; G.gfx.render(); });
+  await p.waitForTimeout(80); await p.screenshot({ path: 'rings.png' });
+  // a real bout and the sheet, at level 10
+  await p.evaluate(() => { document.getElementById('ui').style.display = ''; (window.ROW || []).forEach(c => c.root.parent && c.root.parent.remove(c.root)); });
+  await p.click('#bNew'); await p.click('.c-skip'); await p.click('[data-cls=sorcerer]'); await p.click('#go'); await p.click('#ok'); await p.waitForTimeout(150);
+  console.log(await p.evaluate(() => { const st = G.state, h = st.hero; h.level = 10; st.toured = 1; st.tourAsked = 1; st.kitPicked = 1; st.shownPlaces = { a: 1 }; G.ui.close(); if (G.talk) G.talkApi.skip(); G.ui.close(); G.ui.sheet(); const row = [...document.querySelectorAll('#panel [data-ring]')].map(b => b.textContent).join('|'); document.querySelector('[data-ring=storm]').click(); const after = h.ring; G.ui.close(); G.ui.pit(); document.querySelector('[data-under]').click(); for (let i = 0; i < 6 && G.ui.isOpen(); i++) { const q = document.querySelector('#panel #go, #panel .big'); q && q.click(); } G.debugAuto = true; for (let i = 0; i < 300; i++) G.fight.update(1 / 60); return 'sheet rings: ' + row + ' | chose ' + after + ' | in bout ring: ' + !!G.fight.P.vis.c.ring; }));
+  console.log('ERRORS', errs.length, errs.slice(0, 3).join(' || ')); await b.close(); })();

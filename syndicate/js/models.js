@@ -27,6 +27,20 @@
           g.remove(c); if (ge !== c.geometry) ge.dispose(); });
         const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.BufferAttribute(pos, 3)); geo.setAttribute('normal', new T.BufferAttribute(nor, 3)); const mm = new T.Mesh(geo, list[0].material); mm.castShadow = shadow; mm.receiveShadow = list[0].receiveShadow; g.add(mm); }); });
   }
+  // sorcerers' rings: drawn once per design, laid on the sand under the hover
+  const RINGTEX = {};
+  const ringTex = (id) => { if (RINGTEX[id]) return RINGTEX[id]; const R = (G.RINGS || {})[id]; if (!R) return null; const c = document.createElement('canvas'); c.width = c.height = 256; const x = c.getContext('2d'), C = 128; x.translate(C, C); x.lineCap = 'round';
+    const circ = (r, w, col, a) => { x.globalAlpha = a == null ? 1 : a; x.strokeStyle = col; x.lineWidth = w; x.beginPath(); x.arc(0, 0, r, 0, 6.2832); x.stroke(); x.globalAlpha = 1; };
+    const poly = (n, r, col, w, rot, skip) => { x.strokeStyle = col; x.lineWidth = w; x.beginPath(); for (let i = 0; i <= n; i++) { const a = rot + (i * (skip || 1)) * 6.2832 / n, px = Math.cos(a) * r, py = Math.sin(a) * r; i ? x.lineTo(px, py) : x.moveTo(px, py); } x.stroke(); };
+    const ticks = (n, r0, r1, col, w) => { x.strokeStyle = col; x.lineWidth = w; for (let i = 0; i < n; i++) { const a = i * 6.2832 / n; x.beginPath(); x.moveTo(Math.cos(a) * r0, Math.sin(a) * r0); x.lineTo(Math.cos(a) * r1, Math.sin(a) * r1); x.stroke(); } };
+    const dots = (n, r, rad, col) => { x.fillStyle = col; for (let i = 0; i < n; i++) { const a = i * 6.2832 / n; x.beginPath(); x.arc(Math.cos(a) * r, Math.sin(a) * r, rad, 0, 6.2832); x.fill(); } };
+    const [a, b2] = R.col; x.shadowColor = a; x.shadowBlur = 14; { const g = x.createRadialGradient(0, 0, 60, 0, 0, 124); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.75, a + '30'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.beginPath(); x.arc(0, 0, 124, 0, 6.2832); x.fill(); }
+    if (id === 'cinder') { circ(112, 6, a); ticks(16, 92, 104, b2, 4); dots(16, 82, 3, a); }
+    else if (id === 'glass') { circ(114, 4, a); circ(96, 3, b2, 0.8); for (let i = 0; i < 6; i++) { x.save(); x.rotate(i * 1.0472); x.fillStyle = a; x.beginPath(); x.moveTo(0, -112); x.lineTo(8, -96); x.lineTo(0, -80); x.lineTo(-8, -96); x.closePath(); x.fill(); x.restore(); } }
+    else if (id === 'storm') { circ(114, 5, a); poly(3, 104, b2, 4, -1.5708); poly(3, 104, a, 2, 1.5708); dots(6, 104, 6, b2); circ(30, 3, a); }
+    else if (id === 'wyrm') { circ(116, 6, a); circ(98, 2, b2); for (let i = 0; i < 8; i++) { x.save(); x.rotate(i * 0.7854); x.strokeStyle = b2; x.lineWidth = 4; x.beginPath(); x.moveTo(-14, -84); x.quadraticCurveTo(0, -60, 14, -84); x.stroke(); x.fillStyle = a; x.beginPath(); x.moveTo(0, -108); x.lineTo(5, -96); x.lineTo(-5, -96); x.fill(); x.restore(); } dots(8, 70, 4, a); }
+    else if (id === 'pale') { circ(118, 4, a); circ(104, 2, b2); circ(64, 3, a); poly(12, 100, b2, 2.5, 0, 5); poly(6, 64, a, 2, 0.5236); ticks(24, 108, 116, b2, 2); dots(12, 82, 3.5, a); }
+    const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; return (RINGTEX[id] = t); };
   G.makeChar = function (look) {
     const rcls = look.cls, cls = ({ druid: 'cleric', warlock: 'sorcerer' })[rcls] || rcls, race = G.RACES[look.race], g = look.gear || {};      // new callings wear an older one's frame
     const P = Object.assign({}, BASE[rcls]); if (look.race === 'drow') P.hair = 0xe8e8f0;
@@ -48,14 +62,14 @@
     const glows = [];
 
     // legs
-    const legL = new T.Group(), legR = new T.Group(); legL.position.set(0.17, 0.62, 0); legR.position.set(-0.17, 0.62, 0); body.add(legL, legR);
+    const pelvis = new T.Group(); body.add(pelvis); const legL = new T.Group(), legR = new T.Group(); legL.position.set(0.17, 0.62, 0); legR.position.set(-0.17, 0.62, 0); pelvis.add(legL, legR);
     const legMat = robed ? m.dark : m.legs;
     [legL, legR].forEach(l => { box(0.25, 0.32, 0.29, legMat, 0, -0.15, 0, l);                                  // thigh
       const sh = new T.Group(); sh.position.y = -0.3; l.add(sh); l.userData.shin = sh;                            // the knee
       mesh(new T.SphereGeometry(0.125, 6, 5), cls === 'fighter' ? m.armor2 : legMat, 0, 0, 0.03, sh);            // kneecap
       box(0.21, 0.24, 0.25, legMat, 0, -0.13, 0, sh);                                                           // shin
-      box(0.26, 0.1, 0.3, m.dark, 0, -0.2, 0.01, sh); box(0.27, 0.13, 0.4, m.dark, 0, -0.275, 0.06, sh);        // boot shaft and foot
-      box(0.25, 0.09, 0.12, m.armor2, 0, -0.27, 0.23, sh); box(0.29, 0.035, 0.43, m.dark, 0, -0.335, 0.055, sh); });   // toe cap, sole
+      box(0.26, 0.1, 0.3, m.dark, 0, -0.2, 0.01, sh); const an = new T.Group(); an.position.y = -0.24; sh.add(an); l.userData.ankle = an;        // boot shaft, then the ankle
+      box(0.27, 0.13, 0.4, m.dark, 0, -0.035, 0.06, an); box(0.25, 0.09, 0.12, m.armor2, 0, -0.03, 0.23, an); box(0.29, 0.035, 0.43, m.dark, 0, -0.095, 0.055, an); });   // foot, toe cap, sole   // toe cap, sole
     // torso
     const torso = new T.Group(); torso.position.y = 0.6; body.add(torso);
     box(w, 0.38, 0.44, m.armor, 0, 0.47, 0, torso); box(w * 0.84, 0.3, 0.38, m.armor, 0, 0.16, 0, torso);       // chest, then a waist
@@ -207,7 +221,7 @@
     C.sever = function (part) { const g = C.limbs[part]; if (!g || !g.parent || g.userData.gone) return null; g.userData.gone = 1; const st = new T.Mesh(new T.SphereGeometry(part === 'head' ? 0.15 : 0.11, 6, 5), new T.MeshLambertMaterial({ color: 0x7a0a0a, flatShading: true })); st.position.copy(g.position); st.scale.y = 0.55; g.parent.add(st); const bn = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 0.1, 5), new T.MeshLambertMaterial({ color: 0xe6dcc4 })); bn.position.copy(g.position); bn.position.y -= 0.04; g.parent.add(bn); return g; };
     // Joint targets are computed per state, then eased toward, so stances blend instead of snapping.
     let cur = {}, dtp = 1 / 60, lastPT = null, fresh = 0;
-    const CAP = { arx: 30, arz: 30, alx: 30, alz: 30, ll: 22, lr: 22, bx: 12, bz: 10, ty: 16, tz: 12, hx: 14, hz: 14, by: 4.5, bpz: 4.5, kl: 26, kr: 26, er: 30, el: 30, cape: 20 };
+    const CAP = { arx: 30, arz: 30, alx: 30, alz: 30, ll: 22, lr: 22, bx: 12, bz: 10, ty: 16, tz: 12, hx: 14, hz: 14, by: 4.5, bpz: 4.5, kl: 26, kr: 26, er: 30, el: 30, cape: 20, py: 30, wr: 26, wl: 26, nk: 18 };
     const J = (k, v, s) => { if (cur[k] == null) return (cur[k] = v); const a = 1 - Math.pow(1 - Math.min(0.999, s), dtp * 60), m = (CAP[k] || 30) * dtp; let d = (v - cur[k]) * a; if (d > m) d = m; else if (d < -m) d = -m; return (cur[k] += d); };
     const mix = G.lerp, eo = x => 1 - Math.pow(1 - x, 3), ei = x => x * x;
     const restL = cls === 'fighter' ? -0.9 : cls === 'rogue' || cls === 'sorcerer' ? -0.5 : 0.05;
@@ -222,7 +236,7 @@
       const q = { by: Math.sin(t * 2.4) * 0.015, bx: 0.06, bz: Math.sin(t * 1.2) * 0.02, bpz: 0, ll: 0.05, lr: -0.05, ty: Math.sin(t * 1.2) * 0.04, tz: 0, hx: 0, hz: 0,
         arx: -0.45 + Math.sin(t * 2.4) * 0.04, arz: 0, alx: restL + Math.sin(t * 2.4 + 1) * 0.03, alz: 0, cape: 0.16 + Math.sin(t * 2) * 0.04 };
       let snap = 0.28;
-      if (mv) { q.by = Math.abs(Math.cos(p.walk)) * 0.1 - 0.02; q.bx = 0.2; q.ll = sw * 0.85; q.lr = -sw * 0.85; q.ty = sw * 0.16; q.arx += -sw * 0.38; q.alx += sw * 0.38; q.cape = 0.52 + sw * 0.1; q.hx = -0.06; snap = 0.5;
+      if (mv) { const sd = Math.max(0.7, Math.min(1.35, p.stride || 1)); q.by = Math.abs(Math.cos(p.walk)) * 0.05 - 0.018; q.bx = 0.085; q.ll = sw * 0.8 * sd; q.lr = -sw * 0.8 * sd; q.ty = sw * 0.16; q.arx += -sw * 0.38; q.alx += sw * 0.38; q.cape = 0.52 + sw * 0.1; q.hx = -0.06; snap = 0.5;
         const mf = p.mf == null ? 1 : p.mf, ms = p.ms || 0;
         if (mf < -0.3) { const b = Math.min(1, -mf); q.bx = mix(0.2, -0.04, b); q.ll *= mix(1, 0.5, b); q.lr *= mix(1, 0.5, b); q.by = Math.abs(Math.cos(p.walk)) * 0.05 - 0.05; q.hx = 0.04; q.cape = 0.2; }       // giving ground: short steps, weight back
         if (Math.abs(ms) > 0.35) { const a = Math.min(1, Math.abs(ms)); q.bz += ms * 0.13; q.tz -= ms * 0.08; q.ll *= mix(1, 0.62, a); q.lr *= mix(1, 0.62, a); q.by -= 0.03 * a; q.bx = mix(q.bx, 0.12, a); }       // circling: a crouched side-step
@@ -352,18 +366,28 @@
       else if (p.hurt > 0) { const h = Math.min(1, p.hurt / 0.28), big = p.hbig ? 1.25 : 1, fb = p.hb ? -1 : 1;       // the body goes the way the blow sent it: back from a hit in front, pitched forward from one behind, and twisted off the side it landed on
         q.tz += side * 0.3 * h * big; q.hz = side * 0.28 * h * big; q.ty += -side * 0.32 * h * big; q.bx -= (fb > 0 ? 0.5 : 0.34) * h * big * fb; q.hx = -0.45 * h * fb; q.by -= 0.06 * h * big; q.bpz -= 0.12 * h * big * fb; q.ll += 0.25 * h * fb; q.lr -= 0.35 * h * fb; q.arx += 0.55 * h; q.alx += 0.65 * h; if (side > 0) q.arz -= 0.5 * h * big; else q.alz += 0.5 * h * big; snap = Math.max(snap, 0.7); }
       body.position.y = J('by', q.by, snap); body.position.z = J('bpz', q.bpz, snap); if (q.spin != null) spinNow = q.spin; else if (spinNow) { spinNow = Math.atan2(Math.sin(spinNow), Math.cos(spinNow)) * 0.55; if (Math.abs(spinNow) < 0.02) spinNow = 0; }
+      if (hover && act !== 'ko' && act !== 'kneel' && act !== 'sit' && !p.crawl) { q.bx = 0; q.bz = 0; q.bpz *= 0.4; q.tz *= 0.4; if (act === 'dodge') q.by = 0; }
       body.rotation.set(J('bx', q.bx, snap), spinNow, J('bz', q.bz, snap));
       if (robe && act !== 'kneel' && act !== 'sit' && act !== 'ko' && !p.crawl) { if (hover) { q.ll = 0.06 + q.ll * 0.08; q.lr = -0.06 + q.lr * 0.08; } else { const L = act === 'dodge' ? 0.34 : 0.26; q.ll = Math.max(-L, Math.min(L, q.ll * 0.55)); q.lr = Math.max(-L, Math.min(L, q.lr * 0.55)); } }       // a robe hides the stride, it does not let the shins through it
       legL.rotation.x = J('ll', q.ll, snap); legR.rotation.x = J('lr', q.lr, snap);
-      torso.rotation.set(0, J('ty', q.ty, snap), J('tz', q.tz, snap)); head.rotation.set(J('hx', q.hx, snap), -cur.ty * 0.6, J('hz', q.hz, snap));
+      pelvis.rotation.y = J('py', act === 'ko' || act === 'sit' ? 0 : Math.max(-0.7, Math.min(0.7, (q.ty || 0) * 0.55 - (mv ? sw * 0.13 : 0))), Math.max(snap, 0.45));
+      torso.rotation.set(0, J('ty', q.ty, snap), J('tz', q.tz, snap)); head.rotation.set(J('hx', q.hx, snap), J('nk', act === 'ko' || act === 'sit' || act === 'cheer' ? -cur.ty * 0.5 : -cur.ty * 0.92, 0.5), J('hz', q.hz, snap));
       armR.rotation.set(J('arx', q.arx, snap), 0, J('arz', q.arz, snap)); armL.rotation.set(J('alx', q.alx, snap), 0, J('alz', q.alz, snap));
+      { let wr = 0, wl = 0; const thr = p.mv === 'drive' || p.mv === 'riposte' || p.mv === 'backstab';       // wrists: cock before the blow, snap through it, tip the point up on guard
+        if (act === 'swing' && !thr && FAM !== 'orb') { const cw = Math.min(1, k / 0.5); wr = k < 0.5 ? (cw < 0.75 ? -0.55 * (cw / 0.75) : -0.55 + 0.9 * ((cw - 0.75) / 0.25)) : 0.35 * (1 - Math.min(1, (k - 0.5) / 0.5)); }
+        else if (p.guard && act !== 'ko' && act !== 'dodge') wr = FAM === 'fence' || FAM === 'pole' ? 0 : -0.3;
+        else if (act === 'idle' && mv) wr = sw * 0.22;
+        else if (act === 'cast') wr = -0.35 * Math.min(1, k * 2); else if (act === 'release') wr = 0.25 * (1 - k);
+        if (act === 'idle' && mv) wl = -sw * 0.2;
+        hR.rotation.x = J('wr', wr, 0.5); hL.rotation.x = J('wl', wl, 0.45); }
       if (cape) cape.rotation.x = J('cape', q.cape, 0.2);
       if (robe) robe.rotation.z = mv && !hover ? sw * 0.08 : 0;
-      root.rotation.z = 0; root.rotation.x = 0; { const flo = hover && act !== 'ko' && act !== 'kneel' && act !== 'sit' && !p.crawl; hovY += ((flo ? 0.16 + Math.sin(t * 2.1) * 0.035 : 0) - hovY) * Math.min(1, dtp * 6); root.position.y = (p.y || 0) + hovY; }
+      root.rotation.z = 0; root.rotation.x = 0; { const flo = hover && act !== 'ko' && act !== 'kneel' && act !== 'sit' && !p.crawl; hovY += ((flo ? 0.16 + Math.sin(t * 2.1) * 0.035 : 0) - hovY) * Math.min(1, dtp * 6); root.position.y = (p.y || 0) + hovY; if (C.ring) { C.ring.position.y = 0.08 - hovY; C.ring.visible = act !== 'ko'; C.ring.children.forEach(pl => { pl.rotation.z = t * 0.35 * pl.userData.dir; }); } }
       { const crouch = Math.max(0, Math.min(1, -cur.by * 3.2)), sitting = act === 'sit' || act === 'kneel';
         if (!sitting && act !== 'dodge') { legL.rotation.x -= crouch * 0.42; legR.rotation.x -= crouch * 0.42; }
         const knee = l => robe && !sitting && act !== 'ko' ? Math.max(0, Math.min(0.35, Math.abs(l) * 0.4 + crouch * 0.4)) : Math.max(0, Math.min(1.75, Math.max(0, l) * 0.95 + Math.max(0, -l) * 0.3 + Math.max(0, -l - 0.9) * 2.0 + (sitting ? 0 : crouch * 0.85)));
         legL.userData.shin.rotation.x = J('kl', knee(legL.rotation.x), 0.6); legR.userData.shin.rotation.x = J('kr', knee(legR.rotation.x), 0.6);
+        { const flat = act !== 'ko' && !p.crawl, bxa = body.rotation.x; [legL, legR].forEach(l => { const an = l.userData.ankle; if (!an) return; an.rotation.x = flat ? Math.max(-0.9, Math.min(0.75, -(bxa + l.rotation.x + l.userData.shin.rotation.x))) : 0; }); }
         let eR = 0.28, eL = 0.28;
         if (act === 'swing') { eR = k < 0.5 ? mix(1.0, 0.04, Math.pow(Math.min(1, k / 0.5), 3)) : mix(0.04, 0.45, (k - 0.5) / 0.5); eL = p.sty === 2 || p.sty === 3 || cls === 'rogue' ? eR : 0.7; }
         else if (act === 'cast') { eR = eL = 0.55 - k * 0.3; } else if (act === 'release') { eR = 0.1; eL = 0.5; }
@@ -388,6 +412,7 @@
       if (a !== lastAlpha) { lastAlpha = a; for (const mt of mats) { mt.transparent = a < 1; mt.opacity = a; mt.needsUpdate = true; } glows.forEach(gl => gl.visible = a > 0.5); root.traverse(o => { if (o.isMesh) o.castShadow = a > 0.5; }); }
     };
     if (robe) robe.userData.keep = 1;
+    let ringM = null; if (look.ring && rcls === 'sorcerer' && ringTex(look.ring)) { const R = G.RINGS[look.ring]; ringM = new T.Group(); [[2.5, 0], [1.75, 1]].slice(0, R.layers || 1).forEach(q => { const pl = new T.Mesh(new T.PlaneGeometry(q[0], q[0]), new T.MeshBasicMaterial({ map: ringTex(look.ring), transparent: true, depthWrite: false, opacity: q[1] ? 0.7 : 1 })); pl.rotation.x = -Math.PI / 2; pl.renderOrder = 6; pl.userData.keep = 1; pl.userData.dir = q[1] ? -1.6 : 1; ringM.add(pl); }); ringM.position.y = 0.08; root.add(ringM); C.ring = ringM; }
     if (!G.noSlim) slim(root);
     C.pose({ t: 0, act: 'idle' }); fresh = 1;
     return C;
