@@ -140,9 +140,15 @@
   };
 
   // ------------------------------------------------------------ settings + the objective line
+  // browsers disagree on whether a zoomed box's percentage sizes are zoomed too: measure once, and correct only where they are
+  let zoomPct = null;
+  const zoomCheck = () => { if (zoomPct != null) return zoomPct; try { const o = document.createElement('div'), i = document.createElement('div'); o.style.cssText = 'position:absolute;left:-9999px;top:0;width:200px;height:10px'; i.style.cssText = 'zoom:2;width:100%;height:5px'; o.appendChild(i); document.body.appendChild(o); zoomPct = i.getBoundingClientRect().width > 300; o.remove(); } catch (e) { zoomPct = false; } return zoomPct; };
+  const zp = () => { const p = document.getElementById('panel'); if (p) p.classList.toggle('uizfix', zoomCheck()); };
+  if (window.MutationObserver) document.addEventListener('DOMContentLoaded', () => { const p = document.getElementById('panel'); if (p) new MutationObserver(() => { if (!p.classList.contains('uizfix') && zoomCheck()) p.classList.add('uizfix'); }).observe(p, { attributes: true, attributeFilter: ['class'] }); });
   G.applyOpts = function () {
     const o = (G.state && G.state.opt) || {};
-    document.documentElement.style.setProperty('--tscale', o.text || 1); G.musicOff = !!o.noMusic; G.muted = !!o.noSfx; G.shakeMul = o.noShake ? 0 : 1;
+    if (o.text && o.text !== 1 && o.uiz == null) { o.uiz = o.text; o.text = 1; }
+    document.documentElement.style.setProperty('--tscale', o.text || 1); document.documentElement.style.setProperty('--uiz', o.uiz || 1); zp(); G.musicOff = !!o.noMusic; G.muted = !!o.noSfx; G.shakeMul = o.noShake ? 0 : 1;
   };
   ui.settings = function () {
     const st = G.state, o = st.opt || (st.opt = {});
@@ -150,11 +156,12 @@
     ui._show('<div class="card small"><h2>Settings</h2>' +
       tog('noSfx', 'Sound effects', !o.noSfx, 'Hits, spells, the crowd.') + tog('noMusic', 'Music', !o.noMusic, 'Generated music for each area.') +
       tog('gore', 'Blood', st.gore !== false, 'Blood, floor splats and what a mortal blow leaves behind.') + tog('noShake', 'Screen shake', !o.noShake, 'Camera kick on heavy hits.') +
-      '<div class="ab-row"><div class="ab-tx"><b>Text size</b><p>Scales every menu and label.</p></div><div class="slots">' + [['Small', 0.9], ['Normal', 1], ['Large', 1.15]].map(q => '<button class="slot' + ((o.text || 1) === q[1] ? ' sel' : '') + '" data-ts="' + q[1] + '">' + q[0] + '</button>').join('') + '</div></div>' +
+      '<div class="ab-row uiz-row"><div class="ab-tx"><b>Menu size</b><p>Pop-ups, cards and conversations only. The fight bars stay as they are.</p></div><div class="uiz"><button class="slot" id="uzm" aria-label="Smaller">−</button><input type="range" id="uiz" min="0.75" max="1.4" step="0.05" value="' + (o.uiz || 1) + '"><button class="slot" id="uzp" aria-label="Larger">+</button><b id="uzv">' + Math.round((o.uiz || 1) * 100) + '%</b></div></div>' +
       '<div class="row end"><button id="rst" class="danger">Erase save</button><button class="big" id="x">Done</button></div></div>');
     ui._on('#x', () => { ui.close(); ui.topbar(); });
     ui._on('[data-opt]', el => { const k = el.dataset.opt; if (k === 'gore') st.gore = st.gore === false; else o[k] = !o[k]; G.save(); G.applyOpts(); ui.settings(); });
-    ui._on('[data-ts]', el => { o.text = +el.dataset.ts; G.save(); G.applyOpts(); ui.settings(); });
+    { const r = document.getElementById('uiz'), v = document.getElementById('uzv'), set = (x, save) => { x = Math.max(0.75, Math.min(1.4, Math.round(x * 20) / 20)); o.uiz = x; r.value = x; v.textContent = Math.round(x * 100) + '%'; document.documentElement.style.setProperty('--uiz', x); if (save) G.save(); };
+      if (r) { r.oninput = () => set(+r.value, false); r.onchange = () => { set(+r.value, true); G.sfx('ui'); }; ui._on('#uzm', () => set((o.uiz || 1) - 0.05, true)); ui._on('#uzp', () => set((o.uiz || 1) + 0.05, true)); } }
     ui._on('#rst', () => { ui._show('<div class="card small"><h2>Erase everything?</h2><p>Your fighter, home, Tally and coin are deleted. This cannot be undone.</p><div class="row end"><button id="y" class="danger">Erase</button><button class="big" id="n">Keep playing</button></div></div>'); ui._on('#n', () => ui.settings()); ui._on('#y', () => { G.wipe(); location.reload(); }); });
   };
   // One line that always says what to do next.

@@ -17,7 +17,7 @@
       (h && !watching ? '<p class="dim">' + h.name + ' · level ' + h.level + ' ' + G.CLASSES[h.cls].name + ' · ' + G.RANKS[G.rankOf(st.respect)].name + '</p>' : '') +
       '<div class="choices">' +
       '<button class="big" id="rs"><b>Resume</b><small>Back to ' + (fight ? 'the bout' : 'where you were') + '.</small></button>' +
-      '<button id="pset"><b>Settings</b><small>Sound, music, blood, screen shake, text size, performance.</small></button>' +
+      '<button id="pset"><b>Settings</b><small>Sound, music, blood, screen shake, menu size, performance.</small></button>' +
       '<button id="pctl"><b>Controls</b><small>Keyboard, controller and touch.</small></button>' +
       (fight && !watching ? (G.garden && G.garden.run ? '<button id="ff" class="danger"><b>Give up (soul death)</b><small>There is no walking out of the garden. Giving up ends this fighter for good and erases the save.</small></button>' : '<button id="ff" class="danger"><b>Forfeit the bout</b><small>You walk out. It counts as a loss.</small></button>') : '') +
       (!fight ? '<button id="pquit"><b>Save and quit to title</b><small>Your progress is saved. Continue picks up here.</small></button>' : '') +

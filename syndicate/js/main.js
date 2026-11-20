@@ -19,15 +19,19 @@
     }
     G.titleChars.forEach(c => c.root.visible = true);
   };
-  G.enterCreate = function () { const h = W.get('hub'); gfx.setScene(h.scene); if (W.walker.char) W.walker.char.root.visible = false; };
+  G.enterCreate = function () { const a = W.get('arena'); gfx.setScene(a.scene); if (a.garden && a.inGarden && a.inGarden()) a.garden(false); if (a.cineWall) a.cineWall(false); if (a.setHype) a.setHype(0.35); if (G.titleChars) G.titleChars.forEach(c => c.root.visible = false); if (W.walker.char) W.walker.char.root.visible = false;
+    if (a.flash) { a.flash.color.set(0xffe2b0); a.flash.position.set(0, 3.2, 0.8); a.flash.intensity = 10; } };
+  let previewKey = '', showT = -9;
   G.setPreview = function (look) {
-    const h = W.get('hub');
-    if (preview) h.scene.remove(preview.root);
-    preview = G.makeChar(look); preview.root.position.set(21, 0, 15.5); h.scene.add(preview.root);
+    const a = W.get('arena'), key = JSON.stringify(look);
+    if (preview && key === previewKey && preview.root.parent === a.scene) return;
+    const showOff = !previewKey || JSON.parse(previewKey).cls !== look.cls || JSON.parse(previewKey).arm !== look.arm; previewKey = key;
+    if (preview && preview.root.parent) preview.root.parent.remove(preview.root);
+    preview = G.makeChar(look); preview.root.position.set(0, 0, 0); a.scene.add(preview.root); if (showOff) showT = T;
   };
   function leaveSpecial() {
     if (G.titleChars && G.scene !== 'title') G.titleChars.forEach(c => c.root.visible = false);
-    if (preview && G.scene !== 'create') { preview.root.parent && preview.root.parent.remove(preview.root); preview = null; }
+    if (preview && G.scene !== 'create') { preview.root.parent && preview.root.parent.remove(preview.root); preview = null; previewKey = ''; const a = W.cache.arena; if (a && a.flash) a.flash.intensity = 0; }
     if (W.walker.char) W.walker.char.root.visible = true;
   }
 
@@ -219,10 +223,11 @@
       cam.x = Math.sin(T * 0.12) * 1.2; cam.z = Math.cos(T * 0.1) * 1.2; cam.y = 0.9; cam.vh = port ? 23 : 16; cam.fx = 0.5; cam.fy = port ? 0.6 : 0.58; cam.shake = 0;
       if (G.titleChars) G.titleChars.forEach((c, i) => c.pose({ t: T + i * 1.3, act: 'idle' }));
     } else if (sc === 'create') {
-      cam.x = 21; cam.z = 15.5; cam.y = 1.0; cam.shake = 0;
-      if (port) { cam.vh = 9; cam.fx = 0.5; cam.fy = 0.2; } else { cam.vh = 5.2; cam.fx = 0.24; cam.fy = 0.52; }
-      if (preview) { preview.root.rotation.y = 0.75 + Math.sin(T * 0.7) * 0.7; preview.pose({ t: T, act: 'idle' }); }
-      W.get('hub').update(T, dt);
+      cam.x = 0; cam.z = 0; cam.y = 1.0; cam.shake = 0;
+      if (port) { cam.vh = 8; cam.fx = 0.5; cam.fy = 0.22; } else { cam.vh = 4.7; cam.fx = 0.3; cam.fy = 0.56; }
+      if (preview) { const sh = T - showT; if (sh >= 0 && sh < 1.1) { preview.root.rotation.y += (0.6 - preview.root.rotation.y) * Math.min(1, dt * 8); preview.pose({ t: T, act: 'swing', prog: Math.min(0.98, sh / 1.1), step: 0, ready: 1 }); if (sh < 0.05) G.sfx('swing'); }
+        else { preview.root.rotation.y = 0.6 + Math.sin(T * 0.5) * 0.55; preview.pose({ t: T, act: 'idle', ready: sh < 3 ? 1 : 0 }); } }
+      const ar = W.cache.arena; if (ar && ar.flash) ar.flash.intensity = 9 + Math.sin(T * 1.7) * 1.2;
     }
     if (gfx.scene() === (W.cache.arena && W.cache.arena.scene)) W.cache.arena.update(T);
     G.near = (sc === 'hub' || sc === 'hideout') && !G.ui.isOpen() && !G.placing && !G.talk ? near : null;

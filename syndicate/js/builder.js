@@ -46,7 +46,7 @@
       if (step === 'arm') h += '<p class="bnote">The Guild lends you one. After this, new steel is the Fence’s business.</p><div class="bgrid one">' + al.map(w => opt('arm', w.id, w.id === pick.arm, w.name, w.blurb || (A[w.id] || {}).desc || '')).join('') + '</div><input id="nm" maxlength="16" placeholder="Name your fighter" value="' + esc(pick.name) + '">';
       h += '<div class="bsum"><div class="stats mini">' + G.STATS.map(s => '<div class="stat' + (s === C.primary ? ' prim' : '') + '"><small>' + s.toUpperCase() + '</small><b>' + stats[s] + '</b></div>').join('') + '</div><p>' + [R.name + ' ' + C.name, BG[pick.bg][0], PERS[pick.pers][0], pick.arm && G.ARM_BY[pick.arm] ? G.ARM_BY[pick.arm].name : ''].filter(Boolean).join(' · ') + '</p></div>';
       h += '<div class="row end">' + (pick.step > 0 ? '<button id="bk">Back</button>' : '') + (last ? '' : '<button id="go" class="quiet">Skip and enter</button><button class="big" id="nx">Next: ' + STEPS[pick.step + 1][1] + '</button>') + (last ? '<button class="big" id="go">Enter the Undercity</button>' : '') + '</div></div>';
-      show(h, 'right'); G.setPreview({ cls: pick.cls, race: pick.race });
+      show(h, 'right'); G.setPreview({ cls: pick.cls, race: pick.race, arm: pick.arm || G.CLASSES[pick.cls].basic, gear: { weapon: 0, armor: 0 } });
       document.querySelectorAll('#panel .cp').forEach(el => el.appendChild(G.portrait({ cls: el.dataset.p, race: pick.race }, 54)));
       const nm = document.querySelector('#panel #nm'); if (nm) nm.oninput = () => pick.name = nm.value;
       on('[data-step]', el => { pick.step = +el.dataset.step; render(); }); on('#bk', () => { pick.step--; render(); }); on('#nx', () => { pick.step++; G.sfx('ui'); render(); });

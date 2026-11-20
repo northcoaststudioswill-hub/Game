@@ -741,3 +741,17 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .rolechip { display: inline-block; margin-left: 0.45rem; padding: 0.05em 0.5em; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 0.25rem; color: var(--role); border: 1px solid var(--role); vertical-align: 0.15em; }
 .ab-row.mymove kbd { align-self: center; margin-left: auto; min-width: 2.6rem; text-align: center; }
 .ab svg, .ab-ic svg { overflow: visible; }
+
+/* menu size: only what pops up. Cards are zoomed (so they still fit the screen); boxes that float over the game are scaled in place */
+#panel > .card { zoom: var(--uiz, 1); }
+#panel.uizfix > .card { max-height: calc(100% / var(--uiz, 1)); max-width: calc(100% / var(--uiz, 1)); }
+#talk .tk-box { scale: var(--uiz, 1); transform-origin: 50% 100%; }
+#toast { scale: var(--uiz, 1); transform-origin: 50% 0; }
+#gdavid { scale: var(--uiz, 1); }
+@media (orientation: portrait) { #talk .tk-box { scale: min(var(--uiz, 1), 1.15); } }
+.uiz { display: flex; align-items: center; gap: 0.4rem; flex: 0 0 auto; }
+.uiz input[type=range] { width: 8rem; accent-color: var(--gold); }
+.uiz b { min-width: 2.6rem; text-align: right; font-family: var(--display); color: #fff3cf; }
+.uiz .slot { min-width: 2rem; padding: 0.3rem 0.5rem; font-size: 1rem; }
+@media (max-width: 560px) { .ab-row.uiz-row { flex-wrap: wrap; } .uiz input[type=range] { width: 6rem; } }
+@media (orientation: portrait) { #panel.uizfix > .card { width: calc(100% / var(--uiz, 1)); max-width: none; } }

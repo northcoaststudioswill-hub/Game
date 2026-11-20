@@ -1,0 +1,9 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }); const errs = [];
+  for (const [nm, vp] of [['pc', { width: 1280, height: 720 }], ['phone', { width: 390, height: 844 }]]) {
+    const p = await b.newPage({ viewport: vp }); p.on('pageerror', e => errs.push(e.message));
+    await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(700); await p.evaluate(() => { G.bootSkip(); G.bootSkip(); }); await p.waitForTimeout(400);
+    await p.click('#bNew'); await p.click('.c-skip'); await p.click('#go'); await p.click('#ok'); await p.waitForTimeout(150);
+    for (const z of [0.75, 1, 1.4]) { const r = await p.evaluate(z => { const st = G.state; st.toured = 1; st.tourAsked = 1; st.kitPicked = 1; G.ui.close(); if (G.talk) G.talkApi.skip(); (st.opt = st.opt || {}).uiz = z; G.applyOpts(); G.ui.sheet(); const c = document.querySelector('#panel .card').getBoundingClientRect(), h1 = getComputedStyle(document.querySelector('#panel h2')).fontSize, hud = getComputedStyle(document.querySelector('#abar') || document.body).fontSize; const fix = document.getElementById('panel').classList.contains('uizfix'); return 'zoom ' + z + ': card ' + Math.round(c.width) + 'x' + Math.round(c.height) + ' at ' + Math.round(c.left) + ',' + Math.round(c.top) + ' (screen ' + innerWidth + 'x' + innerHeight + ') fits=' + (c.left >= -1 && c.right <= innerWidth + 1 && c.top >= -1 && c.bottom <= innerHeight + 1) + ' fix=' + fix; }, z); console.log(nm, r); await p.screenshot({ path: 'zm_' + nm + '_' + z + '.png' }); }
+    await p.close(); }
+  console.log('ERRORS', errs.length); await b.close(); })();
