@@ -1,0 +1,3562 @@
+{
+ "classes": [
+  {
+   "id": "fighter",
+   "name": "Fighter",
+   "role": "Frontline Control",
+   "res": "Stamina",
+   "hitDie": 10,
+   "primary": "str",
+   "stats": {
+    "str": 16,
+    "dex": 12,
+    "con": 15,
+    "int": 8,
+    "wis": 10,
+    "cha": 12
+   },
+   "basic": "f_basic",
+   "start": [
+    "shield_bash",
+    "second_wind"
+   ],
+   "l2": [
+    "cleave",
+    "leap_slam",
+    "war_cry"
+   ],
+   "ult": "action_surge",
+   "extra": [
+    "caltrops",
+    "bull_rush",
+    "hamstring",
+    "overrun",
+    "pommel"
+   ],
+   "subs": [
+    "Champion",
+    "Battle Master"
+   ],
+   "edge": {
+    "name": "Momentum",
+    "col": "#e0b040",
+    "desc": "Every blow that lands adds one. Taking a blow loses one. Each pip is +4% damage; at five the next ability or heavy blow is a Crushing Blow that knocks them flat."
+   },
+   "mortals": [
+    {
+     "id": "verdict",
+     "rank": 0,
+     "name": "Headsman’s Verdict",
+     "word": "CLOVEN",
+     "desc": "A leaping two-handed blow that ends the bout and most of the opponent."
+    },
+    {
+     "id": "wall",
+     "rank": 1,
+     "name": "Through the Wall",
+     "word": "FLATTENED",
+     "desc": "One blow sends them the length of the pit. The second arrives before they stop sliding."
+    },
+    {
+     "id": "quake",
+     "rank": 3,
+     "name": "Earthbreaker",
+     "word": "BURIED",
+     "desc": "Three strikes that split the floor, and a fourth that drops them into it."
+    },
+    {
+     "id": "behead",
+     "rank": 2,
+     "name": "The Headsman",
+     "word": "BEHEADED",
+     "desc": "Two cuts to turn them, one to finish. The head lands somewhere in the cheap seats."
+    },
+    {
+     "id": "pin",
+     "rank": 4,
+     "name": "Nailed to the Sand",
+     "word": "PINNED",
+     "desc": "Every blade off the pit wall, called down point first."
+    },
+    {
+     "id": "boot",
+     "rank": 1,
+     "name": "Off With It",
+     "word": "BEHEADED",
+     "desc": "Two cuts, the head is gone, and a boot in the chest sends what is left across the sand."
+    },
+    {
+     "id": "split",
+     "rank": 3,
+     "name": "Down the Middle",
+     "word": "HALVED",
+     "desc": "One stroke from crown to belt. The halves take a moment to agree to part."
+    },
+    {
+     "id": "belt",
+     "rank": 2,
+     "name": "Split to the Belt",
+     "word": "HALVED",
+     "desc": "Three turns of the blade and they are two people, neither of them well."
+    },
+    {
+     "id": "breaker",
+     "rank": 4,
+     "name": "Bent the Wrong Way",
+     "word": "BROKEN",
+     "desc": "The elbow, the knee, the other knee, and then the neck, in that order, each the way it does not go."
+    }
+   ]
+  },
+  {
+   "id": "rogue",
+   "name": "Rogue",
+   "role": "Stealth Skirmish",
+   "res": "Focus",
+   "hitDie": 8,
+   "primary": "dex",
+   "stats": {
+    "str": 10,
+    "dex": 17,
+    "con": 13,
+    "int": 12,
+    "wis": 10,
+    "cha": 13
+   },
+   "basic": "r_basic",
+   "start": [
+    "shadowstep",
+    "fan_knives"
+   ],
+   "l2": [
+    "poison_blade",
+    "smoke_bomb",
+    "throwing_knife"
+   ],
+   "ult": "flurry",
+   "extra": [
+    "bear_trap",
+    "gut_cut",
+    "tumble",
+    "exploit",
+    "caltrops"
+   ],
+   "subs": [
+    "Assassin",
+    "Thief"
+   ],
+   "edge": {
+    "name": "Openings",
+    "col": "#9fe8ff",
+    "desc": "A perfect dodge or a parry adds two; a blow lands for one, or two from the side or behind. At five your next blow is a guaranteed critical."
+   },
+   "mortals": [
+    {
+     "id": "cuts",
+     "rank": 0,
+     "name": "Death of a Thousand Cuts",
+     "word": "UNMADE",
+     "desc": "Seven cuts from seven directions before the body knows to fall."
+    },
+    {
+     "id": "quiet",
+     "rank": 1,
+     "name": "The Quiet Word",
+     "word": "SILENCED",
+     "desc": "You are in front of them. Then you are not. One thrust, a long pause, and it is over."
+    },
+    {
+     "id": "rain",
+     "rank": 3,
+     "name": "Rain of Knives",
+     "word": "PINNED",
+     "desc": "Every blade you own, from every direction at once."
+    },
+    {
+     "id": "smile",
+     "rank": 2,
+     "name": "The Red Smile",
+     "word": "OPENED",
+     "desc": "You are behind them. They work it out a moment after their head does."
+    },
+    {
+     "id": "strung",
+     "rank": 4,
+     "name": "Strung Up",
+     "word": "HANGED",
+     "desc": "A wire nobody saw you throw. They go up kicking and come down quiet."
+    },
+    {
+     "id": "tread",
+     "rank": 1,
+     "name": "Trip and Tread",
+     "word": "STAMPED",
+     "desc": "A heel behind the knee, and then a heel somewhere worse."
+    },
+    {
+     "id": "heads",
+     "rank": 3,
+     "name": "Souvenir",
+     "word": "KEPT",
+     "desc": "You take the head and leave the rest standing. Then you kick it over, for the look of the thing."
+    },
+    {
+     "id": "moth",
+     "rank": 2,
+     "name": "Pinned Like a Moth",
+     "word": "PINNED",
+     "desc": "A knife through each place that matters, and they are left standing because they cannot fall."
+    },
+    {
+     "id": "strings",
+     "rank": 4,
+     "name": "Every String Cut",
+     "word": "UNSTRUNG",
+     "desc": "Wrists, elbows, knees. You cut whatever holds them up and let them fold."
+    }
+   ]
+  },
+  {
+   "id": "sorcerer",
+   "name": "Sorcerer",
+   "role": "Arcane Destruction",
+   "res": "Mana",
+   "hitDie": 8,
+   "primary": "cha",
+   "stats": {
+    "str": 8,
+    "dex": 13,
+    "con": 14,
+    "int": 12,
+    "wis": 10,
+    "cha": 17
+   },
+   "basic": "s_basic",
+   "start": [
+    "burning_hands",
+    "misty_step"
+   ],
+   "l2": [
+    "lightning_bolt",
+    "ray_frost",
+    "glyph"
+   ],
+   "ult": "fireball",
+   "extra": [
+    "shocking_grasp",
+    "thunderwave",
+    "scorching_ray",
+    "release",
+    "shatter"
+   ],
+   "subs": [
+    "Draconic Bloodline",
+    "Wild Magic"
+   ],
+   "edge": {
+    "name": "Overcharge",
+    "col": "#ff8a2a",
+    "desc": "Every spell adds one. At five the next spell is Overcharged for +45% damage."
+   },
+   "mortals": [
+    {
+     "id": "disint",
+     "rank": 0,
+     "name": "Disintegrate",
+     "word": "ASH",
+     "desc": "A green ray that leaves a fine grey dust and a scorch mark."
+    },
+    {
+     "id": "meteor",
+     "rank": 1,
+     "name": "Meteor Swarm",
+     "word": "CRATERED",
+     "desc": "Four burning stones, called down one after another onto the same unlucky spot."
+    },
+    {
+     "id": "storm",
+     "rank": 3,
+     "name": "Chain Lightning",
+     "word": "GROUNDED",
+     "desc": "Every bolt in the vault finds the same body."
+    },
+    {
+     "id": "ignite",
+     "rank": 2,
+     "name": "Burn From Within",
+     "word": "CINDERS",
+     "desc": "They rise off the sand, lit from the inside like a lantern."
+    },
+    {
+     "id": "rift",
+     "rank": 4,
+     "name": "Unzip the World",
+     "word": "ELSEWHERE",
+     "desc": "The floor opens on somewhere that is not the Undercity. It takes them and closes."
+    },
+    {
+     "id": "glass",
+     "rank": 1,
+     "name": "Glass Statue",
+     "word": "SHATTERED",
+     "desc": "They go pale, then blue, then very still. Then you flick them."
+    },
+    {
+     "id": "unstrung",
+     "rank": 3,
+     "name": "Unstrung",
+     "word": "UNSTRUNG",
+     "desc": "You hold them in the air and take them apart, a limb at a time, like a puppet you are tired of."
+    },
+    {
+     "id": "render",
+     "rank": 1,
+     "name": "Rendered Down",
+     "word": "MELTED",
+     "desc": "You hold the heat on them and do not stop. They slump, and run, and soak into the sand."
+    },
+    {
+     "id": "kiln",
+     "rank": 2,
+     "name": "The Kiln",
+     "word": "FIRED",
+     "desc": "Not a burst. A slow, even heat, until they are the colour of a pot."
+    },
+    {
+     "id": "boil",
+     "rank": 4,
+     "name": "Boiled in the Skin",
+     "word": "BURST",
+     "desc": "You heat everything they are made of at once. Their joints jump. Then there is too much of them for the skin."
+    }
+   ]
+  },
+  {
+   "id": "cleric",
+   "name": "Cleric",
+   "role": "Faith Support",
+   "res": "Faith",
+   "hitDie": 8,
+   "primary": "wis",
+   "stats": {
+    "str": 14,
+    "dex": 10,
+    "con": 15,
+    "int": 10,
+    "wis": 16,
+    "cha": 12
+   },
+   "basic": "c_basic",
+   "start": [
+    "sacred_flame",
+    "cure_wounds"
+   ],
+   "l2": [
+    "shield_faith",
+    "guiding_bolt",
+    "toll_dead"
+   ],
+   "ult": "spirit_guardians",
+   "extra": [
+    "guardian_sigil",
+    "spirit_hammer",
+    "sanctuary",
+    "sanctify",
+    "bane"
+   ],
+   "subs": [
+    "War Domain",
+    "Light Domain"
+   ],
+   "edge": {
+    "name": "Devotion",
+    "col": "#ffe08a",
+    "desc": "Every blow that lands adds one. At five the Light answers: you heal a tenth of your health and take a ward."
+   },
+   "mortals": [
+    {
+     "id": "strike",
+     "rank": 0,
+     "name": "Flame Strike",
+     "word": "JUDGED",
+     "desc": "A column of the Light Beneath, called straight down."
+    },
+    {
+     "id": "smite",
+     "rank": 1,
+     "name": "Banishing Smite",
+     "word": "BANISHED",
+     "desc": "Three rings of light close in, and the mace sends what is left somewhere else."
+    },
+    {
+     "id": "word",
+     "rank": 3,
+     "name": "Power Word Kill",
+     "word": "UNSPOKEN",
+     "desc": "A single word. Nobody in the stands hears it. Everybody sees what it does."
+    },
+    {
+     "id": "ascend",
+     "rank": 2,
+     "name": "Taken Up",
+     "word": "ASCENDED",
+     "desc": "The Light lifts them gently. It does not set them down gently."
+    },
+    {
+     "id": "absolve",
+     "rank": 4,
+     "name": "Hammer of the Faithful",
+     "word": "ABSOLVED",
+     "desc": "Three rings of light to hold them still, and one swing to send the head ahead of the soul."
+    },
+    {
+     "id": "heel",
+     "rank": 1,
+     "name": "Heel of the Faithful",
+     "word": "TRODDEN",
+     "desc": "They are put on the ground, and shown the sole of your boot, and the Light Beneath."
+    },
+    {
+     "id": "castout",
+     "rank": 3,
+     "name": "Cast Out",
+     "word": "CAST OUT",
+     "desc": "The head for the Chapel. The body you put out with your foot."
+    },
+    {
+     "id": "salt",
+     "rank": 3,
+     "name": "A Pillar of Salt",
+     "word": "SALTED",
+     "desc": "You tell them not to look. They look. They go white from the eyes outward, and then they break."
+    },
+    {
+     "id": "bell",
+     "rank": 2,
+     "name": "Rung Like a Bell",
+     "word": "TOLLED",
+     "desc": "You lift them into the light and bring them down on the stone, headfirst, twice."
+    },
+    {
+     "id": "penance",
+     "rank": 4,
+     "name": "Made to Pray",
+     "word": "ABSOLVED",
+     "desc": "On their knees, hands raised to the Light. You accept the prayer on its behalf."
+    }
+   ]
+  },
+  {
+   "id": "druid",
+   "name": "Druid",
+   "role": "Shapeshifter",
+   "res": "Wild",
+   "hitDie": 8,
+   "primary": "wis",
+   "stats": {
+    "str": 12,
+    "dex": 13,
+    "con": 14,
+    "int": 10,
+    "wis": 17,
+    "cha": 10
+   },
+   "basic": "d_staff",
+   "start": [
+    "wolf_form",
+    "moonbeam"
+   ],
+   "l2": [
+    "bear_form",
+    "spider_form",
+    "regrowth"
+   ],
+   "ult": "primal_avatar",
+   "extra": [
+    "barkskin",
+    "ice_knife",
+    "entangle",
+    "wildcall",
+    "moonbeam"
+   ],
+   "subs": [
+    "Circle of the Fang",
+    "Circle of the Deep Root"
+   ],
+   "edge": {
+    "name": "Wild Bond",
+    "col": "#8fd66a",
+    "desc": "Every blow that lands adds one. At five your next blow roots them to the spot for a second and a half."
+   },
+   "mortals": [
+    {
+     "id": "pack",
+     "rank": 0,
+     "name": "The Pack Feeds",
+     "word": "DEVOURED",
+     "desc": "You are a wolf for exactly as long as it takes."
+    },
+    {
+     "id": "roots",
+     "rank": 1,
+     "name": "Taken by the Roots",
+     "word": "BURIED",
+     "desc": "The sand opens. Something pale and patient pulls them under, and it closes again."
+    },
+    {
+     "id": "hounds",
+     "rank": 2,
+     "name": "Three From the Dark",
+     "word": "MAULED",
+     "desc": "You whistle. Three shapes come up out of the sand with their ears back, and you let them."
+    },
+    {
+     "id": "oldbear",
+     "rank": 3,
+     "name": "The Old Bear",
+     "word": "BROKEN",
+     "desc": "A shape off a cave wall, twice the height of a man, for one blow."
+    },
+    {
+     "id": "wings",
+     "rank": 2,
+     "name": "A Thousand Wings",
+     "word": "STRIPPED",
+     "desc": "Every bat in the roost, all at once, for about a second."
+    },
+    {
+     "id": "web",
+     "rank": 4,
+     "name": "Hung in the Web",
+     "word": "DRAINED",
+     "desc": "Up into the dark on a silk line, to something that has been waiting patiently."
+    },
+    {
+     "id": "thrown",
+     "rank": 1,
+     "name": "Thrown to the Pack",
+     "word": "THROWN",
+     "desc": "Lifted off the sand and flung the width of the pit, to whatever is waiting there."
+    },
+    {
+     "id": "rent",
+     "rank": 3,
+     "name": "Rent in Two",
+     "word": "SUNDERED",
+     "desc": "Whatever you are for that one second has claws long enough."
+    },
+    {
+     "id": "devour",
+     "rank": 1,
+     "name": "Fed to the Beast",
+     "word": "DEVOURED",
+     "desc": "If you are not already an animal you become one, and eat them. What comes out the other side is not much."
+    },
+    {
+     "id": "thorns",
+     "rank": 4,
+     "name": "Grown Through",
+     "word": "GROWN THROUGH",
+     "desc": "Six thorns come up through the sand, and through the feet, the hands and the neck, and keep growing."
+    }
+   ]
+  },
+  {
+   "id": "warlock",
+   "name": "Warlock",
+   "role": "Pact Caster",
+   "res": "Pact",
+   "hitDie": 9,
+   "primary": "cha",
+   "stats": {
+    "str": 9,
+    "dex": 13,
+    "con": 14,
+    "int": 12,
+    "wis": 10,
+    "cha": 17
+   },
+   "basic": "w_basic",
+   "start": [
+    "hex",
+    "shadow_step"
+   ],
+   "l2": [
+    "hunger_dark",
+    "cause_fear",
+    "shadow_ward"
+   ],
+   "ult": "dark_pact",
+   "extra": [
+    "cause_fear",
+    "void_rift",
+    "fade_out",
+    "foreclose",
+    "hex"
+   ],
+   "subs": [
+    "Pact of the Fiend",
+    "Pact of the Deep Dweller"
+   ],
+   "edge": {
+    "name": "Debt",
+    "col": "#b070ff",
+    "desc": "Every spell adds one, and each pip is +3% damage. At five your next blow collects: you heal half of what it deals."
+   },
+   "mortals": [
+    {
+     "id": "paid",
+     "rank": 0,
+     "name": "Paid in Full",
+     "word": "COLLECTED",
+     "desc": "Your patron reaches up through the sand and takes what it is owed."
+    },
+    {
+     "id": "maw",
+     "rank": 1,
+     "name": "The Maw Below",
+     "word": "SWALLOWED",
+     "desc": "A ring of teeth opens in the floor of the pit. It is gone before the crowd can agree on what they saw."
+    },
+    {
+     "id": "name",
+     "rank": 3,
+     "name": "Speak the Name",
+     "word": "UNMADE",
+     "desc": "You say the thing you promised never to say aloud."
+    },
+    {
+     "id": "folded",
+     "rank": 1,
+     "name": "Folded Away",
+     "word": "FOLDED",
+     "desc": "Your patron closes its hand. They get smaller, and smaller, and then there is a noise."
+    },
+    {
+     "id": "apart",
+     "rank": 3,
+     "name": "Pulled Apart",
+     "word": "DIVIDED",
+     "desc": "Many hands, each with a firm grip and its own idea of which way to go."
+    },
+    {
+     "id": "hands",
+     "rank": 2,
+     "name": "Many Hands",
+     "word": "TORN",
+     "desc": "They come out of the shadows under the stands. There are a great many of them."
+    },
+    {
+     "id": "eyes",
+     "rank": 4,
+     "name": "It Looked Back",
+     "word": "WITNESSED",
+     "desc": "For one moment your patron pays attention. Nothing it looks at survives being seen."
+    },
+    {
+     "id": "unpick",
+     "rank": 1,
+     "name": "Unpicked",
+     "word": "UNMADE",
+     "desc": "Your patron finds the loose thread and pulls. They come undone upward, in ribbons, until there is nothing to hold the shape."
+    },
+    {
+     "id": "wmelt",
+     "rank": 3,
+     "name": "The Gnawing",
+     "word": "DISSOLVED",
+     "desc": "The dark eats them from the feet up, patiently, and leaves a stain."
+    },
+    {
+     "id": "owed",
+     "rank": 2,
+     "name": "What Was Owed",
+     "word": "COLLECTED",
+     "desc": "The floor opens just wide enough. Something below has been keeping an account."
+    },
+    {
+     "id": "marionette",
+     "rank": 4,
+     "name": "Danced to Death",
+     "word": "STRINGS CUT",
+     "desc": "Your patron lends you the strings. They dance for the stands until the strings are taken back."
+    }
+   ]
+  }
+ ],
+ "ranks": [
+  {
+   "name": "Fresh Meat",
+   "at": 0
+  },
+  {
+   "name": "Scrapper",
+   "at": 50
+  },
+  {
+   "name": "Bloodied",
+   "at": 140
+  },
+  {
+   "name": "Enforcer",
+   "at": 260
+  },
+  {
+   "name": "Underboss",
+   "at": 440
+  },
+  {
+   "name": "Pit Legend",
+   "at": 700
+  },
+  {
+   "name": "Crownbearer",
+   "at": 1100
+  },
+  {
+   "name": "Terror of the Nine",
+   "at": 1800
+  },
+  {
+   "name": "A Name the Queen Knows",
+   "at": 2800
+  }
+ ],
+ "arms": [
+  {
+   "id": "f_basic",
+   "name": "Longsword",
+   "type": "melee",
+   "dmg": [
+    1,
+    8
+   ],
+   "stat": "str",
+   "cost": 10,
+   "wind": 0.232,
+   "rec": 0.26,
+   "range": 66,
+   "arc": 110,
+   "desc": "Tap to strike for 1d8 + STR. Costs 10, partly returned on a hit. The third blow of a clean combo is a finisher. Hold, then release, for a heavy blow. Keen: +8% critical chance.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "fighter",
+   "wname": "Longsword",
+   "model": "sword",
+   "coin": 0,
+   "rank": 0,
+   "blurb": "Sword and shield. Nothing it does badly. Keen: +8% critical chance.",
+   "sig": {
+    "name": "Guard-Splitter",
+    "text": "breaks posture and shoves them off their feet"
+   },
+   "trait": {
+    "name": "Riposte",
+    "text": "Blows within a second and a half of your parry or perfect dodge land 35% harder."
+   },
+   "heavy": "Overhead Cleave",
+   "prop": [
+    "Keen",
+    "+8% critical chance."
+   ],
+   "master": "Guard-Splitter"
+  },
+  {
+   "id": "f_spear",
+   "name": "Pit Spear",
+   "type": "melee",
+   "dmg": [
+    1,
+    8
+   ],
+   "stat": "str",
+   "cost": 10,
+   "wind": 0.217,
+   "rec": 0.26,
+   "range": 100,
+   "arc": 54,
+   "desc": "Tap to strike for 1d8 + STR. Costs 10, partly returned on a hit. The third blow of a clean combo is a finisher. Hold, then release, for a heavy blow. First Blood: +20% damage to a foe above 85% health.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "fighter",
+   "wname": "Pit Spear",
+   "model": "spear",
+   "coin": 140,
+   "rank": 1,
+   "deed": null,
+   "blurb": "Long reach, narrow thrust. Keeps them where you want them. First Blood: +20% damage to a foe above 85% health.",
+   "sig": {
+    "name": "Hurl Back",
+    "text": "throws them twice as far and breaks posture"
+   },
+   "trait": {
+    "name": "Tip of the Spear",
+    "text": "Hits at the far end of the reach land 30% harder. Close in, it is just a stick."
+   },
+   "heavy": "Deep Thrust",
+   "prop": [
+    "First Blood",
+    "+20% damage to a foe above 85% health."
+   ],
+   "master": "Hurl Back"
+  },
+  {
+   "id": "f_axe",
+   "name": "Greataxe",
+   "type": "melee",
+   "dmg": [
+    1,
+    12
+   ],
+   "stat": "str",
+   "cost": 13,
+   "wind": 0.319,
+   "rec": 0.338,
+   "range": 76,
+   "arc": 140,
+   "pz": 1.4,
+   "desc": "Tap to strike for 1d12 + STR. Costs 13, partly returned on a hit. The third blow of a clean combo is a finisher. Hold, then release, for a heavy blow. Executioner: +30% damage to a foe below 35% health.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "fighter",
+   "wname": "Greataxe",
+   "model": "axe",
+   "coin": 220,
+   "rank": 2,
+   "deed": null,
+   "blurb": "Two hands, no shield. Slow, wide and ruinous. Executioner: +30% damage to a foe below 35% health.",
+   "sig": {
+    "name": "Skullringer",
+    "text": "stuns for 0.7s"
+   },
+   "trait": {
+    "name": "Hewing",
+    "text": "Heavy blows leave them bleeding for 3s."
+   },
+   "heavy": "Overhead Cleave",
+   "prop": [
+    "Executioner",
+    "+30% damage to a foe below 35% health."
+   ],
+   "master": "Skullringer"
+  },
+  {
+   "id": "f_hammer",
+   "name": "Warhammer",
+   "type": "melee",
+   "dmg": [
+    1,
+    12
+   ],
+   "stat": "str",
+   "cost": 13,
+   "wind": 0.377,
+   "rec": 0.39,
+   "range": 64,
+   "arc": 110,
+   "pz": 2.1,
+   "knock": 130,
+   "desc": "Tap to strike for 1d12 + STR. Costs 13, partly returned on a hit. The third blow of a clean combo is a finisher. Hold, then release, for a heavy blow. Follow-Through: +20% damage to a foe who is slowed, stunned or broken.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "fighter",
+   "wname": "Warhammer",
+   "model": "hammer",
+   "coin": 0,
+   "rank": 0,
+   "deed": "breaker",
+   "blurb": "Slowest thing in the pit. Nobody keeps their footing against it. Follow-Through: +20% damage to a foe who is slowed, stunned or broken.",
+   "sig": {
+    "name": "Skullringer",
+    "text": "stuns for 0.7s"
+   },
+   "trait": {
+    "name": "Bonebreaker",
+    "text": "Heavy blows smash their guard open and daze them for half a second."
+   },
+   "heavy": "Overhead Cleave",
+   "prop": [
+    "Follow-Through",
+    "+20% damage to a foe who is slowed, stunned or broken."
+   ],
+   "master": "Skullringer"
+  },
+  {
+   "id": "r_basic",
+   "name": "Twin Daggers",
+   "type": "melee",
+   "dmg": [
+    1,
+    4
+   ],
+   "stat": "dex",
+   "cost": 6,
+   "wind": 0.145,
+   "rec": 0.182,
+   "range": 56,
+   "arc": 100,
+   "desc": "Tap to strike for 1d4 + DEX. Costs 6, partly returned on a hit. The third blow of a clean combo is a finisher. Hold, then release, for a heavy blow. Light Fingers: Every hit lifts a coin off them.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "rogue",
+   "wname": "Twin Daggers",
+   "model": "daggers",
+   "coin": 0,
+   "rank": 0,
+   "blurb": "Fast and close. Death by arithmetic. Light Fingers: Every hit lifts a coin off them.",
+   "sig": {
+    "name": "Guard-Splitter",
+    "text": "breaks posture and shoves them off their feet"
+   },
+   "trait": {
+    "name": "Flurry",
+    "text": "Every third blow in a row on the same target opens a bleed."
+   },
+   "heavy": "Gutting Thrust",
+   "prop": [
+    "Light Fingers",
+    "Every hit lifts a coin off them."
+   ],
+   "master": "Guard-Splitter"
+  },
+  {
+   "id": "r_rapier",
+   "name": "Duellist’s Rapier",
+   "type": "melee",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "dex",
+   "cost": 6,
+   "wind": 0.16,
+   "rec": 0.195,
+   "range": 84,
+   "arc": 54,
+   "desc": "Tap to strike for 1d6 + DEX. Costs 6, partly returned on a hit. The third blow of a clean combo is a finisher. Hold, then release, for a heavy blow. Heartseeker: +25% damage to a foe below 35% health.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "rogue",
+   "wname": "Duellist’s Rapier",
+   "model": "rapier",
+   "coin": 140,
+   "rank": 1,
+   "deed": null,
+   "blurb": "A long thin point. Reach without weight. Heartseeker: +25% damage to a foe below 35% health.",
+   "sig": {
+    "name": "Heartseeker",
+    "text": "hits half as hard again"
+   },
+   "trait": {
+    "name": "Point Control",
+    "text": "Criticals land 30% harder, and a hit from behind always finds the gap."
+   },
+   "heavy": "Gutting Thrust",
+   "prop": [
+    "Heartseeker",
+    "+25% damage to a foe below 35% health."
+   ],
+   "master": "Heartseeker"
+  },
+  {
+   "id": "r_axes",
+   "name": "Hand Axes",
+   "type": "melee",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "dex",
+   "cost": 8,
+   "wind": 0.189,
+   "rec": 0.234,
+   "range": 58,
+   "arc": 130,
+   "pz": 1.4,
+   "desc": "Tap to strike for 1d6 + DEX. Costs 8, partly returned on a hit. The third blow of a clean combo is a finisher. Hold, then release, for a heavy blow. Hooked Beards: +10% critical chance.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "rogue",
+   "wname": "Hand Axes",
+   "model": "axes",
+   "coin": 0,
+   "rank": 0,
+   "deed": "heavy",
+   "blurb": "Two hatchets. Slower than knives and far ruder. Hooked Beards: +10% critical chance.",
+   "sig": {
+    "name": "Twin Fangs",
+    "text": "strikes twice"
+   },
+   "trait": {
+    "name": "Chop and Hook",
+    "text": "Every hit drags at them: slowed by a fifth for 1.5s."
+   },
+   "heavy": "Gutting Thrust",
+   "prop": [
+    "Hooked Beards",
+    "+10% critical chance."
+   ],
+   "master": "Twin Fangs"
+  },
+  {
+   "id": "s_basic",
+   "name": "Fire Bolt",
+   "type": "proj",
+   "dmg": [
+    1,
+    8
+   ],
+   "stat": "cha",
+   "cost": 8,
+   "wind": 0.29,
+   "rec": 0.286,
+   "speed": 660,
+   "knock": 85,
+   "desc": "Tap to loose for 1d8 + CHA. Costs 8, refunded on a hit. Hold, then release, for a heavy blow. Kindle: Sets them alight for 2s.",
+   "kind": "Cantrip",
+   "role": "Damage",
+   "cls": "sorcerer",
+   "wname": "Fire Bolt",
+   "model": "fire",
+   "coin": 0,
+   "rank": 0,
+   "blurb": "A mote of fire. Reliable. Kindle: Sets them alight for 2s.",
+   "sig": {
+    "name": "Conflagrate",
+    "text": "a bigger bolt that keeps burning"
+   },
+   "trait": {
+    "name": "Kindling",
+    "text": "Every bolt that lands on something already burning burns it a second longer and 15% harder."
+   },
+   "heavy": "Charged Bolt",
+   "prop": [
+    "Kindle",
+    "Sets them alight for 2s."
+   ],
+   "master": "Conflagrate"
+  },
+  {
+   "id": "s_frost",
+   "name": "Frost Shard",
+   "type": "proj",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "cha",
+   "cost": 8,
+   "wind": 0.29,
+   "rec": 0.286,
+   "speed": 580,
+   "knock": 85,
+   "desc": "Tap to loose for 1d6 + CHA. Costs 8, refunded on a hit. Hold, then release, for a heavy blow. Brittle: Slows, and hits slowed foes 12% harder.",
+   "kind": "Cantrip",
+   "role": "Damage",
+   "cls": "sorcerer",
+   "wname": "Frost Shard",
+   "model": "frost",
+   "coin": 140,
+   "rank": 1,
+   "deed": null,
+   "blurb": "Slower in the air, but whatever it hits slows down too. Brittle: Slows, and hits slowed foes 12% harder.",
+   "sig": {
+    "name": "Shatterpoint",
+    "text": "a bigger bolt that keeps burning"
+   },
+   "trait": {
+    "name": "Brittle",
+    "text": "Targets you have slowed take 20% more from every shard."
+   },
+   "heavy": "Charged Bolt",
+   "prop": [
+    "Brittle",
+    "Slows, and hits slowed foes 12% harder."
+   ],
+   "master": "Shatterpoint"
+  },
+  {
+   "id": "s_spark",
+   "name": "Arc Spark",
+   "type": "proj",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "cha",
+   "cost": 8,
+   "wind": 0.217,
+   "rec": 0.234,
+   "speed": 940,
+   "knock": 85,
+   "desc": "Tap to loose for 1d6 + CHA. Costs 8, refunded on a hit. Hold, then release, for a heavy blow. Arc: Ignores half their armour.",
+   "kind": "Cantrip",
+   "role": "Damage",
+   "cls": "sorcerer",
+   "wname": "Arc Spark",
+   "model": "spark",
+   "coin": 0,
+   "rank": 0,
+   "deed": "heavy",
+   "blurb": "Small, quick and very hard to sidestep. Arc: Ignores half their armour.",
+   "sig": {
+    "name": "Forked Arc",
+    "text": "a bigger bolt that keeps burning"
+   },
+   "trait": {
+    "name": "Arc",
+    "text": "One bolt in four jumps back for a second hit."
+   },
+   "heavy": "Charged Bolt",
+   "prop": [
+    "Arc",
+    "Ignores half their armour."
+   ],
+   "master": "Forked Arc"
+  },
+  {
+   "id": "c_basic",
+   "name": "Mace",
+   "type": "melee",
+   "dmg": [
+    1,
+    8
+   ],
+   "stat": "str",
+   "cost": 10,
+   "wind": 0.261,
+   "rec": 0.312,
+   "range": 62,
+   "arc": 100,
+   "desc": "Tap to strike for 1d8 + STR. Costs 10, partly returned on a hit. The third blow of a clean combo is a finisher. Hold, then release, for a heavy blow. Chastise: +20% damage to a foe who is slowed, stunned or broken.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "cleric",
+   "wname": "Mace",
+   "model": "mace",
+   "coin": 0,
+   "rank": 0,
+   "blurb": "A blessed weight on a stick. Chastise: +20% damage to a foe who is slowed, stunned or broken.",
+   "sig": {
+    "name": "Guard-Splitter",
+    "text": "breaks posture and shoves them off their feet"
+   },
+   "trait": {
+    "name": "Blessed Iron",
+    "text": "Every third blow on the same target carries a little light: +1d6 radiant and a flash."
+   },
+   "heavy": "Judgement Swing",
+   "prop": [
+    "Chastise",
+    "+20% damage to a foe who is slowed, stunned or broken."
+   ],
+   "master": "Guard-Splitter"
+  },
+  {
+   "id": "c_flail",
+   "name": "Penitent’s Flail",
+   "type": "melee",
+   "dmg": [
+    1,
+    10
+   ],
+   "stat": "str",
+   "cost": 10,
+   "wind": 0.29,
+   "rec": 0.338,
+   "range": 82,
+   "arc": 150,
+   "desc": "Tap to strike for 1d10 + STR. Costs 10, partly returned on a hit. The third blow of a clean combo is a finisher. Hold, then release, for a heavy blow. Penance: Every hit leaves them marked for a moment: they take 25% more.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "cleric",
+   "wname": "Penitent’s Flail",
+   "model": "flail",
+   "coin": 140,
+   "rank": 1,
+   "deed": null,
+   "blurb": "A wide, wandering arc. Hard to step inside. Penance: Every hit leaves them marked for a moment: they take 25% more.",
+   "sig": {
+    "name": "Hamstring",
+    "text": "slows by 40% for 2s"
+   },
+   "trait": {
+    "name": "Over the Guard",
+    "text": "The head wraps round shields: against a raised guard it lands 40% harder."
+   },
+   "heavy": "Judgement Swing",
+   "prop": [
+    "Penance",
+    "Every hit leaves them marked for a moment: they take 25% more."
+   ],
+   "master": "Hamstring"
+  },
+  {
+   "id": "c_pick",
+   "name": "War Pick",
+   "type": "melee",
+   "dmg": [
+    1,
+    10
+   ],
+   "stat": "str",
+   "cost": 13,
+   "wind": 0.348,
+   "rec": 0.364,
+   "range": 62,
+   "arc": 80,
+   "pz": 1.7,
+   "desc": "Tap to strike for 1d10 + STR. Costs 13, partly returned on a hit. The third blow of a clean combo is a finisher. Hold, then release, for a heavy blow. Punch Through: Ignores half their armour.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "cleric",
+   "wname": "War Pick",
+   "model": "pick",
+   "coin": 0,
+   "rank": 0,
+   "deed": "breaker",
+   "blurb": "One point, a great deal of conviction behind it. Punch Through: Ignores half their armour.",
+   "sig": {
+    "name": "Skullringer",
+    "text": "stuns for 0.7s"
+   },
+   "trait": {
+    "name": "Armour Piercer",
+    "text": "Ignores most of their armour: the heavier they are plated, the harder it lands."
+   },
+   "heavy": "Judgement Swing",
+   "prop": [
+    "Punch Through",
+    "Ignores half their armour."
+   ],
+   "master": "Skullringer"
+  },
+  {
+   "id": "f_halberd",
+   "name": "Stairguard Halberd",
+   "type": "melee",
+   "dmg": [
+    1,
+    10
+   ],
+   "stat": "str",
+   "cost": 13,
+   "wind": 0.30160000000000003,
+   "rec": 0.325,
+   "range": 110,
+   "arc": 86,
+   "pz": 1.5,
+   "desc": "Tap to strike for 1d10 + STR. Costs 13, partly returned on a hit. Hold, then release, for a heavy blow. Hook: Every hit slows by 15% for a moment.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "fighter",
+   "wname": "Stairguard Halberd",
+   "model": "halberd",
+   "coin": 0,
+   "rank": 0,
+   "blurb": "A Seal-Warden’s polearm. Enormous reach, and slow to bring back. Hook: Every hit slows by 15% for a moment.",
+   "sig": {
+    "name": "Hurl Back",
+    "text": "throws them twice as far and breaks posture"
+   },
+   "trait": {
+    "name": "Hook and Haul",
+    "text": "The hook on the back of the head: every hit drags them a step towards you, and heavy blows sweep their feet for half a second."
+   },
+   "heavy": "Overhead Cleave",
+   "prop": [
+    "Hook",
+    "Every hit slows by 15% for a moment."
+   ],
+   "master": "Hurl Back"
+  },
+  {
+   "id": "r_chain",
+   "name": "Weighted Chain",
+   "type": "melee",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "dex",
+   "cost": 8,
+   "wind": 0.21749999999999997,
+   "rec": 0.273,
+   "range": 122,
+   "arc": 34,
+   "pz": 1.5,
+   "desc": "Tap to strike for 1d6 + DEX. Costs 8, partly returned on a hit. Hold, then release, for a heavy blow. Tangle: Slows, and hits slowed foes 15% harder.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "rogue",
+   "wname": "Weighted Chain",
+   "model": "chain",
+   "coin": 0,
+   "rank": 0,
+   "blurb": "A lead weight on four yards of chain. Hits from where they cannot reach you. Tangle: Slows, and hits slowed foes 15% harder.",
+   "sig": {
+    "name": "Hamstring",
+    "text": "slows by 40% for 2s"
+   },
+   "trait": {
+    "name": "Long Weight",
+    "text": "Hits at the far end of the chain land 25% harder and wrap their legs: slowed for 1.5s."
+   },
+   "heavy": "Gutting Thrust",
+   "prop": [
+    "Tangle",
+    "Slows, and hits slowed foes 15% harder."
+   ],
+   "master": "Hamstring"
+  },
+  {
+   "id": "s_acid",
+   "name": "Acid Splash",
+   "type": "proj",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "cha",
+   "cost": 8,
+   "wind": 0.29,
+   "rec": 0.286,
+   "speed": 600,
+   "knock": 85,
+   "desc": "Tap to loose for 1d6 + CHA. Costs 8, refunded on a hit. Hold, then release, for a heavy blow. Corrode: Poisons, and +15% to a foe below 35% health.",
+   "kind": "Cantrip",
+   "role": "Damage",
+   "cls": "sorcerer",
+   "wname": "Acid Splash",
+   "model": "acid",
+   "coin": 0,
+   "rank": 0,
+   "blurb": "A cantrip that keeps eating after it lands. Corrode: Poisons, and +15% to a foe below 35% health.",
+   "sig": {
+    "name": "Dissolve",
+    "text": "a bigger bolt that keeps burning"
+   },
+   "trait": {
+    "name": "Corrode",
+    "text": "Every splash eats a little of their armour for 4s: the next hits land 10% harder, up to +30%."
+   },
+   "heavy": "Charged Bolt",
+   "prop": [
+    "Corrode",
+    "Poisons, and +15% to a foe below 35% health."
+   ],
+   "master": "Dissolve"
+  },
+  {
+   "id": "c_staff",
+   "name": "Pilgrim’s Staff",
+   "type": "melee",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "str",
+   "cost": 8,
+   "wind": 0.21402,
+   "rec": 0.2652,
+   "range": 94,
+   "arc": 124,
+   "desc": "Tap to strike for 1d6 + STR. Costs 8, partly returned on a hit. Hold, then release, for a heavy blow. Pilgrim’s Rest: Heals you for 15% of the damage it deals.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "cleric",
+   "wname": "Pilgrim’s Staff",
+   "model": "staff",
+   "coin": 0,
+   "rank": 0,
+   "blurb": "Longer and quicker than a mace, and lighter for it. Pilgrim’s Rest: Heals you for 15% of the damage it deals.",
+   "sig": {
+    "name": "Hurl Back",
+    "text": "throws them twice as far and breaks posture"
+   },
+   "trait": {
+    "name": "Pilgrim's Ward",
+    "text": "Every hit you land wraps you in a small ward of light (6 points, for 3s)."
+   },
+   "heavy": "Judgement Swing",
+   "prop": [
+    "Pilgrim’s Rest",
+    "Heals you for 15% of the damage it deals."
+   ],
+   "master": "Hurl Back"
+  },
+  {
+   "id": "d_staff",
+   "name": "Thornwood Staff",
+   "type": "melee",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "wis",
+   "cost": 8,
+   "wind": 0.22446,
+   "rec": 0.27456,
+   "range": 92,
+   "arc": 120,
+   "desc": "Tap to strike for 1d6 + WIS. Costs 8, partly returned on a hit. Hold, then release, for a heavy blow. Living Wood: Heals you for 12% of the damage it deals.",
+   "cls": "druid",
+   "wname": "Thornwood Staff",
+   "model": "staff",
+   "coin": 0,
+   "rank": 0,
+   "blurb": "Cut from something that grows without light. Long, quick, forgiving. Living Wood: Heals you for 12% of the damage it deals.",
+   "sig": {
+    "name": "Hurl Back",
+    "text": "throws them twice as far and breaks posture"
+   },
+   "trait": {
+    "name": "Thornwood Sweep",
+    "text": "Hits send them half again as far."
+   },
+   "heavy": "Rootbreaker",
+   "prop": [
+    "Living Wood",
+    "Heals you for 12% of the damage it deals."
+   ],
+   "master": "Hurl Back"
+  },
+  {
+   "id": "d_spear",
+   "name": "Stalactite Spear",
+   "type": "melee",
+   "dmg": [
+    1,
+    10
+   ],
+   "stat": "wis",
+   "cost": 8,
+   "wind": 0.22446,
+   "rec": 0.27456,
+   "range": 104,
+   "arc": 54,
+   "desc": "Tap to strike for 1d8 + WIS. Costs 8, partly returned on a hit. Hold, then release, for a heavy blow. First Blood: +20% damage to a foe above 85% health.",
+   "cls": "druid",
+   "wname": "Stalactite Spear",
+   "model": "spear",
+   "coin": 140,
+   "rank": 1,
+   "blurb": "A stone tooth lashed to a pole. Keeps them at the end of it. First Blood: +20% damage to a foe above 85% health.",
+   "sig": {
+    "name": "Hurl Back",
+    "text": "throws them twice as far and breaks posture"
+   },
+   "trait": {
+    "name": "Stalactite Cold",
+    "text": "Hits chill them: slowed for 1.5s, and slowed targets take 15% more."
+   },
+   "heavy": "Deep Thrust",
+   "prop": [
+    "First Blood",
+    "+20% damage to a foe above 85% health."
+   ],
+   "master": "Hurl Back"
+  },
+  {
+   "id": "d_flail",
+   "name": "Thorn Whip",
+   "type": "melee",
+   "dmg": [
+    1,
+    8
+   ],
+   "stat": "wis",
+   "cost": 8,
+   "wind": 0.280575,
+   "rec": 0.34320000000000006,
+   "range": 112,
+   "arc": 150,
+   "desc": "Tap to strike for 1d8 + WIS. Costs 8, partly returned on a hit. Hold, then release, for a heavy blow. Briar: Slows, and hits slowed foes 15% harder.",
+   "cls": "druid",
+   "wname": "Thorn Whip",
+   "model": "flail",
+   "coin": 220,
+   "rank": 2,
+   "blurb": "A living vine with opinions. Wide, slow, and it clings. Briar: Slows, and hits slowed foes 15% harder.",
+   "sig": {
+    "name": "Hamstring",
+    "text": "slows by 40% for 2s"
+   },
+   "trait": {
+    "name": "Snare",
+    "text": "Every hit pulls them a step towards you."
+   },
+   "heavy": "Rootbreaker",
+   "prop": [
+    "Briar",
+    "Slows, and hits slowed foes 15% harder."
+   ],
+   "master": "Hamstring"
+  },
+  {
+   "id": "d_hammer",
+   "name": "Root Maul",
+   "type": "melee",
+   "dmg": [
+    1,
+    12
+   ],
+   "stat": "wis",
+   "cost": 12,
+   "wind": 0.359136,
+   "rec": 0.41184000000000004,
+   "range": 66,
+   "arc": 100,
+   "pz": 2,
+   "knock": 130,
+   "desc": "Tap to strike for 1d12 + WIS. Costs 12, partly returned on a hit. Hold, then release, for a heavy blow. Deadfall: +25% damage to a foe below 35% health.",
+   "cls": "druid",
+   "wname": "Root Maul",
+   "model": "hammer",
+   "coin": 0,
+   "rank": 0,
+   "blurb": "A burl the size of a head on a root the length of an arm. Deadfall: +25% damage to a foe below 35% health.",
+   "sig": {
+    "name": "Skullringer",
+    "text": "stuns for 0.7s"
+   },
+   "trait": {
+    "name": "Rooted",
+    "text": "Heavy blows root them to the spot for 0.8s."
+   },
+   "heavy": "Rootbreaker",
+   "prop": [
+    "Deadfall",
+    "+25% damage to a foe below 35% health."
+   ],
+   "master": "Skullringer"
+  },
+  {
+   "id": "w_basic",
+   "name": "Eldritch Blast",
+   "type": "proj",
+   "dmg": [
+    1,
+    8
+   ],
+   "stat": "cha",
+   "cost": 8,
+   "wind": 0.29,
+   "rec": 0.286,
+   "speed": 594,
+   "knock": 90,
+   "desc": "Tap to loose for 1d8 + CHA. Costs 8, refunded on a hit. Hold, then release, for a heavy blow. Repelling: Every blast shoves them back.",
+   "cls": "warlock",
+   "wname": "Eldritch Blast",
+   "model": "fire",
+   "coin": 0,
+   "rank": 0,
+   "blurb": "A bolt of whatever your patron is made of. Hits like a thrown brick. Repelling: Every blast shoves them back.",
+   "sig": {
+    "name": "Agonising Blast",
+    "text": "a bigger bolt that keeps burning"
+   },
+   "trait": {
+    "name": "Repelling Blast",
+    "text": "Every blast shoves them back a long way."
+   },
+   "heavy": "Baleful Blast",
+   "prop": [
+    "Repelling",
+    "Every blast shoves them back."
+   ],
+   "master": "Agonising Blast"
+  },
+  {
+   "id": "w_frost",
+   "name": "Grave Chill",
+   "type": "proj",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "cha",
+   "cost": 8,
+   "wind": 0.29,
+   "rec": 0.286,
+   "speed": 504.9,
+   "desc": "Tap to loose for 1d6 + CHA. Costs 8, refunded on a hit. Hold, then release, for a heavy blow. Grave Cold: Slows, and hits slowed foes 12% harder.",
+   "cls": "warlock",
+   "wname": "Grave Chill",
+   "model": "frost",
+   "coin": 140,
+   "rank": 1,
+   "blurb": "Cold off something long dead. Slow in the air; slower still once it lands. Grave Cold: Slows, and hits slowed foes 12% harder.",
+   "sig": {
+    "name": "Grave’s Grip",
+    "text": "a bigger bolt that keeps burning"
+   },
+   "trait": {
+    "name": "Grave Cold",
+    "text": "Hits slow them, and slowed targets take 15% more."
+   },
+   "heavy": "Baleful Blast",
+   "prop": [
+    "Grave Cold",
+    "Slows, and hits slowed foes 12% harder."
+   ],
+   "master": "Grave’s Grip"
+  },
+  {
+   "id": "w_acid",
+   "name": "Gnawing Dark",
+   "type": "proj",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "cha",
+   "cost": 8,
+   "wind": 0.29,
+   "rec": 0.286,
+   "speed": 594,
+   "desc": "Tap to loose for 1d6 + CHA. Costs 8, refunded on a hit. Hold, then release, for a heavy blow. Gnaw: Poisons, and +15% to a foe below 35% health.",
+   "cls": "warlock",
+   "wname": "Gnawing Dark",
+   "model": "acid",
+   "coin": 220,
+   "rank": 2,
+   "blurb": "It keeps eating after it lands. You try not to wonder what it is eating with. Gnaw: Poisons, and +15% to a foe below 35% health.",
+   "sig": {
+    "name": "The Long Hunger",
+    "text": "a bigger bolt that keeps burning"
+   },
+   "trait": {
+    "name": "Gnaw",
+    "text": "Every hit poisons them a little longer."
+   },
+   "heavy": "Baleful Blast",
+   "prop": [
+    "Gnaw",
+    "Poisons, and +15% to a foe below 35% health."
+   ],
+   "master": "The Long Hunger"
+  },
+  {
+   "id": "w_spark",
+   "name": "Witch Bolt",
+   "type": "proj",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "cha",
+   "cost": 8,
+   "wind": 0.23199999999999998,
+   "rec": 0.24309999999999998,
+   "speed": 831.5999999999999,
+   "desc": "Tap to loose for 1d6 + CHA. Costs 8, refunded on a hit. Hold, then release, for a heavy blow. Tether: Heals you for 12% of the damage it deals.",
+   "cls": "warlock",
+   "wname": "Witch Bolt",
+   "model": "spark",
+   "coin": 0,
+   "rank": 0,
+   "blurb": "Thin, fast and spiteful. Tether: Heals you for 12% of the damage it deals.",
+   "sig": {
+    "name": "Soul Tether",
+    "text": "a bigger bolt that keeps burning"
+   },
+   "trait": {
+    "name": "Tether",
+    "text": "Each hit on the same target within two seconds adds 10%, up to +40%."
+   },
+   "heavy": "Baleful Blast",
+   "prop": [
+    "Tether",
+    "Heals you for 12% of the damage it deals."
+   ],
+   "master": "Soul Tether"
+  },
+  {
+   "id": "f_flail",
+   "name": "Pit Flail",
+   "type": "melee",
+   "dmg": [
+    1,
+    10
+   ],
+   "stat": "str",
+   "cost": 12,
+   "wind": 0.278,
+   "rec": 0.312,
+   "range": 88,
+   "arc": 150,
+   "pz": 1.6,
+   "desc": "Tap to strike for 1d10 + STR. Costs 12, partly returned on a hit. Hold, then release, for a heavy blow. Rattle: Every hit leaves them marked for a moment: they take 25% more.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "fighter",
+   "wname": "Pit Flail",
+   "model": "flail",
+   "coin": 480,
+   "rank": 4,
+   "blurb": "A spiked head on a chain. Goes round a raised shield as if it were not there. Rattle: Every hit leaves them marked for a moment: they take 25% more.",
+   "sig": {
+    "name": "Hamstring",
+    "text": "slows by 40% for 2s"
+   },
+   "trait": {
+    "name": "Over the Guard",
+    "text": "The head wraps round shields: against a raised guard it lands 40% harder."
+   },
+   "heavy": "Overhead Cleave",
+   "prop": [
+    "Rattle",
+    "Every hit leaves them marked for a moment: they take 25% more."
+   ],
+   "master": "Hamstring"
+  },
+  {
+   "id": "r_spear",
+   "name": "Gutter Pike",
+   "type": "melee",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "dex",
+   "cost": 8,
+   "wind": 0.196,
+   "rec": 0.227,
+   "range": 106,
+   "arc": 54,
+   "desc": "Tap to strike for 1d6 + DEX. Costs 8, partly returned on a hit. Hold, then release, for a heavy blow. First Blood: +20% damage to a foe above 85% health.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "rogue",
+   "wname": "Gutter Pike",
+   "model": "spear",
+   "coin": 480,
+   "rank": 4,
+   "blurb": "A boat-hook with ambitions. Nobody expects a rogue to have the reach. First Blood: +20% damage to a foe above 85% health.",
+   "sig": {
+    "name": "Hurl Back",
+    "text": "throws them twice as far and breaks posture"
+   },
+   "trait": {
+    "name": "Gutter Reach",
+    "text": "Hits at the far end of the reach land 25% harder and slow them."
+   },
+   "heavy": "Deep Thrust",
+   "prop": [
+    "First Blood",
+    "+20% damage to a foe above 85% health."
+   ],
+   "master": "Hurl Back"
+  },
+  {
+   "id": "s_staff",
+   "name": "Emberwood Staff",
+   "type": "proj",
+   "dmg": [
+    1,
+    10
+   ],
+   "stat": "cha",
+   "cost": 8,
+   "wind": 0.333,
+   "rec": 0.286,
+   "speed": 594,
+   "knock": 70,
+   "desc": "Tap to loose for 1d10 + CHA. Costs 8, refunded on a hit. Hold, then release, for a heavy blow. Ember Heart: Knocks back, and +15% to a foe above 85% health.",
+   "kind": "Cantrip",
+   "role": "Damage",
+   "cls": "sorcerer",
+   "wname": "Emberwood Staff",
+   "model": "staff",
+   "coin": 480,
+   "rank": 4,
+   "blurb": "A focus the length of a man. Bigger bolts, slower, and they shove. Ember Heart: Knocks back, and +15% to a foe above 85% health.",
+   "sig": {
+    "name": "Emberfall",
+    "text": "a bigger bolt that keeps burning"
+   },
+   "trait": {
+    "name": "Ember Burst",
+    "text": "Criticals burst against them and set them alight."
+   },
+   "heavy": "Charged Bolt",
+   "prop": [
+    "Ember Heart",
+    "Knocks back, and +15% to a foe above 85% health."
+   ],
+   "master": "Emberfall"
+  },
+  {
+   "id": "c_hammer",
+   "name": "Bell-Hammer",
+   "type": "melee",
+   "dmg": [
+    1,
+    12
+   ],
+   "stat": "str",
+   "cost": 13,
+   "wind": 0.365,
+   "rec": 0.406,
+   "range": 66,
+   "arc": 100,
+   "pz": 2.2,
+   "knock": 140,
+   "desc": "Tap to strike for 1d12 + STR. Costs 13, partly returned on a hit. Hold, then release, for a heavy blow. Toll: Every hit slows by 20% for a moment.",
+   "kind": "Weapon attack",
+   "role": "Damage",
+   "cls": "cleric",
+   "wname": "Bell-Hammer",
+   "model": "hammer",
+   "coin": 480,
+   "rank": 4,
+   "blurb": "Cast from a cracked chapel bell. It still rings, once, each time. Toll: Every hit slows by 20% for a moment.",
+   "sig": {
+    "name": "Skullringer",
+    "text": "stuns for 0.7s"
+   },
+   "trait": {
+    "name": "The Toll",
+    "text": "Heavy blows ring the bell: they are slowed for 2s and you hear it."
+   },
+   "heavy": "Judgement Swing",
+   "prop": [
+    "Toll",
+    "Every hit slows by 20% for a moment."
+   ],
+   "master": "Skullringer"
+  },
+  {
+   "id": "d_axes",
+   "name": "Bone Sickles",
+   "type": "melee",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "wis",
+   "cost": 6,
+   "wind": 0.175,
+   "rec": 0.22,
+   "range": 60,
+   "arc": 130,
+   "pz": 1.2,
+   "desc": "Tap to strike for 1d6 + WIS. Costs 6, partly returned on a hit. Hold, then release, for a heavy blow. Fester: Every cut festers for 2s.",
+   "cls": "druid",
+   "wname": "Bone Sickles",
+   "model": "axes",
+   "coin": 480,
+   "rank": 4,
+   "blurb": "A pair of curved jaw-bones, ground to an edge. Quick, close and ugly. Fester: Every cut festers for 2s.",
+   "sig": {
+    "name": "Twin Fangs",
+    "text": "strikes twice"
+   },
+   "trait": {
+    "name": "Bone Sickles",
+    "text": "Criticals open a bleed for 4s."
+   },
+   "heavy": "Rootbreaker",
+   "prop": [
+    "Fester",
+    "Every cut festers for 2s."
+   ],
+   "master": "Twin Fangs"
+  },
+  {
+   "id": "w_staff",
+   "name": "Rod of the Pact-Keeper",
+   "type": "proj",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "cha",
+   "cost": 8,
+   "wind": 0.29,
+   "rec": 0.286,
+   "speed": 594,
+   "knock": 60,
+   "desc": "Tap to loose for 1d6 + CHA. Costs 8, refunded on a hit. Hold, then release, for a heavy blow. Pact-Keeper: Slows, shoves, and ignores half their armour.",
+   "cls": "warlock",
+   "wname": "Rod of the Pact-Keeper",
+   "model": "staff",
+   "coin": 480,
+   "rank": 4,
+   "blurb": "It was somebody’s arm, once. The bolts it throws are heavy enough to push. Pact-Keeper: Slows, shoves, and ignores half their armour.",
+   "sig": {
+    "name": "The Clause",
+    "text": "a bigger bolt that keeps burning"
+   },
+   "trait": {
+    "name": "Pact Drain",
+    "text": "You heal for a tenth of every blow."
+   },
+   "heavy": "Baleful Blast",
+   "prop": [
+    "Pact-Keeper",
+    "Slows, shoves, and ignores half their armour."
+   ],
+   "master": "The Clause"
+  }
+ ],
+ "abilities": {
+  "fighter": [
+   {
+    "id": "shield_bash",
+    "name": "Shield Bash",
+    "type": "melee",
+    "dmg": [
+     1,
+     6
+    ],
+    "stat": "str",
+    "cd": 6,
+    "cost": 20,
+    "wind": 0.22,
+    "rec": 0.25,
+    "range": 70,
+    "arc": 80,
+    "knock": 160,
+    "mv": "bash",
+    "desc": "Lunge and slam for 1d6 + STR. Stuns for 1.1s.",
+    "kind": "Maneuver",
+    "role": "Control"
+   },
+   {
+    "id": "second_wind",
+    "name": "Second Wind",
+    "type": "buff",
+    "cd": 16,
+    "cost": 0,
+    "wind": 0.1,
+    "rec": 0.15,
+    "desc": "Catch your breath: heal 1d10 + CON + 3 per level.",
+    "kind": "Class feature",
+    "role": "Heal"
+   },
+   {
+    "id": "cleave",
+    "name": "Sweeping Cleave",
+    "type": "melee",
+    "dmg": [
+     2,
+     6
+    ],
+    "stat": "str",
+    "cd": 5,
+    "cost": 25,
+    "wind": 0.3,
+    "rec": 0.3,
+    "range": 84,
+    "arc": 230,
+    "knock": 260,
+    "mv": "spin",
+    "desc": "A wide arc for 2d6 + STR that hurls the target back.",
+    "kind": "Maneuver",
+    "role": "Damage"
+   },
+   {
+    "id": "leap_slam",
+    "name": "Leaping Slam",
+    "type": "aoe",
+    "dmg": [
+     2,
+     8
+    ],
+    "stat": "str",
+    "cd": 8,
+    "cost": 30,
+    "wind": 0.45,
+    "rec": 0.3,
+    "desc": "Leap to a spot and crash down: 2d8 + STR in an area, slowing for 2s.",
+    "kind": "Maneuver",
+    "role": "Damage"
+   },
+   {
+    "id": "war_cry",
+    "name": "War Cry",
+    "type": "aoe",
+    "dmg": [
+     1,
+     6
+    ],
+    "stat": "str",
+    "cd": 11,
+    "cost": 25,
+    "wind": 0.2,
+    "rec": 0.2,
+    "pz": 2.4,
+    "knock": 260,
+    "desc": "A shout that hits like a wall: 1d6 + STR around you, a hard shove, and it rattles their posture."
+   },
+   {
+    "id": "action_surge",
+    "name": "Action Surge",
+    "type": "buff",
+    "cd": 30,
+    "cost": 0,
+    "wind": 0.15,
+    "rec": 0.1,
+    "ult": 1,
+    "desc": "Reset every cooldown, refill Stamina, then gain +60% attack speed and +25% damage for 5s.",
+    "kind": "Class feature",
+    "role": "Burst"
+   },
+   {
+    "id": "caltrops",
+    "name": "Caltrops",
+    "type": "aoe",
+    "dmg": [
+     1,
+     4
+    ],
+    "stat": "dex",
+    "cd": 9,
+    "cost": 14,
+    "wind": 0.12,
+    "rec": 0.16,
+    "desc": "A handful of iron points where they are about to step: slowed for 4s and bleeding.",
+    "kind": "Cunning Action",
+    "role": "Control"
+   },
+   {
+    "id": "bull_rush",
+    "name": "Bull Rush",
+    "type": "melee",
+    "dmg": [
+     2,
+     6
+    ],
+    "stat": "str",
+    "cd": 9,
+    "cost": 22,
+    "wind": 0.22,
+    "rec": 0.3,
+    "range": 70,
+    "arc": 80,
+    "pz": 1.8,
+    "knock": 440,
+    "mv": "bash",
+    "desc": "Put your shoulder down and go. 2d6 + STR and a shove that carries them into the wall, or onto the spikes.",
+    "kind": "Maneuver",
+    "role": "Control"
+   },
+   {
+    "id": "hamstring",
+    "name": "Hamstring",
+    "type": "melee",
+    "dmg": [
+     1,
+     8
+    ],
+    "stat": "str",
+    "cd": 7,
+    "cost": 16,
+    "wind": 0.14,
+    "rec": 0.2,
+    "range": 82,
+    "arc": 100,
+    "mv": "lowcut",
+    "desc": "A low cut behind the knee: 1d8 + STR, and they move at half pace for 4s.",
+    "kind": "Maneuver",
+    "role": "Control"
+   },
+   {
+    "id": "overrun",
+    "name": "Overrun",
+    "type": "melee",
+    "dmg": [
+     2,
+     8
+    ],
+    "stat": "str",
+    "cd": 9,
+    "cost": 18,
+    "wind": 0.24,
+    "rec": 0.3,
+    "range": 76,
+    "arc": 120,
+    "knock": 300,
+    "mv": "bash",
+    "desc": "Spend all your Momentum on one charge: 2d8 + STR, +35% for every pip spent.",
+    "kind": "Maneuver",
+    "role": "Burst",
+    "spend": 1
+   },
+   {
+    "id": "pommel",
+    "name": "Pommel Strike",
+    "type": "melee",
+    "dmg": [
+     1,
+     6
+    ],
+    "stat": "str",
+    "cd": 5,
+    "cost": 12,
+    "wind": 0.1,
+    "rec": 0.16,
+    "range": 58,
+    "arc": 80,
+    "mv": "bash",
+    "desc": "The wrong end of the sword, very fast: 1d6 + STR and 0.8s dazed.",
+    "kind": "Maneuver",
+    "role": "Control"
+   }
+  ],
+  "rogue": [
+   {
+    "id": "shadowstep",
+    "name": "Shadowstep",
+    "type": "dash",
+    "cd": 6,
+    "cost": 20,
+    "wind": 0.04,
+    "rec": 0.08,
+    "desc": "Vanish and reappear behind your foe. Your next hit within 2.5s is a Sneak Attack (auto-crit, bonus d6s).",
+    "kind": "Cunning Action",
+    "role": "Mobility"
+   },
+   {
+    "id": "fan_knives",
+    "name": "Fan of Knives",
+    "type": "proj",
+    "dmg": [
+     1,
+     4
+    ],
+    "stat": "dex",
+    "cd": 5,
+    "cost": 20,
+    "wind": 0.14,
+    "rec": 0.2,
+    "speed": 640,
+    "desc": "Throw five knives in a fan. Each deals 1d4 + DEX.",
+    "kind": "Weapon attack",
+    "role": "Damage"
+   },
+   {
+    "id": "poison_blade",
+    "name": "Poisoned Blade",
+    "type": "melee",
+    "dmg": [
+     1,
+     6
+    ],
+    "stat": "dex",
+    "cd": 7,
+    "cost": 20,
+    "wind": 0.14,
+    "rec": 0.2,
+    "range": 60,
+    "arc": 90,
+    "mv": "lowcut",
+    "desc": "Stab for 1d6 + DEX and poison for 1d4 every half second for 5s.",
+    "kind": "Weapon attack",
+    "role": "Damage"
+   },
+   {
+    "id": "smoke_bomb",
+    "name": "Smoke Bomb",
+    "type": "buff",
+    "cd": 12,
+    "cost": 25,
+    "wind": 0.08,
+    "rec": 0.1,
+    "desc": "Disappear for 3s and move faster. Your next hit is a Sneak Attack.",
+    "kind": "Cunning Action",
+    "role": "Defense"
+   },
+   {
+    "id": "throwing_knife",
+    "name": "Throwing Knife",
+    "type": "proj",
+    "dmg": [
+     1,
+     6
+    ],
+    "stat": "dex",
+    "cd": 1.6,
+    "cost": 8,
+    "wind": 0.1,
+    "rec": 0.12,
+    "speed": 860,
+    "desc": "A cantrip of the trade: one fast knife for 1d6 + DEX. Cheap, quick, always ready."
+   },
+   {
+    "id": "flurry",
+    "name": "Flurry of Shadows",
+    "type": "dash",
+    "dmg": [
+     2,
+     6
+    ],
+    "stat": "dex",
+    "cd": 28,
+    "cost": 0,
+    "wind": 0.1,
+    "rec": 0.2,
+    "ult": 1,
+    "desc": "Blink through your foe four times. Each pass deals 2d6 + DEX.",
+    "kind": "Class feature",
+    "role": "Burst"
+   },
+   {
+    "id": "bear_trap",
+    "name": "Bear Trap",
+    "type": "aoe",
+    "dmg": [
+     2,
+     6
+    ],
+    "stat": "dex",
+    "cd": 11,
+    "cost": 20,
+    "wind": 0.14,
+    "rec": 0.15,
+    "desc": "Set iron jaws where you stand. The first to step in takes 2d6 + DEX and is held for 1.4s."
+   },
+   {
+    "id": "gut_cut",
+    "name": "Open Them Up",
+    "type": "melee",
+    "dmg": [
+     3,
+     6
+    ],
+    "stat": "dex",
+    "cd": 8,
+    "cost": 22,
+    "wind": 0.12,
+    "rec": 0.22,
+    "range": 66,
+    "arc": 50,
+    "mv": "backstab",
+    "desc": "In close and under the ribs: 3d6 + DEX, and they keep bleeding for 4s.",
+    "kind": "Cunning Action",
+    "role": "Damage"
+   },
+   {
+    "id": "tumble",
+    "name": "Tumble",
+    "type": "dash",
+    "cd": 4,
+    "cost": 12,
+    "wind": 0.04,
+    "rec": 0.08,
+    "desc": "Roll out of trouble, and keep moving faster for 2s.",
+    "kind": "Cunning Action",
+    "role": "Mobility"
+   },
+   {
+    "id": "exploit",
+    "name": "Exploit",
+    "type": "melee",
+    "dmg": [
+     3,
+     6
+    ],
+    "stat": "dex",
+    "cd": 8,
+    "cost": 16,
+    "wind": 0.1,
+    "rec": 0.18,
+    "range": 64,
+    "arc": 70,
+    "mv": "backstab",
+    "desc": "Spend all your Openings in one cut: 3d6 + DEX, +35% for every pip spent, and a full five bleeds them for 5s.",
+    "kind": "Cunning Action",
+    "role": "Burst",
+    "spend": 1
+   },
+   {
+    "id": "caltrops",
+    "name": "Caltrops",
+    "type": "aoe",
+    "dmg": [
+     1,
+     4
+    ],
+    "stat": "dex",
+    "cd": 9,
+    "cost": 14,
+    "wind": 0.12,
+    "rec": 0.16,
+    "desc": "A handful of iron points where they are about to step: slowed for 4s and bleeding.",
+    "kind": "Cunning Action",
+    "role": "Control"
+   }
+  ],
+  "sorcerer": [
+   {
+    "id": "burning_hands",
+    "name": "Burning Hands",
+    "type": "melee",
+    "dmg": [
+     3,
+     6
+    ],
+    "stat": "cha",
+    "cd": 6,
+    "cost": 25,
+    "wind": 0.25,
+    "rec": 0.25,
+    "range": 135,
+    "arc": 70,
+    "knock": 140,
+    "spell": 1,
+    "desc": "A sheet of flame: 3d6 + CHA in a cone, then burning for 3s.",
+    "kind": "1st-level spell",
+    "role": "Damage"
+   },
+   {
+    "id": "misty_step",
+    "name": "Misty Step",
+    "type": "dash",
+    "cd": 4,
+    "cost": 15,
+    "wind": 0.03,
+    "rec": 0.08,
+    "desc": "Teleport a short distance in silver mist. Untouchable while you travel.",
+    "kind": "2nd-level spell",
+    "role": "Mobility"
+   },
+   {
+    "id": "lightning_bolt",
+    "name": "Lightning Bolt",
+    "type": "line",
+    "dmg": [
+     3,
+     8
+    ],
+    "stat": "cha",
+    "cd": 7,
+    "cost": 30,
+    "wind": 0.4,
+    "rec": 0.25,
+    "range": 560,
+    "desc": "After a brief charge, a bolt strikes everything in a line for 3d8 + CHA.",
+    "kind": "3rd-level spell",
+    "role": "Damage"
+   },
+   {
+    "id": "ray_frost",
+    "name": "Ray of Frost",
+    "type": "proj",
+    "dmg": [
+     2,
+     8
+    ],
+    "stat": "cha",
+    "cd": 4,
+    "cost": 20,
+    "wind": 0.18,
+    "rec": 0.2,
+    "speed": 780,
+    "desc": "A frigid lance for 2d8 + CHA that slows by 50% for 3s.",
+    "kind": "Cantrip",
+    "role": "Damage"
+   },
+   {
+    "id": "glyph",
+    "name": "Glyph of Warding",
+    "type": "aoe",
+    "dmg": [
+     4,
+     6
+    ],
+    "stat": "cha",
+    "cd": 12,
+    "cost": 30,
+    "wind": 0.25,
+    "rec": 0.2,
+    "knock": 180,
+    "desc": "Scribe a sigil underfoot. When your foe crosses it: 4d6 + CHA, burning, and thrown back."
+   },
+   {
+    "id": "fireball",
+    "name": "Fireball",
+    "type": "aoe",
+    "dmg": [
+     6,
+     6
+    ],
+    "stat": "cha",
+    "cd": 26,
+    "cost": 0,
+    "wind": 0.3,
+    "rec": 0.3,
+    "knock": 220,
+    "ult": 1,
+    "desc": "A bead of fire streaks out and detonates: 6d6 + CHA in a huge area.",
+    "kind": "3rd-level spell",
+    "role": "Damage"
+   },
+   {
+    "id": "shocking_grasp",
+    "name": "Shocking Grasp",
+    "type": "melee",
+    "dmg": [
+     2,
+     8
+    ],
+    "stat": "cha",
+    "cd": 5,
+    "cost": 15,
+    "wind": 0.14,
+    "rec": 0.2,
+    "range": 78,
+    "arc": 110,
+    "knock": 320,
+    "spell": 1,
+    "desc": "For when they get close: 2d8 + CHA, a jolt that stuns, and a long shove away."
+   },
+   {
+    "id": "thunderwave",
+    "name": "Thunderwave",
+    "type": "aoe",
+    "dmg": [
+     2,
+     8
+    ],
+    "stat": "cha",
+    "cd": 9,
+    "cost": 26,
+    "wind": 0.18,
+    "rec": 0.2,
+    "pz": 2,
+    "knock": 400,
+    "desc": "A clap of thunder from your hands: 2d8 + CHA around you, and everything near is thrown back.",
+    "kind": "1st-level spell",
+    "role": "Control"
+   },
+   {
+    "id": "scorching_ray",
+    "name": "Scorching Ray",
+    "type": "proj",
+    "dmg": [
+     2,
+     6
+    ],
+    "stat": "cha",
+    "cd": 6,
+    "cost": 22,
+    "wind": 0.16,
+    "rec": 0.18,
+    "speed": 980,
+    "desc": "A fast line of fire: 2d6 + CHA, and they burn for 3s.",
+    "kind": "2nd-level spell",
+    "role": "Damage"
+   },
+   {
+    "id": "release",
+    "name": "Release",
+    "type": "aoe",
+    "dmg": [
+     3,
+     8
+    ],
+    "stat": "cha",
+    "cd": 10,
+    "cost": 20,
+    "wind": 0.2,
+    "rec": 0.2,
+    "knock": 280,
+    "desc": "Let all your Overcharge out at once around you: 3d8 + CHA, +35% for every pip spent.",
+    "kind": "2nd-level spell",
+    "role": "Burst",
+    "spend": 1
+   },
+   {
+    "id": "shatter",
+    "name": "Shatter",
+    "type": "aoe",
+    "dmg": [
+     3,
+     8
+    ],
+    "stat": "cha",
+    "cd": 8,
+    "cost": 22,
+    "wind": 0.18,
+    "rec": 0.2,
+    "knock": 200,
+    "desc": "A ringing crack in the air where they stand: 3d8 + CHA.",
+    "kind": "2nd-level spell",
+    "role": "Damage"
+   }
+  ],
+  "cleric": [
+   {
+    "id": "sacred_flame",
+    "name": "Sacred Flame",
+    "type": "aoe",
+    "dmg": [
+     2,
+     8
+    ],
+    "stat": "wis",
+    "cd": 4,
+    "cost": 20,
+    "wind": 0.2,
+    "rec": 0.2,
+    "desc": "Radiance descends on your foe after a moment: 2d8 + WIS.",
+    "kind": "Cantrip",
+    "role": "Damage"
+   },
+   {
+    "id": "cure_wounds",
+    "name": "Cure Wounds",
+    "type": "buff",
+    "cd": 12,
+    "cost": 30,
+    "wind": 0.35,
+    "rec": 0.15,
+    "desc": "Heal 2d8 + WIS + 2 per level.",
+    "kind": "1st-level spell",
+    "role": "Heal"
+   },
+   {
+    "id": "shield_faith",
+    "name": "Shield of Faith",
+    "type": "buff",
+    "cd": 14,
+    "cost": 25,
+    "wind": 0.15,
+    "rec": 0.1,
+    "desc": "A shimmering ward absorbs damage for 6s (22 + 5 per level).",
+    "kind": "1st-level spell",
+    "role": "Defense"
+   },
+   {
+    "id": "guiding_bolt",
+    "name": "Guiding Bolt",
+    "type": "proj",
+    "dmg": [
+     3,
+     6
+    ],
+    "stat": "wis",
+    "cd": 7,
+    "cost": 25,
+    "wind": 0.3,
+    "rec": 0.2,
+    "speed": 620,
+    "desc": "A flash of light for 3d6 + WIS. The target takes 25% more damage for 4s.",
+    "kind": "1st-level spell",
+    "role": "Damage"
+   },
+   {
+    "id": "toll_dead",
+    "name": "Toll the Dead",
+    "type": "aoe",
+    "dmg": [
+     1,
+     12
+    ],
+    "stat": "wis",
+    "cd": 3.2,
+    "cost": 14,
+    "wind": 0.16,
+    "rec": 0.18,
+    "desc": "A cantrip: a bell only they can hear. 1d12 + WIS, doubled against a foe below 40% health."
+   },
+   {
+    "id": "spirit_guardians",
+    "name": "Spirit Guardians",
+    "type": "buff",
+    "cd": 28,
+    "cost": 0,
+    "wind": 0.3,
+    "rec": 0.1,
+    "ult": 1,
+    "desc": "Spectral guardians circle you for 7s, dealing 1d8 + WIS twice a second and slowing foes inside.",
+    "kind": "3rd-level spell",
+    "role": "Burst"
+   },
+   {
+    "id": "guardian_sigil",
+    "name": "Guardian Sigil",
+    "type": "aoe",
+    "dmg": [
+     3,
+     8
+    ],
+    "stat": "wis",
+    "cd": 12,
+    "cost": 25,
+    "wind": 0.2,
+    "rec": 0.2,
+    "desc": "Bless the ground you hold. Whoever crosses it takes 3d8 + WIS and is stunned."
+   },
+   {
+    "id": "spirit_hammer",
+    "name": "Spiritual Hammer",
+    "type": "aoe",
+    "dmg": [
+     2,
+     8
+    ],
+    "stat": "wis",
+    "cd": 7,
+    "cost": 22,
+    "wind": 0.18,
+    "rec": 0.2,
+    "desc": "A hammer of light comes down on them from nowhere: 2d8 + WIS and a short stun.",
+    "kind": "2nd-level spell",
+    "role": "Damage"
+   },
+   {
+    "id": "sanctuary",
+    "name": "Sanctuary",
+    "type": "buff",
+    "cd": 15,
+    "cost": 26,
+    "wind": 0.2,
+    "rec": 0.12,
+    "desc": "A ward, a little mending and lighter feet: a shield, 1d6 + WIS health, and 20% speed for 3s.",
+    "kind": "1st-level spell",
+    "role": "Defense"
+   },
+   {
+    "id": "sanctify",
+    "name": "Sanctify",
+    "type": "buff",
+    "cd": 12,
+    "cost": 18,
+    "wind": 0.2,
+    "rec": 0.15,
+    "desc": "Spend all your Devotion: heal 2d8 + WIS, and a ward of 8 for every pip spent.",
+    "kind": "2nd-level spell",
+    "role": "Sustain",
+    "spend": 1
+   },
+   {
+    "id": "bane",
+    "name": "Bane",
+    "type": "melee",
+    "dmg": [
+     1,
+     4
+    ],
+    "stat": "wis",
+    "cd": 9,
+    "cost": 16,
+    "wind": 0.16,
+    "rec": 0.18,
+    "range": 150,
+    "arc": 90,
+    "spell": 1,
+    "desc": "A curse in a cone: everything you do to them for 5s lands 25% harder, and they move slower.",
+    "kind": "1st-level spell",
+    "role": "Control"
+   }
+  ],
+  "druid": [
+   {
+    "id": "wolf_form",
+    "name": "Tunnel Wolf",
+    "type": "buff",
+    "cd": 13,
+    "cost": 25,
+    "wind": 0.2,
+    "rec": 0.25,
+    "desc": "Become a tunnel wolf for 9s: 28% faster, quick lunging bites, and your heavy blow is a pounce. You change back winded.",
+    "kind": "Wild Shape",
+    "role": "Form"
+   },
+   {
+    "id": "moonbeam",
+    "name": "Moonbeam",
+    "type": "aoe",
+    "dmg": [
+     2,
+     10
+    ],
+    "stat": "wis",
+    "cd": 9,
+    "cost": 22,
+    "wind": 0.2,
+    "rec": 0.2,
+    "desc": "A column of pale light comes down on them: 2d10 + WIS.",
+    "kind": "2nd-level spell",
+    "role": "Damage"
+   },
+   {
+    "id": "bear_form",
+    "name": "Cave Bear",
+    "type": "buff",
+    "cd": 15,
+    "cost": 35,
+    "wind": 0.3,
+    "rec": 0.3,
+    "desc": "Become a cave bear for 10s: a thick hide soaks 34 + 6 per level, slow sweeping mauls break posture, and you hit 20% harder.",
+    "kind": "Wild Shape",
+    "role": "Form"
+   },
+   {
+    "id": "spider_form",
+    "name": "Pit Spider",
+    "type": "buff",
+    "cd": 14,
+    "cost": 30,
+    "wind": 0.2,
+    "rec": 0.25,
+    "desc": "Become a giant pit spider for 9s: every bite poisons and slows, and you skitter 12% faster.",
+    "kind": "Wild Shape",
+    "role": "Form"
+   },
+   {
+    "id": "regrowth",
+    "name": "Regrowth",
+    "type": "buff",
+    "cd": 11,
+    "cost": 28,
+    "wind": 0.35,
+    "rec": 0.15,
+    "desc": "Moss closes over the wound: heal 2d8 + WIS + 2 per level.",
+    "kind": "1st-level spell",
+    "role": "Heal"
+   },
+   {
+    "id": "primal_avatar",
+    "name": "The Old Bear Wakes",
+    "type": "buff",
+    "cd": 28,
+    "cost": 0,
+    "wind": 0.3,
+    "rec": 0.1,
+    "ult": 1,
+    "desc": "Become the cave bear the first miners drew on the walls, for 12s: enormous, armoured in hide, and 35% deadlier.",
+    "kind": "Class feature",
+    "role": "Burst"
+   },
+   {
+    "id": "barkskin",
+    "name": "Barkskin",
+    "type": "buff",
+    "cd": 14,
+    "cost": 25,
+    "wind": 0.15,
+    "rec": 0.1,
+    "desc": "Your skin turns to root-bark for 6s and soaks 22 + 5 per level.",
+    "kind": "2nd-level spell",
+    "role": "Defense"
+   },
+   {
+    "id": "ice_knife",
+    "name": "Ice Knife",
+    "type": "proj",
+    "dmg": [
+     1,
+     10
+    ],
+    "stat": "wis",
+    "cd": 5,
+    "cost": 16,
+    "wind": 0.14,
+    "rec": 0.18,
+    "speed": 860,
+    "desc": "A shard of cave ice: 1d10 + WIS, and the cold slows them for 2s.",
+    "kind": "1st-level spell",
+    "role": "Control"
+   },
+   {
+    "id": "entangle",
+    "name": "Entangle",
+    "type": "aoe",
+    "dmg": [
+     1,
+     6
+    ],
+    "stat": "wis",
+    "cd": 11,
+    "cost": 24,
+    "wind": 0.2,
+    "rec": 0.2,
+    "desc": "Roots come up through the sand where they stand: 1d6 + WIS and they are held to a crawl for 3s.",
+    "kind": "1st-level spell",
+    "role": "Control"
+   },
+   {
+    "id": "wildcall",
+    "name": "Call of the Wild",
+    "type": "aoe",
+    "dmg": [
+     2,
+     8
+    ],
+    "stat": "wis",
+    "cd": 10,
+    "cost": 18,
+    "wind": 0.2,
+    "rec": 0.2,
+    "desc": "Spend all your Wild Bond: the ground bites them for 2d8 + WIS, +35% and +0.3s held for every pip spent.",
+    "kind": "2nd-level spell",
+    "role": "Control",
+    "spend": 1
+   }
+  ],
+  "warlock": [
+   {
+    "id": "hex",
+    "name": "Hex",
+    "type": "proj",
+    "dmg": [
+     1,
+     6
+    ],
+    "stat": "cha",
+    "cd": 8,
+    "cost": 14,
+    "wind": 0.14,
+    "rec": 0.18,
+    "speed": 700,
+    "desc": "Your patron marks them: 1d6 + CHA, and they take 25% more from everything for 6s.",
+    "kind": "1st-level spell",
+    "role": "Control"
+   },
+   {
+    "id": "shadow_step",
+    "name": "Step Through the Dark",
+    "type": "dash",
+    "cd": 5,
+    "cost": 15,
+    "wind": 0.03,
+    "rec": 0.08,
+    "desc": "Step into one shadow and out of another. Untouchable while you travel.",
+    "kind": "2nd-level spell",
+    "role": "Mobility"
+   },
+   {
+    "id": "hunger_dark",
+    "name": "Arms of the Deep",
+    "type": "melee",
+    "dmg": [
+     3,
+     6
+    ],
+    "stat": "cha",
+    "cd": 6,
+    "cost": 25,
+    "wind": 0.25,
+    "rec": 0.25,
+    "range": 135,
+    "arc": 70,
+    "spell": 1,
+    "desc": "Cold black arms sweep out in a cone: 3d6 + CHA, and the cold keeps biting.",
+    "kind": "1st-level spell",
+    "role": "Damage"
+   },
+   {
+    "id": "cause_fear",
+    "name": "Cause Fear",
+    "type": "proj",
+    "dmg": [
+     2,
+     8
+    ],
+    "stat": "cha",
+    "cd": 4,
+    "cost": 20,
+    "wind": 0.18,
+    "rec": 0.2,
+    "speed": 780,
+    "desc": "Show them what waits below: 2d8 + CHA, and they move like a man wading for 3s.",
+    "kind": "1st-level spell",
+    "role": "Control"
+   },
+   {
+    "id": "shadow_ward",
+    "name": "Armour of Shadows",
+    "type": "buff",
+    "cd": 14,
+    "cost": 25,
+    "wind": 0.15,
+    "rec": 0.1,
+    "desc": "The dark thickens round you for 6s and soaks 22 + 5 per level.",
+    "kind": "Invocation",
+    "role": "Defense"
+   },
+   {
+    "id": "dark_pact",
+    "name": "The Bargain Called In",
+    "type": "aoe",
+    "dmg": [
+     6,
+     6
+    ],
+    "stat": "cha",
+    "cd": 26,
+    "cost": 0,
+    "wind": 0.3,
+    "rec": 0.3,
+    "knock": 220,
+    "ult": 1,
+    "desc": "What you sold comes to collect from somebody else: 6d6 + CHA in a huge area.",
+    "kind": "Mystic Arcanum",
+    "role": "Burst"
+   },
+   {
+    "id": "void_rift",
+    "name": "Hunger of the Pit",
+    "type": "aoe",
+    "dmg": [
+     2,
+     6
+    ],
+    "stat": "cha",
+    "cd": 10,
+    "cost": 26,
+    "wind": 0.22,
+    "rec": 0.2,
+    "desc": "A patch of black opens under them: 2d6 + CHA, slowed, and it keeps eating for 3s.",
+    "kind": "3rd-level spell",
+    "role": "Control"
+   },
+   {
+    "id": "fade_out",
+    "name": "Fade Out",
+    "type": "dash",
+    "cd": 6,
+    "cost": 16,
+    "wind": 0.04,
+    "rec": 0.08,
+    "desc": "Step back into the dark and out of sight for a moment.",
+    "kind": "Invocation",
+    "role": "Mobility"
+   },
+   {
+    "id": "foreclose",
+    "name": "Foreclose",
+    "type": "proj",
+    "dmg": [
+     3,
+     8
+    ],
+    "stat": "cha",
+    "cd": 9,
+    "cost": 18,
+    "wind": 0.2,
+    "rec": 0.2,
+    "speed": 760,
+    "desc": "Call in all your Debt at once: 3d8 + CHA, +35% for every pip spent, and you heal a fifth of it.",
+    "kind": "Invocation",
+    "role": "Burst",
+    "spend": 1
+   }
+  ]
+ },
+ "race": [
+  {
+   "race": "human",
+   "move": {
+    "id": "rc_grit",
+    "name": "Stubborn Streak",
+    "type": "buff",
+    "cd": 15,
+    "cost": 18,
+    "wind": 0.12,
+    "rec": 0.12,
+    "desc": "Humans do not know when to stop. Heal 1d8 + CON + 2 per level and strike 25% faster for 3s.",
+    "kind": "Human",
+    "role": "Heal"
+   }
+  },
+  {
+   "race": "elf",
+   "move": {
+    "id": "rc_feystep",
+    "name": "Fey Step",
+    "type": "dash",
+    "cd": 6,
+    "cost": 14,
+    "wind": 0.03,
+    "rec": 0.08,
+    "desc": "Step sideways out of the world and back in behind them. Your next blow lands as a sneak attack.",
+    "kind": "Elf",
+    "role": "Mobility"
+   }
+  },
+  {
+   "race": "dwarf",
+   "move": {
+    "id": "rc_stomp",
+    "name": "Stonefoot",
+    "type": "aoe",
+    "dmg": [
+     2,
+     6
+    ],
+    "stat": "con",
+    "cd": 10,
+    "cost": 22,
+    "wind": 0.2,
+    "rec": 0.25,
+    "pz": 2,
+    "knock": 200,
+    "desc": "One boot, put down the way the Old Seam taught: 2d6 + CON around you, stunned and shoved. You cannot be knocked out of it.",
+    "kind": "Dwarf",
+    "role": "Control"
+   }
+  },
+  {
+   "race": "halforc",
+   "move": {
+    "id": "rc_charge",
+    "name": "Tusk Charge",
+    "type": "melee",
+    "dmg": [
+     3,
+     6
+    ],
+    "stat": "str",
+    "cd": 9,
+    "cost": 24,
+    "wind": 0.24,
+    "rec": 0.3,
+    "range": 72,
+    "arc": 70,
+    "pz": 2,
+    "knock": 380,
+    "mv": "bash",
+    "desc": "Head down, straight through: a long charge for 3d6 + STR that carries them into whatever is behind.",
+    "kind": "Half-Orc",
+    "role": "Damage"
+   }
+  },
+  {
+   "race": "tiefling",
+   "move": {
+    "id": "rc_flare",
+    "name": "Hellish Flare",
+    "type": "aoe",
+    "dmg": [
+     2,
+     8
+    ],
+    "stat": "cha",
+    "cd": 9,
+    "cost": 24,
+    "wind": 0.2,
+    "rec": 0.2,
+    "desc": "What your grandmother bargained for: fire comes up under them for 2d8 + CHA and keeps burning for 4s.",
+    "kind": "Tiefling",
+    "role": "Damage"
+   }
+  },
+  {
+   "race": "drow",
+   "move": {
+    "id": "rc_faerie",
+    "name": "Faerie Fire",
+    "type": "proj",
+    "dmg": [
+     1,
+     8
+    ],
+    "stat": "dex",
+    "cd": 7,
+    "cost": 16,
+    "wind": 0.14,
+    "rec": 0.18,
+    "speed": 820,
+    "desc": "Cold violet light that will not rub off: 1d8 + DEX, slowed for 4s, and nowhere left to hide.",
+    "kind": "Drow",
+    "role": "Control"
+   }
+  }
+ ],
+ "earned": [
+  {
+   "cls": "fighter",
+   "move": {
+    "id": "pe_execute",
+    "name": "Headsman’s Due",
+    "type": "melee",
+    "dmg": [
+     3,
+     8
+    ],
+    "stat": "str",
+    "cd": 11,
+    "cost": 28,
+    "wind": 0.3,
+    "rec": 0.35,
+    "range": 78,
+    "arc": 90,
+    "mv": "chop",
+    "desc": "The blow you learned from being the one left standing: 3d8 + STR, doubled against a foe below 40% health.",
+    "kind": "Pit-earned",
+    "role": "Damage"
+   }
+  },
+  {
+   "cls": "rogue",
+   "move": {
+    "id": "pe_vanish",
+    "name": "Gone Again",
+    "type": "buff",
+    "cd": 13,
+    "cost": 22,
+    "wind": 0.05,
+    "rec": 0.08,
+    "desc": "Ten bouts taught you where the crowd is not looking. Vanish for 2.5s, faster, with a sneak attack waiting.",
+    "kind": "Pit-earned",
+    "role": "Defense"
+   }
+  },
+  {
+   "cls": "sorcerer",
+   "move": {
+    "id": "pe_chain",
+    "name": "Chain Lightning",
+    "type": "line",
+    "dmg": [
+     4,
+     6
+    ],
+    "stat": "cha",
+    "cd": 8,
+    "cost": 28,
+    "wind": 0.32,
+    "rec": 0.22,
+    "range": 600,
+    "desc": "It stopped being one bolt somewhere around your eighth win: a wide line for 4d6 + CHA and a short stun.",
+    "kind": "Pit-earned",
+    "role": "Damage"
+   }
+  },
+  {
+   "cls": "cleric",
+   "move": {
+    "id": "pe_tide",
+    "name": "Turn the Tide",
+    "type": "buff",
+    "cd": 20,
+    "cost": 30,
+    "wind": 0.3,
+    "rec": 0.15,
+    "desc": "A proper prayer, for once answered: heal 3d8 + WIS + 3 per level and stand behind a ward for 6s.",
+    "kind": "Pit-earned",
+    "role": "Heal"
+   }
+  },
+  {
+   "cls": "druid",
+   "move": {
+    "id": "pe_swarm",
+    "name": "The Crawling Dark",
+    "type": "aoe",
+    "dmg": [
+     1,
+     6
+    ],
+    "stat": "wis",
+    "cd": 10,
+    "cost": 24,
+    "wind": 0.2,
+    "rec": 0.2,
+    "desc": "Everything that lives under the sand comes up at once: 1d6 + WIS, then 5s of biting and slowing.",
+    "kind": "Pit-earned",
+    "role": "Control"
+   }
+  },
+  {
+   "cls": "warlock",
+   "move": {
+    "id": "pe_rip",
+    "name": "Collect",
+    "type": "proj",
+    "dmg": [
+     3,
+     6
+    ],
+    "stat": "cha",
+    "cd": 8,
+    "cost": 22,
+    "wind": 0.2,
+    "rec": 0.2,
+    "speed": 760,
+    "desc": "Your patron takes its share and passes you a little: 3d6 + CHA, and half of it comes back to you as health.",
+    "kind": "Pit-earned",
+    "role": "Damage"
+   }
+  }
+ ],
+ "beast": [
+  {
+   "trait": "The Pack",
+   "id": "bite_wolf",
+   "name": "Bite",
+   "type": "melee",
+   "dmg": [
+    1,
+    8
+   ],
+   "stat": "wis",
+   "cost": 5,
+   "wind": 0.16182,
+   "rec": 0.19344,
+   "range": 70,
+   "arc": 60,
+   "desc": "Tap to strike for 1d8 + WIS. Costs 5, refunded on a hit. Hold, then release, for a heavy blow."
+  },
+  {
+   "trait": "The Weight",
+   "id": "maul_bear",
+   "name": "Maul",
+   "type": "melee",
+   "dmg": [
+    2,
+    8
+   ],
+   "stat": "wis",
+   "cost": 11,
+   "wind": 0.33930000000000005,
+   "rec": 0.39,
+   "range": 78,
+   "arc": 130,
+   "pz": 2,
+   "knock": 150,
+   "desc": "Tap to strike for 2d8 + WIS. Costs 11, refunded on a hit. Hold, then release, for a heavy blow."
+  },
+  {
+   "trait": "Venom",
+   "id": "bite_spider",
+   "name": "Venom Bite",
+   "type": "melee",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "wis",
+   "cost": 7,
+   "wind": 0.22185,
+   "rec": 0.2652,
+   "range": 66,
+   "arc": 70,
+   "desc": "Tap to strike for 1d6 + WIS. Costs 7, refunded on a hit. Hold, then release, for a heavy blow."
+  },
+  {
+   "trait": "Blood Drinker",
+   "id": "rake_bat",
+   "name": "Raking Dive",
+   "type": "melee",
+   "dmg": [
+    1,
+    6
+   ],
+   "stat": "wis",
+   "cost": 5,
+   "wind": 0.14355,
+   "rec": 0.21839999999999998,
+   "range": 84,
+   "arc": 46,
+   "desc": "Tap to strike for 1d6 + WIS. Costs 5, refunded on a hit. Hold, then release, for a heavy blow."
+  },
+  {
+   "trait": "The Old Thing",
+   "id": "maul_avatar",
+   "name": "Ruin",
+   "type": "melee",
+   "dmg": [
+    3,
+    8
+   ],
+   "stat": "wis",
+   "cost": 8,
+   "wind": 0.3132,
+   "rec": 0.3432,
+   "range": 96,
+   "arc": 150,
+   "pz": 2.4,
+   "knock": 220,
+   "desc": "Tap to strike for 3d8 + WIS. Costs 8, refunded on a hit. Hold, then release, for a heavy blow."
+  }
+ ],
+ "races": [
+  {
+   "id": "human",
+   "name": "Human",
+   "bonus": {
+    "str": 1,
+    "dex": 1,
+    "con": 1,
+    "int": 1,
+    "wis": 1,
+    "cha": 1
+   },
+   "desc": "+1 to every ability. Adaptable, hungry, everywhere."
+  },
+  {
+   "id": "dwarf",
+   "name": "Dwarf",
+   "bonus": {
+    "con": 2,
+    "wis": 1
+   },
+   "desc": "+2 Constitution, +1 Wisdom. Born under stone and hard to put down."
+  },
+  {
+   "id": "elf",
+   "name": "Elf",
+   "bonus": {
+    "dex": 2,
+    "int": 1
+   },
+   "desc": "+2 Dexterity, +1 Intelligence. Quick hands, long memory."
+  },
+  {
+   "id": "halforc",
+   "name": "Half-Orc",
+   "bonus": {
+    "str": 2,
+    "con": 1
+   },
+   "desc": "+2 Strength, +1 Constitution. The pit crowd loves a bruiser."
+  },
+  {
+   "id": "tiefling",
+   "name": "Tiefling",
+   "bonus": {
+    "cha": 2,
+    "int": 1
+   },
+   "desc": "+2 Charisma, +1 Intelligence. Infernal blood, and an infernal spirit that answers when you taunt: hellhound, ember cat or carrion crow."
+  },
+  {
+   "id": "drow",
+   "name": "Drow",
+   "bonus": {
+    "dex": 2,
+    "cha": 1
+   },
+   "desc": "+2 Dexterity, +1 Charisma. Deep elves: ash skin, white hair, red eyes. The only people in the Undercity who think it is too bright."
+  }
+ ],
+ "stances": {
+  "ground": [
+   "Guild Standard",
+   "The Crouch",
+   "Parade Rest",
+   "The Long Line",
+   "The Roof",
+   "Gutter Guard",
+   "Tavern Lean",
+   "The Hound"
+  ],
+  "floating": [
+   "Stillness",
+   "The Seated Hour",
+   "Open Hands",
+   "The Recline",
+   "The Coil",
+   "The Drowned"
+  ]
+ },
+ "rings": [
+  {
+   "id": "cinder",
+   "name": "Cinder Ring",
+   "cls": "sorcerer"
+  },
+  {
+   "id": "glass",
+   "name": "Wet Glass",
+   "cls": "sorcerer"
+  },
+  {
+   "id": "storm",
+   "name": "The Stormcall",
+   "cls": "sorcerer"
+  },
+  {
+   "id": "wyrm",
+   "name": "Wyrm’s Eye",
+   "cls": "sorcerer"
+  },
+  {
+   "id": "pale",
+   "name": "Pale Crown",
+   "cls": "sorcerer"
+  },
+  {
+   "id": "ash",
+   "name": "Ash Circle",
+   "cls": "warlock"
+  },
+  {
+   "id": "line",
+   "name": "The Signed Line",
+   "cls": "warlock"
+  },
+  {
+   "id": "teeth",
+   "name": "Teeth Below",
+   "cls": "warlock"
+  },
+  {
+   "id": "seal",
+   "name": "The Bargain Seal",
+   "cls": "warlock"
+  },
+  {
+   "id": "unspoken",
+   "name": "Name Unspoken",
+   "cls": "warlock"
+  },
+  {
+   "id": "hourmark",
+   "name": "The Roseinbeirg Hourmark",
+   "cls": "david"
+  }
+ ],
+ "guests": [
+  {
+   "id": "david",
+   "name": "David Roseinbeirg",
+   "race": "Something Old",
+   "title": "Keeper of the Hour",
+   "moves": [
+    "The Sand Runs Out",
+    "Called In",
+    "A Stolen Second"
+   ],
+   "ult": "Midnight",
+   "fin": "Your Hour Is Up"
+  },
+  {
+   "id": "bottie",
+   "name": "Lil Bottie",
+   "race": "Clanker",
+   "title": "Super Soldier",
+   "moves": [
+    "Clanker Guns",
+    "Chain Stun",
+    "Air Support"
+   ],
+   "ult": "Nuke the Data Center",
+   "fin": "Latte-ality"
+  },
+  {
+   "id": "marcus",
+   "name": "Marcus",
+   "race": "Bro",
+   "title": "Plumbing Boss",
+   "moves": [
+    "Pipe Wrench",
+    "Dab Cloud",
+    "Double or Nothing",
+    "Hydro Jet",
+    "Snake the Drain",
+    "Plunger Pop"
+   ],
+   "ult": "The Final Bet",
+   "fin": "Derek Pulls Up"
+  },
+  {
+   "id": "will",
+   "name": "Will",
+   "race": "Founder",
+   "title": "The Developer",
+   "moves": [
+    "Selfie Flash",
+    "Mazel Tov Blast",
+    "Cuyaflare",
+    "Bessie",
+    "Mossman",
+    "Bike Lane",
+    "Push to Main"
+   ],
+   "ult": "Hasbara",
+   "fin": "Selfie-ality"
+  },
+  {
+   "id": "erin",
+   "name": "Erin",
+   "race": "Gardener",
+   "title": "Keeper of the Garden",
+   "moves": [
+    "Cuyapup: River Fire",
+    "Bessling: Lake Wake",
+    "Grasskin: Big Stomp",
+    "Towel Whip",
+    "Hide and Seek",
+    "Sprout Stampede",
+    "Leash Lasso",
+    "Bean Dip"
+   ],
+   "ult": "Louie Airlines",
+   "fin": "Garden-ality"
+  },
+  {
+   "id": "louie",
+   "name": "Louie",
+   "race": "Evolved Shiba",
+   "title": "Good Boy",
+   "moves": [
+    "Zoom Zoom Zoom",
+    "Chomp",
+    "Need More Loaf",
+    "Turbo Zoom",
+    "Paw Paw Paw",
+    "Shiba Plane"
+   ],
+   "ult": "Judgement",
+   "fin": "Bork-ality"
+  },
+  {
+   "id": "bibi",
+   "name": "King Bibi",
+   "race": "Incumbent",
+   "title": "Prime Minister, Again",
+   "moves": [
+    "Red Line",
+    "Iron Dome",
+    "Filibuster",
+    "Next Question",
+    "Coalition"
+   ],
+   "ult": "War Criminal",
+   "fin": "Filibuster-ality"
+  },
+  {
+   "id": "sprout",
+   "name": "A Sprout",
+   "race": "Sprout",
+   "title": "Seedling",
+   "moves": [
+    "Pluck",
+    "Carry",
+    "Swarm"
+   ],
+   "ult": "The Whole Patch",
+   "fin": "Compost-ality"
+  },
+  {
+   "id": "kael",
+   "name": "Kael Brennick",
+   "race": "Sootborn, Gilded",
+   "title": "Accredited, Fully Gilded",
+   "moves": [
+    "Hook Line",
+    "Reaping Hook",
+    "Sling Blade",
+    "Wide Cut",
+    "Breach",
+    "Kick",
+    "Headbutt and Throw",
+    "Shaft Drop",
+    "The Turn",
+    "The Measure",
+    "The Roar",
+    "The Boots"
+   ],
+   "ult": "ELEVEN",
+   "fin": "Eleven, for the Furnace"
+  }
+ ]
+}

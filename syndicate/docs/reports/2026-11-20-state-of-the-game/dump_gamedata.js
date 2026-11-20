@@ -1,0 +1,17 @@
+const { chromium } = require('playwright'); const fs = require('fs');
+(async () => { const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const p = await b.newPage(); await p.addInitScript(() => { window.requestAnimationFrame = () => 0; }); await p.goto('http://localhost:8765/index.html'); await p.waitForTimeout(800); await p.evaluate(() => { G.bootSkip(); G.bootSkip(); }); await p.waitForTimeout(400);
+  const d = await p.evaluate(() => { const A = G.ABILITIES, C = G.CLASSES, out = {};
+    const ab = id => { const a = A[id]; if (!a) return null; return { id, name: a.name, type: a.type, dmg: a.dmg, stat: a.stat, cd: a.cd, cost: a.cost, wind: a.wind, rec: a.rec, range: a.range, arc: a.arc, speed: a.speed, pz: a.pz, knock: a.knock, ult: a.ult, spell: a.spell, mv: a.mv, desc: a.desc, kind: a.kind, role: a.role, spend: a.spend }; };
+    out.classes = Object.keys(C).map(k => ({ id: k, name: C[k].name, role: C[k].role, res: C[k].res, hitDie: C[k].hitDie, primary: C[k].primary, stats: C[k].stats, basic: C[k].basic, start: C[k].start, l2: C[k].l2, ult: C[k].ult, extra: (G.EXTRA[k] || []), subs: C[k].subs ? Object.keys(C[k].subs).map(s => C[k].subs[s].name) : [], edge: G.EDGE && G.EDGE[k], mortals: (G.MORTALS[k] || []).map(m => ({ id: m.id, rank: m.rank, name: m.name, word: m.word, desc: m.desc })) }));
+    out.ranks = G.RANKS.map(r => ({ name: r.name, at: r.at }));
+    out.arms = G.ARMS.map(w => Object.assign({}, ab(w.id), { cls: w.cls, wname: w.name, model: w.model, coin: w.cost, rank: w.rank, deed: w.deed, blurb: w.blurb, sig: G.SIG && G.SIG[w.id], trait: G.ARM_TRAIT && G.ARM_TRAIT[w.id] && { name: G.ARM_TRAIT[w.id].name, text: G.ARM_TRAIT[w.id].text }, heavy: A[w.id + '_h'] ? A[w.id + '_h'].name : null, prop: G.WEAPON_TRAIT && G.WEAPON_TRAIT[w.id], master: A[w.id + '_m'] ? A[w.id + '_m'].name : null }));
+    out.abilities = {}; Object.keys(C).forEach(k => { const ids = new Set([].concat(C[k].start, C[k].l2, [C[k].ult], G.EXTRA[k] || [])); out.abilities[k] = [...ids].filter(Boolean).map(ab).filter(Boolean); });
+    out.race = G.RACE_MOVE ? Object.keys(G.RACE_MOVE).map(r => ({ race: r, move: ab(G.RACE_MOVE[r]) })) : []; out.earned = G.EARNED_MOVE ? Object.keys(G.EARNED_MOVE).map(c => ({ cls: c, move: ab(G.EARNED_MOVE[c]) })) : [];
+    out.beast = ['bite_wolf', 'maul_bear', 'bite_spider', 'rake_bat', 'maul_avatar'].map(id => Object.assign({ trait: G.ARM_TRAIT[id] && G.ARM_TRAIT[id].name }, ab(id)));
+    out.races = Object.keys(G.RACES).map(r => ({ id: r, name: G.RACES[r].name, bonus: G.RACES[r].bonus, desc: G.RACES[r].desc }));
+    out.stances = G.STANCES ? { ground: G.STANCES.g.map(s => s.name), floating: G.STANCES.f.map(s => s.name) } : null;
+    out.rings = G.RINGS ? Object.keys(G.RINGS).map(k => ({ id: k, name: G.RINGS[k].name, cls: G.RINGS[k].cls })) : [];
+    out.guests = G.EGGS ? Object.keys(G.EGGS).filter(k => !G.EGGS[k].hidden).map(k => { const e = G.EGGS[k]; return { id: k, name: e.name, race: G.RACES[e.race].name, title: e.clsName, moves: e.known.map(m => A[m] && A[m].name), ult: A[e.ult] && A[e.ult].name, fin: e.fin && e.fin[1] }; }) : [];
+    return out; });
+  fs.writeFileSync('gamedata.json', JSON.stringify(d, null, 1)); console.log(Object.keys(d).map(k => k + ':' + (Array.isArray(d[k]) ? d[k].length : typeof d[k])).join(' ')); await b.close(); })();
