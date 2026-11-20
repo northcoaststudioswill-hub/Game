@@ -539,4 +539,4 @@ function festB() {
 }
 
 // the Proctor duel plays before the ceremony: the night Kael learns what the Authority takes, cut against the night he takes something back
-{ const f0 = festA; festA = function () { return (NOFF ? [] : [{ card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Day nineteen.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.ford() }]).concat(f0()); }; }
+{ const f0 = festA; festA = function () { return (NOFF ? [] : [{ card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. Day nineteen.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.ford() }, { card: 'LAST BELL', sub: 'Bay Three. Forty-two days after the furnace.', big: 1, tr: 'wake', min: 1.5, max: 4.5 }, { brawl: () => walkLastBell() }]).concat(f0()); }; }

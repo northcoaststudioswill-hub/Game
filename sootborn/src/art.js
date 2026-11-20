@@ -81,6 +81,8 @@ function drawChar(g, ox, oy, d, f, o, blink) {
     if (o.extra === 'coat') { R(5, ty, 6, th - 1, '#b8c2c4'); R(ax, ty + 1, 2, al, '#aab4b8'); }
     if (o.extra === 'apron') R(5, ty + 1, 2, th - 1, '#7a5638');
   }
+  // the seat knife: a hooked blade a palm long, hung at the hip. The only edge a valve hand may carry
+  if (o.knife) { const kx = d === 0 ? 4 : d === 1 ? 11 : 7, ky = ty + th - 1; R(kx, ky, 1, 1, '#b08a44'); R(kx, ky + 1, 1, 3, '#c9d2da'); R(kx + (d === 0 ? -1 : 1), ky + 3, 1, 1, '#9aa4ae'); }
   // ---- head
   if (d === 0) {
     R(4, 3 + Y, 8, 6, skin); R(5, 2 + Y, 6, 1, skin); R(11, 4 + Y, 1, 5, skinD); R(5, 8 + Y, 6, 1, skinD); R(3, 5 + Y, 1, 2, skinD); R(12, 5 + Y, 1, 2, skinD);
@@ -527,3 +529,8 @@ function renderMapLayer(m) {
   c.tall = []; for (const p of m.props) { const T = TALLP[p.t], fn = PROPS[p.t]; if (!T || !fn) continue; const [c2, g2] = mk(T[0], T[1]); fn(g2, T[2], T[3], p.w || p.a, p.h); c.tall.push({ cv: c2, x: p.x * 16 - T[2], y: p.y * 16 - T[3], base: p.y * 16 + T[4], t: p.t, px: p.x, py: p.y }); }
   return c;
 }
+// the seat board: every valve hand's knife hangs here between last bell and first. One hook has been empty since the furnace
+PROPS.knives = function (g, x, y, w) { w = (w || 2) * 16; const R = (a, b, ww, h, c) => { g.fillStyle = c; g.fillRect(x + a, y + b, ww, h); };
+  R(0, 0, w, 14, '#120b0a'); R(1, 1, w - 2, 12, '#4a3426'); R(1, 1, w - 2, 1, '#6a4c38');
+  for (let r = 0; r < 2; r++) for (let i = 0; i * 3 + 3 < w - 3; i++) { const hx = 3 + i * 3, hy = 2 + r * 6; R(hx, hy, 1, 1, '#b08a44'); if (r === 1 && i === 4) { R(hx - 1, hy + 4, 3, 1, '#b08a44'); continue; } R(hx, hy + 1, 1, 3, '#c9d2da'); R(hx + 1, hy + 3, 1, 1, '#9aa4ae'); } };
+

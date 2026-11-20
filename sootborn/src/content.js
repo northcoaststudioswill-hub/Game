@@ -55,7 +55,7 @@ const MAPS = {
     name: 'Maintenance Bay 3', w: 24, h: 14, theme: 'bay', music: 'work', dark: 'rgba(10,6,10,.5)',
     set: [[0, 6, 'E'], [0, 7, 'E'], [13, 2, 4, 2, ','], [15, 9, 8, 4, ','], [17, 1, 'D']],
     overhead: [[1, 3.0, 8, 3.4], [12, 6.2, 22, 5.8]], screens: [[6, 1, 3]],
-    props: [{ t: 'pipes', x: 1, y: 1, w: 3 }, { t: 'board', x: 4, y: 1, w: 2 }, { t: 'pipes', x: 6, y: 1, w: 3 }, { t: 'valves', x: 9, y: 1 }, { t: 'pipes', x: 12, y: 1, w: 2 }, { t: 'furnace', x: 14, y: 1 },
+    props: [{ t: 'pipes', x: 1, y: 1, w: 3 }, { t: 'board', x: 4, y: 1, w: 2 }, { t: 'pipes', x: 6, y: 1, w: 3 }, { t: 'valves', x: 9, y: 1 }, { t: 'pipes', x: 12, y: 1, w: 2 }, { t: 'knives', x: 12, y: 1, w: 2 }, { t: 'furnace', x: 14, y: 1 },
       { t: 'pipes', x: 16, y: 1, w: 1 }, { t: 'door', x: 17, y: 1 }, { t: 'pipes', x: 18, y: 1, w: 1 }, { t: 'freight', x: 19, y: 1 }, { t: 'pipes', x: 21, y: 1, w: 2 }, { t: 'hazard', x: 19, y: 2, w: 2, h: 1 },
       { t: 'conveyor', x: 2, y: 10, w: 6, block: blk(2, 10, 6) }, { t: 'crate', x: 16, y: 10, block: blk(16, 10) }, { t: 'crate', x: 18, y: 10, block: blk(18, 10) }, { t: 'crate', x: 20, y: 10, a: 1, block: blk(20, 10) },
       { t: 'label', x: 16, y: 10, a: 'A' }, { t: 'label', x: 18, y: 10, a: 'B' }, { t: 'label', x: 20, y: 10, a: 'C' },
@@ -66,7 +66,7 @@ const MAPS = {
       { t: 'vent', x: 13, y: 4 }, { t: 'vent', x: 17, y: 6 }, { t: 'oil', x: 6, y: 6 }, { t: 'oil', x: 14, y: 8 }, { t: 'oil', x: 9, y: 11 }, { t: 'barrel', x: 3, y: 4, block: blk(3, 4) }, { t: 'crate', x: 13, y: 7, block: blk(13, 7) }, { t: 'crate', x: 8, y: 7, block: blk(8, 7) }],
     lights: [{ x: 240, y: 30, r: 90, c: '#ff7a30', furnace: 1 }, { x: 168, y: 34, r: 58, c: '#4fd6d0' }, { x: 80, y: 92, r: 56 }, { x: 200, y: 124, r: 56 }, { x: 304, y: 112, r: 64 },
       { x: 312, y: 34, r: 24, c: '#ff3020' }, { x: 80, y: 164, r: 40 }, { x: 120, y: 30, r: 50, c: '#7ad8ff' }],
-    hot: [{ id: 'shiftboard', tiles: blk(4, 1, 2) }, { id: 'valves', tiles: blk(9, 1, 3) }, { id: 'furnace', tiles: blk(14, 1, 2) }, { id: 'freight', tiles: blk(19, 1, 2) },
+    hot: [{ id: 'shiftboard', tiles: blk(4, 1, 2) }, { id: 'knifeboard', tiles: blk(12, 1, 2) }, { id: 'valves', tiles: blk(9, 1, 3) }, { id: 'furnace', tiles: blk(14, 1, 2) }, { id: 'freight', tiles: blk(19, 1, 2) },
       { id: 'crateA', tiles: blk(16, 10) }, { id: 'crateB', tiles: blk(18, 10) }, { id: 'crateC', tiles: blk(20, 10) }, { id: 'conveyor', tiles: blk(2, 10, 6) }, { id: 'hatch', tiles: blk(11, 12) }, { id: 'relay', tiles: blk(21, 7) }, { id: 'screen', tiles: blk(6, 1, 3) }, { id: 'poster4', tiles: blk(1, 1, 2) }, { id: 'poster1', tiles: blk(21, 1, 2) }],
     exits: [{ tiles: [[0, 6], [0, 7]], to: 'square', spawn: { x: 26 * 16 + 4, y: 8 * 16 + 4, dir: 2 } },
       { tiles: [[17, 1]], to: 'fuse', spawn: { x: 5 * 16 + 8, y: 6 * 16 + 4, dir: 1 }, when: () => F('fuseOrder'), deny: () => [narr('FUSE ROOM C. Locked. Mara has the key, and Mara has opinions about keys.'), narr("WO-116 is on tomorrow's board.")] }]

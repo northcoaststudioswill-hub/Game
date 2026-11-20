@@ -1,4 +1,48 @@
-# SOOTBORN — changelog (latest v0.68 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.69 · 2026-11-20)
+
+## v0.69 · 2026-11-20 — two new places to walk in Part One (the camp by day; Bay Three at last bell with the seat knives), and Lucan's own look
+Step 4 of the plan. Both are 2.5D places (the plan's new ones, approved). Neither has a fight.
+
+**The camp by day** (the Assay, day three; in the first night's dream, after the Pairing)
+- Card: MORNING / The Assay. Day three. The camp by daylight. He wakes with his hand on half a loaf, and says the plan's line: "Forty of us in one House, and every one of them was sent by somebody."
+- House Violet's camp in daylight: tents, the standard, the Proctors' ranking board (Violet eleventh), a cold fire ring.
+- Who is there: **Petra Lune** keeping her column, with one boxed name at the foot of it (Aldane, D.). **Oswin Hale**, whose father finished ninth, trying to split wet wood with a blunt practice blade. **Corin Ashby** counting the lamp oil (twelve flasks; "it is only arithmetic"). **The Sisters Vey**, two cadets in teal come up from the river to read Violet's bar. A cadet who watched the other door and has not seen it open again.
+- Two things to look at: **your pack** (Dorian's half loaf, uneaten) and the Proctors' board.
+- **One choice: who you sit with** at the cold fire (Oswin, Petra or Corin). It is remembered: on night twenty-eight, at the Circle, that person has one more line.
+- The night scene that was already there (fetch wood, raise water, light the fire) follows it, so the fire you light that night is now the one you sat beside cold.
+
+**Bay Three at last bell** (First Fire, forty-two days after; between the Ford and the ceremony)
+- Card: LAST BELL / Bay Three. Forty-two days after the furnace.
+- Crew Three walks its seat knives back to the board by the furnace doors. Mara calls the numbers; a Warden counts hooks; Ivo and Old Orin each have a line. **Hook 306 is empty.** You hang your own on the next one, 307. The Warden says "Balanced."
+- **The seat board is on the wall of Bay Three in free play too**, between Bank Seven and the heart-furnace, and can be read.
+- **Seat knives on belts:** Kael, Seren, Mara and Ivo now carry a small hooked knife at the hip in the 2D world below.
+
+**Lucan Aurel, so he cannot be mistaken for Kael** (your note of 2026-11-20: a head and hair of his own, and details in his armour)
+- **Hair:** drawn back into a high tail bound with a gilt ring, hanging to his shoulder blades and swinging as he moves; two long locks left at the temples. Kael's is short, gold and spiked.
+- **Head:** the crown of points stays; a blue stone at the brow.
+- **Armour:** the sun of his House on the breastplate with a blue stone in it, a high gilt collar, a blue tabard with a gilt hem, a fin with a blue stone on each pauldron.
+- **Cloak:** gold, lined in dark blue, with a gilt hem. Kael's is plain white. Blue is Lucan's colour now and nobody else in the Assay wears it.
+- This is on every Lucan in the arena: the cold open, the Keep, The Son, and the films.
+
+**Where I did not follow the plan, and why**
+- **Dorian is not in the camp.** The plan's note said he lived. The written story has him carried out "by the other door", has Kael eating his bread on night forty-nine, puts "Aldane, D." on the wall of names, and makes his sister sell the raid for him. So he is present as his bread and as a boxed name on Petra's slate, not in person. Say if you want him alive and I will change the later scenes to match.
+- **Oswin has no bad leg yet.** The written story hurts it on night forty-nine. On day three he has his father.
+- **The Sisters Vey are House Teal** (they come for Violet's standard on day twenty-six), so they are visitors at the board, not members of the camp.
+
+**Engine**
+- A walk scene can say something as you arrive (`open` on the walk). Two new props for walk scenes: the ranking board (`rank`) and the seat board (`kboard`).
+- New test: `walk2.mjs` (any 2.5D place end to end: every person, every spot, the exit and its choice).
+
+**Checked**
+- Both places walked by script: the arrival line, every person, every spot, the exit; all three choices at the fire set the flag; a still of each.
+- The seat board on the Bay Three map, read in free play; the knife on Kael's belt in a still.
+- The whole-story bot, New Game to THE END (see the note at the end of this entry).
+
+**Not checked**
+- Nothing by hand.
+- The Circle's remembered line was not played on night twenty-eight; it was only written and the flag confirmed.
+- The belt knife is two or three pixels: seen on Kael from behind only.
+- Lucan was seen in one close still from the side and front quarter, not from behind and not in motion. His 2D walking figure (the Last Night) takes the new colours but was not looked at.
 
 ## v0.68 · 2026-11-20 — the new things in the opening: the animated intro, the Keep's ending, the white cloak, the Table at the door
 Step 3 of the plan. Four things, all in Part One.

@@ -24,7 +24,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Repo:** `https://github.com/northcoaststudioswill-hub/game`, branch **`sootborn`**. The pre-reorder game is kept on branch `sootborn-v0.64-before-reorder`.
 - **Layout:** `src/*.js` (the game), `src/shell.html`, `issue/` (the comic-book levels), `build.mjs`, `index.html` (built), `tests/`, `docs/`.
 - **Build:** `node build.mjs` → `index.html` (one self-contained file, about 2.2 MB). It runs `issue/patch.mjs` itself, which turns `issue/base.html` + `rig.js` + `world.js` + `story.js` into `issue/issue.html`. Never edit `issue/base.html`; add patches in `issue/patch.mjs` (each `rep(a, b)` must match exactly once; new blocks go before the marker `\nif (/Calloway|Tally|Deacon`).
-- **Version string:** `src/ui.js`, "Version 0.68." Next is 0.69.
+- **Version string:** `src/ui.js`, "Version 0.69." Next is 0.70.
 - **Publish:** the game is the Claude artifact with slug `2a8a025c-511d-454c-861c-d9bc7a4565f5`; publish `index.html` with `publish_files` and the live version as `base_version` (get it with `get_artifact`). The illustrated progress report is `be5babce-6d5d-4c6e-9668-9b2185959f6c`.
 - **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md` (v0.66 on; v0.56 to v0.65 in `-changelog-archive-2.md`, v0.1 to v0.55 in `-changelog-archive.md`, so the live one stays cheap to read), `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
 - **Commits** end with the attribution lines your session gives you. Push with `git -c push.negotiate=true push origin sootborn` (it prints "repository moved" and still succeeds). If the push is rejected, fetch and rebase first: other sessions also push here.
@@ -93,10 +93,10 @@ Release after every step (Part A2, rule 6). Each step lists what is in it, why i
 - Tests added: `prel.mjs` (stills of the intro; VW, VH, TIMES, TAG), `prel2.mjs` (the intro from New Game in real time; SKIP=1), `keepend.mjs` (the Keep's ending, stepped), `ilse.mjs` (the callback).
 - Not done here and still wanted: the intro has only been seen as stills. If the owner finds Kael and Lucan hard to tell apart in white, give Kael's cloak a violet lining.
 
-**Step 4 · v0.69 · Part One's two new 2.5D places, with the seat knives**
-- The camp by day (4f) with Dorian, Oswin, Petra, the Sisters Vey, Corin; the choice of who you sit with, remembered later.
-- Bay Three at last bell (5b): the knife board, hook 306, counting back. Seat knives on Crew Three's belts everywhere below. The board in Bay Three in free play too.
-- Check: `walk.mjs` with the two new ids; the knife board visible in Ashgate free play.
+**Step 4 · v0.69 · Part One's two new 2.5D places, with the seat knives** — **DONE 2026-11-20**
+- Done: the camp by day (`walkCampDay` in `src/assay.js`, `FF.campday`; card MORNING in `DREAM1` after the Pairing; the choice sets `G.flags.campSat` = oswin|petra|corin and the Circle on night 28 reads it). Bay Three at last bell (`walkLastBell`, `FF.lastbell`; card LAST BELL in `festA` after the Ford). The seat board on the Bay Three map (`PROPS.knives`, hotspot `knifeboard`). Knives on Kael's, Seren's, Mara's and Ivo's belts (`knife: 1` on a look; drawn in `makeChar`). A walk can speak on arrival (`walk.open`). Walk props `rank` and `kboard`. Test: `walk2.mjs` (M=campday|lastbell, PICK=0|1|2).
+- **Departures from Part C, waiting on the owner:** Dorian is not in the camp (the written story has him carried out by the other door and on the wall of names; his bread and a boxed name stand in for him). Oswin's leg is not hurt until night 49, as written. The Sisters Vey are Teal and only visit the board. Kael's hook is 307.
+- Not done: the knife count at the end of the other days below.
 
 **Step 5 · v0.70 · the vent stack (comic-book level, 8c)**
 - Vertical climb on the island's stack with Voss's dead boots; charge at the top; jump. Uses the existing level kit and moves. Flight is live from here on in every later fight.

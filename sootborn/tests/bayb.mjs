@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const page = await (await browser.newContext({ viewport: { width: 1280, height: 720 } })).newPage();
+const errors = []; page.on('pageerror', e => errors.push(e.message)); const wait = ms => page.waitForTimeout(ms), ev = (f, a) => page.evaluate(f, a);
+await page.goto('file:///home/claude/below-the-sun/dist/index.html#noff'); await wait(600);
+for (let i = 0; i < 40 && !(await ev(() => BTS.G.mode === 'title' && BTS.UI.stack.length)); i++) { await page.keyboard.press('Enter'); await wait(250); } await wait(300);
+await ev(() => { BTS.UI.clear(); BTS.Game.loadSave(Save.migrate(JSON.parse(JSON.stringify(CHECKPOINTS.day1 || Object.values(CHECKPOINTS)[0])))); });
+await wait(1500); await ev(() => { BTS.UI.clear(); Fade.a = 0; Fade.busy = false; World.load('bay', { x: 12 * 16 + 14, y: 2 * 16 + 14, dir: 1 }, true); BTS.G.mode = 'world'; World.showPlayer = true; });
+await wait(900); await page.screenshot({ path: '/home/claude/shots/v69/bay-0.png' });
+await page.keyboard.press('ArrowUp'); await wait(200); await page.keyboard.press('KeyE'); await wait(700); await page.screenshot({ path: '/home/claude/shots/v69/bay-1.png' });
+console.log('dialogue', await ev(() => BTS.Dialogue.active), await ev(() => (document.querySelector('#dlg .tx') || {}).textContent), 'checkpoints', await ev(() => Object.keys(CHECKPOINTS).join(',')), 'errors', errors); await browser.close();

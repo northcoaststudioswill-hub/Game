@@ -283,7 +283,7 @@ const DREAM1 = () => [
   { pstage: 3 }, { wait: 1.2 },
   { narr: 'A Proctor reads out a dead boy\'s name. I answer to it. Nobody looks twice. Ilse was right about that: they do not look at each other, only at what the other is worth.' },
   { narr: 'That night they seal us in by twos.' },
-  { fade: 'out' }, { panel: null }, ...(NOFF ? [] : [{ card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The first night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.pairing() }]),
+  { fade: 'out' }, { panel: null }, ...(NOFF ? [] : [{ card: 'FOUR YEARS AFTER THE FURNACE', sub: 'The Assay. The first night.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => FF.pairing() }, { card: 'MORNING', sub: 'The Assay. Day three. The camp by daylight.', big: 1, min: 1.5, max: 4.5 }, { brawl: () => walkCampDay() }]),
   { panel: 'assay' }, { pstage: 3 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
   { narr: 'On the third day House Violet still had not eaten. Forty heirs, a river, a wood full of deer. I had expected to hate them. I had not expected to have to feed them.' },
   { fade: 'out' }, { panel: null }, { card: 'NIGHT THREE', sub: 'The Assay. Day three, after dark.', big: 1, min: 1.5, max: 4.5 }, { mission: 'camp' },

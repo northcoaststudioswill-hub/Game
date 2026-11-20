@@ -4,16 +4,16 @@
 // G.tendency holds his "drive" chosen in the prologue: caretaker=Heart, tinkerer=Pride, seeker=Hunger.
 // ============================================================
 const DRIVE = { caretaker: 'Heart', tinkerer: 'Pride', seeker: 'Hunger' };
-const KAEL_LOOK = { skin: '#c48a64', hair: '#6a2e18', style: 'spiky', shirt: '#3d5a6a', pants: '#2a3440', scarf: '#b8682a' };
+const KAEL_LOOK = { skin: '#c48a64', hair: '#6a2e18', style: 'spiky', shirt: '#3d5a6a', pants: '#2a3440', scarf: '#b8682a', knife: 1 };
 const LOOKS = [Object.assign({ label: 'Kael' }, KAEL_LOOK)];
 const playerLook = () => Object.assign({}, KAEL_LOOK);
 const crowd = (skin, hair, style, shirt) => () => ({ skin, hair, style, shirt, pants: '#2a2420' });
 const CAST = {
   kael: { name: 'Kael', look: () => playerLook() },
-  seren: { name: 'Seren Holloway', look: () => ({ skin: '#9a6448', hair: '#1e1416', style: 'long', shirt: '#6a3a4a', pants: '#2a2430', band: '#c8a050' }) },
+  seren: { name: 'Seren Holloway', look: () => ({ knife: 1, skin: '#9a6448', hair: '#1e1416', style: 'long', shirt: '#6a3a4a', pants: '#2a2430', band: '#c8a050' }) },
   tavi: { name: 'Tavi', look: () => ({ skin: KAEL_LOOK.skin, hair: KAEL_LOOK.hair, style: 'short', shirt: '#7a4a6a', pants: '#3a2e40', kid: 1 }) },
-  mara: { name: 'Mara Venn', look: () => ({ skin: '#a86e4e', hair: '#7a7470', style: 'bun', band: '#8a3a2e', shirt: '#4a3a30', pants: '#2a2420', extra: 'apron' }) },
-  ivo: { name: 'Ivo', look: () => ({ skin: '#d8a07a', hair: '#c8a040', style: 'spiky', extra: 'goggles', shirt: '#5a6a34', pants: '#3a3028' }) },
+  mara: { name: 'Mara Venn', look: () => ({ knife: 1, skin: '#a86e4e', hair: '#7a7470', style: 'bun', band: '#8a3a2e', shirt: '#4a3a30', pants: '#2a2420', extra: 'apron' }) },
+  ivo: { name: 'Ivo', look: () => ({ knife: 1, skin: '#d8a07a', hair: '#c8a040', style: 'spiky', extra: 'goggles', shirt: '#5a6a34', pants: '#3a3028' }) },
   orin: { name: 'Old Orin', look: () => ({ skin: '#b07a5a', hair: '#d8d0c0', style: 'bald', extra: 'beard', shirt: '#5a4a6a', pants: '#2a2430' }) },
   nell: { name: 'Nell', look: () => ({ skin: '#7a4e36', hair: '#1a1014', style: 'long', extra: 'coat', shirt: '#d8dcd8', pants: '#3a4a5a' }) },
   dace: { name: 'Dace Morrow', look: () => ({ skin: '#e0b090', hair: '#5a3a20', style: 'short', extra: 'hat', shirt: '#3d5a6a', pants: '#2a3440' }) },
@@ -44,7 +44,7 @@ const CAST = {
   wren: { name: 'Kestrel Dray', look: () => ({ accredited: 1, cadet: 1, skin: '#f0dcc8', hair: '#c88a4a', style: 'short', robe: '#e8e4dc', armor: '#e8e4dc', trim: '#e8c25a', sash: '#4a8ac8' }) },
   teo: { name: 'Dorian Aldane', look: () => ({ accredited: 1, cadet: 1, skin: '#e8c8a8', hair: '#d8b070', style: 'short', robe: '#e8e0cc', armor: '#e8e0cc', trim: '#e8c25a', sash: '#7a5ac8' }) },
   voss: { name: 'Proctor Voss', look: () => ({ skirt: 1, accredited: 1, cadet: 1, skin: '#f0e0d4', hair: '#e8e4dc', style: 'short', circlet: 1, crown: 1, robe: '#fbf8f0', armor: '#fbf8f0', trim: '#e8c25a', sash: '#f4f0e6', cape: '#f4f2ec' }) },
-  lucan: { name: 'Lucan Aurel', look: () => ({ accredited: 1, cadet: 1, skin: '#f4e6dc', hair: '#f6eac0', style: 'long', long: 1, circlet: 1, crown: 1, robe: '#fbf8f0', armor: '#fbf8f0', trim: '#e8c25a', sash: '#e8c25a', cape: '#f4f2ec' }) },
+  lucan: { name: 'Lucan Aurel', look: () => ({ accredited: 1, cadet: 1, skin: '#f4e6dc', hair: '#f6eac0', style: 'long', long: 1, heir: 1, circlet: 1, crown: 1, robe: '#fbf8f0', armor: '#fbf8f0', trim: '#e8c25a', sash: '#2f7fd0', cape: '#e9c860' }) },
   hollis: { name: 'Hollis the welder', look: crowd('#8a5a3e', '#2a1a14', 'short', '#5a4a3a') },
   marrow: { name: 'Marrow', look: crowd('#c08a6a', '#4a3020', 'long', '#4a4a5a') },
   fen: { name: 'Old Fen', look: crowd('#d0a080', '#6a6a6a', 'bald', '#3a4a4a') },
@@ -288,6 +288,7 @@ const TALK = {
 
 // ---- hotspot scripts
 const HOT = {
+  knifeboard: () => [narr("THE SEAT BOARD · CREW THREE\nHung at last bell. Counted by a Warden. An empty hook at first bell is a line struck by morning."), narr('Three hundred and six has been empty since the furnace. Mine is the next one along. I have never once had to look for it.')],
   mural: () => [narr('A painted sun, peeling at the edges. Mom painted it the year Tavi was born.'), narr("Seren used to touch it on her way out the door. For luck, she said. It didn't work.")],
   shelf: () => [narr("Seren's festival lantern, half-finished. A paper sun on a wire frame. She never got to light it."),
     narr('Beside it, the tin. Authority grey, with a little stamped sun on the lid. Somebody up there thought that was a nice touch.'),

@@ -439,9 +439,9 @@ function walkCircle(atFire) {
         ...[[150, 4], [164, -14], [170, 22], [182, 2], [156, 36], [144, -30]].map(([x, y], i) => ({ t: 'crowd', x, y, s: World.sheetFor(i % 2 ? 'cadt2' : 'cadt1'), k: i + 20 }))],
       npcs: [
         ...Array.from({ length: 13 }, (_, i) => { const a = (-30 + i * 20) * Math.PI / 180, j = (i * 7) % 5 - 2; return { id: i % 3 === 2 ? 'cadv2' : 'cadv1', x: Math.cos(a) * (92 + j * 3), y: -Math.sin(a) * (46 + j * 2), r: 9 }; }),
-        N('petra', -50, -16, 'PETRA LUNE', [say('petra', 'Forty of us, and nobody has sat down. One has seen that once before: the morning they read the pairings.'), narr('She has her slate under her arm. She is the only one here who looked at the fire before she looked at me.')]),
-        N('oswin', 52, -14, 'OSWIN HALE', [say('oswin', 'One brought the water up before anybody asked. It seemed the night for it.'), narr('He is standing on the leg. He will not let any of them see him favour it.')]),
-        N('corin', -58, 10, 'CORIN ASHBY', [say('corin', 'One has the tally here, should it be wanted. Eleven flasks.'), narr('Eleven. He says it the way a man says his own name.')]),
+        N('petra', -50, -16, 'PETRA LUNE', [...(G.flags.campSat === 'petra' ? [narr('She shifts her slate so that I can read it over her shoulder. She has not done that for anybody else in twenty-five days.')] : []), say('petra', 'Forty of us, and nobody has sat down. One has seen that once before: the morning they read the pairings.'), narr('She has her slate under her arm. She is the only one here who looked at the fire before she looked at me.')]),
+        N('oswin', 52, -14, 'OSWIN HALE', [...(G.flags.campSat === 'oswin' ? [narr('He gives me the smallest nod there is. I showed him where the grain runs, on day three.')] : []), say('oswin', 'One brought the water up before anybody asked. It seemed the night for it.'), narr('He is standing on the leg. He will not let any of them see him favour it.')]),
+        N('corin', -58, 10, 'CORIN ASHBY', [...(G.flags.campSat === 'corin' ? [narr('He does not quite look at me. On day three I did his sum for him and he wrote it down as his own.')] : []), say('corin', 'One has the tally here, should it be wanted. Eleven flasks.'), narr('Eleven. He says it the way a man says his own name.')]),
         N('merrow', 128, 12, 'MERROW', [say('merrow', 'Thirty of us at the edge of your light, Sorrel. Notice that nobody has asked us to come nearer.'), narr('Nobody has. That is mine to mend, and it will not be mended tonight.')]),
         N('cadv1', 34, 28, 'A CADET IN A BORROWED CLOAK', [say('cadv1', 'Is it true that below the rock they burn their dead? One heard it from a porter. One did not believe it.'), narr('They burn more than their dead. I told her I had heard the same.')])],
       spots: [
@@ -492,3 +492,54 @@ function walkWard() {
       spots: [{ id: 'board', x: 124, y: -48, r: 8, reach: 30, ph: 44, name: 'THE WARD BOARD', verb: 'LEAVE THEM SLEEPING', exit: 1, talk: () => [narr('Three nights. That was all it ever was. I would do the sum the same way again, and I know what it comes to.')] }] } };
 }
 FF.circle = walkCircle; FF.square = walkSquare; FF.rowmorn = walkRowMorning; FF.ward = walkWard;
+
+// ---- the camp by day (plan 4f): House Violet on day three, before the fighting piles up. Nothing here is needed; one choice is remembered.
+function walkCampDay() {
+  const N = (id, x, y, name, lines, key) => ({ id, x, y, name, key, talk: () => lines });
+  const vey = [narr('Two cadets in teal, come up from the river to read our bar. Nobody stops them. A board is there to be read.'), say('cadt1', 'Eleventh.'), say('cadt2', 'One had heard twelfth. One is almost disappointed.'), narr('They have the same face and the same way of standing, a hand apart. They do not look at me. They look at where I would have to put my feet to reach them both.')];
+  const sit = (who, lines) => ({ t: who, fx: () => { G.flags.campSat = lines[0]; }, then: lines.slice(1) });
+  return { era: 2, d2: 1, title: 'THE CAMP', sub: 'THE ASSAY. DAY THREE', bg: 'valley', arena: { kind: 'ring', rx: 190, ry: 72 }, music: 'dusk', hero: { id: 'kael2', hp: 9, pow: 1, blade: 0, fury0: 0 },
+    walk: { id: 'campday', spawn: [-150, 30], clear: 200,
+      open: () => [narr('I wake with my hand on half a loaf of bread, and for a moment he is still holding out the other half.'), narr('Forty of us in one House, and every one of them was sent by somebody.')],
+      obj: k => k.n >= 3 ? 'THE FIRE RING IS COLD. SIT DOWN WITH SOMEBODY.' : 'DAY THREE. HOUSE VIOLET, BY DAYLIGHT. WALK THE CAMP.',
+      floor(g) { g.fillStyle = 'rgba(90,70,44,.5)'; g.beginPath(); g.ellipse(256, 256, 104, 50, 0, 0, 6.3); g.fill(); g.fillStyle = 'rgba(40,34,30,.75)'; g.beginPath(); g.ellipse(256, 256, 20, 10, 0, 0, 6.3); g.fill(); g.fillStyle = 'rgba(150,146,140,.6)'; for (let i = 0; i < 9; i++) { const a = i / 9 * 6.283; g.beginPath(); g.ellipse(256 + Math.cos(a) * 21, 256 + Math.sin(a) * 10.5, 4, 2.4, 0, 0, 6.3); g.fill(); }
+        g.fillStyle = 'rgba(90,70,44,.36)'; for (let i = 0; i < 26; i++) { g.beginPath(); g.ellipse(256 - 104 - i * 6, 256 + 12 + Math.sin(i * .5) * 6, 9, 4, 0, 0, 6.3); g.fill(); } },
+      props: [{ t: 'tent', x: -196, y: -62, c: '#7a5ac8', k: 1 }, { t: 'tent', x: -120, y: -88, c: '#7a5ac8', k: 2 }, { t: 'tent', x: 30, y: -96, c: '#7a5ac8', k: 3 }, { t: 'tent', x: 110, y: -90, c: '#7a5ac8', k: 4 },
+        ...Array.from({ length: 14 }, (_, i) => ({ t: 'tree', x: -260 + i * 40 + (i * 13) % 17, y: -120 - (i * 7) % 30, k: i, h: 64 + (i * 11) % 24 })),
+        { t: 'banner', x: -44, y: -78, c: '#7a5ac8', k: 1 }, { t: 'rank', x: 150, y: -36, at: 10, k: 1 },
+        ...[[-96, -40], [-70, -52], [96, 36], [70, 48], [-10, 52], [20, -50]].map(([x, y], i) => ({ t: 'crowd', x, y, s: World.sheetFor(i % 2 ? 'cadv2' : 'cadv1'), k: i + 20 }))],
+      npcs: [
+        N('petra', -52, -14, 'PETRA LUNE', [say('petra', 'Forty on the roll. One keeps the column because nobody else will, and because sooner or later somebody will ask.'), narr('At the foot of her slate, apart from the forty, one more name with a box drawn round it. Aldane, D. She has not written what became of him. Nobody has told her. Nobody has told me, and I was in the room.')]),
+        N('oswin', 44, -10, 'OSWIN HALE', [say('oswin', 'Father finished ninth at his Assay. He has been ninth for thirty years. One is not to finish ninth. That was the whole of the advice.'), narr('He is trying to split wet wood with a practice blade. They are issued blunt, four for forty, on purpose. He has not worked out yet that it is on purpose.')]),
+        N('corin', -64, 16, 'CORIN ASHBY', [say('corin', 'One has counted the lamp oil. Twelve flasks, for forty, for a season. It is only arithmetic, Sorrel, but somebody ought to be doing it.'), narr('He is right. He is also pleased to be right. I do not know yet which of those is going to matter.')]),
+        N('cadt1', 108, 8, 'THE SISTERS VEY', vey, 'vey'), N('cadt2', 121, 17, 'THE SISTERS VEY', vey, 'vey'),
+        N('cadv2', 14, 30, 'A CADET WHO HAS NOT SLEPT', [say('cadv2', 'They took the losers out by the other door. One watched for it to open again. It has not opened again.'), narr('Nobody up here says where that door goes. They say a pairing "balanced". I have heard the word used that way before.')])],
+      spots: [
+        { id: 'pack', x: -150, y: 6, r: 7, reach: 26, ph: 14, name: 'MY PACK', verb: 'LOOK', talk: () => [narr('Half a loaf, wrapped in a lift ticket. He tore it down the middle on the way up and held this half out before I had said a word to him.'), narr('Dorian Aldane. Sixteen. I have not eaten it. I am not going to think about why.')] },
+        { id: 'rank', x: 150, y: -30, r: 8, reach: 26, ph: 60, name: "THE PROCTORS' BOARD", verb: 'READ', talk: () => [narr('Twelve bars, repainted from the air each dawn. Violet is eleventh. Under the bars, in small clean letters: POSITIONS ARE PROVISIONAL. DEBTS ARE NOT.'), narr('It is the shift rota. I would know it anywhere. They have only put Houses where we put hands.')] },
+        { id: 'ring', x: 0, y: 2, r: 12, reach: 32, ph: 16, name: 'THE COLD FIRE RING', verb: 'SIT DOWN', exit: 1, talk: () => [narr('Nine stones and three days of ash. Nobody here has ever had to light anything.'), { choice: [
+          sit('Sit by Oswin and the wet wood.', ['oswin', say('oswin', 'One had rather hoped nobody would.'), narr('We do not talk. I take the blunt blade off him and show him where the grain runs. Below, a child knows that. He watches my hands and not the wood, and says nothing about what he sees on them.')]),
+          sit('Sit by Petra and her slate.', ['petra', say('petra', 'You may sit. You may not read over one\'s shoulder.'), narr('I read over her shoulder. Forty names, a column for bread, a column for water, and a third she has not headed yet. Below we would have headed it OWED.')]),
+          sit('Sit by Corin and his count.', ['corin', say('corin', 'Sit, then. Tell one whether twelve is enough.'), narr('It is not enough. A flask every four days is twelve, and the season is fifty. I say so. He writes it down as if it had been his.')])] }] }] } };
+}
+// ---- Bay Three at last bell (plan 5b): the seat knives go back on the board and are counted. Hook 306 has been empty for forty-two days.
+function walkLastBell() {
+  const N = (id, x, y, name, lines) => ({ id, x, y, name, talk: () => lines }); let mine = 0;
+  return { era: 0, title: 'LAST BELL', sub: 'BAY THREE. FORTY-TWO DAYS AFTER THE FURNACE', bg: 'furnace', arena: { kind: 'rect', w: 230, h: 84 }, music: 'work',
+    walk: { id: 'lastbell', spawn: [-92, 24], keep: () => false,
+      open: () => [narr('Last bell. Every valve hand on the tier walks their knife back to the board before they walk anywhere else.')],
+      obj: k => k.n >= 2 ? 'THE BOARD. HANG IT WHERE IT GOES.' : 'CREW THREE IS COUNTING ITS KNIVES BACK. THE BOARD IS BY THE FURNACE DOORS.',
+      props: [{ t: 'kboard', x: 58, y: -44, own: () => mine, k: 1 }, ...[[-30, -30], [-12, -34], [8, -30], [-48, -22]].map(([x, y], i) => ({ t: 'crowd', x, y, s: World.sheetFor(['c2', 'c3', 'pell', 'c4'][i]), k: i + 20 }))],
+      npcs: [
+        N('mara', 26, -22, 'MARA VENN', [say('mara', 'Crew Three, by number. Three-oh-one. Three-oh-two.'), narr('She calls it in the same voice at every number. I have listened for the place where it changes. It does not change. That is how I know what it costs her.')]),
+        N('warden', 92, -26, 'THE WARDEN AT THE BOARD', [say('warden', 'Hang it and step back.'), narr('He has the sheet and a stub of pencil. He does not look at faces. He looks at hooks. An empty one at first bell is a line struck by morning, and he would be the one to strike it.')]),
+        N('ivo', -24, 10, 'IVO', [say('ivo', "Mine's the one with the bent tip. Don't look at it like that. It cuts."), narr('He hangs it and his eyes go one row down and four along, and come away again. Everybody on the crew does it. Nobody on the crew has said so.')]),
+        N('orin', -70, -14, 'OLD ORIN', [say('orin', "Forty years I've hung mine on that board. Couldn't tell you what wood it is. Could tell you every number that's gone quiet."), narr('He does not tell me. He never has, to anybody, and it is the kindest thing about him.')])],
+      spots: [{ id: 'board', x: 58, y: -36, r: 9, reach: 30, ph: 62, name: 'THE SEAT BOARD', verb: 'HANG YOUR KNIFE', exit: 1, talk: () => { mine = 1; return [
+        narr('Three hundred and six. Nobody has hung anything on it. Nobody has taken the hook down either.'),
+        narr('Mine is the next one along. I hang it. It swings a little and touches nothing.'),
+        say('mara', 'Three-oh-seven.'), say('you', 'Aye.'),
+        say('warden', 'Tier Six, Crew Three. All seats in. Balanced.'),
+        narr('He says it of a board of knives. Forty-two days ago, in this bay, somebody said it of her.')]; } }] } };
+}
+FF.campday = walkCampDay; FF.lastbell = walkLastBell;
