@@ -26,7 +26,7 @@ const Cutscene = {
   // wake (back to the present below), furnace (back to before the furnace), strip (to the Assay), step (on, inside the Assay), chalk (the same time, somewhere else), page (into a comic-book level)
   card(t, sub, big, tr) {
     const el = $('#card'); el.classList.remove('hidden'); if (!tr && big && /assay/i.test(sub || '')) tr = /^FOUR YEARS AFTER/.test(t) ? 'strip' : 'step';
-    el.className = el.className.replace(/\s*\btr-\w+/g, ''); void el.offsetWidth; if (tr && !Settings.d.reduce) { el.classList.add('tr-' + tr); const sf = { wake: 'dash', furnace: 'heart', ash: 'heart', strip: 'stage', years: 'stage', chalk: 'clue', page: 'page' }[tr]; if (sf) Sound.play(sf); }
+    el.className = el.className.replace(/\s*\btr-\w+/g, ''); void el.offsetWidth; if (tr && !Settings.d.reduce) { el.classList.add('tr-' + tr); const sf = { wake: 'dash', furnace: 'heart', ash: 'heart', eleven: 'pillar', strip: 'stage', years: 'stage', chalk: 'clue', page: 'page' }[tr]; if (sf) Sound.play(sf); }
     el.innerHTML = big ? `<div class="bigt">${esc(t)}</div>${sub ? `<div class="bigs">${esc(sub)}</div>` : ''}${tr === 'years' ? yearCal(t) : assayCal(sub)}` : `<p>${esc(t)}</p>${sub ? `<p class="s">${esc(sub)}</p>` : ''}`;
     el.classList.remove('on'); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('on')));
   },
@@ -34,7 +34,8 @@ const Cutscene = {
   run(s) {
     const T = (x, y) => ({ x: x * 16 + 8, y: y * 16 + 12 });
     if (s.when && !s.when()) return false;
-    if (s.plate) { const rest = this.steps.slice(this.i), cb = this.onEnd; this.onEnd = null; this.steps = []; this.end(); Prelude.plate(s.plate, s.secs, () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(rest, cb); }); return true; }
+    if (s.plate || s.ledger || s.pages) { const rest = this.steps.slice(this.i), cb = this.onEnd, go = () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(rest, cb); }; this.onEnd = null; this.steps = []; this.end();
+      if (s.ledger) Prelude.ledger(go); else if (s.pages) Prelude.pages(typeof s.pages === 'function' ? s.pages() : s.pages, go, s.music); else Prelude.plate(s.plate, s.secs, go, { count: s.count, white: s.white, hold: s.hold, arg: s.arg }); return true; }
     if (s.issue) { const rest = this.steps.slice(this.i), cb = this.onEnd, or = s.or || []; this.onEnd = null; this.steps = []; this.end(); Issue.start(s.issue, ok => { G.flags['issue_' + s.issue + (s.cold ? 'cold' : '')] = ok ? 1 : 0; Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play((ok ? [] : or).concat(rest), cb); }, s.cold); return true; }
     if (s.mission) { const rest = this.steps.slice(this.i), cb = this.onEnd; this.onEnd = null; this.steps = []; this.end(); Mission.start(s.mission, () => { Fade.a = 1; Fade.dir = 0; Fade.busy = false; Cutscene.play(rest, cb); }); return true; }
     if (s.card !== undefined) { this.card(s.card, s.sub, s.big, s.tr); if (s.sfx) Sound.play(s.sfx); this.block = { type: 'card', t: 0, min: s.min || 1.4, max: s.max || 7 }; return true; }

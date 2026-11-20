@@ -1,5 +1,5 @@
 # SOOTBORN — Story bible 
-Tagline: "Every breath is hers." Current build: v0.73 (see the changelog). **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
+Tagline: "Every breath is hers." Current build: v0.74 (see the changelog). **The plan from here is the handoff / master timeline** (approved 2026-11-19); where it disagrees with this bible, it wins until the bible is brought into line (step 2 of the plan). The newest canon is at the bottom: the canon timeline, the Decisions, the Assay on foot, Part Two additions, the Gilding in full, the High Docks in third person (v0.29.6), and the map of Part Two with its decisions and the three third-person levels (v0.30.1). Where an older section disagrees with those, they win.
 
 ## Direction
 - Standalone game; not a Pocket Lantern cartridge.
@@ -572,7 +572,7 @@ One look for each kind of jump, so it is learned once. **Wake:** white fading ou
 ## Part Two looks ahead (v0.72)
 - **The cold open:** nine years after, sunset, the Stair, Tavi on his left. It ends on somebody standing in front of the white door and "I knew the way he stood." It does not say who. (In the full level the door is held by the Auditor's Blade and then Oswin Hale.)
 - **The book:** the Count, open, one line in red: "Brennick, K." Nobody has struck it; a gilt cuff holds a pen over it. Pays off in the Count (plan 16a).
-- **Tavi at sixteen:** on the service stair with a bedroll and a satchel, chalking a sun on the Spire's wall. Lucan is the one who tells Kael the Spire knows about him ("She says there is a boy"). Pays off in "Tavi is coming up. Sixteen."
+- **Tavi at sixteen:** on the service stair with a bedroll and a satchel, chalking a sun on the Spire's wall. Lucan is the one who tells Kael the Spire knows about Tavi ("She says there is a child. Below, on your tier. One you brought up."). Pays off in "Tavi is coming up. Sixteen."
 
 ## Part Two's flashes, as built (v0.73)
 - **Day thirty-one, after dark (the cloak).** He walks into the camp in Voss's cloak, with Voss's blood on the hem. Cadets of Violet and Teal get up as he passes and fall in behind him; nobody is called. Petra had "ruled the line" under his name. Oswin stands up for the first time in thirty-one days. The six lamps on the dais do not move: there is no line for a cadet in a Proctor's cloak. He breaks the white ribbon on the cache and gives it out by hand, in the order they are standing. "They did not follow me because I won. They followed me because I came back."
@@ -582,4 +582,12 @@ One look for each kind of jump, so it is learned once. **Wake:** white fading ou
 - **The barge (eight years after).** He sat a month and counted nothing. Aboard: Ilse, Sable, Hollis the welder ("He put a halberd butt in my arm once. For humming. I'd have liked to tell him it mended."), Bao the noodle seller at the wheel. Brand's halberd is lashed to the rail, butt down; nobody has said who brought it off the dock stair.
 - **Seren and the line (three weeks before the furnace).** After last bell she puts a hand on Bank Seven: more goes in than comes out at the rack, a breath in every forty. Under the grating the main splits to a blind tee, capped, with an unnumbered wheel: a way round the meter built in when the bank was built, which everybody on Crew Three walks round. Orin: it fed the fever ward before the Count shut the fans; open it and forty beds breathe, and the audit shows a bled line with Crew Three's number on it; "They don't strike a line for that. They strike a crew." She leaves it shut. "Somebody will have to answer for it. Let it be somebody who knew." Kael, after: "She was not curious. She was choosing." Flag: `serenLine`.
 - **Voice rule:** a flash in which you play somebody other than Kael is narrated from outside, in the present tense.
+
+## The last chapter, as built (v0.74)
+- **The book (nine years after, the night before the Stair).** Kestrel brings the Array board's own copy of the Count, which her engineers set the banks from. He carries days across it so that every tier is sent what it is owed; the Spire's rings give up what they were hoarding; Tier Four, struck and BALANCED with nothing, is written back in. The last red line is his own: "Brennick, K. Tier Six. Owed: nine years." He writes it in black. The banks turn to the new figures at first bell. (Where and how this happens is not the owner's; it was written to give the puzzle a place.)
+- **Hollis** carries Brand's halberd up the Stair and grounds it at the top, butt down, the way a Warden does.
+- **One for forty:** Celestine did the sum at twenty with two cadets who did not wake, and every day since. Seren did it too, the other way round. "They called me that too, before they gave me this name."
+- **The last flash:** the heart-furnace and the count, to eleven, held.
+- **Row K, if she is sent down:** Mara calls her "little ember" without knowing. She calls every new mouth on the row that.
+- **Open question:** whether Tavi is his brother or his sister. The plan says brother; the written Part Two says "her"; the Codex says sibling.
 

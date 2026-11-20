@@ -1,4 +1,28 @@
-# SOOTBORN — changelog (latest v0.73 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.74 · 2026-11-20)
+
+## v0.74 · 2026-11-20 — the Count, the last flash, the ending
+Step 9 of the plan. The last chapter is now something you do.
+
+- **The Count, as a puzzle (new).** After the chapter card: THE BOOK / Nine years after the furnace. The Count. One page: the Spire and the six tiers, the days of air each is sent, and what each is owed (eight). Tier Four is struck through, BALANCED, with nothing. **Carry days down the page until every line breathes.** Lift up to four from one line and set them down on another; the total never changes.
+  - **The eye** reads down the margin, one line at a time. Lift or set down on the line it is reading and you are NOTED and the days go back. A line that has moved by more than four since the eye last read it is NOTED too. It cannot be failed; the count of times noted is kept.
+  - When every line is at eight, **one red line is left: "Brennick, K. Tier Six. Owed: nine years."** Hold to write it in black. Then his line: "I have counted eleven seconds every day for nine years."
+  - Keys, a pad, a mouse or a finger on the line all work. The Skip button passes it.
+- **The Stair, from the inside.** At the top of the first flight, where the cold open cut away, the level now says so. After it, Hollis carries Brand's halberd up the last flight and grounds it at the top.
+- **One for forty.** Before Little Ember, Celestine's lines from the plan: "One for forty. I did that sum at twenty, with two cadets who did not wake. I have done it every day since. She did it too, little ember, when she said it was her. She only did it the other way round." And: "They called me that too, before they gave me this name."
+- **The last flash.** On the last blow: LAST BELL / Bay Three. The heart-furnace, coming in on a count of eleven strokes. One drawn picture of the furnace: somebody small walks in, the doors close over fourteen seconds, and the count runs ONE to ELEVEN with a heartbeat on each, and holds. It goes out to white. It cannot be cut short with a button (the Skip button still works).
+- **The ending is six pictures you turn** (the plan: played as drawn pictures, not told): Lift Zero running with its doors open; Ashgate Square looking up; the chalk sun in the old tunnel; the new Count, a list of names; a yellow barge; the shelf on Row K with two tins. **Every line that was there before is still there**, read under its picture, a press at a time. The last picture shows who is at Mara's table: a woman in a grey ration coat, or a closed book with one red line.
+- **Mara's beat** (the Row K ending): "Eat it while it's hot, little ember. Nobody's counting your bowl." She calls every new mouth on the row that, and had never seen the woman before the furnace.
+- **Tavi:** the two lines I added in v0.72 said "boy" and "brother". The written Part Two calls Tavi "her" twice and the Codex says "sibling", so those lines now say neither ("She says there is a child. Below, on your tier.") until you say which it is.
+- **Dev menu:** the puzzle, the last flash, and the ending pictures for each ending (short captions) under Story beats.
+
+**Engine:** the drawn-picture module can now run a game on a page (`Prelude.ledger`), turn captioned pictures (`Prelude.pages`), count on a still, and take a press from a mouse or finger; cutscene steps `{ ledger }`, `{ pages }`, and `count`, `white`, `hold` on `{ plate }`; an `eleven` card transition.
+
+**Checked:** by script. The puzzle played with real key presses by a bot that reads the page: noted once on purpose, then solved in 37 seconds with no more notes, signed, and handed back to the story. The end of the last chapter from the last blow, once for each ending: the count reached eleven and a button did not cut it; the choice set the ending; six pictures; Mara's beat only when she is sent down, the struck line only when she is struck; both THE END texts shown. Stills of the puzzle, the flash and all six pictures.
+
+**The whole-story bot:** new game to THE END, no errors. It reached the book (and skipped the puzzle, as it skips fights), the last flash, and the ending's six pictures with her line struck. The other ending was reached by the script above.
+
+**Not checked:** nothing by hand. Whether the puzzle is fun, too easy, or too slow for a person (the bot is not a person). The puzzle with a mouse or a finger was not tried, only with keys. The ending's pictures were seen as stills. The Stair's new line was not seen in the level.
+
 
 ## v0.73 · 2026-11-20 — Part Two's flashes and new places: the cloak, the service stair, Celestine's own Assay, the barge, Seren and the line
 Step 8 of the plan. Five things to play in Part Two, each set off by something that happens in front of it.

@@ -325,11 +325,11 @@ const P2 = {
     { say: 'kael', t: 'There was a note pinned to the Proctors\' glass, at the Assay. Her hand. "My son is to reach the last day. No further than he can walk."' },
     { sfx: 'heart' }, { say: 'lucan', t: '...She wrote that.' },
     { say: 'lucan', t: 'Of course she wrote that. I reached the last day. I have been proud of it for two years.' },
-    { say: 'lucan', t: 'She says there is a boy. Below, on your tier. You have a brother.' },
+    { say: 'lucan', t: 'She says there is a child. Below, on your tier. One you brought up. She has the name written down.' },
     { fade: 'out' }, { panel: null },
     { card: 'NINE YEARS AFTER THE FURNACE', sub: 'The Sun Spire. The service stair. Tavi, sixteen.', big: 1, tr: 'years', min: 1.6, max: 4.5 }, { plate: 'tavi', secs: 10 },
     { music: 'duel' }, { panel: 'ante' }, { pstage: 4 }, { fade: 'in', spd: 0.8 }, { wait: 0.6 },
-    { say: 'kael', t: 'Leave him out of your mouth.' },
+    { say: 'kael', t: 'Leave that name out of your mouth.' },
     { narr: 'He drew. His hand was steadier than it had been at the keep. I had done that. I was sorry for it, and I let him come.' },
     { fade: 'out' }, { panel: null },
     { brawl: () => FF.son() },
@@ -479,6 +479,12 @@ const P2 = {
   ],
   5: () => [
     { music: 'mystery' }, { card: 'THE COUNT', sub: 'Nine years after the furnace. The Sun Spire.', big: 1, min: 1.6, max: 5 },
+    /* 16a: the Count, as a thing to do */
+    { card: 'THE BOOK', sub: 'Nine years after the furnace. The Count.', big: 1, tr: 'years', min: 1.5, max: 4.5 },
+    { narr: 'The night before the stair, Kestrel put a book on the table in front of me. Not the Count. The Array board\'s own copy of it, that her engineers set the banks from. It had never occurred to anybody up there that the two ought to be kept apart.' },
+    { narr: 'Every tier, the Spire, and a column of days. I had carried days across that page for years, where nobody looked. I did it once more, for all of them at once.' },
+    { ledger: 1 },
+    { narr: 'At first bell the banks would turn to the new figures by themselves. By the time anybody on the fourth ring added the page up, we would be on the stair.' },
     { panel: 'weather' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 0.8 },
     { narr: 'They wanted me to say something before the stair. I am not good at it. Seren was the one who talked.' },
     { say: 'kael', t: 'For five years up here I said "one." One does not kneel. One is not sorry. I\'m done with it. It\'s "we." It was always we.' },
@@ -495,6 +501,7 @@ const P2 = {
     { music: 'spire' }, { panel: 'spire' }, { pstage: 1 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { when: () => G.flags.issue_stair === 1, narr: 'I came up the last flight with the hook wet and a gilt mask in two pieces in my off hand.' },
     { when: () => G.flags.issue_stair === 1, narr: 'I wrote it in chalk on the wall by the door, under the forty-four, and Brand, and Aldane, D., and Rook, A. Hale, O. He had wanted to finish anywhere but ninth. He is forty-eighth on a list he would not have understood.' },
+    { narr: 'Hollis came up the last flight behind us with Brand\'s halberd across his shoulders. He grounded it at the top, butt down, the way a Warden does, and stood beside it as if it were a person.' },
     { when: () => !!P2F('lucanFriend'), narr: 'The Captain of the Door was not at the door. His blade was. It stood grounded point-down against the frame, the way a House that is out grounds its blade at the keep, with a strip of white cloth tied to the hilt.' },
     { when: () => !!P2F('lucanFriend'), narr: 'Under it, in a neat schoolroom hand: I am not where she put me. I should like to be taught the rest.' },
     { when: () => !P2F('lucanFriend'), narr: 'The Captain of the Door stood where she had put him, on his stick, with his blade drawn and his mother\'s chin.' },
@@ -525,11 +532,16 @@ const P2 = {
     { narr: 'For nine years I had thought I was a knife she had not seen. I was a line in her book, entered in her own hand, with a date.' },
     { say: 'kael', t: 'Then you\'ve got it written down what she was worth to you.' },
     { say: 'celestine', t: 'Forty beds, and you. One has never made a better trade. You may hate the arithmetic. You have lived on it.' },
+    { say: 'celestine', t: 'One for forty. I did that sum at twenty, with two cadets who did not wake. I have done it every day since.' },
+    { say: 'celestine', t: 'She did it too, little ember, when she said it was her. She only did it the other way round.' },
+    { narr: 'Little ember. She had said it at a furnace door, and in a square, and to me. I had always taken it for contempt.' },
+    { say: 'celestine', t: 'They called me that too, before they gave me this name.' },
     { sfx: 'heart' },
     { narr: 'She took a blade down from the wall. She was seventy-nine, and she held it as if it were a pen.' },
     { say: 'celestine', t: 'Come, then. Show me what one bought.' },
     { fade: 'out' }, { panel: null },
     { brawl: () => FF.ember() },
+    { card: 'LAST BELL', sub: 'Bay Three. The heart-furnace.', big: 1, tr: 'eleven', min: 1.6, max: 3.5 }, { plate: 'furnace', secs: 14, count: 1, white: 1, hold: 1 },
     { music: 'hum' }, { panel: 'ante' }, { pstage: 6 }, { fade: 'in', spd: 0.8 }, { wait: 1 },
     { narr: 'She knelt on her own floor with the sun going down behind her, and she looked, for the first time since I had known her, like somebody waiting to be told a number.' },
     { say: 'celestine', t: 'You have the book, the door and the lift. That is the whole of the post. One asks only that you count them. Somebody must.' },
@@ -538,16 +550,21 @@ const P2 = {
       { t: 'Strike her line.', fx: () => { G.flags.ending = 'struck'; }, then: [narr('I opened the book on her desk and found her line. Aurel, C. I struck it, and wrote one word after, in my own hand.'), narr('Balanced.'), narr('Then I put down the pen and never picked that one up again.')] },
       { t: 'Send her down Lift Zero.', fx: () => { G.flags.ending = 'below'; }, then: [narr('I walked her to the white car myself. Nine minutes down. I told Mara to give her a bunk on Row K and a ration book.'), say('celestine', 'This is crueller than the furnace.'), say('kael', 'No. It\'s Tuesday. You\'ll get used to it. We did.'), say('celestine', '...Noted.'), say('kael', 'Down there it\'s "aye."')] }
     ] },
-    { fade: 'out' }, { music: 'dawn' }, { panel: 'dawn' }, { fade: 'in', spd: 0.6 }, { wait: 2.4 },
+    /* 16e: the ending, in six pictures the player turns. The words are the ones that were always here */
+    { fade: 'out' }, { panel: null }, { pages: () => endPages([
+    { pic: 'lift' },
     { narr: 'I unlocked Lift Zero from the top and left it running, doors open, all the way down.' },
     { narr: 'It took nine minutes for the light to reach Ashgate Square. It had never been allowed to before.' },
     { pstage: 1 }, { wait: 2.2 },
+    { pic: 'square' },
     { sfx: 'bell' }, { narr: 'They did not cheer. They stood and looked up. Somebody in the back started the shift song, and nobody put a halberd in it.' },
     { narr: 'She had been right about one thing. The Array did not hold. We lost people that first winter, with every door open and nobody rationing. We counted them out loud, by name, all of us. That was the difference. It was all the difference.' },
     { pstage: 2 }, { wait: 2.4 },
+    { pic: 'sun' },
     { narr: 'I went down on the first car. Past the square, past Bay Three, into the old tunnel, to a chalk sun that somebody had been keeping fresh for nine years.' },
     { narr: 'I am told I stood there a long time. I was counting. I got to eleven, and for the first time, I did not have to start again.' },
     ...((G.flags.rays | 0) > 0 ? [{ narr: 'Seren\'s lantern was still on the Pillar, with ' + (G.flags.rays | 0) + ' paper rays on it. Nobody had been allowed to take it down, and then nobody had wanted to.' }] : []),
+    { pic: 'names' },
     { narr: 'Vale handed in his ledger the first morning the light came down. He asked for a wheel on Tier Eight, where his sister\'s ward had been. He is not good at it yet.' },
     { narr: 'Petra Lune kept her column. It is the same book and a different sum. On the first day of every quarter she reads the names aloud in a very even voice. She stops at Hale, O., every time, and then she goes on.' },
     { narr: 'Sull kept the night watch. Somebody has to walk the bays. He says "aye" now and nobody makes anything of it.' },
@@ -555,22 +572,32 @@ const P2 = {
     ...(G.flags.marenDoor ? [{ narr: 'Maren Aldane keeps the new Count. It has no columns. It is a list of names, and she reads it aloud on rest days. Dorian\'s first.' }] : [{ narr: 'Nobody has seen Maren Aldane since the stair. Her desk was cleared. There was a heel of bread on it.' }]),
     ...(P2F('lucanFriend') ? [{ narr: 'Lucan Aurel walks the tiers with a slate, learning names. He asks before he writes one down. He is kind. It has turned out to be of use.' }] : [{ narr: 'Lucan Aurel went out with the first envoy and did not look back. He sent one letter. It said: I should have liked to understand. I have kept it.' }]),
     { narr: 'Ilse would not come down. She said she had been unmade once and it had taken. She keeps the glass room at the top of the Spire, and teaches anybody who asks how they talked up there, so that nobody can be shut out by a word again.' },
+    { pic: 'tbarge' },
     { narr: 'Tavi flies the lift-barges. Yellow hull. She painted the sun on it herself and would not be told it was the wrong yellow.' },
     { narr: 'The other eleven Houses sent envoys the first spring. We showed them the open lift and the list of names. Four went home and opened their own. We are still talking to the rest.' },
     { fade: 'out' }, { panel: 'row' }, { pstage: 3 }, { fade: 'in', spd: 0.7 }, { wait: 1.2 },
+    { pic: 'shelf' },
     { narr: 'Then Row K. The door was open. It had never had a lock. Mara looked up from the table and did not get up.' },
     { say: 'mara', t: 'Taller. I did say. Sit down, you\'re blocking the light, and we\'ve only just got some.' },
     { narr: 'There were two tins on the shelf. I took down the one with my name on it and opened it. There was nothing in it. I put the washer inside, and put it back beside hers.' },
     { say: 'mara', t: 'Well. That\'s the shelf balanced, then.' },
     { when: () => G.flags.ending === 'below', narr: 'There was somebody else at the table, in a grey ration coat, holding a bowl as if it might be taken off her. Mara had put her nearest the stove. I did not ask why, and Mara did not say.' },
+    { when: () => G.flags.ending === 'below', say: 'mara', t: "Eat it while it's hot, little ember. Nobody's counting your bowl." },
+    { when: () => G.flags.ending === 'below', narr: 'Mara calls every new mouth on the row that. She had never laid eyes on the woman before the furnace. The bowl stopped halfway, and for a moment the High Auditor of the Array looked up at her the way a girl looks up from Tier Six.' },
     { when: () => G.flags.ending === 'struck', narr: 'Hers was the last line I ever struck. Aurel, C. Petra reads it out with the others. Nobody has asked me to take it off the list, and I have not. She counted us for fifty years. We can count her once a quarter.' },
     ...(G.flags.wrenAsk ? [{ say: 'mara', t: "There's an engineer out in the row who won't come in without being asked. She's had her hand on every pipe I own. Says they're sound." }, { say: 'kael', t: 'Come in, Kestrel. Mind the step.' }, { narr: 'She came in. Mara looked at her, and at me, and got a third bowl down off the shelf without a word. It was the kindest thing I ever saw her do.' }] : [{ narr: 'Kestrel Dray keeps what is left of the Array. She sends readings down on rest days that I do not need to check. I check them.' }]),
     { narr: 'Every breath I take is hers. There turned out to be enough of them for everyone.' },
+    ]), music: 'dawn' },
     { fade: 'out' }, { panel: null },
     { card: 'SOOTBORN', sub: 'E V E R Y   B R E A T H   I S   H E R S', big: 1, sfx: 'splash', min: 3, max: 9 },
     { card: 'THE END', sub: 'North Coast Studios  x  E Concepts', min: 2.4, max: 8 }
   ]
 };
+// the ending's steps, sorted into pictures: each { pic } starts one, and every line after it is read under it
+function endPages(steps) { const WHO = { mara: 'Mara', kael: 'Kael', wren: 'Kestrel', tavi: 'Tavi' }, out = []; let cur = null;
+  for (const st of steps) { if (!st) continue; if (st.pic) { cur = { plate: st.pic, arg: G.flags.ending, lines: [] }; out.push(cur); continue; } if (st.when && !st.when()) continue; if (!cur) continue;
+    if (st.narr) cur.lines.push(['', st.narr]); else if (st.say) cur.lines.push([WHO[st.say] || (CAST[st.say] ? CAST[st.say].name : ''), st.t]); }
+  return out; }
 const P2_TITLES = { 1: 'The Post', 2: 'The Balancing', 3: 'What She Knows', 4: 'Two Years', 5: 'The Count' };
 const P2KEYS = ['lucanFriend', 'signedFour', 'liedToHer', 'ending', 'marenKind', 'marenDoor', 'wrenMet', 'wrenClose', 'wrenAsk', 'fury', 'rays', 'ranForHer', 'issue_docks', 'issue_riser', 'issue_stair'];
 function p2Save() { try { const o = {}; for (const k of P2KEYS) if (G.flags[k] !== undefined) o[k] = G.flags[k]; Store.set('sootborn_p2f', JSON.stringify(o)); if (G.tendency) Store.set('sootborn_tend', G.tendency); } catch (e) { } }

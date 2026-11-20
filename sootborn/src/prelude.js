@@ -434,7 +434,76 @@ const Prelude = (() => {
     g.beginPath(); g.moveTo(196, 268); g.quadraticCurveTo(206, 300, 196, 330); st(g, 4, '#ffb46a');
     g.restore();
   }
-  const PLATES = { book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
+  // the last flash: the heart-furnace, and the count. It is held at eleven
+  function pFurnace(g, u, T) {
+    g.fillStyle = '#120807'; g.fillRect(-300, -200, 2200, 1300);
+    for (let i = 0; i < 9; i++) { g.beginPath(); g.rect(-300 + i * 260, -200, 30, 1300); fs(g, '#0a0505'); }
+    glow(g, 800, 470, 900, '255,120,40', .55 + Math.sin(T * 2.2) * .05);
+    circ(g, 800, 470, 330); fs(g, '#2a1410'); st(g, 14); circ(g, 800, 470, 286); fs(g, lin(g, 800, 190, 800, 760, ['#fff2c0', '#ffb040', '#e8541a', '#7a1a08'])); g.save(); g.clip(); for (let i = 0; i < 14; i++) { const k = (T * .35 + i / 14) % 1, x = 560 + rnd(i * 3) * 480 + Math.sin(T * 2 + i) * 16; g.beginPath(); g.moveTo(x - 30, 780 - k * 560); g.quadraticCurveTo(x, 700 - k * 620, x + 30, 780 - k * 560); g.closePath(); g.globalAlpha = (1 - k) * .5; fs(g, '#fff6d0'); } g.globalAlpha = 1; g.restore(); circ(g, 800, 470, 286); st(g, 10);
+    for (let i = 0; i < 12; i++) { const a = i / 12 * TAU; circ(g, 800 + Math.cos(a) * 308, 470 + Math.sin(a) * 308, 12); fs(g, '#5a3a2a'); st(g, 5); }
+    // the two doors, coming together over eleven seconds
+    const k = ez(cl(u * 1.05, 0, 1)), dx = 300 * (1 - k); for (const sd of [-1, 1]) { g.save(); g.beginPath(); g.arc(800, 470, 286, 0, TAU); g.clip(); g.beginPath(); g.rect(sd < 0 ? 800 - 300 - dx : 800 + dx, 150, 300, 640); fs(g, '#3a2420'); tone(g, '#0a0505', .5, 9); g.beginPath(); g.rect(sd < 0 ? 800 - 300 - dx : 800 + dx, 150, 300, 640); st(g, 10); for (let r = 0; r < 4; r++) { circ(g, 800 + sd * (dx + 40), 250 + r * 146, 10); fs(g, '#8a6a4a'); } g.restore(); }
+    // somebody small, walking in. She does not turn round
+    const w = cl(1 - u * 1.5, 0, 1); if (w > 0) { g.save(); g.translate(800, 690 - (1 - w) * 150); g.scale(.4 + w * .6, .4 + w * .6); g.globalAlpha = cl(w * 3, 0, 1); capsule(g, 0, -70, 0, 40, 34); fs(g, '#0a0505'); circ(g, 0, -130, 34); fs(g, '#0a0505'); g.restore(); g.globalAlpha = 1; }
+    poly(g, [-300, 790, 1900, 790, 1900, 1100, -300, 1100]); fs(g, '#1c100e'); tone(g, '#0a0505', .5, 9); g.beginPath(); g.moveTo(-300, 790); g.lineTo(1900, 790); st(g, 8);
+  }
+  // ---- the ending, in six pictures
+  function eLift(g, u, T) {   // Lift Zero, unlocked from the top and left running
+    g.fillStyle = '#0e0c12'; g.fillRect(-300, -200, 2200, 1300);
+    poly(g, [520, -200, 1080, -200, 1180, 1100, 420, 1100]); fs(g, lin(g, 800, -200, 800, 1100, ['#fffbe8', '#ffe9a8', '#e8b23a', '#5a3a1a'])); glow(g, 800, 120, 900, '255,240,190', .6);
+    for (let i = 0; i < 9; i++) { const y = -160 + i * 150, k = y / 1100, xl = lerp(520, 420, cl((y + 200) / 1300, 0, 1)), xr = lerp(1080, 1180, cl((y + 200) / 1300, 0, 1)); g.beginPath(); g.moveTo(xl, y); g.lineTo(xr, y); st(g, 6, 'rgba(60,40,20,.5)'); }
+    poly(g, [-300, -200, 520, -200, 420, 1100, -300, 1100]); fs(g, '#1c1a22'); tone(g, '#08070a', .5, 9); poly(g, [1080, -200, 1900, -200, 1900, 1100, 1180, 1100]); fs(g, '#1c1a22'); tone(g, '#08070a', .5, 9);
+    g.beginPath(); g.moveTo(520, -200); g.lineTo(420, 1100); st(g, 10); g.beginPath(); g.moveTo(1080, -200); g.lineTo(1180, 1100); st(g, 10);
+    // the white car, going down with its doors open
+    const y = 120 + ez(u) * 420; g.save(); g.translate(800, y); g.scale(1 - u * .25, 1 - u * .25); poly(g, [-170, -120, 170, -120, 170, 120, -170, 120]); fs(g, '#f4efe2'); st(g, 10); poly(g, [-110, -90, 110, -90, 110, 120, -110, 120]); fs(g, '#fff8dc'); st(g, 7); poly(g, [-170, -120, -110, -90, -110, 120, -170, 120]); fs(g, '#d8d0bc'); st(g, 6); poly(g, [170, -120, 110, -90, 110, 120, 170, 120]); fs(g, '#d8d0bc'); st(g, 6); g.beginPath(); g.rect(-30, -150, 60, 30); fs(g, '#e2b84a'); st(g, 6); g.restore();
+    for (let i = 0; i < 26; i++) { const k = (T * .2 + rnd(i)) % 1; g.globalAlpha = (1 - k) * .6; circ(g, 560 + rnd(i + 9) * 480, -100 + k * 1100, 2 + rnd(i + 3) * 4); fs(g, '#fff6d0'); } g.globalAlpha = 1;
+  }
+  function eSquare(g, u, T) {   // Ashgate Square, looking up
+    g.fillStyle = '#17121a'; g.fillRect(-300, -200, 2200, 1300);
+    poly(g, [640, -200, 960, -200, 1500, 1100, 100, 1100]); g.save(); g.globalAlpha = .35 + ez(u) * .45; fs(g, lin(g, 800, -200, 800, 1000, ['#fffbe8', 'rgba(255,220,140,.5)', 'rgba(255,200,100,0)'])); g.restore(); glow(g, 800, -80, 700, '255,240,190', .3 + u * .4);
+    poly(g, [700, 240, 900, 240, 930, 900, 670, 900]); fs(g, '#3a3038'); tone(g, '#0e0a10', .5, 9); st(g, 9); circ(g, 800, 380, 58); st(g, 9, '#ffe9a8'); for (let i = 0; i < 10; i++) { const a = i / 10 * TAU; g.beginPath(); g.moveTo(800 + Math.cos(a) * 76, 380 + Math.sin(a) * 76); g.lineTo(800 + Math.cos(a) * 108, 380 + Math.sin(a) * 108); st(g, 7, '#ffe9a8'); }
+    poly(g, [-300, 860, 1900, 860, 1900, 1100, -300, 1100]); fs(g, '#241c22'); st(g, 8);
+    // the people of the tier, backs to us, heads tipped up
+    for (let i = 0; i < 17; i++) { const x = -160 + i * 118 + rnd(i) * 40, h = 150 + rnd(i + 7) * 90, y = 900 + rnd(i + 3) * 60; if (Math.abs(x - 800) < 110 && h < 200) continue; g.save(); g.translate(x, y); capsule(g, 0, -h + 60, 0, 60, 46 + rnd(i + 2) * 14); fs(g, ['#3a2c30', '#4a3a34', '#2e2630', '#54402e'][i % 4]); tone(g, '#0a0608', .5, 8); st(g, 8); circ(g, 4, -h + 4, 34); fs(g, ['#9a6448', '#c08a6a', '#6a4430', '#b07a5a'][i % 4]); st(g, 7); g.beginPath(); g.arc(4, -h + 12, 34, Math.PI * .1, Math.PI * .9); g.arc(4, -h + 30, 40, Math.PI * .9, Math.PI * .1, true); fs(g, ['#1a1014', '#2a1a14', '#8a8a8a', '#141014'][(i * 3) % 4]); st(g, 6); g.restore(); }
+  }
+  function eSun(g, u, T) {   // the chalk sun in the old tunnel, kept fresh for nine years
+    g.fillStyle = '#231c1e'; g.fillRect(-300, -200, 2200, 1300); for (let r = 0; r < 12; r++) for (let c = 0; c < 9; c++) { const x = -260 + c * 250 + (r & 1) * 125, y = -180 + r * 104, k = rnd(r * 11 + c); g.fillStyle = k > .6 ? '#33292b' : k > .3 ? '#2c2426' : '#3a2f31'; g.fillRect(x + 5, y + 5, 240, 94); }
+    glow(g, 860, 400, 720, '255,220,150', .34);
+    for (let p = 0; p < 4; p++) { g.beginPath(); for (let i = 0; i <= 40; i++) { const a = i / 40 * TAU, r = 150 + (rnd(i + p * 50) - .5) * 12; g.lineTo(860 + Math.cos(a) * r, 400 + Math.sin(a) * r); } g.globalAlpha = .75; st(g, 12 - p * 2, p ? '#fff3c4' : '#e8c66a'); } g.globalAlpha = 1;
+    for (let i = 0; i < 17; i++) { const a = -Math.PI / 2 + i / 17 * TAU, r1 = 196, r2 = 196 + (i % 2 ? 80 : 130); g.beginPath(); g.moveTo(860 + Math.cos(a) * r1, 400 + Math.sin(a) * r1); g.lineTo(860 + Math.cos(a) * r2, 400 + Math.sin(a) * r2); g.globalAlpha = .85; st(g, 11, '#fff3c4'); } g.globalAlpha = 1;
+    // his back, and a hand not quite touching it
+    g.save(); g.translate(300, 0); g.beginPath(); g.moveTo(-200, 1100); g.lineTo(-150, 640); g.quadraticCurveTo(-120, 470, 0, 440); g.quadraticCurveTo(140, 470, 170, 640); g.lineTo(220, 1100); g.closePath(); fs(g, '#f1e9d6'); tone(g, '#8a7a5c', .5, 8); st(g, 10);
+    circ(g, 10, 330, 104); fs(g, '#bd7a50'); st(g, 9); g.beginPath(); g.arc(10, 310, 110, Math.PI * 1.02, Math.PI * 1.98); g.lineTo(96, 250); g.lineTo(60, 200); g.lineTo(20, 236); g.lineTo(-20, 190); g.lineTo(-50, 240); g.lineTo(-92, 214); g.closePath(); fs(g, '#e8c25a'); st(g, 8);
+    g.lineCap = 'round'; g.beginPath(); g.moveTo(150, 560); g.quadraticCurveTo(300, 520, 380 + ez(u) * 30, 440); st(g, 74, '#120a0e'); st(g, 58, '#f1e9d6'); ell(g, 396 + ez(u) * 30, 424, 40, 32, -.5); fs(g, '#bd7a50'); st(g, 7); g.restore();
+  }
+  function eNames(g, u, T, o) {   // the new Count: no columns. A list of names, read aloud
+    g.fillStyle = '#1a1210'; g.fillRect(-300, -200, 2200, 1300); glow(g, 800, 380, 1000, '255,236,190', .5);
+    poly(g, [260, 60, 1340, 60, 1420, 1040, 180, 1040]); fs(g, '#f8eed2'); st(g, 9);
+    const names = ['Holloway, S.', 'Marrow, J.', 'Aldane, D.', 'Hale, O.', 'Rook, A.', 'Brand', o === 'struck' ? 'Aurel, C.' : '', 'Tier Four, eleven hundred, by name'];
+    g.textBaseline = 'alphabetic'; for (let i = 0; i < 8; i++) { const y = 190 + i * 104, a = cl(u * 9 - i * .9, 0, 1); g.beginPath(); g.moveTo(300 - i * 8, y + 22); g.lineTo(1300 + i * 8, y + 22); st(g, 2, '#c9bb98'); g.globalAlpha = a; g.font = `700 ${names[i].length > 14 ? 44 : 58}px 'Pixelify Sans', monospace`; g.fillStyle = i === 0 ? '#b3261c' : '#2a1c18'; g.fillText(names[i], 330 - i * 6, y + 6); g.globalAlpha = 1; }
+    g.save(); g.translate(1180, 880 + Math.sin(T * 1.2) * 4); ell(g, 0, 0, 120, 84, -.3); fs(g, '#e6c79a'); st(g, 8); capsule(g, -70, -40, -150, -150, 22); fs(g, '#e6c79a'); st(g, 7); poly(g, [-176, -190, -160, -202, -60, -60, -84, -40]); fs(g, '#1a1016'); st(g, 5); g.restore();
+  }
+  function eBarge(g, u, T) {   // Tavi's lift-barge. Yellow hull. The wrong yellow
+    g.fillStyle = lin(g, 0, -200, 0, 1100, ['#f6c66a', '#f2a65a', '#c86a4a', '#5a3040']); g.fillRect(-300, -200, 2200, 1300); glow(g, 1180, 240, 520, '255,246,200', .8); circ(g, 1180, 240, 96); fs(g, '#fff6c8');
+    for (let i = 0; i < 5; i++) { ell(g, ((i * 420 + T * 14) % 2400) - 400, 180 + i * 150, 260, 34, 0); g.globalAlpha = .35; fs(g, '#fff0d0'); g.globalAlpha = 1; }
+    g.save(); g.translate(700 + Math.sin(T * .6) * 12, 520 + Math.sin(T * .9) * 10 - ez(u) * 30); g.rotate(-.04);
+    poly(g, [-420, -40, 420, -40, 340, 130, -330, 130]); fs(g, '#f2c21a'); tone(g, '#8a6a08', .45, 9); st(g, 12); poly(g, [-420, -40, 420, -40, 400, 0, -400, 0]); fs(g, '#ffe070'); st(g, 7);
+    circ(g, 0, 56, 50); st(g, 9, '#fff6d6'); for (let i = 0; i < 10; i++) { const a = i / 10 * TAU; g.beginPath(); g.moveTo(Math.cos(a) * 62, 56 + Math.sin(a) * 62); g.lineTo(Math.cos(a) * 84, 56 + Math.sin(a) * 84); st(g, 7, '#fff6d6'); }
+    ell(g, 0, -250, 400, 150, 0); fs(g, '#e8dcc0'); tone(g, '#8a7a5c', .4, 9); st(g, 12); for (const x of [-300, -100, 100, 300]) { g.beginPath(); g.moveTo(x, -120); g.lineTo(x * .9, -40); st(g, 5); }
+    g.save(); g.translate(250, -40); capsule(g, 0, -90, 0, -20, 24); fs(g, '#6a5236'); st(g, 7); circ(g, 0, -128, 26); fs(g, '#c98a62'); st(g, 6); g.beginPath(); g.arc(0, -134, 28, Math.PI, TAU); fs(g, '#1e1416'); st(g, 5); g.beginPath(); g.moveTo(10, -80); g.lineTo(60, -130); st(g, 12, '#6a5236'); g.restore();
+    g.restore();
+  }
+  function eShelf(g, u, T, o) {   // Row K. Two tins on a shelf, and who is at the table
+    g.fillStyle = '#2a1e1a'; g.fillRect(-300, -200, 2200, 1300); glow(g, 380, 300, 800, '255,236,190', .5);
+    poly(g, [120, 60, 520, 60, 520, 480, 120, 480]); fs(g, '#fff2c8'); st(g, 10); g.beginPath(); g.moveTo(320, 60); g.lineTo(320, 480); g.moveTo(120, 270); g.lineTo(520, 270); st(g, 8);
+    poly(g, [700, 330, 1500, 330, 1500, 366, 700, 366]); fs(g, '#6a4c38'); st(g, 9); for (const [x, c, on] of [[900, '#8a94a0', 1], [1160, '#a8905c', cl(u * 2.4 - .6, 0, 1)]]) { g.save(); g.translate(x, 330); poly(g, [-80, -170, 80, -170, 80, 0, -80, 0]); fs(g, c); tone(g, '#2a2420', .4, 8); st(g, 9); ell(g, 0, -170, 80, 20, 0); fs(g, '#d8d2c0'); st(g, 7); g.beginPath(); g.rect(-50, -120, 100, 50); fs(g, '#f1e6c8'); st(g, 5); if (on < 1) { g.globalAlpha = 1 - on; circ(g, 0, -250 + on * 70, 30); st(g, 12, '#c9d2da'); g.globalAlpha = 1; } g.restore(); }
+    poly(g, [-300, 760, 1900, 760, 1900, 800, -300, 800]); fs(g, '#54402e'); st(g, 9); poly(g, [-300, 800, 1900, 800, 1900, 1100, -300, 1100]); fs(g, '#3a2c20');
+    // Mara, at the table, not getting up
+    g.save(); g.translate(430, 760); capsule(g, 0, -250, 0, 0, 110); fs(g, '#5a4a6a'); tone(g, '#1a1420', .5, 8); st(g, 10); circ(g, 0, -390, 84); fs(g, '#a86e4e'); st(g, 9); g.beginPath(); g.arc(0, -410, 88, Math.PI * .95, Math.PI * 2.05); g.quadraticCurveTo(0, -470, -84, -400); fs(g, '#3a2a2a'); st(g, 7); circ(g, 0, -500, 34); fs(g, '#3a2a2a'); st(g, 7); ell(g, 150, -20, 70, 22, 0); fs(g, '#d8d2c0'); st(g, 7); g.restore();
+    if (o === 'below') { g.save(); g.translate(1240, 760); capsule(g, 0, -230, 0, 0, 96); fs(g, '#8a8a8e'); tone(g, '#3a3a40', .5, 8); st(g, 10); circ(g, 0, -356, 76); fs(g, '#f4e6dc'); st(g, 9); g.beginPath(); g.arc(0, -372, 80, Math.PI, TAU); g.lineTo(84, -300); g.quadraticCurveTo(60, -380, 0, -384); g.quadraticCurveTo(-60, -380, -84, -300); g.closePath(); fs(g, '#f6eac0'); st(g, 7); ell(g, -130, -30, 74, 24, 0); fs(g, '#d8d2c0'); st(g, 7); capsule(g, -60, -110, -120, -50, 22); fs(g, '#a8905c'); st(g, 6); g.restore(); }
+    else { g.save(); g.translate(1240, 760); poly(g, [-160, -40, 160, -40, 180, 0, -180, 0]); fs(g, '#f1e6c8'); st(g, 8); g.beginPath(); g.moveTo(-120, -22); g.lineTo(60, -22); st(g, 6, '#b3261c'); g.restore(); }
+  }
+  const PLATES = { furnace: [pFurnace, [800, 470, 1.0, 800, 470, 1.22]], lift: [eLift, [800, 420, 1.0, 800, 520, 1.12]], square: [eSquare, [800, 520, 1.06, 800, 420, 1.0]], sun: [eSun, [720, 440, 1.0, 800, 410, 1.14]], names: [eNames, [800, 520, 1.0, 800, 560, 1.08]], tbarge: [eBarge, [760, 440, 1.0, 800, 400, 1.1]], shelf: [eShelf, [760, 470, 1.0, 900, 420, 1.12]], book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
   const SHOTS = [
     [[1, s1]], [[1, s2]], [[1, s3], [1.5, s3fg]], [[1, s4], [1.6, s4fg]], [[1, s5]], [[1, s6]], [[1, s7]], [[1, s8], [1.35, s8fg]],
     [[1, (g, u, T) => eyes(g, u, T, 0)]], [[1, (g, u, T) => eyes(g, u, T, 1)]], [[1, s11]]
@@ -444,9 +513,11 @@ const Prelude = (() => {
     on: false, el: null, g: null, t: 0, done: null, last: '', n: -1, D, LEAD,
     total() { return LEAD + D.reduce((a, b) => a + b, 0); },
     run(done) {
-      this.on = true; this.done = done; this.t = 0; this.n = -1; this.last = ''; this.pl = null; pats = {};
+      this.on = true; this.done = done; this.t = 0; this.n = -1; this.last = ''; this.pl = null; this.gm = null; this.pg = null; this.click = 0; this.down = 0; pats = {};
       const c = this.el = document.createElement('canvas'); c.id = 'prelude'; c.style.cssText = 'position:fixed;background:#050305;image-rendering:auto';
       document.body.insertBefore(c, $('#ui')); this.g = c.getContext('2d'); this.place();
+      /* a press on the picture: turns a page, picks a line. Mapped into the 1600 by 900 page when a page is fitted */
+      c.addEventListener('pointerdown', e => { const r = c.getBoundingClientRect(), f = this.fit, px = (e.clientX - r.left) / r.width * c.width, py = (e.clientY - r.top) / r.height * c.height; this.click = f ? { x: (px - f.ox) / f.S, y: (py - f.oy) / f.S } : { x: px, y: py }; this.down = 1; e.preventDefault(); }); const up = () => { this.down = 0; }; c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up); c.addEventListener('pointerleave', up); this.fit = null;
       try { document.body.classList.remove('ingame', 'fight'); $('#cskip').classList.remove('hidden'); } catch (e) { /* no button */ }
       Sound.music('hum'); Input.consume();
     },
@@ -457,8 +528,9 @@ const Prelude = (() => {
     },
     tick(dt) {
       if (!this.on) return; this.place(); this.t += dt;
-      if (this.t > .5 && (Input.p('A') || Input.p('B') || Input.p('START'))) return this.finish();
-      if (this.pl) { if (this.t >= this.pl.secs) return this.finish(); return this.drawPlate(); }
+      if (this.gm) return this.tickLedger(dt); if (this.pg) return this.tickPages(dt);
+      if (this.t > .5 && !(this.pl && this.pl.hold) && (Input.p('A') || Input.p('B') || Input.p('START'))) return this.finish();
+      if (this.pl) { if (this.pl.count) { const n = Math.min(11, 1 + Math.floor(this.t / Math.max(1, this.pl.secs - 3) * 11)); if (n !== this.pl.n) { this.pl.n = n; Sound.play(n === 11 ? 'pillar' : 'heart'); } } if (this.t >= this.pl.secs) return this.finish(); return this.drawPlate(); }
       const at = this.at(this.t);
       if (at.n !== this.n) { this.n = at.n; if (at.n >= 0) { Sound.play(at.n === 10 ? 'pillar' : 'heart'); if (at.n === 10) Sound.play('slash'); } }
       if (this.t >= this.total()) return this.finish();
@@ -495,19 +567,87 @@ const Prelude = (() => {
       const g = this.g, cw = this.el.width, ch = this.el.height, red = Settings.d.reduce, P = PLATES[this.pl.name], C = P[1], u = cl(this.t / this.pl.secs, 0, 1), e = red ? .5 : ez(u);
       g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.fillStyle = '#050305'; g.fillRect(0, 0, cw, ch);
       const cx = lerp(C[0], C[3], e), cy = lerp(C[1], C[4], e), z = lerp(C[2], C[5], e), S = Math.max(cw / VW, ch / VH);
-      g.save(); g.translate(cw / 2, ch / 2); g.scale(S * z, S * z); g.translate(-cx, -cy); P[0](g, u, this.t); g.restore();
+      g.save(); g.translate(cw / 2, ch / 2); g.scale(S * z, S * z); g.translate(-cx, -cy); P[0](g, u, this.t, this.pl.arg); g.restore();
       const vg = g.createRadialGradient(cw / 2, ch / 2, ch * .45, cw / 2, ch / 2, Math.max(cw, ch) * .72); vg.addColorStop(0, 'rgba(5,3,5,0)'); vg.addColorStop(1, 'rgba(5,3,5,.6)'); g.fillStyle = vg; g.fillRect(0, 0, cw, ch);
       const U = ch / 900, bar = 62 * U; g.fillStyle = '#050305'; g.fillRect(0, 0, cw, bar); g.fillRect(0, ch - bar, cw, bar); g.fillStyle = '#e2b84a'; g.fillRect(0, bar - 3 * U, cw, 3 * U); g.fillRect(0, ch - bar, cw, 3 * U);
-      const a = Math.max(1 - this.t / .7, (this.t - (this.pl.secs - .8)) / .8); if (a > 0) { g.fillStyle = `rgba(5,3,5,${cl(a, 0, 1)})`; g.fillRect(0, 0, cw, ch); }
+      if (this.pl.count && this.pl.n) { const n = this.pl.n; g.font = `700 ${Math.round(96 * U)}px 'Pixelify Sans', monospace`; g.textBaseline = 'alphabetic'; g.lineJoin = 'round'; g.lineWidth = 16 * U; g.strokeStyle = INK; g.strokeText(WORDS[n - 1], 40 * U, ch - bar - 34 * U); g.fillStyle = '#ffe9b0'; g.fillText(WORDS[n - 1], 40 * U, ch - bar - 34 * U);
+        g.lineCap = 'round'; g.strokeStyle = '#ffe9b0'; g.lineWidth = 5 * U; for (let i = 0; i < n; i++) { const x = cw - 44 * U - (10 - i) * 22 * U, y0 = bar * .26, y1 = bar * .74; g.beginPath(); if (i % 5 === 4) { g.moveTo(x - 96 * U, y1); g.lineTo(x - 14 * U, y0); } else { g.moveTo(x, y0); g.lineTo(x, y1); } g.stroke(); } }
+      const a0 = 1 - this.t / .7, a1 = (this.t - (this.pl.secs - (this.pl.white ? 1.4 : .8))) / (this.pl.white ? 1.4 : .8); if (a0 > 0) { g.fillStyle = `rgba(5,3,5,${cl(a0, 0, 1)})`; g.fillRect(0, 0, cw, ch); } if (a1 > 0) { g.fillStyle = this.pl.white ? `rgba(246,241,228,${cl(a1, 0, 1)})` : `rgba(5,3,5,${cl(a1, 0, 1)})`; g.fillRect(0, 0, cw, ch); }
     },
     finish() {
-      if (!this.on) return; this.on = false; this.pl = null; const el = this.el, cb = this.done; this.el = this.g = this.done = null; pats = {};
+      if (!this.on) return; this.on = false; this.pl = null; this.gm = null; this.pg = null; this.click = 0; this.down = 0; const el = this.el, cb = this.done; this.el = this.g = this.done = null; pats = {};
       try { $('#cskip').classList.add('hidden'); } catch (e) { /* gone */ }
       Fade.a = 1; Fade.dir = 0; Fade.busy = false; Input.consume();
       if (cb) cb(); setTimeout(() => { if (el) el.remove(); }, 120);
     },
     // one drawn picture, held and slowly pushed in on, for a flash that has no words (the book; Tavi at sixteen)
-    plate(name, secs, done) { if (!PLATES[name]) return done && done(); this.run(done); this.pl = { name, secs: secs || 9 }; Sound.music('hum'); Sound.play('heart'); },
+    plate(name, secs, done, o) { if (!PLATES[name]) return done && done(); this.run(done); this.pl = Object.assign({ name, secs: secs || 9, n: 0 }, o || {}); Sound.music('hum'); Sound.play('heart'); },
+    // ---- pictures with words under them, turned by the player: the ending. list: [{ plate, arg, lines: [[who, text], ...] }]
+    pages(list, done, music) { list = (list || []).filter(p => PLATES[p.plate] && p.lines && p.lines.length); if (!list.length) return done && done(); this.run(done); this.pg = { list, i: 0, li: 0, t: 0, sh: 0 }; Sound.music(music || 'dawn'); },
+    tickPages(dt) { const q = this.pg, pgN = q.list[q.i], ln = pgN.lines[q.li], full = ln[1].length; q.t += dt; q.sh = Math.min(full, q.sh + dt * 52);
+      if ((Input.p('A') || this.click) && q.t > .35) { Input.consume(); if (q.sh < full) q.sh = full; else if (q.li + 1 < pgN.lines.length) { q.li++; q.sh = 0; Sound.play('page'); } else if (q.i + 1 < q.list.length) { q.i++; q.li = 0; q.sh = 0; q.t = 0; Sound.play('stage'); } else { this.click = 0; return this.finish(); } } this.click = 0;
+      const g = this.g, cw = this.el.width, ch = this.el.height, red = Settings.d.reduce, pn = q.list[q.i], P = PLATES[pn.plate], C = P[1], u = cl(q.t / 16, 0, 1), e = red ? .5 : ez(u), U = ch / 900;
+      g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.fillStyle = '#050305'; g.fillRect(0, 0, cw, ch);
+      const cx = lerp(C[0], C[3], e), cy = lerp(C[1], C[4], e), z = lerp(C[2], C[5], e), S = Math.max(cw / VW, ch / VH);
+      g.save(); g.translate(cw / 2, ch * .44); g.scale(S * z, S * z); g.translate(-cx, -cy); P[0](g, cl(q.t / 9, 0, 1), q.t, pn.arg); g.restore();
+      const a = 1 - q.t / .6; if (a > 0) { g.fillStyle = `rgba(5,3,5,${cl(a, 0, 1)})`; g.fillRect(0, 0, cw, ch); }
+      // the words: a band along the bottom, in the game's hand
+      const l2 = q.list[q.i].lines[q.li], who = l2[0], txt = l2[1].slice(0, Math.floor(q.sh)), fz = Math.max(15, Math.round(30 * U)), bandH = Math.round(Math.max(150 * U, fz * 5.4)), bw = Math.min(cw * .92, 1500 * U), bx = (cw - bw) / 2;
+      g.fillStyle = 'rgba(8,5,8,.9)'; g.fillRect(0, ch - bandH, cw, bandH); g.fillStyle = '#e2b84a'; g.fillRect(0, ch - bandH, cw, Math.max(2, 3 * U)); g.fillRect(0, 0, cw, Math.max(2, 3 * U));
+      g.textBaseline = 'alphabetic'; g.font = `${fz}px 'Pixelify Sans', monospace`; let y = ch - bandH + fz * 1.5;
+      if (who) { g.fillStyle = '#e2b84a'; g.font = `700 ${Math.round(fz * .8)}px 'Pixelify Sans', monospace`; g.fillText(who.toUpperCase(), bx, y - fz * .25); y += fz * .95; g.font = `${fz}px 'Pixelify Sans', monospace`; }
+      g.fillStyle = '#f3e3c3'; let line = ''; for (const w of txt.split(' ')) { const t2 = line ? line + ' ' + w : w; if (g.measureText(t2).width > bw && line) { g.fillText(line, bx, y); y += fz * 1.28; line = w; } else line = t2; } g.fillText(line, bx, y);
+      if (q.sh >= l2[1].length && (red || Math.floor(q.t * 2.4) % 2 === 0)) { g.fillStyle = '#e2b84a'; g.beginPath(); g.moveTo(cw - bx - fz * .9, ch - fz * 1.3); g.lineTo(cw - bx, ch - fz * .85); g.lineTo(cw - bx - fz * .9, ch - fz * .4); g.fill(); }
+      g.font = `${Math.round(fz * .6)}px 'Pixelify Sans', monospace`; g.fillStyle = 'rgba(243,227,195,.5)'; g.fillText((q.i + 1) + ' / ' + q.list.length, bx, ch - fz * .5); },
+    // ---- the Count, as a thing to do. Carry days of air down the page so that every line breathes, and never on the line the eye is reading
+    ledger(done) { this.run(done); const R = (nm, v, need) => ({ nm, v, need, base: v, hot: 0 });
+      this.gm = { rows: [R('THE SPIRE', 26, 8), R('TIER ONE', 9, 8), R('TIER TWO', 7, 8), R('TIER THREE', 6, 8), R('TIER FOUR', 0, 8), R('TIER FIVE', 5, 8), R('TIER SIX', 4, 8)], sel: 0, hand: 0, from: -1, t: 0, eye: -1, noted: 0, phase: 'play', sign: 0, msg: 'CARRY A DAY ACROSS WHERE NOBODY IS LOOKING.', msgT: 5, hold: 0 }; Sound.music('mystery'); },
+    ledgerNote(m, i) { const G2 = this.gm; G2.noted++; G2.msg = m; G2.msgT = 3; if (i >= 0) G2.rows[i].hot = 1; if (G2.hand && G2.from >= 0) { G2.rows[G2.from].v += G2.hand; G2.hand = 0; G2.from = -1; } Sound.play('alarm'); },
+    tickLedger(dt) { const G2 = this.gm, rows = G2.rows, N = rows.length, SLOT = .95; G2.t += dt; G2.msgT -= dt; for (const r of rows) r.hot = Math.max(0, r.hot - dt * 1.4);
+      const kb = Input.device === 'kb', A = kb ? 'E' : 'A', B = kb ? 'X' : 'B';
+      let act = Input.p('A'), back = Input.p('B'); if (Input.p('up')) { G2.sel = (G2.sel + N - 1) % N; Sound.play('page'); } if (Input.p('down')) { G2.sel = (G2.sel + 1) % N; Sound.play('page'); }
+      if (this.click) { const c = this.click; this.click = 0; const i = Math.floor((c.y - 196) / 78); if (G2.phase === 'play' && c.x > 120 && c.x < 1480 && i >= 0 && i < N) { G2.sel = i; act = true; } else if (G2.phase === 'play' && c.y > 760 && c.x > 1000) back = true; }
+      if (G2.phase === 'play') {
+        const slot = Math.floor(G2.t / SLOT) % (N + 2), eye = slot < N ? slot : -1;
+        if (eye !== G2.eye) { G2.eye = eye; if (eye >= 0) { const r = rows[eye]; if (Math.abs(r.v - r.base) > 4) this.ledgerNote('NOTED. THAT LINE MOVED TOO FAR BETWEEN TWO READINGS.', eye); r.base = r.v; } }
+        if (act) { Input.consume(); const r = rows[G2.sel];
+          if (G2.sel === G2.eye) this.ledgerNote('NOTED. NOT ON THE LINE THE EYE IS READING.', G2.sel);
+          else if (!G2.hand || G2.from === G2.sel) { if (r.v > 0 && G2.hand < 4) { r.v--; G2.hand++; G2.from = G2.sel; Sound.play('clue'); } }
+          else { r.v += G2.hand; G2.hand = 0; G2.from = -1; Sound.play('stage'); } }
+        if (back && G2.hand) { Input.consume(); rows[G2.from].v += G2.hand; G2.hand = 0; G2.from = -1; Sound.play('page'); }
+        if (!G2.hand && rows.every(r => r.v >= r.need)) { G2.phase = 'sign'; G2.eye = -1; G2.pt = 0; Sound.play('pillar'); G2.msg = ''; }
+      } else if (G2.phase === 'sign') { G2.pt += dt; const held = Input.h('A') || this.down; G2.sign = cl(G2.sign + (held && G2.pt > .8 ? dt / 1.5 : -dt), 0, 1); if (G2.sign >= 1) { G2.phase = 'done'; G2.pt = 0; Sound.play('heart'); try { G.flags.countNoted = G2.noted; G.flags.countDone = 1; } catch (e) { /* no save */ } }
+      } else { G2.pt += dt; if (G2.pt > 3.4) return this.finish(); }
+      // ---- draw: the whole page fits the screen
+      const g = this.g, cw = this.el.width, ch = this.el.height, S = Math.min(cw / VW, ch / VH), ox = (cw - VW * S) / 2, oy = (ch - VH * S) / 2; this.fit = { S, ox, oy };
+      g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.fillStyle = '#0c0808'; g.fillRect(0, 0, cw, ch); g.setTransform(S, 0, 0, S, ox, oy);
+      g.fillStyle = '#1a1210'; g.fillRect(0, 0, VW, VH); glow(g, 800, 420, 1000, '255,236,190', .4);
+      poly(g, [96, 40, 1504, 40, 1504, 846, 96, 846]); fs(g, '#f6ecd0'); st(g, 8); g.beginPath(); g.rect(96, 40, 70, 806); tone(g, '#b9a880', .45, 7);
+      g.textBaseline = 'alphabetic'; const T = (str, x, y, px, col, w) => { g.font = `${w || 700} ${px}px 'Pixelify Sans', monospace`; g.fillStyle = col; g.fillText(str, x, y); };
+      T('THE COUNT', 190, 104, 54, '#2a1c18'); T('AIR SENT, IN DAYS, BY THE QUARTER', 190, 142, 24, '#6a5a4c', 400); T('SENT', 640, 176, 20, '#6a5a4c', 400); T('OWED TO THEM', 1190, 176, 20, '#6a5a4c', 400);
+      g.beginPath(); g.moveTo(180, 186); g.lineTo(1480, 186); st(g, 3, '#2a1c18');
+      rows.forEach((r, i) => { const y = 196 + i * 78, short = r.v < r.need, sel = i === G2.sel && G2.phase === 'play';
+        if (i === G2.eye) { g.fillStyle = 'rgba(226,184,74,.28)'; g.fillRect(100, y + 2, 1400, 74); }
+        if (r.hot > 0) { g.fillStyle = `rgba(200,40,30,${r.hot * .4})`; g.fillRect(100, y + 2, 1400, 74); }
+        if (sel) { g.beginPath(); g.rect(176, y + 6, 1312, 66); st(g, 5, '#b3261c'); }
+        T(r.nm, 196, y + 50, 30, i === 4 && short ? '#8a7a6a' : '#2a1c18');
+        if (i === 4 && r.v === 0) { g.beginPath(); g.moveTo(190, y + 40); g.lineTo(600, y + 40); st(g, 4, '#b3261c'); T('BALANCED', 470, y + 30, 20, '#b3261c'); }
+        for (let k = 0; k < Math.max(r.v, r.need); k++) { const x = 640 + k * 20, on = k < r.v; g.beginPath(); g.rect(x, y + 18, 14, 40); if (on) fs(g, k < r.need ? '#3a2c24' : '#8a7a5c'); else { st(g, 2, '#b3261c'); } }
+        g.beginPath(); g.moveTo(640 + r.need * 20 - 3, y + 10); g.lineTo(640 + r.need * 20 - 3, y + 66); st(g, 3, '#2a1c18');
+        T(r.v + ' OF ' + r.need, 1190, y + 50, 30, short ? '#b3261c' : '#2a1c18'); if (short) T('SHORT', 1370, y + 50, 24, '#b3261c'); g.beginPath(); g.moveTo(180, y + 77); g.lineTo(1480, y + 77); st(g, 1.5, '#c9bb98'); });
+      // the eye in the margin
+      if (G2.eye >= 0) { const y = 196 + G2.eye * 78 + 39; almond(g, 131, y, 54, 22, 0); fs(g, '#fff6d6'); st(g, 4); circ(g, 131, y, 9); fs(g, '#e2b84a'); st(g, 3); circ(g, 131, y, 3); fs(g, '#1a1016'); }
+      else if (G2.phase === 'play') { T('· · ·', 112, 190, 26, '#8a7a5c'); }
+      const tot = rows.reduce((a, r) => a + r.v, 0) + G2.hand; g.beginPath(); g.moveTo(180, 752); g.lineTo(1480, 752); st(g, 3, '#2a1c18'); T('TOTAL', 196, 792, 30, '#2a1c18'); T(tot + '. UNCHANGED.', 640, 792, 30, '#2a1c18');
+      if (G2.phase === 'play') { T('IN THE PEN: ' + G2.hand + (G2.hand ? ' (FROM ' + rows[G2.from].nm + ')' : ''), 980, 792, 24, G2.hand ? '#b3261c' : '#6a5a4c'); T('NOTED: ' + G2.noted, 1330, 104, 26, G2.noted ? '#b3261c' : '#6a5a4c');
+        T(`UP / DOWN: A LINE     ${A}: LIFT A DAY (UP TO FOUR), OR SET THEM DOWN ON ANOTHER LINE     ${B}: PUT THEM BACK`, 196, 820, 17, '#6a5a4c', 400); T('NEVER ON THE LINE THE EYE IS READING.  NO LINE MAY MOVE BY MORE THAN FOUR BETWEEN TWO READINGS.', 196, 840, 17, '#8a2f24', 400);
+        if (G2.msgT > 0 && G2.msg) { g.font = `700 30px 'Pixelify Sans', monospace`; const w = g.measureText(G2.msg).width; g.fillStyle = 'rgba(12,8,8,.9)'; g.fillRect(800 - w / 2 - 20, 852, w + 40, 44); T(G2.msg, 800 - w / 2, 885, 30, '#ffe9b0'); } }
+      else { const a = cl(G2.pt / .8, 0, 1), y = 760; g.globalAlpha = a; g.fillStyle = '#f6ecd0'; g.fillRect(170, 756, 1320, 84); g.beginPath(); g.moveTo(180, 752); g.lineTo(1480, 752); st(g, 3, '#2a1c18');
+        const k = G2.phase === 'done' ? 1 : G2.sign; T('Brennick, K.', 196, 812, 46, k >= 1 ? '#1a1016' : '#b3261c'); if (k > 0 && k < 1) { g.save(); g.beginPath(); g.rect(196, 770, 330 * k, 60); g.clip(); T('Brennick, K.', 196, 812, 46, '#1a1016'); g.restore(); }
+        T('TIER SIX', 640, 806, 30, '#2a1c18'); T(k >= 1 ? 'BREATHING' : 'OWED: NINE YEARS', 1040, 806, 30, k >= 1 ? '#2a1c18' : '#b3261c'); g.globalAlpha = 1;
+        const m = G2.phase === 'done' ? 'I HAVE COUNTED ELEVEN SECONDS EVERY DAY FOR NINE YEARS.' : `ONE RED LINE LEFT. HOLD ${A}: WRITE IT IN BLACK.`; g.font = `700 30px 'Pixelify Sans', monospace`; const w = g.measureText(m).width; g.fillStyle = 'rgba(12,8,8,.9)'; g.fillRect(800 - w / 2 - 20, 852, w + 40, 44); T(m, 800 - w / 2, 885, 30, '#ffe9b0'); }
+      g.setTransform(1, 0, 0, 1, 0, 0); },
+
     // for the Dev menu and the tests: hold one moment of it
     still(t, plate) { if (!this.on) this.run(() => {}); if (plate) this.pl = { name: plate, secs: 9 }; this.t = t; this.place(); if (this.pl) this.drawPlate(); else this.draw(this.at(t)); }
   };

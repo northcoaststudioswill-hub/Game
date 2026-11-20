@@ -15,6 +15,7 @@ await ev(() => {
     if (BTS.UI.stack.length) { const m = BTS.UI.stack[BTS.UI.stack.length - 1], its = (m.items || []).filter(i => i.act && !(i.disabled && i.disabled())); const pick = its.find(i => /Begin Part Two|Continue|Wake up|Sleep|Next|Go on|Carry on/i.test(lab(i))) || its.find(i => !/Back|Save|Export|Import|Settings|title|Stay|Explore|Codex|Memories|Dev|About|New game|Chapter/i.test(lab(i))); if (pick) { L('MENU', (m.opts && m.opts.title) || '(menu)', '-> ' + lab(pick)); pick.act(); return 'menu'; } return 'menu?' + its.map(lab).join('/'); }
     if (BTS.Dialogue.active) { const b = [...document.querySelectorAll('button')].find(x => x.offsetParent && x.closest('#dlg')); if (BTS.Dialogue.choices && b) b.click(); else BTS.Dialogue.next(); return 'dlg'; }
     if (BTS.Puzzle.active) return 'puzzle';
+    if (Prelude.on && Prelude.gm) { L('THE COUNT (a puzzle; the bot skips it)'); Prelude.finish(); return 'ledger'; } if (Prelude.on && Prelude.pg && !window.__pgl) { window.__pgl = 1; L('ENDING IN PICTURES', Prelude.pg.list.map(p => p.plate + ':' + p.lines.length).join(' '), 'ending=' + BTS.G.flags.ending); }
     if (Issue.on) { Issue.finish(true); return 'level'; }
     if (BTS.Brawl.active) { const B = BTS.Brawl; if (B.cine) { B.tap = true; return 'film'; } B.end(!B.def.doomed); return 'fight'; }
     if (G.heist === 3 && Mission.def && G.mode === 'world') { Mission.finish(); return 'mission'; }

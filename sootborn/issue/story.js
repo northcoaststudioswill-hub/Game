@@ -508,7 +508,7 @@
         SC.after(next === 'boss' ? 3.4 : 4.2, () => { if (next === 'boss') bossIntro(); else { U.toast('LAMPS ON THE HILL ROAD. *MORE OF THEM.*', 2.2); startEnc(next); } });
       } else {
         if (SC.cold) { if (F.e_alley && y > 5.4 && z < 17) coldEnd(); return; }
-        if (F.e_alley && !F.e_l1 && y > 5.4 && z < 17) startEnc('l1');
+        if (F.e_alley && !F.e_l1 && y > 5.4 && z < 17) { if (!F.echo) { setFlag('echo'); U.toast('*NINE HUNDRED STEPS. A WHITE DOOR. SOMEBODY STANDING IN FRONT OF IT.*', 3.4); } startEnc('l1'); }   /* where the cold open cut away, from the inside */
         else if (F.e_l1 && F.bell && !F.e_l2 && y > 11.4 && z < -9) startEnc('l2');
         else if (F.e_l2 && !F.boss && !S.bossDown && y > 17.4 && z < -36.5) bossIntro();
       }

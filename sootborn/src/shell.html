@@ -123,6 +123,8 @@ body.portrait #hint{bottom:auto;top:calc(var(--cy) + var(--ch) + 64px)}
 #card.on{opacity:1}
 #card::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:0}
 #card.tr-wake::before{background:#f6f1e4;animation:trFade 1.6s ease-out both}
+#card.tr-eleven::before{background:repeating-linear-gradient(90deg,rgba(255,233,176,.0) 0,rgba(255,233,176,.0) calc(9.09% - 6px),rgba(255,233,176,.85) calc(9.09% - 6px),rgba(255,233,176,.85) 9.09%);animation:trEleven 1.5s steps(11,end) both}
+@keyframes trEleven{0%{clip-path:inset(38% 100% 38% 0);opacity:1}80%{clip-path:inset(38% 0 38% 0);opacity:1}100%{clip-path:inset(38% 0 38% 0);opacity:0}}
 #card.tr-ash::before{background:linear-gradient(to top,#c9c9d0 0%,#77777f 40%,rgba(60,60,66,0) 84%);animation:trRise 2.3s ease-out both}
 #card.tr-furnace::before{background:linear-gradient(to top,#ff8a2a 0%,#c8400c 40%,rgba(120,20,0,0) 84%);animation:trRise 1.9s ease-out both}
 #card.tr-strip::before{background:radial-gradient(ellipse at 50% 72%,rgba(232,194,90,.6),rgba(232,194,90,0) 70%);animation:trFade 1.7s ease-out both}

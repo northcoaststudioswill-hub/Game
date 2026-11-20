@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.73 (2026-11-20).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.74 (2026-11-20).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -20,6 +20,13 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **Weight:** no keeping a man in the air from the ground; air combos need the boots and run out. Say if the fights now feel too stiff, or the heavy launch too low.
 - **Deaths:** knees and over, or onto the back; nobody spins.
 - **The hook shot in the arena fights:** a real line; pulls an ordinary man to you, takes you to a heavy one.
+
+## Built in v0.74 (needs your eye, and one answer)
+- **Answer wanted: Tavi.** The plan's line for Lucan is "You have a brother." The written Part Two calls Tavi "her" twice (the yellow barge; Lucan at the door) and the Codex says "your little sibling". Which is it? Until you say, my new lines say "a child" and name no gender.
+- **The Count as a puzzle.** Say if the eye is too quick or too slow (it reads a line in just under a second), if eight a line and four in the pen feel right, and whether being NOTED should cost anything.
+- **Where the puzzle happens is mine:** the night before the Stair, on the Array board's own copy of the Count, which Kestrel brings; the banks turn to the new figures at first bell. Say if it should be the real book, or after the Stair.
+- **The last flash:** fourteen seconds, cannot be cut with a button. Say if that is too long to hold.
+- **The ending in six pictures.** All the old lines are under them. Say if any picture is weak, and whether six is enough for that many lines (the list of names carries seven).
 
 ## Built in v0.73 (needs your eye)
 - **Five things to play in Part Two:** the cloak (the camp at night, day thirty-one), the service stair, Celestine's own Assay played as her, the barge deck, Seren finding the line played as her.
@@ -119,7 +126,7 @@ Kept current each round. "Keep going" means work down this list from the top unl
 16e. **Built (v0.72, v0.73; needs your eye).** **2D and 2.5D flashbacks through Part Two**, which is otherwise all 3D (master plan 9c, 9e).
 16f. **The Assay's art in the opening:** the expression, the ring, ELEVEN. Its people and story should be felt, not only fought.
 16g. **Partly built (v0.72: the fourth ring with the meter, the cold open, both flash-forwards; still to come: the service stair, the Count as a puzzle).** **Part Two needs more play (owner, 2026-11-19):** the fourth ring as a home base between chapters, with the suspicion meter; a Part Two cold open (a minute of the Stair at +9); two flash-forwards (the book with his name in red; Tavi at sixteen); the service stair; the Count as a puzzle. Master timeline 10f, 11c, 11d, 12b, 14c, 16a.
-17. Part Two play: the service stair as a walked level (chapter 1); a barge in the weather (chapter 4); the ending as a Table-style sequence; a suspicion meter in Spire talk; the Count as a puzzle. (The quiet scene with the Unlit exists: the Night Before, chapter 4. Say if you want a second one between the Fall and the Stair.)
+17. **All built now (v0.72 to v0.74; needs your eye).** Part Two play: the service stair as a walked level (chapter 1); a barge in the weather (chapter 4); the ending as a Table-style sequence; a suspicion meter in Spire talk; the Count as a puzzle. (The quiet scene with the Unlit exists: the Night Before, chapter 4. Say if you want a second one between the Fall and the Stair.)
 
 ## Fighting and controls
 18. **One controls card** that holds across the 2D fights, the arena fights and the comic levels. (The arena legend for a pad is in, v0.56.)

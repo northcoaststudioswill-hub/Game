@@ -24,7 +24,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Repo:** `https://github.com/northcoaststudioswill-hub/game`, branch **`sootborn`**. The pre-reorder game is kept on branch `sootborn-v0.64-before-reorder`.
 - **Layout:** `src/*.js` (the game), `src/shell.html`, `issue/` (the comic-book levels), `build.mjs`, `index.html` (built), `tests/`, `docs/`.
 - **Build:** `node build.mjs` → `index.html` (one self-contained file, about 2.2 MB). It runs `issue/patch.mjs` itself, which turns `issue/base.html` + `rig.js` + `world.js` + `story.js` into `issue/issue.html`. Never edit `issue/base.html`; add patches in `issue/patch.mjs` (each `rep(a, b)` must match exactly once; new blocks go before the marker `\nif (/Calloway|Tally|Deacon`).
-- **Version:** `GAME_VER` in `src/ui.js` (0.73; next is 0.74). Update `DEV_NEW` and `DEV_VER` beside it in the same edit.
+- **Version:** `GAME_VER` in `src/ui.js` (0.74; next is 0.75). Update `DEV_NEW` and `DEV_VER` beside it in the same edit.
 - **Publish:** the game is the Claude artifact with slug `2a8a025c-511d-454c-861c-d9bc7a4565f5`; publish `index.html` with `publish_files` and the live version as `base_version` (get it with `get_artifact`). The illustrated progress report is `be5babce-6d5d-4c6e-9668-9b2185959f6c`.
 - **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md` (v0.71 on; v0.66 to v0.70 in `-changelog-archive-3.md`, v0.56 to v0.65 in `-changelog-archive-2.md`, v0.1 to v0.55 in `-changelog-archive.md`, so the live one stays cheap to read), `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
 - **Commits** end with the attribution lines your session gives you. Push with `git -c push.negotiate=true push origin sootborn` (it prints "repository moved" and still succeeds). If the push is rejected, fetch and rebase first: other sessions also push here.
@@ -330,9 +330,12 @@ Release after every step (Part A2, rule 6). Each step lists what is in it, why i
 - Not done: gloves in the hand-painted story panels; the barge as a place revisited (it is walked once).
 - Tests: `campn.mjs`, `walk3.mjs` (M=sstair|barge), `seren.mjs`, `ember.mjs`, `gloves.mjs`.
 
-**Step 9 · v0.74 · the Count, the last flash, the ending**
+**Step 9 · v0.74 · the Count, the last flash, the ending** — **DONE 2026-11-20**
 - The Count as a puzzle (16a); the full Stair replays the cold open's minute from inside (16b); Celestine's "one for forty" line before Little Ember; the ending choice (become her / send her home) and Mara's "little ember" beat (16c); the last flash (16d); the ending as drawn pictures (16e).
 - Check: both endings reached by the bot (set `G.flags.ending`), both credits texts shown.
+- Done, in `src/prelude.js`: `Prelude.ledger(done)` (the puzzle; state in `Prelude.gm`; flags `countDone`, `countNoted`), `Prelude.pages(list, done, music)` (captioned pictures turned with A or a press), plates `furnace`, `lift`, `square`, `sun`, `names`, `tbarge`, `shelf` (the last two take the ending as `arg`), and `count` / `white` / `hold` on a plate. Steps `{ ledger: 1 }` and `{ pages: () => list }` in `src/cinema.js`. In `P2[5]` (`src/part2.js`): the book after the chapter card; the last flash after `FF.ember()`; the ending's old steps wrapped in `endPages([...])` with `{ pic }` markers (every old line kept). The Stair's echo is a toast in the `stair` block of `issue/story.js`.
+- Open with the owner: whether Tavi is a brother or a sister (the plan and the written lines disagree); where the puzzle happens.
+- Tests: `ledger.mjs`, `ending.mjs` (E=below|struck), `plates2.mjs`. The whole-story bot skips the puzzle (`Prelude.finish()`), as it skips fights.
 
 **Step 10 · matching the writing (what is left after steps 3 to 9)**
 - A clerk's coat for Kael on the Spire and at the High Docks; plate only where he fights openly; gloves on the clerk. Oswin's stiff leg as the Auditor's Blade. Lucan's stick in his last scene (if not befriended).
