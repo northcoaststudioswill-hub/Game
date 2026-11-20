@@ -39,7 +39,7 @@ const Issue = {
     window.addEventListener('message', this.onMsg);
     f.srcdoc = html; document.body.insertBefore(f, $('#controls')); this.place();
     // the fight buttons, named for what they do up here
-    this.lab = {}; [['bY', 'JUMP'], ['bX', 'HOOK'], ['bR', 'KICK'], ['bL', 'LUNGE']].forEach(([id, t]) => { const b = $('#' + id); if (b) { this.lab[id] = b.textContent; b.textContent = t; } });
+    this.lab = {}; [['bY', 'JUMP'], ['bX', 'KICK'], ['bR', 'LUNGE'], ['bL', 'HOOK']].forEach(([id, t]) => { const b = $('#' + id); if (b) { this.lab[id] = b.textContent; b.textContent = t; } });
     this.timer = setTimeout(() => { if (!this.ready) this.finish(false); }, 15000);
   },
   // once a frame from the main loop: hand the level this game's own input
@@ -48,8 +48,9 @@ const Issue = {
     const bc = document.body.classList; if (!bc.contains('ingame')) bc.add('ingame'); if (!bc.contains('fight')) bc.add('fight'); if (bc.contains('ctlfade')) bc.remove('ctlfade');   // this game's pad and buttons stay up for the whole level
     if (!this.ready) return;
     const x = (Input.h('right') ? 1 : 0) - (Input.h('left') ? 1 : 0), y = (Input.h('up') ? 1 : 0) - (Input.h('down') ? 1 : 0), press = [];
-    if (Input.p('A')) press.push('ctx'); if (Input.p('B')) press.push('dodge'); if (Input.p('X')) press.push('hook'); if (Input.p('Y')) press.push('jump');
-    if (Input.p('L')) press.push('boots'); if (Input.p('R')) press.push('kick'); if (Input.p('START')) press.push('pause');
+    /* one set of buttons everywhere (v0.79): what kicks in the arena kicks here, what throws the hook there throws it here; the guard button, which these levels do not use, is the lunge */
+    if (Input.p('A')) press.push('ctx'); if (Input.p('B')) press.push('dodge'); if (Input.p('X')) press.push('kick'); if (Input.p('Y')) press.push('jump');
+    if (Input.p('L')) press.push('hook'); if (Input.p('R')) press.push('boots'); if (Input.p('START')) press.push('pause');
     // the level does not read the controller itself: both sticks and the stick click go to it from here
     let ax = 0, ay = 0, lx = 0, ly = 0, r3 = 0; try { for (const gp of (navigator.getGamepads ? navigator.getGamepads() : [])) { if (!gp || !gp.connected) continue; const dz = v => Math.abs(v) < .18 ? 0 : Math.round(v * 10) / 10; ax = dz(gp.axes[0] || 0); ay = dz(gp.axes[1] || 0); lx = dz(gp.axes[2] || 0); ly = dz(gp.axes[3] || 0); r3 = gp.buttons[11] && gp.buttons[11].pressed ? 1 : 0; break; } } catch (e) { /* no pad */ }
     if (r3 && !this.r3) press.push('lock'); this.r3 = r3;

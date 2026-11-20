@@ -503,6 +503,37 @@ const Prelude = (() => {
     if (o === 'below') { g.save(); g.translate(1240, 760); capsule(g, 0, -230, 0, 0, 96); fs(g, '#8a8a8e'); tone(g, '#3a3a40', .5, 8); st(g, 10); circ(g, 0, -356, 76); fs(g, '#f4e6dc'); st(g, 9); g.beginPath(); g.arc(0, -372, 80, Math.PI, TAU); g.lineTo(84, -300); g.quadraticCurveTo(60, -380, 0, -384); g.quadraticCurveTo(-60, -380, -84, -300); g.closePath(); fs(g, '#f6eac0'); st(g, 7); ell(g, -130, -30, 74, 24, 0); fs(g, '#d8d2c0'); st(g, 7); capsule(g, -60, -110, -120, -50, 22); fs(g, '#a8905c'); st(g, 6); g.restore(); }
     else { g.save(); g.translate(1240, 760); poly(g, [-160, -40, 160, -40, 180, 0, -180, 0]); fs(g, '#f1e6c8'); st(g, 8); g.beginPath(); g.moveTo(-120, -22); g.lineTo(60, -22); st(g, 6, '#b3261c'); g.restore(); }
   }
+  // the Captain of the Door, on his stick, where she put him
+  function pLucan(g, u, T) {
+    g.fillStyle = '#efe8d6'; g.fillRect(-300, -200, 2200, 1300); glow(g, 800, 300, 900, '255,246,220', .7);
+    poly(g, [480, -200, 1120, -200, 1120, 860, 480, 860]); fs(g, '#fbf7ea'); st(g, 12); g.beginPath(); g.moveTo(800, -200); g.lineTo(800, 860); st(g, 8); circ(g, 800, 250, 70); st(g, 9, '#e2b84a'); for (let i = 0; i < 12; i++) { const a = i / 12 * TAU; g.beginPath(); g.moveTo(800 + Math.cos(a) * 88, 250 + Math.sin(a) * 88); g.lineTo(800 + Math.cos(a) * 120, 250 + Math.sin(a) * 120); st(g, 7, '#e2b84a'); }
+    poly(g, [-300, 860, 1900, 860, 1900, 1100, -300, 1100]); fs(g, '#d8cfb8'); tone(g, '#8a7a5c', .4, 9); g.beginPath(); g.moveTo(-300, 860); g.lineTo(1900, 860); st(g, 9);
+    g.save(); g.translate(800, 0);
+    // the stick, and the weight on it
+    g.beginPath(); g.moveTo(-150, 470); g.lineTo(-186, 860); st(g, 20, '#120a0e'); st(g, 12, '#6a4a30'); circ(g, -150, 462, 16); fs(g, '#e2b84a'); st(g, 6);
+    g.beginPath(); g.moveTo(-90, 860); g.lineTo(-70, 560); g.quadraticCurveTo(-110, 400, -30, 360); g.lineTo(70, 360); g.quadraticCurveTo(140, 420, 110, 600); g.lineTo(150, 860); g.closePath(); fs(g, '#f1e9d6'); tone(g, '#9a8a6c', .5, 8); st(g, 10);
+    poly(g, [-20, 380, 40, 380, 60, 760, -40, 760]); fs(g, '#2f7fd0'); st(g, 7); circ(g, 12, 440, 26); fs(g, '#e2b84a'); st(g, 6); circ(g, 12, 440, 9); fs(g, '#2f7fd0');
+    g.beginPath(); g.moveTo(110, 380); g.quadraticCurveTo(260, 520, 210, 860); g.lineTo(120, 860); g.closePath(); fs(g, '#e9c860'); tone(g, '#2a3a70', .35, 8); st(g, 9);
+    g.lineCap = 'round'; g.beginPath(); g.moveTo(-60, 400); g.quadraticCurveTo(-140, 420, -150, 470); st(g, 56, '#120a0e'); st(g, 42, '#f1e9d6'); g.beginPath(); g.moveTo(90, 400); g.quadraticCurveTo(170, 470, 220, 560); st(g, 56, '#120a0e'); st(g, 42, '#f1e9d6'); g.lineCap = 'butt';
+    poly(g, [214, 540, 234, 548, 330, 220, 316, 214]); fs(g, '#eef2f6'); st(g, 6); poly(g, [196, 556, 250, 574, 256, 556, 204, 538]); fs(g, '#e2b84a'); st(g, 5);
+    // head: his mother's chin, the bound tail, the crown of points
+    circ(g, 20, 270, 78); fs(g, '#f0d8c4'); g.save(); g.clip(); g.beginPath(); g.rect(-70, 180, 70, 190); tone(g, '#8a6a58', .6, 7); g.restore(); circ(g, 20, 270, 78); st(g, 9);
+    g.beginPath(); g.arc(20, 250, 84, Math.PI * 1.02, Math.PI * 1.98); g.lineTo(96, 236); g.quadraticCurveTo(20, 196, -58, 240); g.closePath(); fs(g, '#f6eac0'); st(g, 7); g.beginPath(); g.moveTo(-50, 200); g.quadraticCurveTo(-150, 250, -120, 420); st(g, 30, '#120a0e'); st(g, 20, '#f6eac0');
+    for (const x of [-30, 0, 30, 60]) { poly(g, [x - 12, 186, x, 140, x + 12, 186]); fs(g, '#e2b84a'); st(g, 5); } for (const x of [-6, 50]) { ell(g, x, 268, 13, 9, 0); fs(g, '#fff6e6'); st(g, 5); circ(g, x + 2, 269, 6); fs(g, '#2f7fd0'); circ(g, x + 2, 269, 2.5); fs(g, '#120a0e'); g.beginPath(); g.moveTo(x - 16, 250); g.lineTo(x + 16, 246); st(g, 6); } g.beginPath(); g.moveTo(-4, 318); g.lineTo(44, 314); st(g, 6);
+    g.restore();
+  }
+  // Brand's halberd, grounded at the top of the Stair by the welder he once broke the arm of
+  function pHalberd(g, u, T) {
+    g.fillStyle = lin(g, 0, -200, 0, 1100, ['#f6c66a', '#f2a65a', '#c86a4a', '#5a3040']); g.fillRect(-300, -200, 2200, 1300); glow(g, 1250, 300, 600, '255,246,200', .7);
+    for (let i = 0; i < 7; i++) { poly(g, [-300, 760 + i * 50, 1900, 760 + i * 50, 1900, 810 + i * 50, -300, 810 + i * 50]); fs(g, i & 1 ? '#efe8d6' : '#e2dac4'); g.beginPath(); g.moveTo(-300, 760 + i * 50); g.lineTo(1900, 760 + i * 50); st(g, 6); }
+    // the halberd, butt down
+    g.beginPath(); g.moveTo(820, 760); g.lineTo(820, 70); st(g, 26, '#120a0e'); st(g, 16, '#8a6a48'); poly(g, [796, 80, 844, 80, 820, -60]); fs(g, '#eef2f6'); st(g, 8); g.beginPath(); g.moveTo(832, 130); g.quadraticCurveTo(980, 110, 960, 280); g.quadraticCurveTo(900, 230, 832, 250); g.closePath(); fs(g, '#c8ccd4'); tone(g, '#5a5e68', .4, 8); st(g, 8); poly(g, [808, 150, 720, 190, 808, 230]); fs(g, '#9aa0aa'); st(g, 7);
+    for (const y of [330, 520]) { g.beginPath(); g.rect(804, y, 32, 18); fs(g, '#b02a2a'); st(g, 5); }
+    // Hollis: a welder's back, one arm that set crooked, the hand on the shaft
+    g.save(); g.translate(560, 0); g.beginPath(); g.moveTo(-120, 760); g.lineTo(-100, 470); g.quadraticCurveTo(-90, 350, 0, 330); g.quadraticCurveTo(100, 350, 110, 470); g.lineTo(130, 760); g.closePath(); fs(g, '#5a4a3a'); tone(g, '#1a120e', .55, 8); st(g, 10);
+    circ(g, 4, 250, 76); fs(g, '#9a6448'); st(g, 9); g.beginPath(); g.arc(4, 236, 80, Math.PI, TAU); g.closePath(); fs(g, '#2a1a14'); st(g, 7); g.beginPath(); g.rect(-70, 226, 148, 22); fs(g, '#3a3028'); st(g, 5);
+    g.lineCap = 'round'; g.beginPath(); g.moveTo(90, 390); g.lineTo(180, 470); g.lineTo(250, 430); st(g, 60, '#120a0e'); st(g, 46, '#5a4a3a'); g.lineCap = 'butt'; ell(g, 258, 424, 34, 28, 0); fs(g, '#9a6448'); st(g, 7); g.restore();
+  }
   // the week he blamed her: one line in the dock log, under a hooded lamp
   function pDockLog(g, u, T) {
     g.fillStyle = '#12100e'; g.fillRect(-300, -200, 2200, 1300); glow(g, 620, 300, 900, '255,200,120', .5 + Math.sin(T * 2.6) * .03);
@@ -515,7 +546,7 @@ const Prelude = (() => {
     // his thumb on the edge of the page, in a glove
     g.save(); g.translate(1420, 860); ell(g, 0, 0, 150, 90, -.5); fs(g, '#6a5a44'); tone(g, '#2a2016', .5, 8); st(g, 9); capsule(g, -90, -60, -200, -150, 40); fs(g, '#6a5a44'); st(g, 8); g.restore();
   }
-  const PLATES = { docklog: [pDockLog, [800, 500, .98, 900, 500, 1.1]], furnace: [pFurnace, [800, 470, 1.0, 800, 470, 1.22]], lift: [eLift, [800, 420, 1.0, 800, 520, 1.12]], square: [eSquare, [800, 520, 1.06, 800, 420, 1.0]], sun: [eSun, [720, 440, 1.0, 800, 410, 1.14]], names: [eNames, [800, 520, 1.0, 800, 560, 1.08]], tbarge: [eBarge, [760, 440, 1.0, 800, 400, 1.1]], shelf: [eShelf, [760, 470, 1.0, 900, 420, 1.12]], book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
+  const PLATES = { lucan: [pLucan, [800, 500, .98, 810, 380, 1.2]], halberd: [pHalberd, [760, 480, 1.0, 800, 380, 1.14]], docklog: [pDockLog, [800, 500, .98, 900, 500, 1.1]], furnace: [pFurnace, [800, 470, 1.0, 800, 470, 1.22]], lift: [eLift, [800, 420, 1.0, 800, 520, 1.12]], square: [eSquare, [800, 520, 1.06, 800, 420, 1.0]], sun: [eSun, [720, 440, 1.0, 800, 410, 1.14]], names: [eNames, [800, 520, 1.0, 800, 560, 1.08]], tbarge: [eBarge, [760, 440, 1.0, 800, 400, 1.1]], shelf: [eShelf, [760, 470, 1.0, 900, 420, 1.12]], book: [pBook, [860, 500, 1.0, 980, 600, 1.2]], tavi: [pTavi, [640, 480, 1.0, 860, 430, 1.16]] };
   const SHOTS = [
     [[1, s1]], [[1, s2]], [[1, s3], [1.5, s3fg]], [[1, s4], [1.6, s4fg]], [[1, s5]], [[1, s6]], [[1, s7]], [[1, s8], [1.35, s8fg]],
     [[1, (g, u, T) => eyes(g, u, T, 0)]], [[1, (g, u, T) => eyes(g, u, T, 1)]], [[1, s11]]

@@ -1,5 +1,5 @@
 # SOOTBORN — open list
-Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.78 (2026-11-20).
+Kept current each round. "Keep going" means work down this list from the top unless there are new notes. Last updated at v0.79 (2026-11-20).
 
 ## Waiting on you
 - **Approved 2026-11-19: the master timeline (all suggestions).** It is the plan to build from: `MASTER_TIMELINE.md` in the repo, "sootborn master timeline" in the project. Day one is Ashgate; Celestine knew him at the Pinning; the boots fly from day 31; Lucan lives; Tavi is seven at the furnace; the budget split stands. The service stair is 2.5D (owner, 2026-11-19).
@@ -20,6 +20,12 @@ Kept current each round. "Keep going" means work down this list from the top unl
 - **Weight:** no keeping a man in the air from the ground; air combos need the boots and run out. Say if the fights now feel too stiff, or the heavy launch too low.
 - **Deaths:** knees and over, or onto the back; nobody spins.
 - **The hook shot in the arena fights:** a real line; pulls an ordinary man to you, takes you to a heavy one.
+
+## Built in v0.79 (needs your hands)
+- **Buttons moved in the comic-book levels** so they match the fights: on a pad Y is now the kick, LB the hook, RB the lunge. Say if you would rather the levels kept their old layout and the fights changed instead.
+- **The Controls card** in the menu. **Lucan on his stick** and **Hollis with the halberd**, drawn.
+- **Question: what is Ivo's errand below?** The plan names it and nothing describes it.
+- You said (2026-11-20): do Steps 10, 12, 13 and 14 today, as much as can be done.
 
 ## Your aim (2026-11-20): play it start to finish today; after that, only polish
 - Every scene in the plan is built and in order (the bot's log matches the plan). v0.78 fixed the one dead end found by walking every 2.5D place on foot (the fever ward).

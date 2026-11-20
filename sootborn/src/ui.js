@@ -335,18 +335,34 @@ const Menus = {
       ...(Store.get('sootborn_done') ? [{ label: 'Chapter select', act: () => Menus.chapters() }] : []),
       { label: 'Load game', act: () => Menus.slots('load') },
       { label: 'Settings', act: () => Menus.settings() },
-      { label: 'About & controls', act: () => Menus.about() },
+      { label: 'Controls', act: () => Menus.controls() }, { label: 'About', act: () => Menus.about() },
       { label: 'Dev menu · jump to a scene', act: () => Menus.checkpoints() }
     ] }));
   },
   training(back) { const q = DEV.quick; DEV._tq = q; UI.clear(); DEV.quick = 1; ffScene('TRAINING', 'A sealed pump room. All moves. Nobody loses.', () => FF.training(), () => { DEV.quick = q; if (back && Save.latest()) Game.loadSave(Save.latest()); else Game.toTitle(); }); },
   chapters() { const go = f => () => { UI.clear(); f(); }; UI.push(modal({ title: 'Chapter select', build(b) { b.innerHTML = '<p>Replay any chapter. Your save slots are not touched until the game autosaves.</p>'; }, items: [{ label: 'Part One · from the beginning', act: () => Menus.newGame() }, ...[1, 2, 3, 4, 5].map(n => ({ label: `Part Two · ${n} · ${P2_TITLES[n]}`, act: go(() => playPart2(n)) })), { label: 'Back', act: () => UI.pop() }] })); },
   memories() { let L = []; try { L = JSON.parse(Store.get('sootborn_mem') || '[]'); } catch (e) { } UI.push(modal({ title: 'Memories', build(b) { b.innerHTML = '<p style="opacity:.7">Mara keeps them on the shelf, beside the tins. ' + L.length + ' kept so far.</p>' + (L.map(m => `<div class="card"><b>${esc(m[0])}</b><p>${esc(m[1])}</p><p style="opacity:.55">${esc(m[2] || '')}</p></div>`).join('') || '<p>None yet. They come back to him in fights.</p>'); }, items: [{ label: 'Back', act: () => UI.pop() }] })); },
+  // one card for every kind of play: the same button does the same thing below, in the arena and in the comic-book levels
+  controls() {
+    const rows = [
+      ['Move', 'W A S D or arrows', 'Left stick or D-pad', 'The pad'],
+      ['Talk, use, confirm', 'E (or Enter, Space)', 'A', 'A'],
+      ['Strike (in a fight or a level)', 'E', 'X', 'A'],
+      ['Dodge · out of a fight, back', 'X (or Esc)', 'B', 'B'],
+      ['Kick', 'C', 'Y', 'KICK'],
+      ['Jump (hold: the boots)', 'F', 'A', 'JUMP'],
+      ['Hook line', 'Q', 'LB', 'HOOK'],
+      ['Guard · in the comic-book levels, the lunge', 'V', 'RB', 'GUARD / LUNGE'],
+      ['ELEVEN', 'Hold strike when the fury is full', 'Hold strike', 'Hold A'],
+      ['Look round (comic-book levels)', 'Arrow keys, or drag with the mouse', 'Right stick; click it to lock on', 'Drag the picture'],
+      ['Menu, pause', 'M (or Tab, P)', 'Start', '☰']];
+    UI.push(modal({ title: 'Controls', build(b) { b.innerHTML = `<p>The same button does the same thing everywhere: below, in the arena fights, and in the comic-book levels.</p><table class="ctl"><tr><th></th><th>Keyboard</th><th>Controller</th><th>Touch</th></tr>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</table><p><b>In a fight.</b> Three strikes chain; hold strike for a heavy blow. A kick breaks a guard. Dodge through a red swing and he is open. Tap guard as he swings to parry. Walking over a chalked sun in a comic-book level saves and heals.</p><p>Controller letters are an Xbox pad's. On another pad, go by where the button sits.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
+  },
   about() {
     UI.push(modal({ title: 'About', build(b) { b.innerHTML = `<p><b>SOOTBORN</b> — a North Coast Studios × E Concepts game. <i>Every breath is hers.</i> Version ${GAME_VER}. The whole story plays from the animated intro to THE END: four days in Cinderwell, the Assay told in dreams, and five chapters above the rock, with about twenty fights. The training room is on the title screen and in the pause menu. </p><p><b>Fighting.</b> Strike (three-hit chain; hold for a heavy blow). Kick (breaks a guard, stops a wind-up, and after two strikes launches). Jump (strike in the air, kick to dive, dodge button to plunge). Dodge (through the red for an opening; strike or kick out of it). Guard (hold; tap just as he swings to parry). Hook line (drags a man to you, or you to a big one). Fury full: hold strike for ELEVEN.<br><b>Kicks and the ram.</b> Tap kick up to three times for a chain that ends in a roundhouse; hold kick for the boot, which breaks guards and sends a man flying. Hook up close is the ram: a punch from the valve ram on his off hand.<br><b>Boots</b> (the last day of the Assay and after): hold jump to fly, jump again in the air to climb, dodge in the air to dash, guard in the air to slam.<br><b>Signatures.</b> Guard + jump: Breach (a lunge straight through them). Jump twice: Shaft Drop. Guard + strike: Wide Cut (everything around him). Guard + kick: headbutt, or throw a smaller man into the others. Guard + hook: roar. Strike after a parry: riposte. A man on the ground gets no mercy.<br>Fight difficulty is in Settings (Story, Hard, Brutal; Hard is the default). On Story and Hard he gets one second wind, then the fight starts again a little easier.<br>Controller: X strike, Y kick, A jump, B dodge, RB guard, LB hook. Keyboard: E, C, F, X, V, Q.</p><p>Forty-one days ago, the Array Authority took Seren Holloway for a crime Kael Brennick committed. Today, Kael goes back to work on the same valve bank.</p>
       <p>Original story, characters, pixel art and music, all generated in code.</p>
       <p><b>Fights:</b> A strikes (three-hit chain), B dodges. Dodge through a swing and time slows: your next hits land harder. <b>Touch:</b> pad to move, A to interact/confirm, B to back, ☰ for the menu. <b>Keyboard:</b> WASD/arrows, E or Enter, Esc, M (menu), Q/R (journal). <b>Controller:</b> stick/D-pad, Ⓐ, Ⓑ, Start, shoulders.</p>
-      <p><b>The three third-person levels</b> (Riser Nine, the High Docks, the Stair): tap A for light cuts; keep A held for three heavy blows; at full fury a held A is ELEVEN. KICK kicks, twice for the Wide Cut. HOOK throws the hook line. JUMP jumps, held it hovers, and A in the air dives. LUNGE is the boots along the ground. B dodges. Walking over a chalked sun saves and heals; a marked one holds a memory, and A opens it. Drag the picture to look round.</p>
+      <p><b>The comic-book levels</b> use the same buttons as the fights (see Controls): tap strike for light cuts; keep it held for three heavy blows; at full fury a held strike is ELEVEN. Kick twice for the Wide Cut. Jump held hovers, and strike in the air dives. The guard button is the lunge. Walking over a chalked sun saves and heals; a marked one holds a memory, and A opens it. Drag the picture to look round.</p>
       <p>Phone tip: landscape gives the biggest screen.</p>`; }, items: [{ label: 'Back', act: () => UI.pop() }] }));
   },
   newGame() {
@@ -374,8 +390,8 @@ const Menus = {
 
 // ---------- boot splash: North Coast Studios, then E Concepts
 // ---- the Dev menu's notes. GAME_VER is the one place the version number lives; DEV_NEW and DEV_VER are brought up to date every release.
-const GAME_VER = '0.78';
-const DEV_NEW = 'a fix: the fever ward\'s way out (the ward board) could not be reached on foot. Every 2.5D place has now been walked with real key presses.';
+const GAME_VER = '0.79';
+const DEV_NEW = 'one set of buttons everywhere and a Controls card in the menu; Lucan on his stick and Hollis with the halberd, drawn (the Stair\'s top).';
 // which version last changed each scene: first match wins; the last line is everything older
 const DEV_VER = [
   [/fever ward/i, '0.78'], [/Gallery|High Docks|Riser Nine|The Stair/i, '0.77'], [/The Keep|Keep end|The Pinning|cold open/i, '0.76'], [/fourth ring|service stair|Count hall|High Docks|Tier Six Stands|The Balancing|Two Years/i, '0.75'], [/Count, as a puzzle|last flash|ending in six|Little Ember|The Count|What She Knows|The Son/i, '0.74'], [/The cloak: the camp|service stair|Celestine.s own Assay|barge, in the weather|Seren finds|The Post|Two Years/i, '0.73'], [/fourth ring|cold open|Flash forward|Part Two|The Balancing|The Son|Lucan/i, '0.72'], [/Deep Array|The Ledger \(43/i, '0.71'], [/Vent Stack|Valley · day forty|Ledger|third dream|The Ledger, that night/i, '0.70'], [/animated intro/i, '0.68'], [/camp by day|last bell: the seat/i, '0.69'], [/painted valley/i, '0.66'],

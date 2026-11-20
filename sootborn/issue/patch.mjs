@@ -636,6 +636,10 @@ rep("pose = e.kind === 'boss' || e.kind === 'knifer' ? P.run(e.runPh, sp / K.spe
 // ---- v0.77: each boss has his own way of standing (SC.bossIdle, in rig.js)
 rep("} else { pose = P.guard(e.t); if (e.sk === undefined)", "} else { pose = P.guard(e.t); if (e.kind === 'boss' && SC.bossIdle) pose = SC.bossIdle(e, pose); if (e.sk === undefined)");
 
+// ---- v0.79: the same keys as the arena fights (C kick, F jump, Q hook; V, the guard key, is the lunge), and the pad legend to match
+rep("KeyQ: 'power', KeyG: 'power', KeyL: 'power', KeyR: 'lock', KeyC: 'kick', KeyV: 'hook', KeyF: 'boots', KeyT: 'jump',", "KeyQ: 'hook', KeyG: 'power', KeyL: 'power', KeyR: 'lock', KeyC: 'kick', KeyV: 'boots', KeyF: 'jump', KeyT: 'jump',");
+rep('<b class="y">Y</b>HOOK<br>', '<b class="y">Y</b>KICK<br>'); rep('<b>RB</b>KICK<b>LB</b>LUNGE', '<b>RB</b>LUNGE<b>LB</b>HOOK');
+
 if (/Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow/.test(s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, ''))) {
   const m = s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').match(/.{0,60}(Calloway|Tally|Deacon|Mother Mercy|SECOND CHANCE|Second Chance|Halloran|Meridian|Hollow).{0,40}/g);
   console.log('LEFTOVER:', m.slice(0, 12));

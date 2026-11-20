@@ -1,4 +1,23 @@
-# SOOTBORN — changelog (latest v0.78 · 2026-11-20)
+# SOOTBORN — changelog (latest v0.79 · 2026-11-20)
+
+## v0.79 · 2026-11-20 — one set of buttons everywhere; two things drawn that were only told
+The start of Step 13 (controls) and the rest of Step 10 that could be done.
+
+- **The comic-book levels now use the arena fights' buttons.** Before, the kick, the hook and the lunge sat on different buttons in the levels than in the fights.
+  - **Controller:** X strike, Y kick, A jump, B dodge, LB hook, as in the fights. RB (the guard, which the levels do not have) is the lunge. Before, in the levels, Y was the hook, RB the kick and LB the lunge. **If you have played the levels on a pad, three buttons have moved.**
+  - **Keyboard:** E strike, C kick, F jump, X dodge, Q hook, V lunge.
+  - **Touch:** the on-screen buttons are relabelled to match, and the pad legend in the levels is corrected.
+- **A Controls card in the menu** (it was folded into About): one table, every action, with its key, its controller button and its touch button, true for all three kinds of play.
+- **Lucan on his stick, drawn** (if you did not befriend him): seven seconds at the white door before he speaks.
+- **Hollis grounding Brand's halberd, drawn**, at the top of the Stair.
+- **Not done from Step 10, and why:** "Ivo's errand below" has nothing written about it anywhere, so I have not invented one; say what it is. The hand to the washer is still only in the arena fights.
+
+**Checked:** a still of the card and of both pictures; the builds' key maps read back; the whole-story bot (see below).
+
+**The whole-story bot:** new game to THE END, no errors.
+
+**Not checked:** nothing by hand. **The new button layout in the levels was not played**, on a pad or on keys; it is three lines of mapping, read and not felt.
+
 
 ## v0.78 · 2026-11-20 — a playthrough check: every 2.5D place walked on foot; one dead end fixed
 Your aim for today: play it start to finish, in order, with every played moment finished. Every scene in the plan is built (v0.67 to v0.75), so this version looks for places a person would get stuck that the story bot cannot see, because the bot ends walks and fights as they start.

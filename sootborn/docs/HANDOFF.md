@@ -24,7 +24,7 @@ An original story game, inspired by Red Rising but legally distinct. **No Red Ri
 - **Repo:** `https://github.com/northcoaststudioswill-hub/game`, branch **`sootborn`**. The pre-reorder game is kept on branch `sootborn-v0.64-before-reorder`.
 - **Layout:** `src/*.js` (the game), `src/shell.html`, `issue/` (the comic-book levels), `build.mjs`, `index.html` (built), `tests/`, `docs/`.
 - **Build:** `node build.mjs` → `index.html` (one self-contained file, about 2.2 MB). It runs `issue/patch.mjs` itself, which turns `issue/base.html` + `rig.js` + `world.js` + `story.js` into `issue/issue.html`. Never edit `issue/base.html`; add patches in `issue/patch.mjs` (each `rep(a, b)` must match exactly once; new blocks go before the marker `\nif (/Calloway|Tally|Deacon`).
-- **Version:** `GAME_VER` in `src/ui.js` (0.78; next is 0.79). Update `DEV_NEW` and `DEV_VER` beside it in the same edit.
+- **Version:** `GAME_VER` in `src/ui.js` (0.79; next is 0.80). Update `DEV_NEW` and `DEV_VER` beside it in the same edit.
 - **Publish:** the game is the Claude artifact with slug `2a8a025c-511d-454c-861c-d9bc7a4565f5`; publish `index.html` with `publish_files` and the live version as `base_version` (get it with `get_artifact`). The illustrated progress report is `be5babce-6d5d-4c6e-9668-9b2185959f6c`.
 - **Project docs** (claude.ai project "Rr Game Idea"): `claude/sootborn-changelog.md` (v0.71 on; v0.66 to v0.70 in `-changelog-archive-3.md`, v0.56 to v0.65 in `-changelog-archive-2.md`, v0.1 to v0.55 in `-changelog-archive.md`, so the live one stays cheap to read), `-story-bible.md`, `-open-list.md`, `-script-and-plan.md`, `-progress-report-v0.65.md`, `-cards-and-transitions.md`, and this one, `claude/sootborn-master-timeline.md`. Read a doc with `project_read` before writing it.
 - **Commits** end with the attribution lines your session gives you. Push with `git -c push.negotiate=true push origin sootborn` (it prints "repository moved" and still succeeds). If the push is rejected, fetch and rebase first: other sessions also push here.
@@ -147,7 +147,8 @@ Release after every step (Part A2, rule 6). Each step lists what is in it, why i
 - The High Docks rebuilt from reference: a real dock, dressed as where the Accredited live, side corridors that go nowhere, height for the boots, hidden things for the Codex.
 - Riser Nine: more character. The Stair: crew on the near hulls; the three near wrecks and the smoke move. 2D valley maps: readable terrain (rises, banks, cover). The Scuffle's floor (still the square's flagstones). The whole of Ashgate Square walkable in the present, not only as a memory. Every new comic level gets a long first stretch.
 
-**Step 13 · fighting and controls**
+**Step 13 · fighting and controls** — **STARTED in v0.79**
+- Done: one button layout (the host's press names in `Issue.tick` in `src/issue.js`; the hosted key map and pad legend by reps in `issue/patch.mjs`); `Menus.controls()` in `src/ui.js`. Left: thinning group fights, re-fighting for difficulty, a look zone for touch.
 - One controls card across 2D, arena and comic levels. Group fights read as busy: thin them. Difficulty: re-fight the Ember Ring, the Drill and the group fights with the two bots, as was done for the Scuffle in v0.58. A second stick or a look zone for the on-screen pad (the camera still turns by dragging).
 
 **Step 14 · films and hand-offs**
