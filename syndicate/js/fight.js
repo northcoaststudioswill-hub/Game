@@ -110,7 +110,7 @@
       while (v.wounds < want && v.c.body) { const w = new T.Mesh(new T.BoxGeometry(0.05 + Math.random() * 0.05, 0.22 + Math.random() * 0.22, 0.03), new T.MeshBasicMaterial({ color: 0x6a0808 })); w.position.set((Math.random() - 0.5) * 0.4, 1.0 + Math.random() * 0.45, 0.225 * (v.wounds === 1 ? -1 : 1)); w.rotation.z = (Math.random() - 0.5) * 1.6; v.c.body.add(w); v.wounds++; }
       if (fr < 0.4 && Math.random() < 0.05) { gfx.splat(X + rand(-0.25, 0.25), Z + rand(-0.25, 0.25), rand(0.12, 0.3)); if (Math.random() < 0.5) gfx.emit(X, 1.1, Z, rand(-0.4, 0.4), 0, rand(-0.4, 0.4), 0.6, '#8a0c0c', 1); } }
     v.ring.visible = alive && alpha > 0.3 && !F.ex; v.ring.scale.setScalar(1 + Math.min(1, (e.charging || 0) / 0.28) * 0.45); v.ring.position.y = 0.03 - e.z / S;
-    v.ward.visible = alive && e.shield > 0; if (v.ward.visible) v.ward.material.opacity = 0.18 + Math.sin(time * 6) * 0.06;
+    v.ward.visible = alive && e.shield > 0 && phase !== 'mortal' && phase !== 'ko'; if (v.ward.visible) v.ward.material.opacity = 0.18 + Math.sin(time * 6) * 0.06;
     v.mark.visible = alive && !!e.st.mark; v.guard.visible = alive && (!!e.buffs.counter || e.guard > 0 || (e.state === 'parry' && e.parryT > 0)); if (v.guard.visible) v.guard.rotation.y = v.c.root.rotation.y - Math.PI / 2;
     v.stars.forEach((s, i) => { s.visible = alive && !!e.st.stun; const a = time * 6 + i * 2.09; s.position.set(Math.cos(a) * 0.4, 2.25, Math.sin(a) * 0.4); });
     const au = alive && !!e.buffs.aura, ar = A.spirit_guardians.aura.radius / S;

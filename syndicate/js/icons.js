@@ -104,7 +104,7 @@
   Object.keys(A).forEach(k => { if (A[k] && typeof A[k] === 'object') A[k]._k = k; });
   G.icon = ab => {
     if (ab === 'potion' || !ab || typeof ab !== 'object') return OLD(ab);
-    const k0 = key(ab), id = base(k0), body = P[id] || P[id.replace(/_c$/, '')] || (/^[a-z]_[a-z]+_m$/.test(k0) ? MV[ab.mv] || MV.cone : null);
+    const k0 = key(ab), id = base(k0), body = P[id] || P[id.replace(/_c$/, '')] || (G.ICON_EXTRA || {})[id] || (/^[a-z]_[a-z]+_m$/.test(k0) ? MV[ab.mv] || MV.cone : null);
     if (!body) return OLD(ab);
     return '<svg viewBox="0 0 24 24" fill="currentColor" style="color:' + (ab.color || '#e8e0d0') + '">' + body + '</svg>';
   };
