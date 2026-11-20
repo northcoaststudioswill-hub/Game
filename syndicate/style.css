@@ -776,3 +776,6 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 #tDodge { right: calc(8.4rem + var(--sr)); bottom: calc(0.9rem + var(--sb)); }
 #tTaunt { right: calc(14rem + var(--sr)); bottom: calc(1.3rem + var(--sb)); }
 @media (orientation: portrait) { #hud.touch #abar { right: calc(1rem + var(--sr)); max-width: none; } }
+#ui.ingarden .hud-mid > :not(#pauseBtn) { display: none !important; }
+#gsouls { top: 5.9rem; }
+@media (orientation: portrait) { #gsouls { top: 7.6rem; } }
