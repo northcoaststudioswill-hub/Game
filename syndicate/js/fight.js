@@ -1194,7 +1194,8 @@
     const f = e.foe;
     if (f.state !== 'ko' && e.state !== 'dodge' && e.z < 10) {
       const dx = e.x - f.x, dy = e.y - f.y, d = Math.hypot(dx, dy);
-      const MIN = ER * 2.8;       // room for two shields and two sword arms if (d < MIN && d > 0.01) { const want = (MIN - d) / 2, push = d < ER * 1.2 ? want : Math.min(want, 300 * dt); e.x += dx / d * push; e.y += dy / d * push; }
+      const MIN = ER * 2.8;       // room for two shields and two sword arms (this push was commented out by mistake on 19 Nov, so bodies walked through each other)
+      if (d < MIN && d > 0.01) { const want = (MIN - d) / 2, push = d < ER * 1.2 ? want : Math.min(want, 300 * dt); e.x += dx / d * push; e.y += dy / d * push; }
     }
     clampArena(e);
   }
