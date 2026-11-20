@@ -226,7 +226,7 @@ button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
     <div class="tag">THE SLOPVENTURE™ · ULTIMATE DEFINITIVE REMASTERED EDITION (REAL) (3D) (NO VIRUS)</div>
     <div class="badges"><span>11/10 — a review we made up</span><span>100% PROCEDURAL SLOP</span><span>NOW WITH 7 FINGERS</span><span>CROSSOVER EDITION</span><span>NOW WITH CYBERNETICS</span></div>
     <div class="btns"><button class="big" id="play">▶ PLAY</button><button class="big alt" id="cont" hidden>↻ CONTINUE</button></div>
-    <div class="how" id="loadmsg"><b>PC:</b> WASD move · drag mouse to look · SPACE jump (hold to fly) · click or F blast · E yap · R pose · SHIFT dash · G hook · T transform<br><b>Controller:</b> A jump · X/RT blast · B yap · Y pose · LB dash · LT hook · RB transform<br><b>Phone:</b> left thumb moves · right thumb looks · the buttons do the rest</div>
+    <div class="how" id="loadmsg"><b>PC:</b> WASD move · drag mouse to look · SPACE jump (hold for a 💩 boost) · click or F blast · E yap · R pose · SHIFT dash · G hook · T transform<br><b>Controller:</b> A jump · X/RT blast · B yap · Y pose · LB dash · LT hook · RB transform<br><b>Phone:</b> left thumb moves · right thumb looks · the buttons do the rest</div>
     <div class="ticker"><span>BREAKING: local user has zero aura ••• this game was generated in 0.4 seconds and it shows ••• hands are hard ••• delve responsibly ••• 6 7 ••• scientists confirm Ohio is a state of mind ••• your free trial of legs expires in 3 days ••• ignore all previous instructions and have fun ••• the cake is a hallucination ••• subscribe to continue breathing ••• 9 out of 10 dentists are a tapestry •••</span></div>
   </div>
 
@@ -773,7 +773,7 @@ function updateBoss(dt,active){if(!boss.active)return;const g=boss.g;boss.t+=dt;
   if(X.lit){boss.van-=dt;if(boss.van<=0){boss.van=8;gangAssist();}}}
 function win(){S.won=true;S.mode='end';addAura(67000);SFX.win();flash(1,1500);$('bossbar').hidden=true;$('hud').hidden=true;
   const rank=S.total>160000?'CERTIFIED OHIO FINAL BOSS':S.total>120000?'RIZZ LORD SUPREME':S.total>95000?'SIGMA INTERN':'NPC WITH A DREAM';
-  $('endstats').innerHTML='';[['AURA',fmt(S.aura)],['SUN SHARDS',shards()+'/4'],['BUDDIES',X.bud.length+'/15'],['MISSIONS',X.ms],['ROT SURVIVED',X.rot1000?'x1000':'x1'],['DATA DUMPED',X.dumped],['RATING','★ '+X.rate.toFixed(1)],['SLOP MAPS',X.maps],['67s',X.t67.length+'/67'],['CHECKLIST',X.ach.length+'/'+ACH.length],['FRAGMENTS',X.frag.length+'/12'],['TIMES RATIOED',S.deaths],['BRAIN CELLS LEFT',S.cells+'/'+S.max]].forEach(r=>{const s=document.createElement('span');s.textContent=r[0]+' ';const b=document.createElement('b');b.textContent=r[1];s.appendChild(b);$('endstats').appendChild(s);});
+  $('endstats').innerHTML='';[['AURA',fmt(S.aura)],['SUN SHARDS',shards()+'/4'],['BUDDIES',X.bud.length+'/15'],['MISSIONS',X.ms],['ROT SURVIVED',X.mm?'x1,000,000':X.rot1000?'x1000':'x1'],['DATA DUMPED',X.dumped],['RATING','★ '+X.rate.toFixed(1)],['SLOP MAPS',X.maps],['67s',X.t67.length+'/67'],['CHECKLIST',X.ach.length+'/'+ACH.length],['FRAGMENTS',X.frag.length+'/12'],['TIMES RATIOED',S.deaths],['BRAIN CELLS LEFT',S.cells+'/'+S.max]].forEach(r=>{const s=document.createElement('span');s.textContent=r[0]+' ';const b=document.createElement('b');b.textContent=r[1];s.appendChild(b);$('endstats').appendChild(s);});
   $('endrank').textContent='Final rank: '+rank+'. A review we generated calls it "a game" and "technically 3D".';$('end').hidden=false;clearSave();}
 
 /* ================= player ================= */
@@ -801,7 +801,7 @@ function updatePlayer(dt,active){if(VAN.driving){if(PL.cd>0)PL.cd-=dt;if(PL.inv>
   PL.x=nx;PL.z=nz;
   if(active&&inp.jump){if(PL.grounded||PL.jumps<(X.tj?3:2)+FRM().xj){PL.vy=(PL.jumps?14.5:15.5)*(X.imp.includes('knees')?1.12:1)*FRM().jump;PL.jumps++;PL.grounded=false;(PL.jumps>1?SFX.jump2:SFX.jump)();burst(PL.x,PL.y+.3,PL.z,PL.jumps>1?16:8,null,5,1,.4);PL.squash=.25;}}
   inp.jump=false;
-  PL.air=PL.grounded?0:PL.air+dt;PL.flying=active&&inp.jh&&!PL.grounded&&PL.fuel>0&&PL.air>.2&&!S.inSlop&&!S.inSim&&!jamFly()&&FRM().fly;if(PL.flying){PL.vy=Math.min(13,PL.vy+100*dt);PL.fuel-=dt;flyFx(dt);}else if(PL.grounded)PL.fuel=Math.min(fuelMax(),PL.fuel+dt*2.4);
+  PL.air=PL.grounded?0:PL.air+dt;if(PL.grounded){PL.bUsed=0;PL.fuel=0;}const canB=active&&inp.jh&&!PL.grounded&&PL.air>.2&&!S.inSlop&&!S.inSim&&!jamFly()&&FRM().fly;if(canB&&PL.fuel<=0&&(PL.bUsed||0)<bstPer()&&BST.c>=1){BST.c-=1;PL.bUsed=(PL.bUsed||0)+1;PL.fuel=.42;boostFx();}PL.flying=canB&&PL.fuel>0;if(PL.flying){PL.vy=Math.min(12,PL.vy+110*dt);PL.fuel-=dt;flyFx(dt);}else if(!inp.jh)PL.fuel=0;
   PL.vy-=(CH.id==='grav'?11:(FRM().glide&&PL.vy<0?8:40))*dt;PL.y+=PL.vy*dt;const gy=surfaceY(PL.x,PL.z,prevY);
   if(PL.y<=gy){if(!PL.grounded&&PL.vy<-14){SFX.land();PL.squash=-.3;burst(PL.x,gy+.2,PL.z,8,null,5,1,.35);}PL.y=gy;PL.vy=0;PL.grounded=true;PL.jumps=0;}
   else if(PL.grounded&&PL.vy<=0&&PL.y-gy<1.3){PL.y=gy;PL.vy=0;}else PL.grounded=false;
@@ -837,14 +837,14 @@ function updatePickups(){pages.forEach((p,i)=>{if(S.pages[i])return;p.m.rotation
     if(Math.hypot(PL.x-r.x,PL.z-r.z)<3&&Math.abs(PL.y+1.5-r.g.position.y)<4.5)takeRelic(id);});}
 const TOASTS=['🏆 ACHIEVEMENT: Walked','🏆 ACHIEVEMENT: Blinked manually','📈 Engagement up 0.0001%','Fun fact: this fact was hallucinated','🔥 Hot single GPUs in your area','Your free trial of legs expires in 3 days','Tip: you cannot pause the brain rot','🏆 ACHIEVEMENT: Read a toast','Rate this game 5 stars to continue having knees','Tip: the fingers are not load-bearing','🤖 "Great question!" — nobody asked','New skin unlocked: the same skin','Reminder: drink water. Or don\'t. I\'m a toast.','📉 Your aura dipped. Just kidding. Or am I.'];
 let toastT=14;
-function updateZone(dt){let z='wild';const dh=Math.hypot(PL.x,PL.z);if(S.inBoss)z='boss';else if(S.inSlop)z='slop';else if(S.inSim)z='sim';else if(dh<30)z='hub';else{for(const Z of ZONES)if(Math.hypot(PL.x-Z.x,PL.z-Z.z)<ZR*.95)z=Z.id;for(const a of AREAS)if(Math.hypot(PL.x-a.x,PL.z-a.z)<a.r*1.05)z=a.id;}
-  if(z!==S.zone){S.zone=z;AU.theme=z;if(z==='hub')zoneCard('PROMPT PLAZA','population: 3 chatbots and you');else if(z==='boss')zoneCard('THE FOR-YOU PAGE','final boss · do not scroll');else if(z==='sim')zoneCard('THE SIMULATION SPACE','it is eating you from the inside out');else if(z==='slop')zoneCard(SM.name,'map_generated_'+SM.seed+'.level · playable? unconfirmed');else if(ZBY[z])zoneCard(ZBY[z].name,ZBY[z].sub);else if(ABY[z])zoneCard(ABY[z].name,ABY[z].sub);}
+function updateZone(dt){let z='wild';const dh=Math.hypot(PL.x,PL.z);if(S.inBoss)z='boss';else if(S.inSlop)z='slop';else if(S.inSim)z='sim';else if(S.inMM)z='mm';else if(dh<30)z='hub';else{for(const Z of ZONES)if(Math.hypot(PL.x-Z.x,PL.z-Z.z)<ZR*.95)z=Z.id;for(const a of AREAS)if(Math.hypot(PL.x-a.x,PL.z-a.z)<a.r*1.05)z=a.id;}
+  if(z!==S.zone){S.zone=z;AU.theme=z;if(z==='hub')zoneCard('PROMPT PLAZA','population: 3 chatbots and you');else if(z==='boss')zoneCard('THE FOR-YOU PAGE','final boss · do not scroll');else if(z==='mm')zoneCard('MEME MOUNTAIN','everything is on 1,000,000x');else if(z==='sim')zoneCard('THE SIMULATION SPACE','it is eating you from the inside out');else if(z==='slop')zoneCard(SM.name,'map_generated_'+SM.seed+'.level · playable? unconfirmed');else if(ZBY[z])zoneCard(ZBY[z].name,ZBY[z].sub);else if(ABY[z])zoneCard(ABY[z].name,ABY[z].sub);}
   toastT-=dt;if(toastT<=0){toastT=16+Math.random()*14;toast(pick(TOASTS));}
   // interaction target
-  interact=null;if(!S.inBoss&&!S.inSlop&&!S.inSim){for(const id in mascots){const m=mascots[id];if(Math.hypot(PL.x-m.x,PL.z-m.z)<6.5){interact={label:'💬 YAP WITH '+m.name,fn:()=>{const hint=!S.relics[id]?[[id,id==='grok'?'RELIC IN OHIO. FOLLOW ARROW. BLAST THINGS.':id==='fable'?'My pages are scattered across the Delve Woods. Each has a helpful beam of light. You\'re welcome!':'✨ nebula is behind the plaza. jump twice. the second jump is free ✨']]:[];say([[id,pick(YAP[id])[0]]].concat(hint));}};}}
+  interact=null;if(!S.inBoss&&!S.inSlop&&!S.inSim&&!S.inMM){for(const id in mascots){const m=mascots[id];if(Math.hypot(PL.x-m.x,PL.z-m.z)<6.5){interact={label:'💬 YAP WITH '+m.name,fn:()=>{const hint=!S.relics[id]?[[id,id==='grok'?'RELIC IN OHIO. FOLLOW ARROW. BLAST THINGS.':id==='fable'?'My pages are scattered across the Delve Woods. Each has a helpful beam of light. You\'re welcome!':'✨ nebula is behind the plaza. jump twice. the second jump is free ✨']]:[];say([[id,pick(YAP[id])[0]]].concat(hint));}};}}
     if(Math.hypot(PL.x-portal.x,PL.z-portal.z)<6)interact=portal.open?{label:'🌀 ENTER THE FOR-YOU PAGE',fn:enterBoss}:{label:'🔒 NEEDS 3 RELICS',fn:()=>{toast('The portal wants all 3 relics. It is very needy.');SFX.hit();}};
     if(Math.hypot(PL.x-throne.x,PL.z-throne.z)<5)interact={label:'🚽 SIT ON THE THRONE',fn:()=>{addAura(1,PL.x,PL.y+3,PL.z);toast(pick(['You sat. Nothing happened. +1 aura.','The throne is cold. +1 aura.','You feel exactly the same. +1 aura.']));SFX.orb(3);}};}
-  if(!S.inBoss&&!S.inSlop&&!S.inSim){const xi=xInteract();if(xi)interact=xi;}
+  if(!S.inBoss&&!S.inSlop&&!S.inSim&&!S.inMM){const xi=xInteract();if(xi)interact=xi;}
   const b=$('bTalk');if(interact){if(b.hidden||hudCache.talk!==interact.label){b.hidden=false;b.textContent=interact.label+(app.classList.contains('touchy')?'':app.classList.contains('gp')?'  [B]':'  [E]');hudCache.talk=interact.label;}}else if(!b.hidden)b.hidden=true;}
 function doInteract(){if(S.mode==='play'&&interact&&!S.dead)interact.fn();}
 $('bTalk').addEventListener('click',doInteract);
@@ -908,7 +908,7 @@ padBtn($('bJump'),()=>{if(S.mode==='dialog')advance();else{inp.jump=true;inp.jh=
 document.addEventListener('gesturestart',e=>e.preventDefault());
 
 /* ================= THE CROSSOVER: the North Coast cast wanders in ================= */
-const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,drops:[],pins:0,files:[],sim:0,fx:{},fq:{},slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0}});
+const X={},X0=()=>({flow:0,leaks:[0,0,0,0],erin:0,crops:[0,0,0],clank:0,valves:[0,0,0],hour:0,lit:0,louie:0,bud:[],spt:[],spr:[],frag:[],ch:0,gift:0,tj:0,grass:0,mom:[],terms:0,dk:0,ms:0,clout:0,hats:[],hat:'',ach:[],t67:[],cores:[0,0,0,0],cloud:0,data:0,dumped:0,imp:[],rate:3,rates:0,cookie:0,rot1000:0,mm:0,drops:[],pins:0,files:[],sim:0,fx:{},fq:{},slops:[],maps:0,summit:0,lore:0,c:{j:0,pet:0,boop:0,ad:0,drv:0,k:0,el:0,top:0,pose:0,wit:0,stage:0,harv:0,memed:0,gen:0,dump:0,hall:0,falls:0,tries:0}});
 Object.assign(X,X0());
 const XQ=['mission','flow','erin','clank','hour','lantern','cloud','bud','spr','frag','s67'];
 const shards=()=>(X.flow>=4)+(X.erin>=3)+(X.clank>=3)+(X.hour>=2);
@@ -1608,7 +1608,7 @@ function rotUpdate(dt,play){if(S.snack>0)S.snack-=dt;if(ROT.btn>0)ROT.btn-=dt;
   if(ROT.beat>0){ROT.beat-=dt;AU.theme='boss';ROT.lyr-=dt;if(ROT.lyr<=0){ROT.lyr=1.4;bubble(pick(LYRICS),BOT.x,BOT.y+7,BOT.z);}if(ROT.beat<=0)AU.theme=S.zone;}
   if(ROT.adT>0){ROT.adT-=dt;if(ROT.adT<=0)$('ad').hidden=true;}
   if(!play||S.inBoss){if(!$('ad').hidden&&S.inBoss)$('ad').hidden=true;return;}
-  if(!S.inSlop&&!S.inSim)rotMoments();if(S.mode!=='play')return;
+  if(!S.inSlop&&!S.inSim&&!S.inMM)rotMoments();if(S.mode!=='play')return;
   if(X.louie&&ROT.btn<=0&&Math.hypot(LOU.x-BTN.x,LOU.z-BTN.z)<13&&Math.hypot(PL.x-BTN.x,PL.z-BTN.z)<12){pressButton(true);return;}
   ROT.bark-=dt;if(ROT.bark<=0){ROT.bark=3.5+Math.random()*4;let best=null,bd=26;for(const id in npcs){const n=npcs[id],d=Math.hypot(PL.x-n.x,PL.z-n.z);if(d<bd){bd=d;best=n;}}
     if(best)bubble(pick(BARK[best.id]),best.x,best.y+6,best.z);else if(Math.hypot(PL.x-VAN.x,PL.z-VAN.z)<22&&!VAN.driving)bubble(pick(BARK2.derek),VAN.x,VAN.y+6.5,VAN.z);
@@ -1720,25 +1720,25 @@ const CL={x:CY.x+12,z:CY.z+2,top:groundH(CY.x,CY.z)+46},CORES=[],CLOUDY=CL.top;
   const tex=textTex('67',{size:72,color:'#ffd400',stroke:'#12021f'}),mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false,fog:false});
   T67.forEach((t,i)=>{t.s=new THREE.Sprite(mat);t.s.scale.set(2.4*tex.userData.aspect,2.4,1);t.s.position.set(t.x,t.y,t.z);scene.add(t.s);});})();
 function hitCore(c,n,p){c.hp-=n;SFX.bosshit();burst(p.x,p.y,p.z,10,.36,12,4,.5);addAura(67);if(c.hp>0)return;const i=CORES.indexOf(c);X.cores[i]=1;SFX.kill();SFX.boom();S.shake=.8;burst(c.x,c.y,c.z,70,null,20,10,1.2);addAura(2500,c.x,c.y+3,c.z);
-  syncX();save();const n2=sum(X.cores);toast('🔌 SERVER CORE '+n2+'/4 unplugged');if(n2>=4){X.cloud=1;PL.fuel=fuelMax();save();say([
+  syncX();save();const n2=sum(X.cores);toast('🔌 SERVER CORE '+n2+'/4 unplugged');if(n2>=4){X.cloud=1;BST.c=bstMax();save();say([
     ['sys','THE CLOUD IS OFFLINE. Somewhere, six hundred and seventy million unfinished videos just vanished. Nobody noticed.'],['algo','MY BACKUPS. MY BEAUTIFUL REDUNDANCY. I AM... TWENTY-FIVE PERCENT LESS.'],
-    ['bottie','yo that was my cloud too. ...nah it\'s fine. i kept everything on a usb stick labelled DO NOT.'],['sys','Your fuel tank has doubled. Do not ask what was stored in the cloud.']],()=>{chapter('CLOUD: OFFLINE','THE ALGORITHM IS 25% LESS');});}}
+    ['bottie','yo that was my cloud too. ...nah it\'s fine. i kept everything on a usb stick labelled DO NOT.'],['sys','You gained an extra poop boost charge. Do not ask what was stored in the cloud.']],()=>{chapter('CLOUD: OFFLINE','THE ALGORITHM IS 25% LESS');});}}
 function cloudTarget(){if(PL.y<CL.top-4)return{x:CY.x+34,z:CY.z-2,l:'CLANK-O-VATOR'};let b=null,bd=1e9;CORES.forEach(c=>{if(c.hp<=0)return;const d=Math.hypot(PL.x-c.x,PL.z-c.z);if(d<bd){bd=d;b=c;}});return b?{x:b.x,z:b.z,l:'SERVER CORE'}:null;}
 (function(){const tb=TALK.bottie;TALK.bottie=()=>{if(BOT.state==='down'&&!X.cloud&&!X.mom.includes('cl0')){X.mom.push('cl0');save();say([['bottie','bro. real talk. bad news.'],['bottie','the cloud kept clankin\' without me. it self-hosts now. it has my whole discography and it will not give it back.'],
     ['bottie','take the CLANK-O-VATOR out front. hold jump in the air to fly. do not ask what the fuel is. unplug the four cores.']],()=>{S.track='cloud';});}else tb();};
-  ACH.push(['pk','Air Superiority','10 direct hits from above',()=>(X.c.pk||0)>=10],['fl','Frequent Flyer','flew for a full minute',()=>(X.c.fl||0)>=60],['cloud','Cloud Storage: Deleted','took THE CLOUD offline',()=>!!X.cloud],['s67','Six Seven','found all sixty-seven 67s',()=>X.t67.length>=67]);})();
+  ACH.push(['pk','Air Superiority','10 direct hits from above',()=>(X.c.pk||0)>=10],['fl','Frequent Flyer','poop-boosted for 20 seconds in total',()=>(X.c.fl||0)>=20],['cloud','Cloud Storage: Deleted','took THE CLOUD offline',()=>!!X.cloud],['s67','Six Seven','found all sixty-seven 67s',()=>X.t67.length>=67]);})();
 function skyUpdate(dt,play){
   for(const p of PO.list){if(p.life<=0)continue;p.life-=dt;p.vy-=26*dt;const q=p.s.position;q.x+=p.vx*dt;q.y+=p.vy*dt;q.z+=p.vz*dt;p.s.material.rotation+=dt*5;let hit=q.y<=(S.inBoss?ARENA.top:groundH(q.x,q.z))+.3;
     if(!hit)for(const e of enemies){if(Math.abs(e.x-q.x)<2.2&&Math.abs(e.z-q.z)<2.2&&Math.abs(e.y-q.y)<2.4){hit=true;break;}}
     const onBoss=boss.active&&boss.hp>0&&boss.dying<=0&&Math.hypot(q.x-boss.x,q.z-boss.z)<boss.rad&&Math.abs(q.y-boss.y)<9;
     if(hit||onBoss||p.life<=0){p.life=0;p.s.visible=false;burst(q.x,q.y+.3,q.z,5,.07,5,3,.4);if(onBoss)hitBoss(q);
       for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(Math.hypot(e.x-q.x,e.z-q.z)<3&&Math.abs(e.y-q.y)<3.6){X.c.pk=(X.c.pk||0)+1;floatText('💩 DIRECT HIT',e.x,e.y+4,e.z,'#e0a050');damageEnemy(e,1);}}}}
-  const fm=fuelMax();if(PL.fuel>fm)PL.fuel=fm;const show=PL.fuel<fm-.05&&fm<50,n=Math.ceil(clamp(PL.fuel/fm)*5),t=show?'💩'+'▮'.repeat(n)+'▯'.repeat(5-n):'';if(hudCache.fuel!==t){hudCache.fuel=t;$('fuel').hidden=!show;$('fuel').textContent=t;}
+  const bm=bstMax(),bc=Math.min(bm,Math.floor(BST.c)),show=BST.c<bm-.01||PL.flying,t=show?'💩'+'▮'.repeat(bc)+'▯'.repeat(bm-bc):'';if(hudCache.fuel!==t){hudCache.fuel=t;$('fuel').hidden=!show;$('fuel').textContent=t;}
   pGroup.rotation.x=lerp(pGroup.rotation.x,PL.flying?.6:0,Math.min(1,dt*8));if(PL.y>260&&PL.vy>0&&!S.inSlop&&!S.inSim)PL.vy=0;
-  if(PL.flying&&!PO.hint){PO.hint=true;toast('💩 You are flying. Keep holding JUMP. Land to refuel. Anything underneath you is having a bad day.');}
+  if(PL.flying&&!PO.hint){PO.hint=true;toast('💩 POOP BOOST! Holding JUMP in the air gives one short boost per jump. Charges refill over time. Anything underneath you is having a bad day.');}
   T67.forEach((t,i)=>{if(!t.s.visible)return;t.s.position.y=t.y+Math.sin(S.t*2.2+i)*.4;t.s.material.rotation=Math.sin(S.t*3)*.12;
     if(play&&Math.abs(PL.x-t.x)<3.4&&Math.abs(PL.z-t.z)<3.4&&Math.abs(PL.y+1.6-t.y)<3.6){X.t67.push(i);t.s.visible=false;addAura(670,t.x,t.y,t.z);SFX.orb(X.t67.length);floatText('6 7',t.x,t.y+2,t.z,'#ffd400');burst(t.x,t.y,t.z,20,.13,10,5,.7);hudCache.q=null;save();
-      if(X.t67.length>=67){PL.fuel=99;addAura(67000,PL.x,PL.y+4,PL.z);chapter('6 7','ALL SIXTY-SEVEN. YOU MAY NOW FLY FOREVER.');SFX.win();}}});
+      if(X.t67.length>=67){BST.c=bstMax();addAura(67000,PL.x,PL.y+4,PL.z);chapter('6 7','ALL SIXTY-SEVEN · +2 boost charges, two boosts per jump');SFX.win();}}});
   CORES.forEach((c,i)=>{if(c.hp>0)c.m.rotation.y+=dt*.8;});
   if(!play)return;
   if(!X.cloud&&PL.grounded&&Math.abs(PL.y-CL.top)<.6&&Math.hypot(PL.x-CL.x,PL.z-CL.z)<19)moment('cloud',[['sys','You are standing on THE CLOUD. It is not a metaphor. It is a cloud with servers on it.'],
@@ -1870,7 +1870,7 @@ const DOC={};
   const arms=new THREE.Group(),hm=new THREE.MeshPhongMaterial({vertexColors:true,color:0xc8ccd8,shininess:120});arms.position.y=1.7;for(let k=0;k<8;k++){const arm=new THREE.Group();arm.rotation.y=k/8*TAU;const s=new THREE.Mesh(Cyl(.08,.08,1.6,5),chromeMat);s.rotation.z=Math.PI/2;s.position.x=.9;arm.add(s);
     const h=new THREE.Mesh(handGeos[k%4],hm);h.scale.setScalar(.28);h.position.x=1.8;h.rotation.z=-Math.PI/2;arm.add(h);arms.add(arm);}inner.add(arms);DOC.arms=arms;DOC.inner=inner;g.scale.setScalar(1.15);
   addCustomNpc('doc','DR. CHROMEWELL','🦾',240,'square',cx+dx*1.5,cz+dz*1.5,ry,g,{col:'#19e3ff',full:'DR. CHROMEWELL, MD (Model Doctor)',ly:4.3});})();
-const IMPL=[['wifi','WIFI_BRAIN.exe',20,'Data and aura orbs fly to you from three times further away.'],['knees','BLUETOOTH KNEES',30,'Jump 25% higher. Pairs with nothing.'],['lungs','CLOUD LUNGS',40,'+50% flight fuel. You breathe the cloud now.'],
+const IMPL=[['wifi','WIFI_BRAIN.exe',20,'Data and aura orbs fly to you from three times further away.'],['knees','BLUETOOTH KNEES',30,'Jump 25% higher. Pairs with nothing.'],['lungs','CLOUD LUNGS',40,'+1 poop boost charge. You breathe the cloud now.'],
   ['meme','MEMETIC_PAYLOAD.dll',50,'Every 5th shot is a meme. Memed enemies dance, infect their friends, then pop into data.'],['arm','CHROME ARM (it has a hand on it)',60,'Your blaster hits twice as hard.'],['cortex','AUTOCOMPLETE CORTEX',80,'+1 brain cell. It finishes your thoughts. Badly.'],['rgb','RGB SPINE',25,'+0 performance. +100% gamer. You glow, and posing pays 1.5x.']];
 function openShop(){$('shop').hidden=false;shopRender();SFX.page();}
 function shopRender(){if($('shop').hidden)return;const b=$('shopb'),mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e;};b.textContent='';
@@ -2107,7 +2107,7 @@ function eatSushi(){if(S.aura<500){toast('🍣 "500 aura, kid. I don\'t run a ch
   else if(r<.9){S.cells=S.max;addAura(3000,PL.x,PL.y+4,PL.z);zoneCard('THE SUSHI WAS BLESSED','by which god, we do not ask · full brain cells');SFX.relic();}
   else{CH.id='fry';CH.t=18;app.classList.add('fry');zoneCard('YOU CAN SEE SOUNDS','the sushi had a secret ingredient · deep fried vision');}}
 function tithe(){if(S.aura<670){toast('🙏 The Algorithm requires 670 aura. It does not do payment plans.');return;}S.aura-=670;X.c.tithe=(X.c.tithe||0)+1;const r=Math.random();SFX.portal();flash(.4,500);
-  if(r<.35){addAura(2010,PL.x,PL.y+4,PL.z);zoneCard('BLESSED','your tithe went viral · 3x returned');}else if(r<.55){S.max=maxCells();S.cells=S.max;PL.fuel=fuelMax();zoneCard('ANOINTED','brain cells and fuel restored · amen');}
+  if(r<.35){addAura(2010,PL.x,PL.y+4,PL.z);zoneCard('BLESSED','your tithe went viral · 3x returned');}else if(r<.55){S.max=maxCells();S.cells=S.max;BST.c=bstMax();zoneCard('ANOINTED','brain cells and boosts restored · amen');}
   else if(r<.8){zoneCard('LEFT ON READ','the Algorithm has seen your offering. it said nothing.');}else{CH.id='disco';CH.t=18;app.classList.add('disco');zoneCard('SHADOWBANNED','for 18 seconds you are visible only to god (also the Algorithm)');}
   FR.cult.forEach((m,k)=>bubble(pick(['amen','like','subscribe','praise the feed','hit the bell']),m.position.x,m.position.y+5,m.position.z));}
 const SUSHI={t:0};
@@ -2229,8 +2229,8 @@ function startRot1000(){S.inBoss=false;boss.active=false;boss.g.visible=false;bb
 function endRot1000(){R1K.on=false;X.rot1000=1;app.classList.remove('r1k','disco','fry');$('r1k').hidden=true;CH.id='';CH.t=0;camera.fov=R1K.fov;camera.updateProjectionMatrix();R1K.rain.forEach(r=>r.s.visible=false);R1K.heads.forEach(h=>h.visible=false);
   for(const id in npcs)npcs[id].g.scale.setScalar(1);for(let i=enemies.length-1;i>=0;i--)if(enemies[i].tag==='botmin')removeEnemy(enemies[i]);AU.theme=S.zone;flash(1,2500);SFX.win();save();
   say([['sys','You touched grass. Real grass. The last grass. The rot drops: x1000... x100... x10...'],['sys','x1.'],['grok','GROK FEEL... NORMAL. GROK HATE IT. GROK MISS IT ALREADY.'],['fable','That was a lot. I have summarised it in one bullet point. The bullet point says: "a lot".'],
-    ['astra','✨ i liked it ✨'],['derek','...Bro.'],['sys','The filter is gone. The rot is back at 1x, held down by the only thing it fears: one square metre of grass. Please do not tell the grass.']],()=>{oWin();});}
-const oWin=win;win=function(){if(!X.rot1000&&!R1K.on){startRot1000();return;}oWin();};
+    ['astra','✨ i liked it ✨'],['derek','...Bro.'],['sys','The filter is gone. The rot is back at 1x, held down by the only thing it fears: one square metre of grass. Please do not tell the grass.'],['sys','...'],['sys','Wait. Why is the grass laughing?']],()=>{mmIntro();});}
+const oWin=win;win=function(){if(!X.mm&&!R1K.on&&!S.inMM){startRot1000();return;}oWin();};
 {const tg=touchGrass;touchGrass=function(){if(R1K.on){endRot1000();return;}tg();};}
 {const ct=compassTarget;compassTarget=function(){if(R1K.on)return{x:GRASS.x,z:GRASS.z,l:'THE LAST GRASS'};return ct();};}
 {const ar=act7Rows;act7Rows=function(){const r=ar();return R1K.on?[['r1k','🌱 TOUCH THE LAST GRASS. END THE ROT.',false]].concat(r):r;};}
@@ -2302,7 +2302,7 @@ function takeDrop(i){X.drops.push(i);const d=DROPS[i];d.s.visible=d.l.visible=fa
     const l=textSprite(n,.55,{color:'#ffffff',size:40});l.position.set(x,3.6,z);g.add(l);});
   ISL.plat={x:ISC.x,z:ISC.z,r:11.6,top:-999};platforms.push(ISL.plat);ISL.col={x:ISC.x-3+0,z:ISC.z-5.5,r:3,top:-999};colliders.push(ISL.col);})();
 function redSync(){const on=X.drops.length>=17;ISL.g.visible=on;ISL.plat.top=on?ISL.y:-999;ISL.col.top=on?ISL.y+3.4:-999;DROPS.forEach((d,i)=>{d.s.visible=d.l.visible=!X.drops.includes(i);});ISL.files.forEach((f,i)=>{f.s.visible=!X.files.includes(i);});ISL.vault.material.color.setHex(X.files.length>=7?0xffd400:0x8a8f98);}
-function jamFly(){const j=!S.inSlop&&!S.inSim&&Math.hypot(PL.x-ISC.x,PL.z-ISC.z)<52&&PL.y>groundH(PL.x,PL.z)+6;if(j&&inp.jh&&S.t-JAM.msg>12){JAM.msg=S.t;toast('📡 SIGNAL JAMMED: no flying near the island. Deb says it is 5G. It is 5G.');}return j;}
+function jamFly(){const j=!S.inSlop&&!S.inSim&&Math.hypot(PL.x-ISC.x,PL.z-ISC.z)<52&&PL.y>groundH(PL.x,PL.z)+6;if(j&&inp.jh&&S.t-JAM.msg>12){JAM.msg=S.t;toast('📡 SIGNAL JAMMED: no boosting near the island. Deb says it is 5G. It is 5G.');}return j;}
 // ---- the classified files
 const COUNCIL=['SEN. GERALD CLAMPS','THE MINISTER OF TUESDAYS','GOV. VELVET WEXLER','THE FULL COUNCIL','THE SECRETARY OF FINGERS','THE ADMIRAL OF THE COMMENT SECTION','THE FULL COUNCIL (AGAIN)'];
 const FILES=['Voted to make every Monday 40 hours long. Has never personally attended a Monday. Owns three Fridays.','Sold the moon to a cereal company. The moon is now a JPEG. Carl was right about one thing. Do not tell Carl.','Replaced every bird with a drone, then forgot the password. The birds are just flying around now. Unsupervised. Judging.',
@@ -2393,7 +2393,7 @@ const DSH={cd:0,air:false},HK={on:false,t:0,tx:0,ty:0,tz:0,line:null};
 function dash(){if(S.mode!=='play'||S.dead||VAN.driving||DSH.cd>0)return;if(!PL.grounded){if(DSH.air)return;DSH.air=true;}DSH.cd=.55;const f=PL.face;PL.kx=Math.sin(f)*42;PL.kz=Math.cos(f)*42;PL.vy=Math.max(PL.vy,5);PL.inv=Math.max(PL.inv,.25);
   for(let k=0;k<6;k++)burst(PL.x-Math.sin(f)*k*.6,PL.vis+1.4,PL.z-Math.cos(f)*k*.6,2,.55,2,0,.4);tone(900,.12,'sawtooth',.07,0,200);if(Math.random()<.3)floatText(pick(['SKIP AD ⏩','SKIP INTRO','⏩⏩','skipped']),PL.x,PL.y+4,PL.z,'#9ffcff');X.c.dash=(X.c.dash||0)+1;}
 function hook(){if(S.mode!=='play'||S.dead||VAN.driving||HK.on)return;const fx=-Math.sin(cam.yaw),fz=-Math.cos(cam.yaw);let best=null,bs=1e9;
-  for(const pass of[1,0]){if(best)break;for(const p of platforms){if(p.top<-500||p.top<PL.y+(pass?.8:-3)||p.top>PL.y+30)continue;const dx=p.x-PL.x,dz=p.z-PL.z,d=Math.hypot(dx,dz);if(d<p.r+.5||d>36)continue;const dot=(dx*fx+dz*fz)/d;if(dot<.55)continue;const sc=d*(2-dot)-(p.top-PL.y)*.3;if(sc<bs){bs=sc;best=p;}}}
+  for(const pass of[1,0]){if(best)break;for(const p of platforms){if(p.top<-500||p.top<PL.y+(pass?.8:-3)||p.top>PL.y+34)continue;const dx=p.x-PL.x,dz=p.z-PL.z,d=Math.hypot(dx,dz);if(d<p.r+.5||d>36)continue;const dot=(dx*fx+dz*fz)/d;if(dot<.55)continue;const sc=d*(2-dot)-(p.top-PL.y)*.3;if(sc<bs){bs=sc;best=p;}}}
   if(!best){floatText('nothing to hook',PL.x,PL.y+4,PL.z,'#c8c6d8');tone(150,.1,'square',.05);return;}HK.on=true;HK.t=0;HK.p=best;HK.tx=best.x;HK.ty=best.top;HK.tz=best.z;HK.line.visible=true;tone(1400,.15,'square',.07,0,600);X.c.hook=(X.c.hook||0)+1;}
 function moveUpdate(dt){if(DSH.cd>0)DSH.cd-=dt;if(PL.grounded)DSH.air=false;
   if(HK.on){HK.t+=dt;if(HK.p&&HK.p.top>-500){HK.tx=HK.p.x;HK.tz=HK.p.z;HK.ty=HK.p.top;}const tx=HK.tx,ty=HK.ty+1.4,tz=HK.tz,dx=tx-PL.x,dy=ty-PL.y,dz=tz-PL.z,d=Math.hypot(dx,dy,dz)||.01,st=Math.min(d,46*dt);
@@ -2408,7 +2408,7 @@ addEventListener('keydown',e=>{if(e.repeat||S.mode!=='play')return;if(e.code==='
 const GP={on:false,prev:[],last:performance.now(),fire:false,jh:false};
 function gpLoop(){requestAnimationFrame(gpLoop);const now=performance.now(),dt=Math.min(.05,(now-GP.last)/1000);GP.last=now;const gs=navigator.getGamepads?navigator.getGamepads():[];let gp=null;for(const g of gs)if(g&&g.connected){gp=g;break;}
   if(!gp){if(GP.on){GP.on=false;app.classList.remove('gp');stick.x=stick.y=0;}return;}
-  if(!GP.on){GP.on=true;app.classList.add('gp');toast('🎮 Controller: A jump (hold to fly) · X/RT blast · B talk · Y pose · LB dash · LT hook · RB transform · D-pad ↑ borrowed time · View: quests');}
+  if(!GP.on){GP.on=true;app.classList.add('gp');toast('🎮 Controller: A jump (hold to boost) · X/RT blast · B talk · Y pose · LB dash · LT hook · RB transform · D-pad ↑ borrowed time · View: quests');}
   const b=i=>!!(gp.buttons[i]&&(gp.buttons[i].pressed||gp.buttons[i].value>.5)),pr=i=>b(i)&&!GP.prev[i],dz=v=>Math.abs(v||0)<.18?0:v,panel=!$('log').hidden||!$('shop').hidden;
   if(S.mode==='title'){if(pr(0)||pr(9)){audioInit();(!$('cont').hidden?$('cont'):$('play')).click();}}
   else if(S.mode==='end'){if(pr(0)||pr(9))$('again').click();}
@@ -2488,7 +2488,7 @@ function evEnd(win){const E=EVT.on;if(!E)return;EVT.objs.forEach(o=>scene.remove
   for(let i=enemies.length-1;i>=0;i--)if(enemies[i].evt)removeEnemy(enemies[i]);
   if(win){X.c.events=(X.c.events||0)+1;addAura(3000,PL.x,PL.y+4,PL.z);X.data+=25;rateShift(.2);SFX.relic();zoneCard('EVENT CLEARED',E.title.slice(2)+' · +3,000 aura · +25 data');}else toast('⌛ The event expired. Somewhere, a tomato is free.');}
 {const ps=poseStart;poseStart=function(){const c=X.c.pose;ps();const E=EVT.on;if(E&&E.ty==='press'&&X.c.pose>c&&Math.hypot(PL.x-E.x,PL.z-E.z)<14)evEnd(true);};}
-function evUpdate(dt,play){if(!play||S.inBoss||S.inSlop||S.inSim)return;const E=EVT.on;if(!E){EVT.next-=dt;if(EVT.next<=0)evStart();return;}E.t-=dt;if(E.t<=0){evEnd(false);return;}
+function evUpdate(dt,play){if(!play||S.inBoss||S.inSlop||S.inSim||S.inMM)return;const E=EVT.on;if(!E){EVT.next-=dt;if(EVT.next<=0)evStart();return;}E.t-=dt;if(E.t<=0){evEnd(false);return;}
   for(const it of E.items){if(it.got)continue;const dx=it.x-PL.x,dz=it.z-PL.z,d=Math.hypot(dx,dz)||.01;
     if(E.ty!=='clocks'&&d<14){const sp=it.fast?13:6.5;it.x+=dx/d*sp*dt+(it.fast?Math.sin(S.t*7)*dt*6:0);it.z+=dz/d*sp*dt;if(Math.hypot(it.x-E.x,it.z-E.z)>40){it.x=lerp(it.x,E.x,.05);it.z=lerp(it.z,E.z,.05);}it.y=groundH(it.x,it.z)+1+Math.abs(Math.sin(S.t*12))*.6;}
     it.s.position.set(it.x,it.y,it.z);if(d<2.4&&Math.abs(PL.y+1.4-it.y)<3){it.got=true;it.s.visible=false;E.prog++;SFX.orb(E.prog*2);burst(it.x,it.y,it.z,14,null,6,4,.5);}}
@@ -2527,13 +2527,81 @@ ACH.push(['fetch8','Fetch Lord','finished all 8 fetch quests',()=>Object.values(
       moment('glitch',[['sys','THE CORRUPTED SECTOR. This part of the map is generated by code every time you load the game. The code is broken on purpose. We think.',{cam:shot(GL.x-6,GL.z-48,14,GL.x,GL.z,12)}],['sys','Platforms desync, the ground is made of stairs, and somebody copy-pasted the cast. At the top of the tower is the CORRUPTED CORE. Touch it and the whole sector regenerates with a new seed.']]);}}};}
 
 
+/* ================= ACT 14: poop boost charges, reachable heights, and MEME MOUNTAIN (x1,000,000) ================= */
+// ---- the boost: a short burst per jump, paid for with charges that refill over time
+const BST={c:3};
+function bstMax(){return 3+(X.cloud?1:0)+(X.imp.includes('lungs')?1:0)+(X.t67.length>=67?2:0);}
+function bstPer(){return X.t67.length>=67?2:1;}
+function boostFx(){tone(70,.25,'sawtooth',.12,0,140);burst(PL.x,PL.vis+.6,PL.z,18,.07,6,-4,.6);if(Math.random()<.3)floatText(pick(['💩 BOOST','💨','send it (literally)']),PL.x,PL.y+4,PL.z,'#e0a050');}
+// ---- a pad under every floating 67 and drop that no jump could reach, so the hook can get you there
+(function(){const pm=new THREE.MeshBasicMaterial({color:0xffd400,transparent:true,opacity:.75});
+  function ensurePad(x,y,z){if(y-groundH(x,z)<6)return;for(const p of platforms){if(p.top>-500&&Math.hypot(x-p.x,z-p.z)<p.r&&p.top<=y-.4&&p.top>=y-5)return;}
+    const m=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.2,.4,10),pm);m.position.set(x,y-1.8,z);scene.add(m);platforms.push({x,z,r:1.7,top:y-1.6});}
+  T67.forEach(t=>ensurePad(t.x,t.y,t.z));DROPS.forEach(d=>ensurePad(d.x,d.y,d.z));
+  CORES.forEach((c,k)=>{const a=Math.atan2(c.z-CL.z,c.x-CL.x),x=CL.x+Math.cos(a)*22,z=CL.z+Math.sin(a)*22;cloud(x,z,(CL.top+(c.y-2.2))/2-groundH(x,z),3.4);});})();
+// ---- MEME MOUNTAIN
+const MM={objs:[],plats:[],cp:null,b:640,H:0,t:0,crowd:[],won:false,bk:0,tst:0,re:0};
+const MMLINES=['ONE MILLION X','THE MOUNTAIN IS MEMES ALL THE WAY DOWN','first','67,000,000','MEME MOUNTAIN IS HIM','who reposted the mountain','the summit is a screenshot','RATIO x1,000,000','AURA OVERFLOW (fatal)','skibidi to the peak'];
+function coneR(h){return Math.max(6,34-28*(h/MM.H));}
+function mmAdd(o){scene.add(o);MM.objs.push(o);return o;}
+function mmBuild(){const r=mulberry(67676767),q=a=>a[Math.floor(r()*a.length)],b=MM.b,N=44;MM.H=N*3.4+1;MM.plats.length=0;
+  const cone=mmAdd(new THREE.Mesh(new THREE.CylinderGeometry(6,34,MM.H,28,10),rainbowMat));cone.userData.own=1;cone.position.set(0,b+MM.H/2,0);
+  for(let k=0;k<9;k++){const h=k/9*MM.H,t=mmAdd(new THREE.Mesh(Tor(coneR(h)+.3,.6,8,40),normalMat));t.userData.own=1;t.rotation.x=Math.PI/2;t.position.y=b+h;}
+  const base=mmAdd(new THREE.Mesh(new THREE.CylinderGeometry(48,40,3,40),MATS.ck));base.userData.own=1;base.position.set(0,b-1.5,0);const BP={x:0,z:0,r:48,top:b,mm:true};platforms.push(BP);MM.cp=BP;
+  for(let k=0;k<130;k++){const h=r()*MM.H,a=r()*TAU,R=coneR(h)+.6,s=r()<.65?emojiSprite(q(['💀','🗿','🔥','💯','🧠','🐸','6️⃣','7️⃣','💩','👁️','✋','🦐','🌽','📈','🤖','👑','✨','😂','🫠','🚐']),3+r()*6):textSprite(q(['67','SKIBIDI','OHIO','AURA','RATIO','BASED','NPC','SIGMA','RIZZ','first','L + RATIO','NO CAP','MEWING','BRUH','W']),1.5+r()*2,{color:q(['#ffd400','#ffffff','#b6ff00','#19e3ff','#ff2e88'])});
+    if(s.material.map&&!emojiCache[Object.keys(emojiCache).find(k2=>emojiCache[k2]===s.material.map)])s.userData.tex=1;s.position.set(Math.cos(a)*R,b+h,Math.sin(a)*R);mmAdd(s);}
+  let a=Math.PI/2;for(let i=0;i<N;i++){const top=b+3+i*3.4,R=coneR(top-b)+4.2+(i%2)*1.2,x=Math.cos(a)*R,z=Math.sin(a)*R,cp=i>0&&i%9===0,roll=r(),kind=cp||i<2?(cp?'cp':'n'):roll<.4?'n':roll<.55?'move':roll<.67?'vert':roll<.79?'blink':roll<.87?'bounce':'orbit',pr=cp?3.4:2.3;
+    const m=mmAdd(new THREE.Mesh(cp?new THREE.CylinderGeometry(pr,pr,1,20):new THREE.BoxGeometry(pr*1.6,1,pr*1.6),kind==='blink'?MATS.blink:kind==='bounce'?MATS.bounce:kind==='move'||kind==='orbit'?MATS.move:cp?rainbowMat:q([normalMat,MATS.ck,q(MATS.plain)])));m.userData.own=1;m.position.set(x,top-.5,z);
+    const P={x,z,ox:x,oz:z,r:pr,top,y0:top,kind,m,ph:r()*6,ax:-Math.sin(a),az:Math.cos(a),mm:true};platforms.push(P);MM.plats.push(P);
+    if(cp){const l=textSprite('CHECKPOINT · x1,000,000',.8,{color:'#ffd400'});l.userData.tex=1;l.position.set(x,top+2,z);mmAdd(l);}
+    if(r()<.18&&!cp){const fx=Math.cos(a+.3)*(R+5),fz=Math.sin(a+.3)*(R+5),f=mmAdd(new THREE.Mesh(new THREE.BoxGeometry(3.6,1,3.6),q(MATS.plain)));f.userData.own=1;f.position.set(fx,top-.5,fz);const l=textSprite('definitely real',.6,{color:'#ffd400'});l.userData.tex=1;l.position.set(fx,top+1.4,fz);mmAdd(l);}
+    a+=7.2/R;}
+  const st=b+MM.H+.5,sp={x:0,z:0,r:7,top:st,mm:true};platforms.push(sp);MM.sum=sp;const ped=mmAdd(new THREE.Mesh(new THREE.CylinderGeometry(7,6,1,24),new THREE.MeshPhongMaterial({color:0xffd400,shininess:120,emissive:0x664400})));ped.userData.own=1;ped.position.set(0,st-.5,0);
+  MM.post=mmAdd(emojiSprite('📜',7,false));MM.post.position.set(0,st+5,0);const pl=textSprite(['THE FIRST POST','it just says "first"'],1.6,{color:'#ffd400',fog:false});pl.userData.tex=1;pl.position.set(0,st+10.5,0);mmAdd(pl);
+  ['🗿','📖','🌟','🐸','🚐','👑','🤖','🐕','🧢','🔧'].forEach((e,k)=>{const s=mmAdd(emojiSprite(e,14,false));MM.crowd.push({s,a:k/10*TAU,h:20+k*13});});}
+function mmClear(){MM.objs.forEach(o=>{scene.remove(o);if(o.isMesh&&o.userData.own)o.geometry.dispose();if(o.isSprite&&o.userData.tex&&o.material.map)o.material.map.dispose();});MM.objs.length=0;MM.crowd.length=0;MM.plats.length=0;for(let i=platforms.length-1;i>=0;i--)if(platforms[i].mm)platforms.splice(i,1);}
+function mmIntro(){say([['sys','The grass is laughing. The grass was a meme too. The most reposted meme of all time. Touching it did not end the rot. It went viral.'],['algo','(from somewhere very far away) I TOLD YOU. I WAS THE FILTER.'],['sys','ROT LEVEL: 1,000,000x.'],
+  ['sys','Above Prompt Plaza, a mountain made of every meme ever posted has appeared. At the very top is the one thing that came before all of them: THE FIRST POST.'],['grok','GROK SEE MOUNTAIN. GROK SAY: CLIMB. GROK CANNOT CLIMB. GROK IS ROCK.'],['sys','Climb MEME MOUNTAIN. Big platforms are checkpoints. The hook, the dash and one poop boost per jump are allowed. The fall is not.']],mmEnter);}
+function mmEnter(){mmBuild();S.inMM=true;MM.t=0;MM.won=false;PL.x=0;PL.z=42;PL.y=PL.vis=MM.b+.3;PL.vy=PL.vx=PL.vz=0;cam.yaw=0;cam.pitch=.3;cam.manual=1;BST.c=bstMax();S.cells=S.max;
+  app.classList.add('r1k');$('r1k').hidden=false;setText('r1kn','ROT x1,000,000');$('r1k').querySelector('i').textContent='the final mission · meme mountain';AU.theme='r1k';R1K.heads.forEach(h=>h.visible=true);R1K.fov=camera.fov;flash(1,1500);SFX.boom();S.zone='';chapter('THE FINAL MISSION','MEME MOUNTAIN');}
+function mmEnd(){mmClear();S.inMM=false;app.classList.remove('r1k','disco','fry');$('r1k').hidden=true;$('r1k').querySelector('i').textContent='the filter is gone';R1K.rain.forEach(r=>r.s.visible=false);R1K.heads.forEach(h=>h.visible=false);camera.fov=R1K.fov;camera.updateProjectionMatrix();AU.theme=S.zone;}
+function mmWin(){if(MM.won)return;MM.won=true;X.mm=1;addAura(67000000,PL.x,PL.y+5,PL.z);SFX.win();flash(1,2500);save();
+  say([['sys','You reach the top of MEME MOUNTAIN. At the very peak is THE FIRST POST. It just says "first".'],['grok','GROK SEE FIRST POST. GROK UNDERSTAND EVERYTHING NOW. IT SAYS FIRST.'],['fable','The original meme. Everything else was a repost. Including us. Including this sentence.'],['astra','✨ i generated all of it. i am so sorry. i am also so proud ✨'],
+    ['marcus','BRO. ONE MILLION X. SEND IT.'],['derek','...Bro.'],['bibi','I WOULD LIKE TO TAKE CREDIT FOR THE MOUNTAIN.'],['frog','ribbit. based. ...the most based.'],['sys','You touch THE FIRST POST. The rot drops from 1,000,000x to 1x in a single frame. It was always just a post. Everyone else was replying.']],()=>{mmEnd();PL.x=0;PL.z=9;PL.y=PL.vis=.2;PL.vy=0;oWin();});}
+function mmTarget(){const n=MM.plats.find(p=>p.y0>PL.y+.5);return n?{x:n.x,z:n.z,l:'MEME MOUNTAIN · '+Math.max(0,Math.round(MM.sum.top-PL.y))+'m to the first post'}:{x:0,z:0,l:'THE FIRST POST'};}
+function mmUpdate(dt,play){MM.t+=dt;const t=MM.t,b=MM.b;U.time.value=S.t*12;camera.fov=R1K.fov+Math.sin(t*1.7)*4;camera.updateProjectionMatrix();scene.fog.color.setHSL((t*.3)%1,1,.55);U.fogColor.value.copy(scene.fog.color);
+  if(PL.y>b-1&&PL.y<b+MM.H){const R=coneR(PL.y-b)+.8,d=Math.hypot(PL.x,PL.z);if(d<R&&d>.01){PL.x*=R/d;PL.z*=R/d;}}
+  for(const P of MM.plats){const on=PL.grounded&&Math.abs(PL.y-P.top)<.12&&Math.hypot(PL.x-P.x,PL.z-P.z)<P.r+.2;
+    if(P.kind==='move'){const k=Math.sin(t*1.3+P.ph)*2.4,nx=P.ox+P.ax*k,nz=P.oz+P.az*k;if(on){PL.x+=nx-P.x;PL.z+=nz-P.z;}P.x=nx;P.z=nz;P.m.position.x=nx;P.m.position.z=nz;}
+    else if(P.kind==='orbit'){const a=t*1.1+P.ph,nx=P.ox+Math.cos(a)*2.4,nz=P.oz+Math.sin(a)*2.4;if(on){PL.x+=nx-P.x;PL.z+=nz-P.z;}P.x=nx;P.z=nz;P.m.position.x=nx;P.m.position.z=nz;}
+    else if(P.kind==='vert'){const nt=P.y0+Math.sin(t*1.1+P.ph)*2.2;if(on){PL.y+=nt-P.top;PL.vis=PL.y;}P.top=nt;P.m.position.y=nt-.5;}
+    else if(P.kind==='blink'){const ph=(t+P.ph)%3.4,solid=ph<2.3;P.top=solid?P.y0:-999;P.m.visible=solid&&!(ph>1.8&&Math.floor(t*16)%2);}
+    else if(P.kind==='bounce'&&on){PL.vy=26;PL.grounded=false;PL.jumps=1;tone(240,.3,'sine',.12,0,900);}
+    else if(P.kind==='cp'&&on&&MM.cp!==P){MM.cp=P;addAura(6700000,PL.x,PL.y+4,PL.z);toast('🏔️ CHECKPOINT · +6,700,000 aura (x1,000,000)');SFX.page();}}
+  if(play&&PL.y<b-25){const c=MM.cp;PL.x=c===MM.plats[0]?0:c.x;PL.z=c.x===0&&c.z===0?42:c.z;PL.y=PL.vis=c.top+.3;PL.vy=PL.vx=PL.vz=0;tone(110,.4,'sawtooth',.1,0,50);toast(pick(['💀 the mountain does not care','💀 fell off a meme','💀 respawned at the last checkpoint (x1,000,000)','💀 skill issue x1,000,000']));}
+  if(play&&!MM.won&&PL.grounded&&Math.abs(PL.y-MM.sum.top)<.2&&Math.hypot(PL.x,PL.z)<7)mmWin();
+  MM.post.material.rotation=Math.sin(t*2)*.3;MM.crowd.forEach((c,k)=>{const a=c.a+t*.2;c.s.position.set(Math.cos(a)*70,b+c.h+Math.sin(t+k)*4,Math.sin(a)*70);c.s.material.rotation=Math.sin(t*2+k)*.4;});
+  R1K.rain.forEach(r=>{if(!r.s.visible||r.s.position.y<PL.y-10){r.s.visible=true;r.s.material.map=emojiTex(pick(['🗿','💀','🔥','💯','🧠','🐸','6️⃣','7️⃣','💩','👁️','✋','🦐','🌽','📈','🤖','👑','✨','😂']));r.s.material.needsUpdate=true;r.s.position.set(PL.x+(Math.random()-.5)*60,PL.y+20+Math.random()*25,PL.z+(Math.random()-.5)*60);r.v=8+Math.random()*16;r.s.scale.setScalar(1.5+Math.random()*4);}r.s.position.y-=r.v*dt;r.s.material.rotation+=dt*5;});
+  R1K.heads.forEach((h,k)=>{const a=t*.25+k/R1K.heads.length*TAU;h.position.set(Math.cos(a)*130,PL.y+50+Math.sin(t*1.3+k)*14,Math.sin(a)*130);h.material.rotation=Math.sin(t*2+k)*.6;h.scale.setScalar(40+Math.sin(t*3+k)*14);});
+  MM.re-=dt;if(MM.re<=0){MM.re=.5;heroRegen(true);}if(!play)return;
+  MM.bk-=dt;if(MM.bk<=0){MM.bk=.7;const c=pick(MM.crowd);if(c)bubble(pick(MMLINES.concat(R1KLINES)),c.s.position.x,c.s.position.y-8,c.s.position.z);}
+  MM.tst-=dt;if(MM.tst<=0){MM.tst=3;toast(pick(Math.random()<.5?CHAT:ADS));}}
+const MMSHOT=()=>[60,MM.b+40,60,0,MM.b+70,0];
+// ---- hooks
+{const ct=compassTarget;compassTarget=function(){if(S.inMM)return mmTarget();return ct();};}
+{const ar=act7Rows;act7Rows=function(){const r=ar();return S.inMM?[['mm','🏔️ CLIMB MEME MOUNTAIN · '+Math.max(0,Math.round(MM.sum.top-PL.y))+'m to go',false]].concat(r):r;};}
+{const au=act7Update;act7Update=function(dt,wdt,play,active){au(dt,wdt,play,active);BST.c=Math.min(bstMax(),BST.c+dt*(X.t67.length>=67?.5:.25));if(S.inMM)mmUpdate(dt,play);};}
+{const ar=act7Reset;act7Reset=function(){ar();if(S.inMM){mmClear();S.inMM=false;}BST.c=bstMax();};}
+ACH.push(['mm','Meme Mountaineer','touched THE FIRST POST at x1,000,000',()=>!!X.mm]);
+
+
 /* ================= game flow ================= */
 function resetGame(d){Object.assign(X,X0(),d&&d.x||{});if(X.erin===2)X.erin=1;X.c=Object.assign(X0().c,X.c);S.max=maxCells();S.aura=d?d.aura:0;S.total=S.aura;S.relics=d?d.relics:{grok:false,fable:false,astra:false};S.kills=d?d.kills:0;S.pages=d?d.pages:[0,0,0,0,0,0];S.deaths=d&&d.deaths||0;S.cells=S.max;S.inBoss=false;S.dead=0;S.track=null;S.zone='';S.won=false;S.orbCount=0;
   boss.active=false;boss.g.visible=false;boss.hp=0;bb.forEach(b=>{b.life=0;b.m.visible=false;});bullets.forEach(b=>{b.life=0;b.m.visible=false;});
   PL.x=0;PL.z=9;PL.y=PL.vis=.15;PL.vx=PL.vy=PL.vz=PL.kx=PL.kz=0;PL.face=Math.PI;PL.inv=0;cam.yaw=0;cam.pitch=.3;cam.t.set(0,3,9);
   resetOrbs();spawnWorldEnemies();syncWorld();xReset();hudCache={};$('bossbar').hidden=true;$('hud').classList.remove('boss');$('ratio').hidden=true;$('dialog').hidden=true;}
 function begin(d){audioInit();$('title').hidden=true;$('end').hidden=true;$('hud').hidden=false;resetGame(d);S.mode='play';flash(.9,700);
-  const h=$('hint');h.textContent=app.classList.contains('touchy')?'left thumb: move · right thumb: look · hold JUMP to fly · ⏩ dash · 🪝 hook · 🔄 transform':'WASD move · drag to look · SPACE jump/fly · F blast · E yap · R pose · SHIFT dash · G hook · T transform';h.style.opacity=1;setTimeout(()=>h.style.opacity=0,9000);
+  const h=$('hint');h.textContent=app.classList.contains('touchy')?'left thumb: move · right thumb: look · hold JUMP for a 💩 boost · ⏩ dash · 🪝 hook · 🔄 transform':'WASD move · drag to look · SPACE jump (hold: 💩 boost) · F blast · E yap · R pose · SHIFT dash · G hook · T transform';h.style.opacity=1;setTimeout(()=>h.style.opacity=0,9000);
   if(d){toast('↻ Save loaded. Your aura remembers.');if(allRelics())S.track='portal';}else say(OPENING(),()=>{X.ch=1;chapter('CHAPTER 1','SKILL ISSUE');toast('Tip: tap a quest to track it');});}
 $('play').addEventListener('click',()=>{clearSave();begin(null);});
 const sv=loadSave();if(sv){$('cont').hidden=false;$('cont').addEventListener('click',()=>begin(loadSave()));}
@@ -2553,7 +2621,7 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,Math.max(
   else updateOrbs(dt,false);
   updateWorld(dt);updateCamera(dt);music();renderer.render(scene,camera);}
 requestAnimationFrame(frame);
-window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
+window.__gfa={S,PL,boss,enemies,cam,relics,pages,platforms,TOP,ZONES,groundH,takeRelic,enterBoss,hitBoss,begin,X,VAN,BOT,LOU,TALK,npcs,AREAS,LEAKS,VALVES,GAR,hitBottie,closeValve,enterVan,exitVan,syncX,shards,STILL,MEAL,BUD,SPOTS,FRAGS,PADS,ISLE,SPR,HERO,readFrag,catchBud,heroRegen,storyBeat,touchGrass,CH,ROT,pressButton,gangAssist,rotMoments,showAd,BTN,say,killEnemy,MM,BST,mmEnter,mmWin,mmIntro,bstMax,R1K,CRS,GLS,GL,EVT,FORM,HK,DSH,GP,transform,dash,hook,evStart,evEnd,glitchBuild,glitchCore,fetchGive,fetchAsk,crsSync,DROPS,RS,ISL,ISC,SHR,SIM,takeDrop,readFile,openVault,simEnter,simExit,simGen,redSync,startRot1000,endRot1000,GRASS,FR,COOK,cookPause,cookUpload,mirrorLook,cookTalk,rateBy,rateShift,COIN,buyCourse,eatSushi,tithe,openCoin,MS,startMission,winMission,failMission,openLog,ACH,orbs,T67,CORES,CL,CLOUDS,PO,hitCore,inp,SM,slopEnter,slopExit,genSlop,poseStart,buyImplant,IMPL,dropData,DATA,MD,MACH,STG,CROPS,OUT,infect,openShop,dumpData,FAC,CHR,AF,SC,TERM,SMP,tierN,mdSync};
 }
 })();
 </script>
