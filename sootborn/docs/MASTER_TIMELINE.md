@@ -122,6 +122,7 @@ Each beat: **Card** (exact text: TITLE / sub) · **In** (transition) · **Trigge
 - Card: **THAT NIGHT** / *He does not dream of the furnace. For once it runs forward.* In: CUT. Trigger: he lies down in the bunk Seren painted.
 - Context: the dreams now run in order, a little further each night. This night covers his remaking and his training.
 - 5a: **HALF A YEAR AFTER THE FURNACE** / *A sealed pump room under Tier Six. The Table.* (In: PAGE) — the Table, the Gilding as a drawn sequence (comic, `gild`). Out: PAGE.
+  - **The Gilding is shown once, here, and only as a flash forward.** The present never plays it: at The Way Out (10) Ilse comes to fetch him ("One does not keep the table waiting") and the present ends at the door. Don't build a second Gilding scene. The `gild` picture also comes back as a memory image (in the training dreams and the second wind); that is a picture, not the scene.
 - 5b: **TWO YEARS AFTER THE FURNACE** / *A sealed pump room. Brand.* — the lesson with the slate; **the Drill** (2D).
 - 5c: **TWO AND A HALF YEARS AFTER THE FURNACE** / *The pit. Brand. No gloves.* — **No Gloves** (2D).
 - 5d: *Three years of that.* / *Then they sent him up Lift Zero under a dead boy's name, into the Assay.* Out: STRIP.
@@ -168,7 +169,7 @@ Each beat: **Card** (exact text: TITLE / sub) · **In** (transition) · **Trigge
 **10. The Way Out**
 - Card: **THE WAY OUT** / *One hundred and sixty days after the furnace.* In: WAKE.
 - Context: four months on. He leaves Cinderwell; that is how the Gilding (half a year after) can happen.
-- Plays: the months, Mara, **the Way Out** (2D, Proctor Sull and the night watch), Ilse.
+- Plays: the months, Mara, **the Way Out** (2D, Proctor Sull and the night watch), Ilse. **Callback:** when Ilse says "One does not keep the table waiting", one beat of the Table's first picture (PAGE in and out), so the player ties the dream from Ashgate night to this door. That is the only time the Gilding touches the present.
 - 10a: **THAT NIGHT** / *The last dream below. It runs to the end.* Trigger: the lift's light going up. Out: STRIP.
 - 10b: **FOUR YEARS AFTER THE FURNACE** / *The Assay. Day forty.* — **the Valley** (3D; now with the boots and the white cloak). Build: CHANGE (moved from the cold open).
 - 10c: **NIGHT FORTY-NINE** / *The Assay. The night before the last day.* — **the Last Night** (2D level).
