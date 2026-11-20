@@ -787,7 +787,7 @@
       if (o.dot || ab.type === 'aura') return false;
       if (tgt.dodgeStart != null && time - tgt.dodgeStart < 0.15 && !tgt.perfect) {
         tgt.perfect = 1; tgt.dodgeT = 0; tgt.res = Math.min(100, tgt.res + 14); setBuff(tgt, 'dmg', 2.5, 0.3); hitstop = Math.max(hitstop, 0.14);
-        text(tgt, 'PERFECT DODGE', '#9fe8ff', true); G.sfx('perfect'); if (tgt.isPlayer) addHype(18); spark(tgt.x, tgt.y, 30, '#9fe8ff', 14, 200);
+        if (G.edge) G.edge.gain(tgt, 'dodge'); text(tgt, 'PERFECT DODGE', '#9fe8ff', true); G.sfx('perfect'); if (tgt.isPlayer) addHype(18); spark(tgt.x, tgt.y, 30, '#9fe8ff', 14, 200);
       } else text(tgt, 'DODGED', '#9fe8ff');
       if (tgt.isPlayer && !tgt.dodgeCredit) { addHype(10); tgt.dodgeCredit = 1; }
       return false;
@@ -814,7 +814,7 @@
         poiseHit(tgt, o.proj ? 0 : 9, att);                  // a bolt on the shield costs little; a blade on it costs more
         if (tgt.isPlayer) { tgt.res = Math.max(0, tgt.res - (o.proj ? 3 : 9)); if (counted()) G.deeds.bump('block'); if (tgt.res <= 0) { tgt.guard = 0; tgt.st.stun = { t: 0.6 }; text(tgt, 'GUARD CRUSHED', '#ff7a6a', true); G.sfx('stun'); return false; } }
         if (tgt.guardHits >= (tgt.isPlayer ? 3 : 2)) {
-          tgt.guard = 0; tgt.think = 0; text(att, 'PARRIED!', '#ff7a6a', true); att.st.stun = { t: 0.65 }; interrupt(att); G.sfx('stun'); shake = Math.max(shake, 6);
+          tgt.guard = 0; tgt.think = 0; text(att, 'PARRIED!', '#ff7a6a', true); if (G.edge) G.edge.gain(tgt, 'parry'); att.st.stun = { t: 0.65 }; interrupt(att); G.sfx('stun'); shake = Math.max(shake, 6);
           const pa = Math.atan2(att.y - tgt.y, att.x - tgt.x); att.kx = Math.cos(pa) * 150; att.ky = Math.sin(pa) * 150; if (att.isPlayer) addHype(-8);
         }
         return false;
@@ -830,6 +830,7 @@
     let mul = att.d.dmgMul * (1 + (att.buffs.dmg ? att.buffs.dmg.amt : 0)) * (o.power || 1) * (ab.pow || 1) * (att.mast && (ab.basic || ab.heavy) ? 1 + att.mast * 0.03 : 1) * (tgt.st.broken ? 1.35 : 1) * (tgt.st.winded ? 1.15 : 1);
     if (ab.execute && tgt.hp / tgt.maxHp < 0.4) mul *= 2;
     if (ab.exe && tgt.hp / tgt.maxHp < 0.35) mul *= 1 + ab.exe; if (ab.opener && tgt.hp / tgt.maxHp > 0.85) mul *= 1 + ab.opener; if (ab.vsReel && (tgt.st.slow || tgt.st.stun || tgt.st.broken)) mul *= 1 + ab.vsReel;       // what the weapon in your hand is good at
+    const edg = G.edge && ab.type !== 'aura' && !o.dot ? G.edge.pre(att, tgt, ab) : null; if (edg) { mul *= edg.mul || 1; if (edg.crit) crit = true; }
     if (crit) mul *= att.d.critMul;
     if (tgt.st.mark) mul *= 1.25;
     if (att.d.tactical && (tgt.st.stun || tgt.st.slow)) mul *= 1.3;
@@ -844,7 +845,7 @@
     if (ab.leech && ab.type !== 'aura' && !o.dot && att.hp > 0) att.hp = Math.min(att.maxHp, att.hp + Math.max(1, Math.round(dmg * ab.leech)));
     if (tgt.shield > 0) { const a = Math.min(tgt.shield, dmg); tgt.shield -= a; dmg -= a; if (a) text(tgt, 'WARD -' + a, '#ffe9a0'); }
     if (dmg > 0) {
-      tgt.hp -= dmg; att.dmgDealt += dmg;
+      tgt.hp -= dmg; att.dmgDealt += dmg; if (G.edge && ab.type !== 'aura' && !o.dot) G.edge.post(att, tgt, ab, dmg, edg);
       text(tgt, (sneak ? 'SNEAK ' : '') + dmg + (crit ? '!' : ''), crit ? '#ffd23c' : (tgt.isPlayer ? '#ff7a6a' : '#ffffff'), crit);
     }
     if (tag && att.isPlayer) { text(tgt, tag, '#ffd23c', true); addHype(6); }
@@ -972,6 +973,7 @@
   }
   function fire(e) {
     const act = e.act, ab = act.ab, foe = e.foe, a = act.aim;
+    if (G.edge && (ab.spell || ab.type === 'proj' || ab.type === 'aoe' || ab.type === 'line')) G.edge.gain(e, 'cast');
     if (ab.eggFx && G.eggFx) { try { G.eggFx(ab.eggFx, e, foe, a, ab); } catch (err) { } }
     if (ab.type === 'melee') {
       const fin = act.fin, rng = ab.range * (fin ? 1.2 : 1), d = Math.hypot(foe.x - e.x, foe.y - e.y), ta = Math.atan2(foe.y - e.y, foe.x - e.x), arc = ab.arc * Math.PI / 180 * (fin ? 1.5 : 1);
@@ -1437,6 +1439,7 @@
 
   F.hitTest = (a2, t2, ab2, o2) => hit(a2, t2, ab2, o2 || {});
   F.eggApi = { hit, text, spark, blood, mark, sever, S, fx: o => fx.push(o), shake: v => { shake = Math.max(shake, v); }, stop: v => { hitstop = Math.max(hitstop, v); }, alive: e => e && e.hp > 0 && phase === 'fight' };
+  F.edgeApi = { text, heal, setBuff: (e, k, t, a) => setBuff(e, k, t, a), knockdown: (e, t) => knockdown(e, t), spark, S, fx: o => fx.push(o) };
   F.koEntity = e => ko(e); F.inFight = () => phase === 'fight';
   F.forfeit = function () { if (!F.active) return; result = { win: false, forfeit: true }; F.active = false; F.paused = false; G.ui.banner(null); finish(); };
 

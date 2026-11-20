@@ -901,3 +901,8 @@ body.lowq #panel { -webkit-backdrop-filter: none; backdrop-filter: none; }
 .eg-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; } .eg-chips .chip { font-size: 0.74rem; padding: 0.3rem 0.55rem; } .eg-chips .chip.ult { border-color: var(--gold); color: var(--gold); } .eg-chips .chip.sel { background: rgba(240, 201, 90, 0.2); }
 .eg-desc { min-height: 3.4em; margin: 0.5rem 0 0; font-size: 0.8rem; line-height: 1.3; } .eg-desc b { color: #f0e6d0; }
 button.saveslot.egslot { width: 100%; text-align: left; display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; } .danger-tag { color: #ff8a7a; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid #a03a30; padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
+/* the edge: five pips under the stamina bar */
+#hud .edge { display: flex; align-items: center; gap: 3px; margin-top: 3px; } #hud .edge b { font-size: 0.56rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ec); margin-right: 4px; opacity: 0.85; font-weight: 600; }
+#hud .edge i { width: 9px; height: 9px; transform: rotate(45deg); border: 1px solid var(--ec); background: rgba(0, 0, 0, 0.45); } #hud .edge i.on { background: var(--ec); box-shadow: 0 0 5px var(--ec); }
+#hud .edge.full i { animation: edgeP 0.6s ease-in-out infinite alternate; } @keyframes edgeP { to { box-shadow: 0 0 10px var(--ec); } } #hudE .edge { flex-direction: row-reverse; } #hudE .edge b { margin: 0 0 0 4px; }
+.edge-note h3 { margin-top: 0.8rem; }
