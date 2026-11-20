@@ -69,6 +69,18 @@
     hellfire: f('M12 2c3 4 7 7 7 12a7 7 0 0 1-14 0c0-4 3-6 4-8 0 2 1 4 2 4 0-3 0-6 1-8z') + f('M5 2l3 5-4-1z M19 2l-3 5 4-1z'),
     whispers: s('M3 6c4-3 10-3 14 0 M5 11c3-2 8-2 11 0 M7 16c2-1 5-1 7 0', 2) + c(19, 18, 2.5),
     dark_pact: f('M5 2h11l3 3v17H5z') + '<g fill="#000" opacity="0.45">' + f('M8 7h8v1.5H8z M8 10h8v1.5H8z M8 13h5v1.5H8z') + '</g>' + c(15, 18, 2.6),
+    bull_rush: f('M3 9h7l3-4 3 4v4l-3 5H8l-5-3z') + s('M17 7h5 M18 11h5 M17 15h5', 1.8),
+    hamstring: s('M5 3l3 9-2 9 M14 3l-1 9 3 9', 2.2) + s('M2 14l20-3', 2.6),
+    gut_cut: '<g transform="rotate(-60 12 12)">' + f(DAG) + '</g>' + f('M15 15c0 0 2 3 2 4.5a2 2 0 0 1-4 0c0-1.5 2-4.5 2-4.5z M19 12c0 0 1.5 2 1.5 3a1.5 1.5 0 0 1-3 0c0-1 1.5-3 1.5-3z'),
+    tumble: s('M18 12a6 6 0 1 1-6-6', 2.6) + f('M10 2l5 4-6 2z') + s('M2 20h8', 1.6),
+    thunderwave: c(5, 12, 3) + s('M10 6c3 3 3 9 0 12 M14 3c5 5 5 13 0 18 M18 1c6 6 6 16 0 22', 2),
+    scorching_ray: s('M2 20L20 4', 2.8) + f('M17 2c3 1 5 3 5 6-2-1-3-1-4-1 1-2 0-4-1-5z') + s('M4 14l6-6 M8 20l6-6', 1.4),
+    spirit_hammer: f('M7 3h10v6H7z M11 9h2v12h-2z') + s('M3 4l2 2 M21 4l-2 2 M3 10h2 M21 10h-2', 1.6),
+    sanctuary: f('M12 2l9 5v1H3V7z M5 9h2v10H5z M11 9h2v10h-2z M17 9h2v10h-2z M3 20h18v2H3z'),
+    ice_knife: '<g transform="rotate(45 12 12)">' + f('M12 1l3 6-3 15-3-15z') + '</g>' + s('M3 3l3 3 M2 9h4', 1.4),
+    entangle: s('M3 22c1-6 6-6 5-12 M12 22c0-7 4-8 2-14 M20 22c-1-5-5-7-3-12', 2.2) + f('M7 9l-3-2 3-1z M14 7l2-3 1 3z M17 9l3-1-1 3z'),
+    void_rift: '<ellipse cx="12" cy="16" rx="10" ry="4"/>' + '<g fill="#000" opacity="0.6"><ellipse cx="12" cy="16" rx="6.5" ry="2.4"/></g>' + s('M7 12c0-4 2-6 1-10 M12 11c0-4 2-6 0-9 M17 12c0-4-2-6 0-10', 1.6),
+    fade_out: f('M12 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z M8 10h8l1 6-3 1v5h-4v-5l-3-1z') + '<g opacity="0.5">' + s('M3 6v12 M21 6v12', 1.4) + '</g>',
     shadow_ward: f('M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z') + '<g fill="#000" opacity="0.55">' + f('M14 6a5 5 0 1 0 2 9 4 4 0 1 1-2-9z') + '</g>'
   };
   // a signature weapon move takes the shape of how it moves
